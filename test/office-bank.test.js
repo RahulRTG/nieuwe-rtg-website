@@ -42,7 +42,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorKoppelBody } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-officebank-'));
 const CODE = 'KANTOOR-OFFICEBANK';
@@ -85,7 +85,7 @@ test.before(async () => {
   const med = await api('auth/register', { name: 'Bankmedewerker', email: 'obm' + w + '@x.nl',
     phone: '06' + w.slice(0, 8), password: 'geheim12345', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
   assert.ok(med.body.token, 'de kantoormedewerker heeft een eigen account');
-  const kop = await api('account/koppel', { soort: 'kantoor', code: CODE }, med.body.token);
+  const kop = await api('account/koppel', await kantoorKoppelBody(base, med.body.token), med.body.token);
   assert.equal(kop.status, 200, 'en koppelt de kantoorrol: ' + JSON.stringify(kop.body).slice(0, 140));
   opNaam = (await api('account/start', { rol: 'kantoor' }, med.body.token)).body.token;
   assert.ok(opNaam, 'en staat op naam in de backoffice');
@@ -97,7 +97,7 @@ test.before(async () => {
   const med2 = await api('auth/register', { name: 'Bankmedewerker twee', email: 'obm2' + w2 + '@x.nl',
     phone: '06' + w2.slice(0, 8), password: 'geheim12345', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
   assert.ok(med2.body.token, 'de tweede kantoormedewerker heeft een eigen account');
-  const kop2 = await api('account/koppel', { soort: 'kantoor', code: CODE }, med2.body.token);
+  const kop2 = await api('account/koppel', await kantoorKoppelBody(base, med2.body.token), med2.body.token);
   assert.equal(kop2.status, 200, 'en koppelt de kantoorrol: ' + JSON.stringify(kop2.body).slice(0, 140));
   opNaam2 = (await api('account/start', { rol: 'kantoor' }, med2.body.token)).body.token;
   assert.ok(opNaam2, 'en staat ook op naam in de backoffice');

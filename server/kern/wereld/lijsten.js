@@ -9,10 +9,15 @@
 
    EN WAT DIT BEWUST NIET IS. In rechten.js stonden ook `werving.suite` en
    `sales.suite` -- ATS, interviews, assessments, contracten, CRM,
-   account-intelligence. Die zijn NIET gebouwd, en die namen zijn daarom uit de
+   account-intelligence. Die waren NIET gebouwd, en die namen zijn daarom uit de
    lijst gehaald in plaats van hier half te worden aangezet. Een half aangezette
    wervingslaag is gevaarlijker dan een afwezige: iemand gaat er sollicitanten
    in bewaren en denkt dat er een proces omheen staat.
+
+   `werving.suite` is terug sinds 23 september 2026, toen de keten van vacature
+   tot loon rond was (ARBEID.md par. 7a) -- als BESCHRIJVEND in rechten.js, met
+   de reden erbij, en NIET hier: de suite woont bij de zaak, en deze lijst is
+   nog steeds alleen de talentpool. `sales.suite` blijft weg.
 
    Wat er wel is, is de kern die je zonder dat alles al nodig hebt: iemand
    onthouden die je tegenkwam, met waarom.

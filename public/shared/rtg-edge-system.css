@@ -97,9 +97,7 @@ body.rtg-edge-host{margin:0;min-width:320px;padding-top:calc(var(--edge-top) + e
 
 .rtg-edge-workspaces{display:grid;gap:1px}.rtg-edge-workspaces button{min-width:44px;min-height:44px;padding:0 10px;border-top:1px solid var(--edge-line);color:var(--edge-dim);text-align:left;font-size:11px;letter-spacing:.05em}.rtg-edge-workspaces button:hover,.rtg-edge-workspaces button:focus-visible{color:var(--edge-copy);background:linear-gradient(90deg,var(--edge-accent-soft),transparent);outline:0}.rtg-edge-workspaces [data-edge-bewaar]{color:var(--edge-metal)}
 
-body.rtg-edge-fold .rtg-edge-top{transform:translateY(-100%)}body.rtg-edge-fold .rtg-edge-side{transform:translateX(-100%)}body.rtg-edge-fold{padding-top:0!important;padding-left:0!important}
 body.rtg-edge-workspace{padding:0!important;background:var(--edge-bg)!important}body.rtg-edge-workspace .rtg-werkruimte{inset:calc(var(--edge-top) + env(safe-area-inset-top,0px)) 0 calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px)) var(--edge-side)!important;background:radial-gradient(circle at 70% 20%,var(--edge-accent-soft),transparent 28%),var(--edge-bg)!important}
-body.rtg-edge-workspace.rtg-edge-fold .rtg-werkruimte{inset:0 0 calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px)) 0!important}
 body.rtg-edge-host .mgz-blok:not(.rtg-edge-ai-panel .mgz-blok),body.rtg-edge-host>.lo-rahul{display:none!important}
 
 /* De oude wereld-chrome verdwijnt pas wanneer de nieuwe schil actief is. */

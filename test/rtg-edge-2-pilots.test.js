@@ -213,13 +213,16 @@ test('een iframe zonder embed-query krijgt evenmin een geneste Edge of Edge2', (
   assert.ok(SYSTEM.indexOf('if(inKader ||') < SYSTEM.indexOf("className = 'rtg-edge-chrome'"));
 });
 
-function werkRoute(hash) {
-  const attrs = new Map([
+function werkRoute(hash, opties = {}) {
+  const attrs = new Map(opties.begin || [
     ['data-rtg-vandaag-surface', 'projecten'],
     ['data-rtg-edge-2-state', 'overview'],
     ['data-rtg-edge-2-auto', 'true']
   ]);
-  let geklikt = null;
+  let geklikt = null, wissel = null;
+  const location = { hash };
+  const window = { addEventListener: (soort, f) => { if (soort === 'hashchange') wissel = f; } };
+  if (opties.edge2) window.RTGEdge2 = opties.edge2;
   const document = {
     body: {
       getAttribute: naam => attrs.has(naam) ? attrs.get(naam) : null,
@@ -229,11 +232,11 @@ function werkRoute(hash) {
     getElementById: id => id === 'inhoud' ? { hidden: false } : null,
     querySelector: selector => ({ click: () => { geklikt = selector; } })
   };
-  vm.runInNewContext(WORK_ENTRY, {
-    document, location: { hash }, window: { addEventListener: () => {} },
-    decodeURIComponent, Object, String
-  });
-  return { attrs, geklikt };
+  vm.runInNewContext(WORK_ENTRY, { document, location, window, decodeURIComponent, Object, String });
+  return {
+    attrs, get geklikt() { return geklikt; },
+    wissel: nieuw => { location.hash = nieuw; wissel({ type: 'hashchange' }); }
+  };
 }
 
 test('alleen de whitelisted Work-projectenroute wordt een surface met zichtbare autorand', () => {
@@ -248,6 +251,47 @@ test('alleen de whitelisted Work-projectenroute wordt een surface met zichtbare 
     assert.equal(ander.attrs.get('data-rtg-edge-2-state'), 'overview', hash);
     assert.equal(ander.attrs.get('data-rtg-edge-2-auto'), 'true', hash);
   }
+});
+
+/* EEN HASHWISSEL IS GEEN START (EDGE.md, ronde 2). Bij een wissel draait Edge 2
+   al, en dezelfde attributen die bij het laden de verklaring zijn, las Edge 2
+   daar als een nieuwe start: een handmatige keuze Compact werd stil 'auto'. De
+   wissel gaat daarom langs de poort van de eigenaar, als automatiek; die poort
+   laat een keuze van de mens staan (de e2e in rtg-edge-2.e2e.js bewijst dat).
+   Deze toets houdt de VORM vast: laden schrijft de verklaring, een wissel met
+   Edge 2 vraagt de poort en raakt de stand op body niet, een wissel zonder
+   Edge 2 blijft de verklaring.
+
+   DE MUTATIES, elk nagetrokken: zet de twee attribuutregels terug in het pad
+   van de wissel (de stand op body springt terug naar overview), laat `source`
+   weg bij setState (de poort krijgt een keuze van de mens in plaats van
+   automatiek), en schrijf bij het laden niets (de verklaring ontbreekt). */
+test('een hashwissel in Work vraagt de Edge 2-poort als automatiek en laat de stand op body staan', () => {
+  const vragen = [];
+  const edge2 = { setState: (stand, opties) => { vragen.push([stand, Object.assign({}, opties)]); return true; } };
+  const begin = [['data-rtg-vandaag-surface', 'projecten'], ['data-rtg-edge-2-state', 'compact']];
+
+  const werk = werkRoute('#projecten', { begin, edge2 });
+  assert.equal(werk.attrs.get('data-rtg-edge-2-state'), 'overview', 'het laden schrijft de verklaring');
+  assert.equal(werk.attrs.get('data-rtg-edge-2-auto'), 'true', 'het laden schrijft de verklaring');
+  assert.deepEqual(vragen, [], 'het laden is geen wissel en vraagt de poort niet');
+
+  /* De mens koos Compact; Edge 2 zette dat zelf op body en haalde auto weg. */
+  werk.attrs.set('data-rtg-edge-2-state', 'compact');
+  werk.attrs.delete('data-rtg-edge-2-auto');
+  werk.wissel('#people');
+  assert.deepEqual(vragen, [['overview', { source: 'auto' }]], 'de wissel vraagt de poort als automatiek');
+  assert.equal(werk.attrs.get('data-rtg-edge-2-state'), 'compact', 'de wissel schrijft de stand niet zelf');
+  assert.equal(werk.attrs.has('data-rtg-edge-2-auto'), false, 'de wissel zet de automatiek niet terug');
+  assert.equal(werk.attrs.has('data-rtg-vandaag-luxe'), false, 'de wereldkop volgt de route nog wel');
+  assert.equal(werk.geklikt, '[data-wk="people"]', 'het paneel volgt de route nog wel');
+
+  const zonder = werkRoute('#projecten', { begin });
+  zonder.attrs.set('data-rtg-edge-2-state', 'compact');
+  zonder.attrs.delete('data-rtg-edge-2-auto');
+  zonder.wissel('#people');
+  assert.equal(zonder.attrs.get('data-rtg-edge-2-state'), 'overview', 'zonder Edge 2 blijft een wissel de verklaring');
+  assert.equal(zonder.attrs.get('data-rtg-edge-2-auto'), 'true', 'zonder Edge 2 blijft een wissel de verklaring');
 });
 
 function foundationModus(modus) {

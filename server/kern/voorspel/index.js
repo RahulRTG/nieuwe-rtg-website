@@ -5,15 +5,16 @@
 
    Het leren is bewust doorzichtig (geen zwarte doos): per gewoonte tellen
    we hoe vaak, het gebruikelijke uur en de gebruikelijke dag, en het
-   gemiddelde aantal dagen ertussen. De zekerheid groeit met het aantal
-   waarnemingen en met hoe "rijp" het volgende bezoek is. Bij te weinig
+   gemiddelde aantal dagen ertussen, en die delen gaan als `opbouw` mee in
+   plaats van samen te smelten tot een ongeijkt cijfer (ARBEID.md par. 4 punt
+   11). De volgorde is een regel in woorden (VOLGORDE). Bij te weinig
    geschiedenis zeggen we dat eerlijk, in plaats van te gokken (liever te
    hard dan een liegbeest). De AI mag deze paden zelf aanroepen via het
    stuur, en de apps tonen de beste verwachting als stille kaart. Dit is de
    orkestrator: de state-gebonden runtime (voorLid/voorZaak/dealkansen) woont
    hier; de pure rekenkern in ./rekenen. */
 
-const { DAGEN, seintjeVoor, ketenUit, gewoontenUit, combinatiesUit } = require('./rekenen');
+const { DAGEN, VOLGORDE, volgorde, seintjeVoor, ketenUit, gewoontenUit, combinatiesUit } = require('./rekenen');
 
 function maakVoorspel({ db, findSupplier, plaats }) {
   const boek = () => Array.isArray(db.data.payBoekingen) ? db.data.payBoekingen : [];
@@ -42,9 +43,9 @@ function maakVoorspel({ db, findSupplier, plaats }) {
      je aanwezigheid op je werk te bevestigen, mag geen aanbeveling voeden --
      grens 2 van PLAATS.md, en het is precies waarvoor een hek zijn doel draagt.
 
-     WAT ER NIET GEBEURT is de zekerheid opblazen. Die staat voor een geleerde
-     frequentie; er nabijheid bij optellen zou het getal iets anders laten
-     betekenen dan het zegt. Nabijheid verandert alleen de VOLGORDE, en staat als
+     WAT ER NIET GEBEURT is de opbouw opblazen. Die staat voor een geleerde
+     frequentie; er nabijheid bij optellen zou hem iets anders laten betekenen
+     dan hij zegt. Nabijheid verandert alleen de VOLGORDE, en staat als
      eigen veld naast de verwachting zodat je kunt zien dat het meespeelde. */
   const NIET_GEMETEN = { bevestigd: false, gemeten: false };
   function nabijheid(codenaam, code) {
@@ -69,7 +70,7 @@ function maakVoorspel({ db, findSupplier, plaats }) {
        iets verbergen omdat je er nu niet bent zou een lid zijn eigen gewoonte
        kunnen afnemen. */
     const rang = (v) => (v.nabij && v.nabij.gemeten) ? (v.nabij.bevestigd ? 0 : 2) : 1;
-    return uit.sort((a, b) => rang(a) - rang(b) || (b.zekerheid || 0) - (a.zekerheid || 0));
+    return uit.sort((a, b) => rang(a) - rang(b) || volgorde(a, b));
   }
 
   function voorLid(codenaam, key, nu = new Date()) {
@@ -82,7 +83,7 @@ function maakVoorspel({ db, findSupplier, plaats }) {
       reserveringen: (db.data.reserveringen || []).filter(r => r.customerKey === key)
     }, nu) : [];
     const verwachtingen = keten.concat(gewoonten.map(g => ({
-      soort: 'gewoonte', zaak: naamVan(g.code), code: g.code, zekerheid: g.zekerheid, rijp: g.rijp,
+      soort: 'gewoonte', zaak: naamVan(g.code), code: g.code, n: g.n, rijp: g.rijp, opbouw: g.opbouw,
       wat: naamVan(g.code) + ' rond ' + g.uur + ':00' +
         (g.tussenDagen >= 4 ? ', meestal op ' + g.dagNaam : ''),
       waarom: g.n + ' eerdere bezoeken, gemiddeld elke ' +
@@ -92,7 +93,7 @@ function maakVoorspel({ db, findSupplier, plaats }) {
     })));
     const gewogen = metPlaats(codenaam, verwachtingen).slice(0, 3);
     return {
-      ok: true, verwachtingen: gewogen, geleerdUit: rijen.length,
+      ok: true, verwachtingen: gewogen, geleerdUit: rijen.length, volgorde: VOLGORDE,
       uitleg: verwachtingen.length ? null :
         'Nog te weinig geschiedenis om eerlijk te voorspellen; RTG leert met elk bezoek.'
     };

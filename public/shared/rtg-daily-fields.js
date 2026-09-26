@@ -11,7 +11,7 @@
     "agendaPage": ["RTG Agenda", "RTG Calendar"],
     "filesPage": ["RTG Bestanden", "RTG Files"],
     "notesPage": ["RTG Notities", "RTG Notes"],
-    "yourDay": ["Uw dag", "Your day"],
+    "yourCalendar": ["Uw agenda", "Your calendar"],
     "export": ["Exporteer", "Export"],
     "exportHint": ["Exporteer als .ics; opent in elke agenda ter wereld", "Export as .ics to open in another calendar"],
     "newAppointment": ["+ Afspraak", "+ Appointment"],

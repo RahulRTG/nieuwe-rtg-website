@@ -17,6 +17,11 @@ function publiek(r, definitiefBetaald) {
     bijgewerktAt: r.bijgewerktAt, providerKenmerk: r.providerId ? String(r.providerId).slice(-8) : null,
     bewijs: laatste ? laatste.zegel.slice(0, 16).toUpperCase() : null,
     afgehandeld: !!r.afgehandeldAt,
+    /* MONEY-012: aangeboden maar geen providerreferentie -- misschien belast.
+       Niet opnieuw betalen; de veegronde vraagt het na met dezelfde sleutel. */
+    onbekend: !r.providerId && !definitiefBetaald(r.status) &&
+      (r.gebeurtenissen || []).some(g => g.soort === 'PROVIDER_START'),
+    escalatie: r.escalatie ? { at: r.escalatie.at, reden: r.escalatie.reden } : null,
     volgende: r.status === 'WACHT_OP_KLANT' ? 'Rond de betaling af bij de gekozen provider.'
       : r.status === 'IN_BEHANDELING' ? 'Je hoeft niets opnieuw te betalen; RTG controleert de terugmelding.'
       : r.status === 'BEVESTIGD' && !r.afgehandeldAt ? 'De bestelling wordt nu veilig vrijgegeven.'

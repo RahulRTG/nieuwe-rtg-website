@@ -45,7 +45,7 @@ function maakDirectpay(ctxIn) {
     throw new Error('directpay: de transactie-index ontbreekt (' + ontbreekt.join(', ') +
       '). Zonder die hulpjes worden betalingen niet geindexeerd en valt de staart stil weg.');
 
-  const { db, save, crypto, findSupplier, betaal, notify, notifySupplier, sseToSupplier, sseToCustomer, sseToOffice, logActivity,
+  const { db, save, crypto, findSupplier, betaal, betaalWaarheid, notify, notifySupplier, sseToSupplier, sseToCustomer, sseToOffice, logActivity,
     directBetalingMetRef, directBetalingenVanKlant, directBetalingenVanZaak, directBetalingenVoegToe,
     betaalVerzoekMetRef, betaalVerzoekenVoorCodenaam, betaalVerzoekenVanZaak, betaalVerzoekenVoegToe } = ctxIn;
   const nuMs = rtgKlok.nu;
@@ -146,7 +146,7 @@ function maakDirectpay(ctxIn) {
   }
 
   // de gedeelde ctx voor de deelbestanden
-  const ctx = { db, save, crypto, betaal, ensure, centenVan, id, schoon, nu, nuMs, ledger, publiek,
+  const ctx = { db, save, crypto, betaal, betaalWaarheid, ensure, centenVan, id, schoon, nu, nuMs, ledger, publiek,
     idemZoek, idemBewaar, verzoekIdemZoek, verzoekIdemBewaar, tempoOk, findSupplier, notify, notifySupplier, logActivity,
     sseToSupplier, sseToCustomer, sseToOffice, MIN_CENTEN, MAX_CENTEN,
     directBetalingMetRef, directBetalingenVanKlant, directBetalingenVanZaak, directBetalingenVoegToe,

@@ -37,7 +37,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startServer, stop, stopNet } = require('./helper');
+const { startServer, stop, stopNet, kantoorAlsPersoon } = require('./helper');
 
 const KANTOOR = 'KANTOOR-LOONSTROOK-1';
 const ZAAK = 'MERIDIAAN';   // Meridiaan Toren, de NL-zaak in de demo
@@ -158,8 +158,11 @@ test('van de wervingslink tot de loonstrook van de medewerker', async () => {
 
     // vier ogen: de manager bij de zaak, de administrateur bij het kantoor
     assert.equal((await post(base, '/api/supplier/payroll/keur', { runId }, zaakTok)).status, 200);
-    assert.equal((await post(base, '/api/office/payroll/run/keur', { runId }, kantoor)).status, 200);
-    const def = await post(base, '/api/office/payroll/run/definitief', { runId }, kantoor);
+    // de administrateur tekent op naam, niet met de gedeelde code (AUTHORITY.md fase 5)
+    const opNaam = await kantoorAlsPersoon(base, KANTOOR);
+    assert.ok(opNaam, 'een kantoorsessie op naam');
+    assert.equal((await post(base, '/api/office/payroll/run/keur', { runId }, opNaam)).status, 200);
+    const def = await post(base, '/api/office/payroll/run/definitief', { runId }, opNaam);
     assert.equal(def.status, 200, 'definitief: ' + JSON.stringify(def.data));
 
     /* ---- de drie uitgangen, en of ze hetzelfde zeggen ----

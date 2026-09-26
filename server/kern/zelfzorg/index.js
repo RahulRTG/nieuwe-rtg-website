@@ -81,7 +81,7 @@ module.exports = (deps) => {
   api.autoStart = () => {
     if (!api.automaatAan()) return null;
     const t = setInterval(() => {
-      api.autoRonde().catch(() => { /* nooit de server omtrekken */ });
+      require('../dienstidentiteit').alsDienst('zelfzorg', () => api.autoRonde()).catch(() => { /* nooit de server omtrekken */ });
     }, AUTO_MS);
     if (t.unref) t.unref();
     return t;

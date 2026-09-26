@@ -15,7 +15,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { browserOpties, geenBrowser, laadPlaywright, startServer, stop, wachtOpNetstilte, wachtOpRust } = require('./helper');
+const { browserOpties, geenBrowser, laadPlaywright, startServer, stop, wachtOpNetstilte, wachtOpRust, pasAppAdres } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -60,7 +60,7 @@ async function metApp(fn) {
       } catch (e) {}
     }, a.token);
     const pg = await ctx.newPage();
-    await pg.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
+    await pg.goto(await pasAppAdres(base, a.token), { waitUntil: 'domcontentloaded' });
     await wachtOpNetstilte(pg);
     await wachtOpRust(pg);
     await fn({ pg, base, a, b });

@@ -1112,6 +1112,8 @@
 <!-- uitvoer.js zonder defer en voor het eigen script: dat meldt hieronder zijn eigen model aan -->
 <script src="/shared/uitvoer.js"></script>
 <script src="/shared/deur.js"></script>
+<script src="/shared/passkey.js"></script>
+<script src="/shared/zwaarstap.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -2786,15 +2788,21 @@ function bankRenderGezond(g){
    er meer naar. */
 function bankRenderRail(g, op){
   const alarm = (g.railMislukt || 0) > 0 || (g.railZonderTerugboeking || 0) > 0;
+  const onbekend = (g.railOnbekend || 0) > 0;
   const oud = g.railOudsteAt ? Math.round((Date.now() - g.railOudsteAt) / 3600000) : 0;
   const tegels = [
     ['Onderweg', String(g.railOpen || 0) + ' × ' + bkEuro(g.railOpenCenten), false],
     ['Langst onderweg', g.railOudsteAt ? (oud < 1 ? 'minder dan een uur' : oud + ' uur') : 'niets', false],
     ['Opgegeven', String(g.railMislukt || 0), (g.railMislukt || 0) > 0],
-    ['Af zonder bestemming', String(g.railZonderTerugboeking || 0), (g.railZonderTerugboeking || 0) > 0]
+    ['Af zonder bestemming', String(g.railZonderTerugboeking || 0), (g.railZonderTerugboeking || 0) > 0],
+    /* MONEY-012: de rail kan hem hebben uitgevoerd, wij weten het niet. Er is
+       NIET teruggeboekt; opnieuw indienen met dezelfde sleutel haalt de uitspraak
+       van de rail op. */
+    ['Uitkomst onbekend', String(g.railOnbekend || 0) + ' × ' + bkEuro(g.railOnbekendeCenten || 0), (g.railOnbekend || 0) > 0]
   ];
   const STATUSZIN = { GEBOEKT: 'wacht op de rail', INGEDIEND: 'aangenomen, nog niet bevestigd',
-    AFGEWIKKELD: 'afgerond', MISLUKT: 'opgegeven', TERUGGEBOEKT: 'teruggeboekt' };
+    AFGEWIKKELD: 'afgerond', MISLUKT: 'opgegeven', TERUGGEBOEKT: 'teruggeboekt',
+    ONBEKEND: 'uitkomst onbekend, niet teruggeboekt' };
   const rijen = (op.opdrachten || []).map(o =>
     '<div class="bk-rij">' +
     '<strong class="soort">' + esc(o.soort) + '</strong>' +
@@ -2802,7 +2810,7 @@ function bankRenderRail(g, op){
     '<span class="bk-stil">' + esc(STATUSZIN[o.status] || o.status) + '</span>' +
     (o.pogingen > 1 ? '<span class="bk-stil">' + o.pogingen + ' pogingen</span>' : '') +
     (o.laatsteFout ? '<span class="reden">' + esc(o.laatsteFout) + '</span>' : '') +
-    (o.status === 'MISLUKT' ? '<button class="knop stil mini" data-opnieuw="' + esc(o.id) + '">Opnieuw indienen</button>' : '') +
+    ((o.status === 'MISLUKT' || o.status === 'ONBEKEND') ? '<button class="knop stil mini" data-opnieuw="' + esc(o.id) + '">Opnieuw indienen</button>' : '') +
     '</div>').join('');
   $('#bankRail').innerHTML =
     '<div class="kpis bk-tegels">' + tegels.map(([l, v, rood]) =>
@@ -2811,7 +2819,8 @@ function bankRenderRail(g, op){
       '<div class="waarde">' + esc(v) + '</div></div>').join('') + '</div>' +
     (rijen || '<div class="leeg">Niets onderweg.</div>') +
     '<div class="bk-na"><button class="knop stil bk-knopje" id="bankRondeBtn" type="button">Nu opnieuw aanbieden</button>' +
-    (alarm ? ' <span class="bk-waarschuw">Er staat geld af dat nergens is aangekomen.</span>' : '') + '</div>';
+    (alarm ? ' <span class="bk-waarschuw">Er staat geld af dat nergens is aangekomen.</span>' : '') +
+    (onbekend ? ' <span class="bk-waarschuw">Van een uitbetaling weet RTG niet of de rail hem uitvoerde. Er is niet teruggeboekt; dien hem opnieuw in om de uitspraak van de rail op te halen.</span>' : '') + '</div>';
   $('#bankRondeBtn').addEventListener('click', async () => {
     try { const d = await api('bank/opdrachten/ronde', {}); meld(d.gedaan ? d.gedaan + ' opnieuw aangeboden.' : 'Niets aan de beurt.'); bankVervers(); } catch (e) { meld(e.message); }
   });
@@ -3730,6 +3739,19 @@ async function laadToestellen(baas){
     $('#bToestelLijst').innerHTML = '<div class="leeg">De lijst is nu niet op te halen.</div>';
   }
 }
+/* Een zware handeling: NIET via api(), want die leest elke 401 als "uitgelogd"
+   en de vraag om een passkey is ook een 401. /shared/zwaarstap.js vangt die
+   vraag, laat de browser tekenen en probeert het een keer opnieuw. */
+const kaal = (pad, body) => fetch('/api/office/' + pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
+  body: JSON.stringify(body || {})
+}).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+async function metVinger(pad, body){
+  const r = await window.RTGZwaar.metVinger(extra => kaal(pad, Object.assign({}, body, extra)),
+    actie => kaal('boardroom/bevestig/opties', { actie }).then(x => x.body));
+  if (r.status >= 400) throw new Error((r.body && r.body.error) || 'Er ging iets mis.');
+  return r.body;
+}
 /* De sleutel van de kamer: alleen de eigenaar ziet en beheert de lijst. */
 async function laadToegang(baas){
   $('#bToegangKop').hidden = $('#bToegang').hidden = !baas;
@@ -3741,7 +3763,7 @@ async function laadToegang(baas){
       '<button class="knop stil" data-toegangweg="'+esc(t.codenaam)+'" type="button" style="padding:.25rem .8rem;font-size:.75rem;">Trek in</button></div>').join('')
       : '<div class="leeg">Alleen jij kunt de boardroom in.</div>';
     $('#bToegangLijst').querySelectorAll('[data-toegangweg]').forEach(b => b.addEventListener('click', async () => {
-      try { await api('boardroom/toegang/weg', { codenaam: b.dataset.toegangweg }); meld('Toegang ingetrokken.'); laadToegang(true); }
+      try { await metVinger('boardroom/toegang/weg', { codenaam: b.dataset.toegangweg }); meld('Toegang ingetrokken.'); laadToegang(true); }
       catch (e) { meld(e.message); }
     }));
   } catch (e) {}
@@ -3749,7 +3771,7 @@ async function laadToegang(baas){
 $('#bToegangGeef').addEventListener('click', async () => {
   const c = $('#bToegangCode').value.trim();
   if (!c) return;
-  try { await api('boardroom/toegang/geef', { codenaam: c }); $('#bToegangCode').value = ''; meld('Toegang gegeven.'); laadToegang(true); }
+  try { await metVinger('boardroom/toegang/geef', { codenaam: c }); $('#bToegangCode').value = ''; meld('Toegang gegeven.'); laadToegang(true); }
   catch (e) { meld(e.message); }
 });
 /* HET PAPIERWERK. Achttien vragen die alleen een mens kan beantwoorden; de

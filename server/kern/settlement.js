@@ -54,10 +54,9 @@ function maakSettlement({ db, save, accounts, fonds, log, dpRegistreerMunt, dpRe
      is een betaling meteen 'betaald' en komt de code hier niet eens langs.
 
      Het bijschrijven gaat door DEZELFDE boeking als de directe oplading
-     (payOplaadAfronden in kern/pay), zodat er geen tweede boekingsregel
-     ontstaat die ooit uit de pas gaat lopen met de eerste. De webhook heeft de
-     regel al uit kaartWachtend gehaald voor hij ons aanroept, dus een herhaalde
-     webhook boekt niets dubbel. */
+     (payOplaadAfronden in kern/pay). Sinds MONEY-012 komt hier alleen nog een
+     oude kaartWachtend-rij langs; nieuwe lopen via
+     kern/pay/oplaadwaarheid.js. */
   if (ctx.soort === 'oplaad') {
     if (!payOplaadAfronden) { (log && log.error || console.error)('[settlement] oplading kan niet worden bijgeschreven: de betaalkern ontbreekt', { id: betaling && betaling.id }); return { status: 500, error: 'Betaalkern ontbreekt.' }; }
     try {
@@ -145,6 +144,8 @@ function maakSettlement({ db, save, accounts, fonds, log, dpRegistreerMunt, dpRe
   inv.status = 'paid';
   inv.date = betaling.hoe;
   inv.betaalId = betaling.id;
+  // reisonderdelen mee in dezelfde save (deed alleen de route, nooit de webhook)
+  for (const item of (md.trip && md.trip.items) || []) if (item.invoiceId === inv.id) { item.status = 'paid'; item.label = 'Bevestigd'; }
   if (fonds.isAbonnement(inv.desc)) {
     try { await fonds.boekAfdracht({ invoiceId: inv.id, wie: ctx.wie, bijdrage: inv.bijdrage, betaalId: betaling.id, omschrijving: inv.desc }); }
     catch (e) { /* de afdracht mag de settlement nooit blokkeren */ }

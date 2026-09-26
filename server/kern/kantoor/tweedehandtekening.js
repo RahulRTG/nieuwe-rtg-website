@@ -34,27 +34,22 @@
      (`req.officeKey`); de gedeelde code levert `null`, en dan weigert deze laag
      met de reden. Zonder die eis vergelijk je twee lege waarden.
 
-   WAT HIJ NIET DOET: bepalen WELKE handeling een tweede mens verdient. Dat is
-   een besluit en geen meting (`KANTOORMACHT.json`, `ongemeten.vierOgenVereist`).
-   Wie een actie registreert neemt dat besluit; dit bestand voert het uit.
+   WAT HIJ NIET DOET: bepalen WELKE handeling een tweede mens verdient (en of hij
+   geld raakt). Dat besluit neemt wie een actie registreert; dit bestand voert uit.
    ========================================================================== */
 'use strict';
 
 const vierogen = require('../appstore/vierogen');
-/* De klok van dit huis en niet Date.now(), zodat een tijdproef de verlooptijd
-   echt kan verzetten. Rechtstreeks geladen: `klok` staat niet in het
-   kantoren-blok van GRENZEN.json, en die grens verruimen voor een klok is de
-   verkeerde ruil (zelfde keuze als server/opzet/envelop.js). */
+/* De klok van dit huis, zodat een tijdproef de verlooptijd kan verzetten; rechtstreeks,
+   want `klok` staat niet in het kantoren-blok van GRENZEN.json (als server/opzet/envelop.js). */
 const klokHuis = require('../../lib/klok');
 
-/* Tien minuten, gelijk aan kern/bankregie/autorisatie.js -- niet omdat tien het
-   juiste getal is, maar omdat twee verlooptijden voor dezelfde soort ceremonie
-   een verschil zijn dat niemand kan uitleggen. */
+/* Tien minuten, gelijk aan kern/bankregie/autorisatie.js: twee verlooptijden voor
+   dezelfde ceremonie zijn een verschil dat niemand kan uitleggen. */
 const VERLOOPT_MS = 10 * 60 * 1000;
 
-/* Een echte mens achter deze sessie. `kluisAuth` zet req.officeKey op de lidKey
-   van de sessie of op 'user-<id>' voor de eigenaar; de gedeelde code komt er
-   niet langs en levert dus geen sleutel. */
+/* Een echte mens: `kluisAuth` zet req.officeKey op de lidKey of 'user-<id>'; de
+   gedeelde code levert geen sleutel. */
 const isMens = (k) => typeof k === 'string' && /^user-\d+$/.test(k);
 
 module.exports = function maakTweedeHandtekening({ db, save }) {
@@ -67,9 +62,14 @@ module.exports = function maakTweedeHandtekening({ db, save }) {
   /* De uitvoerders, per actienaam. Een actie zonder uitvoerder kan geen aanvraag
      worden: anders staat er straks een bevestigde handeling die niemand doet. */
   const uitvoerders = new Map();
-  function neemHandelingOp(actie, { wat, voerUit }) {
+  function neemHandelingOp(actie, { wat, voerUit, geld }) {
     if (typeof voerUit !== 'function') throw new Error('tweedehandtekening: ' + actie + ' heeft geen uitvoerder');
-    uitvoerders.set(String(actie), { wat: String(wat || actie), voerUit });
+    uitvoerders.set(String(actie), { wat: String(wat || actie), voerUit, geld: geld === true });
+  }
+  /* Beweegt de aanvraag geld? Dan eist de bevestiging een passkey (routes/kantoren/bank-passkey.js). */
+  function raaktGeld(id) {
+    const a = bak().find(x => x.id === String(id || ''));
+    return !!(a && (uitvoerders.get(a.actie) || {}).geld);
   }
 
   const verlopen = (a) => nu() - a.at > VERLOOPT_MS;
@@ -180,5 +180,5 @@ module.exports = function maakTweedeHandtekening({ db, save }) {
      kan een bedrag of een codenaam in staan die op dit scherm niet hoort. */
   function open() { return { ok: true, aanvragen: opruimen().map(pub), verlooptOverMs: VERLOOPT_MS }; }
 
-  return { registreer: neemHandelingOp, vraag, bevestig, annuleer, open, VERLOOPT_MS };
+  return { registreer: neemHandelingOp, vraag, bevestig, annuleer, open, raaktGeld, VERLOOPT_MS };
 };

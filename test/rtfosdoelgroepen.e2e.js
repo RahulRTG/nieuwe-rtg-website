@@ -23,7 +23,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten, kantoorAlsPersoon, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stop, letOpFouten, kantoorAlsPersoon, laadPlaywright, browserOpties, geenBrowser, kantoorKoppelBody } = require('./helper');
 
 const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rtfosdoel-'));
@@ -49,7 +49,7 @@ async function decor(base) {
   }
   const reg = await post('/api/auth/register', { name: 'Bestuur Almere', email: 'ba@rtfosdoel.test',
     phone: '0612345695', password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg' });
-  await post('/api/account/koppel', { soort: 'kantoor', code: OFFICE_CODE }, reg.token);
+  await post('/api/account/koppel', await kantoorKoppelBody(base, reg.token), reg.token);
   const bestuur = (await post('/api/account/start', { rol: 'kantoor' }, reg.token)).token;
   const key = (await api('ik', {}, bestuur)).key;
   await api('zetel', { stad: stad.id, key, naam: 'Bestuur Almere', rol: 'stadsbestuur' });

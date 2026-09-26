@@ -225,6 +225,19 @@ function codemasker(bron) {
     }
     i++;
   }
+  /* EN DE PROGRAMMAWACHT, want die bepaalt of een bestand een PROGRAMMA of een
+     BIBLIOTHEEK is -- en geen toets gaat daarover. Op 25 september 2026 draaide
+     `===->!==` de wacht om in scripts/margeschaal.js (`if (require.main ===
+     module) process.exit(main())`). De `require` in test/margeschaal.test.js
+     startte daarna het omzetprogramma, en dat herschreef de marges van 144
+     bestanden in public/. De motor zette zijn eigen mutatie netjes terug, maar niet
+     wat het gemuteerde programma elders schreef -- en elke toets die daarna werd
+     gemeten, las een veranderde boom. Een uitslag zei hier dus niets over de toets
+     en veel over de schade. Beide vormen (196 keer `===`, 58 keer `!==`) vallen
+     daarom buiten schot; wat er TOCH buiten het gemuteerde bestand verandert,
+     vangt bijwerkingVan() hieronder. */
+  const WACHT = /require\.main\s*[!=]==?\s*module|module\s*[!=]==?\s*require\.main/g;
+  for (let m; (m = WACHT.exec(bron));) uit(m.index, m.index + m[0].length);
   return masker;
 }
 
@@ -392,6 +405,58 @@ const WACHT_MUTATIE = 90000;
 /* `forceer` zet --test-force-exit erbij: de draaier stopt zodra de toetsen klaar
    zijn, ook als er nog een handle openstaat. Alleen gebruikt om NA een time-out te
    achterhalen wat de asserties zeiden -- zie tijdoutMaarMeetbaar(). */
+/* WAT ER BUITEN HET GEMUTEERDE BESTAND IN DE BRON VERANDERT.
+
+   De motor zet zijn eigen mutatie altijd terug (metMutatie), maar een gemuteerd
+   programma kan ELDERS schrijven -- zie de programmawacht in codemasker(). Dat is
+   niet alleen schade aan de werkboom: elke toets die daarna gemeten wordt, leest
+   een andere bron dan die op de stempel staat, en zijn uitslag gaat dan over
+   iets anders dan wat er in MUTATIES.json komt te staan.
+
+   Dus neemt de motor voor elke gemuteerde toets een beeld van de werkboom
+   (gevolgde EN nieuwe bestanden, zonder wat git negeert, zoals server/data/), en
+   kijkt hij na de run wat er anders is. Is er iets anders, dan:
+     - zet hij het terug: een bestand dat al gewijzigd was krijgt zijn inhoud van
+       voor de run, een schoon bestand komt uit git, en een nieuw bestand gaat weg;
+     - is de uitslag `bijwerking`, en die telt als NIET gemeten (norm.js en
+       bewijs.js kennen hem niet als gezakt of overleefd). Een zakker met
+       bijwerking bewijst niet dat de toets gevoelig is: hij kan zijn gezakt op de
+       schade in plaats van op de mutatie. */
+function bronStand(uitgezonderd, wortel = WORTEL) {
+  const r = spawnSync('git', ['status', '--porcelain', '-z', '--untracked-files=all'],
+    { cwd: wortel, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+  if (r.status !== 0) throw new Error('git status faalde; zonder beeld van de werkboom meet de motor niet (' + String(r.stderr || '').trim() + ')');
+  const stand = new Map();
+  for (const regel of String(r.stdout).split('\0').filter(Boolean)) {
+    const rel = regel.slice(3);
+    if (!rel || path.join(wortel, rel) === uitgezonderd) continue;
+    let inhoud = null;
+    try { inhoud = fs.readFileSync(path.join(wortel, rel)); } catch (e) { /* verwijderd: inhoud blijft null */ }
+    stand.set(rel, inhoud);
+  }
+  return stand;
+}
+function bijwerkingVan(voor, na) {
+  const gelijk = (a, b) => (a === null || b === null ? a === b : a.equals(b));
+  const paden = [];
+  for (const [rel, inhoud] of na) if (!voor.has(rel) || !gelijk(voor.get(rel), inhoud)) paden.push(rel);
+  for (const rel of voor.keys()) if (!na.has(rel)) paden.push(rel);   // was gewijzigd, is nu weer als in git
+  return paden;
+}
+function herstelBron(voor, paden, wortel = WORTEL) {
+  for (const rel of paden) {
+    const abs = path.join(wortel, rel);
+    if (voor.has(rel)) {
+      const v = voor.get(rel);
+      if (v === null) { try { fs.rmSync(abs, { force: true }); } catch (e) { /* stond er al niet */ } }
+      else fs.writeFileSync(abs, v);
+      continue;
+    }
+    const r = spawnSync('git', ['checkout', '--', rel], { cwd: wortel, encoding: 'utf8' });
+    if (r.status !== 0) fs.rmSync(abs, { force: true });   // niet in git: een nieuw bestand, dus weg
+  }
+}
+
 function draaiToets(bestand, env, wacht, forceer) {
   /* DE REPORTER STAAT VASTGEPIND OP TAP, want deze functie leest de uitslag
      met /^# tests/ en /^not ok/. Tot Node 22 was TAP de standaard zonder TTY;
@@ -450,6 +515,43 @@ function draaiToets(bestand, env, wacht, forceer) {
    De tien andere staan nog open; dat is een geteld gat in TAKEN.md en geen
    vergeten hoekje. */
 const EIGEN_MODULE = new Map([
+  /* DE SLEUTELWEDLOOP. De toets leest ook scripts/lib/bron.js (om commentaar
+     te strippen), en de motor koos die als module -- een mutatie daar zegt niets
+     over de sleutels. De module die hij beproeft is de helper; met de hand
+     nagetrokken: linkSync terug naar een kale schrijf (toets 1 zakt), een
+     verkeerde lengte stil vervangen (toets 2 zakt). */
+  ['sleutel-wedloop.test.js', ['server/lib/sleutelbestand.js']],
+  /* VEEGDOOR (Edge ronde 2, stap 8). De toets beproeft de helper zelf: welke weg
+     veegDoor nam, en vasthouden zonder loslaten. De liegpoort raakt hem niet,
+     want er gaat geen antwoord van een route in om; de module is test/helper.js. */
+  ['helper-veegdoor.e2e.js', ['test/helper.js']],
+  /* DE POORTREEKS (24 september 2026). De toets legt efemeerBereik() een eigen
+     kernellezing voor en vrijePoortReeks() een eigen bereik; er gaat geen
+     antwoord van een route in om, dus de liegpoort zou hem laten "overleven"
+     terwijl hij alleen test/helper.js op de proef stelt. */
+  ['poortreeks.test.js', ['test/helper.js']],
+  /* DE VERZOEKRACE (24 september 2026, BEWIJSLUS.md par. 6a). De toets bouwt RTG
+     Pay via de opstelling van de Magnaat-geldpomp, en de motor koos die
+     opstelling als module -- een mutatie daar zegt niets over het betalen van een
+     verzoek. De module die hij beproeft is verzoeken.js; met de hand nagetrokken:
+     het slot vrijgeven weghalen (toets 2 zakt), en de reparatie terugdraaien
+     naar de code van voor 24 september (toets 1 zakt). */
+  ['verzoekbetaal-race.test.js', ['server/kern/pay/verzoeken.js']],
+  /* De eerste require is de zoeker (./lib/tegenvoorbeeld.js), want de toets
+     bouwt zijn wereld daarmee; wat hij bewaakt is de divergentie. Met de hand
+     gedraaid (zie de kop van de toets): het E1-verbod weghalen, effecten weer als
+     ok-antwoorden tellen en `overgeslagen` niet vullen laten hem alle drie zakken. */
+  ['divergentie.test.js', ['scripts/lib/divergentie.js']],
+  // The document pilot reaches this handler through HTTP, browser or child processes.
+  ['document-equivalence.e2e.js', ['server/kern/document-capability.js']],
+  ['document-persistence.e2e.js', ['server/kern/document-capability.js']],
+  ['document-revocation.test.js', ['server/kern/document-capability.js']],
+  ['document-certification.test.js', ['server/kern/document-capability.js']],
+  ['document-architecture.test.js', ['scripts/document-fitness.js']],
+  ['document-binding.test.js', ['scripts/document-evidence.js']],
+  ['document-capability.test.js', ['server/kern/document-capability.js']],
+  ['document-capability-storage.test.js', ['server/kern/document-capability.js']],
+  ['document-capability.e2e.js', ['server/kern/document-capability.js']],
   // Deze proeven raken respectievelijk de Office-opslag via HTTP en een
   // testproxy via een lokale import. Richt bronmutaties op hun echte gedrag.
   ['office-save-atomic.test.js', ['server/kern/office/docs.js']],
@@ -510,6 +612,11 @@ const EIGEN_MODULE = new Map([
      Bevestigd door de motor, en dat is hier de voorwaarde: met deze regel
      muteert hij scripts/wekdekking.js en zakt de toets erop. */
   ['wekdekking.test.js', ['scripts/wekdekking.js']],
+  /* DE ZWARE STAP op het scherm is een browserscript dat zich aan `window`
+     hangt; de toets laadt hem als TEKST in een eigen venster-object en requiret
+     hem niet. Statisch ziet de motor dan geen module, en toetsenNietGemeten zou
+     het schrijven van deze toets bestraffen. */
+  ['zwaarstap.test.js', ['public/shared/zwaarstap.js']],
   /* DE MOMENTPROEF wordt door zijn toets als TEKST gelezen (fs.readFileSync) en
      niet gerequired: de toets bewaakt de VORM van het instrument -- zakt het op
      een open schakel, draagt elke bevinding een reden, staan B en D er allebei --
@@ -545,6 +652,11 @@ const EIGEN_MODULE = new Map([
      bewering zakken. De expliciete koppeling voorkomt dat een echte VM-toets
      als "geen module gevonden" buiten de mutatiemeting blijft. */
   ['workspace-platform.test.js', ['public/shared/interface/module-sdk.js']],
+  /* De werkruimtecontext (Edge ronde 2, stap 23) is browsercode die de toets in
+     een VM uitvoert, dus zonder require. Met de hand nagetrokken: de herkomst
+     overschrijven, een cache terugzetten, terugvallen op RTGAdaptief en bij een
+     weigering de oude kopie teruggeven laten elk een bewering zakken. */
+  ['workspace-context.test.js', ['public/shared/interface/workspace-context.js']],
   /* DE TENANTLAAG: twee toetsen die de server als kindproces starten en dus
      geen require van hun module dragen. Beide regels zijn met een mutatie
      nagetrokken en niet gegokt.
@@ -632,6 +744,26 @@ const EIGEN_MODULE = new Map([
      platformblok zetten, de extra weergaven niet sluiten bij een tabwissel, en
      Ververs weer laten gokken welk scherm er open staat. */
   ['werkstatus.e2e.js', ['public/apps/werk/status.js', 'public/apps/werk/app.js']],
+  /* DE LUSSEN VAN DE WERKTAFEL op een telefoon: wereld open, erin, terug, Home.
+     De module die hij het hardst beproeft is de wachtpost en het wereldlabel;
+     met de hand nagetrokken (wachtpost uit -> de pagina verlaat app.html,
+     kopwereld vast op living -> het label klopt niet) en door de motor
+     bevestigd. */
+  ['werktafel-lussen.e2e.js', ['public/shared/command/bladstand.js']],
+  /* KNOPPEN DIE NIET KUNNEN, ZEGGEN WAAROM. Zes plekken in een toets. De
+     gedeelde kantoor-inlog lag voor de hand, maar daar overleefde de toets de
+     vier mutaties: de eerste plek per operator zit in dat bestand in code die
+     deze toets niet raakt. Bevestigd door de motor is de kring van Veilig
+     (return-weg: dan verschijnt de reden bij een lege codenaam niet). */
+  ['stilleknoppen.e2e.js', ['public/shared/veiligheid.js']],
+  /* HET EDGE BLIKVELD (EDGE.md, ronde 0). De browserproef met de hand
+     nagetrokken op vier plekken (de loader laadt het blikveld niet, de brug laat
+     het object vallen, de controls lezen weer zelf, de agenda wijst geen
+     hoofdactie aan) -- alle vier raak. De module die hij het hardst beproeft is
+     het blikveld zelf. De contexttoets leest register.js als tekst in een
+     nagemaakt venster, dus de motor vindt zijn module niet via require. */
+  ['edgeblikveld.e2e.js', ['public/shared/edge/blikveld.js', 'public/shared/edge/blikveld-hoofdactie.js']],
+  ['edgecontext.test.js', ['public/shared/adaptief/register.js']],
   /* DE METING PER CAPABILITY. Vier mutaties, vier raak: de vloer eruit (dan
      krijgt drie verzoeken een geruststellende 0,0%), routes zonder functie
      weglaten (dan klopt het totaal terwijl er iets ontbreekt), een 4xx als
@@ -1050,6 +1182,11 @@ const GEEN_BRONMUTATIE = new Map([
      het gedrag niet vast, en dat is aantoonbaar onwaar) en niet als niet-gemeten
      (dat zou eerlijk werk bestraffen, zie de kop van deze lijst). */
   ['ondernemerbewijs.test.js', 'leest registers en geen servermodule; 0 mutaties geprobeerd (geen module gevonden). De faalklasse staat in de toets zelf: vier tegenproeven op gemuteerde registers in een wegwerpmap, elk aantoonbaar raak'],
+  /* HET REGISTER IN DELEN (Edge ronde 2, stap 19 en 20). Deze toets leest de
+     SCRIPTTAGS van zes schermen; de operatoren van de motor zijn gedragsmatig en
+     raken geen scripttag (met de HTML als module: "geen bruikbare mutatie"). De
+     foutklasse is met de hand nagetrokken, en alle drie zakten ze. */
+  ['adaptiefdelen.test.js', 'leest scripttags in HTML en geen module; de operatoren raken geen scripttag. Met de hand nagetrokken: vorm.js weg op reizen-veilig (zakt, en appmenu.e2e.js op de context van reizen-veilig), vorm.js na register.js op app (zakt), de objectpoort na rtg-schil.js in werkruimte (zakt, en werkruimte-objecten.e2e.js)'],
   ['autonomiegrens.test.js', 'leest EXECUTION_MAP.json en ROLPROEF.json en geen servermodule; 0 mutaties geprobeerd (geen module gevonden). Toets 3 is de tegenproef: een blind pad autonoom maken laat de grens uitslaan'],
   /* Ik heb dit bestand eerst in EIGEN_MODULE gezet met public/apps/voertuig.js en
      rit.js erbij -- de twee modules die deze toets echt leest. De motor probeerde
@@ -1271,6 +1408,7 @@ function proefPuur(naam, posities) {
   for (const rel of modules) {
     const p = path.join(WORTEL, rel);
     const origineel = fs.readFileSync(p, 'utf8');
+    const voor = bronStand(p);           // na de nulmeting: wat die schreef, telt niet als bijwerking
     for (let i = 0; i < diep; i++) {
       for (const op of OPERATOREN) {
         const nieuw = muteer(origineel, op, i);
@@ -1283,6 +1421,13 @@ function proefPuur(naam, posities) {
           if (check.status !== 0) return null;    // mutatie brak de syntaxis: telt niet
           geprobeerd++;
           const na = draaiToets(bestand, null, WACHT_MUTATIE);
+          const schade = bijwerkingVan(voor, bronStand(p));
+          if (schade.length) {
+            herstelBron(voor, schade);
+            return { soort: 'puur', staat: 'bijwerking', module: rel, operator: op.naam + '#' + i, geprobeerd,
+              aantal: schade.length, paden: schade.slice(0, 5),
+              reden: 'met deze mutatie schreef de toets buiten ' + rel + ' in de bron; teruggezet, en de uitslag telt niet' };
+          }
           /* EEN VASTLOPER IS GEEN ZAKKER EN GEEN OVERLEVER. De toets was zonder
              mutatie binnen de tijd groen; komt hij er nu niet uit, dan heeft de
              mutatie het gedrag echt veranderd -- maar de toets heeft niets GEMELD,
@@ -1654,6 +1799,9 @@ module.exports = { OPERATOREN, muteer, codemasker, modulesVan, UITSLAG, VOORTGAN
      een time-out krijgt SIGKILL en geen SIGTERM (anders blijven er wezen achter
      die poorten vasthouden en latere metingen vervuilen). */
   draaiToets,
+  /* De bijwerkingswacht, zodat test/mutatiebijwerking.test.js hem in een eigen
+     repo kan beproeven in plaats van in deze werkboom. */
+  bronStand, bijwerkingVan, herstelBron,
   /* De opruimwacht naar buiten, want een wacht die je niet kunt AANROEPEN kun je
      ook niet toetsen -- en dan is hij een belofte. test/mutatiewacht.test.js
      meldt een bestand aan, muteert het, stuurt SIGTERM en kijkt of het terugstaat. */

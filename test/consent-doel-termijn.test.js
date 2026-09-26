@@ -21,7 +21,7 @@
      - het doel van een laag weghalen: RAAK op 1;
      - de termijnUitleg van een laag weghalen: RAAK op 2;
      - een laag de soort 'onbekend' geven: RAAK op 3;
-     - in toestemming.html de termijnregel weer voorwaardelijk maken: RAAK op 4.
+     - in mijn-relaties.html (weergave per soort) de termijnregel weer voorwaardelijk maken: RAAK op 4.
 
    WAT HIER NIET IN STAAT, want het is al gemeten en het bleek geen gat: alle
    vier de lagen MET een einddatum filteren verlopen vensters bij de bron
@@ -78,10 +78,12 @@ test('4. het scherm toont de termijn altijd, ook zonder datum', () => {
   /* Op de BRON en niet op een draaiende server: wat hier fout kan gaan is dat
      iemand de regel weer voorwaardelijk maakt op t.tot, en dan verdwijnt hij bij
      precies de vijf lagen die er geen hebben. */
-  const bron = fs.readFileSync(path.join(__dirname, '..', 'public', 'apps', 'toestemming.html'), 'utf8');
-  assert.match(bron, /'<div class="tot">' \+ esc\(termijn\(t\)\)/,
+  /* De lijst per soort woont sinds de consolidatie in Wie heeft toegang tot mij
+     (SCHERMEIGENAAR.json); toestemming.html is een doorverwijzing. */
+  const bron = fs.readFileSync(path.join(__dirname, '..', 'public', 'apps', 'mijn-relaties.html'), 'utf8');
+  assert.match(bron, /el\.appendChild\(tekst\(maak\('div', 'tot'\), termijn\(t\)\)\)/,
     'de termijnregel hoort onvoorwaardelijk te worden getekend');
-  assert.ok(!/t\.tot \? '<div class="tot">/.test(bron),
+  assert.ok(!/if \(t\.tot\) el\.appendChild\(tekst\(maak\('div', 'tot'\)/.test(bron),
     'de termijnregel is weer voorwaardelijk op t.tot; dan verdwijnt hij bij de lagen zonder einddatum');
-  assert.match(bron, /t\.doel \? '<div class="doel">/, 'het scherm hoort het doel te tonen');
+  assert.match(bron, /if \(t\.doel\) el\.appendChild\(tekst\(maak\('div', 'doel'\)/, 'het scherm hoort het doel te tonen');
 });

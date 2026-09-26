@@ -20,10 +20,10 @@
     gereed: 'data-rtg-world-dashboard-ready',
     render: 'data-rtg-vandaag-render',
     beelden: Object.freeze({
-      living: '/images/worlds/heritage/living-heritage-v2.jpg',
-      travel: '/images/worlds/heritage/travel-heritage-v2.jpg',
-      work: '/images/worlds/heritage/work-heritage-v2.jpg',
-      foundation: '/images/worlds/heritage/foundation-heritage-v2.jpg'
+      living: '/campagne/huis-omslag.jpg',
+      travel: '/images/world-homes/travel.webp',
+      work: '/images/world-homes/work.webp',
+      foundation: '/images/world-homes/foundation.webp'
     }),
     netwerk: false,
     opslag: false

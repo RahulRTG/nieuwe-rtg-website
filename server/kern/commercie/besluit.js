@@ -132,9 +132,13 @@ function maakBesluit({ zoekBevoegdheid, dagverbruik, beleid, nu, munt }) {
           de persoon: ook wie ruim bevoegd is, tekent bij een groot bedrag niet
           alleen. De volgorde is van zwaar naar licht, want het zwaarste eist het
           meest. */
-    if (bedrag >= B.goedkeuringBovenCenten && ctx.goedgekeurdDoor == null)
+    /* Een goedkeuring door de aanvrager zelf is geen tweede persoon (AUTHORITY.md
+       fase 5): zonder deze vergelijking tekende wie zijn eigen naam meegaf alleen. */
+    const zelf = ctx.goedgekeurdDoor != null && actor != null && String(ctx.goedgekeurdDoor) === String(actor);
+    if (bedrag >= B.goedkeuringBovenCenten && (ctx.goedgekeurdDoor == null || zelf))
       return { ...basis, uitkomst: UITKOMST.GOEDKEURING, bewijs,
-        reden: 'Vanaf ' + bev.euro(B.goedkeuringBovenCenten) + ' tekent er een tweede persoon mee.' };
+        reden: zelf ? 'De aanvrager keurt zijn eigen handeling niet goed; er tekent een ander mee.'
+          : 'Vanaf ' + bev.euro(B.goedkeuringBovenCenten) + ' tekent er een tweede persoon mee.' };
 
     if (bedrag >= B.omkeerbaarBovenCenten && ctx.omkeerbaar !== true)
       return { ...basis, uitkomst: UITKOMST.OMKEERBAAR, bewijs,

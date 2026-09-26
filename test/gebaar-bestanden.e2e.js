@@ -172,7 +172,7 @@ test('een veeg zet een bestand in de prullenbak, en de weg terug haalt het eruit
     await page.keyboard.press('Escape');
 
     // 4. wat de server weigert, komt TERUG op het scherm -- stil falen is hier het ergst
-    await page.route('**/api/bestanden/weg', (r) => r.fulfill({
+    await page.route('**/api/bestanden/actie', (r) => r.fulfill({
       status: 500, contentType: 'application/json', body: JSON.stringify({ error: 'De kluis is even niet bereikbaar.' })
     }));
     const derde = page.locator('#lijst .item').first();
@@ -186,7 +186,7 @@ test('een veeg zet een bestand in de prullenbak, en de weg terug haalt het eruit
       .some((b) => b.textContent.trim() === n), naam3, { timeout: 8000 });
     assert.equal((await staatVan(naam3)).weg, false,
       'een geweigerde veeg mag bij de server niets veranderd hebben');
-    await page.unroute('**/api/bestanden/weg');
+    await page.unroute('**/api/bestanden/actie');
 
     assert.deepEqual(paginaFouten, [], 'geen JS-fouten tijdens het vegen');
   } finally {

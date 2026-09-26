@@ -87,6 +87,52 @@
         <button class="rtg-knop vol" id="bzGeef" type="button" data-i18n="bz.geef">Geef een zetel</button>
       </div>
     </section>
+
+    <!-- De kantoorrol hangt sinds 23 september 2026 alleen nog aan een account
+         via een uitnodiging op naam (AUTHORITY.md fase 2). Alleen de eigenaar
+         maakt er een; de code wordt een keer getoond. -->
+    <section class="rtg-groep" id="kuSectie" hidden>
+      <h2 data-i18n="ku.h">Iemand in het kantoor</h2>
+      <p class="rtg-uitleg" data-i18n="ku.sub">Een nieuwe medewerker koppelt de kantoorrol aan zijn eigen RTG-account met een uitnodiging van u: op zijn codenaam, een keer te gebruiken en zeven dagen geldig. De code ziet u hier een keer; geef hem op een veilige manier door.</p>
+      <div class="rtg-rij">
+        <input class="rtg-veld h-flex1" id="kuCode" maxlength="60" data-i18n-ph="ku.ph" placeholder="Codenaam van de medewerker">
+        <button class="rtg-knop vol" id="kuMaak" type="button" data-i18n="ku.maak">Maak een uitnodiging</button>
+      </div>
+      <p class="rtg-uitleg" id="kuUit" aria-live="polite"></p>
+    </section>
+
+    <!-- De zaakdozen (AUTHORITY.md fase 7): welke dozen melden nog met de gedeelde
+         sleutel. Die gaat pas dicht als deze lijst leeg blijft (besluit van
+         23 september 2026). Uitgeven en intrekken is van de eigenaar, met de vinger. -->
+    <section class="rtg-groep" id="dsSectie" hidden>
+      <h2 data-i18n="ds.h">De zaakdozen</h2>
+      <p class="rtg-uitleg" data-i18n="ds.sub">Een doos met een eigen sleutel is bewezen; een doos op de gedeelde sleutel noemt alleen zijn eigen naam. De gedeelde sleutel gaat dicht zodra hieronder niemand meer staat.</p>
+      <div id="dsGedeeld"><p class="rtg-leeg" data-i18n="ds.laden">Dozen laden&hellip;</p></div>
+      <div id="dsEigen"></div>
+      <div class="rtg-rij" id="dsGeven" hidden>
+        <input class="rtg-veld h-flex1" id="dsNaam" maxlength="40" data-i18n-ph="ds.ph" placeholder="Naam van de doos">
+        <button class="rtg-knop vol" id="dsGeef" type="button" data-i18n="ds.geef">Geef een eigen sleutel</button>
+      </div>
+      <p class="rtg-uitleg" id="dsUit" aria-live="polite"></p>
+    </section>
+
+    <!-- RTG Rekening voor bedrijven: twee schakelaars van RTG, allebei standaard
+         dicht en alleen voor de eigenaar met de vinger (kern/werkbetaling.js en
+         kern/bank/entiteit.js). -->
+    <section class="rtg-groep" id="rbSectie" hidden>
+      <h2 data-i18n="rb.h">RTG Rekening voor bedrijven</h2>
+      <p class="rtg-uitleg" data-i18n="rb.sub">Twee wegen die RTG bewust opent: een Werk OS-uitgave betalen vanaf de eigen RTG-rekening van een lid, en een rekening op naam van een entiteit uit de concerngraaf.</p>
+      <div id="rbLijst"></div>
+    </section>
+
+    <!-- De kantoordeuren (AUTHORITY.md fase 1): per deur schaduw of afdwingen.
+         Afdwingen kan pas als de schaduw rijp is en de motor nooit oneens was;
+         de server rekent dat uit, deze sectie toont alleen wat hij zegt. -->
+    <section class="rtg-groep" id="bmSectie" hidden>
+      <h2 data-i18n="bm.h">De kantoordeuren</h2>
+      <p class="rtg-uitleg" data-i18n="bm.sub">De beleidsmotor loopt mee met elke kantoordeur. In de schaduw telt hij alleen; afgedwongen weigert hij naast de poort, nooit in zijn plaats.</p>
+      <div id="bmDeuren"><p class="rtg-leeg" data-i18n="bm.laden">Deuren laden&hellip;</p></div>
+    </section>
   </div>
 </main>
 
@@ -141,7 +187,25 @@ window.I18N = { en: {
   'bz.geen':'Nobody is at the desk yet.', 'bz.sinds':'at the desk since ', 'bz.weg':'Withdraw',
   'bz.leeg':'Please fill in the codename of the member first.',
   'bz.nietgevonden':'We do not know this codename.', 'bz.meer':'More than one member matches; please be more precise.',
-  'bz.geefOk':'The seat has been given.', 'bz.wegOk':'The seat has been withdrawn.'
+  'bz.geefOk':'The seat has been given.', 'bz.wegOk':'The seat has been withdrawn.',
+  'ku.h':'Someone in the office',
+  'ku.sub':'A new employee links the office role to their own RTG account with an invitation from you: for their codename, usable once and valid for seven days. You see the code here once; pass it on safely.',
+  'ku.ph':'Codename of the employee', 'ku.maak':'Make an invitation',
+  'ku.leeg':'Please fill in the codename of the employee first.',
+  'ku.code':'Invitation code (shown once): ', 'ku.tot':' valid until ',
+  'ds.h':'The business boxes',
+  'ds.sub':'A box with its own key is proven; a box on the shared key only states its own name. The shared key closes once nobody is listed below.',
+  'ds.laden':'Loading boxes…', 'ds.ph':'Name of the box', 'ds.geef':'Give its own key',
+  'ds.gedeeld':'Still on the shared key (last seven days)', 'ds.geengedeeld':'No box reported on the shared key in the last seven days.',
+  'rb.h':'RTG Account for businesses', 'rb.sub':'Two ways RTG opens on purpose: paying a Work OS expense from a member\'s own RTG account, and an account in the name of an entity from the company graph.',
+  'rb.werk':'Work OS expense via a member account', 'rb.ent':'Accounts for entities', 'rb.open':'open', 'rb.dicht':'closed', 'rb.zetOpen':'Open', 'rb.zetDicht':'Close', 'rb.ok':'Switched.',
+  'bm.h':'The office doors', 'bm.sub':'The policy engine runs alongside every office door. In the shadow it only counts; when enforced it refuses next to the gate, never instead of it.',
+  'bm.laden':'Loading doors…', 'bm.aan':'Enforce', 'bm.uit':'Back to the shadow', 'bm.schaduw':'shadow', 'bm.afdwingen':'enforced', 'bm.ok':'The door has been switched.',
+  'ds.stand':'The shared key', 'ds.isdicht':'closed: only a box with its own key gets in', 'ds.isopen':'open (shadow): it still works',
+  'ds.dicht':'Close the shared key', 'ds.open':'Open it again', 'ds.dichtOk':'The shared key is closed.', 'ds.openOk':'The shared key is open again.',
+  'ds.eigen':'Boxes with their own key', 'ds.laatst':'last seen ', 'ds.keer':' times',
+  'ds.klaar':'own key issued, not yet on the box', 'ds.sinds':'own key since ', 'ds.weg':'Withdraw',
+  'ds.leeg':'Please fill in the name of the box first.', 'ds.sleutel':'Key (shown once): ', 'ds.wegOk':'The key has been withdrawn.'
 } };
 </script>
 <script>
@@ -167,6 +231,25 @@ window.I18N = { en: {
         return d;
       });
     });
+  }
+  /* Een zetel geven of intrekken is een ZWARE handeling: de server vraagt dan
+     om de passkey (401 met bevestigingNodig). /shared/zwaarstap.js vangt die
+     vraag, laat de browser tekenen en probeert het een keer opnieuw. */
+  function kaal(pad, body) {
+    return fetch(pad, { method: 'POST', body: JSON.stringify(body || {}),
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token() }
+    }).then(function (r) { return r.json().catch(function () { return {}; })
+      .then(function (d) { return { status: r.status, body: d }; }); });
+  }
+  function metVinger(pad, body) {
+    if (!window.RTGZwaar) return post(pad, body);
+    return window.RTGZwaar.metVinger(function (extra) { return kaal(pad, Object.assign({}, body, extra)); },
+      function (actie) { return kaal('/api/office/boardroom/bevestig/opties', { actie: actie })
+        .then(function (x) { return x.body; }); })
+      .then(function (r) {
+        if (r.status >= 400) throw new Error((r.body && r.body.error) || T('lr.mislukt', 'Dat lukte niet.'));
+        return r.body;
+      });
   }
   // dezelfde melder als de rest van deze pagina, met dezelfde standen
   function zeg(t, soort) {
@@ -276,7 +359,7 @@ window.I18N = { en: {
         k.type = 'button';
         k.addEventListener('click', function () {
           k.disabled = true;
-          post('/api/office/balie/zetel', { key: z.key, weg: true })
+          metVinger('/api/office/balie/zetel', { key: z.key, weg: true })
             .then(function (d) { zeg(T('bz.wegOk', 'De zetel is ingetrokken.'), 'goed'); toonZetels(zetelsUit(d)); })
             .catch(function (e) { zeg(e.message, 'fout'); k.disabled = false; });
         });
@@ -287,6 +370,7 @@ window.I18N = { en: {
   function laadZetels() {
     return post('/api/office/balie/zetels', {}).then(function (d) {
       zetelBaas = !!d.baas;
+      $('kuSectie').hidden = !zetelBaas;
       toonZetels(zetelsUit(d));
     }).catch(function (e) { leeg($('bzLijst'), e.message); });
   }
@@ -310,11 +394,134 @@ window.I18N = { en: {
     var b = $('bzGeef');
     b.disabled = true;
     sleutelVan(v).then(function (key) {
-      return post('/api/office/balie/zetel', { key: key });
+      return metVinger('/api/office/balie/zetel', { key: key });
     }).then(function (d) {
       $('bzCode').value = '';
       zeg(T('bz.geefOk', 'De zetel is gegeven.'), 'goed');
       toonZetels(zetelsUit(d));
+    }).catch(function (e) { zeg(e.message, 'fout'); }).then(function () { b.disabled = false; });
+  }
+
+  /* Een uitnodiging voor het kantoor: zwaar werk, dus met de vinger. De code
+     staat alleen in dit antwoord; de server bewaart hem niet. */
+  function maakUitnodiging() {
+    var v = $('kuCode').value.trim();
+    if (!v) { zeg(T('ku.leeg', 'Vul eerst de codenaam van de medewerker in.'), 'let'); return; }
+    var b = $('kuMaak');
+    b.disabled = true;
+    metVinger('/api/office/kantoor/uitnodiging', { codenaam: v }).then(function (d) {
+      $('kuCode').value = '';
+      $('kuUit').textContent = T('ku.code', 'Uitnodigingscode (een keer getoond): ') + d.code +
+        T('ku.tot', ', geldig tot ') + datum(d.verloopt);
+    }).catch(function (e) { zeg(e.message, 'fout'); }).then(function () { b.disabled = false; });
+  }
+
+  /* ---- de zaakdozen ---- */
+  function toonDozen(d, baas) {
+    $('dsSectie').hidden = false;
+    $('dsGeven').hidden = !baas;
+    var g = $('dsGedeeld'), e = $('dsEigen');
+    g.textContent = ''; e.textContent = '';
+    g.appendChild(el('h3', 'rtg-sub', T('ds.gedeeld', 'Nog op de gedeelde sleutel (laatste zeven dagen)')));
+    if (!(d.nogGedeeld || []).length) g.appendChild(el('p', 'rtg-leeg', T('ds.geengedeeld', 'Geen doos meldde de afgelopen zeven dagen met de gedeelde sleutel.')));
+    (d.nogGedeeld || []).forEach(function (x) {
+      rij(g, x.doos, T('ds.laatst', 'laatst gezien ') + datum(x.laatst) + ' · ' + x.aantal + T('ds.keer', ' keer') +
+        (x.heeftEigen ? ' · ' + T('ds.klaar', 'eigen sleutel uitgegeven, nog niet op de doos') : ''), null);
+    });
+    /* De gedeelde sleutel zelf: open (schaduw) of dicht. Dichtzetten weigert de
+       server zolang er hierboven nog een doos staat, met de namen erbij. */
+    var st = d.gedeeldeSleutel || {}, sk = null;
+    if (baas) {
+      sk = el('button', 'rtg-knop', st.dicht ? T('ds.open', 'Zet weer open') : T('ds.dicht', 'Zet de gedeelde sleutel dicht'));
+      sk.type = 'button'; sk.id = 'dsSchakel';
+      sk.addEventListener('click', function () {
+        sk.disabled = true;
+        metVinger('/api/office/doos/gedeeld/zet', { dicht: !st.dicht })
+          .then(function () { zeg(st.dicht ? T('ds.openOk', 'De gedeelde sleutel staat weer open.') : T('ds.dichtOk', 'De gedeelde sleutel is dicht.'), 'goed'); return laadDozen(); })
+          .catch(function (er) { zeg(er.message, 'fout'); sk.disabled = false; });
+      });
+    }
+    rij(g, T('ds.stand', 'De gedeelde sleutel'), st.dicht ? T('ds.isdicht', 'dicht: alleen een doos met een eigen sleutel komt binnen')
+      : T('ds.isopen', 'open (schaduw): hij werkt nog'), sk);
+    if ((d.dozen || []).length) e.appendChild(el('h3', 'rtg-sub', T('ds.eigen', 'Dozen met een eigen sleutel')));
+    (d.dozen || []).forEach(function (x) {
+      var k = null;
+      if (baas) {
+        k = el('button', 'rtg-knop', T('ds.weg', 'Trek in'));
+        k.type = 'button';
+        k.addEventListener('click', function () {
+          k.disabled = true;
+          metVinger('/api/office/doos/sleutel/weg', { doos: x.doos })
+            .then(function () { zeg(T('ds.wegOk', 'De sleutel is ingetrokken.'), 'goed'); return laadDozen(); })
+            .catch(function (er) { zeg(er.message, 'fout'); k.disabled = false; });
+        });
+      }
+      rij(e, x.doos, T('ds.sinds', 'eigen sleutel sinds ') + datum(x.sinds), k);
+    });
+  }
+  /* ---- RTG Rekening voor bedrijven: twee schakelaars ---- */
+  function laadRekeningen() {
+    var wegen = [
+      { lees: '/api/office/werkos/bankpad', zet: '/api/office/werkos/bankpad/zet', veld: 'aan', naam: T('rb.werk', 'Werk OS-uitgave via de rekening van een lid') },
+      { lees: '/api/office/bank/entiteitrekening', zet: '/api/office/bank/entiteitrekening/zet', veld: 'open', naam: T('rb.ent', 'Rekeningen voor entiteiten') }
+    ];
+    return Promise.all(wegen.map(function (w) { return post(w.lees, {}); })).then(function (st) {
+      $('rbSectie').hidden = false;
+      var box = $('rbLijst'); box.textContent = '';
+      wegen.forEach(function (w, i) {
+        var aan = st[i][w.veld] === true, k = null;
+        if (zetelBaas) {
+          k = el('button', 'rtg-knop', aan ? T('rb.zetDicht', 'Zet dicht') : T('rb.zetOpen', 'Zet open'));
+          k.type = 'button'; k.setAttribute('data-weg', w.veld);
+          k.addEventListener('click', function () {
+            k.disabled = true;
+            var body = {}; body[w.veld] = !aan;
+            metVinger(w.zet, body).then(function () { zeg(T('rb.ok', 'Omgezet.'), 'goed'); return laadRekeningen(); })
+              .catch(function (er) { zeg(er.message, 'fout'); k.disabled = false; });
+          });
+        }
+        rij(box, w.naam + ' · ' + (aan ? T('rb.open', 'open') : T('rb.dicht', 'dicht')), st[i].uitleg || '', k);
+      });
+    }).catch(function () { /* geen boardroom: de sectie blijft verborgen */ });
+  }
+
+  /* ---- de kantoordeuren: schaduw of afdwingen ---- */
+  function laadDeuren() {
+    return post('/api/office/beleidsmotor', {}).then(function (d) {
+      $('bmSectie').hidden = false;
+      var box = $('bmDeuren'); box.textContent = '';
+      var stand = d.afdwingen || {};
+      (d.deuren || []).forEach(function (x) {
+        var st = (stand[x.deur] || {}).stand || 'schaduw', k = null;
+        if (zetelBaas) {
+          var aan = st !== 'afdwingen';
+          k = el('button', 'rtg-knop', aan ? T('bm.aan', 'Afdwingen') : T('bm.uit', 'Terug naar de schaduw'));
+          k.type = 'button'; k.setAttribute('data-deur', x.deur);
+          k.addEventListener('click', function () {
+            k.disabled = true;
+            metVinger('/api/office/beleidsmotor/afdwingen/zet', { deur: x.deur, aan: aan })
+              .then(function () { zeg(T('bm.ok', 'De deur is omgezet.'), 'goed'); return laadDeuren(); })
+              .catch(function (er) { zeg(er.message, 'fout'); k.disabled = false; });
+          });
+        }
+        rij(box, x.deur + ' · ' + (st === 'afdwingen' ? T('bm.afdwingen', 'afgedwongen') : T('bm.schaduw', 'schaduw')),
+          x.eens + ' eens · ' + x.oneens + ' oneens · ' + x.waarom, k);
+      });
+    }).catch(function () { /* geen boardroom: de sectie blijft verborgen */ });
+  }
+  function laadDozen() {
+    return post('/api/office/doos/sleutels', {}).then(function (d) { toonDozen(d, zetelBaas); })
+      .catch(function () { /* geen boardroom, geen dozen: de sectie blijft verborgen */ });
+  }
+  function geefDoosSleutel() {
+    var v = $('dsNaam').value.trim();
+    if (!v) { zeg(T('ds.leeg', 'Vul eerst de naam van de doos in.'), 'let'); return; }
+    var b = $('dsGeef');
+    b.disabled = true;
+    metVinger('/api/office/doos/sleutel', { doos: v }).then(function (d) {
+      $('dsNaam').value = '';
+      $('dsUit').textContent = T('ds.sleutel', 'Sleutel (een keer getoond): ') + d.sleutel + ' · ' + (d.let || '');
+      return laadDozen();
     }).catch(function (e) { zeg(e.message, 'fout'); }).then(function () { b.disabled = false; });
   }
 
@@ -343,15 +550,21 @@ window.I18N = { en: {
     laadRegister(true).then(function (ok) {
       if (!ok) return;
       tabrij();
-      laadZetels();
+      laadZetels().then(laadDozen).then(laadDeuren).then(laadRekeningen);
+      $('dsGeef').addEventListener('click', geefDoosSleutel);
+      $('dsNaam').addEventListener('keydown', function (e) { if (e.key === 'Enter') geefDoosSleutel(); });
       $('bzGeef').addEventListener('click', geefZetel);
       $('bzCode').addEventListener('keydown', function (e) { if (e.key === 'Enter') geefZetel(); });
+      $('kuMaak').addEventListener('click', maakUitnodiging);
+      $('kuCode').addEventListener('keydown', function (e) { if (e.key === 'Enter') maakUitnodiging(); });
     });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
   else start();
 })();
 </script>
+<script src="/shared/passkey.js"></script>
+<script src="/shared/zwaarstap.js"></script>
 <script src="/shared/i18n.js"></script>
 <script src="/shared/uitvoer.js"></script>
 <script src="/apps/boardroom.js" defer></script>

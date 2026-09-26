@@ -22,15 +22,14 @@
 
    WAT DEZE LAAG NIET DOET: iets vastleggen. Bij `zwaar` en `plechtig` wordt de
    reden GEVRAAGD en doorgegeven aan de handeling zelf; of hij in een journaal
-   belandt, weet alleen het scherm dat de handeling uitvoert. Hier doen alsof dat
-   geregeld is, zou de zwaarste belofte van dit hele stuk tot decor maken.
+   belandt, weet alleen het scherm dat de handeling uitvoert.
 
    Levert window.RTGGewicht. */
 (function (w, d) {
   'use strict';
   if (w.RTGGewicht) return;
   var gram = w.RTGGrammatica;
-  if (!gram) return;
+  if (!gram || !gram.effectief) return;   // oude grammatica: dicht
 
   function rail() { return w.RTGRail || null; }
   function lagen() { return w.RTGLagen || null; }
@@ -62,10 +61,18 @@
     r.meld({ tekst: tekst, ongedaan: ongedaan });
   }
 
-  function draai(it, extra) {
+  function draai(it, extra, after) {
     var f = it.doe || (w.RTGAdaptief && function (a) { return w.RTGAdaptief.doe(it.id, a); });
     if (typeof f !== 'function') return false;
-    try { f(extra); } catch (e) { if (w.console) w.console.error('[gewicht] ' + it.id, e); return false; }
+    try {
+      var result = f(extra);
+      if (result && typeof result.then === 'function') {
+        result.then(function () { if (after) after(); }, function () {
+          var r = rail(); if (r) r.meld({ tekst: 'De handeling is niet bevestigd. Controleer de actuele toestand.' });
+        });
+      } else if (result !== false && after) after();
+      if (result === false) return false;
+    } catch (e) { if (w.console) w.console.error('[gewicht] ' + it.id, e); return false; }
     return true;
   }
 
@@ -75,7 +82,7 @@
      zien; wie "weet u het zeker?" leest kan dat niet. */
   function bewust(it, bev) {
     var L = lagen();
-    if (!L) return draai(it, {});
+    if (!L) return false;                  // zonder lade geen vraag, dus dicht
     L.lade({ titel: it.naam, inhoud: function (lijf) {
       if (bev.watGebeurt) regel(lijf, bev.watGebeurt, 'gw-uitleg');
       if (bev.ontvanger) paar(lijf, 'Gaat naar', bev.ontvanger);
@@ -92,7 +99,7 @@
       ga.textContent = bev.knop || it.naam;
       ga.onclick = function () {
         L.sluit();
-        if (draai(it, {})) naMelding(it, it.ongedaan);
+        draai(it, {}, function () { naMelding(it, it.ongedaan); });
       };
       rij.appendChild(af); rij.appendChild(ga);
       lijf.appendChild(rij);
@@ -101,10 +108,8 @@
   }
 
   /* --------------------------------------------------------------- zwaar --
-     De reden is verplicht en de knop gaat pas aan als hij er staat. Dat is geen
-     formaliteit: de reden is wat een mens over een half jaar terugleest als
-     iemand vraagt waarom dit is gebeurd, en een leeg veld beantwoordt die vraag
-     niet. */
+     De reden is verplicht en de knop gaat pas aan als hij er staat: de reden is
+     wat een mens over een half jaar terugleest. */
   function zwaar(it, bev, plechtigStap) {
     var L = lagen();
     if (!L) return false;
@@ -190,29 +195,35 @@
   }
 
   /* ------------------------------------------------------------- de ingang --
-     Eén functie, en elke tik in het dock loopt er langs. Dat is de reden dat het
-     gewicht niet omzeild kan worden door ergens anders een knop te maken: wie de
-     capability aanroept, krijgt zijn trap mee. */
+     Elke tik loopt hier langs en krijgt zijn trap mee. */
   function voer(it, bevestiging) {
     if (!it) return false;
     if (it.verhinderd) {                    // grijs is nooit stil: waarom.js legt uit
       if (w.RTGWaarom) w.RTGWaarom.leguit(it);
       return false;
     }
-    var g = it.gewicht || 'licht';
+    // compensatie is nooit "Ongedaan maken" (EDGE.md par. 3)
+    var cap = w.RTGAdaptief && w.RTGAdaptief.capability ? w.RTGAdaptief.capability(it.id) : null;
+    if (cap && cap.herstel === 'compensatie' && it.ongedaan) { it = Object.assign({}, it); delete it.ongedaan; }
+    var g = gram.effectief(it.gewicht, typeof it.ongedaan === 'function');
     var bev = bevestiging || it.bevestiging || {};
-    if (g === 'terug' && typeof it.ongedaan !== 'function') {
-      if (w.console && w.console.warn) {
-        w.console.warn('[gewicht] ' + it.id + ': gewicht "terug" zonder ongedaan; wordt "bewust"');
-      }
-      g = 'bewust';
+    if (g !== (it.gewicht || 'licht') && w.console && w.console.warn) {
+      w.console.warn('[gewicht] ' + it.id + ': gewicht "' + it.gewicht + '" wordt "' + g + '"');
     }
     if (g === 'licht') return draai(it, {});
-    if (g === 'terug') { var ok = draai(it, {}); if (ok) naMelding(it, it.ongedaan); return ok; }
+    if (g === 'terug') return draai(it, {}, function () { naMelding(it, it.ongedaan); });
     if (g === 'bewust') return bewust(it, bev);
     if (g === 'plechtig') return plechtig(it, bev);
     return zwaar(it, bev, false);
   }
 
-  w.RTGGewicht = { voer: voer };
+  /* Voor een ingang die alleen een id kent (de Second Screen): dezelfde weg
+     als een tik. Speelt de handeling nu niet, dan draait er niets. */
+  function voerId(id) {
+    var A = w.RTGAdaptief, it = null;
+    (A && A.voorNu ? A.voorNu() : []).forEach(function (x) { if (x.id === id) it = x; });
+    return it ? voer(it) : false;
+  }
+
+  w.RTGGewicht = { voer: voer, voerId: voerId };
 })(window, document);

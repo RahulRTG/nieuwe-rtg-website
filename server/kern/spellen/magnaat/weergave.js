@@ -20,6 +20,7 @@ const { SECTOREN } = require('./sectoren');
 const { prijsVan } = require('./prijsstand');
 const H = require('./handel');
 const { PROJECTEN } = require('./foundation');
+const { uitCenten, euroTonen, zorgEenheid } = require('./centen');
 
 module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, veilingbeeld,
   belangbeeld, belangwaarde, eigenDeel, bankbeeld, kredietprofiel, verzekerbeeld }) => {
@@ -48,7 +49,7 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, veilingb
         boete: c.boete, vooraf: c.vooraf, exclusief: c.exclusief,
         ronde: c.ronde, aanZet: c.status === 'voorgesteld' && c.van !== h,
         startMaand: c.startMaand, eindMaand: c.eindMaand,
-        betaald: rond(c.betaald), ontvangen: rond(c.ontvangen), boetes: rond(c.boetes),
+        betaald: euroTonen(c.betaald), ontvangen: euroTonen(c.ontvangen), boetes: euroTonen(c.boetes),
         maandenGeleverd: c.maandenGeleverd, maandenTekort: c.maandenTekort,
         afkoopNu: c.status === 'loopt' ? H.afkoopsom(c, st.maand) : null
       };
@@ -83,6 +84,7 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, veilingb
 
   function eindstand(potje) {
     const st = potje.staat;
+    zorgEenheid(st);
     return potje.spelers.map(h => {
       const rij = st.vestigingen[h] || [];
       /* ALLEEN JE EIGEN DEEL, want een deelneming verplaatst waarde (./aandeel.js).
@@ -98,14 +100,14 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, veilingb
          manier om te winnen. Wat je van de bank hebt, is niet van jou. */
       const schuld = (st.leningen || [])
         .filter(l => l.speler === h && l.status === 'loopt')
-        .reduce((n, l) => n + l.restant, 0);
+        .reduce((n, l) => n + uitCenten(l.restant), 0);
       const banen = rij.reduce((n, v) => n + v.personeel, 0);
       const reputatie = rij.length ? Math.round(rij.reduce((n, v) => n + v.reputatie, 0) / rij.length) : 0;
       const omzet = rij.reduce((n, v) => n + (v.omzetTotaal || 0), 0);
       return {
         codenaam: codenaamVan(h),
-        geld: rond(st.geld[h]), waarde: rond(ondernemingswaarde), schuld: rond(schuld),
-        vermogen: rond(st.geld[h] + ondernemingswaarde - schuld),
+        geld: euroTonen(st.geld[h]), waarde: rond(ondernemingswaarde), schuld: rond(schuld),
+        vermogen: rond(uitCenten(st.geld[h]) + ondernemingswaarde - schuld),
         vestigingen: rij.length, banen, reputatie, omzet: rond(omzet)
       };
     }).sort((a, b) => b.vermogen - a.vermogen);
@@ -125,7 +127,7 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, veilingb
     }));
     return {
       stad: k.naam, bron: k.bron, maand: st.maand, duur: st.duur, klaar: st.klaar,
-      geld: rond(st.geld[mij] || 0),
+      geld: euroTonen(st.geld[mij] || 0),
       vestigingen: eigen,
       // van de anderen alleen wat aan tafel zichtbaar is: waar ze zitten en
       // hoeveel. Hun cash is van hen -- zie de waarschuwing in de descriptor
@@ -158,7 +160,7 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, veilingb
       // waar JIJ mag bouwen zonder te hoeven veilen: een gewonnen kavel
       bouwrecht: Object.entries(st.kavelRecht || {}).filter(([, w]) => w === mij)
         .map(([id]) => ({ id, naam: (k.kavel.get(id) || {}).naam })),
-      foundation: { lokaal: rond(st.foundation.lokaal), centraal: rond(st.foundation.centraal),
+      foundation: { lokaal: euroTonen(st.foundation.lokaal), centraal: euroTonen(st.foundation.centraal),
         gedaan: st.foundation.gedaan.map(g => (PROJECTEN.find(p => p.id === g.id) || {}).naam).filter(Boolean) },
       sinds: st.laatste[mij] || null,
       hospitality: st.hospitality || null,

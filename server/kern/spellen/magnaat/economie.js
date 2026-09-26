@@ -19,16 +19,14 @@
    De descriptor draagt dat via `buitenBeurt`, en de motor houdt zich eraan door
    niets anders te doen dan wat de speler vraagt.
 
-   WAT ER IN DEZE FASE NOG NIET IS, en dat staat hier zodat niemand het
-   misverstaat: contracten tussen spelers, aandelen, banken, verzekeringen,
-   onderzoek, veilingen, AI-managers en de permanente wereld. Fase B en C in
-   GAMEHALL.md paragraaf 12.9. Wat er WEL is, is een economie die je kunt
-   spelen, en dat was de eis. */
+   GELD loopt sinds ronde A2 door het grootboek (./boekhouding.js).
+   Nog niet: onderzoek, AI-managers en de permanente wereld (GAMEHALL.md 12.9). */
 const { kaart, STEDENLIJST, stadNaam, stadSleutel } = require('./kaart');
 const { SECTORLIJST } = require('./sectoren');
 const { waarde } = require('./stap');
 const F = require('./foundation');
 const H = require('./handel');
+const { naarCenten, zorgEenheid, EENHEID, WORLD_REGELVERSIE } = require('./centen');
 
 /* De speelduur in SPELMAANDEN, per variant. Een Quick is drie jaar economie in
    een klein uur: lang genoeg dat een investering zich terugbetaalt, kort genoeg
@@ -36,7 +34,7 @@ const H = require('./handel');
 const DUUR = { quick: 36, avond: 96, weekend: 240 };
 // hoeveel echte milliseconden een spelmaand duurt
 const MAAND_MS = { quick: 100000, avond: 150000, weekend: 720000 };
-const START_GELD = 250000;
+const START_GELD = 250000;         // euro's
 const ROOD_RENTE = 0.014;          // maandrente op een negatieve kas; zie de reden bij het gebruik
 const MAX_MAANDEN_PER_KEER = 60;   // een vangnet: een partij die maanden lag hoort niet in een keer door te rekenen
 
@@ -44,6 +42,7 @@ const rond = (n) => Math.round(n);
 
 module.exports = (ctx) => {
   const { db, save, codenaamVan, nudge, magnaatLeren } = ctx;
+  const boek = require('./boekhouding').maakBoekhouding({ db });
   const hospitality = require('./hospitality');
   const worldModel = require('../../hospitality-universe/world-model');
 
@@ -55,15 +54,17 @@ module.exports = (ctx) => {
     const st = {
       stad: stadsleutel, duur, maandMs: MAAND_MS[v.duur] || MAAND_MS.quick,
       maand: 0, begonnen: Date.now(), gerekendTot: Date.now(),
-      geld: {}, vestigingen: {}, kavelBezet: {}, foundation: F.nieuw(),
+      geld: Object.fromEntries(potje.spelers.map(h => [h, 0])), vestigingen: {}, kavelBezet: {}, foundation: F.nieuw(),
       contracten: [], contractTeller: 0, veilingen: [], veilingTeller: 0, kavelRecht: {},
       deelnemingen: [], deelnemingTeller: 0, leningen: [], leningTeller: 0,
       resultaatlog: {}, betaalgemist: {}, polissen: [], polisTeller: 0,
+      eenheid: EENHEID, regelversie: WORLD_REGELVERSIE,
       laatste: {}, klaar: false, hospitality: hospitality.nieuw(), leer:{acties:{},fouten:{}},
       universe: { wereld: worldModel.maak({ id: 'MAGNAAT-'+potje.id, seed: 'magnaat-'+potje.id }), briefing: null, vergelijking: null, evidence: null }
     };
-    for (const h of potje.spelers) { st.geld[h] = START_GELD; st.vestigingen[h] = []; st.laatste[h] = null; }
+    for (const h of potje.spelers) { st.vestigingen[h] = []; st.laatste[h] = null; }
     potje.staat = st;
+    boek.open(potje, naarCenten(START_GELD));
   }
 
   /* HOE JE IETS TERUGVINDT IN DE STAAT staat in ./vinden.js: welk kavel, welke
@@ -78,6 +79,8 @@ module.exports = (ctx) => {
      ververst hoe snel de tijd gaat. */
   function bijrekenen(potje) {
     const st = potje.staat;
+    zorgEenheid(st);   // van voor A2.1: een keer naar centen
+    boek.koppel(potje); boek.bevestig(st);
     if (st.klaar) return [];
     const nu = Date.now();
     let stappen = Math.floor((nu - st.gerekendTot) / st.maandMs);
@@ -98,6 +101,7 @@ module.exports = (ctx) => {
       verslagen.push(verslag);
     }
     st.gerekendTot += stappen * st.maandMs;
+    boek.bevestig(st);
     if (st.maand >= st.duur && !st.klaar) beeindig(potje);
     return verslagen;
   }
@@ -162,6 +166,7 @@ module.exports = (ctx) => {
     st.leer=st.leer||{acties:{},fouten:{}};
     st.leer.acties[actie]=(st.leer.acties[actie]||0)+1;
     const r = ACTIES[actie](potje, h, z);
+    boek.bevestig(st);
     if (r.error){st.leer.fouten[actie]=(st.leer.fouten[actie]||0)+1;save();return r}
     save();
     // een grote zet is nieuws voor de tafel; aan een prijswijziging heeft

@@ -163,7 +163,7 @@ module.exports = ({ db, save, bewerkCollectie }) => {
   function autoStart() {
     if (!TRAIN_MS) return null;
     timer = setInterval(() => {
-      try { const uit = train('automaat'); if (uit && typeof uit.catch === 'function') uit.catch(() => {}); }
+      try { const uit = require('./dienstidentiteit').alsDienst('rtgai', () => train('automaat')); if (uit && typeof uit.catch === 'function') uit.catch(() => {}); }
       catch (e) { /* nooit de server omtrekken */ }
     }, TRAIN_MS);
     if (timer.unref) timer.unref();

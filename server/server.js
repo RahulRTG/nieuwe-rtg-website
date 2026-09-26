@@ -87,7 +87,6 @@ const { maakLive } = require('./kern/live');
 const { RIT_KETEN, RIT_LEGACY, RIT_MELDING, maakVervoer } = require('./kern/vervoer');
 const { VAC_SOORTEN, maakWerk } = require('./kern/werk');
 const { AI_TONE, maakAi } = require('./kern/ai');
-const { maakKantoor } = require('./kern/kantoor');
 const { SHIFT_NAMES, maakPersoneel } = require('./kern/personeel');
 const { HK_STATUSES, POS_METHODS, DOOR_RELOCK_MS, TABLE_STATUSES, ZAAK_OPTIES, maakLeverancier } = require('./kern/leverancier');
 const { maakLid } = require('./kern/lid');
@@ -1266,9 +1265,8 @@ const carriereledger = maakCarriereLedger({
   db, save, bijeen, inBundel, crypto, schoon, codenaamVan });
 const bestandenOpslag = require('./kern/bestanden-opslag')({ db });
 const bestanden = require('./kern/bestanden').maakBestanden({
-  // antivirus: de gestukte upload komt nooit als data-URL in een verzoek-body
-  // langs het scan-net, dus die scant zichzelf zodra het bestand compleet is
-  db, save, bijeen, inBundel, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer, dir: DATA_DIR, antivirus });
+  // Gestukte uploads worden na samenvoegen gescand.
+  db, save, bijeen, inBundel, bewerkCollectie, store: STORE, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer, dir: DATA_DIR, antivirus });
 /* RTG Meet (kern/meet.js): vergaderkamers op codenaam; de server geeft
    alleen WebRTC-seinen door, beeld en geluid lopen peer-to-peer. */
 const meet = require('./kern/meet').maakMeet({
@@ -1826,7 +1824,7 @@ betaal.koppelStore({
 const {
   DP_MIN_CENTEN, DP_MAX_CENTEN, dpBetaalDirect, dpMijnBetalingen,
   dpVerzoekMaak, dpVerzoekenVoor, dpBetaalVerzoek, dpVerzoekIntrek, dpOntvangsten, dpRegistreerMunt, dpRegistreerBevestigd
-} = maakDirectpay({ db, save, crypto, findSupplier, betaal, notify, notifySupplier, sseToSupplier, sseToCustomer, sseToOffice, logActivity,
+} = maakDirectpay({ db, save, crypto, findSupplier, betaal, betaalWaarheid, notify, notifySupplier, sseToSupplier, sseToCustomer, sseToOffice, logActivity,
   /* De transactie-index voor de twee geldcollecties. Ze werden hier met
      unshift+slice bijgehouden, dus zonder index (O(N) zoeken) en met een
      stille kap op de staart. Nu langs dezelfde weg als orders en boekingen. */
@@ -1911,9 +1909,7 @@ const munten = maakMunten({ db, save, muntbetaal });
 const { maakSettlement } = require('./kern/settlement');
 /* payOplaadAfronden als LATE binding: de betaalkern wordt pas verderop gebouwd
    (kernlaag), maar deze functie draait pas als er een webhook binnenkomt -- dan
-   staat hij er. Zonder deze draad kan settlement een bevestigde oplading niet
-   bijschrijven, en dat is precies wat er misging: kaart afgeschreven, wallet
-   niet bijgeschreven, webhook antwoordde 200 ok. */
+   staat hij er. Sinds MONEY-012 alleen nog voor oude kaartWachtend-rijen. */
 const settleFactuur = maakSettlement({ db, save, accounts, fonds, log, dpRegistreerMunt, dpRegistreerBevestigd,
   payOplaadAfronden: (a) => (kern.pay && kern.pay.oplaadAfronden ? kern.pay.oplaadAfronden(a) : null),
   // bevestigt het IBAN waarvandaan is opgeladen, zodat de wachttijd op DIE rekening vervalt
@@ -2211,7 +2207,7 @@ const OFFICE_CODE = process.env.OFFICE_CODE || (DEMO ? 'RTG-OFFICE' : crypto.ran
 
 
 /* De backoffice-laag (officeAuth, officeState, pendingVerifications) staat in
-   server/kern/kantoor.js en wordt verderop opgezet via maakKantoor(), na de
+   server/kern/kantoor.js en wordt verderop opgezet via opzet/kantoordeur.js, na de
    AI-kern omdat officeState de conciergeInbox meeneemt. OFFICE_CODE blijft hier
    (nodig bij de startwaarschuwing en de kantoor-login). */
 
@@ -2249,8 +2245,8 @@ const { aiSystemPrompt, cannedAnswer, generateAiReply, convOf, memberSays, notee
       return id != null ? geloof.promptRegel(id, null) : null;
     } });
 
-// De backoffice-laag draagt de AI-kern (conciergeInbox) mee, dus staat hij na maakAi.
-const { officeAuth, kluisAuth, naamAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, pendingVerifications, mensdeurStand } = maakKantoor({
+// Kantoorlaag + beleidsmotor: ./opzet/kantoordeur.js (na maakAi).
+const { officeAuth, kluisAuth, naamAuth, boardroomAuth, beleidsmotor, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, pendingVerifications, mensdeurStand } = require('./opzet/kantoordeur')(app, () => kern, {
   db, save, bewerkCollectie, sessionFor, eigenaar, accounts, findSupplier, connectedSupplierCodes,
   publicSupplier, conciergeInbox, beveilig, archief, grootAantal, ledenAantal
 });
@@ -2291,7 +2287,7 @@ const kern = {
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   eersteBijdrageFactuur, ledenInhoudVan, leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
   mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, handelsketen, agenda, notities, vertegenwoordiging, rugdekking, carriereledger, bestanden, bestandenOpslag, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, factuurSaldo, corrigeerFactuur, markt,
-  noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, kluisAuth, naamAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, mensdeurStand, openVacatures, optieAan,
+  noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, kluisAuth, naamAuth, boardroomAuth, beleidsmotor, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, mensdeurStand, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, gidsWeg, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinSlot, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, sessieregister, toestellen, bezitsbewijs, tweefactor, commercieel, commercieelStand, commercieelZet, ritBezetting, ritVerder, rtf,
   runItem, runKey, salonNaarVolgers, salonProfielCompleet, salonZichtbaar, salonItemsVan, ...ondernemerpoort, save, scheduleFor, schoon, sectiesForOrder, sendPush,

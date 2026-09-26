@@ -160,7 +160,7 @@ if(window.RTGUitvoer) RTGUitvoer.bron(function(){
 async function laad(){
   if(!TOKEN){ heading('guest'); return; }
   rememberDraft(); const version=++loadVersion;
-  let d; try{ d=await api('feed',{soort:SOORT}); }catch(e){ if(version===loadVersion){heading('error');meld(e.message);} return; }
+  let d; try{ d=await api('feed',{soort:SOORT}); /* Ontbreekt een veld, dan de eigen foutmelding hieronder -- nooit een lege lijst (die zou beweren dat er niets is) en nooit een ruwe TypeError (LIEGRONDE.json). */ if(!(d && Array.isArray(d.feed) && Array.isArray(d.trending))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.'); }catch(e){ if(version===loadVersion){heading('error');meld(e.message);} return; }
   if(version!==loadVersion)return;
   rememberDraft();
   const first=!d.feed.length&&!d.volgend&&SOORT==='volgend'&&!composing;

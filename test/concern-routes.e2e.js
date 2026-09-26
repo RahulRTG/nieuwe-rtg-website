@@ -66,11 +66,11 @@ test('de concern-routes draaien mee en komen door de domeingrens', async () => {
     const ent = nieuw.body.entiteit.id;
 
     // een feit met bron, en dan de tijdmachine erop
-    const feit = await post(base, '/api/concern/feit/zet', { entiteit: ent, soort: 'bestuurder', waarde: 'directeur', sleutel: 'marco',
+    const feit = await post(base, '/api/concern/feit/zet', { entiteit: ent, soort: 'bestuurder', waarde: 'directeur', sleutel: 'marco', extern: true,
         van: '2026-01-01', bronSoort: 'register', bronDetail: 'KvK' }, t);
     assert.equal(feit.status, 200, JSON.stringify(feit.body));
 
-    const zonderBron = await post(base, '/api/concern/feit/zet', { entiteit: ent, soort: 'bestuurder', waarde: 'directeur', sleutel: 'lisa' }, t);
+    const zonderBron = await post(base, '/api/concern/feit/zet', { entiteit: ent, soort: 'bestuurder', waarde: 'directeur', sleutel: 'lisa', extern: true }, t);
     assert.equal(zonderBron.status, 400, 'een feit zonder bron hoort door de deur te worden geweigerd');
 
     const toen = await post(base, '/api/concern/opdatum', { entiteit: ent, op: '2025-01-01' }, t);

@@ -90,3 +90,49 @@ test('static project path and JavaScript-disabled visitors retain content and re
     }
   } finally { if (browser) await browser.close(); await new Promise(resolve => server.close(resolve)); }
 });
+
+/* Omhoog vegen op de balk vraagt eerst de host (EDGE.md, ronde 2 stap 15). De
+   landing en de sitepagina's hebben een eigen paneel met de rijen van hun
+   scene; zonder die vraag toonde het blad de kernlijst van de Edge, en zonder
+   het tweede register is dat de lege melding. Bij 390x844, met een echte veeg. */
+test('omhoog vegen op de landing en een sitepagina opent het paneel van de host',
+ {skip:geenBrowser(pw),timeout:120000},async()=>{
+ const srv=await startServer({env:{SMTP_URL:'',RTG_AI_UIT:'1'}});let browser;
+ const veeg=page=>page.evaluate(()=>{
+  const bar=document.querySelector('.rtg-adaptive-bar'),r=bar.getBoundingClientRect(),sx=r.left+r.width/2,sy=r.top+r.height/2;
+  const maak=(type,cy)=>bar.dispatchEvent(new PointerEvent(type,{bubbles:true,cancelable:true,pointerId:7,pointerType:'touch',button:0,clientX:sx,clientY:cy}));
+  maak('pointerdown',sy);maak('pointermove',sy-90);maak('pointerup',sy-90);
+ });
+ const blad=page=>page.evaluate(()=>{
+  const sheet=document.querySelector('.rtg-adaptive-sheet');
+  return {staat:document.querySelector('.rtg-adaptive-edge').dataset.rtgAdaptiveState,
+   leeg:sheet.querySelectorAll('.rtg-adaptive-empty').length,
+   kern:[...sheet.querySelectorAll('.rtg-adaptive-sheet-list:not([hidden]) .rtg-adaptive-sheet-action')].map(b=>b.textContent),
+   rijen:[...sheet.querySelectorAll('nav button')].map(b=>b.textContent)};
+ });
+ try{
+  browser=await pw.chromium.launch(browserOpties(pw));
+  const context=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce',serviceWorkers:'block'});
+  await context.addInitScript(()=>localStorage.setItem('rtg_lang','nl'));
+  await context.route('**/api/vertaal/ui',r=>r.fulfill({status:503,body:'Deliberate translation outage'}));
+  const page=await context.newPage(),errors=[];letOpFouten(page,errors);
+  await page.goto(srv.base+'/',{waitUntil:'domcontentloaded'});await ready(page);
+  await veeg(page);
+  await page.waitForFunction(()=>document.querySelector('.rtg-adaptive-edge').dataset.rtgAdaptiveState==='expanded');
+  const landing=await blad(page);
+  assert.equal(landing.leeg,0,'geen lege melding op de landing');
+  assert.deepEqual(landing.kern,[],'de kernlijst blijft weg');
+  assert.deepEqual(landing.rijen,['Bekijk het platform','Zoek in RTG'],'de rijen van de eerste scene');
+  assert.equal(await page.locator('.rtg-adaptive-sheet #contextActions').isVisible(),true);
+  await page.goto(srv.base+'/site/werelden/livingos.html');
+  await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
+  await veeg(page);
+  await page.waitForFunction(()=>document.querySelector('.rtg-adaptive-edge').dataset.rtgAdaptiveState==='expanded');
+  const site=await blad(page);
+  assert.equal(site.leeg,0,'geen lege melding op de sitepagina');
+  assert.deepEqual(site.kern,[],'de kernlijst blijft weg');
+  assert.ok(site.rijen.includes('Stel uw vraag over RTG'),'de rijen van de pagina: '+site.rijen.join(', '));
+  assert.deepEqual(errors,[]);
+  await context.close();
+ }finally{if(browser)await browser.close();await stop(srv);}
+});

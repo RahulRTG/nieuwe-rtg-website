@@ -5,7 +5,7 @@
    aankomt.
 
    De opslag is per eigenaar-sleutel: 'sup:<code>' voor een leverancier,
-   'lid:<key>' voor een lid. maakAgenda(state) volgt het vaste kern-patroon. */
+   'lid:<key>' voor een lid en 'gezin:<code>' voor een RTFoundation-gezin. maakAgenda(state) volgt het vaste kern-patroon. */
 
 const DAGEN = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];
 const { afspraakVoorBron } = require('./agenda-idempotentie');
@@ -167,5 +167,10 @@ function maakAgenda({ db, save, bijeen, inBundel, crypto, anthropic, schoon }) {
    Vandaar hier, naast de opslag die hem gebruikt. */
 const agendaLidSleutel = key => 'lid:' + key;
 const agendaZaakSleutel = code => 'sup:' + code;
+/* De gezinsagenda van de RTFoundation draait op dezelfde motor, onder een
+   derde voorvoegsel. Dat was eerst een eigen lijst in het gezinsrecord met een
+   eigen herhaalregel ernaast (SCHERMEIGENAAR.json, consolidatieronde van 23
+   september 2026); nu is het EEN agenda met drie soorten eigenaar. */
+const agendaGezinSleutel = code => 'gezin:' + code;
 
-module.exports = { maakAgenda, agendaLidSleutel, agendaZaakSleutel };
+module.exports = { maakAgenda, agendaLidSleutel, agendaZaakSleutel, agendaGezinSleutel };

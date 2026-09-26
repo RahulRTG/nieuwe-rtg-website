@@ -134,6 +134,7 @@ function context(req, fouten) {
    Ontbreekt hij, dan hoort de server luid om te vallen en niet zachtjes een
    andere klok te lezen. */
 const klok = require('../lib/klok');
+const { agentVan } = require('../kern/agentteken'); // A5: de AI namens de mens
 
 function maak(req, g) {
   g = g || {};
@@ -146,7 +147,7 @@ function maak(req, g) {
      zeggen terwijl er wel een sessie is. */
   if (!identiteit) identiteit = id ? 'bewezen' : 'anoniem';
   return {
-    actor: { soort, id, naam: tekst(g.naam, 200), rol: tekst(g.rol, 60), identiteit },
+    actor: { soort, id, naam: tekst(g.naam, 200), rol: tekst(g.rol, 60), identiteit, agent: agentVan(req) },
     tenant: g.tenantId ? { soort: tekst(g.tenantSoort, 40) || 'zaak', id: tekst(g.tenantId, 120) } : null,
     capability: tekst(g.capability, 120),
     gezag: g.gezagBron ? { bron: tekst(g.gezagBron, 60), baas: !!g.gezagBaas } : null,

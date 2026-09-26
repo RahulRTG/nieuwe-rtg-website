@@ -89,12 +89,22 @@ function naarClaude(data) {
   return {
     content: content.length ? content : [{ type: 'text', text: '' }],
     stop_reason: heeftTool ? 'tool_use' : (keuze.finish_reason === 'length' ? 'max_tokens' : 'end_turn'),
-    usage: { input_tokens: (data.usage || {}).prompt_tokens || 0, output_tokens: (data.usage || {}).completion_tokens || 0,
-      // OpenAI cachet automatisch; dit maakt de treffers zichtbaar in dezelfde
-      // Claude-vormige usage (cache_read_input_tokens) als bij de andere aanbieders
-      cache_read_input_tokens: (((data.usage || {}).prompt_tokens_details || {}).cached_tokens) || 0 },
+    usage: usageVan(data.usage),
     model: data.model, _via: 'openai'
   };
+}
+
+/* OpenAI cachet automatisch, en telt de treffers MEE in prompt_tokens. Claude
+   telt ze apart (input_tokens is dan alleen het ongecachete deel). De
+   Claude-vorm is wat de rest van het huis leest, dus gaan de treffers eraf --
+   anders telt de meter ze twee keer, een keer vol en een keer als leesbeurt
+   (ARBEID.md par. 4 punt 12). */
+function usageVan(u) {
+  const x = u || {};
+  const prompt = Number(x.prompt_tokens) || 0;
+  const cache = Math.min(prompt, Number((x.prompt_tokens_details || {}).cached_tokens) || 0);
+  return { input_tokens: prompt - cache, output_tokens: Number(x.completion_tokens) || 0,
+    cache_read_input_tokens: cache };
 }
 
 class OpenAI {
@@ -131,4 +141,4 @@ class OpenAI {
 
 module.exports = OpenAI;
 module.exports.OpenAI = OpenAI;
-module.exports._intern = { naarOpenAI, naarClaude, kiesModel };
+module.exports._intern = { naarOpenAI, naarClaude, kiesModel, usageVan };

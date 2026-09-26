@@ -1,19 +1,17 @@
 /* De pro-laag van de agenda: wat van een lijstje een echte kalender maakt.
 
-   - BEREIK: afspraken over een datumvenster, met HERHALINGEN uitgerold
-     (dag/week/maand/jaar, tot een einddatum). Een maand-herhaling op de
-     31e wordt in een korte maand de laatste dag -- klemmen, niet
-     overslaan, en dat staat hier zwart op wit.
+   - BEREIK: een datumvenster met HERHALINGEN uitgerold (dag/week/maand/
+     jaar, tot een einddatum). Een maandpunt op de 31e klemt in een korte
+     maand op de laatste dag -- klemmen, niet overslaan.
    - UITNODIGEN op codenaam: de genodigde krijgt een gekoppelde kopie in
      de eigen agenda en zegt ja of nee; de organisator ziet de stand per
      deelnemer. Echte namen komen hier nergens voor.
    - HERINNERINGEN: een veegtimer die een seintje stuurt (SSE) zoveel
      minuten voor aanvang. De timer is unref'd: hij houdt geen test wakker.
-   - ICS-export: de agenda praat met elke agenda ter wereld (RRULE voor de
-     herhalingen). Tijden zijn bewust lokale tijden, zonder tijdzone: wat
-     u intypt is wat er staat.
-   - ECOSYSTEEM: boekingen uit RTG zelf verschijnen als alleen-lezen laag
-     met bronlabel; de agenda schrijft er nooit aan.
+   - ICS-export met RRULE. Tijden zijn bewust lokaal, zonder tijdzone:
+     wat u intypt is wat er staat.
+   - ECOSYSTEEM: boekingen uit RTG zelf als alleen-lezen laag met label.
+   - GEDEELD: de gezinsagenda (gezin:<code>) zet wie/door (profiel-ids).
 
    De basislaag (lijst, toevoegen, AI-invoer) staat in kern/agenda.js;
    deze laag wordt er in server.js overheen gelegd. */
@@ -53,6 +51,7 @@ function maakAgendaPro({ db, save, bijeen, inBundel, crypto, schoon, keyVanCoden
     return { id: i.id, titel: i.titel, tijd: i.tijd || null, eind: i.eind || null, plek: i.plek || null,
       notitie: i.notitie || null, gedaan: !!i.gedaan, herhaal: i.herhaal || 'geen', herhaalTot: i.herhaalTot || null,
       herinner: i.herinner == null ? null : i.herinner,
+      wie: i.wie || null, door: i.door || null, basis: i.datum,
       van: i.vanKey ? naam(i.vanKey) : null, status: i.status || null,
       deelnemers: (i.deelnemers || []).map(d => ({ codenaam: naam(d.key), status: d.status })) };
   }
@@ -100,6 +99,8 @@ function maakAgendaPro({ db, save, bijeen, inBundel, crypto, schoon, keyVanCoden
     const her = Math.round(Number(data.herinner));
     i.herinner = Number.isFinite(her) && her >= 0 && her <= 10080 && data.herinner !== null && data.herinner !== '' ? her : null;
     delete i.herinnerdOp;
+    if (data.wie !== undefined) i.wie = scho(data.wie, 40) || null;
+    if (!i.door && data.door) i.door = scho(data.door, 40) || null;
     // de kopieën bij de genodigden gaan mee (tijd en plek zijn van de afspraak)
     for (const d of i.deelnemers || []) {
       const kopie = ruw(d.key).find(x => x.bronId === i.id && x.vanKey === ownerKey);

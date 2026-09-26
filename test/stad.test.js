@@ -106,7 +106,13 @@ test('de veld-app: de werklijst schrijft zichzelf en klaarmelden dempt de klus',
   assert.ok(!w2.klussen.some(k => k.sleutel === sleutelKlus), 'klaargemeld = van de lijst (demper)');
   assert.ok(w2.klaargemeld.some(k => k.sleutel === sleutelKlus && k.wie === 'Bram' && k.notitie === 'voeding zat los'), 'de klaarmelding staat erbij, op naam');
   const board = (await oapi('boardroom')).body;
-  assert.ok((board.audit || []).some(a => a.wie === 'Bram' && /Stadsklus klaargemeld/.test(a.wat)), 'het klaarmelden staat in het auditlog');
+  /* De opgegeven naam staat bij de klus (hierboven) en in de TEKST van de
+     auditregel, maar nooit als actor: die komt uit de sessie. Tot 23 september
+     2026 eiste deze bewering het omgekeerde. */
+  const regel = (board.audit || []).find(a => /Stadsklus klaargemeld/.test(a.wat));
+  assert.ok(regel, 'het klaarmelden staat in het auditlog');
+  assert.notEqual(regel.wie, 'Bram', 'een opgegeven naam is geen actor');
+  assert.match(regel.wat, /gemeld als Bram/, 'maar staat wel als gegeven in de regel');
   // een klus die niet (meer) bestaat is netjes 404
   assert.equal((await oapi('stad/werk/klaar', { sleutel: 'doos:SD-BESTAATNIET' })).status, 404);
   await oapi('stad/node/stop', { serial: aan.body.serial });

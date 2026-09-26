@@ -49,7 +49,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, kantoorKoppelBody } = require('./helper');
 
 /* De twee getallen die deze toets nodig heeft komen UIT de bron en staan hier
    niet nog een keer overgetypt (LAT.md regel 4): een tweede kopie van de
@@ -111,7 +111,7 @@ test.before(async () => {
      zelf goed (kern/rtfos/projecten-besluit.js). Zonder deze tweede persoon is
      er geen LOPEND project en kan de geoormerkte gift niet worden beproefd. */
   const tweede = await lid('Tweede Bestuurder');
-  await api('/api/account/koppel', { soort: 'kantoor', code: OFFICE_CODE }, tweede.token);
+  await api('/api/account/koppel', await kantoorKoppelBody(base, tweede.token), tweede.token);
   bestuur2 = (await api('/api/account/start', { rol: 'kantoor' }, tweede.token)).body.token;
   assert.ok(bestuur2, 'de tweede kantoormedewerker kreeg geen sessie');
   const geef = await api('/api/office/boardroom/toegang/geef', { codenaam: tweede.codenaam }, kantoor);

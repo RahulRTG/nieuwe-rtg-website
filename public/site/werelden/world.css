@@ -2,11 +2,12 @@
   --world:#7f1634;
   --world-soft:rgba(127,22,52,.2);
   --world-image:url("../../campagne/kyoto-suite.jpg");
+  --moment-image:url("../../images/editorial/moment-dinner.webp");
 }
 
-body[data-world="travel"]{--world:#941b43;--world-soft:rgba(148,27,67,.2);--world-image:url("../../campagne/kaiseki.jpg")}
-body[data-world="work"]{--world:#183252;--world-soft:rgba(24,50,82,.25);--world-image:url("../../campagne/jet.jpg")}
-body[data-world="foundation"]{--world:#0b5277;--world-soft:rgba(11,82,119,.22);--world-image:url("../../campagne/bamboe.jpg")}
+body[data-world="travel"]{--moment-image:url("../../images/editorial/moment-travel-change.webp");--world:#941b43;--world-soft:rgba(148,27,67,.2);--world-image:url("../../campagne/kaiseki.jpg")}
+body[data-world="work"]{--moment-image:url("../../images/editorial/moment-work-event.webp");--world:#183252;--world-soft:rgba(24,50,82,.25);--world-image:url("../../campagne/jet.jpg")}
+body[data-world="foundation"]{--moment-image:url("../../images/editorial/moment-family-support.webp");--world:#0b5277;--world-soft:rgba(11,82,119,.22);--world-image:url("../../campagne/bamboe.jpg")}
 
 body.world-story{max-width:100%;overflow-x:clip;background:#0b0908;color:var(--ivory)}
 .world-shell{max-width:100%;overflow:clip}
@@ -47,7 +48,7 @@ body.world-story{max-width:100%;overflow-x:clip;background:#0b0908;color:var(--i
 .proof-detail{margin-top:1.35rem;border-top:1px solid rgba(23,18,15,.15);padding-top:1rem}.proof-detail summary{position:relative;padding-right:3.6rem;color:var(--world);font-size:.72rem;font-weight:700;letter-spacing:.04em;line-height:1.5;list-style:none;cursor:pointer}.proof-detail summary::-webkit-details-marker{display:none}.proof-detail summary::after{position:absolute;right:0;top:.12rem;font-family:var(--sans);font-size:.56rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;content:"Meer"}.proof-detail[open] summary::after{content:"Minder"}.proof-detail>p{margin:.9rem 0 0!important;color:#544a42!important;font-size:.79rem!important;line-height:1.72!important}.proof-source{display:block;margin-top:.8rem;color:#766a60;font:500 .62rem/1.65 ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}.proof-source::before{display:block;margin-bottom:.2rem;color:var(--world);font:700 .58rem/1.4 var(--sans);letter-spacing:.12em;text-transform:uppercase;content:"Bestanden"}
 
 .moment{display:grid;grid-template-columns:1fr 1fr;min-height:650px;background:#0d0b0a}
-.moment-visual{min-height:520px;background:linear-gradient(0deg,rgba(8,7,6,.24),rgba(8,7,6,.08)),var(--world-image) center/cover no-repeat}
+.moment-visual{min-height:520px;background:linear-gradient(0deg,rgba(8,7,6,.24),rgba(8,7,6,.08)),var(--moment-image) center/cover no-repeat}
 .moment-copy{display:flex;flex-direction:column;justify-content:center;padding:clamp(3rem,7vw,7rem)}
 .moment-copy h2{margin:1.1rem 0 1.8rem;color:var(--ivory);font-size:clamp(2.7rem,4.5vw,4.9rem)}
 .moment-copy>p:not(.story-kicker){max-width:610px;color:rgba(244,240,233,.67);line-height:1.9}

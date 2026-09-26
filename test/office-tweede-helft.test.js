@@ -254,11 +254,17 @@ test('7. de twee routes met hun token in de URL zijn even streng als de rest', a
   // de documentdownload: zelfde deur, plus een padtraversal die doodloopt
   assert.equal((await haal('/api/office/doc?file=paspoort.jpg')).status, 401, 'eerst de deur, dan pas het bestand');
   assert.equal((await haal('/api/office/doc?file=x&token=' + encodeURIComponent(lid))).status, 401);
-  const traversal = await haal('/api/office/doc?token=' + encodeURIComponent(kantoor) +
+  /* Een identiteitsbewijs is op naam, zoals de lijst waar de link uit komt: de
+     gedeelde code krijgt 403 (AUTHORITY.md fase 1, gevonden door de A3-meting).
+     De traversal wordt daarom met de eigenaar geproefd, want achter een 403
+     bewijst hij niets. */
+  assert.equal((await haal('/api/office/doc?file=paspoort.jpg&token=' + encodeURIComponent(kantoor))).status, 403,
+    'de gedeelde code opent geen identiteitsbewijs');
+  const traversal = await haal('/api/office/doc?token=' + encodeURIComponent(eigenaar) +
     '&file=' + encodeURIComponent('../../server/data/secret.key'));
   assert.equal(traversal.status, 404, 'een pad omhoog wordt een basename, en die bestaat niet');
   assert.ok(!/BEGIN|-----/.test(traversal.tekst), 'en er komt zeker geen sleutel terug');
-  assert.equal((await haal('/api/office/doc?token=' + encodeURIComponent(kantoor))).status, 404,
+  assert.equal((await haal('/api/office/doc?token=' + encodeURIComponent(eigenaar))).status, 404,
     'zonder bestandsnaam valt er niets te downloaden');
 
   // met een geldig kantoortoken gaat de stroom wel open (en meteen weer dicht)

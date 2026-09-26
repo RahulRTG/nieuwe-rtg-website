@@ -1,5 +1,12 @@
 {
-  "stempel": "2026-09-19",
+  "stempel": {
+    "op": "2026-09-25T08:52:01.306Z",
+    "commit": "81cbca1c",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/tafelproef.js",
+    "node": "v22.22.2"
+  },
   "uitleg": "Een horecaketen van tafel tot afrekening, gemeten per SCHAKEL (handelt actor A, en ziet actor B dat?) en per STORING (houdt de keten zich aan wat hij belooft als het misgaat?). Zie MAATSTAF.md par. 7.",
   "grens": "Alleen de tafel-keten; bezorging, hotel en club hebben eigen naden. De rekening loopt niet door tot een creditnota: de retourlaag hangt aan een leverancierbestelling en niet aan een horecarekening. Er komt geen browser aan te pas, dus dit zegt niets over de schermen.",
   "schakels": [
@@ -12,7 +19,7 @@
       "status": 200,
       "ziet": "de gast leest tafel PROEF-1 bij Sal de Mar",
       "fout": null,
-      "ms": 16
+      "ms": 18
     },
     {
       "nr": 2,
@@ -32,9 +39,9 @@
       "wat": "schuift aan via de QR en komt op dezelfde rekening",
       "stand": "gesloten",
       "status": 200,
-      "ziet": "gast op rekening 6612937d6e (zaak opende 6612937d6e), 2 stoelen",
+      "ziet": "gast op rekening eb4b4d36da (zaak opende eb4b4d36da), 2 stoelen",
       "fout": null,
-      "ms": 22
+      "ms": 15
     },
     {
       "nr": 4,
@@ -45,7 +52,7 @@
       "status": 200,
       "ziet": "2 regel(s) op de bon van de zaak",
       "fout": null,
-      "ms": 21
+      "ms": 15
     },
     {
       "nr": 5,
@@ -56,7 +63,7 @@
       "status": 200,
       "ziet": "keukenbord 0 -> 2 bon(nen)",
       "fout": null,
-      "ms": 17
+      "ms": 15
     },
     {
       "nr": 6,
@@ -67,7 +74,7 @@
       "status": 200,
       "ziet": "bon draagt gastNr 2 (Gast)",
       "fout": null,
-      "ms": 0
+      "ms": 1
     },
     {
       "nr": 7,
@@ -78,7 +85,7 @@
       "status": 200,
       "ziet": "1 van 2 uitgegeven",
       "fout": null,
-      "ms": 10
+      "ms": 9
     },
     {
       "nr": 8,
@@ -89,7 +96,7 @@
       "status": 200,
       "ziet": "2 delen, som 3200 van 3200 centen",
       "fout": null,
-      "ms": 5
+      "ms": 6
     },
     {
       "nr": 9,
@@ -100,7 +107,7 @@
       "status": 200,
       "ziet": "de gast leest \"Verkeerd bereid: koud geserveerd\" bij Gazpacho de sandia",
       "fout": null,
-      "ms": 15
+      "ms": 13
     },
     {
       "nr": 10,
@@ -111,7 +118,7 @@
       "status": 200,
       "ziet": "bruto 3200 -> 1600 (correctie 1600), regel staat er nog: true",
       "fout": null,
-      "ms": 7
+      "ms": 4
     },
     {
       "nr": 11,
@@ -122,7 +129,7 @@
       "status": 200,
       "ziet": "zaak: openstaand 0, gesloten true | gast: 401 sessie-weg -- \"Deze tafelsessie is niet meer geldig. Scan de QR op tafel opnieuw.\"",
       "fout": null,
-      "ms": 14
+      "ms": 11
     }
   ],
   "storingen": [
@@ -172,10 +179,10 @@
       "naam": "een tweede rekening op dezelfde tafel",
       "belofte": "weigert en wijst naar de bestaande",
       "stand": "gehouden",
-      "wat": "status 409, wijst naar e91ccf17e5"
+      "wat": "status 409, wijst naar 6e3e96b3e5"
     }
   ],
-  "rekening": "6612937d6e",
+  "rekening": "eb4b4d36da",
   "telling": {
     "schakels": 11,
     "gesloten": 11,

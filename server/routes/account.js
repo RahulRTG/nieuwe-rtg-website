@@ -6,9 +6,10 @@ module.exports = (kern) => {
   const { app, auth, accRollen, accKoppel, accStart, accOntkoppel } = kern;
   // bij een weigering reizen ook de duidingsvelden mee (pinNodig: de app moet
   // om de algemene pin vragen; venster: het werkvenster dat de deur dichthoudt;
-  // locatieNodig: de werkplek-zone vraagt om een positie van het toestel)
+  // locatieNodig: de werkplek-zone vraagt om een positie van het toestel;
+  // watNu: de weg die wel werkt, zoals de kantooruitnodiging)
   const stuur = (res, r) => r.error
-    ? res.status(r.status || 400).json({ error: r.error, ...(r.pinNodig ? { pinNodig: true } : {}), ...(r.venster ? { venster: r.venster } : {}), ...(r.locatieNodig ? { locatieNodig: true } : {}) })
+    ? res.status(r.status || 400).json({ error: r.error, ...(r.pinNodig ? { pinNodig: true } : {}), ...(r.venster ? { venster: r.venster } : {}), ...(r.locatieNodig ? { locatieNodig: true } : {}), ...(r.watNu ? { watNu: r.watNu } : {}) })
     : res.json(r);
   const echtAccount = (req, res) => {
     if (req.session.tier === 'guest' || !req.session.account) {
@@ -30,8 +31,14 @@ module.exports = (kern) => {
     if (!echtAccount(req, res)) return;
     stuur(res, await accStart(req.session.key, req.body || {}, req));
   });
-  app.post('/api/account/ontkoppel', auth, (req, res) => {
+  app.post('/api/account/ontkoppel', auth, async (req, res) => {
     if (!echtAccount(req, res)) return;
-    stuur(res, accOntkoppel(req.session.key, req.body || {}));
+    const r = accOntkoppel(req.session.key, req.body || {});
+    /* Wie de kantoorrol loslaat, laat ook de kantoorsessies los die er al open
+       stonden (AUTHORITY.md fase 3): anders bleef die deur dertig dagen open. */
+    if (r && r.ok && String((req.body || {}).rol || '') === 'kantoor' && kern.kantoorIntrekking) {
+      r.sessiesGesloten = (await kern.kantoorIntrekking.sluitKantoorVan(req.session.key, req)).sessies;
+    }
+    stuur(res, r);
   });
 };

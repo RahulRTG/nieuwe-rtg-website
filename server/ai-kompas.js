@@ -5,7 +5,7 @@
 function kompasStatus({ hybride, heeftLokaal, lokaleGrens, beschikbaar }) {
   const route = hybride ? 'hybride' : heeftLokaal ? lokaleGrens : beschikbaar ? 'extern' : 'regels';
   const privacy = hybride ? 'Lokale start; externe uitwijk kan inhoud verwerken'
-    : heeftLokaal && lokaleGrens === 'op-dit-apparaat' ? 'Inhoud blijft op deze Mac'
+    : heeftLokaal && lokaleGrens === 'rtg-server' ? 'Inhoud blijft op de eigen modelserver van RTG'
     : heeftLokaal ? 'Inhoud blijft binnen de eigen omgeving'
     : beschikbaar ? 'Inhoud wordt door een externe modelprovider verwerkt'
     : 'Geen inhoud naar een model';

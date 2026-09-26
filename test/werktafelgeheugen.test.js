@@ -77,7 +77,11 @@ test('een adres naar buiten komt er niet in terug', () => {
      DE MUTATIE: haal de filter uit lees(). Dan komt https://example.com terug
      als blad. */
   const { G, bak } = laad();
-  for (const url of ['https://example.com/x', '//example.com/x', 'javascript:alert(1)', 'data:text/html,x']) {
+  /* '/\\example.com/x' begint met EEN schuine streep en is toch naar buiten:
+     new URL() leest de backslash als een tweede slash. Gevonden bij de
+     Edge-inventaris van 23 september 2026; zonder de backslash-regel komt hij
+     door de oude filter. */
+  for (const url of ['https://example.com/x', '//example.com/x', '/\\example.com/x', 'javascript:alert(1)', 'data:text/html,x']) {
     bak[G.SLEUTEL] = JSON.stringify({ bladen: [{ url, titel: 'Buiten' }], actief: 0 });
     assert.equal(G.lees(), null, url + ' hoort geweigerd te worden');
   }

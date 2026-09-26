@@ -1,23 +1,4 @@
-/* ============================================================================
-   DE DIENSTEN EN DE TWEE POORTWACHTERS.
-
-   Vervolg van ./diensten.js. Daar staat de LAAG (bus, sse, meldingen,
-   rekenaars); hier staat wat die laag gebruikt: het archief, de beveiliging, de
-   Wacht, RTmail met zijn teams en automatiseringen, het atelierweb, de naamlaag,
-   de antivirus met zijn netscan, en resolveSession + auth -- de twee
-   poortwachters waar bijna elke route van dit huis achter staat.
-
-   Gescheiden omdat samen ze over de 10 kB-grens gaan. De naad is niet op maat
-   gekozen maar met scripts/blokscan.js nagemeten: op dit punt gaan er achttien
-   namen door de deur en komen er vijftien terug, en er loopt geen enkele draad
-   terug. Een naad met nul draden is een echte naad.
-
-   ACHTTIEN SINDS 11 SEPTEMBER 2026, en nageteld en niet geschat: `kernGeef` is
-   erbij gekomen zodat auth() de contractstand van een lid kan lezen (AFSPRAAK.md
-   stap 3). Het is een GETTER en daarmee geen draad terug -- hij wordt per verzoek
-   aangeroepen en nooit tijdens het bedraden. Zelfde idioom als
-   ./leverancierpoort.js, dat `kern` al zo binnenkrijgt.
-   ========================================================================== */
+/* Shared session resolution, member authorization and platform services. */
 'use strict';
 
 const envelop = require('./envelop');
@@ -275,6 +256,12 @@ function auth(req, res, next) {
   // crashen op een ontbrekende codenaam.
   if (!sess.account && !PERSONAS[sess.tier]) return res.status(401).json({ error: 'Niet ingelogd als lid.' });
   req.session = sess;
+  // Recheck after a document operation waited for its collection lock.
+  req.documentAuthority = () => {
+    const current = resolveSession(token);
+    return !!(current && current.key === sess.key && (current.account || PERSONAS[current.tier]) &&
+      (current.account || current.tier !== 'guest') && !lidBoardUit(current.key, lidPadFunctie(req.path)));
+  };
   // Handhaving van de eigen boardroom: heeft het lid (of, via de kind-sleutel,
   // de ouder) deze functie uitgezet, dan gaat de API ook echt dicht. Alles staat
   // standaard aan, dus dit raakt pas iets zodra iemand bewust iets omzet.

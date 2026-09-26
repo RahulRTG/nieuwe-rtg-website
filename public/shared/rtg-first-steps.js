@@ -81,9 +81,8 @@
       + '<div class="first-note"><p class="first-eyebrow">' + text('ownStory') + '</p><p class="first-closing">' + text('yourPosts') + '</p></div>';
     else if (kind === 'genootschappen') {
       content += '<h2 class="first-subheading">' + text('together') + '</h2><div class="first-interests">';
-      [['dinner', '/images/first-steps/salon.webp'], ['travel', '/images/first-steps/reisbureau.webp'], ['culture', '/images/first-steps/cultuur.webp']].forEach(function (item) {
-        content += '<button type="button" data-first-interest="' + item[0] + '"><img src="' + item[1]
-          + '" alt="" width="160" height="160" loading="lazy">' + text(item[0]) + '</button>';
+      [['dinner', 'people'], ['travel', 'plane'], ['culture', 'book']].forEach(function (item) {
+        content += '<button type="button" data-first-interest="' + item[0] + '"><span class="first-interest-mark" aria-hidden="true"><svg viewBox="0 0 24 24">' + ((w.RTGEdgeIcons || {})[item[1]] || '') + '</svg></span>' + text(item[0]) + '</button>';
       });
       content += '</div>' + action('discover', 'discover') + action('found', 'found', true);
     } else if (kind === 'reisbureau') content += '<div class="first-preferences">'

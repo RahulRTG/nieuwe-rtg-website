@@ -67,7 +67,7 @@ function maakIdentiteit({ accounts, opslag, save, nu, inzagelog, notify, logActi
   }
 
   /* ---------- opvragen ---------- */
-  function opvraag({ supplierCode, supplierNaam, staff, niveau, reden, door, doorRol }) {
+  async function opvraag({ supplierCode, supplierNaam, staff, niveau, reden, door, doorRol }) {
     if (!NIVEAUS.includes(niveau))
       return { status: 400, error: 'Kies wat u nodig hebt: gegevens of kopie.' };
     if (!door) return { status: 400, error: 'Noteer wie deze gegevens opvraagt.' };
@@ -101,27 +101,22 @@ function maakIdentiteit({ accounts, opslag, save, nu, inzagelog, notify, logActi
        misgaat mag geen gegevens hebben opgeleverd zonder regel in het
        journaal. */
     const verzoekId = 'inz_' + tijd().replace(/\D/g, '').slice(-12) + '-' + String(staff.id);
-    try {
-      /* DE VORM VAN DEZE AANROEP IS HET HELE PUNT, en hij was fout. Er stond
-         `{ wie, wieRol, wieBedrijf, accountId, wat }` -- vijf sleutels die
-         server/inzagelog.js niet leest. Alleen `waarom` landde; `doorId`,
-         `over` en `bron` bleven leeg.
-
-         Het gevolg was niet een lelijke regel maar een blinde: voorBetrokkene()
-         filtert op overId, dus een medewerker die via /api/privacy/inzage vroeg
-         wie er in zijn dossier had gekeken, kreeg zijn EIGEN werkgever niet te
-         zien. Precies de vraag waarvoor het journaal bestaat (AVG art. 15).
-
-         Het viel niet op omdat test/identiteit-opvraag.test.js een nep-journaal
-         gebruikte dat elk object slikt -- een dubbel dat ruimer is dan het
-         echte ding meet niets. Die toets draait nu op het ECHTE inzagelog. */
-      if (inzagelog && inzagelog.noteer) inzagelog.noteer({
+    /* De vorm {door, over, waarom, bron} is wat server/inzagelog.js leest; met
+       andere sleutels vond voorBetrokkene() de werkgever niet terug (AVG art.
+       15). En GEEN AANTOONBAAR JOURNAAL, GEEN INZAGE: hier stond noteer() in
+       een lege catch, dus de kluis ging open ook als er geen regel bleef
+       (STILSPOOR; ARBEID.md par. 4 punt 6). noteerVast() komt pas terug als de
+       opslag de regel bevestigde; zo niet, dan geen gegeven en geen bericht. */
+    const spoor = (inzagelog && typeof inzagelog.noteerVast === 'function')
+      ? await inzagelog.noteerVast({
         door: { naam: String(door || 'werkgever') + ' (' + (doorRol || 'werkgever') + ')' },
         over: { id: Number(memberId) },
         waarom: String(reden).trim().slice(0, 300),
         bron: 'werkgever/' + supplierCode + ':identiteit:' + niveau
-      });
-    } catch (e) { /* het journaal mag de inzage niet blokkeren, wel altijd geprobeerd */ }
+      })
+      : { ok: false, status: 503, error: 'Dit is niet vast te leggen; het inzagejournaal is niet aangesloten. Zonder spoor geen inzage.' };
+    if (!spoor || !spoor.ok)
+      return { status: (spoor && spoor.status) || 503, error: (spoor && spoor.error) || 'Zonder spoor geen inzage.', spoor: spoor && spoor.reden };
 
     const rij = opslag.bak('identiteitVerzoeken');
     rij.unshift({ id: verzoekId, code: supplierCode, staffId: staff.id, accountId: Number(memberId),

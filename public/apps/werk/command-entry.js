@@ -20,23 +20,38 @@
     if (knop) knop.click();
   }
 
-  function volgRoute() {
+  /* DE STAND IS VAN DE MENS ZODRA HIJ KOOS (EDGE.md, ronde 2). Bij het LADEN
+     schrijft deze route de verklaring op body, gelijk aan de HTML: Edge 2 draait
+     dan nog niet, leest haar bij zijn start, en een bewaarde keuze wint daar al.
+     Bij een HASHWISSEL draait Edge 2 wel, en daar schreven dezelfde attributen
+     een nieuwe start: de keuze Compact werd stil weer 'auto'. Een wissel gaat
+     daarom langs de poort van de eigenaar, als automatiek -- die wijkt voor een
+     keuze van de mens, en wie niets koos krijgt het overzicht zoals voorheen.
+     Zonder Edge 2 blijft het de verklaring; er komt geen tweede stand bij. */
+  function zetStand(wissel) {
+    var edge2 = window.RTGEdge2;
+    if (wissel && edge2 && typeof edge2.setState === 'function') {
+      edge2.setState('overview', { source: 'auto' });
+      return;
+    }
+    document.body.setAttribute('data-rtg-edge-2-state', 'overview');
+    document.body.setAttribute('data-rtg-edge-2-auto', 'true');
+  }
+
+  function volgRoute(wissel) {
     route = routeUitHash();
+    var projecten = document.body.getAttribute('data-rtg-vandaag-surface') === 'projecten';
     /* De compacte wereldkop hoort bij het zelfstandige projectenscherm. In
        een iframe beslist de gedeelde luxe-laag zelf dat de bovenliggende
        Edge-schil eigenaar van de chrome blijft. */
-    if (route === 'projecten' &&
-        document.body.getAttribute('data-rtg-vandaag-surface') === 'projecten') {
+    if (route === 'projecten' && projecten) {
       document.body.setAttribute('data-rtg-vandaag-surface-title', 'Projecten en taken');
       document.body.setAttribute('data-rtg-vandaag-luxe', 'surface');
-      document.body.setAttribute('data-rtg-edge-2-state', 'overview');
-      document.body.setAttribute('data-rtg-edge-2-auto', 'true');
-    } else if (document.body.getAttribute('data-rtg-vandaag-surface') === 'projecten') {
+    } else if (projecten) {
       document.body.removeAttribute('data-rtg-vandaag-surface-title');
       document.body.removeAttribute('data-rtg-vandaag-luxe');
-      document.body.setAttribute('data-rtg-edge-2-state', 'overview');
-      document.body.setAttribute('data-rtg-edge-2-auto', 'true');
     }
+    if (projecten) zetStand(wissel === true);
     openAlsBinnen();
   }
 
@@ -46,6 +61,6 @@
     });
     waarnemer.observe(inhoud, { attributes: true, attributeFilter: ['hidden'] });
   }
-  window.addEventListener('hashchange', volgRoute);
-  volgRoute();
+  window.addEventListener('hashchange', function () { volgRoute(true); });
+  volgRoute(false);
 }());

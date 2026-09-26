@@ -31,9 +31,11 @@ const { spawn, execFileSync } = require('child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const net = require('net');
 
 const { meet } = require('./lib/chaosmeet');
+/* De poorten komen uit dezelfde kiezer als test/trio-wees.test.js en
+   scripts/spreidingsproef.js: zie de kop van vrijePoortReeks in test/helper.js. */
+const { vrijePoortReeks } = require('../test/helper');
 
 const args = process.argv.slice(2);
 const getal = (naam, standaard) => {
@@ -45,14 +47,6 @@ const UIT = (args.find(x => x.startsWith('--uit=')) || '').slice(6) || null;
 const TIK_MS = 25;   // fijn genoeg om een korte onderbreking te zien
 
 const slaap = (ms) => new Promise(k => setTimeout(k, ms));
-
-function vrijePoort() {
-  return new Promise((klaar, fout) => {
-    const s = net.createServer();
-    s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => klaar(p)); });
-    s.on('error', fout);
-  });
-}
 
 /* /api/health draagt de PID van de server die dit verzoek afhandelde. Dat is
    precies wat deze proef nodig heeft: de poortwachter stuurt naar de ACTIEVE
@@ -70,12 +64,16 @@ async function klopt(basis) {
 
 (async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-chaos-'));
-  const poort = await vrijePoort();
+  /* VIER poorten en niet een: zonder RTG_TRIO_BASIS leidt server/trio.js de
+     drie serverpoorten af als PORT+1..+3, en een losse bind(0)-poort heeft op
+     Linux precies de verkeerde buren (oneven uitgifte, even bronpoorten van
+     elke fetch()). Dat was de flake van trio-wees; hier stond dezelfde vorm. */
+  const [poort, trioBasis] = await vrijePoortReeks(4);   // PORT, en trioBasis..+2 voor de drie servers
   const basis = 'http://127.0.0.1:' + poort;
-  console.log('Chaosproef op een EIGEN trio, poort ' + poort + ', datamap ' + TMP + '.\n');
+  console.log('Chaosproef op een EIGEN trio, poort ' + poort + ' (servers ' + trioBasis + '-' + (trioBasis + 2) + '), datamap ' + TMP + '.\n');
 
   const trio = spawn(process.execPath, [path.join(__dirname, '..', 'server', 'trio.js')], {
-    env: Object.assign({}, process.env, { PORT: String(poort), RTG_DATA_DIR: TMP, SMTP_URL: '' }),
+    env: Object.assign({}, process.env, { PORT: String(poort), RTG_TRIO_BASIS: String(trioBasis), RTG_DATA_DIR: TMP, SMTP_URL: '' }),
     stdio: ['ignore', 'ignore', 'ignore']
   });
 

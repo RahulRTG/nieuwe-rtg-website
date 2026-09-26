@@ -1,8 +1,8 @@
-body[data-pass="community"]{--world:#446d5a;--world-soft:rgba(68,109,90,.24);--world-image:url("../../campagne/bamboe.jpg")}
-body[data-pass="rtg"]{--world:#7f1634;--world-soft:rgba(127,22,52,.22);--world-image:url("../../campagne/kyoto-suite.jpg")}
-body[data-pass="business-lite"]{--world:#704b2c;--world-soft:rgba(112,75,44,.23);--world-image:url("../../campagne/riad.jpg")}
-body[data-pass="business"]{--world:#183252;--world-soft:rgba(24,50,82,.27);--world-image:url("../../campagne/jet.jpg")}
-body[data-pass="lifestyle"]{--world:#6e5530;--world-soft:rgba(110,85,48,.25);--world-image:url("../../campagne/palacio.jpg")}
+body[data-pass="community"]{--world:#446d5a;--world-soft:rgba(68,109,90,.24);--world-image:linear-gradient(135deg,#33251c,#111312 70%)}
+body[data-pass="rtg"]{--world:#7f1634;--world-soft:rgba(127,22,52,.22);--world-image:linear-gradient(135deg,#33251c,#111312 70%)}
+body[data-pass="business-lite"]{--world:#704b2c;--world-soft:rgba(112,75,44,.23);--world-image:linear-gradient(135deg,#33251c,#111312 70%)}
+body[data-pass="business"]{--world:#183252;--world-soft:rgba(24,50,82,.27);--world-image:linear-gradient(135deg,#33251c,#111312 70%)}
+body[data-pass="lifestyle"]{--world:#6e5530;--world-soft:rgba(110,85,48,.25);--world-image:linear-gradient(135deg,#33251c,#111312 70%)}
 
 .pass-story .world-hero-copy{min-width:0}
 .pass-story .world-hero h1{max-width:900px;overflow-wrap:break-word;font-size:clamp(3.8rem,6.6vw,7rem);hyphens:auto}

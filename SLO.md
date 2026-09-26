@@ -69,6 +69,7 @@ Een doel telt pas mee vanaf **200 verzoeken** en pas als er over minstens **5%**
 | **De voordeur laadt** | `GET /` | 200 | 1500 ms |
 | **Het inlogpad antwoordt** | `POST /api/auth/login` | 400 / 401 / 403 / 429 | 2000 ms |
 | **Het publieke aanbod laadt** | `GET /api/aanbod` | 200 / 401 / 404 | 1500 ms |
+| **Het grootboek sluit** | `GET /api/pay/gezond` | 200 | 1000 ms |
 
 De inlogreis logt **met opzet verkeerd in**: de sonde toetst dat het pad antwoordt, niet dat hij binnenkomt. Een 200 daar zou een bevinding zijn en geen succes.
 

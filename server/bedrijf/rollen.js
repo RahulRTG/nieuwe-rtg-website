@@ -75,6 +75,15 @@ module.exports = (sctx) => {
     return { w: s.w, l: s.l, directie: false, rechten, alleenLezen: leest(s.l) };
   }
 
+  /* Wie een rol toekent komt uit de sessie en nooit uit het verzoek: hier stond
+     `req.body.door`, een naam die de aanroeper zelf typte onder een
+     toegangswijziging. Zonder lid op naam is het het gedeelde beheer-token, en
+     dan zegt het spoor dat ook in plaats van een verzonnen naam te dragen. */
+  const wieBeheert = (req) => {
+    const l = req.werkosContext && req.werkosContext.lid;
+    return l && l.id ? 'lid:' + l.id : 'beheer (gedeeld token)';
+  };
+
   /* ---------- de rollenkaart ---------- */
   app.post('/api/bedrijf/rollen', (req, res) => {
     const g = werkPoort(req, res); if (!g) return;
@@ -112,7 +121,7 @@ module.exports = (sctx) => {
     // Een toegangswijziging gaat door de gebeurtenislaag: wie, wanneer, en de
     // reden als de aanroeper er een geeft. Zie ./gebeurtenis.js.
     const gm = werkVeld(w, 'lid', l, { rollen: nieuw },
-      { actor: (req.body && req.body.door) || 'beheer', reden: schoon(req.body.reden, 500), bron: 'werk/rollen' });
+      { actor: wieBeheert(req), reden: schoon(req.body.reden, 500), bron: 'werk/rollen' });
     if (!gm.ok) return res.status(gm.status).json(gm);
     log(w, null, 'rollen-gezet', l.id, l.rollen.map(r => r.id + (r.tot ? ' tot ' + r.tot : '')).join(', '));
     save();

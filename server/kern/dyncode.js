@@ -30,8 +30,8 @@ module.exports = ({ crypto, dataDir, sharedSecret }) => {
     sleutel = crypto.createHash('sha256')
       .update('rtg-dyncode-v1\0' + String(sharedSecret)).digest();
   } else {
-    try { sleutel = fs.readFileSync(keyPad); }
-    catch (e) { sleutel = crypto.randomBytes(32); try { fs.writeFileSync(keyPad, sleutel, { mode: 0o600 }); } catch (e2) {} }
+    // lezen, of als eerste publiceren: nooit half, nooit twee sleutels (server/lib/sleutelbestand.js)
+    sleutel = require('../lib/sleutelbestand').sleutel(keyPad, 32);
   }
 
   const DEFAULT_TTL = 45000;                 // 45 seconden: dynamisch, kort houdbaar

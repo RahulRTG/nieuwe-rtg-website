@@ -43,7 +43,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorKoppelBody } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bankdeur-'));
 const CODE = 'KANTOOR-BANK-1';
@@ -124,7 +124,7 @@ test.before(async () => {
     phone: '06' + String(10000000 + Math.floor(Math.random() * 8e7)), password: 'Geheim123!',
     geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
   assert.ok(werker, 'de kantoormedewerker heeft een eigen account');
-  const kop = await api('/api/account/koppel', { soort: 'kantoor', code: CODE }, werker);
+  const kop = await api('/api/account/koppel', await kantoorKoppelBody(base, werker), werker);
   assert.equal(kop.status, 200, 'en koppelt daarin de kantoorrol: ' + JSON.stringify(kop.body).slice(0, 140));
   opNaam = (await api('/api/account/start', { rol: 'kantoor' }, werker)).body.token;
   assert.ok(opNaam, 'en staat daarmee op naam in de backoffice');
@@ -223,6 +223,10 @@ test('5b. de zes geld-knoppen vragen een NAAM, en een medewerker op naam komt er
   for (const pad of KLUIS) {
     const r = await api(pad, {}, opNaam);
     assert.notEqual(r.status, 401, pad + ' hoort een kantoorsessie op naam niet te weigeren');
+    /* DE NAAMDEUR IS GEPASSEERD. Een geldhandeling vraagt daarachter nog een passkey
+       (besluit eigenaar 25-09-2026, routes/kantoren/bank-passkey.js): die weigering
+       mag, maar alleen met die reden -- elke andere 403 is de deur die niet opengaat. */
+    if (r.status === 403 && r.body.watNu === 'passkey-zetten') continue;
     assert.notEqual(r.status, 403, pad + ' hoort een kantoorsessie op naam niet te weigeren (kreeg ' +
       r.status + ': ' + JSON.stringify(r.body).slice(0, 120) + ')');
   }

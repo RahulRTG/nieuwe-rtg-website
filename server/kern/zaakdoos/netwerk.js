@@ -14,7 +14,7 @@ module.exports = (ctx) => {
     st.laatsteMelding = nu();
     try {
       const r = await fetch(CLOUD() + '/api/doos/meting', {
-        method: 'POST', headers: { 'Content-Type': 'application/json', 'x-doos-sleutel': SLEUTEL },
+        method: 'POST', headers: require('./koppen').doosKoppen({ 'Content-Type': 'application/json' }, SLEUTEL),
         body: JSON.stringify({ doos: DOOS_NAAM, rtt, modus: st.modus, journaal: journaal().length, plek: PLEK || undefined,
           versie: beheer.versie, wifi: beheer.wifiRol(), stroom: beheer.stroom() || undefined }),
         signal: AbortSignal.timeout(10000)
@@ -38,7 +38,7 @@ module.exports = (ctx) => {
     } else if (actie === 'hulp') {
       try {
         await fetch(CLOUD() + '/api/doos/rapport', {
-          method: 'POST', headers: { 'Content-Type': 'application/json', 'x-doos-sleutel': SLEUTEL },
+          method: 'POST', headers: require('./koppen').doosKoppen({ 'Content-Type': 'application/json' }, SLEUTEL),
           body: JSON.stringify(dagrapport()), signal: AbortSignal.timeout(10000)
         });
       } catch (e) {}
@@ -61,7 +61,7 @@ module.exports = (ctx) => {
     for (const buur of BUREN) {
       try {
         const r = await fetch(buur + '/api/doos/buurmelding', {
-          method: 'POST', headers: { 'Content-Type': 'application/json', 'x-doos-sleutel': SLEUTEL },
+          method: 'POST', headers: require('./koppen').doosKoppen({ 'Content-Type': 'application/json' }, SLEUTEL),
           body: JSON.stringify(melding), signal: AbortSignal.timeout(8000)
         });
         if (r.ok) return;
@@ -74,7 +74,7 @@ module.exports = (ctx) => {
     b = b || {};
     try {
       const r = await fetch(CLOUD() + '/api/doos/meting', {
-        method: 'POST', headers: { 'Content-Type': 'application/json', 'x-doos-sleutel': SLEUTEL },
+        method: 'POST', headers: require('./koppen').doosKoppen({ 'Content-Type': 'application/json' }, SLEUTEL),
         body: JSON.stringify({ doos: b.doos, rtt: b.rtt, modus: b.modus, journaal: b.journaal, via: DOOS_NAAM }),
         signal: AbortSignal.timeout(10000)
       });
@@ -100,7 +100,7 @@ module.exports = (ctx) => {
     if (!NETWERK) return;
     try {
       const r = await fetch(CLOUD() + '/api/doos/rapport', {
-        method: 'POST', headers: { 'Content-Type': 'application/json', 'x-doos-sleutel': SLEUTEL },
+        method: 'POST', headers: require('./koppen').doosKoppen({ 'Content-Type': 'application/json' }, SLEUTEL),
         body: JSON.stringify(dagrapport()), signal: AbortSignal.timeout(10000)
       });
       if (r.ok) {

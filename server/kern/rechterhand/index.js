@@ -20,10 +20,9 @@ module.exports = ({ db, save, crypto, liveCodename, anthropic, DATA_DIR }) => {
   function laadSleutel() {
     const dir = DATA_DIR || path.join(__dirname, '..', '..', 'data');
     const f = path.join(dir, 'lifestyle.key');
-    try { if (fs.existsSync(f)) return fs.readFileSync(f); } catch (e) {}
-    const k = crypto.randomBytes(32);
-    try { fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(f, k, { mode: 0o600 }); } catch (e) {}
-    return k;
+    // lezen, of als eerste publiceren: nooit half, nooit twee sleutels (server/lib/sleutelbestand.js)
+    fs.mkdirSync(dir, { recursive: true });
+    return require('../../lib/sleutelbestand').sleutel(f, 32);
   }
   const SLEUTEL = laadSleutel();
   function enc(text) {

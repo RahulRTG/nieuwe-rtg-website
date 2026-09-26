@@ -39,12 +39,14 @@ module.exports = (ctx) => {
   const k = { db, save, crypto, schoon, findSupplier, vandaag: ctx.vandaag, opslag };
 
   Object.assign(k, require('./tijd')(k));
+  Object.assign(k, require('./duiding')(k));
   Object.assign(k, require('./entiteit')(k));
   Object.assign(k, require('./vestiging')(k));
   Object.assign(k, require('./graaf')(k));
   Object.assign(k, require('./employment')(k));
   Object.assign(k, require('./scope')(k));
   Object.assign(k, require('./uitnodiging')(k));
+  Object.assign(k, require('./aanname')(k));
   Object.assign(k, require('./readiness')(k));
   Object.assign(k, require('./verandering')(k));
   /* Document Intelligence en Discovery komen als LAATSTE: zij lezen alles wat

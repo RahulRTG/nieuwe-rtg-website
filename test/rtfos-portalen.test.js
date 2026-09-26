@@ -47,7 +47,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, kantoorKoppelBody } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rtfos3-'));
 const OFFICE_CODE = 'RTFOS3-KEURING';
@@ -77,7 +77,7 @@ test.before(async () => {
   // een tweede mens, want indienen en goedkeuren zijn twee handen
   const reg = await post('/api/auth/register', { name: 'Leider Rotterdam', email: 'leider.rotterdam@rtfos.test',
     phone: '0612345672', password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg' });
-  await post('/api/account/koppel', { soort: 'kantoor', code: OFFICE_CODE }, reg.body.token);
+  await post('/api/account/koppel', await kantoorKoppelBody(BASE, reg.body.token), reg.body.token);
   LEIDER = (await post('/api/account/start', { rol: 'kantoor' }, reg.body.token)).body.token;
   LEIDERKEY = (await os_('ik', {}, LEIDER)).body.key;
   await os_('zetel', { stad: STAD, key: LEIDERKEY, naam: 'Leider Rotterdam', rol: 'projectleider' });
@@ -286,7 +286,7 @@ test('uren boeken kan alleen op een project waar de vrijwilliger op staat', asyn
 test('het laatste stadsbestuur blijft staan, en het kernteam is een lijst namen', async () => {
   const reg = await post('/api/auth/register', { name: 'Bestuur Rotterdam', email: 'bestuur.rotterdam@rtfos.test',
     phone: '0612345673', password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg' });
-  await post('/api/account/koppel', { soort: 'kantoor', code: OFFICE_CODE }, reg.body.token);
+  await post('/api/account/koppel', await kantoorKoppelBody(BASE, reg.body.token), reg.body.token);
   const bestuurToken = (await post('/api/account/start', { rol: 'kantoor' }, reg.body.token)).body.token;
   const key = (await os_('ik', {}, bestuurToken)).body.key;
   const zetel = await os_('zetel', { stad: STAD, key, naam: 'Bestuur Rotterdam', rol: 'stadsbestuur' });

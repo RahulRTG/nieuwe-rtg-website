@@ -83,6 +83,21 @@ module.exports = ({ db, lidBoardLogWis }) => {
       }
       if (Array.isArray(ring._keys)) ring._keys = ring._keys.filter(k => k in ring);
     }
+    /* DE BETAALWAARHEID (MONEY-012) houdt, net als paySaldi en payBoekingen,
+       zijn CODENAAM: het is het bewijs dat er geld binnenkwam, met dezelfde
+       bewaarplicht. De SLEUTEL gaat eruit (eigenaar en context); een betaling
+       die nog openstond wikkelt dan niet meer af en escaleert naar een mens. */
+    const bw = db.data.betaalWaarheid;
+    if (bw && typeof bw === 'object') {
+      for (const r of Object.values(bw)) {
+        if (!r) continue;
+        // exact en niet op een deel: user-7 is niet user-70
+        const [soort, ...rest] = String(r.actor || '').split(':');
+        const eigen = rest.join(':') === key, c = r.context;
+        if (eigen) r.actor = soort + ':vergeten';
+        if (c && (eigen || c.key === key)) { delete c.key; delete c.userId; }
+      }
+    }
     /* En het journaal van de eigen boardroom. Dat staat apart omdat het geen tak
        op de sleutel is maar een eigen lijst; het hoort er wel bij, want het legt
        vast WIE welke knop zette -- bij een kind is dat een ouder. Blijft het

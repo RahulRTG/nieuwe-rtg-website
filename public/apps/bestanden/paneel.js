@@ -11,22 +11,17 @@
     });
   };
   var B = function () { return window.RTGBestanden; };
-  var open = null;
+  var open = null, trigger = null;
 
   function vind(id) {
     var s = B().stand();
     return (s.items || []).concat(s.gedeeld || []).find(function (x) { return x.id === id; }) || null;
   }
   function toon(id) {
-    /* EERST ZOEKEN, DAN PAS ZETTEN. Hier stond `open = vind(id); if (!open) return;`
-       -- en dat wist de staat van een paneel dat gewoon openstond zodra vind()
-       even niets vond (de lijst wordt herladen, en dan is stand().items een tel
-       lang leeg). Het scherm bleef open, `open` werd null, en de voorvertoning
-       die onderweg was zag `!open` en hield op: een tekstbestand opende zonder
-       ooit zijn inhoud te tonen. Een mislukte opzoeking hoort niets kapot te
-       maken; hij hoort niets te doen. */
+    // A missing lookup must not clear a still-open preview during a reload.
     var gevonden = vind(id);
     if (!gevonden) return;
+    trigger = document.activeElement;
     open = gevonden;
     $('#bkNaam').value = open.naam;
     $('#bkNaam').readOnly = !open.vanMij;
@@ -47,7 +42,10 @@
     $('#bkHerstel').style.display = open.weg ? '' : 'none';
     $('#bkKijk').style.display = 'none'; $('#bkKijk').innerHTML = '';
     $('#bkVersieWrap').style.display = 'none';
+    // This document surface stays connected to the standard Edge Bar.
+    document.querySelector('main').inert = true;
     $('#bkScrim').classList.add('open');
+    $('#bkNaam').focus();
     kijk();
     versies();
   }
@@ -145,19 +143,23 @@
     var vraag = !open.vanMij ? 'Uzelf van dit gedeelde bestand halen?'
       : (open.weg ? 'Dit bestand voorgoed weggooien, met alle versies?' : 'Naar de prullenbak? Herstellen kan 30 dagen.');
     if (!confirm(vraag)) return;
-    B().api('weg', { id: open.id }).then(function (r) {
+    B().api(open.vanMij && open.weg ? 'wis' : 'weg', { id: open.id }).then(function (r) {
       if (r.body.error) return B().meld(r.body.error);
       B().meld(r.body.prullenbak ? 'In de prullenbak; herstellen kan 30 dagen.' : 'Gebeurd.');
-      dicht(); B().laad();
+      B().laad().then(dicht);
     });
   });
   $('#bkHerstel').addEventListener('click', function () {
     B().api('herstel', { id: open.id }).then(function (r) {
       if (r.body.error) return B().meld(r.body.error);
-      B().meld('Terug in de kluis.'); dicht(); B().laad();
+      B().meld('Terug in de kluis.'); B().laad().then(dicht);
     });
   });
-  function dicht() { $('#bkScrim').classList.remove('open'); open = null; }
+  function dicht() {
+    $('#bkScrim').classList.remove('open'); document.querySelector('main').inert = false; open = null;
+    if (trigger && trigger.isConnected) trigger.focus();
+    else { var fallback = $('#pad button'); if (fallback) fallback.focus(); }
+  }
   /* WIE ER OPENSTAAT, LEESBAAR VAN BUITEN. De adaptieve laag (apps/bestanden/
      adaptief.js) heeft het bestand zelf nodig -- niet om er iets mee te doen,
      maar om te weten welk gewicht de handelingen hier hebben: een bestand naar
@@ -166,7 +168,6 @@
      Alleen LEZEN. Wie hier ooit een setter bijzet, geeft twee lagen de
      mogelijkheid te bepalen welk bestand openstaat, en dan is de vraag welke van
      de twee gelijk heeft. */
-  window.RTGBestandenPaneel = { open: function () { return open; } };
   $('#bkDicht').addEventListener('click', dicht);
 
   /* Meenemen: de kluis geeft zijn EIGEN model mee (naam, map, grootte, soort,
@@ -196,5 +197,5 @@
     });
   }
 
-  window.RTGBestandenPaneel = { open: toon };
+  window.RTGBestandenPaneel = { open: toon, huidig: function () { return open; }, sluit: dicht };
 })();

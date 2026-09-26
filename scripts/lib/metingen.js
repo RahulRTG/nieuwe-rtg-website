@@ -126,6 +126,11 @@ const REGISTER = {
   'AICONTEXT.json': { meter: ['aiContextLek', 'aiContextVeldenGezien'] },
   /* Het stilspoorregister draagt twee schulden en een bereikmeter. */
   'STILSPOOR.json': { meter: ['stilSpoor', 'stilleOpslag', 'stilSpoorAanroepen'] },
+  /* MAGNAATGRONDWET.json (npm run magnaat:grondwet -- --vastleggen) is de
+     bevroren nulstand van de Magnaat-grondwet (MAGNAAT.md). De ratel woont in
+     de toets en is vierledig: niet meer schendingen, niet minder PASS of
+     afgedwongen, en geen enkele regel die zakt. */
+  'MAGNAATGRONDWET.json': { eigenRatel: 'test/magnaatgrondwet.test.js' },
   /* STEMPELVEILIGHEID.json (npm run stempelveiligheid) telt welke generatoren
      repo-waarheid kunnen wegschrijven die niemand heeft gevraagd. Twee schulden
      omlaag en een bereikmeter omhoog, om exact de reden die bij STILSPOOR.json
@@ -185,6 +190,12 @@ const REGISTER = {
      gedeeldheid door een regex in plaats van door een feit, en leest de nul als
      bevestiging terwijl hij een blinde vlek is. */
   'PLANVORM.json': { meter: ['planDomeinenGemeten'] },
+  /* OFFICEVORM.json meet of de elf objectdomeinen onder het voorgestelde
+     `RTGObject` (OFFICE.md par. 0) een datavorm delen. Geratelde waarde: het
+     BEREIK, om exact de reden van PLANVORM.json hierboven -- de uitkomst is een
+     nul, en een nul over minder domeinen leest als bevestiging terwijl hij een
+     blinde vlek is. */
+  'OFFICEVORM.json': { meter: ['officeDomeinenGemeten'] },
   /* NEIGINGVORM.json meet of er een persoonlijke laag bij mag en in welke vorm
      (NEIGING.md par. 0). Twee geratelde waarden, en met opzet geen derde over de
      NAAMmeting: die telt sinds server/kern/neiging/ bestaat zijn eigen bestanden
@@ -259,6 +270,12 @@ const REGISTER = {
   'TREDEPROEF.json': { meter: ['tredeLekken', 'tredeRondgangGezakt', 'tredeIngangLekken'] },
   'WEKKERS.json': { meter: ['wekkersOnverklaard', 'wekkersFunctieUitToch', 'wekkersZonderTrede'] },
   'ZAAKWIG.json': { meter: ['zaakwigGezakt'] },
+  /* DE EDGE (EDGE.md par. 7). De kaart draagt twee schulden; de dekking een
+     schuld die op nul hoort te staan en negen veldtanden die alleen omhoog
+     mogen. De vergelijking per scherm zit daarnaast in edgedekking.js zelf. */
+  'EDGEKAART.json': { meter: ['edgeDubbeleEigenaars', 'rtgDodeKanalen'] },
+  'EDGEDEKKING.json': { meter: ['edgeGeblokkeerdZonderWaarom', 'edgeVeldIdentiteit', 'edgeVeldWereld', 'edgeVeldContext',
+    'edgeVeldObject', 'edgeVeldActiviteit', 'edgeVeldPresence', 'edgeVeldVoortzetting', 'edgeVeldHoofdactie', 'edgeVeldTrust'] },
   'MEETLEER.json': { meter: ['meetleerBlind'] },
 
   /* Deze vier dragen hun eigen grondwaarde. De ratel staat in het genoemde
@@ -283,6 +300,12 @@ const REGISTER = {
   'ISOLATIESCHADUW.json': { eigenRatel: 'test/isolatieregisters.test.js' },
   'ISOLATIEPROEF.json': { eigenRatel: 'test/isolatieregisters.test.js' },
   'RESOLVERBEREIK.json': { eigenRatel: 'test/resolverbereik.test.js' },
+  /* De consolidatieronde (CLAUDE.md, SCHERMEIGENAAR.json). De toets meet VERS
+     met scripts/schermfunctie.js en zakt op een overlappaar zonder oordeel, een
+     menu-ingang op een alias en een link naar een alias; het aantal open
+     oordelen mag er alleen dalen (OPEN_MAX). */
+  'SCHERMFUNCTIE.json': { eigenRatel: 'test/schermeigenaar.test.js' },
+  'SCHERMEIGENAAR.json': { eigenRatel: 'test/schermeigenaar.test.js' },
   'GEZAGSNOEMER.json': { eigenRatel: 'test/gezagsnoemer.test.js' },
   /* De Business Proof Map en de vierde gouden keten. Beide hangen aan
      test/ondernemerbewijs.test.js, en dat is geen regel-om-de-regel: die toets
@@ -387,6 +410,18 @@ const REGISTER = {
   'DOELGROEPBEREIK.json': { eigenRatel: 'test/doelgroepbereik.test.js' },
   'AANVOERVORM.json': { eigenRatel: 'test/aanvoer.test.js' },
   'MOMENTPROEF.json': { eigenRatel: 'test/momentproef.test.js' },
+  /* LUSPROEF.json (sinds 24 september 2026) levert voltooibaar voor Ontdekken
+     via scripts/lib/appcontract.js. De toets houdt het woordgebruik vast dat
+     scripts/lib/bewijsbron.js leest, en dat de telling de rijen niet overstemt. */
+  'LUSPROEF.json': { eigenRatel: 'test/lusproef.test.js' },
+  /* LIEGRONDE.json (sinds 24 september 2026) levert waarheidsgetrouw voor elke
+     rij van APPWERKT.json. De toets houdt vast dat een BEWEZEN rij iets gelogen
+     kreeg en dat een DEFECT een verzonnen zekerheid draagt. */
+  'LIEGRONDE.json': { eigenRatel: 'test/liegronde.test.js' },
+  /* BEVOEGD.json (sinds 25 september 2026) levert bevoegd voor elke rij van
+     APPWERKT.json. De toets houdt vast dat een ledenscherm alleen BEWEZEN is als
+     ELKE route gemeten is, en dat een gezinspaar zonder A binnen niets bewijst. */
+  'BEVOEGD.json': { eigenRatel: 'test/bevoegdronde.test.js' },
   'NAVIGATIEPROEF.json': { eigenRatel: 'test/navigatieproef.test.js' },
   'MOVEPROEF.json': { eigenRatel: 'test/moveproef.test.js' },
   'KETENVORM.json': { eigenRatel: 'test/toelatingsproef.test.js' },

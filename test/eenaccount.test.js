@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorKoppelBody } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-1acc-'));
 let srv, base, lid, staffId, staffNaam, staffPin;
@@ -77,10 +77,16 @@ test('4. de zaak en het kantoor koppelen met hun eigen inlog, en starten', async
   assert.equal(z.status, 200, 'de bedrijfsinlog bewijst de zaak-rol');
   const zs = await api('/api/account/start', { rol: 'zaak' }, lid);
   assert.equal((await api('/api/supplier/state', {}, zs.body.token)).status, 200, 'de zaak-sessie werkt');
+  /* De gedeelde code koppelt niet meer (besluit van 23 september 2026), goed of
+     fout: de weigering zegt niet of de code klopte, wel wat wel werkt. */
   const kFout = await api('/api/account/koppel', { soort: 'kantoor', code: 'FOUT' }, lid);
-  assert.equal(kFout.status, 401);
-  const k = await api('/api/account/koppel', { soort: 'kantoor', code: 'RTG-OFFICE' }, lid);
-  assert.equal(k.status, 200, 'de backoffice-code bewijst de kantoor-rol');
+  assert.equal(kFout.status, 403);
+  const kCode = await api('/api/account/koppel', { soort: 'kantoor', code: 'RTG-OFFICE' }, lid);
+  assert.equal(kCode.status, 403, 'ook de juiste gedeelde code koppelt de kantoorrol niet meer');
+  assert.equal(kCode.body.watNu, 'uitnodiging', 'en de weigering wijst naar de uitnodiging');
+  assert.equal(kCode.body.error, kFout.body.error, 'goed of fout: hetzelfde antwoord, dus niets te raden');
+  const k = await api('/api/account/koppel', await kantoorKoppelBody(base, lid), lid);
+  assert.equal(k.status, 200, 'een uitnodiging van de eigenaar bewijst de kantoor-rol');
   const ks = await api('/api/account/start', { rol: 'kantoor' }, lid);
   assert.equal((await api('/api/office/kamers', {}, ks.body.token)).status, 200, 'de kantoor-sessie werkt op het kantoor');
   // de boardroom is de kamer van de eigenaar: een gekoppelde kantoor-rol opent hem NIET vanzelf
@@ -154,7 +160,8 @@ test('7. de pin-rem hangt aan het DOEL en wordt gedeeld met de losse personeelsl
 });
 
 /* De tweede factor telde helemaal niet mee. Kwam de backoffice-code goed door
-   -- en die is gedeeld en niet geheim -- dan mocht de authenticator-code
+   -- en die was gedeeld en niet geheim; sinds 23 september 2026 koppelt alleen
+   nog een uitnodiging, en de rem geldt daar net zo -- dan mocht de authenticator-code
    onbeperkt geraden worden. Zes cijfers zijn dan in minuten af, en dan staat
    de tweede factor er voor niets.
 
@@ -179,14 +186,23 @@ test('8. de tweede factor van het kantoor telt mee voor de rem', async () => {
     const a = await versLid(1), b = await versLid(2);
     assert.ok(a && b, 'twee verse accounts op de eigen server');
 
-    // de code klopt, de factor niet: dat mag niet gratis herhaalbaar zijn
+    /* De uitnodiging klopt, de factor niet: dan gaat de uitnodiging NIET op. Twee
+       keer dezelfde, en beide keren is de tweede factor het bezwaar -- was hij
+       na de eerste poging verbruikt, dan zei de tweede "niet geldig". */
+    const eenmaal = await kantoorKoppelBody(srv2.base, a, { totp: '000000' });
     const statussen = [];
-    for (let i = 0; i < 5; i++) {
-      statussen.push((await roep('/api/account/koppel', { soort: 'kantoor', code: CODE, totp: '00000' + i }, a)).status);
+    for (const poging of [1, 2]) {
+      const r = await roep('/api/account/koppel', eenmaal, a);
+      statussen.push(r.status);
+      assert.match(r.body.error || '', /Tweede factor/, 'poging ' + poging + ': de factor is het bezwaar, niet de uitnodiging');
+    }
+    // en dat mag niet gratis herhaalbaar zijn
+    for (let i = 0; i < 3; i++) {
+      statussen.push((await roep('/api/account/koppel', await kantoorKoppelBody(srv2.base, a, { totp: '00000' + i }), a)).status);
     }
     assert.deepEqual(statussen, [401, 401, 401, 401, 401], 'vijf foute factoren worden geweigerd');
 
-    const vers = await roep('/api/account/koppel', { soort: 'kantoor', code: CODE, totp: '999999' }, b);
+    const vers = await roep('/api/account/koppel', await kantoorKoppelBody(srv2.base, b, { totp: '999999' }), b);
     assert.equal(vers.status, 429, 'een vers account krijgt geen nieuwe reeks pogingen op de tweede factor');
   } finally {
     stop(srv2 && srv2.child);

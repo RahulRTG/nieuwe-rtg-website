@@ -2,15 +2,15 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-26",
   "gemeten": {
-    "bestanden": 2360,
-    "vormen": 1435,
-    "velden": 2091,
-    "modules": 792,
-    "domeinen": 289,
+    "bestanden": 2439,
+    "vormen": 1450,
+    "velden": 2114,
+    "modules": 807,
+    "domeinen": 293,
     "envelopDrempel": 18,
     "envelop": 28,
-    "veldenDomeineigen": 1472,
-    "veldenGedeeldVanafVier": 211,
+    "veldenDomeineigen": 1487,
+    "veldenGedeeldVanafVier": 214,
     "gelijkendeVormparen": 23
   },
   "envelop": [
@@ -44,6 +44,18 @@
     "wat"
   ],
   "gedeeld": [
+    {
+      "veld": "sinds",
+      "domeinen": 17,
+      "waar": [
+        "bedrijf",
+        "kern/afdelingen",
+        "kern/clubs",
+        "kern/command",
+        "kern/commercie",
+        "kern/ledenbalie-inzage"
+      ]
+    },
     {
       "veld": "type",
       "domeinen": 17,
@@ -90,18 +102,6 @@
         "kern/consent-lezers",
         "kern/factuurcorrectie-gronden",
         "kern/horeca"
-      ]
-    },
-    {
-      "veld": "sinds",
-      "domeinen": 16,
-      "waar": [
-        "bedrijf",
-        "kern/afdelingen",
-        "kern/clubs",
-        "kern/command",
-        "kern/commercie",
-        "kern/ledenbalie-inzage"
       ]
     },
     {
@@ -153,6 +153,18 @@
       ]
     },
     {
+      "veld": "bedrag",
+      "domeinen": 14,
+      "waar": [
+        "kern/bureau",
+        "kern/command",
+        "kern/gemeente",
+        "kern/koppel",
+        "kern/labfonds",
+        "kern/livinglab"
+      ]
+    },
+    {
       "veld": "onderwerp",
       "domeinen": 14,
       "waar": [
@@ -185,7 +197,7 @@
         "kern/commerce",
         "kern/livinglab",
         "kern/magnaat-economenlab-rapport",
-        "kern/magnaat-economie"
+        "kern/magnaat-economische-motor"
       ]
     },
     {
@@ -198,18 +210,6 @@
         "kern/groothandel",
         "kern/keuken",
         "kern/kosten"
-      ]
-    },
-    {
-      "veld": "bedrag",
-      "domeinen": 13,
-      "waar": [
-        "kern/bureau",
-        "kern/command",
-        "kern/gemeente",
-        "kern/koppel",
-        "kern/labfonds",
-        "kern/livinglab"
       ]
     },
     {
@@ -273,6 +273,18 @@
       ]
     },
     {
+      "veld": "ingetrokken",
+      "domeinen": 12,
+      "waar": [
+        "bedrijf",
+        "kern/beschermzaak",
+        "kern/carriereledger",
+        "kern/command",
+        "kern/festival",
+        "kern/kantoor"
+      ]
+    },
+    {
       "veld": "land",
       "domeinen": 12,
       "waar": [
@@ -333,18 +345,6 @@
       ]
     },
     {
-      "veld": "waarde",
-      "domeinen": 11,
-      "waar": [
-        "kern/assets",
-        "kern/bureau",
-        "kern/command",
-        "kern/commercie",
-        "kern/concern",
-        "kern/levensgraaf"
-      ]
-    },
-    {
       "veld": "actief",
       "domeinen": 11,
       "waar": [
@@ -354,30 +354,6 @@
         "kern/concern",
         "kern/livinglab",
         "kern/machtiging"
-      ]
-    },
-    {
-      "veld": "ingetrokken",
-      "domeinen": 11,
-      "waar": [
-        "bedrijf",
-        "kern/beschermzaak",
-        "kern/carriereledger",
-        "kern/command",
-        "kern/festival",
-        "kern/mobiliteit"
-      ]
-    },
-    {
-      "veld": "bewijs",
-      "domeinen": 11,
-      "waar": [
-        "kern/betaalwaarheid",
-        "kern/horeca",
-        "kern/invoer",
-        "kern/livinglab",
-        "kern/magnaat-controle",
-        "kern/magnaat-trainingslobby-acties"
       ]
     },
     {
@@ -414,6 +390,18 @@
         "kern/envelop",
         "kern/experience",
         "kern/luchthaven"
+      ]
+    },
+    {
+      "veld": "rol",
+      "domeinen": 11,
+      "waar": [
+        "kern/concern",
+        "kern/livinglab",
+        "kern/magnaat-leven",
+        "kern/magnaatwereld",
+        "kern/onderneming",
+        "kern/rechterhand"
       ]
     },
     {
@@ -462,6 +450,18 @@
         "kern/economie",
         "kern/hardwarelab",
         "kern/hoteldorp"
+      ]
+    },
+    {
+      "veld": "waarde",
+      "domeinen": 10,
+      "waar": [
+        "kern/assets",
+        "kern/bureau",
+        "kern/command",
+        "kern/commercie",
+        "kern/levensgraaf",
+        "kern/onboarding"
       ]
     },
     {

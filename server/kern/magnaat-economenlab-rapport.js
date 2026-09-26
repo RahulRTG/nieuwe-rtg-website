@@ -19,8 +19,10 @@ function balans(e, b) {
 }
 function kasstroom(e, b) {
   let operationeel = 0, financiering = 0;
-  for (const post of e.journaal || []) {
-    if (post.dag !== e.dag) continue;
+  /* De boekingen van de lopende dag komen uit de projectie `vandaag` van de
+     economische motor, niet uit een zoektocht door het hele journaal. */
+  const vandaag = e.vandaag && e.vandaag.dag === e.dag ? e.vandaag.posten : [];
+  for (const post of vandaag) {
     const delta = (post.regels || []).filter(r => r.rekening === b.id + '.kas').reduce((t, r) => t + rond(r.debet) - rond(r.credit), 0);
     if ((post.labels || []).includes('krediet')) financiering += delta; else operationeel += delta;
   }

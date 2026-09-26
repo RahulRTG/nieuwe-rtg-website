@@ -40,8 +40,12 @@ function bouw(provider) {
   const opRef = (naam) => (ref) => data[naam].find(x => x.ref === ref);
   const opVeld = (naam, veld) => (v) => data[naam].filter(x => x[veld] === v);
   const voeg = (naam) => (x) => { data[naam].unshift(x); };
+  /* Directe betalingen lopen sinds MONEY-012 door de betaalwaarheid: de
+     betaling staat vast VOOR de provider wordt gebeld. */
+  const bw = require('../server/kern/betaalwaarheid')({ d: () => data, save() {}, crypto, betaal: provider,
+    nu: () => new Date().toISOString(), log: null });
   const api = maakDirectpay({
-    db: { data }, save() {}, crypto,
+    db: { data }, save() {}, crypto, betaalWaarheid: bw,
     findSupplier: c => c === 'ZAAK' ? { code: 'ZAAK', name: 'Veilige Zaak', stripeAccount: 'acct_partner' } : null,
     betaal: provider, notify() {}, notifySupplier() {}, sseToSupplier() {}, sseToCustomer() {}, sseToOffice() {}, logActivity() {},
     directBetalingMetRef: opRef('directBetalingen'), directBetalingenVanKlant: opVeld('directBetalingen', 'key'),
@@ -49,7 +53,7 @@ function bouw(provider) {
     betaalVerzoekMetRef: opRef('betaalVerzoeken'), betaalVerzoekenVoorCodenaam: opVeld('betaalVerzoeken', 'naarCodename'),
     betaalVerzoekenVanZaak: opVeld('betaalVerzoeken', 'supplierCode'), betaalVerzoekenVoegToe: voeg('betaalVerzoeken')
   });
-  return { api, data };
+  return { api, data, bw };
 }
 
 test('echte DirectPay staat dicht vóór er een PaymentIntent wordt gestart', async () => {
@@ -70,7 +74,12 @@ test('processing telt niet als partneromzet; pas de bevestigde registrar boekt',
   assert.equal(r.pending, true);
   assert.equal(x.data.directBetalingen.length, 0);
   assert.equal(x.data.directOntvangsten.ZAAK, undefined);
-  assert.equal(x.data.kaartWachtend.pi_wacht.centen, 1000);
+  /* De wachtende betaling staat in de betaalwaarheid (niet meer in
+     kaartWachtend, dat geen veegronde had), met het bedrag en de providerref. */
+  const w = x.bw.van(r.betalingId);
+  assert.equal(w.status, 'IN_BEHANDELING');
+  assert.equal(w.centen, 1000);
+  assert.equal(w.providerId, 'pi_wacht');
 
   const b = x.api.dpRegistreerBevestigd({ key: 'lid', codename: 'Veilig', supplierCode: 'ZAAK', bedragCenten: 1000,
     providerId: 'pi_wacht', idem: 'provider:pi_wacht', aanbieder: 'stripe', betaalwijze: 'kaart' });
@@ -98,4 +107,41 @@ test('directe settlement eist exact het verwachte bedrag', async () => {
   assert.equal(goed.ok, true);
   assert.equal(geboekt.length, 1);
   assert.equal(geboekt[0].bedragCenten, 2500);
+});
+
+/* MONEY-012: staat onder de idem-sleutel al een ANDERE betaling (ander bedrag),
+   dan boekte de afwikkeling "herhaald" op die andere en meldde succes, terwijl
+   het nu betaalde bedrag nooit bij de partner kwam. Nu weigert de registratie,
+   blijft de betaling open voor de veegronde, en komt er geen vreemd antwoord
+   terug. */
+test('een idem-sleutel die al bij een ander bedrag hoort, geeft geen vreemd antwoord terug', async () => {
+  let x;
+  x = bouw({ AANBIEDER: 'demo', async maakBetaling() {
+    // terwijl de betaling onderweg is, landt er een andere onder dezelfde sleutel
+    x.api.dpRegistreerBevestigd({ key: 'lid', codename: 'Veilig', supplierCode: 'ZAAK', bedragCenten: 500,
+      idem: 'dp:lid:een', providerId: 'pi_ander', aanbieder: 'stripe', betaalwijze: 'kaart' });
+    return { id: 'pi_ok', status: 'betaald', aanbieder: 'demo' };
+  } });
+  const settle = maakSettlement({ db: { data: {} }, save() {}, accounts: {}, fonds: {},
+    log: { error() {}, warn() {} }, dpRegistreerMunt() {}, dpRegistreerBevestigd: x.api.dpRegistreerBevestigd });
+  require('../server/kern/betaalwaarheid/inkomend')({ betaalWaarheid: x.bw, settleFactuur: settle });
+  const r = await x.api.dpBetaalDirect({ key: 'lid', codename: 'Veilig', supplierCode: 'ZAAK', bedragCenten: 1000, idem: 'een' });
+  assert.notEqual(r.status, 200, JSON.stringify(r));
+  assert.equal(r.betaling, undefined, 'het antwoord van de andere betaling komt niet terug');
+  // de afwikkeling telt niet als gelukt: de betaling blijft open voor de veegronde en een mens
+  assert.equal(x.bw.van(r.betalingId).afgehandeldAt, undefined);
+  assert.equal(x.data.directOntvangsten.ZAAK.som, 500, 'alleen de andere betaling staat bij de partner');
+});
+
+test('dezelfde idem-sleutel met een ander bedrag wordt vooraf geweigerd, zonder de provider', async () => {
+  let aangeroepen = 0;
+  const x = bouw({ AANBIEDER: 'demo', async maakBetaling() { aangeroepen++; return { id: 'pi_x', status: 'betaald', aanbieder: 'demo' }; } });
+  x.api.dpRegistreerBevestigd({ key: 'lid', codename: 'Veilig', supplierCode: 'ZAAK', bedragCenten: 500,
+    idem: 'dp:lid:twee', providerId: 'pi_eerder', aanbieder: 'stripe', betaalwijze: 'kaart' });
+  const r = await x.api.dpBetaalDirect({ key: 'lid', codename: 'Veilig', supplierCode: 'ZAAK', bedragCenten: 1000, idem: 'twee' });
+  assert.equal(r.status, 409, JSON.stringify(r));
+  assert.equal(aangeroepen, 0, 'de provider wordt niet gebeld');
+  // dezelfde sleutel met hetzelfde bedrag blijft een gewone herhaling
+  const weer = await x.api.dpBetaalDirect({ key: 'lid', codename: 'Veilig', supplierCode: 'ZAAK', bedragCenten: 500, idem: 'twee' });
+  assert.equal(weer.herhaald, true);
 });

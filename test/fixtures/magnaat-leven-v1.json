@@ -1,0 +1,581 @@
+{
+ "toelichting": "Een leven zoals het er onder V1 FROM ZERO uitzag (vóór V2-V4): geen team, handel, contracten, markt, vestiging, mijlpalen of moeilijkheid. test/magnaathardening.test.js laadt het en speelt verder.",
+ "data": {
+  "magnaatLeven": {
+   "oud": {
+    "versie": 2,
+    "regelversie": "2",
+    "wereld": "leven:1dd5737114a8fd6b:2",
+    "dag": 5,
+    "dagMs": 180000,
+    "begonnen": 1000000000000,
+    "gerekendTot": 1000000000000,
+    "kas": 26433,
+    "baan": {
+     "actief": true,
+     "werkgever": "Brasserie De Haven",
+     "functie": "Keukenmedewerker",
+     "urenPerWeek": 24,
+     "dienstdagen": [
+      1,
+      2,
+      5
+     ],
+     "uurloon": 1125,
+     "loondag": 4,
+     "extra": {
+      "dag": 3,
+      "minuten": 420,
+      "loon": 14500
+     }
+    },
+    "bezit": [
+     "telefoon",
+     "eenvoudige laptop"
+    ],
+    "agenda": {
+     "1": [
+      {
+       "wat": "project",
+       "minuten": 240
+      }
+     ]
+    },
+    "aanbod": "websites",
+    "portfolio": 240,
+    "geleerd": 0,
+    "deals": [],
+    "dealTeller": 0,
+    "factuurTeller": 0,
+    "postTeller": 3,
+    "betaald": 0,
+    "posten": [
+     {
+      "id": "huur:1",
+      "soort": "huur",
+      "naam": "Huur van je kamer",
+      "leverancier": "je verhuurder",
+      "bedrag": 65000,
+      "dag": 15
+     },
+     {
+      "id": "vast:3",
+      "soort": "vast",
+      "naam": "Telefoon en zorgverzekering",
+      "leverancier": "je provider en je verzekeraar",
+      "bedrag": 4199,
+      "dag": 10
+     }
+    ],
+    "software": null,
+    "lening": null,
+    "onderneming": null,
+    "ondernemingVraag": null,
+    "zelfstandig": null,
+    "rtg": [
+     {
+      "id": "geld",
+      "naam": "RTG Geld",
+      "waarom": "je hebt een rekening en een loon",
+      "dag": 1
+     },
+     {
+      "id": "agenda",
+      "naam": "Agenda",
+      "waarom": "je plant je eerste vrije uren",
+      "dag": 1
+     }
+    ],
+    "meldingen": [
+     {
+      "dag": 5,
+      "tekst": "Je loon is binnen: € 270,00.",
+      "soort": "goed"
+     },
+     {
+      "dag": 1,
+      "tekst": "Nieuw in je RTG: Agenda -- je plant je eerste vrije uren.",
+      "soort": "rtg"
+     },
+     {
+      "dag": 1,
+      "tekst": "Je begint aan je eigen portfolio-site. Met je laptop en je telefoon kun je al beginnen; plan er tijd voor in je agenda. Wie je werk ziet, kan er iets van vinden.",
+      "soort": "goed"
+     },
+     {
+      "dag": 1,
+      "tekst": "Nieuw in je RTG: RTG Geld -- je hebt een rekening en een loon.",
+      "soort": "rtg"
+     },
+     {
+      "dag": 1,
+      "tekst": "Het is maandag. Je werkt 24 uur per week als keukenmedewerker bij Brasserie De Haven, je loon komt vrijdag, en je hebt € 64,32. Je hebt een telefoon, een eenvoudige laptop, en vandaag nog 4u 20m voor jezelf. Wat ga je maken?",
+      "soort": "info"
+     }
+    ],
+    "boek": {
+     "boekVolgorde": 7,
+     "rekeningen": {
+      "leven:1dd5737114a8fd6b:2:kas": {
+       "code": "leven:1dd5737114a8fd6b:2:kas",
+       "actor": "kas",
+       "naam": "Wat je had",
+       "soort": "actief",
+       "normaal": "debet",
+       "saldo": 26433
+      },
+      "leven:1dd5737114a8fd6b:2:begin": {
+       "code": "leven:1dd5737114a8fd6b:2:begin",
+       "actor": "begin",
+       "naam": "Wat je had",
+       "soort": "passief",
+       "normaal": "credit",
+       "saldo": -6432
+      },
+      "leven:1dd5737114a8fd6b:2:winkels": {
+       "code": "leven:1dd5737114a8fd6b:2:winkels",
+       "actor": "winkels",
+       "naam": "Boodschappen",
+       "soort": "extern",
+       "normaal": "credit",
+       "saldo": 2800
+      },
+      "leven:1dd5737114a8fd6b:2:leveranciers": {
+       "code": "leven:1dd5737114a8fd6b:2:leveranciers",
+       "actor": "leveranciers",
+       "naam": "Telefoon en zorgverzekering",
+       "soort": "extern",
+       "normaal": "credit",
+       "saldo": 4199
+      },
+      "leven:1dd5737114a8fd6b:2:werkgever": {
+       "code": "leven:1dd5737114a8fd6b:2:werkgever",
+       "actor": "werkgever",
+       "naam": "Loon van Brasserie De Haven",
+       "soort": "extern",
+       "normaal": "credit",
+       "saldo": -27000
+      }
+     },
+     "laatstToegepast": 7,
+     "totalen": {
+      "debet": 40431,
+      "credit": 40431,
+      "aantal": 7
+     },
+     "recent": [
+      {
+       "id": "FZ-0005-00007",
+       "datum": "dag 5",
+       "omschrijving": "Boodschappen",
+       "bedrag": 700,
+       "debet": 700,
+       "credit": 700,
+       "labels": [
+        "uit"
+       ]
+      },
+      {
+       "id": "FZ-0005-00006",
+       "datum": "dag 5",
+       "omschrijving": "Loon van Brasserie De Haven",
+       "bedrag": 27000,
+       "debet": 27000,
+       "credit": 27000,
+       "labels": [
+        "in"
+       ]
+      },
+      {
+       "id": "FZ-0004-00005",
+       "datum": "dag 4",
+       "omschrijving": "Boodschappen",
+       "bedrag": 700,
+       "debet": 700,
+       "credit": 700,
+       "labels": [
+        "uit"
+       ]
+      },
+      {
+       "id": "FZ-0003-00004",
+       "datum": "dag 3",
+       "omschrijving": "Telefoon en zorgverzekering",
+       "bedrag": 4199,
+       "debet": 4199,
+       "credit": 4199,
+       "labels": [
+        "uit"
+       ]
+      },
+      {
+       "id": "FZ-0003-00003",
+       "datum": "dag 3",
+       "omschrijving": "Boodschappen",
+       "bedrag": 700,
+       "debet": 700,
+       "credit": 700,
+       "labels": [
+        "uit"
+       ]
+      },
+      {
+       "id": "FZ-0002-00002",
+       "datum": "dag 2",
+       "omschrijving": "Boodschappen",
+       "bedrag": 700,
+       "debet": 700,
+       "credit": 700,
+       "labels": [
+        "uit"
+       ]
+      },
+      {
+       "id": "FZ-0001-00001",
+       "datum": "dag 1",
+       "omschrijving": "Wat je had",
+       "bedrag": 6432,
+       "debet": 6432,
+       "credit": 6432,
+       "labels": [
+        "in"
+       ]
+      }
+     ],
+     "vandaag": {
+      "dag": 5,
+      "posten": [
+       {
+        "volgnummer": 6,
+        "labels": [
+         "in"
+        ],
+        "regels": [
+         {
+          "rekening": "leven:1dd5737114a8fd6b:2:kas",
+          "actor": "kas",
+          "naam": "Loon van Brasserie De Haven",
+          "soort": "actief",
+          "debet": 27000,
+          "credit": 0
+         },
+         {
+          "rekening": "leven:1dd5737114a8fd6b:2:werkgever",
+          "actor": "werkgever",
+          "naam": "Loon van Brasserie De Haven",
+          "soort": "extern",
+          "debet": 0,
+          "credit": 27000
+         }
+        ]
+       },
+       {
+        "volgnummer": 7,
+        "labels": [
+         "uit"
+        ],
+        "regels": [
+         {
+          "rekening": "leven:1dd5737114a8fd6b:2:winkels",
+          "actor": "winkels",
+          "naam": "Boodschappen",
+          "soort": "extern",
+          "debet": 700,
+          "credit": 0
+         },
+         {
+          "rekening": "leven:1dd5737114a8fd6b:2:kas",
+          "actor": "kas",
+          "naam": "Boodschappen",
+          "soort": "actief",
+          "debet": 0,
+          "credit": 700
+         }
+        ]
+       }
+      ]
+     },
+     "wachtend": [],
+     "integriteit": null,
+     "dag": 5
+    }
+   }
+  },
+  "magnaatJournaal": {
+   "leven:1dd5737114a8fd6b:2": {
+    "wereld": "leven:1dd5737114a8fd6b:2",
+    "gebeurtenissen": [
+     {
+      "id": "FZ-0001-00001",
+      "wereld": "leven:1dd5737114a8fd6b:2",
+      "volgnummer": 1,
+      "soort": "OPENING",
+      "oorzaak": "OPENING",
+      "regelVersie": "2",
+      "motorVersie": "from-zero-1",
+      "sleutel": "opening",
+      "dag": 1,
+      "datum": "dag 1",
+      "omschrijving": "Wat je had",
+      "bedrag": 6432,
+      "debet": 6432,
+      "credit": 6432,
+      "regels": [
+       {
+        "rekening": "leven:1dd5737114a8fd6b:2:kas",
+        "actor": "kas",
+        "naam": "Wat je had",
+        "soort": "actief",
+        "debet": 6432,
+        "credit": 0
+       },
+       {
+        "rekening": "leven:1dd5737114a8fd6b:2:begin",
+        "actor": "begin",
+        "naam": "Wat je had",
+        "soort": "passief",
+        "debet": 0,
+        "credit": 6432
+       }
+      ],
+      "labels": [
+       "in"
+      ]
+     },
+     {
+      "id": "FZ-0002-00002",
+      "wereld": "leven:1dd5737114a8fd6b:2",
+      "volgnummer": 2,
+      "soort": "BOODSCHAPPEN",
+      "oorzaak": "BOODSCHAPPEN",
+      "regelVersie": "2",
+      "motorVersie": "from-zero-1",
+      "sleutel": "eten:2",
+      "dag": 2,
+      "datum": "dag 2",
+      "omschrijving": "Boodschappen",
+      "bedrag": 700,
+      "debet": 700,
+      "credit": 700,
+      "regels": [
+       {
+        "rekening": "leven:1dd5737114a8fd6b:2:winkels",
+        "actor": "winkels",
+        "naam": "Boodschappen",
+        "soort": "extern",
+        "debet": 700,
+        "credit": 0
+       },
+       {
+        "rekening": "leven:1dd5737114a8fd6b:2:kas",
+        "actor": "kas",
+        "naam": "Boodschappen",
+        "soort": "actief",
+        "debet": 0,
+        "credit": 700
+       }
+      ],
+      "labels": [
+       "uit"
+      ]
+     },
+     {
+      "id": "FZ-0003-00003",
+      "wereld": "leven:1dd5737114a8fd6b:2",
+      "volgnummer": 3,
+      "soort": "BOODSCHAPPEN",
+      "oorzaak": "BOODSCHAPPEN",
+      "regelVersie": "2",
+      "motorVersie": "from-zero-1",
+      "sleutel": "eten:3",
+      "dag": 3,
+      "datum": "dag 3",
+      "omschrijving": "Boodschappen",
+      "bedrag": 700,
+      "debet": 700,
+      "credit": 700,
+      "regels": [
+       {
+        "rekening": "leven:1dd5737114a8fd6b:2:winkels",
+        "actor": "winkels",
+        "naam": "Boodschappen",
+        "soort": "extern",
+        "debet": 700,
+        "credit": 0
+       },
+       {
+        "rekening": "leven:1dd5737114a8fd6b:2:kas",
+        "actor": "kas",
+        "naam": "Boodschappen",
+        "soort": "actief",
+        "debet": 0,
+        "credit": 700
+       }
+      ],
+      "labels": [
+       "uit"
+      ]
+     },
+     {
+      "id": "FZ-0003-00004",
+      "wereld": "leven:1dd5737114a8fd6b:2",
+      "volgnummer": 4,
+      "soort": "VERPLICHTING",
+      "oorzaak": "VERPLICHTING",
+      "regelVersie": "2",
+      "motorVersie": "from-zero-1",
+      "sleutel": "post:vast:2",
+      "dag": 3,
+      "datum": "dag 3",
+      "omschrijving": "Telefoon en zorgverzekering",
+      "bedrag": 4199,
+      "debet": 4199,
+      "credit": 4199,
+      "regels": [
+       {
+        "rekening": "leven:1dd5737114a8fd6b:2:leveranciers",
+        "actor": "leveranciers",
+        "naam": "Telefoon en zorgverzekering",
+        "soort": "extern",
+        "debet": 4199,
+        "credit": 0
+       },
+       {
+        "rekening": "leven:1dd5737114a8fd6b:2:kas",
+        "actor": "kas",
+        "naam": "Telefoon en zorgverzekering",
+        "soort": "actief",
+        "debet": 0,
+        "credit": 4199
+       }
+      ],
+      "labels": [
+       "uit"
+      ]
+     },
+     {
+      "id": "FZ-0004-00005",
+      "wereld": "leven:1dd5737114a8fd6b:2",
+      "volgnummer": 5,
+      "soort": "BOODSCHAPPEN",
+      "oorzaak": "BOODSCHAPPEN",
+      "regelVersie": "2",
+      "motorVersie": "from-zero-1",
+      "sleutel": "eten:4",
+      "dag": 4,
+      "datum": "dag 4",
+      "omschrijving": "Boodschappen",
+      "bedrag": 700,
+      "debet": 700,
+      "credit": 700,
+      "regels": [
+       {
+        "rekening": "leven:1dd5737114a8fd6b:2:winkels",
+        "actor": "winkels",
+        "naam": "Boodschappen",
+        "soort": "extern",
+        "debet": 700,
+        "credit": 0
+       },
+       {
+        "rekening": "leven:1dd5737114a8fd6b:2:kas",
+        "actor": "kas",
+        "naam": "Boodschappen",
+        "soort": "actief",
+        "debet": 0,
+        "credit": 700
+       }
+      ],
+      "labels": [
+       "uit"
+      ]
+     },
+     {
+      "id": "FZ-0005-00006",
+      "wereld": "leven:1dd5737114a8fd6b:2",
+      "volgnummer": 6,
+      "soort": "LOON",
+      "oorzaak": "LOON",
+      "regelVersie": "2",
+      "motorVersie": "from-zero-1",
+      "sleutel": "loon:5",
+      "dag": 5,
+      "datum": "dag 5",
+      "omschrijving": "Loon van Brasserie De Haven",
+      "bedrag": 27000,
+      "debet": 27000,
+      "credit": 27000,
+      "regels": [
+       {
+        "rekening": "leven:1dd5737114a8fd6b:2:kas",
+        "actor": "kas",
+        "naam": "Loon van Brasserie De Haven",
+        "soort": "actief",
+        "debet": 27000,
+        "credit": 0
+       },
+       {
+        "rekening": "leven:1dd5737114a8fd6b:2:werkgever",
+        "actor": "werkgever",
+        "naam": "Loon van Brasserie De Haven",
+        "soort": "extern",
+        "debet": 0,
+        "credit": 27000
+       }
+      ],
+      "labels": [
+       "in"
+      ]
+     },
+     {
+      "id": "FZ-0005-00007",
+      "wereld": "leven:1dd5737114a8fd6b:2",
+      "volgnummer": 7,
+      "soort": "BOODSCHAPPEN",
+      "oorzaak": "BOODSCHAPPEN",
+      "regelVersie": "2",
+      "motorVersie": "from-zero-1",
+      "sleutel": "eten:5",
+      "dag": 5,
+      "datum": "dag 5",
+      "omschrijving": "Boodschappen",
+      "bedrag": 700,
+      "debet": 700,
+      "credit": 700,
+      "regels": [
+       {
+        "rekening": "leven:1dd5737114a8fd6b:2:winkels",
+        "actor": "winkels",
+        "naam": "Boodschappen",
+        "soort": "extern",
+        "debet": 700,
+        "credit": 0
+       },
+       {
+        "rekening": "leven:1dd5737114a8fd6b:2:kas",
+        "actor": "kas",
+        "naam": "Boodschappen",
+        "soort": "actief",
+        "debet": 0,
+        "credit": 700
+       }
+      ],
+      "labels": [
+       "uit"
+      ]
+     }
+    ],
+    "sleutels": {
+     "opening": 1,
+     "eten:2": 2,
+     "eten:3": 3,
+     "post:vast:2": 4,
+     "eten:4": 5,
+     "loon:5": 6,
+     "eten:5": 7
+    },
+    "ontbrekend": null
+   }
+  }
+ }
+}

@@ -157,6 +157,7 @@
     zet: function (rij, acties) {
       var a = normaliseer(acties);
       if (!rij || !a) return false;
+      grammaticaZacht();
       boek.set(rij, a);
       merkEen(rij);
       return true;
@@ -168,6 +169,7 @@
        door de browser gelezen op het moment van aanraken en niet daarna. */
     lijst: function (wortel, kiezer, bouwer) {
       if (!wortel || !kiezer || typeof bouwer !== 'function') return false;
+      grammaticaZacht();
       /* EERST OPRUIMEN. Een scherm met panelen (reizen-veilig) meldt zijn
          lijst per paneel aan, en die panelen komen en gaan. Zonder deze stap
          groeit de aanmeldlijst met elk paneel en houdt hij de weggehaalde DOM

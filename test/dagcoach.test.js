@@ -147,3 +147,36 @@ test('niemand anders komt bij uw dag', async () => {
   assert.equal((await api('dag', {}, sup)).status, 401);
   assert.equal((await api('dag', {}, '')).status, 401);
 });
+
+test('Dag leest de agenda en bezit hem niet: een afspraak van vandaag staat er, met Agenda als plek om te wijzigen', async () => {
+  /* De consolidatieronde (SCHERMEIGENAAR.json): Dag -> RTG Life, Agenda ->
+     agenda.html. Life laat zien wat er vandaag staat; plannen, verplaatsen en
+     afzeggen gebeurt in de agenda. Zonder deze regel stond een zelf geplande
+     afspraak NIET in "Uw dag", en was vandaag.html met verzonnen momenten de
+     enige plek die er een dag van leek te maken. */
+  const vandaag = new Date().toISOString().slice(0, 10);
+  const titel = 'Consolidatietoets ' + Date.now();
+  const m = await api('agenda/toevoegen', { titel, datum: vandaag, tijd: '23:58' }, lid);
+  assert.equal(m.status, 200, JSON.stringify(m.body));
+  const d = (await api('dag', {}, lid)).body;
+  const p = d.punten.find(x => x.wat === titel);
+  assert.ok(p, 'de afspraak uit de agenda staat op de dag: ' + d.punten.map(x => x.wat).join(', '));
+  assert.equal(p.bron, 'agenda');
+  assert.equal(p.naar, '/apps/agenda.html', 'wijzigen gebeurt in de agenda, niet in Life');
+  assert.equal(p.tijd, '23:58');
+  assert.deepEqual(d.storingen, [], 'en de agendalaag is aangesloten');
+  /* Morgen hoort er niet bij: Dag is vandaag, de agenda is het venster. */
+  const morgen = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+  await api('agenda/toevoegen', { titel: titel + ' morgen', datum: morgen }, lid);
+  const d2 = (await api('dag', {}, lid)).body;
+  assert.ok(!d2.punten.some(x => x.wat === titel + ' morgen'), 'een afspraak van morgen staat niet op vandaag');
+});
+
+test('een agendalaag die ontbreekt of stuk is, staat er met naam en wordt geen lege dag', async () => {
+  const dagcoach = require('../server/kern/dagcoach');
+  const stuk = dagcoach({ kern: { agenda: { bereik: () => { throw new Error('boem'); }, ecosysteem: () => [] } } });
+  const d = stuk.dagVoor('k', 'CODE');
+  assert.ok(d.storingen.some(s => /Agenda/.test(s) && /fout/i.test(s)), d.storingen.join(' | '));
+  const weg = dagcoach({ kern: {} }).dagVoor('k', 'CODE');
+  assert.ok(weg.storingen.some(s => /Agenda/.test(s) && /niet aangesloten/i.test(s)));
+});

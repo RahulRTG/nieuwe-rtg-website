@@ -93,7 +93,7 @@ if (window.RTGUitvoer) RTGUitvoer.bron(function () {
 
 async function laad(){
   if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2></div>'; return; }
-  let d; try{ d=await api('garderobe'); }catch(e){ if(e.status===403){ RTGDeur.toon($('#main'), { soort:'pas', pas:'Lifestyle' }); return; } $('#main').innerHTML='<div class="leeg">Kon de garderobe niet laden.</div>'; return; }
+  let d; try{ d=await api('garderobe'); /* Ontbreekt een veld, dan de eigen foutmelding hieronder -- nooit een lege lijst (die zou beweren dat er niets is) en nooit een ruwe TypeError (LIEGRONDE.json). */ if(!(d && Array.isArray(d.categorieen) && Array.isArray(d.stukken) && Array.isArray(d.vakken) && Array.isArray(d.vaklui) && d.perCategorie && typeof d.perCategorie === 'object')) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.'); }catch(e){ if(e.status===403){ RTGDeur.toon($('#main'), { soort:'pas', pas:'Lifestyle' }); return; } $('#main').innerHTML='<div class="leeg">Kon de garderobe niet laden.</div>'; return; }
   stand=d;
   const catOpts=d.categorieen.map(c=>'<option>'+c+'</option>').join('');
   const vakOpts=d.vakken.map(v=>'<option>'+v+'</option>').join('');

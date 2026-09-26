@@ -1,0 +1,289 @@
+{
+  "schema": "RTG:DOCUMENT-CONTRACTS:v1",
+  "capabilities": [
+    {
+      "version": 1,
+      "actor": {
+        "source": "server authenticated member session",
+        "allowed": "current owner of personal vault; non-guest or registered account"
+      },
+      "resource": {
+        "type": "personal-vault-file",
+        "identity": "owner board + file id",
+        "excluded": [
+          "Office documents",
+          "sharing relationships",
+          "permanent erasure"
+        ]
+      },
+      "input": {
+        "required": {
+          "capability": "canonical unversioned id",
+          "contractVersion": 1,
+          "id": "owned file id",
+          "operationId": "16..100 ASCII alphanumeric/underscore/hyphen",
+          "expectedVersion": "64 lower-case hex SHA-256 resource version"
+        },
+        "additionalProperties": false
+      },
+      "output": {
+        "success": [
+          "capability",
+          "contractVersion",
+          "contractDigest",
+          "policy",
+          "operationId",
+          "resource",
+          "effect",
+          "auditRef",
+          "committedAt",
+          "herhaald"
+        ],
+        "denial": [
+          "status",
+          "code",
+          "messageId",
+          "policy"
+        ]
+      },
+      "preconditions": [
+        "valid session at admission and transaction execution",
+        "supported transactional datastore",
+        "owned resource exists",
+        "known contract and input schema",
+        "operation identity immutable",
+        "fresh expectedVersion unless replay"
+      ],
+      "authorization": {
+        "policy": "documents.owner@1",
+        "decision_order": [
+          "session",
+          "owner",
+          "contract",
+          "input",
+          "replay",
+          "version",
+          "lifecycle",
+          "content availability"
+        ],
+        "non_owner": "404 not_found without resource or receipt"
+      },
+      "invariants": [
+        "No blob, content version or sharing permission is added or removed.",
+        "Only the current owner may mutate lifecycle.",
+        "A stale new operation cannot change authoritative state.",
+        "State and audit receipt commit atomically.",
+        "One operation identity has at most one lifecycle effect.",
+        "No confirmed success before durable commit."
+      ],
+      "idempotency": {
+        "scope": "owner vault + operationId",
+        "fingerprint": "SHA256(capability, version, id, expectedVersion, contractDigest, policyDigest)",
+        "same_input": "return original effect/audit with current resource projection",
+        "different_input": "409 operation_conflict",
+        "capacity": "503 at 10000; never silently evict receipts"
+      },
+      "concurrency_semantics": {
+        "linearization": "transactional collection lock; compare version and authorize inside callback",
+        "competing_stale_operations": "one winner; others version_conflict",
+        "ABA": "monotonic documentRevision included in version hash",
+        "revocation": "must be visible to session resolver before transaction callback; owner checked on locked collection"
+      },
+      "failure_semantics": {
+        "invalid_contract": 400,
+        "invalid_input": 400,
+        "operation_required": 428,
+        "version_conflict": 409,
+        "invalid_state": 409,
+        "content_unavailable": 410,
+        "outcome_unknown": 503,
+        "retry": "reuse original operationId and payload after uncertain outcome"
+      },
+      "recovery_semantics": [
+        "Uncommitted transaction rolls back.",
+        "Committed state/receipt survives process restart.",
+        "Retry after missing response reads durable receipt and current state."
+      ],
+      "audit_requirements": {
+        "durable": "operation receipt in same collection transaction",
+        "payload": "opaque actor-bound auditRef, operation identity, versions, effect, contract/policy digests, timestamp",
+        "denied": "HTTP status/request log; no success receipt"
+      },
+      "privacy_requirements": [
+        "No credentials, file content or file name in operation receipt.",
+        "No other owner data or receipts in denial.",
+        "Existing encrypted storage and account erasure policy apply; this pilot does not certify those policies."
+      ],
+      "interface_requirements": [
+        "UI, Edge and Rahul submit the same input to POST /api/bestanden/actie.",
+        "Legacy owner weg/herstel translate to this gateway.",
+        "No caller-defined actor or authorization.",
+        "Rahul requires a server-held confirmed proposal.",
+        "Responses never confer authority on future requests.",
+        "Refresh, focus, online and new-tab reads converge to server state."
+      ],
+      "side_effects": {
+        "required": [
+          "atomic audit receipt",
+          "authoritative derived vault/shared/gallery reads"
+        ],
+        "not_required": [
+          "notifications",
+          "external search index"
+        ],
+        "delivery": "pull on refresh/focus/online; no realtime push guarantee in v1"
+      },
+      "id": "documents.trash",
+      "capability_id": "documents.trash@1",
+      "intent": "Move an owned file to trash without erasure.",
+      "state_before": "active",
+      "state_transition": "active -> trashed",
+      "state_after": "trashed",
+      "before": "active",
+      "after": "trashed",
+      "invalid_state_semantics": "Already trashed with current version: successful no-op; no revision increment."
+    },
+    {
+      "version": 1,
+      "actor": {
+        "source": "server authenticated member session",
+        "allowed": "current owner of personal vault; non-guest or registered account"
+      },
+      "resource": {
+        "type": "personal-vault-file",
+        "identity": "owner board + file id",
+        "excluded": [
+          "Office documents",
+          "sharing relationships",
+          "permanent erasure"
+        ]
+      },
+      "input": {
+        "required": {
+          "capability": "canonical unversioned id",
+          "contractVersion": 1,
+          "id": "owned file id",
+          "operationId": "16..100 ASCII alphanumeric/underscore/hyphen",
+          "expectedVersion": "64 lower-case hex SHA-256 resource version"
+        },
+        "additionalProperties": false
+      },
+      "output": {
+        "success": [
+          "capability",
+          "contractVersion",
+          "contractDigest",
+          "policy",
+          "operationId",
+          "resource",
+          "effect",
+          "auditRef",
+          "committedAt",
+          "herhaald"
+        ],
+        "denial": [
+          "status",
+          "code",
+          "messageId",
+          "policy"
+        ]
+      },
+      "preconditions": [
+        "valid session at admission and transaction execution",
+        "supported transactional datastore",
+        "owned resource exists",
+        "known contract and input schema",
+        "operation identity immutable",
+        "fresh expectedVersion unless replay"
+      ],
+      "authorization": {
+        "policy": "documents.owner@1",
+        "decision_order": [
+          "session",
+          "owner",
+          "contract",
+          "input",
+          "replay",
+          "version",
+          "lifecycle",
+          "content availability"
+        ],
+        "non_owner": "404 not_found without resource or receipt"
+      },
+      "invariants": [
+        "No blob, content version or sharing permission is added or removed.",
+        "Only the current owner may mutate lifecycle.",
+        "A stale new operation cannot change authoritative state.",
+        "State and audit receipt commit atomically.",
+        "One operation identity has at most one lifecycle effect.",
+        "No confirmed success before durable commit."
+      ],
+      "idempotency": {
+        "scope": "owner vault + operationId",
+        "fingerprint": "SHA256(capability, version, id, expectedVersion, contractDigest, policyDigest)",
+        "same_input": "return original effect/audit with current resource projection",
+        "different_input": "409 operation_conflict",
+        "capacity": "503 at 10000; never silently evict receipts"
+      },
+      "concurrency_semantics": {
+        "linearization": "transactional collection lock; compare version and authorize inside callback",
+        "competing_stale_operations": "one winner; others version_conflict",
+        "ABA": "monotonic documentRevision included in version hash",
+        "revocation": "must be visible to session resolver before transaction callback; owner checked on locked collection"
+      },
+      "failure_semantics": {
+        "invalid_contract": 400,
+        "invalid_input": 400,
+        "operation_required": 428,
+        "version_conflict": 409,
+        "invalid_state": 409,
+        "content_unavailable": 410,
+        "outcome_unknown": 503,
+        "retry": "reuse original operationId and payload after uncertain outcome"
+      },
+      "recovery_semantics": [
+        "Uncommitted transaction rolls back.",
+        "Committed state/receipt survives process restart.",
+        "Retry after missing response reads durable receipt and current state."
+      ],
+      "audit_requirements": {
+        "durable": "operation receipt in same collection transaction",
+        "payload": "opaque actor-bound auditRef, operation identity, versions, effect, contract/policy digests, timestamp",
+        "denied": "HTTP status/request log; no success receipt"
+      },
+      "privacy_requirements": [
+        "No credentials, file content or file name in operation receipt.",
+        "No other owner data or receipts in denial.",
+        "Existing encrypted storage and account erasure policy apply; this pilot does not certify those policies."
+      ],
+      "interface_requirements": [
+        "UI, Edge and Rahul submit the same input to POST /api/bestanden/actie.",
+        "Legacy owner weg/herstel translate to this gateway.",
+        "No caller-defined actor or authorization.",
+        "Rahul requires a server-held confirmed proposal.",
+        "Responses never confer authority on future requests.",
+        "Refresh, focus, online and new-tab reads converge to server state."
+      ],
+      "side_effects": {
+        "required": [
+          "atomic audit receipt",
+          "authoritative derived vault/shared/gallery reads"
+        ],
+        "not_required": [
+          "notifications",
+          "external search index"
+        ],
+        "delivery": "pull on refresh/focus/online; no realtime push guarantee in v1"
+      },
+      "id": "documents.restore",
+      "capability_id": "documents.restore@1",
+      "intent": "Restore a trashed owned file with all content versions intact.",
+      "state_before": "trashed",
+      "state_transition": "trashed -> active",
+      "state_after": "active",
+      "before": "trashed",
+      "after": "active",
+      "invalid_state_semantics": "A new restore of an active file is 409 invalid_state; replay of a prior valid restore remains valid."
+    }
+  ]
+}

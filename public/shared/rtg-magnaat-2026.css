@@ -19,7 +19,10 @@ body.magnaat-voorzijde-actief>.rtg-spring{display:none!important}
 .magnaat-voorzijde[hidden]{display:none!important}
 .magnaat-voorzijde{
   min-height:100dvh;
-  padding:0 0 calc(6.4rem + env(safe-area-inset-bottom));
+  /* De schil zet de body-padding hier op nul voor een doorlopende achtergrond,
+     dus reserveert de voorzijde zelf de ruimte van de RTG-balken: anders viel
+     de kop onder de bovenbalk en de Magnaat-balk onder de onderbalk. */
+  padding:var(--edge-top,0px) 0 calc(var(--edge-bottom,0px) + 6.4rem + env(safe-area-inset-bottom)) var(--edge-side,0px);
   background:
     radial-gradient(circle at 50% -8rem,rgba(36,83,110,.42),transparent 32rem),
     linear-gradient(180deg,var(--mv-nacht),var(--mv-diep));
@@ -82,7 +85,11 @@ body.magnaat-voorzijde-actief>.rtg-spring{display:none!important}
 .mv-uitleg{margin:.65rem 0 0;color:#d0cbc3;font-size:.76rem;line-height:1.55}
 .mv-leren{display:grid;gap:.45rem}.mv-leerregel{display:flex;gap:.6rem;align-items:center;padding:.68rem;border:1px solid rgba(216,172,105,.24);font-size:.7rem;background:rgba(7,22,32,.76)}.mv-leerregel:before{content:'\2713';width:1.45rem;height:1.45rem;display:grid;place-items:center;border:1px solid var(--mv-groen);border-radius:50%;color:#b4d1b9;font-size:.7rem}
 .mv-open-diep{width:100%;margin-top:1rem}
-.mv-navigatie{position:fixed;z-index:45;left:50%;bottom:max(.55rem,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(calc(100% - 1rem),42rem);display:grid;grid-template-columns:repeat(4,1fr);padding:.5rem;border:1px solid var(--mv-lijn);background:rgba(2,11,17,.96);box-shadow:0 .8rem 2.5rem #000;backdrop-filter:blur(16px)}
+.mv-navigatie{position:fixed;z-index:45;left:calc(50% + var(--edge-side,0px)/2);bottom:calc(var(--edge-bottom,0px) + max(.55rem,env(safe-area-inset-bottom)));transform:translateX(-50%);width:min(calc(100% - 1rem),42rem);display:grid;grid-template-columns:repeat(4,1fr);padding:.5rem;border:1px solid var(--mv-lijn);background:rgba(2,11,17,.96);box-shadow:0 .8rem 2.5rem #000;backdrop-filter:blur(16px)}
+/* Onder de RTG-schil is er al een onderbalk; een tweede eronder of erboven
+   maakt het scherm druk. Wereld, missies, team en profiel hebben hier elk een
+   eigen ingang (kopknop, Ga verder, Vraag uw team, volledige wereld). */
+body.rtg-edge-host .mv-navigatie{display:none}
 .mv-navigatie button{min-width:0;min-height:3.25rem;border:0;background:transparent;color:var(--mv-stil);display:grid;place-items:center;gap:.22rem;cursor:pointer;font-size:.58rem}.mv-navigatie button i{font:normal 1.05rem/1 Inter,sans-serif;color:var(--mv-goud)}.mv-navigatie button[aria-current="page"]{color:var(--mv-goud-zacht)}
 .mv-navigatie button[aria-current="page"]:after{content:'';width:1.2rem;height:2px;background:var(--mv-goud)}
 .mv-terugknop{display:flex;align-items:center;gap:.55rem;width:max-content;margin:.6rem 0 0;border:0;background:transparent;color:var(--mv-goud-zacht);font-size:.72rem;cursor:pointer}

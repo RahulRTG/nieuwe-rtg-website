@@ -38,7 +38,7 @@ test('een taak gebruikt dezelfde bestaande personeelshandeling', () => {
 
 test('Team Room blijft warm, menselijk en verbonden met de volledige PDA', () => {
   for (const kleur of ['--trm-nacht:#0d0907', '--trm-goud:#d6a96a', '--trm-wijn:#8d1738', '--trm-groen:#70b782']) assert.ok(css.includes(kleur), kleur);
-  assert.match(css, /work-heritage-v2\.jpg/);
+  assert.match(css, /team-room\.webp/);
   assert.match(css, /\.trm-nav\{position:fixed/);
   assert.match(kern, /Rustig overzicht/);
   for (const tab of ['taken', 'rooster', 'hulp']) assert.match(html, new RegExp('data-trm-diep="' + tab + '"'));

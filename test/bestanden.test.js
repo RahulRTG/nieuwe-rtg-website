@@ -17,6 +17,10 @@ function api(pad, body, token) {
     body: JSON.stringify(body || {}) })
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
+async function lifecycle(pad, id, token) {
+  const it = (await api('/api/bestanden/mijn', {}, token)).body.items.find(x => x.id === id);
+  return api(pad, { id, expectedVersion: it.documentVersion, operationId: require('node:crypto').randomUUID() }, token);
+}
 const b64 = t => Buffer.from(t).toString('base64');
 const alsTekst = t => 'data:text/plain;base64,' + b64(t);
 
@@ -125,16 +129,16 @@ test('3. delen op codenaam: B haalt op en zet een nieuwe versie; nergens een ech
 
 test('4. de prullenbak is een la met een klok: herstellen kan, echt weg is echt weg', async () => {
   const up = await api('/api/bestanden/upload', { naam: 'kladje.txt', dataUrl: alsTekst('weg ermee') }, lidA);
-  const weg1 = await api('/api/bestanden/weg', { id: up.body.id }, lidA);
+  const weg1 = await lifecycle('/api/bestanden/weg', up.body.id, lidA);
   assert.equal(weg1.body.prullenbak, true, 'eerst naar de prullenbak, niet meteen weg');
   let l = await api('/api/bestanden/mijn', {}, lidA);
   assert.equal(l.body.items.find(x => x.id === up.body.id).weg, true);
 
-  await api('/api/bestanden/herstel', { id: up.body.id }, lidA);
+  await lifecycle('/api/bestanden/herstel', up.body.id, lidA);
   l = await api('/api/bestanden/mijn', {}, lidA);
   assert.equal(l.body.items.find(x => x.id === up.body.id).weg, false, 'herstellen kan altijd binnen 30 dagen');
 
-  await api('/api/bestanden/weg', { id: up.body.id }, lidA);
+  await lifecycle('/api/bestanden/weg', up.body.id, lidA);
   await api('/api/bestanden/leeg', {}, lidA);
   l = await api('/api/bestanden/mijn', {}, lidA);
   assert.ok(!l.body.items.find(x => x.id === up.body.id), 'de la is leeg');

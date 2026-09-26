@@ -34,6 +34,7 @@
   }
   function close() { w.RTGAdaptiveEdge.setState('dock'); }
   function currentItems() {
+    if (w.RTGEdgeBlikveld) return w.RTGEdgeBlikveld.acties();
     var A = w.RTGAdaptief, items = A && A.voorNu ? A.voorNu() : [];
     var command = d.getElementById('rtgCommand');
     return items.length || A && A.context().acties.length ? items : command && command.rtgEdgeItems ? command.rtgEdgeItems() : [];

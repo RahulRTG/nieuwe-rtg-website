@@ -4,7 +4,7 @@
    routes/supplier/pda.js de netwerklaag heeft gemount. */
 module.exports = (kctx) => {
   const { accounts, anthropic, app, crypto, db, findSupplier, logActivity, loginFails, managerOnly, noteFailedTry, notifySupplier, rememberSession, save, schoon, sseToSupplier, supplierAuth, supplierState, tooManyTries, orderMetRef, ordersVanZaak } = kctx;
-  const { netState, netPaar, netLink } = kctx;
+  const { netState, netPaar, netLink, heeftKantoor } = kctx;
 
 /* Ingeklokt en geaccrediteerd: een personeelslid dat OOK op het rooster van een
    verbonden zaak staat, wisselt van afdeling zonder nieuwe PIN. De PIN is bij
@@ -115,6 +115,11 @@ app.post('/api/supplier/mijn/login', async (req, res) => {
   loginFails.delete(bucket);
   const posities = mijnPosities(lid.id);
   if (!posities.length) {
+    // geen zaak, wel kantoor: alleen de WEG terug, geen sessie (zie ../pda.js)
+    if (heeftKantoor(lid.id)) {
+      return res.status(404).json({ kantoor: true,
+        error: 'U staat bij geen zaak op het rooster, maar uw account heeft wel toegang tot RTG Kantoor.' });
+    }
     return res.status(404).json({ error: 'U staat nog nergens op het rooster. Vraag uw werkgever om een kassacode en meld u eenmalig aan.' });
   }
   // land op het gevraagde bedrijf (deeplink/onthouden), anders het eerste

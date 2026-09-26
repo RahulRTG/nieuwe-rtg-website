@@ -45,20 +45,24 @@ function stabiliteit(reeks) {
   return klem(1 - Math.sqrt(variantie) / Math.abs(gem) / 2, 0, 1);
 }
 
+const { uitCenten } = require('./centen');
+
 module.exports = ({ waarde }) => {
   /* De harde cijfers waar zowel het profiel als de convenanten op rusten. Een
      keer uitgerekend en aan beide kanten gebruikt: twee berekeningen van
-     dezelfde verhouding lopen uiteen. */
+     dezelfde verhouding lopen uiteen. In euro's, want de verhoudingen zetten
+     kas en schuld naast omzet, lasten en winst: wat in centen op de rekening
+     staat, wordt hier eerst terug naar euro's gezet (./centen.js). */
   function cijfers(st, h) {
     const rij = st.vestigingen[h] || [];
     const leningen = (st.leningen || []).filter(l => l.speler === h && l.status === 'loopt');
-    const schuld = leningen.reduce((n, l) => n + l.restant, 0);
+    const schuld = leningen.reduce((n, l) => n + uitCenten(l.restant), 0);
     const ondernemingswaarde = rij.reduce((n, v) => n + waarde(v), 0);
-    const kas = st.geld[h] || 0;
+    const kas = uitCenten(st.geld[h] || 0);
     const vermogen = kas + ondernemingswaarde - schuld;
     // wat er per maand sowieso uitgaat: lonen, vaste lasten, huur, rente
     const maandlast = rij.reduce((n, v) => n + v.huur + (v.onderhoudBudget || 0) + (v.marketing || 0), 0)
-      + leningen.reduce((n, l) => n + l.restant * (l.rente + (l.opslag || 0)), 0);
+      + leningen.reduce((n, l) => n + uitCenten(l.restant) * (l.rente + (l.opslag || 0)), 0);
     const reeks = (st.resultaatlog || {})[h] || [];
     const jaarwinst = reeks.length ? reeks.reduce((n, x) => n + x, 0) / reeks.length * 12 : 0;
     return {
@@ -66,7 +70,7 @@ module.exports = ({ waarde }) => {
       // de twee waar de convenanten op staan
       buffer: maandlast > 0 ? kas / (maandlast * 12) : (kas > 0 ? 1 : 0),
       schuldlast: jaarwinst > 0 ? schuld / jaarwinst : (schuld > 0 ? 99 : 0),
-      achtergesteld: leningen.filter(l => l.soort === 'achtergesteld').reduce((n, l) => n + l.restant, 0)
+      achtergesteld: leningen.filter(l => l.soort === 'achtergesteld').reduce((n, l) => n + uitCenten(l.restant), 0)
     };
   }
 

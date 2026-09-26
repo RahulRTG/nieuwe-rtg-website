@@ -130,17 +130,12 @@ test('een veeg archiveert een post en draait terug; bewaren drukt de knop in en 
     }, tekst2, { timeout: 8000 });
     assert.equal((await staatVan(tekst2)).bewaard, false, 'de post hoort nog niet bewaard te zijn');
     const d2 = await doosVan(weer, 'de tweede post');
-    const y2 = d2.y + Math.min(40, d2.height / 2);
     /* DEZELFDE GESCHAALDE AFSTAND als veegDoor hierboven. Een vaste stapgrootte
        leek genoeg tot deze proef: de drempel is max(lade + 52, 55% van de REGEL),
        en een Salon-post is zo breed als de kolom. 22 stapjes van 14 pixels kwam
        op 308 en de drempel lag op 462 -- er gebeurde dus niets, en de proef zei
        alleen dat de server niets had gezien. */
-    const px2 = d2.width * 0.62 + 90;
-    await page.mouse.move(d2.x + d2.width * 0.15, y2);
-    await page.mouse.down();
-    for (let i = 1; i <= 22; i++) await page.mouse.move(d2.x + d2.width * 0.15 + (px2 * i) / 22, y2);
-    await page.mouse.up();
+    await veegDoor(page, d2, { startFractie: 0.15, afstand: d2.width * 0.62 + 90, stappen: 22, vanBoven: 40 });
     await wachtTot(() => staatVan(tekst2), (s) => s && s.bewaard,
       'doorvegen naar rechts hoort de post bij de server te bewaren');
     await page.waitForFunction((t) => [...document.querySelectorAll('#main article.post')]

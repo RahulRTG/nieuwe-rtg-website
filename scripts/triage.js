@@ -107,6 +107,20 @@ function duid(reizen) {
     };
   }
 
+  /* Het grootboek sluit niet terwijl de rest gewoon antwoordt. Dat is geen
+     route die omvalt maar een geldinvariant die gebroken is: de som van alle
+     saldi is geen nul meer, of een leden- of partnerrekening staat rood. Het
+     verschil zit in de DATA en niet in de uitrol, dus terugrollen laat het
+     gewoon staan -- en 'deels' zou het tussen de gewone routefouten zetten. */
+  const grootboek = stuk.find(x => x.pad === 'grootboek' || x.pad === '/api/pay/gezond');
+  if (grootboek && grootboek.status === 500) {
+    return {
+      laag: 'geld', terugrollen: false, stuk: stuk.length, totaal: r.length,
+      waarom: 'Het grootboek sluit niet (' + noem() + '). De server antwoordt, maar de som van alle saldi is geen nul meer of een rekening staat rood.',
+      doen: 'Terugrollen herstelt dit niet: het verschil staat in de boekingen, niet in de code. Bekijk het bewijsbord (/api/office/pay/bewijs) en de laatste boekingen; een mens besluit wat er met het geld gebeurt.'
+    };
+  }
+
   return {
     laag: 'deels', terugrollen: false, stuk: stuk.length, totaal: r.length,
     waarom: stuk.length + ' van de ' + r.length + ' reizen viel om: ' + noem() + '. De rest komt gewoon door, dus dit zit in een route en niet in het huis.',

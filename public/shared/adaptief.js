@@ -85,6 +85,12 @@
     c.gewicht = (spec && spec.gewicht) || 'licht';
     if (spec && spec.verhinderd) c.verhinderd = spec.verhinderd;
     if (spec && spec.gebaren) c.gebaren = lijst(spec.gebaren);
+    /* Het actiecontract van de Edge (EDGE.md): hoe hij terug te draaien is
+       (exact / compensatie / geen) en of hij de server raakt (lokaal / server).
+       Het GEVOLG staat hier met opzet niet: dat verklaart een scherm niet over
+       zichzelf, dat meet server/kern/stuur/gevolg.js. */
+    if (spec && spec.herstel) c.herstel = String(spec.herstel);
+    if (spec && spec.effect) c.effect = String(spec.effect);
     return c;
   }
 

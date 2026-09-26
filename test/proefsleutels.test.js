@@ -68,7 +68,23 @@ function nepPost(mislukt = new Set()) {
         nr += 1;
         return { status: 200, data: { token: 't:register:' + nr, state: { user: { id: 1000 + nr } } } };
       }
+      /* De uitnodigingsweg van kantoor-a/-b (sinds 23 september 2026): de munter
+         leest de codenaam uit /api/auth/me en de code uit de uitnodiging. Vorm
+         nagemeten tegen een draaiende server op 23 september 2026: me geeft
+         `user.codename`, de uitnodiging `code` op het hoogste niveau. */
+      if (pad === '/api/auth/me' && tok) return { status: 200, data: { user: { codename: 'Codenaam ' + tok } } };
+      if (pad === '/api/office/kantoor/uitnodiging') return { status: 200, data: { ok: true, code: 'UITN' + nr } };
       if (pad === '/api/techniek/sso/scimsleutel') return { status: 200, data: { sleutel: 'rtgscim_' + 'x'.repeat(30) } };
+      /* DE KANTOORROL LOOPT VIA EEN UITNODIGING (23 september 2026): de munter
+         vraagt de codenaam van het verse account op en de boardroom maakt er een
+         uitnodiging voor. Zelfde vormen als de echte server --
+         /api/auth/me geeft { user: { codename } } (routes/auth/inlog-pas.js) en
+         de uitnodiging { ok, codenaam, code } (routes/kantoren/uitnodiging.js).
+         De codenaam hangt aan het token, zodat A en B ook hier twee mensen zijn. */
+      if (pad === '/api/auth/me' && tok) return { status: 200, data: { user: { codename: 'Codenaam ' + tok } } };
+      if (pad === '/api/office/kantoor/uitnodiging') {
+        return { status: 200, data: { ok: true, codenaam: lijf && lijf.codenaam, code: 'UITN-' + nr } };
+      }
       /* EEN SESSIE HOORT BIJ EEN ACCOUNT, ook in een nep-server. Gaf deze regel
          voor /api/account/start altijd hetzelfde token terug, dan kregen twee
          VERSCHILLENDE kantoormensen dezelfde sleutel -- en dan staat er groen
@@ -209,4 +225,34 @@ test('een kantoormedewerker krijgt zijn baliezetel van de boardroom', async () =
 
 test('de basisrollen zijn de drie zonder welke een proef niets meet', () => {
   assert.deepStrictEqual(bos.BASISROLLEN, ['member', 'office', 'supplier']);
+});
+
+/* ============================================================================
+   MEMBER-ACCOUNT IS EEN EIGEN MENS MET EEN ACCOUNT, EN GEEN DEUR.
+
+   De wereldcompositor vond op 24 september 2026 dat de spelwereld nooit kon
+   opkomen: hij vraagt een tweede ledensessie, `member-account`, en geen munter
+   maakte die. Drie dingen liggen hier vast:
+     1. hij bestaat, en is een ANDER token dan `member` (een tegenstander die
+        jijzelf blijkt te zijn, is geen potje);
+     2. hij komt langs de registratie en niet langs de demo-inlog, want het
+        verschil tussen die twee IS het account;
+     3. hij staat NIET in de rollenlijst: geen route draagt hem als bewaker, en
+        erin opnemen zou de verdeling van elke proef stil veranderen.
+
+   DE MUTATIE: laat de munter `tok(await post('/api/login', { tier: 'rtg' }))`
+   teruggeven, of haal hem uit GEEN_BEWAKER -> deze toets zakt.
+   ========================================================================== */
+test('member-account is een apart lid met een account, en geen bewakersrol', async () => {
+  const { post, gezien } = nepPost();
+  const voor = gezien.length;
+  const b = await bos.haalSleutels({ post });
+  assert.ok(b.tokens['member-account'], 'geen sleutel voor member-account');
+  assert.notStrictEqual(b.tokens['member-account'], b.tokens.member,
+    'member-account draagt de sleutel van member; dan speelt een lid tegen zichzelf');
+  assert.ok(!b.rollen.includes('member-account'),
+    'member-account staat in de rollenlijst; geen route draagt hem, dus hij hoort er niet in');
+  const registraties = gezien.slice(voor).filter(g => g.pad === '/api/auth/register');
+  assert.ok(registraties.length >= 3,
+    'kantoor-a, kantoor-b en member-account horen elk hun eigen account te registreren; nu ' + registraties.length);
 });

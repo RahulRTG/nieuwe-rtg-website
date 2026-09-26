@@ -45,13 +45,13 @@ test('lokale AI wordt als prive lokale verwerking getoond', () => {
   const s = beschikbaarheid(ai);
   assert.equal(s.beschikbaar, true);
   assert.equal(s.modus, 'lokaal');
-  assert.equal(s.verwerking, 'op-dit-apparaat');
+  assert.equal(s.verwerking, 'rtg-server');
   assert.deepEqual(s.aanbieders, ['local']);
   assert.equal(s.mogelijkheden.tekst, true);
   assert.equal(s.mogelijkheden.hulpmiddelen, true);
   assert.equal(s.mogelijkheden.beeld, false);
-  assert.equal(s.kompas.route, 'op-dit-apparaat');
-  assert.equal(s.kompas.privacy, 'Inhoud blijft op deze Mac');
+  assert.equal(s.kompas.route, 'rtg-server');
+  assert.equal(s.kompas.privacy, 'Inhoud blijft op de eigen modelserver van RTG');
   assert.equal(s.kompas.autoriteit, 'mens');
 });
 
@@ -93,7 +93,7 @@ test('de centrale bedieningslaag houdt een handmatige route zichtbaar', () => {
   const twin = lees('public/shared/rahul-tab/workspace.js');
   const consoleLaag = lees('public/shared/command/console.js');
   assert.match(tab, /Handmatige werkmodus · alles blijft bruikbaar/);
-  assert.match(tab, /RTG Kompas · privé op deze Mac/);
+  assert.match(tab, /RTG Kompas · eigen modelserver van RTG/);
   assert.match(tab, /RTG Kompas · lokaal in eigen omgeving/);
   assert.match(tab, /RTG Kompas · externe uitwijk zichtbaar/);
   assert.match(tab, /RTG KOMPAS · LOCAL-FIRST/);
@@ -163,8 +163,8 @@ test('RTG Live Twin haalt bron, uitvoering en autoriteit alleen uit applicatiere
     context: { app: 'RTG Werk', deel: 'Vandaag', selectie: '<script>geen bron</script>' },
     wereld: 'supplier', actor: 'manager', gedaan: false,
     goedkeuringen: [{ id: 'voorstel-1' }],
-    stand: { modus: 'lokaal', verwerking: 'op-dit-apparaat', kompas: {
-      route: 'op-dit-apparaat', privacy: 'Inhoud blijft op deze Mac'
+    stand: { modus: 'lokaal', verwerking: 'rtg-server', kompas: {
+      route: 'rtg-server', privacy: 'Inhoud blijft op de eigen modelserver van RTG'
     } }
   });
   assert.equal(twin.schema, 'rtg.live-twin/1');

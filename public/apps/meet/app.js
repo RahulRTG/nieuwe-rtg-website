@@ -118,7 +118,8 @@
 
   $('#komBtn').addEventListener('click', function () {
     var code = $('#komCode').value.trim().toUpperCase();
-    if (code) { $('#komCode').value = ''; binnen({ code: code }); }
+    if (!code) { meld('Vul eerst de code van het gesprek in.'); $('#komCode').focus(); return; }
+    $('#komCode').value = ''; binnen({ code: code });
   });
   $('#komCode').addEventListener('keydown', function (e) {
     if (e.key === 'Enter') $('#komBtn').click();
@@ -137,4 +138,13 @@
   var m = /kamer=(mk[a-f0-9]{16})/i.exec(location.hash || '');
   if (!token) meld('Log eerst in op de leden-app.');
   else { luister(); laad().then(function () { if (m) binnen({ id: m[1] }); }); }
+
+  /* WAAR JE BENT, gezegd door dit scherm zelf (EDGE.md, ronde 2). De sociale
+     runtime declareert de handeling; welke handelingen hier spelen, zegt het
+     scherm. Na DOMContentLoaded, want het register laadt met defer. Meet heeft
+     bewust geen hoofdactie (meet.html): het publiceert als voertuig voor de
+     declaratie, en telt niet als bewijs voor een scherm met een hoofdactie. */
+  document.addEventListener('DOMContentLoaded', function () {
+    if (window.RTGAdaptief) window.RTGAdaptief.context({ bron: 'sociaal.meet', titel: 'RTG Meet', acties: ['sociaal.context'] });
+  }, { once: true });
 })();

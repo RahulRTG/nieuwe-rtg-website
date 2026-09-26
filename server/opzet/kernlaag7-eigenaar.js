@@ -26,6 +26,11 @@ module.exports = (kern, hulp) => {
     /* De generieke actor-lezer uit de envelop; zie de kop van boardroomUser. */
     envelopWie: require('./envelop').wie });
 
+  /* INTREKKEN SLUIT WAT OPENSTAAT (AUTHORITY.md fase 3): de kantoorsessies en
+     -stromen van een mens van wie een kantoorrecht wordt ingetrokken. */
+  kern.kantoorIntrekking = require('../kern/kantoor/intrekking')({
+    sessions: kern.sessions, sessionFor: kern.sessionFor, accounts, sessieregister: kern.sessieregister, sseClients: kern.sseClients });
+
   kern.eigenaarherstel = require('../kern/eigenaarherstel')({
     db, save, log,
     beveiligVan: () => kern.beveilig,

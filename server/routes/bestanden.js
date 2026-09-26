@@ -10,7 +10,7 @@ module.exports = (kern) => {
     }
     return false;
   };
-  const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
+  const stuur = (res, r) => r.error ? res.status(r.status || 400).json(r) : res.json(r);
 
   app.post('/api/bestanden/mijn', auth, (req, res) => stuur(res, bestanden.bestandenLijst(req.session.key)));
 
@@ -78,13 +78,21 @@ module.exports = (kern) => {
     if (geenGast(req, res)) return;
     stuur(res, await bestanden.bestandenVersieTerug(req.session.key, String((req.body || {}).id || ''), (req.body || {}).n));
   });
+  app.post('/api/bestanden/actie', auth, async (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, await bestanden.documentActie(req.session.key, req.body, req.documentAuthority));
+  });
+  app.post('/api/bestanden/wis', auth, async (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, await bestanden.bestandenWis(req.session.key, req.body.id));
+  });
   app.post('/api/bestanden/weg', auth, async (req, res) => {
     if (geenGast(req, res)) return;
-    stuur(res, await bestanden.bestandenWeg(req.session.key, String((req.body || {}).id || '')));
+    stuur(res, await bestanden.bestandenWeg(req.session.key, String((req.body || {}).id || ''), req.body, req.documentAuthority));
   });
   app.post('/api/bestanden/herstel', auth, async (req, res) => {
     if (geenGast(req, res)) return;
-    stuur(res, await bestanden.bestandenHerstel(req.session.key, String((req.body || {}).id || '')));
+    stuur(res, await bestanden.bestandenHerstel(req.session.key, String((req.body || {}).id || ''), req.body, req.documentAuthority));
   });
   app.post('/api/bestanden/leeg', auth, async (req, res) => {
     if (geenGast(req, res)) return;

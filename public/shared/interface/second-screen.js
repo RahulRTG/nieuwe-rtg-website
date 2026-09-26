@@ -13,7 +13,6 @@
 
     runtime = w.RTGWorkspaceRuntime({
       services: { navigation: nav },
-      context: function () { return w.RTGAdaptief && w.RTGAdaptief.context ? w.RTGAdaptief.context() : {}; },
       open: function (url, title) {
         if (w.matchMedia('(max-width:999px)').matches) zet('peek');
         return o.open(url, title);

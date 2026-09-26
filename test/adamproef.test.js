@@ -53,7 +53,16 @@ test('2. de leeftijd wordt gerekend en niet ingetypt', () => {
 test('3. elke openBekend-schakel zegt WAT, WAAROM en WIE', () => {
   const j = lees('ADAMPROEF.json');
   const bevindingen = j.schakels.filter(s => s.stand === 'openBekend');
-  assert.ok(bevindingen.length > 0, 'geen bevindingen; dan bewaakt deze toets niets');
+  /* GEEN BEVINDINGEN IS HIER GEEN LEGE TOETS, MAAR EEN ANDERE EIS. Sinds 23
+     september sluit de keten helemaal (ARBEID.md par. 7a), en dan zegt deze
+     toets niets over redenen -- er zijn er geen. Wat hij dan wel moet vasthouden
+     is dat de keten ook echt sluit: zonder bevindingen en zonder `sluit` zou een
+     open schakel zonder reden hier stil doorheen lopen. */
+  if (!bevindingen.length) {
+    assert.equal(j.sluit, true, 'geen enkele bevinding, en toch sluit de keten niet');
+    assert.equal((j.bevindingen || []).length, 0);
+    return;
+  }
   assert.equal(bevindingen.length, (j.bevindingen || []).length,
     'de bevindingenlijst loopt niet gelijk met de schakels');
   for (const s of bevindingen) {

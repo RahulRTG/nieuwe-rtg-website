@@ -13,7 +13,15 @@ module.exports = (kern) => {
 
   /* De vier domeindelen draaien als submodules op de gedeelde kern plus de
      query-toegangshelper, een keer gemount bij het opstarten. */
-  const octx = { kern, officeQueryMag };
+  /* DEZELFDE VRAAG OP NAAM, voor /api/office/doc: een paspoortscan hoort bij de
+     kluis (kern/kantoor/kluispoort.js), en de gedeelde code is geen mens. Een
+     <img> kan geen header sturen, vandaar het token in de query. */
+  const officeQueryOpNaam = (token) => {
+    const sess = sessionFor(String(token || ''));
+    if (sess && sess.role === 'office') return !!sess.lidKey;
+    try { return eigenaar.isEigenaar(accounts, accounts.verifyToken(String(token || ''))); } catch (e) { return false; }
+  };
+  const octx = { kern, officeQueryMag, officeQueryOpNaam };
   require('./office/veiligheid')(octx);
   require('./office/partneraanvragen')(octx);
   require('./office/partners')(octx);
@@ -44,6 +52,9 @@ module.exports = (kern) => {
      gebruikt (KANTOOR.md par. 3). Achter boardroomAuth, want een kaart van de
      gaten hoort niet leesbaar te zijn voor de sessie die het gat is. */
   require('./office/mensdeur')(octx);
+  /* De beleidsmotor in de schaduw (AUTHORITY.md fase 1): eens of oneens met de
+     poorten, en welke routes zonder poort liepen. Zie ./office/beleidsmotor.js. */
+  require('./office/beleidsmotor')(octx);
   /* Het routedossier: dezelfde routes, maar dan wat we er over ELF schakels van
      weten. De dekking zegt of een route is aangeraakt; dit zegt of hij dicht
      zit, rommel weigert en een spoor achterlaat. Zie ./office/dossier.js. */

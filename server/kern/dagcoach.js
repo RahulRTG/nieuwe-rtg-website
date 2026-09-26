@@ -21,10 +21,17 @@
    niet doet wordt gemeld en niet stil overgeslagen (regel 5). */
 
 const dagVan = d => new Date(d).toISOString().slice(0, 10);
+const { agendaLidSleutel } = require('./agenda');
 
 /* Waar een regel vandaan komt, en waar het lid hem afhandelt. Deze lijst is de
    enige plek waar een bron een naam en een bestemming krijgt. */
 const BRONNEN = {
+  /* De agenda BEZIT de afspraken en RTG-boekingen staan er alleen-lezen in
+     (kern/agenda-ics.js ecosysteem). Deze laag leest ze voor vandaag en stuurt
+     het lid voor elke wijziging naar de agenda: Dag is het overzicht, Agenda is
+     waar gepland wordt (SCHERMEIGENAAR.json). */
+  agenda: { naam: 'Agenda', naar: '/apps/agenda.html' },
+  boeking: { naam: 'Agenda', naar: '/apps/agenda.html' },
   medicijnen: { naam: 'Medicijnen', naar: '/apps/medicijnen.html' },
   zorg: { naam: 'Zorg', naar: '/apps/app.html' },
   verzorging: { naam: 'Verzorging', naar: '/apps/app.html' },
@@ -57,6 +64,26 @@ module.exports = ({ kern }) => {
         /* Geen "neem dit in": dat is een doseerinstructie en daar gaat RTG niet
            over (zie kern/medicatie.js). */
         uitleg: m.afgetekend ? 'Afgetekend.' : 'Staat in uw schema.' });
+    }
+
+    /* ---- afspraken uit de eigen agenda, en RTG-boekingen van vandaag ----
+       Dezelfde twee bronnen die agenda.html toont, via dezelfde functies
+       (bereik vouwt herhalingen uit, ecosysteem leest de boekingen). Een
+       tweede leesweg naar de agenda-opslag zou een tweede waarheid zijn. */
+    const ag = lees('Agenda', kern.agenda && typeof kern.agenda.bereik === 'function'
+      && (() => kern.agenda.bereik(agendaLidSleutel(key), vandaag, vandaag)));
+    if (ag.fout) storingen.push(ag.fout);
+    for (const a of (ag.waarde && ag.waarde.items) || []) {
+      /* Een uitnodiging waar nog geen ja op staat, is geen afspraak van vandaag. */
+      if (a.status === 'uitgenodigd' || a.status === 'nee') continue;
+      punt({ bron: 'agenda', tijd: a.tijd, gedaan: !!a.gedaan, wat: a.titel,
+        uitleg: a.plek ? 'In ' + a.plek + '.' : 'Staat in uw agenda.' });
+    }
+    const eco = lees('Boekingen', kern.agenda && typeof kern.agenda.ecosysteem === 'function'
+      && (() => kern.agenda.ecosysteem(key, vandaag, vandaag)));
+    if (eco.fout) storingen.push(eco.fout);
+    for (const b of eco.waarde || []) {
+      punt({ bron: 'boeking', tijd: b.tijd, gedaan: false, wat: b.titel, uitleg: 'Een boeking via RTG.' });
     }
 
     /* ---- afspraken van vandaag: zorg en verzorging ---- */

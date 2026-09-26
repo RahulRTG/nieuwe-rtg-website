@@ -30,7 +30,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, kantoorKoppelBody } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rtfosgov-'));
 const OFFICE_CODE = 'RTFOSGOV-KEURING';
@@ -60,7 +60,7 @@ test.before(async () => {
   }
   const reg = await post('/api/auth/register', { name: 'Bestuur Haarlem', email: 'bh@rtfosgov.test',
     phone: '0612345699', password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg' });
-  await post('/api/account/koppel', { soort: 'kantoor', code: OFFICE_CODE }, reg.body.token);
+  await post('/api/account/koppel', await kantoorKoppelBody(BASE, reg.body.token), reg.body.token);
   TWEE = (await post('/api/account/start', { rol: 'kantoor' }, reg.body.token)).body.token;
   KEY_TWEE = (await os_('ik', {}, TWEE)).body.key;
   await os_('zetel', { stad: STAD, key: KEY_TWEE, naam: 'Bestuur Haarlem', rol: 'stadsbestuur' });

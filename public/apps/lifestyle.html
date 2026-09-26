@@ -144,13 +144,13 @@
   <a href="/apps/gedachten.html">Gedachtenboek</a>
   <a href="/apps/memo.html">Memo</a>
   <a href="/apps/tijdlijn.html">Tijdlijn</a>
-  <a href="/apps/toestemming.html">Toestemmingen</a>
+  <a href="/apps/mijn-relaties.html">Wie heeft toegang tot mij</a>
   <a href="/apps/bewijsmap.html">Bewijsmap</a>
   <a href="/apps/concierge.html">Concierge</a>
   <a href="/apps/avond.html">Avond plannen</a>
   <a href="/apps/life.html">Life</a>
   <a href="/apps/home.html">Home Kit</a>
-  <a href="/apps/zorgbalie.html">Zorgbalie</a>
+  <a href="/apps/personeel.html">Zorgbalie</a>
 </nav>
 <main id="main"><div class="leeg">Laden…</div></main>
 <div class="melding" id="melding"></div>
@@ -201,7 +201,7 @@ const fout = e => P('<div class="leeg">'+esc(e.message)+'</div>');
    krijgen hier meteen hun twee knoppen: wie op dit scherm ziet dat er iets op
    hem wacht, hoort het niet ergens anders te moeten gaan zoeken. */
 async function vNu(){
-  let d; try{ d = await api('nu'); }catch(e){ return fout(e); }
+  let d; try{ d = await api('nu'); /* Ontbreekt een deel, dan de melding -- nooit een lege situation room (LIEGRONDE.json). */ if(!(d && d.tellingen && typeof d.tellingen === 'object' && Array.isArray(d.regels))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.'); }catch(e){ return fout(e); }
   const t = d.tellingen;
   let h = '<div class="kop '+esc(d.ernst)+'"><div class="datum">'+esc(datum(d.datum))+'</div><h2>'+esc(d.kop)+'</h2>'
     + '<div class="telling">'+t.knopen+' zaken in uw kantoor'

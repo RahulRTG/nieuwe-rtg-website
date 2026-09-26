@@ -69,7 +69,7 @@ test('de wereldkleurige onderrand houdt vaste rollen en geeft het midden aan de 
 
 test('ervaringsschermen openen weer met de herkenbare Edge', () => {
   for (const bestand of [
-    'public/apps/muziek.html', 'public/apps/geld.html', 'public/apps/vandaag.html',
+    'public/apps/muziek.html', 'public/apps/geld.html',
     'public/apps/magnaat.html', 'public/apps/foundation/school.html'
   ]) {
     const html = lees(bestand);

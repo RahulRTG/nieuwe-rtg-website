@@ -6,12 +6,8 @@
         const d = await r.json().catch(() => ({}));
         if (!r.ok) throw new Error(d.error || T('pd.ka.fout','Die code klopt niet.'));
         kaToken = d.token; try { localStorage.setItem('rtg_office_token', kaToken); } catch(e){}
-        // een account voor alles: net bewezen code stil aan het RTG-account koppelen
-        try {
-          const lt = localStorage.getItem('rtg_member_token');
-          if (lt) fetch('/api/account/koppel', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lt },
-            body: JSON.stringify({ soort: 'kantoor', code: $('#kaCode').value.trim(), totp: $('#kaTotp').value.trim() }) });
-        } catch(e){}
+        // De gedeelde code koppelt geen kantoorrol meer aan een account (23 september
+        // 2026): dat gaat alleen met een uitnodiging van de eigenaar, op naam.
         enterKantoor();
       } catch(e){ $('#kaFout').textContent = e.message; }
     };
@@ -25,7 +21,8 @@
       try {
         const r = await fetch('/api/account/rollen', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lt }, body: '{}' });
         const d = await r.json().catch(() => ({}));
-        if (!r.ok || !(d.rollen || []).some(x => x.rol === 'kantoor')) return;
+        if (!r.ok) return;
+        if (!(d.rollen || []).some(x => x.rol === 'kantoor')) { kantoorUitnodigingVeld(lt); return; }
         // toonKantoorLogin kan opnieuw tekenen terwijl de rollencontrole nog
         // onderweg is. Beide antwoorden mogen samen maar één ingang maken.
         if ($('#kaAccountVerder')) return;
@@ -33,17 +30,55 @@
         b.id = 'kaAccountVerder';
         b.className = 'abtn'; b.style.cssText = 'margin-top:0.7rem;width:100%;padding:0.8rem;';
         b.textContent = '' + T('pd.ka.een', 'Verder met uw RTG-account');
-        b.addEventListener('click', async () => {
-          const s = await fetch('/api/account/start', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lt }, body: JSON.stringify({ rol: 'kantoor' }) });
-          const sd = await s.json().catch(() => ({}));
-          if (!s.ok) { $('#kaFout').textContent = sd.error || T('pd.mis', 'Er ging iets mis.'); return; }
-          kaToken = sd.token; try { localStorage.setItem('rtg_office_token', kaToken); } catch(e){}
-          enterKantoor();
-        });
+        b.addEventListener('click', () => kantoorMetAccount(lt));
         const kaart = $('#gateStep').querySelector('.card');
         if (kaart) kaart.appendChild(b);
       } catch(e){}
     })();
+  }
+  /* DE KANTOORUITNODIGING VERZILVEREN. Sinds 23 september 2026 hangt de
+     kantoorrol alleen nog aan een account via een uitnodiging van de eigenaar,
+     op naam en eenmalig. Wie ingelogd is en de rol nog niet heeft, tikt hier de
+     code in die hij van de eigenaar kreeg; de TOTP komt uit het veld erboven. */
+  function kantoorUitnodigingVeld(lt){
+    const kaart = $('#gateStep').querySelector('.card');
+    if (!kaart || $('#kaUitn')) return;
+    kaart.insertAdjacentHTML('beforeend', '<div class="k h-mt70">'+T('pd.ka.uitn','Uitnodiging van de eigenaar')+'</div>'+
+      '<div class="pinrow h-mt40"><input id="kaUitn" aria-label="'+T('pd.ka.uitn','Uitnodiging van de eigenaar')+'" autocomplete="off" autocapitalize="characters" maxlength="10" placeholder="ABCD234567">'+
+      '<button id="kaUitnGo" class="abtn">'+T('pd.ka.uitnGo','Koppel aan mijn account')+'</button></div>');
+    const ga = async () => {
+      $('#kaFout').textContent = '';
+      const r = await fetch('/api/account/koppel', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lt },
+        body: JSON.stringify({ soort: 'kantoor', uitnodiging: $('#kaUitn').value.trim(), totp: $('#kaTotp').value.trim() }) });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) { $('#kaFout').textContent = d.error || T('pd.mis', 'Er ging iets mis.'); return; }
+      kantoorMetAccount(lt);
+    };
+    $('#kaUitnGo').addEventListener('click', ga);
+    $('#kaUitn').addEventListener('keydown', e => { if (e.key === 'Enter') ga(); });
+  }
+  /* Met het ene RTG-account de kantoordeur openen (/api/account/start, dezelfde
+     munt als de werk-kiezer). Heeft het lid een algemene pin, dan vraagt de
+     server erom; daar komt dan een pinveld voor in de plaats van een melding
+     zonder uitweg. */
+  async function kantoorMetAccount(lt, pin){
+    const s = await fetch('/api/account/start', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lt },
+      body: JSON.stringify(pin ? { rol: 'kantoor', pin } : { rol: 'kantoor' }) });
+    const sd = await s.json().catch(() => ({}));
+    if (!s.ok) {
+      if (sd.pinNodig && !$('#kaPin') && $('#kaFout')) {
+        $('#kaFout').insertAdjacentHTML('afterend', '<div class="pinrow h-mt60"><input id="kaPin" type="password" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="'+T('pin.veld','Algemene pin')+'" placeholder="'+T('pin.veld','Algemene pin')+'">'+
+          '<button id="kaPinGo" class="hoofd">'+T('pd.ka.binnen','Binnen')+'</button></div>');
+        const ga = () => kantoorMetAccount(lt, $('#kaPin').value.trim());
+        $('#kaPinGo').addEventListener('click', ga);
+        $('#kaPin').addEventListener('keydown', e => { if (e.key === 'Enter') ga(); });
+        $('#kaPin').focus();
+      }
+      $('#kaFout').textContent = sd.error || T('pd.mis', 'Er ging iets mis.');
+      return;
+    }
+    kaToken = sd.token; try { localStorage.setItem('rtg_office_token', kaToken); } catch(e){}
+    enterKantoor();
   }
   async function enterKantoor(){
     const k = await kaApi('kamers');

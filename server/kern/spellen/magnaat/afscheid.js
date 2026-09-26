@@ -8,22 +8,25 @@
 
    HET IS BEWUST GEEN "FAILLISSEMENT". Een speler raakt hier een PAND kwijt en
    nooit zijn hele bedrijf; zie GAMEHALL.md 12.6 en de reden in ./bank.js. */
+const { naarCenten } = require('./centen');
+const { beweeg } = require('./boekhouding');
+
 module.exports = ({ mijnVestiging, afkoopsom, rond }) => {
   /* Wat er met een onderpand gebeurt als de bank het opeist, loopt langs
      DEZELFDE weg als zelf sluiten: contracten worden afgekocht, het kavel komt
      vrij, de opbrengst is de halve bouwsom. Een tweede manier om een vestiging
-     te laten verdwijnen zou een tweede set randgevallen zijn. */
+     te laten verdwijnen zou een tweede set randgevallen zijn. Geeft de
+     opbrengst terug in eurocenten (./centen.js). */
   function liquideer(st, h, vestigingId) {
     const v = mijnVestiging(st, h, vestigingId);
     if (!v) return 0;
-    const opbrengst = rond(v.gebouwdVoor * 0.5);
+    const opbrengst = naarCenten(rond(v.gebouwdVoor * 0.5));
     for (const c of st.contracten || []) {
       if (c.status !== 'loopt') continue;
       if (c.leverancierId !== v.id && c.afnemerId !== v.id) continue;
-      const som = afkoopsom(c, st.maand);
+      const som = naarCenten(afkoopsom(c, st.maand));
       const tegen = c.leverancier === h ? c.afnemer : c.leverancier;
-      st.geld[h] -= som;
-      st.geld[tegen] += som;
+      beweeg(st, { soort: 'CONTRACT_AFKOOP', van: ['kas', h], naar: ['kas', tegen], bedrag: som, omschrijving: 'Afkoop bij afscheid' });
       c.status = 'afgekocht'; c.eindMaand = st.maand; c.afkoop = som;
     }
     st.vestigingen[h] = st.vestigingen[h].filter(x => x !== v);

@@ -37,6 +37,8 @@ const { SECTOREN } = require('../server/kern/spellen/magnaat/sectoren');
 const { VRAAGFACTOR, KOSTENSTAND } = require('../server/kern/spellen/magnaat/prijsstand');
 const { basisvraag, drukFactor } = require('../server/kern/spellen/magnaat/vraag');
 const { MARKTPRIJS } = require('../server/kern/spellen/magnaat/handel');
+// World rekent sinds ronde A2.1 in eurocenten; de profielen denken in euro's.
+const { uitCenten } = require('../server/kern/spellen/magnaat/centen');
 
 const maakMagnaat = () => require('../server/kern/spellen/magnaat/index')({
   save() {}, crypto: require('crypto'), codenaamVan: (h) => h, nudge() {}
@@ -198,7 +200,7 @@ function gereedschap(m, potje, mij, profiel, offset) {
   const k = kaart(potje.staat.stad);
   const st = potje.staat;
   return {
-    get geld() { return st.geld[mij]; },
+    get geld() { return uitCenten(st.geld[mij]); },
     get mijn() {
       const laatste = (st.laatste[mij] || {}).regels || [];
       return (st.vestigingen[mij] || []).map(v =>
@@ -250,7 +252,7 @@ function gereedschap(m, potje, mij, profiel, offset) {
          dan de zaak. */
       // de prijsstand zit OOK in de bouwsom (../server/kern/spellen/magnaat/acties.js);
       // hem hier vergeten liet een goedkope speler veel kleiner bouwen dan hij kon
-      const betaalbaar = Math.floor((st.geld[mij] - BUFFER) / (sec.bouw * KOSTENSTAND[stand]));
+      const betaalbaar = Math.floor((uitCenten(st.geld[mij]) - BUFFER) / (sec.bouw * KOSTENSTAND[stand]));
       const omvang = Math.min(opMaat, betaalbaar);
       if (omvang < Math.min(KLEINSTE, opMaat)) return false;
       // de stand gaat MEE met het openen: hij bepaalt de bouwsom en de bezetting

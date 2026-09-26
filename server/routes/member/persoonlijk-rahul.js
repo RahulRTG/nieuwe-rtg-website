@@ -101,7 +101,8 @@ module.exports = (kern) => {
           antwoord: lus.tekst, gedaan: lus.acties.some(a => a.status < 400), stuur: lus.acties,
           goedkeuringen: lus.acties.filter(a => a.goedkeuring).map(a => a.goedkeuring),
           goedkeuringWereld: 'member',
-          aiBeschikbaar: true, modus: stand.modus, verwerking: stand.verwerking, kompas: stand.kompas };
+          aiBeschikbaar: true, modus: stand.modus, verwerking: stand.verwerking, kompas: stand.kompas,
+          uitgevoerd: require('../../ai-stand').uitgevoerd() };
         antwoord.liveTwin = maakLiveTwin({ vraag: req.body.q, context: req.body.context, wereld: 'member',
           actor: req.session.tier || 'member', stand, gedaan: antwoord.gedaan, goedkeuringen: antwoord.goedkeuringen });
         /* De schaduwmeting (kern/ai/routermeting.js): de stuurlus gaf het
@@ -116,7 +117,7 @@ module.exports = (kern) => {
     onthoudGesprek(req, r && r.antwoord);
     const stand = aiStatus();
     const antwoord = Object.assign(r, { aiBeschikbaar: stand.beschikbaar, modus: stand.modus,
-      verwerking: stand.verwerking, kompas: stand.kompas });
+      verwerking: stand.verwerking, kompas: stand.kompas, uitgevoerd: require('../../ai-stand').uitgevoerd() });
     antwoord.liveTwin = maakLiveTwin({ vraag: req.body.q, context: req.body.context, wereld: 'member',
       actor: req.session.tier || 'member', stand, gedaan: !!antwoord.gedaan, goedkeuringen: antwoord.goedkeuringen });
     // Geen stuurlus of geen tekst: kern/fluister gaf het antwoord, of anders de

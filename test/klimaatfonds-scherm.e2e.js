@@ -39,7 +39,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser,
-  kantoorAlsPersoon, wachtTot, wachtOpTekst, tekstVan } = require('./helper');
+  kantoorAlsPersoon, wachtTot, wachtOpTekst, tekstVan, kantoorKoppelBody } = require('./helper');
 
 const pw = laadPlaywright();
 const SCHERM = '/apps/foundation/klimaatfonds.html';
@@ -89,7 +89,7 @@ test('Klimaatfonds: een te korte vraag weigert met reden, een vraag komt in het 
       const STAD = stad.body.stad.id;
       await post('/api/rtfos/stad/status', { id: STAD, status: 'actief' }, kantoor);
       const tweede = await lid('Tweede Bestuurder');
-      await post('/api/account/koppel', { soort: 'kantoor', code: OFFICE_CODE }, tweede.token);
+      await post('/api/account/koppel', await kantoorKoppelBody(base, tweede.token), tweede.token);
       const bestuur2 = (await post('/api/account/start', { rol: 'kantoor' }, tweede.token)).body.token;
       assert.ok(bestuur2, 'de tweede kantoormedewerker kreeg geen sessie');
       const geef = await post('/api/office/boardroom/toegang/geef', { codenaam: tweede.codenaam }, kantoor);

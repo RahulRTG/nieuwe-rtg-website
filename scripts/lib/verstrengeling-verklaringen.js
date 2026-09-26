@@ -16,6 +16,14 @@
    Een rand daarheen verplaatsen is een besluit dat je kunt terugvinden; hem
    DOMEINRELATIE noemen om van het getal af te zijn, is de meter kapotmaken. */
 module.exports = [
+  /* DE ZWARE POORT LEEST DE LIJST ZWARE HANDELINGEN. kern/zwaarbewijs.js weigert
+     een actienaam die kern/webauthn-acties.js niet kent bij de EERSTE aanroep:
+     zonder die controle ging zo'n route op de terugval door zolang de eigenaar
+     geen passkey had, en was hij daarna dicht (23 september 2026: drie routes). */
+  { van: 'domein:zwaarbewijs', naar: 'domein:webauthn-acties', soort: 'BELEID',
+    reden: 'de zware poort weigert een actienaam die niet in de gesloten lijst ZWARE_ACTIES staat, zodat een route met een onbekende naam meteen zakt in plaats van pas als de eigenaar een passkey heeft' },
+  { van: 'domein:bestanden', naar: 'domein:document-capability', soort: 'DOMEINRELATIE',
+    reden: 'De persoonlijke bestandenkluis delegeert trash/restore aan haar eigen versiegebonden lifecyclecontract; UI, Edge Bar, API en bevestigde Rahul-aanvragen krijgen zo dezelfde eigenaarcontrole en transactie.' },
   /* DE KEURING ONDER DE VERTAALMOTOR. server/translate/ levert vertalingen en
      kern/taalkeuring.js beoordeelt of een modelantwoord er een mag heten. Dat
      is een rand tussen twee delen, en hij is er met opzet: de motor mag zijn
@@ -131,10 +139,14 @@ module.exports = [
     reden: 'foundation-productiepoort.js handhaaft het ene commitgebonden Foundation-vrijgavebesluit uit config/foundation-vrijgave; de requestpoort mag dat besluit niet opnieuw interpreteren' },
   { van: 'domein:rtfos', naar: 'domein:codelevenscyclus', soort: 'DOMEINRELATIE',
     reden: 'rtfos/basis.js levert opslag en onderwerpbinding aan de gedeelde lifecycle die hash, verval, gebruikslimiet, rotatie en intrekking van persoonsportaalcodes bezit' },
+  { van: 'domein:spellen', naar: 'domein:betaalwaarheid', soort: 'DOMEINRELATIE',
+    reden: 'magnaat/rtg-keten.js is het proefstuk dat de ECHTE geldketen draait (MAGNAATLAB.md); sinds MONEY-012 legt kern/pay een oplading vast in de betaalwaarheid voor de aanroep, dus de keten bouwt die mee. Alleen dit proefstuk: test/magnaat-rtgketen.test.js toets 7 zakt zodra een speelmodule kern/pay laadt' },
   { van: 'domein:spellen', naar: 'domein:spelprojectie-toegang', soort: 'DOMEINRELATIE',
     reden: 'spellen/projectie.js orkestreert een potje met de aparte toegangscyclus voor projectieschermen; de spelprojectie blijft eigenaar van het getoonde spel, de toegang van het credential' },
 
   /* ---- EEN OPEN VRAAG, EN DIE WORDT NIET WEGGESCHREVEN ---- */
+  { van: 'domein:spellen', naar: 'domein:magnaat-grootboek', soort: 'GEDEELDE_PRIMITIEF',
+    reden: 'kern/spellen/magnaat/boekhouding.js boekt World via het Magnaat-grootboek: de ene boekhoudautoriteit onder elke Magnaat-economie (MAGNAAT.md, besluit 4 van ronde A2). Een eigen boekhouding in World ernaast zou een tweede boekhoudwaarheid zijn; het grootboek kent geen domein (grondwetregel M-601)' },
   { van: 'domein:spellen', naar: 'domein:hospitality-universe', soort: 'DOMEINRELATIE',
     reden: 'Magnaat leest het wereldmodel van de hospitality-universe (economie.js r.48, r.151). MAGNAATLAB.md noemt dit met zoveel woorden: er staan TWEE synthetische werelden die elkaar aanroepen, en die vraag hoort beantwoord vóór er een derde bij komt. De rand is dus bekend en bedoeld; de vraag erachter staat open en staat daar' },
 
@@ -209,8 +221,8 @@ module.exports = [
     reden: 'magnaatwereld.js is 58 KB en is opgeknipt in magnaat-*; dit is een van die delen (GAMEHALL.md)' },
   { van: 'domein:magnaatwereld', naar: 'domein:magnaat-capabilities', soort: 'EIGEN_DATA',
     reden: 'zelfde opknipping van magnaatwereld.js' },
-  { van: 'domein:magnaatwereld', naar: 'domein:magnaat-economie', soort: 'EIGEN_DATA',
-    reden: 'zelfde opknipping van magnaatwereld.js' },
+  { van: 'domein:magnaatwereld', naar: 'domein:magnaat-oefeneconomie', soort: 'EIGEN_DATA',
+    reden: 'zelfde opknipping van magnaatwereld.js: de economie van het Oefenkantoor, sinds ronde A1 een consument van de economische motor (MAGNAAT.md)' },
   { van: 'domein:magnaatwereld', naar: 'domein:magnaat-trainingslobby', soort: 'EIGEN_DATA',
     reden: 'zelfde opknipping van magnaatwereld.js' },
   { van: 'domein:magnaatwereld', naar: 'domein:magnaat-controle', soort: 'EIGEN_DATA',

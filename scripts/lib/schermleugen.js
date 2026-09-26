@@ -92,4 +92,22 @@ const CONTROL = {
     'Een backend die iets VERKEERDS antwoordt in plaats van niets, wordt hier niet betrapt.'
 };
 
-module.exports = { ROMMEL, ZEKERHEID, heelWoord, vindKlachten, vergelijk, CONTROL };
+/* De zichtbare tekst van een pagina, en nadrukkelijk niet de HTML: een
+   zekerheidswoord in een verborgen sjabloon of een aria-label is geen bewering
+   aan een lid. Hier en niet in de toets, zodat test/liegend-scherm.e2e.js en
+   scripts/liegronde.js dezelfde tekst lezen. */
+const zichtbareTekst = (page) => page.evaluate(() => {
+  const uit = [];
+  const loop = (el) => {
+    for (const k of el.children) {
+      const st = getComputedStyle(k);
+      if (st.display === 'none' || st.visibility === 'hidden' || k.hidden) continue;
+      if (!k.children.length) { const t = (k.textContent || '').trim(); if (t) uit.push(t); }
+      else loop(k);
+    }
+  };
+  loop(document.body);
+  return uit.join(' · ');
+});
+
+module.exports = { ROMMEL, ZEKERHEID, heelWoord, vindKlachten, vergelijk, CONTROL, zichtbareTekst };

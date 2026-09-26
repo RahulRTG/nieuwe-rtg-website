@@ -3,7 +3,7 @@
   'use strict';
   w.RTGWidgetLive = function (app, root, o) {
     var U = w.RTGDesktopUI, T = w.RTGWidgetCopy, offset = o.state.offset || 0, revision = 0;
-    var ui = w.RTGWidgetSurfaces(app, root, { open: o.open, days: function () { return offset; },
+    var ui = w.RTGWidgetSurfaces(app, root, { compact: o.compact, open: o.open, days: function () { return offset; },
       offset: function (delta) { offset = Math.max(0, Math.min(28, offset + delta)); o.state.offset = offset; load(false); }, run: o.run,
       changed: function (id) { d.dispatchEvent(new CustomEvent('rtg-widget-changed', { detail: { id: id } })); } });
     var supported = w.RTGWidgetData.supports(app.id);
@@ -28,10 +28,9 @@
     }
     function fallback() {
       root.classList.add('wd-capability-' + app.type);
-      var images = { travel: 'travel', stay: 'travel', hospitality: 'living',
-        community: 'foundation', home: 'living-coast' };
-      if (images[app.type]) ui.photo('/images/world-homes/' + images[app.type] + '.webp');
-      else { var emblem = U.el('div', 'wd-capability-emblem'); emblem.appendChild(U.icon(app.icon)); root.appendChild(emblem); }
+      // A capability has its own identity. A world-wide stock photo neither
+      // describes its records nor belongs to every app of the same type.
+      var emblem = U.el('div', 'wd-capability-emblem'); emblem.appendChild(U.icon(app.icon)); root.appendChild(emblem);
       if (app.id === 'navigatie') { root.appendChild(ui.copy('p', 'wd-widget-empty', 'noRoute')); root.appendChild(ui.open('route')); return; }
       app.sections.slice(0, 2).forEach(function (s, i) {
         var title = ui.row(s, '', app.icon).querySelector('strong'); delete title.dataset.userContent;

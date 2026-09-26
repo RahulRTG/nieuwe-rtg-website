@@ -140,9 +140,9 @@ jobs:
           digest="$(docker inspect --format='{{index .RepoDigests 0}}' "$RTG_CANDIDATE_IMAGE" | cut -d@ -f2)"
           backup_digest="$(docker inspect --format='{{index .RepoDigests 0}}' "$RTG_CANDIDATE_BACKUP_IMAGE" | cut -d@ -f2)"
           test -n "$digest" && test -n "$backup_digest" || { echo "Geen RepoDigest: er is niets om aan te binden."; exit 1; }
-          node scripts/imageherkomst.js --binden --eis-handtekening --image="$RTG_CANDIDATE_IMAGE" --digest="$digest" \
+          node scripts/imageherkomst.js --binden --image="$RTG_CANDIDATE_IMAGE" --digest="$digest" \
             --bewijs=.release/image-release-bewijs.json --sbom=.release/sbom.json --uit=.release/herkomst.json
-          node scripts/imageherkomst.js --binden --eis-handtekening --image="$RTG_CANDIDATE_BACKUP_IMAGE" --digest="$backup_digest" \
+          node scripts/imageherkomst.js --binden --image="$RTG_CANDIDATE_BACKUP_IMAGE" --digest="$backup_digest" \
             --bewijs=.release/image-release-bewijs.json --sbom=.release/sbom-backup.json --uit=.release/herkomst-backup.json
 
       # Een publieke sleutel is geen optionele versiering. Zonder vastgelegd

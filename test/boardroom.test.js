@@ -44,7 +44,7 @@ test.before(async () => {
   esToken = regEs.body.token;
   // een Duits lid ZONDER landcode, maar met "Duitse" nationaliteit op het
   // geverifieerde paspoort: de per-land-regel moet dit alsnog herkennen
-  const office = await kantoorAlsPersoon(base, 'RTG-OFFICE');
+  const office = await kantoorAlsPersoon(base, 'RTG-OFFICE', OWNER);
   const regDe = await api(base, '/api/auth/register', { name: 'Lid Duitsland', email: 'de' + u + '@x.nl',
     phone: '069' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
   deToken = regDe.body.token;
@@ -53,6 +53,7 @@ test.before(async () => {
   await api(base, '/api/verify/selfie', { image: PNG }, deToken);
   const pend = await api(base, '/api/office/verifications', {}, office);
   const mijDe = (pend.body.pending || []).find(p => p.codename === stDe.body.state.user.codename);
+  assert.ok(office && mijDe, 'het kantoor ziet de wachtende verificatie: ' + JSON.stringify(pend.body).slice(0, 160));
   await api(base, '/api/office/verify', { userId: mijDe.id, decision: 'approve', nationaliteit: 'Duitse' }, office);
 });
 test.after(() => stop(srv && srv.child));

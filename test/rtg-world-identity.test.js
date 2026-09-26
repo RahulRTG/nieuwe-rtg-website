@@ -1,10 +1,13 @@
 /* DE HERITAGE-ROUTEKAART IS FAIL-CLOSED.
    Een nieuw echt scherm mag niet ongemerkt een vijfde kleur erven en een oude
    redirect mag geen tweede productoppervlak worden. Daarom wordt het manifest
-   hier tegen de werkelijke HTML-boom gehouden: 294 schermen, 16 doorwijzers,
+   hier tegen de werkelijke HTML-boom gehouden: 292 schermen, 18 doorwijzers,
    (290 sinds deze tak /apps/verificatie.html en /apps/vertegenwoordiging.html
    toevoegde, 292 sinds /apps/loopbaan.html en /apps/loopbaanbewijs.html erbij
-   kwamen, 293 sinds /apps/mijn-neigingen.html en 294 sinds /apps/connect.html --
+   kwamen, 293 sinds /apps/mijn-neigingen.html en 294 sinds /apps/connect.html,
+   en terug naar 293 met 17 doorwijzers sinds /apps/vandaag.html in RTG Life
+   opging (SCHERMEIGENAAR.json), en 292 met 18 sinds /apps/toestemming.html een
+   weergave van Wie heeft toegang tot mij werd --
    het getal is een grendel tegen
    een scherm dat er stil bij komt, en hoort dus mee te bewegen met een scherm
    dat er BEWUST bij komt), ieder exact eenmaal. */
@@ -36,19 +39,19 @@ const ECHTE_ROUTES = BESTANDEN.filter((bestand) =>
 const DOORWIJZERS = BESTANDEN.filter((bestand) =>
   !/\/shared\/basis\.js/.test(fs.readFileSync(bestand, 'utf8'))).map(route).sort();
 
-test('het manifest dekt 294 echte schermen en 16 redirects precies eenmaal', () => {
+test('het manifest dekt 292 echte schermen en 18 redirects precies eenmaal', () => {
   /* DE MUTATIE: voeg een HTML-scherm toe zonder manifestregel, of zet één pad
      in twee werelden. De setvergelijking of de lengtetoets moet dan zakken. */
   const echtManifest = identiteit.VALUES.flatMap((wereld) => identiteit.MANIFEST[wereld]);
   const allesManifest = echtManifest.concat(identiteit.REDIRECTS);
 
   assert.equal(BESTANDEN.length, 310, 'de appboom hoort 310 HTML-bestanden te bevatten');
-  assert.equal(ECHTE_ROUTES.length, 294, 'exact 294 blijvende schermen horen basis.js te laden');
-  assert.equal(DOORWIJZERS.length, 16, 'exact 16 oude adressen horen doorwijzers te blijven');
-  assert.equal(echtManifest.length, 294, 'het vierwereldenmanifest hoort 294 schermen te bevatten');
+  assert.equal(ECHTE_ROUTES.length, 292, 'exact 292 blijvende schermen horen basis.js te laden');
+  assert.equal(DOORWIJZERS.length, 18, 'exact 18 oude adressen horen doorwijzers te blijven');
+  assert.equal(echtManifest.length, 292, 'het vierwereldenmanifest hoort 292 schermen te bevatten');
   assert.deepEqual(identiteit.VALUES, ['living', 'travel', 'work', 'foundation'],
     'Core ondersteunt de werelden maar mag geen vijfde zichtbare wereld zijn');
-  assert.equal(identiteit.REDIRECTS.length, 16, 'het redirectmanifest hoort 16 adressen te bevatten');
+  assert.equal(identiteit.REDIRECTS.length, 18, 'het redirectmanifest hoort 18 adressen te bevatten');
   assert.equal(new Set(allesManifest).size, allesManifest.length,
     'geen route mag in twee werelden of ook als redirect staan');
   assert.deepEqual(echtManifest.slice().sort(), ECHTE_ROUTES,
@@ -121,4 +124,94 @@ test('de gedeelde werkruimte kent uitsluitend centraal toegewezen gebieden', () 
   for (const [area,world] of [['reizen','travel'],['living','living'],['foundation','foundation'],['kantoor','work'],['persoonlijk','work'],['random','work'],['constructor','work'],['toString','work'],['__proto__','work']])
     assert.equal(identity.classify('/apps/werkruimte.html?gebied='+area),world);
   assert.equal(identity.classify('/apps/kantoor.html?gebied=living'),'work','een willekeurige route kan niet van wereld wisselen');
+});
+
+/* HET MANIFEST IS OP DE GEDEELDE ROUTES EEN AFGELEIDE VAN MAPPEN.
+
+   `MAPPEN` in de app-main-bundel is de enige lijst werelden (WERELD.md); daaruit
+   wordt WERELDLIJST.md geschreven, met dezelfde lezer als hier
+   (scripts/lib/wereldregister.js -- een tweede lezer zou LAT.md regel 4 zijn).
+   Het MANIFEST hierboven kent daarnaast een vaste kamer per scherm. Waar ze
+   allebei een route noemen, is het manifest dus geen tweede eigenaar maar een
+   afgeleide die met MAPPEN moet kloppen. Zo niet, dan zegt de wereldbank "dit
+   hoort in Foundation" en verft de Edge het scherm als Living -- dat gebeurde met
+   Vrienden, die op 7 september naar FoundationOS verhuisde (WERELDEN.md) en in
+   het manifest bleef hangen.
+
+   De routes die ALLEEN in het manifest staan (een paar honderd: kassa's, PDA's,
+   juridische pagina's, foundationschermen die niet in een wereldbank hangen)
+   krijgen hier geen tweede eigenaar: MAPPEN zegt over hen niets, en deze toets
+   verzint dat niet. Dat hun enige wereld uit het manifest komt is een bestaande
+   spanning met WERELD.md, en hij staat hier genoemd in plaats van opgelost.
+
+   Een verschil dat bewust is, draagt zijn reden. Een verklaring die niet meer
+   nodig is, laat de toets ook zakken: een uitzondering die blijft liggen nadat
+   haar grond verdween, dekt de volgende drift af. */
+const reg = require('../scripts/lib/wereldregister');
+const WERELD_VAN = { LivingOS: 'living', WorkOS: 'work', TravelOS: 'travel', FoundationOS: 'foundation' };
+const STAND = 'een stand binnen de ledenapp en geen eigen pagina: /apps/app.html heeft een vaste kamer (living), ' +
+  'terwijl MAPPEN de stand in de wereld zet waar de mens hem gebruikt';
+const UITZONDERINGEN = {
+  'TravelOS tab:reizen': STAND,
+  'TravelOS tab:terplaatse': STAND,
+  'FoundationOS tab:zorg': STAND
+};
+
+function vergelijkMetMappen(uitzonderingen) {
+  const afwijkingen = [], gedeeld = new Set();
+  for (const w of reg.WERELDEN) for (const item of w.items) {
+    const los = reg.los(item);
+    if (!los.url || !los.url.startsWith('/')) continue;
+    const pad = reg.kaal(los.url.split(' ')[0]);
+    gedeeld.add(pad);
+    const sleutel = w.naam + ' ' + item, verwacht = WERELD_VAN[w.naam], manifest = identiteit.classify(pad);
+    if (manifest === verwacht) {
+      if (sleutel in uitzonderingen) afwijkingen.push(sleutel + ': verklaard maar klopt al; haal de uitzondering weg');
+      continue;
+    }
+    const reden = uitzonderingen[sleutel];
+    if (typeof reden !== 'string' || reden.trim().length < 20) {
+      afwijkingen.push(sleutel + ' -> ' + pad + ': MAPPEN=' + verwacht + ', manifest=' + manifest +
+        (sleutel in uitzonderingen ? ' (uitzondering zonder reden)' : ''));
+    }
+  }
+  for (const sleutel of Object.keys(uitzonderingen)) {
+    const [wereld, item] = sleutel.split(' ');
+    if (!reg.WERELDEN.some((w) => w.naam === wereld && w.items.includes(item))) {
+      afwijkingen.push(sleutel + ': verklaard maar staat niet (meer) in MAPPEN');
+    }
+  }
+  return { afwijkingen, gedeeld };
+}
+
+test('manifest en MAPPEN zeggen hetzelfde over de routes die ze delen', () => {
+  /* DE MUTATIES: zet /apps/geld.html in het manifest bij work (MAPPEN zegt
+     LivingOS), zet foundation/vrienden terug bij living, of maak de reden van
+     tab:zorg leeg. Elk van de drie hoort hier bij naam te verschijnen. */
+  const { afwijkingen, gedeeld } = vergelijkMetMappen(UITZONDERINGEN);
+  assert.ok(gedeeld.size >= 60, 'er horen gedeelde routes te zijn; gevonden: ' + gedeeld.size);
+  assert.deepEqual(afwijkingen, [], 'MAPPEN is de wereldlijst; het manifest volgt waar het dezelfde route noemt');
+});
+
+test('de vergelijking ziet een verschuiving en een reden die ontbreekt', () => {
+  /* Zelfijking: een uitzondering zonder reden en een verzonnen uitzondering
+     horen allebei te zakken, anders is de toets hierboven blind. */
+  const zonderReden = Object.assign({}, UITZONDERINGEN, { 'FoundationOS tab:zorg': '' });
+  assert.match(vergelijkMetMappen(zonderReden).afwijkingen.join('\n'), /tab:zorg.*zonder reden/);
+  const verzonnen = Object.assign({}, UITZONDERINGEN, { 'LivingOS link:geldcommand': STAND });
+  assert.match(vergelijkMetMappen(verzonnen).afwijkingen.join('\n'), /geldcommand: verklaard maar klopt al/);
+});
+
+test('elk wereldbureau draagt de wereld die het manifest hem geeft', () => {
+  /* DE MUTATIE: zet data-world-home op reizen.html op living. */
+  const bureaus = [];
+  for (const bestand of BESTANDEN) {
+    const html = fs.readFileSync(bestand, 'utf8');
+    const thuis = /<body\b[^>]*\bdata-world-home=["']([^"']+)["']/i.exec(html);
+    if (!thuis) continue;
+    bureaus.push(route(bestand) + '=' + thuis[1] + (identiteit.classify(route(bestand)) === thuis[1] ? '' : ' (manifest: ' +
+      identiteit.classify(route(bestand)) + ')'));
+  }
+  assert.deepEqual(bureaus.sort(), ['/apps/foundation/index.html=foundation', '/apps/foundation/os-publiek.html=foundation',
+    '/apps/kantoor.html=work', '/apps/reizen.html=travel', '/apps/rtg.html=living', '/apps/wereld.html=living']);
 });

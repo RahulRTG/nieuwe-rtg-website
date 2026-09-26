@@ -153,7 +153,10 @@ maar een tweede menu, en dan zijn we terug bij het driepuntjesmenu, de zijbalk,
 het tandwiel en het modale venster.
 
 Drempels: 44px en 150px, met weerstand na de eerste — zo voelt de tweede trap
-verder weg dan de eerste, wat hij ook is.
+verder weg dan de eerste, wat hij ook is. Alle drempels van de gebaren (ook lang
+drukken, 480 ms) staan op EEN plek, `DREMPELS` in `shared/adaptief/grammatica.js`,
+en elke herkenner leest ze daar; zonder die tabel is het gebaar uit en nooit een
+eigen kopie van het getal.
 
 ## Het gewicht: lage gevolgen = snelheid, hoge gevolgen = zekerheid
 
@@ -344,6 +347,12 @@ staat en alleen gemeten toestand toont, dat een zware handeling niet met één t
 afgaat, dat vasthouden hem wél afmaakt en de reden meegeeft, dat een verhinderde
 handeling zijn reden geeft en niet draait, dat de orb de verhinderde erbij toont,
 en dat omhoog trekken de twee trappen geeft.
+
+`test/drempels.test.js` meet dat de drempels op EEN plek staan: een gesloten
+tabel met de getallen van dit document, een proef met een afwijkend getal die
+laat zien dat de balk en de balkknop het getal LEZEN, dat zonder tabel het gebaar
+uit is en vasthouden nooit bevestigt, en dat elke pagina die de invoerlaag zelf
+laadt eerst de grammatica laadt.
 
 Wat **niet** machinaal gehandhaafd wordt, en dus op mensen berust:
 

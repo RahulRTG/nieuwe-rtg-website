@@ -30,6 +30,8 @@ const assert = require('node:assert');
 const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
+const os = require('node:os');
+const { spawnSync } = require('node:child_process');
 const H = require('../scripts/imageherkomst');
 
 const WORTEL = path.join(__dirname, '..');
@@ -194,15 +196,26 @@ test('een handtekening van een VREEMDE sleutel telt niet', () => {
   assert.strictEqual(r.ok, false, 'wie zelf een sleutel meebrengt, tekent voor niemand');
 });
 
-test('de publicatievoorcheck bewijst dat private en vastgelegde publieke sleutel bij elkaar horen', () => {
-  const echte = H.nieuweSleutel();
-  const vreemde = H.nieuweSleutel();
-  const prive = crypto.createPrivateKey(echte.prive);
-  assert.equal(H.sleutelpaarKlopt(prive, echte.publiek), true);
-  assert.equal(H.sleutelpaarKlopt(prive, vreemde.publiek), false,
-    'een geldig maar vreemd vertrouwensanker werd geaccepteerd');
-  assert.equal(H.sleutelpaarKlopt(prive, 'geen sleutel'), false,
-    'onleesbare sleutelinvoer werd geaccepteerd');
+/* De voorcheck vóór publicatie is trust.authorizedPrivate (test/release-trust.test.js);
+   de oude ongedomeinde sleutelproef is weg. Wat hier blijft: een vlag die niets
+   doet, bestaat niet meer -- `--eis-handtekening` stond jaren in de workflow en
+   werd nergens gelezen. */
+test('een onbekende vlag wordt geweigerd, ook de oude --eis-handtekening', () => {
+  assert.deepEqual(H.onbekendeVlaggen(['--binden', '--image=x', '--digest', 'sha256:1', '--eis-kandidaat']), []);
+  assert.deepEqual(H.onbekendeVlaggen(['--binden', '--eis-handtekening']), ['eis-handtekening']);
+  const r = spawnSync(process.execPath, [path.join(__dirname, '..', 'scripts', 'imageherkomst.js'), '--controle', '--eis-handtekening'],
+    { encoding: 'utf8', env: { ...process.env, RTG_RELEASE_SIGN_KEY: '' } });
+  assert.equal(r.status, 1);
+  assert.match(r.stderr, /Onbekende vlag: --eis-handtekening/);
+});
+
+test('binden zonder sleutel of anker stopt voordat er een herkomstdocument ontstaat', () => {
+  const uit = path.join(os.tmpdir(), 'rtg-herkomst-' + process.pid + '-' + Date.now() + '.json');
+  const r = spawnSync(process.execPath, [path.join(__dirname, '..', 'scripts', 'imageherkomst.js'), '--binden',
+    '--image=ghcr.io/rtg/app:proef', '--digest=sha256:' + '0'.repeat(64), '--uit=' + uit],
+    { encoding: 'utf8', env: { ...process.env, RTG_RELEASE_SIGN_KEY: '' } });
+  assert.equal(r.status, 1, r.stdout + r.stderr);
+  assert.equal(fs.existsSync(uit), false, 'er is een ongetekend herkomstdocument geschreven');
 });
 
 test('zonder vastgelegde publieke sleutel is een handtekening geen bewijs', () => {

@@ -19,6 +19,8 @@ const R = require('./risico');
 const P = require('./polis');
 
 const rond = (n) => Math.round(n);
+const { naarCenten, euroTonen } = require('./centen');
+const { beweeg } = require('./boekhouding');
 
 module.exports = ({ mijnVestiging }) => {
   const mijne = (st, h) => (st.polissen || []).filter(p => p.speler === h && p.status === 'loopt');
@@ -104,16 +106,18 @@ module.exports = ({ mijnVestiging }) => {
       const omzet = omzetVan(v);
       // 1. de premies
       for (const p of polissen.filter(x => x.vestiging === v.id)) {
-        const bedrag = P.premieVoor(p.risico, v, omzet, p, ctx);
-        st.geld[h] -= bedrag;
+        // de premie wordt in euro's gerekend en een keer tot centen gemaakt (./centen.js)
+        const bedrag = naarCenten(P.premieVoor(p.risico, v, omzet, p, ctx));
+        beweeg(st, { soort: 'PREMIE', van: ['kas', h], naar: ['macro', 'verzekeraar'], bedrag, omschrijving: 'Premie' });
         p.betaald += bedrag;
         premie += bedrag;
       }
       // 2. wat er gebeurt -- deterministisch uit (partij, maand, vestiging)
       for (const voorval of R.voorvallen(potje.id, st.maand, v, ctx)) {
-        const kosten = R.kosten(voorval, v, omzet);
-        if (kosten < 1) continue;
-        st.geld[h] -= kosten;
+        const kostenEuro = R.kosten(voorval, v, omzet);
+        if (kostenEuro < 1) continue;
+        const kosten = naarCenten(kostenEuro);
+        beweeg(st, { soort: 'SCHADE', van: ['kas', h], naar: ['macro', 'aannemer'], bedrag: kosten, omschrijving: 'Herstel na schade' });
         schade += kosten;
         /* PANDSCHADE ZET OOK DE STAAT TERUG. Zonder dat is een brand alleen een
            rekening, en dan werkt hij niet door in kwaliteit en reputatie -- en
@@ -121,16 +125,18 @@ module.exports = ({ mijnVestiging }) => {
         if (voorval.soort === 'pand') v.onderhoud = Math.max(0, v.onderhoud - voorval.deel * 100);
         // 3. en wat de polis daarvan draagt
         const p = polissen.find(x => x.vestiging === v.id && x.risico === voorval.risico);
-        const uit = p ? P.uitkering(p, v, kosten) : { bedrag: 0, reden: 'niet verzekerd' };
-        if (uit.bedrag > 0) { st.geld[h] += uit.bedrag; p.uitgekeerd += uit.bedrag; uitgekeerd += uit.bedrag; }
+        const uitEuro = p ? P.uitkering(p, v, kostenEuro) : { bedrag: 0, reden: 'niet verzekerd' };
+        // nooit meer dan de schade: de afronding is monotoon, dus de centen ook niet
+        const uit = { bedrag: naarCenten(uitEuro.bedrag), reden: uitEuro.reden };
+        if (uit.bedrag > 0) { beweeg(st, { soort: 'UITKERING', van: ['macro', 'verzekeraar'], naar: ['kas', h], bedrag: uit.bedrag, omschrijving: 'Uitkering' }); p.uitgekeerd += uit.bedrag; uitgekeerd += uit.bedrag; }
         if (p) p.voorvallen++;
         regels.push({ id: voorval.risico, naam: voorval.naam, zaak: v.naam,
-          schade: rond(kosten), uitkering: rond(uit.bedrag), reden: uit.reden,
-          verzekerd: !!p, resultaat: -rond(kosten - uit.bedrag) });
+          schade: euroTonen(kosten), uitkering: euroTonen(uit.bedrag), reden: uit.reden,
+          verzekerd: !!p, resultaat: -euroTonen(kosten - uit.bedrag) });
       }
     }
     if (premie > 0) regels.unshift({ id: 'premie', naam: 'Verzekeringspremie',
-      premie: rond(premie), resultaat: -rond(premie) });
+      premie: euroTonen(premie), resultaat: -euroTonen(premie) });
     return { regels, premie, schade, uitgekeerd };
   }
 
@@ -143,7 +149,7 @@ module.exports = ({ mijnVestiging }) => {
         id: p.id, risico: p.risico, naam: R.RISICOS[p.risico].naam, status: p.status,
         vestiging: p.vestiging, dekking: p.dekking, eigenRisico: p.eigenRisico,
         maximum: p.maximum, sinds: p.sinds, voorvallen: p.voorvallen,
-        betaald: rond(p.betaald), uitgekeerd: rond(p.uitgekeerd)
+        betaald: euroTonen(p.betaald), uitgekeerd: euroTonen(p.uitgekeerd)
       })),
       // wat er te verzekeren valt per zaak, met de kans en de verwachte schade erbij
       risicos: (st.vestigingen[h] || []).map(v => ({

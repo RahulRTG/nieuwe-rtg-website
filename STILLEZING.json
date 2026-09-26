@@ -3,16 +3,16 @@
  "uitleg": "Lezers van bewijs- en gezagsstate die een ONLEESBAAR bestand als een AFWEZIG bestand behandelen. Bewijs kent drie toestanden (bestaat+geldig, bestaat+ongeldig, bestaat niet) en een catch die op null valt, maakt van de tweede de derde -- en leeg betekent in dit huis bijna overal \"geen beperking\". De spiegel van STILSPOOR.json: die meet schrijvers wier falen wordt opgegeten, deze meet lezers die het onderscheid verliezen. Nooit optellen.",
  "grens": "Lexicaal, dus een ONDERGRENS: de werkelijke schuld is minstens dit. server/ en scripts/ worden nooit opgeteld -- daar staat een handeling tegenover een meting. `smeltSamen` mag alleen dalen, `bewijslezingen` alleen stijgen: een schuld die daalt doordat de meter blind wordt, is de gevaarlijkste vorm van vooruitgang.",
  "stempel": {
-  "op": "2026-09-22T09:13:42.981Z",
-  "commit": "f35211a2f",
-  "boomVuil": false,
-  "boomAnders": 0,
+  "op": "2026-09-26T20:42:31.489Z",
+  "commit": "973609c86",
+  "boomVuil": true,
+  "boomAnders": 91,
   "instrument": "scripts/stillezing.js",
   "node": "v24.18.0"
  },
  "gemeten": {
   "server": {
-   "bewijslezingen": 75,
+   "bewijslezingen": 83,
    "metVanger": 9,
    "smeltSamen": 5,
    "zegtHet": 1,
@@ -21,11 +21,11 @@
    "anders": 1
   },
   "scripts": {
-   "bewijslezingen": 484,
-   "metVanger": 98,
+   "bewijslezingen": 506,
+   "metVanger": 99,
    "smeltSamen": 61,
    "zegtHet": 11,
-   "onderscheidt": 5,
+   "onderscheidt": 6,
    "gooit": 2,
    "anders": 19
   }
@@ -148,7 +148,7 @@
    },
    {
     "bestand": "scripts/bewijsladder.js",
-    "regel": 386,
+    "regel": 385,
     "leest": [
      "BEWIJSLADDER.json",
      "LADDER.json"
@@ -197,7 +197,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 3045,
+    "regel": 3053,
     "leest": [
      "BELOFTE.json"
     ],
@@ -205,7 +205,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 3364,
+    "regel": 3372,
     "leest": [
      "SLO.json"
     ],
@@ -213,7 +213,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 4867,
+    "regel": 4882,
     "leest": [
      "MUTATIECONTRACT.json"
     ],
@@ -221,7 +221,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5356,
+    "regel": 5371,
     "leest": [
      "MUTATIECONTRACT.json"
     ],
@@ -229,7 +229,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5622,
+    "regel": 5637,
     "leest": [
      "TEKSTOPPERVLAK.json"
     ],
@@ -237,7 +237,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5798,
+    "regel": 5813,
     "leest": [
      "EERSTEMINUUT.json"
     ],
@@ -245,7 +245,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5810,
+    "regel": 5825,
     "leest": [
      "NORM.json"
     ],
@@ -306,6 +306,14 @@
      "DOODSPOOR.json"
     ],
     "soort": "zegtHet"
+   },
+   {
+    "bestand": "scripts/edgekaart.js",
+    "regel": 753,
+    "leest": [
+     "EDGEKAART.json"
+    ],
+    "soort": "onderscheidt"
    },
    {
     "bestand": "scripts/envelopvelden.js",
@@ -518,7 +526,7 @@
    },
    {
     "bestand": "scripts/kantoormacht.js",
-    "regel": 415,
+    "regel": 423,
     "leest": [
      "KANTOORMACHT.json"
     ],

@@ -264,7 +264,13 @@
     const r = await api('/api/mijn/gegevens', {});
     if (r.status === 401) { $('#uitleg').textContent = 'Log in om dit te zien.'; return; }
     if (r.body.error) { $('#uitleg').textContent = r.body.error; return; }
-    toon(r.body);
+    /* Ontbreekt een deel, dan zeggen we dat -- nooit een halve kaart met een ruwe fout erin (LIEGRONDE.json). */
+    const k = r.body;
+    if (!(k.telling && typeof k.telling === 'object' && Array.isArray(k.rijen) && Array.isArray(k.naOpheffen) &&
+          Array.isArray(k.accountNodig) && Array.isArray(k.grenzen))) {
+      $('#uitleg').textContent = 'Het antwoord was onvolledig, dus dit kon niet worden geladen.'; return;
+    }
+    toon(k);
   }
 
   laad();

@@ -82,6 +82,17 @@ router.post('/gezin/oppasinfo', (req, res) => {
 /* AVG: het recht om vergeten te worden. Zijn er twee volwassenen (ouder of
    beheerder), dan is verwijderen een verzoek dat de tweede volwassene moet
    goedkeuren. Is er maar een volwassene, dan wist die het meteen. */
+/* Wissen is het hele gezin, ook wat buiten het gezinsrecord woont: de
+   gezinsagenda staat sinds 23 september 2026 op de agendamotor (sleutel
+   gezin:<code>), en een gewist gezin mag daar geen punten achterlaten. De
+   helper komt laat op de context (foundation/gasten/gezinsagenda.js wordt na
+   deze module gemount), dus hij wordt bij het wissen opgehaald en niet bij het
+   laden -- en ontbreekt hij, dan gaat het wissen niet door. */
+function wisGezin(g) {
+  if (typeof ctx.wisGezinsagenda !== 'function') throw new Error('gezinsagenda-wisser ontbreekt');
+  ctx.wisGezinsagenda(g.code);
+  delete G()[g.code]; save();
+}
 function volwassenen(g) { return Object.values(g.profielen || {}).filter(p => ['beheerder', 'ouder'].includes(p.rol)); }
 async function adultCheck(g, req, res) {
   const p = profielVan(g, req.body && req.body.token);
@@ -92,7 +103,7 @@ async function adultCheck(g, req, res) {
 router.post('/gezin/wissen', async (req, res) => {
   const g = gezinVan(req, res); if (!g) return;
   const p = await adultCheck(g, req, res); if (!p) return;
-  if (volwassenen(g).length <= 1) { delete G()[g.code]; save(); return res.json({ ok: true, verwijderd: true }); }
+  if (volwassenen(g).length <= 1) { wisGezin(g); return res.json({ ok: true, verwijderd: true }); }
   g.wisVerzoek = { door: p.id, doorNaam: p.naam, at: nu() }; save();
   res.json({ ok: true, wachtOpToestemming: true });
 });
@@ -101,7 +112,7 @@ router.post('/gezin/wissen/bevestig', async (req, res) => {
   if (!g.wisVerzoek) return res.status(400).json({ error: 'Er is geen verzoek om te verwijderen.' });
   const p = await adultCheck(g, req, res); if (!p) return;
   if (g.wisVerzoek.door === p.id) return res.status(403).json({ error: 'De tweede volwassene moet toestemming geven, niet degene die het verzoek deed.' });
-  delete G()[g.code]; save();
+  wisGezin(g);
   res.json({ ok: true, verwijderd: true });
 });
 router.post('/gezin/wissen/intrekken', async (req, res) => {

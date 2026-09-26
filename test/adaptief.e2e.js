@@ -18,7 +18,7 @@
    overgeslagen. Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { laadScherm, startServer, stop, letOpFouten, browserOpties, geenBrowser, wachtOpRust } = require('./helper');
+const { laadScherm, startServer, stop, letOpFouten, browserOpties, geenBrowser, wachtOpRust, pasAppAdres } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -60,7 +60,7 @@ async function metLid(breedte, hoogte, fn) {
     }, reg.token);
     const page = await ctx.newPage();
     const fouten = letOpFouten(page, []);
-    await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
+    await page.goto(await pasAppAdres(base, reg.token), { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#rtgCommand', { timeout: 20000 });
     await page.waitForFunction(() => window.RTGCommand && window.RTGCommand.actief && window.RTGCommand.actief(),
       null, { timeout: 20000 });

@@ -90,4 +90,13 @@ Object.assign(kern, require('../kern/opvang')({ db, save, crypto }));
 Object.assign(kern, require('../kern/afdelingshotel')({ db, save, crypto }));
 Object.assign(kern, require('../kern/regering')({ db, save, crypto, LANDEN,
   regelwacht: kern.regelwacht, bank: kern.bank, opvang: kern.opvang, afdelingen: kern.afdelingen, ledenAantal }));
+/* De Werk OS-uitgave via RTG Rekening: de schakelaar van RTG en het bewijs van een
+   SEPA-opdracht (kern/werkbetaling.js). Hier, want hij leest kern.bank. */
+Object.assign(kern, require('../kern/werkbetaling')({ db, save, opdrachten: hulp.betaalOpdrachten,
+  rekeningenVanLid: kern.bank && kern.bank.rekeningenVanLid }));
+/* De rekening op naam van een entiteit (kern/bank/entiteit.js): alleen deze vijf
+   namen, zodat concern en het Werk OS niet de hele bank in handen krijgen. */
+for (const n of ['entiteitRekeningStand', 'entiteitRekeningZet', 'entiteitRekeningOpen', 'entiteitRekening', 'entiteitBetaal']) {
+  if (kern.bank && typeof kern.bank[n] === 'function') kern[n] = kern.bank[n];
+}
 };

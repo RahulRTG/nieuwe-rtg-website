@@ -79,6 +79,7 @@ test('Foundation Connect: elke deur is gemonteerd, en geen enkele staat open', a
     const gezinswegen = [
       ['/api/rtf/connect/ontdek', { vandaag: '2026-09-15' }],
       ['/api/rtf/connect/horizon', {}],
+      ['/api/rtf/connect/schuif', { schuif: 60 }],
       ['/api/rtf/connect/signaal', { onderwerp: 'koken', signaal: 'meer' }],
       ['/api/rtf/connect/open', { id: 'leerstof:x', onderwerp: 'koken', herkomst: 'leerstof' }],
       ['/api/rtf/connect/noteer', { trede: 'begrepen', onderwerp: 'koken' }],

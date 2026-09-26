@@ -46,11 +46,11 @@ uitslag van `npm run kantoormacht` (`KANTOORMACHT.json`, blok 0 van
 
 | As | Getal | Graad |
 |---|---|---|
-| kantoorroutes (`/api/office` + `/api/boardroom`) | **<!--getal:kantoor.routes-->605<!--/getal-->** over <!--getal:kantoor.bestanden-->95<!--/getal--> bestanden | gemeten |
-| deur eist een bewezen mens | **<!--getal:kantoor.deurEistMens-->178<!--/getal-->** | gemeten |
-| deur is de gedeelde code | **<!--getal:kantoor.deurGedeeld-->427<!--/getal-->** | gemeten |
-| handler kent de handelende mens | <!--getal:kantoor.handlerKentMens-->141<!--/getal--> | vermoed (bovengrens) |
-| **anoniem uitvoerbaar** | **<!--getal:kantoor.anoniem-->365<!--/getal-->** | vermoed (ondergrens) |
+| kantoorroutes (`/api/office` + `/api/boardroom`) | **<!--getal:kantoor.routes-->619<!--/getal-->** over <!--getal:kantoor.bestanden-->101<!--/getal--> bestanden | gemeten |
+| deur eist een bewezen mens | **<!--getal:kantoor.deurEistMens-->194<!--/getal-->** | gemeten |
+| deur is de gedeelde code | **<!--getal:kantoor.deurGedeeld-->425<!--/getal-->** | gemeten |
+| handler kent de handelende mens | <!--getal:kantoor.handlerKentMens-->148<!--/getal--> | vermoed (bovengrens) |
+| **anoniem uitvoerbaar** | **<!--getal:kantoor.anoniem-->358<!--/getal-->** | vermoed (ondergrens) |
 | schrijft een auditspoor | 130 | vermoed |
 | vraagt een reden | 259 | vermoed |
 
@@ -366,7 +366,7 @@ Twee dingen die deze verbouwing NIET mag doen: er komt geen `/admin` erbij
 (`KANTOORMACHT.md` par. 28), en geen tweede zoekbalk naast `kern/command/zoek.js`.
 
 Stand: **een stap weg**, en het is zichtbaar werk — maar het raakt de machtsvraag
-niet. De <!--getal:kantoor.anoniem-->365<!--/getal--> anonieme routes blijven anoniem van een nieuwe schil.
+niet. De <!--getal:kantoor.anoniem-->358<!--/getal--> anonieme routes blijven anoniem van een nieuwe schil.
 
 ## 11. Waar dit voorstel botst met wat er al besloten is
 
@@ -422,7 +422,7 @@ mensen is "een tweede paar ogen" soms "dezelfde mens morgen"**. Daar helpt geen
 hoeveelheid code tegen. `vierogen.js` is er eerlijk over: hij levert de graad van
 de scheiding mee in plaats van een groen vinkje.
 
-**`ENFORCE_EXECUTE` heeft een prijs.** <!--getal:kantoor.deurGedeeld-->427<!--/getal--> routes hangen aan de gedeelde deur, en
+**`ENFORCE_EXECUTE` heeft een prijs.** <!--getal:kantoor.deurGedeeld-->425<!--/getal--> routes hangen aan de gedeelde deur, en
 het kantoor doet daar het dagelijkse werk mee. Wie de deur dichtzet zonder eerst
 de schaduwronde, legt werk stil dat gisteren gewoon mocht. Dat is precies waarom
 `kluispoort.js` destijds de gedeelde code níét heeft afgesloten: *deze poort
@@ -454,7 +454,7 @@ het is de bouwlijst.
 |---|---|---|
 | **0** | de meter — `scripts/kantoormacht.js` → `KANTOORMACHT.json` | **staat** (6 sep 2026) |
 | **1** | mens achter de deur: schaduw, dan `ENFORCE_EXECUTE` | een besluit vraagt |
-| **2** | passkey aan de kantoordeur — `webauthn/` koppelen | een stap weg |
+| **2** | passkey aan de kantoordeur — `webauthn/` koppelen | **half**: verplicht voor geld (25 sep 2026), de rest een stap weg |
 | **3** | `actor.*` compleet in de envelop | een stap weg |
 | **4** | verantwoordelijkheidsgraaf als projectie | een besluit vraagt |
 | **5** | tijdelijke bevoegdheid — `commercie/bevoegdheid.js` aansluiten | een stap weg |
@@ -469,6 +469,23 @@ het is de bouwlijst.
 Blok 2 vóór blok 1 is geen vergissing: een passkey aan de deur maakt
 `ENFORCE_EXECUTE` betaalbaar, want dan is "inloggen op naam" geen extra last maar
 juist minder wrijving dan een code overtypen.
+
+**Blok 2 staat half, en de helft die staat is de geldhelft (besluit van de
+eigenaar, 25 september 2026).** Tot dan liet `kern/zwaarbewijs.js` een
+medewerker zonder passkey op de terugval door, met een melding aan de
+beveiliging, en had een medewerker MET passkey geen kantoorroute om de
+ceremonie te openen: de veiligere mens werd buitengesloten. Nu vragen beide
+handtekeningen onder een geldhandeling een ceremonie, elk op de eigen deur en
+gebonden aan de eigen handeling: de aanvrager aan de grens van de ronde
+(`/api/office/bank/incasso/opties`), de tweede mens aan die ene aanvraag
+(`/api/office/bank/handtekening/opties`). Zonder passkey komt er een 403 met
+`watNu: 'passkey-zetten'` en geen terugval. Dat is met opzet strenger dan
+*schaduw eerst*: het gaat om twee knoppen met twee bekende mensen erachter, en
+een terugval onder geld is precies de uitzondering waar een aanvaller op mikt.
+Wat geen geld raakt (rood staan, rekening openen) blijft op de oude regels, en
+de toets houdt dat vast als tegenproef -- de goedkoopste implementatie van
+"dicht" is alles dicht. Welke tweede handtekening geld raakt, weet de handeling
+zelf (`geld: true` bij `tweedeHand.registreer`), niet de deur.
 
 ## 15. Wat er bewust niet komt
 

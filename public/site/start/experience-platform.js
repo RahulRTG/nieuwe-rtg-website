@@ -86,7 +86,6 @@
     d.querySelectorAll('[data-stage-screen]').forEach(function (screen) { screen.classList.toggle('is-active', screen.dataset.stageScreen === role); });
     if (options && options.scroll) d.getElementById('platform').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
     announce(role.charAt(0).toUpperCase() + role.slice(1) + ' geselecteerd. De pagina toont nu deze kant van RTG.');
-    w.dispatchEvent(new CustomEvent('rtg-platform-role', { detail: { role: role } }));
   }
 
   function restore() {

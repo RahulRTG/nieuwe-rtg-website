@@ -191,37 +191,52 @@ test('de lokale klok kiest ochtend, middag, avond en nacht op vaste grenzen', ()
   assert.equal(start.dagdeelVoorUur(23), 'nacht');
 });
 
-test('ieder dagdeel wisselt de hero én alle vier kaartfoto’s echt', () => {
+test('het dagdeel wisselt de hero; iedere wereld behoudt haar eigen context', () => {
   const dagdelen = ['ochtend', 'middag', 'avond', 'nacht'];
   const sleutels = ['hero', 'living', 'travel', 'work', 'foundation'];
   for (const sleutel of sleutels) {
     const paden = dagdelen.map(dagdeel => start.beeldsetVoorDagdeel(dagdeel)[sleutel]);
-    assert.equal(new Set(paden).size, 4, sleutel + ' gebruikt vier verschillende beeldbestanden');
+    assert.equal(new Set(paden).size, sleutel === 'hero' ? 4 : 1, sleutel + ' heeft een eigen beeldcontext');
     for (const padVanBeeld of paden) {
       assert.ok(fs.existsSync(path.join(ROOT, 'public', padVanBeeld)), padVanBeeld + ' bestaat');
     }
   }
 });
 
+test('redactionele beelden zijn uniek en komen overeen met hun herkomstregister', () => {
+  const map = path.join(ROOT, 'public/images/editorial');
+  const herkomst = JSON.parse(fs.readFileSync(path.join(map, 'PROVENANCE.json'), 'utf8'));
+  const gezien = new Map();
+  for (const beeld of herkomst) {
+    assert.equal(path.basename(beeld.path), beeld.path);
+    const hash = crypto.createHash('sha256').update(fs.readFileSync(path.join(map, beeld.path))).digest('hex');
+    assert.equal(hash, beeld.sha256, beeld.path + ' heeft de geregistreerde bytes');
+    assert.ok(!gezien.has(hash), beeld.path + ' is geen kopie van ' + gezien.get(hash));
+    gezien.set(hash, beeld.path);
+    assert.ok(beeld.prompt && beeld.illustrative === true, beeld.path + ' heeft expliciete generatieherkomst');
+  }
+  assert.deepEqual(fs.readdirSync(map).filter(naam => naam.endsWith('.webp')).sort(),
+    herkomst.map(beeld => beeld.path).sort(), 'ieder redactioneel beeld is geregistreerd');
+});
+
 test('alle landingsbeelden hebben aantoonbare lokale herkomst', () => {
   const dagdelen = ['ochtend', 'middag', 'avond', 'nacht'];
-  const herkomstPad = path.join(ROOT, 'public/images/start/dagdelen/HERKOMST.json');
-  const herkomst = JSON.parse(fs.readFileSync(herkomstPad, 'utf8'));
-  assert.match(herkomst.generator, /OpenAI ImageGen/);
-  assert.equal(herkomst.bestanden.length, 4);
+  const herkomst = JSON.parse(fs.readFileSync(path.join(ROOT, 'public/images/editorial/PROVENANCE.json'), 'utf8'));
 
   for (const dagdeel of dagdelen) {
     const set = start.beeldsetVoorDagdeel(dagdeel);
     const naam = path.basename(set.hero);
-    const rij = herkomst.bestanden.find(item => item.bestand === naam && item.dagdeel === dagdeel);
-    assert.ok(rij, naam + ' staat met het juiste dagdeel in het herkomstregister');
+    const rij = herkomst.find(item => item.path === naam);
+    assert.ok(rij, naam + ' staat in het herkomstregister');
     const inhoud = fs.readFileSync(path.join(ROOT, 'public', set.hero));
     assert.equal(crypto.createHash('sha256').update(inhoud).digest('hex'), rij.sha256,
       naam + ' is byte voor byte het geregistreerde beeld');
 
     for (const rol of ['living', 'travel', 'work', 'foundation']) {
-      assert.match(set[rol], /^campagne\//,
-        dagdeel + ' ' + rol + ' gebruikt alleen de bestaande RTG-campagnebank met generatieherkomst');
+      const beeld = herkomst.find(item => item.path === path.basename(set[rol]));
+      assert.ok(beeld, rol + ' heeft generatieherkomst');
+      assert.equal(beeld.tool, 'built-in image_gen');
+      assert.equal(crypto.createHash('sha256').update(fs.readFileSync(path.join(ROOT, 'public', set[rol]))).digest('hex'), beeld.sha256);
     }
   }
 });

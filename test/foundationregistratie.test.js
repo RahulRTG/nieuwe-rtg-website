@@ -31,12 +31,11 @@ test.after(() => {
 });
 
 test('catalogus toont de vier veilige deuren en officiële bronnen', async () => {
-  /* MET DE KANTOORTOKEN. Deze route stond open en werd door de ladder gevonden
-     op de trede "de dwaler": een route die zonder inlog een geslaagd antwoord
-     geeft. Wat eruit komt is de volledige eisencatalogus plus de actieve steden.
-     Geen scherm vroeg hem op -- deze toets wel, en dat is precies waarom hij
-     nu meetekent voor de poort in plaats van eromheen te lopen. */
-  const r = await post('/api/foundation/registratie/catalogus', {}, office);
+  /* ZONDER INLOG, en dat is een besluit (23 september 2026): een school of
+     stichting heeft vóór toelating geen account, en zonder deze catalogus doen
+     de keuzes op foundation/registreren.html niets. De PUBLIEK-lijst in
+     scripts/lib/publiek.js draagt de reden. */
+  const r = await post('/api/foundation/registratie/catalogus', {});
   assert.equal(r.status, 200);
   const d = await r.json();
   assert.deepEqual(Object.keys(d.types).sort(), ['partnerstichting','school','vrijwilliger']);

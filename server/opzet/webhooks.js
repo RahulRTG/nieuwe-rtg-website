@@ -23,6 +23,9 @@ module.exports = function hangWebhooksOp(deps) {
      handler uitgelezen. Zo kan de volgorde niet stilzwijgend omvallen. */
   const munten = { bevestig: (a) => deps.muntenVan().bevestig(a) };
   const settleFactuur = (...a) => deps.settleFactuurVan()(...a);
+  /* Facturen en directe betalingen lopen via de betaalwaarheid (MONEY-012); hun
+     afwikkeling gaat door dezelfde settleFactuur, laat gebonden zoals hierboven. */
+  require('../kern/betaalwaarheid/inkomend')({ betaalWaarheid, settleFactuur });
   const verwerkPayout = require('./webhook-payout');
   /* DE TWEE WEBHOOKS STAAN HIER, EN NIET ACHTER DE POORTWACHTERS.
 
@@ -73,6 +76,8 @@ module.exports = function hangWebhooksOp(deps) {
       log.warn('munt-webhook geweigerd', { fout: e.message, id: req.id });
       return res.status(400).json({ error: 'Ongeldige handtekening.' });
     }
+    // fase 7: pas NA de handtekening draait het werk als de aanbieder (kern/dienstidentiteit.js)
+    return require('../kern/dienstidentiteit').alsAanbieder('munt', async () => {
     try {
       if (evt && (evt.status === 'ontvangen' || evt.type === 'ontvangst.voltooid') && evt.id) {
         const entry = munten.bevestig({ id: evt.id, euroCenten: evt.euroCenten });
@@ -96,5 +101,6 @@ module.exports = function hangWebhooksOp(deps) {
       return res.status(500).json({ error: 'De ontvangst is nog niet verwerkt; probeer de webhook opnieuw.' });
     }
     res.json({ ok: true });
+    });
   });
 };

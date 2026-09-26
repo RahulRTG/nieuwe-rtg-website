@@ -28,7 +28,16 @@ const maakOpslag = require('../server/kern/payroll/opslag');
    dat ruimer is dan het echte ding meet niets (LAT-regel 9). */
 const inzagelog = require('../server/inzagelog');
 
-function opzet(over) {
+/* Een vastlegger zoals server/lib/duurzaam.js hem levert: voert de mutatie uit
+   en geeft null (bevestigd) of {status, error} (niet bevestigd). `faalt` bootst
+   een opslag na die niet bevestigt. */
+const vastlegger = (faalt) => async (mutatie) => {
+  if (faalt) return { status: 503, error: 'de opslag bevestigde niet' };
+  mutatie();
+  return null;
+};
+
+function opzet(over, opties) {
   const db = { data: {} };
   const berichten = [];
   const journaal = [];
@@ -39,7 +48,7 @@ function opzet(over) {
     getUserById: (id) => users[id] || null,
     getMemberState: (id) => state[id] || null
   };
-  inzagelog.zet(db, () => {});
+  inzagelog.zet(db, () => {}, vastlegger(opties && opties.faalt));
   const ident = maakIdentiteit(Object.assign({
     accounts, opslag: maakOpslag({ db }), save: () => {}, nu: () => '2026-08-06T12:00:00.000Z',
     inzagelog,
@@ -55,13 +64,13 @@ const sam = { id: 1, name: 'Sam', supplier_code: 'ESVEDRA', member_id: 7 };
 const nieuw = { id: 2, name: 'Robin', supplier_code: 'ESVEDRA', member_id: 8 };
 const elders = { id: 3, name: 'Kim', supplier_code: 'KIKUNOI', member_id: 7 };
 
-const vraag = (ident, over) => ident.opvraag(Object.assign({
+const vraag = async (ident, over) => ident.opvraag(Object.assign({
   supplierCode: 'ESVEDRA', supplierNaam: 'Es Vedra Tours', staff: sam,
   niveau: 'gegevens', reden: 'loonadministratie juni, identificatieplicht',
   door: 'M. de Wit', doorRol: 'manager'
 }, over || {}));
 
-test('de standaardweergave zegt ja of nee, en verder niets', () => {
+test('de standaardweergave zegt ja of nee, en verder niets', async () => {
   const { ident } = opzet();
   const rij = ident.standen([sam, nieuw]);
   assert.deepEqual(rij, [
@@ -70,18 +79,18 @@ test('de standaardweergave zegt ja of nee, en verder niets', () => {
   ], 'geen nummer, geen datum, geen nationaliteit: ' + JSON.stringify(rij));
 });
 
-test('zonder een reden die iets zegt is er geen inzage', () => {
+test('zonder een reden die iets zegt is er geen inzage', async () => {
   const { ident, journaal } = opzet();
   for (const reden of ['', '   ', 'ok', 'j', '.........']) {
-    const r = vraag(ident, { reden });
+    const r = await vraag(ident, { reden });
     assert.equal(r.status, 400, 'reden ' + JSON.stringify(reden) + ' hoort te worden geweigerd');
   }
   assert.equal(journaal.length, 0, 'en er komt niets in het journaal');
 });
 
-test('gegevens opvragen levert het nodige, niet het document', () => {
+test('gegevens opvragen levert het nodige, niet het document', async () => {
   const { ident, journaal, berichten } = opzet();
-  const r = vraag(ident);
+  const r = await vraag(ident);
   assert.ok(r.ok, JSON.stringify(r).slice(0, 200));
   assert.equal(r.gegevens.laatsteVier, '4821', 'de laatste vier, niet het hele nummer');
   assert.equal(r.gegevens.geldigTot, '2031-04-12');
@@ -108,31 +117,49 @@ test('gegevens opvragen levert het nodige, niet het document', () => {
   assert.ok(/Reden: loonadministratie/.test(berichten[0].m.body), 'met de reden erin: ' + berichten[0].m.body);
 });
 
-test('een kopie is zwaarder: alleen een manager, en het wordt gezegd', () => {
+test('een kopie is zwaarder: alleen een manager, en het wordt gezegd', async () => {
   const { ident, berichten } = opzet();
-  const nee = vraag(ident, { niveau: 'kopie', doorRol: 'staff', door: 'Iemand' });
+  const nee = await vraag(ident, { niveau: 'kopie', doorRol: 'staff', door: 'Iemand' });
   assert.equal(nee.status, 403, 'een gewone medewerker vraagt geen kopie op');
 
-  const ja = vraag(ident, { niveau: 'kopie' });
+  const ja = await vraag(ident, { niveau: 'kopie' });
   assert.ok(ja.ok);
   assert.ok(ja.kopie && ja.kopie.beschikbaar);
   assert.ok(/kluis/.test(ja.let || ''), 'met de waarschuwing dat de scan de kluis verlaat');
   assert.ok(/[Kk]opie/.test(berichten[berichten.length - 1].m.title), 'en de medewerker hoort dat het een kopie was');
 });
 
-test('niet over iemand die hier niet werkt, en niet over wie nog niet gecontroleerd is', () => {
+test('niet over iemand die hier niet werkt, en niet over wie nog niet gecontroleerd is', async () => {
   const { ident, journaal } = opzet();
-  assert.equal(vraag(ident, { staff: elders }).status, 404, 'een andere zaak: nee');
-  assert.equal(vraag(ident, { staff: nieuw }).status, 409, 'nog niets vastgesteld: er is niets op te vragen');
+  assert.equal((await vraag(ident, { staff: elders })).status, 404, 'een andere zaak: nee');
+  assert.equal((await vraag(ident, { staff: nieuw })).status, 409, 'nog niets vastgesteld: er is niets op te vragen');
   assert.equal(journaal.length, 0, 'en geen van beide komt in het journaal terecht');
 });
 
-test('de medewerker kan zelf zien wie wat opvroeg', () => {
+test('de medewerker kan zelf zien wie wat opvroeg', async () => {
   const { ident } = opzet();
-  vraag(ident);
-  vraag(ident, { niveau: 'kopie', reden: 'controle identificatieplicht 2026' });
+  await vraag(ident);
+  await vraag(ident, { niveau: 'kopie', reden: 'controle identificatieplicht 2026' });
   const mijn = ident.mijnVerzoeken(7);
   assert.equal(mijn.length, 2);
   assert.deepEqual(mijn.map(v => v.niveau).sort(), ['gegevens', 'kopie']);
   assert.ok(mijn.every(v => v.reden && v.door), 'met reden en aanvrager erbij');
+});
+
+test('zonder vastgelegd spoor geen inzage: geen gegevens, geen bericht, geen verzoekregel', async () => {
+  /* ARBEID.md par. 4 punt 6. Hier stond noteer() in een lege catch: faalde het
+     journaal, dan ging de kluis gewoon open. */
+  const { ident, berichten } = opzet(null, { faalt: true });
+  const r = await vraag(ident);
+  assert.equal(r.status, 503, JSON.stringify(r));
+  assert.equal(r.gegevens, undefined, 'geen enkel identiteitsgegeven');
+  assert.equal(berichten.length, 0, 'en geen bericht over een inzage die niet plaatsvond');
+  assert.equal(ident.mijnVerzoeken(7).length, 0, 'en geen verzoekregel');
+});
+
+test('zonder aangesloten journaal ook niet', async () => {
+  const { ident } = opzet({ inzagelog: { noteer: () => ({}) } });
+  const r = await vraag(ident);
+  assert.equal(r.status, 503);
+  assert.equal(r.gegevens, undefined);
 });

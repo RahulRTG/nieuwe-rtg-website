@@ -69,3 +69,9 @@ repository als herstelmechanisme.
 Repetities gebruiken uitsluitend geïsoleerde synthetische testidentiteiten.
 Ze bewijzen domein-/rolgrenzen, niet de bevoegdheid van een echte beoordelaar,
 het gedrag van een provider of productiegeschiktheid van een image.
+
+De generale repetitie staat in `test/signing-repetitie.test.js`: de
+signingstappen van `release-image.yml` (sleutelcontrole, bronbewijs, SBOM,
+binden, controle) als proces, in een gecommitte proefboom met drie synthetische
+ankers, en met dezelfde vlaggen als de workflow. Docker zit er niet in: de
+pakketlijst komt uit een vast bestand en de digests zijn synthetisch.

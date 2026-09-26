@@ -91,6 +91,11 @@
 <link href="/shared/social-elite.css" rel="stylesheet">
 <link href="/shared/sociaal-elite.css" rel="stylesheet">
 <link href="/shared/social-intelligence.css" rel="stylesheet">
+<script src="/shared/adaptief.js" defer></script>
+<script src="/shared/adaptief/grammatica.js" defer></script>
+<script src="/shared/objectverwijzing.js" defer></script>
+<script src="/shared/adaptief/vorm.js" defer></script>
+<script src="/shared/adaptief/register.js" defer></script>
 <script src="/shared/social-intelligence.js" defer></script>
 <script src="/shared/social-intelligence-deck.js" defer></script>
 <script src="/shared/social-intelligence-runtime.js" defer></script>
@@ -120,7 +125,7 @@
 
 <aside class="sociaal-bank" aria-label="RTG hoofdnavigatie">
   <nav>
-    <a href="/apps/vandaag.html"><span aria-hidden="true">⌂</span><b>Vandaag</b></a>
+    <a href="/apps/life.html"><span aria-hidden="true">⌂</span><b>Vandaag</b></a>
     <a href="/apps/reisbureau.html"><span aria-hidden="true">◇</span><b>Reizen</b></a>
     <a href="/apps/geld.html"><span aria-hidden="true">▭</span><b>Geld</b></a>
     <a class="actief" href="/apps/sociaal.html"><span aria-hidden="true">◯</span><b>Sociaal</b></a>
@@ -783,6 +788,15 @@
     }
   })();
 })();
+/* WAAR JE BENT, gezegd door dit scherm zelf (EDGE.md, ronde 2). De sociale
+   runtime declareert de handeling; welke handelingen hier spelen, zegt het
+   scherm. Na DOMContentLoaded, want het register laadt met defer.
+   Een eigen hoofdactie heeft dit scherm niet: het publiceert als voertuig
+   voor de declaratie, en telt niet als bewijs dat een scherm met een
+   hoofdactie zijn context zelf zegt. */
+document.addEventListener('DOMContentLoaded', function () {
+  if (window.RTGAdaptief) RTGAdaptief.context({ bron: 'sociaal.sociaal', titel: 'Sociaal', acties: ['sociaal.context'] });
+}, { once: true });
 </script>
 <script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>

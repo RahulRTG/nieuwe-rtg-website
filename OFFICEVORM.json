@@ -1,0 +1,717 @@
+{
+  "stempel": {
+    "op": "2026-09-23T08:03:20.728Z",
+    "commit": "ca55a00",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/officevorm.js",
+    "node": "v22.22.2"
+  },
+  "uitleg": "Is er een `RTGObject` onder de elf subtypen die het voorstel voor RTG Office Next noemt (document, taak, persoon, bedrijf, besluit, handtekening, betaling, boeking, afspraak, contract, workflow)? Twee assen: DE VORM (delen ze velden -- de Asset-vraag) en DE KOP (welke van de vijftien voorgestelde kenmerken dragen ze vandaag al). Gemeten met de lezer van scripts/objectmodel.js.",
+  "grens": "DE TWEE ASSEN WORDEN NOOIT OPGETELD: de vorm zegt of de GEGEVENS gedeeld zijn, de kop of de VERPAKKING dat is, en een gedeelde verpakking is een envelop en geen type. De kop is LEXICAAL op veldnamen en dus graad `vermoed`; de conclusie hangt aan de vorm-as. Envelopvelden vallen uit de vorm-as en tellen juist WEL mee in de kop-as. De lezer kijkt alleen in server/kern, server/bedrijf, server/school en server/papieren -- een object dat in een ROUTE woont is hier onzichtbaar, en dat is geen nul maar een blinde vlek. En de kop-as ziet een GENEST object niet als eigen vorm: het `beheer`-blok van kern/office/docs.js draagt `bewaartermijn` en het document draagt `audit[]`, en geen van beide telt hier mee. Een kop-getal is dus een ONDERgrens, nooit een afwezigheidsbewijs.",
+  "conclusie": "GEEN GEDEELDE VORM: geen enkel veld buiten de envelop staat in alle gemeten objectdomeinen, onder geen van beide lijsten. Een `RTGObject` met document, taak, betaling en boeking als SUBTYPEN is daarmee niet gerechtvaardigd -- de `Asset`-uitslag, voor de achtste keer. Wat overleeft is een VERWIJZING met een view (een live blok wijst naar het object van zijn eigen domein en kopieert niets) en een gedeelde KOP die een envelop is en geen type: lees daarvoor as B.",
+  "geenGedeeldeVorm": true,
+  "eensgezind": true,
+  "kenmerken": [
+    "id",
+    "tenant",
+    "eigenaar",
+    "rechten",
+    "classificatie",
+    "schema",
+    "inhoud",
+    "relaties",
+    "versie",
+    "historie",
+    "audit",
+    "workflowstand",
+    "aiContext",
+    "bewaring",
+    "versleuteling"
+  ],
+  "rondes": {
+    "ruim": {
+      "vorm": {
+        "domeinen": [
+          "document",
+          "taak",
+          "persoon",
+          "bedrijf",
+          "besluit",
+          "handtekening",
+          "betaling",
+          "boeking",
+          "afspraak",
+          "contract",
+          "workflow"
+        ],
+        "domeinenLeeg": [],
+        "vormen": 49,
+        "velden": 144,
+        "perDomein": {
+          "document": {
+            "velden": 22,
+            "modules": [
+              "server/kern/office/delen.js",
+              "server/kern/office/docs.js",
+              "server/kern/office/samen.js"
+            ]
+          },
+          "taak": {
+            "velden": 18,
+            "modules": [
+              "server/bedrijf/project.js",
+              "server/bedrijf/taak.js"
+            ]
+          },
+          "persoon": {
+            "velden": 13,
+            "modules": [
+              "server/kern/concern/employment-organigram.js",
+              "server/kern/concern/employment.js"
+            ]
+          },
+          "bedrijf": {
+            "velden": 16,
+            "modules": [
+              "server/kern/concern/entiteit.js",
+              "server/kern/concern/scope.js",
+              "server/kern/concern/vestiging.js"
+            ]
+          },
+          "besluit": {
+            "velden": 8,
+            "modules": [
+              "server/bedrijf/besluit.js",
+              "server/bedrijf/besluitlijst.js"
+            ]
+          },
+          "handtekening": {
+            "velden": 5,
+            "modules": [
+              "server/kern/kantoor/tweedehandtekening.js"
+            ]
+          },
+          "betaling": {
+            "velden": 16,
+            "modules": [
+              "server/kern/pay/boeken.js",
+              "server/kern/pay/boeking.js",
+              "server/kern/pay/budget.js",
+              "server/kern/pay/graaf.js",
+              "server/kern/pay/kijken.js",
+              "server/kern/pay/tegoed-bon.js",
+              "server/kern/pay/tegoed-zaak.js",
+              "server/kern/pay/tegoed.js",
+              "server/kern/pay/tik.js",
+              "server/kern/pay/verzoeken.js",
+              "server/kern/pay/vooraf.js"
+            ]
+          },
+          "boeking": {
+            "velden": 20,
+            "modules": [
+              "server/kern/reisbureau-betaling.js",
+              "server/kern/reisbureau.js"
+            ]
+          },
+          "afspraak": {
+            "velden": 8,
+            "modules": [
+              "server/kern/agenda-ics.js",
+              "server/kern/agenda-pro.js",
+              "server/kern/agenda.js"
+            ]
+          },
+          "contract": {
+            "velden": 13,
+            "modules": [
+              "server/kern/commercie/contract.js"
+            ]
+          },
+          "workflow": {
+            "velden": 12,
+            "modules": [
+              "server/kern/commercie/voornemen.js",
+              "server/kern/commercie/voornemen/uitvoeren.js"
+            ]
+          }
+        },
+        "inAlleDomeinen": [],
+        "inMinstensHelft": [],
+        "inEenDomeinPct": 95.1,
+        "paren": [
+          {
+            "paar": [
+              "afspraak",
+              "workflow"
+            ],
+            "gedeeld": 1,
+            "overlap": 0.053,
+            "velden": [
+              "gedaan"
+            ]
+          },
+          {
+            "paar": [
+              "taak",
+              "afspraak"
+            ],
+            "gedeeld": 1,
+            "overlap": 0.04,
+            "velden": [
+              "eind"
+            ]
+          },
+          {
+            "paar": [
+              "taak",
+              "besluit"
+            ],
+            "gedeeld": 1,
+            "overlap": 0.04,
+            "velden": [
+              "eigenaar"
+            ]
+          },
+          {
+            "paar": [
+              "persoon",
+              "bedrijf"
+            ],
+            "gedeeld": 1,
+            "overlap": 0.036,
+            "velden": [
+              "entiteit"
+            ]
+          },
+          {
+            "paar": [
+              "bedrijf",
+              "boeking"
+            ],
+            "gedeeld": 1,
+            "overlap": 0.029,
+            "velden": [
+              "land"
+            ]
+          },
+          {
+            "paar": [
+              "betaling",
+              "boeking"
+            ],
+            "gedeeld": 1,
+            "overlap": 0.029,
+            "velden": [
+              "aan"
+            ]
+          },
+          {
+            "paar": [
+              "document",
+              "bedrijf"
+            ],
+            "gedeeld": 1,
+            "overlap": 0.027,
+            "velden": [
+              "rechten"
+            ]
+          },
+          {
+            "paar": [
+              "afspraak",
+              "contract"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          },
+          {
+            "paar": [
+              "bedrijf",
+              "afspraak"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          },
+          {
+            "paar": [
+              "bedrijf",
+              "besluit"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          }
+        ]
+      },
+      "kop": {
+        "domeinen": 11,
+        "perKenmerk": [
+          {
+            "kenmerk": "id",
+            "domeinen": 11
+          },
+          {
+            "kenmerk": "tenant",
+            "domeinen": 2
+          },
+          {
+            "kenmerk": "eigenaar",
+            "domeinen": 5
+          },
+          {
+            "kenmerk": "rechten",
+            "domeinen": 3
+          },
+          {
+            "kenmerk": "classificatie",
+            "domeinen": 2
+          },
+          {
+            "kenmerk": "schema",
+            "domeinen": 4
+          },
+          {
+            "kenmerk": "inhoud",
+            "domeinen": 1
+          },
+          {
+            "kenmerk": "relaties",
+            "domeinen": 5
+          },
+          {
+            "kenmerk": "versie",
+            "domeinen": 1
+          },
+          {
+            "kenmerk": "historie",
+            "domeinen": 0
+          },
+          {
+            "kenmerk": "audit",
+            "domeinen": 0
+          },
+          {
+            "kenmerk": "workflowstand",
+            "domeinen": 8
+          },
+          {
+            "kenmerk": "aiContext",
+            "domeinen": 0
+          },
+          {
+            "kenmerk": "bewaring",
+            "domeinen": 0
+          },
+          {
+            "kenmerk": "versleuteling",
+            "domeinen": 0
+          }
+        ],
+        "inAlleDomeinen": [
+          "id"
+        ],
+        "nergens": [
+          "historie",
+          "audit",
+          "aiContext",
+          "bewaring",
+          "versleuteling"
+        ],
+        "alleenIn": {
+          "inhoud": "document",
+          "versie": "document"
+        },
+        "perDomein": {
+          "document": [
+            "classificatie",
+            "eigenaar",
+            "id",
+            "inhoud",
+            "rechten",
+            "schema",
+            "versie",
+            "workflowstand"
+          ],
+          "taak": [
+            "eigenaar",
+            "id",
+            "relaties",
+            "workflowstand"
+          ],
+          "persoon": [
+            "id",
+            "rechten",
+            "schema",
+            "tenant",
+            "workflowstand"
+          ],
+          "bedrijf": [
+            "id",
+            "rechten",
+            "tenant"
+          ],
+          "besluit": [
+            "eigenaar",
+            "id",
+            "schema",
+            "workflowstand"
+          ],
+          "handtekening": [
+            "eigenaar",
+            "id"
+          ],
+          "betaling": [
+            "classificatie",
+            "eigenaar",
+            "id",
+            "relaties",
+            "schema",
+            "workflowstand"
+          ],
+          "boeking": [
+            "id",
+            "relaties"
+          ],
+          "afspraak": [
+            "id",
+            "relaties",
+            "workflowstand"
+          ],
+          "contract": [
+            "id",
+            "relaties",
+            "workflowstand"
+          ],
+          "workflow": [
+            "id",
+            "workflowstand"
+          ]
+        }
+      }
+    },
+    "smal": {
+      "vorm": {
+        "domeinen": [
+          "document",
+          "taak",
+          "persoon",
+          "bedrijf",
+          "besluit",
+          "handtekening",
+          "betaling",
+          "boeking",
+          "afspraak",
+          "contract",
+          "workflow"
+        ],
+        "domeinenLeeg": [],
+        "vormen": 17,
+        "velden": 79,
+        "perDomein": {
+          "document": {
+            "velden": 14,
+            "modules": [
+              "server/kern/office/docs.js"
+            ]
+          },
+          "taak": {
+            "velden": 9,
+            "modules": [
+              "server/bedrijf/taak.js"
+            ]
+          },
+          "persoon": {
+            "velden": 12,
+            "modules": [
+              "server/kern/concern/employment.js"
+            ]
+          },
+          "bedrijf": {
+            "velden": 3,
+            "modules": [
+              "server/kern/concern/entiteit.js"
+            ]
+          },
+          "besluit": {
+            "velden": 6,
+            "modules": [
+              "server/bedrijf/besluit.js"
+            ]
+          },
+          "handtekening": {
+            "velden": 5,
+            "modules": [
+              "server/kern/kantoor/tweedehandtekening.js"
+            ]
+          },
+          "betaling": {
+            "velden": 2,
+            "modules": [
+              "server/kern/pay/boeking.js"
+            ]
+          },
+          "boeking": {
+            "velden": 4,
+            "modules": [
+              "server/kern/reisbureau.js"
+            ]
+          },
+          "afspraak": {
+            "velden": 1,
+            "modules": [
+              "server/kern/agenda.js"
+            ]
+          },
+          "contract": {
+            "velden": 13,
+            "modules": [
+              "server/kern/commercie/contract.js"
+            ]
+          },
+          "workflow": {
+            "velden": 10,
+            "modules": [
+              "server/kern/commercie/voornemen.js"
+            ]
+          }
+        },
+        "inAlleDomeinen": [],
+        "inMinstensHelft": [],
+        "inEenDomeinPct": 100,
+        "paren": [
+          {
+            "paar": [
+              "afspraak",
+              "contract"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          },
+          {
+            "paar": [
+              "afspraak",
+              "workflow"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          },
+          {
+            "paar": [
+              "bedrijf",
+              "afspraak"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          },
+          {
+            "paar": [
+              "bedrijf",
+              "besluit"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          },
+          {
+            "paar": [
+              "bedrijf",
+              "betaling"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          },
+          {
+            "paar": [
+              "bedrijf",
+              "boeking"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          },
+          {
+            "paar": [
+              "bedrijf",
+              "contract"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          },
+          {
+            "paar": [
+              "bedrijf",
+              "handtekening"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          },
+          {
+            "paar": [
+              "bedrijf",
+              "workflow"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          },
+          {
+            "paar": [
+              "besluit",
+              "afspraak"
+            ],
+            "gedeeld": 0,
+            "overlap": 0,
+            "velden": []
+          }
+        ]
+      },
+      "kop": {
+        "domeinen": 11,
+        "perKenmerk": [
+          {
+            "kenmerk": "id",
+            "domeinen": 11
+          },
+          {
+            "kenmerk": "tenant",
+            "domeinen": 2
+          },
+          {
+            "kenmerk": "eigenaar",
+            "domeinen": 4
+          },
+          {
+            "kenmerk": "rechten",
+            "domeinen": 2
+          },
+          {
+            "kenmerk": "classificatie",
+            "domeinen": 1
+          },
+          {
+            "kenmerk": "schema",
+            "domeinen": 3
+          },
+          {
+            "kenmerk": "inhoud",
+            "domeinen": 0
+          },
+          {
+            "kenmerk": "relaties",
+            "domeinen": 3
+          },
+          {
+            "kenmerk": "versie",
+            "domeinen": 1
+          },
+          {
+            "kenmerk": "historie",
+            "domeinen": 0
+          },
+          {
+            "kenmerk": "audit",
+            "domeinen": 0
+          },
+          {
+            "kenmerk": "workflowstand",
+            "domeinen": 6
+          },
+          {
+            "kenmerk": "aiContext",
+            "domeinen": 0
+          },
+          {
+            "kenmerk": "bewaring",
+            "domeinen": 0
+          },
+          {
+            "kenmerk": "versleuteling",
+            "domeinen": 0
+          }
+        ],
+        "inAlleDomeinen": [
+          "id"
+        ],
+        "nergens": [
+          "inhoud",
+          "historie",
+          "audit",
+          "aiContext",
+          "bewaring",
+          "versleuteling"
+        ],
+        "alleenIn": {
+          "classificatie": "document",
+          "versie": "document"
+        },
+        "perDomein": {
+          "document": [
+            "classificatie",
+            "eigenaar",
+            "id",
+            "rechten",
+            "schema",
+            "versie",
+            "workflowstand"
+          ],
+          "taak": [
+            "eigenaar",
+            "id",
+            "relaties",
+            "workflowstand"
+          ],
+          "persoon": [
+            "id",
+            "rechten",
+            "schema",
+            "tenant",
+            "workflowstand"
+          ],
+          "bedrijf": [
+            "id",
+            "tenant"
+          ],
+          "besluit": [
+            "eigenaar",
+            "id",
+            "workflowstand"
+          ],
+          "handtekening": [
+            "eigenaar",
+            "id"
+          ],
+          "betaling": [
+            "id",
+            "relaties",
+            "schema"
+          ],
+          "boeking": [
+            "id"
+          ],
+          "afspraak": [
+            "id"
+          ],
+          "contract": [
+            "id",
+            "relaties",
+            "workflowstand"
+          ],
+          "workflow": [
+            "id",
+            "workflowstand"
+          ]
+        }
+      }
+    }
+  }
+}

@@ -41,6 +41,8 @@
    Gebruik: node scripts/magnaat-pomp.js */
 'use strict';
 const { kaart } = require('../server/kern/spellen/magnaat/kaart');
+// World rekent sinds ronde A2.1 in eurocenten; deze meter spreekt in euro's.
+const { naarCenten, uitCenten } = require('../server/kern/spellen/magnaat/centen');
 
 const maakMagnaat = () => require('../server/kern/spellen/magnaat/index')({
   save() {}, crypto: require('crypto'), codenaamVan: (h) => h, nudge() {}
@@ -59,7 +61,7 @@ function wereld() {
   const st = potje.staat;
   const k = kaart(st.stad);
   const kavel = (zone, n) => k.kavels.filter(x => x.zone === zone && !st.kavelBezet[x.id])[n || 0];
-  for (const h of spelers) st.geld[h] = 20000000;
+  for (const h of spelers) st.geld[h] = naarCenten(20000000);
   m.spel.zet(potje, 'a', { actie: 'open', kavel: kavel('terrein').id, sector: 'logistiek', omvang: 20, naam: 'Atlas' });
   m.spel.zet(potje, 'b', { actie: 'open', kavel: kavel('boulevard').id, sector: 'horeca', omvang: 40, naam: 'Zeezicht' });
   m.spel.zet(potje, 'c', { actie: 'open', kavel: kavel('centrum').id, sector: 'retail', omvang: 40, naam: 'Winkel' });
@@ -96,7 +98,7 @@ function totaal(w) {
      fout van deze meter, en hij kwam er meteen bij de eerste ronde uit. */
   const gebouwd = w.st.foundation.gedaan.reduce((n, g) =>
     n + ((PROJECTEN.find(x => x.id === g.id) || {}).kosten || 0), 0);
-  const pot = w.st.foundation.lokaal + w.st.foundation.centraal + gebouwd;
+  const pot = uitCenten(w.st.foundation.lokaal + w.st.foundation.centraal) + gebouwd;
   return { vermogen: Math.round(vermogen), pot: Math.round(pot), samen: Math.round(vermogen + pot) };
 }
 

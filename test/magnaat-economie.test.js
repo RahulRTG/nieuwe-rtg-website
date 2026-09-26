@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const maak = require('../server/kern/magnaat-economie');
+const maak = require('../server/kern/magnaat-oefeneconomie');
 
 function motor(motorklant) {
   const wereld = {};
@@ -19,7 +19,7 @@ test('de openingsbalans en iedere economische journaalpost zijn exact in balans'
   assert.equal(start.grootboek.controle.inBalans, true);
   const dag = economie.volgendeDag('econoom', 'balans-dag-1');
   assert.equal(dag.grootboek.controle.verschil, 0);
-  for (const post of wereld.economie.journaal) {
+  for (const post of economie._gebeurtenissen()) {
     assert.equal(post.debet, post.credit, post.omschrijving);
     assert.ok(Number.isInteger(post.debet));
     assert.ok(post.regels.length >= 2);

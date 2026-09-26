@@ -2,27 +2,27 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-09-26",
   "gemeten": {
-    "bestanden": 2360,
-    "domeinenTotaal": 643,
-    "koopbareVormen": 556,
-    "koopbareDomeinen": 116,
-    "envelopDrempel": 7,
-    "envelop": 46,
-    "veldenDomeineigen": 738,
-    "veldenNietEnvelop": 971,
-    "gelijkendeVormparen": 16,
+    "bestanden": 2439,
+    "domeinenTotaal": 655,
+    "koopbareVormen": 599,
+    "koopbareDomeinen": 120,
+    "envelopDrempel": 8,
+    "envelop": 42,
+    "veldenDomeineigen": 774,
+    "veldenNietEnvelop": 1036,
+    "gelijkendeVormparen": 17,
     "werkwoordenVolledig": 1,
     "werkwoordenOveral": 0,
-    "werkwoordCombinaties": 44,
+    "werkwoordCombinaties": 45,
     "wagenVormen": 33,
     "wagenVormenUniek": 30,
     "wagenDomeinen": 22,
-    "optellingen": 115,
-    "optelDomeinen": 58,
+    "optellingen": 118,
+    "optelDomeinen": 59,
     "optelCenten": 64,
     "optelEuro": 5,
     "optelGemengd": 0,
-    "optelOnbekend": 46
+    "optelOnbekend": 49
   },
   "envelop": [
     "aantal",
@@ -34,8 +34,6 @@
     "centen",
     "codenaam",
     "datum",
-    "doel",
-    "domein",
     "door",
     "id",
     "idem",
@@ -45,18 +43,16 @@
     "naam",
     "naar",
     "notitie",
-    "nr",
     "ok",
     "oms",
     "omschrijving",
-    "open",
     "opties",
     "pagina",
-    "paginas",
     "prijs",
     "reden",
     "ref",
     "regels",
+    "sleutel",
     "soort",
     "stand",
     "status",
@@ -68,18 +64,18 @@
     "uitleg",
     "valuta",
     "van",
+    "voorraad",
     "vraag",
-    "wat",
-    "zaak"
+    "wat"
   ],
   "perWerkwoord": {
-    "toon": 90,
-    "prijs": 37,
-    "beschikbaarheid": 52,
-    "reserveer": 27,
-    "bevestig": 56,
-    "lever": 20,
-    "annuleer": 30,
+    "toon": 92,
+    "prijs": 39,
+    "beschikbaarheid": 54,
+    "reserveer": 28,
+    "bevestig": 58,
+    "lever": 21,
+    "annuleer": 31,
     "retour": 8
   },
   "overalAanwezig": [],
@@ -128,6 +124,29 @@
         "lever": "maakUitgifte",
         "annuleer": "intrekkenKaal",
         "retour": "maakTeruggave"
+      },
+      "telt": 7
+    },
+    {
+      "domein": "kern/magnaat-leven",
+      "heeft": {
+        "toon": true,
+        "prijs": true,
+        "beschikbaarheid": true,
+        "reserveer": true,
+        "bevestig": true,
+        "lever": true,
+        "annuleer": true,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "beeld",
+        "prijs": "kostenPerSoort",
+        "beschikbaarheid": "oordeelOpen",
+        "reserveer": "geblokkeerd",
+        "bevestig": "akkoord",
+        "lever": "lever",
+        "annuleer": "betaalWatVervalt"
       },
       "telt": 7
     },
@@ -193,7 +212,7 @@
         "toon": "bankbeeld",
         "prijs": "afkoopsom",
         "beschikbaarheid": "capaciteit",
-        "reserveer": "onthoud",
+        "reserveer": "maakBoekhouding",
         "bevestig": "afkoopsom",
         "lever": "levering",
         "annuleer": "vervalMs"
@@ -810,7 +829,7 @@
       "telt": 4
     },
     {
-      "domein": "kern/magnaat-economie",
+      "domein": "kern/magnaat-economische-motor",
       "heeft": {
         "toon": true,
         "prijs": true,
@@ -825,7 +844,7 @@
         "toon": "overzicht",
         "prijs": "berekenMarkt",
         "beschikbaarheid": "koopVoorraad",
-        "bevestig": "boek"
+        "bevestig": "boekBedrijfsdag"
       },
       "telt": 4
     },
@@ -1046,6 +1065,25 @@
       "telt": 3
     },
     {
+      "domein": "kern/betaalwaarheid",
+      "heeft": {
+        "toon": true,
+        "prijs": false,
+        "beschikbaarheid": true,
+        "reserveer": false,
+        "bevestig": true,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "publiek",
+        "beschikbaarheid": "openstaand",
+        "bevestig": "boek"
+      },
+      "telt": 3
+    },
+    {
       "domein": "kern/bureau",
       "heeft": {
         "toon": true,
@@ -1137,6 +1175,25 @@
         "toon": "lijst",
         "beschikbaarheid": "verlopen",
         "annuleer": "annuleer"
+      },
+      "telt": 3
+    },
+    {
+      "domein": "kern/magnaat-grootboek",
+      "heeft": {
+        "toon": true,
+        "prijs": true,
+        "beschikbaarheid": false,
+        "reserveer": false,
+        "bevestig": true,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "zoek",
+        "prijs": "som",
+        "bevestig": "bevestig"
       },
       "telt": 3
     },
@@ -1268,24 +1325,6 @@
       "bewijs": {
         "toon": "beeld",
         "prijs": "prijsPP"
-      },
-      "telt": 2
-    },
-    {
-      "domein": "kern/betaalwaarheid",
-      "heeft": {
-        "toon": true,
-        "prijs": false,
-        "beschikbaarheid": false,
-        "reserveer": false,
-        "bevestig": true,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "publiek",
-        "bevestig": "boek"
       },
       "telt": 2
     },
@@ -2140,6 +2179,21 @@
       "telt": 0
     },
     {
+      "domein": "kern/magnaat-oefeneconomie",
+      "heeft": {
+        "toon": false,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": false,
+        "bevestig": false,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {},
+      "telt": 0
+    },
+    {
       "domein": "kern/move",
       "heeft": {
         "toon": false,
@@ -2216,6 +2270,21 @@
     },
     {
       "domein": "kern/webplatform-taal",
+      "heeft": {
+        "toon": false,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": false,
+        "bevestig": false,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {},
+      "telt": 0
+    },
+    {
+      "domein": "kern/werkbetaling",
       "heeft": {
         "toon": false,
         "prijs": false,
@@ -2333,6 +2402,23 @@
     },
     {
       "gelijkenis": 0.89,
+      "a": "server/kern/mall/demozaken.js",
+      "b": "server/kern/retail/vloer.js",
+      "domeinA": "kern/mall",
+      "domeinB": "kern/retail",
+      "gedeeld": [
+        "categorie",
+        "drop",
+        "foto",
+        "materiaal",
+        "price",
+        "publiekePrijs",
+        "sku",
+        "varianten"
+      ]
+    },
+    {
+      "gelijkenis": 0.89,
       "a": "server/kern/reisbureau-betaling.js",
       "b": "server/kern/reisbureau-geldrijen.js",
       "domeinA": "kern/reisbureau-betaling",
@@ -2418,27 +2504,10 @@
       "domeinB": "kern/zaakcommand",
       "gedeeld": [
         "collectie",
+        "domein",
         "meervoud",
-        "sleutel",
         "sub",
         "zoek"
-      ]
-    },
-    {
-      "gelijkenis": 0.8,
-      "a": "server/kern/mall/demozaken.js",
-      "b": "server/kern/retail/vloer.js",
-      "domeinA": "kern/mall",
-      "domeinB": "kern/retail",
-      "gedeeld": [
-        "categorie",
-        "drop",
-        "foto",
-        "materiaal",
-        "price",
-        "publiekePrijs",
-        "sku",
-        "varianten"
       ]
     },
     {
@@ -2469,6 +2538,22 @@
         "betaalwijze",
         "codename",
         "providerId"
+      ]
+    },
+    {
+      "gelijkenis": 0.64,
+      "a": "server/kern/magnaat-economische-motor/rust.js",
+      "b": "server/kern/magnaat-oefeneconomie.js",
+      "domeinA": "kern/magnaat-economische-motor",
+      "domeinB": "kern/magnaat-oefeneconomie",
+      "gedeeld": [
+        "basisProductiviteit",
+        "bestelling",
+        "kwaliteit",
+        "personeel",
+        "reputatie",
+        "trainingDag",
+        "vasteCapaciteit"
       ]
     },
     {
@@ -2633,6 +2718,15 @@
       ]
     },
     {
+      "domein": "kern/magnaat-leven",
+      "plekken": 3,
+      "waar": [
+        "server/kern/magnaat-leven/dag.js",
+        "server/kern/magnaat-leven/volgende.js",
+        "server/kern/magnaat-leven/weergave.js"
+      ]
+    },
+    {
       "domein": "kern/waarde",
       "plekken": 3,
       "waar": [
@@ -2735,14 +2829,6 @@
       "waar": [
         "server/kern/voorspel/index.js",
         "server/kern/voorspel/rekenen.js"
-      ]
-    },
-    {
-      "domein": "bedrijf",
-      "plekken": 2,
-      "waar": [
-        "server/bedrijf/beeld.js",
-        "server/bedrijf/klant.js"
       ]
     }
   ]

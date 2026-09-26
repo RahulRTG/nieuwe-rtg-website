@@ -25,7 +25,7 @@ module.exports = Object.assign({
     ['Bovenaan ligt je ledenpas: codenaam, lidnummer en een QR', 'Tik op een kaart voor het grote codescherm', 'Koop feestmunten, wissel ze in en voeg zelf kaarten toe'],
     'De zorgpas van de verzekeraar verschijnt hier vanzelf; wat je niet meer nodig hebt haal je er zo weer uit.'),
   '/apps/rtgid.html': G('RTG iD: jouw digitale identiteit; inloggen met je passkey, delen wat jij kiest.',
-    ['Voer de koppelcode van een dienst in en zie wie er aanklopt', 'Bevestig of weiger; er wordt nooit meer gedeeld dan gevraagd', 'Bekijk je inzagelog en trek toegang of machtigingen in'],
+    ['Voer de koppelcode van een dienst in en zie wie er aanklopt', 'Bevestig of weiger; er wordt nooit meer gedeeld dan gevraagd', 'Machtig iemand om namens je in te loggen; wat openstaat en wie keek, zie je in Wie heeft toegang tot mij'],
     'Een dienst die alleen "18 of ouder" hoeft te weten, krijgt precies dat bewijs; je geboortedatum blijft in de kluis.'),
   '/apps/verificatie.html': G('Identiteit aantonen: laat RTG zien wie je bent, zodat je niveau A3 haalt.',
     ['Kies een foto van de voorkant van je identiteitsbewijs', 'Maak een selfie, zodat RTG kan zien dat het document bij je hoort', 'Volg de stand: in behandeling, geverifieerd of afgewezen'],

@@ -27,7 +27,7 @@ app.post('/api/supplier/ai', supplierAuth, async (req, res) => {
       aiBeschikbaar: stand.beschikbaar,
       modus: stand.beschikbaar ? stand.modus : 'workflow',
       verwerking: stand.verwerking,
-      kompas: stand.kompas }, extra || {});
+      kompas: stand.kompas, uitgevoerd: require('../../../ai-stand').uitgevoerd() }, extra || {});
     antwoord.liveTwin = maakLiveTwin({ vraag: q, context: req.body.context, wereld,
       actor: (req.actor && req.actor.name) || 'beheer', stand, gedaan: antwoord.did,
       goedkeuringen: antwoord.goedkeuringen });

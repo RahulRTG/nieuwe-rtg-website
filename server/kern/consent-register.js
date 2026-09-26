@@ -118,27 +118,8 @@ const LAGEN = [
     termijnUitleg: 'Een wachtlijst loopt tot u eraf gaat of tot er een plek is. Er staat geen datum op.' }
 ];
 
-/* Wat dit scherm NIET dekt, met reden. Deze regels gaan mee naar het scherm,
-   want een lezer hoort te weten waar de lijst ophoudt. */
-const NIET_GEDEKT = [
-  { naam: 'Wat u in De Salon of een genootschap plaatst',
-    reden: 'Dat is publiceren en geen toestemming: u haalt het weg bij de post zelf.' },
-  { naam: 'Uw veiligheidskring (Thuiswacht, Codewoord, Vitaal)',
-    reden: 'Die kring krijgt pas iets te zien als er een alarm afgaat; u beheert hem in de veiligheidsapps.' },
-  { naam: 'Uw noodkaart',
-    reden: 'Die toont u zelf op uw scherm. Er is geen route waarmee een zaak, een kantoor of een hulpverlener hem opvraagt, dus er valt ook niets in te trekken.' },
-  { naam: 'Uw medicatieschema',
-    reden: 'Dat is uw eigen lijst. Niemand anders kan hem opvragen of aanpassen -- ook een behandelaar niet, want die schrijft voor in zijn eigen systeem.' },
-  { naam: 'Uw dagcheck-in en wat u daarbij opschreef',
-    reden: 'Daar valt niets te delen: die notities verlaten uw account niet, en er is geen knop die dat wel zou doen.' },
-  { naam: 'Uw gedachtenboek',
-    reden: 'Daar leest niemand in mee, ook geen model: er bestaat geen route die die tekst ergens anders heen stuurt, dus er valt niets in te trekken.' },
-  { naam: 'Een ID-/leeftijdscheck met het Zegel',
-    reden: 'Dat toont u zelf: de zaak scant uw Zegel en leert alleen het bewezen feit (18-plus, welke pas), nooit uw naam. Er blijft niets openstaan, dus er valt ook niets in te trekken.' },
-  { naam: 'Wat uw werkgever voor de loonadministratie opvraagt',
-    reden: 'Dat is een wettelijke plicht en geen toestemming die u geeft. U krijgt van elke opvraging bericht, en ze staat met reden in het inzagejournaal.' },
-  { naam: 'Wat een zaak van een boeking weet',
-    reden: 'Dat hoort bij de boeking en verdwijnt met de boeking; het is geen losse toestemming.' }
-];
+/* Wat dit scherm NIET dekt staat in ./consent-register-grens.js: een eigen
+   onderwerp (waar de lijst ophoudt), en dit bestand kwam over de 10 KB. */
+const { NIET_GEDEKT } = require('./consent-register-grens');
 
 module.exports = { LAGEN, NIET_GEDEKT };

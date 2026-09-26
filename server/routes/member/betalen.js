@@ -3,7 +3,7 @@
    met munten (crypto via een vergunninghoudende aanbieder, meteen omgezet naar
    euro) en facturen/jaaroverzichten als PDF. Gemount vanuit routes/member.js. */
 module.exports = (kern) => {
-  const { app, auth, db, save, accounts, memberTemplate, betaal, fonds, factuur, broadcastSync, stateFor,
+  const { app, auth, db, accounts, memberTemplate, betaal, betaalWaarheid, fonds, factuur, broadcastSync, stateFor,
           liveCodename } = kern;
   const { principalVoorSession } = require('../../kern/economie/principal');
 
@@ -40,60 +40,38 @@ module.exports = (kern) => {
       if (inv.status === 'paid') return res.status(409).json({ error: 'Deze factuur is al betaald.' });
       targets = [inv];
     }
-    // De afschrijving loopt via de betaalprovider met een idempotentiesleutel per
-    // factuur: twee keer op "betaal" tikken of een netwerk-herhaling schrijft nooit
-    // dubbel af. In demo-stand bevestigt de provider direct ('betaald'); met een
-    // echte Stripe-sleutel komt de definitieve bevestiging via de webhook, en
-    // markeren we hier nog niets als betaald.
+    /* VIA DE BETAALWAARHEID (MONEY-012). Per factuur een betaling met een vaste
+       sleutel, vastgelegd VOOR de aanroep; de afwikkeling (betaald zetten, de
+       30%-afdracht, de reisonderdelen) loopt via kern/betaalwaarheid/inkomend.js
+       door settleFactuur, of de provider nu meteen bevestigt of later via de
+       webhook of de veegronde. Hier stond een kale betaal.maakBetaling met een
+       wachtende rij in kaartWachtend: geen veegronde, een stille wis boven de
+       20.000 rijen, en bij een fout niets vastgelegd.
+
+       DE ROUTE SCHRIJFT DE LEDENSTAAT NIET MEER. getMemberState geeft een kopie;
+       de afwikkeling bewaart haar eigen verse kopie, en een save van de oude
+       kopie hier zou "betaald" weer overschrijven. */
+    if (!betaalWaarheid) return res.status(503).json({ error: 'De betaalwaarheid is niet aangesloten; er is niets afgeschreven.' });
     const wie = principalVoorSession(req.session);
-    let foundation = 0, provider = betaal.AANBIEDER, intents = [];
+    let foundation = 0;
+    const provider = betaal.AANBIEDER, intents = [];
     for (const inv of targets) {
-      let uitslag;
+      let w, uit;
       try {
-        uitslag = await betaal.maakBetaling({
-          bedrag: Math.max(1, Math.round((inv.bijdrage || 0) * 100)), // euro's -> centen
-          valuta: 'eur', referentie: String(inv.id),
-          idempotentieSleutel: wie + ':inv:' + inv.id,
-          omschrijving: 'RTG factuur ' + inv.id
-        });
-      } catch (e) { return res.status(502).json({ error: 'Betaling kon niet worden gestart.' }); }
-      const bevestigd = uitslag.status === 'betaald' || uitslag.status === 'succeeded';
-      if (bevestigd) {
-        inv.status = 'paid';
-        inv.date = 'Zojuist betaald';
-        inv.betaalId = uitslag.id;
-        // Vaste 30%-afdracht aan de RTFoundation: bij elke bevestigde maandbetaling
-        // splitsen we het foundation-deel meteen af en zetten het (zodra het IBAN
-        // bekend is) als uitbetaling weg. Boekingen dragen niets af; alleen
-        // abonnementen. fonds.boekAfdracht is idempotent per factuur.
-        if (fonds.isAbonnement(inv.desc)) {
-          foundation += fonds.aandeelEuro(inv.bijdrage);
-          try { await fonds.boekAfdracht({ invoiceId: inv.id, wie, bijdrage: inv.bijdrage, betaalId: uitslag.id, omschrijving: inv.desc }); }
-          catch (e) { /* afdracht mag de betaling nooit blokkeren; ledger vangt het later op */ }
-        }
-        for (const item of (md.trip ? md.trip.items : [])) {
-          if (item.invoiceId === inv.id) { item.status = 'paid'; item.label = 'Bevestigd'; }
-        }
-      } else {
-        /* De belofte "de webhook bevestigt" stond hier al, maar niets vertelde
-           die webhook WELKE factuur bij welk lid hoorde -- dus wikkelde hij nooit
-           iets af en werd in productie geen enkele factuur betaald. De context
-           gaat daarom lokaal in de boeken, op het betaal-id. Bewust lokaal en
-           niet als metadata bij de provider: een accountId hoort niet naar een
-           derde partij, ook niet als pseudoniem. */
-        db.data.kaartWachtend = db.data.kaartWachtend && typeof db.data.kaartWachtend === 'object' ? db.data.kaartWachtend : {};
-        db.data.kaartWachtend[uitslag.id] = {
-          soort: 'factuur', wie, invoiceId: inv.id,
-          own, accountId: own ? req.session.account.id : null, at: Date.now()
-        };
-        // een plafond, zodat een reeks afgebroken betalingen dit niet laat groeien
-        const sleutels = Object.keys(db.data.kaartWachtend);
-        if (sleutels.length > 20000) for (const k of sleutels.slice(0, sleutels.length - 20000)) delete db.data.kaartWachtend[k];
-        intents.push({ invoiceId: inv.id, clientSecret: uitslag.clientSecret, status: uitslag.status });
+        w = betaalWaarheid.maak({ actor: wie, idem: 'inv:' + inv.id, soort: 'factuur', bronRef: String(inv.id),
+          centen: Math.max(1, Math.round((inv.bijdrage || 0) * 100)), valuta: 'eur',
+          context: { invoiceId: inv.id, wie, own, accountId: own ? req.session.account.id : null } });
+        uit = await betaalWaarheid.begin(w.id, { omschrijving: 'RTG factuur ' + inv.id });
+      } catch (e) {
+        return res.status(502).json({ betalingId: w ? w.id : null,
+          error: w ? 'De betaling gaf geen uitsluitsel. Betaal niet opnieuw: RTG zoekt het na met dezelfde sleutel.'
+            : 'Betaling kon niet worden gestart.' });
       }
+      const r = betaalWaarheid.van(w.id);
+      if (r && r.afgehandeldAt) { if (fonds.isAbonnement(inv.desc)) foundation += fonds.aandeelEuro(inv.bijdrage); }
+      else intents.push({ invoiceId: inv.id, betalingId: w.id, status: r ? r.status : null,
+        clientSecret: (uit && uit.actie && uit.actie.clientSecret) || null });
     }
-    if (own) accounts.saveMemberState(req.session.account.id, md);
-    else save();
     // ander open scherm van hetzelfde lid meteen bijwerken
     broadcastSync([req.session.tier], 'payments');
     const antwoord = { ok: true, foundation, provider, state: stateFor(req.session, req.body.lang) };

@@ -1,9 +1,9 @@
 {
-  "catalogi": 1095,
-  "verschillendeNamen": 645,
-  "namenInMeerDomeinen": 125,
-  "woordenMetMeerBetekenissen": 107,
-  "betekenissenTotaal": 399,
+  "catalogi": 1140,
+  "verschillendeNamen": 683,
+  "namenInMeerDomeinen": 128,
+  "woordenMetMeerBetekenissen": 110,
+  "betekenissenTotaal": 408,
   "ergsteWoord": "SOORTEN",
   "ergsteAantal": 49,
   "dubbelingen": 33,
@@ -49,6 +49,7 @@
         "server/kern/fluister.js",
         "server/kern/huis.js",
         "server/kern/invoer-lezer.js",
+        "server/kern/magnaat-leven/regels-markt.js",
         "server/kern/socialegraaf/lijn.js",
         "server/kern/tijdlijn.js"
       ],
@@ -526,7 +527,7 @@
       ]
     }
   ],
-  "dubbelingenZonderNaam": 213,
+  "dubbelingenZonderNaam": 226,
   "dubbelingZonderNaamLijst": [
     {
       "overlap": 1,
@@ -772,6 +773,21 @@
       "overlap": 1,
       "a": "server/kern/kosten/factuurregel.js",
       "aNaam": "MAAND",
+      "b": "server/kern/magnaat-leven/regels-markt.js",
+      "bNaam": "MAANDEN",
+      "leden": 12,
+      "voorbeeld": [
+        "januari",
+        "februari",
+        "maart",
+        "april",
+        "mei"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/kern/kosten/factuurregel.js",
+      "aNaam": "MAAND",
       "b": "server/kern/socialegraaf/lijn.js",
       "bNaam": "MAANDEN",
       "leden": 12,
@@ -802,22 +818,7 @@
       "overlap": 1,
       "a": "server/kern/lid/facturen.js",
       "aNaam": "MAAND_NL",
-      "b": "server/kern/socialegraaf/lijn.js",
-      "bNaam": "MAANDEN",
-      "leden": 12,
-      "voorbeeld": [
-        "januari",
-        "februari",
-        "maart",
-        "april",
-        "mei"
-      ]
-    },
-    {
-      "overlap": 1,
-      "a": "server/kern/lid/facturen.js",
-      "aNaam": "MAAND_NL",
-      "b": "server/kern/tijdlijn.js",
+      "b": "server/kern/magnaat-leven/regels-markt.js",
       "bNaam": "MAANDEN",
       "leden": 12,
       "voorbeeld": [
@@ -1682,7 +1683,7 @@
           "bestanden": [
             "server/kern/betaalopdracht/status.js"
           ],
-          "leden": 5,
+          "leden": 6,
           "voorbeeld": [
             "GEBOEKT",
             "INGEDIEND",
@@ -1943,8 +1944,8 @@
     },
     {
       "naam": "VELDEN",
-      "domeinen": 9,
-      "betekenissen": 9,
+      "domeinen": 10,
+      "betekenissen": 10,
       "hoogsteOverlap": 0.09,
       "soort": "botsing",
       "waar": [
@@ -1970,6 +1971,18 @@
             "bestemming",
             "datum",
             "tot"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/beleidsmotor/index.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "eens",
+            "oneens",
+            "onbekend",
+            "gebruik"
           ]
         },
         {
@@ -2166,7 +2179,7 @@
       "naam": "BRONNEN",
       "domeinen": 8,
       "betekenissen": 8,
-      "hoogsteOverlap": 0,
+      "hoogsteOverlap": 0.05,
       "soort": "botsing",
       "waar": [
         {
@@ -2184,12 +2197,12 @@
           "bestanden": [
             "server/kern/dagcoach.js"
           ],
-          "leden": 6,
+          "leden": 8,
           "voorbeeld": [
+            "agenda",
+            "boeking",
             "medicijnen",
-            "zorg",
-            "verzorging",
-            "gewoonten"
+            "zorg"
           ]
         },
         {
@@ -3608,5 +3621,5 @@
       ]
     }
   ],
-  "bestanden": 3566
+  "bestanden": 3679
 }

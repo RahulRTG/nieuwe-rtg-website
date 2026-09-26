@@ -115,3 +115,24 @@ test('elk nieuw randbestand blijft klein en zelfstandig',()=>{
     assert.ok(fs.statSync(path.join(__dirname,'../public/shared',bestand)).size<10*1024,bestand);
   }
 });
+
+/* DE EDGE 1-VOUWSTAND IS WEG (EDGE.md, ronde 2). body.rtg-edge-fold was een
+   standmachine die alleen leefde als Edge 2 niet rendert, en in de laadwedloop
+   soms naast Edge 2 bleef hangen zonder zichtbaar effect. Een tweede menuklik
+   sluit nu de index en vouwt niets meer weg. Deze vormtoets houdt de terugkeer
+   tegen: de klasse komt in public/shared nergens meer voor, ook niet in een
+   stylesheet of in een lader die hem opruimt.
+   DE MUTATIE, nagetrokken: zet de toggle van de klasse terug in menu.onclick,
+   en deze toets zakt met het bestand erbij. */
+test('de Edge 1-vouwstand komt in public/shared niet meer voor',()=>{
+  const wortel=path.join(__dirname,'..','public','shared'),treffers=[];
+  const loop=map=>fs.readdirSync(map,{withFileTypes:true}).forEach(e=>{
+    const p=path.join(map,e.name);
+    if(e.isDirectory())loop(p);
+    else if(/\.(js|css|html)$/.test(e.name)&&fs.readFileSync(p,'utf8').includes('rtg-edge-fold'))treffers.push(path.relative(wortel,p));
+  });
+  loop(wortel);
+  assert.deepEqual(treffers,[],'rtg-edge-fold staat er weer in');
+  assert.match(kern,/menu\.onclick = function \(\) \{\s*if \(menu\.getAttribute\('aria-expanded'\) === 'true'\) sluitLagen\(\); else openIndex\(false\);\s*\};/,
+    'een menuklik opent of sluit de index, en doet verder niets');
+});

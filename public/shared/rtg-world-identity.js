@@ -2,7 +2,11 @@
    Een route krijgt precies een vaste menselijke context: Living, Travel,
    Work of Foundation. Core blijft de techniek die alle werelden ondersteunt,
    maar is geen vijfde zichtbare wereld. Toegang, data en gedrag blijven bij
-   het scherm zelf; dit manifest bepaalt alleen de vaste kamer en haar Edge. */
+   het scherm zelf; dit manifest bepaalt alleen de vaste kamer en haar Edge.
+   Waar MAPPEN (app-main, de enige wereldlijst) dezelfde route noemt, is dit
+   een afgeleide die daarmee moet kloppen en geen tweede eigenaar
+   (test/rtg-world-identity.test.js); de routes die alleen hier staan krijgen
+   van die toets geen tweede eigenaar erbij. */
 (function (g, fabriek) {
   'use strict';
   var api = fabriek();
@@ -20,14 +24,14 @@
   var MANIFEST = Object.freeze({
     living: routes('\
       agenda appstore-dossier attenties camera cellier cercle clips comm commerce entourage foodcourt \
-      foundation/vrienden garderobe geld krant leven lifestyle living-os maison mall media \
+      garderobe geld krant leven lifestyle living-os maison mall media \
       mijnmall muziek nieuws onderhoud pay podium pulse rendezvous rtg scherm sociaal spelen spelscherm sport table \
-      theater thuis uitgaan vandaag veilig verificatie vonk wereld wonen woningdossier \
+      theater thuis uitgaan veilig verificatie vonk wereld wonen woningdossier \
       app avond bestellen concierge doelen festival-gast festival galerij gast gedachten genootschap \
       gereedschap home ik isolatie juridisch juridisch/partnervoorwaarden juridisch/privacy \
       juridisch/voorwaarden klankwerk labpas life medicijnen meet memo mijn-gegevens mijn-isolatie \
       mijn-neigingen mijn-post mijn-relaties mijn-sessies notities oog passkeys rtgid salon scanner service-bel service \
-      sociaal-prive tijdlijn toestemming training vertaler voeding zaal'),
+      sociaal-prive tijdlijn training vertaler voeding zaal'),
     travel: routes('\
       arrival boeken chauffeur flits hangar hotels move navigatie ov reisboek reisbureau reizen-veilig reizen \
       residentie rit routedossier stad vluchten \
@@ -62,7 +66,7 @@
       foundation/registreren foundation/reis foundation/rust foundation/samen-thuis foundation/school foundation/schoolbieb \
       foundation/schrift foundation/schrijven foundation/societeit foundation/speelhal \
       foundation/speeltuin foundation/steun foundation/studie foundation/tellen foundation/toetsen \
-      foundation/veilig foundation/veilig-vertrouwd foundation/verhaaltje foundation/verjaardagen \
+      foundation/veilig foundation/veilig-vertrouwd foundation/verhaaltje foundation/verjaardagen foundation/vrienden \
       foundation/wegwijzer foundation/werk foundation/winkel foundation/zakgeld foundation/zorg \
       connect defensie gemeente gemeenteloket gemeentepda lab lesmaker livinglab overheid overheidspda \
       rechtbank rijksloket schoolpartner zorgbalie')
@@ -77,7 +81,7 @@
 
   var REDIRECTS = routes('\
     balans bank berichten codewoord geld-command labfonds logboek mecenaat metier nalatenschap rtgcode thuisrust \
-    thuiswacht vitaal wallet wbw');
+    thuiswacht toestemming vandaag vitaal wallet wbw');
   var ROUTES = Object.create(null);
   Object.keys(MANIFEST).forEach(function (wereld) {
     MANIFEST[wereld].forEach(function (pad) { ROUTES[pad] = wereld; });

@@ -74,6 +74,7 @@
   };
 
   function veld(h, v) {
+    if (v[2].indexOf('vast:') === 0) return ''; // een vaste waarde, geen invoer
     var id = 'a_' + h + '_' + v[0];
     var breed = v[3] ? 'flex:0 1 ' + v[3] + ';' : '';
     if (v[2] === 'vink') return '<label class="stil"><input type="checkbox" id="' + id + '"> ' + K.esc(v[1]) + '</label>';
@@ -91,6 +92,7 @@
   function lees(h, velden) {
     var body = {};
     velden.forEach(function (v) {
+      if (v[2].indexOf('vast:') === 0) { body[v[0]] = v[2].slice(5); return; }
       var el = document.getElementById('a_' + h + '_' + v[0]);
       if (!el) return;
       if (v[2] === 'vink') { if (el.checked) body[v[0]] = true; return; }

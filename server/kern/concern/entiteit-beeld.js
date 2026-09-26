@@ -56,7 +56,9 @@ module.exports = (ctx) => {
         register: (r.extra || {}).register || null, van: r.van, tot: r.tot, bron: r.bron })),
       fiscaal: (f.fiscaal || []).map(x => ({ soort: x.sleutel, waarde: x.waarde, bron: x.bron })),
       bestuurders: (f.bestuurder || []).map(x => ({
-        wie: x.sleutel, rol: x.waarde, van: x.van, tot: x.tot,
+        wie: x.sleutel, rol: x.waarde, van: x.van, tot: x.tot, feit: x.id,
+        /* codenaam, extern of een oude vrije naam (./duiding.js): alleen de eerste telt voor een tekengrens. */
+        persoon: (x.extra || {}).extern === false ? 'codenaam' : (x.extra || {}).extern === true ? 'extern' : 'vrij',
         bevoegd: (x.extra || {}).bevoegd || null, tekenlimiet: (x.extra || {}).tekenlimiet ?? null, bron: x.bron })),
       aandeelhouders: (f.aandeelhouder || []).map(x => ({
         wie: x.sleutel, percentage: Number(x.waarde) || 0,

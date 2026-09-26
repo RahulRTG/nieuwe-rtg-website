@@ -35,7 +35,8 @@ module.exports = (ctx) => {
       if (m.wifi && m.wifi !== 'uit') detail += ', wifi: ' + m.wifi;
       const acties = status === 'groen' ? ['hulp'] : ['reset', 'hulp'];
       if (doel && doel.versie && m.versie && m.versie !== doel.versie) acties.push('update');
-      items.push({ id: 'doos:' + naam, naam, soort: 'doos', plek: m.plek || null, status, detail, acties });
+      // bewezen: de naam komt uit het register van eigen sleutels (fase 7) en is geen zelfopgave
+      items.push({ id: 'doos:' + naam, naam, soort: 'doos', plek: m.plek || null, status, detail, acties, bewezen: !!m.bewezen });
     }
     for (const g of functies.catalogus(functiesStand())) for (const f of g.functies) {
       if (f.storing) items.push({ id: 'functie:' + f.id, naam: f.naam, soort: 'functie', plek: null, status: 'rood', detail: 'storing gemeld: ' + String(f.storing).slice(0, 80), acties: ['reset'] });

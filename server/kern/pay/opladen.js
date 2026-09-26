@@ -6,8 +6,9 @@
    NIETS aan de boekingsregels. */
 function maakOpladen(basis) {
   const { betaal, metIdem, boekAsync, rekLid, saldoVan, nu, d, save,
-    motorklant, geldModus, keyVanCodenaam, plafondFout,
+    motorklant, geldModus, keyVanCodenaam, plafondFout, betaalWaarheid,
     OPLAAD_MIN, MAX_CENTEN, AUTOLAAD_STAP } = basis;
+  const { randomUUID } = require('crypto');
 
   /* ---------- opladen (Apple Pay / kaart via de betaal-naad) ---------- */
   async function laadOp({ codenaam, centen, idem, oms, userId, interneStap }) {
@@ -25,46 +26,28 @@ function maakOpladen(basis) {
     if (vol) return vol;
     // `interneStap`: stap binnen een andere handeling (zie zorgSaldo), nooit van buiten.
     return metIdem(idem ? 'oplaad:' + codenaam + ':' + idem : null, 'oplaad|' + codenaam + '|' + c, async () => {
-      let betaling;
+      /* VIA DE BETAALWAARHEID (MONEY-012); waarom, staat in ./oplaadwaarheid.js.
+         Zonder `idem` krijgt de poging een eigen sleutel: een tweede tik is dan
+         een tweede betaling, maar een verloren antwoord raakt niet meer zoek. */
+      if (!betaalWaarheid) return { status: 503, error: 'De betaalwaarheid is niet aangesloten; er is niets afgeschreven.' };
+      let w;
       try {
-        betaling = await betaal.maakBetaling({
-          bedrag: c, referentie: 'pay-oplaad-' + codenaam + '-' + nu(),
-          idempotentieSleutel: idem ? 'pay-oplaad:' + codenaam + ':' + idem : undefined,
-          omschrijving: oms || 'RTG Pay opladen'
-        });
-      } catch (e) { return { status: 502, error: 'De betaling lukte niet: ' + e.message }; }
-      if (betaling.status !== 'betaald' && betaling.status !== 'succeeded') {
-        /* "De webhook crediteert daarna" -- dat stond hier, en het was niet waar.
-           Niets vertelde die webhook WELKE oplading bij welk lid hoorde: hij kijkt
-           in db.data.kaartWachtend, en daar kwam alleen een FACTUUR in te staan
-           (routes/member/betalen.js). Een oplading stond er nergens, dus vond de
-           webhook niets, logde "zonder wachtende betaling" en deed niets.
-
-           Het gevolg bij een echte aanbieder: de kaart van het lid werd wel
-           afgeschreven en zijn wallet nooit bijgeschreven. De aanroeper kreeg
-           een nette 402 "wacht op bevestiging" en die bevestiging kwam nooit aan.
-           In demostand viel het niet op, want daar is de betaling meteen betaald
-           en loopt de code hier niet langs -- precies dezelfde blinde vlek die
-           kern/settlement.js in zijn kop beschrijft voor de facturen.
-
-           De context gaat lokaal in de boeken, op het betaal-id. Bewust lokaal
-           en niet als metadata bij de provider: een codenaam hoort niet naar een
-           derde partij, ook niet als pseudoniem. */
-        try {
-          d().kaartWachtend = d().kaartWachtend && typeof d().kaartWachtend === 'object' ? d().kaartWachtend : {};
-          /* userId gaat mee zodat de webhook straks het BETALER-IBAN kan
-             bevestigen bij de juiste persoon (kern/settlement.js). Het IBAN zelf
-             komt nooit hier terecht -- dat woont in de identiteitskluis en niet
-             in db.data, waar deze rij staat. */
-          d().kaartWachtend[betaling.id] = { soort: 'oplaad', codenaam, userId: userId || null, centen: c, oms: oms || 'Opladen', at: Date.now() };
-          // hetzelfde plafond als bij de facturen, zodat afgebroken betalingen dit niet laten groeien
-          const sleutels = Object.keys(d().kaartWachtend);
-          if (sleutels.length > 20000) for (const k of sleutels.slice(0, sleutels.length - 20000)) delete d().kaartWachtend[k];
-          save();
-        } catch (e) { /* de registratie mag de betaling niet omgooien */ }
-        return { status: 402, error: 'De betaling wacht op bevestiging.', betaalStatus: betaling.status };
+        w = betaalWaarheid.maak({ actor: 'pay:' + codenaam, soort: 'pay-oplaad', bronRef: codenaam,
+          idem: 'pay-oplaad:' + codenaam + ':' + (idem ? String(idem) : 'los:' + randomUUID()),
+          centen: c, valuta: 'eur', context: { codenaam, userId: userId || null, oms: oms || 'Opladen' } });
+      } catch (e) { return { status: 409, error: e.message }; }
+      let uit;
+      try { uit = await betaalWaarheid.begin(w.id, { omschrijving: oms || 'RTG Pay opladen' }); }
+      catch (e) {
+        if (e && e.code === 'BETAAL_AFHANDELING_MISLUKT')
+          return { status: 502, betalingId: w.id, error: 'De betaling is bevestigd maar nog niet bijgeschreven; dat gebeurt vanzelf.' };
+        return { status: 502, betalingId: w.id, onbekend: true,
+          error: 'De betaling gaf geen uitsluitsel. Betaal niet opnieuw: RTG zoekt het na met dezelfde sleutel.' };
       }
-      return oplaadAfronden({ codenaam, centen: c, oms, ref: betaling.id });
+      const r = betaalWaarheid.van(w.id);
+      if (r && r.afgehandeldAt) return { ok: true, saldo: saldoVan(rekLid(codenaam)), geladen: c, betalingId: w.id };
+      return { status: 402, error: 'De betaling wacht op bevestiging.', betalingId: w.id,
+        betaalStatus: (r && r.providerStatus) || (uit && uit.betaling && uit.betaling.status) || null };
     }, interneStap ? null : { geld: 'laadt de wallet op, met transactiekosten op dat moment' });
   }
 
@@ -73,10 +56,10 @@ function maakOpladen(basis) {
      bevestigt, kern/settlement.js). Die tweede weg bestond niet en daar ging
      het geld verloren. Een tweede boekingsregel ernaast zou hetzelfde soort
      fout zijn: twee bronnen die ooit uit de pas lopen. Dus een. */
-  async function oplaadAfronden({ codenaam, centen, oms, ref }) {
+  async function oplaadAfronden({ codenaam, centen, oms, ref, economischeSleutel }) {
     const c = Math.round(Number(centen));
     if (!Number.isFinite(c) || c <= 0) return { status: 400, error: 'Geen geldig bedrag om bij te schrijven.' };
-    const b = await boekAsync({ van: 'extern:oplaad', naar: rekLid(codenaam), centen: c, soort: 'oplaad', oms: oms || 'Opladen', ref });
+    const b = await boekAsync({ van: 'extern:oplaad', naar: rekLid(codenaam), centen: c, soort: 'oplaad', oms: oms || 'Opladen', ref, economischeSleutel });
     if (b.error) return b;
     /* DE TRANSACTIEKOSTEN, op het OPLAADMOMENT. Dat is niet toevallig de plek:
        WAARDE.md par. 1 zegt het al met zoveel woorden -- transactiekosten
@@ -92,6 +75,9 @@ function maakOpladen(basis) {
     }
     return { ok: true, saldo: saldoVan(rekLid(codenaam)), geladen: c };
   }
+
+  // de enige bijschrijving van een bevestigde oplading, precies een keer: ./oplaadwaarheid.js
+  require('./oplaadwaarheid')({ betaalWaarheid, oplaadAfronden, nu });
 
   /* De kostprijslaag hangt hier LAAT aan: kern/kosten wordt na kern/pay gebouwd,
      en pay hoeft niets van de kosten te weten om te bestaan (zelfde draadje als

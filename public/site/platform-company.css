@@ -1,6 +1,6 @@
 /* Company stories inhabit the native app grid, widget frame and Edge. */
 body[data-public-platform="company"]{--wd-line:rgba(219,189,141,.27);background:#100e0b!important}
-body[data-public-platform="company"]::before{content:"";position:absolute;inset:0 0 auto;height:24rem;background:linear-gradient(180deg,rgba(16,14,11,.58),#100e0b),url('../images/world-homes/travel.webp') center 40%/cover;pointer-events:none}
+body[data-public-platform="company"]::before{content:"";position:absolute;inset:0 0 auto;height:24rem;background:linear-gradient(180deg,rgba(16,14,11,.58),#100e0b),linear-gradient(125deg,#372016,#101817 60%,#090b0c) center 40%/cover;pointer-events:none}
 body[data-public-platform="company"] .pp-header{background:transparent!important}
 body[data-public-platform="company"] .pp-shell{position:relative}
 body[data-public-platform="company"] .pp-profile{border-color:var(--wh-gold)}
@@ -29,6 +29,12 @@ body[data-public-platform="company"] .wd-widget.pc-widget{display:block;position
 .pc-meaning{position:relative;min-height:155px;display:flex;flex-direction:column;justify-content:end;padding:1rem;border-radius:var(--rtg-radius-editorial);overflow:hidden;background:linear-gradient(145deg,#30251d,#191612)}
 .pc-meaning::before{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(135deg,transparent 0 32px,rgba(208,182,110,.1) 33px,transparent 34px)}
 .pc-step-number{font:400 3.6rem/1 "Bodoni Moda",serif;color:var(--wh-gold);margin-bottom:.4rem}
+.pc-world-mark{display:grid;place-items:center;min-height:120px;color:#ebcc94;background:radial-gradient(ellipse at center,#6a503526,transparent 72%);margin-bottom:.5rem}
+.pc-world-mark[data-world="travel"]{color:#ddb5ad;background:radial-gradient(ellipse at center,#a82c5130,transparent 72%)}
+.pc-world-mark[data-world="work"]{color:#c8bda9;background:radial-gradient(ellipse at center,#75b8b125,transparent 72%)}
+.pc-world-mark[data-world="foundation"]{color:#b9c9ee;background:radial-gradient(ellipse at center,#3d68c92a,transparent 72%)}
+.pc-world-mark .wd-icon{width:52px;height:52px}
+.wd-favorites .pc-world-mark{min-height:64px;margin:0}
 .pc-meaning .wd-muted{margin:.5rem 0 0}
 .pc-language-art{display:flex;gap:1.8rem;align-items:center;justify-content:center;min-height:125px;background:radial-gradient(ellipse,rgba(154,53,78,.16),transparent 70%);color:var(--wh-gold);font:400 2.6rem/1.4 "Bodoni Moda",serif}
 .pc-intent{font:400 1.45rem/1.4 "Bodoni Moda",serif;margin:0 0 .35rem;text-align:center;color:var(--wh-ink)}
@@ -125,7 +131,7 @@ body[data-public-platform="company"]::before{
  background:
   linear-gradient(180deg,rgba(13,12,10,.22),var(--company-bg) 92%),
   linear-gradient(90deg,rgba(13,12,10,.46),transparent 48%,rgba(13,12,10,.34)),
-  url('../images/world-homes/travel.webp') center 42%/cover;
+  linear-gradient(125deg,#372016,#101817 60%,#090b0c) center 42%/cover;
 }
 body[data-public-platform="company"][data-company-page]:not([data-company-page="home"])::before{
  height:18rem;

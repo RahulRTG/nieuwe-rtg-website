@@ -41,6 +41,11 @@ const { zonderCommentaar } = require('../scripts/lib/bron.js');
    laat deze toets zakken. */
 const BUITEN = {
   'BEWIJSSCHULD.json': 'een schuldenlijst die met de hand wordt bijgehouden en per post een sluitweg draagt; geen meetronde',
+  /* Sinds 24 september 2026 noemt scripts/appwerkt.js deze naam, en daarom ziet
+     de detectie hierboven hem als SCHRIJVER. Hij LEEST hem alleen: het register
+     is de schermidentiteit (capability, rol, doelgroep) waarop bereikbaar zijn
+     bestemming beoordeelt (scripts/lib/bestemming.js). */
+  'SCHERMEIGENAAR.json': 'een oordeelregister dat een mens bijhoudt (capability, rol en doelgroep per scherm), bewaakt door test/schermeigenaar.test.js tegen een verse meting; scripts/appwerkt.js leest hem en schrijft hem niet',
   /* Het oordeel van een mens die de taal spreekt. Een machine kan het niet
      opnieuw draaien en het veroudert ook niet: wat een spreker in september zag,
      zag hij. Wat wel kan verlopen is de DEKKING ervan -- verandert de tabel na
@@ -49,6 +54,12 @@ const BUITEN = {
      werkelijk in de tabel staat. */
   'TAALOORDEEL.json': 'het oordeel van een mens die de taal spreekt; met de hand bijgehouden, geen meetronde -- de dekking ervan bewaakt test/taaloordeel.test.js',
   'NORM.json': 'de normtanden zelf -- hij IS de ratel en wordt door de ratels geschreven, niet door een meetronde',
+  /* De nulstand van de Magnaat-grondwet is met opzet OUD. Hij is de lat waar
+     test/magnaatgrondwet.test.js vers tegen meet; hem "verversen" is achteruit
+     mogen gaan zonder dat iemand het ziet (MAGNAAT.md par. 5). Veroudering is
+     hier dus geen signaal maar de bedoeling, en een versheidsmelding zou juist
+     aanzetten tot het verkeerde commando. */
+  'MAGNAATGRONDWET.json': 'bevroren nulstand van de Magnaat-grondwet; opnieuw vastleggen is een constitutionele wijziging en geen verversing -- de verse meting doet test/magnaatgrondwet.test.js',
   'SUITEDUUR.json': 'een tijdmeting die bij elke testronde meeschrijft; SUITE.json draagt de stand die telt',
   'KRIMP.json': 'een historielijst die aangroeit; er is geen "huidige meting" om te verouderen',
   /* HIER STOND DAT HIJ MEELIFT OP MUTATIES.json, EN DAT WAS NIET WAAR. Die twee

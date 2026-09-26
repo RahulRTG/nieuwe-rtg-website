@@ -190,7 +190,7 @@
     if (!bron || !knoppen.length) { A.wisContext(); return; }
     A.context({ bron: bron, titel: titel(), acties: ordenen(bron, knoppen, stand),
       selectie: stand === 'selectie', staat: standen(knoppen),
-      rail: staat ? staat.rail() : [] });
+      rail: staat ? staat.rail() : [], object: staat ? staat.object() : null });
   }
 
   /* WANNEER MELDEN. Niet op een tijdklok maar op wat er echt gebeurt: een ander

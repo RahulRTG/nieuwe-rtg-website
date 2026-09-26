@@ -240,7 +240,7 @@ async function motorStatus() {
   //    via de gecontroleerde lokale terugval (nooit een half toegepaste dag).
   process.env.RTG_MAGNAAT_RUST = 'motor';
   process.env.RTG_MOTOR_REKEN_URL = URL;
-  const maakEconomie = require('../server/kern/magnaat-economie');
+  const maakEconomie = require('../server/kern/magnaat-oefeneconomie');
   const jsWereld = {}, rustWereld = {};
   const jsEconomie = maakEconomie({ wereldState: () => jsWereld, save() {}, motorklant: { aan: false } });
   const rustEconomie = maakEconomie({ wereldState: () => rustWereld, save() {} });

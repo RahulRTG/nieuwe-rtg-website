@@ -23,7 +23,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon } = require('./helper');
 const U = require('../server/kern/appstore/uitgevers');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-appstore-persoon-'));
@@ -138,8 +138,16 @@ test('7 - een mens van RTG laat toe, en daarna gaat het gratis wel', async () =>
   const toegankelijk = await api('/api/appstore/kantoor/toegankelijk',
     { versieId: r.body.versie.id, stand: 'in-orde', fouten: 0 }, office);
   assert.equal(toegankelijk.status, 200, JSON.stringify(toegankelijk.body));
-  const live = await api('/api/appstore/kantoor/besluit',
+  /* DE GEDEELDE CODE TEKENT HIER NIET AF (AUTHORITY.md B2). De inzender is een
+     sessiesleutel zonder naam, de gedeelde code een naam zonder sleutel: er is
+     niets om te vergelijken, dus niet vast te stellen dat het twee mensen zijn. */
+  const blind = await api('/api/appstore/kantoor/besluit',
     { versieId: r.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, office);
+  assert.equal(blind.status, 403, 'zonder identiteit aan een kant hoort het aftekenen dicht te zijn: ' + JSON.stringify(blind.body));
+  assert.equal(blind.body.code, 'geen-identiteit');
+  const opNaam = await kantoorAlsPersoon(base);
+  const live = await api('/api/appstore/kantoor/besluit',
+    { versieId: r.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, opNaam);
   assert.equal(live.status, 200, JSON.stringify(live.body));
 
   const dossier = await api('/api/appstore/persoon/dossier', { sleutel: 'van-een-mens' }, lid);

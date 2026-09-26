@@ -1,25 +1,25 @@
 {
   "stempel": {
-    "op": "2026-09-20T11:36:01.146Z",
-    "commit": "cea10ab1b",
+    "op": "2026-09-25T09:50:46.197Z",
+    "commit": "52d6801a",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/vindbaar.js",
-    "node": "v24.18.0"
+    "node": "v22.22.2"
   },
   "uitleg": "Per bestemming in de sprong: welk aandeel van de ONDERSCHEIDENDE woorden van dat scherm (woorden uit zijn koppen die op hooguit 3 bestemmingen voorkomen) er ook naartoe leidt in de zoekfilter van shared/sprong.js. Meet woorden, geen mensen: of iemand op het idee komt dat woord te typen, weet deze meter niet.",
   "vloer": 0.6,
   "drempel": 3,
   "bestemmingen": 99,
-  "woorden": 1201,
-  "gevonden": 777,
-  "dekking": 0.647,
+  "woorden": 1205,
+  "gevonden": 775,
+  "dekking": 0.6432,
   "perBestemming": [
     {
       "naam": "Magnaat",
       "url": "/apps/magnaat.html",
-      "woorden": 86,
-      "gevonden": 34,
+      "woorden": 83,
+      "gevonden": 35,
       "mist": [
         "werkvloer",
         "vraagt",
@@ -30,16 +30,17 @@
         "waarom",
         "werkte",
         "meegenomen",
+        "week",
+        "gebeurde",
+        "bedrijf",
         "instapt",
         "lobby",
         "partnerwereld",
-        "future",
         "alsof",
-        "functies",
         "dagdienst",
         "laden",
         "soleerd",
-        "functiehal",
+        "functies",
         "wereldkaart",
         "waarin",
         "oefenen",
@@ -58,21 +59,16 @@
         "laatste",
         "geldstromen",
         "opdracht",
-        "bedrijfstraining",
-        "bedrijfsteamkamer",
-        "bedrijf",
+        "strategie",
+        "vastleggen",
+        "testtaak",
+        "vorige",
         "blokkeer",
         "afronden",
         "vrije",
         "teamkamer",
         "oefen",
-        "solo",
-        "teamtraining",
-        "hervat",
-        "overdragen",
-        "pauzeer",
-        "kamer",
-        "trainingsronde"
+        "solo"
       ]
     },
     {
@@ -163,8 +159,8 @@
     {
       "naam": "Privekantoor",
       "url": "/apps/lifestyle.html",
-      "woorden": 35,
-      "gevonden": 21,
+      "woorden": 34,
+      "gevonden": 20,
       "mist": [
         "briefing",
         "zaak",
@@ -269,8 +265,8 @@
     {
       "naam": "Daten",
       "url": "/apps/vonk.html",
-      "woorden": 25,
-      "gevonden": 14,
+      "woorden": 24,
+      "gevonden": 13,
       "mist": [
         "bevestig",
         "genoeg",
@@ -286,10 +282,10 @@
       ]
     },
     {
-      "naam": "Ontdekken",
+      "naam": "Overzicht",
       "url": "/apps/rtg.html",
-      "woorden": 55,
-      "gevonden": 45,
+      "woorden": 56,
+      "gevonden": 46,
       "mist": [
         "documenten",
         "acties",
@@ -301,6 +297,24 @@
         "rechtstreeks",
         "tussen",
         "hangt"
+      ]
+    },
+    {
+      "naam": "Partner Network",
+      "url": "/apps/partner-network.html",
+      "woorden": 22,
+      "gevonden": 12,
+      "mist": [
+        "rustige",
+        "week",
+        "vier",
+        "viering",
+        "drukte",
+        "beloften",
+        "loopt",
+        "volgens",
+        "kyoto",
+        "consortium"
       ]
     },
     {
@@ -322,6 +336,39 @@
       ]
     },
     {
+      "naam": "Vandaag",
+      "url": "/apps/life.html",
+      "woorden": 16,
+      "gevonden": 7,
+      "mist": [
+        "ervoor",
+        "invullen",
+        "gewoonten",
+        "toestellen",
+        "werkt",
+        "komt",
+        "ritme",
+        "nemen",
+        "vertellen"
+      ]
+    },
+    {
+      "naam": "Logeren bij leden",
+      "url": "/apps/thuis.html",
+      "woorden": 20,
+      "gevonden": 12,
+      "mist": [
+        "regels",
+        "reviews",
+        "huisregels",
+        "zakelijk",
+        "boeken",
+        "rating",
+        "sterren",
+        "aantal"
+      ]
+    },
+    {
       "naam": "Sociaal",
       "url": "/apps/sociaal.html",
       "woorden": 10,
@@ -338,22 +385,6 @@
       ]
     },
     {
-      "naam": "Thuis",
-      "url": "/apps/thuis.html",
-      "woorden": 20,
-      "gevonden": 12,
-      "mist": [
-        "regels",
-        "reviews",
-        "huisregels",
-        "zakelijk",
-        "boeken",
-        "rating",
-        "sterren",
-        "aantal"
-      ]
-    },
-    {
       "naam": "Mijn team",
       "url": "/apps/vertegenwoordiging.html",
       "woorden": 11,
@@ -367,22 +398,6 @@
         "persoon",
         "zekerheid",
         "gewogen"
-      ]
-    },
-    {
-      "naam": "Partner Network",
-      "url": "/apps/partner-network.html",
-      "woorden": 22,
-      "gevonden": 14,
-      "mist": [
-        "rustige",
-        "week",
-        "vier",
-        "viering",
-        "drukte",
-        "beloften",
-        "loopt",
-        "volgens"
       ]
     },
     {
@@ -403,8 +418,8 @@
     {
       "naam": "Rendez-vous",
       "url": "/apps/rendezvous.html",
-      "woorden": 25,
-      "gevonden": 18,
+      "woorden": 24,
+      "gevonden": 17,
       "mist": [
         "intentie",
         "inhoud",
@@ -433,8 +448,8 @@
     {
       "naam": "RTG One",
       "url": "/apps/rtgone.html",
-      "woorden": 30,
-      "gevonden": 23,
+      "woorden": 28,
+      "gevonden": 21,
       "mist": [
         "geladen",
         "persoonlijke",
@@ -443,21 +458,6 @@
         "persoonlijk",
         "actieve",
         "werkstromen"
-      ]
-    },
-    {
-      "naam": "Website",
-      "url": "/apps/sitemaker.html",
-      "woorden": 21,
-      "gevonden": 14,
-      "mist": [
-        "blok",
-        "websites",
-        "eerdere",
-        "versies",
-        "begin",
-        "sjabloon",
-        "leden"
       ]
     },
     {
@@ -475,20 +475,6 @@
       ]
     },
     {
-      "naam": "Betalen",
-      "url": "/apps/pay.html",
-      "woorden": 18,
-      "gevonden": 12,
-      "mist": [
-        "tikken",
-        "sturen",
-        "ander",
-        "kassa",
-        "uitstaand",
-        "geschiedenis"
-      ]
-    },
-    {
       "naam": "Entourage",
       "url": "/apps/entourage.html",
       "woorden": 9,
@@ -503,6 +489,20 @@
       ]
     },
     {
+      "naam": "RTG Pay",
+      "url": "/apps/pay.html",
+      "woorden": 18,
+      "gevonden": 12,
+      "mist": [
+        "tikken",
+        "sturen",
+        "ander",
+        "kassa",
+        "uitstaand",
+        "geschiedenis"
+      ]
+    },
+    {
       "naam": "RTMail",
       "url": "/apps/rtmail.html",
       "woorden": 23,
@@ -514,6 +514,20 @@
         "namens",
         "onderwerp",
         "samenvatting"
+      ]
+    },
+    {
+      "naam": "Website",
+      "url": "/apps/sitemaker.html",
+      "woorden": 21,
+      "gevonden": 15,
+      "mist": [
+        "blok",
+        "websites",
+        "eerdere",
+        "versies",
+        "begin",
+        "sjabloon"
       ]
     },
     {
@@ -588,8 +602,8 @@
     {
       "naam": "Mijn leven",
       "url": "/apps/leven.html",
-      "woorden": 17,
-      "gevonden": 12,
+      "woorden": 14,
+      "gevonden": 9,
       "mist": [
         "noire",
         "salon",
@@ -752,6 +766,17 @@
       ]
     },
     {
+      "naam": "Wie heeft toegang tot mij",
+      "url": "/apps/mijn-relaties.html",
+      "woorden": 8,
+      "gevonden": 5,
+      "mist": [
+        "openstaat",
+        "gekeken",
+        "dekt"
+      ]
+    },
+    {
       "naam": "Loon",
       "url": "/apps/loonstrook.html",
       "woorden": 4,
@@ -794,16 +819,6 @@
       ]
     },
     {
-      "naam": "Vandaag",
-      "url": "/apps/vandaag.html",
-      "woorden": 4,
-      "gevonden": 2,
-      "mist": [
-        "vraagt",
-        "geregeld"
-      ]
-    },
-    {
       "naam": "Accountbescherming",
       "url": "/apps/mijn-isolatie.html",
       "woorden": 4,
@@ -841,16 +856,6 @@
       "mist": [
         "toont",
         "resultaat"
-      ]
-    },
-    {
-      "naam": "Web",
-      "url": "/apps/browser.html",
-      "woorden": 4,
-      "gevonden": 2,
-      "mist": [
-        "bestaat",
-        "leden"
       ]
     },
     {
@@ -901,7 +906,7 @@
       ]
     },
     {
-      "naam": "Vandaag",
+      "naam": "Pulse",
       "url": "/apps/pulse.html",
       "woorden": 5,
       "gevonden": 4,
@@ -928,6 +933,15 @@
       ]
     },
     {
+      "naam": "Web",
+      "url": "/apps/browser.html",
+      "woorden": 4,
+      "gevonden": 3,
+      "mist": [
+        "bestaat"
+      ]
+    },
+    {
       "naam": "Haal ik het?",
       "url": "/apps/move.html",
       "woorden": 3,
@@ -948,8 +962,8 @@
     {
       "naam": "OV-routes",
       "url": "/apps/ovroutes.html",
-      "woorden": 5,
-      "gevonden": 4,
+      "woorden": 4,
+      "gevonden": 3,
       "mist": [
         "lijnen"
       ]
@@ -1043,9 +1057,9 @@
     },
     {
       "naam": "Geld",
-      "url": "/apps/geld-command.html",
-      "woorden": 2,
-      "gevonden": 2,
+      "url": "/apps/geld.html",
+      "woorden": 0,
+      "gevonden": 0,
       "mist": []
     },
     {
@@ -1147,13 +1161,6 @@
       "mist": []
     },
     {
-      "naam": "Wie heeft toegang tot mij",
-      "url": "/apps/mijn-relaties.html",
-      "woorden": 2,
-      "gevonden": 2,
-      "mist": []
-    },
-    {
       "naam": "School",
       "url": "/apps/rtgschool.html",
       "woorden": 6,
@@ -1191,8 +1198,8 @@
     {
       "naam": "Klimaatfonds",
       "url": "/apps/foundation/klimaatfonds.html",
-      "woorden": 9,
-      "gevonden": 9,
+      "woorden": 8,
+      "gevonden": 8,
       "mist": []
     },
     {

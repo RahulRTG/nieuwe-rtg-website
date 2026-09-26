@@ -1,0 +1,690 @@
+{
+ "uitleg": "WORLD ECONOMIC GOLDEN BASELINE: Magnaat World NA ronde A2.1 (regelversie 2, hele eurocenten), per stap, gemaakt op ea4547f09. A2.2 t/m A2.9 moeten hier exact aan gelijk blijven.",
+ "regelversie": "2",
+ "commit": "ea4547f09",
+ "scenarios": {
+  "gewoon": {
+   "stappen": [
+    {
+     "stap": "start",
+     "hash": "4571cb151b92f1425282d07d"
+    },
+    {
+     "stap": 1,
+     "soort": "open",
+     "status": 200,
+     "hash": "f4a0816aef3ff762ae32039b",
+     "delen": {
+      "antwoord": "83da3365480514fcee6c199f",
+      "geld": "71b3313ab22f1af02df38712",
+      "rest": "60d75338e4e9647ec298103a"
+     }
+    },
+    {
+     "stap": 2,
+     "soort": "open",
+     "status": 200,
+     "hash": "15c28b50e76575aef21a9838",
+     "delen": {
+      "antwoord": "aad6ad6634810dc07ddf23f4",
+      "geld": "178458b7dc8b5cab5fb8043a",
+      "rest": "6bdf099237914e47f52dd1bd"
+     }
+    },
+    {
+     "stap": 3,
+     "soort": "open",
+     "status": 200,
+     "hash": "9f69a3f2b0214686e6277347",
+     "delen": {
+      "antwoord": "5217e5c1c79fe2858b6f2e69",
+      "geld": "05d8ebb8b5e5e2c9f4ec4514",
+      "rest": "9b911ab76be04c3dffd7ed0d"
+     }
+    },
+    {
+     "stap": 4,
+     "soort": "uitbreiden",
+     "status": 200,
+     "hash": "d9653eb9f513dadc26a51372",
+     "delen": {
+      "antwoord": "7d15bf8862d1bd2a9acf641d",
+      "geld": "c3146be97f17470d61fd9247",
+      "rest": "3be817953f5fe141fe5dcb98"
+     }
+    },
+    {
+     "stap": 5,
+     "soort": "beleid",
+     "status": 200,
+     "hash": "534fa6164d4b9429d5312e36",
+     "delen": {
+      "antwoord": "7d15bf8862d1bd2a9acf641d",
+      "geld": "e12b5fef5d4f515130ce72a1",
+      "rest": "c80178ebc96d2d8338a25467"
+     }
+    },
+    {
+     "stap": 6,
+     "soort": "contract-voorstel",
+     "status": 200,
+     "hash": "57f2a0efc86eb471ae880a51",
+     "delen": {
+      "antwoord": "bdef06cd7d2d046e0363c9ae",
+      "geld": "e12b5fef5d4f515130ce72a1",
+      "rest": "ad1eeb3cb2bec7bdae16af68"
+     }
+    },
+    {
+     "stap": 7,
+     "soort": "contract-antwoord",
+     "status": 200,
+     "hash": "4156b1bf051dc2b815c75ae1",
+     "delen": {
+      "antwoord": "7d15bf8862d1bd2a9acf641d",
+      "geld": "38f2e9f0fd95628663942583",
+      "rest": "e3b2f8ac52aaf5ab211aa503"
+     }
+    },
+    {
+     "stap": 8,
+     "soort": "contract-voorstel",
+     "status": 200,
+     "hash": "733c6fede3eea00de2ed63f5",
+     "delen": {
+      "antwoord": "a43fa2efc718d932ddbacae0",
+      "geld": "38f2e9f0fd95628663942583",
+      "rest": "ae0c482df5fdc8ae0ca02478"
+     }
+    },
+    {
+     "stap": 9,
+     "soort": "contract-antwoord",
+     "status": 200,
+     "hash": "955639339ed26e10b5298f43",
+     "delen": {
+      "antwoord": "7d15bf8862d1bd2a9acf641d",
+      "geld": "38f2e9f0fd95628663942583",
+      "rest": "0ae563f26226b7ec79c997ed"
+     }
+    },
+    {
+     "stap": 10,
+     "soort": "belang-voorstel",
+     "status": 200,
+     "hash": "dd2697e090d4896da0d4cc31",
+     "delen": {
+      "antwoord": "1e7e6956da7934975aa66741",
+      "geld": "38f2e9f0fd95628663942583",
+      "rest": "cbeff5f9f88271c28c846469"
+     }
+    },
+    {
+     "stap": 11,
+     "soort": "belang-antwoord",
+     "status": 200,
+     "hash": "175561c03a8ca0cfed6d1333",
+     "delen": {
+      "antwoord": "7d15bf8862d1bd2a9acf641d",
+      "geld": "e74e6acb2af8020c17a1e39b",
+      "rest": "ea6ae343428d32e32b1c20fb"
+     }
+    },
+    {
+     "stap": 12,
+     "soort": "krediet-opnemen",
+     "status": 200,
+     "hash": "68552bb77b7c479aea52fddd",
+     "delen": {
+      "antwoord": "09433fdab4f24beb5025d937",
+      "geld": "33aaf795b9bd51af20913aaa",
+      "rest": "1cb4b4c6226d21e3fc34234f"
+     }
+    },
+    {
+     "stap": 13,
+     "soort": "krediet-aflossen",
+     "status": 200,
+     "hash": "622e18f9d039cfb06c5a4a7e",
+     "delen": {
+      "antwoord": "7d15bf8862d1bd2a9acf641d",
+      "geld": "8ee0d86f2b055e8d50ad7613",
+      "rest": "9d209472b07d101bd7cce515"
+     }
+    },
+    {
+     "stap": 14,
+     "soort": "krediet-opnemen",
+     "status": 200,
+     "hash": "d240bafb0a49d752900e2b3d",
+     "delen": {
+      "antwoord": "f29dba639ca4ca24b7aefcb7",
+      "geld": "c10404fb74f2d77197f342b6",
+      "rest": "007e64339aab9e492c6df026"
+     }
+    },
+    {
+     "stap": 15,
+     "soort": "krediet-herzien",
+     "status": 200,
+     "hash": "a13c301e1296e4dda7336aba",
+     "delen": {
+      "antwoord": "7d15bf8862d1bd2a9acf641d",
+      "geld": "c10404fb74f2d77197f342b6",
+      "rest": "007e64339aab9e492c6df026"
+     }
+    },
+    {
+     "stap": 16,
+     "soort": "polis-sluiten",
+     "status": 200,
+     "hash": "2f69fdf4e030825fd0d4aa33",
+     "delen": {
+      "antwoord": "5458fac5ed14aa1996a71612",
+      "geld": "c10404fb74f2d77197f342b6",
+      "rest": "9707c63a7e824c99652825ac"
+     }
+    },
+    {
+     "stap": 17,
+     "soort": "polis-sluiten",
+     "status": 200,
+     "hash": "7c6048e49def5ea8023b84f1",
+     "delen": {
+      "antwoord": "578499e4d8179b3b9cd5d1de",
+      "geld": "c10404fb74f2d77197f342b6",
+      "rest": "9d98c5f52251b4e6a4af453f"
+     }
+    },
+    {
+     "stap": 18,
+     "soort": "polis-sluiten",
+     "status": 200,
+     "hash": "8bac7377b9ab3c275bc6c180",
+     "delen": {
+      "antwoord": "7bb10a20068221f8d8b2aeeb",
+      "geld": "c10404fb74f2d77197f342b6",
+      "rest": "5fbaf946c4bc4101faf97d08"
+     }
+    },
+    {
+     "stap": 19,
+     "soort": "polis-sluiten",
+     "status": 200,
+     "hash": "26e469151167b656ec6d3fc4",
+     "delen": {
+      "antwoord": "0d8a00f45a2a06c9f9bc1da7",
+      "geld": "c10404fb74f2d77197f342b6",
+      "rest": "f4ec73656205e82f27bb5560"
+     }
+    },
+    {
+     "stap": 20,
+     "soort": "polis-sluiten",
+     "status": 200,
+     "hash": "c6c7b1b3f78338e442b55c55",
+     "delen": {
+      "antwoord": "38249d146172952c896a1196",
+      "geld": "c10404fb74f2d77197f342b6",
+      "rest": "edccfd1223ebea6a9639e8c0"
+     }
+    },
+    {
+     "stap": 21,
+     "soort": "polis-sluiten",
+     "status": 200,
+     "hash": "1ed94c411783951f130a1782",
+     "delen": {
+      "antwoord": "fa52a27c1648ca3cc41fefa6",
+      "geld": "c10404fb74f2d77197f342b6",
+      "rest": "d6f9d522f5d5e49d8099413a"
+     }
+    },
+    {
+     "stap": 22,
+     "soort": "maand",
+     "status": null,
+     "hash": "67085d1526b09c7056f24314",
+     "delen": {
+      "antwoord": "9fa8fc7e58a27699764b8f6f",
+      "geld": "06ea4ed8c37165d7d3593549",
+      "rest": "60d30fb929f061985797a140"
+     }
+    },
+    {
+     "stap": 23,
+     "soort": "contract-opzeggen",
+     "status": 200,
+     "hash": "5c8735203669598daddbc16b",
+     "delen": {
+      "antwoord": "7d15bf8862d1bd2a9acf641d",
+      "geld": "ce9a96e0005e36e9489369c1",
+      "rest": "69f57c01c1ff3fcd65b018e9"
+     }
+    },
+    {
+     "stap": 24,
+     "soort": "veiling-start",
+     "status": 200,
+     "hash": "ba4815f33d6cee421a3a769e",
+     "delen": {
+      "antwoord": "53cdf3d650ba6ff7109803e0",
+      "geld": "ce9a96e0005e36e9489369c1",
+      "rest": "d3b01586362ffcf4a1e51418"
+     }
+    },
+    {
+     "stap": 25,
+     "soort": "veiling-bod",
+     "status": 200,
+     "hash": "2b3c57d5812755596dacef3a",
+     "delen": {
+      "antwoord": "7d15bf8862d1bd2a9acf641d",
+      "geld": "ce9a96e0005e36e9489369c1",
+      "rest": "d3b01586362ffcf4a1e51418"
+     }
+    },
+    {
+     "stap": 26,
+     "soort": "veiling-start",
+     "status": 200,
+     "hash": "703aaeae906aa6aefc74ccfb",
+     "delen": {
+      "antwoord": "bf002252726f0dec2679dc84",
+      "geld": "ce9a96e0005e36e9489369c1",
+      "rest": "9df0763c8f83db7c8bd50936"
+     }
+    },
+    {
+     "stap": 27,
+     "soort": "veiling-bod",
+     "status": 200,
+     "hash": "4dff5cfcb43efdacdaa7c3b3",
+     "delen": {
+      "antwoord": "7d15bf8862d1bd2a9acf641d",
+      "geld": "ce9a96e0005e36e9489369c1",
+      "rest": "9df0763c8f83db7c8bd50936"
+     }
+    },
+    {
+     "stap": 28,
+     "soort": "maand",
+     "status": null,
+     "hash": "b74cea562a47c6678589c2bd",
+     "delen": {
+      "antwoord": "afcea0577e4d2ed657dcaa0d",
+      "geld": "be0d047e821e2f19ae84d49e",
+      "rest": "eeaceb23fb18bb7e3e4c3aea"
+     }
+    }
+   ],
+   "eind": {
+    "maand": 12,
+    "geld": {
+     "a": 14687247,
+     "b": 4988698,
+     "c": 906175
+    },
+    "foundation": {
+     "lokaal": 11918297,
+     "centraal": 8459146,
+     "gedaan": [
+      "speeltuin"
+     ]
+    },
+    "vestigingen": {
+     "a": [
+      {
+       "id": "v1",
+       "omvang": 12,
+       "personeel": 10,
+       "gebouwdVoor": 221040,
+       "omzetTotaal": 884100.8037020488,
+       "resultaatTotaal": 144906.49829527026
+      },
+      {
+       "id": "v3",
+       "omvang": 10,
+       "personeel": 1,
+       "gebouwdVoor": 24060,
+       "omzetTotaal": 93600,
+       "resultaatTotaal": 8740.8
+      }
+     ],
+     "b": [
+      {
+       "id": "v2",
+       "omvang": 10,
+       "personeel": 6,
+       "gebouwdVoor": 59030,
+       "omzetTotaal": 151200,
+       "resultaatTotaal": -85058.39999999998
+      }
+     ],
+     "c": []
+    },
+    "leningen": [
+     {
+      "id": "l1",
+      "speler": "a",
+      "status": "loopt",
+      "hoofdsom": 20000,
+      "restant": 1500000,
+      "betaaldRente": 287868,
+      "betaaldAflossing": 500000,
+      "opbrengst": null
+     },
+     {
+      "id": "l2",
+      "speler": "c",
+      "status": "afgelost",
+      "hoofdsom": 30000,
+      "restant": 0,
+      "betaaldRente": 362955,
+      "betaaldAflossing": 3000000,
+      "opbrengst": null
+     }
+    ],
+    "contracten": [
+     {
+      "id": "c1",
+      "status": "afgelopen",
+      "betaald": 3600000,
+      "ontvangen": 3600000,
+      "boetes": 280000,
+      "afkoop": null
+     },
+     {
+      "id": "c2",
+      "status": "afgekocht",
+      "betaald": 20000000,
+      "ontvangen": 20000000,
+      "boetes": 0,
+      "afkoop": 90000
+     }
+    ],
+    "deelnemingen": [
+     {
+      "id": "d1",
+      "status": "loopt",
+      "houder": "c",
+      "prijs": 15000,
+      "ontvangen": -1701168
+     }
+    ],
+    "polissen": [
+     {
+      "id": "p1",
+      "status": "loopt",
+      "betaald": 143448,
+      "uitgekeerd": 0
+     },
+     {
+      "id": "p2",
+      "status": "loopt",
+      "betaald": 537132,
+      "uitgekeerd": 0
+     },
+     {
+      "id": "p3",
+      "status": "loopt",
+      "betaald": 328723,
+      "uitgekeerd": 0
+     },
+     {
+      "id": "p4",
+      "status": "loopt",
+      "betaald": 242150,
+      "uitgekeerd": 1524432
+     },
+     {
+      "id": "p5",
+      "status": "loopt",
+      "betaald": 179329,
+      "uitgekeerd": 946255
+     },
+     {
+      "id": "p6",
+      "status": "loopt",
+      "betaald": 96862,
+      "uitgekeerd": 0
+     }
+    ],
+    "veilingen": [
+     {
+      "id": "a1",
+      "status": "gesloten",
+      "winnaar": "b",
+      "prijs": 40000
+     },
+     {
+      "id": "a2",
+      "status": "gesloten",
+      "winnaar": "a",
+      "prijs": 15000
+     }
+    ]
+   }
+  },
+  "crisis": {
+   "stappen": [
+    {
+     "stap": "start",
+     "hash": "4571cb151b92f1425282d07d"
+    },
+    {
+     "stap": 1,
+     "soort": "open",
+     "status": 200,
+     "hash": "f4a0816aef3ff762ae32039b",
+     "delen": {
+      "antwoord": "83da3365480514fcee6c199f",
+      "geld": "71b3313ab22f1af02df38712",
+      "rest": "60d75338e4e9647ec298103a"
+     }
+    },
+    {
+     "stap": 2,
+     "soort": "open",
+     "status": 200,
+     "hash": "15c28b50e76575aef21a9838",
+     "delen": {
+      "antwoord": "aad6ad6634810dc07ddf23f4",
+      "geld": "178458b7dc8b5cab5fb8043a",
+      "rest": "6bdf099237914e47f52dd1bd"
+     }
+    },
+    {
+     "stap": 3,
+     "soort": "open",
+     "status": 200,
+     "hash": "a46458c85807eca07c2ed32e",
+     "delen": {
+      "antwoord": "5217e5c1c79fe2858b6f2e69",
+      "geld": "8e1fef5f51bcc82052577e02",
+      "rest": "c9749f6375c146d60a60cdb9"
+     }
+    },
+    {
+     "stap": 4,
+     "soort": "contract-voorstel",
+     "status": 200,
+     "hash": "a22c297caba9a61bfb43d06b",
+     "delen": {
+      "antwoord": "bdef06cd7d2d046e0363c9ae",
+      "geld": "8e1fef5f51bcc82052577e02",
+      "rest": "a039755b5905bf763ce2a201"
+     }
+    },
+    {
+     "stap": 5,
+     "soort": "contract-antwoord",
+     "status": 200,
+     "hash": "19011ce38bca0c7058eafa5b",
+     "delen": {
+      "antwoord": "7d15bf8862d1bd2a9acf641d",
+      "geld": "8e1fef5f51bcc82052577e02",
+      "rest": "94c45eecc4b95e2b6d34febf"
+     }
+    },
+    {
+     "stap": 6,
+     "soort": "contract-voorstel",
+     "status": 200,
+     "hash": "a2c61f5242c7ef04953485b3",
+     "delen": {
+      "antwoord": "a43fa2efc718d932ddbacae0",
+      "geld": "8e1fef5f51bcc82052577e02",
+      "rest": "acbf11401946b4daa2da2e4d"
+     }
+    },
+    {
+     "stap": 7,
+     "soort": "contract-antwoord",
+     "status": 200,
+     "hash": "cdf9020a2b1c76ba23cb6b5f",
+     "delen": {
+      "antwoord": "7d15bf8862d1bd2a9acf641d",
+      "geld": "8e1fef5f51bcc82052577e02",
+      "rest": "222db5b38b2c1a134c07a6ee"
+     }
+    },
+    {
+     "stap": 8,
+     "soort": "krediet-opnemen",
+     "status": 200,
+     "hash": "ba9dfe08cff7ea450bebf52e",
+     "delen": {
+      "antwoord": "09433fdab4f24beb5025d937",
+      "geld": "1ed89e78b5361120e348f2fd",
+      "rest": "9e7af62f8ad42780c2bf041d"
+     }
+    },
+    {
+     "stap": 9,
+     "soort": "polis-sluiten",
+     "status": 200,
+     "hash": "b084714495f66e1276626cfe",
+     "delen": {
+      "antwoord": "5458fac5ed14aa1996a71612",
+      "geld": "1ed89e78b5361120e348f2fd",
+      "rest": "89b1657a66e292fe63621576"
+     }
+    },
+    {
+     "stap": 10,
+     "soort": "maand",
+     "status": null,
+     "hash": "ebd387fe537642f6afa1fbb8",
+     "delen": {
+      "antwoord": "8c30c91992e68216ddfaf100",
+      "geld": "4c77fd205368b6a156730b2e",
+      "rest": "553de9e8e42dba5fb19d5a34"
+     }
+    },
+    {
+     "stap": 11,
+     "soort": "sluiten",
+     "status": 200,
+     "hash": "ab4c5b000b6becc3302e9f8f",
+     "delen": {
+      "antwoord": "7d15bf8862d1bd2a9acf641d",
+      "geld": "1c3577e9c861c70085138734",
+      "rest": "84e53b4d47d9c554340594bb"
+     }
+    },
+    {
+     "stap": 12,
+     "soort": "beleid",
+     "status": 200,
+     "hash": "ec74980ec6ee5d92ed66d19c",
+     "delen": {
+      "antwoord": "7d15bf8862d1bd2a9acf641d",
+      "geld": "5880b6aa681ae2392794da0c",
+      "rest": "9d054ef25ffae97da9885555"
+     }
+    },
+    {
+     "stap": 13,
+     "soort": "maand",
+     "status": null,
+     "hash": "f5a2bd2ec9b995d5d4f42560",
+     "delen": {
+      "antwoord": "e32a0b2cdec0fd3d637ef3fa",
+      "geld": "c34eb36de3ceb07ee483645e",
+      "rest": "7b18541650025170abc8c409"
+     }
+    }
+   ],
+   "eind": {
+    "maand": 15,
+    "geld": {
+     "a": 13517186,
+     "b": -106547663,
+     "c": 25000000
+    },
+    "foundation": {
+     "lokaal": 12117585,
+     "centraal": 10558792,
+     "gedaan": [
+      "speeltuin"
+     ]
+    },
+    "vestigingen": {
+     "a": [
+      {
+       "id": "v1",
+       "omvang": 10,
+       "personeel": 10,
+       "gebouwdVoor": 184200,
+       "omzetTotaal": 899051.3993403965,
+       "resultaatTotaal": 66371.86759104594
+      }
+     ],
+     "b": [],
+     "c": []
+    },
+    "leningen": [
+     {
+      "id": "l1",
+      "speler": "b",
+      "status": "uitgewonnen",
+      "hoofdsom": 20000,
+      "restant": 0,
+      "betaaldRente": 260378,
+      "betaaldAflossing": 2000000,
+      "opbrengst": 2951500
+     }
+    ],
+    "contracten": [
+     {
+      "id": "c1",
+      "status": "afgekocht",
+      "betaald": 400000,
+      "ontvangen": 400000,
+      "boetes": 0,
+      "afkoop": 270000
+     },
+     {
+      "id": "c2",
+      "status": "afgelopen",
+      "betaald": 1600000,
+      "ontvangen": 1600000,
+      "boetes": 0,
+      "afkoop": 30000
+     }
+    ],
+    "deelnemingen": [],
+    "polissen": [
+     {
+      "id": "p1",
+      "status": "loopt",
+      "betaald": 83678,
+      "uitgekeerd": 0
+     }
+    ],
+    "veilingen": []
+   }
+  }
+ }
+}

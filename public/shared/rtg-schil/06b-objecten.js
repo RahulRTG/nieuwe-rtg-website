@@ -176,17 +176,10 @@
 
   /* Wat een app mag sturen, en wat er van gelezen wordt. Alles wordt gekapt:
      een verwijzing hoort klein te zijn, en een app die er een dossier in propt
-     krijgt hem afgekapt in plaats van dat de schil hem doorgeeft. */
+     krijgt hem afgekapt in plaats van dat de schil hem doorgeeft. De vorm
+     beslist ../objectverwijzing.js, die in werkruimte.html VOOR de schil laadt;
+     de schil pakt hem bij het laden, en zonder poort gaat er niets over. */
+  var objectpoort = w.RTGObjectverwijzing || null;
   function schoneVerwijzing(o) {
-    if (!o || !o.id) return null;
-    var velden = {};
-    var bron = o.velden && typeof o.velden === 'object' ? o.velden : {};
-    var namen = Object.keys(bron).slice(0, 8);
-    namen.forEach(function (n) { velden[String(n).slice(0, 24)] = String(bron[n] == null ? '' : bron[n]).slice(0, 120); });
-    return {
-      soort: String(o.soort || '').slice(0, 32),
-      id: String(o.id).slice(0, 64),
-      label: String(o.label || '').slice(0, 120),
-      velden: velden
-    };
+    return objectpoort ? objectpoort.verwijzing(o) : null;
   }

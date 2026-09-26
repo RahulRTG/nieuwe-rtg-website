@@ -184,6 +184,8 @@ const KAART = new Map([
   ['luchtzijdePoort', ['verfijner', null,
     'luchthaven of expliciet toegestane luchthavenzaak, binnen supplierAuth']],
 
+  ['geldPasskey', ['verfijner', null,
+    'passkeyceremonie van de tweede mens onder een geldhandeling, binnen kluisAuth (routes/kantoren/bank-passkey.js)']],
   // ---- lichaamssleutel: de sleutel staat in het verzoek, niet in de kop ----
   ['gastAuth', ['lichaamssleutel', null, 'herkent req.body.sleutel als tafelsessie']],
   ['gezinsPoort', ['lichaamssleutel', null, 'verifieerProfiel(req.body.code, req.body.token)']],

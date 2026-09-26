@@ -140,6 +140,17 @@
       ],
       "maxMs": 1500,
       "waarom": "Een leesroute die de database aanraakt. Antwoordt de voordeur wel maar deze niet, dan zit het onder de webserver."
+    },
+    {
+      "id": "grootboek",
+      "naam": "Het grootboek sluit",
+      "pad": "/api/pay/gezond",
+      "methode": "GET",
+      "verwacht": [
+        200
+      ],
+      "maxMs": 1000,
+      "waarom": "De enige reis die over JUISTHEID gaat en niet over beschikbaarheid: 200 als de som van alle saldi exact nul is en geen leden- of partnerrekening rood staat, 500 als dat niet zo is. De route bestond al en meldde zijn stand aan een bewaking die niet keek (BEWIJSLUS.md par. 8)."
     }
   ],
   "alarmen": {

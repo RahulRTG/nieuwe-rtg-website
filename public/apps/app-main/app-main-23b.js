@@ -27,8 +27,8 @@
        een wereld hangen zou een deur maken naar een tafel waar u niet zit. */
     mall:        { naam: 'Mall',          url: '/apps/mall.html' },
     mijnmall:    { naam: 'Mijn bestellingen', url: '/apps/mijnmall.html' },
-    pay:         { naam: 'Betalen',       url: '/apps/pay.html' },
-    huis:        { naam: 'Thuis',         url: '/apps/thuis.html' },
+    pay:         { naam: 'RTG Pay',       url: '/apps/pay.html' },
+    huis:        { naam: 'Logeren bij leden', url: '/apps/thuis.html' },
     uitgaan:     { naam: 'Uitgaan',       url: '/apps/uitgaan.html' },
     foodcourt:   { naam: 'Food Court',    url: '/apps/foodcourt.html' },
     spelavond:   { naam: 'Game Night',    url: '/apps/spelscherm.html' },
@@ -37,7 +37,7 @@
        (APPSTORE.md). Dat het nergens aan hing, maakte die belofte leeg. */
     appdossier:  { naam: 'App-dossier',   url: '/apps/appstore-dossier.html' },
     aankomst:    { naam: 'Aankomst',      url: '/apps/arrival.html' },
-    routedossier:{ naam: 'Routedossier',  url: '/apps/routedossier.html' },
+    routedossier:{ naam: 'Routedossier',  url: '/apps/routedossier.html', werkrol: 'kantoor' }, // zie app-main-24a3.js
     ovroutes:    { naam: 'OV-routes',     url: '/apps/ovroutes.html' },
     /* Foundation Connect (apps/connect.html): de ontdeklus. Hij heet op het
        scherm "Ontdekken" en niet "Connect" -- een wereldnaam hoort te klinken

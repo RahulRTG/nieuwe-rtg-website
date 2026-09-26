@@ -8,7 +8,7 @@
       if (!r.ok) throw new Error('catalog-unavailable'); return r.json();
     }).then(function (catalog) {
       var all = catalog.apps, apps = all.filter(function (a) { return a.worlds.includes(world) &&
-        (world !== 'foundation' || a.world === 'foundation' || a.url.includes('pas=foundation') || a.url === '/apps/foundation/vrienden.html'); });
+        (world !== 'foundation' || a.world === 'foundation' || a.url.includes('pas=foundation')); });
       var root = U.el('div', 'wd-shell'), people = U.label(U.el('aside', 'wd-people'), 'people');
       var favorites = U.label(U.el('aside', 'wd-favorites'), 'favorites'), surface = U.el('section', 'wd-focus');
       var library = U.label(U.el('section', 'wd-library'), 'library'), announcement = U.el('p', 'wd-announcement');
@@ -63,11 +63,12 @@
           var label = U.el('span', 'wd-world-label', { living: 'LivingOS', travel: 'TravelOS', work: 'WorkOS', foundation: 'FoundationOS' }[world]);
           label.translate = false; brand.appendChild(label);
         }
-        w.RTGAdaptiveEdge.registerAction({ id: 'home', label: U.value('overview'), run: function () {
-          if (frame.isOpen()) frame.collapse(); else { home.scrollIntoView({ block: 'start' }); }
-        } });
       }
-      edge(); d.addEventListener('rtg-edge-ready', edge);
+      edge();
+      // Home hangt aan window en niet aan het model van de Edge: dat begint bij elke start leeg.
+      w.addEventListener('rtg-edge-home', function (e) {
+        e.preventDefault(); if (frame.isOpen()) frame.collapse(); else { home.scrollIntoView({ block: 'start' }); }
+      });
       var watch = new MutationObserver(function () { if (d.body.dataset.rtgAdaptiveReady === 'true') { edge(); watch.disconnect(); } });
       if (d.body.dataset.rtgAdaptiveReady !== 'true') watch.observe(d.body, { attributes: true, attributeFilter: ['data-rtg-adaptive-ready'] });
       w.addEventListener('rtglang', function () { cards.refresh(); runtime.setState('workspace'); edge(); greet(); });

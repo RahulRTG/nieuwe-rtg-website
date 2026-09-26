@@ -6,11 +6,7 @@
    HET GAT DAT DIT VULT. De keten draait op GitHub tientallen poorten die
    niemand lokaal draait: de deltapoort, het verval, het wettenregister, de
    overleving, het gezag, de envelop, de ladder, de rolronde, de gluurronde.
-   Lokaal draait een mens `npm test` en `npm run check`, en de rest ziet hij
-   pas als het vinkje rood is -- twintig minuten later, op een machine waar hij
-   niet bij kan. Erger: een poort die er in de keten BIJ komt, komt lokaal
-   nooit vanzelf mee. De twee lijsten lopen uit elkaar zonder dat iemand het
-   merkt, en dat is precies de vorm van fout waar dit huis meters voor bouwt.
+   Een nieuwe ketenpoort moet vanzelf in de lokale inventaris verschijnen.
 
    DE AFLEIDING IS HET HELE PUNT. Er komt hier dus GEEN tweede lijst poorten
    naast .github/workflows/ te staan -- die zou binnen een maand achterlopen,
@@ -424,11 +420,12 @@ function poortenVanDoc(ws) {
   for (const jobId of Object.keys(jobs)) {
     const job = jobs[jobId] || {};
     const stappen = Array.isArray(job.steps) ? job.steps : [];
-    /* Twee eigenschappen van de JOB die elke poort erin raken. */
-    const artefact = stappen.some(s => s && typeof s.uses === 'string' && /download-artifact/.test(s.uses));
+    // Een latere download kan geen invoer van een eerdere stap zijn.
+    let artefact = false;
     const browser = stappen.some(s => s && typeof s.run === 'string' &&
       /browserinstall\.js|playwright\s+install/.test(s.run));
     for (const stap of stappen) {
+      if (stap && typeof stap.uses === 'string' && /download-artifact/.test(stap.uses)) artefact = true;
       if (!stap || typeof stap.run !== 'string') continue;
       for (const { opdracht, informatief } of opdrachtenUit(stap.run)) {
         const soort = soortVan(opdracht);
@@ -470,7 +467,7 @@ function oordeel(gat) {
   if (gat.doel && /^(?:scripts|server|test)\//.test(gat.doel) && !fs.existsSync(path.join(WORTEL, gat.doel)))
     return { lokaal: false, soortReden: 'doel-weg', reden: 'het doel ' + gat.doel + ' staat niet in deze werkboom' };
   if (gat.artefact)
-    return { lokaal: false, soortReden: 'artefact', reden: 'deze job leest een artefact uit een andere job van dezelfde run' };
+    return { lokaal: false, soortReden: 'artefact', reden: 'deze stap volgt op het ophalen van een artefact uit een andere job' };
   if (gat.geheim)
     return { lokaal: false, soortReden: 'geheim', reden: 'de stap krijgt een geheim uit de keten mee' };
   if (gat.ketenwaarde)

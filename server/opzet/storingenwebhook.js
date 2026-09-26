@@ -47,6 +47,8 @@ module.exports = function hangStoringenOp({ app, express, log, env = process.env
     next();
   }
   app.post('/api/webhooks/storingen', rem, leesMelding, storingenAuth, (req, res) => {
+    // storingenAuth heeft de handtekening al gezien; het werk draait als de aanbieder (fase 7)
+    require('../kern/dienstidentiteit').alsAanbieder('storingen', () => {
     const inhoud = inhoudVan(req.body), id = req.get('x-rtg-event-id');
     if (!inhoud) { noteer('invoer-geweigerd', req); return res.status(400).json({ ok: false, error: 'Ongeldige melding.' }); }
     try {
@@ -63,6 +65,7 @@ module.exports = function hangStoringenOp({ app, express, log, env = process.env
       noteer('opslag-mislukt', req, { eventId: id });
       res.set('Retry-After', '60').status(503).json({ ok: false, error: 'Melding niet opgeslagen; probeer opnieuw.' });
     }
+    });
   });
 };
 module.exports.inhoudVan = inhoudVan;

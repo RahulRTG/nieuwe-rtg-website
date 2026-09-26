@@ -1,6 +1,6 @@
 /* Zelfzorg, pijler 3: REPAREREN. Herstelt wat structureel kapot maar veilig te
    herstellen is: een kerncollectie die ontbreekt of het verkeerde type heeft
-   (daar crasht een lezer op), zekeringen die een nieuwe versie nog niet kent,
+   (alleen als hij ONTBREEKT; een verkeerd type wordt een advies), zekeringen die een nieuwe versie nog niet kent,
    en tellers die uit de pas lopen. De grens is hard: klantdata en geld worden
    nooit "gerepareerd" door de automaat; wat daar scheef zit wordt een advies
    met het grootboek ernaast, en een mens beslist. */
@@ -13,8 +13,17 @@ module.exports = (ctx) => {
 
   /* De kerncollecties die routes zonder eigen vangnet aanraken: bestaat er
      een niet of heeft hij het verkeerde type, dan crasht een lezer op
-     Object.keys/filter. Herstellen = het juiste lege type terugzetten; de
-     kapotte waarde gaat als bewijsstuk in het journaal-item mee. */
+     Object.keys/filter.
+
+     ONTBREEKT er een, dan wordt het lege type aangelegd: er gaat niets
+     verloren. Heeft hij het VERKEERDE TYPE, dan wordt hij NIET meer
+     teruggezet -- dat is een ADVIES voor een mens. Hier stond dat de kapotte
+     waarde "als bewijsstuk in het journaal-item mee" ging, en dat gebeurde
+     niet: orders en boekingen (klantdata) en kantoorAudit (een spoor) werden
+     op een knopdruk leeg gezet zonder dat de oude waarde ergens bleef, een
+     herstel zonder terugweg (BESTUUR.md 6.5; ARBEID.md par. 4 punt 9). Alleen
+     de eigen staat van deze module mag hij zelf terugzetten. */
+  const EIGEN = new Set(['zelfzorg']);
   const KERN = [
     ['orders', 'array'], ['boekingen', 'array'], ['snaps', 'array'], ['stories', 'array'],
     ['notifications', 'object'], ['kantoorChat', 'object'], ['kantoorAudit', 'array'],
@@ -31,9 +40,13 @@ module.exports = (ctx) => {
       if (v === undefined || v === null) {
         d()[naam] = soort === 'array' ? [] : {};
         reparaties.push({ wat: 'ontbrekende collectie "' + naam + '" aangelegd' });
-      } else if (!goed) {
+      } else if (!goed && EIGEN.has(naam)) {
         d()[naam] = soort === 'array' ? [] : {};
         reparaties.push({ wat: 'collectie "' + naam + '" had het verkeerde type (' + (Array.isArray(v) ? 'array' : typeof v) + ') en is teruggezet' });
+      } else if (!goed) {
+        adviezen.push({ ernst: 'hoog', tekst: 'De collectie "' + naam + '" heeft het verkeerde type (' +
+          (Array.isArray(v) ? 'array' : typeof v) + ' in plaats van ' + soort + '). Die wordt niet automatisch geleegd: ' +
+          'er kan klantdata of een spoor in staan. Herstel is mensenwerk, met een back-up erbij.', waar: 'techniekbord' });
       }
     }
 

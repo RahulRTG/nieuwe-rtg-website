@@ -27,6 +27,9 @@ const assert = require('node:assert/strict');
 
 const { kaart } = require('../server/kern/spellen/magnaat/kaart');
 const H = require('../server/kern/spellen/magnaat/handel');
+/* World rekent sinds ronde A2.1 in eurocenten; deze toetsen spreken in euro's
+   en zetten om waar ze een saldo zelf aanraken. */
+const { naarCenten, uitCenten: E } = require('../server/kern/spellen/magnaat/centen');
 
 const maakMagnaat = () => require('../server/kern/spellen/magnaat/index')({
   save() {}, crypto: require('crypto'), codenaamVan: (h) => 'CN-' + h, nudge() {}
@@ -39,7 +42,7 @@ function opstelling(spelers = ['anna', 'boris']) {
   const p = { id: 'p1', soort: 'magnaat', spelers, teams: spelers.map((_, i) => i), modus: 'vrij',
     status: 'bezig', beurt: 0, winnaar: null, variant: ECO };
   m.spel.init(p);
-  for (const h of spelers) p.staat.geld[h] = 5000000;
+  for (const h of spelers) p.staat.geld[h] = naarCenten(5000000);
   return { m, p, st: p.staat };
 }
 const maand = (m, p, n = 1) => {
@@ -129,13 +132,13 @@ test('een bod zonder dekking gaat naar de volgende bieder, en dat is zichtbaar',
   const v = m.eco.zet(p, 'anna', { actie: 'veiling-start', soort: 'kavel', kavel: kavelIn('boulevard').id, duur: 'kort' });
   m.eco.zet(p, 'boris', { actie: 'veiling-bod', id: v.id, bedrag: 4000000 });
   m.eco.zet(p, 'cato', { actie: 'veiling-bod', id: v.id, bedrag: 900000 });
-  st.geld.boris = 10000;   // boris heeft het niet meer
+  st.geld.boris = naarCenten(10000);   // boris heeft het niet meer
   maand(m, p, 2);
   const a = st.veilingen[0];
   assert.equal(a.winnaar, 'cato', 'de hoogste bieder kon niet betalen');
   assert.equal(a.prijs, 900000);
   assert.deepEqual(a.gemist, ['boris'], 'en wie niet kon betalen staat erbij');
-  assert.equal(Math.round(st.geld.boris), 10000, 'er is niets van hem afgeschreven');
+  assert.equal(Math.round(E(st.geld.boris)), 10000, 'er is niets van hem afgeschreven');
   // ook in het beeld van een derde: dit is publieke schande, geen geheim
   const beeld = m.eco.zicht(p, st, 'anna').veilingen[0];
   assert.equal(beeld.winnaar, 'CN-cato');
@@ -147,7 +150,7 @@ test('kan niemand betalen, dan gaat er niets over', () => {
   const kav = kavelIn('centrum');
   const v = m.eco.zet(p, 'anna', { actie: 'veiling-start', soort: 'kavel', kavel: kav.id, duur: 'kort' });
   m.eco.zet(p, 'boris', { actie: 'veiling-bod', id: v.id, bedrag: 4000000 });
-  st.geld.boris = 1000;
+  st.geld.boris = naarCenten(1000);
   maand(m, p, 2);
   assert.equal(st.veilingen[0].winnaar, null);
   assert.equal((st.kavelRecht || {})[kav.id], undefined, 'het kavel is gewoon weer vrij');
@@ -184,9 +187,9 @@ test('wie een vestiging koopt, koopt haar contracten erbij', () => {
   /* Cato had nog niets, dus zijn kas verandert door NIETS anders dan de koop --
      dat is de scherpe kant. Bij anna zitten er ook twee maanden bedrijfsvoering
      in, dus daar is de bewering ruimer. */
-  assert.equal(Math.round(voorCato - st.geld.cato), 400000, 'de koper betaalt precies zijn bod');
-  assert.ok(st.geld.anna - voorAnna > 380000, 'en de verkoper krijgt de opbrengst: ' +
-    Math.round(st.geld.anna - voorAnna));
+  assert.equal(Math.round(E(voorCato - st.geld.cato)), 400000, 'de koper betaalt precies zijn bod');
+  assert.ok(E(st.geld.anna - voorAnna) > 380000, 'en de verkoper krijgt de opbrengst: ' +
+    Math.round(E(st.geld.anna - voorAnna)));
 
   // en boris merkt er niets van behalve de naam van zijn tegenpartij
   const bij = m.eco.zicht(p, st, 'boris').contracten[0];
@@ -212,7 +215,7 @@ test('koop je beide kanten van een contract, dan wordt het afgekocht in plaats v
   const c = st.contracten[0];
   assert.equal(st.veilingen[0].winnaar, 'boris');
   assert.equal(c.status, 'afgekocht', 'boris staat nu aan beide kanten; dat kan niet blijven staan');
-  assert.equal(c.afkoop, H.afkoopsom({ boete: 500, eindMaand: c.eindMaand }, c.eindMaand - 99) === 1500 ? 1500 : c.afkoop);
+  assert.equal(E(c.afkoop), H.afkoopsom({ boete: 500, eindMaand: c.eindMaand }, c.eindMaand - 99) === 1500 ? 1500 : E(c.afkoop));
   maand(m, p, 2);
   assert.equal((st.laatste.boris.contracten || []).length, 0, 'en er wordt niets meer op afgerekend');
 });
@@ -274,12 +277,32 @@ test('grond gaat naar de Foundation-pot, een zaak naar de verkoper', () => {
   m.eco.zet(p, 'boris', { actie: 'veiling-bod', id: v.id, bedrag: 600000 });
   const geldVoor = st.geld.boris, annaVoor = st.geld.anna;
   maand(m, p, 2);
-  assert.equal(Math.round(geldVoor - st.geld.boris), 600000, 'de koper betaalt');
-  assert.ok(st.foundation.lokaal >= potVoor + 600000, 'en grond is van de stad: de pot groeit mee');
+  assert.equal(Math.round(E(geldVoor - st.geld.boris)), 600000, 'de koper betaalt');
+  assert.ok(st.foundation.lokaal >= potVoor + naarCenten(600000), 'en grond is van de stad: de pot groeit mee');
   /* De INZETTER van een kavelveiling verdient er niets aan, en dat is met opzet:
      anders zet iedereen elke maand elk vrij kavel in en is de kaart een
      veilinghuis. */
   assert.ok(st.geld.anna <= annaVoor, 'wie een kavel inzet verdient er niets aan');
+});
+
+/* Ronde A2.4: de winnaar betaalde al voordat vaststond dat de zaak nog bestond,
+   en bij `mislukt` verdween zijn koopsom zonder ontvanger. Nu gaat er dan niets
+   over, ook geen geld. */
+test('bestaat de geveilde zaak niet meer, dan betaalt de winnaar ook niets', () => {
+  const { m, p, st } = opstelling(['anna', 'boris', 'cato']);
+  m.eco.zet(p, 'anna', { actie: 'open', kavel: kavelIn('terrein').id, sector: 'logistiek', omvang: 12, naam: 'Atlas' });
+  maand(m, p, 1);
+  const A = st.vestigingen.anna[0];
+  const v = m.eco.zet(p, 'anna', { actie: 'veiling-start', soort: 'vestiging', vestiging: A.id, duur: 'kort' });
+  assert.ok(v.ok, v.error);
+  m.eco.zet(p, 'cato', { actie: 'veiling-bod', id: v.id, bedrag: 400000 });
+  st.vestigingen.anna = [];   // de zaak verdwijnt voor de hamer valt
+  const voorCato = st.geld.cato;
+  const verslagen = [];
+  for (let i = 0; i < 2; i++) { st.gerekendTot -= st.maandMs; verslagen.push(...m.eco.bijrekenen(p)); }
+  const uitslag = verslagen.flatMap(x => x.veilingen || []).find(x => x.id === v.id);
+  assert.equal(uitslag.mislukt, 'die vestiging bestaat niet meer');
+  assert.equal(st.geld.cato, voorCato, 'de winnaar houdt zijn geld');
 });
 
 test('een veiling zonder biedingen kun je intrekken, een met biedingen niet', () => {

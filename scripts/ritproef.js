@@ -37,6 +37,10 @@
 const fs = require('fs');
 const path = require('path');
 const { start } = require('./lib/wegwerpserver');
+/* Het volle stempel (commit + boomVuil + instrument) en niet een kale datum:
+   APPWERKT.json leest deze proef als bewijsbron, en zonder waartegen-is-dit-
+   gemeten kan versheid() niet zeggen of het bewijs nog bij deze code hoort. */
+const { stempel: huisStempel } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'RITPROEF.json');
@@ -369,7 +373,7 @@ async function storingen(basis, uit) {
 
 async function meet() {
   const uit = {
-    stempel: new Date().toISOString().slice(0, 10),
+    stempel: huisStempel(),
     uitleg: 'Een ritketen van aanvraag tot afronding, gemeten per SCHAKEL (handelt actor A, en ziet actor B dat?) en per STORING (houdt de keten zijn belofte als het misgaat?). Tweede keten naast scripts/tafelproef.js, in een ander domein -- zie MAATSTAF.md par. 7.',
     grens: 'Alleen de rit bij een vervoerszaak; OV, vluchten en zakelijk vervoer hebben eigen naden. De proef zet een chauffeur klaar omdat de seed er geen heeft. Er komt geen browser aan te pas, en de betaling loopt via de demo-rail: dat het geld werkelijk bij de vervoerder landt, is hier niet gemeten.',
     schakels: [], storingen: [], rit: null, wereld: null

@@ -122,6 +122,17 @@
       return uit;
     }
 
-    return { rail: rail, caps: caps };
+    /* ----------------------------------------------------------- het object --
+       Welk document er open is, als VERWIJZING: soort, id en titel, en nooit de
+       tekst -- die blijft van Office (EDGE.md par. 1). Het id komt van de actieve
+       tab, die app.js tekent uit het document dat de server teruggaf; de vorm
+       beslist de objectpoort in het register (shared/objectverwijzing.js). */
+    function object() {
+      var tab = $('#docTabs [data-actief="1"]'), id = tab && tab.getAttribute('data-tab');
+      var t = $('.balk input.titel');
+      return id ? { soort: 'document', id: id, label: (t && t.value) || 'Document' } : null;
+    }
+
+    return { rail: rail, caps: caps, object: object };
   };
 })(window, document);

@@ -29,7 +29,7 @@ module.exports = (ctx) => {
   async function haalKloon() {
     if (!actief || st.modus !== 'cloud' || journaal().length) return;
     try {
-      const r = await fetch(CLOUD() + '/api/doos/kloon', { headers: { 'x-doos-sleutel': SLEUTEL }, signal: AbortSignal.timeout(60000) });
+      const r = await fetch(CLOUD() + '/api/doos/kloon', { headers: require('./koppen').doosKoppen({}, SLEUTEL), signal: AbortSignal.timeout(60000) });
       if (!r.ok) return;
       const d = await r.json();
       if (!d || typeof d.data !== 'object' || !d.data) return;

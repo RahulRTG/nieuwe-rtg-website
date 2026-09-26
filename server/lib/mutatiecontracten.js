@@ -10,10 +10,7 @@
    Dat staat hier, per route, met de reden erbij.
 
    DE VOLGORDE IS EEN GRENS EN GEEN GEWOONTE. Eerst het contract, dan de route.
-   Een schrijfroute zonder contract laat de keuring zakken (regel in
-   scripts/check.js), en dat is de hele reden dat dit bestand bestaat: zo kan het
-   gat niet stil weer groeien terwijl iemand aan de achterkant aan het opruimen
-   is.
+   scripts/check.js weigert een schrijfroute zonder contract.
 
    WAT HIER NIET MAG. Een stand invullen omdat de meter iets liet zien. De meter
    levert een VOORSTEL; hier staat een besluit. Het verschil is dat een besluit
@@ -41,6 +38,7 @@
 'use strict';
 
 const CONTRACTEN = Object.assign({},
+  require('./mutatiecontracten-document').CONTRACTEN,
   require('./mutatiecontracten-storingen').CONTRACTEN,
   /* Opgesplitst omdat scripts/check.js een bestandsgrens kent en die terecht
      aansloeg: een lijst die naar duizenden regels groeit, hoort niet in een
@@ -51,10 +49,13 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-connection-edge').CONTRACTEN,
   require('./mutatiecontracten-connection-media').CONTRACTEN,
   require('./mutatiecontracten-connection-final').CONTRACTEN,
+  require('./mutatiecontracten-beleidsmotor').CONTRACTEN,
+  require('./mutatiecontracten-werkbetaling').CONTRACTEN,
   require('./mutatiecontracten-vertegenwoordiging').CONTRACTEN,
   require('./mutatiecontracten-staffgemoed').CONTRACTEN,
   require('./mutatiecontracten-zaakkant').CONTRACTEN,
   require('./mutatiecontracten-rugdekking').CONTRACTEN,
+  require('./mutatiecontracten-magnaatleven').CONTRACTEN,
   require('./mutatiecontracten-carriereledger').CONTRACTEN,
   require('./mutatiecontracten-vakschema').CONTRACTEN,
   require('./mutatiecontracten-tweedehandeling').CONTRACTEN,
@@ -106,6 +107,7 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-naleesronde-c').CONTRACTEN,
   require('./mutatiecontracten-opvangwijzer').CONTRACTEN,
   require('./mutatiecontracten-horeca-correctie').CONTRACTEN,
+  require('./mutatiecontracten-inhaal').CONTRACTEN,
   /* De nazorg van een reisaanvraag: vier routes die samen de weg terug uit een
      toezegging zijn. Eigen bestand omdat ze een afweging delen -- zie de kop. */
   require('./mutatiecontracten-reisnazorg').CONTRACTEN,
@@ -128,6 +130,7 @@ const CONTRACTEN = Object.assign({},
      loket zijn. Eigen bestand omdat het interessante in het VERSCHIL tussen die
      twee helften zit -- zie de kop. */
   require('./mutatiecontracten-tweedehand').CONTRACTEN,
+  require('./mutatiecontracten-afstemming').CONTRACTEN,
   require('./mutatiecontracten-wonen').CONTRACTEN,
   require('./mutatiecontracten-project-room').CONTRACTEN,
   /* De zware poort: drie ceremonieloketten, alle drie met opzet niet

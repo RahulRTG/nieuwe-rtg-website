@@ -59,7 +59,9 @@
       alle('[data-dr-huis]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.drHuis === huis)); });
       if (gekozenId && !gekozen()) gekozenId = '';
       teken();
-      if (!intakeEenmaal && params.get('document')) { intakeEenmaal = true; openIntake(); }
+      /* ?nieuw=1 komt uit RTG One: daar staat de knop "nieuw besluit", maar voorleggen
+         en beslissen gebeuren hier (SCHERMEIGENAAR.json). */
+      if (!intakeEenmaal && (params.get('document') || params.get('nieuw'))) { intakeEenmaal = true; openIntake(); }
     } catch (e) { root.querySelector('#drAgenda').innerHTML = '<div class="dr-leeg"><h2>Decision Room kon niet laden.</h2><p>' + veilig(e.message) + '</p></div>'; }
   }
   function openIntake() {

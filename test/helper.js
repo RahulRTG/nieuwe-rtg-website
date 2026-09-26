@@ -57,6 +57,110 @@ function vrijePoort() {
   });
 }
 
+/* EEN REEKS AANEENGESLOTEN VRIJE POORTEN, BUITEN HET EFEMERE BEREIK.
+
+   Voor een fixture die uit EEN poort meer poorten afleidt (het trio: PORT, en
+   RTG_TRIO_BASIS+0..2 voor de drie servers). vrijePoort() bewijst alleen die
+   ene, en de afgeleide buren liggen precies verkeerd: op Linux geeft bind(0)
+   bij voorkeur ONEVEN poorten en krijgt een uitgaande connect() bij voorkeur
+   EVEN bronpoorten (raakt een helft op, dan valt de kernel op de andere
+   terug), dus poort+1 en poort+3 zitten in de bronpoortruimte van elke fetch()
+   van elke toets die tegelijk draait. Een clientsocket die daar nog staat
+   (open keep-alive, of 60 s TIME_WAIT nadat de client als eerste sloot) laat
+   de listen() van server 1 zakken met EADDRINUSE; de hoofd herstart hem dan
+   om de 2 s en wacht 30 + 10 s voordat hij verder gaat -- hij logt dat wel,
+   maar de toets las zijn regels niet -- en de telling van
+   test/trio-wees.test.js viel in CI in het herstartgat van die server
+   (5 !== 6, 24 september 2026 -- drie keer onafhankelijk gereproduceerd, zie
+   de kop van dat bestand).
+
+   Daarom twee dingen tegelijk. De reeks ligt BUITEN ip_local_port_range: daar
+   landt nooit een bind(0) en nooit een autobind, dus die klasse botsingen
+   bestaat er niet -- een bindproef binnen het bereik verkleint alleen het
+   venster (server 1 bindt pas seconden na de spawn). En alle n poorten worden
+   TEGELIJK gebonden op 0.0.0.0, want dat ziet ook een 127.0.0.1-luisteraar van
+   een andere toets; bij een botsing komt er een nieuwe basis. De poorten gaan
+   pas los vlak voor de teruggave, dus de aanroeper spawnt meteen.
+
+   RESTRISICO, UITGESCHREVEN. Spawnen is niet binden: server 1 bindt pas ~3,6 s
+   na het loslaten (de hoofd start hem na zijn eigen listen), servers 2 en 3 pas
+   ~7 s later. In dat venster kan een TWEEDE kiezer in een ander proces (een
+   andere toets in dezelfde scherf) dezelfde basis trekken; de bindproef dekt
+   het proefmoment en niet het venster. De kans is klein (twee reeksen van 4 en
+   14 op ~12.700 bases) en de uitkomst is luid -- EADDRINUSE in de laatste regels
+   van de hoofd, die elke melding meedraagt -- dus dit is bewust niet met een
+   slot in os.tmpdir() dichtgezet. Wie het wel wil: een atomaire mkdirSync per
+   basis, met een TTL, is de goedkoopste vorm. */
+const EFEMEER_STANDAARD = [32768, 60999];
+const EFEMEER_BESTAND = '/proc/sys/net/ipv4/ip_local_port_range';
+/* `lees` is injecteerbaar, zodat een toets een andere kernelinstelling kan
+   voorleggen zonder aan de machine te komen (test/poortreeks.test.js).
+
+   EEN GESLAAGDE LEZING WORDT VERTROUWD. De kernel weigert zelf alles wat niet
+   kan (lo onder ip_unprivileged_port_start, hi onder lo), dus wat in /proc
+   staat is echt; hier wordt alleen nog getoetst dat het twee gehele getallen
+   in 1..65535 zijn met hi boven lo. De eerste versie eiste `lo > 1024` en
+   behandelde daarmee de gangbare tuning "1024 65535" (1024 is de standaard
+   ondergrens van de kernel, en precies wat hosts met veel uitgaande
+   verbindingen instellen) als leesfout: die ECHTE lezing viel stil terug op de
+   Linux-standaard, en dan koos de reeks 20000-32767 -- middenin het werkelijke
+   efemere bereik -- terwijl toets 0 van trio-wees groen bleef, want die meet de
+   helper tegen zichzelf (reviewronde 24 september 2026). */
+function efemeerBereik(lees) {
+  try {
+    const tekst = (lees || (() => fs.readFileSync(EFEMEER_BESTAND, 'utf8')))();
+    const [lo, hi] = String(tekst).trim().split(/\s+/).map(Number);
+    if (Number.isInteger(lo) && Number.isInteger(hi) && lo >= 1 && hi > lo && hi <= 65535) return [lo, hi];
+  } catch (e) {
+    /* Geen /proc (macOS, FreeBSD): terugval op de Linux-standaard. Alleen voor
+       macOS is dat onderbouwd (49152-65535 ligt boven het onderste venster); op
+       FreeBSD (10000-65535) niet -- maar de botsingsklasse hierboven is
+       Linux-bindsemantiek, dus daar telt alleen dat de reeks vrij en
+       aaneengesloten is, en dat bewijst de bindproef ook zonder bereik. */
+  }
+  return EFEMEER_STANDAARD;
+}
+const bindProef = (p) => new Promise((resolve, reject) => {
+  const s = net.createServer();
+  s.unref();
+  s.on('error', reject);
+  s.listen(p, '0.0.0.0', () => resolve(s));
+});
+/* `opties.bereik` vervangt de kernellezing -- alleen voor een toets die wil zien
+   wat deze functie doet bij een bereik dat deze machine niet heeft. */
+async function vrijePoortReeks(n, opties) {
+  const [lo, hi] = (opties && opties.bereik) || efemeerBereik();
+  const ONDER = 20000;                       // onder de 20000 wonen de vaste diensten (3000-3003, 5432, 6379)
+  const BOVEN = 65535;
+  if (!(n > 0)) throw new Error('vrijePoortReeks: n moet positief zijn');
+  /* Eerst onder het bereik (de Linux-standaard laat daar 12.000 poorten vrij),
+     en pas als dat venster er niet is of dertig keer bezet blijkt erboven
+     (tuning "1024 61000"). Is er geen van beide, dan bestaat er op deze host
+     geen poort waar nooit een autobind landt, en dat zeggen we hardop: een reeks
+     die stil in het bereik valt is de flake in een nieuwe jas. */
+  const vensters = [];
+  if (lo - n > ONDER) vensters.push([ONDER, lo - n]);          // basis + n - 1 < lo
+  if (BOVEN - n > hi) vensters.push([hi + 1, BOVEN - n]);      // basis + n - 1 < 65535
+  if (!vensters.length) {
+    throw new Error('vrijePoortReeks: ip_local_port_range ' + lo + '-' + hi + ' laat geen ' + n +
+      ' poorten buiten het efemere bereik over (boven ' + ONDER + '); op deze host is de poortbotsing niet te vermijden');
+  }
+  for (let poging = 0; poging < 60; poging++) {
+    const [van, tot] = vensters[Math.min(Math.floor(poging / 30), vensters.length - 1)];
+    const basis = van + Math.floor(Math.random() * (tot - van + 1));
+    const open = [];
+    try {
+      for (let i = 0; i < n; i++) open.push(await bindProef(basis + i));
+    } catch (e) {
+      for (const s of open) s.close();
+      continue;                                // iets staat er al; een andere basis
+    }
+    await Promise.all(open.map(s => new Promise(r => s.close(r))));
+    return Array.from({ length: n }, (_, i) => basis + i);
+  }
+  throw new Error('vrijePoortReeks: na 60 pogingen geen ' + n + ' aaneengesloten vrije poorten buiten ' + lo + '-' + hi);
+}
+
 /* Start server/server.js (of een ander script) en wacht tot hij gezond is.
    Geeft { child, base, port } terug. Gooit als de server niet gezond wordt.
 
@@ -451,36 +555,51 @@ function postJson(base) {
    proefpubliek in gezelschap.js). Twee kopieen van dezelfde weg lopen uiteen
    zodra de inlog verandert -- LAT.md regel 4. Geeft null als het niet lukt, zodat
    de aanroeper zelf kan besluiten wat dat betekent. */
-async function kantoorAlsPersoon(base, code) {
+async function kantoorAlsPersoon(base, code, opties) {
   const post = postJson(base);
-  const eig = await post('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' });
+  /* `opties.eigenaar`: de e-mail van de eigenaar van DEZE server. Een toets die
+     start met een eigen RTG_OWNER_EMAIL heeft een andere demo-eigenaar dan de
+     standaard, en die kon hier niet binnenkomen -- dan gaf dit hulpje null en
+     viel alles wat een kantoormens nodig had om. Een kale string is dezelfde
+     eigenaar (zo roepen de toetsen van de kantoorsleutels hem aan). */
+  const login = (typeof opties === 'string' ? opties : opties && opties.eigenaar) || 'roellie.i@gmail.com';
+  const eig = await post('/api/auth/login', { login, password: 'Imran', pasApp: 'business' });
   if (eig && eig.token) {
     const kantoor = await post('/api/account/start', { rol: 'kantoor' }, eig.token);
     if (kantoor && kantoor.token) return kantoor.token;
   }
-  /* GEEN DEMO-EIGENAAR? DAN DE WEG DIE EEN MEDEWERKER OOK LOOPT.
+  /* GEEN DEMO-EIGENAAR? DAN GEEN KANTOORMENS. Hier stond een tweede weg: een
+     vers account dat de kantoorrol koppelde met de gedeelde code. Die weg is
+     dicht (besluit van de eigenaar, 23 september 2026): de kantoorrol hangt
+     alleen nog aan een account via een uitnodiging van de eigenaar, en zonder
+     eigenaar is er niemand die uitnodigt. `code` blijft in de handtekening
+     staan zodat de aanroepers niet hoeven te veranderen. */
+  void code;
+  return null;
+}
 
-     De eigenaar hierboven bestaat alleen in de demo-seed. Toetsen die met een
-     eigen OFFICE_CODE en een lege database starten, kregen daarom `null` terug
-     en vielen terug op de gedeelde code -- en sinds kern/kantoor/kluispoort.js
-     komt die niet meer langs de kluisdeuren (KYC-besluit, documentnummer,
-     aftekenen).
+/* DE KANTOORROL KOPPELEN, ZOALS HET IN PRODUCTIE GAAT: de eigenaar maakt een
+   uitnodiging voor de codenaam van dit lid, en het lid verzilvert hem. Geeft het
+   LICHAAM voor /api/account/koppel terug, zodat een toets alleen dat hoeft te
+   wisselen. De gedeelde code koppelt niet meer (kern/eenaccount/koppelen.js).
 
-     De tweede weg is geen omweg maar het echte scenario: een eigen RTG-account,
-     daarin de kantoorrol koppelen met dezelfde code, en die rol starten. Wat je
-     terugkrijgt is een office-sessie MET een sleutel, en dat is precies wat het
-     inzagejournaal nodig heeft om een regel naar een mens terug te voeren.
-
-     Elke aanroeper krijgt een vers account, zodat twee toetsen nooit dezelfde
-     kantoormedewerker delen. */
-  const email = 'kantoor' + Date.now() + Math.random().toString(36).slice(2, 8) + '@voorbeeld.test';
-  const reg = await post('/api/auth/register', { name: 'Kantoor Toets', email,
-    password: 'geheim123', geboortedatum: '1985-05-05', pasApp: 'rtg' });
-  if (!reg || !reg.token) return null;
-  const k = await post('/api/account/koppel', { soort: 'kantoor', code: code || 'RTG-OFFICE' }, reg.token);
-  if (!k || k.error) return null;
-  const s2 = await post('/api/account/start', { rol: 'kantoor' }, reg.token);
-  return (s2 && s2.token) || null;
+   `opties.eigenaar` is een eigen eigenaarssessie (een toets met RTG_OWNER_EMAIL),
+   en `opties.bevestig` levert de zware ceremonie voor een eigenaar met passkey:
+   een uitnodiging maken is zwaar werk. */
+async function kantoorKoppelBody(base, lidToken, extra, opties) {
+  const post = postJson(base);
+  const o = opties || {};
+  const me = await post('/api/auth/me', {}, lidToken);
+  const codenaam = me && me.user && me.user.codename;
+  let eigTok = o.eigenaar || null;
+  if (!eigTok) {
+    const eig = await post('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' });
+    eigTok = eig && eig.token;
+  }
+  const bewijs = o.bevestig ? await o.bevestig() : {};
+  const u = codenaam && eigTok
+    ? await post('/api/office/kantoor/uitnodiging', { codenaam, ...bewijs }, eigTok) : null;
+  return Object.assign({ soort: 'kantoor', uitnodiging: (u && u.code) || 'geen-uitnodiging' }, extra || {});
 }
 
 /* Een lid naar Lifestyle of Business tillen, zoals het in het echt gaat: een
@@ -1177,9 +1296,39 @@ async function keurLidGoed(base, token, codenaam, geboortedatum) {
    bewegen en loslaten synchroon worden afgeleverd. Een timer kan niet midden
    in één JavaScript-taak vallen. Ook die poging loopt door precies dezelfde
    pointerlisteners; alleen de CI-planner zit er niet meer tussen. Geen langere
-   wachttijden: die maken een dobbelsteen stiller, niet eerlijker. */
+   wachttijden: die maken een dobbelsteen stiller, niet eerlijker.
+
+   DE WEG DIE HIJ NAM, EN WAAROM DIE TERUGKOMT. De terugval hierboven maakt de
+   race onschadelijk, maar daarmee ook onzichtbaar: een proef die groen staat
+   zegt niet of dat via de browser kwam of via de rendererpoging, en hoe vaak
+   die tweede afgaat telde nergens (EDGE.md par. 11, ronde 2). veegDoor geeft
+   daarom terug welke weg het werd: 'vlucht' (de protocolvlucht naar Chromium)
+   of 'terugval' (de poging in de renderer). Wie het niet wil weten, negeert het.
+
+   LOSLATEN IS EEN KEUZE. Met { loslaten: false } blijft de knop ingedrukt,
+   zodat een proef kan kijken naar wat er ONDER een halve veeg ligt en daarna
+   zelf loslaat met een echte page.mouse.up(). Dat geldt voor BEIDE wegen: in
+   de vlucht gaat er geen mouseReleased achteraan, en de terugval heeft een
+   eigen staart -- synthetisch neer en bewegen, zonder pointerup. De enige
+   pointerup die de terugval dan nog stuurt, is die van de mislukte vlucht
+   ervoor; na de laatste pointerdown komt er geen. Lukt de rendererpoging niet,
+   dan wordt er wel losgelaten: een gebaar dat niet begon, hoort niet te
+   blijven hangen terwijl de fout wordt gemeld. */
 async function veegDoor(page, doos, opties) {
   const o = opties || {};
+  const loslaten = o.loslaten !== false;
+  /* DE TABEL EERST (ronde 2, stap 10). Lang drukken en stilstaan lezen hun
+     drempel uit de grammatica, en de gebaarlaag laadt die zacht bij de eerste
+     zet() of lijst(). Een veeg die valt voordat hij er is, veegt over een laag
+     zonder lang drukken: dan is er geen wedloop, en bewijst de proef minder dan
+     hij lijkt. Waar de gebaarlaag staat, wacht de helper dus op de tabel. Komt
+     hij niet, dan is dat een gebrek van de laag en geen reden om zonder te vegen. */
+  const tabel = await page.waitForFunction(() => !window.RTGGebaar || !!window.RTGGrammatica, null,
+    { timeout: geduld(5000) }).then(() => true, () => false);
+  if (!tabel) {
+    throw new Error('de gebaarlaag staat er, maar de grammatica kwam niet (shared/gebaar/gebaar-01.js laadt hem ' +
+      'bij de eerste zet() of lijst()); zonder DREMPELS is lang drukken uit en meet deze veeg iets anders dan hij lijkt');
+  }
   const y = doos.y + (o.vanBoven ? Math.min(o.vanBoven, doos.height / 2) : doos.height / 2);
   const x0 = doos.x + doos.width * (Number.isFinite(o.startFractie) ? o.startFractie : 0.8);
   /* Dezelfde racevrije aanzet is ook nodig voor een halve veeg die alleen een
@@ -1207,8 +1356,8 @@ async function veegDoor(page, doos, opties) {
     const begonnen = await page.evaluate(() => !!document.querySelector('[data-gb]'));
     if (begonnen) {
       for (let i = 2; i <= stappen; i++) await beweeg(x0 + (px * i) / stappen, true);
-      await los(x0 + px);
-      return;
+      if (loslaten) await los(x0 + px);
+      return 'vlucht';
     }
 
     await los(x0 + eerste);
@@ -1220,7 +1369,7 @@ async function veegDoor(page, doos, opties) {
     await page.waitForFunction(() => !document.querySelector('.gb-blad,.gb-lade,[data-gb]'), null,
       { timeout: 5000 }).catch(() => {});
     const rendererPoging = await page.evaluate(({
-      x0, y, px, stappen, eerste, kiezer, startFractie, afstand, vanBoven
+      x0, y, px, stappen, eerste, kiezer, startFractie, afstand, vanBoven, loslaten
     }) => {
       /* De regel uit zijn rechthoek, niet het toevallige bovenste element op
          dat punt. Na een langdruk kan daar nog één frame een verdwijnende
@@ -1279,17 +1428,19 @@ async function veegDoor(page, doos, opties) {
         for (let i = 2; i <= stappen; i++)
           stuur('pointermove', beginX + (verschuiving * i) / stappen, 1);
       }
-      stuur('pointerup', beginX + (begon ? verschuiving : eersteStap), 0);
-      return begon ? true : 'niet-opgepakt';
+      if (!begon) { stuur('pointerup', beginX + eersteStap, 0); return 'niet-opgepakt'; }
+      if (loslaten) stuur('pointerup', beginX + verschuiving, 0);
+      return true;
     }, {
       x0, y, px, stappen, eerste, kiezer: o.kiezer || null,
-      startFractie: o.startFractie, afstand: o.afstand, vanBoven: o.vanBoven
+      startFractie: o.startFractie, afstand: o.afstand, vanBoven: o.vanBoven, loslaten
     });
     if (rendererPoging !== true) {
       throw new Error('het gebaar begon niet via browserinput en ook niet in één rendererhandeling (' +
         (rendererPoging === 'geen-rij' ? 'er stond geen enkele .gb-rij op het scherm'
           : 'de gebaarlaag pakte de beweging niet op') + '); dan is de gebaarbedrading zelf stuk.');
     }
+    return 'terugval';
   } finally {
     await cdp.detach();
   }
@@ -1369,6 +1520,38 @@ async function edgeWerkbladen(page) {
     await page.locator('[data-edge-command-bank]:visible').click();
 }
 
+/* HET ADRES VAN DE EIGEN PAS-APP van een ingelogd lid.
+
+   Een account weet bij welke pas het hoort. Opent de browser /apps/app.html
+   ZONDER ?pas= (of in een andere pas-app), dan doet de app zelf
+   location.replace naar ?pas=<tier> (app-main-04.js; zonder ?pas= is de lijst
+   `magHier` leeg, dus dat gebeurt ALTIJD). Een toets die het kale adres opent
+   en daarna meteen navigeert of wacht, racet met die omleiding: zo stond main
+   twee merges rood op werkscherm.e2e (lokaal 3 van 6 op net::ERR_ABORTED onder
+   belasting, in CI een kale timeout).
+
+   Deze helper vraagt de SERVER welke pas bij het token hoort -- dezelfde vraag
+   die de app stelt (/api/state) -- en rekent het doel uit met dezelfde regel
+   (guest -> rtg). Hij raadt dus niets: registreert een toets als 'business'
+   maar geeft de server 'rtg', dan opent de toets de rtg-app, net als een lid.
+   Een tier zonder pas-app is een fout met de reden erbij, geen stille terugval.
+
+   Wie de omleiding ZELF toetst (premium.e2e), opent het kale adres bewust. */
+async function pasAppAdres(base, token, extra) {
+  const r = await fetch(base + '/api/state', { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: '{}' });
+  const d = await r.json().catch(() => ({}));
+  const tier = d && d.state && d.state.user && d.state.user.tier;
+  const doel = tier === 'guest' ? 'rtg' : tier;
+  if (!['rtg', 'lifestyle', 'business'].includes(doel)) {
+    throw new Error('pasAppAdres: de server gaf geen pas voor dit token (HTTP ' + r.status + ', tier ' +
+      JSON.stringify(tier) + '). De app toont dan de poort en leidt niet om; open het kale adres bewust.');
+  }
+  const q = new URLSearchParams(extra || {});
+  q.set('pas', doel);
+  return base + '/apps/app.html?' + q.toString();
+}
+
 async function bankDeur(page, naam, opties) {
   const ms = (opties && opties.timeout) || 15000;
   /* Tijdens login wordt de gesloten Command-root door de echte werktafel
@@ -1399,9 +1582,9 @@ async function bankDeur(page, naam, opties) {
   await deur.click();
 }
 
-module.exports = { edgeActies, edgeBediening, edgeCatalogus, edgeWerkbladen, bankDeur, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde,
-  installeerNepMicrofoon, kantoorAlsPersoon, keurLidGoed, laadPlaywright, laadScherm, metGedeeldeBrowser, letOpFouten,
-  nepMediaArgs, opstartGeduld, startServer, stop, stopHard, stopNet, veegDoor, volgVerzoeken, vrijePoort,
+module.exports = { edgeActies, edgeBediening, edgeCatalogus, edgeWerkbladen, bankDeur, pasAppAdres, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde,
+  installeerNepMicrofoon, kantoorAlsPersoon, kantoorKoppelBody, keurLidGoed, laadPlaywright, laadScherm, metGedeeldeBrowser, letOpFouten,
+  nepMediaArgs, opstartGeduld, startServer, stop, stopHard, stopNet, veegDoor, volgVerzoeken, vrijePoort, vrijePoortReeks, efemeerBereik,
   wachtOpRust, wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering,
   wachtOpNetstilte, wachtOpBestand, klikEnWacht, tekstVan, postJson,
   // testhaken om de strenge poort zelf te kunnen verifieren

@@ -131,6 +131,7 @@ Object.assign(kern, require('../kern/vakwerk').maakVakwerk({ db, save, anthropic
 Object.assign(kern, require('../kern/waarde').maakWaarde({ db, save, crypto }));
 /* RTG Pay: wallet, grootboek en automatisch bijladen. */
 Object.assign(kern, require('../kern/pay')({ db, save, bijeen, economischeBoekingEenmaal, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon, betaalOpdrachten, waarde: kern.waarde,
+  betaalWaarheid: kern.betaalWaarheid,
   payBoekingenVoegToe: require('../db').payBoekingenVoegToe,
   accounts, // alleen voor het uitbetaal-IBAN: dat hoort in de kluis, niet naast een codenaam
   // de geld-regie bepaalt het tarief; als thunk zodat de mount-volgorde niet uitmaakt

@@ -142,6 +142,17 @@ test('Werkruimte: een kamer bewaren, leeghalen en met een klik terughalen',
     assert.equal(await page.evaluate(() => RTGSchil.surfaces.length), voor,
       'Escape hoort niets te openen');
 
+    /* De Zoeken-knop van de schil doet wat ⌘K doet (EDGE.md par. 10, ronde 1:
+       rtg-palet-open had een zender en geen luisteraar). Op dit scherm is de
+       onderbalk display:none (rtg-schil.css), dus dit bewijst de BEDRADING en
+       niet dat een mens de knop kan bereiken -- vandaar el.click() en geen
+       echte klik. DE MUTATIES: haal de luisteraar in werkruimte.html weg
+       (time-out), of laat hem alleen paletOpen() aanroepen (dan gaat #palet
+       open en de Edge-index niet). */
+    await page.evaluate(() => document.querySelector('[data-dock-zoek]').click());
+    await page.waitForSelector('.rtg-edge-index[aria-hidden="false"]', { timeout: 5000 });
+    await page.keyboard.press('Escape');
+
     assert.deepEqual(fouten, [], 'de werkruimte hoort zonder consolefouten te draaien');
   } finally {
     if (browser) await browser.close().catch(() => {});

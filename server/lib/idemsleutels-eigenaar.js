@@ -25,13 +25,17 @@ const SLEUTELS = {
   /* Een leesroute. Apart van "geen verklaring": dit is een besluit. */
   'POST /api/techniek/herstel/stand': { leest: true },
 
-  /* De drie loketten die een verse WebAuthn-uitdaging munten. */
+  /* De loketten die een verse WebAuthn-uitdaging munten. */
   'POST /api/techniek/bevestig/opties': { nietIdempotent: true,
     waarom: 'munt een verse uitdaging voor een benoemde zware handeling; een bewaard antwoord ' +
       'zou dezelfde challenge twee keer geldig maken en de binding opheffen' },
   'POST /api/office/boardroom/bevestig/opties': { nietIdempotent: true,
     waarom: 'zelfde ceremonie achter de boardroomdeur, en om dezelfde reden: een herhaalde ' +
       'challenge is een herbruikbare challenge' },
+  'POST /api/office/bank/incasso/opties': { nietIdempotent: true,
+    waarom: 'de ceremonie voor de incassoronde, gebonden aan zijn grens; een herhaalde challenge is een herbruikbare challenge' },
+  'POST /api/office/bank/handtekening/opties': { nietIdempotent: true,
+    waarom: 'de ceremonie voor de tweede handtekening, gebonden aan die aanvraag; een herhaalde challenge is een herbruikbare challenge' },
   'POST /api/webauthn/bevestig/opties': { nietIdempotent: true,
     waarom: 'de ceremonie waarmee een lid het weghalen van een passkey bevestigt; herhaalbaar ' +
       'maken zou een onderschepte bevestiging een tweede sleutel laten verwijderen' },
@@ -51,7 +55,52 @@ const SLEUTELS = {
     waarom: 'verse registratie-uitdaging binnen het herstelvenster' },
   'POST /api/herstel/eigenaar/passkey': { nietIdempotent: true,
     waarom: 'zet de passkey en SLUIT het venster; herhaalbaar maken zou van een geslaagd herstel ' +
-      'een kwartier lang een open deur maken' }
+      'een kwartier lang een open deur maken' },
+  /* De beleidsmotor (AUTHORITY.md fase 1): twee leeswegen. De tellers lopen via
+     de gewikkelde poorten op res.finish en niet in deze handlers, dus twee keer
+     opvragen verandert niets aan wat er geteld of besloten is. */
+  'POST /api/office/beleidsmotor': { leest: true },
+  'POST /api/office/beleidsmotor/waarom': { leest: true },
+  /* De toegangsreview (fase 8) leest drie zetelbronnen. Elke aanroep laat bewust
+     EEN journaalregel na: het journaal hoort elke inzage te zien, ook de tweede. */
+  'POST /api/office/beleidsmotor/review': { leest: true },
+  /* De kantooruitnodiging (fase 2): elke oproep maakt een NIEUWE code en maakt de
+     vorige van dezelfde mens ongeldig. Het overzicht leest alleen. */
+  'POST /api/office/kantoor/uitnodiging': { nietIdempotent: true,
+    waarom: 'een tweede oproep is een tweede uitnodiging: een nieuwe code, en de vorige vervalt; een laag die ' +
+      'hem opslikt geeft de eigenaar een code terug waarvan hij denkt dat die de nieuwste is' },
+  'POST /api/office/kantoor/uitnodigingen': { leest: true },
+  /* De simulator (fase 8) rekent en verandert niets; elke oproep laat bewust een
+     journaalregel na. De doossleutels (fase 7): uitgeven maakt elke keer een
+     NIEUWE sleutel en maakt de vorige ongeldig; intrekken is een toestand. */
+  'POST /api/office/beleidsmotor/simulatie': { leest: true },
+  'POST /api/office/doos/sleutel': { nietIdempotent: true,
+    waarom: 'een tweede oproep geeft een nieuwe sleutel en maakt de vorige van die doos ongeldig; een laag die ' +
+      'hem opslikt geeft een sleutel terug die de doos niet meer binnenlaat' },
+  'POST /api/office/doos/sleutel/weg': { zelfdeVerzoek: true },
+  'POST /api/office/doos/gedeeld/zet': { zelfdeVerzoek: true },
+  'POST /api/office/beleidsmotor/afdwingen': { leest: true },
+  'POST /api/office/beleidsmotor/afdwingen/zet': { zelfdeVerzoek: true },
+  'POST /api/concern/rekening': { leest: true },
+  'POST /api/concern/rekening/open': { zelfdeVerzoek: true },
+  'POST /api/bedrijf/uitgave/betaal': { zelfdeVerzoek: true },
+  'POST /api/office/bank/entiteitrekening': { leest: true },
+  'POST /api/office/bank/entiteitrekening/zet': { zelfdeVerzoek: true },
+  /* De uitgave in het Werk OS: indienen is elke keer een nieuwe uitgave; betaald
+     noteren en de tekengrens zetten zijn een toestand. */
+  'POST /api/bedrijf/uitgave/maak': { nietIdempotent: true,
+    waarom: 'een tweede oproep is een tweede uitgave; een laag die hem opslikt laat een echte tweede factuur verdwijnen' },
+  'POST /api/bedrijf/uitgaven': { leest: true },
+  'POST /api/bedrijf/uitgave/betaald': { zelfdeVerzoek: true },
+  'POST /api/bedrijf/lid/tekengrens': { zelfdeVerzoek: true },
+  'POST /api/bedrijf/werkruimte/entiteit': { zelfdeVerzoek: true },
+  'POST /api/bedrijf/werkruimte/betaalwijze': { zelfdeVerzoek: true },
+  'POST /api/bedrijf/werkruimte/tekenwijze': { zelfdeVerzoek: true },
+  'POST /api/office/werkos/bankpad': { leest: true },
+  'POST /api/office/werkos/bankpad/zet': { zelfdeVerzoek: true },
+  'POST /api/office/doos/sleutels': { leest: true },
+  /* Een vrije naam duiden: de tweede keer is het oude feit al vervallen en weigert de route. */
+  'POST /api/concern/feit/duid': { zelfdeVerzoek: true }
 };
 
 module.exports = { SLEUTELS };

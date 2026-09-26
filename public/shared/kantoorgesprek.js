@@ -130,7 +130,7 @@
 
     function stuur() {
       var tekst = veld.value;
-      if (!tekst) return;
+      if (!tekst) return melden('Typ uw antwoord.');
       veld.value = '';                       // meteen uit beeld
       veld.disabled = true; knop.disabled = true;
       fout.textContent = '';

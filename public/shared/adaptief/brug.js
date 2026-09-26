@@ -9,7 +9,10 @@
    werkblad gaat wonen -- dan heeft elk werkblad zijn eigen balk en zijn we terug
    bij honderd uitzonderingen. De andere is dat het bovendocument in het frame
    gaat graaien -- dan kent de schil de binnenkant van elke app, en dat is
-   precies wat de schil niet mag weten (WERKRUIMTE.md).
+   precies wat de schil niet mag weten (WERKRUIMTE.md). EEN lezer kijkt wel in
+   het actieve blad: edge/blikveld-hoofdactie.js, en alleen naar data-hoofdactie
+   -- een verklaring voor de Edge, geen binnenkant van de app -- onder dezelfde
+   drie eisen als hier (actief blad, zelfde herkomst, platte tekst).
 
    Wat er wél kan: het werkblad stuurt zijn DECLARATIES en zijn CONTEXT omhoog,
    en krijgt handelingen terug omlaag. Beide kanten kennen alleen ids.
@@ -44,7 +47,7 @@
          tik -- de bevestiging zou verdwijnen precies doordat je hem van een
          andere kant aanraakt. De verhindering gaat om dezelfde reden mee. */
       gewicht: c.gewicht || 'licht',
-      verhinderd: c.verhinderd || null };
+      verhinderd: c.verhinderd || null, herstel: c.herstel || null, effect: c.effect || null };
   }
 
   /* EEN FUNCTIE GAAT NIET OVER DE GRENS, EN DAT MAG NIET STIL MISLUKKEN.
@@ -86,7 +89,8 @@
       try {
         w.parent.postMessage({ merk: MERK, soort: 'context', caps: caps,
           ctx: { bron: ctx.bron, titel: ctx.titel, acties: ctx.acties,
-            selectie: ctx.selectie, staat: platteStaat(ctx.staat), rail: ctx.rail || [] } }, HERKOMST);
+            selectie: ctx.selectie, staat: platteStaat(ctx.staat), rail: ctx.rail || [],
+            object: ctx.object || null, activiteit: ctx.activiteit || '' } }, HERKOMST);
       } catch (e) {}
     }
     A.opContext(zendContext);

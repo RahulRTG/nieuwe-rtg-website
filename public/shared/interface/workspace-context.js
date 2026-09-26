@@ -1,7 +1,18 @@
-/* Context Engine: een kleine, serialiseerbare afdruk van wat nu relevant is.
-   Modules kunnen die lezen; alleen de host kan de context vervangen. */
+/* Context Engine: een LEZER van het Edge Blikveld (shared/edge/blikveld.js),
+   zonder eigen staat. Hier stond een eigen `current` met een eigen ontdubbeling,
+   gevoed uit RTGAdaptief.context(): een derde contextmodel dat bij elke vraag
+   kon achterlopen op het tweede. Nu vraagt get() het blikveld OP HET MOMENT VAN
+   VRAGEN en geeft vier velden door zoals ze daar staan -- herkomst, gezag en
+   sinds ongewijzigd, want de werkruimte weet niet beter waar iets vandaan komt
+   dan het blikveld (EDGE.md par. 2). Er is geen setter en geen luisteraar: wie
+   wil weten wat er nu speelt, vraagt het nu.
+
+   Geen blikveld, een blikveld dat gooit, of een afdruk die clean() weigert:
+   dan `velden: null` MET de reden, en nooit een oude kopie -- een context die
+   stil blijft staan zegt iets wat niet meer waar is. */
 (function (w) {
   'use strict';
+  var VELDEN = ['wereld', 'context', 'object', 'activiteit'];
   function clean(value) {
     var text = JSON.stringify(value == null ? {} : value);
     if (text.length > 16384) throw new Error('Workspace-context is groter dan 16 KB.');
@@ -9,17 +20,16 @@
       throw new Error('Workspace-context mag geen geheimen bevatten.');
     return JSON.parse(text);
   }
-  w.RTGWorkspaceContext = function (opties) {
-    var o = opties || {}, current = {}, listeners = [];
-    function get() { return clean(current); }
-    function set(value, reason) {
-      var next = clean(value); if (JSON.stringify(next) === JSON.stringify(current)) return get();
-      current = next; var change = { value: get(), reason: reason || 'host-update' };
-      listeners.slice().forEach(function (fn) { try { fn(change); } catch (e) {} }); return get();
+  w.RTGWorkspaceContext = function () {
+    function get() {
+      var B = w.RTGEdgeBlikveld;
+      if (!B || typeof B.lees !== 'function') return { velden: null, reden: 'het Edge Blikveld (edge/blikveld.js) is niet geladen' };
+      try {
+        var b = B.lees(), velden = {};
+        VELDEN.forEach(function (k) { velden[k] = b.velden[k]; });
+        return clean({ op: b.op, velden: velden });
+      } catch (e) { return { velden: null, reden: 'het blikveld gaf geen bruikbare context: ' + (e && e.message || e) }; }
     }
-    function refresh() { try { return set(typeof o.source === 'function' ? o.source() : {}, 'source-refresh'); } catch (e) { return get(); } }
-    refresh();
-    return { get: get, set: set, refresh: refresh, subscribe: function (fn) { listeners.push(fn); return function () {
-      var i = listeners.indexOf(fn); if (i >= 0) listeners.splice(i, 1); }; }, destroy: function () { listeners.length = 0; } };
+    return { get: get };
   };
 })(window);

@@ -66,3 +66,33 @@ test('zonder koppeling houdt de eigenaar zijn kantoorsleutel, een ander lid niet
     assert.equal(startAnder.status, 404, 'een ander lid komt daar niet binnen');
   } finally { stop(child); }
 });
+
+/* DE PERSONEELSINLOG WAS EEN DOODLOPENDE WEG VOOR HET KANTOOR. Op
+   /apps/personeel.html ("Welkom bij uw team") logt iemand in met zijn eigen
+   RTG-account, en /api/supplier/mijn/login zocht daar alleen een rooster. De
+   eigenaar, met klopend wachtwoord en de kantoorsleutel aan zijn bos, las
+   "Vraag uw werkgever om een kassacode". Nu zegt de deur dat er een
+   kantoorsleutel is -- en munt hij er zelf GEEN sessie voor: dat blijft
+   /api/account/start, na de gewone accountinlog. */
+test('de personeelsinlog wijst een account met kantoorsleutel de weg, zonder zelf een sessie te munten', async () => {
+  const WW = 'eigenaarsproef123';
+  const { child, base } = await startServer({ env: { SMTP_URL: '',
+    RTG_OWNER_EMAIL: 'baas@rtg.test', DEMO_PASS: WW } });
+  try {
+    await api(base, '/api/auth/register', { name: 'Gewoon Lid', email: 'lid@rtg.test',
+      password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' });
+
+    const baas = await api(base, '/api/supplier/mijn/login', { login: 'baas@rtg.test', password: WW });
+    assert.equal(baas.status, 404, 'de eigenaar staat op geen rooster');
+    assert.equal(baas.body.kantoor, true, 'maar de deur zegt dat er een kantoorsleutel is');
+    assert.equal(baas.body.token, undefined, 'en munt daar zelf geen sessie voor');
+
+    const ander = await api(base, '/api/supplier/mijn/login', { login: 'lid@rtg.test', password: 'geheim123' });
+    assert.equal(ander.status, 404, 'een gewoon lid staat ook op geen rooster');
+    assert.equal(ander.body.kantoor, undefined, 'en krijgt geen kantoorwijzer');
+
+    const fout = await api(base, '/api/supplier/mijn/login', { login: 'baas@rtg.test', password: 'verkeerd' });
+    assert.equal(fout.status, 401, 'zonder het juiste wachtwoord verraadt de deur niets');
+    assert.equal(fout.body.kantoor, undefined);
+  } finally { stop(child); }
+});

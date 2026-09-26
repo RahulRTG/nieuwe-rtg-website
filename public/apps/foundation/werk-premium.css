@@ -54,7 +54,7 @@ body.rtg-werk-os{background:radial-gradient(1000px 620px at 72% -20%,rgba(47,98,
 .werk-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;}
 .werk-card h3{margin:0;font:500 20px/1.16 var(--serif);letter-spacing:-.01em;}
 .werk-card .bedrijf{margin-top:5px;color:var(--werk-muted);font-size:12px;}
-.werk-score{display:grid;place-items:center;width:48px;height:48px;flex:none;border:1px solid rgba(131,187,147,.35);border-radius:50%;background:rgba(131,187,147,.06);color:var(--werk-good);font:800 12px/1 var(--sans);}
+.werk-score{display:inline-block;flex:none;max-width:9rem;padding:6px 8px;border:1px solid rgba(131,187,147,.35);border-radius:0;background:rgba(131,187,147,.06);color:var(--werk-good);font:700 11px/1.3 var(--sans);text-align:center;}
 .werk-card-meta{display:flex;flex-wrap:wrap;gap:7px;margin-top:15px;color:var(--werk-soft);font-size:11px;}
 .werk-card-meta span+span::before{content:"·";margin-right:7px;color:var(--werk-line-strong);}
 .werk-card-reason{margin:13px 0 0;color:var(--werk-muted);font-size:12px;line-height:1.5;}

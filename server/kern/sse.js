@@ -56,14 +56,33 @@ function maakSse({ bus }) {
   // persoonlijke events ook in de terugspeelbuffer leggen.
   function leverSse(m) {
     if (m.doel === 'key' && m.id) bufferEvent(m.match, m.id, m.event, m.data);
-    for (const c of sseClients) {
+    // een kopie: sluit() haalt een verbinding uit de lijst, en de lus mag daar
+    // niet de volgende door overslaan
+    for (const c of sseClients.slice()) {
       let raak = false;
       if (m.doel === 'key') raak = c.key === m.match;
       else if (m.doel === 'sup') raak = c.sup === m.match;
       else if (m.doel === 'office') raak = !!c.office;
       else if (m.doel === 'tier') raak = m.match.includes(c.tier);
-      if (raak) sseSend(c.res, m.event, m.data, m.doel === 'key' ? m.id : undefined);
+      if (!raak) continue;
+      if (!nogGeldig(c)) { sluit(c); continue; }
+      sseSend(c.res, m.event, m.data, m.doel === 'key' ? m.id : undefined);
     }
+  }
+
+  /* ELK BERICHT OPNIEUW (AUTHORITY.md fase 3). Een kantoor- of leveranciersstroom
+     werd alleen bij het OPENEN gecontroleerd; een ingetrokken sessie bleef daarna
+     meelezen tot de verbinding vanzelf viel. Wie een stroom opent, geeft nu een
+     `geldig()` mee; die wordt vlak voor elk bericht gevraagd. Een vraag die
+     gooit, geldt als NEE: een stroom die niet kan bewijzen dat hij mag, zwijgt. */
+  function nogGeldig(c) {
+    if (typeof c.geldig !== 'function') return true;
+    try { return !!c.geldig(); } catch (e) { return false; }
+  }
+  function sluit(c) {
+    try { c.res.end(); } catch (e) { /* al dicht */ }
+    const i = sseClients.indexOf(c);
+    if (i >= 0) sseClients.splice(i, 1);
   }
 
   // Periodiek onderhoud: verlopen buffers opruimen zodat het geheugen niet

@@ -58,7 +58,13 @@ test('Mijn loopbaan en het deelbewijs: van een leeg ledger naar een regel die ee
 
       /* 1. Leeg is een uitnodiging. */
       await page.goto(base + '/apps/loopbaan.html', { waitUntil: 'domcontentloaded' });
-      await page.waitForSelector('#reeks .leeg, #reeks .kaart');
+      /* Niet op `#reeks .leeg` alleen: de laadtekst "Bezig met laden." draagt die
+         klasse ook, dus dan kijkt de toets voor het antwoord er is. Onder belasting
+         (vier toetsbestanden tegelijk) zakte hij daarop, 24 september 2026. */
+      await page.waitForFunction(() => {
+        const r = document.querySelector('#reeks');
+        return r && r.querySelector('.leeg, .kaart') && !/Bezig met laden/.test(r.textContent);
+      });
       assert.match(await page.textContent('#reeks'), /begint hier|jaren geleden/i,
         'een leeg ledger hoort te zeggen dat het hier begint, niet leeg te blijven');
 

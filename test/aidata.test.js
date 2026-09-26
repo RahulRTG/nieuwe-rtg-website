@@ -114,7 +114,11 @@ test('de export laat een auditregel achter die de boardroom terugleest', async (
   const na = await api('office/boardroom', {}, office.token);
   const regels = (na.body.audit || []).filter(r => /AI-dataset geexporteerd/.test(r.wat || ''));
   assert.ok(regels.length > tellingVoor, 'na de export hoort er een regel bij te staan');
-  assert.equal(regels[0].wie, 'auditproef', 'en die regel noemt wie het deed');
+  /* WIE HET DEED KOMT UIT DE SESSIE. Deze bewering eiste tot 23 september 2026
+     precies het omgekeerde: dat de naam uit het verzoek in het spoor kwam. Een
+     spoor waarin de aanroeper zijn eigen naam typt, bewijst niets. */
+  assert.notEqual(regels[0].wie, 'auditproef', 'een meegestuurde naam komt NIET in het spoor');
+  assert.match(String(regels[0].wie), /^user-\d+$/, 'maar de sleutel die de boardroompoort vaststelde: ' + regels[0].wie);
 });
 
 test('onder een liegende opslag gaat de dataset NIET de deur uit', async () => {

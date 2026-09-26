@@ -88,10 +88,12 @@
     </div>
   </div>
 
-  <div class="deel">Toegang</div>
-  <h2>Actieve toegang</h2>
-  <div class="kaart"><div id="sessies" class="stil">…</div></div>
-
+  <!-- WIE ER TOEGANG HEEFT STAAT HIER NIET MEER. Hier stonden "Actieve toegang",
+       de machtigingen die u gaf en het inzagelog, met eigen intrekknoppen -- terwijl
+       /apps/mijn-relaties.html precies die drie al toonde uit dezelfde bron
+       (kern/consent-register.js draagt rtgid-sessie en rtgid-machtiging als lagen,
+       /api/inzagekaart leest het iD-log). Drie schermen die hetzelfde beantwoorden
+       lopen uit elkaar; dit scherm houdt wat alleen RTG iD kan (SCHERMEIGENAAR.json). -->
   <div class="deel">Machtigingen</div>
   <h2>Machtigingen</h2>
   <div class="kaart">
@@ -102,15 +104,12 @@
       <input id="mDagen" type="number" min="1" max="90" value="30" aria-label="Dagen">
       <button class="knop vol" id="mGeef" type="button">Machtig</button>
     </div>
+    <p class="stil h-mt50">Welke diensten nu toegang hebben, wie namens u mag inloggen, en wat er is
+      opgevraagd, ziet en sluit u in <a href="/apps/mijn-relaties.html">Wie heeft toegang tot mij</a>.</p>
     <div class="h-mt50" id="machtigingen"></div>
   </div>
-
-  <div class="deel">Inzagelog</div>
-  <h2>Inzagelog</h2>
-  <div class="kaart"><div id="log" class="stil">…</div></div>
 </main>
 <div class="melding" id="melding" role="status"></div>
-<script src="/shared/uitvoer.js"></script>
 <script>
 (() => {
   const $ = s => document.querySelector(s);
@@ -252,49 +251,21 @@
     $('#koppelKaart').style.display = 'none'; $('#codeIn').value = ''; koppel = null;
   });
 
-  /* ---- inzage: log, actieve sessies met intrekken, machtigingen ---- */
-  let STAND = null;
+  /* ---- namens wie U mag inloggen ----
+     De machtigingen die u GAF zijn toegang tot u, en die staan in Wie heeft toegang
+     tot mij. Wat hier blijft is de andere richting: namens wie u zelf mag inloggen.
+     Dat is geen toegang tot u maar een bevoegdheid van u, en die hoort bij het
+     inloggen hierboven (de keuze "Namens ..." bij een koppelcode). */
   async function laad(){
     const r = await api('inzage');
     if (r.status !== 200) { zeg(r.body.error || 'Log eerst in op de leden-app.'); return; }
-    const d = r.body;
-    STAND = d;
-    $('#sessies').innerHTML = d.sessies.length ? d.sessies.map(s =>
-      '<div class="item"><span class="rek">' + esc(s.dienst) + (s.namens ? ' <small>via gemachtigde ' + esc(s.namens) + '</small>' : '') +
-      '<small>tot ' + new Date(s.verloopt).toLocaleTimeString('nl-NL').slice(0,5) + ' · ' + s.attributen.map(esc).join(', ') +
-      /* Hoe vaak deze dienst uw gegevens heeft opgehaald. Een inlog is een
-         deur; dit is hoeveel er doorheen is gelopen. Bij een keer zeggen we
-         niets: dat is de inlog zelf. */
-      (s.opgehaald > 1 ? ' · ' + s.opgehaald + '\u00d7 opgehaald' : '') + '</small></span>' +
-      '<button class="knop rood" data-intrek="' + esc(s.dienst) + '">Trek in</button></div>').join('')
-      : 'Geen dienst heeft nu toegang.';
-    $('#machtigingen').innerHTML = d.machtigingen.length ? d.machtigingen.map(m =>
-      '<div class="item"><span class="rek">' + (m.ik === 'geef' ? esc(m.naar) + ' mag namens u' : 'U mag namens ' + esc(m.van)) +
-      '<small>' + esc(m.dienst) + ' · tot ' + new Date(m.tot).toLocaleDateString('nl-NL') + '</small></span>' +
-      '<button class="knop rood" data-mweg="' + m.id + '">Trek in</button></div>').join('')
-      : '<p class="stil">Geen machtigingen.</p>';
-    $('#log').innerHTML = d.log.length ? d.log.map(l =>
-      '<div class="item"><span class="rek">' + esc(l.dienst) + ' · ' + esc(l.soort) +
-      '<small>' + new Date(l.om).toLocaleString('nl-NL') + (l.attributen.length ? ' · ' + l.attributen.map(esc).join(', ') : '') + '</small></span></div>').join('')
-      : 'Nog niets gedeeld; zo hoort het log te beginnen.';
-    document.querySelectorAll('[data-intrek]').forEach(b => b.addEventListener('click', async () => {
-      await api('intrek', { dienst: b.dataset.intrek }); zeg('Toegang ingetrokken.'); laad();
-    }));
-    document.querySelectorAll('[data-mweg]').forEach(b => b.addEventListener('click', async () => {
-      await api('machtig/intrek', { id: b.dataset.mweg }); zeg('Machtiging ingetrokken.'); laad();
-    }));
+    const mijn = (r.body.machtigingen || []).filter(m => m.ik !== 'geef');
+    $('#machtigingen').innerHTML = mijn.length
+      ? '<p class="stil">Namens wie u mag inloggen:</p>' + mijn.map(m =>
+        '<div class="item"><span class="rek">U mag namens ' + esc(m.van) +
+        '<small>' + esc(m.dienst) + ' · tot ' + new Date(m.tot).toLocaleDateString('nl-NL') + '</small></span></div>').join('')
+      : '';
   }
-  /* Meenemen: het inzagelog is het register van deze app -- wie vroeg wat, en
-     wanneer. De app kent dat model zelf, dus geeft hij het door in plaats van
-     de gedeelde laag het scherm te laten raden. Datum en tijd staan los, zodat
-     een rij ook buiten deze app te sorteren is. */
-  if (window.RTGUitvoer) RTGUitvoer.bron(() => {
-    if (!STAND || !STAND.log || !STAND.log.length) return null;
-    return { naam: 'inzagelog',
-      kolommen: ['datum', 'tijd', 'dienst', 'soort', 'gedeelde gegevens'],
-      rijen: STAND.log.map(l => [String(l.om).slice(0, 10), String(l.om).slice(11, 16),
-        l.dienst, l.soort, (l.attributen || []).join(', ')]) };
-  });
 
   $('#mGeef').addEventListener('click', async () => {
     const r = await api('machtig', { codenaam: $('#mCode').value, dienst: $('#mDienst').value, dagen: $('#mDagen').value });

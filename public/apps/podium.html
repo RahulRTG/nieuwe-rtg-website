@@ -271,6 +271,8 @@
       if (balk && balk.parentNode !== $('#vPoort')) $('#vPoort').insertBefore(balk, $('#vPoort').firstChild);
       toon('vPoort'); return;
     }
+    /* Onvolledig antwoord: niet "undefined" in de uitleg en geen lege zaal die beweert dat er niets live is (LIEGRONDE.json). */
+    if (!(r.body && typeof r.body.zoneUitleg === 'string' && Array.isArray(r.body.kanalen))) { $('#poortReden').textContent = 'Het antwoord was onvolledig, dus dit kon niet worden geladen.'; toon('vPoort'); return; }
     zaal = r.body; cadeaus = zaal.cadeaus || [];
     tekenZones(zaal.zones, zaal.zone);
     const uitleg = $('#zoneUitleg');

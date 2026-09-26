@@ -1,5 +1,12 @@
 {
-  "stempel": "2026-09-13",
+  "stempel": {
+    "op": "2026-09-24T16:37:26.650Z",
+    "commit": "56ea75ba",
+    "boomVuil": false,
+    "boomAnders": 4,
+    "instrument": "scripts/momentproef.js",
+    "node": "v22.22.2"
+  },
   "uitleg": "Een publieke keten van een feit bij de bron tot een melding bij iemand die daar zelf ja tegen zei, gemeten per SCHAKEL (handelt actor A, en weet actor B het?) en per STORING (houdt de keten zijn belofte als het misgaat?). Vierde keten naast tafelproef, ritproef en toelatingsproef -- zie STAGE.md par. 6.",
   "grens": "Alle vier de Moment-aanleidingen lopen hier echt: festivalboeking, festivalproduct en de uitlichting in De Salon op de hoofdserver, de wedstrijd van een sportclub op een eigen server (schakel 10 -- zie de kop van sportclubKeten voor waarom dat een tweede server vraagt). Wat hier NIET gemeten is: er komt geen browser aan te pas, en er wordt niets betaald -- dat een fan werkelijk een kaart KAN kopen blijft ongemeten, want die route bestaat aan de ledenkant niet. Schakel 5 meet dat hij het moment TERUGVINDT, niet dat hij het kan afrekenen.",
   "schakels": [
@@ -13,7 +20,7 @@
       "status": 200,
       "ziet": "aanwezigheid \"Sal Nocturna\" (drager: zaak), zendt uit: muziek, video's, korte video, live, optredens, kaartverkoop, wedstrijden, uitgelicht werk",
       "fout": null,
-      "ms": 23
+      "ms": 15
     },
     {
       "nr": 2,
@@ -25,7 +32,7 @@
       "status": 200,
       "ziet": "zoeken op de naam geeft 1 treffer(s); de aanwezigheid van het festival staat erbij met volgIk=false en zendt uit: muziek, video's, korte video, live, optredens, kaartverkoop, wedstrijden, uitgelicht werk",
       "fout": null,
-      "ms": 13
+      "ms": 10
     },
     {
       "nr": 3,
@@ -37,7 +44,7 @@
       "status": 200,
       "ziet": "volgt er 1, en kreeg vooraf te lezen: muziek, video's, korte video, live, optredens, kaartverkoop, wedstrijden, uitgelicht werk",
       "fout": null,
-      "ms": 20
+      "ms": 10
     },
     {
       "nr": 4,
@@ -49,7 +56,7 @@
       "status": 200,
       "ziet": "\"Sal Nocturna: kaartverkoop open -- \"Weekendpas voor Proeffestival\".\" (0 -> 1 meldingen)",
       "fout": null,
-      "ms": 20
+      "ms": 14
     },
     {
       "nr": 5,
@@ -61,7 +68,7 @@
       "status": 200,
       "ziet": "de melding draagt geen bestemming (velden buiten de vaste zes: geen), en de tijdlijn van wat hij volgt geeft 2 moment(en) -- de kaartverkoop staat erbij als \"Sal Nocturna: kaartverkoop open\"",
       "fout": null,
-      "ms": 12
+      "ms": 8
     },
     {
       "nr": 6,
@@ -73,7 +80,7 @@
       "status": 200,
       "ziet": "twee posts, 0 lopende uitlichtingen, en de maker draagt 0 aanwezigheden",
       "fout": null,
-      "ms": 25
+      "ms": 21
     },
     {
       "nr": 7,
@@ -85,7 +92,7 @@
       "status": 200,
       "ziet": "moment op lid:lifestyle -- drager: lid, naam: Gouden Ibis",
       "fout": null,
-      "ms": 22
+      "ms": 16
     },
     {
       "nr": 8,
@@ -97,7 +104,7 @@
       "status": 200,
       "ziet": "\"Gouden Ibis: uitgelicht werk -- \"En de tweede middag was stiller.\".\"",
       "fout": null,
-      "ms": 28
+      "ms": 21
     },
     {
       "nr": 9,
@@ -109,7 +116,7 @@
       "status": 200,
       "ziet": "1 melding(en) over kaartverkoop, en het Dagticket zit er niet bij",
       "fout": null,
-      "ms": 30
+      "ms": 17
     },
     {
       "nr": 10,
@@ -121,7 +128,7 @@
       "status": 200,
       "ziet": "de supporter vond \"FC RTG\" via de zoeker, en na de wedstrijd 0 -> 1 meldingen (1 over een wedstrijd); zijn tijdlijn draagt 2 wedstrijdmoment(en) van de club",
       "fout": null,
-      "ms": 24
+      "ms": 22
     }
   ],
   "storingen": [

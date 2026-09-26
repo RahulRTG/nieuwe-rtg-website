@@ -287,7 +287,15 @@ function meet() {
           'bankVervers() haalt kredietbord en matrix in een Promise.all op, dus de hele kamer ' +
           'viel om. Nog altijd 16 lager dan main (385).',
         omlaag: 'De zes uitvoerende bankknoppen staan nu op naam; de volgende stap is niet deze ' +
-          'vier lezingen maar de 13 zware routes buiten de bank, en daarna ENFORCE_READ per kamer.' }
+          'vier lezingen maar de 13 zware routes buiten de bank, en daarna ENFORCE_READ per kamer.' },
+      { as: 'anoniemUitvoerbaar', van: 365, naar: 366, op: '2026-09-23',
+        reden: 'POST /api/office/beleidsmotor/waarom (AUTHORITY.md fase 1, #347) is met opzet open ' +
+          'voor ELKE kantoorsessie, ook de gedeelde code: hij zegt alleen over de aanvrager zelf welke ' +
+          'eis per deur viel, zodat een weigering niet geraden hoeft te worden. Hij schrijft niets ' +
+          '(mutatiecontract NOT_APPLICABLE, idem-verklaring leest). Op de tak van #347 mat de meter ' +
+          'al 366; het register was daar niet bijgewerkt.',
+        omlaag: 'Zodra de beleidsmotor uit de schaduw komt (AUTHORITY.md fase 2) antwoordt de route ' +
+          'op de handelende mens en valt hij onder KENT_MENS; tot dan telt hij hier mee.' }
     ],
     stempel: { op: new Date().toISOString(), commit: commit(), node: process.version },
     gemeten: {

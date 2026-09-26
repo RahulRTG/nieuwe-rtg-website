@@ -53,7 +53,13 @@ test('0. de toets zelf: sleutel gaat voor naam, en de graad zegt hoe hard hij is
 
   assert.equal(vierogen.toets({ inzender: { id: 'a', naam: 'Sam' }, doorKey: 'b', doorNaam: 'Ada' }).graad, 'bewezen');
   assert.equal(vierogen.toets({ inzender: { id: null, naam: 'Sam' }, doorKey: null, doorNaam: 'Ada' }).graad, 'opgegeven');
-  assert.equal(vierogen.toets({ inzender: null, doorKey: null, doorNaam: 'Ada' }).graad, 'onbekend');
+  const onbekend = vierogen.toets({ inzender: null, doorKey: null, doorNaam: 'Ada' });
+  assert.equal(onbekend.graad, 'onbekend');
+  assert.equal(onbekend.mag, false, 'zonder identiteit is niet vast te stellen dat het twee mensen zijn: dicht (AUTHORITY.md B2)');
+  assert.equal(onbekend.code, 'geen-identiteit');
+  assert.match(onbekend.reden, /persoonlijke inlog/, 'de weigering zegt hoe het wel kan');
+  assert.equal(vierogen.toets({ inzender: { soort: 'medewerker', id: null, naam: null }, doorKey: 'user-7', doorNaam: 'Ada' }).mag, false,
+    'een inzending zonder mens erachter tekent niemand af, ook niet met een bewezen sleutel aan de andere kant');
 });
 
 test.before(async () => {

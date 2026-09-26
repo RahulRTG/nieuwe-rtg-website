@@ -23,7 +23,6 @@
    ========================================================================== */
 const fs = require('fs');
 const path = require('path');
-const crypto = require('crypto');
 const { DatabaseSync } = require('node:sqlite');
 const S = require('./state');
 const migraties = require('../migraties');
@@ -33,6 +32,7 @@ const users = require('./users');
 const staff = require('./staff');
 const staffSessie = require('./staff-sessie');
 const actiebewijs = require('./actiebewijs');
+const sleutelbestand = require('../lib/sleutelbestand');
 
 // Zelfde datamap als db.js: instelbaar met RTG_DATA_DIR (tests + productie).
 const DATA_DIR = process.env.RTG_DATA_DIR || path.join(__dirname, '..', 'data');
@@ -45,15 +45,9 @@ const RING_FILE = path.join(DATA_DIR, 'vault.ring');     // extra kluissleutels 
    de token-ondertekening (SECRET) op elke instance gelijk zijn, anders kan de ene
    instance de gegevens van de andere niet ontsleutelen en klopt de e-mail-hash
    voor het inloggen niet. Daarom eerst uit de omgeving (gedeeld secret manager),
-   en pas als terugval een lokaal bestand (prima voor één instance / lokaal). */
-function loadKey(file, envName) {
-  const env = envName ? process.env[envName] : null;
-  if (env) return /^[0-9a-fA-F]{64}$/.test(env) ? Buffer.from(env, 'hex') : crypto.createHash('sha256').update(env).digest();
-  if (fs.existsSync(file)) return fs.readFileSync(file);
-  const k = crypto.randomBytes(32);
-  try { fs.writeFileSync(file, k); } catch (e) {}
-  return k;
-}
+   en pas als terugval een lokaal bestand -- gelezen of als EERSTE gepubliceerd
+   (server/lib/sleutelbestand.js). Hier stond existsSync + writeFileSync, en dat
+   liet een tweede proces een lege vault.key lezen: `Invalid key length`. */
 
 /* De keyring voor de VERSLEUTELING laden: extra sleutels die bij een rotatie zijn
    bijgezet, nieuwste eerst. De oorspronkelijke VAULT-sleutel komt er altijd achter
@@ -90,8 +84,8 @@ function zetGelijktijdigheid(db) {
      je wilt weten. */
   migraties.draai(db);
 
-  S.SECRET = loadKey(SECRET_FILE, 'RTG_SECRET_KEY');
-  S.VAULT = loadKey(VAULT_FILE, 'RTG_VAULT_KEY');
+  S.SECRET = sleutelbestand.uitOmgevingOfBestand(SECRET_FILE, 'RTG_SECRET_KEY');
+  S.VAULT = sleutelbestand.uitOmgevingOfBestand(VAULT_FILE, 'RTG_VAULT_KEY');
   S.RING = loadRing(RING_FILE, S.VAULT);
 }
 

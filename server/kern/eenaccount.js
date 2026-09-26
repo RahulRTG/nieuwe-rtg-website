@@ -34,8 +34,11 @@ function maakEenAccount({ db, save, crypto, accounts, findSupplier, checkCred, h
      is ontstaan. Liever een server die niet start. */
   if (!pinSlot || typeof pinSlot.personeel !== 'function')
     throw new Error('eenaccount: pinSlot ontbreekt; zonder gedeeld doel-slot is /api/account/koppel een tweede, ongeremde deur naar de personeelspin.');
+  /* Fase 2: de uitnodiging op naam woont bij de kantoorlaag, maar wordt hier
+     verzilverd, want hier komt de kantoorrol aan de sleutelbos. */
+  const kantoorUitnodiging = require('./kantoor/uitnodiging').maakUitnodiging({ db, save, crypto });
   const koppelen = require('./eenaccount/koppelen')({ accounts, findSupplier, checkCred, hasCred,
-    DEMO, DEMO_SUPPLIER, OFFICE_CODE, veiligGelijk, totpOk, logInlog, pinSlot, nu });
+    DEMO, DEMO_SUPPLIER, OFFICE_CODE, veiligGelijk, totpOk, logInlog, pinSlot, nu, kantoorUitnodiging });
 
   /* De AFGELEIDE sleutels: niet opgeslagen maar gelezen uit een waarheid die
      ergens anders al staat -- de kantoordeur van de eigenaar en elke
@@ -123,7 +126,19 @@ function maakEenAccount({ db, save, crypto, accounts, findSupplier, checkCred, h
     findSupplier, rememberSession, logInlog, logActivity, supplierState, officeState,
     magWerken, pinInfo, pinCheck, lijst, zelfde, eigenaarKantoor, afgeleid, nu, persoonsPoort, sessieregister });
 
-  return { accRollen, accKoppel, accStart, accOntkoppel };
+  /* Wie de kantoorrol houdt, voor de toegangsreview (AUTHORITY.md fase 8): alleen
+     sleutel en sinds, en alleen lezen. Hier en niet in de review, want deze
+     module is de eigenaar van db.data.accountRollen. */
+  function kantoorHouders() {
+    const alle = (db.data && db.data.accountRollen) || {};
+    const uit = [];
+    for (const [key, l] of Object.entries(alle)) {
+      for (const r of (Array.isArray(l) ? l : [])) if (r && r.rol === 'kantoor') uit.push({ key, sinds: r.at || null });
+    }
+    return uit;
+  }
+
+  return { accRollen, accKoppel, accStart, accOntkoppel, kantoorHouders, kantoorUitnodiging };
 }
 
 module.exports = { maakEenAccount };

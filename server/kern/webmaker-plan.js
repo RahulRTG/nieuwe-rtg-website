@@ -50,7 +50,7 @@ module.exports = ({ store, save, bevries, spoor }) => {
     if (Date.parse(d.plan) > Date.now()) return false;
     delete d.plan;
     bevries(d);
-    spoor.noteer(d.id, 'gepubliceerd volgens planning', null);
+    spoor.noteer(d.id, 'gepubliceerd volgens planning', require('./dienstidentiteit').actorVan('webmaker-plan'));
     return true;
   }
 
@@ -64,7 +64,7 @@ module.exports = ({ store, save, bevries, spoor }) => {
     if (anders) save();
   }
 
-  const timer = setInterval(veeg, TIK_MS);
+  const timer = setInterval(() => require('./dienstidentiteit').alsDienst('webmaker-plan', veeg), TIK_MS);
   if (timer.unref) timer.unref();
 
   return { plan, veeg, rijp };

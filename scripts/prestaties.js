@@ -9,7 +9,7 @@ const crypto = require('node:crypto');
 const functies = require('../server/functies');
 const maakScanner = require('../server/kern/magnaat-capabilities');
 const maakControle = require('../server/kern/magnaat-controle');
-const maakEconomie = require('../server/kern/magnaat-economie');
+const maakEconomie = require('../server/kern/magnaat-oefeneconomie');
 
 const SNEL = process.argv.includes('--snel');
 

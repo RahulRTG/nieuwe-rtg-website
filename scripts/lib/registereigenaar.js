@@ -54,6 +54,15 @@ const WORTEL = path.join(__dirname, '..', '..');
    er geen programma is en dat een mens of een keuring hem onderhoudt -- dan hoort
    er een LEZER bij te staan, want een register dat niemand leest is geen register. */
 const EIGENAAR = {
+  /* Twee registers uit de afbouw van APPWERKT (24 september 2026). Beide zijn
+     een bron voor een bewijs en worden via versheid() gelezen, dus hun eigenaar
+     staat hier en niet alleen in de detectie. */
+  'LUSPROEF.json': { schrijver: 'scripts/lusproef.js',
+    waarom: 'lusproef.js --vastleggen schrijft het na een volledige keten tegen een wegwerpserver; APPWERKT leest het als bron voor voltooibaar van Ontdekken (scripts/lib/appcontract.js).' },
+  'LIEGRONDE.json': { schrijver: 'scripts/liegronde.js',
+    waarom: 'liegronde.js --vastleggen schrijft het na een browserronde met de liegpoort over elke rij van MAPPEN; APPWERKT leest het als bron voor waarheidsgetrouw (ALGEMEEN in scripts/lib/appcontract.js).' },
+  'BEVOEGD.json': { schrijver: 'scripts/bevoegdronde.js',
+    waarom: 'bevoegdronde.js --vastleggen stelt de ledenrijen samen uit IDOR.json en ROLPROEF.json en loopt een kruisproef over de gezinsschermen; APPWERKT leest het als bron voor bevoegd (ALGEMEEN in scripts/lib/appcontract.js).' },
   'WORLD-DESKTOP.md': { soort: 'BRON',
     waarom: 'Handmatig onderhouden ontwerp- en bereikbeschrijving van de desktopwerelden; uitvoerbare toetsen leveren het afzonderlijke bewijs.' },
   'WEBSITE-STORYLINE.md': { soort: 'BRON',
@@ -71,10 +80,26 @@ const EIGENAAR = {
     waarom: 'Handmatig onderhouden ontwerp- en implementatienotitie voor de drie goedgekeurde homes, met de daadwerkelijk uitgevoerde proeven en hun grenzen.' },
   'LANGUAGE.md': { soort: 'BRON',
     waarom: 'Handmatig onderhouden architectuur- en bereikbeschrijving; de drie taalrapporten dragen het afzonderlijke uitvoerbare bewijs.' },
+  'TOESTEL.md': { soort: 'BRON',
+    waarom: 'Handmatig geschreven richtingsdocument (AI op het toestel van het lid); de gerepareerde herkomst staat in test/ai-herkomst.test.js, er is geen generator die het schrijft.' },
+  'AUTHORITY.md': { soort: 'BRON',
+    waarom: 'Handmatig geschreven richtingsdocument (RTG Authority Engine); de bronverwijzingen zijn met de hand nagelopen, er is geen generator die het schrijft.' },
+  'BENOEMING.md': { soort: 'BRON',
+    waarom: 'Handmatig geschreven richtingsdocument (RTFoundation Roles & Governance 2.0); de bronverwijzingen erin zijn met de hand nagelopen, er is geen generator die het schrijft.' },
+  'BEWIJSLUS.md': { soort: 'BRON',
+    waarom: 'Handmatig geschreven richtingsdocument (de terugweg van productie naar bewijs); de namen en bronverwijzingen erin zijn met de hand gemeten, er is geen generator die het schrijft.' },
   'LANGUAGE-AUDIT.md': { soort: 'BRON',
     waarom: 'Handmatig beoordeelde bevindingen en resterende taalgrenzen; geen automatisch gegenereerd register.' },
   /* De aanleiding zelf. Er is geen schrijvend script: de lijst wordt met de hand
      onderhouden en mag alleen krimpen. */
+  /* De consolidatieronde van 23 september 2026: de meting (welke schermen
+     roepen dezelfde paden aan) en het besluit (wie is eigenaar per capability)
+     zijn twee bestanden, en alleen de eerste heeft een schrijver. */
+  'SCHERMFUNCTIE.json': { schrijver: 'scripts/schermfunctie.js' },
+  'SCHERMEIGENAAR.json': { handmatig: true, lezer: 'test/schermeigenaar.test.js',
+    waarom: 'het eigenaarsregister is een BESLUIT per capability en per overlappend paar; de toets houdt het ' +
+      'tegen een verse meting van scripts/schermfunctie.js, en wie het uit die meting genereert laat de toets ' +
+      'met zichzelf vergelijken' },
   'BEREIK.json': { handmatig: true, lezer: 'test/bereikbaar.test.js',
     waarom: 'schuldlijst van schermen zonder klikroute; wordt met de hand bijgehouden en mag alleen krimpen. ' +
       'Precies daarom kon een nieuw script hem stil overschrijven zonder dat een schrijverscan iets zag.' },
@@ -90,6 +115,12 @@ const EIGENAAR = {
      bijkomen zonder dat iemand zegt wie ze bezit. */
   'VERANDERBEREIK-KENNIS.json': { schrijver: 'scripts/veranderbereik.js' },
   'VERANDERBEREIK-RONDE.json': { schrijver: 'scripts/veranderbereik.js' },
+  /* DE EDGE (EDGE.md par. 9). Twee meters en elk zijn eigen bestand: de kaart
+     leest de BRON (wie schrijft, beslist en leest), de dekking een echte
+     BROWSER (welk veld heeft elk scherm, en waar komt het vandaan). Hun ratels
+     staan in scripts/norm.js; dat de meters kunnen uitslaan in test/meterijk.test.js. */
+  'EDGEKAART.json': { schrijver: 'scripts/edgekaart.js' },
+  'EDGEDEKKING.json': { schrijver: 'scripts/edgedekking.js' },
   'LANDDEKKING.json': { schrijver: 'scripts/landdekking.js' },
   'SOEVEREIN.json': { schrijver: 'scripts/soeverein.js' },
   'DOORBELASTING.json': { schrijver: 'scripts/doorbelasting.js' },
@@ -111,6 +142,12 @@ const EIGENAAR = {
      bijkomen, niet te stijgen doordat er registers bijkomen zonder eigenaar. De
      vloer oprekken zou die zin precies omdraaien. */
   'PLANVORM.json': { schrijver: 'scripts/planvorm.js' },
+
+  /* De officevorm: is er een `RTGObject` onder document, taak, betaling en de
+     andere subtypen die het voorstel voor RTG Office Next noemt (OFFICE.md par.
+     0)? Zelfde vorm als de planvorm hierboven: een schrijver, een ratel op het
+     BEREIK, een ijking en een regel in de versheidslijst. */
+  'OFFICEVORM.json': { schrijver: 'scripts/officevorm.js' },
 
   /* De spiegel van STILSPOOR: lezers die een onleesbaar bewijs als een afwezig
      bewijs behandelen. Vier tanden in scripts/lib/metingen.js, en de detectie
@@ -210,6 +247,8 @@ const EIGENAAR = {
   'KETENBEREIK.json': { schrijver: 'scripts/ketenbereik.js' },
   'PAKTEBETEKENIS.json': { schrijver: 'scripts/paktebetekenis.js' },
   'MANDAATPROEF.json': { schrijver: 'scripts/mandaatproef.js' },
+  /* De Magnaat-grondwet komt met de tak die hem meet; zie MAGNAAT.md. */
+  'MAGNAATGRONDWET.json': { schrijver: 'scripts/magnaatgrondwet.js' },
 };
 
 /* EEN CONSTANTE NAAR DE ARTEFACTNAAM HERLEIDEN, HOOGUIT TWEE SCHAKELS DIEP.

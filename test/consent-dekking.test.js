@@ -96,6 +96,53 @@ test('elke gedekte laag die hier een module heeft, staat ook echt in het registe
   }
 });
 
+/* DE TWEEDE VORM, IN ROUTES/ (ARBEID.md par. 4 punt 7). De eerste scan kende
+   alleen `status: 'actief'` in server/kern/, en daardoor zag hij niet dat een
+   sollicitatie (naam, contact en cv naar een werkgever) en een anonieme
+   werkinteresse nergens in het consentregister stonden: die rijen wonen in
+   server/routes/ en beginnen op `nieuw` of `interesse`. Een rij met die stand
+   en een persoonsverwijzing in de buurt is een OVERDRACHT aan een derde die op
+   een besluit wacht; elke module met die vorm hoort hieronder, met de regel
+   van NIET_GEDEKT die de lezer uitlegt waar het scherm ophoudt, of met een
+   reden waarom het geen gegevens van een lid zijn. */
+const ROUTES = path.join(__dirname, '..', 'server', 'routes');
+const { NIET_GEDEKT } = require('../server/kern/consent-register');
+const OVERDRACHT = {
+  'member/werk.js': { nietGedekt: 'Een sollicitatie die u instuurde' },
+  'supplier/werving/sollicitaties.js': { nietGedekt: 'Een sollicitatie die u instuurde' },
+  'member/werk/talent.js': { nietGedekt: 'Anonieme werkinteresse vanuit de RTFoundation' },
+  'member/partneraanmelding-aanvraag.js': { reden: 'de aanvraag van een ZAAK om partner te worden; er gaan geen gegevens van een lid naar een derde' }
+};
+function heeftOverdrachtsvorm(bron) {
+  const zonderUitleg = bron.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|\s)\/\/[^\n]*/g, '$1');
+  const regels = zonderUitleg.split('\n');
+  for (let i = 0; i < regels.length; i++) {
+    if (!/status:\s*'(nieuw|interesse)'/.test(regels[i])) continue;
+    const buurt = regels.slice(Math.max(0, i - 4), i + 5).join('\n');
+    if (/\bkey\b|\brtf:\s*\{|\bcontact\b/.test(buurt)) return true;
+  }
+  return false;
+}
+
+test('elke overdracht van persoonsgegevens aan een derde in routes/ staat verklaard', () => {
+  const gevonden = jsBestanden(ROUTES)
+    .filter(([, vol]) => heeftOverdrachtsvorm(fs.readFileSync(vol, 'utf8')))
+    .map(([rel]) => rel).sort();
+  assert.ok(gevonden.includes('member/werk/talent.js'), 'de scan vindt de bekende overdracht nog: ' + gevonden.join(', '));
+  const onbekend = gevonden.filter(f => !OVERDRACHT[f]);
+  assert.deepEqual(onbekend, [], 'nieuwe overdracht gevonden in: ' + onbekend.join(', ') +
+    ' -- zet hem in kern/consent-register.js (LAGEN) of kern/consent-register-grens.js (NIET_GEDEKT) en hier met de verwijzing');
+  const dood = Object.keys(OVERDRACHT).filter(f => !gevonden.includes(f));
+  assert.deepEqual(dood, [], 'deze staan in de lijst maar hebben de vorm niet meer: ' + dood.join(', '));
+  const namen = NIET_GEDEKT.map(n => n.naam);
+  for (const [f, def] of Object.entries(OVERDRACHT)) {
+    if (def.nietGedekt) assert.ok(namen.includes(def.nietGedekt), f + ' wijst naar "' + def.nietGedekt + '", en die regel staat niet in NIET_GEDEKT');
+    else assert.ok(def.reden && def.reden.length > 20, f + ' heeft een reden nodig');
+  }
+  assert.equal(heeftOverdrachtsvorm("const e = { id, name, contact, status: 'nieuw' };"), true, 'de vorm wordt herkend');
+  assert.equal(heeftOverdrachtsvorm("const e = { id, status: 'nieuw' };"), false, 'zonder persoon geen overdracht');
+});
+
 test('de scan kan een nieuwe laag ook echt vinden', () => {
   /* Regel 10: een meter die je niet hebt zien uitslaan, meet niets. Hier is de
      bekend-foute invoer: een verzonnen module met precies de vorm. Vindt de

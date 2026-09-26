@@ -11,13 +11,8 @@
    maken -- en een belofte die je alleen kunt nakomen door eerst een route te
    bouwen, is geen goede eerste.
 
-   EN DE PRULLENBAK ZELF IS DE UITZONDERING DIE DE REGEL DRAAGT. Een tweede /weg
-   op iets dat al in de prullenbak staat, wist het bestand met inhoud en versies
-   (server/kern/bestanden-delen.js). Daar is geen terugweg, dus die actie krijgt
-   er ook geen: hij gaat alleen op VASTHOUDEN. Dat komt niet uit een keuze hier
-   maar uit de laag zelf -- een actie zonder `terug` wordt automatisch een borg,
-   en dat is precies de bedoeling. Een knop 'Terugdraaien' die niets terugdraait
-   is erger dan geen knop.
+   Definitief wissen gebruikt nu /wis. /weg mag nooit door een herhaling
+   een zwaarder effect krijgen. Trash/restore lopen via de gedeelde adapter.
 
    Apart bestand en niet in app.js: dat blad staat op 9997 bytes en de maat is
    10240 (check.js regel 13). Zelfde reden als paneel.js ernaast. */
@@ -58,7 +53,7 @@
           /* Geen `terug`, dus de laag maakt er vanzelf een vasthouden van. */
           links: [K.server({
             naam: 'Voorgoed weg', teken: 'ingrijp', sig: 'incident',
-            doe: function () { return roep('weg', { id: id }); }, na: B.laad
+            doe: function () { return roep('wis', { id: id }); }, na: B.laad
           }), K.overnemen(naam)]
         };
       }

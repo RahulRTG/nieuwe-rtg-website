@@ -762,6 +762,9 @@ const METERS = [
      publieke domeinen dat de meter ziet niet stil dalen. */
   { sleutel: 'stageDomeinenGemeten', richting: 'omhoog', wat: 'publieke domeinen die de stagevormmeter werkelijk heeft gezien' },
   { sleutel: 'planDomeinenGemeten', richting: 'omhoog', wat: 'plandomeinen die de planvormmeter werkelijk heeft gezien' },
+  /* OFFICEVORM.json (OFFICE.md par. 0): het bereik onder de nul waarop het
+     besluit rust dat er geen `RTGObject` komt. */
+  { sleutel: 'officeDomeinenGemeten', richting: 'omhoog', wat: 'objectdomeinen die de officevormmeter werkelijk heeft gezien' },
   /* NEIGINGVORM.json (NEIGING.md par. 0). Twee ratels en met opzet geen derde
      over de naamsmeting: die telt sinds de laag bestaat zijn eigen bestanden
      mee, dus een getal daarop zou alleen maar groeien met het werk.
@@ -917,7 +920,45 @@ const METERS = [
      TEGENHOUDT, niet of het gebeurt -- vandaar een schuld en geen storing. */
   { sleutel: 'lussenGeenUitweg', richting: 'omlaag', wat: 'altijd-ware lussen zonder uitweg in hun eigen lijf (LUSSEN.json)' },
   { sleutel: 'lussenKritiek', richting: 'omlaag', wat: 'lussen met onzekere afloop en een gevolg in een kritiek domein (LUSSEN.json)' },
-  { sleutel: 'lussenZonderOverlapRem', richting: 'omlaag', wat: 'wekkers met een async callback en geen rem tegen overlappende uitvoering (LUSSEN.json)' }
+  { sleutel: 'lussenZonderOverlapRem', richting: 'omlaag', wat: 'wekkers met een async callback en geen rem tegen overlappende uitvoering (LUSSEN.json)' },
+  /* DE EDGE (EDGE.md par. 7). Twee registers: EDGEKAART.json (wie doet wat in de
+     Edge-lagen) en EDGEDEKKING.json (wat elk scherm, gemeten in een echte
+     browser, aan de Edge vertelt).
+
+     De veldtanden gaan OMHOOG en staan er per veld, met opzet zonder een som:
+     een totaal over negen velden laat het ene veld dalen terwijl een ander
+     stijgt, en dan staat de ratel groen terwijl er iets verdween. De vergelijking
+     PER SCHERM zit in scripts/edgedekking.js zelf (achteruit zakt, tenzij het
+     met naam wordt aanvaard); deze tanden houden het ingecheckte register vast.
+
+     `edgeGeblokkeerdZonderWaarom` hoort op nul te staan: een geblokkeerde
+     handeling draagt altijd een reden (EDGE.md par. 3). De twee kaarttanden
+     zijn schulden: dubbele eigenaars van een verantwoordelijkheid, en
+     rtg-gebeurtenissen met een zender zonder luisteraar of andersom -- die
+     laatste over heel public/, want een dood kanaal naast de Edge is net zo
+     dood. */
+  { sleutel: 'edgeGeblokkeerdZonderWaarom', richting: 'omlaag', wat: 'geblokkeerde Edge-handelingen zonder reden, over alle gemeten schermen -- hoort nul te zijn (EDGEDEKKING.json)' },
+  { sleutel: 'edgeDubbeleEigenaars', richting: 'omlaag', wat: 'Edge-verantwoordelijkheden met meer dan een schrijver of beslisser (EDGEKAART.json)' },
+  { sleutel: 'rtgDodeKanalen', richting: 'omlaag', wat: 'rtg-gebeurtenissen in public/ met een luisteraar zonder zender of andersom (EDGEKAART.json)' },
+  { sleutel: 'edgeVeldIdentiteit', richting: 'omhoog', wat: 'schermen die identiteit aan de Edge publiceren (EDGEDEKKING.json)' },
+  { sleutel: 'edgeVeldWereld', richting: 'omhoog', wat: 'schermen die wereld aan de Edge publiceren (EDGEDEKKING.json)' },
+  { sleutel: 'edgeVeldContext', richting: 'omhoog', wat: 'schermen die context aan de Edge publiceren (EDGEDEKKING.json)' },
+  /* DE ENIGE ZELF-TAND, en hij is GEEN CI-handhaver: de browsermeter draait
+     niet in CI, dus dit getal beweegt alleen als iemand npm run edgedekking
+     draait en het register incheckt. Een scherm dat zijn eigen context
+     kwijtraakt, wordt dan al per scherm tegengehouden door achteruitgang() in
+     scripts/edgedekking.js. Deze tand bijt pas NA een bewuste --aanvaard: een
+     aanvaarde daling staat anders alleen in `aanvaardAchteruit`, en die lijst
+     verdwijnt bij de volgende meting. Hier moet hij een besluit met reden in
+     NORM.json worden. Geen zelf-tanden voor object en activiteit: die staan op
+     nul en kunnen niet zakken. */
+  { sleutel: 'edgeVeldContextZelf', richting: 'omhoog', wat: 'schermen die hun context ZELF aan de Edge publiceren, en niet via een terugval (EDGEDEKKING.json)' },
+  { sleutel: 'edgeVeldObject', richting: 'omhoog', wat: 'schermen die object aan de Edge publiceren (EDGEDEKKING.json)' },
+  { sleutel: 'edgeVeldActiviteit', richting: 'omhoog', wat: 'schermen die activiteit aan de Edge publiceren (EDGEDEKKING.json)' },
+  { sleutel: 'edgeVeldPresence', richting: 'omhoog', wat: 'schermen die presence aan de Edge publiceren (EDGEDEKKING.json)' },
+  { sleutel: 'edgeVeldVoortzetting', richting: 'omhoog', wat: 'schermen die voortzetting aan de Edge publiceren (EDGEDEKKING.json)' },
+  { sleutel: 'edgeVeldHoofdactie', richting: 'omhoog', wat: 'schermen die hoofdactie aan de Edge publiceren (EDGEDEKKING.json)' },
+  { sleutel: 'edgeVeldTrust', richting: 'omhoog', wat: 'schermen die trust aan de Edge publiceren (EDGEDEKKING.json)' }
 ];
 
 /* De telling zelf, als losse functie met de bestandslijst als invoer -- zodat
@@ -1256,6 +1297,27 @@ function leesZaakwig(pad) {
   return a.gezakt;
 }
 
+/* DE EDGE-REGISTERS (EDGE.md par. 7). Een lezer voor beide, want de vorm is
+   dezelfde: een `telling` met getallen. Ontbreekt het getal, dan zakt de meter
+   in plaats van nul te melden -- nul geblokkeerde handelingen zonder reden is
+   precies wat een register zonder acties zou beweren. Met `teller` leest hij
+   een andere teller van hetzelfde veld dan `ja` -- vandaag alleen `zelf`, en
+   dat is een eigen getal en geen deel van `ja`: een scherm dat zijn context
+   verliest aan de casco-terugval blijft `ja` en is niet meer `zelf`. */
+function leesEdge(pad, wat, teller) {
+  const naam = path.basename(pad);
+  let j;
+  try { j = JSON.parse(fs.readFileSync(pad, 'utf8')); }
+  catch (e) { throw new Error(naam + ' ontbreekt of is stuk (' + e.message + '); draai npm run ' + naam.replace('.json', '').toLowerCase()); }
+  const t = (j && j.telling) || {};
+  let v;
+  if (wat === 'dubbeleEigenaars' || wat === 'dodeKanalen') v = t[wat];
+  else if (wat === 'geblokkeerdZonderWaarom') v = t.acties ? Object.values(t.acties).reduce((som, a) => som + a.geblokkeerdZonderWaarom, 0) : undefined;
+  else v = t.perVeld && t.perVeld[wat] ? t.perVeld[wat][teller || 'ja'] : undefined;
+  if (typeof v !== 'number' || Number.isNaN(v)) throw new Error(naam + ' draagt geen ' + wat + (teller ? '.' + teller : '') + '; een meter zonder invoer is geen meter');
+  return v;
+}
+
 /* Een register uit de wortel, met de eerlijke uitkomst als hij er niet is:
    `undefined` en geen nul. Een meter die een ontbrekend bestand als nul leest,
    meldt zijn beste stand op het moment dat hij niets meet. */
@@ -1493,6 +1555,8 @@ function meet(bronnen) {
   const tredeRondgangGezakt = leesRondgang(path.join(WORTEL, 'TREDEPROEF.json'));
   const tredeIngangLekken = leesRondgang(path.join(WORTEL, 'TREDEPROEF.json'), 'ingangLekken');
   const zaakwigGezakt = leesZaakwig(path.join(WORTEL, 'ZAAKWIG.json'));
+  const edgeKaart = (wat) => leesEdge(path.join(WORTEL, 'EDGEKAART.json'), wat);
+  const edgeDekking = (wat, teller) => leesEdge(path.join(WORTEL, 'EDGEDEKKING.json'), wat, teller);
   const meetleerBlind = leesMeetleer(path.join(WORTEL, 'MEETLEER.json'));
 
   /* De deuren naar db.data uit dezelfde bron als het losse script, om dezelfde
@@ -1585,6 +1649,19 @@ function meet(bronnen) {
     tredeRondgangGezakt,
     tredeIngangLekken,
     zaakwigGezakt,
+    edgeGeblokkeerdZonderWaarom: edgeDekking('geblokkeerdZonderWaarom'),
+    edgeDubbeleEigenaars: edgeKaart('dubbeleEigenaars'),
+    rtgDodeKanalen: edgeKaart('dodeKanalen'),
+    edgeVeldIdentiteit: edgeDekking('identiteit'),
+    edgeVeldWereld: edgeDekking('wereld'),
+    edgeVeldContext: edgeDekking('context'),
+    edgeVeldContextZelf: edgeDekking('context', 'zelf'),
+    edgeVeldObject: edgeDekking('object'),
+    edgeVeldActiviteit: edgeDekking('activiteit'),
+    edgeVeldPresence: edgeDekking('presence'),
+    edgeVeldVoortzetting: edgeDekking('voortzetting'),
+    edgeVeldHoofdactie: edgeDekking('hoofdactie'),
+    edgeVeldTrust: edgeDekking('trust'),
     meetleerBlind,
     wekkersOnverklaard,
     wekkersFunctieUitToch,
@@ -1637,6 +1714,7 @@ function meet(bronnen) {
     stempelSchrijversGezien: leesRegister('STEMPELVEILIGHEID.json', (j) => j.schrijvers),
     stageDomeinenGemeten: leesRegister('STAGEVORM.json', (j) => j.gemeten.vorm.domeinen),
     planDomeinenGemeten: leesRegister('PLANVORM.json', (j) => j.rondes.ruim.vorm.domeinen.length),
+    officeDomeinenGemeten: leesRegister('OFFICEVORM.json', (j) => j.rondes.ruim.vorm.domeinen.length),
     neigingVerwijzingRot: leesRegister('NEIGINGVORM.json', (j) => j.gemeten.voorstel.rot),
     neigingVoorkeurBlind: leesRegister('NEIGINGVORM.json', (j) => j.gemeten.voorkeur.metAffiniteit - j.gemeten.voorkeur.metAlledrie),
     connectDomeinenGemeten: leesRegister('CONNECTLUS.json', (j) => j.werkwoorden.domeinen),
@@ -2112,6 +2190,6 @@ function main() {
 }
 
 if (require.main === module) process.exit(main());
-module.exports = { meet, keuringRapport, leesNorm, METERS, schoon, traagsteTanden, heeftEinde, dagenTussen, oordeel, leesActivering, leesTredeproef, leesWekkers, leesRondgang, leesZaakwig, leesMeetleer,
+module.exports = { meet, keuringRapport, leesNorm, METERS, schoon, traagsteTanden, heeftEinde, dagenTussen, oordeel, leesActivering, leesTredeproef, leesWekkers, leesRondgang, leesZaakwig, leesEdge, leesMeetleer,
   PRESTATIEMETERS, leesPrestatie, leesMeting, prestatiePad, bron, PRESTATIEBESTAND, METINGBESTAND, telOngeijkt, telInlineStijl, telSkips,
   telBewijslaag };

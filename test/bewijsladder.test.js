@@ -89,7 +89,8 @@ test('de ladder meet de keten, niet zichzelf', () => {
 test('wat alleen in de keten draait, wordt geteld en niet verzwegen', () => {
   const uit = meet();
   const alleenKeten = uit.sporten.flatMap(s => s.mechanismen.filter(m => !m.lokaal).map(m => m.doel));
-  assert.equal(uit.telling.alleenKeten, alleenKeten.length);
+  assert.equal(uit.telling.vermeldingenAlleenKeten, alleenKeten.length);
+  assert.equal(uit.telling.alleenKeten, new Set(alleenKeten).size);
   for (const doel of alleenKeten) assert.ok(doel, 'een mechanisme zonder naam telt niet mee');
 });
 

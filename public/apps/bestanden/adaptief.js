@@ -37,13 +37,25 @@
   function $(s) { return d.querySelector(s); }
   function B() { return w.RTGBestanden || null; }
   function P() { return w.RTGBestandenPaneel || null; }
-  function nu() { var p = P(); return (p && p.open && p.open()) || null; }
+  function nu() { var p = P(); return (p && p.huidig && p.huidig()) || null; }
   function aan() { var s = $('#bkScrim'); return !!(s && s.classList.contains('open')); }
 
   function tik(el) {
     if (!el) return;
     ['mousedown', 'mouseup', 'click'].forEach(function (n) {
       el.dispatchEvent(new w.MouseEvent(n, { bubbles: true, cancelable: true, view: w }));
+    });
+  }
+
+  function voerUit(pad, file, melding) {
+    var b = B();
+    return b.api(pad, { id: file.id }).then(function (r) {
+      if (r.status !== 200 || r.body.error) {
+        var error = r.body.error || 'De handeling is niet bevestigd.';
+        b.meld(error); throw new Error(error);
+      }
+      if (melding) b.meld(melding);
+      return b.laad().then(function () { if (P()) P().sluit(); });
     });
   }
 
@@ -116,20 +128,20 @@
     /* WEG: het gewicht komt uit de toestand. Zie de kop van dit bestand. */
     if (f.weg) {
       zet('bestanden.voorgoed', 'Voorgoed weg', '✕', 'bewust',
-        function () { b.api('weg', { id: f.id }).then(function () { b.meld('Voorgoed weg.'); b.laad(); }); },
+        function () { return voerUit('wis', f, 'Het bestand is definitief verwijderd.'); },
         { staat: { bevestiging: {
           watGebeurt: 'Dit bestand verdwijnt met al zijn versies. Herstellen kan hierna niet meer.',
           omvang: b.maat(f.bytes), knop: 'Voorgoed weggooien' } } });
       zet('bestanden.herstel', 'Terugzetten', '↺', 'licht',
-        function () { b.api('herstel', { id: f.id }).then(function () { b.meld('Terug in de kluis.'); b.laad(); }); });
+        function () { return voerUit('herstel', f, 'Het bestand staat weer in uw kluis.'); });
     } else if (f.vanMij) {
       zet('bestanden.weg', 'Verwijder', '✕', 'terug',
-        function () { b.api('weg', { id: f.id }).then(function () { b.laad(); }); },
+        function () { return voerUit('weg', f); },
         { staat: {
           /* De weg terug is dezelfde api() die het paneel gebruikt. Zonder deze
              functie zou `terug` een lege belofte zijn, en dan zet gewicht.js hem
              van rechtswege een trap hoger (GRAMMATICA.md). */
-          ongedaan: function () { b.api('herstel', { id: f.id }).then(function () { b.laad(); }); } } });
+          ongedaan: function () { return voerUit('herstel', f); } } });
     }
     return uit;
   }
@@ -137,16 +149,24 @@
   /* Melden zodra het paneel opengaat of dichtgaat, en zodra er in het paneel iets
      verandert. Het register slikt een gelijke melding stil, dus dit mag zo vaak
      als er iets kán zijn veranderd. */
+  /* Zonder open bestand spreekt het scherm toch voor zichzelf (EDGE.md besluit
+     11, stap 24): een context met een bron en zonder handelingen, zodat de Edge
+     de titel van Bestanden leest en niet die van het casco. */
+  function kaal() { A.context({ bron: 'bestanden', titel: 'Bestanden' }); }
   function meld() {
-    if (!aan()) { A.wisContext(); return; }
+    if (!aan()) { kaal(); return; }
     var f = nu();
-    if (!f) { A.wisContext(); return; }
+    if (!f) { kaal(); return; }
     var lijst = caps();
-    if (!lijst.length) { A.wisContext(); return; }
+    if (!lijst.length) { kaal(); return; }
     var staat = {};
     lijst.forEach(function (x) { staat[x.id] = x.staat; });
+    /* Het object is een VERWIJZING naar het open bestand: soort, id en naam, en
+       nooit de inhoud. De vorm beslist de objectpoort in het register
+       (shared/objectverwijzing.js); een scherm geeft alleen door wat het weet. */
     A.context({ bron: 'bestanden', titel: f.naam || 'Bestand',
-      acties: lijst.map(function (x) { return x.id; }), staat: staat, rail: rail() });
+      acties: lijst.map(function (x) { return x.id; }), staat: staat, rail: rail(),
+      object: { soort: 'bestand', id: f.id, label: f.naam || 'Bestand' } });
   }
 
   function start() {

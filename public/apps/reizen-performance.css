@@ -41,7 +41,7 @@ main{min-height:calc(100dvh - var(--header));padding-bottom:calc(var(--nav) + en
 .sub,.sectiekop>p:last-child{color:var(--muted)}
 .tekstknop{border:0;border-bottom:1px solid var(--wine);background:none;color:var(--ivory);padding:.4rem 0;font-size:.62rem;font-weight:700;letter-spacing:.16em}
 
-.dagkop{position:relative;isolation:isolate;container-type:inline-size;min-height:clamp(230px,24vw,330px);display:flex;align-items:flex-end;padding:clamp(1.1rem,2.5vw,1.8rem);overflow:hidden;border:1px solid #4f1324;background-image:linear-gradient(90deg,rgba(24,4,10,.96) 0,rgba(24,4,10,.75) 38%,rgba(24,4,10,.16) 76%),linear-gradient(0deg,rgba(24,4,10,.93),transparent 56%),url('/images/travelos/ibiza-chauffeur.jpg');background-size:cover;background-position:center 58%;box-shadow:0 34px 90px rgba(0,0,0,.34)}
+.dagkop{position:relative;isolation:isolate;container-type:inline-size;min-height:clamp(230px,24vw,330px);display:flex;align-items:flex-end;padding:clamp(1.1rem,2.5vw,1.8rem);overflow:hidden;border:1px solid #4f1324;background-image:linear-gradient(90deg,rgba(24,4,10,.96) 0,rgba(24,4,10,.75) 38%,rgba(24,4,10,.16) 76%),linear-gradient(0deg,rgba(24,4,10,.93),transparent 56%),none;background-size:cover;background-position:center 58%;box-shadow:0 34px 90px rgba(0,0,0,.34)}
 .dagkop::before{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(115deg,transparent 55%,rgba(194,58,94,.08));pointer-events:none}
 .dagkop-inhoud{position:relative;z-index:1;width:min(88%,520px)}
 .bestemmingkop{display:flex;flex-direction:column;align-items:flex-start;gap:.7rem;margin-top:.65rem}
@@ -174,17 +174,17 @@ main>.regkop:has(+ #poorten){margin-top:clamp(3.5rem,7vw,6rem);padding-bottom:1r
 #poorten .poort:hover{filter:brightness(1.15)}#poorten .poort:hover::before{border-top-color:var(--wine-licht)}
 #poorten .poort .ic{width:34px;height:34px;display:grid;place-items:center;margin-bottom:auto;color:var(--wine-licht)}
 #poorten .poort b{font-size:1rem;letter-spacing:.05em;text-transform:uppercase}#poorten .poort>span:last-child{max-width:25ch;color:#c9c7c0;font-size:.68rem;line-height:1.5}
-#poorten .poort[data-scene="aviation"]{--poort-beeld:url('/images/travelos/private-aviation.jpg')}
-#poorten .poort[data-scene="villa"]{--poort-beeld:url('/images/travelos/ibiza-villa.jpg')}
-#poorten .poort[data-scene="desk"]{--poort-beeld:url('/images/travelos/travel-desk.jpg')}
-#poorten .poort[data-scene="mobility"]{--poort-beeld:url('/images/travelos/coastal-train.jpg')}
-#poorten .poort[data-scene="road"]{--poort-beeld:url('/images/travelos/night-road.jpg')}
-#poorten .poort[data-scene="city"]{--poort-beeld:url('/images/travelos/city-arrival.jpg')}
-#poorten .poort[data-scene="documents"]{--poort-beeld:url('/images/travelos/travel-documents.jpg')}
-#poorten .poort[data-scene="residence"]{--poort-beeld:url('/images/travelos/residence-lobby.jpg')}
+#poorten .poort[data-scene="aviation"]{--poort-beeld:none}
+#poorten .poort[data-scene="villa"]{--poort-beeld:none}
+#poorten .poort[data-scene="desk"]{--poort-beeld:none}
+#poorten .poort[data-scene="mobility"]{--poort-beeld:none}
+#poorten .poort[data-scene="road"]{--poort-beeld:none}
+#poorten .poort[data-scene="city"]{--poort-beeld:none}
+#poorten .poort[data-scene="documents"]{--poort-beeld:none}
+#poorten .poort[data-scene="residence"]{--poort-beeld:none}
 #poorten .poort:last-child{grid-column:span 2}
 
-.taxikop{position:relative;isolation:isolate;min-height:clamp(300px,38vw,430px);display:flex;align-items:flex-end;margin-bottom:1.4rem;padding:clamp(1.35rem,4vw,3rem);overflow:hidden;border:1px solid #4f1324;background-image:linear-gradient(90deg,rgba(24,4,10,.96),rgba(24,4,10,.7) 42%,rgba(24,4,10,.1) 78%),linear-gradient(0deg,rgba(24,4,10,.9),transparent 58%),url('/images/travelos/hotel-executive.jpg');background-size:cover;background-position:center 56%;box-shadow:0 34px 90px rgba(0,0,0,.35)}
+.taxikop{position:relative;isolation:isolate;min-height:clamp(300px,38vw,430px);display:flex;align-items:flex-end;margin-bottom:1.4rem;padding:clamp(1.35rem,4vw,3rem);overflow:hidden;border:1px solid #4f1324;background-image:linear-gradient(90deg,rgba(24,4,10,.96),rgba(24,4,10,.7) 42%,rgba(24,4,10,.1) 78%),linear-gradient(0deg,rgba(24,4,10,.9),transparent 58%),none;background-size:cover;background-position:center 56%;box-shadow:0 34px 90px rgba(0,0,0,.35)}
 .taxikop::after{content:"";position:absolute;z-index:-1;inset:0;border-left:3px solid var(--wine-bright);background:linear-gradient(120deg,transparent 60%,rgba(194,58,94,.08));pointer-events:none}
 .taxikop>.taxikop-inhoud{position:relative;z-index:1;display:block;width:min(78%,720px);max-width:720px}
 .taxikop .micro{color:#d8d5cf}

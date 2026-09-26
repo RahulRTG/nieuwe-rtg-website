@@ -32,6 +32,7 @@
 
 module.exports = (ctx) => {
   const { app, kluisAuth, veilig, afdelingen, sseToOffice, kern, tweedeHand } = ctx;
+  const { geldPasskey } = require('./bank-passkey')(ctx);
   const bank = kern.bank;
   const sync = () => sseToOffice('sync', { scope: 'bank' });
 
@@ -67,7 +68,7 @@ module.exports = (ctx) => {
      stilletjes de oude weg nemen -- geld dat beweegt zonder besluit, zonder
      bewijs en zonder spoor. Hij weigert met de weg erbij (opnieuw aanvragen). */
   tweedeHand.registreer('bank.incasso', {
-    wat: 'een incassoronde draaien (vaste betalingen innen)',
+    wat: 'een incassoronde draaien (vaste betalingen innen)', geld: true,
     voerUit: async (lijf, wie) => {
       const ketenlaag = kern.geldketen;
       if (!ketenlaag) return { status: 503,
@@ -137,7 +138,7 @@ module.exports = (ctx) => {
   app.post('/api/office/bank/handtekening/open', kluisAuth, (req, res) =>
     veilig(res, () => tweedeHand.open()));
 
-  app.post('/api/office/bank/handtekening/bevestig', kluisAuth, async (req, res) => {
+  app.post('/api/office/bank/handtekening/bevestig', kluisAuth, geldPasskey, async (req, res) => {
     /* `verzoek` loopt mee tot in de uitvoerder: dat is de brug naar de effectbon, die
        pas bestaat als dit antwoord de deur uit gaat (server/effectbon.js). */
     const r = await tweedeHand.bevestig({ id: String((req.body || {}).id || ''),

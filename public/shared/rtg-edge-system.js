@@ -65,7 +65,7 @@
   }
   function openIndex(zoek) {
     if (!A) return;
-    d.body.classList.remove('rtg-edge-fold'); sluitLagen();
+    sluitLagen();
     var idx = A.root.querySelector('.rtg-edge-index'), menu = A.root.querySelector('.rtg-edge-menu');
     idx.setAttribute('aria-hidden', 'false'); menu.setAttribute('aria-expanded', 'true');
     if (zoek) setTimeout(function () { if (w.RTGEdgeSmartMenu) w.RTGEdgeSmartMenu.openSearch(); var v = idx.querySelector('input'); if (v) v.focus(); }, 20);
@@ -73,11 +73,7 @@
   function bind() {
     var e = A, r = e.root, menu = r.querySelector('.rtg-edge-menu'), idx = r.querySelector('.rtg-edge-index'), ai = r.querySelector('.rtg-edge-ai'), panel = r.querySelector('.rtg-edge-ai-panel'), status = r.querySelector('.rtg-edge-status-panel'), state = r.querySelector('.rtg-edge-state');
     menu.onclick = function () {
-      var open = menu.getAttribute('aria-expanded') === 'true', fold = d.body.classList.contains('rtg-edge-fold');
-      if(d.body.getAttribute('data-rtg-edge-2-rendered')==='true'){if(open)sluitLagen();else openIndex(false);return;}
-      if (open) { sluitLagen(); d.body.classList.add('rtg-edge-fold'); }
-      else if (fold) d.body.classList.remove('rtg-edge-fold');
-      else openIndex(false);
+      if (menu.getAttribute('aria-expanded') === 'true') sluitLagen(); else openIndex(false);
     };
     r.querySelector('[data-go="back"]').onclick = function () { history.back(); };
     r.querySelector('[data-go="next"]').onclick = function () { history.forward(); };

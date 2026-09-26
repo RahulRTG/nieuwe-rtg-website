@@ -2,7 +2,7 @@
  "use strict";
  var story=w.RTGPublicDataFactory.story,card=w.RTGPublicDataFactory.card;
  var companyCards=[
-  card('origin','Ons ontstaan','Our origins','Het begon met reizen.','It began with travel.','Lees het verhaal','Read the story','plane','photo','travel','platform/company',null,[
+  card('origin','Ons ontstaan','Our origins','Het begon met reizen.','It began with travel.','Lees het verhaal','Read the story','plane','chain','travel',null,null,[
    ['Een reis begint en eindigt niet bij een boeking. Er is ook een agenda, een gezin, werk en alles onderweg.','A journey does not begin and end with a booking. There is a calendar, a family, work and everything along the way.'],
    ['Wat in één deel van uw leven verandert, kan gevolgen hebben voor andere delen. Vanuit die samenhang bouwen wij aan RTG.','A change in one part of life can affect the others. That connection is where we start building RTG.']]),
   card('worlds','Vier werelden','Four worlds','Leven, reizen, werk en kansen.','Life, travel, work and opportunity.','Bekijk de samenhang','Explore the connections','grid','worlds','living',null,null,[
@@ -20,7 +20,7 @@
   card('control','Menselijke regie','Human control','Bevoegdheden bepalen wat mag.','Authority determines what is allowed.','Bekijk de grenzen','Explore the boundaries','shield','chain','work',null,null,[
    ['Een mandaat begrenst bestaande bevoegdheden. Het geeft geen nieuwe rechten en kan een vereiste menselijke bevestiging niet opheffen.','A mandate limits existing authority. It does not grant new rights or remove a required human confirmation.'],
    ['Voorbereiden, bevestigen en uitvoeren hebben verschillende statussen. De interface moet uitleggen wat daadwerkelijk is gebeurd en wat nog niet vaststaat.','Preparing, confirming and executing have different statuses. The interface must explain what actually happened and what remains uncertain.']]),
-  card('foundation','FoundationOS','FoundationOS','Altijd 100% gratis.','Always 100% free.','Ontdek de mogelijkheden','Explore the possibilities','heart','photo','foundation','world-homes/foundation',null,[
+  card('foundation','FoundationOS','FoundationOS','Altijd 100% gratis.','Always 100% free.','Ontdek de mogelijkheden','Explore the possibilities','heart','foundation','foundation',null,null,[
    ['FoundationOS is en blijft altijd 100% gratis. Gezin, onderwijs, ontwikkeling, talent en kansen krijgen een eigen plek binnen RTG.','FoundationOS is and always will be 100% free. Family, education, development, talent and opportunity have their own place in RTG.'],
    ['FoundationOS kent geen betaalde upgrade. De productomgeving laat zien welke mogelijkheden beschikbaar zijn.','FoundationOS has no paid upgrade. The product environment shows which options are available.']]),
   card('questions','Vragen over RTG','Questions about RTG','Wat wilt u weten?','What would you like to know?','Bekijk de antwoorden','Read the answers','doc','questions','living',null,null,[

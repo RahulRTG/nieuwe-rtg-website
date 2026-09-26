@@ -156,7 +156,7 @@ async function laad(){
   if(TAB==='bord') laadBord(); else if(TAB==='mijn') laadMijn(); else laadCharter();
 }
 async function laadBord(){
-  let d; try{ d=await api('/bord'); }catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  let d; try{ d=await api('/bord'); /* Ontbreekt een veld, dan de eigen foutmelding hieronder -- nooit een lege lijst (die zou beweren dat er niets is) en nooit een ruwe TypeError (LIEGRONDE.json). */ if(!(d && Array.isArray(d.security) && Array.isArray(d.vluchten))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.'); }catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
   BORD=d;
   const sec=d.security.filter(f=>f.open).map(f=>esc(f.naam)+': '+f.wachtMinuten+' min').join(' · ');
   const eerste=(d.vluchten[0]||{}).datum||new Date().toISOString().slice(0,10);

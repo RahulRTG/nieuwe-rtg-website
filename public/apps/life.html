@@ -32,7 +32,8 @@
   .balk i{display:block;height:2px;background:var(--goldlicht);}
   .storing{border:1px solid var(--rood,#DE6E92);border-radius:0;padding:.7rem .9rem;
     margin:.6rem 0;font-size:.82rem;color:var(--soft);}
-  .heen{display:inline-block;margin:.35rem .5rem 0 0;font-size:.82rem;}
+  /* een raakvlak van minstens 24x24 op telefoonformaat (WCAG 2.5.8, TOEGANKELIJK.md) */
+  .heen{display:inline-flex;align-items:center;min-height:24px;margin:.35rem .5rem 0 0;font-size:.82rem;}
   .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;margin-top:.7rem;}
   .rij input{width:6rem;}
   .knop.mini{padding:.4rem .7rem;font-size:.8rem;}
@@ -84,6 +85,11 @@
     wanneer u de kinderen ophaalt, en een indeling verzinnen uit de rest levert een zelfverzekerd
     verkeerd plan. Afvinken doet u in de app waar het thuishoort.</p>
     <div id="dag"><p class="stil">Laden...</p></div>
+    <!-- Deze drie wegen stonden alleen op vandaag.html, dat hierin is opgegaan
+         (SCHERMEIGENAAR.json). Life toont de dag; plannen doet u in de agenda. -->
+    <a class="heen" href="/apps/agenda.html">Plannen en afspraken in de Agenda &#8594;</a>
+    <a class="heen" href="/apps/mijnmall.html">Wat onderweg is: uw bestellingen &#8594;</a>
+    <a class="heen" href="/apps/leven.html">Uw avond: eten, vervoer en gezelschap &#8594;</a>
   </section>
 
   <section aria-label="Uw signalen">
@@ -138,7 +144,7 @@
   <section aria-label="Rust en ritme">
     <h2>Rust en ritme</h2>
     <div id="adviezen"></div>
-    <a class="heen" href="/apps/balans.html">Naar Balans &#8594;</a>
+    <a class="heen" href="/apps/geld.html#balans">Naar Balans &#8594;</a>
   </section>
 
   <section aria-label="Medicijnen">

@@ -9,7 +9,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorKoppelBody } = require('./helper');
 
 let srv, base, office, baas, lid, lidCodenaam;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-brd-'));
@@ -79,7 +79,7 @@ test('6. toegang geven op codenaam: de vertrouweling komt binnen via het ene acc
   assert.equal(geef.status, 200, 'de eigenaar geeft toegang');
   assert.ok(geef.body.lijst.some(t => t.codenaam === lidCodenaam), 'de codenaam staat op de lijst');
   // het lid koppelt de kantoor-rol (bewijst de code) en start ermee
-  assert.equal((await api('/api/account/koppel', { soort: 'kantoor', code: 'RTG-OFFICE' }, lid)).status, 200, 'kantoor-rol gekoppeld');
+  assert.equal((await api('/api/account/koppel', await kantoorKoppelBody(base, lid), lid)).status, 200, 'kantoor-rol gekoppeld');
   const start = await api('/api/account/start', { rol: 'kantoor' }, lid);
   assert.equal(start.status, 200, 'kantoor-sessie via het ene account');
   const b = await api('/api/office/boardroom', {}, start.body.token);

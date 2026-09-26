@@ -2,6 +2,7 @@
    duurzaam vastleggen, dan pas 2xx: zo kan een provider veilig blijven
    herhalen zonder dat RTG een betaling kwijtraakt of dubbel verwerkt. */
 'use strict';
+const { alsAanbieder } = require('../kern/dienstidentiteit');
 
 module.exports = function hangKaartWebhooks({ app, express, db, save, log, betaal,
   betaalWaarheid, webhookRem, webhookPoort, settleFactuur, opdrachtenVan }) {
@@ -53,6 +54,7 @@ module.exports = function hangKaartWebhooks({ app, express, db, save, log, betaa
         log.warn('betaal-webhook geweigerd', { fout: e.message, id: req.id });
         return res.status(400).json({ error: 'Ongeldige handtekening.' });
       }
+      return alsAanbieder(req.get('stripe-signature') ? 'stripe' : null, async () => {
       try {
         const soort = evt && evt.type;
         const p = evt && evt.data && evt.data.object;
@@ -91,6 +93,7 @@ module.exports = function hangKaartWebhooks({ app, express, db, save, log, betaa
         log.uitzondering(e, { bron: 'betaal-webhook' });
         return res.status(500).json({ error: 'Terugmelding is niet volledig verwerkt; probeer opnieuw.' });
       }
+      });
     });
 
   /* Mollie's klassieke webhook bevat alleen het payment-id. Dat bericht zelf
@@ -104,10 +107,12 @@ module.exports = function hangKaartWebhooks({ app, express, db, save, log, betaa
       if (!/^tr_[A-Za-z0-9]+$/.test(id)) return res.status(400).json({ error: 'Ongeldige Mollie-terugmelding.' });
       try {
         const p = await betaal.haalBetaling('mollie', id);
-        await betaalWaarheid.providerMelding({ eventId: 'mollie:' + p.id + ':' + p.status,
-          gebeurtenis: 'payment.' + p.status, aanbieder: 'mollie', providerId: p.id,
-          status: p.status, referentie: p.referentie, bedrag: p.bedrag, valuta: p.valuta });
-        if (p.status === 'paid') await settleWachtend(p, 'Betaald via Mollie');
+        await alsAanbieder('mollie', async () => { // het opgehaalde antwoord is het bewijs
+          await betaalWaarheid.providerMelding({ eventId: 'mollie:' + p.id + ':' + p.status,
+            gebeurtenis: 'payment.' + p.status, aanbieder: 'mollie', providerId: p.id,
+            status: p.status, referentie: p.referentie, bedrag: p.bedrag, valuta: p.valuta });
+          if (p.status === 'paid') await settleWachtend(p, 'Betaald via Mollie');
+        });
         log.info('mollie-webhook verwerkt', { id: p.id, status: p.status });
         return res.json({ ok: true });
       } catch (e) {
@@ -133,6 +138,7 @@ module.exports = function hangKaartWebhooks({ app, express, db, save, log, betaa
           return res.status(401).json({ error: 'Ongeldige Adyen-handtekening.' });
         }
       }
+      return alsAanbieder('adyen', async () => {
       try {
         for (const item of items) {
           const soort = String(item.eventCode || '').toUpperCase();
@@ -163,5 +169,6 @@ module.exports = function hangKaartWebhooks({ app, express, db, save, log, betaa
         log.uitzondering(e, { bron: 'adyen-webhook' });
         return res.status(500).json({ error: 'Adyen-terugmelding is nog niet volledig verwerkt.' });
       }
+      });
     });
 };

@@ -175,3 +175,52 @@ test('ouderdom() wijst de vuile bronnen aan, en onbekend is geen vuil', () => {
   assert.equal(uit.bronnen['POORTWACHT.json'].boomVuil, false);
   assert.equal(uit.bronnen['OUTPUTPROEF.json'].boomVuil, false, 'onbekend telt niet als vuil');
 });
+
+/* WAT HET DOSSIER NIET WEET (BEWIJSLUS.md par. 7). Drie assen die voor geen
+   route een meting hebben, of alleen een verklaring. MUTATIES die zijn gedraaid:
+   - de methodevergelijking in nietGemetenVan() weghalen -> de POST-toets zakt
+     (een reis op GET zou dan een POST op hetzelfde pad "verklaard" maken)
+   - in dossierAanvulling() de catch om staatVan() weghalen -> de laatste toets
+     zakt met een throw in plaats van een staat null met de reden */
+test('nietGemetenVan: productie is alleen verklaard waar een sondereis de route loopt', () => {
+  const reizen = [{ id: 'grootboek', pad: '/api/pay/gezond', methode: 'GET' }];
+  const wel = v.nietGemetenVan('GET', '/api/pay/gezond', reizen);
+  assert.equal(wel.productie.staat, 'verklaard');
+  assert.equal(wel.productie.reis, 'grootboek');
+  assert.match(wel.productie.reden, /staat niet in dit dossier/,
+    'een ingerichte reis is geen waarneming, en dat hoort er te staan');
+
+  assert.equal(v.nietGemetenVan('POST', '/api/pay/gezond', reizen).productie.staat, 'ongemeten',
+    'een reis op GET zegt niets over een POST op hetzelfde pad');
+  assert.equal(v.nietGemetenVan('GET', '/api/elders', reizen).productie.staat, 'ongemeten');
+  assert.equal(v.nietGemetenVan('GET', '/api/elders', undefined).productie.staat, 'ongemeten',
+    'zonder SLO.json is er niets verklaard');
+});
+
+test('nietGemetenVan: tegenvoorbeeld en mutatie per route zijn nergens gemeten, met wat er nodig is', () => {
+  const n = v.nietGemetenVan('GET', '/api/x', []);
+  for (const as of ['tegenvoorbeeld', 'mutatiePerRoute']) {
+    assert.equal(n[as].staat, 'ongemeten', as);
+    assert.ok(n[as].nodig && n[as].reden, as + ' draagt een reden en wat er nodig is');
+  }
+});
+
+test('dossierAanvulling: bron uit ROUTEBRON, en zonder cellen een staat null met de reden', () => {
+  const registers = {
+    'ROUTEBRON.json': { perRoute: { 0: { route: 'GET /api/a', bestand: 'server/a.js', regel: 7 } } },
+    'SLO.json': { reizen: [] }
+  };
+  const lees = (naam) => registers[naam] || null;
+
+  const a = v.dossierAanvulling({ methode: 'GET', pad: '/api/a', cellen: cellen('bewezen') }, lees);
+  assert.deepEqual(a.bron, { bestand: 'server/a.js', regel: 7, register: 'ROUTEBRON.json' });
+  assert.equal(a.nietGemeten.productie.staat, 'ongemeten');
+
+  const b = v.dossierAanvulling({ methode: 'GET', pad: '/api/b', cellen: cellen('bewezen') }, lees);
+  assert.equal(b.bron.bestand, null, 'een onbekende route krijgt geen geraden bestand');
+  assert.match(b.bron.reden, /kent deze route niet/);
+
+  const c = v.dossierAanvulling({ methode: 'GET', pad: '/api/a', cellen: {} }, lees);
+  assert.equal(c.vervalstaat.staat, null, 'een staat die niet te geven is, wordt niet verzonnen');
+  assert.match(c.vervalstaat.reden, /niet vast te stellen/);
+});

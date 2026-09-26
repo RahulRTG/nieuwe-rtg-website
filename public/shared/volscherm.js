@@ -72,7 +72,6 @@
     aan = !!nieuw;
     try { localStorage.setItem(SLEUTEL, aan ? '1' : '0'); } catch (e) {}
     pas();
-    try { w.dispatchEvent(new CustomEvent('rtg-volscherm', { detail: { aan: aan } })); } catch (e) {}
   }
 
   w.RTGVol = {

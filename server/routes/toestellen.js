@@ -24,6 +24,7 @@ module.exports = (kern) => {
   app.post('/api/toestel/meting', (req, res) => {
     const toestel = toestelVanSleutel(req.get('x-rtg-toestel'));
     if (!toestel) return res.status(401).json({ error: 'Geen geldige toestelsleutel.' });
-    stuur(res, toestelMeting(toestel, req.body || {}));
+    // fase 7: op de bus schrijft het TOESTEL, niet het lid (kern/dienstidentiteit.js)
+    require('../kern/dienstidentiteit').alsToestel(toestel.id, () => stuur(res, toestelMeting(toestel, req.body || {})));
   });
 };

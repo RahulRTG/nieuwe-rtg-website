@@ -51,7 +51,7 @@ body.rtg-stijl.rtg-salon-elite .kaart{padding:clamp(1.1rem,3vw,1.8rem);border:1p
   min-height:262px;border-bottom-color:rgba(216,191,128,.26);
   background:
     linear-gradient(90deg,rgba(20,20,18,.98) 0%,rgba(24,24,21,.94) 52%,rgba(46,27,32,.68) 76%,rgba(17,18,16,.88) 100%),
-    url('/campagne/kyoto-suite.jpg') 72% 48%/cover no-repeat;
+    url('/campagne/palacio.jpg') 72% 48%/cover no-repeat;
 }
 .rtg-salon-elite .salon-werkveld>header::before{right:4vw;border-color:rgba(205,184,121,.22);}
 .rtg-salon-elite .kop{min-height:190px;}
@@ -86,13 +86,13 @@ body.rtg-stijl.rtg-salon-elite input:not([type=range]):not([type=checkbox]):not(
 body.rtg-stijl.rtg-salon-elite .knop,body.rtg-stijl.rtg-salon-elite .meer,body.rtg-stijl.rtg-salon-elite .aibalk button{border-radius:0;}
 
 @media(max-width:1050px){
-  .rtg-salon-elite .salon-werkveld>header{background:linear-gradient(90deg,rgba(20,20,18,.97),rgba(43,27,31,.8)),url('/campagne/kyoto-suite.jpg') center/cover no-repeat;}
+  .rtg-salon-elite .salon-werkveld>header{background:linear-gradient(90deg,rgba(20,20,18,.97),rgba(43,27,31,.8)),url('/campagne/palacio.jpg') center/cover no-repeat;}
   .salon-briefing{border-top:2px solid #cbb574;}
 }
 @media(max-width:760px){
   .salon-socialnav{background:rgba(20,21,19,.99);}
   .salon-socialnav a{border-inline-start:0;}
-  .rtg-salon-elite .salon-werkveld>header{min-height:255px;padding:0 1rem;background:linear-gradient(90deg,rgba(18,18,16,.96),rgba(46,27,32,.67)),url('/campagne/kyoto-suite.jpg') center/cover no-repeat;}
+  .rtg-salon-elite .salon-werkveld>header{min-height:255px;padding:0 1rem;background:linear-gradient(90deg,rgba(18,18,16,.96),rgba(46,27,32,.67)),url('/campagne/palacio.jpg') center/cover no-repeat;}
   .rtg-salon-elite .kop{min-height:182px;}
   .rtg-salon-elite .kop h1{color:#f6f1e7;font-size:3rem;}
   .rtg-salon-elite .salon-belofte{color:rgba(246,241,231,.65);font-size:.82rem;}
@@ -136,7 +136,7 @@ body.rtg-stijl.rtg-salon-elite .knop,body.rtg-stijl.rtg-salon-elite .meer,body.r
   top:0;right:0;width:34%;height:100%;border:0;border-radius:0;box-shadow:none;
   background:
     linear-gradient(90deg,#f1eee7 0%,rgba(241,238,231,.18) 28%,rgba(18,17,13,.08) 100%),
-    url('/campagne/kyoto-suite.jpg') center/cover no-repeat;
+    url('/campagne/palacio.jpg') center/cover no-repeat;
 }
 .rtg-salon-elite .salon-werkveld>header::after{
   content:"JOURNAL  /  PRIVATE 01";top:2rem;right:clamp(1.5rem,4vw,4.5rem);
@@ -273,7 +273,7 @@ body.rtg-stijl.rtg-salon-elite .knop{background:#691f32;background-image:none;}
   }
   .rtg-salon-elite .salon-werkveld>header::before{
     right:0;width:92px;height:100%;opacity:.62;
-    background:linear-gradient(90deg,#f1eee7 0%,rgba(241,238,231,.18) 52%),url('/campagne/kyoto-suite.jpg') center/cover no-repeat;
+    background:linear-gradient(90deg,#f1eee7 0%,rgba(241,238,231,.18) 52%),url('/campagne/palacio.jpg') center/cover no-repeat;
   }
   .rtg-salon-elite .salon-werkveld>header::after{display:none;}
   .rtg-salon-elite .kop{min-height:184px;align-items:center;}
@@ -312,7 +312,7 @@ body.rtg-stijl.rtg-salon-elite .knop{background:#691f32;background-image:none;}
 .rtg-salon-elite .salon-werkveld{background:#dcd5c8;}
 .rtg-salon-elite .salon-werkveld>header{
   min-height:270px;border-bottom-color:rgba(205,184,121,.26);
-  background:linear-gradient(90deg,rgba(20,20,18,.985),rgba(24,24,21,.93) 52%,rgba(46,27,32,.68) 78%,rgba(17,18,16,.88)),url('/campagne/kyoto-suite.jpg') 72% 48%/cover no-repeat;
+  background:linear-gradient(90deg,rgba(20,20,18,.985),rgba(24,24,21,.93) 52%,rgba(46,27,32,.68) 78%,rgba(17,18,16,.88)),url('/campagne/palacio.jpg') 72% 48%/cover no-repeat;
 }
 .rtg-salon-elite .kop .ey{color:#cdb879;}
 .rtg-salon-elite .kop h1{color:#f6f1e7;}
@@ -339,13 +339,13 @@ body.rtg-stijl.rtg-salon-elite .knop{background:#691f32;background-image:none;}
 .salon-briefingacties{border-block-color:rgba(255,255,255,.11);}.salon-briefingacties button{border-bottom-color:rgba(255,255,255,.09);color:#f5f2eb;}.salon-briefingacties button span,.salon-kringlink{color:#cbb574;}
 
 @media(max-width:1050px){
-  .rtg-salon-elite .salon-werkveld>header{background:linear-gradient(90deg,rgba(20,20,18,.97),rgba(43,27,31,.76)),url('/campagne/kyoto-suite.jpg') center/cover no-repeat;}
+  .rtg-salon-elite .salon-werkveld>header{background:linear-gradient(90deg,rgba(20,20,18,.97),rgba(43,27,31,.76)),url('/campagne/palacio.jpg') center/cover no-repeat;}
 }
 @media(max-width:760px){
   .rtg-salon-elite .rtg-social-commandbar{background:#171815;}
   .salon-socialnav{background:rgba(20,21,19,.99);border-top-color:rgba(255,255,255,.1);}
   .salon-socialnav a{color:rgba(244,239,227,.48);}.salon-socialnav a[aria-current="page"]{color:#fff;}
-  .rtg-salon-elite .salon-werkveld>header{min-height:265px;background:linear-gradient(100deg,rgba(18,18,16,.96),rgba(46,27,32,.66)),url('/campagne/kyoto-suite.jpg') center/cover no-repeat;}
+  .rtg-salon-elite .salon-werkveld>header{min-height:265px;background:linear-gradient(100deg,rgba(18,18,16,.96),rgba(46,27,32,.66)),url('/campagne/palacio.jpg') center/cover no-repeat;}
   .rtg-salon-elite .salon-werkveld>header::before{display:none;}
   .rtg-salon-elite .kop h1{color:#f6f1e7;}
   .rtg-salon-elite .salon-belofte{color:rgba(246,241,231,.65);font-size:.78rem;}
@@ -370,7 +370,7 @@ body.rtg-stijl.rtg-salon-elite .knop{background:#691f32;background-image:none;}
 .rtg-salon-elite .rtg-social-commandbar .rtg-rahul-tab small{color:rgba(23,23,18,.44)!important;}
 .rtg-salon-elite .salon-werkveld{background:#f1eee7;}
 .rtg-salon-elite .salon-werkveld>header{min-height:294px;border-bottom-color:rgba(23,23,18,.14);background:#f1eee7;}
-.rtg-salon-elite .salon-werkveld>header::before{display:block;top:0;right:0;width:34%;height:100%;border:0;border-radius:0;box-shadow:none;background:linear-gradient(90deg,#f1eee7,rgba(241,238,231,.18) 28%,rgba(18,17,13,.08)),url('/campagne/kyoto-suite.jpg') center/cover no-repeat;}
+.rtg-salon-elite .salon-werkveld>header::before{display:block;top:0;right:0;width:34%;height:100%;border:0;border-radius:0;box-shadow:none;background:linear-gradient(90deg,#f1eee7,rgba(241,238,231,.18) 28%,rgba(18,17,13,.08)),url('/campagne/palacio.jpg') center/cover no-repeat;}
 .rtg-salon-elite .kop .ey{color:#691f32;}
 .rtg-salon-elite .kop h1{color:#171712;font-size:clamp(4rem,5.4vw,5.4rem)!important;line-height:.88;letter-spacing:-.045em;}
 .rtg-salon-elite .salon-belofte{color:var(--rtg-soft);font-family:Inter,system-ui,sans-serif;font-size:.82rem;line-height:1.72;}

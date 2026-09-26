@@ -172,7 +172,7 @@ async function laad(){
 }
 
 async function laadBord(){
-  let d; try{ d=await api('/bord'); }catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  let d; try{ d=await api('/bord'); /* Ontbreekt een lijst, dan de melding hieronder -- nooit een leeg bord (LIEGRONDE.json). */ if(!(d && Array.isArray(d.clubs) && Array.isArray(d.wedstrijden))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.'); }catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
   CLUB = (d.clubs[0]||{}).code || CLUB;
   CLUBNAAM = (d.clubs[0]||{}).naam || CLUBNAAM;
   BORD = d.wedstrijden||[];

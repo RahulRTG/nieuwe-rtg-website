@@ -11,11 +11,16 @@
     function finish() {
       if(closed)return;closed=true;observer.disconnect();w.clearTimeout(timer);w.clearTimeout(fallback);
       body.setAttribute('data-rtg-world-start','ready');body.removeAttribute('aria-busy');layer.hidden=true;
-      d.dispatchEvent(new CustomEvent('rtg-world-start-ready'));
     }
     function check() {
       if(closed)return;
-      var ready=(embedded || body.getAttribute('data-rtg-edge-2-rendered')==='true') && body.getAttribute('data-rtg-world-dashboard-ready')==='true';
+      /* Het dashboard commit alleen waar het hoort (niet ingebed, juiste route).
+         Waar rtg-vandaag-luxe.js zelf zegt dat het hier NIET commit, is wachten
+         op zijn vlag wachten op iets dat nooit komt: dan hing elke wereld die de
+         schil in een frame opent twaalf seconden op dit scherm. */
+      var luxe=w.RTGVandaagLuxe;
+      var dashboardKlaar=body.getAttribute('data-rtg-world-dashboard-ready')==='true' || !!(luxe && typeof luxe.geschikt==='function' && !luxe.geschikt(d));
+      var ready=(embedded || body.getAttribute('data-rtg-edge-2-rendered')==='true') && dashboardKlaar;
       if(ready && fontsReady && performance.now()-lastChange>=160) {
         requestAnimationFrame(function(){requestAnimationFrame(finish);});return;
       }

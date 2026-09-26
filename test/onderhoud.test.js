@@ -112,3 +112,15 @@ test('de ronde valt niet om als een van de drie er niet is', () => {
   assert.doesNotThrow(() => onderhoudsronde({ loginFails: new Map() }));
   assert.doesNotThrow(() => onderhoudsronde({ pinSlot: {} }));
 });
+
+test('de ronde legt de kostenvooruitblik vast, en een fout daarin gaat niet stil', () => {
+  /* ARBEID.md par. 4 punt 10: legVoorspellingVast had buiten de toets geen
+     aanroeper, dus de gemeten trefzekerheid (en de band) kwam nooit. */
+  let geroepen = 0;
+  const uit = onderhoudsronde({ vooruitblik: () => { geroepen++; return { ok: true, periode: '2026-09' }; } });
+  assert.equal(geroepen, 1, 'elke ronde vraagt het (de vastlegger slaat zelf een tweede keer per dag over)');
+  assert.equal(uit.vooruitblik.ok, true);
+  const fout = onderhoudsronde({ vooruitblik: () => { throw new Error('kapot'); } });
+  assert.equal(fout.vooruitblik.ok, false);
+  assert.match(fout.vooruitblik.fout, /kapot/);
+});

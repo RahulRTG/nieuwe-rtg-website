@@ -47,7 +47,7 @@ const OPEN = new Set();
 
 async function tekenLijsten() {
   let d;
-  try { d = await api('/api/mall/lijsten', {}); } catch (e) { $('#lijsten').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; return; }
+  try { d = await api('/api/mall/lijsten', {}); /* Zonder lijst geen "Nog niets bewaard" -- dat zou beweren dat er niets is (LIEGRONDE.json). */ if (!(d && Array.isArray(d.lijsten))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.'); } catch (e) { $('#lijsten').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; return; }
   if (!d.lijsten.length) { $('#lijsten').innerHTML = '<div class="leeg">Nog niets bewaard. Druk in de Mall op Bewaren bij iets dat je wilt onthouden.</div>'; return; }
   $('#lijsten').innerHTML = d.lijsten.map((l) =>
     '<div class="kaart" data-lijst="' + esc(l.id) + '">' +

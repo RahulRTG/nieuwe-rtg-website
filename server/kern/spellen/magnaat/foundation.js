@@ -17,12 +17,15 @@
    Foundation die slim zou investeren om ergens winst te maken is precies wat ze
    niet is.
 
-   DE AFDRACHT KOMT UIT DE OMZET VAN DE HELE WERELD, spelers en AI-bedrijven
-   samen. Dat is een spelmechaniek en geen weergave van een echte geldstroom:
-   buiten het spel komt de bijdrage uit lidmaatschappen, niet uit de omzet van
-   ondernemers. Het staat hier zo omdat een spelwereld zonder abonnementen wel
-   een economie heeft, en de VERHOUDING is wat je wilt laten zien. */
+   DE AFDRACHT RUST OP DE OMZET VAN DE HELE WERELD, spelers en AI-bedrijven
+   samen, en sinds regelversie 3 betaalt ook ieder zijn eigen deel: de stad
+   over haar omzet, de speler over zijn eindverkoop, via RTG naar de
+   RTFoundation (MAGNAAT.md, besluit 3). Buiten het spel komt de bijdrage uit
+   lidmaatschappen; een spelwereld zonder abonnementen heeft wel een economie,
+   en de VERHOUDING is wat je wilt laten zien. */
 
+const { naarCenten, euroTonen } = require('./centen');
+const { beweeg } = require('./boekhouding');
 const DEEL_LOKAAL = 0.20;
 const DEEL_CENTRAAL = 0.10;
 /* Op welk deel van de omzet die afdracht rust. Bewust laag: dit is niet
@@ -61,22 +64,42 @@ function nieuw() {
 
 /* De afdracht over een maand omzet. Geeft terug wat er is afgedragen, zodat de
    speler het als regel op zijn maandoverzicht ziet in plaats van als verschil. */
-function draagAf(f, omzet) {
+/* WIE BETAALT (MAGNAAT.md, besluit 3). Tot regelversie 3 de stad over de hele
+   omzet: de pot groeide uit geld dat niemand miste. Vanaf regelversie 3 de stad
+   over haar eigen omzet en elke speler over zijn eindverkoop, dus de afdracht is
+   een echte post op zijn maandoverzicht. Een lopende partij houdt haar versie. */
+function draagAf(st, omzet, per) {
   const bijdrage = omzet * BIJDRAGE;
   const lokaal = bijdrage * DEEL_LOKAAL, centraal = bijdrage * DEEL_CENTRAAL;
-  f.lokaal += lokaal;
-  f.centraal += centraal;
-  return { bijdrage: Math.round(bijdrage), lokaal: Math.round(lokaal), centraal: Math.round(centraal) };
+  const v3 = Number(st.regelversie) >= 3;
+  /* In eurocenten (./centen.js), elk deel per betaler een keer afgerond. Het
+     loopt via RTG: RTG is de ROUTE naar de RTFoundation en geen partij, dus zijn
+     rekening staat na de afdracht weer op nul. */
+  const deel = (o) => { const b = o * BIJDRAGE; return [naarCenten(b * DEEL_LOKAAL), naarCenten(b * DEEL_CENTRAAL)]; };
+  let [l, c] = v3 ? deel(per.stad) : [naarCenten(lokaal), naarCenten(centraal)];
+  beweeg(st, { soort: 'FOUNDATION_AFDRACHT', van: ['macro', 'stad'], naar: ['rtg', 'foundation'], bedrag: l + c, omschrijving: 'Afdracht van de stad' });
+  const spelers = {};
+  for (const [h, o] of Object.entries(v3 ? per.spelers : {})) {
+    const [dl, dc] = deel(o);
+    beweeg(st, { soort: 'FOUNDATION_AFDRACHT', van: ['kas', h], naar: ['rtg', 'foundation'], bedrag: dl + dc, omschrijving: 'Afdracht van een speler' });
+    l += dl; c += dc; spelers[h] = euroTonen(dl + dc);
+  }
+  beweeg(st, { soort: 'FOUNDATION_AFDRACHT', van: ['rtg', 'foundation'], naar: ['foundation', 'lokaal'], bedrag: l, omschrijving: 'Naar de lokale pot' });
+  beweeg(st, { soort: 'FOUNDATION_AFDRACHT', van: ['rtg', 'foundation'], naar: ['foundation', 'centraal'], bedrag: c, omschrijving: 'Naar de centrale pot' });
+  const uit = { bijdrage: Math.round(bijdrage), lokaal: Math.round(lokaal), centraal: Math.round(centraal) };
+  if (v3) uit.spelers = spelers;
+  return uit;
 }
 
 /* Is er genoeg voor het volgende project? Zo ja: voer het uit en verschuif de
    zone. De volgorde ligt vast (en niet op toeval), want een campagne moet na
    een herstart hetzelfde verlopen -- zie de kop van ./stap.js. */
-function bouw(f, kaart, perZone) {
-  const klaar = [];
-  while (f.volgend < PROJECTEN.length && f.lokaal >= PROJECTEN[f.volgend].kosten) {
+function bouw(st, kaart, perZone) {
+  const f = st.foundation, klaar = [];
+  // de kosten van een project staan in hele euro's; de pot in eurocenten
+  while (f.volgend < PROJECTEN.length && f.lokaal >= naarCenten(PROJECTEN[f.volgend].kosten)) {
     const p = PROJECTEN[f.volgend];
-    f.lokaal -= p.kosten;
+    beweeg(st, { soort: 'FOUNDATION_PROJECT', van: ['foundation', 'lokaal'], naar: ['macro', 'aannemer'], bedrag: naarCenten(p.kosten), omschrijving: p.naam });
     /* Het project landt in de zone met de MEESTE bedrijvigheid: daar komt het
        geld vandaan en daar zijn de mensen die het gebruiken. Bij gelijke stand
        wint de zone die in de stadsdata het eerst staat -- vast en niet

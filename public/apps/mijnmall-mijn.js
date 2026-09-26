@@ -46,6 +46,8 @@ async function tekenBewaard() {
 async function tekenWijzigingen() {
   let d;
   try { d = await api('/api/mall/wijzigingen', {}); } catch (e) { return; }
+  /* Zonder lijst geen "Er is niets veranderd" -- dat zou beweren dat er niets is (LIEGRONDE.json). */
+  if (!(d && Array.isArray(d.wijzigingen))) { $('#wijzigingen').innerHTML = '<div class="leeg">Het antwoord was onvolledig, dus dit kon niet worden geladen.</div>'; return; }
   if (!d.wijzigingen.length) {
     $('#wijzigingen').innerHTML = d.bekeken
       ? '<div class="leeg">Er is niets veranderd aan wat je bewaarde.</div>' : '';

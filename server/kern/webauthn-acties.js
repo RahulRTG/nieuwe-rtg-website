@@ -47,11 +47,19 @@ const ZWARE_ACTIES = Object.freeze([
   'eigenaar-overdracht',        // POST /api/techniek/eigenaar
   'eigenaar-techniektoegang',   // POST /api/techniek/toegang
   'eigenaar-boardroomtoegang',  // POST /api/office/boardroom/toegang/geef
+  'eigenaar-boardroomtoegang-weg', // POST /api/office/boardroom/toegang/weg
+  'eigenaar-baliezetel',        // POST /api/office/balie/zetel  (geven en intrekken)
   'eigenaar-bewaarveeg',        // POST /api/techniek/bewaren/veeg  (alleen bevestig:'WIS')
   'eigenaar-noodrem-uit',       // POST /api/techniek/beveiliging/auto  (alleen bij UIT)
   'eigenaar-terugstorting',     // POST /api/office/bank/terugstorting
   'eigenaar-herstel-in',        // POST /api/techniek/herstel/inrichten
   'eigenaar-herstel-af',        // POST /api/techniek/herstel/afbreken
+  'eigenaar-kantooruitnodiging', // POST /api/office/kantoor/uitnodiging
+  'eigenaar-doossleutel',       // POST /api/office/doos/sleutel
+  'eigenaar-doossleutel-weg', 'eigenaar-doossleutel-gedeeld', 'eigenaar-beleidsmotor-afdwingen', 'eigenaar-entiteitrekening',   // POST /api/office/doos/sleutel/weg
+  'eigenaar-werkbankpad',       // POST /api/office/werkos/bankpad/zet
+  'bank.incasso',               // POST /api/office/bank/incasso  (de geldketen, MACHINE.md par. 5a)
+  'bank.bevestig',              // POST /api/office/bank/handtekening/bevestig  (tweede handtekening onder geld)
   'passkey-weg'                 // POST /api/webauthn/weg
 ]);
 

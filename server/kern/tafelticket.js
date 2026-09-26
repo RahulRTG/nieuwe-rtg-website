@@ -30,8 +30,8 @@ module.exports = ({ crypto, dataDir, findSupplier, ordersVanZaak }) => {
   // eigen HMAC-zegelsleutel, zoals de andere sleutels: 0600 in de datamap.
   const keyPad = path.join(dataDir, 'tafelticket.key');
   let sleutel;
-  try { sleutel = fs.readFileSync(keyPad); }
-  catch (e) { sleutel = crypto.randomBytes(32); try { fs.writeFileSync(keyPad, sleutel, { mode: 0o600 }); } catch (e2) {} }
+  // lezen, of als eerste publiceren: nooit half, nooit twee sleutels (server/lib/sleutelbestand.js)
+  sleutel = require('../lib/sleutelbestand').sleutel(keyPad, 32);
 
   const rond = n => Math.round((Number(n) || 0) * 100) / 100;
   const norm = t => String(t == null ? '' : t).trim().slice(0, 40);

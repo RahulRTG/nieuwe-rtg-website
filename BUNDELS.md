@@ -13,7 +13,7 @@ omlaag.
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 98 delen, 9698 regels in de delen
+`public/apps/app-main/` -- 98 delen, 9722 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -377,7 +377,7 @@ omlaag.
 
 ## `apps/personeel.js`
 
-`public/apps/personeel/` -- 31 delen, 3062 regels in de delen
+`public/apps/personeel/` -- 31 delen, 3121 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -613,7 +613,7 @@ omlaag.
 
 ## `shared/deelmenu.js`
 
-`public/shared/deelmenu/` -- 3 delen, 374 regels in de delen
+`public/shared/deelmenu/` -- 3 delen, 372 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -632,7 +632,7 @@ omlaag.
 
 ## `shared/gebaar.js`
 
-`public/shared/gebaar/` -- 8 delen, 1051 regels in de delen
+`public/shared/gebaar/` -- 8 delen, 1096 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -743,7 +743,7 @@ omlaag.
 
 ## `shared/levendekleur.js`
 
-`public/shared/levendekleur/` -- 2 delen, 281 regels in de delen
+`public/shared/levendekleur/` -- 2 delen, 280 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -804,7 +804,7 @@ omlaag.
 
 ## `shared/rtg-edge-smart-menu.js`
 
-`public/shared/rtg-edge-smart-menu/` -- 2 delen, 221 regels in de delen
+`public/shared/rtg-edge-smart-menu/` -- 2 delen, 250 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -813,7 +813,7 @@ omlaag.
 
 ## `shared/rtg-schil.js`
 
-`public/shared/rtg-schil/` -- 8 delen, 811 regels in de delen
+`public/shared/rtg-schil/` -- 8 delen, 804 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -878,7 +878,7 @@ omlaag.
 
 ## `shared/verbinding.js`
 
-`public/shared/verbinding/` -- 2 delen, 347 regels in de delen
+`public/shared/verbinding/` -- 2 delen, 346 regels in de delen
 
 | deel | onderwerp |
 |---|---|

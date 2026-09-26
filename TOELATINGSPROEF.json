@@ -1,5 +1,12 @@
 {
-  "stempel": "2026-09-19",
+  "stempel": {
+    "op": "2026-09-24T16:37:21.876Z",
+    "commit": "56ea75ba",
+    "boomVuil": false,
+    "boomAnders": 3,
+    "instrument": "scripts/toelatingsproef.js",
+    "node": "v22.22.2"
+  },
   "uitleg": "De toelatingsketen van een zaak in een gereguleerd genre: aanvraag, bewijs, aftekenen, besluit, zaak, herkeuring. Gemeten per SCHAKEL (handelt actor A, en ziet actor B dat?) en per STORING (houdt de keten zijn belofte als het misgaat?). Derde keten naast tafelproef en ritproef -- zie MAATSTAF.md par. 7.",
   "grens": "Alleen de zaakaanmelding in een gereguleerd genre; de ballotage van een LID en een vrij genre lopen anders. Geen browser. Dat het geld werkelijk binnenkomt is niet gemeten: de termijn wordt administratief afgetekend.",
   "genre": "apotheek",
@@ -12,9 +19,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "id 94fe3d72, in de wachtrij: true",
+      "ziet": "id 616f94a2, in de wachtrij: true",
       "fout": null,
-      "ms": 15
+      "ms": 17
     },
     {
       "nr": 2,
@@ -26,7 +33,7 @@
       "status": 200,
       "ziet": "stand: ontbreekt, eis: Uw aanvraag staat op de stapel. Uw zaak wordt klaargezet zodra een medewerker uw Register gevestigde apothekers en toepasselijke Farmatec-registratie heeft gezien.",
       "fout": null,
-      "ms": 5
+      "ms": 6
     },
     {
       "nr": 3,
@@ -38,7 +45,7 @@
       "status": 200,
       "ziet": "stand na indienen: ingediend",
       "fout": null,
-      "ms": 9
+      "ms": 11
     },
     {
       "nr": 4,
@@ -62,7 +69,7 @@
       "status": 200,
       "ziet": "status: geaccepteerd, besloten door: user-1",
       "fout": null,
-      "ms": 21
+      "ms": 37
     },
     {
       "nr": 6,
@@ -72,9 +79,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "antwoord: {\"ok\":true,\"maand\":1,\"zaak\":{\"code\":\"PROEFZAAK\",\"staffId\":184,\"pin\":\"9690\",\"toegang\":\"magnaat-test-pin\"}}",
+      "ziet": "antwoord: {\"ok\":true,\"maand\":1,\"zaak\":{\"code\":\"PROEFZAAK\",\"staffId\":184,\"pin\":\"4285\",\"toegang\":\"magnaat-test-pin\"}}",
       "fout": null,
-      "ms": 105
+      "ms": 110
     },
     {
       "nr": 7,
@@ -134,14 +141,14 @@
     }
   ],
   "aanmelding": {
-    "id": "94fe3d72",
+    "id": "616f94a2",
     "genre": "apotheek"
   },
   "wereld": {
     "keurder": "ingelogd met het eigenaarsaccount (demostand); de gedeelde kantoorcode heeft geen naam en kan daarom niet aftekenen of beslissen -- zie storing 1 en 7",
     "naamvorm": "de naam die in het dossier belandt is een SLEUTEL (user-1), geen mensennaam"
   },
-  "verlopenId": "7e2ae855",
+  "verlopenId": "b9c2ccd6",
   "telling": {
     "schakels": 7,
     "gesloten": 7,

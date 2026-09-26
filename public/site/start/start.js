@@ -9,32 +9,32 @@
   var DAGDELEN = ['ochtend', 'middag', 'avond', 'nacht'];
   var BEELDEN = {
     ochtend: {
-      hero: 'images/start/dagdelen/hero-ochtend.jpg',
-      living: 'campagne/palacio.jpg',
-      travel: 'campagne/jet.jpg',
-      work: 'campagne/kyoto-suite.jpg',
-      foundation: 'campagne/bamboe.jpg'
+      hero: 'images/editorial/public-morning.webp',
+      living: 'images/editorial/discover-living.webp',
+      travel: 'images/editorial/discover-travel.webp',
+      work: 'images/editorial/discover-work.webp',
+      foundation: 'images/editorial/discover-foundation.webp'
     },
     middag: {
-      hero: 'images/start/dagdelen/hero-middag.jpg',
-      living: 'campagne/onsen.jpg',
-      travel: 'campagne/riad.jpg',
-      work: 'campagne/palacio.jpg',
-      foundation: 'campagne/hero.jpg'
+      hero: 'images/editorial/public-afternoon.webp',
+      living: 'images/editorial/discover-living.webp',
+      travel: 'images/editorial/discover-travel.webp',
+      work: 'images/editorial/discover-work.webp',
+      foundation: 'images/editorial/discover-foundation.webp'
     },
     avond: {
-      hero: 'images/start/dagdelen/hero-avond.jpg',
-      living: 'campagne/kyoto-suite.jpg',
-      travel: 'campagne/kaiseki.jpg',
-      work: 'campagne/jet.jpg',
-      foundation: 'campagne/riad.jpg'
+      hero: 'images/editorial/public-evening.webp',
+      living: 'images/editorial/discover-living.webp',
+      travel: 'images/editorial/discover-travel.webp',
+      work: 'images/editorial/discover-work.webp',
+      foundation: 'images/editorial/discover-foundation.webp'
     },
     nacht: {
-      hero: 'images/start/dagdelen/hero-nacht.jpg',
-      living: 'campagne/riad.jpg',
-      travel: 'campagne/bamboe.jpg',
-      work: 'campagne/onsen.jpg',
-      foundation: 'campagne/kaiseki.jpg'
+      hero: 'images/editorial/public-night.webp',
+      living: 'images/editorial/discover-living.webp',
+      travel: 'images/editorial/discover-travel.webp',
+      work: 'images/editorial/discover-work.webp',
+      foundation: 'images/editorial/discover-foundation.webp'
     }
   };
 

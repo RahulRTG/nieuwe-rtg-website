@@ -9,7 +9,7 @@ const path = require('node:path');
 const ROOT = path.join(__dirname, '..');
 const REGISTER = path.join(ROOT, 'RUST-MIGRATIES.json');
 const VERWACHT = [
-  'server/kern/magnaat-capabilities.js', 'server/kern/magnaat-economie.js',
+  'server/kern/magnaat-capabilities.js', 'server/kern/magnaat-economische-motor/markt.js',
   'server/kern/pay/index.js', 'server/db/ledengids.js', 'server/db/index.js',
   'server/pg/sync.js', 'server/kern/magnaat-controle.js',
   'server/kern/magnaatwereld.js', 'server/kern/rtgone.js', 'server/mail.js',

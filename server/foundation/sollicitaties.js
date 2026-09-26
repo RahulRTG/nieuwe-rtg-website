@@ -39,7 +39,12 @@ module.exports = (ctx) => {
       const a = apps.find(y => y.id === x.appId);
       if (a) status = a.status; else if (x.appId) status = 'onbekend';
       const chat = (db.data.applyChats && db.data.applyChats[x.appId]) ? x.appId : null;
-      return { bedrijf: x.bedrijf, func: x.func, land: x.land || null, landNaam: x.landNaam || null, at: x.at, status, chatId: chat };
+      /* De uitnodiging om je plek in te nemen, alleen voor wie zelf solliciteerde
+         (de lijst hierboven is al gefilterd op het eigen profiel) en alleen zolang
+         de sollicitatie op aangenomen staat. Claimen gebeurt met een eigen
+         RTG-account langs /api/werving/verbind; die weg is eenmalig. */
+      const plek = a && a.status === 'aangenomen' && a.plek && a.plek.link ? { link: a.plek.link } : null;
+      return { bedrijf: x.bedrijf, func: x.func, land: x.land || null, landNaam: x.landNaam || null, at: x.at, status, chatId: chat, plek };
     });
     res.json({ sollicitaties: lijst });
   });

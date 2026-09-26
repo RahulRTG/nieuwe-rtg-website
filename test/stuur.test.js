@@ -142,3 +142,21 @@ test('9. parseSubs: leest JSON of een genummerde lijst, kapt op 3', () => {
     ['Vlucht zoeken', 'Hotel boeken', 'Auto huren']);
   assert.deepEqual(parseSubs('   '), []);
 });
+
+test('10. besluit A5: het spoor ziet dat de AI handelde, namens de mens, en dat is niet te vervalsen', async () => {
+  const viaAi = await doe('/api/kantoorpakket/mijn', {}, lid);
+  assert.equal(viaAi.status, 200, JSON.stringify(viaAi.body).slice(0, 160));
+  assert.equal(viaAi.body.ok, true, 'de handeling zelf lukt, met dezelfde rechten als het lid');
+  assert.equal(viaAi.body.agent, 'ai:rahul', 'de route legde vast dat een agent handelde: ' + JSON.stringify(viaAi.body).slice(0, 300));
+
+  const kop = (extra) => fetch(base + '/api/kantoorpakket/mijn', { method: 'POST',
+    headers: Object.assign({ 'Content-Type': 'application/json', Authorization: 'Bearer ' + lid }, extra), body: '{}' });
+  const mens = await kop({});
+  assert.equal(mens.status, 200);
+  assert.equal(mens.headers.get('x-rtg-handelaar'), null, 'een gewone klik van het lid is geen agent');
+  const vals = await kop({ 'x-rtg-agent': 'rahul.' + 'a'.repeat(48) });
+  assert.equal(vals.status, 200, 'een vals kenmerk breekt het verzoek niet');
+  assert.equal(vals.headers.get('x-rtg-handelaar'), null, 'maar maakt er ook geen agent van: het geheim bestaat alleen in het proces');
+  const kaal = await kop({ 'x-rtg-agent': 'rahul' });
+  assert.equal(kaal.headers.get('x-rtg-handelaar'), null);
+});

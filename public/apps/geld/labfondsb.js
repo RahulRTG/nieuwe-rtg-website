@@ -56,7 +56,7 @@
   async function doneer(locId) {
     var inp = $('#lfWrap').querySelector('[data-b="' + locId + '"]');
     var bedrag = Deel().getal(inp && inp.value);
-    if (!bedrag) { if (inp) inp.focus(); return; }
+    if (!bedrag) { if (inp) inp.focus(); w.Geld.melding('Vul eerst een bedrag in.'); return; }
     try {
       await w.Geld.api('/api/labfonds/doneer', { locId: locId, bedrag: bedrag });
       if (inp) inp.value = '';

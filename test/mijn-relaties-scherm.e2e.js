@@ -100,7 +100,7 @@ test('Wie heeft toegang tot mij: lid B ziet lid A niet, gevolgen tonen verandert
       assert.match(await tekst(b.page, '#lijst'), /niets open bij een partij/, 'en het scherm zegt dat er niets openstaat');
       assert.ok(!(await tekst(b.page, 'body')).includes('Aanbiedingen en reisvoorstellen'),
         'de toestemming van lid A staat niet op het scherm van lid B');
-      assert.match(await tekst(b.page, '#grenzen'), /Wat dit scherm niet dekt/, 'de grenzen van het scherm staan erbij');
+      assert.match(await tekst(b.page, 'section[aria-label="Wat dit scherm niet dekt"]'), /Wat dit scherm niet dekt/, 'de grenzen van het scherm staan erbij');
       assert.deepEqual(b.fouten, [], 'geen JS-fouten bij lid B: ' + b.fouten.join(' | '));
       await b.ctx.close();
 

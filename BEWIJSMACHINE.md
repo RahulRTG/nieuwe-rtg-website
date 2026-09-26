@@ -390,7 +390,14 @@ De opzet vraagt een `RTG Release Passport`: welke code → welke build → welke
 toetsen → welke goedkeuring → dit artefact.
 
 Nagemeten over de hele boom: **geen SLSA, geen SBOM, geen in-toto, geen sigstore,
-geen build-attestatie.** (Wat de zoektocht wél oplevert is WebAuthn-attestatie,
+geen build-attestatie.**
+
+*Correctie (24 september 2026):* een CycloneDX-stuklijst en een met Ed25519
+getekend herkomstdocument bestaan wel in code (`scripts/imageherkomst.js`,
+`.github/workflows/release-image.yml`, drie rollen in `deploy/TRUST.md`) -- maar
+ze hebben nog nooit gedraaid: er is geen enkel publiek vertrouwensanker
+vastgelegd, dus de workflow weigert en er is nul keer een release doorheen
+gegaan. Geen SLSA, geen in-toto en geen sigstore blijft waar. (Wat de zoektocht wél oplevert is WebAuthn-attestatie,
 en dat is iets anders: dat gaat over een sleutel van een lid.)
 
 Dit is een echt gat en het is ook een eigen project — een supply-chain-laag, geen

@@ -11,7 +11,8 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorKoppelBody } = require('./helper');
+const { kantoorPasskey } = require('./kantoorpasskey');
 
 let srv, base, lid, office;
 /* De vier-ogen op het OPSCHALEN vraagt twee ECHTE personen. Vroeger stonden hier
@@ -21,7 +22,7 @@ let srv, base, lid, office;
    req.body.naam, dus een sessie kon beide rollen spelen. Opschalen zit nu achter
    de boardroomdeur en de identiteit komt uit de sessie. Deze twee tokens zijn
    dus geen testdecor maar de kern van wat de knop beschermt. */
-let baas, tweede, opNaam, opNaam2;
+let baas, tweede, opNaam, opNaam2, pk, sleutel1, sleutel2;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bank-'));
 
 const api = (pad, body, token) => fetch(base + '/api/' + pad, {
@@ -49,9 +50,15 @@ const kapi = (pad, body, nm) => api('office/' + pad, { ...(body || {}), naam: nm
    ceremonie struikelt -- die heeft zijn eigen toets in
    test/tweedehandtekening.test.js. */
 async function metTweedeHand(pad, body) {
-  const aanvraag = await kapi(pad, body);
+  /* Een GELDhandeling vraagt bij beide handtekeningen een passkeyceremonie
+     (besluit 25 september 2026, routes/kantoren/bank-passkey.js); rood staan niet. */
+  const geld = pad === 'bank/incasso';
+  const c1 = geld ? await pk.ceremonie(sleutel1, '/api/office/bank/incasso/opties', body, opNaam) : {};
+  const aanvraag = await kapi(pad, { ...body, ...c1 });
   if (!aanvraag.body || !aanvraag.body.needsAuth) return aanvraag;
-  return api('office/bank/handtekening/bevestig', { id: aanvraag.body.aanvraag.id }, opNaam2);
+  const id = aanvraag.body.aanvraag.id;
+  const c2 = geld ? await pk.ceremonie(sleutel2, '/api/office/bank/handtekening/opties', { id }, opNaam2) : {};
+  return api('office/bank/handtekening/bevestig', { id, ...c2 }, opNaam2);
 }
 
 function ibanGeldig(iban) {
@@ -92,7 +99,7 @@ test.before(async () => {
   const cn = (await api('state', {}, reg.token)).body.state.user.codename;
   const geef = await bapi('boardroom/toegang/geef', { codenaam: cn }, baas);
   assert.equal(geef.status, 200, 'de eigenaar geeft boardroom-toegang: ' + JSON.stringify(geef.body).slice(0, 140));
-  const kop = await api('account/koppel', { soort: 'kantoor', code: 'KANTOOR-BANK-1' }, reg.token);
+  const kop = await api('account/koppel', await kantoorKoppelBody(base, reg.token), reg.token);
   assert.equal(kop.status, 200, 'het tweede lid koppelt de kantoorrol: ' + JSON.stringify(kop.body).slice(0, 140));
   tweede = (await api('account/start', { rol: 'kantoor' }, reg.token)).body.token;
   assert.ok(tweede, 'en staat als tweede persoon in de backoffice');
@@ -106,7 +113,7 @@ test.before(async () => {
     body: JSON.stringify({ name: 'Bankmedewerker', email: 'med' + w + '@x.nl', phone: '06' + w,
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' }) })).json();
   assert.ok(med.token, 'de kantoormedewerker heeft een eigen account');
-  const kop2 = await api('account/koppel', { soort: 'kantoor', code: 'KANTOOR-BANK-1' }, med.token);
+  const kop2 = await api('account/koppel', await kantoorKoppelBody(base, med.token), med.token);
   assert.equal(kop2.status, 200, 'de medewerker koppelt de kantoorrol: ' + JSON.stringify(kop2.body).slice(0, 140));
   opNaam = (await api('account/start', { rol: 'kantoor' }, med.token)).body.token;
   assert.ok(opNaam, 'en staat op naam in de backoffice');
@@ -119,10 +126,13 @@ test.before(async () => {
     body: JSON.stringify({ name: 'Bankmedewerker twee', email: 'med2' + w2 + '@x.nl', phone: '06' + w2,
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' }) })).json();
   assert.ok(med2.token, 'de tweede kantoormedewerker heeft een eigen account');
-  const kop3 = await api('account/koppel', { soort: 'kantoor', code: 'KANTOOR-BANK-1' }, med2.token);
+  const kop3 = await api('account/koppel', await kantoorKoppelBody(base, med2.token), med2.token);
   assert.equal(kop3.status, 200, 'de tweede medewerker koppelt de kantoorrol: ' + JSON.stringify(kop3.body).slice(0, 140));
   opNaam2 = (await api('account/start', { rol: 'kantoor' }, med2.token)).body.token;
   assert.ok(opNaam2, 'en staat ook op naam in de backoffice');
+  pk = kantoorPasskey(base);
+  sleutel1 = await pk.zet(med.token);
+  sleutel2 = await pk.zet(med2.token);
 
   /* DE VERGUNNING VASTLEGGEN, en dat is sinds de bevoegdheidslaag geen decor.
      Wat RTG zelf mag hangt niet aan de drie-standen-knop maar aan wat er is
@@ -543,6 +553,7 @@ test('een uitgaande SEPA levert een betaalopdracht op die het kantoor kan volgen
   assert.equal(na.railOpen, (voor.railOpen || 0) + 1, 'er staat een opdracht meer open');
   assert.equal(na.railOpenCenten, (voor.railOpenCenten || 0) + 12500, 'voor precies dit bedrag');
   assert.equal(na.railMislukt, 0, 'en niets is mislukt');
+  assert.equal(na.railOnbekend, 0, 'en van niets is de uitkomst onbekend (MONEY-012; het veld hoort er te staan)');
   assert.ok(na.railOudsteAt > 0, 'met een leeftijd, zodat een blijvende storing opvalt');
 
   // dubbeltik: dezelfde idem-sleutel maakt geen tweede opdracht
@@ -603,6 +614,41 @@ test('een mislukte payout komt via de webhook binnen en brengt het geld terug', 
   const af = await api('bank/afschrift', { iban: lid.iban }, lid.token);
   assert.ok(af.body.regels.some(r => r.soort === 'sepa-terug' && !r.af),
     'de teruggeboeking staat als bijschrijving op het afschrift');
+});
+
+/* DE AFSTEMMINGSROUTE (MONEY-012). Een ONBEKENDE uitbetaling valt in een
+   draaiende server niet uit te lokken (docs/money-012.md); de drie uitkomsten
+   staan in test/money012.test.js. Hier staat wat de ROUTE zelf belooft: alleen
+   op naam, alleen een ONBEKENDE opdracht, en een weigering maakt geen aanvraag
+   die een collega daarna kan aftekenen. */
+test('de afstemmingsroute weigert wat niet ONBEKEND is en maakt dan geen aanvraag', async () => {
+  const uit = await api('bank/sepa', { iban: lid.iban, centen: 1500, naarIban: 'NL91ABNA0417164300',
+    begunstigde: 'Ontvanger', oms: 'Afstemproef', idem: 'sepa-afstem' }, lid.token);
+  assert.equal(uit.status, 200);
+  const lijf = { id: uit.body.opdrachtId, uitspraak: 'niet-uitgevoerd', bron: 'afschrift proef' };
+  const ids = (r) => r.body.aanvragen.map(a => a.id).sort();
+  const voor = await api('office/bank/handtekening/open', {}, opNaam);
+  assert.equal(voor.status, 200);
+
+  const gedeeld = await api('office/bank/opdrachten/afstemming', lijf, office.token);
+  assert.ok(gedeeld.status === 401 || gedeeld.status === 403, 'de gedeelde kantoorcode komt er niet door: ' + gedeeld.status);
+
+  const onbekendId = await api('office/bank/opdrachten/afstemming', { ...lijf, id: 'BO-BESTAATNIET' }, opNaam);
+  assert.equal(onbekendId.status, 404);
+
+  const ingediend = await api('office/bank/opdrachten/afstemming', lijf, opNaam);
+  assert.equal(ingediend.status, 409, 'een aangenomen opdracht sluit via de rail, niet via een afschriftregel');
+  assert.match(ingediend.body.error, /INGEDIEND/, 'de weigering noemt de stand waar hij op staat');
+
+  const zonderBron = await api('office/bank/opdrachten/afstemming', { ...lijf, bron: '' }, opNaam);
+  assert.ok(zonderBron.status === 400 || zonderBron.status === 409);
+
+  /* Vergelijken met de lijst van VOOR de weigeringen, en niet "er zit geen
+     afstemming tussen": dat tweede slaagt ook op een lege lijst, en dan meet het
+     niets (scripts/tandeloos.js). */
+  const na = await api('office/bank/handtekening/open', {}, opNaam);
+  assert.equal(na.status, 200);
+  assert.deepEqual(ids(na), ids(voor), 'geen van die weigeringen liet een aanvraag achter om af te tekenen');
 });
 
 test('een payout-webhook die wij niet kennen verandert niets en valt niet om', async () => {

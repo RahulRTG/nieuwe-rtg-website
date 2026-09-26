@@ -1,9 +1,8 @@
 /* Directpay-handeling voor kaart- en reeds bevestigde muntbetalingen.
    De gedeelde grenzen, idempotentie en boekhouding komen via index.js. */
-const betaalstaten = require('../betaalwaarheid/staten');
 
 module.exports = (ctx) => {
-  const { db, save, crypto, betaal, ensure, centenVan, id, schoon, nu, nuMs, ledger, publiek,
+  const { save, crypto, betaal, betaalWaarheid, ensure, centenVan, id, schoon, nu, ledger, publiek,
     idemZoek, idemBewaar, tempoOk, findSupplier, notifySupplier, logActivity,
     sseToSupplier, sseToCustomer, sseToOffice, MIN_CENTEN, MAX_CENTEN,
     directBetalingenVoegToe } = ctx;
@@ -30,6 +29,8 @@ module.exports = (ctx) => {
     const idemSleutel = idem ? ('dp:' + key + ':' + String(idem).slice(0, 60)) : null;
     if (idemSleutel) {
       const al = idemZoek(idemSleutel);
+      if (al && (al.bedrag !== cent || al.supplierCode !== s.code))
+        return { status: 409, error: 'Deze sleutel hoort al bij een ander bedrag of een andere partner.' };
       if (al) return { status: 200, ok: true, betaling: publiek(al), herhaald: true };
       const bezig = inVlucht.get(idemSleutel);
       if (bezig) {
@@ -46,55 +47,40 @@ module.exports = (ctx) => {
     try { return await belofte; } finally { inVlucht.delete(idemSleutel); }
   }
 
-  async function voerUit({ key, codename, zaak: s, cent, omschrijving, bron, idem, idemSleutel }) {
-    let prov;
+  /* VIA DE BETAALWAARHEID (MONEY-012). Hier stond een kale betaal.maakBetaling
+     met een wachtende rij in kaartWachtend: geen veegronde, een stille wis boven
+     de 20.000 rijen, en een verloren antwoord liet niets achter. Nu staat de
+     betaling vast VOOR de aanroep en boekt de afhandelaar
+     (kern/betaalwaarheid/inkomend.js) pas als de provider hem definitief
+     bevestigt -- processing en requires_capture zijn nog geen geld. */
+  async function voerUit({ key, codename, zaak: s, cent, omschrijving, bron, idemSleutel }) {
+    if (!betaalWaarheid) return { status: 503, error: 'De betaalwaarheid is niet aangesloten; er is niets afgeschreven.' };
+    let w;
     try {
-      prov = await betaal.maakBetaling({
-        bedrag: cent, valuta: 'eur',
-        referentie: 'DP-' + (idem || crypto.randomUUID()),
-        idempotentieSleutel: idemSleutel || undefined,
-        omschrijving: (s.name + ' · ' + (omschrijving || 'Directe betaling')).slice(0, 120),
-        // productie: bestemming = connected account van de leverancier (destination charge)
-        bestemming: s.stripeAccount || undefined
-      });
-    } catch (e) { return { status: 502, error: 'Betaling kon niet gestart worden: ' + e.message }; }
-    /* Processing en requires_capture zijn nog geen ontvangen geld. Bewaar wel
-       de strikt begrensde settlementcontext, zodat uitsluitend een later
-       geverifieerd providerbericht de echte boeking kan afronden. */
-    if (!betaalstaten.definitiefBetaald(betaalstaten.providerStatus(prov.aanbieder, prov.status, 'start'))) {
-      if (prov.id) {
-        db.data.kaartWachtend = db.data.kaartWachtend && typeof db.data.kaartWachtend === 'object'
-          ? db.data.kaartWachtend : {};
-        db.data.kaartWachtend[prov.id] = {
-          soort: 'direct', betaalwijze: 'kaart', key, codename,
-          supplierCode: s.code, centen: cent,
-          omschrijving: schoon(omschrijving, 120) || 'Directe betaling',
-          bron: ['ai', 'salon', 'verzoek', 'app'].includes(bron) ? bron : 'app',
-          idem: idemSleutel || ('provider:' + prov.id), at: nuMs()
-        };
-        const sleutels = Object.keys(db.data.kaartWachtend);
-        if (sleutels.length > 20000)
-          for (const k of sleutels.slice(0, sleutels.length - 20000)) delete db.data.kaartWachtend[k];
-        save();
-      }
-      return {
-        status: 402,
-        error: 'De kaartbetaling is nog niet definitief bevestigd. Er is niets bij de partner geboekt.',
-        pending: true,
-        providerId: prov.id || null,
-        clientSecret: prov.clientSecret || null
-      };
+      w = betaalWaarheid.maak({ actor: 'dp:' + key, soort: 'direct', bronRef: s.code, supplierCode: s.code,
+        idem: idemSleutel || ('los:' + crypto.randomUUID()), centen: cent, valuta: 'eur',
+        context: { key, codename, supplierCode: s.code, omschrijving: schoon(omschrijving, 120) || 'Directe betaling',
+          bron: ['ai', 'salon', 'verzoek', 'app'].includes(bron) ? bron : 'app', idem: idemSleutel || null } });
+    } catch (e) { return { status: 409, error: e.message }; }
+    let uit;
+    try {
+      uit = await betaalWaarheid.begin(w.id, { bestemming: s.stripeAccount || undefined,
+        omschrijving: (s.name + ' · ' + (omschrijving || 'Directe betaling')).slice(0, 120) });
+    } catch (e) {
+      return { status: 502, betalingId: w.id, onbekend: e && e.code !== 'BETAAL_AFHANDELING_MISLUKT',
+        error: 'De betaling gaf geen uitsluitsel. Betaal niet opnieuw: RTG zoekt het na met dezelfde sleutel.' };
     }
-    const b = {
-      ref: id('DP'), key, codename: codename || key, supplierCode: s.code, supplierName: s.name,
-      bedrag: cent, omschrijving: schoon(omschrijving, 120) || 'Directe betaling',
-      bron: ['ai', 'salon', 'verzoek', 'app'].includes(bron) ? bron : 'app',
-      providerId: prov.id || null, aanbieder: prov.aanbieder || 'uit', idem: idemSleutel || null, at: nu()
-    };
-    vastleggen(b, cent, key, 'Rechtstreeks betaald', 'betaalde rechtstreeks € ' + (cent / 100).toFixed(2));
-    idemBewaar(b);
-    save();
-    return { status: 200, ok: true, betaling: publiek(b) };
+    const r = betaalWaarheid.van(w.id);
+    if (r && r.afgehandeldAt) {
+      const b = idemZoek(idemSleutel || ('waarheid:' + w.id));
+      // wat onder deze sleutel staat, moet DEZE betaling zijn
+      if (!b || b.bedrag !== cent || b.supplierCode !== s.code)
+        return { status: 409, betalingId: w.id, error: 'Deze sleutel hoort al bij een ander bedrag of een andere partner.' };
+      return { status: 200, ok: true, betaling: publiek(b), betalingId: w.id };
+    }
+    return { status: 402, pending: true, betalingId: w.id, providerId: (r && r.providerId) || null,
+      clientSecret: (uit && uit.actie && uit.actie.clientSecret) || null,
+      error: 'De kaartbetaling is nog niet definitief bevestigd. Er is niets bij de partner geboekt.' };
   }
 
   /* Een met munten (crypto) betaalde directe betaling vastleggen. Het geld is al
@@ -112,6 +98,9 @@ module.exports = (ctx) => {
     const idemSleutel = idem || (providerId ? String(aanbieder || 'provider') + ':' + providerId : null);
     if (idemSleutel) {
       const al = idemZoek(idemSleutel);
+      // een herhaling is alleen een herhaling bij hetzelfde bedrag en dezelfde partner
+      if (al && (al.bedrag !== cent || al.supplierCode !== s.code))
+        return { status: 409, error: 'Deze sleutel hoort al bij een ander bedrag of een andere partner.' };
       if (al) return { status: 200, ok: true, betaling: publiek(al), herhaald: true };
     }
     const isMunt = betaalwijze === 'munt';

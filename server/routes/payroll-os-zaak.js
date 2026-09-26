@@ -125,13 +125,16 @@ module.exports = (kern) => {
   app.post('/api/supplier/identiteit', supplierAuth, (req, res) =>
     res.json({ ok: true, standen: payrollOS.identiteit.standen(accounts.listStaff(req.supplier.code)) }));
 
-  app.post('/api/supplier/identiteit/opvraag', supplierAuth, (req, res) => {
+  app.post('/api/supplier/identiteit/opvraag', supplierAuth, async (req, res) => {
     const b = req.body || {};
     const staff = accounts.getStaffById(Number(b.staffId));
-    antwoord(res, payrollOS.identiteit.opvraag({ supplierCode: req.supplier.code,
+    let r;
+    try { r = await payrollOS.identiteit.opvraag({ supplierCode: req.supplier.code,
       supplierNaam: req.supplier.name, staff, niveau: String(b.niveau || 'gegevens'),
       reden: schoon(b.reden, 300), door: req.actor.name,
-      doorRol: req.actor.manager ? 'manager' : 'staff' }));
+      doorRol: req.actor.manager ? 'manager' : 'staff' }); }
+    catch (e) { r = { status: 503, error: 'De inzage kon niet veilig worden vastgelegd.' }; }
+    antwoord(res, r);
   });
 
   /* De MEDEWERKERSKANT (zijn eigen stroken, zijn eigen dossier, zijn eigen

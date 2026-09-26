@@ -31,7 +31,7 @@
   // Elke app kent zijn eigen huisstijl-glyf (shared/glyf.js) op naam van de
   // sleutel; de tegel tekent die als dunne lijn-icoon (geen emoji meer).
   const LINKS = {
-    ontdek:      { naam: 'Ontdekken',     url: '/apps/rtg.html' },
+    ontdek:      { naam: 'Overzicht',     url: '/apps/rtg.html' },
     /* De cockpit van LivingOS (WERELDEN.md). Het bestand heet nog living-os,
        want een bestandsnaam is geen merknaam; de APP heette dat ook, en dat
        botste vier regels ver in de bank met de WERELD LivingOS. */
@@ -54,7 +54,7 @@
        -- die is Rahuls routeertabel en de bron van werkbladtitels -- maar tekent
        geen bank-sectie meer. test/wereldregister.test.js bewaakt dat elke app
        uit die catalogus ook echt in een wereld hangt. */
-    vandaag:     { naam: 'Vandaag',        url: '/apps/vandaag.html' },
+    vandaag:     { naam: 'Vandaag',        url: '/apps/life.html' },
     leven:       { naam: 'Mijn leven',     url: '/apps/leven.html' },
     sociaal:     { naam: 'Sociaal',        url: '/apps/sociaal.html' },
     /* De WERELDLAAG (README: server/kern/wereld/) -- een LEESLAAG over vijf
@@ -69,7 +69,7 @@
        WERELDEN.md gaat over de MENS: wie zijn eigen tijdlijn leest, is bezig
        met zijn dagelijks leven. */
     wereldlaag:  { naam: 'Alles bij elkaar', url: '/apps/wereld.html' },
-    geldcommand: { naam: 'Geld',           url: '/apps/geld-command.html' },
+    geldcommand: { naam: 'Geld',           url: '/apps/geld.html' },
     commerce:    { naam: 'Commerce',       url: '/apps/commerce.html' },
     /* HIER STONDEN INSTANTREALITY EN PRIVATEOFFICE, en die zijn 19 augustus 2026
        samengevoegd met de sleutel ernaast (WERELDEN.md, "de twee dubbele

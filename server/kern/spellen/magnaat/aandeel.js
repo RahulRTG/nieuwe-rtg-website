@@ -30,6 +30,8 @@
    de contracten en de veilingen: dit bestand kent het BELANG en wat een maand
    ermee doet, dat bestand kent het gesprek. */
 const rond = (n) => Math.round(n);
+const { naarCenten, uitCenten, euroTonen } = require('./centen');
+const { beweeg } = require('./boekhouding');
 
 const MAX_DEEL = 49;      // procent dat weg mag; zie besluit 2
 
@@ -49,18 +51,23 @@ module.exports = ({ wieHeeft, waarde }) => {
      niet vergeven is; elke aandeelhouder krijgt zijn deel -- ook als dat een
      verlies is (besluit 3). Wordt aangeroepen met het resultaat van EEN
      vestiging, en geeft terug wat er naar wie ging zodat het op het
-     maandoverzicht komt. */
+     maandoverzicht komt.
+
+     IN EUROCENTEN (./centen.js): `resultaat` komt als centen binnen, elk deel
+     wordt een keer afgerond, en de eigenaar houdt precies de rest -- zo is de
+     som van alle delen het resultaat, tot op de cent. */
   function verdeel(st, vestigingId, resultaat) {
     const rijen = lopend(st).filter(d => d.vestiging === vestigingId);
     if (!rijen.length) return { eigenaar: resultaat, uit: [] };
     const uit = [];
     let weg = 0;
+    const eigenaar = wieHeeft(st, vestigingId).speler;
     for (const d of rijen) {
-      const bedrag = resultaat * (d.deel / 100);
-      st.geld[d.houder] += bedrag;
+      const bedrag = naarCenten(uitCenten(resultaat) * (d.deel / 100));
+      if (d.houder !== eigenaar) { beweeg(st, { soort: 'RESULTAATDELING', van: ['kas', eigenaar], naar: ['kas', d.houder], bedrag, omschrijving: 'Deel van het resultaat' }); }
       d.ontvangen += bedrag;
       weg += bedrag;
-      uit.push({ id: d.id, houder: d.houder, deel: d.deel, bedrag: rond(bedrag) });
+      uit.push({ id: d.id, houder: d.houder, deel: d.deel, bedrag: euroTonen(bedrag) });
     }
     return { eigenaar: resultaat - weg, uit };
   }
@@ -101,7 +108,7 @@ module.exports = ({ wieHeeft, waarde }) => {
         // de waarde van JOUW deel; de rest van de zaak gaat je niet aan
         mijnWaarde: w && d.status === 'loopt' && d.houder === h ? rond(waarde(w.v) * (d.deel / 100)) : null,
         aanZet: d.status === 'voorgesteld' && d.van !== h, ronde: d.ronde,
-        ontvangen: rond(d.ontvangen), gekocht: d.gekocht };
+        ontvangen: euroTonen(d.ontvangen), gekocht: d.gekocht };
     });
   }
 

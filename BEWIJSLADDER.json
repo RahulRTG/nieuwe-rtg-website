@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-15T15:33:03.424Z",
-    "commit": "b007567b",
+    "op": "2026-09-22T17:12:04.581Z",
+    "commit": "0f88d9cf1",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bewijsladder.js",
-    "node": "v22.22.2"
+    "node": "v24.18.0"
   },
   "sporten": [
     {
@@ -92,6 +92,22 @@
         },
         {
           "doel": "scripts/deltapoort.js",
+          "lokaal": true,
+          "keten": [
+            "ci.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null,
+          "graad": "vermoed"
+        },
+        {
+          "doel": "scripts/document-fitness.js",
           "lokaal": true,
           "keten": [
             "ci.yml"
@@ -224,6 +240,54 @@
           "graad": "vermoed"
         },
         {
+          "doel": "scripts/evidence-base.js",
+          "lokaal": true,
+          "keten": [
+            "ci.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null,
+          "graad": "vermoed"
+        },
+        {
+          "doel": "scripts/evidence-gate.js",
+          "lokaal": false,
+          "keten": [
+            "ci.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null,
+          "graad": "vermoed"
+        },
+        {
+          "doel": "scripts/evidence.js",
+          "lokaal": true,
+          "keten": [
+            "ci.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null,
+          "graad": "vermoed"
+        },
+        {
           "doel": "scripts/veranderbereik.js",
           "lokaal": false,
           "keten": [
@@ -234,7 +298,7 @@
             "push",
             "workflow_dispatch"
           ],
-          "register": "VERANDERBEREIK.json",
+          "register": "VERANDERBEREIK-KENNIS.json",
           "stempel": true,
           "grond": "schrijft",
           "graad": "gemeten"
@@ -1047,7 +1111,7 @@
   "uitleg": "Welk bewijsmechanisme op welke sport van de bewijsladder staat, afgeleid uit de keten in .github/workflows en uit de scripts zelf. Per sport de stand (staat, een stap weg, bestaat niet) en per mechanisme of het lokaal draait, alleen in de keten, of beide.",
   "grens": "De SPORTEN zijn verklaard en niet gemeten: dat een soort bewijs hier ontbreekt, zegt deze meter niet. Van de mechanismen erop meet hij dat ze DRAAIEN en waar -- niet of het bewijs dat ze leveren goed is, en niet of het genoeg is. `alleenKeten` telt en oordeelt niet: zeven van die mechanismen lezen een artefact uit een andere job en kunnen lokaal per definitie niet draaien. En er staat met opzet geen samengesteld eindoordeel onder deze tabel (KEURING.md par. 5).",
   "telling": {
-    "mechanismen": 57,
+    "mechanismen": 61,
     "sporten": 12,
     "staat": 6,
     "stap": 6,
@@ -1057,6 +1121,7 @@
     "graadVermoed": 12,
     "graadOnbekend": 0,
     "alleenKeten": 17,
+    "vermeldingenAlleenKeten": 18,
     "zonderTrede": 0
   }
 }

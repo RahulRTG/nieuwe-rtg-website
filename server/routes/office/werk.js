@@ -2,7 +2,7 @@
    De identiteitsverificaties staan in ./verificaties.js.
    Draait op de gedeelde kern; gemount vanuit routes/office.js. */
 module.exports = (octx) => {
-  const { kern, officeQueryMag } = octx;
+  const { kern, officeQueryMag, officeQueryOpNaam } = octx;
   const { UPLOAD_DIR, accounts, app, broadcastSync, conciergeInbox, db, fs, notify,
           notifySupplier, officeAuth, officeState, path, talen, trChat, save, sseToOffice, sseToSupplier,
           paspoortIncidenten, paspoortBeoordeel } = kern;
@@ -83,7 +83,10 @@ app.post('/api/office/incident/beslis', officeAuth, (req, res) => {
 });
 
 app.get('/api/office/doc', (req, res) => {
+  /* Op naam, zoals de lijst waar deze link uit komt (/api/office/verifications,
+     kluisAuth): gevonden door de A3-meting van de beleidsmotor. */
   if (!officeQueryMag(req.query.token)) return res.status(401).end();
+  if (!officeQueryOpNaam(req.query.token)) return res.status(403).end();
   const file = path.basename(String(req.query.file || '')); // geen padtraversal
   const full = path.join(UPLOAD_DIR, file);
   if (!file || !full.startsWith(UPLOAD_DIR) || !fs.existsSync(full)) return res.status(404).end();

@@ -229,6 +229,16 @@ test('er is EEN communicatie-app: het oude berichtenpad leidt erheen en bellen s
         'de knop "nieuw gesprek" staat buiten beeld (' + maat.plusRechts + ' > ' + maat.venster + ')');
       assert.equal(maat.overloop, false, 'het scherm loopt horizontaal over');
 
+      /* ESCAPE SLUIT HET BLAD. Het blad is aria-modal en de rest gaat inert;
+         zonder Escape zat wie met een toetsenbord werkt erachter vast
+         (24 september 2026, gevonden doordat APPWERKT de volgende knop niet
+         meer kon aantikken). */
+      await page.click('#nieuwBtn');
+      await page.waitForSelector('#bladWaas.open', { timeout: 5000 });
+      await page.keyboard.press('Escape');
+      const nogOpen = await page.evaluate(() => document.getElementById('bladWaas').classList.contains('open'));
+      assert.equal(nogOpen, false, 'Escape sluit het blad niet: een toetsenbordgebruiker zit erachter vast');
+
       /* HET BEGINSCHERM TOONT ALLEEN NOG DE VIER HOOFDAPPS.
 
          Hier stond dat Bellen en Videobellen niet meer als eigen app in de

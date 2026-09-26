@@ -112,7 +112,8 @@ module.exports = (ctx) => {
 
   /* Uit dienst. Geen verwijdering: iemand die vorig jaar bij u werkte, werkte
      vorig jaar bij u -- en dat moet terug te vinden zijn als er een vraag komt
-     over wie toen wat deed. Zie ./offboarding.js voor wat er verder bij hoort. */
+     over wie toen wat deed. Wat er verder bij hoort (toegang, rollen) staat in
+       ./verandering-eigendom.js (offboardingBeeld/offboardingDoe). */
   function employmentBeeindig(e, per) {
     const d = per && DATUM.test(per) ? per : tijdVandaag();
     if (d < String(e.van)) return { status: 400, error: 'De einddatum ligt voor de begindatum.' };

@@ -312,7 +312,7 @@ async function raakdoel(page, selector, label) {
 async function bewijsHandeling(page, route, maat) {
   const label = route.naam + ' @ ' + maat.naam;
   if (route.wereld === 'living') {
-    const cta = '.dagkop .rtg-dashboard-hero-cta[href="/apps/vandaag.html"]';
+    const cta = '.dagkop .rtg-dashboard-hero-cta[href="/apps/life.html"]';
     await page.waitForSelector(cta, { state: 'visible', timeout: geduld(8000) });
     await raakdoel(page, cta, label);
     await page.click('[data-paneel="alles"]');

@@ -160,15 +160,40 @@ test('de sprong: via Edge naar elke functie, vanaf elk scherm', { skip: geenBrow
     });
 
     await t.test('een bestemming opent de functie', async () => {
+      /* Gefilterd betekent: elke rij draagt het zoekwoord. Een grens op het
+         AANTAL rijen (dat was < 10) meet iets anders -- sinds de rij "RTG Pay"
+         heet (SCHERMEIGENAAR.json: geen twee menu-items "Betalen") staan ook de
+         handelingen die in RTG Pay wonen eronder, en dat zijn er tien. */
       await page.fill('.rtgsprong-kop input', 'pay');
       await wachtTot(page, () => {
-        const r = document.querySelectorAll('.rtgsprong-rij');
-        return r.length > 0 && r.length < 10;
+        const r = [...document.querySelectorAll('.rtgsprong-rij')];
+        return r.length > 0 && r.every(b => /pay/i.test(b.textContent));
       }, null, { wat: 'de lijst gefilterd op pay' });
       await Promise.all([page.waitForURL('**/apps/pay.html', { timeout: 20000 }),
         page.locator('.rtgsprong-rij:visible').first().click()]);
       assert.equal(new URL(page.url()).pathname, '/apps/pay.html',
-        'zoeken op de SLEUTEL (pay) hoort RTG Pay te openen, ook al heet de rij "Betalen"');
+        'zoeken op pay hoort als bovenste treffer de bestemming RTG Pay te openen, niet een handeling erin');
+    });
+    await t.test('zoeken op de SLEUTEL vindt een rij die anders heet', async () => {
+      /* Wat de stap hierboven bewees tot de rij "RTG Pay" ging heten: je vindt
+         een functie ook op haar sleutel als de naam iets anders zegt. vonk is de
+         sleutel, "Daten" de naam. */
+      await page.goto(srv.base + '/apps/leven.html', { waitUntil: 'domcontentloaded' });
+      await wachtOpGreep(page);
+      await greepVan(page).click();
+      await wachtTot(page, () => {
+        const v = document.querySelector('.rtgsprong-kop input');
+        return !!v && v.getBoundingClientRect().width > 0;
+      }, null, { wat: 'het zoekveld van de sprong' });
+      await page.fill('.rtgsprong-kop input', 'vonk');
+      await wachtTot(page, () => {
+        const r = document.querySelector('.rtgsprong-rij');
+        return !!r && /Daten/.test(r.textContent);
+      }, null, { wat: 'de rij Daten op de sleutel vonk' });
+      await Promise.all([page.waitForURL('**/apps/vonk.html', { timeout: 20000 }),
+        page.locator('.rtgsprong-rij:visible').first().click()]);
+      assert.equal(new URL(page.url()).pathname, '/apps/vonk.html',
+        'zoeken op de sleutel (vonk) hoort Daten te openen, ook al staat het woord niet in de naam');
     });
     await t.test('op een toetsenbord: typen en Enter opent de beste treffer', async () => {
       /* Op een bureau is dit een toetsenbordding: wie typt en meteen Enter

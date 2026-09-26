@@ -21,7 +21,7 @@
     if (!empty && kind === 'bestanden') label = 'archiveLabel';
     if (!empty && kind === 'notities') label = 'notebook';
     var title = options.title ? '<span translate="no">' + C.esc(options.title) + '</span>' : C.text(kind + (empty ? 'Title' : 'Ready'));
-    var photo = empty || state === 'ready' ? '<img class="daily-photo" src="' + (empty ? '/images/daily/' + kind + '.webp' : '/images/first-steps/salon.webp') + '" width="1088" height="1456" alt="" fetchpriority="high">' : '';
+    var photo = empty ? '<img class="daily-photo" src="' + ('/images/daily/' + kind + '.webp') + '" width="1088" height="1456" alt="" fetchpriority="high">' : '';
     host.innerHTML = '<div class="daily-hero">' + photo + '<div class="daily-heading"><p class="daily-eyebrow">' + C.text(label)
       + '</p><h1>' + title + '</h1></div>' + (photo ? '<p class="daily-caption">' + C.text('atmosphere') + '</p>' : '') + '</div>';
     if (state === 'loading') host.innerHTML += '<p class="daily-message" role="status">' + C.text('loading') + '</p>';

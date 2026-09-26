@@ -96,7 +96,7 @@ module.exports = ({ db, store }, h) => {
   }
   function startHerinneringen() {
     if (timer) return;
-    timer = setInterval(veeg, 30000);
+    timer = setInterval(() => require('./dienstidentiteit').alsDienst('agenda-ics', veeg), 30000);
     if (timer.unref) timer.unref();
   }
 

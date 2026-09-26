@@ -371,6 +371,10 @@ const PUBLIEK = new Map([
      bedoeling -- alle vier staan met reden in scripts/lib/publiek.js -- maar in
      wat de dwaler kan waarnemen. */
   ['POST /api/bescherming/deur/steden', 'alleen de NAMEN van plaatsen die een beschermzaak kunnen oppakken. Geen enkel getal en geen enkele zaak, en met opzet zonder inlog: wie hier aanklopt heeft vaak geen account, en een deur die eerst een account vraagt is voor die mens geen deur'],
+  /* Besluit van de eigenaar, 23 september 2026: zonder deze catalogus doen de
+     keuzes op foundation/registreren.html niets, en de aanvrager heeft vóór
+     toelating nog geen account. Met reden ook in scripts/lib/publiek.js. */
+  ['POST /api/foundation/registratie/catalogus', 'de eisen per registratiesoort en de actieve steden: geen geheim, en een aanvrager leest ze voordat hij een account heeft; met rem per ip'],
   ['POST /api/rtfos/publiek/steden', 'de buurt zonder code; getemperd'],
   ['POST /api/rtfos/publiek/campagnes', 'idem'],
   ['POST /api/rtfos/publiek/jaarverslagen', 'de ANBI-publicatie -- openbaar, want anders is het geen publicatie'],

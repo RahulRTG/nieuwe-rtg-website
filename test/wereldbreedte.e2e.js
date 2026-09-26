@@ -48,9 +48,9 @@ const pw = laadPlaywright();
    naam niet: een toets die het huisvocabulaire tegenspreekt, leert je het
    verkeerde woord. */
 const SCHERMEN = [
-  '/apps/vandaag.html', '/apps/living-os.html', '/apps/lifestyle.html',
+  '/apps/life.html', '/apps/living-os.html', '/apps/lifestyle.html',
   '/apps/partner-network.html', '/apps/reizen-veilig.html',
-  '/apps/leven.html', '/apps/geld-command.html', '/apps/sociaal.html',
+  '/apps/leven.html', '/apps/geld.html', '/apps/sociaal.html',
   '/apps/media.html', '/apps/horeca.html', '/apps/reisboek.html',
 ];
 

@@ -140,9 +140,7 @@ test('een veeg bergt post op, de weg terug haalt hem terug, en een weigering ook
     await page.waitForSelector('#main .rij[data-i].gb-rij');
     const d2 = await meetVerseRij(page, '#main .rij[data-i]',
       'de teruggezette postregel hoort stabiel zichtbaar te worden');
-    await page.mouse.move(d2.x + d2.width * 0.15, d2.y + d2.height / 2);
-    await page.mouse.down();
-    for (let i = 1; i <= 16; i++) await page.mouse.move(d2.x + d2.width * 0.15 + i * 11, d2.y + d2.height / 2);
+    await veegDoor(page, d2, { startFractie: 0.15, afstand: 176, stappen: 16, loslaten: false });
     /* DE LADE TOONT ALLEEN WAT ER HEEL OP PAST. Post heeft aan deze kant drie
        acties en op een regel van deze breedte passen er twee; de derde stond
        eerder half in beeld en las als 'OVER'. Wat er niet bij past hoort er

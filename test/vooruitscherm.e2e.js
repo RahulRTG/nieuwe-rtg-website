@@ -21,7 +21,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, pasAppAdres } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -87,7 +87,7 @@ test('Vooruit en Uit uw post: van lege kaart naar een termijn, met EEN klik',
          met een ruimere wacht ernaast, en dat is een groter venster om een race
          mee toe te dekken -- precies wat deze ronde overal juist weghaalt. Een
          toets die twee van de drie keer groen is, is geen toets. */
-      await page.goto(base + '/apps/app.html', { waitUntil: 'load' });
+      await page.goto(await pasAppAdres(base, reg.token), { waitUntil: 'load' });
       /* Twee dingen liggen modaal over de pagina en vangen elke klik op. De
          knop is dan volgens de driver zichtbaar en klikbaar, en er gebeurt
          alleen niets -- dat kostte hier twee ronden.

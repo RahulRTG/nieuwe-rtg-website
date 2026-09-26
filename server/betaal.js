@@ -118,11 +118,15 @@ const maakBetaling = require('./betaal-connect')({
      uitgang in de echte Stripe-stand veilig dicht tot er een expliciete SEPA-
      rail of gecontroleerd Connected Account is gekoppeld.
    - Idempotent op sleutel: dezelfde afdracht wordt nooit twee keer weggezet. */
+/* MONEY-012: alleen een fout die aantoonbaar VOOR verzending valt, mag tot
+   terugboeken leiden (kern/betaalopdracht/inzending.js). Niet standaard zetten. */
+const voorDeDeur = (e) => { e.nietVerstuurd = true; return e; };
+
 async function maakUitbetaling(opdracht) {
   if (BETALEN_UIT)
-    throw new Error('Betalen staat bewust uitgeschakeld. Er is niets uitbetaald.');
+    throw voorDeDeur(new Error('Betalen staat bewust uitgeschakeld. Er is niets uitbetaald.'));
   const { bedrag, valuta = 'eur', iban, begunstigde, referentie, idempotentieSleutel, omschrijving } = opdracht || {};
-  if (!Number.isFinite(bedrag) || bedrag <= 0) throw new Error('Bedrag moet een positief bedrag in centen zijn.');
+  if (!Number.isFinite(bedrag) || bedrag <= 0) throw voorDeDeur(new Error('Bedrag moet een positief bedrag in centen zijn.'));
   const sleutel = 'uit:' + (idempotentieSleutel || referentie || crypto.randomUUID());
 
   const bestaand = haalOp(sleutel);
@@ -135,18 +139,20 @@ async function maakUitbetaling(opdracht) {
   } else if (regie.sepaGeconfigureerd && !regie.sepaAan) {
     const e = new Error('SEPA-sandbox is door de Integratiekamer uitgezet.');
     e.code = 'SEPA_SANDBOX_UIT';
-    throw e;
+    throw voorDeDeur(e);
   } else if (regie.sepaAan) {
-    res = sandbox.sepa({ bedrag, valuta, referentie, iban, begunstigde, omschrijving });
+    // lokaal: weigert alleen bij de invoercontrole
+    try { res = sandbox.sepa({ bedrag, valuta, referentie, iban, begunstigde, omschrijving }); }
+    catch (e) { throw voorDeDeur(e); }
   } else if (stripe) {
     const bevestiging = UITGAAND_BEWUST_DICHT ? ' De installatie staat bewust in deze gesloten stand.' : '';
     const e = new Error('Uitbetaling veilig geblokkeerd: een IBAN in Stripe-metadata is geen echte betaalbestemming. Koppel eerst een gecontroleerde uitbetaalrail.' + bevestiging);
     e.code = 'UITBETAALRAIL_NIET_ACTIEF';
-    throw e;
+    throw voorDeDeur(e);
   } else if (DEMO_BETALEN) {
     res = { id: 'magnaat_uit_' + crypto.randomBytes(8).toString('hex'), status: 'ingepland', aanbieder: 'magnaat-test', bedrag: Math.round(bedrag), valuta, referentie, iban };
   } else {
-    eisBetaalrail();
+    try { eisBetaalrail(); } catch (e) { throw voorDeDeur(e); }
   }
   bewaar(sleutel, res);
   return res;

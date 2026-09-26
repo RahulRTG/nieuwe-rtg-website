@@ -9,15 +9,16 @@ const { spawn } = require('node:child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const POORT = 4200 + Math.floor(Math.random() * 60);  // de gateway
-const BASIS = POORT + 100;                            // groepspoorten: leden, kantoor, rtf
-const BASE = 'http://127.0.0.1:' + POORT;
+const { vrijePoortReeks, stopNet } = require('./helper');
+let POORT, BASIS, BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-vloot-'));
 let vloot;
+let uitvoer = '';
 
 function post(pad, body, poort) {
   return fetch('http://127.0.0.1:' + (poort || POORT) + pad, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {})
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}),
+    signal: AbortSignal.timeout(5000)
   });
 }
 async function wachtTot(fn, ms = 20000) {
@@ -60,13 +61,20 @@ async function wachtTot(fn, ms = 20000) {
 const OPKOMST = 120000;
 
 test.before(async () => {
+  // De oude zestig willekeurige poorten konden al bezet zijn. Gebruik dezelfde
+  // bindproef als de trio-tests, buiten de efemere clientpoortruimte.
+  const poorten = await vrijePoortReeks(4);
+  POORT = poorten[0]; BASIS = poorten[1]; BASE = 'http://127.0.0.1:' + POORT;
   vloot = spawn(process.execPath, [path.join(__dirname, '..', 'server', 'vloot.js')], {
     env: {
       ...process.env, NODE_ENV: 'test', RTG_DEMO: '1', RTG_DATA_DIR: TMP, SMTP_URL: '',
       RTG_POORT: String(POORT), RTG_VLOOT_BASIS: String(BASIS),
       RTG_VLOOT_GROEPEN: 'leden:auth,member,social,zakelijk|kantoor:office,techniek|rtf:-'
     },
-    stdio: ['ignore', 'ignore', 'inherit']
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+  for (const stream of [vloot.stdout, vloot.stderr]) stream.on('data', bytes => {
+    uitvoer = (uitvoer + bytes.toString()).slice(-16000);
   });
   /* Alle drie de groepen en de gateway moeten opkomen -- en als er een NIET
      komt, hoort de melding te zeggen welke. "de vloot komt op" was met vier
@@ -78,16 +86,17 @@ test.before(async () => {
     catch (e) { stand[naam] = String(e.code || e.message || e).slice(0, 60); return false; }
   };
   const klaar = await wachtTot(async () => {
-    const a = await probeer('leden', () => fetch(BASE + '/api/health'));
+    const a = await probeer('leden', () => fetch(BASE + '/api/health', { signal: AbortSignal.timeout(5000) }));
     const b = await probeer('kantoor', () => post('/api/office/login', { code: 'RTG-OFFICE' }));
-    const c = await probeer('rtf', () => fetch(BASE + '/api/foundation/health'));
+    const c = await probeer('rtf', () => fetch(BASE + '/api/foundation/health', { signal: AbortSignal.timeout(5000) }));
     return a && b && c;
   }, OPKOMST);
   assert.ok(klaar, 'de vloot (3 groepen + poortwachter) komt op binnen ' +
-    Math.round(OPKOMST / 1000) + 's; laatste stand per groep: ' + JSON.stringify(stand));
+    Math.round(OPKOMST / 1000) + 's; laatste stand per groep: ' + JSON.stringify(stand) + '\n' + uitvoer);
 });
-test.after(() => {
-  if (vloot) try { vloot.kill('SIGTERM'); } catch (e) {}
+test.after(async () => {
+  // Eerst het eigen vlootproces laten stoppen, daarna pas zijn data verwijderen.
+  await stopNet(vloot, 10000);
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 

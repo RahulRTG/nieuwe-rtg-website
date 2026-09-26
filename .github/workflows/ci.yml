@@ -34,6 +34,11 @@ permissions:
   contents: read
   actions: read
 
+# Route- en schermjournalen blijven dertig dagen beschikbaar, net als het
+# afgeleide bewijsboek. Met één dag vervielen de geslaagde delen vóór een
+# herhaling op de volgende dag; de aggregatie kon toen terecht geen volledig
+# bewijs meer maken. De vereiste aantallen journalen blijven ongewijzigd.
+#
 # VIER DINGEN DIE IN ELKE JOB HETZELFDE ZIJN, EN WAAROM.
 #
 # 1. persist-credentials: false op ELKE checkout. Zonder die regel laat de
@@ -300,7 +305,7 @@ jobs:
         with:
           name: routejournaal-scherf-${{ matrix.scherf }}
           path: routejournaal.log
-          retention-days: 1
+          retention-days: 30
           if-no-files-found: error
       # DE DUURMETING VAN DEZE SCHERF. Elk toetsproces schrijft zelf op hoe lang
       # het erover deed (test/toetsnaam.js); scripts/toetsduur.js maakt daar het
@@ -404,7 +409,7 @@ jobs:
         with:
           name: routejournaal-ijking-${{ matrix.ijking }}
           path: routejournaal.log
-          retention-days: 1
+          retention-days: 30
           if-no-files-found: error
 
   # DE ZWARE TOETSEN: eigen job, en met opzet ZONDER dekking.
@@ -784,7 +789,7 @@ jobs:
         with:
           name: routejournaal
           path: routejournaal.log
-          retention-days: 1
+          retention-days: 30
           if-no-files-found: error
 
   # De naam van deze check staat in branch protection. Hij velt hetzelfde
@@ -1205,7 +1210,7 @@ jobs:
         with:
           name: schermjournaal-deel-${{ matrix.deel }}
           path: .schermjournaal
-          retention-days: 1
+          retention-days: 30
           if-no-files-found: error
           include-hidden-files: true
       - name: De installatietijden van deze browserjob bewaren
@@ -1255,7 +1260,7 @@ jobs:
         with:
           name: schermjournaal
           path: .schermjournaal
-          retention-days: 1
+          retention-days: 30
           if-no-files-found: error
           include-hidden-files: true
 

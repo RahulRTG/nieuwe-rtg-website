@@ -41,6 +41,17 @@ const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrows
 
 const pw = laadPlaywright();
 
+// Een gemiste route of vastgelopen response moet een gerichte fout geven,
+// niet de hele CI-shard 45 minuten laten hangen. De timer wordt altijd gewist.
+async function begrensd(werk, wat, ms = 20000) {
+  let klok;
+  try {
+    return await Promise.race([werk, new Promise((resolve, reject) => {
+      klok = setTimeout(() => reject(new Error(wat + ' kwam niet binnen ' + ms + 'ms')), ms);
+    })]);
+  } finally { clearTimeout(klok); }
+}
+
 async function post(base, pad, body, token) {
   const headers = { 'Content-Type': 'application/json' };
   if (token) headers.Authorization = 'Bearer ' + token;
@@ -103,25 +114,44 @@ test('RTG Commerce: een lid vult zijn mand bij twee verkopers, leest dat RTG nie
       // A slow response from the previous seller must never replace the new
       // selection. Hold a real Maison response, select Kikunoi, then release it.
       await kies('KIKUNOI');
-      let releaseOld, oldReady;
+      let releaseOld, oldReady, oldFailed, routeError;
       const release = new Promise(r => { releaseOld = r; });
-      const ready = new Promise(r => { oldReady = r; });
+      const ready = new Promise((resolve, reject) => { oldReady = resolve; oldFailed = reject; });
+      // De route kan al falen terwijl selectOption nog bezig is; de fout blijft
+      // via ready/routeError bepalend, zonder een onbehandelde promise rejection.
+      ready.catch(() => {});
       const holdOld = async route => {
         if (route.request().postDataJSON().verkoper !== 'MAISON') return route.continue();
-        const response = await route.fetch(); oldReady(); await release;
-        await route.fulfill({response});
+        try {
+          const response = await route.fetch({ timeout: 20000 }); oldReady(); await release;
+          await route.fulfill({response});
+        } catch (e) {
+          routeError = e; oldFailed(e);
+          await route.abort().catch(() => {});
+        }
       };
       await page.route('**/api/commerce/etalage', holdOld);
-      await page.selectOption('#kies', 'MAISON'); await ready;
-      await kies('KIKUNOI');
-      const oldDelivered = page.waitForResponse(r => r.url().endsWith('/api/commerce/etalage')
-        && r.request().postDataJSON().verkoper === 'MAISON');
-      releaseOld(); await (await oldDelivered).finished();
-      await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
-      assert.equal(await page.locator('#kies').inputValue(), 'KIKUNOI');
-      assert.equal(await page.locator('#etalage').getAttribute('data-verkoper'), 'KIKUNOI', 'a late seller response cannot replace the chosen seller');
-      assert.match(await page.locator('#etalage').innerText(), /Een zaak is geen artikel/);
-      await page.unroute('**/api/commerce/etalage', holdOld);
+      try {
+        await page.selectOption('#kies', 'MAISON');
+        await begrensd(ready, 'De onderschepte Maison-response');
+        await kies('KIKUNOI');
+        const oldDelivered = page.waitForResponse(r => r.url().endsWith('/api/commerce/etalage')
+          && r.request().postDataJSON().verkoper === 'MAISON', { timeout: 20000 });
+        releaseOld();
+        const delivered = await oldDelivered;
+        assert.equal(await begrensd(delivered.finished(), 'De vrijgegeven Maison-response'), null);
+        await begrensd(page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))),
+          'De verwerking van de late response in de browser');
+        assert.equal(await page.locator('#kies').inputValue(), 'KIKUNOI');
+        assert.equal(await page.locator('#etalage').getAttribute('data-verkoper'), 'KIKUNOI', 'a late seller response cannot replace the chosen seller');
+        assert.match(await page.locator('#etalage').innerText(), /Een zaak is geen artikel/);
+        if (routeError) throw routeError;
+      } finally {
+        // Ook wanneer een assertion faalt mag de opgehouden request het sluiten
+        // van browser en server niet blokkeren.
+        releaseOld();
+        await page.unroute('**/api/commerce/etalage', holdOld);
+      }
 
       /* ---- 2. niet te koop: een reden, geen knop ---- */
       await kies('KIKUNOI');

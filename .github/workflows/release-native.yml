@@ -1,0 +1,44 @@
+name: Native Mac releasekandidaat
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['fix/main-release-blockers-*']
+
+permissions:
+  contents: read
+
+jobs:
+  native:
+    runs-on: macos-15
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+      - run: npm ci
+      - name: Pakket- en trustgrenzen
+        run: node --test test/native-artifact.test.js test/release-trust.test.js test/productie-promotie.test.js
+      - name: Eén native kandidaat bouwen uit een schone commit
+        run: node scripts/native-release.js build .release/native
+      - name: Exact pakket met eigen runtime, SQLite en procesherstart beproeven
+        run: node scripts/native-rehearsal.js .release/native/candidate.rtgp "$GITHUB_SHA" .release/native/RUNTIME-PROOF.json
+      # Alleen deze stap krijgt de BUILD-key. Er is geen toegang tot de twee
+      # owner-Keychain-identiteiten en deze workflow kan niets promoveren.
+      - name: BUILD-herkomst ondertekenen
+        env:
+          RTG_RELEASE_SIGN_KEY: ${{ secrets.RTG_RELEASE_SIGN_KEY }}
+        run: node scripts/native-release.js attest .release/native/candidate.rtgp .release/native/RUNTIME-PROOF.json
+      - name: Handtekening en volledige artifactbytes terugcontroleren
+        run: node scripts/native-release.js verify .release/native/candidate.rtgp "$GITHUB_SHA"
+      - name: Exact native pakket bewaren
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: native-candidate-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .release/native/
+          retention-days: 90
+          if-no-files-found: error

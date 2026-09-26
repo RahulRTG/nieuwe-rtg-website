@@ -2,13 +2,11 @@
 module.exports = ({ db, save, crypto, codenaamVan, anthropic, notify, accounts, leeftijdVan, tableZet, handleVanPin, sociaalRate,
   connectionBlocking, media, sseToCustomer, connectionMediaTicketSecret, partnerSuppliers, partnerBookings }) => {
   const Projection = require('./connection-projection');
-  const ConnectionPartner = require('./connection-partner');
   const nu = () => new Date().toISOString();
   const { ontmoetPoort } = require('./ontmoetpoort').maakOntmoetpoort({ accounts, leeftijdVan });
   const mag = key => ontmoetPoort(key, 'Rendez-vous');
-  /* Presence leest uitsluitend wat het lid hier zelf deelt, nooit TravelOS. */
+  /* Presence komt alleen uit expliciete deling; beschikbaarheid pas na match. */
   const AW = require('./rendezvous-aanwezig');
-  /* Private Availability deelt pas na een match de doorsnede. */
   const B = require('./beschikbaar');
   const schoon = (t, n) => String(t == null ? '' : t).replace(/[<>]/g, '').trim().slice(0, n || 200);
   const lijstUit = (v, max, elk) => (Array.isArray(v) ? v : String(v || '').split(',')).map(x => schoon(x, elk || 40)).filter(Boolean).slice(0, max || 12);
@@ -22,26 +20,15 @@ module.exports = ({ db, save, crypto, codenaamVan, anthropic, notify, accounts, 
     if (!Array.isArray(r.meldingen)) r.meldingen = [];
     return r;
   }
-  /* Codenaam komt uit de accountgids, niet uit sessiecontext. */
+  /* Accountcodenaam, niet sessiecontext. */
   const codenaam = key => (codenaamVan ? codenaamVan(key) : '') || 'Een lid';
-  const leveranciers = () => typeof partnerSuppliers === 'function' ? partnerSuppliers() : [];
-  const boekingen = () => typeof partnerBookings === 'function' ? partnerBookings() : [];
-  const partnerCandidates = (program, context) => ConnectionPartner.candidates(leveranciers(), program,
-    { ...(context || {}), bookings: boekingen() }).map(s => Projection.project(Projection.NAMES.CONNECTION_PARTNER_OFFICE, {
-      code: s.code, name: s.name, city: s.city, location: s.loc && s.loc.label, program,
-      services: ConnectionPartner.stored(s, program).services
-    }));
-  const partnerEligible = (code, program, context) => {
-    const s = leveranciers().find(x => x.code === code);
-    const reserveringen = boekingen();
-    return !!(s && ConnectionPartner.eligible(s, program, { ...(context || {}), bookings: reserveringen,
-      activeBookings: ConnectionPartner.activeBookings(reserveringen, code, context && context.date, context && context.time) }).ok);
-  };
-  /* Uit de dating-premium-ronde op main: een blokkade werkt in BEIDE richtingen,
-     wie u blokkeerde ziet u ook niet meer. */
+  const { partnerCandidates, partnerEligible } = require('./rendezvous-partners')({
+    Projection, partnerSuppliers, partnerBookings
+  });
+  /* Blokkeren werkt in beide richtingen en over beide producten. */
   const geblokkeerd = (r, a, b) => !!((r.blokkades[a] && r.blokkades[a][b]) || (r.blokkades[b] && r.blokkades[b][a])
     || (connectionBlocking && connectionBlocking.isGeblokkeerd(a, b)));
-  // overlap van twee locatielijsten, hoofdletterongevoelig, met de oorspronkelijke schrijfwijze
+  // hoofdletterongevoelige overlap, met oorspronkelijke schrijfwijze
   function gedeeld(a, b) {
     const bl = (b || []).map(x => x.toLowerCase());
     return (a || []).filter(x => bl.includes(x.toLowerCase()));

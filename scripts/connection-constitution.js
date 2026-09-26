@@ -44,6 +44,7 @@ const BRONNEN = [
   'server/kern/connection-state-rendezvous.js',
   'server/kern/connection-state-vonk.js',
   'server/kern/rendezvous.js',
+  'server/kern/rendezvous-partners.js',
   'server/kern/rendezvous-connection-setup.js',
   'server/kern/rendezvous-concierge.js',
   'server/kern/rendezvous-circles.js',

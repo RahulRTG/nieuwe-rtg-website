@@ -325,6 +325,7 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
     await page2.waitForSelector('#feed .leeg', { timeout: 15000 });
     assert.match(await page2.locator('#feed .leeg').innerText(), /Geen resultaten/);
     assert.equal(await page2.locator('#feed .tel,#feed .auteur').count(), 0);
+    await page2.waitForFunction(() => window.RTGi18n && typeof window.RTGi18n.set === 'function');
     await page2.evaluate(() => RTGi18n.set('en'));
     await page2.waitForFunction(() => document.querySelector('#feed .leeg').textContent === 'No results within your current choices.');
     assert.equal((await api(base, '/api/wereld/state', {}, b)).modus, 'prive');

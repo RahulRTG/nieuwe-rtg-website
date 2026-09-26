@@ -22,8 +22,7 @@ module.exports = ({ db, save, crypto, codenaamVan, anthropic, notify, accounts, 
     if (!Array.isArray(r.meldingen)) r.meldingen = [];
     return r;
   }
-  /* Gebruik de gids op accountsleutel; sessie-gebaseerde naamresolutie is hier
-     onjuist en zou ieder profiel tot dezelfde terugvalcodenaam reduceren. */
+  /* Codenaam komt uit de accountgids, niet uit sessiecontext. */
   const codenaam = key => (codenaamVan ? codenaamVan(key) : '') || 'Een lid';
   const leveranciers = () => typeof partnerSuppliers === 'function' ? partnerSuppliers() : [];
   const boekingen = () => typeof partnerBookings === 'function' ? partnerBookings() : [];

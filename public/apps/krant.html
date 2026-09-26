@@ -181,7 +181,10 @@ async function gids(){
   }catch(e){ $('#krantgrid').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; }
 }
 
-if(ZAAK) toonKrant(); else gids();
+if(ZAAK) {
+  const artikelId = decodeURIComponent(location.hash.slice(1));
+  if(artikelId) lees(artikelId); else toonKrant();
+} else gids();
 </script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/basis.js" defer></script>

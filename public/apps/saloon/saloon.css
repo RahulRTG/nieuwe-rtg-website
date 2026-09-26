@@ -1,0 +1,28 @@
+.saloon{margin:0 0 2rem;color:var(--text,#f4f1ec)}
+.saloon-kop{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.5rem}
+.saloon-kop h2{font:400 clamp(1.8rem,4vw,3rem)/1.15 Georgia,serif;margin:.4rem 0 .8rem}
+.saloon p,.saloon-dialoog p{line-height:1.65}
+.saloon button,.saloon-dialoog button{min-height:44px;padding:.65rem 1rem;border:1px solid #a38c65;background:transparent;color:inherit;cursor:pointer;font:inherit}
+.saloon-vormen{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem}
+.saloon-vormen [aria-pressed=true]{background:#d0bd97;color:#151515}
+.saloon-keuzes,.saloon-herkomst{border-top:1px solid #665e50;padding:1rem 0}
+.saloon summary,.saloon-herkomst summary{cursor:pointer;min-height:30px}
+.saloon label,.saloon-dialoog label{display:block;font-size:.9rem;line-height:1.6}
+.saloon-velden{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0}
+.saloon input:not([type=checkbox]),.saloon-dialoog input,.saloon-dialoog textarea,.saloon-dialoog select{display:block;width:100%;box-sizing:border-box;padding:.8rem;color:inherit;background:#181817;border:1px solid #746b5d;font:inherit;border-radius:0}
+.saloon input[type=checkbox]{accent-color:#c8ad7c;width:18px;height:18px;margin-right:.5rem}
+.saloon fieldset{border:0;padding:0;margin:1rem 0}
+#saloonBronnen{display:flex;flex-wrap:wrap;gap:1rem}
+.saloon-uitleg,#saloonStatus{font-size:.85rem;color:#c5bfb4}
+.saloon-herkomst{margin:0 1.25rem;font-size:.8rem;color:#c5bfb4}
+.saloon-herkomst a,.saloon-werkruimtes a{display:block;color:inherit;line-height:1.5;margin:.6rem 0;text-decoration:underline;text-underline-offset:3px}
+.saloon-dialoog{position:fixed;max-width:650px;width:calc(100% - 2rem);max-height:85dvh;box-sizing:border-box;overflow:auto;background:#1c1c1a;color:#f4f1ec;border:1px solid #96805b;padding:2rem}
+.saloon-dialoog::backdrop{background:rgba(0,0,0,.7)}
+.saloon-dialoog h2{padding-right:5rem;font:400 1.9rem/1.25 Georgia,serif}
+.saloon-sluit{position:absolute;top:1rem;right:1rem}
+.saloon-dialoog textarea{min-height:120px;resize:vertical}
+.saloon-werkruimtes{margin-top:2rem;border-top:1px solid #665e50;padding-top:1rem}
+.living-post-media{position:relative}
+.living-post-media video{width:100%;max-height:65vh;display:block}
+.saloon:focus-visible,.saloon button:focus-visible,.saloon-dialoog button:focus-visible{outline:2px solid #e4c994;outline-offset:3px}
+@media(max-width:600px){.saloon-velden{grid-template-columns:1fr}.saloon-kop{align-items:flex-start}.saloon-dialoog{padding:1.1rem}.saloon-kop p{font-size:.85rem}}

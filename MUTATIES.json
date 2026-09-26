@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-25T13:50:55.472Z",
-    "commit": "58fb26410",
-    "boomVuil": false,
-    "boomAnders": 1,
+    "op": "2026-09-26T20:51:48.280Z",
+    "commit": "c82e3f9",
+    "boomVuil": true,
+    "boomAnders": 9,
     "instrument": "scripts/mutatie.js",
-    "node": "v22.22.2"
+    "node": "v24.18.0"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -8219,6 +8219,29 @@
       "operator": "true->false#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "saloon-lus.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "saloon-projectie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/wereld/saloon/index.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 3
+    },
+    "saloon-zicht.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/salon/zichtbaarheid.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 3
     },
     "samen.test.js": {
       "soort": "server",

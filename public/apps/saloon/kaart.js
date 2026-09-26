@@ -1,0 +1,47 @@
+(function (w) {
+  'use strict';
+  w.RTGSaloonKaart = function (k, i, esc, bewaar, host) {
+    k.dataset.saloonId = i.id;
+    if (i.titel) { var h = document.createElement('h3'); h.textContent = i.titel; k.querySelector('.living-post-copy').prepend(h); }
+    var b = document.createElement('button'); b.type = 'button'; b.dataset.bewaar = '';
+    b.textContent = i.bewaard ? 'Bewaard' : 'Bewaren'; b.setAttribute('aria-pressed', String(i.bewaard));
+    b.addEventListener('click', function () { b.disabled = true; bewaar().catch(function () {}).finally(function () { b.disabled = false; }); });
+    k.querySelector('.acties').appendChild(b);
+    var open = k.querySelector('[data-open]');
+    if (open && i.url) {
+      open.removeAttribute('data-open'); open.textContent = i.actie || 'Open bericht';
+      open.addEventListener('click', function () {
+        if (i.artikel) w.RTGSaloonActies.artikel(i, host);
+        else location.href = i.url;
+      });
+    } else if (open && !i.open) open.remove();
+    if (i.bronGroep !== 'sociaal') {
+      k.querySelectorAll('[data-chat],.tel').forEach(function (e) { e.remove(); });
+    }
+    if (i.bron === 'salon') {
+      var reageer = document.createElement('button'); reageer.type = 'button'; reageer.textContent = 'Reacties';
+      reageer.onclick = function () { w.RTGSaloonActies.reacties(i, host); };
+      k.querySelector('.acties').appendChild(reageer);
+    }
+    var d = document.createElement('details'); d.className = 'saloon-herkomst';
+    var bron = i.herkomst || {};
+    d.innerHTML = '<summary>Bron en samenhang' + (i.prive ? ' · privé' : '') + '</summary><p>'
+      + esc(bron.naam) + ' · ' + esc(bron.zicht) + '</p><p>' + esc(i.waarom) + '</p>'
+      + (bron.gewijzigd ? '<p>Bron bijgewerkt: <time>' + esc(new Date(bron.gewijzigd).toLocaleString()) + '</time></p>' : '')
+      + (i.verbanden || []).filter(function (v) { return v.url; }).map(function (v) {
+        return '<a href="' + esc(v.url) + '">' + esc(v.relatie) + ': ' + esc(v.titel) + '</a>';
+      }).join('');
+    k.appendChild(d);
+    var media = i.beeld && i.beeld[0], figure = k.querySelector('.living-post-media');
+    if (figure && media && media.type === 'video') {
+      // Zelfde speler en ondertitelband als bij de bronpublicatie.
+      var img = figure.querySelector('img'), src = img && img.src;
+      if (src) {
+        figure.textContent = ''; var video = document.createElement('video');
+        video.src = src; video.controls = true; video.playsInline = true; video.preload = 'metadata';
+        video.setAttribute('aria-label', media.alt || 'Video uit Saloon'); figure.appendChild(video);
+        w.RTGOndertitelband.zet(figure, video, media.ondertitels || []);
+      }
+    }
+  };
+}(window));

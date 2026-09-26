@@ -1,27 +1,14 @@
-/* De Salon als volwaardige app: leden die zelf plaatsen, meerdere foto's per
-   post, onderwerpen (hashtags), en een feed die verder gaat dan de laatste 60.
-
-   Wat hier veranderde en waarom:
-
-   1. LEDEN KONDEN NIET PLAATSEN. Alleen partners hadden een route; nu schrijft
-      een lid zelf via `authorKey`.
-   2. HET PLAFOND VAN 60. `posts.slice(0, 60)` zorgde dat post 61
-      duwde post 1 er stilletjes uit, voorgoed. Dat is nu een ruim, instelbaar
-      venster met echte paginering.
-      Wel begrensd: `posts` is één rij in de kv-opslag; oneindig vraagt later
-      het grootboek-patroon, niet alleen een hogere kap.
-   3. Beeld gaat NOOIT als base64 de database in; het gaat naar de mediastore en
-      we bewaren de verwijzing. Dat was al zo voor partners en geldt hier ook.
-
-   De zichtbaarheidspoort blijft waar hij hoort: kern/salonviraal.js bepaalt wat
-   iemand te zien krijgt, kern/veilig.js is de 9+-keuring op elke tekst. */
+/* Salon bezit publicaties en media. Wereld en Saloon lezen dezelfde poort.
+   Het begrensde publicatievenster ruimt ook ongebruikte mediabestanden op;
+   paginering en onderwerpselectie veranderen de bronrechten niet. */
 const { keur } = require('../veilig');
 const vorm = require('./vorm');
 
-module.exports = ({ db, save, media, liveCodename, codenaamVan, crypto, broadcastSync, spraaktekst }) => {
+module.exports = ({ db, save, media, liveCodename, codenaamVan, crypto, broadcastSync, spraaktekst, magLezen }) => {
   /* Valt een post uit het venster, of haalt de auteur hem weg, dan gaan zijn
      foto's mee. Dat gebeurde niet: de verwijzing verdween, het bestand bleef --
      zie kern/mediaopruim.js voor wat dat op drie plekken tegelijk aanrichtte. */
+  magLezen = magLezen || require('./zichtbaarheid')({ db }).magLezen;
   const opruim = require('../mediaopruim')(media, db);
   const MAX_POSTS = Number(process.env.SALON_MAX || 2000);
   const MAX_MEDIA = 6;              // foto's/video's per post (de karrousel)
@@ -32,15 +19,7 @@ module.exports = ({ db, save, media, liveCodename, codenaamVan, crypto, broadcas
   const nu = () => new Date().toISOString();
   const upload = salonMedia.upload;
 
-  /* Een id dat echt uniek is. Eerst stond hier `Date.now() + random(1000)`, en
-     dat leek genoeg tot de paginerings-toets 65 posts achter elkaar plaatste:
-     dan zitten er betrouwbaar een of twee dubbele ids tussen. Twee posts met
-     hetzelfde id betekent dat verwijderen, bewaren of melden de VERKEERDE post
-     raakt -- een stille vergissing met iemands bericht.
-
-     Nu strikt oplopend, en met een blik op wat er al ligt: de poortwachter
-     (server/trio.js) start drie serverkinderen op dezelfde opslag, en die delen
-     deze teller niet. */
+  // Oplopend, met botsingscontrole in de gedeelde opslag.
   let laatsteId = 0;
   function nieuwId() {
     const t = Date.now();
@@ -153,7 +132,8 @@ module.exports = ({ db, save, media, liveCodename, codenaamVan, crypto, broadcas
 
     let lijst = db.data.posts.filter(p => {
       if (verborgen.includes(p.id)) return false;
-      if (p.weg) return false;
+      if (p.weg || p.verborgen) return false;
+      if (o.archief ? p.authorKey !== mij : !magLezen(sess, p)) return false;
       // gearchiveerd: uit de etalage van iedereen, ook uit je eigen raster
       if (p.archief && !o.archief) return false;
       if (o.archief && !p.archief) return false;
@@ -184,10 +164,10 @@ module.exports = ({ db, save, media, liveCodename, codenaamVan, crypto, broadcas
   /* Welke onderwerpen leven er? Geteld over de recente posts, aflopend. Dit is
      de ontdek-kant: je kiest zelf een onderwerp, er is geen motor die kiest wat
      jou het langst vasthoudt. */
-  function onderwerpen(limiet) {
+  function onderwerpen(limiet, sess) {
     S();
     const tel = new Map();
-    for (const p of db.data.posts.slice(0, 400)) {
+    for (const p of db.data.posts.filter(p => magLezen(sess, p)).slice(0, 400)) {
       for (const t of (p.onderwerpen || [])) tel.set(t, (tel.get(t) || 0) + 1);
     }
     return [...tel].sort((a, b) => b[1] - a[1]).slice(0, Math.min(30, limiet || 12))
@@ -207,6 +187,6 @@ module.exports = ({ db, save, media, liveCodename, codenaamVan, crypto, broadcas
     opruim.wis(opruim.refsVanPosts(eraf));
   }
 
-  return { upload, ondertitel: salonMedia.ondertitel, plaats, verwijder, feed, publiek, onderwerpen, onderwerpenUit, postMet, kap, S,
+  return { upload, ondertitel: salonMedia.ondertitel, plaats, verwijder, feed, publiek, onderwerpen, onderwerpenUit, postMet, kap, S, magLezen,
     MAX_POSTS, MAX_MEDIA, MAX_FOTO_BYTES, MAX_VIDEO_BYTES };
 };

@@ -62,7 +62,7 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, claude }) => {
   }
 
   /* ---- artikelen ---- */
-  const kortArt = a => ({ id: a.id, titel: a.titel, chapo: a.chapo, rubriek: a.rubriek, status: a.status, auteur: a.auteur, beeld: a.beeld || '', bij: a.bij, gelezen: a.gelezen || 0 });
+  const kortArt = a => ({ id: a.id, titel: a.titel, chapo: a.chapo, rubriek: a.rubriek, status: a.status, auteur: a.auteur, beeld: a.beeld || '', bij: a.bij, gepubliceerd: a.gepubliceerd || null, gelezen: a.gelezen || 0 });
   function schoonArt(r, d, actor) {
     d = d || {};
     const rubriek = r.rubrieken.includes(d.rubriek) ? d.rubriek : (r.rubrieken[0] || 'Voorpagina');

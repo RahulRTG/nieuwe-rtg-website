@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1761,
-    "toetsenNietGemeten": 632,
+    "toetsenNietGemeten": 633,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -3086,6 +3086,16 @@
       "vervalt": "2026-12-27",
       "meter": "toetsenNietGemeten 631 -> 632",
       "reden": "test/verzuimrooster.test.js is nieuw (het rooster leest verzuim). Met de hand nagetrokken met acht mutaties: de beveiligingsplanner en het weekrooster die verzuim negeren, de lezer die niet of leeg is bedraad, de afwijzing die niet schrapt, deels inzetbaar als inplanbaar, en lezen dat een lege rij aanlegt; alle acht zakken op de toets die erover gaat. De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 632,
+      "vervalt": "2026-12-27",
+      "meter": "toetsenNietGemeten 632 -> 633",
+      "reden": "test/kantoorhuis.test.js is nieuw (besluit B1: welke entiteit is RTG, en loopt er een dienstverband). Met de hand nagetrokken met zeven mutaties: de entiteit genegeerd, een mandaat dat meetelt, oude dienstverbanden die meetellen, geen in plaats van onbekend, de eigenaarscontrole weg, de review niet bedraad, en de aanwijzing die niet idempotent is; alle zeven zakken op de toets die erover gaat. De mutatiemotor is er nog niet langs geweest.",
       "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
     }
   ],

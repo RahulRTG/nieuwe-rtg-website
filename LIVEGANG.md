@@ -105,7 +105,11 @@ ondertekende externe dossier staan.
    twee unieke kandidaat-tags over in `deploy/live.env` als
    `RTG_CANDIDATE_IMAGE` en `RTG_CANDIDATE_BACKUP_IMAGE`.
 4. Plaats de echte onafhankelijke bewijsbestanden in
-   `.release/external-evidence/`, vul `.release/external-release.json` op basis
+   `.release/external-evidence/`. Vier ervan maakt de host zelf, als verslag van
+   een proef die hij echt uitvoert (`npm run extern:bewijs -- malware`,
+   `objectopslag`, `rollback` en `herstel <stempel>`; herstel blijft OPEN tot een
+   mens met naam verklaart dat een lid inlogt en zijn echte naam ziet). Vul
+   daarna `.release/external-release.json` op basis
    van `deploy/external-release.example.json` en laat de aangewezen
    releasebeoordelaar het dossier ondertekenen met `npm run external:teken`.
 5. Keur de host en exact dezelfde CI-kandidaat. `live:golive` bouwt niets en

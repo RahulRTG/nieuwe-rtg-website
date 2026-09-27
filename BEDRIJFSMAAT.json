@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T14:19:43.750Z",
-    "commit": "56c84972",
+    "op": "2026-09-27T16:54:29.157Z",
+    "commit": "8d372bf1",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bedrijfsmaat.js",
@@ -80,33 +80,73 @@
       "kort": "De machine stelt voor, de eigenaar tekent.",
       "handhaving": "kern/streefbeeld.js (voorstel uit drie maanden, tekenen op de vingerafdruk, een dimensie buiten is nee); test/streefbeeld.test.js. Er is nog niets dat autonoom handelt.",
       "stand": "gebouwd"
+    },
+    {
+      "id": "C8",
+      "naam": "De vaste kosten van RTG, ingevoerd door Financien",
+      "besloten": "27 september 2026, door de eigenaar",
+      "herkomst": "mens",
+      "regel": "Het Financien-kantoor voert in zijn eigen kamer per maand de vaste lasten, de marketinguitgaven per kanaal en de korte verplichtingen van RTG in, elk met een bron en op naam.",
+      "kort": "Wat RTG zelf kost, staat bij de mensen die het betalen.",
+      "handhaving": "kern/rtgboek.js en kern/bedrijfsmaat/stand-rtgboek.js; test/rtgboek.test.js. Posten per maand met een bron, op naam, personeel als totaal; stroom en serverhuur blijven in de huisrekening.",
+      "stand": "gebouwd"
+    },
+    {
+      "id": "C9",
+      "naam": "De runway netto en bruto naast elkaar",
+      "besloten": "27 september 2026, door de eigenaar",
+      "herkomst": "mens",
+      "regel": "Het vrije banksaldo gedeeld door het verbruik over drie afgesloten maanden, een keer met en een keer zonder de ontvangen omzet; geen van beide wint.",
+      "kort": "Hoe lang het duurt, en hoe lang als de omzet wegvalt.",
+      "handhaving": "kern/rtgboek.js en kern/bedrijfsmaat/stand-rtgboek.js; test/rtgboek.test.js. Bruto en netto naast elkaar; geen netto verbruik geeft geen getal.",
+      "stand": "gebouwd"
+    },
+    {
+      "id": "C10",
+      "naam": "Liquiditeit telt alleen eigen schulden",
+      "besloten": "27 september 2026, door de eigenaar",
+      "herkomst": "mens",
+      "regel": "Het vrije banksaldo min de eigen korte verplichtingen; het tegoed van leden staat er los naast en wordt niet afgetrokken.",
+      "kort": "Het ledentegoed is een getal ernaast, geen aftrekpost.",
+      "handhaving": "kern/rtgboek.js en kern/bedrijfsmaat/stand-rtgboek.js; test/rtgboek.test.js. Het ledentegoed komt uit kern/pay (ledentegoed) en wordt niet afgetrokken.",
+      "stand": "gebouwd"
+    },
+    {
+      "id": "C11",
+      "naam": "CAC per kanaal",
+      "besloten": "27 september 2026, door de eigenaar",
+      "herkomst": "mens",
+      "regel": "De marketinguitgave per kanaal gedeeld door de nieuwe leden via dat kanaal in dezelfde maand, langs de groepspoort.",
+      "kort": "Welk kanaal werkt, en niet een gemiddelde over alles.",
+      "handhaving": "kern/rtgboek.js en kern/bedrijfsmaat/stand-rtgboek.js; test/rtgboek.test.js. Per kanaal, langs de groepspoort van het aanmeldkanaal; vriend heeft geen post.",
+      "stand": "gebouwd"
     }
   ],
   "telling": {
     "maten": 67,
     "domeinen": 28,
     "perStatus": {
-      "bestaat": 40,
-      "half": 19,
-      "ontbreekt": 8,
+      "bestaat": 44,
+      "half": 20,
+      "ontbreekt": 3,
       "onbekend": 0
     },
     "primairGat": {
-      "BRON_ONTBREEKT": 8,
-      "DEFINITIE_ONTBREEKT": 11,
+      "BRON_ONTBREEKT": 3,
+      "DEFINITIE_ONTBREEKT": 12,
       "PROJECTIE_ONTBREEKT": 3,
       "BEWIJS_ONTBREEKT": 5
     },
     "perGat": {
-      "BRON_ONTBREEKT": 8,
-      "DEFINITIE_ONTBREEKT": 19,
-      "PROJECTIE_ONTBREEKT": 19,
-      "BEWIJS_ONTBREEKT": 27
+      "BRON_ONTBREEKT": 3,
+      "DEFINITIE_ONTBREEKT": 15,
+      "PROJECTIE_ONTBREEKT": 15,
+      "BEWIJS_ONTBREEKT": 23
     },
     "ketens": 6,
-    "ketensGegrond": 3,
-    "bestaatGedeeltelijk": 13,
-    "rustOpGat": 1,
+    "ketensGegrond": 4,
+    "bestaatGedeeltelijk": 16,
+    "rustOpGat": 2,
     "privacyGaten": 0,
     "verworpen": 0,
     "vormfouten": 0
@@ -132,9 +172,9 @@
     },
     "marge": {
       "maten": 3,
-      "bestaat": 1,
+      "bestaat": 2,
       "half": 1,
-      "ontbreekt": 1
+      "ontbreekt": 0
     },
     "kosten": {
       "maten": 4,
@@ -144,15 +184,15 @@
     },
     "liquiditeit": {
       "maten": 1,
-      "bestaat": 0,
+      "bestaat": 1,
       "half": 0,
-      "ontbreekt": 1
+      "ontbreekt": 0
     },
     "runway": {
       "maten": 1,
-      "bestaat": 0,
+      "bestaat": 1,
       "half": 0,
-      "ontbreekt": 1
+      "ontbreekt": 0
     },
     "acquisitie": {
       "maten": 3,
@@ -162,9 +202,9 @@
     },
     "cac": {
       "maten": 1,
-      "bestaat": 0,
+      "bestaat": 1,
       "half": 0,
-      "ontbreekt": 1
+      "ontbreekt": 0
     },
     "activatie": {
       "maten": 1,
@@ -241,8 +281,8 @@
     "campagnes": {
       "maten": 2,
       "bestaat": 0,
-      "half": 1,
-      "ontbreekt": 1
+      "half": 2,
+      "ontbreekt": 0
     },
     "infrastructuur": {
       "maten": 3,
@@ -291,9 +331,9 @@
     {
       "id": "geld",
       "naam": "van ontvangen omzet naar runway",
-      "gegrond": false,
-      "eersteBreuk": "marge.operationeel-rtg",
-      "bestaand": 3,
+      "gegrond": true,
+      "eersteBreuk": null,
+      "bestaand": 5,
       "van": 5,
       "schakels": [
         {
@@ -308,13 +348,8 @@
         },
         {
           "id": "marge.operationeel-rtg",
-          "status": "ontbreekt",
-          "gaten": [
-            "BRON_ONTBREEKT",
-            "DEFINITIE_ONTBREEKT",
-            "PROJECTIE_ONTBREEKT",
-            "BEWIJS_ONTBREEKT"
-          ]
+          "status": "bestaat",
+          "gaten": []
         },
         {
           "id": "cash.rtg-bankpositie",
@@ -323,13 +358,8 @@
         },
         {
           "id": "runway.rtg",
-          "status": "ontbreekt",
-          "gaten": [
-            "BRON_ONTBREEKT",
-            "DEFINITIE_ONTBREEKT",
-            "PROJECTIE_ONTBREEKT",
-            "BEWIJS_ONTBREEKT"
-          ]
+          "status": "bestaat",
+          "gaten": []
         }
       ]
     },
@@ -373,14 +403,13 @@
       "naam": "van campagne naar wervingskosten",
       "gegrond": false,
       "eersteBreuk": "campagnes.rtg-marketing",
-      "bestaand": 1,
+      "bestaand": 2,
       "van": 3,
       "schakels": [
         {
           "id": "campagnes.rtg-marketing",
-          "status": "ontbreekt",
+          "status": "half",
           "gaten": [
-            "BRON_ONTBREEKT",
             "DEFINITIE_ONTBREEKT",
             "PROJECTIE_ONTBREEKT",
             "BEWIJS_ONTBREEKT"
@@ -393,13 +422,8 @@
         },
         {
           "id": "cac.per-kanaal",
-          "status": "ontbreekt",
-          "gaten": [
-            "BRON_ONTBREEKT",
-            "DEFINITIE_ONTBREEKT",
-            "PROJECTIE_ONTBREEKT",
-            "BEWIJS_ONTBREEKT"
-          ]
+          "status": "bestaat",
+          "gaten": []
         }
       ]
     },
@@ -494,6 +518,12 @@
       "zwakkeSchakels": [
         "groei.leden-per-pas"
       ]
+    },
+    {
+      "id": "cac.per-kanaal",
+      "zwakkeSchakels": [
+        "campagnes.rtg-marketing"
+      ]
     }
   ],
   "privacyGaten": [],
@@ -547,11 +577,6 @@
         "domein": "marge"
       },
       {
-        "id": "marge.operationeel-rtg",
-        "status": "ontbreekt",
-        "domein": "marge"
-      },
-      {
         "id": "marge.per-lid",
         "status": "half",
         "domein": "marge"
@@ -582,16 +607,6 @@
         "domein": "cash"
       },
       {
-        "id": "liquiditeit.rtg",
-        "status": "ontbreekt",
-        "domein": "liquiditeit"
-      },
-      {
-        "id": "runway.rtg",
-        "status": "ontbreekt",
-        "domein": "runway"
-      },
-      {
         "id": "acquisitie.nieuwe-leden",
         "status": "bestaat",
         "domein": "acquisitie"
@@ -605,11 +620,6 @@
         "id": "acquisitie.kanaal",
         "status": "bestaat",
         "domein": "acquisitie"
-      },
-      {
-        "id": "cac.per-kanaal",
-        "status": "ontbreekt",
-        "domein": "cac"
       },
       {
         "id": "cohort.aanmeldweek",
@@ -653,7 +663,7 @@
       },
       {
         "id": "campagnes.rtg-marketing",
-        "status": "ontbreekt",
+        "status": "half",
         "domein": "campagnes"
       },
       {
@@ -760,6 +770,26 @@
         "id": "uitkomst.klantwaarde-foundation",
         "status": "bestaat",
         "domein": "uitkomst"
+      },
+      {
+        "id": "marge.operationeel-rtg",
+        "status": "bestaat",
+        "domein": "marge"
+      },
+      {
+        "id": "liquiditeit.rtg",
+        "status": "bestaat",
+        "domein": "liquiditeit"
+      },
+      {
+        "id": "runway.rtg",
+        "status": "bestaat",
+        "domein": "runway"
+      },
+      {
+        "id": "cac.per-kanaal",
+        "status": "bestaat",
+        "domein": "cac"
       },
       {
         "id": "capaciteit.partners",
@@ -869,16 +899,6 @@
         "gegrond": true
       },
       {
-        "van": "marge.bruto-rtg",
-        "naar": "marge.operationeel-rtg",
-        "gegrond": true
-      },
-      {
-        "van": "personeel.rtg-op-naam",
-        "naar": "marge.operationeel-rtg",
-        "gegrond": false
-      },
-      {
         "van": "omzet.leden-maand",
         "naar": "marge.per-lid",
         "gegrond": true
@@ -902,36 +922,6 @@
         "van": "kosten.maand-totaal",
         "naar": "kosten.herkomst",
         "gegrond": true
-      },
-      {
-        "van": "cash.rtg-bankpositie",
-        "naar": "liquiditeit.rtg",
-        "gegrond": true
-      },
-      {
-        "van": "cash.rtg-bankpositie",
-        "naar": "runway.rtg",
-        "gegrond": true
-      },
-      {
-        "van": "marge.operationeel-rtg",
-        "naar": "runway.rtg",
-        "gegrond": false
-      },
-      {
-        "van": "acquisitie.kanaal",
-        "naar": "cac.per-kanaal",
-        "gegrond": true
-      },
-      {
-        "van": "acquisitie.nieuwe-leden",
-        "naar": "cac.per-kanaal",
-        "gegrond": true
-      },
-      {
-        "van": "campagnes.rtg-marketing",
-        "naar": "cac.per-kanaal",
-        "gegrond": false
       },
       {
         "van": "acquisitie.nieuwe-leden",
@@ -967,6 +957,41 @@
         "van": "support.klokken",
         "naar": "uitkomst.service-zonder-herhaling",
         "gegrond": true
+      },
+      {
+        "van": "marge.bruto-rtg",
+        "naar": "marge.operationeel-rtg",
+        "gegrond": true
+      },
+      {
+        "van": "kosten.maand-totaal",
+        "naar": "marge.operationeel-rtg",
+        "gegrond": true
+      },
+      {
+        "van": "cash.rtg-bankpositie",
+        "naar": "liquiditeit.rtg",
+        "gegrond": true
+      },
+      {
+        "van": "cash.rtg-bankpositie",
+        "naar": "runway.rtg",
+        "gegrond": true
+      },
+      {
+        "van": "marge.operationeel-rtg",
+        "naar": "runway.rtg",
+        "gegrond": true
+      },
+      {
+        "van": "acquisitie.kanaal",
+        "naar": "cac.per-kanaal",
+        "gegrond": true
+      },
+      {
+        "van": "campagnes.rtg-marketing",
+        "naar": "cac.per-kanaal",
+        "gegrond": false
       },
       {
         "van": "support.klokken",
@@ -1731,68 +1756,6 @@
       "gedeeltelijk": "De ontvangen omzet eronder ziet alleen de betaalschema's van aanmeldingen en niet de ledenfacturen in de kluis; zolang dat zo is, zegt deze marge iets over de vorm en weinig over het bedrag."
     },
     {
-      "id": "marge.operationeel-rtg",
-      "versie": 1,
-      "domein": "marge",
-      "betekenis": "Brutomarge min de vaste kosten van de organisatie (mensen, huisvesting, diensten).",
-      "wereld": "rtg-intern",
-      "bronnen": [],
-      "berekening": "nog niet vastgesteld",
-      "eenheid": "euro per maand",
-      "graad": "onbekend",
-      "actualiteit": "periode",
-      "minimaleGroep": null,
-      "privacyklasse": "huis",
-      "eigenaar": null,
-      "eigenaarReden": "Niemand.",
-      "afhankelijk": [
-        "marge.bruto-rtg",
-        "personeel.rtg-op-naam"
-      ],
-      "status": "ontbreekt",
-      "gaten": [
-        "BRON_ONTBREEKT",
-        "DEFINITIE_ONTBREEKT",
-        "PROJECTIE_ONTBREEKT",
-        "BEWIJS_ONTBREEKT"
-      ],
-      "elementen": {
-        "bron": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "De vaste kosten van RTG als organisatie (salarissen van het eigen kantoor, huur, abonnementen) worden nergens geregistreerd; de kostenlaag kent alleen platformkosten."
-        },
-        "definitie": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Niet besloten."
-        },
-        "projectie": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Niet gebouwd."
-        },
-        "bewijs": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Volgt uit de projectie."
-        }
-      },
-      "groepsgrens": {
-        "vereist": false,
-        "afgedwongen": null,
-        "citaten": [],
-        "reden": null
-      },
-      "keten": {
-        "gegrond": false,
-        "zwakkeSchakels": [
-          "personeel.rtg-op-naam"
-        ]
-      },
-      "gedeeltelijk": null
-    },
-    {
       "id": "marge.per-lid",
       "versie": 1,
       "domein": "marge",
@@ -2257,129 +2220,6 @@
       "gedeeltelijk": "Handmatig: een mens tikt het saldo over van een afschrift. Een bankkoppeling is een eigen besluit (C4)."
     },
     {
-      "id": "liquiditeit.rtg",
-      "versie": 1,
-      "domein": "liquiditeit",
-      "betekenis": "Beschikbaar geld tegenover wat RTG op korte termijn moet betalen, inclusief het tegoed dat leden bij RTG hebben staan.",
-      "wereld": "rtg-intern",
-      "bronnen": [],
-      "berekening": "nog niet vastgesteld",
-      "eenheid": "euro",
-      "graad": "onbekend",
-      "actualiteit": "onbekend",
-      "minimaleGroep": null,
-      "privacyklasse": "huis",
-      "eigenaar": null,
-      "eigenaarReden": "Niemand.",
-      "afhankelijk": [
-        "cash.rtg-bankpositie"
-      ],
-      "status": "ontbreekt",
-      "gaten": [
-        "BRON_ONTBREEKT",
-        "DEFINITIE_ONTBREEKT",
-        "PROJECTIE_ONTBREEKT",
-        "BEWIJS_ONTBREEKT"
-      ],
-      "elementen": {
-        "bron": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Er is geen register van de korte verplichtingen van RTG zelf, en geen kaspositie om ze tegenover te zetten."
-        },
-        "definitie": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Niet besloten."
-        },
-        "projectie": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Niet gebouwd."
-        },
-        "bewijs": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Volgt uit de projectie."
-        }
-      },
-      "groepsgrens": {
-        "vereist": false,
-        "afgedwongen": null,
-        "citaten": [],
-        "reden": null
-      },
-      "keten": {
-        "gegrond": false,
-        "zwakkeSchakels": []
-      },
-      "gedeeltelijk": null
-    },
-    {
-      "id": "runway.rtg",
-      "versie": 1,
-      "domein": "runway",
-      "betekenis": "Hoe lang RTG met de huidige kaspositie en het huidige netto verbruik doorkan.",
-      "wereld": "rtg-intern",
-      "bronnen": [],
-      "berekening": "nog niet vastgesteld",
-      "eenheid": "maanden",
-      "graad": "onbekend",
-      "actualiteit": "onbekend",
-      "minimaleGroep": null,
-      "privacyklasse": "huis",
-      "eigenaar": null,
-      "eigenaarReden": "Niemand.",
-      "afhankelijk": [
-        "cash.rtg-bankpositie",
-        "marge.operationeel-rtg"
-      ],
-      "status": "ontbreekt",
-      "gaten": [
-        "BRON_ONTBREEKT",
-        "DEFINITIE_ONTBREEKT",
-        "PROJECTIE_ONTBREEKT",
-        "BEWIJS_ONTBREEKT"
-      ],
-      "elementen": {
-        "bron": {
-          "aanwezig": false,
-          "afgeleid": true,
-          "citaten": [],
-          "reden": "afgeleid, maar zonder bron in: marge.operationeel-rtg"
-        },
-        "definitie": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Niet besloten (netto of bruto verbruik, welke horizon)."
-        },
-        "projectie": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "De rekenvorm bestaat voor een ondernemer in kern/onderneming/kas.js; voor RTG zelf niet."
-        },
-        "bewijs": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Volgt uit de projectie."
-        }
-      },
-      "groepsgrens": {
-        "vereist": false,
-        "afgedwongen": null,
-        "citaten": [],
-        "reden": null
-      },
-      "keten": {
-        "gegrond": false,
-        "zwakkeSchakels": [
-          "marge.operationeel-rtg",
-          "personeel.rtg-op-naam"
-        ]
-      },
-      "gedeeltelijk": null
-    },
-    {
       "id": "acquisitie.nieuwe-leden",
       "versie": 1,
       "domein": "acquisitie",
@@ -2631,70 +2471,6 @@
         "zwakkeSchakels": []
       },
       "gedeeltelijk": "Alleen wie de vraag beantwoordt of via een campagnelink komt. De vraag komt na de registratie en is over te slaan."
-    },
-    {
-      "id": "cac.per-kanaal",
-      "versie": 1,
-      "domein": "cac",
-      "betekenis": "Wat het kost om via een kanaal een lid te werven.",
-      "wereld": "rtg-intern",
-      "bronnen": [],
-      "berekening": "marketinguitgaven per kanaal / nieuwe leden per kanaal",
-      "eenheid": "euro per nieuw lid",
-      "graad": "onbekend",
-      "actualiteit": "onbekend",
-      "minimaleGroep": null,
-      "privacyklasse": "huis",
-      "eigenaar": null,
-      "eigenaarReden": "Niemand.",
-      "afhankelijk": [
-        "acquisitie.kanaal",
-        "acquisitie.nieuwe-leden",
-        "campagnes.rtg-marketing"
-      ],
-      "status": "ontbreekt",
-      "gaten": [
-        "BRON_ONTBREEKT",
-        "DEFINITIE_ONTBREEKT",
-        "PROJECTIE_ONTBREEKT",
-        "BEWIJS_ONTBREEKT"
-      ],
-      "elementen": {
-        "bron": {
-          "aanwezig": false,
-          "afgeleid": true,
-          "citaten": [],
-          "reden": "afgeleid, maar zonder bron in: campagnes.rtg-marketing"
-        },
-        "definitie": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Niet besloten welke uitgaven meetellen."
-        },
-        "projectie": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Niet gebouwd."
-        },
-        "bewijs": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Volgt uit de projectie."
-        }
-      },
-      "groepsgrens": {
-        "vereist": false,
-        "afgedwongen": null,
-        "citaten": [],
-        "reden": null
-      },
-      "keten": {
-        "gegrond": false,
-        "zwakkeSchakels": [
-          "campagnes.rtg-marketing"
-        ]
-      },
-      "gedeeltelijk": null
     },
     {
       "id": "cohort.aanmeldweek",
@@ -3397,7 +3173,9 @@
       "domein": "campagnes",
       "betekenis": "De campagnes van RTG zelf: wat ze kostten, wie ze bereikten, wat ze opleverden.",
       "wereld": "rtg-intern",
-      "bronnen": [],
+      "bronnen": [
+        "server/kern/rtgboek.js"
+      ],
       "berekening": "nog niet vastgesteld",
       "eenheid": "euro en bereik per campagne",
       "graad": "onbekend",
@@ -3407,33 +3185,38 @@
       "eigenaar": null,
       "eigenaarReden": "Niemand.",
       "afhankelijk": [],
-      "status": "ontbreekt",
+      "status": "half",
       "gaten": [
-        "BRON_ONTBREEKT",
         "DEFINITIE_ONTBREEKT",
         "PROJECTIE_ONTBREEKT",
         "BEWIJS_ONTBREEKT"
       ],
       "elementen": {
         "bron": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Er is geen register van RTG-campagnes of marketinguitgaven, en de kostenlaag kent geen marketingsoort. Het campagnebeeld (uitgelichte Salon-posts) draagt geen uitgave en geen bereik."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/rtgboek.js",
+              "citaat": "marketing: Object.freeze(KANALEN",
+              "klopt": true
+            }
+          ],
+          "reden": null
         },
         "definitie": {
           "aanwezig": false,
           "citaten": [],
-          "reden": "Volgt pas als er een bron is (en incrementeel effect, niet klikken)."
+          "reden": "Wat een campagne is (naast een kanaal) en hoe het effect wordt gemeten (incrementeel, niet klikken) is niet besloten."
         },
         "projectie": {
           "aanwezig": false,
           "citaten": [],
-          "reden": "Idem."
+          "reden": "Niet gebouwd."
         },
         "bewijs": {
           "aanwezig": false,
           "citaten": [],
-          "reden": "Idem."
+          "reden": "Volgt uit de projectie."
         }
       },
       "groepsgrens": {
@@ -3446,7 +3229,7 @@
         "gegrond": false,
         "zwakkeSchakels": []
       },
-      "gedeeltelijk": null
+      "gedeeltelijk": "De uitgave per aanmeldkanaal per maand staat in het boek van RTG (C8, C11); per campagne en het bereik nog niet."
     },
     {
       "id": "campagnes.rtf-werving",
@@ -5093,6 +4876,329 @@
         "zwakkeSchakels": []
       },
       "gedeeltelijk": "Casussen die voor 27 september 2026 zijn afgerond, hebben geen dag van afronden."
+    },
+    {
+      "id": "marge.operationeel-rtg",
+      "versie": 1,
+      "domein": "marge",
+      "betekenis": "Brutomarge min stroom en serverhuur min de vaste kosten van de organisatie (mensen, huisvesting, diensten).",
+      "wereld": "rtg-intern",
+      "bronnen": [
+        "server/kern/rtgboek.js"
+      ],
+      "berekening": "ontvangen omzet min platformkosten, min de nota's van stroom en serverhuur, min de vaste lasten uit het boek",
+      "eenheid": "eurocent per maand, zonder btw",
+      "graad": "vermoed",
+      "actualiteit": "periode",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": "kern/rtgboek",
+      "eigenaarReden": null,
+      "afhankelijk": [
+        "marge.bruto-rtg",
+        "kosten.maand-totaal"
+      ],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/rtgboek.js",
+              "citaat": "function zet(",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/definities.js",
+              "citaat": "operationeleMarge: dC(8, 1",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand-rtgboek.js",
+              "citaat": "const operationeel = ",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/rtgboek.js",
+              "citaat": "totaalCenten: ontbreekt.length ? null",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": "Personeel is een totaal per maand en nooit per medewerker; zonder volledig boek staat er geen getal."
+    },
+    {
+      "id": "liquiditeit.rtg",
+      "versie": 1,
+      "domein": "liquiditeit",
+      "betekenis": "Het vrije banksaldo tegenover wat RTG zelf op korte termijn moet betalen; het tegoed van leden staat ernaast.",
+      "wereld": "rtg-intern",
+      "bronnen": [
+        "server/kern/rtgboek.js",
+        "server/kern/pay/kijken.js"
+      ],
+      "berekening": "vrij banksaldo van de maand min de korte verplichtingen uit het boek; het ledentegoed los",
+      "eenheid": "eurocent",
+      "graad": "vermoed",
+      "actualiteit": "periode",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": "kern/rtgboek",
+      "eigenaarReden": null,
+      "afhankelijk": [
+        "cash.rtg-bankpositie"
+      ],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/rtgboek.js",
+              "citaat": "function zet(",
+              "klopt": true
+            },
+            {
+              "bestand": "server/kern/pay/kijken.js",
+              "citaat": "function ledentegoed()",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/definities.js",
+              "citaat": "liquiditeit: dC(10, 1",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand-rtgboek.js",
+              "citaat": "const liquiditeit = ",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/rtgboek.js",
+              "citaat": "totaalCenten: ontbreekt.length ? null",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": "Het ledentegoed is de stand van nu, niet van het eind van de maand."
+    },
+    {
+      "id": "runway.rtg",
+      "versie": 1,
+      "domein": "runway",
+      "betekenis": "Hoe lang RTG met het vrije banksaldo doorkan, bruto (zonder omzet) en netto (met omzet) naast elkaar.",
+      "wereld": "rtg-intern",
+      "bronnen": [],
+      "berekening": "vrij banksaldo gedeeld door het gemiddelde verbruik over drie afgesloten maanden, bruto en netto",
+      "eenheid": "maanden",
+      "graad": "vermoed",
+      "actualiteit": "periode",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": "kern/rtgboek",
+      "eigenaarReden": null,
+      "afhankelijk": [
+        "cash.rtg-bankpositie",
+        "marge.operationeel-rtg"
+      ],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "afgeleid": true,
+          "citaten": [],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/definities.js",
+              "citaat": "runway: dC(9, 1",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand-rtgboek.js",
+              "citaat": "const runway = ",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand-rtgboek.js",
+              "citaat": "waarom: 'Geen netto verbruik",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": null
+    },
+    {
+      "id": "cac.per-kanaal",
+      "versie": 1,
+      "domein": "cac",
+      "betekenis": "Wat het kost om via een kanaal een lid te werven.",
+      "wereld": "rtg-intern",
+      "bronnen": [],
+      "berekening": "marketinguitgave per kanaal uit het boek gedeeld door de nieuwe leden die dat kanaal opgaven",
+      "eenheid": "eurocent per nieuw lid",
+      "graad": "vermoed",
+      "actualiteit": "periode",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": "kern/rtgboek",
+      "eigenaarReden": null,
+      "afhankelijk": [
+        "acquisitie.kanaal",
+        "campagnes.rtg-marketing"
+      ],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "afgeleid": true,
+          "citaten": [],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/definities.js",
+              "citaat": "cac: dC(11, 1",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand-rtgboek.js",
+              "citaat": "const perKanaal = ",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand-rtgboek.js",
+              "citaat": "stand: 'TE_KLEINE_GROEP'",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [
+          {
+            "bestand": "server/kern/bedrijfsmaat/stand-rtgboek.js",
+            "citaat": "g.stand !== 'TOONBAAR'",
+            "klopt": true
+          }
+        ],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": false,
+        "zwakkeSchakels": [
+          "campagnes.rtg-marketing"
+        ]
+      },
+      "gedeeltelijk": "Alleen leden die een kanaal opgaven; wie de vraag oversloeg en zonder campagnelink kwam, telt nergens."
     },
     {
       "id": "capaciteit.partners",

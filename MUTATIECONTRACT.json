@@ -1,27 +1,27 @@
 {
  "stempel": {
-  "op": "2026-09-27T16:06:54.243Z",
-  "commit": "386afd32",
+  "op": "2026-09-27T16:54:40.055Z",
+  "commit": "8d372bf1",
   "boomVuil": false,
-  "boomAnders": 5,
+  "boomAnders": 6,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5044,
-  "geclassificeerd": 5044,
+  "totaal": 5046,
+  "geclassificeerd": 5046,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3190,
-   "NOT_APPLICABLE": 1218,
-   "PROTECTED": 493,
+   "NOT_APPLICABLE": 1219,
+   "PROTECTED": 494,
    "INTENTIONALLY_NON_IDEMPOTENT": 143
   },
-  "vastgesteldDoorMens": 1903,
+  "vastgesteldDoorMens": 1905,
   "afgeleidDoorScript": 3141,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4153,
+   "AUTHENTICATED": 4155,
    "PUBLIC": 124,
    "OBJECT_SCOPED": 746,
    "(niet af te leiden -- vraagt een verklaring)": 5,
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 134,
    "kale ronde: onbeschermd": 125,
    "kale ronde: geen uitspraak": 4761,
-   "niet gemeten": 24
+   "niet gemeten": 26
   },
   "voorstellen": {},
   "metingVan": "2026-09-27T12:22:52.912Z"
@@ -66089,6 +66089,48 @@
     "hindernis": null
    },
    "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.rtgboek",
+   "route": "POST /api/office/rtgboek",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.rtgboek.zet",
+   "route": "POST /api/office/rtgboek/zet",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null

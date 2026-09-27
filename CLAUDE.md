@@ -864,9 +864,12 @@ is geen resource** -- een optimizer die op geschiktheid rangschikt maakt een
 cijfer op een mens (CAR-05), en de uitweg staat al in
 `kern/beveiliging/rooster/aanvragen.js`: sorteren op de minste uren, dus op wat
 iemand TOEKOMT en nooit op wat hij waard is. Par. 6 zet per onderdeel of het
-staat, een stap weg is, een besluit vraagt of jaren weg is; het eerste dat vandaag
-écht fout kan gaan staat bovenaan par. 7: **géén roostermotor leest verzuim**,
-dus een zieke medewerker kan gewoon worden ingepland.
+staat, een stap weg is, een besluit vraagt of jaren weg is. Wat bovenaan par. 7
+stond is sinds 27 september gedaan: **de twee autoplanners en het weekrooster
+lezen verzuim** (`kern/payroll/inplanbaar.js`) en plannen automatisch alleen wie
+er volledig is -- deels inzetbaar plant een mens in, en het teamrooster zegt DAT
+iemand afwezig is en nooit waarom. De festival-, OV-, taxi- en schoolplanners
+lezen het nog niet.
 
 **`VRIJHEID.md` is de mens die in dat rooster staat** -- RTG Vrijheid: tijd,
 rust, vrijheid en eerlijkheid voor wie bij RTG of een zaak werkt, in
@@ -889,7 +892,7 @@ staat met opzet OPEN en de motor zegt dan UNKNOWN of BLOCKED met de reden. `serv
 PEOPLE_TIME_LOOP_COMPLETENESS_CHECK en staat op BLOCKED: de motor is bewezen op
 een teambeeld, de routes en twee schermen staan (Mijn tijd in de personeelsapp,
 Tijd van het team in het Kantoor), en een toegekende hele vrije dag staat via
-het verzuimregister op de loonstrook, maar geen roostermotor leest hem, en de bron van dat
+het verzuimregister op de loonstrook en vrij in het rooster, maar de bron van dat
 teambeeld en het vakantiesaldo zijn nog niet aangesloten.
 
 **`OFFICE.md` is de richting van RTG Office Next** -- van zes editors naar

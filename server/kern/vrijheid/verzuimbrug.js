@@ -6,9 +6,9 @@
    bij wie plant. Beide lezen al EEN register -- kern/payroll/verzuim.js, met
    `voorPayroll()` voor de loonrun en `voorPlanning()` voor het
    afwezigheidsoverzicht van de leidinggevende (/api/supplier/verzuim/planning)
-   -- en de oude verlofroute schrijft er al een goedgekeurd verlof in. Let op
-   wat dat NIET is: geen roostermotor leest dit register (PLANNING.md par. 7),
-   dus een roostervoorstel kan iemand op zijn vrije dag nog steeds inplannen. Een tweede plek voor dezelfde afwezigheid zou de fout zijn die
+   -- en de oude verlofroute schrijft er al een goedgekeurd verlof in. Het
+   weekrooster en de twee autoplanners lezen het ook (kern/payroll/inplanbaar.js);
+   de festival-, OV-, taxi- en schoolplanners nog niet. Een tweede plek voor dezelfde afwezigheid zou de fout zijn die
    verzuim.js in zijn kop beschrijft: twee opslagen lopen uit elkaar.
 
    WAT ER DOOR KOMT: alleen hele dagen, met een soort die de payroll kent. Een

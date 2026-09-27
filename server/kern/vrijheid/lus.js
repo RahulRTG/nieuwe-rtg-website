@@ -25,7 +25,7 @@ const SCHAKELS = Object.freeze([
   { schakel: 'POLICY', stand: 'DEELS', waar: 'server/kern/vrijheid/rtgbeleid.js', bewijs: [T, 'het besluit van de eigenaar staat, en de rest blijft open'],
     ontbreekt: 'Besloten (27 september 2026): tien RTG Days, en een verjaardag op een vrije dag schuift naar de vorige werkdag. Nog open: nachtdienst, schrikkeldag en alle drempels. Niets ervan is juridisch en loonadministratief gevalideerd.' },
   { schakel: 'ROSTER', stand: 'DEELS', waar: 'server/kern/vrijheid/teambeeld.js', bewijs: [TB, 'het teambeeld komt uit de bronnen, en zegt wat ontbreekt'],
-    ontbreekt: 'Het rooster wordt GELEZEN uit kern/personeel.js, maar kijkt maar zeven dagen vooruit en een dag zonder vastgesteld rooster is een patroon. De haak `pas`/`heeft` schrijft sinds 27 september in het verzuimregister (verzuimbrug.js), maar geen roostermotor leest dat: een roostervoorstel kan iemand op zijn vrije dag nog inplannen.' },
+    ontbreekt: 'Het rooster wordt GELEZEN uit kern/personeel.js, maar kijkt maar zeven dagen vooruit en een dag zonder vastgesteld rooster is een patroon. De haak `pas`/`heeft` schrijft sinds 27 september in het verzuimregister (verzuimbrug.js), en het weekrooster en de twee autoplanners lezen dat (kern/payroll/inplanbaar.js); de overige planners nog niet.' },
   { schakel: 'WORK', stand: 'DEELS', waar: 'server/kern/vrijheid/werkstand.js', bewijs: [T, 'zelf afvinken is geen WORK_COMPLETE'],
     ontbreekt: 'Geen domein legt vandaag verantwoordelijkheden per dienst vast; zonder bron is de werkstand UNKNOWN en komt er geen automatisch aanbod.' },
   { schakel: 'COVERAGE', stand: 'STAAT', waar: 'server/kern/vrijheid/dekking.js', bewijs: [T, 'vier aanwezigen zijn te weinig zonder de specialist'] },

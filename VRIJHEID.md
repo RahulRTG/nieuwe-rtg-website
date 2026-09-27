@@ -326,17 +326,19 @@ valideren:
      mee tegen de tien en bleef collega's blokkeren. Vrijgeven staat nu op een
      plek (`vrijgaveTerug` in `roosterhaak.js`), en een afwezigheid met een `bron` raakt
      nooit een melding uit een andere weg.
-   - Wat het NIET doet: geen roostermotor leest het verzuimregister
-     (PLANNING.md par. 7), dus een roostervoorstel kan iemand op zijn vrije
-     dag nog inplannen. En het vakantiesaldo komt nergens vandaan.
+   - Het weekrooster, het AI-roostervoorstel en de autoplanner van de
+     beveiliging lezen het verzuimregister (`kern/payroll/inplanbaar.js`), dus
+     een toegekende vrije dag staat daar vrij. De overige planners (festival,
+     OV, taxi, school) lezen het nog niet, en het vakantiesaldo komt nergens
+     vandaan.
 
    `test/vrijheid-verzuim.test.js` draait de echte motor, het echte register
    en de echte samenstelling van een loonrun.
 
 **P1**
 
-- Het rooster zelf leest de toegekende vrije dagen (vandaag komen ze alleen in
-  het verzuimregister, en geen roostermotor leest dat).
+- De overige planners (festival, OV, taxi, school) lezen het verzuimregister
+  nog niet; het weekrooster en de twee autoplanners wel.
 - Een vervanger krijgt zijn dienst in het rooster.
 - Dienst ruilen.
 - Overdracht breder dan de horecawijk.

@@ -2,16 +2,16 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-27",
   "gemeten": {
-    "bestanden": 2443,
-    "vormen": 1439,
+    "bestanden": 2444,
+    "vormen": 1440,
     "velden": 2082,
     "modules": 800,
     "domeinen": 284,
     "envelopDrempel": 18,
     "envelop": 29,
-    "veldenDomeineigen": 1464,
+    "veldenDomeineigen": 1462,
     "veldenGedeeldVanafVier": 210,
-    "gelijkendeVormparen": 20
+    "gelijkendeVormparen": 21
   },
   "envelop": [
     "aantal",
@@ -322,6 +322,18 @@
       ]
     },
     {
+      "veld": "name",
+      "domeinen": 11,
+      "waar": [
+        "kern/agent",
+        "kern/experience",
+        "kern/gast",
+        "kern/kantoor",
+        "kern/leverancier",
+        "kern/lidacties"
+      ]
+    },
+    {
       "veld": "sleutel",
       "domeinen": 11,
       "waar": [
@@ -512,18 +524,6 @@
         "kern/reisgezelschap",
         "kern/reisgezelschap-delen"
       ]
-    },
-    {
-      "veld": "grond",
-      "domeinen": 10,
-      "waar": [
-        "kern/connect",
-        "kern/economie",
-        "kern/factuurcorrectie",
-        "kern/identiteit",
-        "kern/kosten",
-        "kern/neiging"
-      ]
     }
   ],
   "paren": [
@@ -599,6 +599,19 @@
         "rk",
         "rt",
         "type"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/agent.js",
+      "b": "server/kern/personeel.js",
+      "domeinA": "kern/agent",
+      "domeinB": "kern/personeel",
+      "gedeeld": [
+        "afwezig",
+        "name",
+        "role",
+        "shift"
       ]
     },
     {

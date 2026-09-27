@@ -126,9 +126,8 @@ function maakVerzuim({ opslag, save, nu }) {
     return { ok: true, melding: { van: m.van, tot: m.tot, inzetbaarheid: m.inzetbaarheid } };
   }
 
-  /* Een afwezigheid die een besluit neerzette, haalt dat besluit ook weer weg
-     (een ingetrokken vrije dag). Alleen op `bron`: een melding zonder bron
-     (ziekte, verlof langs de oude weg) raakt deze functie nooit. */
+  /* Een afwezigheid die een besluit neerzette, haalt dat besluit weer weg.
+     Alleen op `bron`: een melding zonder bron raakt deze functie nooit. */
   function bronWeg(code, staffId, bron) {
     if (!bron) return { status: 400, error: 'Zonder bron wordt er niets ingetrokken.' };
     const rij = rijVan(code, staffId);
@@ -153,6 +152,13 @@ function maakVerzuim({ opslag, save, nu }) {
     });
   }
 
+  /* EEN dag voor een planner, in de vorm van voorPlanning. null = er staat
+     niets; een register dat er niet IS meldt de aanroeper (server.js). */
+  function afwezigOp(code, staffId, datum) {
+    const r = voorPlanning(code, staffId, datum, datum)[0];
+    return r ? { wat: r.wat, inzetbaarheid: r.inzetbaarheid } : null;
+  }
+
   /* Wat de payroll nodig heeft: de soort (voor het doorbetalingspercentage) en
      of het UWV eraan te pas komt. De payroll rekent, hij toont niets aan een
      leidinggevende, dus hier mag de soort wel staan. */
@@ -164,7 +170,7 @@ function maakVerzuim({ opslag, save, nu }) {
     });
   }
 
-  return { meld, bronWeg, heeftBron, zetInzetbaarheid, voorPlanning, voorPayroll, keur, SOORTEN, INZETBAARHEID };
+  return { meld, bronWeg, heeftBron, zetInzetbaarheid, voorPlanning, afwezigOp, voorPayroll, keur, SOORTEN, INZETBAARHEID };
 }
 
 module.exports = { maakVerzuim, keur, SOORTEN, INZETBAARHEID };

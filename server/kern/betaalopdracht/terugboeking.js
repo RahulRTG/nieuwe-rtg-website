@@ -5,8 +5,15 @@
 'use strict';
 const crypto = require('crypto');
 
+/* `sleutelSoort` is de soort economische sleutel, en de lijst is gesloten
+   (db/economische-identiteit.js, SLEUTEL). Hetzelfde eenmaal-boeken dient ook
+   de tegoedbon: geld dat een bon uit de escrow haalt is een herhaalbare
+   beweging die bij een retry nooit twee keer mag landen -- precies deze vorm,
+   met een eigen voorvoegsel zodat de twee sleutelruimtes nooit botsen. */
+const { SLEUTEL } = require('../../db/economische-identiteit');
+
 module.exports = async function boekTerugEenmaal({ domein, grootboek, boek, boekAsync,
-  boekEenmaal, geldModus, van, naar, centen, soort, oms, ref }) {
+  boekEenmaal, geldModus, van, naar, centen, soort, oms, ref, sleutelSoort = 'payout-terug' }) {
   if (typeof grootboek !== 'function')
     return { status: 500, error: 'Het grootboek ontbreekt; een payout-teruggang wordt niet gegokt.' };
   const c = Math.round(Number(centen));
@@ -14,9 +21,11 @@ module.exports = async function boekTerugEenmaal({ domein, grootboek, boek, boek
   /* Alleen een vaste hash gaat naar de permanente sleutelindex. Providerrefs
      mogen spaties, slashes en veel tekens bevatten en kunnen persoonsgegevens
      verraden; geen van beide hoort in een DB-primary-key of statusdump. */
-  const sleutel = 'payout-terug:' + crypto.createHash('sha256')
+  const sleutel = sleutelSoort + ':' + crypto.createHash('sha256')
     .update(['v1', d, soort, r].map(x => String(x == null ? '' : x)).join('\u001f'))
     .digest('hex');
+  if (!SLEUTEL.test(sleutel))
+    return { status: 500, error: 'Onbekende soort economische sleutel; er is niets geboekt.' };
   const afdruk = crypto.createHash('sha256')
     .update([d, van, naar, c, soort, r].map(x => String(x == null ? '' : x)).join('\u001f'))
     .digest('hex');

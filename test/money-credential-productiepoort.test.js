@@ -129,9 +129,23 @@ test('de poort staat na begrensde body-ontleding en vóór idemopslag en domeinh
   assert.equal((bron.match(/money-credential-productiepoort/g) || []).length, 1);
 });
 
+test('de tegoedbon is gemigreerd: geen grendel, wel een bewezen deur', () => {
+  for (const pad of ['/api/pay/tegoed', '/api/pay/tegoed/koop', '/api/pay/tegoed/verzilver',
+    '/api/pay/tegoed/terug', '/api/pay/tegoed/roteer', '/api/supplier/pay/tegoed',
+    '/api/supplier/pay/tegoed/zet', '/api/supplier/pay/tegoed/terug', '/api/supplier/pay/tegoed/roteer']) {
+    assert.equal(maakPoort.EXACT.has(pad), false, pad);
+    assert.equal(roep({ path: pad }).door, 1, pad);
+  }
+  const register = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'CODECREDENTIALS.json'), 'utf8'));
+  const deur = register.deuren.find(d => d.id === 'pay.tegoedbon');
+  assert.equal(deur.status, 'migrated');
+  assert.equal(deur.release_blocker, false);
+  assert.ok(deur.bewijs.includes('test/tegoedbon-credential.test.js'));
+});
+
 test('hard sluiten wordt niet als gemigreerde money lifecycle verkocht', () => {
   const register = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'CODECREDENTIALS.json'), 'utf8'));
-  for (const id of ['pay.kascode_en_vooraf', 'pay.tikcode', 'pay.tegoedbon',
+  for (const id of ['pay.kascode_en_vooraf', 'pay.tikcode',
     'pay.giftcard_value_code', 'pay.order_pickup_code']) {
     const deur = register.deuren.find(d => d.id === id);
     assert.ok(deur, id);
@@ -179,22 +193,14 @@ test('kernfuncties kunnen de HTTP-poort in productie niet omzeilen', async () =>
     assert.equal(tik.tikCode({ codenaam: 'A' }).code, maakPoort.CODE);
     assert.equal((await tik.tikBetaal({ van: 'A', code: 'ruw' })).code, maakPoort.CODE);
 
+    /* De tegoedbon is gemigreerd en hangt NIET meer aan deze grendel. Wat hem
+       in productie wel tegenhoudt: zonder collectietransactie weigert de bon
+       zelf (kern/pay/tegoed-bon.js), zodat een kernaanroep buiten de echte
+       opslag nooit een proceslokale claim krijgt. */
     const data = {};
-    const tegoed = require('../server/kern/pay/tegoed')({
-      crypto, save() { saves++; }, schoon: String, nu: () => 1, d: () => data,
-      rekLid: c => 'lid:' + c, rekPartner: c => 'partner:' + c, saldoVan: () => 0,
-      id: () => 'TG1', metIdem() { throw new Error('idem mocht niet worden bereikt'); },
-      boekAsync() { throw new Error('grootboek mocht niet worden bereikt'); },
-      zorgSaldo() {}, seintje() {}, bestaatLid: async () => true,
-      MIN_CENTEN: 1, MAX_CENTEN: 500000
-    });
-    assert.equal((await tegoed.tegoedKoop({ codenaam: 'A', centen: 100 })).code, maakPoort.CODE);
-    assert.equal((await tegoed.tegoedVerzilver({ codenaam: 'B', code: 'ruw' })).code, maakPoort.CODE);
-    assert.equal((await tegoed.tegoedTerug({ codenaam: 'A', tegoedId: 'TG1' })).code, maakPoort.CODE);
-    assert.equal(tegoed.tegoedOverzicht('A').code, maakPoort.CODE);
-    assert.equal((await tegoed.tegoedZaakKoop({ supplierCode: 'S', centen: 100 })).code, maakPoort.CODE);
-    assert.equal((await tegoed.tegoedZaakTerug({ supplierCode: 'S', tegoedId: 'TG1' })).code, maakPoort.CODE);
-    assert.equal(tegoed.tegoedZaakOverzicht('S').code, maakPoort.CODE);
+    const bon = require('../server/kern/pay/tegoed-bon')({ d: () => data, save() { saves++; },
+      crypto, nu: () => 1 });
+    assert.throws(() => bon.transactie(() => ({})), /collectietransactie/);
 
     const kassa = require('../server/kern/pay/kassa')({
       crypto, save() { saves++; }, nu: () => 1, kascodes: () => [], grootboek: () => [],
@@ -220,14 +226,6 @@ test('kernfuncties kunnen de HTTP-poort in productie niet omzeilen', async () =>
     const kaart = require('../server/routes/supplier/kassa/kaart');
     assert.equal(kaart.verzilver(kaartDb, 'S', 'RAUW', 1, 'actor').code, maakPoort.CODE);
     assert.equal(kaartDb.data.giftcards[0].saldo, 10);
-
-    const tegoedBon = require('../server/kern/pay/tegoed-bon')({
-      d: () => data, save() { saves++; }, crypto, nu: () => 1
-    });
-    assert.throws(() => tegoedBon.nieuweCode(), e =>
-      e && e.code === maakPoort.CODE && e.status === 503);
-    assert.throws(() => tegoedBon.bewaar({ status: 'open' }), e =>
-      e && e.code === maakPoort.CODE && e.status === 503);
 
     const bestellen = require('../server/kern/lidacties/bestellen')({});
     assert.equal(bestellen.plaatsOrderVoor({}, {}).code, maakPoort.CODE,

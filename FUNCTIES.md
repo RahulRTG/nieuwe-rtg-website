@@ -21,9 +21,9 @@ het?**
 | Bedrijfsgenres | **78** in 28 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
-| Kernmodules (`server/kern/**`) | **2327** |
+| Kernmodules (`server/kern/**`) | **2331** |
 | App-pagina's (`public/apps/**.html`) | **310** |
-| Testbestanden | **2070** |
+| Testbestanden | **2073** |
 
 ## De vier werelden
 
@@ -490,9 +490,9 @@ ook blokkeert.
   _voor: rtg, lifestyle, business, gast_
 - **Walletsaldo en betalen binnen RTG** (`dom-pay-wallet`) — Saldo aanhouden, opladen, tikken en betaalverzoeken binnen het gesloten RTG-circuit.  
   _voor: rtg, lifestyle, business, gast_
-- **Tegoed voor een ander** (`dom-pay-tegoed`) — Tegoed kopen voor iemand anders, verzilveren met een code, en verlopen tegoed terugnemen.  
+- **Tegoed voor een ander** (`dom-pay-tegoed`) — Tegoed kopen voor iemand anders, verzilveren met een code, een nieuwe code maken, intrekken, en verlopen tegoed terugnemen.  
   _voor: rtg, lifestyle, business_
-- **Tegoed vanuit een zaak** (`dom-pay-tegoed-zaak`) — Een zaak zet tegoed klaar voor personeel of klanten, en neemt verlopen tegoed terug.  
+- **Tegoed vanuit een zaak** (`dom-pay-tegoed-zaak`) — Een zaak zet tegoed klaar voor personeel of klanten, maakt een nieuwe code of trekt in, en neemt verlopen tegoed terug.  
   _voor: leverancier_
 - **Saldo terugstorten naar het lid** (`dom-pay-terug`) — Het eigen walletsaldo terugstorten naar de eigen bankrekening.  
   _voor: rtg, lifestyle, business_

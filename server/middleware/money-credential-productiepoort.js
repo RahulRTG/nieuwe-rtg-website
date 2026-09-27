@@ -30,13 +30,10 @@ const EXACT = new Map([
   ['/api/pay/tikcode', 'pay.tikcode'],
   ['/api/pay/tik', 'pay.tikcode'],
 
-  ['/api/pay/tegoed', 'pay.tegoedbon'],
-  ['/api/pay/tegoed/koop', 'pay.tegoedbon'],
-  ['/api/pay/tegoed/verzilver', 'pay.tegoedbon'],
-  ['/api/pay/tegoed/terug', 'pay.tegoedbon'],
-  ['/api/supplier/pay/tegoed', 'pay.tegoedbon'],
-  ['/api/supplier/pay/tegoed/zet', 'pay.tegoedbon'],
-  ['/api/supplier/pay/tegoed/terug', 'pay.tegoedbon'],
+  /* pay.tegoedbon staat hier sinds 27 september 2026 niet meer: hash-only,
+     128 bits, een claim in een collectietransactie en een economische sleutel
+     onder de boeking (kern/pay/tegoed-*.js, CODECREDENTIALS.json). Een deur gaat
+     alleen zo open -- door de reparatie, niet door een vlag. */
 
   ['/api/giftcard/buy', 'pay.giftcard_value_code'],
   ['/api/giftcards/mine', 'pay.giftcard_value_code'],

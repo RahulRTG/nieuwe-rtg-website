@@ -59,6 +59,10 @@ module.exports = ({
     'uitgifte bevat een eenmalige vrachtvolgcode; alleen de domeinkern mag een retry beoordelen',
   'POST /api/supplier/vracht/volgcode/roteer':
     'rotatie bevat een nieuwe eenmalige vrachtvolgcode; een antwoordcache mag haar niet heronthullen',
+  'POST /api/pay/tegoed/roteer':
+    'rotatie toont een nieuwe geldwaardige tegoedcode eenmaal; de bon weigert de sleutel daarna met 409',
+  'POST /api/supplier/pay/tegoed/roteer':
+    'zelfde reden als de ledenkant: geen antwoordcache mag de code heronthullen',
   'POST /api/member/vluchten/incheck':
     'check-in geeft de kale boarding-passcode eenmaal; een generieke antwoordcache mag haar nooit heronthullen',
   'POST /api/member/vluchten/pass/roteer':

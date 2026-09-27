@@ -837,9 +837,14 @@ fn boeking_is(boeking: &Json, van: &str, naar: &str, centen: i64,
         boeking.str_at("ref") == ref_
 }
 
+/* Twee soorten economische sleutel, gelijk aan SLEUTEL in
+   server/db/economische-identiteit.js: een teruggeboekte uitbetaling
+   (`payout-terug:`) en geld dat een tegoedbon uit de escrow haalt
+   (`pay-tegoed:`). Daarachter altijd een SHA-256 en nooit vrije tekst. */
 fn economische_sleutel_geldig(sleutel: &str) -> bool {
     let rest = sleutel.strip_prefix("pay:").or_else(|| sleutel.strip_prefix("bank:"));
-    let hash = match rest.and_then(|r| r.strip_prefix("payout-terug:")) {
+    let hash = match rest.and_then(|r| r.strip_prefix("payout-terug:")
+        .or_else(|| r.strip_prefix("pay-tegoed:"))) {
         Some(v) => v,
         None => return false,
     };
@@ -1209,6 +1214,24 @@ mod tests {
             Some("heen-1".into()), Some(sleutel));
         assert_eq!(botsing.status, 409);
         assert_eq!(herstart.grb.saldo_van("lid:A"), 137);
+    }
+
+    #[test]
+    fn economische_tegoedclaim_boekt_eenmaal_en_andere_soort_blijft_geweigerd() {
+        let mut s = State::new();
+        let sleutel = "pay-tegoed:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+        let een = s.boek_guard_eenmaal("extern:tegoed", "lid:B", 2500, "tegoed", "verzilverd",
+            Some("TG1/claim-1".into()), Some(sleutel));
+        assert_eq!(een.status, 200);
+        let twee = s.boek_guard_eenmaal("extern:tegoed", "lid:B", 2500, "tegoed", "retry",
+            Some("TG1/claim-1".into()), Some(sleutel));
+        assert_eq!(twee.status, 200);
+        assert_eq!(twee.body.bool_at("herhaald"), true);
+        assert_eq!(s.grb.saldo_van("lid:B"), 2500);
+        let vrij = "vrije-tekst:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+        assert_eq!(s.boek_guard_eenmaal("extern:tegoed", "lid:B", 1, "tegoed", "x",
+            Some("TG2/claim-1".into()), Some(vrij)).status, 400);
+        assert_eq!(s.grb.saldo_van("lid:B"), 2500);
     }
 
     #[test]

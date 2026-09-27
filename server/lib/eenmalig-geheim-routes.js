@@ -40,7 +40,14 @@ const ROUTES = new Set([
   'POST /api/supplier/vracht/maak',
   'POST /api/supplier/vracht/volgcode/roteer',
   'POST /api/member/vluchten/incheck',
-  'POST /api/member/vluchten/pass/roteer'
+  'POST /api/member/vluchten/pass/roteer',
+  /* De tegoedbon draagt geld: de kale code staat alleen in het antwoord op de
+     koop en op een rotatie. De koop is wel idempotent (lib/idem.js), maar het
+     bewaarde antwoord draagt met opzet geen code (kern/pay/tegoed-uitgifte.js). */
+  'POST /api/pay/tegoed/koop',
+  'POST /api/pay/tegoed/roteer',
+  'POST /api/supplier/pay/tegoed/zet',
+  'POST /api/supplier/pay/tegoed/roteer'
 ]);
 
 const isEenmalig = (methode, pad) => ROUTES.has(

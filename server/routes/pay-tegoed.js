@@ -19,11 +19,13 @@ module.exports = (kern, { stuur, geenGast, kyc, geenEchtAccount }) => {
 
   /* Tegoed: een lid koopt tegoed voor een ander (kern/pay/tegoed.js). Kopen en
      verzilveren zijn geld-momenten en dragen dezelfde twee poorten als de rest
-     hier; het overzicht en het terugnemen niet -- kijken kost niets, en
-     terugnemen haalt je eigen geld op uit een bon die je zelf hebt betaald. */
-  app.post('/api/pay/tegoed', auth, (req, res) => {
+     hier; het overzicht, het terugnemen en een nieuwe code niet -- kijken kost
+     niets, en terugnemen haalt je eigen geld op uit een bon die je zelf hebt
+     betaald. De kale code staat alleen in het antwoord op /koop en /roteer
+     (lib/eenmalig-geheim-routes.js houdt elke retrycache daarbuiten). */
+  app.post('/api/pay/tegoed', auth, async (req, res) => {
     if (geenGast(req, res)) return;
-    res.json(pay.tegoedOverzicht(liveCodename(req.session)));
+    res.json(await pay.tegoedOverzicht(liveCodename(req.session)));
   });
   app.post('/api/pay/tegoed/koop', auth, async (req, res) => {
     if (geenGast(req, res)) return;
@@ -33,11 +35,17 @@ module.exports = (kern, { stuur, geenGast, kyc, geenEchtAccount }) => {
   app.post('/api/pay/tegoed/verzilver', auth, async (req, res) => {
     if (geenGast(req, res)) return;
     if (kyc(req, res)) return;
-    stuur(res, await pay.tegoedVerzilver({ codenaam: liveCodename(req.session), code: req.body.code, idem: req.body.idem }));
+    stuur(res, await pay.tegoedVerzilver({ codenaam: liveCodename(req.session), code: req.body.code,
+      tegoedId: req.body.id, idem: req.body.idem }));
   });
   app.post('/api/pay/tegoed/terug', auth, async (req, res) => {
     if (geenGast(req, res)) return;
-    stuur(res, await pay.tegoedTerug({ codenaam: liveCodename(req.session), tegoedId: String(req.body.id || ''), idem: req.body.idem }));
+    stuur(res, await pay.tegoedTerug({ codenaam: liveCodename(req.session), tegoedId: String(req.body.id || ''),
+      intrekken: req.body.intrekken === true, idem: req.body.idem }));
+  });
+  app.post('/api/pay/tegoed/roteer', auth, async (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, await pay.tegoedRoteer({ codenaam: liveCodename(req.session), tegoedId: String(req.body.id || ''), idem: req.body.idem }));
   });
 
   // de tik: ontvangen met een aanraking (tikcode), betalen met een knop

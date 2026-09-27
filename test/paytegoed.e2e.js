@@ -114,7 +114,7 @@ test('tegoed op het scherm: klaarzetten geeft een code, verzilveren zet hem op h
     await paginaA.click('#gZet');
     await paginaA.waitForSelector('#gNieuw:not([hidden])', { timeout: 12000 });
     const code = (await paginaA.textContent('#gCode') || '').trim();
-    assert.match(code, /^[0-9A-F]{4}(-[0-9A-F]{4}){5}$/, 'de code staat leesbaar op het scherm: ' + code);
+    assert.match(code, /^TG(-[0-9A-F]{4}){8}$/, 'de code staat leesbaar op het scherm: ' + code);
 
     // het saldo van de gever is met precies dat bedrag gedaald
     await paginaA.waitForFunction(() => document.querySelector('#pSaldo').textContent.startsWith('75,00'), null, { timeout: 12000 });
@@ -123,17 +123,29 @@ test('tegoed op het scherm: klaarzetten geeft een code, verzilveren zet hem op h
     const klaar = await paginaA.textContent('#gGekocht');
     assert.match(klaar, /25,00 eur/, 'de klaargezette bon staat er met zijn bedrag: ' + klaar.slice(0, 160));
     assert.match(klaar, /wacht op ophalen/, 'en met wat hij doet');
+    assert.equal(klaar.includes(code), false, 'de code staat NIET in het overzicht; hij bestaat een keer');
+
+    /* Een nieuwe code: de oude is daarna dood en de nieuwe verschijnt een keer
+       in hetzelfde vak. MUTATIE GEZIEN ZAKKEN: `data-roteer` naar
+       'pay/tegoed/terug' laten wijzen -- de code veranderde niet en deze stap
+       zakte. Teruggedraaid, daarna groen. */
+    await paginaA.click('#gGekocht [data-roteer]');
+    await paginaA.waitForFunction(oud => document.querySelector('#gCode').textContent.trim() !== oud, code, { timeout: 12000 });
+    const nieuweCode = (await paginaA.textContent('#gCode') || '').trim();
+    assert.match(nieuweCode, /^TG(-[0-9A-F]{4}){8}$/);
+    const dood = await api(base, '/api/pay/tegoed/verzilver', { code, idem: 'e2e-dood' }, krijger.token);
+    assert.match(String(dood.error || ''), /kennen we niet/, 'de oude code werkt niet meer');
 
     // 2. het tweede lid tikt de code in en verzilvert
     const paginaB = await openPay(browser, base, krijger.token, fouten);
     assert.equal(await paginaB.$eval('#pSaldo', el => el.textContent.startsWith('0,00')), true, 'de ontvanger begint op nul');
     await openDeel(paginaB, /tegoed/i);
-    await paginaB.fill('#gIn', code);
+    await paginaB.fill('#gIn', nieuweCode);
     await paginaB.click('#gVerzilver');
     await paginaB.waitForFunction(() => document.querySelector('#pSaldo').textContent.startsWith('25,00'), null, { timeout: 12000 });
 
     // en een tweede keer levert niets op: de bon is op
-    await paginaB.fill('#gIn', code);
+    await paginaB.fill('#gIn', nieuweCode);
     await paginaB.click('#gVerzilver');
     await paginaB.waitForFunction(() => /al gebruikt/i.test(document.querySelector('#melding').textContent), null, { timeout: 12000 });
     assert.equal(await paginaB.$eval('#pSaldo', el => el.textContent.startsWith('25,00')), true, 'en het saldo bewoog niet');

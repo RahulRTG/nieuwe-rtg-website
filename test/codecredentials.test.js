@@ -129,6 +129,7 @@ test('iedere resterende deur blokkeert de release', () => {
     'pay.order_pickup_code',
     'travelos.activity_ticket_entry'])
     assert.ok(uit.blockers.some(x => x.id === id), id + ' hoort expliciet te blokkeren');
+  assert.ok(!uit.blockers.some(x => x.id === 'pay.tegoedbon'), 'de tegoedbon is gemigreerd (27 september 2026)');
   assert.ok(!uit.blockers.some(x => x.id === 'travelos.airport_boarding_pass'));
   assert.equal(poort.lees().deuren.find(x =>
     x.id === 'travelos.airport_boarding_pass').status, 'migrated');

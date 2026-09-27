@@ -1,19 +1,19 @@
 {
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
-  "vastgelegd": "2026-09-25",
+  "vastgelegd": "2026-09-27",
   "gemeten": {
-    "bestanden": 2417,
+    "bestanden": 2421,
     "domeinenTotaal": 636,
-    "koopbareVormen": 598,
+    "koopbareVormen": 597,
     "koopbareDomeinen": 120,
     "envelopDrempel": 8,
     "envelop": 42,
-    "veldenDomeineigen": 775,
-    "veldenNietEnvelop": 1036,
+    "veldenDomeineigen": 778,
+    "veldenNietEnvelop": 1039,
     "gelijkendeVormparen": 17,
-    "werkwoordenVolledig": 1,
+    "werkwoordenVolledig": 2,
     "werkwoordenOveral": 0,
-    "werkwoordCombinaties": 46,
+    "werkwoordCombinaties": 45,
     "wagenVormen": 33,
     "wagenVormenUniek": 30,
     "wagenDomeinen": 22,
@@ -74,7 +74,7 @@
     "beschikbaarheid": 54,
     "reserveer": 28,
     "bevestig": 57,
-    "lever": 21,
+    "lever": 22,
     "annuleer": 31,
     "retour": 8
   },
@@ -101,6 +101,30 @@
         "lever": "leveranciers",
         "annuleer": "mobAnnuleer",
         "retour": "storingTeruggave"
+      },
+      "telt": 8
+    },
+    {
+      "domein": "kern/pay",
+      "heeft": {
+        "toon": true,
+        "prijs": true,
+        "beschikbaarheid": true,
+        "reserveer": true,
+        "bevestig": true,
+        "lever": true,
+        "annuleer": true,
+        "retour": true
+      },
+      "bewijs": {
+        "toon": "kaart",
+        "prijs": "koppelKosten",
+        "beschikbaarheid": "kasVrijgeef",
+        "reserveer": "kasVastleg",
+        "bevestig": "boek",
+        "lever": "uitgeef",
+        "annuleer": "vervalt",
+        "retour": "terugGave"
       },
       "telt": 8
     },
@@ -147,29 +171,6 @@
         "bevestig": "akkoord",
         "lever": "lever",
         "annuleer": "betaalWatVervalt"
-      },
-      "telt": 7
-    },
-    {
-      "domein": "kern/pay",
-      "heeft": {
-        "toon": true,
-        "prijs": true,
-        "beschikbaarheid": true,
-        "reserveer": true,
-        "bevestig": true,
-        "lever": false,
-        "annuleer": true,
-        "retour": true
-      },
-      "bewijs": {
-        "toon": "kaart",
-        "prijs": "koppelKosten",
-        "beschikbaarheid": "eisVrijgegeven",
-        "reserveer": "kasVastleg",
-        "bevestig": "boek",
-        "annuleer": "verzoekIntrek",
-        "retour": "terugGave"
       },
       "telt": 7
     },

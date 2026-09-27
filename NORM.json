@@ -152,6 +152,16 @@
     {
       "datum": "2026-09-27",
       "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 633,
+      "vervalt": "2026-12-27",
+      "meter": "toetsenNietGemeten 633 -> 634",
+      "reden": "test/kascode-credential.pg.test.js is nieuw (kas- en tikcode, RELEASEKANDIDAAT.md B9). Zonder DATABASE_URL slaat hij zichzelf over, dus de mutatiemotor kan er niet langs; de drie gewone kascodetoetsen zijn wel gemeten (MUTATIES.json). Met de hand nagetrokken tegen echte PostgreSQL: de collectietransactie overslaan en een niet-vaste ref onder de economische sleutel laten hem allebei zakken.",
+      "waarheen": "Een mutatieronde met DATABASE_URL, of de pg-scherf als meetomgeving."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
       "sleutel": "zelfpoortendeToetsen",
       "van": 31,
       "vervalt": "2026-12-27",

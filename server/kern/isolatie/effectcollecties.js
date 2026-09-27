@@ -22,9 +22,7 @@
    de rest kwam de proef niet langs (geen wereld, geen object, geen rol). Ook als
    dit register 236 van de 236 collecties zou indelen, blijft de dekking daar
    steken. Het effectmodel komt dus NIET uit de schaduw door dit bestand vol te
-   maken; het komt uit de schaduw als IDEMPROEF.json verder reikt. Dat is een
-   bevinding met een getal in plaats van een gevoel, en hij hoort hier te staan
-   waar iemand hem tegenkomt die denkt dat hij er met nog vijftig regels is.
+   maken; het komt uit de schaduw als IDEMPROEF.json verder reikt.
 
    WAT ER NIET IN STAAT, MET REDEN. De meeste van de 236 zijn met opzet nog niet
    ingedeeld. Ingedeeld is wat een HOOG BELANG draagt en waarover geen redelijke
@@ -52,11 +50,11 @@ const PER_COLLECTIE = Object.freeze({
   payTegoedBon:     ['GELD_BEWEGEN', 'besteedbaar tegoed'],
   payVerzoeken:     ['GELD_BEWEGEN', 'een betaalverzoek dat een ander bereikt'],
   payTreasury:      ['GELD_BEWEGEN', 'de treasury van een ondernemer'],
-  payCodes:         ['GELD_BEWEGEN', 'oude kascodes'],
-  payTikCodes:      ['GELD_BEWEGEN', 'oude tikcodes'],
-  payKasToegang:    ['GELD_BEWEGEN', 'kascodes en hun claim'],
+  payCodes:         ['GELD_BEWEGEN', 'oud'],
+  payTikCodes:      ['GELD_BEWEGEN', 'oud'],
+  payKasToegang:    ['GELD_BEWEGEN', 'kascodes'],
   payTikToegang:    ['GELD_BEWEGEN', 'tikcodes'],
-  payVoorafAfloop:  ['GELD_BEWEGEN', 'vastleggen of vrijgeven'],
+  payVoorafAfloop:  ['GELD_BEWEGEN', 'vastleggen'],
   betaalRegie:      ['GELD_BEWEGEN', 'de bediening van de betaalproviders'],
   betaalVerzoeken:  ['GELD_BEWEGEN', 'een openstaand betaalverzoek'],
   directOntvangsten:['GELD_BEWEGEN', 'geld dat binnenkomt'],

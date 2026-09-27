@@ -1,32 +1,23 @@
 /* RTG Pay, deelbestand "vooraf": de pre-autorisatie aan de kassa.
 
-   ./kassa.js kent EEN afrekenmoment. Een hotel wil bij het inchecken zeker
-   weten dat de borg er bij het uitchecken nog staat; een taxi kent de ritprijs
-   pas aan het eind. Daarom drie handelingen in plaats van een:
+   ./kassa.js kent EEN afrekenmoment; een hotel, een taxi of een open rekening
+   heeft er twee met tijd ertussen. Daarom drie handelingen:
 
-     vooraf     de zaak zet met een kascode een MAXIMUM vast. Er wordt niets
-                geboekt; het lid kan dat deel alleen niet meer uitgeven.
-     vastleggen het werkelijke bedrag wordt geboekt, nooit meer dan het maximum.
-     vrijgeven  er komt niets van; het lid heeft zijn ruimte terug.
-
-   DE GARANTIE MOET ECHT ZIJN: bij het vastzetten laadt de wallet zo nodig zelf
-   bij (zorgSaldo), anders is het geen pre-autorisatie maar een voornemen.
+     vooraf     de zaak zet met een kascode een MAXIMUM vast; er wordt niets
+                geboekt, het lid kan dat deel alleen niet meer uitgeven. De
+                wallet laadt zo nodig bij, anders is het een voornemen.
+     vastleggen het werkelijke bedrag wordt geboekt, nooit meer dan het maximum:
+                eerst de reservering sluiten, dan boeken (anders loopt de boeking
+                tegen haar eigen reservering aan).
+     vrijgeven  er komt niets van. Beweegt geen geld en blijft daarom werken
+                tijdens een betaalstop (server/opzet/betaalstop.js).
 
    ATOMAIR OVER INSTANCES (27 september 2026). Vastzetten claimt de kascode in
-   dezelfde saga als afrekenen (./kas-claim.js): een code, een claim, en een
-   reservering met een id dat uit de claim volgt. Vastleggen en vrijgeven van
-   een reservering lopen door de collectietransactie van `payVoorafAfloop`,
-   per reservering een rij: wie hem als eerste op `vastleggend` of
-   `vrijgegeven` zet, is de enige. Het boeken gebeurt met de bevroren
-   samenstelling en een economische sleutel per deel (./kas-boek.js), dus een
-   hervatting na een crash boekt niets dubbel.
-
-   DE VOLGORDE BIJ HET VASTLEGGEN: eerst de reservering sluiten, dan boeken --
-   andersom loopt de boeking tegen zijn eigen reservering aan. Faalt de boeking
-   daarna, dan staat het geld weer vrij bij het lid; dat is de veilige kant.
-
-   VRIJGEVEN BEWEEGT GEEN GELD en blijft daarom werken tijdens een betaalstop
-   (server/opzet/betaalstop.js): het is een collectietransactie en geen boeking.
+   de saga van ./kas-claim.js, met een reservering waarvan het id uit de claim
+   volgt. Vastleggen en vrijgeven lopen per reservering door de
+   collectietransactie van `payVoorafAfloop`: wie de rij als eerste zet, is de
+   enige. Het boeken gebruikt de bevroren samenstelling en een economische
+   sleutel per deel (./kas-boek.js), dus een hervatting boekt niets dubbel.
 
    Krijgt de gedeelde ctx van kern/pay/index.js. */
 'use strict';
@@ -58,8 +49,7 @@ module.exports = (ctx) => {
       oms: schoon(oms, 60) || 'Vooraf vastgezet', urenGeldig }, { na: r => { seintje(r.codenaam); return {}; } });
   }
 
-  /* De reservering moet van DEZE zaak zijn. Zonder die toets kon elke
-     ingelogde leverancier het vastgezette bedrag van een andere zaak innen. */
+  // de reservering moet van DEZE zaak zijn, anders int elke leverancier die van een ander
   function reserveringVanZaak(id, supplierCode) {
     const r = waarde.reservering(id);
     if (!r || r.ref !== supplierCode || r.status !== 'open') return null;
@@ -161,8 +151,7 @@ module.exports = (ctx) => {
     return { ok: true, vrijgevallen: v.vrijgevallen || 0 };
   }
 
-  /* Wat deze zaak op dit moment heeft vastgezet -- een ander getal dan zijn
-     saldo, en het hoort niet door elkaar te lopen. */
+  // wat deze zaak heeft vastgezet: een ander getal dan haar saldo
   function voorafVanZaak(supplierCode) {
     const open = waarde.reserveringenVan(supplierCode);
     return { ok: true, aantal: open.length,

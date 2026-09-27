@@ -38,19 +38,26 @@
       if (typeof f !== 'function') throw new Error('de module heeft geen export maal');
       return { waarde: f(Number(invoer.a), Number(invoer.b)) };
     },
+    /* `feeds` is een run; `reeks` is een lijst runs in DEZELFDE sessie, elk
+       apart. Een reeks is geen batch: een gekwantiseerd model rekent zijn
+       schaal over de hele invoer, dus in een batch hangt de uitkomst van een
+       tekst af van zijn buren (TOESTEL.md par. 12). */
     onnx: async function (a, invoer) {
       var ort = await laadOrt(a);
       var sessie = await ort.InferenceSession.create(new Uint8Array(a.model), { executionProviders: ['wasm'] });
-      var feeds = {};
-      Object.keys(invoer.feeds || {}).forEach(function (n) {
-        var t = invoer.feeds[n];
-        feeds[n] = new ort.Tensor(t.type, t.data, t.dims);
-      });
-      var r = await sessie.run(feeds), uit = {};
-      Object.keys(r).forEach(function (n) {
-        uit[n] = { type: r[n].type, dims: r[n].dims.slice(), data: Array.from(r[n].data) };
-      });
-      return { tensors: uit };
+      async function run(fs) {
+        var feeds = {};
+        Object.keys(fs || {}).forEach(function (n) { feeds[n] = new ort.Tensor(fs[n].type, fs[n].data, fs[n].dims); });
+        var r = await sessie.run(feeds), uit = {};
+        Object.keys(r).forEach(function (n) {
+          uit[n] = { type: r[n].type, dims: r[n].dims.slice(), data: Array.from(r[n].data) };
+        });
+        return uit;
+      }
+      if (!Array.isArray(invoer.reeks)) return { tensors: await run(invoer.feeds) };
+      var reeks = [];
+      for (var i = 0; i < invoer.reeks.length; i++) reeks.push(await run(invoer.reeks[i]));
+      return { reeks: reeks };
     },
     /* Whisper: encoder een keer, daarna de decoder token voor token met zijn
        eigen geheugen (past_key_values). Er gaat een spectrogram in en er komen

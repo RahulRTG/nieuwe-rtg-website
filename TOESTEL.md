@@ -242,7 +242,7 @@ meter er staat.
 | 4 | Toestelrekenaar met twee uitvoerders (eigen WASM, ONNX Runtime) | **staat** voor WASM (par. 10); WebGPU is hier niet te meten, het browsermodel en WebNN een stap weg |
 | 5 | Modelmanifest, hashes, licentiegrendel, OPFS-beheer | **staat** (par. 10); terugrollen naar een vorige versie een stap weg |
 | 6 | `spraak.naartekst` op het toestel, gemeten op echte telefoons | **staat** als keten, gemeten in Chromium (par. 11); telefoons, een proefset en een bron die we mogen ondertekenen zijn een stap weg; vult SERVICE.md par. 13d zonder `LOCAL_AI_URL` |
-| 7 | `tekst.vector` over de Toestelkluis | een stap weg na 4-5 |
+| 7 | `tekst.vector` over de Toestelkluis | **staat** als keten, gemeten in Chromium (par. 12); een meertalig model, een proefset en de kluis zelf zijn een stap weg |
 | 8 | Samenvatten en herschrijven | een stap weg; het browsermodel als eerste trede |
 | 9 | Een kleine algemene LLM | jaren weg op een telefoon, dichterbij op een laptop; te meten, niet te schatten |
 | 10 | Verschuiving meten in de kostenlaag | een stap weg na 6 |
@@ -637,3 +637,60 @@ Kloppen ze, dan was de kopie eerlijk; kloppen ze niet, dan weten we dat ook.
   (besluit 6) al gebroken voordat hij iets tekent. De eigenaar maakt hem met
   `node scripts/toestel-artefact.js nieuwe-sleutel` op een eigen machine en
   zet alleen de publieke helft in de lijst.
+
+## 12. Tekst naar vector: het tweede contract, zonder nieuwe uitvoerder (27 september 2026)
+
+`tekst.vector` loopt als keten in een echte browser, en de cel kreeg er GEEN
+uitvoerder bij: het model draait op de algemene uitvoerder `onnx`. Dat is de
+belofte van par. 0 in zijn kleinste vorm -- een tweede taak is een contract,
+geen nieuwe machine.
+
+| Onderdeel | Waar | Bewijs |
+|---|---|---|
+| Normaliseren, WordPiece, invoer per tekst, middelen, cosinus | `public/shared/toestel/vector.js` (puur) | `test/toestel-vector.test.js`: de tokens van 13 zinnen (accenten, leestekens, CJK, emoji, een URL, witruimte) exact gelijk aan de Python-bibliotheek `tokenizers` (`test/fixtures/minilm-tokens.json`); zes van zeven mutaties zakken, de zevende is gelijkwaardig (zie onder) |
+| De ouderkant van het contract | `public/shared/toestel/vectorvoer.js` | de tokenizer gaat langs dezelfde grendel als het model; elke uitslag draagt een VINGERAFDRUK (sha256 van runtime, model en tokenizer samen) |
+| Een reeks runs in een sessie | `public/shared/toestel/cel.js`, uitvoerder `onnx` | `invoer.reeks` naast `invoer.feeds`; de bestaande ONNX-proef en de spraakketen draaien er ongewijzigd op |
+| De meting | `scripts/vectorproef.js` | Chromium, WASM: 13 teksten in **612 ms** rekentijd (2,3 s totaal met laden), 384 dimensies, laagste cosinus met de Python-referentie **0,993**, en een tekst los gerekend is gelijk aan dezelfde tekst in de reeks (cosinus 1,0000000) |
+
+### 12.1 Wat het meten blootlegde
+
+- **In een batch hangt een vector af van zijn buren.** Het gekwantiseerde
+  model rekent zijn schaal over de hele invoer, dus dezelfde zin gaf naast een
+  andere zin een andere vector (cosinus 0,993), ook als hij zelf niet werd
+  opgevuld. Een zoekindex waarin "de hond rent" anders klinkt naargelang wat er
+  toevallig mee werd ingelezen, is geen index. Daarom is er geen batch: elke
+  tekst krijgt een eigen run, en de cel draait ze na elkaar in een sessie.
+- **Twee runtimes, twee vectoren.** Dezelfde bytes en dezelfde tokens gaven in
+  de browser (WASM) en in Python (x64) een cosinus van 0,993 tot 1,000; met de
+  graafoptimalisaties uit bleef dat zo, dus het verschil zit in de rekenkernen
+  en niet in onze code. Een vector is daarom alleen vergelijkbaar met een
+  vector van DEZELFDE vingerafdruk. Een index slaat die mee op, en een vector
+  van een ander toestel of een andere runtime wordt opnieuw berekend en nooit
+  naast de eigen gelegd.
+- **Een gelijkwaardige mutant is geen gat.** Het weghalen van de deling door
+  het aantal tokens laat de toets groen, en terecht: gemiddelde en som wijzen
+  na het normaliseren exact dezelfde kant op.
+
+### 12.2 Waar de bytes vandaan kwamen
+
+Net als bij spraak (par. 11.1): Hugging Face wordt geweigerd, en het model kwam
+van npm, uit `@ryanstark24/sfgraph-models@1.1.3` -- een kopie van
+`Xenova/all-MiniLM-L6-v2` (q8, Apache-2.0) met een eigen `CHECKSUM.json`. Alleen
+gebruikt om te meten, niet ondertekend. De hashes: `onnx/model_quantized.onnx`
+`afdb6f1a0e45b715d0bb9b11772f032c399babd23bfc31fed1c170afc848bdb1`,
+`tokenizer.json` `da0e79933b9ed51798a3ae27893d3c5fa4a201126cef75586296df9b4d2c62a0`
+(gelijk aan wat die kopie zelf opgeeft, en dat zegt alleen dat hij consequent
+is -- niet dat hij van de bron komt).
+
+### 12.3 Wat dit nog niet bewijst
+
+- **Nederlands.** all-MiniLM-L6-v2 is getraind op Engels. Gemeten:
+  "De hond rent door het park." en "A dog is running through the park." halen
+  een cosinus van 0,16, lager dan twee zinnen over iets anders in dezelfde taal.
+  Voor leden is een meertalig model nodig (multilingual-e5-small, MIT, of
+  paraphrase-multilingual-MiniLM, Apache) -- dezelfde machine, een ander
+  artefact, en de tokenizer is dan geen WordPiece maar SentencePiece.
+- **Zoekkwaliteit.** Gelijk zijn aan een referentie is geen kwaliteit. Dat
+  vraagt een proefset met relevantie-oordelen (par. 9.2).
+- **De Toestelkluis.** Waar de vectoren blijven (OPFS, versleuteld, met de
+  vingerafdruk ernaast) en wat een lid ermee doorzoekt, is nog niet gebouwd.

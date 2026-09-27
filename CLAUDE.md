@@ -2425,6 +2425,12 @@ transformers tot op float32 (`test/fixtures/whisper-mel-toon.json` is een
 ONAFHANKELIJKE referentie, geen afdruk van onze eigen code). De gemeten bytes
 kwamen van een anonieme npm-kopie omdat Hugging Face geweigerd wordt, en zijn
 daarom met opzet NIET ondertekend: eerst de hashes naast de bron leggen.
+**`tekst.vector` loopt ook** (par. 12), zonder nieuwe uitvoerder, en het meten
+vond twee regels: in een BATCH hangt de vector van een tekst af van zijn buren
+(het gekwantiseerde model schaalt over de hele invoer), dus elke tekst krijgt
+een eigen run; en twee runtimes geven op dezelfde bytes een andere vector
+(cosinus 0,993), dus een vector draagt een VINGERAFDRUK en wordt alleen naast
+een vector met dezelfde vingerafdruk gelegd.
 
 **`MACHINE.md` is de laag die de motoren aan elkaar riemt** -- RTG Execution
 Physics (de uitvoeringskant van hetzelfde voorstel waarvan RUNTIME.md de

@@ -21,6 +21,20 @@ const LINK = '<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="sty
 const DESKTOP = '<script src="/shared/rtg-world-desktop.js" defer></script>';
 const VASTLEGGEN = process.argv.includes('--vastleggen');
 
+/* Knipt elke treffer van `re` (met g-vlag) uit `tekst`, en herhaalt dat tot er
+   niets meer verandert: een geknipte tag kan anders een nieuwe laten ontstaan.
+   Bewust knippen op positie in plaats van .replace() (CodeQL
+   js/incomplete-multi-character-sanitization). */
+function schrap(tekst, re) {
+  for (;;) {
+    let uit = '', vanaf = 0;
+    for (const m of tekst.matchAll(re)) { uit += tekst.slice(vanaf, m.index); vanaf = m.index + m[0].length; }
+    uit += tekst.slice(vanaf);
+    if (uit === tekst) return uit;
+    tekst = uit;
+  }
+}
+
 function htmlBestanden(map, uit = []) {
   for (const naam of fs.readdirSync(map).sort()) {
     const volledig = path.join(map, naam);
@@ -91,14 +105,11 @@ function gewenst(bestand, bron) {
   bodyNieuw = zetAttribuut(bodyNieuw, 'data-rtg-layout', 'standard');
   bodyNieuw = bodyNieuw.replace(/\sdata-rtg-eigenvlak=["'][^"']*["']/gi, '');
   let uit = bron.replace(body[0], bodyNieuw);
-  /* Herhalen tot er niets meer verandert: een verwijdering kan een nieuwe
-     treffer laten ontstaan (CodeQL js/incomplete-multi-character-sanitization). */
-  let vorig;
-  do {
+  for (let vorig = null; vorig !== uit;) {
     vorig = uit;
-    uit = uit.replace(/<script\b[^>]*src=["']\/shared\/rtg-world-desktop\.js["'][^>]*><\/script>\s*/gi, '');
-    uit = uit.replace(/<link\b[^>]*href=["']\/shared\/rtg-world-desktop\.css["'][^>]*>\s*/gi, '');
-  } while (uit !== vorig);
+    uit = schrap(uit, /<script\b[^>]*src=["']\/shared\/rtg-world-desktop\.js["'][^>]*><\/script>\s*/gi);
+    uit = schrap(uit, /<link\b[^>]*href=["']\/shared\/rtg-world-desktop\.css["'][^>]*>\s*/gi);
+  }
 
   const heritageLinks = uit.match(/<link\b[^>]*href=["']\/?shared\/rtg-heritage\.css(?:[?#][^"']*)?["'][^>]*>/gi) || [];
   if (heritageLinks.length > 1) throw new Error('Dubbel Heritage-blad in ' + route);

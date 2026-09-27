@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-27T16:07:13.354Z",
-  "commit": "386afd32",
+  "op": "2026-09-27T14:33:46.240Z",
+  "commit": "4dc809df",
   "boomVuil": false,
   "boomAnders": 9,
   "instrument": "scripts/handlerwacht.js",
@@ -360,7 +360,7 @@
   },
   {
    "sleutel": "POST /api/auth/verify-email",
-   "bestand": "server/routes/auth/account.js:85",
+   "bestand": "server/routes/auth/account.js:78",
    "staat": "openbaar",
    "reden": "de bevestigingslink IS de geloofsbrief (verifyActionToken); ongeldig of verlopen geeft 400"
   },
@@ -1066,25 +1066,25 @@
   },
   {
    "sleutel": "POST /api/doos/buurmelding",
-   "bestand": "server/routes/doos.js:123",
+   "bestand": "server/routes/doos.js:127",
    "staat": "bewaakt",
    "wacht": "doosSleutelOk"
   },
   {
    "sleutel": "POST /api/doos/meting",
-   "bestand": "server/routes/doos.js:40",
+   "bestand": "server/routes/doos.js:44",
    "staat": "bewaakt",
    "wacht": "doosSleutelOk"
   },
   {
    "sleutel": "POST /api/doos/rapport",
-   "bestand": "server/routes/doos.js:132",
+   "bestand": "server/routes/doos.js:136",
    "staat": "bewaakt",
    "wacht": "doosSleutelOk"
   },
   {
    "sleutel": "POST /api/doos/update/status",
-   "bestand": "server/routes/doos.js:103",
+   "bestand": "server/routes/doos.js:107",
    "staat": "bewaakt",
    "wacht": "doosSleutelOk"
   },

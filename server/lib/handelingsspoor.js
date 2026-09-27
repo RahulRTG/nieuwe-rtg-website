@@ -65,6 +65,7 @@ const crypto = require('crypto');
 const keten = require('./keten');
 const klok = require('./klok');
 const verzoekcontext = require('../db/verzoekcontext');
+const burger = require('./burgerpad');
 
 const MAX = 50000;          // ruim genoeg voor een jaar bij dit verkeer, en begrensd
 const SCHRIJFT = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
@@ -102,9 +103,9 @@ function maakHandelingsspoor({ db, save, nu, max }) {
 
   const rij = () => eigen.bak('handelingLog');
 
-  function noteer({ wie, methode, pad, status, afdruk }) {
+  function noteer({ wie, methode, pad, status, afdruk, grof }) {
     return keten.noteerIn(rij(), {
-      at: new Date(tijd()).toISOString(),
+      at: grof ? burger.dag(tijd()) : new Date(tijd()).toISOString(),
       wie: String(wie || 'anoniem').slice(0, 60),
       methode: String(methode || '').slice(0, 10),
       pad: String(pad || '').slice(0, 200),
@@ -160,8 +161,12 @@ function maakHandelingsspoor({ db, save, nu, max }) {
     const schrijf = () => {
       const status = res.statusCode || 200;
       if (!(status >= 200 && status < 300)) return;
-      noteer({ wie: wieVan(req), methode: req.method,
-        pad: String(req.path || req.url || ''), status, afdruk: afdrukVan(req.body) });
+      const pad = String(req.path || req.url || '');
+      /* Een burgerpad komt erin zonder sleutel, zonder afdruk en met alleen de
+         dag (lib/burgerpad.js): de regel blijft, de weg naar de mens niet. */
+      const pseudoniem = burger.isBurgerpad(pad);
+      noteer({ wie: pseudoniem ? burger.PSEUDONIEM : wieVan(req), methode: req.method,
+        pad, status, afdruk: pseudoniem ? '' : afdrukVan(req.body), grof: pseudoniem });
       save();
     };
     if (!verzoekcontext.haakVoorCommit(schrijf)) {

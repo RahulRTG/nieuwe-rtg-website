@@ -932,6 +932,8 @@ console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoor
     ['/api/bank/', 'de eigen bank van RTG; een overboeking gaat niet langs een derde']
   ];
   const MAG_ZONDER = new Map([
+    ['/api/vonk/profile-photo/order', 'alleen de volgorde van eigen, al opgeslagen profielmedia; er staat geen derde partij tegenover'],
+    ['/api/member/rendezvous/profile-photo/order', 'alleen de volgorde van eigen, al opgeslagen profielmedia; er staat geen derde partij tegenover'],
     ['/api/member/sport/tickets', 'je eigen ticketlijst opvragen'],
     ['/api/muziek/bestand-ticket', 'een tijdelijke luisterkaart voor muziek die al in RTG is gepubliceerd; "ticket" is hier een cryptografische toegangssleutel en geen aankoop bij een derde'],
     ['/api/member/boardroom/logboek', 'je eigen boardroom-journaal ("logboek" bevat toevallig "boek"); geen derde partij'],
@@ -3798,6 +3800,9 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
      een anker bestaat. */
   const SPRAAKEERLIJK = ['public/shared/meeluister.js', 'meelees-geenauto'];
   const REGISTER = new Map([
+    ['public/shared/connection-communication-view.js#1', ['ondertiteld', 'een spraakbericht wordt uitsluitend geplaatst met het zichtbare, door de afzender geschreven transcript er direct naast', ['public/shared/connection-communication-view.js', 'connection-transcript']]],
+    ['public/shared/connection-communication-view.js#2', ['gesprek', 'het beeld en geluid van de andere deelnemer in een besloten Connection-gesprek, met dezelfde meelees- en lokale ondertitelbaan', ['public/shared/connection-communication.js', 'RTGMeelezen'], ['public/apps/vonk.html', 'meeluister.js']]],
+    ['public/shared/connection-communication-view.js#3', ['spiegel', 'het eigen stille beeld in de hoek van een besloten Connection-gesprek']],
     ['public/apps/app.html#csRemote', ['gesprek', 'het beeld en geluid van de ander in een videogesprek tussen twee leden', ['public/apps/app-main.js', 'RTGMeelezen'], ['public/apps/app.html', 'meeluister.js']]],
     ['public/apps/app.html#csLocal', ['spiegel', 'je eigen beeld in de hoek van dat gesprek; stil, want jezelf terughoren is een echo']],
     ['public/apps/backoffice.html#ontLiveVid', ['uitzending', 'SOS: het kantoor kijkt live mee met de camera van een lid, met geluid erbij. Er loopt WEL een tekstbaan mee (#ontLiveTekst): het toestel van het lid zet zijn eigen stem om naar tekst en stuurt de regels langs hetzelfde seinkanaal, zonder tweede tik -- de toestemming voor beeld en geluid staat al in het veiligheidscontract. Blijft OPEN: het hangt aan een browser die de Web Speech API heeft, en dat is geen ondertiteling waar je op kunt rekenen', ['public/apps/backoffice.js', 'ontLiveTekst']]],
@@ -4736,6 +4741,9 @@ console.log('\n58) vaste hoekgrammatica: rechte inhoud, afgeronde systeemlagen e
     ['public/shared/rtg-adaptive-edge.css', new Set([
       'var(--rtg-radius-system,22px)'
     ])],
+    ['public/shared/connection-edge.css', new Set([
+      'var(--rtg-radius-system,22px)'
+    ])],
     ['public/shared/i18n/i18n-03.js', new Set([
       'var(--rtg-radius-content,2px)', 'var(--rtg-radius-system,22px)'
     ])],
@@ -4743,6 +4751,7 @@ console.log('\n58) vaste hoekgrammatica: rechte inhoud, afgeronde systeemlagen e
       'var(--rtg-radius-content,2px)', 'var(--rtg-radius-system,22px)'
     ])],
     ['public/shared/rtg-world-home.css', new Set(['var(--rtg-radius-editorial)', 'var(--rtg-radius-system)'])],
+    ['public/shared/vonk-2.css', new Set(['var(--rtg-radius-system)'])],
     ['public/shared/rtg-world-desktop.css', new Set(['var(--rtg-radius-editorial)'])],
     ['public/shared/rtg-world-widgets.css', new Set(['var(--rtg-radius-editorial)'])],
     ['public/shared/rtg-world-screen.css', new Set(['var(--rtg-radius-content)!important'])],

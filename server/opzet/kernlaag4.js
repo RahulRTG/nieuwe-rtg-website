@@ -16,8 +16,16 @@ kern.huis = require('../kern/huis')({
     : (sess && sess.tier !== 'guest' ? db.data.trip : null)) || null,
   entourageVan: (sess) => { try { return kern.entourage(sess.key); } catch (e) { return null; } }
 });
+/* Connection OS formaliseert wat de twee producten al delen. De policy is een
+   contract en geen vervangende backend; de blokkadelaag is wel een gedeelde
+   waarheid, zodat een veiligheidsactie niet bij de grens van een app stopt. */
+kern.connectionPolicy = require('../kern/connection-policy');
+kern.connectionBlocking = require('../kern/connection-blocking')({ db, save });
 // Rendez-vous deelt zijn 18+/KYC-poort met Vonk; de route bewaakt de pas.
 Object.assign(kern, require('../kern/rendezvous')({ db, save, crypto, anthropic, notify, accounts, leeftijdVan,
+  connectionBlocking: kern.connectionBlocking,
+  partnerSuppliers: () => db.data.suppliers || [], partnerBookings: () => db.data.reserveringen || [],
+  media, sseToCustomer: hulp.sseToCustomer, connectionMediaTicketSecret: process.env.RTG_ENC_KEY,
   /* codenaamVan en niet liveCodename: zie de kop van kern/rendezvous.js. Laat
      gebonden, want de sociale laag wordt later samengesteld. */
   codenaamVan: (k) => kern.codenaamVan(k),
@@ -26,7 +34,8 @@ Object.assign(kern, require('../kern/rendezvous')({ db, save, crypto, anthropic,
   tableZet: kern.tableZet,
   /* De contactpin uit kern/sociaal: Encounter LEENT hem als adres en maakt geen
      eigen koppelcode. Zie de kop van kern/rendezvous-kring.js. */
-  handleVanPin: (pin) => kern.handleVanPin(pin) }));
+  handleVanPin: (pin) => kern.handleVanPin(pin),
+  sociaalRate: (...args) => kern.sociaalRate(...args) }));
 // De wauw-laag: stemming, verjaardagsglans en De Terugblik over alle socials
 Object.assign(kern, require('../kern/wauw')({ db, save, accounts, socialConnecties: kern.socialConnecties }));
 // RTG Pulse: het eigen 9+-microblog (chronologisch, zonder verslavende trucs)

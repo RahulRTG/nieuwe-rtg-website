@@ -21,9 +21,9 @@ het?**
 | Bedrijfsgenres | **78** in 28 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
-| Kernmodules (`server/kern/**`) | **2338** |
+| Kernmodules (`server/kern/**`) | **2352** |
 | App-pagina's (`public/apps/**.html`) | **310** |
-| Testbestanden | **2073** |
+| Testbestanden | **2077** |
 
 ## De vier werelden
 
@@ -56,7 +56,7 @@ ook blokkeert.
 
 # 1. De 222 functieschakelaars
 
-### Leden (RTG-app) — 26
+### Leden (RTG-app) — 25
 
 - **Leden-app (algemeen)** (`member`) — Alle ledenfuncties in de RTG-app. Zet je dit uit, dan valt de hele ledenkant stil (behalve wat hieronder apart aan staat).  
   _voor: rtg, lifestyle, business, gast_
@@ -84,8 +84,6 @@ ook blokkeert.
   _voor: rtg, lifestyle, business_
 - **Het Privékantoor (Lifestyle)** (`privekantoor`) — De ene app van de Lifestyle Pass: de levensgraaf over de premium-apps heen, de Control Tower met alle termijnen, het mandaat (wat mag het kantoor zelf) en zaken met een team en een tijdlijn. Uit zetten laat de onderliggende apps staan; alleen de samenhang verdwijnt.  
   _voor: lifestyle, business_
-- **Kwesties inbrengen (DemocratieOS)** (`democratie`) — Een burger brengt een kwestie in en volgt wat ermee gebeurt. Alleen voor iedereen tegelijk aan of uit: nooit per persoon, plaats, pas of canary.  
-  _voor: rtg, lifestyle, business, gast_
 - **De app-staat** (`kern-state`) — De ene aanroep waarmee de app zijn hele beeld ophaalt. Uit betekent een lege app voor iedereen.  
   _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
 - **De live-verbinding** (`kern-live`) — De open lijn (SSE) waarover meldingen en verversingen binnenkomen, plus de verbindingsgegevens voor bellen.  
@@ -145,7 +143,7 @@ ook blokkeert.
 - **RTG Commerce (mand & retour)** (`commerce`) — De verkooplaag boven de domeinen: wat er te koop staat en wat NIET met de reden erbij, een mand over verkopers heen met een afrekening per verkoper, de overdracht naar de deur die bevestigt, en de weg terug. RTG bevestigt hier zelf niets.  
   _voor: rtg, lifestyle, business_
 
-### Eigen apps — 41
+### Eigen apps — 42
 
 - **Spelen (spellen met vrienden)** (`spellen`) — Alle spellen: schaken, dammen, rummi, Magnaat, sudoku en de partyspellen.  
   _voor: rtg, lifestyle, business, foundation_
@@ -172,6 +170,8 @@ ook blokkeert.
 - **RTG Ondernemers-OS** (`ondernemersos`) — Van "ik denk erover na" tot een draaiend bedrijf in een scherm: de verkenning en de stress test, de rechtsvorm en het oprichtingsproject, het dagbeeld met debiteuren, btw, kas en capaciteit, de verkooppijplijn en het bestuur met de UBO-afleiding.  
   _voor: rtg, lifestyle, business_
 - **RTG Vonk (dating)** (`vonk`) — Dating op codenaam met de Salon-veiligheidslat: 18+, geverifieerd paspoort, een eindige dagselectie, en bij een match automatisch een tafel rond het midden van beide woonplaatsen (EUR 10 p.p., waarvan EUR 5 voor RTG).  
+  _voor: rtg, lifestyle, business_
+- **RTG Connection OS** (`connectionos`) — De gedeelde, afschakelbare communicatie- en medialaag onder Vonk en Rendez-vous. Productbeleid, wederzijdse toestemming en blokkades blijven per product beslissen welke capability daadwerkelijk beschikbaar is.  
   _voor: rtg, lifestyle, business_
 - **RTG Media (één mediawereld)** (`mediaos`) — De laag die Klankwerk, Theater, Clips en Podium tot één wereld maakt: drie standen (muziek, kijk, flow) op dezelfde catalogus, één makersprofiel, één volgrelatie, één bibliotheek en de eigen smaakregelaars. Zet u hem uit, dan blijven de vier apps eronder gewoon werken.  
   _voor: rtg, lifestyle, business_

@@ -189,10 +189,18 @@ const EIGENAAR = {
   'BEWIJSKOSTEN.json': { soort: 'MOMENTOPNAME', schrijver: 'scripts/bewijskosten.js' },
 
   /* De lagen die in deze tak zijn gebouwd. */
+  'CONNECTION_OS.md': { soort: 'BRON',
+    waarom: 'Handmatig onderhouden bouwspecificatie en architectuurbesluiten voor Connection OS; de uitvoerbare toetsen en CONNECTION_CONSTITUTION.json leveren het afzonderlijke bewijs.' },
+  'CONNECTION_OS_FINAL.md': { soort: 'BRON',
+    waarom: 'Handmatig onderhouden finale productscope en acceptatiegrenzen voor Vonk en Rendez-vous; geen generator schrijft dit document.' },
   'IDEMIDENTITEIT.json': { schrijver: 'scripts/idemidentiteit.js' },
   'DOCTRINE.json': { schrijver: 'scripts/doctrine.js' },
   'VERBAND.json': { schrijver: 'scripts/verband.js' },
   'GELDING.json': { schrijver: 'scripts/gelding.js' },
+  'CONNECTION_CONSTITUTION.json': { schrijver: 'scripts/connection-constitution.js',
+    waarom: 'de machinaal afgeleide Connection OS-grondwet: capability-, policy-, consent-, projectie- en ' +
+      'productstatebewijzen worden door scripts/connection-constitution.js uit de levende bron en toetsen ' +
+      'samengebracht; het bestand wordt niet handmatig onderhouden' },
 
   /* De dragende registers van de bewijsmachine. */
   'WETTEN.json': { handmatig: true, lezer: 'scripts/wetten.js',

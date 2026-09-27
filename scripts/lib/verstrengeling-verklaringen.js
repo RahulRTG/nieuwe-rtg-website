@@ -442,5 +442,25 @@ module.exports = [
      hele systeem wantrouwen. De som staat nu in kern/afgeleid.js, waar btwSplit
      al stond, en beide kanten tellen dezelfde afgeronde centen op. */
   { van: 'domein:fiscaal', naar: 'domein:afgeleid', soort: 'DOMEINRELATIE',
-    reden: 'kern/fiscaal/index.js en kern/fiscaal/btwtelling.js lezen allebei btwCenten uit kern/afgeleid.js. Dat is met opzet EEN plek: de aangifte telt per factuurregel en de maandboekhouding per bestelregel, en alleen met dezelfde afrondregel komen die twee op hetzelfde getal uit. Stond de som in het fiscale domein zelf, dan had de boekhouding hem opnieuw geschreven -- wat zij deed, en wat de cent opleverde' }
+    reden: 'kern/fiscaal/index.js en kern/fiscaal/btwtelling.js lezen allebei btwCenten uit kern/afgeleid.js. Dat is met opzet EEN plek: de aangifte telt per factuurregel en de maandboekhouding per bestelregel, en alleen met dezelfde afrondregel komen die twee op hetzelfde getal uit. Stond de som in het fiscale domein zelf, dan had de boekhouding hem opnieuw geschreven -- wat zij deed, en wat de cent opleverde' },
+
+  /* ---- CONNECTION OS ----
+     Vonk en Rendez-vous delen uitsluitend de bewezen kernelmechanismen. De
+     productmodules bezitten hun eigen regels en presentatie; media,
+     communicatie en state-resolution bestaan juist eenmaal zodat consent,
+     blocking en implemented:false niet per product uiteen kunnen lopen. */
+  { van: 'domein:rendezvous-connection-setup', naar: 'domein:connection-profile-media', soort: 'GEDEELDE_PRIMITIEF',
+    reden: 'Rendez-vous monteert de gedeelde, purpose-gebonden profielmedia op zijn eigen routes; de kernel bewaakt tickets, disclosure en blokkeren zodat Rendez-vous geen tweede media-autoriteit krijgt' },
+  { van: 'domein:rendezvous-connection-setup', naar: 'domein:connection-communication', soort: 'GEDEELDE_PRIMITIEF',
+    reden: 'Rendez-vous monteert dezelfde consent- en block-veilige transportprimitieven als Vonk, terwijl zijn productpolicy onafhankelijk bepaalt welke communicatiecapability mag bestaan' },
+  { van: 'domein:rendezvous-state', naar: 'domein:connection-product-state', soort: 'BELEID',
+    reden: 'de Rendez-vous-state vraagt de gedeelde resolver om capabilities uit policy, consent, blockstatus en revision af te leiden; de client en het productdomein mogen die veiligheidsbeslissing niet zelf reconstrueren' },
+  { van: 'domein:vonk', naar: 'domein:connection-profile-media', soort: 'GEDEELDE_PRIMITIEF',
+    reden: 'Vonk gebruikt de gedeelde profielmedialaag voor purpose-gebonden, kortlevende levering; eigendom, disclosure en blokkeren horen niet nogmaals in de Vonk-route te worden geïmplementeerd' },
+  { van: 'domein:vonk', naar: 'domein:connection-communication', soort: 'GEDEELDE_PRIMITIEF',
+    reden: 'Vonk gebruikt de gedeelde communicatieprimitieven voor tekst, media en bewezen realtime capabilities; de Vonk-policy bepaalt afzonderlijk wat in iedere productstate beschikbaar is' },
+  { van: 'domein:vonk', naar: 'domein:connection-product-state', soort: 'BELEID',
+    reden: 'Vonk laat availableCapabilities en Edge-projecties door de centrale state-resolver bepalen, zodat stale clients en zelfverzonnen acties nooit productbeleid kunnen omzeilen' },
+  { van: 'domein:vonk', naar: 'domein:connection-state-vonk', soort: 'EIGEN_DATA',
+    reden: 'connection-state-vonk is de uitgeknipte Vonk-state-machine: hetzelfde productonderwerp in een kleiner bestand, met server-authoritative transitions en revisioncontrole' }
 ];

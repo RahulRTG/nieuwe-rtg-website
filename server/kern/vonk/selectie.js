@@ -11,7 +11,7 @@
 const W = require('./wensen');
 
 module.exports = (ctx) => {
-  const { d, mag, likeVan, matchTussen, haversine, publiek, DAG_MAX, rooster, tafelkaart } = ctx;
+  const { d, mag, likeVan, matchTussen, haversine, publiek, DAG_MAX, rooster, tafelkaart, geblokkeerd } = ctx;
 
   /* AFSTAND IN KILOMETERS, of null als we het niet weten.
 
@@ -55,7 +55,7 @@ module.exports = (ctx) => {
        geen cijfer op een mens te staan -- ONTMOETEN.md par. 4.4. */
     const basis = Object.entries(d().profielen)
       .filter(([k, p]) => k !== key && p.actief !== false
-        && !ik.blokkade.includes(k) && !(p.blokkade || []).includes(key)
+        && !geblokkeerd(key, k)
         && pastBij(ik, p) && pastBij(p, ik)
         && !likeVan(key, k) && !matchTussen(key, k));
     const door = basis.filter(([, p]) => hardePoort(ik, p));
@@ -66,8 +66,10 @@ module.exports = (ctx) => {
         - (km(ik, p) || 0) / 10 }))
       .sort((x, y) => y.orde - x.orde)
       .slice(0, DAG_MAX)
-      .map(({ k, p }) => ({ ...publiek(k, p), gemeen: (p.interesses || []).filter(i => ik.interesses.includes(i)),
-        waarom: W.reden(ik, p) }));
+      .map(({ k, p }) => publiek(k, p, false, 'kandidaten', {
+        gemeen: (p.interesses || []).filter(i => ik.interesses.includes(i)),
+        waarom: W.reden(ik, p)
+      }, key));
     /* Een lege dag is een antwoord en geen storing (ONTMOETEN.md par. 3.5).
 
        De zin wijst de harde eisen alleen aan als die WERKELIJK iemand hebben

@@ -1,7 +1,6 @@
-/* Leverancier (deelmodule): de volledige zaak-status voor de leverancier-app (een samengestelde kaart van alles).
-   Krijgt de gedeelde context een keer bij het opstarten vanuit
-   kern/leverancier.js. */
+/* De volledige zaak-status voor de leverancier-app. */
 const GS = require('../geschikt');
+const ConnectionPartner = require('../connection-partner');
 module.exports = (ctx) => {
   const { db, save, crypto, i18n, notify, broadcastSync, sseToSupplier, sseToCustomer, logActivity,
     findSupplier, connectedSupplierCodes, guestsFor, gidsHaal, etaMinutes, haversine, accounts, werkgeverSollicitatie,
@@ -53,6 +52,7 @@ module.exports = (ctx) => {
       doors: s.doors || null,
       tables: s.tables || null,
       settings: s.settings || { ordersOpen: true, reservationsOpen: true },
+      connectionParticipation: ConnectionPartner.project(s),
       fleet: s.fleet || null,
       voorraad: s.voorraad || [],
       minibar: Array.isArray(s.minibar) ? {

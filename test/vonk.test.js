@@ -290,6 +290,10 @@ test('12. de tafel staat bij de zaak het dichtst bij het geografische midden', a
     midden: { code: 'midden', name: 'Bij het midden', loc: { lat: 50.85, lng: 4.35, label: 'Brussel' }, tables: [{ id: 't' }] },
     noord:  { code: 'noord',  name: 'Noordelijk', loc: { lat: 55.68, lng: 12.57, label: 'Kopenhagen' }, tables: [{ id: 't' }] }
   } } };
+  const CP = require('../server/kern/connection-partner');
+  for (const zaak of Object.values(db.data.suppliers)) CP.update(zaak, { programs: { vonk: {
+    enabled: true, locations: ['primary'], services: ['diner']
+  } } });
   const accounts = { getUserById: () => ({ id: 1, verified: 'verified' }), getMemberState: () => ({ geboren: '1990-05-05' }) };
   const api = maakVonk({
     db, save() {}, crypto: require('crypto'), schoon: (t, n) => String(t == null ? '' : t).slice(0, n),
@@ -469,6 +473,7 @@ test('21. meet halfway: verschillende keuze onthult beide keuzes, zonder duwtje'
 
 test('22. meet halfway: een harde eis aan de plek weegt voor allebei, en onbekend is nee', async () => {
   const H = require('../server/kern/vonk/halfweg');
+  const CP = require('../server/kern/connection-partner');
   const { haversine, etaMinutes } = require('../server/lib/geo');
   const afstandM = (p, l) => haversine({ lat: p.lat, lng: p.lng }, { lat: l.lat, lng: l.lng });
   const zaken = {
@@ -477,6 +482,9 @@ test('22. meet halfway: een harde eis aan de plek weegt voor allebei, en onbeken
     onbekend: { code: 'onbekend', name: 'Onbekend', type: 'bar', loc: { lat: 52, lng: 4.5 }, tables: [1],
       menu: [{ price: 12 }] }                                   // heeft niets verklaard
   };
+  for (const zaak of Object.values(zaken)) CP.update(zaak, { programs: { vonk: {
+    enabled: true, locations: ['primary'], services: ['koffie', 'borrel', 'diner']
+  } } });
   const a = { lat: 51.9, lng: 4.5, datewens: { eisen: ['rolstoel'] } };
   const b = { lat: 52.1, lng: 4.5, datewens: {} };
   const r = H.drieOpties({ a, b, suppliers: zaken, mid: { lat: 52, lng: 4.5 }, afstandM,
@@ -534,10 +542,14 @@ test('25. een zaak verklaart zelf wat hij kan, en dat bereikt de datefinder', as
   const { haversine, etaMinutes } = require('../server/lib/geo');
   const afstandM = (p, l) => haversine({ lat: p.lat, lng: p.lng }, { lat: l.lat, lng: l.lng });
   const G = require('../server/kern/geschikt');
+  const CP = require('../server/kern/connection-partner');
 
   // een zaak zonder verklaring en dezelfde zaak met verklaring
   const zonder = { code: 'z', name: 'Zonder', type: 'restaurant', loc: { lat: 52, lng: 4.5 }, tables: [1], menu: [{ price: 12 }] };
   const met = { ...zonder, code: 'm', name: 'Met', geschikt: G.schoonGeschikt(['rolstoel', 'onzin']) };
+  for (const zaak of [zonder, met]) CP.update(zaak, { programs: { vonk: {
+    enabled: true, locations: ['primary'], services: ['koffie', 'diner']
+  } } });
   const a = { lat: 51.9, lng: 4.5, datewens: { eisen: ['rolstoel'] } };
   const b = { lat: 52.1, lng: 4.5, datewens: {} };
   const r = H.drieOpties({ a, b, suppliers: { zonder, met }, mid: { lat: 52, lng: 4.5 }, afstandM,

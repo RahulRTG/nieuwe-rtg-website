@@ -2,18 +2,18 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-09-27",
   "gemeten": {
-    "bestanden": 2428,
-    "domeinenTotaal": 637,
-    "koopbareVormen": 598,
+    "bestanden": 2442,
+    "domeinenTotaal": 657,
+    "koopbareVormen": 599,
     "koopbareDomeinen": 120,
     "envelopDrempel": 8,
     "envelop": 42,
-    "veldenDomeineigen": 775,
+    "veldenDomeineigen": 774,
     "veldenNietEnvelop": 1036,
     "gelijkendeVormparen": 17,
     "werkwoordenVolledig": 1,
     "werkwoordenOveral": 0,
-    "werkwoordCombinaties": 46,
+    "werkwoordCombinaties": 45,
     "wagenVormen": 33,
     "wagenVormenUniek": 30,
     "wagenDomeinen": 22,
@@ -73,7 +73,7 @@
     "prijs": 39,
     "beschikbaarheid": 54,
     "reserveer": 28,
-    "bevestig": 57,
+    "bevestig": 58,
     "lever": 21,
     "annuleer": 31,
     "retour": 8
@@ -1255,6 +1255,25 @@
       "telt": 3
     },
     {
+      "domein": "kern/vonk",
+      "heeft": {
+        "toon": true,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": true,
+        "bevestig": true,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "publiek",
+        "reserveer": "blokkeer",
+        "bevestig": "boek"
+      },
+      "telt": 3
+    },
+    {
       "domein": "kern/werkplaats",
       "heeft": {
         "toon": true,
@@ -1576,24 +1595,6 @@
       "bewijs": {
         "toon": "jeugdbeeld",
         "annuleer": "intrek"
-      },
-      "telt": 2
-    },
-    {
-      "domein": "kern/vonk",
-      "heeft": {
-        "toon": true,
-        "prijs": false,
-        "beschikbaarheid": false,
-        "reserveer": true,
-        "bevestig": false,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "publiek",
-        "reserveer": "blokkeer"
       },
       "telt": 2
     },

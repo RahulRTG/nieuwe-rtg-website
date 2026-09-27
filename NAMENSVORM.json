@@ -1,15 +1,15 @@
 {
   "stempel": {
-    "op": "2026-09-25T12:37:54.961Z",
-    "commit": "58149076",
+    "op": "2026-09-27T03:00:55.050Z",
+    "commit": "840fb8a21",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/namensvorm.js",
-    "node": "v22.22.2"
+    "node": "v24.18.0"
   },
   "uitleg": "Gemeten met scripts/namensvorm.js, op de lezer van scripts/objectmodel.js. De vraag staat in REPRESENTATIE.md par. 0: delen de bestaande manieren waarop iemand namens een ander handelt werkelijk een machine? Twee lijsten (smal = handelen, ruim = handelen plus kennen), zodat de uitslag niet op de lijst drijft.",
   "grens": "De eenheid is het MECHANISME en niet het domein, omdat kern/service/machtiging*.js en kern/command/bijstand*.js elk een mechanisme BINNEN een groter domein zijn. Daardoor zijn de percentages hier NIET uitwisselbaar met CARRIEREVORM.json of STAGEVORM.json, die per domein tellen; alleen de VORM van het antwoord is vergelijkbaar. Verder meet dit bewaarde VORMEN (velden van objectliteralen) en geen werkwoorden, volgorde of uitkomst: een nul zegt dat er geen gedeeld OBJECT is, niet dat er geen gedeeld PROCES is -- die tweede vraag beantwoordt een ketenproef. Een mechanisme zonder opgeslagen vormen (een regelbestand zonder db) valt uit de noemer en staat in `zonderVormen`. De woordenschat telt IDENTIFIERS na aftrek van commentaar en tekenreeksen: `bezet` is een waarschuwing met een adres en geen verbod, en samenstellingen tellen niet mee omdat een samenstelling een andere naam is.",
-  "vastgelegd": "2026-09-25",
+  "vastgelegd": "2026-09-27",
   "gemeten": {
     "smal": {
       "vormen": 10,
@@ -636,25 +636,25 @@
     },
     {
       "woord": "contract",
-      "bestanden": 55,
-      "domeinen": 19,
-      "samengesteld": 85,
-      "samengesteldDomeinen": 29,
+      "bestanden": 57,
+      "domeinen": 21,
+      "samengesteld": 88,
+      "samengesteldDomeinen": 32,
       "stand": "bezet",
       "waar": [
         "bedrijf",
         "kern/aanmeldingen",
         "kern/autoverkoop",
         "kern/commercie",
-        "kern/document-capability"
+        "kern/connection-policy"
       ],
       "vormen": [
         "CONTRACTEN",
         "CONTRACTEN_WAARSCHUW_DAGEN",
+        "CONTRACTS",
         "CONTRACTSLEUTELS",
         "CONTRACTSOORTEN",
-        "CONTRACT_BETALING",
-        "CONTRACT_VERSION"
+        "CONTRACT_BETALING"
       ]
     },
     {
@@ -750,18 +750,41 @@
       ]
     },
     {
+      "woord": "capability",
+      "bestanden": 46,
+      "domeinen": 22,
+      "samengesteld": 8,
+      "samengesteldDomeinen": 8,
+      "stand": "bezet",
+      "waar": [
+        "kern/bestanden-delen",
+        "kern/commercie",
+        "kern/concern",
+        "kern/connection-communication",
+        "kern/connection-communication-call"
+      ],
+      "vormen": [
+        "CAPABILITY_GATED",
+        "CAPABILITY_UNKNOWN",
+        "RTG_CAPABILITY_RUST_BIN",
+        "RTG_CAPABILITY_RUST_CANARY_KEY",
+        "RTG_CAPABILITY_RUST_CANARY_PCT",
+        "RTG_CAPABILITY_RUST_MODE"
+      ]
+    },
+    {
       "woord": "intent",
-      "bestanden": 17,
-      "domeinen": 6,
+      "bestanden": 18,
+      "domeinen": 7,
       "samengesteld": 31,
       "samengesteldDomeinen": 13,
       "stand": "bezet",
       "waar": [
+        "kern/connection-edge",
         "kern/economie",
         "kern/experience",
         "kern/fluister",
-        "kern/fonds",
-        "kern/instant-reality"
+        "kern/fonds"
       ],
       "vormen": [
         "INTENTIE",
@@ -770,52 +793,6 @@
         "RTG_INTENT_RAIL",
         "claimsVoorIntent",
         "deelPinIntent"
-      ]
-    },
-    {
-      "woord": "capability",
-      "bestanden": 37,
-      "domeinen": 13,
-      "samengesteld": 7,
-      "samengesteldDomeinen": 7,
-      "stand": "bezet",
-      "waar": [
-        "kern/bestanden-delen",
-        "kern/commercie",
-        "kern/concern",
-        "kern/document-capability",
-        "kern/drm"
-      ],
-      "vormen": [
-        "CAPABILITY_GATED",
-        "RTG_CAPABILITY_RUST_BIN",
-        "RTG_CAPABILITY_RUST_CANARY_KEY",
-        "RTG_CAPABILITY_RUST_CANARY_PCT",
-        "RTG_CAPABILITY_RUST_MODE",
-        "capabilityGraph"
-      ]
-    },
-    {
-      "woord": "projectie",
-      "bestanden": 25,
-      "domeinen": 7,
-      "samengesteld": 15,
-      "samengesteldDomeinen": 9,
-      "stand": "bezet",
-      "waar": [
-        "kern/bedrijfsmaat",
-        "kern/kosten",
-        "kern/magnaat-grootboek",
-        "kern/magnaat-kantoorregels",
-        "kern/namens"
-      ],
-      "vormen": [
-        "herstelProjectie",
-        "maakFondsProjecties",
-        "maakProjectie",
-        "maakProjecties",
-        "nieuweProjectie",
-        "projectieKoppel"
       ]
     },
     {
@@ -885,6 +862,29 @@
         "vermogenId",
         "vermogenPk",
         "vermogenUit"
+      ]
+    },
+    {
+      "woord": "projectie",
+      "bestanden": 16,
+      "domeinen": 7,
+      "samengesteld": 18,
+      "samengesteldDomeinen": 12,
+      "stand": "bezet",
+      "waar": [
+        "kern/kosten",
+        "kern/magnaat-grootboek",
+        "kern/magnaat-kantoorregels",
+        "kern/namens",
+        "kern/rendezvous-date"
+      ],
+      "vormen": [
+        "herstelProjectie",
+        "maakFondsProjecties",
+        "maakProjectie",
+        "maakProjecties",
+        "maakVonkProjecties",
+        "nieuweProjectie"
       ]
     },
     {
@@ -997,6 +997,25 @@
       ]
     },
     {
+      "woord": "purpose",
+      "bestanden": 12,
+      "domeinen": 9,
+      "samengesteld": 2,
+      "samengesteldDomeinen": 2,
+      "stand": "bezet",
+      "waar": [
+        "kern/connection-communication",
+        "kern/connection-communication-media",
+        "kern/connection-consent",
+        "kern/connection-profile-media",
+        "kern/connection-state-rendezvous"
+      ],
+      "vormen": [
+        "economicIntentsVoorPurpose",
+        "intentsVoorPurpose"
+      ]
+    },
+    {
       "woord": "principal",
       "bestanden": 2,
       "domeinen": 2,
@@ -1053,24 +1072,6 @@
         "intenties",
         "intentiesActief",
         "linkIntenties"
-      ]
-    },
-    {
-      "woord": "purpose",
-      "bestanden": 7,
-      "domeinen": 4,
-      "samengesteld": 2,
-      "samengesteldDomeinen": 2,
-      "stand": "bezet",
-      "waar": [
-        "kern/economie",
-        "kern/fonds",
-        "kern/gast",
-        "kern/namens"
-      ],
-      "vormen": [
-        "economicIntentsVoorPurpose",
-        "intentsVoorPurpose"
       ]
     },
     {

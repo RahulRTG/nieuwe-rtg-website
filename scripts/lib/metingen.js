@@ -96,6 +96,11 @@ const GEEN_METING = new Set([
 ]);
 
 const REGISTER = {
+  /* CONNECTION_CONSTITUTION.json wordt uitsluitend geschreven nadat alle
+     genoemde product-, privacy-, state- en routeproeven groen zijn. Het script
+     weigert bij een ontbrekend bewijs of exposed implemented:false capability
+     en is daarmee de eigen ratel van dit samengestelde bewijsbestand. */
+  'CONNECTION_CONSTITUTION.json': { eigenRatel: 'scripts/connection-constitution.js' },
   'LANGUAGECAPABILITY.json': { eigenRatel: 'scripts/language-proof.js' },
   'MEANINGPARITY.json': { eigenRatel: 'scripts/language-proof.js' },
   'LANGUAGEFAILOVER.json': { eigenRatel: 'scripts/language-proof.js' },

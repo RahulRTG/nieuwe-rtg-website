@@ -84,17 +84,17 @@ function filiaalHuur(st) {
 }
 
 /* Wat een concurrent kost: zijn marktaandeel, met een bodem. */
-function prijsVan(st, c) {
+function overnamePrijs(st, c) {
   return Math.max(G.OVERNAME.minimum, (aandelen(st)[c.id] || 0) * G.OVERNAME.perPromille);
 }
 
-function overname(st, z) {
+function neemOver(st, z) {
   const nee = eerst(st);
   if (nee) return nee;
   const g = groei(st), nog = concurrenten(st), c = nog.find(x => x.id === z.bedrijf);
   if (!c) return fout('Kies een concurrent om over te nemen: ' + nog.map(x => x.naam).join(', ') + '.');
   if (nog.length <= G.OVERNAME.overblijven) return fout(c.naam + ' is je laatste concurrent: een stad met een bedrijf is geen markt.');
-  const prijs = prijsVan(st, c), mens = G.OVERNAME.mensen[c.id];
+  const prijs = overnamePrijs(st, c), mens = G.OVERNAME.mensen[c.id];
   if ((st.team || []).filter(m => !m.weg).length >= teamMax(st)) return fout(mens + ' van ' + c.naam + ' komt mee, en je team is vol: open een filiaal of zeg iemand op.');
   if (st.kas < prijs) return fout(c.naam + ' overnemen kost ' + euro(prijs) + ', en er staat ' + euro(st.kas) + ' op je rekening. Een krediet van de bank kan helpen.');
   boekVan(st).boekOver(st, { soort: 'OVERNAME', van: ['kas'], naar: ['kosten', 'overname'], bedrag: prijs, omschrijving: 'Overname van ' + c.naam, sleutel: 'overname:' + c.id });
@@ -131,8 +131,8 @@ function groeiBeeld(st) {
     open: !!st.zelfstandig, krediet: g.krediet || null, kredietRuimte: st.zelfstandig ? kredietRuimte(st) : 0,
     filiaal: g.filiaal ? { wijk: g.filiaal.wijk, naam: M.WIJKEN[g.filiaal.wijk].naam, huur: M.WIJKEN[g.filiaal.wijk].huur } : null,
     overgenomen: (g.overgenomen || []).map(id => (M.CONCURRENTEN[st.aanbod] || []).find(c => c.id === id)).filter(Boolean).map(c => c.naam),
-    overnames: st.aanbod ? concurrenten(st).map(c => ({ id: c.id, naam: c.naam, prijs: prijsVan(st, c) })) : []
+    overnames: st.aanbod ? concurrenten(st).map(c => ({ id: c.id, naam: c.naam, prijs: overnamePrijs(st, c) })) : []
   };
 }
 
-module.exports = { krediet, filiaal, overname, groeiDag, groeiBeeld, kredietRuimte, prijsVan };
+module.exports = { krediet, filiaal, neemOver, groeiDag, groeiBeeld, kredietRuimte, overnamePrijs };

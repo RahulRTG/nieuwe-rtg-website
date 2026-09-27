@@ -71,7 +71,7 @@ const ACTIES = {
   uitstel: geld.uitstel, lenen: geld.lenen,
   werf: team.werf, ontsla: team.ontsla, bestel: voorraad.bestelInkoop, prijs: voorraad.prijs,
   teken: contract.teken, wijsaf: contract.wijsAf, zegop: contract.zegOp,
-  vestig, krediet: groei.krediet, filiaal: groei.filiaal, overname: groei.overname
+  vestig, krediet: groei.krediet, filiaal: groei.filiaal, overname: groei.neemOver
 };
 
 module.exports = { ACTIES };

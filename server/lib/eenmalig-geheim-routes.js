@@ -90,7 +90,11 @@ const ROUTES = new Set([
   'POST /api/bedrijf/mijn',
   'POST /api/bedrijf/sleutel/roteer',
   'POST /api/tenant/bootstrap/mijn',
-  'POST /api/account/start'
+  'POST /api/account/start',
+  /* De sleutel per Zaakdoos (kern/zaakdoos/sleutels.js): uitgeven is roteren, en
+     het antwoord draagt de kale sleutel die daarna alleen als hash bestaat. */
+  'POST /api/office/doos/sleutel',
+  'POST /api/supplier/doos/sleutel'
 ]);
 
 const isEenmalig = (methode, pad) => ROUTES.has(

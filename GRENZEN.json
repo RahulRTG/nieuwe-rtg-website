@@ -312,6 +312,7 @@
     "doos": [
       "afdelingen",
       "beveilig",
+      "doosSleutels",
       "zaakdoos"
     ],
     "doos-wacht": [],
@@ -570,6 +571,7 @@
       "werkplek"
     ],
     "kantoren": [
+      "doosSleutels",
       "entiteitRekeningStand",
       "entiteitRekeningZet",
       "afdelingen",
@@ -606,6 +608,7 @@
       "commercieRechten",
       "commercieRonde",
       "commercieVerrekening",
+      "findSupplier",
       "fonds",
       "geldAiInkoopZet",
       "geldBetaaldienst",
@@ -1997,6 +2000,7 @@
       "C",
       "DEMO",
       "DEMO_SUPPLIER",
+      "doosSleutels",
       "GROOTHANDEL_CATEGORIEEN",
       "H",
       "HK_STATUSES",

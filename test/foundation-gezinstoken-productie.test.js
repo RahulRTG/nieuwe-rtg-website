@@ -1,6 +1,8 @@
 /* De niet-gemigreerde gezins- en lesdragers zijn in productie DICHT, ook met een
-   geslaagd extern Foundation-dossier; en de Zaakdoos-kloon (de hele db.data) is
-   in productie dicht, met of zonder sleutel. CODECREDENTIALS.json:
+   geslaagd extern Foundation-dossier; en de gedeelde Zaakdoos-sleutel opent in
+   productie niets meer (B12): de kloon is dan 503 en de meting 403. Alleen de
+   eigen sleutel van een doos komt door (test/zaakdoos-productie.test.js).
+   CODECREDENTIALS.json:
    foundation.family_profile_token_buiten_harde_poort,
    foundation.onderwijs_les_tokens en devices.zaakdoos_sleutel.
 
@@ -112,6 +114,9 @@ test('echte productieserver: gezinstoken-, les- en klooneindpunten weigeren vÃ³Ã
   const lijf = await kloon.json();
   assert.equal(lijf.code, 'doos-kloon-productie-dicht');
   assert.equal(lijf.data, undefined, 'geen databasekloon in het antwoord');
+  const meting = await fetch(base + '/api/doos/meting', { method: 'POST', headers: { ...PROXY, 'x-doos-sleutel': SLEUTEL },
+    body: JSON.stringify({ doos: 'x', rtt: 1 }) });
+  assert.equal(meting.status, 403, 'de gedeelde sleutel opent in productie niets, ook met de juiste waarde');
 });
 
 test('buiten productie werken kloon en de gezinsdeur zoals voorheen', async t => {

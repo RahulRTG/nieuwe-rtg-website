@@ -83,7 +83,7 @@ test('de echte credentials uit de classificatieronde blokkeren de release', () =
   const echte = ['office.gedeelde_kantoorcode', 'partnerkanaal.personeels_en_partnercode',
     'horeca.bon_en_polsbandsaldo', 'link.capability_aanvaarden', 'travelos.ov_incheckcode',
     'mode.bezorgcode', 'workos.concern_uitnodiging', 'festivalos.toegangspas',
-    'magnaat.teamkamer_toegangscode', 'devices.zaakdoos_sleutel', 'identity.sso_client_secret',
+    'magnaat.teamkamer_toegangscode', 'identity.sso_client_secret',
     'rtfos.activiteit_incheckcode', 'office.kantooruitnodiging', 'service.balie_bevestigingscode',
     'foundation.onderwijs_les_tokens', 'foundation.family_profile_token_buiten_harde_poort',
     'eten.kortingscode'];

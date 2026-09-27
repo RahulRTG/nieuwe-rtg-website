@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-27T12:49:32.704Z",
-    "commit": "31e0dfd57",
+    "op": "2026-09-27T17:34:52.579Z",
+    "commit": "870fe4d0",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 2,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -6719,6 +6719,14 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
+    "onvervreemdbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/onvervreemdbaar.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
     "oog.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -6894,6 +6902,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "scherp": "gezakt"
+    },
+    "paspoortdeur.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
       "scherp": "gezakt"
     },
     "pasprijs.test.js": {

@@ -49,7 +49,7 @@ const DEFINITIES = Object.freeze({
   klantwaardeTravel: d27(1, 'KLANTWAARDE in TravelOS: een reis die thuis is, gemeld door het lid of het kantoor, in de maand van thuiskomst.',
     'Een bevestiging is een toezegging; pas thuis is de reis geleverd.'),
   klantwaardeWork: d27(1, 'KLANTWAARDE in WorkOS: een loonrun die definitief werd, in de maand van definitief maken; de groep is het aantal zaken.',
-    'Het loon is betaald zoals afgesproken; dat is wat een werkgever van het Werk OS wil.'),
+    'Het loon is definitief vastgesteld; of het geld ook is overgemaakt, zegt deze maat niet.'),
   klantwaardeFoundation: d27(1, 'KLANTWAARDE in FoundationOS: een hulpvraag die is afgerond met een hulpactie in het dossier, op de dag van afronden.',
     'Telt over gezinnen en nooit per gezin; de RTFoundation blijft haar eigen economische wereld (C1).')
 });

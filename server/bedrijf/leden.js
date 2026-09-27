@@ -84,23 +84,23 @@ module.exports = (sctx) => {
   /* De houder van een beheer- of lidsessie roteert of trekt hem zelf in
      (./sleutels.js). Productie heeft geen sessiesleutels: daar is het
      RTG-account de sleutel. */
-  function eigenSleutel(req, res) {
+  function soortVan(req, res) {
     if (PRODUCTIE) { res.status(404).json({ error: 'In productie is uw RTG-account de sleutel.' }); return null; }
     res.set('Cache-Control', 'no-store');
-    const beheer = !!String((req.body || {}).beheerToken || '');
-    const w = beheer ? beheerVan(req, res) : (lidVan(req, res) || {}).w;
-    return w ? { w, beheer, raw: beheer ? req.body.beheerToken : req.body.lidToken } : null;
+    return String((req.body || {}).beheerToken || '') ? 'beheer' : 'lid';
   }
   app.post('/api/bedrijf/sleutel/roteer', (req, res) => {
-    const s = eigenSleutel(req, res); if (!s) return;
-    const nieuw = sleutels.roteer(s.w, s.raw, s.beheer ? 'beheer' : 'lid');
+    const soort = soortVan(req, res); if (!soort) return;
+    const w = soort === 'beheer' ? beheerVan(req, res) : (lidVan(req, res) || {}).w; if (!w) return;
+    const nieuw = sleutels.roteer(w, req.body[soort + 'Token'], soort);
     save();
-    res.json({ ok: true, eenmalig: true, [s.beheer ? 'beheerToken' : 'lidToken']: nieuw,
+    res.json({ ok: true, eenmalig: true, [soort + 'Token']: nieuw,
       let: 'De vorige sleutel werkt niet meer. Deze wordt maar een keer getoond.' });
   });
   app.post('/api/bedrijf/sleutel/intrek', (req, res) => {
-    const s = eigenSleutel(req, res); if (!s) return;
-    sleutels.intrek(s.w, s.raw, s.beheer ? 'beheer' : 'lid');
+    const soort = soortVan(req, res); if (!soort) return;
+    const w = soort === 'beheer' ? beheerVan(req, res) : (lidVan(req, res) || {}).w; if (!w) return;
+    sleutels.intrek(w, req.body[soort + 'Token'], soort);
     save();
     res.json({ ok: true, let: 'Deze sleutel is ingetrokken. Andere sessies van hetzelfde lid blijven werken.' });
   });

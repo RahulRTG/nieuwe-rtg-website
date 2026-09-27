@@ -83,7 +83,9 @@ test('RTG Commerce: een lid vult zijn mand bij twee verkopers, leest dat RTG nie
       assert.ok(tweede, 'de zaaiset heeft een tweede verkoper met iets dat te kopen is');
 
       browser = await pw.chromium.launch(browserOpties(pw));
-      const ctx = await browser.newContext({ viewport: { width: 900, height: 900 } });
+      // Deze proef vertraagt echte netwerkresponses via page.route. Een actieve
+      // service worker kan die interceptie omzeilen; SW/offline heeft eigen tests.
+      const ctx = await browser.newContext({ viewport: { width: 900, height: 900 }, serviceWorkers: 'block' });
       await ctx.addInitScript((token) => {
         localStorage.setItem('rtg_member_token', token);
         localStorage.setItem('rtg_lang', 'nl');

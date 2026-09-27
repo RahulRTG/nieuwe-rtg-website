@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2072 bestanden en 14611 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2072 bestanden en 14608 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2072 |
-| losse beweringen (`test(...)`) | 14611 |
+| losse beweringen (`test(...)`) | 14608 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 174 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1418 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1808 bestanden, 14147 beweringen.
+1807 bestanden, 14143 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -884,6 +884,7 @@ toets omvalt.
 | `magnaatonderneming.test.js` | 12 | gezakt op `===->!==#0` | Magnaat V2 ONDERNEMING: wat er gebeurt als je bedrijf groter wordt dan jij. Personeel dat loon kost voordat de klant betaalt, planning over meer mensen, contracten met vaste uren, een leverancier die eerst geld wil,... |
 | `magnaatreis.test.js` | 2 | gezakt op `!==->===#0` | Magnaat V5: VOLLEDIGE REIZEN EN BELASTING. Een automatische speler (./lib-magnaatspeler.js) speelt het spel van een maandag met bijna niets tot zijn ontslag bij de keuken, op alle drie de moeilijkheden, en daarna... |
 | `magnaatspeelronde.test.js` | 7 | gezakt op `!==->===#0` | Magnaat na 1.0: DE SPEELRONDE MET MENSEN (./server/kern/magnaat-leven/oordeel.js). Op drie momenten vraagt het spel hoe het speelt. |
+| `magnaatstad.test.js` | 8 | gezakt op `liegpoort /api/` | Magnaat na 1.0: SAMEN IN EEN OUDWIJK (./server/kern/magnaat-leven/stad.js). Twee tot vier spelers in een stad, ieder met een eigen leven en eigen boeken. |
 | `magnaatstart.test.js` | 8 | gezakt op `!==->===#0` | Magnaat na 1.0: WAAR JE BEGINT (regels.js, STARTPOSITIES). Niet iedereen begint in de keuken. |
 | `magnaatwereld.test.js` | 20 | gezakt op `!==->===#0` | Magnaat Wereld: alle functies zijn speelbaar, maar de spelbrug raakt nooit productie. De Future Engine stelt voor; een mens bepaalt iedere fase. |
 | `mail-eigen.test.js` | 18 | gezakt op `===->!==#0` | Eigen post: DKIM-ondertekening (server/dkim.js) en directe bezorging bij de mailserver van de ontvanger (server/smtp-direct.js), plus de koppeling in server/mail.js. Waar dit op let, in volgorde van belang: 1. |
@@ -1094,7 +1095,6 @@ toets omvalt.
 | `ontvanger.test.js` | 9 | gezakt op `===->!==#0` | DE ONTVANGEROPLOSSING -- wie krijgt een bericht, en wat als niemand het kreeg. server/kern/ontvanger.js vervangt `if (!a.key) return;` in kern/werk.js. |
 | `ontwerp.test.js` | 9 | geen module gevonden | RTG Interface Operating Standard: de visuele regels uit ONTWERP.md, machinaal gehandhaafd. Waarom deze toets bestaat. |
 | `ontwerpbank.test.js` | 5 | gezakt op `+->-#0` | DE GEDEELDE REKENKERN VAN DE VIER ONTWERPBANKEN. hash, kies en palet stonden byte voor byte gelijk in kern/architect/bank.js, kern/atelier/bank.js, kern/hardwarelab/bank.js en kern/studio/bank.js. |
-| `onvervreemdbaar.test.js` | 7 | gezakt op `===->!==#0` | DE UNIVERSELE BODEM -- de nulmeting, en vooral wat zij niet mag beweren. scripts/onvervreemdbaar.js vraagt voor SAMENLEVING.md SAM-01 of een werkwoord van de bodem (leren, ontwikkelen, orienteren, verbinden, rust,... |
 | `oog.test.js` | 4 | gezakt op `liegpoort /api/` | RTG Eye: de camerabril van de werkvloer. De visielaag draait op het toestel; de server bewaart compacte, gecodeerde regels: nulmetingen en schouwen per voertuig, aangeleerde spullen en het knoploze uitgifteregister... |
 | `openbare-bouwstand.test.js` | 12 | gezakt op `true->false#0` | De grendel op een OPENBARE installatie die in Magnaat Test draait. WAAR HIJ VANDAAN KOMT. |
 | `oplaadgat.test.js` | 4 | gezakt op `===->!==#0` | AFGESCHREVEN MOET BIJGESCHREVEN WORDEN. WAT ER MISGING. |
@@ -1127,7 +1127,6 @@ toets omvalt.
 | `pas-escalatie.test.js` | 5 | gezakt op `liegpoort /api/` | Merkregel-poort: de Lifestyle- en Business Pass komen UITSLUITEND na een menselijk besluit. Zelf-registreren mag ze nooit geven -- eerder gaf het tier-veld bij /api/auth/register direct een Business Pass (gevonden... |
 | `pasladder.test.js` | 9 | -- | DE LADDER: vijf treden, elk met een bodem. Het besluit van 20 augustus 2026 zet een MKB-laag tussen consument en enterprise (Business Lite, 150 euro) en maakt de twee bovenste treden contractueel met een "vanaf". |
 | `paspoort.test.js` | 11 | gezakt op `liegpoort /api/` | End-to-end tests voor de paspoort-/identiteitslaag (kern/paspoort.js): het gecontroleerde, toestemmingsgestuurde kanaal waarlangs een partner de identiteit achter een codenaam opvraagt. Dekt: de directe... |
-| `paspoortdeur.test.js` | 5 | gezakt op `liegpoort /api/` | DE DEUR VAN DE UNIVERSELE BODEM (server/kern/onvervreemdbaar.js), tegen een echte server. Het besluit van 27 september 2026 (SAMENLEVING.md, besluit 4c): een afspraak bij de gemeente, aangifte bij de overheid en een... |
 | `pasprijs.test.js` | 6 | gezakt op `===->!==#0` | WAT KOST EEN PAS PER MAAND? EEN ANTWOORD. |
 | `pasroutes.test.js` | 5 | -- | De pasroutes: deuren die om een betaalde pas vragen. De eenvoudigste van de vijf verfijningen -- geen account, geen persoon, geen geverifieerde identiteit, gewoon een andere pas. |
 | `passkeys-eerste.test.js` | 4 | -- | HET PASSKEY-SCHERM VOOR WIE ER NOG GEEN HEEFT. WAAROM DIT BESTAAT. |
@@ -1848,7 +1847,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-264 bestanden, 464 beweringen.
+265 bestanden, 465 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1981,6 +1980,7 @@ toets omvalt.
 | `magnaatleven.e2e.js` | 1 | gezakt op `liegpoort /api/` | MAGNAAT FROM ZERO IN EEN ECHTE BROWSER: van de voorzijde naar Vandaag, en de eerste dag met de Edge als bediening -- kiezen wat je maakt, tijd plannen in je agenda, een blok schrappen, en de dag afsluiten. Wat deze... |
 | `magnaatonderneming.e2e.js` | 1 | gezakt op `liegpoort /api/` | MAGNAAT V2 ONDERNEMING IN EEN ECHTE BROWSER. Het leven wordt eerst via de gewone route tot een ingeschreven onderneming gespeeld (dezelfde handelingen die een speler doet); daarna gaat het in de browser verder:... |
 | `magnaatspeelronde.e2e.js` | 1 | gezakt op `liegpoort /api/` | Magnaat na 1.0, DE SPEELRONDE IN EEN ECHTE BROWSER EN TEGEN EEN ECHTE SERVER. Een kantoormens op naam opent het Magnaat-kantoor en ziet het blok "Hoe spelers de balans ervaren": eerst leeg met de uitleg, en daarna --... |
+| `magnaatstad.e2e.js` | 1 | gezakt op `liegpoort /api/` | Magnaat na 1.0, SAMEN IN EEN OUDWIJK IN TWEE ECHTE BROWSERS, op telefoons. Speler A maakt onder Wereld een stad en krijgt een code; speler B doet mee met die code; A begint. |
 | `magnaatstart.e2e.js` | 1 | gezakt op `liegpoort /api/` | Magnaat na 1.0, WAAR JE BEGINT IN EEN ECHTE BROWSER, op een telefoon. Op dag 1 kies je via de handelingen een kleine erfenis en staat het geld van je tante op de bank; daarna begin je onder Wereld opnieuw als... |
 | `media-studio-pro.e2e.js` | 1 | -- | De Studio Pro met een echt bronbestand. Deze toets controleert de keten die voor een maker telt: openen, beeld tekenen, niet-destructief bewerken, herstellen, ondertitelen en een watermerkvrije master downloaden. |
 | `media.e2e.js` | 1 | -- | CAMERA EN MICROFOON ZOALS EEN BROWSER ZE ERVAART. WAAROM DEZE TOETS BESTAAT. |

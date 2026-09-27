@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T16:22:39.231Z",
-    "commit": "51e9e2a2",
+    "op": "2026-09-27T16:32:40.898Z",
+    "commit": "054e2aad",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/onvervreemdbaar.js",
@@ -63,6 +63,7 @@
       },
       "zonderAccount": "dicht",
       "bezoeker": "open",
+      "achterPaspoortcontrole": false,
       "routes": [
         {
           "route": "POST /api/leerstof/antwoord",
@@ -70,6 +71,7 @@
           "gratis": 400,
           "rtg": 400,
           "bezoeker": 400,
+          "zonderControle": 400,
           "redenGratis": "Begin eerst een oefensessie."
         },
         {
@@ -77,7 +79,8 @@
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/leerstof/examen",
@@ -85,6 +88,7 @@
           "gratis": 400,
           "rtg": 400,
           "bezoeker": 400,
+          "zonderControle": 400,
           "redenGratis": "Voor deze fase is er (nog) geen examentraining. Kies een fase uit het voortgezet of vervolgonderwijs."
         },
         {
@@ -93,6 +97,7 @@
           "gratis": 400,
           "rtg": 400,
           "bezoeker": 400,
+          "zonderControle": 400,
           "redenGratis": "Begin eerst een examentraining."
         },
         {
@@ -101,6 +106,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 404,
+          "zonderControle": 404,
           "redenGratis": "Dat leerdoel staat niet in de leerlijn."
         },
         {
@@ -108,7 +114,8 @@
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/leerstof/les",
@@ -116,6 +123,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 404,
+          "zonderControle": 404,
           "redenGratis": "Dat leerdoel staat niet in de leerlijn."
         },
         {
@@ -124,6 +132,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 404,
+          "zonderControle": 404,
           "redenGratis": "Dat leerdoel staat niet in de leerlijn."
         }
       ]
@@ -145,20 +154,23 @@
       },
       "zonderAccount": "dicht",
       "bezoeker": "open",
+      "achterPaspoortcontrole": false,
       "routes": [
         {
           "route": "POST /api/onderwijs/advies",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/onderwijs/bewijs",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/onderwijs/doel",
@@ -166,6 +178,7 @@
           "gratis": 400,
           "rtg": 400,
           "bezoeker": 400,
+          "zonderControle": 400,
           "redenGratis": "Geef een geldig leerdoel-id."
         },
         {
@@ -174,6 +187,7 @@
           "gratis": 400,
           "rtg": 400,
           "bezoeker": 400,
+          "zonderControle": 400,
           "redenGratis": "Die fase staat niet op de ladder."
         },
         {
@@ -182,6 +196,7 @@
           "gratis": 400,
           "rtg": 400,
           "bezoeker": 400,
+          "zonderControle": 400,
           "redenGratis": "Schrijf eerst in op een fase."
         },
         {
@@ -189,14 +204,16 @@
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/onderwijs/mijn",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         }
       ]
     },
@@ -217,13 +234,15 @@
       },
       "zonderAccount": "dicht",
       "bezoeker": "open",
+      "achterPaspoortcontrole": false,
       "routes": [
         {
           "route": "POST /api/bijles/gesprek",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/bijles/vraag",
@@ -231,6 +250,7 @@
           "gratis": 400,
           "rtg": 400,
           "bezoeker": 400,
+          "zonderControle": 400,
           "redenGratis": "Stel eerst je vraag."
         }
       ]
@@ -252,20 +272,23 @@
       },
       "zonderAccount": "dicht",
       "bezoeker": "open",
+      "achterPaspoortcontrole": false,
       "routes": [
         {
           "route": "POST /api/connect/dossier",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/connect/horizon",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/connect/kring",
@@ -273,6 +296,7 @@
           "gratis": 400,
           "rtg": 400,
           "bezoeker": 400,
+          "zonderControle": 400,
           "redenGratis": "Die kring bestaat niet. Kies uit: alleenIk, gezin, team, community, publiek."
         },
         {
@@ -280,7 +304,8 @@
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/connect/naklank",
@@ -288,6 +313,7 @@
           "gratis": 400,
           "rtg": 400,
           "bezoeker": 400,
+          "zonderControle": 400,
           "redenGratis": "Die naklank bestaat niet. Kies uit: mooi, geleerd, geprobeerd, gemaakt, doorgegeven, geholpen."
         },
         {
@@ -295,14 +321,16 @@
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/connect/naklank/weg",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/connect/noteer",
@@ -310,6 +338,7 @@
           "gratis": 400,
           "rtg": 400,
           "bezoeker": 400,
+          "zonderControle": 400,
           "redenGratis": "Die trede bestaat niet. Kies uit: gezien, gelezen, begrepen, geoefend, toegepast, gemaakt, aangeboden, bereikt, gebruikt"
         }
       ]
@@ -331,6 +360,7 @@
       },
       "zonderAccount": "open",
       "bezoeker": "open",
+      "achterPaspoortcontrole": false,
       "routes": [
         {
           "route": "POST /api/carriere/ledger/deel",
@@ -338,6 +368,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 404,
+          "zonderControle": 404,
           "redenGratis": "Dit feit staat niet in uw ledger."
         },
         {
@@ -345,7 +376,8 @@
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/carriere/ledger/intrek",
@@ -353,6 +385,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 404,
+          "zonderControle": 404,
           "redenGratis": "Deze regel staat niet in dit ledger."
         },
         {
@@ -360,7 +393,8 @@
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/carriere/ledger/stopdelen",
@@ -368,6 +402,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 404,
+          "zonderControle": 404,
           "redenGratis": "Deze deelcode kennen wij niet."
         },
         {
@@ -376,6 +411,7 @@
           "gratis": 400,
           "rtg": 400,
           "bezoeker": 400,
+          "zonderControle": 400,
           "redenGratis": "Kies waar dit bij hoort: vermogen, netwerk, publiek, financieel, eigendom, bewijs, reputatie."
         },
         {
@@ -384,6 +420,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 404,
+          "zonderControle": 404,
           "redenGratis": "Deze code doet niets meer."
         }
       ]
@@ -405,6 +442,7 @@
       },
       "zonderAccount": "dicht",
       "bezoeker": "open",
+      "achterPaspoortcontrole": false,
       "routes": [
         {
           "route": "POST /api/member/apply",
@@ -412,6 +450,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 404,
+          "zonderControle": 404,
           "redenGratis": "Partner niet gevonden."
         },
         {
@@ -420,6 +459,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 404,
+          "zonderControle": 404,
           "redenGratis": "Chat niet gevonden."
         },
         {
@@ -428,6 +468,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 404,
+          "zonderControle": 404,
           "redenGratis": "Chat niet gevonden."
         },
         {
@@ -435,7 +476,8 @@
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         }
       ]
     },
@@ -456,13 +498,15 @@
       },
       "zonderAccount": "dicht",
       "bezoeker": "open",
+      "achterPaspoortcontrole": false,
       "routes": [
         {
           "route": "POST /api/doelen",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/doelen/maak",
@@ -470,6 +514,7 @@
           "gratis": 400,
           "rtg": 400,
           "bezoeker": 400,
+          "zonderControle": 400,
           "redenGratis": "Waar gaat dit doel over?"
         },
         {
@@ -478,6 +523,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 404,
+          "zonderControle": 404,
           "redenGratis": "Dit doel staat niet op uw naam."
         },
         {
@@ -486,6 +532,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 404,
+          "zonderControle": 404,
           "redenGratis": "Dit doel staat niet op uw naam."
         },
         {
@@ -494,6 +541,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 404,
+          "zonderControle": 404,
           "redenGratis": "Dit doel staat niet op uw naam."
         }
       ]
@@ -515,13 +563,15 @@
       },
       "zonderAccount": "dicht",
       "bezoeker": "open",
+      "achterPaspoortcontrole": false,
       "routes": [
         {
           "route": "POST /api/gewoonten",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/gewoonten/maak",
@@ -529,6 +579,7 @@
           "gratis": 400,
           "rtg": 400,
           "bezoeker": 400,
+          "zonderControle": 400,
           "redenGratis": "Wat wilt u vaker doen?"
         },
         {
@@ -537,6 +588,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 404,
+          "zonderControle": 404,
           "redenGratis": "Deze gewoonte staat niet op uw naam."
         },
         {
@@ -545,6 +597,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 404,
+          "zonderControle": 404,
           "redenGratis": "Deze gewoonte staat niet op uw naam."
         },
         {
@@ -553,6 +606,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 404,
+          "zonderControle": 404,
           "redenGratis": "Deze gewoonte staat niet op uw naam."
         }
       ]
@@ -574,6 +628,7 @@
       },
       "zonderAccount": "dicht",
       "bezoeker": "dicht",
+      "achterPaspoortcontrole": false,
       "routes": [
         {
           "route": "POST /api/metier/aanbeveling-intrekken",
@@ -581,6 +636,7 @@
           "gratis": 400,
           "rtg": 400,
           "bezoeker": 403,
+          "zonderControle": 400,
           "redenGratis": "Deze aanbeveling is niet van jou."
         },
         {
@@ -589,6 +645,7 @@
           "gratis": 400,
           "rtg": 400,
           "bezoeker": 403,
+          "zonderControle": 400,
           "redenGratis": "Deze aanbeveling staat niet op jouw profiel."
         },
         {
@@ -596,21 +653,24 @@
           "stand": "open",
           "gratis": 400,
           "rtg": 400,
-          "bezoeker": 403
+          "bezoeker": 403,
+          "zonderControle": 400
         },
         {
           "route": "POST /api/metier/ai/oefen",
           "stand": "open",
           "gratis": 400,
           "rtg": 400,
-          "bezoeker": 403
+          "bezoeker": 403,
+          "zonderControle": 400
         },
         {
           "route": "POST /api/metier/ai/profiel",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 403
+          "bezoeker": 403,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/metier/beveel-aan",
@@ -618,6 +678,7 @@
           "gratis": 400,
           "rtg": 400,
           "bezoeker": 403,
+          "zonderControle": 400,
           "redenGratis": "Dit lid ken ik niet."
         },
         {
@@ -625,14 +686,16 @@
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 403
+          "bezoeker": 403,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/metier/kaart",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 403
+          "bezoeker": 403,
+          "zonderControle": 200
         }
       ]
     },
@@ -653,6 +716,7 @@
       },
       "zonderAccount": "dicht",
       "bezoeker": "open",
+      "achterPaspoortcontrole": false,
       "routes": [
         {
           "route": "POST /api/knelpunt",
@@ -660,6 +724,7 @@
           "gratis": 400,
           "rtg": 400,
           "bezoeker": 400,
+          "zonderControle": 400,
           "redenGratis": "Waar wilt u naartoe? Zonder doel is er niets om wegen naartoe te zoeken."
         }
       ]
@@ -681,6 +746,7 @@
       },
       "zonderAccount": "dicht",
       "bezoeker": "open",
+      "achterPaspoortcontrole": false,
       "routes": [
         {
           "route": "POST /api/knelpunt",
@@ -688,6 +754,7 @@
           "gratis": 400,
           "rtg": 400,
           "bezoeker": 400,
+          "zonderControle": 400,
           "redenGratis": "Waar wilt u naartoe? Zonder doel is er niets om wegen naartoe te zoeken."
         }
       ]
@@ -709,20 +776,23 @@
       },
       "zonderAccount": "dicht",
       "bezoeker": "open",
+      "achterPaspoortcontrole": false,
       "routes": [
         {
           "route": "POST /api/connect/dossier",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/connect/horizon",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/connect/kring",
@@ -730,6 +800,7 @@
           "gratis": 400,
           "rtg": 400,
           "bezoeker": 400,
+          "zonderControle": 400,
           "redenGratis": "Die kring bestaat niet. Kies uit: alleenIk, gezin, team, community, publiek."
         },
         {
@@ -737,7 +808,8 @@
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/connect/naklank",
@@ -745,6 +817,7 @@
           "gratis": 400,
           "rtg": 400,
           "bezoeker": 400,
+          "zonderControle": 400,
           "redenGratis": "Die naklank bestaat niet. Kies uit: mooi, geleerd, geprobeerd, gemaakt, doorgegeven, geholpen."
         },
         {
@@ -752,14 +825,16 @@
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/connect/naklank/weg",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/connect/noteer",
@@ -767,6 +842,7 @@
           "gratis": 400,
           "rtg": 400,
           "bezoeker": 400,
+          "zonderControle": 400,
           "redenGratis": "Die trede bestaat niet. Kies uit: gezien, gelezen, begrepen, geoefend, toegepast, gemaakt, aangeboden, bereikt, gebruikt"
         }
       ]
@@ -788,6 +864,7 @@
       },
       "zonderAccount": "open",
       "bezoeker": "open",
+      "achterPaspoortcontrole": false,
       "routes": [
         {
           "route": "POST /api/gids/app",
@@ -795,6 +872,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 404,
+          "zonderControle": 404,
           "redenGratis": "Voor deze pagina is geen gids."
         }
       ]
@@ -816,20 +894,23 @@
       },
       "zonderAccount": "dicht",
       "bezoeker": "open",
+      "achterPaspoortcontrole": false,
       "routes": [
         {
           "route": "POST /api/opvang",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/opvang/mijn",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/opvang/vraag",
@@ -837,6 +918,7 @@
           "gratis": 403,
           "rtg": 404,
           "bezoeker": 403,
+          "zonderControle": 403,
           "redenGratis": "Een aanvraag klaarzetten kan met een lidmaatschap."
         },
         {
@@ -845,6 +927,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 404,
+          "zonderControle": 404,
           "redenGratis": "Deze opvang bestaat niet."
         }
       ]
@@ -877,13 +960,15 @@
       },
       "zonderAccount": "dicht",
       "bezoeker": "open",
+      "achterPaspoortcontrole": false,
       "routes": [
         {
           "route": "POST /api/chat/history",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/chat/send",
@@ -891,6 +976,7 @@
           "gratis": 400,
           "rtg": 400,
           "bezoeker": 403,
+          "zonderControle": 400,
           "redenGratis": "Leeg bericht."
         },
         {
@@ -899,6 +985,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 404,
+          "zonderControle": 404,
           "redenGratis": "Post niet gevonden."
         },
         {
@@ -906,7 +993,8 @@
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 403
+          "bezoeker": 403,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/klets/gesprek",
@@ -914,6 +1002,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 403,
+          "zonderControle": 404,
           "redenGratis": "Dit gesprek bestaat niet (meer)."
         },
         {
@@ -922,6 +1011,7 @@
           "gratis": 400,
           "rtg": 400,
           "bezoeker": 403,
+          "zonderControle": 400,
           "redenGratis": "Kies een vriend."
         },
         {
@@ -929,7 +1019,8 @@
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 403
+          "bezoeker": 403,
+          "zonderControle": 200
         }
       ]
     },
@@ -950,27 +1041,31 @@
       },
       "zonderAccount": "dicht",
       "bezoeker": "open",
+      "achterPaspoortcontrole": false,
       "routes": [
         {
           "route": "POST /api/salon/ai/bijschrift",
           "stand": "open",
           "gratis": 400,
           "rtg": 400,
-          "bezoeker": 403
+          "bezoeker": 403,
+          "zonderControle": 400
         },
         {
           "route": "POST /api/salon/ai/reacties",
           "stand": "open",
           "gratis": 400,
           "rtg": 400,
-          "bezoeker": 403
+          "bezoeker": 403,
+          "zonderControle": 400
         },
         {
           "route": "POST /api/salon/ai/waarover",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/salon/archiveer",
@@ -978,6 +1073,7 @@
           "gratis": 400,
           "rtg": 400,
           "bezoeker": 403,
+          "zonderControle": 400,
           "redenGratis": "Deze post bestaat niet."
         },
         {
@@ -986,6 +1082,7 @@
           "gratis": 400,
           "rtg": 400,
           "bezoeker": 403,
+          "zonderControle": 400,
           "redenGratis": "Deze post bestaat niet."
         },
         {
@@ -993,7 +1090,8 @@
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 403
+          "bezoeker": 403,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/salon/deal/claim",
@@ -1001,6 +1099,7 @@
           "gratis": 403,
           "rtg": 400,
           "bezoeker": 403,
+          "zonderControle": 403,
           "redenGratis": "Alleen voor leden."
         },
         {
@@ -1009,6 +1108,7 @@
           "gratis": 403,
           "rtg": 400,
           "bezoeker": 403,
+          "zonderControle": 403,
           "redenGratis": "Alleen voor leden."
         }
       ]
@@ -1031,6 +1131,7 @@
       },
       "zonderAccount": "dicht",
       "bezoeker": "dicht",
+      "achterPaspoortcontrole": false,
       "routes": [
         {
           "route": "POST /api/member/connect",
@@ -1038,6 +1139,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 403,
+          "zonderControle": 404,
           "redenGratis": "Deze codenaam kennen we niet."
         },
         {
@@ -1046,6 +1148,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 403,
+          "zonderControle": 404,
           "redenGratis": "Er staat geen verzoek van jou open bij deze codenaam."
         },
         {
@@ -1054,6 +1157,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 403,
+          "zonderControle": 404,
           "redenGratis": "Geen openstaand verzoek van deze codenaam."
         },
         {
@@ -1061,7 +1165,8 @@
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 403
+          "bezoeker": 403,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/member/pin/actie/opties",
@@ -1069,6 +1174,7 @@
           "gratis": 400,
           "rtg": 400,
           "bezoeker": 403,
+          "zonderControle": 400,
           "redenGratis": "Onbekende PIN-veiligheidshandeling."
         },
         {
@@ -1077,6 +1183,7 @@
           "gratis": 400,
           "rtg": 400,
           "bezoeker": 403,
+          "zonderControle": 400,
           "redenGratis": "Ongeldige RTG PIN."
         },
         {
@@ -1084,7 +1191,8 @@
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 403
+          "bezoeker": 403,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/member/pin/live/kijk",
@@ -1092,6 +1200,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 403,
+          "zonderControle": 404,
           "redenGratis": "Deze code is verlopen of hoort bij niemand. Laat een verse code tonen."
         }
       ]
@@ -1113,48 +1222,55 @@
       },
       "zonderAccount": "dicht",
       "bezoeker": "dicht",
+      "achterPaspoortcontrole": false,
       "routes": [
         {
           "route": "POST /api/sociaal/actielog",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 403
+          "bezoeker": 403,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/sociaal/beleid",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 403
+          "bezoeker": 403,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/sociaal/beleid/zet",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 403
+          "bezoeker": 403,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/sociaal/command",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 403
+          "bezoeker": 403,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/sociaal/graaf",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 403
+          "bezoeker": 403,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/sociaal/lijn",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 403
+          "bezoeker": 403,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/sociaal/object",
@@ -1162,6 +1278,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 403,
+          "zonderControle": 404,
           "redenGratis": "Dit vinden we niet."
         },
         {
@@ -1170,6 +1287,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 403,
+          "zonderControle": 404,
           "redenGratis": "Dit vinden we niet."
         }
       ]
@@ -1191,6 +1309,7 @@
       },
       "zonderAccount": "dicht",
       "bezoeker": "dicht",
+      "achterPaspoortcontrole": false,
       "routes": [
         {
           "route": "POST /api/rtfos/ruil/interesse",
@@ -1198,6 +1317,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 403,
+          "zonderControle": 404,
           "redenGratis": "Dit aanbod bestaat niet (meer)."
         },
         {
@@ -1206,6 +1326,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 403,
+          "zonderControle": 404,
           "redenGratis": "Deze stadsafdeling kennen we niet."
         },
         {
@@ -1214,6 +1335,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 403,
+          "zonderControle": 404,
           "redenGratis": "Dit aanbod bestaat niet (meer)."
         },
         {
@@ -1221,7 +1343,8 @@
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 403
+          "bezoeker": 403,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/rtfos/ruil/plaats",
@@ -1229,6 +1352,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 403,
+          "zonderControle": 404,
           "redenGratis": "Deze stadsafdeling kennen we niet."
         },
         {
@@ -1237,6 +1361,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 403,
+          "zonderControle": 404,
           "redenGratis": "Dit aanbod bestaat niet (meer)."
         }
       ]
@@ -1258,6 +1383,7 @@
       },
       "zonderAccount": "dicht",
       "bezoeker": "dicht",
+      "achterPaspoortcontrole": false,
       "routes": [
         {
           "route": "POST /api/samen/chat",
@@ -1265,6 +1391,7 @@
           "gratis": 403,
           "rtg": 404,
           "bezoeker": 403,
+          "zonderControle": 403,
           "redenGratis": "Samen-sessies zijn voor leden."
         },
         {
@@ -1273,6 +1400,7 @@
           "gratis": 403,
           "rtg": 404,
           "bezoeker": 403,
+          "zonderControle": 403,
           "redenGratis": "Samen-sessies zijn voor leden."
         },
         {
@@ -1281,6 +1409,7 @@
           "gratis": 403,
           "rtg": 200,
           "bezoeker": 403,
+          "zonderControle": 403,
           "redenGratis": "Samen-sessies zijn voor leden."
         },
         {
@@ -1289,6 +1418,7 @@
           "gratis": 403,
           "rtg": 404,
           "bezoeker": 403,
+          "zonderControle": 403,
           "redenGratis": "Samen-sessies zijn voor leden."
         },
         {
@@ -1297,6 +1427,7 @@
           "gratis": 403,
           "rtg": 404,
           "bezoeker": 403,
+          "zonderControle": 403,
           "redenGratis": "Samen-sessies zijn voor leden."
         },
         {
@@ -1305,6 +1436,7 @@
           "gratis": 403,
           "rtg": 404,
           "bezoeker": 403,
+          "zonderControle": 403,
           "redenGratis": "Samen-sessies zijn voor leden."
         },
         {
@@ -1313,6 +1445,7 @@
           "gratis": 403,
           "rtg": 404,
           "bezoeker": 403,
+          "zonderControle": 403,
           "redenGratis": "Samen-sessies zijn voor leden."
         },
         {
@@ -1321,6 +1454,7 @@
           "gratis": 403,
           "rtg": 200,
           "bezoeker": 403,
+          "zonderControle": 403,
           "redenGratis": "Samen-sessies zijn voor leden."
         }
       ]
@@ -1342,13 +1476,15 @@
       },
       "zonderAccount": "dicht",
       "bezoeker": "open",
+      "achterPaspoortcontrole": false,
       "routes": [
         {
           "route": "POST /api/veiligheid/rust",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/veiligheid/rust/aan",
@@ -1356,6 +1492,7 @@
           "gratis": 400,
           "rtg": 400,
           "bezoeker": 400,
+          "zonderControle": 400,
           "redenGratis": "Deze stand kennen we niet."
         },
         {
@@ -1363,7 +1500,8 @@
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         }
       ]
     },
@@ -1384,13 +1522,15 @@
       },
       "zonderAccount": "dicht",
       "bezoeker": "open",
+      "achterPaspoortcontrole": false,
       "routes": [
         {
           "route": "POST /api/gemoed",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/gemoed/weg",
@@ -1398,6 +1538,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 404,
+          "zonderControle": 404,
           "redenGratis": "Voor die dag staat er niets."
         },
         {
@@ -1406,6 +1547,7 @@
           "gratis": 400,
           "rtg": 400,
           "bezoeker": 400,
+          "zonderControle": 400,
           "redenGratis": "Kies hoe u erbij zit."
         }
       ]
@@ -1427,13 +1569,15 @@
       },
       "zonderAccount": "dicht",
       "bezoeker": "open",
+      "achterPaspoortcontrole": false,
       "routes": [
         {
           "route": "POST /api/gedachten",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/gedachten/weg",
@@ -1441,6 +1585,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 404,
+          "zonderControle": 404,
           "redenGratis": "Die notitie staat niet in uw boek."
         },
         {
@@ -1449,6 +1594,7 @@
           "gratis": 400,
           "rtg": 400,
           "bezoeker": 400,
+          "zonderControle": 400,
           "redenGratis": "Er staat nog niets in."
         }
       ]
@@ -1470,6 +1616,7 @@
       },
       "zonderAccount": "dicht",
       "bezoeker": "open",
+      "achterPaspoortcontrole": false,
       "routes": [
         {
           "route": "POST /api/service/bel",
@@ -1477,6 +1624,7 @@
           "gratis": 403,
           "rtg": 403,
           "bezoeker": 403,
+          "zonderControle": 403,
           "redenGratis": "Bellen hoort bij de Lifestyle Pass en de Business Pass."
         },
         {
@@ -1485,6 +1633,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 404,
+          "zonderControle": 404,
           "redenGratis": "Deze oproep kennen wij niet."
         },
         {
@@ -1492,7 +1641,8 @@
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/service/bel/signaal",
@@ -1500,6 +1650,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 404,
+          "zonderControle": 404,
           "redenGratis": "Deze oproep kennen wij niet."
         },
         {
@@ -1508,6 +1659,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 404,
+          "zonderControle": 404,
           "redenGratis": "Deze zaak kennen wij niet."
         },
         {
@@ -1516,6 +1668,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 404,
+          "zonderControle": 404,
           "redenGratis": "Dit verzoek kennen wij niet."
         },
         {
@@ -1523,14 +1676,16 @@
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/service/keuzes",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         }
       ]
     },
@@ -1551,6 +1706,7 @@
       },
       "zonderAccount": "open",
       "bezoeker": "open",
+      "achterPaspoortcontrole": false,
       "routes": [
         {
           "route": "POST /api/bescherming/deur/intrekken",
@@ -1558,6 +1714,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 404,
+          "zonderControle": 404,
           "redenGratis": "Deze code kennen wij niet."
         },
         {
@@ -1566,6 +1723,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 404,
+          "zonderControle": 404,
           "redenGratis": "Deze code kennen wij niet. Kijk hem na, of begin opnieuw."
         },
         {
@@ -1574,6 +1732,7 @@
           "gratis": 400,
           "rtg": 400,
           "bezoeker": 400,
+          "zonderControle": 400,
           "redenGratis": "Kies een plaats uit de lijst. Alleen daar kan iemand dit oppakken."
         },
         {
@@ -1581,7 +1740,8 @@
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         }
       ]
     },
@@ -1602,13 +1762,15 @@
       },
       "zonderAccount": "dicht",
       "bezoeker": "open",
+      "achterPaspoortcontrole": false,
       "routes": [
         {
           "route": "POST /api/noodkaart",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/noodkaart/weg",
@@ -1616,6 +1778,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 404,
+          "zonderControle": 404,
           "redenGratis": "U heeft geen noodkaart."
         },
         {
@@ -1623,7 +1786,8 @@
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         }
       ]
     },
@@ -1637,28 +1801,31 @@
       ],
       "stand": "deels-achter-betaling",
       "telling": {
-        "open": 2,
-        "achter-betaling": 2,
+        "open": 3,
+        "achter-betaling": 1,
         "ook-rtg-geweigerd": 4,
         "onbepaald": 0
       },
       "zonderAccount": "dicht",
       "bezoeker": "open",
+      "achterPaspoortcontrole": true,
       "routes": [
         {
           "route": "POST /api/overheid/aangifte",
-          "stand": "achter-betaling",
-          "gratis": 403,
+          "stand": "open",
+          "gratis": 400,
           "rtg": 400,
           "bezoeker": 403,
-          "redenGratis": "Alleen voor leden."
+          "zonderControle": 403,
+          "redenGratis": "Vul je bruto jaarinkomen in."
         },
         {
           "route": "POST /api/overheid/aangifte/advies",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/overheid/aanslag/betaal",
@@ -1666,6 +1833,7 @@
           "gratis": 403,
           "rtg": 404,
           "bezoeker": 403,
+          "zonderControle": 403,
           "redenGratis": "Alleen voor leden."
         },
         {
@@ -1673,7 +1841,8 @@
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/overheid/bd/aanslagen",
@@ -1681,6 +1850,7 @@
           "gratis": 401,
           "rtg": 401,
           "bezoeker": 401,
+          "zonderControle": 401,
           "redenGratis": "Niet ingelogd als leverancier."
         },
         {
@@ -1689,6 +1859,7 @@
           "gratis": 401,
           "rtg": 401,
           "bezoeker": 401,
+          "zonderControle": 401,
           "redenGratis": "Niet ingelogd als leverancier."
         },
         {
@@ -1697,6 +1868,7 @@
           "gratis": 401,
           "rtg": 401,
           "bezoeker": 401,
+          "zonderControle": 401,
           "redenGratis": "Niet ingelogd als leverancier."
         },
         {
@@ -1705,6 +1877,7 @@
           "gratis": 401,
           "rtg": 401,
           "bezoeker": 401,
+          "zonderControle": 401,
           "redenGratis": "Niet ingelogd als leverancier."
         }
       ]
@@ -1719,21 +1892,23 @@
       ],
       "stand": "deels-achter-betaling",
       "telling": {
-        "open": 4,
-        "achter-betaling": 2,
+        "open": 5,
+        "achter-betaling": 1,
         "ook-rtg-geweigerd": 2,
         "onbepaald": 0
       },
       "zonderAccount": "dicht",
       "bezoeker": "open",
+      "achterPaspoortcontrole": true,
       "routes": [
         {
           "route": "POST /api/gemeente/afspraak",
-          "stand": "achter-betaling",
-          "gratis": 403,
+          "stand": "open",
+          "gratis": 400,
           "rtg": 400,
           "bezoeker": 403,
-          "redenGratis": "Alleen voor leden."
+          "zonderControle": 403,
+          "redenGratis": "Kies een balieproduct."
         },
         {
           "route": "POST /api/gemeente/afspraak/annuleer",
@@ -1741,6 +1916,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 404,
+          "zonderControle": 404,
           "redenGratis": "Afspraak niet gevonden."
         },
         {
@@ -1749,6 +1925,7 @@
           "gratis": 401,
           "rtg": 401,
           "bezoeker": 401,
+          "zonderControle": 401,
           "redenGratis": "Niet ingelogd als leverancier."
         },
         {
@@ -1756,14 +1933,16 @@
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/gemeente/afval",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/gemeente/bekendmaking",
@@ -1771,6 +1950,7 @@
           "gratis": 401,
           "rtg": 401,
           "bezoeker": 401,
+          "zonderControle": 401,
           "redenGratis": "Niet ingelogd als leverancier."
         },
         {
@@ -1778,7 +1958,8 @@
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/gemeente/belasting/betaal",
@@ -1786,6 +1967,7 @@
           "gratis": 403,
           "rtg": 404,
           "bezoeker": 403,
+          "zonderControle": 403,
           "redenGratis": "Alleen voor leden."
         }
       ]
@@ -1800,20 +1982,22 @@
       ],
       "stand": "deels-achter-betaling",
       "telling": {
-        "open": 6,
-        "achter-betaling": 2,
+        "open": 7,
+        "achter-betaling": 1,
         "ook-rtg-geweigerd": 0,
         "onbepaald": 0
       },
       "zonderAccount": "dicht",
       "bezoeker": "open",
+      "achterPaspoortcontrole": true,
       "routes": [
         {
           "route": "POST /api/care",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/care/annuleer",
@@ -1821,6 +2005,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 404,
+          "zonderControle": 404,
           "redenGratis": "Boeking niet gevonden."
         },
         {
@@ -1829,6 +2014,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 404,
+          "zonderControle": 404,
           "redenGratis": "Boeking niet gevonden."
         },
         {
@@ -1837,15 +2023,17 @@
           "gratis": 403,
           "rtg": 404,
           "bezoeker": 403,
+          "zonderControle": 403,
           "redenGratis": "Boeken kan alleen met een lidmaatschap."
         },
         {
           "route": "POST /api/care/intake/deel",
-          "stand": "achter-betaling",
-          "gratis": 403,
+          "stand": "open",
+          "gratis": 404,
           "rtg": 404,
           "bezoeker": 403,
-          "redenGratis": "Alleen voor leden."
+          "zonderControle": 403,
+          "redenGratis": "Zorgaanbieder niet gevonden."
         },
         {
           "route": "POST /api/care/intake/stop",
@@ -1853,6 +2041,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 404,
+          "zonderControle": 404,
           "redenGratis": "Deze deling is er niet (meer)."
         },
         {
@@ -1860,7 +2049,8 @@
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
-          "bezoeker": 200
+          "bezoeker": 200,
+          "zonderControle": 200
         },
         {
           "route": "POST /api/care/pakket/betaal",
@@ -1868,6 +2058,7 @@
           "gratis": 404,
           "rtg": 404,
           "bezoeker": 404,
+          "zonderControle": 404,
           "redenGratis": "Pakketboeking niet gevonden."
         }
       ]

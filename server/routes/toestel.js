@@ -23,7 +23,10 @@
    ondertekend artefact binnenkomt en niet uit de repo: dit huis heeft nul
    afhankelijkheden (scripts/check.js regel 14), en de runtime is net zo goed
    onbetrouwbare rekentechnologie als een model. test/toestel-routes.test.js
-   houdt de combinatie vast.
+   houdt de combinatie vast. worker-src blob: om dezelfde reden als
+   script-src: de cel rekent in een worker uit haar eigen bron (zie cel.js), en
+   een blob-worker ERFT deze CSP -- connect-src 'none' geldt daar net zo
+   (test/toestel.e2e.js bewijst dat in de browser).
 
    DE ARTEFACTEN staan in de datamap en niet in git: een model is tientallen
    tot honderden MB, en de ONNX-runtime alleen al 14 MB. Het adres IS de hash,
@@ -35,7 +38,7 @@ const path = require('path');
 const { stuurBestand } = require('../web/bestanden');
 
 const CEL_CSP = "default-src 'none'; script-src 'self' 'wasm-unsafe-eval' blob:; connect-src 'none'; " +
-  "img-src 'none'; style-src 'none'; font-src 'none'; media-src 'none'; worker-src 'none'; " +
+  "img-src 'none'; style-src 'none'; font-src 'none'; media-src 'none'; worker-src blob:; " +
   "frame-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'; object-src 'none'";
 
 /* Klassiek script, geen module: een module vanuit een ondoorzichtige origin

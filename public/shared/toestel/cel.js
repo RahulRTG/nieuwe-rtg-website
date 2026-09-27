@@ -18,9 +18,18 @@
 (function () {
   'use strict';
 
+  /* HET REKENEN GEBEURT IN EEN WORKER, en niet in de cel zelf. Een sandbox-iframe
+   deelt in de praktijk de thread met de pagina van het lid: een uitvoerder die
+   blijft rekenen bevroor de HELE pagina, en dan gaat de klok van het plafond in
+   ../toestel/rekenaar.js nooit af (gemeten met een oneindige lus, TOESTEL.md
+   par. 10.2 -- ook met procesisolatie voor sandbox-iframes aan). In een worker
+   blijven beide threads vrij: de klok van de ouder gaat af, de ouder haalt de
+   cel weg, en met de cel gaat haar worker. De worker komt als blob uit DEZE
+   functie en erft de CSP van de cel, dus ook connect-src 'none'. */
+  function werker() {
   /* De runtime komt als ondertekend artefact binnen: JS als blob-module, de
      wasm als bytes. Threads vragen crossOriginIsolated (een apart besluit), en
-     een proxyworker mag niet: worker-src staat op 'none'. */
+     een proxyworker is niet nodig: dit IS al een worker. */
   async function laadOrt(a) {
     var url = URL.createObjectURL(new Blob([a.runtime], { type: 'text/javascript' }));
     var ort;
@@ -48,7 +57,6 @@
     }
     return 0;
   }
-  self.RTGCelHerhaalt = herhaalt; // alleen zichtbaar binnen de cel zelf, en voor de toets
 
   var UITVOERDERS = {
     'wasm-proef': async function (a, invoer) {
@@ -122,24 +130,56 @@
     }
   };
 
+  /* In de worker: een opdracht in, een uitkomst uit. Buiten een worker (de
+     cel zelf, of de toets in een vm) wordt alleen de lusdetector teruggegeven. */
+  if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
+    addEventListener('message', async function (e) {
+      var d = e.data || {}, antwoord = {};
+      var f = Object.prototype.hasOwnProperty.call(UITVOERDERS, d.uitvoerder) ? UITVOERDERS[d.uitvoerder] : null;
+      if (!f) { antwoord.ok = false; antwoord.reden = 'deze cel kent de uitvoerder ' + d.uitvoerder + ' niet'; return postMessage(antwoord); }
+      var t0 = performance.now();
+      try {
+        antwoord.uitkomst = await f(d.artefacten || {}, d.invoer || {});
+        antwoord.ok = true;
+      } catch (x) {
+        antwoord.ok = false; antwoord.reden = 'de uitvoerder faalde: ' + String(x && x.message || x).slice(0, 200);
+      }
+      antwoord.rekenMs = Math.round(performance.now() - t0);
+      postMessage(antwoord);
+    });
+  }
+  return { herhaalt: herhaalt };
+}
+
+  self.RTGCelHerhaalt = werker().herhaalt; // alleen zichtbaar binnen de cel zelf, en voor de toets
+  var WERKER_BRON = '(' + werker.toString() + ')();';
+
+  /* Een verse worker per opdracht: niets van een vorige uitvoerder blijft
+     hangen, en afbreken is de worker weggooien. */
+  function inWorker(d) {
+    return new Promise(function (klaar) {
+      var url = URL.createObjectURL(new Blob([WERKER_BRON], { type: 'text/javascript' }));
+      var w;
+      try { w = new Worker(url); } catch (x) {
+        URL.revokeObjectURL(url);
+        return klaar({ ok: false, reden: 'de cel kon geen worker starten: ' + String(x && x.message || x).slice(0, 200) });
+      }
+      URL.revokeObjectURL(url);
+      function klaarMet(a) { w.terminate(); klaar(a); }
+      w.onmessage = function (e) { klaarMet(e.data || { ok: false, reden: 'de worker gaf niets terug' }); };
+      w.onerror = function (e) { e.preventDefault(); klaarMet({ ok: false, reden: 'de worker faalde: ' + String(e.message || 'onbekend').slice(0, 200) }); };
+      var overdracht = Object.keys(d.artefacten || {}).map(function (r) { return d.artefacten[r]; })
+        .filter(function (b) { return b instanceof ArrayBuffer; });
+      w.postMessage({ uitvoerder: d.uitvoerder, artefacten: d.artefacten || {}, invoer: d.invoer || {} }, overdracht);
+    });
+  }
+
   addEventListener('message', async function (e) {
     if (e.source !== parent) return; // alleen de eigen ouder
     var d = e.data || {};
     if (d.soort !== 'reken') return;
-    var antwoord = { soort: 'uitkomst', id: d.id, uitvoerder: d.uitvoerder };
-    var f = Object.prototype.hasOwnProperty.call(UITVOERDERS, d.uitvoerder) ? UITVOERDERS[d.uitvoerder] : null;
-    if (!f) {
-      antwoord.ok = false; antwoord.reden = 'deze cel kent de uitvoerder ' + d.uitvoerder + ' niet';
-      return parent.postMessage(antwoord, '*');
-    }
-    var t0 = performance.now();
-    try {
-      antwoord.uitkomst = await f(d.artefacten || {}, d.invoer || {});
-      antwoord.ok = true;
-    } catch (x) {
-      antwoord.ok = false; antwoord.reden = 'de uitvoerder faalde: ' + String(x && x.message || x).slice(0, 200);
-    }
-    antwoord.rekenMs = Math.round(performance.now() - t0);
+    var antwoord = Object.assign({ soort: 'uitkomst', id: d.id, uitvoerder: d.uitvoerder }, await inWorker(d));
+    antwoord.soort = 'uitkomst'; antwoord.id = d.id; antwoord.uitvoerder = d.uitvoerder;
     /* '*' omdat de ouder vanuit een ondoorzichtige origin niet bij naam te
        noemen is. Wat hier uitgaat is alleen de uitkomst; de ouder toetst dat
        het bericht van ZIJN cel komt (e.source). */

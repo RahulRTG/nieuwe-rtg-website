@@ -38,6 +38,7 @@ test('1. de cel draagt wasm-unsafe-eval alleen samen met connect-src none', asyn
   assert.match(deel('script-src'), /'wasm-unsafe-eval'/);
   assert.equal(deel('connect-src'), "'none'", 'rekenen mag, bellen niet');
   assert.equal(deel('default-src'), "'none'");
+  assert.equal(deel('worker-src'), 'blob:', 'een worker alleen uit de eigen bron van de cel, en die erft deze CSP');
   assert.doesNotMatch(deel('script-src'), /unsafe-inline|'unsafe-eval'/);
   assert.equal(r.headers.get('cache-control'), 'no-store');
   const html = await r.text();

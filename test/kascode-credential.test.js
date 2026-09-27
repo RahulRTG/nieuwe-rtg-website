@@ -92,6 +92,8 @@ test('7. een weigering draait terug en geeft de code terug; boven het maximum cl
   const w = wereld();
   const k = await w.kassa.kasCode({ codenaam: 'A', maxCenten: 1000 });
   assert.equal((await w.kassa.kasInt({ supplierCode: 'Z', code: k.code, centen: 1001, idem: 'a' })).status, 402);
+  assert.equal((await w.kassa.kasInt({ supplierCode: 'Z', code: 'KC-ONBEKEND', centen: 5 })).status, 404, 'eerst de code');
+  assert.equal((await w.kassa.kasInt({ supplierCode: 'Z', code: k.code, centen: 5 })).code, 'IDEMPOTENTIESLEUTEL_VERPLICHT');
   w.stuk.weiger = { status: 403, error: 'grens', reden: 'eigen' };
   const r = await w.kassa.kasInt({ supplierCode: 'Z', code: k.code, centen: 500, idem: 'b' });
   assert.equal(r.reden, 'eigen', 'de reden reist mee naar het lid');

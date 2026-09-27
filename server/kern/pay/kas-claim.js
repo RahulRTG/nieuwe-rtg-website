@@ -29,7 +29,7 @@ const GEBRUIKT = NIET;   // een gebruikte code is voor een ander gewoon niet (me
 module.exports = ({ bak, crypto, nu, stelSamen, zorgSaldo, rekPartner, betaalDelen, weigering, waarde, schoon }) => {
   const { transactie, zoek, reden, bearer, afdruk, kopie, iso } = bak;
 
-  async function stap1({ code, soort, supplierCode, centen, idem, genre, oms }) {
+  async function stap1({ code, soort, supplierCode, centen, idem, idemVerplicht, genre, oms }) {
     const idemHash = idem ? afdruk('kas-claim|' + soort + '|' + supplierCode + '|' + idem) : null;
     return transactie(bron => {
       const r = zoek(bron, code);
@@ -47,6 +47,9 @@ module.exports = ({ bak, crypto, nu, stelSamen, zorgSaldo, rekPartner, betaalDel
       if (reden(r)) return { fout: NIET };
       if (centen > r.maxCenten)
         return { fout: { status: 402, error: 'Boven het maximum van deze code (' + (r.maxCenten / 100).toFixed(2) + ' euro).' } };
+      if (idemVerplicht && !idemHash) return { fout: { status: 400, code: 'IDEMPOTENTIESLEUTEL_VERPLICHT',
+        error: 'Deze opdracht verplaatst geld en vraagt een idempotentiesleutel. Stuur een `idem` mee en gebruik bij een herhaling dezelfde waarde.',
+        waarom: idemVerplicht } };
       bearer.gebruik(r.toegang);
       r.stand = 'claimend';
       r.claim = { id: 'KC' + crypto.randomBytes(8).toString('hex'), soort, supplierCode, centen,

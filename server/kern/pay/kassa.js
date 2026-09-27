@@ -87,10 +87,10 @@ module.exports = (ctx) => {
   async function kasInt({ supplierCode, code, centen, oms, idem, genre }) {
     const c = Math.round(Number(centen));
     if (!Number.isFinite(c) || c < ctx.MIN_CENTEN || c > ctx.MAX_CENTEN) return { status: 400, error: 'Vul het bedrag in.' };
-    if (!idem) return { status: 400, code: 'IDEMPOTENTIESLEUTEL_VERPLICHT',
-      error: 'Deze opdracht verplaatst geld en vraagt een idempotentiesleutel. Stuur een `idem` mee en gebruik bij een herhaling dezelfde waarde.',
-      waarom: 'rekent een tik af tegen een kascode' };
-    return claim.neem({ code, soort: 'kas', supplierCode, centen: c, idem: String(idem), genre, oms: oms || 'Kassa' },
+    /* Geld verplaatsen vraagt een idem-sleutel (lib/idem.js, `geld`); de claim
+       weigert zonder, maar pas NA de codetoets -- een onbekende code blijft 404. */
+    return claim.neem({ code, soort: 'kas', supplierCode, centen: c, idem: idem ? String(idem) : null,
+      idemVerplicht: 'rekent een tik af tegen een kascode', genre, oms: oms || 'Kassa' },
       { voor: kosten, na: naAfronden });
   }
 

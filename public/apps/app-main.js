@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '7963a1ac';
+var RTG_BOUW = 'cebfc27e';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -2560,8 +2560,10 @@ var RTG_BOUW = '7963a1ac';
       '<div style="margin-top:0.35rem;font-size:0.92rem;"><b>'+esc(t.naam)+'</b> \u00B7 '+t.datum+' '+t.tijd+' \u00B7 '+t.personen+'p</div>'+
       (t.gebruikt
         ? '<div style="margin-top:0.4rem;font-size:0.8rem;color:var(--rtg-leesgroen,var(--green));">\u2705 '+T('tk.gebruikt','Binnen; ingecheckt door ')+esc(t.checkin.door)+'</div>'
+        // de code staat nergens bewaard: tonen maakt een nieuwe (en trekt de vorige in)
         : '<div style="margin-top:0.5rem;text-align:center;background:rgba(208,172,87,0.12);border:1px dashed rgba(208,172,87,0.5);border-radius:0;padding:0.55rem;">'+
-          '<span style="font-size:1.3rem;letter-spacing:0.35em;color:var(--rtg-leesgoud,var(--gold));font-weight:700;">'+esc(t.code)+'</span>'+
+          '<span id="tkCode-'+esc(t.ref)+'" style="font-size:0.9rem;letter-spacing:0.08em;color:var(--rtg-leesgoud,var(--gold));font-weight:700;word-break:break-all;"></span>'+
+          '<button class="bz-btn" data-tktoon="'+esc(t.ref)+'">'+T('tk.toon','Toon ticketcode')+'</button>'+
           '<div style="font-size:0.66rem;color:var(--soft);margin-top:0.2rem;">'+T('tk.laatzien','Laat deze code zien aan de deur')+'</div></div>')+
       // de eigen transferdienst van de zaak: aanvragen, of live zien wie er komt
       (t.transfer
@@ -2575,6 +2577,13 @@ var RTG_BOUW = '7963a1ac';
             '<button class="bz-btn" data-trvraag="'+t.ref+'" data-trprijs="'+t.transferPrijs+'">\uD83D\uDE90 '+(t.transferPrijs ? eur(t.transferPrijs) : T('tk.tr.gratis','Gratis'))+'</button></div>'
           : ''))+
       '</div>').join('');
+    document.querySelectorAll('[data-tktoon]').forEach(b => b.addEventListener('click', async () => {
+      try {
+        const r = await API.call('/ticket/toon', { ref: b.dataset.tktoon });
+        const el = document.getElementById('tkCode-' + b.dataset.tktoon);
+        if (el) el.textContent = r.code;
+      } catch(e){ toast(e.message); }
+    }));
     document.querySelectorAll('[data-trvraag]').forEach(b => b.addEventListener('click', async () => {
       const veld = document.getElementById('trVan-' + b.dataset.trvraag);
       try {

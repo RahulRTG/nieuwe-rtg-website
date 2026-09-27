@@ -7,9 +7,15 @@ const cp = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const { pak } = require('./afbouw-slot');
+const afloop = require('./lib/afbouw-afloop');
 const ROOT = path.join(__dirname, '..');
 const RAPPORT = path.join(ROOT, '.release', 'release-gate-bewijs.json');
+// Beoordeel de vorige ronde voordat pak() het nieuwe RUNNING-journal schrijft.
+const vooraf = afloop.magStarten();
+if (!vooraf.mag) throw new Error(afloop.diagnose(vooraf, afloop.lees()));
 const geefAfbouwSlotVrij = pak(process.argv.includes('--productie') ? 'productiereleasepoort' : 'releasepoort');
+// Alleen onze eigen, seriële controles erven het succesvol verkregen slot.
+const kindEnv = { ...process.env, RTG_AFBOUW_SLOT_ACTIEF: '1', RTG_AFBOUW_RUN_ID: afloop.lees().runId };
 const begonnen = new Date().toISOString();
 try { fs.rmSync(RAPPORT, { force: true }); } catch (e) {}
 
@@ -48,7 +54,7 @@ if (process.argv.includes('--productie')) stappen.splice(9, 0,
 const controles = [];
 for (const [naam, commando, args] of stappen) {
   console.log('\n=== ' + naam + ' ===');
-  const r = cp.spawnSync(commando, args, { cwd: ROOT, env: process.env, stdio: 'inherit' });
+  const r = cp.spawnSync(commando, args, { cwd: ROOT, env: kindEnv, stdio: 'inherit' });
   if (r.error) { console.error('[release-gate] ' + naam + ': ' + r.error.message); process.exit(r.error.code || 1); }
   if (r.status !== 0) { console.error('[release-gate] gestopt bij: ' + naam); process.exit(r.status || 1); }
   controles.push({ naam, geslaagd: true });

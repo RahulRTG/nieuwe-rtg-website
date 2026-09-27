@@ -279,6 +279,41 @@ function magStarten(taak) {
         'dus er mag gewerkt worden -- haar UITKOMST telt niet als bewijs' };
 }
 
+/* Een controle BINNEN de releasepoort start geen nieuwe ronde. Alleen een
+   werkelijk kind van de vastgelegde eigenaar, met diens exacte run-id, mag de
+   lopende ronde inspecteren. magStarten blijft dicht en het journal blijft
+   RUNNING: dit is geen geslaagde afloop en geen toestemming voor een opvolger.
+   De releasepoort beoordeelt de vorige afloop VOOR zij haar eigen ronde opent. */
+function eigenVoorouder(pid) {
+  let ouder = process.ppid;
+  const gezien = new Set();
+  while (ouder > 1 && !gezien.has(ouder)) {
+    if (ouder === pid) return true;
+    gezien.add(ouder);
+    try {
+      const stat = fs.readFileSync('/proc/' + ouder + '/stat', 'utf8');
+      ouder = Number(stat.slice(stat.lastIndexOf(')') + 2).split(' ')[1]);
+    } catch (e) {
+      try { ouder = Number(execFileSync('ps', ['-o', 'ppid=', '-p', String(ouder)], { encoding: 'utf8' }).trim()); }
+      catch (geenOuder) { return false; }
+    }
+  }
+  return false;
+}
+
+function magControleren() {
+  const a = lees();
+  const eigenaar = require('../afbouw-slot').actief();
+  if (a && a.stand === 'RUNNING' && ['releasepoort', 'productiereleasepoort'].includes(a.taak) &&
+      eigenaar && eigenaar.pid === a.wortel.pid && eigenaar.taak === a.taak &&
+      process.env.RTG_AFBOUW_SLOT_ACTIEF === '1' && process.env.RTG_AFBOUW_RUN_ID === a.runId &&
+      zelfdeProces(a.wortel) && eigenVoorouder(a.wortel.pid)) {
+    return { mag: true, stand: 'RUNNING', oordeel: 'EIGEN_CONTROLE', resultaatBruikbaar: false,
+      reden: 'controle binnen de eigen releasepoort; de ronde is nog niet afgerond' };
+  }
+  return magStarten();
+}
+
 /* Bekende wezen beeindigen. Alleen processen die ALS ZELFDE PROCES herkend
    worden -- een hergebruikt PID raakt hier nooit iets. */
 function ruimOp() {
@@ -467,4 +502,4 @@ function begin({ taak, commit, basis, verwachteUitvoer, poorten, uitExitcode } =
   };
 }
 
-module.exports = { begin, lees, magStarten, ruimOp, herstel, diagnose, wezenVan, kringVan, zelfdeProces, procesLeeft, AFLOOP, STANDEN, TERMINAAL };
+module.exports = { begin, lees, magStarten, magControleren, ruimOp, herstel, diagnose, wezenVan, kringVan, zelfdeProces, procesLeeft, AFLOOP, STANDEN, TERMINAAL };

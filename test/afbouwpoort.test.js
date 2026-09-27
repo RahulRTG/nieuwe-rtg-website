@@ -24,6 +24,76 @@ const path = require('path');
 const WORTEL = path.join(__dirname, '..');
 const slot = require('../scripts/afbouw-slot');
 
+test('releasepoort geeft haar eigen slot door aan controles, maar niet aan buitenstaanders', (t) => {
+  const os = require('node:os');
+  const { spawnSync } = require('node:child_process');
+  const map = fs.mkdtempSync(path.join(os.tmpdir(), 'releasepoort-kind-'));
+  t.after(() => fs.rmSync(map, { recursive: true, force: true }));
+  fs.mkdirSync(path.join(map, 'scripts'));
+  fs.copyFileSync(path.join(WORTEL, 'scripts/release-gate.js'), path.join(map, 'scripts/release-gate.js'));
+  fs.symlinkSync(path.join(WORTEL, 'scripts/afbouw-slot.js'), path.join(map, 'scripts/afbouw-slot.js'));
+  fs.symlinkSync(path.join(WORTEL, 'scripts/lib'), path.join(map, 'scripts/lib'));
+  const probe = path.join(map, 'probe.cjs');
+  fs.writeFileSync(probe, `
+    const slot = require(${JSON.stringify(path.join(WORTEL, 'scripts/afbouw-slot.js'))});
+    const afloop = require(${JSON.stringify(path.join(WORTEL, 'scripts/lib/afbouw-afloop.js'))});
+    console.log(JSON.stringify({slot:slot.eisGeenAfbouw('controle'),
+      controle:afloop.magControleren ? afloop.magControleren() : afloop.magStarten(),
+      nieuweRonde:afloop.magStarten(), stand:afloop.lees().stand,
+      run:process.env.RTG_AFBOUW_RUN_ID}));
+  `);
+  const hook = path.join(map, 'hook.cjs');
+  fs.writeFileSync(hook, `
+    const cp = require('node:child_process');
+    const fs = require('node:fs');
+    const echt = cp.spawnSync;
+    cp.spawnSync = (cmd, args, opties) => {
+      if (args[0] !== 'scripts/build.js') return echt(cmd, args, opties);
+      const kind = echt(process.execPath, [${JSON.stringify(probe)}], {...opties, encoding:'utf8', stdio:'pipe'});
+      const buitenEnv = {...process.env};
+      delete buitenEnv.RTG_AFBOUW_SLOT_ACTIEF;
+      const buiten = echt(process.execPath, [${JSON.stringify(probe)}], {...opties, env:buitenEnv, encoding:'utf8', stdio:'pipe'});
+      const oud = echt(process.execPath, [${JSON.stringify(probe)}], {...opties,
+        env:{...opties.env,RTG_AFBOUW_RUN_ID:'andere-ronde'}, encoding:'utf8', stdio:'pipe'});
+      fs.writeFileSync(${JSON.stringify(path.join(map, 'observations.json'))}, JSON.stringify({
+        kind:{status:kind.status,stdout:kind.stdout,stderr:kind.stderr},
+        buiten:{status:buiten.status,stdout:buiten.stdout,stderr:buiten.stderr},
+        oud:{status:oud.status,stdout:oud.stdout,stderr:oud.stderr}
+      }));
+      return {status:73}; // Opzettelijke stop: deze proef maakt nooit releasebewijs.
+    };
+  `);
+  const env = {...process.env, RTG_AFBOUW_SLOT:path.join(map, 'slot'), RTG_AFLOOP_PAD:path.join(map, 'afloop.json')};
+  delete env.RTG_AFBOUW_SLOT_ACTIEF;
+  delete env.RTG_METEN_TIJDENS_AFBOUW;
+  const r = spawnSync(process.execPath, ['--require', hook, path.join(map, 'scripts/release-gate.js')],
+    { env, encoding:'utf8', timeout:20000 });
+  assert.equal(r.status, 73, r.stderr);
+  const o = JSON.parse(fs.readFileSync(path.join(map, 'observations.json')));
+  assert.equal(o.kind.status, 0, o.kind.stderr);
+  assert.equal(o.buiten.status, 0, o.buiten.stderr);
+  const kind = JSON.parse(o.kind.stdout), buiten = JSON.parse(o.buiten.stdout);
+  assert.equal(kind.slot.ok, true, 'de echte releasepoort moet haar eigen kind laten meten');
+  assert.equal(kind.controle.mag, true, 'de controle is geen nieuwe afbouwronde: ' + JSON.stringify(kind));
+  assert.equal(kind.nieuweRonde.mag, false, 'de lopende ronde mag niet als voltooid gelden');
+  assert.equal(kind.stand, 'RUNNING');
+  assert.equal(buiten.slot.ok, false, 'zonder overgedragen slot blijft de buitenstaander geweigerd');
+  assert.equal(buiten.controle.mag, false);
+  assert.equal(o.oud.status, 0, o.oud.stderr);
+  assert.equal(JSON.parse(o.oud.stdout).controle.mag, false, 'een verkeerde run-id geeft geen vrijstelling');
+  assert.equal(fs.existsSync(path.join(map, '.release/release-gate-bewijs.json')), false);
+  assert.equal(JSON.parse(fs.readFileSync(path.join(map, 'afloop.json'))).stand, 'FAILED');
+  // Een vorige onafgeronde ronde mag niet verdwijnen achter de nieuwe claim.
+  const onvoltooid = JSON.stringify({runId:'oude-run',taak:'releasepoort',stand:'RUNNING',
+    wortel:{pid:process.pid,start:null},kring:[]});
+  fs.writeFileSync(path.join(map, 'afloop.json'), onvoltooid);
+  const geblokkeerd = spawnSync(process.execPath, [path.join(map, 'scripts/release-gate.js')],
+    {env,encoding:'utf8',timeout:20000});
+  assert.notEqual(geblokkeerd.status, 0);
+  assert.match(geblokkeerd.stderr, /oude-run/);
+  assert.equal(fs.readFileSync(path.join(map, 'afloop.json'),'utf8'), onvoltooid);
+});
+
 test('actief() leest het slot zonder het te pakken', () => {
   /* De hele reden dat deze functie naast pak() staat: twee LEZERS mogen naast
      elkaar draaien. Zou dit pak() gebruiken, dan sloten metingen elkaar uit. */

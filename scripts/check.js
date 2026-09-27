@@ -5887,9 +5887,10 @@ console.log('\n71) de vorige bronmuterende ronde is netjes afgelopen en heeft ni
   if (!vorige) {
     ok('geen eerdere ronde vastgelegd; de eerste die pak() aanroept legt er een aan');
   } else {
-    const g = afloop.magStarten();
+    const g = afloop.magControleren();
     if (g.mag) {
-      ok('vorige ronde ' + (vorige.taak || '?') + ' (' + vorige.runId + ') staat op ' + vorige.stand +
+      ok(g.oordeel === 'EIGEN_CONTROLE' ? g.reden :
+        'vorige ronde ' + (vorige.taak || '?') + ' (' + vorige.runId + ') staat op ' + vorige.stand +
         ' en haar proceskring is leeg');
     } else {
       fout(afloop.diagnose(g, vorige));

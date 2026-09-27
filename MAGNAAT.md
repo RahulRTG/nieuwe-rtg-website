@@ -587,7 +587,7 @@ De balans van 1.0 is afgestemd op een automatische speler. Of dag 97 op normaal 
 
 ### NA 1.0: waar je begint (27 september 2026)
 
-Niet iedereen begint in de keuken. Op dag 1 kies je, naast de moeilijkheid, ook waar je begint. Later kan dat alleen door opnieuw te beginnen, en dan kies je het onder Wereld. De tabel staat in `regels.js` (STARTPOSITIES).
+Niet iedereen begint in de keuken. Op dag 1 kies je, naast de moeilijkheid, ook waar je begint. Later kan dat alleen door opnieuw te beginnen, en dan kies je het onder Wereld. De tabel staat in `regels-start.js` (STARTPOSITIES).
 
 | | De keuken | Student | Een kleine erfenis |
 |---|---|---|---|
@@ -612,6 +612,38 @@ Niet iedereen begint in de keuken. Op dag 1 kies je, naast de moeilijkheid, ook 
 **De toetsen:**
 - `test/magnaatstart.test.js` (8 toetsen).
 - `test/magnaatstart.e2e.js`: op een telefoon kies je een erfenis op dag 1, en daarna begin je onder Wereld opnieuw als student.
+
+### NA 1.0: groeien (27 september 2026)
+
+Wie van zijn eigen bedrijf leeft, krijgt drie nieuwe deuren. Voor die dag zijn ze er niet, en een weigering zegt waarom. De module is `groei.js`, de getallen staan in `regels-groei.js`, en wat de markt ervan merkt staat in `bereik.js`.
+
+| | Wat het kost | Wat het oplevert |
+|---|---|---|
+| **Krediet** bij de Oudwijkse Bank | 6% rente over het hele bedrag, terug in 6 termijnen van vier weken | geld nu: hooguit twee keer wat klanten de laatste acht weken betaalden, tussen € 1.000 en € 25.000 |
+| **Filiaal** in een tweede wijk | inrichten plus huur per vier weken, en iemand van je team die er staat | de helft van de zichtbaarheid van die wijk erbij, en plek voor twee mensen meer |
+| **Overname** van een concurrent | € 30 per promille van zijn marktaandeel, minstens € 6.000 | het bedrijf verdwijnt van de markt, een ervaren medewerker komt mee, en zijn vaste klanten zoeken voortaan jou |
+
+**Hoe het in de boeken staat:**
+- Een krediet is een schuld aan de `financier`. Een aflossing verlaagt die schuld; alleen de rente is een kostenpost. Zo zie je in je resultaat wat lenen je echt kost.
+- De huur van een filiaal is huisvesting, net als de huur van je hoofdplek.
+- Een overname is in Magnaat een kostenpost en geen bezit: je koopt klanten en een mens, geen spullen. Dat is een vereenvoudiging.
+
+**Twee grenzen:**
+- Er blijft altijd minstens één concurrent over. Een stad met één bedrijf is geen markt.
+- Een overname brengt iemand mee. Met een vol team kan het dus niet, en de weigering wijst naar een filiaal.
+
+**Wat de automatische speler zei, en wat daardoor veranderde:**
+- De eerste versie maakte een overname slechter dan niets doen. Wie een concurrent kocht, kreeg *minder* klanten, want klanten uit de markt komen van de fouten van concurrenten, en een gekochte concurrent maakt geen fouten meer. Daarom komen zijn vaste klanten nu zelf naar jou.
+- Daarna bleek de rem geen vraag maar capaciteit: een speler met een klein team laat 16 tot 28 opdrachten liggen, en meer klanten helpen dan niets. Daarom brengt een overname een mens mee en geeft een filiaal plek voor meer.
+- Na 24 weken, bij een speler met twee mensen in dienst:
+  - bij websites en foto verdient een overname zijn loon ruim terug, en de koopsom in een tot anderhalf jaar;
+  - bij administratie niet, want daar is juist de vraag de rem;
+  - een filiaal levert de automatische speler niets op, omdat hij niet handelt en het extra team niet vult.
+- Groeien is dus een weddenschap en geen knop die altijd wint. Het basisspel verandert er niet door: alle toetsen van 1.0 en van de startposities blijven groen.
+
+**De toetsen:**
+- `test/magnaatgroei.test.js` (7 toetsen).
+- `test/magnaatgroei.e2e.js`: op een telefoon toont Mijn bedrijf het blok Groeien, en een overname gaat naar de echte server, die hem met reden weigert.
 
 ---
 

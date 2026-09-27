@@ -116,10 +116,16 @@ function lenen(st, z) {
   return { ok: true };
 }
 
+/* Wat klanten de laatste `dagen` dagen betaalden. */
+function ontvangen(st, dagen) {
+  return st.deals.filter(d => d.fase === 'betaald' && d.betaaldOp > st.dag - dagen)
+    .reduce((s, d) => s + d.afspraak.bedrag, 0);
+}
+
 function volgendeLoondag(st, n) {
   let d = st.dag + 1;
   while (R.weekdag(d) !== R.BAAN.loondag) d++;
   return d + (n - 1) * 7;
 }
 
-module.exports = { startDag, betaalWatVervalt, uitstel, lenen };
+module.exports = { startDag, betaalWatVervalt, uitstel, lenen, ontvangen };

@@ -434,14 +434,14 @@ test('17. duurzaam (B4): drie handelingen gaan alleen via doeVast, en een misluk
 
 test('18. B1 in de schaduw: eens, oneens en onbekend, en een weigering of een afgebroken antwoord telt niet', () => {
   const { EventEmitter } = require('events');
-  const { maakSchaduw } = require('../server/kern/leerhuis/schaduw');
+  const { maakLeerhuisSchaduw } = require('../server/kern/leerhuis/schaduw');
   const Q = { E: 'lid:1', KO: 'lid:2', KO2: 'lid:3', CO: 'lid:4', Q: 'lid:5', A: 'lid:6', T: 'lid:7', M: 'lid:8', N: 'lid:9' };
   const w = basis('RTG', 'RTG', Q);
   W.leidOp(w, 'RTG', Q.N, Q);
   w.doe('RTG', 'beleidZet', { id: 'tb', handeling: 'betaling.terugboeken', vaardigheden: ['terugboeken'], certificaat: true }, Q.E);
   w.doe('RTG', 'beleidGoedkeuren', { id: 'tb' }, Q.Q);
   const sessies = { geschikt: { lidKey: 'user-9' }, niet: { lidKey: 'user-8' }, gedeeld: { role: 'office' } };
-  const s = maakSchaduw({ db: w.db, save: () => {}, sessionFor: (t) => sessies[t] || null });
+  const s = maakLeerhuisSchaduw({ db: w.db, save: () => {}, sessionFor: (t) => sessies[t] || null });
   const loop = (token, status, pad, afgebroken) => {
     const req = { method: 'POST', originalUrl: pad || '/api/office/pay/factuurcorrectie?x=1', get: () => 'Bearer ' + token };
     const res = new EventEmitter(); res.statusCode = status; res.writableFinished = !afgebroken;

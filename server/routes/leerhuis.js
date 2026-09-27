@@ -53,7 +53,7 @@ module.exports = (kern) => {
   const leerhuis = maakLeerhuis({ db, save, bijeen, inBundel });
   /* Alleen om de schaduwtellers van besluit B1 te LEZEN; de meelezer zelf hangt
      in opzet/kantoordeur.js. */
-  const schaduw = require('../kern/leerhuis/schaduw').maakSchaduw({ db, save });
+  const schaduw = require('../kern/leerhuis/schaduw').maakLeerhuisSchaduw({ db, save });
   /* Dezelfde fabriek als kern.volwassen (opzet/kernlaag1.js), op dezelfde
      accounts: de poort is een pure functie over de kluis, dus een eigen
      exemplaar is dezelfde regel en geen tweede -- en de kern wordt er niet

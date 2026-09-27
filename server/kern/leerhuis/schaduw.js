@@ -37,7 +37,7 @@ const SCHADUW = Object.freeze({
 });
 const VELDEN = ['eens', 'oneens', 'onbekend'];
 
-function maakSchaduw({ db, save, sessionFor }) {
+function maakLeerhuisSchaduw({ db, save, sessionFor }) {
   const eigen = require('../eigencollectie')({ db, domein: 'kern/leerhuis', bezit: { leerhuisSchaduw: 'kaart' } });
   const lh = maakLeerhuis({ db, save });
 
@@ -50,7 +50,7 @@ function maakSchaduw({ db, save, sessionFor }) {
     return m ? 'lid:' + m[1] : null;
   }
 
-  function oordeel(sleutel, req) {
+  function schaduwOordeel(sleutel, req) {
     const d = SCHADUW[sleutel];
     if (!d) return null;
     const p = persoonVan(req);
@@ -76,7 +76,7 @@ function maakSchaduw({ db, save, sessionFor }) {
       res.once('close', () => {
         try {
           if (res.writableFinished === false || res.statusCode < 200 || res.statusCode >= 300) return;
-          const veld = oordeel(sleutel, req);
+          const veld = schaduwOordeel(sleutel, req);
           if (veld && VELDEN.includes(veld)) tel(sleutel, veld);
         } catch (e) { /* een meting raakt geen antwoord */ }
       });
@@ -94,7 +94,7 @@ function maakSchaduw({ db, save, sessionFor }) {
     };
   }
 
-  return { meelezer, stand, oordeel, SCHADUW };
+  return { meelezer, stand, oordeel: schaduwOordeel, SCHADUW };
 }
 
-module.exports = { maakSchaduw, SCHADUW };
+module.exports = { maakLeerhuisSchaduw, SCHADUW };

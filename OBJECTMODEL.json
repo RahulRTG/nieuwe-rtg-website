@@ -2,16 +2,16 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-27",
   "gemeten": {
-    "bestanden": 2426,
-    "vormen": 1436,
-    "velden": 2079,
-    "modules": 798,
+    "bestanden": 2428,
+    "vormen": 1440,
+    "velden": 2082,
+    "modules": 799,
     "domeinen": 284,
     "envelopDrempel": 18,
-    "envelop": 28,
-    "veldenDomeineigen": 1464,
-    "veldenGedeeldVanafVier": 210,
-    "gelijkendeVormparen": 21
+    "envelop": 29,
+    "veldenDomeineigen": 1467,
+    "veldenGedeeldVanafVier": 209,
+    "gelijkendeVormparen": 20
   },
   "envelop": [
     "aantal",
@@ -28,6 +28,7 @@
     "label",
     "naam",
     "notitie",
+    "ok",
     "omschrijving",
     "prijs",
     "reden",
@@ -54,18 +55,6 @@
         "kern/command",
         "kern/commercie",
         "kern/ledenbalie-inzage"
-      ]
-    },
-    {
-      "veld": "ok",
-      "domeinen": 17,
-      "waar": [
-        "kern/appstore",
-        "kern/festival",
-        "kern/fiscaal",
-        "kern/foundationregistratie-register",
-        "kern/koppel",
-        "kern/leren"
       ]
     },
     {
@@ -523,6 +512,18 @@
         "kern/reisgezelschap",
         "kern/reisgezelschap-delen"
       ]
+    },
+    {
+      "veld": "name",
+      "domeinen": 10,
+      "waar": [
+        "kern/experience",
+        "kern/gast",
+        "kern/kantoor",
+        "kern/leverancier",
+        "kern/lidacties",
+        "kern/personeel"
+      ]
     }
   ],
   "paren": [
@@ -820,18 +821,6 @@
         "gratis",
         "nr",
         "prijsCenten"
-      ]
-    },
-    {
-      "gelijkenis": 0.6,
-      "a": "server/kern/appstore/context.js",
-      "b": "server/kern/mailsleutel.js",
-      "domeinA": "kern/appstore",
-      "domeinB": "kern/mailsleutel",
-      "gedeeld": [
-        "let",
-        "ok",
-        "sleutel"
       ]
     },
     {

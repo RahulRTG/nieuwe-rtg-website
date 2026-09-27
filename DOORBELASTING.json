@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T13:52:34.943Z",
-    "commit": "295262cd",
+    "op": "2026-09-27T18:33:23.694Z",
+    "commit": "c53241b9",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/doorbelasting.js",
@@ -21,13 +21,13 @@
   ],
   "regel": "onbekend is een uitkomst en nooit een aanname: een bedrag zonder aantoonbare herkomst wordt niet naar rtgEigen of derdePartij geduwd, want beide fouten zijn onzichtbaar en komen allebei iemand goed uit",
   "vorm": {
-    "vormenTotaal": 1436,
-    "geldvormen": 218,
-    "volgbaar": 36,
+    "vormenTotaal": 1447,
+    "geldvormen": 219,
+    "volgbaar": 37,
     "perHerkomstveld": {
       "bron": 19,
       "provider": 1,
-      "herkomst": 2,
+      "herkomst": 3,
       "aanbieder": 7,
       "leverancier": 8,
       "economischeHerkomst": 4
@@ -44,6 +44,7 @@
       "server/kern/cadeaukaart.js",
       "server/kern/commerce/koopbaar.js",
       "server/kern/groothandel/assortiment.js",
+      "server/kern/horeca/bon-maak.js",
       "server/kern/horeca/foliolaag.js",
       "server/kern/kosten/providerfactuur.js",
       "server/kern/kosten/providerfactuur.js",
@@ -197,8 +198,8 @@
         "volgbaar": 1
       },
       "server/kern/horeca": {
-        "geldvormen": 2,
-        "volgbaar": 1
+        "geldvormen": 3,
+        "volgbaar": 2
       },
       "server/kern/koppel.js": {
         "geldvormen": 2,

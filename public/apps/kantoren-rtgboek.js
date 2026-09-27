@@ -14,7 +14,8 @@
   var POST = { personeel: 'Personeel (totaal)', huisvesting: 'Huisvesting', diensten: 'Diensten en abonnementen', overig: 'Overig',
     werkgever: 'Via werkgevers', campagne: 'Advertenties', zoeken: 'Zoekmachines', sociaal: 'Sociale media', anders: 'Anders',
     crediteuren: 'Openstaande rekeningen', belasting: 'Belasting', loon: 'Loon' };
-  var euro = function (c) { return c == null ? '—' : '€ ' + (c / 100).toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+  var taal = function () { return document.documentElement.lang || undefined; };
+  var euro = function (c) { return c == null ? 'niet ingevuld' : '€ ' + (c / 100).toLocaleString(taal(), { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
   /* "1.234,56" en "1234.56" zijn allebei euro's; geen geldig bedrag is null, geen nul */
   var centenVan = function (t) {
     var s = String(t || '').trim().replace(/\s|€/g, '');
@@ -38,7 +39,7 @@
     vak.innerHTML = ['vast', 'marketing', 'kort'].map(function (deel) {
       var d = boek[deel];
       return '<div class="rb-deel"><h5>' + esc(DEEL[deel]) + '</h5>' +
-        '<div class="stil">' + (d.compleet ? 'Totaal ' + esc(euro(d.totaalCenten)) : 'Nog leeg: ' + esc(d.ontbreekt.map(function (x) { return POST[x] || x; }).join(', ')) + ' — zonder elke post geen totaal.') + '</div>' +
+        '<div class="stil">' + (d.compleet ? 'Totaal ' + esc(euro(d.totaalCenten)) : 'Nog leeg: ' + esc(d.ontbreekt.map(function (x) { return POST[x] || x; }).join(', ')) + '; zonder elke post geen totaal.') + '</div>' +
         d.posten.map(function (p) { return rij(deel, p); }).join('') + '</div>';
     }).join('');
   }

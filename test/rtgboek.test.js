@@ -22,7 +22,8 @@ const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 const { startServer, stop, kantoorAlsPersoon } = require('./helper');
 
-const nieuwBoek = () => require('../server/kern/rtgboek')({ db: { data: {} }, save: () => {}, nu: () => '2026-09-15T10:00:00Z' });
+const nieuwBoek = () => require('../server/kern/rtgboek')({ db: { data: {} }, save: () => {}, nu: () => '2026-09-15T10:00:00Z',
+  kanalen: ['vriend', 'werkgever', 'campagne', 'zoeken', 'sociaal', 'anders'] });
 const vulDeel = (k, maand, deel, bedragen) => { for (const [post, centen] of Object.entries(bedragen))
   assert.equal(k.rtgBoekZet({ maand, deel, post, centen, bron: 'opgave ' + post, wie: 'financien' }).ok, true); };
 

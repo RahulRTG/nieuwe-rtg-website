@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4628,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1607,
+    "kernBreedte": 1610,
     "kernGedeeld": 244,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1761,
-    "toetsenNietGemeten": 641,
+    "toetsenNietGemeten": 643,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -149,6 +149,25 @@
     "edgeVeldContextZelf": 11
   },
   "notities": [
+    {
+      "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1607,
+      "meter": "kernBreedte 1607 -> 1610",
+      "reden": "Het boek van RTG (besluiten C8 tot en met C11). Het domein bedrijfsmaat leest nu rtgBoek, rtgBoekZet en RTGBOEK_DELEN, en de twee routes hangen achter officeAuth omdat de kamer Financien ze vult en niet de boardroom. Ze staan bij de bedrijfsmaten en niet in een eigen ingang: een route-ingang die een andere laadt was een nieuwe onverklaarde verstrengeling, en een eigen mount liet routes-dwars.js over de omvanggrens gaan.",
+      "waarheen": "GRENZEN.json (bedrijfsmaat draagt de drie namen en officeAuth) en test/rtgboek.test.js toets 8"
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 641,
+      "vervalt": "2026-12-27",
+      "meter": "toetsenNietGemeten 641 -> 643",
+      "reden": "test/rtgboek.test.js en test/rtgboek.e2e.js zijn nieuw (C8-C11). Met de hand nagetrokken: een half boek dat toch een totaal krijgt (toets 2), het ledentegoed dat wordt afgetrokken (toets 5), een netto runway zonder verbruik (toets 6), een bedrag op de gedeelde code (toets 8) en negatieve lid-rekeningen die meetellen (toets 3) laten elk de toets zakken; in de browser zakt de toets als het paneel in elke kamer staat of als een bedrag met een komma niet wordt gelezen. De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt ze mee."
+    },
     {
       "datum": "2026-09-27",
       "soort": "schuld",

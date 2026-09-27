@@ -1,5 +1,6 @@
 /* De bedrijfsmaten van RTG als onderneming (server/kern/bedrijfsmaat/stand.js),
-   en het banksaldo van RTG eronder (server/kern/bankpositie.js).
+   en eronder het banksaldo (server/kern/bankpositie.js) en het boek van RTG zelf
+   (server/kern/rtgboek.js).
 
    DE BEDRIJFSMATEN: EEN ROUTE, LEZEND, ACHTER DE BOARDROOM. Wat hier staat, gaat over de hele
    onderneming, en dat is de kamer van de eigenaar. Elk getal dat over mensen
@@ -12,7 +13,8 @@
 const { BESLUITEN } = require('../kern/bedrijfsmaat/besluiten');
 
 module.exports = (kern) => {
-  const { app, boardroomAuth, boardroomWie, bedrijfsmaat, bankpositie, bankpositieZet, aanmeldkanaalStand, streefbeeld } = kern;
+  const { app, boardroomAuth, boardroomWie, bedrijfsmaat, bankpositie, bankpositieZet, aanmeldkanaalStand, streefbeeld,
+    officeAuth, rtgBoek, rtgBoekZet, RTGBOEK_DELEN } = kern;
   app.post('/api/office/bedrijfsmaat', boardroomAuth, (req, res) => {
     const uit = bedrijfsmaat.stand({ maand: (req.body || {}).maand });
     res.json(Object.assign({ ok: true, besluiten: BESLUITEN.map(b => ({ id: b.id, naam: b.naam, kort: b.kort })) }, uit));
@@ -46,6 +48,18 @@ module.exports = (kern) => {
     if (!wie) return res.status(403).json({ error: 'Een saldo zet een mens op naam, niet de gedeelde kantoorcode.' });
     const b = req.body || {};
     const r = bankpositieZet({ maand: b.maand, centen: b.centen, peildatum: b.peildatum, bron: b.bron, wie });
+    if (r.error) return res.status(r.status || 400).json({ error: r.error });
+    res.json(r);
+  });
+  /* HET BOEK VAN RTG ZELF (server/kern/rtgboek.js, besluit C8), achter de
+     KANTOORdeur en niet de boardroom: de kamer Financien leest en vult het. Wie
+     een bedrag zet komt uit de sessie, en op de gedeelde code weigert de kern. */
+  app.post('/api/office/rtgboek', officeAuth, (req, res) =>
+    res.json({ ok: true, boek: rtgBoek((req.body || {}).maand), delen: RTGBOEK_DELEN }));
+  app.post('/api/office/rtgboek/zet', officeAuth, (req, res) => {
+    const b = req.body || {};
+    const r = rtgBoekZet({ maand: b.maand, deel: String(b.deel || ''), post: String(b.post || ''),
+      centen: b.centen, bron: b.bron, wie: boardroomWie(req) });
     if (r.error) return res.status(r.status || 400).json({ error: r.error });
     res.json(r);
   });

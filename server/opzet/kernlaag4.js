@@ -145,7 +145,7 @@ Object.assign(kern, require('../kern/bankpositie')({ db, save }));
 // hoe leden bij RTG kwamen: een telling per maand, nooit per lid (besluit C6)
 Object.assign(kern, require('../kern/aanmeldkanaal')({ db, save }));
 // het boek van RTG zelf, gevuld door Financien op naam (besluiten C8-C11)
-Object.assign(kern, require('../kern/rtgboek')({ db, save }));
+Object.assign(kern, require('../kern/rtgboek')({ db, save, kanalen: kern.AANMELDKANALEN }));
 kern.bedrijfsmaat = require('../kern/bedrijfsmaat/stand')({
   lees: { ritten: () => db.data.rides, bestellingen: () => db.data.orders,
     betaalschemas: () => db.data.lidmaatschapBetalingen,

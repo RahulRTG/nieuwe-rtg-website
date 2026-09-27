@@ -19,8 +19,8 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | Wat | Aantal |
 |---|---|
 | API-endpoints | 5171 |
-| servermodules (`server/**/*.js`) | 3742 |
-| routebestanden (`server/routes/**`) | 616 |
+| servermodules (`server/**/*.js`) | 3741 |
+| routebestanden (`server/routes/**`) | 615 |
 | kernmodules (`server/kern/**`) | 2360 |
 | schermen (`public/**/*.html`) | 320 |
 | gedeelde browsermodules (`public/shared/*.js`) | 398 |
@@ -150,8 +150,8 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(211) auth(129) supplierAuth(65) officeAuth(47) db(38) liveCodename(35) status(31)
-accounts(28) schoon(23) boardroomWie(20) codenaamVan(19) managerOnly(18) rtf(18)
+app(210) auth(129) supplierAuth(65) officeAuth(47) db(38) liveCodename(35) status(31)
+accounts(28) schoon(23) boardroomWie(19) codenaamVan(19) managerOnly(18) rtf(18)
 save(17) tooManyTries(14) geenGast(14) express(13) crypto(12) findSupplier(12)
 boardroomAuth(12) appUrl(11) keyVanCodenaam(11) pay(11) anthropic(11) noteFailedTry(10)
 rtmail(10) kern(9) gegevensStop(9) sseToOffice(9) payrollOS(9) loginFails(8) stuur(8)

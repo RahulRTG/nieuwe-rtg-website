@@ -36,17 +36,18 @@
    Wat dit NIET is: een boekhouding of een betaalweg. Er beweegt hier geen geld. */
 'use strict';
 
-const { KANALEN } = require('./aanmeldkanaal');
-
 const NAAM = 'rtgBoek';
-const DELEN = Object.freeze({
-  vast: Object.freeze(['personeel', 'huisvesting', 'diensten', 'overig']),
-  marketing: Object.freeze(KANALEN.filter(k => k !== 'vriend')),
-  kort: Object.freeze(['crediteuren', 'belasting', 'loon', 'overig'])
-});
 const MAX_CENTEN = 100000000000;   // een miljard euro per post: een grens op het doel
 
-module.exports = ({ db, save, nu }) => {
+/* De marketingposten zijn de aanmeldkanalen; die lijst komt BINNEN (`kanalen`)
+   in plaats van hier te worden opgehaald, zodat er geen tweede lijst ontstaat en
+   geen koppeling tussen de twee domeinen. Zonder lijst is er geen marketingpost. */
+module.exports = ({ db, save, nu, kanalen }) => {
+  const DELEN = Object.freeze({
+    vast: Object.freeze(['personeel', 'huisvesting', 'diensten', 'overig']),
+    marketing: Object.freeze((Array.isArray(kanalen) ? kanalen : []).filter(k => k !== 'vriend')),
+    kort: Object.freeze(['crediteuren', 'belasting', 'loon', 'overig'])
+  });
   const eigen = require('./eigencollectie')({ db, domein: 'kern/rtgboek', bezit: { [NAAM]: 'kaart' } });
   const klok = typeof nu === 'function' ? nu : () => new Date().toISOString();
   const maandVan = (m) => (/^\d{4}-\d{2}$/.test(String(m || '')) ? String(m) : null);

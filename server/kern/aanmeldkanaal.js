@@ -76,5 +76,3 @@ module.exports = ({ db, save, nu }) => {
 
   return { aanmeldkanaalTel: tel, aanmeldkanaalStand: stand, aanmeldkanaalKeuzes: keuzes, AANMELDKANALEN: KANALEN };
 };
-/* De kanalen ook zonder instantie: kern/rtgboek.js houdt er de marketingposten op. */
-module.exports.KANALEN = KANALEN;

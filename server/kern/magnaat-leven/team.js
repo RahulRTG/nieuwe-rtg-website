@@ -17,6 +17,7 @@ const { meld, ontgrendel, post, euro, tijd } = require('./staat');
 const { boekVan } = require('./boek');
 const { betaalWatVervalt } = require('./geld');
 const { mijlpaal } = require('./gids');
+const { teamMax } = require('./bereik');
 
 const fout = (error) => ({ status: 400, error });
 const teamlid = (st, id) => (st.team || []).find(m => m.id === String(id || '') && !m.weg) || null;
@@ -43,7 +44,12 @@ function werf(st, z) {
   if (!k) return fout('Kies wie je aanneemt: ' + B.TEAMKANDIDATEN.map(x => x.naam).join(', ') + '.');
   const eerder = st.team.find(m => m.id === k.id);
   if (eerder) return fout(k.naam + (eerder.weg ? ' werkte al voor je, en komt niet terug.' : ' werkt al voor je.'));
-  if (st.team.filter(m => !m.weg).length >= B.TEAM_MAX) return fout('Meer dan ' + B.TEAM_MAX + ' mensen kun je naast je eigen werk niet aansturen.');
+  return komtErbij(st, k);
+}
+
+/* Iemand komt bij je team: aangenomen, of meegekomen met een overname (./groei.js). */
+function komtErbij(st, k) {
+  if (st.team.filter(m => !m.weg).length >= teamMax(st)) return fout('Meer dan ' + teamMax(st) + ' mensen kun je naast je eigen werk niet aansturen' + (st.groei && st.groei.filiaal ? '.' : '; met een filiaal is er plek voor meer.'));
   const m = Object.assign({}, k, { dagen: k.dagen.slice(), sinds: st.dag, betaaldTot: st.dag - 1, gewerkt: 0, gestaakt: null, einde: null, weg: false });
   st.team.push(m);
   mijlpaal(st, 'team', 'Je eerste medewerker: ' + m.naam + '.');
@@ -119,4 +125,4 @@ function ontsla(st, z) {
   return { ok: true };
 }
 
-module.exports = { werf, ontsla, teamDag, werkminuten, teamlid };
+module.exports = { werf, komtErbij, ontsla, teamDag, werkminuten, teamlid };

@@ -16,7 +16,7 @@ const { aandelen } = require('./markt');
 const M = require('./regels-markt');
 
 const KOSTEN = { software: 'Software', personeel: 'Loon van je team', inhuur: 'Freelancers', werkplek: 'Werkplekken',
-  inkoopwaarde: 'Inkoopwaarde van wat je verkocht', huisvesting: 'Huisvesting', korting: 'Korting aan klanten', financiering: 'Voorfinanciering', kvk: 'Inschrijving' };
+  inkoopwaarde: 'Inkoopwaarde van wat je verkocht', huisvesting: 'Huisvesting', korting: 'Korting aan klanten', financiering: 'Voorfinanciering', kvk: 'Inschrijving', rente: 'Rente op je krediet', overname: 'Overnames' };
 
 /* Het loon dat je team in dit venster krijgt: op elke vrijdag, en op de dag na
    iemands laatste werkdag. */

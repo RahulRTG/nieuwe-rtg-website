@@ -135,6 +135,30 @@ hash en met het merkteken `legacy96`, totdat de koper roteert of de kaart
 verloopt; dat is hooguit een jaar. De houder houdt zo zijn waarde. Het
 alternatief is die codes nu ongeldig maken en een rotatie afdwingen.
 
+**B9, tweede type gemigreerd: de afhaalcode (`pay.order_pickup_code`).** Het oude
+veld `pickup` telde vier tekens en blijft bestaan, maar alleen als bonnummer voor
+keuken en pas; het opent niets meer. De credential is nu een aparte afhaalcode
+van 128 bits (`AH.`), die alleen als hash wordt bewaard in `afhaalToegang`.
+- Het lid haalt de code op met `POST /api/order/afhaalcode`. Elke keer tonen
+  maakt een nieuwe code en trekt de vorige in.
+- De code is zes uur geldig en kan één keer worden gebruikt. Hij hoort bij één
+  zaak.
+- De kassa scant een QR. Het claimen, het uitgeven en het besluit of de kassa
+  nog moet afrekenen staan samen in één collectietransactie.
+- Een betaling in de app zet eerst een betaalweg vast. Zo kunnen kassa en app
+  nooit allebei afrekenen.
+- De zaak trekt de code in vóórdat een bestelling wordt afgesloten of
+  teruggestort.
+
+Bestaande bestellingen zijn niet gemigreerd: hun oude code is nu alleen een
+bonnummer, en het lid maakt met "Toon afhaal-QR" een nieuwe. Het restrisico:
+crasht het proces tussen een app-betaling en `betaalEinde`, dan kan de kassa na
+twee minuten toch afrekenen. Dat wordt gelogd en niet stil geslikt; het helemaal
+dichtzetten vraagt een besluit.
+
+Blijven over van B9: cadeaukaart, kascode, vooraf, tikcode, entreetickets,
+vervoerskaartjes, Invisible Arrival en WorkOS-werkruimtetokens.
+
 **Juridisch open (E8), en niet door code te beslissen:** een opwaardeerkaart die
 tegen nominale waarde in een uitbetaalbare wallet landt, is vermoedelijk
 elektronisch geld (terugstortstand `open`, `WAARDE.md`, `TOKEN.md`). Wie contant

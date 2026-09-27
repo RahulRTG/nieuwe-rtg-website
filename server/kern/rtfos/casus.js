@@ -65,7 +65,7 @@ module.exports = (ctx) => {
     ingetrokken: c.ingetrokken ? { at: c.ingetrokken.at, reden: c.ingetrokken.reden } : null,
     partnerId: c.partnerId || null, projectId: c.projectId || null,
     heeftPersoonscode: !!c.persoonscode_id,
-    stappen: (c.stappen || []).slice(0, 40), bewaarTot: c.bewaarTot || null, at: c.at });
+    stappen: (c.stappen || []).slice(0, 40), bewaarTot: c.bewaarTot || null, afgerondOp: c.afgerondOp || null, at: c.at });
 
   function lijst(req, stadId, filter) {
     const w = wie(req);

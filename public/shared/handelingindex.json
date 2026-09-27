@@ -1196,6 +1196,12 @@
       "url": "/apps/loopbaan.html"
     },
     {
+      "label": "Mijn leerhuis",
+      "app": "Mijn loopbaan",
+      "wereld": "WorkOS",
+      "url": "/apps/loopbaan.html"
+    },
+    {
       "label": "Stoppen",
       "app": "Mijn loopbaan",
       "wereld": "WorkOS",

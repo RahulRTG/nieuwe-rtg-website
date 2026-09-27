@@ -33,7 +33,7 @@
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
-    "keuringOmvang": 331,
+    "keuringOmvang": 332,
     "keuringScheef": 16,
     "keuringStuk": 0,
     "keuringTeGroot": 14,
@@ -149,6 +149,15 @@
     "edgeVeldContextZelf": 11
   },
   "notities": [
+    {
+      "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "keuringOmvang",
+      "van": 331,
+      "meter": "keuringOmvang 331 -> 332",
+      "reden": "Terug naar de stand van main. De samenvoeging zette routes-dwars.js even boven de 10 kB-grens (twee takken hingen er elk een route aan), waardoor hij tijdelijk uit deze telling viel en --vastleggen de lat een tel strakker zette; na het inkorten van een commentaar staat hij weer vlak onder de grens, precies zoals op main.",
+      "waarheen": "server/opzet/routes-dwars.js opknippen zodra er weer een route bij komt."
+    },
     {
       "datum": "2026-09-27",
       "soort": "structureel",

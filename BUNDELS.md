@@ -354,7 +354,7 @@ omlaag.
 
 ## `apps/office/app.js`
 
-`public/apps/office/app/` -- 9 delen, 951 regels in de delen
+`public/apps/office/app/` -- 9 delen, 957 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -418,7 +418,7 @@ omlaag.
 
 ## `apps/residentie.js`
 
-`public/apps/residentie/` -- 16 delen, 2027 regels in de delen
+`public/apps/residentie/` -- 16 delen, 2039 regels in de delen
 
 | deel | onderwerp |
 |---|---|

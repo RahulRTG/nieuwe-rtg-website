@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T13:56:18.282Z",
-    "commit": "43461f914",
+    "op": "2026-09-27T16:49:13.289Z",
+    "commit": "a268a6fa",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -586,6 +586,14 @@
       "operator": "===->!==#8",
       "gezakt": 2,
       "geprobeerd": 50
+    },
+    "appwerkt-schil.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/appwerkt.js",
+      "operator": "-->+#0",
+      "gezakt": 1,
+      "geprobeerd": 7
     },
     "archief.test.js": {
       "soort": "server",
@@ -2747,6 +2755,13 @@
       "gezakt": 1,
       "geprobeerd": 2
     },
+    "eigen-bedekking.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "overleefd"
+    },
     "eigen-website.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2857,6 +2872,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "scherp": "gezakt"
+    },
+    "escape-lagen.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "eten-uitgaan-voorzijde.test.js": {
@@ -9640,30 +9662,6 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
-    "toestel-kluisindex.e2e.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/shared/toestel/kluisindex.js",
-      "operator": "===->!==#0",
-      "gezakt": 1,
-      "geprobeerd": 1
-    },
-    "toestel-spraak.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/shared/toestel/spraak.js",
-      "operator": "===->!==#0",
-      "gezakt": 7,
-      "geprobeerd": 1
-    },
-    "toestel-vector.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/shared/toestel/vector.js",
-      "operator": "true->false#0",
-      "gezakt": 2,
-      "geprobeerd": 1
-    },
     "toestellen.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -10977,14 +10975,6 @@
       "gezakt": 3,
       "geprobeerd": 3
     },
-    "zoekmaat.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/zoekmaat.js",
-      "operator": "===->!==#0",
-      "gezakt": 1,
-      "geprobeerd": 1
-    },
     "zorgketen.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -11021,21 +11011,6 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
-    },
-    "onvervreemdbaar.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/onvervreemdbaar.js",
-      "operator": "===->!==#0",
-      "gezakt": 1,
-      "geprobeerd": 2
-    },
-    "paspoortdeur.test.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 3,
-      "scherp": "gezakt"
     }
   }
 }

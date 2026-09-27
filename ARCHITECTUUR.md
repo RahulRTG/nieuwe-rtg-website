@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 5171 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 5174 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 5171 |
-| servermodules (`server/**/*.js`) | 3738 |
-| routebestanden (`server/routes/**`) | 614 |
-| kernmodules (`server/kern/**`) | 2345 |
+| API-endpoints | 5174 |
+| servermodules (`server/**/*.js`) | 3743 |
+| routebestanden (`server/routes/**`) | 616 |
+| kernmodules (`server/kern/**`) | 2347 |
 | schermen (`public/**/*.html`) | 320 |
 | gedeelde browsermodules (`public/shared/*.js`) | 398 |
-| toetsbestanden (`test/*.test.js`) | 1832 |
+| toetsbestanden (`test/*.test.js`) | 1836 |
 | schermtoetsen (`test/*.e2e.js`) | 262 |
 
 ## 2. De weg van een verzoek
@@ -106,13 +106,13 @@ luister
 Acht domeinen, uit `server/opzet/routes.js`. Met `RTG_DOMAINS=member,social` draait
 een proces alleen die domeinen; een gateway (`server/poort.js`) stuurt de
 padvoorvoegsels dan naar het juiste proces. **Die belofte is nog niet waargemaakt:**
-zie §5 -- er zijn nog 245 kern-namen die meer dan één domein aanraakt.
+zie §5 -- er zijn nog 246 kern-namen die meer dan één domein aanraakt.
 
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
 | `auth` | 20 | 6 | 8 | 52 |
 | `member` | 703 | 73 | 16 | 430 |
-| `supplier` | 629 | 129 | 6 | 339 |
+| `supplier` | 632 | 130 | 6 | 340 |
 | `office` | 74 | 21 | 3 | 84 |
 | `staff` | 26 | 8 | 1 | 42 |
 | `social` | 76 | 10 | 31 | 71 |
@@ -136,8 +136,8 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1603 |
-| daarvan door **meer dan één** domein (de echte koppeling) | 245 |
+| kern-namen die routes aanraken | 1604 |
+| daarvan door **meer dan één** domein (de echte koppeling) | 246 |
 | daarvan door precies één domein | 1358 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
@@ -150,13 +150,14 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(208) auth(128) supplierAuth(65) officeAuth(46) db(38) liveCodename(35) status(31)
-accounts(27) schoon(23) codenaamVan(19) managerOnly(18) rtf(18) boardroomWie(17)
-save(17) tooManyTries(14) geenGast(14) express(13) crypto(12) findSupplier(12)
+app(209) auth(128) supplierAuth(65) officeAuth(46) db(39) liveCodename(35) status(31)
+accounts(27) schoon(23) codenaamVan(19) managerOnly(18) save(18) rtf(18)
+boardroomWie(17) tooManyTries(14) geenGast(14) express(13) findSupplier(13) crypto(12)
 appUrl(11) keyVanCodenaam(11) pay(11) anthropic(11) noteFailedTry(10) boardroomAuth(10)
 rtmail(10) kern(9) gegevensStop(9) sseToOffice(9) payrollOS(9) loginFails(8) stuur(8)
 logActivity(8) mail(7) sseToSupplier(7) onboarding(6) notifySupplier(6) talen(6)
-tenant(5) logInlog(5) veilig(5) openVacatures(5) overheid(5) sseToCustomer(5)
+tenant(5) logInlog(5) veilig(5) afdelingen(5) openVacatures(5) overheid(5)
+sseToCustomer(5)
 ```
 
 **De breedste routebestanden** -- hier zou je beginnen:

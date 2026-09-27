@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T13:53:38.520Z",
-    "commit": "b465f346",
+    "op": "2026-09-27T14:12:45.638Z",
+    "commit": "31b3e180",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -4485,6 +4485,13 @@
       "module": "public/shared/kaart.js",
       "operator": "===->!==",
       "gezakt": 2
+    },
+    "kaarttoegang.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "kantoorbank.test.js": {
       "soort": "puur",
@@ -9626,6 +9633,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "scherp": "gezakt"
+    },
+    "tickettoegang.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "tiener.test.js": {

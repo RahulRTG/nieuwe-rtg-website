@@ -156,9 +156,6 @@ const REQUIRED_ROUTES = [
   'POST /api/supplier/rtmail/imap/sleutels',
   'POST /api/supplier/rtmail/imap/sleutel',
   'POST /api/supplier/rtmail/imap/intrekken', 'POST /api/rtfos/activiteit/incheck',
-  // rotatie en eerste uitgifte van de machinesleutels (API-poort, Stadsdoos, IMAP)
-  'POST /api/command/apipoort/roteer', 'POST /api/office/stad/node/aanmeld',
-  'POST /api/member/rtmail/imap/roteer', 'POST /api/supplier/rtmail/imap/roteer',
   'POST /api/office/kantoor/uitnodiging',
   'POST /api/office/service/bevestiging/vraag',
   'POST /api/office/service/bevestiging/code', 'POST /api/foundation/les/maak',

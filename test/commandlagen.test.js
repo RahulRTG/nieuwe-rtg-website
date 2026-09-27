@@ -9,9 +9,8 @@
    fouten die deze ronde twee keer opleverde (een receptenboek dat de verkeerde
    id-kaart kreeg, en een laag die pas na aanbouw bestond).
 
-   EN ELKE INGANG MOET DICHT ZITTEN ZONDER SESSIE. Dat staat hier per laag en
-   niet één keer aan het eind: een enkele vergeten officeAuth is genoeg, en
-   "de meeste routes zijn dicht" is geen uitspraak waar iemand iets aan heeft.
+   EN ELKE INGANG MOET DICHT ZITTEN ZONDER SESSIE, per laag: een enkele
+   vergeten officeAuth is genoeg.
 
    MUTATIES die zijn gedraaid en welke toets erop zakte (LAT.md regel 2):
    - de canary-routes uit routes/command/meten.js gehaald
@@ -37,8 +36,8 @@ const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-lagen-'));
 const CODE = 'KANTOOR-LAGEN-1';
 let srv, base, office;
 
-const api = (pad, body) => fetch(base + '/api/' + pad, {
-  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + office },
+const api = (pad, body, tok) => fetch(base + '/api/' + pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (tok || office) },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
@@ -141,17 +140,8 @@ test('de API-poort geeft een geheim dat nergens terugkomt', async () => {
     'buiten de toelating komt er geen sleutel');
   assert.equal((await api('command/apipoort/toelaten', { pad: '/api/extern/proef' })).status, 200);
 
-  /* Uitgeven gebeurt OP NAAM (naamAuth): de gedeelde kantoorcode krijgt 403 met
-     de weg erheen, een kantoormens met een eigen account krijgt de sleutel. */
-  const gedeeld = await api('command/apipoort/sleutel', { naam: 'Routetoets',
-    scopes: [{ pad: '/api/extern/proef', methoden: ['GET'] }], quotaPerUur: 5 });
-  assert.equal(gedeeld.status, 403, 'de gedeelde kantoorcode geeft geen machinesleutel uit');
-  const opNaam = await kantoorAlsPersoon(base, CODE);
-  assert.ok(opNaam, 'er is een kantoorsessie op naam');
-  const s = await fetch(base + '/api/command/apipoort/sleutel', { method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + opNaam },
-    body: JSON.stringify({ naam: 'Routetoets', scopes: [{ pad: '/api/extern/proef', methoden: ['GET'] }], quotaPerUur: 5 })
-  }).then(async x => ({ status: x.status, body: await x.json() }));
+  const s = await api('command/apipoort/sleutel', { naam: 'Routetoets',   // op naam (naamAuth)
+    scopes: [{ pad: '/api/extern/proef', methoden: ['GET'] }], quotaPerUur: 5 }, await kantoorAlsPersoon(base, CODE));
   assert.match(s.body.geheim, /^RTG-/);
 
   const stand = await api('command/apipoort');

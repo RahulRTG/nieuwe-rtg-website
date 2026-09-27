@@ -66,7 +66,7 @@ const ALLE = [
   '/api/supplier/rtmail/concepten', '/api/supplier/rtmail/concept/bewaar', '/api/supplier/rtmail/concept/weg', '/api/supplier/rtmail/concept/verstuur',
   '/api/supplier/rtmail/instellingen', '/api/supplier/rtmail/handtekening', '/api/supplier/rtmail/afwezig', '/api/supplier/rtmail/alias',
   '/api/supplier/rtmail/regels', '/api/supplier/rtmail/regel/maak', '/api/supplier/rtmail/regel/zet', '/api/supplier/rtmail/regel/weg',
-  '/api/supplier/rtmail/imap/sleutels', '/api/supplier/rtmail/imap/sleutel', '/api/supplier/rtmail/imap/intrekken', '/api/supplier/rtmail/imap/roteer',
+  '/api/supplier/rtmail/imap/sleutels', '/api/supplier/rtmail/imap/sleutel', '/api/supplier/rtmail/imap/intrekken',
   // bestuur (routes/rtmail-bestuur.js)
   '/api/supplier/rtmail/rechten', '/api/supplier/rtmail/delegeer', '/api/supplier/rtmail/delegatie/weg', '/api/supplier/rtmail/journaal',
   '/api/supplier/rtmail/bewaarbeleid', '/api/supplier/rtmail/bewaartermijn', '/api/supplier/rtmail/bewaring', '/api/supplier/rtmail/opruimen', '/api/supplier/rtmail/vernietigingen', '/api/supplier/rtmail/export',

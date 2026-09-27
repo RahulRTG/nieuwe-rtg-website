@@ -18,13 +18,14 @@
 'use strict';
 
 const T = 'test/vrijheid.test.js';
+const TB = 'test/vrijheid-teambeeld.test.js';
 const SCHAKELS = Object.freeze([
-  { schakel: 'PERSON', stand: 'DEELS', waar: 'server/kern/vrijheid/dekking.js', bewijs: [T, 'uit dienst telt niet mee'],
-    ontbreekt: 'Adapter van kern/concern/employment.js en accounts/staff.js naar het teambeeld; staff draagt vandaag geen verjaardag (MM-DD) en die moet rechtmatig worden vastgelegd.' },
+  { schakel: 'PERSON', stand: 'DEELS', waar: 'server/kern/vrijheid/teambeeld.js', bewijs: [TB, 'het teambeeld komt uit de bronnen, en zegt wat ontbreekt'],
+    ontbreekt: 'Het teambeeld leest staff, dienstverband en vakbewijs, en de verjaardag geeft de mens zelf op -- maar het is alleen bewezen met nepbronnen van de echte vorm. Een toets op een echte server komt met de routes.' },
   { schakel: 'POLICY', stand: 'DEELS', waar: 'server/kern/vrijheid/rtgbeleid.js', bewijs: [T, 'het besluit van de eigenaar staat, en de rest blijft open'],
     ontbreekt: 'Besloten (27 september 2026): tien RTG Days, en een verjaardag op een vrije dag schuift naar de vorige werkdag. Nog open: nachtdienst, schrikkeldag en alle drempels. Niets ervan is juridisch en loonadministratief gevalideerd.' },
-  { schakel: 'ROSTER', stand: 'DEELS', waar: 'server/kern/vrijheid/jaarplan.js', bewijs: [T, 'onbekende rooster-uitkomst wordt eerst afgestemd'],
-    ontbreekt: 'Rooster-adapter (pas/heeft) naar de bestaande roosters: kern/personeel.js, kern/beveiliging/rooster/, kern/festival/dienst.js.' },
+  { schakel: 'ROSTER', stand: 'DEELS', waar: 'server/kern/vrijheid/teambeeld.js', bewijs: [TB, 'het teambeeld komt uit de bronnen, en zegt wat ontbreekt'],
+    ontbreekt: 'Het rooster wordt GELEZEN uit kern/personeel.js, maar kijkt maar zeven dagen vooruit en een dag zonder vastgesteld rooster is een patroon. Terugschrijven (pas/heeft) is niet aangesloten.' },
   { schakel: 'WORK', stand: 'DEELS', waar: 'server/kern/vrijheid/werkstand.js', bewijs: [T, 'zelf afvinken is geen WORK_COMPLETE'],
     ontbreekt: 'Geen domein legt vandaag verantwoordelijkheden per dienst vast; zonder bron is de werkstand UNKNOWN en komt er geen automatisch aanbod.' },
   { schakel: 'COVERAGE', stand: 'STAAT', waar: 'server/kern/vrijheid/dekking.js', bewijs: [T, 'vier aanwezigen zijn te weinig zonder de specialist'] },
@@ -42,8 +43,8 @@ const SCHAKELS = Object.freeze([
 ]);
 
 const OVERIG = Object.freeze([
-  'Geen HTTP-route en geen scherm: de motor is niet gemount (VRIJHEID.md par. 7).',
-  'Geen duurzame opslag: de motor schrijft via de meegegeven opslag en is nog niet op db.data aangesloten.',
+  'Geen HTTP-route en geen scherm: de motor hangt in de kern (kern.vrijheid) maar niemand roept hem aan (VRIJHEID.md par. 7).',
+  'Geen duurzame vastlegging: de motor schrijft in zijn eigen collectie via save() (write-behind); een besluit hoort pas gelukt te heten als het vaststaat, en dat hoort bij de route.',
   'Geen productiebewijs.'
 ]);
 

@@ -2412,6 +2412,7 @@ require('./opzet/kernlaag4b')(kern, hulp);
 require('./opzet/kernlaag4c')(kern, hulp);   // de drie kantoorkamers; NA 4b, want regering leest kern.bank
 require('./opzet/kernlaag5')(kern, hulp);
 require('./opzet/kernlaag5f')(kern, hulp);  // RTG Festival; hangt onder EEN naam, zie de kop daar
+require('./opzet/kernlaag5g')(kern, hulp);  // RTG Vrijheid; hangt onder EEN naam (kern.vrijheid), zie VRIJHEID.md
 require('./opzet/kernlaag6')(kern, hulp);
 require('./opzet/kernlaag6b')(kern, hulp);
 require('./opzet/kernlaag7')(kern, hulp);

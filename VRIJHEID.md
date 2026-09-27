@@ -72,7 +72,7 @@ stap verder brengen, en **nieuw** betekent dat er niets was.
 |---|---|---|---|
 | Persoon op codenaam | BESTAAT | `server/accounts/staff.js`, `server/kern/concern/employment.js` | HERGEBRUIKEN als bron van het teambeeld; de adapter ontbreekt |
 | Dienstverband als waarheid | BESTAAT | `server/kern/concern/employment.js` (besluit ARBEID.md par. 7a) | HERGEBRUIKEN: "in dienst op datum" |
-| Verjaardag | ONTBREEKT | staff draagt geen geboortedatum; `md.geboren` staat bij het lid | NIEUW: alleen `MM-DD`, zelf opgegeven |
+| Verjaardag | ONTBREEKT | staff draagt geen geboortedatum; `md.geboren` staat bij het lid en hoort niet naar de werkgever (MN-02) | NIEUW (`instellingen.js`): alleen `MM-DD`, door de mens zelf opgegeven |
 | Verlof en ziekte | DEELS, en dubbel | `server/kern/payroll/verzuim.js` én `db.data.verlof` via `server/routes/staff/dienst.js` | BOTST: twee opslagen, zie par. 4 |
 | Vakantiesaldo | ONTBREEKT | geen teller in dit huis | NIEUW als teller in `categorieen.js`; het RECHT komt van contract en payroll |
 | RTG Day, verjaardagvrijheid, eerder naar huis, hersteltijd | ONTBREEKT | | NIEUW |
@@ -139,7 +139,7 @@ korte dienst levert dus geen halve RTG Day in.
 
 ## 5. V1: wat er staat
 
-Negentien modules in `server/kern/vrijheid/`, allemaal onder de 10 kB en zonder
+Drieëntwintig modules in `server/kern/vrijheid/`, allemaal onder de 10 kB en zonder
 modelaanroep:
 
 | Module | Wat hij doet |
@@ -156,6 +156,7 @@ modelaanroep:
 | `capaciteit.js` | van blokkade naar opleidingsbehoefte, en terug |
 | `standen.js` | vijf standmachines met expliciete overgangen |
 | `index.js` + `mens.js` + `aanbod.js` + `herstel.js` + `jaarplan.js` + `beeld.js` | vastleggen, menselijke beoordeling, aanbod, jobs en de drie beelden |
+| `teambeeld.js` + `instellingen.js` + `huis.js` | het teambeeld uit de bestaande bronnen, wat de zaak en de mens zelf opgeven, en de montage als `kern.vrijheid` |
 | `lus.js` | PEOPLE_TIME_LOOP_COMPLETENESS_CHECK |
 
 **De gouden bewijzen A tot en met G** staan in `test/vrijheid.test.js` onder hun
@@ -238,10 +239,26 @@ valideren:
    nog in de opslag.
 3. De rest van het arbeidsvoorwaardenbesluit (par. 6), plus de juridische
    validatie van wat al besloten is.
-4. De teambeeld-adapter: `employment` + staff + een zelf opgegeven verjaardag
-   + een rooster + `vakbewijs`.
-5. De eigen collectie op `db.data` (`server/kern/eigencollectie.js`) en
-   duurzaam vastleggen voor een besluit (`server/lib/duurzaam.js`).
+4. ~~De teambeeld-adapter.~~ **Gedaan** (`teambeeld.js`). Hij leest het
+   personeelsregister, het DIENSTVERBAND bij de entiteit van de zaak (dezelfde
+   weg als `dienstverbandToets`), het weekrooster en het vakbewijs, en zegt
+   per veld wat er ontbreekt. De verjaardag geeft de medewerker zelf op
+   (`instellingen.js`, alleen dag en maand, en hij kan hem weer weghalen);
+   bezetting en feestdagen legt een leidinggevende vast, want die stonden
+   nergens. Vier eerlijkheden die hij hardop zegt:
+   - wie geen eigen account of geen dienstverband bij die entiteit heeft, telt
+     NIET als in dienst en krijgt BLOCKED met de reden;
+   - het rooster kijkt zeven dagen vooruit;
+   - een dag zonder vastgesteld rooster is het standaardpatroon;
+   - verantwoordelijkheden per dienst legt geen enkel domein vast, dus de
+     werkstand blijft UNKNOWN.
+5. **Half gedaan.** De motor hangt als `kern.vrijheid` in de server
+   (`server/opzet/kernlaag5g.js`) en schrijft in zijn eigen collecties
+   `vrijheid` en `vrijheidInstellingen` (`server/kern/eigencollectie.js`).
+   Bij het opstarten loopt de laag na of elke bron van het teambeeld in de kern
+   staat; ontbreekt er een, dan start de server niet. Wat nog niet staat is
+   duurzaam vastleggen (`server/lib/duurzaam.js`): dat hoort bij de route die
+   het antwoord geeft, dus bij punt 6.
 6. Routes (`/api/staff/tijd`, verzoek, aanbod aanvaarden; leidinggevende:
    beoordelen, verdelen), met een toets op een echte server, en het scherm
    *Mijn tijd*.

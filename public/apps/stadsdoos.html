@@ -192,7 +192,7 @@ $('#aMeld').addEventListener('click', async () => {
   try {
     const r = await api('stad/node/aanmeld', { doosNaam: $('#aNaam').value, zone: $('#aZone').value,
       sensoren: $('#aSens').value.split(',').map(s => s.trim()).filter(Boolean), naam: wie() });
-    $('#aUit').innerHTML = '<div style="padding:.55rem .7rem;border:1px solid var(--gold);border-radius:0;"><strong>' + esc(r.serial) + '</strong><br>sleutel: <code style="word-break:break-all;">' + esc(r.sleutel) + '</code><br>manifestsleutel: <code style="word-break:break-all;">' + esc(r.manifestSleutel || '-') + '</code><br><span style="color:var(--soft);">' + esc(r.let_op) + '</span></div>';
+    $('#aUit').innerHTML = '<div style="padding:.55rem .7rem;border:1px solid var(--gold);border-radius:0;"><strong>' + esc(r.serial) + '</strong><br>sleutel: <code style="word-break:break-all;">' + esc(r.sleutel) + '</code><br>manifestsleutel: <code>' + esc(r.manifestSleutel || '-') + '</code><br><span style="color:var(--soft);">' + esc(r.let_op) + '</span></div>';
     $('#tSerial').value = r.serial; $('#tSleutel').value = r.sleutel; // klaar voor de verbindingstest
     $('#aNaam').value = ''; $('#aSens').value = '';
     laad();

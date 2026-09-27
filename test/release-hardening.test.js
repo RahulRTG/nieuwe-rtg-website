@@ -176,6 +176,8 @@ test('de imageworkflow publiceert alleen een getekende kandidaat en geen officiÃ
   const gereedschap = bron.indexOf('sudo apt-get install -y -qq libxml2-utils redis-server');
   assert.ok(gereedschap >= 0 && gereedschap < afbouw,
     'de volledige suite vereist xmllint en een eigen redis-server executable, ook naast de servicecontainer');
+  assert.match(lees('.github/workflows/ci.yml'), /sudo apt-get install -y -qq libxml2-utils redis-server/,
+    'de gewone testscherven moeten dezelfde echte Redis-protocolproef kunnen uitvoeren');
   const pg = bron.indexOf('run: node scripts/ci-pg-bewijs.js');
   const bootstrap = bron.indexOf('imageherkomst.js --sleutelcontrole');
   const sleutel = bron.indexOf('imageherkomst.js --sleutelcontrole', afbouw);

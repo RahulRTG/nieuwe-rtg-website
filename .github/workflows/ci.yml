@@ -258,8 +258,8 @@ jobs:
       # andere machine dan de toets: drie beweringen zakten op ENOENT terwijl ze
       # los groen zijn. Een aanname over de omgeving is geen omgeving, en die
       # zin gold hier net zo goed.
-      - name: libxml2 (de scheidsrechter van de c14n-toets)
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq libxml2-utils
+      - name: libxml2 en Redis voor de onafhankelijke protocolproeven
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq libxml2-utils redis-server
       # EEN GEZAKTE TOETS MOET TE LEZEN ZIJN, ANDERS IS HET GEEN SIGNAAL.
       # Deze stap zakte een keer met drie rode toetsen, en die namen waren niet
       # meer te achterhalen: node zet "not ok" op de plek waar de toets draaide,

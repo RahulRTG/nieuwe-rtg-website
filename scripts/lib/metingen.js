@@ -417,6 +417,7 @@ const REGISTER = {
   'TOELATINGSPROEF.json': { eigenRatel: 'test/toelatingsproef.test.js' },
   'ADAMPROEF.json': { eigenRatel: 'test/adamproef.test.js' },
   'DOELGROEPBEREIK.json': { eigenRatel: 'test/doelgroepbereik.test.js' },
+  'ONVERVREEMDBAAR.json': { eigenRatel: 'test/onvervreemdbaar.test.js' },
   'AANVOERVORM.json': { eigenRatel: 'test/aanvoer.test.js' },
   'MOMENTPROEF.json': { eigenRatel: 'test/momentproef.test.js' },
   /* LUSPROEF.json (sinds 24 september 2026) levert voltooibaar voor Ontdekken

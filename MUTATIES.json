@@ -11021,6 +11021,21 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "onvervreemdbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/onvervreemdbaar.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "paspoortdeur.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
     }
   }
 }

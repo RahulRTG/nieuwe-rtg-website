@@ -390,6 +390,8 @@
     "toelatingsproef:vast": "node scripts/toelatingsproef.js --vastleggen",
     "doelgroepbereik": "node scripts/doelgroepbereik.js",
     "doelgroepbereik:vast": "node scripts/doelgroepbereik.js --vastleggen",
+    "onvervreemdbaar": "node scripts/onvervreemdbaar.js",
+    "onvervreemdbaar:vast": "node scripts/onvervreemdbaar.js --vastleggen",
     "landdekking": "node scripts/landdekking.js",
     "landdekking:vast": "node scripts/landdekking.js --vastleggen",
     "soeverein": "node scripts/soeverein.js",

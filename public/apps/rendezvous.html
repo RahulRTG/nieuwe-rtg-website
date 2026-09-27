@@ -138,7 +138,7 @@
     const tekst = fout && fout.message ? fout.message : 'Log eerst in via de leden-app om Rendez-vous te openen.';
     const href = inlog || identiteit || leeftijd ? '/apps/app.html' : '/apps/lifestyle.html';
     const knop = inlog ? 'Naar de leden-app' : identiteit ? 'Start identiteitscontrole' : leeftijd ? 'Terug naar de leden-app' : 'Bekijk Signature';
-    $('#main').innerHTML = '<section class="dating-gate"><div class="dating-seal">R</div><span class="dating-eyebrow">Toegang bewaakt</span><h2>'+esc(titel)+'</h2><p>'+esc(tekst)+'</p><div class="dating-actions"><a class="dating-button primary" href="'+href+'">'+knop+'</a></div></section>';
+    $('#main').innerHTML = '<section class="dating-gate"><div class="dating-seal">R</div><span class="dating-eyebrow">Toegang bewaakt</span><h2>'+esc(titel)+'</h2><p>'+esc(tekst)+'</p><div class="dating-actions"><a class="dating-button primary" href="'+href+'" data-rtg-safe-exit>'+knop+'</a></div></section>';
   }
   function openSafety(id, naam) {
     safetyTarget = { id, naam }; $('#safetyReason').value = '';

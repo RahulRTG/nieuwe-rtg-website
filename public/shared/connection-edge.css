@@ -5,7 +5,7 @@ body[data-connection-edge]{--connection-edge-space:calc(7.6rem + env(safe-area-i
 .connection-edge{
   position:fixed;z-index:10020;inset-inline:clamp(.75rem,3vw,2rem);inset-block-end:calc(.7rem + env(safe-area-inset-bottom,0px));
   width:min(760px,calc(100vw - clamp(1.5rem,6vw,4rem)));margin-inline:auto;box-sizing:border-box;
-  display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:.7rem;padding:.58rem;
+  display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:.7rem;padding:.58rem;
   isolation:isolate;transition:width .28s cubic-bezier(.2,.8,.2,1),padding .28s cubic-bezier(.2,.8,.2,1),
     transform .28s cubic-bezier(.2,.8,.2,1),background-color .24s ease,box-shadow .24s ease;
   touch-action:pan-y;overscroll-behavior:contain;
@@ -44,6 +44,12 @@ body[data-connection-edge]{--connection-edge-space:calc(7.6rem + env(safe-area-i
 .connection-edge__mark{width:.35rem;height:.35rem;flex:none;border:1px solid currentColor;border-radius:50%;opacity:.5;transition:transform .18s ease,opacity .18s ease,background-color .18s ease;}
 .connection-edge__action[aria-current="page"] .connection-edge__mark{opacity:1;background:currentColor;transform:scale(1.28);}
 .connection-edge__label{overflow:hidden;text-overflow:ellipsis;}
+.connection-edge__exit{
+  min-width:48px;min-height:48px;padding:.35rem .52rem;display:grid;place-items:center;box-sizing:border-box;
+  border:1px solid currentColor;border-radius:var(--rtg-radius-system,22px);color:inherit;text-decoration:none;
+  font:700 .62rem/1 Inter,system-ui,sans-serif;letter-spacing:.14em;
+}
+.connection-edge__exit:focus-visible{outline:2px solid currentColor;outline-offset:2px;}
 .connection-edge__status{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
 .connection-edge.is-compact{width:min(560px,calc(100vw - 2rem));padding:.36rem;transform:translateY(.16rem);}
 .connection-edge.is-compact .connection-edge__context{max-width:0;min-width:0;padding:0;opacity:0;}
@@ -61,6 +67,7 @@ body[data-connection-edge]{--connection-edge-space:calc(7.6rem + env(safe-area-i
 .connection-edge--vonk .connection-edge__action:hover,
 .connection-edge--vonk .connection-edge__action[aria-current="page"]{color:#fffaf1;border-color:rgba(228,193,112,.34);background:rgba(255,245,223,.09);}
 .connection-edge--vonk .connection-edge__mark{color:#e3c878;}
+.connection-edge--vonk .connection-edge__exit{color:#e3c878;border-color:rgba(228,193,112,.34);}
 
 /* Rendez-vous: een stille hospitality-laag. Minder glans, meer ruimte en een
    redactionele titeltoon; dezelfde renderer, nadrukkelijk niet dezelfde huid. */
@@ -76,6 +83,7 @@ body[data-connection-edge]{--connection-edge-space:calc(7.6rem + env(safe-area-i
 .connection-edge--rendezvous .connection-edge__action[aria-current="page"]{color:#5d4c12;border-block-color:rgba(133,112,7,.38);background:rgba(192,165,68,.055);}
 .connection-edge--rendezvous .connection-edge__mark{border-radius:0;width:.48rem;height:1px;border:0;background:currentColor;transform:none;}
 .connection-edge--rendezvous .connection-edge__action[aria-current="page"] .connection-edge__mark{height:2px;transform:scaleX(1.35);}
+.connection-edge--rendezvous .connection-edge__exit{color:#74601b;border-color:rgba(133,112,7,.38);border-radius:0;}
 
 [dir="rtl"] .connection-edge{direction:rtl;}
 [dir="rtl"] .connection-edge__rail{direction:rtl;}
@@ -84,7 +92,7 @@ html.rtg-tekst-groot .connection-edge__rail,html.rtg-tekst-groter .connection-ed
 html.rtg-tekst-groot .connection-edge__action,html.rtg-tekst-groter .connection-edge__action{white-space:normal;line-height:1.18;}
 @media(max-width:620px){
   body[data-connection-edge]{--connection-edge-space:calc(7rem + env(safe-area-inset-bottom,0px));}
-  .connection-edge{inset-inline:.65rem;inset-block-end:calc(.55rem + env(safe-area-inset-bottom,0px));width:calc(100vw - 1.3rem);grid-template-columns:1fr;padding:.44rem;}
+  .connection-edge{inset-inline:.65rem;inset-block-end:calc(.55rem + env(safe-area-inset-bottom,0px));width:calc(100vw - 1.3rem);grid-template-columns:minmax(0,1fr) auto;padding:.44rem;}
   .connection-edge__context{display:none;}
   .connection-edge__rail{grid-auto-columns:minmax(0,1fr);gap:.2rem;}
   .connection-edge__action{min-height:52px;padding:.5rem .35rem;gap:.32rem;font-size:clamp(.65rem,3.2vw,.76rem);}

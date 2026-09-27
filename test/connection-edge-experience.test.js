@@ -87,6 +87,7 @@ test('de Edge heeft toetsenbord, screenreader, touch target, safe area, RTL en r
   const js = lees('public/shared/connection-edge.js') + lees('public/shared/connection-edge-input.js');
   const css = lees('public/shared/connection-edge.css');
   assert.match(js, /role', 'toolbar'/); assert.match(js, /aria-live/);
+  assert.match(js, /data-rtg-safe-exit/); assert.match(js, /href = '\/apps\/app\.html'/);
   assert.match(js, /ArrowLeft/); assert.match(js, /Escape/); assert.match(js, /navigator\.vibrate/);
   assert.match(css, /safe-area-inset-bottom/); assert.match(css, /min-height:52px/);
   assert.match(css, /\[dir="rtl"\]/); assert.match(css, /prefers-reduced-motion:reduce/);
@@ -109,6 +110,7 @@ test('Vonk en Rendez-vous delen de engine maar niet hun presentatie', () => {
     const html = lees('public/apps/' + app);
     assert.match(html, /connection-edge-core\.js/); assert.match(html, /connection-edge-input\.js/);
     assert.match(html, /connection-edge\.js/); assert.match(html, /connection-edge\.css/);
+    assert.match(html, /data-rtg-safe-exit/);
     assert.doesNotMatch(html, /const tabs =/);
   }
 });

@@ -25,7 +25,15 @@
     var rail = d.createElement('div'); rail.className = 'connection-edge__rail'; rail.setAttribute('role', 'toolbar');
     var status = d.createElement('span'); status.className = 'connection-edge__status'; status.setAttribute('role', 'status');
     status.setAttribute('aria-live', 'polite'); status.setAttribute('aria-atomic', 'true');
-    host.appendChild(kop); host.appendChild(rail); host.appendChild(status); d.body.appendChild(host);
+    host.appendChild(kop); host.appendChild(rail);
+    /* Geen capability: de vaste systeemuitgang die de buitenste embed al bezit. */
+    if (!ingebed) {
+      var uitgang = d.createElement('a'); uitgang.className = 'connection-edge__exit';
+      uitgang.href = '/apps/app.html'; uitgang.setAttribute('data-rtg-safe-exit', '');
+      uitgang.setAttribute('aria-label', 'Terug naar RTG'); uitgang.textContent = 'RTG';
+      host.appendChild(uitgang);
+    }
+    host.appendChild(status); d.body.appendChild(host);
     d.body.setAttribute(ingebed ? 'data-connection-edge-embedded' : 'data-connection-edge', o.product);
     var plaatser = null, valTerug = w.setTimeout(function () { host.hidden = !staat.model; }, 1800);
     function plaats() {

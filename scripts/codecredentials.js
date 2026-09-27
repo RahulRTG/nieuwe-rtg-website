@@ -10,13 +10,19 @@ const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const { ROUTES: EENMALIGE_ROUTES } = require('../server/lib/eenmalig-geheim-routes');
+const { zonderCommentaar } = require('./lib/bron');
 
 const PAD = path.join(__dirname, '..', 'CODECREDENTIALS.json');
 const ROOT = path.join(__dirname, '..');
 const STATUSES = new Set(['migrated', 'closed', 'remaining']);
 const CLASSIFICATIES = new Set(['credential', 'money_credential', 'public_identifier',
   'tracking_identifier', 'signed_presentation', 'authenticated_identifier',
-  'external_protocol_credential', 'central_session_credential']);
+  'external_protocol_credential', 'central_session_credential',
+  /* GEEN CREDENTIAL: de census ziet iets credentialachtigs dat het niet is (een
+     record-id uit randomBytes, een veld `verdieping` dat "pin" bevat, de
+     keukenpas). Dat is geen identificator, dus `public_identifier` zou liegen.
+     Alleen met status `closed` en een notitie die zegt WAAROM -- zie controleer(). */
+  'geen_credential']);
 const REQUIRED_ROUTES = [
   'GET /api/projectie/:code',
   'POST /api/projectie/koppel', 'POST /api/projectie/kijk',
@@ -129,11 +135,15 @@ const CONTROLES = ['hash_only_at_rest', 'issuer_doel_scope', 'issued_at_expires_
    reden. Daarmee blijft de poort bruikbaar terwijl de inventaris groeit, maar
    kan onbekend nooit READY betekenen. */
 const METHODEN = 'get|post|put|patch|delete|head|options|all';
-const ROUTE = new RegExp('\\b(?:app|router)\\.(' + METHODEN + ')\\s*\\(\\s*([\'"`])(\\/[^\'"`$]+)\\2', 'g');
+/* `*` en niet `+` na de slash: `app.get('/')` is ook een letterlijke route, en
+   met `+` werd hij als onleesbaar geteld (middleware/voordeur.js). */
+const ROUTE = new RegExp('\\b(?:app|router)\\.(' + METHODEN + ')\\s*\\(\\s*([\'"`])(\\/[^\'"`$]*)\\2', 'g');
 const ROUTE_AANROEP = new RegExp('\\b(?:app|router)\\.(' + METHODEN + ')\\s*\\(', 'g');
 const PAD_RISICO = /(?:^|\/)(?:code(?:s|woord)?|sleutel|token|pin|claim|ticket|pas|pass|uitnodig(?:ing)?|kassacode|toegang)(?:$|[\/_-])|koppel\/code|projectie\/:code|vracht\/volg|lab2\/mijn|salon\/deal\/claim/i;
 const VELD_RISICO = /(?:req\.body|\bbody|\bb)\s*(?:\.|\[\s*['"])(?:[a-z0-9_]*(?:code|token|sleutel|pin|password|wachtwoord|pas|pass|claim|ticket|key|secret)[a-z0-9_]*)/i;
-const KOP_RISICO = /(?:authorization|x-[a-z0-9-]*(?:code|token|key|secret)|bearer\s)/i;
+/* `sleutel` hoort erbij: `x-doos-eigen-sleutel` (kern/stad) is een apparaatsleutel
+   in een kop, en zonder dit woord zag de census die route niet eens. */
+const KOP_RISICO = /(?:authorization|x-[a-z0-9-]*(?:code|token|key|secret|sleutel)|bearer\s)/i;
 /* Niet alleen wat binnenkomt kan een deur verraden. Een route die een geheim
    maakt of een PIN/token/kassacode in haar antwoord zet is zelf een issuer en
    moet dus ook worden geclassificeerd. */
@@ -149,12 +159,49 @@ function jsBestanden(map) {
   return uit;
 }
 
-function bronCensus(root = ROOT) {
+/* DYNAMISCHE ROUTES OPLOSSEN ZONDER HANDLIJST. Een pad als `p.pad + '/verstuur'`
+   of `BASIS + '/Users'` is voor deze census onleesbaar -- maar de ROUTER kent het
+   wel, en ROUTEBRON.json legt per route vast in welk bestand en op welke regel de
+   router hem vond (`samengesteld: true`). Wat daar staat is de waarheid van de
+   server en geen bewering van een mens; een verouderde regel valt vanzelf terug
+   op onleesbaar, want de sleutel is bestand:regel. */
+function routebronKaart(root) {
+  const kaart = new Map();
+  let rb = null;
+  try { rb = JSON.parse(fs.readFileSync(path.join(root, 'ROUTEBRON.json'), 'utf8')); } catch (e) { return kaart; }
+  for (const r of Object.values((rb && rb.perRoute) || {})) {
+    if (!r || !r.samengesteld || !r.bestand || !Number.isSafeInteger(r.regel)) continue;
+    const m = /^([A-Z]+) (\/\S*)$/.exec(String(r.route || ''));
+    if (!m) continue;
+    const k = r.bestand + ':' + r.regel;
+    if (!kaart.has(k)) kaart.set(k, []);
+    kaart.get(k).push({ methode: m[1], pad: m[2] });
+  }
+  return kaart;
+}
+
+/* Wat ook de router niet kent (gehashte bundelpaden, de Express-shim zelf), wordt
+   in het register VERKLAARD: bron plus de exacte regeltekst van de aanroep. Een
+   gewijzigde regel verklaart niets meer en wordt weer een blokkade. */
+function aanroepTekst(bron, index) {
+  const eind = bron.indexOf('\n', index);
+  return bron.slice(bron.lastIndexOf('\n', index) + 1, eind < 0 ? bron.length : eind).trim();
+}
+
+function bronCensus(root = ROOT, register = null) {
   const server = path.join(root, 'server');
-  const alle = [], onleesbaar = [];
-  let aanroepen = 0;
+  const alle = [], onleesbaar = [], verklaardDynamisch = [];
+  const kaart = routebronKaart(root);
+  const verklaringen = Array.isArray(register && register.dynamische_aanroepen) ? register.dynamische_aanroepen : [];
+  let aanroepen = 0, letterlijk = 0, doorRouter = 0;
   for (const bestand of jsBestanden(server).sort()) {
-    const bron = fs.readFileSync(bestand, 'utf8');
+    /* COMMENTAAR IS GEEN CODE. Zonder deze stap telde een `app.post(` in een
+       uitleg als onleesbare route, en een woord als "Authorization" in het
+       commentaar boven de VOLGENDE route maakte de vorige een kandidaat (het
+       handlervenster loopt tot de volgende aanroep). Platgeslagen en niet
+       weggehaald (scripts/lib/bron.js, regelsHeel): posities en regelnummers
+       blijven die van de echte bron. */
+    const bron = zonderCommentaar(fs.readFileSync(bestand, 'utf8'), { regelsHeel: true });
     const calls = [];
     ROUTE_AANROEP.lastIndex = 0;
     let call;
@@ -167,12 +214,27 @@ function bronCensus(root = ROOT) {
     while ((m = ROUTE.exec(bron))) gevonden.push({ index: m.index, einde: ROUTE.lastIndex,
       methode: m[1].toUpperCase(), pad: m[3] });
     const leesbarePosities = new Set(gevonden.map(x => x.index));
+    letterlijk += leesbarePosities.size;
+    const rel = path.relative(root, bestand).replace(/\\/g, '/');
     for (const c of calls) if (!leesbarePosities.has(c.index)) {
       const regel = 1 + bron.slice(0, c.index).split('\n').length - 1;
-      onleesbaar.push({ bron: path.relative(root, bestand).replace(/\\/g, '/'),
-        regel, methode: c.methode,
-        reden: 'routepad is dynamisch, een regex of niet-letterlijk; expliciete classificatie vereist' });
+      const opgelost = kaart.get(rel + ':' + regel);
+      if (opgelost) {
+        doorRouter++;
+        /* Elke route die de router op deze regel vond, krijgt dezelfde keuring
+           als een letterlijke: pad plus het handlervenster vanaf deze aanroep. */
+        for (const r of opgelost) gevonden.push({ index: c.index, einde: c.index, methode: r.methode,
+          pad: r.pad, dynamisch: true });
+        continue;
+      }
+      const tekst = aanroepTekst(bron, c.index);
+      const verklaring = verklaringen.find(v => v && v.bron === rel && v.aanroep === tekst);
+      if (verklaring) { verklaardDynamisch.push({ bron: rel, regel, aanroep: tekst }); continue; }
+      onleesbaar.push({ bron: rel, regel, methode: c.methode,
+        reden: 'routepad is dynamisch, een regex of niet-letterlijk en de router kent hem niet op deze regel; ' +
+          'verklaar hem in dynamische_aanroepen of maak het pad letterlijk' });
     }
+    gevonden.sort((a, b) => a.index - b.index);
     for (let i = 0; i < gevonden.length; i++) {
       const r = gevonden[i];
       const volgende = calls.find(x => x.index > r.index);
@@ -198,7 +260,7 @@ function bronCensus(root = ROOT) {
   }
   const routes = [...perRoute.values()].sort((a, b) => a.route.localeCompare(b.route));
   const kandidaten = routes.filter(r => r.redenen.length);
-  return { aanroepen, verklaringen: routes.length, kandidaten, onleesbaar,
+  return { aanroepen, letterlijk, doorRouter, verklaringen: routes.length, kandidaten, onleesbaar, verklaardDynamisch,
     sha256: crypto.createHash('sha256').update(JSON.stringify(routes)).digest('hex') };
 }
 
@@ -286,10 +348,23 @@ function controleer(register, root = ROOT) {
   }
   for (const route of REQUIRED_ROUTES) if (!externeRoutes.has(route))
     fouten.push('ontbrekende geïnventariseerde werkelijke route: ' + route);
+  for (const d of register.deuren) if (d && d.classificatie === 'geen_credential' &&
+      (d.status !== 'closed' || String(d.notitie || '').trim().length < 40))
+    fouten.push(d.id + ': geen_credential kan alleen gesloten zijn, met een notitie die zegt waarom');
   const blockers = register.deuren.filter(d => d && d.status === 'remaining' && d.release_blocker === true)
     .map(d => ({ id: d.id, classificatie: d.classificatie,
       routes: effectieveRoutes(d), eigenaar: d.eigenaar }));
-  const census = bronCensus(root);
+  const census = bronCensus(root, register);
+  const verklaringen = Array.isArray(register.dynamische_aanroepen) ? register.dynamische_aanroepen : [];
+  for (const v of verklaringen) {
+    const id = 'dynamische aanroep ' + (v && v.bron) + ': ' + (v && v.aanroep);
+    if (!v || typeof v.bron !== 'string' || typeof v.aanroep !== 'string' || !v.aanroep) fouten.push(id + ': onvolledig');
+    else if (!CLASSIFICATIES.has(v.classificatie) || v.classificatie === 'credential' || v.classificatie === 'money_credential')
+      fouten.push(id + ': een dynamische credential wordt niet verklaard maar letterlijk gemaakt');
+    else if (String(v.notitie || '').trim().length < 40) fouten.push(id + ': notitie zegt niet waarom');
+    else if (!census.verklaardDynamisch.some(x => x.bron === v.bron && x.aanroep === v.aanroep))
+      fouten.push(id + ': deze aanroep bestaat niet meer -- haal de verklaring weg');
+  }
   const onbekend = census.kandidaten.filter(k => !bronRoutes.has(k.route));
   for (const k of onbekend) blockers.push({ id: 'unclassified:' + k.route,
     classificatie: 'unclassified', routes: [k.route], eigenaar: 'unassigned',

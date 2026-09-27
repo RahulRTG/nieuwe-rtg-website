@@ -12,16 +12,16 @@ test('codecredentialregister is compleet en intern geldig', () => {
   assert.ok(uit.telling.migrated >= 7);
   assert.ok(uit.telling.closed >= 3);
   assert.ok(uit.telling.remaining > 0, 'onvolwassen deuren worden niet weggepoetst');
-  assert.ok(uit.census.aanroepen >= uit.census.verklaringen,
-    'de census telt ook dynamische en anders niet parseerbare routeverklaringen');
+  const census = poort.bronCensus(undefined, register);
+  assert.equal(census.aanroepen, census.letterlijk + census.doorRouter +
+    census.verklaardDynamisch.length + census.onleesbaar.length,
+  'elke routeaanroep is letterlijk, door de router opgelost, verklaard of onleesbaar -- niets valt ertussen');
   assert.ok(uit.census.verklaringen > 100, 'de inventaris komt uit een volledige server-routecensus');
   assert.ok(uit.census.kandidaten > 20, 'credentialachtige paden en velden worden bronafgeleid gevonden');
-  assert.ok(uit.census.unclassified.length > 0,
-    'nog niet beoordeelde kandidaten blijven zichtbaar en blokkeren');
-  assert.ok(uit.census.onleesbaar.length > 0,
-    'dynamische routepaden verdwijnen niet stil uit de census');
-  assert.ok(uit.blockers.some(x => x.id.startsWith('unparsed-route:')),
-    'iedere nog niet statisch herleidbare route is fail-closed een releaseblokkade');
+  /* Dat een onbeoordeelde kandidaat en een onleesbare route BLOKKEREN, stond hier
+     als "er zijn er nu meer dan nul" -- een bewering over de achterstand, niet
+     over de poort, en die zakt zodra de achterstand is weggewerkt. De poort zelf
+     wordt beproefd in de fixtureproef hieronder. */
   const kandidaten = poort.bronCensus().kandidaten.map(x => x.route);
   for (const route of ['POST /school/personeel/inloglink', 'POST /api/vastgoed/keyless',
     'POST /api/arrival/pass', 'POST /api/supplier/ticket/checkin'])
@@ -143,4 +143,51 @@ test('de niet-omzeilbare release- en READY-keten voeren deze poort uit', () => {
   assert.match(release, /scripts\/codecredentials\.js', '--bewijs'/,
     'de releasegang voert de gehashte control-testbundel echt uit');
   assert.match(oordeel, /'Codecredentialregister'/);
+});
+
+/* DE CENSUS OP EEN WEGWERPBOOM. Beproeft de poort zelf, los van hoe groot de
+   achterstand in de echte bron nu is:
+     - een onbekende credentialachtige route blokkeert;
+     - een dynamisch pad dat niemand kent blokkeert;
+     - een `app.post(` en een "Authorization" in COMMENTAAR tellen niet;
+     - een dynamisch pad dat de ROUTER op die regel kent (ROUTEBRON.json) wordt
+       gewoon gekeurd, en een verklaarde dynamische aanroep blokkeert niet;
+     - een verklaring die niet meer klopt en een geen_credential-deur zonder
+       reden zijn fouten. */
+test('de census blokkeert wat hij niet kent, en laat zich niet door commentaar misleiden', () => {
+  const fs = require('node:fs');
+  const os = require('node:os');
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-codecred-'));
+  try {
+    fs.mkdirSync(path.join(root, 'server'), { recursive: true });
+    fs.writeFileSync(path.join(root, 'server', 'x.js'), [
+      "app.post('/api/x/toegangscode', (req, res) => res.json({ ok: req.body.toegangscode }));",
+      "// app.post('/api/y/iets', h) -- een uitleg, geen route",
+      "/* Authorization: Bearer ... staat hier alleen in commentaar */",
+      "app.get('/api/x/lijst', (req, res) => res.json([]));",
+      "app.post(BASIS + '/onbekend', h);",
+      "app.post(BASIS + '/bekend', (req, res) => res.json({ token: req.body.token }));",
+      "app.get(bundelPad, bundel(DIR));"
+    ].join('\n') + '\n');
+    fs.writeFileSync(path.join(root, 'ROUTEBRON.json'), JSON.stringify({ perRoute: {
+      0: { route: 'POST /api/x/bekend', bestand: 'server/x.js', regel: 6, samengesteld: true } } }));
+    const register = { schema: 1, beleid: { credential_min_entropy_bits: 128 }, deuren: [
+      { id: 'proef.leeg', classificatie: 'geen_credential', status: 'closed', release_blocker: false,
+        routes: ['GET /api/x/lijst'], bron: ['server/x.js'], notitie: 'te kort' }],
+      dynamische_aanroepen: [
+        { bron: 'server/x.js', aanroep: 'app.get(bundelPad, bundel(DIR));', classificatie: 'geen_credential',
+          notitie: 'levert een gebundeld openbaar bestand uit, zonder sessie, code of geheim erin of eruit' },
+        { bron: 'server/x.js', aanroep: 'app.get(weg, h);', classificatie: 'geen_credential',
+          notitie: 'deze aanroep bestaat niet meer en moet dus als verouderd gemeld worden' }] };
+    const uit = poort.controleer(register, root);
+    const ids = uit.blockers.map(b => b.id);
+    assert.ok(ids.includes('unclassified:POST /api/x/toegangscode'), 'onbekende credentialroute blokkeert');
+    assert.ok(ids.includes('unclassified:POST /api/x/bekend'), 'een door de router opgelost dynamisch pad wordt gekeurd');
+    assert.ok(ids.includes('unparsed-route:server/x.js:5'), 'een dynamisch pad dat niemand kent blokkeert');
+    assert.equal(ids.filter(x => x.startsWith('unparsed-route:')).length, 1, 'commentaar en de verklaarde aanroep blokkeren niet');
+    assert.ok(!ids.some(x => /api\/y\/iets|x\/lijst/.test(x)), 'commentaar maakt geen route en geen kandidaat');
+    assert.ok(uit.fouten.some(f => /proef\.leeg: geen_credential/.test(f)), 'geen_credential zonder reden is een fout');
+    assert.ok(uit.fouten.some(f => /app\.get\(weg, h\);: deze aanroep bestaat niet meer/.test(f)), 'een verouderde verklaring is een fout');
+    assert.ok(!uit.fouten.some(f => /bundelPad/.test(f)), 'de geldige verklaring is geen fout');
+  } finally { fs.rmSync(root, { recursive: true, force: true }); }
 });

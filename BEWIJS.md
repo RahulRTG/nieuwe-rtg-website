@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2069 bestanden en 14607 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2069 bestanden en 14608 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2069 |
-| losse beweringen (`test(...)`) | 14607 |
+| losse beweringen (`test(...)`) | 14608 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 174 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1415 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1807 bestanden, 14145 beweringen.
+1807 bestanden, 14146 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -284,7 +284,7 @@ toets omvalt.
 | `clips.test.js` | 9 | gezakt op `liegpoort /api/` | RTG Clips: korte verticale video's die alleen op het toestel van de maker staan (OPFS). De server bewaart enkel de kaart (titel, duur, affiche) en relayeert signalen; de feed is een eindige dagselectie zonder... |
 | `clubdorp.test.js` | 4 | gezakt op `liegpoort /api/` | Het clubdorp: bars, clubs en beachclubs krijgen dezelfde afdelingen-motor als het hotel, maar met de eigen afdelingen van de nachtzaak: van de deur en de garderobe tot promo, inkoop en het kantoor. Draai los: node... |
 | `clubs.test.js` | 8 | gezakt op `liegpoort /api/` | RTG Clubs: de golf- en countryclub (Sa Roca) en de sport- en fitnessclub (Fortia). Bewaakt de tee sheet zonder dubbele flights, de lessen van de pro's, de maandbeker met vol-is-vol, de baanstatus, de ledenpas met... |
-| `codecredentials.test.js` | 7 | gezakt op `return-weg#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `codecredentials.test.js` | 8 | gezakt op `return-weg#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `codegrens.test.js` | 3 | geen bruikbare mutatie | CODE-AI-001 -- DE RUNTIME-AI KOMT NOOIT AAN DE BRON. Dit huis heeft vandaag twee gescheiden intelligenties, en die scheiding is waardevoller dan hij eruitziet: RUNTIME het stuur (kern/stuur/*) bestuurt RTG via... |
 | `codewereld.test.js` | 7 | geen module gevonden | DE CODEWERELD TELT INDEXEN NIET ALS GEDRAG. Twee keer op rij sprong hier een dekkingsgetal omhoog zonder dat er iets bij was gekomen: eerst bij SYMBOLEN.json (bronbereik 33% -> 100%) en daarna bij AANROEPGRAAF.json... |
 | `collectie-transactie-sqlite.test.js` | 1 | gezakt op `===->!==#0` | De collectie-transactie tegen twee ECHTE processen op dezelfde SQLite-WAL. Eén verwachte revisie mag precies één keer winnen; een gooiende callback mag geen gewijzigde RAM- of schijfstaat achterlaten. |

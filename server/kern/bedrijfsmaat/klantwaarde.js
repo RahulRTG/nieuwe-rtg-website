@@ -22,7 +22,7 @@ const lijst = (x) => (Array.isArray(x) ? x : []);
 
 /* LivingOS: een rit die de keten afmaakte of een bestelling die bezorgd of
    opgehaald werd -- dezelfde uitkomsten als activatie. */
-function living(ritten, bestellingen, m) {
+function klantwaardeLiving(ritten, bestellingen, m) {
   const wie = new Set(); let aantal = 0;
   for (const r of lijst(ritten)) if (r && ['afgerond', 'gearriveerd'].includes(r.status) && inMaand(r.finishedAt || r.at, m)) {
     aantal += 1; if (r.customerCodename) wie.add(r.customerCodename);
@@ -35,7 +35,7 @@ function living(ritten, bestellingen, m) {
 
 /* TravelOS: een reis die thuis is (kern/reisbureau-thuis.js), in de maand van
    thuiskomst. */
-function travel(aanvragen, m) {
+function klantwaardeTravel(aanvragen, m) {
   const wie = new Set(); let aantal = 0;
   for (const a of lijst(aanvragen)) if (a && a.status === 'thuis' && a.thuis && inMaand(a.thuis.at, m)) {
     aantal += 1; if (a.customerKey) wie.add(a.customerKey);
@@ -45,7 +45,7 @@ function travel(aanvragen, m) {
 
 /* WorkOS: een loonrun die definitief werd (kern/payroll/run.js). De groep is
    het aantal ZAKEN, niet het aantal medewerkers op de strook. */
-function work(runs, m) {
+function klantwaardeWork(runs, m) {
   const zaken = new Set(); let aantal = 0;
   for (const r of lijst(runs)) if (r && r.stand === 'definitief' && inMaand(r.definitiefOp, m)) {
     aantal += 1; if (r.code) zaken.add(r.code);
@@ -56,10 +56,10 @@ function work(runs, m) {
 /* FoundationOS: een hulpvraag afgerond (kern/rtfos/casus-keten.js), op de dag van
    afronden -- ook als hij daarna in nazorg ging. Een casus is een hulpvraag van een
    gezin; de groep is het aantal casussen. */
-function foundation(casussen, m) {
+function klantwaardeFoundation(casussen, m) {
   let aantal = 0;
   for (const c of lijst(casussen)) if (c && inMaand(c.afgerondOp, m)) aantal += 1;
   return { aantal, n: aantal };
 }
 
-module.exports = { living, travel, work, foundation };
+module.exports = { klantwaardeLiving, klantwaardeTravel, klantwaardeWork, klantwaardeFoundation };

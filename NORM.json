@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1761,
-    "toetsenNietGemeten": 635,
+    "toetsenNietGemeten": 636,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -149,6 +149,16 @@
     "edgeVeldContextZelf": 11
   },
   "notities": [
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 635,
+      "vervalt": "2026-12-27",
+      "meter": "toetsenNietGemeten 635 -> 636",
+      "reden": "test/klantwaarde.test.js is nieuw (klantwaarde per wereld, besluit C3). Met de hand nagetrokken met een mutatie in server/kern/bedrijfsmaat/klantwaarde.js: de zaakgroep van WorkOS telde elke loonrun als een eigen zaak (toets 3 zakt: de groepspoort zou naar het verkeerde getal kijken). De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
     {
       "datum": "2026-09-27",
       "soort": "schuld",

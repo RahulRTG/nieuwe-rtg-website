@@ -14,7 +14,7 @@ const K = require('../server/kern/bedrijfsmaat/klantwaarde');
 const M = '2026-09';
 
 test('1 en 2. LivingOS: ritten en bestellingen, en de groep is het aantal leden', () => {
-  const r = K.living([
+  const r = K.klantwaardeLiving([
     { status: 'afgerond', customerCodename: 'A', finishedAt: '2026-09-02T09:00:00Z' },
     { status: 'afgerond', customerCodename: 'A', finishedAt: '2026-09-03T09:00:00Z' },
     { status: 'onderweg', customerCodename: 'B', at: '2026-09-03T09:00:00Z' }
@@ -26,7 +26,7 @@ test('1 en 2. LivingOS: ritten en bestellingen, en de groep is het aantal leden'
 });
 
 test('1 en 2. TravelOS: alleen reizen die thuis zijn, in de maand van thuiskomst', () => {
-  const r = K.travel([
+  const r = K.klantwaardeTravel([
     { status: 'thuis', customerKey: 'user-1', thuis: { at: '2026-09-10T10:00:00Z' } },
     { status: 'thuis', customerKey: 'user-1', thuis: { at: '2026-09-20T10:00:00Z' } },
     { status: 'bevestigd', customerKey: 'user-2' },
@@ -36,7 +36,7 @@ test('1 en 2. TravelOS: alleen reizen die thuis zijn, in de maand van thuiskomst
 });
 
 test('1 en 2. WorkOS: definitieve loonruns, en de groep is het aantal zaken', () => {
-  const r = K.work([
+  const r = K.klantwaardeWork([
     { stand: 'definitief', code: 'Z1', definitiefOp: '2026-09-25T10:00:00Z' },
     { stand: 'definitief', code: 'Z1', definitiefOp: '2026-09-26T10:00:00Z' },
     { stand: 'manager', code: 'Z2', definitiefOp: null }
@@ -45,7 +45,7 @@ test('1 en 2. WorkOS: definitieve loonruns, en de groep is het aantal zaken', ()
 });
 
 test('1 en 2. FoundationOS: afgerond op de dag van afronden, ook als hij daarna in nazorg ging', () => {
-  const r = K.foundation([
+  const r = K.klantwaardeFoundation([
     { status: 'afgerond', afgerondOp: '2026-09-05' },
     { status: 'nazorg', afgerondOp: '2026-09-06' },
     { status: 'in_uitvoering' },
@@ -55,7 +55,7 @@ test('1 en 2. FoundationOS: afgerond op de dag van afronden, ook als hij daarna 
 });
 
 test('3. er is geen totaal over de vier werelden', () => {
-  assert.deepEqual(Object.keys(K).sort(), ['foundation', 'living', 'travel', 'work'],
+  assert.deepEqual(Object.keys(K).sort(), ['klantwaardeFoundation', 'klantwaardeLiving', 'klantwaardeTravel', 'klantwaardeWork'],
     'een extra functie hier is waarschijnlijk een optelling -- dat is het samengestelde cijfer van INT-04');
 });
 

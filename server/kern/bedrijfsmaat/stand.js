@@ -80,8 +80,8 @@ module.exports = ({ lees, pasgeschiedenis, aanwezigheid, kosten, nu }) => {
     /* Klantwaarde per wereld (besluit C3): vier maten naast elkaar, elk langs zijn
        eigen groepspoort, en geen totaal (./klantwaarde.js). */
     const lees0 = (f) => (typeof f === 'function' ? lijst(f()) : []);
-    const kw = { living: K.living(lees.ritten(), lees.bestellingen(), m), travel: K.travel(lees0(lees.reizen), m),
-      work: K.work(lees0(lees.loonruns), m), foundation: K.foundation(lees0(lees.casussen), m) };
+    const kw = { living: K.klantwaardeLiving(lees.ritten(), lees.bestellingen(), m), travel: K.klantwaardeTravel(lees0(lees.reizen), m),
+      work: K.klantwaardeWork(lees0(lees.loonruns), m), foundation: K.klantwaardeFoundation(lees0(lees.casussen), m) };
     const kwMaat = (id, def, klasse, v, dekt) => maat(id, def,
       Object.assign(toon(klasse, { waarde: v.aantal, n: v.n }), { eenheid: 'uitkomsten in de maand' }), dekt);
     const UITKOMST = 'Als geslaagde uitkomst tellen alleen afgeronde ritten en bezorgde of opgehaalde bestellingen; boekingen, reizen en servicezaken nog niet.';

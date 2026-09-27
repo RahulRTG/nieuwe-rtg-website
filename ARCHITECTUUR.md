@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 5155 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 5157 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 5155 |
-| servermodules (`server/**/*.js`) | 3724 |
+| API-endpoints | 5157 |
+| servermodules (`server/**/*.js`) | 3725 |
 | routebestanden (`server/routes/**`) | 614 |
-| kernmodules (`server/kern/**`) | 2346 |
+| kernmodules (`server/kern/**`) | 2347 |
 | schermen (`public/**/*.html`) | 320 |
 | gedeelde browsermodules (`public/shared/*.js`) | 398 |
-| toetsbestanden (`test/*.test.js`) | 1808 |
+| toetsbestanden (`test/*.test.js`) | 1809 |
 | schermtoetsen (`test/*.e2e.js`) | 262 |
 
 ## 2. De weg van een verzoek
@@ -111,7 +111,7 @@ zie §5 -- er zijn nog 243 kern-namen die meer dan één domein aanraakt.
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
 | `auth` | 20 | 6 | 8 | 52 |
-| `member` | 699 | 72 | 16 | 428 |
+| `member` | 700 | 72 | 16 | 428 |
 | `supplier` | 624 | 127 | 6 | 337 |
 | `office` | 74 | 21 | 3 | 84 |
 | `staff` | 26 | 8 | 1 | 42 |
@@ -128,7 +128,7 @@ lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
 bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
 publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 3517 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 3518 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 

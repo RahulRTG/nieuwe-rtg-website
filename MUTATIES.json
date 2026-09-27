@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T17:43:53.806Z",
-    "commit": "b47ac965",
+    "op": "2026-09-27T19:04:18.781Z",
+    "commit": "1d41215f",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -7292,6 +7292,14 @@
     "persistentiestand.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
+    },
+    "personeelsuitnodiging-montage.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/routes/supplier/werving/uitnodiging.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "persoonseis.test.js": {
       "soort": "puur",

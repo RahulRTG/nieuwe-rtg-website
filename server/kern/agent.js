@@ -131,7 +131,7 @@ function maakAgent({ db, crypto, findSupplier, notifySupplier, ghBijbestelVoorst
       const druk = factor >= 1.1;
       const datum = date.toISOString().slice(0, 10);
       const rows = staff.map((m, i) => {
-        const v = verzuim.stand(s.code, m.id, datum); // kern/verzuimrooster.js
+        const v = verzuim ? verzuim.stand(s.code, m.id, datum) : { stand: 'onbekend' };
         if (v.stand === 'onbekend') onbekend++;
         if (v.stand === 'afwezig') {
           afwezig.add(m.id);
@@ -146,7 +146,7 @@ function maakAgent({ db, crypto, findSupplier, notifySupplier, ghBijbestelVoorst
       days.push({ date: datum, label, factor, staff: rows });
     }
     agentVan(s).rooster = { days, status: 'voorstel', at: new Date().toISOString(),
-      verzuimNagekeken: onbekend === 0, verzuim: verzuim.verzuimZin(afwezig.size, onbekend) || null };
+      verzuimNagekeken: onbekend === 0, verzuim: verzuim ? verzuim.verzuimZin(afwezig.size, onbekend) || null : 'Verzuim niet nagekeken.' };
     save();
     return { status: 200, ok: true, rooster: agentVan(s).rooster };
   }

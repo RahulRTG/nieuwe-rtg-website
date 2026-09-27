@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T19:16:54.952Z",
-    "commit": "e754e82d",
+    "op": "2026-09-27T20:03:20.740Z",
+    "commit": "257d3dad",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -4598,6 +4598,14 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "kantoor-productiedeur.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/kantoor/productiedeur.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
     "kantoorbank.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -4611,6 +4619,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "kantoordeur-productie.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "kantoordienst.test.js": {

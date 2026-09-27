@@ -46,6 +46,14 @@ async function main() {
           // desktop stylesheet to finish applying before measuring its grid.
           await page.waitForFunction(() => getComputedStyle(document.body).paddingTop === '64px', null, { timeout: 6000 });
           await page.evaluate(() => document.fonts.ready);
+          // Meet pas als het kader stilstaat: op een trage runner zette een scherm
+          // (spelscherm) nog een laag neer terwijl de maat al werd genomen.
+          await page.waitForFunction(() => new Promise(klaar => {
+            const e = document.querySelector('.wd-shell'), plek = () => e ? Math.round(e.getBoundingClientRect().top + scrollY) : -1;
+            let vorige = plek(), rust = 0;
+            const kijk = () => { const nu = plek(); rust = nu === vorige ? rust + 1 : 0; vorige = nu; if (rust >= 5) klaar(true); else requestAnimationFrame(kijk); };
+            requestAnimationFrame(kijk);
+          }), null, { timeout: 6000 });
           row.state = await page.evaluate(() => {
             const b = document.body, css = getComputedStyle(b);
             const rect = s => { const e = document.querySelector(s); if (!e) return null; const r = e.getBoundingClientRect(); return { x:r.x,y:r.y,w:r.width,h:r.height,right:r.right,bottom:r.bottom,scroll: getComputedStyle(e).overflowY }; };

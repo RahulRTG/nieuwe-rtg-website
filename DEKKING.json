@@ -1,9 +1,9 @@
 {
   "uitleg": "Elke route (METHODE + patroon) die tijdens de volledige testsuite ECHT is aangeraakt, uit het routejournaal van server/routelog.js en niet uit de tekst van de toetsen. De eis is 100%: scripts/dekking.js zakt op elk gat en kent geen norm om die eis te verlagen. Het RTG Kantoor leest dit bestand (routes/office/dekking.js) en houdt het naast wat de server op dit moment registreert, zodat een route die er na de meting bij komt meteen als ongemeten opvalt. Bijwerken met: npm run dekking:vast",
   "gemeten": {
-    "op": "2026-09-27T15:56:47.628Z",
-    "commit": "c470d433",
-    "routesToen": 5168
+    "op": "2026-09-27T17:50:58.717Z",
+    "commit": "e220a6ba",
+    "routesToen": 5171
   },
   "aangeraakt": [
     "GET /",
@@ -419,6 +419,7 @@
     "POST /api/command/alarm/stil",
     "POST /api/command/apipoort",
     "POST /api/command/apipoort/intrekken",
+    "POST /api/command/apipoort/roteer",
     "POST /api/command/apipoort/sleutel",
     "POST /api/command/apipoort/toelaten",
     "POST /api/command/apipoort/toelating-weg",
@@ -1867,6 +1868,7 @@
     "POST /api/member/rtmail/handtekening",
     "POST /api/member/rtmail/hulp",
     "POST /api/member/rtmail/imap/intrekken",
+    "POST /api/member/rtmail/imap/roteer",
     "POST /api/member/rtmail/imap/sleutel",
     "POST /api/member/rtmail/imap/sleutels",
     "POST /api/member/rtmail/inbox",
@@ -4543,6 +4545,7 @@
     "POST /api/supplier/rtmail/handtekening",
     "POST /api/supplier/rtmail/hulp",
     "POST /api/supplier/rtmail/imap/intrekken",
+    "POST /api/supplier/rtmail/imap/roteer",
     "POST /api/supplier/rtmail/imap/sleutel",
     "POST /api/supplier/rtmail/imap/sleutels",
     "POST /api/supplier/rtmail/inbox",

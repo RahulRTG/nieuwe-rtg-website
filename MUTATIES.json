@@ -2924,6 +2924,21 @@
       "gezakt": 9,
       "scherp": "gezakt"
     },
+    "eten-kortingscode-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "eten-kortingscode.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/collectie-bewerken.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "eten-uitgaan-voorzijde.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
@@ -4222,6 +4237,21 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 20,
+      "scherp": "gezakt"
+    },
+    "horecabon-credential.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/collectie-bewerken.js",
+      "operator": "===->!==#0",
+      "gezakt": 9,
+      "geprobeerd": 1
+    },
+    "horecabon-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
       "scherp": "gezakt"
     },
     "horlogewerk.test.js": {

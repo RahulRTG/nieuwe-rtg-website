@@ -101,7 +101,7 @@
       (kaarten.length ? kaarten.map(k =>
         '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.7rem;padding:0.55rem 0;border-bottom:1px solid var(--line);font-size:0.8rem;">' +
         '<span>' + k.supplierName + '<span style="display:block;font-size:0.66rem;color:var(--muted);letter-spacing:0.06em;">' + (k.stand === 'actief' ? T('gc.getoond','Code getoond bij aankoop') : T('gc.dicht','Code niet meer geldig')) + '</span></span>' +
-        '<b>' + eur(k.saldo) + '</b>' + (k.saldo > 0 ? '<button class="gcRot" data-id="' + k.id + '" style="background:none;border:1px solid var(--line);border-radius:0;padding:0.35rem 0.6rem;color:var(--txt);font-size:0.66rem;font-family:inherit;">' + T('gc.nieuw','Nieuwe code') + '</button>' : '') + '</div>').join('') : '') +
+        '<b>' + eur(k.saldo) + '</b>' + (k.saldo > 0 ? '<button class="vbtn gcRot" data-id="' + k.id + '">' + T('gc.nieuw','Nieuwe code') + '</button>' : '') + '</div>').join('') : '') +
       '<div style="display:flex;gap:0.5rem;margin-top:0.7rem;flex-wrap:wrap;">' +
       '<select id="gcSup" style="flex:2;min-width:120px;background:var(--bg);border:1px solid var(--line);border-radius:0;padding:0.6rem;color:var(--txt);font-family:inherit;">' + opties + '</select>' +
       '<input id="gcAmt" type="number" placeholder="€ 50" style="flex:1;min-width:70px;background:var(--bg);border:1px solid var(--line);border-radius:0;padding:0.6rem;color:var(--txt);font-family:inherit;">' +

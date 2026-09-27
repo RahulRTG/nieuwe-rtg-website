@@ -1310,8 +1310,8 @@ in de ontwikkelaarsroute** (de beproevingsomgeving voor software is een eigen
 ding, met `scripts/aanval.js` en `scripts/chaos.js` als eerste bouwstenen), de
 App Store-keuring keek niet naar toegankelijkheid (inmiddels wél, en als POORT:
 zie par. 9.2), en er is geen kostenvlak. En
-par. 10 draait één aanname om die vaak fout gaat: van <!--getal:idem.routesMetRol-->4219<!--/getal--> routes met een rol
-zijn er <!--getal:idem.beoordeeld-->1716<!--/getal--> beproefd op herhaalbaarheid en <!--getal:idem.ongemeten-->3256<!--/getal--> ongemeten (`IDEMPROEF.json`,
+par. 10 draait één aanname om die vaak fout gaat: van <!--getal:idem.routesMetRol-->4258<!--/getal--> routes met een rol
+zijn er <!--getal:idem.beoordeeld-->1729<!--/getal--> beproefd op herhaalbaarheid en <!--getal:idem.ongemeten-->3291<!--/getal--> ongemeten (`IDEMPROEF.json`,
 levend getal — `npm run getallen` houdt het bij),
 maar het doel is **niet alles idempotent — het is alles geclassificeerd**, met
 `UNKNOWN` verboden voor nieuwe publiek aanroepbare ontwikkelaarsopdrachten.
@@ -1339,8 +1339,8 @@ weigert wat op een contactgegeven lijkt, want met `REDIS_URL` gaat hij over een
 netwerk), **`onbekend` is geen `openbaar`** (en een gevolg erft de classificatie
 niet — dat zou raden zijn), en **de levering gaat voor** (een geweigerde actor
 houdt een melding nooit tegen, maar verdwijnt ook nooit stil). Wat er nog niet is,
-staat er met de meting erbij: van de <!--getal:idem.beoordeeld-->1716<!--/getal--> beproefde muterende routes zijn er
-<!--getal:idem.beschermd-->1715<!--/getal--> retry-veilig, en een schemaregister (`payment.authorized.v1` met een vorm
+staat er met de meting erbij: van de <!--getal:idem.beoordeeld-->1729<!--/getal--> beproefde muterende routes zijn er
+<!--getal:idem.beschermd-->1728<!--/getal--> retry-veilig, en een schemaregister (`payment.authorized.v1` met een vorm
 erachter) bestaat niet — de envelop zegt met opzet nooit WAT. Zeven punten die een besluit van de eigenaar vragen staan in par. 4.
 **Het goedkoopste daarvan is genomen (27 augustus 2026):** het woord dat in twee
 lagenmodellen niet hetzelfde betekende, is hernoemd — laag 4 van `PLATFORM.md`
@@ -1873,7 +1873,7 @@ afkapgrens van vijftien sneed midden in een GELIJKE score, dus /api/bank/pas/bet
 viel op alfabet af terwijl /api/bank/advies bleef. Een gelijke score afkappen is
 willekeur, en willekeur verbergt een vermogen zonder dat iemand het merkt.
 **En meetgetallen in de documenten verouderen niet meer**: `npm run getallen`
-schrijft ze tussen merktekens uit de registers (`<!--getal:idem.ongemeten-->3256<!--/getal--> randen,
+schrijft ze tussen merktekens uit de registers (`<!--getal:idem.ongemeten-->3291<!--/getal--> randen,
 <!--getal:verstrengeling.onverklaard-->0<!--/getal--> onverklaard — en dát getal moet naar nul, niet het
 aantal randen), de activering per functie, de deltapoort die er niets bij laat
 komen, de tredeproef over alle zeven treden van LAUNCH.md (0 lekken), en de
@@ -2307,8 +2307,8 @@ gemeten leespaden en geen bevestigroute. De fundering is gemeten en niet
 verklaard: `npm run bedrijfsmaat` (`BEDRIJFSMAAT.json`, catalogus in
 `server/kern/bedrijfsmaat/`) houdt per maat vier elementen tegen de code --
 bron, definitie, projectie, bewijs -- met vier gatsoorten en een
-afhankelijkheidsgraaf; <!--getal:bedrijfsmaat.bestaat-->31<!--/getal--> van <!--getal:bedrijfsmaat.maten-->64<!--/getal--> maten bestaan en
-<!--getal:bedrijfsmaat.ketensGegrond-->1<!--/getal--> van zes ketens is gegrond. Drie dingen die niet mogen sneuvelen: **lenzen,
+afhankelijkheidsgraaf; <!--getal:bedrijfsmaat.bestaat-->34<!--/getal--> van <!--getal:bedrijfsmaat.maten-->64<!--/getal--> maten bestaan en
+<!--getal:bedrijfsmaat.ketensGegrond-->2<!--/getal--> van zes ketens is gegrond. Drie dingen die niet mogen sneuvelen: **lenzen,
 geen breinen** (geen eigen opslag per lens), **de groepspoort staat aan de bron
 van een maat** (`bedrijfsmaat/poort.js`: onder de grens geen waarde, geen nul en
 geen aantal, ook op het kantoorscherm; werklijsten per persoon blijven voor een

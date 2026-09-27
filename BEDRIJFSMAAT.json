@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-27T09:35:09.210Z",
-    "commit": "fa1537a0",
+    "op": "2026-09-27T10:08:35.139Z",
+    "commit": "a53ab543",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 3,
     "instrument": "scripts/bedrijfsmaat.js",
     "node": "v22.22.2"
   },
@@ -3907,7 +3907,7 @@
       "bronnen": [
         "server/kern/vervoer.js"
       ],
-      "berekening": "ritten met de laatste stand van RIT_KETEN (of de oude naam gearriveerd) en een eindtijd in de maand; de groepsgrens telt verschillende leden",
+      "berekening": "ritten in de laatste stand van RIT_KETEN met een eindtijd in de maand; de poort telt leden",
       "eenheid": "ritten per maand",
       "graad": "gemeten",
       "actualiteit": "live",
@@ -3962,11 +3962,6 @@
           "citaten": [
             {
               "bestand": "server/kern/bedrijfsmaat/stand.js",
-              "citaat": "maat('uitkomst.rit-afgerond'",
-              "klopt": true
-            },
-            {
-              "bestand": "server/kern/bedrijfsmaat/stand.js",
               "citaat": "opdrachten die het dispatchcentrum zelf aannam",
               "klopt": true
             }
@@ -3990,7 +3985,7 @@
         "gegrond": true,
         "zwakkeSchakels": []
       },
-      "gedeeltelijk": "Alleen de ritlijst van de app; opdrachten die het dispatchcentrum zonder app-rit aannam (db.data.mobOpdrachten) tellen niet mee, en dat staat in het antwoord."
+      "gedeeltelijk": "Alleen de ritlijst van de app; dispatchopdrachten zonder app-rit tellen niet mee."
     },
     {
       "id": "uitkomst.klantwaarde",

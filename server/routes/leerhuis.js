@@ -24,6 +24,7 @@
 
 const { maakLeerhuis } = require('../kern/leerhuis');
 const { idVanKey } = require('../lib/lidsleutel');
+const { maakVolwassen } = require('../kern/volwassen');
 
 /* Wat een LID mag vragen, en wat alleen het bestuur van de organisatie mag
    lezen. Een lid leest zijn eigen stand; het organisatiebrede beeld
@@ -36,8 +37,13 @@ const BESTUURSVRAGEN = ['gereedheid', 'eenheid', 'wieGeraakt', 'reconstrueer', '
 const LEESROLLEN = ['ACADEMY_OWNER', 'QUALITY_AUTHORITY', 'KNOWLEDGE_OWNER', 'ASSESSMENT_AUTHORITY'];
 
 module.exports = (kern) => {
-  const { app, auth, db, save, kluisAuth, volwassen } = kern;
+  const { app, auth, db, save, accounts, kluisAuth } = kern;
   const leerhuis = maakLeerhuis({ db, save });
+  /* Dezelfde fabriek als kern.volwassen (opzet/kernlaag1.js), op dezelfde
+     accounts: de poort is een pure functie over de kluis, dus een eigen
+     exemplaar is dezelfde regel en geen tweede -- en de kern wordt er niet
+     breder van (de ratel kernBreedte). */
+  const volwassen = maakVolwassen({ accounts });
 
   function actor(req, res) {
     const id = idVanKey(req.session && req.session.key);

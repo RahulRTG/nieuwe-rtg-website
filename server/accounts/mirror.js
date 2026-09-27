@@ -69,6 +69,9 @@ async function commitAccountWijzigingen(client, wijzigingen) {
   }
   return pg.pasAccountWijzigingenToe(client, wijzigingen);
 }
+/* De verbinding voor deelnemers zonder HTTP-verzoek (./achtergrond.js). */
+function accountPool() { return PGMODE && pgKlaar && pg ? pg.pool : null; }
+const { vrijeGeneratie, nogVers } = require('./transactie');
 
 function eisIntrekkingen() {
   if (!PGMODE) return null;
@@ -120,15 +123,19 @@ async function pullEen(payload) {
        hele kanaal voor. */
     if (pg && pg.vanMij && pg.vanMij(payload)) return;
     const [soort, idStr] = String(payload).split(':'); const id = Number(idStr);
+    const tabel = soort === 'user' ? 'users' : soort === 'staff' ? 'supplier_staff' : null;
+    if (!tabel) return;
+    let rows;
+    for (;;) {
+      const g = await vrijeGeneratie();
+      ({ rows } = await pg.pool.query('SELECT * FROM ' + tabel + ' WHERE id = $1', [id]));
+      if (nogVers(g)) break;
+    }
     if (soort === 'user') {
-      const { rows } = await pg.pool.query('SELECT * FROM users WHERE id = $1', [id]);
       if (rows.length) upsertLocalUser(rows[0]);
       else duurzaamheid.internePublicatie(() => S.zin('DELETE FROM users WHERE id = ?').run(id));
       if (externCb) externCb();
-    } else if (soort === 'staff') {
-      const { rows } = await pg.pool.query('SELECT * FROM supplier_staff WHERE id = $1', [id]);
-      if (rows.length) upsertLocalStaff(rows[0]);
-    }
+    } else if (rows.length) upsertLocalStaff(rows[0]);
   } catch (e) {
     /* Een gemiste accountmelding kan een ingetrokken user/staff-binding lokaal
        actief laten lijken. Dat is een identity-storing, geen best-effort
@@ -149,7 +156,13 @@ async function startPostgresEenmaal() {
   pg = nieuw;
   if (vorig && vorig !== nieuw) { try { await vorig.sluit(); } catch (e) {} }
   await nieuw.schema();
-  const { users, staff } = await nieuw.pullAlles();
+  let getrokken;
+  for (;;) {
+    const g = await vrijeGeneratie();
+    getrokken = await nieuw.pullAlles();
+    if (nogVers(g)) break;
+  }
+  const { users, staff } = getrokken;
   if (transactioneleProductie()) {
     /* Productie kent geen lokale oorsprong. Ook lokaal achtergebleven rijen die
        in PostgreSQL bewust zijn gewist moeten verdwijnen, anders kan een koude
@@ -203,6 +216,7 @@ module.exports = {
   PGMODE, rawUser, rawStaff, nieuwId,
   markUser: wachtrij.markUser, markStaff: wachtrij.markStaff, markDelete: wachtrij.markDelete,
   authoriteitKlaar, postgresKlaar: authoriteitKlaar, commitAccountWijzigingen,
+  accountPool, planAccountHerstel,
   bewaarIntrekking, gedeeldeIntrekkingen, voltooiIntrekkingen,
   startPostgres, onExternalChange, flushBijAfsluiten
 };

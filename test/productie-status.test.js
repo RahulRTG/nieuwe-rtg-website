@@ -94,13 +94,19 @@ test('dirty code, stale suite en een ontbrekende controle kunnen niet worden weg
   assert.ok(uit.blokkades.some(x => /Servicebevoegdheden/.test(x)));
 });
 
-test('tijdelijk gesloten accountwrites blijven een machineleesbare releaseblokkade', () => {
+test('gesloten accountwrites zijn een machineleesbare releaseblokkade, de transactionele stand niet', () => {
+  /* De rode kant blijft beproefd met de vorm die duurzaamheid.js teruggeeft als
+     het deelnemersprotocol ontbreekt; de groene kant is de echte releaseStand. */
   const invoer = groen();
-  invoer.golive.accounts = require('../server/accounts/duurzaamheid').releaseStand();
+  invoer.golive.accounts = { code: 'PG_ACCOUNTS_ATOMAIR_ONTBREEKT', gereed: false, transactioneel: false,
+    productieMutaties: 'gesloten', vereist: 'gedeelde-pg-requesttransactie' };
   const uit = beoordeel(invoer);
   assert.equal(uit.status, 'BLOCKED');
   assert.ok(uit.blokkades.some(x => /Accountmutaties.*PostgreSQL-requesttransactie/.test(x)));
-  assert.equal(invoer.golive.accounts.code, 'PG_ACCOUNTS_ATOMAIR_ONTBREEKT');
+  const echt = groen();
+  echt.golive.accounts = require('../server/accounts/duurzaamheid').releaseStand();
+  assert.ok(!beoordeel(echt).blokkades.some(x => /Accountmutaties/.test(x)),
+    'de transactionele accountlaag blokkeert de release niet');
 });
 
 test('een groene selectie of een suite van vóór een nieuw testbestand is nooit volledig bewijs', () => {

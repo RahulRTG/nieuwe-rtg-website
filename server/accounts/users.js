@@ -248,8 +248,11 @@ function setPasswordZaai(userId, password) {
 async function vernieuwWachtwoordHash(userId, password) {
   const u = getUserById(userId);
   if (!u || !kluis.moetVernieuwen(u.password_hash)) return false;
-  S.zin('UPDATE users SET password_hash = ? WHERE id = ?')
-    .run(await kluis.hashPassword(password), userId);
+  const hash = await kluis.hashPassword(password);
+  /* Een verbetering, geen voorwaarde: staat er een accountwerkkopie van een
+     ANDER verzoek open, dan zou deze write de inlog met een 503 laten zakken. */
+  if (require('./transactie').bezetDoorAnder()) return false;
+  S.zin('UPDATE users SET password_hash = ? WHERE id = ?').run(hash, userId);
   mirror.markUser(userId);
   return true;
 }

@@ -186,8 +186,12 @@ test('de go-live-keuring keurt af zonder geheimen, en met alle geheimen blijft h
     'proceslokale frauderem en realtime krijgen geen B2B2C-go-live');
   assert.match(goed.stdout, /RTG_OWNER_BOOTSTRAP staat nog/,
     'het eenmalige eigenaarsgeheim mag niet in de vrijgegeven omgeving achterblijven');
-  assert.match(goed.stdout, /PG_ACCOUNTS_ATOMAIR_ONTBREEKT/,
-    'read-only accountveiligheid mag niet als productierijpe identiteit tellen');
+  /* Sinds 27 september 2026 zijn accountmutaties transactioneel (werkkopie als
+     deelnemer aan de PostgreSQL-requestcommit). De keuring meldt dat nu als
+     goed, en niet meer als blokkade. */
+  assert.doesNotMatch(goed.stdout, /PG_ACCOUNTS_ATOMAIR_ONTBREEKT/,
+    'de accountlaag is transactioneel en blokkeert de keuring niet meer');
+  assert.match(goed.stdout, /B2B2C-identiteit: accountmutaties zijn gedeeld en transactioneel duurzaam/);
   assert.match(goed.stdout, /open plek\(ken\)/, 'de blokkade telt de open plekken in de AVG-documenten');
   assert.match(goed.stdout, /vragen staan nog open/, 'en wijst naar de vragen die Rahul nog moet stellen');
 });

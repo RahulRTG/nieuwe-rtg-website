@@ -1,7 +1,5 @@
-/* Voorbereiding voor een request-lokale werkkopie van users en supplier_staff.
-
-   Deze participant is nog niet aangesloten op de centrale requestcommit.
-   duurzaamheid.js activeert hem daarom niet en houdt productiewrites dicht.
+/* De request-lokale werkkopie van users en supplier_staff, als deelnemer aan
+   de PostgreSQL-requestcommit (protocol: ../db/deelnemers.js).
 
    SQLite is hier nadrukkelijk GEEN waarheid. Een productieverzoek schrijft op
    een aparte verbinding binnen een nog niet gecommitte SQLite-transactie. De
@@ -14,7 +12,15 @@
    een tweede synchrone schrijver anders laten wachten terwijl de eerste op een
    asynchrone PostgreSQL-commit wacht: de event-loop zou zichzelf dan blokkeren.
    De tweede schrijver krijgt daarom direct een herhaalbare 503. Lezers blijven
-   door WAL gewoon op de laatst bevestigde cache werken. */
+   door WAL gewoon op de laatst bevestigde cache werken.
+
+   EN DE GLOBALE VERBINDING WACHT NIET MEER. Zolang een werkkopie het
+   schrijfslot houdt staat busy_timeout op S.db op 0: een schrijver die er
+   toch langs S.db bij wil (een ander verzoek, een timer) krijgt meteen
+   SQLITE_BUSY in plaats van tot vijf seconden de event loop vast te zetten --
+   de loop die de PostgreSQL-commit moet afmaken die het slot vrijgeeft.
+   Wie mag wachten (de NOTIFY-pull, de volledige herbouw) wacht asynchroon met
+   wachtVrij() en kijkt daarna naar de generatie. */
 'use strict';
 
 const { DatabaseSync } = require('node:sqlite');
@@ -22,6 +28,10 @@ const verzoekcontext = require('../db/verzoekcontext');
 const S = require('./state');
 
 let actief = null;
+let generatieTeller = 0;
+let wachters = [];
+const LEVENSDUUR_MS = 30000;
+const BUSY_MS = 5000; // dezelfde waarde als ../lib/sqlite-gelijktijdigheid.js
 
 const fout = (code, tekst, status = 503) =>
   Object.assign(new Error(tekst), { code, status });
@@ -73,18 +83,62 @@ function wijzigingenVan(tx, volg) {
   return uit;
 }
 
+function herstelCache(e, bron) {
+  try { require('./mirror').planAccountHerstel(e, bron); } catch (x) {}
+}
+
 function ruim(tx, commit) {
   if (!tx || tx.afgerond) return;
   tx.afgerond = true;
+  if (tx.timer) clearTimeout(tx.timer);
+  let rolFout = null;
   try { tx.db.exec(commit ? 'COMMIT' : 'ROLLBACK'); } catch (e) {
     /* PostgreSQL kan al gecommit zijn. Een cache-publicatiefout mag dan nooit
-       een 503 over een geslaagde autoritatieve commit veroorzaken. De eigen
-       NOTIFY/pull of een herstart bouwt de cache opnieuw op. */
-    if (!commit) throw e;
-    console.error('[accounts] lokale cachepublicatie na PostgreSQL-commit mislukt:', e.message);
+       een 503 over een geslaagde autoritatieve commit veroorzaken -- maar de
+       eigen NOTIFY wordt overgeslagen (mirror.js, vanMij), dus zonder expliciete
+       herbouw bleef de cache tot een herstart achter. PostgreSQL is de waarheid:
+       de accountauthority gaat dicht tot de volledige pull hem opnieuw vult. */
+    if (commit) { console.error('[accounts] lokale cachepublicatie na PostgreSQL-commit mislukt:', e.message);
+      herstelCache(e, 'lokale-publicatie'); }
+    else rolFout = e;
   }
   try { tx.db.close(); } catch (e) {}
-  if (actief === tx) actief = null;
+  if (actief === tx) {
+    actief = null;
+    if (commit) generatieTeller++;
+    try { S.db && S.db.exec('PRAGMA busy_timeout=' + BUSY_MS); } catch (e) {}
+    const klaar = wachters; wachters = [];
+    for (const w of klaar) setImmediate(w);
+  }
+  if (rolFout) throw rolFout;
+}
+
+/* Voor wie niet mag schrijven terwijl een werkkopie open staat. */
+function bezet() { return !!actief; }
+function bezetDoorAnder() {
+  return !!actief && actief.ctx !== verzoekcontext.huidige();
+}
+function generatie() { return generatieTeller; }
+/* Wachten tot er geen werkkopie open staat, met de generatie erbij: wie
+   tussendoor uit PostgreSQL leest, mag alleen schrijven als nogVers() nog klopt
+   -- anders zet hij een oudere rij over een zojuist gepubliceerde heen. */
+async function vrijeGeneratie() {
+  while (actief) await wachtVrij();
+  return generatieTeller;
+}
+const nogVers = g => !actief && generatieTeller === g;
+function wachtVrij() {
+  return actief ? new Promise(r => wachters.push(r)) : Promise.resolve();
+}
+/* Een schrijver op S.db binnen een ANDER verzoek: faal nu, hard en
+   herhaalbaar. hardeFout houdt ook een oude catch-en-2xx dicht. */
+function eisVrij(onderdeel) {
+  if (!bezetDoorAnder()) return;
+  const e = fout('PG_ACCOUNTS_BEZET', 'Een accountmutatie wordt nog duurzaam bevestigd (' +
+    String(onderdeel || 'accounts').slice(0, 60) + '); probeer opnieuw.');
+  const ctx = verzoekcontext.huidige();
+  if (ctx) ctx.hardeFout = e;
+  throw e;
 }
 
 function begin() {
@@ -111,9 +165,19 @@ function begin() {
       volgers: [maakVolgers(db, 'users', 'rtg_users'),
         maakVolgers(db, 'supplier_staff', 'rtg_staff')] };
     actief = tx;
+    try { S.db.exec('PRAGMA busy_timeout=0'); } catch (e) {}
+    /* Een antwoord dat nooit eindigt mag het schrijfslot niet eeuwig houden.
+       Loopt de commit al ('toepassen'), dan maakt die hem af. */
+    tx.timer = setTimeout(() => {
+      if (tx.afgerond || (tx.deelnemer && tx.deelnemer.fase === 'toepassen')) return;
+      ctx.hardeFout = fout('PG_ACCOUNTS_TE_LANG', 'De accountmutatie bleef te lang onbevestigd.');
+      if (tx.deelnemer) tx.deelnemer.fase = 'geannuleerd';
+      try { ruim(tx, false); } catch (e) {}
+    }, LEVENSDUUR_MS);
+    if (tx.timer.unref) tx.timer.unref();
     const deelnemer = {
       naam: 'accounts',
-      heeftWerk: () => tx.volgers.some(v =>
+      heeftWerk: () => !tx.afgerond && tx.volgers.some(v =>
         tx.db.prepare(`SELECT 1 AS ja FROM ${q(v.prefix + '_geraakt')} LIMIT 1`).get()),
       pasToe: async client => {
         const lijst = tx.volgers.flatMap(v => wijzigingenVan(tx, v));
@@ -123,8 +187,11 @@ function begin() {
         return uit;
       },
       publiceer: () => ruim(tx, true),
-      annuleer: () => ruim(tx, false)
+      annuleer: () => ruim(tx, false),
+      onzeker: () => herstelCache(fout('PG_ACCOUNTS_COMMIT_ONZEKER',
+        'De uitkomst van de accountcommit is onbekend.'), 'commit-onzeker')
     };
+    tx.deelnemer = deelnemer;
     if (!verzoekcontext.registreerDeelnemer('accounts', deelnemer)) {
       ruim(tx, false);
       throw fout('PG_ACCOUNTS_DEELNEMER_DUPLICAAT',
@@ -146,6 +213,9 @@ function database() {
 function resetVoorToets() {
   if (actief) { try { ruim(actief, false); } catch (e) {} }
   actief = null;
+  const klaar = wachters; wachters = [];
+  for (const w of klaar) w();
 }
 
-module.exports = { begin, database, resetVoorToets };
+module.exports = { begin, database, resetVoorToets, bezet, bezetDoorAnder, eisVrij,
+  wachtVrij, generatie, vrijeGeneratie, nogVers, fout };

@@ -26,7 +26,7 @@ const BANK = Object.freeze({
        zonder adres is een wens. Alle drie zijn na te lopen in de route. */
     voorwaarden: [
       { wat: 'een kantoorsessie op naam', bron: 'kluisAuth (kern/kantoor/kluispoort.js)' },
-      { wat: 'een passkey onder deze handeling, of de gemelde terugval', bron: 'kern/zwaarbewijs.js' },
+      { wat: 'een passkey onder deze handeling, zonder terugval', bron: 'kern/zwaarbewijs.js' },
       { wat: 'er staat minstens een vaste betaling aan de beurt', bron: 'bankIncassoVooruitblik' }
     ],
     gevolgen: [
@@ -44,20 +44,27 @@ const BANK = Object.freeze({
          Twee collecties die in het eerste verschil meekwamen staan er met opzet NIET bij:
          `kantoorMensdeur` en `techniek` bewegen op een klok en een buffer, niet op deze
          handeling -- zie de stille ronde in scripts/idemproef-route.js. */
-      { soort: 'direct', graad: 'gemeten', collectie: 'kantoorHandtekeningen',
+      /* TERUG NAAR `vermoed`, 27 SEPTEMBER 2026. Sinds de kantoordeur de passkey zonder
+         terugval eist (zonderTerugval: true, commit effcd822) heeft de sessie van de
+         idempotentieproef geen passkey en krijgt ze 403: de verse ronde van 27 september zag
+         deze collecties dus niet bewegen, en `gemeten` zou leunen op een ronde van voor die
+         verharding. Dat ze bewegen staat nog steeds vast in test/tweedehandtekening.test.js
+         toets 6 -- een e2e-proef, geen idempotentiemeting -- en daarom `vermoed` en niet
+         `onbekend`. Terug naar `gemeten` zodra de proefwereld een passkey kan zetten. */
+      { soort: 'direct', graad: 'vermoed', collectie: 'kantoorHandtekeningen',
         wat: 'er komt een openstaande aanvraag voor een tweede mens bij',
-        reden: 'de idempotentieproef zag deze collectie veranderen; ook uitgevoerd in ' +
-          'test/tweedehandtekening.test.js toets 6' },
-      { soort: 'direct', graad: 'gemeten', collectie: 'voornemens',
+        reden: 'uitgevoerd in test/tweedehandtekening.test.js toets 6; de idempotentieproef ' +
+          'komt sinds de passkey zonder terugval niet meer binnen' },
+      { soort: 'direct', graad: 'vermoed', collectie: 'voornemens',
         wat: 'er wordt een voornemen vastgelegd met een bevroren totaal en een besluit',
-        reden: 'gemeten in dezelfde ronde; kern/commercie/voornemen.js schrijft het weg, en de ' +
+        reden: 'dezelfde e2e-proef; kern/commercie/voornemen.js schrijft het weg, en de ' +
           'economische sleutel maakt een tweede klik hetzelfde voornemen' },
-      { soort: 'direct', graad: 'gemeten', collectie: 'geldketenDossiers',
+      { soort: 'direct', graad: 'vermoed', collectie: 'geldketenDossiers',
         wat: 'het dossier van de geldketen krijgt zijn assen met een uitslag en een graad',
-        reden: 'gemeten in dezelfde ronde; kern/kantoor/geldketen/klaarzet.js legt ze vast' },
-      { soort: 'direct', graad: 'gemeten', collectie: 'geldketenJournaal',
+        reden: 'dezelfde e2e-proef; kern/kantoor/geldketen/klaarzet.js legt ze vast' },
+      { soort: 'direct', graad: 'vermoed', collectie: 'geldketenJournaal',
         wat: 'het journaal van de baan krijgt een regel die aan de vorige is geketend',
-        reden: 'gemeten in dezelfde ronde; de hashketen van kern/kantoor/geldketen.js' },
+        reden: 'dezelfde e2e-proef; de hashketen van kern/kantoor/geldketen.js' },
       { soort: 'afgeleid', graad: 'vermoed',
         wat: 'een tweede klik levert een tweede deurticket en GEEN tweede voornemen',
         reden: 'de economische sleutel hangt aan de klokgrens van de ronde: op dezelfde grens is ' +

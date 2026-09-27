@@ -1377,6 +1377,12 @@
       "muziekVraagRtg",
       "muziekZaal"
     ],
+    "naargast": [
+      "aanmeldingen",
+      "accounts",
+      "boardroomAuth",
+      "boardroomWie"
+    ],
     "navigatie": [
       "navBestemmingen",
       "navKaart",

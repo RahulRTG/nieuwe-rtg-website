@@ -19,6 +19,7 @@
    Hetzelfde geldt als de invarianten na een handeling niet meer kloppen. */
 'use strict';
 const B = require('./regels-bedrijf');
+const { teamMax } = require('./bereik');
 
 function controleer(st, boek) {
   const uit = [];
@@ -39,7 +40,7 @@ function controleer(st, boek) {
     const plank = boek.saldo(st, ['voorraad']);
     if (plank !== st.handel.voorraad * w.inkoop) uit.push('de voorraad in de boeken (' + plank + ') is niet het aantal stuks tegen inkoopprijs');
   }
-  if ((st.team || []).filter(m => !m.weg).length > B.TEAM_MAX) uit.push('meer mensen in je team dan er mogen');
+  if ((st.team || []).filter(m => !m.weg).length > teamMax(st)) uit.push('meer mensen in je team dan er mogen');
   return uit;
 }
 

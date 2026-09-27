@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T15:20:10.115Z",
-    "commit": "abaa5585d",
+    "op": "2026-09-27T13:56:18.282Z",
+    "commit": "43461f914",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5391,6 +5391,14 @@
       "operator": "return-weg#1",
       "gezakt": 4,
       "geprobeerd": 13
+    },
+    "magnaatgroei.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/magnaat-leven/index.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "magnaatgrondwet.test.js": {
       "soort": "puur",

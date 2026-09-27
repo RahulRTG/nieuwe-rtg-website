@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-25T11:54:08.555Z",
-  "commit": "fe8ad091",
+  "op": "2026-09-27T13:38:03.640Z",
+  "commit": "4c698936",
   "boomVuil": false,
-  "boomAnders": 8,
+  "boomAnders": 5,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.2"
  },
@@ -360,7 +360,7 @@
   },
   {
    "sleutel": "POST /api/auth/verify-email",
-   "bestand": "server/routes/auth/account.js:78",
+   "bestand": "server/routes/auth/account.js:81",
    "staat": "openbaar",
    "reden": "de bevestigingslink IS de geloofsbrief (verifyActionToken); ongeldig of verlopen geeft 400"
   },

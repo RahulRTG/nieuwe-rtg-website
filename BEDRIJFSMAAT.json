@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-27T13:23:52.629Z",
-    "commit": "24a18b1e",
+    "op": "2026-09-27T13:38:10.544Z",
+    "commit": "4c698936",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 8,
     "instrument": "scripts/bedrijfsmaat.js",
     "node": "v22.22.2"
   },
@@ -86,26 +86,26 @@
     "maten": 67,
     "domeinen": 28,
     "perStatus": {
-      "bestaat": 39,
+      "bestaat": 40,
       "half": 19,
-      "ontbreekt": 9,
+      "ontbreekt": 8,
       "onbekend": 0
     },
     "primairGat": {
-      "BRON_ONTBREEKT": 9,
+      "BRON_ONTBREEKT": 8,
       "DEFINITIE_ONTBREEKT": 11,
       "PROJECTIE_ONTBREEKT": 3,
       "BEWIJS_ONTBREEKT": 5
     },
     "perGat": {
-      "BRON_ONTBREEKT": 9,
-      "DEFINITIE_ONTBREEKT": 20,
-      "PROJECTIE_ONTBREEKT": 20,
-      "BEWIJS_ONTBREEKT": 28
+      "BRON_ONTBREEKT": 8,
+      "DEFINITIE_ONTBREEKT": 19,
+      "PROJECTIE_ONTBREEKT": 19,
+      "BEWIJS_ONTBREEKT": 27
     },
     "ketens": 6,
     "ketensGegrond": 3,
-    "bestaatGedeeltelijk": 12,
+    "bestaatGedeeltelijk": 13,
     "rustOpGat": 1,
     "privacyGaten": 0,
     "verworpen": 0,
@@ -156,9 +156,9 @@
     },
     "acquisitie": {
       "maten": 3,
-      "bestaat": 1,
+      "bestaat": 2,
       "half": 1,
-      "ontbreekt": 1
+      "ontbreekt": 0
     },
     "cac": {
       "maten": 1,
@@ -373,7 +373,7 @@
       "naam": "van campagne naar wervingskosten",
       "gegrond": false,
       "eersteBreuk": "campagnes.rtg-marketing",
-      "bestaand": 0,
+      "bestaand": 1,
       "van": 3,
       "schakels": [
         {
@@ -388,13 +388,8 @@
         },
         {
           "id": "acquisitie.kanaal",
-          "status": "ontbreekt",
-          "gaten": [
-            "BRON_ONTBREEKT",
-            "DEFINITIE_ONTBREEKT",
-            "PROJECTIE_ONTBREEKT",
-            "BEWIJS_ONTBREEKT"
-          ]
+          "status": "bestaat",
+          "gaten": []
         },
         {
           "id": "cac.per-kanaal",
@@ -608,7 +603,7 @@
       },
       {
         "id": "acquisitie.kanaal",
-        "status": "ontbreekt",
+        "status": "bestaat",
         "domein": "acquisitie"
       },
       {
@@ -924,14 +919,9 @@
         "gegrond": false
       },
       {
-        "van": "campagnes.rtg-marketing",
-        "naar": "acquisitie.kanaal",
-        "gegrond": false
-      },
-      {
         "van": "acquisitie.kanaal",
         "naar": "cac.per-kanaal",
-        "gegrond": false
+        "gegrond": true
       },
       {
         "van": "acquisitie.nieuwe-leden",
@@ -2562,62 +2552,85 @@
       "id": "acquisitie.kanaal",
       "versie": 1,
       "domein": "acquisitie",
-      "betekenis": "Via welke campagne, verwijzing of link iemand binnenkwam.",
+      "betekenis": "Via welk kanaal of welke campagne iemand zegt binnen te komen -- geteld, niet per lid bewaard.",
       "wereld": "consument",
-      "bronnen": [],
-      "berekening": "nog niet vastgesteld",
-      "eenheid": "leden per kanaal",
-      "graad": "onbekend",
-      "actualiteit": "onbekend",
+      "bronnen": [
+        "server/routes/auth/account.js"
+      ],
+      "berekening": "een telling per maand per kanaal en per campagnecode, bij het aanmelden; kanalen met secundaire onderdrukking, campagnes onder de grens in Overige",
+      "eenheid": "aanmeldingen per kanaal per maand",
+      "graad": "gemeten",
+      "actualiteit": "live",
       "minimaleGroep": 10,
       "privacyklasse": "leden",
-      "eigenaar": null,
-      "eigenaarReden": "Niemand.",
-      "afhankelijk": [
-        "campagnes.rtg-marketing"
-      ],
-      "status": "ontbreekt",
-      "gaten": [
-        "BRON_ONTBREEKT",
-        "DEFINITIE_ONTBREEKT",
-        "PROJECTIE_ONTBREEKT",
-        "BEWIJS_ONTBREEKT"
-      ],
+      "eigenaar": "kern/aanmeldkanaal",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "bestaat",
+      "gaten": [],
       "elementen": {
         "bron": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Geen enkele route legt een herkomstkanaal vast (nul treffers in server/ op utm, verwijzer, referral of acquisitiekanaal). Alleen de werkgeverslink wordt onthouden."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/routes/auth/account.js",
+              "citaat": "kern.aanmeldkanaalTel({ kanaal: req.body.aanmeldkanaal",
+              "klopt": true
+            }
+          ],
+          "reden": null
         },
         "definitie": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Volgt pas als er een bron is."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/definities.js",
+              "citaat": "Het AANMELDKANAAL is",
+              "klopt": true
+            }
+          ],
+          "reden": null
         },
         "projectie": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Idem."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/aanmeldkanaal.js",
+              "citaat": "function stand(",
+              "klopt": true
+            }
+          ],
+          "reden": null
         },
         "bewijs": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Idem."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/aanmeldkanaal.js",
+              "citaat": "dektNiet:",
+              "klopt": true
+            }
+          ],
+          "reden": null
         }
       },
       "groepsgrens": {
         "vereist": true,
-        "afgedwongen": false,
-        "citaten": [],
-        "reden": "Idem."
+        "afgedwongen": true,
+        "citaten": [
+          {
+            "bestand": "server/kern/aanmeldkanaal.js",
+            "citaat": "{ benoemd: true }",
+            "klopt": true
+          }
+        ],
+        "reden": null
       },
       "keten": {
-        "gegrond": false,
-        "zwakkeSchakels": [
-          "campagnes.rtg-marketing"
-        ]
+        "gegrond": true,
+        "zwakkeSchakels": []
       },
-      "gedeeltelijk": null
+      "gedeeltelijk": "Alleen wie de vraag beantwoordt of via een campagnelink komt. De vraag zelf staat nog niet in het aanmeldscherm; de API en de link wel."
     },
     {
       "id": "cac.per-kanaal",
@@ -2651,7 +2664,7 @@
           "aanwezig": false,
           "afgeleid": true,
           "citaten": [],
-          "reden": "afgeleid, maar zonder bron in: acquisitie.kanaal, campagnes.rtg-marketing"
+          "reden": "afgeleid, maar zonder bron in: campagnes.rtg-marketing"
         },
         "definitie": {
           "aanwezig": false,
@@ -2678,7 +2691,6 @@
       "keten": {
         "gegrond": false,
         "zwakkeSchakels": [
-          "acquisitie.kanaal",
           "campagnes.rtg-marketing"
         ]
       },

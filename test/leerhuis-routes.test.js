@@ -16,6 +16,8 @@
        met een relatie (haal de volwassenLid-regel weg en toets 5 zakt)
                                                                 -> toets 5
      - een lid leest zijn eigen stand en niet het bestuursbeeld  -> toets 6
+     - besluit B1: de factuurcorrectie wordt meegelezen en niemand wordt
+       tegengehouden (haal de meelezer uit opzet/kantoordeur.js)   -> toets 7
 
    Draai los: node --test test/leerhuis-routes.test.js */
 const test = require('node:test');
@@ -131,4 +133,34 @@ test('6. een lid leest zijn eigen stand, het bestuur leest het organisatiebeeld'
   const geschikt = await lees(N, 'geschiktheid', { handeling: 'betaling.terugboeken' });
   assert.equal(geschikt.body.antwoord.uitkomst, 'NOT_ELIGIBLE');
   assert.equal(geschikt.body.antwoord.verleent, false);
+});
+
+test('7. B1 in de schaduw: een echte terugboeking wordt meegelezen en niemand wordt tegengehouden', async () => {
+  /* De eigenaar van dit huis als MEDEWERKER op naam (office) en als lid (eig).
+     Hij krijgt het RTG-leerhuis, maar geen certificaat en geen beleid: dus
+     "niet geschikt", en toch moet de terugboeking gewoon slagen. */
+  const eig = (await post('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })).body.token;
+  const eigId = (await post('/api/state', {}, eig)).body.state.user.id;
+  const open = await post('/api/office/leerhuis/open', { id: 'RTG', soort: 'RTG', naam: 'RTG', eigenaar: 'user-' + eigId }, office);
+  assert.equal(open.status, 200, JSON.stringify(open.body));
+
+  const reg = await post('/api/auth/register', { name: 'Schaduw Lid', email: 'lh-s@x.nl', phone: '0612348009',
+    password: 'geheim12345', geboortedatum: '1985-04-04', tier: 'rtg', pasApp: 'rtg' });
+  const lid = reg.body.token;
+  const userId = reg.body.state.user.id;
+  const PNG = 'data:image/png;base64,' + Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 1, 2, 3, 4]).toString('base64');
+  await post('/api/verify/upload', { image: PNG }, lid);
+  await post('/api/verify/selfie', { image: PNG }, lid);
+  const factuur = ((await post('/api/state', {}, lid)).body.state.invoices || []).find(i => i.status === 'open');
+  assert.ok(factuur, 'het nieuwe lid heeft een open factuur');
+  assert.equal((await post('/api/pay/saldo', { invoiceId: factuur.id }, lid)).status, 200);
+
+  const voor = (await lees(eig, 'schaduw', { org: 'RTG' })).body.antwoord.routes[0];
+  const r = await post('/api/office/pay/factuurcorrectie',
+    { userId, invoiceId: factuur.id, grond: 'niet-geleverd', reden: 'schaduwproef' }, office);
+  assert.equal(r.status, 200, 'de schaduw houdt niemand tegen: ' + JSON.stringify(r.body));
+  const na = (await lees(eig, 'schaduw', { org: 'RTG' })).body.antwoord.routes[0];
+  assert.equal(na.route, 'POST /api/office/pay/factuurcorrectie');
+  assert.equal(na.oneens, voor.oneens + 1, 'toegelaten maar niet geschikt: precies wat afdwingen had tegengehouden');
+  assert.ok(!JSON.stringify(na).includes('lid:'), 'een teller en geen journaal: er staat geen mens in');
 });

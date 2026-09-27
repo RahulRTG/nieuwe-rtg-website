@@ -19,6 +19,11 @@ module.exports = function kantoordeur(app, kern, deps) {
     accounts: deps.accounts, eigenaar: deps.eigenaar, boardroomWie: rauw.boardroomWie,
     magBoardroom: rauw.magBoardroom, boardroomBaas: rauw.boardroomBaas, balieBron: () => kern().magBalie });
   app.use('/api/office', beleidsmotor.meelezer);
+  /* Besluit B1 van het leerhuis (ACADEMY.md par. 5): een echte handeling leest
+     de geschiktheid mee, in de schaduw en zonder iemand tegen te houden. Zie de
+     kop van kern/leerhuis/schaduw.js voor waarom dit (nog) naast de motor staat. */
+  app.use('/api/office/pay/factuurcorrectie', require('../kern/leerhuis/schaduw')
+    .maakSchaduw({ db: deps.db, save: deps.save, sessionFor: deps.sessionFor }).meelezer);
   /* Fase 8: de toegangsreview leest de drie zetelbronnen. De balie en de
      codenamen bestaan pas bij een verzoek, vandaar de functies. */
   beleidsmotor.review = require('../kern/beleidsmotor/review').maakReview({ kantoorHouders: () => kern().kantoorHouders(),

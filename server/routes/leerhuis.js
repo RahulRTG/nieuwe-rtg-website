@@ -45,12 +45,15 @@ const { bijeen, inBundel } = require('../db');
    is isolatie (grondwet 16). */
 const EIGEN_VRAGEN = ['mijn', 'vakstaat', 'trainerCockpit', 'managerCockpit', 'waaromLeren', 'waaromVerversen',
   'waaromNietGereed', 'geschiktheid', 'loopbaan', 'waaromTrainer', 'grond', 'uitkomst'];
-const BESTUURSVRAGEN = ['gereedheid', 'eenheid', 'wieGeraakt', 'reconstrueer', 'certStand'];
+const BESTUURSVRAGEN = ['gereedheid', 'eenheid', 'wieGeraakt', 'reconstrueer', 'certStand', 'schaduw'];
 const LEESROLLEN = ['ACADEMY_OWNER', 'QUALITY_AUTHORITY', 'KNOWLEDGE_OWNER', 'ASSESSMENT_AUTHORITY'];
 
 module.exports = (kern) => {
   const { app, auth, db, save, accounts, kluisAuth } = kern;
   const leerhuis = maakLeerhuis({ db, save, bijeen, inBundel });
+  /* Alleen om de schaduwtellers van besluit B1 te LEZEN; de meelezer zelf hangt
+     in opzet/kantoordeur.js. */
+  const schaduw = require('../kern/leerhuis/schaduw').maakSchaduw({ db, save });
   /* Dezelfde fabriek als kern.volwassen (opzet/kernlaag1.js), op dezelfde
      accounts: de poort is een pure functie over de kluis, dus een eigen
      exemplaar is dezelfde regel en geen tweede -- en de kern wordt er niet
@@ -121,7 +124,7 @@ module.exports = (kern) => {
         return res.status(403).json({ error: 'Het organisatiebrede beeld is voor het bestuur van de Academy.' });
       const a = { gereedheid: () => l.gereedheid(org, b.eisen || {}), eenheid: () => l.eenheid(org),
         wieGeraakt: () => l.wieGeraakt(org, String(b.kennis || ''), b.klasse || null),
-        reconstrueer: () => l.reconstrueer(org, String(b.certificaat || '')), certStand: () => l.certStand(org, String(b.certificaat || '')) }[vraag];
+        reconstrueer: () => l.reconstrueer(org, String(b.certificaat || '')), certStand: () => l.certStand(org, String(b.certificaat || '')), schaduw: () => schaduw.stand() }[vraag];
       return res.json({ ok: true, vraag, antwoord: a() });
     }
     res.status(400).json({ error: 'Onbekende vraag.', vragen: EIGEN_VRAGEN.concat(BESTUURSVRAGEN) });

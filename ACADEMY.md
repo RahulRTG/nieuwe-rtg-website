@@ -28,7 +28,7 @@ uit dezelfde lijst (`BLOKKADES` in `scripts/leerhuisproef.js`).
 | blokkade | klasse | wat er ontbreekt | sluit met |
 |---|---|---|---|
 | `UI` | UX | geen scherm voor My Academy, Trainer, Manager en Knowledge Governance | fase B-UI (par. 6) |
-| `DOMEINPOORT` | AUTHORITY | geen RTG-domeinpoort leest AUTHORITY_ELIGIBLE als feit; geschiktheid verandert nog nergens een recht | besluit B1 (genomen: eerst schaduw) |
+| `DOMEINPOORT` | AUTHORITY | `POST /api/office/pay/factuurcorrectie` leest de geschiktheid mee, maar alleen in de schaduw (besluit B1): geschiktheid verandert nog nergens een recht | afdwingen als de schaduw rijp is en nul keer oneens staat; dat is een volgend besluit |
 | `IDENTITEIT` | TENANT_ISOLATION | de persoonsleutel is niet gekoppeld aan `employment` (kern/concern) of de werkruimte; een relatie is een verklaring van de organisatie zelf | besluit B2 (genomen: per soort bron) |
 
 ---
@@ -162,7 +162,7 @@ vulling van het leerhuis werd een zevende besluit.
 
 | # | vraag | besluit | wat het kost | stand |
 |---|---|---|---|---|
-| B1 | Welke domeinpoort leest AUTHORITY_ELIGIBLE als feit? | **één handeling, in de schaduw van de beleidsmotor** (de keuze werd aan de bouwer gelaten; dit was het voorstel): de poort leest de geschiktheid mee en telt eens/oneens, en houdt niemand tegen | klein; DOMEINPOORT gaat van open naar *schaduw*, niet naar dicht. Afdwingen is een volgend besluit, als de schaduw rijp is (A3, 23 september) | een stap weg |
+| B1 | Welke domeinpoort leest AUTHORITY_ELIGIBLE als feit? | **één handeling, in de schaduw van de beleidsmotor** (de keuze werd aan de bouwer gelaten; dit was het voorstel): de poort leest de geschiktheid mee en telt eens/oneens, en houdt niemand tegen | de handeling is `POST /api/office/pay/factuurcorrectie` (geld terug naar een lid, `betaling.terugboeken` in het RTG-leerhuis). De meelezer (`kern/leerhuis/schaduw.js`, gehangen in `opzet/kantoordeur.js`) telt alleen afgeronde 2xx: eens, oneens (afdwingen had hem tegengehouden) of onbekend, zonder namen. Hij staat NAAST de beleidsmotor en niet erin: dat bestand zit net onder de band van keuringsregel 13, en een deur-motor die per handeling denkt is een ontwerpstap van AUTHORITY.md. Het bestuur leest de tellers met de vraag `schaduw` | **staat** in de schaduw; DOMEINPOORT blijft tot afdwingen |
 | B2 | Welke relatie is de waarheid? | **per soort bron**: `employment` (kern/concern) voor RTG en Business, `rtfos/vrijwilligers` voor RTF, de werving-uitnodiging voor Supplier, met een brug die één kant op loopt | een lezer per bron; de relatie in het leerhuis wordt een AFGELEIDE en geen verklaring meer | een stap weg |
 | B3 | Kennisbank en Knowledge Core? | **samenvoegen**: de kennisbank van een werkruimte (`server/bedrijf/kennis.js`) krijgt review, goedkeuring en afhankelijkheden en wordt de Knowledge Core | raakt elke bestaande werkruimte en haar artikelen; vraagt een migratie die per artikel byte voor byte vergelijkt, en een besluit over wie in een werkruimte KNOWLEDGE_OWNER is | jaren weg is het niet, maar het is het grootste stuk werk van de zeven |
 | B4 | Duurzaam? | **ja, drie handelingen**: `certificaatUitgeven`, `certificaatStand`, `beoordelingAfronden` | een regel op de lijst van regel 47 (`kern/leerhuis/index.js`); de route gaat via `doeVast()`, de synchrone `doe()` weigert die drie zodra er een bundel is. Een mislukte commit heet ONBEKEND en niet mislukt, want `db/bijeen.js` draait het geheugen niet terug: eerst `uitkomst` navragen, dan opnieuw met dezelfde sleutel (toets 17) | **staat** |

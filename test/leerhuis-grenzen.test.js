@@ -14,6 +14,7 @@
      - de tweede-mens-eis weg uit geschiktheid (brug.js)              -> toets 12
      - de bestaand-id-weigering weg uit nieuwId (hulp.js)             -> toets 14
      - `DUURZAAM.has(actie)` weg uit doe() in index.js               -> toets 17
+     - de 2xx-eis of de eens/oneens-volgorde in schaduw.js omdraaien -> toets 18
    Toets 1 zakte eerst NIET op zijn eigen mutatie: een andere weigering redde
    hem. Hij is daarna zo gemaakt dat alleen die ene regel nog in de weg staat.
    Toets 14 vond zelf een fout (een bestaand id herschreef een beoordeling) en
@@ -429,4 +430,31 @@ test('17. duurzaam (B4): drie handelingen gaan alleen via doeVast, en een misluk
   /* En een handeling die niet duurzaam hoeft, raakt de bundel niet. */
   const v = await lh.doeVast(ORG, 'voorstelIndienen', { probleem: 'a', voorstel: 'b', reden: 'c' }, P.N, { sleutel: 'v-1' });
   assert.equal(v.ok, true); assert.equal(commits, 1);
+});
+
+test('18. B1 in de schaduw: eens, oneens en onbekend, en een weigering of een afgebroken antwoord telt niet', () => {
+  const { EventEmitter } = require('events');
+  const { maakSchaduw } = require('../server/kern/leerhuis/schaduw');
+  const Q = { E: 'lid:1', KO: 'lid:2', KO2: 'lid:3', CO: 'lid:4', Q: 'lid:5', A: 'lid:6', T: 'lid:7', M: 'lid:8', N: 'lid:9' };
+  const w = basis('RTG', 'RTG', Q);
+  W.leidOp(w, 'RTG', Q.N, Q);
+  w.doe('RTG', 'beleidZet', { id: 'tb', handeling: 'betaling.terugboeken', vaardigheden: ['terugboeken'], certificaat: true }, Q.E);
+  w.doe('RTG', 'beleidGoedkeuren', { id: 'tb' }, Q.Q);
+  const sessies = { geschikt: { lidKey: 'user-9' }, niet: { lidKey: 'user-8' }, gedeeld: { role: 'office' } };
+  const s = maakSchaduw({ db: w.db, save: () => {}, sessionFor: (t) => sessies[t] || null });
+  const loop = (token, status, pad, afgebroken) => {
+    const req = { method: 'POST', originalUrl: pad || '/api/office/pay/factuurcorrectie?x=1', get: () => 'Bearer ' + token };
+    const res = new EventEmitter(); res.statusCode = status; res.writableFinished = !afgebroken;
+    s.meelezer(req, res, () => {});
+    res.emit('close');
+  };
+  loop('geschikt', 200);
+  loop('niet', 200); loop('niet', 201);
+  loop('gedeeld', 200);
+  loop('niet', 403);                                   // een weigering door de poort zelf
+  loop('niet', 200, null, true);                       // afgebroken antwoord
+  loop('niet', 200, '/api/office/iets-anders');         // een andere route
+  const r = s.stand().routes[0];
+  assert.deepEqual({ eens: r.eens, oneens: r.oneens, onbekend: r.onbekend }, { eens: 1, oneens: 2, onbekend: 1 });
+  assert.equal(r.handeling, 'betaling.terugboeken');
 });

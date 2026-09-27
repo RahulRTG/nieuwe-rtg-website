@@ -43,7 +43,7 @@ const [E, KO, CO, Q, A, T, M, N, N2] = ['lid:1', 'lid:2', 'lid:4', 'lid:5', 'lid
    test/leerhuis-lus.test.js zakt als ACADEMY.md een blokkade niet noemt. */
 const BLOKKADES = [
   { id: 'UI', klasse: 'UX', wat: 'er is nog geen scherm (My Academy, Trainer, Manager, Knowledge Governance)', sluit: 'fase B-UI' },
-  { id: 'DOMEINPOORT', klasse: 'AUTHORITY', wat: 'geen RTG-domeinpoort leest AUTHORITY_ELIGIBLE als feit; geschiktheid verandert nog nergens een recht', sluit: 'besluit ACADEMY-B1' },
+  { id: 'DOMEINPOORT', klasse: 'AUTHORITY', wat: 'een RTG-handeling (de factuurcorrectie) leest de geschiktheid mee, maar alleen in de schaduw: geschiktheid verandert nog nergens een recht', sluit: 'afdwingen als de schaduw rijp is en nul keer oneens staat (een volgend besluit na B1)' },
   { id: 'IDENTITEIT', klasse: 'TENANT_ISOLATION', wat: 'de persoonsleutel is nog niet gekoppeld aan employment (kern/concern) of de werkruimte; een relatie is een verklaring van de organisatie zelf', sluit: 'besluit ACADEMY-B2' }
 ];
 

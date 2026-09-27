@@ -322,7 +322,7 @@ function nieuwTeamForm(){
    hele punt: zonder dat antwoorden twee mensen hetzelfde, of niemand. */
 async function openTeam(id, alles){
   const versie=++laadVersie;
-  let d; try{ d=await api('team/postvak',{id,alles:!!alles}); }catch(e){ alert(e.message); return laadInbox(); }
+  let d; try{ d=await api('team/postvak',{id,alles:!!alles}); }catch(e){ if(versie!==laadVersie) return; alert(e.message); return laadInbox(); }
   if(versie!==laadVersie) return;
   const t=d.team;
   $('#main').innerHTML=

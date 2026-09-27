@@ -46,7 +46,7 @@ module.exports = (ctx) => {
   /* Oude bezorgingen droegen hun vier cijfers kaal; die worden weggehaald en
      niet gehonoreerd. Het lid vraagt voor een lopende bezorging een nieuwe. */
   let legacyKlaar = false;
-  function ruimLegacy() {
+  function ruimOudeBezorgcodes() {
     if (legacyKlaar) return;
     let n = 0;
     for (const b of lijst()) if (b && Object.prototype.hasOwnProperty.call(b, 'bezorgcode')) { delete b.bezorgcode; n++; }
@@ -54,7 +54,7 @@ module.exports = (ctx) => {
     legacyKlaar = true;
   }
   function aanvraag(key, codenaam, supplierCode, itemsIn, opts) {
-    ruimLegacy();
+    ruimOudeBezorgcodes();
     const s = findSupplier(supplierCode);
     if (!isRetail(s)) return { status: 404, error: 'Winkel niet gevonden.' };
     if (!magLeveren(s)) return { status: 409, error: s.name + ' bezorgt op dit moment niet.' };
@@ -90,7 +90,7 @@ module.exports = (ctx) => {
   }
   // Een nieuwe bezorgcode voor een eigen, lopende bezorging (de vorige vervalt).
   async function codeNieuw(key, ref) {
-    ruimLegacy();
+    ruimOudeBezorgcodes();
     const b = lijst().find(x => x.ref === String(ref || '') && x.key === key);
     if (!b) return { status: 404, error: 'Bezorging niet gevonden.' };
     if (KLAAR[b.status]) return { status: 409, error: 'Deze bezorging is al afgerond.' };
@@ -125,7 +125,7 @@ module.exports = (ctx) => {
     };
   }
   function mijnBezorgingen(key) {
-    ruimLegacy();
+    ruimOudeBezorgcodes();
     return lijst().filter(b => b.key === key).slice(0, 30).map(klantBeeld);
   }
   return { isRetail, instel, setup, magLeveren, accountVerified, aanvraag, codeNieuw, winkelOverzicht, winkelBeeld, klantBeeld, mijnBezorgingen };

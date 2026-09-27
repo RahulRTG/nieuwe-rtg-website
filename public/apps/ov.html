@@ -77,6 +77,8 @@
   .codeScherm{position:fixed;inset:0;background:#0C0C0B;display:none;flex-direction:column;align-items:center;
     justify-content:center;gap:1.2rem;z-index:50;}
   .codeScherm.zien{display:flex;}
+  .codeScherm .codeQr{width:min(70vw,300px);height:auto;border-radius:0;background:#fff;padding:0.6rem;}
+  .codeScherm .codeTekst{font-family:'Bodoni Moda',serif;letter-spacing:0.1em;word-break:break-all;max-width:90vw;text-align:center;}
   .codeScherm .code{font-family:'Bodoni Moda',serif;font-size:3.4rem;letter-spacing:0.35em;padding-left:0.35em;
     color:#0C0C0B;background:var(--gold);border-radius:0;padding:1rem 1.4rem;
     box-shadow:0 0 60px rgba(201,162,75,0.65), 0 0 140px rgba(201,162,75,0.35);}
@@ -326,8 +328,8 @@
 
 <div class="codeScherm" id="codeScherm" role="dialog" aria-label="Uw incheckcode">
   <p class="stil" id="codeZaak">Toon dit scherm; het personeel scant de code.</p>
-  <img id="codeQr" alt="QR-code om in te checken" hidden style="width:min(70vw,300px);height:auto;border-radius:0;background:#fff;padding:0.6rem;">
-  <p class="stil" id="codeTekst" aria-live="polite" style="font-family:'Bodoni Moda',serif;letter-spacing:0.1em;word-break:break-all;max-width:90vw;text-align:center;"></p>
+  <img id="codeQr" alt="QR-code om in te checken" class="codeQr" hidden>
+  <p class="stil codeTekst" id="codeTekst" aria-live="polite"></p>
   <p class="stil" id="codeTijd"></p>
   <button class="knop" id="codeDicht" type="button">Sluiten</button>
 </div>

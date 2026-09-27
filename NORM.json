@@ -169,6 +169,15 @@
     },
     {
       "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1603,
+      "meter": "kernBreedte 1603 -> 1605",
+      "reden": "Twee nieuwe namen uit de kern-tas, elk voor een nieuwe credentialroute van de restdeuren (RELEASEKANDIDAAT.md B9): mbCode (domein member: het lid haalt een nieuwe bezorgcode, want de aanvraag draagt hem niet meer) en ovCodeIntrek (domein ov: het lid trekt zijn OV-incheckcode in als het scherm sluit). Serverside intrekken en roteren zijn controls van het credentialbeleid; een ingang daarvoor is een naam, en die staat in GRENZEN.json bij het domein dat hem leest.",
+      "waarheen": "GRENZEN.json (member: mbCode, ov: ovCodeIntrek) en test/ovincheckcode.test.js plus test/modebezorg.test.js"
+    },
+    {
+      "datum": "2026-09-27",
       "soort": "schuld",
       "sleutel": "zelfpoortendeToetsen",
       "van": 36,
@@ -186,6 +195,16 @@
       "meter": "zelfpoortendeToetsen 35 -> 36; toetsenNietGemeten 635 -> 636",
       "reden": "test/algpin-herstel.pg.test.js is nieuw (CODECREDENTIALS.json, identity.algpin_herstelsleutel, beleid B9): twee echte PostgreSQL-instances racen om dezelfde herstelsleutel (precies een claim wint), om twee aanvragen van hetzelfde lid tegelijk (er blijft een werkende sleutel over) en een aanvraag op B trekt de sleutel in die A net uitgaf. Dat kan niet eerlijk zonder database; zonder DATABASE_URL slaat hij zichzelf over. Hij staat in scripts/lib/pg-toetslijst.js (verplicht in CI) en als uitzondering onder zelfpoortende-toets. Lokaal gedraaid tegen postgresql://localhost: 1 van 1 groen, en met claim() gesplitst in lezen en schrijven in twee transacties zakte hij (beide instances claimden). Daarom telt hij ook als niet-gemeten toets: de mutatiemotor draait zonder PostgreSQL. De vijf gewone toetsen van deze ronde (apipoort-levensduur, stadsdoossleutel, algpin-herstel, scim-sleutelverval, imap-sleutelverval) zijn wel door de motor gemeten.",
       "waarheen": "Dezelfde aflossing als de andere pg-toetsen: de standaardomgeving levert PostgreSQL, en dan meet de motor ze mee."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "toetsenNietGemeten",
+      "van": 635,
+      "vervalt": "2026-12-27",
+      "meter": "toetsenNietGemeten 635 -> 636",
+      "reden": "test/restdeuren.pg.test.js is nieuw (de vier restdeuren van B9). Zonder DATABASE_URL slaat hij zichzelf over, dus de mutatiemotor kan er niet langs; de vier gewone restdeurtoetsen zijn wel gemeten (MUTATIES.json, 0 overleefd). Met de hand nagetrokken tegen echte PostgreSQL: advisory lock plus FOR UPDATE uit pg/collectietransactie.js liet hem 3 van 3 keer zakken.",
+      "waarheen": "Een mutatieronde met DATABASE_URL, of de pg-scherf als meetomgeving."
     },
     {
       "datum": "2026-09-27",

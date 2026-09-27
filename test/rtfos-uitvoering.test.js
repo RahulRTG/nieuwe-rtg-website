@@ -287,7 +287,7 @@ test('vol is een wachtlijst, en een kind zonder oudertoestemming komt er niet in
 
   // een nieuwe incheckcode (kwijt): de vorige opent daarna niets meer, de nieuwe wel
   const vervang = await os_('activiteit/incheckcode', { id, inschrijvingId: twee.body.inschrijving.id });
-  assert.equal(vervang.status, 200, JSON.stringify(vervang.body).slice(0, 200));
+  assert.equal(vervang.status, 200, 'POST /api/rtfos/activiteit/incheckcode: ' + JSON.stringify(vervang.body).slice(0, 200));
   assert.match(vervang.body.inschrijving.checkinCode, /^IN\.[0-9A-F]{32}$/);
   assert.equal((await os_('activiteit/incheck', { id, checkinCode: twee.body.inschrijving.checkinCode })).status, 404,
     'de vervangen code kent de deur niet meer');

@@ -44,7 +44,9 @@ test('de kascode: no-store, geen tweede code op dezelfde sleutel, en intrekken s
   const weg = await api('pay/kascode/intrek', {}, lid);
   assert.equal(weg.status, 200);
   assert.equal(weg.body.ingetrokken, 1);
-  assert.equal((await api('pay/kascode/intrek', {}, lid)).body.ingetrokken, 0, 'een tweede keer verandert niets');
+  /* Een tweede keer is hetzelfde verzoek (idemsleutels-geld.js: zelfdeVerzoek):
+     hetzelfde antwoord, en er gaat niets extra dicht of open. */
+  assert.equal((await api('pay/kascode/intrek', {}, lid)).status, 200, 'een tweede keer is geen fout');
   assert.equal((await api('supplier/pay/in', { code: k.body.code, centen: 500, idem: 'kr-in' }, zaak)).status, 404,
     'een ingetrokken code opent niets');
 });

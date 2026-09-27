@@ -8,7 +8,10 @@
       niet stil "anders";
    4. er staat NIETS per lid: de opslag bevat geen account, geen codenaam en geen
       sleutel -- alleen tellingen per maand;
-   5. na dertien maanden valt een maand weg.
+   5. na dertien maanden valt een maand weg;
+   6. telde de link niets, dan krijgt het lid de vraag een keer op het welkomstscherm
+      (met de antwoorden van de server): een onbekend antwoord sluit hem niet,
+      antwoorden of overslaan wel, en een tweede keer is 409.
 
    Draai: node --test test/aanmeldkanaal.test.js */
 'use strict';
@@ -73,4 +76,27 @@ test('4 en 5. er staat niets per lid, en na dertien maanden valt een maand weg',
   klok = '2027-02-16T10:00:00Z';
   k.aanmeldkanaalTel({ kanaal: 'zoeken' });
   assert.equal(db.data.aanmeldkanaalTelling['2027-02'].kanalen.zoeken, 2);
+});
+
+test('6. de vraag na de registratie: een keer, en alleen als de link niets telde', async () => {
+  const metLink = await meldAan({ campagne: 'najaar-26' });
+  assert.equal(metLink.aanmeldkanaalVraag, undefined, 'de link telde al; geen tweede telling');
+  assert.equal((await api('/api/auth/aanmeldkanaal', { kanaal: 'vriend' }, metLink.token)).status, 409);
+
+  const kaal = await meldAan({});
+  const v = kaal.aanmeldkanaalVraag;
+  assert.ok(v && v.kanalen.length === 6 && v.kanalen.every(k => k.id && k.label), 'de antwoorden komen van de server');
+  const fout = await api('/api/auth/aanmeldkanaal', { kanaal: 'nergens' }, kaal.token);
+  assert.equal(fout.status, 400);
+  const goed = await api('/api/auth/aanmeldkanaal', { kanaal: 'sociaal' }, kaal.token);
+  assert.equal(goed.status, 200, 'een onbekend antwoord sloot de vraag niet: ' + JSON.stringify(goed.body));
+  assert.equal(goed.body.geteld, true);
+  assert.equal((await api('/api/auth/aanmeldkanaal', { kanaal: 'sociaal' }, kaal.token)).status, 409, 'een keer');
+
+  const over = await meldAan({});
+  const o = await api('/api/auth/aanmeldkanaal', {}, over.token);
+  assert.equal(o.status, 200);
+  assert.equal(o.body.geteld, false, 'overslaan telt niets');
+  assert.equal((await api('/api/auth/aanmeldkanaal', { kanaal: 'vriend' }, over.token)).status, 409, 'en sluit de vraag');
+  assert.equal((await api('/api/auth/aanmeldkanaal', { kanaal: 'vriend' })).status, 401);
 });

@@ -53,11 +53,13 @@
       "media"
     ],
     "auth": [
+      "AANMELDKANALEN",
       "DEMO",
       "DEV_VELDEN",
       "PAS_FOUT",
       "PERSONAS",
       "PRODUCTION",
+      "aanmeldkanaalKeuzes",
       "aanmeldkanaalTel",
       "antivirus",
       "appUrl",

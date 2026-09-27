@@ -79,6 +79,14 @@ CONTRACTEN['POST /api/office/aanmeldkanaal'] = {
   nagekeken: 'met de hand, 2026-09-27: de handler roept alleen aanmeldkanaalStand() aan, die via eigencollectie.kijk leest',
   afgetekend: AF
 };
+/* De herkomstvraag na de registratie (routes/auth/account.js, C6): een keer per account. */
+CONTRACTEN['POST /api/auth/aanmeldkanaal'] = {
+  mutatieId: 'auth.aanmeldkanaal', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
+  toegang: { klasse: 'AUTHENTICATED' }, stand: 'PROTECTED',
+  bewijs: { gemeten: 'test/aanmeldkanaal.test.js toets 6: antwoorden of overslaan sluit de vraag, een tweede keer is 409 ' +
+    'en telt niets; een onbekend antwoord is 400 en sluit hem niet', op: '2026-09-27' },
+  afgetekend: AF
+};
 /* Het streefbeeld (kern/streefbeeld.js, besluit C7). */
 CONTRACTEN['POST /api/office/streefbeeld'] = {
   mutatieId: 'office.streefbeeld', herkomst: 'mens', semantiek: { klasse: 'idempotent' },

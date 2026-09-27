@@ -35,7 +35,7 @@ module.exports = [
     definitie: [c('server/kern/bedrijfsmaat/definities.js', 'Het AANMELDKANAAL is')],
     projectie: [c('server/kern/aanmeldkanaal.js', 'function stand(')], bewijs: [c('server/kern/aanmeldkanaal.js', 'dektNiet:')],
     groepsgrens: [c('server/kern/aanmeldkanaal.js', "{ benoemd: true }")],
-    gedeeltelijk: 'Alleen wie de vraag beantwoordt of via een campagnelink komt. De vraag zelf staat nog niet in het aanmeldscherm; de API en de link wel.',
+    gedeeltelijk: 'Alleen wie de vraag beantwoordt of via een campagnelink komt. De vraag komt na de registratie en is over te slaan.',
     waarom: {} },
 
   { id: 'cac.per-kanaal', domein: 'cac', wereld: 'rtg-intern', eenheid: 'euro per nieuw lid',

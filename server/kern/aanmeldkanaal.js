@@ -23,6 +23,10 @@
 
 const NAAM = 'aanmeldkanaalTelling';
 const KANALEN = Object.freeze(['vriend', 'werkgever', 'campagne', 'zoeken', 'sociaal', 'anders']);
+/* De woorden bij de vraag op het welkomstscherm. Ze staan HIER en nergens anders:
+   het scherm krijgt ze mee met de registratie, zodat er geen tweede lijst ontstaat. */
+const LABELS = Object.freeze({ vriend: 'Via iemand die ik ken', werkgever: 'Via mijn werk', campagne: 'Via een advertentie',
+  zoeken: 'Zelf gezocht', sociaal: 'Via sociale media', anders: 'Anders' });
 const CODE = /^[a-z0-9][a-z0-9-]{1,31}$/;
 const BEWAAR_MAANDEN = 13;
 const { groepeer } = require('./bedrijfsmaat/poort');
@@ -68,5 +72,7 @@ module.exports = ({ db, save, nu }) => {
         'Een telling per maand en geen herkomst per lid: behoud of kosten per kanaal zijn daaruit niet te volgen.'] };
   }
 
-  return { aanmeldkanaalTel: tel, aanmeldkanaalStand: stand, AANMELDKANALEN: KANALEN };
+  const keuzes = () => KANALEN.map(id => ({ id, label: LABELS[id] }));
+
+  return { aanmeldkanaalTel: tel, aanmeldkanaalStand: stand, aanmeldkanaalKeuzes: keuzes, AANMELDKANALEN: KANALEN };
 };

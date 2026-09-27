@@ -78,6 +78,7 @@
                 wervingscode:wervingscode || undefined, campagne })
             : await accessRequest('identity.session.open', {login:cred.u,password:cred.p,pasApp:vastePas || undefined}));
           if (data.tweedeFactorNodig) return data;
+          if (data.aanmeldkanaalVraag) aanmeldkanaalVraag = data.aanmeldkanaalVraag;
           if (!data.token || !data.state) throw new Error('De server heeft nog geen geldige sessie bevestigd.');
           API.token = data.token;
           applyState(data.state);           // user = het echte account

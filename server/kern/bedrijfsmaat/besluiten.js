@@ -23,7 +23,7 @@ const HANDHAVING = {
   C5: 'kern/aanmeldingen/naargast.js (lid nu of aan het eind, kantoor met reden, drie regels standaard uit); ' +
     'test/naargast.test.js.',
   C6: 'kern/aanmeldkanaal.js (een telling per maand, nooit per lid); test/aanmeldkanaal.test.js. ' +
-    'De vraag zelf staat nog niet in het aanmeldscherm; de API en de campagnelink wel.',
+    'De vraag staat na de registratie op het welkomstscherm (routes/auth/account.js, een keer per account).',
   C7: 'kern/streefbeeld.js (voorstel uit drie maanden, tekenen op de vingerafdruk, een dimensie buiten is nee); ' +
     'test/streefbeeld.test.js. Er is nog niets dat autonoom handelt.'
 };

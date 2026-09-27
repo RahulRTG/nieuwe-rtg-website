@@ -11,5 +11,6 @@ module.exports = {
   'POST /api/office/reisbureau/thuis': 'zelfde reden als de ledenkant',
   'POST /api/mijn/pas/gast': 'nu laat de sessies vervallen en einde is idempotent op stand; een afgespeeld succes verbergt dat',
   'POST /api/office/pas/gast': 'een tweede keer is al gast (409); die weigering is het antwoord',
+  'POST /api/auth/aanmeldkanaal': 'de vraag gaat na een antwoord dicht (409); een afgespeeld succes zou een tweede telling suggereren',
   'POST /api/office/pas/gast/ronde': 'een ronde kijkt naar de klok van nu; een opgeslikte tweede laat liggen wat intussen aan de beurt is',
 };

@@ -178,7 +178,7 @@ erbij. Nog niet gebouwd, behalve waar het staat.
   samen wint de zachtste, en facturen en bewijsstukken blijven na de overgang
   (`AFSPRAAK.md`: rechten hangen per capability, niet per account).
 - **C6, het herkomstkanaal: een vraag bij aanmelding EN een campagnecode in de
-  link.** Allebei optioneel, alleen geteld langs de groepspoort, nooit per lid
+  link.** De vraag komt na de registratie, op het welkomstscherm. Allebei optioneel, alleen geteld langs de groepspoort, nooit per lid
   zichtbaar, dertien maanden bewaard en weg bij vergetelheid.
 - **C7, de streefstand: de machine stelt voor, de eigenaar tekent.** Een
   voorstel per dimensie met een tolerantie, uit de afgesloten maanden; het geldt
@@ -308,8 +308,12 @@ doorgestreept met de datum; de besluiten staan in par. 2.5.
    vervallen; facturen en betaalschema blijven. Churn kan nu voorkomen.
 8. ~~**Een herkomstkanaal bij aanmelding**~~ -- staat grotendeels (27 september, C6):
    `kern/aanmeldkanaal.js` telt per maand, nooit per lid, en de campagnecode uit de
-   link (`?c=`) reist mee. Nog niet: de vraag zelf in het aanmeldscherm (een
-   keuzelijst is daar een nieuw bedieningselement), en CAC, dat wacht op een
+   link (`?c=`) reist mee. De vraag zelf staat sinds dezelfde dag NA de registratie
+   (keuze van de eigenaar), op het welkomstscherm zodra de onboarding klaar is:
+   alleen als de link niets telde, een keer (`POST /api/auth/aanmeldkanaal`;
+   antwoorden en overslaan sluiten hem allebei), en de antwoorden komen van de
+   server zodat er geen tweede lijst ontstaat. Het account draagt alleen DAT de
+   vraag nog open is, nooit wat er gekozen werd. Nog niet: CAC, dat wacht op een
    register van de marketinguitgaven van RTG.
 9. ~~**De streefstand**~~ -- staat (27 september, C7), in de code het **streefbeeld**
    (`kern/streefbeeld.js`; `streefstand` was al een veld van elk gevolgcontract).

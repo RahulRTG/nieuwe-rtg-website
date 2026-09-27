@@ -158,3 +158,35 @@ test('7. echte server: koop zonder code, tonen roteert, de deur laat een keer bi
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });
+
+test('8. echte server: de zaak toont een deurticket opnieuw, en dat roteert', async () => {
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-tkt-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  const api = async (pad, body, token) => {
+    const r = await fetch(base + pad, { method: 'POST', body: JSON.stringify(body || {}),
+      headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}) });
+    const tekst = await r.text();
+    let json = {}; try { json = JSON.parse(tekst); } catch (e) { json = {}; }
+    return { status: r.status, body: json, tekst, koppen: r.headers };
+  };
+  try {
+    const roster = (await api('/api/supplier/roster', { code: 'ESVEDRA' })).body.staff;
+    const deur = (await api('/api/supplier/login', { code: 'ESVEDRA', staffId: roster.find(x => x.role !== 'manager').id, pin: '5678' })).body.token;
+    const verkocht = await api('/api/supplier/ticket/deurverkoop', { activiteitId: 'a2', tijd: '14:00', personen: 1, method: 'contant' }, deur);
+    assert.equal(verkocht.status, 200, verkocht.tekst);
+    const { ref, code: eerste } = verkocht.body.ticket;
+    assert.match(eerste, /^TK\.[0-9A-F]{32}$/, 'de deurverkoop geeft de code een keer');
+    const opnieuw = await api('/api/supplier/ticket/toon', { ref }, deur);
+    assert.equal(opnieuw.status, 200, opnieuw.tekst);
+    assert.match(opnieuw.body.code, /^TK\.[0-9A-F]{32}$/);
+    assert.notEqual(opnieuw.body.code, eerste, 'opnieuw tonen is roteren');
+    assert.equal(opnieuw.koppen.get('cache-control'), 'no-store');
+    assert.equal((await api('/api/supplier/ticket/checkin', { code: eerste }, deur)).status, 409,
+      'de eerste code is ingetrokken');
+    assert.equal((await api('/api/supplier/ticket/checkin', { code: opnieuw.body.code }, deur)).status, 200);
+    assert.equal((await api('/api/supplier/ticket/toon', { ref: 'Dbestaatniet' }, deur)).status >= 400, true);
+  } finally {
+    stop(child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});

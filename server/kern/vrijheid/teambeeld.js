@@ -54,7 +54,7 @@ module.exports = ({ bronnen, instellingen }) => {
     return mensen;
   }
 
-  function dienstenVan(code, k, ontbreekt) {
+  function roosterDiensten(code, k, ontbreekt) {
     const sup = k.findSupplier ? k.findSupplier(code) : null;
     const vast = (sup && sup.roosterVast) || {};
     const r = k.scheduleFor(code) || { days: [] };
@@ -102,7 +102,7 @@ module.exports = ({ bronnen, instellingen }) => {
     const inst = instellingen.lees(code);
     const mensen = mensenVan(code, k, ontbreekt);
     for (const m of mensen) { const v = inst.verjaardagen[m.id]; if (v) m.verjaardag = v.mmdd; }
-    const diensten = dienstenVan(code, k, ontbreekt);
+    const diensten = roosterDiensten(code, k, ontbreekt);
     const datums = [...new Set(diensten.map(d => d.datum))].sort();
     const eisen = eisenVan(inst, datums);
     if (!(inst.eisen || []).length) ontbreekt.push({ veld: 'eisen', reden: 'Er is geen bezetting vastgelegd; zonder eis is dekking niet aan te tonen en beslist een mens.' });

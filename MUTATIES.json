@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T12:30:04.270Z",
-    "commit": "731d8a76",
+    "op": "2026-09-27T14:25:21.343Z",
+    "commit": "a97e90ee",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -10211,6 +10211,14 @@
       "module": "server/kern/vrijheid/lus.js",
       "operator": "!==->===#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "vrijheid-teambeeld.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/eigencollectie.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
       "geprobeerd": 1
     },
     "vrijheid.test.js": {

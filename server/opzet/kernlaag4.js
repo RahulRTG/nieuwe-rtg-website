@@ -140,6 +140,8 @@ Object.assign(kern, require('../kern/economie')({ db, save }));
    overgang). */
 kern.aanwezigheid = require('../kern/aanwezigheid')({ db, save, bewerkCollectie });
 kern.pasgeschiedenis = require('../kern/pasgeschiedenis')({ db, save, bewerkCollectie, accounts });
+// het banksaldo van RTG, handmatig met het afschrift als bron (besluit C4)
+Object.assign(kern, require('../kern/bankpositie')({ db, save }));
 kern.bedrijfsmaat = require('../kern/bedrijfsmaat/stand')({
   lees: { ritten: () => db.data.rides, bestellingen: () => db.data.orders,
     betaalschemas: () => db.data.lidmaatschapBetalingen,
@@ -147,7 +149,7 @@ kern.bedrijfsmaat = require('../kern/bedrijfsmaat/stand')({
     reizen: () => db.data.reisAanvragen, loonruns: () => db.data.payrollRunsV2,
     casussen: () => (db.data.rtfos && db.data.rtfos.casussen) },
   pasgeschiedenis: kern.pasgeschiedenis, aanwezigheid: kern.aanwezigheid,
-  kosten: () => kern.kosten });
+  kosten: () => kern.kosten, bank: kern.bankpositie });
 Object.assign(kern, require('../kern/kosten')({ db, save, bewerkCollectie, accounts, economie: kern.economie,
   keyVanCodenaam, bestandenOpslag: kern.bestandenOpslag,
   geldPasprijzen: () => (kern.geldPasprijzen ? kern.geldPasprijzen() : null),

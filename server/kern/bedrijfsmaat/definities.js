@@ -40,6 +40,10 @@ const DEFINITIES = Object.freeze({
   brutomarge: d(1, 'De BRUTOMARGE is ontvangen omzet min de GEMETEN kostensoorten (AI, verzoeken, opslag, berichten, transacties). ' +
     'Stroom en serverhuur (toegerekend, graad vermoed) horen bij de operationele marge.',
     'Zo blijft de brutomarge gemeten en erft hij niet de graad vermoed.'),
+  cash: Object.freeze({ versie: 1, besloten: '27 september 2026, door de eigenaar (C4)', herkomst: 'mens',
+    regel: 'CASH is het saldo van de rekeningen van RTG aan het eind van de maand, overgetikt van een afschrift met die bron; ' +
+      'het geld van verkochte RTG-cadeaubonnen staat ernaast als verplichting en is geen vrij geld.',
+    waarom: 'Een runway die op onverdiend geld rust, is te lang.' }),
   klantwaardeLiving: d27(1, 'KLANTWAARDE in LivingOS: een rit die de keten afmaakte of een bestelling die bezorgd of opgehaald werd, in de maand van afronden.',
     'Dezelfde uitkomsten als activatie; een van vier maten naast elkaar, zonder totaal.'),
   klantwaardeTravel: d27(1, 'KLANTWAARDE in TravelOS: een reis die thuis is, gemeld door het lid of het kantoor, in de maand van thuiskomst.',

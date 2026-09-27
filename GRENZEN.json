@@ -147,8 +147,11 @@
       "werkplekken"
     ],
     "bedrijfsmaat": [
+      "bankpositie",
+      "bankpositieZet",
       "bedrijfsmaat",
-      "boardroomAuth"
+      "boardroomAuth",
+      "boardroomWie"
     ],
     "bestanden": [
       "bestanden"

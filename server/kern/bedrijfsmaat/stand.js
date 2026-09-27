@@ -24,7 +24,7 @@ const { DEFINITIES } = require('./definities');
 const GEPEILD = 'gemeten';
 const VANAF = 'Leden van voor de ingebruikname van kern/pasgeschiedenis.js hebben geen overgang en tellen niet mee.';
 
-module.exports = ({ lees, pasgeschiedenis, aanwezigheid, kosten, nu }) => {
+module.exports = ({ lees, pasgeschiedenis, aanwezigheid, kosten, bank, nu }) => {
   const klok = typeof nu === 'function' ? nu : Date.now;
   const lijst = (x) => (Array.isArray(x) ? x : []);
 
@@ -115,6 +115,13 @@ module.exports = ({ lees, pasgeschiedenis, aanwezigheid, kosten, nu }) => {
             : { stand: 'TOONBAAR', waarde: bm.margeCenten, eenheid: 'eurocent, zonder btw', kostenCenten: bm.kostenCenten, ontvangenCenten: om.ontvangenCenten },
           ['De ontvangen omzet is alleen die uit de betaalschema\'s van aanmeldingen; de ledenfacturen in de kluis tellen niet mee, dus deze marge is te laag of te hoog op een manier die niet te zeggen is.',
             'Stroom en serverhuur zijn toegerekend en horen bij de operationele marge, niet hier.']),
+        /* het banksaldo van RTG (kern/bankpositie.js): handmatig, dus vermoed */
+        (() => { const bp = typeof bank === 'function' ? bank(m) : null;
+          return Object.assign(maat('cash.rtg-bankpositie', DEFINITIES.cash, bp && bp.saldo
+            ? { stand: 'TOONBAAR', waarde: bp.saldo.centen, eenheid: 'eurocent', peildatum: bp.saldo.peildatum,
+              bonnenVerplichting: bp.bonnenVerplichting, vrij: bp.vrij }
+            : { stand: 'NIET_UIT_TE_REKENEN', waarde: null, waarom: bp ? bp.reden : 'Het banksaldo is niet gemount.' },
+          ['Handmatig overgetikt van een afschrift; er is geen bankkoppeling.']), { graad: 'vermoed' }); })(),
         kwMaat('uitkomst.klantwaarde-living', DEFINITIES.klantwaardeLiving, LEDEN, kw.living,
           ['Boekingen bij zaken en servicezaken tellen hier nog niet; tevredenheid wordt niet gemeten.']),
         kwMaat('uitkomst.klantwaarde-travel', DEFINITIES.klantwaardeTravel, LEDEN, kw.travel,

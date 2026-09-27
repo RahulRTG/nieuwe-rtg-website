@@ -4,15 +4,19 @@
 'use strict';
 const c = (bestand, citaat) => ({ bestand, citaat });
 const KOS = 'server/kern/kosten/';
+const PRJ = 'server/kern/bedrijfsmaat/projecties.js', STAND = 'server/kern/bedrijfsmaat/stand.js';
 
 module.exports = [
-  { id: 'marge.bruto-rtg', domein: 'marge', wereld: 'rtg-intern', eenheid: 'euro per maand',
+  { id: 'marge.bruto-rtg', domein: 'marge', wereld: 'rtg-intern', eenheid: 'eurocent per maand, zonder btw',
     betekenis: 'Ontvangen omzet min de directe kosten van het platform.',
-    berekening: 'nog niet vastgesteld', actualiteit: 'periode', privacy: 'huis', minGroep: null, eigenaar: null, graad: 'onbekend',
+    berekening: 'omzet.leden-ontvangen min de som van de gerekende GEMETEN kostensoorten van de maand (kern/kosten afstemming); verbruik zonder tarief maakt de marge niet uit te rekenen',
+    actualiteit: 'periode', privacy: 'huis', minGroep: null, eigenaar: 'kern/bedrijfsmaat', graad: 'gemeten',
     afhankelijk: ['omzet.leden-ontvangen', 'kosten.maand-totaal'],
-    bron: 'afgeleid', definitie: [c('server/kern/bedrijfsmaat/definities.js', 'brutomarge: d(1')], projectie: null, bewijs: null, groepsgrens: null,
-    waarom: { projectie: 'Geen functie zet de ontvangen omzet en de GEMETEN kostensoorten van een maand naast elkaar. De kostenlaag rekent per drager en per periode; een totaal per soort als bedrag zonder toegerekende soorten moet daar eerst uit komen.',
-      bewijs: 'Volgt uit de projectie.', eigenaar: 'Niemand.' } },
+    bron: 'afgeleid', definitie: [c('server/kern/bedrijfsmaat/definities.js', 'brutomarge: d(1')],
+    projectie: [c(PRJ, 'function brutomarge')], bewijs: [c(PRJ, 'if (zonderTarief.length) return { margeCenten: null'), c(STAND, "stand: 'NIET_UIT_TE_REKENEN'")],
+    groepsgrens: null,
+    gedeeltelijk: 'De ontvangen omzet eronder ziet alleen de betaalschema\'s van aanmeldingen en niet de ledenfacturen in de kluis; zolang dat zo is, zegt deze marge iets over de vorm en weinig over het bedrag.',
+    waarom: {} },
 
   { id: 'marge.operationeel-rtg', domein: 'marge', wereld: 'rtg-intern', eenheid: 'euro per maand',
     betekenis: 'Brutomarge min de vaste kosten van de organisatie (mensen, huisvesting, diensten).',

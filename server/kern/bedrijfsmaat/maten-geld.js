@@ -29,10 +29,10 @@ module.exports = [
   { id: 'omzet.leden-maand', domein: 'omzet', wereld: 'rtg-intern', eenheid: 'euro per maand',
     betekenis: 'De terugkerende maandbijdrage van alle leden: lijstprijs maal aantal voor RTG Pass, de afgesproken contractbedragen voor de contractuele treden.',
     berekening: 'per pas aantal x maandprijs, of de som van afgesprokenCenten van lopende contracten; leden zonder contract apart',
-    actualiteit: 'live', privacy: 'huis', minGroep: null, eigenaar: 'kern/ledenregister', graad: 'onbekend', afhankelijk: ['groei.leden-per-pas'],
+    actualiteit: 'live', privacy: 'huis', minGroep: null, eigenaar: 'kern/ledenregister', graad: 'gemeten', afhankelijk: ['groei.leden-per-pas'],
     bron: [c(OMZ, 'afgesprokenCenten'), c('server/accounts/dossier.js', 'function ledenRegisterRijen')],
-    definitie: [c(OMZ, 'WAT BRENGEN DE LEDEN OP')], projectie: [c(OMZ, 'function omzetstaat')], bewijs: null, groepsgrens: null,
-    waarom: { bewijs: 'De staat zegt eerlijk wat er NIET in zit (zonderContract), maar draagt geen graad en geen peilmoment. Het is een terugkerend bedrag uit afspraken, geen ontvangen geld; dat verschil staat nergens in het antwoord.' } },
+    definitie: [c(OMZ, 'WAT BRENGEN DE LEDEN OP')], projectie: [c(OMZ, 'function omzetstaat')], bewijs: [c(OMZ, "split.aard = 'afgesproken'"), c(OMZ, 'split.peilmoment'), c(OMZ, 'split.dektNiet')],
+    groepsgrens: null, waarom: {} },
 
   { id: 'omzet.leden-ontvangen', domein: 'omzet', wereld: 'rtg-intern', eenheid: 'eurocent per maand, zonder btw',
     betekenis: 'De lidmaatschapstermijnen die een mens in de maand als voldaan aftekende (kasbasis).',

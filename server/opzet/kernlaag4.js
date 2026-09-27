@@ -143,7 +143,8 @@ kern.pasgeschiedenis = require('../kern/pasgeschiedenis')({ db, save, bewerkColl
 kern.bedrijfsmaat = require('../kern/bedrijfsmaat/stand')({
   lees: { ritten: () => db.data.rides, bestellingen: () => db.data.orders,
     betaalschemas: () => db.data.lidmaatschapBetalingen },
-  pasgeschiedenis: kern.pasgeschiedenis, aanwezigheid: kern.aanwezigheid });
+  pasgeschiedenis: kern.pasgeschiedenis, aanwezigheid: kern.aanwezigheid,
+  kosten: () => kern.kosten });
 Object.assign(kern, require('../kern/kosten')({ db, save, bewerkCollectie, accounts, economie: kern.economie,
   keyVanCodenaam, bestandenOpslag: kern.bestandenOpslag,
   geldPasprijzen: () => (kern.geldPasprijzen ? kern.geldPasprijzen() : null),

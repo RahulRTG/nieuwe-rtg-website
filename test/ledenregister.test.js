@@ -88,6 +88,12 @@ test('omzet per pas en de 30%-split (20% lokaal, 10% RTF)', () => {
   // en de leden die er niet in zitten, worden wel geteld: 10 Lifestyle + 10 Business
   assert.equal(r.split.businessOpMaat, 20,
     'een lid buiten het totaal hoort zichtbaar te blijven, anders lijkt het totaal compleet');
+  /* AUTONOMIE.md par. 7, stap 4: het antwoord zegt zelf wat het is. */
+  assert.equal(r.split.aard, 'afgesproken', 'een bedrag uit afspraken, geen ontvangen geld');
+  assert.equal(r.split.graad, 'gemeten');
+  assert.ok(!Number.isNaN(Date.parse(r.split.peilmoment)), 'met een peilmoment');
+  assert.ok(r.split.dektNiet.some(z => /20 leden op een contractuele trede/.test(z)),
+    'de leden zonder contract staan ook in wat het getal niet dekt');
 });
 
 test('de alfabetische lijst is te filteren per pas en stad', () => {

@@ -3,6 +3,8 @@
 'use strict';
 const c = (bestand, citaat) => ({ bestand, citaat });
 const SVC = 'server/kern/service/', SLO = 'server/kern/command/slo.js';
+const DEF = 'server/kern/bedrijfsmaat/definities.js', PRJ = 'server/kern/bedrijfsmaat/projecties.js';
+const STAND = 'server/kern/bedrijfsmaat/stand.js';
 
 module.exports = [
   { id: 'uitkomst.service-zonder-herhaling', domein: 'uitkomst', wereld: 'consument', eenheid: 'aandeel opgeloste zaken',
@@ -13,13 +15,16 @@ module.exports = [
     projectie: [c(SVC + 'kwaliteit.js', 'function meting')], bewijs: [c(SVC + 'kwaliteit.js', 'nietTeZeggen: true')],
     groepsgrens: [c(SVC + 'kwaliteit.js', 'const MINIMUM = 10')], waarom: {} },
 
-  { id: 'uitkomst.rit-afgerond', domein: 'uitkomst', wereld: 'consument', eenheid: 'ritten per periode',
-    betekenis: 'Ritten die de keten tot het einde liepen.', berekening: 'nog niet vastgesteld',
-    actualiteit: 'live', privacy: 'leden', minGroep: 10, eigenaar: null, graad: 'onbekend', afhankelijk: [],
-    bron: [c('server/kern/kantoor/metrics.js', 'r.finishedAt')], definitie: [c('server/kern/vervoer.js', 'const RIT_KETEN')],
-    projectie: null, bewijs: null, groepsgrens: null,
-    waarom: { projectie: 'De prestatielijst telt ritten per zaak en een gemiddelde duur, geen afgeronde ritten per periode.',
-      bewijs: 'Volgt uit de projectie.', groepsgrens: 'Volgt uit de projectie.', eigenaar: 'Niemand.' } },
+  { id: 'uitkomst.rit-afgerond', domein: 'uitkomst', wereld: 'consument', eenheid: 'ritten per maand',
+    betekenis: 'Ritten die de keten tot het einde liepen.',
+    berekening: 'ritten met de laatste stand van RIT_KETEN (of de oude naam gearriveerd) en een eindtijd in de maand; de groepsgrens telt verschillende leden',
+    actualiteit: 'live', privacy: 'leden', minGroep: 10, eigenaar: 'kern/bedrijfsmaat', graad: 'gemeten', afhankelijk: [],
+    bron: [c('server/kern/vervoer.js', 'r.finishedAt = new Date().toISOString()')],
+    definitie: [c('server/kern/vervoer.js', 'const RIT_KETEN'), c(DEF, 'een rit die de keten afmaakte (afgerond)')],
+    projectie: [c(PRJ, 'function rittenAfgerond')], bewijs: [c(STAND, "maat('uitkomst.rit-afgerond'"), c(STAND, 'opdrachten die het dispatchcentrum zelf aannam')],
+    groepsgrens: [c(STAND, 'toon(LEDEN, { waarde: rit.aantal, n: rit.klanten })')],
+    gedeeltelijk: 'Alleen de ritlijst van de app; opdrachten die het dispatchcentrum zonder app-rit aannam (db.data.mobOpdrachten) tellen niet mee, en dat staat in het antwoord.',
+    waarom: {} },
 
   { id: 'uitkomst.klantwaarde', domein: 'uitkomst', wereld: 'consument', eenheid: 'aandeel geslaagde bedoelingen',
     betekenis: 'Klantwaarde als geslaagde uitkomst over de werelden heen, niet als aandacht of engagement.',

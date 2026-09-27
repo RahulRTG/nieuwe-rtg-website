@@ -117,3 +117,26 @@ test('7. een telling per categorie: samenvoegen waar de naam iets verraadt, secu
   const groot = P.groepeer([{ naam: 'A', aantal: 40 }, { naam: 'B', aantal: 6 }, { naam: 'C', aantal: 7 }]);
   assert.equal(groot.find(r => r.samengevoegd).aantal, 13, 'samen boven de grens: het totaal van de rest mag');
 });
+
+/* AUTONOMIE.md par. 7, stap 1 en 3: twee projecties die er eerst niet waren. */
+test('8. afgeronde ritten per maand: mensen tellen voor de poort, en de oude standnaam telt mee', () => {
+  const { rittenAfgerond } = require('../server/kern/bedrijfsmaat/projecties');
+  const r = rittenAfgerond([
+    { status: 'afgerond', customerCodename: 'A', finishedAt: '2026-09-03T10:00:00Z' },
+    { status: 'afgerond', customerCodename: 'A', finishedAt: '2026-09-04T10:00:00Z' },
+    { status: 'gearriveerd', customerCodename: 'B', at: '2026-09-05T10:00:00Z' },
+    { status: 'onderweg', customerCodename: 'C', at: '2026-09-05T10:00:00Z' },
+    { status: 'afgerond', customerCodename: 'D', finishedAt: '2026-08-31T23:00:00Z' }
+  ], '2026-09');
+  assert.deepEqual(r, { aantal: 3, klanten: 2 }, 'drie ritten van twee leden; lopend en vorige maand tellen niet');
+});
+
+test('9. brutomarge: geen getal waar er geen is', () => {
+  const { brutomarge } = require('../server/kern/bedrijfsmaat/projecties');
+  const goed = brutomarge(10000, [{ soort: 'ai-invoer', aantal: 5, gerekendCenten: 300 }, { soort: 'opslag', aantal: 0, gerekendCenten: null }]);
+  assert.equal(goed.margeCenten, 9700, 'een soort zonder verbruik en zonder tarief kost niets');
+  const zonder = brutomarge(10000, [{ soort: 'ai-invoer', aantal: 5, gerekendCenten: 300 }, { soort: 'bericht', aantal: 2, gerekendCenten: null }]);
+  assert.equal(zonder.margeCenten, null, 'verbruik zonder tarief: niet uit te rekenen, geen nul');
+  assert.deepEqual(zonder.zonderTarief, ['bericht']);
+  assert.equal(brutomarge(10000, null).margeCenten, null, 'zonder kostenlaag geen marge');
+});

@@ -97,6 +97,16 @@ test('5. omzet in centen zonder btw, met het aantal termijnen', async () => {
   }
 });
 
+test('5b. afgeronde ritten gaan langs de poort, en de brutomarge is een getal of zegt waarom niet', async () => {
+  const b = (await stand()).body;
+  const rit = maatVan(b, 'uitkomst.rit-afgerond');
+  assert.ok(['TOONBAAR', 'TE_KLEINE_GROEP'].includes(rit.stand), 'ritten tellen mensen, dus de poort geldt');
+  if (rit.stand === 'TE_KLEINE_GROEP') assert.equal(rit.waarde, undefined);
+  const m = maatVan(b, 'marge.bruto-rtg');
+  if (m.stand === 'TOONBAAR') assert.ok(Number.isInteger(m.waarde) && Number.isInteger(m.kostenCenten));
+  else { assert.equal(m.stand, 'NIET_UIT_TE_REKENEN'); assert.equal(m.waarde, null); assert.ok(m.waarom.length > 10); }
+});
+
 test('6. het ledenregister en de werelden gaan langs de groepspoort, ook voor het kantoorscherm', async () => {
   const r = (await api('/api/office/ledenregister', {}, eig)).body;
   for (const veld of ['perPas', 'perGeslacht', 'perLand', 'perStad', 'perBedrijf'])

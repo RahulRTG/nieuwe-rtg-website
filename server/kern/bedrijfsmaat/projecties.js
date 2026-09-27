@@ -141,5 +141,43 @@ function omzet(termijnen, maand) {
   return { gefactureerdCenten: gefactureerd, ontvangenCenten: ontvangen, termijnenGefactureerd: nGef, termijnenOntvangen: nOnt };
 }
 
-module.exports = { tijdlijn, nieuwOp, isoWeek, nieuweLeden, activatie, retentieWaarde, retentieAanwezig,
+/* De afgeronde ritten van een maand 'JJJJ-MM' (uitkomst.rit-afgerond). Afgerond is
+   de laatste stand van RIT_KETEN in kern/vervoer.js; `gearriveerd` is daar de
+   oude naam voor en telt dus mee. `klanten` is het aantal VERSCHILLENDE leden,
+   want de groepspoort telt mensen en geen ritten: tien ritten van een lid zijn
+   een lid. Een rit zonder eindtijd valt terug op zijn aanvraagmoment, net als in
+   de uitkomstenlijst van activatie. */
+function rittenAfgerond(ritten, maand) {
+  let aantal = 0; const klanten = new Set();
+  for (const r of ritten || []) {
+    if (!r || !['afgerond', 'gearriveerd'].includes(r.status)) continue;
+    if (String(r.finishedAt || r.at || '').slice(0, 7) !== maand) continue;
+    aantal += 1; if (r.customerCodename) klanten.add(r.customerCodename);
+  }
+  return { aantal, klanten: klanten.size };
+}
+
+/* definities.brutomarge: ontvangen omzet min de GEMETEN kostensoorten van de
+   maand. `afstemming` is die van kern/kosten (een regel per gemeten soort, met
+   het gerekende bedrag of null als er geen tarief was).
+
+   ER STAAT NOOIT EEN GETAL WAAR ER GEEN IS (KOSTEN.md): heeft een soort verbruik
+   maar geen tarief, dan is de marge niet uit te rekenen en is de waarde null,
+   met de soort erbij. Nul kosten voor een soort zonder tarief zou de marge te
+   hoog maken, en dat ziet er precies zo uit als een goede maand. */
+function brutomarge(ontvangenCenten, afstemming) {
+  const zonderTarief = [];
+  let kosten = 0;
+  for (const r of afstemming || []) {
+    if (!r) continue;
+    if (r.gerekendCenten == null) { if (Number(r.aantal) > 0) zonderTarief.push(r.soort); continue; }
+    kosten += r.gerekendCenten;
+  }
+  if (!Array.isArray(afstemming)) return { margeCenten: null, kostenCenten: null, zonderTarief, waarom: 'De kostenlaag is niet beschikbaar.' };
+  if (zonderTarief.length) return { margeCenten: null, kostenCenten: null, zonderTarief,
+    waarom: 'Verbruik zonder tarief (' + zonderTarief.join(', ') + '); de kosten zijn niet uit te rekenen.' };
+  return { margeCenten: ontvangenCenten - kosten, kostenCenten: kosten, zonderTarief, waarom: null };
+}
+
+module.exports = { rittenAfgerond, brutomarge, tijdlijn, nieuwOp, isoWeek, nieuweLeden, activatie, retentieWaarde, retentieAanwezig,
   churnEnAfwaardering, omzet, BETAALD, DAG };

@@ -23,7 +23,7 @@ const { DEFINITIES } = require('./definities');
 const GEPEILD = 'gemeten';
 const VANAF = 'Leden van voor de ingebruikname van kern/pasgeschiedenis.js hebben geen overgang en tellen niet mee.';
 
-module.exports = ({ lees, pasgeschiedenis, aanwezigheid, nu }) => {
+module.exports = ({ lees, pasgeschiedenis, aanwezigheid, kosten, nu }) => {
   const klok = typeof nu === 'function' ? nu : Date.now;
   const lijst = (x) => (Array.isArray(x) ? x : []);
 
@@ -70,6 +70,12 @@ module.exports = ({ lees, pasgeschiedenis, aanwezigheid, nu }) => {
     }
     const ce = P.churnEnAfwaardering(overgangen, m);
     const om = P.omzet(termijnen(), m);
+    const rit = P.rittenAfgerond(lijst(lees.ritten()), m);
+    /* De kostenlaag wordt NA deze stand gebouwd (kernlaag4), dus hij komt als
+       lezer binnen. Faalt hij, dan is de marge onbekend -- geen nul. */
+    let afst = null;
+    try { const k = typeof kosten === 'function' ? kosten() : null; afst = k && k.afstemming ? k.afstemming(m) : null; } catch (e) { afst = null; }
+    const bm = P.brutomarge(om.ontvangenCenten, afst);
     const UITKOMST = 'Als geslaagde uitkomst tellen alleen afgeronde ritten en bezorgde of opgehaalde bestellingen; boekingen, reizen en servicezaken nog niet.';
 
     return {
@@ -90,7 +96,17 @@ module.exports = ({ lees, pasgeschiedenis, aanwezigheid, nu }) => {
           ['Alleen de betaalschema\'s uit aanmeldingen; de ledenfacturen van RTG Pass-leden staan per lid in de kluis en worden hier niet gelezen.']),
         maat('omzet.leden-ontvangen', DEFINITIES.omzetOntvangen,
           { stand: 'TOONBAAR', waarde: om.ontvangenCenten, eenheid: 'eurocent, zonder btw', termijnen: om.termijnenOntvangen },
-          ['Alleen termijnen die een mens als voldaan aftekende, uit de betaalschema\'s van aanmeldingen.'])
+          ['Alleen termijnen die een mens als voldaan aftekende, uit de betaalschema\'s van aanmeldingen.']),
+        maat('uitkomst.rit-afgerond', DEFINITIES.activatie,
+          Object.assign(toon(LEDEN, { waarde: rit.aantal, n: rit.klanten }), { eenheid: 'ritten' }),
+          ['Alleen ritten die een lid via de app aanvroeg (de ritlijst); opdrachten die het dispatchcentrum zelf aannam zonder app-rit tellen niet mee.',
+            'De groepsgrens telt verschillende leden en geen ritten.']),
+        maat('marge.bruto-rtg', DEFINITIES.brutomarge,
+          bm.margeCenten == null
+            ? { stand: 'NIET_UIT_TE_REKENEN', waarde: null, waarom: bm.waarom, zonderTarief: bm.zonderTarief }
+            : { stand: 'TOONBAAR', waarde: bm.margeCenten, eenheid: 'eurocent, zonder btw', kostenCenten: bm.kostenCenten, ontvangenCenten: om.ontvangenCenten },
+          ['De ontvangen omzet is alleen die uit de betaalschema\'s van aanmeldingen; de ledenfacturen in de kluis tellen niet mee, dus deze marge is te laag of te hoog op een manier die niet te zeggen is.',
+            'Stroom en serverhuur zijn toegerekend en horen bij de operationele marge, niet hier.'])
       ]
     };
   }

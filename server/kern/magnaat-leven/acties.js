@@ -21,6 +21,7 @@ const team = require('./team');
 const voorraad = require('./voorraad');
 const contract = require('./contract');
 const { vestig } = require('./vestiging');
+const groei = require('./groei');
 
 const fout = (error) => ({ status: 400, error });
 
@@ -56,7 +57,7 @@ function ontslag(st) {
   st.baan.actief = false;
   st.zelfstandig = st.dag;
   mijlpaal(st, 'zelfstandig', 'Je zegde je baan op bij ' + st.baan.werkgever + ': je leeft van je eigen bedrijf.');
-  meld(st, 'Je hebt opgezegd bij ' + st.baan.werkgever + '. Je begon met ' + euro(R.niveauVan(st).startKas) + ' en een baan in de keuken; ' +
+  meld(st, 'Je hebt opgezegd bij ' + st.baan.werkgever + '. Je begon met ' + euro(R.beginKas(st)) + ' en ' + R.startVan(st).beschrijving + '; ' +
     (st.onderneming ? st.onderneming.naam : 'je bedrijf') + ' is van jou, en jij hebt het opgebouwd.', 'goed');
   return { ok: true };
 }
@@ -70,7 +71,7 @@ const ACTIES = {
   uitstel: geld.uitstel, lenen: geld.lenen,
   werf: team.werf, ontsla: team.ontsla, bestel: voorraad.bestelInkoop, prijs: voorraad.prijs,
   teken: contract.teken, wijsaf: contract.wijsAf, zegop: contract.zegOp,
-  vestig
+  vestig, krediet: groei.krediet, filiaal: groei.filiaal, overname: groei.neemOver
 };
 
 module.exports = { ACTIES };

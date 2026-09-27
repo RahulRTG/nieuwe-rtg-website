@@ -12,7 +12,7 @@ const { meld, ontgrendel, post, euro } = require('./staat');
 const { boekVan } = require('./boek');
 
 const fout = (error) => ({ status: 400, error });
-const TEGEN = { huur: 'verhuurder', vast: 'leveranciers', software: null, aanmaning: 'incasso', uitstel: 'leveranciers', aflossing: null };
+const TEGEN = { huur: 'verhuurder', vast: 'leveranciers', software: null, aanmaning: 'incasso', uitstel: 'leveranciers', aflossing: null, studie: 'financier' };
 
 function betaalPost(st, p) {
   const b = boekVan(st), sleutel = 'post:' + p.id;
@@ -24,7 +24,7 @@ function betaalPost(st, p) {
 
 /* De volgende keer van een terugkerende betaling. */
 function volgendeKeer(st, p) {
-  const v = R.VERPLICHTINGEN.find(x => x.id === p.soort) || (p.soort === 'software' ? R.SOFTWARE : null);
+  const v = R.verplichtingenVan(st).find(x => x.id === p.soort) || (p.soort === 'software' ? R.SOFTWARE : null);
   /* Een licentie per mens die met de software werkt: jij en je team (V2). */
   const licenties = p.soort === 'software' ? 1 + (st.team || []).filter(m => !m.weg).length : 1;
   if (v) post(st, { soort: p.soort, naam: p.naam, bedrag: (v.id ? R.verplichtingBedrag(st, v) : v.bedrag) * licenties, dag: (p.oorspronkelijk || p.dag) + v.elke });
@@ -82,7 +82,7 @@ function startDag(st) {
 function uitstel(st, z) {
   const p = st.posten.find(x => x.id === String(z.post || ''));
   if (!p) return fout('Die betaling staat niet open.');
-  const regel = p.soort === 'software' ? R.SOFTWARE.uitstel : (R.VERPLICHTINGEN.find(v => v.id === p.soort) || {}).uitstel;
+  const regel = p.soort === 'software' ? R.SOFTWARE.uitstel : (R.verplichtingenVan(st).find(v => v.id === p.soort) || {}).uitstel;
   if (!regel) return fout(p.naam + ' kun je niet uitstellen.');
   if (p.uitgesteld) return fout('Die betaling heb je al een keer uitgesteld.');
   if (p.dag > st.dag + 7) return fout('Uitstellen doe je in de week dat hij moet worden betaald.');
@@ -116,10 +116,16 @@ function lenen(st, z) {
   return { ok: true };
 }
 
+/* Wat klanten de laatste `dagen` dagen betaalden. */
+function ontvangen(st, dagen) {
+  return st.deals.filter(d => d.fase === 'betaald' && d.betaaldOp > st.dag - dagen)
+    .reduce((s, d) => s + d.afspraak.bedrag, 0);
+}
+
 function volgendeLoondag(st, n) {
   let d = st.dag + 1;
   while (R.weekdag(d) !== R.BAAN.loondag) d++;
   return d + (n - 1) * 7;
 }
 
-module.exports = { startDag, betaalWatVervalt, uitstel, lenen };
+module.exports = { startDag, betaalWatVervalt, uitstel, lenen, ontvangen };

@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-27T00:53:34.233Z",
-    "commit": "f48f86399",
+    "op": "2026-09-27T13:56:18.282Z",
+    "commit": "43461f914",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
-    "node": "v26.10.0"
+    "node": "v22.22.2"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -5392,6 +5392,14 @@
       "gezakt": 4,
       "geprobeerd": 13
     },
+    "magnaatgroei.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/magnaat-leven/index.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
     "magnaatgrondwet.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -5481,6 +5489,21 @@
       "module": "server/kern/magnaat-leven/index.js",
       "operator": "!==->===#0",
       "gezakt": 6,
+      "geprobeerd": 2
+    },
+    "magnaatstart.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "magnaatstart.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/magnaat-leven/index.js",
+      "operator": "!==->===#0",
+      "gezakt": 7,
       "geprobeerd": 2
     },
     "magnaatwereld.test.js": {
@@ -10991,5 +11014,26 @@
       "gezakt": 1,
       "geprobeerd": 1
     }
+  },
+  "samengevoegd": {
+    "uitleg": "Historische mutatie-uitkomsten uit beide takken behouden; geen nieuwe meetronde of kandidaatbewijs.",
+    "bronnen": [
+      {
+        "op": "2026-09-27T00:53:34.233Z",
+        "commit": "f48f86399",
+        "boomVuil": false,
+        "boomAnders": 1,
+        "instrument": "scripts/mutatie.js",
+        "node": "v26.10.0"
+      },
+      {
+        "op": "2026-09-27T13:56:18.282Z",
+        "commit": "43461f914",
+        "boomVuil": false,
+        "boomAnders": 1,
+        "instrument": "scripts/mutatie.js",
+        "node": "v22.22.2"
+      }
+    ]
   }
 }

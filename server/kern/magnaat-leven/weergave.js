@@ -13,6 +13,7 @@ const { vrij, gepland, rest, WAT } = require('./tijd');
 const { sneller } = require('./gesprek');
 const { handelingenNu } = require('./volgende');
 const { prognose, bedrijfExtra } = require('./weergave-bedrijf');
+const { groeiBeeld } = require('./groei');
 const { kalender } = require('./kalender');
 const { marktBeeld } = require('./markt');
 const { gids, verhaal } = require('./gids');
@@ -100,7 +101,8 @@ function beeld(st, boek, nu) {
     },
     netwerk: { contacten: deals, eerder: alle.length - deals.length },
     wereld: {
-      stad: R.JURISDICTIE.stad, startKas: R.niveauVan(st).startKas, moeilijkheid: st.moeilijkheid || 'normaal', voorbij: st.voorbij || null,
+      stad: R.JURISDICTIE.stad, startKas: R.beginKas(st), moeilijkheid: st.moeilijkheid || 'normaal', voorbij: st.voorbij || null,
+      start: st.start || 'keuken', startposities: Object.entries(R.STARTPOSITIES).map(([id, x]) => ({ id, naam: x.naam, uitleg: x.uitleg })),
       niveaus: Object.entries(R.MOEILIJKHEID).map(([id, x]) => ({ id, naam: x.naam, uitleg: x.uitleg, startKas: x.startKas })),
       spelregels: [R.JURISDICTIE.inschrijven, R.JURISDICTIE.btw, R.JURISDICTIE.termijn],
       plaatsen: [{ naam: st.baan.werkgever, wat: st.baan.actief ? 'waar je werkt' : 'waar je werkte' }]
@@ -111,7 +113,7 @@ function beeld(st, boek, nu) {
     bedrijf: st.onderneming ? Object.assign({
       naam: st.onderneming.naam, sinds: st.onderneming.sinds, omzet: c.omzet, kosten: c.kosten, resultaat: c.resultaat,
       balans: { kas: c.kas, vorderingen: c.vorderingen, voorraad: c.voorraad, vooruit: c.vooruit, crediteuren: c.crediteuren, schuld: c.schuld },
-      zelfstandig: st.zelfstandig
+      zelfstandig: st.zelfstandig, groei: groeiBeeld(st)
     }, bedrijfExtra(st)) : null,
     rtg: st.rtg,
     gids: gids(st), verhaal: verhaal(st, c)

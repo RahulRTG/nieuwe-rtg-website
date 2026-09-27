@@ -104,10 +104,8 @@ module.exports = ({
     'na het besluit ligt er geen wijzigingsverzoek meer; een afgespeeld succes zou een tweede keer personen en bedrag lijken te verzetten',
   'POST /api/office/reisbureau/afzeggen':
     'zelfde reden als de ledenkant, plus: een herhaling zou het lid een tweede melding sturen over dezelfde afzegging',
-  'POST /api/reisbureau/thuis':
-    'een reis die thuis is kan niet nog een keer thuiskomen; die weigering is het antwoord en mag niet door een cache worden overschreven',
-  'POST /api/office/reisbureau/thuis':
-    'zelfde reden als de ledenkant: de standcontrole weet dat het al gebeurd is',
+  'POST /api/reisbureau/thuis': 'een reis die thuis is, komt niet nog eens thuis; de weigering is het antwoord',
+  'POST /api/office/reisbureau/thuis': 'zelfde reden als de ledenkant',
   /* Het lid zegt zijn eigen lidmaatschap op (kern/aanmeldingen/
      lidabonnement-opzeg.js). Zelfde grond als de reisnazorg hierboven: de route
      WEET zelf dat ze het al gedaan heeft -- het contract staat dan op OPZEGGEND

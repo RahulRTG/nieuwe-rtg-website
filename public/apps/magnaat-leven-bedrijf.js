@@ -16,6 +16,14 @@
     var regels = function (rijen) {
       return rijen.map(function (r) { return '<div class="vn-regel"><span>' + esc(r[0]) + '</span><b>' + r[1] + '</b></div>'; }).join('');
     };
+    /* Na zelfstandig: krediet, filiaal en overnames (server/kern/magnaat-leven/groei.js). */
+    function groei(g) {
+      if (!g || !g.open) return '';
+      var r = [['Krediet', g.krediet ? euro(g.krediet.bedrag) + ' van de bank · nog ' + euro(g.krediet.open) + ' af te lossen · rente ' + euro(g.krediet.rente)
+        : 'geen · de bank leent je nu tot ' + euro(g.kredietRuimte)], ['Filiaal', g.filiaal ? esc(g.filiaal.naam) + ' · ' + euro(g.filiaal.huur) + ' per vier weken' : 'geen']];
+      if (g.overgenomen.length) r.push(['Overgenomen', esc(g.overgenomen.join(', '))]);
+      return '<h3>Groeien</h3>' + regels(r);
+    }
 
     var p = s.geld.prognose, plek = q('#vnPrognose');
     if (plek && p) {
@@ -58,6 +66,7 @@
         ['Op voorraad', hw.voorraad + ' stuks' + (hw.onderweg ? ', ' + hw.onderweg + ' onderweg' : '')],
         ['Verkocht', hw.verkocht + ' stuks, marge ' + euro(hw.marge) + (hw.gemist ? ' · ' + hw.gemist + ' gemist' : '')],
         ['Vraag', 'ongeveer ' + String(hw.perWeek).replace('.', ',') + ' per week bij deze prijs, in dit seizoen' + (hw.aandeel != null ? ' · ' + pct(hw.aandeel) + ' van de markt' : '')]]) : '') +
+      groei(z.groei) +
       '<h3>Balans</h3>' + regels([['Bank', euro(z.balans.kas)], ['Te ontvangen', euro(z.balans.vorderingen)], ['Voorraad', euro(z.balans.voorraad)],
         ['Voorschotten (nog leveren)', euro(z.balans.vooruit)], ['Aan leveranciers', euro(z.balans.crediteuren)], ['Schuld', euro(z.balans.schuld)]]);
   }

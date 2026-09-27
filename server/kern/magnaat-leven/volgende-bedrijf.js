@@ -8,6 +8,9 @@ const { euro, tijd: duur } = require('./staat');
 const { rest } = require('./tijd');
 const { waarVan, geblokkeerd } = require('./voorraad');
 const M = require('./regels-markt');
+const G = require('./regels-groei');
+const { groeiBeeld } = require('./groei');
+const { teamMax } = require('./bereik');
 
 function contractAanbod(st, zet) {
   for (const c of st.contracten || []) {
@@ -37,7 +40,7 @@ function bedrijfHandelingen(st, zet) {
       { wat: 'opdracht', deal: open[0].id, dag: st.dag, wie: m.id, minuten: r - (r % 30) });
   }
   const vrij = B.TEAMKANDIDATEN.filter(k => !st.team.some(m => m.id === k.id));
-  if (team.length < B.TEAM_MAX && vrij.length) {
+  if (team.length < teamMax(st) && vrij.length) {
     zet('werf', 'Neem iemand aan', 'Meer uren dan je zelf hebt. In dienst kost elke week loon, ook zonder werk; een freelancer alleen zijn uren.',
       { kandidaat: vrij.map(kandidaat) });
   }
@@ -54,11 +57,24 @@ function bedrijfHandelingen(st, zet) {
   for (const c of st.contracten) {
     if (c.stand === 'actief' && !c.opgezegd) zet('zegop', 'Zeg het contract met ' + c.klant + ' op', 'De termijn die loopt, maak je af.', { contract: c.id });
   }
+  groeiHandelingen(st, zet);
   for (const m of team) {
     if (m.einde != null) continue;
     zet('ontsla', m.contract === 'dienst' ? 'Zeg ' + m.naam + ' op' : 'Stop met ' + m.naam,
       m.contract === 'dienst' ? 'Hij werkt en krijgt loon nog ' + B.OPZEGTERMIJN + ' dagen.' : 'Hij stuurt nog een laatste factuur.', { medewerker: m.id });
   }
+}
+
+/* Na zelfstandig: krediet, een filiaal, een overname (./groei.js). */
+function groeiHandelingen(st, zet) {
+  if (!st.zelfstandig) return;
+  const g = groeiBeeld(st);
+  if (!g.krediet && g.kredietRuimte >= G.KREDIET.minimum) zet('krediet', 'Vraag een krediet bij de bank', 'Tot ' + euro(g.kredietRuimte) + ', met ' + G.KREDIET.rente + '% rente, terug in ' + G.KREDIET.termijnen + ' termijnen van vier weken.', { bedrag: 'euro' });
+  const plekken = Object.entries(M.WIJKEN).filter(([id, x]) => x.huur && id !== st.vestiging.wijk);
+  if (!g.filiaal && st.vestiging.wijk !== 'thuis') zet('filiaal', 'Open een filiaal', 'Een tweede plek maakt je zichtbaarder; iemand van je team staat er.',
+    { wijk: plekken.map(([id, x]) => ({ id, naam: x.naam + ': ' + euro(x.huur) + ' per vier weken, inrichten ' + euro(x.verhuis) })) });
+  if (g.overnames.length > G.OVERNAME.overblijven) zet('overname', 'Neem een concurrent over', 'Hij verdwijnt van de markt en zijn klanten zoeken voortaan jou.',
+    { bedrijf: g.overnames.map(c => ({ id: c.id, naam: c.naam + ': ' + euro(c.prijs) })) });
 }
 
 module.exports = { contractAanbod, bedrijfHandelingen };

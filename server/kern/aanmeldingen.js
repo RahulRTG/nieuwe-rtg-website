@@ -61,7 +61,7 @@ const REIS = [
     u: 'Privacy (AVG): u mag uw gegevens altijd inzien, corrigeren en laten wissen.' }
 ];
 
-module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts }) => {
+module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts, meldLid }) => {
   const nu = () => new Date().toISOString();
   const rid = () => crypto.randomBytes(4).toString('hex');
   const kap = (t, n) => schoon(String(t == null ? '' : t), n || 200);
@@ -131,6 +131,9 @@ module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts }) => {
   const lidAbonnementLezer = require('./aanmeldingen/lidabonnement')({ A, B, contracten, PASSEN, eur });
   const lidAbonnementOpzeg = require('./aanmeldingen/lidabonnement-opzeg')({
     contracten, zegOpLidmaatschap, lezer: lidAbonnementLezer });
+  // naar gast: ./aanmeldingen/naargast.js (besluit C5)
+  const { naarGast } = require('./aanmeldingen/naargast')({ db, save, A, B, contracten, accounts,
+    zegOpZelf: lidAbonnementOpzeg.zegOpZelf, meldLid: (k, n) => (typeof meldLid === 'function' ? meldLid(k, n) : null), nu });
   const lidAbonnement = {
     mijn: lidAbonnementLezer.mijn,
     opzegVoorbeeld: lidAbonnementOpzeg.opzegVoorbeeld,
@@ -142,5 +145,5 @@ module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts }) => {
   };
 
   return { aanmeldingen: Object.assign({ aanvraag, lijst, een, beslis, betalingen, verlengLidmaatschap, zegOpLidmaatschap, contracten,
-    termijnVoldaan, magAutomatischToekennen, PASSEN, lidAbonnement }, klaarzetten) };
+    termijnVoldaan, magAutomatischToekennen, PASSEN, lidAbonnement, naarGast }, klaarzetten) };
 };

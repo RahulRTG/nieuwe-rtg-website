@@ -268,7 +268,9 @@ window.I18N = { en: {
     var r = el('div', 'kpis');
     arr.forEach(function (x) {
       var k = el('div', 'kpi');
-      k.appendChild(el('b', null, String(x.aantal)));
+      /* Onder de groepsgrens komt er geen aantal (server/kern/bedrijfsmaat/poort.js):
+         dan zegt de tegel dat, en niet "null" of een nul. */
+      k.appendChild(el('b', null, x.aantal == null ? T('lr.klein', 'te kleine groep') : String(x.aantal)));
       k.appendChild(el('small', null, x.naam));
       r.appendChild(k);
     });
@@ -316,13 +318,14 @@ window.I18N = { en: {
       items.forEach(function (x) {
         var o = document.createElement('option');
         o.value = veld ? x[veld] : x.naam;
-        o.textContent = x.naam + ' (' + x.aantal + ')';
+        o.textContent = x.aantal == null ? x.naam : x.naam + ' (' + x.aantal + ')';
         sel.appendChild(o);
       });
     };
-    vul('lrPas', (d.perPas || []).filter(function (p) { return p.aantal; }), 'pas');
-    vul('lrLand', (d.perLand || []).filter(function (x) { return x.naam !== 'Onbekend'; }));
-    vul('lrStad', (d.perStad || []).filter(function (x) { return x.naam !== 'Onbekend'; }));
+    // een pas zonder aantal (te kleine groep) blijft kiesbaar; een samengevoegde regel "Overige" niet
+    vul('lrPas', (d.perPas || []).filter(function (p) { return p.aantal == null || p.aantal; }), 'pas');
+    vul('lrLand', (d.perLand || []).filter(function (x) { return x.naam !== 'Onbekend' && !x.samengevoegd; }));
+    vul('lrStad', (d.perStad || []).filter(function (x) { return x.naam !== 'Onbekend' && !x.samengevoegd; }));
     optiesKlaar = true;
     ['lrPas', 'lrGeslacht', 'lrLand', 'lrStad'].forEach(function (id) {
       $(id).addEventListener('change', function () { laadRegister(false); });

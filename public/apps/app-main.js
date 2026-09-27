@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'bdba37ae';
+var RTG_BOUW = '516d8f8f';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -230,6 +230,8 @@ var RTG_BOUW = 'bdba37ae';
      globale verwijzing; niets wordt in local/sessionStorage bewaard. */
   let wervingscode = String(window.__RTG_WERVING_CODE || '').trim().toUpperCase();
   try { delete window.__RTG_WERVING_CODE; } catch (e) { window.__RTG_WERVING_CODE = null; }
+  // de campagnecode uit de link (app.html, besluit C6): alleen een telling bij de aanmelding
+  const campagne = String(window.__RTG_CAMPAGNE || '') || undefined;
   magnaatProef = zoekParams.get('magnaat') === '1';
   if (magnaatProef) API.enabled = false;
   let vastePas = zoekParams.get('pas');
@@ -440,9 +442,10 @@ var RTG_BOUW = 'bdba37ae';
         try {
           const data = cred.response || (cred.register
             ? await accessRequest('identity.account.create', { name:cred.name,email:cred.u,geboortedatum:cred.geboortedatum,password:cred.p,
-                wervingscode:wervingscode || undefined })
+                wervingscode:wervingscode || undefined, campagne })
             : await accessRequest('identity.session.open', {login:cred.u,password:cred.p,pasApp:vastePas || undefined}));
           if (data.tweedeFactorNodig) return data;
+          if (data.aanmeldkanaalVraag) aanmeldkanaalVraag = data.aanmeldkanaalVraag;
           if (!data.token || !data.state) throw new Error('De server heeft nog geen geldige sessie bevestigd.');
           API.token = data.token;
           applyState(data.state);           // user = het echte account
@@ -984,6 +987,7 @@ var RTG_BOUW = 'bdba37ae';
 
   // Na de onboarding kiest het lid zelf een wereld; de inlog opent niets voor.
   function naarWereldkeuze(){
+    vraagAanmeldkanaal();
     if (window.RTGCommand && typeof RTGCommand.land === 'function') RTGCommand.land();
   }
 
@@ -1046,6 +1050,36 @@ var RTG_BOUW = 'bdba37ae';
     onbZeg(onbVraagTekst(v));
     if (inp && !preserve) inp.focus();
   }
+  /* ---------- de herkomstvraag op het welkomstscherm (besluit C6) ----------
+     De eigenaar koos voor NA de registratie: het aanmeldformulier blijft even
+     kort, en wie de vraag overslaat is gewoon lid. De server zegt bij de
+     registratie OF de vraag open is en geeft de antwoorden mee (er is geen
+     tweede lijst hier); de vraag komt pas als de onboarding klaar is, zodat hij
+     het verplichte gesprek niet onderbreekt. Een keer: het antwoord en het
+     overslaan sluiten hem allebei, op de server. */
+  var aanmeldkanaalVraag = null;
+  function vraagAanmeldkanaal(){
+    const v = aanmeldkanaalVraag; aanmeldkanaalVraag = null;
+    if (!v || !Array.isArray(v.kanalen) || !v.kanalen.length || !API.live || document.getElementById('kanaalVraag')) return;
+    const d = document.createElement('section');
+    d.id = 'kanaalVraag'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-labelledby', 'kanaalVraagTitel');
+    d.innerHTML = '<div class="kv-in">' +
+      '<div id="kanaalVraagTitel" class="big kv-titel">' + escT(T('kanaal.vraag', 'Hoe kent u RTG?')) + '</div>' +
+      '<div class="meta kv-meta">' + escT(T('kanaal.uitleg', 'Eén vraag, en niet verplicht. We tellen alleen hoeveel mensen elk antwoord gaven; bij uw account komt het niet te staan.')) + '</div>' +
+      '<div class="kv-rij">' +
+      v.kanalen.map(function(k){ return '<button class="go" data-kanaal="' + escT(k.id) + '">' + escT(k.label) + '</button>'; }).join('') +
+      '</div><button class="go kv-over" data-kanaal="">' + escT(T('kanaal.over', 'Overslaan')) + '</button></div>';
+    document.body.appendChild(d);
+    d.querySelectorAll('[data-kanaal]').forEach(function(b){ b.addEventListener('click', async function(){
+      d.querySelectorAll('button').forEach(function(x){ x.disabled = true; });
+      try {
+        await API.call('/auth/aanmeldkanaal', { kanaal: b.dataset.kanaal || null });
+        if (b.dataset.kanaal) toast(T('kanaal.dank', 'Dank u.'));
+      } catch (e) { /* een telling is een extra; de vraag gaat hoe dan ook dicht */ }
+      d.remove();
+    }); });
+  }
+
 /* Language changes only presentation; agreement, identity and focus are preserved. */
   window.addEventListener('rtglang',()=>{
     if(!onbSt || onbEl('onbGate').hidden) return;

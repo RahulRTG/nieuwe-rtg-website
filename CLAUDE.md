@@ -1310,8 +1310,8 @@ in de ontwikkelaarsroute** (de beproevingsomgeving voor software is een eigen
 ding, met `scripts/aanval.js` en `scripts/chaos.js` als eerste bouwstenen), de
 App Store-keuring keek niet naar toegankelijkheid (inmiddels wél, en als POORT:
 zie par. 9.2), en er is geen kostenvlak. En
-par. 10 draait één aanname om die vaak fout gaat: van <!--getal:idem.routesMetRol-->4219<!--/getal--> routes met een rol
-zijn er <!--getal:idem.beoordeeld-->1716<!--/getal--> beproefd op herhaalbaarheid en <!--getal:idem.ongemeten-->3256<!--/getal--> ongemeten (`IDEMPROEF.json`,
+par. 10 draait één aanname om die vaak fout gaat: van <!--getal:idem.routesMetRol-->4258<!--/getal--> routes met een rol
+zijn er <!--getal:idem.beoordeeld-->1730<!--/getal--> beproefd op herhaalbaarheid en <!--getal:idem.ongemeten-->3290<!--/getal--> ongemeten (`IDEMPROEF.json`,
 levend getal — `npm run getallen` houdt het bij),
 maar het doel is **niet alles idempotent — het is alles geclassificeerd**, met
 `UNKNOWN` verboden voor nieuwe publiek aanroepbare ontwikkelaarsopdrachten.
@@ -1339,8 +1339,8 @@ weigert wat op een contactgegeven lijkt, want met `REDIS_URL` gaat hij over een
 netwerk), **`onbekend` is geen `openbaar`** (en een gevolg erft de classificatie
 niet — dat zou raden zijn), en **de levering gaat voor** (een geweigerde actor
 houdt een melding nooit tegen, maar verdwijnt ook nooit stil). Wat er nog niet is,
-staat er met de meting erbij: van de <!--getal:idem.beoordeeld-->1716<!--/getal--> beproefde muterende routes zijn er
-<!--getal:idem.beschermd-->1715<!--/getal--> retry-veilig, en een schemaregister (`payment.authorized.v1` met een vorm
+staat er met de meting erbij: van de <!--getal:idem.beoordeeld-->1730<!--/getal--> beproefde muterende routes zijn er
+<!--getal:idem.beschermd-->1729<!--/getal--> retry-veilig, en een schemaregister (`payment.authorized.v1` met een vorm
 erachter) bestaat niet — de envelop zegt met opzet nooit WAT. Zeven punten die een besluit van de eigenaar vragen staan in par. 4.
 **Het goedkoopste daarvan is genomen (27 augustus 2026):** het woord dat in twee
 lagenmodellen niet hetzelfde betekende, is hernoemd — laag 4 van `PLATFORM.md`
@@ -1425,7 +1425,7 @@ mórgen nog klopt. Lees die vóór je een begrip introduceert, een register aanl
 of een scorecard bouwt. De opzet vraagt een semantisch register naar aanleiding
 van de twee `VERMOGENS`; de vraag ervóór is gemeten (`scripts/semantiek.js`,
 `SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->128<!--/getal--> namen die in meer dan
-één domein staan, dragen er **<!--getal:semantiek.betekenissen-->110<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->408<!--/getal-->
+één domein staan, dragen er **<!--getal:semantiek.betekenissen-->110<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->409<!--/getal-->
 betekenissen, met `SOORTEN` op **39**. Daarnaast **29** betekenissen die op meer
 dan één plek wonen én **106** paren die dezelfde waarheid onder een ándere naam
 dragen — die tweede ronde bestaat omdat de eerste ze miste, en de duurste
@@ -1873,7 +1873,7 @@ afkapgrens van vijftien sneed midden in een GELIJKE score, dus /api/bank/pas/bet
 viel op alfabet af terwijl /api/bank/advies bleef. Een gelijke score afkappen is
 willekeur, en willekeur verbergt een vermogen zonder dat iemand het merkt.
 **En meetgetallen in de documenten verouderen niet meer**: `npm run getallen`
-schrijft ze tussen merktekens uit de registers (`<!--getal:idem.ongemeten-->3256<!--/getal--> randen,
+schrijft ze tussen merktekens uit de registers (`<!--getal:idem.ongemeten-->3290<!--/getal--> randen,
 <!--getal:verstrengeling.onverklaard-->0<!--/getal--> onverklaard — en dát getal moet naar nul, niet het
 aantal randen), de activering per functie, de deltapoort die er niets bij laat
 komen, de tredeproef over alle zeven treden van LAUNCH.md (0 lekken), en de
@@ -2075,9 +2075,9 @@ en het pad gaat nooit via `incident` of `geannuleerd` -- dat zou een gebeurtenis
 verzinnen die niet plaatsvond. De standen worden VERTAALD en niet overgetypt
 (toets 4 zakt zodra een ritstand naar `rijdt` vertaalt). En de brug loopt ÉÉN
 KANT OP: twee lijsten die elkaar bijwerken hebben geen waarheid meer. **De migratie is in kaart en staat stil op EEN besluit**
-(`scripts/ritmigratie.js`): van de <!--getal:ritmigratie.bestanden-->21<!--/getal-->
+(`scripts/ritmigratie.js`): van de <!--getal:ritmigratie.bestanden-->23<!--/getal-->
 plekken die `db.data.rides` noemen lezen er <!--getal:ritmigratie.stand-->7<!--/getal-->
-de lopende rit, tellen <!--getal:ritmigratie.historie-->9<!--/getal--> historie af,
+de lopende rit, tellen <!--getal:ritmigratie.historie-->10<!--/getal--> historie af,
 schrijven er 2 en noemen er 3 hem alleen in commentaar. De kaart bewees haar nut
 binnen het uur: de eerste versie zei "zeven kunnen nu om", maar een rit ZONDER
 opdracht valt dan uit beeld -- en dan ziet een lid zijn eigen taxi niet meer in
@@ -2093,7 +2093,7 @@ geen afstand, geen vaste prijs, wel een plek op het dispatchbord. Neemt hij hem
 niet aan, dan weigert `kern/lidacties/ritten.js` met de reden en de weg
 eromheen. Zo of zo heeft elke rit die BESTAAT voortaan een opdracht. Stand nu:
 <!--getal:ritmigratie.kanNu-->7<!--/getal--> lezers kunnen om (de stand-lezers),
-daarna <!--getal:ritmigratie.daarna-->11<!--/getal--> (historie, dan de
+daarna <!--getal:ritmigratie.daarna-->12<!--/getal--> (historie, dan de
 schrijvers). **De losse chauffeur is geen bijzonder geval**: hij is een zaak met
 een persoon erin, meldt zich aan op eigen naam en wijst zichzelf de rit toe met
 `self: true` -- wie met het BEDRIJFSaccount inlogt heeft geen `staffId` en kan
@@ -2294,6 +2294,28 @@ gedefinieerd op getallen die nog niet bestaan, en twee van de meest waardevolle
 stappen zijn geen bouwwerk maar een besluit (`mandaat.js` een aanroeper geven, en
 `RTG_HERKOMST_AFDWINGEN` omzetten -- die prijs is gemeten: een lid gaat van 120
 naar 36 paden, een zaak van 53 naar 9).
+
+**`AUTONOMIE.md` is de RTG Autonomy Kernel** -- de organisatorische intelligentie
+BOVEN de bestaande motoren: RTG bestuurt zichzelf binnen een door mensen
+vastgestelde constitutie. De machine krijgt initiatief, niet vanzelf gezag. Lees
+die vóór je iets bouwt dat over RTG als ONDERNEMING rekent (omzet, cohorten,
+churn, cash, marge). Twee constitutionele besluiten van 25 september 2026: **C1**
+-- een waarnemend brein is niet een portemonnee (RTG en de RTFoundation samen
+waargenomen, elke maat draagt precies een economische wereld, de firewall blijft)
+-- en **C2** -- het kantoor is een AI-rol uitsluitend op tonen, op naam, met drie
+gemeten leespaden en geen bevestigroute. De fundering is gemeten en niet
+verklaard: `npm run bedrijfsmaat` (`BEDRIJFSMAAT.json`, catalogus in
+`server/kern/bedrijfsmaat/`) houdt per maat vier elementen tegen de code --
+bron, definitie, projectie, bewijs -- met vier gatsoorten en een
+afhankelijkheidsgraaf; <!--getal:bedrijfsmaat.bestaat-->40<!--/getal--> van <!--getal:bedrijfsmaat.maten-->67<!--/getal--> maten bestaan en
+<!--getal:bedrijfsmaat.ketensGegrond-->3<!--/getal--> van zes ketens is gegrond. Drie dingen die niet mogen sneuvelen: **lenzen,
+geen breinen** (geen eigen opslag per lens), **de groepspoort staat aan de bron
+van een maat** (`bedrijfsmaat/poort.js`: onder de grens geen waarde, geen nul en
+geen aantal, ook op het kantoorscherm; werklijsten per persoon blijven voor een
+mens op naam en komen niet op het stuur), en **autonome actie alleen als geen
+dimensie van de streefstand buiten haar tolerantie verslechtert** -- geen gewogen
+som. De definities (nieuw lid, cohort, activatie, churn, retentie, omzet,
+brutomarge) staan met een versie in `bedrijfsmaat/definities.js`.
 
 **`CODE.md` is de laag waarin RTG naar zijn EIGEN software kijkt** -- de Code
 Intelligence Plane, als richtingsdocument met per onderdeel of het **staat**,

@@ -24,12 +24,14 @@
    boardroomroute onder geen enkel werkwoord valt. */
 const WERKWOORDEN = Object.freeze({
   toegang: { trede: 'uitvoeren', uitleg: 'wie mag het kantoor, de boardroom en de balie in, en wat de deuren zouden besluiten',
-    voorvoegsels: ['/api/office/boardroom/toegang', '/api/office/balie/', '/api/office/beleidsmotor', '/api/office/mensdeur', '/api/office/ledenregister', '/api/office/kantoor/'] },
+    voorvoegsels: ['/api/office/boardroom/toegang', '/api/office/balie/', '/api/office/beleidsmotor', '/api/office/mensdeur', '/api/office/ledenregister', '/api/office/kantoor/',
+      '/api/office/pas/'] },
   kosten: { trede: 'uitvoeren', uitleg: 'kostprijs, tarieven, perioden sluiten en een rekening vrijgeven (KOSTEN.md)',
     voorvoegsels: ['/api/office/kosten/'] },
   geld: { trede: 'uitvoeren', uitleg: 'prijzen, commissie, de bank, voornemens tekenen, de economische werelden en de bankweg van het Werk OS',
     voorvoegsels: ['/api/office/geld', '/api/office/bank/', '/api/office/commercie/', '/api/office/voornemen/',
-      '/api/office/economie/', '/api/office/rtfwallet/', '/api/office/terugval/', '/api/rtfos/gift/', '/api/office/werkos/'] },
+      '/api/office/economie/', '/api/office/rtfwallet/', '/api/office/terugval/', '/api/rtfos/gift/', '/api/office/werkos/',
+      '/api/office/bankpositie'] },
   export: { trede: 'uitvoeren', uitleg: 'gegevens in bulk naar buiten', voorvoegsels: ['/api/office/aidata/'] },
   partners: { trede: 'uitvoeren', uitleg: 'partners, instellingen, foundationregistraties en hun papieren toelaten',
     voorvoegsels: ['/api/office/partner/', '/api/office/papieren', '/api/office/instelling/', '/api/office/foundation/'] },
@@ -37,11 +39,13 @@ const WERKWOORDEN = Object.freeze({
     voorvoegsels: ['/api/office/magnaat/', '/api/office/boardroom/magnaat/'] },
   techniek: { trede: 'uitvoeren', uitleg: 'integraties, noodstop, lastafworp, quarantaine van capabilities en de sleutels van de zaakdozen',
     voorvoegsels: ['/api/office/techniek', '/api/office/gezondheid/', '/api/office/doos/'] },
-  toezicht: { trede: 'tonen', uitleg: 'het journaal lezen', voorvoegsels: ['/api/office/journaal'] },
+  toezicht: { trede: 'tonen', uitleg: 'het journaal en de bedrijfsmaten lezen (AUTONOMIE.md)', voorvoegsels: ['/api/office/journaal', '/api/office/bedrijfsmaat', '/api/office/aanmeldkanaal'] },
   salon: { trede: 'uitvoeren', uitleg: 'De Salon uitlichten en belangen beoordelen', voorvoegsels: ['/api/office/salon/'] },
   instellingen: { trede: 'uitvoeren', uitleg: 'het platform zelf: schakelaars, genres, fasen, de mall, paniek en Rahul',
     voorvoegsels: ['/api/office/boardroom', '/api/office/mall/', '/api/office/paniek/', '/api/office/wereld/',
-      '/api/office/stuur/', '/api/office/handhaving/'] }
+      '/api/office/stuur/', '/api/office/handhaving/',
+      /* het streefbeeld tekenen is een besluit over het platform, niet lezen (C7) */
+      '/api/office/streefbeeld'] }
 });
 
 function werkwoordVan(pad) {

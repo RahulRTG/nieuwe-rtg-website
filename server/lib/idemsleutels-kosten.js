@@ -51,6 +51,27 @@ const SLEUTELS = {
   /* De proef rekent een doorbelasting DOOR zonder hem te doen -- dat is de hele
      bedoeling van een firewallproef, en dus leest hij. */
   'POST /api/office/economie/proef': { leest: true },
+  /* De bedrijfsmaten (AUTONOMIE.md): een stand uitrekenen verandert niets. */
+  'POST /api/office/bedrijfsmaat': { leest: true },
+  /* Het banksaldo van RTG (besluit C4): lezen leest; zetten met hetzelfde saldo van
+     hetzelfde afschrift is een keer (kern/bankpositie.js geeft ongewijzigd terug). */
+  'POST /api/office/bankpositie': { leest: true },
+  'POST /api/office/aanmeldkanaal': { leest: true },                          // een telling lezen (C6)
+  /* Het streefbeeld (C7): lezen leest; tekenen gaat over een vingerafdruk en
+     intrekken is een stand, dus een tweede gelijke oproep is dezelfde. */
+  'POST /api/office/streefbeeld': { leest: true },
+  'POST /api/office/streefbeeld/teken': { zelfdeVerzoek: true },
+  'POST /api/office/streefbeeld/intrek': { zelfdeVerzoek: true },
+  'POST /api/office/bankpositie/zet': { zelfdeVerzoek: true },             // maand + saldo + afschrift
+  /* Naar gast (besluit C5, server/routes/naargast.js): de standcontrole weet het al. */
+  'POST /api/office/pas/gast/regels': { leest: true },
+  'POST /api/office/pas/gast/regels/zet': { zelfdeVerzoek: true },          // regel + aan + getal
+  /* Het kantoorstuur (besluit C2): het model mag alleen de drie tonen-paden
+     lezen, maar een tweede vraag is een tweede gesprek met een nieuw antwoord. */
+  'POST /api/office/doe': { nietIdempotent: true,
+    waarom: 'elke vraag aan Rahul is een nieuw gesprek met een nieuw antwoord; er verandert niets in ' +
+      'de opslag (alleen tonen-paden), maar een laag die de tweede vraag opslikt geeft een oud antwoord' },
+  'POST /api/office/doe/kaart': { leest: true },
 
   /* ---- zetten: dezelfde waarde tweemaal is dezelfde eindstand ---- */
   'POST /api/kosten/grens/zet': { zelfdeVerzoek: true },                    // het eigen plafond

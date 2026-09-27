@@ -222,6 +222,10 @@ const REGISTER = {
      door een feit. */
   'NAMENSVORM.json': { meter: ['namensMechanismenGemeten'] },
   'SPOORVORM.json': { meter: ['spoorConvergent'] },
+  /* Geen richting maar een ANKER: test/bedrijfsmaat.test.js eist nul verworpen
+     citaten en nul vormfouten, en dat het register gelijk is aan een verse meting.
+     Een maat die stil verdwijnt of een citaat dat niet meer klopt, laat hem zakken. */
+  'BEDRIJFSMAAT.json': { eigenRatel: 'test/bedrijfsmaat.test.js' },
   /* CONNECTLUS.json meet of de ontdekkingsdomeinen de lus DELEN (CONNECT.md
      par. 1). Zelfde soort als CARRIEREVORM, STAGEVORM en NAMENSVORM hierboven,
      en om exact dezelfde reden is de geratelde waarde het BEREIK: dat er 0 van

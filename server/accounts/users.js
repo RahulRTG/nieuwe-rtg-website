@@ -22,6 +22,22 @@ function createUserSync(gegevens) {
 function createUserZaai(gegevens) {
   return schrijfUser(gegevens, kluis.zaaiHash(gegevens.password));
 }
+/* DE PASOVERGANG MELDEN. Een pas ontstaat hier (schrijfUser) en verandert hier
+   (setTier), en nergens anders -- dus hier wordt elke overgang gemeld. Er is EEN
+   luisteraar (kern/pasgeschiedenis.js), en die krijgt alleen codenaam en passen:
+   de kluis geeft geen naam of adres mee. Een luisteraar die gooit, houdt de
+   overgang zelf niet tegen; hij telt wel mee in `pasMeldFouten`, zodat een
+   gemiste regel zichtbaar is in plaats van stil. */
+let pasLuisteraar = null;
+let pasMeldFouten = 0;
+function opPasOvergang(fn) { pasLuisteraar = typeof fn === 'function' ? fn : null; }
+function meldPas(u, van, bron) {
+  if (!pasLuisteraar || !u) return;
+  try { pasLuisteraar({ codenaam: u.codename, van, naar: u.tier, op: new Date().toISOString(), bron }); }
+  catch (e) { pasMeldFouten += 1; }
+}
+const pasMeldStand = () => ({ luisteraar: !!pasLuisteraar, fouten: pasMeldFouten });
+
 function schrijfUser({ email, username, tier, realName, phone }, passwordHash) {
   // 'guest' is de gratis (bestel/betaal) laag: een echt account met paspoort,
   // maar zonder betaalde pas. rtg/lifestyle/business zijn de betaalde passen.
@@ -52,7 +68,9 @@ function schrijfUser({ email, username, tier, realName, phone }, passwordHash) {
   }
   require('./onderhoud').herzegel(S.huidigeDb(), newId); // id is nu bekend: kolommen eraan binden
   mirror.markUser(newId);
-  return getUserById(newId);
+  const nieuw = getUserById(newId);
+  meldPas(nieuw, null, 'aanmaak');
+  return nieuw;
 }
 function getUserById(id) { return S.zin('SELECT * FROM users WHERE id = ?').get(id) || null; }
 function findByLogin(login) {
@@ -177,7 +195,9 @@ function setTier(id, tier) {
   if (!u) return null;
   S.zin('UPDATE users SET tier = ? WHERE id = ?').run(tier, id);
   mirror.markUser(id);
-  return getUserById(id);
+  const na = getUserById(id);
+  if (u.tier !== tier) meldPas(na, u.tier, 'besluit');
+  return na;
 }
 
 /* Een account aan- of uitzetten (in/uit dienst bij een SSO-organisatie).
@@ -293,7 +313,7 @@ module.exports = {
   /* uit ./publiekmail.js -- hier doorgegeven zodat de gevel (accounts/index.js)
      en alle bestaande aanroepers niets merken van de opsplitsing. */
   findByPublicMail, reservePublicMail,
-  renameUser, setTier, zetActief, isActief, realNameOf, emailOf, phoneOf, setPhone, setEmail,
+  renameUser, setTier, opPasOvergang, pasMeldStand, zetActief, isActief, realNameOf, emailOf, phoneOf, setPhone, setEmail,
   zetSessiegrens,
   issueToken, verifyToken, apparaatVanToken, sessieVan, trekIn, trekInActie, isIngetrokken, trekInSessie, sessieIngetrokken, wachtIntrekkingen, issueActionToken, verifyActionToken,
   setEmailVerified, createReset, findByReset, consumeReset, setPassword, setPasswordSync, setPasswordZaai, vernieuwWachtwoordHash,

@@ -4183,11 +4183,13 @@ async function laadLedenregister(){
   const eur = c => '€ ' + (Math.round(Number(c)*100)/100).toLocaleString('nl-NL', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   const kop = t => '<div style="font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:0.75rem 0 0.25rem;">'+t+'</div>';
   const tegels = arr => '<div style="display:flex;flex-wrap:wrap;gap:.5rem;">'+arr.map(x =>
-    '<span style="background:var(--paneel2,#1B1817);border:1px solid var(--line);border-radius:0;padding:.35rem .7rem;font-size:.82rem;"><b>'+esc(x.naam)+'</b> <span style="color:var(--rtg-leesgoud,var(--gold));">'+x.aantal+'</span></span>').join('')+'</div>';
+    '<span style="background:var(--paneel2,#1B1817);border:1px solid var(--line);border-radius:0;padding:.35rem .7rem;font-size:.82rem;"><b>'+esc(x.naam)+'</b> <span style="color:var(--rtg-leesgoud,var(--gold));">'+(x.aantal == null ? 'te kleine groep' : x.aantal)+'</span></span>').join('')+'</div>';
   // de omzet + 30%-split
+  /* Een pas onder de groepsgrens toont geen aantal en geen omzet: prijs maal
+     aantal zou het aantal alsnog verraden (server/kern/bedrijfsmaat/poort.js). */
   const omzetRijen = (d.omzet||[]).map(o =>
-    '<div class="taakrij" style="border-bottom:1px solid var(--line);padding:.4rem 0;gap:.6rem;"><span style="flex:1;"><b>'+esc(o.pasNaam)+'</b> <span class="stil" style="color:var(--soft);font-size:.72rem;">'+o.aantal+' leden'+(o.opMaat?'':' · '+eur(o.prijsPP)+' p/m ex btw')+'</span></span>'+
-    '<span style="color:var(--rtg-leesgoud,var(--gold));font-size:.82rem;">'+(o.opMaat?'op maat':eur(o.maandOmzet)+' /mnd')+'</span></div>').join('');
+    '<div class="taakrij" style="border-bottom:1px solid var(--line);padding:.4rem 0;gap:.6rem;"><span style="flex:1;"><b>'+esc(o.pasNaam)+'</b> <span class="stil" style="color:var(--soft);font-size:.72rem;">'+(o.aantal == null ? 'te kleine groep' : o.aantal+' leden'+(o.opMaat?'':' · '+eur(o.prijsPP)+' p/m ex btw'))+'</span></span>'+
+    '<span style="color:var(--rtg-leesgoud,var(--gold));font-size:.82rem;">'+(o.aantal == null ? '' : (o.opMaat?'op maat':eur(o.maandOmzet)+' /mnd'))+'</span></div>').join('');
   const s = d.split || {};
   box.innerHTML =
     kop('Per pas') + tegels((d.perPas||[]).map(p => ({ naam: p.naam, aantal: p.aantal }))) +
@@ -4210,10 +4212,11 @@ async function laadLedenregister(){
       : '<div class="leeg">Geen leden in deze selectie.</div>');
   // de keuzelijsten eenmalig vullen uit de facetten
   if (!LR_OPTIES_KLAAR) {
-    const vul = (sel, items, waardeVeld) => { const cur = sel.value; items.forEach(x => { const o = document.createElement('option'); o.value = waardeVeld ? x[waardeVeld] : x.naam; o.textContent = x.naam + ' (' + x.aantal + ')'; sel.appendChild(o); }); sel.value = cur; };
-    vul($('#lrPas'), (d.perPas||[]).filter(p=>p.aantal), 'pas');
-    vul($('#lrLand'), (d.perLand||[]).filter(x=>x.naam!=='Onbekend'));
-    vul($('#lrStad'), (d.perStad||[]).filter(x=>x.naam!=='Onbekend'));
+    const vul = (sel, items, waardeVeld) => { const cur = sel.value; items.forEach(x => { const o = document.createElement('option'); o.value = waardeVeld ? x[waardeVeld] : x.naam; o.textContent = x.aantal == null ? x.naam : x.naam + ' (' + x.aantal + ')'; sel.appendChild(o); }); sel.value = cur; };
+    // een pas onder de groepsgrens blijft kiesbaar; de samengevoegde regel "Overige" niet
+    vul($('#lrPas'), (d.perPas||[]).filter(p=>p.aantal==null||p.aantal), 'pas');
+    vul($('#lrLand'), (d.perLand||[]).filter(x=>x.naam!=='Onbekend'&&!x.samengevoegd));
+    vul($('#lrStad'), (d.perStad||[]).filter(x=>x.naam!=='Onbekend'&&!x.samengevoegd));
     LR_OPTIES_KLAAR = true;
     ['#lrPas','#lrGeslacht','#lrLand','#lrStad'].forEach(id => $(id).addEventListener('change', laadLedenregister));
   }

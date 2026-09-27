@@ -58,6 +58,8 @@
       "PAS_FOUT",
       "PERSONAS",
       "PRODUCTION",
+      "aanmeldkanaalKeuzes",
+      "aanmeldkanaalTel",
       "antivirus",
       "appUrl",
       "automatisering",
@@ -145,6 +147,15 @@
       "werkBankBewijs",
       "werkBankpadStand",
       "werkplekken"
+    ],
+    "bedrijfsmaat": [
+      "aanmeldkanaalStand",
+      "bankpositie",
+      "bankpositieZet",
+      "bedrijfsmaat",
+      "boardroomAuth",
+      "boardroomWie",
+      "streefbeeld"
     ],
     "bestanden": [
       "bestanden"
@@ -1370,6 +1381,12 @@
       "muziekVraagRtg",
       "muziekZaal"
     ],
+    "naargast": [
+      "aanmeldingen",
+      "accounts",
+      "boardroomAuth",
+      "boardroomWie"
+    ],
     "navigatie": [
       "navBestemmingen",
       "navKaart",
@@ -1975,6 +1992,7 @@
     ],
     "stuur": [
       "isolatie",
+      "naamAuth",
       "stuurBevestig",
       "stuurIntrek",
       "stuurPaden",

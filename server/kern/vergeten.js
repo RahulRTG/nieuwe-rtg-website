@@ -48,6 +48,8 @@ module.exports = function maakVergeten(kern) {
   const anoniem = require('./vergeten/anoniem')({ db, accounts, spelVergeet: kern.spelVergeet });
   const { wisGesprekkenVan: wisGesprekken, wisSollicitatiechats } = require('./vergeten/gesprekken');
   const eigen = require('./vergeten/eigen')({ db, lidBoardLogWis });
+  const aanwezigheid = require('./aanwezigheid');
+  const pasgeschiedenis = require('./pasgeschiedenis');
 
   /* Wist dit lid definitief. Async omdat de mediastore ook een objectopslag op
      afstand kan zijn (S3); de aanroeper wacht erop voordat hij antwoordt --
@@ -69,6 +71,10 @@ module.exports = function maakVergeten(kern) {
        staat in ./vergeten/eigen.js; daar is de LIJST het onderwerp, en hier zou
        hij het bestand overheersen. */
     eigen.wisEigen(key, bytes.noteerPostBeelden, teWissen, codenaam);
+    /* De twee bronnen onder de bedrijfsmaten (AUTONOMIE.md): de bezoekdag gaat
+       weg, de pasovergangen verliezen hun codenaam. Waarom die twee verschillen
+       staat bij `vergeet` in elk van beide. */
+    if (codenaam) { aanwezigheid.vergeet(codenaam); pasgeschiedenis.vergeet(codenaam); }
     /* De gesprekken van de communicatiekern. De regel staat apart (./vergeten/
        gesprekken.js) omdat hij binnen deze functie niet los te toetsen was --
        en precies daardoor stond hij er eerst helemaal niet: de bezem liep groen

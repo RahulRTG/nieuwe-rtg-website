@@ -26,7 +26,7 @@ const VERBODEN = [
      uitsprak is niet hetzelfde als dat een mens de aanvraag beoordeelde. Dat
      verschil IS de regel. */
   /^\/api\/aanmelding\//,
-  /^\/api\/(member|supplier|staff)\/doe(?:\/|$)/ // stuur + menselijke bevestiging: geen rondzingen
+  /^\/api\/(member|supplier|staff|office)\/doe(?:\/|$)/ // stuur + menselijke bevestiging: geen rondzingen
 ];
 
 /* ---- lichte vs. zware taak: bepaalt het stappen-budget ----

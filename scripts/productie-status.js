@@ -80,7 +80,9 @@ if (require.main === module) {
     console.log('Commit: ' + (rapport.commit || 'onbekend'));
     console.log('Bewijs SHA-256: ' + rapport.bewijsSha256);
     for (const b of rapport.blokkades) console.error('✗ ' + b);
-    if (rapport.PRODUCTION_STATUS !== 'READY') process.exitCode = 1;
+    if (rapport.PRODUCTION_STATUS === 'READY_ZONDER_RAIL')
+      console.log('Beperkte release: geen kaartrail. Promotie vraagt RTG_PROMOTION_CONFIRM=PROMOVEER-ZONDER-RAIL-<commit12>.');
+    if (!['READY', 'READY_ZONDER_RAIL'].includes(rapport.PRODUCTION_STATUS)) process.exitCode = 1;
   } catch (e) { console.error('[productie-status] ' + e.message); process.exitCode = 1; }
 }
 

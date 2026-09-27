@@ -56,7 +56,8 @@ function leesProductiestatus(commit, root = ROOT) {
   let rapport;
   try { rapport = JSON.parse(fs.readFileSync(pad, 'utf8')); }
   catch (e) { throw new Error('Productiestatus ontbreekt of is onleesbaar; de afbouw heeft geen READY-bewijs gemaakt.'); }
-  if (rapport.formaat !== 'rtg-production-status-v1' || rapport.PRODUCTION_STATUS !== 'READY')
+  if (rapport.formaat !== 'rtg-production-status-v1' ||
+      !['READY', 'READY_ZONDER_RAIL'].includes(rapport.PRODUCTION_STATUS))
     throw new Error('Productiestatus is niet READY.');
   if (String(rapport.commit || '') !== String(commit || ''))
     throw new Error('Productiestatus hoort niet bij de releasecommit.');

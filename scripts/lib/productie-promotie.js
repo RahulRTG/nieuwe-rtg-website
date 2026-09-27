@@ -48,17 +48,24 @@ function bewijskaart(root) {
 
 function maak(root, commit, env = process.env) {
   const status = leesProductiestatus(commit, root);
-  const kandidaat = require('./live-kandidaat').controleer(root, commit);
   const approver = String(env.RTG_PROMOTION_APPROVER || '').trim();
   const ticket = String(env.RTG_PROMOTION_TICKET || '').trim();
   const bevestiging = String(env.RTG_PROMOTION_CONFIRM || '');
   if (approver.length < 3 || approver.length > 160 || /[\0\r\n]/.test(approver) ||
       ticket.length < 3 || ticket.length > 160 || /[\0\r\n]/.test(ticket))
     throw new Error('Promotie vereist een geldige release-authority en besluitreferentie.');
-  if (bevestiging !== 'PROMOVEER-' + commit.slice(0, 12))
-    throw new Error('Expliciete RTG_PROMOTION_CONFIRM voor deze commit ontbreekt.');
+  /* Een beperkte release (READY_ZONDER_RAIL) vraagt een ANDER bevestigingswoord:
+     wie promoveert, typt dat er geen kaartrail is. Het woord voor een volle
+     release promoveert een beperkte niet, en omgekeerd. */
+  const zonderRail = status.PRODUCTION_STATUS === 'READY_ZONDER_RAIL';
+  const verwacht = (zonderRail ? 'PROMOVEER-ZONDER-RAIL-' : 'PROMOVEER-') + commit.slice(0, 12);
+  if (bevestiging !== verwacht)
+    throw new Error('Expliciete RTG_PROMOTION_CONFIRM voor deze commit ontbreekt (verwacht ' +
+      (zonderRail ? 'PROMOVEER-ZONDER-RAIL-' : 'PROMOVEER-') + '<commit12>).');
+  const kandidaat = require('./live-kandidaat').controleer(root, commit);
   return { formaat:'rtg-productie-promotie-v2', ondertekenDomein:trust.ROLES.PROMOTION.domain, gemaakt:new Date().toISOString(),
     commit, release:status.release, goedgekeurdDoor:approver, besluit:ticket,
+    productieStand:status.PRODUCTION_STATUS,
     productionStatus:{ pad:'.release/productie-status.json',
       sha256:sha256(leesRegulier(path.join(root, '.release', 'productie-status.json'))),
       bewijsSha256:status.bewijsSha256 },
@@ -76,6 +83,7 @@ function controleerStructuur(document, commit, status, kaart) {
   if (!document || document.formaat !== 'rtg-productie-promotie-v2' ||
       document.ondertekenDomein !== trust.ROLES.PROMOTION.domain ||
       document.commit !== commit || document.release !== status.release ||
+      document.productieStand !== status.PRODUCTION_STATUS ||
       !Number.isFinite(Date.parse(document.gemaakt)) ||
       typeof document.goedgekeurdDoor !== 'string' || document.goedgekeurdDoor.length < 3 ||
       typeof document.besluit !== 'string' || document.besluit.length < 3 ||

@@ -84,6 +84,8 @@ function beoordeel(invoer) {
   }
 
   eis(!!golive, 'Go-livebewijs ontbreekt.');
+  const zonderRail = !!golive && !!golive.geld && golive.geld.releaseZonderRail === true &&
+    golive.geld.betalingenUit === true;
   if (golive) {
     const uitgangen = require('./golive-uitgangen');
     eis(golive.geslaagd === true && golive.blokkers === 0, 'Go-live heeft nog blokkades.');
@@ -93,9 +95,11 @@ function beoordeel(invoer) {
     eis(golive.accounts && golive.accounts.gereed === true &&
       golive.accounts.transactioneel === true && golive.accounts.productieMutaties === 'duurzaam',
     'Accountmutaties zijn niet aan dezelfde gedeelde PostgreSQL-requesttransactie gebonden.');
-    eis(golive.geld && golive.geld.inkomendGeconfigureerd === true,
+    /* Een release zonder kaartrail (besluit B2a) vraagt geen rails en geen
+       geldmotor, maar wordt ook nooit READY -- zie het slot van beoordeel(). */
+    eis(zonderRail || (golive.geld && golive.geld.inkomendGeconfigureerd === true),
       'De echte inkomende betaalprovider is niet geconfigureerd.');
-    eis(golive.geld && golive.geld.uitgaandGeconfigureerd === true,
+    eis(zonderRail || (golive.geld && golive.geld.uitgaandGeconfigureerd === true),
       'Er is geen productie-uitbetaalrail geconfigureerd.');
     eis(golive.geld && golive.geld.foundationRekeningGeconfigureerd === true,
       'De rekening voor Foundation-settlement ontbreekt.');
@@ -105,7 +109,7 @@ function beoordeel(invoer) {
       'Gedeelde media is niet met put/get/hash/delete over twee instanties bewezen.');
     eis(uitgangen.alarmBewijsGeldig(golive.alarmering),
       'De externe foutalarmering heeft geen actuele 2xx-zelfproef bewezen.');
-    eis(golive.geldMotor && golive.geldMotor.modus === 'motor' &&
+    eis(zonderRail || golive.geldMotor && golive.geldMotor.modus === 'motor' &&
       golive.geldMotor.bereikbaar === true &&
       ['pay-grootboek', 'bank-grootboek'].every(n => golive.geldMotor.native.includes(n)) &&
       golive.geldMotor.duurzaam && golive.geldMotor.duurzaam.gereed === true &&
@@ -171,7 +175,8 @@ function beoordeel(invoer) {
       geldigKandidaatDeel(keten.image, false) && geldigKandidaatDeel(keten.backup, true),
     'Een getekende CI-kandidaat met volledige SBOM, registrydigest en probereis ontbreekt' +
       (keten && keten.reden ? ' (' + keten.reden + ')' : '') + '.');
-  return { status: blokkades.length ? 'BLOCKED' : 'READY', blokkades };
+  return { status: blokkades.length ? 'BLOCKED' : (zonderRail ? 'READY_ZONDER_RAIL' : 'READY'),
+    blokkades, zonderRail };
 }
 
 function geldigKandidaatDeel(deel, backup = false) {

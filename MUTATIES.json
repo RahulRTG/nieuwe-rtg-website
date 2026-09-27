@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T13:56:18.282Z",
-    "commit": "43461f914",
+    "op": "2026-09-27T14:16:55.381Z",
+    "commit": "cabe6bcca",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5490,6 +5490,13 @@
       "operator": "!==->===#0",
       "gezakt": 6,
       "geprobeerd": 2
+    },
+    "magnaatstad.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "magnaatstart.e2e.js": {
       "soort": "server",

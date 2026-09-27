@@ -68,9 +68,9 @@ test('plaats: het toestel meldt de aankomst zelf, en de pass blijft zonder GPS',
       password: 'nadergeheim123', geboortedatum: '1990-04-04', tier: 'rtg', pasApp: 'rtg' });
     assert.ok(reg.token, 'lid-registratie geeft een token');
 
-    /* De aanvraagcode heeft de vorm <id>.<geheim>, allebei 20-80 tekens uit
-       [A-Za-z0-9_-] (zie routes/supplier/horeca/arrival-toegang.js). De client
-       maakt er twee uuid's van; hier doen we hetzelfde met de hand. */
+    /* De aanvraagcode is de idempotentiesleutel van de browser: 32 tot 170
+       tekens uit [A-Za-z0-9_.-] (routes/supplier/horeca/invisible-arrival.js).
+       De pass zelf maakt de server (kern/arrivalpas.js). */
     const deel = (p) => (p + 'abcdefghijklmnopqrstuvwxyz').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 32);
     const vraag = await api(base, '/api/arrival/request', {
       requestToken: deel('id' + u) + '.' + deel('geheim' + u), supplierCode: ZAAK,
@@ -91,10 +91,10 @@ test('plaats: het toestel meldt de aankomst zelf, en de pass blijft zonder GPS',
     await ctx.addInitScript((d) => {
       try {
         localStorage.setItem('rtg_member_token', d.lid);
-        localStorage.setItem('rtg_arrival_pass', d.pas);
+        localStorage.setItem('rtg_arrival_pass', JSON.stringify({ p: d.pas, tot: d.tot }));
         localStorage.setItem('rtg_cookieinfo_v1', '1');
       } catch (e) {}
-    }, { lid: reg.token, pas: pasToken });
+    }, { lid: reg.token, pas: pasToken, tot: vraag.pass.vervaltAt });
     const page = await ctx.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
@@ -213,10 +213,10 @@ test('plaats: langs een ANDERE zaak lopen geeft geen aankomstpuls',
     await ctx.addInitScript((d) => {
       try {
         localStorage.setItem('rtg_member_token', d.lid);
-        localStorage.setItem('rtg_arrival_pass', d.pas);
+        localStorage.setItem('rtg_arrival_pass', JSON.stringify({ p: d.pas, tot: d.tot }));
         localStorage.setItem('rtg_cookieinfo_v1', '1');
       } catch (e) {}
-    }, { lid: reg.token, pas: vraag.pass.accessToken });
+    }, { lid: reg.token, pas: vraag.pass.accessToken, tot: vraag.pass.vervaltAt });
     const page = await ctx.newPage();
     const fouten = [];
     letOpFouten(page, fouten);

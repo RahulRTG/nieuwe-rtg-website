@@ -125,6 +125,7 @@ const REQUIRED_ROUTES = [
   'POST /api/bedrijf/ticket/reageer', 'POST /api/bedrijf/ticket/sluit',
   'POST /api/bedrijf/ticket/waardeer',
   'POST /api/arrival/request', 'POST /api/arrival/pass',
+  'POST /api/arrival/pass/roteer', 'POST /api/arrival/pass/intrek',
   'POST /api/arrival/pulse', 'POST /api/supplier/horeca/arrivals',
   'POST /api/supplier/horeca/arrival/promise',
   /* De classificatieronde van 27 september 2026: de echte, nog onvolwassen

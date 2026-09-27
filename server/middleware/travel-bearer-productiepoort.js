@@ -9,10 +9,7 @@
    intrekking, verval, retry en multi-instance claim groen zijn.
 
    Hard sluiten is risicobeheersing, geen migratiebewijs. CODECREDENTIALS houdt
-   de groepen hieronder daarom op `remaining` en release_blocker=true. De
-   activiteitenkaart en het OV-vervoerbewijs zijn gemigreerd (27 september
-   2026: kern/tickettoegang.js, kern/mobiliteit/kaarttoegang.js) en staan hier
-   niet meer. */
+   de groepen hieronder daarom op `remaining` en release_blocker=true. */
 'use strict';
 
 const STATUS = 503;
@@ -20,12 +17,11 @@ const CODE = 'TRAVEL_BEARER_NOT_RELEASED';
 const BERICHT = 'Deze toegang is nog niet voor productie vrijgegeven. Er is niets uitgegeven of verbruikt.';
 
 const PER_ROUTE = new Map([
-  /* Invisible Arrival: issuer, redisclosure/validatie, pulse en zaakkant. */
-  ['/api/arrival/request', 'livingos.invisible_arrival_pass'],
-  ['/api/arrival/pass', 'livingos.invisible_arrival_pass'],
-  ['/api/arrival/pulse', 'livingos.invisible_arrival_pass'],
-  ['/api/supplier/horeca/arrivals', 'livingos.invisible_arrival_pass'],
-  ['/api/supplier/horeca/arrival/promise', 'livingos.invisible_arrival_pass']
+  /* Leeg sinds 27 september 2026: de activiteitenkaart
+     (kern/tickettoegang.js), het OV-vervoerbewijs (kern/mobiliteit/
+     kaarttoegang.js) en de Arrival Pass (kern/arrivalpas.js) zijn alle drie
+     gemigreerd. De grendel blijft staan als de plek waar een NIEUW
+     travel-bewijs dicht gaat tot zijn eigen lifecycle bewezen is. */
 ]);
 
 function normaliseerPad(waarde) {

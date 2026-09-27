@@ -32,7 +32,6 @@ test('iedere bekende Travel-bearerissuer, redisclosure en consumer is in product
     gezien.add(feature);
   }
   assert.deepEqual([...gezien].sort(), [
-    'livingos.invisible_arrival_pass'
   ]);
 });
 
@@ -50,8 +49,10 @@ test('de gemigreerde boarding-passketen is in productie selectief vrijgegeven', 
     assert.equal(uit.status, 200, pad);
     assert.equal(uit.door, 1, pad);
   }
-  assert.equal(roep('/api/arrival/request').status, 503,
-    'vrijgeven van boardingpassen opent geen aankomstbewijs');
+  for (const pad of ['/api/arrival/request', '/api/arrival/pass', '/api/arrival/pulse',
+    '/api/arrival/pass/roteer', '/api/arrival/pass/intrek',
+    '/api/supplier/horeca/arrivals', '/api/supplier/horeca/arrival/promise'])
+    assert.equal(roep(pad).door, 1, 'de gemigreerde Arrival Pass is vrijgegeven: ' + pad);
 });
 
 test('de gemigreerde activiteitenkaart en het OV-vervoerbewijs zijn in productie vrijgegeven', () => {
@@ -67,8 +68,6 @@ test('de gemigreerde activiteitenkaart en het OV-vervoerbewijs zijn in productie
     assert.equal(uit.status, 200, pad);
     assert.equal(uit.door, 1, pad);
   }
-  assert.equal(roep('/api/arrival/request').status, 503,
-    'vrijgeven van tickets en vervoerbewijzen opent geen aankomstbewijs');
 });
 
 test('veilige aangrenzende lezers, intrekkingen en operationele routes blijven open', () => {
@@ -95,9 +94,10 @@ test('Express-equivalente hoofdletters, encoding en eindslash omzeilen de poort 
   for (const pad of [
     '/API/ARRIVAL/REQUEST/',
     '/api/supplier/horeca/%61rrivals',
-    '/api/arrival/%70ass/?x=1',
-    '/api/arrival/pulse/'
-  ]) assert.equal(roep(pad).status, 503, pad);
+    '/API/TICKET/KOOP/',
+    '/api/mob/kaart/%6Boop/?x=1'
+  ]) assert.equal(roep(pad).door, 1, 'een gemigreerd pad blijft open, ook in een andere spelling: ' + pad);
+  assert.equal(maakPoort.PER_ROUTE.size, 0, 'geen enkel bekend travel-bewijs hangt nog aan de grendel');
 });
 
 test('de productierem staat eenmalig vóór idemopslag en domeinhandlers', () => {
@@ -111,16 +111,15 @@ test('de productierem staat eenmalig vóór idemopslag en domeinhandlers', () =>
 
 test('hard sluiten wordt niet als gemigreerde lifecycle verkocht', () => {
   const register = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'CODECREDENTIALS.json'), 'utf8'));
-  for (const id of [
-    'livingos.invisible_arrival_pass'
-  ]) {
+  // elke deur die de grendel nog dicht houdt, blokkeert eerlijk de release
+  for (const id of new Set(maakPoort.PER_ROUTE.values())) {
     const deur = register.deuren.find(x => x.id === id);
     assert.ok(deur, id);
     assert.equal(deur.status, 'remaining', id);
     assert.equal(deur.release_blocker, true, id);
   }
   for (const id of ['travelos.airport_boarding_pass', 'travelos.activity_ticket_entry',
-    'travelos.mobility_transport_ticket']) {
+    'travelos.mobility_transport_ticket', 'livingos.invisible_arrival_pass']) {
     const deur = register.deuren.find(x => x.id === id);
     assert.ok(deur, id);
     assert.equal(deur.status, 'migrated', id);

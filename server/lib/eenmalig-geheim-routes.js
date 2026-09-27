@@ -66,7 +66,10 @@ const ROUTES = new Set([
   /* kascode en tikcode (kern/pay/kasbak.js): uitgeven is roteren, en een retry
      met dezelfde sleutel krijgt 409 zonder code in plaats van een kopie. */
   'POST /api/pay/kascode',
-  'POST /api/pay/tikcode'
+  'POST /api/pay/tikcode',
+  // de Arrival Pass: aanvragen en roteren tonen een pass die de server maakt (kern/arrivalpas.js)
+  'POST /api/arrival/request',
+  'POST /api/arrival/pass/roteer'
 ]);
 
 const isEenmalig = (methode, pad) => ROUTES.has(

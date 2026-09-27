@@ -58,6 +58,7 @@
       "PAS_FOUT",
       "PERSONAS",
       "PRODUCTION",
+      "aanmeldkanaalTel",
       "antivirus",
       "appUrl",
       "automatisering",
@@ -147,6 +148,7 @@
       "werkplekken"
     ],
     "bedrijfsmaat": [
+      "aanmeldkanaalStand",
       "bankpositie",
       "bankpositieZet",
       "bedrijfsmaat",

@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'bdba37ae';
+var RTG_BOUW = '9e303d32';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -230,6 +230,8 @@ var RTG_BOUW = 'bdba37ae';
      globale verwijzing; niets wordt in local/sessionStorage bewaard. */
   let wervingscode = String(window.__RTG_WERVING_CODE || '').trim().toUpperCase();
   try { delete window.__RTG_WERVING_CODE; } catch (e) { window.__RTG_WERVING_CODE = null; }
+  // de campagnecode uit de link (app.html, besluit C6): alleen een telling bij de aanmelding
+  const campagne = String(window.__RTG_CAMPAGNE || '') || undefined;
   magnaatProef = zoekParams.get('magnaat') === '1';
   if (magnaatProef) API.enabled = false;
   let vastePas = zoekParams.get('pas');
@@ -440,7 +442,7 @@ var RTG_BOUW = 'bdba37ae';
         try {
           const data = cred.response || (cred.register
             ? await accessRequest('identity.account.create', { name:cred.name,email:cred.u,geboortedatum:cred.geboortedatum,password:cred.p,
-                wervingscode:wervingscode || undefined })
+                wervingscode:wervingscode || undefined, campagne })
             : await accessRequest('identity.session.open', {login:cred.u,password:cred.p,pasApp:vastePas || undefined}));
           if (data.tweedeFactorNodig) return data;
           if (!data.token || !data.state) throw new Error('De server heeft nog geen geldige sessie bevestigd.');

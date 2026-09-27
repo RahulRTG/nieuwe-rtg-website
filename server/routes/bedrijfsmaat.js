@@ -12,7 +12,7 @@
 const { BESLUITEN } = require('../kern/bedrijfsmaat/besluiten');
 
 module.exports = (kern) => {
-  const { app, boardroomAuth, boardroomWie, bedrijfsmaat, bankpositie, bankpositieZet } = kern;
+  const { app, boardroomAuth, boardroomWie, bedrijfsmaat, bankpositie, bankpositieZet, aanmeldkanaalStand } = kern;
   app.post('/api/office/bedrijfsmaat', boardroomAuth, (req, res) => {
     const uit = bedrijfsmaat.stand({ maand: (req.body || {}).maand });
     res.json(Object.assign({ ok: true, besluiten: BESLUITEN.map(b => ({ id: b.id, naam: b.naam, kort: b.kort })) }, uit));
@@ -23,6 +23,9 @@ module.exports = (kern) => {
      uit de sessie en nooit uit het verzoek. */
   app.post('/api/office/bankpositie', boardroomAuth, (req, res) =>
     res.json(Object.assign({ ok: true }, bankpositie((req.body || {}).maand))));
+  // hoe leden bij RTG kwamen, per maand en langs de groepspoort (kern/aanmeldkanaal.js, C6)
+  app.post('/api/office/aanmeldkanaal', boardroomAuth, (req, res) =>
+    res.json(Object.assign({ ok: true }, aanmeldkanaalStand((req.body || {}).maand))));
   app.post('/api/office/bankpositie/zet', boardroomAuth, (req, res) => {
     const wie = boardroomWie(req);
     if (!wie) return res.status(403).json({ error: 'Een saldo zet een mens op naam, niet de gedeelde kantoorcode.' });

@@ -142,6 +142,8 @@ kern.aanwezigheid = require('../kern/aanwezigheid')({ db, save, bewerkCollectie 
 kern.pasgeschiedenis = require('../kern/pasgeschiedenis')({ db, save, bewerkCollectie, accounts });
 // het banksaldo van RTG, handmatig met het afschrift als bron (besluit C4)
 Object.assign(kern, require('../kern/bankpositie')({ db, save }));
+// hoe leden bij RTG kwamen: een telling per maand, nooit per lid (besluit C6)
+Object.assign(kern, require('../kern/aanmeldkanaal')({ db, save }));
 kern.bedrijfsmaat = require('../kern/bedrijfsmaat/stand')({
   lees: { ritten: () => db.data.rides, bestellingen: () => db.data.orders,
     betaalschemas: () => db.data.lidmaatschapBetalingen,

@@ -97,6 +97,8 @@
      globale verwijzing; niets wordt in local/sessionStorage bewaard. */
   let wervingscode = String(window.__RTG_WERVING_CODE || '').trim().toUpperCase();
   try { delete window.__RTG_WERVING_CODE; } catch (e) { window.__RTG_WERVING_CODE = null; }
+  // de campagnecode uit de link (app.html, besluit C6): alleen een telling bij de aanmelding
+  const campagne = String(window.__RTG_CAMPAGNE || '') || undefined;
   magnaatProef = zoekParams.get('magnaat') === '1';
   if (magnaatProef) API.enabled = false;
   let vastePas = zoekParams.get('pas');

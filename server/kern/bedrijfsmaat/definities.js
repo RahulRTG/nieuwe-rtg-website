@@ -44,6 +44,10 @@ const DEFINITIES = Object.freeze({
     regel: 'CASH is het saldo van de rekeningen van RTG aan het eind van de maand, overgetikt van een afschrift met die bron; ' +
       'het geld van verkochte RTG-cadeaubonnen staat ernaast als verplichting en is geen vrij geld.',
     waarom: 'Een runway die op onverdiend geld rust, is te lang.' }),
+  aanmeldkanaal: Object.freeze({ versie: 1, besloten: '27 september 2026, door de eigenaar (C6)', herkomst: 'mens',
+    regel: 'Het AANMELDKANAAL is het antwoord op een optionele vraag bij het aanmelden, of de campagnecode uit de link; ' +
+      'het wordt geteld per maand en nooit bij het account bewaard.',
+    waarom: 'Weten waar leden vandaan komen, niet wie.' }),
   klantwaardeLiving: d27(1, 'KLANTWAARDE in LivingOS: een rit die de keten afmaakte of een bestelling die bezorgd of opgehaald werd, in de maand van afronden.',
     'Dezelfde uitkomsten als activatie; een van vier maten naast elkaar, zonder totaal.'),
   klantwaardeTravel: d27(1, 'KLANTWAARDE in TravelOS: een reis die thuis is, gemeld door het lid of het kantoor, in de maand van thuiskomst.',

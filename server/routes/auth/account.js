@@ -54,6 +54,9 @@ app.post('/api/auth/register', async (req, res) => {
     const verifyUrl = appUrl(req) + '/apps/app.html?pas=' + pasAppVan(user.tier) + '&verify=' + vtok;
     try { mail.send(email, 'Bevestig uw e-mailadres bij Rahul Travel Group',
       'Welkom bij RTG. Bevestig uw e-mailadres via deze link:\n' + verifyUrl); } catch (e) {}
+    /* Het aanmeldkanaal (kern/aanmeldkanaal.js, besluit C6): een telling per maand
+       en niets bij dit account. Optioneel; een ongeldige waarde telt gewoon niet. */
+    try { if (kern.aanmeldkanaalTel) kern.aanmeldkanaalTel({ kanaal: req.body.aanmeldkanaal, campagne: req.body.campagne }); } catch (e) { /* een telling houdt geen registratie tegen */ }
     /* Kwam dit account via een WERVINGSLINK binnen, dan zijn aanmelden en in
        dienst treden een handeling. Zie werving/uitnodiging.js. */
     const werk = kern.wisselCodeIn

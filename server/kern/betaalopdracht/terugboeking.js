@@ -13,7 +13,7 @@ const crypto = require('crypto');
 const { SLEUTEL } = require('../../db/economische-identiteit');
 
 module.exports = async function boekTerugEenmaal({ domein, grootboek, boek, boekAsync,
-  boekEenmaal, geldModus, van, naar, centen, soort, oms, ref, sleutelSoort = 'payout-terug' }) {
+  boekEenmaal, geldModus, van, naar, centen, soort, oms, ref, sleutelSoort = 'payout-terug', genre, dagBesteed }) {
   if (typeof grootboek !== 'function')
     return { status: 500, error: 'Het grootboek ontbreekt; een payout-teruggang wordt niet gegokt.' };
   const c = Math.round(Number(centen));
@@ -29,7 +29,13 @@ module.exports = async function boekTerugEenmaal({ domein, grootboek, boek, boek
   const afdruk = crypto.createHash('sha256')
     .update([d, van, naar, c, soort, r].map(x => String(x == null ? '' : x)).join('\u001f'))
     .digest('hex');
+  /* Genre en al-besteed reizen alleen mee als de aanroeper ze geeft (de
+     kascode, ../pay/kas-boek.js): de waardepoort toetst er het beleid mee.
+     Ze staan niet in de afdruk -- ze bepalen of er geboekt mag worden, niet
+     welke beweging het is. */
   const args = { van, naar, centen: c, soort, oms, ref };
+  if (genre != null) args.genre = genre;
+  if (dagBesteed != null) args.dagBesteed = dagBesteed;
 
   /* In cutover-stand is de motor de enige geldwaarheid. Dezelfde economische
      sleutel gaat mee naar zijn duurzame, atomische boekpad; een losse

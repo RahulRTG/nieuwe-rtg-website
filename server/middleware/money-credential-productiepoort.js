@@ -18,17 +18,15 @@ const CODE = 'MONEY_CREDENTIAL_NOT_RELEASED';
 const BERICHT = 'Deze betaalwijze is nog niet voor productie vrijgegeven. Er is niets afgeschreven of uitgegeven.';
 
 const EXACT = new Map([
-  ['/api/pay/kascode', 'pay.kascode_en_vooraf'],
-  ['/api/supplier/pay/in', 'pay.kascode_en_vooraf'],
-  ['/api/supplier/pay/vooraf', 'pay.kascode_en_vooraf'],
-  ['/api/supplier/pay/vastleg', 'pay.kascode_en_vooraf'],
-  /* Dit supplier-loket accepteert momenteel uitsluitend `geld.kassa`; andere
-     capabilities noemen supplier niet als aanvaarder. Daarom kan het exact
-     dicht zonder een veilige Link-handeling te raken. */
-  ['/api/supplier/link/cap/aanvaard', 'pay.kascode_en_vooraf'],
-
-  ['/api/pay/tikcode', 'pay.tikcode'],
-  ['/api/pay/tik', 'pay.tikcode']
+  /* De kascode (pay.kascode_en_vooraf) en de tikcode (pay.tikcode) staan hier
+     sinds 27 september 2026 niet meer: 128 bits, hash-only, een claim in een
+     collectietransactie en boekingen met een `pay-kas`-sleutel
+     (kern/pay/kasbak.js, kas-claim.js, kas-boek.js, tik.js). De ondertekende
+     Link-drager van de kascode is een ANDERE deur (link.capability_aanvaarden:
+     72 bits in procesgeheugen) en blijft dicht: het supplier-loket accepteert
+     uitsluitend `geld.kassa`, dus het kan exact dicht zonder een veilige
+     Link-handeling te raken. */
+  ['/api/supplier/link/cap/aanvaard', 'link.capability_aanvaarden'],
 
   /* pay.tegoedbon staat hier sinds 27 september 2026 niet meer: hash-only,
      128 bits, een claim in een collectietransactie en een economische sleutel
@@ -62,16 +60,12 @@ const PICKUP_CODE_ISSUERS = Object.freeze({
   ])
 });
 
-/* Alternatieve kassaschermen delen dezelfde kerncode. Ze blijven voor contant
-   of pin bruikbaar; alleen de RTG-Pay-tak is een consumer van kascode. */
-const KAS_CONDITIONEEL = new Map([
-  ['/api/supplier/pos/sale', 'method'],
-  ['/api/supplier/pos/checkout', 'method'],
-  ['/api/supplier/tafelticket/afrekenen', 'method'],
-  ['/api/supplier/retail/verkoop', 'method'],
-  ['/api/supplier/ticket/deurverkoop', 'method'],
-  ['/api/festival/verkoop/rond', 'methode']
-]);
+/* De RTG-Pay-tak van de kassaschermen (pos/sale, pos/checkout, tafelticket,
+   retail, deurverkoop, festival) stond hier tot 27 september 2026 als
+   KAS_CONDITIONEEL. Een kale kascode is nu gemigreerd; een ondertekend
+   Link-token in diezelfde tak gaat via kern/pay/kasinnen.js naar
+   linkCapAanvaard, en kern/pay/kassacode.js weigert daar zelf in productie
+   (blokkade 'link.capability_aanvaarden'). */
 
 function productie(env) {
   return String((env || process.env).NODE_ENV || '') === 'production';
@@ -98,15 +92,7 @@ function featureVoor(req) {
   if (vast) return vast;
   if (pad === '/api/link/cap/maak' &&
       String(req && req.body && req.body.handeling || '').toLowerCase() === 'geld.kassa') {
-    return 'pay.kascode_en_vooraf';
-  }
-  /* De algemene kassaverkoop blijft voor contant en pin beschikbaar. Alleen de
-     takken die een nog-onbewezen bearer consumeren gaan dicht. De body is op
-     deze plek al begrensd en ontleed door de lijfpoort. */
-  const veld = KAS_CONDITIONEEL.get(pad);
-  if (veld) {
-    const methode = String(req && req.body && req.body[veld] || '').toLowerCase();
-    if (methode === 'rtgpay' || methode === 'rtg') return 'pay.kascode_en_vooraf';
+    return 'link.capability_aanvaarden';
   }
   return null;
 }
@@ -130,7 +116,6 @@ module.exports = function moneyCredentialProductiepoort({ env } = {}) {
 module.exports.blokkade = blokkade;
 module.exports.featureVoor = featureVoor;
 module.exports.EXACT = EXACT;
-module.exports.KAS_CONDITIONEEL = KAS_CONDITIONEEL;
 module.exports.PICKUP_CODE_ISSUERS = PICKUP_CODE_ISSUERS;
 module.exports.CODE = CODE;
 module.exports.BERICHT = BERICHT;

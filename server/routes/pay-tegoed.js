@@ -49,9 +49,16 @@ module.exports = (kern, { stuur, geenGast, kyc, geenEchtAccount }) => {
   });
 
   // de tik: ontvangen met een aanraking (tikcode), betalen met een knop
-  app.post('/api/pay/tikcode', auth, (req, res) => {
+  /* Tik- en kascode staan alleen kaal in het antwoord op hun uitgifte
+     (lib/eenmalig-geheim-routes.js: no-store, buiten elke retrycache); intrekken
+     is server-side en raakt alleen de open codes van de aanroeper zelf. */
+  app.post('/api/pay/tikcode', auth, async (req, res) => {
     if (geenGast(req, res)) return;
-    res.json(pay.tikCode({ codenaam: liveCodename(req.session) }));
+    stuur(res, await pay.tikCode({ codenaam: liveCodename(req.session), idem: req.body.idem }));
+  });
+  app.post('/api/pay/tikcode/intrek', auth, async (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, await pay.tikIntrek({ codenaam: liveCodename(req.session) }));
   });
   app.post('/api/pay/tik', auth, async (req, res) => {
     if (geenGast(req, res)) return;
@@ -62,13 +69,14 @@ module.exports = (kern, { stuur, geenGast, kyc, geenEchtAccount }) => {
     if (geenGast(req, res)) return;
     res.json(pay.tikFeed(liveCodename(req.session)));
   });
-  /* de kassacode: vijf minuten geldig, tot een zelfgekozen maximum
-
-     Zelfde besluit als bij tikcode hierboven: een herhaling verdringt de vorige
-     code in plaats van er een tweede naast te zetten, en het geld beweegt pas
-     bij /api/supplier/pay/in. Dezelfde toets meet het na. */
-  app.post('/api/pay/kascode', auth, (req, res) => {
+  /* de kassacode: vijf minuten geldig, tot een zelfgekozen maximum. Een nieuwe
+     code trekt de vorige in; het geld beweegt pas bij /api/supplier/pay/in. */
+  app.post('/api/pay/kascode', auth, async (req, res) => {
     if (geenEchtAccount(req, res)) return;
-    res.json(pay.kasCode({ codenaam: liveCodename(req.session), maxCenten: req.body.maxCenten }));
+    stuur(res, await pay.kasCode({ codenaam: liveCodename(req.session), maxCenten: req.body.maxCenten, idem: req.body.idem }));
+  });
+  app.post('/api/pay/kascode/intrek', auth, async (req, res) => {
+    if (geenEchtAccount(req, res)) return;
+    stuur(res, await pay.kasIntrek({ codenaam: liveCodename(req.session) }));
   });
 };

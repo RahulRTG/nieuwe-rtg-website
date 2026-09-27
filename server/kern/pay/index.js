@@ -41,9 +41,9 @@ module.exports = (ctxIn) => {
      nog steeds aan het OS. Zonder RTG_KLOK geeft klok.nu() exact
      Date.now(); in productie weigert een verzette klok bij het laden. */
   const nu = require('../../lib/klok').nu;
-  /* De opslagvorm -- de vijf bakken in db.data en de vier naamregels ('lid:',
+  /* De opslagvorm -- de drie bakken in db.data en de vier naamregels ('lid:',
      'partner:', het saldo van een rekening, een nieuw id) -- staat in ./bakken.js. */
-  const { d, saldi, grootboek, klompjes, kascodes, tikcodes,
+  const { d, saldi, grootboek, klompjes,
     saldiKijk, grootboekKijk, klompjesKijk, rekLid, rekPartner, saldoVan, id } =
     require('./bakken')({ db, crypto });
   /* De stand van deze laag -- de drie schakelaars uit de omgeving en de zes
@@ -101,7 +101,7 @@ module.exports = (ctxIn) => {
 
   const ctx = {
     db, save, economischeBoekingEenmaal, bewerkCollectie, crypto, betaal, schoon, nu, d,
-    saldi, grootboek, klompjes, kascodes, tikcodes, saldiKijk, grootboekKijk, klompjesKijk,
+    saldi, grootboek, klompjes, saldiKijk, grootboekKijk, klompjesKijk,
     rekLid, rekPartner, saldoVan, id, metIdem, boek, boekAsync, geldModus, zorgSaldo, seintje, bestaatLid,
     betaaldienstKosten: betaaldienstKosten || (() => 0), waarde, accounts,
     opdrachten: betaalOpdrachten,

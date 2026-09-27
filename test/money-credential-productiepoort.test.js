@@ -44,54 +44,41 @@ test('iedere nog onbewezen money bearer issuer en consumer weigert in productie 
   }
 });
 
-test('de algemene POS blijft open behalve voor RTG Pay', () => {
-  for (const method of ['rtgpay']) {
-    const r = roep({ path: '/api/supplier/pos/sale', body: { method } });
-    assert.equal(r.status, 503);
-    assert.equal(r.door, 0);
-  }
-  // de cadeaukaart is gemigreerd (kern/cadeaukaart.js) en hangt niet meer aan de grendel
-  for (const method of ['contant', 'pin', 'tafel', 'cadeaukaart']) {
+test('de algemene POS blijft volledig open: cadeaukaart en RTG Pay zijn gemigreerd', () => {
+  for (const method of ['contant', 'pin', 'tafel', 'cadeaukaart', 'rtgpay']) {
     const r = roep({ path: '/api/supplier/pos/sale', body: { method } });
     assert.equal(r.door, 1, method);
   }
 });
 
-test('alle alternatieve kassamonts sluiten alleen hun RTG-Pay-tak', () => {
-  for (const [pad, veld] of maakPoort.KAS_CONDITIONEEL) {
-    const dicht = roep({ path: pad, body: { [veld]: 'rtgpay' } });
-    assert.equal(dicht.status, 503, pad);
-    assert.equal(dicht.door, 0, pad);
-    const open = roep({ path: pad, body: { [veld]: 'contant' } });
-    assert.equal(open.door, 1, pad);
+/* De kascode en tikcode zijn gemigreerd (27 september 2026, kern/pay/kasbak.js):
+   hun routes en de RTG-Pay-tak van elke kassa zijn open. Wat dicht blijft is de
+   ondertekende Link-drager (link.capability_aanvaarden), aan de HTTP-kant EN in
+   kern/pay/kassacode.js. Elke kascode-inning loopt langs EEN claim. */
+test('kascode en tik zijn open; de Link-drager en iedere inning blijven op een plek bewaakt', () => {
+  for (const pad of ['/api/pay/kascode', '/api/pay/kascode/intrek', '/api/supplier/pay/in',
+    '/api/supplier/pay/vooraf', '/api/supplier/pay/vastleg', '/api/pay/tikcode', '/api/pay/tikcode/intrek', '/api/pay/tik'])
+    assert.equal(roep({ path: pad, body: { method: 'rtgpay', methode: 'rtgpay' } }).door, 1, pad);
+  for (const [pad, body] of [['/api/link/cap/maak', { handeling: 'geld.kassa' }], ['/api/supplier/link/cap/aanvaard', {}]]) {
+    const r = roep({ path: pad, body });
+    assert.equal(r.status, 503, pad);
+    assert.equal(r.json.feature, 'link.capability_aanvaarden', pad);
   }
-  const cap = roep({ path: '/api/link/cap/maak', body: { handeling: 'geld.kassa' } });
-  assert.equal(cap.status, 503);
-  assert.equal(cap.door, 0);
   assert.equal(roep({ path: '/api/link/cap/maak', body: { handeling: 'contact.verbinden' } }).door, 1);
-});
-
-test('iedere bronaanroep van kasInt/kasInnen hoort bij de uitputtende productiegrendel', () => {
-  const routeNaarBron = new Map([
-    ['/api/supplier/pay/in', 'server/routes/pay-zaak.js'],
-    ['/api/festival/verkoop/rond', 'server/routes/festival/verkoop.js'],
-    ['/api/supplier/pos/checkout', 'server/routes/supplier/kassa/afrekenen.js'],
-    ['/api/supplier/pos/sale', 'server/routes/supplier/kassa/verkoop.js'],
-    ['/api/supplier/retail/verkoop', 'server/routes/supplier/retail.js'],
-    ['/api/supplier/ticket/deurverkoop', 'server/routes/supplier/tickets.js']
-  ]);
-  const intern = ['server/kern/pay/kasinnen.js', 'server/kern/pay/kassacode.js'];
-  assert.deepEqual(serverAanroepBestanden(/\b(?:pay\.kasInt|kern\.kasInnen)\s*\(/),
-    [...routeNaarBron.values(), ...intern].sort());
-  for (const [route, bron] of routeNaarBron) {
-    assert.ok(maakPoort.EXACT.has(route) || maakPoort.KAS_CONDITIONEEL.has(route), route);
-    assert.match(fs.readFileSync(path.join(__dirname, '..', bron), 'utf8'),
-      new RegExp("app\\.post\\('" + route.replace(/\//g, '\\/') + "'"), bron);
+  assert.deepEqual(serverAanroepBestanden(/\b(?:pay\.kasInt|kern\.kasInnen)\s*\(/), ['server/kern/pay/kasinnen.js',
+    'server/kern/pay/kassacode.js', 'server/routes/festival/verkoop.js', 'server/routes/pay-zaak.js',
+    'server/routes/supplier/kassa/afrekenen.js', 'server/routes/supplier/retail.js',
+    'server/routes/supplier/kassa/verkoop.js', 'server/routes/supplier/tickets.js'].sort());
+  const kassa = fs.readFileSync(path.join(__dirname, '..', 'server/kern/pay/kassa.js'), 'utf8');
+  assert.match(kassa, /return claim\.neem\(\{ code, soort: 'kas'/, 'kasInt int alleen langs de claim-saga');
+  assert.deepEqual(serverAanroepBestanden(/payKasToegang|payTikToegang/),
+    ['server/kern/pay/kassa.js', 'server/kern/pay/tik.js'], 'geen tweede schrijver van de codebakken');
+  const reg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'CODECREDENTIALS.json'), 'utf8'));
+  for (const id of ['pay.kascode_en_vooraf', 'pay.tikcode']) {
+    const deur = reg.deuren.find(d => d.id === id);
+    assert.equal(deur.status, 'migrated', id);
+    assert.ok(deur.bewijs.includes('test/kascode-routes.test.js'), id);
   }
-  assert.ok(maakPoort.EXACT.has('/api/supplier/link/cap/aanvaard'),
-    'de Link-consumer in kassacode.js heeft een externe grendel');
-  assert.equal(roep({ path: '/api/link/cap/maak', body: { handeling: 'geld.kassa' } }).status, 503,
-    'ook de Link-issuer is dicht');
 });
 
 test('de cadeaukaart is gemigreerd: geen grendel, en alleen de kern maakt of claimt een code', () => {
@@ -126,8 +113,8 @@ test('ontwikkeling blijft bruikbaar en geld terug vrijgeven blijft in productie 
 });
 
 test('Express-varianten met encoding, hoofdletters of een eindslash zijn geen omweg', () => {
-  for (const pad of ['/API/PAY/KASCODE', '/api/pay/kascode/', '/api/pay/%6Bascode',
-    '/API/PAY/TIK/?x=1']) {
+  for (const pad of ['/API/SUPPLIER/LINK/CAP/AANVAARD', '/api/supplier/link/cap/aanvaard/', '/api/supplier/link/cap/%61anvaard',
+    '/API/SUPPLIER/LINK/CAP/AANVAARD/?x=1']) {
     const r = roep({ url: pad, path: undefined });
     assert.equal(r.status, 503, pad);
     assert.equal(r.door, 0, pad);
@@ -159,20 +146,20 @@ test('de tegoedbon is gemigreerd: geen grendel, wel een bewezen deur', () => {
 
 test('hard sluiten wordt niet als gemigreerde money lifecycle verkocht', () => {
   const register = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'CODECREDENTIALS.json'), 'utf8'));
-  for (const id of ['pay.kascode_en_vooraf', 'pay.tikcode']) {
+  /* Elke deur die deze grendel nog dicht houdt, staat eerlijk als resterende
+     releaseblokkade in het register -- nooit als gemigreerd. */
+  const dicht = new Set(maakPoort.EXACT.values());
+  assert.ok(dicht.size > 0, 'de grendel houdt nog minstens een deur dicht');
+  for (const id of dicht) {
     const deur = register.deuren.find(d => d.id === id);
     assert.ok(deur, id);
-    assert.equal(deur.classificatie, 'money_credential', id);
     assert.equal(deur.status, 'remaining', id);
     assert.equal(deur.release_blocker, true, id);
   }
 });
 
 test('de gemigreerde afhaalcode is uit de grendel en staat als bewezen deur in het register', () => {
-  /* Pas als elke control in code staat en door een toets wordt bewezen, mag een
-     geld-dragende code uit deze grendel. Voor de afhaalcode is dat gebeurd
-     (server/kern/afhaalcode.js); de bestel- en betaalroutes zijn in productie
-     dus weer open, en de kassa geeft alleen uit op de 128-bit afhaalcode. */
+  // pas met elke control in code en een toets mag een geld-dragende code uit de grendel
   for (const pad of ['/api/order', '/api/order/pay', '/api/orders/mine',
     '/api/bezorg/bestel', '/api/bezorg/volg', '/api/supplier/pos/redeem',
     '/api/order/afhaalcode', '/api/order/afhaalcode/intrek']) {
@@ -209,42 +196,35 @@ test('kernfuncties kunnen de HTTP-poort in productie niet omzeilen', async () =>
   process.env.NODE_ENV = 'production';
   let saves = 0;
   try {
-    const tik = require('../server/kern/pay/tik')({
-      crypto, save() { saves++; }, nu: () => 1, tikcodes: () => [], grootboek: () => [],
-      rekLid: c => 'lid:' + c, KASCODE_MS: 1000,
-      stuur() { throw new Error('geldpad mocht niet worden bereikt'); }
-    });
-    assert.equal(tik.tikCode({ codenaam: 'A' }).code, maakPoort.CODE);
-    assert.equal((await tik.tikBetaal({ van: 'A', code: 'ruw' })).code, maakPoort.CODE);
+    /* De tik en de kascode zijn gemigreerd. Zonder collectietransactie weigeren
+       ze in productie zelf (kern/pay/kasbak.js), dus een kernaanroep buiten de
+       echte opslag krijgt nooit een proceslokale claim of code. */
+    const tik = require('../server/kern/pay/tik')({ crypto, save() { saves++; }, nu: () => 1, d: () => ({}),
+      grootboek: () => [], rekLid: c => 'lid:' + c, KASCODE_MS: 1000,
+      stuur() { throw new Error('geldpad mocht niet worden bereikt'); } });
+    await assert.rejects(tik.tikCode({ codenaam: 'A' }), /collectietransactie/);
+    await assert.rejects(tik.tikBetaal({ van: 'A', code: 'ruw', idem: 'i' }), /collectietransactie/);
 
-    /* De tegoedbon is gemigreerd en hangt NIET meer aan deze grendel. Wat hem
-       in productie wel tegenhoudt: zonder collectietransactie weigert de bon
-       zelf (kern/pay/tegoed-bon.js), zodat een kernaanroep buiten de echte
-       opslag nooit een proceslokale claim krijgt. */
     const data = {};
     const bon = require('../server/kern/pay/tegoed-bon')({ d: () => data, save() { saves++; },
       crypto, nu: () => 1 });
     assert.throws(() => bon.transactie(() => ({})), /collectietransactie/);
 
-    const kassa = require('../server/kern/pay/kassa')({
-      crypto, save() { saves++; }, nu: () => 1, kascodes: () => [], grootboek: () => [],
-      rekLid: c => 'lid:' + c, rekPartner: c => 'partner:' + c, saldoVan: () => 0,
-      metIdem() { throw new Error('idem mocht niet worden bereikt'); },
-      boek() {}, boekAsync() {}, betaalUit() { throw new Error('geldpad mocht niet worden bereikt'); },
-      zorgSaldo() {}, seintje() {}, betaaldienstKosten: () => 0, bijOntvangst: () => ({}),
-      opdrachten: { registreerTeruggang() {} }, db: { data: {} }, waarde: null,
-      economischeBoekingEenmaal() {}, geldModus: 'schaduw',
-      MIN_CENTEN: 1, MAX_CENTEN: 500000, KASCODE_MS: 1000, KASCODE_MAX: 50000
-    });
-    assert.equal(kassa.kasCode({ codenaam: 'A', maxCenten: 100 }).code, maakPoort.CODE);
-    assert.equal((await kassa.kasInt({ supplierCode: 'S', code: 'ruw', centen: 100 })).code, maakPoort.CODE);
-    assert.equal(kassa.kasStand('ruw'), null);
+    const kassa = require('../server/kern/pay/kassa')({ crypto, save() { saves++; }, nu: () => 1, d: () => data,
+      grootboek: () => [], rekLid: c => 'lid:' + c, rekPartner: c => 'partner:' + c, saldoVan: () => 0,
+      boek() {}, boekAsync() {}, zorgSaldo() {}, seintje() {}, betaaldienstKosten: () => 0,
+      stelSamen() { throw new Error('geldpad mocht niet worden bereikt'); },
+      opdrachten: { registreerTeruggang() {} }, db: { data: {} }, waarde: null, schoon: s => s,
+      MIN_CENTEN: 1, MAX_CENTEN: 500000, KASCODE_MS: 1000, KASCODE_MAX: 50000 });
+    await assert.rejects(kassa.kasCode({ codenaam: 'A', maxCenten: 100 }), /collectietransactie/);
+    await assert.rejects(kassa.kasInt({ supplierCode: 'S', code: 'ruw', centen: 100, idem: 'i' }), /collectietransactie/);
+    const def = require('../server/kern/pay/kassacode')({ pay: kassa, schoon: s => s });
+    assert.equal((await def.lees({}, { codenaam: 'A' })).code, maakPoort.CODE, 'de Link-drager blijft dicht');
+    assert.equal(def.doe({ opdracht: {}, invoer: {}, aanvaarder: {} }).code, maakPoort.CODE);
 
     const vooraf = require('../server/kern/pay/vooraf')({});
-    assert.equal((await vooraf.kasVooraf({ supplierCode: 'S', code: 'ruw' })).code, maakPoort.CODE);
-    assert.equal((await vooraf.kasVastleg({ supplierCode: 'S', reservering: 'R' })).code, maakPoort.CODE);
-    assert.equal(vooraf.kasVrijgeef({ supplierCode: 'S', reservering: 'R' }).status, 501,
-      'veilig vrijgeven krijgt bewust niet de money-credentialgrendel');
+    assert.equal((await vooraf.kasVrijgeef({ supplierCode: 'S', reservering: 'R' })).status, 501,
+      'veilig vrijgeven blijft bereikbaar en krijgt geen grendel');
 
     /* De cadeaukaart is gemigreerd: zonder collectietransactie bestaat de
        kern niet eens, dus geen kernaanroep kan een proceslokale claim doen. */

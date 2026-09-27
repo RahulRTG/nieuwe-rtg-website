@@ -18,12 +18,10 @@ const STATUSES = new Set(['migrated', 'closed', 'remaining']);
 const CLASSIFICATIES = new Set(['credential', 'money_credential', 'public_identifier',
   'tracking_identifier', 'signed_presentation', 'authenticated_identifier',
   'external_protocol_credential', 'central_session_credential', 'geen_credential']);
-/* `geen_credential` zegt dat een censuskandidaat na lezing GEEN identifier of
-   geheim is (een record-id uit randomBytes, het woord `pas` voor de uitgiftepas
-   van een keuken, een idempotentiesleutel, commentaar van de buurhandler). Dat
-   is een oordeel dat een kandidaat uit de blokkerlijst haalt, dus het mag nooit
-   goedkoop zijn: alleen gesloten, nooit blokkerend en altijd met een uitleg
-   die lang genoeg is om het oordeel na te lopen. */
+/* `geen_credential`: een censuskandidaat is na lezing GEEN identifier of geheim
+   (een record-id, de uitgiftepas van een keuken, een idempotentiesleutel). Dat
+   oordeel haalt hem uit de blokkerlijst, dus het mag nooit goedkoop zijn:
+   gesloten, nooit blokkerend, en met een uitleg die het oordeel naloopt. */
 const GEEN_NOTITIE_MIN = 40;
 const REQUIRED_ROUTES = [
   'GET /api/projectie/:code',
@@ -39,13 +37,13 @@ const REQUIRED_ROUTES = [
   'POST /api/meet/maak', 'POST /api/meet/kom', 'POST /api/meet/code',
   'POST /api/samen/maak', 'POST /api/samen/mee', 'POST /api/samen/code',
   'POST /api/samen/sluit',
-  'POST /api/pay/kascode', 'POST /api/supplier/pay/in',
+  'POST /api/pay/kascode', 'POST /api/pay/kascode/intrek', 'POST /api/supplier/pay/in',
   'POST /api/supplier/pay/vooraf', 'POST /api/supplier/pay/vastleg',
   'POST /api/link/cap/maak', 'POST /api/supplier/link/cap/aanvaard',
   'POST /api/supplier/pos/sale', 'POST /api/supplier/pos/checkout',
   'POST /api/supplier/tafelticket/afrekenen', 'POST /api/supplier/retail/verkoop',
   'POST /api/supplier/ticket/deurverkoop', 'POST /api/festival/verkoop/rond',
-  'POST /api/pay/tikcode', 'POST /api/pay/tik',
+  'POST /api/pay/tikcode', 'POST /api/pay/tikcode/intrek', 'POST /api/pay/tik',
   'POST /api/pay/tegoed', 'POST /api/pay/tegoed/koop',
   'POST /api/pay/tegoed/verzilver', 'POST /api/pay/tegoed/terug',
   'POST /api/pay/tegoed/roteer',

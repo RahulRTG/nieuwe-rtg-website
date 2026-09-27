@@ -71,7 +71,7 @@
     "wekkersZonderTrede": 0,
     "wettenOnbewezen": 5,
     "zaakwigGezakt": 0,
-    "zelfpoortendeToetsen": 33,
+    "zelfpoortendeToetsen": 34,
     "geldRoutesPubliek": 0,
     "geldRoutesZonderSemantiek": 1,
     "geldRoutesZonderIdemBewijs": 3,
@@ -149,6 +149,16 @@
     "edgeVeldContextZelf": 11
   },
   "notities": [
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "zelfpoortendeToetsen",
+      "van": 31,
+      "vervalt": "2026-12-27",
+      "meter": "zelfpoortendeToetsen 31 -> 32",
+      "reden": "test/kascode-credential.pg.test.js is nieuw (RELEASEKANDIDAAT.md B9, deuren pay.kascode_en_vooraf en pay.tikcode): twee echte PostgreSQL-instances racen op dezelfde kascode, een derde hervat na een crash na de commit van de boeking, en tikken vanaf twee instances tegelijk mag geen gebruik verliezen. Dat kan niet eerlijk zonder database; zonder DATABASE_URL slaat hij zichzelf over. Hij staat in scripts/lib/pg-toetslijst.js (verplicht in CI) en als uitzondering onder zelfpoortende-toets. Lokaal gedraaid tegen postgresql://localhost met Redis: 1 van 1 groen; zonder collectietransactie in kern/pay/kasbak.js zakte hij, en met een niet-vaste ref onder de economische sleutel ook (3 boekingen in plaats van 2).",
+      "waarheen": "Dezelfde aflossing als de notitie van 5 september: de standaardomgeving levert PostgreSQL, en het nul-skipbewijs hangt aan de releasecommit."
+    },
     {
       "datum": "2026-09-27",
       "soort": "structureel",
@@ -3473,6 +3483,12 @@
       "pad": "test/grafsteen.pg.test.js",
       "vervalt": "2026-10-15",
       "reden": "binnengekomen met samenvoeg-PR #137 uit PR #132; de proef vereist bewust PostgreSQL, draait in CI met die dienst en blijft lokaal expliciet overgeslagen tot de standaarddraaier PostgreSQL start"
+    },
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/kascode-credential.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "de kas- en tikcode-raceproef (claim over twee instances, hervatten na een crash, tikteller) vereist echte PostgreSQL; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die dienst, terwijl hij lokaal zonder die infrastructuur expliciet wordt overgeslagen in plaats van een lichtere opslag als bewijs te laten gelden"
     },
     {
       "regel": "zelfpoortende-toets",

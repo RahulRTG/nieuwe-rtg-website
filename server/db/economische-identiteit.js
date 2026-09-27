@@ -7,14 +7,15 @@ const normRef = v => v == null ? null : String(v);
 const heeft = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
 
 /* DE VORM VAN EEN ECONOMISCHE SLEUTEL, op een plek voor alle drie de opslagen
-   (sqlite, PostgreSQL, de proceslokale ontwikkelweg). Twee soorten en geen
+   (sqlite, PostgreSQL, de proceslokale ontwikkelweg). Drie soorten en geen
    vrije tekst: `payout-terug` voor een teruggeboekte uitbetaling en
    `pay-tegoed` voor geld dat een tegoedbon uit de escrow haalt
-   (kern/pay/tegoed-claim.js). Achter de dubbele punt staat altijd een
+   (kern/pay/tegoed-claim.js), plus `pay-kas` voor de delen onder een
+   kascode-claim (kern/pay/kas-boek.js). Achter de dubbele punt staat altijd een
    SHA-256, want deze sleutel wordt een permanente primaire sleutel en een
-   providerref of codenaam hoort daar niet in. De Rust-motor kent dezelfde twee
+   providerref of codenaam hoort daar niet in. De Rust-motor kent dezelfde drie
    (motor/src/pay.rs, economische_sleutel_geldig). */
-const SLEUTEL = /^(?:payout-terug|pay-tegoed):[a-f0-9]{64}$/;
+const SLEUTEL = /^(?:payout-terug|pay-tegoed|pay-kas):[a-f0-9]{64}$/;
 
 function gelijk(a, b) {
   return !!a && !!b && typeof a.id === 'string' && a.id.length > 0 &&

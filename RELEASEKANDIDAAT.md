@@ -182,7 +182,7 @@ zijn waarde houdt. Maar 24 bits zijn raadbaar aan de kassa van die zaak en een
 hash ervan is geen geheim voor wie de database heeft. Het alternatief is die
 codes nu ongeldig maken en de houder via de zaak een nieuwe laten roteren.
 
-**B9, derde en vierde type gemigreerd: het entreeticket
+**B9, vierde en vijfde type gemigreerd: het entreeticket
 (`travelos.activity_ticket_entry`) en het vervoerskaartje
 (`travelos.mobility_transport_ticket`).** De boeking en het kaartje dragen geen
 code meer. De credential is een 128-bit bearer (`TK.` en `OV.`), alleen als hash
@@ -204,8 +204,30 @@ houdt zijn waarde, want de houder toont een nieuwe code. En offline tonen: de
 app houdt de laatst getoonde code alleen in het geheugen van de pagina. Een pas
 die zonder verbinding opnieuw getoond moet kunnen worden, vraagt een besluit.
 
-Blijven over van B9: kascode, vooraf, tikcode, Invisible Arrival en
-WorkOS-werkruimtetokens.
+**B9, zesde en zevende type gemigreerd: RTG Pay aan de kassa (kascode, vooraf)
+en de tikcode.** Beide codes zijn nu 128 bits (`KC-`/`TK-`), staan alleen als
+hash in een eigen collectie (`kern/pay/kasbak.js`) en worden een keer getoond;
+een retry met dezelfde sleutel krijgt 409 zonder code. Uitgeven is roteren, en
+`/api/pay/kascode/intrek` en `/api/pay/tikcode/intrek` trekken server-side in.
+- Innen en vastzetten zijn een saga (`kern/pay/kas-claim.js`): de claim in de
+  collectietransactie, de samenstelling bevroren, per deel een boeking met een
+  `pay-kas`-sleutel (ook in de Rust-motor), dan afronden. Een crash wordt na een
+  lease van een minuut naar dezelfde zaak en hetzelfde bedrag afgemaakt; een
+  weigering draait terug en geeft de code terug.
+- Vastleggen en vrijgeven van een reservering lopen door `payVoorafAfloop`, een
+  rij per reservering; vrijgeven werkt ook tijdens een betaalstop.
+- De tik mag door een tafel worden gebruikt: hoogstens 25 keer, elk gebruik
+  geclaimd per betaler en sleutel.
+- Beproefd over twee PostgreSQL-instances plus een derde die hervat.
+
+Oude kale codes (hoogstens vijf minuten geldig) openen niets meer en worden bij
+de eerste handeling gewist. De ondertekende Link-drager van de kascode is een
+andere deur (`link.capability_aanvaarden`) en blijft in productie dicht. Het
+restrisico: bijladen is niet economisch gesleuteld, dus twee hervattingen die
+elkaars lease overschrijden kunnen de eigen wallet van het lid twee keer
+bijladen -- geld naar het lid zelf, geen dubbele betaling.
+
+Blijven over van B9: Invisible Arrival en WorkOS-werkruimtetokens.
 
 **Juridisch open (E8), en niet door code te beslissen:** een opwaardeerkaart die
 tegen nominale waarde in een uitbetaalbare wallet landt, is vermoedelijk

@@ -443,6 +443,7 @@ const REGISTERS = [
   ['LIEGRONDE.json', 'npm run liegronde:vast', 'of een scherm een zekerheid verzint als de backend leeg antwoordt, per onderdeel uit MAPPEN'],
   ['BEVOEGD.json', 'npm run bevoegdronde:vast', 'of een ander lid, een andere rol of een ander gezin bij het werk van een onderdeel uit MAPPEN kan'],
   ['DOELGROEPBEREIK.json', 'npm run doelgroepbereik:vast', 'of de VERKLAARDE doelgroep van een functie zijn eigen paden werkelijk kan bereiken'],
+  ['ONVERVREEMDBAAR.json', 'npm run onvervreemdbaar:vast', 'of een werkwoord van de universele bodem voor een gratis account achter betaling verdwijnt (SAMENLEVING.md SAM-01)'],
   ['AANVOERVORM.json', 'npm run aanvoervorm:vast', 'of de vijf terreinen van de aanvoer een VORM delen -- de vraag onder het aanvoercontract'],
 
   /* De ketenbereikmeting hoort bij deze groep en niet bij de gouden ketens: die

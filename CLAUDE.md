@@ -222,9 +222,15 @@ en nooit *mens → klasse → product* -- een positie is een toestand, de pas ze
 niets over de mens, en er komt nergens een maatschappelijke score. **Identiteit
 begrenst handelingen, niet het mens-zijn.** Let op de namen: `bodem` is bezet
 door de prijsondergrens in `kern/pasladder.js` (in code heet het
-`onvervreemdbaar`), en "Gemeenschap" botst met RTG Community. Par. 11.1 is de
-reden dat eerst gemeten moet worden: een Community-lid en een niet-lid zijn in de
-code allebei `tier === 'guest'`, en 101 bestanden toetsen daarop.
+`onvervreemdbaar`, de RTF-functie Toegang `insluiting`), en "Gemeenschap" botst
+met RTG Community -- de vervanger `nabijheid` bleek zelf bezet, dus die naam staat
+nog open. **De nulmeting staat** (`npm run onvervreemdbaar`,
+`ONVERVREEMDBAAR.json`): voor een geregistreerd gratis account is elk werkwoord
+aanwezig, *opnieuw beginnen* heeft geen eigenaar, en een gemeenteafspraak,
+aangifte en zorgintake zitten achter de pas. Let op de meetfout die eraan voorafging:
+`tier === 'guest'` is TWEE mensen -- een bezoeker zonder account (die `geenGast()`
+weigert) en een Community-lid met account -- en de demo-inlog `gast` van de
+doelgroepmeter is alleen de eerste. Wie "gratis" meet, registreert een account.
 
 **`CONNECT.md` is het diepte-document van Foundation Connect** -- het
 ontdeknetwerk van FoundationOS, op het scherm **Ontdekken**. In een zin: *je komt

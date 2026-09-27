@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2068 bestanden en 14591 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2069 bestanden en 14598 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2068 |
-| losse beweringen (`test(...)`) | 14591 |
+| toetsbestanden | 2069 |
+| losse beweringen (`test(...)`) | 14598 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 174 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1415 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 74 |
 | alleen in de kop *genoemd*, nog niet gemeten | 168 |
-| niets van beide | 411 |
+| niets van beide | 412 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1805 bestanden, 14128 beweringen.
+1806 bestanden, 14135 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1093,6 +1093,7 @@ toets omvalt.
 | `ontvanger.test.js` | 9 | gezakt op `===->!==#0` | DE ONTVANGEROPLOSSING -- wie krijgt een bericht, en wat als niemand het kreeg. server/kern/ontvanger.js vervangt `if (!a.key) return;` in kern/werk.js. |
 | `ontwerp.test.js` | 9 | geen module gevonden | RTG Interface Operating Standard: de visuele regels uit ONTWERP.md, machinaal gehandhaafd. Waarom deze toets bestaat. |
 | `ontwerpbank.test.js` | 5 | gezakt op `+->-#0` | DE GEDEELDE REKENKERN VAN DE VIER ONTWERPBANKEN. hash, kies en palet stonden byte voor byte gelijk in kern/architect/bank.js, kern/atelier/bank.js, kern/hardwarelab/bank.js en kern/studio/bank.js. |
+| `onvervreemdbaar.test.js` | 7 | -- | DE UNIVERSELE BODEM -- de nulmeting, en vooral wat zij niet mag beweren. scripts/onvervreemdbaar.js vraagt voor SAMENLEVING.md SAM-01 of een werkwoord van de bodem (leren, ontwikkelen, orienteren, verbinden, rust,... |
 | `oog.test.js` | 4 | gezakt op `liegpoort /api/` | RTG Eye: de camerabril van de werkvloer. De visielaag draait op het toestel; de server bewaart compacte, gecodeerde regels: nulmetingen en schouwen per voertuig, aangeleerde spullen en het knoploze uitgifteregister... |
 | `openbare-bouwstand.test.js` | 12 | gezakt op `true->false#0` | De grendel op een OPENBARE installatie die in Magnaat Test draait. WAAR HIJ VANDAAN KOMT. |
 | `oplaadgat.test.js` | 4 | gezakt op `===->!==#0` | AFGESCHREVEN MOET BIJGESCHREVEN WORDEN. WAT ER MISGING. |

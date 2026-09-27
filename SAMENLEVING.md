@@ -2,9 +2,10 @@
 
 *Richtingsdocument en grondwet, 27 september 2026. Zoals PLATFORM.md,
 ECONOMIE.md en HDI.md staat bij elk onderdeel of het **staat**, **een stap weg**
-is, **een besluit vraagt** of **jaren weg** is. Wat hier als stand staat is
-gelezen in de code en niet gemeten, dus draagt het de graad `vermoed` tot de
-nulmeting van par. 11 heeft gedraaid.*
+is, **een besluit vraagt** of **jaren weg** is. De bodem voor de gratis trede is
+inmiddels GEMETEN (`npm run onvervreemdbaar`, `ONVERVREEMDBAAR.json`, par. 11);
+de rest van wat hier als stand staat is gelezen in de code en draagt de graad
+`vermoed`.*
 
 ---
 
@@ -242,11 +243,11 @@ dingen houden het verschil vast:
 Dit is de goedkoopste paragraaf van het document, en die van `VERMOGENS`,
 `Pulse` en `moment` laten zien waarom hij voorop moet.
 
-| begrip hier | waar het al iets anders betekent | voorstel |
+| begrip hier | waar het al iets anders betekent | besluit (27 september 2026) |
 |---|---|---|
-| **bodem** | `bodemCenten` in `kern/pasladder.js` is de prijsondergrens van een trede, en PRIJZEN.md zegt met nadruk: *een bodem is geen prijs*. RTG Community heeft daar letterlijk `bodemCenten: 0`. Een tweede `bodem` die over mogelijkheden gaat, zou in hetzelfde bestand een andere betekenis krijgen | in proza "de universele bodem"; in code **`onvervreemdbaar`** (0 treffers in `server/` en `public/`) |
-| **Toegang** (RTF-functie) | WERELDEN.md maakt van **Access** een van vier begrippen: *wat mag ik*. De RTF-functie betekent iets anders: *niemand valt buiten* | in code **`insluiting`**; in proza mag "toegang" blijven zolang het bij de RTF staat |
-| **Gemeenschap** (RTF-functie) | **RTG Community** is de gratis trede. `kern/pasladder.js` noemt zelf de reden waarom "RTG Foundation" als productnaam afviel: *twee semantisch verschillende objecten horen twee namen te hebben* | in code niet `community` of `gemeenschap`; voorstel **`nabijheid`** (eerst zelf meten) |
+| **bodem** | `bodemCenten` in `kern/pasladder.js` is de prijsondergrens van een trede, en PRIJZEN.md zegt met nadruk: *een bodem is geen prijs*. RTG Community heeft daar letterlijk `bodemCenten: 0`. Een tweede `bodem` die over mogelijkheden gaat, zou in hetzelfde bestand een andere betekenis krijgen | in proza "de universele bodem"; in code **`onvervreemdbaar`** (gemeten: 0 treffers) -- **genomen** |
+| **Toegang** (RTF-functie) | WERELDEN.md maakt van **Access** een van vier begrippen: *wat mag ik*. De RTF-functie betekent iets anders: *niemand valt buiten* | in code **`insluiting`** (3 treffers, alle drie gewone lopende tekst en geen identifier) -- **genomen** |
+| **Gemeenschap** (RTF-functie) | **RTG Community** is de gratis trede. `kern/pasladder.js` noemt zelf de reden waarom "RTG Foundation" als productnaam afviel: *twee semantisch verschillende objecten horen twee namen te hebben* | gekozen was **`nabijheid`**, en die bleek bij het meten **bezet** met drie betekenissen: de nabijheid van een plek (`kern/voorspel/index.js:51`), de trede van een RELATIE in de kringladder (`kern/connect/kring.js:91`, CONNECT.md noemt die trap met zoveel woorden nabijheid) en een weegfactor voor wagen-tot-reiziger (`kern/mobiliteit/matching.js:26`). **Vraagt opnieuw een besluit**; vrij gemeten zijn `samenkomst`, `saamhorigheid`, `ontmoetingsplek` en `erbijhoren` (0 treffers) |
 | **vangnet** | 129 bestanden | niet gebruiken |
 | **ondergrens** | 85 bestanden, onder meer de prijsbodem en de mens-ondergrens van Service | niet als identifier gebruiken |
 
@@ -261,7 +262,7 @@ Bij elke regel staat wie hem handhaaft, en waar dat nog niemand is.
 
 | regel | inhoud | handhaver |
 |---|---|---|
-| **SAM-01** | **De bodem verdwijnt nooit achter betaling.** Geen van de zeven werkwoorden van par. 2 vraagt een betaalde pas. | **niemand**. Dat is precies wat de nulmeting moet meten |
+| **SAM-01** | **De bodem verdwijnt nooit achter betaling.** Geen van de zeven werkwoorden van par. 2 vraagt een betaalde pas. | `test/onvervreemdbaar.test.js` op `ONVERVREEMDBAAR.json`: geen werkwoord `verdwenen`, en het aantal functies (deels) achter betaling mag alleen dalen. De DEUR, niet de kamer, en op een indeling die nog niet is afgetekend (par. 11) |
 | **SAM-02** | **Geen maatschappelijke score.** Nergens wordt een positie, klasse of kwetsbaarheid van een mens berekend, opgeslagen of als sorteersleutel gebruikt, ook niet intern. | deels: `test/cijferopmens.test.js` en de CAR-05-familie; voor een positie-afleiding **niemand** |
 | **SAM-03** | **De pas zegt niets over de mens.** Uit een trede wordt nooit kwetsbaarheid, draagkracht of bescherming afgeleid, in geen van beide richtingen. | **niemand** |
 | **SAM-04** | **Identiteit begrenst handelingen, niet het mens-zijn.** De bodem vraagt geen bewezen identiteit, en een weigering op identiteit zegt hoe het wel kan. | **niemand** voor de bodem; `volwassen()` voor de handelingen erboven |
@@ -270,8 +271,8 @@ Bij elke regel staat wie hem handhaaft, en waar dat nog niemand is.
 | **SAM-07** | **Elke deelnamevorm die voor een functie bestaat, bestaat voor de bodem.** Wie via een gemachtigde of in begeleiding kan betalen, kan zo ook leren en hulp vinden. | **niemand** |
 
 Zes van de zeven hebben geen handhaver. Dat staat er liever dan een
-schijnbewaker (vergelijk AI-CONTEXT-02 in MENSNETWERK.md). SAM-01 krijgt de
-eerste, omdat die meetbaar is zonder één productbesluit (par. 11).
+schijnbewaker (vergelijk AI-CONTEXT-02 in MENSNETWERK.md). SAM-01 kreeg de
+eerste, omdat die meetbaar was zonder één productbesluit (par. 11).
 
 ## 11. De toetsvraag, en de meting die bepaalt of dit bestaat
 
@@ -282,63 +283,98 @@ Per product is de hoofdvraag niet alleen *wat krijg je voor deze prijs?* maar:
 > zetten?**
 
 Waar het antwoord nee is, is er een maatschappelijk gat gevonden. De tabel die
-dat beantwoordt, staat hieronder en is **ongemeten**:
+dat beantwoordt, is voor twee rijen GEMETEN (27 september 2026, graad `vermoed`,
+op de deur) en voor de rest nog niet:
 
 | | leren | ontwikkelen | oriënteren | verbinden | rust | hulp vinden | opnieuw beginnen |
 |---|---|---|---|---|---|---|---|
-| zonder account | ? | ? | ? | ? | ? | staat (HDI-voordeur) | ? |
-| RTG Community | ? | ? | ? | ? | ? | staat (Service) | ? |
-| RTG Pass | ? | ? | ? | ? | ? | staat | ? |
-| Business Lite | ? | ? | ? | ? | ? | ? | ? |
-| Business Pass | ? | ? | ? | ? | ? | staat | ? |
-| Lifestyle Pass | ? | ? | ? | ? | ? | staat | ? |
-| FoundationOS (gezin) | ? | ? | ? | ? | ? | ? | ? |
+| zonder account | nee | deels | ja | nee | nee | ja (HDI-voordeur) | geen eigenaar |
+| RTG Community | **ja** | **ja** | **ja** | **ja** | **ja** | **ja** | geen eigenaar |
+| RTG Pass en hoger | ? | ? | ? | ? | ? | ? | geen eigenaar |
+| Business Lite | bestaat nog niet als pas (`bestaatNog: false`) | | | | | | |
+| FoundationOS (gezin) | ? | ? | ? | ? | ? | ? | geen eigenaar |
 
-### 11.1 Wat bij het schrijven al bovenkwam, en waarom de meting eerst moet
+"Ja" betekent: minstens één functie die het werkwoord draagt, laat deze sessie
+langs de deur. De rij "zonder account" komt uit dezelfde meting (`zonderAccount`
+per functie) en is informatie en geen overtreding: de bodem belooft vandaag
+alleen de HDI-voordeur en de hulpwijzer zonder account.
 
-**Een lid met RTG Community en een niet-lid zijn in de code dezelfde waarde.**
-`kern/passen.js` zegt het met zoveel woorden: *een gast/gratis lid heeft tier
-`guest`*. Tegelijk toetsen **101 bestanden** in `server/` op `tier === 'guest'`,
-en AFSPRAAK.md stelde bij 45 van de 46 ledenroutes vast dat die toets betekent
-*is dit überhaupt een lid*. Voor de code is iemand op de maatschappelijke bodem
-dus per constructie iemand die er niet bij hoort.
+### 11.1 Wat bij het schrijven bovenkwam, en wat de meting ervan overliet
 
-Dat is een vermoeden en geen uitslag, om twee redenen die elkaar tegenwerken.
-Een deel van die toetsen bedoelt terecht "wie niet betaalt, koopt hier niets"
-(`kern/passen.js` noemt precies dat voorbeeld), en dat is geen bodemfunctie.
-Omgekeerd hangen `/api/veiligheid/rust` en de leerstofroutes gewoon aan `auth`
-zonder op `guest` te toetsen, dus daar is de bodem waarschijnlijk open. Welke
-kant de overhand heeft, zegt alleen een echte sessie.
+De eerste versie van deze paragraaf schreef: *een lid met RTG Community en een
+niet-lid zijn in de code dezelfde waarde*, want beide dragen `tier === 'guest'`
+en 101 bestanden toetsen daarop. **Dat was maar half waar.** `geenGast()` in
+`server/server.js` weigert alleen `guest` ZONDER `session.account`, met de zin
+*"Maak een gratis account (met paspoort) om vrienden toe te voegen en te
+chatten."* -- de code kent het verschil dus wel, op de plekken die `geenGast`
+gebruiken. Van de 101 bestanden noemen er 36 ook `account` (lexicaal); de andere 65
+zijn niet nagelopen.
 
-### 11.2 De nulmeting
+### 11.2 De nulmeting, en de meetfout die zij eerst maakte
 
-De meting bestaat grotendeels al. `DOELGROEPBEREIK.json` meet per cel (functie x
-doelgroep) of een verklaarde doelgroep met een echte sessie binnenkomt, en
-leest `dicht` alleen als de sessie geen enkel verschil maakte met anoniem
-(MAATSTAF.md par. 7f). Wat ontbreekt is een as, geen motor:
+`scripts/onvervreemdbaar.js` legt per functie uit de verklaring
+(`scripts/lib/onvervreemdbaar-verklaring.js`) drie verzoeken naast elkaar: een
+**geregistreerd gratis account**, een **RTG Pass** en **anoniem**. Komt de RTG
+Pass langs en het gratis account niet, dan is de pas het enige verschil en heet
+de route `achter-betaling`. Per route staat de foutzin erbij, want dat is een
+sessieverschil gelezen als pasverschil (graad `vermoed`).
 
-1. **De zeven werkwoorden als verklaring** over de bestaande functies uit
-   `MAPPEN`: welke functie draagt welk werkwoord. Dit is een verklaring en geen
-   afleiding, net als `LEDENVELDEN` in AI-CONTEXT-01, en een mens tekent haar af.
-2. **Een sessie op de gratis trede** in de sleutelbos van de proeven, naast de
-   sessies die er al zijn.
-3. **De uitslag per cel** in de standen van de doelgroepmeter, met één regel erbij:
-   een werkwoord van de bodem dat voor de gratis trede `dicht` is, is een
-   overtreding van SAM-01 en geen triagepunt.
+**De eerste ronde mat de verkeerde persoon**, en dat hoort hier te staan
+(BEWIJSMACHINE.md par. 6a). Hij leende de "gratis" sessie van de doelgroepmeter,
+en die is de DEMO-inlog: `guest` zonder account, een bezoeker. Uitslag: vijf
+functies achter betaling (Metier, vrienden verbinden, de kring, Buurtruil, de
+stadsraad), en alle vijf gaven de `geenGast`-zin. Met een echt gratis account
+langs `/api/auth/register` zijn het er nog **een**. Twee gevolgen:
 
-Pas daarna heeft het zin om Community, Business Lite, Pass, Business,
-Lifestyle, FoundationOS en HDI aan deze grondwet te toetsen. Zonder de meting
-is dit document een belofte over het huis in plaats van een beschrijving ervan.
+- **`DOELGROEPBEREIK.json` zegt over RTG Community niets.** Het register rekent
+  bezoeker en gratis account allebei tot de doelgroep `gast`
+  (`tierNaarDoelgroep`), maar de meter draagt alleen de bezoeker. Dezelfde vorm
+  als `foundation` daar (drie sessievormen, een gemeten), en dezelfde uitweg:
+  een tweede sessie of `onbepaald` met de reden. Niet in deze ronde gerepareerd;
+  het verschuift een andere meter en hoort een eigen wijziging te zijn.
+- **Een account opent meer dan een pas.** Voor de bodem is het verschil tussen
+  zonder en met account groter dan tussen gratis en betaald: leren, verbinden
+  en rust gaan pas open met een account. Een gratis account vraagt een paspoort
+  (de zin van `geenGast`), en dan staat SAM-04 er scherp: *identiteit begrenst
+  handelingen, niet het mens-zijn*. Of leren zonder paspoort hoort te kunnen, is
+  een besluit.
+
+**Wat er voor het gratis account achter betaling zit** (routes waar de RTG Pass
+langskomt en het gratis account niet):
+
+| functie | wat | foutzin |
+|---|---|---|
+| `dom-samen` | alle acht routes: samen-sessies | *Samen-sessies zijn voor leden.* |
+| `dom-gemeente` | een afspraak maken, belasting betalen | *Alleen voor leden.* |
+| `dom-overheid` | aangifte, een aanslag betalen | *Alleen voor leden.* |
+| `dom-care` | boeken, een intake delen | *Boeken kan alleen met een lidmaatschap.* / *Alleen voor leden.* |
+| `opvangwijzer` | een aanvraag klaarzetten | *Een aanvraag klaarzetten kan met een lidmaatschap.* |
+| `salon` | een deal claimen | *Alleen voor leden.* |
+
+Geen werkwoord verdwijnt daarmee (SAM-01 houdt), maar drie van deze regels
+zitten in **hulp vinden**: een afspraak bij de gemeente, aangifte bij de
+overheid en een zorgintake delen. Dat is geen commerciële functie maar een
+weg naar een instantie, en de foutzin noemt een Community-lid "geen lid". Een
+salondeal achter de pas is een terechte keuze; een gemeenteafspraak is het
+waarschijnlijk niet. Dat oordeel is een besluit en staat daarom niet in de
+meter.
+
+**Wat de meting niet zegt.** Of de indeling in werkwoorden klopt: die is een
+VOORSTEL en door geen mens afgetekend (`AFGETEKEND` in de verklaring). Of de
+kamer werkt: er gaat een leeg lichaam heen. En niets over de betaalde treden
+onderling of over het gezin in FoundationOS; die rijen blijven `?`.
 
 ## 12. De volgorde
 
 | # | wat | stand |
 |---|---|---|
 | 1 | Dit document als grondwet | **staat** |
-| 2 | De naamsbesluiten van par. 9, vóór de eerste identifier | **vraagt een besluit** |
-| 3 | De nulmeting van par. 11.2: de werkwoordverklaring, de gratis sessie en de uitslag per cel | **een stap weg** |
-| 4 | SAM-01 als ratel: het aantal dichte bodemcellen mag alleen dalen | na 3 |
-| 5 | `guest` splitsen in *geen lid* en *lid op de bodem*, als de meting laat zien dat het ertoe doet | na 3; raakt 101 bestanden, dus eerst de schaduw (CONTROLPLANE.md) |
+| 2 | De naamsbesluiten van par. 9, vóór de eerste identifier | `onvervreemdbaar` en `insluiting` **genomen**; de naam voor Gemeenschap **vraagt opnieuw een besluit** |
+| 3 | De nulmeting van par. 11.2 | **staat** voor het gratis account; de verklaring wacht op aftekening |
+| 4 | SAM-01 als ratel | **staat** (`test/onvervreemdbaar.test.js`) |
+| 4b | De doelgroepmeter een gratis-accountsessie geven naast de bezoeker | een stap weg (par. 11.2) |
+| 4c | Gemeenteafspraak, aangifte en zorgintake voor een Community-lid | **vraagt een besluit** (par. 11.2) |
+| 5 | `guest` splitsen in *bezoeker* en *lid op de bodem* | de code maakt het onderscheid al via `session.account`; 65 van de 101 bestanden zijn niet nagelopen |
 | 6 | Rust verhuizen van Veiligheid naar de bodem, plus de vijf eisen van par. 6 | een stap weg |
 | 7 | Eenvoudige taal als deelnamevorm | een stap weg |
 | 8 | De Foundation-rekening en de ANBI-vraag (GIFT.md) | **vraagt een besluit**; sluit de eerste pijl van de kringloop |

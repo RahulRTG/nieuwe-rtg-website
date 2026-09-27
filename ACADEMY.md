@@ -22,12 +22,11 @@ Allebei zijn eerlijk, en ze worden nooit opgeteld. De lus sluit in de REGELS
 (`server/kern/leerhuis/`): van een behoefte aan een operationsmens tot de
 leerling van gisteren die de volgende leerling traint, via een kennisverandering
 die uit de praktijk kwam. De Academy is toch niet klaar voor productie, want er
-staan vijf P0-blokkades open. Die staan hieronder bij naam, en de proef leest ze
+staan vier P0-blokkades open. Die staan hieronder bij naam, en de proef leest ze
 uit dezelfde lijst (`BLOKKADES` in `scripts/leerhuisproef.js`).
 
 | blokkade | klasse | wat er ontbreekt | sluit met |
 |---|---|---|---|
-| `API` | AUTHORITY | geen HTTP-deur: de actor komt pas uit een sessie als een route hem daar haalt | fase B-API (par. 6) |
 | `UI` | UX | geen scherm voor My Academy, Trainer, Manager en Knowledge Governance | fase B-UI (par. 6) |
 | `DOMEINPOORT` | AUTHORITY | geen RTG-domeinpoort leest AUTHORITY_ELIGIBLE als feit; geschiktheid verandert nog nergens een recht | besluit B1 |
 | `DUURZAAM` | RECOVERY | het spoor gaat via `save()`, niet via `db/duurzaam.js`; een certificaat kan een crash vlak na het antwoord niet overleven | besluit B4 plus regel 47 |
@@ -111,8 +110,9 @@ Gemeten over `server/` en `scripts/`, 27 september 2026.
    niet vanzelf. Dat is besluit B5, en tot dan hoort het leerhuis niet open te gaan
    voor wie de 18+-poort niet haalt.
 5. **De actor komt uit de sessie** (AUTHORITY.md grens 1). De kern neemt `door` als
-   argument en vertrouwt nooit een veld uit een verzoek. Dat een route hem uit de
-   sessie haalt, is blokkade `API`.
+   argument en vertrouwt nooit een veld uit een verzoek; `server/routes/leerhuis.js`
+   haalt hem uit `req.session.key` (of `req.kantoorKey` op naam), en toets 4 van
+   `test/leerhuis-routes.test.js` zakt zodra een veld uit het lijf meetelt.
 
 ## 4. Het model
 
@@ -173,7 +173,7 @@ De opdracht, par. 32 en 33: eerst één verticale lus, dan pas breedte.
 |---|---|---|
 | A Foundation | **staat** | gap-matrix, domeinmodel, grenzen, rol, vaardigheid, kennis, bewijs, standmachines |
 | B First Loop (kern) | **staat** | startplan, My Academy, trainer, oefenen, beoordeling, certificaat, brug |
-| B-API | **een stap weg** | HTTP-routes: een mutatiecontract per route, de actor uit de sessie, een toets op een echte server (LAT-regel 17) |
+| B-API | **staat** | drie routes (`/api/leerhuis/doe`, `/api/leerhuis/lees`, `/api/office/leerhuis/open`), de actor uit de sessie, een sleutel verplicht, alleen volwassen gekeurde leden, functie `leerhuis` standaard UIT; `test/leerhuis-routes.test.js` tegen een echte server, vijf mutaties nagetrokken |
 | B-UI | **een stap weg** | vier schermen (TODAY, PATH, PRACTICE, SKILLS, GROWTH, COACH voor het lid); vraagt B-API |
 | C Trainer Loop | **staat** in de kern | trainerladder, Train-the-Trainer als eigen vaardigheid, cockpit, gescheiden assessor |
 | D Knowledge Loop | **staat** in de kern | voorstel, versies, impact, verversen, hercertificering |
@@ -230,8 +230,10 @@ toetsbestand). Vier fouten zijn door de proeven gevonden en niet door lezen:
 
 ## 9. Wat hier niet bewezen is
 
-- Er komt geen server, HTTP of browser aan te pas. Dat de actor uit een sessie
-  komt, is dus niet bewezen (blokkade `API`).
+- De lusproef zelf draait zonder server. De HTTP-deur is apart bewezen
+  (`test/leerhuis-routes.test.js`): de actor komt uit de sessie, een veld `door`
+  in het lijf verandert niets, dicht is dicht zolang de functie uit staat. Er
+  komt nog geen browser aan te pas (blokkade `UI`).
 - Er is geen schaalbewering. De projectie loopt per vraag over het hele spoor van
   één organisatie (O(n)). Voor een organisatie met honderdduizend mensen en
   miljoenen bewijsstukken is een momentopname per persoon nodig, en die is er
@@ -252,7 +254,7 @@ toetsbestand). Vier fouten zijn door de proeven gevonden en niet door lezen:
 | 6 | organisatie-, rol-, competentiegraaf | rol en vaardigheid staan; de organisatiegraaf is dun (`eenheid`) |
 | 7 | Knowledge Core | staat, met besluit B3 |
 | 8 | curriculum, startplan | staat |
-| 9 | My Academy, vakstaat | leeskant staat, scherm niet |
+| 9 | My Academy, vakstaat | leeskant staat, ook over HTTP (`lees`); scherm niet |
 | 10 | leerstandmachine | staat |
 | 11 | oefenen, simulatie, bewijs | staat, simulatie klein |
 | 12 | beoordeling, certificaat, brug | staat, brug met besluit B1 |
@@ -273,7 +275,7 @@ toetsbestand). Vier fouten zijn door de proeven gevonden en niet door lezen:
 | 28 | human readiness, drills | jaren weg |
 | 29 | organisatiegeheugen | vertrek staat; overdracht van eigenaarschap niet |
 | 30 | prestatie | niet gemeten (par. 9) |
-| 31 | contracten, opslag | domeinacties staan; opslag in een spoor, geen JSON-blob als stand |
+| 31 | contracten, opslag | domeinacties staan, drie routes met een mutatiecontract; opslag in een spoor, geen JSON-blob als stand |
 | 32, 33 | volgorde, V1 | par. 6 |
 | 34 | gouden bewijzen A tot en met E | A, B, C in de lusproef; D en E in de grenzentoets |
 | 35 | negatieve toetsen | staat |

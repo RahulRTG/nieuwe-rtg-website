@@ -42,7 +42,6 @@ const [E, KO, CO, Q, A, T, M, N, N2] = ['lid:1', 'lid:2', 'lid:4', 'lid:5', 'lid
    Hij staat hier als DATA zodat de status niet los van het document kan lopen:
    test/leerhuis-lus.test.js zakt als ACADEMY.md een blokkade niet noemt. */
 const BLOKKADES = [
-  { id: 'API', klasse: 'AUTHORITY', wat: 'er is nog geen HTTP-deur; de actor komt pas uit een sessie als een route hem daar haalt', sluit: 'fase B-API (ACADEMY.md par. 6)' },
   { id: 'UI', klasse: 'UX', wat: 'er is nog geen scherm (My Academy, Trainer, Manager, Knowledge Governance)', sluit: 'fase B-UI' },
   { id: 'DOMEINPOORT', klasse: 'AUTHORITY', wat: 'geen RTG-domeinpoort leest AUTHORITY_ELIGIBLE als feit; geschiktheid verandert nog nergens een recht', sluit: 'besluit ACADEMY-B1' },
   { id: 'DUURZAAM', klasse: 'RECOVERY', wat: 'het spoor gaat via save() en niet via db/duurzaam.js; een certificaat kan een crash vlak na het antwoord niet overleven', sluit: 'besluit ACADEMY-B4 plus regel 47' },

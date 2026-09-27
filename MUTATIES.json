@@ -1835,6 +1835,14 @@
       "gezakt": 8,
       "scherp": "gezakt"
     },
+    "codecredentials-kortecode.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/codecredentials.js",
+      "operator": "return-weg#0",
+      "gezakt": 2,
+      "geprobeerd": 8
+    },
     "codecredentials.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2060,6 +2068,13 @@
       "geprobeerd": 1
     },
     "concern-scherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "concern-uitnodiging-credential.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
@@ -4642,6 +4657,13 @@
       "gezakt": 10,
       "scherp": "gezakt"
     },
+    "kantooruitnodiging-credential.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "kantooruitnodiging.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -5505,6 +5527,13 @@
       "operator": "!==->===#0",
       "gezakt": 2,
       "geprobeerd": 2
+    },
+    "magnaat-teamkamer-credential.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "magnaat-teamkamer-productie.test.js": {
       "soort": "puur",
@@ -8732,6 +8761,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "scherp": "gezakt"
+    },
+    "service-bevestigingscode.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "sessie-herstart.test.js": {

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2109 bestanden en 14808 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2115 bestanden en 14845 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2109 |
-| losse beweringen (`test(...)`) | 14808 |
+| toetsbestanden | 2115 |
+| losse beweringen (`test(...)`) | 14845 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 173 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1446 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1451 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 75 |
 | alleen in de kop *genoemd*, nog niet gemeten | 172 |
-| niets van beide | 416 |
+| niets van beide | 417 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1847 bestanden, 14346 beweringen.
+1853 bestanden, 14383 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -293,7 +293,9 @@ toets omvalt.
 | `clips.test.js` | 9 | gezakt op `liegpoort /api/` | RTG Clips: korte verticale video's die alleen op het toestel van de maker staan (OPFS). De server bewaart enkel de kaart (titel, duur, affiche) en relayeert signalen; de feed is een eindige dagselectie zonder... |
 | `clubdorp.test.js` | 4 | gezakt op `liegpoort /api/` | Het clubdorp: bars, clubs en beachclubs krijgen dezelfde afdelingen-motor als het hotel, maar met de eigen afdelingen van de nachtzaak: van de deur en de garderobe tot promo, inkoop en het kantoor. Draai los: node... |
 | `clubs.test.js` | 8 | gezakt op `liegpoort /api/` | RTG Clubs: de golf- en countryclub (Sa Roca) en de sport- en fitnessclub (Fortia). Bewaakt de tee sheet zonder dubbele flights, de lessen van de pro's, de maandbeker met vol-is-vol, de baanstatus, de ledenpas met... |
+| `codecredentials-kortecode.test.js` | 3 | gezakt op `return-weg#0` | De ENIGE weg onder de 128 bit in CODECREDENTIALS.json: een verklaarde korte menscode (`beleid.korte_menscode`), voor een code die een mens voorleest. Deze toets houdt de uitzondering smal: zonder binding, rem,... |
 | `codecredentials.test.js` | 12 | gezakt op `return-weg#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `codedeuren-claim.pg.test.js` | 1 | -- | Echte productie-topologieproef voor vier codedeuren die op 27 september 2026 van `remaining` naar `migrated` gingen: workos.concern_uitnodiging, office.kantooruitnodiging, service.balie_bevestigingscode en... |
 | `codegrens.test.js` | 3 | geen bruikbare mutatie | CODE-AI-001 -- DE RUNTIME-AI KOMT NOOIT AAN DE BRON. Dit huis heeft vandaag twee gescheiden intelligenties, en die scheiding is waardevoller dan hij eruitziet: RUNTIME het stuur (kern/stuur/*) bestuurt RTG via... |
 | `codewereld.test.js` | 7 | geen module gevonden | DE CODEWERELD TELT INDEXEN NIET ALS GEDRAG. Twee keer op rij sprong hier een dekkingsgetal omhoog zonder dat er iets bij was gekomen: eerst bij SYMBOLEN.json (bronbereik 33% -> 100%) en daarna bij AANROEPGRAAF.json... |
 | `collectie-transactie-sqlite.test.js` | 1 | gezakt op `===->!==#0` | De collectie-transactie tegen twee ECHTE processen op dezelfde SQLite-WAL. Eén verwachte revisie mag precies één keer winnen; een gooiende callback mag geen gewijzigde RAM- of schijfstaat achterlaten. |
@@ -320,6 +322,7 @@ toets omvalt.
 | `commerce.test.js` | 10 | gezakt op `&&->||#0` | DE COMMERCE-METING -- en of hij werkelijk iets onderscheidt. scripts/commerce.js beantwoordt de vraag uit COMMERCE.md par. |
 | `commercie.test.js` | 14 | gezakt op `return-weg#0` | DE COMMERCIELE KERN: twee invarianten die over geld gaan. Allebei komen ze uit een gat dat de doorlichting van 20 augustus 2026 vond, en allebei zijn ze van de soort "het scherm klopte en het geld niet". |
 | `commercieel.test.js` | 16 | gezakt op `!==->===#0` | COMMERCIELE COMMUNICATIE -- toestemming, en niet een voorkeur. DE BEWERING DIE ERTOE DOET staat in toets 1: alles staat standaard UIT. |
+| `concern-uitnodiging-credential.test.js` | 9 | gezakt op `liegpoort /api/` | De code van een concernuitnodiging als credential (workos.concern_uitnodiging), control voor control: 128 bit en eenmaal tonen, hash-only opslag, issuer/doel/ scope, vervaltijd, max_gebruik 1, intrekken en roteren... |
 | `concern-vestiging.test.js` | 1 | gezakt op `liegpoort /api/` | RTG Concern: VESTIGINGEN, tegen een echte server (routes/concern/vestiging.js). De vestigingsroutes gingen naar een eigen deelmodule toen de samenvoeging van twee takken routes/concern.js over de 10 kB duwde. |
 | `concern-voorstel.test.js` | 5 | gezakt op `===->!==#0` | STAP 9: WAT UIT EEN DOCUMENT KOMT IS EEN VOORSTEL, NOOIT EEN FEIT. WAAROM DIT BESTAAT Document Intelligence is het deel dat het meest indrukwekkend oogt en het makkelijkst fout gaat: een patroonherkenner die zijn... |
 | `concern.test.js` | 15 | gezakt op `getal+1#2` | RTG CONCERN: HET BEDRIJF BOVEN DE ZAAK. WAAROM DIT BESTAAT Een bedrijf was hier een rij in `suppliers`: een code, een naam en een genre. |
@@ -746,6 +749,7 @@ toets omvalt.
 | `kantoormacht.test.js` | 11 | gezakt op `getal+1#0` | DE KANTOORMACHT-METER (scripts/kantoormacht.js). KANTOORMACHT.md par. |
 | `kantoorpakket-alle.test.js` | 10 | gezakt op `liegpoort /api/` | RTG Office voor het hele ecosysteem: leden (alle passen), elke leverancier en partner (team-drive per zaak), de eigen RTG-kantoren (kantoor-drive) en RTF-leden (per gezinsprofiel, met delen binnen het gezin). Bewaakt... |
 | `kantoorroutes.test.js` | 3 | -- | De kantoorroutes: officeAuth laat door, de handeling vraagt wie er zit. |
+| `kantooruitnodiging-credential.test.js` | 7 | gezakt op `liegpoort /api/` | De kantooruitnodiging als credential (office.kantooruitnodiging), control voor control: 128 bit en eenmaal tonen, hash-only opslag, issuer/doel/scope en de binding aan EEN sleutel, vervaltijd, max_gebruik 1,... |
 | `kantooruitnodiging.test.js` | 3 | gezakt op `liegpoort /api/` | DE KANTOORUITNODIGING (AUTHORITY.md fase 2, gebouwd naast de gedeelde code). Vijf dingen die niet mogen sneuvelen: 1. |
 | `kantoorwereld.test.js` | 11 | gezakt op `===->!==#0` | RTG Kantoor, de samenhanglaag. Wat hier getoetst wordt is niet of de lijst klopt -- dat weten de vier domeinen zelf -- maar of deze laag zich aan zijn eigen belofte houdt: hij bezit niets, hij verzint niets, en hij... |
 | `kantoren-uitbreiding.test.js` | 5 | gezakt op `liegpoort /api/` | De kantoren-uitbreiding: vijf nieuwe kamers (Support team, Ingenieurs, Consumenten- en Partner-abonnementen, Kantine), de kantine-kaart van vandaag, en de identiteitskluis-inzage: kamers met naamInzage (en de... |
@@ -897,6 +901,7 @@ toets omvalt.
 | `magnaat-partnerstudio.test.js` | 8 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `magnaat-rtgketen.test.js` | 9 | gezakt op `===->!==#0` | MAGNAAT STELT ZIJN GELDPOMPVRAAG AAN RTG PAY. `MAGNAATLAB.md` par. |
 | `magnaat-rust-integratie.test.js` | 2 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `magnaat-teamkamer-credential.test.js` | 8 | gezakt op `liegpoort /api/` | De toegangscode van een Magnaat-teamkamer (magnaat.teamkamer_toegangscode), control voor control: 128 bit en eenmaal tonen, hash-only opslag, issuer/doel/ scope, vervaltijd, max_gebruik, roteren en intrekken door de... |
 | `magnaat-teamkamer-productie.test.js` | 2 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `magnaat-trainingslobby.test.js` | 4 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `magnaat-voorzijde.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -1472,6 +1477,7 @@ toets omvalt.
 | `semdiff.test.js` | 14 | genoemd | HET REGRESSIECORPUS VAN DE SEMANTISCHE DIFF. Deze laag levert de ONDERGRENS waarmee scripts/lib/risico.js verder rekent. |
 | `sentinel.test.js` | 1 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `server.test.js` | 9 | gezakt op `liegpoort /api/` | Integratietests: een echte server draaien in een geisoleerde datamap en de kernflows over HTTP uitoefenen. Dit bewaakt precies de plekken waar geld en wet aan hangen: de fiscale rekenmachine, de leeftijdslaag, De... |
+| `service-bevestigingscode.test.js` | 9 | gezakt op `liegpoort /api/` | De terugvalcode van een supportbevestiging (service.balie_bevestigingscode), control voor control. De code BLIJFT zes cijfers -- een lid leest hem aan de telefoon voor -- en is daarom een verklaarde korte menscode:... |
 | `service-routes.test.js` | 7 | genoemd | DE ZESTIEN ROUTES VAN RTG SERVICE DIE NERGENS VOLUIT STONDEN. WAAROM DIT BESTAND BESTAAT. |
 | `service.test.js` | 7 | -- | RTG SERVICE: DE GEMEENSCHAPPELIJKE ENVELOP. Deze toetsen leggen vooral vast wat de servicelaag NIET doet, want dat is waar de merkregels zitten en wat bij een verbouwing als eerste sneuvelt: 1. |
 | `servicecaps-releasepoort.test.js` | 2 | -- | SERVICECAPABILITIES ZIJN EEN RELEASEPOORT, GEEN RAPPORT. scripts/check.js heeft bewust een aflopende ratel voor dagelijks werk. |

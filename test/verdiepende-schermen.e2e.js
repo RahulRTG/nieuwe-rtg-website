@@ -59,10 +59,22 @@ test('de elf verdiepingsschermen openen en brengen een mens naar de volgende sta
     letOpFouten(page, fouten);
 
     await openEnZie(page, server.base, '/apps/decision-room.html', /Beslis waar het nodig is/);
+    /* De eigen tabbalk van de kamer is met een muis te bedienen. Hij lag tot
+       27 september 2026 precies onder de onderbalk van de Edge; een gewone klik
+       struikelt daarop ("intercepts pointer events"). Eerst wachten tot de Edge
+       er staat: zonder die wacht klikte de toets voordat de balk er was, en
+       stond hij groen op het scherm met het gebrek. */
+    const edgeKlaar = () => page.waitForFunction(() => document.body.getAttribute('data-rtg-adaptive-ready') === 'true', null, { timeout: 15000 });
+    await edgeKlaar();
+    await page.locator('.dr-nav button').nth(1).click({ timeout: 5000 });
+    await page.waitForFunction(() => document.querySelectorAll('.dr-nav button')[1]?.getAttribute('aria-current') === 'page');
     await page.locator('[data-dr-nieuw]').first().click();
     await page.locator('#drIntake').waitFor({ state: 'visible' });
 
     await openEnZie(page, server.base, '/apps/project-room.html', /Maak voortgang voelbaar/);
+    await edgeKlaar();
+    await page.locator('.pr-nav button').nth(1).click({ timeout: 5000 });
+    await page.waitForFunction(() => document.querySelectorAll('.pr-nav button')[1]?.getAttribute('aria-current') === 'page');
     await page.locator('[data-pr-huis="rtf"]').click();
     await page.waitForFunction(() => document.querySelector('[data-pr-huis="rtf"]')?.getAttribute('aria-pressed') === 'true');
 

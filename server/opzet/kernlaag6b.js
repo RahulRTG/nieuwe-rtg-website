@@ -61,5 +61,11 @@ kern.arrivalpas = require('../kern/arrivalpas')({ db, bewerkCollectie: hulp.bewe
    manager van de zaak delen dit ene register. */
 kern.doosSleutels = require('../kern/zaakdoos/sleutels').doosSleutelsVan({ db, save: hulp.save,
   bewerkCollectie: hulp.bewerkCollectie, crypto });
+/* De personeelsuitnodiging (routes/supplier/werving/uitnodiging.js): EEN
+   instantie met de collectietransactie. Werving en supplier maakten er elk een
+   eigen met alleen `kern`, en kern draagt bewerkCollectie niet -- dus de claim
+   nam stil de niet-transactionele weg, over twee instances niet atomair. */
+kern.personeelsUitnodiging = require('../routes/supplier/werving/uitnodiging')({
+  kern: Object.assign(Object.create(kern), { bewerkCollectie: hulp.bewerkCollectie }) });
 
 };

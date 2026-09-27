@@ -2241,6 +2241,7 @@
       "paspoortVraag",
       "pay",
       "pc",
+      "personeelsUitnodiging",
       "persoonsPoort",
       "persoonseis",
       "petcare",
@@ -2660,6 +2661,7 @@
       "loginFails",
       "noteFailedTry",
       "notifySupplier",
+      "personeelsUitnodiging",
       "verbindCode",
       "verbindLid",
       "zoekInvite"

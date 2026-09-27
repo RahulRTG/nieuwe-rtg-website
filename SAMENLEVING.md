@@ -247,7 +247,7 @@ Dit is de goedkoopste paragraaf van het document, en die van `VERMOGENS`,
 |---|---|---|
 | **bodem** | `bodemCenten` in `kern/pasladder.js` is de prijsondergrens van een trede, en PRIJZEN.md zegt met nadruk: *een bodem is geen prijs*. RTG Community heeft daar letterlijk `bodemCenten: 0`. Een tweede `bodem` die over mogelijkheden gaat, zou in hetzelfde bestand een andere betekenis krijgen | in proza "de universele bodem"; in code **`onvervreemdbaar`** (gemeten: 0 treffers) -- **genomen** |
 | **Toegang** (RTF-functie) | WERELDEN.md maakt van **Access** een van vier begrippen: *wat mag ik*. De RTF-functie betekent iets anders: *niemand valt buiten* | in code **`insluiting`** (3 treffers, alle drie gewone lopende tekst en geen identifier) -- **genomen** |
-| **Gemeenschap** (RTF-functie) | **RTG Community** is de gratis trede. `kern/pasladder.js` noemt zelf de reden waarom "RTG Foundation" als productnaam afviel: *twee semantisch verschillende objecten horen twee namen te hebben* | gekozen was **`nabijheid`**, en die bleek bij het meten **bezet** met drie betekenissen: de nabijheid van een plek (`kern/voorspel/index.js:51`), de trede van een RELATIE in de kringladder (`kern/connect/kring.js:91`, CONNECT.md noemt die trap met zoveel woorden nabijheid) en een weegfactor voor wagen-tot-reiziger (`kern/mobiliteit/matching.js:26`). **Vraagt opnieuw een besluit**; vrij gemeten zijn `samenkomst`, `saamhorigheid`, `ontmoetingsplek` en `erbijhoren` (0 treffers) |
+| **Gemeenschap** (RTF-functie) | **RTG Community** is de gratis trede. `kern/pasladder.js` noemt zelf de reden waarom "RTG Foundation" als productnaam afviel: *twee semantisch verschillende objecten horen twee namen te hebben* | in code **`samenkomst`** (gemeten: 0 treffers) -- **genomen**. Eerst gekozen was `nabijheid`, en die bleek **bezet** met drie betekenissen: de nabijheid van een plek (`kern/voorspel/index.js:51`), de trede van een RELATIE in de kringladder (`kern/connect/kring.js:91`) en een weegfactor voor wagen-tot-reiziger (`kern/mobiliteit/matching.js:26`) |
 | **vangnet** | 129 bestanden | niet gebruiken |
 | **ondergrens** | 85 bestanden, onder meer de prijsbodem en de mens-ondergrens van Service | niet als identifier gebruiken |
 
@@ -339,25 +339,38 @@ langs `/api/auth/register` zijn het er nog **een**. Twee gevolgen:
   handelingen, niet het mens-zijn*. Of leren zonder paspoort hoort te kunnen, is
   een besluit.
 
-**Wat er voor het gratis account achter betaling zit** (routes waar de RTG Pass
-langskomt en het gratis account niet):
+**Wat er voor het gratis account achter betaling zat** (routes waar de RTG Pass
+langskwam en het gratis account niet):
 
-| functie | wat | foutzin |
-|---|---|---|
-| `dom-samen` | alle acht routes: samen-sessies | *Samen-sessies zijn voor leden.* |
-| `dom-gemeente` | een afspraak maken, belasting betalen | *Alleen voor leden.* |
-| `dom-overheid` | aangifte, een aanslag betalen | *Alleen voor leden.* |
-| `dom-care` | boeken, een intake delen | *Boeken kan alleen met een lidmaatschap.* / *Alleen voor leden.* |
-| `opvangwijzer` | een aanvraag klaarzetten | *Een aanvraag klaarzetten kan met een lidmaatschap.* |
-| `salon` | een deal claimen | *Alleen voor leden.* |
+| functie | wat | foutzin | stand na besluit 4c |
+|---|---|---|---|
+| `dom-gemeente` | een afspraak maken | *Alleen voor leden.* | **open na paspoortcontrole** |
+| `dom-overheid` | aangifte doen | *Alleen voor leden.* | **open na paspoortcontrole** |
+| `dom-care` | een intake delen | *Alleen voor leden.* | **open na paspoortcontrole** |
+| `dom-gemeente` / `dom-overheid` | belasting of een aanslag betalen | *Alleen voor leden.* | achter de pas: geld, niet besloten |
+| `dom-care` | een behandeling boeken | *Boeken kan alleen met een lidmaatschap.* | achter de pas: boeking, niet besloten |
+| `dom-samen` | alle acht routes: samen-sessies | *Samen-sessies zijn voor leden.* | achter de pas |
+| `opvangwijzer` | een aanvraag klaarzetten | *Een aanvraag klaarzetten kan met een lidmaatschap.* | achter de pas |
+| `salon` | een deal claimen | *Alleen voor leden.* | achter de pas, en terecht |
 
-Geen werkwoord verdwijnt daarmee (SAM-01 houdt), maar drie van deze regels
-zitten in **hulp vinden**: een afspraak bij de gemeente, aangifte bij de
-overheid en een zorgintake delen. Dat is geen commerciële functie maar een
-weg naar een instantie, en de foutzin noemt een Community-lid "geen lid". Een
-salondeal achter de pas is een terechte keuze; een gemeenteafspraak is het
-waarschijnlijk niet. Dat oordeel is een besluit en staat daarom niet in de
-meter.
+**Besluit 4c (27 september 2026).** De gemeenteafspraak, de aangifte en de
+zorgintake zijn wegen naar een instantie en horen bij *hulp vinden*. Ze staan
+open voor een gratis account, maar pas nadat RTG het paspoort heeft gezien.
+Dat is geen nieuwe identiteitsregel maar `idGeverifieerd()` uit
+`server/server.js`, en hij woont op een plek: `server/kern/onvervreemdbaar.js`
+(`maakPaspoortdeur`). Drie dingen liggen daar vast en worden alle drie tegen een
+echte server beproefd (`test/paspoortdeur.test.js`, met twee mutaties die hem
+laten zakken): een betaalde pas merkt er niets van, een bezoeker zonder account
+blijft buiten, en elke weigering zegt in `hoe` hoe het wel kan (SAM-04). Wat
+ernaast staat en geld is -- een aanslag of gemeentebelasting BETALEN -- is met
+opzet niet meegegaan.
+
+**De meter meet daarom een GECONTROLEERD gratis account.** Wie met een
+ongecontroleerd account meet, noemt een route die achter de paspoortcontrole
+zit "achter betaling" -- dezelfde vorm als de eerste meetfout hierboven. Het
+ongecontroleerde account staat ernaast als kolom (`zonderControle` per route,
+`achterPaspoortcontrole` per functie), zodat zichtbaar blijft wat de controle
+opent.
 
 **Wat de meting niet zegt.** Of de indeling in werkwoorden klopt: die is een
 VOORSTEL en door geen mens afgetekend (`AFGETEKEND` in de verklaring). Of de
@@ -369,11 +382,11 @@ onderling of over het gezin in FoundationOS; die rijen blijven `?`.
 | # | wat | stand |
 |---|---|---|
 | 1 | Dit document als grondwet | **staat** |
-| 2 | De naamsbesluiten van par. 9, vóór de eerste identifier | `onvervreemdbaar` en `insluiting` **genomen**; de naam voor Gemeenschap **vraagt opnieuw een besluit** |
+| 2 | De naamsbesluiten van par. 9, vóór de eerste identifier | **genomen**: `onvervreemdbaar`, `insluiting`, `samenkomst` |
 | 3 | De nulmeting van par. 11.2 | **staat** voor het gratis account; de verklaring wacht op aftekening |
 | 4 | SAM-01 als ratel | **staat** (`test/onvervreemdbaar.test.js`) |
 | 4b | De doelgroepmeter een gratis-accountsessie geven naast de bezoeker | een stap weg (par. 11.2) |
-| 4c | Gemeenteafspraak, aangifte en zorgintake voor een Community-lid | **vraagt een besluit** (par. 11.2) |
+| 4c | Gemeenteafspraak, aangifte en zorgintake voor een Community-lid | **staat**: open na paspoortcontrole (`server/kern/onvervreemdbaar.js`) |
 | 5 | `guest` splitsen in *bezoeker* en *lid op de bodem* | de code maakt het onderscheid al via `session.account`; 65 van de 101 bestanden zijn niet nagelopen |
 | 6 | Rust verhuizen van Veiligheid naar de bodem, plus de vijf eisen van par. 6 | een stap weg |
 | 7 | Eenvoudige taal als deelnamevorm | een stap weg |

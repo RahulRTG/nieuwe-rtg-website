@@ -90,7 +90,8 @@ test('4. de classificatie per route, functie en werkwoord', () => {
 test('5. "gratis" is een geregistreerd account en niet de demo-gast zonder account', () => {
   assert.match(bron, /\/api\/auth\/register/);
   assert.match(bron, /tier: 'guest'/);
-  assert.match(bron, /const gratisKop = \{ Authorization: 'Bearer ' \+ gratisToken \}/);
+  assert.match(bron, /const gratisKop = \{ Authorization: 'Bearer ' \+ gratisAccount\.token \}/);
+  assert.match(bron, /keurLidGoed\(srv\.basis, gratisAccount\.token/, 'het oordeel hoort op een GECONTROLEERD gratis account te staan');
   assert.match(bron, /klop\(srv\.basis, r, gratisKop\)/,
     'de gratis kolom moet de geregistreerde sessie gebruiken, anders meet hij een bezoeker zonder account');
   assert.doesNotMatch(bron, /klop\(srv\.basis, r, kop\(sessies\.gast\)\)/);

@@ -112,8 +112,8 @@ async function registreerGratis(basis) {
       password: 'geheim12345', geboortedatum: '1985-05-05', tier: 'guest' }) }).catch(() => null);
   if (!r) return null;
   const j = await r.json().catch(() => null);
-  const tier = j && j.state && j.state.user && j.state.user.tier;
-  return (j && j.token && tier === 'guest') ? j.token : null;
+  const gebruiker = j && j.state && j.state.user;
+  return (j && j.token && gebruiker && gebruiker.tier === 'guest') ? { token: j.token, codenaam: gebruiker.codename } : null;
 }
 
 function onderVoorvoegsel(pad, prefix) {
@@ -168,15 +168,31 @@ async function meet() {
        aangemaakt, en de bezoeker staat ernaast als eigen kolom. */
     const { sessies, overgeslagen } = await haalDoelgroepen(srv.basis, ['gast', 'rtg']);
     uit.overgeslagen = overgeslagen;
-    const gratisToken = await registreerGratis(srv.basis);
-    if (!gratisToken) uit.overgeslagen.push({ doelgroep: 'gratis', reden: 'registreren met tier guest leverde geen sessie op' });
-    if (!gratisToken || !sessies.rtg) {
+    /* EN HET GRATIS ACCOUNT WAAR HET OORDEEL OP STAAT IS GECONTROLEERD. Het
+       besluit van 27 september 2026 opende drie hulproutes voor een gratis
+       account NA een paspoortcontrole (server/kern/onvervreemdbaar.js). Wie
+       met een ongecontroleerd account meet, noemt een route die achter de
+       controle zit "achter betaling" -- dezelfde vorm als de eerste meetfout
+       hierboven. De controle loopt langs de echte keuring (keurLidGoed uit
+       test/helper, zoals scripts/chaos.js die ook leent), en het account
+       ZONDER controle staat ernaast als eigen kolom. */
+    const gratisAccount = await registreerGratis(srv.basis);
+    const ongecontroleerd = await registreerGratis(srv.basis);
+    let gecontroleerd = false, keurFout = null;
+    if (gratisAccount) {
+      try { await require('../test/helper').keurLidGoed(srv.basis, gratisAccount.token, gratisAccount.codenaam); gecontroleerd = true; }
+      catch (e) { keurFout = String((e && e.message) || e); }
+    }
+    if (!gratisAccount) uit.overgeslagen.push({ doelgroep: 'gratis', reden: 'registreren met tier guest leverde geen sessie op' });
+    else if (!gecontroleerd) uit.overgeslagen.push({ doelgroep: 'gratis', reden: 'de paspoortcontrole lukte niet: ' + keurFout });
+    if (!gratisAccount || !gecontroleerd || !sessies.rtg) {
       uit.klopt = false;
-      uit.reden = 'zonder een gratis account EN een RTG-sessie is er niets te vergelijken; niet gemeten is geen uitslag';
+      uit.reden = 'zonder een gecontroleerd gratis account EN een RTG-sessie is er niets te vergelijken; niet gemeten is geen uitslag';
       return uit;
     }
     const kop = (s) => s.draag().kop;
-    const gratisKop = { Authorization: 'Bearer ' + gratisToken };
+    const gratisKop = { Authorization: 'Bearer ' + gratisAccount.token };
+    const ongecontroleerdKop = ongecontroleerd ? { Authorization: 'Bearer ' + ongecontroleerd.token } : null;
     const bezoekerKop = sessies.gast ? kop(sessies.gast) : null;
     const verboden = new Set((NIET_AANRAKEN || []).map((n) => n.pad));
     const routes = alleRoutes().filter((r) => r.pad.startsWith('/api/') && !verboden.has(r.pad));
@@ -199,22 +215,27 @@ async function meet() {
           if (!gemeten.has(sleutel)) {
             const mijn = routes.filter((r) => paden.some((p) => onderVoorvoegsel(r.pad, p))).slice(0, MAX_PER_FUNCTIE);
             const perRoute = [];
-            let anoniemOpen = false, bezoekerOpen = false;
+            let anoniemOpen = false, bezoekerOpen = false, achterControle = false;
             for (const r of mijn) {
               const gratis = await klop(srv.basis, r, gratisKop);
               const rtg = await klop(srv.basis, r, kop(sessies.rtg));
               const anoniem = await klop(srv.basis, r, null);
               const bezoeker = bezoekerKop ? await klop(srv.basis, r, bezoekerKop) : null;
+              const zonderControle = ongecontroleerdKop ? await klop(srv.basis, r, ongecontroleerdKop) : null;
+              if (zonderControle && !zonderControle.onbepaald && WEIGERSTATUS.has(zonderControle.status) &&
+                  !WEIGERSTATUS.has(gratis.status)) achterControle = true;
               if (!anoniem.onbepaald && !WEIGERSTATUS.has(anoniem.status)) anoniemOpen = true;
               if (bezoeker && !bezoeker.onbepaald && !WEIGERSTATUS.has(bezoeker.status)) bezoekerOpen = true;
               perRoute.push({ route: r.methode + ' ' + r.pad, stand: klasseRoute({ gratis, rtg }),
                 gratis: gratis.status, rtg: rtg.status, bezoeker: bezoeker ? bezoeker.status : null,
+                zonderControle: zonderControle ? zonderControle.status : null,
                 redenGratis: gratis.reden || undefined });
             }
             const k = klasseFunctie(perRoute.map((x) => x.stand));
             gemeten.set(sleutel, { functie: regel.functie, naam: f ? f.naam : null, paden, stand: k.stand,
               telling: k.telling, zonderAccount: mijn.length ? (anoniemOpen ? 'open' : 'dicht') : 'niet-beproefd',
               bezoeker: !mijn.length || !bezoekerKop ? 'niet-beproefd' : (bezoekerOpen ? 'open' : 'dicht'),
+              achterPaspoortcontrole: achterControle,
               routes: perRoute, reden: mijn.length ? undefined : 'geen route van dit huis valt onder ' + paden.join(', ') });
           }
           uitslag = gemeten.get(sleutel);

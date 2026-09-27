@@ -222,12 +222,15 @@ en nooit *mens → klasse → product* -- een positie is een toestand, de pas ze
 niets over de mens, en er komt nergens een maatschappelijke score. **Identiteit
 begrenst handelingen, niet het mens-zijn.** Let op de namen: `bodem` is bezet
 door de prijsondergrens in `kern/pasladder.js` (in code heet het
-`onvervreemdbaar`, de RTF-functie Toegang `insluiting`), en "Gemeenschap" botst
-met RTG Community -- de vervanger `nabijheid` bleek zelf bezet, dus die naam staat
-nog open. **De nulmeting staat** (`npm run onvervreemdbaar`,
-`ONVERVREEMDBAAR.json`): voor een geregistreerd gratis account is elk werkwoord
-aanwezig, *opnieuw beginnen* heeft geen eigenaar, en een gemeenteafspraak,
-aangifte en zorgintake zitten achter de pas. Let op de meetfout die eraan voorafging:
+`onvervreemdbaar`, de RTF-functie Toegang `insluiting` en Gemeenschap
+`samenkomst` -- `nabijheid` was de eerste keus en bleek bezet). **De nulmeting
+staat** (`npm run onvervreemdbaar`, `ONVERVREEMDBAAR.json`): voor een gratis
+account is elk werkwoord aanwezig en *opnieuw beginnen* heeft geen eigenaar. Een
+gemeenteafspraak, aangifte en zorgintake zaten achter de pas en staan sinds
+besluit 4c open voor een gratis account NA een paspoortcontrole
+(`server/kern/onvervreemdbaar.js`, dat `idGeverifieerd()` hergebruikt en een
+betaalde pas niets nieuws oplegt); de meter meet daarom een GECONTROLEERD gratis
+account. Let op de meetfout die eraan voorafging:
 `tier === 'guest'` is TWEE mensen -- een bezoeker zonder account (die `geenGast()`
 weigert) en een Community-lid met account -- en de demo-inlog `gast` van de
 doelgroepmeter is alleen de eerste. Wie "gratis" meet, registreert een account.

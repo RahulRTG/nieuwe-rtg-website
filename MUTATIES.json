@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T14:23:54.038Z",
-    "commit": "0ffb1958",
+    "op": "2026-09-27T14:37:53.985Z",
+    "commit": "36c09fad",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -635,6 +635,13 @@
       "operator": "===->!==#5",
       "gezakt": 1,
       "geprobeerd": 15
+    },
+    "arrivalpas.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
     },
     "assets.test.js": {
       "soort": "server",
@@ -10712,6 +10719,13 @@
     "werkruimte-kantoor.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
+    },
+    "werksleutels.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "werkstatus.e2e.js": {
       "soort": "puur",

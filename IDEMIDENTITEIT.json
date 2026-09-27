@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-25T09:20:37.723Z",
-    "commit": "2d5f726f",
+    "op": "2026-09-27T12:10:42.954Z",
+    "commit": "c1c02ae9",
     "boomVuil": false,
-    "boomAnders": 4,
+    "boomAnders": 1,
     "instrument": "scripts/idemidentiteit.js",
     "node": "v22.22.2"
   },
@@ -12,11 +12,11 @@
   "grens": "Deze meting toont NIET aan dat een smalle afdruk fout is -- bij kern/pay/partner.js staat uitgeschreven dat een uitbetaling geen parameters buiten de partner heeft. Het is een triagelijst, geen oordeel. Zij toont ook NIET aan dat een `voegtToe` in orde is: dat zegt alleen dat de afdruk IETS draagt dat de sleutel niet heeft, niet dat hij alles draagt waarop de handler onderscheidt -- precies het gat van #270, dat hier `voegtToe` zou heten. En `geenVergelijking` in de tweede familie is een ONDERGRENS: er wordt vanaf de opzoeking veertig regels vooruit gekeken, dus een vergelijking die verderop staat of via een hulpfunctie loopt, ziet deze meter niet.",
   "graad": "vermoed",
   "waaromVermoed": "de argumenten worden uit de BRON gelezen en niet uitgevoerd; een naam die via een hulpfunctie in de afdruk belandt, telt hier als een naam en niet als de velden erachter.",
-  "aanroepplekken": 38,
+  "aanroepplekken": 35,
   "verklaard": 1,
   "geenAfdruk": 0,
   "voegtNietsToe": 2,
-  "voegtToe": 31,
+  "voegtToe": 28,
   "nietTeLezen": 4,
   "voegtToeIsGeenGoedkeuring": true,
   "handwerkPlekken": 5,
@@ -401,7 +401,7 @@
         "c",
         "zaak"
       ],
-      "regelTekst": "return metIdem(idem ? 'tegoedzaak:' + zaak + ':' + idem : null,",
+      "regelTekst": "const r = await metIdem(idem ? 'tegoedzaak:' + zaak + ':' + idem : null,",
       "afdrukExtra": [
         "aan",
         "c"
@@ -409,29 +409,8 @@
       "uitspraak": "voegtToe"
     },
     {
-      "bestand": "server/kern/pay/tegoed-zaak.js",
-      "regel": 72,
-      "soort": "kern",
-      "binding": "server/lib/idem.js",
-      "sleutelNamen": [
-        "idem",
-        "zaak"
-      ],
-      "afdrukNamen": [
-        "id",
-        "t",
-        "zaak"
-      ],
-      "regelTekst": "return metIdem(idem ? 'tegoedzaakterug:' + zaak + ':' + idem : null,",
-      "afdrukExtra": [
-        "id",
-        "t"
-      ],
-      "uitspraak": "voegtToe"
-    },
-    {
       "bestand": "server/kern/pay/tegoed.js",
-      "regel": 56,
+      "regel": 47,
       "soort": "kern",
       "binding": "server/lib/idem.js",
       "sleutelNamen": [
@@ -443,52 +422,10 @@
         "c",
         "codenaam"
       ],
-      "regelTekst": "return metIdem(idem ? 'tegoedkoop:' + codenaam + ':' + idem : null,",
+      "regelTekst": "const r = await metIdem(idem ? 'tegoedkoop:' + codenaam + ':' + idem : null,",
       "afdrukExtra": [
         "aan",
         "c"
-      ],
-      "uitspraak": "voegtToe"
-    },
-    {
-      "bestand": "server/kern/pay/tegoed.js",
-      "regel": 88,
-      "soort": "kern",
-      "binding": "server/lib/idem.js",
-      "sleutelNamen": [
-        "codenaam",
-        "idem"
-      ],
-      "afdrukNamen": [
-        "codenaam",
-        "id",
-        "t"
-      ],
-      "regelTekst": "return metIdem(idem ? 'tegoedin:' + codenaam + ':' + idem : null,",
-      "afdrukExtra": [
-        "id",
-        "t"
-      ],
-      "uitspraak": "voegtToe"
-    },
-    {
-      "bestand": "server/kern/pay/tegoed.js",
-      "regel": 125,
-      "soort": "kern",
-      "binding": "server/lib/idem.js",
-      "sleutelNamen": [
-        "codenaam",
-        "idem"
-      ],
-      "afdrukNamen": [
-        "codenaam",
-        "id",
-        "t"
-      ],
-      "regelTekst": "return metIdem(idem ? 'tegoedterug:' + codenaam + ':' + idem : null,",
-      "afdrukExtra": [
-        "id",
-        "t"
       ],
       "uitspraak": "voegtToe"
     },

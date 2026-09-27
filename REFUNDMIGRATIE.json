@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-19T19:07:15.399Z",
-  "commit": "6083f652",
+  "op": "2026-09-27T12:10:47.012Z",
+  "commit": "c1c02ae9",
   "boomVuil": false,
-  "boomAnders": 40,
+  "boomAnders": 4,
   "instrument": "scripts/refundmigratie.js",
   "node": "v22.22.2"
  },
@@ -13,7 +13,7 @@
  "perCollectie": {
   "orders": {
    "verklaard": 32,
-   "onbekend": 0,
+   "onbekend": 2,
    "om": 14,
    "geenWerk": 18,
    "wacht": 0,
@@ -373,7 +373,7 @@
   },
   {
    "bestand": "server/routes/supplier/kassa/innen.js",
-   "treffers": 4,
+   "treffers": 3,
    "laag": "server",
    "leesbreedte": "venster",
    "collectie": "orders",
@@ -417,7 +417,7 @@
   },
   {
    "bestand": "public/apps/app-main/app-main-20.js",
-   "treffers": 4,
+   "treffers": 5,
    "laag": "scherm",
    "leesbreedte": "venster",
    "collectie": "orders",
@@ -494,6 +494,24 @@
   }
  ],
  "onbekend": [
+  {
+   "bestand": "server/kern/afhaalcode-toegang.js",
+   "treffers": 1,
+   "laag": "server",
+   "leesbreedte": "venster",
+   "collecties": [
+    "orders"
+   ]
+  },
+  {
+   "bestand": "server/kern/afhaalcode.js",
+   "treffers": 2,
+   "laag": "server",
+   "leesbreedte": "venster",
+   "collecties": [
+    "orders"
+   ]
+  },
   {
    "bestand": "server/kern/care/leden.js",
    "treffers": 3,
@@ -636,13 +654,13 @@
  ],
  "verdwenen": [],
  "telling": {
-  "bestanden": 58,
+  "bestanden": 60,
   "verklaard": 40,
-  "onbekend": 15,
+  "onbekend": 17,
   "verdwenen": 0,
-  "server": 44,
+  "server": 46,
   "scherm": 11,
-  "scherp": 50,
+  "scherp": 52,
   "ruim": 5
  }
 }

@@ -787,14 +787,9 @@ const talen = maakTalen({ db, save });
 const salonClaimcode = require('./kern/salon-claimcode')({
   db, save, bewerkCollectie, crypto
 });
-/* De afhaalcode van een bestelling (kern/afhaalcode.js): een 128-bit bearer
-   die alleen als hash in `afhaalToegang` staat en in een collectietransactie
-   wordt geclaimd. Hij gaat naar de routes (uitgeven, intrekken, innen) en naar
-   de lidacties (de betaalweg van een balie-bon). */
 const afhaalcode = require('./kern/afhaalcode')({ db, bewerkCollectie, crypto });
-/* PostgreSQL neemt zijn waarheid pas asynchroon over; die variant draait daarom
-   in startPostgresMetSalon en niet vóór de pull. De drie lokale migraties
-   draaien verderop samen, zodra ook Samen en Luchthaven zijn opgebouwd. */
+/* PostgreSQL neemt pas asynchroon over (startPostgresMetSalon); de lokale
+   migraties draaien verderop, na Samen. */
 const startPostgresMetSalon = () => {
   /* opslagstart roept deze ingang voor elke motor aan. Een lokale standby mag
      daardoor niet via de inerte Postgres-tak ten onrechte "gemigreerd" worden. */

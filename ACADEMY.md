@@ -85,7 +85,7 @@ Gemeten over `server/` en `scripts/`, 27 september 2026.
 | policy, capability, machtiging, mandaat, benoeming | allemaal bezet (AUTHORITY.md par. 2.5) | **beleid** binnen het leerhuis, en het heet een *geschiktheidsbeleid* |
 | readiness | `concern/readiness.js` (een entiteit) | **gereedheid** (een mens, een team, een eenheid) |
 | NIVEAUS, BEWIJSSOORTEN, RELATIES, VOLGENDE | `NIVEAUS` draagt al negen betekenissen (HDI.md par. 2), `BEWIJSSOORTEN` staat in `onderwijs-bewijs.js` met andere leden | **VAARDIGHEIDSNIVEAUS**, **LEERBEWIJS**, **RELATIESOORTEN**, **VOLGENDE_STAP**. De eerste versie gebruikte de bezette namen; `npm run semantiek:vast` zag het, niet het lezen |
-| verifieer, impact, projecteer, gereedheid (functies) | elk al in twee andere kernmodules (de keuring, groep dubbeling) | `spoorKlopt`, `geraakt`, `herbouw`, `teamGereed`; de sleutels naar buiten bleven gelijk |
+| verifieer, impact, projecteer, gereedheid (functies) | elk al in twee andere kernmodules (de keuring, groep dubbeling) | `spoorKlopt`, `geraakt`, `standUitSpoor`, `teamGereed`; de sleutels naar buiten bleven gelijk |
 
 ## 3. Botsingen met grondregels, en hoe het is opgelost
 

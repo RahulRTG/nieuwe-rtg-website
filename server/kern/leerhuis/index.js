@@ -27,7 +27,7 @@
 
 const crypto = require('crypto');
 const keten = require('../../lib/keten');
-const { herbouw } = require('./projectie');
+const { standUitSpoor } = require('./projectie');
 const { Weigering, PERSOON, ID } = require('./hulp');
 const zicht = require('./zicht');
 const uitleg = require('./uitleg');
@@ -44,7 +44,7 @@ function maakLeerhuis({ db, save, nu }) {
   const nieuwId = () => crypto.randomBytes(6).toString('hex');
 
   const spoorLees = (org) => (eigen.kijk('leerhuis')[org] || []);
-  const stand = (org) => herbouw(org, spoorLees(org));
+  const stand = (org) => standUitSpoor(org, spoorLees(org));
 
   function doe(org, actie, invoer, door, opties) {
     const o = opties || {};

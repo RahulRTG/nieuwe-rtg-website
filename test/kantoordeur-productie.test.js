@@ -42,6 +42,7 @@ test('echte productieserver: de kantoorcode opent niets, op naam met een passkey
 
   /* ---- buiten productie: de oude deur werkt nog, en we leggen sessies aan ---- */
   const proef = await startServer({ env: { RTG_DATA_DIR: tmp, SMTP_URL: '', OFFICE_CODE: CODE, ...KEYS } });
+  t.after(() => stop(proef.child));   // ook als een assertie hieronder zakt
   const pa = maakApi(proef.base);
   const code = await pa('/api/office/login', { code: CODE });
   assert.equal(code.status, 200, 'buiten productie blijft de gedeelde code werken: ' + JSON.stringify(code.body).slice(0, 120));

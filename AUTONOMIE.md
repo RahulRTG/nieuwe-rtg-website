@@ -169,13 +169,14 @@ erbij. Nog niet gebouwd, behalve waar het staat.
   bouwstuk met die vraag erbij, en tot hij bestaat staat zijn plek in het
   banksaldo op nul met die reden. De bonnen die ZAKEN vandaag verkopen blijven
   van die zaak; de firewall laat ze niet als RTG-geld tellen.
-- **C5, van een betaalde pas naar gast langs drie wegen.** Het lid zelf; het
-  kantoor met de hand; en automatisch, met regels die per situatie te kiezen
-  zijn. Wat Claude daaronder legt en nog door de eigenaar moet worden bevestigd:
-  elke automatische regel is een schakelaar die standaard DICHT staat, een lid
-  zonder vastgelegd contract (`GEEN_CONTRACT`) gaat nooit automatisch, en
-  facturen en bewijsstukken blijven na de overgang (`AFSPRAAK.md`: rechten
-  hangen per capability, niet per account).
+- **C5, van een betaalde pas naar gast langs drie wegen.** Het lid zelf, en hij
+  kiest nu of aan het eind van zijn periode; het kantoor met de hand; en
+  automatisch met drie regels (afgelopen, afgelopen plus wachttijd, onbetaalde
+  termijnen), elk een schakelaar die standaard uit staat. Wat Claude daaronder
+  legt en nog door de eigenaar moet worden bevestigd: een lid zonder vastgelegd
+  contract (`GEEN_CONTRACT`) gaat nooit automatisch, bij `afgelopen` en `wacht`
+  samen wint de zachtste, en facturen en bewijsstukken blijven na de overgang
+  (`AFSPRAAK.md`: rechten hangen per capability, niet per account).
 - **C6, het herkomstkanaal: een vraag bij aanmelding EN een campagnecode in de
   link.** Allebei optioneel, alleen geteld langs de groepspoort, nooit per lid
   zichtbaar, dertien maanden bewaard en weg bij vergetelheid.
@@ -299,8 +300,12 @@ doorgestreept met de datum; de besluiten staan in par. 2.5.
    graad `vermoed`, en de plek voor eigen bonnen op nul met reden. Nog te doen: de
    bon zelf als eigen bouwstuk met de e-geldvraag, en liquiditeit en runway, die een
    register van de korte verplichtingen van RTG nodig hebben.
-7. **Een weg van een betaalde pas naar gast** -- besloten (C5); drie wegen, de
-   automatische dicht tot de eigenaar een regel aanzet.
+7. ~~**Een weg van een betaalde pas naar gast**~~ -- staat (27 september, C5):
+   `kern/aanmeldingen/naargast.js`. Het lid kiest nu of aan het eind van zijn
+   periode (zijn eigen opdracht, geen schakelaar), het kantoor op naam met een
+   reden, en drie automatische regels (afgelopen, afgelopen plus wachttijd,
+   onbetaalde termijnen) die standaard uit staan. Elke weg laat de sessies
+   vervallen; facturen en betaalschema blijven. Churn kan nu voorkomen.
 8. **Een herkomstkanaal bij aanmelding** -- besloten (C6); daarna pas CAC.
 9. **De streefstand** -- besloten (C7): de machine stelt voor, de eigenaar tekent.
 10. **Het beslisgeheugen** -- nadat 1 tot en met 9 er zijn, want een geheugen

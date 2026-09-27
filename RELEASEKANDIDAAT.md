@@ -95,6 +95,28 @@ Kolommen: **code** / **extern** / **besluit** = JA/NEE; *bewijs* = wat
 lijken maar niet in het register staan, en **75** routes die de scanner niet kan
 lezen. Die 474 zijn indelingswerk (A); de 9 types zijn bouwwerk (A, besloten in B9).
 
+**Stand na de indeling (27 september 2026):** 0 ongeclassificeerd en 0
+onleesbaar (de router lost de dynamische paden nu op). Het register telt 14
+gemigreerd, 41 gesloten en **31 resterend**, en die 31 zijn allemaal echte
+deuren die de release blokkeren. De indeling vond **22 nieuwe deuren**, elk met
+de risico's erbij. Voorbeelden zijn de gedeelde `OFFICE_CODE`, de bon- en
+polsbandsaldo's in de horeca, de OV-incheckcode, de Zaakdoos-sleutel die de hele
+database kan klonen, de kortingscode van RTG Eten en de gezinsprofieltokens.
+Een geen-credentialoordeel mag alleen met status gesloten, zonder blokkade en
+met een notitie van minstens 40 tekens; `test/codecredentials.test.js`
+beproeft dat met een mutatie.
+
+Drie vondsten zijn gevaarlijker dan hun deur doet vermoeden:
+- Het gezinsprofieltoken heeft consumers buiten de Foundation-productiepoort:
+  `/api/rtf/toegang`, `/beroepen*`, `/bieb*`, `/geloof*` en `/knelpunt`.
+  Daarnaast geeft `/api/rtf/kanaal` het ruwe token terug.
+- De lesfamilie `/api/foundation/les/*` staat niet in `NOG_GESLOTEN`.
+- De gedeelde Zaakdoos-sleutel opent `GET /api/doos/kloon`, dus een kloon van
+  de hele database.
+
+Een toets zakt zodra de poort op die paden verandert. Het dichtzetten is A-werk
+en volgt in de migratieronde.
+
 **Juridisch open (E8), en niet door code te beslissen:** een opwaardeerkaart die
 tegen nominale waarde in een uitbetaalbare wallet landt, is vermoedelijk
 elektronisch geld (terugstortstand `open`, `WAARDE.md`, `TOKEN.md`). Wie contant

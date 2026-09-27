@@ -7,24 +7,42 @@
     var o = {}, bronnen = [], vorige = new Map(), vorigeVraag = '', klaar = false, wachtrij = Promise.resolve();
     var vlak = document.createElement('section'); vlak.id = 'saloon'; vlak.className = 'saloon';
     vlak.setAttribute('aria-label', 'Uw Saloon');
-    vlak.innerHTML = '<div class="saloon-kop"><div><p class="eyebrow">SALOON</p><h2>Uw wereld komt samen.</h2>'
-      + '<p>Mensen, verhalen en mogelijkheden. Met ruimte voor wat u kiest.</p></div>'
-      + '<button type="button" data-saloon-maken>Maken</button></div>'
-      + '<nav class="saloon-vormen" aria-label="Weergave"><button type="button" data-vorm="overzicht">Overzicht</button>'
-      + '<button type="button" data-vorm="agenda">Agenda</button><button type="button" data-vorm="bewaard">Bewaard</button>'
-      + '<button type="button" data-ververs>Vernieuwen</button></nav>'
-      + '<details class="saloon-keuzes"><summary>Mijn bronnen en omgeving</summary>'
-      + '<form id="saloonFilters"><div class="saloon-velden"><label>Zoeken<input name="zoek" type="search" maxlength="100" placeholder="Onderwerp, maker of verhaal"></label>'
-      + '<label>Plaats<input name="plaats" type="search" maxlength="60" placeholder="Bijvoorbeeld Amsterdam"></label></div>'
-      + '<fieldset><legend>Wat komt samen in uw Saloon?</legend><div id="saloonBronnen"></div></fieldset>'
-      + '<p class="saloon-uitleg">Mijn reizen is alleen voor u. Saloon gebruikt uw keuzes; u kunt ze hier altijd wijzigen.</p>'
-      + '<button type="submit">Keuzes toepassen</button></form></details>'
-      + '<p id="saloonStatus" role="status" aria-live="polite"></p><div id="saloonBronstatus"></div>';
-    document.getElementById('feed').before(vlak);
+    vlak.innerHTML = w.RTGSaloonOpbouw();
+    document.querySelector('.living-intro').appendChild(vlak);
+    var aan = false, leest = false, plaatsKiezen = false;
+    function keuzes(plaats) {
+      lezer.sluit(); vlak.hidden = false; vlak.querySelector('details').open = true;
+      var doel = vlak.querySelector(plaats ? '[name="plaats"]' : 'summary'); doel.focus(); doel.scrollIntoView({ block: 'center' });
+    }
+    var edge = w.RTGSaloonEdge({
+      Voorkeuren: { naam: 'Uw Saloon-voorkeuren', doe: function () { keuzes(false); } },
+      Maken: { naam: 'Delen in Saloon', doe: function () { w.RTGSaloonActies.maken(host); } },
+      Agenda: { naam: 'Uw agenda in Saloon', doe: function () { lezer.sluit(); bewaar({ vorm: 'agenda' }, true).catch(function () {}); } },
+      Terug: { naam: 'Terug naar Saloon', lezer: true, doe: function () { lezer.terug(); } },
+      Bewaren: { naam: 'Artikel bewaren of verwijderen', lezer: true, doe: function () { lezer.bewaren(); } }
+    });
+    var lezer = w.RTGSaloonLezer({ veranderd: function (actief) { leest = actief; edge(aan, leest); },
+      bewaard: function (id) { return (o.bewaard || []).includes(id); }, bewaar: bewaarItem });
+    function bewaarItem(i) {
+      return bewaar({ bewaar: { id: i.id, aan: !(o.bewaard || []).includes(i.id) } }, false).then(function () {
+        i.bewaard = o.bewaard.includes(i.id);
+        document.querySelectorAll('[data-saloon-id]').forEach(function (k) {
+          if (k.dataset.saloonId !== i.id) return;
+          var b = k.querySelector('[data-bewaar]'); b.textContent = i.bewaard ? 'Bewaard' : 'Bewaren';
+          b.setAttribute('aria-pressed', String(i.bewaard));
+        });
+        if (o.vorm === 'bewaard' && !i.bewaard) host.laad();
+        return i.bewaard;
+      });
+    }
+    host.openArtikel = function (i) { lezer.open(i, function () { return bewaarItem(i); }); };
     function teken() {
-      vlak.querySelectorAll('[data-vorm]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.vorm === o.vorm)); });
-      var form = vlak.querySelector('form');
-      form.elements.zoek.value = o.zoek || ''; form.elements.plaats.value = o.plaats || '';
+      var dichtbij = !!o.plaats && o.vorm === 'overzicht';
+      vlak.querySelectorAll('[data-vorm]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.vorm === o.vorm && !dichtbij)); });
+      vlak.querySelector('[data-dichtbij]').setAttribute('aria-pressed', String(dichtbij));
+      var form = vlak.querySelector('#saloonFilters');
+      vlak.querySelector('[name="zoek"]').value = o.zoek || ''; form.elements.plaats.value = o.plaats || '';
+      vlak.querySelector('#saloonOmgeving').textContent = (o.plaats ? o.plaats + ' · ' : '') + new Date().toLocaleDateString(document.documentElement.lang || undefined, { day: 'numeric', month: 'long' });
       vlak.querySelector('#saloonBronnen').innerHTML = bronnen.map(function (b) {
         return '<label><input type="checkbox" name="bron" value="' + esc(b.id) + '"'
           + ((o.bronnen || []).includes(b.id) ? ' checked' : '') + '> ' + esc(b.naam) + (b.prive ? ' · privé' : '') + '</label>';
@@ -42,20 +60,38 @@
     }
     vlak.addEventListener('click', function (e) {
       var b = e.target.closest('[data-vorm]');
-      if (b) bewaar({ vorm: b.dataset.vorm }, true).catch(function () {});
+      if (b) {
+        plaatsKiezen = false;
+        bewaar(b.dataset.vorm === 'overzicht' ? { vorm: 'overzicht', plaats: '' } : { vorm: b.dataset.vorm }, true).catch(function () {});
+      }
+      if (e.target.closest('[data-keuzes]')) keuzes(false);
+      if (e.target.closest('[data-dichtbij]')) {
+        if (!o.plaats) { plaatsKiezen = true; keuzes(true); }
+        else bewaar({ vorm: 'overzicht' }, true).catch(function () {});
+      }
       if (e.target.closest('[data-ververs]')) host.laad();
       if (e.target.closest('[data-saloon-maken]')) w.RTGSaloonActies.maken(host);
     });
-    vlak.querySelector('form').addEventListener('submit', function (e) {
+    vlak.querySelector('details').addEventListener('toggle', function () { vlak.querySelector('[data-keuzes]').setAttribute('aria-expanded', String(this.open)); });
+    vlak.querySelector('#saloonZoek').addEventListener('submit', function (e) {
+      e.preventDefault(); bewaar({ zoek: this.elements.zoek.value }, true).catch(function () {});
+    });
+    vlak.querySelector('#saloonFilters').addEventListener('submit', function (e) {
       e.preventDefault();
-      bewaar({ zoek: this.elements.zoek.value, plaats: this.elements.plaats.value,
+      var vorm = plaatsKiezen ? 'overzicht' : o.vorm; plaatsKiezen = false;
+      bewaar({ vorm: vorm, plaats: this.elements.plaats.value,
         bronnen: Array.from(this.querySelectorAll('[name="bron"]:checked')).map(function (b) { return b.value; }) }, true).catch(function () {});
     });
     return {
-      init: function (d) { o = d.voorkeuren; bronnen = d.bronnen; klaar = true; teken(); },
+      init: function (d, ik) {
+        o = d.voorkeuren; bronnen = d.bronnen; klaar = true; document.body.classList.add('rtg-saloon-experience');
+        document.body.setAttribute('data-rtg-screen', 'world-home');
+        vlak.querySelector('#saloonGroet').textContent = 'Welkom' + (ik && ik.codenaam ? ', ' + ik.codenaam : '') + '.'; teken();
+        lezer.herstel();
+      },
       parameters: function () { return klaar ? { ervaring: 'saloon' } : {}; },
       vorm: function () { return o.vorm; },
-      zichtbaar: function (aan) { vlak.hidden = !aan; },
+      zichtbaar: function (actief) { aan = actief; vlak.hidden = !aan; if (!aan) lezer.sluit(); edge(aan, leest); },
       ontvang: function (d, vraag, aanvullen) {
         if (!d.voorkeuren) return;
         o = d.voorkeuren; teken();
@@ -75,14 +111,7 @@
           + esc(b.ok ? (b.beperkt ? 'Een begrensde selectie. Open de bron voor meer. ' : '') + b.meldingen.join(' ') : b.meldingen.join(' ')) + '</p>'; }).join('');
       },
       kaart: function (k, i) {
-        w.RTGSaloonKaart(k, i, esc, function () {
-          return bewaar({ bewaar: { id: i.id, aan: !i.bewaard } }, false).then(function () {
-            i.bewaard = o.bewaard.includes(i.id);
-            var b = k.querySelector('[data-bewaar]'); b.textContent = i.bewaard ? 'Bewaard' : 'Bewaren';
-            b.setAttribute('aria-pressed', String(i.bewaard));
-            if (o.vorm === 'bewaard' && !i.bewaard) host.laad();
-          });
-        }, host);
+        w.RTGSaloonKaart(k, i, esc, function () { return bewaarItem(i); }, host);
       }
     };
   }

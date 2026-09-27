@@ -17,15 +17,6 @@
     d.addEventListener('close', function () { d.remove(); }); document.body.appendChild(d); d.showModal();
     return { element: d, inhoud: inhoud };
   }
-  function artikel(i) {
-    var d = dialoog(i.titel); d.inhoud.textContent = 'Artikel ophalen…';
-    verzoek('/api/krant/artikel', i.artikel).then(function (r) {
-      var a = r.artikel, esc = w.RTGSaloon.esc;
-      d.inhoud.innerHTML = '<p class="saloon-uitleg">' + esc(a.naam) + ' · ' + esc(a.auteur) + '</p><p><b>' + esc(a.chapo) + '</b></p>'
-        + String(a.inhoud || '').split(/\n+/).map(function (t) { return '<p>' + esc(t) + '</p>'; }).join('')
-        + w.RTGPublicatieInfo(a, esc) + '<a href="' + esc(i.url) + '">Open in de krant</a>';
-    }).catch(function (e) { d.inhoud.textContent = e.message; });
-  }
   function reacties(i, host) {
     var d = dialoog('Gesprek bij dit bericht'), id = i.id.slice('salon:'.length), esc = w.RTGSaloon.esc;
     function laad() {
@@ -64,6 +55,6 @@
         .catch(function (err) { f.querySelector('[role="status"]').textContent = err.message; b.disabled = false; });
     };
   }
-  w.RTGSaloonActies = { maken: maken, artikel: artikel, reacties: reacties,
+  w.RTGSaloonActies = { maken: maken, verzoek: verzoek, reacties: reacties,
     volgMaker: function (i) { return verzoek('/api/mediaos/volg', { codenaam: i.volgMaker, aan: !i.volgIk }); } };
 }(window));

@@ -2,7 +2,14 @@
   'use strict';
   w.RTGSaloonKaart = function (k, i, esc, bewaar, host) {
     k.dataset.saloonId = i.id;
-    if (i.titel) { var h = document.createElement('h3'); h.textContent = i.titel; k.querySelector('.living-post-copy').prepend(h); }
+    k.classList.add('saloon-verhaal');
+    var kop = document.createElement('header'); kop.className = 'saloon-verhaalkop';
+    var lint = document.createElement('p'); lint.className = 'saloon-bronlint';
+    lint.textContent = (i.herkomst && i.herkomst.naam || i.uitgever || i.bronGroep) + (i.bronGroep === 'nieuws' ? ' · Journalistiek' : '');
+    kop.appendChild(lint);
+    if (i.titel) { var h = document.createElement('h3'); h.textContent = i.titel; kop.appendChild(h); }
+    kop.appendChild(k.querySelector('.living-post-head'));
+    k.querySelector('.living-post-copy').before(kop);
     var b = document.createElement('button'); b.type = 'button'; b.dataset.bewaar = '';
     b.textContent = i.bewaard ? 'Bewaard' : 'Bewaren'; b.setAttribute('aria-pressed', String(i.bewaard));
     b.addEventListener('click', function () { b.disabled = true; bewaar().catch(function () {}).finally(function () { b.disabled = false; }); });
@@ -11,7 +18,7 @@
     if (open && i.url) {
       open.removeAttribute('data-open'); open.textContent = i.actie || 'Open bericht';
       open.addEventListener('click', function () {
-        if (i.artikel) w.RTGSaloonActies.artikel(i, host);
+        if (i.artikel) host.openArtikel(i);
         else location.href = i.url;
       });
     } else if (open && !i.open) open.remove();

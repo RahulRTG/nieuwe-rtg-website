@@ -39,10 +39,11 @@ test('Saloon: publiceren, reageren, bewaren, filters en mobiele bediening', { sk
     await kaart.locator('[data-bewaar][aria-pressed="true"]').waitFor();
     await page.locator('[data-vorm="bewaard"]').click();
     await page.locator('[data-vorm="bewaard"][aria-pressed="true"]').waitFor();
+    await page.waitForFunction(() => document.querySelectorAll('[data-saloon-id]').length === 1);
     assert.equal(await page.locator('[data-saloon-id]').count(), 1);
     await page.reload(); await kaart.waitFor();
     assert.equal(await page.locator('[data-vorm="bewaard"]').getAttribute('aria-pressed'), 'true');
-    await page.locator('.saloon-keuzes summary').click();
+    await page.locator('[data-keuzes]').click();
     await page.locator('#saloonFilters input[name="plaats"]').fill('Rotterdam');
     await page.getByRole('button', { name: 'Keuzes toepassen' }).click();
     await page.waitForFunction(() => document.getElementById('saloonStatus').textContent.startsWith('0 resultaten'));
@@ -64,8 +65,8 @@ test('Saloon: publiceren, reageren, bewaren, filters en mobiele bediening', { sk
     const nieuws = page.locator('[data-saloon-id="nieuws:BODE:' + bericht.artikel.id + '"]');
     await nieuws.waitFor();
     await nieuws.getByRole('button', { name: 'Lees artikel' }).click();
-    await page.locator('dialog').getByText('Dit is het volledige testverslag uit de bronredactie.').waitFor();
-    await page.getByRole('button', { name: 'Sluiten', exact: true }).click();
+    await page.locator('#saloonArtikel').getByText('Dit is het volledige testverslag uit de bronredactie.').waitFor();
+    await page.getByRole('button', { name: '‹ Saloon', exact: true }).click();
     await page.keyboard.press('Escape');
     // Verbanden zijn zelfstandige links en moeten ook op telefoon te raken zijn.
     for (const width of [390, 834]) {

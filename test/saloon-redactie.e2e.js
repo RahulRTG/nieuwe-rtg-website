@@ -48,9 +48,9 @@ test('van interne redactie via review naar Saloon, met een zichtbare correctie',
     await lees.goto(srv.base + '/apps/wereld.html?embed=1');
     const kaart = lees.locator('[data-saloon-id="nieuws:BODE:' + id + '"]');
     await kaart.getByRole('button', { name: 'Lees artikel', exact: true }).click();
-    await lees.locator('dialog').getByText('Het plein gaat maandag open.', { exact: true }).waitFor();
-    assert.ok(!(await lees.locator('dialog').textContent()).includes('VERTRAUWELIJK'));
-    await lees.getByRole('button', { name: 'Sluiten', exact: true }).click();
+    await lees.locator('#saloonArtikel').getByText('Het plein gaat maandag open.', { exact: true }).waitFor();
+    assert.ok(!(await lees.locator('#saloonArtikel').textContent()).includes('VERTRAUWELIJK'));
+    await lees.getByRole('button', { name: '‹ Saloon', exact: true }).click();
     await editor.locator('.art').filter({ hasText: 'Een nieuw plein voor de buurt' }).getByRole('button', { name: 'Bewerk', exact: true }).click();
     await editor.locator('#a_inhoud').fill('Het plein gaat dinsdag open.');
     await editor.locator('#a_bewaar').click();
@@ -61,9 +61,9 @@ test('van interne redactie via review naar Saloon, met een zichtbare correctie',
     await lees.locator('[data-ververs]').click();
     await lees.waitForFunction(() => document.querySelector('#saloonStatus')?.textContent.includes('1 gewijzigd'));
     await kaart.getByRole('button', { name: 'Lees artikel', exact: true }).click();
-    await lees.locator('dialog').getByText('Het plein gaat dinsdag open.', { exact: true }).waitFor();
-    await lees.locator('dialog summary').click();
-    await lees.locator('dialog').getByText('Correctie: de opening is op dinsdag.', { exact: true }).waitFor();
+    await lees.locator('#saloonArtikel').getByText('Het plein gaat dinsdag open.', { exact: true }).waitFor();
+    await lees.locator('#saloonArtikel summary').click();
+    await lees.locator('#saloonArtikel').getByText('Correctie: de opening is op dinsdag.', { exact: true }).waitFor();
     if (process.env.SALOON_REDACTIE_SCREENSHOT) await lees.screenshot({ path: process.env.SALOON_REDACTIE_SCREENSHOT });
     await lees.goto(srv.base + '/apps/krant.html?zaak=BODE#' + id);
     await lees.locator('article').getByText('Het plein gaat dinsdag open.', { exact: true }).waitFor();

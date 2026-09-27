@@ -14,7 +14,7 @@ rechten en uitvoering. Deze versie verbindt daadwerkelijk vijf bronfamilies.
 
 ## Eén ervaring
 
-Overzicht, Agenda en Bewaard delen dezelfde bronobjecten. De gebruiker kiest
+Voor u (Overzicht), Agenda en Bewaard delen dezelfde bronobjecten. De gebruiker kiest
 bronnen, onderwerpzoekterm en plaats. Deze voorkeuren en maximaal 200 bewaarde
 verwijzingen worden per account onthouden. Mijn reizen staat standaard uit.
 Een bewaarde verwijzing verleent geen toegang: bronrechten en publicatiestatus
@@ -38,6 +38,28 @@ Nieuwe en gewijzigde kaarten worden geteld. Ingetrokken of ontoegankelijke
 publicaties verdwijnen uit de actuele resultaten, ook uit Bewaard. Dit is
 wijzigingsdetectie binnen de opgehaalde selectie; geen achtergrondmonitor,
 volledige historie of garantie dat iedere tussenliggende verandering is gezien.
+
+### Mobiele Saloon en Edge
+
+De startpagina gebruikt de goedgekeurde donkere RTG-stijl, Bodoni-koppen,
+fotografie uit de bronpublicatie, een zoekveld en Voor u / Dichtbij / Bewaard.
+Dichtbij gebruikt de zelfgekozen plaats, zonder een locatie te veronderstellen.
+Agenda, bronnen en omgeving blijven bereikbaar via de voorkeuren en Edge.
+De desktop toont dezelfde bronvolgorde in twee kolommen; er wordt geen tweede
+dashboard of appcatalogus voor Saloon opgebouwd.
+
+Een artikel opent als leesscherm binnen Saloon. De gedeelde Edge blijft daarbij
+bedienbaar: Home, Werelden, Rahul, Acties en Menu. De Saloon-acties worden via
+de bestaande projectie van bronknoppen aangeboden. Het menu behoudt de echte
+RTG-werelden en krijgt lokaal het donkere Saloon-materiaal. In een ingebed
+werkvlak blijft de Edge van de bovenliggende schil eigenaar.
+
+Terug, browsergeschiedenis en vernieuwen werken met de leesstand. Iedere opening
+vraagt de gepubliceerde editie opnieuw aan de krant, inclusief beeld en correcties.
+Een laat antwoord kan een gesloten lezer niet heropenen; bronuitval geeft een
+zichtbare melding met opnieuw proberen. Bewaren gebruikt dezelfde accountkeuze
+vanuit de kaart, de lezer en Edge. De voorbeeldverhalen uit de ontwerptekening
+worden niet in de productfeed ingevoegd.
 
 ## De lus terug naar de bron
 
@@ -126,8 +148,12 @@ Salon-video gebruikt dezelfde ondertitelband als de bronapp.
 De gerichte integratie- en schermtests toetsen publicatie, privacy,
 correctie/intrekking, voorkeurisolatie, bronuitval, onderwerpverbanden,
 plaatsen, reageren, bewaren, mobiel gebruik, de bestaande Wereld-navigatie en
-het lezen van een artikel binnen Saloon. De drie nieuwe testbestanden zijn met
-de mutatiemotor op foutgevoeligheid beproefd. `scripts/check.js` controleert
+het lezen van een artikel binnen Saloon. De nieuwe testbestanden zijn met
+foutinjecties op gevoeligheid beproefd. De nieuwe Edge-schermtest controleert
+320, 390, 834 en 1440 pixels, bewaren via Edge, terug/vooruit, herladen,
+plaatsvoorkeuren en bronuitval. Alleen de Edge-balk tijdens lezen verbergen
+laat precies de bewering over één zichtbare balk zakken; de bron is daarna
+teruggezet. `scripts/check.js` controleert
 de bron, documentatie, registers en ondertitelbeslissing.
 
 De eerste GitHub-ronde vond verouderde afgeleide registers, twee testscenario's

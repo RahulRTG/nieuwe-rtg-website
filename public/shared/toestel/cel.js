@@ -18,14 +18,12 @@
 (function () {
   'use strict';
 
-  /* HET REKENEN GEBEURT IN EEN WORKER, en niet in de cel zelf. Een sandbox-iframe
-   deelt in de praktijk de thread met de pagina van het lid: een uitvoerder die
-   blijft rekenen bevroor de HELE pagina, en dan gaat de klok van het plafond in
-   ../toestel/rekenaar.js nooit af (gemeten met een oneindige lus, TOESTEL.md
-   par. 10.2 -- ook met procesisolatie voor sandbox-iframes aan). In een worker
-   blijven beide threads vrij: de klok van de ouder gaat af, de ouder haalt de
-   cel weg, en met de cel gaat haar worker. De worker komt als blob uit DEZE
-   functie en erft de CSP van de cel, dus ook connect-src 'none'. */
+  /* HET REKENEN GEBEURT IN EEN WORKER. De sandbox-cel deelt in de praktijk de
+     thread met de pagina van het lid: een uitvoerder die bleef rekenen bevroor
+     de hele pagina, en de klok van het plafond (rekenaar.js) ging nooit af
+     (TOESTEL.md par. 10.1). In een worker gaat de klok af, en met de cel gaat
+     haar worker. Hij komt als blob uit DEZE functie en erft de CSP van de cel,
+     dus ook connect-src 'none'. */
   function werker() {
   /* De runtime komt als ondertekend artefact binnen: JS als blob-module, de
      wasm als bytes. Threads vragen crossOriginIsolated (een apart besluit), en
@@ -154,8 +152,7 @@
   self.RTGCelHerhaalt = werker().herhaalt; // alleen zichtbaar binnen de cel zelf, en voor de toets
   var WERKER_BRON = '(' + werker.toString() + ')();';
 
-  /* Een verse worker per opdracht: niets van een vorige uitvoerder blijft
-     hangen, en afbreken is de worker weggooien. */
+  /* Een verse worker per opdracht: er blijft niets van een vorige hangen. */
   function inWorker(d) {
     return new Promise(function (klaar) {
       var url = URL.createObjectURL(new Blob([WERKER_BRON], { type: 'text/javascript' }));

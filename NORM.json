@@ -3322,7 +3322,8 @@
       "sleutel": "kernBreedte",
       "van": 1600,
       "meter": "kernBreedte 1600 -> 1601 (VERHOOGD, met reden)",
-      "reden": "RTG Vrijheid (VRIJHEID.md) is een nieuwe laag met een eigen kernnaam, kern.vrijheid, en routes die hem aanraken. Er komt precies EEN naam bij, niet twee: de zaak van RTG zelf als werkgever (kern/vrijheid/rtghuis.js) hangt met opzet BINNEN kern.vrijheid (kern.vrijheid.rtghuis) in plaats van als eigen kernnaam, en beide routebestanden staan in een map (routes/vrijheid/) zodat ze een domein zijn en kernGedeeld niet beweegt. Wie deze tand weer omlaag wil: dat kan alleen door de laag weg te halen, en dat is een productbesluit."
+      "reden": "RTG Vrijheid (VRIJHEID.md) is een nieuwe laag met een eigen kernnaam, kern.vrijheid, en routes die hem aanraken. Er komt precies EEN naam bij, niet twee: de zaak van RTG zelf als werkgever (kern/vrijheid/rtghuis.js) hangt met opzet BINNEN kern.vrijheid (kern.vrijheid.rtghuis) in plaats van als eigen kernnaam, en beide routebestanden staan in een map (routes/vrijheid/) zodat ze een domein zijn en kernGedeeld niet beweegt. Wie deze tand weer omlaag wil: dat kan alleen door de laag weg te halen, en dat is een productbesluit.",
+      "waarheen": "GRENZEN.json (vrijheid draagt vrijheid) en test/vrijheid-routes.test.js plus test/vrijheid.test.js"
     },
     {
       "datum": "2026-09-27",

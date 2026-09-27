@@ -100,7 +100,8 @@ function beeld(st, boek, nu) {
     },
     netwerk: { contacten: deals, eerder: alle.length - deals.length },
     wereld: {
-      stad: R.JURISDICTIE.stad, startKas: R.niveauVan(st).startKas, moeilijkheid: st.moeilijkheid || 'normaal', voorbij: st.voorbij || null,
+      stad: R.JURISDICTIE.stad, startKas: R.beginKas(st), moeilijkheid: st.moeilijkheid || 'normaal', voorbij: st.voorbij || null,
+      start: st.start || 'keuken', startposities: Object.entries(R.STARTPOSITIES).map(([id, x]) => ({ id, naam: x.naam, uitleg: x.uitleg })),
       niveaus: Object.entries(R.MOEILIJKHEID).map(([id, x]) => ({ id, naam: x.naam, uitleg: x.uitleg, startKas: x.startKas })),
       spelregels: [R.JURISDICTIE.inschrijven, R.JURISDICTIE.btw, R.JURISDICTIE.termijn],
       plaatsen: [{ naam: st.baan.werkgever, wat: st.baan.actief ? 'waar je werkt' : 'waar je werkte' }]

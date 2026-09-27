@@ -89,7 +89,13 @@ const MOEILIJKHEID = {
   zwaar: { naam: 'Zwaar', startKas: 1500, laat: 150, huur: 110, zelfstandig: { dagen: 105, factor: 250, buffer: 8 }, uitzetting: 21, uitleg: 'bijna niets op de bank, klanten betalen later, je kamer is duurder' }
 };
 const niveauVan = (st) => MOEILIJKHEID[st.moeilijkheid] || MOEILIJKHEID.normaal;
-const verplichtingBedrag = (st, v) => (v.id === 'huur' ? Math.round(v.bedrag * niveauVan(st).huur / 100) : v.bedrag);
+
+/* Waar je begint (na 1.0): de tabel staat in ./regels-start.js. */
+const STARTPOSITIES = require('./regels-start')(PERIODE);
+const startVan = (st) => STARTPOSITIES[st.start] || STARTPOSITIES.keuken;
+const beginKas = (st) => niveauVan(st).startKas + startVan(st).extraKas;
+const verplichtingenVan = (st) => (startVan(st).verplichting ? VERPLICHTINGEN.concat(startVan(st).verplichting) : VERPLICHTINGEN);
+const verplichtingBedrag = (st, v) => (v.id === 'huur' ? Math.round((startVan(st).huur || v.bedrag) * niveauVan(st).huur / 100) : v.bedrag);
 
 const RTG = {
   geld: { naam: 'RTG Geld', waarom: 'je hebt een rekening en een loon' },
@@ -108,5 +114,5 @@ const RTG = {
 };
 
 module.exports = { REGELVERSIE, DAG_MS, MAX_DAGEN_PER_KEER, TEMPO, DOORSPOELEN_MAX, START_KAS, PERIODE, DAGNAMEN, weekdag, dagNaam, BAAN, VRIJ,
-  VERPLICHTINGEN, BOODSCHAPPEN, SOFTWARE, JURISDICTIE, AANMANING, KVK, LEREN, BETAALTERMIJN, HERINNERING_DAGEN, LENING,
+  VERPLICHTINGEN, STARTPOSITIES, startVan, beginKas, verplichtingenVan, BOODSCHAPPEN, SOFTWARE, JURISDICTIE, AANMANING, KVK, LEREN, BETAALTERMIJN, HERINNERING_DAGEN, LENING,
   VOORFINANCIERING, ONDERNEMING, ZELFSTANDIG, RTG, MOEILIJKHEID, niveauVan, verplichtingBedrag };

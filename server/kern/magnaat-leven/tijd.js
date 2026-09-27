@@ -46,7 +46,7 @@ function plan(st, z) {
   }
   if (wat === 'extra') {
     if (!st.baan.actief) return fout('Je hebt geen baan meer om een extra dienst te draaien.');
-    if (R.weekdag(dag) !== st.baan.extra.dag) return fout('De keuken vraagt extra mensen op ' + R.DAGNAMEN[st.baan.extra.dag] + '.');
+    if (R.weekdag(dag) !== st.baan.extra.dag) return fout(st.baan.werkgever + ' vraagt extra mensen op ' + R.DAGNAMEN[st.baan.extra.dag] + '.');
     if ((st.agenda[dag] || []).some(x => x.wat === 'extra')) return fout('Die extra dienst staat al in je agenda.');
     regel.minuten = st.baan.extra.minuten;
   } else if (!Number.isInteger(minuten) || minuten < 30 || minuten % 30) {

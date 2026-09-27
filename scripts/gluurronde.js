@@ -166,7 +166,12 @@ const IDVELDEN = ['id', 'ref', 'code', 'sleutel', 'key', 'nummer', 'uuid', 'kame
    /api/browser/*, mét de codenaam van de maker erbij. Dat is attributie en geen
    lek -- dezelfde regel als "Uit De Salon - naam" in de huisstijl. Zonder dat
    veld zou de ronde die attributie elke draai als bevinding melden, en dan is
-   hij binnen een week niet meer serieus te nemen. */
+   hij binnen een week niet meer serieus te nemen.
+
+   `familie` zet de vrijstelling SMALLER dan de gewone familie van twee
+   segmenten, voor een route die diep onder een portaal hangt: zonder dat veld
+   zou /api/member/magnaat/stad/maak alles onder /api/member uit de
+   inhoudscontrole tillen. */
 const GEDEELD_BEDOELD = new Map([
   ['/api/labfonds/locatie/maak', { reden: 'een locatie in het Lab-fonds is juist openbaar: leden doneren eraan en stemmen erover' }],
   /* Dezelfde locatie, aangemaakt via de gezinsdeur van 14 september 2026. Het is
@@ -182,6 +187,12 @@ const GEDEELD_BEDOELD = new Map([
   ['/api/meet/maak', { reden: 'de code van een ontmoeting IS de uitnodiging: wie hem heeft mag erbij, net als een vergaderlink' }],
   ['/api/samen/maak', { reden: 'idem voor een samen-sessie: meedoen gebeurt met de code, dat is het hele mechanisme' }],
   ['/api/les/maak', { reden: 'de code van een les is de uitnodiging: de klas doet ermee mee' }],
+  /* Magnaat, samen in een Oudwijk (kern/magnaat-leven/stad.js): met de code doe je mee, en alleen zolang
+     de stad nog wacht. Wie meedoet ziet de codenamen en ondernemingen van de anderen -- zij zijn elkaars
+     concurrenten op de markt, dat IS de stad. Een sessiesleutel verlaat de module nooit, er gaat geen geld
+     tussen spelers, en A kan in de stad van B alleen zichzelf laten vertrekken (test/magnaatstad.test.js). */
+  ['/api/member/magnaat/stad/maak', { reden: 'de code van een stad is de uitnodiging: wie hem krijgt doet mee zolang de stad wacht, en ziet dan wie er nog meer in zit',
+    familie: '/api/member/magnaat/stad' }],
   ['/api/site/bewaar', { reden: 'een gepubliceerde site staat in de browsergids -- openbaar zijn IS het doel van publiceren',
     toont: ['/api/browser'] }]
 ]);
@@ -647,7 +658,7 @@ async function main() {
   const priveMerken = [...bezitB.merken.keys()].filter(m => !gedeeldeMerken.has(m));
   const priveIds = vanB.filter(id => !GEDEELD_BEDOELD.has(bezitB.bronnen.get(id)));
   const gedeeldeFamilies = [...GEDEELD_BEDOELD].flatMap(([pad, regel]) =>
-    [vrijstellingsFamilie(pad)].concat((regel && regel.toont) || []));
+    [(regel && regel.familie) || vrijstellingsFamilie(pad)].concat((regel && regel.toont) || []));
   const inGedeeldeFamilie = (pad) => gedeeldeFamilies.some(f => pad.startsWith(f + '/') || pad === f);
   const merkersVanB = new Set(priveIds.concat(codeB ? [codeB] : []).concat(priveMerken));
   for (const pad of onbewaakt.filter(p => ONGELEZEN_BEDOELD.has(p)))

@@ -89,7 +89,33 @@ const MOEILIJKHEID = {
   zwaar: { naam: 'Zwaar', startKas: 1500, laat: 150, huur: 110, zelfstandig: { dagen: 105, factor: 250, buffer: 8 }, uitzetting: 21, uitleg: 'bijna niets op de bank, klanten betalen later, je kamer is duurder' }
 };
 const niveauVan = (st) => MOEILIJKHEID[st.moeilijkheid] || MOEILIJKHEID.normaal;
-const verplichtingBedrag = (st, v) => (v.id === 'huur' ? Math.round(v.bedrag * niveauVan(st).huur / 100) : v.bedrag);
+
+/* WAAR JE BEGINT (na 1.0). Niet iedereen begint in de keuken. Een startpositie
+   verschuift drie dingen: de baan (werkgever, uren, loon, de extra dienst), wat
+   er op de bank staat bovenop het startgeld van de moeilijkheid, en eventueel
+   een eigen vaste last. De keten zelf verandert niet, en de drempel om
+   zelfstandig te worden rekent met het loon van DEZE baan: wie minder verdient,
+   hoeft minder te vervangen, maar heeft ook minder om op terug te vallen. */
+const STARTPOSITIES = {
+  keuken: { naam: 'De keuken', uitleg: '24 uur per week in een brasserie, en bijna niets op de bank', huur: null,
+    beschrijving: 'een baan in de keuken', baan: {}, extraKas: 0, verplichting: null },
+  student: { naam: 'Student', uitleg: 'een bijbaan van 20 uur, een goedkope studentenkamer, en elke vier weken aflossen op je studieschuld',
+    beschrijving: 'een bijbaan en een studieschuld',
+    baan: { werkgever: 'Supermarkt De Linde', functie: 'Vakkenvuller', urenPerWeek: 20, dienstdagen: [1, 5], uurloon: 1150,
+      extra: { dag: 3, minuten: 240, loon: 4600 } },
+    extraKas: 0, huur: 42000,
+    verplichting: { id: 'studie', naam: 'Aflossing studieschuld', leverancier: 'de studiefinanciering', bedrag: 6000, elke: PERIODE, eerste: 20,
+      uitstel: { dagen: 7, kosten: 0 } } },
+  erfenis: { naam: 'Een kleine erfenis', uitleg: '16 uur in een bakkerij, en € 8.000 van je tante op de bank',
+    beschrijving: 'een erfenis en een baan in de bakkerij',
+    baan: { werkgever: 'Bakkerij Van Dam', functie: 'Verkoper', urenPerWeek: 16, dienstdagen: [1, 5], uurloon: 1125,
+      extra: { dag: 3, minuten: 420, loon: 7875 } },
+    extraKas: 800000, verplichting: null }
+};
+const startVan = (st) => STARTPOSITIES[st.start] || STARTPOSITIES.keuken;
+const beginKas = (st) => niveauVan(st).startKas + startVan(st).extraKas;
+const verplichtingenVan = (st) => (startVan(st).verplichting ? VERPLICHTINGEN.concat(startVan(st).verplichting) : VERPLICHTINGEN);
+const verplichtingBedrag = (st, v) => (v.id === 'huur' ? Math.round((startVan(st).huur || v.bedrag) * niveauVan(st).huur / 100) : v.bedrag);
 
 const RTG = {
   geld: { naam: 'RTG Geld', waarom: 'je hebt een rekening en een loon' },
@@ -108,5 +134,5 @@ const RTG = {
 };
 
 module.exports = { REGELVERSIE, DAG_MS, MAX_DAGEN_PER_KEER, TEMPO, DOORSPOELEN_MAX, START_KAS, PERIODE, DAGNAMEN, weekdag, dagNaam, BAAN, VRIJ,
-  VERPLICHTINGEN, BOODSCHAPPEN, SOFTWARE, JURISDICTIE, AANMANING, KVK, LEREN, BETAALTERMIJN, HERINNERING_DAGEN, LENING,
+  VERPLICHTINGEN, STARTPOSITIES, startVan, beginKas, verplichtingenVan, BOODSCHAPPEN, SOFTWARE, JURISDICTIE, AANMANING, KVK, LEREN, BETAALTERMIJN, HERINNERING_DAGEN, LENING,
   VOORFINANCIERING, ONDERNEMING, ZELFSTANDIG, RTG, MOEILIJKHEID, niveauVan, verplichtingBedrag };

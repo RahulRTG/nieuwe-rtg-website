@@ -124,7 +124,7 @@
     "staging:repetitie": "node scripts/staging-repetitie.js",
     "afbouw:oordeel": "node scripts/afbouwoordeel.js",
     "afbouw:snel": "npm run release:gate && npm run staging:repetitie && npm run afbouw:oordeel",
-    "afbouw:software": "npm test && npm run schermsuite:bewijs && npm run release:gate && npm run staging:repetitie && npm run afbouw:oordeel -- --eis-bewezen",
+    "afbouw:software": "npm test && node scripts/lokale-toetsomgeving.js npm run schermsuite:bewijs && node scripts/lokale-toetsomgeving.js npm run release:gate && node scripts/lokale-toetsomgeving.js npm run staging:repetitie && npm run afbouw:oordeel -- --eis-bewezen",
     "afbouw:alles": "npm run afbouw:software && npm run live:golive && npm run productie:status",
     "deploy:productie": "npm run live:deploy",
     "deploy:terug": "node scripts/uitrol.js --terug",

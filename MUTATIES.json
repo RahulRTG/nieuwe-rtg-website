@@ -2530,6 +2530,14 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "doossleutels-register.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/zaakdoos/sleutels.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "doossleutels.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -10978,6 +10986,20 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "zaakdoos-kloon.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "zaakdoos-productie.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "zaakdoos.test.js": {
       "soort": "server",

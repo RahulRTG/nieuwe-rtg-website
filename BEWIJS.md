@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2094 bestanden en 14740 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2098 bestanden en 14752 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2094 |
-| losse beweringen (`test(...)`) | 14740 |
+| toetsbestanden | 2098 |
+| losse beweringen (`test(...)`) | 14752 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 173 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1435 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1438 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 75 |
-| alleen in de kop *genoemd*, nog niet gemeten | 170 |
+| alleen in de kop *genoemd*, nog niet gemeten | 171 |
 | niets van beide | 414 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1832 bestanden, 14278 beweringen.
+1836 bestanden, 14290 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -377,7 +377,8 @@ toets omvalt.
 | `doorwerking.test.js` | 7 | gezakt op `===->!==#0` | DE DOORWERKING VAN HET ZORGPROFIEL (scripts/doorwerking.js). MAATSTAF.md U10: een gegeven wordt één keer gevraagd en alleen hergebruikt met doel, toestemming, bron en actualiteit. |
 | `doos-journaal.test.js` | 3 | gezakt op `true->false` | Zaakdoos-journaal, beveiliging: het journaal wordt na herstel nagespeeld naar de cloud met de inlog van de doos. Daarom is het gezegeld (HMAC), genummerd (seq) en padgebonden. |
 | `doos-regie.test.js` | 5 | gezakt op `liegpoort /api/` | De doos-regie: het beheer op afstand van de Zaakdoos-vloot. Het kantoor zet een doelversie en per doos een netwerkrol (accesspoint, versterker, gastwifi); de doos haalt beide zelf op bij zijn eigen melding en meldt... |
-| `doossleutels.test.js` | 6 | gezakt op `liegpoort /api/` | EEN SLEUTEL PER ZAAKDOOS (AUTHORITY.md fase 7, in de schaduw). Vijf dingen die niet mogen sneuvelen: 1. |
+| `doossleutels-register.test.js` | 5 | gezakt op `===->!==#0` | Het register van de zaakdoossleutels zonder server (devices.zaakdoos_sleutel, B12): hash-only, vervaldatum, plafond per zaak, legacy opent niets, de schaduw, de wacht in productie en constante tijd. Draai los: node... |
+| `doossleutels.test.js` | 7 | gezakt op `liegpoort /api/` | EEN SLEUTEL PER ZAAKDOOS, GEBONDEN AAN ZIJN ZAAK (devices.zaakdoos_sleutel, B12). Uitgeven doet een mens op naam (de eigenaar of een manager van DE zaak); met een eigen sleutel zijn doos en zaak bewezen, niet... |
 | `drempels.test.js` | 7 | gezakt op `&&->||#0` | DE DREMPELS VAN DE GEBAREN STAAN OP EEN PLEK (EDGE.md par. 11, ronde 1). |
 | `drie.test.js` | 9 | gezakt op `!==->===` | Drie (public/shared/drie.js): de pure kern van de 3D-laag -- mat4/vec3 en de meshbouwers -- draait ook in Node en is hier los getoetst (geen canvas nodig). De WebGL-renderer zelf leeft alleen in de browser en valt... |
 | `drm.test.js` | 5 | gezakt op `liegpoort /api/` | RTG contentbescherming, de DRM-route (kern/drm.js): Encrypted Media Extensions met een Clear Key-licentie die RTG zelf bedient. Draai: npm test |
@@ -479,7 +480,7 @@ toets omvalt.
 | `fonds.test.js` | 9 | gezakt op `liegpoort /api/` | Sociale afdracht: van elke bevestigde maandbetaling gaat 30% (ex btw) als twee formele claims naar 20% lokaal en 10% RTFoundation. We toetsen drie lagen: 1. |
 | `foodcourt.test.js` | 3 | gezakt op `liegpoort /api/` | De RTG Food Court (kern/foodcourt.js): alle restaurants op een rij, in de stijl van een reserveerplatform. Overzicht met keuken/prijs/ledenvoordeel, vrije tijdsloten per datum en gezelschap, en reserveren via... |
 | `foundation-geld-later.test.js` | 5 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `foundation-gezinstoken-productie.test.js` | 4 | gezakt op `liegpoort /api/` | De niet-gemigreerde gezins- en lesdragers zijn in productie DICHT, ook met een geslaagd extern Foundation-dossier; en de Zaakdoos-kloon (de hele db.data) is in productie dicht, met of zonder sleutel.... |
+| `foundation-gezinstoken-productie.test.js` | 4 | gezakt op `liegpoort /api/` | De niet-gemigreerde gezins- en lesdragers zijn in productie DICHT, ook met een geslaagd extern Foundation-dossier; en de gedeelde Zaakdoos-sleutel opent in productie niets meer (B12): de kloon is dan 503 en de meting... |
 | `foundation-gezondheid-welzijn.test.js` | 5 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `foundation-hulp-zorg.test.js` | 4 | -- | De Hulp & Zorg-voorzijde mag warm en persoonlijk ogen, maar nooit een zorgverlener, dossier of toestemming verzinnen. Deze toets bewaakt de drie getekende schermen en hun echte databronnen. |
 | `foundation-leren-groei.test.js` | 5 | -- | Leren & Groei toont de bestaande leerroute in de drie goedgekeurde schermen. De toets bewaakt dat vorm nooit wordt verward met bewijs. |
@@ -1848,6 +1849,9 @@ toets omvalt.
 | `zaakbetaling.test.js` | 6 | genoemd | DE DRIE BETAALPADEN VERPLAATSEN ECHT GELD. Een bestelling, een lopende rekening en een rit zetten `paid = true`, schreven een factuur en stuurden een bericht -- en verplaatsten geen cent. |
 | `zaakcommand-routes.test.js` | 8 | gezakt op `liegpoort /api/` | DE ROUTES VAN ZAAK COMMAND -- de commandolaag van EEN zaak, over HTTP. test/zaakcommand.test.js toetst de motor met nagemaakte gegevens: daar staat dat de zaak niets van de buurman ziet en niets van RTG. |
 | `zaakcommand.test.js` | 8 | gezakt op `===->!==#0` | Zaak Command (kern/zaakcommand/): dezelfde commandologica als RTG Command, maar van EEN zaak en uitsluitend over die zaak. Deze toets bewijst vier dingen: de zaak ziet niets van een andere zaak en niets van RTG; een... |
+| `zaakdoos-kloon.test.js` | 4 | gezakt op `liegpoort /api/` | DE KLOON PER ZAAK (devices.zaakdoos_sleutel, besluit B12). 1. |
+| `zaakdoos-productie.test.js` | 1 | gezakt op `liegpoort /api/` | DE EIGEN ZAAKDOOSSLEUTEL OP EEN ECHTE PRODUCTIESERVER (devices.zaakdoos_sleutel, besluit B12). De gedeelde sleutel opent daar niets (test/foundation-gezinstoken- productie.test.js toets 3); de eigen sleutel van een... |
+| `zaakdoos-sleutel.pg.test.js` | 1 | genoemd | Echte productie-topologieproef voor devices.zaakdoos_sleutel (besluit B12). Twee onafhankelijke kerninstances delen de autoritatieve `doosSleutels` in PostgreSQL. |
 | `zaakdoos.test.js` | 10 | gezakt op `liegpoort /api/` | De Zaakdoos end-to-end: een cloudserver en een doos-kastje ernaast. 1. |
 | `zaakinlog.test.js` | 6 | -- | Inloggen bij een zaak: op een plek, met een teller die klopt. Deze module bestaat omdat er TWEE implementaties van dezelfde handeling stonden -- de genrewereld en de proefsleutels deden allebei rooster+login -- en de... |
 | `zaaktools.test.js` | 2 | gezakt op `liegpoort /api/` | De gereedschappen die elke zaak krijgt: reageren op reviews (met melding aan de gast) en de lichte voorraad met drempelmeldingen. |

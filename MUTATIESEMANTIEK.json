@@ -6,9 +6,9 @@
     "routesGevonden": 4550,
     "verklaard": 37,
     "onverklaard": 4513,
-    "beproefd": 1729,
-    "onbereikbaarVoorDeProef": 3291,
-    "verklaardEnBeproefd": 13,
+    "beproefd": 1730,
+    "onbereikbaarVoorDeProef": 3290,
+    "verklaardEnBeproefd": 14,
     "tegenspraken": 0,
     "onbekendeKlassen": 0,
     "randVerklaard": 9
@@ -455,8 +455,8 @@
       "regel": 56,
       "klasse": "sleutelVereist",
       "waarom": "MET dezelfde sleutel merkt de poort de herhaling",
-      "gemeten": "ongemeten",
-      "reden": "de eerste oproep deed geen werk (status 403)",
+      "gemeten": "beschermd",
+      "reden": "de server merkte de herhaling zelf (herhaald: true)",
       "tegenspraak": null
     },
     {

@@ -228,10 +228,10 @@ bestaat. Daarom: eerst schaduw, dan tanden.
 | | aantal |
 |---|---|
 | routes met een rol | <!--getal:idem.routesMetRol-->4258<!--/getal--> |
-| beoordeeld | <!--getal:idem.beoordeeld-->1729<!--/getal--> |
-| beschermd | <!--getal:idem.beschermd-->1728<!--/getal--> |
+| beoordeeld | <!--getal:idem.beoordeeld-->1730<!--/getal--> |
+| beschermd | <!--getal:idem.beschermd-->1729<!--/getal--> |
 | onbeschermd | **<!--getal:idem.onbeschermd-->1<!--/getal-->** |
-| ongemeten | <!--getal:idem.ongemeten-->3291<!--/getal--> |
+| ongemeten | <!--getal:idem.ongemeten-->3290<!--/getal--> |
 
 Dit staat er beter voor dan `CLAUDE.md` beweert (dat noemt nog 115 gemeten; dat
 cijfer is verouderd). Van alles wat beoordeeld is, is niets onbeschermd. De

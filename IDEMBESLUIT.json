@@ -19,7 +19,7 @@
  },
  "telling": {
   "creatie": 45,
-  "beschermd": 15,
+  "beschermd": 16,
   "berekening": 70,
   "instelling": 27,
   "code-maker": 4,
@@ -583,6 +583,10 @@
   "/api/office/werkos/bankpad": {
    "klasse": "berekening",
    "reden": "Gemeten op 27 september 2026 (IDEMPROEF op 51d9ae44): de proef zag geen tweede effect. Leest de stand van de Werk OS-uitgave via RTG Rekening; zetten gaat via /zet."
+  },
+  "/api/office/bank/incasso": {
+   "klasse": "beschermd",
+   "reden": "Gemeten op 27 september 2026 met de passkeymedewerker (scripts/lib/idempasskey.js): de server merkte de herhaling zelf. De economische sleutel van het voornemen (kern/commercie/voornemen.js) maakt van een tweede klik hetzelfde voornemen, en de ronde zelf draait pas na een tweede mens (kern/kantoor/geldketen.js). Een aanvraag voor dezelfde grens is dus geen tweede incassoronde."
   }
  }
 }

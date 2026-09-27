@@ -63,6 +63,10 @@ module.exports = ({
     'rotatie toont een nieuwe geldwaardige tegoedcode eenmaal; de bon weigert de sleutel daarna met 409',
   'POST /api/supplier/pay/tegoed/roteer':
     'zelfde reden als de ledenkant: geen antwoordcache mag de code heronthullen',
+  'POST /api/order/afhaalcode':
+    'tonen is roteren: elk antwoord draagt een nieuwe afhaalcode en trekt de vorige in; een herhaald antwoord zou een ingetrokken code tonen',
+  'POST /api/order/afhaalcode/intrek':
+    'intrekken leest de actuele stand in kern/afhaalcode.js; een tweede keer is een toestandscontrole, geen gecachet antwoord',
   'POST /api/member/vluchten/incheck':
     'check-in geeft de kale boarding-passcode eenmaal; een generieke antwoordcache mag haar nooit heronthullen',
   'POST /api/member/vluchten/pass/roteer':

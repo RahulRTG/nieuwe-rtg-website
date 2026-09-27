@@ -1,12 +1,12 @@
 {
-  "catalogi": 1163,
+  "catalogi": 1164,
   "verschillendeNamen": 706,
   "namenInMeerDomeinen": 128,
   "woordenMetMeerBetekenissen": 110,
   "betekenissenTotaal": 408,
   "ergsteWoord": "SOORTEN",
   "ergsteAantal": 49,
-  "dubbelingen": 33,
+  "dubbelingen": 34,
   "dubbelingLijst": [
     {
       "naam": "PALET",
@@ -437,6 +437,21 @@
         "opgepakt",
         "klaar",
         "ingetrokken"
+      ]
+    },
+    {
+      "naam": "VELDEN",
+      "betekenissenVanDitWoord": 10,
+      "waar": [
+        "server/kern/beleidsmotor/index.js",
+        "server/kern/leerhuis/schaduw.js"
+      ],
+      "leden": 4,
+      "voorbeeld": [
+        "eens",
+        "oneens",
+        "onbekend",
+        "gebruik"
       ]
     },
     {
@@ -1944,10 +1959,10 @@
     },
     {
       "naam": "VELDEN",
-      "domeinen": 10,
+      "domeinen": 11,
       "betekenissen": 10,
-      "hoogsteOverlap": 0.09,
-      "soort": "botsing",
+      "hoogsteOverlap": 0.75,
+      "soort": "gemengd",
       "waar": [
         {
           "bestanden": [
@@ -1975,7 +1990,8 @@
         },
         {
           "bestanden": [
-            "server/kern/beleidsmotor/index.js"
+            "server/kern/beleidsmotor/index.js",
+            "server/kern/leerhuis/schaduw.js"
           ],
           "leden": 4,
           "voorbeeld": [
@@ -3621,5 +3637,5 @@
       ]
     }
   ],
-  "bestanden": 3702
+  "bestanden": 3703
 }

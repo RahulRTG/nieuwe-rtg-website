@@ -30,8 +30,8 @@ omlaag.
 | `app-main-05.js` | Account access: validate the current step and submit through the existing auth routes |
 | `app-main-06.js` | SALON-CONNECTIES |
 | `app-main-07.js` | het contactenblok op het beginscherm, met de lege staat |
+| `app-main-070.js` | de herkomstvraag op het welkomstscherm (besluit C6) |
 | `app-main-07a.js` | Language changes only presentation; agreement, identity and focus are preserved |
-| `app-main-07c.js` | de herkomstvraag op het welkomstscherm (besluit C6) |
 | `app-main-08.js` | de onboarding: het paspoort scannen of een bestand kiezen |
 | `app-main-08a.js` | Vervolg van app-main-08: het meebouwen aan het eind van de onboarding |
 | `app-main-08b.js` | Vervolg van app-main-08: de snaps- en verhalenstrip boven de contactenkaart |

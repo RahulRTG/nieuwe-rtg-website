@@ -32,6 +32,7 @@ function vestig(st, z) {
   const w = M.WIJKEN[z.wijk];
   if (!w) return fout('Kies een plek: ' + Object.values(M.WIJKEN).map(x => x.naam).join(', ') + '.');
   if (z.wijk === st.vestiging.wijk) return fout('Je zit al in ' + w.naam + '.');
+  if (st.groei && st.groei.filiaal && st.groei.filiaal.wijk === z.wijk) return fout('Daar staat je filiaal al.');
   if (st.kas < w.verhuis + w.huur) return fout('Verhuizen naar ' + w.naam + ' kost ' + euro(w.verhuis) + ' plus de eerste huur van ' + euro(w.huur) + ', en er staat ' + euro(st.kas) + ' op je rekening.');
   const oud = M.WIJKEN[st.vestiging.wijk];
   st.posten = st.posten.filter(p => p.soort !== 'huisvesting' || p.achterstand);

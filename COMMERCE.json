@@ -17,12 +17,12 @@
     "wagenVormen": 33,
     "wagenVormenUniek": 30,
     "wagenDomeinen": 22,
-    "optellingen": 118,
+    "optellingen": 119,
     "optelDomeinen": 59,
     "optelCenten": 64,
     "optelEuro": 5,
     "optelGemengd": 0,
-    "optelOnbekend": 49
+    "optelOnbekend": 50
   },
   "envelop": [
     "aantal",
@@ -2681,6 +2681,16 @@
       ]
     },
     {
+      "domein": "kern/magnaat-leven",
+      "plekken": 4,
+      "waar": [
+        "server/kern/magnaat-leven/geld.js",
+        "server/kern/magnaat-leven/groei.js",
+        "server/kern/magnaat-leven/volgende.js",
+        "server/kern/magnaat-leven/weergave.js"
+      ]
+    },
+    {
       "domein": "kern/rtfos",
       "plekken": 4,
       "waar": [
@@ -2715,15 +2725,6 @@
         "server/kern/gast/betalen.js",
         "server/kern/gast/foodcourt.js",
         "server/kern/gast/order.js"
-      ]
-    },
-    {
-      "domein": "kern/magnaat-leven",
-      "plekken": 3,
-      "waar": [
-        "server/kern/magnaat-leven/dag.js",
-        "server/kern/magnaat-leven/volgende.js",
-        "server/kern/magnaat-leven/weergave.js"
       ]
     },
     {

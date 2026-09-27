@@ -13,6 +13,7 @@
      - `eisNiet(door, v.auteur, ...)` weg uit kennisStand             -> toets 11
      - de tweede-mens-eis weg uit geschiktheid (brug.js)              -> toets 12
      - de bestaand-id-weigering weg uit nieuwId (hulp.js)             -> toets 14
+     - `DUURZAAM.has(actie)` weg uit doe() in index.js               -> toets 17
    Toets 1 zakte eerst NIET op zijn eigen mutatie: een andere weigering redde
    hem. Hij is daarna zo gemaakt dat alleen die ene regel nog in de weg staat.
    Toets 14 vond zelf een fout (een bestaand id herschreef een beoordeling) en
@@ -391,4 +392,41 @@ test('16. uitleg: waarom leren, waarom niet gereed, en een startplan dat eerlijk
   const mc = w.lh.lees.managerCockpit(ORG, P.M);
   assert.ok(mc.TEAM.some(t => t.persoon === P.N));
   assert.ok(!JSON.stringify(mc).includes('criteria"'), 'een manager ziet geen beoordelingscriteria');
+});
+
+test('17. duurzaam (B4): drie handelingen gaan alleen via doeVast, en een mislukte commit heet onbekend', async () => {
+  const { maakLeerhuis, DUURZAAM } = require('../server/kern/leerhuis');
+  assert.deepEqual([...DUURZAAM].sort(), ['beoordelingAfronden', 'certificaatStand', 'certificaatUitgeven']);
+  const w = basis();
+  const { beoordeling } = (() => {
+    const s = (naar, door) => w.doe(ORG, 'lerenStand', { persoon: P.N, curriculum: 'ops-basis', naar }, door);
+    w.doe(ORG, 'rolToewijzen', { persoon: P.N, rol: 'ops' }, P.M);
+    w.doe(ORG, 'startplanMaak', { persoon: P.N, rol: 'ops' }, P.M);
+    s('LEARNING', P.N); s('PRACTICING', P.N);
+    w.doe(ORG, 'simulatieAfronden', { scenario: 'storno', keuzes: W.STORNO }, P.N);
+    s('SIMULATING', P.N); s('SUPERVISED', P.T);
+    w.doe(ORG, 'bewijsVastleggen', { persoon: P.N, vaardigheid: 'terugboeken', soort: 'OBSERVATION_EVIDENCE', sterkte: 'OBSERVED' }, P.T);
+    s('READY_FOR_ASSESSMENT', P.T);
+    return { beoordeling: W.beoordeel(w, ORG, P.N, 'terugboeken', P.A) };
+  })();
+  /* Dezelfde opslag, nu met een bundel die de commit NIET bevestigt. */
+  let commits = 0;
+  const faalt = async (fn) => { await fn(); commits++; throw new Error('schijf vol'); };
+  const lh = maakLeerhuis({ db: w.db, save: () => {}, bijeen: faalt, inBundel: () => false, nu: w.nu });
+  const i = { persoon: P.N, vaardigheden: ['terugboeken'], beoordelingen: [beoordeling] };
+  const sync = lh.doe(ORG, 'certificaatUitgeven', i, P.Q, { sleutel: 'c-1' });
+  assert.equal(sync.ok, false, 'de synchrone deur weigert een duurzame handeling zodra er een bundel is');
+  const r = await lh.doeVast(ORG, 'certificaatUitgeven', i, P.Q, { sleutel: 'c-1' });
+  assert.equal(r.ok, false); assert.equal(r.status, 503); assert.equal(r.onbekend, true);
+  assert.match(r.hoe, /uitkomst/);
+  assert.equal(commits, 1, 'er is precies een duurzame commit geprobeerd');
+  /* Onbekend en niet mislukt: de regel staat in het geheugen, en een herhaling
+     met dezelfde sleutel maakt geen tweede certificaat. */
+  assert.equal(lh.uitkomst(ORG, 'c-1').bekend, true);
+  const nogmaals = await lh.doeVast(ORG, 'certificaatUitgeven', i, P.Q, { sleutel: 'c-1' });
+  assert.equal(nogmaals.herhaald, true);
+  assert.equal(Object.values(lh.stand(ORG).certificaten).filter(c => c.persoon === P.N).length, 1);
+  /* En een handeling die niet duurzaam hoeft, raakt de bundel niet. */
+  const v = await lh.doeVast(ORG, 'voorstelIndienen', { probleem: 'a', voorstel: 'b', reden: 'c' }, P.N, { sleutel: 'v-1' });
+  assert.equal(v.ok, true); assert.equal(commits, 1);
 });

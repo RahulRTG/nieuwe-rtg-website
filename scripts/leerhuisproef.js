@@ -44,7 +44,6 @@ const [E, KO, CO, Q, A, T, M, N, N2] = ['lid:1', 'lid:2', 'lid:4', 'lid:5', 'lid
 const BLOKKADES = [
   { id: 'UI', klasse: 'UX', wat: 'er is nog geen scherm (My Academy, Trainer, Manager, Knowledge Governance)', sluit: 'fase B-UI' },
   { id: 'DOMEINPOORT', klasse: 'AUTHORITY', wat: 'geen RTG-domeinpoort leest AUTHORITY_ELIGIBLE als feit; geschiktheid verandert nog nergens een recht', sluit: 'besluit ACADEMY-B1' },
-  { id: 'DUURZAAM', klasse: 'RECOVERY', wat: 'het spoor gaat via save() en niet via db/duurzaam.js; een certificaat kan een crash vlak na het antwoord niet overleven', sluit: 'besluit ACADEMY-B4 plus regel 47' },
   { id: 'IDENTITEIT', klasse: 'TENANT_ISOLATION', wat: 'de persoonsleutel is nog niet gekoppeld aan employment (kern/concern) of de werkruimte; een relatie is een verklaring van de organisatie zelf', sluit: 'besluit ACADEMY-B2' }
 ];
 

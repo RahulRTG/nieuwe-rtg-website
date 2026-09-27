@@ -22,14 +22,13 @@ Allebei zijn eerlijk, en ze worden nooit opgeteld. De lus sluit in de REGELS
 (`server/kern/leerhuis/`): van een behoefte aan een operationsmens tot de
 leerling van gisteren die de volgende leerling traint, via een kennisverandering
 die uit de praktijk kwam. De Academy is toch niet klaar voor productie, want er
-staan vier P0-blokkades open. Die staan hieronder bij naam, en de proef leest ze
+staan drie P0-blokkades open. Die staan hieronder bij naam, en de proef leest ze
 uit dezelfde lijst (`BLOKKADES` in `scripts/leerhuisproef.js`).
 
 | blokkade | klasse | wat er ontbreekt | sluit met |
 |---|---|---|---|
 | `UI` | UX | geen scherm voor My Academy, Trainer, Manager en Knowledge Governance | fase B-UI (par. 6) |
 | `DOMEINPOORT` | AUTHORITY | geen RTG-domeinpoort leest AUTHORITY_ELIGIBLE als feit; geschiktheid verandert nog nergens een recht | besluit B1 (genomen: eerst schaduw) |
-| `DUURZAAM` | RECOVERY | het spoor gaat via `save()`, niet via `db/duurzaam.js`; een certificaat kan een crash vlak na het antwoord niet overleven | besluit B4 (genomen: drie handelingen) plus regel 47 |
 | `IDENTITEIT` | TENANT_ISOLATION | de persoonsleutel is niet gekoppeld aan `employment` (kern/concern) of de werkruimte; een relatie is een verklaring van de organisatie zelf | besluit B2 (genomen: per soort bron) |
 
 ---
@@ -108,8 +107,8 @@ Gemeten over `server/` en `scripts/`, 27 september 2026.
    een vakstaat zijn opgeslagen progressie. Voor werk is dat de bedoeling, maar een
    RTF-vrijwilliger kan jonger zijn. De uitzondering van 14 september voor een
    leerdossier (niet vergelijkend, geen blijvend niveaulabel) dekt een certificaat
-   niet vanzelf. Dat is besluit B5 (genomen: 18+ voor een certificaat, leren mag jonger), en tot het is uitgevoerd hoort het leerhuis niet open te gaan
-   voor wie de 18+-poort niet haalt.
+   niet vanzelf. Dat is besluit B5, en het is uitgevoerd: een certificaat alleen
+   voor wie de 18+-poort haalt, leren en bewijs op elke leeftijd.
 5. **De actor komt uit de sessie** (AUTHORITY.md grens 1). De kern neemt `door` als
    argument en vertrouwt nooit een veld uit een verzoek; `server/routes/leerhuis.js`
    haalt hem uit `req.session.key` (of `req.kantoorKey` op naam), en toets 4 van
@@ -166,8 +165,8 @@ vulling van het leerhuis werd een zevende besluit.
 | B1 | Welke domeinpoort leest AUTHORITY_ELIGIBLE als feit? | **één handeling, in de schaduw van de beleidsmotor** (de keuze werd aan de bouwer gelaten; dit was het voorstel): de poort leest de geschiktheid mee en telt eens/oneens, en houdt niemand tegen | klein; DOMEINPOORT gaat van open naar *schaduw*, niet naar dicht. Afdwingen is een volgend besluit, als de schaduw rijp is (A3, 23 september) | een stap weg |
 | B2 | Welke relatie is de waarheid? | **per soort bron**: `employment` (kern/concern) voor RTG en Business, `rtfos/vrijwilligers` voor RTF, de werving-uitnodiging voor Supplier, met een brug die één kant op loopt | een lezer per bron; de relatie in het leerhuis wordt een AFGELEIDE en geen verklaring meer | een stap weg |
 | B3 | Kennisbank en Knowledge Core? | **samenvoegen**: de kennisbank van een werkruimte (`server/bedrijf/kennis.js`) krijgt review, goedkeuring en afhankelijkheden en wordt de Knowledge Core | raakt elke bestaande werkruimte en haar artikelen; vraagt een migratie die per artikel byte voor byte vergelijkt, en een besluit over wie in een werkruimte KNOWLEDGE_OWNER is | jaren weg is het niet, maar het is het grootste stuk werk van de zeven |
-| B4 | Duurzaam? | **ja, drie handelingen**: `certificaatUitgeven`, `certificaatStand`, `beoordelingAfronden` | drie regels op de lijst van regel 47; die handelingen worden async | een stap weg |
-| B5 | 18+? | **18+ voor een certificaat**: onder de 18 wel leren, oefenen, bewijs en beoordeling in de vorm van het leerdossier (niet vergelijkend, geen niveaulabel); geen certificaat en geen vakstaat als niveau | een tweede poort in de route; de ledendeur staat nu op 18+ voor alles en wordt dus ruimer | een stap weg |
+| B4 | Duurzaam? | **ja, drie handelingen**: `certificaatUitgeven`, `certificaatStand`, `beoordelingAfronden` | een regel op de lijst van regel 47 (`kern/leerhuis/index.js`); de route gaat via `doeVast()`, de synchrone `doe()` weigert die drie zodra er een bundel is. Een mislukte commit heet ONBEKEND en niet mislukt, want `db/bijeen.js` draait het geheugen niet terug: eerst `uitkomst` navragen, dan opnieuw met dezelfde sleutel (toets 17) | **staat** |
+| B5 | 18+? | **18+ voor een certificaat**: onder de 18 wel leren, oefenen, bewijs en beoordeling in de vorm van het leerdossier (niet vergelijkend, geen niveaulabel); geen certificaat en geen vakstaat als niveau | de ledendeur vraagt alleen een eigen account; `certificaatUitgeven` vraagt dat de ONTVANGER `volwassen()` haalt, en een sleutel buiten `lid:` telt als niet vast te stellen (fail closed). Wie jonger is, ziet zijn vaardigheden zonder niveaulabel (routetoets 5) | **staat** |
 | B6 | Wie opent een leerhuis? | **het kantoor op naam** (`kluisAuth`), voor elke soort organisatie | een Business-zaak vraagt RTG | **staat** |
 | B7 | Waarmee wordt het leerhuis gevuld? | **alles**: het RTG-eigen Operations-leerhuis (V1), een startpakket per soort organisatie (RTG, RTF-stad, Business, Supplier), en een demo-organisatie in de zaaiset | inhoud is officiele kennis en moet door een mens worden goedgekeurd: de bouwer zet CONCEPTEN klaar, een KNOWLEDGE_OWNER activeert. De mensen in de rollen (trainer, assessor, kenniseigenaar) wijst de eigenaar aan; die worden niet verzonnen. De demo in de zaaiset draagt zichtbaar dat hij demo is | een stap weg |
 

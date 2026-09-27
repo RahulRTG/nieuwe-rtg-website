@@ -12,8 +12,9 @@
        (laat de route `b.door` doorgeven en toets 4 zakt)        -> toets 4
      - zonder sleutel geen handeling, en dezelfde sleutel twee keer schrijft
        een keer (haal de sleutelregel uit de route en toets 3 zakt) -> toets 3
-     - wie niet gekeurd en 18+ is, komt er niet in (haal de volwassen()-regel
-       weg en toets 5 zakt)                                     -> toets 5
+     - een certificaat alleen voor wie aantoonbaar 18+ is, leren voor iedereen
+       met een relatie (haal de volwassenLid-regel weg en toets 5 zakt)
+                                                                -> toets 5
      - een lid leest zijn eigen stand en niet het bestuursbeeld  -> toets 6
 
    Draai los: node --test test/leerhuis-routes.test.js */
@@ -101,10 +102,19 @@ test('4. de actor komt uit de sessie: een veld door in het lijf verandert niets'
   assert.equal(echt.status, 200, JSON.stringify(echt.body));
 });
 
-test('5. wie niet gekeurd en 18+ is, komt er niet in, en zonder account al helemaal niet', async () => {
-  const r = await lees(X, 'mijn');
-  assert.equal(r.status, 403);
-  assert.match(r.body.hoe || '', /B5/);
+test('5. B5: leren mag zonder 18+-keuring, een certificaat niet -- en zonder account komt er niets in', async () => {
+  const xId = (await post('/api/state', {}, X)).body.state.user.id;
+  assert.equal((await lees(X, 'mijn')).status, 403, 'zonder relatie met de organisatie leest niemand iets');
+  assert.equal((await doe(E, 'relatieZet', { persoon: 'lid:' + xId, soort: 'VOLUNTEER' }, 'rel-x-1')).status, 200);
+  const m = await lees(X, 'mijn');
+  assert.equal(m.status, 200, 'wie niet gekeurd is, leert gewoon mee: ' + JSON.stringify(m.body));
+  const c = await doe(E, 'certificaatUitgeven', { persoon: 'lid:' + xId, vaardigheden: ['terugboeken'], beoordelingen: [] }, 'cert-x-1');
+  assert.equal(c.status, 403);
+  assert.match(c.body.hoe || '', /B5/, 'de weigering noemt de grens en niet een ontbrekende rol');
+  const vreemd = await doe(E, 'certificaatUitgeven', { persoon: 'concern:iemand', vaardigheden: ['terugboeken'], beoordelingen: [] }, 'cert-c-1');
+  assert.equal(vreemd.status, 403, 'wie zijn leeftijd niet kan laten vaststellen, krijgt geen certificaat');
+  const volw = await doe(E, 'certificaatUitgeven', { persoon: 'lid:' + nId, vaardigheden: ['terugboeken'], beoordelingen: [] }, 'cert-n-1');
+  assert.doesNotMatch(volw.body.hoe || '', /B5/, 'een volwassene komt langs de 18+-grens; wat er dan weigert is de kern');
   assert.equal((await post('/api/leerhuis/lees', { org: ORG, vraag: 'mijn' }, null)).status, 401);
 });
 

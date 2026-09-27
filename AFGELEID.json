@@ -3,25 +3,25 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-09-27T15:47:46.655Z",
-  "commit": "e7e6bbfd",
+  "op": "2026-09-27T16:49:31.991Z",
+  "commit": "db0725ce",
   "boomVuil": false,
-  "boomAnders": 3,
+  "boomAnders": 0,
   "instrument": "scripts/afgeleid.js",
   "node": "v22.22.2"
  },
  "gemeten": {
-  "artefacten": 321,
-  "bron": 12,
-  "afgeleid": 178,
-  "fragmenten": 25,
+  "artefacten": 331,
+  "bron": 18,
+  "afgeleid": 180,
+  "fragmenten": 26,
   "momentopname": 1,
-  "onbeslist": 105,
+  "onbeslist": 106,
   "afgeleidZonderEigenaar": 2,
-  "metEigenaar": 202,
-  "afgeleidEigenaarHard": 176,
-  "afgeleidGrendelt": 20,
-  "metStempel": 110,
+  "metEigenaar": 205,
+  "afgeleidEigenaarHard": 178,
+  "afgeleidGrendelt": 21,
+  "metStempel": 111,
   "stempelAnders": 0
  },
  "artefacten": [
@@ -63,6 +63,18 @@
    "stempelAnders": false,
    "versheidOpdracht": "npm run aanvoervorm:vast",
    "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "ACADEMY.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
    "botsingVerklaard": null
   },
   {
@@ -238,6 +250,18 @@
    "botsingVerklaard": null
   },
   {
+   "naam": "AUTONOMIE.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
    "naam": "BEDRADING.json",
    "soort": "ONBESLIST",
    "eigenaar": null,
@@ -247,6 +271,20 @@
    "stempelAnders": false,
    "versheidOpdracht": null,
    "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "BEDRIJFSMAAT.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/bedrijfsmaat.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/bedrijfsmaat.js"
+   ],
+   "stempelInstrument": "scripts/bedrijfsmaat.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run bedrijfsmaat:vast",
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -631,6 +669,44 @@
    "stempelAnders": false,
    "versheidOpdracht": null,
    "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "CONNECTION_CONSTITUTION.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/connection-constitution.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/connection-constitution.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "CONNECTION_OS.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "CONNECTION_OS_FINAL.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
    "botsingVerklaard": null
   },
   {
@@ -2912,6 +2988,18 @@
    "botsingVerklaard": null
   },
   {
+   "naam": "POLITIEK.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
    "naam": "POORTWACHT.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/meetronde.js",
@@ -3229,6 +3317,30 @@
    "stempelAnders": false,
    "versheidOpdracht": "node scripts/sabotage.js",
    "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "SALOON.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "SAMENLEVING.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
    "botsingVerklaard": null
   },
   {
@@ -3981,6 +4093,18 @@
    "stempelAnders": false,
    "versheidOpdracht": "npm run vindbaar",
    "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "VRIJHEID.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
    "botsingVerklaard": null
   },
   {

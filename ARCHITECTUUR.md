@@ -110,7 +110,7 @@ zie §5 -- er zijn nog 244 kern-namen die meer dan één domein aanraakt.
 
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
-| `auth` | 21 | 6 | 8 | 55 |
+| `auth` | 21 | 6 | 8 | 54 |
 | `member` | 700 | 72 | 16 | 428 |
 | `supplier` | 624 | 127 | 6 | 337 |
 | `office` | 74 | 21 | 3 | 84 |
@@ -136,9 +136,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1608 |
+| kern-namen die routes aanraken | 1607 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 244 |
-| daarvan door precies één domein | 1364 |
+| daarvan door precies één domein | 1363 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -164,7 +164,7 @@ tenant(5) logInlog(5) veilig(5) openVacatures(5) overheid(5) sseToCustomer(5)
 | Namen uit kern | Bestand |
 |---|---|
 | 71 | `server/routes/member/rechterhand.js` |
-| 46 | `server/routes/auth/account.js` |
+| 45 | `server/routes/auth/account.js` |
 | 42 | `server/routes/member/voertuigen/huur.js` |
 | 41 | `server/routes/member/voertuigen/charter.js` |
 | 41 | `server/routes/member/voertuigen.js` |

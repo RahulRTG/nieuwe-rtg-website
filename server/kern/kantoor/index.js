@@ -13,6 +13,7 @@
 const { txLedgerAantal } = require('../../db'); // gecachete grootboek-teller (O(1), ~10 s vers)
 const inzagelog = require('../../inzagelog');  // spoor bij elke blik in de identiteitskluis
 const envelop = require('../../opzet/envelop');
+const productiedeur = require('./productiedeur');
 
 function maakKantoor({ db, save, bewerkCollectie, sessionFor, eigenaar, accounts, findSupplier, connectedSupplierCodes, publicSupplier, conciergeInbox, beveilig, archief, grootAantal, ledenAantal }) {
   const metrics = require('./metrics')({ db, accounts, conciergeInbox, beveilig });
@@ -38,6 +39,9 @@ function maakKantoor({ db, save, bewerkCollectie, sessionFor, eigenaar, accounts
     const token = header.startsWith('Bearer ') ? header.slice(7) : null;
     const sess = token && sessionFor(token);
     if (sess && sess.role === 'office') {
+      // B10: in productie alleen op naam met een passkey (./productiedeur.js)
+      const pd = productiedeur.sessieMag(sess);
+      if (!pd.ok) return res.status(pd.status).json(pd.body);
       // geen lidKey = geen mens achter dit token; zie ENVELOP.json (bevinding)
       envelop.zet(req, { soort: 'kantoor', id: sess.lidKey || null,
         identiteit: sess.lidKey ? 'bewezen' : 'anoniem' });
@@ -51,6 +55,8 @@ function maakKantoor({ db, save, bewerkCollectie, sessionFor, eigenaar, accounts
     try {
       const u = token && accounts.verifyToken(token);
       if (u && eigenaar.isEigenaar(accounts, u)) {
+        const pe = productiedeur.eigenaarDirect();
+        if (!pe.ok) return res.status(pe.status).json(pe.body);
         req.eigenaar = true;
         req.officeKey = 'user-' + u.id;   // zie hierboven
         envelop.zet(req, { soort: 'eigenaar', id: 'user-' + u.id,

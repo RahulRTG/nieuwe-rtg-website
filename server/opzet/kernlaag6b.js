@@ -40,7 +40,9 @@ Object.assign(kern, require('../kern/eenaccount').maakEenAccount({
   // en dezelfde persoonseis als /api/supplier/login: het ene account is geen achterdeur
   persoonsPoort: kern.persoonsPoort,
   // MIJN RTG blok 3: hier ontstaat een tweede context voor dezelfde mens
-  sessieregister
+  sessieregister,
+  // B10: de passkey aan de kantoordeur; een getter, want de zware poort komt later
+  zwaarVan: () => kern.zwaarbewijs
 }));
 /* Het kantoorgesprek (kern/kantoorgesprek.js): de backoffice binnenkomen door
    met Rahul te praten in plaats van een codeveld in te vullen. Zelfde slot als

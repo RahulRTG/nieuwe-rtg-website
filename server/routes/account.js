@@ -8,8 +8,11 @@ module.exports = (kern) => {
   // om de algemene pin vragen; venster: het werkvenster dat de deur dichthoudt;
   // locatieNodig: de werkplek-zone vraagt om een positie van het toestel;
   // watNu: de weg die wel werkt, zoals de kantooruitnodiging)
+  // B10 (kern/kantoor/productiedeur.js): de kantoordeur in productie vraagt een
+  // passkey; `bevestiging` draagt de ceremonie, `code` de soort weigering
   const stuur = (res, r) => r.error
-    ? res.status(r.status || 400).json({ error: r.error, ...(r.pinNodig ? { pinNodig: true } : {}), ...(r.venster ? { venster: r.venster } : {}), ...(r.locatieNodig ? { locatieNodig: true } : {}), ...(r.watNu ? { watNu: r.watNu } : {}) })
+    ? res.status(r.status || 400).json({ error: r.error, ...(r.pinNodig ? { pinNodig: true } : {}), ...(r.venster ? { venster: r.venster } : {}), ...(r.locatieNodig ? { locatieNodig: true } : {}), ...(r.watNu ? { watNu: r.watNu } : {}),
+      ...(r.code ? { code: r.code } : {}), ...(r.bevestigingNodig ? { bevestigingNodig: true, actie: r.actie, bevestiging: r.bevestiging } : {}) })
     : res.json(r);
   const echtAccount = (req, res) => {
     if (req.session.tier === 'guest' || !req.session.account) {

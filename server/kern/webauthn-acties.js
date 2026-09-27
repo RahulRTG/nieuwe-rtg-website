@@ -60,6 +60,7 @@ const ZWARE_ACTIES = Object.freeze([
   'eigenaar-werkbankpad',       // POST /api/office/werkos/bankpad/zet
   'bank.incasso',               // POST /api/office/bank/incasso  (de geldketen, MACHINE.md par. 5a)
   'bank.bevestig',              // POST /api/office/bank/handtekening/bevestig  (tweede handtekening onder geld)
+  'kantoor-binnen',             // POST /api/account/start  (rol kantoor, in productie; kern/kantoor/productiedeur.js)
   'passkey-weg'                 // POST /api/webauthn/weg
 ]);
 

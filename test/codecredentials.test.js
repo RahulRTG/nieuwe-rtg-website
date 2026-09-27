@@ -80,7 +80,8 @@ test('geen_credential is alleen een gesloten, onderbouwd oordeel', () => {
 test('de echte credentials uit de classificatieronde blokkeren de release', () => {
   const register = poort.lees();
   const uit = poort.controleer(register);
-  const echte = ['office.gedeelde_kantoorcode', 'partnerkanaal.personeels_en_partnercode',
+  // office.gedeelde_kantoorcode is in productie gesloten (B10): zie de toets hieronder
+  const echte = ['partnerkanaal.personeels_en_partnercode',
     'link.capability_aanvaarden', 'travelos.ov_incheckcode',
     'mode.bezorgcode', 'festivalos.toegangspas',
     'identity.sso_client_secret',
@@ -109,6 +110,26 @@ test('de echte credentials uit de classificatieronde blokkeren de release', () =
       assert.equal(vrijgave.isNogGeslotenCredentialroute(methode, pad, {}) ||
         vrijgave.VEILIGE_UITGANGEN.includes(route), true, route + ' hoort in NOG_GESLOTEN');
     }
+});
+
+/* B10 (27 september 2026): de gedeelde kantoorcode is in productie gesloten. Dat
+   is geen migratie van de code -- die blijft buiten productie gedeeld en niet
+   hash-only, en dat staat er eerlijk bij -- maar de deur opent in productie niets. */
+test('de gedeelde kantoorcode is in productie gesloten, met eerlijke controls en een proef op een productieserver', () => {
+  const register = poort.lees();
+  const uit = poort.controleer(register);
+  const d = register.deuren.find(x => x.id === 'office.gedeelde_kantoorcode');
+  assert.equal(d.status, 'closed');
+  assert.equal(d.release_blocker, false);
+  assert.ok(!uit.blockers.some(x => x.id === d.id), 'blokkeert niet meer');
+  assert.ok(d.bewijs.includes('test/kantoordeur-productie.test.js'), 'bewezen op een echte productieserver');
+  for (const c of ['productie_code_opent_niets', 'productie_passkey_per_kantoorsessie', 'fail_closed_zonder_passkeyconfig'])
+    assert.equal(d.controls[c], true, c);
+  for (const c of ['code_zelf_hash_only', 'code_zelf_persoonsgebonden'])
+    assert.equal(d.controls[c], false, c + ': de code zelf is niet gemigreerd, en dat staat er');
+  assert.ok(String(d.notitie).length >= 40);
+  const pd = require('../server/kern/kantoor/productiedeur');
+  assert.equal(pd.codeDicht({ NODE_ENV: 'production' }).code, pd.CODE_DICHT, 'de bron sluit hem echt');
 });
 
 test('de vier restdeuren zijn gemigreerd, en de korte bezorgcode alleen met haar grenzen', () => {

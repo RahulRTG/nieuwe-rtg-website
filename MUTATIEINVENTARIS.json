@@ -3,7 +3,7 @@
   "op": "2026-09-27T09:39:01.513Z",
   "commit": "ef473de8a",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 2,
   "instrument": "scripts/mutatieinventaris.js",
   "node": "v24.18.0"
  },

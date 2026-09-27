@@ -71,7 +71,7 @@ test('kascode en tik zijn open; de Link-drager en iedere inning blijven op een p
     'server/routes/supplier/kassa/verkoop.js', 'server/routes/supplier/tickets.js'].sort());
   const kassa = fs.readFileSync(path.join(__dirname, '..', 'server/kern/pay/kassa.js'), 'utf8');
   assert.match(kassa, /return claim\.neem\(\{ code, soort: 'kas'/, 'kasInt int alleen langs de claim-saga');
-  assert.deepEqual(serverAanroepBestanden(/payKasToegang|payTikToegang/),
+  assert.deepEqual(serverAanroepBestanden(/COL: 'pay(?:Kas|Tik)Toegang'/),
     ['server/kern/pay/kassa.js', 'server/kern/pay/tik.js'], 'geen tweede schrijver van de codebakken');
   const reg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'CODECREDENTIALS.json'), 'utf8'));
   for (const id of ['pay.kascode_en_vooraf', 'pay.tikcode']) {

@@ -67,7 +67,9 @@ test('het hele gezelschap staat er, en iedereen bereikt iedereen', async () => {
     // ---- 1. WIE BEREIKT WIE ----
     // elk lid zet eerst iets in De Salon, zodat er iets is om op te reageren
     for (const lid of g.allen) {
-      const p = await post('/api/salon/plaats', { tekst: 'Hallo, hier is ' + lid.naam + '.' }, lid.token);
+      // De DM vertrekt vanaf een zichtbare publicatie: publiekskeuze én
+      // maatschappelijk onderwerp passeren de gewone Salon-leespoort.
+      const p = await post('/api/salon/plaats', { publiek: 'salon', tekst: 'Onderwijs in de buurt, door ' + lid.naam + '.' }, lid.token);
       assert.equal(p.status, 200, lid.naam + ' kan in De Salon posten: ' + JSON.stringify(p.body));
       lid.postId = (p.body.post && p.body.post.id) != null ? p.body.post.id : p.body.id;
       assert.ok(lid.postId != null, lid.naam + ' heeft een post-id');

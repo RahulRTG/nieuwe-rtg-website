@@ -34,7 +34,7 @@ const KAART = {
   salon:        { app: '/apps/salon.html',   param: 'post',   titel: 'Uit De Salon',   deel: true },
   pulse:        { app: '/apps/pulse.html',   param: 'post',   titel: 'Pulse',          deel: true },
   zakelijk:     { app: '/apps/zakelijk.html', param: 'post',  titel: 'RTG Zakelijk',   deel: true },
-  genootschap:  { app: '/apps/cercle.html',  param: 'bericht', titel: 'Genootschap',   deel: false },
+  genootschap:  { app: '/apps/genootschap.html',  param: 'bericht', titel: 'Genootschap',   deel: false },
   verhalen:     { app: '/apps/wereld.html',  param: 'verhaal', titel: 'Verhaal',       deel: false },
   profiel:      { app: '/apps/wereld.html',  param: 'profiel', titel: 'Profiel',       deel: true },
   gesprek:      { app: '/apps/comm.html',    param: 'gesprek', titel: 'Berichten',     deel: false },

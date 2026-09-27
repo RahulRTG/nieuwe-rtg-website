@@ -46,11 +46,20 @@ Object.assign(kern, require('../kern/pulse')({ db, save, crypto, liveCodename, n
    bij de bron; er wordt geen tweede opslag of selectiebeleid gemaakt. */
 const salonZicht = require('../kern/salon/zichtbaarheid')({ db, findSupplier, zijnVrienden: kern.zijnVrienden });
 kern.wereldFeed = require('../kern/wereld/feed')({ db, codenaamVan: kern.codenaamVan,
-  zijnVrienden: kern.zijnVrienden, salonToegang: salonZicht.magZien,
+  zijnVrienden: kern.zijnVrienden, salonToegang: salonZicht.magLezen,
   pulseLezen: key => ((kern.pulseFeed(key, 'volgend') || {}).feed || []) }).feed;
+kern.wereldFeed.saloon = require('../kern/wereld/saloon')({ kern, sociaal: kern.wereldFeed,
+  voorkeurOpslag: {
+    haal: key => (((db.data.wereld || {}).saloon || {})[key]),
+    schrijf: (key, keuze) => {
+      const w = db.data.wereld = db.data.wereld || {};
+      w.saloon = w.saloon || {}; w.saloon[key] = keuze; save();
+    }
+  }
+});
 // De Salon bewaart zijn eigen posts en publicatierechten.
 kern.salon = require('../kern/salon')({ db, save, media, liveCodename, codenaamVan: kern.codenaamVan,
-  crypto, broadcastSync, spraaktekst: kern.spraaktekst });
+  crypto, broadcastSync, spraaktekst: kern.spraaktekst, magLezen: salonZicht.magLezen });
 kern.salonProfiel = require('../kern/salon/profiel')({ db, save, codenaamVan: kern.codenaamVan,
   keyVanCodenaam: kern.keyVanCodenaam, liveCodename, salon: kern.salon });
 kern.salonReacties = require('../kern/salon/reacties')({ db, save, liveCodename, codenaamVan: kern.codenaamVan,

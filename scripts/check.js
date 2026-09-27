@@ -3832,6 +3832,7 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
     ['public/apps/meet/kamer.js#1', ['gesprek', 'de vergaderkamer: een tegel per deelnemer, en de eigen tegel krijgt muted', ['public/apps/meet/kamer.js', 'RTGMeelezen'], ['public/apps/meet.html', 'meeluister.js']]],
     ['public/apps/memo/app.js#1', ['ondertiteld', 'een eigen spraakmemo; het toestel maakt er een transcript bij dat in de lijst staat en samen te vatten is', ['public/apps/memo/app.js', 'transcript']]],
     ['public/apps/oog.html#cam', ['werktuig', 'het oog schouwt een voertuig of werkvloer: beeldanalyse, geen geluid']],
+    ['public/apps/saloon/kaart.js#js1', ['ondertiteld', 'Saloon speelt dezelfde video met de cue-lijst van de bron en de gedeelde ondertitelband', ['public/apps/saloon/kaart.js', 'RTGOndertitelband.zet']]],
     ['public/apps/salon.html#1', ['ondertiteld', 'een korte video in de Salon-feed; de maker maakt lokale automatische of handmatige tijdregels vóór plaatsing en de speler toont dezelfde cue-lijst', ['public/apps/salon.html', 'zetSalonOndertitels']]],
     ['public/apps/salon.html#2', ['spiegel', 'het stille voorbeeld van de eigen gekozen video voordat het lid de Salon-post plaatst']],
     ['public/apps/salon.html#3', ['werktuig', 'een stille videominiatuur in het profielraster die alleen als ingang naar de volledige post dient']],

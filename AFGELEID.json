@@ -3,23 +3,23 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-09-27T03:00:54.056Z",
-  "commit": "840fb8a21",
+  "op": "2026-09-27T03:41:43.971Z",
+  "commit": "c9f78f1",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 1,
   "instrument": "scripts/afgeleid.js",
   "node": "v24.18.0"
  },
  "gemeten": {
-  "artefacten": 324,
-  "bron": 14,
-  "afgeleid": 179,
+  "artefacten": 322,
+  "bron": 13,
+  "afgeleid": 178,
   "fragmenten": 25,
   "momentopname": 1,
   "onbeslist": 105,
   "afgeleidZonderEigenaar": 2,
-  "metEigenaar": 203,
-  "afgeleidEigenaarHard": 177,
+  "metEigenaar": 202,
+  "afgeleidEigenaarHard": 176,
   "afgeleidGrendelt": 20,
   "metStempel": 110,
   "stempelAnders": 0
@@ -631,44 +631,6 @@
    "stempelAnders": false,
    "versheidOpdracht": null,
    "grendelt": false,
-   "botsingVerklaard": null
-  },
-  {
-   "naam": "CONNECTION_CONSTITUTION.json",
-   "soort": "AFGELEID",
-   "eigenaar": "scripts/connection-constitution.js",
-   "graad": "verklaard",
-   "schrijvers": [
-    "scripts/connection-constitution.js"
-   ],
-   "stempelInstrument": null,
-   "stempelAnders": false,
-   "versheidOpdracht": null,
-   "grendelt": false,
-   "botsingVerklaard": null
-  },
-  {
-   "naam": "CONNECTION_OS.md",
-   "soort": "BRON",
-   "eigenaar": null,
-   "graad": null,
-   "schrijvers": [],
-   "stempelInstrument": null,
-   "stempelAnders": false,
-   "versheidOpdracht": null,
-   "grendelt": null,
-   "botsingVerklaard": null
-  },
-  {
-   "naam": "CONNECTION_OS_FINAL.md",
-   "soort": "BRON",
-   "eigenaar": null,
-   "graad": null,
-   "schrijvers": [],
-   "stempelInstrument": null,
-   "stempelAnders": false,
-   "versheidOpdracht": null,
-   "grendelt": null,
    "botsingVerklaard": null
   },
   {
@@ -3267,6 +3229,18 @@
    "stempelAnders": false,
    "versheidOpdracht": "node scripts/sabotage.js",
    "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "SALOON.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
    "botsingVerklaard": null
   },
   {

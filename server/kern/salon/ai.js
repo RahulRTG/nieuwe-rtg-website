@@ -48,8 +48,8 @@ module.exports = ({ anthropic, salon }) => {
   /* Waar gaat De Salon vandaag over? De tellingen komen uit de eigen module
      (geen AI nodig om te tellen); de AI zet er een leesbare zin omheen. Zo
      blijft het cijfer waar en de tekst prettig. */
-  async function waarOverGaatHet() {
-    const lijst = salon.onderwerpen(12);
+  async function waarOverGaatHet(sess) {
+    const lijst = salon.onderwerpen(12, sess);
     if (!lijst.length) return { ok: true, onderwerpen: [], tekst: 'Er is vandaag nog weinig gedeeld.',
       bron: 'lokale-regels', ai: false };
     const top = lijst.slice(0, 3);

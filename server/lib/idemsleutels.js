@@ -157,6 +157,7 @@ Object.assign(SLEUTELS,
   /* Reisbetalingen verklaren hun eigen replay-antwoorden in het deelbestand. */
   require('./idemsleutels-reisherkomst').SLEUTELS,
   require('./idemsleutels-bundel').SLEUTELS,
+  require('./idemsleutels-kantoorhuis').SLEUTELS,
   require('./idemsleutels-magnaatleven').SLEUTELS);
 
 /* Drie keuringen bij het laden, en ze staan bij elkaar in ./idemsleutels-nooit.js:

@@ -37,6 +37,12 @@ test('1. de rekensom: onbekend zonder aanwijzing, dan loopt / geen / alleen mand
   assert.equal(h.wijsAan('', 'user-9', () => true).status, 400);
   assert.equal(h.wijsAan('ent_rtg', 'user-9', () => true).ok, true);
   assert.equal(h.aanwijzing().entiteit, 'ent_rtg');
+  /* dezelfde aanwijzing nog een keer (ook buiten het venster van de idem-poort)
+     verandert niets: niet wie, en niet sinds wanneer */
+  const voor = h.aanwijzing();
+  const nogEens = h.wijsAan('ent_rtg', 'user-7', () => true);
+  assert.equal(nogEens.ongewijzigd, true);
+  assert.deepEqual(h.aanwijzing(), voor);
 
   assert.deepEqual(h.werkverband('user-1', bron([{ entiteit: 'ent_rtg', telt: true, rol: 'Kantine' }])),
     { stand: 'loopt', rollen: ['Kantine'] });
@@ -111,10 +117,12 @@ test('2-4. echte server: aanwijzen, in dienst, uit dienst -- en de review blijft
   assert.equal((await api(base, '/api/office/beleidsmotor/huis/zet', { entiteit: 'bestaat-niet' }, eigKantoor)).status, 404);
   const zet = await api(base, '/api/office/beleidsmotor/huis/zet', { entiteit: entId }, eigKantoor);
   assert.equal(zet.status, 200, JSON.stringify(zet.body));
-  /* dezelfde aanwijzing nog een keer is een dubbeltik: niets verandert, ook de datum niet */
+  /* dezelfde aanwijzing nog een keer is een dubbeltik: niets verandert, ook de
+     datum niet. Binnen het venster antwoordt de idem-poort
+     (lib/idemsleutels-kantoorhuis.js), daarbuiten de route met `ongewijzigd`;
+     de unittoets hierboven houdt die tweede weg vast. */
   const nogEens = await api(base, '/api/office/beleidsmotor/huis/zet', { entiteit: entId }, eigKantoor);
   assert.equal(nogEens.status, 200);
-  assert.equal(nogEens.body.ongewijzigd, true);
   assert.deepEqual(nogEens.body.huis, zet.body.huis, 'sinds en door blijven staan');
 
   const r1 = await review();

@@ -46,12 +46,12 @@ module.exports = ({ db, save, nu }) => {
     m.kanalen[kan] = (m.kanalen[kan] || 0) + 1;
     if (c) m.campagnes[c] = (m.campagnes[c] || 0) + 1;
     m.totaal += 1;
-    ruimOp(kaart, maand);
+    ruimKanaalOp(kaart, maand);
     save();
     return { geteld: true };
   }
 
-  function ruimOp(kaart, maand) {
+  function ruimKanaalOp(kaart, maand) {
     const [j, mm] = maand.split('-').map(Number);
     const grens = new Date(Date.UTC(j, mm - BEWAAR_MAANDEN, 1)).toISOString().slice(0, 7);
     for (const m of Object.keys(kaart)) if (m < grens) delete kaart[m];

@@ -98,5 +98,8 @@ test('6. over HTTP: de boardroom leest, een oud voorstel tekenen weigert', async
     assert.equal(r.body.toets.magAutonoom, false);
     assert.equal(r.body.voorstel.dimensies.length, 8);
     assert.equal((await api('/api/office/streefbeeld/teken', { id: 'oud' }, eig)).status, 409);
+    const weg = await api('/api/office/streefbeeld/intrek', {}, eig);
+    assert.equal(weg.status, 200);
+    assert.equal(weg.body.alLeeg, true, 'niets getekend, dus niets in te trekken');
   } finally { stop(srv); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) { /* opruimen */ } }
 });

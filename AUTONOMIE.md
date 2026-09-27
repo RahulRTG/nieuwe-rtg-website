@@ -311,6 +311,10 @@ doorgestreept met de datum; de besluiten staan in par. 2.5.
    link (`?c=`) reist mee. Nog niet: de vraag zelf in het aanmeldscherm (een
    keuzelijst is daar een nieuw bedieningselement), en CAC, dat wacht op een
    register van de marketinguitgaven van RTG.
-9. **De streefstand** -- besloten (C7): de machine stelt voor, de eigenaar tekent.
+9. ~~**De streefstand**~~ -- staat (27 september, C7), in de code het **streefbeeld**
+   (`kern/streefbeeld.js`; `streefstand` was al een veld van elk gevolgcontract).
+   Het voorstel komt uit de laatste drie afgesloten maanden, de eigenaar tekent een
+   vingerafdruk van precies dat voorstel, en autonoom mag alleen als geen enkele
+   dimensie buiten de tolerantie of onbekend is. Er handelt nog niets autonoom.
 10. **Het beslisgeheugen** -- nadat 1 tot en met 9 er zijn, want een geheugen
     over besluiten zonder gegronde ketens onthoudt vooral gissingen.

@@ -84,7 +84,7 @@ module.exports = ({ db, save, bedrijfsmaat, nu }) => {
     return { ok: true, getekend: k.getekend };
   }
 
-  function intrek(door) {
+  function trekStreefbeeldIn(door) {
     if (!door) return { status: 403, error: 'Intrekken doet de eigenaar op naam.' };
     const k = eigen.bak(NAAM);
     if (!k.getekend) return { ok: true, alLeeg: true };
@@ -111,5 +111,5 @@ module.exports = ({ db, save, bedrijfsmaat, nu }) => {
       dimensies };
   }
 
-  return { streefbeeld: { voorstel, getekend, teken, intrek, toets, DIMENSIES } };
+  return { streefbeeld: { voorstel, getekend, teken, intrek: trekStreefbeeldIn, toets, DIMENSIES } };
 };

@@ -40,7 +40,7 @@ module.exports = ({ db, save, A, B, contracten, accounts, zegOpZelf, meldLid, nu
   const klok = () => Date.parse(typeof nu === 'function' ? nu() : new Date().toISOString());
   const kaart = () => { const k = eigen.bak(NAAM); if (!k.gepland) k.gepland = {}; if (!k.regels) k.regels = {}; return k; };
 
-  function regels() {
+  function naarGastRegels() {
     const k = eigen.kijk(NAAM), r = k.regels || {};
     const uit = {};
     for (const [id, d] of Object.entries(REGELS)) uit[id] = Object.assign({}, d.standaard, r[id] || {});
@@ -107,13 +107,13 @@ module.exports = ({ db, save, A, B, contracten, accounts, zegOpZelf, meldLid, nu
     if (id === 'onbetaald') { const t = Math.round(Number(p.termijnen)); if (!(t >= 1 && t <= 12)) return { status: 400, error: 'Van 1 tot 12 open termijnen.' }; nieuw.termijnen = t; }
     kaart().regels[id] = nieuw;
     save();
-    return { ok: true, regels: regels() };
+    return { ok: true, regels: naarGastRegels() };
   }
 
   /* DE RONDE. Voert de geplande overgangen uit en, waar een schakelaar aan staat,
      de automatische. Geeft tellingen terug en geen namen. */
   function ronde() {
-    const t = klok(), r = regels(), uit = { gepland: 0, afgelopen: 0, wacht: 0, aangekondigd: 0, onbetaald: 0 };
+    const t = klok(), r = naarGastRegels(), uit = { gepland: 0, afgelopen: 0, wacht: 0, aangekondigd: 0, onbetaald: 0 };
     const k = eigen.kijk(NAAM);
     for (const [id, g] of Object.entries(k.gepland || {})) {
       if (Date.parse(g.op) > t) continue;
@@ -152,5 +152,5 @@ module.exports = ({ db, save, A, B, contracten, accounts, zegOpZelf, meldLid, nu
   const ms = Number(process.env.NAARGAST_RONDE_MS == null ? 3600000 : process.env.NAARGAST_RONDE_MS);
   if (ms > 0) setInterval(() => { try { ronde(); } catch (e) { console.error('[naargast] ronde:', e.message); } }, ms).unref();
 
-  return { naarGast: { lidNu, lidEinde, kantoor, regels, regelZet, ronde, REGELS: Object.keys(REGELS) } };
+  return { naarGast: { lidNu, lidEinde, kantoor, regels: naarGastRegels, regelZet, ronde, REGELS: Object.keys(REGELS) } };
 };

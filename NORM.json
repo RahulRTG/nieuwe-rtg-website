@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4628,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1605,
+    "kernBreedte": 1606,
     "kernGedeeld": 244,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1761,
-    "toetsenNietGemeten": 639,
+    "toetsenNietGemeten": 640,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -149,6 +149,25 @@
     "edgeVeldContextZelf": 11
   },
   "notities": [
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 639,
+      "vervalt": "2026-12-27",
+      "meter": "toetsenNietGemeten 639 -> 640",
+      "reden": "test/streefbeeld.test.js is nieuw (besluit C7). Met de hand nagetrokken met drie mutaties in server/kern/streefbeeld.js: een meerderheid in plaats van elke dimensie (toets 4b zakt -- de eerste versie van de toets had maar twee dimensies en zag deze mutatie NIET, en kreeg er daarom een bij), tekenen zonder vingerafdruk (toets 2 en 6 zakken) en onbekend als binnen (toets 4 zakt). De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1605,
+      "meter": "kernBreedte 1605 -> 1606",
+      "reden": "Het streefbeeld (besluit C7 van de eigenaar, 27 september 2026). Het domein bedrijfsmaat leest kern.streefbeeld: het voorstel rekent uit dezelfde bedrijfsmaten die die route al toont, en een eigen instantie in het routebestand zou een tweede getekend streefbeeld naast het eerste kunnen maken.",
+      "waarheen": "GRENZEN.json (bedrijfsmaat draagt streefbeeld) en test/streefbeeld.test.js"
+    },
     {
       "datum": "2026-09-27",
       "soort": "schuld",

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-27T12:51:15.438Z",
-    "commit": "874a94de",
+    "op": "2026-09-27T13:00:45.065Z",
+    "commit": "da1b1d24",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 6,
     "instrument": "scripts/bedrijfsmaat.js",
     "node": "v22.22.2"
   },
@@ -86,26 +86,26 @@
     "maten": 67,
     "domeinen": 28,
     "perStatus": {
-      "bestaat": 38,
+      "bestaat": 39,
       "half": 19,
-      "ontbreekt": 10,
+      "ontbreekt": 9,
       "onbekend": 0
     },
     "primairGat": {
-      "BRON_ONTBREEKT": 10,
+      "BRON_ONTBREEKT": 9,
       "DEFINITIE_ONTBREEKT": 11,
       "PROJECTIE_ONTBREEKT": 3,
       "BEWIJS_ONTBREEKT": 5
     },
     "perGat": {
-      "BRON_ONTBREEKT": 10,
-      "DEFINITIE_ONTBREEKT": 21,
-      "PROJECTIE_ONTBREEKT": 21,
-      "BEWIJS_ONTBREEKT": 29
+      "BRON_ONTBREEKT": 9,
+      "DEFINITIE_ONTBREEKT": 20,
+      "PROJECTIE_ONTBREEKT": 20,
+      "BEWIJS_ONTBREEKT": 28
     },
     "ketens": 6,
     "ketensGegrond": 3,
-    "bestaatGedeeltelijk": 11,
+    "bestaatGedeeltelijk": 12,
     "rustOpGat": 1,
     "privacyGaten": 0,
     "verworpen": 0,
@@ -120,9 +120,9 @@
     },
     "cash": {
       "maten": 1,
-      "bestaat": 0,
+      "bestaat": 1,
       "half": 0,
-      "ontbreekt": 1
+      "ontbreekt": 0
     },
     "omzet": {
       "maten": 4,
@@ -293,7 +293,7 @@
       "naam": "van ontvangen omzet naar runway",
       "gegrond": false,
       "eersteBreuk": "marge.operationeel-rtg",
-      "bestaand": 2,
+      "bestaand": 3,
       "van": 5,
       "schakels": [
         {
@@ -318,13 +318,8 @@
         },
         {
           "id": "cash.rtg-bankpositie",
-          "status": "ontbreekt",
-          "gaten": [
-            "BRON_ONTBREEKT",
-            "DEFINITIE_ONTBREEKT",
-            "PROJECTIE_ONTBREEKT",
-            "BEWIJS_ONTBREEKT"
-          ]
+          "status": "bestaat",
+          "gaten": []
         },
         {
           "id": "runway.rtg",
@@ -588,7 +583,7 @@
       },
       {
         "id": "cash.rtg-bankpositie",
-        "status": "ontbreekt",
+        "status": "bestaat",
         "domein": "cash"
       },
       {
@@ -916,12 +911,12 @@
       {
         "van": "cash.rtg-bankpositie",
         "naar": "liquiditeit.rtg",
-        "gegrond": false
+        "gegrond": true
       },
       {
         "van": "cash.rtg-bankpositie",
         "naar": "runway.rtg",
-        "gegrond": false
+        "gegrond": true
       },
       {
         "van": "marge.operationeel-rtg",
@@ -2197,45 +2192,66 @@
       "id": "cash.rtg-bankpositie",
       "versie": 1,
       "domein": "cash",
-      "betekenis": "Het saldo op de rekeningen van RTG zelf.",
+      "betekenis": "Het saldo op de rekeningen van RTG zelf, met het geld van verkochte RTG-bonnen als verplichting ernaast.",
       "wereld": "rtg-intern",
-      "bronnen": [],
-      "berekening": "nog niet vastgesteld",
-      "eenheid": "euro",
-      "graad": "onbekend",
-      "actualiteit": "onbekend",
+      "bronnen": [
+        "server/kern/bankpositie.js"
+      ],
+      "berekening": "het saldo van de maand uit kern/bankpositie.js, overgetikt van een afschrift; vrij = saldo min bonnenverplichting",
+      "eenheid": "eurocent",
+      "graad": "vermoed",
+      "actualiteit": "periode",
       "minimaleGroep": null,
       "privacyklasse": "huis",
-      "eigenaar": null,
-      "eigenaarReden": "Niemand.",
+      "eigenaar": "kern/bankpositie",
+      "eigenaarReden": null,
       "afhankelijk": [],
-      "status": "ontbreekt",
-      "gaten": [
-        "BRON_ONTBREEKT",
-        "DEFINITIE_ONTBREEKT",
-        "PROJECTIE_ONTBREEKT",
-        "BEWIJS_ONTBREEKT"
-      ],
+      "status": "bestaat",
+      "gaten": [],
       "elementen": {
         "bron": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "RTG registreert zijn eigen banksaldo nergens. kern/bankregie en kern/pay gaan over het geld van leden en zaken; de kasvooruitblik (kern/onderneming/kas.js) is een instrument voor een ondernemer, niet voor RTG."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bankpositie.js",
+              "citaat": "function zet(",
+              "klopt": true
+            }
+          ],
+          "reden": null
         },
         "definitie": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Volgt pas als er een bron is."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/definities.js",
+              "citaat": "CASH is het saldo",
+              "klopt": true
+            }
+          ],
+          "reden": null
         },
         "projectie": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Idem."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bankpositie.js",
+              "citaat": "function stand(",
+              "klopt": true
+            }
+          ],
+          "reden": null
         },
         "bewijs": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Idem."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bankpositie.js",
+              "citaat": "graad: 'vermoed', bonnenVerplichting",
+              "klopt": true
+            }
+          ],
+          "reden": null
         }
       },
       "groepsgrens": {
@@ -2245,10 +2261,10 @@
         "reden": null
       },
       "keten": {
-        "gegrond": false,
+        "gegrond": true,
         "zwakkeSchakels": []
       },
-      "gedeeltelijk": null
+      "gedeeltelijk": "Handmatig: een mens tikt het saldo over van een afschrift. Een bankkoppeling is een eigen besluit (C4)."
     },
     {
       "id": "liquiditeit.rtg",
@@ -2305,9 +2321,7 @@
       },
       "keten": {
         "gegrond": false,
-        "zwakkeSchakels": [
-          "cash.rtg-bankpositie"
-        ]
+        "zwakkeSchakels": []
       },
       "gedeeltelijk": null
     },
@@ -2342,7 +2356,7 @@
           "aanwezig": false,
           "afgeleid": true,
           "citaten": [],
-          "reden": "afgeleid, maar zonder bron in: cash.rtg-bankpositie, marge.operationeel-rtg"
+          "reden": "afgeleid, maar zonder bron in: marge.operationeel-rtg"
         },
         "definitie": {
           "aanwezig": false,
@@ -2369,7 +2383,6 @@
       "keten": {
         "gegrond": false,
         "zwakkeSchakels": [
-          "cash.rtg-bankpositie",
           "marge.operationeel-rtg",
           "personeel.rtg-op-naam"
         ]

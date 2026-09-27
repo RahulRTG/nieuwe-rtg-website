@@ -1,8 +1,8 @@
 {
  "stempel": {
-  "op": "2026-09-27T18:52:18.129Z",
-  "commit": "68bb0848",
-  "boomVuil": false,
+  "op": "2026-09-27T20:20:11.209Z",
+  "commit": "61fe448e",
+  "boomVuil": true,
   "boomAnders": 2,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
@@ -11,16 +11,15 @@
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
   "totaal": 5148,
-  "geclassificeerd": 5130,
+  "geclassificeerd": 5148,
   "perStand": {
-   "BLOCKED_BY_TEST_FIXTURE": 3192,
-   "NOT_APPLICABLE": 1223,
+   "BLOCKED_BY_TEST_FIXTURE": 3193,
+   "NOT_APPLICABLE": 1240,
    "PROTECTED": 560,
-   "LEGACY_PENDING_CLASSIFICATION": 18,
    "INTENTIONALLY_NON_IDEMPOTENT": 155
   },
-  "vastgesteldDoorMens": 1990,
-  "afgeleidDoorScript": 3140,
+  "vastgesteldDoorMens": 2007,
+  "afgeleidDoorScript": 3141,
   "toegangWaargenomen": {
    "AUTHENTICATED": 4253,
    "PUBLIC": 126,
@@ -35,10 +34,7 @@
    "kale ronde: geen uitspraak": 4761,
    "niet gemeten": 128
   },
-  "voorstellen": {
-   "PROTECTED": 3,
-   "BLOCKED_BY_TEST_FIXTURE": 2
-  },
+  "voorstellen": {},
   "metingVan": "2026-09-27T12:22:52.912Z"
  },
  "tegenspraken": [
@@ -82,6 +78,12 @@
    "route": "POST /api/festival/scan",
    "bedoeld": "OBJECT_SCOPED",
    "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/foundation/registratie/catalogus",
+   "bedoeld": "AUTHENTICATED",
+   "waargenomen": "PUBLIC",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
   {
@@ -1351,12 +1353,14 @@
   {
    "mutatieId": "appstore.berichten",
    "route": "POST /api/appstore/berichten",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -1368,10 +1372,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "appstore.berichten.gelezen",
@@ -3670,12 +3674,14 @@
   {
    "mutatieId": "bank.advies",
    "route": "POST /api/bank/advies",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -3687,10 +3693,10 @@
     "grond": "gemerkt",
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "PROTECTED",
-   "voorstelGrond": "kale ronde (gemerkt): de server merkte de herhaling zelf (herhaald: true) terwijl er GEEN sleutel is gestuurd -- dat kan alleen van de idem-poort komen, op grond van de verklaring in idemsleutels.js"
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bank.afschrift",
@@ -4532,12 +4538,14 @@
   {
    "mutatieId": "bank.veeg",
    "route": "POST /api/bank/veeg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -4549,10 +4557,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "deze route draagt een duplicaatregel in lib/idemsleutels.js; dat zegt dat een herhaling WEL iets zou doen, en dus is NOT_APPLICABLE hier uitgesloten -- de meters zagen niets omdat de stand al op de doelwaarde stond"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.apparaat.innemen",
@@ -11089,12 +11097,14 @@
   {
    "mutatieId": "command.alarm",
    "route": "POST /api/command/alarm",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -11106,10 +11116,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "command.alarm.stil",
@@ -11864,12 +11874,14 @@
   {
    "mutatieId": "command.gezondheid",
    "route": "POST /api/command/gezondheid",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -11881,10 +11893,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "command.gezondheid.controleer",
@@ -13293,12 +13305,14 @@
   {
    "mutatieId": "command.start",
    "route": "POST /api/command/start",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -13310,10 +13324,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "command.tijdlijn",
@@ -13507,12 +13521,14 @@
   {
    "mutatieId": "command.vloot",
    "route": "POST /api/command/vloot",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -13524,10 +13540,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "command.vloot.organisatie",
@@ -22090,7 +22106,7 @@
    "toegang": {
     "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "mw"
     ]
@@ -24187,12 +24203,14 @@
   {
    "mutatieId": "foundation.school.journaal",
    "route": "POST /api/foundation/school/journaal",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: schoolCode",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -24202,10 +24220,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.school.kantine.saldo",
@@ -33989,12 +34007,14 @@
   {
    "mutatieId": "lab2.bewoner.labs",
    "route": "POST /api/lab2/bewoner/labs",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw"
     ]
@@ -34006,10 +34026,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "lab2.bewoner.overzicht",
@@ -50970,12 +50990,14 @@
   {
    "mutatieId": "member.spel.klasgenoten",
    "route": "POST /api/member/spel/klasgenoten",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -50987,10 +51009,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.spel.mijn",
@@ -56870,7 +56892,7 @@
    "mutatieId": "office.asset.fees",
    "route": "POST /api/office/asset/fees",
    "semantiek": {
-    "klasse": "idempotent"
+    "klasse": "onbekend"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -56888,8 +56910,8 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -58388,12 +58410,14 @@
   {
    "mutatieId": "office.bank.opdrachten.ronde",
    "route": "POST /api/office/bank/opdrachten/ronde",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -58405,10 +58429,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.bank.operationeel",
@@ -70308,12 +70332,14 @@
   {
    "mutatieId": "office.web.overzicht",
    "route": "POST /api/office/web/overzicht",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -70325,20 +70351,22 @@
     "grond": "opslag",
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "PROTECTED",
-   "voorstelGrond": "kale ronde (opslag): het verschil zat in rtgai. NA TE KIJKEN: is dat werk van deze route, of een rem/meter die alleen de eerste keer aansloeg? In dat laatste geval is de juiste stand NOT_APPLICABLE en niet PROTECTED."
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.weefsel",
    "route": "POST /api/office/weefsel",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -70350,10 +70378,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.weefsel.aandacht",
@@ -70898,12 +70926,14 @@
   {
    "mutatieId": "office.weefsel.kaart",
    "route": "POST /api/office/weefsel/kaart",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -70915,10 +70945,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.weefsel.kansen",
@@ -71814,12 +71844,14 @@
   {
    "mutatieId": "office.weefsel.relaties",
    "route": "POST /api/office/weefsel/relaties",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -71831,10 +71863,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.weefsel.simulaties",
@@ -79743,12 +79775,14 @@
   {
    "mutatieId": "podium.weg",
    "route": "POST /api/podium/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": "velden",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -79760,10 +79794,10 @@
     "grond": "gemerkt",
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "PROTECTED",
-   "voorstelGrond": "kale ronde (gemerkt): de server merkte de herhaling zelf (herhaald: true) terwijl er GEEN sleutel is gestuurd -- dat kan alleen van de idem-poort komen, op grond van de verklaring in idemsleutels.js"
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "privacy.export",
@@ -114429,12 +114463,14 @@
   {
    "mutatieId": "supplier.lucht.pass",
    "route": "POST /api/supplier/lucht/pass",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth",
      "luchtzijdePoort",
@@ -114448,10 +114484,10 @@
     "grond": null,
     "hindernis": "Deze boarding-passcontrole is alleen beschikbaar voor de luchthaven of een expliciet toegestane luchthavenzaak."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Deze boarding-passcontrole is alleen beschikbaar voor de luchthaven of een expliciet toegestane luchthavenzaak.\""
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.magnaat.studio",
@@ -136172,12 +136208,14 @@
   {
    "mutatieId": "werkplek.kantoorpakket.mijn",
    "route": "POST /api/werkplek/kantoorpakket/mijn",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "huisPoort"
     ]
@@ -136189,10 +136227,10 @@
     "grond": null,
     "hindernis": "Dit bedrijf kennen we niet."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Dit bedrijf kennen we niet.\""
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "werkplek.kantoorpakket.open",

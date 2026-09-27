@@ -70,7 +70,7 @@ Per stap van de systeemlus, waar hij vandaag woont:
 | Stap | Woont al in | Stand |
 |---|---|---|
 | signaleren | `kern/envelop.js` (elk bericht draagt `correlatie` + `oorzaak`) | **staat** |
-| begrijpen | `kern/kantoor/weerklank.js` — de naam is gereserveerd in KANTOOR.md par. 6 | **een stap weg** |
+| begrijpen | `weerklank` — de naam is gereserveerd in KANTOOR.md par. 6, het bestand bestaat nog niet | **een stap weg** |
 | voorbereiden | `kern/commercie/voornemen.js` (een plan dat niet meer kan veranderen) | **staat**, niet op personeel |
 | aanbieden | Fluister voor de vloer (par. 5) | **staat** als gesprek, niet als aanbod |
 | mens beslist | `kern/kantoor/tweedehandtekening.js`, de boardroom | **staat** voor geld |

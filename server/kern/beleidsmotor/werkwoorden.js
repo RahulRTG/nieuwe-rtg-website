@@ -45,7 +45,9 @@ const WERKWOORDEN = Object.freeze({
     voorvoegsels: ['/api/office/boardroom', '/api/office/mall/', '/api/office/paniek/', '/api/office/wereld/',
       '/api/office/stuur/', '/api/office/handhaving/',
       /* het streefbeeld tekenen is een besluit over het platform, niet lezen (C7) */
-      '/api/office/streefbeeld'] }
+      '/api/office/streefbeeld',
+      /* RTG zelf als werkgever inrichten: een werkgever en een eerste leidinggevende (VRIJHEID.md) */
+      '/api/office/rtghuis'] }
 });
 
 function werkwoordVan(pad) {

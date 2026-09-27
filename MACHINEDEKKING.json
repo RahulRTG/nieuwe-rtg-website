@@ -3,23 +3,23 @@
  "uitleg": "Per handeling: hoeveel van de eigen machinerie raakt hij? Zestien motoren die ieder apart gemeten zijn, hier voor het eerst naast elkaar op DEZELFDE route.",
  "grens": "Twee assen die verschillende dingen missen, nooit opgeteld: `handler` is lexicaal binnen de tekst van de handler (mist een hulpfunctie en de kern-tas) en `bestand` rekent het routebestand plus zijn DIRECTE requires (vangt de hulpfunctie, markeert alle routes in een bestand, mist nog steeds de kern-tas). De tas zit met opzet niet in de route-as: een hub als server.js zette zo 4162 routes op \"idempotent\". Woont een route ZELF in een hub, dan vervalt de bestandsas (bestandsasOnbruikbaar) en is ook zijn handlerspan grof, want die loopt door de infrastructuur van dat bestand. Alleen `mensAanDeDeur` komt uit de ROUTER en is hard. De assen uit EXECUTION_MAP.json zijn gelezen en niet hier geteld.",
  "stempel": {
-  "op": "2026-09-20T08:18:15.712Z",
-  "commit": "8e944dc47",
-  "boomVuil": false,
-  "boomAnders": 0,
+  "op": "2026-09-27T20:22:41.814Z",
+  "commit": "61fe448e",
+  "boomVuil": true,
+  "boomAnders": 4,
   "instrument": "scripts/machinedekking.js",
-  "node": "v24.18.0"
+  "node": "v22.22.2"
  },
  "bronnen": {
-  "EXECUTION_MAP.json": "c712a29884bcaa0d",
-  "KERNHERKOMST.json": "807b7a8bc53cd607",
-  "MUTATIECONTRACT.json": "83549d9917018997",
+  "EXECUTION_MAP.json": "727010d489e1bc7c",
+  "KERNHERKOMST.json": "2c6eefee5905f626",
+  "MUTATIECONTRACT.json": "45cfd1152d374da3",
   "server/kern/stuur/beleid.js": "8dc821a9959c82e0",
   "kernherkomstStempel": {
-   "op": "2026-09-03",
-   "commit": "db63488d"
+   "op": "2026-09-19",
+   "commit": "6083f652"
   },
-  "kernherkomstNamen": 1190,
+  "kernherkomstNamen": 1246,
   "executionmapStempel": null
  },
  "assen": {
@@ -213,18 +213,18 @@
   }
  },
  "gemeten": {
-  "routes": 5111,
-  "muterend": 3821,
-  "leesroutesUitRegister": 1199,
+  "routes": 5277,
+  "muterend": 3938,
+  "leesroutesUitRegister": 1240,
   "assen": 19,
   "perAs": {
    "mensAanDeDeur": {
-    "handler": 238,
-    "bestand": 238
+    "handler": 290,
+    "bestand": 290
    },
    "assurance": {
-    "handler": 2,
-    "bestand": 49
+    "handler": 3,
+    "bestand": 57
    },
    "mandaat": {
     "handler": 0,
@@ -252,7 +252,7 @@
    },
    "simulatie": {
     "handler": 10,
-    "bestand": 103
+    "bestand": 104
    },
    "frictie": {
     "handler": 1,
@@ -260,19 +260,19 @@
    },
    "envelop": {
     "handler": 4,
-    "bestand": 144
+    "bestand": 180
    },
    "idempotentie": {
-    "handler": 13,
-    "bestand": 114
+    "handler": 14,
+    "bestand": 161
    },
    "atomair": {
-    "handler": 1,
-    "bestand": 17
+    "handler": 2,
+    "bestand": 25
    },
    "bewijsketen": {
     "handler": 4,
-    "bestand": 23
+    "bestand": 37
    },
    "gevolg": {
     "handler": 0,
@@ -283,8 +283,8 @@
     "bestand": 29
    },
    "aiVindbaar": {
-    "handler": 174,
-    "bestand": 174,
+    "handler": 176,
+    "bestand": 176,
     "uitKaart": true
    },
    "bewijsstand": {
@@ -293,8 +293,8 @@
     "uitKaart": true
    },
    "herhaling": {
-    "handler": 1704,
-    "bestand": 1704,
+    "handler": 1737,
+    "bestand": 1737,
     "uitKaart": true
    }
   },
@@ -308,8 +308,8 @@
     "lezers": [
      "server/kern/kantoor/index.js"
     ],
-    "routesHandler": 238,
-    "routesBestand": 238,
+    "routesHandler": 290,
+    "routesBestand": 290,
     "tokens": null,
     "graad": "gemeten"
    },
@@ -322,8 +322,8 @@
     "lezers": [
      "server/kern/identiteit/sessielijst.js"
     ],
-    "routesHandler": 2,
-    "routesBestand": 49,
+    "routesHandler": 3,
+    "routesBestand": 57,
     "tokens": 4,
     "graad": "vermoed"
    },
@@ -416,7 +416,7 @@
      "server/kern/command/index.js"
     ],
     "routesHandler": 10,
-    "routesBestand": 103,
+    "routesBestand": 104,
     "tokens": 3,
     "graad": "vermoed"
    },
@@ -438,10 +438,11 @@
     "motor": "envelop",
     "bron": "server/kern/envelop.js",
     "bestaat": true,
-    "moduleLezers": 6,
+    "moduleLezers": 7,
     "zakLezers": 0,
     "lezers": [
      "server/bus.js",
+     "server/kern/dienstidentiteit.js",
      "server/kern/kantoor/geldketen/klaarzet.js",
      "server/kern/kantoor/geldketen/weging.js",
      "server/kern/kantoor/geldketen.js",
@@ -449,7 +450,7 @@
      "server/kern/stuur/gevolgcontract/woorden.js"
     ],
     "routesHandler": 4,
-    "routesBestand": 144,
+    "routesBestand": 180,
     "tokens": 4,
     "graad": "vermoed"
    },
@@ -460,8 +461,8 @@
     "moduleLezers": 0,
     "zakLezers": 0,
     "lezers": [],
-    "routesHandler": 13,
-    "routesBestand": 114,
+    "routesHandler": 14,
+    "routesBestand": 161,
     "tokens": 4,
     "graad": "vermoed"
    },
@@ -474,8 +475,8 @@
     "lezers": [
      "server/pg/index.js"
     ],
-    "routesHandler": 1,
-    "routesBestand": 17,
+    "routesHandler": 2,
+    "routesBestand": 25,
     "tokens": 4,
     "graad": "vermoed"
    },
@@ -483,20 +484,20 @@
     "motor": "bewijsketen",
     "bron": "server/lib/keten.js",
     "bestaat": true,
-    "moduleLezers": 9,
+    "moduleLezers": 12,
     "zakLezers": 0,
     "lezers": [
      "server/inzagelog-lezen.js",
      "server/inzagelog.js",
+     "server/kern/democratie/kwestie.js",
+     "server/kern/democratie/meter.js",
      "server/kern/kantoor/geldketen/boeken.js",
      "server/kern/kantoor/geldketen.js",
-     "server/kern/lidboard/journaal.js",
-     "server/kern/livinglab/opslag.js",
-     "server/lib/handelingsspoor.js",
-     "server/pg/verzoeksporen.js"
+     "server/kern/leerhuis/index.js",
+     "server/kern/lidboard/journaal.js"
     ],
     "routesHandler": 4,
-    "routesBestand": 23,
+    "routesBestand": 37,
     "tokens": 3,
     "graad": "vermoed"
    },
@@ -522,9 +523,10 @@
     "motor": "schaduw",
     "bron": "server/kern/commercie/schaduw.js",
     "bestaat": true,
-    "moduleLezers": 1,
+    "moduleLezers": 2,
     "zakLezers": 0,
     "lezers": [
+     "server/kern/beleidsmotor/stand.js",
      "server/kern/commercie/rechten.js"
     ],
     "routesHandler": 3,
@@ -577,14 +579,16 @@
     }
    }
   ],
-  "mutatiesZonderEnigeAs": 2791,
+  "mutatiesZonderEnigeAs": 2819,
   "mutatiesZonderHandlerSpan": 0,
   "bestandsasOnbruikbaar": 13,
   "hubdrempel": 40,
   "hubs": [
+   "server/bedrijf/index.js",
    "server/lib/mutatiecontracten.js",
    "server/opzet/aanbouw.js",
    "server/opzet/aanbouw2.js",
+   "server/opzet/kernlaag4.js",
    "server/opzet/routes-dwars.js",
    "server/routes/member.js",
    "server/routes/supplier.js",
@@ -594,15 +598,15 @@
   "assenPerMutatie": [
    {
     "assen": 0,
-    "routes": 2984
+    "routes": 3062
    },
    {
     "assen": 1,
-    "routes": 769
+    "routes": 805
    },
    {
     "assen": 2,
-    "routes": 65
+    "routes": 68
    },
    {
     "assen": 3,
@@ -1095,6 +1099,20 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/arrival/pass/intrek",
+   "bestand": "server/routes/supplier/horeca/arrival-toegang.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/arrival/pass/roteer",
+   "bestand": "server/routes/supplier/horeca/arrival-toegang.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
    "pad": "/api/arrival/pulse",
    "bestand": "server/routes/supplier/horeca/invisible-arrival.js",
    "onder": [],
@@ -1172,6 +1190,13 @@
    "boven": [
     "aiVindbaar"
    ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/auth/aanmeldkanaal",
+   "bestand": "server/routes/auth/account.js",
+   "onder": [],
+   "boven": []
   },
   {
    "methode": "POST",
@@ -1846,6 +1871,13 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/bedrijf/lid/tekengrens",
+   "bestand": "server/bedrijf/tekengrens.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
    "pad": "/api/bedrijf/lid/uit-dienst",
    "bestand": "server/bedrijf/leden.js",
    "onder": [],
@@ -1959,6 +1991,20 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/bedrijf/sleutel/intrek",
+   "bestand": "server/bedrijf/leden.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bedrijf/sleutel/roteer",
+   "bestand": "server/bedrijf/leden.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
    "pad": "/api/bedrijf/storing/evalueer",
    "bestand": "server/bedrijf/storing.js",
    "onder": [],
@@ -2065,6 +2111,29 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/bedrijf/uitgave/betaal",
+   "bestand": "server/bedrijf/entiteitbetaling.js",
+   "onder": [],
+   "boven": [
+    "idempotentie"
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bedrijf/uitgave/betaald",
+   "bestand": "server/bedrijf/uitgave.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bedrijf/uitgave/maak",
+   "bestand": "server/bedrijf/uitgave.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
    "pad": "/api/bedrijf/uitval",
    "bestand": "server/bedrijf/uitval.js",
    "onder": [],
@@ -2093,6 +2162,20 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/bedrijf/werkruimte/betaalwijze",
+   "bestand": "server/bedrijf/tekengrens.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bedrijf/werkruimte/entiteit",
+   "bestand": "server/bedrijf/tekengrens.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
    "pad": "/api/bedrijf/werkruimte/maak",
    "bestand": "server/bedrijf/werkruimte.js",
    "onder": [
@@ -2101,6 +2184,13 @@
    "boven": [
     "herhaling"
    ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bedrijf/werkruimte/tekenwijze",
+   "bestand": "server/bedrijf/samentekenen.js",
+   "onder": [],
+   "boven": []
   },
   {
    "methode": "POST",
@@ -2115,6 +2205,17 @@
    "bestand": "server/routes/rtfos/voordeur.js",
    "onder": [],
    "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bestanden/actie",
+   "bestand": "server/routes/bestanden.js",
+   "onder": [
+    "aiVindbaar"
+   ],
+   "boven": [
+    "aiVindbaar"
+   ]
   },
   {
    "methode": "POST",
@@ -2252,6 +2353,13 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/bestanden/wis",
+   "bestand": "server/routes/bestanden.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
    "pad": "/api/betaal/direct",
    "bestand": "server/routes/member/kopen.js",
    "onder": [],
@@ -2269,14 +2377,18 @@
    "pad": "/api/betaal/webhook/adyen",
    "bestand": "server/opzet/kaartwebhooks.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "envelop"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/betaal/webhook/mollie",
    "bestand": "server/opzet/kaartwebhooks.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "envelop"
+   ]
   },
   {
    "methode": "POST",
@@ -2871,10 +2983,25 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/command/apipoort/roteer",
+   "bestand": "server/routes/command/inrichten.js",
+   "onder": [
+    "mensAanDeDeur"
+   ],
+   "boven": [
+    "mensAanDeDeur",
+    "simulatie"
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/command/apipoort/sleutel",
    "bestand": "server/routes/command/inrichten.js",
-   "onder": [],
+   "onder": [
+    "mensAanDeDeur"
+   ],
    "boven": [
+    "mensAanDeDeur",
     "simulatie"
    ]
   },
@@ -3579,6 +3706,7 @@
     "herhaling"
    ],
    "boven": [
+    "idempotentie",
     "herhaling"
    ]
   },
@@ -3587,14 +3715,18 @@
    "pad": "/api/concern/bulk/lees",
    "bestand": "server/routes/concern/mensen.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "idempotentie"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/concern/bulk/verstuur",
    "bestand": "server/routes/concern/mensen.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "idempotentie"
+   ]
   },
   {
    "methode": "POST",
@@ -3640,6 +3772,7 @@
     "herhaling"
    ],
    "boven": [
+    "idempotentie",
     "herhaling"
    ]
   },
@@ -3651,6 +3784,7 @@
     "herhaling"
    ],
    "boven": [
+    "idempotentie",
     "herhaling"
    ]
   },
@@ -3662,6 +3796,7 @@
     "herhaling"
    ],
    "boven": [
+    "idempotentie",
     "herhaling"
    ]
   },
@@ -3670,26 +3805,41 @@
    "pad": "/api/concern/entiteit/onderneming",
    "bestand": "server/routes/concern.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "idempotentie"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/concern/entiteit/registratie",
    "bestand": "server/routes/concern.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "idempotentie"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/concern/entiteit/verwijder",
    "bestand": "server/routes/concern.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "idempotentie"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/concern/feit/beeindig",
    "bestand": "server/routes/concern.js",
+   "onder": [],
+   "boven": [
+    "idempotentie"
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/feit/duid",
+   "bestand": "server/routes/concern/duiding.js",
    "onder": [],
    "boven": []
   },
@@ -3698,14 +3848,18 @@
    "pad": "/api/concern/feit/zet",
    "bestand": "server/routes/concern.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "idempotentie"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/concern/functiescheiding",
    "bestand": "server/routes/concern/mensen.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "idempotentie"
+   ]
   },
   {
    "methode": "POST",
@@ -3726,63 +3880,83 @@
    "pad": "/api/concern/geschiedenis",
    "bestand": "server/routes/concern.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "idempotentie"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/concern/kwalificatie/zet",
    "bestand": "server/routes/concern/mensen.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "idempotentie"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/concern/kwalificaties",
    "bestand": "server/routes/concern/mensen.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "idempotentie"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/concern/launch",
    "bestand": "server/routes/concern.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "idempotentie"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/concern/mag",
    "bestand": "server/routes/concern/mensen.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "idempotentie"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/concern/mens/nieuw",
    "bestand": "server/routes/concern/mensen.js",
-   "onder": [],
-   "boven": []
+   "onder": [
+    "idempotentie"
+   ],
+   "boven": [
+    "idempotentie"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/concern/mens/uitdienst",
    "bestand": "server/routes/concern/mensen.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "idempotentie"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/concern/mens/zet",
    "bestand": "server/routes/concern/mensen.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "idempotentie"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/concern/mensen",
    "bestand": "server/routes/concern/mensen.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "idempotentie"
+   ]
   },
   {
    "methode": "POST",
@@ -3792,6 +3966,7 @@
     "herhaling"
    ],
    "boven": [
+    "idempotentie",
     "herhaling"
    ]
   },
@@ -3800,7 +3975,9 @@
    "pad": "/api/concern/opdatum",
    "bestand": "server/routes/concern.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "idempotentie"
+   ]
   },
   {
    "methode": "POST",
@@ -3825,7 +4002,9 @@
    "pad": "/api/concern/organigram",
    "bestand": "server/routes/concern/mensen.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "idempotentie"
+   ]
   },
   {
    "methode": "POST",
@@ -3839,21 +4018,38 @@
    "pad": "/api/concern/readiness",
    "bestand": "server/routes/concern.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "idempotentie"
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/rekening/open",
+   "bestand": "server/routes/concern/rekening.js",
+   "onder": [
+    "idempotentie"
+   ],
+   "boven": [
+    "idempotentie"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/concern/tekenen",
    "bestand": "server/routes/concern.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "idempotentie"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/concern/ubo",
    "bestand": "server/routes/concern.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "idempotentie"
+   ]
   },
   {
    "methode": "POST",
@@ -3874,68 +4070,87 @@
    "pad": "/api/concern/uitnodigen",
    "bestand": "server/routes/concern/mensen.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "idempotentie"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/concern/uitnodiging/accepteer",
    "bestand": "server/routes/concern/mensen.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "idempotentie"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/concern/uitnodiging/intrek",
    "bestand": "server/routes/concern/mensen.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "idempotentie"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/concern/uitnodigingen",
    "bestand": "server/routes/concern/mensen.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "idempotentie"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/concern/verloopt",
    "bestand": "server/routes/concern.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "idempotentie"
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/vestiging/inhaal/bevestig",
+   "bestand": "server/routes/concern/mensen.js",
+   "onder": [],
+   "boven": [
+    "idempotentie"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/concern/vestiging/nieuw",
-   "bestand": "server/routes/concern.js",
+   "bestand": "server/routes/concern/vestiging.js",
    "onder": [],
    "boven": []
   },
   {
    "methode": "POST",
    "pad": "/api/concern/vestiging/sluit",
-   "bestand": "server/routes/concern.js",
+   "bestand": "server/routes/concern/vestiging.js",
    "onder": [],
    "boven": []
   },
   {
    "methode": "POST",
    "pad": "/api/concern/vestiging/zaak",
-   "bestand": "server/routes/concern.js",
+   "bestand": "server/routes/concern/vestiging.js",
    "onder": [],
    "boven": []
   },
   {
    "methode": "POST",
    "pad": "/api/concern/vestiging/zaaklos",
-   "bestand": "server/routes/concern.js",
+   "bestand": "server/routes/concern/vestiging.js",
    "onder": [],
    "boven": []
   },
   {
    "methode": "POST",
    "pad": "/api/concern/vestigingen",
-   "bestand": "server/routes/concern.js",
+   "bestand": "server/routes/concern/vestiging.js",
    "onder": [],
    "boven": []
   },
@@ -3950,8 +4165,12 @@
    "methode": "POST",
    "pad": "/api/connect/naklank/weg",
    "bestand": "server/routes/connect.js",
-   "onder": [],
-   "boven": []
+   "onder": [
+    "herhaling"
+   ],
+   "boven": [
+    "herhaling"
+   ]
   },
   {
    "methode": "POST",
@@ -3985,6 +4204,136 @@
    "methode": "POST",
    "pad": "/api/connect/werk",
    "bestand": "server/routes/connect.js",
+   "onder": [
+    "herhaling"
+   ],
+   "boven": [
+    "herhaling"
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/connection/rendezvous/call/answer",
+   "bestand": "server/routes/member/rendezvous-connection.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/connection/rendezvous/call/end",
+   "bestand": "server/routes/member/rendezvous-connection.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/connection/rendezvous/call/signal",
+   "bestand": "server/routes/member/rendezvous-connection.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/connection/rendezvous/call/start",
+   "bestand": "server/routes/member/rendezvous-connection.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/connection/rendezvous/consent",
+   "bestand": "server/routes/member/rendezvous-connection.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/connection/rendezvous/message-media",
+   "bestand": "server/routes/member/rendezvous-connection.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/connection/rendezvous/message/remove",
+   "bestand": "server/routes/member/rendezvous-connection.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/connection/rendezvous/message/report",
+   "bestand": "server/routes/member/rendezvous-connection.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/connection/rendezvous/text",
+   "bestand": "server/routes/member/rendezvous-connection.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/connection/vonk/call/answer",
+   "bestand": "server/routes/vonk.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/connection/vonk/call/end",
+   "bestand": "server/routes/vonk.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/connection/vonk/call/signal",
+   "bestand": "server/routes/vonk.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/connection/vonk/call/start",
+   "bestand": "server/routes/vonk.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/connection/vonk/consent",
+   "bestand": "server/routes/vonk.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/connection/vonk/message-media",
+   "bestand": "server/routes/vonk.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/connection/vonk/message/remove",
+   "bestand": "server/routes/vonk.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/connection/vonk/message/report",
+   "bestand": "server/routes/vonk.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/connection/vonk/text",
+   "bestand": "server/routes/vonk.js",
    "onder": [],
    "boven": []
   },
@@ -4051,26 +4400,32 @@
    "pad": "/api/doos/buurmelding",
    "bestand": "server/routes/doos.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "envelop"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/doos/meting",
    "bestand": "server/routes/doos.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "envelop"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/doos/rapport",
    "bestand": "server/routes/doos.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "envelop"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/doos/update/status",
-   "bestand": "server/routes/doos.js",
+   "bestand": "server/routes/doos-kloon.js",
    "onder": [],
    "boven": []
   },
@@ -4713,31 +5068,35 @@
   {
    "methode": "POST",
    "pad": "/api/foundation/gezin/agenda",
-   "bestand": "server/foundation/gasten/gezinsleven.js",
+   "bestand": "server/foundation/gasten/gezinsagenda.js",
    "onder": [
     "herhaling"
    ],
    "boven": [
+    "idempotentie",
     "herhaling"
    ]
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/gezin/agenda/verwijder",
-   "bestand": "server/foundation/gasten/gezinsleven.js",
+   "bestand": "server/foundation/gasten/gezinsagenda.js",
    "onder": [
     "herhaling"
    ],
    "boven": [
+    "idempotentie",
     "herhaling"
    ]
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/gezin/agenda/wijzig",
-   "bestand": "server/foundation/gasten/gezinsleven.js",
+   "bestand": "server/foundation/gasten/gezinsagenda.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "idempotentie"
+   ]
   },
   {
    "methode": "POST",
@@ -7510,6 +7869,13 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/giftcard/roteer",
+   "bestand": "server/routes/member/cadeaukaart.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
    "pad": "/api/groothandel/annuleer",
    "bestand": "server/routes/member/handel/winkel.js",
    "onder": [],
@@ -8901,6 +9267,15 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/leerhuis/doe",
+   "bestand": "server/routes/leerhuis.js",
+   "onder": [],
+   "boven": [
+    "bewijsketen"
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/leerstof/antwoord",
    "bestand": "server/routes/leerstof.js",
    "onder": [
@@ -10244,6 +10619,27 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/democratie/kwestie/gezien",
+   "bestand": "server/routes/democratie/index.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/democratie/kwestie/inbreng",
+   "bestand": "server/routes/democratie/index.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/democratie/kwestie/intrek",
+   "bestand": "server/routes/democratie/index.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/dm",
    "bestand": "server/routes/social/leden.js",
    "onder": [],
@@ -10619,6 +11015,27 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/magnaat/leven/actie",
+   "bestand": "server/routes/magnaatwereld.js",
+   "onder": [],
+   "boven": [
+    "envelop"
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/leven/staat",
+   "bestand": "server/routes/magnaatwereld.js",
+   "onder": [
+    "herhaling"
+   ],
+   "boven": [
+    "envelop",
+    "herhaling"
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/magnaat/partner/stap",
    "bestand": "server/routes/magnaatwereld.js",
    "onder": [],
@@ -10634,6 +11051,48 @@
    "boven": [
     "envelop"
    ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/stad/actie",
+   "bestand": "server/routes/magnaatstad.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/stad/doe",
+   "bestand": "server/routes/magnaatstad.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/stad/maak",
+   "bestand": "server/routes/magnaatstad.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/stad/staat",
+   "bestand": "server/routes/magnaatstad.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/stad/start",
+   "bestand": "server/routes/magnaatstad.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/stad/verlaat",
+   "bestand": "server/routes/magnaatstad.js",
+   "onder": [],
+   "boven": []
   },
   {
    "methode": "POST",
@@ -11408,6 +11867,27 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/rendezvous/circle/rsvp",
+   "bestand": "server/routes/member/rendezvous.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/concierge/approve",
+   "bestand": "server/routes/member/rendezvous.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/concierge/request",
+   "bestand": "server/routes/member/rendezvous.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/rendezvous/date",
    "bestand": "server/routes/member/rendezvous.js",
    "onder": [],
@@ -11473,6 +11953,34 @@
    "methode": "POST",
    "pad": "/api/member/rendezvous/profiel/zet",
    "bestand": "server/routes/member/rendezvous.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/profile-photo",
+   "bestand": "server/routes/member/rendezvous-connection.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/profile-photo/order",
+   "bestand": "server/routes/member/rendezvous-connection.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/profile-photo/publish",
+   "bestand": "server/routes/member/rendezvous-connection.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/profile-photo/remove",
+   "bestand": "server/routes/member/rendezvous-connection.js",
    "onder": [],
    "boven": []
   },
@@ -11656,6 +12164,13 @@
   {
    "methode": "POST",
    "pad": "/api/member/rtmail/imap/intrekken",
+   "bestand": "server/routes/rtmail-schrijf.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/imap/roteer",
    "bestand": "server/routes/rtmail-schrijf.js",
    "onder": [],
    "boven": []
@@ -12361,6 +12876,13 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/mijn/pas/gast",
+   "bestand": "server/routes/naargast.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
    "pad": "/api/mijn/post",
    "bestand": "server/routes/member/tweefactor.js",
    "onder": [],
@@ -12516,6 +13038,13 @@
   {
    "methode": "POST",
    "pad": "/api/mob/kaart/koop",
+   "bestand": "server/routes/mobiliteit/vervoerbewijs.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mob/kaart/toon",
    "bestand": "server/routes/mobiliteit/vervoerbewijs.js",
    "onder": [],
    "boven": []
@@ -12793,15 +13322,23 @@
    "methode": "POST",
    "pad": "/api/neiging/geheugen",
    "bestand": "server/routes/neiging.js",
-   "onder": [],
-   "boven": []
+   "onder": [
+    "herhaling"
+   ],
+   "boven": [
+    "herhaling"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/neiging/intake",
    "bestand": "server/routes/neiging.js",
-   "onder": [],
-   "boven": []
+   "onder": [
+    "herhaling"
+   ],
+   "boven": [
+    "herhaling"
+   ]
   },
   {
    "methode": "POST",
@@ -12814,15 +13351,23 @@
    "methode": "POST",
    "pad": "/api/neiging/opnieuw",
    "bestand": "server/routes/neiging.js",
-   "onder": [],
-   "boven": []
+   "onder": [
+    "herhaling"
+   ],
+   "boven": [
+    "herhaling"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/neiging/overslaan",
    "bestand": "server/routes/neiging.js",
-   "onder": [],
-   "boven": []
+   "onder": [
+    "herhaling"
+   ],
+   "boven": [
+    "herhaling"
+   ]
   },
   {
    "methode": "POST",
@@ -12928,6 +13473,7 @@
     "autoriteit",
     "voornemen",
     "tegenfeit",
+    "envelop",
     "schaduw"
    ]
   },
@@ -13170,7 +13716,8 @@
     "mensAanDeDeur"
    ],
    "boven": [
-    "mensAanDeDeur"
+    "mensAanDeDeur",
+    "assurance"
    ]
   },
   {
@@ -13181,7 +13728,8 @@
     "mensAanDeDeur"
    ],
    "boven": [
-    "mensAanDeDeur"
+    "mensAanDeDeur",
+    "assurance"
    ]
   },
   {
@@ -13192,7 +13740,8 @@
     "mensAanDeDeur"
    ],
    "boven": [
-    "mensAanDeDeur"
+    "mensAanDeDeur",
+    "assurance"
    ]
   },
   {
@@ -13203,7 +13752,8 @@
     "mensAanDeDeur"
    ],
    "boven": [
-    "mensAanDeDeur"
+    "mensAanDeDeur",
+    "assurance"
    ]
   },
   {
@@ -13214,7 +13764,8 @@
     "mensAanDeDeur"
    ],
    "boven": [
-    "mensAanDeDeur"
+    "mensAanDeDeur",
+    "assurance"
    ]
   },
   {
@@ -13222,10 +13773,12 @@
    "pad": "/api/office/balie/zetel",
    "bestand": "server/routes/ledenbalie.js",
    "onder": [
-    "mensAanDeDeur"
+    "mensAanDeDeur",
+    "assurance"
    ],
    "boven": [
-    "mensAanDeDeur"
+    "mensAanDeDeur",
+    "assurance"
    ]
   },
   {
@@ -13238,6 +13791,7 @@
    ],
    "boven": [
     "mensAanDeDeur",
+    "assurance",
     "herhaling"
    ]
   },
@@ -13298,6 +13852,17 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/bank/entiteitrekening/zet",
+   "bestand": "server/routes/kantoren/werkbetaling.js",
+   "onder": [
+    "mensAanDeDeur"
+   ],
+   "boven": [
+    "mensAanDeDeur"
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/bank/handtekening/bevestig",
    "bestand": "server/routes/kantoren/bank-tweedehand.js",
    "onder": [
@@ -13326,6 +13891,17 @@
     "beleid",
     "tegenfeit",
     "frictie"
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/bank/handtekening/opties",
+   "bestand": "server/routes/kantoren/bank-passkey.js",
+   "onder": [
+    "mensAanDeDeur"
+   ],
+   "boven": [
+    "mensAanDeDeur"
    ]
   },
   {
@@ -13362,6 +13938,17 @@
     "tegenfeit",
     "frictie",
     "herhaling"
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/bank/incasso/opties",
+   "bestand": "server/routes/kantoren/bank-passkey.js",
+   "onder": [
+    "mensAanDeDeur"
+   ],
+   "boven": [
+    "mensAanDeDeur"
    ]
   },
   {
@@ -13458,6 +14045,17 @@
     "frictie",
     "envelop",
     "herhaling"
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/bank/opdrachten/afstemming",
+   "bestand": "server/routes/kantoren/bank-afstemming.js",
+   "onder": [
+    "mensAanDeDeur"
+   ],
+   "boven": [
+    "mensAanDeDeur"
    ]
   },
   {
@@ -13592,6 +14190,28 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/bankpositie/zet",
+   "bestand": "server/routes/bedrijfsmaat.js",
+   "onder": [
+    "mensAanDeDeur"
+   ],
+   "boven": [
+    "mensAanDeDeur"
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/beleidsmotor/afdwingen/zet",
+   "bestand": "server/routes/kantoren/beleidsafdwingen.js",
+   "onder": [
+    "mensAanDeDeur"
+   ],
+   "boven": [
+    "mensAanDeDeur"
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/bewaarverzoek",
    "bestand": "server/routes/office/bewaarverzoek.js",
    "onder": [],
@@ -13692,37 +14312,34 @@
   {
    "methode": "POST",
    "pad": "/api/office/boardroom/toegang",
-   "bestand": "server/routes/kantoren/regie.js",
+   "bestand": "server/routes/kantoren/regie-toegang.js",
    "onder": [
     "mensAanDeDeur"
    ],
    "boven": [
-    "mensAanDeDeur",
-    "envelop"
+    "mensAanDeDeur"
    ]
   },
   {
    "methode": "POST",
    "pad": "/api/office/boardroom/toegang/geef",
-   "bestand": "server/routes/kantoren/regie.js",
+   "bestand": "server/routes/kantoren/regie-toegang.js",
    "onder": [
     "mensAanDeDeur"
    ],
    "boven": [
-    "mensAanDeDeur",
-    "envelop"
+    "mensAanDeDeur"
    ]
   },
   {
    "methode": "POST",
    "pad": "/api/office/boardroom/toegang/weg",
-   "bestand": "server/routes/kantoren/regie.js",
+   "bestand": "server/routes/kantoren/regie-toegang.js",
    "onder": [
     "mensAanDeDeur"
    ],
    "boven": [
-    "mensAanDeDeur",
-    "envelop"
+    "mensAanDeDeur"
    ]
   },
   {
@@ -13811,6 +14428,34 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/democratie/kwestie/behandel",
+   "bestand": "server/routes/democratie/kantoor.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/democratie/kwestie/eindstand",
+   "bestand": "server/routes/democratie/kantoor.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/democratie/kwestie/herbezorg",
+   "bestand": "server/routes/democratie/kantoor.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/democratie/kwestie/heropen",
+   "bestand": "server/routes/democratie/kantoor.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/dienst/in",
    "bestand": "server/routes/kantoren/index.js",
    "onder": [],
@@ -13831,12 +14476,47 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/doos/gedeeld/zet",
+   "bestand": "server/routes/kantoren/doossleutels.js",
+   "onder": [
+    "mensAanDeDeur"
+   ],
+   "boven": [
+    "mensAanDeDeur"
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/doos/netwerk-zet",
    "bestand": "server/routes/kantoren/index.js",
    "onder": [],
    "boven": [
     "assurance",
     "envelop"
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/doos/sleutel",
+   "bestand": "server/routes/kantoren/doossleutels.js",
+   "onder": [
+    "mensAanDeDeur"
+   ],
+   "boven": [
+    "mensAanDeDeur"
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/doos/sleutel/weg",
+   "bestand": "server/routes/kantoren/doossleutels.js",
+   "onder": [
+    "mensAanDeDeur",
+    "herhaling"
+   ],
+   "boven": [
+    "mensAanDeDeur",
+    "herhaling"
    ]
   },
   {
@@ -13912,6 +14592,7 @@
     "autoriteit",
     "voornemen",
     "tegenfeit",
+    "envelop",
     "schaduw"
    ]
   },
@@ -13927,6 +14608,7 @@
     "autoriteit",
     "voornemen",
     "tegenfeit",
+    "envelop",
     "schaduw"
    ]
   },
@@ -13942,6 +14624,7 @@
     "autoriteit",
     "voornemen",
     "tegenfeit",
+    "envelop",
     "schaduw"
    ]
   },
@@ -13957,6 +14640,7 @@
     "autoriteit",
     "voornemen",
     "tegenfeit",
+    "envelop",
     "schaduw"
    ]
   },
@@ -13972,6 +14656,7 @@
     "autoriteit",
     "voornemen",
     "tegenfeit",
+    "envelop",
     "schaduw"
    ]
   },
@@ -13987,6 +14672,7 @@
     "autoriteit",
     "voornemen",
     "tegenfeit",
+    "envelop",
     "schaduw"
    ]
   },
@@ -14261,6 +14947,17 @@
    "boven": [
     "assurance",
     "envelop"
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/kantoor/uitnodiging",
+   "bestand": "server/routes/kantoren/uitnodiging.js",
+   "onder": [
+    "mensAanDeDeur"
+   ],
+   "boven": [
+    "mensAanDeDeur"
    ]
   },
   {
@@ -14553,10 +15250,24 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/leerhuis/open",
+   "bestand": "server/routes/leerhuis.js",
+   "onder": [
+    "mensAanDeDeur"
+   ],
+   "boven": [
+    "mensAanDeDeur",
+    "bewijsketen"
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/login",
    "bestand": "server/routes/office/toegang.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "bewijsketen"
+   ]
   },
   {
    "methode": "POST",
@@ -15003,6 +15714,39 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/pas/gast",
+   "bestand": "server/routes/naargast.js",
+   "onder": [
+    "mensAanDeDeur"
+   ],
+   "boven": [
+    "mensAanDeDeur"
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/pas/gast/regels/zet",
+   "bestand": "server/routes/naargast.js",
+   "onder": [
+    "mensAanDeDeur"
+   ],
+   "boven": [
+    "mensAanDeDeur"
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/pas/gast/ronde",
+   "bestand": "server/routes/naargast.js",
+   "onder": [
+    "mensAanDeDeur"
+   ],
+   "boven": [
+    "mensAanDeDeur"
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/pay/factuurcorrectie",
    "bestand": "server/routes/pay-correctie.js",
    "onder": [],
@@ -15128,8 +15872,12 @@
    "methode": "POST",
    "pad": "/api/office/payroll/run/definitief",
    "bestand": "server/routes/payroll-os-run.js",
-   "onder": [],
-   "boven": []
+   "onder": [
+    "mensAanDeDeur"
+   ],
+   "boven": [
+    "mensAanDeDeur"
+   ]
   },
   {
    "methode": "POST",
@@ -15142,8 +15890,12 @@
    "methode": "POST",
    "pad": "/api/office/payroll/run/keur",
    "bestand": "server/routes/payroll-os-run.js",
-   "onder": [],
-   "boven": []
+   "onder": [
+    "mensAanDeDeur"
+   ],
+   "boven": [
+    "mensAanDeDeur"
+   ]
   },
   {
    "methode": "POST",
@@ -15358,6 +16110,13 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/reisbureau/thuis",
+   "bestand": "server/routes/kantoren/reisbureau.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/reisbureau/uitnodiging-roteer",
    "bestand": "server/routes/kantoren/reisbureau.js",
    "onder": [],
@@ -15379,12 +16138,69 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/rendezvous/arrangement/step",
+   "bestand": "server/routes/office/rendezvous.js",
+   "onder": [
+    "mensAanDeDeur"
+   ],
+   "boven": [
+    "mensAanDeDeur"
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/rendezvous/circle/create",
+   "bestand": "server/routes/office/rendezvous.js",
+   "onder": [
+    "mensAanDeDeur"
+   ],
+   "boven": [
+    "mensAanDeDeur"
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/rendezvous/circle/gathering",
+   "bestand": "server/routes/office/rendezvous.js",
+   "onder": [
+    "mensAanDeDeur"
+   ],
+   "boven": [
+    "mensAanDeDeur"
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/rendezvous/circle/invite",
+   "bestand": "server/routes/office/rendezvous.js",
+   "onder": [
+    "mensAanDeDeur"
+   ],
+   "boven": [
+    "mensAanDeDeur"
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/rendezvous/concierge/step",
+   "bestand": "server/routes/office/rendezvous.js",
+   "onder": [
+    "mensAanDeDeur"
+   ],
+   "boven": [
+    "mensAanDeDeur"
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/rendezvous/tafel/maak",
    "bestand": "server/routes/office/rendezvous.js",
    "onder": [
+    "mensAanDeDeur",
     "herhaling"
    ],
    "boven": [
+    "mensAanDeDeur",
     "herhaling"
    ]
   },
@@ -15392,8 +16208,12 @@
    "methode": "POST",
    "pad": "/api/office/rendezvous/tafel/nodig",
    "bestand": "server/routes/office/rendezvous.js",
-   "onder": [],
-   "boven": []
+   "onder": [
+    "mensAanDeDeur"
+   ],
+   "boven": [
+    "mensAanDeDeur"
+   ]
   },
   {
    "methode": "POST",
@@ -15435,6 +16255,24 @@
    ],
    "boven": [
     "herhaling"
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/rtgboek/zet",
+   "bestand": "server/routes/bedrijfsmaat.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/rtghuis/maak",
+   "bestand": "server/routes/vrijheid/rtghuis.js",
+   "onder": [
+    "mensAanDeDeur"
+   ],
+   "boven": [
+    "mensAanDeDeur"
    ]
   },
   {
@@ -15708,6 +16546,7 @@
     "autoriteit",
     "voornemen",
     "tegenfeit",
+    "envelop",
     "schaduw"
    ]
   },
@@ -15736,8 +16575,12 @@
    "methode": "POST",
    "pad": "/api/office/stad/node/aanmeld",
    "bestand": "server/routes/kantoren/stad.js",
-   "onder": [],
-   "boven": []
+   "onder": [
+    "mensAanDeDeur"
+   ],
+   "boven": [
+    "mensAanDeDeur"
+   ]
   },
   {
    "methode": "POST",
@@ -15771,8 +16614,12 @@
    "methode": "POST",
    "pad": "/api/office/stad/sleutel",
    "bestand": "server/routes/kantoren/stad.js",
-   "onder": [],
-   "boven": []
+   "onder": [
+    "mensAanDeDeur"
+   ],
+   "boven": [
+    "mensAanDeDeur"
+   ]
   },
   {
    "methode": "POST",
@@ -15787,6 +16634,28 @@
    "bestand": "server/routes/kantoren/stad.js",
    "onder": [],
    "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/streefbeeld/intrek",
+   "bestand": "server/routes/bedrijfsmaat.js",
+   "onder": [
+    "mensAanDeDeur"
+   ],
+   "boven": [
+    "mensAanDeDeur"
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/streefbeeld/teken",
+   "bestand": "server/routes/bedrijfsmaat.js",
+   "onder": [
+    "mensAanDeDeur"
+   ],
+   "boven": [
+    "mensAanDeDeur"
+   ]
   },
   {
    "methode": "POST",
@@ -16409,6 +17278,17 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/werkos/bankpad/zet",
+   "bestand": "server/routes/kantoren/werkbetaling.js",
+   "onder": [
+    "mensAanDeDeur"
+   ],
+   "boven": [
+    "mensAanDeDeur"
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/werkplaats/introk",
    "bestand": "server/routes/kantoren/werkplaats.js",
    "onder": [],
@@ -16584,12 +17464,8 @@
    "methode": "POST",
    "pad": "/api/onboarding/teken",
    "bestand": "server/routes/onboarding.js",
-   "onder": [
-    "herhaling"
-   ],
-   "boven": [
-    "herhaling"
-   ]
+   "onder": [],
+   "boven": []
   },
   {
    "methode": "POST",
@@ -17049,6 +17925,20 @@
    "methode": "POST",
    "pad": "/api/order",
    "bestand": "server/routes/member/boeken.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/order/afhaalcode",
+   "bestand": "server/routes/member/afhaalcode.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/order/afhaalcode/intrek",
+   "bestand": "server/routes/member/afhaalcode.js",
    "onder": [],
    "boven": []
   },
@@ -17876,9 +18766,7 @@
    "methode": "POST",
    "pad": "/api/pay",
    "bestand": "server/routes/member/betalen.js",
-   "onder": [
-    "idempotentie"
-   ],
+   "onder": [],
    "boven": [
     "idempotentie"
    ]
@@ -17895,6 +18783,13 @@
     "aiVindbaar",
     "herhaling"
    ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/pay/kascode/intrek",
+   "bestand": "server/routes/pay-tegoed.js",
+   "onder": [],
+   "boven": []
   },
   {
    "methode": "POST",
@@ -17953,6 +18848,13 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/pay/tegoed/roteer",
+   "bestand": "server/routes/pay-tegoed.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
    "pad": "/api/pay/tegoed/terug",
    "bestand": "server/routes/pay-tegoed.js",
    "onder": [],
@@ -17995,6 +18897,13 @@
    "boven": [
     "herhaling"
    ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/pay/tikcode/intrek",
+   "bestand": "server/routes/pay-tegoed.js",
+   "onder": [],
+   "boven": []
   },
   {
    "methode": "POST",
@@ -18430,6 +19339,13 @@
   {
    "methode": "POST",
    "pad": "/api/reisbureau/boek",
+   "bestand": "server/routes/member/winkel.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/reisbureau/thuis",
    "bestand": "server/routes/member/winkel.js",
    "onder": [],
    "boven": []
@@ -18881,6 +19797,13 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/rtf/connect/schuif",
+   "bestand": "server/routes/connect.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
    "pad": "/api/rtf/connect/signaal",
    "bestand": "server/routes/connect.js",
    "onder": [],
@@ -18890,8 +19813,12 @@
    "methode": "POST",
    "pad": "/api/rtf/connect/werk",
    "bestand": "server/routes/connect.js",
-   "onder": [],
-   "boven": []
+   "onder": [
+    "herhaling"
+   ],
+   "boven": [
+    "herhaling"
+   ]
   },
   {
    "methode": "POST",
@@ -21478,6 +22405,20 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/rtfos/portaal/vrijwilliger/koppel",
+   "bestand": "server/routes/rtfos/doelgroepen.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtfos/portaal/vrijwilliger/ontkoppel",
+   "bestand": "server/routes/rtfos/doelgroepen.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
    "pad": "/api/rtfos/portaal/vrijwilliger/uren",
    "bestand": "server/routes/rtfos/doelgroepen.js",
    "onder": [],
@@ -21858,6 +22799,13 @@
    "methode": "POST",
    "pad": "/api/rtfos/voorraad/uit",
    "bestand": "server/routes/rtfos/uitvoering.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtfos/vrijwilliger/account-los",
+   "bestand": "server/routes/rtfos/doelgroepen.js",
    "onder": [],
    "boven": []
   },
@@ -23391,6 +24339,27 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/staff/tijd/intrekken",
+   "bestand": "server/routes/vrijheid/tijd.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/staff/tijd/verjaardag",
+   "bestand": "server/routes/vrijheid/tijd.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/staff/tijd/verzoek",
+   "bestand": "server/routes/vrijheid/tijd.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
    "pad": "/api/staff/trust/send",
    "bestand": "server/routes/staff/dienst-vertrouwen.js",
    "onder": [],
@@ -23440,7 +24409,9 @@
    "pad": "/api/supplier/activiteit",
    "bestand": "server/routes/supplier/tickets.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "atomair"
+   ]
   },
   {
    "methode": "POST",
@@ -23647,14 +24618,14 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/apply/chat",
-   "bestand": "server/routes/supplier/werving/sollicitaties.js",
+   "bestand": "server/routes/supplier/werving/sollchat.js",
    "onder": [],
    "boven": []
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/apply/chat/send",
-   "bestand": "server/routes/supplier/werving/sollicitaties.js",
+   "bestand": "server/routes/supplier/werving/sollchat.js",
    "onder": [],
    "boven": []
   },
@@ -24602,6 +25573,20 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/doos/sleutel",
+   "bestand": "server/routes/supplier/doossleutels.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/doos/sleutel/weg",
+   "bestand": "server/routes/supplier/doossleutels.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/dorp/drukte",
    "bestand": "server/routes/supplier/verblijf.js",
    "onder": [],
@@ -25006,7 +25991,25 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/giftcard/intrek",
+   "bestand": "server/routes/supplier/kassa/cadeaukaart.js",
+   "onder": [],
+   "boven": [
+    "idempotentie"
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/giftcard/redeem",
+   "bestand": "server/routes/supplier/kassa/cadeaukaart.js",
+   "onder": [],
+   "boven": [
+    "idempotentie"
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/giftcard/roteer",
    "bestand": "server/routes/supplier/kassa/cadeaukaart.js",
    "onder": [],
    "boven": [
@@ -27236,6 +28239,13 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/pay/tegoed/roteer",
+   "bestand": "server/routes/pay-zaak.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/pay/tegoed/terug",
    "bestand": "server/routes/pay-zaak.js",
    "onder": [],
@@ -27469,40 +28479,47 @@
    "methode": "POST",
    "pad": "/api/supplier/pos/redeem",
    "bestand": "server/routes/supplier/kassa/innen.js",
-   "onder": [],
-   "boven": []
+   "onder": [
+    "idempotentie"
+   ],
+   "boven": [
+    "idempotentie",
+    "atomair"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/pos/sale",
    "bestand": "server/routes/supplier/kassa/verkoop.js",
-   "onder": [
-    "idempotentie"
-   ],
-   "boven": [
-    "idempotentie"
-   ]
+   "onder": [],
+   "boven": []
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/pr/nieuwsbrief",
    "bestand": "server/routes/supplier/prplus.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "envelop"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/pr/plan",
    "bestand": "server/routes/supplier/prplus.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "envelop"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/pr/plan/weg",
    "bestand": "server/routes/supplier/prplus.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "envelop"
+   ]
   },
   {
    "methode": "POST",
@@ -27864,6 +28881,13 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/rtg/afdeling",
+   "bestand": "server/routes/vrijheid/rtghuis.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/rtmail/afwezig",
    "bestand": "server/routes/rtmail-schrijf.js",
    "onder": [],
@@ -28000,6 +29024,13 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/rtmail/imap/intrekken",
+   "bestand": "server/routes/rtmail-schrijf.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/imap/roteer",
    "bestand": "server/routes/rtmail-schrijf.js",
    "onder": [],
    "boven": []
@@ -28617,21 +29648,55 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/ticket/checkin",
-   "bestand": "server/routes/supplier/tickets.js",
+   "bestand": "server/routes/supplier/tickets-deur.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "atomair"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/ticket/deurverkoop",
    "bestand": "server/routes/supplier/tickets.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "atomair"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/ticket/status",
    "bestand": "server/routes/supplier/kamers/huishouding.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/ticket/toon",
+   "bestand": "server/routes/supplier/tickets-deur.js",
+   "onder": [],
+   "boven": [
+    "atomair"
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/tijd/beoordeel",
+   "bestand": "server/routes/vrijheid/tijd.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/tijd/bezetting",
+   "bestand": "server/routes/vrijheid/tijd.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/tijd/feestdagen",
+   "bestand": "server/routes/vrijheid/tijd.js",
    "onder": [],
    "boven": []
   },
@@ -28673,7 +29738,9 @@
    "pad": "/api/supplier/transfer",
    "bestand": "server/routes/supplier/tickets.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "atomair"
+   ]
   },
   {
    "methode": "POST",
@@ -30060,17 +31127,28 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/ticket/toon",
+   "bestand": "server/routes/member/kopen/tickets.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
    "pad": "/api/toestel/meting",
    "bestand": "server/routes/toestellen.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "envelop"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/toestellen/intrek",
    "bestand": "server/routes/toestellen.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "envelop"
+   ]
   },
   {
    "methode": "POST",
@@ -30080,6 +31158,7 @@
     "herhaling"
    ],
    "boven": [
+    "envelop",
     "herhaling"
    ]
   },
@@ -30587,6 +31666,34 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/vonk/profile-photo",
+   "bestand": "server/routes/vonk.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/vonk/profile-photo/order",
+   "bestand": "server/routes/vonk.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/vonk/profile-photo/publish",
+   "bestand": "server/routes/vonk.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/vonk/profile-photo/remove",
+   "bestand": "server/routes/vonk.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
    "pad": "/api/vonk/selectie",
    "bestand": "server/routes/vonk.js",
    "onder": [],
@@ -30734,7 +31841,9 @@
    "pad": "/api/webhooks/storingen",
    "bestand": "server/opzet/storingenwebhook.js",
    "onder": [],
-   "boven": []
+   "boven": [
+    "envelop"
+   ]
   },
   {
    "methode": "POST",

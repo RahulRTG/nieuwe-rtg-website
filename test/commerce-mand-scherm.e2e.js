@@ -53,6 +53,10 @@ test('RTG Commerce: een lid vult zijn mand bij twee verkopers, leest dat RTG nie
     const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-commerce-mand-'));
     const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
     let browser;
+    /* Het vastgehouden MAISON-antwoord hieronder wordt ook bij een fout
+       losgelaten: anders blijft de route hangen, sluit de browser niet, en
+       wordt elke fout een time-out van tien minuten zonder melding. */
+    let releaseOld = () => {};
     try {
       const u = Date.now().toString().slice(-8) + Math.floor(Math.random() * 90 + 10);
       const reg = await post(base, '/api/auth/register', { name: 'Koper', email: 'cm' + u + '@x.nl',
@@ -103,7 +107,7 @@ test('RTG Commerce: een lid vult zijn mand bij twee verkopers, leest dat RTG nie
       // A slow response from the previous seller must never replace the new
       // selection. Hold a real Maison response, select Kikunoi, then release it.
       await kies('KIKUNOI');
-      let releaseOld, oldReady;
+      let oldReady;
       const release = new Promise(r => { releaseOld = r; });
       const ready = new Promise(r => { oldReady = r; });
       const holdOld = async route => {
@@ -112,7 +116,9 @@ test('RTG Commerce: een lid vult zijn mand bij twee verkopers, leest dat RTG nie
         await route.fulfill({response});
       };
       await page.route('**/api/commerce/etalage', holdOld);
-      await page.selectOption('#kies', 'MAISON'); await ready;
+      await page.selectOption('#kies', 'MAISON');
+      await Promise.race([ready, new Promise((_, nee) => setTimeout(() =>
+        nee(new Error('het MAISON-verzoek kwam binnen 20 s niet bij de vastgehouden route')), 20000))]);
       await kies('KIKUNOI');
       const oldDelivered = page.waitForResponse(r => r.url().endsWith('/api/commerce/etalage')
         && r.request().postDataJSON().verkoper === 'MAISON');
@@ -219,6 +225,7 @@ test('RTG Commerce: een lid vult zijn mand bij twee verkopers, leest dat RTG nie
 
       assert.deepEqual(fouten, [], 'geen JS-fouten op het commerce-scherm: ' + fouten.join(' | '));
     } finally {
+      releaseOld();
       if (browser) await browser.close();
       await stop(child);
       try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) { /* weg is weg */ }

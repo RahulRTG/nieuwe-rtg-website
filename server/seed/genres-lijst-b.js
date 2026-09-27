@@ -111,5 +111,11 @@ module.exports = {
      precies een en hij wordt aangemaakt (kern/rtfwallet.js), niet aangevraagd
      en niet aangesloten. Geen caps -- dit is geen zaak met een werkvloer maar
      een positie waar geld kan landen. */
-  rtfoundation: { label: 'RTFoundation', icon: 'hart', industry: 'nonprofit', caps: [], status: 'huis' }
+  rtfoundation: { label: 'RTFoundation', icon: 'hart', industry: 'nonprofit', caps: [], status: 'huis' },
+  /* RTG zelf, als werkgever van de mensen in het kantoor (besluit van de
+     eigenaar, 27 september 2026; VRIJHEID.md). Status 'huis', net als de
+     RTFoundation: er is er precies een, de eigenaar maakt hem aan
+     (kern/rtghuis.js) en niemand vraagt hem aan. Geen caps -- de kamers van het
+     kantoor zijn zijn afdelingen, en dit is geen zaak met een etalage. */
+  rtg: { label: 'RTG (het huis zelf)', icon: 'huis', industry: 'professional', caps: [], status: 'huis' }
 };

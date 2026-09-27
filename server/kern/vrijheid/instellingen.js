@@ -57,6 +57,7 @@ module.exports = ({ eigen, save, nu }) => {
     if (!(Number.isInteger(e.weekdag) && e.weekdag >= 0 && e.weekdag <= 6)) return 'weekdag is 0 (zondag) tot en met 6.';
     if (!T.isKlok(e.van) || !T.isKlok(e.tot)) return 'van en tot zijn tijden als UU:MM.';
     if (!(Number.isInteger(e.minBezetting) && e.minBezetting >= 0)) return 'minBezetting is een heel getal van nul of meer.';
+    if (e.kamer != null && !/^[a-zA-Z]{2,30}$/.test(String(e.kamer))) return 'kamer is de id van een kamer, bijvoorbeeld financien.';
     for (const [c, n] of Object.entries(e.vereist || {}))
       if (!/^[A-Z0-9_]{2,40}$/.test(c) || !(Number.isInteger(n) && n >= 1)) return 'vereist noemt een bevoegdheid (HOOFDLETTERS) en een aantal van minstens 1.';
     return null;
@@ -68,7 +69,8 @@ module.exports = ({ eigen, save, nu }) => {
     const bezwaren = eisen.map(keurEis).map((b, i) => b && ('eis ' + (i + 1) + ': ' + b)).filter(Boolean);
     if (bezwaren.length) return { status: 422, error: 'De eisen zijn afgekeurd.', bezwaren };
     const inst = schrijf(code);
-    inst.eisen = eisen.map(e => ({ weekdag: e.weekdag, van: e.van, tot: e.tot, minBezetting: e.minBezetting, vereist: { ...(e.vereist || {}) } }));
+    inst.eisen = eisen.map(e => ({ weekdag: e.weekdag, van: e.van, tot: e.tot, minBezetting: e.minBezetting, vereist: { ...(e.vereist || {}) },
+      ...(e.kamer ? { kamer: String(e.kamer) } : {}) }));
     inst.eisenDoor = String(door || ''); inst.eisenOp = tijd();
     save();
     return { ok: true, eisen: inst.eisen };

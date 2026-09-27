@@ -24,7 +24,7 @@ const { maakVrijheid } = require('./index');
 const { rtgBeleid, STAND } = require('./rtgbeleid');
 const { maakBeleid } = require('./beleid');
 
-module.exports = ({ db, save, kern }) => {
+module.exports = ({ db, save, bijeen, inBundel, kern }) => {
   const eigen = require('../eigencollectie')({ db, domein: 'kern/vrijheid',
     bezit: { vrijheid: 'kaart', vrijheidInstellingen: 'kaart' } });
   const instellingen = require('./instellingen')({ eigen, save });
@@ -32,11 +32,24 @@ module.exports = ({ db, save, kern }) => {
   const { teambeeld } = require('./teambeeld')({ bronnen: kern, instellingen });
 
   /* Welk beleid geldt voor welke organisatie. Voor RTG zelf is er een besluit
-     (rtgbeleid.js); een andere zaak heeft er nog geen, en krijgt dan een LEEG
-     beleid -- open waarden, nooit het beleid van RTG geleend. */
+     (rtgbeleid.js), en RTG zelf is de zaak met genre `rtg` (kern/rtghuis.js);
+     een andere zaak heeft nog geen beleid en krijgt dan een LEEG beleid --
+     open waarden, nooit het beleid van RTG geleend. `isRtg` mag een toets
+     meegeven; de server vraagt het aan rtghuis. */
   function beleidVoor(code, isRtg) {
-    return isRtg ? rtgBeleid() : maakBeleid({});
+    const rtg = isRtg !== undefined ? isRtg : !!(kern().rtghuis && kern().rtghuis.isRtgZaak(code));
+    return rtg ? rtgBeleid() : maakBeleid({});
   }
 
-  return Object.freeze({ motor, instellingen, teambeeld, beleidVoor, rtgStand: STAND });
+  /* DUURZAAM VASTLEGGEN (lib/duurzaam.js). Een besluit over iemands vrije tijd
+     heet pas gelukt als de opslag het bevestigt: een goedgekeurde dag die na een
+     herstart weg is, is een belofte die niemand heeft gebroken maar die wel
+     kapot is. De route wikkelt elke mutatie hierin; lezen gaat er niet door.
+     Zonder bijeen (een toets met een kale db) is er niets te bevestigen en
+     loopt de mutatie gewoon. */
+  const vastleggen = bijeen
+    ? require('../../lib/duurzaam')({ bijeen, save, inBundel, bron: 'vrijheid' })
+    : async (werk) => { await werk(); return null; };
+
+  return Object.freeze({ motor, instellingen, teambeeld, beleidVoor, vastleggen, rtgStand: STAND });
 };

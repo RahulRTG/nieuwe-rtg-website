@@ -91,7 +91,7 @@ module.exports = ({ bronnen, instellingen }) => {
   function eisenVan(inst, datums) {
     const uit = [];
     for (const datum of datums) for (const e of inst.eisen || [])
-      if (e.weekdag === T.weekdag(datum)) uit.push({ datum, van: e.van, tot: e.tot, minBezetting: e.minBezetting, vereist: e.vereist });
+      if (e.weekdag === T.weekdag(datum)) uit.push({ datum, van: e.van, tot: e.tot, minBezetting: e.minBezetting, vereist: e.vereist, ...(e.kamer ? { kamer: e.kamer } : {}) });
     return uit;
   }
 
@@ -102,6 +102,9 @@ module.exports = ({ bronnen, instellingen }) => {
     const inst = instellingen.lees(code);
     const mensen = mensenVan(code, k, ontbreekt);
     for (const m of mensen) { const v = inst.verjaardagen[m.id]; if (v) m.verjaardag = v.mmdd; }
+    /* Bij RTG zelf zijn de kamers van het kantoor de teams (kern/rtghuis.js). */
+    const rtg = k.rtghuis && k.rtghuis.isRtgZaak(code) ? k.rtghuis : null;
+    if (rtg) for (const m of mensen) m.kamers = rtg.afdelingenVan(m.id);
     const diensten = roosterDiensten(code, k, ontbreekt);
     const datums = [...new Set(diensten.map(d => d.datum))].sort();
     const eisen = eisenVan(inst, datums);

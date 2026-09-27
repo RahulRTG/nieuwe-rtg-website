@@ -82,29 +82,36 @@ function toets(team, venster, reeds) {
     const hier = aanwezigOp(team, vak.van, afwezig);
     const datum = T.datumVan(Math.floor(vak.van / T.DAG));
     for (const { e } of actief) {
+      /* Een eis kan bij een TEAM horen (bij RTG zelf: een kamer van het
+         kantoor). Dan tellen alleen de mensen van dat team mee -- de kassa van
+         Financien wordt niet gedekt door iemand van Klantenservice. */
+      const team_ = e.kamer ? hier.filter(h => kamersVan(team, h.persoon).includes(e.kamer)) : hier;
+      const kamer = e.kamer ? { kamer: e.kamer } : {};
       const min = Number(e.minBezetting) || 0;
-      if (hier.length < min) gaten.push({ ...vak, ontbreekt: 'bezetting', nodig: min, aanwezig: hier.length });
-      minMarge = Math.min(minMarge, hier.length - min);
+      if (team_.length < min) gaten.push({ ...vak, ...kamer, ontbreekt: 'bezetting', nodig: min, aanwezig: team_.length });
+      minMarge = Math.min(minMarge, team_.length - min);
       for (const [code, nodig] of Object.entries(e.vereist || {})) {
-        const met = hier.filter(h => geldigeKwalificaties(team, h.persoon, datum).codes.has(code)).length;
-        if (met < nodig) gaten.push({ ...vak, ontbreekt: code, nodig, aanwezig: met });
+        const met = team_.filter(h => geldigeKwalificaties(team, h.persoon, datum).codes.has(code)).length;
+        if (met < nodig) gaten.push({ ...vak, ...kamer, ontbreekt: code, nodig, aanwezig: met });
         minMarge = Math.min(minMarge, met - nodig);
       }
     }
   }
   /* Aaneengesloten gaten met dezelfde ontbrekende eis worden een gat. */
   const samen = [];
-  for (const g of gaten.sort((a, b) => a.ontbreekt.localeCompare(b.ontbreekt) || a.van - b.van)) {
+  for (const g of gaten.sort((a, b) => a.ontbreekt.localeCompare(b.ontbreekt) || String(a.kamer || '').localeCompare(String(b.kamer || '')) || a.van - b.van)) {
     const vorige = samen[samen.length - 1];
-    if (vorige && vorige.ontbreekt === g.ontbreekt && vorige.tot === g.van) vorige.tot = g.tot;
+    if (vorige && vorige.ontbreekt === g.ontbreekt && vorige.kamer === g.kamer && vorige.tot === g.van) vorige.tot = g.tot;
     else samen.push({ ...g });
   }
   if (samen.length) return { stand: 'GAP', gaten: samen, marge: minMarge, uitleg: samen.map(zin).join(' ') };
   return { stand: 'SAFE', gaten: [], marge: minMarge, uitleg: 'Bezetting en vereiste bevoegdheden blijven gedekt.' };
 }
 
+const kamersVan = (team, persoon) => { const m = (team.mensen || []).find(x => x.id === persoon); return (m && m.kamers) || []; };
+
 function zin(g) {
-  const wat = g.ontbreekt === 'bezetting' ? 'De minimale bezetting (' + g.nodig + ')' : g.ontbreekt + '-dekking';
+  const wat = (g.ontbreekt === 'bezetting' ? 'De minimale bezetting (' + g.nodig + ')' : g.ontbreekt + '-dekking') + (g.kamer ? ' in ' + g.kamer : '');
   return wat + ' zou tussen ' + T.klokVan(g.van) + ' en ' + T.klokVan(g.tot) + ' ontbreken.';
 }
 

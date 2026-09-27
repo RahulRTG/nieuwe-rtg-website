@@ -52,6 +52,8 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-staffgemoed').CONTRACTEN,
   require('./mutatiecontracten-zaakkant').CONTRACTEN,
   require('./mutatiecontracten-rugdekking').CONTRACTEN,
+  /* RTG Vrijheid en RTG zelf als werkgever (VRIJHEID.md). */
+  require('./mutatiecontracten-vrijheid').CONTRACTEN,
   require('./mutatiecontracten-magnaatleven').CONTRACTEN,
   require('./mutatiecontracten-carriereledger').CONTRACTEN,
   require('./mutatiecontracten-vakschema').CONTRACTEN,

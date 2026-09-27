@@ -431,3 +431,16 @@ test('het besluit van de eigenaar staat, en de rest blijft open', () => {
   const mijn = m.mijnTijd(ORG, 'b', { beleid: b, rechten: { wettelijk: 160 }, jaar: 2026 });
   assert.equal(mijn.rtgDagen.over, 10);
 });
+
+test('een eis van een kamer telt alleen de mensen van die kamer', () => {
+  const t = team();
+  t.mensen.forEach(m => { m.kamers = ['a', 'b'].includes(m.id) ? ['financien'] : ['klantenservice']; });
+  const datum = '2026-10-06';
+  t.eisen = [{ datum, van: '09:00', tot: '17:00', minBezetting: 2, kamer: 'financien' }];
+  const afw = { persoon: 'b', van: T.punt(datum, '09:00'), tot: T.punt(datum, '17:00') };
+  const r = D.toets(t, afw, []);
+  assert.equal(r.stand, 'GAP', 'drie van klantenservice dekken financien niet');
+  assert.equal(r.gaten[0].kamer, 'financien');
+  assert.match(r.uitleg, /in financien/);
+  assert.equal(D.toets(t, { ...afw, persoon: 'c' }, []).stand, 'SAFE', 'klantenservice mag weg: financien blijft op twee');
+});

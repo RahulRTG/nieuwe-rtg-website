@@ -102,5 +102,9 @@ module.exports = (ctx) => {
     };
   }
 
-  return { mijnTijd, managerBeeld, teamBeeld, verzoekUitleg, gezondheid };
+  /* Wat op een mens wacht: alleen de ids, het beeld per stuk komt uit
+     managerBeeld (met zijn eigen poort). */
+  const wachtend = (code) => Object.values(org(code).verzoeken).filter(v => v.stand === 'HUMAN_REVIEW').map(v => v.id);
+
+  return { mijnTijd, managerBeeld, teamBeeld, verzoekUitleg, gezondheid, wachtend };
 };

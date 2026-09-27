@@ -1648,6 +1648,11 @@
       "schoolbieb",
       "tooManyTries"
     ],
+    "rtghuis": [
+      "boardroomAuth",
+      "rtghuis",
+      "vrijheid"
+    ],
     "rtgid": [
       "appUrl",
       "rtgid",
@@ -2557,6 +2562,10 @@
     "vracht": [
       "status",
       "vracht"
+    ],
+    "vrijheid": [
+      "rtghuis",
+      "vrijheid"
     ],
     "wbw": [
       "wbwGroep",

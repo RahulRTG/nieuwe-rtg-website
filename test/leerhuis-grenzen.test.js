@@ -16,6 +16,8 @@
      - `DUURZAAM.has(actie)` weg uit doe() in index.js               -> toets 17
      - de 2xx-eis of de eens/oneens-volgorde in schaduw.js omdraaien -> toets 18
      - de bron-eis uit relatieActief of uit relatieZet             -> toets 19
+     - B7: de bron-eis bij activeren, de rolcontrole vooraf, het
+       overslaan van wat er al staat, of het vastleggen van de bron -> toets 21
    Toets 1 zakte eerst NIET op zijn eigen mutatie: een andere weigering redde
    hem. Hij is daarna zo gemaakt dat alleen die ene regel nog in de weg staat.
    Toets 14 vond zelf een fout (een bestaand id herschreef een beoordeling) en
@@ -507,4 +509,36 @@ test('20. B2: de bron-toets per soort, en alles wat hij niet kan vaststellen is 
   assert.equal(t({ soort: 'zaak', id: 'KIKUNOI' }, 'concern:x'), false, 'een sleutel buiten lid: bevestigt niets');
   const kapot = maakBronToets({ accounts: { staffByMember: () => { throw new Error('db weg'); } } });
   assert.equal(kapot({ soort: 'zaak', id: 'KIKUNOI' }, 'lid:7'), false, 'een bron die gooit is geen ja');
+});
+
+test('21. B7: een startpakket zet concepten klaar, benoemt niemand en wordt niet ongewijzigd officieel', () => {
+  const w = W.maakWereld();
+  const org = 'RTF-UTRECHT';
+  W.richtIn(w, org, 'RTF', { eigenaar: P.E, relaties: { [P.CO]: { soort: 'VOLUNTEER' }, [P.KO]: { soort: 'VOLUNTEER' } },
+    bestuur: { [P.CO]: ['CURRICULUM_OWNER'], [P.KO]: ['KNOWLEDGE_OWNER'] } });
+  const voor = w.lh.spoor(org).length;
+  nee(w.lh.startpakketLaden(org, P.KO), 403);
+  assert.equal(w.lh.spoor(org).length, voor, 'een geweigerde lading schrijft ook geen half pakket');
+  const r = w.lh.startpakketLaden(org, P.CO);
+  assert.equal(r.ok, true, JSON.stringify(r));
+  assert.equal(r.gezet.length, 8);
+  assert.ok(r.gezet.includes('pakket-kennis-vog'), 'een RTF-stad krijgt de VOG-afspraak');
+  const lengte = w.lh.spoor(org).length;
+  const nog = w.lh.startpakketLaden(org, P.CO);
+  assert.equal(nog.gezet.length, 0);
+  assert.equal(nog.overgeslagen.length, 8);
+  assert.equal(w.lh.spoor(org).length, lengte, 'opnieuw laden schrijft niets');
+  const st = w.lh.stand(org);
+  assert.equal(st.kennis['pakket-kennis-melding'].versies[1].stand, 'DRAFT');
+  assert.equal(st.curricula['pakket-curriculum-start'].stand, 'DRAFT');
+  assert.deepEqual(Object.keys(st.trainers), [], 'een pakket wijst geen trainer aan');
+  assert.ok(!JSON.stringify(require('../server/kern/leerhuis/startpakket').stappen('RTF')).includes('lid:'), 'er staat geen mens in');
+  w.doe(org, 'kennisStand', { id: 'pakket-kennis-melding', versie: 1, naar: 'REVIEW' }, P.CO);
+  const kaal = nee(w.probeer(org, 'kennisStand', { id: 'pakket-kennis-melding', versie: 1, naar: 'ACTIVE' }, P.KO), 409);
+  assert.match(kaal.reden, /eigen bron/);
+  w.doe(org, 'kennisStand', { id: 'pakket-kennis-melding', versie: 1, naar: 'ACTIVE', bron: 'werkinstructie RTF Utrecht 2026' }, P.KO);
+  assert.equal(w.lh.stand(org).kennis['pakket-kennis-melding'].versies[1].bron, 'werkinstructie RTF Utrecht 2026');
+  const vreemd = W.maakWereld();
+  W.richtIn(vreemd, 'PRJ', 'PROJECT', { eigenaar: P.E, relaties: { [P.CO]: { soort: 'EMPLOYEE' } }, bestuur: { [P.CO]: ['CURRICULUM_OWNER'] } });
+  nee(vreemd.lh.startpakketLaden('PRJ', P.CO), 400);
 });

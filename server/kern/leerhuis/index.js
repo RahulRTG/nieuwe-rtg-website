@@ -151,7 +151,11 @@ function maakLeerhuis({ db, save, nu, bijeen, inBundel, bronToets }) {
   /* De leeskant staat in ./lees.js: elke vraag rekent op een verse projectie. */
   const lees = require('./lees')(stand, klok);
 
-  return { doe, doeVast, stand, uitkomst, verifieer: spoorKlopt, organisaties, spoor: spoorLees, lees, ACTIES: Object.keys(ACTIES).sort() };
+  /* Besluit B7: een startpakket loopt langs doe() zelf, elk stuk met een eigen
+     sleutel; zie startpakket.js. */
+  const startpakketLaden = (org, door) => require('./startpakket').laad({ doe, stand }, org, door);
+
+  return { doe, doeVast, startpakketLaden, stand, uitkomst, verifieer: spoorKlopt, organisaties, spoor: spoorLees, lees, ACTIES: Object.keys(ACTIES).sort() };
 }
 
 module.exports = { maakLeerhuis, DUURZAAM };

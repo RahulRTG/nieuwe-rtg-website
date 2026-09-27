@@ -10,6 +10,7 @@ const uitleg = require('./uitleg');
 const gereedheid = require('./gereedheid');
 const { geschiktheid } = require('./brug');
 const { certStand } = require('./oordeel');
+const { stappen } = require('./startpakket');
 
 module.exports = (stand, klok) => {
   const t = () => klok();
@@ -29,6 +30,8 @@ module.exports = (stand, klok) => {
     wieGeraakt: (org, k, klasse) => uitleg.wieGeraakt(stand(org), k, klasse),
     reconstrueer: (org, c) => uitleg.reconstrueer(stand(org), c, t()),
     grond: (org, vraag) => uitleg.grond(stand(org), vraag),
-    certStand: (org, c) => { const st = stand(org); return st.certificaten[c] ? certStand(st, st.certificaten[c], t()) : null; }
+    certStand: (org, c) => { const st = stand(org); return st.certificaten[c] ? certStand(st, st.certificaten[c], t()) : null; },
+    /* Wat een startpakket zou klaarzetten, voordat iemand het laadt (besluit B7). */
+    startpakket: (org) => { const s = stand(org).org.soort; return { soort: s, stappen: stappen(s) }; }
   };
 };

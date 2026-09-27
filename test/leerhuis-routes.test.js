@@ -198,3 +198,17 @@ test('8. B2: een leerhuis met een entiteit als bron volgt het dienstverband, en 
   assert.equal((await post('/api/leerhuis/lees', { org: 'BRON-BV', vraag: 'mijn' }, W)).status, 403,
     'wie niet meer in dienst is, leest het leerhuis van zijn oude werkgever niet meer');
 });
+
+test('9. B7: het startpakket laden kan alleen de curriculumeigenaar, en opnieuw laden schrijft niets', async () => {
+  const laad = (tok, s) => doe(tok, 'startpakketLaden', {}, s);
+  assert.equal((await laad(N, 'pak-0')).status, 403, 'zonder CURRICULUM_OWNER geen pakket');
+  assert.equal((await doe(E, 'bestuurZet', { persoon: 'lid:' + nId, rol: 'CURRICULUM_OWNER' }, 'best-co')).status, 200);
+  const vooraf = await lees(E, 'startpakket');
+  assert.equal(vooraf.status, 200, JSON.stringify(vooraf.body));
+  assert.equal(vooraf.body.antwoord.stappen.length, 8, 'het bestuur ziet wat er klaargezet zou worden');
+  const r = await laad(N, 'pak-1');
+  assert.equal(r.status, 200, JSON.stringify(r.body));
+  assert.equal(r.body.gezet.length, 8);
+  const nog = await laad(N, 'pak-2');
+  assert.equal(nog.body.gezet.length, 0, 'wat er al staat, wordt overgeslagen en niet overschreven');
+});

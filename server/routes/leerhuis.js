@@ -9,6 +9,7 @@
    is ziet geen niveau. B4: certificaat en beoordeling antwoorden pas na een
    bevestigde commit; een 503 daar is "onbekend" (eerst `uitkomst`, dan opnieuw
    met dezelfde sleutel). B2: de relatie komt uit de bron van het leerhuis.
+   B7: een startpakket zet concepten klaar via dezelfde handelingen.
 
    STANDAARD UIT (functie `leerhuis`), en elke handeling draagt een SLEUTEL:
    zonder sleutel is een herhaling een tweede handeling. */
@@ -29,7 +30,7 @@ const { bijeen, inBundel } = require('../db');
    is isolatie (grondwet 16). */
 const EIGEN_VRAGEN = ['mijn', 'vakstaat', 'trainerCockpit', 'managerCockpit', 'waaromLeren', 'waaromVerversen',
   'waaromNietGereed', 'geschiktheid', 'loopbaan', 'waaromTrainer', 'grond', 'uitkomst'];
-const BESTUURSVRAGEN = ['gereedheid', 'eenheid', 'wieGeraakt', 'reconstrueer', 'certStand', 'schaduw'];
+const BESTUURSVRAGEN = ['gereedheid', 'eenheid', 'wieGeraakt', 'reconstrueer', 'certStand', 'schaduw', 'startpakket'];
 const LEESROLLEN = ['ACADEMY_OWNER', 'QUALITY_AUTHORITY', 'KNOWLEDGE_OWNER', 'ASSESSMENT_AUTHORITY'];
 
 module.exports = (kern) => {
@@ -43,10 +44,8 @@ module.exports = (kern) => {
   /* Alleen om de schaduwtellers van besluit B1 te LEZEN; de meelezer zelf hangt
      in opzet/kantoordeur.js. */
   const schaduw = require('../kern/leerhuis/schaduw').maakLeerhuisSchaduw({ db, save });
-  /* Dezelfde fabriek als kern.volwassen (opzet/kernlaag1.js), op dezelfde
-     accounts: de poort is een pure functie over de kluis, dus een eigen
-     exemplaar is dezelfde regel en geen tweede -- en de kern wordt er niet
-     breder van (de ratel kernBreedte). */
+  /* Dezelfde fabriek als kern.volwassen (opzet/kernlaag1.js): dezelfde regel,
+     en de kern wordt er niet breder van (de ratel kernBreedte). */
   const volwassen = maakVolwassen({ accounts });
 
   function actor(req, res) {
@@ -71,6 +70,7 @@ module.exports = (kern) => {
     if (b.actie === 'orgOpen') return res.status(403).json({ error: 'Een leerhuis openen doet het kantoor op naam.', hoe: 'POST /api/office/leerhuis/open' });
     const sleutel = String(b.sleutel || req.get('idempotency-key') || '').slice(0, 80);
     if (!sleutel) return res.status(400).json({ error: 'Elke handeling draagt een sleutel; zonder sleutel is een herhaling een tweede handeling.' });
+    if (b.actie === 'startpakketLaden') return stuur(res, leerhuis.startpakketLaden(String(b.org || ''), door));
     const invoer = b.invoer || {};
     if (b.actie === 'certificaatUitgeven' && !volwassenLid(invoer.persoon))
       return res.status(403).json({ error: 'Een certificaat krijgt alleen wie aantoonbaar 18 of ouder is.',
@@ -115,7 +115,8 @@ module.exports = (kern) => {
         return res.status(403).json({ error: 'Het organisatiebrede beeld is voor het bestuur van de Academy.' });
       const a = { gereedheid: () => l.gereedheid(org, b.eisen || {}), eenheid: () => l.eenheid(org),
         wieGeraakt: () => l.wieGeraakt(org, String(b.kennis || ''), b.klasse || null),
-        reconstrueer: () => l.reconstrueer(org, String(b.certificaat || '')), certStand: () => l.certStand(org, String(b.certificaat || '')), schaduw: () => schaduw.stand() }[vraag];
+        reconstrueer: () => l.reconstrueer(org, String(b.certificaat || '')), certStand: () => l.certStand(org, String(b.certificaat || '')), schaduw: () => schaduw.stand(),
+        startpakket: () => l.startpakket(org) }[vraag];
       return res.json({ ok: true, vraag, antwoord: a() });
     }
     res.status(400).json({ error: 'Onbekende vraag.', vragen: EIGEN_VRAGEN.concat(BESTUURSVRAGEN) });

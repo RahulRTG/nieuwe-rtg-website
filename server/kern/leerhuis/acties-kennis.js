@@ -37,7 +37,8 @@ module.exports = {
     return [{ soort: 'kennisVersie', data: { id: i.id, versie, domein: tekst(i.domein, 60), titel: tekst(i.titel, 160),
       tekst: tekst(i.tekst, 8000), bron: tekst(i.bron, 300), risico: tekst(i.risico || 'normaal', 30),
       doelgroep: tekst(i.doelgroep, 120), geldigVan: i.geldigVan || null, geldigTot: i.geldigTot || null,
-      reden: tekst(i.reden, 400), voorstel: i.voorstel || null } }];
+      reden: tekst(i.reden, 400), voorstel: i.voorstel || null,
+      herkomst: i.herkomst === 'startpakket' ? 'startpakket' : null } }];
   },
 
   kennisStand(st, i, door, ctx) {
@@ -53,11 +54,17 @@ module.exports = {
     const uit = [];
     if (i.naar === 'ACTIVE') {
       eisNiet(door, v.auteur, 'wie een kennisversie schrijft, keurt hem niet zelf goed');
+      /* Besluit B7: een tekst uit een startpakket is voor deze organisatie pas
+         waar als iemand HIER zegt waarom (startpakket.js, grens 2). */
+      if (v.herkomst === 'startpakket' && !String(i.bron || '').trim())
+        weiger('een concept uit het startpakket wordt pas officiele kennis met de eigen bron van deze organisatie', 409,
+          'noem bij het activeren de bron (bron: ...)');
       if (k.actief) {
         if (!IMPACT.includes(i.impactKlasse)) weiger('een opvolgende versie vraagt een impactklasse: ' + IMPACT.join(', '), 400);
       }
     }
-    uit.push({ soort: 'kennisStand', data: { id: i.id, versie: i.versie, naar: i.naar, reden: tekst(i.reden, 300) } });
+    uit.push({ soort: 'kennisStand', data: { id: i.id, versie: i.versie, naar: i.naar, reden: tekst(i.reden, 300),
+      bron: i.naar === 'ACTIVE' && v.herkomst === 'startpakket' ? tekst(i.bron, 300) : null } });
     if (i.naar === 'ACTIVE' && k.actief) {
       const im = geraakt(st, i.id, i.impactKlasse);
       uit.push({ soort: 'impact', data: { kennis: i.id, versie: i.versie, van: k.actief, klasse: i.impactKlasse,

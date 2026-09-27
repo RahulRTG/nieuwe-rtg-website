@@ -61,6 +61,7 @@ function pas(st, r) {
     case 'kennisStand': {
       const k = st.kennis[d.id]; const v = k.versies[d.versie];
       v.stand = d.naar; v.historie.push({ stand: d.naar, door: r.door, at: r.at, reden: d.reden || null });
+      if (d.bron) v.bron = d.bron;
       if (d.naar === 'ACTIVE') {
         if (k.actief && k.actief !== d.versie) {
           const oud = k.versies[k.actief]; oud.stand = 'DEPRECATED';

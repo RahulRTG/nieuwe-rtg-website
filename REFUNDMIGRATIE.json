@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-27T12:15:52.137Z",
-  "commit": "27a7fd28",
-  "boomVuil": true,
-  "boomAnders": 4,
+  "op": "2026-09-27T12:21:26.961Z",
+  "commit": "12ea75c2",
+  "boomVuil": false,
+  "boomAnders": 2,
   "instrument": "scripts/refundmigratie.js",
   "node": "v22.22.2"
  },

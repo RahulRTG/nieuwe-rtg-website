@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4628,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1606,
+    "kernBreedte": 1607,
     "kernGedeeld": 244,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
@@ -158,6 +158,15 @@
       "meter": "toetsenNietGemeten 639 -> 640",
       "reden": "test/streefbeeld.test.js is nieuw (besluit C7). Met de hand nagetrokken met drie mutaties in server/kern/streefbeeld.js: een meerderheid in plaats van elke dimensie (toets 4b zakt -- de eerste versie van de toets had maar twee dimensies en zag deze mutatie NIET, en kreeg er daarom een bij), tekenen zonder vingerafdruk (toets 2 en 6 zakken) en onbekend als binnen (toets 4 zakt). De mutatiemotor is er nog niet langs geweest.",
       "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1606,
+      "meter": "kernBreedte 1606 -> 1607",
+      "reden": "De herkomstvraag na de registratie (besluit C6, keuze van de eigenaar: op het welkomstscherm). Het domein auth leest kern.aanmeldkanaalKeuzes: de antwoorden en hun woorden gaan met de registratie mee naar het scherm, zodat er geen tweede lijst in de client ontstaat, en de antwoordroute toetst tegen diezelfde keuzes in plaats van een tweede naam (AANMELDKANALEN) erbij te lezen.",
+      "waarheen": "GRENZEN.json (auth draagt aanmeldkanaalKeuzes) en test/aanmeldkanaal.test.js toets 6"
     },
     {
       "datum": "2026-09-27",

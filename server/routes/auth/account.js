@@ -121,7 +121,7 @@ app.post('/api/auth/aanmeldkanaal', auth, (req, res) => {
   if (!md.aanmeldkanaalOpen) return res.status(409).json({ error: 'Deze vraag is al beantwoord, of hoort niet bij dit account.' });
   const k = (req.body || {}).kanaal;
   const kanaal = k == null || k === '' ? null : String(k);
-  if (kanaal && !kern.AANMELDKANALEN.includes(kanaal)) return res.status(400).json({ error: 'Kies een van de antwoorden, of sla de vraag over.' });
+  if (kanaal && !kern.aanmeldkanaalKeuzes().some(x => x.id === kanaal)) return res.status(400).json({ error: 'Kies een van de antwoorden, of sla de vraag over.' });
   const geteld = kanaal ? kern.aanmeldkanaalTel({ kanaal }).geteld === true : false;
   delete md.aanmeldkanaalOpen;
   accounts.saveMemberState(u.id, md);

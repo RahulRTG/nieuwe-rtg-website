@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T12:44:26.944Z",
-    "commit": "acb54cae",
+    "op": "2026-09-27T13:53:38.520Z",
+    "commit": "b465f346",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -3776,6 +3776,21 @@
       "operator": "return-weg#2",
       "gezakt": 1,
       "geprobeerd": 8
+    },
+    "giftcard-credential.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/collectie-bewerken.js",
+      "operator": "===->!==#0",
+      "gezakt": 8,
+      "geprobeerd": 1
+    },
+    "giftcard-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
     },
     "golive.test.js": {
       "soort": "puur",

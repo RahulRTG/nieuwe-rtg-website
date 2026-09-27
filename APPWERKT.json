@@ -10,8 +10,8 @@
   "NIET_GETEST": "deze ronde niet aangeraakt, met de reden erbij"
  },
  "stempel": {
-  "op": "2026-09-27T13:28:18.264Z",
-  "commit": "cfa672d7",
+  "op": "2026-09-27T17:03:34.472Z",
+  "commit": "0d00778c",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/appwerkt.js",
@@ -21,9 +21,9 @@
  "gemeten": {
   "onderdelen": 112,
   "defecten": 0,
-  "knoppenGevonden": 832,
-  "knoppenAangetikt": 598,
-  "knoppenNietKlikbaar": 77,
+  "knoppenGevonden": 817,
+  "knoppenAangetikt": 625,
+  "knoppenNietKlikbaar": 64,
   "remGeraakt": 0,
   "weigeringenGetoond": 7,
   "taalWissels": [],
@@ -31,16 +31,10 @@
    "aside#mediaRechten.media-rechten": 5,
    "div#blokSheet.sheet.open": 5,
    "header.kop.ios-nav": 5,
-   "div.rtg-edge-chrome": 4,
-   "div#faseScrim.scrim.open": 4,
-   "section#gidsLaag.laag.open": 4,
-   "section#intelligenceDock.intelligence-dock": 2,
-   "div.onder": 1,
-   "div#poort.poort.zien": 1,
-   "header#balk.ios-nav": 1,
-   "section#blad.blad.open": 1
+   "div.rtg-edge-chrome": 2,
+   "header#balk.ios-nav": 2
   },
-  "schermenGrotendeelsOngemeten": 14,
+  "schermenGrotendeelsOngemeten": 9,
   "deurenZonderPersona": 2
  },
  "telling": {
@@ -52,8 +46,8 @@
    "NIET_GETEST": 15
   },
   "bedienbaar": {
-   "NIET_GETEST": 34,
-   "BEWEZEN": 78
+   "NIET_GETEST": 29,
+   "BEWEZEN": 83
   },
   "menselijk": {
    "NIET_GETEST": 112
@@ -1960,7 +1954,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -1978,7 +1972,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -2066,7 +2060,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -2084,7 +2078,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -2172,7 +2166,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -2190,7 +2184,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -2267,7 +2261,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -2285,7 +2279,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -2357,7 +2351,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -2375,7 +2369,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -2447,8 +2441,8 @@
      "bewijs": "/apps/connect.html"
     },
     "bedienbaar": {
-     "status": "NIET_GETEST",
-     "reden": "1 van 4 eigen knoppen aangetikt zonder fout (plus 23 van de gedeelde schil, die hier niet telt) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
+     "status": "BEWEZEN",
+     "reden": "5 van 4 eigen knoppen aangetikt zonder fout (plus 23 van de gedeelde schil, die hier niet telt)",
      "bewijs": null
     },
     "menselijk": {
@@ -2458,7 +2452,7 @@
     },
     "voltooibaar": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 910cd346, sindsdien zijn 47 codebestand(en) gewijzigd (16 andere buiten dit instrument gelaten)",
+     "reden": "bewijs vervallen: gemeten op 910cd346, sindsdien zijn 71 codebestand(en) gewijzigd (16 andere buiten dit instrument gelaten)",
      "bewijs": {
       "register": "LUSPROEF.json",
       "op": "2026-09-25T08:52:10.526Z",
@@ -2474,7 +2468,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -2492,7 +2486,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -2510,12 +2504,12 @@
     }
    },
    "gevonden": 4,
-   "geklikt": 1,
+   "geklikt": 5,
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
     "als gezin: 2316 tekens zichtbaar",
-    "proef: de proef verloor de pagina door een navigatie en opende hem opnieuw; opnieuw openen lukte niet: page.goto: Navigation to \"http://127.0.0.1:36745/apps/connect.html\" is interrupt"
+    "proef: de proef verloor de pagina door een navigatie en opende hem opnieuw"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -2577,7 +2571,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -2595,7 +2589,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -2619,7 +2613,7 @@
    ],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als gezin: 3187 tekens zichtbaar"
+    "als gezin: 3289 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -2680,7 +2674,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -2698,7 +2692,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -2771,7 +2765,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "7 van 14 eigen knoppen aangetikt zonder fout (plus 23 van de gedeelde schil, die hier niet telt), 8 niet aan te tikken (3x intercepts pointer events, 5x element is not visible)",
+     "reden": "7 van 14 eigen knoppen aangetikt zonder fout (plus 23 van de gedeelde schil, die hier niet telt), 8 niet aan te tikken (2x intercepts pointer events, 1x element is not stable, 5x element is not visible)",
      "bewijs": null
     },
     "menselijk": {
@@ -2786,7 +2780,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -2804,7 +2798,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -2826,7 +2820,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [
     "Samen: intercepts pointer events",
-    "✶ Rahul: intercepts pointer events",
+    "✶ Rahul: element is not stable",
     "P\nPapa: intercepts pointer events",
     "(naamloos): element is not visible",
     "(naamloos): element is not visible",
@@ -2835,7 +2829,7 @@
     "(naamloos): element is not visible"
    ],
    "waarnemingen": [
-    "als gezin: 1288 tekens zichtbaar"
+    "als gezin: 1287 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -2851,12 +2845,8 @@
      "door": "header#balk.ios-nav"
     },
     {
-     "knop": "✶ Rahul",
-     "door": "div.rtg-edge-chrome"
-    },
-    {
      "knop": "P\nPapa",
-     "door": "div.rtg-edge-chrome"
+     "door": "header#balk.ios-nav"
     }
    ],
    "rem": 0,
@@ -2909,7 +2899,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -2927,7 +2917,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -2996,7 +2986,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -3014,7 +3004,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -3097,7 +3087,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -3115,7 +3105,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -3198,7 +3188,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -3216,7 +3206,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -3299,7 +3289,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -3317,7 +3307,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -3339,7 +3329,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1162 tekens zichtbaar"
+    "als lid: 1146 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -3400,7 +3390,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -3418,7 +3408,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -3501,7 +3491,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -3519,7 +3509,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -3602,7 +3592,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -3620,7 +3610,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -3642,7 +3632,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 2464 tekens zichtbaar"
+    "als lid: 2448 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -3703,7 +3693,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -3721,7 +3711,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -3834,7 +3824,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -3852,7 +3842,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -3937,7 +3927,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -3955,7 +3945,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -3977,7 +3967,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 16681 tekens zichtbaar"
+    "als lid: 16665 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -4038,7 +4028,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -4056,7 +4046,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -4143,7 +4133,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -4161,7 +4151,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -4183,7 +4173,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1262 tekens zichtbaar"
+    "als lid: 1332 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -4244,7 +4234,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -4262,7 +4252,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -4286,7 +4276,7 @@
    ],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 4880 tekens zichtbaar"
+    "als lid: 4885 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -4347,7 +4337,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -4365,7 +4355,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -4448,7 +4438,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -4466,7 +4456,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -4535,7 +4525,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -4553,7 +4543,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -4575,7 +4565,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1972 tekens zichtbaar"
+    "als lid: 1741 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -4636,7 +4626,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -4654,7 +4644,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -4737,7 +4727,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -4755,7 +4745,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -4838,7 +4828,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -4856,7 +4846,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -4910,7 +4900,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "8 van 8 eigen knoppen aangetikt zonder fout (plus 23 van de gedeelde schil, die hier niet telt)",
+     "reden": "10 van 10 eigen knoppen aangetikt zonder fout (plus 23 van de gedeelde schil, die hier niet telt)",
      "bewijs": null
     },
     "menselijk": {
@@ -4925,7 +4915,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -4943,7 +4933,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -4960,13 +4950,13 @@
      "bewijs": null
     }
    },
-   "gevonden": 8,
-   "geklikt": 8,
+   "gevonden": 10,
+   "geklikt": 10,
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
     "als lid: 1512 tekens zichtbaar",
-    "proef: de proef verloor de pagina door een navigatie en opende hem opnieuw; opnieuw openen lukte niet: page.goto: Navigation to \"http://127.0.0.1:36745/apps/comm.html\" is interrupted "
+    "proef: de proef verloor de pagina door een navigatie en opende hem opnieuw"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -5027,7 +5017,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -5045,7 +5035,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -5114,7 +5104,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -5132,7 +5122,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -5215,7 +5205,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -5233,7 +5223,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -5286,8 +5276,8 @@
      "bewijs": "/apps/camera.html"
     },
     "bedienbaar": {
-     "status": "NIET_GETEST",
-     "reden": "1 van 10 eigen knoppen aangetikt zonder fout (plus 24 van de gedeelde schil, die hier niet telt), 1 niet aan te tikken (1x intercepts pointer events) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
+     "status": "BEWEZEN",
+     "reden": "10 van 11 eigen knoppen aangetikt zonder fout (plus 24 van de gedeelde schil, die hier niet telt)",
      "bewijs": null
     },
     "menselijk": {
@@ -5302,7 +5292,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -5320,7 +5310,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -5337,15 +5327,13 @@
      "bewijs": null
     }
    },
-   "gevonden": 10,
-   "geklikt": 1,
+   "gevonden": 11,
+   "geklikt": 10,
    "overgeslagen": [],
-   "nietKlikbaar": [
-    "CAMERA OPNIEUW OPENEN: intercepts pointer events"
-   ],
+   "nietKlikbaar": [],
    "waarnemingen": [
     "als lid: 1000 tekens zichtbaar",
-    "proef: de proef verloor de pagina door een navigatie en opende hem opnieuw; opnieuw openen lukte niet: page.goto: Navigation to \"http://127.0.0.1:36745/apps/camera.html\" is interrupte"
+    "proef: de proef verloor de pagina door een navigatie en opende hem opnieuw"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -5355,12 +5343,7 @@
    },
    "schil": 24,
    "bedekt": [],
-   "onderschept": [
-    {
-     "knop": "CAMERA OPNIEUW OPENEN",
-     "door": "div.onder"
-    }
-   ],
+   "onderschept": [],
    "rem": 0,
    "gezegd": [],
    "taalWissel": [],
@@ -5411,7 +5394,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -5429,7 +5412,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -5512,7 +5495,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -5530,7 +5513,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -5613,7 +5596,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -5631,7 +5614,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -5653,7 +5636,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 3138 tekens zichtbaar"
+    "als lid: 3122 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -5714,7 +5697,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -5732,7 +5715,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -5815,7 +5798,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -5833,7 +5816,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -5855,7 +5838,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 2006 tekens zichtbaar"
+    "als lid: 1730 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -5916,7 +5899,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -5934,7 +5917,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -6019,7 +6002,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -6037,7 +6020,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -6104,8 +6087,8 @@
      "bewijs": "/apps/foodcourt.html"
     },
     "bedienbaar": {
-     "status": "NIET_GETEST",
-     "reden": "10 van 21 eigen knoppen aangetikt zonder fout (plus 23 van de gedeelde schil, die hier niet telt), 1 niet aan te tikken (1x intercepts pointer events) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
+     "status": "BEWEZEN",
+     "reden": "10 van 14 eigen knoppen aangetikt zonder fout (plus 23 van de gedeelde schil, die hier niet telt)",
      "bewijs": null
     },
     "menselijk": {
@@ -6120,7 +6103,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -6138,7 +6121,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -6155,14 +6138,12 @@
      "bewijs": null
     }
    },
-   "gevonden": 21,
+   "gevonden": 14,
    "geklikt": 10,
    "overgeslagen": [],
-   "nietKlikbaar": [
-    "VISRESTAURANT · €€€ · IBIZA\nSal Nocturna: intercepts pointer events"
-   ],
+   "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1563 tekens zichtbaar"
+    "als lid: 1533 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -6172,12 +6153,7 @@
    },
    "schil": 23,
    "bedekt": [],
-   "onderschept": [
-    {
-     "knop": "VISRESTAURANT · €€€ · IBIZA\nSal Nocturna",
-     "door": "section#blad.blad.open"
-    }
-   ],
+   "onderschept": [],
    "rem": 0,
    "gezegd": [],
    "taalWissel": [],
@@ -6228,7 +6204,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -6246,7 +6222,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -6329,7 +6305,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -6347,7 +6323,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -6430,7 +6406,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -6448,7 +6424,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -6470,7 +6446,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1748 tekens zichtbaar"
+    "als lid: 1485 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -6531,7 +6507,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -6549,7 +6525,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -6618,7 +6594,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -6636,7 +6612,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -6658,7 +6634,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 2996 tekens zichtbaar"
+    "als lid: 2951 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -6719,7 +6695,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -6737,7 +6713,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -6820,7 +6796,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -6838,7 +6814,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -6860,7 +6836,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1520 tekens zichtbaar"
+    "als lid: 1504 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -6923,7 +6899,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -6941,7 +6917,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -7024,7 +7000,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -7042,7 +7018,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -7127,7 +7103,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -7145,7 +7121,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -7167,7 +7143,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1241 tekens zichtbaar"
+    "als lid: 1225 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -7228,7 +7204,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -7246,7 +7222,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -7329,7 +7305,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -7347,7 +7323,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -7430,7 +7406,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -7448,7 +7424,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -7470,7 +7446,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1111 tekens zichtbaar"
+    "als lid: 1333 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -7531,7 +7507,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -7549,7 +7525,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -7632,7 +7608,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -7650,7 +7626,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -7672,7 +7648,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1766 tekens zichtbaar"
+    "als lid: 1507 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -7733,7 +7709,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -7751,7 +7727,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -7834,7 +7810,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -7852,7 +7828,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -7935,7 +7911,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -7953,7 +7929,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -8039,7 +8015,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -8057,7 +8033,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -8079,7 +8055,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1652 tekens zichtbaar"
+    "als lid: 1636 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -8140,7 +8116,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -8158,7 +8134,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -8241,7 +8217,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -8259,7 +8235,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -8342,7 +8318,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -8360,7 +8336,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -8429,7 +8405,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -8447,7 +8423,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -8475,7 +8451,7 @@
     "Sluiten: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2797 tekens zichtbaar"
+    "als lid: 2842 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -8557,7 +8533,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -8575,7 +8551,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -8599,7 +8575,7 @@
    ],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 798 tekens zichtbaar"
+    "als lid: 917 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -8660,7 +8636,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -8678,7 +8654,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -8747,7 +8723,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -8765,7 +8741,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -8848,7 +8824,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -8866,7 +8842,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -8935,7 +8911,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -8953,7 +8929,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -9036,7 +9012,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -9054,7 +9030,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -9137,7 +9113,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -9155,7 +9131,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -9238,7 +9214,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -9256,7 +9232,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -9339,7 +9315,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -9357,7 +9333,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -9445,7 +9421,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -9463,7 +9439,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -9487,7 +9463,7 @@
     "← Uitgaan: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1375 tekens zichtbaar"
+    "als lid: 1345 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -9553,7 +9529,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -9571,7 +9547,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -9593,7 +9569,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1635 tekens zichtbaar"
+    "als lid: 1377 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -9654,7 +9630,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -9672,7 +9648,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -9755,7 +9731,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -9773,7 +9749,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -9842,7 +9818,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -9860,7 +9836,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -9943,7 +9919,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -9961,7 +9937,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -9983,7 +9959,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1158 tekens zichtbaar"
+    "als lid: 1413 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -10044,7 +10020,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -10062,7 +10038,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -10147,7 +10123,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -10165,7 +10141,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -10248,7 +10224,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -10266,7 +10242,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -10333,8 +10309,8 @@
      "bewijs": "/apps/navigatie.html"
     },
     "bedienbaar": {
-     "status": "NIET_GETEST",
-     "reden": "11 van 28 eigen knoppen aangetikt zonder fout (plus 24 van de gedeelde schil, die hier niet telt), 11 niet aan te tikken (3x intercepts pointer events, 8x element is outside of the viewport) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
+     "status": "BEWEZEN",
+     "reden": "14 van 28 eigen knoppen aangetikt zonder fout (plus 24 van de gedeelde schil, die hier niet telt), 8 niet aan te tikken (8x element is outside of the viewport)",
      "bewijs": null
     },
     "menselijk": {
@@ -10349,7 +10325,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -10367,7 +10343,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -10385,11 +10361,9 @@
     }
    },
    "gevonden": 28,
-   "geklikt": 11,
+   "geklikt": 14,
    "overgeslagen": [],
    "nietKlikbaar": [
-    "KAARTEN: intercepts pointer events",
-    "🚨: intercepts pointer events",
     "✕: element is outside of the viewport",
     "RTG SLIM: element is outside of the viewport",
     "SNEL: element is outside of the viewport",
@@ -10397,8 +10371,7 @@
     "ZEKER: element is outside of the viewport",
     "ELECTRIC: element is outside of the viewport",
     "START BEGELEIDING: element is outside of the viewport",
-    "🚨 MELD EEN WEGPROBLEEM OP DEZE PLEK: element is outside of the viewport",
-    "MEENEMEN: intercepts pointer events"
+    "🚨 MELD EEN WEGPROBLEEM OP DEZE PLEK: element is outside of the viewport"
    ],
    "waarnemingen": [
     "als lid: 1302 tekens zichtbaar"
@@ -10411,20 +10384,7 @@
    },
    "schil": 24,
    "bedekt": [],
-   "onderschept": [
-    {
-     "knop": "KAARTEN",
-     "door": "section#intelligenceDock.intelligence-dock"
-    },
-    {
-     "knop": "🚨",
-     "door": "div#poort.poort.zien"
-    },
-    {
-     "knop": "MEENEMEN",
-     "door": "section#intelligenceDock.intelligence-dock"
-    }
-   ],
+   "onderschept": [],
    "rem": 0,
    "gezegd": [],
    "taalWissel": [],
@@ -10475,7 +10435,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -10493,7 +10453,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -10576,7 +10536,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -10594,7 +10554,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -10682,7 +10642,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -10700,7 +10660,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -10722,7 +10682,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1277 tekens zichtbaar"
+    "als lid: 1315 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -10783,7 +10743,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -10801,7 +10761,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -10870,7 +10830,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -10888,7 +10848,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -10971,7 +10931,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -10989,7 +10949,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -11074,7 +11034,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -11092,7 +11052,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -11114,7 +11074,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1244 tekens zichtbaar"
+    "als lid: 1247 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -11175,7 +11135,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -11193,7 +11153,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -11246,8 +11206,8 @@
      "bewijs": "/apps/residentie.html"
     },
     "bedienbaar": {
-     "status": "NIET_GETEST",
-     "reden": "5 van 22 eigen knoppen aangetikt zonder fout (plus 24 van de gedeelde schil, die hier niet telt), 4 niet aan te tikken (4x intercepts pointer events) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
+     "status": "BEWEZEN",
+     "reden": "10 van 10 eigen knoppen aangetikt zonder fout (plus 24 van de gedeelde schil, die hier niet telt)",
      "bewijs": null
     },
     "menselijk": {
@@ -11262,7 +11222,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -11280,7 +11240,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -11297,15 +11257,10 @@
      "bewijs": null
     }
    },
-   "gevonden": 22,
-   "geklikt": 5,
+   "gevonden": 10,
+   "geklikt": 10,
    "overgeslagen": [],
-   "nietKlikbaar": [
-    "Mijn suite: intercepts pointer events",
-    "✶: intercepts pointer events",
-    "♥: intercepts pointer events",
-    "Zeg: intercepts pointer events"
-   ],
+   "nietKlikbaar": [],
    "waarnemingen": [
     "als lid: 725 tekens zichtbaar"
    ],
@@ -11317,24 +11272,7 @@
    },
    "schil": 24,
    "bedekt": [],
-   "onderschept": [
-    {
-     "knop": "Mijn suite",
-     "door": "section#gidsLaag.laag.open"
-    },
-    {
-     "knop": "✶",
-     "door": "section#gidsLaag.laag.open"
-    },
-    {
-     "knop": "♥",
-     "door": "section#gidsLaag.laag.open"
-    },
-    {
-     "knop": "Zeg",
-     "door": "section#gidsLaag.laag.open"
-    }
-   ],
+   "onderschept": [],
    "rem": 0,
    "gezegd": [],
    "taalWissel": [],
@@ -11385,7 +11323,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -11403,7 +11341,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -11486,7 +11424,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -11504,7 +11442,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -11589,7 +11527,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -11607,7 +11545,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -11685,7 +11623,7 @@
     },
     "voltooibaar": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 81cbca1c, sindsdien zijn 47 codebestand(en) gewijzigd (16 andere buiten dit instrument gelaten)",
+     "reden": "bewijs vervallen: gemeten op 81cbca1c, sindsdien zijn 71 codebestand(en) gewijzigd (16 andere buiten dit instrument gelaten)",
      "bewijs": {
       "register": "TAFELPROEF.json",
       "op": "2026-09-25T08:52:01.306Z",
@@ -11701,7 +11639,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -11719,7 +11657,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -11808,7 +11746,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -11826,7 +11764,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -11909,7 +11847,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -11927,7 +11865,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -11951,7 +11889,7 @@
     "(naamloos): element is not visible"
    ],
    "waarnemingen": [
-    "als lid: 1669 tekens zichtbaar"
+    "als lid: 704 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -12012,7 +11950,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -12030,7 +11968,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -12115,7 +12053,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -12133,7 +12071,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -12216,7 +12154,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -12234,7 +12172,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -12256,7 +12194,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 944 tekens zichtbaar"
+    "als lid: 1249 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -12317,7 +12255,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -12335,7 +12273,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -12357,8 +12295,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 2596 tekens zichtbaar",
-    "proef: de proef verloor de pagina door een navigatie en opende hem opnieuw"
+    "als lid: 2596 tekens zichtbaar"
    ],
    "personaAfwijking": {
     "gebruikt": "lid",
@@ -12424,7 +12361,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -12442,7 +12379,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -12510,7 +12447,7 @@
     },
     "bedienbaar": {
      "status": "NIET_GETEST",
-     "reden": "8 van 37 eigen knoppen aangetikt zonder fout (plus 24 van de gedeelde schil, die hier niet telt), 32 niet aan te tikken (5x intercepts pointer events, 27x element is not visible) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
+     "reden": "12 van 38 eigen knoppen aangetikt zonder fout (plus 24 van de gedeelde schil, die hier niet telt), 28 niet aan te tikken (1x intercepts pointer events, 27x element is not visible) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -12525,7 +12462,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -12543,7 +12480,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -12560,13 +12497,11 @@
      "bewijs": null
     }
    },
-   "gevonden": 37,
-   "geklikt": 8,
+   "gevonden": 38,
+   "geklikt": 12,
    "overgeslagen": [],
    "nietKlikbaar": [
     "Rustig overzicht: intercepts pointer events",
-    "Vraag beoordeling: intercepts pointer events",
-    "Alleen u: intercepts pointer events",
     "Kop 1: element is not visible",
     "Kop 2: element is not visible",
     "Tussenkop: element is not visible",
@@ -12593,9 +12528,7 @@
     "(naamloos): element is not visible",
     "(naamloos): element is not visible",
     "Afdrukken of opslaan als PDF: element is not visible",
-    "(naamloos): element is not visible",
-    "TER BEOORDELING: intercepts pointer events",
-    "Keur goed: intercepts pointer events"
+    "(naamloos): element is not visible"
    ],
    "waarnemingen": [
     "als lid: 1020 tekens zichtbaar"
@@ -12617,22 +12550,6 @@
     {
      "knop": "Rustig overzicht",
      "door": "div.rtg-edge-chrome"
-    },
-    {
-     "knop": "Vraag beoordeling",
-     "door": "div#faseScrim.scrim.open"
-    },
-    {
-     "knop": "Alleen u",
-     "door": "div#faseScrim.scrim.open"
-    },
-    {
-     "knop": "TER BEOORDELING",
-     "door": "div#faseScrim.scrim.open"
-    },
-    {
-     "knop": "Keur goed",
-     "door": "div#faseScrim.scrim.open"
     }
    ],
    "rem": 0,
@@ -12685,7 +12602,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -12703,7 +12620,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -12786,7 +12703,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -12804,7 +12721,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -12826,7 +12743,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1034 tekens zichtbaar"
+    "als lid: 1040 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -12887,7 +12804,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -12905,7 +12822,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -12927,7 +12844,7 @@
    "overgeslagen": [],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 1438 tekens zichtbaar"
+    "als lid: 1467 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -12988,7 +12905,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -13006,7 +12923,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -13094,7 +13011,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -13112,7 +13029,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -13195,7 +13112,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -13213,7 +13130,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",
@@ -13323,7 +13240,7 @@
     },
     "waarheidsgetrouw": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 13c2d2e3, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "LIEGRONDE.json",
       "op": "2026-09-25T08:53:32.474Z",
@@ -13341,7 +13258,7 @@
     },
     "bevoegd": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 63 codebestand(en) gewijzigd",
+     "reden": "bewijs vervallen: gemeten op 28be5395, sindsdien zijn 87 codebestand(en) gewijzigd",
      "bewijs": {
       "register": "BEVOEGD.json",
       "op": "2026-09-25T08:51:52.448Z",

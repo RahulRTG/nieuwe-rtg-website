@@ -44,7 +44,7 @@ blijven.
 | # | bewijs | de vraag | stand |
 |---|---|---|---|
 | 1 | **bereikbaar** | vindt de gebruiker de functie vanaf de plek waar RTG haar presenteert? | **staat** (`APPWERKT.json`) |
-| 2 | **bedienbaar** | doen de knoppen, tabs, velden, uploads en gebaren iets, zonder te breken? | **knoppen wel, de rest niet** — 78 van 112 onderdelen bewezen op hun eigen knoppen (de schil telt niet mee, par. 4g); formulieren, uploads, toetsenbord en gebaren worden niet gemeten |
+| 2 | **bedienbaar** | doen de knoppen, tabs, velden, uploads en gebaren iets, zonder te breken? | **knoppen wel, de rest niet** — 83 van 112 onderdelen bewezen op hun eigen knoppen (de schil telt niet mee, par. 4g); formulieren, uploads, toetsenbord en gebaren worden niet gemeten |
 | 3 | **voltooibaar** | kan de hele stroom worden afgemaakt, tot en met de bevestiging? | **een stap weg** (vraagt de testwereld uit par. 4) |
 | 4 | **waarheidsgetrouw** | toont de UI nooit een sterkere toestand dan de backend heeft bewezen? | **staat, voor een leeg antwoord** (`LIEGRONDE.json`, per onderdeel; zie par. 4e) |
 | 5 | **persistent** | komt de juiste toestand terug na refresh, nieuwe sessie, andere browser? | **een stap weg** |
@@ -526,6 +526,20 @@ dan de helft, en de oorzaak ligt nu bij het scherm zelf: een eigen laag die
 na een tik open blijft en niet met Escape sluit (de gids van Residentie, een
 scrim, een blad), of een knop die na de vorige tik verdwijnt. Dat is de
 volgende vraag, en hij is kleiner dan de vorige.
+
+**Vervolg, dezelfde dag.** Die veertien leverden vijf productdefecten op, alle
+vijf gerepareerd. Escape sloot de laag niet op Residentie (gids, atelier,
+huistelefoon; een lopend spel sluit hij met opzet niet), Food Court
+(reserveerblad) en Office (documentwerkstroom) -- `test/escape-lagen.e2e.js`.
+En een eigen laag lag volledig over een eigen knop: het statuspaneel van
+Navigatie over Kaarten, en de onderbalk van Camera over "Camera opnieuw
+openen", de enige weg uit die stand -- `test/eigen-bedekking.e2e.js`. Beide
+toetsen klikken met de muis en zakken zonder de reparatie.
+
+Hermeting: **83 van 112 BEWEZEN**, 0 defecten. Van de negen die overblijven
+met eigen knoppen stopt de proef bij een deel te vroeg (Leven 1/9): een tik
+verandert de weergave, de andere knoppen verdwijnen, en de proef noemt dat
+klaar. Dat is een tekort van de meter en geen bevinding over het scherm.
 
 ## 5. Wat er vandaag gemeten wordt, en wat dat niet bewijst
 

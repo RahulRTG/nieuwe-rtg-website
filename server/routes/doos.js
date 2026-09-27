@@ -2,9 +2,9 @@
    status, meting, buurmelding, rapport) plus de satelliet-ping. De proxy- en
    journaal-lagen die elke aanvraag omhullen blijven in server.js.
 
-   NIET ELKE ROUTE ZIT ACHTER DE SLEUTEL, en de kop beweerde eerder van wel.
-   Per route, met reden:
-     kloon, meting, buurmelding   altijd achter RTG_DOOS_SLEUTEL
+   NIET ELKE ROUTE ZIT ACHTER DE SLEUTEL. Per route, met reden:
+     meting, buurmelding          altijd achter RTG_DOOS_SLEUTEL
+     kloon                        idem, en in productie dicht
      status                       bewust open: elke app pollt hem om te weten of
                                   er een doos is en of die lokaal draait; zonder
                                   doos antwoordt hij {doos:false}
@@ -15,7 +15,7 @@
 module.exports = (kern) => {
   const { app, db, save, crypto, beveilig, zaakdoos } = kern;
 
-  // de rondreistijd peilen voor de satellietmodus; zonder inloggen, zonder poespas.
+  // de rondreistijd peilen voor de satellietmodus; zonder inloggen.
   app.get('/api/sat/ping', (req, res) => res.json({ ok: 1, t: Date.now() }));
 
   /* De sleutelwacht van de doos-vloot, met de eigen sleutel per doos (fase 7),
@@ -27,9 +27,15 @@ module.exports = (kern) => {
     save();
   } });
 
-  /* De Zaakdoos: een verse kloon van de data voor het kastje in de zaak.
-     De doos zelf meldt zijn status onbeschermd op het eigen net. */
+  /* Een verse kloon van de data voor het kastje. In productie
+     dicht, vóór de sleutel: het antwoord is de hele db.data van alle zaken,
+     geen sleutel maakt dat veilig (devices.zaakdoos_sleutel). */
   app.get('/api/doos/kloon', (req, res) => {
+    if (process.env.NODE_ENV === 'production') {
+      res.set('Cache-Control', 'no-store');
+      return res.status(503).json({ code: 'doos-kloon-productie-dicht',
+        error: 'De databasekloon is in productie dicht.' });
+    }
     if (!doosSleutelOk(req, res)) return;
     res.json({ data: db.data });
   });

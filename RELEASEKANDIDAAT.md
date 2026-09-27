@@ -106,16 +106,24 @@ Een geen-credentialoordeel mag alleen met status gesloten, zonder blokkade en
 met een notitie van minstens 40 tekens; `test/codecredentials.test.js`
 beproeft dat met een mutatie.
 
-Drie vondsten zijn gevaarlijker dan hun deur doet vermoeden:
-- Het gezinsprofieltoken heeft consumers buiten de Foundation-productiepoort:
-  `/api/rtf/toegang`, `/beroepen*`, `/bieb*`, `/geloof*` en `/knelpunt`.
-  Daarnaast geeft `/api/rtf/kanaal` het ruwe token terug.
-- De lesfamilie `/api/foundation/les/*` staat niet in `NOG_GESLOTEN`.
-- De gedeelde Zaakdoos-sleutel opent `GET /api/doos/kloon`, dus een kloon van
-  de hele database.
+Drie vondsten waren gevaarlijker dan hun deur deed vermoeden. Alle drie zijn
+in productie dichtgezet; de deuren blijven `remaining`, want de credentials zelf
+zijn niet gemigreerd:
+- Het gezinsprofieltoken had consumers buiten de Foundation-productiepoort:
+  `/api/rtf/toegang`, `/beroepen*`, `/bieb*`, `/geloof*` en `/knelpunt`, en
+  bronafgeleid ook `/api/rtf/connect/*`, `/labfonds/*` en
+  `/api/foundation/kosten`. `/api/rtf/kanaal` gaf het ruwe token terug. Elke
+  consumer en uitgever staat nu in `NOG_GESLOTEN`
+  (`server/middleware/foundation-nog-gesloten.js`), ook de routes die alleen in
+  de beschermde lijsten stonden en met een extern dossier opengingen.
+- De lesfamilie `/api/foundation/les/*` en de routes die dezelfde lescode en
+  tokens lezen (`/bord`, `/schrift`, `/opgave(n)`, `/agenda`, `/ai`) staan in
+  `NOG_GESLOTEN`.
+- `GET /api/doos/kloon` geeft in productie 503 (`doos-kloon-productie-dicht`),
+  vóór de sleutelwacht en voor elke sleutel: het antwoord was de hele database.
 
-Een toets zakt zodra de poort op die paden verandert. Het dichtzetten is A-werk
-en volgt in de migratieronde.
+`test/foundation-gezinstoken-productie.test.js` leidt de consumers uit de bron
+af en beproeft de sluiting op een echte productieserver.
 
 **B9, eerste type gemigreerd: de opwaardeerkaart (`pay.tegoedbon`).** De code is
 128 bits en wordt alleen als hash bewaard. Hij wordt precies één keer getoond en

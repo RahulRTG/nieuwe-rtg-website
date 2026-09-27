@@ -98,17 +98,17 @@ test('de echte credentials uit de classificatieronde blokkeren de release', () =
     for (const route of poort.effectieveRoutes(d))
       assert.ok(poort.REQUIRED_ROUTES.includes(route), route + ' hoort bewaakt te zijn');
   }
-  /* De ongepoorte consumers van het niet-gemigreerde gezinsprofieltoken staan
-     met naam in de deur, zodat een productiepoort-wijziging hier te zien is. */
-  const fam = register.deuren.find(x => x.id === 'foundation.family_profile_token_buiten_harde_poort');
-  for (const route of ['POST /api/rtf/toegang', 'POST /api/rtf/beroepen/mijn', 'POST /api/rtf/kanaal'])
-    assert.ok(fam.routes.includes(route));
+  /* Elke consumer en uitgever van het niet-gemigreerde gezinsprofieltoken en de
+     onderwijslesfamilie zit sinds 27 september 2026 in NOG_GESLOTEN: in productie
+     dicht, ook met een geslaagd extern dossier. De deuren blijven remaining omdat
+     de credential zelf niet gemigreerd is. */
   const vrijgave = require('../server/middleware/foundation-productiepoort');
-  for (const pad of ['/api/rtf/toegang', '/api/rtf/beroepen/mijn', '/api/rtf/bieb', '/api/rtf/geloof'])
-    assert.equal(vrijgave.isBeschermdeRoute('POST', pad, {}) || vrijgave.isNogGeslotenCredentialroute('POST', pad, {}),
-      false, pad + ' staat nog steeds buiten de Foundation-productiepoort; pas de deur aan als dat verandert');
-  assert.equal(vrijgave.isNogGeslotenCredentialroute('POST', '/api/foundation/les/join', {}), false,
-    'de onderwijslesfamilie is nog niet hard gesloten; pas foundation.onderwijs_les_tokens aan als dat verandert');
+  for (const id of ['foundation.family_profile_token_buiten_harde_poort', 'foundation.onderwijs_les_tokens'])
+    for (const route of poort.effectieveRoutes(register.deuren.find(x => x.id === id))) {
+      const [methode, pad] = route.split(' ');
+      assert.equal(vrijgave.isNogGeslotenCredentialroute(methode, pad, {}) ||
+        vrijgave.VEILIGE_UITGANGEN.includes(route), true, route + ' hoort in NOG_GESLOTEN');
+    }
 });
 
 test('een routermount kan niet alleen met zijn interne schijnpad groen worden', () => {

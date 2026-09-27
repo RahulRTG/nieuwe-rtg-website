@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-25T13:50:55.472Z",
-    "commit": "58fb26410",
+    "op": "2026-09-27T11:47:06.968Z",
+    "commit": "67cdcb41",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -4857,6 +4857,22 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "leerhuis-grenzen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/leerhuiswereld.js",
+      "operator": "===->!==#0",
+      "gezakt": 16,
+      "geprobeerd": 1
+    },
+    "leerhuis-lus.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/leerhuisproef.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
     },
     "leerpaspoort-scherm.e2e.js": {
       "soort": "server",

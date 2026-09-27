@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-25T11:54:02.869Z",
-    "commit": "fe8ad091",
+    "op": "2026-09-27T09:35:09.210Z",
+    "commit": "fa1537a0",
     "boomVuil": false,
-    "boomAnders": 7,
+    "boomAnders": 0,
     "instrument": "scripts/bedrijfsmaat.js",
     "node": "v22.22.2"
   },
@@ -34,27 +34,27 @@
     "maten": 64,
     "domeinen": 28,
     "perStatus": {
-      "bestaat": 31,
-      "half": 23,
+      "bestaat": 34,
+      "half": 20,
       "ontbreekt": 10,
       "onbekend": 0
     },
     "primairGat": {
       "BRON_ONTBREEKT": 10,
       "DEFINITIE_ONTBREEKT": 12,
-      "PROJECTIE_ONTBREEKT": 5,
-      "BEWIJS_ONTBREEKT": 6
+      "PROJECTIE_ONTBREEKT": 3,
+      "BEWIJS_ONTBREEKT": 5
     },
     "perGat": {
       "BRON_ONTBREEKT": 10,
       "DEFINITIE_ONTBREEKT": 22,
-      "PROJECTIE_ONTBREEKT": 24,
-      "BEWIJS_ONTBREEKT": 33
+      "PROJECTIE_ONTBREEKT": 22,
+      "BEWIJS_ONTBREEKT": 30
     },
     "ketens": 6,
-    "ketensGegrond": 1,
-    "bestaatGedeeltelijk": 5,
-    "rustOpGat": 2,
+    "ketensGegrond": 2,
+    "bestaatGedeeltelijk": 7,
+    "rustOpGat": 1,
     "privacyGaten": 0,
     "verworpen": 0,
     "vormfouten": 0
@@ -74,14 +74,14 @@
     },
     "omzet": {
       "maten": 4,
-      "bestaat": 3,
-      "half": 1,
+      "bestaat": 4,
+      "half": 0,
       "ontbreekt": 0
     },
     "marge": {
       "maten": 3,
-      "bestaat": 0,
-      "half": 2,
+      "bestaat": 1,
+      "half": 1,
       "ontbreekt": 1
     },
     "kosten": {
@@ -140,8 +140,8 @@
     },
     "uitkomst": {
       "maten": 3,
-      "bestaat": 1,
-      "half": 2,
+      "bestaat": 2,
+      "half": 1,
       "ontbreekt": 0
     },
     "gebruik": {
@@ -240,8 +240,8 @@
       "id": "geld",
       "naam": "van ontvangen omzet naar runway",
       "gegrond": false,
-      "eersteBreuk": "marge.bruto-rtg",
-      "bestaand": 1,
+      "eersteBreuk": "marge.operationeel-rtg",
+      "bestaand": 2,
       "van": 5,
       "schakels": [
         {
@@ -251,11 +251,8 @@
         },
         {
           "id": "marge.bruto-rtg",
-          "status": "half",
-          "gaten": [
-            "PROJECTIE_ONTBREEKT",
-            "BEWIJS_ONTBREEKT"
-          ]
+          "status": "bestaat",
+          "gaten": []
         },
         {
           "id": "marge.operationeel-rtg",
@@ -430,17 +427,15 @@
     {
       "id": "afdracht",
       "naam": "van bijdrage naar de RTFoundation",
-      "gegrond": false,
-      "eersteBreuk": "omzet.leden-maand",
-      "bestaand": 2,
+      "gegrond": true,
+      "eersteBreuk": null,
+      "bestaand": 3,
       "van": 3,
       "schakels": [
         {
           "id": "omzet.leden-maand",
-          "status": "half",
-          "gaten": [
-            "BEWIJS_ONTBREEKT"
-          ]
+          "status": "bestaat",
+          "gaten": []
         },
         {
           "id": "omzet.leden-ontvangen",
@@ -457,15 +452,9 @@
   ],
   "rustOpGat": [
     {
-      "id": "activatie.eerste-waarde",
+      "id": "omzet.leden-maand",
       "zwakkeSchakels": [
-        "uitkomst.rit-afgerond"
-      ]
-    },
-    {
-      "id": "retentie.waarde",
-      "zwakkeSchakels": [
-        "uitkomst.rit-afgerond"
+        "groei.leden-per-pas"
       ]
     }
   ],
@@ -486,7 +475,7 @@
       },
       {
         "id": "omzet.leden-maand",
-        "status": "half",
+        "status": "bestaat",
         "domein": "omzet"
       },
       {
@@ -516,7 +505,7 @@
       },
       {
         "id": "marge.bruto-rtg",
-        "status": "half",
+        "status": "bestaat",
         "domein": "marge"
       },
       {
@@ -666,7 +655,7 @@
       },
       {
         "id": "uitkomst.rit-afgerond",
-        "status": "half",
+        "status": "bestaat",
         "domein": "uitkomst"
       },
       {
@@ -829,7 +818,7 @@
       {
         "van": "marge.bruto-rtg",
         "naar": "marge.operationeel-rtg",
-        "gegrond": false
+        "gegrond": true
       },
       {
         "van": "personeel.rtg-op-naam",
@@ -839,7 +828,7 @@
       {
         "van": "omzet.leden-maand",
         "naar": "marge.per-lid",
-        "gegrond": false
+        "gegrond": true
       },
       {
         "van": "kosten.per-drager",
@@ -909,7 +898,7 @@
       {
         "van": "uitkomst.rit-afgerond",
         "naar": "activatie.eerste-waarde",
-        "gegrond": false
+        "gegrond": true
       },
       {
         "van": "cohort.aanmeldweek",
@@ -939,7 +928,7 @@
       {
         "van": "uitkomst.rit-afgerond",
         "naar": "uitkomst.klantwaarde",
-        "gegrond": false
+        "gegrond": true
       },
       {
         "van": "support.klokken",
@@ -1131,7 +1120,7 @@
       ],
       "berekening": "per pas aantal x maandprijs, of de som van afgesprokenCenten van lopende contracten; leden zonder contract apart",
       "eenheid": "euro per maand",
-      "graad": "onbekend",
+      "graad": "gemeten",
       "actualiteit": "live",
       "minimaleGroep": null,
       "privacyklasse": "huis",
@@ -1140,10 +1129,8 @@
       "afhankelijk": [
         "groei.leden-per-pas"
       ],
-      "status": "half",
-      "gaten": [
-        "BEWIJS_ONTBREEKT"
-      ],
+      "status": "bestaat",
+      "gaten": [],
       "elementen": {
         "bron": {
           "aanwezig": true,
@@ -1184,9 +1171,25 @@
           "reden": null
         },
         "bewijs": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "De staat zegt eerlijk wat er NIET in zit (zonderContract), maar draagt geen graad en geen peilmoment. Het is een terugkerend bedrag uit afspraken, geen ontvangen geld; dat verschil staat nergens in het antwoord."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/ledenregister/omzet.js",
+              "citaat": "split.aard = 'afgesproken'",
+              "klopt": true
+            },
+            {
+              "bestand": "server/kern/ledenregister/omzet.js",
+              "citaat": "split.peilmoment",
+              "klopt": true
+            },
+            {
+              "bestand": "server/kern/ledenregister/omzet.js",
+              "citaat": "split.dektNiet",
+              "klopt": true
+            }
+          ],
+          "reden": null
         }
       },
       "groepsgrens": {
@@ -1617,23 +1620,20 @@
       "betekenis": "Ontvangen omzet min de directe kosten van het platform.",
       "wereld": "rtg-intern",
       "bronnen": [],
-      "berekening": "nog niet vastgesteld",
-      "eenheid": "euro per maand",
-      "graad": "onbekend",
+      "berekening": "omzet.leden-ontvangen min de som van de gerekende GEMETEN kostensoorten van de maand (kern/kosten afstemming); verbruik zonder tarief maakt de marge niet uit te rekenen",
+      "eenheid": "eurocent per maand, zonder btw",
+      "graad": "gemeten",
       "actualiteit": "periode",
       "minimaleGroep": null,
       "privacyklasse": "huis",
-      "eigenaar": null,
-      "eigenaarReden": "Niemand.",
+      "eigenaar": "kern/bedrijfsmaat",
+      "eigenaarReden": null,
       "afhankelijk": [
         "omzet.leden-ontvangen",
         "kosten.maand-totaal"
       ],
-      "status": "half",
-      "gaten": [
-        "PROJECTIE_ONTBREEKT",
-        "BEWIJS_ONTBREEKT"
-      ],
+      "status": "bestaat",
+      "gaten": [],
       "elementen": {
         "bron": {
           "aanwezig": true,
@@ -1653,14 +1653,31 @@
           "reden": null
         },
         "projectie": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Geen functie zet de ontvangen omzet en de GEMETEN kostensoorten van een maand naast elkaar. De kostenlaag rekent per drager en per periode; een totaal per soort als bedrag zonder toegerekende soorten moet daar eerst uit komen."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/projecties.js",
+              "citaat": "function brutomarge",
+              "klopt": true
+            }
+          ],
+          "reden": null
         },
         "bewijs": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Volgt uit de projectie."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/projecties.js",
+              "citaat": "if (zonderTarief.length) return { margeCenten: null",
+              "klopt": true
+            },
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand.js",
+              "citaat": "stand: 'NIET_UIT_TE_REKENEN'",
+              "klopt": true
+            }
+          ],
+          "reden": null
         }
       },
       "groepsgrens": {
@@ -1670,10 +1687,10 @@
         "reden": null
       },
       "keten": {
-        "gegrond": false,
+        "gegrond": true,
         "zwakkeSchakels": []
       },
-      "gedeeltelijk": null
+      "gedeeltelijk": "De ontvangen omzet eronder ziet alleen de betaalschema's van aanmeldingen en niet de ledenfacturen in de kluis; zolang dat zo is, zegt deze marge iets over de vorm en weinig over het bedrag."
     },
     {
       "id": "marge.operationeel-rtg",
@@ -1732,7 +1749,6 @@
       "keten": {
         "gegrond": false,
         "zwakkeSchakels": [
-          "marge.bruto-rtg",
           "personeel.rtg-op-naam"
         ]
       },
@@ -1795,8 +1811,7 @@
       "keten": {
         "gegrond": false,
         "zwakkeSchakels": [
-          "groei.leden-per-pas",
-          "omzet.leden-maand"
+          "groei.leden-per-pas"
         ]
       },
       "gedeeltelijk": null
@@ -2302,7 +2317,6 @@
         "gegrond": false,
         "zwakkeSchakels": [
           "cash.rtg-bankpositie",
-          "marge.bruto-rtg",
           "marge.operationeel-rtg",
           "personeel.rtg-op-naam"
         ]
@@ -2788,10 +2802,8 @@
         "reden": null
       },
       "keten": {
-        "gegrond": false,
-        "zwakkeSchakels": [
-          "uitkomst.rit-afgerond"
-        ]
+        "gegrond": true,
+        "zwakkeSchakels": []
       },
       "gedeeltelijk": null
     },
@@ -2985,10 +2997,8 @@
         "reden": null
       },
       "keten": {
-        "gegrond": false,
-        "zwakkeSchakels": [
-          "uitkomst.rit-afgerond"
-        ]
+        "gegrond": true,
+        "zwakkeSchakels": []
       },
       "gedeeltelijk": null
     },
@@ -3895,29 +3905,26 @@
       "betekenis": "Ritten die de keten tot het einde liepen.",
       "wereld": "consument",
       "bronnen": [
-        "server/kern/kantoor/metrics.js"
+        "server/kern/vervoer.js"
       ],
-      "berekening": "nog niet vastgesteld",
-      "eenheid": "ritten per periode",
-      "graad": "onbekend",
+      "berekening": "ritten met de laatste stand van RIT_KETEN (of de oude naam gearriveerd) en een eindtijd in de maand; de groepsgrens telt verschillende leden",
+      "eenheid": "ritten per maand",
+      "graad": "gemeten",
       "actualiteit": "live",
       "minimaleGroep": 10,
       "privacyklasse": "leden",
-      "eigenaar": null,
-      "eigenaarReden": "Niemand.",
+      "eigenaar": "kern/bedrijfsmaat",
+      "eigenaarReden": null,
       "afhankelijk": [],
-      "status": "half",
-      "gaten": [
-        "PROJECTIE_ONTBREEKT",
-        "BEWIJS_ONTBREEKT"
-      ],
+      "status": "bestaat",
+      "gaten": [],
       "elementen": {
         "bron": {
           "aanwezig": true,
           "citaten": [
             {
-              "bestand": "server/kern/kantoor/metrics.js",
-              "citaat": "r.finishedAt",
+              "bestand": "server/kern/vervoer.js",
+              "citaat": "r.finishedAt = new Date().toISOString()",
               "klopt": true
             }
           ],
@@ -3930,32 +3937,60 @@
               "bestand": "server/kern/vervoer.js",
               "citaat": "const RIT_KETEN",
               "klopt": true
+            },
+            {
+              "bestand": "server/kern/bedrijfsmaat/definities.js",
+              "citaat": "een rit die de keten afmaakte (afgerond)",
+              "klopt": true
             }
           ],
           "reden": null
         },
         "projectie": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "De prestatielijst telt ritten per zaak en een gemiddelde duur, geen afgeronde ritten per periode."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/projecties.js",
+              "citaat": "function rittenAfgerond",
+              "klopt": true
+            }
+          ],
+          "reden": null
         },
         "bewijs": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Volgt uit de projectie."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand.js",
+              "citaat": "maat('uitkomst.rit-afgerond'",
+              "klopt": true
+            },
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand.js",
+              "citaat": "opdrachten die het dispatchcentrum zelf aannam",
+              "klopt": true
+            }
+          ],
+          "reden": null
         }
       },
       "groepsgrens": {
         "vereist": true,
-        "afgedwongen": false,
-        "citaten": [],
-        "reden": "Volgt uit de projectie."
+        "afgedwongen": true,
+        "citaten": [
+          {
+            "bestand": "server/kern/bedrijfsmaat/stand.js",
+            "citaat": "toon(LEDEN, { waarde: rit.aantal, n: rit.klanten })",
+            "klopt": true
+          }
+        ],
+        "reden": null
       },
       "keten": {
-        "gegrond": false,
+        "gegrond": true,
         "zwakkeSchakels": []
       },
-      "gedeeltelijk": null
+      "gedeeltelijk": "Alleen de ritlijst van de app; opdrachten die het dispatchcentrum zonder app-rit aannam (db.data.mobOpdrachten) tellen niet mee, en dat staat in het antwoord."
     },
     {
       "id": "uitkomst.klantwaarde",
@@ -4013,9 +4048,7 @@
       },
       "keten": {
         "gegrond": false,
-        "zwakkeSchakels": [
-          "uitkomst.rit-afgerond"
-        ]
+        "zwakkeSchakels": []
       },
       "gedeeltelijk": null
     },

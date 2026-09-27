@@ -38,33 +38,21 @@ const EXACT = new Map([
   ['/api/giftcard/buy', 'pay.giftcard_value_code'],
   ['/api/giftcards/mine', 'pay.giftcard_value_code'],
   ['/api/supplier/giftcard/sell', 'pay.giftcard_value_code'],
-  ['/api/supplier/giftcard/redeem', 'pay.giftcard_value_code'],
-
-  /* Ook de issuer en het ledenoverzicht gaan dicht. Alleen de consumer sluiten
-     zou nog steeds verse vierteken-codes maken en later opnieuw tonen alsof ze
-     bruikbaar zijn. Bestaande orders kunnen via hun normale authenticated
-     status- en refundpaden worden afgehandeld, maar niet op de bearer. */
-  ['/api/order', 'pay.order_pickup_code'],
-  ['/api/order/pay', 'pay.order_pickup_code'],
-  ['/api/bezorg/bestel', 'pay.order_pickup_code'],
-  ['/api/bezorg/volg', 'pay.order_pickup_code'],
-  ['/api/orders/mine', 'pay.order_pickup_code'],
-  ['/api/supplier/pos/redeem', 'pay.order_pickup_code']
+  ['/api/supplier/giftcard/redeem', 'pay.giftcard_value_code']
 ]);
 
-/* De pickupCode-generator heeft historisch twee betekenissen. Alleen de twee
-   member-orderissuers maken een code die later een order kan uitgeven; de
-   overige aanroepen maken een bonnummer of een label binnen een reeds
-   geauthenticeerde supplier-werkstroom. `kassa/innen.js` sluit `intern` daarom
-   expliciet uit bij het enige zoeken op pickupcode. Deze uitputtende indeling
-   wordt door de test tegen de bron gehouden, zodat een negende issuer niet
-   stil in de verkeerde risicoklasse belandt. */
+/* De AFHAALCODE (pay.order_pickup_code) staat hier sinds 27 september 2026
+   niet meer: hij is een 128-bit bearer met hash-only opslag, vervaltijd,
+   intrekking, rotatie en een atomaire claim (server/kern/afhaalcode.js), met
+   bewijs in test/afhaalcode.test.js en de PostgreSQL-raceproef. De generator
+   pickupCode (kern/util.js) bestaat nog, maar alleen als BONNUMMER: een label voor
+   keuken, pas en kassabon dat niets autoriseert. Deze indeling wordt door de
+   test tegen de bron gehouden, zodat een nieuwe aanroeper niet stil alsnog
+   een bearer van vier tekens maakt: de kassa zoekt niet meer op `pickup`. */
 const PICKUP_CODE_ISSUERS = Object.freeze({
-  bearer: Object.freeze([
+  bonnummer: Object.freeze([
     'server/kern/lidacties/bestellen.js',
-    'server/routes/member/kopen/bezorg.js'
-  ]),
-  authenticated_identifier: Object.freeze([
+    'server/routes/member/kopen/bezorg.js',
     'server/routes/supplier/kassa/afrekenen.js',
     'server/routes/supplier/kassa/premium.js',
     'server/routes/supplier/kassa/verkoop.js',

@@ -3367,7 +3367,7 @@ var RTG_BOUW = 'bdba37ae';
         '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--burgundy);display:flex;align-items:center;gap:0.4rem;"><span class="livedot"></span>'+esc(o.supplierName)+' \u00B7 '+(o.levering==='ophalen'?T('bz.m.ophalen','ophalen'):T('bz.m.bezorgen','bezorging'))+'</div>'+
         '<div style="margin-top:0.4rem;font-size:0.9rem;"><b>'+st+'</b><span id="bzEta-'+o.ref+'">'+(o.status==='onderweg'&&o.etaMin?' \u00B7 \u23F1 '+o.etaMin+' min':'')+'</span></div>'+
         '<div style="margin-top:0.3rem;font-size:0.78rem;color:var(--muted);">'+o.items.map(i=>i.qty+'x '+esc(i.name)).join(', ')+
-        (o.levering==='ophalen' ? ' \u00B7 '+T('bz.m.code','code')+' <b style="color:var(--rtg-leesgoud,var(--gold));">'+o.pickup+'</b>' : (o.bezorger?' \u00B7 \uD83D\uDEF5 '+esc(o.bezorger.name):''))+'</div></div>';
+        (o.levering==='ophalen' ? ' \u00B7 '+T('bz.m.code','bon')+' <b style="color:var(--rtg-leesgoud,var(--gold));">'+o.pickup+'</b>' : (o.bezorger?' \u00B7 \uD83D\uDEF5 '+esc(o.bezorger.name):''))+'</div></div>';
     }).join('');
   }
   function opBezorg(d){
@@ -3448,7 +3448,7 @@ var RTG_BOUW = 'bdba37ae';
         const skV = b.order.servicekosten;
         const sk = skV ? ' ' + T('bz.service','(incl. EUR {bedrag} servicekosten ex btw voor niet-leden)')
           .replace('{bedrag}', String(skV.exBtw).replace('.', ',')) : '';
-        toast((bzLevering === 'ophalen' ? T('bz.ok.oph','Betaald. Uw ophaalcode: ') + b.order.pickup : T('bz.ok.bez','Betaald. U volgt de bezorging hierboven live.')) + sk);
+        toast((bzLevering === 'ophalen' ? T('bz.ok.oph','Betaald. Uw bonnummer: ') + b.order.pickup + T('bz.ok.qr','. Bij het ophalen toont u de afhaal-QR onder Mijn bestellingen.') : T('bz.ok.bez','Betaald. U volgt de bezorging hierboven live.')) + sk);
         bzZaak = null; bzMand = {};
         renderBestellen(); laadBzMijn();
       } catch(e){ toast(e.message); }
@@ -3511,7 +3511,7 @@ var RTG_BOUW = 'bdba37ae';
             '<div class="acts">' + (o.paid
               ? '<span class="mo-paid">✓ '+T('app.paid','Betaald')+'</span>'
               : '<button class="mo-pay js-opay">' + FID_MINI + T('app.paywithfid','Betaal met Face ID') + '</button>') +
-              (o.pickup ? '<button class="mo-code js-ocode">' + T('app.showcode','Toon ophaalcode') + '</button>' : '') +
+              (o.pickup && (o.paid || o.aanBalie) && o.levering !== 'bezorgen' && !o.refunded && !['geserveerd','opgehaald','bezorgd','geweigerd','terugbetaald','geannuleerd'].includes(o.status) ? '<button class="mo-code js-ocode">' + T('app.showcode','Toon afhaal-QR') + '</button>' : '') +
               (['nieuw','wacht-op-betaling'].includes(o.status) ? '<button class="mo-code js-oann">✕ ' + T('erv.annuleer','Annuleer') + '</button>' : '') +
               (o.paid && !o.splitst ? '<button class="mo-code js-osplit">' + T('erv.splits','Splits') + '</button>' : '') +
               (['geserveerd','bezorgd','opgehaald'].includes(o.status) ? '<button class="mo-code js-orev">' + T('erv.review','Beoordeel') + '</button>' : '') +
@@ -7089,16 +7089,22 @@ var RTG_BOUW = 'bdba37ae';
       sparIn.addEventListener('keydown', e => { if (e.key === 'Enter') park(); });
     }
   }
-  /* ---------- oplichtend ophaalcode-scherm ---------- */
-  function showGlow(o){
+  /* ---------- oplichtend afhaalscherm ----------
+     De QR draagt de AFHAALCODE: 128 bits, en de server geeft hem alleen in het
+     antwoord op /order/afhaalcode. Elke keer tonen maakt dus een nieuwe code en
+     trekt de vorige in -- er staat niets van op dit toestel. Het bonnummer
+     eronder is voor mensen (keuken, pas) en opent niets. */
+  async function showGlow(o){
+    let d;
+    try { d = await API.call('/order/afhaalcode', { ref: o.ref }); }
+    catch(e){ toast(e.message); return; }
     $('#gcSup').textContent = o.supplierName;
-    $('#gcCode').textContent = o.pickup;
-    // een echte, scanbare QR van de ophaalcode: de kassa scant hem, of typt de code
+    $('#gcCode').textContent = o.pickup ? T('app.gc.bon','Bon') + ' ' + o.pickup : '';
     const qh = $('#gcQr');
     if (qh){
       qh.innerHTML = ''; qh.style.display = 'none';
-      if (window.RTGQRteken && o.pickup){
-        try { qh.appendChild(RTGQRteken.teken(String(o.pickup), { schaal: 5, ecc: 'M' })); qh.style.display = 'inline-block'; } catch(e){}
+      if (window.RTGQRteken && d && d.code){
+        try { qh.appendChild(RTGQRteken.teken(String(d.code), { schaal: 4, ecc: 'M' })); qh.style.display = 'inline-block'; } catch(e){}
       }
     }
     $('#glowCode').classList.add('open');

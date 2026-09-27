@@ -55,6 +55,7 @@ const REQUIRED_ROUTES = [
   'POST /api/supplier/giftcard/sell', 'POST /api/supplier/giftcard/redeem',
   'POST /api/order', 'POST /api/order/pay', 'POST /api/orders/mine',
   'POST /api/bezorg/bestel', 'POST /api/bezorg/volg',
+  'POST /api/order/afhaalcode', 'POST /api/order/afhaalcode/intrek',
   'POST /api/supplier/pos/redeem',
   'POST /api/ticket/koop', 'POST /api/tickets/mijn',
   'POST /api/supplier/programma', 'POST /api/supplier/ticket/checkin',

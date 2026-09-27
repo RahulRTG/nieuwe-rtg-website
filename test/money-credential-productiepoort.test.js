@@ -113,7 +113,7 @@ test('ontwikkeling blijft bruikbaar en geld terug vrijgeven blijft in productie 
 
 test('Express-varianten met encoding, hoofdletters of een eindslash zijn geen omweg', () => {
   for (const pad of ['/API/PAY/KASCODE', '/api/pay/kascode/', '/api/pay/%6Bascode',
-    '/API/SUPPLIER/POS/REDEEM/?x=1']) {
+    '/API/SUPPLIER/GIFTCARD/REDEEM/?x=1']) {
     const r = roep({ url: pad, path: undefined });
     assert.equal(r.status, 503, pad);
     assert.equal(r.door, 0, pad);
@@ -146,7 +146,7 @@ test('de tegoedbon is gemigreerd: geen grendel, wel een bewezen deur', () => {
 test('hard sluiten wordt niet als gemigreerde money lifecycle verkocht', () => {
   const register = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'CODECREDENTIALS.json'), 'utf8'));
   for (const id of ['pay.kascode_en_vooraf', 'pay.tikcode',
-    'pay.giftcard_value_code', 'pay.order_pickup_code']) {
+    'pay.giftcard_value_code']) {
     const deur = register.deuren.find(d => d.id === id);
     assert.ok(deur, id);
     assert.equal(deur.classificatie, 'money_credential', id);
@@ -155,29 +155,40 @@ test('hard sluiten wordt niet als gemigreerde money lifecycle verkocht', () => {
   }
 });
 
-test('normale orderuitgifte is expliciet een productieblokkade, geen verborgen degradatie', () => {
+test('de gemigreerde afhaalcode is uit de grendel en staat als bewezen deur in het register', () => {
+  /* Pas als elke control in code staat en door een toets wordt bewezen, mag een
+     geld-dragende code uit deze grendel. Voor de afhaalcode is dat gebeurd
+     (server/kern/afhaalcode.js); de bestel- en betaalroutes zijn in productie
+     dus weer open, en de kassa geeft alleen uit op de 128-bit afhaalcode. */
   for (const pad of ['/api/order', '/api/order/pay', '/api/orders/mine',
-    '/api/bezorg/bestel', '/api/bezorg/volg', '/api/supplier/pos/redeem']) {
+    '/api/bezorg/bestel', '/api/bezorg/volg', '/api/supplier/pos/redeem',
+    '/api/order/afhaalcode', '/api/order/afhaalcode/intrek']) {
     const r = roep({ path: pad });
-    assert.equal(r.status, 503, pad);
-    assert.equal(r.json.feature, 'pay.order_pickup_code', pad);
+    assert.equal(r.door, 1, pad);
+    assert.equal(r.status, 200, pad);
   }
+  assert.equal([...maakPoort.EXACT.values()].includes('pay.order_pickup_code'), false);
+  const register = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'CODECREDENTIALS.json'), 'utf8'));
+  const deur = register.deuren.find(d => d.id === 'pay.order_pickup_code');
+  assert.equal(deur.status, 'migrated');
+  assert.equal(deur.release_blocker, false);
+  assert.ok(deur.bewijs.includes('test/afhaalcode.test.js'));
+  assert.ok(deur.bewijs.includes('test/afhaalcode.pg.test.js'));
 });
 
-test('iedere pickupCode-issuer is uitputtend als bearer of bonnummer ingedeeld', () => {
+test('iedere pickupCode-aanroeper maakt een bonnummer, en de kassa zoekt er niet op', () => {
   const root = path.join(__dirname, '..');
   const gevonden = serverAanroepBestanden(/\bpickupCode\(\)/)
     .filter(rel => !/function\s+pickupCode\(\)/.test(fs.readFileSync(path.join(root, rel), 'utf8')));
-  const ingedeeld = [...maakPoort.PICKUP_CODE_ISSUERS.bearer,
-    ...maakPoort.PICKUP_CODE_ISSUERS.authenticated_identifier].sort();
-  assert.deepEqual(gevonden.sort(), ingedeeld);
-  for (const rel of maakPoort.PICKUP_CODE_ISSUERS.bearer) {
-    const bron = fs.readFileSync(path.join(root, rel), 'utf8');
-    assert.match(bron, /moneyCredentialBlokkade\('pay\.order_pickup_code'\)/, rel);
-  }
+  assert.deepEqual(gevonden.sort(), [...maakPoort.PICKUP_CODE_ISSUERS.bonnummer].sort());
   const consumer = fs.readFileSync(path.join(root, 'server/routes/supplier/kassa/innen.js'), 'utf8');
-  assert.match(consumer, /find\(x\s*=>\s*!x\.intern\s*&&\s*x\.pickup\s*===\s*code\)/,
-    'een interne keukenbon blijft een geauthenticeerd werknummer en wordt niet alsnog bearer');
+  assert.doesNotMatch(consumer, /\.pickup\s*===/, 'de kassa zoekt niet meer op het bonnummer');
+  assert.match(consumer, /afhaalcode\.claim\(/, 'de kassa claimt de afhaalcode');
+  /* Het bonnummer mag nergens meer als sleutel naar een order dienen: een
+     lookup `x.pickup === iets` buiten de keuken- en weergavelagen zou van vier
+     tekens alsnog een bearer maken. */
+  const zoekers = serverAanroepBestanden(/\.pickup\s*===/);
+  assert.deepEqual(zoekers, [], 'geen enkele serverplek zoekt een order op zijn bonnummer');
 });
 
 test('kernfuncties kunnen de HTTP-poort in productie niet omzeilen', async () => {
@@ -227,9 +238,6 @@ test('kernfuncties kunnen de HTTP-poort in productie niet omzeilen', async () =>
     assert.equal(kaart.verzilver(kaartDb, 'S', 'RAUW', 1, 'actor').code, maakPoort.CODE);
     assert.equal(kaartDb.data.giftcards[0].saldo, 10);
 
-    const bestellen = require('../server/kern/lidacties/bestellen')({});
-    assert.equal(bestellen.plaatsOrderVoor({}, {}).code, maakPoort.CODE,
-      'ook een niet-HTTP producer mag geen verse ophaalbearer uitgeven');
     assert.equal(saves, 0, 'geen directe kernweigering mag staat bewaren');
   } finally {
     if (oud == null) delete process.env.NODE_ENV;

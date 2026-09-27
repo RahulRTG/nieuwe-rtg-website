@@ -39,6 +39,13 @@ async function api(base, pad, body, token) {
   const r = await fetch(base + pad, { method: 'POST', headers: h, body: JSON.stringify(body || {}) });
   return { status: r.status, body: await r.json().catch(() => ({})) };
 }
+/* De kassa geeft uit op de AFHAALCODE (128 bits, kern/afhaalcode.js), niet op het
+   bonnummer `pickup`. Het lid vraagt hem op zoals de app dat doet. */
+async function afhaalQr(base, ref, token) {
+  const r = await api(base, '/api/order/afhaalcode', { ref }, token);
+  assert.equal(r.status, 200, JSON.stringify(r.body).slice(0, 200));
+  return r.body.code;
+}
 async function registreer(base, naam) {
   const u = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   const r = (await api(base, '/api/auth/register', {
@@ -231,7 +238,7 @@ test('4. de balie int een onbetaalde bon op de ophaalcode: een factuur, en de be
     assert.equal(o.body.order.paid, false, 'aan de balie betaal je aan de balie');
     const ref = o.body.order.ref;
 
-    const inn = await api(base, '/api/supplier/pos/redeem', { code: o.body.order.pickup }, mgr);
+    const inn = await api(base, '/api/supplier/pos/redeem', { code: await afhaalQr(base, o.body.order.ref, lid) }, mgr);
     assert.equal(inn.status, 200, JSON.stringify(inn.body).slice(0, 200));
     assert.equal(inn.body.order.wasPaid, false, 'de balie heeft hem echt geind');
 
@@ -267,7 +274,7 @@ test('5. een bon die al in de app is betaald, wordt aan de balie NIET nog eens g
     assert.equal((await wachtOpFacturen(base, mgr, ref))[ref].length, 1, 'na de app-betaling: een');
 
     // en dan komt hij zijn bestelling ophalen
-    const inn = await api(base, '/api/supplier/pos/redeem', { code: o.body.order.pickup }, mgr);
+    const inn = await api(base, '/api/supplier/pos/redeem', { code: await afhaalQr(base, o.body.order.ref, lid) }, mgr);
     assert.equal(inn.status, 200);
     assert.equal(inn.body.order.wasPaid, true, 'de balie ziet dat er al betaald is');
     /* HIER BLIJFT EEN WACHT STAAN, en dat is een besluit. Deze bewering gaat
@@ -502,7 +509,7 @@ test('7. de btw-aangifte komt uit op de omzet die de maandboekhouding telt', asy
     assert.equal((await api(base, '/api/order/pay', { ref: drank.body.order.ref }, lid)).status, 200);
     refs.push(drank.body.order.ref);
     const balie = await api(base, '/api/order', { supplierCode: 'KIKUNOI', items: [{ id: item, qty: 4 }], naarKassa: true }, lid);
-    assert.equal((await api(base, '/api/supplier/pos/redeem', { code: balie.body.order.pickup }, mgr)).status, 200);
+    assert.equal((await api(base, '/api/supplier/pos/redeem', { code: await afhaalQr(base, balie.body.order.ref, lid) }, mgr)).status, 200);
     refs.push(balie.body.order.ref);
     await wachtOpFacturen(base, mgr, refs);
 

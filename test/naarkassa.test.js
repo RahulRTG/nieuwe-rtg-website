@@ -1,6 +1,7 @@
 /* Order naar de kassa (server): het lid kiest "stuur naar de kassa" -- de
    bestelling gaat direct als open bon naar de zaak (de keuken maakt hem), en
-   wordt aan de balie afgerekend met de ophaalcode. Getoetst: de vlag aanBalie,
+   wordt aan de balie afgerekend met de afhaalcode (de 128-bit QR uit
+   /api/order/afhaalcode; het bonnummer `pickup` opent niets). Getoetst: de vlag aanBalie,
    dat de bon meteen loopt (status nieuw, onbetaald), dat de kassa hem met de
    code afrekent en uitgeeft, en dat een jeugdlid toch eerst moet betalen.
    Draai los: node --test test/naarkassa.test.js */
@@ -46,13 +47,18 @@ test('1. naar de kassa: bon loopt meteen, aanBalie, en de kassa rekent op de cod
     assert.equal(o.betaalMoment, 'achteraf', 'niet vooraf: de keuken maakt hem al');
     assert.equal(o.status, 'nieuw', 'de bon loopt meteen');
     assert.equal(o.paid, false, 'nog niet betaald');
-    assert.ok(o.pickup, 'er is een ophaalcode om te tonen/scannen');
+    assert.ok(o.pickup, 'er is een bonnummer voor keuken en pas');
+    const qr = await api(base, '/api/order/afhaalcode', { ref: o.ref }, lid);
+    assert.equal(qr.status, 200, JSON.stringify(qr.body));
+    assert.match(qr.body.code, /^AH\.[0-9A-F]{32}$/, 'de afhaalcode draagt 128 bits');
 
     // de kassa rekent af op de code
     const roster = (await api(base, '/api/supplier/roster', { code: 'KIKUNOI' })).body;
     const staff = roster.staff.find(x => x.role !== 'manager') || roster.staff[0];
     const sup = (await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: staff.id, pin: '5678' })).body.token;
-    const inn = await api(base, '/api/supplier/pos/redeem', { code: o.pickup }, sup);
+    assert.equal((await api(base, '/api/supplier/pos/redeem', { code: o.pickup }, sup)).status, 404,
+      'het bonnummer alleen geeft niets uit');
+    const inn = await api(base, '/api/supplier/pos/redeem', { code: qr.body.code }, sup);
     assert.equal(inn.status, 200);
     assert.equal(inn.body.order.wasPaid, false, 'aan de balie afgerekend (was nog niet betaald)');
     assert.ok(inn.body.sale, 'er is een kassabon aangemaakt');

@@ -47,7 +47,9 @@ const ROUTES = new Set([
   'POST /api/pay/tegoed/koop',
   'POST /api/pay/tegoed/roteer',
   'POST /api/supplier/pay/tegoed/zet',
-  'POST /api/supplier/pay/tegoed/roteer'
+  'POST /api/supplier/pay/tegoed/roteer',
+  // de afhaalcode van een bestelling: uitgeven is roteren (kern/afhaalcode.js)
+  'POST /api/order/afhaalcode'
 ]);
 
 const isEenmalig = (methode, pad) => ROUTES.has(

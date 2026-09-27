@@ -7144,8 +7144,8 @@
       '</div>'+
       // gast toont het oplichtende scherm; sla de code aan om de bestelling uit te geven
       '<div class="card"><div class="tt-h">'+T('pos.redeemh','RTG-ophaalcode innen')+'</div>'+
-      '<div style="margin-top:0.5rem;font-size:0.78rem;color:var(--muted);">'+T('pos.redeemsub','De gast laat het oplichtende scherm zien. Sla de code aan; de bestelling wordt gekoppeld, zo nodig afgerekend en uitgegeven.')+'</div>'+
-      '<div class="tt-add"><input id="posCode" placeholder="'+T('pos.codeph','Bijv. TBS9')+'" maxlength="4" autocapitalize="characters" style="text-transform:uppercase;letter-spacing:0.2em;font-weight:700;"><button id="posScan" title="'+T('pos.scan','Scan de code')+'" aria-label="'+T('pos.scan','Scan de code')+'"></button><button id="posRedeem">'+T('pos.redeem','Innen')+'</button></div>'+
+      '<div style="margin-top:0.5rem;font-size:0.78rem;color:var(--muted);">'+T('pos.redeemsub','De gast laat de afhaal-QR in zijn app zien. Scan hem; de bestelling wordt gekoppeld, zo nodig afgerekend en uitgegeven. Het bonnummer alleen opent niets.')+'</div>'+
+      '<div class="tt-add"><input id="posCode" placeholder="'+T('pos.codeph','Scan de afhaal-QR')+'" maxlength="80" autocapitalize="characters" autocomplete="off" spellcheck="false"><button id="posScan" title="'+T('pos.scan','Scan de code')+'" aria-label="'+T('pos.scan','Scan de code')+'"></button><button id="posRedeem">'+T('pos.redeem','Innen')+'</button></div>'+
       '<div id="posRedeemResult"></div></div>';
   }
 
@@ -7222,7 +7222,7 @@
     const posScan = $('#posScan'); if (posScan) posScan.addEventListener('click', () => {
       if (!window.RTGScanknop){ toast(T('pos.scannietklaar','De scanner is nog niet geladen.')); return; }
       RTGScanknop.open({ titel: T('pos.scan','Scan de ophaalcode'), hint: T('pos.scanhint','Scan de QR op het scherm van het lid.'), onCode: (c) => {
-        const el = $('#posCode'); if (el) el.value = String(c.tekst || '').trim().toUpperCase().slice(0, 4);
+        const el = $('#posCode'); if (el) el.value = String(c.tekst || '').trim().toUpperCase().slice(0, 80);
         redeemCode();
       } });
     });
@@ -7272,12 +7272,12 @@
   async function redeemCode(){
     const inp = $('#posCode');
     const code = (inp.value||'').trim().toUpperCase();
-    if (!code){ toast(T('pos.entercode','Voer een ophaalcode in.')); return; }
+    if (!code){ toast(T('pos.entercode','Scan de afhaal-QR van het lid.')); return; }
     const box = $('#posRedeemResult');
     try {
-      const d = await API.call('/supplier/pos/redeem', { code });
+      const d = await API.call('/supplier/pos/redeem', { code, idem: RTGIdem('afhaal') });
       const o = d.order;
-      box.innerHTML = '<div class="enroute here h-mt80">✓ '+code+' · '+T('sup.guest','Gast')+' <b>'+o.codename+'</b> · '+
+      box.innerHTML = '<div class="enroute here h-mt80">✓ '+T('pos.bon','Bon')+' '+esc(o.bon || o.ref)+' · '+T('sup.guest','Gast')+' <b>'+o.codename+'</b> · '+
         o.items.map(i=>i.qty+'× '+i.name).join(', ')+' · '+eur(o.total)+
         (o.wasPaid ? ' · '+T('pos.waspaid','al betaald in de app') : ' · '+T('pos.chargedrtg','afgerekend via RTG'))+'</div>';
       inp.value = '';

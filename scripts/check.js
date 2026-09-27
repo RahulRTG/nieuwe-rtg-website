@@ -947,6 +947,13 @@ console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoor
     ['/api/member/rechterhand/logboek/regel', 'idem: een onderhoudsregel bij eigen bezit'],
     ['/api/member/rechterhand/logboek/regel/weg', 'idem'],
     ['/api/tickets/aanbod', 'het aanbod bekijken; er gebeurt nog niets'],
+    /* De afhaalcode van een eigen bestelling. De bestelling zelf ging AL langs de
+       poort (/api/order en /api/bezorg/bestel); tonen en intrekken delen met de
+       zaak niets nieuws -- de zaak ziet alleen dat de QR bij de kassa klopt. En
+       intrekken hoort nooit achter een vraag om gegevens te staan: een
+       gestolen code dichtzetten mag geen drempel hebben. */
+    ['/api/order/afhaalcode', 'de afhaal-QR van een bestelling die al langs de poort ging; de zaak krijgt hier niets nieuws'],
+    ['/api/order/afhaalcode/intrek', 'een eigen afhaalcode intrekken; beveiliging hoort geen drempel te hebben'],
     /* De winkel van de RTFoundation. Deze route KWAM eerst door de poort met
        soort 'bestelling', en dat was fout op een manier die het waard is op te
        schrijven: die soort vraagt een telefoonnummer met de reden "de zaak moet

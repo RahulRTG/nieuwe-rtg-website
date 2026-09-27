@@ -787,6 +787,11 @@ const talen = maakTalen({ db, save });
 const salonClaimcode = require('./kern/salon-claimcode')({
   db, save, bewerkCollectie, crypto
 });
+/* De afhaalcode van een bestelling (kern/afhaalcode.js): een 128-bit bearer
+   die alleen als hash in `afhaalToegang` staat en in een collectietransactie
+   wordt geclaimd. Hij gaat naar de routes (uitgeven, intrekken, innen) en naar
+   de lidacties (de betaalweg van een balie-bon). */
+const afhaalcode = require('./kern/afhaalcode')({ db, bewerkCollectie, crypto });
 /* PostgreSQL neemt zijn waarheid pas asynchroon over; die variant draait daarom
    in startPostgresMetSalon en niet vóór de pull. De drie lokale migraties
    draaien verderop samen, zodra ook Samen en Luchthaven zijn opgebouwd. */
@@ -2295,7 +2300,7 @@ const kern = {
   sseSend, sseToCustomer, sseToOffice, sseToSupplier, stateFor, stationsForOrder, supplierAuth, supplierState, persoonsPoort,
   toRad, tokenHash, tooManyTries, totpOk, trChat, trustVan, unlockDoor, urenVan, validDept, veiligGelijk, logInlog,
   securityLogKeten, handelingsspoor, ankerdienst, ankerpost,
-  zorgContact, klantSalon, salonClaimcode,
+  zorgContact, klantSalon, salonClaimcode, afhaalcode,
   // de stemming van Rahul + de geloofslaag (kern/rahul/stemming.js, kern/geloof/)
   geloof, stemmingToon: stemming.stemmingToon, stemmingZet: stemming.stemmingZet,
   stemmingVoor: stemming.stemmingVoor,
@@ -2382,7 +2387,7 @@ const hulp = {
      "herstelTegoed is not a function": het lid kreeg een 500 waar een nette
      409 hoorde, en het tegoed bleef verrekend. Nooit de ene helft van dit
      paar doorgeven zonder de andere. */
-  ordersVanKlant, ordersVanZaak, pasTegoedToe, herstelTegoed, path, pickupCode, pinSlot, pushLive, rememberSession,
+  ordersVanKlant, ordersVanZaak, pasTegoedToe, herstelTegoed, path, pickupCode, afhaalcode, pinSlot, pushLive, rememberSession,
   reserveerTafel, rtf, rtmail, save, schoon, sessieregister, sendPush, sendPushToUser, sociaal, sseToCustomer,
   sseToOffice, sseToSupplier, supplierState, ticketsVoorSlot, verdienPunten, zetRtgai, zetServiceOverdracht, zorgContact,
   /* Voor "wie van je vrienden is er nu" (kern/spellen/presence.js): de levende

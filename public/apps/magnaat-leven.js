@@ -74,6 +74,15 @@
     }).join('');
   }
 
+  /* Wie een eigen hoofdactie heeft (#vnHoofd, data-hoofdactie), zegt ook zelf
+     waar je bent (EDGE.md par. 8, besluit 11). De adaptieve laag laadt met
+     defer, dus bij de eerste tekening kan hij er nog niet zijn: daarom ook bij
+     DOMContentLoaded. */
+  function meldContext() {
+    if (window.RTGAdaptief) window.RTGAdaptief.context({ bron: 'spel.magnaat', titel: 'Magnaat' });
+  }
+  document.addEventListener('DOMContentLoaded', meldContext);
+
   function tekenVandaag(s) {
     var v = s.vandaag;
     q('#vnDag').textContent = s.dagNaam + ', dag ' + s.dag;
@@ -82,6 +91,7 @@
     var hoofd = q('#vnHoofd'), eerste = v.volgende[0];
     hoofd.hidden = !eerste;
     hoofd.textContent = eerste ? eerste.label : '';
+    meldContext();
     q('#vnActies').innerHTML = v.volgende.slice(1).map(function (a, n) {
       return '<button type="button" class="btn" data-vn-actie="' + (n + 1) + '">' + esc(a.label) + '</button>';
     }).join('');

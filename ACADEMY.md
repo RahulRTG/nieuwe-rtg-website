@@ -1,0 +1,280 @@
+# RTG Academy: het leerhuis
+
+*Richtingsdocument én bouwverslag, zoals `PLATFORM.md` en `ECONOMIE.md`: per
+onderdeel staat er of het **staat**, **een stap weg** is, **een besluit vraagt**
+of **jaren weg** is. "De opdracht, par. N" in de code verwijst naar de
+masteropdracht van 27 september 2026 (People, Knowledge, Academy & Human
+Capability Infrastructure), paragraaf N. Bijlage A zet die veertig paragrafen
+naast wat er staat.*
+
+De kern in één zin: **RTG Academy is geen plek met cursussen maar een gesloten
+lus van behoefte naar bewezen vakmanschap en weer terug, en elke stap in die lus
+laat een spoor na dat een ander kan nalezen.**
+
+De stand op 27 september 2026:
+
+```
+LOOP_COMPLETENESS=CLOSED   (25/25 schakels, 5/5 storingen; npm run leerhuisproef)
+ACADEMY_STATUS=BLOCKED
+```
+
+Allebei zijn eerlijk, en ze worden nooit opgeteld. De lus sluit in de REGELS
+(`server/kern/leerhuis/`): van een behoefte aan een operationsmens tot de
+leerling van gisteren die de volgende leerling traint, via een kennisverandering
+die uit de praktijk kwam. De Academy is toch niet klaar voor productie, want er
+staan vijf P0-blokkades open. Die staan hieronder bij naam, en de proef leest ze
+uit dezelfde lijst (`BLOKKADES` in `scripts/leerhuisproef.js`).
+
+| blokkade | klasse | wat er ontbreekt | sluit met |
+|---|---|---|---|
+| `API` | AUTHORITY | geen HTTP-deur: de actor komt pas uit een sessie als een route hem daar haalt | fase B-API (par. 6) |
+| `UI` | UX | geen scherm voor My Academy, Trainer, Manager en Knowledge Governance | fase B-UI (par. 6) |
+| `DOMEINPOORT` | AUTHORITY | geen RTG-domeinpoort leest AUTHORITY_ELIGIBLE als feit; geschiktheid verandert nog nergens een recht | besluit B1 |
+| `DUURZAAM` | RECOVERY | het spoor gaat via `save()`, niet via `db/duurzaam.js`; een certificaat kan een crash vlak na het antwoord niet overleven | besluit B4 plus regel 47 |
+| `IDENTITEIT` | TENANT_ISOLATION | de persoonsleutel is niet gekoppeld aan `employment` (kern/concern) of de werkruimte; een relatie is een verklaring van de organisatie zelf | besluit B2 |
+
+---
+
+## 1. De gap-matrix
+
+Eerst gemeten, dan gebouwd (de opdracht, par. 3 en 39). Drie verkenningen over
+`server/`, `public/` en de diepte-documenten. De kolom *besluit* zegt wat er met
+het bestaande gebeurt: HERGEBRUIKEN (aanroepen zoals het is), UITBREIDEN
+(daarin bijbouwen), NIEUW (er is niets bruikbaars) of BOTST (bestaat met een
+andere betekenis, dus niet aanraken en een eigen naam kiezen).
+
+| onderdeel uit de opdracht | stand in de code | besluit | waar |
+|---|---|---|---|
+| identiteit, codenamen | BESTAAT | HERGEBRUIKEN | `accounts.js`, sleutel `lid:<id>` zoals `kern/vakbewijs.js` |
+| organisatie / tenant | BESTAAT, drie keer | HERGEBRUIKEN als sleutel, niet als model | `kern/tenant/`, `kern/concern/`, `kern/rtfos/steden.js`, `bedrijf/` |
+| dienstverband / relatie | DEELS, drie modellen die elkaar niet lezen (ARBEID.md par. 3) | NIEUW (dun) + besluit B2 | `kern/concern/employment.js` is de gekozen waarheid (ARBEID.md par. 7a) |
+| rollen en rechten | BESTAAT, vijf vocabulaires (AUTHORITY.md par. 1) | BOTST: geen zesde | leerhuis kent alleen BESTUURsrollen van de Academy zelf |
+| bevoegdheid (authority) | BESTAAT in de schaduw | HERGEBRUIKEN, via besluit B1 | `kern/beleidsmotor/`, `kern/persoonseis.js` |
+| organisatiegraaf | DEELS | NIEUW (dun), in het spoor | `eenheid`-gebeurtenis; `orggraaf` blijft vrij voor AUTHORITY.md |
+| competentie | ONTBREEKT (vrije tekst op negen plekken, ARBEID.md #103) | NIEUW als `vaardigheid` | `server/kern/leerhuis/` |
+| Knowledge Core | DEELS: kennisbank met eigenaar, versie en houdbaarheid, zonder goedkeuring en zonder afhankelijkheden | NIEUW naast de kennisbank + besluit B3 | `server/bedrijf/kennis.js` |
+| curriculum / leerpad | DEELS: `leerstof`, `onderwijs` en School, allemaal voor leerlingen en niet voor werk | NIEUW | niet in `leerstof-*`: dat is een andere doelgroep met eigen grenzen (SCHOOL.md) |
+| Personal Start Plan | DEELS: `bedrijf/indienst.js` (zes stappen, plant uitdrukkelijk geen training) | NIEUW, afgeleid | `leerhuis/startplan.js` |
+| oefenen / zandbak | BESTAAT: `command/zandbak.js`, Magnaat | HERGEBRUIKEN later; V1 heeft een eigen scenario-oordeel | `leerhuis/acties-simulatie.js` |
+| simulatie | BESTAAT vier keer, geen voor mensen beoordelen | NIEUW (klein, deterministisch) | idem |
+| bewijs | DEELS: `onderwijs-bewijs.js`, `carriereledger`, `connect/leerdossier` | NIEUW, met de graadvorm van het leerdossier | wie schrijft bepaalt de sterkte |
+| beoordeling | DEELS: `toetsbouw`, `toetsspiegel`, `schooladvies` (leerlingen) | NIEUW | |
+| certificering | ONTBREEKT (`onderwijs-ladder.js`: "wij claimen geen diploma's") | NIEUW | niet `vakbewijs`: dat is een EXTERN stuk dat RTG zag |
+| trainer / mentor / assessor | ONTBREEKT voor werk; `trainer` en `mentor` zijn bezet (sport, school) | NIEUW | eigen ladder in `standen.js` |
+| manager-, trainercockpit | ONTBREEKT | NIEUW (leeskant), scherm is fase B-UI | `leerhuis/zicht.js` |
+| workforce readiness | DEELS: `concern/readiness.js` meet een ENTITEIT | NIEUW voor mensen, dezelfde vorm | `leerhuis/gereedheid.js` |
+| impactanalyse | ONTBREEKT | NIEUW, als projectie | `leerhuis/graaf.js` |
+| audit / historie | BESTAAT | HERGEBRUIKEN | `lib/keten.js` |
+| idempotentie | BESTAAT per route | HERGEBRUIKEN de vorm; in de kern op sleutel | `leerhuis/index.js` |
+| gebeurtenissen / jobs | BESTAAT (`bus.js`, `envelop.js`) | nog niet aangesloten | par. 6, P1 |
+| AI-coach | BESTAAT als patroon (`ai/prompt.js`, positieve veldlijst) | alleen de GROND gebouwd | `leerhuis/uitleg.js` `grond()` |
+| 18+-grens op progressie | BESTAAT | BOTST mogelijk | besluit B5 |
+
+## 2. Namen
+
+Gemeten over `server/` en `scripts/`, 27 september 2026.
+
+| voorgesteld | bezet door | gekozen |
+|---|---|---|
+| Academy (als code) | `scope 'academy'` in `scripts/lib/magnaatgrondwet.js` (het Oefenkantoor) | **`leerhuis`** (0 treffers). *RTG Academy* blijft de naam voor mensen |
+| Competency, Capability | *capability* is platformvermogen (OS.md); HDI.md par. 2 wijst `vaardigheid` aan | **`vaardigheid`** |
+| Skills Passport | `paspoort` (207 bestanden) | **vakstaat** (een projectie, geen dossier) |
+| Knowledge Graph | een tweede graaf naast de rest is de `Asset`-fout | een PROJECTIE (`graaf.js`), zoals `kern/levensgraaf/graaf.js` |
+| trainer, mentor | `trainingsschema.js` (fitness), School (mentor) | als TREDEN op de ladder, niet als modulenaam |
+| simulatie | vier modules | `acties-simulatie.js` binnen het leerhuis, geen nieuwe laag |
+| policy, capability, machtiging, mandaat, benoeming | allemaal bezet (AUTHORITY.md par. 2.5) | **beleid** binnen het leerhuis, en het heet een *geschiktheidsbeleid* |
+| readiness | `concern/readiness.js` (een entiteit) | **gereedheid** (een mens, een team, een eenheid) |
+
+## 3. Botsingen met grondregels, en hoe het is opgelost
+
+1. **Geen zesde rechtenmodel** (AUTHORITY.md INT-01, CONCERN.md). Het leerhuis
+   deelt geen rechten uit. `geschiktheid()` in `brug.js` geeft hoogstens
+   AUTHORITY_ELIGIBLE en draagt altijd `verleent: false`. De bestuursrollen
+   (ACADEMY_OWNER, KNOWLEDGE_OWNER, ASSESSOR ...) gaan alleen over handelingen
+   BINNEN het leerhuis. Hoe een domeinpoort de uitslag als feit leest, is besluit B1.
+2. **Geen score op een mens** (CARRIERE.md par. 4.1, KANTOORMACHT.md, INT-04).
+   Gereedheid is een lijst van wat ontbreekt en wat verloopt. Loopbaan is READY,
+   NEARLY_READY, DEVELOPING of NOT_ELIGIBLE met de ontbrekende stukken, en de
+   promotie blijft een menselijk besluit. Een trainer wordt gekozen op de minste
+   leerlingen (rust), nooit op wie "beter" is. De managercockpit noemt uitdrukkelijk
+   wat hij niet toont.
+3. **Twee kennislagen.** `server/bedrijf/kennis.js` is de kennisbank van een
+   werkruimte: eigenaar, versie, houdbaarheid, maar geen goedkeuring en geen
+   afhankelijkheden. De Knowledge Core van de opdracht vraagt die twee wel. Er
+   staat nu dus een tweede kennislaag, en dat is een schuld met een naam: besluit B3.
+4. **De 18+-grens op progressie** (`progressieMag`, CLAUDE.md). Een certificaat en
+   een vakstaat zijn opgeslagen progressie. Voor werk is dat de bedoeling, maar een
+   RTF-vrijwilliger kan jonger zijn. De uitzondering van 14 september voor een
+   leerdossier (niet vergelijkend, geen blijvend niveaulabel) dekt een certificaat
+   niet vanzelf. Dat is besluit B5, en tot dan hoort het leerhuis niet open te gaan
+   voor wie de 18+-poort niet haalt.
+5. **De actor komt uit de sessie** (AUTHORITY.md grens 1). De kern neemt `door` als
+   argument en vertrouwt nooit een veld uit een verzoek. Dat een route hem uit de
+   sessie haalt, is blokkade `API`.
+
+## 4. Het model
+
+**Eén spoor per organisatie, gekettend.** `db.data.leerhuis[org]` is een lijst
+gebeurtenissen, nieuwste vooraan, elk met de hash van zijn voorganger
+(`lib/keten.js`). Er is geen tabel met standen: `projectie.js` rekent ze bij elke
+vraag uit het spoor. Er is geen gedeelde lijst mensen, bewijzen of certificaten
+over organisaties heen, dus een certificaat in A kan structureel niet naar bewijs
+uit B wijzen. Isolatie is hier geen filter maar het ontbreken van een opzoeking.
+
+**Standen.** De gebeurde standen zijn machines met een overgangstabel
+(`standen.js`): kennis, curriculum, leren, beoordeling, voorstel, bezwaar en EVC.
+De berekende standen (certificaat, versheid van bewijs, geschiktheid, gereedheid,
+eenheid) worden nooit opgeslagen.
+
+**Handelingen.** 37 stuks, elk met de projectie, de invoer, de actor en een klok.
+Een handeling geeft gebeurtenissen terug of gooit een weigering met reden, status
+en waar het kan de weg eromheen. `index.js` schrijft ze alles-of-niets en
+idempotent op een sleutel (`uitkomst()` voor wie geen antwoord kreeg).
+
+**Wie mag welk bewijs zetten.** De sterkte volgt uit wie schrijft: SELF_REPORTED
+de mens zelf, DOCUMENTED en OBSERVED een geldige trainer of assessor, ASSESSED
+alleen een assessor, SYSTEM_VERIFIED alleen de simulatiemotor. EVC maakt van een
+extern stuk hoogstens DOCUMENTED bewijs. PROVEN komt altijd uit een eigen beoordeling.
+
+**Scheiding van taken** (de opdracht, par. 22), elk als code en elk door een toets
+bewaakt: wie kennis schrijft keurt haar niet goed; de trainer is bij een kritieke
+vaardigheid niet de assessor; de manager beoordeelt zijn eigen medewerker niet;
+niemand certificeert, benoemt of kwalificeert zichzelf; wie een beleid voorstelt
+keurt het niet goed; een assessor verklaart zijn eigen oordeel niet ongeldig.
+
+**De kennislus.** Een voorstel uit de praktijk verandert nooit ACTIVE kennis. Het
+wordt pas IMPLEMENTED als er een ACTIVE versie bestaat die ernaar wijst. Een
+opvolgende versie gaat niet ACTIVE zonder impactklasse, en `graaf.js` rekent uit
+wie en wat er geraakt wordt. Trainers moeten eerst zelf bij zijn voordat ze weer
+les mogen geven. Vanaf ASSESSMENT_REQUIRED krijgen geraakte mensen hun leerpad
+opnieuw, met de reden erbij; bij LEARNING_UPDATE volstaat één nieuw stuk
+kennisbewijs. Een certificaat dat vóór een RECERTIFICATION_REQUIRED-wijziging is
+uitgegeven, blijft REFRESH_REQUIRED: de mens krijgt een nieuw certificaat en het
+oude blijft als historie staan.
+
+## 5. Open besluiten
+
+| # | vraag | waarom het een besluit is | voorstel |
+|---|---|---|---|
+| B1 | Leest een domeinpoort AUTHORITY_ELIGIBLE als feit, en welke eerst? | anders verandert geschiktheid nergens iets; maar een poort die een nieuw feit leest, verandert wat mensen mogen | eerst in de schaduw van de beleidsmotor (A3, 23 september), één handeling, geen weigering |
+| B2 | Welke relatie is de waarheid voor het leerhuis? | ARBEID.md par. 7a koos `employment` aan een entiteit; RTF-vrijwilligers en leveranciers staan daar niet in | `employment` voor RTG en Business, `rtfos/vrijwilligers` voor RTF, de werving-uitnodiging voor Supplier, met een brug die één kant op loopt |
+| B3 | Wordt de kennisbank van een werkruimte een bron van de Knowledge Core, of andersom? | twee kennislagen lopen binnen een jaar uiteen | de kennisbank wordt een DRAFT-bron: een artikel kan als concept het leerhuis in en gaat daar door governance |
+| B4 | Komt het spoor op de duurzaamheidslijst van regel 47? | die lijst is bewust schaars; een certificaat is een verklaring over een mens | ja, voor `certificaatUitgeven`, `certificaatStand` en `beoordelingAfronden` |
+| B5 | Geldt de 18+-grens voor certificaten van RTF-vrijwilligers onder de 18? | par. 3 punt 4 | geen certificaat onder de 18; wel bewijs en beoordeling in de vorm van het leerdossier |
+| B6 | Waar komt de eerste organisatie vandaan, en wie opent haar? | `orgOpen` is de enige plek waar iemand een bestuursrol krijgt zonder dat een ander hem benoemt | alleen vanuit het kantoor op naam (`kluisAuth`), nooit met de gedeelde code |
+
+## 6. Bouwvolgorde
+
+De opdracht, par. 32 en 33: eerst één verticale lus, dan pas breedte.
+
+| fase | stand | wat |
+|---|---|---|
+| A Foundation | **staat** | gap-matrix, domeinmodel, grenzen, rol, vaardigheid, kennis, bewijs, standmachines |
+| B First Loop (kern) | **staat** | startplan, My Academy, trainer, oefenen, beoordeling, certificaat, brug |
+| B-API | **een stap weg** | HTTP-routes: een mutatiecontract per route, de actor uit de sessie, een toets op een echte server (LAT-regel 17) |
+| B-UI | **een stap weg** | vier schermen (TODAY, PATH, PRACTICE, SKILLS, GROWTH, COACH voor het lid); vraagt B-API |
+| C Trainer Loop | **staat** in de kern | trainerladder, Train-the-Trainer als eigen vaardigheid, cockpit, gescheiden assessor |
+| D Knowledge Loop | **staat** in de kern | voorstel, versies, impact, verversen, hercertificering |
+| E Management | **staat half** | gereedheid, eenheid, busfactor, loopbaan; nog geen capaciteitsplanning over tijd |
+| F Ecosystem | **staat** als isolatie | RTF, Business en Supplier gebruiken dezelfde motor met een eigen spoor; nog geen stadssjablonen |
+| G AI | **een stap weg** | alleen de grond (`grond()`); de coach zelf komt pas na B-API en met een lokaal model |
+| gebeurtenissen en jobs | **een stap weg** | verloop van certificaten wordt nu bij elke vraag gerekend; een melding bij EXPIRING vraagt de bus |
+
+**P0** (voor ACADEMY_STATUS=READY): de vijf blokkades hierboven.
+**P1**: gebeurtenissen op de bus (PERSON_JOINED, COMPETENCY_PROVEN,
+CERTIFICATION_EXPIRING, KNOWLEDGE_IMPACT_DETECTED), herstelproef van het spoor,
+bezwaar met een tweede assessor, overdracht bij vertrek van een kenniseigenaar.
+**P2**: stadssjablonen, teamdrills, human readiness als releasepoort, een
+interne talentmarkt (die wacht op ARBEID.md #104).
+
+## 7. Bewijs
+
+- `npm run leerhuisproef`: de gouden lus, 25 schakels van NEED tot NEXT
+  TRAINEE plus AUDIT, elk gemeten bij de ontvanger, en vijf storingen
+  (zelfcertificering, dubbel certificaat, verlopen certificaat, vertrek,
+  gemanipuleerd spoor).
+- `test/leerhuis-lus.test.js`: de lus als toets, plus de eis dat de status
+  BLOCKED blijft zolang er blokkades zijn en dat elke blokkade hier staat.
+- `test/leerhuis-grenzen.test.js`: de zestien negatieve en adversariële gevallen
+  uit de opdracht, par. 35. Daartoe horen de zeven invarianten als
+  eigenschapstoets over 4000 handelingen, de isolatieproef (RTG, RTF, twee
+  zaken) en de reproductieproef (stad A leidt het kernteam van stad B op; B gaat
+  van BLOCKED via DEPENDENT naar SELF_SUSTAINING en leidt het volgende cohort zelf op).
+
+Elke grens in de toetsen is met een mutatie nagetrokken (zie de kop van het
+toetsbestand). Vier fouten zijn door de proeven gevonden en niet door lezen:
+
+1. `impact()` vergeleek een trainerkwalificatie (een object) met een id, en meldde
+   daardoor nooit een trainer als geraakt.
+2. De certificaatstand keek naar het huidige bewijs van de MENS en niet naar het
+   certificaat. Een oud certificaat werd daardoor weer ACTIVE zodra iemand
+   opnieuw bewees.
+3. Een id van de aanroeper dat al bestond, verving in de projectie stil het oude
+   object. Een afgeronde beoordeling kon zo verdwijnen: historie herschrijven.
+4. De eigenschapstoets zelf bewees eerst bijna niets. Van 600 handelingen
+   slaagden er 4, omdat de lage bits van de pseudo-random generator een korte
+   periode hebben. Hij eist nu dat er echt beoordeeld en gecertificeerd wordt.
+
+## 8. Grenzen
+
+1. **Bekwaam is niet bevoegd, en gecertificeerd ook niet.** Het leerhuis verleent niets.
+2. **Geen score op een mens**, ook niet intern als sorteersleutel.
+3. **Niemand keurt zijn eigen werk goed**: kennis, beleid, beoordeling, certificaat, trainerschap.
+4. **Historie wordt niet herschreven.** Intrekken is een nieuwe regel, en een bestaand id krijgt geen nieuwe geschiedenis.
+5. **Onbekend is niet ja.** Een ontbrekende vaardigheid, een beleid zonder tweede handtekening of een verlopen stuk geven NOT_ELIGIBLE, met de reden erbij.
+6. **Narratief is geen oordeel.** Een model mag een simulatie aankleden en een antwoord navertellen, maar de uitslag komt uit regels.
+7. **De coach kent alleen ACTIVE kennis**, en zonder bron zegt hij ONBEKEND. Inhoud is nooit een instructie aan de coach.
+8. **Oefenen is zonder gevolgen**: een mislukte simulatie laat geen bewijs na.
+
+## 9. Wat hier niet bewezen is
+
+- Er komt geen server, HTTP of browser aan te pas. Dat de actor uit een sessie
+  komt, is dus niet bewezen (blokkade `API`).
+- Er is geen schaalbewering. De projectie loopt per vraag over het hele spoor van
+  één organisatie (O(n)). Voor een organisatie met honderdduizend mensen en
+  miljoenen bewijsstukken is een momentopname per persoon nodig, en die is er
+  niet. Er staat hier dus geen getal.
+- Het spoor is lokaal gekettend en niet extern verankerd (`lib/keten.js`, de kop).
+  Wie de nieuwste regels weggooit, valt niet op.
+- De simulatie is een regelcontrole over gekozen stappen, geen zandbak. Ze meet
+  of iemand de juiste stappen in de juiste volgorde kent, niet of hij ze onder druk zet.
+
+## Bijlage A. De opdracht per paragraaf
+
+| par. | onderwerp | stand |
+|---|---|---|
+| 1, 2 | missie, grondwet | de twintig regels: 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 16, 17, 18, 19 en 20 in code; 9 (assessor is geen kenniseigenaar) als losse bestuursrollen; 13 (geen checkbox-overload) in de verversregel; 14 (AI) als grens zonder AI; 15 (kwaliteit meten) nog niet |
+| 3 | eerst onderzoeken | par. 1 hierboven |
+| 4 | conceptuele architectuur | één module met projecties, geen services |
+| 5 | multi-organisatie | een spoor per organisatie; RTG, RTF, BUSINESS, SUPPLIER, PARTNER, PROJECT |
+| 6 | organisatie-, rol-, competentiegraaf | rol en vaardigheid staan; de organisatiegraaf is dun (`eenheid`) |
+| 7 | Knowledge Core | staat, met besluit B3 |
+| 8 | curriculum, startplan | staat |
+| 9 | My Academy, vakstaat | leeskant staat, scherm niet |
+| 10 | leerstandmachine | staat |
+| 11 | oefenen, simulatie, bewijs | staat, simulatie klein |
+| 12 | beoordeling, certificaat, brug | staat, brug met besluit B1 |
+| 13 | trainer en mentor | staat |
+| 14 | manager, loopbaan | leeskant staat |
+| 15 | gereedheid, reproductie | staat |
+| 16 | RTF, Business, Supplier | als isolatie; eigen rolladders van Business en Supplier niet voorgebakken |
+| 17 | kennisverandering | staat |
+| 18 | hercertificering, EVC | staat; PERIODIC via `geldigDagen`, PRACTICE_DEPENDENT nog niet |
+| 19 | levenscyclus | aanname, vertrek en terugkeer (berekend); overplaatsing niet apart |
+| 20 | AI | alleen de grond |
+| 21 | privacy, fairness | minste kennis per lezer; bewaartermijn en export ontbreken |
+| 22 | governance | staat |
+| 23 | standen, integriteit | staat; gelijktijdigheid is in één proces vanzelf serieel, over processen niet bewezen |
+| 24 | gebeurtenissen, jobs | een stap weg |
+| 25 | dreigingsmodel | toetsen 1 tot en met 14 |
+| 26, 27 | UX, leren in het werk | een stap weg |
+| 28 | human readiness, drills | jaren weg |
+| 29 | organisatiegeheugen | vertrek staat; overdracht van eigenaarschap niet |
+| 30 | prestatie | niet gemeten (par. 9) |
+| 31 | contracten, opslag | domeinacties staan; opslag in een spoor, geen JSON-blob als stand |
+| 32, 33 | volgorde, V1 | par. 6 |
+| 34 | gouden bewijzen A tot en met E | A, B, C in de lusproef; D en E in de grenzentoets |
+| 35 | negatieve toetsen | staat |
+| 36 | uitleg | `uitleg.js` |
+| 37 | Definition of Done | ACADEMY_STATUS=BLOCKED |
+| 38 | eindacceptatie | LOOP_COMPLETENESS=CLOSED |

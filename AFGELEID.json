@@ -3,23 +3,23 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-09-25T15:55:25.818Z",
-  "commit": "0a9013ae",
-  "boomVuil": false,
+  "op": "2026-09-27T00:47:51.278Z",
+  "commit": "dc946c10b",
+  "boomVuil": true,
   "boomAnders": 1,
   "instrument": "scripts/afgeleid.js",
-  "node": "v22.22.2"
+  "node": "v24.18.0"
  },
  "gemeten": {
-  "artefacten": 321,
+  "artefacten": 324,
   "bron": 12,
-  "afgeleid": 178,
+  "afgeleid": 179,
   "fragmenten": 25,
   "momentopname": 1,
-  "onbeslist": 105,
+  "onbeslist": 107,
   "afgeleidZonderEigenaar": 2,
-  "metEigenaar": 202,
-  "afgeleidEigenaarHard": 176,
+  "metEigenaar": 203,
+  "afgeleidEigenaarHard": 177,
   "afgeleidGrendelt": 20,
   "metStempel": 110,
   "stempelAnders": 0
@@ -631,6 +631,44 @@
    "stempelAnders": false,
    "versheidOpdracht": null,
    "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "CONNECTION_CONSTITUTION.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/connection-constitution.js",
+   "graad": "gemeten",
+   "schrijvers": [
+    "scripts/connection-constitution.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "CONNECTION_OS.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "CONNECTION_OS_FINAL.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
    "botsingVerklaard": null
   },
   {

@@ -14,7 +14,7 @@ module.exports = (kern, { stuur, doe, eisCapability }) => {
   app.post('/api/member/rendezvous/profile-photo/publish',auth,doe('connection.profile.photo.manage',(k,b)=>rvFotoPubliceer(k,b.id,b.visibility,b.publish!==false)));
   app.post('/api/member/rendezvous/profile-photo/remove',auth,doe('connection.profile.photo.manage',(k,b)=>rvFotoVerwijder(k,b.id)));
   app.post('/api/member/rendezvous/profile-photo/order',auth,doe('connection.profile.photo.manage',(k,b)=>rvFotoOrden(k,b.ids)));
-  app.get('/api/member/rendezvous/profile-photo/delivery/:ticket',async(req,res)=>{try{const item=await rvFotoLever(req.params.ticket);return item
+  app.get('/api/member/rendezvous/profile-photo/delivery/:ticket',auth,async(req,res)=>{try{const item=await rvFotoLever(req.params.ticket);return item
     ?stuurBuffer(req,res,item.bytes,item.mime,'private, no-store'):res.status(404).end();}catch(e){if(!res.headersSent)res.status(404).end();}});
   app.post('/api/connection/rendezvous/status',auth,doe('connection.message',(k,b)=>rvCommStatus(k,b)));
   app.post('/api/connection/rendezvous/consent',auth,doe('connection.communication.consent',(k,b)=>rvCommConsent(k,b,b.capability,b.active!==false)));

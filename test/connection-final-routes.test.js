@@ -36,8 +36,10 @@ test('Vonk en Rendez-vous finale routes vormen een echte mobiele serviceketen',a
   assert.equal((await api('/api/member/rendezvous/profile-photo/publish',{id:upload.body.media.id,visibility:'DISCOVERY'},B.token)).status,200);
   const candidates=await api('/api/member/rendezvous/kandidaten',{},A.token),candidate=candidates.body.kandidaten.find(x=>x.codenaam===B.codenaam);
   assert.equal(candidate.media.length,1);assert.equal(Object.hasOwn(candidate.media[0],'ref'),false);
-  assert.equal((await fetch(base+candidate.media[0].src)).status,200);
-  assert.equal((await fetch(base+'/api/member/rendezvous/profile-photo/delivery/ongeldig')).status,404);
+  const fotoHeaders={Authorization:'Bearer '+A.token};
+  assert.equal((await fetch(base+candidate.media[0].src)).status,401);
+  assert.equal((await fetch(base+candidate.media[0].src,{headers:fotoHeaders})).status,200);
+  assert.equal((await fetch(base+'/api/member/rendezvous/profile-photo/delivery/ongeldig',{headers:fotoHeaders})).status,404);
   assert.equal(padVorm(candidate.media[0].src),'/api/member/rendezvous/profile-photo/delivery/:ticket');
   assert.equal((await api('/api/member/rendezvous/like',{id:candidate.id},A.token)).status,200);
   const candidateA=(await api('/api/member/rendezvous/kandidaten',{},B.token)).body.kandidaten.find(x=>x.codenaam===A.codenaam);
@@ -107,7 +109,9 @@ test('Vonk en Rendez-vous finale routes vormen een echte mobiele serviceketen',a
   assert.equal((await fetch(base+'/api/connection/vonk/message-media/delivery/ongeldig')).status,404);
 
   const request=await api('/api/member/rendezvous/concierge/request',{subject:'Diner',request:'Een rustige tafel in Amsterdam.',idempotencyKey:'rv-concierge-final-0001'},A.token);
-  const rid=request.body.request.id;for(const [state,extra] of [['ACKNOWLEDGED',{}],['IN_PROGRESS',{}],['PROPOSED',{proposal:'Vrijdag om 20:00'}]])
+  const rid=request.body.request.id;
+  assert.ok((await api('/api/office/rendezvous/concierge',{},office)).body.requests.some(x=>x.id===rid));
+  for(const [state,extra] of [['ACKNOWLEDGED',{}],['IN_PROGRESS',{}],['PROPOSED',{proposal:'Vrijdag om 20:00'}]])
     assert.equal((await api('/api/office/rendezvous/concierge/step',{id:rid,state,...extra},office)).status,200);
   await api('/api/member/rendezvous/concierge/approve',{id:rid,approve:true},A.token);
   await api('/api/office/rendezvous/concierge/step',{id:rid,state:'CONFIRMED',confirmation:'Bevestiging RV-2026'},office);

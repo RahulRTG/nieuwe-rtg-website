@@ -191,6 +191,10 @@ const EIGENAAR = {
   'DOCTRINE.json': { schrijver: 'scripts/doctrine.js' },
   'VERBAND.json': { schrijver: 'scripts/verband.js' },
   'GELDING.json': { schrijver: 'scripts/gelding.js' },
+  'CONNECTION_CONSTITUTION.json': { schrijver: 'scripts/connection-constitution.js',
+    waarom: 'de machinaal afgeleide Connection OS-grondwet: capability-, policy-, consent-, projectie- en ' +
+      'productstatebewijzen worden door scripts/connection-constitution.js uit de levende bron en toetsen ' +
+      'samengebracht; het bestand wordt niet handmatig onderhouden' },
 
   /* De dragende registers van de bewijsmachine. */
   'WETTEN.json': { handmatig: true, lezer: 'scripts/wetten.js',

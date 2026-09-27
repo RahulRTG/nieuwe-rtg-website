@@ -1,0 +1,16 @@
+/* Article content changes, the surrounding desktop grid does not. */
+@media(min-width:1000px){
+ body[data-rtg-desktop] .pp-detail-shell>.world-shell{max-width:none;width:100%;margin:0;padding:0;overflow:visible}
+ .pp-detail-shell .world-header{display:none}
+ .pp-detail-shell .world-hero{min-height:0;height:auto;margin:0;padding:24px;background:var(--rtg-world-card);color:var(--rtg-world-ink);border:1px solid var(--rtg-world-line);border-radius:var(--rtg-radius-editorial)}
+ .pp-detail-shell .world-hero-inner{display:block;padding:0;min-height:0}
+ .pp-detail-shell .world-hero h1{font-size:44px;line-height:1.1;max-width:none}
+ .pp-detail-shell .world-hero img{max-width:100%;height:auto}
+ .pp-detail-shell main,.pp-detail-shell section{max-width:100%;min-width:0}
+ .pp-detail-shell main{padding:24px 0}
+ .pp-detail-shell :is(.world-lead,.world-section p,.world-section h2){color:var(--rtg-world-ink)}
+ .pp-detail-shell .wd-library{display:flex;flex-wrap:wrap;gap:24px}
+ .pp-detail-shell .wd-favorites a{font-size:13px}
+ .pp-detail-shell .wd-people h2{font:400 26px/1.2 "Bodoni Moda",Georgia,serif;margin:0 0 16px}
+ body[data-rtg-desktop]>.pp-header .pp-language{margin-inline-start:auto}
+}

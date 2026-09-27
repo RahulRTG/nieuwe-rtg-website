@@ -18,6 +18,7 @@ const identiteit = require('../public/shared/rtg-world-identity');
 const WORTEL = path.join(__dirname, '..');
 const APPS = path.join(WORTEL, 'public', 'apps');
 const LINK = '<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">';
+const DESKTOP = '<script src="/shared/rtg-world-desktop.js" defer></script>';
 const VASTLEGGEN = process.argv.includes('--vastleggen');
 
 function htmlBestanden(map, uit = []) {
@@ -72,7 +73,7 @@ function gewenst(bestand, bron) {
   const route = appPad(bestand);
   const wereld = identiteit.classify(route);
   if (!wereld) throw new Error('Ongeclassificeerd appscherm: ' + route);
-  if (wereld === 'redirect') return bron;
+  if (wereld === 'redirect') return bron.replace(/\sdata-rtg-eigenvlak=["'][^"']*["']/gi, '');
 
   const body = bron.match(/<body\b[^>]*>/i);
   if (!body) throw new Error('Geen <body> in ' + route);
@@ -87,7 +88,11 @@ function gewenst(bestand, bron) {
 
   let bodyNieuw = zetAttribuut(body[0], 'data-rtg-world', wereld);
   bodyNieuw = voegAttribuutToe(bodyNieuw, 'data-rtg-skin', 'heritage');
+  bodyNieuw = zetAttribuut(bodyNieuw, 'data-rtg-layout', 'standard');
+  bodyNieuw = bodyNieuw.replace(/\sdata-rtg-eigenvlak=["'][^"']*["']/gi, '');
   let uit = bron.replace(body[0], bodyNieuw);
+  uit = uit.replace(/<script\b[^>]*src=["']\/shared\/rtg-world-desktop\.js["'][^>]*><\/script>\s*/gi, '');
+  uit = uit.replace(/<link\b[^>]*href=["']\/shared\/rtg-world-desktop\.css["'][^>]*>\s*/gi, '');
 
   const heritageLinks = uit.match(/<link\b[^>]*href=["']\/?shared\/rtg-heritage\.css(?:[?#][^"']*)?["'][^>]*>/gi) || [];
   if (heritageLinks.length > 1) throw new Error('Dubbel Heritage-blad in ' + route);
@@ -97,7 +102,7 @@ function gewenst(bestand, bron) {
     uit = verwijderLinkregel(uit, LINK);
   }
   if (!/<\/head>/i.test(uit)) throw new Error('Geen </head> in ' + route);
-  uit = uit.replace(/<\/head>/i, LINK + '\n</head>');
+  uit = uit.replace(/<\/head>/i, DESKTOP + '\n' + LINK + '\n</head>');
   return uit;
 }
 

@@ -1,0 +1,59 @@
+/* The world owns the entire UI palette, including Edge. No per-route skins.
+   Media, documents and native canvases retain their actual content colours. */
+body[data-rtg-skin="heritage"]{
+  --rtg-world-bg:#121210!important;--rtg-world-card:#1b1b18!important;
+  --rtg-world-card-strong:#252520!important;--rtg-world-ink:#f5f1e8!important;
+  --rtg-world-muted:#beb8ab!important;--rtg-world-line:#3e3c34!important;
+  --rtg-world-signature:#c9b47f!important;--rtg-world-metal:#c9b47f!important;
+  --rtg-world-action:#c9b47f!important;--rtg-world-action-ink:#211e18!important;
+  --rtg-world-schema:dark!important;
+}
+body[data-rtg-skin="heritage"][data-rtg-world="living"]:not([data-public-platform]){
+  --rtg-world-bg:#f4efe6!important;--rtg-world-card:#fffaf2!important;
+  --rtg-world-card-strong:#ebe2d3!important;--rtg-world-ink:#302b25!important;
+  --rtg-world-muted:#685d4f!important;--rtg-world-line:#d9ccba!important;
+  --rtg-world-signature:#89704b!important;--rtg-world-metal:#79613d!important;
+  --rtg-world-action:#79613d!important;--rtg-world-action-ink:#fffaf2!important;
+  --rtg-world-schema:light!important;
+  --rtg-status-ok:#246a47;--rtg-status-warn:#765300;--rtg-status-danger:#9b2c42;
+}
+body[data-rtg-skin="heritage"][data-rtg-world="work"]:not([data-public-platform]){
+  --rtg-world-bg:#141a1a!important;--rtg-world-card:#1c2524!important;
+  --rtg-world-card-strong:#263130!important;--rtg-world-ink:#eff3ee!important;
+  --rtg-world-muted:#b1c0b9!important;--rtg-world-line:#354b45!important;
+  --rtg-world-signature:#91b7a9!important;--rtg-world-metal:#91b7a9!important;
+  --rtg-world-action:#91b7a9!important;--rtg-world-action-ink:#14211d!important;
+}
+body[data-rtg-skin="heritage"][data-rtg-world="travel"]:not([data-public-platform]){
+  --rtg-world-bg:#21171b!important;--rtg-world-card:#2d2025!important;
+  --rtg-world-card-strong:#3b2b31!important;--rtg-world-ink:#f7efeb!important;
+  --rtg-world-muted:#cab8bb!important;--rtg-world-line:#503940!important;
+  --rtg-world-signature:#c4a0a6!important;--rtg-world-metal:#c9af92!important;
+  --rtg-world-action:#c4a0a6!important;--rtg-world-action-ink:#2b1920!important;
+}
+body[data-rtg-skin="heritage"][data-rtg-world="foundation"]:not([data-public-platform]){
+  --rtg-world-bg:#111c29!important;--rtg-world-card:#1b293a!important;
+  --rtg-world-card-strong:#26374b!important;--rtg-world-ink:#f3f1e9!important;
+  --rtg-world-muted:#b6c1cd!important;--rtg-world-line:#3b4d60!important;
+  --rtg-world-signature:#cbb681!important;--rtg-world-metal:#cbb681!important;
+  --rtg-world-action:#cbb681!important;--rtg-world-action-ink:#172335!important;
+}
+body[data-rtg-skin="heritage"][data-rtg-world][data-rtg-layout="standard"]{
+  --rtg-world-ground:var(--rtg-world-bg)!important;
+  --rtg-world-photo:none!important;--rtg-world-photo-mask:none!important;
+  --rtg-world-signature-soft:color-mix(in srgb,var(--rtg-world-signature) 8%,transparent)!important;
+  --rtg-depth-content:none!important;--rtg-depth-focus:none!important;
+  --wh-bg:var(--rtg-world-bg);--wh-ink:var(--rtg-world-ink);--wh-soft:var(--rtg-world-muted);
+  --wh-gold:var(--rtg-world-metal);--wh-line:var(--rtg-world-line);
+  --edge-bg:var(--rtg-world-bg)!important;--edge-panel:var(--rtg-world-card)!important;
+  --edge-copy:var(--rtg-world-ink)!important;--edge-dim:var(--rtg-world-muted)!important;
+  --edge-line:var(--rtg-world-line)!important;--edge-metal:var(--rtg-world-metal)!important;
+  --edge2-bg:var(--rtg-world-bg)!important;--edge2-panel:var(--rtg-world-card)!important;
+  --edge2-copy:var(--rtg-world-ink)!important;--edge2-dim:var(--rtg-world-muted)!important;
+  --edge2-line:var(--rtg-world-line)!important;--edge2-metal:var(--rtg-world-metal)!important;
+  --edge-bar-bg:var(--rtg-world-card)!important;--edge-bar-copy:var(--rtg-world-ink)!important;
+  --edge-bar-dim:var(--rtg-world-muted)!important;--edge-bar-line:var(--rtg-world-line)!important;
+  --edge-bar-accent:var(--rtg-world-metal)!important;--edge-bar-metal:var(--rtg-world-metal)!important;
+  background:var(--rtg-world-bg)!important;color:var(--rtg-world-ink)!important;
+  color-scheme:var(--rtg-world-schema)!important;
+}

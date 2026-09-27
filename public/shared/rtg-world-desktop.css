@@ -1,10 +1,8 @@
 /* Shared geometry, with the current world's heritage signature as a quiet accent. */
 .wd-shell{display:contents}
 .wd-people,.wd-favorites,.wd-library,.wd-greeting{display:none}
-body[data-rtg-desktop]{--wd-accent:var(--rtg-world-signature,var(--wh-gold));--wd-line:color-mix(in srgb,var(--wd-accent) 32%,#4b4133);--wd-surface:color-mix(in srgb,var(--wd-accent) 5%,#15130f)}
-body[data-rtg-desktop="living"]{--wh-ink:var(--rtg-world-ink,#ede7da);--wh-soft:var(--rtg-world-muted,#dcd7cb);--wh-line:var(--rtg-world-line,rgba(201,162,75,.18));--wh-gold:var(--rtg-world-metal,#c9a24b);--wh-bg:var(--rtg-world-bg,#030303);--wd-surface:color-mix(in srgb,var(--rtg-world-card,#121210) 94%,#050504)}
-body[data-rtg-desktop="foundation"]{--wh-ink:var(--rtg-world-ink,#f2f2ea);--wh-soft:var(--rtg-world-muted,#aebccc);--wh-line:var(--rtg-world-line,rgba(242,242,234,.17));--wh-gold:var(--rtg-world-metal,#d0b66e);--wh-bg:var(--rtg-world-bg,#071522);--wd-surface:color-mix(in srgb,var(--rtg-world-card,#0b2032) 92%,#050b10)}
-body[data-world-home] .wd-shell [hidden]{display:none!important}
+body[data-rtg-desktop]{--wd-accent:var(--rtg-world-signature);--wd-line:var(--rtg-world-line);--wd-surface:var(--rtg-world-card)}
+body[data-rtg-desktop] .wd-shell [hidden]{display:none!important}
 .wd-shell :is(button,a,input):focus-visible{outline:2px solid var(--wh-gold);outline-offset:4px}
 .wd-focus{min-width:0;border:1px solid var(--wd-line);border-radius:var(--rtg-radius-editorial);overflow:hidden;background:var(--wd-surface);scroll-margin-top:6rem}
 .wd-focus-head{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center;padding:1rem 1.4rem;border-bottom:1px solid var(--wd-line)}
@@ -15,15 +13,16 @@ body[data-world-home] .wd-shell [hidden]{display:none!important}
 .wd-announcement{grid-column:1/-1;line-height:1.6;padding:1rem;border:1px solid var(--wd-line);color:var(--wh-ink)}
 @media(min-width:1000px){
   body.rtg-stijl[data-rtg-desktop]{padding-inline:0!important}
+  body[data-rtg-layout="standard"][data-rtg-skin="heritage"][data-rtg-world][data-rtg-desktop]{--edge-top:64px!important;--edge-bottom:104px!important;margin:0!important;padding:64px 0 0!important;height:auto!important;min-height:100dvh;overflow:visible!important}
   body[data-rtg-desktop] .rtg-edge-side{display:none!important}
   body[data-rtg-desktop] .rtg-edge-crumbs,body[data-rtg-desktop] .rtg-edge-worldbar{display:none!important}
-  body[data-rtg-desktop] .rtg-edge-top{display:flex;align-items:center;padding-inline:1.6rem!important;min-height:4rem}
+  body[data-rtg-desktop] .rtg-edge-top{display:flex;align-items:center;padding-inline:40px!important;height:64px;min-height:64px}
   body[data-rtg-desktop] .rtg-edge-mark{display:flex;align-items:center;flex:0 0 auto;border:0;font-size:2.25rem;color:var(--wh-gold)!important}
   body[data-rtg-desktop] .rtg-edge-state{margin-inline-start:auto}
   body[data-rtg-desktop] .rtg-edge-mark::after{font:400 1rem/1.2 Inter,sans-serif}
   body[data-rtg-desktop] .reisapp{max-width:none!important;width:auto!important;padding-inline:0!important}
-  body[data-rtg-desktop] .wd-shell{display:grid;grid-template-columns:minmax(190px,230px) minmax(0,1fr) minmax(220px,280px);align-items:start;gap:clamp(1rem,2vw,2rem);max-width:1680px;width:calc(100% - 3rem);margin:2rem auto 10rem;padding:0;isolation:isolate}
-  body[data-rtg-desktop] .wd-home,body[data-rtg-desktop] main.wd-home#inhoud,body[data-rtg-desktop] main.wd-home#hoofd,body[data-rtg-desktop] main.wd-home#main{grid-column:2;min-width:0;width:100%;max-width:none!important;max-height:min(44rem,calc(100dvh - 15rem));margin:0!important;padding:0 .2rem .2rem!important;overflow:auto!important;box-sizing:border-box;scrollbar-width:thin;scrollbar-color:var(--wd-line) transparent}
+  body[data-rtg-desktop] .wd-shell{display:grid;grid-template-columns:216px minmax(0,1fr) 280px;align-items:start;gap:24px;max-width:1840px;width:calc(100% - 80px);margin:24px auto 120px;padding:0;isolation:isolate}
+  body[data-rtg-desktop] .wd-home,body[data-rtg-desktop] main.wd-home#inhoud,body[data-rtg-desktop] main.wd-home#hoofd,body[data-rtg-desktop] main.wd-home#main{grid-column:2;min-width:0;width:100%;max-width:none!important;max-height:none;margin:0!important;padding:0 .2rem .2rem!important;overflow:visible!important;box-sizing:border-box;scrollbar-width:thin;scrollbar-color:var(--wd-line) transparent}
   body[data-rtg-desktop] .living-example-photo>img{height:clamp(360px,31vw,460px);aspect-ratio:auto}
   body[data-rtg-desktop] .living-intro .momenten{padding-block:.5rem 1rem}
   body[data-rtg-desktop] .living-intro .moment i{width:3.5rem;height:3.5rem}
@@ -58,7 +57,7 @@ body[data-world-home] .wd-shell [hidden]{display:none!important}
   body[data-rtg-desktop="foundation"] .wd-home .onthaal-kies{margin-top:1.5rem;border:1px solid var(--wd-line);background:var(--wd-surface)}
   body[data-rtg-desktop="foundation"] .wd-home .tweeluik{grid-template-columns:minmax(0,1fr)}
   /* Side panels belong to the story row and scroll away before the full-width library. */
-  body[data-rtg-desktop] .wd-people,body[data-rtg-desktop] .wd-favorites{display:block;position:relative;min-width:0;max-height:calc(100dvh - 15rem);overflow:auto;scrollbar-width:thin;scrollbar-color:var(--wd-line) transparent}
+  body[data-rtg-desktop] .wd-people,body[data-rtg-desktop] .wd-favorites{display:block;position:relative;min-width:0;max-height:none;overflow:visible;scrollbar-width:thin;scrollbar-color:var(--wd-line) transparent}
   body[data-rtg-desktop] .wd-people{grid-column:1;grid-row:2;background:var(--wd-surface);border:1px solid var(--wd-line);border-radius:var(--rtg-radius-editorial);padding:1.15rem}
   .wd-people .rtg-ss-module-head h3{font:400 1.8rem/1.2 "Bodoni Moda",serif;color:var(--wh-ink);margin:0 0 1.2rem}
   .wd-people .rtg-module-head-tools{display:none}
@@ -66,9 +65,9 @@ body[data-world-home] .wd-shell [hidden]{display:none!important}
   .wd-shell .wd-muted{color:var(--wh-soft);font:400 .76rem/1.6 Inter,sans-serif;overflow-wrap:anywhere}
   .wd-person{display:flex;align-items:flex-start;gap:.65rem;padding:1rem 0;border-bottom:1px solid var(--wd-line);color:var(--wh-ink);text-decoration:none;font:400 .82rem/1.5 Inter,sans-serif;overflow-wrap:anywhere}
   .wd-person strong,.wd-person span.wd-muted{display:block}
-  .wd-avatar{display:grid;place-items:center;flex:0 0 2.2rem;width:2.2rem;height:2.2rem;border-radius:50%;border:1px solid var(--wd-line);background:color-mix(in srgb,var(--wd-accent) 22%,#32251b);color:var(--wh-gold)}
+  .wd-avatar{display:grid;place-items:center;flex:0 0 2.2rem;width:2.2rem;height:2.2rem;border-radius:50%;border:1px solid var(--wd-line);background:var(--rtg-world-card-strong);color:var(--wh-gold)}
   .wd-favorites{grid-column:3;grid-row:2}
-  .wd-greeting{display:grid;grid-template-columns:1fr auto;grid-column:1/-1;gap:.25rem 1rem;border-bottom:1px solid var(--wd-line);padding-bottom:1.1rem}
+  .wd-greeting{display:grid;grid-template-columns:1fr auto;grid-column:1/-1;gap:.25rem 1rem;border-bottom:1px solid var(--wd-line);min-height:64px;padding-bottom:16px}
   .wd-greeting h1{font:400 1.45rem/1.3 "Bodoni Moda",serif;color:var(--wh-ink);margin:0;letter-spacing:0;text-transform:none}
   .wd-greeting time{font:400 .73rem/1.5 Inter,sans-serif;color:var(--wh-soft);grid-column:1}
   .wd-greeting p{font:400 .7rem/1.5 Inter,sans-serif;color:var(--wh-gold);grid-column:2;grid-row:1/3;align-self:center;margin:0}
@@ -83,7 +82,7 @@ body[data-world-home] .wd-shell [hidden]{display:none!important}
   .wd-widget-parts{display:grid;gap:.7rem;min-height:3.8rem;align-content:start}
   .wd-widget-parts>span{display:flex;align-items:center;gap:.65rem;overflow-wrap:anywhere}
   .wd-widget-foot{display:block;border-top:1px solid var(--wd-line);padding-top:.7rem;margin-top:1rem;font-size:.68rem;color:var(--wh-soft)}
-  .wd-shell .wd-widget-pin{background:transparent;color:var(--wh-soft);font:400 .66rem/1.4 Inter,sans-serif;border:0;min-height:36px;padding:.5rem 1rem;text-align:start;width:100%;cursor:pointer;border-radius:0}
+  .wd-shell .wd-widget-pin{position:absolute;top:8px;inset-inline-end:8px;background:transparent!important;color:var(--wh-soft);font-size:0!important;border:0;min-height:44px!important;min-width:44px!important;padding:0!important;text-align:center;width:44px!important;cursor:pointer;border-radius:0;box-shadow:none!important}
   .wd-widget-pin[aria-pressed="true"]{color:var(--wh-gold)}
   .wd-library{display:block;grid-column:1/-1;border-top:1px solid var(--wd-line);padding-top:1.6rem;scroll-margin-top:6rem}
   .wd-library-heading{display:flex;justify-content:space-between;gap:2rem;align-items:center;margin-bottom:1.5rem}
@@ -94,6 +93,24 @@ body[data-world-home] .wd-shell [hidden]{display:none!important}
   .wd-pages{display:flex;justify-content:center;align-items:center;gap:1rem;color:var(--wh-soft);font:400 .75rem/1.5 Inter,sans-serif}
   .wd-pages button{background:transparent;border:1px solid var(--wd-line);color:var(--wh-ink);border-radius:var(--rtg-radius-editorial);padding:.65rem .9rem;min-height:44px;cursor:pointer}
   .wd-pages button:disabled{opacity:.45;cursor:default}
-  .wd-expanded .wd-focus{grid-column:2/4;grid-row:2}
+  .wd-expanded .wd-focus{grid-column:2;grid-row:2}
+}
+/* Function screens keep their real DOM inside the same middle column. Fixed
+   camera/editor tools are contained by that column, not by the viewport. */
+@media(min-width:1000px){
+  .wd-page{position:relative;contain:layout;min-height:560px;isolation:isolate}
+  body[data-rtg-desktop] .wd-page :is(main,[data-rtg-screen-root],.wrap,.shell,.schil){width:100%!important;max-width:none!important;margin:0!important;padding:0!important;min-height:0!important}
+  body[data-rtg-desktop] .wd-page>[data-rtg-screen-root],body[data-rtg-desktop] .wd-page>main{position:relative!important;inset:auto!important;height:auto!important;overflow:visible!important}
+  body[data-rtg-desktop] .wd-page>[data-rtg-screen-root="immersive"]{min-height:560px!important}
+  body[data-rtg-desktop] .wd-page>header{position:relative!important;inset:auto!important;max-width:100%;margin-bottom:16px}
+  body[data-rtg-desktop] .wd-page[data-rtg-canvas-surface]{height:max(560px,calc(100dvh - 240px));overflow:hidden!important}
+  body[data-rtg-desktop] .wd-page[data-rtg-canvas-surface]>[data-rtg-screen-root="immersive"]{height:100%!important}
+  body[data-rtg-desktop] .wd-page :is(.saloon-shell,.saloon-feed-layout){max-width:100%;grid-template-columns:minmax(0,1fr)}
+  body[data-rtg-desktop] .wd-home{grid-row:2}
+  body[data-rtg-desktop] .rtg-adaptive-edge:not([data-rtg-adaptive-state="peek"]){bottom:20px!important;width:min(600px,calc(100% - 40px))!important;height:64px!important;left:50%!important}
+  body[data-rtg-desktop] .rtg-adaptive-bar{inset:0!important}
+}
+@media(min-width:1000px) and (max-width:1199px){
+  body[data-rtg-desktop] .wd-shell{grid-template-columns:176px minmax(0,1fr) 232px;width:calc(100% - 48px);gap:20px}
 }
 @media(prefers-reduced-motion:reduce){.wd-shell *{transition:none!important;scroll-behavior:auto!important}}

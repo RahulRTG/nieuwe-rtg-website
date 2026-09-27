@@ -32,8 +32,8 @@
    detail.replaceChildren();
    if(content.parentNode){var marker=d.createComment('public-content:'+id);content.before(marker);moved={el:content,marker:marker};}
    detail.append(content);current=id;focusTitle.textContent=copy(titleKey);focusTitle.dataset.i18n='public.'+titleKey;focusTitle.dataset.i18nSource=(D.words[titleKey]||[titleKey])[0];
-   focus.hidden=false;home.hidden=true;favorites.hidden=true;library.hidden=true;root.classList.add('wd-expanded');saveHash();
-   if(w.RTGAdaptiveEdge)w.RTGAdaptiveEdge.setState('dock');focus.scrollIntoView({block:'start',behavior:'instant'});focusTitle.focus({preventScroll:true});o.detailChanged&&o.detailChanged(id);
+   focus.hidden=false;home.hidden=true;favorites.hidden=false;library.hidden=false;root.classList.add('wd-expanded');saveHash();
+   if(w.RTGAdaptiveEdge)w.RTGAdaptiveEdge.setState('dock');w.scrollTo({top:0,behavior:'instant'});focusTitle.focus({preventScroll:true});o.detailChanged&&o.detailChanged(id);
   }
   function menu(){w.RTGAdaptiveEdge.openPanel(menuPanel,{title:copy(company?'company':'app')});}
   function worlds(){w.RTGAdaptiveEdge.openPanel(worldPanel,{title:copy('worlds')});}

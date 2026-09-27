@@ -241,8 +241,8 @@ meter er staat.
 | 3 | Toestelcel en echte toestelmeting | **staat** (par. 10) |
 | 4 | Toestelrekenaar met twee uitvoerders (eigen WASM, ONNX Runtime) | **staat** voor WASM (par. 10); WebGPU is hier niet te meten, het browsermodel en WebNN een stap weg |
 | 5 | Modelmanifest, hashes, licentiegrendel, OPFS-beheer | **staat** (par. 10); terugrollen naar een vorige versie een stap weg |
-| 6 | `spraak.naartekst` op het toestel, gemeten op echte telefoons | **staat** als keten, gemeten in Chromium (par. 11); telefoons, een proefset en een bron die we mogen ondertekenen zijn een stap weg; vult SERVICE.md par. 13d zonder `LOCAL_AI_URL` |
-| 7 | `tekst.vector` over de Toestelkluis | **staat** als keten, gemeten in Chromium (par. 12); een meertalig model, een proefset en de kluis zelf zijn een stap weg |
+| 6 | `spraak.naartekst` op het toestel, gemeten op echte telefoons | **staat** als keten, gemeten in Chromium (par. 11), met een lusrem en een Nederlandse proefset (par. 13); een model dat Nederlands aankan, opnamen van mensen, telefoons en een bron die we mogen ondertekenen zijn een stap weg; vult SERVICE.md par. 13d zonder `LOCAL_AI_URL` |
+| 7 | `tekst.vector` over de Toestelkluis | **staat** als keten, gemeten in Chromium (par. 12), met een Nederlandse zoekproefset (par. 13) en een index in de Toestelkluis (par. 14); een meertalig model is een stap weg en wacht op het netwerk |
 | 8 | Samenvatten en herschrijven | een stap weg; het browsermodel als eerste trede |
 | 9 | Een kleine algemene LLM | jaren weg op een telefoon, dichterbij op een laptop; te meten, niet te schatten |
 | 10 | Verschuiving meten in de kostenlaag | een stap weg na 6 |
@@ -692,5 +692,105 @@ is -- niet dat hij van de bron komt).
   artefact, en de tokenizer is dan geen WordPiece maar SentencePiece.
 - **Zoekkwaliteit.** Gelijk zijn aan een referentie is geen kwaliteit. Dat
   vraagt een proefset met relevantie-oordelen (par. 9.2).
-- **De Toestelkluis.** Waar de vectoren blijven (OPFS, versleuteld, met de
-  vingerafdruk ernaast) en wat een lid ermee doorzoekt, is nog niet gebouwd.
+- **De Toestelkluis.** Staat sinds par. 14, als index NAAST de bestaande
+  kluis en niet als tweede kluis.
+
+## 13. Gemeten in het Nederlands (27 september 2026)
+
+De tekortkomingen van par. 11.2 en 12.3 zijn waar het kon GEMETEN in plaats van
+beschreven. Waar een meting er niet komt, staat waarom.
+
+### 13.1 Spraak: een Nederlandse proefset, en een lusrem die er zonder hem niet was
+
+`test/fixtures/proefset-spraak-nl.json` heeft twaalf zinnen uit het dagelijks
+gebruik; `scripts/spraakset.js` maakt er opnamen van met espeak-ng, en
+`scripts/spraakproef.js` met `RTG_SPRAAK_SET` telt de woordfout over de hele set
+(alle fouten gedeeld door alle woorden) en per zin.
+
+| Set | Woordfout whisper-tiny | Lussen |
+|---|---|---|
+| Nederlands, synthetische stem, zonder lusrem | 3,01 (340 fouten op 113 woorden) | 2, tot het plafond |
+| Nederlands, synthetische stem, met lusrem | **0,885** | 2, gestopt en gemeld |
+| Engels, DEZELFDE synthetische stem, dezelfde zinnen | 0,578 | 0 |
+| Engels, echte stem (JFK, par. 11) | 0,000 | 0 |
+
+Drie dingen die de meting laat zien:
+
+- **Een echte fout in onze uitvoerder.** Op twee zinnen schoot het model in een
+  lus ("een beetje een beetje ...") en rekende door tot het plafond: 45 s werk
+  voor een tekst die er vol uitzag. De cel stopt nu als het staartstuk van 1 tot
+  12 tokens zich vier keer herhaalt, laat een exemplaar staan en zegt
+  `herhaling: true` (`public/shared/toestel/cel.js`; `test/toestel-spraak.test.js`
+  toets 7 op de ECHTE cel.js, twee mutaties zakken). Drie keer mag wel: "ja ja ja"
+  is geen lus.
+- **De synthetische stem is zelf een slecht instrument.** Dezelfde robotstem gaf
+  in het Engels 58% woordfout waar een echte stem 0% gaf. Deze set meet dus model
+  plus stem, en zegt niet hoe goed een lid wordt verstaan. De uitslag draagt dat
+  voorbehoud in de tekst.
+- **Maar het verschil staat.** Met dezelfde stem is Nederlands 88,5% tegen
+  Engels 58%. whisper-tiny is te zwak voor Nederlands, en dat is nu een getal en
+  geen vermoeden. De weg is een groter Whisper (base of small, ook MIT) door
+  dezelfde machine -- een ander artefact, geen andere code -- en opnamen van
+  mensen in plaats van espeak.
+
+### 13.2 Zoeken: een Nederlandse proefset, met een woordtelling ernaast
+
+`test/fixtures/proefset-zoeken-nl.json` heeft twaalf notities en achttien vragen,
+elk met een soort: `letterlijk` (deelt woorden met het antwoord), `omschrijving`
+(zegt hetzelfde met andere woorden) en `andere-taal` (vraagt in het Engels).
+`scripts/vectorproef.js` met `RTG_VECTOR_SET` telt treffer@1, treffer@3 en MRR
+per soort (`scripts/lib/zoekmaat.js`, getoetst in `test/zoekmaat.test.js` met
+vier mutaties), naast BM25 zonder model op dezelfde normalisering.
+
+| Soort | all-MiniLM-L6-v2 (t@1 / t@3 / MRR) | BM25, geen model | Samen (RRF) |
+|---|---|---|---|
+| letterlijk (6) | 0,83 / 1,00 / 0,92 | **1,00** / 1,00 / 1,00 | 1,00 / 1,00 / 1,00 |
+| omschrijving (8) | **0,38** / 0,63 / 0,54 | 0,13 / 0,50 / 0,37 | 0,38 / 0,63 / 0,56 |
+| andere taal (4) | **0,50** / 0,50 / 0,55 | 0,25 / 0,25 / 0,33 | 0,00 / 0,25 / 0,25 |
+| alles (18) | **0,56** / 0,72 / 0,67 | 0,44 / 0,61 / 0,57 | 0,50 / 0,67 / 0,64 |
+
+- **Het model verdient zijn plek op omschrijvingen** (0,38 tegen 0,13), en daar
+  is het ook voor. Op letterlijke vragen verliest het van een woordtelling.
+- **Samenvoegen is gemeten en NIET overgenomen.** Reciprocal rank fusion (geen
+  gewicht om af te stellen, met opzet) wint op letterlijk en zakt op andere taal
+  naar nul; over alles is hij slechter dan het model alleen. Een gewicht dat het
+  wel zou laten winnen, zou op deze achttien vragen zijn afgesteld en daarna op
+  deze achttien vragen worden geprezen.
+- **0,38 is te laag voor een lid.** De vraag "wat mag ik niet eten" vindt de
+  allergie niet. Dat is het Engelse model op Nederlandse tekst (par. 12.3), en
+  het tweede getal dat op een meertalig model wacht.
+
+### 13.3 Wat hier niet kon, en waarom
+
+Een meertalig vectormodel (multilingual-e5-small, paraphrase-multilingual) en een
+groter Whisper staan op Hugging Face, en het netwerkbeleid van deze omgeving
+weigert `huggingface.co` (403). npm en PyPI hebben ze niet als pakket. Zodra de
+host is toegestaan, draaien dezelfde twee proefsets met het andere artefact; de
+enige code die er dan bij moet, is een SentencePiece-tokenizer voor de meertalige
+modellen -- en die wordt pas geschreven als er een referentie naast kan, zoals
+bij WordPiece (par. 12).
+
+## 14. De zoekindex van de Toestelkluis (27 september 2026)
+
+De kluis bestond al (`public/shared/toestelkluis.js`, par. 1); er komt geen
+tweede. `public/shared/toestel/kluisindex.js` legt er een INDEX naast die per
+document een vector bewaart en naar het document verwijst op naam.
+
+| Regel | Bewijs (`test/toestel-kluisindex.e2e.js`, Chromium) |
+|---|---|
+| Een index per vingerafdruk; een vraag van een ander model wordt geweigerd met de reden | stap `vingerafdruk`, "moet opnieuw worden berekend" |
+| Een index heeft een vorm; een vector van een andere lengte gaat er niet in | weigering met beide lengtes |
+| De kluis is de waarheid: een gewist document valt weg en wordt geteld (`weg`), een document zonder vector ook (`zonderVector`) | beide geteld |
+| Vergeten is echt vergeten, in ELKE index | `vergeet()` haalt de vector overal weg; het document blijft |
+
+Vijf mutaties, alle vijf zakken. Twee dingen die met opzet zo zijn:
+
+- **Geen aparte versleuteling.** Een vector is zo gevoelig als zijn tekst (hij is
+  deels terug te rekenen) en staat daarom onder dezelfde bescherming als het
+  document: OPFS van deze origin, niet over de lijn. Apart versleutelen met een
+  sleutel die dezelfde pagina kan gebruiken zou schijn zijn, zolang de documenten
+  zelf dat niet zijn. Wordt de kluis versleuteld (`toestelsleutel.js` staat er al
+  voor), dan gaat de index mee.
+- **Nog geen scherm.** De index werkt en is bewezen; de knop "zoek in mijn
+  kluis" komt als er een model is dat Nederlands aankan en dat we mogen
+  ondertekenen. Nu zou hij 0,38 halen op de vragen waar hij voor is.

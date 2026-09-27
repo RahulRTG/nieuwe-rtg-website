@@ -31,6 +31,25 @@
     return ort;
   }
 
+  /* Een model dat in een lus schiet ("een beetje een beetje een beetje ...")
+     rekent anders door tot het plafond, en levert een tekst die er vol uitziet.
+     Herhaalt het staartstuk van n tokens (n = 1..12) zich VIER keer achter
+     elkaar, dan stopt het decoderen: er blijft een exemplaar staan en de uitslag
+     draagt `herhaling`, zodat een scherm kan zeggen dat de herkenning vastliep.
+     Nooit stil afknippen. Gemeten aanleiding: TOESTEL.md par. 13. */
+  var HERHAAL = 4;
+  function herhaalt(t) {
+    for (var n = 1; n <= 12 && n * HERHAAL <= t.length; n++) {
+      var ok = true;
+      for (var k = 1; k < HERHAAL && ok; k++) {
+        for (var i = 0; i < n; i++) if (t[t.length - 1 - i] !== t[t.length - 1 - i - k * n]) { ok = false; break; }
+      }
+      if (ok) return n;
+    }
+    return 0;
+  }
+  self.RTGCelHerhaalt = herhaalt; // alleen zichtbaar binnen de cel zelf, en voor de toets
+
   var UITVOERDERS = {
     'wasm-proef': async function (a, invoer) {
       var m = await WebAssembly.instantiate(a.module);
@@ -96,8 +115,10 @@
         });
         if (beste === invoer.eot) break;
         ids.push(beste); uit.push(beste);
+        var lus = herhaalt(uit);
+        if (lus) { uit.length -= lus * (HERHAAL - 1); return { tokens: uit, afgekapt: false, herhaling: true }; }
       }
-      return { tokens: uit, afgekapt: uit.length >= max };
+      return { tokens: uit, afgekapt: uit.length >= max, herhaling: false };
     }
   };
 

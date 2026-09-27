@@ -90,3 +90,23 @@ test('6. de taal komt uit het tokenbestand, en een onbekende taal is een weigeri
   assert.deepEqual(S.prompt(sp, 'nl'), [50258, 50271, 50359, 50363]);
   assert.throws(() => S.prompt(sp, 'xx'), /kent de taal xx niet/);
 });
+
+test('7. de cel stopt een lus en zegt het, en knipt geen gewone herhaling af', () => {
+  /* De ECHTE cel.js, in een vm zonder browser: alleen zijn lusdetector wordt
+     aangeroepen. Aanleiding: whisper-tiny schoot op de Nederlandse proefset twee
+     keer in een lus tot het plafond (TOESTEL.md par. 13). */
+  const vm = require('vm');
+  const bron = require('fs').readFileSync(require('path').join(__dirname, '..', 'public', 'shared', 'toestel', 'cel.js'), 'utf8');
+  const ctx = { parent: { postMessage() {} }, addEventListener() {}, performance: { now: () => 0 } };
+  ctx.self = ctx;
+  vm.runInNewContext(bron, ctx);
+  const h = ctx.RTGCelHerhaalt;
+  assert.equal(typeof h, 'function');
+  assert.equal(h([5, 7, 8, 7, 8, 7, 8, 7, 8]), 2, 'vier keer hetzelfde paar is een lus van twee');
+  assert.equal(h([5, 7, 8, 7, 8, 7, 8]), 0, 'drie keer is nog geen lus');
+  assert.equal(h([1, 1, 1]), 0, '"ja ja ja" mag blijven staan');
+  assert.equal(h([9, 1, 1, 1, 1]), 1);
+  assert.equal(h([1, 2, 3, 4, 5, 6]), 0);
+  const blok = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22];
+  assert.equal(h([0].concat(blok, blok, blok, blok)), 12, 'ook een lange zin die rondgaat');
+});

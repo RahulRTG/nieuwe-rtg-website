@@ -11,6 +11,15 @@
                                                    deze code (optioneel)
      node scripts/vectorproef.js
 
+   Of een ZOEKPROEFSET (par. 13):
+     RTG_VECTOR_SET=test/fixtures/proefset-zoeken-nl.json
+   Dan worden notities en vragen in de browser vectoren, en telt de uitslag
+   treffer@1, treffer@3 en MRR per soort vraag -- naast dezelfde maat voor een
+   woordtelling zonder model (BM25, scripts/lib/zoekmaat.js). Die twee worden
+   nooit opgeteld tot een cijfer: het verschil tussen hen IS de uitslag. De
+   derde kolom `samen` is een GECOMBINEERDE rangorde (reciprocal rank fusion),
+   een zoekmethode en geen gemiddelde van de twee maten.
+
    De weg is die van een lid: artefacten naar OPFS, grendel (met een
    wegwerpsleutel), tokens in de pagina, rekenen in de afgesloten cel met de
    ALGEMENE uitvoerder `onnx`, middelen in de pagina. De uitslag noemt per zin de
@@ -34,7 +43,9 @@ if (mist.length) nietGemeten('ontbreekt: ' + mist.join(', ') + ' (zet RTG_ORT_DI
 const pw = laadPlaywright();
 if (geenBrowser(pw)) nietGemeten(geenBrowser(pw));
 const ref = REF ? JSON.parse(fs.readFileSync(REF, 'utf8')) : null;
-const ZINNEN = ref ? ref.zinnen : ['De hond rent door het park.', 'A dog is running through the park.', 'Mijn vlucht is verzet.'];
+const SET = process.env.RTG_VECTOR_SET ? JSON.parse(fs.readFileSync(process.env.RTG_VECTOR_SET, 'utf8')) : null;
+const ZINNEN = SET ? SET.notities.map((n) => n.tekst).concat(SET.vragen.map((v) => v.vraag))
+  : ref ? ref.zinnen : ['De hond rent door het park.', 'A dog is running through the park.', 'Mijn vlucht is verzet.'];
 
 (async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-vectorproef-'));
@@ -85,6 +96,20 @@ const ZINNEN = ref ? ref.zinnen : ['De hond rent door het park.', 'A dog is runn
       return r;
     }, { regels, sleutels: [{ id: s.id, publiek: s.publiek, stand: 'actief' }], zinnen: ZINNEN });
     const cos = (a, b) => a.reduce((t, x, i) => t + x * b[i], 0);
+    if (SET && uit.ok) {
+      const Z = require('./lib/zoekmaat');
+      const N = SET.notities.length, notV = uit.vectoren.slice(0, N), vraagV = uit.vectoren.slice(N);
+      const rv = vraagV.map((q) => Z.rangorde(SET.notities, (i) => cos(q, notV[i])));
+      const s25 = Z.bm25(SET.notities);
+      const rb = SET.vragen.map((v) => Z.rangorde(SET.notities, (i) => s25(v.vraag, i)));
+      const vec = Z.maat(SET.vragen, rv), bm = Z.maat(SET.vragen, rb);
+      const samen = Z.maat(SET.vragen, rv.map((r, i) => Z.samen([r, rb[i]])));
+      console.log(JSON.stringify({ gemeten: new Date().toISOString(), ok: true, taal: SET.taal,
+        notities: N, vragen: SET.vragen.length, model: 'vectoren via ' + ML, vingerafdruk: uit.vingerafdruk,
+        vector: vec, basislijnZonderModel: bm, samen: samen, rekenMs: uit.herkomst.rekenMs,
+        voorbehoud: 'de relevantie-oordelen zijn van de bouwer en niet van leden; achttien vragen zijn een richting, geen maat met een foutmarge' }, null, 2));
+      return;
+    }
     const tegenRef = uit.ok && ref ? uit.vectoren.map((v, i) => +cos(v, ref.vectoren[i]).toFixed(5)) : null;
     const laagste = tegenRef ? Math.min(...tegenRef) : null;
     console.log(JSON.stringify({ gemeten: new Date().toISOString(), ok: uit.ok, stap: uit.stap || null, reden: uit.reden || null,

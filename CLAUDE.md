@@ -2430,7 +2430,14 @@ vond twee regels: in een BATCH hangt de vector van een tekst af van zijn buren
 (het gekwantiseerde model schaalt over de hele invoer), dus elke tekst krijgt
 een eigen run; en twee runtimes geven op dezelfde bytes een andere vector
 (cosinus 0,993), dus een vector draagt een VINGERAFDRUK en wordt alleen naast
-een vector met dezelfde vingerafdruk gelegd.
+een vector met dezelfde vingerafdruk gelegd. **In het Nederlands is gemeten**
+(par. 13): whisper-tiny haalt 88,5% woordfout op een Nederlandse set tegen 58% in
+het Engels met dezelfde synthetische stem, en de meting vond een lus die tot het
+plafond doorrekende -- de cel stopt nu en meldt `herhaling`. Zoeken met MiniLM
+wint op omschrijvingen van een woordtelling (0,38 tegen 0,13 treffer@1) en
+verliest op letterlijke vragen; samenvoegen (RRF) is gemeten en niet overgenomen.
+De zoekindex hangt NAAST de bestaande Toestelkluis (par. 14), een index per
+vingerafdruk, en de kluis blijft de waarheid.
 
 **`MACHINE.md` is de laag die de motoren aan elkaar riemt** -- RTG Execution
 Physics (de uitvoeringskant van hetzelfde voorstel waarvan RUNTIME.md de

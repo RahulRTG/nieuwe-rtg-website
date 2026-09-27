@@ -13,6 +13,13 @@
      RTG_SPRAAK_TAAL=en                          (standaard en)
      node scripts/spraakproef.js
 
+   Of een hele SET in plaats van een opname (par. 13):
+     RTG_SPRAAK_SET=<set.json van scripts/spraakset.js>
+   Dan telt de uitslag de woordfout per zin en over de hele set (alle fouten
+   gedeeld door alle woorden, niet het gemiddelde van de zinnen), en zegt hij of
+   de stem synthetisch was. Getallen worden NIET genormaliseerd: "tien" tegen
+   "10" telt als fout, en dat staat erbij.
+
    De weg is die van een lid: artefacten naar OPFS, grendel (met een
    wegwerpsleutel), spectrogram in de pagina, rekenen in de afgesloten cel,
    tekst terug in de pagina. De uitslag noemt de woordfoutratio tegen de
@@ -35,12 +42,15 @@ const BESTANDEN = {
 };
 const mist = Object.entries(BESTANDEN).filter(([, p]) => !p || !fs.existsSync(p)).map(([r]) => r);
 if (mist.length) nietGemeten('ontbreekt: ' + mist.join(', ') + ' (zet RTG_ORT_DIR en RTG_WHISPER_DIR).');
-if (!WAV || !fs.existsSync(WAV)) nietGemeten('zet RTG_SPRAAK_WAV op een 16-bit PCM WAV-opname.');
+const SET = process.env.RTG_SPRAAK_SET ? JSON.parse(fs.readFileSync(process.env.RTG_SPRAAK_SET, 'utf8')) : null;
+if (!SET && (!WAV || !fs.existsSync(WAV))) nietGemeten('zet RTG_SPRAAK_WAV op een 16-bit PCM WAV-opname, of RTG_SPRAAK_SET op een set.');
+const OPNAMEN = SET ? SET.items.map((it) => ({ wav: it.wav, tekst: it.tekst }))
+  : [{ wav: WAV, tekst: process.env.RTG_SPRAAK_VERWACHT || null }];
 const pw = laadPlaywright();
 if (geenBrowser(pw)) nietGemeten(geenBrowser(pw));
 
 const woorden = (t) => String(t || '').toLowerCase().replace(/[^\p{L}\p{N}' ]+/gu, ' ').split(/\s+/).filter(Boolean);
-function woordfout(verwacht, gehoord) {
+function fouten(verwacht, gehoord) {
   const a = woorden(verwacht), b = woorden(gehoord);
   let vorig = b.map((_, j) => j + 1); vorig.unshift(0);
   for (let i = 1; i <= a.length; i++) {
@@ -48,8 +58,9 @@ function woordfout(verwacht, gehoord) {
     for (let j = 1; j <= b.length; j++) rij[j] = Math.min(vorig[j] + 1, rij[j - 1] + 1, vorig[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
     vorig = rij;
   }
-  return a.length ? vorig[b.length] / a.length : null;
+  return { fouten: vorig[b.length], woorden: a.length };
 }
+function woordfout(verwacht, gehoord) { const f = fouten(verwacht, gehoord); return f.woorden ? f.fouten / f.woorden : null; }
 
 (async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-spraakproef-'));
@@ -74,7 +85,7 @@ function woordfout(verwacht, gehoord) {
     await page.goto(srv.base + '/site/404.html');
     for (const m of ['licenties', 'manifest', 'poorten', 'meting', 'opslag', 'rekenaar', 'spraak', 'spraakvoer'])
       await page.addScriptTag({ url: '/shared/toestel/' + m + '.js' });
-    const uit = await page.evaluate(async ({ regels, sleutels, wav, taal }) => {
+    const uit = await page.evaluate(async ({ regels, sleutels, wavs, taal }) => {
       const O = window.RTGToestelOpslag, art = {};
       for (const rol of Object.keys(regels)) {
         const h = await O.haal(regels[rol], { doorLid: true, mobielBevestigd: true });
@@ -88,25 +99,43 @@ function woordfout(verwacht, gehoord) {
         uitvoerder: 'whisper', beschikbaar: feiten.wasm, kwaliteit: { woordfout: { waarde: 0, graad: 'vermoed' } }, kosten: 0 }],
       { beleid: { 'spraak.naartekst': true } });
       if (!keus.gekozen) return { ok: false, stap: 'poorten', reden: keus.reden };
-      const S = window.RTGToestelSpraak, geluid = S.wav(Uint8Array.from(atob(wav), (x) => x.charCodeAt(0)));
-      const t0 = performance.now();
-      const r = await window.RTGToestelSpraakVoer.naarTekst({ contract: c, kandidaat: keus.gekozen, artefacten: art,
-        sleutels, monsters: geluid.monsters, hz: geluid.hz, taal });
-      r.totaalMs = Math.round(performance.now() - t0);
-      r.seconden = geluid.monsters.length / geluid.hz;
-      r.feiten = { webgpu: feiten.webgpu, wasmSimd: feiten.wasmSimd, geheugenGb: feiten.geheugenGb };
-      return r;
+      const S = window.RTGToestelSpraak, rs = [];
+      for (const wav of wavs) {
+        const geluid = S.wav(Uint8Array.from(atob(wav), (x) => x.charCodeAt(0)));
+        const t0 = performance.now();
+        const r = await window.RTGToestelSpraakVoer.naarTekst({ contract: c, kandidaat: keus.gekozen, artefacten: art,
+          sleutels, monsters: geluid.monsters, hz: geluid.hz, taal });
+        if (!r.ok) return r;
+        rs.push({ tekst: r.tekst, herhaling: r.herhaling, rekenMs: r.herkomst.rekenMs, totaalMs: Math.round(performance.now() - t0),
+          seconden: geluid.monsters.length / geluid.hz, herkomst: r.herkomst });
+      }
+      return { ok: true, rs, feiten: { webgpu: feiten.webgpu, wasmSimd: feiten.wasmSimd, geheugenGb: feiten.geheugenGb } };
     }, { regels, sleutels: [{ id: s.id, publiek: s.publiek, stand: 'actief' }],
-      wav: fs.readFileSync(WAV).toString('base64'), taal: process.env.RTG_SPRAAK_TAAL || 'en' });
-    const verwacht = process.env.RTG_SPRAAK_VERWACHT || null;
-    const wer = uit.ok && verwacht ? woordfout(verwacht, uit.tekst) : null;
-    console.log(JSON.stringify({ gemeten: new Date().toISOString(), ok: uit.ok, stap: uit.stap || null, reden: uit.reden || null,
-      tekst: uit.tekst || null, verwacht, woordfout: wer, opnameSeconden: uit.seconden, rekenMs: uit.herkomst ? uit.herkomst.rekenMs : null,
-      totaalMs: uit.totaalMs, feiten: uit.feiten,
-      herkomst: uit.herkomst && { plaats: uit.herkomst.plaats, uitvoerder: uit.herkomst.uitvoerder,
-        artefacten: uit.herkomst.artefacten.map((a) => a.rol + '=' + a.sha256.slice(0, 12)) },
-      voorbehoud: 'een opname is een rookproef en geen kwaliteitsmaat; de woordfout geldt alleen voor deze opname' }, null, 2));
-    process.exitCode = uit.ok && (wer === null || wer <= 0.2) ? 0 : 1;
+      wavs: OPNAMEN.map((o) => fs.readFileSync(o.wav).toString('base64')),
+      taal: (SET && SET.taal) || process.env.RTG_SPRAAK_TAAL || 'en' });
+    if (!uit.ok) {
+      console.log(JSON.stringify({ gemeten: new Date().toISOString(), ok: false, stap: uit.stap || null, reden: uit.reden || null }, null, 2));
+      process.exitCode = 1; return;
+    }
+    const per = uit.rs.map((r, i) => Object.assign({ verwacht: OPNAMEN[i].tekst, tekst: r.tekst,
+      woordfout: OPNAMEN[i].tekst ? +woordfout(OPNAMEN[i].tekst, r.tekst).toFixed(3) : null,
+      opnameSeconden: +r.seconden.toFixed(2), rekenMs: r.rekenMs, herhaling: !!r.herhaling }));
+    const som = OPNAMEN.reduce((t, o, i) => { if (!o.tekst) return t; const f = fouten(o.tekst, uit.rs[i].tekst);
+      return { fouten: t.fouten + f.fouten, woorden: t.woorden + f.woorden }; }, { fouten: 0, woorden: 0 });
+    const wer = som.woorden ? som.fouten / som.woorden : null;
+    const h = uit.rs[0].herkomst;
+    console.log(JSON.stringify({ gemeten: new Date().toISOString(), ok: true,
+      taal: (SET && SET.taal) || process.env.RTG_SPRAAK_TAAL || 'en', opnamen: per.length,
+      stem: SET ? SET.stem + (SET.synthetisch ? ' (synthetisch)' : '') : 'opname',
+      woordfoutSet: wer === null ? null : +wer.toFixed(3), fouten: som.fouten, woorden: som.woorden,
+      opnameSeconden: +uit.rs.reduce((t, r) => t + r.seconden, 0).toFixed(1),
+      rekenMs: uit.rs.reduce((t, r) => t + r.rekenMs, 0), lussen: per.filter((p) => p.herhaling).length, per, feiten: uit.feiten,
+      herkomst: { plaats: h.plaats, uitvoerder: h.uitvoerder, artefacten: h.artefacten.map((a) => a.rol + '=' + a.sha256.slice(0, 12)) },
+      voorbehoud: SET && SET.synthetisch ? 'een synthetische stem is geen mens: dit meet model en keten, niet hoe goed een lid wordt verstaan; getallen zijn niet genormaliseerd'
+        : 'een opname is een rookproef en geen kwaliteitsmaat; de woordfout geldt alleen voor deze opname' }, null, 2));
+    /* Een set is een METING en geen poort: de uitslag is het getal. Een losse
+       opname is een rookproef, en die zakt boven 20% woordfout. */
+    process.exitCode = SET ? 0 : (wer === null || wer <= 0.2 ? 0 : 1);
   } finally {
     await browser.close(); await stop(srv); fs.rmSync(tmp, { recursive: true, force: true });
   }

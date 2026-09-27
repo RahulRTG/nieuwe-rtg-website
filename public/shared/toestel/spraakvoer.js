@@ -13,7 +13,9 @@
         runtime, encoder en decoder, die de rekenaar zelf door de grendel haalt;
      4. de token-id's terugvertalen naar tekst.
 
-   Uit komt { ok, tekst, herkomst } of een weigering met de stap erbij. De
+   Uit komt { ok, tekst, afgekapt, herhaling, herkomst } of een weigering met de
+   stap erbij. `herhaling` betekent dat het model in een lus schoot en dat de
+   cel is gestopt: de tekst is dan onbetrouwbaar en een scherm zegt dat. De
    herkomst is die van de rekenaar plus de gegevensbestanden, zodat onder de
    tekst kan staan welke bytes hem maakten. Er gaat niets naar RTG.
    In de browser window.RTGToestelSpraakVoer. */
@@ -51,6 +53,7 @@
     if (!uit.ok) return uit;
     uit.herkomst.artefacten = uit.herkomst.artefacten.concat(herkomst);
     return { ok: true, tekst: S.tekst(uit.uitkomst.tokens, json.vocab), afgekapt: !!uit.uitkomst.afgekapt,
+      herhaling: !!uit.uitkomst.herhaling,
       herkomst: uit.herkomst };
   }
 

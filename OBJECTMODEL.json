@@ -2,14 +2,14 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-27",
   "gemeten": {
-    "bestanden": 2422,
-    "vormen": 1435,
-    "velden": 2077,
-    "modules": 797,
+    "bestanden": 2425,
+    "vormen": 1440,
+    "velden": 2082,
+    "modules": 799,
     "domeinen": 283,
     "envelopDrempel": 17,
     "envelop": 32,
-    "veldenDomeineigen": 1463,
+    "veldenDomeineigen": 1461,
     "veldenGedeeldVanafVier": 205,
     "gelijkendeVormparen": 20
   },
@@ -313,6 +313,18 @@
       ]
     },
     {
+      "veld": "actie",
+      "domeinen": 11,
+      "waar": [
+        "bedrijf",
+        "kern/bankregie",
+        "kern/command",
+        "kern/frictie",
+        "kern/geldbeleid",
+        "kern/kantoor"
+      ]
+    },
+    {
       "veld": "voor",
       "domeinen": 11,
       "waar": [
@@ -397,6 +409,18 @@
       ]
     },
     {
+      "veld": "versie",
+      "domeinen": 10,
+      "waar": [
+        "bedrijf",
+        "kern/appstore",
+        "kern/beroepenbieb",
+        "kern/command",
+        "kern/envelop",
+        "kern/journalistiek-krant"
+      ]
+    },
+    {
       "veld": "waarde",
       "domeinen": 10,
       "waar": [
@@ -430,18 +454,6 @@
         "kern/gemeente",
         "kern/mall",
         "kern/overheid"
-      ]
-    },
-    {
-      "veld": "actie",
-      "domeinen": 10,
-      "waar": [
-        "bedrijf",
-        "kern/bankregie",
-        "kern/command",
-        "kern/frictie",
-        "kern/geldbeleid",
-        "kern/kantoor"
       ]
     },
     {
@@ -514,18 +526,6 @@
         "kern/magnaat-controle",
         "kern/magnaat-trainingslobby-acties",
         "kern/magnaatwereld"
-      ]
-    },
-    {
-      "veld": "geldigTot",
-      "domeinen": 9,
-      "waar": [
-        "bedrijf",
-        "kern/aanmeldingen",
-        "kern/concern",
-        "kern/festival",
-        "kern/mobiliteit",
-        "kern/navigatie"
       ]
     }
   ],

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T16:49:13.289Z",
-    "commit": "a268a6fa",
+    "op": "2026-09-27T13:56:18.282Z",
+    "commit": "43461f914",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -586,14 +586,6 @@
       "operator": "===->!==#8",
       "gezakt": 2,
       "geprobeerd": 50
-    },
-    "appwerkt-schil.e2e.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/appwerkt.js",
-      "operator": "-->+#0",
-      "gezakt": 1,
-      "geprobeerd": 7
     },
     "archief.test.js": {
       "soort": "server",
@@ -2755,13 +2747,6 @@
       "gezakt": 1,
       "geprobeerd": 2
     },
-    "eigen-bedekking.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "overleefd"
-    },
     "eigen-website.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2872,13 +2857,6 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
-      "scherp": "gezakt"
-    },
-    "escape-lagen.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
       "scherp": "gezakt"
     },
     "eten-uitgaan-voorzijde.test.js": {
@@ -5413,14 +5391,6 @@
       "operator": "return-weg#1",
       "gezakt": 4,
       "geprobeerd": 13
-    },
-    "magnaatgroei.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/magnaat-leven/index.js",
-      "operator": "!==->===#0",
-      "gezakt": 1,
-      "geprobeerd": 2
     },
     "magnaatgrondwet.test.js": {
       "soort": "puur",
@@ -11011,6 +10981,66 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "journalistiek-versies.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/journalistiek.js",
+      "operator": "getal+1#0",
+      "gezakt": 3,
+      "geprobeerd": 6
+    },
+    "saloon-edge.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "saloon-lus.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
+    },
+    "saloon-projectie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/wereld/saloon/index.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 3
+    },
+    "saloon-redactie.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "saloon-zicht.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/salon/zichtbaarheid.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 3
+    },
+    "saloon.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "magnaatgroei.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/magnaat-leven/index.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     }
   }
 }

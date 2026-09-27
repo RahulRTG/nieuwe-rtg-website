@@ -106,8 +106,8 @@ module.exports = ({ bak, crypto, nu, stelSamen, zorgSaldo, rekPartner, betaalDel
     let res = waarde.reservering(resId);
     if (!res) {
       const uren = Math.min(24, Math.max(1, Math.round(Number(urenGeldig) || 4)));
-      const n = waarde.reserveer({ id: resId, rek: 'lid:' + r.codenaam, centen: c.centen,
-        doel: c.oms || 'Vooraf vastgezet', ref: c.supplierCode, msGeldig: uren * 3600000 });
+      const n = waarde.reserveer({ rek: 'lid:' + r.codenaam, centen: c.centen,
+        doel: c.oms || 'Vooraf vastgezet', ref: c.supplierCode, msGeldig: uren * 3600000 }, { id: resId });
       if (n.error) { if (weigering(n)) await geefVrij(r); return n; }
       res = n.reservering;
     }

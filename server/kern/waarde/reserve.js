@@ -66,10 +66,13 @@ function maakReserve({ db, save, crypto, nu = klokNu }) {
      lijkt. */
   function vind(id) { return kijk().find(r => r.id === String(id || '')) || null; }
 
-  /* `id` is optioneel en maakt reserveren herhaalbaar: een hervatte kascode-
-     claim (kern/pay/kas-claim.js) geeft een id mee dat uit de claim volgt, en
-     vindt dan zijn eigen reservering terug in plaats van een tweede te zetten. */
-  function reserveer({ id, rek, centen, doel, ref, msGeldig }) {
+  /* `vast.id` is optioneel en maakt reserveren herhaalbaar: een hervatte
+     kascode-claim (kern/pay/kas-claim.js) geeft een id mee dat uit de claim
+     volgt, en vindt dan zijn eigen reservering terug in plaats van een tweede
+     te zetten. Het staat NAAST het verzoek en niet erin: het verzoek zelf is
+     hetzelfde als altijd, het id zegt alleen welke het is. */
+  function reserveer({ rek, centen, doel, ref, msGeldig }, vast = {}) {
+    const id = vast.id;
     const c = Math.round(Number(centen));
     if (!rek) return { status: 400, error: 'Op welke rekening?' };
     if (id != null) {

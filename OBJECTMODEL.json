@@ -2,14 +2,14 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-27",
   "gemeten": {
-    "bestanden": 2433,
+    "bestanden": 2436,
     "vormen": 1445,
-    "velden": 2087,
+    "velden": 2088,
     "modules": 801,
     "domeinen": 285,
     "envelopDrempel": 18,
-    "envelop": 29,
-    "veldenDomeineigen": 1471,
+    "envelop": 30,
+    "veldenDomeineigen": 1470,
     "veldenGedeeldVanafVier": 209,
     "gelijkendeVormparen": 20
   },
@@ -21,6 +21,7 @@
     "code",
     "codenaam",
     "datum",
+    "doel",
     "door",
     "gemaakt",
     "id",
@@ -55,18 +56,6 @@
         "kern/command",
         "kern/commercie",
         "kern/ledenbalie-inzage"
-      ]
-    },
-    {
-      "veld": "doel",
-      "domeinen": 17,
-      "waar": [
-        "kern/appstore",
-        "kern/codelevenscyclus",
-        "kern/commercie",
-        "kern/consent-register",
-        "kern/defensie",
-        "kern/labfonds"
       ]
     },
     {
@@ -178,6 +167,18 @@
       ]
     },
     {
+      "veld": "vervalt",
+      "domeinen": 13,
+      "waar": [
+        "kern/aanmeldingen",
+        "kern/command",
+        "kern/commerce",
+        "kern/koppel",
+        "kern/levensband",
+        "kern/levensgraaf"
+      ]
+    },
+    {
       "veld": "vraag",
       "domeinen": 13,
       "waar": [
@@ -199,18 +200,6 @@
         "kern/groothandel",
         "kern/keuken",
         "kern/kosten"
-      ]
-    },
-    {
-      "veld": "vervalt",
-      "domeinen": 12,
-      "waar": [
-        "kern/aanmeldingen",
-        "kern/command",
-        "kern/commerce",
-        "kern/koppel",
-        "kern/levensband",
-        "kern/levensgraaf"
       ]
     },
     {
@@ -523,6 +512,18 @@
         "kern/leverancier",
         "kern/lidacties",
         "kern/personeel"
+      ]
+    },
+    {
+      "veld": "dagen",
+      "domeinen": 10,
+      "waar": [
+        "kern/gewoonten",
+        "kern/klok",
+        "kern/levensgraaf",
+        "kern/levenslijn",
+        "kern/magnaat-leven",
+        "kern/mobiliteit"
       ]
     }
   ],

@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-27T14:34:16.637Z",
-  "commit": "228c5eb6",
+  "op": "2026-09-27T17:39:12.259Z",
+  "commit": "fcca8064",
   "boomVuil": false,
   "boomAnders": 4,
   "instrument": "scripts/handlerwacht.js",
@@ -3186,7 +3186,7 @@
   },
   {
    "sleutel": "POST /api/pin/herstel",
-   "bestand": "server/routes/algpin.js:51",
+   "bestand": "server/routes/algpin.js:55",
    "staat": "openbaar",
    "reden": "pin vergeten: de eenmalige sleutel uit de mail IS het bewijs, net als bij /api/auth/reset"
   },
@@ -3912,13 +3912,13 @@
   },
   {
    "sleutel": "POST /api/stad/doos/hartslag",
-   "bestand": "server/routes/kantoren/stad.js:97",
+   "bestand": "server/routes/kantoren/stad.js:100",
    "staat": "openbaar",
    "reden": "de stadsdoos stuurt zijn apparaatsleutel mee"
   },
   {
    "sleutel": "POST /api/stad/doos/meting",
-   "bestand": "server/routes/kantoren/stad.js:100",
+   "bestand": "server/routes/kantoren/stad.js:103",
    "staat": "openbaar",
    "reden": "idem"
   },

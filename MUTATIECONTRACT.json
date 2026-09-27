@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-27T14:34:04.092Z",
-  "commit": "228c5eb6",
+  "op": "2026-09-27T17:38:56.010Z",
+  "commit": "fcca8064",
   "boomVuil": false,
   "boomAnders": 2,
   "instrument": "scripts/mutatiecontract.js",
@@ -10,18 +10,18 @@
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5043,
-  "geclassificeerd": 5043,
+  "totaal": 5046,
+  "geclassificeerd": 5046,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3190,
    "NOT_APPLICABLE": 1211,
    "PROTECTED": 493,
-   "INTENTIONALLY_NON_IDEMPOTENT": 149
+   "INTENTIONALLY_NON_IDEMPOTENT": 152
   },
-  "vastgesteldDoorMens": 1902,
+  "vastgesteldDoorMens": 1905,
   "afgeleidDoorScript": 3141,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4148,
+   "AUTHENTICATED": 4151,
    "PUBLIC": 126,
    "OBJECT_SCOPED": 746,
    "(niet af te leiden -- vraagt een verklaring)": 7,
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 136,
    "kale ronde: onbeschermd": 123,
    "kale ronde: geen uitspraak": 4713,
-   "niet gemeten": 71
+   "niet gemeten": 74
   },
   "voorstellen": {},
   "metingVan": "2026-09-19T17:45:58.177Z"
@@ -11116,6 +11116,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "command.apipoort.roteren",
+   "route": "POST /api/command/apipoort/roteer",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "naamAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "command.apipoort.sleutel",
    "route": "POST /api/command/apipoort/sleutel",
    "semantiek": {
@@ -11127,7 +11148,7 @@
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "officeAuth"
+     "naamAuth"
     ]
    },
    "bewijs": {
@@ -48651,6 +48672,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "member.rtmail.imap.roteren",
+   "route": "POST /api/member/rtmail/imap/roteer",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "member.rtmail.imap.sleutel",
    "route": "POST /api/member/rtmail/imap/sleutel",
    "semantiek": {
@@ -66972,7 +67014,7 @@
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "officeAuth"
+     "naamAuth"
     ]
    },
    "bewijs": {
@@ -67107,7 +67149,7 @@
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "officeAuth"
+     "naamAuth"
     ]
    },
    "bewijs": {
@@ -119274,6 +119316,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "supplier.rtmail.imap.roteren",
+   "route": "POST /api/supplier/rtmail/imap/roteer",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

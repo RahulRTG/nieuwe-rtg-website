@@ -2,8 +2,8 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-09-27",
   "gemeten": {
-    "bestanden": 2433,
-    "domeinenTotaal": 643,
+    "bestanden": 2436,
+    "domeinenTotaal": 644,
     "koopbareVormen": 604,
     "koopbareDomeinen": 121,
     "envelopDrempel": 8,
@@ -13,7 +13,7 @@
     "gelijkendeVormparen": 17,
     "werkwoordenVolledig": 2,
     "werkwoordenOveral": 0,
-    "werkwoordCombinaties": 47,
+    "werkwoordCombinaties": 46,
     "wagenVormen": 33,
     "wagenVormenUniek": 30,
     "wagenDomeinen": 22,
@@ -74,8 +74,8 @@
     "beschikbaarheid": 54,
     "reserveer": 28,
     "bevestig": 57,
-    "lever": 23,
-    "annuleer": 33,
+    "lever": 24,
+    "annuleer": 34,
     "retour": 8
   },
   "overalAanwezig": [],
@@ -239,6 +239,28 @@
         "reserveer": "careVastleg",
         "bevestig": "boekBehandelingActie",
         "annuleer": "careAnnuleer"
+      },
+      "telt": 6
+    },
+    {
+      "domein": "kern/command",
+      "heeft": {
+        "toon": true,
+        "prijs": false,
+        "beschikbaarheid": true,
+        "reserveer": true,
+        "bevestig": true,
+        "lever": true,
+        "annuleer": true,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "beeld",
+        "beschikbaarheid": "lopende",
+        "reserveer": "claims",
+        "bevestig": "bevestig",
+        "lever": "uitgifteFout",
+        "annuleer": "vervaltVan"
       },
       "telt": 6
     },
@@ -686,26 +708,6 @@
         "beschikbaarheid": "maakOpenstaandOverzicht",
         "bevestig": "bevestig",
         "retour": "terugboeken"
-      },
-      "telt": 4
-    },
-    {
-      "domein": "kern/command",
-      "heeft": {
-        "toon": true,
-        "prijs": false,
-        "beschikbaarheid": true,
-        "reserveer": true,
-        "bevestig": true,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "beeld",
-        "beschikbaarheid": "lopende",
-        "reserveer": "claims",
-        "bevestig": "bevestig"
       },
       "telt": 4
     },

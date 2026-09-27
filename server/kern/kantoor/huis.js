@@ -43,6 +43,10 @@ function maakHuis({ db, save, nu }) {
     if (typeof entiteitBestaat !== 'function' || !entiteitBestaat(id))
       return { status: 404, error: 'Deze entiteit bestaat niet in RTG Concern.' };
     if (!door) return { status: 400, error: 'Noteer wie deze aanwijzing doet.' };
+    /* Dezelfde aanwijzing nog een keer is een dubbeltik en geen nieuw besluit:
+       er verandert niets, ook `sinds` niet (het contract zegt PROTECTED). */
+    const nu0 = aanwijzing();
+    if (nu0 && nu0.entiteit === id) return { ok: true, huis: nu0, ongewijzigd: true };
     const h = eigen.bak('kantoorHuis');
     h.entiteit = id; h.door = door; h.sinds = tijd();
     save();

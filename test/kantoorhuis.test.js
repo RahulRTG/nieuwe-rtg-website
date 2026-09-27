@@ -111,6 +111,11 @@ test('2-4. echte server: aanwijzen, in dienst, uit dienst -- en de review blijft
   assert.equal((await api(base, '/api/office/beleidsmotor/huis/zet', { entiteit: 'bestaat-niet' }, eigKantoor)).status, 404);
   const zet = await api(base, '/api/office/beleidsmotor/huis/zet', { entiteit: entId }, eigKantoor);
   assert.equal(zet.status, 200, JSON.stringify(zet.body));
+  /* dezelfde aanwijzing nog een keer is een dubbeltik: niets verandert, ook de datum niet */
+  const nogEens = await api(base, '/api/office/beleidsmotor/huis/zet', { entiteit: entId }, eigKantoor);
+  assert.equal(nogEens.status, 200);
+  assert.equal(nogEens.body.ongewijzigd, true);
+  assert.deepEqual(nogEens.body.huis, zet.body.huis, 'sinds en door blijven staan');
 
   const r1 = await review();
   assert.equal(r1.werkverband.huis.entiteit, entId);

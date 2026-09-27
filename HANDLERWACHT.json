@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-27T17:39:12.259Z",
-  "commit": "fcca8064",
+  "op": "2026-09-27T18:08:53.370Z",
+  "commit": "ffd914e9",
   "boomVuil": false,
-  "boomAnders": 4,
+  "boomAnders": 0,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.2"
  },
@@ -1079,25 +1079,25 @@
   },
   {
    "sleutel": "POST /api/doos/buurmelding",
-   "bestand": "server/routes/doos.js:129",
+   "bestand": "server/routes/doos.js:99",
    "staat": "bewaakt",
    "wacht": "doosSleutelOk"
   },
   {
    "sleutel": "POST /api/doos/meting",
-   "bestand": "server/routes/doos.js:46",
+   "bestand": "server/routes/doos.js:38",
    "staat": "bewaakt",
    "wacht": "doosSleutelOk"
   },
   {
    "sleutel": "POST /api/doos/rapport",
-   "bestand": "server/routes/doos.js:138",
+   "bestand": "server/routes/doos.js:118",
    "staat": "bewaakt",
    "wacht": "doosSleutelOk"
   },
   {
    "sleutel": "POST /api/doos/update/status",
-   "bestand": "server/routes/doos.js:109",
+   "bestand": "server/routes/doos-kloon.js:49",
    "staat": "bewaakt",
    "wacht": "doosSleutelOk"
   },

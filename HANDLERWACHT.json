@@ -1,19 +1,19 @@
 {
  "stempel": {
-  "op": "2026-09-27T16:46:32.771Z",
-  "commit": "2155edb0",
+  "op": "2026-09-27T14:34:16.637Z",
+  "commit": "228c5eb6",
   "boomVuil": false,
-  "boomAnders": 3,
+  "boomAnders": 4,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
-  "zonderBewakerslaag": 632,
-  "bewaakt": 542,
+  "zonderBewakerslaag": 634,
+  "bewaakt": 545,
   "openbaarMetReden": 51,
   "eigenControle": 19,
-  "sleutelDoorgegeven": 12,
+  "sleutelDoorgegeven": 11,
   "zonderWachtMetReden": 8,
   "laat": 0,
   "onbewaakt": 0,
@@ -87,16 +87,16 @@
    "aantal": 13
   },
   {
+   "naam": "beheerVan",
+   "aantal": 12
+  },
+  {
    "naam": "schoolVan",
    "aantal": 11
   },
   {
    "naam": "lesVan",
    "aantal": 10
-  },
-  {
-   "naam": "beheerVan",
-   "aantal": 9
   },
   {
    "naam": "viaBeheerOfDirectie",
@@ -360,7 +360,7 @@
   },
   {
    "sleutel": "POST /api/auth/verify-email",
-   "bestand": "server/routes/auth/account.js:85",
+   "bestand": "server/routes/auth/account.js:78",
    "staat": "openbaar",
    "reden": "de bevestigingslink IS de geloofsbrief (verifyActionToken); ongeldig of verlopen geeft 400"
   },
@@ -654,7 +654,7 @@
   },
   {
    "sleutel": "POST /api/bedrijf/leden",
-   "bestand": "server/bedrijf/leden.js:81",
+   "bestand": "server/bedrijf/leden.js:108",
    "staat": "bewaakt",
    "wacht": "beheerVan"
   },
@@ -678,13 +678,13 @@
   },
   {
    "sleutel": "POST /api/bedrijf/lid/aanmeld",
-   "bestand": "server/bedrijf/leden.js:18",
+   "bestand": "server/bedrijf/leden.js:19",
    "staat": "openbaar",
    "reden": "aanmelden bij een werkruimte kan zonder sleutel -- het token dat je krijgt werkt pas na toelating (test/bedrijfkern.test.js)"
   },
   {
    "sleutel": "POST /api/bedrijf/lid/besluit",
-   "bestand": "server/bedrijf/leden.js:49",
+   "bestand": "server/bedrijf/leden.js:52",
    "staat": "bewaakt",
    "wacht": "beheerVan"
   },
@@ -708,7 +708,7 @@
   },
   {
    "sleutel": "POST /api/bedrijf/lid/uit-dienst",
-   "bestand": "server/bedrijf/leden.js:67",
+   "bestand": "server/bedrijf/leden.js:70",
    "staat": "bewaakt",
    "wacht": "beheerVan"
   },
@@ -825,6 +825,18 @@
    "bestand": "server/bedrijf/storing.js:65",
    "staat": "bewaakt",
    "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/sleutel/intrek",
+   "bestand": "server/bedrijf/leden.js:100",
+   "staat": "bewaakt",
+   "wacht": "beheerVan"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/sleutel/roteer",
+   "bestand": "server/bedrijf/leden.js:92",
+   "staat": "bewaakt",
+   "wacht": "beheerVan"
   },
   {
    "sleutel": "POST /api/bedrijf/start",
@@ -990,7 +1002,7 @@
   },
   {
    "sleutel": "POST /api/bedrijf/werkruimte",
-   "bestand": "server/bedrijf/werkruimte.js:92",
+   "bestand": "server/bedrijf/werkruimte.js:93",
    "staat": "bewaakt",
    "wacht": "beheerVan"
   },
@@ -1009,7 +1021,8 @@
   {
    "sleutel": "POST /api/bedrijf/werkruimte/maak",
    "bestand": "server/bedrijf/werkruimte.js:37",
-   "staat": "sleutelDoorgegeven"
+   "staat": "bewaakt",
+   "wacht": "beheerVan"
   },
   {
    "sleutel": "POST /api/bedrijf/werkruimte/tekenwijze",
@@ -1048,7 +1061,7 @@
   },
   {
    "sleutel": "POST /api/cluster/:actie",
-   "bestand": "server/server.js:931",
+   "bestand": "server/server.js:932",
    "staat": "openbaar",
    "reden": "de clustersleutel zit in een eigen kop; zonder sleutel bestaat de route niet"
   },
@@ -1066,25 +1079,25 @@
   },
   {
    "sleutel": "POST /api/doos/buurmelding",
-   "bestand": "server/routes/doos.js:127",
+   "bestand": "server/routes/doos.js:129",
    "staat": "bewaakt",
    "wacht": "doosSleutelOk"
   },
   {
    "sleutel": "POST /api/doos/meting",
-   "bestand": "server/routes/doos.js:44",
+   "bestand": "server/routes/doos.js:46",
    "staat": "bewaakt",
    "wacht": "doosSleutelOk"
   },
   {
    "sleutel": "POST /api/doos/rapport",
-   "bestand": "server/routes/doos.js:136",
+   "bestand": "server/routes/doos.js:138",
    "staat": "bewaakt",
    "wacht": "doosSleutelOk"
   },
   {
    "sleutel": "POST /api/doos/update/status",
-   "bestand": "server/routes/doos.js:107",
+   "bestand": "server/routes/doos.js:109",
    "staat": "bewaakt",
    "wacht": "doosSleutelOk"
   },
@@ -3141,7 +3154,7 @@
   },
   {
    "sleutel": "POST /api/partner",
-   "bestand": "server/routes/member/kopen/bezorg.js:13",
+   "bestand": "server/routes/member/kopen/bezorg.js:12",
    "staat": "openbaar",
    "reden": "het partnerkanaal is bedoeld voor niet-leden"
   },
@@ -4065,7 +4078,7 @@
   },
   {
    "sleutel": "POST /api/zegel/controleer",
-   "bestand": "server/server.js:1447",
+   "bestand": "server/server.js:1448",
    "staat": "openbaar",
    "reden": "controleert een handtekening; het bewijs zit in het verzoek"
   }

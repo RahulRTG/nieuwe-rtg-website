@@ -268,8 +268,9 @@ function setPasswordZaai(userId, password) {
 async function vernieuwWachtwoordHash(userId, password) {
   const u = getUserById(userId);
   if (!u || !kluis.moetVernieuwen(u.password_hash)) return false;
-  S.zin('UPDATE users SET password_hash = ? WHERE id = ?')
-    .run(await kluis.hashPassword(password), userId);
+  const hash = await kluis.hashPassword(password);
+  if (require('./transactie').bezetDoorAnder()) return false; // een verbetering mag de inlog niet laten zakken
+  S.zin('UPDATE users SET password_hash = ? WHERE id = ?').run(hash, userId);
   mirror.markUser(userId);
   return true;
 }

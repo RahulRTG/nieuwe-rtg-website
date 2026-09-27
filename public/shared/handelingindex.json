@@ -2480,6 +2480,12 @@
       "url": "/apps/pay.html"
     },
     {
+      "label": "Nieuwe code",
+      "app": "RTG Pay",
+      "wereld": "LivingOS",
+      "url": "/apps/pay.html"
+    },
+    {
       "label": "Tik en betaal",
       "app": "RTG Pay",
       "wereld": "LivingOS",

@@ -1,10 +1,13 @@
-/* Tijdelijke, harde productiegrens voor de identiteitscache.
+/* De productiegrens voor de identiteitscache.
 
-   users/staff leven lokaal in SQLite en worden nog met vertraging naar een
-   aparte PostgreSQL-pool gespiegeld. Dat kan niet deelnemen aan de atomaire
-   requestcommit van de gewone collecties. Tot die migratie klaar is mogen
-   productieverzoeken dus wel lezen, maar geen accountwaarheid wijzigen.
-   Replicatie VAN de gedeelde bron naar de lokale cache is de enige bypass. */
+   users/staff leven lokaal in SQLite als CACHE; PostgreSQL is de waarheid. In
+   productie opent elke accountmutatie een request-lokale werkkopie
+   (./transactie.js) die als deelnemer in dezelfde PostgreSQL-requestcommit
+   landt als de collecties (../db/deelnemers.js). Pas na die COMMIT volgt de
+   lokale cache. Tot 27 september 2026 was deze poort hard dicht
+   (PG_ACCOUNTS_ATOMAIR_ONTBREEKT): zelfs registreren gaf 503.
+   Replicatie VAN de gedeelde bron naar de lokale cache (internePublicatie)
+   blijft de enige weg buiten de werkkopie om. */
 'use strict';
 
 const verzoekcontext = require('../db/verzoekcontext');
@@ -15,24 +18,19 @@ function gesloten(env = process.env) {
   return String(env.NODE_ENV || '') === 'production' && !!(env.DATABASE_URL || env.PG_URL);
 }
 
-function fout(onderdeel) {
-  const e = new Error('Accountmutaties zijn gesloten totdat users en staff aan dezelfde PostgreSQL-requesttransactie deelnemen.');
-  e.code = BLOKKADECODE; e.status = 503;
-  e.onderdeel = String(onderdeel || 'accounts').slice(0, 80);
-  return e;
-}
-
 function eisMutatie(onderdeel) {
   if (!gesloten() || interneDiepte) return true;
-  /* transactie.js bevat voorbereidende techniek, maar verzoekcontext en de
-     PostgreSQL-commitmotor dragen die participant nog niet end-to-end. De
-     aanwezigheid van dat halve pad mag deze poort dus niet openen. */
-  const e = fout(onderdeel);
-  const ctx = verzoekcontext.huidige();
-  /* Ook als een oude route deze fout opvangt en een 2xx probeert te sturen,
-     houdt de centrale responsegrens het antwoord dicht. */
-  if (ctx) ctx.hardeFout = e;
-  throw e;
+  try {
+    require('./transactie').begin();
+    return true;
+  } catch (e) {
+    if (!e.onderdeel) e.onderdeel = String(onderdeel || 'accounts').slice(0, 80);
+    const ctx = verzoekcontext.huidige();
+    /* Ook als een oude route deze fout opvangt en een 2xx probeert te sturen,
+       houdt de centrale responsegrens het antwoord dicht. */
+    if (ctx && ctx.open) ctx.hardeFout = e;
+    throw e;
+  }
 }
 
 function transactieDatabase() {
@@ -72,18 +70,30 @@ const isAccountSchrijfzin = sql => {
   return SCHRIJFBEWERKING.test(zin) && ACCOUNTTABEL.test(zin);
 };
 
-/* Machineleesbare releasewaarheid. Geen env-vlag kan dit groen maken: pas een
-   echte, gedeelde requesttransactie voor users/staff mag deze code vervangen.
-   De server blijft ondertussen veilig bruikbaar in read-only/fail-closed vorm. */
+/* Machineleesbare releasewaarheid. Geen env-vlag kan dit groen maken: de
+   stand wordt afgeleid uit de STRUCTUUR -- de verzoekcontext moet deelnemers
+   aannemen en de commitlaag moet ze meenemen. Valt een van beide weg, dan is
+   het weer de blokkade. */
 function releaseStand() {
-  return {
-    code: BLOKKADECODE,
-    gereed: false,
-    transactioneel: false,
-    productieMutaties: 'gesloten',
-    vereist: 'gedeelde-pg-requesttransactie'
-  };
+  let verbonden = false;
+  try {
+    verbonden = typeof verzoekcontext.registreerDeelnemer === 'function' &&
+      typeof verzoekcontext.deelnemersMetWerk === 'function' &&
+      typeof require('../db/deelnemers').pasToe === 'function' &&
+      typeof require('../db/verzoekcommit') === 'function';
+  } catch (e) { verbonden = false; }
+  return verbonden
+    ? { code: 'PG_ACCOUNTS_ATOMAIR_BEVESTIGD', gereed: true, transactioneel: true,
+      productieMutaties: 'duurzaam', vereist: 'gedeelde-pg-requesttransactie' }
+    : { code: BLOKKADECODE, gereed: false, transactioneel: false,
+      productieMutaties: 'gesloten', vereist: 'gedeelde-pg-requesttransactie' };
 }
 
-module.exports = { BLOKKADECODE, gesloten, eisMutatie, transactieDatabase,
+/* Voor timers buiten de accountlaag (SCIM-herstelronde): staat er een
+   werkkopie open, dan wacht S.db niet en slaat een ronde beter een beurt over. */
+function werkkopieOpen() {
+  try { return require('./transactie').bezet(); } catch (e) { return false; }
+}
+
+module.exports = { BLOKKADECODE, gesloten, eisMutatie, transactieDatabase, werkkopieOpen,
   internePublicatie, isAccountSchrijfzin, releaseStand };

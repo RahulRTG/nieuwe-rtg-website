@@ -3,7 +3,7 @@
    een tweede proces dezelfde teruggang pas zien nadat de eerste geheel is
    gecommit; na een rollback ziet het juist niets en mag de retry boeken. */
 'use strict';
-const { vind: heeftRegel, vindBeweging, bewegingGelijk, saldoSamen,
+const { SLEUTEL, vind: heeftRegel, vindBeweging, bewegingGelijk, saldoSamen,
   boekingenSamen } = require('./economische-identiteit');
 const publiceerCollectie = require('./collectie-publicatie');
 
@@ -35,7 +35,7 @@ module.exports = ({ db, verbinding, statements, merge3, uitStore, naarStore,
   return function boekEenmaal(invoer, werk) {
     const i = invoer || {}, sleutel = String(i.sleutel || ''), afdruk = String(i.afdruk || '');
     const collecties = Array.isArray(i.collecties) ? [...new Set(i.collecties.map(String))].sort() : [];
-    if (!/^payout-terug:[a-f0-9]{64}$/.test(sleutel) || !/^[a-f0-9]{64}$/.test(afdruk) ||
+    if (!SLEUTEL.test(sleutel) || !/^[a-f0-9]{64}$/.test(afdruk) ||
         !i.identiteit || !['pay', 'bank'].includes(i.identiteit.domein) ||
         !i.identiteit.van || !i.identiteit.naar || !Number.isSafeInteger(i.identiteit.centen) ||
         !i.identiteit.soort || typeof i.identiteit.ref !== 'string' ||

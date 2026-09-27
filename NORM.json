@@ -71,7 +71,7 @@
     "wekkersZonderTrede": 0,
     "wettenOnbewezen": 5,
     "zaakwigGezakt": 0,
-    "zelfpoortendeToetsen": 28,
+    "zelfpoortendeToetsen": 35,
     "geldRoutesPubliek": 0,
     "geldRoutesZonderSemantiek": 1,
     "geldRoutesZonderIdemBewijs": 3,
@@ -3332,6 +3332,114 @@
       "meter": "dbDeuren 529 -> 530 (VERHOOGD, met reden)",
       "reden": "kern/vrijheid/rtghuis.js maakt de zaak van RTG zelf aan (besluit van de eigenaar, 27 september 2026) en schrijft daarvoor in db.data.suppliers -- precies zoals kern/rtfwallet.js de RTFoundation-positie maakt. Er bestaat in dit huis geen gedeelde zaakmaker om langs te gaan: acht kernmodules duwen zelf een zaak in db.data.suppliers. De eigen afdelingen van RTG staan WEL in een eigen collectie (eigencollectie, rtgAfdelingen) en tellen hier dus niet. Wie deze tand omlaag wil: een gedeelde zaakmaker bouwen waar alle negen doorheen gaan.",
       "waarheen": "Een gedeelde zaakmaker voor de negen modules die een zaak aanmaken."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 634,
+      "vervalt": "2026-12-27",
+      "meter": "toetsenNietGemeten 634 -> 635 (de som van drie takken, geen nieuwe toets)",
+      "reden": "De cadeaukaart, de ticketcodes en de kascodes kwamen elk met een eigen pg-raceproef (test/giftcard-credential.pg.test.js, test/ticketcodes.pg.test.js, test/kascode-credential.pg.test.js) en zetten deze meter elk op hun eigen tak van 633 naar 634. Samengevoegd staan ze naast elkaar. Zonder DATABASE_URL slaan ze zichzelf over, dus de mutatiemotor meet ze hier niet; in CI draaien ze in de pg-scherf met echte PostgreSQL en Redis.",
+      "waarheen": "Dezelfde aflossing als de andere pg-toetsen: de standaardomgeving levert PostgreSQL, en dan meet de motor ze mee."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 633,
+      "vervalt": "2026-12-27",
+      "meter": "toetsenNietGemeten 633 -> 634",
+      "reden": "test/kascode-credential.pg.test.js is nieuw (kas- en tikcode, RELEASEKANDIDAAT.md B9). Zonder DATABASE_URL slaat hij zichzelf over, dus de mutatiemotor kan er niet langs; de drie gewone kascodetoetsen zijn wel gemeten (MUTATIES.json). Met de hand nagetrokken tegen echte PostgreSQL: de collectietransactie overslaan en een niet-vaste ref onder de economische sleutel laten hem allebei zakken.",
+      "waarheen": "Een mutatieronde met DATABASE_URL, of de pg-scherf als meetomgeving."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "zelfpoortendeToetsen",
+      "van": 31,
+      "vervalt": "2026-12-27",
+      "meter": "zelfpoortendeToetsen 31 -> 32",
+      "reden": "test/kascode-credential.pg.test.js is nieuw (RELEASEKANDIDAAT.md B9, deuren pay.kascode_en_vooraf en pay.tikcode): twee echte PostgreSQL-instances racen op dezelfde kascode, een derde hervat na een crash na de commit van de boeking, en tikken vanaf twee instances tegelijk mag geen gebruik verliezen. Dat kan niet eerlijk zonder database; zonder DATABASE_URL slaat hij zichzelf over. Hij staat in scripts/lib/pg-toetslijst.js (verplicht in CI) en als uitzondering onder zelfpoortende-toets. Lokaal gedraaid tegen postgresql://localhost met Redis: 1 van 1 groen; zonder collectietransactie in kern/pay/kasbak.js zakte hij, en met een niet-vaste ref onder de economische sleutel ook (3 boekingen in plaats van 2).",
+      "waarheen": "Dezelfde aflossing als de notitie van 5 september: de standaardomgeving levert PostgreSQL, en het nul-skipbewijs hangt aan de releasecommit."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 244,
+      "meter": "kernGedeeld 244 -> 245; kernBreedte 1601 -> 1603",
+      "reden": "Het entreeticket en het vervoerskaartje als gemigreerde credentials (RELEASEKANDIDAAT.md B9). De ene naam kern.tickettoegang wordt door twee domeinen gelezen: het lid toont zijn entreecode (routes/member/kopen/tickets.js), de zaak scant hem aan de deur en vernieuwt een deurticket (routes/supplier/tickets-deur.js, tickets.js). Dat is de bedoelde koppeling: EEN plek die weet hoe een entreecode wordt uitgegeven, geclaimd en geroteerd; een kopie per kant zou twee claimwegen opleveren die uiteenlopen, precies de dubbele toegang die de claimtransactie voorkomt. De tweede nieuwe naam, kaartToonVoor, raakt alleen het domein mobiliteit (breedte, geen koppeling).",
+      "waarheen": "GRENZEN.json (lid en leverancier dragen tickettoegang, mobiliteit kaartToonVoor) en test/tickettoegang.test.js, test/kaarttoegang.test.js plus test/ticketcodes.pg.test.js"
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 633,
+      "vervalt": "2026-12-27",
+      "meter": "toetsenNietGemeten 633 -> 634",
+      "reden": "test/ticketcodes.pg.test.js is nieuw en slaat zichzelf zonder DATABASE_URL en REDIS_URL over; de mutatiemotor kan hem daardoor niet meten (zoals elke pg-proef). Met de hand nagetrokken tegen echte PostgreSQL en Redis: zonder advisory lock plus FOR UPDATE in pg/collectietransactie.js zakt hij. De twee andere nieuwe toetsen (tickettoegang, kaarttoegang) zijn wel door de motor gemeten en zakken allebei.",
+      "waarheen": "De pg-scherf in CI; het nul-skipbewijs hangt aan de releasecommit."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "zelfpoortendeToetsen",
+      "van": 32,
+      "vervalt": "2026-12-27",
+      "meter": "zelfpoortendeToetsen 32 -> 33",
+      "reden": "Een nieuwe pg-proef: test/ticketcodes.pg.test.js bewijst dat de entreecode van een activiteitenticket en de code van een OV-vervoerbewijs (RELEASEKANDIDAAT.md B9) over twee echte PostgreSQL-instances een keer binnenlaten en een rit een keer tellen, ook als een scan tegen een rotatie racet. Dat kan niet eerlijk zonder database; zonder DATABASE_URL en REDIS_URL slaat hij zichzelf over. Hij staat in scripts/lib/pg-toetslijst.js (verplicht in de pg-scherf en het releasebewijs) en als uitzondering onder zelfpoortende-toets. Lokaal tegen echte PostgreSQL en Redis groen, en zonder advisory lock plus FOR UPDATE in pg/collectietransactie.js zakte hij: beide poorten lieten hetzelfde ticket binnen (2 in plaats van 1).",
+      "waarheen": "Dezelfde als de andere pg-toetsen: de CI-dienstmatrix zonder skips afdwingen."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "zelfpoortendeToetsen",
+      "van": 31,
+      "vervalt": "2026-12-27",
+      "meter": "zelfpoortendeToetsen 31 -> 32; toetsenNietGemeten 633 -> 634",
+      "reden": "test/giftcard-credential.pg.test.js is nieuw (de cadeaukaart als gemigreerde money-credential, RELEASEKANDIDAAT.md B9): twee instances racen op hetzelfde saldo, op deelbedragen, op dezelfde kassasleutel, op rotatie tegen inwisseling, op intrekken en op de migratie van een oude 24-bitkaart. Dat kan niet eerlijk zonder database en slaat lokaal zonder DATABASE_URL over; hij staat in scripts/lib/pg-toetslijst.js (verplicht in CI) en als uitzondering onder zelfpoortende-toets. Lokaal tegen echte PostgreSQL en Redis groen, en zonder advisory lock plus FOR UPDATE in pg/collectietransactie.js zakte hij (twee instances boekten dezelfde oude kaart allebei af). Daarom telt hij ook als niet-gemeten toets: de mutatiemotor draait zonder PostgreSQL. De twee andere nieuwe toetsen (giftcard-credential.test.js, giftcard-routes.test.js) zijn wel door de motor gemeten en zakken.",
+      "waarheen": "Dezelfde aflossing als de notitie van 5 september: de standaardomgeving levert PostgreSQL, en het nul-skipbewijs hangt aan de releasecommit."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 243,
+      "meter": "kernGedeeld 243 -> 244; kernBreedte 1600 -> 1601",
+      "reden": "De afhaalcode als gemigreerde money-credential (RELEASEKANDIDAAT.md B9). De ene naam kern.afhaalcode wordt door twee domeinen gelezen: het lid haalt en trekt zijn code in (routes/member/afhaalcode.js), de zaak claimt hem aan de kassa en trekt hem in bij afhandelen en terugstorten (routes/supplier/kassa/innen.js, orders/afhandeling.js). Dat is de bedoelde koppeling: EEN plek die weet hoe een afhaalcode wordt uitgegeven, geclaimd en ingetrokken. Een kopie per kant zou deze meter sparen en twee claimwegen opleveren die uiteenlopen -- precies de dubbele-afrekenfout die de claimtransactie voorkomt.",
+      "waarheen": "GRENZEN.json (lid en leverancier dragen afhaalcode) en test/afhaalcode.test.js plus test/afhaalcode.pg.test.js"
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 631,
+      "vervalt": "2026-12-27",
+      "meter": "toetsenNietGemeten 631 -> 633",
+      "reden": "test/tegoedbon-credential.test.js en test/tegoedbon-routes.test.js zijn nieuw (de tegoedbon als gemigreerde money-credential, besluit van de eigenaar van 27 september 2026). Met de hand nagetrokken met twintig mutaties op kern/pay/tegoed-*.js, db/economische-identiteit.js, lib/eenmalig-geheim-routes.js en de twee routebestanden; negentien raakten de juiste toets, een (alleen bearer.intrekken weghalen bij roteren) sloeg af omdat de toegang in zijn geheel wordt vervangen -- de twee mutaties die dan wel iets openen, raakten allebei. De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt ze mee."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "zelfpoortendeToetsen",
+      "van": 31,
+      "vervalt": "2026-12-27",
+      "meter": "zelfpoortendeToetsen 31 -> 32",
+      "reden": "test/arrivalpas.pg.test.js is nieuw (Invisible Arrival als gemigreerde credential, besluit B9): twee instances racen om dezelfde aanvraag, om de eenmalige voorbereidingsclaim, om rotatie tegen een puls, en een intrekking op A sluit de pass op B. Dat kan niet eerlijk zonder PostgreSQL en Redis en slaat lokaal zonder DATABASE_URL over. Hij staat in scripts/lib/pg-toetslijst.js (verplicht in CI) en als uitzondering onder zelfpoortende-toets. Lokaal tegen echte PostgreSQL en Redis groen, en zonder advisory lock plus FOR UPDATE in pg/collectietransactie.js zakte hij 3 van 3 keer. De WorkOS-sleutels kregen geen pg-proef: een sessie heeft geen eenmalige claim.",
+      "waarheen": "Dezelfde aflossing als de notitie van 5 september: de standaardomgeving levert PostgreSQL, en het nul-skipbewijs hangt aan de releasecommit."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "zelfpoortendeToetsen",
+      "van": 28,
+      "vervalt": "2026-12-27",
+      "meter": "zelfpoortendeToetsen 28 -> 31",
+      "reden": "Twee nieuwe pg-proeven. (1) test/accounts-requestcommit.pg.test.js is nieuw: de accountwerkkopie als deelnemer aan de PostgreSQL-requestcommit (RELEASEKANDIDAAT.md A2), tegen een ECHTE PostgreSQL -- registratie, verouderde basis 409, unieke botsing 409 en een gedode backend die niets achterlaat. Zonder DATABASE_URL slaat hij zichzelf over, zoals elke pg-proef. Hij staat in scripts/lib/pg-toetslijst.js en draait dus zonder skips in de pg-scherf en in het releasebewijs (ci-pg-bewijs.json); lokaal nagetrokken met een mutatie op de accountstap in verzoektransactie.js (alle vier zakken). (2) test/tegoedbon-credential.pg.test.js bewijst de claim en de escrowboeking over twee echte PostgreSQL-instances plus het hervatten door een derde na een crash; dat kan niet eerlijk zonder database en slaat lokaal zonder DATABASE_URL over. Hij staat in scripts/lib/pg-toetslijst.js (verplicht in CI) en als uitzondering onder zelfpoortende-toets hieronder. Lokaal gedraaid tegen postgresql://localhost: 1 van 1 groen, en met de collectietransactie uitgeschakeld zakte hij (2 boekingen uit de escrow in plaats van 1). (3) test/afhaalcode.pg.test.js: twee instances racen op de claim, op claim tegen rotatie, op de betaalweg en op intrekken; lokaal tegen echte PostgreSQL en Redis groen, en zonder advisory lock plus FOR UPDATE in pg/collectietransactie.js zakte hij.",
+      "waarheen": "Dezelfde aflossing als de notitie van 5 september: de standaardomgeving levert PostgreSQL, en het nul-skipbewijs hangt aan de releasecommit."
     }
   ],
   "prestatie": {
@@ -3672,6 +3780,36 @@
     },
     {
       "regel": "zelfpoortende-toets",
+      "pad": "test/kascode-credential.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "de kas- en tikcode-raceproef (claim over twee instances, hervatten na een crash, tikteller) vereist echte PostgreSQL; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die dienst, terwijl hij lokaal zonder die infrastructuur expliciet wordt overgeslagen in plaats van een lichtere opslag als bewijs te laten gelden"
+    },
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/arrivalpas.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "de Arrival Pass-raceproef (aanvraag, voorbereidingsclaim, rotatie en intrekking over twee instances) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl lokaal zonder die infrastructuur expliciet wordt overgeslagen in plaats van een lichtere opslag als bewijs te laten gelden"
+    },
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/afhaalcode.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "de afhaalcode-raceproef (claim, rotatie en betaalweg over twee instances) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl lokaal zonder die infrastructuur expliciet wordt overgeslagen in plaats van een lichtere opslag als bewijs te laten gelden"
+    },
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/giftcard-credential.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "de cadeaukaart-raceproef (saldo, deelbedragen, kassasleutel, rotatie, intrekking en de migratie van oude codes over twee instances) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl lokaal zonder die infrastructuur expliciet wordt overgeslagen in plaats van een lichtere opslag als bewijs te laten gelden"
+    },
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/ticketcodes.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "de raceproef voor de entreecode van een activiteitenticket en de code van een OV-vervoerbewijs (twee poorten, twee conducteurs, scan tegen rotatie, over twee instances) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl lokaal zonder die infrastructuur expliciet wordt overgeslagen in plaats van een lichtere opslag als bewijs te laten gelden"
+    },
+    {
+      "regel": "zelfpoortende-toets",
       "pad": "test/boarding-pass.pg.test.js",
       "vervalt": "2026-10-15",
       "reden": "de boardingpass-raceproef vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl lokaal zonder die infrastructuur expliciet wordt overgeslagen in plaats van een lichtere opslag als bewijs te laten gelden"
@@ -3726,9 +3864,21 @@
     },
     {
       "regel": "zelfpoortende-toets",
+      "pad": "test/tegoedbon-credential.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "de tegoedbonrace en de hervatte saga na een crash over twee instances bewijzen juist de PostgreSQL-collectie- en economische transactie; scripts/lib/pg-toetslijst.js maakt hem verplicht in CI en lokaal zonder database blijft het ontbreken zichtbaar als skip"
+    },
+    {
+      "regel": "zelfpoortende-toets",
       "pad": "test/spelprojectie.pg.test.js",
       "vervalt": "2026-10-15",
       "reden": "de spelprojectie-claimrace vereist echte PostgreSQL; scripts/lib/pg-toetslijst.js laat CI hem verplicht uitvoeren en lokaal zonder die dienst wordt geen zwakker resultaat als equivalent bewijs geaccepteerd"
+    },
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/accounts-requestcommit.pg.test.js",
+      "vervalt": "2026-12-27",
+      "reden": "de accountwerkkopie als deelnemer aan de PostgreSQL-requestcommit vereist echte PostgreSQL (unieke botsing, verouderde basis en een gedode backend bestaan alleen daar); scripts/lib/pg-toetslijst.js laat CI hem verplicht zonder skip draaien, en een lokale skip is eerlijker dan dezelfde invariant op een nagemaakte client te veinzen -- dat deel dekt test/accounts-transactie.test.js al"
     }
   ]
 }

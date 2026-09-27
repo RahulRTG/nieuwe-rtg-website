@@ -263,3 +263,44 @@ test('elk tijdelijk ijkbestand staat in .gitignore', () => {
     'deze tijdelijke ijkbestanden staan niet in .gitignore en kunnen dus met een ' +
     '`git add -A` in de repo belanden terwijl de ijking loopt:\n  ' + nietGenegeerd.join('\n  '));
 });
+
+/* EEN SLOTHOUDER DIE ZELF METINGEN START, MOET ZIJN KINDEREN VRIJ LATEN.
+   De releasepoort pakte het slot en gaf `process.env` ongewijzigd door aan
+   check.js; scripts/kaart.js zag daar het slot van zijn EIGEN grootouder en
+   weigerde, en de poort zakte bij elke run op "Bron- en securityregels". Dit
+   loopt met een echt slot in een eigen map (RTG_AFBOUW_SLOT), in een eigen
+   proceslijn -- het slot van de lopende suite blijft onaangeroerd. */
+test('een kind van de slothouder mag meten met kindOmgeving(), en zonder niet', () => {
+  const cp = require('child_process');
+  const os = require('os');
+  const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-slotkind-'));
+  const env = { ...process.env, RTG_AFBOUW_SLOT: path.join(map, 'slot') };
+  delete env.RTG_AFBOUW_SLOT_ACTIEF;
+  delete env.RTG_METEN_TIJDENS_AFBOUW;
+  const houder = `
+    const cp = require('child_process');
+    const slot = require(${JSON.stringify(path.join(WORTEL, 'scripts', 'afbouw-slot.js'))});
+    const vrij = slot.pak('toets-slotkind');
+    const kind = env => JSON.parse(cp.execFileSync(process.execPath, ['-e',
+      'const s=require(' + JSON.stringify(${JSON.stringify(path.join(WORTEL, 'scripts', 'afbouw-slot.js'))}) + ');' +
+      'process.stdout.write(JSON.stringify(s.eisGeenAfbouw("kaart.js")))'], { env }).toString());
+    const kaal = { ...process.env }; delete kaal.RTG_AFBOUW_SLOT_ACTIEF;
+    process.stdout.write(JSON.stringify({ met: kind(slot.kindOmgeving(kaal)), zonder: kind(kaal) }));
+    vrij();`;
+  try {
+    const uit = JSON.parse(cp.execFileSync(process.execPath, ['-e', houder], { env }).toString());
+    assert.equal(uit.met.ok, true, 'met de doorgegeven vlag meet het kind: ' + uit.met.reden);
+    assert.equal(uit.zonder.ok, false, 'zonder de vlag ziet het kind het slot van zijn ouder als vreemd');
+    assert.match(uit.zonder.reden, /toets-slotkind/);
+  } finally { fs.rmSync(map, { recursive: true, force: true }); }
+});
+
+test('de releasepoort geeft elke stap kindOmgeving() mee, niet de kale omgeving', () => {
+  /* De gedragsproef hierboven bewijst de functie; deze houdt vast dat de poort
+     hem gebruikt. Zonder deze regel kan iemand de spawn terugzetten op
+     `env: process.env` en blijft de proef hierboven groen. */
+  const bron = fs.readFileSync(path.join(WORTEL, 'scripts', 'release-gate.js'), 'utf8');
+  const spawns = bron.match(/cp\.spawnSync\([^)]*\{[^}]*\}/g) || [];
+  assert.ok(spawns.length >= 1, 'de poort start zijn stappen met spawnSync');
+  for (const s of spawns) assert.match(s, /env:\s*kindOmgeving\(/, 'elke stap erft de slotvlag: ' + s);
+});

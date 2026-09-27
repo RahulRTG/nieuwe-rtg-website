@@ -4,6 +4,7 @@
      werkvenster
      eenaccount
      kantoorgesprek
+     arrivalpas
 
    WAAROM DIT DEEL BESTAAT. ./kernlaag6.js ging over de tienkilobytegrens van
    keuringsregel 13 toen drie takken er tegelijk iets bijzetten. De naad ligt
@@ -48,5 +49,10 @@ Object.assign(kern, require('../kern/kantoorgesprek').maakKantoorgesprek({
   crypto, rememberSession, officeState: kern.officeState, logInlog: kern.logInlog,
   loginFails, noteFailedTry
 }));
+
+/* De Arrival Pass van Invisible Arrival (kern/arrivalpas.js): een 128-bit
+   gastbearer die alleen als hash in `arrivalToegang` staat en in een
+   collectietransactie wordt uitgegeven, geroteerd, gebruikt en ingetrokken. */
+kern.arrivalpas = require('../kern/arrivalpas')({ db, bewerkCollectie: hulp.bewerkCollectie, crypto });
 
 };

@@ -50,7 +50,7 @@
   .min{color:var(--burgundy);font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap;}
   .leeg{color:var(--muted);font-size:.84rem;padding:.4rem 0;}
   .hint{font-size:.74rem;color:var(--soft);line-height:1.5;}
-  /* Zelfde afweging als op apps/pay.html: een tegoedcode van vierentwintig
+  /* Zelfde afweging als op apps/pay.html: een tegoedcode van tweeenveertig
      tekens is werk en geen ceremonie, dus Inter, tabulair, en hij mag afbreken. */
   .boncode{font-variant-numeric:tabular-nums;font-weight:700;letter-spacing:.08em;font-size:1.05rem;color:var(--leesgoud);text-align:center;padding:.5rem 0 .2rem;word-break:break-all;}
   .melding{position:fixed;left:50%;bottom:1rem;transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1.1rem;border-radius:0;font-size:.85rem;opacity:0;transition:opacity .2s;z-index:50;max-width:90vw;}
@@ -100,7 +100,7 @@
       <input class="veld h-rek9" id="tOms" placeholder="Waarvoor? (mag leeg)" maxlength="80" aria-label="Waarvoor is het tegoed">
       <button class="knop hoofd" id="tZet">Zet klaar</button>
     </div>
-    <p class="hint h-mt60">Het geld gaat meteen uit de kas en staat vast tot iemand het ophaalt. Een zaak laadt niet bij: is het saldo te laag, dan kan het niet. Laat je de codenaam leeg, dan kan iedereen met de code het ophalen. Na een jaar haal je het zelf terug.</p>
+    <p class="hint h-mt60">Het geld gaat meteen uit de kas en staat vast tot iemand het ophaalt. Een zaak laadt niet bij: is het saldo te laag, dan kan het niet. Laat je de codenaam leeg, dan kan iedereen met de code het ophalen. De code staat hier maar een keer; kwijt of gelekt, vraag dan een nieuwe of trek het tegoed in. Na een jaar haal je het zelf terug.</p>
     <div id="tNieuw" hidden>
       <div class="boncode" id="tCode" aria-live="polite"></div>
       <div class="rij h-centreer"><button class="knop stil" id="tKopieer">Kopieer de code</button></div>
@@ -197,19 +197,29 @@ async function verversTegoed(){
   if (!open.length) return;
   $('#tKlaar').innerHTML = open.map(t =>
     '<div class="regel"><div class="wie"><b>'+esc(euro(t.centen))+' eur</b>'+
-      '<small>'+(t.aan ? 'voor '+esc(t.aan) : 'vrij, met code')+' · '+esc(t.code || '')+'</small></div>'+
+      '<small>'+(t.aan ? 'voor '+esc(t.aan) : 'vrij, met code')+'</small></div>'+
     (t.verlopen
       ? '<button class="knop stil" data-terug="'+esc(t.id)+'">Neem terug</button>'
-      : '<span style="color:var(--leesgoud);font-size:.8rem;">wacht op ophalen</span>')+
+      : '<span style="color:var(--leesgoud);font-size:.8rem;">wacht op ophalen</span>'+
+        '<button class="knop stil" data-roteer="'+esc(t.id)+'">Nieuwe code</button>'+
+        '<button class="knop stil" data-intrek="'+esc(t.id)+'">Trek in</button>')+
     '</div>').join('');
-  $('#tKlaar').querySelectorAll('[data-terug]').forEach(b => b.addEventListener('click', async () => {
+  /* De code staat hier met opzet niet: hij bestaat alleen in het antwoord op
+     het klaarzetten of op een nieuwe code, en de oude is dan dood. */
+  const doe = (sel, pad, extra, klaar) => $('#tKlaar').querySelectorAll(sel).forEach(b => b.addEventListener('click', async () => {
     b.disabled = true;
     try {
-      const r = await api('pay/tegoed/terug', { id: b.dataset.terug, idem: idem() });
-      meld(euro(r.centen) + ' eur is terug in de kas.');
-      ververs(); verversTegoed();
+      const r = await api(pad, Object.assign({ id: b.getAttribute(sel.slice(1, -1)), idem: idem() }, extra));
+      klaar(r); ververs(); verversTegoed();
     } catch (e) { meld(e.message); b.disabled = false; }
   }));
+  doe('[data-terug]', 'pay/tegoed/terug', {}, r => meld(euro(r.centen) + ' eur is terug in de kas.'));
+  doe('[data-intrek]', 'pay/tegoed/terug', { intrekken: true }, r => meld('Ingetrokken: ' + euro(r.centen) + ' eur is terug in de kas.'));
+  doe('[data-roteer]', 'pay/tegoed/roteer', {}, r => {
+    $('#tNieuw').hidden = false;
+    $('#tCode').textContent = r.tegoed.code;
+    meld('Nieuwe code. De oude werkt niet meer.');
+  });
 }
 
 /* ---------- innen ---------- */

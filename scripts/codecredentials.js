@@ -10,13 +10,19 @@ const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const { ROUTES: EENMALIGE_ROUTES } = require('../server/lib/eenmalig-geheim-routes');
+const { zonderCommentaar } = require('./lib/bron');
 
 const PAD = path.join(__dirname, '..', 'CODECREDENTIALS.json');
 const ROOT = path.join(__dirname, '..');
 const STATUSES = new Set(['migrated', 'closed', 'remaining']);
 const CLASSIFICATIES = new Set(['credential', 'money_credential', 'public_identifier',
   'tracking_identifier', 'signed_presentation', 'authenticated_identifier',
-  'external_protocol_credential', 'central_session_credential']);
+  'external_protocol_credential', 'central_session_credential', 'geen_credential']);
+/* `geen_credential`: een censuskandidaat is na lezing GEEN identifier of geheim
+   (een record-id, de uitgiftepas van een keuken, een idempotentiesleutel). Dat
+   oordeel haalt hem uit de blokkerlijst, dus het mag nooit goedkoop zijn:
+   gesloten, nooit blokkerend, en met een uitleg die het oordeel naloopt. */
+const GEEN_NOTITIE_MIN = 40;
 const REQUIRED_ROUTES = [
   'GET /api/projectie/:code',
   'POST /api/projectie/koppel', 'POST /api/projectie/kijk',
@@ -31,24 +37,28 @@ const REQUIRED_ROUTES = [
   'POST /api/meet/maak', 'POST /api/meet/kom', 'POST /api/meet/code',
   'POST /api/samen/maak', 'POST /api/samen/mee', 'POST /api/samen/code',
   'POST /api/samen/sluit',
-  'POST /api/pay/kascode', 'POST /api/supplier/pay/in',
+  'POST /api/pay/kascode', 'POST /api/pay/kascode/intrek', 'POST /api/supplier/pay/in',
   'POST /api/supplier/pay/vooraf', 'POST /api/supplier/pay/vastleg',
   'POST /api/link/cap/maak', 'POST /api/supplier/link/cap/aanvaard',
   'POST /api/supplier/pos/sale', 'POST /api/supplier/pos/checkout',
   'POST /api/supplier/tafelticket/afrekenen', 'POST /api/supplier/retail/verkoop',
   'POST /api/supplier/ticket/deurverkoop', 'POST /api/festival/verkoop/rond',
-  'POST /api/pay/tikcode', 'POST /api/pay/tik',
+  'POST /api/pay/tikcode', 'POST /api/pay/tikcode/intrek', 'POST /api/pay/tik',
   'POST /api/pay/tegoed', 'POST /api/pay/tegoed/koop',
   'POST /api/pay/tegoed/verzilver', 'POST /api/pay/tegoed/terug',
+  'POST /api/pay/tegoed/roteer',
   'POST /api/supplier/pay/tegoed', 'POST /api/supplier/pay/tegoed/zet',
-  'POST /api/supplier/pay/tegoed/terug',
-  'POST /api/giftcard/buy', 'POST /api/giftcards/mine',
+  'POST /api/supplier/pay/tegoed/terug', 'POST /api/supplier/pay/tegoed/roteer',
+  'POST /api/giftcard/buy', 'POST /api/giftcards/mine', 'POST /api/giftcard/roteer',
   'POST /api/supplier/giftcard/sell', 'POST /api/supplier/giftcard/redeem',
+  'POST /api/supplier/giftcard/intrek', 'POST /api/supplier/giftcard/roteer',
   'POST /api/order', 'POST /api/order/pay', 'POST /api/orders/mine',
   'POST /api/bezorg/bestel', 'POST /api/bezorg/volg',
+  'POST /api/order/afhaalcode', 'POST /api/order/afhaalcode/intrek',
   'POST /api/supplier/pos/redeem',
   'POST /api/ticket/koop', 'POST /api/tickets/mijn',
   'POST /api/supplier/programma', 'POST /api/supplier/ticket/checkin',
+  'POST /api/ticket/toon', 'POST /api/supplier/ticket/toon',
   'POST /api/member/sport/ticket/koop', 'POST /api/sport/scan',
   'POST /api/member/vluchten/boek', 'POST /api/member/vluchten/incheck',
   'POST /api/member/vluchten/mijn', 'POST /api/supplier/lucht/pass',
@@ -56,6 +66,7 @@ const REQUIRED_ROUTES = [
   'POST /api/mob/kaart/koop', 'POST /api/mob/kaart/mijn',
   'POST /api/mob/abo/koop', 'POST /api/mob/abo/mijn',
   'POST /api/mob/reis/boek', 'POST /api/staff/mob/kaart/controle',
+  'POST /api/mob/kaart/toon',
   'POST /api/supplier/horeca/simulatie/maak',
   'POST /api/supplier/horeca/simulatie/voorstellen',
   'POST /api/member/spel/hospitality-koppel',
@@ -105,6 +116,7 @@ const REQUIRED_ROUTES = [
   'POST /api/appstore/uitgever/voorbeeld', 'POST /api/appstore/verleen',
   'POST /api/appstore/vernietig', 'POST /api/appstore/weg',
   'POST /api/appstore/wis-opslag',
+  'POST /api/bedrijf/sleutel/roteer', 'POST /api/bedrijf/sleutel/intrek',
   'POST /api/bedrijf/werkruimte/maak', 'POST /api/bedrijf/werkruimte',
   'POST /api/bedrijf/lid/aanmeld', 'POST /api/bedrijf/lid/besluit',
   'POST /api/bedrijf/leden', 'POST /api/bedrijf/mijn',
@@ -114,26 +126,78 @@ const REQUIRED_ROUTES = [
   'POST /api/bedrijf/ticket/reageer', 'POST /api/bedrijf/ticket/sluit',
   'POST /api/bedrijf/ticket/waardeer',
   'POST /api/arrival/request', 'POST /api/arrival/pass',
+  'POST /api/arrival/pass/roteer', 'POST /api/arrival/pass/intrek',
   'POST /api/arrival/pulse', 'POST /api/supplier/horeca/arrivals',
-  'POST /api/supplier/horeca/arrival/promise'
+  'POST /api/supplier/horeca/arrival/promise',
+  /* De classificatieronde van 27 september 2026: de echte, nog onvolwassen
+     credentials die de census als ongeclassificeerd vond. Ze staan hier zodat
+     hun deur niet stil kan verdwijnen. */
+  'POST /api/office/login', 'POST /api/staff', 'POST /api/partnertrips',
+  'POST /api/book', 'POST /api/partner', 'POST /api/supplier/horeca/bon/maak',
+  'POST /api/supplier/horeca/club/band', 'POST /api/supplier/horeca/bon',
+  'POST /api/supplier/horeca/betaal', 'POST /api/gast/betaal',
+  'POST /api/link/cap/aanvaard', 'POST /api/link/cap/trek', 'POST /api/ov/code',
+  'POST /api/staff/ov/checkin', 'POST /api/mode/bezorg/aanvraag',
+  'POST /api/supplier/mode/bezorg/overhandig', 'POST /api/concern/uitnodigen',
+  'POST /api/concern/uitnodigingen', 'POST /api/concern/uitnodiging/accepteer',
+  'POST /api/concern/uitnodiging/intrek', 'POST /api/concern/bulk/verstuur',
+  'POST /api/festival/pas', 'POST /api/festival/pas/intrek',
+  'POST /api/festival/scan', 'POST /api/member/magnaat/teamkamer/maak',
+  'POST /api/member/magnaat/teamkamer/deelnemen', 'POST /api/pin/vergeten',
+  'POST /api/pin/herstel', 'POST /api/command/apipoort/sleutel',
+  'POST /api/command/apipoort/intrekken', 'POST /api/doos/rapport',
+  'POST /api/office/doos/sleutel', 'POST /api/office/doos/sleutel/weg',
+  'POST /api/office/stad/sleutel', 'POST /api/stad/doos/hartslag',
+  'POST /api/stad/doos/meting', 'POST /api/techniek/sso',
+  'POST /api/techniek/sso/scimsleutel',
+  'DELETE /api/techniek/sso/scimsleutel/:org',
+  'POST /api/member/rtmail/imap/sleutels', 'POST /api/member/rtmail/imap/sleutel',
+  'POST /api/member/rtmail/imap/intrekken',
+  'POST /api/supplier/rtmail/imap/sleutels',
+  'POST /api/supplier/rtmail/imap/sleutel',
+  'POST /api/supplier/rtmail/imap/intrekken', 'POST /api/rtfos/activiteit/incheck',
+  'POST /api/office/kantoor/uitnodiging',
+  'POST /api/office/service/bevestiging/vraag',
+  'POST /api/office/service/bevestiging/code', 'POST /api/foundation/les/maak',
+  'POST /api/foundation/les/join', 'POST /api/foundation/ai',
+  'POST /api/rtf/uitnodiging/accepteer', 'POST /api/rtf/kanaal',
+  'POST /api/rtf/toegang', 'POST /api/rtf/bieb', 'POST /api/rtf/bieb/catalogus',
+  'POST /api/rtf/bieb/installeer', 'POST /api/rtf/bieb/weg',
+  'POST /api/rtf/bieb/mijn', 'POST /api/rtf/beroepen',
+  'POST /api/rtf/beroepen/catalogus', 'POST /api/rtf/beroepen/installeer',
+  'POST /api/rtf/beroepen/weg', 'POST /api/rtf/beroepen/mijn',
+  'POST /api/rtf/geloof', 'POST /api/rtf/geloof/catalogus',
+  'POST /api/rtf/geloof/installeer', 'POST /api/rtf/geloof/weg',
+  'POST /api/rtf/geloof/mijn', 'POST /api/rtf/geloof/lees',
+  'POST /api/rtf/knelpunt', 'POST /api/rtf/apply/chat',
+  'POST /api/rtf/apply/chat/send', 'POST /api/rtf/solliciteer',
+  'POST /api/rtf/talent/interesse', 'POST /api/rtf/talent/mijn',
+  'POST /api/rtf/leren/project-uitnodig', 'POST /api/rtf/leren/sessie-start',
+  'POST /api/rtf/leren/taak-zet', 'POST /api/rtf/social/call',
+  'POST /api/rtf/social/connect', 'POST /api/rtf/social/dm',
+  'POST /api/rtf/social/dm/send', 'POST /api/rtf/social/goedkeuren',
+  'POST /api/rtf/social/oudervoeg', 'POST /api/rtf/social/respond',
+  'POST /api/rtf/social/snap/send', 'POST /api/rtf/social/unblock',
+  'POST /api/supplier/eten/instellingen', 'POST /api/gast/bezorg/checkout'
 ];
 const CONTROLES = ['hash_only_at_rest', 'issuer_doel_scope', 'issued_at_expires_at',
   'max_gebruik_gebruik', 'server_side_intrekken_roteren', 'constant_time_lookup',
   'atomic_claim', 'raw_once'];
 
-/* BRONAFGELEIDE CENSUS. REQUIRED_ROUTES bewaakt bekende deuren, maar kan een
-   morgen toegevoegde `/api/.../toegangscode` nooit raden. Daarom halen we alle
-   letterlijke routeverklaringen uit server/ en markeren we de kandidaten op
-   zowel pad als de eerste handlertekst. Een kandidaat die niet in het register
-   staat is geen parsefout: hij wordt een expliciete RELEASEBLOCKER met bron en
-   reden. Daarmee blijft de poort bruikbaar terwijl de inventaris groeit, maar
-   kan onbekend nooit READY betekenen. */
+/* BRONAFGELEIDE CENSUS. REQUIRED_ROUTES kan een morgen toegevoegde
+   `/api/.../toegangscode` nooit raden; daarom markeren we uit server/ elke
+   letterlijke route op pad en eerste handlertekst. Een kandidaat buiten het
+   register wordt een RELEASEBLOCKER met bron en reden: onbekend is nooit READY. */
 const METHODEN = 'get|post|put|patch|delete|head|options|all';
-const ROUTE = new RegExp('\\b(?:app|router)\\.(' + METHODEN + ')\\s*\\(\\s*([\'"`])(\\/[^\'"`$]+)\\2', 'g');
+/* `*` en niet `+` na de slash: `app.get('/')` is ook een letterlijke route, en
+   met `+` werd hij als onleesbaar geteld (middleware/voordeur.js). */
+const ROUTE = new RegExp('\\b(?:app|router)\\.(' + METHODEN + ')\\s*\\(\\s*([\'"`])(\\/[^\'"`$]*)\\2', 'g');
 const ROUTE_AANROEP = new RegExp('\\b(?:app|router)\\.(' + METHODEN + ')\\s*\\(', 'g');
 const PAD_RISICO = /(?:^|\/)(?:code(?:s|woord)?|sleutel|token|pin|claim|ticket|pas|pass|uitnodig(?:ing)?|kassacode|toegang)(?:$|[\/_-])|koppel\/code|projectie\/:code|vracht\/volg|lab2\/mijn|salon\/deal\/claim/i;
 const VELD_RISICO = /(?:req\.body|\bbody|\bb)\s*(?:\.|\[\s*['"])(?:[a-z0-9_]*(?:code|token|sleutel|pin|password|wachtwoord|pas|pass|claim|ticket|key|secret)[a-z0-9_]*)/i;
-const KOP_RISICO = /(?:authorization|x-[a-z0-9-]*(?:code|token|key|secret)|bearer\s)/i;
+/* `sleutel` hoort erbij: `x-doos-eigen-sleutel` (kern/stad) is een apparaatsleutel
+   in een kop, en zonder dit woord zag de census die route niet eens. */
+const KOP_RISICO = /(?:authorization|x-[a-z0-9-]*(?:code|token|key|secret|sleutel)|bearer\s)/i;
 /* Niet alleen wat binnenkomt kan een deur verraden. Een route die een geheim
    maakt of een PIN/token/kassacode in haar antwoord zet is zelf een issuer en
    moet dus ook worden geclassificeerd. */
@@ -149,12 +213,49 @@ function jsBestanden(map) {
   return uit;
 }
 
-function bronCensus(root = ROOT) {
+/* DYNAMISCHE ROUTES OPLOSSEN ZONDER HANDLIJST. Een pad als `p.pad + '/verstuur'`
+   of `BASIS + '/Users'` is voor deze census onleesbaar -- maar de ROUTER kent het
+   wel, en ROUTEBRON.json legt per route vast in welk bestand en op welke regel de
+   router hem vond (`samengesteld: true`). Wat daar staat is de waarheid van de
+   server en geen bewering van een mens; een verouderde regel valt vanzelf terug
+   op onleesbaar, want de sleutel is bestand:regel. */
+function routebronKaart(root) {
+  const kaart = new Map();
+  let rb = null;
+  try { rb = JSON.parse(fs.readFileSync(path.join(root, 'ROUTEBRON.json'), 'utf8')); } catch (e) { return kaart; }
+  for (const r of Object.values((rb && rb.perRoute) || {})) {
+    if (!r || !r.samengesteld || !r.bestand || !Number.isSafeInteger(r.regel)) continue;
+    const m = /^([A-Z]+) (\/\S*)$/.exec(String(r.route || ''));
+    if (!m) continue;
+    const k = r.bestand + ':' + r.regel;
+    if (!kaart.has(k)) kaart.set(k, []);
+    kaart.get(k).push({ methode: m[1], pad: m[2] });
+  }
+  return kaart;
+}
+
+/* Wat ook de router niet kent (gehashte bundelpaden, de Express-shim zelf), wordt
+   in het register VERKLAARD: bron plus de exacte regeltekst van de aanroep. Een
+   gewijzigde regel verklaart niets meer en wordt weer een blokkade. */
+function aanroepTekst(bron, index) {
+  const eind = bron.indexOf('\n', index);
+  return bron.slice(bron.lastIndexOf('\n', index) + 1, eind < 0 ? bron.length : eind).trim();
+}
+
+function bronCensus(root = ROOT, register = null) {
   const server = path.join(root, 'server');
-  const alle = [], onleesbaar = [];
-  let aanroepen = 0;
+  const alle = [], onleesbaar = [], verklaardDynamisch = [];
+  const kaart = routebronKaart(root);
+  const verklaringen = Array.isArray(register && register.dynamische_aanroepen) ? register.dynamische_aanroepen : [];
+  let aanroepen = 0, letterlijk = 0, doorRouter = 0;
   for (const bestand of jsBestanden(server).sort()) {
-    const bron = fs.readFileSync(bestand, 'utf8');
+    /* COMMENTAAR IS GEEN CODE. Zonder deze stap telde een `app.post(` in een
+       uitleg als onleesbare route, en een woord als "Authorization" in het
+       commentaar boven de VOLGENDE route maakte de vorige een kandidaat (het
+       handlervenster loopt tot de volgende aanroep). Platgeslagen en niet
+       weggehaald (scripts/lib/bron.js, regelsHeel): posities en regelnummers
+       blijven die van de echte bron. */
+    const bron = zonderCommentaar(fs.readFileSync(bestand, 'utf8'), { regelsHeel: true });
     const calls = [];
     ROUTE_AANROEP.lastIndex = 0;
     let call;
@@ -167,12 +268,27 @@ function bronCensus(root = ROOT) {
     while ((m = ROUTE.exec(bron))) gevonden.push({ index: m.index, einde: ROUTE.lastIndex,
       methode: m[1].toUpperCase(), pad: m[3] });
     const leesbarePosities = new Set(gevonden.map(x => x.index));
+    letterlijk += leesbarePosities.size;
+    const rel = path.relative(root, bestand).replace(/\\/g, '/');
     for (const c of calls) if (!leesbarePosities.has(c.index)) {
       const regel = 1 + bron.slice(0, c.index).split('\n').length - 1;
-      onleesbaar.push({ bron: path.relative(root, bestand).replace(/\\/g, '/'),
-        regel, methode: c.methode,
-        reden: 'routepad is dynamisch, een regex of niet-letterlijk; expliciete classificatie vereist' });
+      const opgelost = kaart.get(rel + ':' + regel);
+      if (opgelost) {
+        doorRouter++;
+        /* Elke route die de router op deze regel vond, krijgt dezelfde keuring
+           als een letterlijke: pad plus het handlervenster vanaf deze aanroep. */
+        for (const r of opgelost) gevonden.push({ index: c.index, einde: c.index, methode: r.methode,
+          pad: r.pad, dynamisch: true });
+        continue;
+      }
+      const tekst = aanroepTekst(bron, c.index);
+      const verklaring = verklaringen.find(v => v && v.bron === rel && v.aanroep === tekst);
+      if (verklaring) { verklaardDynamisch.push({ bron: rel, regel, aanroep: tekst }); continue; }
+      onleesbaar.push({ bron: rel, regel, methode: c.methode,
+        reden: 'routepad is dynamisch, een regex of niet-letterlijk en de router kent hem niet op deze regel; ' +
+          'verklaar hem in dynamische_aanroepen of maak het pad letterlijk' });
     }
+    gevonden.sort((a, b) => a.index - b.index);
     for (let i = 0; i < gevonden.length; i++) {
       const r = gevonden[i];
       const volgende = calls.find(x => x.index > r.index);
@@ -198,7 +314,7 @@ function bronCensus(root = ROOT) {
   }
   const routes = [...perRoute.values()].sort((a, b) => a.route.localeCompare(b.route));
   const kandidaten = routes.filter(r => r.redenen.length);
-  return { aanroepen, verklaringen: routes.length, kandidaten, onleesbaar,
+  return { aanroepen, letterlijk, doorRouter, verklaringen: routes.length, kandidaten, onleesbaar, verklaardDynamisch,
     sha256: crypto.createHash('sha256').update(JSON.stringify(routes)).digest('hex') };
 }
 
@@ -255,6 +371,10 @@ function controleer(register, root = ROOT) {
     if (ids.has(d.id)) fouten.push('dubbele deur-id: ' + d.id); else ids.add(d.id);
     if (!STATUSES.has(d.status)) fouten.push(d.id + ': onbekende status'); else telling[d.status]++;
     if (!CLASSIFICATIES.has(d.classificatie)) fouten.push(d.id + ': onbekende classificatie');
+    if (d.classificatie === 'geen_credential' && (d.status !== 'closed' ||
+        d.release_blocker !== false || String(d.notitie || '').trim().length < GEEN_NOTITIE_MIN))
+      fouten.push(d.id + ': geen_credential vraagt status closed, geen releaseblokkade en een notitie van minstens ' +
+        GEEN_NOTITIE_MIN + ' tekens met het bewijs');
     if (!Array.isArray(d.routes) || !d.routes.length) fouten.push(d.id + ': routes ontbreken');
     else for (const route of d.routes) bronRoutes.add(route);
     if (d.effective_mount != null) {
@@ -289,7 +409,17 @@ function controleer(register, root = ROOT) {
   const blockers = register.deuren.filter(d => d && d.status === 'remaining' && d.release_blocker === true)
     .map(d => ({ id: d.id, classificatie: d.classificatie,
       routes: effectieveRoutes(d), eigenaar: d.eigenaar }));
-  const census = bronCensus(root);
+  const census = bronCensus(root, register);
+  const verklaringen = Array.isArray(register.dynamische_aanroepen) ? register.dynamische_aanroepen : [];
+  for (const v of verklaringen) {
+    const id = 'dynamische aanroep ' + (v && v.bron) + ': ' + (v && v.aanroep);
+    if (!v || typeof v.bron !== 'string' || typeof v.aanroep !== 'string' || !v.aanroep) fouten.push(id + ': onvolledig');
+    else if (!CLASSIFICATIES.has(v.classificatie) || v.classificatie === 'credential' || v.classificatie === 'money_credential')
+      fouten.push(id + ': een dynamische credential wordt niet verklaard maar letterlijk gemaakt');
+    else if (String(v.notitie || '').trim().length < 40) fouten.push(id + ': notitie zegt niet waarom');
+    else if (!census.verklaardDynamisch.some(x => x.bron === v.bron && x.aanroep === v.aanroep))
+      fouten.push(id + ': deze aanroep bestaat niet meer -- haal de verklaring weg');
+  }
   const onbekend = census.kandidaten.filter(k => !bronRoutes.has(k.route));
   for (const k of onbekend) blockers.push({ id: 'unclassified:' + k.route,
     classificatie: 'unclassified', routes: [k.route], eigenaar: 'unassigned',

@@ -6,7 +6,7 @@
 const cp = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const { pak } = require('./afbouw-slot');
+const { pak, kindOmgeving } = require('./afbouw-slot');
 const afloop = require('./lib/afbouw-afloop');
 const ROOT = path.join(__dirname, '..');
 const RAPPORT = path.join(ROOT, '.release', 'release-gate-bewijs.json');
@@ -15,7 +15,7 @@ const vooraf = afloop.magStarten();
 if (!vooraf.mag) throw new Error(afloop.diagnose(vooraf, afloop.lees()));
 const geefAfbouwSlotVrij = pak(process.argv.includes('--productie') ? 'productiereleasepoort' : 'releasepoort');
 // Alleen onze eigen, seriële controles erven het succesvol verkregen slot.
-const kindEnv = { ...process.env, RTG_AFBOUW_SLOT_ACTIEF: '1', RTG_AFBOUW_RUN_ID: afloop.lees().runId };
+const kindEnv = { ...kindOmgeving(process.env), RTG_AFBOUW_RUN_ID: afloop.lees().runId };
 const begonnen = new Date().toISOString();
 try { fs.rmSync(RAPPORT, { force: true }); } catch (e) {}
 

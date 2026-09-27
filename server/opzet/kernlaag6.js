@@ -41,8 +41,8 @@ Object.assign(kern, require('../kern/mobiliteit').maakMobiliteit({
   // de kaartverkoop rekent af via dezelfde betaalkern en met dezelfde
   // OV-prijsformule als het uitchecken; geen tweede som, geen tweede grootboek
   pay: kern.pay, ovPrijsVan: kern.ovPrijsVan,
-  // voor de dienstverbandcontrole bij zakelijke ritten
-  accounts
+  // voor de dienstverbandcontrole bij zakelijke ritten; de kaartcode claimt atomair
+  accounts, bewerkCollectie: hulp.bewerkCollectie
 }));
 /* DE APPBRUG: een app-rit wordt ook een vervoersOPDRACHT en komt zo op het
    dispatchbord. HIER en niet in kern/lidacties, dat vóór mobiliteit staat en

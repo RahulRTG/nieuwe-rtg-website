@@ -57,7 +57,7 @@ test('kopen met capaciteit: vol is vol, en betalen gaat via de bestaande stroom'
   // de snorkeltocht heeft capaciteit 10: koop 8, dan past 3 niet meer
   const k1 = await json(await api('/api/ticket/koop', { supplierCode: 'ESVEDRA', activiteitId: 'a2', datum: VANDAAG, tijd: '10:00', personen: 8 }, lidToken));
   assert.equal(k1.ticket.price, 55 * 8);
-  assert.ok(/^[A-Z2-9]{6}$/.test(k1.ticket.code), 'de entreecode is zes leesbare tekens');
+  assert.equal(k1.ticket.code, undefined, 'de boeking draagt geen code; tonen doet /api/ticket/toon');
   const vol = await api('/api/ticket/koop', { supplierCode: 'ESVEDRA', activiteitId: 'a2', datum: VANDAAG, tijd: '10:00', personen: 3 }, lidToken);
   assert.equal(vol.status, 409, 'vol is vol');
   assert.match((await vol.json()).error, /2 plek/);
@@ -67,7 +67,9 @@ test('kopen met capaciteit: vol is vol, en betalen gaat via de bestaande stroom'
   // betalen via de bestaande boekingstroom
   assert.equal((await api('/api/booking/pay', { ref: k1.ticket.ref }, lidToken)).status, 200);
   assert.equal((await api('/api/booking/pay', { ref: k2.ticket.ref }, lidToken)).status, 200);
-  global.__t1 = k1.ticket; global.__t2 = k2.ticket;
+  const toon = await json(await api('/api/ticket/toon', { ref: k1.ticket.ref }, lidToken));
+  assert.match(toon.code, /^TK\.[0-9A-F]{32}$/, 'de entreecode is een 128-bit bearer');
+  global.__t1 = Object.assign({}, k1.ticket, { code: toon.code }); global.__t2 = k2.ticket;
 });
 
 test('het programma toont per tijdslot verkocht/binnen en de gastenlijst', async () => {
@@ -79,9 +81,9 @@ test('het programma toont per tijdslot verkocht/binnen en de gastenlijst', async
 });
 
 test('check-in aan de deur: op naam, een keer, en alleen betaald en vandaag', async () => {
-  // onbetaald ticket komt niet binnen
+  // een onbetaald ticket krijgt niet eens een code
   const los = await json(await api('/api/ticket/koop', { supplierCode: 'ESVEDRA', activiteitId: 'a1', datum: VANDAAG, tijd: '17:30', personen: 1 }, lidToken));
-  assert.equal((await api('/api/supplier/ticket/checkin', { code: los.ticket.code }, deurToken)).status, 409);
+  assert.equal((await api('/api/ticket/toon', { ref: los.ticket.ref }, lidToken)).status, 409);
   // de betaalde snorkelgroep komt binnen, afgevinkt door het deurpersoneel op naam
   const ok = await json(await api('/api/supplier/ticket/checkin', { code: global.__t1.code.toLowerCase() }, deurToken));
   assert.equal(ok.ticket.personen, 8);
@@ -91,17 +93,19 @@ test('check-in aan de deur: op naam, een keer, en alleen betaald en vandaag', as
   assert.match((await dubbel.json()).error, /Joel Ferrer/);
   // een onbekende code hoort nergens bij
   assert.equal((await api('/api/supplier/ticket/checkin', { code: 'ZZZZZZ' }, deurToken)).status, 404);
+  // een betaald en ongebruikt ticket toont nog steeds een verse code, maar een gebruikt niet meer
+  assert.equal((await api('/api/ticket/toon', { ref: global.__t1.ref }, lidToken)).status, 409);
   // het programma telt de groep nu als binnen
   const pr = await json(await api('/api/supplier/programma', { datum: VANDAAG }, deurToken));
   assert.equal(pr.slots.find(x => x.activiteitId === 'a2' && x.tijd === '10:00').binnen, 8);
 });
 
-test('het lid ziet zijn tickets met code en gebruikt-status', async () => {
+test('het lid ziet zijn tickets met gebruikt-status en nooit de code', async () => {
   const mijn = await json(await api('/api/tickets/mijn', {}, lidToken));
   const t1 = mijn.tickets.find(t => t.ref === global.__t1.ref);
   assert.equal(t1.gebruikt, true);
   assert.equal(t1.checkin.door, 'Joel Ferrer');
   const t2 = mijn.tickets.find(t => t.ref === global.__t2.ref);
   assert.equal(t2.gebruikt, false);
-  assert.ok(t2.code);
+  assert.equal(t2.code, undefined);
 });

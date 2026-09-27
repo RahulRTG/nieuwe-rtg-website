@@ -120,7 +120,7 @@ app.post('/api/supplier/ai', supplierAuth, async (req, res) => {
   if (/(bestelling|orders?|bon(nen)?\b)/.test(ql)) {
     const open = ordersVanZaak(s.code).filter(o => !['geserveerd', 'geweigerd', 'terugbetaald', 'bezorgd', 'opgehaald'].includes(o.status));
     return A(open.length
-      ? open.length + ' open bestelling(en): ' + open.map(o => o.customerCodename + ' € ' + o.total + ' (' + o.status + ', code ' + o.pickup + ')').join('; ') + '.'
+      ? open.length + ' open bestelling(en): ' + open.map(o => o.customerCodename + ' € ' + o.total + ' (' + o.status + ', bon ' + o.pickup + ')').join('; ') + '.'
       : 'Er zijn geen open bestellingen.');
   }
   if (/(rooster|dienst|schedule|shift)/.test(ql)) {

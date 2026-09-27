@@ -48,8 +48,8 @@ test.after(() => {
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 
-/* Een aanvraagcode heeft de vorm <id>.<geheim>; de poort ontleedt hem en kent
-   verder geen register (zie routes/supplier/horeca/arrival-toegang.js). */
+/* Een aanvraagcode is de idempotentiesleutel van de browser (32 tot 170
+   tekens); de pass zelf maakt de server (kern/arrivalpas.js). */
 const code = (n) => 'arrivaltest' + n + 'abcdefghijkl.' + 'geheimgeheimgeheim' + n + 'abcdef';
 /* Datum EN tijd komen uit HETZELFDE moment. Nemen we de tijd van de klok (die
    over middernacht rolt) en de datum van vandaag (die dat niet doet), dan wijst

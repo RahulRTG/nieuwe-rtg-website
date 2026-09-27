@@ -49,16 +49,22 @@
       sparIn.addEventListener('keydown', e => { if (e.key === 'Enter') park(); });
     }
   }
-  /* ---------- oplichtend ophaalcode-scherm ---------- */
-  function showGlow(o){
+  /* ---------- oplichtend afhaalscherm ----------
+     De QR draagt de AFHAALCODE: 128 bits, en de server geeft hem alleen in het
+     antwoord op /order/afhaalcode. Elke keer tonen maakt dus een nieuwe code en
+     trekt de vorige in -- er staat niets van op dit toestel. Het bonnummer
+     eronder is voor mensen (keuken, pas) en opent niets. */
+  async function showGlow(o){
+    let d;
+    try { d = await API.call('/order/afhaalcode', { ref: o.ref }); }
+    catch(e){ toast(e.message); return; }
     $('#gcSup').textContent = o.supplierName;
-    $('#gcCode').textContent = o.pickup;
-    // een echte, scanbare QR van de ophaalcode: de kassa scant hem, of typt de code
+    $('#gcCode').textContent = o.pickup ? T('app.gc.bon','Bon') + ' ' + o.pickup : '';
     const qh = $('#gcQr');
     if (qh){
       qh.innerHTML = ''; qh.style.display = 'none';
-      if (window.RTGQRteken && o.pickup){
-        try { qh.appendChild(RTGQRteken.teken(String(o.pickup), { schaal: 5, ecc: 'M' })); qh.style.display = 'inline-block'; } catch(e){}
+      if (window.RTGQRteken && d && d.code){
+        try { qh.appendChild(RTGQRteken.teken(String(d.code), { schaal: 4, ecc: 'M' })); qh.style.display = 'inline-block'; } catch(e){}
       }
     }
     $('#glowCode').classList.add('open');

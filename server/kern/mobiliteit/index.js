@@ -45,7 +45,7 @@
 
 function maakMobiliteit(state) {
   const { db, save, crypto, schoon, codenaamVan, haversine, etaMinutes, notify,
-    findSupplier, logActivity, sseToOffice, sseToCustomer, pay, ovPrijsVan, accounts } = state;
+    findSupplier, logActivity, sseToOffice, sseToCustomer, pay, ovPrijsVan, accounts, bewerkCollectie } = state;
 
   const nu = () => new Date().toISOString();
   const id = p => (p || 'mb') + crypto.randomBytes(4).toString('hex');
@@ -74,6 +74,8 @@ function maakMobiliteit(state) {
   Object.assign(ctx, require('./overeenkomst')(ctx));
   Object.assign(ctx, require('./kaartje')(ctx));
   Object.assign(ctx, require('./kaartje-beeld')(ctx));
+  // de 128-bit code; de collectietransactie gaat alleen naar hem en niet de kern in
+  Object.assign(ctx, require('./kaarttoegang')(Object.assign({}, ctx, { bewerkCollectie })));
   Object.assign(ctx, require('./kaartje-gebruik')(ctx));
   Object.assign(ctx, require('./abonnement')(ctx));   // leunt op de kaartjesvoorraad
   Object.assign(ctx, require('./storing')(ctx));

@@ -86,6 +86,8 @@ const EIGENAAR = {
     waarom: 'Handmatig geschreven richtingsdocument (RTG Vrijheid: tijd, rust, vrijheid en eerlijkheid); de machineleesbare lusstand staat in server/kern/vrijheid/lus.js en wordt door test/vrijheid-lus.test.js tegen de boom gehouden, er is geen generator die het schrijft.' },
   'TOESTEL.md': { soort: 'BRON',
     waarom: 'Handmatig geschreven richtingsdocument (AI op het toestel van het lid); de gerepareerde herkomst staat in test/ai-herkomst.test.js, er is geen generator die het schrijft.' },
+  'RELEASEKANDIDAAT.md': { soort: 'BRON',
+    waarom: 'Handmatig geschreven blocker-matrix voor de release candidate V1 met de besluiten van de eigenaar; de getallen erin zijn met de hand uit productie-status, golive en de releasepoort overgenomen, er is geen generator die het schrijft.' },
   'AUTHORITY.md': { soort: 'BRON',
     waarom: 'Handmatig geschreven richtingsdocument (RTG Authority Engine); de bronverwijzingen zijn met de hand nagelopen, er is geen generator die het schrijft.' },
   'BENOEMING.md': { soort: 'BRON',

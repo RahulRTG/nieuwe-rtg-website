@@ -45,7 +45,7 @@ function draai(org) {
   const sleutel = PREFIX + crypto.randomBytes(32).toString('base64url');
   // de hint is genoeg om sleutels uit elkaar te houden, te weinig om te raden
   const hint = sleutel.slice(0, PREFIX.length + 4) + '...' + sleutel.slice(-4);
-  S.db.prepare(`INSERT INTO scim_sleutels (org, hash, hint, created_at) VALUES (?, ?, ?, ?)
+  S.huidigeDb().prepare(`INSERT INTO scim_sleutels (org, hash, hint, created_at) VALUES (?, ?, ?, ?)
     ON CONFLICT(org) DO UPDATE SET hash = excluded.hash, hint = excluded.hint,
     created_at = excluded.created_at, laatst_gebruikt = NULL`)
     .run(o, hashVan(sleutel), hint, new Date().toISOString());
@@ -54,14 +54,14 @@ function draai(org) {
 
 function weg(org) {
   const o = String(org || '').trim().toLowerCase();
-  const had = S.db.prepare('SELECT org FROM scim_sleutels WHERE org = ?').get(o);
+  const had = S.huidigeDb().prepare('SELECT org FROM scim_sleutels WHERE org = ?').get(o);
   if (!had) return false;
-  S.db.prepare('DELETE FROM scim_sleutels WHERE org = ?').run(o);
+  S.huidigeDb().prepare('DELETE FROM scim_sleutels WHERE org = ?').run(o);
   return true;
 }
 
 function stand(org) {
-  const r = S.db.prepare('SELECT org, hint, laatst_gebruikt, created_at FROM scim_sleutels WHERE org = ?')
+  const r = S.huidigeDb().prepare('SELECT org, hint, laatst_gebruikt, created_at FROM scim_sleutels WHERE org = ?')
     .get(String(org || '').trim().toLowerCase());
   return r || null;
 }
@@ -76,11 +76,11 @@ function vanSleutel(sleutel) {
   const s = String(sleutel || '');
   if (!s.startsWith(PREFIX) || s.length < PREFIX.length + 20) return null;
   const h = hashVan(s);
-  const r = S.db.prepare('SELECT org, hash FROM scim_sleutels WHERE hash = ?').get(h);
+  const r = S.huidigeDb().prepare('SELECT org, hash FROM scim_sleutels WHERE hash = ?').get(h);
   if (!r) return null;
   const a = Buffer.from(r.hash, 'hex'), b = Buffer.from(h, 'hex');
   if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return null;
-  try { S.db.prepare('UPDATE scim_sleutels SET laatst_gebruikt = ? WHERE org = ?').run(new Date().toISOString(), r.org); }
+  try { S.huidigeDb().prepare('UPDATE scim_sleutels SET laatst_gebruikt = ? WHERE org = ?').run(new Date().toISOString(), r.org); }
   catch (e) { /* de sleutel werkt; het bijhouden van het tijdstip mag falen */ }
   return r.org;
 }

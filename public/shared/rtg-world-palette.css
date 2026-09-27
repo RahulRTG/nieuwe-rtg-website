@@ -57,3 +57,7 @@ body[data-rtg-skin="heritage"][data-rtg-world][data-rtg-layout="standard"]{
   background:var(--rtg-world-bg)!important;color:var(--rtg-world-ink)!important;
   color-scheme:var(--rtg-world-schema)!important;
 }
+/* Controls share the same quiet treatment; focus remains an explicit outline. */
+body[data-rtg-skin="heritage"][data-rtg-layout="standard"] :is(button,input,select,textarea){
+  box-shadow:none!important;text-shadow:none!important;
+}

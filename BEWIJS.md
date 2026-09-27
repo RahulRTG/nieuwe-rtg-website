@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2082 bestanden en 14681 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2086 bestanden en 14698 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2082 |
-| losse beweringen (`test(...)`) | 14681 |
+| toetsbestanden | 2086 |
+| losse beweringen (`test(...)`) | 14698 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 174 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1425 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 75 |
-| alleen in de kop *genoemd*, nog niet gemeten | 168 |
-| niets van beide | 414 |
+| alleen in de kop *genoemd*, nog niet gemeten | 171 |
+| niets van beide | 415 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1820 bestanden, 14219 beweringen.
+1824 bestanden, 14236 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -735,6 +735,10 @@ toets omvalt.
 | `kantoren-uitbreiding.test.js` | 5 | gezakt op `liegpoort /api/` | De kantoren-uitbreiding: vijf nieuwe kamers (Support team, Ingenieurs, Consumenten- en Partner-abonnementen, Kantine), de kantine-kaart van vandaag, en de identiteitskluis-inzage: kamers met naamInzage (en de... |
 | `kantoren.test.js` | 13 | gezakt op `liegpoort /api/` | De RTG-kantoren en de boardroom: zesentwintig afdelingskamers met echte cijfers, taken per kamer, en de boardroom die alles ziet, elke platformfunctie kan schakelen (globaal en per doelgroep, en het werkt echt: het... |
 | `kappen.test.js` | 8 | gezakt op `===->!==#0` | AFKAPPEN IS HUISHOUDEN, EN HUISHOUDEN HOORT NIET IN EEN VERZOEK. WAAROM DIT BESTAAT. |
+| `kascode-credential.pg.test.js` | 1 | genoemd | Echte PostgreSQL-proef voor de kas- en tikcode (CODECREDENTIALS.json, deuren pay.kascode_en_vooraf en pay.tikcode, control `atomic_claim`). Twee app- instances delen alleen de database: de codes leven in de... |
+| `kascode-credential.test.js` | 8 | genoemd | KAS- EN TIKCODE ALS CREDENTIAL (CODECREDENTIALS.json, deuren pay.kascode_en_vooraf en pay.tikcode). Per control van de kascode een toets op de wereld van test/lib/kaswereld.js; tik en vooraf staan in... |
+| `kascode-routes.test.js` | 2 | -- | KAS- EN TIKCODE OP EEN ECHTE SERVER (CODECREDENTIALS.json, deuren pay.kascode_en_vooraf en pay.tikcode): de uitgifte is no-store en staat buiten elke retrycache, een retry met dezelfde sleutel geeft geen code, en de... |
+| `kascode-tik-vooraf.test.js` | 7 | genoemd | DE TIKCODE EN HET VASTZETTEN (CODECREDENTIALS.json, deuren pay.tikcode en pay.kascode_en_vooraf). Zelfde wereld als test/kascode-credential.test.js (test/lib/kaswereld.js). |
 | `kassa-herhaling.test.js` | 8 | gezakt op `liegpoort /api/` | RTG Kassa: dezelfde bon twee keer versturen mag niet twee keer omzet zijn. WAAROM DEZE TOETS ER IS. |
 | `kassa-modus.test.js` | 5 | gezakt op `liegpoort /api/` | De Kassa: een kassa-app voor elke zaak, met een omschakelbare modus per sector. De werkgever kiest de modus en beheert het eigen assortiment (met prijs per stuk of per kilo); afrekenen loopt door de bestaande... |
 | `kassa-premium.test.js` | 7 | gezakt op `liegpoort /api/` | De premium-laag van De Kassa, gewoon inbegrepen: derving (verspil, breuk, eigen gebruik, repro), retour als minbon, wachtbonnen (parkeren en terughalen), korting met reden op de bon, het dagrapport en de kasopmaak. |
@@ -985,7 +989,7 @@ toets omvalt.
 | `mollie-eigen.test.js` | 1 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `momentproef.test.js` | 9 | gezakt op `===->!==#48` | DE MOMENTPROEF -- de vierde keten, en de eerste die over een PROJECTIE gaat. scripts/momentproef.js legt een publieke keten af zoals scripts/ritproef.js een ritketen: van een feit bij de bron tot een melding bij... |
 | `mond.test.js` | 10 | gezakt op `===->!==#0` | De RTG-signatuurmond (public/shared/mond.js): het puntenveld dat de lippen vormt is een pure functie met diepte (z). Hier los getoetst in Node -- de WebGL-render en de 2D-terugval leven alleen in de browser. |
-| `money-credential-productiepoort.test.js` | 13 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `money-credential-productiepoort.test.js` | 12 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `money012-inkomend.test.js` | 9 | gezakt op `!==->===#0` | MONEY-012, de inkomende kant -- geld dat het huis BINNENKOMT eindigt na elke onderbreking in precies een verklaarbare waarheid. Dezelfde vier wetten als test/money012.test.js (de uitgaande kant), nu op... |
 | `money012-keten.test.js` | 3 | gezakt op `===->!==#0` | MONEY-012, DE EINDPROEF -- de keten als een systeem en niet als losse modules. test/money012.test.js en test/money012-inkomend.test.js beproeven elk een module met een nagemaakte buitenwereld. |
 | `money012.test.js` | 15 | gezakt op `===->!==#0` | MONEY-012 -- geld dat het huis verlaat, eindigt na elke onderbreking in precies EEN verklaarbare waarheid. Vier wetten, en deze toets beproeft ze op de uitgaande kant (de betaalopdracht, server/kern/betaalopdracht/),... |

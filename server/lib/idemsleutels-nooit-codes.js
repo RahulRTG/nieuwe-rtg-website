@@ -6,6 +6,12 @@
 'use strict';
 
 module.exports = Object.freeze({
+  'POST /api/giftcard/roteer':
+    'rotatie toont een nieuwe cadeaukaartcode eenmaal; de kern weigert dezelfde sleutel daarna met 409 zonder code',
+  'POST /api/supplier/giftcard/roteer':
+    'zelfde reden als de ledenkant: geen antwoordcache mag de code van een kaart met saldo heronthullen',
+  'POST /api/supplier/giftcard/intrek':
+    'intrekken leest de actuele stand in kern/cadeaukaart.js; een tweede keer is een toestandscontrole, geen gecachet antwoord',
   'POST /api/pay/kascode':
     'uitgifte toont een 128-bit kascode eenmaal en trekt de vorige in; de bak weigert dezelfde sleutel daarna met 409',
   'POST /api/pay/tikcode':

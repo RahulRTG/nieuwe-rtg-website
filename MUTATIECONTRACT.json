@@ -1,27 +1,27 @@
 {
  "stempel": {
-  "op": "2026-09-27T14:06:02.297Z",
-  "commit": "bf3ddfe0",
+  "op": "2026-09-27T14:19:28.330Z",
+  "commit": "2bdc459a",
   "boomVuil": false,
-  "boomAnders": 3,
+  "boomAnders": 2,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5037,
-  "geclassificeerd": 5037,
+  "totaal": 5039,
+  "geclassificeerd": 5039,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3190,
    "NOT_APPLICABLE": 1211,
-   "PROTECTED": 489,
+   "PROTECTED": 491,
    "INTENTIONALLY_NON_IDEMPOTENT": 147
   },
-  "vastgesteldDoorMens": 1896,
+  "vastgesteldDoorMens": 1898,
   "afgeleidDoorScript": 3141,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4146,
+   "AUTHENTICATED": 4148,
    "PUBLIC": 124,
    "OBJECT_SCOPED": 746,
    "(niet af te leiden -- vraagt een verklaring)": 5,
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 136,
    "kale ronde: onbeschermd": 123,
    "kale ronde: geen uitspraak": 4713,
-   "niet gemeten": 65
+   "niet gemeten": 67
   },
   "voorstellen": {},
   "metingVan": "2026-09-19T17:45:58.177Z"
@@ -76428,6 +76428,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "pay.kascode.intrekken",
+   "route": "POST /api/pay/kascode/intrek",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "een echt account",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "pay.oplaad",
    "route": "POST /api/pay/oplaad",
    "semantiek": {
@@ -76822,6 +76843,27 @@
     "hindernis": null
    },
    "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "pay.tikcode.intrekken",
+   "route": "POST /api/pay/tikcode/intrek",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null

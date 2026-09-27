@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T03:41:29.169Z",
-    "commit": "c9f78f1",
+    "op": "2026-09-27T12:55:12.819Z",
+    "commit": "eb64c1e",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -8227,6 +8227,13 @@
       "operator": "true->false#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "saloon-edge.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "saloon-lus.test.js": {
       "soort": "server",

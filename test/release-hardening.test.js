@@ -173,7 +173,7 @@ test('de imageworkflow publiceert alleen een getekende kandidaat en geen offici√
   assert.match(bron, /actions\/checkout@[^\n]*\n\s+with:[\s\S]*?fetch-depth: 0\n\s+persist-credentials: false/,
     'historische releaseproeven vereisen de volledige Git-geschiedenis');
   const afbouw = bron.indexOf('npm run afbouw:software');
-  const pg = bron.indexOf("require('./scripts/lib/suite-pg').telling");
+  const pg = bron.indexOf('run: node scripts/ci-pg-bewijs.js');
   const bootstrap = bron.indexOf('imageherkomst.js --sleutelcontrole');
   const sleutel = bron.indexOf('imageherkomst.js --sleutelcontrole', afbouw);
   const kandidaat = bron.indexOf('docker push "$RTG_CANDIDATE_IMAGE"');

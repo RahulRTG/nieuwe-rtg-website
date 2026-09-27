@@ -89,6 +89,10 @@ Kolommen: **code** / **extern** / **besluit** = JA/NEE; *bewijs* = wat
 | B9 | **Alle negen dichtgezette geldcode- en tickettypes gaan mee in V1**: opwaardeerkaarten (tegoedbon), cadeaukaart, bestellen en bezorgen, RTG Pay aan de kassa (kascode, vooraf, tikcode), entreetickets, vervoerskaartjes, Invisible Arrival, WorkOS-werkruimtetokens | elk type naar het beleid in `CODECREDENTIALS.json` (128-bit, hash-only, eenmalig tonen, vervaldatum, intrekken en roteren, constante-tijd, atomisch claimen), met toetsen als `bewijs` |
 | A1b | Keuringsregel 71 mag een lopende ronde doorlaten die aantoonbaar de eigen ouder is | gedaan: `eigenLijn()` |
 | A2b | Accountmutaties met een schrijver per proces, en de bewaarveger meteen mee | gedaan: `server/db/deelnemers.js`, `server/accounts/achtergrond.js` |
+| B10 | **Kantoortoegang in productie op naam met een passkey**; de gedeelde `OFFICE_CODE` werkt alleen nog buiten productie | deur `office.gedeelde_kantoorcode`; bestaande poort aansluiten (`kern/kantoor/kluispoort.js`, `server/webauthn/`) |
+| B11 | **Bon- en polsbandsaldo naar 128 bits** met een atomische claim; een gast boekt alleen af wat aan zijn eigen sessie hangt | deur `horeca.bon_en_polsbandsaldo`, patroon van de cadeaukaart |
+| B12 | **Zaakdoos-sleutel per zaak** (128 bits, hash-only, intrekken en roteren), met een kloon die alleen de eigen zaak bevat | deur `devices.zaakdoos_sleutel` |
+| B13 | **De kortingscode van RTG Eten is een promotiecode** en geen geheim: wel een vervaldatum, een maximum, een grens per lid en een rem tegen raden | deur `eten.kortingscode` |
 
 **Nieuw gemeten sinds de matrix:** de codecredentialpoort telt geen 9 maar
 **483** blokkades: de 9 open types, **399** routes die op een toegangscode

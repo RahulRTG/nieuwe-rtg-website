@@ -9,11 +9,11 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**60 bundels, 480 delen, 0 zonder onderwerp.**
+**60 bundels, 482 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 98 delen, 9722 regels in de delen
+`public/apps/app-main/` -- 99 delen, 9756 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -30,6 +30,7 @@ omlaag.
 | `app-main-05.js` | Account access: validate the current step and submit through the existing auth routes |
 | `app-main-06.js` | SALON-CONNECTIES |
 | `app-main-07.js` | het contactenblok op het beginscherm, met de lege staat |
+| `app-main-070.js` | de herkomstvraag op het welkomstscherm (besluit C6) |
 | `app-main-07a.js` | Language changes only presentation; agreement, identity and focus are preserved |
 | `app-main-08.js` | de onboarding: het paspoort scannen of een bestand kiezen |
 | `app-main-08a.js` | Vervolg van app-main-08: het meebouwen aan het eind van de onboarding |
@@ -118,7 +119,7 @@ omlaag.
 
 ## `apps/backoffice.js`
 
-`public/apps/backoffice/` -- 9 delen, 1144 regels in de delen
+`public/apps/backoffice/` -- 9 delen, 1145 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -211,7 +212,7 @@ omlaag.
 
 ## `apps/leverancier.js`
 
-`public/apps/leverancier/` -- 114 delen, 9785 regels in de delen
+`public/apps/leverancier/` -- 115 delen, 9825 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -329,6 +330,7 @@ omlaag.
 | `leverancier-83.js` | de recepten en hun marges |
 | `leverancier-84.js` | de meldingenlijst van de zaak |
 | `leverancier-84a.js` | HET ETEN-WERKBLAD AAN ZIJN KNOPPEN, en de rest van het werkblad zelf |
+| `leverancier-84b.js` | Een algemene reserveringsschakelaar geeft RTG geen toestemming voor een Connection-programma |
 
 ## `apps/meldkamer.js`
 

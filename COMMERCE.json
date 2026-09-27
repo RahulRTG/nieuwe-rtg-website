@@ -2,18 +2,18 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-09-27",
   "gemeten": {
-    "bestanden": 2422,
-    "domeinenTotaal": 636,
-    "koopbareVormen": 601,
-    "koopbareDomeinen": 120,
+    "bestanden": 2533,
+    "domeinenTotaal": 669,
+    "koopbareVormen": 605,
+    "koopbareDomeinen": 121,
     "envelopDrempel": 8,
     "envelop": 42,
     "veldenDomeineigen": 781,
-    "veldenNietEnvelop": 1042,
+    "veldenNietEnvelop": 1047,
     "gelijkendeVormparen": 17,
     "werkwoordenVolledig": 1,
     "werkwoordenOveral": 0,
-    "werkwoordCombinaties": 46,
+    "werkwoordCombinaties": 45,
     "wagenVormen": 33,
     "wagenVormenUniek": 30,
     "wagenDomeinen": 22,
@@ -73,7 +73,7 @@
     "prijs": 39,
     "beschikbaarheid": 54,
     "reserveer": 28,
-    "bevestig": 57,
+    "bevestig": 58,
     "lever": 21,
     "annuleer": 31,
     "retour": 8
@@ -1022,7 +1022,7 @@
       "bewijs": {
         "toon": "beeld",
         "prijs": "som",
-        "beschikbaarheid": "verlopen"
+        "beschikbaarheid": "lopendContract"
       },
       "telt": 3
     },
@@ -1251,6 +1251,25 @@
         "toon": "overzicht",
         "bevestig": "boek",
         "annuleer": "annuleer"
+      },
+      "telt": 3
+    },
+    {
+      "domein": "kern/vonk",
+      "heeft": {
+        "toon": true,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": true,
+        "bevestig": true,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "publiek",
+        "reserveer": "blokkeer",
+        "bevestig": "boek"
       },
       "telt": 3
     },
@@ -1576,24 +1595,6 @@
       "bewijs": {
         "toon": "jeugdbeeld",
         "annuleer": "intrek"
-      },
-      "telt": 2
-    },
-    {
-      "domein": "kern/vonk",
-      "heeft": {
-        "toon": true,
-        "prijs": false,
-        "beschikbaarheid": false,
-        "reserveer": true,
-        "bevestig": false,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "publiek",
-        "reserveer": "blokkeer"
       },
       "telt": 2
     },
@@ -2044,6 +2045,21 @@
     },
     {
       "domein": "kern/antivirus",
+      "heeft": {
+        "toon": false,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": false,
+        "bevestig": false,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {},
+      "telt": 0
+    },
+    {
+      "domein": "kern/bankpositie",
       "heeft": {
         "toon": false,
         "prijs": false,

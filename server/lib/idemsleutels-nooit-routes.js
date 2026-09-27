@@ -59,24 +59,6 @@ module.exports = ({
     'uitgifte bevat een eenmalige vrachtvolgcode; alleen de domeinkern mag een retry beoordelen',
   'POST /api/supplier/vracht/volgcode/roteer':
     'rotatie bevat een nieuwe eenmalige vrachtvolgcode; een antwoordcache mag haar niet heronthullen',
-  'POST /api/pay/kascode':
-    'uitgifte toont een 128-bit kascode eenmaal en trekt de vorige in; de bak weigert dezelfde sleutel daarna met 409',
-  'POST /api/pay/tikcode':
-    'zelfde reden als de kascode: geen antwoordcache mag een tikcode heronthullen',
-  'POST /api/pay/tegoed/roteer':
-    'rotatie toont een nieuwe geldwaardige tegoedcode eenmaal; de bon weigert de sleutel daarna met 409',
-  'POST /api/supplier/pay/tegoed/roteer':
-    'zelfde reden als de ledenkant: geen antwoordcache mag de code heronthullen',
-  'POST /api/order/afhaalcode':
-    'tonen is roteren: elk antwoord draagt een nieuwe afhaalcode en trekt de vorige in; een herhaald antwoord zou een ingetrokken code tonen',
-  'POST /api/ticket/toon':
-    'tonen is roteren: elk antwoord draagt een nieuwe entreecode en trekt de vorige in (kern/tickettoegang.js); een herhaald antwoord zou een ingetrokken code tonen',
-  'POST /api/supplier/ticket/toon':
-    'zelfde reden als de ledenkant: het vernieuwen van een deurticket geeft een nieuwe code en trekt de vorige in',
-  'POST /api/mob/kaart/toon':
-    'tonen is roteren: elk antwoord draagt een nieuwe code van het vervoerbewijs en trekt de vorige in (kern/mobiliteit/kaarttoegang.js)',
-  'POST /api/order/afhaalcode/intrek':
-    'intrekken leest de actuele stand in kern/afhaalcode.js; een tweede keer is een toestandscontrole, geen gecachet antwoord',
   'POST /api/member/vluchten/incheck':
     'check-in geeft de kale boarding-passcode eenmaal; een generieke antwoordcache mag haar nooit heronthullen',
   'POST /api/member/vluchten/pass/roteer':
@@ -146,4 +128,5 @@ module.exports = ({
 Object.assign(module.exports, require('./idemsleutels-nooit-carriere'));
 Object.assign(module.exports, require('./idemsleutels-nooit-ledger'));
 Object.assign(module.exports, require('./idemsleutels-nooit-vakschema'));
+Object.assign(module.exports, require('./idemsleutels-nooit-codes'));
 Object.freeze(module.exports);

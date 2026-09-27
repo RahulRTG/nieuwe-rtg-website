@@ -90,7 +90,7 @@ module.exports = ({ db, bewerkCollectie, transactie, bearer, codeHash, crypto, n
       for (const g of bron) {
         if (!g || typeof g !== 'object' || !g.id) continue;
         if (typeof g.code === 'string') {
-          if (!g.toegang) { g.toegang = toegangVoor(g); g.legacy24 = true; g.historie = g.historie || []; }
+          if (!g.toegang) { g.toegang = toegangVoor(g); g.legacy24 = true; g.historie = g.historie || []; g.herkomst = g.toegang.issuer; }
           delete g.code; n++;
         } else if (!g.toegang) {
           /* geen code en geen toegang: er is niets om mee te openen, en dat blijft zo */

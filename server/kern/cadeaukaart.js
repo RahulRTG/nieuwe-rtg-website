@@ -50,7 +50,7 @@ module.exports = ({ db, bewerkCollectie, crypto, nu }) => {
       if (eerder) return { ok: true, herhaald: true, codeGetoond: false, kaart: naarBuiten(eerder),
         uitleg: 'De code is alleen bij de eerste keer getoond. Kwijt? Vraag een nieuwe code aan; de oude vervalt dan.' };
       const kaart = { id: 'GC' + crypto.randomBytes(8).toString('hex'), supplierCode, supplierName,
-        bedrag, saldo: bedrag, kocht, customerKey: customerKey || null, at: nu(), verzilveringen: [],
+        bedrag, saldo: bedrag, herkomst: issuer, kocht, customerKey: customerKey || null, at: nu(), verzilveringen: [],
         uitgifte_idem: idemHash, historie: [] };
       const g = nieuweToegang(issuer, kaart);
       kaart.toegang = g.toegang;

@@ -211,6 +211,21 @@ LEZER op `levensgraaf/termijnen.js`. Par. 7 zet de volgorde vast, en de eerste
 twee regels (uitstapknop, hulpwijzer verbreden) kosten samen twee dagen en doen
 meer voor de mens uit de missie dan de acht eronder.
 
+**`SAMENLEVING.md` is de grondwet boven de hele ladder** -- hoe RTG en de
+RTFoundation elke plek in de samenleving bedienen met één infrastructuur en
+verschillende routes voor betalen, uitvoeren, beschermen en deelnemen. Lees die
+vóór je een trede, een Foundation-functie of een poort op identiteit toevoegt.
+De kern: er is een **universele bodem** die achter geen enkele betaling
+verdwijnt (leren, ontwikkelen, oriënteren, verbinden, rust, hulp vinden, opnieuw
+beginnen), en RTG modelleert *mens → huidige behoefte → passende mogelijkheid*
+en nooit *mens → klasse → product* -- een positie is een toestand, de pas zegt
+niets over de mens, en er komt nergens een maatschappelijke score. **Identiteit
+begrenst handelingen, niet het mens-zijn.** Let op de namen: `bodem` is bezet
+door de prijsondergrens in `kern/pasladder.js` (in code heet het
+`onvervreemdbaar`), en "Gemeenschap" botst met RTG Community. Par. 11.1 is de
+reden dat eerst gemeten moet worden: een Community-lid en een niet-lid zijn in de
+code allebei `tier === 'guest'`, en 101 bestanden toetsen daarop.
+
 **`CONNECT.md` is het diepte-document van Foundation Connect** -- het
 ontdeknetwerk van FoundationOS, op het scherm **Ontdekken**. In een zin: *je komt
 omdat het leuk is, je blijft omdat je nieuwsgierig wordt, en je gaat weg met iets

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-27T12:10:42.954Z",
-    "commit": "c1c02ae9",
+    "op": "2026-09-27T14:00:46.998Z",
+    "commit": "46b1a102",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 0,
     "instrument": "scripts/idemidentiteit.js",
     "node": "v22.22.2"
   },
@@ -688,7 +688,7 @@
     },
     {
       "bestand": "server/routes/supplier/kassa/cadeaukaart.js",
-      "regel": 35,
+      "regel": 38,
       "soort": "kern",
       "binding": "server/lib/idem.js",
       "sleutelNamen": [
@@ -700,7 +700,7 @@
         "req",
         "supplier"
       ],
-      "regelTekst": "const r = await metIdem(idem, 'gc|' + req.supplier.code + '|' + bedrag, () => {",
+      "regelTekst": "const r = await metIdem(idem, 'gc|' + req.supplier.code + '|' + bedrag, async () => {",
       "afdrukExtra": [
         "bedrag",
         "code",

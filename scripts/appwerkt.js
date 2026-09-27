@@ -118,7 +118,12 @@ const controle = process.argv.includes('--controle');
 const stil = process.argv.includes('--stil');
 const filter = (process.argv.find((a) => a.startsWith('--filter=')) || '').slice(9);
 const PAR = Number((process.argv.find((a) => a.startsWith('--par=')) || '').slice(6) || 6);
-const MAXKLIK = 14;
+/* Hoogstens zoveel tikken per scherm. Het oordeel eist dat de proef minstens
+   de helft van de eigen knoppen raakt, dus een plafond van 14 maakte elk scherm
+   met meer dan 28 eigen knoppen per definitie onbewijsbaar (routedossier.html
+   heeft er 55). Met 40 kan dat tot 80; wat daarboven zit blijft NIET_GETEST,
+   met de telling erbij. */
+const MAXKLIK = 40;
 
 /* Knoppen die iets doen wat je niet wilt uitlokken op een proefserver met een
    echte sessie. Ze worden NIET stil overgeslagen: elke rij noemt ze bij naam,

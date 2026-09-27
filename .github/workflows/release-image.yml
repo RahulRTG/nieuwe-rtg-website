@@ -66,17 +66,7 @@ jobs:
       - name: PostgreSQL/Redis-duurzaamheidsbewijs
         # npm test heeft alle PG-bestanden al in afzonderlijke databases
         # uitgevoerd. Een tweede run zou de door SUITE gepinde bytes vervangen.
-        run: |
-          node <<'NODE'
-          const fs = require('node:fs'), crypto = require('node:crypto');
-          const bytes = fs.readFileSync('.release/pg-bewijs.json');
-          const suite = JSON.parse(fs.readFileSync('SUITE.json'));
-          require('./scripts/lib/suite-pg').telling(JSON.parse(bytes), process.env.GITHUB_SHA);
-          if (suite.stempel?.commit !== process.env.GITHUB_SHA || suite.stempel?.boomVuil !== false ||
-              suite.postgres?.pad !== '.release/pg-bewijs.json' ||
-              suite.postgres?.sha256 !== crypto.createHash('sha256').update(bytes).digest('hex'))
-            throw Error('PostgreSQL-bewijs wijkt af van de volledige suite.');
-          NODE
+        run: node scripts/ci-pg-bewijs.js
       - name: Softwarebewijs bewaren, ook bij een mislukte ronde
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7

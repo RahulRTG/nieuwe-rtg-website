@@ -50,21 +50,24 @@ test('de echte CI-verificatiestap weigert vervangen PG-bytes en een verkeerde su
  const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),cp=require('node:child_process'),crypto=require('node:crypto');
  const root=path.join(__dirname,'..');
  const workflow=fs.readFileSync(path.join(root,'.github/workflows/release-image.yml'),'utf8');
- const code=workflow.match(/node <<'NODE'\n([\s\S]*?)\n\s+NODE\n/)[1];
+ assert.match(workflow,/run: node scripts\/ci-pg-bewijs\.js/);
+ const script=path.join(root,'scripts/ci-pg-bewijs.js');
  const temp=fs.mkdtempSync(path.join(os.tmpdir(),'rtg-ci-pg-proof-'));
  try {
-  fs.mkdirSync(path.join(temp,'.release'));fs.mkdirSync(path.join(temp,'scripts/lib'),{recursive:true});
-  for(const n of ['suite-pg.js','pg-toetslijst.js'])fs.copyFileSync(path.join(root,'scripts/lib',n),path.join(temp,'scripts/lib',n));
+  fs.mkdirSync(path.join(temp,'.release'));
   const bytes=JSON.stringify(bewijs());const suite={stempel:{commit:'a'.repeat(40),boomVuil:false},
    postgres:{pad:'.release/pg-bewijs.json',sha256:crypto.createHash('sha256').update(bytes).digest('hex')}};
-  const run=(pg,s)=>{
+  const run=(pg,s,commit='a'.repeat(40))=>{
    fs.writeFileSync(path.join(temp,'.release/pg-bewijs.json'),pg);fs.writeFileSync(path.join(temp,'SUITE.json'),JSON.stringify(s));
-   return cp.spawnSync(process.execPath,['-e',code],{cwd:temp,encoding:'utf8',env:{...process.env,GITHUB_SHA:'a'.repeat(40)}});
+   return cp.spawnSync(process.execPath,[script],{cwd:temp,encoding:'utf8',env:{...process.env,GITHUB_SHA:commit}});
   };
   assert.equal(run(bytes,suite).status,0);
   for(const [pg,s] of [[bytes+' ',suite],[bytes,{...suite,stempel:{commit:'b'.repeat(40),boomVuil:false}}],
    [bytes,{...suite,postgres:null}],[JSON.stringify({...bewijs(),tests:999}),suite]]){
    const r=run(pg,s);assert.notEqual(r.status,0);assert.match(r.stderr,/PostgreSQL/);
+  }
+  for(const commit of ['', 'a'.repeat(7)]){
+   const r=run(bytes,suite,commit);assert.notEqual(r.status,0);assert.match(r.stderr,/volledige kandidaatcommit/);
   }
  }finally{fs.rmSync(temp,{recursive:true,force:true});}
 });

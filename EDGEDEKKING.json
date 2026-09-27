@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T15:05:02.587Z",
-    "commit": "5ad3db97",
+    "op": "2026-09-27T17:14:32.984Z",
+    "commit": "9456d758",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/edgedekking.js",
@@ -13373,7 +13373,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -20911,7 +20911,7 @@
       },
       "context": {
         "ja": 281,
-        "zelf": 11,
+        "zelf": 12,
         "nee": 0,
         "nvt": 0,
         "na-openen": 0,

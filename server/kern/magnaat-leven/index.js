@@ -20,12 +20,14 @@ const speelronde = require('./speelronde');
 const { controleer, bevries } = require('./bewaking');
 const { oordeelGeef, oordeelOverzicht } = require('./oordeel');
 
+const KIES_START = 'Kies waar je begint: ' + Object.values(R.STARTPOSITIES).map(x => x.naam.toLowerCase()).join(', ') + '.';
+
 function maakLeven({ db, save = () => {}, nu = () => Date.now() } = {}) {
   const boek = maakBoek({ db });
   const eigen = require('../eigencollectie')({ db, domein: 'kern/magnaat-leven', bezit: { magnaatLeven: 'kaart', magnaatOordelen: 'lijst' } });
   const levens = () => eigen.bak('magnaatLeven');
 
-  function haal(key, opnieuw, moeilijkheid) {
+  function haal(key, opnieuw, moeilijkheid, start) {
     const alle = levens();
     let st = alle[key];
     /* Een leven uit de eerste opzet (versie 1) had geen week en geen agenda; het
@@ -35,12 +37,15 @@ function maakLeven({ db, save = () => {}, nu = () => Date.now() } = {}) {
     if (!st || st.versie !== 2 || opnieuw) {
       const ronde = opnieuw ? (st.ronde || 0) + 1 : 0;
       const niveau = moeilijkheid || (st && st.moeilijkheid) || 'normaal';
-      st = nieuw({ wereld: wereldVan(key) + ':2' + (ronde ? ':' + ronde : ''), nu: nu(), moeilijkheid: niveau });
+      const begin = start || (st && st.start) || 'keuken';
+      st = nieuw({ wereld: wereldVan(key) + ':2' + (ronde ? ':' + ronde : ''), nu: nu(), moeilijkheid: niveau, start: begin });
       st.ronde = ronde;
       koppel(st, boek);
-      boek.open(st, R.niveauVan(st).startKas);
-      meld(st, 'Het is maandag. Je werkt 24 uur per week als keukenmedewerker bij ' + R.BAAN.werkgever +
-        ', je loon komt vrijdag, en je hebt ' + euro(R.niveauVan(st).startKas) + '. Je hebt een telefoon, een eenvoudige laptop, en vandaag nog ' +
+      boek.open(st, R.beginKas(st));
+      const v = R.startVan(st).verplichting;
+      meld(st, 'Het is maandag. Je werkt ' + st.baan.urenPerWeek + ' uur per week als ' + st.baan.functie.toLowerCase() + ' bij ' + st.baan.werkgever +
+        ', je loon komt vrijdag, en je hebt ' + euro(R.beginKas(st)) + (R.startVan(st).extraKas ? ', waarvan ' + euro(R.startVan(st).extraKas) + ' van je tante' : '') +
+        (v ? '. Elke vier weken gaat er ' + euro(v.bedrag) + ' naar ' + v.leverancier : '') + '. Je hebt een telefoon, een eenvoudige laptop, en vandaag nog ' +
         '4u 20m voor jezelf. Wat ga je maken?');
       ontgrendel(st, 'geld');
       alle[key] = st;
@@ -136,7 +141,14 @@ function maakLeven({ db, save = () => {}, nu = () => Date.now() } = {}) {
     } else if (body.actie === 'opnieuw') {
       if (body.zeker !== true) return { status: 400, error: 'Opnieuw beginnen gooit dit leven weg. Bevestig het met "zeker".' };
       if (body.moeilijkheid != null && !R.MOEILIJKHEID[body.moeilijkheid]) return { status: 400, error: 'Kies licht, normaal of zwaar.' };
-      return Object.assign(bewaarEnToon(haal(key, true, body.moeilijkheid)), { nieuw: true });
+      if (body.begin != null && !Object.prototype.hasOwnProperty.call(R.STARTPOSITIES, body.begin)) return { status: 400, error: KIES_START };
+      return Object.assign(bewaarEnToon(haal(key, true, body.moeilijkheid, body.begin)), { nieuw: true });
+    } else if (body.actie === 'start') {
+      /* Waar je begint, net als de moeilijkheid: op de eerste dag zonder bevestiging, later alleen door opnieuw te beginnen. */
+      if (!Object.prototype.hasOwnProperty.call(R.STARTPOSITIES, body.begin)) return { status: 400, error: KIES_START };
+      if (st.dag !== 1 || st.aanbod) return { status: 400, error: 'Waar je begint kies je aan het begin. Wil je het anders, begin dan opnieuw.' };
+      if ((st.start || 'keuken') === body.begin) return bewaarEnToon(st);
+      return Object.assign(bewaarEnToon(haal(key, true, null, body.begin)), { nieuw: true });
     } else if (body.actie === 'moeilijkheid') {
       /* Op de eerste dag, voordat je iets hebt gekozen, gaat er niets verloren: dan kan het zonder bevestiging. */
       if (!R.MOEILIJKHEID[body.stand]) return { status: 400, error: 'Kies licht, normaal of zwaar.' };

@@ -22,7 +22,7 @@
 'use strict';
 
 const AFGETEKEND = {
-  door: 'Claude (Opus 5.5), op grond van de keten over HTTP, de browsertoets en de kerntoetsen; niet door een mens nagelezen',
+  door: 'Claude Code, op grond van de keten over HTTP, de browsertoets en de kerntoetsen; niet door een mens nagelezen',
   op: '2026-09-23'
 };
 

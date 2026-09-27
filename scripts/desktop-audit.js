@@ -38,7 +38,10 @@ async function main() {
           const response = await page.goto(srv.base + route, { waitUntil: 'domcontentloaded', timeout: 25000 });
           row.http = response.status();
           await page.waitForSelector('body[data-rtg-desktop-state="ready"],body[data-public-platform]', { timeout: 12000 });
-          await page.waitForSelector('.rtg-adaptive-bar', { timeout: 6000 });
+          // Aanwezig, niet zichtbaar: op Vonk en Rendez-vous neemt de connection
+          // edge de balk over en verbergt hem (connection-edge.css, .connection-edge-owner).
+          await page.waitForSelector('.rtg-adaptive-bar', { state: 'attached', timeout: 6000 });
+          await page.waitForSelector('.wd-shell', { state: 'attached', timeout: 6000 });
           // Edge can append styles after DOMContentLoaded; wait for the shared
           // desktop stylesheet to finish applying before measuring its grid.
           await page.waitForFunction(() => getComputedStyle(document.body).paddingTop === '64px', null, { timeout: 6000 });

@@ -15,6 +15,7 @@
      - de bestaand-id-weigering weg uit nieuwId (hulp.js)             -> toets 14
      - `DUURZAAM.has(actie)` weg uit doe() in index.js               -> toets 17
      - de 2xx-eis of de eens/oneens-volgorde in schaduw.js omdraaien -> toets 18
+     - de bron-eis uit relatieActief of uit relatieZet             -> toets 19
    Toets 1 zakte eerst NIET op zijn eigen mutatie: een andere weigering redde
    hem. Hij is daarna zo gemaakt dat alleen die ene regel nog in de weg staat.
    Toets 14 vond zelf een fout (een bestaand id herschreef een beoordeling) en
@@ -457,4 +458,49 @@ test('18. B1 in de schaduw: eens, oneens en onbekend, en een weigering of een af
   const r = s.stand().routes[0];
   assert.deepEqual({ eens: r.eens, oneens: r.oneens, onbekend: r.onbekend }, { eens: 1, oneens: 2, onbekend: 1 });
   assert.equal(r.handeling, 'betaling.terugboeken');
+});
+
+test('19. B2: met een bron volgt het leerhuis de bron, en een bron die zwijgt telt als nee', () => {
+  const { maakLeerhuis } = require('../server/kern/leerhuis');
+  const db = { data: {} };
+  const inDienst = new Set(['lid:1', 'lid:2']);
+  let bronAan = true;
+  const lh = maakLeerhuis({ db, save: () => {}, bronToets: (bron, p) => (bronAan && bron.soort === 'entiteit' && bron.id === 'ENT1' ? inDienst.has(p) : false) });
+  const doe = (a, i, door) => { const r = lh.doe('ZAAK1', a, i, door); assert.equal(r.ok, true, a + ': ' + r.reden); return r; };
+  doe('orgOpen', { id: 'ZAAK1', soort: 'BUSINESS', eigenaar: 'lid:1', bron: { soort: 'entiteit', id: 'ENT1' } }, 'lid:99');
+  doe('relatieZet', { persoon: 'lid:2', soort: 'EMPLOYEE' }, 'lid:1');
+  const vreemd = lh.doe('ZAAK1', 'relatieZet', { persoon: 'lid:3', soort: 'EMPLOYEE' }, 'lid:1');
+  assert.equal(vreemd.status, 409, 'wie niet in de bron staat, verklaart niemand hier');
+  assert.match(vreemd.reden, /bron/);
+  doe('bestuurZet', { persoon: 'lid:2', rol: 'CURRICULUM_OWNER' }, 'lid:1');
+  /* Het dienstverband stopt: de relatie stopt mee, zonder handeling in het leerhuis. */
+  inDienst.delete('lid:2');
+  const na = lh.doe('ZAAK1', 'vaardigheidZet', { id: 'v', naam: 'v', niveau: 'AWARE' }, 'lid:2');
+  assert.equal(na.status, 403, 'een beeindigd dienstverband beeindigt de relatie');
+  /* En een bron die niet kan antwoorden, is geen ja. */
+  bronAan = false;
+  assert.equal(lh.doe('ZAAK1', 'bestuurZet', { persoon: 'lid:2', rol: 'ASSESSOR', aan: false }, 'lid:1').status, 403);
+  /* Zonder toets-functie maar met een bron: ook dicht. */
+  const blind = maakLeerhuis({ db, save: () => {} });
+  assert.equal(blind.doe('ZAAK1', 'bestuurZet', { persoon: 'lid:2', rol: 'ASSESSOR' }, 'lid:1').status, 403);
+  assert.equal(lh.doe('ZAAK2', 'orgOpen', { id: 'ZAAK2', soort: 'BUSINESS', eigenaar: 'lid:1', bron: { soort: 'kvk', id: 'x' } }, 'lid:99').status, 400);
+});
+
+test('20. B2: de bron-toets per soort, en alles wat hij niet kan vaststellen is nee', () => {
+  const { maakBronToets } = require('../server/kern/leerhuis/bron');
+  const t = maakBronToets({
+    accounts: { staffByMember: (code, id) => (code === 'KIKUNOI' && id === 7 ? { id: 1, active: 1 } : null) },
+    entiteitVind: (id) => (id === 'E1' ? { id: 'E1', eigenaar: 'user-1' } : null),
+    employmentVanPersoon: (key) => ({ 'user-2': [{ entiteit: 'E1', soort: 'employment' }], 'user-3': [{ entiteit: 'E1', soort: 'mandaat' }] })[key] || []
+  });
+  assert.equal(t({ soort: 'zaak', id: 'KIKUNOI' }, 'lid:7'), true, 'een actieve plek bij de zaak');
+  assert.equal(t({ soort: 'zaak', id: 'KIKUNOI' }, 'lid:8'), false);
+  assert.equal(t({ soort: 'entiteit', id: 'E1' }, 'lid:1'), true, 'de eigenaar van de entiteit');
+  assert.equal(t({ soort: 'entiteit', id: 'E1' }, 'lid:2'), true, 'een lopend dienstverband');
+  assert.equal(t({ soort: 'entiteit', id: 'E1' }, 'lid:3'), false, 'een mandaat is geen werken hier');
+  assert.equal(t({ soort: 'entiteit', id: 'E2' }, 'lid:1'), false, 'een entiteit die niet bestaat');
+  assert.equal(t({ soort: 'rtf-stad', id: 'AMS' }, 'lid:1'), false, 'RTF is nog niet vast te stellen (B2b)');
+  assert.equal(t({ soort: 'zaak', id: 'KIKUNOI' }, 'concern:x'), false, 'een sleutel buiten lid: bevestigt niets');
+  const kapot = maakBronToets({ accounts: { staffByMember: () => { throw new Error('db weg'); } } });
+  assert.equal(kapot({ soort: 'zaak', id: 'KIKUNOI' }, 'lid:7'), false, 'een bron die gooit is geen ja');
 });

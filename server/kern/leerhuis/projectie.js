@@ -43,7 +43,7 @@ function pas(st, r) {
   const d = r.data || {};
   if (r.sleutel) st.sleutels[r.sleutel] = r;
   switch (r.soort) {
-    case 'org': st.org = { id: d.id, soort: d.soort, naam: d.naam, ouder: d.ouder || null, at: r.at }; break;
+    case 'org': st.org = { id: d.id, soort: d.soort, naam: d.naam, ouder: d.ouder || null, bron: d.bron || null, at: r.at }; break;
     case 'bestuur': {
       const b = st.bestuur[d.persoon] || (st.bestuur[d.persoon] = []);
       if (d.aan) { if (!b.includes(d.rol)) b.push(d.rol); } else st.bestuur[d.persoon] = b.filter(x => x !== d.rol);

@@ -697,6 +697,8 @@
       "ledenregister"
     ],
     "leerhuis": [
+      "employmentVanPersoon",
+      "entiteitVind",
       "kluisAuth"
     ],
     "leerstof": [

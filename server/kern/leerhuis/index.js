@@ -39,7 +39,7 @@ const ACTIES = Object.assign({}, require('./acties-bouw'), require('./acties-ken
    write-behind, want een relatie of een oefening is geen verklaring. */
 const DUURZAAM = new Set(['certificaatUitgeven', 'certificaatStand', 'beoordelingAfronden']);
 
-function maakLeerhuis({ db, save, nu, bijeen, inBundel }) {
+function maakLeerhuis({ db, save, nu, bijeen, inBundel, bronToets }) {
   const klok = nu || Date.now;
   const eigen = require('../eigencollectie')({ db, domein: 'kern/leerhuis', bezit: { leerhuis: 'kaart' } });
   const nieuwId = () => crypto.randomBytes(6).toString('hex');
@@ -50,7 +50,13 @@ function maakLeerhuis({ db, save, nu, bijeen, inBundel }) {
     ? require('../../lib/duurzaam')({ bijeen, save, inBundel, bron: 'leerhuis' }) : null;
 
   const spoorLees = (org) => (eigen.kijk('leerhuis')[org] || []);
-  const stand = (org) => standUitSpoor(org, spoorLees(org));
+  /* De bron wordt per vraag geraadpleegd en nergens gekopieerd: een kopie van
+     een dienstverband is binnen een dag een tweede waarheid. */
+  const stand = (org) => {
+    const st = standUitSpoor(org, spoorLees(org));
+    if (st.org && st.org.bron && typeof bronToets === 'function') st.bronToets = (p) => bronToets(st.org.bron, p);
+    return st;
+  };
   const weigering = (e) => ({ ok: false, status: e.status || 403, reden: e.message, hoe: e.hoe || null, opbouw: e.opbouw || null });
 
   /* Stap 1: alles uitrekenen tegen de huidige stand, niets schrijven. Geeft een

@@ -18,6 +18,9 @@
      - een lid leest zijn eigen stand en niet het bestuursbeeld  -> toets 6
      - besluit B1: de factuurcorrectie wordt meegelezen en niemand wordt
        tegengehouden (haal de meelezer uit opzet/kantoordeur.js)   -> toets 7
+     - besluit B2: de bron-eis bij het openen weg                 -> toets 8
+       (en de leesroute las eerst zijn eigen kopie van de relatie; toets 8
+       vond dat wie uit dienst was, nog meelas)
 
    Draai los: node --test test/leerhuis-routes.test.js */
 const test = require('node:test');
@@ -163,4 +166,35 @@ test('7. B1 in de schaduw: een echte terugboeking wordt meegelezen en niemand wo
   assert.equal(na.route, 'POST /api/office/pay/factuurcorrectie');
   assert.equal(na.oneens, voor.oneens + 1, 'toegelaten maar niet geschikt: precies wat afdwingen had tegengehouden');
   assert.ok(!JSON.stringify(na).includes('lid:'), 'een teller en geen journaal: er staat geen mens in');
+});
+
+test('8. B2: een leerhuis met een entiteit als bron volgt het dienstverband, en een verklaring houdt dat niet tegen', async () => {
+  const lid = async (n, geboren) => (await post('/api/auth/register', { name: 'Bron ' + n, email: 'lh-b' + n + '@x.nl',
+    phone: '06123481' + n, password: 'geheim12345', geboortedatum: geboren || '1988-08-08', tier: 'rtg' })).body.token;
+  const A = await lid(10), W = await lid(11), V = await lid(12);
+  const id = async (t) => (await post('/api/state', {}, t)).body.state.user.id;
+  const [aId, wId, vId] = [await id(A), await id(W), await id(V)];
+  const ent = (await post('/api/concern/entiteit/nieuw', { naam: 'Leerhuis Bron BV', land: 'NL', rechtsvorm: 'bv' }, A)).body.entiteit;
+  assert.ok(ent && ent.id, 'een entiteit om in te werken');
+  const emp = await post('/api/concern/mens/nieuw', { entiteit: ent.id, persoon: 'user-' + wId, rol: 'Operations', van: '2026-01-01' }, A);
+  assert.equal(emp.status, 200, JSON.stringify(emp.body));
+
+  const zonderEigenaarInBron = await post('/api/office/leerhuis/open',
+    { id: 'BRON-BV', soort: 'BUSINESS', naam: 'Bron BV', eigenaar: 'user-' + vId, bron: { soort: 'entiteit', id: ent.id } }, office);
+  assert.equal(zonderEigenaarInBron.status, 409, 'het kantoor opent geen leerhuis waarin de eigenaar zelf niet in de bron staat');
+  const open = await post('/api/office/leerhuis/open',
+    { id: 'BRON-BV', soort: 'BUSINESS', naam: 'Bron BV', eigenaar: 'user-' + aId, bron: { soort: 'entiteit', id: ent.id } }, office);
+  assert.equal(open.status, 200, JSON.stringify(open.body));
+
+  const zet = (p, s) => post('/api/leerhuis/doe', { org: 'BRON-BV', actie: 'relatieZet', invoer: { persoon: 'lid:' + p, soort: 'EMPLOYEE' }, sleutel: s }, A);
+  assert.equal((await zet(wId, 'b-w')).status, 200, 'in dienst: de relatie mag');
+  const vreemd = await zet(vId, 'b-v');
+  assert.equal(vreemd.status, 409, 'niet in dienst: geen verklaring kan dat vervangen');
+  assert.equal((await post('/api/leerhuis/lees', { org: 'BRON-BV', vraag: 'mijn' }, W)).status, 200);
+
+  /* Het dienstverband stopt; het leerhuis doet niets, en toch stopt de relatie. */
+  const eind = await post('/api/concern/mens/uitdienst', { employment: emp.body.employment.id, per: '2026-02-01' }, A);
+  assert.equal(eind.status, 200, JSON.stringify(eind.body));
+  assert.equal((await post('/api/leerhuis/lees', { org: 'BRON-BV', vraag: 'mijn' }, W)).status, 403,
+    'wie niet meer in dienst is, leest het leerhuis van zijn oude werkgever niet meer');
 });

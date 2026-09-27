@@ -9,7 +9,7 @@
    ========================================================================== */
 'use strict';
 
-const { overgang, ORGSOORTEN, ROLSOORTEN, VAARDIGHEIDSNIVEAUS, STERKTE, LEERBEWIJS, LEERFASEN, BESTUUR, RELATIESOORTEN, DRAAGBAAR, HERCERT } = require('./standen');
+const { overgang, ORGSOORTEN, BRONSOORTEN, ROLSOORTEN, VAARDIGHEIDSNIVEAUS, STERKTE, LEERBEWIJS, LEERFASEN, BESTUUR, RELATIESOORTEN, DRAAGBAAR, HERCERT } = require('./standen');
 const { cyclus } = require('./graaf');
 const { relatieActief } = require('./oordeel');
 const { weiger, eisPersoon, eisId, eisBestuur, eisNiet } = require('./hulp');
@@ -27,8 +27,13 @@ module.exports = {
     eisId(i.id, 'organisatie');
     if (!ORGSOORTEN.includes(i.soort)) weiger('soort organisatie: ' + ORGSOORTEN.join(', '), 400);
     const eig = eisPersoon(i.eigenaar, 'eigenaar');
+    let bron = null;
+    if (i.bron) {
+      if (!BRONSOORTEN.includes(i.bron.soort)) weiger('soort bron: ' + BRONSOORTEN.join(', '), 400);
+      bron = { soort: i.bron.soort, id: eisId(String(i.bron.id || ''), 'bron') };
+    }
     return [
-      { soort: 'org', data: { id: i.id, soort: i.soort, naam: tekst(i.naam, 120), ouder: i.ouder || null } },
+      { soort: 'org', data: { id: i.id, soort: i.soort, naam: tekst(i.naam, 120), ouder: i.ouder || null, bron } },
       { soort: 'relatie', data: { persoon: eig, soort: i.relatie || 'EMPLOYEE', actief: true } },
       { soort: 'bestuur', data: { persoon: eig, rol: 'ACADEMY_OWNER', aan: true, door } }
     ];
@@ -49,6 +54,11 @@ module.exports = {
     const p = eisPersoon(i.persoon);
     if (!RELATIESOORTEN.includes(i.soort)) weiger('soort relatie: ' + RELATIESOORTEN.join(', '), 400);
     if (i.manager) eisPersoon(i.manager, 'manager');
+    /* Met een bron volgt het leerhuis de bron en niet andersom: een relatie die
+       de bron niet draagt, kan niemand hier verklaren (besluit B2). */
+    if (i.actief !== false && st.org.bron && typeof st.bronToets === 'function' && st.bronToets(p) !== true)
+      weiger(p + ' staat niet in de bron van dit leerhuis (' + st.org.bron.soort + ' ' + st.org.bron.id + ')', 409,
+        'leg de relatie vast waar hij woont: een dienstverband, een plek bij de zaak of een zetel');
     return [{ soort: 'relatie', data: { persoon: p, soort: i.soort, actief: i.actief !== false, eenheid: i.eenheid || null, manager: i.manager || null } }];
   },
 

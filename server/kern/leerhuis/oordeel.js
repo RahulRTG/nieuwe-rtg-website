@@ -28,7 +28,11 @@ const rang = (lijst, x) => lijst.indexOf(x);
 const ms = (t) => (typeof t === 'number' ? t : Date.parse(t));
 
 const heeftBestuur = (st, persoon, rol) => (st.bestuur[persoon] || []).includes(rol);
-const relatieActief = (st, persoon) => !!(st.relaties[persoon] && st.relaties[persoon].actief);
+/* Met een bron (besluit B2) telt een relatie alleen zolang de bron de persoon
+   kent: een beeindigd dienstverband beeindigt de relatie, zonder dat iemand in
+   het leerhuis eraan hoeft te denken. Onbekend telt als nee (fail closed). */
+const relatieActief = (st, persoon) => !!(st.relaties[persoon] && st.relaties[persoon].actief
+  && (!(st.org && st.org.bron) || (typeof st.bronToets === 'function' && st.bronToets(persoon) === true)));
 
 /* Hoe vers is een bewijs? Alleen voor een vaardigheid met een geldigheid;
    zonder termijn blijft bewijs CURRENT tot een kennisverandering iets anders zegt. */

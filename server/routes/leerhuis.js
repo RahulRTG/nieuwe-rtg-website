@@ -1,37 +1,21 @@
 /* Routes "leerhuis" (RTG Academy, ACADEMY.md): de HTTP-deur naar
    server/kern/leerhuis. Drie routes, en de kern doet het werk.
 
-   DE ACTOR KOMT UIT DE SESSIE, NOOIT UIT HET LIJF (AUTHORITY.md grens 1). Een
-   veld `door` of `persoon` van de aanroeper wordt niet gelezen als actor; de
-   kern krijgt `lid:<account-id>` uit `req.session.key` en toetst daar zijn
-   bestuursrollen, relaties en scheiding van taken op. Dat is blokkade `API` uit
-   ACADEMY.md.
+   DE ACTOR KOMT UIT DE SESSIE, NOOIT UIT HET LIJF (AUTHORITY.md grens 1): de
+   kern krijgt `lid:<account-id>` uit `req.session.key`.
 
-   18+ VOOR EEN CERTIFICAAT, NIET VOOR LEREN (ACADEMY.md besluit B5, 27
-   september 2026). Leren, oefenen, bewijs en een beoordeling mogen op elke
-   leeftijd, in de vorm van het leerdossier: niet vergelijkend en zonder
-   blijvend niveaulabel. Een CERTIFICAAT is opgeslagen progressie en krijgt
-   alleen wie `volwassen()` haalt (eigen account, A3, 18 of ouder). Wie dat niet
-   kan laten vaststellen (een sleutel buiten `lid:`), krijgt er ook geen: fail
-   closed. En de vakstaat van wie jonger is, toont geen niveau.
+   BESLUITEN (ACADEMY.md par. 5). B5: leren op elke leeftijd, een certificaat
+   alleen voor wie `volwassen()` haalt, fail closed buiten `lid:`; wie jonger
+   is ziet geen niveau. B4: certificaat en beoordeling antwoorden pas na een
+   bevestigde commit; een 503 daar is "onbekend" (eerst `uitkomst`, dan opnieuw
+   met dezelfde sleutel). B2: de relatie komt uit de bron van het leerhuis.
 
-   DUURZAAM (besluit B4). Certificaat uitgeven, schorsen of intrekken en een
-   beoordeling afronden antwoorden pas als de opslag ze heeft bevestigd
-   (lib/duurzaam.js via de kern). Een 503 daar betekent "onbekend", en de weg is
-   eerst navragen (lees `uitkomst`) en dan opnieuw met dezelfde sleutel.
-
-   STANDAARD UIT. De functie `leerhuis` staat uit tot de eigenaar hem aanzet
-   (server/functies/register/cat-life2.js): de besluiten B1 tot en met B7
-   (ACADEMY.md par. 5) zijn genomen maar nog niet alle uitgevoerd, en een deur
-   die niemand bewust heeft geopend hoort dicht.
-
-   EEN SLEUTEL IS VERPLICHT bij elke handeling. De kern is idempotent op die
-   sleutel; zonder sleutel is een herhaling een tweede handeling, en bij een
-   certificaat is dat precies wat niet mag gebeuren. Wie geen antwoord kreeg,
-   vraagt eerst `uitkomst` voordat hij het opnieuw probeert. */
+   STANDAARD UIT (functie `leerhuis`), en elke handeling draagt een SLEUTEL:
+   zonder sleutel is een herhaling een tweede handeling. */
 'use strict';
 
 const { maakLeerhuis } = require('../kern/leerhuis');
+const { relatieActief } = require('../kern/leerhuis/oordeel');
 const { idVanKey } = require('../lib/lidsleutel');
 const { maakVolwassen } = require('../kern/volwassen');
 /* Zelfde weg als routes/supplier/kassa.js: de bundel komt uit de opslag zelf,
@@ -49,8 +33,10 @@ const BESTUURSVRAGEN = ['gereedheid', 'eenheid', 'wieGeraakt', 'reconstrueer', '
 const LEESROLLEN = ['ACADEMY_OWNER', 'QUALITY_AUTHORITY', 'KNOWLEDGE_OWNER', 'ASSESSMENT_AUTHORITY'];
 
 module.exports = (kern) => {
-  const { app, auth, db, save, accounts, kluisAuth } = kern;
-  const leerhuis = maakLeerhuis({ db, save, bijeen, inBundel });
+  const { app, auth, db, save, accounts, kluisAuth, employmentVanPersoon, entiteitVind } = kern;
+  /* Besluit B2: de relatie komt uit de bron van het leerhuis (kern/leerhuis/bron.js). */
+  const bronToets = require('../kern/leerhuis/bron').maakBronToets({ accounts, employmentVanPersoon, entiteitVind });
+  const leerhuis = maakLeerhuis({ db, save, bijeen, inBundel, bronToets });
   /* Alleen om de schaduwtellers van besluit B1 te LEZEN; de meelezer zelf hangt
      in opzet/kantoordeur.js. */
   const schaduw = require('../kern/leerhuis/schaduw').maakLeerhuisSchaduw({ db, save });
@@ -96,8 +82,10 @@ module.exports = (kern) => {
     const vraag = String(b.vraag || '');
     const st = leerhuis.stand(org);
     if (!st.org) return res.status(404).json({ error: 'Deze organisatie heeft geen leerhuis.' });
-    const rel = st.relaties[door];
-    if (!rel || !rel.actief) return res.status(403).json({ error: 'U heeft geen lopende relatie met deze organisatie.' });
+    /* De ene regel uit de kern en geen eigen kopie: een kopie las alleen het
+       spoor en sloeg de bron over (routetoets 8 vond het: wie uit dienst was,
+       las nog mee). */
+    if (!relatieActief(st, door)) return res.status(403).json({ error: 'U heeft geen lopende relatie met deze organisatie.' });
     const l = leerhuis.lees;
     if (EIGEN_VRAGEN.includes(vraag)) {
       /* Altijd over DE LEZER zelf: een ander vakstaat of geschiktheid opvragen
@@ -139,7 +127,11 @@ module.exports = (kern) => {
     const b = req.body || {};
     const eigenaar = idVanKey(String(b.eigenaar || ''));
     if (eigenaar == null) return res.status(400).json({ error: 'De eerste eigenaar is een lid (user-<id>).' });
+    /* Met een bron moet de eerste eigenaar er zelf in staan: anders opent het
+       kantoor een leerhuis waarin niemand iets mag. */
+    if (b.bron && bronToets(b.bron, 'lid:' + eigenaar) !== true)
+      return res.status(409).json({ error: 'De eerste eigenaar staat niet in de bron van dit leerhuis.' });
     stuur(res, await leerhuis.doeVast(String(b.id || ''), 'orgOpen',
-      { id: b.id, soort: b.soort, naam: b.naam, eigenaar: 'lid:' + eigenaar }, 'lid:' + id, { sleutel: 'open:' + String(b.id || '') }));
+      { id: b.id, soort: b.soort, naam: b.naam, eigenaar: 'lid:' + eigenaar, bron: b.bron || null }, 'lid:' + id, { sleutel: 'open:' + String(b.id || '') }));
   });
 };

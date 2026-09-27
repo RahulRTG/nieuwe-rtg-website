@@ -111,6 +111,9 @@ const BESTUUR = ['ACADEMY_OWNER', 'CURRICULUM_OWNER', 'KNOWLEDGE_OWNER', 'TRAINE
   'ASSESSMENT_AUTHORITY', 'QUALITY_AUTHORITY', 'ASSESSOR'];
 /* Soorten organisatie. RTG en de RTFoundation zijn twee soorten, niet een. */
 const ORGSOORTEN = ['RTG', 'RTF', 'BUSINESS', 'SUPPLIER', 'PARTNER', 'PROJECT'];
+/* Besluit B2: waar een relatie vandaan komt. Met een bron is de relatie in het
+   leerhuis een AFGELEIDE: zij loopt zolang de bron de persoon kent. */
+const BRONSOORTEN = ['entiteit', 'zaak', 'rtf-stad'];
 
 const index = (lijst, x) => lijst.indexOf(x);
 const minimumSterkte = (lijst) => lijst.length
@@ -118,4 +121,4 @@ const minimumSterkte = (lijst) => lijst.length
 
 module.exports = { MACHINES, overgang, CERTIFICAAT, BEWIJS_VERS, GESCHIKT, GEREED, EENHEID, LOOPBAAN_GEREED,
   VAARDIGHEIDSNIVEAUS, ROLSOORTEN, LEERFASEN, LEERBEWIJS, STERKTE, IMPACT, HERCERT, DRAAGBAAR, RELATIESOORTEN,
-  TRAINERLADDER, BESTUUR, ORGSOORTEN, minimumSterkte };
+  TRAINERLADDER, BESTUUR, ORGSOORTEN, BRONSOORTEN, minimumSterkte };

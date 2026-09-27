@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2088 bestanden en 14712 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2088 bestanden en 14713 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2088 |
-| losse beweringen (`test(...)`) | 14712 |
+| losse beweringen (`test(...)`) | 14713 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 173 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1430 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1826 bestanden, 14250 beweringen.
+1826 bestanden, 14251 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1629,7 +1629,7 @@ toets omvalt.
 | `thuis.test.js` | 10 | gezakt op `liegpoort /api/` | RTG Thuis: thuisverhuur van lid aan lid -- ons antwoord op Airbnb, met de premium functies gratis. Getest: huis live zetten (validatie), zoeken met filters, de transparante prijsopbouw met 0% servicekosten en... |
 | `thuiszakelijk.test.js` | 8 | gezakt op `liegpoort /api/` | RTG Thuis, de commerciele tak + de plek in de Mall. Getest: een zaak zet haar huis commercieel (een prive-lid mag dat niet), de logies-btw komt uit de landtabel en staat apart in de prijsopbouw, langverblijf rekent... |
 | `ticketcodes.pg.test.js` | 1 | -- | Echte productie-topologieproef voor travelos.activity_ticket_entry en travelos.mobility_transport_ticket. Twee onafhankelijke kerninstances delen de autoritatieve `ticketToegang`- en `mobKaartToegang`-rij in PostgreSQL. |
-| `tickettoegang.test.js` | 7 | gezakt op `liegpoort /api/` | De entreecode van een activiteitenticket (travelos.activity_ticket_entry), control voor control: 128 bits en kaal eenmaal, hash-only, issuer/doel/scope, verval aan het eind van de ticketdag, max_gebruik 1, intrekken... |
+| `tickettoegang.test.js` | 8 | gezakt op `liegpoort /api/` | De entreecode van een activiteitenticket (travelos.activity_ticket_entry), control voor control: 128 bits en kaal eenmaal, hash-only, issuer/doel/scope, verval aan het eind van de ticketdag, max_gebruik 1, intrekken... |
 | `tiener.test.js` | 4 | gezakt op `liegpoort /api/` | Integratietests voor de tiener-tools: de toetsplanner (leerplan gespreid over de dagen, stappen afvinken, opruimen), het zakgeldpotje (boeken, saldo-bewaking, spaardoelen met inleg en teruggave), de gast-poort en de... |
 | `tijdlijn.test.js` | 7 | gezakt op `liegpoort /api/` | DE CONFIGURATIETIJDLIJN: acht beweringen, en ze gaan allemaal over de manier waarop een "wat is er veranderd"-scherm normaal gesproken onwaar wordt. 1. |
 | `tls-acme-boot.test.js` | 2 | gezakt op `===->!==#0` | Bewijst de boot-lijm (server/lib/tls-acme.js): de ACME-accountsleutel en het opgehaalde certificaat persisteren, en -- het echte werk -- dat startAcme een vers uitgegeven certificaat LIVE in een draaiende native... |

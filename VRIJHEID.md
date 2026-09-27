@@ -139,7 +139,7 @@ korte dienst levert dus geen halve RTG Day in.
 
 ## 5. V1: wat er staat
 
-Drieëntwintig modules in `server/kern/vrijheid/`, allemaal onder de 10 kB en zonder
+Vierentwintig modules in `server/kern/vrijheid/`, allemaal onder de 10 kB en zonder
 modelaanroep:
 
 | Module | Wat hij doet |
@@ -156,7 +156,7 @@ modelaanroep:
 | `capaciteit.js` | van blokkade naar opleidingsbehoefte, en terug |
 | `standen.js` | vijf standmachines met expliciete overgangen |
 | `index.js` + `mens.js` + `aanbod.js` + `herstel.js` + `jaarplan.js` + `beeld.js` | vastleggen, menselijke beoordeling, aanbod, jobs en de drie beelden |
-| `teambeeld.js` + `instellingen.js` + `huis.js` | het teambeeld uit de bestaande bronnen, wat de zaak en de mens zelf opgeven, en de montage als `kern.vrijheid` |
+| `teambeeld.js` + `instellingen.js` + `huis.js` + `rtghuis.js` | het teambeeld uit de bestaande bronnen, wat de zaak en de mens zelf opgeven, RTG zelf als werkgever met de kamers als teams, en de montage als `kern.vrijheid` |
 | `lus.js` | PEOPLE_TIME_LOOP_COMPLETENESS_CHECK |
 
 **De gouden bewijzen A tot en met G** staan in `test/vrijheid.test.js` onder hun
@@ -259,9 +259,33 @@ valideren:
    staat; ontbreekt er een, dan start de server niet. Wat nog niet staat is
    duurzaam vastleggen (`server/lib/duurzaam.js`): dat hoort bij de route die
    het antwoord geeft, dus bij punt 6.
-6. Routes (`/api/staff/tijd`, verzoek, aanbod aanvaarden; leidinggevende:
-   beoordelen, verdelen), met een toets op een echte server, en het scherm
-   *Mijn tijd*.
+6. **Routes gedaan, schermen volgen.** `server/routes/vrijheid/tijd.js`:
+   - voor de medewerker: Mijn tijd, de eigen verjaardag, verzoeken, intrekken
+     en uitleg;
+   - voor de leidinggevende, op eigen naam: overzicht, beoordelen, bezetting
+     en feestdagen.
+
+   Elke mutatie gaat door `server/lib/duurzaam.js`. De persoon komt uit de
+   sessie en nooit uit het lichaam. `test/vrijheid-routes.test.js` beproeft
+   de routes tegen een echte server, met een dubbeltik-ronde waar de
+   contracten in `server/lib/mutatiecontracten-vrijheid.js` op rusten. Drie
+   routes staan daar eerlijk op BLOCKED_BY_TEST_FIXTURE, met wat er moet komen.
+   De routes om een aanbod "eerder naar huis" te aanvaarden staan er met
+   opzet NIET: zonder verantwoordelijkheden per dienst komt er nooit een
+   aanbod.
+6a. **RTG zelf als werkgever** (besluit van de eigenaar, 27 september 2026).
+   - Een zaak met genre `rtg` (status `huis`, er bestaat er precies een): de
+     eigenaar maakt hem eenmalig aan vanuit de boardroom
+     (`server/kern/vrijheid/rtghuis.js`, `server/routes/vrijheid/rtghuis.js`),
+     met een bestaand persoonlijk account als eerste leidinggevende.
+   - Hij gaat nooit online en staat in de economische wereld `rtg-intern`.
+   - De kamers van het kantoor zijn zijn AFDELINGEN. Een leidinggevende van
+     RTG zet mensen in kamers, en een bezettingseis kan bij een kamer horen:
+     dan telt alleen dat team mee.
+   - Het RTG-beleid (tien RTG Days) geldt ALLEEN in deze zaak; elke andere
+     zaak krijgt leeg beleid.
+   - Stap twee van het besluit volgt in een eigen PR: het kantoor logt in als
+     personeel van deze zaak in plaats van met de gedeelde code.
 7. `samenstellen.js` leest de nieuwe categorieën.
 
 **P1**

@@ -12,7 +12,7 @@
     "bronBlindeBestanden": 3,
     "browserpoortToetsen": 388,
     "carriereDomeinenGemeten": 15,
-    "dbDeuren": 529,
+    "dbDeuren": 530,
     "dbDeurenSchrijvend": 275,
     "dekkingPct": 82,
     "dekkingWaargenomenPct": 100,
@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4628,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1600,
+    "kernBreedte": 1601,
     "kernGedeeld": 243,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
@@ -3068,6 +3068,23 @@
       "meter": "toetsenNietGemeten 626 -> 627",
       "reden": "test/samentekenen.test.js is nieuw (samen tekenen, besluit van de eigenaar van 24 september 2026). Met de hand nagetrokken met tien mutaties op bedrijf/samentekenen.js, de regelpoort en het loskoppelen; alle tien zakken, waarvan een pas na een extra bewering. De mutatiemotor is er nog niet langs geweest.",
       "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1600,
+      "meter": "kernBreedte 1600 -> 1601 (VERHOOGD, met reden)",
+      "reden": "RTG Vrijheid (VRIJHEID.md) is een nieuwe laag met een eigen kernnaam, kern.vrijheid, en routes die hem aanraken. Er komt precies EEN naam bij, niet twee: de zaak van RTG zelf als werkgever (kern/vrijheid/rtghuis.js) hangt met opzet BINNEN kern.vrijheid (kern.vrijheid.rtghuis) in plaats van als eigen kernnaam, en beide routebestanden staan in een map (routes/vrijheid/) zodat ze een domein zijn en kernGedeeld niet beweegt. Wie deze tand weer omlaag wil: dat kan alleen door de laag weg te halen, en dat is een productbesluit."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "dbDeuren",
+      "van": 529,
+      "meter": "dbDeuren 529 -> 530 (VERHOOGD, met reden)",
+      "reden": "kern/vrijheid/rtghuis.js maakt de zaak van RTG zelf aan (besluit van de eigenaar, 27 september 2026) en schrijft daarvoor in db.data.suppliers -- precies zoals kern/rtfwallet.js de RTFoundation-positie maakt. Er bestaat in dit huis geen gedeelde zaakmaker om langs te gaan: acht kernmodules duwen zelf een zaak in db.data.suppliers. De eigen afdelingen van RTG staan WEL in een eigen collectie (eigencollectie, rtgAfdelingen) en tellen hier dus niet. Wie deze tand omlaag wil: een gedeelde zaakmaker bouwen waar alle negen doorheen gaan.",
+      "waarheen": "Een gedeelde zaakmaker voor de negen modules die een zaak aanmaken."
     }
   ],
   "prestatie": {

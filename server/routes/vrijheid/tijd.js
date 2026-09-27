@@ -22,7 +22,7 @@ const SOORTEN = ['VRIJE_DAG', 'EERDER_WEG', 'LATER_BEGINNEN'];
 const vandaag = () => new Date().toISOString().slice(0, 10);
 
 module.exports = (kern) => {
-  const { app, supplierAuth, managerOnly, vrijheid, rtghuis } = kern;
+  const { app, supplierAuth, managerOnly, vrijheid } = kern;
   const V = () => vrijheid;
   const zelf = (req) => (req.actor && req.actor.staffId != null) ? String(req.actor.staffId) : null;
   const antwoord = (res, r) => r && r.error ? res.status(r.status || 400).json(r) : res.json(r);
@@ -109,7 +109,7 @@ module.exports = (kern) => {
       eisen: inst.eisen, feestdagen: inst.feestdagen,
       ontbreekt: t.ontbreekt.map(o => o.reden),
       gezondheid: m.gezondheid(code),
-      kamers: rtghuis && rtghuis.isRtgZaak(code) ? rtghuis.kamerIds() : null,
+      kamers: V().rtghuis.isRtgZaak(code) ? V().rtghuis.kamerIds() : null,
       beleidOpen: V().beleidVoor(code).open() });
   });
 

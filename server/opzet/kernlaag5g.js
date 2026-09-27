@@ -26,9 +26,9 @@ module.exports = (kern, hulp) => {
   if (!kern.economie || typeof kern.economie.identiteitZet !== 'function') mist.push('economie.identiteitZet');
   if (mist.length) throw new Error('kernlaag5g (RTG Vrijheid): het teambeeld mist ' + mist.join(', ') +
     ' in de kern. Hangt deze laag te vroeg, of is een bron hernoemd?');
-  /* RTG zelf als werkgever (kern/rtghuis.js): de zaak waarin het kantoor
-     werkt, met de kamers als afdelingen. Vrijheid leest hem om te weten waar
-     het beleid van RTG geldt. */
-  kern.rtghuis = require('../kern/rtghuis')({ db, save, kern: () => kern });
+  /* RTG zelf als werkgever (kern/vrijheid/rtghuis.js) hangt BINNEN kern.vrijheid
+     (kern.vrijheid.rtghuis) en niet als eigen kernnaam: hij bestaat alleen
+     omdat deze laag moet weten waar het beleid van RTG geldt, en `kernBreedte`
+     in NORM.json mag alleen omlaag. */
   kern.vrijheid = require('../kern/vrijheid/huis')({ db, save, bijeen, inBundel, kern: () => kern });
 };

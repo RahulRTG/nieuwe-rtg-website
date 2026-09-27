@@ -30,7 +30,7 @@
    een leidinggevende van deze zaak -- niet het anonieme kantoor, want dat heeft
    geen naam om onder te tekenen. */
 'use strict';
-const klok = require('../lib/klok');
+const klok = require('../../lib/klok');
 
 const GENRE = 'rtg';
 
@@ -38,7 +38,7 @@ module.exports = ({ db, save, kern }) => {
   const k = () => kern();
   const nu = () => klok.datum().toISOString();
   const schoon = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n);
-  const eigen = require('./eigencollectie')({ db, domein: 'kern/rtghuis', bezit: { rtgAfdelingen: 'kaart' } });
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/vrijheid/rtghuis', bezit: { rtgAfdelingen: 'kaart' } });
 
   const rtgZaak = () => (db.data.suppliers || []).find(s => s && s.type === GENRE) || null;
   const isRtgZaak = (code) => { const s = rtgZaak(); return !!s && s.code === String(code || '').toUpperCase(); };

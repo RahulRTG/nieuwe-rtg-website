@@ -29,15 +29,16 @@ module.exports = ({ db, save, bijeen, inBundel, kern }) => {
     bezit: { vrijheid: 'kaart', vrijheidInstellingen: 'kaart' } });
   const instellingen = require('./instellingen')({ eigen, save });
   const motor = maakVrijheid({ opslag: { bak: (naam) => eigen.bak(naam), kijk: (naam) => eigen.kijk(naam) }, save });
-  const { teambeeld } = require('./teambeeld')({ bronnen: kern, instellingen });
+  const rtghuis = require('./rtghuis')({ db, save, kern });
+  const { teambeeld } = require('./teambeeld')({ bronnen: () => ({ ...kern(), rtghuis }), instellingen });
 
   /* Welk beleid geldt voor welke organisatie. Voor RTG zelf is er een besluit
-     (rtgbeleid.js), en RTG zelf is de zaak met genre `rtg` (kern/rtghuis.js);
+     (rtgbeleid.js), en RTG zelf is de zaak met genre `rtg` (kern/vrijheid/rtghuis.js);
      een andere zaak heeft nog geen beleid en krijgt dan een LEEG beleid --
      open waarden, nooit het beleid van RTG geleend. `isRtg` mag een toets
      meegeven; de server vraagt het aan rtghuis. */
   function beleidVoor(code, isRtg) {
-    const rtg = isRtg !== undefined ? isRtg : !!(kern().rtghuis && kern().rtghuis.isRtgZaak(code));
+    const rtg = isRtg !== undefined ? isRtg : rtghuis.isRtgZaak(code);
     return rtg ? rtgBeleid() : maakBeleid({});
   }
 
@@ -51,5 +52,5 @@ module.exports = ({ db, save, bijeen, inBundel, kern }) => {
     ? require('../../lib/duurzaam')({ bijeen, save, inBundel, bron: 'vrijheid' })
     : async (werk) => { await werk(); return null; };
 
-  return Object.freeze({ motor, instellingen, teambeeld, beleidVoor, vastleggen, rtgStand: STAND });
+  return Object.freeze({ motor, instellingen, teambeeld, beleidVoor, vastleggen, rtghuis, rtgStand: STAND });
 };

@@ -91,9 +91,9 @@ module.exports = function bouwKernAanVier(kern, grens) {
     ...require('../kern/spellen/grens')({ volwassen: kern.volwassen }),
     log: (t) => { try { require('../log').log.warn(t); } catch (e) { console.warn(t); } } }));
   require('../routes/appstore')(grens('appstore'));
-  /* RTG Vrijheid en RTG zelf als werkgever (VRIJHEID.md). De motor en de zaak
-     hangen al als kern.vrijheid en kern.rtghuis (opzet/kernlaag5g.js); hier
-     alleen de deuren. */
-  require('../routes/vrijheid')(grens('vrijheid'));
-  require('../routes/rtghuis')(grens('rtghuis'));
+  /* RTG Vrijheid en RTG zelf als werkgever (VRIJHEID.md). Motor en zaak hangen
+     al als kern.vrijheid (opzet/kernlaag5g.js); hier alleen de deuren, in EEN
+     domein, want de zaak van RTG bestaat alleen voor deze laag. */
+  require('../routes/vrijheid/tijd')(grens('vrijheid'));
+  require('../routes/vrijheid/rtghuis')(grens('vrijheid'));
 };

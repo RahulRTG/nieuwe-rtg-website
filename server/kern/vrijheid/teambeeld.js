@@ -102,7 +102,7 @@ module.exports = ({ bronnen, instellingen }) => {
     const inst = instellingen.lees(code);
     const mensen = mensenVan(code, k, ontbreekt);
     for (const m of mensen) { const v = inst.verjaardagen[m.id]; if (v) m.verjaardag = v.mmdd; }
-    /* Bij RTG zelf zijn de kamers van het kantoor de teams (kern/rtghuis.js). */
+    /* Bij RTG zelf zijn de kamers van het kantoor de teams (kern/vrijheid/rtghuis.js). */
     const rtg = k.rtghuis && k.rtghuis.isRtgZaak(code) ? k.rtghuis : null;
     if (rtg) for (const m of mensen) m.kamers = rtg.afdelingenVan(m.id);
     const diensten = roosterDiensten(code, k, ontbreekt);

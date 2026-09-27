@@ -1,6 +1,6 @@
 /* ============================================================================
    DE MUTATIECONTRACTEN VAN RTG VRIJHEID EN RTG ZELF ALS WERKGEVER
-   (routes/vrijheid.js, routes/rtghuis.js; VRIJHEID.md).
+   (routes/vrijheid/tijd.js, routes/vrijheid/rtghuis.js; VRIJHEID.md).
 
    EERST HET BEWIJS, DAN HET CONTRACT. test/vrijheid-routes.test.js draait een
    dubbeltik-ronde op een echte server: elke schrijfweg twee keer met hetzelfde

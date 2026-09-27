@@ -43,8 +43,9 @@ const SCHAKELS = Object.freeze([
 ]);
 
 const OVERIG = Object.freeze([
-  'Geen HTTP-route en geen scherm: de motor hangt in de kern (kern.vrijheid) maar niemand roept hem aan (VRIJHEID.md par. 7).',
-  'Geen duurzame vastlegging: de motor schrijft in zijn eigen collectie via save() (write-behind); een besluit hoort pas gelukt te heten als het vaststaat, en dat hoort bij de route.',
+  'Geen scherm: de routes staan (routes/vrijheid/) en zijn tegen een echte server beproefd, maar Mijn tijd in de personeelsapp en het blok voor de leidinggevende volgen nog.',
+  'Drie routes zijn niet beproefd omdat de proefopstelling de wereld niet kan bouwen (intrekken, beoordelen, afdelingen zetten): BLOCKED_BY_TEST_FIXTURE in server/lib/mutatiecontracten-vrijheid.js.',
+  'Het kantoor logt nog in met de gedeelde OFFICE_CODE in plaats van als personeel van de RTG-zaak; dat is stap twee van het besluit van 27 september 2026.',
   'Geen productiebewijs.'
 ]);
 

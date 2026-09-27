@@ -1,11 +1,11 @@
 'use strict';
-/* RTG zelf als werkgever (kern/rtghuis.js): precies een zaak, door de eigenaar
+/* RTG zelf als werkgever (kern/vrijheid/rtghuis.js): precies een zaak, door de eigenaar
    aangemaakt met een echt persoonlijk account, nooit online, in de wereld
    rtg-intern; de kamers van het kantoor zijn zijn afdelingen. De bronnen
    hebben de vorm van de echte (accounts, economie, afdelingen). */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const maak = require('../server/kern/rtghuis');
+const maak = require('../server/kern/vrijheid/rtghuis');
 
 function wereld() {
   const db = { data: { suppliers: [] } };

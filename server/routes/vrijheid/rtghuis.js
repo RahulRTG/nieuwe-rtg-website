@@ -1,4 +1,4 @@
-/* RTG ZELF ALS WERKGEVER -- de deuren (kern/rtghuis.js, VRIJHEID.md).
+/* RTG ZELF ALS WERKGEVER -- de deuren (kern/vrijheid/rtghuis.js, VRIJHEID.md).
 
    Dezelfde verdeling als de RTFoundation-positie (routes/office/instellingen.js):
    de STAND mag het hele kantoor zien, hem MAKEN is boardroom -- de eigenaar,
@@ -10,7 +10,8 @@
 'use strict';
 
 module.exports = (kern) => {
-  const { app, officeAuth, supplierAuth, managerOnly, boardroomAuth, boardroomWie, rtghuis, vrijheid } = kern;
+  const { app, officeAuth, supplierAuth, managerOnly, boardroomAuth, boardroomWie, vrijheid } = kern;
+  const rtghuis = vrijheid.rtghuis;
   const antwoord = (res, r) => r && r.error ? res.status(r.status || 400).json(r) : res.json(r);
 
   app.post('/api/office/rtghuis', officeAuth, (req, res) => res.json(rtghuis.stand()));

@@ -115,7 +115,7 @@ module.exports = {
   /* RTG zelf, als werkgever van de mensen in het kantoor (besluit van de
      eigenaar, 27 september 2026; VRIJHEID.md). Status 'huis', net als de
      RTFoundation: er is er precies een, de eigenaar maakt hem aan
-     (kern/rtghuis.js) en niemand vraagt hem aan. Geen caps -- de kamers van het
+     (kern/vrijheid/rtghuis.js) en niemand vraagt hem aan. Geen caps -- de kamers van het
      kantoor zijn zijn afdelingen, en dit is geen zaak met een etalage. */
   rtg: { label: 'RTG (het huis zelf)', icon: 'huis', industry: 'professional', caps: [], status: 'huis' }
 };

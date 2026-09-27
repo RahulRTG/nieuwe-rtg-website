@@ -26,6 +26,9 @@ Object.assign(kern, require('../kern/magnaatwereld')({
 /* Magnaat Van Nul (V1): een leven per lid, met al het geld door het grootboek.
    Het hangt onder Magnaat Wereld en krijgt geen eigen kernnaam. */
 kern.magnaatWereld.leven = require('../kern/magnaat-leven').maakLeven({ db, save });
+/* Samen in een Oudwijk: de gedeelde stad hangt aan hetzelfde leven, met de codenaam en het seintje erbij. */
+kern.magnaatWereld.leven.stad = require('../kern/magnaat-leven/stad').maakStad({
+  eigen: kern.magnaatWereld.leven.intern.eigen, leven: kern.magnaatWereld.leven, crypto, codenaamVan: kern.codenaamVan, sseToCustomer });
 /* DemocratieOS fase B (kern/democratie/, POLITIEK.md): de minimale burgerlus.
    `meldLid` wordt LUI doorgegeven: hij hangt pas later aan de kern. */
 kern.democratie = require('../kern/democratie').maakDemocratie({ db, save, crypto,

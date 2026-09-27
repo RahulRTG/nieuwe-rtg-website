@@ -2,15 +2,15 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-27",
   "gemeten": {
-    "bestanden": 2441,
-    "vormen": 1440,
-    "velden": 2083,
-    "modules": 801,
-    "domeinen": 284,
-    "envelopDrempel": 18,
-    "envelop": 29,
-    "veldenDomeineigen": 1465,
-    "veldenGedeeldVanafVier": 210,
+    "bestanden": 2422,
+    "vormen": 1435,
+    "velden": 2077,
+    "modules": 797,
+    "domeinen": 283,
+    "envelopDrempel": 17,
+    "envelop": 32,
+    "veldenDomeineigen": 1463,
+    "veldenGedeeldVanafVier": 205,
     "gelijkendeVormparen": 20
   },
   "envelop": [
@@ -21,6 +21,7 @@
     "code",
     "codenaam",
     "datum",
+    "doel",
     "door",
     "gemaakt",
     "id",
@@ -33,6 +34,7 @@
     "prijs",
     "reden",
     "ref",
+    "sinds",
     "soort",
     "stand",
     "status",
@@ -42,45 +44,10 @@
     "tot",
     "uitleg",
     "van",
-    "wat"
+    "wat",
+    "wie"
   ],
   "gedeeld": [
-    {
-      "veld": "sinds",
-      "domeinen": 17,
-      "waar": [
-        "bedrijf",
-        "kern/afdelingen",
-        "kern/clubs",
-        "kern/command",
-        "kern/commercie",
-        "kern/ledenbalie-inzage"
-      ]
-    },
-    {
-      "veld": "doel",
-      "domeinen": 17,
-      "waar": [
-        "kern/appstore",
-        "kern/codelevenscyclus",
-        "kern/commercie",
-        "kern/consent-register",
-        "kern/defensie",
-        "kern/labfonds"
-      ]
-    },
-    {
-      "veld": "wie",
-      "domeinen": 17,
-      "waar": [
-        "bedrijf",
-        "kern/comm",
-        "kern/commerce",
-        "kern/consent-lezers",
-        "kern/factuurcorrectie-gronden",
-        "kern/horeca"
-      ]
-    },
     {
       "veld": "naar",
       "domeinen": 16,
@@ -190,18 +157,6 @@
       ]
     },
     {
-      "veld": "categorie",
-      "domeinen": 13,
-      "waar": [
-        "kern/appbieb",
-        "kern/command",
-        "kern/geloofbieb",
-        "kern/groothandel",
-        "kern/magnaat-partnerstudio-bedrijf",
-        "kern/mall"
-      ]
-    },
-    {
       "veld": "eenheid",
       "domeinen": 13,
       "waar": [
@@ -235,6 +190,18 @@
         "kern/klok",
         "kern/lidboard",
         "kern/pay"
+      ]
+    },
+    {
+      "veld": "categorie",
+      "domeinen": 12,
+      "waar": [
+        "kern/appbieb",
+        "kern/command",
+        "kern/geloofbieb",
+        "kern/groothandel",
+        "kern/magnaat-partnerstudio-bedrijf",
+        "kern/mall"
       ]
     },
     {
@@ -514,15 +481,51 @@
       ]
     },
     {
-      "veld": "grond",
+      "veld": "name",
       "domeinen": 10,
       "waar": [
-        "kern/connect",
-        "kern/economie",
-        "kern/factuurcorrectie",
-        "kern/identiteit",
-        "kern/kosten",
-        "kern/neiging"
+        "kern/experience",
+        "kern/gast",
+        "kern/kantoor",
+        "kern/leverancier",
+        "kern/lidacties",
+        "kern/personeel"
+      ]
+    },
+    {
+      "veld": "dagen",
+      "domeinen": 10,
+      "waar": [
+        "kern/gewoonten",
+        "kern/klok",
+        "kern/levensgraaf",
+        "kern/levenslijn",
+        "kern/magnaat-leven",
+        "kern/mobiliteit"
+      ]
+    },
+    {
+      "veld": "bewijs",
+      "domeinen": 10,
+      "waar": [
+        "kern/horeca",
+        "kern/invoer",
+        "kern/livinglab",
+        "kern/magnaat-controle",
+        "kern/magnaat-trainingslobby-acties",
+        "kern/magnaatwereld"
+      ]
+    },
+    {
+      "veld": "geldigTot",
+      "domeinen": 9,
+      "waar": [
+        "bedrijf",
+        "kern/aanmeldingen",
+        "kern/concern",
+        "kern/festival",
+        "kern/mobiliteit",
+        "kern/navigatie"
       ]
     }
   ],

@@ -18,7 +18,7 @@
    beweegt de kas niet. */
 'use strict';
 
-const OP = '2026-09-24';
+const OP = '2026-09-24', OP_STAD = '2026-09-27';
 const AFGETEKEND = {
   door: 'Claude Code, op grond van een gedraaide dubbeltik-ronde op kern/magnaat-leven; ' +
     'niet door een mens nagelezen',
@@ -49,7 +49,20 @@ const CONTRACTEN = Object.fromEntries([
       'de extra dienst twee keer op dezelfde donderdag gaf de tweede keer een weigering; slaap twee keer gaf twee ' +
       'dagen verder (1 -> 3), met de kas gelijk aan het grootboek en verifieerGrootboek zonder bevindingen.', op: OP },
     afgetekend: AFGETEKEND
-  }]
+  }],
+  /* Samen in een Oudwijk (kern/magnaat-leven/stad.js). Toegang op de eigen sleutel: de stad wordt gevonden
+     bij wie vraagt, en de code uit het lijf opent alleen een stad die nog wacht. */
+  ...[['staat', 'idempotent', 'PROTECTED', 'twee keer staat gaf hetzelfde beeld; lezen maakt geen stad'],
+    ['maak', 'hooguitEens', 'PROTECTED', 'een tweede maak met een open stad geeft 409 en geen tweede stad; een dubbeltik over HTTP krijgt het eerste antwoord terug'],
+    ['doe', 'idempotent', 'PROTECTED', 'nog een keer meedoen met dezelfde code geeft dezelfde stad en geen tweede plek'],
+    ['start', 'hooguitEens', 'PROTECTED', 'een tweede start vindt geen wachtende stad meer en geeft 404; de levens ontstaan een keer'],
+    ['verlaat', 'hooguitEens', 'PROTECTED', 'een tweede keer verlaten vindt geen stad meer (404 in de kern); een dubbeltik over HTTP krijgt het eerste antwoord terug'],
+    ['actie', 'nietHerhaalbaar', 'INTENTIONALLY_NON_IDEMPOTENT', 'twee keer plannen gaf twee blokken (bedoeld); twee keer de dag afsluiten gaf de tweede keer herhaald en geen tweede dag']
+  ].map(([w, klasse, stand, gemeten]) => ['POST /api/member/magnaat/stad/' + w, Object.assign({
+    mutatieId: 'magnaat.stad.' + w, herkomst: 'mens', semantiek: { klasse }, toegang: LID, stand,
+    bewijs: { gemeten: 'test/magnaatstad.test.js, ' + OP_STAD + ': ' + gemeten, op: OP_STAD },
+    afgetekend: { door: 'Claude Code, op grond van test/magnaatstad.test.js; niet door een mens nagelezen', op: OP_STAD }
+  }, stand === 'INTENTIONALLY_NON_IDEMPOTENT' ? { waarom: 'Een handeling in een gedeelde stad is een zet in een spel, net als in je eigen leven.' } : {})])
 ]);
 
 module.exports = { CONTRACTEN };

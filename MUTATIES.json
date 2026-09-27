@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T16:04:48.004Z",
-    "commit": "9353ea88",
+    "op": "2026-09-27T14:24:07.236Z",
+    "commit": "ab1dc80e0",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -586,14 +586,6 @@
       "operator": "===->!==#8",
       "gezakt": 2,
       "geprobeerd": 50
-    },
-    "appwerkt-schil.e2e.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/appwerkt.js",
-      "operator": "-->+#0",
-      "gezakt": 1,
-      "geprobeerd": 7
     },
     "archief.test.js": {
       "soort": "server",
@@ -5498,6 +5490,20 @@
       "operator": "!==->===#0",
       "gezakt": 6,
       "geprobeerd": 2
+    },
+    "magnaatstad.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "magnaatstad.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "magnaatstart.e2e.js": {
       "soort": "server",

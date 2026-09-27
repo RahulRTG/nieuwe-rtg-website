@@ -83,8 +83,7 @@ module.exports = function hangDwarseRoutersOp(grens) {
      de firewall ertussen. Na de kosten, want de werelden-route toont de
      verdeling van de nota's die daar wordt gerekend. */
   require('../routes/economie')(grens('economie'));
-  /* De bedrijfsmaten (server/kern/bedrijfsmaat/), na de economielaag: elke maat
-     draagt een economische wereld (besluit C1). */
+  /* Bedrijfsmaten na de economielaag: elke maat draagt een wereld (C1). */
   require('../routes/bedrijfsmaat')(grens('bedrijfsmaat'));
   require('../routes/naargast')(grens('naargast'));
   require('../routes/rtmail')(grens('rtmail'));

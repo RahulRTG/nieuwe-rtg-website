@@ -121,6 +121,33 @@ function zelfdeProces(p) {
 }
 const merk = (pid) => ({ pid: Number(pid), start: procesStart(Number(pid)) });
 
+/* IS DE LOPENDE RONDE MIJN EIGEN VOOROUDER? De releasepoort pakt het slot, zet
+   een afloop op RUNNING en start daarna check.js -- en regel 71 daarin las die
+   RUNNING-stand als "de vorige ronde loopt nog" en zakte. De poort blokkeerde
+   zichzelf, net als eerder met het slot in scripts/afbouw-slot.js.
+
+   Dit is met opzet GEEN omgevingsvlag: een vlag kan iedereen zetten, en dan
+   verdwijnt de bescherming tegen een echte tweede ronde. Hier wordt de
+   OUDERKETEN gelopen (veld 4 van /proc/<pid>/stat) en moet de wortel van de
+   ronde daarin staan met dezelfde starttijd. Zonder /proc is het antwoord nee:
+   dan blijft de oude, strenge uitslag staan. */
+function ouderVan(pid) {
+  try {
+    const stat = fs.readFileSync('/proc/' + pid + '/stat', 'utf8');
+    return Number(stat.slice(stat.lastIndexOf(')') + 2).split(' ')[1]) || 0;
+  } catch (e) { return 0; }
+}
+function eigenLijn(afloop, vanaf = process.pid) {
+  const w = afloop && afloop.wortel;
+  if (!w || !zelfdeProces(w)) return false;
+  let pid = Number(vanaf);
+  for (let stap = 0; pid > 1 && stap < 64; stap++) {
+    if (pid === Number(w.pid)) return true;
+    pid = ouderVan(pid);
+  }
+  return false;
+}
+
 /* De proceskring: alle nakomelingen van een wortel-PID. Linux levert ze uit
    /proc; op macOS bestaat die boom niet en gebruiken we pgrep met een losse
    argumentlijst (dus zonder shell). Recursief, want een toets die een server
@@ -467,4 +494,4 @@ function begin({ taak, commit, basis, verwachteUitvoer, poorten, uitExitcode } =
   };
 }
 
-module.exports = { begin, lees, magStarten, ruimOp, herstel, diagnose, wezenVan, kringVan, zelfdeProces, procesLeeft, AFLOOP, STANDEN, TERMINAAL };
+module.exports = { begin, lees, magStarten, ruimOp, herstel, diagnose, wezenVan, kringVan, zelfdeProces, procesLeeft, eigenLijn, AFLOOP, STANDEN, TERMINAAL };

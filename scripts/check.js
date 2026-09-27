@@ -5891,6 +5891,11 @@ console.log('\n71) de vorige bronmuterende ronde is netjes afgelopen en heeft ni
     if (g.mag) {
       ok('vorige ronde ' + (vorige.taak || '?') + ' (' + vorige.runId + ') staat op ' + vorige.stand +
         ' en haar proceskring is leeg');
+    } else if (g.oordeel === 'LOOPT' && afloop.eigenLijn(vorige)) {
+      /* De lopende ronde is de ouder van deze keuring (de releasepoort draait
+         check.js als stap). Dat is geen achtergelaten werk maar de opdrachtgever;
+         de ouderketen komt uit /proc, niet uit een vlag. */
+      ok('de lopende ronde ' + (vorige.taak || '?') + ' (' + vorige.runId + ') is de eigen ouder van deze keuring');
     } else {
       fout(afloop.diagnose(g, vorige));
     }

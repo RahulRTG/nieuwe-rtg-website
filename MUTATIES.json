@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T12:49:32.704Z",
-    "commit": "31e0dfd57",
+    "op": "2026-09-27T15:20:10.115Z",
+    "commit": "abaa5585d",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -9632,6 +9632,30 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "toestel-kluisindex.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/toestel/kluisindex.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "toestel-spraak.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/toestel/spraak.js",
+      "operator": "===->!==#0",
+      "gezakt": 7,
+      "geprobeerd": 1
+    },
+    "toestel-vector.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/toestel/vector.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "toestellen.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -10944,6 +10968,14 @@
       "operator": "return-weg#0",
       "gezakt": 3,
       "geprobeerd": 3
+    },
+    "zoekmaat.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/zoekmaat.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "zorgketen.test.js": {
       "soort": "server",

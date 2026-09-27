@@ -2313,8 +2313,8 @@ in plaats van aangenomen -- zelfde reden als bij `Asset`: <!--getal:codewereld.r
 loopt over de as ROUTE. De as SYMBOOL is **nul** -- geen register kent een
 functienaam met een plaats, dus het objectvoorbeeld `pay.boeken` met een
 `symbol`-veld belooft iets wat geen enkele meter vult. Die as is
-inmiddels GEBOUWD (`npm run symbolen`, `SYMBOLEN.json`): <!--getal:symbolen.totaal-->22665<!--/getal--> benoemde symbolen
-met een regelnummer en <!--getal:symbolen.kanten-->5742<!--/getal--> require-kanten heen en terug, met de eigen parser
+inmiddels GEBOUWD (`npm run symbolen`, `SYMBOLEN.json`): <!--getal:symbolen.totaal-->23473<!--/getal--> benoemde symbolen
+met een regelnummer en <!--getal:symbolen.kanten-->6083<!--/getal--> require-kanten heen en terug, met de eigen parser
 en <!--getal:symbolen.parsefout-->0<!--/getal--> parsefouten. De <!--getal:symbolen.nietGelezen-->309<!--/getal--> niet-gelezen bestanden staan er MET reden in
 (bundeldelen die pas samengevoegd een programma vormen) -- weglaten zou ze
 onzichtbaar maken. Wat hij met opzet niet doet: aanroepers raden (een naam in
@@ -2334,11 +2334,11 @@ grens vandaag niet -- en dat ene getal verbergt nog iets, want `server/` haalt
 vrijwel niets (6,6%) tot `SCHERMROUTES.json` erbij kwam, dat per bestand in
 public/ leest welke API-paden het noemt en daarmee de keten scherm -> route legt.
 De aanroepgraaf ligt er sinds dezelfde dag naast (`AANROEPGRAAF.json`,
-<!--getal:graaf.kanten-->26516<!--/getal--> kanten): wie roept wie aan, en welk symbool handelt welke route af
-(<!--getal:graaf.routesMetSymbool-->3131<!--/getal--> routes). Daarmee loopt de impactketen scherm -> route -> bestand ->
+<!--getal:graaf.kanten-->27314<!--/getal--> kanten): wie roept wie aan, en welk symbool handelt welke route af
+(<!--getal:graaf.routesMetSymbool-->3159<!--/getal--> routes). Daarmee loopt de impactketen scherm -> route -> bestand ->
 functie uit registers alleen. Let daar op twee dingen. Ten eerste is
 <!--getal:graaf.opgelostPct-->25.9<!--/getal-->% opgelost geen tekort maar een indeling: het meeste dat overblijft is
-`res.json()` of `String()`, en <!--getal:graaf.contextobject-->15676<!--/getal--> aanroepen lopen via het CONTEXTOBJECT dat
+`res.json()` of `String()`, en <!--getal:graaf.contextobject-->16017<!--/getal--> aanroepen lopen via het CONTEXTOBJECT dat
 in server/opzet/ wordt samengesteld. Dat leek statisch onherleidbaar tot
 `CONTEXTPROEF.json` het NAMAT (`npm run contextproef`, een runtime-meting in de
 domeingrens-Proxy): van de <!--getal:context.aanHetWerk-->3214<!--/getal--> routes die werk deden reiken er maar
@@ -2348,12 +2348,12 @@ keerde de voorspelling om, en dat is precies waarom hij er is. `KERNHERKOMST.jso
 (`npm run kernherkomst`) volgt die aanwijzing en beantwoordt wie welke naam in de
 zak legt: <!--getal:kern.namen-->1246<!--/getal--> namen over <!--getal:kern.vulplekken-->300<!--/getal--> vulplekken, met <!--getal:kern.onopgelost-->29<!--/getal--> plekken die
 niet te volgen zijn (elk met een reden, geen daarvan geraden). Dat leverde
-<!--getal:graaf.viaKern-->5912<!--/getal--> nieuwe kanten en bracht de graaf van 18,1% naar <!--getal:graaf.opgelostPct-->25.9<!--/getal-->%; de restbak
-van de graaf ging in dezelfde ronde van 3071 naar <!--getal:graaf.overig-->402<!--/getal--> aanroepen (0,27%), en
+<!--getal:graaf.viaKern-->5942<!--/getal--> nieuwe kanten en bracht de graaf van 18,1% naar <!--getal:graaf.opgelostPct-->25.9<!--/getal-->%; de restbak
+van de graaf ging in dezelfde ronde van 3071 naar <!--getal:graaf.overig-->416<!--/getal--> aanroepen (0,27%), en
 daar zat geen raadsel in maar vijf BEKENDE vormen die de meter niet herkende --
 een restbak vol bekende vormen laat je denken dat je code ondoorgrondelijk is
 terwijl je meter te weinig weet. Twee
-dingen daar niet wegpoetsen: <!--getal:graaf.viaKernZonderSymbool-->4105<!--/getal--> van die kanten wijzen alleen het BESTAND
+dingen daar niet wegpoetsen: <!--getal:graaf.viaKernZonderSymbool-->4127<!--/getal--> van die kanten wijzen alleen het BESTAND
 aan en niet de functie (een fabriek mag `{ walletVoeg: voeg }` teruggeven, en dan
 is de zaknaam niet de symboolnaam), en een parameter die `save` heet wordt NIET
 op zijn naam als kernnaam herkend maar op zijn functie -- alleen de fabrieken die
@@ -2372,13 +2372,15 @@ dekkingsgetal doordat er een meter bij komt die zwijgt. Die meter begon
 op 118 "dode paden" en eindigde op <!--getal:schermroutes.dood-->0<!--/getal-->; de aanroepgraaf begon op 587 onbekende
 doelen en eindigde op <!--getal:graaf.doelOnbekend-->0<!--/getal-->, en in beide gevallen zat de fout in de METER en niet
 in de code. Dat laatste nul is sinds 20 september 2026 een ANDER nul: er staat een derde
-soort naast, `bewaakteVooruitwijzing` (<!--getal:graaf.bewaakteVooruitwijzing-->1<!--/getal-->), voor een aanroep naar een integratie die
+soort naast, `bewaakteVooruitwijzing` (<!--getal:graaf.bewaakteVooruitwijzing-->0<!--/getal-->), voor een aanroep naar een integratie die
 met opzet nog niet gebouwd is en waar het bestand ZELF afbreekt als de andere kant
 ontbreekt -- `server/accounts/transactie.js` toetst op regel 102 of
 `verzoekcontext.registreerDeelnemer` bestaat en gooit anders
-`PG_ACCOUNTS_DEELNEMER_ONTBREEKT`. Dat is een gedeclareerd gat en geen vergissing,
+`PG_ACCOUNTS_DEELNEMER_ONTBREEKT`. Dat was een gedeclareerd gat en geen vergissing,
 en het was twee weken onzichtbaar omdat het register van 3 september ouder was dan
-de code van 6 september. De ratel blijft op nul staan en blijft bijten: haal de
+de code van 6 september. Op 27 september 2026 is het gesloten: accountmutaties
+zijn in productie een deelnemer aan de PostgreSQL-requestcommit
+(`server/db/deelnemers.js`), dus de aanroep lost op en de teller staat op nul. De ratel blijft op nul staan en blijft bijten: haal de
 wacht weg, of laat hem alleen waarschuwen, en de aanroep valt terug in
 `doelOnbekend`. Wat ertussen zat zijn regels die overal gelden -- een pad kan VERDERGAAN (`'/api/agenda/' + id`),
 een pad kan een GEGEVEN zijn in plaats van een doel (in een `.replace()`), en

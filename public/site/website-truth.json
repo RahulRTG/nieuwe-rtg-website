@@ -8,7 +8,7 @@
     "public/apps/leverancier.html",
     "public/apps/app.html"
   ],
-  "sourceHash": "7d4d95426dd5909ab0795857e9245ae522539029feb61d8e15d1ad92cbdb7733",
+  "sourceHash": "ca542e4603fb8e97aadb53ae9a17b9b307f63cd77097b0ab84b3bf3a87054890",
   "platform": [
     {
       "id": "organisatie",
@@ -55,7 +55,7 @@
         "Je ledenpas ligt in je wallet, de tegel rechts onder de klok"
       ],
       "note": "Je echte naam blijft in de kluis; partners zien alleen je codenaam. Dat is bewust ons ontwerp.",
-      "sourceHash": "a656bca504be057dbc7228aeaf9a93e14bc2e099f6cec61d57b3d0b95c5fc1b4"
+      "sourceHash": "970c40a59f64e1216b90c7dfd2d60a39a89ea67cb2890b0c1923a52bc980bb0c"
     }
   ],
   "worlds": {

@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-09-27T03:00:55.417Z",
-    "commit": "840fb8a21",
-    "boomVuil": false,
+    "op": "2026-09-27T08:05:05.895Z",
+    "commit": "3037f9a66",
+    "boomVuil": true,
     "boomAnders": 2,
     "instrument": "scripts/vindbaar.js",
     "node": "v24.18.0"
@@ -12,8 +12,8 @@
   "drempel": 3,
   "bestemmingen": 99,
   "woorden": 1245,
-  "gevonden": 771,
-  "dekking": 0.6193,
+  "gevonden": 786,
+  "dekking": 0.6313,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -75,9 +75,10 @@
       "naam": "Daten",
       "url": "/apps/vonk.html",
       "woorden": 44,
-      "gevonden": 8,
+      "gevonden": 16,
       "mist": [
         "bevestig",
+        "aandeel",
         "leeftijd",
         "belangrijk",
         "waarom",
@@ -92,6 +93,7 @@
         "ritme",
         "geen",
         "agenda",
+        "plek",
         "moet",
         "beiden",
         "kloppen",
@@ -102,51 +104,7 @@
         "kijken",
         "niemand",
         "wachten",
-        "ontmoeting",
-        "overslaan",
-        "connection",
-        "passport",
-        "eerder",
-        "later",
-        "trek",
-        "publiceer",
-        "verwijder",
-        "opnieuw",
-        "proberen"
-      ]
-    },
-    {
-      "naam": "Rendez-vous",
-      "url": "/apps/rendezvous.html",
-      "woorden": 43,
-      "gevonden": 17,
-      "mist": [
-        "portret",
-        "intentie",
-        "intros",
-        "join",
-        "tables",
-        "gatherings",
-        "overlaps",
-        "circles",
-        "name",
-        "today",
-        "matches",
-        "society",
-        "uitnodigingen",
-        "voorgesteld",
-        "worden",
-        "ontmoet",
-        "concierge",
-        "verzoeken",
-        "eerder",
-        "later",
-        "accept",
-        "decline",
-        "goedkeuren",
-        "aanpassen",
-        "verzoek",
-        "indienen"
+        "ontmoeting"
       ]
     },
     {
@@ -181,6 +139,33 @@
         "pijplijn",
         "bestuur",
         "capaciteit"
+      ]
+    },
+    {
+      "naam": "Rendez-vous",
+      "url": "/apps/rendezvous.html",
+      "woorden": 43,
+      "gevonden": 24,
+      "mist": [
+        "portret",
+        "intentie",
+        "intros",
+        "join",
+        "tables",
+        "gatherings",
+        "overlaps",
+        "circles",
+        "name",
+        "today",
+        "matches",
+        "uitnodigingen",
+        "voorgesteld",
+        "worden",
+        "ontmoet",
+        "concierge",
+        "verzoeken",
+        "verzoek",
+        "indienen"
       ]
     },
     {

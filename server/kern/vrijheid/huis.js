@@ -11,14 +11,13 @@
    `vrijheid` voor verzoeken, grootboek en boekingen per organisatie, en
    `vrijheidInstellingen` voor wat de zaak en de mens zelf opgeven.
 
-   WAT HIER NOG NIET GEBEURT, en waarom:
-     - duurzaam vastleggen (lib/duurzaam.js). De motor schrijft via save(), en
-       dat is write-behind. Een besluit over iemands vrije tijd hoort pas "gelukt"
-       te heten als het vaststaat -- maar dat hoort bij de ROUTE die het antwoord
-       geeft (VRIJHEID.md par. 7, P0 punt 6), niet bij de motor.
-     - het rooster terugschrijven. Er gaat geen `rooster`-adapter mee, dus een
-       besluit staat op NIET_AANGESLOTEN in plaats van te doen alsof het rooster
-       is bijgewerkt. */
+   DUURZAAM VASTLEGGEN hoort bij de ROUTE die het antwoord geeft en niet bij de
+   motor; zie `vastleggen` hieronder.
+
+   HET ROOSTER EN DE STROOK. De `rooster`-adapter van de motor is de brug naar
+   het verzuimregister (./verzuimbrug.js): een toegekende hele vrije dag komt
+   daar te staan, en dat register lezen de loonrun en de planning al. Een deel
+   van een dag komt er niet in, met de reden erbij. */
 'use strict';
 const { maakVrijheid } = require('./index');
 const { rtgBeleid, STAND } = require('./rtgbeleid');
@@ -28,7 +27,11 @@ module.exports = ({ db, save, bijeen, inBundel, kern }) => {
   const eigen = require('../eigencollectie')({ db, domein: 'kern/vrijheid',
     bezit: { vrijheid: 'kaart', vrijheidInstellingen: 'kaart' } });
   const instellingen = require('./instellingen')({ eigen, save });
-  const motor = maakVrijheid({ opslag: { bak: (naam) => eigen.bak(naam), kijk: (naam) => eigen.kijk(naam) }, save });
+  /* Het register komt LAAT uit de kern: payrollOS hangt er al, maar een toets
+     met een kale kern heeft hem niet, en dan gooit de brug -- ONBEKEND, nooit
+     stil "gelukt". */
+  const rooster = require('./verzuimbrug')({ verzuim: () => (kern().payrollOS || {}).verzuim });
+  const motor = maakVrijheid({ opslag: { bak: (naam) => eigen.bak(naam), kijk: (naam) => eigen.kijk(naam) }, save, rooster });
   const rtghuis = require('./rtghuis')({ db, save, kern });
   const { teambeeld } = require('./teambeeld')({ bronnen: () => ({ ...kern(), rtghuis }), instellingen });
 

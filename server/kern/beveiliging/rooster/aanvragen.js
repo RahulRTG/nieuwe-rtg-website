@@ -2,12 +2,14 @@
    en de inzetaanvragen van klanten. rooster en zetDienst komen uit de
    planninglaag via de context. Krijgt de gedeelde context een keer bij het
    opstarten vanuit kern/beveiliging/rooster.js. */
+const { maakInplanbaar, NIET_GELEZEN } = require('../../payroll/inplanbaar');
 module.exports = (ctx) => {
   const { db, save, accounts, findSupplier, notify, notifySupplier, sseToSupplier, sseToOffice, logActivity, haversine,
     BEV_FUNCTIES, BEV_SHIFTS, BEV_ERNST, AANVR_KLAAR,
     id, nu, vandaag, schoon, getal, shiftVan, isBeveiliging, defaults, functieAan,
     diensten, aanvragen, incidenten, rondes, guards, guardNaam, postVan, functieLijst, zetPost } = ctx;
   const { rooster, zetDienst, rustBotsing } = ctx;
+  const inplanbaar = maakInplanbaar(ctx.afwezigOp);
   /* ---- de AI neemt het rooster over: vul de open plekken van een dag ----
      Kiest per open plek een beschikbare bewaker: niet al op die shift, en met
      rust -- ook over de datumgrens, want een nachtdienst loopt door tot 07:00
@@ -32,11 +34,16 @@ module.exports = (ctx) => {
     }
     const gemaakt = [];
     let onvervuld = 0;
+    /* Wie ziek of vrij is, komt niet in aanmerking (kern/payroll/inplanbaar.js);
+       deels inzetbaar plant een mens in. */
+    const afwezig = new Set(); let nietGelezen = false;
+    for (const g of team) { const ip = inplanbaar(s.code, g.id, dag); if (ip.onbekend) nietGelezen = true; if (!ip.plan) afwezig.add(g.id); }
     for (const post of rst.posten) {
       for (const sl of post.shifts) {
         for (let k = 0; k < sl.open; k++) {
           const kandidaat = team
             .filter(g => {
+              if (afwezig.has(g.id)) return false;                     // ziek of vrij
               const set = shiftVanGuard.get(g.id) || new Set();
               if (set.has(sl.shiftId)) return false;                 // al op deze shift
               return !rustBotsing(s, g.id, dag, sl.shiftId);          // rust, ook over de datumgrens
@@ -56,7 +63,8 @@ module.exports = (ctx) => {
     const uitleg = gemaakt.length
       ? 'De AI vulde ' + gemaakt.length + ' open dienst(en) in op ' + dag + (onvervuld ? ', maar ' + onvervuld + ' plek(ken) bleven open (te weinig beschikbare bewakers, rust bewaakt).' : '. Alle posten gedekt.')
       : (onvervuld ? 'Geen dienst kon ingevuld worden: te weinig beschikbare bewakers met rust tussen de diensten.' : 'Er stonden geen open diensten op ' + dag + '.');
-    return { status: 200, ok: true, datum: dag, gemaakt, onvervuld, uitleg };
+    const afw = nietGelezen ? ' ' + NIET_GELEZEN : afwezig.size ? ' ' + afwezig.size + ' bewaker(s) afwezig en niet ingepland.' : '';
+    return { status: 200, ok: true, datum: dag, gemaakt, onvervuld, afwezig: afwezig.size, uitleg: uitleg + afw };
   }
 
   /* ---- inzetaanvragen van klanten (en interne extra-mankracht/verlof) ---- */

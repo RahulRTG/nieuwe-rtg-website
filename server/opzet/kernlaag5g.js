@@ -6,8 +6,8 @@
    dienstverband en het vakbewijs op het moment van vragen -- niet op het moment
    van opstarten, als nog niet elke laag erin staat.
 
-   Er hangt nog geen route aan (VRIJHEID.md par. 7, P0 punt 6); dit maakt de
-   motor, zijn opslag en het teambeeld beschikbaar voor wie hem aanroept. */
+   De routes staan in server/routes/vrijheid/; dit maakt de motor, zijn opslag,
+   het teambeeld en de brug naar het verzuimregister beschikbaar. */
 'use strict';
 
 module.exports = (kern, hulp) => {
@@ -24,6 +24,9 @@ module.exports = (kern, hulp) => {
     if (!kern.accounts || typeof kern.accounts[n] !== 'function') mist.push('accounts.' + n);
   if (!kern.afdelingen || !Array.isArray(kern.afdelingen.KAMER_IDS)) mist.push('afdelingen.KAMER_IDS');
   if (!kern.economie || typeof kern.economie.identiteitZet !== 'function') mist.push('economie.identiteitZet');
+  /* De brug naar de strook en de planning (kern/vrijheid/verzuimbrug.js). */
+  const vz = kern.payrollOS && kern.payrollOS.verzuim;
+  for (const n of ['meld', 'bronWeg', 'heeftBron']) if (!vz || typeof vz[n] !== 'function') mist.push('payrollOS.verzuim.' + n);
   if (mist.length) throw new Error('kernlaag5g (RTG Vrijheid): het teambeeld mist ' + mist.join(', ') +
     ' in de kern. Hangt deze laag te vroeg, of is een bron hernoemd?');
   /* RTG zelf als werkgever (kern/vrijheid/rtghuis.js) hangt BINNEN kern.vrijheid

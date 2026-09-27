@@ -1723,13 +1723,22 @@ const {
   }
 });
 
+/* Afwezigheid voor de planners (kern/payroll/verzuim.js, afwezigOp). LAAT
+   gelezen: payrollOS hangt pas in kernlaag2 in de kern, en de planners worden
+   hier al gemaakt. Geen register is { onbekend: true } en nooit "niemand is
+   afwezig" -- een planner die dat niet kan lezen, zegt het erbij. */
+function afwezigOp(code, staffId, datum) {
+  const vz = kern.payrollOS && kern.payrollOS.verzuim;
+  return vz && typeof vz.afwezigOp === 'function' ? vz.afwezigOp(code, staffId, datum) : { onbekend: true };
+}
+
 /* De AI-bedrijfsagent (kern/agent.js): vaste leverancier koppelen, AI-inkoop-
    voorstellen op verkoop + mise en place + verwachte drukte, en het AI-week-
    rooster; de gemachtigde (manager) keurt goed, past aan of wijst af. */
 const { maakAgent } = require('./kern/agent');
 const { agentKoppel, agentPubliek, agentVoorstel, agentBeslis, roosterVoorstel, roosterBeslis } = maakAgent({
   db, crypto, findSupplier, notifySupplier, ghBijbestelVoorstel, ghPlaatsBestelling,
-  accounts, weekdagFactor, SHIFT_NAMES, save, logActivity
+  accounts, weekdagFactor, SHIFT_NAMES, save, logActivity, afwezigOp
 });
 
 /* Mode-bezorging (kern/modebezorg.js): een modewinkel zet in een tik een slimme,
@@ -1794,7 +1803,7 @@ const {
   bevMeldIncident, bevBeslisIncident, bevSos, bevCommand,
   // de sleuf waar opzet/plaatsbronnen.js de plaatslaag in hangt (late binding)
   bevKoppelPlaats
-} = maakBeveiliging({ db, save, crypto, accounts, findSupplier, notify, notifySupplier, sseToSupplier, sseToOffice, logActivity, haversine });
+} = maakBeveiliging({ db, save, crypto, accounts, findSupplier, notify, notifySupplier, sseToSupplier, sseToOffice, logActivity, haversine, afwezigOp });
 
 /* De idempotentie-administratie van de betaal-naad (server/betaal.js) durable
    maken: dezelfde idempotentiesleutel geeft ook NA een herstart hetzelfde
@@ -2051,7 +2060,7 @@ const { runItem, runKey, sortRunsheet, fallbackRunsheet, parseRunsheetText, cate
 /* De personeelslaag (klok, vertrouwenslijn, weekrooster) staat in
    server/kern/personeel.js. SHIFT_NAMES komt daar rechtstreeks vandaan; de
    functies dragen db + accounts. */
-const { urenVan, klokVan, trustVan, scheduleFor } = maakPersoneel({ db, accounts });
+const { urenVan, klokVan, trustVan, scheduleFor } = maakPersoneel({ db, accounts, afwezigOp });
 
 // backoffice: de vertrouwenspersoon leest en antwoordt
 

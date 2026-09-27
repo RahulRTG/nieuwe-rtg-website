@@ -69,17 +69,15 @@ function maakVrijheid({ opslag, save, nu, meld, rooster }) {
     if (r.fout) throw new Error(r.reden);
     org(code).boekingen.push(Object.freeze({ ...r, id: bron, afwezigheid: afw || null }));
   }
-  function roosterPas(code, obj, wijziging) {
-    obj.roosterWijziging = wijziging;
-    if (!rooster) { obj.rooster = 'NIET_AANGESLOTEN'; return; }
-    try { rooster.pas(code, wijziging); obj.rooster = 'BIJGEWERKT'; }
-    catch (e) { obj.rooster = 'ONBEKEND'; obj.roosterFout = String(e && e.message || e); zend('RECONCILE_REQUIRED', { organisatie: code, id: obj.id }); }
-  }
+  /* De haak naar het rooster en het verzuimregister, en het vrijgeven van
+     toegekende tijd: ./roosterhaak.js. */
+  const { roosterPas, vrijgaveTerug } = require('./roosterhaak')({ rooster, zend, tijd, org });
   function plan(code, v) {
     S.zet(v, 'verzoek', 'SCHEDULED', 'systeem', tijd());
     boek(code, v.id, { categorie: v.categorie, uren: v.uren, datum: v.datum, persoon: v.persoon }, v.afwezigheid);
     if (v.vervanger) schrijfGrootboek(code, { soort: 'EXTRA_COVERAGE', persoon: v.vervanger, datum: v.datum });
-    roosterPas(code, v, { soort: 'afwezig', persoon: v.persoon, afwezigheid: v.afwezigheid, bron: v.id });
+    roosterPas(code, v, { soort: 'afwezig', persoon: v.persoon, afwezigheid: v.afwezigheid, bron: v.id,
+      categorie: v.categorie, datum: v.datum, dag: v.soort === 'VRIJE_DAG' });
     zend(v.categorie === 'RTG_DAY' ? 'RTG_DAY_SCHEDULED' : 'FREEDOM_APPROVED', { organisatie: code, id: v.id });
   }
 
@@ -125,7 +123,7 @@ function maakVrijheid({ opslag, save, nu, meld, rooster }) {
     return { ok: true, verzoek: v };
   }
 
-  const ctx = { org, orgLees, id, fout, tijd, bewaar, zend, teamKlopt, afwezig, schrijfGrootboek, boek, roosterPas, plan, rooster, TOEGEKEND };
+  const ctx = { org, orgLees, id, fout, tijd, bewaar, zend, teamKlopt, afwezig, schrijfGrootboek, boek, roosterPas, vrijgaveTerug, plan, rooster, TOEGEKEND };
   return Object.assign({ vraag }, require('./mens')(ctx),
     require('./aanbod')(ctx), require('./herstel')(ctx), require('./jaarplan')(ctx), require('./beeld')(ctx));
 }

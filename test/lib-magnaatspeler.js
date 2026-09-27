@@ -7,13 +7,14 @@
 'use strict';
 const { maakLeven } = require('../server/kern/magnaat-leven');
 
-function maakSpeler({ moeilijkheid = 'normaal', aanbod = 'websites', key = 'speler' } = {}) {
+function maakSpeler({ moeilijkheid = 'normaal', aanbod = 'websites', key = 'speler', begin = 'keuken' } = {}) {
   let t = 1e12;
   const db = { data: {} };
   const L = maakLeven({ db, nu: () => t });
   let s = L.staat(key);
   const doe = (b) => { const r = L.actie(key, b); if (!r.error) s = r; return r; };
   if (moeilijkheid !== 'normaal') doe({ actie: 'moeilijkheid', stand: moeilijkheid });
+  if (begin !== 'keuken') doe({ actie: 'start', begin });
   doe({ actie: 'kies', aanbod });
   const vind = (f) => s.netwerk.contacten.filter(d => d.fase === f);
   const vrij = () => s.vrijVandaag - (s.vrijVandaag % 30);

@@ -49,12 +49,12 @@ function verhaal(st, c) {
   return {
     mijlpalen: (st.mijlpalen || []).slice(),
     slot: st.zelfstandig ? {
-      tekst: 'Je begon op een maandag met ' + euro(R.niveauVan(st).startKas) + ' en een baan in de keuken. Na ' + st.dag + ' dagen leef je van ' +
+      tekst: 'Je begon op een maandag met ' + euro(R.beginKas(st)) + ' en ' + R.startVan(st).beschrijving + '. Na ' + st.dag + ' dagen leef je van ' +
         (st.onderneming ? st.onderneming.naam : 'je eigen bedrijf') + '.',
       omzet: c.omzet, resultaat: c.resultaat, klanten, team: (st.team || []).filter(m => !m.weg).length, dagen: st.dag
     } : null,
     einde: st.voorbij ? {
-      tekst: 'Je begon op een maandag met ' + euro(R.niveauVan(st).startKas) + '. Op dag ' + st.voorbij.dag + ' was het voorbij: ' + st.voorbij.reden + '.',
+      tekst: 'Je begon op een maandag met ' + euro(R.beginKas(st)) + ' en ' + R.startVan(st).beschrijving + '. Op dag ' + st.voorbij.dag + ' was het voorbij: ' + st.voorbij.reden + '.',
       klanten, dagen: st.voorbij.dag
     } : null
   };

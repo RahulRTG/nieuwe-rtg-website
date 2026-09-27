@@ -30,10 +30,10 @@ const { idVanKey } = require('../lib/lidsleutel');
    (gereedheid, eenheid, wie geraakt, reconstructie) is voor wie de Academy
    bestuurt. Een lezer zonder relatie met de organisatie leest niets: ook dat
    is isolatie (grondwet 16). */
-const EIGEN = ['mijn', 'vakstaat', 'trainerCockpit', 'managerCockpit', 'waaromLeren', 'waaromVerversen',
+const EIGEN_VRAGEN = ['mijn', 'vakstaat', 'trainerCockpit', 'managerCockpit', 'waaromLeren', 'waaromVerversen',
   'waaromNietGereed', 'geschiktheid', 'loopbaan', 'waaromTrainer', 'grond', 'uitkomst'];
-const BESTUUR = ['gereedheid', 'eenheid', 'wieGeraakt', 'reconstrueer', 'certStand'];
-const BESTUURSROLLEN = ['ACADEMY_OWNER', 'QUALITY_AUTHORITY', 'KNOWLEDGE_OWNER', 'ASSESSMENT_AUTHORITY'];
+const BESTUURSVRAGEN = ['gereedheid', 'eenheid', 'wieGeraakt', 'reconstrueer', 'certStand'];
+const LEESROLLEN = ['ACADEMY_OWNER', 'QUALITY_AUTHORITY', 'KNOWLEDGE_OWNER', 'ASSESSMENT_AUTHORITY'];
 
 module.exports = (kern) => {
   const { app, auth, db, save, kluisAuth, volwassen } = kern;
@@ -72,7 +72,7 @@ module.exports = (kern) => {
     const rel = st.relaties[door];
     if (!rel || !rel.actief) return res.status(403).json({ error: 'U heeft geen lopende relatie met deze organisatie.' });
     const l = leerhuis.lees;
-    if (EIGEN.includes(vraag)) {
+    if (EIGEN_VRAGEN.includes(vraag)) {
       /* Altijd over DE LEZER zelf: een ander vakstaat of geschiktheid opvragen
          kan hier niet, ook niet met een veld in het lijf. */
       const a = { mijn: () => l.mijn(org, door), vakstaat: () => l.vakstaat(org, door),
@@ -87,15 +87,15 @@ module.exports = (kern) => {
           return r && r.door === door ? leerhuis.uitkomst(org, String(b.sleutel)) : { bekend: false }; } }[vraag];
       return res.json({ ok: true, vraag, antwoord: a() });
     }
-    if (BESTUUR.includes(vraag)) {
-      if (!BESTUURSROLLEN.some(r => (st.bestuur[door] || []).includes(r)))
+    if (BESTUURSVRAGEN.includes(vraag)) {
+      if (!LEESROLLEN.some(r => (st.bestuur[door] || []).includes(r)))
         return res.status(403).json({ error: 'Het organisatiebrede beeld is voor het bestuur van de Academy.' });
       const a = { gereedheid: () => l.gereedheid(org, b.eisen || {}), eenheid: () => l.eenheid(org),
         wieGeraakt: () => l.wieGeraakt(org, String(b.kennis || ''), b.klasse || null),
         reconstrueer: () => l.reconstrueer(org, String(b.certificaat || '')), certStand: () => l.certStand(org, String(b.certificaat || '')) }[vraag];
       return res.json({ ok: true, vraag, antwoord: a() });
     }
-    res.status(400).json({ error: 'Onbekende vraag.', vragen: EIGEN.concat(BESTUUR) });
+    res.status(400).json({ error: 'Onbekende vraag.', vragen: EIGEN_VRAGEN.concat(BESTUURSVRAGEN) });
   });
 
   /* Besluit B6: het leerhuis van een organisatie opent een mens van het kantoor

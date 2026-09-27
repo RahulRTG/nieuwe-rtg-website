@@ -117,6 +117,24 @@ Drie vondsten zijn gevaarlijker dan hun deur doet vermoeden:
 Een toets zakt zodra de poort op die paden verandert. Het dichtzetten is A-werk
 en volgt in de migratieronde.
 
+**B9, eerste type gemigreerd: de opwaardeerkaart (`pay.tegoedbon`).** De code is
+128 bits en wordt alleen als hash bewaard. Hij wordt precies één keer getoond en
+heeft een vervaldatum. Er is één gebruik, en intrekken en roteren gebeurt aan de
+serverkant. De vergelijking gebeurt in constante tijd. Het claimen is een saga:
+eerst de claim in de collectietransactie, dan de escrowboeking met een vaste
+sleutel, dan het afronden. Een crash halverwege wordt hervat naar dezelfde
+bestemming. Dat is beproefd over twee PostgreSQL-instances plus een derde die
+hervat.
+
+Daarbij is een fout in `saldoSamen` gerepareerd die elk `extern:`-account in
+PostgreSQL raakte: een rekening op precies 0 viel weg, en het volgende verzoek
+kreeg daardoor een 409.
+
+Er ligt één besluit voor de eigenaar. Oude codes van 96 bits blijven geldig, als
+hash en met het merkteken `legacy96`, totdat de koper roteert of de kaart
+verloopt; dat is hooguit een jaar. De houder houdt zo zijn waarde. Het
+alternatief is die codes nu ongeldig maken en een rotatie afdwingen.
+
 **Juridisch open (E8), en niet door code te beslissen:** een opwaardeerkaart die
 tegen nominale waarde in een uitbetaalbare wallet landt, is vermoedelijk
 elektronisch geld (terugstortstand `open`, `WAARDE.md`, `TOKEN.md`). Wie contant

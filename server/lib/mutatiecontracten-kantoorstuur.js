@@ -71,6 +71,14 @@ CONTRACTEN['POST /api/office/bankpositie'] = {
     '(afwezig blijft afwezig) -- geen save(), geen toewijzing',
   afgetekend: AF
 };
+/* Het aanmeldkanaal (kern/aanmeldkanaal.js, besluit C6): een telling lezen. */
+CONTRACTEN['POST /api/office/aanmeldkanaal'] = {
+  mutatieId: 'office.aanmeldkanaal', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
+  toegang: { klasse: 'AUTHENTICATED' }, stand: 'NOT_APPLICABLE',
+  bewijs: { gemeten: 'test/aanmeldkanaal.test.js toets 1: 401 zonder sessie, en de telling langs de groepspoort', op: '2026-09-27' },
+  nagekeken: 'met de hand, 2026-09-27: de handler roept alleen aanmeldkanaalStand() aan, die via eigencollectie.kijk leest',
+  afgetekend: AF
+};
 CONTRACTEN['POST /api/office/bankpositie/zet'] = {
   mutatieId: 'office.bankpositie.zet',
   herkomst: 'mens',

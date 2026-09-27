@@ -56,6 +56,7 @@ const SLEUTELS = {
   /* Het banksaldo van RTG (besluit C4): lezen leest; zetten met hetzelfde saldo van
      hetzelfde afschrift is een keer (kern/bankpositie.js geeft ongewijzigd terug). */
   'POST /api/office/bankpositie': { leest: true },
+  'POST /api/office/aanmeldkanaal': { leest: true },                          // een telling lezen (C6)
   'POST /api/office/bankpositie/zet': { zelfdeVerzoek: true },             // maand + saldo + afschrift
   /* Naar gast (besluit C5, server/routes/naargast.js): de standcontrole weet het al. */
   'POST /api/office/pas/gast/regels': { leest: true },

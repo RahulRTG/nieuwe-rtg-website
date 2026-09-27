@@ -57,6 +57,11 @@ const SLEUTELS = {
      hetzelfde afschrift is een keer (kern/bankpositie.js geeft ongewijzigd terug). */
   'POST /api/office/bankpositie': { leest: true },
   'POST /api/office/aanmeldkanaal': { leest: true },                          // een telling lezen (C6)
+  /* Het streefbeeld (C7): lezen leest; tekenen gaat over een vingerafdruk en
+     intrekken is een stand, dus een tweede gelijke oproep is dezelfde. */
+  'POST /api/office/streefbeeld': { leest: true },
+  'POST /api/office/streefbeeld/teken': { zelfdeVerzoek: true },
+  'POST /api/office/streefbeeld/intrek': { zelfdeVerzoek: true },
   'POST /api/office/bankpositie/zet': { zelfdeVerzoek: true },             // maand + saldo + afschrift
   /* Naar gast (besluit C5, server/routes/naargast.js): de standcontrole weet het al. */
   'POST /api/office/pas/gast/regels': { leest: true },

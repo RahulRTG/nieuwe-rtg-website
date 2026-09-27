@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-27T13:38:10.544Z",
-    "commit": "4c698936",
+    "op": "2026-09-27T13:45:46.771Z",
+    "commit": "3ff7d3b7",
     "boomVuil": false,
-    "boomAnders": 8,
+    "boomAnders": 0,
     "instrument": "scripts/bedrijfsmaat.js",
     "node": "v22.22.2"
   },
@@ -18,7 +18,7 @@
       "herkomst": "mens",
       "regel": "RTG en de RTFoundation mogen door dezelfde intelligentielaag worden waargenomen. Iedere waarneming en iedere voorgestelde handeling behoudt haar economische wereld. kern/economie/firewall.js wordt niet omzeild of versoepeld. RTF-informatie kan buiten haar economische wereld hoogstens tot een constatering of een voorstel leiden.",
       "kort": "Eén waarnemend brein is niet één portemonnee.",
-      "handhaving": "Elke bedrijfsmaat draagt precies één wereld uit kern/economie/werelden.js; de meter weigert een maat zonder wereld of met een onbekende. De firewall is in deze ronde niet aangeraakt.",
+      "handhaving": "Elke bedrijfsmaat draagt precies één wereld uit kern/economie/werelden.js; de meter weigert een maat zonder wereld of met een onbekende (test/bedrijfsmaat.test.js). De firewall is in deze ronde niet aangeraakt.",
       "stand": "gebouwd"
     },
     {
@@ -38,8 +38,8 @@
       "herkomst": "mens",
       "regel": "Een geslaagde uitkomst per wereld, vier maten naast elkaar en geen totaal: LivingOS een rit of bestelling afgerond, TravelOS een reis die thuis is (een nieuwe stand, gezet door het kantoor of het lid), WorkOS een definitieve loonrun, FoundationOS een afgeronde casus met een tijdstip.",
       "kort": "Waarde per wereld, nooit een cijfer over alles.",
-      "handhaving": "Nog geen: staat in AUTONOMIE.md par. 2.5 en par. 7.",
-      "stand": "te bouwen"
+      "handhaving": "kern/bedrijfsmaat/klantwaarde.js (vier maten, geen totaal), kern/reisbureau-thuis.js en afgerondOp in kern/rtfos/casus-keten.js; test/klantwaarde.test.js en test/reisbureau-thuis.test.js.",
+      "stand": "gebouwd"
     },
     {
       "id": "C4",
@@ -48,8 +48,8 @@
       "herkomst": "mens",
       "regel": "Eerst handmatig met het afschrift als herkomst (graad vermoed), een bankkoppeling later als eigen besluit. RTG gaat eigen cadeaubonnen verkopen; geld van een verkochte bon telt als cash en als verplichting. De bon zelf draagt de e-geldvraag van TOKEN.md; bonnen van zaken blijven van de zaak.",
       "kort": "Wat op de bank staat is niet allemaal vrij geld.",
-      "handhaving": "Nog geen: staat in AUTONOMIE.md par. 2.5 en par. 7.",
-      "stand": "te bouwen"
+      "handhaving": "kern/bankpositie.js (handmatig, bron verplicht, graad vermoed, bonnen op nul met reden); test/bankpositie.test.js. De eigen bon zelf en een bankkoppeling zijn nog niet gebouwd.",
+      "stand": "gebouwd"
     },
     {
       "id": "C5",
@@ -58,8 +58,8 @@
       "herkomst": "mens",
       "regel": "Het lid zelf, het kantoor met de hand, en automatisch met regels die per situatie te kiezen zijn. Voorstel van Claude, nog te bevestigen: elke automatische regel staat standaard dicht, een lid zonder vastgelegd contract gaat nooit automatisch, en facturen en bewijsstukken blijven.",
       "kort": "Weggaan kan, en niemand verdwijnt stil.",
-      "handhaving": "Nog geen: staat in AUTONOMIE.md par. 2.5 en par. 7.",
-      "stand": "te bouwen"
+      "handhaving": "kern/aanmeldingen/naargast.js (lid nu of aan het eind, kantoor met reden, drie regels standaard uit); test/naargast.test.js.",
+      "stand": "gebouwd"
     },
     {
       "id": "C6",
@@ -68,8 +68,8 @@
       "herkomst": "mens",
       "regel": "Een optionele vraag bij aanmelding en een campagnecode in de link; alleen geteld langs de groepspoort, nooit per lid zichtbaar, dertien maanden bewaard en weg bij vergetelheid.",
       "kort": "Weten waar leden vandaan komen, niet wie.",
-      "handhaving": "Nog geen: staat in AUTONOMIE.md par. 2.5 en par. 7.",
-      "stand": "te bouwen"
+      "handhaving": "kern/aanmeldkanaal.js (een telling per maand, nooit per lid); test/aanmeldkanaal.test.js. De vraag zelf staat nog niet in het aanmeldscherm; de API en de campagnelink wel.",
+      "stand": "gebouwd"
     },
     {
       "id": "C7",
@@ -78,8 +78,8 @@
       "herkomst": "mens",
       "regel": "De machine stelt per dimensie een streefstand met tolerantie voor uit afgesloten maanden; hij geldt pas na de handtekening van de eigenaar. Zonder getekende streefstand gebeurt er niets autonoom.",
       "kort": "De machine stelt voor, de eigenaar tekent.",
-      "handhaving": "Nog geen: staat in AUTONOMIE.md par. 2.5 en par. 7.",
-      "stand": "te bouwen"
+      "handhaving": "kern/streefbeeld.js (voorstel uit drie maanden, tekenen op de vingerafdruk, een dimensie buiten is nee); test/streefbeeld.test.js. Er is nog niets dat autonoom handelt.",
+      "stand": "gebouwd"
     }
   ],
   "telling": {

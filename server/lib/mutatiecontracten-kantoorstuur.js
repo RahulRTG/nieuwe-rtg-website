@@ -79,6 +79,28 @@ CONTRACTEN['POST /api/office/aanmeldkanaal'] = {
   nagekeken: 'met de hand, 2026-09-27: de handler roept alleen aanmeldkanaalStand() aan, die via eigencollectie.kijk leest',
   afgetekend: AF
 };
+/* Het streefbeeld (kern/streefbeeld.js, besluit C7). */
+CONTRACTEN['POST /api/office/streefbeeld'] = {
+  mutatieId: 'office.streefbeeld', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
+  toegang: { klasse: 'AUTHENTICATED' }, stand: 'NOT_APPLICABLE',
+  bewijs: { gemeten: 'test/streefbeeld.test.js toets 6: 401 zonder sessie, 200 met voorstel, getekend en toets', op: '2026-09-27' },
+  nagekeken: 'met de hand, 2026-09-27: voorstel() en toets() rekenen uit bedrijfsmaat.stand(), getekend() leest via ' +
+    'eigencollectie.kijk -- geen save(), geen toewijzing',
+  afgetekend: AF
+};
+CONTRACTEN['POST /api/office/streefbeeld/teken'] = {
+  mutatieId: 'office.streefbeeld.teken', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
+  toegang: { klasse: 'AUTHENTICATED' }, stand: 'PROTECTED',
+  bewijs: { gemeten: 'test/streefbeeld.test.js toets 2: een tweede keer tekenen met dezelfde vingerafdruk zet hetzelfde ' +
+    'voorstel; een oude vingerafdruk geeft 409', op: '2026-09-27' },
+  afgetekend: AF
+};
+CONTRACTEN['POST /api/office/streefbeeld/intrek'] = {
+  mutatieId: 'office.streefbeeld.intrek', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
+  toegang: { klasse: 'AUTHENTICATED' }, stand: 'PROTECTED',
+  bewijs: { gemeten: 'test/streefbeeld.test.js toets 4: na intrekken is het streefbeeld leeg; een tweede keer geeft alLeeg', op: '2026-09-27' },
+  afgetekend: AF
+};
 CONTRACTEN['POST /api/office/bankpositie/zet'] = {
   mutatieId: 'office.bankpositie.zet',
   herkomst: 'mens',

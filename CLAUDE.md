@@ -865,8 +865,12 @@ cijfer op een mens (CAR-05), en de uitweg staat al in
 `kern/beveiliging/rooster/aanvragen.js`: sorteren op de minste uren, dus op wat
 iemand TOEKOMT en nooit op wat hij waard is. Par. 6 zet per onderdeel of het
 staat, een stap weg is, een besluit vraagt of jaren weg is; het eerste dat vandaag
-écht fout kan gaan staat bovenaan par. 7: **géén roostermotor leest verzuim**,
-dus een zieke medewerker kan gewoon worden ingepland.
+écht fout kon gaan stond bovenaan par. 7: **géén roostermotor las verzuim**,
+dus een zieke medewerker kon gewoon worden ingepland. Dat is gerepareerd (27
+september 2026): `kern/verzuimrooster.js` is de ene regel die beide
+autoplanners lezen, `deels` en `aangepast` plant een mens en niet de machine, en
+een ontbrekende verzuimlaag heet `onbekend` en nooit "niemand is ziek". Afgewezen
+verlof stond al die tijd als vakantie in de verzuimlaag en gaat er nu uit.
 
 **`OFFICE.md` is de richting van RTG Office Next** -- van zes editors naar
 werk: alles wat een bedrijf van Microsoft 365 of Google Workspace verwacht,

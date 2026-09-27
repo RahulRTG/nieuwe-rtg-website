@@ -159,7 +159,7 @@ zeggen.
 | **Goedemorgen, Amir** | het eigen account: zelf-inzage is vrij | **staat** | de echte naam wordt op het toestel getoond en gaat nooit mee naar een model (`dienst-fluister.js` noemt de medewerker al niet bij naam) |
 | **Alles staat voor je klaar** | de optelsom van de regels eronder | **een stap weg** | mag er alleen staan als ELKE regel eronder gemeten is; anders: *"Eén ding kon ik niet nakijken: …"* — `niet vast te stellen` is een eersteklas uitslag (BESTUUR.md) |
 | **Kantine · 08:00–16:30** | het rooster van de zaak | **staat** voor zaken | — |
-| **Team compleet** | rooster × verzuim | **een stap weg** | PLANNING.md par. 7: *géén roostermotor leest verzuim*. `voorPlanning()` levert het al; het rooster moet het lezen. Tot dan zegt de regel wie er ingeroosterd is, niet dat het team compleet is |
+| **Team compleet** | rooster × verzuim | **een stap weg** | de autoplanners lezen verzuim sinds 27 september 2026 (`kern/verzuimrooster.js`) en plannen een zieke medewerker niet meer in. De KAART bestaat nog niet; zij zegt "compleet" alleen als de verzuimlaag is nagekeken (`verzuimNagekeken`), anders wie er ingeroosterd is |
 | **Eerste levering 08:20** | de inkoop van de zaak (`/api/supplier/inkoop`) | **een stap weg** | alleen een BEVESTIGDE levering; een verwachte levering heet zo |
 | **Lunch: 73 aangemeld** | aanmeldingen of reserveringen | **een stap weg** | een GETELD getal mag. Een VOORSPELD getal pas als de trefzekerheid over drie afgesloten perioden is gemeten, en dan met bandbreedte (INT-04, `kern/kosten/vooruitblik.js`). "73 personen" zonder die meting is een verzonnen zekerheid |
 | **Begin mijn dag** | inklokken (`/api/staff/clock`) | **staat** | — |
@@ -175,8 +175,9 @@ Wat er daarnaast vóór 08:00 moet zijn gebeurd, en waarom je het NIET ziet:
 - **Zijn pauze past bij de bezetting.** De pauzeregel staat
   (`werkbeleidPauzeStand`); de pauze PLANNEN op de bezetting niet. **Een stap
   weg.**
-- **Als een collega ziek is, is de impact al doorgerekend.** Hetzelfde gat als
-  "team compleet". En de doorrekening gaat over de BEZETTING en nooit over de
+- **Als een collega ziek is, is de impact al doorgerekend.** De planners slaan
+  hem sinds 27 september 2026 over en zeggen welke plek daardoor open bleef; de
+  doorrekening naar de kaart is nog een stap weg. En de doorrekening gaat over de BEZETTING en nooit over de
   zieke: wie ziek is, verschijnt als "afwezig" en niets meer.
 
 ## 5. Het uur van de eigenaar: status ≠ aandacht
@@ -444,7 +445,7 @@ Waar een functie botst met een grens, vervalt de functie.
 | **0** | RTG wordt werkgever in zijn eigen Concern, en RTG's eigen werk (ook de kantine) draait op de WorkOS-personeelslaag | **vraagt een besluit** (B1) |
 | **1** | dienstverband ↔ kantoorrol; einde dienstverband roept `intrekking.js` aan | een stap weg |
 | **2** | toegang per kamer op het dienstverband — de kantine krijgt alleen de kantine | een stap weg |
-| **3** | de ochtendkaart (par. 4) op gegevens die al bestaan; het rooster leest verzuim | een stap weg |
+| **3** | de ochtendkaart (par. 4) op gegevens die al bestaan; het rooster leest verzuim | half: het rooster leest verzuim (27 sep 2026), de kaart is een stap weg |
 | **4** | de aandachtskaart van de eigenaar (par. 5): besluitenwachtrij plus stilte met bewijsgraad | een stap weg |
 | **5** | het loopbaanbewijs als lezing van het ledger (par. 8) | een stap weg |
 | **6** | de waardige uitgang (par. 9), behalve de overdracht | een stap weg |

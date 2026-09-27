@@ -241,7 +241,7 @@ meter er staat.
 | 3 | Toestelcel en echte toestelmeting | **staat** (par. 10) |
 | 4 | Toestelrekenaar met twee uitvoerders (eigen WASM, ONNX Runtime) | **staat** voor WASM (par. 10); WebGPU is hier niet te meten, het browsermodel en WebNN een stap weg |
 | 5 | Modelmanifest, hashes, licentiegrendel, OPFS-beheer | **staat** (par. 10); terugrollen naar een vorige versie een stap weg |
-| 6 | `spraak.naartekst` op het toestel, gemeten op echte telefoons | een stap weg; wacht op `huggingface.co` in het netwerkbeleid; vult SERVICE.md par. 13d zonder `LOCAL_AI_URL` |
+| 6 | `spraak.naartekst` op het toestel, gemeten op echte telefoons | **staat** als keten, gemeten in Chromium (par. 11); telefoons, een proefset en een bron die we mogen ondertekenen zijn een stap weg; vult SERVICE.md par. 13d zonder `LOCAL_AI_URL` |
 | 7 | `tekst.vector` over de Toestelkluis | een stap weg na 4-5 |
 | 8 | Samenvatten en herschrijven | een stap weg; het browsermodel als eerste trede |
 | 9 | Een kleine algemene LLM | jaren weg op een telefoon, dichterbij op een laptop; te meten, niet te schatten |
@@ -253,9 +253,10 @@ meter er staat.
 1. **`'wasm-unsafe-eval'` op de toestelcel**, en alleen daar. Genomen op 25
    september 2026: ja, op die ene pagina, met `connect-src 'none'` ernaast;
    `test/toestel-routes.test.js` houdt de combinatie vast.
-2. **Modelhosting.** Honderden MB tot enkele GB per model, van de eigen origin
-   (de CSP staat geen CDN toe). Dat kost bandbreedte en hoort in KOSTEN.md.
-   Advies: eigen origin met Range-ondersteuning, per taak.
+2. **Modelhosting.** Genomen op 27 september 2026: de eigen server, in
+   `RTG_TOESTEL_DIR` via `/toestel/artefact/<sha256>` met Range. RTG draagt de
+   bandbreedte (dat hoort in KOSTEN.md), en geen derde ziet welk lid welk model
+   ophaalt.
 3. **Welke modellicenties toegestaan zijn.** Genomen op 25 september 2026:
    zo breed mogelijk. Alles met bekende voorwaarden die commercieel gebruik
    toestaan, ook Gemma en Llama met hun eisen erbij; onbekend en
@@ -572,3 +573,67 @@ twee bewijzen.
 - **De sleutellijst in de service-worker-schil**: `sleutels.js` is nog leeg en
   staat nog niet in `SHELL`; dat gebeurt met de eerste echte sleutel, en dan
   hoort `npm run swcache` erbij.
+
+## 11. Spraak naar tekst: het eerste echte contract (27 september 2026)
+
+`spraak.naartekst` loopt als keten, in een echte browser, over de machine van
+par. 10 -- en de rekenaar, de grendel en de opslag zijn er geen letter voor
+veranderd. Wat erbij kwam is een derde uitvoerder in de cel en twee modules
+aan de ouderkant.
+
+| Onderdeel | Waar | Bewijs |
+|---|---|---|
+| WAV, herbemonsteren, log-mel, tokens naar tekst, de openingstokens | `public/shared/toestel/spraak.js` (puur) | `test/toestel-spraak.test.js`: het spectrogram tegen een ONAFHANKELIJKE referentie (`test/fixtures/whisper-mel-toon.json`, uit transformers 5.17 en niet uit deze code); zes mutaties zakken, waaronder het Hann-venster, de gespiegelde rand en het overslaan van speciale tokens |
+| De ouderkant van het contract | `public/shared/toestel/spraakvoer.js` | vocabulaire, speciale tokens, configuratie en generatie-instelling gaan langs DEZELFDE grendel als het model: een tokenizer die niet klopt, maakt van een goed model een leugenaar |
+| De uitvoerder `whisper` | `public/shared/toestel/cel.js` | encoder een keer, decoder token voor token met zijn eigen geheugen; hebzuchtig, met de onderdrukte tokens uit de generatie-instelling van het model zelf. Er gaat een spectrogram in en er komen token-id's uit |
+| De meting | `scripts/spraakproef.js` | Chromium, WASM zonder threads: 11 s spraak in **6,3 s** rekentijd (9,5 s totaal met het spectrogram), woordfout **0** tegen de bekende tekst, herkomst `toestel` met acht artefacten op hash |
+
+Het spectrogram is gelijk aan dat van de `WhisperFeatureExtractor` tot op de
+precisie van float32: over alle 240.000 waarden van de JFK-opname was het
+grootste verschil 1,2e-7.
+
+### 11.1 Waar de bytes vandaan kwamen, en waarom ze niet ondertekend zijn
+
+Hugging Face en jsDelivr worden door het netwerkbeleid geweigerd (403). Het
+npm-register niet, en daar staat `sts-whisper-tiny@1.0.0`: een kopie van
+`Xenova/whisper-tiny` (q8, de vorm van transformers.js), op 17 september 2026
+geplaatst door een onbekende uitgever. **Die is gebruikt om te METEN en wordt
+nooit ondertekend**: een handtekening van RTG zegt "deze bytes zijn wat wij
+bedoelen", en dat weten we van een anonieme herverpakking niet. De hashes van
+wat er gemeten is:
+
+| Bestand | sha256 |
+|---|---|
+| `onnx/encoder_model_quantized.onnx` | `fd9d995b9dcb0520f0dbf6cf68651af639fc385f594d9d876e69ca2802dc438e` |
+| `onnx/decoder_model_merged_quantized.onnx` | `6c0c125986b007d2e3734bec84c18bda0152071b90b87fadac6d7764499927a0` |
+| `vocab.json` | `50d6a919f0a0601d56a04eb583c780d18553aa388254ba3158eb6a00f13e2c1a` |
+| `added_tokens.json` | `ce949fe720c14311cb6c446e69cfe340dc669d7b006077a6feed6ae571dd7e88` |
+| `config.json` | `2b2e4e519084e0ea028b19b153f95202735a971870d6844aa26e559edd292e94` |
+| `generation_config.json` | `68ac791fcb4999461a313472125042934656240ba1cba7d1c2627fcbb19ac24c` |
+
+De weg naar een ondertekend model is daarom: dezelfde bestanden van de bron
+halen (`onnx-community` of `Xenova` op Hugging Face, of zelf exporteren uit de
+gewichten van OpenAI), de hashes naast deze tabel leggen, en pas dan tekenen.
+Kloppen ze, dan was de kopie eerlijk; kloppen ze niet, dan weten we dat ook.
+
+### 11.2 Wat dit nog niet bewijst
+
+- **Kwaliteit.** Een opname is een rookproef. De kwaliteitspoort (par. 9.2)
+  vraagt een proefset met een gemeten woordfout per taal, en voor Nederlands
+  is er nog niets gemeten -- whisper-tiny is daar zwak, en dat hoort een getal
+  te worden en geen indruk.
+- **Telefoons.** Gemeten op een server-Chromium. De rekentijd op een telefoon
+  is onbekend, en 6,3 s voor 11 s spraak laat weinig marge; de lastpoort
+  (par. 9.4) moet dat per toestel leren.
+- **Sneller.** De decoder draait zonder WebGPU en zonder threads. Threads
+  vragen `crossOriginIsolated` (een besluit), WebGPU een adapter die hier
+  ontbreekt.
+- **Een scherm.** Er is geen knop die de microfoon naar deze keten leidt; de
+  meeleesbaan (SERVICE.md par. 13d) is de eerste plek, en die komt pas als er
+  een model is dat we mogen ondertekenen.
+- **De sleutel.** `sleutels.js` blijft leeg. De private modelsleutel wordt
+  niet in deze cloudomgeving gemaakt: een sleutel die hier ontstaat, heeft
+  een machine gezien die niet van RTG is, en dan is "offline, bij een mens"
+  (besluit 6) al gebroken voordat hij iets tekent. De eigenaar maakt hem met
+  `node scripts/toestel-artefact.js nieuwe-sleutel` op een eigen machine en
+  zet alleen de publieke helft in de lijst.

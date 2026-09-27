@@ -2418,7 +2418,13 @@ is met opzet LEEG tot er een echte sleutel bij een mens ligt), en een cel als
 niet wegpoetsen: de ONNX-runtime is een ondertekend ARTEFACT en geen
 afhankelijkheid (keuringsregel 14), en het celscript woont op `/toestel/cel.js`
 omdat de cel geen origin heeft en het huis elk statisch bestand `same-origin`
-geeft -- alleen de echte browser vond dat.
+geeft -- alleen de echte browser vond dat. **`spraak.naartekst` loopt**
+(par. 11, 27 september 2026): Whisper in de cel, 11 s spraak in 6,3 s op
+WASM, woordfout 0 op een opname, en het spectrogram gelijk aan dat van
+transformers tot op float32 (`test/fixtures/whisper-mel-toon.json` is een
+ONAFHANKELIJKE referentie, geen afdruk van onze eigen code). De gemeten bytes
+kwamen van een anonieme npm-kopie omdat Hugging Face geweigerd wordt, en zijn
+daarom met opzet NIET ondertekend: eerst de hashes naast de bron leggen.
 
 **`MACHINE.md` is de laag die de motoren aan elkaar riemt** -- RTG Execution
 Physics (de uitvoeringskant van hetzelfde voorstel waarvan RUNTIME.md de

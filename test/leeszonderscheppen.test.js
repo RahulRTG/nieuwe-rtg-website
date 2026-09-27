@@ -29,10 +29,11 @@ const geenMeubilair = (db, naam, wat) =>
 /* ------------------------------------------------------------------ algpin */
 test('algpin: een pin opzoeken die er niet is, schept geen collectie', async () => {
   const { maakAlgPin } = require('../server/kern/algpin');
-  const db = { data: {} };
+  const db = { data: {}, writable: true };
   const k = maakAlgPin({
     db, save: () => {}, crypto: require('node:crypto'),
     slot: { dicht: () => false, fout: () => {}, goed: () => {} },
+    bewerkCollectie: require('../server/db/collectie-bewerken')({ store: 'json', db, save() {} }),
   });
 
   assert.equal(k.pinInfo('lid-1').gezet, false);

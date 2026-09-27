@@ -198,6 +198,7 @@
       "bezitsbewijs",
       "command",
       "doelpoort",
+      "naamAuth",
       "veilig",
       "wie"
     ],
@@ -622,6 +623,7 @@
       "kantoorIntrekking",
       "kantoorUitnodiging",
       "kluisAuth",
+      "naamAuth",
       "magnaatLeren",
       "mail",
       "mall",

@@ -16,6 +16,7 @@ const TOETSEN = Object.freeze([
   'test/giftcard-credential.pg.test.js',
   'test/ticketcodes.pg.test.js',
   'test/arrivalpas.pg.test.js',
+  'test/algpin-herstel.pg.test.js',
   'test/payout-terugboeking.pg.test.js',
   'test/postgres-requestcommit.pg.test.js',
   'test/accounts-requestcommit.pg.test.js',

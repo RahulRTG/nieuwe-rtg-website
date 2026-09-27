@@ -13,6 +13,7 @@ const { vrij, gepland, rest, WAT } = require('./tijd');
 const { sneller } = require('./gesprek');
 const { handelingenNu } = require('./volgende');
 const { prognose, bedrijfExtra } = require('./weergave-bedrijf');
+const { groeiBeeld } = require('./groei');
 const { kalender } = require('./kalender');
 const { marktBeeld } = require('./markt');
 const { gids, verhaal } = require('./gids');
@@ -112,7 +113,7 @@ function beeld(st, boek, nu) {
     bedrijf: st.onderneming ? Object.assign({
       naam: st.onderneming.naam, sinds: st.onderneming.sinds, omzet: c.omzet, kosten: c.kosten, resultaat: c.resultaat,
       balans: { kas: c.kas, vorderingen: c.vorderingen, voorraad: c.voorraad, vooruit: c.vooruit, crediteuren: c.crediteuren, schuld: c.schuld },
-      zelfstandig: st.zelfstandig
+      zelfstandig: st.zelfstandig, groei: groeiBeeld(st)
     }, bedrijfExtra(st)) : null,
     rtg: st.rtg,
     gids: gids(st), verhaal: verhaal(st, c)

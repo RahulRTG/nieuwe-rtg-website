@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T15:00:57.642Z",
-    "commit": "90d33919",
+    "op": "2026-09-27T16:57:27.034Z",
+    "commit": "77e56876",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -10234,6 +10234,14 @@
       "module": "server/kern/eigencollectie.js",
       "operator": "===->!==#0",
       "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "vrijheid-verzuim.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/vrijheid/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 8,
       "geprobeerd": 1
     },
     "vrijheid.test.js": {

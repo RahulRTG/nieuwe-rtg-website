@@ -182,8 +182,30 @@ zijn waarde houdt. Maar 24 bits zijn raadbaar aan de kassa van die zaak en een
 hash ervan is geen geheim voor wie de database heeft. Het alternatief is die
 codes nu ongeldig maken en de houder via de zaak een nieuwe laten roteren.
 
-Blijven over van B9: kascode, vooraf, tikcode, entreetickets,
-vervoerskaartjes, Invisible Arrival en WorkOS-werkruimtetokens.
+**B9, derde en vierde type gemigreerd: het entreeticket
+(`travelos.activity_ticket_entry`) en het vervoerskaartje
+(`travelos.mobility_transport_ticket`).** De boeking en het kaartje dragen geen
+code meer. De credential is een 128-bit bearer (`TK.` en `OV.`), alleen als hash
+bewaard in `ticketToegang` en `mobKaartToegang`.
+- Tonen is roteren: `POST /api/ticket/toon` en `POST /api/mob/kaart/toon`
+  (het lid), en voor een aan de deur verkocht kaartje de deurverkoop zelf en
+  `POST /api/supplier/ticket/toon` (de zaak). Mijn tickets, Mijn kaartjes, het
+  dagprogramma, de kassabon en de reis tonen nooit een code.
+- Een ticketcode vervalt aan het eind van de ticketdag en wordt één keer
+  gebruikt; een kaartcode vervalt met het kaartje en telt de ritten van het
+  product, en die teller reist mee bij een rotatie.
+- De deur en de conducteur claimen in één collectietransactie, waarin ook de
+  boeking of het kaartje opnieuw wordt gekeurd (betaald, niet geannuleerd, de
+  goede dag, de goede lijn). Beproefd over twee PostgreSQL-instances.
+
+Twee besluiten voor de eigenaar. Oude codes (24-30 bits voor tickets, ~60 voor
+kaartjes) zijn van de rijen gehaald en openen niets meer; het ticket of kaartje
+houdt zijn waarde, want de houder toont een nieuwe code. En offline tonen: de
+app houdt de laatst getoonde code alleen in het geheugen van de pagina. Een pas
+die zonder verbinding opnieuw getoond moet kunnen worden, vraagt een besluit.
+
+Blijven over van B9: kascode, vooraf, tikcode, Invisible Arrival en
+WorkOS-werkruimtetokens.
 
 **Juridisch open (E8), en niet door code te beslissen:** een opwaardeerkaart die
 tegen nominale waarde in een uitbetaalbare wallet landt, is vermoedelijk

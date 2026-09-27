@@ -28,7 +28,7 @@ module.exports = ({ db, save, kern }) => {
   const eigen = require('../eigencollectie')({ db, domein: 'kern/vrijheid',
     bezit: { vrijheid: 'kaart', vrijheidInstellingen: 'kaart' } });
   const instellingen = require('./instellingen')({ eigen, save });
-  const motor = maakVrijheid({ opslag: { bak: (naam) => eigen.bak(naam) }, save });
+  const motor = maakVrijheid({ opslag: { bak: (naam) => eigen.bak(naam), kijk: (naam) => eigen.kijk(naam) }, save });
   const { teambeeld } = require('./teambeeld')({ bronnen: kern, instellingen });
 
   /* Welk beleid geldt voor welke organisatie. Voor RTG zelf is er een besluit

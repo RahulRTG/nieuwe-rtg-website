@@ -40,6 +40,14 @@ function maakVrijheid({ opslag, save, nu, meld, rooster }) {
     if (!k) throw new Error('Geen organisatie.');
     return b[k] || (b[k] = { verzoeken: {}, sleutels: {}, grootboek: [], boekingen: [], aanbiedingen: {}, verjaardagen: {}, signalen: [], behoeften: [], vertrouwelijk: {} });
   };
+  /* LEZEN SCHEPT NIETS (kern/eigencollectie.js, kijk). Een beeld van een
+     organisatie die nog niets heeft, is een leeg beeld -- en dat lege beeld
+     wordt niet teruggeschreven, want een leesverzoek is geen mutatie. */
+  const orgLees = (code) => {
+    const k = String(code || '').toUpperCase();
+    const b = opslag.kijk ? opslag.kijk('vrijheid') : opslag.bak('vrijheid');
+    return b[k] || { verzoeken: {}, sleutels: {}, grootboek: [], boekingen: [], aanbiedingen: {}, verjaardagen: {}, signalen: [], behoeften: [], vertrouwelijk: {} };
+  };
   const id = (pre, ...delen) => pre + '_' + crypto.createHash('sha256').update(delen.join('|')).digest('hex').slice(0, 12);
   const fout = (status, error, extra) => ({ status, error, ...extra });
 
@@ -117,7 +125,7 @@ function maakVrijheid({ opslag, save, nu, meld, rooster }) {
     return { ok: true, verzoek: v };
   }
 
-  const ctx = { org, id, fout, tijd, bewaar, zend, teamKlopt, afwezig, schrijfGrootboek, boek, roosterPas, plan, rooster, TOEGEKEND };
+  const ctx = { org, orgLees, id, fout, tijd, bewaar, zend, teamKlopt, afwezig, schrijfGrootboek, boek, roosterPas, plan, rooster, TOEGEKEND };
   return Object.assign({ vraag }, require('./mens')(ctx),
     require('./aanbod')(ctx), require('./herstel')(ctx), require('./jaarplan')(ctx), require('./beeld')(ctx));
 }

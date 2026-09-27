@@ -21,7 +21,7 @@ const { CATEGORIEEN } = require('./categorieen');
 const OPENBAAR_TEAM = (v) => ({ datum: v.datum, van: v.afwezigheid ? T.klokVan(v.afwezigheid.van) : null, tot: v.afwezigheid ? T.klokVan(v.afwezigheid.tot) : null, persoon: v.persoon, wat: 'afwezig' });
 
 module.exports = (ctx) => {
-  const { org, fout, teamKlopt, TOEGEKEND } = ctx;
+  const { orgLees: org, fout, teamKlopt, TOEGEKEND } = ctx;
 
   function mijnTijd(code, persoon, { beleid, rechten, jaar }) {
     const staat = org(code);

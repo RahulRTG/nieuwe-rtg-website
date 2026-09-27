@@ -31,9 +31,7 @@ module.exports = function maakIntreklijst(strikt) {
        een BEGIN omheen zetten faalt, en op S.db beginnen terwijl S.zin naar de
        werkkopie wijst zou zelfs twee verschillende transacties veinzen. */
     if (doelDb !== S.db) return doe();
-    /* Staat een ander verzoek met een accountwerkkopie open, dan wacht S.db
-       niet (transactie.js). Een uitlog die "gelukt" meldt terwijl de intrekking
-       niet geschreven is, is erger dan een 503 met probeer opnieuw. */
+    // liever 503 dan een schijnuitlog (./transactie.js)
     require('./transactie').eisVrij('tokenintrekking');
     doelDb.exec('BEGIN IMMEDIATE');
     try { doe(); doelDb.exec('COMMIT'); }
@@ -49,7 +47,6 @@ module.exports = function maakIntreklijst(strikt) {
         .all(klok.nu());
     },
     voltooi(sleutels) {
-      /* Opruimen na een geslaagde publicatie mag wachten tot de volgende ronde. */
       if (!S.db || require('./transactie').bezet()) return 0;
       const weg = S.zin('DELETE FROM intrekking_outbox WHERE sleutel = ?');
       let aantal = 0;

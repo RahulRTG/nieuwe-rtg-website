@@ -58,6 +58,10 @@ module.exports = function lijfpoort(deps) {
     next();
   });
 
+  /* Extern afrekenen tijdens een betaalstop: alleen contant, pin of rekening
+     (./betaalstop.js). Hier, omdat pas na de body-parser de wijze te lezen is. */
+  app.use(require('./betaalstop').externWijzePoort);
+
   /* Geld-dragende codes zonder bewezen atomaire lifecycle blijven in productie
      dicht. Dit staat na de begrensde body-parser (de algemene POS-route wordt
      alleen voor cadeaukaart/RTG Pay geraakt) en vóór idemopslag en handlers. */

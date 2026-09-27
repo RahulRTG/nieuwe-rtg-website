@@ -69,9 +69,9 @@ async function commitAccountWijzigingen(client, wijzigingen) {
   }
   return pg.pasAccountWijzigingenToe(client, wijzigingen);
 }
-/* De verbinding voor deelnemers zonder HTTP-verzoek (./achtergrond.js). */
+// voor ./achtergrond.js
 function accountPool() { return PGMODE && pgKlaar && pg ? pg.pool : null; }
-const { vrijeGeneratie, nogVers } = require('./transactie');
+const { leesVers } = require('./transactie');
 
 function eisIntrekkingen() {
   if (!PGMODE) return null;
@@ -125,12 +125,7 @@ async function pullEen(payload) {
     const [soort, idStr] = String(payload).split(':'); const id = Number(idStr);
     const tabel = soort === 'user' ? 'users' : soort === 'staff' ? 'supplier_staff' : null;
     if (!tabel) return;
-    let rows;
-    for (;;) {
-      const g = await vrijeGeneratie();
-      ({ rows } = await pg.pool.query('SELECT * FROM ' + tabel + ' WHERE id = $1', [id]));
-      if (nogVers(g)) break;
-    }
+    const { rows } = await leesVers(() => pg.pool.query('SELECT * FROM ' + tabel + ' WHERE id = $1', [id]));
     if (soort === 'user') {
       if (rows.length) upsertLocalUser(rows[0]);
       else duurzaamheid.internePublicatie(() => S.zin('DELETE FROM users WHERE id = ?').run(id));
@@ -156,13 +151,7 @@ async function startPostgresEenmaal() {
   pg = nieuw;
   if (vorig && vorig !== nieuw) { try { await vorig.sluit(); } catch (e) {} }
   await nieuw.schema();
-  let getrokken;
-  for (;;) {
-    const g = await vrijeGeneratie();
-    getrokken = await nieuw.pullAlles();
-    if (nogVers(g)) break;
-  }
-  const { users, staff } = getrokken;
+  const { users, staff } = await leesVers(() => nieuw.pullAlles());
   if (transactioneleProductie()) {
     /* Productie kent geen lokale oorsprong. Ook lokaal achtergebleven rijen die
        in PostgreSQL bewust zijn gewist moeten verdwijnen, anders kan een koude

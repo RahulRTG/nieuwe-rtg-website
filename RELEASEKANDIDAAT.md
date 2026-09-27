@@ -79,6 +79,29 @@ Kolommen: **code** / **extern** / **besluit** = JA/NEE; *bewijs* = wat
 | B7 | **`RTF_IBAN` + Foundation-wallet** | golive `foundationRekeningGeconfigureerd` | IBAN leveren; wallet aanmaken via `rtfwallet.js` |
 | B8 | **Foundation/minderjarigen in V1 dicht** | dossierveld `foundationMinderjarigen` | aanbevolen en al de standaard: `vrijgave: GESLOTEN` |
 
+## 1a. Besluiten van de eigenaar (27 september 2026)
+
+| # | besluit | gevolg in code |
+|---|---|---|
+| B2 | **Scope V1**: zonder kaartprovider werkt RTG met eigen **opwaardeerkaarten** of **extern afrekenen**; meerdere opties naast elkaar | geldmodus naast `RTG_BETALEN_UIT`; zie B2a en B2b |
+| B2a | **Aparte beperkte releasestand**: naast READY komt een expliciete stand voor een release zonder kaartrail; volledige READY blijft ongewijzigd voor de latere geldrelease | `scripts/lib/productie-oordeel.js`, `scripts/productie-status.js`, `LIVEGANG.md` |
+| B2b | **Extern afrekenen mag** terwijl RTG-betalingen uit staan, **alleen** met contant, pin (eigen terminal) of op rekening; elke RTG Pay-, cadeaukaart- of tegoedmethode blijft dicht | `server/opzet/betaalstop.js` plus een regressietoets dat trede 3 echt afrekent |
+| B9 | **Alle negen dichtgezette geldcode- en tickettypes gaan mee in V1**: opwaardeerkaarten (tegoedbon), cadeaukaart, bestellen en bezorgen, RTG Pay aan de kassa (kascode, vooraf, tikcode), entreetickets, vervoerskaartjes, Invisible Arrival, WorkOS-werkruimtetokens | elk type naar het beleid in `CODECREDENTIALS.json` (128-bit, hash-only, eenmalig tonen, vervaldatum, intrekken en roteren, constante-tijd, atomisch claimen), met toetsen als `bewijs` |
+| A1b | Keuringsregel 71 mag een lopende ronde doorlaten die aantoonbaar de eigen ouder is | gedaan: `eigenLijn()` |
+| A2b | Accountmutaties met een schrijver per proces, en de bewaarveger meteen mee | gedaan: `server/db/deelnemers.js`, `server/accounts/achtergrond.js` |
+
+**Nieuw gemeten sinds de matrix:** de codecredentialpoort telt geen 9 maar
+**483** blokkades: de 9 open types, **399** routes die op een toegangscode
+lijken maar niet in het register staan, en **75** routes die de scanner niet kan
+lezen. Die 474 zijn indelingswerk (A); de 9 types zijn bouwwerk (A, besloten in B9).
+
+**Juridisch open (E8), en niet door code te beslissen:** een opwaardeerkaart die
+tegen nominale waarde in een uitbetaalbare wallet landt, is vermoedelijk
+elektronisch geld (terugstortstand `open`, `WAARDE.md`, `TOKEN.md`). Wie contant
+geld of een overboeking voor een kaart aanneemt, raakt derdengelden. Beide horen
+bij de jurist vóór de kaart live gaat; de code bouwt de kaart fail-closed en
+zonder uitbetaalweg tot dat oordeel er is.
+
 ## 2. Afhankelijkheidsgraaf
 
 ```

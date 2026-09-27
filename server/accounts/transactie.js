@@ -35,53 +35,7 @@ const BUSY_MS = 5000; // dezelfde waarde als ../lib/sqlite-gelijktijdigheid.js
 
 const fout = (code, tekst, status = 503) =>
   Object.assign(new Error(tekst), { code, status });
-const q = naam => '"' + String(naam).replace(/"/g, '""') + '"';
-
-function kolommen(db, tabel) {
-  return db.prepare('PRAGMA table_info(' + q(tabel) + ')').all().map(r => String(r.name));
-}
-
-function maakVolgers(db, tabel, prefix) {
-  const cols = kolommen(db, tabel);
-  if (!cols.includes('id')) throw fout('PG_ACCOUNTS_SCHEMA', tabel + ' heeft geen id-kolom.');
-  const lijst = cols.map(q).join(', ');
-  const oud = cols.map(c => 'OLD.' + q(c)).join(', ');
-  db.exec(`CREATE TEMP TABLE ${q(prefix + '_basis')} AS SELECT ${lijst} FROM main.${q(tabel)} WHERE 0;
-    CREATE UNIQUE INDEX ${q(prefix + '_basis_id')} ON ${q(prefix + '_basis')}(id);
-    CREATE TEMP TABLE ${q(prefix + '_geraakt')}(id INTEGER PRIMARY KEY);
-    CREATE TEMP TABLE ${q(prefix + '_nieuw')}(id INTEGER PRIMARY KEY);
-    CREATE TEMP TRIGGER ${q(prefix + '_bi')} BEFORE INSERT ON main.${q(tabel)} BEGIN
-      INSERT OR IGNORE INTO ${q(prefix + '_geraakt')}(id) VALUES(NEW.id);
-      INSERT OR IGNORE INTO ${q(prefix + '_nieuw')}(id) VALUES(NEW.id);
-    END;
-    CREATE TEMP TRIGGER ${q(prefix + '_bu')} BEFORE UPDATE ON main.${q(tabel)} BEGIN
-      INSERT OR IGNORE INTO ${q(prefix + '_geraakt')}(id) VALUES(OLD.id);
-      INSERT OR IGNORE INTO ${q(prefix + '_basis')}(${lijst})
-        SELECT ${oud} WHERE NOT EXISTS(SELECT 1 FROM ${q(prefix + '_nieuw')} WHERE id=OLD.id);
-    END;
-    CREATE TEMP TRIGGER ${q(prefix + '_bd')} BEFORE DELETE ON main.${q(tabel)} BEGIN
-      INSERT OR IGNORE INTO ${q(prefix + '_geraakt')}(id) VALUES(OLD.id);
-      INSERT OR IGNORE INTO ${q(prefix + '_basis')}(${lijst})
-        SELECT ${oud} WHERE NOT EXISTS(SELECT 1 FROM ${q(prefix + '_nieuw')} WHERE id=OLD.id);
-    END;`);
-  return { tabel, prefix, cols };
-}
-
-function rij(db, sql, id) { return db.prepare(sql).get(id) || null; }
-
-function wijzigingenVan(tx, volg) {
-  const ids = tx.db.prepare(`SELECT id FROM ${q(volg.prefix + '_geraakt')} ORDER BY id`).all();
-  const basisSql = `SELECT * FROM ${q(volg.prefix + '_basis')} WHERE id=?`;
-  const naSql = `SELECT * FROM main.${q(volg.tabel)} WHERE id=?`;
-  const uit = [];
-  for (const x of ids) {
-    const basis = rij(tx.db, basisSql, x.id);
-    const na = rij(tx.db, naSql, x.id);
-    if (!basis && !na) continue; // binnen hetzelfde verzoek gemaakt en weer gewist
-    uit.push({ tabel: volg.tabel, id: Number(x.id), basis, na });
-  }
-  return uit;
-}
+const { q, maakVolgers, wijzigingenVan } = require('./transactie-volgers')(fout);
 
 function herstelCache(e, bron) {
   try { require('./mirror').planAccountHerstel(e, bron); } catch (x) {}
@@ -119,14 +73,19 @@ function bezetDoorAnder() {
   return !!actief && actief.ctx !== verzoekcontext.huidige();
 }
 function generatie() { return generatieTeller; }
-/* Wachten tot er geen werkkopie open staat, met de generatie erbij: wie
-   tussendoor uit PostgreSQL leest, mag alleen schrijven als nogVers() nog klopt
-   -- anders zet hij een oudere rij over een zojuist gepubliceerde heen. */
-async function vrijeGeneratie() {
-  while (actief) await wachtVrij();
-  return generatieTeller;
+/* Lezen uit PostgreSQL om daarna de lokale cache bij te werken (de NOTIFY-pull,
+   de volledige herbouw). Wacht tot er geen werkkopie open staat, leest, en leest
+   OPNIEUW als er ondertussen een eigen commit is gepubliceerd -- anders zet de
+   aanroeper een oudere rij over een zojuist gepubliceerde heen. Na de laatste
+   await is er geen werkkopie open, dus de synchrone schrijfstap erna wacht niet. */
+async function leesVers(lees) {
+  for (;;) {
+    while (actief) await wachtVrij();
+    const g = generatieTeller;
+    const uit = await lees();
+    if (!actief && generatieTeller === g) return uit;
+  }
 }
-const nogVers = g => !actief && generatieTeller === g;
 function wachtVrij() {
   return actief ? new Promise(r => wachters.push(r)) : Promise.resolve();
 }
@@ -218,4 +177,4 @@ function resetVoorToets() {
 }
 
 module.exports = { begin, database, resetVoorToets, bezet, bezetDoorAnder, eisVrij,
-  wachtVrij, generatie, vrijeGeneratie, nogVers, fout };
+  wachtVrij, generatie, leesVers, fout };

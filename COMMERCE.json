@@ -2,14 +2,14 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-09-27",
   "gemeten": {
-    "bestanden": 2428,
-    "domeinenTotaal": 637,
-    "koopbareVormen": 598,
+    "bestanden": 2421,
+    "domeinenTotaal": 636,
+    "koopbareVormen": 600,
     "koopbareDomeinen": 120,
     "envelopDrempel": 8,
     "envelop": 42,
-    "veldenDomeineigen": 775,
-    "veldenNietEnvelop": 1036,
+    "veldenDomeineigen": 778,
+    "veldenNietEnvelop": 1039,
     "gelijkendeVormparen": 17,
     "werkwoordenVolledig": 1,
     "werkwoordenOveral": 0,
@@ -17,12 +17,12 @@
     "wagenVormen": 33,
     "wagenVormenUniek": 30,
     "wagenDomeinen": 22,
-    "optellingen": 118,
+    "optellingen": 119,
     "optelDomeinen": 59,
     "optelCenten": 64,
     "optelEuro": 5,
     "optelGemengd": 0,
-    "optelOnbekend": 49
+    "optelOnbekend": 50
   },
   "envelop": [
     "aantal",
@@ -2680,6 +2680,16 @@
       ]
     },
     {
+      "domein": "kern/magnaat-leven",
+      "plekken": 4,
+      "waar": [
+        "server/kern/magnaat-leven/geld.js",
+        "server/kern/magnaat-leven/groei.js",
+        "server/kern/magnaat-leven/volgende.js",
+        "server/kern/magnaat-leven/weergave.js"
+      ]
+    },
+    {
       "domein": "kern/rtfos",
       "plekken": 4,
       "waar": [
@@ -2714,15 +2724,6 @@
         "server/kern/gast/betalen.js",
         "server/kern/gast/foodcourt.js",
         "server/kern/gast/order.js"
-      ]
-    },
-    {
-      "domein": "kern/magnaat-leven",
-      "plekken": 3,
-      "waar": [
-        "server/kern/magnaat-leven/dag.js",
-        "server/kern/magnaat-leven/volgende.js",
-        "server/kern/magnaat-leven/weergave.js"
       ]
     },
     {

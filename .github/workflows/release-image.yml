@@ -49,8 +49,10 @@ jobs:
       - run: npm ci
       # xmllint is de scheidsrechter van test/samlc14n.test.js en die toets slaat
       # zichzelf niet over; ubuntu-latest draagt hem niet. Zie ci.yml voor waarom.
-      - name: libxml2 (de scheidsrechter van de c14n-toets)
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq libxml2-utils
+      # redis.test.js start daarnaast bewust een eigen geïsoleerd proces;
+      # de servicecontainer levert geen redis-server executable op de runner.
+      - name: libxml2 en Redis voor de lokale protocolproeven
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq libxml2-utils redis-server
       - name: Playwright + Chromium voor de volledige schermsuite
         run: node scripts/browserinstall.js
       # Dit is dezelfde softwarepoort die vóór een echte uitrol draait:

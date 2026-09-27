@@ -17,13 +17,13 @@ module.exports = [
 
   { id: 'uitkomst.rit-afgerond', domein: 'uitkomst', wereld: 'consument', eenheid: 'ritten per maand',
     betekenis: 'Ritten die de keten tot het einde liepen.',
-    berekening: 'ritten met de laatste stand van RIT_KETEN (of de oude naam gearriveerd) en een eindtijd in de maand; de groepsgrens telt verschillende leden',
+    berekening: 'ritten in de laatste stand van RIT_KETEN met een eindtijd in de maand; de poort telt leden',
     actualiteit: 'live', privacy: 'leden', minGroep: 10, eigenaar: 'kern/bedrijfsmaat', graad: 'gemeten', afhankelijk: [],
     bron: [c('server/kern/vervoer.js', 'r.finishedAt = new Date().toISOString()')],
     definitie: [c('server/kern/vervoer.js', 'const RIT_KETEN'), c(DEF, 'een rit die de keten afmaakte (afgerond)')],
-    projectie: [c(PRJ, 'function rittenAfgerond')], bewijs: [c(STAND, "maat('uitkomst.rit-afgerond'"), c(STAND, 'opdrachten die het dispatchcentrum zelf aannam')],
+    projectie: [c(PRJ, 'function rittenAfgerond')], bewijs: [c(STAND, 'opdrachten die het dispatchcentrum zelf aannam')],
     groepsgrens: [c(STAND, 'toon(LEDEN, { waarde: rit.aantal, n: rit.klanten })')],
-    gedeeltelijk: 'Alleen de ritlijst van de app; opdrachten die het dispatchcentrum zonder app-rit aannam (db.data.mobOpdrachten) tellen niet mee, en dat staat in het antwoord.',
+    gedeeltelijk: 'Alleen de ritlijst van de app; dispatchopdrachten zonder app-rit tellen niet mee.',
     waarom: {} },
 
   { id: 'uitkomst.klantwaarde', domein: 'uitkomst', wereld: 'consument', eenheid: 'aandeel geslaagde bedoelingen',

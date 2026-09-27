@@ -20,8 +20,8 @@
  "telling": {
   "creatie": 45,
   "beschermd": 15,
-  "berekening": 58,
-  "instelling": 25,
+  "berekening": 70,
+  "instelling": 27,
   "code-maker": 4,
   "teller": 1
  },
@@ -527,6 +527,62 @@
   "/api/rtf/connect/werk": {
    "klasse": "instelling",
    "reden": "Gezinsdeur naar dezelfde handler als /api/connect/werk; idempotent om dezelfde reden -- de treden dragen `eenmalig: true`."
+  },
+  "/api/bedrijf/uitgaven": {
+   "klasse": "berekening",
+   "reden": "Gemeten op 27 september 2026 (IDEMPROEF op 51d9ae44): de proef zag geen tweede effect. Leest de uitgaven van de werkruimte; de stand wordt berekend en niet gezet."
+  },
+  "/api/member/magnaat/leven/staat": {
+   "klasse": "instelling",
+   "reden": "Gemeten op 27 september 2026 (IDEMPROEF op 51d9ae44): de proef zag geen tweede effect. De eerste oproep legt het spelleven aan en rekent de verstreken dagen bij; een herhaling op dezelfde dag geeft dezelfde eindstand."
+  },
+  "/api/muziek/bestanden": {
+   "klasse": "berekening",
+   "reden": "Gemeten op 27 september 2026 (IDEMPROEF op 51d9ae44): de proef zag geen tweede effect. Leest de eigen muziekbestanden van het lid."
+  },
+  "/api/muziek/feed": {
+   "klasse": "berekening",
+   "reden": "Gemeten op 27 september 2026 (IDEMPROEF op 51d9ae44): de proef zag geen tweede effect. Leest de muziekfeed voor het lid."
+  },
+  "/api/office/bank/entiteitrekening": {
+   "klasse": "berekening",
+   "reden": "Gemeten op 27 september 2026 (IDEMPROEF op 51d9ae44): de proef zag geen tweede effect. Leest de stand van rekeningen voor entiteiten; zetten gaat via /zet."
+  },
+  "/api/office/bedrijfsmaat": {
+   "klasse": "berekening",
+   "reden": "Gemeten op 27 september 2026 (IDEMPROEF op 51d9ae44): de proef zag geen tweede effect. Rekent de bedrijfsmaten uit lijsten van anderen en langs de groepspoort; schrijft niets (server/kern/bedrijfsmaat/stand.js)."
+  },
+  "/api/office/beleidsmotor": {
+   "klasse": "berekening",
+   "reden": "Gemeten op 27 september 2026 (IDEMPROEF op 51d9ae44): de proef zag geen tweede effect. Leest de schaduwtelling en de afdwingstand van de beleidsmotor."
+  },
+  "/api/office/beleidsmotor/afdwingen": {
+   "klasse": "berekening",
+   "reden": "Gemeten op 27 september 2026 (IDEMPROEF op 51d9ae44): de proef zag geen tweede effect. Leest het overzicht van de deuren; zetten gaat via /afdwingen/zet."
+  },
+  "/api/office/beleidsmotor/waarom": {
+   "klasse": "berekening",
+   "reden": "Gemeten op 27 september 2026 (IDEMPROEF op 51d9ae44): de proef zag geen tweede effect. Zegt wat de deuren over de aanroeper zelf zouden besluiten; schrijft niets."
+  },
+  "/api/office/doe/kaart": {
+   "klasse": "berekening",
+   "reden": "Gemeten op 27 september 2026 (IDEMPROEF op 51d9ae44): de proef zag geen tweede effect. Geeft de paden die het kantoor aan het stuur mag tonen; schrijft niets (server/routes/stuur.js)."
+  },
+  "/api/office/doos/sleutel/weg": {
+   "klasse": "instelling",
+   "reden": "Gemeten op 27 september 2026 (IDEMPROEF op 51d9ae44): de proef zag geen tweede effect. Een sleutel intrekken: twee keer intrekken geeft dezelfde eindstand (de sleutel is weg), en de tweede keer vraagt opnieuw de passkey van de eigenaar."
+  },
+  "/api/office/doos/sleutels": {
+   "klasse": "berekening",
+   "reden": "Gemeten op 27 september 2026 (IDEMPROEF op 51d9ae44): de proef zag geen tweede effect. Leest het overzicht van de doossleutels."
+  },
+  "/api/office/kantoor/uitnodigingen": {
+   "klasse": "berekening",
+   "reden": "Gemeten op 27 september 2026 (IDEMPROEF op 51d9ae44): de proef zag geen tweede effect. Leest het overzicht van de kantooruitnodigingen."
+  },
+  "/api/office/werkos/bankpad": {
+   "klasse": "berekening",
+   "reden": "Gemeten op 27 september 2026 (IDEMPROEF op 51d9ae44): de proef zag geen tweede effect. Leest de stand van de Werk OS-uitgave via RTG Rekening; zetten gaat via /zet."
   }
  }
 }

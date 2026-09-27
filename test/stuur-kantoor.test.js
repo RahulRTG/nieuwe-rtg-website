@@ -28,7 +28,7 @@ const { LEZEN, KLEIN, VOORSTEL } = require('../server/kern/stuur/beleid-lijsten'
 const { beleidVoor, NIVEAUS } = require('../server/kern/stuur/beleid');
 const { startServer, stop, kantoorAlsPersoon, kantoorKoppelBody } = require('./helper');
 
-const TONEN = ['/api/command/puls', '/api/office/economie/werelden', '/api/office/kosten/periode'];
+const TONEN = ['/api/command/puls', '/api/office/bedrijfsmaat', '/api/office/economie/werelden', '/api/office/kosten/periode'];
 /* Elk van deze bestaat en is voor een kantoormens bereikbaar -- en elk toont
    mensen of verandert iets. Staat er een ooit op `lezen`, dan is C2 gebroken. */
 const NOOIT = ['/api/office/state', '/api/office/payroll/overzicht', '/api/office/kosten/overzicht',

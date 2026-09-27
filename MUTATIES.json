@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-27T16:35:50.390Z",
-    "commit": "25a037ec",
+    "op": "2026-09-27T14:24:07.236Z",
+    "commit": "ab1dc80e0",
     "boomVuil": false,
-    "boomAnders": 4,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -2280,36 +2280,6 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
-    },
-    "democratie-aanval.test.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 3,
-      "scherp": "gezakt"
-    },
-    "democratie-afhankelijk.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/bron.js",
-      "operator": "===->!==#0",
-      "gezakt": 2,
-      "geprobeerd": 1
-    },
-    "democratie-grondwet.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/bron.js",
-      "operator": "&&->||#0",
-      "gezakt": 1,
-      "geprobeerd": 3
-    },
-    "democratie.test.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 3,
-      "scherp": "gezakt"
     },
     "demostand.test.js": {
       "soort": "server",
@@ -5422,13 +5392,6 @@
       "gezakt": 4,
       "geprobeerd": 13
     },
-    "magnaatgroei.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "gezakt"
-    },
     "magnaatgroei.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -5527,6 +5490,20 @@
       "operator": "!==->===#0",
       "gezakt": 6,
       "geprobeerd": 2
+    },
+    "magnaatstad.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "magnaatstad.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "magnaatstart.e2e.js": {
       "soort": "server",

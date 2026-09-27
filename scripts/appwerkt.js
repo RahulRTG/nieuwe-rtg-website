@@ -375,6 +375,7 @@ async function meetRij(rij, base, persoonlijk, rollen) {
   r.gevonden = bediening.gevonden;
   r.geklikt = bediening.geklikt;
   r.schil = bediening.schil;
+  r.bedekt = bediening.bedekt;
   r.overgeslagen = bediening.overgeslagen;
   r.nietKlikbaar = bediening.nietKlikbaar;
   r.onderschept = bediening.onderschept;
@@ -397,6 +398,10 @@ async function meetRij(rij, base, persoonlijk, rollen) {
     r.bewijzen.bedienbaar = { status: 'NIET_GETEST', reden: 'geen eigen knop zonder bestemming gevonden' + (bediening.schil ? ' (alleen ' + bediening.schil + ' van de gedeelde schil)' : '') + '; wat dit scherm doet, loopt via links of formulieren', bewijs: null };
   } else if (stuk.length) {
     r.bewijzen.bedienbaar = { status: 'GEBLOKKEERD_DOOR_DEFECT', reden: stuk[0], bewijs: bediening.crash.concat(bediening.serverfout).slice(0, 5).join(' | ') };
+  } else if (bediening.bedekt.length) {
+    r.bewijzen.bedienbaar = { status: 'GEBLOKKEERD_DOOR_DEFECT',
+      reden: bediening.bedekt.length + ' eigen knop(pen) volledig bedekt door de gedeelde schil; een muis komt er niet bij',
+      bewijs: bediening.bedekt.slice(0, 5).join(' | ') };
   } else if (bediening.config.length) {
     r.bewijzen.bedienbaar = { status: 'GEBLOKKEERD_DOOR_CONFIG', reden: bediening.config[0], bewijs: null };
   } else if (bediening.gevonden > 0 && bediening.geklikt * 2 < bediening.gevonden) {
@@ -492,13 +497,14 @@ function onderschepper(log) {
 
 async function bedien(ctx, base, pad) {
   const page = await ctx.newPage();
-  const crash = [], config = [], serverfout = [], rem = [], weigering = [], gezegd = [], taalWissel = [];
+  const crash = [], config = [], serverfout = [], rem = [], weigering = [], gezegd = [], taalWissel = [], bedekt = [];
   let laatste = null;
   let geklikt = 0, gevonden = 0, schil = 0;
   const overgeslagen = [], nietKlikbaar = [], onderschept = [], instrument = [];
   try {
     await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
     await page.waitForTimeout(2200);
+    bedekt.push(...await bedektDoorSchil(page));
     luister(page, base, { crash, config, serverfout, rem, weigering });   // pas NA het laden: laadfouten horen bij bewijs 1
     /* Welke tik de taal van de persona verandert: een vertaalverzoek naar een
        andere taal dan nl na een tik, met de knop erbij. */
@@ -566,7 +572,7 @@ async function bedien(ctx, base, pad) {
   }
   await beoordeelWeigeringen(page, weigering, gezegd, serverfout);
   await page.close();
-  return { geklikt, gevonden, schil, overgeslagen, nietKlikbaar, onderschept, instrument, crash, config, serverfout, rem, gezegd, taalWissel };
+  return { geklikt, gevonden, schil, bedekt, overgeslagen, nietKlikbaar, onderschept, instrument, crash, config, serverfout, rem, gezegd, taalWissel };
 }
 
 /* WAT STAAT ER NU, EN WAT HEBBEN WE NOG NIET GEHAD.
@@ -594,6 +600,48 @@ async function beoordeelWeigeringen(page, weigering, gezegd, serverfout) {
     if (tekst.includes(w.zin)) gezegd.push(w.s + ' ' + w.pad + ': ' + w.zin);
     else serverfout.push(w.s + ' ' + w.pad + ' -- de server weigerde ("' + w.zin.slice(0, 80) + '") maar het scherm toonde de reden niet');
   }
+}
+
+/* EEN EIGEN KNOP DIE DE SCHIL HELEMAAL BEDEKT, IS EEN DEFECT en geen
+   ongemeten knop. Gevonden op 27 september 2026: de tabbalk van Decision Room
+   lag onder de onderbalk van de Edge, en de werkbalk van de browser onder de
+   herstelstrook die de Edge in de compacte stand over de bovenrand legt. Een
+   muis kwam er niet bij; de proef meldde dat als "niet aan te tikken" en de rij
+   bleef NIET_GETEST, waarmee het defect uit beeld verdween.
+
+   Streng met opzet: pas als ALLE 45 meetpunten van de knop (na hem in beeld te
+   schuiven, zoals een mens scrolt) op de schil vallen. Een knop die half
+   bedekt is, is nog aan te tikken en blijft een zaak voor de gewone tik. */
+async function bedektDoorSchil(page) {
+  try {
+    return await page.evaluate(() => {
+      const SCHIL = '.rtg-edge-chrome, .rnd-toets, .rtg-edge-2-edge-reveal';
+      const zie = (el) => { if (!el || el.hidden || el.disabled) return false;
+        if (!el.offsetParent && getComputedStyle(el).position !== 'fixed') return false;
+        const b = el.getBoundingClientRect(); return b.width > 1 && b.height > 1; };
+      const uit = [];
+      const knoppen = Array.from(document.querySelectorAll('button,[role=button],[data-tab],[data-stand]'))
+        .filter(zie).filter((el) => !el.closest(SCHIL) && !el.closest('#rtg-lang-modal'));
+      for (const el of knoppen) {
+        el.scrollIntoView({ block: 'center', inline: 'center' });
+        const r = el.getBoundingClientRect();
+        let punten = 0, onderSchil = 0, door = null;
+        for (let a = 1; a < 10; a++) for (let c = 1; c < 6; c++) {
+          const x = r.x + r.width * a / 10, y = r.y + r.height * c / 6;
+          if (x < 0 || y < 0 || x > innerWidth || y > innerHeight) continue;
+          punten++;
+          const t = document.elementFromPoint(x, y);
+          const s = t && !el.contains(t) && t.closest(SCHIL);
+          if (s) { onderSchil++; door = door || (t.tagName.toLowerCase() + '.' + Array.from(t.classList).slice(0, 2).join('.')); }
+        }
+        if (punten && onderSchil === punten) {
+          uit.push((el.innerText || el.getAttribute('aria-label') || el.title || '(naamloos)').trim().replace(/\s+/g, ' ').slice(0, 30) + ' onder ' + door);
+        }
+      }
+      window.scrollTo(0, 0);
+      return uit;
+    });
+  } catch (e) { return []; }
 }
 
 async function kijkRonde(page, gehad) {

@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1761,
-    "toetsenNietGemeten": 640,
+    "toetsenNietGemeten": 641,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -149,6 +149,16 @@
     "edgeVeldContextZelf": 11
   },
   "notities": [
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 640,
+      "vervalt": "2026-12-27",
+      "meter": "toetsenNietGemeten 640 -> 641",
+      "reden": "Niet van deze tak maar uit de samenvoeging met main (#407): test/magnaatgroei.e2e.js is daar nieuw en de mutatiemotor is er nog niet langs geweest. Op main zelf telt hij net zo; hier staat hij nu naast de schuld van deze tak.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee, op main of hier."
+    },
     {
       "datum": "2026-09-27",
       "soort": "schuld",

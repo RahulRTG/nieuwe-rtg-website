@@ -132,4 +132,5 @@ Object.assign(module.exports, require('./idemsleutels-nooit-lid'));
 Object.assign(module.exports, require('./idemsleutels-nooit-democratie'));
 Object.assign(module.exports, require('./idemsleutels-nooit-codes'));
 Object.assign(module.exports, require('./idemsleutels-nooit-sessies'));
+Object.assign(module.exports, require('./idemsleutels-nooit-machinesleutels'));
 Object.freeze(module.exports);

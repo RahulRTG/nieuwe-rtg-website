@@ -213,6 +213,7 @@
       "bezitsbewijs",
       "command",
       "doelpoort",
+      "naamAuth",
       "veilig",
       "wie"
     ],
@@ -326,6 +327,7 @@
     "doos": [
       "afdelingen",
       "beveilig",
+      "doosSleutels",
       "zaakdoos"
     ],
     "doos-wacht": [],
@@ -584,6 +586,7 @@
       "werkplek"
     ],
     "kantoren": [
+      "doosSleutels",
       "entiteitRekeningStand",
       "entiteitRekeningZet",
       "afdelingen",
@@ -620,6 +623,7 @@
       "commercieRechten",
       "commercieRonde",
       "commercieVerrekening",
+      "findSupplier",
       "fonds",
       "geldAiInkoopZet",
       "geldBetaaldienst",
@@ -637,6 +641,7 @@
       "kantoorIntrekking",
       "kantoorUitnodiging",
       "kluisAuth",
+      "naamAuth",
       "magnaatLeren",
       "mail",
       "mall",
@@ -2058,6 +2063,7 @@
       "C",
       "DEMO",
       "DEMO_SUPPLIER",
+      "doosSleutels",
       "GROOTHANDEL_CATEGORIEEN",
       "H",
       "HK_STATUSES",

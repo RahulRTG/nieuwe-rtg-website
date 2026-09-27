@@ -6,18 +6,23 @@
    blijft. Meten en uitrollen staan in ./meten.js. */
 'use strict';
 
-module.exports = ({ app, officeAuth, veilig, wie, command }) => {
+module.exports = ({ app, officeAuth, naamAuth, veilig, wie, command }) => {
   /* De API-poort. Het geheim van een sleutel gaat één keer mee terug en wordt
-     nergens bewaard; hier staat alleen een hash met zout. */
+     nergens bewaard; hier staat alleen een hash met zout. Uitgeven en roteren
+     doet een mens OP NAAM (naamAuth): een machinesleutel onder de gedeelde
+     kantoorcode is een sleutel zonder uitgever. Intrekken blijft bij elke
+     kantoorsessie -- dichtdoen hoort de makkelijkste kant op te zijn. */
   app.post('/api/command/apipoort', officeAuth, (req, res) => veilig(res, () => command.apipoort.stand()));
   app.post('/api/command/apipoort/toelaten', officeAuth, (req, res) => veilig(res, () =>
     command.apipoort.laatToe(String(req.body.pad || ''), { versie: req.body.versie,
       uitfasering: req.body.uitfasering, waarvoor: req.body.waarvoor }, wie(req))));
   app.post('/api/command/apipoort/toelating-weg', officeAuth, (req, res) => veilig(res, () =>
     command.apipoort.haalWeg(String(req.body.pad || ''), wie(req))));
-  app.post('/api/command/apipoort/sleutel', officeAuth, (req, res) => veilig(res, () =>
+  app.post('/api/command/apipoort/sleutel', naamAuth, (req, res) => veilig(res, () =>
     command.apipoort.maak(req.body.naam, req.body.scopes, { door: wie(req), eigenaar: req.body.eigenaar,
       quotaPerUur: req.body.quotaPerUur, dagen: req.body.dagen })));
+  app.post('/api/command/apipoort/roteer', naamAuth, (req, res) => veilig(res, () =>
+    command.apipoort.roteer(String(req.body.id || ''), { door: wie(req), dagen: req.body.dagen })));
   app.post('/api/command/apipoort/intrekken', officeAuth, (req, res) => veilig(res, () =>
     command.apipoort.trekIn(String(req.body.id || ''), wie(req), req.body.reden)));
 

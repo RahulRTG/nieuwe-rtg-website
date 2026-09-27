@@ -34,11 +34,15 @@ module.exports = (kern) => {
      sleutel komt uit kern/algpin.js en gaat hier de deur uit naar het adres dat
      WIJ van dit account hebben -- de aanvrager kiest dat adres niet. Zie de
      uitleg bij pinHerstelStart voor waarom dat veilig genoeg is. */
-  app.post('/api/pin/vergeten', auth, (req, res) => {
+  app.post('/api/pin/vergeten', auth, async (req, res) => {
     if (!echtAccount(req, res)) return;
-    const r = pinHerstelStart(req.session.key);
+    /* Eerst het adres, dan de sleutel: uitgeven trekt de vorige in, en een
+       sleutel die nergens heen kan zou een werkende link voor niets vervangen. */
     const adres = accounts.emailOf(req.session.account);
     if (!adres) return res.status(400).json({ error: 'Er staat geen e-mailadres bij dit account; herstellen kan dan niet per mail.' });
+    let r;
+    try { r = await pinHerstelStart(req.session.key); }
+    catch (e) { console.error('[algpin] herstel', e && e.message); return res.status(503).json({ error: 'Herstellen lukt nu niet. Probeer het zo opnieuw.' }); }
     const url = appUrl(req) + '/apps/app.html?pinherstel=' + r.sleutel;
     mail.send(adres, 'Uw algemene pincode herstellen bij Rahul Travel Group',
       'U vroeg aan om uw algemene pincode opnieuw in te stellen. Dat kan via deze link (1 uur geldig):\n' + url +
@@ -50,6 +54,7 @@ module.exports = (kern) => {
 
   app.post('/api/pin/herstel', async (req, res) => {
     const b = req.body || {};
-    stuur(res, await pinHerstelZet(b.sleutel, b.pin));
+    try { stuur(res, await pinHerstelZet(b.sleutel, b.pin)); }
+    catch (e) { console.error('[algpin] herstel', e && e.message); res.status(503).json({ error: 'Herstellen lukt nu niet. Probeer het zo opnieuw.' }); }
   });
 };

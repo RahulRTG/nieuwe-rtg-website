@@ -2,16 +2,16 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-27",
   "gemeten": {
-    "bestanden": 2445,
-    "vormen": 1450,
-    "velden": 2115,
-    "modules": 807,
-    "domeinen": 293,
+    "bestanden": 2438,
+    "vormen": 1445,
+    "velden": 2088,
+    "modules": 801,
+    "domeinen": 285,
     "envelopDrempel": 18,
-    "envelop": 28,
-    "veldenDomeineigen": 1488,
-    "veldenGedeeldVanafVier": 214,
-    "gelijkendeVormparen": 23
+    "envelop": 30,
+    "veldenDomeineigen": 1470,
+    "veldenGedeeldVanafVier": 209,
+    "gelijkendeVormparen": 20
   },
   "envelop": [
     "aantal",
@@ -21,6 +21,7 @@
     "code",
     "codenaam",
     "datum",
+    "doel",
     "door",
     "gemaakt",
     "id",
@@ -28,6 +29,7 @@
     "label",
     "naam",
     "notitie",
+    "ok",
     "omschrijving",
     "prijs",
     "reden",
@@ -57,42 +59,6 @@
       ]
     },
     {
-      "veld": "type",
-      "domeinen": 17,
-      "waar": [
-        "bedrijf",
-        "kern/antivirus",
-        "kern/command",
-        "kern/commerce",
-        "kern/connection-communication",
-        "kern/connection-communication-call"
-      ]
-    },
-    {
-      "veld": "ok",
-      "domeinen": 17,
-      "waar": [
-        "kern/appstore",
-        "kern/festival",
-        "kern/fiscaal",
-        "kern/foundationregistratie-register",
-        "kern/koppel",
-        "kern/leren"
-      ]
-    },
-    {
-      "veld": "doel",
-      "domeinen": 17,
-      "waar": [
-        "kern/appstore",
-        "kern/codelevenscyclus",
-        "kern/commercie",
-        "kern/consent-register",
-        "kern/defensie",
-        "kern/labfonds"
-      ]
-    },
-    {
       "veld": "wie",
       "domeinen": 17,
       "waar": [
@@ -108,12 +74,12 @@
       "veld": "supplierCode",
       "domeinen": 16,
       "waar": [
+        "kern/arrivalpas",
         "kern/autoverkoop",
         "kern/beveiliging",
         "kern/comm",
         "kern/commercie",
-        "kern/ervaring",
-        "kern/gastzorg"
+        "kern/ervaring"
       ]
     },
     {
@@ -138,6 +104,18 @@
         "kern/commercie",
         "kern/concern",
         "kern/gewoonten"
+      ]
+    },
+    {
+      "veld": "type",
+      "domeinen": 15,
+      "waar": [
+        "bedrijf",
+        "kern/antivirus",
+        "kern/command",
+        "kern/commerce",
+        "kern/instant-reality",
+        "kern/magnaat-werkroutefabriek"
       ]
     },
     {
@@ -189,6 +167,18 @@
       ]
     },
     {
+      "veld": "vervalt",
+      "domeinen": 13,
+      "waar": [
+        "kern/aanmeldingen",
+        "kern/command",
+        "kern/commerce",
+        "kern/koppel",
+        "kern/levensband",
+        "kern/levensgraaf"
+      ]
+    },
+    {
       "veld": "vraag",
       "domeinen": 13,
       "waar": [
@@ -210,18 +200,6 @@
         "kern/groothandel",
         "kern/keuken",
         "kern/kosten"
-      ]
-    },
-    {
-      "veld": "vervalt",
-      "domeinen": 12,
-      "waar": [
-        "kern/aanmeldingen",
-        "kern/command",
-        "kern/commerce",
-        "kern/koppel",
-        "kern/levensband",
-        "kern/levensgraaf"
       ]
     },
     {
@@ -369,6 +347,18 @@
       ]
     },
     {
+      "veld": "wanneer",
+      "domeinen": 11,
+      "waar": [
+        "kern/checklijst",
+        "kern/defensie",
+        "kern/hulpdienst",
+        "kern/levenslijn",
+        "kern/mall",
+        "kern/onderneming"
+      ]
+    },
+    {
       "veld": "niveau",
       "domeinen": 11,
       "waar": [
@@ -405,18 +395,6 @@
       ]
     },
     {
-      "veld": "name",
-      "domeinen": 11,
-      "waar": [
-        "kern/experience",
-        "kern/gast",
-        "kern/kantoor",
-        "kern/leverancier",
-        "kern/lidacties",
-        "kern/personeel"
-      ]
-    },
-    {
       "veld": "klaar",
       "domeinen": 10,
       "waar": [
@@ -438,18 +416,6 @@
         "kern/gebouw-demo",
         "kern/mobiliteit",
         "kern/rtfos"
-      ]
-    },
-    {
-      "veld": "updatedAt",
-      "domeinen": 10,
-      "waar": [
-        "kern/architect",
-        "kern/atelier",
-        "kern/connection-communication-call",
-        "kern/economie",
-        "kern/hardwarelab",
-        "kern/hoteldorp"
       ]
     },
     {
@@ -501,18 +467,6 @@
       ]
     },
     {
-      "veld": "stad",
-      "domeinen": 10,
-      "waar": [
-        "kern/beschermzaak",
-        "kern/foundationregistratie-uitgifte",
-        "kern/ledenbalie-inzage",
-        "kern/livinglab",
-        "kern/mobiliteit",
-        "kern/rechterhand"
-      ]
-    },
-    {
       "veld": "op",
       "domeinen": 10,
       "waar": [
@@ -522,6 +476,54 @@
         "kern/galerij",
         "kern/gedachten",
         "kern/klok"
+      ]
+    },
+    {
+      "veld": "laatst",
+      "domeinen": 10,
+      "waar": [
+        "kern/command",
+        "kern/fluister",
+        "kern/geldbeleid",
+        "kern/link",
+        "kern/mailsleutel",
+        "kern/meet"
+      ]
+    },
+    {
+      "veld": "eigenaar",
+      "domeinen": 10,
+      "waar": [
+        "bedrijf",
+        "kern/command",
+        "kern/levensgraaf",
+        "kern/onderneming",
+        "kern/reisgezelschap",
+        "kern/reisgezelschap-delen"
+      ]
+    },
+    {
+      "veld": "name",
+      "domeinen": 10,
+      "waar": [
+        "kern/experience",
+        "kern/gast",
+        "kern/kantoor",
+        "kern/leverancier",
+        "kern/lidacties",
+        "kern/personeel"
+      ]
+    },
+    {
+      "veld": "dagen",
+      "domeinen": 10,
+      "waar": [
+        "kern/gewoonten",
+        "kern/klok",
+        "kern/levensgraaf",
+        "kern/levenslijn",
+        "kern/magnaat-leven",
+        "kern/mobiliteit"
       ]
     }
   ],
@@ -597,19 +599,6 @@
         "lt",
         "rk",
         "rt",
-        "type"
-      ]
-    },
-    {
-      "gelijkenis": 1,
-      "a": "server/kern/connection-communication-call.js",
-      "b": "server/kern/connection-communication.js",
-      "domeinA": "kern/connection-communication-call",
-      "domeinB": "kern/connection-communication",
-      "gedeeld": [
-        "incoming",
-        "revision",
-        "state",
         "type"
       ]
     },
@@ -700,6 +689,19 @@
         "publiekePrijs",
         "sku",
         "varianten"
+      ]
+    },
+    {
+      "gelijkenis": 0.8,
+      "a": "server/kern/tenant/brug.js",
+      "b": "server/bedrijf/leden.js",
+      "domeinA": "kern/tenant",
+      "domeinB": "bedrijf",
+      "gedeeld": [
+        "afdeling",
+        "extern",
+        "functie",
+        "rollen"
       ]
     },
     {
@@ -809,33 +811,6 @@
       ]
     },
     {
-      "gelijkenis": 0.71,
-      "a": "server/kern/connection-communication-media.js",
-      "b": "server/kern/connection-communication.js",
-      "domeinA": "kern/connection-communication-media",
-      "domeinB": "kern/connection-communication",
-      "gedeeld": [
-        "from",
-        "kind",
-        "pair",
-        "scope",
-        "to"
-      ]
-    },
-    {
-      "gelijkenis": 0.67,
-      "a": "server/kern/tenant/brug.js",
-      "b": "server/bedrijf/leden.js",
-      "domeinA": "kern/tenant",
-      "domeinB": "bedrijf",
-      "gedeeld": [
-        "afdeling",
-        "extern",
-        "functie",
-        "rollen"
-      ]
-    },
-    {
       "gelijkenis": 0.63,
       "a": "server/kern/geloofbieb.js",
       "b": "server/kern/reisbieb/index.js",
@@ -847,18 +822,6 @@
         "gratis",
         "nr",
         "prijsCenten"
-      ]
-    },
-    {
-      "gelijkenis": 0.6,
-      "a": "server/kern/appstore/context.js",
-      "b": "server/kern/mailsleutel.js",
-      "domeinA": "kern/appstore",
-      "domeinB": "kern/mailsleutel",
-      "gedeeld": [
-        "let",
-        "ok",
-        "sleutel"
       ]
     },
     {

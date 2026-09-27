@@ -150,6 +150,6 @@ Object.assign(kern, require('../kern/aanmeldgesprek').maakAanmeldgesprek({ db, s
 /* De algemene pin (kern/algpin.js): een pincode van het lid die de
    privacygevoelige apps op het OS beschermt en waarmee de werk-apps openen
    (het ene account = bevoegdheid, de pin = bewijs). */
-Object.assign(kern, require('../kern/algpin').maakAlgPin({ db, save, crypto, slot: pinSlot }));
+Object.assign(kern, require('../kern/algpin').maakAlgPin({ db, save, crypto, slot: pinSlot, bewerkCollectie: hulp.bewerkCollectie }));
 
 };

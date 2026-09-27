@@ -1,30 +1,30 @@
 {
  "stempel": {
-  "op": "2026-09-27T16:32:38.820Z",
-  "commit": "ce4bce564",
+  "op": "2026-09-27T17:57:46.064Z",
+  "commit": "de8ee02e",
   "boomVuil": false,
-  "boomAnders": 8,
+  "boomAnders": 2,
   "instrument": "scripts/mutatiecontract.js",
-  "node": "v24.18.0"
+  "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5072,
-  "geclassificeerd": 5072,
+  "totaal": 5049,
+  "geclassificeerd": 5049,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3190,
-   "NOT_APPLICABLE": 1222,
-   "PROTECTED": 517,
-   "INTENTIONALLY_NON_IDEMPOTENT": 143
+   "NOT_APPLICABLE": 1212,
+   "PROTECTED": 494,
+   "INTENTIONALLY_NON_IDEMPOTENT": 153
   },
-  "vastgesteldDoorMens": 1931,
+  "vastgesteldDoorMens": 1908,
   "afgeleidDoorScript": 3141,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4181,
-   "PUBLIC": 124,
+   "AUTHENTICATED": 4154,
+   "PUBLIC": 126,
    "OBJECT_SCOPED": 746,
-   "(niet af te leiden -- vraagt een verklaring)": 5,
+   "(niet af te leiden -- vraagt een verklaring)": 7,
    "SERVICE_TO_SERVICE": 15,
    "SYSTEM_INTERNAL": 1
   },
@@ -32,12 +32,24 @@
    "kale ronde: beschermd": 136,
    "kale ronde: onbeschermd": 123,
    "kale ronde: geen uitspraak": 4713,
-   "niet gemeten": 100
+   "niet gemeten": 77
   },
   "voorstellen": {},
   "metingVan": "2026-09-19T17:45:58.177Z"
  },
  "tegenspraken": [
+  {
+   "route": "POST /api/arrival/pass/intrek",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "PUBLIC",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/arrival/pass/roteer",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "PUBLIC",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
   {
    "route": "POST /api/cluster/:actie",
    "bedoeld": "SYSTEM_INTERNAL",
@@ -120,6 +132,12 @@
    "route": "POST /api/lab2/bewoner/studie",
    "bedoeld": "AUTHENTICATED",
    "waargenomen": "PUBLIC",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/mob/kaart/toon",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
   {
@@ -273,6 +291,18 @@
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
   {
+   "route": "POST /api/order/afhaalcode",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/order/afhaalcode/intrek",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
    "route": "POST /api/reisbureau/afzeggen",
    "bedoeld": "OBJECT_SCOPED",
    "waargenomen": "AUTHENTICATED",
@@ -352,6 +382,18 @@
   },
   {
    "route": "POST /api/supplier/service/weiger",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/supplier/ticket/toon",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/ticket/toon",
    "bedoeld": "OBJECT_SCOPED",
    "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
@@ -2785,6 +2827,48 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "arrival.pass.intrekken",
+   "route": "POST /api/arrival/pass/intrek",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "PUBLIC",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "arrival.pass.roteren",
+   "route": "POST /api/arrival/pass/roteer",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "PUBLIC",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -6528,6 +6612,44 @@
     "hindernis": null
    },
    "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "bedrijf.sleutel.intrekken",
+   "route": "POST /api/bedrijf/sleutel/intrek",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": null,
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "bedrijf.sleutel.roteren",
+   "route": "POST /api/bedrijf/sleutel/roteer",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": null,
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
@@ -10994,6 +11116,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "command.apipoort.roteren",
+   "route": "POST /api/command/apipoort/roteer",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "naamAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "command.apipoort.sleutel",
    "route": "POST /api/command/apipoort/sleutel",
    "semantiek": {
@@ -11005,7 +11148,7 @@
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "officeAuth"
+     "naamAuth"
     ]
    },
    "bewijs": {
@@ -15959,468 +16102,6 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "rendezvous.communication.call.answer",
-   "route": "POST /api/connection/rendezvous/call/answer",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "rendezvous.communication.call.end",
-   "route": "POST /api/connection/rendezvous/call/end",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "rendezvous.communication.call.poll",
-   "route": "POST /api/connection/rendezvous/call/poll",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "leest",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "rendezvous.communication.call.signal",
-   "route": "POST /api/connection/rendezvous/call/signal",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "rendezvous.communication.call.start",
-   "route": "POST /api/connection/rendezvous/call/start",
-   "semantiek": {
-    "klasse": "sleutelVereist"
-   },
-   "duplicaatregel": "nietIdempotent",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "rendezvous.communication.consent",
-   "route": "POST /api/connection/rendezvous/consent",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "rendezvous.communication.media",
-   "route": "POST /api/connection/rendezvous/message-media",
-   "semantiek": {
-    "klasse": "sleutelVereist"
-   },
-   "duplicaatregel": "nietIdempotent",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "rendezvous.communication.message.remove",
-   "route": "POST /api/connection/rendezvous/message/remove",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "rendezvous.communication.message.report",
-   "route": "POST /api/connection/rendezvous/message/report",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "rendezvous.communication.status",
-   "route": "POST /api/connection/rendezvous/status",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "leest",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "rendezvous.communication.text",
-   "route": "POST /api/connection/rendezvous/text",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "nietIdempotent",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "vonk.communication.call.answer",
-   "route": "POST /api/connection/vonk/call/answer",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "vonk.communication.call.end",
-   "route": "POST /api/connection/vonk/call/end",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "vonk.communication.call.poll",
-   "route": "POST /api/connection/vonk/call/poll",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "leest",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "vonk.communication.call.signal",
-   "route": "POST /api/connection/vonk/call/signal",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "vonk.communication.call.start",
-   "route": "POST /api/connection/vonk/call/start",
-   "semantiek": {
-    "klasse": "sleutelVereist"
-   },
-   "duplicaatregel": "nietIdempotent",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": "Lifestyle of Business Pass",
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "vonk.communication.consent",
-   "route": "POST /api/connection/vonk/consent",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "vonk.communication.media",
-   "route": "POST /api/connection/vonk/message-media",
-   "semantiek": {
-    "klasse": "sleutelVereist"
-   },
-   "duplicaatregel": "nietIdempotent",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "vonk.communication.message.remove",
-   "route": "POST /api/connection/vonk/message/remove",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "vonk.communication.message.report",
-   "route": "POST /api/connection/vonk/message/report",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "vonk.communication.status",
-   "route": "POST /api/connection/vonk/status",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "leest",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "vonk.communication.text",
-   "route": "POST /api/connection/vonk/text",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "nietIdempotent",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
    "mutatieId": "contract.teken",
    "route": "POST /api/contract/teken",
    "semantiek": {
@@ -16753,7 +16434,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "SERVICE_TO_SERVICE",
-    "uitHandler": "ja",
+    "uitHandler": null,
     "bedoeld": "SERVICE_TO_SERVICE",
     "bewakers": []
    },
@@ -30500,6 +30181,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "giftcard.roteren",
+   "route": "POST /api/giftcard/roteer",
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -47890,111 +47592,6 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "rendezvous.circle.rsvp",
-   "route": "POST /api/member/rendezvous/circle/rsvp",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "rendezvous.circles.list",
-   "route": "POST /api/member/rendezvous/circles",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "leest",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "rendezvous.concierge.list",
-   "route": "POST /api/member/rendezvous/concierge",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "leest",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "rendezvous.concierge.approve",
-   "route": "POST /api/member/rendezvous/concierge/approve",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "rendezvous.concierge.request",
-   "route": "POST /api/member/rendezvous/concierge/request",
-   "semantiek": {
-    "klasse": "sleutelVereist"
-   },
-   "duplicaatregel": "velden",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
    "mutatieId": "member.rendezvous.date",
    "route": "POST /api/member/rendezvous/date",
    "semantiek": {
@@ -48003,7 +47600,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "Lifestyle of Business Pass",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -48018,27 +47615,6 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "member.rendezvous.edge",
-   "route": "POST /api/member/rendezvous/edge",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "leest",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -48282,90 +47858,6 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "rendezvous.profile.photo.upload",
-   "route": "POST /api/member/rendezvous/profile-photo",
-   "semantiek": {
-    "klasse": "sleutelVereist"
-   },
-   "duplicaatregel": "nietIdempotent",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "rendezvous.profile.photo.order",
-   "route": "POST /api/member/rendezvous/profile-photo/order",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "rendezvous.profile.photo.publish",
-   "route": "POST /api/member/rendezvous/profile-photo/publish",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "rendezvous.profile.photo.remove",
-   "route": "POST /api/member/rendezvous/profile-photo/remove",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "nietIdempotent",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -49176,6 +48668,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "member.rtmail.imap.roteren",
+   "route": "POST /api/member/rtmail/imap/roteer",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -53739,6 +53252,27 @@
     "hindernis": null
    },
    "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "vervoerbewijs.code.tonen",
+   "route": "POST /api/mob/kaart/toon",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
@@ -59188,7 +58722,7 @@
    "semantiek": {
     "klasse": "nietHerhaalbaar"
    },
-   "duplicaatregel": "nietIdempotent",
+   "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -59209,7 +58743,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": "zelfdeVerzoek",
+   "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -65878,174 +65412,6 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "rendezvous.arrangements.office.step",
-   "route": "POST /api/office/rendezvous/arrangement/step",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "naamAuth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "rendezvous.arrangements.office.list",
-   "route": "POST /api/office/rendezvous/arrangements",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "leest",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "naamAuth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "rendezvous.circle.create",
-   "route": "POST /api/office/rendezvous/circle/create",
-   "semantiek": {
-    "klasse": "sleutelVereist"
-   },
-   "duplicaatregel": "velden",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "naamAuth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "rendezvous.circle.gathering",
-   "route": "POST /api/office/rendezvous/circle/gathering",
-   "semantiek": {
-    "klasse": "sleutelVereist"
-   },
-   "duplicaatregel": "velden",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "naamAuth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "rendezvous.circle.invite",
-   "route": "POST /api/office/rendezvous/circle/invite",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "naamAuth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "rendezvous.circles.office.list",
-   "route": "POST /api/office/rendezvous/circles",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "leest",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "naamAuth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "rendezvous.concierge.office.list",
-   "route": "POST /api/office/rendezvous/concierge",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "leest",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "naamAuth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "rendezvous.concierge.office.step",
-   "route": "POST /api/office/rendezvous/concierge/step",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "naamAuth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
    "mutatieId": "office.rendezvous.meldingen",
    "route": "POST /api/office/rendezvous/meldingen",
    "semantiek": {
@@ -66057,7 +65423,7 @@
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "naamAuth"
+     "officeAuth"
     ]
    },
    "bewijs": {
@@ -66084,7 +65450,7 @@
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "naamAuth"
+     "officeAuth"
     ]
    },
    "bewijs": {
@@ -66111,7 +65477,7 @@
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "naamAuth"
+     "officeAuth"
     ]
    },
    "bewijs": {
@@ -66138,7 +65504,7 @@
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "naamAuth"
+     "officeAuth"
     ]
    },
    "bewijs": {
@@ -67648,7 +67014,7 @@
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "officeAuth"
+     "naamAuth"
     ]
    },
    "bewijs": {
@@ -67783,7 +67149,7 @@
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "officeAuth"
+     "naamAuth"
     ]
    },
    "bewijs": {
@@ -68914,7 +68280,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "Lifestyle of Business Pass",
+    "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
@@ -73619,6 +72985,48 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "order.afhaalcode.tonen",
+   "route": "POST /api/order/afhaalcode",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "order.afhaalcode.intrekken",
+   "route": "POST /api/order/afhaalcode/intrek",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "order.pay",
    "route": "POST /api/order/pay",
    "semantiek": {
@@ -77154,6 +76562,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "pay.kascode.intrekken",
+   "route": "POST /api/pay/kascode/intrek",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "een echt account",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "pay.oplaad",
    "route": "POST /api/pay/oplaad",
    "semantiek": {
@@ -77370,6 +76799,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "pay.tegoed.roteren",
+   "route": "POST /api/pay/tegoed/roteer",
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "pay.tegoed.terug",
    "route": "POST /api/pay/tegoed/terug",
    "semantiek": {
@@ -77527,6 +76977,27 @@
     "hindernis": null
    },
    "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "pay.tikcode.intrekken",
+   "route": "POST /api/pay/tikcode/intrek",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
@@ -104103,6 +103574,69 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "supplier.doos.sleutel",
+   "route": "POST /api/supplier/doos/sleutel",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "supplier.doos.sleutel.weg",
+   "route": "POST /api/supplier/doos/sleutel/weg",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "supplier.doos.sleutels",
+   "route": "POST /api/supplier/doos/sleutels",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "manager",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "supplier.dorp",
    "route": "POST /api/supplier/dorp",
    "semantiek": {
@@ -106047,6 +105581,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "supplier.giftcard.intrekken",
+   "route": "POST /api/supplier/giftcard/intrek",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "supplier.giftcard.redeem",
    "route": "POST /api/supplier/giftcard/redeem",
    "semantiek": {
@@ -106070,6 +105625,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "supplier.giftcard.roteren",
+   "route": "POST /api/supplier/giftcard/roteer",
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "manager",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -116332,6 +115908,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "supplier.pay.tegoed.roteren",
+   "route": "POST /api/supplier/pay/tegoed/roteer",
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "manager",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "supplier.pay.tegoed.terug",
    "route": "POST /api/supplier/pay/tegoed/terug",
    "semantiek": {
@@ -119786,6 +119383,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "supplier.rtmail.imap.roteren",
+   "route": "POST /api/supplier/rtmail/imap/roteer",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "supplier.rtmail.imap.sleutel",
    "route": "POST /api/supplier/rtmail/imap/sleutel",
    "semantiek": {
@@ -122750,6 +122368,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "ticket.deurcode.vernieuwen",
+   "route": "POST /api/supplier/ticket/toon",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -128422,6 +128061,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "ticket.entreecode.tonen",
+   "route": "POST /api/ticket/toon",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "tickets.aanbod",
    "route": "POST /api/tickets/aanbod",
    "semantiek": {
@@ -131210,7 +130870,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "geen gast",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -131237,7 +130897,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "geen gast",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -131264,7 +130924,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "geen gast",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -131283,27 +130943,6 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "vonk.edge",
-   "route": "POST /api/vonk/edge",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "leest",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
    "mutatieId": "vonk.halfweg",
    "route": "POST /api/vonk/halfweg",
    "semantiek": {
@@ -131312,7 +130951,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "geen gast",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -131339,7 +130978,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "geen gast",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -131366,7 +131005,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "geen gast",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -131393,7 +131032,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "geen gast",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -131420,7 +131059,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "geen gast",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -131439,90 +131078,6 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "vonk.profile.photo.upload",
-   "route": "POST /api/vonk/profile-photo",
-   "semantiek": {
-    "klasse": "sleutelVereist"
-   },
-   "duplicaatregel": "nietIdempotent",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "vonk.profile.photo.order",
-   "route": "POST /api/vonk/profile-photo/order",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "vonk.profile.photo.publish",
-   "route": "POST /api/vonk/profile-photo/publish",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "vonk.profile.photo.remove",
-   "route": "POST /api/vonk/profile-photo/remove",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "nietIdempotent",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
    "mutatieId": "vonk.selectie",
    "route": "POST /api/vonk/selectie",
    "semantiek": {
@@ -131531,7 +131086,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "geen gast",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"

@@ -35,6 +35,19 @@ const ROUTES = new Set([
   'POST /api/projectie/koppel',
   'POST /api/rtgid/start',
   'POST /api/rtgid/roteer',
+  /* Machine- en herstelsleutels (CODECREDENTIALS.json): API-poort, Stadsdoos,
+     algemene pin, SCIM en IMAP. Elk antwoord draagt een geheim dat alleen als
+     hash blijft, of trekt atomair een vorige in. */
+  'POST /api/command/apipoort/sleutel',
+  'POST /api/command/apipoort/roteer',
+  'POST /api/office/stad/sleutel',
+  'POST /api/office/stad/node/aanmeld',
+  'POST /api/pin/vergeten',
+  'POST /api/techniek/sso/scimsleutel',
+  'POST /api/member/rtmail/imap/sleutel',
+  'POST /api/supplier/rtmail/imap/sleutel',
+  'POST /api/member/rtmail/imap/roteer',
+  'POST /api/supplier/rtmail/imap/roteer',
   'POST /api/salon/deal/claim',
   'POST /api/salon/deal/claim/roteer',
   'POST /api/supplier/vracht/maak',
@@ -77,7 +90,11 @@ const ROUTES = new Set([
   'POST /api/bedrijf/mijn',
   'POST /api/bedrijf/sleutel/roteer',
   'POST /api/tenant/bootstrap/mijn',
-  'POST /api/account/start'
+  'POST /api/account/start',
+  /* De sleutel per Zaakdoos (kern/zaakdoos/sleutels.js): uitgeven is roteren, en
+     het antwoord draagt de kale sleutel die daarna alleen als hash bestaat. */
+  'POST /api/office/doos/sleutel',
+  'POST /api/supplier/doos/sleutel'
 ]);
 
 const isEenmalig = (methode, pad) => ROUTES.has(

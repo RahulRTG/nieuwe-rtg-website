@@ -1,9 +1,9 @@
 {
-  "catalogi": 1147,
-  "verschillendeNamen": 689,
-  "namenInMeerDomeinen": 129,
-  "woordenMetMeerBetekenissen": 111,
-  "betekenissenTotaal": 410,
+  "catalogi": 1144,
+  "verschillendeNamen": 686,
+  "namenInMeerDomeinen": 128,
+  "woordenMetMeerBetekenissen": 110,
+  "betekenissenTotaal": 409,
   "ergsteWoord": "SOORTEN",
   "ergsteAantal": 49,
   "dubbelingen": 33,
@@ -527,7 +527,7 @@
       ]
     }
   ],
-  "dubbelingenZonderNaam": 226,
+  "dubbelingenZonderNaam": 231,
   "dubbelingZonderNaamLijst": [
     {
       "overlap": 1,
@@ -3621,5 +3621,5 @@
       ]
     }
   ],
-  "bestanden": 3701
+  "bestanden": 3720
 }

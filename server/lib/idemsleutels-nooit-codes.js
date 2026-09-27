@@ -34,6 +34,14 @@ module.exports = Object.freeze({
     'zelfde reden als de ledenkant: het vernieuwen van een deurticket geeft een nieuwe code en trekt de vorige in',
   'POST /api/mob/kaart/toon':
     'tonen is roteren: elk antwoord draagt een nieuwe code van het vervoerbewijs en trekt de vorige in (kern/mobiliteit/kaarttoegang.js)',
+  'POST /api/office/doos/sleutel':
+    'uitgeven is roteren: elk antwoord draagt een nieuwe 128-bit doossleutel en trekt de vorige van die doos in (kern/zaakdoos/sleutels.js); een herhaald antwoord zou een ingetrokken sleutel tonen',
+  'POST /api/supplier/doos/sleutel':
+    'zelfde reden aan de zaakkant: de manager roteert de sleutel van zijn eigen doos, en een antwoordcache zou de vorige heronthullen',
+  'POST /api/office/doos/sleutel/weg':
+    'intrekken leest de actuele stand in de collectietransactie van kern/zaakdoos/sleutels.js; een tweede keer is een toestandscontrole, geen gecachet antwoord',
+  'POST /api/supplier/doos/sleutel/weg':
+    'zelfde reden als de kantoorkant: intrekken beslist op de actuele stand, en een gecachet antwoord mag geen intrekking overslaan',
   'POST /api/order/afhaalcode/intrek':
     'intrekken leest de actuele stand in kern/afhaalcode.js; een tweede keer is een toestandscontrole, geen gecachet antwoord'
 });

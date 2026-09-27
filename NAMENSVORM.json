@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-27T17:24:38.869Z",
-    "commit": "ac4a0941",
+    "op": "2026-09-27T17:42:05.446Z",
+    "commit": "84352cb1",
     "boomVuil": false,
-    "boomAnders": 5,
+    "boomAnders": 6,
     "instrument": "scripts/namensvorm.js",
     "node": "v22.22.2"
   },
@@ -598,8 +598,8 @@
       "woord": "doel",
       "bestanden": 272,
       "domeinen": 144,
-      "samengesteld": 189,
-      "samengesteldDomeinen": 87,
+      "samengesteld": 188,
+      "samengesteldDomeinen": 86,
       "stand": "bezet",
       "waar": [
         "bedrijf",
@@ -619,31 +619,54 @@
     },
     {
       "woord": "contract",
-      "bestanden": 58,
-      "domeinen": 21,
-      "samengesteld": 91,
-      "samengesteldDomeinen": 33,
+      "bestanden": 55,
+      "domeinen": 19,
+      "samengesteld": 85,
+      "samengesteldDomeinen": 29,
       "stand": "bezet",
       "waar": [
         "bedrijf",
         "kern/aanmeldingen",
         "kern/autoverkoop",
         "kern/commercie",
-        "kern/connection-policy"
+        "kern/document-capability"
       ],
       "vormen": [
         "CONTRACTEN",
         "CONTRACTEN_WAARSCHUW_DAGEN",
-        "CONTRACTS",
         "CONTRACTSLEUTELS",
         "CONTRACTSOORTEN",
-        "CONTRACTUAL_LEAVE"
+        "CONTRACT_BETALING",
+        "CONTRACT_VERSION"
+      ]
+    },
+    {
+      "woord": "claim",
+      "bestanden": 37,
+      "domeinen": 23,
+      "samengesteld": 42,
+      "samengesteldDomeinen": 24,
+      "stand": "bezet",
+      "waar": [
+        "kern/afhaalcode",
+        "kern/algpin",
+        "kern/algpin-herstel",
+        "kern/appstore",
+        "kern/assets"
+      ],
+      "vormen": [
+        "CLAIM_STATUS",
+        "CLAIM_TTL_MS",
+        "MAX_CLAIMS",
+        "alGeclaimd",
+        "beginClaim",
+        "beloningGeclaimd"
       ]
     },
     {
       "woord": "risico",
-      "bestanden": 52,
-      "domeinen": 21,
+      "bestanden": 50,
+      "domeinen": 20,
       "samengesteld": 28,
       "samengesteldDomeinen": 15,
       "stand": "bezet",
@@ -661,52 +684,6 @@
         "bvRisicoWeg",
         "eigenRisico",
         "genoteerdeRisicos"
-      ]
-    },
-    {
-      "woord": "claim",
-      "bestanden": 36,
-      "domeinen": 22,
-      "samengesteld": 42,
-      "samengesteldDomeinen": 24,
-      "stand": "bezet",
-      "waar": [
-        "kern/afhaalcode",
-        "kern/appstore",
-        "kern/assets",
-        "kern/commercie",
-        "kern/economie"
-      ],
-      "vormen": [
-        "CLAIM_STATUS",
-        "CLAIM_TTL_MS",
-        "MAX_CLAIMS",
-        "alGeclaimd",
-        "beginClaim",
-        "beloningGeclaimd"
-      ]
-    },
-    {
-      "woord": "kans",
-      "bestanden": 23,
-      "domeinen": 9,
-      "samengesteld": 37,
-      "samengesteldDomeinen": 19,
-      "stand": "bezet",
-      "waar": [
-        "bedrijf",
-        "kern/flits",
-        "kern/ghost",
-        "kern/magnaat-leven",
-        "kern/magnaatwereld"
-      ],
-      "vormen": [
-        "HERKANSING",
-        "KANSEN",
-        "KANS_MIN_BRONNEN",
-        "dealkansen",
-        "dealkansenVoor",
-        "foutkans"
       ]
     },
     {
@@ -733,41 +710,41 @@
       ]
     },
     {
-      "woord": "capability",
-      "bestanden": 46,
-      "domeinen": 22,
-      "samengesteld": 9,
-      "samengesteldDomeinen": 9,
+      "woord": "kans",
+      "bestanden": 23,
+      "domeinen": 9,
+      "samengesteld": 35,
+      "samengesteldDomeinen": 18,
       "stand": "bezet",
       "waar": [
-        "kern/bestanden-delen",
-        "kern/commercie",
-        "kern/concern",
-        "kern/connection-communication",
-        "kern/connection-communication-call"
+        "bedrijf",
+        "kern/flits",
+        "kern/ghost",
+        "kern/magnaat-leven",
+        "kern/magnaatwereld"
       ],
       "vormen": [
-        "CAPABILITY_COVERAGE",
-        "CAPABILITY_GATED",
-        "CAPABILITY_UNKNOWN",
-        "RTG_CAPABILITY_RUST_BIN",
-        "RTG_CAPABILITY_RUST_CANARY_KEY",
-        "RTG_CAPABILITY_RUST_CANARY_PCT"
+        "HERKANSING",
+        "KANSEN",
+        "KANS_MIN_BRONNEN",
+        "dealkansen",
+        "dealkansenVoor",
+        "foutkans"
       ]
     },
     {
       "woord": "intent",
-      "bestanden": 18,
-      "domeinen": 7,
+      "bestanden": 17,
+      "domeinen": 6,
       "samengesteld": 31,
       "samengesteldDomeinen": 13,
       "stand": "bezet",
       "waar": [
-        "kern/connection-edge",
         "kern/economie",
         "kern/experience",
         "kern/fluister",
-        "kern/fonds"
+        "kern/fonds",
+        "kern/instant-reality"
       ],
       "vormen": [
         "INTENTIE",
@@ -779,33 +756,33 @@
       ]
     },
     {
-      "woord": "projectie",
-      "bestanden": 27,
-      "domeinen": 8,
-      "samengesteld": 18,
-      "samengesteldDomeinen": 12,
+      "woord": "capability",
+      "bestanden": 37,
+      "domeinen": 13,
+      "samengesteld": 7,
+      "samengesteldDomeinen": 7,
       "stand": "bezet",
       "waar": [
-        "kern/bedrijfsmaat",
-        "kern/kosten",
-        "kern/magnaat-grootboek",
-        "kern/magnaat-kantoorregels",
-        "kern/namens"
+        "kern/bestanden-delen",
+        "kern/commercie",
+        "kern/concern",
+        "kern/document-capability",
+        "kern/drm"
       ],
       "vormen": [
-        "herstelProjectie",
-        "maakFondsProjecties",
-        "maakProjectie",
-        "maakProjecties",
-        "maakVonkProjecties",
-        "nieuweProjectie"
+        "CAPABILITY_GATED",
+        "RTG_CAPABILITY_RUST_BIN",
+        "RTG_CAPABILITY_RUST_CANARY_KEY",
+        "RTG_CAPABILITY_RUST_CANARY_PCT",
+        "RTG_CAPABILITY_RUST_MODE",
+        "capabilityGraph"
       ]
     },
     {
       "woord": "deal",
       "bestanden": 18,
       "domeinen": 12,
-      "samengesteld": 22,
+      "samengesteld": 21,
       "samengesteldDomeinen": 6,
       "stand": "bezet",
       "waar": [
@@ -871,6 +848,29 @@
       ]
     },
     {
+      "woord": "projectie",
+      "bestanden": 15,
+      "domeinen": 6,
+      "samengesteld": 15,
+      "samengesteldDomeinen": 9,
+      "stand": "bezet",
+      "waar": [
+        "kern/kosten",
+        "kern/magnaat-grootboek",
+        "kern/magnaat-kantoorregels",
+        "kern/namens",
+        "kern/spelprojectie-toegang"
+      ],
+      "vormen": [
+        "herstelProjectie",
+        "maakFondsProjecties",
+        "maakProjectie",
+        "maakProjecties",
+        "nieuweProjectie",
+        "projectieKoppel"
+      ]
+    },
+    {
       "woord": "zekerheid",
       "bestanden": 24,
       "domeinen": 12,
@@ -888,28 +888,6 @@
         "contractzekerheid",
         "onzekerheid",
         "trefzekerheid"
-      ]
-    },
-    {
-      "woord": "bevoegdheid",
-      "bestanden": 19,
-      "domeinen": 14,
-      "samengesteld": 7,
-      "samengesteldDomeinen": 6,
-      "stand": "bezet",
-      "waar": [
-        "kern/command",
-        "kern/commercie",
-        "kern/concern",
-        "kern/democratie",
-        "kern/isolatie"
-      ],
-      "vormen": [
-        "behandelbevoegdheid",
-        "bevoegdheidNodig",
-        "kanBevoegdheidDragen",
-        "maakBevoegdheid",
-        "zoekBevoegdheid"
       ]
     },
     {
@@ -957,6 +935,28 @@
       ]
     },
     {
+      "woord": "bevoegdheid",
+      "bestanden": 16,
+      "domeinen": 13,
+      "samengesteld": 7,
+      "samengesteldDomeinen": 6,
+      "stand": "bezet",
+      "waar": [
+        "kern/command",
+        "kern/commercie",
+        "kern/concern",
+        "kern/isolatie",
+        "kern/levensdossier"
+      ],
+      "vormen": [
+        "behandelbevoegdheid",
+        "bevoegdheidNodig",
+        "kanBevoegdheidDragen",
+        "maakBevoegdheid",
+        "zoekBevoegdheid"
+      ]
+    },
+    {
       "woord": "mandaat",
       "bestanden": 11,
       "domeinen": 5,
@@ -980,25 +980,6 @@
       ]
     },
     {
-      "woord": "purpose",
-      "bestanden": 12,
-      "domeinen": 9,
-      "samengesteld": 2,
-      "samengesteldDomeinen": 2,
-      "stand": "bezet",
-      "waar": [
-        "kern/connection-communication",
-        "kern/connection-communication-media",
-        "kern/connection-consent",
-        "kern/connection-profile-media",
-        "kern/connection-state-rendezvous"
-      ],
-      "vormen": [
-        "economicIntentsVoorPurpose",
-        "intentsVoorPurpose"
-      ]
-    },
-    {
       "woord": "principal",
       "bestanden": 2,
       "domeinen": 2,
@@ -1018,31 +999,11 @@
       ]
     },
     {
-      "woord": "verplichting",
-      "bestanden": 4,
-      "domeinen": 2,
-      "samengesteld": 9,
-      "samengesteldDomeinen": 5,
-      "stand": "bezet",
-      "waar": [
-        "kern/magnaat-leven",
-        "kern/spellen"
-      ],
-      "vormen": [
-        "VERPLICHTINGEN",
-        "bonnenVerplichting",
-        "maakVerplichting",
-        "verplichtingBedrag",
-        "verplichtingOp",
-        "verplichtingen"
-      ]
-    },
-    {
       "woord": "authority",
       "bestanden": 5,
       "domeinen": 4,
-      "samengesteld": 7,
-      "samengesteldDomeinen": 5,
+      "samengesteld": 5,
+      "samengesteldDomeinen": 4,
       "stand": "bezet",
       "waar": [
         "kern/bestanden-delen",
@@ -1051,7 +1012,6 @@
         "kern/experience"
       ],
       "vormen": [
-        "AUTHORITY_ELIGIBLE",
         "authorityRef",
         "authorityScope",
         "requiredAuthority"
@@ -1076,6 +1036,42 @@
         "intenties",
         "intentiesActief",
         "linkIntenties"
+      ]
+    },
+    {
+      "woord": "purpose",
+      "bestanden": 7,
+      "domeinen": 4,
+      "samengesteld": 2,
+      "samengesteldDomeinen": 2,
+      "stand": "bezet",
+      "waar": [
+        "kern/economie",
+        "kern/fonds",
+        "kern/gast",
+        "kern/namens"
+      ],
+      "vormen": [
+        "economicIntentsVoorPurpose",
+        "intentsVoorPurpose"
+      ]
+    },
+    {
+      "woord": "verplichting",
+      "bestanden": 1,
+      "domeinen": 1,
+      "samengesteld": 7,
+      "samengesteldDomeinen": 3,
+      "stand": "bezet",
+      "waar": [
+        "kern/spellen"
+      ],
+      "vormen": [
+        "VERPLICHTINGEN",
+        "maakVerplichting",
+        "verplichtingBedrag",
+        "verplichtingOp",
+        "verplichtingen"
       ]
     },
     {
@@ -1159,19 +1155,6 @@
       ]
     },
     {
-      "woord": "opportunity",
-      "bestanden": 0,
-      "domeinen": 0,
-      "samengesteld": 2,
-      "samengesteldDomeinen": 2,
-      "stand": "bezet-samengesteld",
-      "waar": [],
-      "vormen": [
-        "OPPORTUNITY_DETECTED",
-        "opportunityCost"
-      ]
-    },
-    {
       "woord": "outbox",
       "bestanden": 1,
       "domeinen": 1,
@@ -1213,6 +1196,18 @@
         "obligationId",
         "obligationIds",
         "obligationPayId"
+      ]
+    },
+    {
+      "woord": "opportunity",
+      "bestanden": 0,
+      "domeinen": 0,
+      "samengesteld": 1,
+      "samengesteldDomeinen": 1,
+      "stand": "bezet-samengesteld",
+      "waar": [],
+      "vormen": [
+        "opportunityCost"
       ]
     },
     {

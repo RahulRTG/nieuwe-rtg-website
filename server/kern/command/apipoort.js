@@ -33,6 +33,8 @@ const { veiligGelijk } = require('../util');
 const { nu: klokNu, datum: klokDatum } = require('../../lib/klok');
 
 const { NIVEAUS } = require('../frictie');
+// verplichte levensduur, rotatie en uitgave op naam: zie ./apipoort-levensduur.js
+const L = require('./apipoort-levensduur');
 
 const UUR = 3600000;
 const MAX_SLEUTELS = 50;
@@ -79,12 +81,15 @@ function maakApiPoort({ opslag, save, crypto, journaal }) {
 
   /* De publieke vorm van een sleutel: alles behalve het geheim zelf. */
   const kort = (s) => ({ id: s.id, naam: s.naam, eigenaar: s.eigenaar || null, scopes: s.scopes,
-    quotaPerUur: s.quotaPerUur, gemaakt: s.gemaakt, door: s.door, vervalt: s.vervalt,
+    quotaPerUur: s.quotaPerUur, gemaakt: s.gemaakt, door: s.door, vervalt: L.vervaltVan(s),
+    legacy: !s.vervalt, issuer: 'rtg.command.apipoort', doel: 'api-koppeling', gebruik: s.gebruik || 0,
     ingetrokken: s.ingetrokken, laatst: s.laatst, geweigerd: s.geweigerd,
     gebruiktDitUur: s.teller && s.teller.uur === Math.floor(klokNu() / UUR) ? s.teller.n : 0 });
 
   function maak(naam, scopes, opties) {
     const v = vak();
+    const fout = L.uitgifteFout(opties);
+    if (fout) return fout;
     if (Object.keys(v.sleutels).length >= MAX_SLEUTELS) {
       return { error: 'Er zijn al ' + MAX_SLEUTELS + ' sleutels. Trek er een in; een sleutellijst die ' +
         'niemand meer overziet, is geen toegangsbeheer.', status: 409 };
@@ -110,7 +115,7 @@ function maakApiPoort({ opslag, save, crypto, journaal }) {
           ? sc.methoden.map(m => String(m).toUpperCase()) : ['GET', 'POST'] })),
       quotaPerUur: Math.max(1, Math.min(Number(o.quotaPerUur || 1000), 1000000)),
       gemaakt: nu(), door: String(o.door || ''),
-      vervalt: o.dagen ? new Date(klokNu() + Number(o.dagen) * 86400000).toISOString() : null,
+      vervalt: new Date(klokNu() + L.geldigheid(o.dagen) * 86400000).toISOString(), gebruik: 0,
       ingetrokken: null, teller: { uur: 0, n: 0 }, laatst: null, geweigerd: 0
     };
     save();
@@ -121,6 +126,8 @@ function maakApiPoort({ opslag, save, crypto, journaal }) {
       let: 'dit geheim is nu één keer te zien. Het staat nergens opgeslagen; raakt het kwijt, dan maak ' +
         'je een nieuwe sleutel en trek je deze in.' };
   }
+
+  const roteer = L.maakRoteer({ vak, save, journaal, NIVEAUS, maak, kort, nu });
 
   function trekIn(id, door, reden) {
     const s = vak().sleutels[String(id)];
@@ -137,7 +144,7 @@ function maakApiPoort({ opslag, save, crypto, journaal }) {
      gaat over beheer (wat mag er ooit achter, wie krijgt een sleutel); die
      laag staat in het pad van elk binnenkomend verzoek en heeft daardoor
      andere eisen -- niets lekken, en elke nee met een reden. */
-  const { apiSleutelOk } = require('./apipoort-controle')({ vak, save, hash, veiligGelijk, binnenToelating, kort, UUR });
+  const { apiSleutelOk } = require('./apipoort-controle')({ vak, save, hash, veiligGelijk, binnenToelating, kort, UUR, vervaltVan: L.vervaltVan });
 
   function stand() {
     const v = vak();
@@ -153,7 +160,7 @@ function maakApiPoort({ opslag, save, crypto, journaal }) {
     };
   }
 
-  return { laatToe, haalWeg, maak, trekIn, apiSleutelOk, stand, binnenToelating };
+  return { laatToe, haalWeg, maak, roteer, trekIn, apiSleutelOk, stand, binnenToelating };
 }
 
 module.exports = { maakApiPoort, MAX_SLEUTELS };

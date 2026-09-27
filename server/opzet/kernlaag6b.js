@@ -54,5 +54,10 @@ Object.assign(kern, require('../kern/kantoorgesprek').maakKantoorgesprek({
    gastbearer die alleen als hash in `arrivalToegang` staat en in een
    collectietransactie wordt uitgegeven, geroteerd, gebruikt en ingetrokken. */
 kern.arrivalpas = require('../kern/arrivalpas')({ db, bewerkCollectie: hulp.bewerkCollectie, crypto });
+/* De sleutel per Zaakdoos (kern/zaakdoos/sleutels.js, besluit B12): uitgeven,
+   roteren en intrekken in een collectietransactie; de vloot, het kantoor en de
+   manager van de zaak delen dit ene register. */
+kern.doosSleutels = require('../kern/zaakdoos/sleutels').doosSleutelsVan({ db, save: hulp.save,
+  bewerkCollectie: hulp.bewerkCollectie, crypto });
 
 };

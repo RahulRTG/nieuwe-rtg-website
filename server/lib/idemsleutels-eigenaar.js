@@ -71,13 +71,9 @@ const SLEUTELS = {
       'hem opslikt geeft de eigenaar een code terug waarvan hij denkt dat die de nieuwste is' },
   'POST /api/office/kantoor/uitnodigingen': { leest: true },
   /* De simulator (fase 8) rekent en verandert niets; elke oproep laat bewust een
-     journaalregel na. De doossleutels (fase 7): uitgeven maakt elke keer een
-     NIEUWE sleutel en maakt de vorige ongeldig; intrekken is een toestand. */
+     journaalregel na. Uitgeven en intrekken van een doossleutel staan sinds
+     B12 in ./idemsleutels-nooit-codes.js; de gedeelde-sleutelschakelaar blijft hier. */
   'POST /api/office/beleidsmotor/simulatie': { leest: true },
-  'POST /api/office/doos/sleutel': { nietIdempotent: true,
-    waarom: 'een tweede oproep geeft een nieuwe sleutel en maakt de vorige van die doos ongeldig; een laag die ' +
-      'hem opslikt geeft een sleutel terug die de doos niet meer binnenlaat' },
-  'POST /api/office/doos/sleutel/weg': { zelfdeVerzoek: true },
   'POST /api/office/doos/gedeeld/zet': { zelfdeVerzoek: true },
   'POST /api/office/beleidsmotor/afdwingen': { leest: true },
   'POST /api/office/beleidsmotor/afdwingen/zet': { zelfdeVerzoek: true },
@@ -99,6 +95,7 @@ const SLEUTELS = {
   'POST /api/office/werkos/bankpad': { leest: true },
   'POST /api/office/werkos/bankpad/zet': { zelfdeVerzoek: true },
   'POST /api/office/doos/sleutels': { leest: true },
+  'POST /api/supplier/doos/sleutels': { leest: true }, // de manager leest de dozen van zijn eigen zaak
   /* Een vrije naam duiden: de tweede keer is het oude feit al vervallen en weigert de route. */
   'POST /api/concern/feit/duid': { zelfdeVerzoek: true }
 };

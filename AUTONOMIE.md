@@ -228,7 +228,7 @@ breekt, is waar het verhaal ophoudt:
 | afdracht | **gegrond** (27 september) | de maandbijdrage zegt nu zelf dat hij afgesproken is, gemeten, wanneer gepeild en wat hij niet dekt |
 | funnel | **gegrond** (27 september) | nieuw lid, cohort, activatie, klantwaarde in LivingOS en aanwezigheid; de andere drie werelden hebben hun eigen klantwaardemaat ernaast |
 | kosten | breekt bij `marge.per-lid` | kosten per drager bestaan, opbrengst per drager niet |
-| geld | breekt bij `marge.operationeel-rtg` | de brutomarge staat sinds 27 september; de vaste kosten van RTG als organisatie worden nergens geregistreerd |
+| geld | breekt bij `marge.operationeel-rtg` | de brutomarge en het banksaldo staan sinds 27 september; de vaste kosten van RTG als organisatie worden nergens geregistreerd |
 | werving | breekt bij `campagnes.rtg-marketing` | RTG registreert geen eigen campagnes of uitgaven |
 
 ---
@@ -294,9 +294,11 @@ doorgestreept met de datum; de besluiten staan in par. 2.5.
    niet kende (alle veertien kregen een besluit), en een proef die na de
    passkeyverharding van de incassoronde niet meer binnenkwam -- die krijgt nu een
    eigen medewerker met passkey (`scripts/lib/idempasskey.js`).
-6. **Het banksaldo van RTG** -- besloten (C4); eerst de handmatige bron, de plek
-   voor eigen bonnen op nul met reden, en de bon zelf als eigen bouwstuk met de
-   e-geldvraag.
+6. **Het banksaldo van RTG** -- besloten (C4). ~~De handmatige bron~~ staat (27
+   september): `kern/bankpositie.js`, per maand met afschrift en afschriftdag,
+   graad `vermoed`, en de plek voor eigen bonnen op nul met reden. Nog te doen: de
+   bon zelf als eigen bouwstuk met de e-geldvraag, en liquiditeit en runway, die een
+   register van de korte verplichtingen van RTG nodig hebben.
 7. **Een weg van een betaalde pas naar gast** -- besloten (C5); drie wegen, de
    automatische dicht tot de eigenaar een regel aanzet.
 8. **Een herkomstkanaal bij aanmelding** -- besloten (C6); daarna pas CAC.

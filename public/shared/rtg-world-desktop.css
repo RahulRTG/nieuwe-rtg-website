@@ -21,7 +21,7 @@ body[data-rtg-desktop] .wd-shell [hidden]{display:none!important}
   body[data-rtg-desktop] .rtg-edge-state{margin-inline-start:auto}
   body[data-rtg-desktop] .rtg-edge-mark::after{font:400 1rem/1.2 Inter,sans-serif}
   body[data-rtg-desktop] .reisapp{max-width:none!important;width:auto!important;padding-inline:0!important}
-  body[data-rtg-desktop] .wd-shell{display:grid;grid-template-columns:216px minmax(0,1fr) 280px;align-items:start;gap:24px;max-width:1840px;width:calc(100% - 80px);margin:24px auto 120px;padding:0;isolation:isolate}
+  body[data-rtg-desktop] .wd-shell{display:grid;grid-template-columns:216px minmax(0,1fr) 280px;align-items:start;gap:24px;max-width:1840px;width:calc(100% - 80px);margin:24px auto 120px!important;padding:0;isolation:isolate}
   body[data-rtg-desktop] .wd-home,body[data-rtg-desktop] main.wd-home#inhoud,body[data-rtg-desktop] main.wd-home#hoofd,body[data-rtg-desktop] main.wd-home#main{grid-column:2;min-width:0;width:100%;max-width:none!important;max-height:none;margin:0!important;padding:0 .2rem .2rem!important;overflow:visible!important;box-sizing:border-box;scrollbar-width:thin;scrollbar-color:var(--wd-line) transparent}
   body[data-rtg-desktop] .living-example-photo>img{height:clamp(360px,31vw,460px);aspect-ratio:auto}
   body[data-rtg-desktop] .living-intro .momenten{padding-block:.5rem 1rem}

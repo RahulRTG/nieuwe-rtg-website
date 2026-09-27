@@ -2,27 +2,27 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-09-27",
   "gemeten": {
-    "bestanden": 2433,
-    "domeinenTotaal": 643,
-    "koopbareVormen": 604,
-    "koopbareDomeinen": 121,
+    "bestanden": 2549,
+    "domeinenTotaal": 676,
+    "koopbareVormen": 611,
+    "koopbareDomeinen": 122,
     "envelopDrempel": 8,
     "envelop": 42,
-    "veldenDomeineigen": 780,
-    "veldenNietEnvelop": 1043,
+    "veldenDomeineigen": 786,
+    "veldenNietEnvelop": 1054,
     "gelijkendeVormparen": 17,
     "werkwoordenVolledig": 2,
     "werkwoordenOveral": 0,
-    "werkwoordCombinaties": 47,
+    "werkwoordCombinaties": 46,
     "wagenVormen": 33,
     "wagenVormenUniek": 30,
     "wagenDomeinen": 22,
-    "optellingen": 118,
+    "optellingen": 119,
     "optelDomeinen": 59,
     "optelCenten": 64,
     "optelEuro": 5,
     "optelGemengd": 0,
-    "optelOnbekend": 49
+    "optelOnbekend": 50
   },
   "envelop": [
     "aantal",
@@ -73,7 +73,7 @@
     "prijs": 39,
     "beschikbaarheid": 54,
     "reserveer": 28,
-    "bevestig": 57,
+    "bevestig": 58,
     "lever": 23,
     "annuleer": 33,
     "retour": 8
@@ -1024,7 +1024,7 @@
       "bewijs": {
         "toon": "beeld",
         "prijs": "som",
-        "beschikbaarheid": "verlopen"
+        "beschikbaarheid": "lopendContract"
       },
       "telt": 3
     },
@@ -1272,6 +1272,25 @@
         "toon": "overzicht",
         "bevestig": "boek",
         "annuleer": "annuleer"
+      },
+      "telt": 3
+    },
+    {
+      "domein": "kern/vonk",
+      "heeft": {
+        "toon": true,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": true,
+        "bevestig": true,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "publiek",
+        "reserveer": "blokkeer",
+        "bevestig": "boek"
       },
       "telt": 3
     },
@@ -1597,24 +1616,6 @@
       "bewijs": {
         "toon": "jeugdbeeld",
         "annuleer": "intrek"
-      },
-      "telt": 2
-    },
-    {
-      "domein": "kern/vonk",
-      "heeft": {
-        "toon": true,
-        "prijs": false,
-        "beschikbaarheid": false,
-        "reserveer": true,
-        "bevestig": false,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "publiek",
-        "reserveer": "blokkeer"
       },
       "telt": 2
     },
@@ -2065,6 +2066,21 @@
     },
     {
       "domein": "kern/antivirus",
+      "heeft": {
+        "toon": false,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": false,
+        "bevestig": false,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {},
+      "telt": 0
+    },
+    {
+      "domein": "kern/bankpositie",
       "heeft": {
         "toon": false,
         "prijs": false,
@@ -2701,6 +2717,16 @@
       ]
     },
     {
+      "domein": "kern/magnaat-leven",
+      "plekken": 4,
+      "waar": [
+        "server/kern/magnaat-leven/geld.js",
+        "server/kern/magnaat-leven/groei.js",
+        "server/kern/magnaat-leven/volgende.js",
+        "server/kern/magnaat-leven/weergave.js"
+      ]
+    },
+    {
       "domein": "kern/rtfos",
       "plekken": 4,
       "waar": [
@@ -2735,15 +2761,6 @@
         "server/kern/gast/betalen.js",
         "server/kern/gast/foodcourt.js",
         "server/kern/gast/order.js"
-      ]
-    },
-    {
-      "domein": "kern/magnaat-leven",
-      "plekken": 3,
-      "waar": [
-        "server/kern/magnaat-leven/dag.js",
-        "server/kern/magnaat-leven/volgende.js",
-        "server/kern/magnaat-leven/weergave.js"
       ]
     },
     {

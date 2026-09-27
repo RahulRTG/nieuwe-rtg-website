@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-25T13:50:55.472Z",
-    "commit": "58fb26410",
+    "op": "2026-09-27T10:20:50.306Z",
+    "commit": "5176615d",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -119,6 +119,19 @@
       "operator": "return-weg#0",
       "gezakt": 1,
       "geprobeerd": 8
+    },
+    "accounts-requestcommit.pg.test.js": {
+      "soort": "puur",
+      "staat": "slaat zichzelf over",
+      "overgeslagen": 1
+    },
+    "accounts-transactie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/accounts/state.js",
+      "operator": "return-weg#0",
+      "gezakt": 8,
+      "geprobeerd": 6
     },
     "accounts.test.js": {
       "soort": "puur",
@@ -2946,6 +2959,13 @@
       "operator": "true->false#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "extern-afrekenen.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
     },
     "faalproefklasse.test.js": {
       "soort": "puur",

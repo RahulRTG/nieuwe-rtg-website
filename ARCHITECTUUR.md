@@ -111,7 +111,7 @@ zie §5 -- er zijn nog 243 kern-namen die meer dan één domein aanraakt.
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
 | `auth` | 20 | 6 | 8 | 52 |
-| `member` | 730 | 73 | 18 | 460 |
+| `member` | 730 | 73 | 17 | 460 |
 | `supplier` | 624 | 127 | 6 | 337 |
 | `office` | 74 | 21 | 3 | 84 |
 | `staff` | 26 | 8 | 1 | 42 |

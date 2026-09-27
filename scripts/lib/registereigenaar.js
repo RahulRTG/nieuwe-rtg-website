@@ -187,6 +187,10 @@ const EIGENAAR = {
   'BEWIJSKOSTEN.json': { soort: 'MOMENTOPNAME', schrijver: 'scripts/bewijskosten.js' },
 
   /* De lagen die in deze tak zijn gebouwd. */
+  'CONNECTION_OS.md': { soort: 'BRON',
+    waarom: 'Handmatig onderhouden bouwspecificatie en architectuurbesluiten voor Connection OS; de uitvoerbare toetsen en CONNECTION_CONSTITUTION.json leveren het afzonderlijke bewijs.' },
+  'CONNECTION_OS_FINAL.md': { soort: 'BRON',
+    waarom: 'Handmatig onderhouden finale productscope en acceptatiegrenzen voor Vonk en Rendez-vous; geen generator schrijft dit document.' },
   'IDEMIDENTITEIT.json': { schrijver: 'scripts/idemidentiteit.js' },
   'DOCTRINE.json': { schrijver: 'scripts/doctrine.js' },
   'VERBAND.json': { schrijver: 'scripts/verband.js' },

@@ -3,20 +3,20 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-09-27T00:47:51.278Z",
-  "commit": "dc946c10b",
+  "op": "2026-09-27T02:58:58.595Z",
+  "commit": "25a39ae63",
   "boomVuil": true,
-  "boomAnders": 1,
+  "boomAnders": 6,
   "instrument": "scripts/afgeleid.js",
   "node": "v24.18.0"
  },
  "gemeten": {
   "artefacten": 324,
-  "bron": 12,
+  "bron": 14,
   "afgeleid": 179,
   "fragmenten": 25,
   "momentopname": 1,
-  "onbeslist": 107,
+  "onbeslist": 105,
   "afgeleidZonderEigenaar": 2,
   "metEigenaar": 203,
   "afgeleidEigenaarHard": 177,
@@ -637,7 +637,7 @@
    "naam": "CONNECTION_CONSTITUTION.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/connection-constitution.js",
-   "graad": "gemeten",
+   "graad": "verklaard",
    "schrijvers": [
     "scripts/connection-constitution.js"
    ],
@@ -649,7 +649,7 @@
   },
   {
    "naam": "CONNECTION_OS.md",
-   "soort": "ONBESLIST",
+   "soort": "BRON",
    "eigenaar": null,
    "graad": null,
    "schrijvers": [],
@@ -661,7 +661,7 @@
   },
   {
    "naam": "CONNECTION_OS_FINAL.md",
-   "soort": "ONBESLIST",
+   "soort": "BRON",
    "eigenaar": null,
    "graad": null,
    "schrijvers": [],

@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 2086 |
 | losse beweringen (`test(...)`) | 14698 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 174 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1425 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1428 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 75 |
-| alleen in de kop *genoemd*, nog niet gemeten | 171 |
-| niets van beide | 415 |
+| alleen in de kop *genoemd*, nog niet gemeten | 169 |
+| niets van beide | 414 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -736,9 +736,9 @@ toets omvalt.
 | `kantoren.test.js` | 13 | gezakt op `liegpoort /api/` | De RTG-kantoren en de boardroom: zesentwintig afdelingskamers met echte cijfers, taken per kamer, en de boardroom die alles ziet, elke platformfunctie kan schakelen (globaal en per doelgroep, en het werkt echt: het... |
 | `kappen.test.js` | 8 | gezakt op `===->!==#0` | AFKAPPEN IS HUISHOUDEN, EN HUISHOUDEN HOORT NIET IN EEN VERZOEK. WAAROM DIT BESTAAT. |
 | `kascode-credential.pg.test.js` | 1 | genoemd | Echte PostgreSQL-proef voor de kas- en tikcode (CODECREDENTIALS.json, deuren pay.kascode_en_vooraf en pay.tikcode, control `atomic_claim`). Twee app- instances delen alleen de database: de codes leven in de... |
-| `kascode-credential.test.js` | 8 | genoemd | KAS- EN TIKCODE ALS CREDENTIAL (CODECREDENTIALS.json, deuren pay.kascode_en_vooraf en pay.tikcode). Per control van de kascode een toets op de wereld van test/lib/kaswereld.js; tik en vooraf staan in... |
-| `kascode-routes.test.js` | 2 | -- | KAS- EN TIKCODE OP EEN ECHTE SERVER (CODECREDENTIALS.json, deuren pay.kascode_en_vooraf en pay.tikcode): de uitgifte is no-store en staat buiten elke retrycache, een retry met dezelfde sleutel geeft geen code, en de... |
-| `kascode-tik-vooraf.test.js` | 7 | genoemd | DE TIKCODE EN HET VASTZETTEN (CODECREDENTIALS.json, deuren pay.tikcode en pay.kascode_en_vooraf). Zelfde wereld als test/kascode-credential.test.js (test/lib/kaswereld.js). |
+| `kascode-credential.test.js` | 8 | gezakt op `===->!==#0` | KAS- EN TIKCODE ALS CREDENTIAL (CODECREDENTIALS.json, deuren pay.kascode_en_vooraf en pay.tikcode). Per control van de kascode een toets op de wereld van test/lib/kaswereld.js; tik en vooraf staan in... |
+| `kascode-routes.test.js` | 2 | gezakt op `liegpoort /api/` | KAS- EN TIKCODE OP EEN ECHTE SERVER (CODECREDENTIALS.json, deuren pay.kascode_en_vooraf en pay.tikcode): de uitgifte is no-store en staat buiten elke retrycache, een retry met dezelfde sleutel geeft geen code, en de... |
+| `kascode-tik-vooraf.test.js` | 7 | gezakt op `===->!==#0` | DE TIKCODE EN HET VASTZETTEN (CODECREDENTIALS.json, deuren pay.tikcode en pay.kascode_en_vooraf). Zelfde wereld als test/kascode-credential.test.js (test/lib/kaswereld.js). |
 | `kassa-herhaling.test.js` | 8 | gezakt op `liegpoort /api/` | RTG Kassa: dezelfde bon twee keer versturen mag niet twee keer omzet zijn. WAAROM DEZE TOETS ER IS. |
 | `kassa-modus.test.js` | 5 | gezakt op `liegpoort /api/` | De Kassa: een kassa-app voor elke zaak, met een omschakelbare modus per sector. De werkgever kiest de modus en beheert het eigen assortiment (met prijs per stuk of per kilo); afrekenen loopt door de bestaande... |
 | `kassa-premium.test.js` | 7 | gezakt op `liegpoort /api/` | De premium-laag van De Kassa, gewoon inbegrepen: derving (verspil, breuk, eigen gebruik, repro), retour als minbon, wachtbonnen (parkeren en terughalen), korting met reden op de bon, het dagrapport en de kasopmaak. |

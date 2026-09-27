@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-27T13:56:18.282Z",
-    "commit": "43461f914",
+    "op": "2026-09-27T16:35:50.390Z",
+    "commit": "25a037ec",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 4,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -2280,6 +2280,36 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "democratie-aanval.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "democratie-afhankelijk.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "democratie-grondwet.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 3
+    },
+    "democratie.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
     },
     "demostand.test.js": {
       "soort": "server",
@@ -5391,6 +5421,13 @@
       "operator": "return-weg#1",
       "gezakt": 4,
       "geprobeerd": 13
+    },
+    "magnaatgroei.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "magnaatgroei.test.js": {
       "soort": "puur",
@@ -10989,36 +11026,6 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
-    },
-    "democratie-aanval.test.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 3,
-      "scherp": "gezakt"
-    },
-    "democratie-afhankelijk.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/bron.js",
-      "operator": "===->!==#0",
-      "gezakt": 2,
-      "geprobeerd": 1
-    },
-    "democratie-grondwet.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/bron.js",
-      "operator": "&&->||#0",
-      "gezakt": 1,
-      "geprobeerd": 3
-    },
-    "democratie.test.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 3,
-      "scherp": "gezakt"
     }
   }
 }

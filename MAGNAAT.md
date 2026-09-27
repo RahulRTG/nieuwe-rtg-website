@@ -645,6 +645,44 @@ Wie van zijn eigen bedrijf leeft, krijgt drie nieuwe deuren. Voor die dag zijn z
 - `test/magnaatgroei.test.js` (7 toetsen).
 - `test/magnaatgroei.e2e.js`: op een telefoon toont Mijn bedrijf het blok Groeien, en een overname gaat naar de echte server, die hem met reden weigert.
 
+### NA 1.0: samen in een Oudwijk (27 september 2026)
+
+Twee tot vier spelers delen een stad. Ieder houdt zijn eigen leven en zijn eigen grootboek; wat ze delen is de markt. Dit is de keuze van de eigenaar uit drie vormen:
+- **gekozen:** samen in één Oudwijk;
+- **niet gekozen:** samen één bedrijf, en handel tussen spelers.
+
+Het tempo is "de volgende dag als iedereen klaar is", en je komt binnen met een code uit je eigen kring. De module is `stad.js`, en de routes staan in `server/routes/magnaatstad.js`.
+
+**Hoe het werkt:**
+- **Een stad maken.** Wie een stad maakt, kiest de moeilijkheid en waar iedereen begint, en krijgt een code van zes tekens.
+- **Meedoen.** Met die code doe je mee, maar alleen zolang de stad nog wacht. Er kunnen hooguit vier spelers in.
+- **Beginnen.** Wie de stad maakte, zet hem in gang, vanaf twee spelers. Dan krijgt iedereen een nieuw leven met hetzelfde begin.
+- **De dag.** De echte klok telt niet. Wie zijn dag afsluit, wacht op de rest, en de laatste die klaar is, zet de stad voor iedereen een dag verder. Iedereen krijgt daarvan een seintje; de schermen verversen zichzelf.
+- **De markt.** De andere spelers nemen de plekken van verzonnen concurrenten in (`bereik.js`, de kring). Een speler:
+  - verkoopt tegen zijn eigen prijs, en alleen als hij handelt;
+  - zit waar zijn bedrijf zit;
+  - heet bij klanten zoals zijn onderneming;
+  - verliest een klant aan jou als hij die week echt te laat leverde.
+- **Overnemen.** Een andere speler neem je niet over; met mensen concurreer je.
+- **Vertrekken en het einde.**
+  - Wie vertrekt, laat de rest niet wachten.
+  - Na 112 dagen is de stad afgelopen.
+  - Beginnen, versnellen en opnieuw beginnen kunnen in een stad niet.
+
+**De grenzen:**
+- Er gaat geen geld tussen spelers, dus het grootboek verandert niet.
+- Een sessiesleutel verlaat `stad.js` nooit: een speler heet zijn codenaam, ook in het seintje.
+- Er is geen ranglijst. Aan het eind staan de verhalen naast elkaar in de volgorde waarin spelers binnenkwamen, niet op winst.
+- Een stad is een potje. 28 dagen na afloop verdwijnt hij, met de levens erin; het journaal blijft staan, want een journaal groeit alleen en kent geen leden. Daarom mag iedereen meespelen, ook onder de 18.
+
+**Een vondst onderweg.** `stad/staat` stond eerst als "zelfde verzoek" in het idempotentieregister. Een speler die ververste nadat een ander de dag afsloot, kreeg dan vijf seconden lang het oude antwoord terug, en dat is in een gedeelde stad juist het moment waarop je ververst. De route verandert niets en heet daarom `leest`.
+
+**Wat het niet bewijst.** De gelijktijdigheid is net als in V5 alleen binnen één proces beproefd: twee spelers die op exact hetzelfde moment als laatste klaar zijn, worden door Node na elkaar afgehandeld. Met meerdere serverprocessen hoort de stad onder een slot, zoals de Teamkamers dat met `bewerkCollectie` doen.
+
+**De toetsen:**
+- `test/magnaatstad.test.js` (8 toetsen, waarvan één tegen een echte server over alle zes routes).
+- `test/magnaatstad.e2e.js`: twee telefoons, een stad maken, meedoen met de code, en samen een dag verder via het seintje van de server.
+
 ---
 
 ## 8. De regels

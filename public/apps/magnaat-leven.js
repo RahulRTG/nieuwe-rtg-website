@@ -19,12 +19,17 @@
   var duur = function (m) { var u = Math.floor(m / 60), r = m % 60; return (u ? u + 'u' : '') + (r ? (u ? ' ' : '') + r + 'm' : u ? '' : '0m'); };
   var LEVEN = null, KEUZE = null, KLOK = null;
 
+  /* Loopt er een gedeelde stad (./magnaat-leven-stad.js), dan gaat alles naar de stad, en komt het leven terug naast de stand van de stad. */
+  var STAD = function () { return !!(window.RTGMagnaatStad && window.RTGMagnaatStad.loopt()); };
   function vraag(pad, body) {
-    return fetch('/api/member/magnaat/leven/' + pad, { method: 'POST',
+    var stad = STAD();
+    return fetch('/api/member/magnaat/' + (stad ? 'stad/' : 'leven/') + pad, { method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN }, body: JSON.stringify(body || {}) })
       .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) {
         if (!r.ok) throw new Error(d.error || 'Magnaat kon dit niet doen.');
-        return d;
+        if (!stad) return d;
+        window.RTGMagnaatStad.zet(d.stad);
+        return d.leven || vraag('staat');
       }); });
   }
   function meldFout(t) { var e = q('#vnFout'); e.textContent = t; e.hidden = !t; }
@@ -46,6 +51,7 @@
 
   function klok(s) {
     clearTimeout(KLOK);
+    if (STAD()) { q('#vnKlok').textContent = 'Week ' + s.week + ' · nog ' + duur(s.vrijVandaag) + ' vrij vandaag · de dag gaat door als iedereen hem heeft afgesloten'; return; }
     KLOK = setTimeout(laad, Math.max(1000, s.volgendeDagOver + 500));
     var t = q('#vnTempo');
     if (t && !t.options.length) t.innerHTML = s.tempo.standen.map(function (x) { return '<option value="' + esc(x) + '">' + esc(x) + '</option>'; }).join('');
@@ -132,5 +138,6 @@
     var gekozen = LEVEN.vandaag.volgende[KEUZE];
     if (gekozen) doe(lichaam(gekozen));
   });
+  window.RTGMagnaatLeven = { laad: laad };
   laad();
 }());

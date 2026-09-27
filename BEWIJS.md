@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2075 bestanden en 14650 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2076 bestanden en 14654 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2075 |
-| losse beweringen (`test(...)`) | 14650 |
+| toetsbestanden | 2076 |
+| losse beweringen (`test(...)`) | 14654 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 174 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1419 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1421 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 75 |
-| alleen in de kop *genoemd*, nog niet gemeten | 169 |
+| alleen in de kop *genoemd*, nog niet gemeten | 168 |
 | niets van beide | 412 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1813 bestanden, 14188 beweringen.
+1814 bestanden, 14192 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -474,6 +474,7 @@ toets omvalt.
 | `fonds.test.js` | 9 | gezakt op `liegpoort /api/` | Sociale afdracht: van elke bevestigde maandbetaling gaat 30% (ex btw) als twee formele claims naar 20% lokaal en 10% RTFoundation. We toetsen drie lagen: 1. |
 | `foodcourt.test.js` | 3 | gezakt op `liegpoort /api/` | De RTG Food Court (kern/foodcourt.js): alle restaurants op een rij, in de stijl van een reserveerplatform. Overzicht met keuken/prijs/ledenvoordeel, vrije tijdsloten per datum en gezelschap, en reserveren via... |
 | `foundation-geld-later.test.js` | 5 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `foundation-gezinstoken-productie.test.js` | 4 | gezakt op `liegpoort /api/` | De niet-gemigreerde gezins- en lesdragers zijn in productie DICHT, ook met een geslaagd extern Foundation-dossier; en de Zaakdoos-kloon (de hele db.data) is in productie dicht, met of zonder sleutel.... |
 | `foundation-gezondheid-welzijn.test.js` | 5 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `foundation-hulp-zorg.test.js` | 4 | -- | De Hulp & Zorg-voorzijde mag warm en persoonlijk ogen, maar nooit een zorgverlener, dossier of toestemming verzinnen. Deze toets bewaakt de drie getekende schermen en hun echte databronnen. |
 | `foundation-leren-groei.test.js` | 5 | -- | Leren & Groei toont de bestaande leerroute in de drie goedgekeurde schermen. De toets bewaakt dat vorm nooit wordt verward met bewijs. |
@@ -483,7 +484,7 @@ toets omvalt.
 | `foundation-persoonscodes.pg.test.js` | 1 | genoemd | Echte PostgreSQL-proef voor Foundation-persoonscodes. Twee onafhankelijke contexts delen alleen de database en raken tegelijk dezelfde `rtfos`-rij. |
 | `foundation-persoonscodes.test.js` | 13 | genoemd | De drie Foundation-persoonsportalen delen een codelevenscyclus. Deze toets bewaakt zowel de motor als de echte routes: verval, intrekking, rotatie en gebruik zijn geen UI-belofte, maar sluiten de serverdeur. |
 | `foundation-premium-ui.test.js` | 5 | -- | De Foundation is één ervaring: elk los hulpmiddel, School, Klas en Campus draagt dezelfde premiumlaag. Deze toets voorkomt dat een nieuwe pagina als visueel eiland verschijnt of dat mobiel opnieuw buiten beeld groeit. |
-| `foundation-productiepoort.test.js` | 11 | genoemd | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `foundation-productiepoort.test.js` | 11 | gezakt op `true->false#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `foundation-reisrem.test.js` | 3 | genoemd | DE REIS-AANVRAAG HEEFT EEN REM. WAT ER MIS WAS. |
 | `foundation-rest.test.js` | 4 | gezakt op `liegpoort /api/` | DE LAATSTE FOUNDATION-ROUTES -- 5 endpoints, twee heel verschillende kanten. Hiermee is de foundation-groep uit de dekkingsmeting afgewerkt. |
 | `foundation-samen-thuis.test.js` | 5 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |

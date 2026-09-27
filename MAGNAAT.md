@@ -585,6 +585,34 @@ De balans van 1.0 is afgestemd op een automatische speler. Of dag 97 op normaal 
 
 **Wat hiermee nog niet gebeurt:** de balans verschuiven. Dat is een besluit op grond van wat er binnenkomt, en de getallen staan klaar in de tabel MOEILIJKHEID van `regels.js`.
 
+### NA 1.0: waar je begint (27 september 2026)
+
+Niet iedereen begint in de keuken. Op dag 1 kies je, naast de moeilijkheid, ook waar je begint. Later kan dat alleen door opnieuw te beginnen, en dan kies je het onder Wereld. De tabel staat in `regels.js` (STARTPOSITIES).
+
+| | De keuken | Student | Een kleine erfenis |
+|---|---|---|---|
+| Baan | 24 uur, Brasserie De Haven | 20 uur, Supermarkt De Linde | 16 uur, Bakkerij Van Dam |
+| Kamer | gewone huur | studentenkamer (€ 420 per vier weken op normaal) | gewone huur |
+| Op de bank bovenop het startgeld | niets | niets | € 8.000 van je tante |
+| Eigen vaste last | geen | aflossing studieschuld, € 60 per vier weken, een week uit te stellen | geen |
+
+**Wat een startpositie verschuift, en wat niet:**
+- Een startpositie verschuift drie dingen: de baan, het geld op de bank en eventueel een eigen vaste last.
+- De keten zelf verandert niet.
+- De drempel om zelfstandig te worden rekent met het loon van *deze* baan. Wie minder verdient, hoeft minder te vervangen, maar heeft ook minder om op terug te vallen.
+- De studieschuld is een echte terugkerende betaling door het grootboek, naar de tegenpartij `financier`.
+- Het geld van de erfenis zit in de openingsboeking.
+- Een oude save zonder startpositie is de keuken.
+
+**Wat de automatische speler zegt:**
+- Het einde ligt voor alle drie op dezelfde dag, rond 97 op normaal. Wat daar bindt, is hoe lang je bedrijf moet bestaan.
+- Het verschil zit in het begin en in de fouten: slecht spel op zwaar is in de keuken en als student rond dag 92 voorbij, met een erfenis pas rond dag 120.
+- Een eerste versie van de student (12 uur, gewone huur) verloor als hij *niets* deed. Daarmee brak de belofte van 1.0 dat niets doen geen verlies is. Daarom werkt de student nu 20 uur en heeft hij een studentenkamer. `test/magnaatstart.test.js` houdt die belofte per startpositie vast.
+
+**De toetsen:**
+- `test/magnaatstart.test.js` (8 toetsen).
+- `test/magnaatstart.e2e.js`: op een telefoon kies je een erfenis op dag 1, en daarna begin je onder Wereld opnieuw als student.
+
 ---
 
 ## 8. De regels

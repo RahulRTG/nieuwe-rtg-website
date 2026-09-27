@@ -2,24 +2,24 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-09-27",
   "gemeten": {
-    "bestanden": 2425,
-    "domeinenTotaal": 637,
-    "koopbareVormen": 601,
-    "koopbareDomeinen": 120,
+    "bestanden": 2561,
+    "domeinenTotaal": 679,
+    "koopbareVormen": 612,
+    "koopbareDomeinen": 123,
     "envelopDrempel": 8,
     "envelop": 42,
-    "veldenDomeineigen": 781,
-    "veldenNietEnvelop": 1043,
+    "veldenDomeineigen": 786,
+    "veldenNietEnvelop": 1054,
     "gelijkendeVormparen": 17,
-    "werkwoordenVolledig": 1,
+    "werkwoordenVolledig": 2,
     "werkwoordenOveral": 0,
-    "werkwoordCombinaties": 46,
+    "werkwoordCombinaties": 45,
     "wagenVormen": 33,
     "wagenVormenUniek": 30,
     "wagenDomeinen": 22,
-    "optellingen": 119,
-    "optelDomeinen": 59,
-    "optelCenten": 64,
+    "optellingen": 120,
+    "optelDomeinen": 60,
+    "optelCenten": 65,
     "optelEuro": 5,
     "optelGemengd": 0,
     "optelOnbekend": 50
@@ -69,13 +69,13 @@
     "wat"
   ],
   "perWerkwoord": {
-    "toon": 92,
+    "toon": 93,
     "prijs": 39,
     "beschikbaarheid": 54,
     "reserveer": 28,
-    "bevestig": 57,
-    "lever": 21,
-    "annuleer": 31,
+    "bevestig": 59,
+    "lever": 24,
+    "annuleer": 34,
     "retour": 8
   },
   "overalAanwezig": [],
@@ -96,11 +96,35 @@
         "toon": "aboBeeld",
         "prijs": "prijsUit",
         "beschikbaarheid": "magVerkopen",
-        "reserveer": "pendelReserveer",
+        "reserveer": "claim",
         "bevestig": "aboKoop",
         "lever": "leveranciers",
         "annuleer": "mobAnnuleer",
         "retour": "storingTeruggave"
+      },
+      "telt": 8
+    },
+    {
+      "domein": "kern/pay",
+      "heeft": {
+        "toon": true,
+        "prijs": true,
+        "beschikbaarheid": true,
+        "reserveer": true,
+        "bevestig": true,
+        "lever": true,
+        "annuleer": true,
+        "retour": true
+      },
+      "bewijs": {
+        "toon": "kaart",
+        "prijs": "koppelKosten",
+        "beschikbaarheid": "geefVrij",
+        "reserveer": "kasVastleg",
+        "bevestig": "boek",
+        "lever": "uitgeef",
+        "annuleer": "intrekken",
+        "retour": "terugGave"
       },
       "telt": 8
     },
@@ -147,29 +171,6 @@
         "bevestig": "akkoord",
         "lever": "lever",
         "annuleer": "betaalWatVervalt"
-      },
-      "telt": 7
-    },
-    {
-      "domein": "kern/pay",
-      "heeft": {
-        "toon": true,
-        "prijs": true,
-        "beschikbaarheid": true,
-        "reserveer": true,
-        "bevestig": true,
-        "lever": false,
-        "annuleer": true,
-        "retour": true
-      },
-      "bewijs": {
-        "toon": "kaart",
-        "prijs": "koppelKosten",
-        "beschikbaarheid": "eisVrijgegeven",
-        "reserveer": "kasVastleg",
-        "bevestig": "boek",
-        "annuleer": "verzoekIntrek",
-        "retour": "terugGave"
       },
       "telt": 7
     },
@@ -238,6 +239,28 @@
         "reserveer": "careVastleg",
         "bevestig": "boekBehandelingActie",
         "annuleer": "careAnnuleer"
+      },
+      "telt": 6
+    },
+    {
+      "domein": "kern/command",
+      "heeft": {
+        "toon": true,
+        "prijs": false,
+        "beschikbaarheid": true,
+        "reserveer": true,
+        "bevestig": true,
+        "lever": true,
+        "annuleer": true,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "beeld",
+        "beschikbaarheid": "lopende",
+        "reserveer": "claims",
+        "bevestig": "bevestig",
+        "lever": "uitgifteFout",
+        "annuleer": "vervaltVan"
       },
       "telt": 6
     },
@@ -629,6 +652,26 @@
       "telt": 5
     },
     {
+      "domein": "bedrijf",
+      "heeft": {
+        "toon": true,
+        "prijs": true,
+        "beschikbaarheid": true,
+        "reserveer": false,
+        "bevestig": false,
+        "lever": false,
+        "annuleer": true,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "beeld",
+        "prijs": "som",
+        "beschikbaarheid": "open",
+        "annuleer": "intrek"
+      },
+      "telt": 4
+    },
+    {
       "domein": "kern/assets",
       "heeft": {
         "toon": true,
@@ -665,26 +708,6 @@
         "beschikbaarheid": "maakOpenstaandOverzicht",
         "bevestig": "bevestig",
         "retour": "terugboeken"
-      },
-      "telt": 4
-    },
-    {
-      "domein": "kern/command",
-      "heeft": {
-        "toon": true,
-        "prijs": false,
-        "beschikbaarheid": true,
-        "reserveer": true,
-        "bevestig": true,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "beeld",
-        "beschikbaarheid": "lopende",
-        "reserveer": "claims",
-        "bevestig": "bevestig"
       },
       "telt": 4
     },
@@ -989,25 +1012,6 @@
       "telt": 4
     },
     {
-      "domein": "bedrijf",
-      "heeft": {
-        "toon": true,
-        "prijs": true,
-        "beschikbaarheid": true,
-        "reserveer": false,
-        "bevestig": false,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "beeld",
-        "prijs": "som",
-        "beschikbaarheid": "open"
-      },
-      "telt": 3
-    },
-    {
       "domein": "kern/aanmeldingen",
       "heeft": {
         "toon": true,
@@ -1022,7 +1026,7 @@
       "bewijs": {
         "toon": "beeld",
         "prijs": "som",
-        "beschikbaarheid": "verlopen"
+        "beschikbaarheid": "lopendContract"
       },
       "telt": 3
     },
@@ -1099,6 +1103,25 @@
         "toon": "bureauOverzicht",
         "beschikbaarheid": "caseOpen",
         "annuleer": "caseIntrek"
+      },
+      "telt": 3
+    },
+    {
+      "domein": "kern/cadeaukaart",
+      "heeft": {
+        "toon": true,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": false,
+        "bevestig": false,
+        "lever": true,
+        "annuleer": true,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "kaartIntrek",
+        "lever": "uitgeef",
+        "annuleer": "kaartIntrek"
       },
       "telt": 3
     },
@@ -1251,6 +1274,25 @@
         "toon": "overzicht",
         "bevestig": "boek",
         "annuleer": "annuleer"
+      },
+      "telt": 3
+    },
+    {
+      "domein": "kern/vonk",
+      "heeft": {
+        "toon": true,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": true,
+        "bevestig": true,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "publiek",
+        "reserveer": "blokkeer",
+        "bevestig": "boek"
       },
       "telt": 3
     },
@@ -1576,24 +1618,6 @@
       "bewijs": {
         "toon": "jeugdbeeld",
         "annuleer": "intrek"
-      },
-      "telt": 2
-    },
-    {
-      "domein": "kern/vonk",
-      "heeft": {
-        "toon": true,
-        "prijs": false,
-        "beschikbaarheid": false,
-        "reserveer": true,
-        "bevestig": false,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "publiek",
-        "reserveer": "blokkeer"
       },
       "telt": 2
     },
@@ -1924,6 +1948,23 @@
       "telt": 1
     },
     {
+      "domein": "kern/rtgboek",
+      "heeft": {
+        "toon": false,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": false,
+        "bevestig": true,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "bevestig": "boek"
+      },
+      "telt": 1
+    },
+    {
       "domein": "kern/rtgone-projecten",
       "heeft": {
         "toon": false,
@@ -2044,6 +2085,21 @@
     },
     {
       "domein": "kern/antivirus",
+      "heeft": {
+        "toon": false,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": false,
+        "bevestig": false,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {},
+      "telt": 0
+    },
+    {
+      "domein": "kern/bankpositie",
       "heeft": {
         "toon": false,
         "prijs": false,

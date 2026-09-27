@@ -57,6 +57,9 @@ const SLEUTELS = {
      hetzelfde afschrift is een keer (kern/bankpositie.js geeft ongewijzigd terug). */
   'POST /api/office/bankpositie': { leest: true },
   'POST /api/office/bankpositie/zet': { zelfdeVerzoek: true },             // maand + saldo + afschrift
+  /* Naar gast (besluit C5, server/routes/naargast.js): de standcontrole weet het al. */
+  'POST /api/office/pas/gast/regels': { leest: true },
+  'POST /api/office/pas/gast/regels/zet': { zelfdeVerzoek: true },          // regel + aan + getal
   /* Het kantoorstuur (besluit C2): het model mag alleen de drie tonen-paden
      lezen, maar een tweede vraag is een tweede gesprek met een nieuw antwoord. */
   'POST /api/office/doe': { nietIdempotent: true,

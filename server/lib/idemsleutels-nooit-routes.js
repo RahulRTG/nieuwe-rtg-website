@@ -104,8 +104,6 @@ module.exports = ({
     'na het besluit ligt er geen wijzigingsverzoek meer; een afgespeeld succes zou een tweede keer personen en bedrag lijken te verzetten',
   'POST /api/office/reisbureau/afzeggen':
     'zelfde reden als de ledenkant, plus: een herhaling zou het lid een tweede melding sturen over dezelfde afzegging',
-  'POST /api/reisbureau/thuis': 'een reis die thuis is, komt niet nog eens thuis; de weigering is het antwoord',
-  'POST /api/office/reisbureau/thuis': 'zelfde reden als de ledenkant',
   /* Het lid zegt zijn eigen lidmaatschap op (kern/aanmeldingen/
      lidabonnement-opzeg.js). Zelfde grond als de reisnazorg hierboven: de route
      WEET zelf dat ze het al gedaan heeft -- het contract staat dan op OPZEGGEND
@@ -130,4 +128,5 @@ module.exports = ({
 Object.assign(module.exports, require('./idemsleutels-nooit-carriere'));
 Object.assign(module.exports, require('./idemsleutels-nooit-ledger'));
 Object.assign(module.exports, require('./idemsleutels-nooit-vakschema'));
+Object.assign(module.exports, require('./idemsleutels-nooit-lid'));
 Object.freeze(module.exports);

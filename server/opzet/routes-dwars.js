@@ -85,7 +85,6 @@ module.exports = function hangDwarseRoutersOp(grens) {
   /* De bedrijfsmaten (server/kern/bedrijfsmaat/), na de economielaag: elke maat
      draagt een economische wereld (besluit C1). */
   require('../routes/bedrijfsmaat')(grens('bedrijfsmaat'));
-  // van een betaalde pas naar gast (besluit C5), naast de bedrijfsmaten die churn meten
   require('../routes/naargast')(grens('naargast'));
   require('../routes/rtmail')(grens('rtmail'));
   require('../routes/rtmail-vak')(grens('rtmail-vak'));

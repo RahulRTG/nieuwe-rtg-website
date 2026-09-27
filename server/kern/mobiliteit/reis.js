@@ -90,7 +90,7 @@ module.exports = (ctx) => {
       if (k.error) { await draaiTerug(gemaakteRitten); return k; }
       r.etappes.push({ wijze: 'ov', lijnId: e.lijnId, lijnNaam: e.lijnNaam, vervoerder: e.vervoerder,
         van: e.van, naar: e.naar, km: e.km, minuten: e.minuten, prijs: k.kaartje.prijs,
-        kaartje: k.kaartje.id, betaald: true });   // het id, nooit de code
+        kaartje: k.kaartje.id, betaald: true });
     }
 
     // de looptappes staan er ook in: een reisoverzicht zonder het stuk lopen klopt niet

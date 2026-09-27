@@ -935,11 +935,8 @@ console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoor
     ['/api/member/sport/tickets', 'je eigen ticketlijst opvragen'],
     ['/api/muziek/bestand-ticket', 'een tijdelijke luisterkaart voor muziek die al in RTG is gepubliceerd; "ticket" is hier een cryptografische toegangssleutel en geen aankoop bij een derde'],
     ['/api/member/boardroom/logboek', 'je eigen boardroom-journaal ("logboek" bevat toevallig "boek"); geen derde partij'],
-    /* Dezelfde valse vriend, nu bij De Rechterhand. Het REISBOEK is uw eigen
-       reisdagboek en het LOGBOEK het onderhoudsboek van uw eigen jacht of
-       oldtimer: eigen dossiers, geen bestelling en geen partij tegenover u.
-       Ze werden zichtbaar toen de rechterhand-paden voluit kwamen te staan
-       (regel 45); daarvoor zag ook deze regel ze niet. */
+    /* Dezelfde valse vriend bij De Rechterhand: REISBOEK en LOGBOEK zijn eigen
+       dossiers, geen bestelling en geen partij tegenover u. */
     ['/api/member/rechterhand/reisboek', 'uw eigen reisdagboek ("reisboek" bevat toevallig "boek"); geen derde partij'],
     ['/api/member/rechterhand/logboek', 'het onderhoudsboek van uw eigen bezit; geen derde partij'],
     ['/api/member/rechterhand/logboek/object', 'idem: een eigen object in het eigen logboek'],
@@ -954,6 +951,8 @@ console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoor
        gestolen code dichtzetten mag geen drempel hebben. */
     ['/api/order/afhaalcode', 'de afhaal-QR van een bestelling die al langs de poort ging; de zaak krijgt hier niets nieuws'],
     ['/api/order/afhaalcode/intrek', 'een eigen afhaalcode intrekken; beveiliging hoort geen drempel te hebben'],
+    ['/api/ticket/toon', 'de entreecode van een eigen ticket dat al langs de poort ging; de zaak krijgt niets nieuws'],
+    ['/api/mob/kaart/toon', 'idem: de code van een eigen vervoerbewijs'],
     /* De winkel van de RTFoundation. Deze route KWAM eerst door de poort met
        soort 'bestelling', en dat was fout op een manier die het waard is op te
        schrijven: die soort vraagt een telefoonnummer met de reden "de zaak moet

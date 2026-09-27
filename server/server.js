@@ -1726,9 +1726,14 @@ const {
    voorstellen op verkoop + mise en place + verwachte drukte, en het AI-week-
    rooster; de gemachtigde (manager) keurt goed, past aan of wijst af. */
 const { maakAgent } = require('./kern/agent');
+/* De verzuimlaag (kern.payrollOS, kernlaag2) bestaat pas ver hierna; de twee
+   autoplanners lezen hem daarom laat, via kern. Ontbreekt hij, dan is het
+   antwoord null en zeggen de planners dat ze niet konden nakijken. */
+const verzuimLezer = (code, staffId, van, tot) =>
+  (kern.payrollOS && kern.payrollOS.verzuim) ? kern.payrollOS.verzuim.voorPlanning(code, staffId, van, tot) : null;
 const { agentKoppel, agentPubliek, agentVoorstel, agentBeslis, roosterVoorstel, roosterBeslis } = maakAgent({
   db, crypto, findSupplier, notifySupplier, ghBijbestelVoorstel, ghPlaatsBestelling,
-  accounts, weekdagFactor, SHIFT_NAMES, save, logActivity
+  accounts, weekdagFactor, SHIFT_NAMES, save, logActivity, verzuimLezer
 });
 
 /* Mode-bezorging (kern/modebezorg.js): een modewinkel zet in een tik een slimme,
@@ -1793,7 +1798,7 @@ const {
   bevMeldIncident, bevBeslisIncident, bevSos, bevCommand,
   // de sleuf waar opzet/plaatsbronnen.js de plaatslaag in hangt (late binding)
   bevKoppelPlaats
-} = maakBeveiliging({ db, save, crypto, accounts, findSupplier, notify, notifySupplier, sseToSupplier, sseToOffice, logActivity, haversine });
+} = maakBeveiliging({ db, save, crypto, accounts, findSupplier, notify, notifySupplier, sseToSupplier, sseToOffice, logActivity, haversine, verzuimLezer });
 
 /* De idempotentie-administratie van de betaal-naad (server/betaal.js) durable
    maken: dezelfde idempotentiesleutel geeft ook NA een herstart hetzelfde

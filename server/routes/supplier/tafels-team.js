@@ -96,6 +96,13 @@ app.post('/api/supplier/leave/decide', supplierAuth, (req, res) => {
   if (v.status !== 'nieuw') return res.status(409).json({ error: 'Deze aanvraag is al behandeld.' });
   v.status = req.body.action === 'goedkeuren' ? 'goedgekeurd' : 'afgewezen';
   v.decidedBy = req.actor.name;
+  /* De aanvraag ging bij het indienen al als 'vakantie' naar de verzuimlaag
+     (routes/staff/dienst.js). Afgewezen verlof is geen verlof: zonder deze regel
+     rekende de loonrun het toch als vakantie, en hield het rooster hem vrij. */
+  if (v.status === 'afgewezen' && v.soort === 'verlof' && typeof kern.verlofAfgewezen === 'function') {
+    const w = kern.verlofAfgewezen(req.supplier.code, v.staffId, v.van);
+    if (w && w.error && w.status !== 404) console.error('[verzuim] afgewezen verlof niet geschrapt:', w.error);
+  }
   save();
   logActivity(req.supplier.code, req.actor, (v.status === 'goedgekeurd' ? 'keurde verlof goed van ' : 'wees verlof af van ') + v.name);
   sseToSupplier(req.supplier.code, 'sync', { scope: 'verlof' });

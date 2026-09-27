@@ -12,7 +12,8 @@ const { dagContext } = require('./context');
    zelf. */
 const handeling = require('../opzet/handeling');
 
-function maakAgent({ db, crypto, findSupplier, notifySupplier, ghBijbestelVoorstel, ghPlaatsBestelling, accounts, weekdagFactor, SHIFT_NAMES, save, logActivity }) {
+function maakAgent({ db, crypto, findSupplier, notifySupplier, ghBijbestelVoorstel, ghPlaatsBestelling, accounts, weekdagFactor, SHIFT_NAMES, save, logActivity, verzuimLezer }) {
+  const verzuim = require('./verzuimrooster').maakVerzuimRooster(verzuimLezer);
   const agentVan = s => {
     const a = (s.agent = s.agent || { partnerCode: null, auto: false, voorstellen: [], rooster: null });
     // een zaak kan meerdere groothandels hebben; oude databases (een enkele
@@ -124,20 +125,30 @@ function maakAgent({ db, crypto, findSupplier, notifySupplier, ghBijbestelVoorst
     const staff = accounts.listStaff(s.code).map(accounts.publicStaff);
     if (!staff.length) return { status: 409, error: 'Geen personeel gevonden.' };
     const days = [];
+    const afwezig = new Set(); let onbekend = 0;
     for (let d = 0; d < 7; d++) {
       const date = new Date(Date.now() + d * 86400000);
       const [factor, label] = weekdagFactor(date);
       const druk = factor >= 1.1;
+      const datum = date.toISOString().slice(0, 10);
       const rows = staff.map((m, i) => {
+        // wie verzuim of verlof heeft, staat vrij (kern/verzuimrooster.js)
+        const v = verzuim.stand(s.code, m.id, datum);
+        if (v.stand === 'onbekend') onbekend++;
+        if (v.stand === 'afwezig') {
+          afwezig.add(m.id);
+          return { id: m.id, name: m.name, role: m.role, shift: SHIFT_NAMES[2], afwezig: v.wat, inzetbaarheid: v.inzetbaarheid };
+        }
         let shift;
         if (m.role === 'manager') shift = SHIFT_NAMES[0];
         else if (!druk && (i + d) % Math.max(2, staff.length) === 0) shift = SHIFT_NAMES[2];
         else shift = SHIFT_NAMES[(i + d) % 2];
         return { id: m.id, name: m.name, role: m.role, shift };
       });
-      days.push({ date: date.toISOString().slice(0, 10), label, factor, staff: rows });
+      days.push({ date: datum, label, factor, staff: rows });
     }
-    agentVan(s).rooster = { days, status: 'voorstel', at: new Date().toISOString() };
+    agentVan(s).rooster = { days, status: 'voorstel', at: new Date().toISOString(),
+      verzuimNagekeken: onbekend === 0, verzuim: verzuim.uitleg(afwezig.size, onbekend) || null };
     save();
     return { status: 200, ok: true, rooster: agentVan(s).rooster };
   }

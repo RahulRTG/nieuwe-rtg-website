@@ -88,8 +88,13 @@ function maakVerzuim({ opslag, save, nu }) {
     return { ok: true, melding: m };
   }
 
-  const inPeriode = (code, staffId, van, tot) => rijVan(code, staffId)
-    .filter(m => m.van <= tot && (!m.tot || m.tot >= van));
+  /* LEZEN SCHEPT NIETS. rijVan() legt een lege rij aan, en dat hoort bij
+     schrijven; een rooster dat voor elke medewerker vraagt of hij er is, zou
+     anders voor iedereen een lege verzuimrij achterlaten. */
+  const inPeriode = (code, staffId, van, tot) => {
+    const rij = bak()[sleutel(code, staffId)];
+    return (Array.isArray(rij) ? rij : []).filter(m => m.van <= tot && (!m.tot || m.tot >= van));
+  };
 
   /* Wat iemand nog wel kan, bijgesteld terwijl het verzuim loopt. Ziek zijn is
      geen toestand die op dag een vaststaat: na een week kan iemand aangepast
@@ -139,7 +144,23 @@ function maakVerzuim({ opslag, save, nu }) {
     });
   }
 
-  return { meld, zetInzetbaarheid, voorPlanning, voorPayroll, keur, SOORTEN, INZETBAARHEID };
+  /* Een verlofAANVRAAG staat hier al voordat iemand erop heeft beslist, zodat de
+     planning ziet wat er aankomt. Wordt hij afgewezen, dan is er geen verlof
+     geweest: de melding gaat weg, anders rekent de loonrun vakantie over dagen
+     waarop iemand gewoon werkte en houdt een rooster hem ten onrechte vrij.
+     Alleen niet-medische soorten: een ziekmelding wordt niet afgewezen. */
+  function schrap(code, staffId, van, soort) {
+    if (!SOORTEN[soort] || SOORTEN[soort].medisch) return { status: 400, error: 'Alleen verlof kan worden geschrapt.' };
+    const rij = bak()[sleutel(code, staffId)];
+    const id = 'vz_' + String(staffId) + '-' + String(van).replace(/-/g, '') + '-' + soort;
+    const idx = Array.isArray(rij) ? rij.findIndex(x => x.id === id) : -1;
+    if (idx < 0) return { status: 404, error: 'Deze verlofmelding staat er niet.' };
+    rij.splice(idx, 1);
+    save();
+    return { ok: true };
+  }
+
+  return { meld, zetInzetbaarheid, voorPlanning, voorPayroll, schrap, keur, SOORTEN, INZETBAARHEID };
 }
 
 module.exports = { maakVerzuim, keur, SOORTEN, INZETBAARHEID };

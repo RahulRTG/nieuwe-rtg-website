@@ -497,7 +497,13 @@ hij focus krijgt). De echte oorzaak was rekenkunde:
 
 Die laatste meting vond vier echte defecten, alle vier gerepareerd en bewaakt
 door `test/edge-enige-balk.e2e.js` (elke reparatie teruggedraaid laat zijn
-deeltoets zakken). Het besluit van de eigenaar was **de Edge is de enige balk**:
+deeltoets zakken). Het besluit van de eigenaar (27 september 2026) was **de Edge
+is de enige balk, en de Edge is altijd leidend**: een scherm wijkt voor de Edge,
+nooit andersom. Wat de Edge kan dragen neemt hij over; wat hij niet kan dragen
+schuift uit op de maat die de Edge zelf opgeeft. Wat daarmee nog NIET besloten
+is: `.ios-nav` (108 schermen) staat bewust buiten de claim, omdat die kop vaak de
+hoofdhandeling draagt; overnemen hoort pas als die hoofdhandeling een eigen plek
+in de Edge krijgt (zie de kop van `rtg-adaptive-edge-claim.js`).
 
 - **Decision Room en Project Room**: de eigen tabbalk lag volledig onder de
   onderbalk van de Edge. De claim herkende hem niet, omdat hij smaller is dan

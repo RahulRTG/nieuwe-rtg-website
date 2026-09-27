@@ -18,9 +18,8 @@
      (`boekingen` is een rij-voor-rij grootboek zonder collectieslot); de
      boeking krijgt de projectie, en een gemiste projectie herstelt de volgende
      scan.
-   - ruimLegacy() haalt oude kale codes van boekingen en kassabonnen en
-     honoreert ze niet. Het ticket houdt zijn waarde: het lid toont een nieuwe
-     code, een deurticket vernieuwt de zaak vanuit het dagprogramma. */
+   - ruimLegacy() haalt oude kale codes weg en honoreert ze niet; het ticket
+     houdt zijn waarde (het lid of de deur toont een nieuwe). */
 'use strict';
 
 const klok = require('../lib/klok');
@@ -30,7 +29,8 @@ const SCOPE = Object.freeze(['zaak.ticket.checkin']);
 const BEWAAR_MS = 30 * 86400000;
 const DICHT = ['geweigerd', 'geannuleerd'];
 
-module.exports = ({ db, save, bewerkCollectie, crypto, nu = () => klok.datum().toISOString() }) => {
+// oudeRijen(): boekingen en kassabonnen voor ruimLegacy(), van hun eigenaar
+module.exports = ({ db, save, bewerkCollectie, crypto, oudeRijen, nu = () => klok.datum().toISOString() }) => {
   if (typeof bewerkCollectie !== 'function') throw new Error('De ticketcode vereist een collectietransactie.');
   const bearer = require('./bearercode')({ crypto, namespace: 'travelos.activity_ticket_entry', nu });
   const eigen = require('./eigencollectie')({ db, domein: 'kern/tickettoegang', bezit: { ticketToegang: 'kaart' } });
@@ -47,12 +47,14 @@ module.exports = ({ db, save, bewerkCollectie, crypto, nu = () => klok.datum().t
   let legacyKlaar = false;
   function ruimLegacy() {
     if (legacyKlaar) return 0;
+    if (typeof oudeRijen !== 'function') throw new Error('ruimLegacy vereist oudeRijen()');
+    const { boekingen, posSales } = oudeRijen() || {};
     let n = 0;
-    for (const b of (db.data.boekingen || [])) {
+    for (const b of (boekingen || [])) {
       if (!b || b.kind !== 'ticket' || !Object.prototype.hasOwnProperty.call(b, 'code')) continue;
       delete b.code; b.codeLegacy = true; n++;
     }
-    for (const bonnen of Object.values(db.data.posSales || {}))
+    for (const bonnen of Object.values(posSales || {}))
       for (const x of Array.isArray(bonnen) ? bonnen : [])
         if (x && /^Deurverkoop /.test(String(x.desc || '')) && /^[0-9A-F]{6}$/.test(String(x.bon || ''))) {
           x.bon = null; x.bonLegacy = true; n++;   // de oude deurcode stond hier als bonnummer

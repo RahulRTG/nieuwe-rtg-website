@@ -22,6 +22,7 @@ function wereld() {
   const db = { data: { boekingen: [], posSales: {} }, writable: true };
   const bewerkCollectie = require('../server/db/collectie-bewerken')({ store: 'json', db, save() {} });
   const kern = require('../server/kern/tickettoegang')({ db, save() {}, bewerkCollectie, crypto,
+    oudeRijen: () => db.data,
     nu: () => new Date(klok).toISOString() });
   const ticket = (ref, extra) => {
     const b = Object.assign({ ref, kind: 'ticket', supplierCode: 'ZAAK', customerKey: 'lid:' + ref,

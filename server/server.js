@@ -774,21 +774,22 @@ zetWacht(wacht);
    Lifestyle & Business: volledige interactie met alle leden.
    Wederkerigheid: spreekt een hoger lid een RTG-lid aan (reactie of DM
    op diens post), dan mag dat RTG-lid bij die persoon terugpraten. */
-/* De leden-laag (contactregels, memberTemplate, de leden-app-state en de
-   eigen sollicitaties) staat in server/kern/lid.js. findSupplier en geborenVan
-   zijn hoisted functies en dus hier al bruikbaar. */
+/* De leden-laag (contactregels, memberTemplate, leden-app-state, eigen
+   sollicitaties) staat in server/kern/lid.js; findSupplier en geborenVan
+   zijn hoisted. */
 /* Wereldtalen (server/talen.js): de Boardroom zet per taal een schakelaar;
    iedereen chat in de eigen taal. Vroeg, zodat de leden-laag taalVan kent. */
 const talen = maakTalen({ db, save });
-/* Salon-claimcodes, afhaal- en ticketcodes zijn bearers met een eigen
-   transactionele kern, vóór de ledenprojectie (die toont nooit de kale code). */
+/* Salon-claim-, afhaal- en ticketcodes: bearers met een eigen transactionele
+   kern, vóór de ledenprojectie (die nooit de kale code toont). */
 const salonClaimcode = require('./kern/salon-claimcode')({
   db, save, bewerkCollectie, crypto
 });
 const afhaalcode = require('./kern/afhaalcode')({ db, bewerkCollectie, crypto });
-const tickettoegang = require('./kern/tickettoegang')({ db, save, bewerkCollectie, crypto });
+const tickettoegang = require('./kern/tickettoegang')({ db, save, bewerkCollectie, crypto,
+  oudeRijen: () => ({ boekingen: db.data.boekingen, posSales: db.data.posSales }) });
 /* PostgreSQL neemt pas asynchroon over (startPostgresMetSalon); de lokale
-   migraties draaien verderop, na Samen. */
+   migraties draaien na Samen. */
 const startPostgresMetSalon = () => {
   /* opslagstart roept deze ingang voor elke motor aan. Een lokale standby mag
      daardoor niet via de inerte Postgres-tak ten onrechte "gemigreerd" worden. */

@@ -1,5 +1,5 @@
 /* ============================================================================
-   HET LEERHUIS -- certificaat, geschiktheidsbeleid, echt werk, EVC en bezwaar.
+   HET LEERHUIS -- certificaat, geschiktheidsbeleid en echt werk.
 
    CERTIFICATION IS GEEN AUTHORITY (grondwet 4). Een certificaat legt vast dat
    een mens een vaardigheid bewezen heeft; of hij daarmee iets MAG, zegt een
@@ -12,15 +12,13 @@
    domeinpoort binnen het leerhuis; hoe een RTG-route die ene uitslag als feit
    leest, is een besluit dat ACADEMY.md par. 5 open laat -- niet stil ingebouwd.
 
-   EXTERN BEWIJS IS GEEN INTERN RECHT. EVC accepteert een extern stuk hoogstens
-   als DOCUMENTED bewijs; PROVEN komt nog steeds uit een eigen beoordeling.
+   EVC en bezwaar staan in ./acties-evc.js.
    ========================================================================== */
 'use strict';
 
-const { overgang } = require('./standen');
 const { relatieActief, certStand } = require('./oordeel');
 const { geschiktheid } = require('./brug');
-const { weiger, eisPersoon, eisId, eisBestuur, eisNiet, eisOrg, kennisNu, nieuwId } = require('./hulp');
+const { weiger, eisPersoon, eisId, eisBestuur, eisNiet, eisOrg, kennisNu, eigenId } = require('./hulp');
 
 const tekst = (x, n) => String(x == null ? '' : x).slice(0, n || 300);
 const DAG = 86400000;
@@ -47,7 +45,7 @@ module.exports = {
       && certStand(st, c, ctx.nu()).stand !== 'REVOKED');
     if (dubbel) weiger('op deze beoordeling staat al certificaat ' + dubbel.id, 409);
     const dagen = Number(i.geldigDagen) || null;
-    const id = nieuwId(st.certificaten, i.id, ctx);
+    const id = eigenId(st.certificaten, i.id, ctx);
     const uit = [{ soort: 'certificaat', data: { id, persoon: p, vaardigheden: vs, beoordelingen: bs.map(b => b.id),
       bewijs: bs.flatMap(b => b.bewijs || []), geldigTot: dagen ? new Date(ctx.nu() + dagen * DAG).toISOString().slice(0, 10) : null,
       beleidHercert: tekst(i.hercertificering || 'EVENT_DRIVEN', 40), kennis: Object.assign({}, ...vs.map(v => kennisNu(st, v))), versie: 1 } }];
@@ -105,51 +103,6 @@ module.exports = {
       if (l.stand === 'PROVEN' || l.stand === 'CERTIFIED') uit.push({ soort: 'lerenStand', data: { persoon: door, curriculum: c, naar: 'AUTHORITY_ELIGIBLE' } });
       if (['PROVEN', 'CERTIFIED', 'AUTHORITY_ELIGIBLE'].includes(l.stand)) uit.push({ soort: 'lerenStand', data: { persoon: door, curriculum: c, naar: 'PRACTICING_IN_ROLE' } });
     }
-    return uit;
-  },
-
-  evcIndienen(st, i, door, ctx) {
-    eisOrg(st);
-    if (!relatieActief(st, door)) weiger('EVC vraagt een lopende relatie', 403);
-    if (!st.vaardigheden[i.vaardigheid]) weiger('vaardigheid bestaat niet', 404);
-    if (!i.extern) weiger('noem het externe stuk (wat, van wie, wanneer)', 400);
-    const id = nieuwId(st.evc, i.id, ctx);
-    return [{ soort: 'evc', data: { id, persoon: door, vaardigheid: i.vaardigheid, extern: tekst(i.extern, 400) } },
-      { soort: 'evcStand', data: { id, naar: 'EVIDENCE' } }];
-  },
-
-  evcBeoordeel(st, i, door, ctx) {
-    eisBestuur(st, door, ['ASSESSOR'], 'een EVC beoordelen');
-    const e = st.evc[i.id]; if (!e) weiger('EVC bestaat niet', 404);
-    eisNiet(door, e.persoon, 'niemand beoordeelt zijn eigen EVC');
-    const uit = [];
-    if (e.stand === 'EVIDENCE') uit.push({ soort: 'evcStand', data: { id: e.id, naar: 'REVIEW' } });
-    const o = overgang('evc', 'REVIEW', i.uitkomst); if (!o.ok) weiger(o.reden, 409);
-    uit.push({ soort: 'evcStand', data: { id: e.id, naar: i.uitkomst } });
-    if (i.uitkomst !== 'REJECTED') uit.push({ soort: 'bewijs', data: { id: ctx.id(), persoon: e.persoon, vaardigheid: e.vaardigheid,
-      soort: 'KNOWLEDGE_EVIDENCE', sterkte: 'DOCUMENTED', bron: 'EVC ' + e.id + ': ' + e.extern, notitie: i.uitkomst, kennis: kennisNu(st, e.vaardigheid) } });
-    return uit;
-  },
-
-  bezwaarIndienen(st, i, door, ctx) {
-    eisOrg(st);
-    const b = st.beoordelingen[i.beoordeling]; if (!b) weiger('beoordeling bestaat niet', 404);
-    if (b.persoon !== door) weiger('bezwaar maakt de beoordeelde zelf', 403);
-    return [{ soort: 'bezwaar', data: { id: ctx.id(), beoordeling: b.id, reden: tekst(i.reden, 800) } }];
-  },
-
-  /* Onafhankelijk: niet de assessor, niet de indiener. REASSESSMENT maakt de
-     oude beoordeling ongeldig, zodat een nieuwe kan beginnen. */
-  bezwaarStand(st, i, door) {
-    eisBestuur(st, door, ['QUALITY_AUTHORITY'], 'een bezwaar behandelen');
-    const z = st.bezwaren[i.id]; if (!z) weiger('bezwaar bestaat niet', 404);
-    const b = st.beoordelingen[z.beoordeling];
-    eisNiet(door, b.assessor, 'de assessor behandelt geen bezwaar tegen zijn eigen oordeel');
-    const o = overgang('bezwaar', z.stand, i.naar); if (!o.ok) weiger(o.reden, 409);
-    if (z.stand === 'INDEPENDENT_REVIEW' && z.reviewer !== door) weiger('de reviewer die begon, rondt af', 403);
-    const uit = [{ soort: 'bezwaarStand', data: { id: z.id, naar: i.naar, notitie: tekst(i.notitie, 600) } }];
-    if (i.naar === 'REASSESSMENT' && overgang('beoordeling', b.stand, 'INVALIDATED').ok)
-      uit.push({ soort: 'beoordelingStand', data: { id: b.id, naar: 'INVALIDATED', reden: 'bezwaar ' + z.id + ': opnieuw beoordelen' } });
     return uit;
   }
 };

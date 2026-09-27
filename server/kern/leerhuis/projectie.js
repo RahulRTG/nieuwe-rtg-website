@@ -32,7 +32,7 @@ function persoon(st, key) {
 
 /* Van oud naar nieuw toepassen. `regels` staat nieuwste-eerst, zoals lib/keten.js
    hem bewaart. */
-function projecteer(orgId, regels) {
+function herbouw(orgId, regels) {
   const st = leeg(orgId);
   const lijst = (regels || []).slice().reverse();
   for (const r of lijst) pas(st, r);
@@ -116,4 +116,4 @@ function pas(st, r) {
   }
 }
 
-module.exports = { projecteer, leeg };
+module.exports = { herbouw, leeg };

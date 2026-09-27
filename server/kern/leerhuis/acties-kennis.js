@@ -17,9 +17,9 @@
 'use strict';
 
 const { overgang, IMPACT } = require('./standen');
-const { impact } = require('./graaf');
+const { geraakt } = require('./graaf');
 const { relatieActief, heeftBestuur } = require('./oordeel');
-const { weiger, eisId, eisBestuur, eisNiet, eisOrg, nieuwId } = require('./hulp');
+const { weiger, eisId, eisBestuur, eisNiet, eisOrg, eigenId } = require('./hulp');
 
 const tekst = (x, n) => String(x == null ? '' : x).slice(0, n || 200);
 
@@ -59,7 +59,7 @@ module.exports = {
     }
     uit.push({ soort: 'kennisStand', data: { id: i.id, versie: i.versie, naar: i.naar, reden: tekst(i.reden, 300) } });
     if (i.naar === 'ACTIVE' && k.actief) {
-      const im = impact(st, i.id, i.impactKlasse);
+      const im = geraakt(st, i.id, i.impactKlasse);
       uit.push({ soort: 'impact', data: { kennis: i.id, versie: i.versie, van: k.actief, klasse: i.impactKlasse,
         vaardigheden: im.vaardigheden, curricula: im.curricula, rollen: im.rollen,
         mensen: im.mensen.map(m => m.persoon), trainers: im.trainers.map(t => t.persoon), beleid: im.beleid.map(b => b.id),
@@ -86,7 +86,7 @@ module.exports = {
     if (!relatieActief(st, door)) weiger('alleen wie hier werkt of meedoet kan een voorstel indienen', 403);
     for (const veld of ['probleem', 'voorstel', 'reden']) if (!i[veld]) weiger('een voorstel noemt ' + veld, 400);
     if (i.kennis && !st.kennis[i.kennis]) weiger('kennisitem ' + i.kennis + ' bestaat niet', 404);
-    return [{ soort: 'voorstel', data: { id: nieuwId(st.voorstellen, i.id, ctx), kennis: i.kennis || null, probleem: tekst(i.probleem, 800),
+    return [{ soort: 'voorstel', data: { id: eigenId(st.voorstellen, i.id, ctx), kennis: i.kennis || null, probleem: tekst(i.probleem, 800),
       huidigeRegel: tekst(i.huidigeRegel, 800), voorstel: tekst(i.voorstel, 1600), reden: tekst(i.reden, 800),
       bewijs: tekst(i.bewijs, 800), voorbeelden: tekst(i.voorbeelden, 800), risico: tekst(i.risico, 300),
       domein: tekst(i.domein, 60) } }];

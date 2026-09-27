@@ -18,7 +18,7 @@
 const { trainerGeldig, verversen, certStand } = require('./oordeel');
 const { geschiktheid } = require('./brug');
 const { rolKlaar } = require('./gereedheid');
-const { impact } = require('./graaf');
+const { geraakt } = require('./graaf');
 
 function waaromLeren(st, persoon, curriculum) {
   const l = st.personen[persoon] && st.personen[persoon].leren[curriculum];
@@ -37,7 +37,7 @@ function waaromTrainer(st, trainer, curriculum) {
     bijgewerkt: t ? t.bijgewerkt : null, trede: t ? t.trede : null };
 }
 
-const wieGeraakt = (st, kennis, klasse) => impact(st, kennis, klasse);
+const wieGeraakt = (st, kennis, klasse) => geraakt(st, kennis, klasse);
 
 /* De auditvraag: waarom bestaat dit certificaat, en wat is er sindsdien veranderd? */
 function reconstrueer(st, certificaatId, nu) {

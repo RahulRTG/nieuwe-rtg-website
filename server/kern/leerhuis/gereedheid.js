@@ -48,7 +48,7 @@ function rolKlaar(st, persoon, rolId, nu) {
 }
 
 /* Workforce readiness: eisen als { rolId: aantal }. */
-function gereedheid(st, eisen, nu) {
+function teamGereed(st, eisen, nu) {
   const regels = [];
   for (const [rolId, aantal] of Object.entries(eisen || {})) {
     const dragers = Object.entries(st.personen).filter(([, p]) => p.rollen.includes(rolId)).map(([k]) => k);
@@ -112,4 +112,4 @@ function loopbaan(st, persoon, rolId, nu) {
   return { stand, waarom: r.ontbreekt, besluit: 'mens' };
 }
 
-module.exports = { rolKlaar, gereedheid, eenheid, loopbaan };
+module.exports = { rolKlaar, teamGereed, eenheid, loopbaan };

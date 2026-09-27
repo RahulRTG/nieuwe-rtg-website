@@ -27,7 +27,7 @@
 
 const crypto = require('crypto');
 const keten = require('../../lib/keten');
-const { projecteer } = require('./projectie');
+const { herbouw } = require('./projectie');
 const { Weigering, PERSOON, ID } = require('./hulp');
 const zicht = require('./zicht');
 const uitleg = require('./uitleg');
@@ -36,7 +36,7 @@ const { geschiktheid } = require('./brug');
 const { certStand } = require('./oordeel');
 
 const ACTIES = Object.assign({}, require('./acties-bouw'), require('./acties-kennis'), require('./acties-mens'),
-  require('./acties-oordeel'), require('./acties-simulatie'), require('./acties-cert'));
+  require('./acties-oordeel'), require('./acties-simulatie'), require('./acties-cert'), require('./acties-evc'));
 
 function maakLeerhuis({ db, save, nu }) {
   const klok = nu || Date.now;
@@ -44,7 +44,7 @@ function maakLeerhuis({ db, save, nu }) {
   const nieuwId = () => crypto.randomBytes(6).toString('hex');
 
   const spoorLees = (org) => (eigen.kijk('leerhuis')[org] || []);
-  const stand = (org) => projecteer(org, spoorLees(org));
+  const stand = (org) => herbouw(org, spoorLees(org));
 
   function doe(org, actie, invoer, door, opties) {
     const o = opties || {};
@@ -88,7 +88,7 @@ function maakLeerhuis({ db, save, nu }) {
     return r ? { bekend: true, actie: r.actie, id: (r.data || {}).id || null, nr: r.nr, at: r.at } : { bekend: false };
   }
 
-  function verifieer(org) { return keten.verifieer(spoorLees(org)); }
+  const spoorKlopt = (org) => keten.verifieer(spoorLees(org));
   const organisaties = () => Object.keys(eigen.kijk('leerhuis')).sort();
 
   /* De leeskant: elke vraag rekent op een verse projectie van EEN organisatie. */
@@ -99,7 +99,7 @@ function maakLeerhuis({ db, save, nu }) {
     trainerCockpit: (org, p) => zicht.trainerCockpit(stand(org), p),
     managerCockpit: (org, p) => zicht.managerCockpit(stand(org), p, t()),
     geschiktheid: (org, p, h) => geschiktheid(stand(org), p, h, t()),
-    gereedheid: (org, eisen) => gereedheid.gereedheid(stand(org), eisen, t()),
+    gereedheid: (org, eisen) => gereedheid.teamGereed(stand(org), eisen, t()),
     eenheid: (org) => gereedheid.eenheid(stand(org), t()),
     loopbaan: (org, p, rol) => gereedheid.loopbaan(stand(org), p, rol, t()),
     waaromLeren: (org, p, c) => uitleg.waaromLeren(stand(org), p, c),
@@ -112,7 +112,7 @@ function maakLeerhuis({ db, save, nu }) {
     certStand: (org, c) => { const st = stand(org); return st.certificaten[c] ? certStand(st, st.certificaten[c], t()) : null; }
   };
 
-  return { doe, stand, uitkomst, verifieer, organisaties, spoor: spoorLees, lees, ACTIES: Object.keys(ACTIES).sort() };
+  return { doe, stand, uitkomst, verifieer: spoorKlopt, organisaties, spoor: spoorLees, lees, ACTIES: Object.keys(ACTIES).sort() };
 }
 
 module.exports = { maakLeerhuis };

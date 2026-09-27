@@ -18,7 +18,7 @@
 
 const { overgang, BEWIJSSOORTEN, STERKTE } = require('./standen');
 const { relatieActief, heeftBestuur, trainerGeldig, bewijsVoldoet } = require('./oordeel');
-const { weiger, eisPersoon, eisBestuur, eisNiet, eisOrg, kennisNu, nieuwId } = require('./hulp');
+const { weiger, eisPersoon, eisBestuur, eisNiet, eisOrg, kennisNu, eigenId } = require('./hulp');
 
 const curriculaMet = (st, v) => Object.values(st.curricula).filter(c => c.vaardigheden.includes(v)).map(c => c.id);
 const isTrainerVoor = (st, door, v) => curriculaMet(st, v).some(c => trainerGeldig(st, door, c).ok);
@@ -42,7 +42,7 @@ module.exports = {
     if (!STERKTE.includes(i.sterkte)) weiger('sterkte: ' + STERKTE.join(', '), 400);
     if (!magSterkte(st, door, p, i.vaardigheid, i.sterkte))
       weiger(door + ' kan geen ' + i.sterkte + '-bewijs over ' + (door === p ? 'zichzelf' : p) + ' vastleggen voor ' + i.vaardigheid, 403);
-    return [{ soort: 'bewijs', data: { id: nieuwId(st.bewijs, i.id, ctx), persoon: p, vaardigheid: i.vaardigheid, soort: i.soort,
+    return [{ soort: 'bewijs', data: { id: eigenId(st.bewijs, i.id, ctx), persoon: p, vaardigheid: i.vaardigheid, soort: i.soort,
       sterkte: i.sterkte, bron: tekst(i.bron, 200), notitie: tekst(i.notitie, 600), kennis: kennisNu(st, i.vaardigheid) } }];
   },
 
@@ -66,7 +66,7 @@ module.exports = {
       weiger('er loopt al een beoordeling voor deze vaardigheid', 409);
     if (!Object.values(st.bewijs).some(b => b.persoon === p && b.vaardigheid === i.vaardigheid && !b.ongeldig))
       weiger('zonder bewijs is er niets te beoordelen', 409, 'oefen, simuleer of werk onder toezicht');
-    const id = nieuwId(st.beoordelingen, i.id, ctx);
+    const id = eigenId(st.beoordelingen, i.id, ctx);
     const uit = [{ soort: 'beoordeling', data: { id, persoon: p, vaardigheid: i.vaardigheid, vorm: tekst(i.vorm || 'practical task', 40) } }];
     for (const [c, x] of Object.entries(l.leren || {}))
       if (x.stand === 'READY_FOR_ASSESSMENT' && st.curricula[c].vaardigheden.includes(i.vaardigheid))

@@ -46,7 +46,7 @@ function cyclus(vereist) {
    KNOWLEDGE_OWNER opgegeven impactklasse; de graaf verzint hem niet, want of een
    wijziging "alleen informatie" is of hercertificering vraagt, is een oordeel
    over de INHOUD en dat is mensenwerk. */
-function impact(st, kennisId, klasse) {
+function geraakt(st, kennisId, klasse) {
   const vaardigheden = Object.values(st.vaardigheden).filter(v => (v.kennis || []).includes(kennisId));
   const vIds = new Set(vaardigheden.map(v => v.id));
   const curricula = Object.values(st.curricula).filter(c =>
@@ -80,4 +80,4 @@ function impact(st, kennisId, klasse) {
   };
 }
 
-module.exports = { cyclus, impact };
+module.exports = { cyclus, geraakt };

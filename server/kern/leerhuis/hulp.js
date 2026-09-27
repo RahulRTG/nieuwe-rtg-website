@@ -48,7 +48,7 @@ const kennisNu = (st, v) => Object.fromEntries(((st.vaardigheden[v] || {}).kenni
 /* Een id van de aanroeper mag, maar nooit een id dat al bestaat: dan zou de
    projectie het oude object stil vervangen, en dat is historie herschrijven
    (grondwet 18). Gevonden door de eigenschapstoets, niet door lezen. */
-function nieuwId(bak, id, ctx) {
+function eigenId(bak, id, ctx) {
   if (id == null) return ctx.id();
   eisId(id);
   if (Object.prototype.hasOwnProperty.call(bak, id)) weiger('id ' + id + ' bestaat al; een bestaand object krijgt geen nieuwe geschiedenis', 409);
@@ -56,4 +56,4 @@ function nieuwId(bak, id, ctx) {
 }
 function eisNiet(a, b, reden) { if (a === b) weiger(reden, 403); }
 
-module.exports = { Weigering, weiger, eisPersoon, eisId, eisOrg, eisBestuur, eisNiet, kennisNu, nieuwId, PERSOON, ID };
+module.exports = { Weigering, weiger, eisPersoon, eisId, eisOrg, eisBestuur, eisNiet, kennisNu, eigenId, PERSOON, ID };

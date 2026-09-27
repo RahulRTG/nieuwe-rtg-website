@@ -56,7 +56,7 @@ function ontslag(st) {
   st.baan.actief = false;
   st.zelfstandig = st.dag;
   mijlpaal(st, 'zelfstandig', 'Je zegde je baan op bij ' + st.baan.werkgever + ': je leeft van je eigen bedrijf.');
-  meld(st, 'Je hebt opgezegd bij ' + st.baan.werkgever + '. Je begon met ' + euro(R.niveauVan(st).startKas) + ' en een baan in de keuken; ' +
+  meld(st, 'Je hebt opgezegd bij ' + st.baan.werkgever + '. Je begon met ' + euro(R.beginKas(st)) + ' en ' + R.startVan(st).beschrijving + '; ' +
     (st.onderneming ? st.onderneming.naam : 'je bedrijf') + ' is van jou, en jij hebt het opgebouwd.', 'goed');
   return { ok: true };
 }

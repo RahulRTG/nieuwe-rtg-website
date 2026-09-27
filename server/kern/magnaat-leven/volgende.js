@@ -31,6 +31,8 @@ function handelingenNu(st) {
   if (st.dag === 1 && !st.aanbod) {
     zet('moeilijkheid', 'Kies hoe zwaar het is', 'Nu is het ' + R.niveauVan(st).naam.toLowerCase() + '. Later kan dit alleen door opnieuw te beginnen.',
       { stand: Object.entries(R.MOEILIJKHEID).map(([id, x]) => ({ id, naam: x.naam + ': ' + x.uitleg })) });
+    zet('start', 'Kies waar je begint', 'Nu begin je bij ' + st.baan.werkgever + '. Later kan dit alleen door opnieuw te beginnen.',
+      { begin: Object.entries(R.STARTPOSITIES).map(([id, x]) => ({ id, naam: x.naam + ': ' + x.uitleg })) });
   }
   if (st.ondernemingVraag != null && !st.onderneming) {
     zet('onderneming', 'Schrijf je onderneming in', 'Je werkt structureel voor klanten. ' + R.JURISDICTIE.inschrijven + ' Het kost ' + euro(R.KVK) + '.', { naam: 'tekst' });
@@ -61,7 +63,7 @@ function handelingenNu(st) {
   const nodig = komend.reduce((s, p) => s + p.bedrag, 0);
   if (nodig > st.kas) {
     for (const p of komend) {
-      const kan = p.soort === 'software' || (R.VERPLICHTINGEN.find(v => v.id === p.soort) || {}).uitstel;
+      const kan = p.soort === 'software' || (R.verplichtingenVan(st).find(v => v.id === p.soort) || {}).uitstel;
       if (!kan || p.uitgesteld) continue;
       if (p.soort === 'software') zet('uitstel', 'Zet je abonnement een week stil', 'Een week niets betalen, maar je software ligt dan stil: geen werk aan opdrachten.', { post: p.id });
       else zet('uitstel', 'Vraag een betalingsregeling', p.naam + ' een week later betalen, tegen ' + euro(kan.kosten) + ' kosten.', { post: p.id });

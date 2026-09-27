@@ -65,6 +65,8 @@
       '<h3>Een andere weg proberen</h3><p class="vn-rust">Je begint dan opnieuw op maandag met ' + euro(s.wereld.startKas) + '. Wat je in dit leven deed, blijft in het grootboek staan.' +
       (s.ronde ? ' Dit is je poging ' + (s.ronde + 1) + '.' : '') + '</p><label class="vn-tempo">Hoe zwaar <select id="vnNiveau">' + (s.wereld.niveaus || []).map(function (n) {
         return '<option value="' + esc(n.id) + '"' + (n.id === s.wereld.moeilijkheid ? ' selected' : '') + '>' + esc(n.naam) + ': ' + esc(n.uitleg) + '</option>';
+      }).join('') + '</select></label> <label class="vn-tempo">Waar je begint <select id="vnStart">' + (s.wereld.startposities || []).map(function (n) {
+        return '<option value="' + esc(n.id) + '"' + (n.id === s.wereld.start ? ' selected' : '') + '>' + esc(n.naam) + ': ' + esc(n.uitleg) + '</option>';
       }).join('') + '</select></label> <button type="button" class="btn subtle" data-vn-opnieuw>Begin opnieuw</button>';
 
     /* Mijn bedrijf en de prognose tekent ./magnaat-leven-bedrijf.js. */

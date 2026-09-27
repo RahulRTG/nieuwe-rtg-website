@@ -580,6 +580,12 @@ const EIGEN_MODULE = new Map([
      weglaten, de tokens niet lezen, de grondketen niet opbouwen, en
      contrastContext uit BRON halen). */
   ['contrastcontext.e2e.js', ['scripts/a11ykeuring.js']],
+  /* DE SCHIL VAN BEDIENBAAR (27 september 2026). De toets draait bedien() uit
+     scripts/appwerkt.js tegen een eigen kleine server zonder /api/, dus de
+     liegpoort kan hem niet raken en noemde hem "overleefd". Zijn onderwerp is
+     de meter zelf; met de hand nagetrokken op vier assen: de schil meetellen,
+     dubbelen meetellen, bedekking nooit melden, half bedekt meetellen. */
+  ['appwerkt-schil.e2e.js', ['scripts/appwerkt.js']],
   /* De Evidence Engine-toets importeert ook test/helper.js om het gedrag van
      een verbonden browserclient te isoleren. Zonder deze expliciete bron wint
      daardoor de serverheuristiek en krijgt hij een liegende API die niets met

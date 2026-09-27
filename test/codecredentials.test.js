@@ -22,6 +22,8 @@ test('codecredentialregister is compleet en intern geldig', () => {
      als "er zijn er nu meer dan nul" -- een bewering over de achterstand, niet
      over de poort, en die zakt zodra de achterstand is weggewerkt. De poort zelf
      wordt beproefd in de fixtureproef hieronder. */
+  assert.deepEqual(uit.census.unclassified.map(x => x.route), [],
+    'iedere bronafgeleide kandidaat is na lezing aan een deur toegewezen');
   const kandidaten = poort.bronCensus().kandidaten.map(x => x.route);
   for (const route of ['POST /school/personeel/inloglink', 'POST /api/vastgoed/keyless',
     'POST /api/arrival/pass', 'POST /api/supplier/ticket/checkin'])
@@ -49,6 +51,64 @@ test('codecredentialregister is compleet en intern geldig', () => {
     d.tests.every(b => /^[a-f0-9]{64}$/.test(b.sha256)) &&
     d.bron.every(b => /^[a-f0-9]{64}$/.test(b.sha256))),
   'gemigreerde deuren dragen hashes van hun actuele bron en control-tests');
+});
+
+/* De classificatieronde van 27 september 2026 bracht `unclassified` op nul.
+   Dat mag geen stille nul worden: haal een route uit haar deur en de census
+   moet hem weer als releaseblokkade melden. */
+test('een kandidaat zonder deur wordt weer een ongeclassificeerde releaseblokkade', () => {
+  const register = JSON.parse(JSON.stringify(poort.lees()));
+  const deur = register.deuren.find(x => x.id === 'geen.woord_en_buurtreffers');
+  deur.routes = deur.routes.filter(x => x !== 'POST /api/supplier/horeca/pas/pak');
+  const uit = poort.controleer(register);
+  assert.deepEqual(uit.census.unclassified.map(x => x.route), ['POST /api/supplier/horeca/pas/pak']);
+  assert.ok(uit.blockers.some(x => x.id === 'unclassified:POST /api/supplier/horeca/pas/pak'));
+});
+
+test('geen_credential is alleen een gesloten, onderbouwd oordeel', () => {
+  for (const wijzig of [d => { d.status = 'remaining'; d.release_blocker = true; },
+    d => { d.release_blocker = true; }, d => { d.notitie = 'record-id'; }]) {
+    const register = JSON.parse(JSON.stringify(poort.lees()));
+    const deur = register.deuren.find(x => x.id === 'geen.record_ids_randombytes');
+    wijzig(deur);
+    const uit = poort.controleer(register);
+    assert.ok(uit.fouten.some(f => f.startsWith('geen.record_ids_randombytes: geen_credential')),
+      'een goedkoop geen-credential-oordeel wordt geweigerd');
+  }
+});
+
+test('de echte credentials uit de classificatieronde blokkeren de release', () => {
+  const register = poort.lees();
+  const uit = poort.controleer(register);
+  const echte = ['office.gedeelde_kantoorcode', 'partnerkanaal.personeels_en_partnercode',
+    'horeca.bon_en_polsbandsaldo', 'link.capability_aanvaarden', 'travelos.ov_incheckcode',
+    'mode.bezorgcode', 'workos.concern_uitnodiging', 'festivalos.toegangspas',
+    'magnaat.teamkamer_toegangscode', 'identity.algpin_herstelsleutel',
+    'command.api_machinesleutel', 'devices.zaakdoos_sleutel', 'devices.stadsdoos_sleutel',
+    'identity.sso_client_secret', 'identity.scim_bearer_sleutel', 'rtmail.imap_apparaatsleutel',
+    'rtfos.activiteit_incheckcode', 'office.kantooruitnodiging', 'service.balie_bevestigingscode',
+    'foundation.onderwijs_les_tokens', 'foundation.family_profile_token_buiten_harde_poort',
+    'eten.kortingscode'];
+  for (const id of echte) {
+    const d = register.deuren.find(x => x.id === id);
+    assert.ok(d, id + ' hoort geregistreerd te zijn');
+    assert.equal(d.status, 'remaining', id + ' is niet gemigreerd');
+    assert.ok(Array.isArray(d.huidige_risicos) && d.huidige_risicos.length, id + ' noemt zijn risico');
+    assert.ok(uit.blockers.some(x => x.id === id), id + ' hoort de release te blokkeren');
+    for (const route of poort.effectieveRoutes(d))
+      assert.ok(poort.REQUIRED_ROUTES.includes(route), route + ' hoort bewaakt te zijn');
+  }
+  /* De ongepoorte consumers van het niet-gemigreerde gezinsprofieltoken staan
+     met naam in de deur, zodat een productiepoort-wijziging hier te zien is. */
+  const fam = register.deuren.find(x => x.id === 'foundation.family_profile_token_buiten_harde_poort');
+  for (const route of ['POST /api/rtf/toegang', 'POST /api/rtf/beroepen/mijn', 'POST /api/rtf/kanaal'])
+    assert.ok(fam.routes.includes(route));
+  const vrijgave = require('../server/middleware/foundation-productiepoort');
+  for (const pad of ['/api/rtf/toegang', '/api/rtf/beroepen/mijn', '/api/rtf/bieb', '/api/rtf/geloof'])
+    assert.equal(vrijgave.isBeschermdeRoute('POST', pad, {}) || vrijgave.isNogGeslotenCredentialroute('POST', pad, {}),
+      false, pad + ' staat nog steeds buiten de Foundation-productiepoort; pas de deur aan als dat verandert');
+  assert.equal(vrijgave.isNogGeslotenCredentialroute('POST', '/api/foundation/les/join', {}), false,
+    'de onderwijslesfamilie is nog niet hard gesloten; pas foundation.onderwijs_les_tokens aan als dat verandert');
 });
 
 test('een routermount kan niet alleen met zijn interne schijnpad groen worden', () => {

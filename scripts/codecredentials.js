@@ -17,12 +17,14 @@ const ROOT = path.join(__dirname, '..');
 const STATUSES = new Set(['migrated', 'closed', 'remaining']);
 const CLASSIFICATIES = new Set(['credential', 'money_credential', 'public_identifier',
   'tracking_identifier', 'signed_presentation', 'authenticated_identifier',
-  'external_protocol_credential', 'central_session_credential',
-  /* GEEN CREDENTIAL: de census ziet iets credentialachtigs dat het niet is (een
-     record-id uit randomBytes, een veld `verdieping` dat "pin" bevat, de
-     keukenpas). Dat is geen identificator, dus `public_identifier` zou liegen.
-     Alleen met status `closed` en een notitie die zegt WAAROM -- zie controleer(). */
-  'geen_credential']);
+  'external_protocol_credential', 'central_session_credential', 'geen_credential']);
+/* `geen_credential` zegt dat een censuskandidaat na lezing GEEN identifier of
+   geheim is (een record-id uit randomBytes, het woord `pas` voor de uitgiftepas
+   van een keuken, een idempotentiesleutel, commentaar van de buurhandler). Dat
+   is een oordeel dat een kandidaat uit de blokkerlijst haalt, dus het mag nooit
+   goedkoop zijn: alleen gesloten, nooit blokkerend en altijd met een uitleg
+   die lang genoeg is om het oordeel na te lopen. */
+const GEEN_NOTITIE_MIN = 40;
 const REQUIRED_ROUTES = [
   'GET /api/projectie/:code',
   'POST /api/projectie/koppel', 'POST /api/projectie/kijk',
@@ -121,7 +123,57 @@ const REQUIRED_ROUTES = [
   'POST /api/bedrijf/ticket/waardeer',
   'POST /api/arrival/request', 'POST /api/arrival/pass',
   'POST /api/arrival/pulse', 'POST /api/supplier/horeca/arrivals',
-  'POST /api/supplier/horeca/arrival/promise'
+  'POST /api/supplier/horeca/arrival/promise',
+  /* De classificatieronde van 27 september 2026: de echte, nog onvolwassen
+     credentials die de census als ongeclassificeerd vond. Ze staan hier zodat
+     hun deur niet stil kan verdwijnen. */
+  'POST /api/office/login', 'POST /api/staff', 'POST /api/partnertrips',
+  'POST /api/book', 'POST /api/partner', 'POST /api/supplier/horeca/bon/maak',
+  'POST /api/supplier/horeca/club/band', 'POST /api/supplier/horeca/bon',
+  'POST /api/supplier/horeca/betaal', 'POST /api/gast/betaal',
+  'POST /api/link/cap/aanvaard', 'POST /api/link/cap/trek', 'POST /api/ov/code',
+  'POST /api/staff/ov/checkin', 'POST /api/mode/bezorg/aanvraag',
+  'POST /api/supplier/mode/bezorg/overhandig', 'POST /api/concern/uitnodigen',
+  'POST /api/concern/uitnodigingen', 'POST /api/concern/uitnodiging/accepteer',
+  'POST /api/concern/uitnodiging/intrek', 'POST /api/concern/bulk/verstuur',
+  'POST /api/festival/pas', 'POST /api/festival/pas/intrek',
+  'POST /api/festival/scan', 'POST /api/member/magnaat/teamkamer/maak',
+  'POST /api/member/magnaat/teamkamer/deelnemen', 'POST /api/pin/vergeten',
+  'POST /api/pin/herstel', 'POST /api/command/apipoort/sleutel',
+  'POST /api/command/apipoort/intrekken', 'POST /api/doos/rapport',
+  'POST /api/office/doos/sleutel', 'POST /api/office/doos/sleutel/weg',
+  'POST /api/office/stad/sleutel', 'POST /api/stad/doos/hartslag',
+  'POST /api/stad/doos/meting', 'POST /api/techniek/sso',
+  'POST /api/techniek/sso/scimsleutel',
+  'DELETE /api/techniek/sso/scimsleutel/:org',
+  'POST /api/member/rtmail/imap/sleutels', 'POST /api/member/rtmail/imap/sleutel',
+  'POST /api/member/rtmail/imap/intrekken',
+  'POST /api/supplier/rtmail/imap/sleutels',
+  'POST /api/supplier/rtmail/imap/sleutel',
+  'POST /api/supplier/rtmail/imap/intrekken', 'POST /api/rtfos/activiteit/incheck',
+  'POST /api/office/kantoor/uitnodiging',
+  'POST /api/office/service/bevestiging/vraag',
+  'POST /api/office/service/bevestiging/code', 'POST /api/foundation/les/maak',
+  'POST /api/foundation/les/join', 'POST /api/foundation/ai',
+  'POST /api/rtf/uitnodiging/accepteer', 'POST /api/rtf/kanaal',
+  'POST /api/rtf/toegang', 'POST /api/rtf/bieb', 'POST /api/rtf/bieb/catalogus',
+  'POST /api/rtf/bieb/installeer', 'POST /api/rtf/bieb/weg',
+  'POST /api/rtf/bieb/mijn', 'POST /api/rtf/beroepen',
+  'POST /api/rtf/beroepen/catalogus', 'POST /api/rtf/beroepen/installeer',
+  'POST /api/rtf/beroepen/weg', 'POST /api/rtf/beroepen/mijn',
+  'POST /api/rtf/geloof', 'POST /api/rtf/geloof/catalogus',
+  'POST /api/rtf/geloof/installeer', 'POST /api/rtf/geloof/weg',
+  'POST /api/rtf/geloof/mijn', 'POST /api/rtf/geloof/lees',
+  'POST /api/rtf/knelpunt', 'POST /api/rtf/apply/chat',
+  'POST /api/rtf/apply/chat/send', 'POST /api/rtf/solliciteer',
+  'POST /api/rtf/talent/interesse', 'POST /api/rtf/talent/mijn',
+  'POST /api/rtf/leren/project-uitnodig', 'POST /api/rtf/leren/sessie-start',
+  'POST /api/rtf/leren/taak-zet', 'POST /api/rtf/social/call',
+  'POST /api/rtf/social/connect', 'POST /api/rtf/social/dm',
+  'POST /api/rtf/social/dm/send', 'POST /api/rtf/social/goedkeuren',
+  'POST /api/rtf/social/oudervoeg', 'POST /api/rtf/social/respond',
+  'POST /api/rtf/social/snap/send', 'POST /api/rtf/social/unblock',
+  'POST /api/supplier/eten/instellingen', 'POST /api/gast/bezorg/checkout'
 ];
 const CONTROLES = ['hash_only_at_rest', 'issuer_doel_scope', 'issued_at_expires_at',
   'max_gebruik_gebruik', 'server_side_intrekken_roteren', 'constant_time_lookup',
@@ -317,6 +369,10 @@ function controleer(register, root = ROOT) {
     if (ids.has(d.id)) fouten.push('dubbele deur-id: ' + d.id); else ids.add(d.id);
     if (!STATUSES.has(d.status)) fouten.push(d.id + ': onbekende status'); else telling[d.status]++;
     if (!CLASSIFICATIES.has(d.classificatie)) fouten.push(d.id + ': onbekende classificatie');
+    if (d.classificatie === 'geen_credential' && (d.status !== 'closed' ||
+        d.release_blocker !== false || String(d.notitie || '').trim().length < GEEN_NOTITIE_MIN))
+      fouten.push(d.id + ': geen_credential vraagt status closed, geen releaseblokkade en een notitie van minstens ' +
+        GEEN_NOTITIE_MIN + ' tekens met het bewijs');
     if (!Array.isArray(d.routes) || !d.routes.length) fouten.push(d.id + ': routes ontbreken');
     else for (const route of d.routes) bronRoutes.add(route);
     if (d.effective_mount != null) {
@@ -348,9 +404,6 @@ function controleer(register, root = ROOT) {
   }
   for (const route of REQUIRED_ROUTES) if (!externeRoutes.has(route))
     fouten.push('ontbrekende geïnventariseerde werkelijke route: ' + route);
-  for (const d of register.deuren) if (d && d.classificatie === 'geen_credential' &&
-      (d.status !== 'closed' || String(d.notitie || '').trim().length < 40))
-    fouten.push(d.id + ': geen_credential kan alleen gesloten zijn, met een notitie die zegt waarom');
   const blockers = register.deuren.filter(d => d && d.status === 'remaining' && d.release_blocker === true)
     .map(d => ({ id: d.id, classificatie: d.classificatie,
       routes: effectieveRoutes(d), eigenaar: d.eigenaar }));

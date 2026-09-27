@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1761,
-    "toetsenNietGemeten": 633,
+    "toetsenNietGemeten": 634,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -71,7 +71,7 @@
     "wekkersZonderTrede": 0,
     "wettenOnbewezen": 5,
     "zaakwigGezakt": 0,
-    "zelfpoortendeToetsen": 31,
+    "zelfpoortendeToetsen": 32,
     "geldRoutesPubliek": 0,
     "geldRoutesZonderSemantiek": 1,
     "geldRoutesZonderIdemBewijs": 3,
@@ -149,6 +149,16 @@
     "edgeVeldContextZelf": 11
   },
   "notities": [
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "zelfpoortendeToetsen",
+      "van": 31,
+      "vervalt": "2026-12-27",
+      "meter": "zelfpoortendeToetsen 31 -> 32; toetsenNietGemeten 633 -> 634",
+      "reden": "test/giftcard-credential.pg.test.js is nieuw (de cadeaukaart als gemigreerde money-credential, RELEASEKANDIDAAT.md B9): twee instances racen op hetzelfde saldo, op deelbedragen, op dezelfde kassasleutel, op rotatie tegen inwisseling, op intrekken en op de migratie van een oude 24-bitkaart. Dat kan niet eerlijk zonder database en slaat lokaal zonder DATABASE_URL over; hij staat in scripts/lib/pg-toetslijst.js (verplicht in CI) en als uitzondering onder zelfpoortende-toets. Lokaal tegen echte PostgreSQL en Redis groen, en zonder advisory lock plus FOR UPDATE in pg/collectietransactie.js zakte hij (twee instances boekten dezelfde oude kaart allebei af). Daarom telt hij ook als niet-gemeten toets: de mutatiemotor draait zonder PostgreSQL. De twee andere nieuwe toetsen (giftcard-credential.test.js, giftcard-routes.test.js) zijn wel door de motor gemeten en zakken.",
+      "waarheen": "Dezelfde aflossing als de notitie van 5 september: de standaardomgeving levert PostgreSQL, en het nul-skipbewijs hangt aan de releasecommit."
+    },
     {
       "datum": "2026-09-27",
       "soort": "structureel",

@@ -57,7 +57,7 @@ module.exports = ({ db, bewerkCollectie, transactie, bearer, codeHash, crypto, n
 
   /* De kale code uit een bon of een bewaard antwoord halen, met het id ervoor
      in de plaats. `veld` wordt geleegd, ook als de kaart niet (meer) bestaat. */
-  function schoon(obj, velden, kaarten) {
+  function zonderCode(obj, velden, kaarten) {
     if (!obj || typeof obj !== 'object') return;
     for (const veld of velden) {
       if (typeof obj[veld] !== 'string' || !obj[veld]) continue;
@@ -75,13 +75,13 @@ module.exports = ({ db, bewerkCollectie, transactie, bearer, codeHash, crypto, n
     // 2. bonnen en bewaarde kassa-antwoorden op het id zetten
     await bewerkCollectie('posSales', bron => {
       for (const lijst of Object.values(bron || {})) for (const b of Array.isArray(lijst) ? lijst : [])
-        schoon(b, ['kaartCode', 'gcCode'], kaarten);
+        zonderCode(b, ['kaartCode', 'gcCode'], kaarten);
     });
     await bewerkCollectie('kassaIdem', bron => {
       for (const [k, r] of Object.entries(bron || {})) {
         if (k === '_keys' || !r || typeof r !== 'object') continue;
-        schoon(r.sale, ['kaartCode', 'gcCode'], kaarten);
-        schoon(r.kaart, ['code'], kaarten);
+        zonderCode(r.sale, ['kaartCode', 'gcCode'], kaarten);
+        zonderCode(r.kaart, ['code'], kaarten);
       }
     });
     // 3. pas nu de kale code van de kaart af

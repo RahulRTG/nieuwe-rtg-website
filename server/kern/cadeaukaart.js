@@ -61,7 +61,7 @@ module.exports = ({ db, bewerkCollectie, crypto, nu }) => {
 
   /* Saldo afhalen. `viaBon` zegt of er een kassabon bij hoort (de boekhouding
      telt hem dan niet nog eens; zie kern/fiscaal/index.js). */
-  function verzilver({ supplierCode, code, bedrag, actor, viaBon, idem }) {
+  function kaartVerzilver({ supplierCode, code, bedrag, actor, viaBon, idem }) {
     if (!kaal(code)) return { status: 400, error: 'Vul de code van de cadeaukaart in.' };
     const gezocht = codeHash(code);
     const s = sleutel(idem);
@@ -131,7 +131,7 @@ module.exports = ({ db, bewerkCollectie, crypto, nu }) => {
   /* Intrekken zonder nieuwe code (de zaak: gestolen, verloren). Het saldo
      blijft staan -- het is geld van de houder; een rotatie geeft hem een nieuwe
      code. Een tweede keer verandert niets. */
-  function intrek({ vind, door, reden }) {
+  function kaartIntrek({ vind, door, reden }) {
     return transactie(bron => {
       const g = bron.find(x => x && vind(x));
       if (!g) return { status: 404, error: 'Deze cadeaukaart kennen we hier niet.' };
@@ -149,7 +149,7 @@ module.exports = ({ db, bewerkCollectie, crypto, nu }) => {
      nooit langs een zoeklus komen die alleen hashes kent. */
   const na = fn => async (...a) => { await migratie.zorg(); return fn(...a); };
 
-  return { uitgeef: na(uitgeef), verzilver: na(verzilver), roteer: na(roteer), intrek: na(intrek),
+  return { uitgeef: na(uitgeef), verzilver: na(kaartVerzilver), roteer: na(roteer), intrek: na(kaartIntrek),
     mijn: na(mijn), kijk, naarBuiten, codeHash, zorg: migratie.zorg, migreer: migratie.migreer,
     DOEL, SCOPE, GELDIG_MS, MAX_GEBRUIK };
 };

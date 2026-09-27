@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-27T12:23:36.037Z",
-  "commit": "d46361c2",
+  "op": "2026-09-27T16:02:52.383Z",
+  "commit": "c55b9c60",
   "boomVuil": false,
-  "boomAnders": 6,
+  "boomAnders": 0,
   "instrument": "scripts/bewijsschuld.js",
   "node": "v22.22.2"
  },
@@ -11,14 +11,14 @@
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 18,
-  "meetwerk": 2094,
+  "meetwerk": 2095,
   "instrument": 323,
   "grens": 674
  },
  "aflossing": {
   "doel": 0,
   "wat": "de achterstand (meetwerk + instrument) gaat naar nul. `grens` telt niet mee en sluit nooit -- dat is de rand van de methode en geen werk.",
-  "staat": 2417,
+  "staat": 2418,
   "regels": [
    "de achterstand mag nooit groeien zonder een reden IN dit register (--groei=...)",
    "een post mag niet van soort veranderen om onder de poort uit te komen: naar `grens` verplaatsen laat de achterstand dalen zonder dat er iets gemeten is",
@@ -28,7 +28,7 @@
  },
  "gemeten": {
   "postenTotaal": 18,
-  "achterstand": 2417,
+  "achterstand": 2418,
   "randVanDeMethode": 674,
   "auth-onbeslist": 1,
   "capability-in-handler": 558,
@@ -43,7 +43,7 @@
   "rollback-gezakt": 0,
   "object-vooraf": 323,
   "proefruis": 1,
-  "gevolg-onbekend": 95,
+  "gevolg-onbekend": 96,
   "droogloop-onbeoordeeld": 2,
   "herstel-onbevestigd": 49,
   "idem-ongeclassificeerd": 1606,
@@ -158,7 +158,7 @@
    "id": "gevolg-onbekend",
    "soort": "meetwerk",
    "wat": "bereikbare capabilities waarvan niemand heeft gemeten WAT ze veranderen",
-   "aantal": 95,
+   "aantal": 96,
    "waarom": "server/kern/stuur/gevolg.js projecteert een EERDERE proefronde op de stappen van een plan. Staat een pad niet in die ronde, dan is de eerlijke uitslag `onbekend` -- en een plan dat voor het merendeel uit onbekende gevolgen bestaat, is geen voorspelling.",
    "sluit": "de idempotentieproef over deze paden halen, of ze in de droogloop opnemen. Het gereedschap staat er (scripts/droogloop.js meet per stap welke collectie werkelijk bewoog); wat rest is meten."
   },
@@ -389,7 +389,7 @@
    },
    {
     "op": "2026-09-27",
-    "aantal": 95
+    "aantal": 96
    }
   ],
   "droogloop-onbeoordeeld": [
@@ -479,12 +479,6 @@
    "aantal": 1,
    "meetdagen": 3,
    "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: de ruis meten: tien rondes op dezelfde commit, en per as de spreiding vastleggen. Dan weet de ratel wat een echte verslechtering is en wat niet."
-  },
-  {
-   "id": "gevolg-onbekend",
-   "aantal": 95,
-   "meetdagen": 3,
-   "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: de idempotentieproef over deze paden halen, of ze in de droogloop opnemen. Het gereedschap staat er (scripts/droogloop.js meet per stap welke collectie werkelijk bewoog); wat rest is meten."
   },
   {
    "id": "droogloop-onbeoordeeld",
@@ -601,6 +595,12 @@
    "van": 2407,
    "naar": 2419,
    "reden": "De achterstand groeit van 2407 naar 2419, en dat is volledig ONTDEKTE schuld: idem-ongeclassificeerd 1595 -> 1607, precies +12. Die post telt routes die WERK deden minus die met een besluit in IDEMBESLUIT.json. De idempotentieproef kreeg in deze tak een wereld voor het Lab-fonds (scripts/lib/idemwereld.js: een locatie plus verse voorstellen) en bereikt daardoor routes die eerder 404 gaven -- beschermd 1696 van 4933 gemeten routes. Die twaalf muteerden altijd al en niemand had erover besloten; zij verstopten zich achter 'de proef kwam er niet bij'. Een meting die MEER ziet laat deze post dus stijgen, en dat is de richting waarin hij hoort te bewegen: je kunt geen besluitachterstand hebben over routes die je nooit hebt gemeten. Aflossen kan deze tak niet -- MUTATIECONTRACT.md zegt dat een stand nooit uit bewijs wordt afgeleid, want het bewijs draagt een voorstel en een MENS draagt het besluit."
+  },
+  {
+   "op": "2026-09-27",
+   "van": 2417,
+   "naar": 2418,
+   "reden": "Het AI-leespad /api/office/bedrijfsmaat (besluit C2 van de eigenaar: het kantoor als AI-rol uitsluitend op tonen) kwam in de uitvoeringskaart. Een leesroute met nog ongemeten gevolg telt als gevolg-onbekend; dat is zichtbaar geworden, niet verslechterd."
   }
  ]
 }

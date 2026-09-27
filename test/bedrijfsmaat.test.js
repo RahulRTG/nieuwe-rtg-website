@@ -102,6 +102,8 @@ test('6. de besluiten C1 tot en met C7 reizen mee, met hun herkomst en hun stand
     assert.ok(['gebouwd', 'te bouwen'].includes(b.stand), b.id + ' zegt niet of hij al een handhaver heeft');
     if (b.stand === 'te bouwen') assert.match(b.handhaving, /^Nog geen/, b.id + ' belooft een handhaver die er niet is');
   }
+  /* Het register mag niet achterlopen op de bron: anders keurt deze toets een oud besluit. */
+  assert.deepEqual(vast.besluiten, JSON.parse(JSON.stringify(B.BESLUITEN)), 'BEDRIJFSMAAT.json loopt achter op besluiten.js');
   const { LEZEN, KLEIN, VOORSTEL } = require('../server/kern/stuur/beleid-lijsten');
   assert.ok(LEZEN.office && KLEIN.office.length === 0 && VOORSTEL.office.length === 0, 'C2 staat in het stuur zoals het besluit zegt');
 });

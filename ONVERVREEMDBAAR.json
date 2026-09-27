@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-09-27T15:08:15.684Z",
-    "commit": "f47cb346",
-    "boomVuil": true,
+    "op": "2026-09-27T16:22:39.231Z",
+    "commit": "51e9e2a2",
+    "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/onvervreemdbaar.js",
     "node": "v22.22.2"

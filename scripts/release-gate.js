@@ -6,7 +6,7 @@
 const cp = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const { pak } = require('./afbouw-slot');
+const { pak, kindOmgeving } = require('./afbouw-slot');
 const ROOT = path.join(__dirname, '..');
 const RAPPORT = path.join(ROOT, '.release', 'release-gate-bewijs.json');
 const geefAfbouwSlotVrij = pak(process.argv.includes('--productie') ? 'productiereleasepoort' : 'releasepoort');
@@ -48,7 +48,7 @@ if (process.argv.includes('--productie')) stappen.splice(9, 0,
 const controles = [];
 for (const [naam, commando, args] of stappen) {
   console.log('\n=== ' + naam + ' ===');
-  const r = cp.spawnSync(commando, args, { cwd: ROOT, env: process.env, stdio: 'inherit' });
+  const r = cp.spawnSync(commando, args, { cwd: ROOT, env: kindOmgeving(process.env), stdio: 'inherit' });
   if (r.error) { console.error('[release-gate] ' + naam + ': ' + r.error.message); process.exit(r.error.code || 1); }
   if (r.status !== 0) { console.error('[release-gate] gestopt bij: ' + naam); process.exit(r.status || 1); }
   controles.push({ naam, geslaagd: true });

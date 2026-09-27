@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-27T13:52:40.481Z",
-    "commit": "295262cd",
+    "op": "2026-09-27T14:12:02.122Z",
+    "commit": "63dec5c8",
     "boomVuil": false,
-    "boomAnders": 4,
+    "boomAnders": 7,
     "instrument": "scripts/namensvorm.js",
     "node": "v22.22.2"
   },
@@ -17,16 +17,16 @@
       "zonderVormen": [
         "ai-mandaat"
       ],
-      "velden": 51,
+      "velden": 50,
       "inAlleMechanismen": 0,
       "inMinstensDeHelft": 0,
       "helftDrempel": 3,
-      "veldenMechanismeEigen": 46,
-      "eigenPct": 90.2,
+      "veldenMechanismeEigen": 45,
+      "eigenPct": 90,
       "perMechanisme": [
         {
           "mechanisme": "app-machtiging",
-          "velden": 9
+          "velden": 8
         },
         {
           "mechanisme": "bijstand",
@@ -99,16 +99,16 @@
         "ai-mandaat",
         "rtgid-claims"
       ],
-      "velden": 75,
+      "velden": 74,
       "inAlleMechanismen": 0,
       "inMinstensDeHelft": 0,
       "helftDrempel": 5,
-      "veldenMechanismeEigen": 70,
-      "eigenPct": 93.3,
+      "veldenMechanismeEigen": 69,
+      "eigenPct": 93.2,
       "perMechanisme": [
         {
           "mechanisme": "app-machtiging",
-          "velden": 9
+          "velden": 8
         },
         {
           "mechanisme": "bijstand",
@@ -608,14 +608,14 @@
         }
       ]
     },
-    "envelopVelden": 28
+    "envelopVelden": 29
   },
   "woordenschat": [
     {
       "woord": "doel",
-      "bestanden": 260,
-      "domeinen": 140,
-      "samengesteld": 187,
+      "bestanden": 262,
+      "domeinen": 141,
+      "samengesteld": 188,
       "samengesteldDomeinen": 86,
       "stand": "bezet",
       "waar": [
@@ -682,10 +682,10 @@
     },
     {
       "woord": "claim",
-      "bestanden": 29,
-      "domeinen": 19,
-      "samengesteld": 37,
-      "samengesteldDomeinen": 22,
+      "bestanden": 31,
+      "domeinen": 21,
+      "samengesteld": 39,
+      "samengesteldDomeinen": 23,
       "stand": "bezet",
       "waar": [
         "kern/afhaalcode",

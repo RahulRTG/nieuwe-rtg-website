@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-27T12:21:26.961Z",
-  "commit": "12ea75c2",
+  "op": "2026-09-27T14:11:50.228Z",
+  "commit": "63dec5c8",
   "boomVuil": false,
-  "boomAnders": 2,
+  "boomAnders": 3,
   "instrument": "scripts/refundmigratie.js",
   "node": "v22.22.2"
  },
@@ -28,18 +28,18 @@
    "scherm": 0
   },
   "tickets": {
-   "verklaard": 3,
+   "verklaard": 4,
    "onbekend": 5,
    "om": 0,
-   "geenWerk": 0,
+   "geenWerk": 1,
    "wacht": 3,
    "scherm": 2
   },
   "boekingen": {
-   "verklaard": 5,
+   "verklaard": 6,
    "onbekend": 14,
    "om": 0,
-   "geenWerk": 1,
+   "geenWerk": 2,
    "wacht": 4,
    "scherm": 3
   }
@@ -297,6 +297,20 @@
    "stand": "geen-werk",
    "wat": "de openstaande rekening aan een tafel",
    "gedaan": "zoekt juist `!o.paid`; een teruggestorte bon valt er vanzelf buiten"
+  },
+  {
+   "bestand": "server/kern/tickettoegang.js",
+   "treffers": 2,
+   "laag": "server",
+   "leesbreedte": "venster",
+   "collectie": [
+    "tickets",
+    "boekingen"
+   ],
+   "soort": "grendel",
+   "stand": "geen-werk",
+   "wat": "of een ticket een entreecode krijgt en of de deur hem binnenlaat",
+   "gedaan": "sluit `refunded` en geweigerd/geannuleerd VOOR `paid` uit, dus een teruggestort ticket opent niets"
   },
   {
    "bestand": "server/kern/zaakcommand/signalen.js",
@@ -601,7 +615,7 @@
   },
   {
    "bestand": "server/routes/supplier/tickets.js",
-   "treffers": 2,
+   "treffers": 1,
    "laag": "server",
    "leesbreedte": "venster",
    "collecties": [
@@ -658,13 +672,13 @@
  ],
  "verdwenen": [],
  "telling": {
-  "bestanden": 60,
-  "verklaard": 42,
+  "bestanden": 61,
+  "verklaard": 43,
   "onbekend": 15,
   "verdwenen": 0,
-  "server": 46,
+  "server": 47,
   "scherm": 11,
-  "scherp": 52,
+  "scherp": 53,
   "ruim": 5
  }
 }

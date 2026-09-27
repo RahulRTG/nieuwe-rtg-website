@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-27T14:00:46.998Z",
-    "commit": "46b1a102",
+    "op": "2026-09-27T14:11:58.730Z",
+    "commit": "63dec5c8",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 6,
     "instrument": "scripts/idemidentiteit.js",
     "node": "v22.22.2"
   },

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-27T10:08:35.139Z",
-    "commit": "a53ab543",
+    "op": "2026-09-27T12:27:36.912Z",
+    "commit": "0fccc67e",
     "boomVuil": false,
-    "boomAnders": 3,
+    "boomAnders": 1,
     "instrument": "scripts/bedrijfsmaat.js",
     "node": "v22.22.2"
   },
@@ -18,7 +18,8 @@
       "herkomst": "mens",
       "regel": "RTG en de RTFoundation mogen door dezelfde intelligentielaag worden waargenomen. Iedere waarneming en iedere voorgestelde handeling behoudt haar economische wereld. kern/economie/firewall.js wordt niet omzeild of versoepeld. RTF-informatie kan buiten haar economische wereld hoogstens tot een constatering of een voorstel leiden.",
       "kort": "Eén waarnemend brein is niet één portemonnee.",
-      "handhaving": "Elke bedrijfsmaat draagt precies één wereld uit kern/economie/werelden.js; de meter weigert een maat zonder wereld of met een onbekende. De firewall is in deze ronde niet aangeraakt."
+      "handhaving": "Elke bedrijfsmaat draagt precies één wereld uit kern/economie/werelden.js; de meter weigert een maat zonder wereld of met een onbekende. De firewall is in deze ronde niet aangeraakt.",
+      "stand": "gebouwd"
     },
     {
       "id": "C2",
@@ -27,7 +28,58 @@
       "herkomst": "mens",
       "regel": "office wordt een AI-rol, uitsluitend op de bestaande gezagstrede tonen (lezen). Geen nieuwe gezagsladder en geen muterende kantoormacht.",
       "kort": "Het kantoor kijkt mee; het stuur verandert er niets.",
-      "handhaving": "kern/stuur/beleid-lijsten.js (office alleen in LEZEN, lege KLEIN en VOORSTEL), de ingang /api/office/doe op naam, en test/stuur-kantoor.test.js."
+      "handhaving": "kern/stuur/beleid-lijsten.js (office alleen in LEZEN, lege KLEIN en VOORSTEL), de ingang /api/office/doe op naam, en test/stuur-kantoor.test.js.",
+      "stand": "gebouwd"
+    },
+    {
+      "id": "C3",
+      "naam": "Klantwaarde per wereld",
+      "besloten": "27 september 2026, door de eigenaar",
+      "herkomst": "mens",
+      "regel": "Een geslaagde uitkomst per wereld, vier maten naast elkaar en geen totaal: LivingOS een rit of bestelling afgerond, TravelOS een reis die thuis is (een nieuwe stand, gezet door het kantoor of het lid), WorkOS een definitieve loonrun, FoundationOS een afgeronde casus met een tijdstip.",
+      "kort": "Waarde per wereld, nooit een cijfer over alles.",
+      "handhaving": "Nog geen: staat in AUTONOMIE.md par. 2.5 en par. 7.",
+      "stand": "te bouwen"
+    },
+    {
+      "id": "C4",
+      "naam": "Het banksaldo van RTG uit meer dan een bron",
+      "besloten": "27 september 2026, door de eigenaar",
+      "herkomst": "mens",
+      "regel": "Eerst handmatig met het afschrift als herkomst (graad vermoed), een bankkoppeling later als eigen besluit. RTG gaat eigen cadeaubonnen verkopen; geld van een verkochte bon telt als cash en als verplichting. De bon zelf draagt de e-geldvraag van TOKEN.md; bonnen van zaken blijven van de zaak.",
+      "kort": "Wat op de bank staat is niet allemaal vrij geld.",
+      "handhaving": "Nog geen: staat in AUTONOMIE.md par. 2.5 en par. 7.",
+      "stand": "te bouwen"
+    },
+    {
+      "id": "C5",
+      "naam": "Van een betaalde pas naar gast langs drie wegen",
+      "besloten": "27 september 2026, door de eigenaar",
+      "herkomst": "mens",
+      "regel": "Het lid zelf, het kantoor met de hand, en automatisch met regels die per situatie te kiezen zijn. Voorstel van Claude, nog te bevestigen: elke automatische regel staat standaard dicht, een lid zonder vastgelegd contract gaat nooit automatisch, en facturen en bewijsstukken blijven.",
+      "kort": "Weggaan kan, en niemand verdwijnt stil.",
+      "handhaving": "Nog geen: staat in AUTONOMIE.md par. 2.5 en par. 7.",
+      "stand": "te bouwen"
+    },
+    {
+      "id": "C6",
+      "naam": "Het herkomstkanaal bij aanmelding",
+      "besloten": "27 september 2026, door de eigenaar",
+      "herkomst": "mens",
+      "regel": "Een optionele vraag bij aanmelding en een campagnecode in de link; alleen geteld langs de groepspoort, nooit per lid zichtbaar, dertien maanden bewaard en weg bij vergetelheid.",
+      "kort": "Weten waar leden vandaan komen, niet wie.",
+      "handhaving": "Nog geen: staat in AUTONOMIE.md par. 2.5 en par. 7.",
+      "stand": "te bouwen"
+    },
+    {
+      "id": "C7",
+      "naam": "De streefstand",
+      "besloten": "27 september 2026, door de eigenaar",
+      "herkomst": "mens",
+      "regel": "De machine stelt per dimensie een streefstand met tolerantie voor uit afgesloten maanden; hij geldt pas na de handtekening van de eigenaar. Zonder getekende streefstand gebeurt er niets autonoom.",
+      "kort": "De machine stelt voor, de eigenaar tekent.",
+      "handhaving": "Nog geen: staat in AUTONOMIE.md par. 2.5 en par. 7.",
+      "stand": "te bouwen"
     }
   ],
   "telling": {

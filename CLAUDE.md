@@ -1154,7 +1154,11 @@ een ZAAK heeft het meeste al (Team Room, `/api/staff/*`: klok, verlof,
 ziekmelden zonder reden-veld, Fluister voor de vloer met een geheugen dat de
 werkgever nooit ziet), terwijl RTG's eigen kantoor er niets van heeft -- dus er
 komt geen tweede personeelsportaal maar **RTG wordt de eerste klant van zijn
-eigen WorkOS** (besluit B1). "Staff Concierge", "Passport" en "Mijn RTG" zijn
+eigen WorkOS** (besluit B1, genomen op 27 september 2026: ja, helemaal). De eerste stap
+staat in de schaduw: de eigenaar wijst in de boardroom aan welke entiteit RTG
+IS (`kern/kantoor/huis.js`), en de toegangsreview rekent per kantoorhouder uit
+of er een dienstverband loopt -- uitgerekend en niet opgeslagen, want een
+dienstverband eindigt op een datum. Afdwingen is een volgend besluit. "Staff Concierge", "Passport" en "Mijn RTG" zijn
 bezet; de concierge bestaat al en heet Fluister, het paspoort is een lezing van
 `kern/carriereledger/`. En geen score op een mens, geen "waarschijnlijk" zonder
 meting, en alles wat een tweede persoon bereikt (een ruil, ook voor een

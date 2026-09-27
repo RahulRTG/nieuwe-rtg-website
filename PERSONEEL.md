@@ -120,7 +120,7 @@ Een eigen "RTG-personeelsportaal" naast de Team Room zou de fout zijn die
 kantoorkamers blijven waar de MACHT woont; het WERKLEVEN van een RTG-medewerker
 woont waar dat van iedere andere werknemer woont.
 
-Stand: **vraagt een besluit** (par. 12, B1).
+Stand: **besloten** (B1, 27 september 2026: ja, helemaal) -- de eerste stap staat, zie par. 12.
 
 ## 3. Namen die al bezet zijn — lees dit vóór je begint
 
@@ -442,7 +442,7 @@ Waar een functie botst met een grens, vervalt de functie.
 
 | Blok | Wat | Stand |
 |---|---|---|
-| **0** | RTG wordt werkgever in zijn eigen Concern, en RTG's eigen werk (ook de kantine) draait op de WorkOS-personeelslaag | **vraagt een besluit** (B1) |
+| **0** | RTG wordt werkgever in zijn eigen Concern, en RTG's eigen werk (ook de kantine) draait op de WorkOS-personeelslaag | **half**: besloten (B1), de huisentiteit en het werkverband in de toegangsreview staan in de schaduw; de entiteit zelf richt de eigenaar in |
 | **1** | dienstverband ↔ kantoorrol; einde dienstverband roept `intrekking.js` aan | een stap weg |
 | **2** | toegang per kamer op het dienstverband — de kantine krijgt alleen de kantine | een stap weg |
 | **3** | de ochtendkaart (par. 4) op gegevens die al bestaan; het rooster leest verzuim | half: het rooster leest verzuim (27 sep 2026), de kaart is een stap weg |
@@ -458,13 +458,29 @@ ervaring hoeft niet gebouwd te worden, alleen te worden OPENGEZET voor RTG zelf.
 
 **De besluiten van de eigenaar:**
 
-- **B1 — Wordt RTG de eerste klant van zijn eigen WorkOS?**
-  - *Ja, helemaal* (aanbevolen): RTG's werkleven op de Team Room, de kamers
-    alleen voor de macht. Kost: RTG moet als entiteit en als zaak bestaan.
-  - *Alleen de kantine eerst*: de kantine wordt een zaak op WorkOS
-    (`personeelskantine` bestaat al als kassamodus); de rest volgt.
-  - *Nee*: een eigen kantoorvariant. Kost: twee personeelservaringen die uit
-    elkaar lopen.
+- **B1 — Wordt RTG de eerste klant van zijn eigen WorkOS? BESLOTEN (27 september
+  2026): ja, helemaal.** RTG's werkleven woont op de WorkOS-personeelslaag; de
+  kantoorkamers blijven voor de macht. De eerste stap staat, en hij houdt nog
+  niemand tegen (`kern/kantoor/huis.js`, `test/kantoorhuis.test.js`):
+  - **de huisentiteit**: de eigenaar wijst in de boardroom aan welke entiteit in
+    RTG Concern RTG IS (`/api/office/beleidsmotor/huis/zet`, alleen de eigenaar
+    zelf). Tot dan is het antwoord `onbekend` en nooit "niemand in dienst".
+  - **het werkverband in de toegangsreview**: per kantoorhouder `loopt`, `geen`
+    of `onbekend`, UITGEREKEND uit de dienstverbanden en niet opgeslagen -- een
+    dienstverband eindigt op een datum, dus een opgeslagen "in dienst" zou de
+    dag erna liegen. Een mandaat telt niet als dienstverband en staat er apart
+    bij. De review blijft schaduw: de deuren besluiten precies hetzelfde.
+
+  Wat nog volgt, in deze volgorde:
+  1. de eigenaar richt RTG in als entiteit (en zaak) in RTG Concern en wijst hem
+     aan -- dat is een handeling van een mens, geen code;
+  2. de medewerkers krijgen een dienstverband bij die entiteit; de review laat
+     zien wie er nog `geen` heeft;
+  3. pas als `geen` op nul staat of elk geval een reden heeft, **vraagt het een
+     besluit** om de kantoordeur het werkverband te laten EISEN (KANTOORMACHT.md:
+     schaduw, dan waarschuwen, dan afdwingen); de intrekking van lopende sessies
+     staat al klaar (`kern/kantoor/intrekking.js`);
+  4. RTG's eigen werk (ook de kantine) op de Team Room.
 - **B2 — Is een verjaardag vrij een arbeidsvoorwaarde bij RTG?** Ja (en dan per
   medewerker zelf aan te zetten) of nee (dan alleen een felicitatie, ook zelf aan
   te zetten).

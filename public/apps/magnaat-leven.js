@@ -117,7 +117,7 @@
     /* Opnieuw beginnen gooit een leven weg en kan niet terug: de eerste tik vraagt
        het, de tweede doet het. */
     if (t.dataset.vnOpnieuw != null) {
-      if (t.dataset.zeker) { var nv = q('#vnNiveau'); doe({ actie: 'opnieuw', zeker: true, moeilijkheid: nv ? nv.value : undefined }); return; }
+      if (t.dataset.zeker) { var nv = q('#vnNiveau'), ns = q('#vnStart'); doe({ actie: 'opnieuw', zeker: true, moeilijkheid: nv ? nv.value : undefined, begin: ns ? ns.value : undefined }); return; }
       t.dataset.zeker = '1';
       t.textContent = 'Ja, gooi dit leven weg en begin opnieuw';
       return;

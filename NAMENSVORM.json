@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T14:12:02.122Z",
-    "commit": "63dec5c8",
+    "op": "2026-09-27T14:23:13.010Z",
+    "commit": "d8bf1cba",
     "boomVuil": false,
     "boomAnders": 7,
     "instrument": "scripts/namensvorm.js",
@@ -613,7 +613,7 @@
   "woordenschat": [
     {
       "woord": "doel",
-      "bestanden": 262,
+      "bestanden": 266,
       "domeinen": 141,
       "samengesteld": 188,
       "samengesteldDomeinen": 86,
@@ -682,10 +682,10 @@
     },
     {
       "woord": "claim",
-      "bestanden": 31,
+      "bestanden": 35,
       "domeinen": 21,
-      "samengesteld": 39,
-      "samengesteldDomeinen": 23,
+      "samengesteld": 42,
+      "samengesteldDomeinen": 24,
       "stand": "bezet",
       "waar": [
         "kern/afhaalcode",

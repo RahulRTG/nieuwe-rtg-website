@@ -101,6 +101,7 @@ test('6. de besluiten C1 tot en met C7 reizen mee, met hun herkomst en hun stand
     assert.match(b.besloten, /2[57] september 2026/);
     assert.ok(['gebouwd', 'te bouwen'].includes(b.stand), b.id + ' zegt niet of hij al een handhaver heeft');
     if (b.stand === 'te bouwen') assert.match(b.handhaving, /^Nog geen/, b.id + ' belooft een handhaver die er niet is');
+    if (b.stand === 'gebouwd') assert.match(b.handhaving, /test\/[a-z-]+\.test\.js|test\/stuur-kantoor/, b.id + ' noemt geen toets die hem vasthoudt');
   }
   /* Het register mag niet achterlopen op de bron: anders keurt deze toets een oud besluit. */
   assert.deepEqual(vast.besluiten, JSON.parse(JSON.stringify(B.BESLUITEN)), 'BEDRIJFSMAAT.json loopt achter op besluiten.js');

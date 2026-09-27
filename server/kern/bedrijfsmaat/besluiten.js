@@ -14,6 +14,20 @@
    een vergeten vraag, terwijl het een genomen besluit is dat op werk wacht. */
 'use strict';
 
+/* Wie C3 tot en met C7 handhaaft, sinds 27 september 2026. */
+const HANDHAVING = {
+  C3: 'kern/bedrijfsmaat/klantwaarde.js (vier maten, geen totaal), kern/reisbureau-thuis.js en afgerondOp in ' +
+    'kern/rtfos/casus-keten.js; test/klantwaarde.test.js en test/reisbureau-thuis.test.js.',
+  C4: 'kern/bankpositie.js (handmatig, bron verplicht, graad vermoed, bonnen op nul met reden); test/bankpositie.test.js. ' +
+    'De eigen bon zelf en een bankkoppeling zijn nog niet gebouwd.',
+  C5: 'kern/aanmeldingen/naargast.js (lid nu of aan het eind, kantoor met reden, drie regels standaard uit); ' +
+    'test/naargast.test.js.',
+  C6: 'kern/aanmeldkanaal.js (een telling per maand, nooit per lid); test/aanmeldkanaal.test.js. ' +
+    'De vraag zelf staat nog niet in het aanmeldscherm; de API en de campagnelink wel.',
+  C7: 'kern/streefbeeld.js (voorstel uit drie maanden, tekenen op de vingerafdruk, een dimensie buiten is nee); ' +
+    'test/streefbeeld.test.js. Er is nog niets dat autonoom handelt.'
+};
+
 const BESLUITEN = Object.freeze([
   Object.freeze({
     id: 'C1',
@@ -26,7 +40,7 @@ const BESLUITEN = Object.freeze([
       'economische wereld hoogstens tot een constatering of een voorstel leiden.',
     kort: 'Eén waarnemend brein is niet één portemonnee.',
     handhaving: 'Elke bedrijfsmaat draagt precies één wereld uit kern/economie/werelden.js; de meter ' +
-      'weigert een maat zonder wereld of met een onbekende. De firewall is in deze ronde niet aangeraakt.',
+      'weigert een maat zonder wereld of met een onbekende (test/bedrijfsmaat.test.js). De firewall is in deze ronde niet aangeraakt.',
     stand: 'gebouwd'
   }),
   Object.freeze({
@@ -66,8 +80,7 @@ const BESLUITEN = Object.freeze([
       'pas na de handtekening van de eigenaar. Zonder getekende streefstand gebeurt er niets autonoom.',
       'De machine stelt voor, de eigenaar tekent.']
   ].map(([id, naam, regel, kort]) => Object.freeze({ id, naam, besloten: '27 september 2026, door de eigenaar',
-    herkomst: 'mens', regel, kort, handhaving: 'Nog geen: staat in AUTONOMIE.md par. 2.5 en par. 7.',
-    stand: 'te bouwen' }))
+    herkomst: 'mens', regel, kort, handhaving: HANDHAVING[id], stand: 'gebouwd' }))
 ]);
 
 module.exports = { BESLUITEN };

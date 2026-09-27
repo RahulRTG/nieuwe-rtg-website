@@ -12,7 +12,7 @@
 const { BESLUITEN } = require('../kern/bedrijfsmaat/besluiten');
 
 module.exports = (kern) => {
-  const { app, boardroomAuth, boardroomWie, bedrijfsmaat, bankpositie, bankpositieZet, aanmeldkanaalStand } = kern;
+  const { app, boardroomAuth, boardroomWie, bedrijfsmaat, bankpositie, bankpositieZet, aanmeldkanaalStand, streefbeeld } = kern;
   app.post('/api/office/bedrijfsmaat', boardroomAuth, (req, res) => {
     const uit = bedrijfsmaat.stand({ maand: (req.body || {}).maand });
     res.json(Object.assign({ ok: true, besluiten: BESLUITEN.map(b => ({ id: b.id, naam: b.naam, kort: b.kort })) }, uit));
@@ -23,6 +23,21 @@ module.exports = (kern) => {
      uit de sessie en nooit uit het verzoek. */
   app.post('/api/office/bankpositie', boardroomAuth, (req, res) =>
     res.json(Object.assign({ ok: true }, bankpositie((req.body || {}).maand))));
+  /* HET STREEFBEELD (kern/streefbeeld.js, besluit C7): lezen mag de boardroom;
+     tekenen en intrekken alleen de eigenaar, op naam. */
+  app.post('/api/office/streefbeeld', boardroomAuth, (req, res) => res.json({ ok: true,
+    voorstel: streefbeeld.voorstel(), getekend: streefbeeld.getekend(), toets: streefbeeld.toets((req.body || {}).maand) }));
+  const alleenEigenaar = (req, res) => {
+    if (req.boardroomBaas) return true;
+    res.status(403).json({ error: 'Alleen de eigenaar tekent of trekt een streefbeeld in.' }); return false;
+  };
+  const uit = (res, r) => (r.error ? res.status(r.status || 400).json(r) : res.json(r));
+  app.post('/api/office/streefbeeld/teken', boardroomAuth, (req, res) => {
+    if (alleenEigenaar(req, res)) uit(res, streefbeeld.teken((req.body || {}).id, boardroomWie(req)));
+  });
+  app.post('/api/office/streefbeeld/intrek', boardroomAuth, (req, res) => {
+    if (alleenEigenaar(req, res)) uit(res, streefbeeld.intrek(boardroomWie(req)));
+  });
   // hoe leden bij RTG kwamen, per maand en langs de groepspoort (kern/aanmeldkanaal.js, C6)
   app.post('/api/office/aanmeldkanaal', boardroomAuth, (req, res) =>
     res.json(Object.assign({ ok: true }, aanmeldkanaalStand((req.body || {}).maand))));

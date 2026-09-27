@@ -35,6 +35,8 @@ Object.assign(kern, require('../kern/eenaccount').maakEenAccount({
   pinInfo: kern.pinInfo, pinCheck: kern.pinCheck,
   // hetzelfde doel-slot als /api/supplier/login: een pin, een teller
   pinSlot,
+  // de kantooruitnodiging claimt in een collectietransactie (kern/kantoor/uitnodiging.js)
+  bewerkCollectie: hulp.bewerkCollectie,
   // en dezelfde persoonseis als /api/supplier/login: het ene account is geen achterdeur
   persoonsPoort: kern.persoonsPoort,
   // MIJN RTG blok 3: hier ontstaat een tweede context voor dezelfde mens

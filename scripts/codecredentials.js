@@ -18,10 +18,9 @@ const STATUSES = new Set(['migrated', 'closed', 'remaining']);
 const CLASSIFICATIES = new Set(['credential', 'money_credential', 'public_identifier',
   'tracking_identifier', 'signed_presentation', 'authenticated_identifier',
   'external_protocol_credential', 'central_session_credential', 'geen_credential']);
-/* `geen_credential`: een censuskandidaat is na lezing GEEN identifier of geheim
-   (een record-id, de uitgiftepas van een keuken, een idempotentiesleutel). Dat
-   oordeel haalt hem uit de blokkerlijst, dus het mag nooit goedkoop zijn:
-   gesloten, nooit blokkerend, en met een uitleg die het oordeel naloopt. */
+/* `geen_credential`: na lezing GEEN identifier of geheim (record-id,
+   idempotentiesleutel). Dat haalt hem uit de blokkers, dus nooit goedkoop:
+   gesloten, niet blokkerend, met een uitleg die het oordeel naloopt. */
 const GEEN_NOTITIE_MIN = 40;
 const REQUIRED_ROUTES = [
   'GET /api/projectie/:code',
@@ -166,6 +165,9 @@ const REQUIRED_ROUTES = [
   'POST /api/office/kantoor/uitnodiging',
   'POST /api/office/service/bevestiging/vraag',
   'POST /api/office/service/bevestiging/code', 'POST /api/foundation/les/maak',
+  'POST /api/concern/uitnodiging/roteer', 'POST /api/office/kantoor/uitnodiging/intrek',
+  'POST /api/member/magnaat/teamkamer/code', 'POST /api/member/magnaat/teamkamer/code/intrek',
+  'POST /api/service/bevestiging/toon', 'POST /api/supplier/service/bevestiging/toon',
   'POST /api/foundation/les/join', 'POST /api/foundation/ai',
   'POST /api/rtf/uitnodiging/accepteer', 'POST /api/rtf/kanaal',
   'POST /api/rtf/toegang', 'POST /api/rtf/bieb', 'POST /api/rtf/bieb/catalogus',
@@ -192,10 +194,8 @@ const CONTROLES = ['hash_only_at_rest', 'issuer_doel_scope', 'issued_at_expires_
   'max_gebruik_gebruik', 'server_side_intrekken_roteren', 'constant_time_lookup',
   'atomic_claim', 'raw_once'];
 
-/* BRONAFGELEIDE CENSUS. REQUIRED_ROUTES kan een morgen toegevoegde
-   `/api/.../toegangscode` nooit raden; daarom markeren we uit server/ elke
-   letterlijke route op pad en eerste handlertekst. Een kandidaat buiten het
-   register wordt een RELEASEBLOCKER met bron en reden: onbekend is nooit READY. */
+/* BRONAFGELEIDE CENSUS: elke letterlijke route in server/ op pad en handlertekst;
+   een kandidaat buiten het register is een RELEASEBLOCKER (onbekend is nooit READY). */
 const METHODEN = 'get|post|put|patch|delete|head|options|all';
 /* `*` en niet `+` na de slash: `app.get('/')` is ook een letterlijke route, en
    met `+` werd hij als onleesbaar geteld (middleware/voordeur.js). */
@@ -206,9 +206,7 @@ const VELD_RISICO = /(?:req\.body|\bbody|\bb)\s*(?:\.|\[\s*['"])(?:[a-z0-9_]*(?:
 /* `sleutel` hoort erbij: `x-doos-eigen-sleutel` (kern/stad) is een apparaatsleutel
    in een kop, en zonder dit woord zag de census die route niet eens. */
 const KOP_RISICO = /(?:authorization|x-[a-z0-9-]*(?:code|token|key|secret|sleutel)|bearer\s)/i;
-/* Niet alleen wat binnenkomt kan een deur verraden. Een route die een geheim
-   maakt of een PIN/token/kassacode in haar antwoord zet is zelf een issuer en
-   moet dus ook worden geclassificeerd. */
+/* Ook een route die een geheim in haar antwoord zet is een issuer. */
 const UITGIFTE_RISICO = /(?:\bmakePin\s*\(|\bbearer\.maak\s*\(|\brandomBytes\s*\(|\b(?:pin|token|kassacode|secret)\s*:|\.kassacode\b)/i;
 
 function jsBestanden(map) {
@@ -221,12 +219,9 @@ function jsBestanden(map) {
   return uit;
 }
 
-/* DYNAMISCHE ROUTES OPLOSSEN ZONDER HANDLIJST. Een pad als `p.pad + '/verstuur'`
-   of `BASIS + '/Users'` is voor deze census onleesbaar -- maar de ROUTER kent het
-   wel, en ROUTEBRON.json legt per route vast in welk bestand en op welke regel de
-   router hem vond (`samengesteld: true`). Wat daar staat is de waarheid van de
-   server en geen bewering van een mens; een verouderde regel valt vanzelf terug
-   op onleesbaar, want de sleutel is bestand:regel. */
+/* DYNAMISCHE ROUTES ZONDER HANDLIJST: `p.pad + '/verstuur'` is hier onleesbaar,
+   maar ROUTEBRON.json kent bestand en regel uit de ROUTER (`samengesteld: true`);
+   een verouderde regel valt terug op onleesbaar (sleutel bestand:regel). */
 function routebronKaart(root) {
   const kaart = new Map();
   let rb = null;
@@ -242,9 +237,8 @@ function routebronKaart(root) {
   return kaart;
 }
 
-/* Wat ook de router niet kent (gehashte bundelpaden, de Express-shim zelf), wordt
-   in het register VERKLAARD: bron plus de exacte regeltekst van de aanroep. Een
-   gewijzigde regel verklaart niets meer en wordt weer een blokkade. */
+/* Wat ook de router niet kent, wordt VERKLAARD met bron en exacte regeltekst;
+   een gewijzigde regel verklaart niets meer. */
 function aanroepTekst(bron, index) {
   const eind = bron.indexOf('\n', index);
   return bron.slice(bron.lastIndexOf('\n', index) + 1, eind < 0 ? bron.length : eind).trim();
@@ -257,12 +251,8 @@ function bronCensus(root = ROOT, register = null) {
   const verklaringen = Array.isArray(register && register.dynamische_aanroepen) ? register.dynamische_aanroepen : [];
   let aanroepen = 0, letterlijk = 0, doorRouter = 0;
   for (const bestand of jsBestanden(server).sort()) {
-    /* COMMENTAAR IS GEEN CODE. Zonder deze stap telde een `app.post(` in een
-       uitleg als onleesbare route, en een woord als "Authorization" in het
-       commentaar boven de VOLGENDE route maakte de vorige een kandidaat (het
-       handlervenster loopt tot de volgende aanroep). Platgeslagen en niet
-       weggehaald (scripts/lib/bron.js, regelsHeel): posities en regelnummers
-       blijven die van de echte bron. */
+    /* COMMENTAAR IS GEEN CODE (een `app.post(` of "Authorization" in uitleg maakte
+       anders een kandidaat); platgeslagen met regelsHeel, zodat regels kloppen. */
     const bron = zonderCommentaar(fs.readFileSync(bestand, 'utf8'), { regelsHeel: true });
     const calls = [];
     ROUTE_AANROEP.lastIndex = 0;
@@ -372,15 +362,23 @@ function bewijsManifest(register, root = ROOT) {
     sha256: crypto.createHash('sha256').update(JSON.stringify(perDeur)).digest('hex'), perDeur };
 }
 
-/* `routes` zijn de letterlijke verklaringen die de broncensus vindt. Een
-   Express-router kan daar nog onder een mount hangen. Zodra een deur zo'n
-   mount noemt, zijn `effective_routes` de werkelijke externe adressen en dus
-   de adressen die REQUIRED_ROUTES bewaakt. Zo kan `/school/koppel` niet per
-   ongeluk als publieke waarheid gelden terwijl de echte deur
-   `/api/foundation/school/koppel` heet. */
+/* `routes` zijn wat de broncensus letterlijk vindt; noemt een deur een
+   routermount, dan zijn `effective_routes` de echte externe adressen (en die
+   bewaakt REQUIRED_ROUTES): `/school/koppel` heet buiten `/api/foundation/school/koppel`. */
 function effectieveRoutes(d) {
   return Array.isArray(d && d.effective_routes) && d.effective_routes.length
     ? d.effective_routes : (d && d.routes) || [];
+}
+
+/* De ENIGE weg onder de 128 bit: een verklaarde korte menscode (een mens leest
+   hem voor). Alleen met binding, pogingenrem en uitgifte na een handeling van de
+   houder, binnen de plafonds van het beleid, en met een onderbouwing. */
+function korteMenscode(b, d) {
+  const k = d.korte_menscode, c = d.controls || {}, n = x => Number(x);
+  return !!(b && k && n(c.entropy_bits) >= 1 && n(k.geldig_seconden) > 0 && n(k.geldig_seconden) <= n(b.max_geldig_seconden) &&
+    n(k.max_pogingen_per_code) >= 1 && n(k.max_pogingen_per_code) <= n(b.max_pogingen_per_code) &&
+    n(k.max_uitgiften) >= 1 && n(k.max_uitgiften) <= n(b.max_uitgiften) &&
+    (b.vereist || []).every(x => c[x] === true) && String(k.waarom || '').trim().length >= n(b.waarom_min_tekens));
 }
 
 function controleer(register, root = ROOT) {
@@ -415,7 +413,7 @@ function controleer(register, root = ROOT) {
       fouten.push(d.id + ': afgeronde deur mag geen releaseblokkade blijven');
     if ((d.classificatie === 'credential' || d.classificatie === 'money_credential') && d.status === 'migrated') {
       if (!d.controls || (Number(d.controls.entropy_bits) < Number(register.beleid.credential_min_entropy_bits) &&
-          !korteCodeGedragen(d)))
+          !korteCodeGedragen(d) && !korteMenscode(register.beleid.korte_menscode, d)))
         fouten.push(d.id + ': gemigreerde credential mist minimaal 128-bit bewijs');
       for (const c of CONTROLES) if (!d.controls || d.controls[c] !== true)
         fouten.push(d.id + ': gemigreerde credential mist control ' + c);

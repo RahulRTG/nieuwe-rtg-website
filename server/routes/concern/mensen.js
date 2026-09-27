@@ -12,7 +12,7 @@
 module.exports = (kern, hulp) => {
   const { app, auth, employmentVind, employmentNieuw, employmentBeeindig, employmentZet,
     employmentVanEntiteit, employmentVanPersoon, employmentOpDatum, employmentOrganigram,
-    uitnodigingNieuw, uitnodigingAccepteer, uitnodigingIntrek, uitnodigingVind,
+    uitnodigingNieuw, uitnodigingAccepteer, uitnodigingIntrek, uitnodigingRoteer, uitnodigingVind,
     uitnodigingVanEntiteit, uitnodigingBulk, uitnodigingBulkVerstuur,
     scopeMag, scopeFunctiescheiding, kwalificatieZet, kwalificatiesVan,
     werkOverzicht, entiteitVind } = kern;
@@ -41,16 +41,26 @@ module.exports = (kern, hulp) => {
   /* ACCEPTEREN. `persoon` komt uit de GEVERIFIEERDE sessie en nooit uit het
      lichaam -- anders accepteert de een op naam van de ander. Dezelfde regel als
      bij ondernemingAanvraag(). */
-  app.post('/api/concern/uitnodiging/accepteer', auth, (req, res) => {
-    stuur(res, uitnodigingAccepteer(String((req.body || {}).code || ''), req.session.key));
+  app.post('/api/concern/uitnodiging/accepteer', auth, async (req, res) => {
+    stuur(res, await uitnodigingAccepteer(String((req.body || {}).code || ''), req.session.key));
   });
 
-  app.post('/api/concern/uitnodiging/intrek', auth, (req, res) => {
+  /* Intrekken en roteren: alleen de eigenaar van de entiteit. Roteren geeft een
+     nieuwe code (kaal, alleen in dit antwoord) en trekt de vorige in. */
+  const eigenUitnodiging = (req) => {
     const u = uitnodigingVind(String((req.body || {}).uitnodiging || ''));
+    const e = u && entiteitVind(u.entiteit);
+    return e && e.eigenaar === req.session.key ? u : null;
+  };
+  app.post('/api/concern/uitnodiging/intrek', auth, async (req, res) => {
+    const u = eigenUitnodiging(req);
     if (!u) return stuur(res, { status: 404, error: 'Deze uitnodiging bestaat niet.' });
-    const e = entiteitVind(u.entiteit);
-    if (!e || e.eigenaar !== req.session.key) return stuur(res, nietGevonden);
-    stuur(res, uitnodigingIntrek(u));
+    stuur(res, await uitnodigingIntrek(u, req.session.key));
+  });
+  app.post('/api/concern/uitnodiging/roteer', auth, async (req, res) => {
+    const u = eigenUitnodiging(req);
+    if (!u) return stuur(res, { status: 404, error: 'Deze uitnodiging bestaat niet.' });
+    stuur(res, await uitnodigingRoteer(u, req.session.key));
   });
 
   /* Bulk in twee stappen: eerst wat er uit het bestand komt (met de

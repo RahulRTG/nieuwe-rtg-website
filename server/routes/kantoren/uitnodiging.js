@@ -22,10 +22,23 @@ module.exports = (ctx) => {
       const bewijs = await zwaar.eis(boardroomUser(req), 'eigenaar-kantooruitnodiging',
         zwaar.sessieSleutel(req), req, 'Een uitnodiging voor het kantoor maken');
       if (bewijs.error) return zwaar.stuur(res, bewijs);
-      const r = bron().maak({ voorKey: t.key, codenaam: t.codename, door: 'eigenaar' });
+      const r = await bron().maak({ voorKey: t.key, codenaam: t.codename, door: 'eigenaar' });
       if (r.error) return res.status(r.status || 400).json({ error: r.error });
       afdelingen.audit('eigenaar', 'Kantooruitnodiging gemaakt voor ' + t.codename);
       res.json(Object.assign({ codenaam: t.codename }, r));
+    } catch (e) { console.error('[uitnodiging]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
+
+  /* Intrekken is geen zware handeling: een uitgelekte uitnodiging dichtzetten
+     hoort geen drempel te hebben. Wel alleen de eigenaar, net als uitgeven. */
+  app.post('/api/office/kantoor/uitnodiging/intrek', boardroomAuth, async (req, res) => {
+    try {
+      if (!req.boardroomBaas) return res.status(403).json({ error: 'Alleen de eigenaar trekt een kantooruitnodiging in.' });
+      if (!bron()) return res.status(503).json({ error: 'De kantooruitnodiging is niet bedraad in deze server.' });
+      const r = await bron().intrek(String((req.body || {}).id || '').slice(0, 60), 'eigenaar');
+      if (r.error) return res.status(r.status || 400).json({ error: r.error });
+      afdelingen.audit('eigenaar', 'Kantooruitnodiging ingetrokken (' + r.id + ')');
+      res.json(r);
     } catch (e) { console.error('[uitnodiging]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   });
 

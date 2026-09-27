@@ -22,8 +22,8 @@ module.exports = (kern) => {
     serviceZaken, serviceLoop, serviceMachtiging, serviceBevestiging, serviceKeuzes,
     serviceFoutsignaal, findSupplier, serviceGesprek } = kern;
 
-  const veilig = (res, werk) => {
-    try { const r = werk(); res.status(r && r.status ? r.status : 200).json(r); }
+  const veilig = async (res, werk) => {
+    try { const r = await werk(); res.status(r && r.status ? r.status : 200).json(r); }
     catch (e) { console.error('[service-kantoor]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   };
   const lijf = (req) => req.body || {};
@@ -104,19 +104,18 @@ module.exports = (kern) => {
     serviceLoop.koppel(kort(lijf(req).id, 40), { soort: kort(lijf(req).soort, 30), code: kort(lijf(req).code, 60), door: req.balieKey })));
 
   /* ------------------------------------------------------- bevestigingen -- */
-  /* Om een bevestiging VRAGEN. De code komt hier niet terug: die staat in de app
-     van het lid. Een medewerker die de code van zijn eigen scherm kan aflezen,
-     bevestigt niets -- dan is de terugval een lege ceremonie. */
+  /* Om een bevestiging VRAGEN. De code komt hier niet terug maar in de app van
+     het lid: van zijn eigen scherm afgelezen bevestigt hij niets. */
   app.post('/api/office/service/bevestiging/vraag', officeAuth, balieAuth, (req, res) => veilig(res, () => {
     const b = lijf(req);
     return serviceBevestiging.vraag({ zaakId: kort(b.id, 40), mens: req.balieKey,
       doel: kort(b.doel, 200), capabilities: b.capabilities, reden: kort(b.reden, 500) });
   }));
 
-  /* De terugval: het lid leest zijn zes cijfers voor. Alleen geldig voor de
-     medewerker die het verzoek deed, en een keer. */
+  /* De terugval: het lid leest zijn zes cijfers voor, voor DEZE zaak (`id`).
+     Alleen voor de medewerker die het verzoek deed, een keer. */
   app.post('/api/office/service/bevestiging/code', officeAuth, balieAuth, (req, res) => veilig(res, () =>
-    serviceBevestiging.metCode(kort(lijf(req).code, 20), { mens: req.balieKey })));
+    serviceBevestiging.metCode(kort(lijf(req).code, 20), { mens: req.balieKey, zaak: kort(lijf(req).id, 40) })));
 
   /* ---------------------------------------------------------- machtiging -- */
   /* De tweede handtekening onder zwaar werk. De kern weigert de aanvrager zelf;

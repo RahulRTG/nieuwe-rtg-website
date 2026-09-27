@@ -82,9 +82,9 @@ test('de echte credentials uit de classificatieronde blokkeren de release', () =
   const uit = poort.controleer(register);
   const echte = ['office.gedeelde_kantoorcode', 'partnerkanaal.personeels_en_partnercode',
     'link.capability_aanvaarden', 'travelos.ov_incheckcode',
-    'mode.bezorgcode', 'workos.concern_uitnodiging', 'festivalos.toegangspas',
-    'magnaat.teamkamer_toegangscode', 'identity.sso_client_secret',
-    'rtfos.activiteit_incheckcode', 'office.kantooruitnodiging', 'service.balie_bevestigingscode',
+    'mode.bezorgcode', 'festivalos.toegangspas',
+    'identity.sso_client_secret',
+    'rtfos.activiteit_incheckcode',
     'foundation.onderwijs_les_tokens', 'foundation.family_profile_token_buiten_harde_poort'];
   // gemigreerd op 27 september 2026 (B9, de vier restdeuren): zie de toets hieronder
   const restdeuren = new Set(['travelos.ov_incheckcode', 'mode.bezorgcode', 'festivalos.toegangspas',

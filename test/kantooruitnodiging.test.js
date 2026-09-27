@@ -69,7 +69,7 @@ test('1-3. op naam, eenmalig, en de oude vervalt', async () => {
 
   const eerste = await nodig(a.codenaam);
   assert.equal(eerste.status, 200, JSON.stringify(eerste.body));
-  assert.match(eerste.body.code, /^[A-Z2-9]{10}$/);
+  assert.match(eerste.body.code, /^KU\.[0-9A-F]{32}$/, '128 bit, kaal alleen in dit antwoord');
   const tweede = await nodig(a.codenaam);
   assert.equal((await koppel(a.token, eerste.body.code)).status, 401, 'een nieuwe uitnodiging maakt de oude ongeldig');
 
@@ -100,14 +100,16 @@ test('5. de gedeelde code koppelt niet meer, en de koppelwegen tellen mee', asyn
   assert.ok(!JSON.stringify(o.body).includes('hash'), 'het overzicht draagt geen hash');
 });
 
-test('4. de code staat niet in de opslag, en na zeven dagen is hij dicht', () => {
+test('4. de code staat niet in de opslag, en na zeven dagen is hij dicht', async () => {
   let t = Date.parse('2026-09-23T09:00:00Z');
-  const db = { data: {} };
-  const u = maakUitnodiging({ db, save: () => {}, crypto, nu: () => t });
-  const r = u.maak({ voorKey: 'user-5', codenaam: 'Test' });
+  const db = { data: {}, writable: true };
+  const bewerkCollectie = require('../server/db/collectie-bewerken')({ store: 'json', db, save: () => {} });
+  const u = maakUitnodiging({ db, save: () => {}, crypto, nu: () => t, bewerkCollectie });
+  const r = await u.maak({ voorKey: 'user-5', codenaam: 'Test' });
   assert.ok(r.ok);
   assert.ok(!JSON.stringify(db.data).includes(r.code), 'de code zelf staat niet in de opslag');
-  assert.equal(u.maak({ voorKey: 'gedeeld' }).status, 400, 'een uitnodiging hangt aan een persoonlijke inlog');
+  assert.ok(!JSON.stringify(db.data).includes(r.code.slice(3)), 'ook het geheim zonder voorvoegsel niet');
+  assert.equal((await u.maak({ voorKey: 'gedeeld' })).status, 400, 'een uitnodiging hangt aan een persoonlijke inlog');
   t += 8 * 86400000;
-  assert.equal(u.verzilver('user-5', r.code).status, 401, 'na zeven dagen is hij dicht');
+  assert.equal((await u.verzilver('user-5', r.code)).status, 401, 'na zeven dagen is hij dicht');
 });

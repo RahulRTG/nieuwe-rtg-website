@@ -111,7 +111,13 @@ const ROUTES = new Set([
      herhaling krijgt de bon zonder code. */
   'POST /api/supplier/horeca/bon/maak',
   'POST /api/supplier/horeca/bon/roteer',
-  'POST /api/supplier/horeca/club/band'
+  'POST /api/supplier/horeca/club/band',
+  /* De vier codedeuren van 27 september 2026 (lib/idemsleutels-nooit-codedeuren.js):
+     elk van deze antwoorden draagt een kale code die alleen als hash blijft. */
+  'POST /api/concern/uitnodigen', 'POST /api/concern/bulk/verstuur', 'POST /api/concern/uitnodiging/roteer',
+  'POST /api/member/magnaat/teamkamer/maak', 'POST /api/member/magnaat/teamkamer/code',
+  'POST /api/service/bevestiging/toon', 'POST /api/supplier/service/bevestiging/toon',
+  'POST /api/office/kantoor/uitnodiging'
 ]);
 
 const isEenmalig = (methode, pad) => ROUTES.has(

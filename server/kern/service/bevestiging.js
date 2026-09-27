@@ -19,9 +19,9 @@
    geheim dat rondgaat.
 
    DE CODE BLIJFT, MAAR ALS TERUGVAL EN NIET ALS IDENTITEIT: zes cijfers, vijf
-   minuten, EEN keer, gebonden aan DEZE zaak en DEZE gevraagde bevoegdheden.
-   Nodig omdat een lid dat niet bij zijn app kan -- bij een toegangsprobleem
-   nogal waarschijnlijk -- anders nergens heen kan.
+   minuten, EEN keer, gebonden aan DEZE zaak en DEZE gevraagde bevoegdheden, pas
+   gemaakt als het lid hem opvraagt en alleen als hash bewaard
+   (./bevestiging-code.js zegt waarom zes cijfers daar veilig genoeg zijn).
 
    WAT EEN BEVESTIGING NIET DOET: iemand identificeren. Zij bewijst dat wie de
    app open heeft akkoord gaat, meer niet. Wat echt om identiteit vraagt
@@ -32,26 +32,21 @@
 
 const klok = require('../../lib/klok');
 const router = require('./router');
-/* De stand, de naar-buiten-vorm en de vergelijking van de code staan in
+/* De stand en de naar-buiten-vorm staan in
    ./bevestiging-vorm.js: geen levensloop, geen opslag, alleen vorm. */
 const vorm = require('./bevestiging-vorm');
 
 const MINUTEN = 5;
 
-module.exports = function maakBevestiging({ db, save, crypto, zaken, machtigingen }) {
+module.exports = function maakBevestiging({ db, save, crypto, zaken, machtigingen, bewerkCollectie }) {
   const eigen = require('../eigencollectie')({ db, domein: 'kern/service-bevestiging', bezit: { serviceBevestigingen: 'lijst' } });
   const B = () => eigen.bak('serviceBevestigingen');
   const nu = () => klok.datum().toISOString();
   const schoon = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n);
   const inhoud = (s) => String(s || '').replace(/[^\p{L}\p{N}]/gu, '').length;
 
-  /* Zes cijfers uit een CSPRNG. Geen Math.random: dit is een sleutel, hoe kort
-     hij ook leeft (keuringsregel over zwakke sleutels). */
-  const cijfers = () => String(crypto.randomInt(0, 1000000)).padStart(6, '0');
-
   const stand = vorm.stand;
   const levend = vorm.levend;
-  const gelijk = vorm.gelijk;
   const kortB = (b, o) => vorm.kortB(b, Object.assign({ minuten: MINUTEN }, o));
   const vind = (id) => B().find(b => b.id === String(id || '')) || null;
 
@@ -116,7 +111,7 @@ module.exports = function maakBevestiging({ db, save, crypto, zaken, machtiginge
       zaak: z.id, melder: z.melder, mens: w,
       doel: schoon(doel, 200) || null, reden: r,
       capabilities: gekregen, team: z.team,
-      code: cijfers(),
+      code_hash: null, codeUitgifte: 0, codePogingen: 0,
       at, tot: new Date(Date.parse(at) + MINUTEN * 60000).toISOString(),
       gebruiktAt: null, geweigerdAt: null, machtiging: null, via: null
     };
@@ -133,50 +128,9 @@ module.exports = function maakBevestiging({ db, save, crypto, zaken, machtiginge
       .map(b => kortB(b, { voorLid: true }));
   }
 
-  /* Het lid drukt. Hier ontstaat de machtiging -- en nergens anders: een
-     bevestiging die geen machtiging oplevert, is een knop zonder gevolg, en een
-     machtiging zonder bevestiging is precies wat deze laag voorkomt. */
-  function bevestig(id, { melder, via } = {}) {
-    const b = vind(id);
-    if (!b) return { status: 404, error: 'Dit verzoek kennen wij niet.' };
-    if (String(melder || '') !== b.melder) return { status: 403, error: 'Dit verzoek staat niet op uw naam.' };
-    const s = stand(b);
-    if (s !== 'open') return { status: 400, error: 'Dit verzoek is ' + s + '. Vraag de medewerker om een nieuw verzoek.' };
-
-    const m = machtigingen.verleen({ zaakId: b.zaak, mens: b.mens, doel: b.doel,
-      capabilities: b.capabilities, binnenTeam: b.team,
-      reden: b.reden + ' (bevestigd door het lid zelf)' });
-    if (m.error) return m;
-    b.gebruiktAt = nu(); b.machtiging = m.machtiging.id; b.via = String(via || 'app');
-    save();
-    return { ok: true, bevestiging: kortB(b), machtiging: m.machtiging };
-  }
-
-  /* Weigeren hoort net zo makkelijk te zijn als bevestigen. Een knop die alleen
-     ja kent, is geen keuze. */
-  function weiger(id, { melder } = {}) {
-    const b = vind(id);
-    if (!b) return { status: 404, error: 'Dit verzoek kennen wij niet.' };
-    if (String(melder || '') !== b.melder) return { status: 403, error: 'Dit verzoek staat niet op uw naam.' };
-    if (stand(b) !== 'open') return { status: 400, error: 'Dit verzoek is ' + stand(b) + '.' };
-    b.geweigerdAt = nu();
-    save();
-    return { ok: true, bevestiging: kortB(b) };
-  }
-
-  /* DE TERUGVAL. Het lid leest zijn zes cijfers voor; de medewerker typt ze in.
-     Dezelfde uitkomst als drukken, dus dezelfde eenmaligheid en dezelfde
-     vervaltijd -- en de code hoort bij DEZE bevestiging, dus hij opent niets
-     anders. Vergelijken zonder vroegtijdig af te breken: een code van zes
-     cijfers is klein genoeg om te raden als je mag meten hoe ver je kwam. */
-  function metCode(code, { mens } = {}) {
-    const c = String(code || '').replace(/\D/g, '');
-    if (c.length !== 6) return { status: 400, error: 'Een bevestigingscode is zes cijfers.' };
-    const w = schoon(mens, 60);
-    const kandidaat = B().find(b => levend(b) && b.mens === w && gelijk(b.code, c));
-    if (!kandidaat) return { status: 404, error: 'Deze code hoort niet bij een openstaand verzoek van u. Codes gelden ' + MINUTEN + ' minuten en een keer.' };
-    return bevestig(kandidaat.id, { melder: kandidaat.melder, via: 'code' });
-  }
+  /* Indrukken, weigeren, de code opvragen en de code gebruiken VERBRUIKEN een
+     verzoek; dat staat in ./bevestiging-code.js, in een collectietransactie. */
+  const code = require('./bevestiging-code')({ crypto, bewerkCollectie, machtigingen, nu, stand, kortB, MINUTEN, B });
 
   const lijst = (f) => {
     const o = f || {};
@@ -186,5 +140,6 @@ module.exports = function maakBevestiging({ db, save, crypto, zaken, machtiginge
     return a.slice(0, Number(o.max || 50)).map(b => kortB(b));
   };
 
-  return { vraag, bevestig, weiger, metCode, voorLid, lijst, stand, vind, MINUTEN };
+  return { vraag, bevestig: code.bevestig, weiger: code.weiger, toon: code.toon, metCode: code.metCode,
+    voorLid, lijst, stand, vind, MINUTEN };
 };

@@ -28,7 +28,7 @@
          om iemand terug te bereiken, en een knop die een wachtrij vult waar
          niemand uit komt is erger dan geen knop;
        - hij toont niemand een bevestigingscode die er niet om vroeg: die komt
-         uit /api/service/bevestigingen en dus uit de eigen sessie;
+         uit /api/service/bevestiging/toon, dus uit de eigen sessie, een keer;
        - hij zwijgt bij een storing. Deze la is de UITLEG van een scherm; loopt
          de servicelaag niet, dan hoort die uitleg gewoon te blijven werken. */
     function tok() { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } }
@@ -100,8 +100,15 @@
           svc('/api/service/weiger', { id: v.id }).then(function () { z.textContent = 'Geweigerd.'; });
         }));
         z.appendChild(rij);
-        z.appendChild(el('p', null, 'Of lees de code voor: ' + (v.code || '?') +
-          ' (' + v.minuten + ' minuten, een keer).'));
+        // de terugvalcode bestaat pas als het lid erom vraagt (kern/service/bevestiging-code.js)
+        var cr = el('p', null, 'Kunt u niet bevestigen? ');
+        cr.appendChild(knop(null, 'Toon een code om voor te lezen', function () {
+          svc('/api/service/bevestiging/toon', { id: v.id }).then(function (d) {
+            cr.textContent = d && d.code ? 'Lees deze code voor: ' + d.code + ' (' + v.minuten + ' minuten, een keer).'
+              : ((d && d.error) || 'Er is nu geen code te krijgen.');
+          });
+        }));
+        z.appendChild(cr);
         blok.appendChild(z);
       });
 
@@ -127,13 +134,10 @@
           });
         }));
       }
-      /* DE BELKNOP, en alleen waar hij bestaat. Bellen hoort bij de Lifestyle-
-         en Business Pass; voor de rest staat hij er niet, en dat is geen
-         weglating maar de ladder. Wat er WEL is -- een mens vragen -- staat er
-         hierboven al, want dat is een ondergrens voor elk account en geen
-         premium-dienst (kern/service/mens.js). Hij gaat naar een eigen scherm:
-         deze la verdwijnt zodra je ergens heen navigeert, en een gesprek dat
-         daarmee wegvalt is erger dan geen belknop. */
+      /* DE BELKNOP, alleen waar hij bestaat (Lifestyle en Business: de ladder,
+         geen weglating). Een mens vragen staat er al; dat is een ondergrens
+         (kern/service/mens.js). Een eigen scherm, want deze la verdwijnt zodra
+         je navigeert, en een gesprek dat daarmee wegvalt is erger dan geen knop. */
       if (bel && bel.mag && bel.mag.mag) {
         rij.appendChild(knop(null, 'Bel RTG', function () {
           var z = lopend.length ? ('?zaak=' + encodeURIComponent(lopend[0].id)) : '';

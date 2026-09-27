@@ -8,6 +8,11 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const wereld = require('./lib/kaswereld');
+// bij naam, zodat scripts/mutatie.js weet welke modules hier op de proef staan
+const { TAFEL } = require('../server/kern/pay/tik');
+const { LEASE_MS } = require('../server/kern/pay/kas-claim');
+require('../server/kern/pay/vooraf');
+require('../server/kern/pay/kas-boek');
 
 test('de tik: 128 bits, een gebruik per betaler en sleutel, een plafond en intrekken', async () => {
   const w = wereld();
@@ -15,7 +20,7 @@ test('de tik: 128 bits, een gebruik per betaler en sleutel, een plafond en intre
   assert.match(t.code, /^TK(-[0-9A-F]{4}){8}$/);
   const rij = () => Object.values(w.data.payTikToegang)[0];
   assert.equal(JSON.stringify(w.data).includes(w.kaal(t.code).slice(2)), false, 'nergens een kale code');
-  assert.deepEqual([rij().toegang.issuer, rij().toegang.doel, rij().toegang.max_gebruik], ['rtg.lid.tik', 'pay-tik', 25]);
+  assert.deepEqual([rij().toegang.issuer, rij().toegang.doel, rij().toegang.max_gebruik], ['rtg.lid.tik', 'pay-tik', TAFEL]);
   assert.equal((await w.tik.tikBetaal({ van: 'A', code: t.code, centen: 100, idem: 'p' })).ok, true);
   await w.tik.tikBetaal({ van: 'A', code: t.code, centen: 100, idem: 'p' });
   assert.equal(rij().toegang.gebruik, 1, 'dezelfde betaler met dezelfde sleutel telt een keer');
@@ -71,14 +76,14 @@ test('vooraf en vastleggen overleven een crash zonder tweede reservering of boek
   /* Een proces dat na het reserveren wegviel: de claim staat nog open. */
   const rij = Object.values(w.data.payKasToegang)[0];
   Object.assign(rij, { stand: 'claimend', uitkomst: null });
-  w.klok.t += 61000;
+  w.klok.t += LEASE_MS + 1000;
   const nog = await w.vooraf.kasVooraf({ supplierCode: 'H', code: k.code, maxCenten: 5000, idem: 'v' });
   assert.equal(nog.reservering, v.reservering, 'dezelfde reservering, geen tweede');
   assert.equal(w.waarde.reserveringenVan('H').length, 1);
   w.stuk.crash = true;
   assert.equal((await w.vooraf.kasVastleg({ supplierCode: 'H', reservering: v.reservering, centen: 3000, idem: 'c' })).status, 503);
   assert.equal((await w.vooraf.kasVastleg({ supplierCode: 'H', reservering: v.reservering, centen: 3000, idem: 'c' })).code, 'KASCODE_BEZIG');
-  w.klok.t += 61000;
+  w.klok.t += LEASE_MS + 1000;
   assert.equal((await w.vooraf.kasVastleg({ supplierCode: 'H', reservering: v.reservering, centen: 3000, idem: 'c' })).ok, true);
   assert.equal(w.regels('kassa').length, 1, 'een boeking, ook na de hervatting');
 });
@@ -104,7 +109,7 @@ test('twee potjes: een weigering op het tweede deel draait het eerste terug, ook
   assert.equal((await w.kassa.kasInt({ supplierCode: 'Z', code: k.code, centen: 1000, idem: 'd' })).status, 503);
   assert.equal(w.saldi()['budget:A'], 400, 'het budgetdeel is teruggedraaid');
   w.stuk.weiger = null;
-  w.klok.t += 61000;
+  w.klok.t += LEASE_MS + 1000;
   /* Deel 2 zou nu slagen. Een hervatting die de stand niet las, boekte vooruit. */
   const r = await w.kassa.kasInt({ supplierCode: 'Z', code: k.code, centen: 1000, idem: 'd' });
   assert.equal(r.status, 403, 'de hervatting maakt het terugdraaien af, niet de betaling');

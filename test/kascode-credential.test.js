@@ -11,6 +11,11 @@ const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
 
 const kaswereld = require('./lib/kaswereld');
+/* De wereld bouwt ze op; hier staan ze bij naam zodat scripts/mutatie.js weet
+   welke modules deze toets op de proef stelt. */
+const { LEASE_MS } = require('../server/kern/pay/kas-claim');
+require('../server/kern/pay/kasbak');
+require('../server/kern/pay/kassa');
 const wereld = kaswereld;
 const kaal = s => String(s).replace(/[^0-9A-Z]/g, '');
 const kassaRegels = w => w.regels('kassa');
@@ -102,7 +107,7 @@ test('8. crash na de boeking: de claim blijft, een ander maakt hem af naar DEZE 
   assert.equal(weg.status, 503, 'niet bevestigd is geen succes en geen weigering');
   assert.equal(Object.values(w.data.payKasToegang)[0].stand, 'claimend');
   assert.equal((await w.kassa.kasInt({ supplierCode: 'Z1', code: k.code, centen: 700, idem: 'e' })).code, 'KASCODE_BEZIG');
-  w.klok.t += 61000;
+  w.klok.t += LEASE_MS + 1000;
   assert.equal((await w.kassa.kasInt({ supplierCode: 'Z2', code: k.code, centen: 4000, idem: 'x' })).status, 404);
   assert.equal(kassaRegels(w).length, 1, 'geen tweede boeking');
   assert.equal(w.saldi()['partner:Z1'], 700 - 17, 'het geld ging naar de zaak van de claim');

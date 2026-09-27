@@ -1,7 +1,7 @@
 {
   "schema": "RTG_CONNECTION_CONSTITUTION",
   "version": 7,
-  "source_sha256": "3f6c9b6987ff17135db658affa14ef6b4dee12217452a668883f4529af28899e",
+  "source_sha256": "bac0dfd69179e1f6b17b6ac5d480a5562c314051f6e789277199160405b8506e",
   "tests": {
     "total": 117,
     "passed": 117,

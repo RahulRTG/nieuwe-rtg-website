@@ -4166,7 +4166,7 @@
   "POST /api/office/rendezvous/meldingen": {
    "methode": "POST",
    "pad": "/api/office/rendezvous/meldingen",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "status": 200,
    "sleutels": [
     "meldingen",
@@ -4180,7 +4180,7 @@
   "POST /api/office/rendezvous/tafel/maak": {
    "methode": "POST",
    "pad": "/api/office/rendezvous/tafel/maak",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "status": 200,
    "sleutels": [
     "ok",
@@ -4197,7 +4197,7 @@
   "POST /api/office/rendezvous/tafel/nodig": {
    "methode": "POST",
    "pad": "/api/office/rendezvous/tafel/nodig",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "status": 404,
    "sleutels": [
     "error"
@@ -4210,7 +4210,7 @@
   "POST /api/office/rendezvous/tafels": {
    "methode": "POST",
    "pad": "/api/office/rendezvous/tafels",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "status": 200,
    "sleutels": [
     "status",

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-27T12:27:36.912Z",
-    "commit": "0fccc67e",
+    "op": "2026-09-27T12:45:59.133Z",
+    "commit": "726f24dc",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 0,
     "instrument": "scripts/bedrijfsmaat.js",
     "node": "v22.22.2"
   },
@@ -83,29 +83,29 @@
     }
   ],
   "telling": {
-    "maten": 64,
+    "maten": 67,
     "domeinen": 28,
     "perStatus": {
-      "bestaat": 34,
-      "half": 20,
+      "bestaat": 38,
+      "half": 19,
       "ontbreekt": 10,
       "onbekend": 0
     },
     "primairGat": {
       "BRON_ONTBREEKT": 10,
-      "DEFINITIE_ONTBREEKT": 12,
+      "DEFINITIE_ONTBREEKT": 11,
       "PROJECTIE_ONTBREEKT": 3,
       "BEWIJS_ONTBREEKT": 5
     },
     "perGat": {
       "BRON_ONTBREEKT": 10,
-      "DEFINITIE_ONTBREEKT": 22,
-      "PROJECTIE_ONTBREEKT": 22,
-      "BEWIJS_ONTBREEKT": 30
+      "DEFINITIE_ONTBREEKT": 21,
+      "PROJECTIE_ONTBREEKT": 21,
+      "BEWIJS_ONTBREEKT": 29
     },
     "ketens": 6,
-    "ketensGegrond": 2,
-    "bestaatGedeeltelijk": 7,
+    "ketensGegrond": 3,
+    "bestaatGedeeltelijk": 11,
     "rustOpGat": 1,
     "privacyGaten": 0,
     "verworpen": 0,
@@ -191,9 +191,9 @@
       "ontbreekt": 0
     },
     "uitkomst": {
-      "maten": 3,
-      "bestaat": 2,
-      "half": 1,
+      "maten": 6,
+      "bestaat": 6,
+      "half": 0,
       "ontbreekt": 0
     },
     "gebruik": {
@@ -282,10 +282,10 @@
     }
   },
   "perWereld": {
-    "commercieel": 6,
+    "commercieel": 7,
     "rtg-intern": 34,
-    "consument": 21,
-    "rtfoundation": 3
+    "consument": 22,
+    "rtfoundation": 4
   },
   "ketens": [
     {
@@ -341,9 +341,9 @@
     {
       "id": "funnel",
       "naam": "van nieuw lid naar behoud",
-      "gegrond": false,
-      "eersteBreuk": "uitkomst.klantwaarde",
-      "bestaand": 4,
+      "gegrond": true,
+      "eersteBreuk": null,
+      "bestaand": 5,
       "van": 5,
       "schakels": [
         {
@@ -362,13 +362,9 @@
           "gaten": []
         },
         {
-          "id": "uitkomst.klantwaarde",
-          "status": "half",
-          "gaten": [
-            "DEFINITIE_ONTBREEKT",
-            "PROJECTIE_ONTBREEKT",
-            "BEWIJS_ONTBREEKT"
-          ]
+          "id": "uitkomst.klantwaarde-living",
+          "status": "bestaat",
+          "gaten": []
         },
         {
           "id": "retentie.aanwezig",
@@ -711,11 +707,6 @@
         "domein": "uitkomst"
       },
       {
-        "id": "uitkomst.klantwaarde",
-        "status": "half",
-        "domein": "uitkomst"
-      },
-      {
         "id": "gebruik.ai",
         "status": "bestaat",
         "domein": "gebruik"
@@ -759,6 +750,26 @@
         "id": "performance.snelheid",
         "status": "bestaat",
         "domein": "performance"
+      },
+      {
+        "id": "uitkomst.klantwaarde-living",
+        "status": "bestaat",
+        "domein": "uitkomst"
+      },
+      {
+        "id": "uitkomst.klantwaarde-travel",
+        "status": "bestaat",
+        "domein": "uitkomst"
+      },
+      {
+        "id": "uitkomst.klantwaarde-work",
+        "status": "bestaat",
+        "domein": "uitkomst"
+      },
+      {
+        "id": "uitkomst.klantwaarde-foundation",
+        "status": "bestaat",
+        "domein": "uitkomst"
       },
       {
         "id": "capaciteit.partners",
@@ -970,16 +981,6 @@
       {
         "van": "support.klokken",
         "naar": "uitkomst.service-zonder-herhaling",
-        "gegrond": true
-      },
-      {
-        "van": "uitkomst.service-zonder-herhaling",
-        "naar": "uitkomst.klantwaarde",
-        "gegrond": true
-      },
-      {
-        "van": "uitkomst.rit-afgerond",
-        "naar": "uitkomst.klantwaarde",
         "gegrond": true
       },
       {
@@ -4040,66 +4041,6 @@
       "gedeeltelijk": "Alleen de ritlijst van de app; dispatchopdrachten zonder app-rit tellen niet mee."
     },
     {
-      "id": "uitkomst.klantwaarde",
-      "versie": 1,
-      "domein": "uitkomst",
-      "betekenis": "Klantwaarde als geslaagde uitkomst over de werelden heen, niet als aandacht of engagement.",
-      "wereld": "consument",
-      "bronnen": [],
-      "berekening": "nog niet vastgesteld",
-      "eenheid": "aandeel geslaagde bedoelingen",
-      "graad": "onbekend",
-      "actualiteit": "onbekend",
-      "minimaleGroep": 10,
-      "privacyklasse": "leden",
-      "eigenaar": null,
-      "eigenaarReden": "Niemand.",
-      "afhankelijk": [
-        "uitkomst.service-zonder-herhaling",
-        "uitkomst.rit-afgerond"
-      ],
-      "status": "half",
-      "gaten": [
-        "DEFINITIE_ONTBREEKT",
-        "PROJECTIE_ONTBREEKT",
-        "BEWIJS_ONTBREEKT"
-      ],
-      "elementen": {
-        "bron": {
-          "aanwezig": true,
-          "afgeleid": true,
-          "citaten": [],
-          "reden": null
-        },
-        "definitie": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Wat een geslaagde uitkomst is, verschilt per wereld en is per wereld niet besloten. Een samengesteld cijfer erover is met opzet niet de bedoeling (INT-04); het blijven naast elkaar staande maten."
-        },
-        "projectie": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Niet gebouwd."
-        },
-        "bewijs": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Volgt uit de projectie."
-        }
-      },
-      "groepsgrens": {
-        "vereist": true,
-        "afgedwongen": false,
-        "citaten": [],
-        "reden": "Volgt uit de projectie."
-      },
-      "keten": {
-        "gegrond": false,
-        "zwakkeSchakels": []
-      },
-      "gedeeltelijk": null
-    },
-    {
       "id": "gebruik.ai",
       "versie": 1,
       "domein": "gebruik",
@@ -4791,6 +4732,342 @@
         "zwakkeSchakels": []
       },
       "gedeeltelijk": null
+    },
+    {
+      "id": "uitkomst.klantwaarde-living",
+      "versie": 1,
+      "domein": "uitkomst",
+      "betekenis": "Ritten en bestellingen die tot het einde liepen, in LivingOS.",
+      "wereld": "consument",
+      "bronnen": [
+        "server/kern/vervoer.js"
+      ],
+      "berekening": "afgeronde ritten plus bezorgde of opgehaalde bestellingen in de maand; de poort telt leden",
+      "eenheid": "uitkomsten per maand",
+      "graad": "gemeten",
+      "actualiteit": "live",
+      "minimaleGroep": 10,
+      "privacyklasse": "leden",
+      "eigenaar": "kern/bedrijfsmaat",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/vervoer.js",
+              "citaat": "r.finishedAt = new Date().toISOString()",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/definities.js",
+              "citaat": "klantwaardeLiving: d27(1",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/klantwaarde.js",
+              "citaat": "function living",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand.js",
+              "citaat": "kwMaat('uitkomst.klantwaarde-living'",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": true,
+        "citaten": [
+          {
+            "bestand": "server/kern/bedrijfsmaat/stand.js",
+            "citaat": "DEFINITIES.klantwaardeLiving, LEDEN, kw.living",
+            "klopt": true
+          }
+        ],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": "Alleen ritten en bestellingen; boekingen bij zaken en servicezaken nog niet."
+    },
+    {
+      "id": "uitkomst.klantwaarde-travel",
+      "versie": 1,
+      "domein": "uitkomst",
+      "betekenis": "Reizen van het RTG-reisbureau die thuis zijn.",
+      "wereld": "consument",
+      "bronnen": [
+        "server/kern/reisbureau-thuis.js"
+      ],
+      "berekening": "reisaanvragen met de stand thuis en een thuiskomst in de maand; de poort telt leden",
+      "eenheid": "reizen per maand",
+      "graad": "gemeten",
+      "actualiteit": "live",
+      "minimaleGroep": 10,
+      "privacyklasse": "leden",
+      "eigenaar": "kern/bedrijfsmaat",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/reisbureau-thuis.js",
+              "citaat": "a.status = 'thuis'",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/definities.js",
+              "citaat": "klantwaardeTravel: d27(1",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/klantwaarde.js",
+              "citaat": "function travel",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand.js",
+              "citaat": "kwMaat('uitkomst.klantwaarde-travel'",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": true,
+        "citaten": [
+          {
+            "bestand": "server/kern/bedrijfsmaat/stand.js",
+            "citaat": "DEFINITIES.klantwaardeTravel, LEDEN, kw.travel",
+            "klopt": true
+          }
+        ],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": "Een reis die niemand thuis meldt, telt niet mee; reizen buiten het reisbureau ook niet."
+    },
+    {
+      "id": "uitkomst.klantwaarde-work",
+      "versie": 1,
+      "domein": "uitkomst",
+      "betekenis": "Loonruns die definitief werden, in WorkOS.",
+      "wereld": "commercieel",
+      "bronnen": [
+        "server/kern/payroll/run.js"
+      ],
+      "berekening": "loonruns met de stand definitief en definitiefOp in de maand; de poort telt zaken",
+      "eenheid": "loonruns per maand",
+      "graad": "gemeten",
+      "actualiteit": "live",
+      "minimaleGroep": 5,
+      "privacyklasse": "zaken",
+      "eigenaar": "kern/bedrijfsmaat",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/payroll/run.js",
+              "citaat": "run.stand = 'definitief'",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/definities.js",
+              "citaat": "klantwaardeWork: d27(1",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/klantwaarde.js",
+              "citaat": "function work",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand.js",
+              "citaat": "kwMaat('uitkomst.klantwaarde-work'",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": true,
+        "citaten": [
+          {
+            "bestand": "server/kern/bedrijfsmaat/stand.js",
+            "citaat": "DEFINITIES.klantwaardeWork, { privacy: 'zaken', minGroep: 5 }, kw.work",
+            "klopt": true
+          }
+        ],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": "Alleen de payrollmotor van nu (payrollRunsV2); de oude loonruns tellen niet mee."
+    },
+    {
+      "id": "uitkomst.klantwaarde-foundation",
+      "versie": 1,
+      "domein": "uitkomst",
+      "betekenis": "Hulpvragen van de RTFoundation die zijn afgerond met een hulpactie in het dossier.",
+      "wereld": "rtfoundation",
+      "bronnen": [
+        "server/kern/rtfos/casus-keten.js"
+      ],
+      "berekening": "casussen met een dag van afronden in de maand; de poort telt casussen, nooit per gezin",
+      "eenheid": "hulpvragen per maand",
+      "graad": "gemeten",
+      "actualiteit": "live",
+      "minimaleGroep": 10,
+      "privacyklasse": "gezinnen",
+      "eigenaar": "kern/bedrijfsmaat",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/rtfos/casus-keten.js",
+              "citaat": "c.afgerondOp = new Date()",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/definities.js",
+              "citaat": "klantwaardeFoundation: d27(1",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/klantwaarde.js",
+              "citaat": "function foundation",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand.js",
+              "citaat": "kwMaat('uitkomst.klantwaarde-foundation'",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": true,
+        "afgedwongen": true,
+        "citaten": [
+          {
+            "bestand": "server/kern/bedrijfsmaat/stand.js",
+            "citaat": "DEFINITIES.klantwaardeFoundation, { privacy: 'gezinnen', minGroep: 10 }, kw.foundation",
+            "klopt": true
+          }
+        ],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": "Casussen die voor 27 september 2026 zijn afgerond, hebben geen dag van afronden."
     },
     {
       "id": "capaciteit.partners",

@@ -58,10 +58,10 @@ gedrag zonder commentaar mee te lezen):
 | projectie | is er code die hem uitrekent? | `PROJECTIE_ONTBREEKT` |
 | bewijs | kan de uitkomst herkomst, graad of peilmoment tonen? | `BEWIJS_ONTBREEKT` |
 
-De stand: <!--getal:bedrijfsmaat.maten-->64<!--/getal--> maten over de 28 domeinen van de eigenaar.
-<!--getal:bedrijfsmaat.bestaat-->34<!--/getal--> bestaan, <!--getal:bedrijfsmaat.half-->20<!--/getal--> half en <!--getal:bedrijfsmaat.ontbreekt-->10<!--/getal--> ontbreken.
-Van de bestaande zien er <!--getal:bedrijfsmaat.gedeeltelijk-->7<!--/getal--> een deel van de werkelijkheid niet
-(`gedeeltelijk`, met de reden). <!--getal:bedrijfsmaat.ketensGegrond-->2<!--/getal--> van de zes ketens is gegrond, en er staan
+De stand: <!--getal:bedrijfsmaat.maten-->67<!--/getal--> maten over de 28 domeinen van de eigenaar.
+<!--getal:bedrijfsmaat.bestaat-->38<!--/getal--> bestaan, <!--getal:bedrijfsmaat.half-->19<!--/getal--> half en <!--getal:bedrijfsmaat.ontbreekt-->10<!--/getal--> ontbreken.
+Van de bestaande zien er <!--getal:bedrijfsmaat.gedeeltelijk-->11<!--/getal--> een deel van de werkelijkheid niet
+(`gedeeltelijk`, met de reden). <!--getal:bedrijfsmaat.ketensGegrond-->3<!--/getal--> van de zes ketens is gegrond, en er staan
 <!--getal:bedrijfsmaat.privacyGaten-->0<!--/getal--> projecties over mensen zonder afgedwongen groepsgrens.
 
 De eerste meting (commit `2820af35`) stond op 61 maten, 22 bestaand en 9
@@ -226,7 +226,7 @@ breekt, is waar het verhaal ophoudt:
 |---|---|---|
 | service | **gegrond** | fout -> klokken -> opgelost zonder herhaling |
 | afdracht | **gegrond** (27 september) | de maandbijdrage zegt nu zelf dat hij afgesproken is, gemeten, wanneer gepeild en wat hij niet dekt |
-| funnel | breekt bij `uitkomst.klantwaarde` | nieuw lid, cohort, activatie en afgeronde ritten staan; klantwaarde per wereld is besloten (C3) maar niet gebouwd |
+| funnel | **gegrond** (27 september) | nieuw lid, cohort, activatie, klantwaarde in LivingOS en aanwezigheid; de andere drie werelden hebben hun eigen klantwaardemaat ernaast |
 | kosten | breekt bij `marge.per-lid` | kosten per drager bestaan, opbrengst per drager niet |
 | geld | breekt bij `marge.operationeel-rtg` | de brutomarge staat sinds 27 september; de vaste kosten van RTG als organisatie worden nergens geregistreerd |
 | werving | breekt bij `campagnes.rtg-marketing` | RTG registreert geen eigen campagnes of uitgaven |
@@ -279,8 +279,10 @@ doorgestreept met de datum; de besluiten staan in par. 2.5.
 
 1. ~~**`uitkomst.rit-afgerond` als projectie**~~ -- staat (27 september), langs de
    groepspoort, die leden telt en geen ritten.
-2. **Klantwaarde per wereld** -- besloten (C3); te bouwen: de reisstand `thuis`,
-   `afgerondOp` op een casus, en de vier projecties.
+2. ~~**Klantwaarde per wereld**~~ -- staat (27 september, C3): de reisstand `thuis`
+   (`kern/reisbureau-thuis.js`, door het lid of het kantoor), `afgerondOp` op een
+   casus, en vier maten naast elkaar in `kern/bedrijfsmaat/klantwaarde.js` -- elk
+   met een eigen wereld en groepspoort, en geen totaal.
 3. ~~**De brutomarge uitrekenen**~~ -- staat (27 september): ontvangen omzet min
    de gerekende gemeten kostensoorten; verbruik zonder tarief maakt haar
    `NIET_UIT_TE_REKENEN` in plaats van nul.

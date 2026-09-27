@@ -504,6 +504,14 @@ async function bedien(ctx, base, pad) {
   try {
     await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
     await page.waitForTimeout(2200);
+    /* Pas meten als de Edge staat. Daarvoor ligt de onderste herstelstrook er
+       nog en is een balk die de Edge overneemt nog niet overgenomen; een meting
+       in die tussenstand meldde Office als bedekt terwijl zijn balk een tel
+       later in de Edge zat. Een scherm zonder adaptieve Edge wordt nooit klaar,
+       vandaar de grens. */
+    await page.waitForFunction(() => document.body && document.body.getAttribute('data-rtg-adaptive-ready') === 'true',
+      null, { timeout: 8000 }).catch(() => {});
+    await page.waitForTimeout(400);
     bedekt.push(...await bedektDoorSchil(page));
     luister(page, base, { crash, config, serverfout, rem, weigering });   // pas NA het laden: laadfouten horen bij bewijs 1
     /* Welke tik de taal van de persona verandert: een vertaalverzoek naar een

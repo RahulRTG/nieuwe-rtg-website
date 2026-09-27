@@ -41,7 +41,8 @@ body.travel-os-map:before{
 .privacy-line i{width:7px;height:7px;background:var(--nav-green);box-shadow:0 0 12px rgba(99,214,146,.7);}
 body.nav-route .intelligence-dock{opacity:0;transform:translateX(18px);pointer-events:none;}
 
-.lagen{right:1.5rem;top:auto;bottom:1.5rem;transform:none;flex-direction:row;background:rgba(10,10,10,.76);backdrop-filter:blur(18px);border:1px solid var(--nav-line);padding:.3rem;}
+/* Boven de onderbalk van de Edge (--edge-bottom): op 1280 breed lag de eerste laag (bank) er volledig onder. */
+.lagen{right:1.5rem;top:auto;bottom:calc(1.5rem + var(--edge-bottom,0px));transform:none;flex-direction:row;background:rgba(10,10,10,.76);backdrop-filter:blur(18px);border:1px solid var(--nav-line);padding:.3rem;}
 .lagen button{border:0;border-left:1px solid rgba(255,255,255,.08);box-shadow:none;background:transparent;width:42px;height:42px;}
 .lagen button:first-child{border-left:0;}
 .lagen button[aria-pressed="true"]{border-color:rgba(255,255,255,.08);background:rgba(215,181,109,.16);color:var(--nav-gold);}

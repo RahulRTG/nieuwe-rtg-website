@@ -10,16 +10,22 @@
    inzagejournaal. Gemount vanuit routes/office.js. */
 module.exports = (octx) => {
   const { kern } = octx;
-  const { app, officeAuth, keyVanCodenaam, rvTafelMaak, rvTafelNodig, rvTafelKantoor } = kern;
+  const {
+    app, boardroomAuth, keyVanCodenaam,
+    rvTafelMaak, rvTafelNodig, rvTafelKantoor, rvMeldingen,
+    rvArrangeQueue, rvArrangeFulfil,
+    rvConciergeOfficeList, rvConciergeOfficeStep,
+    rvCircleOffice, rvCircleCreate, rvCircleInvite, rvCircleGathering
+  } = kern;
   const { eis } = require('../connection-policy')({ product: 'rendezvous' });
   const stuur = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
 
-  app.post('/api/office/rendezvous/tafels', officeAuth, (req, res) => {
+  app.post('/api/office/rendezvous/tafels', boardroomAuth, (req, res) => {
     if (!eis(req, res, 'connection.table.manage', 'office')) return;
     stuur(res, rvTafelKantoor());
   });
 
-  app.post('/api/office/rendezvous/tafel/maak', officeAuth, async (req, res) => {
+  app.post('/api/office/rendezvous/tafel/maak', boardroomAuth, async (req, res) => {
     if (!eis(req, res, 'connection.table.manage', 'office')) return;
     const b = req.body || {};
     /* De codenamen worden een voor een opgezocht. Een naam die niemand aanwijst
@@ -34,10 +40,62 @@ module.exports = (octx) => {
     stuur(res, rvTafelMaak({ ...b, genodigden }));
   });
 
-  app.post('/api/office/rendezvous/tafel/nodig', officeAuth, async (req, res) => {
+  app.post('/api/office/rendezvous/tafel/nodig', boardroomAuth, async (req, res) => {
     if (!eis(req, res, 'connection.table.manage', 'office')) return;
     const t = await keyVanCodenaam(String((req.body || {}).codenaam || '').trim());
     if (!t || !t.key) return res.status(404).json({ error: 'Geen lid met die codenaam.' });
     stuur(res, rvTafelNodig(String((req.body || {}).id || ''), t.key));
+  });
+
+  app.post('/api/office/rendezvous/meldingen', boardroomAuth, (req, res) => {
+    if (!eis(req, res, 'connection.safety.report.read', 'office')) return;
+    stuur(res, rvMeldingen());
+  });
+
+  app.post('/api/office/rendezvous/concierge', boardroomAuth, (req, res) => {
+    if (!eis(req, res, 'connection.concierge.manage', 'office')) return;
+    stuur(res, rvConciergeOfficeList());
+  });
+
+  app.post('/api/office/rendezvous/concierge/step', boardroomAuth, (req, res) => {
+    if (!eis(req, res, 'connection.concierge.manage', 'office')) return;
+    const b = req.body || {};
+    stuur(res, rvConciergeOfficeStep(b.id, b.state, b, req.session && req.session.key));
+  });
+
+  app.post('/api/office/rendezvous/arrangements', boardroomAuth, (req, res) => {
+    if (!eis(req, res, 'connection.concierge.manage', 'office')) return;
+    stuur(res, rvArrangeQueue());
+  });
+
+  app.post('/api/office/rendezvous/arrangement/step', boardroomAuth, (req, res) => {
+    if (!eis(req, res, 'connection.concierge.manage', 'office')) return;
+    const b = req.body || {};
+    stuur(res, rvArrangeFulfil(b.id, b.state, b.confirmation, b.supplierCode));
+  });
+
+  app.post('/api/office/rendezvous/circles', boardroomAuth, (req, res) => {
+    if (!eis(req, res, 'connection.circle.manage', 'office')) return;
+    stuur(res, rvCircleOffice());
+  });
+
+  app.post('/api/office/rendezvous/circle/create', boardroomAuth, (req, res) => {
+    if (!eis(req, res, 'connection.circle.manage', 'office')) return;
+    stuur(res, rvCircleCreate(req.body || {}));
+  });
+
+  app.post('/api/office/rendezvous/circle/invite', boardroomAuth, async (req, res) => {
+    if (!eis(req, res, 'connection.circle.manage', 'office')) return;
+    const b = req.body || {};
+    const found = await keyVanCodenaam(String(b.codename || ''));
+    stuur(res, found && found.key
+      ? rvCircleInvite(b.circleId, found.key)
+      : { status: 404, error: 'Dit lid bestaat niet.' });
+  });
+
+  app.post('/api/office/rendezvous/circle/gathering', boardroomAuth, (req, res) => {
+    if (!eis(req, res, 'connection.circle.manage', 'office')) return;
+    const b = req.body || {};
+    stuur(res, rvCircleGathering(b.circleId, b));
   });
 };

@@ -111,9 +111,9 @@ zie §5 -- er zijn nog 243 kern-namen die meer dan één domein aanraakt.
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
 | `auth` | 20 | 6 | 8 | 52 |
-| `member` | 730 | 73 | 17 | 460 |
+| `member` | 721 | 73 | 17 | 451 |
 | `supplier` | 624 | 127 | 6 | 337 |
-| `office` | 74 | 21 | 3 | 84 |
+| `office` | 83 | 21 | 3 | 93 |
 | `staff` | 26 | 8 | 1 | 42 |
 | `social` | 76 | 10 | 31 | 71 |
 | `techniek` | 77 | 19 | 1 | 64 |
@@ -170,9 +170,9 @@ tenant(5) logInlog(5) veilig(5) openVacatures(5) overheid(5) sseToCustomer(5)
 | 41 | `server/routes/member/voertuigen.js` |
 | 40 | `server/routes/member/voertuigen/verkoop.js` |
 | 39 | `server/routes/member/voertuigen/ontmoeten.js` |
-| 38 | `server/routes/member/rendezvous.js` |
 | 38 | `server/routes/staff.js` |
 | 35 | `server/routes/auth.js` |
+| 34 | `server/routes/auth/herstel.js` |
 
 ## 6. Waar de waarheid staat
 

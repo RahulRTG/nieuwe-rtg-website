@@ -8,13 +8,12 @@
    hier ooit ook de leeftijd zou controleren, bouwt de tweede kopie van een grens
    en dat is precies hoe deze app hem eerder helemaal misliep. */
 module.exports = (kern) => {
-  const { app, auth, officeAuth, accounts, keyVanCodenaam, leeftijdVan, rvProfielGet, rvProfiel, rvKandidaten, rvKies, rvMatches, rvMeldingen,
-    rvDate, rvAanwezigWis, rvArrange, rvAkkoord, rvArrangeQueue, rvArrangeFulfil,
+  const { app, auth, accounts, leeftijdVan, rvProfielGet, rvProfiel, rvKandidaten, rvKies, rvMatches,
+    rvDate, rvAanwezigWis, rvArrange, rvAkkoord,
     rvTafels, rvTafelAntwoord, rvIntroducties, rvIntroAntwoord, rvEncounter, rvSamen, rvSamenZet,
     rvEdge, rvStateGuard } = kern;
-  const { rvConciergeList, rvConciergeRequest, rvConciergeApprove,
-    rvConciergeOfficeList, rvConciergeOfficeStep } = kern;
-  const { rvCircles, rvCircleRsvp, rvCircleCreate, rvCircleInvite, rvCircleGathering, rvCircleOffice } = kern;
+  const { rvConciergeList, rvConciergeRequest, rvConciergeApprove } = kern;
+  const { rvCircles, rvCircleRsvp } = kern;
   const State = require('../../kern/connection-state-rendezvous');
   const { eis: eisCapability } = require('../connection-policy')({ product: 'rendezvous', accounts, leeftijdVan });
 
@@ -53,10 +52,6 @@ module.exports = (kern) => {
     b => ({ kind: 'candidate', id: String(b.id || '') }), (k, b) => rvKies(k, String(b.id || ''), 'pas')));
   app.post('/api/member/rendezvous/matches', auth, doe('connection.match.read', (k) => rvMatches(k)));
   app.post('/api/member/rendezvous/blokkeer', auth, doe('connection.safety.block', (k, b) => rvKies(k, String(b.id || ''), 'blokkeer', b.meld)));
-  app.post('/api/office/rendezvous/meldingen', officeAuth, (req, res) => {
-    if (!eisCapability(req, res, 'connection.safety.report.read', 'office')) return;
-    stuur(res, rvMeldingen());
-  });
   app.post('/api/member/rendezvous/aanwezig/wis', auth, doe('connection.presence.manage', (k) => rvAanwezigWis(k)));
   app.post('/api/member/rendezvous/arrange', auth, overgang('connection.meet.plan', State.EVENTS.PLAN_ARRANGE,
     b => ({ kind: 'match', id: String(b.id || '') }), (k, b) => rvArrange(k, String(b.id || ''), b.setting)));
@@ -77,35 +72,8 @@ module.exports = (kern) => {
   app.post('/api/member/rendezvous/concierge', auth, doe('connection.concierge.request', (k) => rvConciergeList(k)));
   app.post('/api/member/rendezvous/concierge/request', auth, doe('connection.concierge.request', (k, b) => rvConciergeRequest(k, b)));
   app.post('/api/member/rendezvous/concierge/approve', auth, doe('connection.concierge.request', (k, b) => rvConciergeApprove(k, b.id, b.approve)));
-  app.post('/api/office/rendezvous/concierge', officeAuth, (req,res) => {
-    if (!eisCapability(req,res,'connection.concierge.manage','office')) return; stuur(res,rvConciergeOfficeList());
-  });
-  app.post('/api/office/rendezvous/concierge/step', officeAuth, (req,res) => {
-    if (!eisCapability(req,res,'connection.concierge.manage','office')) return;
-    stuur(res,rvConciergeOfficeStep((req.body||{}).id,(req.body||{}).state,req.body||{},req.session&&req.session.key));
-  });
-  app.post('/api/office/rendezvous/arrangements', officeAuth, (req,res) => {
-    if(!eisCapability(req,res,'connection.concierge.manage','office'))return;stuur(res,rvArrangeQueue());
-  });
-  app.post('/api/office/rendezvous/arrangement/step', officeAuth, (req,res) => {
-    if(!eisCapability(req,res,'connection.concierge.manage','office'))return;stuur(res,rvArrangeFulfil((req.body||{}).id,(req.body||{}).state,(req.body||{}).confirmation,(req.body||{}).supplierCode));
-  });
   app.post('/api/member/rendezvous/circles', auth, doe('connection.circle.read', (k) => rvCircles(k)));
   app.post('/api/member/rendezvous/circle/rsvp', auth, doe('connection.circle.read', (k,b) => rvCircleRsvp(k,b.circleId,b.gatheringId,b.yes)));
-  app.post('/api/office/rendezvous/circles', officeAuth, (req,res) => {
-    if(!eisCapability(req,res,'connection.circle.manage','office'))return;stuur(res,rvCircleOffice());
-  });
-  app.post('/api/office/rendezvous/circle/create', officeAuth, (req,res) => {
-    if(!eisCapability(req,res,'connection.circle.manage','office'))return;stuur(res,rvCircleCreate(req.body||{}));
-  });
-  app.post('/api/office/rendezvous/circle/invite', officeAuth, async (req,res) => {
-    if(!eisCapability(req,res,'connection.circle.manage','office'))return;
-    const found=await keyVanCodenaam(String((req.body||{}).codename||''));
-    stuur(res,found&&found.key?rvCircleInvite((req.body||{}).circleId,found.key):{status:404,error:'Dit lid bestaat niet.'});
-  });
-  app.post('/api/office/rendezvous/circle/gathering', officeAuth, (req,res) => {
-    if(!eisCapability(req,res,'connection.circle.manage','office'))return;stuur(res,rvCircleGathering((req.body||{}).circleId,req.body||{}));
-  });
 
   // de AI-date is async (Rahul de koppelaar), dus een eigen handler
   app.post('/api/member/rendezvous/date', auth, async (req, res) => {

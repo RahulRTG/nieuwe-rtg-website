@@ -37,8 +37,10 @@ write('404.html','<!doctype html><html lang="en"><head><meta charset="utf-8"><me
 const pages=[];
 for(const rel of fs.readdirSync(out,{recursive:true}).filter(f=>f.endsWith('.html')&&!f.startsWith('public/'))){
  let html=fs.readFileSync(path.join(out,rel),'utf8');
- html=html.replace(/<script\b[^>]+src="[^"]*(?:language|script|site)\.js[^"]*"[^>]*>\s*<\/script>/g,'');
- html=html.replace(/<link\b[^>]+href="[^"]*\b(?:site|styles)\.css[^"]*"[^>]*>/g,'');
+ // tot er niets meer verandert: een verwijdering kan een nieuwe treffer laten ontstaan
+ for(let vorig=null;vorig!==html;){vorig=html;
+  html=html.replace(/<script\b[^>]+src="[^"]*(?:language|script|site)\.js[^"]*"[^>]*>\s*<\/script>/g,'');
+  html=html.replace(/<link\b[^>]+href="[^"]*\b(?:site|styles)\.css[^"]*"[^>]*>/g,'');}
  html=html.replace(/(src|href|srcset)="\.\//g,'$1="/');
  html=html.replace('<body','<body class="rtg-stijl" data-rtg-skin="heritage" data-rtg-world="living" data-rtg-layout="standard" data-public-platform="company" data-company-page="'+(rel==='index.html'?'home':rel)+'"');
  html=html.replace('</head>',assets+'</head>');write(rel,html);pages.push(rel);

@@ -91,8 +91,13 @@ function gewenst(bestand, bron) {
   bodyNieuw = zetAttribuut(bodyNieuw, 'data-rtg-layout', 'standard');
   bodyNieuw = bodyNieuw.replace(/\sdata-rtg-eigenvlak=["'][^"']*["']/gi, '');
   let uit = bron.replace(body[0], bodyNieuw);
-  uit = uit.replace(/<script\b[^>]*src=["']\/shared\/rtg-world-desktop\.js["'][^>]*><\/script>\s*/gi, '');
-  uit = uit.replace(/<link\b[^>]*href=["']\/shared\/rtg-world-desktop\.css["'][^>]*>\s*/gi, '');
+  /* Herhalen tot er niets meer verandert: een verwijdering kan een nieuwe
+     treffer laten ontstaan (CodeQL js/incomplete-multi-character-sanitization). */
+  for (let vorig = null; vorig !== uit;) {
+    vorig = uit;
+    uit = uit.replace(/<script\b[^>]*src=["']\/shared\/rtg-world-desktop\.js["'][^>]*><\/script>\s*/gi, '');
+    uit = uit.replace(/<link\b[^>]*href=["']\/shared\/rtg-world-desktop\.css["'][^>]*>\s*/gi, '');
+  }
 
   const heritageLinks = uit.match(/<link\b[^>]*href=["']\/?shared\/rtg-heritage\.css(?:[?#][^"']*)?["'][^>]*>/gi) || [];
   if (heritageLinks.length > 1) throw new Error('Dubbel Heritage-blad in ' + route);

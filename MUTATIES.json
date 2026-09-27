@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T15:00:57.642Z",
-    "commit": "90d33919",
+    "op": "2026-09-27T15:20:10.115Z",
+    "commit": "abaa5585d",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5483,6 +5483,21 @@
       "gezakt": 6,
       "geprobeerd": 2
     },
+    "magnaatstart.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "magnaatstart.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/magnaat-leven/index.js",
+      "operator": "!==->===#0",
+      "gezakt": 7,
+      "geprobeerd": 2
+    },
     "magnaatwereld.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -8061,14 +8076,6 @@
       "gezakt": 5,
       "geprobeerd": 2
     },
-    "rtghuis.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/rtghuis.js",
-      "operator": "===->!==#0",
-      "gezakt": 2,
-      "geprobeerd": 1
-    },
     "rtgid.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -9625,6 +9632,30 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "toestel-kluisindex.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/toestel/kluisindex.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "toestel-spraak.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/toestel/spraak.js",
+      "operator": "===->!==#0",
+      "gezakt": 7,
+      "geprobeerd": 1
+    },
+    "toestel-vector.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/toestel/vector.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "toestellen.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -10211,37 +10242,6 @@
       "module": "scripts/lib/vrijenamen.js",
       "operator": "true->false#0",
       "gezakt": 3,
-      "geprobeerd": 1
-    },
-    "vrijheid-lus.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/vrijheid/lus.js",
-      "operator": "!==->===#0",
-      "gezakt": 1,
-      "geprobeerd": 1
-    },
-    "vrijheid-routes.test.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 6,
-      "scherp": "gezakt"
-    },
-    "vrijheid-teambeeld.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/eigencollectie.js",
-      "operator": "===->!==#0",
-      "gezakt": 2,
-      "geprobeerd": 1
-    },
-    "vrijheid.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/vrijheid/index.js",
-      "operator": "===->!==#0",
-      "gezakt": 19,
       "geprobeerd": 1
     },
     "vuurplan.test.js": {
@@ -10968,6 +10968,14 @@
       "operator": "return-weg#0",
       "gezakt": 3,
       "geprobeerd": 3
+    },
+    "zoekmaat.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/zoekmaat.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "zorgketen.test.js": {
       "soort": "server",

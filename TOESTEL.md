@@ -241,8 +241,8 @@ meter er staat.
 | 3 | Toestelcel en echte toestelmeting | **staat** (par. 10) |
 | 4 | Toestelrekenaar met twee uitvoerders (eigen WASM, ONNX Runtime) | **staat** voor WASM (par. 10); WebGPU is hier niet te meten, het browsermodel en WebNN een stap weg |
 | 5 | Modelmanifest, hashes, licentiegrendel, OPFS-beheer | **staat** (par. 10); terugrollen naar een vorige versie een stap weg |
-| 6 | `spraak.naartekst` op het toestel, gemeten op echte telefoons | een stap weg; wacht op `huggingface.co` in het netwerkbeleid; vult SERVICE.md par. 13d zonder `LOCAL_AI_URL` |
-| 7 | `tekst.vector` over de Toestelkluis | een stap weg na 4-5 |
+| 6 | `spraak.naartekst` op het toestel, gemeten op echte telefoons | **staat** als keten, gemeten in Chromium (par. 11), met een lusrem en een Nederlandse proefset (par. 13); een model dat Nederlands aankan, opnamen van mensen, telefoons en een bron die we mogen ondertekenen zijn een stap weg; vult SERVICE.md par. 13d zonder `LOCAL_AI_URL` |
+| 7 | `tekst.vector` over de Toestelkluis | **staat** als keten, gemeten in Chromium (par. 12), met een Nederlandse zoekproefset (par. 13) en een index in de Toestelkluis (par. 14); een meertalig model is een stap weg en wacht op het netwerk |
 | 8 | Samenvatten en herschrijven | een stap weg; het browsermodel als eerste trede |
 | 9 | Een kleine algemene LLM | jaren weg op een telefoon, dichterbij op een laptop; te meten, niet te schatten |
 | 10 | Verschuiving meten in de kostenlaag | een stap weg na 6 |
@@ -253,9 +253,10 @@ meter er staat.
 1. **`'wasm-unsafe-eval'` op de toestelcel**, en alleen daar. Genomen op 25
    september 2026: ja, op die ene pagina, met `connect-src 'none'` ernaast;
    `test/toestel-routes.test.js` houdt de combinatie vast.
-2. **Modelhosting.** Honderden MB tot enkele GB per model, van de eigen origin
-   (de CSP staat geen CDN toe). Dat kost bandbreedte en hoort in KOSTEN.md.
-   Advies: eigen origin met Range-ondersteuning, per taak.
+2. **Modelhosting.** Genomen op 27 september 2026: de eigen server, in
+   `RTG_TOESTEL_DIR` via `/toestel/artefact/<sha256>` met Range. RTG draagt de
+   bandbreedte (dat hoort in KOSTEN.md), en geen derde ziet welk lid welk model
+   ophaalt.
 3. **Welke modellicenties toegestaan zijn.** Genomen op 25 september 2026:
    zo breed mogelijk. Alles met bekende voorwaarden die commercieel gebruik
    toestaan, ook Gemma en Llama met hun eisen erbij; onbekend en
@@ -572,3 +573,224 @@ twee bewijzen.
 - **De sleutellijst in de service-worker-schil**: `sleutels.js` is nog leeg en
   staat nog niet in `SHELL`; dat gebeurt met de eerste echte sleutel, en dan
   hoort `npm run swcache` erbij.
+
+## 11. Spraak naar tekst: het eerste echte contract (27 september 2026)
+
+`spraak.naartekst` loopt als keten, in een echte browser, over de machine van
+par. 10 -- en de rekenaar, de grendel en de opslag zijn er geen letter voor
+veranderd. Wat erbij kwam is een derde uitvoerder in de cel en twee modules
+aan de ouderkant.
+
+| Onderdeel | Waar | Bewijs |
+|---|---|---|
+| WAV, herbemonsteren, log-mel, tokens naar tekst, de openingstokens | `public/shared/toestel/spraak.js` (puur) | `test/toestel-spraak.test.js`: het spectrogram tegen een ONAFHANKELIJKE referentie (`test/fixtures/whisper-mel-toon.json`, uit transformers 5.17 en niet uit deze code); zes mutaties zakken, waaronder het Hann-venster, de gespiegelde rand en het overslaan van speciale tokens |
+| De ouderkant van het contract | `public/shared/toestel/spraakvoer.js` | vocabulaire, speciale tokens, configuratie en generatie-instelling gaan langs DEZELFDE grendel als het model: een tokenizer die niet klopt, maakt van een goed model een leugenaar |
+| De uitvoerder `whisper` | `public/shared/toestel/cel.js` | encoder een keer, decoder token voor token met zijn eigen geheugen; hebzuchtig, met de onderdrukte tokens uit de generatie-instelling van het model zelf. Er gaat een spectrogram in en er komen token-id's uit |
+| De meting | `scripts/spraakproef.js` | Chromium, WASM zonder threads: 11 s spraak in **6,3 s** rekentijd (9,5 s totaal met het spectrogram), woordfout **0** tegen de bekende tekst, herkomst `toestel` met acht artefacten op hash |
+
+Het spectrogram is gelijk aan dat van de `WhisperFeatureExtractor` tot op de
+precisie van float32: over alle 240.000 waarden van de JFK-opname was het
+grootste verschil 1,2e-7.
+
+### 11.1 Waar de bytes vandaan kwamen, en waarom ze niet ondertekend zijn
+
+Hugging Face en jsDelivr worden door het netwerkbeleid geweigerd (403). Het
+npm-register niet, en daar staat `sts-whisper-tiny@1.0.0`: een kopie van
+`Xenova/whisper-tiny` (q8, de vorm van transformers.js), op 17 september 2026
+geplaatst door een onbekende uitgever. **Die is gebruikt om te METEN en wordt
+nooit ondertekend**: een handtekening van RTG zegt "deze bytes zijn wat wij
+bedoelen", en dat weten we van een anonieme herverpakking niet. De hashes van
+wat er gemeten is:
+
+| Bestand | sha256 |
+|---|---|
+| `onnx/encoder_model_quantized.onnx` | `fd9d995b9dcb0520f0dbf6cf68651af639fc385f594d9d876e69ca2802dc438e` |
+| `onnx/decoder_model_merged_quantized.onnx` | `6c0c125986b007d2e3734bec84c18bda0152071b90b87fadac6d7764499927a0` |
+| `vocab.json` | `50d6a919f0a0601d56a04eb583c780d18553aa388254ba3158eb6a00f13e2c1a` |
+| `added_tokens.json` | `ce949fe720c14311cb6c446e69cfe340dc669d7b006077a6feed6ae571dd7e88` |
+| `config.json` | `2b2e4e519084e0ea028b19b153f95202735a971870d6844aa26e559edd292e94` |
+| `generation_config.json` | `68ac791fcb4999461a313472125042934656240ba1cba7d1c2627fcbb19ac24c` |
+
+De weg naar een ondertekend model is daarom: dezelfde bestanden van de bron
+halen (`onnx-community` of `Xenova` op Hugging Face, of zelf exporteren uit de
+gewichten van OpenAI), de hashes naast deze tabel leggen, en pas dan tekenen.
+Kloppen ze, dan was de kopie eerlijk; kloppen ze niet, dan weten we dat ook.
+
+### 11.2 Wat dit nog niet bewijst
+
+- **Kwaliteit.** Een opname is een rookproef. De kwaliteitspoort (par. 9.2)
+  vraagt een proefset met een gemeten woordfout per taal, en voor Nederlands
+  is er nog niets gemeten -- whisper-tiny is daar zwak, en dat hoort een getal
+  te worden en geen indruk.
+- **Telefoons.** Gemeten op een server-Chromium. De rekentijd op een telefoon
+  is onbekend, en 6,3 s voor 11 s spraak laat weinig marge; de lastpoort
+  (par. 9.4) moet dat per toestel leren.
+- **Sneller.** De decoder draait zonder WebGPU en zonder threads. Threads
+  vragen `crossOriginIsolated` (een besluit), WebGPU een adapter die hier
+  ontbreekt.
+- **Een scherm.** Er is geen knop die de microfoon naar deze keten leidt; de
+  meeleesbaan (SERVICE.md par. 13d) is de eerste plek, en die komt pas als er
+  een model is dat we mogen ondertekenen.
+- **De sleutel.** `sleutels.js` blijft leeg. De private modelsleutel wordt
+  niet in deze cloudomgeving gemaakt: een sleutel die hier ontstaat, heeft
+  een machine gezien die niet van RTG is, en dan is "offline, bij een mens"
+  (besluit 6) al gebroken voordat hij iets tekent. De eigenaar maakt hem met
+  `node scripts/toestel-artefact.js nieuwe-sleutel` op een eigen machine en
+  zet alleen de publieke helft in de lijst.
+
+## 12. Tekst naar vector: het tweede contract, zonder nieuwe uitvoerder (27 september 2026)
+
+`tekst.vector` loopt als keten in een echte browser, en de cel kreeg er GEEN
+uitvoerder bij: het model draait op de algemene uitvoerder `onnx`. Dat is de
+belofte van par. 0 in zijn kleinste vorm -- een tweede taak is een contract,
+geen nieuwe machine.
+
+| Onderdeel | Waar | Bewijs |
+|---|---|---|
+| Normaliseren, WordPiece, invoer per tekst, middelen, cosinus | `public/shared/toestel/vector.js` (puur) | `test/toestel-vector.test.js`: de tokens van 13 zinnen (accenten, leestekens, CJK, emoji, een URL, witruimte) exact gelijk aan de Python-bibliotheek `tokenizers` (`test/fixtures/minilm-tokens.json`); zes van zeven mutaties zakken, de zevende is gelijkwaardig (zie onder) |
+| De ouderkant van het contract | `public/shared/toestel/vectorvoer.js` | de tokenizer gaat langs dezelfde grendel als het model; elke uitslag draagt een VINGERAFDRUK (sha256 van runtime, model en tokenizer samen) |
+| Een reeks runs in een sessie | `public/shared/toestel/cel.js`, uitvoerder `onnx` | `invoer.reeks` naast `invoer.feeds`; de bestaande ONNX-proef en de spraakketen draaien er ongewijzigd op |
+| De meting | `scripts/vectorproef.js` | Chromium, WASM: 13 teksten in **612 ms** rekentijd (2,3 s totaal met laden), 384 dimensies, laagste cosinus met de Python-referentie **0,993**, en een tekst los gerekend is gelijk aan dezelfde tekst in de reeks (cosinus 1,0000000) |
+
+### 12.1 Wat het meten blootlegde
+
+- **In een batch hangt een vector af van zijn buren.** Het gekwantiseerde
+  model rekent zijn schaal over de hele invoer, dus dezelfde zin gaf naast een
+  andere zin een andere vector (cosinus 0,993), ook als hij zelf niet werd
+  opgevuld. Een zoekindex waarin "de hond rent" anders klinkt naargelang wat er
+  toevallig mee werd ingelezen, is geen index. Daarom is er geen batch: elke
+  tekst krijgt een eigen run, en de cel draait ze na elkaar in een sessie.
+- **Twee runtimes, twee vectoren.** Dezelfde bytes en dezelfde tokens gaven in
+  de browser (WASM) en in Python (x64) een cosinus van 0,993 tot 1,000; met de
+  graafoptimalisaties uit bleef dat zo, dus het verschil zit in de rekenkernen
+  en niet in onze code. Een vector is daarom alleen vergelijkbaar met een
+  vector van DEZELFDE vingerafdruk. Een index slaat die mee op, en een vector
+  van een ander toestel of een andere runtime wordt opnieuw berekend en nooit
+  naast de eigen gelegd.
+- **Een gelijkwaardige mutant is geen gat.** Het weghalen van de deling door
+  het aantal tokens laat de toets groen, en terecht: gemiddelde en som wijzen
+  na het normaliseren exact dezelfde kant op.
+
+### 12.2 Waar de bytes vandaan kwamen
+
+Net als bij spraak (par. 11.1): Hugging Face wordt geweigerd, en het model kwam
+van npm, uit `@ryanstark24/sfgraph-models@1.1.3` -- een kopie van
+`Xenova/all-MiniLM-L6-v2` (q8, Apache-2.0) met een eigen `CHECKSUM.json`. Alleen
+gebruikt om te meten, niet ondertekend. De hashes: `onnx/model_quantized.onnx`
+`afdb6f1a0e45b715d0bb9b11772f032c399babd23bfc31fed1c170afc848bdb1`,
+`tokenizer.json` `da0e79933b9ed51798a3ae27893d3c5fa4a201126cef75586296df9b4d2c62a0`
+(gelijk aan wat die kopie zelf opgeeft, en dat zegt alleen dat hij consequent
+is -- niet dat hij van de bron komt).
+
+### 12.3 Wat dit nog niet bewijst
+
+- **Nederlands.** all-MiniLM-L6-v2 is getraind op Engels. Gemeten:
+  "De hond rent door het park." en "A dog is running through the park." halen
+  een cosinus van 0,16, lager dan twee zinnen over iets anders in dezelfde taal.
+  Voor leden is een meertalig model nodig (multilingual-e5-small, MIT, of
+  paraphrase-multilingual-MiniLM, Apache) -- dezelfde machine, een ander
+  artefact, en de tokenizer is dan geen WordPiece maar SentencePiece.
+- **Zoekkwaliteit.** Gelijk zijn aan een referentie is geen kwaliteit. Dat
+  vraagt een proefset met relevantie-oordelen (par. 9.2).
+- **De Toestelkluis.** Staat sinds par. 14, als index NAAST de bestaande
+  kluis en niet als tweede kluis.
+
+## 13. Gemeten in het Nederlands (27 september 2026)
+
+De tekortkomingen van par. 11.2 en 12.3 zijn waar het kon GEMETEN in plaats van
+beschreven. Waar een meting er niet komt, staat waarom.
+
+### 13.1 Spraak: een Nederlandse proefset, en een lusrem die er zonder hem niet was
+
+`test/fixtures/proefset-spraak-nl.json` heeft twaalf zinnen uit het dagelijks
+gebruik; `scripts/spraakset.js` maakt er opnamen van met espeak-ng, en
+`scripts/spraakproef.js` met `RTG_SPRAAK_SET` telt de woordfout over de hele set
+(alle fouten gedeeld door alle woorden) en per zin.
+
+| Set | Woordfout whisper-tiny | Lussen |
+|---|---|---|
+| Nederlands, synthetische stem, zonder lusrem | 3,01 (340 fouten op 113 woorden) | 2, tot het plafond |
+| Nederlands, synthetische stem, met lusrem | **0,885** | 2, gestopt en gemeld |
+| Engels, DEZELFDE synthetische stem, dezelfde zinnen | 0,578 | 0 |
+| Engels, echte stem (JFK, par. 11) | 0,000 | 0 |
+
+Drie dingen die de meting laat zien:
+
+- **Een echte fout in onze uitvoerder.** Op twee zinnen schoot het model in een
+  lus ("een beetje een beetje ...") en rekende door tot het plafond: 45 s werk
+  voor een tekst die er vol uitzag. De cel stopt nu als het staartstuk van 1 tot
+  12 tokens zich vier keer herhaalt, laat een exemplaar staan en zegt
+  `herhaling: true` (`public/shared/toestel/cel.js`; `test/toestel-spraak.test.js`
+  toets 7 op de ECHTE cel.js, twee mutaties zakken). Drie keer mag wel: "ja ja ja"
+  is geen lus.
+- **De synthetische stem is zelf een slecht instrument.** Dezelfde robotstem gaf
+  in het Engels 58% woordfout waar een echte stem 0% gaf. Deze set meet dus model
+  plus stem, en zegt niet hoe goed een lid wordt verstaan. De uitslag draagt dat
+  voorbehoud in de tekst.
+- **Maar het verschil staat.** Met dezelfde stem is Nederlands 88,5% tegen
+  Engels 58%. whisper-tiny is te zwak voor Nederlands, en dat is nu een getal en
+  geen vermoeden. De weg is een groter Whisper (base of small, ook MIT) door
+  dezelfde machine -- een ander artefact, geen andere code -- en opnamen van
+  mensen in plaats van espeak.
+
+### 13.2 Zoeken: een Nederlandse proefset, met een woordtelling ernaast
+
+`test/fixtures/proefset-zoeken-nl.json` heeft twaalf notities en achttien vragen,
+elk met een soort: `letterlijk` (deelt woorden met het antwoord), `omschrijving`
+(zegt hetzelfde met andere woorden) en `andere-taal` (vraagt in het Engels).
+`scripts/vectorproef.js` met `RTG_VECTOR_SET` telt treffer@1, treffer@3 en MRR
+per soort (`scripts/lib/zoekmaat.js`, getoetst in `test/zoekmaat.test.js` met
+vier mutaties), naast BM25 zonder model op dezelfde normalisering.
+
+| Soort | all-MiniLM-L6-v2 (t@1 / t@3 / MRR) | BM25, geen model | Samen (RRF) |
+|---|---|---|---|
+| letterlijk (6) | 0,83 / 1,00 / 0,92 | **1,00** / 1,00 / 1,00 | 1,00 / 1,00 / 1,00 |
+| omschrijving (8) | **0,38** / 0,63 / 0,54 | 0,13 / 0,50 / 0,37 | 0,38 / 0,63 / 0,56 |
+| andere taal (4) | **0,50** / 0,50 / 0,55 | 0,25 / 0,25 / 0,33 | 0,00 / 0,25 / 0,25 |
+| alles (18) | **0,56** / 0,72 / 0,67 | 0,44 / 0,61 / 0,57 | 0,50 / 0,67 / 0,64 |
+
+- **Het model verdient zijn plek op omschrijvingen** (0,38 tegen 0,13), en daar
+  is het ook voor. Op letterlijke vragen verliest het van een woordtelling.
+- **Samenvoegen is gemeten en NIET overgenomen.** Reciprocal rank fusion (geen
+  gewicht om af te stellen, met opzet) wint op letterlijk en zakt op andere taal
+  naar nul; over alles is hij slechter dan het model alleen. Een gewicht dat het
+  wel zou laten winnen, zou op deze achttien vragen zijn afgesteld en daarna op
+  deze achttien vragen worden geprezen.
+- **0,38 is te laag voor een lid.** De vraag "wat mag ik niet eten" vindt de
+  allergie niet. Dat is het Engelse model op Nederlandse tekst (par. 12.3), en
+  het tweede getal dat op een meertalig model wacht.
+
+### 13.3 Wat hier niet kon, en waarom
+
+Een meertalig vectormodel (multilingual-e5-small, paraphrase-multilingual) en een
+groter Whisper staan op Hugging Face, en het netwerkbeleid van deze omgeving
+weigert `huggingface.co` (403). npm en PyPI hebben ze niet als pakket. Zodra de
+host is toegestaan, draaien dezelfde twee proefsets met het andere artefact; de
+enige code die er dan bij moet, is een SentencePiece-tokenizer voor de meertalige
+modellen -- en die wordt pas geschreven als er een referentie naast kan, zoals
+bij WordPiece (par. 12).
+
+## 14. De zoekindex van de Toestelkluis (27 september 2026)
+
+De kluis bestond al (`public/shared/toestelkluis.js`, par. 1); er komt geen
+tweede. `public/shared/toestel/kluisindex.js` legt er een INDEX naast die per
+document een vector bewaart en naar het document verwijst op naam.
+
+| Regel | Bewijs (`test/toestel-kluisindex.e2e.js`, Chromium) |
+|---|---|
+| Een index per vingerafdruk; een vraag van een ander model wordt geweigerd met de reden | stap `vingerafdruk`, "moet opnieuw worden berekend" |
+| Een index heeft een vorm; een vector van een andere lengte gaat er niet in | weigering met beide lengtes |
+| De kluis is de waarheid: een gewist document valt weg en wordt geteld (`weg`), een document zonder vector ook (`zonderVector`) | beide geteld |
+| Vergeten is echt vergeten, in ELKE index | `vergeet()` haalt de vector overal weg; het document blijft |
+
+Vijf mutaties, alle vijf zakken. Twee dingen die met opzet zo zijn:
+
+- **Geen aparte versleuteling.** Een vector is zo gevoelig als zijn tekst (hij is
+  deels terug te rekenen) en staat daarom onder dezelfde bescherming als het
+  document: OPFS van deze origin, niet over de lijn. Apart versleutelen met een
+  sleutel die dezelfde pagina kan gebruiken zou schijn zijn, zolang de documenten
+  zelf dat niet zijn. Wordt de kluis versleuteld (`toestelsleutel.js` staat er al
+  voor), dan gaat de index mee.
+- **Nog geen scherm.** De index werkt en is bewezen; de knop "zoek in mijn
+  kluis" komt als er een model is dat Nederlands aankan en dat we mogen
+  ondertekenen. Nu zou hij 0,38 halen op de vragen waar hij voor is.

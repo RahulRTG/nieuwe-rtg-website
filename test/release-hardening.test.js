@@ -170,6 +170,8 @@ test('rollback herstelt app, motor, sentinel, backup en de vorige bewijs-pin', (
 
 test('de imageworkflow publiceert alleen een getekende kandidaat en geen officiële release', () => {
   const bron = lees('.github/workflows/release-image.yml');
+  assert.match(bron, /actions\/checkout@[^\n]*\n\s+with:[\s\S]*?fetch-depth: 0\n\s+persist-credentials: false/,
+    'historische releaseproeven vereisen de volledige Git-geschiedenis');
   const afbouw = bron.indexOf('npm run afbouw:software');
   const pg = bron.indexOf("require('./scripts/lib/suite-pg').telling");
   const bootstrap = bron.indexOf('imageherkomst.js --sleutelcontrole');

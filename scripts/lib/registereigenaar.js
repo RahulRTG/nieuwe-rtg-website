@@ -86,6 +86,8 @@ const EIGENAAR = {
     waarom: 'Handmatig geschreven richtingsdocument (RTG Authority Engine); de bronverwijzingen zijn met de hand nagelopen, er is geen generator die het schrijft.' },
   'BENOEMING.md': { soort: 'BRON',
     waarom: 'Handmatig geschreven richtingsdocument (RTFoundation Roles & Governance 2.0); de bronverwijzingen erin zijn met de hand nagelopen, er is geen generator die het schrijft.' },
+  'PERSONEEL.md': { soort: 'BRON',
+    waarom: 'Handmatig geschreven richtingsdocument (de werkervaring van RTG, van eigenaar tot kantine); de bronverwijzingen erin zijn met de hand nagelopen, er is geen generator die het schrijft.' },
   'BEWIJSLUS.md': { soort: 'BRON',
     waarom: 'Handmatig geschreven richtingsdocument (de terugweg van productie naar bewijs); de namen en bronverwijzingen erin zijn met de hand gemeten, er is geen generator die het schrijft.' },
   'LANGUAGE-AUDIT.md': { soort: 'BRON',

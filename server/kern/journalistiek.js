@@ -62,48 +62,11 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, claude }) => {
   }
 
   /* ---- artikelen ---- */
-  const kortArt = a => ({ id: a.id, titel: a.titel, chapo: a.chapo, rubriek: a.rubriek, status: a.status, auteur: a.auteur, beeld: a.beeld || '', bij: a.bij, gepubliceerd: a.gepubliceerd || null, gelezen: a.gelezen || 0 });
-  function schoonArt(r, d, actor) {
-    d = d || {};
-    const rubriek = r.rubrieken.includes(d.rubriek) ? d.rubriek : (r.rubrieken[0] || 'Voorpagina');
-    return {
-      titel: scho(d.titel, 160) || 'Zonder titel',
-      chapo: scho(d.chapo, 300),
-      inhoud: scho(d.inhoud, 20000),
-      rubriek,
-      beeld: scho(d.beeld, 400),
-      auteur: scho((actor && actor.name) || d.auteur, 60) || 'Redactie'
-    };
-  }
-  function bewaarArtikel(code, d, actor) {
-    const r = ruimte(code); d = d || {};
-    let a = d.id ? r.artikelen.find(x => x.id === scho(d.id, 20)) : null;
-    const velden = schoonArt(r, d, actor);
-    if (a) { Object.assign(a, velden); a.bij = nu(); }
-    else { a = Object.assign({ id: id('a'), status: 'concept', gelezen: 0, gemaakt: nu(), bij: nu() }, velden); r.artikelen.unshift(a); r.artikelen = r.artikelen.slice(0, 500); }
-    save(); return { ok: true, artikel: a };
-  }
-  function publiceer(code, artId, actor) {
-    const r = lees(code); const a = r && r.artikelen.find(x => x.id === scho(artId, 20));
-    if (!a) return { error: 'Artikel niet gevonden.', status: 404 };
-    a.status = 'live'; a.bij = nu(); a.gepubliceerd = nu(); save();
-    return { ok: true, artikel: a };
-  }
-  function naarConcept(code, artId) {
-    const r = lees(code); const a = r && r.artikelen.find(x => x.id === scho(artId, 20));
-    if (!a) return { error: 'Artikel niet gevonden.', status: 404 };
-    a.status = 'concept'; a.bij = nu(); save(); return { ok: true, artikel: a };
-  }
+  const { kortArtikel: kortArt } = require('./journalistiek-artikelen');
+  const { bewaarArtikel, publiceer, naarConcept, snel } = require('./journalistiek-artikelen')({ ruimte, lees, save, scho, id, nu });
   function verwijderArtikel(code, artId) {
     const r = ruimte(code); r.artikelen = r.artikelen.filter(x => x.id !== scho(artId, 20)); save(); return { ok: true };
   }
-  // de snelle knop: in een keer schrijven en publiceren
-  function snel(code, d, actor) {
-    const gemaakt = bewaarArtikel(code, d, actor);
-    if (gemaakt.error) return gemaakt;
-    return publiceer(code, gemaakt.artikel.id, actor);
-  }
-
   /* ---- de eigen krantsite (blokken) ---- */
   function siteBewaar(code, d) {
     const r = ruimte(code); d = d || {};
@@ -126,7 +89,7 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, claude }) => {
   function artikelen(code, filter) {
     const r = ruimte(code); filter = filter || {};
     let lijst = r.artikelen;
-    if (filter.status) lijst = lijst.filter(a => a.status === filter.status);
+    if (filter.status) lijst = lijst.filter(a => filter.status === 'eindredactie' ? a.redactiestand === 'eindredactie' : a.status === filter.status);
     if (filter.rubriek) lijst = lijst.filter(a => a.rubriek === filter.rubriek);
     return { lijst: lijst.slice(0, 200).map(kortArt) };
   }
@@ -138,7 +101,7 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, claude }) => {
   /* De publieke kant -- de krant zoals een bezoeker hem ziet -- woont in
      ./journalistiek-krant.js: andere lezer, andere deur naar de opslag. */
   const publiek = require('./journalistiek-krant')({
-    lees, kijk: () => eigen.kijk('redacties'), save, scho, kortArt });
+    lees, kijk: () => eigen.kijk('redacties'), save, scho });
 
   /* ---- redactie-assistent (regelgestuurd; met sleutel scherper) ---- */
   function chapoVoorstel(inhoud) {

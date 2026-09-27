@@ -23,7 +23,7 @@
       var a = r.artikel, esc = w.RTGSaloon.esc;
       d.inhoud.innerHTML = '<p class="saloon-uitleg">' + esc(a.naam) + ' · ' + esc(a.auteur) + '</p><p><b>' + esc(a.chapo) + '</b></p>'
         + String(a.inhoud || '').split(/\n+/).map(function (t) { return '<p>' + esc(t) + '</p>'; }).join('')
-        + '<a href="' + esc(i.url) + '">Open in de krant</a>';
+        + w.RTGPublicatieInfo(a, esc) + '<a href="' + esc(i.url) + '">Open in de krant</a>';
     }).catch(function (e) { d.inhoud.textContent = e.message; });
   }
   function reacties(i, host) {
@@ -64,5 +64,6 @@
         .catch(function (err) { f.querySelector('[role="status"]').textContent = err.message; b.disabled = false; });
     };
   }
-  w.RTGSaloonActies = { maken: maken, artikel: artikel, reacties: reacties };
+  w.RTGSaloonActies = { maken: maken, artikel: artikel, reacties: reacties,
+    volgMaker: function (i) { return verzoek('/api/mediaos/volg', { codenaam: i.volgMaker, aan: !i.volgIk }); } };
 }(window));

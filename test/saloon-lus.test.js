@@ -40,11 +40,33 @@ test('publiceren, lezen, bewaren, corrigeren en intrekken sluiten dezelfde lus',
   assert.equal((await feed({ vorm: 'bewaard' })).items[0].id, ref);
   assert.equal((await api('/api/wereld/state', {}, ander)).saloon.voorkeuren.bewaard.length, 0);
   await red('bewaar', { id, titel: 'Gecorrigeerd verslag haven', inhoud: 'Het juiste verslag.', rubriek: 'Stad' });
+  assert.equal((await feed()).items.find(x => x.id === ref).versie, item.versie, 'intern bewaren wijzigt de gepubliceerde editie niet');
+  assert.equal((await red('publiceer', { id })).status, 400, 'een correctie heeft een openbare toelichting');
+  assert.equal((await red('publiceer', { id, toelichting: 'De eerdere routebeschrijving is verbeterd.' })).ok, true);
   const gewijzigd = (await feed()).items.find(x => x.id === ref);
   assert.notEqual(gewijzigd.versie, item.versie); assert.equal(gewijzigd.titel, 'Gecorrigeerd verslag haven');
+  const herzien = (await api('/api/krant/artikel', item.artikel)).artikel;
+  assert.equal(herzien.versie, 2); assert.equal(herzien.inhoud, 'Het juiste verslag.');
+  assert.equal(herzien.correcties[0].toelichting, 'De eerdere routebeschrijving is verbeterd.');
   await red('concept', { id });
   assert.equal((await feed({ vorm: 'bewaard' })).items.some(x => x.id === ref), false, 'bewaren verleent geen toegang');
   assert.equal((await api('/api/krant/artikel', item.artikel)).status, 404);
+});
+
+test('creatorwerk leidt tot een echte gratis volgrelatie en komt terug op het makersbord', async () => {
+  const clip = await api('/api/clips/maak', { titel: 'Een maakproces voor Saloon', duurS: 20, mbGeschat: 4 }, ander);
+  assert.ok(clip.id);
+  const q = { bronnen: ['makers'], vorm: 'overzicht', plaats: '' };
+  const item = (await feed(q)).items.find(x => x.id === 'makers:clip:' + clip.id);
+  assert.ok(item && item.volgMaker); assert.equal(item.volgIk, false);
+  assert.equal((await api('/api/mediaos/volg', { codenaam: item.volgMaker, aan: true })).ok, true);
+  assert.equal((await feed(q)).items.find(x => x.id === item.id).volgIk, true);
+  const bord = await api('/api/mediaos/bord', {}, ander);
+  assert.equal(bord.relatie.clipVolgers, 1); assert.equal(bord.geld.podiumAbonnees, 0);
+  const eigen = await api('/api/wereld/feed', { ervaring: 'saloon', lens: 'all', ...q }, ander);
+  assert.equal(eigen.items.find(x => x.id === item.id).volgMaker, null, 'geen eigen volgknop');
+  await api('/api/mediaos/volg', { codenaam: item.volgMaker, aan: false });
+  assert.equal((await api('/api/mediaos/bord', {}, ander)).relatie.clipVolgers, 0);
 });
 
 test('keuzes overleven opnieuw openen; bronnen en privécontext blijven expliciet', async () => {

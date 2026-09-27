@@ -35,7 +35,7 @@ module.exports = ({ kern, sociaal, lezers, voorkeurOpslag }) => {
             waarom: a.prive ? 'U heeft Mijn reizen aangezet.' : 'U heeft ' + b.naam.toLowerCase() + ' aangezet.',
             bewaard: o.bewaard.includes(a.id) };
           // Veranderingen in inhoud, datum of bestemming tellen; likes niet.
-          i.versie = hash([i.titel, i.tekst, i.beeld, i.begint, i.eindigt, i.plaats, i.url, i.herkomst]);
+          i.versie = hash([i.titel, i.tekst, i.beeld, i.begint, i.eindigt, i.plaats, i.url, i.herkomst, i.bronversie]);
           alles.push(i);
         }
       } catch (e) { status.push({ id: b.id, naam: b.naam, ok: false, meldingen: ['Tijdelijk niet bereikbaar. Probeer opnieuw.'] }); }

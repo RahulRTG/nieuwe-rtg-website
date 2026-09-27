@@ -58,14 +58,37 @@ test('Saloon: publiceren, reageren, bewaren, filters en mobiele bediening', { sk
     const bericht = await post('/api/supplier/redactie/artikel/bewaar', { titel: 'Demonstratie: de buurt in beweging',
       chapo: 'Een artikel om de publicatielus te beproeven.', inhoud: 'Dit is het volledige testverslag uit de bronredactie.', rubriek: 'Stad' }, zaak.token);
     await post('/api/supplier/redactie/artikel/publiceer', { id: bericht.artikel.id }, zaak.token);
+    await post('/api/supplier/redactie/snel', { titel: 'Een tweede blik op de buurt', inhoud: 'Een tweede verslag.', rubriek: 'Stad' }, zaak.token);
     await post('/api/wereld/modus', { modus: 'alles', saloon: { bronnen: ['sociaal', 'nieuws'], plaats: '', vorm: 'overzicht' } }, reg.token);
     await page.goto(srv.base + '/apps/wereld.html?embed=1');
-    const nieuws = page.locator('[data-saloon-id]').filter({ hasText: 'Demonstratie: de buurt in beweging' });
+    const nieuws = page.locator('[data-saloon-id="nieuws:BODE:' + bericht.artikel.id + '"]');
     await nieuws.waitFor();
     await nieuws.getByRole('button', { name: 'Lees artikel' }).click();
     await page.locator('dialog').getByText('Dit is het volledige testverslag uit de bronredactie.').waitFor();
     await page.getByRole('button', { name: 'Sluiten', exact: true }).click();
     await page.keyboard.press('Escape');
+    // Verbanden zijn zelfstandige links en moeten ook op telefoon te raken zijn.
+    for (const width of [390, 834]) {
+      await page.setViewportSize({ width, height: 1000 });
+      await page.locator('.saloon-herkomst').evaluateAll(nodes => nodes.forEach(n => { n.open = true; }));
+      const maten = await page.locator('.saloon-herkomst a').evaluateAll(nodes => nodes.map(n => n.getBoundingClientRect().height));
+      assert.ok(maten.length > 0, 'er zijn echte verbandlinks om te meten');
+      assert.ok(maten.every(h => h >= 24), 'verbandlinks zijn minstens 24px hoog');
+    }
+    const maker = await post('/api/auth/register', { name: 'Maker Saloon', email: 'maker-scherm@example.test',
+      phone: '0612345678', password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' });
+    const clip = await post('/api/clips/maak', { titel: 'Een creator aan het werk', duurS: 20, mbGeschat: 4 }, maker.token);
+    assert.ok(clip.id);
+    await post('/api/wereld/modus', { modus: 'alles', saloon: { bronnen: ['makers'], plaats: '', vorm: 'overzicht' } }, reg.token);
+    await page.reload();
+    const werk = page.locator('[data-saloon-id="makers:clip:' + clip.id + '"]');
+    await werk.getByRole('button', { name: 'Maker gratis volgen', exact: true }).click();
+    await werk.getByRole('button', { name: 'Maker ontvolgen', exact: true }).waitFor();
+    assert.equal((await post('/api/mediaos/bord', {}, maker.token)).relatie.clipVolgers, 1);
+    await werk.getByRole('button', { name: 'Maker ontvolgen', exact: true }).click();
+    await werk.getByRole('button', { name: 'Maker gratis volgen', exact: true }).waitFor();
+    assert.equal((await post('/api/mediaos/bord', {}, maker.token)).relatie.clipVolgers, 0);
+    await page.setViewportSize({ width: 1440, height: 1000 });
     await page.mouse.move(1200, 100);
     await page.locator('.saloon-kop h2').click();
     await page.evaluate(() => window.scrollTo(0, 0));

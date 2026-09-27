@@ -49,6 +49,7 @@
   .lezen .meta{color:var(--soft);font-size:.8rem;margin:.7rem 0 1.2rem;border-bottom:1px solid var(--line);padding-bottom:1rem;}
   .lezen .beeld{border-radius:0;overflow:hidden;margin-bottom:1.3rem;} .lezen .beeld img{width:100%;display:block;}
   .lezen .inhoud p{line-height:1.8;margin-bottom:1.1rem;font-size:1.05rem;color:var(--txt);}
+  .lezen summary{min-height:30px;padding:.4rem 0;cursor:pointer;}
   /* de gids van kranten */
   .gids{max-width:900px;margin:0 auto;padding:2.2rem 1.1rem 4rem;}
   .gids h1{font-size:clamp(1.8rem,5vw,2.8rem);text-align:center;}
@@ -62,6 +63,7 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/apps/redactie/publicatie.js"></script>
 </head>
 <body class="rtg-stijl" data-rtg-world="living" data-rtg-eigenvlak="bordeaux" data-rtg-skin="heritage">
 <div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
@@ -163,7 +165,7 @@ async function lees(id){
     const paras=String(a.inhoud||'').split(/\n{2,}|\n/).filter(x=>x.trim()).map(p=>'<p>'+esc(p)+'</p>').join('')||'<p class="chapo">'+esc(a.chapo||'')+'</p>';
     $('#hoofd').innerHTML='<article class="lezen"><div class="rub" style="color:'+esc(a.accent||'#7F1634')+';">'+esc(a.rubriek)+'</div><h1>'+esc(a.titel)+'</h1>'+
       (a.chapo?'<div class="chapo">'+esc(a.chapo)+'</div>':'')+'<div class="meta">'+esc(a.naam)+' · '+esc(a.auteur||'Redactie')+'</div>'+
-      (a.beeld?'<div class="beeld"><img src="'+esc(a.beeld)+'" alt=""></div>':'')+'<div class="inhoud">'+paras+'</div></article>';
+      (a.beeld?'<div class="beeld"><img src="'+esc(a.beeld)+'" alt=""></div>':'')+'<div class="inhoud">'+paras+'</div>'+window.RTGPublicatieInfo(a,esc)+'</article>';
     window.scrollTo(0,0);
   }catch(e){ alert(e.message); }
 }

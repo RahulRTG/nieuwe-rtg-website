@@ -18,6 +18,17 @@
     if (i.bronGroep !== 'sociaal') {
       k.querySelectorAll('[data-chat],.tel').forEach(function (e) { e.remove(); });
     }
+    if (i.volgMaker) {
+      var volg = document.createElement('button'); volg.type = 'button'; volg.dataset.volgMaker = i.volgMaker;
+      volg.textContent = i.volgIk ? 'Maker ontvolgen' : 'Maker gratis volgen';
+      volg.setAttribute('aria-pressed', String(i.volgIk));
+      volg.onclick = function () {
+        volg.disabled = true;
+        w.RTGSaloonActies.volgMaker(i).then(function () { host.laad(); })
+          .catch(function (e) { host.fout(e.message); volg.disabled = false; });
+      };
+      k.querySelector('.acties').appendChild(volg);
+    }
     if (i.bron === 'salon') {
       var reageer = document.createElement('button'); reageer.type = 'button'; reageer.textContent = 'Reacties';
       reageer.onclick = function () { w.RTGSaloonActies.reacties(i, host); };

@@ -1,4 +1,4 @@
-# Saloon — eerste werkende implementatie
+# Saloon — levende interface en publicatielussen
 
 Saloon is de gezamenlijke lees- en handelingslaag op `/apps/wereld.html`.
 Het bestaande RTG-werkvlak en de domeinapps blijven de ingang voor identiteit,
@@ -53,6 +53,43 @@ uit Saloon en onleesbaar via de artikelroute. Getoetste sociale lus: plaatsen
 met doelgroep → geautoriseerd lezen → reageren → bewaren → filteren en opnieuw
 openen → verbergen.
 
+### Redactionele werkversie en gepubliceerde editie
+
+De bestaande Redactie heeft nu een interne werkversie, research- en
+verificatienotities, de werkstand Eindredactie en een publicatiehistorie.
+Bewaren of naar eindredactie sturen verandert een live artikel niet. Alleen
+Publiceren vervangt de gepubliceerde editie. Krant en Saloon lezen diezelfde
+editie; interne notities, werkhistorie en personeels-ID's gaan niet mee.
+
+Een correctie of herpublicatie vraagt een openbare toelichting. Die verschijnt
+bij het artikel in zowel de krant als Saloon, met editienummer en datums. De
+oorspronkelijke publicatiedatum en auteur blijven behouden; de handelende
+redacteur staat in de interne historie. Ook een correctie van uitsluitend de
+artikeltekst verandert de Saloon-inhoudsversie. Intrekken sluit onmiddellijk
+de publieke leesroute en de Saloon-projectie.
+
+De editor stuurt de gelezen werkversie mee bij bewaren, publiceren en intrekken.
+Een achterhaalde versie levert een conflictmelding op. Bestaande API-clients
+zonder versienummer blijven compatibel; deze bescherming geldt voor opdrachten
+die een versienummer meesturen. Oude live artikelen blijven leesbaar en krijgen
+bij hun eerste bewerking een afzonderlijke gepubliceerde editie.
+
+De laatste 100 werkhandelingen en de laatste 100 openbare correctietoelichtingen
+blijven bij het bronartikel. Dit is een publicatiehistorie, geen volledig archief
+van iedere tekstversie. Bij 500 artikelen weigert de redactie nieuwe stukken in
+plaats van het oudste artikel stil te verwijderen. Eindredactie is een werkstand
+voor de bestaande bevoegde redactie; onafhankelijke goedkeuring door een tweede
+persoon, embargo's en automatische publicatieplanning zijn nog niet gebouwd.
+
+### Creator en publiek
+
+Bij werk uit Clips en Theater kan de lezer de maker direct gratis volgen of
+ontvolgen. Saloon gebruikt de bestaande Media-OS-handeling en leest de volgstand
+terug uit de bron. De relatie is zichtbaar op het makersbord. Eigen werk krijgt
+geen volgknop. Deze handeling verandert geen betaald Podium-abonnement.
+Creatoropdrachten, overdracht van gebruiksrechten en afrekening vragen nog hun
+eigen uitvoerlus.
+
 ## Architectuur
 
 - `server/kern/wereld/saloon/bronnen.js` adapteert bestaande bronlezers. Nieuwe
@@ -93,14 +130,15 @@ het lezen van een artikel binnen Saloon. De drie nieuwe testbestanden zijn met
 de mutatiemotor op foutgevoeligheid beproefd. `scripts/check.js` controleert
 de bron, documentatie, registers en ondertitelbeslissing.
 
-De volledige CI is niet bewezen. De lokale kantoorrolproef kan geen
-demo-kantoorsessie openen; hetzelfde is gereproduceerd op de ongewijzigde
-basiscommit `c82e3f94d89be9512a2f80044205dfa83b7b8e04`. PostgreSQL-, Redis-,
-container- en GitHub-specifieke controles vragen hun eigen voorzieningen.
-Dit document is geen vrijgave voor productie.
+De eerste GitHub-ronde vond verouderde afgeleide registers, twee testscenario's
+die reageerden op voor de ontvanger onzichtbare posts, en te lage onderwerp-links
+op telefoon en tablet. De scenario's gebruiken nu zichtbare publicaties; de
+leespoort blijft gelden. De links krijgen grotere aanraakvlakken en de
+schermtest meet ze op beide formaten. De volledige CI moet ook de bijgewerkte
+branch beoordelen. Dit document is geen vrijgave voor productie.
 
 De grotere productvisie vraagt nog afzonderlijke bouwstappen: een volledige
-redactionele research/review/correctiehistorie, creatoropdrachten met rechten,
+redactionele dossier- en goedkeuringsketen, creatoropdrachten met rechten,
 levering en afrekening, alle event- en transactiedomeinen in de projectie, een
 uitgebreide knowledge graph en een generatieve interface met gecontroleerde
 acties. Deze versie levert de werkende verbinding en de genoemde lussen.

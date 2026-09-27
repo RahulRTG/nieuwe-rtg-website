@@ -21,7 +21,7 @@ module.exports = ({ kern, sociaal }) => ({
       for (const a of d.artikelen) items.push({
         id: 'nieuws:' + krant.code + ':' + a.id, bron: 'nieuws', type: 'article',
         titel: a.titel, tekst: a.chapo, auteur: a.auteur || krant.naam,
-        uitgever: krant.naam, at: a.gepubliceerd || a.bij, gewijzigd: a.bij,
+        uitgever: krant.naam, at: a.gepubliceerd || a.bij, gewijzigd: a.bij, bronversie: a.publicatieversie,
         onderwerpen: [a.rubriek], beeld: a.beeld ? [{ src: a.beeld, alt: a.titel }] : [],
         url: url('/apps/krant.html', { zaak: krant.code }) + '#' + enc(a.id),
         actie: 'Lees artikel', artikel: { code: krant.code, id: a.id }
@@ -40,7 +40,9 @@ module.exports = ({ kern, sociaal }) => ({
         onderwerpen: a.onderwerp ? [a.onderwerp] : [],
         beeld: a.poster ? [{ src: a.poster, alt: a.titel }] : [],
         url: '/apps/media.html#stuk=' + enc(a.id), actie: 'Open werk',
-        media: a.id, volgIk: !!a.volgIk, waarom: a.waarom || ''
+        media: a.id, volgIk: !!a.volgIk,
+        volgMaker: !a.mijn && ['clip', 'video'].includes(a.vorm) ? (a.maker || {}).codenaam : null,
+        waarom: a.waarom || ''
       })) };
   },
   plekken() {

@@ -9,11 +9,11 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**60 bundels, 478 delen, 0 zonder onderwerp.**
+**60 bundels, 479 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 98 delen, 9724 regels in de delen
+`public/apps/app-main/` -- 99 delen, 9756 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -31,6 +31,7 @@ omlaag.
 | `app-main-06.js` | SALON-CONNECTIES |
 | `app-main-07.js` | het contactenblok op het beginscherm, met de lege staat |
 | `app-main-07a.js` | Language changes only presentation; agreement, identity and focus are preserved |
+| `app-main-07c.js` | de herkomstvraag op het welkomstscherm (besluit C6) |
 | `app-main-08.js` | de onboarding: het paspoort scannen of een bestand kiezen |
 | `app-main-08a.js` | Vervolg van app-main-08: het meebouwen aan het eind van de onboarding |
 | `app-main-08b.js` | Vervolg van app-main-08: de snaps- en verhalenstrip boven de contactenkaart |

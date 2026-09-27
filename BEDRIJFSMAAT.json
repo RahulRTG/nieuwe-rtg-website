@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T13:51:08.589Z",
-    "commit": "97f6ed5d",
+    "op": "2026-09-27T14:19:43.750Z",
+    "commit": "56c84972",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bedrijfsmaat.js",
@@ -68,7 +68,7 @@
       "herkomst": "mens",
       "regel": "Een optionele vraag bij aanmelding en een campagnecode in de link; alleen geteld langs de groepspoort, nooit per lid zichtbaar, dertien maanden bewaard en weg bij vergetelheid.",
       "kort": "Weten waar leden vandaan komen, niet wie.",
-      "handhaving": "kern/aanmeldkanaal.js (een telling per maand, nooit per lid); test/aanmeldkanaal.test.js. De vraag zelf staat nog niet in het aanmeldscherm; de API en de campagnelink wel.",
+      "handhaving": "kern/aanmeldkanaal.js (een telling per maand, nooit per lid); test/aanmeldkanaal.test.js. De vraag staat na de registratie op het welkomstscherm (routes/auth/account.js, een keer per account).",
       "stand": "gebouwd"
     },
     {
@@ -2630,7 +2630,7 @@
         "gegrond": true,
         "zwakkeSchakels": []
       },
-      "gedeeltelijk": "Alleen wie de vraag beantwoordt of via een campagnelink komt. De vraag zelf staat nog niet in het aanmeldscherm; de API en de link wel."
+      "gedeeltelijk": "Alleen wie de vraag beantwoordt of via een campagnelink komt. De vraag komt na de registratie en is over te slaan."
     },
     {
       "id": "cac.per-kanaal",

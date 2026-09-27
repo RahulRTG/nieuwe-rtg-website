@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T16:57:27.034Z",
-    "commit": "77e56876",
+    "op": "2026-09-27T17:14:01.034Z",
+    "commit": "e18de257",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -7705,6 +7705,13 @@
       "operator": "===->!==#0",
       "gezakt": 5,
       "geprobeerd": 1
+    },
+    "rooster-verzuim.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "routelog.test.js": {
       "soort": "server",

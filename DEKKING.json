@@ -1,9 +1,9 @@
 {
   "uitleg": "Elke route (METHODE + patroon) die tijdens de volledige testsuite ECHT is aangeraakt, uit het routejournaal van server/routelog.js en niet uit de tekst van de toetsen. De eis is 100%: scripts/dekking.js zakt op elk gat en kent geen norm om die eis te verlagen. Het RTG Kantoor leest dit bestand (routes/office/dekking.js) en houdt het naast wat de server op dit moment registreert, zodat een route die er na de meting bij komt meteen als ongemeten opvalt. Bijwerken met: npm run dekking:vast",
   "gemeten": {
-    "op": "2026-09-27T18:33:50.234Z",
-    "commit": "34defbd4",
-    "routesToen": 5180
+    "op": "2026-09-27T18:47:36.815Z",
+    "commit": "433142d2",
+    "routesToen": 5186
   },
   "aangeraakt": [
     "GET /",
@@ -581,6 +581,7 @@
     "POST /api/concern/uitnodigen",
     "POST /api/concern/uitnodiging/accepteer",
     "POST /api/concern/uitnodiging/intrek",
+    "POST /api/concern/uitnodiging/roteer",
     "POST /api/concern/uitnodigingen",
     "POST /api/concern/verloopt",
     "POST /api/concern/vestiging/inhaal",
@@ -1721,6 +1722,8 @@
     "POST /api/member/magnaat/taak/start",
     "POST /api/member/magnaat/teamkamer/actie",
     "POST /api/member/magnaat/teamkamer/bedien",
+    "POST /api/member/magnaat/teamkamer/code",
+    "POST /api/member/magnaat/teamkamer/code/intrek",
     "POST /api/member/magnaat/teamkamer/deelnemen",
     "POST /api/member/magnaat/teamkamer/maak",
     "POST /api/member/magnaat/teamkamer/mijn",
@@ -2323,6 +2326,7 @@
     "POST /api/office/kantine/menu",
     "POST /api/office/kantine/menu-zet",
     "POST /api/office/kantoor/uitnodiging",
+    "POST /api/office/kantoor/uitnodiging/intrek",
     "POST /api/office/kantoor/uitnodigingen",
     "POST /api/office/kantoorpakket/aanwezig",
     "POST /api/office/kantoorpakket/ai",
@@ -3627,6 +3631,7 @@
     "POST /api/service/bel/signaal",
     "POST /api/service/bericht",
     "POST /api/service/bevestig",
+    "POST /api/service/bevestiging/toon",
     "POST /api/service/bevestigingen",
     "POST /api/service/keuzes",
     "POST /api/service/mens",
@@ -4601,6 +4606,7 @@
     "POST /api/supplier/service",
     "POST /api/supplier/service/bericht",
     "POST /api/supplier/service/bevestig",
+    "POST /api/supplier/service/bevestiging/toon",
     "POST /api/supplier/service/bevestigingen",
     "POST /api/supplier/service/keuzes",
     "POST /api/supplier/service/mens",

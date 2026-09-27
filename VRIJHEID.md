@@ -15,7 +15,8 @@ teambeeld, de routes staan en zijn tegen een echte server beproefd, en er
 zijn twee schermen: **Mijn tijd** in de personeelsapp en **Tijd van het team**
 in het Kantoor van de zaak. Wat nog niet aangesloten is: de bronnen die het
 teambeeld in productie vullen (verantwoordelijkheden, een lopend dienstverband
-in de zaaiset) en de loonstrook, en de meeste beleidswaarden staan nog open.
+in de zaaiset) en het vakantiesaldo, en de meeste beleidswaarden staan nog
+open. Een toegekende hele vrije dag bereikt de loonstrook wel (par. 7, punt 7).
 Dat is par. 7.
 
 ---
@@ -310,11 +311,32 @@ valideren:
      zaak krijgt leeg beleid.
    - Stap twee van het besluit volgt in een eigen PR: het kantoor logt in als
      personeel van deze zaak in plaats van met de gedeelde code.
-7. `samenstellen.js` leest de nieuwe categorieën.
+7. **Half gedaan: de loonstrook** (27 september 2026). De motor had al een
+   `rooster`-haak die niemand vulde; die is nu de brug naar het
+   verzuimregister (`server/kern/vrijheid/verzuimbrug.js`), en dat register
+   leest de loonrun al (`kern/payroll/samenstellen.js`), net als het
+   afwezigheidsoverzicht van de leidinggevende. Een toegekende hele vrije dag
+   staat er onder zijn EIGEN soort: vakantie, bijzonder of onbetaald verlof,
+   en twee nieuwe die 100% doorbetalen -- `rtgdag` en `verjaardag` -- zodat op
+   de strook staat waarom iemand betaald vrij was.
+   - Een deel van een dag komt er niet in (de payroll rekent in werkdagen) en
+     zegt dat met stand NIET_DOORGEZET en de reden.
+   - Het bouwen vond een gebrek: een ingetrokken of door uitdiensttreding
+     vervallen dag hield zijn boeking, dus een ingetrokken RTG Day telde nog
+     mee tegen de tien en bleef collega's blokkeren. Vrijgeven staat nu op een
+     plek (`vrijgaveTerug` in `roosterhaak.js`), en een afwezigheid met een `bron` raakt
+     nooit een melding uit een andere weg.
+   - Wat het NIET doet: geen roostermotor leest het verzuimregister
+     (PLANNING.md par. 7), dus een roostervoorstel kan iemand op zijn vrije
+     dag nog inplannen. En het vakantiesaldo komt nergens vandaan.
+
+   `test/vrijheid-verzuim.test.js` draait de echte motor, het echte register
+   en de echte samenstelling van een loonrun.
 
 **P1**
 
-- De rooster-adapter schrijft terug (`pas`/`heeft`).
+- Het rooster zelf leest de toegekende vrije dagen (vandaag komen ze alleen in
+  het verzuimregister, en geen roostermotor leest dat).
 - Een vervanger krijgt zijn dienst in het rooster.
 - Dienst ruilen.
 - Overdracht breder dan de horecawijk.

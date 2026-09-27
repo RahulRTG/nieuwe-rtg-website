@@ -11,7 +11,7 @@ const K = require('./capaciteit');
 const { herstelSignaal } = require('./rust');
 
 module.exports = (ctx) => {
-  const { org, id, fout, tijd, bewaar, zend, teamKlopt, afwezig, boek, roosterPas, rooster, TOEGEKEND } = ctx;
+  const { org, id, fout, tijd, bewaar, zend, teamKlopt, afwezig, boek, roosterPas, vrijgaveTerug, rooster, TOEGEKEND } = ctx;
 
   /* Verjaardagen van een heel jaar, ruim vooraf. Idempotent per mens per jaar.
      Een dekkingsgat maakt de verjaardag NIET ongedaan: het wordt een signaal
@@ -37,7 +37,8 @@ module.exports = (ctx) => {
       S.zet(j, 'verjaardag', 'COVERAGE_PLANNED', 'systeem', tijd());
       S.zet(j, 'verjaardag', 'SCHEDULED', 'systeem', tijd());
       boek(code, jid, { categorie: 'BIRTHDAY_LEAVE', uren: j.uren, datum: j.datum, persoon: mens.id, betaaldeUren: j.uren }, j.afwezigheid);
-      roosterPas(code, j, { soort: 'afwezig', persoon: mens.id, afwezigheid: j.afwezigheid, bron: jid });
+      roosterPas(code, j, { soort: 'afwezig', persoon: mens.id, afwezigheid: j.afwezigheid, bron: jid,
+        categorie: 'BIRTHDAY_LEAVE', datum: j.datum, dag: true });
       zend('BIRTHDAY_LEAVE_SCHEDULED', { organisatie: code, id: jid });
       uit.push(j);
     }
@@ -52,8 +53,7 @@ module.exports = (ctx) => {
     if (door !== j.persoon) return fout(403, 'Alleen uzelf kiest ervoor om op uw verjaardag te werken.');
     if (j.stand !== 'SCHEDULED') return fout(409, 'Deze verjaardag staat niet (meer) gepland.');
     S.zet(j, 'verjaardag', 'WORKED_BY_CHOICE', door, tijd());
-    const b = org(code).boekingen; const i = b.findIndex(x => x.id === jid);
-    if (i >= 0) b[i] = Object.freeze({ ...b[i], ingetrokken: true, afwezigheid: null });
+    vrijgaveTerug(code, j);
     bewaar();
     return { ok: true, verjaardag: j };
   }
@@ -68,7 +68,12 @@ module.exports = (ctx) => {
     for (const v of Object.values(staat.verzoeken)) {
       if (!['SCHEDULED', 'CHECKING', 'HUMAN_REVIEW', 'ALTERNATIVE_PROPOSED'].includes(v.stand)) continue;
       const mens = (team.mensen || []).find(m => m.id === v.persoon);
-      if (!D.inDienst(mens, v.datum)) { v.reden = 'Het dienstverband loopt op ' + v.datum + ' niet meer.'; S.zet(v, 'verzoek', 'CANCELLED', 'systeem', tijd()); gevonden.push({ id: v.id, wat: 'uit-dienst' }); continue; }
+      if (!D.inDienst(mens, v.datum)) {
+        const toegekend = v.stand === 'SCHEDULED';
+        v.reden = 'Het dienstverband loopt op ' + v.datum + ' niet meer.'; S.zet(v, 'verzoek', 'CANCELLED', 'systeem', tijd());
+        if (toegekend) vrijgaveTerug(code, v);
+        gevonden.push({ id: v.id, wat: 'uit-dienst' }); continue;
+      }
       if (v.stand !== 'SCHEDULED' || !v.afwezigheid) continue;
       const dek = D.toets(team, v.afwezigheid, afwezig(code, v.id));
       if (dek.stand === 'GAP' && !v.herbeoordeling) {
@@ -118,7 +123,10 @@ module.exports = (ctx) => {
     const alle = [...Object.values(staat.verzoeken), ...Object.values(staat.aanbiedingen), ...Object.values(staat.verjaardagen)];
     for (const o of alle.filter(x => x.rooster === 'ONBEKEND')) {
       const er = rooster && rooster.heeft ? rooster.heeft(code, o.roosterWijziging) : undefined;
-      if (er === true) o.rooster = 'BIJGEWERKT';
+      /* Een TERUGNAME die onbekend afliep gaat de andere kant op: staat hij er
+         nog, dan opnieuw weghalen -- nooit als "bijgewerkt" bevestigen. */
+      if (o.roosterRichting === 'terug') { if (er === false) o.rooster = 'TERUGGEDRAAID'; else if (er === true) vrijgaveTerug(code, o); }
+      else if (er === true) o.rooster = 'BIJGEWERKT';
       else if (er === false) roosterPas(code, o, o.roosterWijziging);
       if (o.rooster === 'BIJGEWERKT' && o.stand === 'RECONCILE_PENDING') S.zet(o, 'vrijgaveAanbod', 'ROSTER_RECONCILED', 'systeem', tijd());
       uit.push({ id: o.id, rooster: o.rooster });

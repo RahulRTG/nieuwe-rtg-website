@@ -1,8 +1,8 @@
 {
  "stempel": {
-  "op": "2026-09-27T12:10:47.012Z",
-  "commit": "c1c02ae9",
-  "boomVuil": false,
+  "op": "2026-09-27T12:15:52.137Z",
+  "commit": "27a7fd28",
+  "boomVuil": true,
   "boomAnders": 4,
   "instrument": "scripts/refundmigratie.js",
   "node": "v22.22.2"
@@ -12,9 +12,9 @@
  "grens": "De toewijzing van een bestand aan een collectie is lexicaal en dus een BOVENgrens: een bestand dat twee collecties noemt, staat bij allebei. Elke rij draagt daarom zijn `leesbreedte` -- `venster` is toegewezen uit vijftien regels rond de treffer en is scherp, `bestand` uit het hele bestand en is ruim. Het zegt ook niets over of een verklaring KLOPT -- alleen dat de plek nog bestaat. En het ziet geen lezer die de betaalstand via een hulpfunctie leest zonder `.paid` te noemen; dat is een ONDERgrens die naast de bovengrens staat en er niet tegen wegvalt.",
  "perCollectie": {
   "orders": {
-   "verklaard": 32,
-   "onbekend": 2,
-   "om": 14,
+   "verklaard": 34,
+   "onbekend": 0,
+   "om": 16,
    "geenWerk": 18,
    "wacht": 0,
    "scherm": 7
@@ -88,6 +88,28 @@
    "stand": "geen-werk",
    "wat": "de sqlite-kant van datzelfde grootboek",
    "gedaan": "leest `data` terug, niet de kolom"
+  },
+  {
+   "bestand": "server/kern/afhaalcode-toegang.js",
+   "treffers": 1,
+   "laag": "server",
+   "leesbreedte": "venster",
+   "collectie": "orders",
+   "soort": "grendel",
+   "stand": "om",
+   "wat": "of een bestelling een afhaalcode mag krijgen (open en betaald of aan de balie)",
+   "gedaan": "`open()` sluit `refunded` zelf uit, dus een teruggestorte bon krijgt geen code, ook al staat `paid` nog"
+  },
+  {
+   "bestand": "server/kern/afhaalcode.js",
+   "treffers": 2,
+   "laag": "server",
+   "leesbreedte": "venster",
+   "collectie": "orders",
+   "soort": "grendel",
+   "stand": "om",
+   "wat": "of de kassa bij het uitgeven nog moet afrekenen",
+   "gedaan": "de claim toetst eerst `open()` (sluit `refunded` uit) en leest `paid` pas daarna"
   },
   {
    "bestand": "server/kern/bezorgvolg.js",
@@ -495,24 +517,6 @@
  ],
  "onbekend": [
   {
-   "bestand": "server/kern/afhaalcode-toegang.js",
-   "treffers": 1,
-   "laag": "server",
-   "leesbreedte": "venster",
-   "collecties": [
-    "orders"
-   ]
-  },
-  {
-   "bestand": "server/kern/afhaalcode.js",
-   "treffers": 2,
-   "laag": "server",
-   "leesbreedte": "venster",
-   "collecties": [
-    "orders"
-   ]
-  },
-  {
    "bestand": "server/kern/care/leden.js",
    "treffers": 3,
    "laag": "server",
@@ -655,8 +659,8 @@
  "verdwenen": [],
  "telling": {
   "bestanden": 60,
-  "verklaard": 40,
-  "onbekend": 17,
+  "verklaard": 42,
+  "onbekend": 15,
   "verdwenen": 0,
   "server": 46,
   "scherm": 11,

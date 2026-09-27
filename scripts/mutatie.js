@@ -998,6 +998,10 @@ const EIGEN_MODULE = new Map([
      onbetrouwbaar maken -- elke regel hier hoort een uitspraak te zijn die de
      standaardweg niet al doet. */
   ['camerascherm.e2e.js', ['public/shared/media.js']],
+  /* De zoekindex van de Toestelkluis leeft helemaal in de BROWSER (OPFS) en
+     raakt /api/ nooit: de liegpoort kan hem niet raken, dus die "overleefde" zei
+     niets over de toets. De bronmutatie op kluisindex.js wel. Bevestigd. */
+  ['toestel-kluisindex.e2e.js', ['public/shared/toestel/kluisindex.js']],
   /* De verdiepingsreis opent elf nieuwe schermen en gebruikt op elk scherm de
      eerste betekenisvolle bediening. De intake van de Decision Room is de
      zwaarste eerste schakel: zonder de klikafhandeling komt de dialoog niet in

@@ -369,6 +369,7 @@ async function meetRij(rij, base, persoonlijk, rollen) {
   const bediening = await bedien(eigen, base, rij.pad);
   r.gevonden = bediening.gevonden;
   r.geklikt = bediening.geklikt;
+  r.schil = bediening.schil;
   r.overgeslagen = bediening.overgeslagen;
   r.nietKlikbaar = bediening.nietKlikbaar;
   r.onderschept = bediening.onderschept;
@@ -383,11 +384,12 @@ async function meetRij(rij, base, persoonlijk, rollen) {
      weet niemand of dat alles was of het topje. */
   const redenenTelling = {};
   for (const n of bediening.nietKlikbaar) { const w = n.split(': ').pop(); redenenTelling[w] = (redenenTelling[w] || 0) + 1; }
-  const uitsplitsing = bediening.geklikt + ' van ' + bediening.gevonden + ' zichtbare knoppen aangetikt zonder fout'
+  const uitsplitsing = bediening.geklikt + ' van ' + bediening.gevonden + ' eigen knoppen aangetikt zonder fout'
+    + (bediening.schil ? ' (plus ' + bediening.schil + ' van de gedeelde schil, die hier niet telt)' : '')
     + (bediening.nietKlikbaar.length ? ', ' + bediening.nietKlikbaar.length + ' niet aan te tikken (' + Object.entries(redenenTelling).map(([w, n]) => n + 'x ' + w).join(', ') + ')' : '')
     + (bediening.overgeslagen.length ? ', ' + bediening.overgeslagen.length + ' overgeslagen omdat ze onomkeerbaar zijn' : '');
   if (bediening.geklikt === 0 && !bediening.gevonden) {
-    r.bewijzen.bedienbaar = { status: 'NIET_GETEST', reden: 'geen zichtbare knop zonder bestemming gevonden; wat dit scherm doet, loopt via links of formulieren', bewijs: null };
+    r.bewijzen.bedienbaar = { status: 'NIET_GETEST', reden: 'geen eigen knop zonder bestemming gevonden' + (bediening.schil ? ' (alleen ' + bediening.schil + ' van de gedeelde schil)' : '') + '; wat dit scherm doet, loopt via links of formulieren', bewijs: null };
   } else if (stuk.length) {
     r.bewijzen.bedienbaar = { status: 'GEBLOKKEERD_DOOR_DEFECT', reden: stuk[0], bewijs: bediening.crash.concat(bediening.serverfout).slice(0, 5).join(' | ') };
   } else if (bediening.config.length) {
@@ -487,7 +489,7 @@ async function bedien(ctx, base, pad) {
   const page = await ctx.newPage();
   const crash = [], config = [], serverfout = [], rem = [], weigering = [], gezegd = [], taalWissel = [];
   let laatste = null;
-  let geklikt = 0, gevonden = 0;
+  let geklikt = 0, gevonden = 0, schil = 0;
   const overgeslagen = [], nietKlikbaar = [], onderschept = [], instrument = [];
   try {
     await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
@@ -517,6 +519,7 @@ async function bedien(ctx, base, pad) {
         catch (x) { instrument.push('opnieuw openen lukte niet: ' + String(x.message || x).split('\n')[0].slice(0, 80)); break; }
       }
       gevonden = Math.max(gevonden, k.zichtbaar || 0);
+      schil = Math.max(schil, k.schil || 0);
       if (k.klaar) break;
       gehad.add(k.merk);
       if (ONOMKEERBAAR.test(k.tekst)) { overgeslagen.push(k.tekst || '(naamloos)'); continue; }
@@ -558,7 +561,7 @@ async function bedien(ctx, base, pad) {
   }
   await beoordeelWeigeringen(page, weigering, gezegd, serverfout);
   await page.close();
-  return { geklikt, gevonden, overgeslagen, nietKlikbaar, onderschept, instrument, crash, config, serverfout, rem, gezegd, taalWissel };
+  return { geklikt, gevonden, schil, overgeslagen, nietKlikbaar, onderschept, instrument, crash, config, serverfout, rem, gezegd, taalWissel };
 }
 
 /* WAT STAAT ER NU, EN WAT HEBBEN WE NOG NIET GEHAD.
@@ -598,14 +601,31 @@ async function kijkRonde(page, gehad) {
     /* De taalkeuze wordt niet aangetikt: een taal kiezen verandert de persona
        voor ELK volgend scherm (en liet elk scherm daarna vertalingen vragen).
        Dat is een instelling, geen functie van het scherm onder de meting. */
-    const alle = Array.from(document.querySelectorAll('button,[role=button],[data-tab],[data-stand]'))
+    const kandidaten = Array.from(document.querySelectorAll('button,[role=button],[data-tab],[data-stand]'))
       .filter(zie).filter((el) => !el.getAttribute('href') && !el.getAttribute('data-url'))
       .filter((el) => !el.closest('#rtg-lang-modal'));
+    /* DE SCHIL IS NIET DIT SCHERM. De Edge (.rtg-edge-chrome) en de toetsknop
+       van het veeggebaar (.rnd-toets, randen.js) staan op ELK scherm en worden
+       daar door hun eigen toetsen beproefd (test/appmenu.e2e.js e.a.). Telden
+       ze mee, dan mat elke rij vooral de schil: op geven.html waren alle 23
+       knoppen schil en nul van het scherm zelf, en met hoogstens MAXKLIK tikken
+       tegen "minstens de helft van wat zichtbaar is" kon een scherm met meer dan
+       28 knoppen nooit bewezen worden (gemeten 27 september 2026: 111 van 112
+       rijen NIET_GETEST, geen enkele boven de 14 tikken). De .rnd-toets staat
+       bovendien met opzet buiten beeld tot hij focus krijgt; zijn "outside of
+       the viewport" was de proef, niet het scherm. */
+    const SCHIL = '.rtg-edge-chrome, .rnd-toets';
+    const alle = kandidaten.filter((el) => !el.closest(SCHIL));
+    /* En een knop telt EEN keer: vier kaarten met "Bekijken" zijn een handeling,
+       en de proef tikt er ook maar een aan (hetzelfde merk). In de noemer
+       stonden ze vier keer. */
+    const zichtbaar = new Set(alle.map(merk)).size;
+    const schil = kandidaten.length - alle.length;
     document.querySelectorAll('[data-appwerkt]').forEach((el) => el.removeAttribute('data-appwerkt'));
     const nieuwe = alle.filter((el) => !alGehad.includes(merk(el)));
-    if (!nieuwe.length) return { klaar: true, zichtbaar: alle.length };
+    if (!nieuwe.length) return { klaar: true, zichtbaar, schil };
     nieuwe[0].setAttribute('data-appwerkt', '1');
-    return { klaar: false, zichtbaar: alle.length, merk: merk(nieuwe[0]),
+    return { klaar: false, zichtbaar, schil, merk: merk(nieuwe[0]),
       tekst: (nieuwe[0].innerText || nieuwe[0].getAttribute('aria-label') || nieuwe[0].title || '').trim().slice(0, 40) };
   }, [...gehad]);
 }

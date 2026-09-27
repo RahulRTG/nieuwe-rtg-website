@@ -61,8 +61,8 @@ jobs:
       # vooronderzoek vervangt geen enkel definitief bewijsbestand.
       - name: Releaseketen vooraf controleren
         run: |
-          node scripts/lokale-toetsomgeving.js npm run release:gate
-          node scripts/lokale-toetsomgeving.js npm run staging:repetitie
+          npm run release:gate
+          npm run staging:repetitie
       # Dit is dezelfde softwarepoort die vóór een echte uitrol draait:
       # volledige suite op deze commit, releasegate en stagingrepetitie. Een
       # losse check + test liet herstel, mutatiecontracten en staging buiten.

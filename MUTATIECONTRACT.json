@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-27T18:32:47.387Z",
-  "commit": "aa676a49",
+  "op": "2026-09-27T18:46:28.465Z",
+  "commit": "5afae0ae",
   "boomVuil": false,
   "boomAnders": 2,
   "instrument": "scripts/mutatiecontract.js",
@@ -10,18 +10,18 @@
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5055,
-  "geclassificeerd": 5055,
+  "totaal": 5061,
+  "geclassificeerd": 5061,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3190,
    "NOT_APPLICABLE": 1212,
-   "PROTECTED": 497,
-   "INTENTIONALLY_NON_IDEMPOTENT": 156
+   "PROTECTED": 499,
+   "INTENTIONALLY_NON_IDEMPOTENT": 160
   },
-  "vastgesteldDoorMens": 1914,
+  "vastgesteldDoorMens": 1920,
   "afgeleidDoorScript": 3141,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4160,
+   "AUTHENTICATED": 4166,
    "PUBLIC": 126,
    "OBJECT_SCOPED": 746,
    "(niet af te leiden -- vraagt een verklaring)": 7,
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 136,
    "kale ronde: onbeschermd": 123,
    "kale ronde: geen uitspraak": 4713,
-   "niet gemeten": 83
+   "niet gemeten": 89
   },
   "voorstellen": {},
   "metingVan": "2026-09-19T17:45:58.177Z"
@@ -70,6 +70,12 @@
   },
   {
    "route": "POST /api/concern/rekening/open",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/concern/uitnodiging/roteer",
    "bedoeld": "OBJECT_SCOPED",
    "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
@@ -135,8 +141,26 @@
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
   {
+   "route": "POST /api/member/magnaat/teamkamer/code",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/member/magnaat/teamkamer/code/intrek",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
    "route": "POST /api/mob/kaart/toon",
    "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/office/kantoor/uitnodiging/intrek",
+   "bedoeld": "CAPABILITY_GATED",
    "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
@@ -345,6 +369,12 @@
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
   {
+   "route": "POST /api/service/bevestiging/toon",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
    "route": "POST /api/service/mens",
    "bedoeld": "OBJECT_SCOPED",
    "waargenomen": "AUTHENTICATED",
@@ -370,6 +400,12 @@
   },
   {
    "route": "POST /api/supplier/service/bevestig",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/supplier/service/bevestiging/toon",
    "bedoeld": "OBJECT_SCOPED",
    "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
@@ -15462,6 +15498,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "concern.uitnodiging.roteren",
+   "route": "POST /api/concern/uitnodiging/roteer",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -44697,6 +44754,48 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "magnaat.teamkamer.code.roteren",
+   "route": "POST /api/member/magnaat/teamkamer/code",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "magnaat.teamkamer.code.intrekken",
+   "route": "POST /api/member/magnaat/teamkamer/code/intrek",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "member.magnaat.teamkamer.deelnemen",
    "route": "POST /api/member/magnaat/teamkamer/deelnemen",
    "semantiek": {
@@ -60296,6 +60395,27 @@
    },
    "bewijs": null,
    "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.kantoor.uitnodiging.intrekken",
+   "route": "POST /api/office/kantoor/uitnodiging/intrek",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "boardroomAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
@@ -94739,6 +94859,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "service.bevestiging.code.tonen",
+   "route": "POST /api/service/bevestiging/toon",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "service.bevestigingen",
    "route": "POST /api/service/bevestigingen",
    "semantiek": {
@@ -120766,6 +120907,27 @@
     "grond": null,
     "hindernis": "Dit verzoek kennen wij niet."
    },
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "supplier.service.bevestiging.code.tonen",
+   "route": "POST /api/supplier/service/bevestiging/toon",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
    "stand": "INTENTIONALLY_NON_IDEMPOTENT",
    "herkomst": "mens",
    "voorstel": null,

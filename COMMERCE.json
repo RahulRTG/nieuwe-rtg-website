@@ -2,8 +2,8 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-09-27",
   "gemeten": {
-    "bestanden": 2447,
-    "domeinenTotaal": 644,
+    "bestanden": 2450,
+    "domeinenTotaal": 645,
     "koopbareVormen": 607,
     "koopbareDomeinen": 121,
     "envelopDrempel": 8,
@@ -76,7 +76,7 @@
     "reserveer": 31,
     "bevestig": 57,
     "lever": 24,
-    "annuleer": 35,
+    "annuleer": 36,
     "retour": 8
   },
   "overalAanwezig": [],
@@ -326,9 +326,9 @@
         "toon": "beeld",
         "beschikbaarheid": "openstaand",
         "reserveer": "houdersVan",
-        "bevestig": "uitnodigingAccepteer",
+        "bevestig": "accepteerBinnen",
         "lever": "uitnodigingBulkVerstuur",
-        "annuleer": "uitnodigingIntrek"
+        "annuleer": "intrekken"
       },
       "telt": 6
     },
@@ -1518,6 +1518,24 @@
       "telt": 2
     },
     {
+      "domein": "kern/magnaatwereld",
+      "heeft": {
+        "toon": true,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": false,
+        "bevestig": false,
+        "lever": false,
+        "annuleer": true,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "boardroomControleOverzicht",
+        "annuleer": "teamkamerCodeIntrek"
+      },
+      "telt": 2
+    },
+    {
       "domein": "kern/mediaos",
       "heeft": {
         "toon": true,
@@ -1829,23 +1847,6 @@
       },
       "bewijs": {
         "prijs": "somRekeningen"
-      },
-      "telt": 1
-    },
-    {
-      "domein": "kern/magnaatwereld",
-      "heeft": {
-        "toon": true,
-        "prijs": false,
-        "beschikbaarheid": false,
-        "reserveer": false,
-        "bevestig": false,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "boardroomControleOverzicht"
       },
       "telt": 1
     },

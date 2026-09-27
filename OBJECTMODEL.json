@@ -2,14 +2,14 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-27",
   "gemeten": {
-    "bestanden": 2447,
-    "vormen": 1447,
-    "velden": 2096,
+    "bestanden": 2450,
+    "vormen": 1446,
+    "velden": 2099,
     "modules": 802,
     "domeinen": 285,
     "envelopDrempel": 18,
     "envelop": 30,
-    "veldenDomeineigen": 1477,
+    "veldenDomeineigen": 1481,
     "veldenGedeeldVanafVier": 209,
     "gelijkendeVormparen": 20
   },
@@ -251,18 +251,6 @@
       ]
     },
     {
-      "veld": "ingetrokken",
-      "domeinen": 12,
-      "waar": [
-        "bedrijf",
-        "kern/beschermzaak",
-        "kern/carriereledger",
-        "kern/command",
-        "kern/festival",
-        "kern/kantoor"
-      ]
-    },
-    {
       "veld": "land",
       "domeinen": 12,
       "waar": [
@@ -272,6 +260,18 @@
         "kern/labfonds",
         "kern/ledenbalie-inzage",
         "kern/livinglab"
+      ]
+    },
+    {
+      "veld": "toegang",
+      "domeinen": 12,
+      "waar": [
+        "kern/concern",
+        "kern/festival",
+        "kern/kantoor",
+        "kern/livinglab",
+        "kern/luchthaven",
+        "kern/magnaat-capabilities"
       ]
     },
     {
@@ -332,6 +332,18 @@
         "kern/concern",
         "kern/livinglab",
         "kern/machtiging"
+      ]
+    },
+    {
+      "veld": "ingetrokken",
+      "domeinen": 11,
+      "waar": [
+        "bedrijf",
+        "kern/beschermzaak",
+        "kern/carriereledger",
+        "kern/command",
+        "kern/festival",
+        "kern/mobiliteit"
       ]
     },
     {
@@ -512,18 +524,6 @@
         "kern/leverancier",
         "kern/lidacties",
         "kern/personeel"
-      ]
-    },
-    {
-      "veld": "toegang",
-      "domeinen": 10,
-      "waar": [
-        "kern/festival",
-        "kern/livinglab",
-        "kern/luchthaven",
-        "kern/magnaat-capabilities",
-        "kern/meet",
-        "kern/mobiliteit"
       ]
     }
   ],

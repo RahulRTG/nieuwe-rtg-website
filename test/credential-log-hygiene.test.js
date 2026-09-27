@@ -90,12 +90,14 @@ test('PIN- en tokenuitgiftes zijn uitgesloten van antwoordreplay en browsercache
   }
 });
 
-test('cadeaukaartcodes komen bij verkoop en afboeking niet in activiteitenlogs', async () => {
-  const routes = {}, logs = [], kaartCode = 'RTG-GC-A1B2C3';
-  const db = { data: { giftcards: [] } };
+test('cadeaukaartcodes komen bij verkoop, afboeking en rotatie niet in activiteitenlogs', async () => {
+  const routes = {}, logs = [];
+  const db = { data: { giftcards: [] }, writable: true };
+  const bewerkCollectie = require('../server/db/collectie-bewerken')({ store: 'json', db, save() {} });
   const kern = {
     app: { post(pad, ...lagen) { routes[pad] = lagen.at(-1); } }, db,
-    gcCode() { return kaartCode; }, supplierAuth() {}, save() {},
+    cadeaukaart: require('../server/kern/cadeaukaart')({ db, bewerkCollectie, crypto }),
+    supplierAuth() {}, save() {}, managerOnly: () => true,
     logActivity(...delen) { logs.push(JSON.stringify(delen)); }
   };
   const herhaling = { metEigenAfdruk: async (_id, _vinger, werk) => werk() };
@@ -105,13 +107,21 @@ test('cadeaukaartcodes komen bij verkoop en afboeking niet in activiteitenlogs',
   await routes['/api/supplier/giftcard/sell'](
     Object.assign({ body: { bedrag: 100, idem: 'kaart-1' } }, basis), verkocht);
   assert.equal(verkocht.statusCode, 200);
-  assert.equal(verkocht.body.kaart.code, kaartCode);
+  const kaartCode = verkocht.body.kaart.code;
+  assert.match(kaartCode, /^GC(-[0-9A-F]{4}){8}$/);
 
   const verzilverd = antwoord();
-  routes['/api/supplier/giftcard/redeem'](
+  await routes['/api/supplier/giftcard/redeem'](
     Object.assign({ body: { code: kaartCode, bedrag: 10 } }, basis), verzilverd);
   assert.equal(verzilverd.statusCode, 200);
+  assert.equal(JSON.stringify(verzilverd.body).includes(kaartCode), false, 'het antwoord noemt de kaart bij haar id');
+  const nieuw = antwoord();
+  await routes['/api/supplier/giftcard/roteer'](
+    Object.assign({ body: { id: verkocht.body.kaart.id, idem: 'rot-1' } }, basis), nieuw);
+  assert.equal(nieuw.statusCode, 200);
   assert.ok(!logs.join('\n').includes(kaartCode));
+  assert.ok(!logs.join('\n').includes(nieuw.body.code));
+  assert.ok(!logs.join('\n').replace(/-/g, '').includes(kaartCode.replace(/-/g, '').slice(2)));
 });
 
 test('afhaalcode komt niet in fout, kassabontekst, activiteitenlog of antwoord', async () => {

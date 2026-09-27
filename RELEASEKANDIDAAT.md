@@ -164,7 +164,25 @@ crasht het proces tussen een app-betaling en `betaalEinde`, dan kan de kassa na
 twee minuten toch afrekenen. Dat wordt gelogd en niet stil geslikt; het helemaal
 dichtzetten vraagt een besluit.
 
-Blijven over van B9: cadeaukaart, kascode, vooraf, tikcode, entreetickets,
+**B9, derde type gemigreerd: de cadeaukaart (`pay.giftcard_value_code`).** De
+oude code was `RTG-GC-` plus zes hextekens (24 bits) en stond kaal op de kaart,
+op de kassabon en in het bewaarde kassa-antwoord. Nu (`server/kern/cadeaukaart*.js`):
+- De code is 128 bits (`GC-` plus 32 hextekens) en staat alleen kaal in het
+  antwoord op de koop, de kassaverkoop en een rotatie; daarna alleen als hash.
+- Een jaar geldig, hoort bij een zaak, en telt zijn deelverzilveringen; het
+  saldo blijft de echte grens.
+- De zaak trekt in (het saldo blijft staan) en koper of manager roteert.
+- Verzilveren, los of via de kassabon, is een collectietransactie op
+  `giftcards` en onthoudt de kassasleutel, zodat een herhaling niet opnieuw
+  afboekt. Bon en antwoord noemen de kaart bij haar id.
+
+Er ligt een besluit voor de eigenaar. Oude kaarten houden hun 24-bitcode,
+gehasht en gemerkt `legacy24`, minstens een jaar na de migratie, zodat de houder
+zijn waarde houdt. Maar 24 bits zijn raadbaar aan de kassa van die zaak en een
+hash ervan is geen geheim voor wie de database heeft. Het alternatief is die
+codes nu ongeldig maken en de houder via de zaak een nieuwe laten roteren.
+
+Blijven over van B9: kascode, vooraf, tikcode, entreetickets,
 vervoerskaartjes, Invisible Arrival en WorkOS-werkruimtetokens.
 
 **Juridisch open (E8), en niet door code te beslissen:** een opwaardeerkaart die

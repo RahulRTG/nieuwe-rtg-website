@@ -20,7 +20,9 @@
       gS.disabled = true;
       try {
         const d = await API.call('/supplier/giftcard/sell', { bedrag: Number(el.querySelector('#gcBedrag').value) });
-        finMsg = ''+T('fn.gcklaar','Cadeaukaart verkocht. Geef deze code mee:')+' <b style="color:var(--rtg-leesgoud,var(--gold));">'+d.kaart.code+'</b> (€ '+d.kaart.bedrag+')';
+        finMsg = d.kaart.code
+          ? ''+T('fn.gcklaar','Cadeaukaart verkocht. Geef deze code mee:')+' <b style="color:var(--rtg-leesgoud,var(--gold));">'+d.kaart.code+'</b> (€ '+d.kaart.bedrag+')'
+          : T('fn.gceenmaal','Deze kaart is al verkocht; de code wordt maar een keer getoond.');
         finData = null;
         renderStation();   // hertekent het scherm, dus de knop komt vers terug
       } catch(e){ gS.disabled = false; toast(e.message); }

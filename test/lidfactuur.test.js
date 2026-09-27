@@ -419,7 +419,8 @@ test('6c. een bon die met een cadeaukaart wordt betaald telt EEN keer, en de aan
     }, mgr);
     assert.equal(bon.status, 200, JSON.stringify(bon.body).slice(0, 200));
     assert.equal(bon.body.sale.method, 'cadeaukaart', 'de bon draagt de betaalwijze');
-    assert.equal(bon.body.sale.kaartCode, code, 'en welke kaart het was');
+    assert.equal(bon.body.sale.kaartId, kaart.body.kaart.id, 'en welke kaart het was, bij haar id');
+    assert.equal(JSON.stringify(bon.body).includes(code), false, 'de bon draagt de kaartcode niet');
     /* De kassabon boekt zijn factuur op `sale.id` (verkoop.js: `ref: sale.id`),
        dus dat is hier het teken dat de facturatiemotor klaar is. */
     await wachtOpFacturen(base, mgr, bon.body.sale.id);
@@ -725,12 +726,14 @@ test('10. een cadeaukaart verkopen met dezelfde sleutel geeft EEN kaart, geen tw
 
     const herhaald = await api(base, '/api/supplier/giftcard/sell', { bedrag: 250, idem: 'gc-vast-1' }, mgr);
     assert.equal(herhaald.status, 200);
-    assert.equal(herhaald.body.kaart.code, code, 'dezelfde kaart terug, geen tweede met saldo');
+    assert.equal(herhaald.body.kaart.id, eerste.body.kaart.id, 'dezelfde kaart terug, geen tweede met saldo');
     assert.equal(herhaald.body.herhaald, true, 'de server merkt de herhaling zelf');
+    assert.equal(JSON.stringify(herhaald.body).includes(code), false, 'en toont de code geen tweede keer');
 
     // een verse sleutel is wel een echte tweede verkoop
     const tweede = await api(base, '/api/supplier/giftcard/sell', { bedrag: 250, idem: 'gc-vast-2' }, mgr);
-    assert.notEqual(tweede.body.kaart.code, code, 'twee bewuste verkopen geven twee kaarten');
+    assert.notEqual(tweede.body.kaart.id, eerste.body.kaart.id, 'twee bewuste verkopen geven twee kaarten');
+    assert.notEqual(tweede.body.kaart.code, code);
 
     // dezelfde sleutel voor een ander bedrag is een fout, geen stille echo
     const ander = await api(base, '/api/supplier/giftcard/sell', { bedrag: 500, idem: 'gc-vast-1' }, mgr);

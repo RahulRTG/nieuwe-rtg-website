@@ -2071,11 +2071,9 @@ const BOEK_KETEN = ['aangevraagd', 'bevestigd', 'afgerond'];
 
 // dienstenbeheer: de zelfstandige is baas over het eigen aanbod
 
-/* ---- cadeaukaarten ----
-   Kopen via de leden-app (Face ID) of verkopen aan de kassa; innen door de
-   zaak op code. Boekhoudkundig correct: de verkoop is nog geen omzet (het
-   saldo is een verplichting op de balans), de btw hoort bij de inwisseling. */
-const gcCode = () => 'RTG-GC-' + crypto.randomBytes(3).toString('hex').toUpperCase();
+/* cadeaukaarten: 128-bit code, alleen als hash, verzilverd in een
+   collectietransactie (kern/cadeaukaart.js, pay.giftcard_value_code). */
+const cadeaukaart = require('./kern/cadeaukaart')({ db, bewerkCollectie, crypto });
 
 
 
@@ -2283,7 +2281,7 @@ const kern = {
   chatKeyOf, chatStuur, checkCred, coachCache, coachRules, conciergeInbox, connectedSupplierCodes, convOf,
   crypto, cvReady, db, bijeen, deptsFor, dirTouch, eisAccount, engageError, ensureApplyChat, foutmelder,
   ensureSupplierDefaults, etaMinutes, eventCovers, express, fallbackRunsheet, financeVoor, dagrapport, shiftSamenvatting, findPartner, findStaffPartner,
-  findSupplier, forgetSession, forgetSessionDuurzaam, fs, gcCode, geborenVan, geenGast, idGeverifieerd, generateAiReply,
+  findSupplier, forgetSession, forgetSessionDuurzaam, fs, cadeaukaart, geborenVan, geenGast, idGeverifieerd, generateAiReply,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   eersteBijdrageFactuur, ledenInhoudVan, leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
   mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, handelsketen, agenda, notities, vertegenwoordiging, rugdekking, carriereledger, bestanden, bestandenOpslag, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, factuurSaldo, corrigeerFactuur, markt,

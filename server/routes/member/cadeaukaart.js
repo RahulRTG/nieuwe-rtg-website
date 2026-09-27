@@ -6,12 +6,16 @@
    sinds hij echt betaald wordt is het geen paar regels meer maar een
    geldhandeling met een betaalpad, een volgorde en een herhaalgrendel.
 
+   DE CODE (pay.giftcard_value_code) staat in kern/cadeaukaart.js: 128 bits,
+   alleen als hash bewaard, en kaal alleen in het antwoord op de koop en op een
+   rotatie. Het overzicht toont hem nooit meer.
+
    Gemount vanuit routes/member.js. */
-const moneyCredentialBlokkade = require('../../middleware/money-credential-productiepoort').blokkade;
 
 module.exports = (kern) => {
-  const { app, auth, db, save, findSupplier, schoon, notifySupplier, sseToSupplier,
-    gcCode, PERSONAS, pay } = kern;
+  const { app, auth, findSupplier, schoon, notifySupplier, sseToSupplier,
+    cadeaukaart, PERSONAS, pay } = kern;
+  const codenaamVan = req => (req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename);
 
   /* EEN CADEAUKAART KOPEN KOSTTE NIETS, EN DAT IS HIER GEREPAREERD.
 
@@ -32,14 +36,12 @@ module.exports = (kern) => {
      dat ook: daar staat de klant aan de balie en rekent hij aan de kassa af.
      Daar is de betaling het werk van de kassa, niet van deze code. */
   app.post('/api/giftcard/buy', auth, async (req, res) => {
-    const dicht = moneyCredentialBlokkade('pay.giftcard_value_code');
-    if (dicht) return res.status(dicht.status).json(dicht);
     if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
     const s = findSupplier(req.body.supplierCode);
     if (!s) return res.status(404).json({ error: 'Partner niet gevonden.' });
     const bedrag = Math.round(Number(req.body.bedrag));
     if (!(bedrag >= 10 && bedrag <= 5000)) return res.status(400).json({ error: 'Kies een bedrag tussen € 10 en € 5.000.' });
-    const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
+    const codename = codenaamVan(req);
     /* EERST BETALEN, DAN DE KAART. Andersom zou een mislukte betaling een
        geldige kaart achterlaten -- precies de fout die hierboven beschreven
        staat, alleen dan bij vlagen in plaats van altijd. */
@@ -60,23 +62,27 @@ module.exports = (kern) => {
        De sleutel gaat daarom mee op de kaart. Vindt hij hem niet terwijl de
        betaling wel herhaald is, dan is de vorige poging gestorven vóór het
        aanmaken -- dan hoort de kaart er alsnog te komen, en niet twee keer. */
-    if (idem) {
-      const bestaand = (db.data.giftcards || []).find(g => g.customerKey === req.session.key && g.idem === idem);
-      if (bestaand) return res.json({ ok: true, kaart: bestaand, herhaald: true });
-    }
-    const kaart = { code: gcCode(), supplierCode: s.code, supplierName: s.name, bedrag, saldo: bedrag, idem,
-      kocht: codename, customerKey: req.session.key, at: new Date().toISOString(), verzilveringen: [] };
-    db.data.giftcards.unshift(kaart);
-    db.data.giftcards = db.data.giftcards.slice(0, 20000);
-    save();
+    const r = await cadeaukaart.uitgeef({ supplierCode: s.code, supplierName: s.name, bedrag, kocht: codename,
+      customerKey: req.session.key, issuer: 'rtg.lid.cadeaukaart', idem });
+    if (r.herhaald) return res.json(r);
     notifySupplier(s.code, { icon: 'attenties', title: 'Cadeaukaart verkocht', body: codename + ' kocht via de app een cadeaukaart van € ' + bedrag + '.' });
     sseToSupplier(s.code, 'sync', { scope: 'pos' });
-    res.json({ ok: true, kaart, betaaldCenten: betaald.centen, bijgeladen: betaald.bijgeladen || 0 });
+    const kaart = Object.assign({}, r.kaart, { code: r.code });
+    res.json({ ok: true, eenmalig: true, kaart, betaaldCenten: betaald.centen, bijgeladen: betaald.bijgeladen || 0 });
   });
 
-  app.post('/api/giftcards/mine', auth, (req, res) => {
-    const dicht = moneyCredentialBlokkade('pay.giftcard_value_code');
-    if (dicht) return res.status(dicht.status).json(dicht);
-    res.json({ kaarten: (db.data.giftcards || []).filter(g => g.customerKey === req.session.key).slice(0, 20) });
+  app.post('/api/giftcards/mine', auth, async (req, res) => {
+    res.json({ kaarten: await cadeaukaart.mijn(req.session.key) });
+  });
+
+  /* Een nieuwe code voor een kaart die dit lid kocht: de oude is daarna dood,
+     de nieuwe staat alleen in dit antwoord. */
+  app.post('/api/giftcard/roteer', auth, async (req, res) => {
+    if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+    const id = String(req.body.id || '').slice(0, 40);
+    const r = await cadeaukaart.roteer({ vind: g => g.id === id && g.customerKey === req.session.key,
+      door: 'lid:' + codenaamVan(req), idem: req.body.idem });
+    if (!r.ok) return res.status(r.status || 400).json(r);
+    res.json(r);
   });
 };

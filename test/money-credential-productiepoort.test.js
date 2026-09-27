@@ -44,13 +44,14 @@ test('iedere nog onbewezen money bearer issuer en consumer weigert in productie 
   }
 });
 
-test('de algemene POS blijft open behalve voor RTG Pay en cadeaukaart', () => {
-  for (const method of ['rtgpay', 'cadeaukaart']) {
+test('de algemene POS blijft open behalve voor RTG Pay', () => {
+  for (const method of ['rtgpay']) {
     const r = roep({ path: '/api/supplier/pos/sale', body: { method } });
     assert.equal(r.status, 503);
     assert.equal(r.door, 0);
   }
-  for (const method of ['contant', 'pin', 'tafel']) {
+  // de cadeaukaart is gemigreerd (kern/cadeaukaart.js) en hangt niet meer aan de grendel
+  for (const method of ['contant', 'pin', 'tafel', 'cadeaukaart']) {
     const r = roep({ path: '/api/supplier/pos/sale', body: { method } });
     assert.equal(r.door, 1, method);
   }
@@ -93,15 +94,28 @@ test('iedere bronaanroep van kasInt/kasInnen hoort bij de uitputtende productieg
     'ook de Link-issuer is dicht');
 });
 
-test('iedere cadeaukaartissuer en -consumer hoort bij een productiegrendel', () => {
-  assert.deepEqual(serverAanroepBestanden(/\b(?:gcCode|verzilverKaart)\s*\(/), [
+test('de cadeaukaart is gemigreerd: geen grendel, en alleen de kern maakt of claimt een code', () => {
+  /* Een cadeaukaartcode ontstaat en wordt verzilverd in kern/cadeaukaart.js
+     (128 bits, hash-only, claim in een collectietransactie). De routes roepen
+     die kern aan; geen enkele serverplek maakt nog een eigen code of zoekt er
+     een op met ===. */
+  assert.deepEqual(serverAanroepBestanden(/\bcadeaukaart\.(?:uitgeef|verzilver|roteer|intrek)\s*\(/), [
     'server/routes/member/cadeaukaart.js',
     'server/routes/supplier/kassa/cadeaukaart.js',
     'server/routes/supplier/kassa/verkoop.js'
   ]);
-  for (const route of ['/api/giftcard/buy', '/api/supplier/giftcard/sell',
-    '/api/supplier/giftcard/redeem']) assert.equal(roep({ path: route }).status, 503, route);
-  assert.equal(roep({ path: '/api/supplier/pos/sale', body: { method: 'cadeaukaart' } }).status, 503);
+  assert.deepEqual(serverAanroepBestanden(/\b(?:gcCode|verzilverKaart)\s*\(|['"]RTG-GC-['"]\s*\+/), []);
+  for (const route of ['/api/giftcard/buy', '/api/giftcards/mine', '/api/giftcard/roteer',
+    '/api/supplier/giftcard/sell', '/api/supplier/giftcard/redeem', '/api/supplier/giftcard/intrek',
+    '/api/supplier/giftcard/roteer']) assert.equal(roep({ path: route }).door, 1, route);
+  assert.equal(roep({ path: '/api/supplier/pos/sale', body: { method: 'cadeaukaart' } }).door, 1);
+  assert.equal([...maakPoort.EXACT.values()].includes('pay.giftcard_value_code'), false);
+  const register = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'CODECREDENTIALS.json'), 'utf8'));
+  const deur = register.deuren.find(d => d.id === 'pay.giftcard_value_code');
+  assert.equal(deur.status, 'migrated');
+  assert.equal(deur.release_blocker, false);
+  assert.ok(deur.bewijs.includes('test/giftcard-credential.test.js'));
+  assert.ok(deur.bewijs.includes('test/giftcard-credential.pg.test.js'));
 });
 
 test('ontwikkeling blijft bruikbaar en geld terug vrijgeven blijft in productie bereikbaar', () => {
@@ -113,7 +127,7 @@ test('ontwikkeling blijft bruikbaar en geld terug vrijgeven blijft in productie 
 
 test('Express-varianten met encoding, hoofdletters of een eindslash zijn geen omweg', () => {
   for (const pad of ['/API/PAY/KASCODE', '/api/pay/kascode/', '/api/pay/%6Bascode',
-    '/API/SUPPLIER/GIFTCARD/REDEEM/?x=1']) {
+    '/API/PAY/TIK/?x=1']) {
     const r = roep({ url: pad, path: undefined });
     assert.equal(r.status, 503, pad);
     assert.equal(r.door, 0, pad);
@@ -145,8 +159,7 @@ test('de tegoedbon is gemigreerd: geen grendel, wel een bewezen deur', () => {
 
 test('hard sluiten wordt niet als gemigreerde money lifecycle verkocht', () => {
   const register = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'CODECREDENTIALS.json'), 'utf8'));
-  for (const id of ['pay.kascode_en_vooraf', 'pay.tikcode',
-    'pay.giftcard_value_code']) {
+  for (const id of ['pay.kascode_en_vooraf', 'pay.tikcode']) {
     const deur = register.deuren.find(d => d.id === id);
     assert.ok(deur, id);
     assert.equal(deur.classificatie, 'money_credential', id);
@@ -233,10 +246,10 @@ test('kernfuncties kunnen de HTTP-poort in productie niet omzeilen', async () =>
     assert.equal(vooraf.kasVrijgeef({ supplierCode: 'S', reservering: 'R' }).status, 501,
       'veilig vrijgeven krijgt bewust niet de money-credentialgrendel');
 
-    const kaartDb = { data: { giftcards: [{ code: 'RAUW', supplierCode: 'S', saldo: 10 }] } };
-    const kaart = require('../server/routes/supplier/kassa/kaart');
-    assert.equal(kaart.verzilver(kaartDb, 'S', 'RAUW', 1, 'actor').code, maakPoort.CODE);
-    assert.equal(kaartDb.data.giftcards[0].saldo, 10);
+    /* De cadeaukaart is gemigreerd: zonder collectietransactie bestaat de
+       kern niet eens, dus geen kernaanroep kan een proceslokale claim doen. */
+    assert.throws(() => require('../server/kern/cadeaukaart')({ db: { data: {} }, crypto }),
+      /collectietransactie/);
 
     assert.equal(saves, 0, 'geen directe kernweigering mag staat bewaren');
   } finally {

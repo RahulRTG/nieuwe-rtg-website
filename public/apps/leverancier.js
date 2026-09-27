@@ -2329,7 +2329,7 @@
           '<input class="st-in" id="gcBedrag" type="number" placeholder="€ 50" style="flex:1;min-width:80px;">'+
           '<button class="obtn primary" id="gcSell">'+T('fn.gcsell','Verkoop kaart')+'</button></div>'+
           '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.25rem;">'+
-          '<input class="st-in" id="gcCode" placeholder="RTG-GC-XXXXXX" style="flex:2;min-width:130px;">'+
+          '<input class="st-in" id="gcCode" placeholder="GC-XXXX-XXXX-…" style="flex:2;min-width:130px;">'+
           '<input class="st-in" id="gcInBedrag" type="number" placeholder="€" style="flex:1;min-width:70px;">'+
           '<button class="obtn" id="gcRedeem">'+T('fn.gcredeem','In te wisselen')+'</button></div></div>';
         html += '<div class="tkc"><h3>'+T('fn.regels','Regels in ')+f.landNaam+'</h3>'+
@@ -3199,7 +3199,9 @@
       gS.disabled = true;
       try {
         const d = await API.call('/supplier/giftcard/sell', { bedrag: Number(el.querySelector('#gcBedrag').value) });
-        finMsg = ''+T('fn.gcklaar','Cadeaukaart verkocht. Geef deze code mee:')+' <b style="color:var(--rtg-leesgoud,var(--gold));">'+d.kaart.code+'</b> (€ '+d.kaart.bedrag+')';
+        finMsg = d.kaart.code
+          ? ''+T('fn.gcklaar','Cadeaukaart verkocht. Geef deze code mee:')+' <b style="color:var(--rtg-leesgoud,var(--gold));">'+d.kaart.code+'</b> (€ '+d.kaart.bedrag+')'
+          : T('fn.gceenmaal','Deze kaart is al verkocht; de code wordt maar een keer getoond.');
         finData = null;
         renderStation();   // hertekent het scherm, dus de knop komt vers terug
       } catch(e){ gS.disabled = false; toast(e.message); }
@@ -7318,14 +7320,14 @@
        handeling. Daarom hoort de code hier en niet in het boekhoudscherm --
        daar boekt hij alleen saldo af en telt er niets als omzet. */
     if (method === 'cadeaukaart'){
-      body.gcCode = (window.prompt(T('pos.gcvraag','Code van de cadeaukaart (bijv. RTG-GC-A1B2C3):'))||'').trim();
+      body.gcCode = (window.prompt(T('pos.gcvraag','Code van de cadeaukaart (bijv. GC-1A2B-…):'))||'').trim();
       if (!body.gcCode) return;
     }
     try {
       const d = await API.call('/supplier/pos/sale', body);
       bon = {};
       toast(T('pos.done','Afgerekend:')+' '+eur(d.sale.total)+' ('+methodLabel(d.sale.method)+'), '+T('pos.bonnr','bon')+' '+d.sale.bon+
-        (d.sale.gcCode ? ' · '+T('pos.gcrest','restsaldo')+' '+eur(d.sale.gcRest) : '')+
+        (d.sale.kaartId ? ' · '+T('pos.gcrest','restsaldo')+' '+eur(d.sale.gcRest) : '')+
         (d.sale.betaaldienstKosten ? ' · '+T('pos.kosten','betaaldienst')+' '+eur(d.sale.betaaldienstKosten/100)+' '+T('pos.kostendirect','direct verrekend') : ''));
       await refresh(); openTab('kassa');
     } catch(e){ toast(e.message); }

@@ -28,17 +28,17 @@ const EXACT = new Map([
   ['/api/supplier/link/cap/aanvaard', 'pay.kascode_en_vooraf'],
 
   ['/api/pay/tikcode', 'pay.tikcode'],
-  ['/api/pay/tik', 'pay.tikcode'],
+  ['/api/pay/tik', 'pay.tikcode']
 
   /* pay.tegoedbon staat hier sinds 27 september 2026 niet meer: hash-only,
      128 bits, een claim in een collectietransactie en een economische sleutel
      onder de boeking (kern/pay/tegoed-*.js, CODECREDENTIALS.json). Een deur gaat
      alleen zo open -- door de reparatie, niet door een vlag. */
 
-  ['/api/giftcard/buy', 'pay.giftcard_value_code'],
-  ['/api/giftcards/mine', 'pay.giftcard_value_code'],
-  ['/api/supplier/giftcard/sell', 'pay.giftcard_value_code'],
-  ['/api/supplier/giftcard/redeem', 'pay.giftcard_value_code']
+  /* pay.giftcard_value_code evenmin sinds 27 september 2026: 128 bits,
+     hash-only, intrekken en roteren, en de verzilvering in een
+     collectietransactie op giftcards (kern/cadeaukaart*.js). Ook de
+     kassabon met betaalwijze cadeaukaart gaat daar langs. */
 ]);
 
 /* De AFHAALCODE (pay.order_pickup_code) staat hier sinds 27 september 2026
@@ -103,10 +103,6 @@ function featureVoor(req) {
   /* De algemene kassaverkoop blijft voor contant en pin beschikbaar. Alleen de
      takken die een nog-onbewezen bearer consumeren gaan dicht. De body is op
      deze plek al begrensd en ontleed door de lijfpoort. */
-  if (pad === '/api/supplier/pos/sale' &&
-      String(req && req.body && req.body.method || '').toLowerCase() === 'cadeaukaart') {
-    return 'pay.giftcard_value_code';
-  }
   const veld = KAS_CONDITIONEEL.get(pad);
   if (veld) {
     const methode = String(req && req.body && req.body[veld] || '').toLowerCase();

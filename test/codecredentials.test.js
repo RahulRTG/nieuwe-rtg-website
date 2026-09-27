@@ -125,13 +125,16 @@ test('iedere resterende deur blokkeert de release', () => {
   const uit = poort.controleer(poort.lees());
   assert.ok(uit.blockers.length > 0);
   assert.ok(uit.blockers.every(x => x.routes.length && x.eigenaar));
-  for (const id of ['pay.kascode_en_vooraf', 'pay.giftcard_value_code',
+  for (const id of ['pay.kascode_en_vooraf', 'pay.tikcode',
     'travelos.activity_ticket_entry'])
     assert.ok(uit.blockers.some(x => x.id === id), id + ' hoort expliciet te blokkeren');
   assert.ok(!uit.blockers.some(x => x.id === 'pay.tegoedbon'), 'de tegoedbon is gemigreerd (27 september 2026)');
   assert.ok(!uit.blockers.some(x => x.id === 'pay.order_pickup_code'),
     'de afhaalcode is gemigreerd en blokkeert niet meer');
   assert.equal(poort.lees().deuren.find(x => x.id === 'pay.order_pickup_code').status, 'migrated');
+  assert.ok(!uit.blockers.some(x => x.id === 'pay.giftcard_value_code'),
+    'de cadeaukaart is gemigreerd (27 september 2026) en blokkeert niet meer');
+  assert.equal(poort.lees().deuren.find(x => x.id === 'pay.giftcard_value_code').status, 'migrated');
   assert.ok(!uit.blockers.some(x => x.id === 'travelos.airport_boarding_pass'));
   assert.equal(poort.lees().deuren.find(x =>
     x.id === 'travelos.airport_boarding_pass').status, 'migrated');

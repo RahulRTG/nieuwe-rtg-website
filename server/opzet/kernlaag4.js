@@ -142,7 +142,10 @@ kern.aanwezigheid = require('../kern/aanwezigheid')({ db, save, bewerkCollectie 
 kern.pasgeschiedenis = require('../kern/pasgeschiedenis')({ db, save, bewerkCollectie, accounts });
 kern.bedrijfsmaat = require('../kern/bedrijfsmaat/stand')({
   lees: { ritten: () => db.data.rides, bestellingen: () => db.data.orders,
-    betaalschemas: () => db.data.lidmaatschapBetalingen },
+    betaalschemas: () => db.data.lidmaatschapBetalingen,
+    /* klantwaarde per wereld (besluit C3): drie lezers erbij, niets schrijvends */
+    reizen: () => db.data.reisAanvragen, loonruns: () => db.data.payrollRunsV2,
+    casussen: () => (db.data.rtfos && db.data.rtfos.casussen) },
   pasgeschiedenis: kern.pasgeschiedenis, aanwezigheid: kern.aanwezigheid,
   kosten: () => kern.kosten });
 Object.assign(kern, require('../kern/kosten')({ db, save, bewerkCollectie, accounts, economie: kern.economie,

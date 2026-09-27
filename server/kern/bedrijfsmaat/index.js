@@ -34,7 +34,7 @@ const { KLASSEN } = require('./poort');
 const { BESLUITEN } = require('./besluiten');
 
 const MATEN = [].concat(require('./maten-geld'), require('./maten-kosten'), require('./maten-groei'), require('./maten-behoud'),
-  require('./maten-markt'), require('./maten-product'), require('./maten-operatie'), require('./maten-weerbaarheid'));
+  require('./maten-markt'), require('./maten-product'), require('./maten-klantwaarde'), require('./maten-operatie'), require('./maten-weerbaarheid'));
 
 /* De domeinen die de eigenaar noemde (25 september 2026). Elk heeft minstens een maat. */
 const DOMEINEN = Object.freeze(['geld', 'cash', 'omzet', 'marge', 'kosten', 'liquiditeit', 'runway',
@@ -57,7 +57,7 @@ const KETENS = Object.freeze([
   { id: 'geld', naam: 'van ontvangen omzet naar runway',
     schakels: ['omzet.leden-ontvangen', 'marge.bruto-rtg', 'marge.operationeel-rtg', 'cash.rtg-bankpositie', 'runway.rtg'] },
   { id: 'funnel', naam: 'van nieuw lid naar behoud',
-    schakels: ['acquisitie.nieuwe-leden', 'cohort.aanmeldweek', 'activatie.eerste-waarde', 'uitkomst.klantwaarde', 'retentie.aanwezig'] },
+    schakels: ['acquisitie.nieuwe-leden', 'cohort.aanmeldweek', 'activatie.eerste-waarde', 'uitkomst.klantwaarde-living', 'retentie.aanwezig'] },
   { id: 'werving', naam: 'van campagne naar wervingskosten',
     schakels: ['campagnes.rtg-marketing', 'acquisitie.kanaal', 'cac.per-kanaal'] },
   { id: 'kosten', naam: 'van verbruik naar unit economics',

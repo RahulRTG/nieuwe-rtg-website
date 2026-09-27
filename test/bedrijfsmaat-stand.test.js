@@ -107,6 +107,17 @@ test('5b. afgeronde ritten gaan langs de poort, en de brutomarge is een getal of
   else { assert.equal(m.stand, 'NIET_UIT_TE_REKENEN'); assert.equal(m.waarde, null); assert.ok(m.waarom.length > 10); }
 });
 
+test('5c. klantwaarde per wereld: vier maten naast elkaar, elk langs zijn poort, en geen totaal', async () => {
+  const b = (await stand()).body;
+  for (const w of ['living', 'travel', 'work', 'foundation']) {
+    const m = maatVan(b, 'uitkomst.klantwaarde-' + w);
+    assert.ok(m, w + ' ontbreekt');
+    assert.ok(['TOONBAAR', 'TE_KLEINE_GROEP'].includes(m.stand), w + ': ' + m.stand);
+    if (m.stand === 'TE_KLEINE_GROEP') assert.equal(m.waarde, undefined, w + ' toont een waarde onder de grens');
+  }
+  assert.equal(b.maten.filter(m => /klantwaarde$/.test(m.id)).length, 0, 'er is geen maat die de vier samenvat');
+});
+
 test('6. het ledenregister en de werelden gaan langs de groepspoort, ook voor het kantoorscherm', async () => {
   const r = (await api('/api/office/ledenregister', {}, eig)).body;
   for (const veld of ['perPas', 'perGeslacht', 'perLand', 'perStad', 'perBedrijf'])

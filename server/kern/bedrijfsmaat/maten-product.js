@@ -26,14 +26,6 @@ module.exports = [
     gedeeltelijk: 'Alleen de ritlijst van de app; dispatchopdrachten zonder app-rit tellen niet mee.',
     waarom: {} },
 
-  { id: 'uitkomst.klantwaarde', domein: 'uitkomst', wereld: 'consument', eenheid: 'aandeel geslaagde bedoelingen',
-    betekenis: 'Klantwaarde als geslaagde uitkomst over de werelden heen, niet als aandacht of engagement.',
-    berekening: 'nog niet vastgesteld', actualiteit: 'onbekend', privacy: 'leden', minGroep: 10, eigenaar: null, graad: 'onbekend',
-    afhankelijk: ['uitkomst.service-zonder-herhaling', 'uitkomst.rit-afgerond'],
-    bron: 'afgeleid', definitie: null, projectie: null, bewijs: null, groepsgrens: null,
-    waarom: { definitie: 'Wat een geslaagde uitkomst is, verschilt per wereld en is per wereld niet besloten. Een samengesteld cijfer erover is met opzet niet de bedoeling (INT-04); het blijven naast elkaar staande maten.',
-      projectie: 'Niet gebouwd.', bewijs: 'Volgt uit de projectie.', groepsgrens: 'Volgt uit de projectie.', eigenaar: 'Niemand.' } },
-
   { id: 'gebruik.ai', domein: 'gebruik', wereld: 'rtg-intern', eenheid: 'aanroepen en tokens per dag, lokaal en extern apart',
     betekenis: 'Hoeveel het huis de modellen gebruikt, met lokaal en extern gescheiden.',
     berekening: 'teller per dag in de AI-meter; lokaal verbruik buiten tarief en grens', actualiteit: 'live', privacy: 'huis',

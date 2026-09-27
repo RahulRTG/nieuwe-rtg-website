@@ -17,6 +17,7 @@
 'use strict';
 
 const P = require('./projecties');
+const K = require('./klantwaarde');
 const { toon } = require('./poort');
 const { DEFINITIES } = require('./definities');
 
@@ -76,6 +77,13 @@ module.exports = ({ lees, pasgeschiedenis, aanwezigheid, kosten, nu }) => {
     let afst = null;
     try { const k = typeof kosten === 'function' ? kosten() : null; afst = k && k.afstemming ? k.afstemming(m) : null; } catch (e) { afst = null; }
     const bm = P.brutomarge(om.ontvangenCenten, afst);
+    /* Klantwaarde per wereld (besluit C3): vier maten naast elkaar, elk langs zijn
+       eigen groepspoort, en geen totaal (./klantwaarde.js). */
+    const lees0 = (f) => (typeof f === 'function' ? lijst(f()) : []);
+    const kw = { living: K.living(lees.ritten(), lees.bestellingen(), m), travel: K.travel(lees0(lees.reizen), m),
+      work: K.work(lees0(lees.loonruns), m), foundation: K.foundation(lees0(lees.casussen), m) };
+    const kwMaat = (id, def, klasse, v, dekt) => maat(id, def,
+      Object.assign(toon(klasse, { waarde: v.aantal, n: v.n }), { eenheid: 'uitkomsten in de maand' }), dekt);
     const UITKOMST = 'Als geslaagde uitkomst tellen alleen afgeronde ritten en bezorgde of opgehaalde bestellingen; boekingen, reizen en servicezaken nog niet.';
 
     return {
@@ -106,7 +114,15 @@ module.exports = ({ lees, pasgeschiedenis, aanwezigheid, kosten, nu }) => {
             ? { stand: 'NIET_UIT_TE_REKENEN', waarde: null, waarom: bm.waarom, zonderTarief: bm.zonderTarief }
             : { stand: 'TOONBAAR', waarde: bm.margeCenten, eenheid: 'eurocent, zonder btw', kostenCenten: bm.kostenCenten, ontvangenCenten: om.ontvangenCenten },
           ['De ontvangen omzet is alleen die uit de betaalschema\'s van aanmeldingen; de ledenfacturen in de kluis tellen niet mee, dus deze marge is te laag of te hoog op een manier die niet te zeggen is.',
-            'Stroom en serverhuur zijn toegerekend en horen bij de operationele marge, niet hier.'])
+            'Stroom en serverhuur zijn toegerekend en horen bij de operationele marge, niet hier.']),
+        kwMaat('uitkomst.klantwaarde-living', DEFINITIES.klantwaardeLiving, LEDEN, kw.living,
+          ['Boekingen bij zaken en servicezaken tellen hier nog niet; tevredenheid wordt niet gemeten.']),
+        kwMaat('uitkomst.klantwaarde-travel', DEFINITIES.klantwaardeTravel, LEDEN, kw.travel,
+          ['Alleen reizen van het RTG-reisbureau; een reis die niemand thuis meldt, telt niet mee.']),
+        kwMaat('uitkomst.klantwaarde-work', DEFINITIES.klantwaardeWork, { privacy: 'zaken', minGroep: 5 }, kw.work,
+          ['Alleen de loonruns van de nieuwe payrollmotor (payrollRunsV2); de groep is het aantal zaken.']),
+        kwMaat('uitkomst.klantwaarde-foundation', DEFINITIES.klantwaardeFoundation, { privacy: 'gezinnen', minGroep: 10 }, kw.foundation,
+          ['Casussen van voor 27 september 2026 hebben geen dag van afronden en tellen niet mee.'])
       ]
     };
   }

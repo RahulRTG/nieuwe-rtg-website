@@ -13,6 +13,8 @@
 
 const BESLOTEN = '25 september 2026, door de eigenaar';
 const d = (versie, regel, waarom) => Object.freeze({ versie, besloten: BESLOTEN, herkomst: 'mens', regel, waarom });
+const d27 = (versie, regel, waarom) => Object.freeze({ versie, besloten: '27 september 2026, door de eigenaar (C3)',
+  herkomst: 'mens', regel, waarom });
 
 const DEFINITIES = Object.freeze({
   nieuwLid: d(1, 'Iemand wordt NIEUW LID op het moment van zijn eerste pas boven gast (rtg, lifestyle of business).',
@@ -37,7 +39,15 @@ const DEFINITIES = Object.freeze({
     'De eigenaar koos beide maten; deze leunt op kern/aanwezigheid.js (een dag per lid, 13 maanden). De drempel van 30 dagen is een voorstel van Claude en nog niet bevestigd.'),
   brutomarge: d(1, 'De BRUTOMARGE is ontvangen omzet min de GEMETEN kostensoorten (AI, verzoeken, opslag, berichten, transacties). ' +
     'Stroom en serverhuur (toegerekend, graad vermoed) horen bij de operationele marge.',
-    'Zo blijft de brutomarge gemeten en erft hij niet de graad vermoed.')
+    'Zo blijft de brutomarge gemeten en erft hij niet de graad vermoed.'),
+  klantwaardeLiving: d27(1, 'KLANTWAARDE in LivingOS: een rit die de keten afmaakte of een bestelling die bezorgd of opgehaald werd, in de maand van afronden.',
+    'Dezelfde uitkomsten als activatie; een van vier maten naast elkaar, zonder totaal.'),
+  klantwaardeTravel: d27(1, 'KLANTWAARDE in TravelOS: een reis die thuis is, gemeld door het lid of het kantoor, in de maand van thuiskomst.',
+    'Een bevestiging is een toezegging; pas thuis is de reis geleverd.'),
+  klantwaardeWork: d27(1, 'KLANTWAARDE in WorkOS: een loonrun die definitief werd, in de maand van definitief maken; de groep is het aantal zaken.',
+    'Het loon is betaald zoals afgesproken; dat is wat een werkgever van het Werk OS wil.'),
+  klantwaardeFoundation: d27(1, 'KLANTWAARDE in FoundationOS: een hulpvraag die is afgerond met een hulpactie in het dossier, op de dag van afronden.',
+    'Telt over gezinnen en nooit per gezin; de RTFoundation blijft haar eigen economische wereld (C1).')
 });
 
 module.exports = { DEFINITIES, BESLOTEN };

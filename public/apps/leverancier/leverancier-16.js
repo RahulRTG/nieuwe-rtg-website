@@ -64,6 +64,8 @@
         (verlofRest.length ? verlofRest.map(v =>
           '<div class="st-row"><span>'+v.name+'<span class="sub">'+(v.soort==='ziek'?T('kt.ziek','ziek gemeld')+' '+v.van:v.van+' t/m '+(v.tot||''))+'</span></span>'+
           '<span class="sub" style="text-transform:uppercase;font-size:0.6rem;letter-spacing:0.06em;">'+(v.status==='goedgekeurd'?'\u2705 '+T('kt.vok','goedgekeurd'):v.status==='afgewezen'?'\u2715 '+T('kt.vno','afgewezen'):'\uD83E\uDD12 '+T('kt.vzm','gemeld'))+'</span></div>').join('') : '')+'</div>';
+      // RTG Vrijheid: wat op een mens wacht en de bezetting; laadTijdKaart vult hem (leverancier-55e.js)
+      html += '<div class="tkc h-volbreed" id="tijdKaart"><h3>'+T('kt.tijd','Tijd van het team')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
       const klok2 = state.klok || { vandaag: [], binnen: [] };
       html += '<div class="tkc"><h3>\u23F1 '+T('kt.klok','Nu ingeklokt')+' ('+klok2.binnen.length+')</h3>'+
         (klok2.binnen.length ? klok2.binnen.map(n => '<div class="st-row"><span>\uD83D\uDFE2 '+n+'</span></div>').join('')

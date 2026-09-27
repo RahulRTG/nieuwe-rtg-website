@@ -887,7 +887,8 @@ verjaardag op een vrije dag schuift naar de vorige werkdag), nog zonder
 juridische toets; wat niet besloten is (nachtdienst, schrikkeldag, drempels)
 staat met opzet OPEN en de motor zegt dan UNKNOWN of BLOCKED met de reden. `server/kern/vrijheid/lus.js` is de
 PEOPLE_TIME_LOOP_COMPLETENESS_CHECK en staat op BLOCKED: de motor is bewezen op
-een teambeeld, maar de bron van dat teambeeld, de route, het scherm en de
+een teambeeld, de routes en twee schermen staan (Mijn tijd in de personeelsapp,
+Tijd van het team in het Kantoor), maar de bron van dat teambeeld en de
 loonstrook zijn nog niet aangesloten.
 
 **`OFFICE.md` is de richting van RTG Office Next** -- van zes editors naar

@@ -11,9 +11,12 @@ De code staat in `server/kern/vrijheid/`, de bewijzen in
 De stand vandaag, machineleesbaar in `server/kern/vrijheid/lus.js`:
 
 **PEOPLE_TIME_STATUS = BLOCKED.** De motor is gebouwd en bewezen op een
-teambeeld. De bronnen die dat teambeeld in productie vullen, de route, het
-scherm en de loonstrook zijn nog niet aangesloten, en de beleidswaarden zijn
-nog niet vastgesteld. Dat is par. 7.
+teambeeld, de routes staan en zijn tegen een echte server beproefd, en er
+zijn twee schermen: **Mijn tijd** in de personeelsapp en **Tijd van het team**
+in het Kantoor van de zaak. Wat nog niet aangesloten is: de bronnen die het
+teambeeld in productie vullen (verantwoordelijkheden, een lopend dienstverband
+in de zaaiset) en de loonstrook, en de meeste beleidswaarden staan nog open.
+Dat is par. 7.
 
 ---
 
@@ -259,7 +262,7 @@ valideren:
    staat; ontbreekt er een, dan start de server niet. Wat nog niet staat is
    duurzaam vastleggen (`server/lib/duurzaam.js`): dat hoort bij de route die
    het antwoord geeft, dus bij punt 6.
-6. **Routes gedaan, schermen volgen.** `server/routes/vrijheid/tijd.js`:
+6. **Routes en schermen gedaan.** `server/routes/vrijheid/tijd.js`:
    - voor de medewerker: Mijn tijd, de eigen verjaardag, verzoeken, intrekken
      en uitleg;
    - voor de leidinggevende, op eigen naam: overzicht, beoordelen, bezetting
@@ -273,6 +276,27 @@ valideren:
    De routes om een aanbod "eerder naar huis" te aanvaarden staan er met
    opzet NIET: zonder verantwoordelijkheden per dienst komt er nooit een
    aanbod.
+
+   De schermen (27 september 2026):
+   - **Mijn tijd**, een tab in de personeelsapp
+     (`public/apps/personeel/personeel-03c.js`, en een knop in het profiel van
+     de Team Room). Een saldo dat het systeem niet kent staat er als "niet
+     bekend" MET de reden, nooit als nul; een verzoek toont wat er mee gebeurde
+     en de alternatieven; en "Wat het systeem niet weet" staat er als eigen
+     kaart.
+   - **Tijd van het team**, een kaart in HR & team van het Kantoor
+     (`public/apps/leverancier/leverancier-55e.js`): wat op een mens wacht met
+     de stappen en de alternatieven, goedkeuren of afwijzen (afwijzen vraagt
+     een reden, want de medewerker leest hem), de bezetting per weekdag (met
+     kamer bij RTG zelf) en de feestdagen. Met het bedrijfsaccount krijgt de
+     kaart de zin van de server en geen lege lijst.
+
+   `test/vrijheid-scherm.e2e.js` beproeft beide in een echte browser. Twee
+   vondsten daar: een bundeldeel dat midden in een functie van een ander deel
+   sorteert, maakt zijn functies onzichtbaar voor de rest van de app terwijl de
+   bundel gewoon bouwt (beide delen staan nu op een grens tussen twee hele
+   functies), en een herlaadbeurt van de tab wiste een datum die de
+   medewerker al had ingevuld.
 6a. **RTG zelf als werkgever** (besluit van de eigenaar, 27 september 2026).
    - Een zaak met genre `rtg` (status `huis`, er bestaat er precies een): de
      eigenaar maakt hem eenmalig aan vanuit de boardroom

@@ -21,7 +21,7 @@ const T = 'test/vrijheid.test.js';
 const TB = 'test/vrijheid-teambeeld.test.js';
 const SCHAKELS = Object.freeze([
   { schakel: 'PERSON', stand: 'DEELS', waar: 'server/kern/vrijheid/teambeeld.js', bewijs: [TB, 'het teambeeld komt uit de bronnen, en zegt wat ontbreekt'],
-    ontbreekt: 'Het teambeeld leest staff, dienstverband en vakbewijs, en de verjaardag geeft de mens zelf op -- maar het is alleen bewezen met nepbronnen van de echte vorm. Een toets op een echte server komt met de routes.' },
+    ontbreekt: 'Het teambeeld leest staff, dienstverband en vakbewijs, en de verjaardag geeft de mens zelf op -- bewezen met nepbronnen van de echte vorm en op een echte server (test/vrijheid-routes.test.js). Maar geen zaak in de zaaiset hangt aan een entiteit met een lopend dienstverband, dus daar telt niemand als in dienst en eindigt elk verzoek op die reden.' },
   { schakel: 'POLICY', stand: 'DEELS', waar: 'server/kern/vrijheid/rtgbeleid.js', bewijs: [T, 'het besluit van de eigenaar staat, en de rest blijft open'],
     ontbreekt: 'Besloten (27 september 2026): tien RTG Days, en een verjaardag op een vrije dag schuift naar de vorige werkdag. Nog open: nachtdienst, schrikkeldag en alle drempels. Niets ervan is juridisch en loonadministratief gevalideerd.' },
   { schakel: 'ROSTER', stand: 'DEELS', waar: 'server/kern/vrijheid/teambeeld.js', bewijs: [TB, 'het teambeeld komt uit de bronnen, en zegt wat ontbreekt'],
@@ -43,7 +43,7 @@ const SCHAKELS = Object.freeze([
 ]);
 
 const OVERIG = Object.freeze([
-  'Geen scherm: de routes staan (routes/vrijheid/) en zijn tegen een echte server beproefd, maar Mijn tijd in de personeelsapp en het blok voor de leidinggevende volgen nog.',
+  'De schermen staan (Mijn tijd in de personeelsapp, Tijd van het team in het Kantoor; test/vrijheid-scherm.e2e.js), maar de gouden lus -- vragen, dekking, besluit, vrij -- is in een browser nog nooit rond gelopen: zonder dienstverband eindigt elk verzoek op het scherm bij die reden.',
   'Drie routes zijn niet beproefd omdat de proefopstelling de wereld niet kan bouwen (intrekken, beoordelen, afdelingen zetten): BLOCKED_BY_TEST_FIXTURE in server/lib/mutatiecontracten-vrijheid.js.',
   'Het kantoor logt nog in met de gedeelde OFFICE_CODE in plaats van als personeel van de RTG-zaak; dat is stap twee van het besluit van 27 september 2026.',
   'Geen productiebewijs.'

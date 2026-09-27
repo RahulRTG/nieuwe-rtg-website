@@ -29,7 +29,7 @@
     "inlineStijlAttributen": 4628,
     "kernBreedsteBestand": 71,
     "kernBreedte": 1651,
-    "kernGedeeld": 244,
+    "kernGedeeld": 246,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
@@ -3269,6 +3269,15 @@
       "meter": "toetsenNietGemeten 631 -> 639",
       "reden": "Acht nieuwe Connection-testsuites zijn functioneel groen en draaien onder de Constitution- en productpoorten, maar zijn nog niet opgenomen in het bestaande mutatieregister. De mutatiemeter loopt bewust niet impliciet mee met iedere testtoevoeging en daarom wordt dit verschil zichtbaar als tijdelijke meetschuld, niet als bewezen mutatiedekking.",
       "waarheen": "Neem deze acht Connection-testsuites mee in de eerstvolgende volledige mutatieronde en verlaag de baseline met de werkelijk gemeten uitkomst."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 243,
+      "meter": "kernGedeeld 243 -> 246; kernBreedte blijft gelijk",
+      "reden": "Leerhuis besluit B2 (ACADEMY.md par. 5): de relatie van een persoon met een organisatie komt uit haar BRON en niet uit een verklaring van het leerhuis. Voor een entiteit is dat het dienstverband, dus het leerhuis leest employmentVanPersoon en entiteitVind, twee namen die concern al deelt. Een eigen kopie van de dienstverbandsopzoeking zou deze meter sparen en een tweede werkrelatiemodel opleveren, precies de naad die ARBEID.md par. 7a met een besluit dichtzette (employment aan een entiteit is de waarheid). Stap B2b voegt rtfos toe: een leerhuis van een RTF-stad vraagt aan kern/rtfos of een account daar een zetel heeft of een zelfgekoppelde, actieve vrijwilliger is. Die vraag leest alleen een ja of nee; een kopie van de zetels of het vrijwilligersregister in het leerhuis zou binnen een dag een tweede waarheid zijn.",
+      "waarheen": "GRENZEN.json (leerhuis draagt employmentVanPersoon, entiteitVind en rtfos), test/leerhuis-routes.test.js toets 8 (wie uit dienst gaat verliest de relatie) en test/leerhuis-rtfbron.test.js (wie losgemaakt of inactief is, leest niet meer mee)"
     }
   ],
   "prestatie": {

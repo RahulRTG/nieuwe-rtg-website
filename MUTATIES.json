@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-27T12:55:12.819Z",
-    "commit": "eb64c1e",
+    "op": "2026-09-27T15:00:33.737Z",
+    "commit": "f27be1cd",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
-    "node": "v24.18.0"
+    "node": "v22.22.2"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -4414,14 +4414,6 @@
       "gezakt": 11,
       "scherp": "gezakt"
     },
-    "journalistiek-versies.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/journalistiek.js",
-      "operator": "getal+1#0",
-      "gezakt": 3,
-      "geprobeerd": 6
-    },
     "kaart.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -4864,6 +4856,36 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "leerhuis-grenzen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/leerhuiswereld.js",
+      "operator": "===->!==#0",
+      "gezakt": 16,
+      "geprobeerd": 1
+    },
+    "leerhuis-lus.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/leerhuisproef.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "leerhuis-rtfbron.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
+    "leerhuis-scherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "leerpaspoort-scherm.e2e.js": {
@@ -5489,6 +5511,21 @@
       "module": "server/kern/magnaat-leven/index.js",
       "operator": "!==->===#0",
       "gezakt": 6,
+      "geprobeerd": 2
+    },
+    "magnaatstart.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "magnaatstart.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/magnaat-leven/index.js",
+      "operator": "!==->===#0",
+      "gezakt": 7,
       "geprobeerd": 2
     },
     "magnaatwereld.test.js": {
@@ -8227,50 +8264,6 @@
       "operator": "true->false#0",
       "gezakt": 1,
       "geprobeerd": 1
-    },
-    "saloon-edge.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "gezakt"
-    },
-    "saloon-lus.test.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 4,
-      "scherp": "gezakt"
-    },
-    "saloon-projectie.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/wereld/saloon/index.js",
-      "operator": "!==->===#0",
-      "gezakt": 2,
-      "geprobeerd": 3
-    },
-    "saloon-redactie.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "gezakt"
-    },
-    "saloon-zicht.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/salon/zichtbaarheid.js",
-      "operator": "===->!==#0",
-      "gezakt": 2,
-      "geprobeerd": 3
-    },
-    "saloon.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "gezakt"
     },
     "samen.test.js": {
       "soort": "server",

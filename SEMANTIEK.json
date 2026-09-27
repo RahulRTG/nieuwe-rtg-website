@@ -1,12 +1,12 @@
 {
-  "catalogi": 1142,
-  "verschillendeNamen": 683,
+  "catalogi": 1168,
+  "verschillendeNamen": 710,
   "namenInMeerDomeinen": 128,
   "woordenMetMeerBetekenissen": 110,
-  "betekenissenTotaal": 410,
+  "betekenissenTotaal": 408,
   "ergsteWoord": "SOORTEN",
   "ergsteAantal": 49,
-  "dubbelingen": 33,
+  "dubbelingen": 34,
   "dubbelingLijst": [
     {
       "naam": "PALET",
@@ -437,6 +437,21 @@
         "opgepakt",
         "klaar",
         "ingetrokken"
+      ]
+    },
+    {
+      "naam": "VELDEN",
+      "betekenissenVanDitWoord": 10,
+      "waar": [
+        "server/kern/beleidsmotor/index.js",
+        "server/kern/leerhuis/schaduw.js"
+      ],
+      "leden": 4,
+      "voorbeeld": [
+        "eens",
+        "oneens",
+        "onbekend",
+        "gebruik"
       ]
     },
     {
@@ -1812,147 +1827,6 @@
       ]
     },
     {
-      "naam": "VELDEN",
-      "domeinen": 11,
-      "betekenissen": 11,
-      "hoogsteOverlap": 0.09,
-      "soort": "botsing",
-      "waar": [
-        {
-          "bestanden": [
-            "server/db/tx/pgachter.js"
-          ],
-          "leden": 8,
-          "voorbeeld": [
-            "soort",
-            "ref",
-            "klant",
-            "zaak"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/appstore/context.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "bedrag",
-            "bestemming",
-            "datum",
-            "tot"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/beleidsmotor/index.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "eens",
-            "oneens",
-            "onbekend",
-            "gebruik"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/gegevenspoort.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "telefoon",
-            "adres",
-            "identiteit",
-            "reisdocument"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/identiteit/sessievelden.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "authenticator",
-            "toestel",
-            "context",
-            "sleutelbinding"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/journalistiek-artikelen.js"
-          ],
-          "leden": 6,
-          "voorbeeld": [
-            "titel",
-            "chapo",
-            "inhoud",
-            "rubriek"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/levensdossier/velden.js"
-          ],
-          "leden": 24,
-          "voorbeeld": [
-            "verzoeken",
-            "bezittingen",
-            "afspraken",
-            "dossier"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/onderzoekslab.js"
-          ],
-          "leden": 9,
-          "voorbeeld": [
-            "hardware",
-            "software",
-            "dorp",
-            "meta"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/rtmail-regels.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "van",
-            "onderwerp",
-            "tekst",
-            "soort"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/webplatform-taal.js"
-          ],
-          "leden": 11,
-          "voorbeeld": [
-            "hero",
-            "kop",
-            "tekst",
-            "knop"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/school/koppelingen.js"
-          ],
-          "leden": 12,
-          "voorbeeld": [
-            "naam",
-            "klas",
-            "opleiding",
-            "vestiging"
-          ]
-        }
-      ]
-    },
-    {
       "naam": "ROLLEN",
       "domeinen": 12,
       "betekenissen": 10,
@@ -2079,6 +1953,136 @@
             "finance",
             "legal",
             "privacy"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "VELDEN",
+      "domeinen": 11,
+      "betekenissen": 10,
+      "hoogsteOverlap": 0.75,
+      "soort": "gemengd",
+      "waar": [
+        {
+          "bestanden": [
+            "server/db/tx/pgachter.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "soort",
+            "ref",
+            "klant",
+            "zaak"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/appstore/context.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "bedrag",
+            "bestemming",
+            "datum",
+            "tot"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/beleidsmotor/index.js",
+            "server/kern/leerhuis/schaduw.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "eens",
+            "oneens",
+            "onbekend",
+            "gebruik"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/gegevenspoort.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "telefoon",
+            "adres",
+            "identiteit",
+            "reisdocument"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/identiteit/sessievelden.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "authenticator",
+            "toestel",
+            "context",
+            "sleutelbinding"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/levensdossier/velden.js"
+          ],
+          "leden": 24,
+          "voorbeeld": [
+            "verzoeken",
+            "bezittingen",
+            "afspraken",
+            "dossier"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/onderzoekslab.js"
+          ],
+          "leden": 9,
+          "voorbeeld": [
+            "hardware",
+            "software",
+            "dorp",
+            "meta"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rtmail-regels.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "van",
+            "onderwerp",
+            "tekst",
+            "soort"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/webplatform-taal.js"
+          ],
+          "leden": 11,
+          "voorbeeld": [
+            "hero",
+            "kop",
+            "tekst",
+            "knop"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/school/koppelingen.js"
+          ],
+          "leden": 12,
+          "voorbeeld": [
+            "naam",
+            "klas",
+            "opleiding",
+            "vestiging"
           ]
         }
       ]
@@ -2603,109 +2607,6 @@
       ]
     },
     {
-      "naam": "VORMEN",
-      "domeinen": 8,
-      "betekenissen": 8,
-      "hoogsteOverlap": 0,
-      "soort": "botsing",
-      "waar": [
-        {
-          "bestanden": [
-            "server/kern/appstore/naslag.js"
-          ],
-          "leden": 8,
-          "voorbeeld": [
-            "opslag.lees",
-            "opslag.lijst",
-            "opslag.zet",
-            "opslag.wis"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/leerstof-taalvorm.js"
-          ],
-          "leden": 9,
-          "voorbeeld": [
-            "som",
-            "tafel",
-            "deel",
-            "breuk-som"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/mediaos/catalogus.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "track",
-            "video",
-            "clip",
-            "live"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/office/basis.js"
-          ],
-          "leden": 5,
-          "voorbeeld": [
-            "kader",
-            "ovaal",
-            "ruit",
-            "pijl"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/rtfos/gift-vormen.js"
-          ],
-          "leden": 3,
-          "voorbeeld": [
-            "eenmalig",
-            "geoormerkt",
-            "periodiek"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/spellen/magnaat/bankvormen.js"
-          ],
-          "leden": 5,
-          "voorbeeld": [
-            "rekeningcourant",
-            "werkkapitaal",
-            "investering",
-            "vastgoed"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/wereld/saloon/voorkeur.js"
-          ],
-          "leden": 3,
-          "voorbeeld": [
-            "overzicht",
-            "agenda",
-            "bewaard"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/werkvormen.js"
-          ],
-          "leden": 9,
-          "voorbeeld": [
-            "vervoer",
-            "zelfstandig",
-            "horeca",
-            "verblijf"
-          ]
-        }
-      ]
-    },
-    {
       "naam": "NIET_GEBOUWD",
       "domeinen": 13,
       "betekenissen": 7,
@@ -2979,6 +2880,98 @@
             "bar",
             "club",
             "beachclub"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "VORMEN",
+      "domeinen": 7,
+      "betekenissen": 7,
+      "hoogsteOverlap": 0,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/appstore/naslag.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "opslag.lees",
+            "opslag.lijst",
+            "opslag.zet",
+            "opslag.wis"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/leerstof-taalvorm.js"
+          ],
+          "leden": 9,
+          "voorbeeld": [
+            "som",
+            "tafel",
+            "deel",
+            "breuk-som"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/mediaos/catalogus.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "track",
+            "video",
+            "clip",
+            "live"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/office/basis.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "kader",
+            "ovaal",
+            "ruit",
+            "pijl"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rtfos/gift-vormen.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "eenmalig",
+            "geoormerkt",
+            "periodiek"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/spellen/magnaat/bankvormen.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "rekeningcourant",
+            "werkkapitaal",
+            "investering",
+            "vastgoed"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/werkvormen.js"
+          ],
+          "leden": 9,
+          "voorbeeld": [
+            "vervoer",
+            "zelfstandig",
+            "horeca",
+            "verblijf"
           ]
         }
       ]
@@ -3644,5 +3637,5 @@
       ]
     }
   ],
-  "bestanden": 3684
+  "bestanden": 3707
 }

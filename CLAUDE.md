@@ -2380,8 +2380,8 @@ gemeten leespaden en geen bevestigroute. De fundering is gemeten en niet
 verklaard: `npm run bedrijfsmaat` (`BEDRIJFSMAAT.json`, catalogus in
 `server/kern/bedrijfsmaat/`) houdt per maat vier elementen tegen de code --
 bron, definitie, projectie, bewijs -- met vier gatsoorten en een
-afhankelijkheidsgraaf; <!--getal:bedrijfsmaat.bestaat-->40<!--/getal--> van <!--getal:bedrijfsmaat.maten-->67<!--/getal--> maten bestaan en
-<!--getal:bedrijfsmaat.ketensGegrond-->3<!--/getal--> van zes ketens is gegrond. Drie dingen die niet mogen sneuvelen: **lenzen,
+afhankelijkheidsgraaf; <!--getal:bedrijfsmaat.bestaat-->44<!--/getal--> van <!--getal:bedrijfsmaat.maten-->67<!--/getal--> maten bestaan en
+<!--getal:bedrijfsmaat.ketensGegrond-->4<!--/getal--> van zes ketens is gegrond. Drie dingen die niet mogen sneuvelen: **lenzen,
 geen breinen** (geen eigen opslag per lens), **de groepspoort staat aan de bron
 van een maat** (`bedrijfsmaat/poort.js`: onder de grens geen waarde, geen nul en
 geen aantal, ook op het kantoorscherm; werklijsten per persoon blijven voor een

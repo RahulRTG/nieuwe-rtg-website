@@ -1,5 +1,5 @@
-/* DE BESLUITEN ONDER DE BEDRIJFSMAATLAAG: twee constitutionele (C1, C2) en vijf
-   over wat er gemeten wordt en hoe (C3 tot en met C7).
+/* DE BESLUITEN ONDER DE BEDRIJFSMAATLAAG: twee constitutionele (C1, C2) en negen
+   over wat er gemeten wordt en hoe (C3 tot en met C11).
 
    Genomen door de eigenaar op 25 september 2026, vóór de meter werd gebouwd --
    in die volgorde, omdat een meter die RTG en de RTFoundation samen waarneemt
@@ -14,7 +14,7 @@
    een vergeten vraag, terwijl het een genomen besluit is dat op werk wacht. */
 'use strict';
 
-/* Wie C3 tot en met C7 handhaaft, sinds 27 september 2026. */
+/* Wie C3 tot en met C11 handhaaft, sinds 27 september 2026. */
 const HANDHAVING = {
   C3: 'kern/bedrijfsmaat/klantwaarde.js (vier maten, geen totaal), kern/reisbureau-thuis.js en afgerondOp in ' +
     'kern/rtfos/casus-keten.js; test/klantwaarde.test.js en test/reisbureau-thuis.test.js.',
@@ -25,7 +25,11 @@ const HANDHAVING = {
   C6: 'kern/aanmeldkanaal.js (een telling per maand, nooit per lid); test/aanmeldkanaal.test.js. ' +
     'De vraag staat na de registratie op het welkomstscherm (routes/auth/account.js, een keer per account).',
   C7: 'kern/streefbeeld.js (voorstel uit drie maanden, tekenen op de vingerafdruk, een dimensie buiten is nee); ' +
-    'test/streefbeeld.test.js. Er is nog niets dat autonoom handelt.'
+    'test/streefbeeld.test.js. Er is nog niets dat autonoom handelt.',
+  C8: 'kern/rtgboek.js en kern/bedrijfsmaat/stand-rtgboek.js; test/rtgboek.test.js. Posten per maand met een bron, op naam, personeel als totaal; stroom en serverhuur blijven in de huisrekening.',
+  C9: 'kern/rtgboek.js en kern/bedrijfsmaat/stand-rtgboek.js; test/rtgboek.test.js. Bruto en netto naast elkaar; geen netto verbruik geeft geen getal.',
+  C10: 'kern/rtgboek.js en kern/bedrijfsmaat/stand-rtgboek.js; test/rtgboek.test.js. Het ledentegoed komt uit kern/pay (ledentegoed) en wordt niet afgetrokken.',
+  C11: 'kern/rtgboek.js en kern/bedrijfsmaat/stand-rtgboek.js; test/rtgboek.test.js. Per kanaal, langs de groepspoort van het aanmeldkanaal; vriend heeft geen post.'
 };
 
 const BESLUITEN = Object.freeze([
@@ -78,7 +82,22 @@ const BESLUITEN = Object.freeze([
     ['C7', 'De streefstand',
       'De machine stelt per dimensie een streefstand met tolerantie voor uit afgesloten maanden; hij geldt ' +
       'pas na de handtekening van de eigenaar. Zonder getekende streefstand gebeurt er niets autonoom.',
-      'De machine stelt voor, de eigenaar tekent.']
+      'De machine stelt voor, de eigenaar tekent.'],
+    ['C8', 'De vaste kosten van RTG, ingevoerd door Financien',
+      'Het Financien-kantoor voert in zijn eigen kamer per maand de vaste lasten, de marketinguitgaven per kanaal ' +
+      'en de korte verplichtingen van RTG in, elk met een bron en op naam.',
+      'Wat RTG zelf kost, staat bij de mensen die het betalen.'],
+    ['C9', 'De runway netto en bruto naast elkaar',
+      'Het vrije banksaldo gedeeld door het verbruik over drie afgesloten maanden, een keer met en een keer zonder de ' +
+      'ontvangen omzet; geen van beide wint.',
+      'Hoe lang het duurt, en hoe lang als de omzet wegvalt.'],
+    ['C10', 'Liquiditeit telt alleen eigen schulden',
+      'Het vrije banksaldo min de eigen korte verplichtingen; het tegoed van leden staat er los naast en wordt niet ' +
+      'afgetrokken.',
+      'Het ledentegoed is een getal ernaast, geen aftrekpost.'],
+    ['C11', 'CAC per kanaal',
+      'De marketinguitgave per kanaal gedeeld door de nieuwe leden via dat kanaal in dezelfde maand, langs de groepspoort.',
+      'Welk kanaal werkt, en niet een gemiddelde over alles.']
   ].map(([id, naam, regel, kort]) => Object.freeze({ id, naam, besloten: '27 september 2026, door de eigenaar',
     herkomst: 'mens', regel, kort, handhaving: HANDHAVING[id], stand: 'gebouwd' }))
 ]);

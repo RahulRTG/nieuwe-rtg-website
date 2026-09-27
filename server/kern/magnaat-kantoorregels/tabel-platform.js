@@ -57,6 +57,8 @@ module.exports = [
      aanmaakt en uitzet: toegangsbeheer, dezelfde familie als de bootstrap. */
   [/\/api\/scim(?:\/|$)/, 'intern', 'Intern & IT'],
   [/office\/(?:aidata)|\/belastingkantoor|\/loonstrook/, 'financien', 'Financiën'],
+  /* het boek van RTG zelf (kern/rtgboek.js, besluit C8): Financien vult het in zijn eigen kamer */
+  [/office\/rtgboek(?:\/|$)/, 'financien', 'Financiën'],
   [/office\/wereld|\/wereld\b/, 'controleregister', 'RTG Controleregister'],
   /* VOOGDIJ EN RUGDEKKING STAAN HIER EN NIET IN ./tabel-lid.js, en dat is de
      regel "smal gaat voor breed" -- alleen op deze plek werkt hij ook.

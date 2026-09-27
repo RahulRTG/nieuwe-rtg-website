@@ -56,6 +56,7 @@ const SLEUTELS = {
   /* Het banksaldo van RTG (besluit C4): lezen leest; zetten met hetzelfde saldo van
      hetzelfde afschrift is een keer (kern/bankpositie.js geeft ongewijzigd terug). */
   'POST /api/office/bankpositie': { leest: true },
+  'POST /api/office/rtgboek': { leest: true },                               // het boek van RTG lezen (C8)
   'POST /api/office/aanmeldkanaal': { leest: true },                          // een telling lezen (C6)
   /* Het streefbeeld (C7): lezen leest; tekenen gaat over een vingerafdruk en
      intrekken is een stand, dus een tweede gelijke oproep is dezelfde. */
@@ -63,6 +64,7 @@ const SLEUTELS = {
   'POST /api/office/streefbeeld/teken': { zelfdeVerzoek: true },
   'POST /api/office/streefbeeld/intrek': { zelfdeVerzoek: true },
   'POST /api/office/bankpositie/zet': { zelfdeVerzoek: true },             // maand + saldo + afschrift
+  'POST /api/office/rtgboek/zet': { zelfdeVerzoek: true },                  // maand + post + bedrag + bron
   /* Naar gast (besluit C5, server/routes/naargast.js): de standcontrole weet het al. */
   'POST /api/office/pas/gast/regels': { leest: true },
   'POST /api/office/pas/gast/regels/zet': { zelfdeVerzoek: true },          // regel + aan + getal

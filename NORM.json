@@ -3440,6 +3440,25 @@
       "meter": "zelfpoortendeToetsen 28 -> 31",
       "reden": "Twee nieuwe pg-proeven. (1) test/accounts-requestcommit.pg.test.js is nieuw: de accountwerkkopie als deelnemer aan de PostgreSQL-requestcommit (RELEASEKANDIDAAT.md A2), tegen een ECHTE PostgreSQL -- registratie, verouderde basis 409, unieke botsing 409 en een gedode backend die niets achterlaat. Zonder DATABASE_URL slaat hij zichzelf over, zoals elke pg-proef. Hij staat in scripts/lib/pg-toetslijst.js en draait dus zonder skips in de pg-scherf en in het releasebewijs (ci-pg-bewijs.json); lokaal nagetrokken met een mutatie op de accountstap in verzoektransactie.js (alle vier zakken). (2) test/tegoedbon-credential.pg.test.js bewijst de claim en de escrowboeking over twee echte PostgreSQL-instances plus het hervatten door een derde na een crash; dat kan niet eerlijk zonder database en slaat lokaal zonder DATABASE_URL over. Hij staat in scripts/lib/pg-toetslijst.js (verplicht in CI) en als uitzondering onder zelfpoortende-toets hieronder. Lokaal gedraaid tegen postgresql://localhost: 1 van 1 groen, en met de collectietransactie uitgeschakeld zakte hij (2 boekingen uit de escrow in plaats van 1). (3) test/afhaalcode.pg.test.js: twee instances racen op de claim, op claim tegen rotatie, op de betaalweg en op intrekken; lokaal tegen echte PostgreSQL en Redis groen, en zonder advisory lock plus FOR UPDATE in pg/collectietransactie.js zakte hij.",
       "waarheen": "Dezelfde aflossing als de notitie van 5 september: de standaardomgeving levert PostgreSQL, en het nul-skipbewijs hangt aan de releasecommit."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1607,
+      "meter": "kernBreedte 1607 -> 1610",
+      "reden": "Het boek van RTG (besluiten C8 tot en met C11). Het domein bedrijfsmaat leest nu rtgBoek, rtgBoekZet en RTGBOEK_DELEN, en de twee routes hangen achter officeAuth omdat de kamer Financien ze vult en niet de boardroom. Ze staan bij de bedrijfsmaten en niet in een eigen ingang: een route-ingang die een andere laadt was een nieuwe onverklaarde verstrengeling, en een eigen mount liet routes-dwars.js over de omvanggrens gaan.",
+      "waarheen": "GRENZEN.json (bedrijfsmaat draagt de drie namen en officeAuth) en test/rtgboek.test.js toets 8"
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 641,
+      "vervalt": "2026-12-27",
+      "meter": "toetsenNietGemeten 641 -> 643",
+      "reden": "test/rtgboek.test.js en test/rtgboek.e2e.js zijn nieuw (C8-C11). Met de hand nagetrokken: een half boek dat toch een totaal krijgt (toets 2), het ledentegoed dat wordt afgetrokken (toets 5), een netto runway zonder verbruik (toets 6), een bedrag op de gedeelde code (toets 8) en negatieve lid-rekeningen die meetellen (toets 3) laten elk de toets zakken; in de browser zakt de toets als het paneel in elke kamer staat of als een bedrag met een komma niet wordt gelezen. De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt ze mee."
     }
   ],
   "prestatie": {

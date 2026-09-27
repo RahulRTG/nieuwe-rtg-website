@@ -59,9 +59,9 @@ gedrag zonder commentaar mee te lezen):
 | bewijs | kan de uitkomst herkomst, graad of peilmoment tonen? | `BEWIJS_ONTBREEKT` |
 
 De stand: <!--getal:bedrijfsmaat.maten-->67<!--/getal--> maten over de 28 domeinen van de eigenaar.
-<!--getal:bedrijfsmaat.bestaat-->40<!--/getal--> bestaan, <!--getal:bedrijfsmaat.half-->19<!--/getal--> half en <!--getal:bedrijfsmaat.ontbreekt-->8<!--/getal--> ontbreken.
-Van de bestaande zien er <!--getal:bedrijfsmaat.gedeeltelijk-->13<!--/getal--> een deel van de werkelijkheid niet
-(`gedeeltelijk`, met de reden). <!--getal:bedrijfsmaat.ketensGegrond-->3<!--/getal--> van de zes ketens is gegrond, en er staan
+<!--getal:bedrijfsmaat.bestaat-->44<!--/getal--> bestaan, <!--getal:bedrijfsmaat.half-->20<!--/getal--> half en <!--getal:bedrijfsmaat.ontbreekt-->3<!--/getal--> ontbreken.
+Van de bestaande zien er <!--getal:bedrijfsmaat.gedeeltelijk-->16<!--/getal--> een deel van de werkelijkheid niet
+(`gedeeltelijk`, met de reden). <!--getal:bedrijfsmaat.ketensGegrond-->4<!--/getal--> van de zes ketens is gegrond, en er staan
 <!--getal:bedrijfsmaat.privacyGaten-->0<!--/getal--> projecties over mensen zonder afgedwongen groepsgrens.
 
 De eerste meting (commit `2820af35`) stond op 61 maten, 22 bestaand en 9
@@ -184,6 +184,18 @@ erbij. Nog niet gebouwd, behalve waar het staat.
   voorstel per dimensie met een tolerantie, uit de afgesloten maanden; het geldt
   pas na een handtekening, en zonder getekende streefstand gebeurt er niets
   autonoom (leeg is dicht).
+- **C8, de vaste kosten van RTG worden ingevoerd door het Financiën-kantoor, in
+  zijn eigen kamer.** Per maand de vaste lasten, de marketinguitgaven per kanaal
+  en de korte verplichtingen, elk met een bron en op naam. Personeel is een
+  totaal en nooit per medewerker; stroom en serverhuur blijven in de huisrekening
+  van de kostenlaag en worden daar gelezen.
+- **C9, de runway netto en bruto naast elkaar.** Het vrije banksaldo gedeeld door
+  het verbruik over drie afgesloten maanden, een keer met en een keer zonder de
+  ontvangen omzet. Geen netto verbruik geeft geen getal, en geen oneindig getal.
+- **C10, liquiditeit telt alleen eigen schulden.** Het tegoed dat leden bij RTG
+  hebben staat er los naast en wordt niet afgetrokken.
+- **C11, CAC per kanaal**, met dezelfde kanalen als de herkomstvraag en langs de
+  groepspoort; 'via iemand die ik ken' heeft geen uitgave.
 
 ---
 
@@ -229,8 +241,8 @@ breekt, is waar het verhaal ophoudt:
 | afdracht | **gegrond** (27 september) | de maandbijdrage zegt nu zelf dat hij afgesproken is, gemeten, wanneer gepeild en wat hij niet dekt |
 | funnel | **gegrond** (27 september) | nieuw lid, cohort, activatie, klantwaarde in LivingOS en aanwezigheid; de andere drie werelden hebben hun eigen klantwaardemaat ernaast |
 | kosten | breekt bij `marge.per-lid` | kosten per drager bestaan, opbrengst per drager niet |
-| geld | breekt bij `marge.operationeel-rtg` | de brutomarge en het banksaldo staan sinds 27 september; de vaste kosten van RTG als organisatie worden nergens geregistreerd |
-| werving | breekt bij `campagnes.rtg-marketing` | RTG registreert geen eigen campagnes of uitgaven |
+| geld | **gegrond** (27 september) | van ontvangen omzet via bruto- en operationele marge en het banksaldo naar de runway; alles na de brutomarge draagt de graad `vermoed`, want het rust op overgetikte bedragen |
+| werving | breekt bij `campagnes.rtg-marketing` | de uitgave per kanaal staat in het boek van RTG (C8, C11), maar wat een campagne is naast een kanaal en hoe haar effect gemeten wordt, is niet besloten |
 
 ---
 
@@ -297,9 +309,13 @@ doorgestreept met de datum; de besluiten staan in par. 2.5.
    eigen medewerker met passkey (`scripts/lib/idempasskey.js`).
 6. **Het banksaldo van RTG** -- besloten (C4). ~~De handmatige bron~~ staat (27
    september): `kern/bankpositie.js`, per maand met afschrift en afschriftdag,
-   graad `vermoed`, en de plek voor eigen bonnen op nul met reden. Nog te doen: de
-   bon zelf als eigen bouwstuk met de e-geldvraag, en liquiditeit en runway, die een
-   register van de korte verplichtingen van RTG nodig hebben.
+   graad `vermoed`, en de plek voor eigen bonnen op nul met reden. ~~Liquiditeit en
+   runway~~ staan ook (27 september, C8-C10): `kern/rtgboek.js` is het boek van RTG
+   zelf, gevuld door Financiën in zijn eigen kamer, en
+   `kern/bedrijfsmaat/stand-rtgboek.js` rekent er de operationele marge, de
+   liquiditeit (met het ledentegoed uit `kern/pay` ernaast) en de runway bruto en
+   netto uit. Een half ingevuld boek levert geen enkel getal. Nog te doen: de bon
+   zelf als eigen bouwstuk met de e-geldvraag.
 7. ~~**Een weg van een betaalde pas naar gast**~~ -- staat (27 september, C5):
    `kern/aanmeldingen/naargast.js`. Het lid kiest nu of aan het eind van zijn
    periode (zijn eigen opdracht, geen schakelaar), het kantoor op naam met een
@@ -313,8 +329,9 @@ doorgestreept met de datum; de besluiten staan in par. 2.5.
    alleen als de link niets telde, een keer (`POST /api/auth/aanmeldkanaal`;
    antwoorden en overslaan sluiten hem allebei), en de antwoorden komen van de
    server zodat er geen tweede lijst ontstaat. Het account draagt alleen DAT de
-   vraag nog open is, nooit wat er gekozen werd. Nog niet: CAC, dat wacht op een
-   register van de marketinguitgaven van RTG.
+   vraag nog open is, nooit wat er gekozen werd. ~~CAC~~ staat ook (C11): de
+   marketinguitgave per kanaal uit het boek van RTG, gedeeld door de nieuwe leden
+   die dat kanaal opgaven, en onder de groepsgrens geen getal.
 9. ~~**De streefstand**~~ -- staat (27 september, C7), in de code het **streefbeeld**
    (`kern/streefbeeld.js`; `streefstand` was al een veld van elk gevolgcontract).
    Het voorstel komt uit de laatste drie afgesloten maanden, de eigenaar tekent een

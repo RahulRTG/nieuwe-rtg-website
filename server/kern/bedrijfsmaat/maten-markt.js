@@ -8,9 +8,10 @@ module.exports = [
   { id: 'campagnes.rtg-marketing', domein: 'campagnes', wereld: 'rtg-intern', eenheid: 'euro en bereik per campagne',
     betekenis: 'De campagnes van RTG zelf: wat ze kostten, wie ze bereikten, wat ze opleverden.', berekening: 'nog niet vastgesteld',
     actualiteit: 'onbekend', privacy: 'huis', minGroep: null, eigenaar: null, graad: 'onbekend', afhankelijk: [],
-    bron: null, definitie: null, projectie: null, bewijs: null, groepsgrens: null,
-    waarom: { bron: 'Er is geen register van RTG-campagnes of marketinguitgaven, en de kostenlaag kent geen marketingsoort. Het campagnebeeld (uitgelichte Salon-posts) draagt geen uitgave en geen bereik.',
-      definitie: 'Volgt pas als er een bron is (en incrementeel effect, niet klikken).', projectie: 'Idem.', bewijs: 'Idem.', eigenaar: 'Niemand.' } },
+    bron: [c('server/kern/rtgboek.js', "marketing: Object.freeze((Array.isArray(kanalen)")], definitie: null, projectie: null, bewijs: null, groepsgrens: null,
+    gedeeltelijk: 'De uitgave per aanmeldkanaal per maand staat in het boek van RTG (C8, C11); per campagne en het bereik nog niet.',
+    waarom: { definitie: 'Wat een campagne is (naast een kanaal) en hoe het effect wordt gemeten (incrementeel, niet klikken) is niet besloten.',
+      projectie: 'Niet gebouwd.', bewijs: 'Volgt uit de projectie.', eigenaar: 'Niemand.' } },
 
   { id: 'campagnes.rtf-werving', domein: 'campagnes', wereld: 'rtfoundation', eenheid: 'euro per campagne',
     betekenis: 'Landelijke wervingscampagnes van de RTFoundation en hoe hun opbrengst naar steden gaat.',

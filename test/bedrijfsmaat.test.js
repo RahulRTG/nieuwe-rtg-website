@@ -67,10 +67,17 @@ test('3. een citaat dat niet klopt maakt het element afwezig, en een afgeleide b
   assert.equal(na.status, 'half', 'zonder projectie bestaat de maat niet meer');
   assert.ok(na.gaten.includes('PROJECTIE_ONTBREEKT'));
   assert.ok(nep.verworpen.some(v => v.maat === doel.id && v.element === 'projectie'), 'en het citaat staat op de lijst verworpen');
+  /* Het erven zelf: sinds het boek van RTG (C8-C10) bestaat de runway, dus het gat
+     wordt hier gemaakt -- het citaat onder het banksaldo verworpen -- en dan moet de
+     afgeleide bron van de runway het mee verliezen. */
   const runway = echt.maten.find(m => m.id === 'runway.rtg');
   assert.equal(runway.elementen.bron.afgeleid, true);
-  assert.equal(runway.elementen.bron.aanwezig, false, 'runway erft het ontbrekende banksaldo');
-  assert.equal(runway.status, 'ontbreekt');
+  assert.equal(runway.elementen.bron.aanwezig, true, 'met een banksaldo heeft de runway een bron');
+  const saldo = B.opId().get('cash.rtg-bankpositie').bron[0];
+  const zonderSaldo = B.beoordeel((x, e) => (x === saldo ? false : klopt(x, e)));
+  const rw = zonderSaldo.maten.find(m => m.id === 'runway.rtg');
+  assert.equal(rw.elementen.bron.aanwezig, false, 'runway erft het ontbrekende banksaldo');
+  assert.notEqual(rw.status, 'bestaat');
 });
 
 test('4. wat alleen in commentaar staat, is geen bron, projectie of bewijs', () => {
@@ -92,10 +99,10 @@ test('5. de catalogus klopt tegen de code, en het register loopt niet achter', (
     'BEDRIJFSMAAT.json loopt achter op de catalogus of de code -- draai: npm run bedrijfsmaat:vast');
 });
 
-test('6. de besluiten C1 tot en met C7 reizen mee, met hun herkomst en hun stand', () => {
+test('6. de besluiten C1 tot en met C11 reizen mee, met hun herkomst en hun stand', () => {
   const vast = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'BEDRIJFSMAAT.json'), 'utf8'));
   const ids = vast.besluiten.map(b => b.id);
-  assert.deepEqual(ids, ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7']);
+  assert.deepEqual(ids, ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11']);
   for (const b of vast.besluiten) {
     assert.equal(b.herkomst, 'mens');
     assert.match(b.besloten, /2[57] september 2026/);

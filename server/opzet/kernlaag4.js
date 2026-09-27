@@ -162,6 +162,8 @@ kern.pasgeschiedenis = require('../kern/pasgeschiedenis')({ db, save, bewerkColl
 Object.assign(kern, require('../kern/bankpositie')({ db, save }));
 // hoe leden bij RTG kwamen: een telling per maand, nooit per lid (besluit C6)
 Object.assign(kern, require('../kern/aanmeldkanaal')({ db, save }));
+// het boek van RTG zelf, gevuld door Financien op naam (besluiten C8-C11)
+Object.assign(kern, require('../kern/rtgboek')({ db, save, kanalen: kern.AANMELDKANALEN }));
 kern.bedrijfsmaat = require('../kern/bedrijfsmaat/stand')({
   lees: { ritten: () => db.data.rides, bestellingen: () => db.data.orders,
     betaalschemas: () => db.data.lidmaatschapBetalingen,
@@ -169,7 +171,8 @@ kern.bedrijfsmaat = require('../kern/bedrijfsmaat/stand')({
     reizen: () => db.data.reisAanvragen, loonruns: () => db.data.payrollRunsV2,
     casussen: () => (db.data.rtfos && db.data.rtfos.casussen) },
   pasgeschiedenis: kern.pasgeschiedenis, aanwezigheid: kern.aanwezigheid,
-  kosten: () => kern.kosten, bank: kern.bankpositie });
+  kosten: () => kern.kosten, bank: kern.bankpositie, boek: kern.rtgBoek, kanalen: kern.aanmeldkanaalStand,
+  ledentegoed: () => (kern.pay && kern.pay.ledentegoed ? kern.pay.ledentegoed() : null) });
 // het streefbeeld (besluit C7): de machine stelt voor uit de bedrijfsmaten, de eigenaar tekent
 Object.assign(kern, require('../kern/streefbeeld')({ db, save, bedrijfsmaat: kern.bedrijfsmaat }));
 Object.assign(kern, require('../kern/kosten')({ db, save, bewerkCollectie, accounts, economie: kern.economie,

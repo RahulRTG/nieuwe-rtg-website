@@ -6,25 +6,22 @@
    kantoorstuur: onder de groepsgrens staat er geen getal meer in, ook niet het
    aantal.
 
-   EEN UITKOMST ZEGT WAT ZE NIET DEKT. Elke maat draagt `dektNiet`, en dat is hier
-   geen voetnoot: de pasgeschiedenis begint op de dag dat hij werd ingebouwd, de
-   uitkomsten zijn nog alleen ritten en bestellingen, en de omzet ziet het
-   betaalschema van aanmeldingen maar niet de ledenfacturen in de kluis. Een
-   getal dat compleet LIJKT terwijl het dat niet is, is erger dan geen getal.
+   EEN UITKOMST ZEGT WAT ZE NIET DEKT: elke maat draagt `dektNiet`. Een getal dat
+   compleet LIJKT terwijl het dat niet is, is erger dan geen getal.
 
-   DE OPSLAG KOMT ALS LEZERS BINNEN (`lees.ritten`, `lees.bestellingen`,
-   `lees.betaalschemas`), zodat dit bestand geen eigen deur naar de opslag is. */
+   DE OPSLAG KOMT ALS LEZERS BINNEN, zodat dit bestand geen eigen deur is. */
 'use strict';
 
 const P = require('./projecties');
 const K = require('./klantwaarde');
+const RB = require('./stand-rtgboek');
 const { toon } = require('./poort');
 const { DEFINITIES } = require('./definities');
 
 const GEPEILD = 'gemeten';
 const VANAF = 'Leden van voor de ingebruikname van kern/pasgeschiedenis.js hebben geen overgang en tellen niet mee.';
 
-module.exports = ({ lees, pasgeschiedenis, aanwezigheid, kosten, bank, nu }) => {
+module.exports = ({ lees, pasgeschiedenis, aanwezigheid, kosten, bank, boek, kanalen, ledentegoed, nu }) => {
   const klok = typeof nu === 'function' ? nu : Date.now;
   const lijst = (x) => (Array.isArray(x) ? x : []);
 
@@ -72,11 +69,10 @@ module.exports = ({ lees, pasgeschiedenis, aanwezigheid, kosten, bank, nu }) => 
     const ce = P.churnEnAfwaardering(overgangen, m);
     const om = P.omzet(termijnen(), m);
     const rit = P.rittenAfgerond(lijst(lees.ritten()), m);
-    /* De kostenlaag wordt NA deze stand gebouwd (kernlaag4), dus hij komt als
-       lezer binnen. Faalt hij, dan is de marge onbekend -- geen nul. */
-    let afst = null;
-    try { const k = typeof kosten === 'function' ? kosten() : null; afst = k && k.afstemming ? k.afstemming(m) : null; } catch (e) { afst = null; }
-    const bm = P.brutomarge(om.ontvangenCenten, afst);
+    // de kostenlaag komt later (kernlaag4) en als lezer; faalt hij, dan geen nul maar onbekend
+    const kl = (f, x) => { try { const k = typeof kosten === 'function' ? kosten() : null; return k && k[f] ? k[f](x) : null; } catch (e) { return null; } };
+    const cijfers = (x) => { const o = P.omzet(termijnen(), x); return { ontvangen: o.ontvangenCenten, bruto: P.brutomarge(o.ontvangenCenten, kl('afstemming', x)) }; };
+    const bm = cijfers(m).bruto;
     /* Klantwaarde per wereld (besluit C3): vier maten naast elkaar, elk langs zijn
        eigen groepspoort, en geen totaal (./klantwaarde.js). */
     const lees0 = (f) => (typeof f === 'function' ? lijst(f()) : []);
@@ -115,7 +111,7 @@ module.exports = ({ lees, pasgeschiedenis, aanwezigheid, kosten, bank, nu }) => 
             : { stand: 'TOONBAAR', waarde: bm.margeCenten, eenheid: 'eurocent, zonder btw', kostenCenten: bm.kostenCenten, ontvangenCenten: om.ontvangenCenten },
           ['De ontvangen omzet is alleen die uit de betaalschema\'s van aanmeldingen; de ledenfacturen in de kluis tellen niet mee, dus deze marge is te laag of te hoog op een manier die niet te zeggen is.',
             'Stroom en serverhuur zijn toegerekend en horen bij de operationele marge, niet hier.']),
-        /* het banksaldo van RTG (kern/bankpositie.js): handmatig, dus vermoed */
+        // banksaldo (kern/bankpositie.js): handmatig
         (() => { const bp = typeof bank === 'function' ? bank(m) : null;
           return Object.assign(maat('cash.rtg-bankpositie', DEFINITIES.cash, bp && bp.saldo
             ? { stand: 'TOONBAAR', waarde: bp.saldo.centen, eenheid: 'eurocent', peildatum: bp.saldo.peildatum,
@@ -129,7 +125,10 @@ module.exports = ({ lees, pasgeschiedenis, aanwezigheid, kosten, bank, nu }) => 
         kwMaat('uitkomst.klantwaarde-work', DEFINITIES.klantwaardeWork, { privacy: 'zaken', minGroep: 5 }, kw.work,
           ['Alleen de loonruns van de nieuwe payrollmotor (payrollRunsV2); de groep is het aantal zaken.']),
         kwMaat('uitkomst.klantwaarde-foundation', DEFINITIES.klantwaardeFoundation, { privacy: 'gezinnen', minGroep: 10 }, kw.foundation,
-          ['Casussen van voor 27 september 2026 hebben geen dag van afronden en tellen niet mee.'])
+          ['Casussen van voor 27 september 2026 hebben geen dag van afronden en tellen niet mee.']),
+        // het boek van RTG (C8-C11): operationele marge, liquiditeit, runway, CAC
+        ...(typeof boek === 'function' ? RB({ m, peilmoment, maat, boek, bank, cijfers, notas: (x) => kl('posten', x),
+          kanalen: typeof kanalen === 'function' ? kanalen : () => ({}), ledentegoed: typeof ledentegoed === 'function' ? ledentegoed : () => null }) : [])
       ]
     };
   }

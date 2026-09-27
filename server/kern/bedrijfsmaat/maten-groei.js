@@ -38,13 +38,6 @@ module.exports = [
     gedeeltelijk: 'Alleen wie de vraag beantwoordt of via een campagnelink komt. De vraag komt na de registratie en is over te slaan.',
     waarom: {} },
 
-  { id: 'cac.per-kanaal', domein: 'cac', wereld: 'rtg-intern', eenheid: 'euro per nieuw lid',
-    betekenis: 'Wat het kost om via een kanaal een lid te werven.', berekening: 'marketinguitgaven per kanaal / nieuwe leden per kanaal',
-    actualiteit: 'onbekend', privacy: 'huis', minGroep: null, eigenaar: null, graad: 'onbekend',
-    afhankelijk: ['acquisitie.kanaal', 'acquisitie.nieuwe-leden', 'campagnes.rtg-marketing'],
-    bron: 'afgeleid', definitie: null, projectie: null, bewijs: null, groepsgrens: null,
-    waarom: { definitie: 'Niet besloten welke uitgaven meetellen.', projectie: 'Niet gebouwd.', bewijs: 'Volgt uit de projectie.', eigenaar: 'Niemand.' } },
-
   { id: 'cohort.aanmeldweek', domein: 'cohort', wereld: 'consument', eenheid: 'leden per ISO-week',
     betekenis: 'Leden gegroepeerd naar de ISO-week waarin ze nieuw lid werden, zodat gedrag per groep te volgen is.',
     berekening: 'ISO-week van het moment van nieuw lid, de laatste twaalf weken',

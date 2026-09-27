@@ -34,7 +34,7 @@ const { KLASSEN } = require('./poort');
 const { BESLUITEN } = require('./besluiten');
 
 const MATEN = [].concat(require('./maten-geld'), require('./maten-kosten'), require('./maten-groei'), require('./maten-behoud'),
-  require('./maten-markt'), require('./maten-product'), require('./maten-klantwaarde'), require('./maten-operatie'), require('./maten-weerbaarheid'));
+  require('./maten-markt'), require('./maten-product'), require('./maten-klantwaarde'), require('./maten-boek'), require('./maten-operatie'), require('./maten-weerbaarheid'));
 
 /* De domeinen die de eigenaar noemde (25 september 2026). Elk heeft minstens een maat. */
 const DOMEINEN = Object.freeze(['geld', 'cash', 'omzet', 'marge', 'kosten', 'liquiditeit', 'runway',

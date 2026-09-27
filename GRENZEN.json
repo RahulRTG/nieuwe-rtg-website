@@ -149,12 +149,16 @@
       "werkplekken"
     ],
     "bedrijfsmaat": [
+      "RTGBOEK_DELEN",
       "aanmeldkanaalStand",
       "bankpositie",
       "bankpositieZet",
       "bedrijfsmaat",
       "boardroomAuth",
       "boardroomWie",
+      "officeAuth",
+      "rtgBoek",
+      "rtgBoekZet",
       "streefbeeld"
     ],
     "bestanden": [

@@ -1,5 +1,8 @@
-/* De ENIGE weg onder de 128 bit in CODECREDENTIALS.json: een verklaarde korte
-   menscode (`beleid.korte_menscode`), voor een code die een mens voorleest. Deze
+/* Een van de TWEE wegen onder de 128 bit in CODECREDENTIALS.json: een verklaarde
+   korte menscode (`beleid.korte_menscode`), voor een code die een mens voorleest.
+   De andere is `korte_code` van de bezorgcode (mode.bezorgcode, vier cijfers aan
+   de deur, zeven dagen, gebonden aan een bestelling): andere plafonds, dus een
+   eigen verklaring en een eigen toets (test/codecredentials.test.js). Deze
    toets houdt de uitzondering smal: zonder binding, rem, uitgifte na een
    handeling van de houder, binnen de plafonds van het beleid en met een
    onderbouwing zakt een gemigreerde deur onder de 128 bit weer.
@@ -40,7 +43,11 @@ test('een 128-bitdeur heeft de uitzondering niet nodig, en geen andere deur gebr
   const register = poort.lees();
   const met = register.deuren.filter(d => d.korte_menscode);
   assert.deepEqual(met.map(d => d.id), [ID], 'een nieuwe korte code hoort een eigen besluit te zijn');
-  for (const d of register.deuren.filter(x => x.status === 'migrated' && x.id !== ID &&
+  // de bezorgcode gaat langs haar eigen uitzondering (korte_code), en nooit langs deze
+  const eigen = new Set([ID, 'mode.bezorgcode']);
+  assert.deepEqual(register.deuren.filter(d => d.korte_code).map(d => d.id), ['mode.bezorgcode'],
+    'een nieuwe korte code hoort een eigen besluit te zijn');
+  for (const d of register.deuren.filter(x => x.status === 'migrated' && !eigen.has(x.id) &&
     (x.classificatie === 'credential' || x.classificatie === 'money_credential')))
     assert.ok(Number(d.controls.entropy_bits) >= 128, d.id);
 });

@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-27T17:57:46.064Z",
-  "commit": "de8ee02e",
+  "op": "2026-09-27T18:16:41.924Z",
+  "commit": "db964f9f",
   "boomVuil": false,
   "boomAnders": 2,
   "instrument": "scripts/mutatiecontract.js",
@@ -10,18 +10,18 @@
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5049,
-  "geclassificeerd": 5049,
+  "totaal": 5053,
+  "geclassificeerd": 5053,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3190,
    "NOT_APPLICABLE": 1212,
-   "PROTECTED": 494,
-   "INTENTIONALLY_NON_IDEMPOTENT": 153
+   "PROTECTED": 495,
+   "INTENTIONALLY_NON_IDEMPOTENT": 156
   },
-  "vastgesteldDoorMens": 1908,
+  "vastgesteldDoorMens": 1912,
   "afgeleidDoorScript": 3141,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4154,
+   "AUTHENTICATED": 4158,
    "PUBLIC": 126,
    "OBJECT_SCOPED": 746,
    "(niet af te leiden -- vraagt een verklaring)": 7,
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 136,
    "kale ronde: onbeschermd": 123,
    "kale ronde: geen uitspraak": 4713,
-   "niet gemeten": 77
+   "niet gemeten": 81
   },
   "voorstellen": {},
   "metingVan": "2026-09-19T17:45:58.177Z"
@@ -17580,6 +17580,27 @@
     "hindernis": null
    },
    "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "festival.pas.tonen",
+   "route": "POST /api/festival/gast/pas/toon",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
@@ -53575,6 +53596,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "mode.bezorgcode.nieuw",
+   "route": "POST /api/mode/bezorg/code",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "mode.bezorg.mijn",
    "route": "POST /api/mode/bezorg/mijn",
    "semantiek": {
@@ -73108,6 +73150,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "ov.incheckcode.intrekken",
+   "route": "POST /api/ov/code/intrek",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "ov.hier",
    "route": "POST /api/ov/hier",
    "semantiek": {
@@ -87184,6 +87247,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "rtfos.activiteit.incheckcode",
+   "route": "POST /api/rtfos/activiteit/incheckcode",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

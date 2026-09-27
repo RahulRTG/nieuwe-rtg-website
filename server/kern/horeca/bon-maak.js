@@ -15,7 +15,8 @@ module.exports = ({ transactie, geldig, mutatie, t, heel, crypto }) => {
     return transactie(bron => {
       const eerder = idemHash ? bron.find(b => b && b.zaak === zaak && b.maak_idem === idemHash) : null;
       if (eerder) return { ok: true, herhaald: true, codeGetoond: false, bon: naarBuiten(eerder) };
-      const bon = { id: 'HB' + crypto.randomBytes(8).toString('hex'), zaak, soort: soort === 'tegoed' ? 'tegoed' : 'cadeaubon',
+      // herkomst: wie de waarde uitgaf (de zaak zelf; de bon loopt niet door kern/pay)
+      const bon = { id: 'HB' + crypto.randomBytes(8).toString('hex'), zaak, herkomst: 'zaak:' + zaak, soort: soort === 'tegoed' ? 'tegoed' : 'cadeaubon',
         band: null, naam: String(naam || '').slice(0, 60) || null, uitgegeven: heel(centen), saldo: heel(centen),
         at: nu(), door: String(door || '').slice(0, 80), mutaties: [], historie: [], binding: null, maak_idem: idemHash };
       const g = nieuweBonToegang('zaak:' + zaak, bon, geldigTot);
@@ -45,7 +46,7 @@ module.exports = ({ transactie, geldig, mutatie, t, heel, crypto }) => {
         if (bedrag) mutatie(bestaand, { centen: bedrag, soort: 'opgewaardeerd', idem_hash: idemHash });
         return { ok: true, nieuw: false, bon: naarBuiten(bestaand) };
       }
-      const bon = { id: 'HB' + crypto.randomBytes(8).toString('hex'), zaak, soort: 'tegoed', band: nummer,
+      const bon = { id: 'HB' + crypto.randomBytes(8).toString('hex'), zaak, herkomst: 'zaak:' + zaak, soort: 'tegoed', band: nummer,
         naam: 'Polsband ' + nummer, uitgegeven: bedrag, saldo: bedrag, at: nu(), door: String(door || '').slice(0, 80),
         mutaties: [], historie: [], binding: null, maak_idem: idemHash };
       const g = nieuweBonToegang('zaak:' + zaak, bon);

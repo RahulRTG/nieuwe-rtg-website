@@ -49,7 +49,7 @@ module.exports = ({ lees, bewerkCollectie, transactie, t, crypto }) => {
         for (const [code, b] of Object.entries((h && h.bonnen) || {})) {
           const hash = codeHash(code);
           if (bron.some(x => x && x.zaak === zaak && bearer.zelfdeHash(x.toegang && x.toegang.code_hash, hash))) continue;
-          const nieuw = { id: 'HB' + crypto.randomBytes(8).toString('hex'), zaak,
+          const nieuw = { id: 'HB' + crypto.randomBytes(8).toString('hex'), zaak, herkomst: 'zaak:' + zaak,
             soort: b.soort === 'tegoed' ? 'tegoed' : 'cadeaubon', band: band[String(code).toUpperCase()] || null,
             naam: b.naam || null, uitgegeven: Math.round(Number(b.uitgegeven) || 0), saldo: Math.max(0, Math.round(Number(b.saldo) || 0)),
             at: b.at || nu(), door: 'migratie', mutaties: (b.mutaties || []).slice(0, 200).reverse().map(m => ({ at: m.at, centen: m.centen, soort: m.soort || null })),

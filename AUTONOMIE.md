@@ -86,11 +86,11 @@ nu een vormregel.
   voorstel. Afgedwongen: elke maat draagt precies een wereld uit
   `kern/economie/werelden.js`.
 - **C2, het kantoor alleen op tonen.** `office` is een AI-rol op de bestaande
-  trede `lezen`, met drie paden die gemeten niets schrijven en totalen tonen
-  (`command/puls`, `economie/werelden`, `kosten/periode`). De ingang
-  `/api/office/doe` eist een mens op naam, en er is met opzet geen
-  `/doe/bevestig`. `/api/office/bedrijfsmaat` hoort er inhoudelijk bij, maar
-  komt pas op de lijst als de idempotentieproef hem gemeten heeft.
+  trede `lezen`, met paden die gemeten niets schrijven en totalen tonen
+  (`command/puls`, `economie/werelden`, `kosten/periode`, en sinds 27 september
+  `office/bedrijfsmaat`, nadat de idempotentieproef hem als beschermd en zonder
+  effect in de opslag mat). De ingang `/api/office/doe` eist een mens op naam,
+  en er is met opzet geen `/doe/bevestig`.
 
 Beide staan als gegevens in `server/kern/bedrijfsmaat/besluiten.js` en reizen mee
 in het register. De formulering is door Claude opgeschreven en nog niet door een
@@ -146,6 +146,44 @@ houdt dat vast.
 - **De laatste bezoekdag** (`kern/aanwezigheid.js`): een dag per lid, aangeraakt
   naast de ledengids, dertien maanden bewaard.
 
+### 2.5 De besluiten van 27 september 2026
+
+Genomen door de eigenaar uit meerkeuzevragen; de opties en wat ze kosten stonden
+erbij. Nog niet gebouwd, behalve waar het staat.
+
+- **C3, klantwaarde per wereld: een uitkomst per wereld, vier maten naast
+  elkaar en geen totaal.** LivingOS: een rit of bestelling afgerond. TravelOS:
+  een reis die THUIS is -- een nieuwe stand in de reisketen, gezet door het
+  kantoor of het lid, want vandaag stopt een reisaanvraag bij bevestigd.
+  WorkOS: een loonrun die definitief is. FoundationOS: een casus afgerond --
+  die krijgt daarvoor een tijdstip (`afgerondOp`), want vandaag staat dat alleen
+  in het auditspoor.
+- **C4, het banksaldo van RTG uit meer dan een bron.** Eerst handmatig, met het
+  afschrift als herkomst en de graad `vermoed` (het patroon van de huisrekening
+  in `kern/kosten`). Een bankkoppeling later, als eigen besluit met een contract.
+  En **RTG gaat eigen cadeaubonnen verkopen**: geld van een verkochte bon staat
+  op de bank maar is nog niet verdiend, dus telt het als cash EN als verplichting,
+  zodat runway het niet als vrij geld leest. Let op wat dat raakt: een bon die
+  tegen de nominale waarde inwisselbaar is, valt onder de e-geldvraag van
+  `TOKEN.md` en de regels van `WAARDE.md` -- de bon zelf is dus een eigen
+  bouwstuk met die vraag erbij, en tot hij bestaat staat zijn plek in het
+  banksaldo op nul met die reden. De bonnen die ZAKEN vandaag verkopen blijven
+  van die zaak; de firewall laat ze niet als RTG-geld tellen.
+- **C5, van een betaalde pas naar gast langs drie wegen.** Het lid zelf; het
+  kantoor met de hand; en automatisch, met regels die per situatie te kiezen
+  zijn. Wat Claude daaronder legt en nog door de eigenaar moet worden bevestigd:
+  elke automatische regel is een schakelaar die standaard DICHT staat, een lid
+  zonder vastgelegd contract (`GEEN_CONTRACT`) gaat nooit automatisch, en
+  facturen en bewijsstukken blijven na de overgang (`AFSPRAAK.md`: rechten
+  hangen per capability, niet per account).
+- **C6, het herkomstkanaal: een vraag bij aanmelding EN een campagnecode in de
+  link.** Allebei optioneel, alleen geteld langs de groepspoort, nooit per lid
+  zichtbaar, dertien maanden bewaard en weg bij vergetelheid.
+- **C7, de streefstand: de machine stelt voor, de eigenaar tekent.** Een
+  voorstel per dimensie met een tolerantie, uit de afgesloten maanden; het geldt
+  pas na een handtekening, en zonder getekende streefstand gebeurt er niets
+  autonoom (leeg is dicht).
+
 ---
 
 ## 3. De architectuur, onderdeel voor onderdeel
@@ -187,10 +225,10 @@ breekt, is waar het verhaal ophoudt:
 | keten | stand | eerste breuk, en wat er ontbreekt |
 |---|---|---|
 | service | **gegrond** | fout -> klokken -> opgelost zonder herhaling |
-| funnel | breekt bij `uitkomst.klantwaarde` | nieuw lid, cohort en activatie staan; klantwaarde per wereld is niet gedefinieerd |
+| afdracht | **gegrond** (27 september) | de maandbijdrage zegt nu zelf dat hij afgesproken is, gemeten, wanneer gepeild en wat hij niet dekt |
+| funnel | breekt bij `uitkomst.klantwaarde` | nieuw lid, cohort, activatie en afgeronde ritten staan; klantwaarde per wereld is besloten (C3) maar niet gebouwd |
 | kosten | breekt bij `marge.per-lid` | kosten per drager bestaan, opbrengst per drager niet |
-| afdracht | breekt bij `omzet.leden-maand` | de terugkerende maandbijdrage draagt geen graad of peilmoment |
-| geld | breekt bij `marge.bruto-rtg` | de definitie staat; een projectie die omzet en gemeten kosten naast elkaar zet niet |
+| geld | breekt bij `marge.operationeel-rtg` | de brutomarge staat sinds 27 september; de vaste kosten van RTG als organisatie worden nergens geregistreerd |
 | werving | breekt bij `campagnes.rtg-marketing` | RTG registreert geen eigen campagnes of uitgaven |
 
 ---
@@ -236,25 +274,30 @@ Dingen die geen bestaande toets zag, en die het ontwerp raken:
 
 ## 7. De volgorde
 
-Van goedkoop naar duur, en waar een besluit nodig is staat dat erbij:
+Van goedkoop naar duur. Bijgewerkt op 27 september 2026: wat staat, is
+doorgestreept met de datum; de besluiten staan in par. 2.5.
 
-1. **`uitkomst.rit-afgerond` als projectie** -- klein; activatie en retentie
-   rusten er nu op een gat.
-2. **Klantwaarde per wereld definieren** -- **besluit**; daarmee is de funnel
-   gegrond.
-3. **De brutomarge uitrekenen** -- de definitie staat; de kostenlaag moet een
-   totaal per gemeten soort per maand leveren.
-4. **Een graad en peilmoment op de maandbijdrage** (`omzet.leden-maand`) -- klein;
-   de afdrachtketen wordt dan gegrond.
-5. **De idempotentieproef over `/api/office/bedrijfsmaat`** -- dan komt hij op het
-   kantoorstuur, zonder dat de onbekende effectpaden stijgen.
-6. **Het banksaldo van RTG als bron** -- **besluit**: handmatig met herkomst, of
-   een bankkoppeling. Cash, liquiditeit en runway volgen.
-7. **Een weg van een betaalde pas naar gast** -- **besluit** (`AFSPRAAK.md`: de
-   contractstand afdwingen). Zonder die weg meet churn niets.
-8. **Een herkomstkanaal bij aanmelding** -- **besluit**, met een privacyvraag; CAC
-   volgt pas daarna.
-9. **De streefstand met een tolerantie per dimensie** -- **besluit**; pas dan kan
-   iets autonoom binnen mandaat.
+1. ~~**`uitkomst.rit-afgerond` als projectie**~~ -- staat (27 september), langs de
+   groepspoort, die leden telt en geen ritten.
+2. **Klantwaarde per wereld** -- besloten (C3); te bouwen: de reisstand `thuis`,
+   `afgerondOp` op een casus, en de vier projecties.
+3. ~~**De brutomarge uitrekenen**~~ -- staat (27 september): ontvangen omzet min
+   de gerekende gemeten kostensoorten; verbruik zonder tarief maakt haar
+   `NIET_UIT_TE_REKENEN` in plaats van nul.
+4. ~~**Een graad en peilmoment op de maandbijdrage**~~ -- staat (27 september); de
+   afdrachtketen is gegrond.
+5. ~~**De idempotentieproef over `/api/office/bedrijfsmaat`**~~ -- gemeten en op het
+   kantoorstuur (27 september), zonder dat de onbekende effectpaden stegen. De
+   verse ronde legde twee dingen bloot: veertien routes die het oude register
+   niet kende (alle veertien kregen een besluit), en een proef die na de
+   passkeyverharding van de incassoronde niet meer binnenkwam -- die krijgt nu een
+   eigen medewerker met passkey (`scripts/lib/idempasskey.js`).
+6. **Het banksaldo van RTG** -- besloten (C4); eerst de handmatige bron, de plek
+   voor eigen bonnen op nul met reden, en de bon zelf als eigen bouwstuk met de
+   e-geldvraag.
+7. **Een weg van een betaalde pas naar gast** -- besloten (C5); drie wegen, de
+   automatische dicht tot de eigenaar een regel aanzet.
+8. **Een herkomstkanaal bij aanmelding** -- besloten (C6); daarna pas CAC.
+9. **De streefstand** -- besloten (C7): de machine stelt voor, de eigenaar tekent.
 10. **Het beslisgeheugen** -- nadat 1 tot en met 9 er zijn, want een geheugen
     over besluiten zonder gegronde ketens onthoudt vooral gissingen.

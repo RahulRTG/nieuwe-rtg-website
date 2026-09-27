@@ -13,8 +13,9 @@
    is `volwassen()`: eigen account, A3, 18 of ouder.
 
    STANDAARD UIT. De functie `leerhuis` staat uit tot de eigenaar hem aanzet
-   (server/functies/register/cat-life2.js): de open besluiten B1 tot en met B6
-   gaan voor, en een deur die niemand bewust heeft geopend hoort dicht.
+   (server/functies/register/cat-life2.js): de besluiten B1 tot en met B7
+   (ACADEMY.md par. 5) zijn genomen maar nog niet alle uitgevoerd, en een deur
+   die niemand bewust heeft geopend hoort dicht.
 
    EEN SLEUTEL IS VERPLICHT bij elke handeling. De kern is idempotent op die
    sleutel; zonder sleutel is een herhaling een tweede handeling, en bij een

@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1761,
-    "toetsenNietGemeten": 634,
+    "toetsenNietGemeten": 635,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -149,6 +149,16 @@
     "edgeVeldContextZelf": 11
   },
   "notities": [
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 634,
+      "vervalt": "2026-12-27",
+      "meter": "toetsenNietGemeten 634 -> 635 (de som van drie takken, geen nieuwe toets)",
+      "reden": "De cadeaukaart, de ticketcodes en de kascodes kwamen elk met een eigen pg-raceproef (test/giftcard-credential.pg.test.js, test/ticketcodes.pg.test.js, test/kascode-credential.pg.test.js) en zetten deze meter elk op hun eigen tak van 633 naar 634. Samengevoegd staan ze naast elkaar. Zonder DATABASE_URL slaan ze zichzelf over, dus de mutatiemotor meet ze hier niet; in CI draaien ze in de pg-scherf met echte PostgreSQL en Redis.",
+      "waarheen": "Dezelfde aflossing als de andere pg-toetsen: de standaardomgeving levert PostgreSQL, en dan meet de motor ze mee."
+    },
     {
       "datum": "2026-09-27",
       "soort": "schuld",

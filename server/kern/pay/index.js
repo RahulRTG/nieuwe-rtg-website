@@ -96,7 +96,7 @@ module.exports = (ctxIn) => {
      aan het grootboek, het seintje naar het lid en de schaduwstand voor het
      statusbord -- staat in ./kijken.js. Daar komen save noch boek binnen: wie
      er iets verandert kan per definitie geen geld verplaatsen. */
-  const { sluitcontrole, boekingenVan, seintje, schaduwStand } =
+  const { sluitcontrole, boekingenVan, seintje, schaduwStand, ledentegoed } =
     require('./kijken')({ saldi, grootboek, keyVanCodenaam, sseToCustomer, schaduw });
 
   const ctx = {
@@ -115,7 +115,7 @@ module.exports = (ctxIn) => {
   /* KASCODE_* staat OP DE API en niet alleen in de ctx: ./kassacode.js leest
      pay.KASCODE_MS voor zijn eigen ttl. Main kent dat bestand niet, dus was het
      undefined en weigerde de linklaag bij het opstarten. */
-  const api = { MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX, boek, boekAsync, geldModus, sluitcontrole, laadOp, oplaadAfronden, saldoVan, rekLid, boekingenVan, koppelBank, koppelKosten, reconcileVanMotor };
+  const api = { MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX, boek, boekAsync, geldModus, sluitcontrole, laadOp, oplaadAfronden, saldoVan, rekLid, boekingenVan, koppelBank, koppelKosten, reconcileVanMotor, ledentegoed };
   api.schaduw = schaduwStand;
   // de portefeuille: de waardelaag kent de betekenis, dit grootboek de bedragen
   if (waarde) api.portefeuille = c => waarde.portefeuille(c, saldoVan);

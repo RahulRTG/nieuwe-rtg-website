@@ -86,6 +86,7 @@ module.exports = function hangDwarseRoutersOp(grens) {
      draagt een economische wereld (besluit C1). */
   require('../routes/bedrijfsmaat')(grens('bedrijfsmaat'));
   require('../routes/naargast')(grens('naargast'));
+  require('../routes/rtgboek')(grens('rtgboek'));
   require('../routes/rtmail')(grens('rtmail'));
   require('../routes/rtmail-vak')(grens('rtmail-vak'));
   require('../routes/rtmail-schrijf')(grens('rtmail-schrijf'));

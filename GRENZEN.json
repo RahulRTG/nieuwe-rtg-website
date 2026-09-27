@@ -1665,6 +1665,13 @@
       "schoolbieb",
       "tooManyTries"
     ],
+    "rtgboek": [
+      "RTGBOEK_DELEN",
+      "boardroomWie",
+      "officeAuth",
+      "rtgBoek",
+      "rtgBoekZet"
+    ],
     "rtgid": [
       "appUrl",
       "rtgid",

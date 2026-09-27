@@ -44,6 +44,17 @@
   .veld:focus{border-color:var(--burgundy);}
   .knop{background:var(--txt);color:var(--bg);border:none;border-radius:0;padding:.7rem 1.5rem;font-size:.9rem;font-weight:600;cursor:pointer;font-family:inherit;}
   .knop:hover{background:var(--burgundy);color:#fff;}
+  /* het boek van RTG in de kamer Financien (kantoren-rtgboek.js) */
+  #kRtgBoek{padding:1.1rem 1.25rem;margin-top:1rem;}
+  #kRtgBoek h4{margin:0 0 .25rem;}
+  .rb-maand{display:flex;gap:.5rem;align-items:center;margin:.75rem 0;font-size:.85rem;}
+  .rb-deel{margin-top:1rem;}
+  .rb-deel h5{margin:0 0 .2rem;font-size:.9rem;}
+  .rb-rij{display:flex;flex-wrap:wrap;gap:.45rem;align-items:center;padding:.5rem 0;border-bottom:1px solid var(--line);}
+  .rb-post{flex:1 1 14rem;display:flex;flex-direction:column;}
+  .rb-post .stil{font-size:.76rem;color:var(--soft);}
+  .rb-bedrag{flex:0 1 8rem;min-width:6rem;}
+  .rb-bron{flex:1 1 10rem;}
   .knop.stil{background:var(--card2);color:var(--txt);border:1px solid var(--line);}
   .fout{color:var(--burgundy);font-size:.85rem;min-height:1.2rem;margin-top:.5rem;}
   /* kamergrid in de Werk-OS-taal: scherpe tegels, haarlijnen, korte beweging */
@@ -286,6 +297,12 @@
       <div class="kpis h-mt80" id="kBetaalKpis"></div>
       <div class="betaal-providers" id="kBetaalProviders"></div>
       <div id="kBetaalProblemen" style="margin-top:0.75rem;"></div>
+    </div>
+    <div class="kaart" id="kRtgBoek" hidden>
+      <h4>Het boek van RTG</h4>
+      <div class="stil">Wat RTG zelf uitgeeft en verschuldigd is, per maand. Elk bedrag met een bron en op uw naam; personeel als totaal, nooit per medewerker. Hier rusten de operationele marge, de liquiditeit, de runway en de kosten per nieuw lid op.</div>
+      <label class="rb-maand">Maand <input type="month" class="veld" id="kRbMaand"></label>
+      <div id="kRbDelen"></div>
     </div>
     <h3 class="sec">De werklijst van deze kamer</h3>
     <div class="kaart lijst">
@@ -1249,6 +1266,9 @@ async function openKamer(id){
     '<div class="kaart lijst"><h4>'+esc(l.titel)+'</h4>'+(l.items.length ? '<ul>'+l.items.map(i => '<li>'+esc(i)+'</li>').join('')+'</ul>' : '<div class="leeg">Niets openstaand.</div>')+'</div>').join('');
   $('#kBetaal').hidden = (id !== 'financien' && id !== 'intern');
   if (id === 'financien' || id === 'intern') laadBetaalKamer(id);
+  // het boek van RTG zelf: Financien vult het op naam (besluit C8)
+  $('#kRtgBoek').hidden = (id !== 'financien');
+  if (id === 'financien' && window.RTGBoekKamer) RTGBoekKamer.laad(api, meld);
   tekenTaken(d.taken);
   // Rahul denkt mee in deze kamer -- schoon starten bij elke kamer
   $('#kRahulUit').textContent = '';
@@ -4312,6 +4332,7 @@ else uitgelogd();
 <script src="/shared/drie.js"></script>
 <script src="/apps/kantoren-atelier3d.js"></script>
 <script src="/apps/kantoren-collectieboek.js"></script>
+<script src="/apps/kantoren-rtgboek.js"></script>
 <script src="/shared/glyf.js"></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>

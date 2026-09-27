@@ -13,6 +13,9 @@
 
 const BESLOTEN = '25 september 2026, door de eigenaar';
 const d = (versie, regel, waarom) => Object.freeze({ versie, besloten: BESLOTEN, herkomst: 'mens', regel, waarom });
+/* De besluiten C8 tot en met C11 (27 september 2026) over het boek van RTG. */
+const dC = (c, versie, regel, waarom) => Object.freeze({ versie, besloten: '27 september 2026, door de eigenaar (C' + c + ')',
+  herkomst: 'mens', regel, waarom });
 const d27 = (versie, regel, waarom) => Object.freeze({ versie, besloten: '27 september 2026, door de eigenaar (C3)',
   herkomst: 'mens', regel, waarom });
 
@@ -55,7 +58,20 @@ const DEFINITIES = Object.freeze({
   klantwaardeWork: d27(1, 'KLANTWAARDE in WorkOS: een loonrun die definitief werd, in de maand van definitief maken; de groep is het aantal zaken.',
     'Het loon is definitief vastgesteld; of het geld ook is overgemaakt, zegt deze maat niet.'),
   klantwaardeFoundation: d27(1, 'KLANTWAARDE in FoundationOS: een hulpvraag die is afgerond met een hulpactie in het dossier, op de dag van afronden.',
-    'Telt over gezinnen en nooit per gezin; de RTFoundation blijft haar eigen economische wereld (C1).')
+    'Telt over gezinnen en nooit per gezin; de RTFoundation blijft haar eigen economische wereld (C1).'),
+  operationeleMarge: dC(8, 1, 'De OPERATIONELE MARGE is de brutomarge min stroom en serverhuur (de nota\'s uit de huisrekening) min de vaste lasten ' +
+    'van RTG uit het boek van Financiën; alleen als elke post van die maand is ingevuld.',
+    'Een half ingevuld boek ziet eruit als een goede maand.'),
+  liquiditeit: dC(10, 1, 'De LIQUIDITEIT is het vrije banksaldo aan het eind van de maand min de eigen korte verplichtingen van RTG ' +
+    '(crediteuren, belasting, loon, overig); het tegoed van leden staat ernaast en wordt niet afgetrokken.',
+    'Keuze van de eigenaar: alleen eigen schulden; het ledentegoed is een los getal.'),
+  runway: dC(9, 1, 'De RUNWAY is het vrije banksaldo gedeeld door het maandverbruik, gemiddeld over de laatste drie afgesloten maanden, ' +
+    'twee keer naast elkaar: BRUTO (vaste lasten, marketing en platformkosten) en NETTO (bruto min ontvangen omzet). ' +
+    'Is het netto verbruik nul of lager, dan is er geen verbruik en geen getal.',
+    'Netto zegt hoe lang het duurt; bruto zegt hoe lang het duurt als de omzet wegvalt.'),
+  cac: dC(11, 1, 'De CAC per kanaal is de marketinguitgave van een maand voor dat kanaal gedeeld door de nieuwe leden die dat kanaal ' +
+    'opgaven in dezelfde maand; onder tien leden geen getal.',
+    'Per kanaal, zodat te zien is welk kanaal werkt; \'via iemand die ik ken\' heeft geen uitgave.')
 });
 
 module.exports = { DEFINITIES, BESLOTEN };

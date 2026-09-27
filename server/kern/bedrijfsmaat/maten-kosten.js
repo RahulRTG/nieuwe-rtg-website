@@ -18,14 +18,6 @@ module.exports = [
     gedeeltelijk: 'De ontvangen omzet eronder ziet alleen de betaalschema\'s van aanmeldingen en niet de ledenfacturen in de kluis; zolang dat zo is, zegt deze marge iets over de vorm en weinig over het bedrag.',
     waarom: {} },
 
-  { id: 'marge.operationeel-rtg', domein: 'marge', wereld: 'rtg-intern', eenheid: 'euro per maand',
-    betekenis: 'Brutomarge min de vaste kosten van de organisatie (mensen, huisvesting, diensten).',
-    berekening: 'nog niet vastgesteld', actualiteit: 'periode', privacy: 'huis', minGroep: null, eigenaar: null, graad: 'onbekend',
-    afhankelijk: ['marge.bruto-rtg', 'personeel.rtg-op-naam'],
-    bron: null, definitie: null, projectie: null, bewijs: null, groepsgrens: null,
-    waarom: { bron: 'De vaste kosten van RTG als organisatie (salarissen van het eigen kantoor, huur, abonnementen) worden nergens geregistreerd; de kostenlaag kent alleen platformkosten.',
-      definitie: 'Niet besloten.', projectie: 'Niet gebouwd.', bewijs: 'Volgt uit de projectie.', eigenaar: 'Niemand.' } },
-
   { id: 'marge.per-lid', domein: 'marge', wereld: 'consument', eenheid: 'euro per lid per maand',
     betekenis: 'Unit economics: wat een lid bijdraagt min wat hij kost, opgeteld per pas of cohort en nooit per mens.',
     berekening: 'nog niet vastgesteld', actualiteit: 'periode', privacy: 'leden', minGroep: 10, eigenaar: null, graad: 'onbekend',
@@ -73,21 +65,5 @@ module.exports = [
     projectie: [c('server/kern/bankpositie.js', 'function stand(')], bewijs: [c('server/kern/bankpositie.js', "graad: 'vermoed', bonnenVerplichting")],
     groepsgrens: null,
     gedeeltelijk: 'Handmatig: een mens tikt het saldo over van een afschrift. Een bankkoppeling is een eigen besluit (C4).',
-    waarom: {} },
-
-  { id: 'liquiditeit.rtg', domein: 'liquiditeit', wereld: 'rtg-intern', eenheid: 'euro',
-    betekenis: 'Beschikbaar geld tegenover wat RTG op korte termijn moet betalen, inclusief het tegoed dat leden bij RTG hebben staan.',
-    berekening: 'nog niet vastgesteld', actualiteit: 'onbekend', privacy: 'huis', minGroep: null, eigenaar: null, graad: 'onbekend',
-    afhankelijk: ['cash.rtg-bankpositie'],
-    bron: null, definitie: null, projectie: null, bewijs: null, groepsgrens: null,
-    waarom: { bron: 'Er is geen register van de korte verplichtingen van RTG zelf, en geen kaspositie om ze tegenover te zetten.',
-      definitie: 'Niet besloten.', projectie: 'Niet gebouwd.', bewijs: 'Volgt uit de projectie.', eigenaar: 'Niemand.' } },
-
-  { id: 'runway.rtg', domein: 'runway', wereld: 'rtg-intern', eenheid: 'maanden',
-    betekenis: 'Hoe lang RTG met de huidige kaspositie en het huidige netto verbruik doorkan.',
-    berekening: 'nog niet vastgesteld', actualiteit: 'onbekend', privacy: 'huis', minGroep: null, eigenaar: null, graad: 'onbekend',
-    afhankelijk: ['cash.rtg-bankpositie', 'marge.operationeel-rtg'],
-    bron: 'afgeleid', definitie: null, projectie: null, bewijs: null, groepsgrens: null,
-    waarom: { definitie: 'Niet besloten (netto of bruto verbruik, welke horizon).',
-      projectie: 'De rekenvorm bestaat voor een ondernemer in kern/onderneming/kas.js; voor RTG zelf niet.', bewijs: 'Volgt uit de projectie.', eigenaar: 'Niemand.' } }
+    waarom: {} }
 ];

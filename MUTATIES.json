@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-27T16:35:50.390Z",
-    "commit": "25a037ec",
+    "op": "2026-09-27T17:22:43.951Z",
+    "commit": "7115424f8",
     "boomVuil": false,
-    "boomAnders": 4,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
-    "node": "v22.22.2"
+    "node": "v24.18.0"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -2061,6 +2061,13 @@
       "gezakt": 1,
       "geprobeerd": 2
     },
+    "connection-product-state.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "consent-dekking.test.js": {
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
@@ -2280,36 +2287,6 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
-    },
-    "democratie-aanval.test.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 3,
-      "scherp": "gezakt"
-    },
-    "democratie-afhankelijk.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/bron.js",
-      "operator": "===->!==#0",
-      "gezakt": 2,
-      "geprobeerd": 1
-    },
-    "democratie-grondwet.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/bron.js",
-      "operator": "&&->||#0",
-      "gezakt": 1,
-      "geprobeerd": 3
-    },
-    "democratie.test.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 3,
-      "scherp": "gezakt"
     },
     "demostand.test.js": {
       "soort": "server",
@@ -5421,13 +5398,6 @@
       "operator": "return-weg#1",
       "gezakt": 4,
       "geprobeerd": 13
-    },
-    "magnaatgroei.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "gezakt"
     },
     "magnaatgroei.test.js": {
       "soort": "puur",

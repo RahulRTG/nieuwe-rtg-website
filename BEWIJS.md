@@ -15,10 +15,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 2094 |
 | losse beweringen (`test(...)`) | 14740 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 173 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1430 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1435 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 75 |
-| alleen in de kop *genoemd*, nog niet gemeten | 175 |
+| alleen in de kop *genoemd*, nog niet gemeten | 170 |
 | niets van beide | 414 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -96,7 +96,7 @@ toets omvalt.
 | `alarm.test.js` | 12 | gezakt op `!==->===#0` | Het alarm (kern/command/alarm.js): een SLO zonder alarm is een rapportcijfer achteraf, dus dit is de piep. WAT DEZE TOETS VOORAL BEWAAKT is dat het alarm op VERANDERING piept en niet elke ronde. |
 | `alarmweg.test.js` | 7 | gezakt op `===->!==` | DE ALARMWEG NAAR BUITEN, EN WAAROM HIJ ER NIET WAS. De eigen fout-aggregatie (server/log.js) draait altijd en staat op het techniekbord. |
 | `algpin-herstel.pg.test.js` | 1 | genoemd | Echte productie-topologieproef voor identity.algpin_herstelsleutel. Twee onafhankelijke kerninstances delen de autoritatieve `algPinHerstel` in PostgreSQL. |
-| `algpin-herstel.test.js` | 6 | genoemd | De herstelsleutel van de algemene pin als gemigreerde credential (CODECREDENTIALS.json, identity.algpin_herstelsleutel; kern/algpin-herstel.js). De raceproef over twee PostgreSQL-instances staat in... |
+| `algpin-herstel.test.js` | 6 | gezakt op `liegpoort /api/` | De herstelsleutel van de algemene pin als gemigreerde credential (CODECREDENTIALS.json, identity.algpin_herstelsleutel; kern/algpin-herstel.js). De raceproef over twee PostgreSQL-instances staat in... |
 | `algpin.test.js` | 1 | gezakt op `liegpoort /api/` | De algemene pin: een pincode van het lid die prive-apps beschermt en waarmee de werk-apps op het OS openen. Getoetst: instellen, controleren, het slot tegen raden, wijzigen alleen met de oude pin, en de echte tanden:... |
 | `allergie.test.js` | 2 | gezakt op `liegpoort /api/` | Allergieveiligheid bij het bestellen (server): staat er een allergeen in het gedeelde zorgprofiel van het lid dat botst met een gerecht, dan houdt de /api/order-route dat gerecht tegen (409, met allergieBotsing). Het... |
 | `allocatie.test.js` | 11 | gezakt op `<=-><#0` | DE SOCIALE AFDRACHT: 30%, met een spoor per euro. Drie gaten uit de doorlichting van 20 augustus 2026 (PRIJZEN.md 4.8 en 4.9): 1. |
@@ -107,7 +107,7 @@ toets omvalt.
 | `anthropic.test.js` | 4 | gezakt op `return-weg#3` | Test voor de eigen Claude-client (server/anthropic.js), die @anthropic-ai/sdk verving. We draaien tegen een lokale nep-API (geen echte sleutel/kosten) en controleren: de juiste headers + body gaan eruit, het antwoord... |
 | `antivirus.test.js` | 23 | gezakt op `true->false` | Tests voor De Ontsmetter (server/kern/antivirus.js): de platform-malware- scanner. Handtekeningen, magie-controle, extensies en entropie. |
 | `api-contract.test.js` | 5 | gezakt op `liegpoort /api/` | Contracttests: leggen de VORM (velden + types) van de belangrijkste API- antwoorden vast, los van de flow-tests. Zo kan een refactor of herindeling niet stilletjes een veld weglaten waar een van de apps op leunt (bijv. |
-| `apipoort-levensduur.test.js` | 6 | genoemd | De machinesleutel van de API-poort als gemigreerde credential (CODECREDENTIALS.json, command.api_machinesleutel). Wat hier moet kunnen zakken: 1. |
+| `apipoort-levensduur.test.js` | 6 | gezakt op `liegpoort /api/` | De machinesleutel van de API-poort als gemigreerde credential (CODECREDENTIALS.json, command.api_machinesleutel). Wat hier moet kunnen zakken: 1. |
 | `apipoort.test.js` | 9 | gezakt op `===->!==#0` | De API-poort (kern/command/apipoort.js): sleutels, scopes, quota en contractregels voor koppelingen. WAT DEZE TOETS VOORAL BEWAAKT zijn vier dingen die allemaal onzichtbaar kapot kunnen gaan: 1. |
 | `appbieb.test.js` | 5 | gezakt op `liegpoort /api/` | De App-Bibliotheek: de ECHTE RTG-apps van het ecosysteem (geen verzonnen namen meer). Elke tegel opent een bestaande pagina; installeren zet hem op je startscherm. |
 | `appbrug.test.js` | 10 | gezakt op `===->!==#0` | DE APPBRUG (kern/mobiliteit/appbrug.js) -- van app-rit naar vervoersopdracht. Het besluit erachter staat in MAATSTAF.md par. |
@@ -689,7 +689,7 @@ toets omvalt.
 | `idor.test.js` | 7 | -- | HET IDOR-OORDEEL, NAGETROKKEN. Een 2xx is een BEVINDING (kan publiek zijn), een 401/403/404 is het bewijs van scheiding, en een 400 zegt niets over eigenaarschap. |
 | `idperdeel.test.js` | 6 | -- | Een veldnaam, meer betekenissen. De vorm die vier keer terugkwam, en de grens eromheen. |
 | `imageherkomst.test.js` | 20 | gezakt op `false->true#0` | DE HERKOMST VAN HET PRODUCTIE-IMAGE (scripts/imageherkomst.js). Niet te verwarren met test/herkomst.test.js: die gaat over de herkomst van GEGEVENS in RTG Command (waar komt dit veld vandaan). |
-| `imap-sleutelverval.test.js` | 5 | genoemd | De IMAP-apparaatsleutel vervalt en roteert (CODECREDENTIALS.json, rtmail.imap_apparaatsleutel; server/kern/mailsleutel.js). Wat hier moet kunnen zakken: 1. |
+| `imap-sleutelverval.test.js` | 5 | gezakt op `liegpoort /api/` | De IMAP-apparaatsleutel vervalt en roteert (CODECREDENTIALS.json, rtmail.imap_apparaatsleutel; server/kern/mailsleutel.js). Wat hier moet kunnen zakken: 1. |
 | `imap.test.js` | 10 | gezakt op `!==->===` | IMAP: een externe mailclient die meeleest met een RTG-postvak. DEZE TOETS PRAAT HET PROTOCOL, ZONDER SOCKET. |
 | `incident.test.js` | 10 | gezakt op `===->!==#0` | HET INCIDENT ALS OBJECT: tien beweringen, en ze gaan allemaal over de manier waarop een incidentenlijst normaal gesproken onwaar wordt. 1. |
 | `incidentcontrole-route.test.js` | 3 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -1446,7 +1446,7 @@ toets omvalt.
 | `schrijfanalyse.test.js` | 10 | gezakt op `===->!==#0` | DE SCHRIJFANALYSE -- en vooral: waar hij NIET 'nee' mag zeggen. Deze analyse is een VETO en geen certificaat (zie de kop van scripts/schrijfanalyse.js). |
 | `schrijfproef.test.js` | 7 | genoemd | DE SCHRIJFPROEF (scripts/schrijfproef.js) -- de indeling, niet de ronde. Deze toets draait GEEN meting: dat kost een server per route en hoort in `npm run schrijfproef`. |
 | `scim-deprovisioning-failclosed.test.js` | 6 | -- | SCIM UIT DIENST -- een 2xx is een bevestiging dat OOK Werk OS dicht is. Deze toets injecteert de storing op de naad zelf. |
-| `scim-sleutelverval.test.js` | 4 | genoemd | De SCIM-sleutel vervalt (CODECREDENTIALS.json, identity.scim_bearer_sleutel; server/scim/sleutels.js, migratie 11). Een sleutel met de volledige provisioning- en uitdienstmacht over een tenant geldt standaard 90... |
+| `scim-sleutelverval.test.js` | 4 | gezakt op `liegpoort /api/` | De SCIM-sleutel vervalt (CODECREDENTIALS.json, identity.scim_bearer_sleutel; server/scim/sleutels.js, migratie 11). Een sleutel met de volledige provisioning- en uitdienstmacht over een tenant geldt standaard 90... |
 | `scim-user-outbox.test.js` | 2 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `scim.test.js` | 20 | gezakt op `return-weg#0` | SCIM: de IdP van een klant mag zelf accounts aanmaken en uitzetten. Dat is de gevaarlijkste bevoegdheid die we buiten de deur geven, want de sleutel ligt bij de klant. |
 | `scimgroepen.test.js` | 6 | gezakt op `===->!==#0` | SCIM /Groups -- een groepswijziging bij de klant werkt METEEN door. Waarom deze laag er is: de identiteitsbrug las de claim `groups` uit het ID-token, en dat gebeurt alleen bij een inlog. |
@@ -1545,7 +1545,7 @@ toets omvalt.
 | `stad.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Stad: het slimme-stad-platform op eigen hardware (de Stadsdoos-vloot) en eigen software. Getest: het stadsbeeld met de demovloot en de privacy-belofte; de scenario-knop die alle regimes in een keer verzet (met... |
 | `stadsbesluit.test.js` | 7 | gezakt op `liegpoort /api/` | DE BESTUURLIJKE LAAG: organen, mandaat, besluitvorming, inspraak, rekenkamer. Het weefsel kon alles uitrekenen. |
 | `stadsbestuur.test.js` | 9 | gezakt op `liegpoort /api/` | HET STADSWEEFSEL, BESTUURSKANT: onderhoud, contracten, indicatoren, begroting, energie, klimaat, simulatie en het algoritmeregister. test/stadsweefsel.test.js dekt de operatie (waar staat het, wie gaat erheen); dit... |
-| `stadsdoossleutel.test.js` | 5 | genoemd | De apparaatsleutel van de Stadsdoos als gemigreerde credential (CODECREDENTIALS.json, devices.stadsdoos_sleutel; kern/stad/doossleutel.js). Wat hier moet kunnen zakken: 1. |
+| `stadsdoossleutel.test.js` | 5 | gezakt op `liegpoort /api/` | De apparaatsleutel van de Stadsdoos als gemigreerde credential (CODECREDENTIALS.json, devices.stadsdoos_sleutel; kern/stad/doossleutel.js). Wat hier moet kunnen zakken: 1. |
 | `stadshardware.test.js` | 8 | gezakt op `liegpoort /api/` | DE STADSDOOS ALS PRODUCT, DE NOODBEDIENING EN HET SOCIAAL DOMEIN. Drie lagen die alle drie over hetzelfde gaan: wat er gebeurt als de werkelijkheid niet meewerkt. |
 | `stadskansen.test.js` | 6 | gezakt op `liegpoort /api/` | DE STEDELIJKE KANSENLAAG: onderwijs, werk en de lokale economie. Het punt van deze laag is dat hij bijna niets zelf bijhoudt: vacatures komen uit kern/werk, bedrijven uit de partnerlijst, beroepen uit de... |
 | `stadsraad.test.js` | 3 | gezakt op `liegpoort /api/` | De Stadsraad: per stad EEN invloedrijke partner (foundation/club/instelling) die met een eigen raadcode het gezamenlijke foundation-kantoor in mag en daar SAMEN met RTG-personeel beslist over de lab-uitslagen.... |

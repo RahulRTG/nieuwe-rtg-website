@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T16:00:34.784Z",
-    "commit": "121f758a",
+    "op": "2026-09-27T17:43:53.806Z",
+    "commit": "b47ac965",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -425,6 +425,13 @@
       "operator": "===->!==",
       "gezakt": 5
     },
+    "algpin-herstel.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "algpin.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -490,6 +497,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "scherp": "gezakt"
+    },
+    "apipoort-levensduur.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "apipoort.test.js": {
@@ -4366,6 +4380,13 @@
       "operator": "false->true#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "imap-sleutelverval.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "imap.test.js": {
       "soort": "puur",
@@ -8585,6 +8606,13 @@
       "gezakt": 7,
       "geprobeerd": 1
     },
+    "scim-sleutelverval.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "scim.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -9142,6 +9170,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "scherp": "gezakt"
+    },
+    "stadsdoossleutel.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "stadshardware.test.js": {

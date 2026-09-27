@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 5152 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 5169 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 5152 |
-| servermodules (`server/**/*.js`) | 3707 |
-| routebestanden (`server/routes/**`) | 613 |
-| kernmodules (`server/kern/**`) | 2331 |
+| API-endpoints | 5169 |
+| servermodules (`server/**/*.js`) | 3738 |
+| routebestanden (`server/routes/**`) | 615 |
+| kernmodules (`server/kern/**`) | 2357 |
 | schermen (`public/**/*.html`) | 320 |
 | gedeelde browsermodules (`public/shared/*.js`) | 398 |
-| toetsbestanden (`test/*.test.js`) | 1806 |
+| toetsbestanden (`test/*.test.js`) | 1816 |
 | schermtoetsen (`test/*.e2e.js`) | 264 |
 
 ## 2. De weg van een verzoek
@@ -106,12 +106,12 @@ luister
 Acht domeinen, uit `server/opzet/routes.js`. Met `RTG_DOMAINS=member,social` draait
 een proces alleen die domeinen; een gateway (`server/poort.js`) stuurt de
 padvoorvoegsels dan naar het juiste proces. **Die belofte is nog niet waargemaakt:**
-zie §5 -- er zijn nog 243 kern-namen die meer dan één domein aanraakt.
+zie §5 -- er zijn nog 244 kern-namen die meer dan één domein aanraakt.
 
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
-| `auth` | 20 | 6 | 8 | 52 |
-| `member` | 699 | 72 | 16 | 428 |
+| `auth` | 21 | 6 | 8 | 54 |
+| `member` | 700 | 72 | 16 | 428 |
 | `supplier` | 624 | 127 | 6 | 337 |
 | `office` | 74 | 21 | 3 | 84 |
 | `staff` | 26 | 8 | 1 | 42 |
@@ -128,7 +128,7 @@ lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
 bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
 publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 3514 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 3529 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -136,9 +136,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1600 |
-| daarvan door **meer dan één** domein (de echte koppeling) | 243 |
-| daarvan door precies één domein | 1357 |
+| kern-namen die routes aanraken | 1607 |
+| daarvan door **meer dan één** domein (de echte koppeling) | 244 |
+| daarvan door precies één domein | 1363 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -150,10 +150,10 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(208) auth(128) supplierAuth(65) officeAuth(46) db(38) liveCodename(35) status(31)
-accounts(27) schoon(23) codenaamVan(19) managerOnly(18) rtf(18) boardroomWie(17)
+app(210) auth(129) supplierAuth(65) officeAuth(46) db(38) liveCodename(35) status(31)
+accounts(28) schoon(23) boardroomWie(19) codenaamVan(19) managerOnly(18) rtf(18)
 save(17) tooManyTries(14) geenGast(14) express(13) crypto(12) findSupplier(12)
-appUrl(11) keyVanCodenaam(11) pay(11) anthropic(11) noteFailedTry(10) boardroomAuth(10)
+boardroomAuth(12) appUrl(11) keyVanCodenaam(11) pay(11) anthropic(11) noteFailedTry(10)
 rtmail(10) kern(9) gegevensStop(9) sseToOffice(9) payrollOS(9) loginFails(8) stuur(8)
 logActivity(8) mail(7) sseToSupplier(7) onboarding(6) notifySupplier(6) talen(6)
 tenant(5) logInlog(5) veilig(5) openVacatures(5) overheid(5) sseToCustomer(5)
@@ -164,7 +164,7 @@ tenant(5) logInlog(5) veilig(5) openVacatures(5) overheid(5) sseToCustomer(5)
 | Namen uit kern | Bestand |
 |---|---|
 | 71 | `server/routes/member/rechterhand.js` |
-| 43 | `server/routes/auth/account.js` |
+| 45 | `server/routes/auth/account.js` |
 | 42 | `server/routes/member/voertuigen/huur.js` |
 | 41 | `server/routes/member/voertuigen/charter.js` |
 | 41 | `server/routes/member/voertuigen.js` |

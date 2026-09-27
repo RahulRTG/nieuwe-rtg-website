@@ -9,9 +9,18 @@ const M = require('./regels-markt');
 const B = require('./regels-bedrijf');
 const { FILIAAL } = require('./regels-groei');
 
+/* In een gedeelde stad (./stad.js) nemen de andere spelers de eerste plekken
+   op de markt in: een speler verkoopt tegen zijn eigen prijs, zit waar hij zit,
+   en maakt alleen een fout als hij echt te laat leverde. De kring wordt voor
+   elke zet gezet en niet bewaard: hij hoort bij dit moment. */
+const kring = new WeakMap();
+const zetKring = (st, spelers) => kring.set(st, spelers || []);
+
 function concurrenten(st) {
-  const weg = (st.groei && st.groei.overgenomen) || [];
-  return (M.CONCURRENTEN[st.aanbod] || []).filter(c => !weg.includes(c.id));
+  const weg = (st.groei && st.groei.overgenomen) || [], k = kring.get(st) || [];
+  return (M.CONCURRENTEN[st.aanbod] || [])
+    .map((c, i) => k[i] ? Object.assign({}, c, k[i], { id: c.id, speler: true, betrouwbaar: k[i].laat ? 0 : 100 }) : c)
+    .filter(c => c.speler || !weg.includes(c.id));
 }
 
 function zichtbaarheid(st) {
@@ -22,4 +31,4 @@ function zichtbaarheid(st) {
 /* Hoeveel mensen je kunt aansturen: met een filiaal is er plek voor meer. */
 const teamMax = (st) => B.TEAM_MAX + (st.groei && st.groei.filiaal ? FILIAAL.extraMensen : 0);
 
-module.exports = { concurrenten, zichtbaarheid, teamMax };
+module.exports = { concurrenten, zichtbaarheid, teamMax, zetKring };

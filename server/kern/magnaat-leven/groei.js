@@ -91,8 +91,9 @@ function overnamePrijs(st, c) {
 function neemOver(st, z) {
   const nee = eerst(st);
   if (nee) return nee;
-  const g = groei(st), nog = concurrenten(st), c = nog.find(x => x.id === z.bedrijf);
-  if (!c) return fout('Kies een concurrent om over te nemen: ' + nog.map(x => x.naam).join(', ') + '.');
+  const g = groei(st), nog = concurrenten(st), c = nog.find(x => x.id === z.bedrijf && !x.speler);
+  if (!c && nog.some(x => x.id === z.bedrijf)) return fout('Een andere speler neem je niet over: met mensen concurreer je.');
+  if (!c) return fout('Kies een concurrent om over te nemen: ' + nog.filter(x => !x.speler).map(x => x.naam).join(', ') + '.');
   if (nog.length <= G.OVERNAME.overblijven) return fout(c.naam + ' is je laatste concurrent: een stad met een bedrijf is geen markt.');
   const prijs = overnamePrijs(st, c), mens = G.OVERNAME.mensen[c.id];
   if ((st.team || []).filter(m => !m.weg).length >= teamMax(st)) return fout(mens + ' van ' + c.naam + ' komt mee, en je team is vol: open een filiaal of zeg iemand op.');
@@ -131,7 +132,7 @@ function groeiBeeld(st) {
     open: !!st.zelfstandig, krediet: g.krediet || null, kredietRuimte: st.zelfstandig ? kredietRuimte(st) : 0,
     filiaal: g.filiaal ? { wijk: g.filiaal.wijk, naam: M.WIJKEN[g.filiaal.wijk].naam, huur: M.WIJKEN[g.filiaal.wijk].huur } : null,
     overgenomen: (g.overgenomen || []).map(id => (M.CONCURRENTEN[st.aanbod] || []).find(c => c.id === id)).filter(Boolean).map(c => c.naam),
-    overnames: st.aanbod ? concurrenten(st).map(c => ({ id: c.id, naam: c.naam, prijs: overnamePrijs(st, c) })) : []
+    overnames: st.aanbod ? concurrenten(st).filter(c => !c.speler).map(c => ({ id: c.id, naam: c.naam, prijs: overnamePrijs(st, c) })) : []
   };
 }
 

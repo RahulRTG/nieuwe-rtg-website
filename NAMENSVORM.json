@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-27T14:23:13.010Z",
-    "commit": "d8bf1cba",
+    "op": "2026-09-27T14:36:58.199Z",
+    "commit": "b83879c5",
     "boomVuil": false,
-    "boomAnders": 7,
+    "boomAnders": 6,
     "instrument": "scripts/namensvorm.js",
     "node": "v22.22.2"
   },
@@ -613,8 +613,8 @@
   "woordenschat": [
     {
       "woord": "doel",
-      "bestanden": 266,
-      "domeinen": 141,
+      "bestanden": 268,
+      "domeinen": 142,
       "samengesteld": 188,
       "samengesteldDomeinen": 86,
       "stand": "bezet",

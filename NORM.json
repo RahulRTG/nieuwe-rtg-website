@@ -12,7 +12,7 @@
     "bronBlindeBestanden": 3,
     "browserpoortToetsen": 388,
     "carriereDomeinenGemeten": 15,
-    "dbDeuren": 529,
+    "dbDeuren": 530,
     "dbDeurenSchrijvend": 275,
     "dekkingPct": 82,
     "dekkingWaargenomenPct": 100,
@@ -3278,6 +3278,23 @@
       "meter": "kernGedeeld 243 -> 246; kernBreedte blijft gelijk",
       "reden": "Leerhuis besluit B2 (ACADEMY.md par. 5): de relatie van een persoon met een organisatie komt uit haar BRON en niet uit een verklaring van het leerhuis. Voor een entiteit is dat het dienstverband, dus het leerhuis leest employmentVanPersoon en entiteitVind, twee namen die concern al deelt. Een eigen kopie van de dienstverbandsopzoeking zou deze meter sparen en een tweede werkrelatiemodel opleveren, precies de naad die ARBEID.md par. 7a met een besluit dichtzette (employment aan een entiteit is de waarheid). Stap B2b voegt rtfos toe: een leerhuis van een RTF-stad vraagt aan kern/rtfos of een account daar een zetel heeft of een zelfgekoppelde, actieve vrijwilliger is. Die vraag leest alleen een ja of nee; een kopie van de zetels of het vrijwilligersregister in het leerhuis zou binnen een dag een tweede waarheid zijn.",
       "waarheen": "GRENZEN.json (leerhuis draagt employmentVanPersoon, entiteitVind en rtfos), test/leerhuis-routes.test.js toets 8 (wie uit dienst gaat verliest de relatie) en test/leerhuis-rtfbron.test.js (wie losgemaakt of inactief is, leest niet meer mee)"
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1600,
+      "meter": "kernBreedte 1600 -> 1601 (VERHOOGD, met reden)",
+      "reden": "RTG Vrijheid (VRIJHEID.md) is een nieuwe laag met een eigen kernnaam, kern.vrijheid, en routes die hem aanraken. Er komt precies EEN naam bij, niet twee: de zaak van RTG zelf als werkgever (kern/vrijheid/rtghuis.js) hangt met opzet BINNEN kern.vrijheid (kern.vrijheid.rtghuis) in plaats van als eigen kernnaam, en beide routebestanden staan in een map (routes/vrijheid/) zodat ze een domein zijn en kernGedeeld niet beweegt. Wie deze tand weer omlaag wil: dat kan alleen door de laag weg te halen, en dat is een productbesluit."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "dbDeuren",
+      "van": 529,
+      "meter": "dbDeuren 529 -> 530 (VERHOOGD, met reden)",
+      "reden": "kern/vrijheid/rtghuis.js maakt de zaak van RTG zelf aan (besluit van de eigenaar, 27 september 2026) en schrijft daarvoor in db.data.suppliers -- precies zoals kern/rtfwallet.js de RTFoundation-positie maakt. Er bestaat in dit huis geen gedeelde zaakmaker om langs te gaan: acht kernmodules duwen zelf een zaak in db.data.suppliers. De eigen afdelingen van RTG staan WEL in een eigen collectie (eigencollectie, rtgAfdelingen) en tellen hier dus niet. Wie deze tand omlaag wil: een gedeelde zaakmaker bouwen waar alle negen doorheen gaan.",
+      "waarheen": "Een gedeelde zaakmaker voor de negen modules die een zaak aanmaken."
     }
   ],
   "prestatie": {

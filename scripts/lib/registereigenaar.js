@@ -82,6 +82,8 @@ const EIGENAAR = {
     waarom: 'Handmatig onderhouden ontwerp- en implementatienotitie voor de drie goedgekeurde homes, met de daadwerkelijk uitgevoerde proeven en hun grenzen.' },
   'LANGUAGE.md': { soort: 'BRON',
     waarom: 'Handmatig onderhouden architectuur- en bereikbeschrijving; de drie taalrapporten dragen het afzonderlijke uitvoerbare bewijs.' },
+  'VRIJHEID.md': { soort: 'BRON',
+    waarom: 'Handmatig geschreven richtingsdocument (RTG Vrijheid: tijd, rust, vrijheid en eerlijkheid); de machineleesbare lusstand staat in server/kern/vrijheid/lus.js en wordt door test/vrijheid-lus.test.js tegen de boom gehouden, er is geen generator die het schrijft.' },
   'TOESTEL.md': { soort: 'BRON',
     waarom: 'Handmatig geschreven richtingsdocument (AI op het toestel van het lid); de gerepareerde herkomst staat in test/ai-herkomst.test.js, er is geen generator die het schrijft.' },
   'AUTHORITY.md': { soort: 'BRON',

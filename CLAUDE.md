@@ -903,6 +903,29 @@ staat, een stap weg is, een besluit vraagt of jaren weg is; het eerste dat vanda
 écht fout kan gaan staat bovenaan par. 7: **géén roostermotor leest verzuim**,
 dus een zieke medewerker kan gewoon worden ingepland.
 
+**`VRIJHEID.md` is de mens die in dat rooster staat** -- RTG Vrijheid: tijd,
+rust, vrijheid en eerlijkheid voor wie bij RTG of een zaak werkt, in
+`server/kern/vrijheid/`. De vraag is niet "waarom zouden we dit toestaan?" maar
+**"is er een concrete reden waarom dit niet kan?"** -- en is die er, dan krijgt
+de mens hem in een zin en eerst een alternatief. Lees die vóór je aan verlof,
+een vrije dag, eerder naar huis of een eerlijke verdeling werkt. Drie dingen die
+niet mogen sneuvelen: **de tijdcategorieën zijn hard gescheiden** (een RTG Day,
+verjaardagvrijheid en eerder naar huis hebben geen of een eigen teller, en er
+bestaat geen functie die de ene van het saldo van de andere afschrijft);
+**WORK_COMPLETE is nooit een lege takenlijst** (een kritieke verantwoordelijkheid
+die alleen de houder zelf afvinkte is UNKNOWN, anders wordt vrijheid een race);
+en **een geweigerd verzoek is een capaciteitsvraag en geen gedragsvraag** --
+blokkeert PAYMENT_L3 steeds de vrijdagmiddag, dan is de uitkomst een tweede
+bevoegde en geen strengere regel. Wat de eigenaar besloot staat in
+`server/kern/vrijheid/rtgbeleid.js` (27 september 2026: tien RTG Days, en een
+verjaardag op een vrije dag schuift naar de vorige werkdag), nog zonder
+juridische toets; wat niet besloten is (nachtdienst, schrikkeldag, drempels)
+staat met opzet OPEN en de motor zegt dan UNKNOWN of BLOCKED met de reden. `server/kern/vrijheid/lus.js` is de
+PEOPLE_TIME_LOOP_COMPLETENESS_CHECK en staat op BLOCKED: de motor is bewezen op
+een teambeeld, de routes en twee schermen staan (Mijn tijd in de personeelsapp,
+Tijd van het team in het Kantoor), maar de bron van dat teambeeld en de
+loonstrook zijn nog niet aangesloten.
+
 **`OFFICE.md` is de richting van RTG Office Next** -- van zes editors naar
 werk: alles wat een bedrijf van Microsoft 365 of Google Workspace verwacht,
 maar documenten, data, processen en AI als één systeem. Een richtingsdocument

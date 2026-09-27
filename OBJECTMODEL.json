@@ -3,15 +3,15 @@
   "vastgelegd": "2026-09-27",
   "gemeten": {
     "bestanden": 2441,
-    "vormen": 1457,
-    "velden": 2092,
-    "modules": 806,
+    "vormen": 1440,
+    "velden": 2083,
+    "modules": 801,
     "domeinen": 284,
     "envelopDrempel": 18,
     "envelop": 29,
-    "veldenDomeineigen": 1471,
-    "veldenGedeeldVanafVier": 211,
-    "gelijkendeVormparen": 21
+    "veldenDomeineigen": 1465,
+    "veldenGedeeldVanafVier": 210,
+    "gelijkendeVormparen": 20
   },
   "envelop": [
     "aantal",
@@ -21,7 +21,6 @@
     "code",
     "codenaam",
     "datum",
-    "doel",
     "door",
     "gemaakt",
     "id",
@@ -29,6 +28,7 @@
     "label",
     "naam",
     "notitie",
+    "ok",
     "omschrijving",
     "prijs",
     "reden",
@@ -58,27 +58,15 @@
       ]
     },
     {
-      "veld": "ok",
+      "veld": "doel",
       "domeinen": 17,
       "waar": [
         "kern/appstore",
-        "kern/festival",
-        "kern/fiscaal",
-        "kern/foundationregistratie-register",
-        "kern/koppel",
-        "kern/leren"
-      ]
-    },
-    {
-      "veld": "naar",
-      "domeinen": 17,
-      "waar": [
-        "bedrijf",
-        "kern/bank",
-        "kern/command",
-        "kern/leerhuis",
-        "kern/lidboard",
-        "kern/mailwachtrij"
+        "kern/codelevenscyclus",
+        "kern/commercie",
+        "kern/consent-register",
+        "kern/defensie",
+        "kern/labfonds"
       ]
     },
     {
@@ -91,6 +79,18 @@
         "kern/consent-lezers",
         "kern/factuurcorrectie-gronden",
         "kern/horeca"
+      ]
+    },
+    {
+      "veld": "naar",
+      "domeinen": 16,
+      "waar": [
+        "bedrijf",
+        "kern/bank",
+        "kern/command",
+        "kern/lidboard",
+        "kern/mailwachtrij",
+        "kern/mobiliteit"
       ]
     },
     {
@@ -190,6 +190,18 @@
       ]
     },
     {
+      "veld": "categorie",
+      "domeinen": 13,
+      "waar": [
+        "kern/appbieb",
+        "kern/command",
+        "kern/geloofbieb",
+        "kern/groothandel",
+        "kern/magnaat-partnerstudio-bedrijf",
+        "kern/mall"
+      ]
+    },
+    {
       "veld": "eenheid",
       "domeinen": 13,
       "waar": [
@@ -223,18 +235,6 @@
         "kern/klok",
         "kern/lidboard",
         "kern/pay"
-      ]
-    },
-    {
-      "veld": "categorie",
-      "domeinen": 12,
-      "waar": [
-        "kern/appbieb",
-        "kern/command",
-        "kern/geloofbieb",
-        "kern/groothandel",
-        "kern/magnaat-partnerstudio-bedrijf",
-        "kern/mall"
       ]
     },
     {
@@ -274,18 +274,6 @@
       ]
     },
     {
-      "veld": "niveau",
-      "domeinen": 12,
-      "waar": [
-        "bedrijf",
-        "kern/command",
-        "kern/geldbeleid",
-        "kern/geldgraaf",
-        "kern/leerhuis",
-        "kern/levenslijn"
-      ]
-    },
-    {
       "veld": "land",
       "domeinen": 12,
       "waar": [
@@ -295,18 +283,6 @@
         "kern/labfonds",
         "kern/ledenbalie-inzage",
         "kern/livinglab"
-      ]
-    },
-    {
-      "veld": "rol",
-      "domeinen": 12,
-      "waar": [
-        "kern/concern",
-        "kern/leerhuis",
-        "kern/livinglab",
-        "kern/magnaat-leven",
-        "kern/magnaatwereld",
-        "kern/onderneming"
       ]
     },
     {
@@ -394,15 +370,15 @@
       ]
     },
     {
-      "veld": "eigenaar",
+      "veld": "niveau",
       "domeinen": 11,
       "waar": [
         "bedrijf",
         "kern/command",
-        "kern/leerhuis",
-        "kern/levensgraaf",
-        "kern/onderneming",
-        "kern/reisgezelschap"
+        "kern/geldbeleid",
+        "kern/geldgraaf",
+        "kern/levenslijn",
+        "kern/livinglab"
       ]
     },
     {
@@ -418,27 +394,15 @@
       ]
     },
     {
-      "veld": "bewijs",
+      "veld": "rol",
       "domeinen": 11,
       "waar": [
-        "kern/horeca",
-        "kern/invoer",
-        "kern/leerhuis",
-        "kern/livinglab",
-        "kern/magnaat-controle",
-        "kern/magnaat-trainingslobby-acties"
-      ]
-    },
-    {
-      "veld": "geldigTot",
-      "domeinen": 10,
-      "waar": [
-        "bedrijf",
-        "kern/aanmeldingen",
         "kern/concern",
-        "kern/festival",
-        "kern/leerhuis",
-        "kern/mobiliteit"
+        "kern/livinglab",
+        "kern/magnaat-leven",
+        "kern/magnaatwereld",
+        "kern/onderneming",
+        "kern/rechterhand"
       ]
     },
     {
@@ -463,18 +427,6 @@
         "kern/gebouw-demo",
         "kern/mobiliteit",
         "kern/rtfos"
-      ]
-    },
-    {
-      "veld": "versie",
-      "domeinen": 10,
-      "waar": [
-        "bedrijf",
-        "kern/appstore",
-        "kern/beroepenbieb",
-        "kern/command",
-        "kern/envelop",
-        "kern/leerhuis"
       ]
     },
     {
@@ -523,6 +475,54 @@
         "kern/frictie",
         "kern/geldbeleid",
         "kern/kantoor"
+      ]
+    },
+    {
+      "veld": "op",
+      "domeinen": 10,
+      "waar": [
+        "bedrijf",
+        "kern/bestanden",
+        "kern/bureau",
+        "kern/galerij",
+        "kern/gedachten",
+        "kern/klok"
+      ]
+    },
+    {
+      "veld": "laatst",
+      "domeinen": 10,
+      "waar": [
+        "kern/command",
+        "kern/fluister",
+        "kern/geldbeleid",
+        "kern/link",
+        "kern/mailsleutel",
+        "kern/meet"
+      ]
+    },
+    {
+      "veld": "eigenaar",
+      "domeinen": 10,
+      "waar": [
+        "bedrijf",
+        "kern/command",
+        "kern/levensgraaf",
+        "kern/onderneming",
+        "kern/reisgezelschap",
+        "kern/reisgezelschap-delen"
+      ]
+    },
+    {
+      "veld": "grond",
+      "domeinen": 10,
+      "waar": [
+        "kern/connect",
+        "kern/economie",
+        "kern/factuurcorrectie",
+        "kern/identiteit",
+        "kern/kosten",
+        "kern/neiging"
       ]
     }
   ],
@@ -821,18 +821,6 @@
         "gratis",
         "nr",
         "prijsCenten"
-      ]
-    },
-    {
-      "gelijkenis": 0.6,
-      "a": "server/kern/appstore/context.js",
-      "b": "server/kern/mailsleutel.js",
-      "domeinA": "kern/appstore",
-      "domeinB": "kern/mailsleutel",
-      "gedeeld": [
-        "let",
-        "ok",
-        "sleutel"
       ]
     },
     {

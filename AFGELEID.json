@@ -3,10 +3,10 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-09-27T13:39:45.700Z",
-  "commit": "63b83314",
+  "op": "2026-09-27T15:03:15.857Z",
+  "commit": "52ef1d7d",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 3,
   "instrument": "scripts/afgeleid.js",
   "node": "v22.22.2"
  },
@@ -63,18 +63,6 @@
    "stempelAnders": false,
    "versheidOpdracht": "npm run aanvoervorm:vast",
    "grendelt": false,
-   "botsingVerklaard": null
-  },
-  {
-   "naam": "ACADEMY.md",
-   "soort": "BRON",
-   "eigenaar": null,
-   "graad": null,
-   "schrijvers": [],
-   "stempelInstrument": null,
-   "stempelAnders": false,
-   "versheidOpdracht": null,
-   "grendelt": null,
    "botsingVerklaard": null
   },
   {
@@ -3993,6 +3981,18 @@
    "stempelAnders": false,
    "versheidOpdracht": "npm run vindbaar",
    "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "VRIJHEID.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
    "botsingVerklaard": null
   },
   {

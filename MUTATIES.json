@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T15:00:33.737Z",
-    "commit": "f27be1cd",
+    "op": "2026-09-27T15:00:57.642Z",
+    "commit": "90d33919",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -4858,36 +4858,6 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
-    "leerhuis-grenzen.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/leerhuiswereld.js",
-      "operator": "===->!==#0",
-      "gezakt": 16,
-      "geprobeerd": 1
-    },
-    "leerhuis-lus.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/leerhuisproef.js",
-      "operator": "===->!==#0",
-      "gezakt": 3,
-      "geprobeerd": 1
-    },
-    "leerhuis-rtfbron.test.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 6,
-      "scherp": "gezakt"
-    },
-    "leerhuis-scherm.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "gezakt"
-    },
     "leerpaspoort-scherm.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -5511,21 +5481,6 @@
       "module": "server/kern/magnaat-leven/index.js",
       "operator": "!==->===#0",
       "gezakt": 6,
-      "geprobeerd": 2
-    },
-    "magnaatstart.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "gezakt"
-    },
-    "magnaatstart.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/magnaat-leven/index.js",
-      "operator": "!==->===#0",
-      "gezakt": 7,
       "geprobeerd": 2
     },
     "magnaatwereld.test.js": {
@@ -8106,6 +8061,14 @@
       "gezakt": 5,
       "geprobeerd": 2
     },
+    "rtghuis.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/rtghuis.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "rtgid.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -10248,6 +10211,37 @@
       "module": "scripts/lib/vrijenamen.js",
       "operator": "true->false#0",
       "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "vrijheid-lus.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/vrijheid/lus.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "vrijheid-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
+    "vrijheid-teambeeld.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/eigencollectie.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "vrijheid.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/vrijheid/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 19,
       "geprobeerd": 1
     },
     "vuurplan.test.js": {

@@ -1722,15 +1722,10 @@ const {
   }
 });
 
-/* De AI-bedrijfsagent (kern/agent.js): vaste leverancier koppelen, AI-inkoop-
-   voorstellen op verkoop + mise en place + verwachte drukte, en het AI-week-
-   rooster; de gemachtigde (manager) keurt goed, past aan of wijst af. */
+/* De AI-bedrijfsagent (kern/agent.js): inkoopvoorstel en weekrooster,
+   dat verzuim leest (kern/verzuimrooster.js); een mens beslist. */
 const { maakAgent } = require('./kern/agent');
-/* De verzuimlaag (kern.payrollOS, kernlaag2) bestaat pas ver hierna; de twee
-   autoplanners lezen hem daarom laat, via kern. Ontbreekt hij, dan is het
-   antwoord null en zeggen de planners dat ze niet konden nakijken. */
-const verzuim = require('./kern/verzuimrooster').maakVerzuimRooster((code, staffId, van, tot) =>
-  (kern.payrollOS && kern.payrollOS.verzuim) ? kern.payrollOS.verzuim.voorPlanning(code, staffId, van, tot) : null);
+const verzuim = require('./kern/verzuimrooster').uitKern(() => kern);
 const { agentKoppel, agentPubliek, agentVoorstel, agentBeslis, roosterVoorstel, roosterBeslis } = maakAgent({
   db, crypto, findSupplier, notifySupplier, ghBijbestelVoorstel, ghPlaatsBestelling,
   accounts, weekdagFactor, SHIFT_NAMES, save, logActivity, verzuim

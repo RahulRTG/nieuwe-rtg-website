@@ -48,4 +48,16 @@ function maakVerzuimRooster(lezer) {
   return { stand, verzuimZin };
 }
 
-module.exports = { maakVerzuimRooster };
+/* De verzuimlaag (kern.payrollOS, opzet/kernlaag2.js) bestaat pas ruim nadat
+   server.js de planners bouwt; daarom wordt hij pas bij de vraag opgezocht.
+   Ontbreekt hij, dan is het antwoord null en zeggen de planners dat ze niet
+   konden nakijken. `haalKern` is een functie: in server.js bestaat `kern` op
+   dat moment nog niet eens als naam. */
+function uitKern(haalKern) {
+  return maakVerzuimRooster((code, staffId, van, tot) => {
+    const p = haalKern().payrollOS;
+    return p && p.verzuim ? p.verzuim.voorPlanning(code, staffId, van, tot) : null;
+  });
+}
+
+module.exports = { maakVerzuimRooster, uitKern };

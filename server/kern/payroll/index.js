@@ -103,7 +103,11 @@ function maakPayrollOS({ db, save, crypto, accounts, nu, inzagelog, notify, logA
     payrollOS: {
       regels, componenten, contracten, motor, run, journaal, aangifte, verzuim, identiteit, uren, samenstellen, controles, dekking, dossier, herkomst: payrollHerkomst,
       bijwerken, urlBron, laadMeegeleverd
-    }
+    },
+    /* Een smalle deur voor de verlofbeslissing van de zaak (routes/supplier/
+       tafels-team.js): afgewezen verlof gaat uit de verzuimlaag. Het domein
+       `supplier` krijgt deze ene naam en niet heel payrollOS. */
+    verlofAfgewezen: (code, staffId, van) => verzuim.schrap(code, staffId, van, 'vakantie')
   };
 }
 

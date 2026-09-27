@@ -96,10 +96,6 @@ Object.assign(kern, require('../kern/payroll/index.js').maakPayrollOS({ db, save
    staat daarna als ONGECONTROLEERD klaar: er mag geen definitieve loonrun op
    tot iemand hem tegen het Handboek Loonheffingen heeft gelegd. */
 try { kern.payrollOS.laadMeegeleverd(); } catch (e) { console.error('[payrollOS] jaargang laden:', e.message); }
-/* Een smalle deur voor de verlofbeslissing van de zaak (routes/supplier/
-   tafels-team.js): afgewezen verlof gaat uit de verzuimlaag. Het domein
-   `supplier` krijgt deze ene naam en niet heel payrollOS. */
-kern.verlofAfgewezen = (code, staffId, van) => kern.payrollOS.verzuim.schrap(code, staffId, van, 'vakantie');
 /* DE BIJWERKKLOK GAAT HIER AAN. In kern/payroll/index.js staat met zoveel
    woorden "het opstarten roept start() aan" -- en dat deed niemand. De laag die
    is gebouwd om tarieven vanzelf binnen te halen, keek dus nooit. Dat is erger

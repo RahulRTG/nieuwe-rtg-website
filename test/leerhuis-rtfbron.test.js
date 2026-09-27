@@ -106,8 +106,8 @@ test('4. gekoppeld en actief: de stad neemt hem op, en hij leest mee', async () 
 });
 
 test('5. de coordinator maakt los met een reden, en dan leest hij niet meer mee', async () => {
-  assert.equal((await rtf('vrijwilliger/account-los', { id: VRIJW })).status, 400, 'zonder reden niet');
-  const los = await rtf('vrijwilliger/account-los', { id: VRIJW, reden: 'code gedeeld op de balie' });
+  assert.equal((await post('/api/rtfos/vrijwilliger/account-los', { id: VRIJW }, office)).status, 400, 'zonder reden niet');
+  const los = await post('/api/rtfos/vrijwilliger/account-los', { id: VRIJW, reden: 'code gedeeld op de balie' }, office);
   assert.equal(los.status, 200, JSON.stringify(los.body));
   assert.equal(los.body.losgemaakt, true);
   assert.equal((await post('/api/leerhuis/lees', { org: ORG, vraag: 'mijn' }, V)).status, 403);

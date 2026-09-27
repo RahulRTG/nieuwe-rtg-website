@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2069 bestanden en 14616 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2070 bestanden en 14622 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2069 |
-| losse beweringen (`test(...)`) | 14616 |
+| toetsbestanden | 2070 |
+| losse beweringen (`test(...)`) | 14622 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 177 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1415 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1416 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 74 |
 | alleen in de kop *genoemd*, nog niet gemeten | 168 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1807 bestanden, 14154 beweringen.
+1808 bestanden, 14160 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -789,6 +789,7 @@ toets omvalt.
 | `leerhuis-grenzen.test.js` | 20 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `leerhuis-lus.test.js` | 6 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `leerhuis-routes.test.js` | 8 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `leerhuis-rtfbron.test.js` | 6 | gezakt op `liegpoort /api/` | HET LEERHUIS VAN EEN RTF-STAD: de relatie komt uit de zetels en uit een koppeling die de vrijwilliger ZELF legt (ACADEMY.md besluit B2, stap B2b). Tegen een echte server, want de vraag loopt over twee domeinen: het... |
 | `leerstof.test.js` | 3 | gezakt op `liegpoort /api/` | RTG School golf 2: de leerstof-motor. Elke groep heeft echte leerdoelen met een les, de oefensessie is server-authoritatief (antwoorden staan nooit in de vraag), een behaald doel komt in het leerpaspoort, en er zijn... |
 | `leerstofbreed.test.js` | 3 | gezakt op `+->-#0` | RTG School, de brede leerlijn: van twee vakken naar een echt curriculum. Basisschool: rekenen, taal, aardrijkskunde, geschiedenis, natuur, verkeer en Engels. |
 | `leerstofvo.test.js` | 3 | gezakt op `liegpoort /api/` | RTG School golf 3: het voortgezet en vervolgonderwijs op de leerstof-motor. Vakken per fase (vmbo t/m wo), examentraining die pas aan het eind terugkijkt (zoals een echt examen), en het niveau-advies dat adviseert en... |

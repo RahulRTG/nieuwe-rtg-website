@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-27T11:47:06.968Z",
-    "commit": "67cdcb41",
+    "op": "2026-09-27T14:18:45.097Z",
+    "commit": "ef15395c",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 12,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -4873,6 +4873,13 @@
       "operator": "===->!==#0",
       "gezakt": 3,
       "geprobeerd": 1
+    },
+    "leerhuis-rtfbron.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
     },
     "leerpaspoort-scherm.e2e.js": {
       "soort": "server",

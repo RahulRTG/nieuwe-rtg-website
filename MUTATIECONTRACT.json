@@ -1,27 +1,27 @@
 {
  "stempel": {
-  "op": "2026-09-27T13:34:59.168Z",
-  "commit": "1492330e",
+  "op": "2026-09-27T14:14:38.229Z",
+  "commit": "ef15395c",
   "boomVuil": false,
-  "boomAnders": 9,
+  "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5030,
-  "geclassificeerd": 5030,
+  "totaal": 5033,
+  "geclassificeerd": 5033,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3190,
    "NOT_APPLICABLE": 1212,
-   "PROTECTED": 485,
+   "PROTECTED": 488,
    "INTENTIONALLY_NON_IDEMPOTENT": 143
   },
-  "vastgesteldDoorMens": 1889,
+  "vastgesteldDoorMens": 1892,
   "afgeleidDoorScript": 3141,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4139,
+   "AUTHENTICATED": 4142,
    "PUBLIC": 124,
    "OBJECT_SCOPED": 746,
    "(niet af te leiden -- vraagt een verklaring)": 5,
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 136,
    "kale ronde: onbeschermd": 123,
    "kale ronde: geen uitspraak": 4713,
-   "niet gemeten": 58
+   "niet gemeten": 61
   },
   "voorstellen": {},
   "metingVan": "2026-09-19T17:45:58.177Z"
@@ -90009,6 +90009,50 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "rtfos.vrijwilliger.account.koppel",
+   "route": "POST /api/rtfos/portaal/vrijwilliger/koppel",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth",
+     "mw",
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "rtfos.vrijwilliger.account.ontkoppel",
+   "route": "POST /api/rtfos/portaal/vrijwilliger/ontkoppel",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "rtfos.portaal.vrijwilliger.uren",
    "route": "POST /api/rtfos/portaal/vrijwilliger/uren",
    "semantiek": {
@@ -91660,6 +91704,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "rtfos.vrijwilliger.account.los",
+   "route": "POST /api/rtfos/vrijwilliger/account-los",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

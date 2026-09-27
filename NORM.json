@@ -29,7 +29,7 @@
     "inlineStijlAttributen": 4628,
     "kernBreedsteBestand": 71,
     "kernBreedte": 1600,
-    "kernGedeeld": 245,
+    "kernGedeeld": 246,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
@@ -201,9 +201,9 @@
       "soort": "structureel",
       "sleutel": "kernGedeeld",
       "van": 243,
-      "meter": "kernGedeeld 243 -> 245; kernBreedte blijft gelijk",
-      "reden": "Leerhuis besluit B2 (ACADEMY.md par. 5): de relatie van een persoon met een organisatie komt uit haar BRON en niet uit een verklaring van het leerhuis. Voor een entiteit is dat het dienstverband, dus het leerhuis leest employmentVanPersoon en entiteitVind, twee namen die concern al deelt. Een eigen kopie van de dienstverbandsopzoeking zou deze meter sparen en een tweede werkrelatiemodel opleveren, precies de naad die ARBEID.md par. 7a met een besluit dichtzette (employment aan een entiteit is de waarheid).",
-      "waarheen": "GRENZEN.json (leerhuis draagt employmentVanPersoon en entiteitVind) en test/leerhuis-routes.test.js toets 8, die tegen een echte server vasthoudt dat wie uit dienst gaat de relatie en de leesroute verliest"
+      "meter": "kernGedeeld 243 -> 246; kernBreedte blijft gelijk",
+      "reden": "Leerhuis besluit B2 (ACADEMY.md par. 5): de relatie van een persoon met een organisatie komt uit haar BRON en niet uit een verklaring van het leerhuis. Voor een entiteit is dat het dienstverband, dus het leerhuis leest employmentVanPersoon en entiteitVind, twee namen die concern al deelt. Een eigen kopie van de dienstverbandsopzoeking zou deze meter sparen en een tweede werkrelatiemodel opleveren, precies de naad die ARBEID.md par. 7a met een besluit dichtzette (employment aan een entiteit is de waarheid). Stap B2b voegt rtfos toe: een leerhuis van een RTF-stad vraagt aan kern/rtfos of een account daar een zetel heeft of een zelfgekoppelde, actieve vrijwilliger is. Die vraag leest alleen een ja of nee; een kopie van de zetels of het vrijwilligersregister in het leerhuis zou binnen een dag een tweede waarheid zijn.",
+      "waarheen": "GRENZEN.json (leerhuis draagt employmentVanPersoon, entiteitVind en rtfos), test/leerhuis-routes.test.js toets 8 (wie uit dienst gaat verliest de relatie) en test/leerhuis-rtfbron.test.js (wie losgemaakt of inactief is, leest niet meer mee)"
     },
     {
       "datum": "2026-09-24",

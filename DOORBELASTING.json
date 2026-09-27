@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T18:33:23.694Z",
-    "commit": "c53241b9",
+    "op": "2026-09-27T19:13:01.826Z",
+    "commit": "5ea5de85",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/doorbelasting.js",
@@ -21,7 +21,7 @@
   ],
   "regel": "onbekend is een uitkomst en nooit een aanname: een bedrag zonder aantoonbare herkomst wordt niet naar rtgEigen of derdePartij geduwd, want beide fouten zijn onzichtbaar en komen allebei iemand goed uit",
   "vorm": {
-    "vormenTotaal": 1447,
+    "vormenTotaal": 1446,
     "geldvormen": 219,
     "volgbaar": 37,
     "perHerkomstveld": {

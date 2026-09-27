@@ -55,14 +55,6 @@ jobs:
         run: sudo apt-get update -qq && sudo apt-get install -y -qq libxml2-utils redis-server
       - name: Playwright + Chromium voor de volledige schermsuite
         run: node scripts/browserinstall.js
-      # Laat de bestaande bouw-/herstelpoort eerst zelf draaien. Anders wordt
-      # een defect in de releaseketen pas na uren unit- en browsertests zichtbaar.
-      # De volledige ronde hieronder herhaalt beide stappen na de tests; dit
-      # vooronderzoek vervangt geen enkel definitief bewijsbestand.
-      - name: Releaseketen vooraf controleren
-        run: |
-          npm run release:gate
-          npm run staging:repetitie
       # Dit is dezelfde softwarepoort die vóór een echte uitrol draait:
       # volledige suite op deze commit, releasegate en stagingrepetitie. Een
       # losse check + test liet herstel, mutatiecontracten en staging buiten.

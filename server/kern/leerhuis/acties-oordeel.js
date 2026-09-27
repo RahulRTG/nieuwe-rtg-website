@@ -16,7 +16,7 @@
    ========================================================================== */
 'use strict';
 
-const { overgang, BEWIJSSOORTEN, STERKTE } = require('./standen');
+const { overgang, LEERBEWIJS, STERKTE } = require('./standen');
 const { relatieActief, heeftBestuur, trainerGeldig, bewijsVoldoet } = require('./oordeel');
 const { weiger, eisPersoon, eisBestuur, eisNiet, eisOrg, kennisNu, eigenId } = require('./hulp');
 
@@ -38,7 +38,7 @@ module.exports = {
     const p = eisPersoon(i.persoon);
     if (!relatieActief(st, p)) weiger(p + ' heeft geen lopende relatie met ' + st.org.id, 409);
     if (!st.vaardigheden[i.vaardigheid]) weiger('vaardigheid bestaat niet in deze organisatie', 404);
-    if (!BEWIJSSOORTEN.includes(i.soort)) weiger('bewijssoort: ' + BEWIJSSOORTEN.join(', '), 400);
+    if (!LEERBEWIJS.includes(i.soort)) weiger('bewijssoort: ' + LEERBEWIJS.join(', '), 400);
     if (!STERKTE.includes(i.sterkte)) weiger('sterkte: ' + STERKTE.join(', '), 400);
     if (!magSterkte(st, door, p, i.vaardigheid, i.sterkte))
       weiger(door + ' kan geen ' + i.sterkte + '-bewijs over ' + (door === p ? 'zichzelf' : p) + ' vastleggen voor ' + i.vaardigheid, 403);

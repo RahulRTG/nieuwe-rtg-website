@@ -2,7 +2,7 @@
    HET LEERHUIS -- wat een mens ziet: My Academy, de vakstaat, en de cockpits
    van trainer en manager.
 
-   Elke stand draagt WAT / WAAROM / VOLGENDE (de opdracht, par. 26). Een getal
+   Elke stand draagt WAT / WAAROM / VOLGENDE_STAP (de opdracht, par. 26). Een getal
    zonder uitleg komt hier niet voor, en een voortgangspercentage evenmin: wat
    telt is welke vaardigheid bewezen is, niet hoeveel procent van een cursus is
    aangeklikt.
@@ -20,7 +20,7 @@
 const { verversen, certStand, versheid, trainerGeldig } = require('./oordeel');
 const { rolKlaar, loopbaan } = require('./gereedheid');
 
-const VOLGENDE = {
+const VOLGENDE_STAP = {
   ASSIGNED: 'begin met lezen en kijken (UNDERSTAND, OBSERVE)', LEARNING: 'ga oefenen in de zandbak', PRACTICING: 'speel een scenario',
   SIMULATING: 'werk een keer onder toezicht van je trainer', SUPERVISED: 'je trainer bevestigt dat je klaar bent voor beoordeling',
   READY_FOR_ASSESSMENT: 'vraag een beoordeling aan', ASSESSING: 'een onafhankelijke assessor beoordeelt je',
@@ -52,7 +52,7 @@ function vakstaat(st, persoon, nu) {
 function mijn(st, persoon, nu) {
   const p = st.personen[persoon] || { rollen: [], leren: {}, bewezen: {} };
   const pad = Object.entries(p.leren).map(([c, l]) => ({ curriculum: c, titel: (st.curricula[c] || {}).titel, stand: l.stand,
-    wat: 'leerpad ' + c + ' staat op ' + l.stand, waarom: l.reden, volgende: VOLGENDE[l.stand] || null, trainer: l.trainer }));
+    wat: 'leerpad ' + c + ' staat op ' + l.stand, waarom: l.reden, volgende: VOLGENDE_STAP[l.stand] || null, trainer: l.trainer }));
   const ververs = verversen(st, persoon, nu).map(x => ({ wat: 'verversen: ' + x.vaardigheid, waarom: x.waarom,
     volgende: x.klasse === 'LEARNING_UPDATE' ? 'lees de nieuwe versie en leg dat vast' : 'opnieuw bewijzen' }));
   const lopend = new Set(Object.keys(p.leren).flatMap(c => (st.curricula[c] || { vaardigheden: [] }).vaardigheden));
@@ -87,7 +87,7 @@ function trainerCockpit(st, trainer) {
   if (!t) return { ok: false, reden: trainer + ' is geen trainer in deze organisatie' };
   const leerlingen = [];
   for (const [k, p] of Object.entries(st.personen))
-    for (const [c, l] of Object.entries(p.leren)) if (l.trainer === trainer) leerlingen.push({ persoon: k, curriculum: c, stand: l.stand, volgende: VOLGENDE[l.stand] || null });
+    for (const [c, l] of Object.entries(p.leren)) if (l.trainer === trainer) leerlingen.push({ persoon: k, curriculum: c, stand: l.stand, volgende: VOLGENDE_STAP[l.stand] || null });
   return { ok: true, trede: t.trede,
     VANDAAG: leerlingen.filter(x => ['SIMULATING', 'SUPERVISED'].includes(x.stand)),
     LEERLINGEN: leerlingen,
@@ -102,4 +102,4 @@ function managerCockpit(st, manager, nu) {
   nietZichtbaar: 'criteria, bewijs en uitslagen van beoordelingen; er is geen productiviteits-, loyaliteits- of persoonlijkheidsscore, en die komt er niet' };
 }
 
-module.exports = { vakstaat, mijn, sessie, trainerCockpit, managerCockpit, VOLGENDE };
+module.exports = { vakstaat, mijn, sessie, trainerCockpit, managerCockpit, VOLGENDE_STAP };

@@ -9,7 +9,7 @@
    ========================================================================== */
 'use strict';
 
-const { overgang, ORGSOORTEN, ROLSOORTEN, NIVEAUS, STERKTE, BEWIJSSOORTEN, LEERFASEN, BESTUUR, RELATIES, DRAAGBAAR, HERCERT } = require('./standen');
+const { overgang, ORGSOORTEN, ROLSOORTEN, VAARDIGHEIDSNIVEAUS, STERKTE, LEERBEWIJS, LEERFASEN, BESTUUR, RELATIESOORTEN, DRAAGBAAR, HERCERT } = require('./standen');
 const { cyclus } = require('./graaf');
 const { relatieActief } = require('./oordeel');
 const { weiger, eisPersoon, eisId, eisBestuur, eisNiet } = require('./hulp');
@@ -47,7 +47,7 @@ module.exports = {
   relatieZet(st, i, door) {
     eisBestuur(st, door, ['ACADEMY_OWNER'], 'een relatie vastleggen');
     const p = eisPersoon(i.persoon);
-    if (!RELATIES.includes(i.soort)) weiger('soort relatie: ' + RELATIES.join(', '), 400);
+    if (!RELATIESOORTEN.includes(i.soort)) weiger('soort relatie: ' + RELATIESOORTEN.join(', '), 400);
     if (i.manager) eisPersoon(i.manager, 'manager');
     return [{ soort: 'relatie', data: { persoon: p, soort: i.soort, actief: i.actief !== false, eenheid: i.eenheid || null, manager: i.manager || null } }];
   },
@@ -62,11 +62,11 @@ module.exports = {
   vaardigheidZet(st, i, door) {
     eisBestuur(st, door, ['CURRICULUM_OWNER'], 'een vaardigheid vastleggen');
     eisId(i.id, 'vaardigheid');
-    if (!NIVEAUS.includes(i.niveau)) weiger('niveau: ' + NIVEAUS.join(', '), 400);
+    if (!VAARDIGHEIDSNIVEAUS.includes(i.niveau)) weiger('niveau: ' + VAARDIGHEIDSNIVEAUS.join(', '), 400);
     const eis = i.bewijsEis || {};
     const sterkte = eis.sterkte || 'OBSERVED';
     if (!STERKTE.includes(sterkte)) weiger('sterkte: ' + STERKTE.join(', '), 400);
-    for (const s of eis.soorten || []) if (!BEWIJSSOORTEN.includes(s)) weiger('bewijssoort: ' + BEWIJSSOORTEN.join(', '), 400);
+    for (const s of eis.soorten || []) if (!LEERBEWIJS.includes(s)) weiger('bewijssoort: ' + LEERBEWIJS.join(', '), 400);
     /* Een kritieke vaardigheid op eigen verklaring is geen kritieke vaardigheid. */
     if (i.kritiek && STERKTE.indexOf(sterkte) < STERKTE.indexOf('OBSERVED'))
       weiger('een kritieke vaardigheid vraagt minstens OBSERVED bewijs', 400);

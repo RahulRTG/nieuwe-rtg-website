@@ -32,9 +32,7 @@ test('iedere bekende Travel-bearerissuer, redisclosure en consumer is in product
     gezien.add(feature);
   }
   assert.deepEqual([...gezien].sort(), [
-    'livingos.invisible_arrival_pass',
-    'travelos.activity_ticket_entry',
-    'travelos.mobility_transport_ticket'
+    'livingos.invisible_arrival_pass'
   ]);
 });
 
@@ -52,12 +50,25 @@ test('de gemigreerde boarding-passketen is in productie selectief vrijgegeven', 
     assert.equal(uit.status, 200, pad);
     assert.equal(uit.door, 1, pad);
   }
-  assert.equal(roep('/api/ticket/koop').status, 503,
-    'vrijgeven van boardingpassen opent geen activiteitenkaart');
-  assert.equal(roep('/api/mob/kaart/koop').status, 503,
-    'vrijgeven van boardingpassen opent geen vervoerbewijs');
   assert.equal(roep('/api/arrival/request').status, 503,
     'vrijgeven van boardingpassen opent geen aankomstbewijs');
+});
+
+test('de gemigreerde activiteitenkaart en het OV-vervoerbewijs zijn in productie vrijgegeven', () => {
+  for (const pad of [
+    '/api/ticket/koop', '/api/tickets/mijn', '/api/ticket/toon',
+    '/api/supplier/programma', '/api/supplier/ticket/checkin',
+    '/api/supplier/ticket/deurverkoop', '/api/supplier/ticket/toon',
+    '/api/mob/kaart/koop', '/api/mob/kaart/mijn', '/api/mob/kaart/toon',
+    '/api/mob/abo/koop', '/api/mob/abo/mijn', '/api/mob/reis/boek',
+    '/api/staff/mob/kaart/controle'
+  ]) {
+    const uit = roep(pad);
+    assert.equal(uit.status, 200, pad);
+    assert.equal(uit.door, 1, pad);
+  }
+  assert.equal(roep('/api/arrival/request').status, 503,
+    'vrijgeven van tickets en vervoerbewijzen opent geen aankomstbewijs');
 });
 
 test('veilige aangrenzende lezers, intrekkingen en operationele routes blijven open', () => {
@@ -83,9 +94,9 @@ test('ontwikkeling, niet-POST en onbekende paden worden niet door deze poort ger
 test('Express-equivalente hoofdletters, encoding en eindslash omzeilen de poort niet', () => {
   for (const pad of [
     '/API/ARRIVAL/REQUEST/',
-    '/api/supplier/ticket/%63heckin',
+    '/api/supplier/horeca/%61rrivals',
     '/api/arrival/%70ass/?x=1',
-    '/api/staff/mob/kaart/controle/'
+    '/api/arrival/pulse/'
   ]) assert.equal(roep(pad).status, 503, pad);
 });
 
@@ -101,17 +112,18 @@ test('de productierem staat eenmalig vóór idemopslag en domeinhandlers', () =>
 test('hard sluiten wordt niet als gemigreerde lifecycle verkocht', () => {
   const register = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'CODECREDENTIALS.json'), 'utf8'));
   for (const id of [
-    'livingos.invisible_arrival_pass',
-    'travelos.activity_ticket_entry',
-    'travelos.mobility_transport_ticket'
+    'livingos.invisible_arrival_pass'
   ]) {
     const deur = register.deuren.find(x => x.id === id);
     assert.ok(deur, id);
     assert.equal(deur.status, 'remaining', id);
     assert.equal(deur.release_blocker, true, id);
   }
-  const boarding = register.deuren.find(x => x.id === 'travelos.airport_boarding_pass');
-  assert.ok(boarding);
-  assert.equal(boarding.status, 'migrated');
-  assert.equal(boarding.release_blocker, false);
+  for (const id of ['travelos.airport_boarding_pass', 'travelos.activity_ticket_entry',
+    'travelos.mobility_transport_ticket']) {
+    const deur = register.deuren.find(x => x.id === id);
+    assert.ok(deur, id);
+    assert.equal(deur.status, 'migrated', id);
+    assert.equal(deur.release_blocker, false, id);
+  }
 });

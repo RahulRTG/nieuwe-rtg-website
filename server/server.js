@@ -777,17 +777,16 @@ zetWacht(wacht);
 /* De leden-laag (contactregels, memberTemplate, de leden-app-state en de
    eigen sollicitaties) staat in server/kern/lid.js. findSupplier en geborenVan
    zijn hoisted functies en dus hier al bruikbaar. */
-/* Wereldtalen (server/talen.js): de Boardroom zet per taal een schakelaar aan of
-   uit; iedereen chat in de eigen taal en de ander leest alles in de zijne. Vroeg
-   opgezet zodat de leden-laag (en alles daarna) taalVan kan gebruiken. */
+/* Wereldtalen (server/talen.js): de Boardroom zet per taal een schakelaar;
+   iedereen chat in de eigen taal. Vroeg, zodat de leden-laag taalVan kent. */
 const talen = maakTalen({ db, save });
-/* Salon-claimcodes zijn bearers en delen daarom een eigen transactionele kern
-   tussen de leden- en leveranciersroute. Hij staat vóór de ledenprojectie,
-   zodat die uitsluitend statusmetadata en nooit de kale code teruggeeft. */
+/* Salon-claimcodes, afhaal- en ticketcodes zijn bearers met een eigen
+   transactionele kern, vóór de ledenprojectie (die toont nooit de kale code). */
 const salonClaimcode = require('./kern/salon-claimcode')({
   db, save, bewerkCollectie, crypto
 });
 const afhaalcode = require('./kern/afhaalcode')({ db, bewerkCollectie, crypto });
+const tickettoegang = require('./kern/tickettoegang')({ db, save, bewerkCollectie, crypto });
 /* PostgreSQL neemt pas asynchroon over (startPostgresMetSalon); de lokale
    migraties draaien verderop, na Samen. */
 const startPostgresMetSalon = () => {
@@ -2293,7 +2292,7 @@ const kern = {
   sseSend, sseToCustomer, sseToOffice, sseToSupplier, stateFor, stationsForOrder, supplierAuth, supplierState, persoonsPoort,
   toRad, tokenHash, tooManyTries, totpOk, trChat, trustVan, unlockDoor, urenVan, validDept, veiligGelijk, logInlog,
   securityLogKeten, handelingsspoor, ankerdienst, ankerpost,
-  zorgContact, klantSalon, salonClaimcode, afhaalcode,
+  zorgContact, klantSalon, salonClaimcode, afhaalcode, tickettoegang,
   // de stemming van Rahul + de geloofslaag (kern/rahul/stemming.js, kern/geloof/)
   geloof, stemmingToon: stemming.stemmingToon, stemmingZet: stemming.stemmingZet,
   stemmingVoor: stemming.stemmingVoor,

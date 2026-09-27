@@ -56,7 +56,13 @@ const ROUTES = new Set([
   'POST /api/giftcard/buy',
   'POST /api/giftcard/roteer',
   'POST /api/supplier/giftcard/sell',
-  'POST /api/supplier/giftcard/roteer'
+  'POST /api/supplier/giftcard/roteer',
+  // entreecode van een activiteitenticket en code van een vervoerbewijs:
+  // tonen is roteren (kern/tickettoegang.js, kern/mobiliteit/kaarttoegang.js)
+  'POST /api/ticket/toon',
+  'POST /api/supplier/ticket/toon',
+  'POST /api/supplier/ticket/deurverkoop',
+  'POST /api/mob/kaart/toon'
 ]);
 
 const isEenmalig = (methode, pad) => ROUTES.has(

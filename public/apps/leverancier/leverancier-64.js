@@ -68,7 +68,7 @@
         '<div class="mitem"><div class="r1"><span class="nm">'+sl.tijd+' \u00B7 '+esc(sl.naam)+'</span>'+
         '<span class="pr">'+sl.binnen+'/'+sl.verkocht+' '+T('tk2.binnenkort','binnen')+' \u00B7 '+sl.verkocht+'/'+sl.capaciteit+'</span></div>'+
         (sl.gasten.length ? '<div class="ds"><button class="obtn" data-tkg="'+i+'" style="padding:0.2rem 0.8rem;font-size:0.7rem;">'+T('tk2.gasten','Gastenlijst')+' ('+sl.gasten.length+')</button>'+
-          '<span id="tkGast-'+i+'" style="display:none;">'+sl.gasten.map(g => '<br>'+(g.binnen?'\u2705':'\u25CB')+' '+esc(g.codename)+' \u00B7 '+g.personen+'p \u00B7 '+g.code).join('')+'</span></div>' : '')+
+          '<span id="tkGast-'+i+'" style="display:none;">'+sl.gasten.map(g => '<br>'+(g.binnen?'\u2705':'\u25CB')+' '+esc(g.codename)+' \u00B7 '+g.personen+'p \u00B7 '+esc(g.ref)).join('')+'</span></div>' : '')+
         '</div>').join('')
       : '<div class="empty">'+T('tk2.leeg','Nog geen tijdsloten. '+(canEdit?'Voeg hieronder een activiteit toe.':''))+'</div>')+'</div>';
     // de eigen transferdienst (chauffeurs van de zaak rijden; ritten in de Ritten-tab)

@@ -65,6 +65,12 @@ module.exports = ({
     'zelfde reden als de ledenkant: geen antwoordcache mag de code heronthullen',
   'POST /api/order/afhaalcode':
     'tonen is roteren: elk antwoord draagt een nieuwe afhaalcode en trekt de vorige in; een herhaald antwoord zou een ingetrokken code tonen',
+  'POST /api/ticket/toon':
+    'tonen is roteren: elk antwoord draagt een nieuwe entreecode en trekt de vorige in (kern/tickettoegang.js); een herhaald antwoord zou een ingetrokken code tonen',
+  'POST /api/supplier/ticket/toon':
+    'zelfde reden als de ledenkant: het vernieuwen van een deurticket geeft een nieuwe code en trekt de vorige in',
+  'POST /api/mob/kaart/toon':
+    'tonen is roteren: elk antwoord draagt een nieuwe code van het vervoerbewijs en trekt de vorige in (kern/mobiliteit/kaarttoegang.js)',
   'POST /api/order/afhaalcode/intrek':
     'intrekken leest de actuele stand in kern/afhaalcode.js; een tweede keer is een toestandscontrole, geen gecachet antwoord',
   'POST /api/member/vluchten/incheck':

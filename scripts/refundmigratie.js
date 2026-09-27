@@ -16,25 +16,20 @@
    blijft staan, en -- het duurst -- een grendel die aan `paid` hing en nu open
    staat.
 
-   DAT LAATSTE IS GEEN THEORIE. Bij de ORDERS is het gebeurd: de grendel op een
-   tweede terugstorting hing aan `paid`, en zonder een eigen grendel op
-   `refunded` had dezelfde bon twee keer geld teruggestuurd. Vier van de
-   order-lezers braken; de rest sloot `terugbetaald` al uit via de status. Dat
-   verschil was niet te raden -- het moest gelezen worden.
+   DAT LAATSTE IS GEEN THEORIE: bij de ORDERS hing de grendel op een tweede
+   terugstorting aan `paid`, en zonder grendel op `refunded` stuurde dezelfde bon
+   twee keer geld terug. Dat verschil moest gelezen worden, niet geraden.
 
-   WAT DIT SCRIPT DOET, EN WAT NIET. Het TELT de lezers per collectie en wijst
-   ze per bestand aan. Het VERKLAART ze niet: elke lezer staat op `onbekend` tot
-   iemand hem met de hand heeft ingedeeld, precies zoals in
-   scripts/ritmigratie.js. Een kaart waarvan je niet weet welke regel zorgvuldig
-   is, is gevaarlijker dan geen kaart -- dus staat er liever `onbekend` dan een
-   gok.
+   WAT DIT SCRIPT DOET: het TELT de lezers per collectie en per bestand, en
+   VERKLAART ze niet -- elke lezer staat op `onbekend` tot een mens hem indeelt
+   (zoals scripts/ritmigratie.js); liever `onbekend` dan een gok.
 
    DRIE STANDEN, en de derde is geen tussenstand maar een ANDER soort regel:
 
-     om         is meegegaan met de tegenboeking (of hoefde niet te wijzigen om
-                mee te gaan). Draagt `gedaan`: wat ermee gebeurd is.
+     om         is meegegaan met de tegenboeking (of hoefde niets te
+                wijzigen). Draagt `gedaan`: wat ermee gebeurd is.
      geen-werk  beweegt vanzelf mee, meestal omdat hij ook de status leest en
-                een terugstorting die op een eindstand zet. Draagt `gedaan`.
+                een terugstorting op een eindstand zet. Draagt `gedaan`.
      wacht      is INGEDEELD maar zijn collectie is nog niet om. Draagt
                 `tedoen`: wat er moet gebeuren op de dag dat zij omgaat. Dit is
                 de bak waar rides, tickets en boekingen in horen te belanden --
@@ -196,6 +191,9 @@ const LEZERS = {
     wat: 'de eigen kaartjes van een lid, de betaalstand van de transferrit, en de grendel op een transfer zonder betaald ticket',
     tedoen: 'drie plekken: de lijst en de grendel sluiten `refunded` niet uit, en de transferrit toont ' +
       'zijn betaalstand door -- alle drie gaan mee met hun eigen collectie' },
+  'server/kern/tickettoegang.js': { collectie: ['tickets', 'boekingen'], soort: 'grendel', stand: 'geen-werk',
+    wat: 'of een ticket een entreecode krijgt en of de deur hem binnenlaat',
+    gedaan: 'sluit `refunded` en geweigerd/geannuleerd VOOR `paid` uit, dus een teruggestort ticket opent niets' },
   'server/kern/lidacties.js': { collectie: 'boekingen', soort: 'grendel', stand: 'wacht',
     wat: 'weigert een tweede betaling van dezelfde boeking',
     tedoen: 'zelfde volgorde-probleem als bij ritten: gaat deze collectie om, dan leest een teruggestorte boeking als "Al betaald."' },

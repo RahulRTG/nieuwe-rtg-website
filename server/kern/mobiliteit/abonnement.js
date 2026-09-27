@@ -2,7 +2,8 @@
    onbeperkt reist op de lijnen die de overeenkomst dekt.
 
    EEN ABONNEMENT IS HIER GEEN TWEEDE SOORT DING. Het wordt bewaard als een
-   kaartje met product 'abonnement', in dezelfde voorraad en met dezelfde code.
+   kaartje met product 'abonnement', in dezelfde voorraad en met dezelfde code
+   (kaarttoegang.js).
    Dat is met opzet: de conducteur controleert dan langs precies EEN weg, de
    geldigheid wordt met dezelfde som gerekend, en er is geen tweede plek waar
    een vervoerbewijs kan bestaan. Een apart abonnementenregister zou binnen een
@@ -77,7 +78,6 @@ module.exports = (ctx) => {
     const start = new Date();
     const a = {
       id: id('ab'),
-      code: crypto.randomBytes(9).toString('base64url').toUpperCase(),
       key: session.key, codenaam,
       vervoerder: zaak.code, vervoerderNaam: zaak.name,
       product: 'abonnement',
@@ -133,7 +133,6 @@ module.exports = (ctx) => {
       // bewust erbij: geteld, niet begrensd
       rittenUitleg: 'Onbeperkt reizen; het aantal staat er alleen zodat u het kunt zien.',
       terugbetaald: a.terugbetaald || null, gekocht: a.gekocht };
-    if (eigen) b.code = a.code;
     return b;
   }
 

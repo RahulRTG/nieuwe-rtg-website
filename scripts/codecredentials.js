@@ -60,6 +60,7 @@ const REQUIRED_ROUTES = [
   'POST /api/supplier/pos/redeem',
   'POST /api/ticket/koop', 'POST /api/tickets/mijn',
   'POST /api/supplier/programma', 'POST /api/supplier/ticket/checkin',
+  'POST /api/ticket/toon', 'POST /api/supplier/ticket/toon',
   'POST /api/member/sport/ticket/koop', 'POST /api/sport/scan',
   'POST /api/member/vluchten/boek', 'POST /api/member/vluchten/incheck',
   'POST /api/member/vluchten/mijn', 'POST /api/supplier/lucht/pass',
@@ -67,6 +68,7 @@ const REQUIRED_ROUTES = [
   'POST /api/mob/kaart/koop', 'POST /api/mob/kaart/mijn',
   'POST /api/mob/abo/koop', 'POST /api/mob/abo/mijn',
   'POST /api/mob/reis/boek', 'POST /api/staff/mob/kaart/controle',
+  'POST /api/mob/kaart/toon',
   'POST /api/supplier/horeca/simulatie/maak',
   'POST /api/supplier/horeca/simulatie/voorstellen',
   'POST /api/member/spel/hospitality-koppel',
@@ -182,13 +184,10 @@ const CONTROLES = ['hash_only_at_rest', 'issuer_doel_scope', 'issued_at_expires_
   'max_gebruik_gebruik', 'server_side_intrekken_roteren', 'constant_time_lookup',
   'atomic_claim', 'raw_once'];
 
-/* BRONAFGELEIDE CENSUS. REQUIRED_ROUTES bewaakt bekende deuren, maar kan een
-   morgen toegevoegde `/api/.../toegangscode` nooit raden. Daarom halen we alle
-   letterlijke routeverklaringen uit server/ en markeren we de kandidaten op
-   zowel pad als de eerste handlertekst. Een kandidaat die niet in het register
-   staat is geen parsefout: hij wordt een expliciete RELEASEBLOCKER met bron en
-   reden. Daarmee blijft de poort bruikbaar terwijl de inventaris groeit, maar
-   kan onbekend nooit READY betekenen. */
+/* BRONAFGELEIDE CENSUS. REQUIRED_ROUTES kan een morgen toegevoegde
+   `/api/.../toegangscode` nooit raden; daarom markeren we uit server/ elke
+   letterlijke route op pad en eerste handlertekst. Een kandidaat buiten het
+   register wordt een RELEASEBLOCKER met bron en reden: onbekend is nooit READY. */
 const METHODEN = 'get|post|put|patch|delete|head|options|all';
 /* `*` en niet `+` na de slash: `app.get('/')` is ook een letterlijke route, en
    met `+` werd hij als onleesbaar geteld (middleware/voordeur.js). */

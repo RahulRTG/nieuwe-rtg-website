@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T14:24:07.236Z",
-    "commit": "ab1dc80e0",
+    "op": "2026-09-27T18:25:25.362Z",
+    "commit": "4d0662b1",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -4873,6 +4873,13 @@
       "operator": "===->!==#0",
       "gezakt": 3,
       "geprobeerd": 1
+    },
+    "leerhuis-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 9,
+      "scherp": "gezakt"
     },
     "leerhuis-rtfbron.test.js": {
       "soort": "server",

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T17:14:01.034Z",
-    "commit": "e18de257",
+    "op": "2026-09-27T13:56:18.282Z",
+    "commit": "43461f914",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5392,6 +5392,14 @@
       "gezakt": 4,
       "geprobeerd": 13
     },
+    "magnaatgroei.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/magnaat-leven/index.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
     "magnaatgrondwet.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -5481,6 +5489,21 @@
       "module": "server/kern/magnaat-leven/index.js",
       "operator": "!==->===#0",
       "gezakt": 6,
+      "geprobeerd": 2
+    },
+    "magnaatstart.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "magnaatstart.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/magnaat-leven/index.js",
+      "operator": "!==->===#0",
+      "gezakt": 7,
       "geprobeerd": 2
     },
     "magnaatwereld.test.js": {
@@ -7706,13 +7729,6 @@
       "gezakt": 5,
       "geprobeerd": 1
     },
-    "rooster-verzuim.test.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "gezakt"
-    },
     "routelog.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -8067,14 +8083,6 @@
       "operator": "!==->===#0",
       "gezakt": 5,
       "geprobeerd": 2
-    },
-    "rtghuis.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/rtghuis.js",
-      "operator": "===->!==#0",
-      "gezakt": 2,
-      "geprobeerd": 1
     },
     "rtgid.test.js": {
       "soort": "server",
@@ -9632,6 +9640,30 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "toestel-kluisindex.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/toestel/kluisindex.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "toestel-spraak.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/toestel/spraak.js",
+      "operator": "===->!==#0",
+      "gezakt": 7,
+      "geprobeerd": 1
+    },
+    "toestel-vector.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/toestel/vector.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "toestellen.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -10218,45 +10250,6 @@
       "module": "scripts/lib/vrijenamen.js",
       "operator": "true->false#0",
       "gezakt": 3,
-      "geprobeerd": 1
-    },
-    "vrijheid-lus.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/vrijheid/lus.js",
-      "operator": "!==->===#0",
-      "gezakt": 1,
-      "geprobeerd": 1
-    },
-    "vrijheid-routes.test.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 6,
-      "scherp": "gezakt"
-    },
-    "vrijheid-teambeeld.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/eigencollectie.js",
-      "operator": "===->!==#0",
-      "gezakt": 2,
-      "geprobeerd": 1
-    },
-    "vrijheid-verzuim.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/vrijheid/index.js",
-      "operator": "===->!==#0",
-      "gezakt": 8,
-      "geprobeerd": 1
-    },
-    "vrijheid.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/vrijheid/index.js",
-      "operator": "===->!==#0",
-      "gezakt": 19,
       "geprobeerd": 1
     },
     "vuurplan.test.js": {
@@ -10983,6 +10976,14 @@
       "operator": "return-weg#0",
       "gezakt": 3,
       "geprobeerd": 3
+    },
+    "zoekmaat.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/zoekmaat.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "zorgketen.test.js": {
       "soort": "server",

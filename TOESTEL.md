@@ -525,6 +525,7 @@ twee bewijzen.
 | De rekenaar | `public/shared/toestel/rekenaar.js` | e2e: 6 × 7 = 42 met herkomst `toestel`; gewijzigde bytes weigeren bij `hash`; elke cel `sandbox="allow-scripts"` en `allow=""`, en na afloop weg |
 | Opslag op het toestel | `public/shared/toestel/opslag.js` | e2e: geen download zonder tik, onbekende verbinding vraagt nog eens, tweede keer uit OPFS |
 | De meting | `public/shared/toestel/meting.js` | feiten zonder klasse; energie `null` met de reden; niets naar RTG |
+| Het rekentijdplafond | `rekenaar.js` (klok), `cel.js` (rekent in een worker) | e2e: een ondertekende module die nooit stopt wordt na 1,5 s afgebroken met stap `last`, de pagina blijft tikken, de cel is weg; een worker in de cel heeft ook geen netwerk. Twee mutaties (rekenen terug in de cel, klok ×100) zakken met "de pagina van het lid bevroor" |
 | Tweede uitvoerder: ONNX Runtime Web 1.30 | `scripts/toestelproef.js` | echte runtime in dezelfde cel: [1,2,3] × [4,5,6] = [4,10,18], 209 ms rekentijd, zonder een regel in rekenaar of cel te veranderen |
 
 ### 10.1 Wat het bouwen blootlegde
@@ -553,6 +554,19 @@ twee bewijzen.
   licentie, als blob-module in de cel. Vandaar `blob:` in de `script-src` van
   de cel, en alleen daar.
 
+- **Een plafond dat niet kan afgaan, is geen plafond** (27 september 2026).
+  De klok stond in de rekenaar, maar de cel rekende op haar eigen thread, en
+  een sandbox-iframe deelt die in de praktijk met de pagina van het lid. Een
+  ondertekende module met een oneindige lus bevroor daarom de HELE pagina:
+  de klok ging nooit af, de cel werd nooit weggehaald, en het lid zat vast --
+  ook met procesisolatie voor sandbox-iframes aan. De cel rekent nu in een
+  eigen worker, gemaakt uit haar eigen bron als blob. Beide threads blijven
+  vrij, de klok gaat af, en met de cel verdwijnt haar worker. Daarvoor ging
+  `worker-src` van `'none'` naar `blob:`; een blob-worker ERFT de CSP van de
+  cel, en de e2e-toets meet dat `fetch` daar net zo dicht is. Whisper (JFK,
+  woordfout 0) en MiniLM (dezelfde treffers per soort als par. 13) lopen
+  ongewijzigd door de worker.
+
 ### 10.2 Wat er met opzet nog niet is
 
 - **WebGPU**: headless Chromium heeft hier geen adapter, dus alleen de
@@ -562,8 +576,6 @@ twee bewijzen.
   omgeving geweigerd. Zodra `huggingface.co` openstaat, volgen
   `spraak.naartekst` (Whisper, MIT) en `tekst.vector` (een Apache-model), elk
   met een proefset en een gemeten maat (par. 9.2).
-- **Het rekentijdplafond** staat in de rekenaar maar is niet beproefd: daar
-  is een uitvoerder voor nodig die bewust te lang rekent.
 - **Een schakelaar in de boardroom**: `/toestel` staat in `kern/bestuursroutes.js` en `kern/platformregister/bediening.js` en niet aan een functie, omdat de functiepoort alleen `/api` afdwingt. De uitknop is nu een lege sleutellijst en geen manifest; een echte schakelaar vraagt dat de functiepoort ook `/toestel` afdwingt.
 - **Centrale tellers (TOE-07)**: de meting stuurt niets naar RTG. Grove
   tellers zonder toestel-id komen pas als er iets te tellen valt.

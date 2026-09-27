@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 5165 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 5152 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,14 +18,14 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 5165 |
-| servermodules (`server/**/*.js`) | 3734 |
-| routebestanden (`server/routes/**`) | 615 |
-| kernmodules (`server/kern/**`) | 2354 |
+| API-endpoints | 5152 |
+| servermodules (`server/**/*.js`) | 3707 |
+| routebestanden (`server/routes/**`) | 613 |
+| kernmodules (`server/kern/**`) | 2331 |
 | schermen (`public/**/*.html`) | 320 |
-| gedeelde browsermodules (`public/shared/*.js`) | 398 |
-| toetsbestanden (`test/*.test.js`) | 1811 |
-| schermtoetsen (`test/*.e2e.js`) | 263 |
+| gedeelde browsermodules (`public/shared/*.js`) | 403 |
+| toetsbestanden (`test/*.test.js`) | 1809 |
+| schermtoetsen (`test/*.e2e.js`) | 265 |
 
 ## 2. De weg van een verzoek
 
@@ -87,7 +87,6 @@ kernlaag4b
 kernlaag4c
 kernlaag5
 kernlaag5f
-kernlaag5g
 kernlaag6
 kernlaag6b
 kernlaag7
@@ -113,7 +112,7 @@ zie §5 -- er zijn nog 243 kern-namen die meer dan één domein aanraakt.
 |---|---|---|---|---|
 | `auth` | 20 | 6 | 8 | 52 |
 | `member` | 699 | 72 | 16 | 428 |
-| `supplier` | 624 | 127 | 6 | 338 |
+| `supplier` | 624 | 127 | 6 | 337 |
 | `office` | 74 | 21 | 3 | 84 |
 | `staff` | 26 | 8 | 1 | 42 |
 | `social` | 76 | 10 | 31 | 71 |
@@ -129,7 +128,7 @@ lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
 bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
 publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 3527 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 3514 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -137,9 +136,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1601 |
+| kern-namen die routes aanraken | 1600 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 243 |
-| daarvan door precies één domein | 1358 |
+| daarvan door precies één domein | 1357 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -151,11 +150,11 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(209) auth(128) supplierAuth(66) officeAuth(47) db(38) liveCodename(35) status(31)
-accounts(27) schoon(23) managerOnly(19) codenaamVan(19) boardroomWie(18) rtf(18)
+app(208) auth(128) supplierAuth(65) officeAuth(46) db(38) liveCodename(35) status(31)
+accounts(27) schoon(23) codenaamVan(19) managerOnly(18) rtf(18) boardroomWie(17)
 save(17) tooManyTries(14) geenGast(14) express(13) crypto(12) findSupplier(12)
-appUrl(11) keyVanCodenaam(11) boardroomAuth(11) pay(11) anthropic(11) noteFailedTry(10)
-payrollOS(10) rtmail(10) kern(9) gegevensStop(9) sseToOffice(9) loginFails(8) stuur(8)
+appUrl(11) keyVanCodenaam(11) pay(11) anthropic(11) noteFailedTry(10) boardroomAuth(10)
+rtmail(10) kern(9) gegevensStop(9) sseToOffice(9) payrollOS(9) loginFails(8) stuur(8)
 logActivity(8) mail(7) sseToSupplier(7) onboarding(6) notifySupplier(6) talen(6)
 tenant(5) logInlog(5) veilig(5) openVacatures(5) overheid(5) sseToCustomer(5)
 ```

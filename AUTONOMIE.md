@@ -59,8 +59,8 @@ gedrag zonder commentaar mee te lezen):
 | bewijs | kan de uitkomst herkomst, graad of peilmoment tonen? | `BEWIJS_ONTBREEKT` |
 
 De stand: <!--getal:bedrijfsmaat.maten-->67<!--/getal--> maten over de 28 domeinen van de eigenaar.
-<!--getal:bedrijfsmaat.bestaat-->39<!--/getal--> bestaan, <!--getal:bedrijfsmaat.half-->19<!--/getal--> half en <!--getal:bedrijfsmaat.ontbreekt-->9<!--/getal--> ontbreken.
-Van de bestaande zien er <!--getal:bedrijfsmaat.gedeeltelijk-->12<!--/getal--> een deel van de werkelijkheid niet
+<!--getal:bedrijfsmaat.bestaat-->40<!--/getal--> bestaan, <!--getal:bedrijfsmaat.half-->19<!--/getal--> half en <!--getal:bedrijfsmaat.ontbreekt-->8<!--/getal--> ontbreken.
+Van de bestaande zien er <!--getal:bedrijfsmaat.gedeeltelijk-->13<!--/getal--> een deel van de werkelijkheid niet
 (`gedeeltelijk`, met de reden). <!--getal:bedrijfsmaat.ketensGegrond-->3<!--/getal--> van de zes ketens is gegrond, en er staan
 <!--getal:bedrijfsmaat.privacyGaten-->0<!--/getal--> projecties over mensen zonder afgedwongen groepsgrens.
 
@@ -306,7 +306,11 @@ doorgestreept met de datum; de besluiten staan in par. 2.5.
    reden, en drie automatische regels (afgelopen, afgelopen plus wachttijd,
    onbetaalde termijnen) die standaard uit staan. Elke weg laat de sessies
    vervallen; facturen en betaalschema blijven. Churn kan nu voorkomen.
-8. **Een herkomstkanaal bij aanmelding** -- besloten (C6); daarna pas CAC.
+8. ~~**Een herkomstkanaal bij aanmelding**~~ -- staat grotendeels (27 september, C6):
+   `kern/aanmeldkanaal.js` telt per maand, nooit per lid, en de campagnecode uit de
+   link (`?c=`) reist mee. Nog niet: de vraag zelf in het aanmeldscherm (een
+   keuzelijst is daar een nieuw bedieningselement), en CAC, dat wacht op een
+   register van de marketinguitgaven van RTG.
 9. **De streefstand** -- besloten (C7): de machine stelt voor, de eigenaar tekent.
 10. **Het beslisgeheugen** -- nadat 1 tot en met 9 er zijn, want een geheugen
     over besluiten zonder gegronde ketens onthoudt vooral gissingen.

@@ -171,7 +171,7 @@ test('rollback herstelt app, motor, sentinel, backup en de vorige bewijs-pin', (
 test('de imageworkflow publiceert alleen een getekende kandidaat en geen officiële release', () => {
   const bron = lees('.github/workflows/release-image.yml');
   const afbouw = bron.indexOf('npm run afbouw:software');
-  const pg = bron.indexOf('node scripts/pgtoetsen.js');
+  const pg = bron.indexOf("require('./scripts/lib/suite-pg').telling");
   const bootstrap = bron.indexOf('imageherkomst.js --sleutelcontrole');
   const sleutel = bron.indexOf('imageherkomst.js --sleutelcontrole', afbouw);
   const kandidaat = bron.indexOf('docker push "$RTG_CANDIDATE_IMAGE"');
@@ -182,6 +182,14 @@ test('de imageworkflow publiceert alleen een getekende kandidaat en geen offici�
     'de drie signingrollen worden niet vóór de bouw gecontroleerd');
   assert.ok(pg > afbouw && pg < kandidaat && /postgres:16-alpine/.test(bron) && /redis:7-alpine/.test(bron),
     'het kandidaatimage kan ontstaan zonder PostgreSQL/Redis-duurzaamheidsbewijs');
+  assert.doesNotMatch(bron, /run: node scripts\/pgtoetsen\.js/,
+    'een tweede PG-run vervangt de door de volledige suite gepinde bewijsbytes');
+  const bewaar = bron.slice(bron.indexOf('- name: Softwarebewijs bewaren'), bron.indexOf('- name: Bevries CI-uitvoering'));
+  assert.match(bewaar, /if: always\(\)/, 'mislukte ronden moeten hun bewijs behouden');
+  for (const pad of ['SUITE.json', '.release/pg-bewijs.json', '.release/schermsuite-bewijs.json',
+    '.release/release-gate-bewijs.json', '.release/staging-bewijs.json', '.release/afbouwoordeel.json'])
+    assert.ok(bewaar.includes(pad), 'ontbrekend overdraagbaar softwarebewijs: ' + pad);
+  assert.doesNotMatch(bewaar, /\.release\/\*|path: \.release\s*$/, 'geen ongefilterde secretmap uploaden');
   assert.ok(sleutel > afbouw && sleutel < kandidaat,
     'de ondertekeningssleutel wordt niet vóór publicatie tegen het vertrouwensanker bewezen');
   assert.ok(teken > kandidaat, 'de kandidaatdigest wordt niet verplicht getekend');

@@ -62,12 +62,35 @@ jobs:
           RTG_VAULT_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
           RTG_SECRET_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
       - name: PostgreSQL/Redis-duurzaamheidsbewijs
-        run: node scripts/pgtoetsen.js
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/rtgtest
-          REDIS_URL: redis://localhost:6379
-          RTG_VAULT_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
-          RTG_SECRET_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+        # npm test heeft alle PG-bestanden al in afzonderlijke databases
+        # uitgevoerd. Een tweede run zou de door SUITE gepinde bytes vervangen.
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs'), crypto = require('node:crypto');
+          const bytes = fs.readFileSync('.release/pg-bewijs.json');
+          const suite = JSON.parse(fs.readFileSync('SUITE.json'));
+          require('./scripts/lib/suite-pg').telling(JSON.parse(bytes), process.env.GITHUB_SHA);
+          if (suite.stempel?.commit !== process.env.GITHUB_SHA || suite.stempel?.boomVuil !== false ||
+              suite.postgres?.pad !== '.release/pg-bewijs.json' ||
+              suite.postgres?.sha256 !== crypto.createHash('sha256').update(bytes).digest('hex'))
+            throw Error('PostgreSQL-bewijs wijkt af van de volledige suite.');
+          NODE
+      - name: Softwarebewijs bewaren, ook bij een mislukte ronde
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: software-proof-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          # Expliciete bewijsbestanden, nooit een hele .release-map met secrets.
+          path: |
+            SUITE.json
+            .release/pg-bewijs.json
+            .release/schermsuite-bewijs.json
+            .release/release-gate-bewijs.json
+            .release/staging-bewijs.json
+            .release/afbouwoordeel.json
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 90
       - name: Bevries CI-uitvoering en exacte Git-bron
         run: |
           mkdir -p .release
@@ -172,5 +195,8 @@ jobs:
             .release/ci-suite.json
             .release/ci-pg-bewijs.json
             .release/ci-schermsuite-bewijs.json
+            .release/release-gate-bewijs.json
+            .release/staging-bewijs.json
+            .release/afbouwoordeel.json
           if-no-files-found: error
           retention-days: 90

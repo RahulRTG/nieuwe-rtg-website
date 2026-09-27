@@ -67,7 +67,7 @@ module.exports = (ctx) => {
     const uitleg = gemaakt.length
       ? 'De AI vulde ' + gemaakt.length + ' open dienst(en) in op ' + dag + (onvervuld ? ', maar ' + onvervuld + ' plek(ken) bleven open (te weinig beschikbare bewakers, rust bewaakt).' : '. Alle posten gedekt.')
       : (onvervuld ? 'Geen dienst kon ingevuld worden: te weinig beschikbare bewakers met rust tussen de diensten.' : 'Er stonden geen open diensten op ' + dag + '.');
-    const vz = verzuim ? verzuim.uitleg(nietIngepland.length, onbekend) : 'Verzuim kon niet worden nagekeken.';
+    const vz = verzuim ? verzuim.verzuimZin(nietIngepland.length, onbekend) : 'Verzuim kon niet worden nagekeken.';
     return { status: 200, ok: true, datum: dag, gemaakt, onvervuld, nietIngepland,
       verzuimNagekeken: onbekend === 0, uitleg: vz ? uitleg + ' ' + vz : uitleg };
   }

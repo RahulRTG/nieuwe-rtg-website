@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4628,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1600,
+    "kernBreedte": 1601,
     "kernGedeeld": 243,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1761,
-    "toetsenNietGemeten": 631,
+    "toetsenNietGemeten": 632,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -3067,6 +3067,25 @@
       "vervalt": "2026-12-24",
       "meter": "toetsenNietGemeten 626 -> 627",
       "reden": "test/samentekenen.test.js is nieuw (samen tekenen, besluit van de eigenaar van 24 september 2026). Met de hand nagetrokken met tien mutaties op bedrijf/samentekenen.js, de regelpoort en het loskoppelen; alle tien zakken, waarvan een pas na een extra bewering. De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1600,
+      "meter": "kernBreedte 1600 -> 1601; kernGedeeld blijft 243",
+      "reden": "Afgewezen verlof uit de verzuimlaag (PERSONEEL.md par. 4, PLANNING.md par. 7). Een verlofaanvraag gaat bij het indienen al als vakantie naar kern/payroll/verzuim.js, zodat de planning ziet wat er aankomt; werd hij afgewezen, dan bleef hij staan en rekende de loonrun vakantie. De beslissing valt in het domein supplier (/api/supplier/leave/decide), dat daarom EEN smalle naam krijgt -- kern.verlofAfgewezen, gezet in opzet/kernlaag2.js -- en niet heel payrollOS.",
+      "waarheen": "GRENZEN.json (supplier draagt verlofAfgewezen) en test/verzuimrooster.test.js toets 5, die tegen een echte server vasthoudt dat afgewezen verlof van het planbord verdwijnt"
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 631,
+      "vervalt": "2026-12-27",
+      "meter": "toetsenNietGemeten 631 -> 632",
+      "reden": "test/verzuimrooster.test.js is nieuw (het rooster leest verzuim). Met de hand nagetrokken met acht mutaties: de beveiligingsplanner en het weekrooster die verzuim negeren, de lezer die niet of leeg is bedraad, de afwijzing die niet schrapt, deels inzetbaar als inplanbaar, en lezen dat een lege rij aanlegt; alle acht zakken op de toets die erover gaat. De mutatiemotor is er nog niet langs geweest.",
       "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
     }
   ],

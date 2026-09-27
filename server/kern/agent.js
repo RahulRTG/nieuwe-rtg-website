@@ -12,8 +12,7 @@ const { dagContext } = require('./context');
    zelf. */
 const handeling = require('../opzet/handeling');
 
-function maakAgent({ db, crypto, findSupplier, notifySupplier, ghBijbestelVoorstel, ghPlaatsBestelling, accounts, weekdagFactor, SHIFT_NAMES, save, logActivity, verzuimLezer }) {
-  const verzuim = require('./verzuimrooster').maakVerzuimRooster(verzuimLezer);
+function maakAgent({ db, crypto, findSupplier, notifySupplier, ghBijbestelVoorstel, ghPlaatsBestelling, accounts, weekdagFactor, SHIFT_NAMES, save, logActivity, verzuim }) {
   const agentVan = s => {
     const a = (s.agent = s.agent || { partnerCode: null, auto: false, voorstellen: [], rooster: null });
     // een zaak kan meerdere groothandels hebben; oude databases (een enkele
@@ -132,8 +131,7 @@ function maakAgent({ db, crypto, findSupplier, notifySupplier, ghBijbestelVoorst
       const druk = factor >= 1.1;
       const datum = date.toISOString().slice(0, 10);
       const rows = staff.map((m, i) => {
-        // wie verzuim of verlof heeft, staat vrij (kern/verzuimrooster.js)
-        const v = verzuim.stand(s.code, m.id, datum);
+        const v = verzuim.stand(s.code, m.id, datum); // kern/verzuimrooster.js
         if (v.stand === 'onbekend') onbekend++;
         if (v.stand === 'afwezig') {
           afwezig.add(m.id);
@@ -148,7 +146,7 @@ function maakAgent({ db, crypto, findSupplier, notifySupplier, ghBijbestelVoorst
       days.push({ date: datum, label, factor, staff: rows });
     }
     agentVan(s).rooster = { days, status: 'voorstel', at: new Date().toISOString(),
-      verzuimNagekeken: onbekend === 0, verzuim: verzuim.uitleg(afwezig.size, onbekend) || null };
+      verzuimNagekeken: onbekend === 0, verzuim: verzuim.verzuimZin(afwezig.size, onbekend) || null };
     save();
     return { status: 200, ok: true, rooster: agentVan(s).rooster };
   }

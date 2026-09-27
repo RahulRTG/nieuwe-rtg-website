@@ -37,7 +37,7 @@ function maakVerzuimRooster(lezer) {
   }
 
   /* De zin voor de uitslag van een planner. Leeg als er niets te melden is. */
-  function uitleg(afwezig, onbekend) {
+  function verzuimZin(afwezig, onbekend) {
     const delen = [];
     if (afwezig) delen.push(afwezig + ' medewerker(s) niet ingepland omdat er verzuim of verlof loopt' +
       ' (wie deels of aangepast inzetbaar is, plant een mens in)');
@@ -45,7 +45,7 @@ function maakVerzuimRooster(lezer) {
     return delen.length ? delen.join('; ') + '.' : '';
   }
 
-  return { stand, uitleg };
+  return { stand, verzuimZin };
 }
 
 module.exports = { maakVerzuimRooster };

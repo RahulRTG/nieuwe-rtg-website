@@ -40,9 +40,9 @@ test('1. de regel: wie er niet (volledig) is, is niet inplanbaar -- en geen leze
     'deels inzetbaar plant een MENS in, niet de automaat');
   assert.equal(met([{ wat: 'Vakantie', inzetbaarheid: null }]).stand('Z', 1, 'd').wat, 'Vakantie');
   const r = maakVerzuimRooster(null);
-  assert.equal(r.uitleg(0, 0), '');
-  assert.match(r.uitleg(0, 3), /niet worden nagekeken/);
-  assert.match(r.uitleg(2, 0), /^2 medewerker/);
+  assert.equal(r.verzuimZin(0, 0), '');
+  assert.match(r.verzuimZin(0, 3), /niet worden nagekeken/);
+  assert.match(r.verzuimZin(2, 0), /^2 medewerker/);
 });
 
 function wereld(lezer) {
@@ -111,6 +111,8 @@ test('3. echte server: de autoplanner van de beveiliging plant een zieke bewaker
 
   const r = await api(base, '/api/supplier/beveiliging/planauto', { datum: vandaag() }, mgr);
   assert.equal(r.status, 200, JSON.stringify(r.body).slice(0, 200));
+  /* eerst: er IS gepland -- anders slaagt "hij staat op geen dienst" vanzelf */
+  assert.ok(r.body.gemaakt.length >= 1, 'de planner vulde diensten met de rest van de ploeg');
   assert.ok(!r.body.gemaakt.some(d => d.guardId === ziek.id), 'de zieke bewaker staat op geen enkele dienst');
   const niet = r.body.nietIngepland.find(n => n.guardId === ziek.id);
   assert.ok(niet, 'en de uitslag zegt waarom hij ontbreekt');

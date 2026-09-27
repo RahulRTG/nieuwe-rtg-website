@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T10:20:50.306Z",
-    "commit": "5176615d",
+    "op": "2026-09-27T10:47:03.478Z",
+    "commit": "114c50c3",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -2966,6 +2966,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "extern-bewijs.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/extern-bewijs.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "faalproefklasse.test.js": {
       "soort": "puur",

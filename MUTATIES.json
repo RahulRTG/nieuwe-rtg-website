@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T10:47:03.478Z",
-    "commit": "114c50c3",
+    "op": "2026-09-27T11:44:59.530Z",
+    "commit": "3087d9f6",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -9470,6 +9470,21 @@
       "operator": "===->!==#0",
       "gezakt": 4,
       "geprobeerd": 1
+    },
+    "tegoedbon-credential.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/economische-boeking.js",
+      "operator": "===->!==#0",
+      "gezakt": 9,
+      "geprobeerd": 1
+    },
+    "tegoedbon-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
     },
     "tekstbinding.test.js": {
       "soort": "puur",

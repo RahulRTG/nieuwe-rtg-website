@@ -129,7 +129,7 @@ function maakStad({ eigen, leven, crypto, codenaamVan = () => null, sseToCustome
     return beeld(s, key);
   }
 
-  function verlaat(key) {
+  function verlaatStad(key) {
     const s = mijnStad(key), lid = s && s.leden.find(l => l.key === key);
     if (!lid || s.status === 'klaar') return fout('Je speelt niet in een stad.', 404);
     if (s.status === 'wacht') {
@@ -182,7 +182,7 @@ function maakStad({ eigen, leven, crypto, codenaamVan = () => null, sseToCustome
     return { stad: publiek(s, key), leven: r };
   }
 
-  return { maak, doe, start, verlaat, staat, actie };
+  return { maak, doe, start, verlaat: verlaatStad, staat, actie };
 }
 
 module.exports = { maakStad, MAX, MIN, DUUR };

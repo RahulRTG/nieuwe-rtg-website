@@ -1,9 +1,9 @@
 /* Magnaat Van Nul, SAMEN IN EEN OUDWIJK (kern/magnaat-leven/stad.js): zes deuren
    voor leden met hun pas. De sleutel komt uit de sessie; de code van de stad uit
    het lijf, en alleen bij het binnenkomen. Naast ./magnaatwereld.js omdat dat
-   bestand op de 10 kB-grens staat; zelfde domein, zelfde poort. */
-module.exports = (kern) => {
-  const { app, auth, geenGast, magnaatWereld } = kern;
+   bestand op de 10 kB-grens staat; dat bestand hangt deze deuren op en geeft
+   alleen door wat ze nodig hebben, zodat dit geen tweede domein op de kern is. */
+module.exports = ({ app, auth, geenGast, magnaatWereld }) => {
   const deur = (werk) => async (req, res) => {
     if (geenGast(req, res)) return;
     try {

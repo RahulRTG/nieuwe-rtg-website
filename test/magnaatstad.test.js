@@ -175,27 +175,27 @@ test('de zes routes werken met een ledensessie op een echte server', async () =>
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-stad-'));
   const { child, base } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } });
   try {
-    const post = (pad, body, tok) => fetch(base + '/api/member/magnaat/stad/' + pad, { method: 'POST',
+    const post = (pad, body, tok) => fetch(base + pad, { method: 'POST',
       headers: { 'Content-Type': 'application/json', ...(tok ? { Authorization: 'Bearer ' + tok } : {}) },
       body: JSON.stringify(body || {}) });
     const lid = async (n) => (await (await fetch(base + '/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: 'Stad Speler ' + n, email: 'stad' + n + '@x.nl', phone: '061234567' + n, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' }) })).json()).token;
-    assert.equal((await post('staat')).status, 401);
+    assert.equal((await post('/api/member/magnaat/stad/staat')).status, 401);
     const a = await lid(1), b = await lid(2);
-    assert.deepEqual(await (await post('staat', {}, a)).json(), { stad: null, leven: null });
-    const code = (await (await post('maak', {}, a)).json()).stad.code;
-    assert.equal((await post('doe', { code }, b)).status, 200);
-    const s = await (await post('start', {}, a)).json();
+    assert.deepEqual(await (await post('/api/member/magnaat/stad/staat', {}, a)).json(), { stad: null, leven: null });
+    const code = (await (await post('/api/member/magnaat/stad/maak', {}, a)).json()).stad.code;
+    assert.equal((await post('/api/member/magnaat/stad/doe', { code }, b)).status, 200);
+    const s = await (await post('/api/member/magnaat/stad/start', {}, a)).json();
     assert.equal(s.stad.status, 'loopt');
     assert.ok(s.leven.geld.bank > 0);
-    assert.equal((await post('actie', { actie: 'slaap' }, a)).status, 200);
-    const d = await (await post('actie', { actie: 'slaap' }, b)).json();
+    assert.equal((await post('/api/member/magnaat/stad/actie', { actie: 'slaap' }, a)).status, 200);
+    const d = await (await post('/api/member/magnaat/stad/actie', { actie: 'slaap' }, b)).json();
     assert.equal(d.stad.dag, 2);
-    assert.equal((await post('actie', { actie: 'opnieuw', zeker: true }, a)).status, 400);
-    const weg = await (await post('verlaat', {}, b)).json();
-    assert.deepEqual(await (await post('verlaat', {}, b)).json(), Object.assign({ herhaald: true }, weg), 'een dubbeltik krijgt het eerste antwoord terug (de idempotentiepoort)');
-    assert.deepEqual(await (await post('staat', {}, b)).json(), { stad: null, leven: null }, 'en wie vertrok, speelt niet meer mee');
-    assert.equal((await (await post('staat', {}, a)).json()).stad.spelers[1].weg, true);
+    assert.equal((await post('/api/member/magnaat/stad/actie', { actie: 'opnieuw', zeker: true }, a)).status, 400);
+    const weg = await (await post('/api/member/magnaat/stad/verlaat', {}, b)).json();
+    assert.deepEqual(await (await post('/api/member/magnaat/stad/verlaat', {}, b)).json(), Object.assign({ herhaald: true }, weg), 'een dubbeltik krijgt het eerste antwoord terug (de idempotentiepoort)');
+    assert.deepEqual(await (await post('/api/member/magnaat/stad/staat', {}, b)).json(), { stad: null, leven: null }, 'en wie vertrok, speelt niet meer mee');
+    assert.equal((await (await post('/api/member/magnaat/stad/staat', {}, a)).json()).stad.spelers[1].weg, true);
   } finally {
     try { child.kill('SIGKILL'); } catch (e) {}
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}

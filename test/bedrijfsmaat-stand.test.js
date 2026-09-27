@@ -58,7 +58,7 @@ test('1. de boardroom is de deur, en lezen verandert niets', async () => {
   const a = await stand(), b = await stand();
   assert.equal(a.status, 200);
   assert.deepEqual(b.body.maten.map(m => m.id), a.body.maten.map(m => m.id), 'twee keer lezen, dezelfde maten');
-  assert.deepEqual(a.body.besluiten.map(x => x.id), ['C1', 'C2']);
+  assert.deepEqual(a.body.besluiten.map(x => x.id), ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7']);
 });
 
 test('2. elke maat draagt zijn definitie en wat hij niet dekt', async () => {

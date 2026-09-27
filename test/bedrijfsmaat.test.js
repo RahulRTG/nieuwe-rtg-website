@@ -12,7 +12,7 @@
    4. een bron, projectie of bewijs die alleen in COMMENTAAR staat, telt niet;
    5. de catalogus klopt tegen de code, en BEDRIJFSMAAT.json is gelijk aan een
       verse meting;
-   6. de besluiten C1 en C2 reizen mee in het register.
+   6. de besluiten C1 tot en met C7 reizen mee in het register.
 
    Draai los: node --test test/bedrijfsmaat.test.js */
 const test = require('node:test');
@@ -92,13 +92,15 @@ test('5. de catalogus klopt tegen de code, en het register loopt niet achter', (
     'BEDRIJFSMAAT.json loopt achter op de catalogus of de code -- draai: npm run bedrijfsmaat:vast');
 });
 
-test('6. de besluiten C1 en C2 reizen mee, met hun herkomst', () => {
+test('6. de besluiten C1 tot en met C7 reizen mee, met hun herkomst en hun stand', () => {
   const vast = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'BEDRIJFSMAAT.json'), 'utf8'));
   const ids = vast.besluiten.map(b => b.id);
-  assert.deepEqual(ids, ['C1', 'C2']);
+  assert.deepEqual(ids, ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7']);
   for (const b of vast.besluiten) {
     assert.equal(b.herkomst, 'mens');
-    assert.match(b.besloten, /25 september 2026/);
+    assert.match(b.besloten, /2[57] september 2026/);
+    assert.ok(['gebouwd', 'te bouwen'].includes(b.stand), b.id + ' zegt niet of hij al een handhaver heeft');
+    if (b.stand === 'te bouwen') assert.match(b.handhaving, /^Nog geen/, b.id + ' belooft een handhaver die er niet is');
   }
   const { LEZEN, KLEIN, VOORSTEL } = require('../server/kern/stuur/beleid-lijsten');
   assert.ok(LEZEN.office && KLEIN.office.length === 0 && VOORSTEL.office.length === 0, 'C2 staat in het stuur zoals het besluit zegt');

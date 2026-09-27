@@ -147,5 +147,10 @@ module.exports = ({ db, save, A, B, contracten, accounts, zegOpZelf, meldLid, nu
     return uit;
   }
 
+  /* Elk uur: de geplande overgangen van leden, en de regels alleen als ze aan staan.
+     NAARGAST_RONDE_MS=0 zet de klok uit (voor toetsen die zelf de ronde draaien). */
+  const ms = Number(process.env.NAARGAST_RONDE_MS == null ? 3600000 : process.env.NAARGAST_RONDE_MS);
+  if (ms > 0) setInterval(() => { try { ronde(); } catch (e) { console.error('[naargast] ronde:', e.message); } }, ms).unref();
+
   return { naarGast: { lidNu, lidEinde, kantoor, regels, regelZet, ronde, REGELS: Object.keys(REGELS) } };
 };

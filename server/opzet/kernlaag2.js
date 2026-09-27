@@ -126,15 +126,9 @@ Object.assign(kern, require('../kern/werkplek')({ db, save, crypto }));
    alleen het accepteren of afwijzen blijft mensenwerk. De AI kent nooit zelf
    Lifestyle/Business toe. */
 Object.assign(kern, require('../kern/aanmeldingen')({ db, save, crypto, schoon, accounts,
-  // laat gebonden: de geld-regie wordt verderop gemount; bij het accepteren
-  // (request-tijd) is kern.geldPasprijzen al beschikbaar voor het betaalschema.
+  // laat gebonden: geld-regie en meldingen (naar gast, C5) staan er pas later
   geldPasprijzen: () => (kern.geldPasprijzen ? kern.geldPasprijzen() : null),
-  // laat gebonden: een bericht voor de wachttijdregel van naar-gast (besluit C5)
-  meldLid: (k, n) => (kern.meldLid ? kern.meldLid(k, n) : null) }));
-/* De ronde van naar-gast (besluit C5): elk uur. Voert de geplande overgangen van
-   leden uit, en de automatische regels alleen als de eigenaar ze aanzette. */
-setInterval(() => { try { kern.aanmeldingen.naarGast.ronde(); } catch (e) { console.error('[naargast] ronde:', e.message); } },
-  Number(process.env.NAARGAST_RONDE_MS || 3600000)).unref();
+  meldLid: (...a) => kern.meldLid && kern.meldLid(...a) }));
 /* De pestgrens (kern/pestgrens.js): drie waarschuwingen bij pesten, dan een
    vurig slotantwoord en 24 uur weg; daarna opent alleen een excuus de deur. */
 Object.assign(kern, require('../kern/pestgrens')({ db, save }));

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2103 bestanden en 14786 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2109 bestanden en 14808 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2103 |
-| losse beweringen (`test(...)`) | 14786 |
+| toetsbestanden | 2109 |
+| losse beweringen (`test(...)`) | 14808 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 173 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1442 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1446 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 75 |
-| alleen in de kop *genoemd*, nog niet gemeten | 171 |
-| niets van beide | 415 |
+| alleen in de kop *genoemd*, nog niet gemeten | 172 |
+| niets van beide | 416 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1841 bestanden, 14324 beweringen.
+1847 bestanden, 14346 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -429,6 +429,9 @@ toets omvalt.
 | `envelopvelden.test.js` | 8 | gezakt op `===->!==#0` | DE VELDEN VAN DE ENVELOP (scripts/envelopvelden.js + ENVELOP.json). WAAROM DEZE TOETS ER IS. |
 | `envelopvorm.test.js` | 14 | gezakt op `&&->||#0` | DE CANONIEKE ENVELOP (server/opzet/envelop.js). WAT HIER OP HET SPEL STAAT. |
 | `ervaring.test.js` | 9 | gezakt op `liegpoort /api/` | End-to-end tests voor de ervaring-laag (kern/ervaring.js): tafelreserveringen, annuleren, reviews, favorieten, fooi, de reisagenda, rekening splitsen, wachtlijsten, RTG-punten en meldingsvoorkeuren. Tegen een echte... |
+| `eten-kortingscode-routes.test.js` | 3 | gezakt op `liegpoort /api/` | De promotiecode van RTG Eten tegen een ECHTE server (eten.kortingscode): de zaak slaat hem op met een vervaldatum, een maximum en een grens per lid; de controlesheet toont waarom een code niet geldt; bestellen telt... |
+| `eten-kortingscode.pg.test.js` | 1 | -- | Echte productie-topologieproef voor eten.kortingscode (de promotiecode). Twee onafhankelijke kerninstances delen de `etenKortingGebruik`-rij in PostgreSQL. |
+| `eten-kortingscode.test.js` | 3 | gezakt op `===->!==#0` | De kortingscode van RTG Eten (eten.kortingscode) als PROMOTIECODE: geen geheim (besluit B13), maar wel vier grenzen in code -- een vervaldatum, een maximum over alle leden, een grens per lid en (in de routes) een rem... |
 | `eten-uitgaan-voorzijde.test.js` | 4 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `eten.test.js` | 4 | gezakt op `getal+1#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `eu-naleving.test.js` | 6 | geen bronmutatie mogelijk | De pinnen onder EU.md: elke "dit staat in de code"-bewering uit dat document staat hier als toets. Niet omdat een tekstcontrole diepgang heeft, maar omdat een nalevingsdocument dat naar de code wijst gaat LIEGEN... |
@@ -659,6 +662,9 @@ toets omvalt.
 | `horeca-werklijst-modus.test.js` | 2 | geen module gevonden | DE WERKLIJST VIEL OM ZONDER MODUS, EN WERKTE MET ROMMEL. In server/kern/horeca/werklijst.js stond: const modus = MODI[String((opties && opties.modus) \|\| 'alles')] ? |
 | `horeca-werklijst.test.js` | 7 | gezakt op `getal+1#4` | RTG Horeca: DE WERKLIJST -- wat is mijn eerstvolgende handeling? De rekensom achter PDA SERVICE. |
 | `horeca-wijk.test.js` | 20 | gezakt op `liegpoort /api/` | RTG Horeca: DE WIJK -- welke tafels zijn van wie. De werklijst toonde de hele zaak, en dat stond er ook bij: een sectie-indeling bestond nergens, dus deed het scherm niet alsof. |
+| `horecabon-credential.pg.test.js` | 1 | genoemd | Echte productie-topologieproef voor horeca.bon_en_polsbandsaldo. Twee onafhankelijke kerninstances delen de autoritatieve `horecaBonnen`-rij in PostgreSQL. |
+| `horecabon-credential.test.js` | 9 | gezakt op `===->!==#0` | De horecabon en het polsbandsaldo (horeca.bon_en_polsbandsaldo), control voor control: 128 bits en de kale code eenmaal, hash-only, issuer/doel/ scope, vervaldatum, max_gebruik (bon 100, band 10000 naast het saldo),... |
+| `horecabon-routes.test.js` | 5 | gezakt op `liegpoort /api/` | De horecabon en de polsband tegen een ECHTE server (horeca.bon_en_polsbandsaldo): de code eenmaal en no-store, intrekken en roteren (roteren alleen de manager), de kassa die op code of op ID afboekt, de polsband, en... |
 | `horlogewerk.test.js` | 11 | gezakt op `!==->===` | Het RTG-uurwerk (public/shared/horlogewerk.js): de pure, wiskundig kloppende mechaniek van het RTG-horloge. Deze toets bewijst de foutmarge 0,0 -- de perioden, de frequentie en de wijzerhoeken moeten tot op de bit... |
 | `hospitality-universe.test.js` | 5 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `housekeeping.test.js` | 6 | gezakt op `liegpoort /api/` | De housekeeper-flow: kamerstatus in een tik per stap, en de nieuwe vrijgave voor vroege check-in (de overschot-techniek voor het hotel): alleen een schone kamer kan vrij, en elke andere status haalt de vrijgave... |

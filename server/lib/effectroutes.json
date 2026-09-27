@@ -1,8 +1,8 @@
 {
  "uitleg": "De routes die onder het besluit van 30 augustus 2026 vallen: twee onafhankelijke runtime-metingen lezen allebei nul. Alleen de namen en de deur -- de redenering, het bewijs en de aftekening staan een keer, in ./mutatiecontracten-effect.js.",
  "geschrevenDoor": "scripts/effectcontracten.js",
- "aantal": 999,
- "zonderWaargenomenDeur": 0,
+ "aantal": 1020,
+ "zonderWaargenomenDeur": 6,
  "routes": [
   {
    "route": "POST /api/aanmeld/start",
@@ -48,6 +48,11 @@
   {
    "route": "POST /api/ai/status",
    "mutatieId": "ai.status",
+   "toegang": "AUTHENTICATED"
+  },
+  {
+   "route": "POST /api/appstore/berichten",
+   "mutatieId": "appstore.berichten",
    "toegang": "AUTHENTICATED"
   },
   {
@@ -188,6 +193,11 @@
    "toegang": "AUTHENTICATED"
   },
   {
+   "route": "POST /api/bank/advies",
+   "mutatieId": "bank.advies",
+   "toegang": "AUTHENTICATED"
+  },
+  {
    "route": "POST /api/bank/afschrift",
    "mutatieId": "bank.afschrift",
    "toegang": "AUTHENTICATED"
@@ -230,6 +240,11 @@
   {
    "route": "POST /api/bank/vastelasten",
    "mutatieId": "bank.vastelasten",
+   "toegang": "AUTHENTICATED"
+  },
+  {
+   "route": "POST /api/bank/veeg",
+   "mutatieId": "bank.veeg",
    "toegang": "AUTHENTICATED"
   },
   {
@@ -576,6 +591,11 @@
    "toegang": "AUTHENTICATED"
   },
   {
+   "route": "POST /api/command/alarm",
+   "mutatieId": "command.alarm",
+   "toegang": "AUTHENTICATED"
+  },
+  {
    "route": "POST /api/command/apipoort",
    "mutatieId": "command.apipoort",
    "toegang": "AUTHENTICATED"
@@ -598,6 +618,11 @@
   {
    "route": "POST /api/command/canary",
    "mutatieId": "command.canary",
+   "toegang": "AUTHENTICATED"
+  },
+  {
+   "route": "POST /api/command/gezondheid",
+   "mutatieId": "command.gezondheid",
    "toegang": "AUTHENTICATED"
   },
   {
@@ -676,6 +701,11 @@
    "toegang": "AUTHENTICATED"
   },
   {
+   "route": "POST /api/command/start",
+   "mutatieId": "command.start",
+   "toegang": "AUTHENTICATED"
+  },
+  {
    "route": "POST /api/command/tijdlijn/rondom",
    "mutatieId": "command.tijdlijn.rondom",
    "toegang": "AUTHENTICATED"
@@ -683,6 +713,11 @@
   {
    "route": "POST /api/command/uitrol",
    "mutatieId": "command.uitrol",
+   "toegang": "AUTHENTICATED"
+  },
+  {
+   "route": "POST /api/command/vloot",
+   "mutatieId": "command.vloot",
    "toegang": "AUTHENTICATED"
   },
   {
@@ -887,8 +922,7 @@
   {
    "route": "POST /api/foundation/registratie/catalogus",
    "mutatieId": "foundation.registratie.catalogus",
-   "toegang": "PUBLIC",
-   "waarom": "de eisen per registratiesoort en de actieve steden: een aanvrager leest ze vóór hij een account heeft, anders doen de keuzes op registreren.html niets (besluit eigenaar 23-09-2026, met rem per ip)"
+   "toegang": "AUTHENTICATED"
   },
   {
    "route": "POST /api/foundation/school/bezoeker/lijst",
@@ -941,6 +975,12 @@
   {
    "route": "POST /api/foundation/school/hr/overzicht",
    "mutatieId": "foundation.school.hr.overzicht",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "schoolCode"
+  },
+  {
+   "route": "POST /api/foundation/school/journaal",
+   "mutatieId": "foundation.school.journaal",
    "toegang": "OBJECT_SCOPED",
    "objectVeld": "schoolCode"
   },
@@ -1317,6 +1357,12 @@
    "waarom": "de spelregels van het lab: cyclus, methoden en bewijsgraden horen juist openbaar te zijn"
   },
   {
+   "route": "POST /api/lab2/bewoner/labs",
+   "mutatieId": "lab2.bewoner.labs",
+   "toegang": "PUBLIC",
+   "waarom": "welke Living Labs er zijn; zonder budget, tekenaars en partners"
+  },
+  {
    "route": "POST /api/lab2/kader",
    "mutatieId": "lab2.kader",
    "toegang": "AUTHENTICATED"
@@ -1355,7 +1401,7 @@
    "route": "POST /api/les/apps",
    "mutatieId": "les.apps",
    "toegang": "PUBLIC",
-   "waarom": "idem"
+   "waarom": "de lesmaker werkt op een meegestuurd profiel"
   },
   {
    "route": "POST /api/leven/beeindigd",
@@ -1993,6 +2039,11 @@
    "toegang": "AUTHENTICATED"
   },
   {
+   "route": "POST /api/member/spel/klasgenoten",
+   "mutatieId": "member.spel.klasgenoten",
+   "toegang": "AUTHENTICATED"
+  },
+  {
    "route": "POST /api/member/spel/mijn",
    "mutatieId": "member.spel.mijn",
    "toegang": "AUTHENTICATED"
@@ -2275,11 +2326,6 @@
    "toegang": "AUTHENTICATED"
   },
   {
-   "route": "POST /api/office/asset/fees",
-   "mutatieId": "office.asset.fees",
-   "toegang": "AUTHENTICATED"
-  },
-  {
    "route": "POST /api/office/asset/overzicht",
    "mutatieId": "office.asset.overzicht",
    "toegang": "AUTHENTICATED"
@@ -2335,6 +2381,11 @@
    "toegang": "AUTHENTICATED"
   },
   {
+   "route": "POST /api/office/bank/opdrachten/ronde",
+   "mutatieId": "office.bank.opdrachten.ronde",
+   "toegang": "AUTHENTICATED"
+  },
+  {
    "route": "POST /api/office/bank/regels/geschiedenis",
    "mutatieId": "office.bank.regels.geschiedenis",
    "toegang": "AUTHENTICATED"
@@ -2372,6 +2423,21 @@
   {
    "route": "POST /api/office/boardroom/magnaat/leren",
    "mutatieId": "office.boardroom.magnaat.leren",
+   "toegang": "AUTHENTICATED"
+  },
+  {
+   "route": "POST /api/office/boardroom/toegang",
+   "mutatieId": "office.boardroom.toegang",
+   "toegang": "AUTHENTICATED"
+  },
+  {
+   "route": "POST /api/office/boardroom/toegang/geef",
+   "mutatieId": "office.boardroom.toegang.geef",
+   "toegang": "AUTHENTICATED"
+  },
+  {
+   "route": "POST /api/office/boardroom/toegang/weg",
+   "mutatieId": "office.boardroom.toegang.weg",
    "toegang": "AUTHENTICATED"
   },
   {
@@ -2930,6 +2996,16 @@
    "toegang": "AUTHENTICATED"
   },
   {
+   "route": "POST /api/office/web/overzicht",
+   "mutatieId": "office.web.overzicht",
+   "toegang": "AUTHENTICATED"
+  },
+  {
+   "route": "POST /api/office/weefsel",
+   "mutatieId": "office.weefsel",
+   "toegang": "AUTHENTICATED"
+  },
+  {
    "route": "POST /api/office/weefsel/aandacht",
    "mutatieId": "office.weefsel.aandacht",
    "toegang": "AUTHENTICATED"
@@ -2977,6 +3053,11 @@
   {
    "route": "POST /api/office/weefsel/jaarbeeld",
    "mutatieId": "office.weefsel.jaarbeeld",
+   "toegang": "AUTHENTICATED"
+  },
+  {
+   "route": "POST /api/office/weefsel/kaart",
+   "mutatieId": "office.weefsel.kaart",
    "toegang": "AUTHENTICATED"
   },
   {
@@ -3047,6 +3128,11 @@
   {
    "route": "POST /api/office/weefsel/reeks",
    "mutatieId": "office.weefsel.reeks",
+   "toegang": "AUTHENTICATED"
+  },
+  {
+   "route": "POST /api/office/weefsel/relaties",
+   "mutatieId": "office.weefsel.relaties",
    "toegang": "AUTHENTICATED"
   },
   {
@@ -3319,6 +3405,11 @@
   {
    "route": "POST /api/podium/mijn",
    "mutatieId": "podium.mijn",
+   "toegang": "AUTHENTICATED"
+  },
+  {
+   "route": "POST /api/podium/weg",
+   "mutatieId": "podium.weg",
    "toegang": "AUTHENTICATED"
   },
   {
@@ -4165,6 +4256,11 @@
    "toegang": "AUTHENTICATED"
   },
   {
+   "route": "POST /api/supplier/lucht/pass",
+   "mutatieId": "supplier.lucht.pass",
+   "toegang": "AUTHENTICATED"
+  },
+  {
    "route": "POST /api/supplier/magnaat/studio",
    "mutatieId": "supplier.magnaat.studio",
    "toegang": "AUTHENTICATED"
@@ -4661,6 +4757,11 @@
    "toegang": "AUTHENTICATED"
   },
   {
+   "route": "POST /api/techniek/bewaren/veeg",
+   "mutatieId": "techniek.bewaren.veeg",
+   "toegang": "AUTHENTICATED"
+  },
+  {
    "route": "POST /api/techniek/papieren",
    "mutatieId": "techniek.papieren",
    "toegang": "AUTHENTICATED"
@@ -5031,6 +5132,12 @@
   {
    "route": "POST /api/werkplek/bureaus",
    "mutatieId": "werkplek.bureaus",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "bedrijf"
+  },
+  {
+   "route": "POST /api/werkplek/kantoorpakket/mijn",
+   "mutatieId": "werkplek.kantoorpakket.mijn",
    "toegang": "OBJECT_SCOPED",
    "objectVeld": "bedrijf"
   },

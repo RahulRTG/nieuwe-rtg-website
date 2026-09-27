@@ -51,7 +51,7 @@ module.exports = (kern) => function ambtenaar(s, q, req) {
      De mens die bevestigt hoort te lezen waarom dit zijn beslissing is en niet
      die van de machine -- een tik op een ingevuld formulier is geen besluit. */
   const A4 = (reply, af2) => af2 ? reply + ' Dit is een afwijzing (' +
-    ({ reden: '' }).reden + '). Lees het dossier voor u bevestigt.' : reply;
+    magAutomatisch(AANVRAAG_BESLUIT).reden + '). Lees het dossier voor u bevestigt.' : reply;
   // let op: Nederlandse scheidbare werkwoorden ("ken … toe", "wijs … af")
   const goed = /(ken\b.*?\btoe|toeken|toekennen|keur\s+goed|goedkeur|verleen|honoreer|gegrond|toewijs|toewijzen|akkoord)/i.test(q);
   const af = /(wijs\b.*?\baf|afwijz|weiger|afkeur|ongegrond|afgewezen|afgekeurd)/i.test(q);
@@ -71,7 +71,7 @@ module.exports = (kern) => function ambtenaar(s, q, req) {
        Een besluit over de aanvraag van een mens staat op niveau 4; het antwoord
        komt uit ainiveau.js zelf, zodat er hier geen tweede versie van die regel
        ontstaat. */
-    const oordeel = ({ reden: '' });
+    const oordeel = magAutomatisch(AANVRAAG_BESLUIT);
     const zelfKiezen = (naam) => R('Ik kies geen ' + naam + ' voor u uit: dit is een besluit over de ' +
       'aanvraag van een mens (' + oordeel.reden + '). Noem de referentie, bijvoorbeeld RTG-SB-1234, ' +
       'dan zet ik het exacte voorstel klaar.', false);

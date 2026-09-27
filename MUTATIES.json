@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T16:04:48.004Z",
-    "commit": "9353ea88",
+    "op": "2026-09-27T16:49:13.289Z",
+    "commit": "a268a6fa",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -2755,6 +2755,13 @@
       "gezakt": 1,
       "geprobeerd": 2
     },
+    "eigen-bedekking.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "overleefd"
+    },
     "eigen-website.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2865,6 +2872,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "scherp": "gezakt"
+    },
+    "escape-lagen.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "eten-uitgaan-voorzijde.test.js": {

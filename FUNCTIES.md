@@ -227,7 +227,7 @@ ook blokkeert.
   _voor: rtg, lifestyle, business_
 - **Ontdekken (leren, doen, doorgeven)** (`connect`) — Een ontdeklijst die wordt samengesteld uit lagen die RTG al heeft: leerstof en wat er in de buurt gebeurt. Bezit zelf geen inhoud. Er wordt niets gerangschikt en er staat geen cijfer op iets of iemand; elke plek zegt welke motor hem koos en waarom. Wat u hebt gezien, begrepen, geoefend, gemaakt of doorgegeven blijft als lijst staan -- nooit als niveau, en nooit vergeleken met iemand anders. Uitzetten haalt uw leerdossier niet weg; het sluit alleen de ingang.  
   _voor: rtg, lifestyle, business, foundation_
-- **RTG Academy (leren, bewijzen, certificeren)** (`leerhuis`) — Het leerhuis: van rol en officiele kennis via oefenen, simulatie, werk onder toezicht en een onafhankelijke beoordeling naar een certificaat, en terug via verbetervoorstellen uit de praktijk. Staat uit tot de eigenaar de open besluiten in ACADEMY.md par. 5 heeft genomen. Een certificaat verleent geen bevoegdheid; het maakt iemand hoogstens geschikt volgens een beleid dat twee mensen hebben vastgesteld.  
+- **RTG Academy (leren, bewijzen, certificeren)** (`leerhuis`) — Het leerhuis: van rol en officiele kennis via oefenen, simulatie, werk onder toezicht en een onafhankelijke beoordeling naar een certificaat, en terug via verbetervoorstellen uit de praktijk. Staat uit tot de besluiten in ACADEMY.md par. 5 zijn uitgevoerd. Een certificaat verleent geen bevoegdheid; het maakt iemand hoogstens geschikt volgens een beleid dat twee mensen hebben vastgesteld.  
   _voor: rtg, lifestyle, business_
 
 ### Partners (leveranciers) — 11

@@ -1139,6 +1139,22 @@ verantwoordelijkheidsgraaf hoort een PROJECTIE te zijn in de vorm van
 `kern/levensgraaf/graaf.js` — er komt geen `humans`-tabel, dezelfde grens als
 HDI.md par. 5.1. Par. 13 is de eerlijke stand: van de tien wetten hebben er zes
 vandaag geen handhaver.
+**`PERSONEEL.md` is wat die mens ERVAART** — niet een HR-lus maar een
+belevingslus: *RTG behandelt iedere medewerker alsof zijn werkdag speciaal voor
+hem is voorbereid, ook degene die de kantine draait.* Lees die vóór je een
+personeelsscherm, een ochtendkaart of een aanbod van Fluister bouwt. De toets:
+de kaart van de kantine en die van de eigenaar zijn HETZELFDE onderdeel, en
+**status ≠ aandacht** (niemand ziet meer omdat hij hoger staat; stilte is
+volgorde en nooit weglating). De meting die de volgorde stuurt: het personeel van
+een ZAAK heeft het meeste al (Team Room, `/api/staff/*`: klok, verlof,
+ziekmelden zonder reden-veld, Fluister voor de vloer met een geheugen dat de
+werkgever nooit ziet), terwijl RTG's eigen kantoor er niets van heeft -- dus er
+komt geen tweede personeelsportaal maar **RTG wordt de eerste klant van zijn
+eigen WorkOS** (besluit B1). "Staff Concierge", "Passport" en "Mijn RTG" zijn
+bezet; de concierge bestaat al en heet Fluister, het paspoort is een lezing van
+`kern/carriereledger/`. En geen score op een mens, geen "waarschijnlijk" zonder
+meting, en alles wat een tweede persoon bereikt (een ruil, ook voor een
+verjaardag) bevestigt een mens.
 **`MUTATIECONTRACT.md` is de laag ernaast** — niet wie iets mag (dat is
 CONTROLPLANE.md) maar wat een TWEEDE aanroep doet, en hoe hard dit huis dat weet.
 Lees die vóór je een schrijfroute toevoegt of aan idempotentie werkt. De kern in

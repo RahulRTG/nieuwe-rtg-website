@@ -88,6 +88,10 @@ const EIGENAAR = {
     waarom: 'Handmatig geschreven richtingsdocument (RTFoundation Roles & Governance 2.0); de bronverwijzingen erin zijn met de hand nagelopen, er is geen generator die het schrijft.' },
   'BEWIJSLUS.md': { soort: 'BRON',
     waarom: 'Handmatig geschreven richtingsdocument (de terugweg van productie naar bewijs); de namen en bronverwijzingen erin zijn met de hand gemeten, er is geen generator die het schrijft.' },
+  /* De nulmeting van de universele bodem (SAMENLEVING.md par. 11). De meting is
+     afgeleid; de indeling van functies in werkwoorden is een VERKLARING in
+     scripts/lib/onvervreemdbaar-verklaring.js en nog door geen mens afgetekend. */
+  'ONVERVREEMDBAAR.json': { schrijver: 'scripts/onvervreemdbaar.js' },
   'SAMENLEVING.md': { soort: 'BRON',
     waarom: 'Handmatig geschreven grondwet (de universele bodem en SAM-01 t/m 07); de meetgetallen erin komen uit ONVERVREEMDBAAR.json en zijn met de hand overgenomen, er is geen generator die het schrijft.' },
   'LANGUAGE-AUDIT.md': { soort: 'BRON',

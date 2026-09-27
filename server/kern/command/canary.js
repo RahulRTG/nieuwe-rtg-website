@@ -73,6 +73,7 @@ function maakCanary({ opslag, save, meting, journaal, functies }) {
   function start(id, deel, opties) {
     const f = OP_ID[String(id)];
     if (!f) return { error: 'Onbekende functie: ' + id, status: 404 };
+    if (f.alleenGlobaal) return { error: 'Deze functie gaat alleen voor iedereen tegelijk aan of uit; een canary kiest wie er wel en niet bij kan.', status: 409 };
     const o = opties || {};
     const d = Math.max(0, Math.min(Number(deel == null ? STANDAARD.deel : deel), 1));
     const st = staat();

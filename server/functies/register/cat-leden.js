@@ -8,6 +8,15 @@ module.exports = [
   // ---- Leden (RTG-app) ----
   { id: 'member', categorie: 'Leden (RTG-app)', naam: 'Leden-app (algemeen)', standaard: true, doelgroepen: LEDEN_GAST,
     uitleg: 'Alle ledenfuncties in de RTG-app. Zet je dit uit, dan valt de hele ledenkant stil (behalve wat hieronder apart aan staat).', paden: ['/api/member'] },
+  /* DemocratieOS (POLITIEK.md, fase C4). Stond onder `member`, en die kan per
+     persoon, plaats, pas en canary dicht: dan kon het bord een burger gericht
+     het inbrengen van een kwestie ontzeggen. Een noodstop mag alleen UITZETTEN
+     en nooit selecteren wie er nog mag spreken, dus deze functie kent alleen de
+     globale schakelaar. functies/toegang.js negeert elke fijne as voor
+     `alleenGlobaal`, ook een oude stand die er al lag. */
+  { id: 'democratie', categorie: 'Leden (RTG-app)', naam: 'Kwesties inbrengen (DemocratieOS)', standaard: true, doelgroepen: LEDEN_GAST,
+    alleenGlobaal: true,
+    uitleg: 'Een burger brengt een kwestie in en volgt wat ermee gebeurt. Alleen voor iedereen tegelijk aan of uit: nooit per persoon, plaats, pas of canary.', paden: ['/api/member/democratie'] },
   { id: 'member-dm', categorie: 'Leden (RTG-app)', naam: 'Directe berichten (DM)', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Privéberichten tussen leden onderling.', paden: ['/api/member/dm'] },
   { id: 'member-snaps', categorie: 'Leden (RTG-app)', naam: 'Snaps & 24-uurs verhalen', standaard: true, doelgroepen: LEDEN,

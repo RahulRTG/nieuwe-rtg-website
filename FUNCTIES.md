@@ -16,14 +16,14 @@ het?**
 
 | | |
 |---|---|
-| Functieschakelaars (aan/uit per functie) | **221** in 17 categorieën |
+| Functieschakelaars (aan/uit per functie) | **222** in 17 categorieën |
 | Apps in de leden-catalogus | **89** in 8 categorieën |
 | Bedrijfsgenres | **78** in 28 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
 | Kernmodules (`server/kern/**`) | **2336** |
 | App-pagina's (`public/apps/**.html`) | **310** |
-| Testbestanden | **2064** |
+| Testbestanden | **2066** |
 
 ## De vier werelden
 
@@ -54,11 +54,13 @@ ook blokkeert.
 
 ---
 
-# 1. De 221 functieschakelaars
+# 1. De 222 functieschakelaars
 
-### Leden (RTG-app) — 25
+### Leden (RTG-app) — 26
 
 - **Leden-app (algemeen)** (`member`) — Alle ledenfuncties in de RTG-app. Zet je dit uit, dan valt de hele ledenkant stil (behalve wat hieronder apart aan staat).  
+  _voor: rtg, lifestyle, business, gast_
+- **Kwesties inbrengen (DemocratieOS)** (`democratie`) — Een burger brengt een kwestie in en volgt wat ermee gebeurt. Alleen voor iedereen tegelijk aan of uit: nooit per persoon, plaats, pas of canary.  
   _voor: rtg, lifestyle, business, gast_
 - **Directe berichten (DM)** (`member-dm`) — Privéberichten tussen leden onderling.  
   _voor: rtg, lifestyle, business_

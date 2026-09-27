@@ -184,7 +184,7 @@ test('12. de bewijsstand: bewezen noemt een toets die bestaat, onbewezen heeft e
   const path = require('path');
   const { BEWIJSSTAND } = require('../server/kern/democratie/bewijsstand');
   const codes = BEWIJSSTAND.map(b => b.code);
-  for (const c of ['NIEMAND_KWIJT', 'SQLITE_CRASH_CONSISTENCY', 'POSTGRES_DURABILITY', 'INBRENG_IDEMPOTENT', 'PSEUDONIMITEIT']) {
+  for (const c of ['NIEMAND_KWIJT', 'SQLITE_CRASH_CONSISTENCY', 'POSTGRES_DURABILITY', 'INBRENG_IDEMPOTENT', 'PSEUDONIEM_SPOOR', 'ZIJKANALEN']) {
     assert.ok(codes.includes(c), c + ' hoort op de lijst te staan, ook als hij onbewezen is');
   }
   for (const b of BEWIJSSTAND) {

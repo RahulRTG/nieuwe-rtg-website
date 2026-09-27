@@ -37,11 +37,31 @@ const BEWIJSSTAND = [
       'dezelfde vastlegging als de kwestie, met een afdruk van het verzoek (409 bij hetzelfde sleutel en een ander ' +
       'onderwerp); daarna de verliesproef met een herhaling na elke dood. De bestaande duplicaatlagen staan in het ' +
       'geheugen en overleven een herstart niet' },
-  { code: 'PSEUDONIMITEIT', stand: 'onbewezen',
-    wat: 'een inbrenger is niet via andere gegevens tot een mens terug te voeren',
-    sluit: 'fase C: de burgerpaden pseudoniem in het handelingsspoor en apiSpoor (besluit van 25 september 2026), ' +
-      'dan een doorzoeking van de hele database op een sleutel en een kwestie samen, en de koppelaanval via alles wat ' +
-      'het kantoor kan lezen. Het tijdstip van de wek is nog een zijkanaal' }
+  /* Fase C (aanvalsfase). Elke bewezen bewering is met een mutatie aan het
+     zakken gezien; de grens zegt wat de toets NIET dekt. */
+  { code: 'PARTIJNEUTRAAL', stand: 'bewezen',
+    wat: 'vier actoren (geen partij, Noord, Midden, Zuid) met hetzelfde scenario eindigen in dezelfde toestand',
+    toets: 'test/democratie-aanval.test.js',
+    grens: 'fase C kent geen partijregister: de partij staat alleen in wat de burger zelf aanlevert. Een register in een latere fase vraagt deze proef opnieuw' },
+  { code: 'MACHTSNEUTRAAL', stand: 'bewezen',
+    wat: 'eigenaar, kantoor, gedeelde code, zaak en bord krijgen geen voordeel; wie inbracht beslist niet, en een ingetrokken kwestie heropent het kantoor niet',
+    toets: 'test/democratie-aanval.test.js',
+    grens: 'een toets beschermt tegen vergissingen en niet tegen de eigenaar die de code verandert: die bescherming zit in statuten, review en een extern anker (POLITIEK.md par. 12)' },
+  { code: 'ALLEEN_GLOBAAL', stand: 'bewezen',
+    wat: 'het bord kan democratie alleen voor iedereen uitzetten, nooit per persoon, plaats, land, pas, genre of canary',
+    toets: 'test/democratie-grondwet.test.js',
+    grens: 'de globale noodstop bestaat en mag bestaan: hij zet uit voor iedereen, ook voor de eigenaar' },
+  { code: 'PSEUDONIEM_SPOOR', stand: 'bewezen',
+    wat: 'het handelingsspoor en het API-spoor dragen bij een burgerpad geen sleutel, geen afdruk en alleen de dag; de zaakdoos-kloon draagt geen DemocratieOS; op schijf staat de sleutel nergens naast een kwestie behalve in de koppeling',
+    toets: 'test/democratie-aanval.test.js',
+    grens: 'de bezem leest de JSON-opslag; SQLite en PostgreSQL bewaren dezelfde inhoud in een ander doosje, en backups en snapshots zijn een kopie van de opslag en dragen de koppeling dus ook' },
+  { code: 'WEK_EERLIJK', stand: 'bewezen',
+    wat: 'een wek die de rust of de voorkeur van het lid tegenhield, blijft klaargezet en wordt niet als gewekt geboekt',
+    toets: 'test/democratie-grondwet.test.js',
+    grens: 'herbezorgen is een kantoorhandeling; er is geen automatische tweede poging na de rust' },
+  { code: 'ZIJKANALEN', stand: 'onbewezen',
+    wat: 'een inbrenger is ook via tijd en volgorde niet tot een mens terug te voeren',
+    sluit: 'drie zijkanalen staan open en zijn niet gemeten: de VOLGORDE van regels in een keten (een pseudonieme regel staat tussen regels op sleutel van hetzelfde moment), het tijdstip van de wek naast een eindstand, en `laatst` in de kostenmeter per lid. Sluiten vraagt een meting van hoe goed een kantoorlezer ze kan koppelen, niet een aanname' }
 ];
 
 module.exports = { BEWIJSSTAND };

@@ -29,9 +29,16 @@ module.exports = (kern) => {
 
   /* De Zaakdoos: een verse kloon van de data voor het kastje in de zaak.
      De doos zelf meldt zijn status onbeschermd op het eigen net. */
+  const NIET_IN_KLOON = ['democratieKwesties', 'democratieJournaal', 'democratieInbrengers'];
   app.get('/api/doos/kloon', (req, res) => {
     if (!doosSleutelOk(req, res)) return;
-    res.json({ data: db.data });
+    /* Geen DemocratieOS in de kloon (POLITIEK.md fase C4): een zaakdoos heeft er
+       niets aan, en `democratieInbrengers` is de koppeling van kwestie naar mens.
+       Een kopie van de hele opslag naar een kastje in een zaak is de ruimste
+       omweg om die koppeling heen die er was. De rest blijft ongemoeid. */
+    const data = Object.assign({}, db.data);
+    for (const tak of NIET_IN_KLOON) delete data[tak];
+    res.json({ data });
   });
   app.get('/api/doos/status', (req, res) => res.json(zaakdoos.status()));
   /* Het meetstation van de doos-vloot: dozen die met instemming van de partner

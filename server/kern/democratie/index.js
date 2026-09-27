@@ -58,6 +58,15 @@ function maakDemocratie({ db, save, bijeen, inBundel, crypto, meldLid, codenaamV
 
   const ontvangersVan = (k) => [k.inbrenger].concat(k.volgers || []);
 
+  /* Wie een kwestie inbracht of volgt, beslist er niet over (fase C, W2). De
+     kantoorrol en het burgerschap kunnen bij een mens samenvallen -- ook bij de
+     eigenaar -- en dan zou hij zijn eigen kwestie kunnen sluiten of heropenen.
+     De vergelijking gebeurt hier, want alleen ./koppeling.js weet welke mens
+     achter een inbrengersnummer zit; niets van die koppeling gaat mee in het
+     antwoord. */
+  const betrokken = (k, sleutel) => !!sleutel && ontvangersVan(k).some(ref => koppeling.sleutelVan(ref) === sleutel);
+  const eigenKwestie = { status: 409, error: 'U bent zelf betrokken bij deze kwestie. Een collega op naam behandelt hem.' };
+
   /* De wek na een vastgelegde eindstand. Mislukt hij, dan blijft de trede
      `klaargezet` staan: verklaard, en herbezorgbaar. */
   async function wek(k) {
@@ -96,6 +105,7 @@ function maakDemocratie({ db, save, bijeen, inBundel, crypto, meldLid, codenaamV
        geen spoor in de opslag na. */
     const door = wie(doorSleutel);
     if (!door) return zonderNaam;
+    if (betrokken(k, doorSleutel)) return eigenKwestie;
     if (!schrijver.loopt(k)) return { status: 409, error: 'Deze ronde is al afgesloten. Heropen de kwestie als er iets nieuws is.' };
     if (!['in-behandeling', 'wacht-op-bevoegde'].includes(naar)) return { status: 400, error: 'Kies in-behandeling of wacht-op-bevoegde.' };
     if (schrijver.huidige(k).stand === naar) return { ok: true, herhaling: true, kwestie: publiek(k, null) };
@@ -110,6 +120,7 @@ function maakDemocratie({ db, save, bijeen, inBundel, crypto, meldLid, codenaamV
       bevoegdheid: schoon(b.bevoegdheid, 120), naar: schoon(b.naar, 120), in: String(b.in || '').toUpperCase() || null };
     const door = wie(doorSleutel);
     if (!door) return zonderNaam;
+    if (betrokken(k, doorSleutel)) return eigenKwestie;
     const fout = schrijver.toetsEindstand(k, g, false);
     if (fout) return fout;
     const doel = g.stand === 'samengevoegd' ? zoek(g.in) : null;
@@ -131,7 +142,12 @@ function maakDemocratie({ db, save, bijeen, inBundel, crypto, meldLid, codenaamV
     const reden = schoon(b.reden, 600);
     const door = wie(doorSleutel);
     if (!door) return zonderNaam;
+    if (betrokken(k, doorSleutel)) return eigenKwestie;
     if (schrijver.loopt(k)) return { status: 409, error: 'Deze kwestie loopt nog; er is niets te heropenen.' };
+    /* W4: intrekken is het besluit van de inbrenger zelf. Het kantoor draait
+       dat niet terug; wil hij verder, dan brengt hij een nieuwe kwestie in. */
+    const e = schrijver.huidige(k).eindstand;
+    if (e && e.stand === 'ingetrokken') return { status: 409, error: 'De inbrenger heeft deze kwestie zelf ingetrokken. Het kantoor heropent hem niet; de inbrenger kan een nieuwe kwestie inbrengen.' };
     if (reden.length < 15) return { status: 400, error: 'Zeg in minstens vijftien tekens welk nieuw feit een nieuwe ronde rechtvaardigt.' };
     const mis = await vastleggen(() => { schrijver.heropen(k, door, reden); });
     return mis || { ok: true, kwestie: publiek(k, null) };

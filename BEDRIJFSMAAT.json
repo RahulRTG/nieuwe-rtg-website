@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T16:54:29.157Z",
-    "commit": "8d372bf1",
+    "op": "2026-09-27T19:08:49.689Z",
+    "commit": "600c7e25",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bedrijfsmaat.js",
@@ -3197,7 +3197,7 @@
           "citaten": [
             {
               "bestand": "server/kern/rtgboek.js",
-              "citaat": "marketing: Object.freeze(KANALEN",
+              "citaat": "marketing: Object.freeze((Array.isArray(kanalen)",
               "klopt": true
             }
           ],

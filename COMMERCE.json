@@ -2,14 +2,14 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-09-27",
   "gemeten": {
-    "bestanden": 2422,
-    "domeinenTotaal": 636,
-    "koopbareVormen": 601,
-    "koopbareDomeinen": 120,
+    "bestanden": 2451,
+    "domeinenTotaal": 645,
+    "koopbareVormen": 604,
+    "koopbareDomeinen": 122,
     "envelopDrempel": 8,
     "envelop": 42,
-    "veldenDomeineigen": 781,
-    "veldenNietEnvelop": 1042,
+    "veldenDomeineigen": 779,
+    "veldenNietEnvelop": 1043,
     "gelijkendeVormparen": 17,
     "werkwoordenVolledig": 1,
     "werkwoordenOveral": 0,
@@ -17,9 +17,9 @@
     "wagenVormen": 33,
     "wagenVormenUniek": 30,
     "wagenDomeinen": 22,
-    "optellingen": 119,
-    "optelDomeinen": 59,
-    "optelCenten": 64,
+    "optellingen": 120,
+    "optelDomeinen": 60,
+    "optelCenten": 65,
     "optelEuro": 5,
     "optelGemengd": 0,
     "optelOnbekend": 50
@@ -73,7 +73,7 @@
     "prijs": 39,
     "beschikbaarheid": 54,
     "reserveer": 28,
-    "bevestig": 57,
+    "bevestig": 58,
     "lever": 21,
     "annuleer": 31,
     "retour": 8
@@ -1022,7 +1022,7 @@
       "bewijs": {
         "toon": "beeld",
         "prijs": "som",
-        "beschikbaarheid": "verlopen"
+        "beschikbaarheid": "lopendContract"
       },
       "telt": 3
     },
@@ -1924,6 +1924,23 @@
       "telt": 1
     },
     {
+      "domein": "kern/rtgboek",
+      "heeft": {
+        "toon": false,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": false,
+        "bevestig": true,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "bevestig": "boek"
+      },
+      "telt": 1
+    },
+    {
       "domein": "kern/rtgone-projecten",
       "heeft": {
         "toon": false,
@@ -2044,6 +2061,21 @@
     },
     {
       "domein": "kern/antivirus",
+      "heeft": {
+        "toon": false,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": false,
+        "bevestig": false,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {},
+      "telt": 0
+    },
+    {
+      "domein": "kern/bankpositie",
       "heeft": {
         "toon": false,
         "prijs": false,

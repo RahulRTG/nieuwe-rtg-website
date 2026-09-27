@@ -6,8 +6,8 @@ const AFGETEKEND = {
   door: 'Codex, kern en gerichte Connection Profile Media-proef nagelezen; niet door een mens nagelezen',
   op: '2026-09-22'
 };
-const toegang = { klasse: 'CAPABILITY_GATED', capability: 'connection.profile.photo.manage',
-  uitleg: 'auth stelt het lid vast; de Connection-policy opent beheer alleen voor het eigen Vonk-profiel' };
+const toegang = { klasse: 'AUTHENTICATED', connectionCapability: 'connection.profile.photo.manage',
+  uitleg: 'auth stelt het lid vast; daarna opent de Connection-policy beheer alleen voor het eigen Vonk-profiel' };
 const bewijs = wat => ({ gemeten: 'test/connection-profile-media.test.js bewijst ' + wat, op: '2026-09-22' });
 
 const CONTRACTEN = {

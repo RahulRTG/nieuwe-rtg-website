@@ -5,7 +5,8 @@
 
 const afgetekend={door:'Codex, handler en kernketen nagelezen; adversarial toetsen in connection-final.test.js',op:'2026-09-26'};
 const bewijs={gemeten:'test/connection-final.test.js en de Connection Constitution bewijzen consent, purpose, state, block en projectiegrenzen',op:'2026-09-26'};
-const toegang=capability=>({klasse:'CAPABILITY_GATED',capability,uitleg:'de route opent alleen na Connection-policy en de domeineigen state-/ownershipgrens'});
+const toegang=capability=>({klasse:'AUTHENTICATED',connectionCapability:capability,
+  uitleg:'auth stelt de actor vast; daarna openen Connection-policy en de domeineigen state-/ownershipgrens uitsluitend deze capability'});
 const contract=(id,capability,stand,klasse,nagekeken)=>({mutatieId:id,herkomst:'mens',semantiek:{klasse},toegang:toegang(capability),stand,
   nagekeken,bewijs,afgetekend});
 const lees=(id,cap)=>contract(id,cap,'NOT_APPLICABLE','idempotent','Deze POST is een projectielezer; dezelfde toestand levert dezelfde toegestane projectie en roept geen save aan.');

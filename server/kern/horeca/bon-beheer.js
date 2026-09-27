@@ -12,7 +12,7 @@
 'use strict';
 
 module.exports = ({ transactie, zoekIn, vanId, geldig, mutatie, t }) => {
-  const { bearer, afdruk, sleutel, nieuweToegang, naarBuiten, nu } = t;
+  const { bearer, afdruk, sleutel, nieuweBonToegang, naarBuiten, nu } = t;
 
   /* Kijken schept niets: de zaak ziet saldo en de laatste mutaties, nooit de code. */
   function lees({ zaak, code }) {
@@ -86,7 +86,7 @@ module.exports = ({ transactie, zoekIn, vanId, geldig, mutatie, t }) => {
       bearer.intrekken(oud, door, 'geroteerd');
       b.historie = (b.historie || []).concat([{ code_hash: oud.code_hash, ingetrokken_at: oud.ingetrokken_at,
         rotatie: oud.rotatie }]).slice(-12);
-      const n = nieuweToegang(oud.issuer, b);
+      const n = nieuweBonToegang(oud.issuer, b);
       n.toegang.expires_at = oud.expires_at;
       n.toegang.rotatie = (Number(oud.rotatie) || 1) + 1;
       n.toegang.gebruik = oud.gebruik;

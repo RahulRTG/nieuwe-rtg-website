@@ -30,7 +30,7 @@ const COL = 'horecaBonnen';
 module.exports = ({ db, bewerkCollectie, crypto, nu }) => {
   if (typeof bewerkCollectie !== 'function') throw new Error('De horecabon vereist een collectietransactie.');
   const t = require('./bon-toegang')(nu ? { crypto, nu } : { crypto });
-  const { bearer, codeHash, afdruk, sleutel, nieuweToegang, naarBuiten, DOEL, SCOPE } = t;
+  const { bearer, codeHash, afdruk, sleutel, nieuweBonToegang, naarBuiten, DOEL, SCOPE } = t;
   nu = t.nu;
   const heel = v => Math.round(Math.max(0, Math.min(10000000, Number(v) || 0)));
   // een kaart op bon-ID; `werk` krijgt de rijen als lijst en zet met bron.zet(bon)
@@ -98,7 +98,7 @@ module.exports = ({ db, bewerkCollectie, crypto, nu }) => {
   const intern = { transactie, zoekIn, vanId, geldig, mutatie, t, heel, crypto };
   const beheer = require('./bon-beheer')(intern);
   const { maak, band } = require('./bon-maak')(intern);
-  const migratie = require('./bon-migratie')({ db, bewerkCollectie, transactie, t, crypto });
+  const migratie = require('./bon-migratie')({ lees: k => db.data[k], bewerkCollectie, transactie, t, crypto });
   /* Elke ingang zet eerst oude bonnen om: een bon met een kale code mag nooit
      langs een zoeklus komen die alleen hashes kent. */
   const na = fn => async (...a) => { await migratie.zorg(); return fn(...a); };

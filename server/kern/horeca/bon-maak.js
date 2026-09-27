@@ -5,7 +5,7 @@
 'use strict';
 
 module.exports = ({ transactie, geldig, mutatie, t, heel, crypto }) => {
-  const { afdruk, sleutel, nieuweToegang, naarBuiten, nu } = t;
+  const { afdruk, sleutel, nieuweBonToegang, naarBuiten, nu } = t;
 
   /* Een nieuwe bon. `idem` maakt een herhaling tot DEZELFDE bon -- zonder
      code: die is een keer getoond, en wie hem kwijt is laat de zaak roteren. */
@@ -18,7 +18,7 @@ module.exports = ({ transactie, geldig, mutatie, t, heel, crypto }) => {
       const bon = { id: 'HB' + crypto.randomBytes(8).toString('hex'), zaak, soort: soort === 'tegoed' ? 'tegoed' : 'cadeaubon',
         band: null, naam: String(naam || '').slice(0, 60) || null, uitgegeven: heel(centen), saldo: heel(centen),
         at: nu(), door: String(door || '').slice(0, 80), mutaties: [], historie: [], binding: null, maak_idem: idemHash };
-      const g = nieuweToegang('zaak:' + zaak, bon, geldigTot);
+      const g = nieuweBonToegang('zaak:' + zaak, bon, geldigTot);
       bon.toegang = g.toegang;
       bron.zet(bon);
       return { ok: true, eenmalig: true, code: g.code, bon: naarBuiten(bon) };
@@ -48,7 +48,7 @@ module.exports = ({ transactie, geldig, mutatie, t, heel, crypto }) => {
       const bon = { id: 'HB' + crypto.randomBytes(8).toString('hex'), zaak, soort: 'tegoed', band: nummer,
         naam: 'Polsband ' + nummer, uitgegeven: bedrag, saldo: bedrag, at: nu(), door: String(door || '').slice(0, 80),
         mutaties: [], historie: [], binding: null, maak_idem: idemHash };
-      const g = nieuweToegang('zaak:' + zaak, bon);
+      const g = nieuweBonToegang('zaak:' + zaak, bon);
       bon.toegang = g.toegang;
       bron.zet(bon);
       return { ok: true, nieuw: true, eenmalig: true, code: g.code, bon: naarBuiten(bon) };

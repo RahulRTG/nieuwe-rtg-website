@@ -154,6 +154,25 @@
       "soort": "structureel",
       "sleutel": "kernGedeeld",
       "van": 245,
+      "meter": "kernGedeeld 245 -> 246; dbDeuren 529 -> 530",
+      "reden": "De horecabon en de promotiecode van RTG Eten als eigen geldcodes (RELEASEKANDIDAAT.md B11 en B13). kern.horecaBonlaag (kern/horeca/bon.js) wordt door twee domeinen gelezen: de zaak geeft bonnen en polsbanden uit, roteert, trekt in en boekt af (routes/supplier/horeca/bonkaart.js, club.js, betalen.js), de gast koppelt en betaalt (routes/gast/club.js, kern/gast/betalen.js). Dat is de bedoelde koppeling: EEN instantie die weet hoe een bon wordt geclaimd, want twee instanties met elk een eigen claimweg is precies de dubbele afboeking die de collectietransactie voorkomt. kern.etenKorting (kern/eten/kortingscode.js) is dezelfde vorm voor de promotiecode: de zaak stelt hem in, het lid wisselt hem in. dbDeuren +1 omdat kern/horeca/bon.js en kern/eten/kortingscode.js elk hun eigen collectie lezen (horecaBonnen, etenKortingGebruik), zoals kern/cadeaukaart.js giftcards; de migratie krijgt haar lezer van bon.js mee in plaats van zelf een deur te openen.",
+      "waarheen": "GRENZEN.json (supplier en gast dragen horecaBonlaag en etenKorting) en test/horecabon-credential.test.js, test/horecabon-routes.test.js, test/eten-kortingscode.test.js, test/eten-kortingscode-routes.test.js"
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "zelfpoortendeToetsen",
+      "van": 35,
+      "vervalt": "2026-12-27",
+      "meter": "zelfpoortendeToetsen 35 -> 37; toetsenNietGemeten 635 -> 637",
+      "reden": "Twee nieuwe pg-proeven. test/horecabon-credential.pg.test.js: twee echte PostgreSQL-instances racen op hetzelfde bonsaldo, op deelbedragen, op dezelfde kassasleutel, op het koppelen van een polsband aan twee gastsessies, op rotatie tegen afboeken en op de migratie van een oude 32-bitbon. test/eten-kortingscode.pg.test.js: twee leden claimen tegelijk het laatste gebruik van een promotiecode, een lid probeert twee rekeningen tegelijk, en dezelfde rekening op twee instances telt een keer. Dat kan niet eerlijk zonder database; zonder DATABASE_URL en REDIS_URL slaan ze zichzelf over, dus de mutatiemotor meet ze niet. Ze staan in scripts/lib/pg-toetslijst.js (verplicht in de pg-scherf en het releasebewijs) en als uitzondering onder zelfpoortende-toets. Lokaal tegen echte PostgreSQL en Redis groen; de promotiecodeproef zakte eerst (2 in plaats van 1) en vond zo dat pg/collectietransactie.js een collectie die de instance nooit zag als {} las en de rij van de andere instance wiste -- gerepareerd, en met die reparatie teruggedraaid zakt hij weer. De vier gewone nieuwe toetsen zijn wel door de motor gemeten en zakken.",
+      "waarheen": "Dezelfde aflossing als de andere pg-toetsen: de standaardomgeving levert PostgreSQL, en het nul-skipbewijs hangt aan de releasecommit."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 245,
       "meter": "kernGedeeld 245 -> 246; kernBreedte 1603 -> 1604",
       "reden": "De sleutel per Zaakdoos als gemigreerde credential (RELEASEKANDIDAAT.md B12). De ene naam kern.doosSleutels (kern/zaakdoos/sleutels.js, gemonteerd in opzet/kernlaag6b.js met de collectietransactie) wordt door drie domeinen gelezen: de vloot keurt er de doossleutel mee (routes/doos.js), het kantoor geeft en trekt in (routes/kantoren/doossleutels.js) en de manager van de zaak doet dat voor zijn eigen dozen (routes/supplier/doossleutels.js). Een instantie is met opzet: drie instanties zouden elk een eigen greep op dezelfde collectie hebben, en de routes kregen bewerkCollectie niet eens (kern draagt hem niet). kantoren leest daarnaast findSupplier om de zaak van een uitgifte te controleren.",
       "waarheen": "GRENZEN.json (doos, kantoren en supplier dragen doosSleutels; kantoren findSupplier) en test/doossleutels.test.js plus test/zaakdoos-sleutel.pg.test.js"

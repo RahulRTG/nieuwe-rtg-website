@@ -2,7 +2,7 @@
    horeca.bon_en_polsbandsaldo; de levenscyclus staat in ./bon.js). Wat een
    toegang IS, hoe een code wordt genormaliseerd en gehasht, en wat er naar
    buiten mag. Een kale code bestaat alleen in de terugkeerwaarde van
-   nieuweToegang() -- nooit op schijf.
+   nieuweBonToegang() -- nooit op schijf.
 
    TWEE SOORTEN, EEN GRENS PER SOORT:
    - cadeaubon en tegoed: een jaar geldig, hooguit 100 afboekingen (een bon
@@ -37,7 +37,7 @@ module.exports = ({ crypto, nu = () => klok.datum().toISOString() }) => {
 
   /* `vervalt` (JJJJ-MM-DD van de zaak) mag de geldigheid INKORTEN, nooit
      verlengen voorbij de grens van de soort. */
-  function nieuweToegang(issuer, bon, vervalt) {
+  function nieuweBonToegang(issuer, bon, vervalt) {
     const g = grensVan(bon);
     const t = bearer.maak({ prefix: g.prefix, issuer, doel: DOEL, scope: SCOPE,
       onderwerp: { soort: bon.band ? 'polsband' : bon.soort, id: bon.id, zaak: bon.zaak },
@@ -56,7 +56,7 @@ module.exports = ({ crypto, nu = () => klok.datum().toISOString() }) => {
     toegang: bearer.publiek(b.toegang), legacy32: !!b.legacy32,
     mutaties: (b.mutaties || []).slice(-10).reverse().map(m => ({ at: m.at, centen: m.centen, soort: m.soort || null })) });
 
-  return { bearer, kaal, codeHash, weergave, afdruk, sleutel, grensVan, nieuweToegang, naarBuiten, stand, nu,
+  return { bearer, kaal, codeHash, weergave, afdruk, sleutel, grensVan, nieuweBonToegang, naarBuiten, stand, nu,
     DOEL, SCOPE, GRENS };
 };
 

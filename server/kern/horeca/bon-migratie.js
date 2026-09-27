@@ -2,7 +2,7 @@
    32 bits als objectsleutel naar een hash in `horecaBonnen`, zonder dat de
    houder een cent verliest.
 
-   Tot 27 september 2026 stond elke bon als db.data.horeca[zaak].bonnen[CODE],
+   Tot 27 september 2026 stond elke bon als horeca[zaak].bonnen[CODE] in de doos,
    de band verwees ernaar met `bonCode`, en elke betaling met een bon droeg
    `bon: CODE`. Die code is waarde: de houder heeft hem op papier of als QR op
    zijn polsband. Daarom:
@@ -23,14 +23,14 @@
    wijst die niet meer te vinden is. */
 'use strict';
 
-module.exports = ({ db, bewerkCollectie, transactie, t, crypto }) => {
-  const { bearer, codeHash, nieuweToegang, nu } = t;
-  const heeftOud = () => Object.values(db.data.horeca || {}).some(h => h && (
+module.exports = ({ lees, bewerkCollectie, transactie, t, crypto }) => {
+  const { bearer, codeHash, nieuweBonToegang, nu } = t;
+  const heeftOud = () => Object.values(lees('horeca') || {}).some(h => h && (
     (h.bonnen && Object.keys(h.bonnen).length) ||
     Object.values((h.club && h.club.banden) || {}).some(b => b && typeof b.bonCode === 'string')));
 
   function toegangVoor(b, zaak, code) {
-    const t0 = nieuweToegang('zaak:' + zaak, b);
+    const t0 = nieuweBonToegang('zaak:' + zaak, b);
     const oud = /^\d{4}-\d{2}-\d{2}$/.test(String(b._geldigTot || '')) ? Date.parse(b._geldigTot + 'T23:59:59.999Z') : NaN;
     const gebruik = (b.mutaties || []).filter(m => m && m.centen < 0).length;
     return Object.assign(t0.toegang, { code_hash: codeHash(code),
@@ -39,7 +39,7 @@ module.exports = ({ db, bewerkCollectie, transactie, t, crypto }) => {
   }
 
   async function migreer() {
-    const oud = JSON.parse(JSON.stringify(db.data.horeca || {}));
+    const oud = JSON.parse(JSON.stringify(lees('horeca') || {}));
     // 1. elke oude bon als hash in horecaBonnen, een keer
     await transactie(bron => {
       for (const [zaak, h] of Object.entries(oud)) {
@@ -60,7 +60,7 @@ module.exports = ({ db, bewerkCollectie, transactie, t, crypto }) => {
         }
       }
     });
-    const bonnen = Object.values(JSON.parse(JSON.stringify(db.data.horecaBonnen || {})));
+    const bonnen = Object.values(JSON.parse(JSON.stringify(lees('horecaBonnen') || {})));
     const idVan = (zaak, code) => {
       const h = codeHash(code);
       let id = null;

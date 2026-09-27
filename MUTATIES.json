@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T13:56:18.282Z",
-    "commit": "43461f914",
+    "op": "2026-09-27T16:04:48.004Z",
+    "commit": "9353ea88",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -586,6 +586,14 @@
       "operator": "===->!==#8",
       "gezakt": 2,
       "geprobeerd": 50
+    },
+    "appwerkt-schil.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/appwerkt.js",
+      "operator": "-->+#0",
+      "gezakt": 1,
+      "geprobeerd": 7
     },
     "archief.test.js": {
       "soort": "server",

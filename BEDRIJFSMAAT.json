@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T12:45:59.133Z",
-    "commit": "726f24dc",
+    "op": "2026-09-27T12:51:15.438Z",
+    "commit": "874a94de",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bedrijfsmaat.js",
@@ -4781,7 +4781,7 @@
           "citaten": [
             {
               "bestand": "server/kern/bedrijfsmaat/klantwaarde.js",
-              "citaat": "function living",
+              "citaat": "function klantwaardeLiving",
               "klopt": true
             }
           ],
@@ -4865,7 +4865,7 @@
           "citaten": [
             {
               "bestand": "server/kern/bedrijfsmaat/klantwaarde.js",
-              "citaat": "function travel",
+              "citaat": "function klantwaardeTravel",
               "klopt": true
             }
           ],
@@ -4949,7 +4949,7 @@
           "citaten": [
             {
               "bestand": "server/kern/bedrijfsmaat/klantwaarde.js",
-              "citaat": "function work",
+              "citaat": "function klantwaardeWork",
               "klopt": true
             }
           ],
@@ -5033,7 +5033,7 @@
           "citaten": [
             {
               "bestand": "server/kern/bedrijfsmaat/klantwaarde.js",
-              "citaat": "function foundation",
+              "citaat": "function klantwaardeFoundation",
               "klopt": true
             }
           ],

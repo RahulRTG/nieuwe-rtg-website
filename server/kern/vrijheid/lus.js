@@ -21,8 +21,8 @@ const T = 'test/vrijheid.test.js';
 const SCHAKELS = Object.freeze([
   { schakel: 'PERSON', stand: 'DEELS', waar: 'server/kern/vrijheid/dekking.js', bewijs: [T, 'uit dienst telt niet mee'],
     ontbreekt: 'Adapter van kern/concern/employment.js en accounts/staff.js naar het teambeeld; staff draagt vandaag geen verjaardag (MM-DD) en die moet rechtmatig worden vastgelegd.' },
-  { schakel: 'POLICY', stand: 'DEELS', waar: 'server/kern/vrijheid/beleid.js', bewijs: [T, 'een hoger recht wordt nooit verminderd'],
-    ontbreekt: 'De waarden zelf: aantal RTG Days, verjaardag in weekend/feestdag/parttime/schrikkeldag/nachtdienst, drempels. Arbeidsvoorwaardenbesluit plus juridische en loonadministratieve validatie.' },
+  { schakel: 'POLICY', stand: 'DEELS', waar: 'server/kern/vrijheid/rtgbeleid.js', bewijs: [T, 'het besluit van de eigenaar staat, en de rest blijft open'],
+    ontbreekt: 'Besloten (27 september 2026): tien RTG Days, en een verjaardag op een vrije dag schuift naar de vorige werkdag. Nog open: nachtdienst, schrikkeldag en alle drempels. Niets ervan is juridisch en loonadministratief gevalideerd.' },
   { schakel: 'ROSTER', stand: 'DEELS', waar: 'server/kern/vrijheid/jaarplan.js', bewijs: [T, 'onbekende rooster-uitkomst wordt eerst afgestemd'],
     ontbreekt: 'Rooster-adapter (pas/heeft) naar de bestaande roosters: kern/personeel.js, kern/beveiliging/rooster/, kern/festival/dienst.js.' },
   { schakel: 'WORK', stand: 'DEELS', waar: 'server/kern/vrijheid/werkstand.js', bewijs: [T, 'zelf afvinken is geen WORK_COMPLETE'],

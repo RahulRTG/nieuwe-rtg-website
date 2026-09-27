@@ -33,9 +33,9 @@
       '<button class="abtn ghost" id="ziekBtn" style="width:100%;margin-top:0.5rem;">'+(ziekArm ? ''+T('pd.ad.ziek2','Tik nogmaals om de ziekmelding te bevestigen') : ''+T('pd.ad.ziek','Ziek melden'))+'</button>'+
       '<div style="margin-top:0.75rem;font-size:0.64rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+T('pd.ad.verlof','Verlof aanvragen')+'</div>'+
       '<div style="display:flex;gap:0.5rem;margin-top:0.5rem;"><input type="date" id="vlVan" class="vlin" style="flex:1;min-width:0;"><input type="date" id="vlTot" class="vlin" style="flex:1;min-width:0;"></div>'+
-      '<div class="compose" style="padding:0.5rem 0 0;"><input id="vlReden" placeholder="'+T('pd.ad.reden','Reden (mag leeg blijven)')+'"><button id="vlGo">'+T('pd.ad.vraag','Vraag aan')+'</button></div>'+
+      '<div class="compose" style="padding:0.5rem 0 0;"><span style="flex:1;color:var(--soft);">'+T('pd.ad.geenreden','Een reden is niet nodig.')+'</span><button id="vlGo">'+T('pd.ad.vraag','Vraag aan')+'</button></div>'+
       (vl.length ? '<div class="h-mt60">'+vl.map(v =>
-        '<div class="task"><span class="ic">'+(v.soort === 'ziek' ? '' : '')+'</span><div class="t"><b>'+(v.soort === 'ziek' ? T('pd.ad.zm','Ziekmelding')+' '+v.van : v.van+' t/m '+(v.tot || ''))+'</b><span>'+esc(v.reden || '')+'</span></div>'+
+        '<div class="task"><span class="ic">'+(v.soort === 'ziek' ? '' : '')+'</span><div class="t"><b>'+(v.soort === 'ziek' ? T('pd.ad.zm','Ziekmelding')+' '+v.van : v.van+' t/m '+(v.tot || ''))+'</b></div>'+
         '<span style="font-size:0.64rem;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:'+(VST[v.status] || [v.status, 'var(--soft)'])[1]+';">'+(VST[v.status] || [v.status])[0]+'</span></div>').join('')+'</div>' : '')+
       '</div>'+
 

@@ -58,7 +58,7 @@
       const verlofRest = (state.verlof || []).filter(v => v.status !== 'nieuw').slice(0, 8);
       html += '<div class="tkc"><h3>\uD83C\uDF34 '+T('kt.verlof','Verlof & ziek')+(verlofOpen.length ? ' ('+verlofOpen.length+')' : '')+'</h3>'+
         (verlofOpen.length ? verlofOpen.map(v =>
-          '<div class="st-row h-wrap"><span>'+v.name+'<span class="sub">'+v.van+' t/m '+(v.tot||'')+(v.reden?' \u00B7 '+v.reden:'')+'</span></span>'+
+          '<div class="st-row h-wrap"><span>'+v.name+'<span class="sub">'+v.van+' t/m '+(v.tot||'')+'</span></span>'+
           '<span class="acts"><button class="obtn primary" data-kvja="'+v.id+'">'+T('kt.vja','Goedkeuren')+'</button><button class="obtn warn" data-kvnee="'+v.id+'">'+T('kt.vnee','Afwijzen')+'</button></span></div>').join('')
           : '<div class="tkc-who">'+T('kt.geenverlof','Geen open aanvragen. Personeel vraagt verlof aan via de PDA; ziekmeldingen komen hier ook binnen.')+'</div>')+
         (verlofRest.length ? verlofRest.map(v =>

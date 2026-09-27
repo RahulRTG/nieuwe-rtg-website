@@ -881,10 +881,11 @@ bestaat geen functie die de ene van het saldo van de andere afschrijft);
 die alleen de houder zelf afvinkte is UNKNOWN, anders wordt vrijheid een race);
 en **een geweigerd verzoek is een capaciteitsvraag en geen gedragsvraag** --
 blokkeert PAYMENT_L3 steeds de vrijdagmiddag, dan is de uitkomst een tweede
-bevoegde en geen strengere regel. De beleidswaarden (aantal RTG Days, verjaardag
-in het weekend, drempels) staan met opzet OPEN tot er een
-arbeidsvoorwaardenbesluit en een juridische toets zijn; de motor zegt dan
-UNKNOWN of BLOCKED met de reden. `server/kern/vrijheid/lus.js` is de
+bevoegde en geen strengere regel. Wat de eigenaar besloot staat in
+`server/kern/vrijheid/rtgbeleid.js` (27 september 2026: tien RTG Days, en een
+verjaardag op een vrije dag schuift naar de vorige werkdag), nog zonder
+juridische toets; wat niet besloten is (nachtdienst, schrikkeldag, drempels)
+staat met opzet OPEN en de motor zegt dan UNKNOWN of BLOCKED met de reden. `server/kern/vrijheid/lus.js` is de
 PEOPLE_TIME_LOOP_COMPLETENESS_CHECK en staat op BLOCKED: de motor is bewezen op
 een teambeeld, maar de bron van dat teambeeld, de route, het scherm en de
 loonstrook zijn nog niet aangesloten.

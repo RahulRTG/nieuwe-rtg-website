@@ -409,3 +409,25 @@ test('eerder naar huis na overdracht: eerst overdragen, dan pas weg', () => {
   Object.assign(t.verantwoordelijkheden[0], { overgedragenAan: 'c', aanvaard: true });
   assert.ok(m.aanvaardVrijheid(ORG, t, a.id, 'b').ok);
 });
+
+test('het besluit van de eigenaar staat, en de rest blijft open', () => {
+  const { rtgBeleid, STAND } = require('../server/kern/vrijheid/rtgbeleid');
+  const b = rtgBeleid();
+  assert.equal(b.waarde('rtgDag.perJaar').waarde, 10);
+  assert.match(b.waarde('rtgDag.perJaar').bron, /besluit eigenaar RTG, 27 september 2026/);
+  for (const p of ['verjaardag.weekend', 'verjaardag.feestdag', 'verjaardag.geenWerkdag']) assert.equal(b.waarde(p).waarde, 'vorige-werkdag', p);
+  for (const p of ['verjaardag.nachtdienst', 'verjaardag.schrikkeldag', 'vroegVertrek.autoTotMinuten', 'capaciteit.minAantal']) assert.ok(b.waarde(p).open, p + ' is niet besloten');
+  assert.equal(STAND.juridischGevalideerd, false);
+  /* Een wet of cao eronder blijft gelden; het RTG-beleid verdringt geen recht. */
+  const met = rtgBeleid({ LEGAL_BASELINE: { 'rust.minUurTussenDiensten': { waarde: 11, bron: 'ATW' } } });
+  assert.equal(met.waarde('rust.minUurTussenDiensten').waarde, 11);
+  /* Een parttimer die op zijn vrije woensdag jarig is, krijgt zijn vorige werkdag. */
+  const t = team();
+  const d = t.mensen.find(m => m.id === 'd'); d.verjaardag = '10-07';
+  t.diensten = t.diensten.filter(x => !(x.persoon === 'd' && x.datum === '2026-10-07'));
+  const { m } = motor();
+  const vj = m.planVerjaardagen(ORG, t, 2026, { beleid: b }).verjaardagen.find(j => j.persoon === 'd');
+  assert.equal(vj.datum, '2026-10-06');
+  const mijn = m.mijnTijd(ORG, 'b', { beleid: b, rechten: { wettelijk: 160 }, jaar: 2026 });
+  assert.equal(mijn.rtgDagen.over, 10);
+});

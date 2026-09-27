@@ -120,14 +120,14 @@ korte dienst levert dus geen halve RTG Day in.
 - **`vrijgave` is bezet** (`server/config/foundation-vrijgave.js` en de
   productiepoorten). Daarom heet de laag `vrijheid` en houdt de categorie haar
   naam uit de opdracht: FREEDOM_RELEASE.
-- **Twee verlofopslagen.** `/api/staff/leave/request` schrijft in
-  `db.data.verlof` én meldt meteen `vakantie` in de verzuimlaag, **vóór de
-  goedkeuring**. `/api/supplier/leave/decide` werkt daarna de verzuimlaag niet
-  bij. Een afgewezen verzoek staat dus als vakantie in de payrollinvoer. Dat is
-  een bestaand gebrek (P0).
-- **Die route bewaart een reden bij gewoon verlof**, en het HR-scherm toont
-  hem. Dat botst met 2.11: voor gewone persoonlijke tijd is een reden geen
-  vraag (P0).
+- **Twee verlofopslagen.** `/api/staff/leave/request` schreef in
+  `db.data.verlof` én meldde meteen `vakantie` in de verzuimlaag, **vóór de
+  goedkeuring**, en `/api/supplier/leave/decide` werkte de verzuimlaag daarna
+  niet bij. Een afgewezen verzoek stond dus als vakantie in de payrollinvoer.
+  Gerepareerd, zie par. 7. De twee opslagen bestaan nog: dat is een
+  samenvoegvraag voor als deze laag gemount wordt.
+- **Die route bewaarde een reden bij gewoon verlof**, en het HR-scherm toonde
+  hem. Dat botste met 2.11. Gerepareerd, zie par. 7.
 - **Een mens is geen resource** (PLANNING.md grens 1). Er wordt gesorteerd op
   wat iemand toekomt en nooit op geschiktheid. De rotatie kent geen kenmerk van
   de mens behalve hoe vaak en wanneer hij dit soort moment kreeg.
@@ -183,14 +183,24 @@ groen, en daar kwam een toets bij:
 
 ---
 
-## 6. Wat NIET besloten is, en dus niet in de code staat
+## 6. Wat besloten is, en wat niet
 
-Deze waarden staan in `beleid.js` zonder waarde. De motor zegt UNKNOWN of
+**Besloten door de eigenaar op 27 september 2026**, vastgelegd in
+`server/kern/vrijheid/rtgbeleid.js` met die datum als bron:
+
+- **tien RTG Days** per kalenderjaar, bovenop het wettelijke en contractuele
+  verlof;
+- valt een verjaardag op een dag waarop iemand al vrij is, dan is de **vorige
+  werkdag** vrij. Dat geldt voor het weekend, een officiële feestdag en een
+  vaste vrije dag van een parttimer: één regel voor alle drie. De "werkdag" is
+  die van de mens zelf, dus een parttimer krijgt zijn eigen vorige dienst.
+
+Dit beleid geldt voor RTG als werkgever. Een andere organisatie erft het niet.
+
+**Nog niet besloten.** Deze waarden staan in `beleid.js` zonder waarde. De motor zegt UNKNOWN of
 BLOCKED_BY_LAW_OR_POLICY met de reden, en verzint niets:
 
-- **aantal RTG Days per jaar**;
-- **verjaardag** in het weekend, op een feestdag, op een dag dat een parttimer
-  niet werkt, op 29 februari in een gewoon jaar, en welke dienst vrij is als
+- **verjaardag** op 29 februari in een gewoon jaar, en welke dienst vrij is als
   een nachtdienst over middernacht loopt;
 - de **grens voor eerder weg zonder menselijke beoordeling**;
 - het **venster en de grens voor extra dekking**, het maximum openstaande
@@ -217,10 +227,17 @@ valideren:
 
 **P0: eerst, want het is vandaag al fout of het blokkeert alles**
 
-1. De verlofroute boekt geen `vakantie` in de verzuimlaag vóór de
-   goedkeuring, en `leave/decide` werkt de verzuimlaag bij.
-2. Geen reden meer bij gewoon verlof in `/api/staff/leave/request`.
-3. Het arbeidsvoorwaardenbesluit over par. 6, plus de juridische validatie.
+1. ~~De verlofroute boekt geen `vakantie` in de verzuimlaag vóór de
+   goedkeuring, en `leave/decide` werkt de verzuimlaag bij.~~ **Gedaan.**
+   Verlof gaat pas naar de verzuimlaag bij de goedkeuring; ziekte nog steeds
+   meteen. Meldingen die vóór deze reparatie al als vakantie zijn geboekt en
+   daarna zijn afgewezen, staan er nog: die zijn niet automatisch opgeruimd.
+2. ~~Geen reden meer bij gewoon verlof in `/api/staff/leave/request`.~~
+   **Gedaan.** Een reden wordt geweigerd (422) en niet bewaard. Het veld is uit
+   de app en de manager ziet geen reden meer. Oude aanvragen dragen hun reden
+   nog in de opslag.
+3. De rest van het arbeidsvoorwaardenbesluit (par. 6), plus de juridische
+   validatie van wat al besloten is.
 4. De teambeeld-adapter: `employment` + staff + een zelf opgegeven verjaardag
    + een rooster + `vakbewijs`.
 5. De eigen collectie op `db.data` (`server/kern/eigencollectie.js`) en

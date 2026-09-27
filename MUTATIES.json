@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-26T21:08:55.993Z",
-    "commit": "f52f6ec",
-    "boomVuil": false,
-    "boomAnders": 1,
+    "op": "2026-09-27T03:01:45.861Z",
+    "commit": "9fbfb85",
+    "boomVuil": true,
+    "boomAnders": 9,
     "instrument": "scripts/mutatie.js",
     "node": "v24.18.0"
   },
@@ -4414,6 +4414,14 @@
       "gezakt": 11,
       "scherp": "gezakt"
     },
+    "journalistiek-versies.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/journalistiek.js",
+      "operator": "getal+1#0",
+      "gezakt": 3,
+      "geprobeerd": 6
+    },
     "kaart.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -8224,7 +8232,7 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 3,
+      "gezakt": 4,
       "scherp": "gezakt"
     },
     "saloon-projectie.test.js": {

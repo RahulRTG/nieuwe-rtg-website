@@ -3475,6 +3475,12 @@
       "pad": "test/spelprojectie.pg.test.js",
       "vervalt": "2026-10-15",
       "reden": "de spelprojectie-claimrace vereist echte PostgreSQL; scripts/lib/pg-toetslijst.js laat CI hem verplicht uitvoeren en lokaal zonder die dienst wordt geen zwakker resultaat als equivalent bewijs geaccepteerd"
+    },
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/accounts-requestcommit.pg.test.js",
+      "vervalt": "2026-12-27",
+      "reden": "de accountwerkkopie als deelnemer aan de PostgreSQL-requestcommit vereist echte PostgreSQL (unieke botsing, verouderde basis en een gedode backend bestaan alleen daar); scripts/lib/pg-toetslijst.js laat CI hem verplicht zonder skip draaien, en een lokale skip is eerlijker dan dezelfde invariant op een nagemaakte client te veinzen -- dat deel dekt test/accounts-transactie.test.js al"
     }
   ]
 }

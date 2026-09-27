@@ -1,27 +1,27 @@
 {
  "stempel": {
-  "op": "2026-09-27T19:55:00.758Z",
-  "commit": "77ea906a",
+  "op": "2026-09-27T14:28:45.827Z",
+  "commit": "dcf2a135b",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 1,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5028,
-  "geclassificeerd": 5028,
+  "totaal": 5033,
+  "geclassificeerd": 5033,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3190,
    "NOT_APPLICABLE": 1211,
-   "PROTECTED": 484,
-   "INTENTIONALLY_NON_IDEMPOTENT": 143
+   "PROTECTED": 488,
+   "INTENTIONALLY_NON_IDEMPOTENT": 144
   },
-  "vastgesteldDoorMens": 1887,
+  "vastgesteldDoorMens": 1892,
   "afgeleidDoorScript": 3141,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4137,
+   "AUTHENTICATED": 4142,
    "PUBLIC": 124,
    "OBJECT_SCOPED": 746,
    "(niet af te leiden -- vraagt een verklaring)": 5,
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 136,
    "kale ronde: onbeschermd": 123,
    "kale ronde: geen uitspraak": 4713,
-   "niet gemeten": 56
+   "niet gemeten": 61
   },
   "voorstellen": {},
   "metingVan": "2026-09-19T17:45:58.177Z"
@@ -44350,6 +44350,132 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "magnaat.stad.actie",
+   "route": "POST /api/member/magnaat/stad/actie",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "magnaat.stad.doe",
+   "route": "POST /api/member/magnaat/stad/doe",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "magnaat.stad.maak",
+   "route": "POST /api/member/magnaat/stad/maak",
+   "semantiek": {
+    "klasse": "hooguitEens"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "magnaat.stad.staat",
+   "route": "POST /api/member/magnaat/stad/staat",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "magnaat.stad.start",
+   "route": "POST /api/member/magnaat/stad/start",
+   "semantiek": {
+    "klasse": "hooguitEens"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "magnaat.stad.verlaat",
+   "route": "POST /api/member/magnaat/stad/verlaat",
+   "semantiek": {
+    "klasse": "hooguitEens"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "member.magnaat.taak.actie",
    "route": "POST /api/member/magnaat/taak/actie",
    "semantiek": {
@@ -57548,27 +57674,6 @@
     "klasse": "idempotent"
    },
    "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "boardroomAuth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "office.beleidsmotor.huis.zet",
-   "route": "POST /api/office/beleidsmotor/huis/zet",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,

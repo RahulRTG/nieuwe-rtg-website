@@ -70,6 +70,11 @@ test('3 en 4. een saldo is vermoed, bonnen staan op nul met reden, en wie het ze
   const c = await api('/api/office/bankpositie/zet', { maand: '2026-08', centen: 1200000, peildatum: '2026-08-31',
     bron: 'gecorrigeerd afschrift' }, eig);
   assert.equal(c.body.stand.saldo.vorige.centen, 1234500, 'een correctie laat de vorige stand zien');
+  /* Een gelijke tweede oproep vangt de platformlaag al (zelfdeVerzoek); het verschil
+     dat telt is dat de vorige stand daarna nog die van VOOR de correctie is. */
+  const nog = await api('/api/office/bankpositie/zet', { maand: '2026-08', centen: 1200000, peildatum: '2026-08-31',
+    bron: 'gecorrigeerd afschrift' }, eig);
+  assert.equal(nog.body.stand.saldo.vorige.centen, 1234500, 'een dubbelklik wist de echte vorige stand niet');
 });
 
 test('5. de bedrijfsmaat leest hetzelfde saldo', async () => {
@@ -79,4 +84,17 @@ test('5. de bedrijfsmaat leest hetzelfde saldo', async () => {
   assert.equal(m.stand, 'TOONBAAR');
   assert.equal(m.waarde, 1200000);
   assert.equal(m.graad, 'vermoed');
+});
+
+/* De kern moet het ook zelf weten, buiten het venster van de platformlaag om:
+   hetzelfde saldo van hetzelfde afschrift raakt de vorige stand niet. */
+test('4b. de kern: hetzelfde saldo nog eens verandert niets, ook de vorige stand niet', () => {
+  const db = { data: {} };
+  const k = require('../server/kern/bankpositie')({ db, save: () => {}, nu: () => '2026-09-27T10:00:00Z' });
+  const z = { maand: '2026-08', peildatum: '2026-08-31', wie: 'user-1' };
+  k.bankpositieZet(Object.assign({ centen: 500, bron: 'afschrift 1' }, z));
+  k.bankpositieZet(Object.assign({ centen: 700, bron: 'afschrift 2' }, z));
+  const nog = k.bankpositieZet(Object.assign({ centen: 700, bron: 'afschrift 2' }, z));
+  assert.equal(nog.ongewijzigd, true);
+  assert.equal(nog.stand.saldo.vorige.centen, 500, 'de echte vorige stand blijft staan');
 });

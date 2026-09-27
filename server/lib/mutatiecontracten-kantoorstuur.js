@@ -57,4 +57,29 @@ CONTRACTEN['POST /api/office/bedrijfsmaat'] = {
   afgetekend: AF
 };
 
+/* Het banksaldo van RTG (kern/bankpositie.js, besluit C4): hetzelfde kantoorbeeld,
+   een leesroute en een zetroute op naam. */
+CONTRACTEN['POST /api/office/bankpositie'] = {
+  mutatieId: 'office.bankpositie',
+  herkomst: 'mens',
+  semantiek: { klasse: 'idempotent' },
+  toegang: { klasse: 'AUTHENTICATED' },
+  stand: 'NOT_APPLICABLE',
+  bewijs: { gemeten: 'tegen een draaiende server (test/bankpositie.test.js toets 1): 401 zonder sessie, 200 voor de ' +
+    'eigenaar, en zonder saldo een reden en geen getal', op: '2026-09-27' },
+  nagekeken: 'met de hand, 2026-09-27: de handler roept alleen bankpositie() aan, die via eigencollectie.kijk leest ' +
+    '(afwezig blijft afwezig) -- geen save(), geen toewijzing',
+  afgetekend: AF
+};
+CONTRACTEN['POST /api/office/bankpositie/zet'] = {
+  mutatieId: 'office.bankpositie.zet',
+  herkomst: 'mens',
+  semantiek: { klasse: 'idempotent' },
+  toegang: { klasse: 'AUTHENTICATED' },
+  stand: 'PROTECTED',
+  bewijs: { gemeten: 'test/bankpositie.test.js toets 3-4: een tweede oproep met hetzelfde saldo, dezelfde dag en ' +
+    'dezelfde bron geeft ongewijzigd: true, en de vorige stand blijft die van voor de eerste oproep', op: '2026-09-27' },
+  afgetekend: AF
+};
+
 module.exports = { CONTRACTEN };

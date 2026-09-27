@@ -47,6 +47,10 @@ module.exports = ({ db, save, nu }) => {
     if (b.length < 4) return { status: 400, error: 'Zeg waar het saldo vandaan komt: welk afschrift, van welke rekening.' };
     const kaart = eigen.bak(NAAM);
     const oud = kaart[m] || null;
+    /* Hetzelfde saldo van hetzelfde afschrift nog een keer: er verandert niets, ook
+       `vorige` niet -- anders wist een dubbelklik de echte vorige stand. */
+    if (oud && oud.centen === centen && oud.peildatum === String(peildatum) && oud.bron === b)
+      return { ok: true, ongewijzigd: true, stand: stand(m) };
     kaart[m] = { centen, peildatum: String(peildatum), bron: b, gezetOp: klok(),
       gezetDoor: String(wie || 'kantoor').slice(0, 80),
       vorige: oud ? { centen: oud.centen, peildatum: oud.peildatum, bron: oud.bron, gezetOp: oud.gezetOp } : null };

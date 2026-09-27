@@ -53,6 +53,10 @@ const SLEUTELS = {
   'POST /api/office/economie/proef': { leest: true },
   /* De bedrijfsmaten (AUTONOMIE.md): een stand uitrekenen verandert niets. */
   'POST /api/office/bedrijfsmaat': { leest: true },
+  /* Het banksaldo van RTG (besluit C4): lezen leest; zetten met hetzelfde saldo van
+     hetzelfde afschrift is een keer (kern/bankpositie.js geeft ongewijzigd terug). */
+  'POST /api/office/bankpositie': { leest: true },
+  'POST /api/office/bankpositie/zet': { zelfdeVerzoek: true },             // maand + saldo + afschrift
   /* Het kantoorstuur (besluit C2): het model mag alleen de drie tonen-paden
      lezen, maar een tweede vraag is een tweede gesprek met een nieuw antwoord. */
   'POST /api/office/doe': { nietIdempotent: true,

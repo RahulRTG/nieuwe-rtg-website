@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T12:05:44.924Z",
-    "commit": "1793f305",
+    "op": "2026-09-27T12:44:26.944Z",
+    "commit": "acb54cae",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -3212,12 +3212,27 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "foundation-gezinstoken-productie.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
     "foundation-markt.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "foundation-productiepoort.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/middleware/foundation-productiepoort.js",
+      "operator": "true->false#0",
+      "gezakt": 3,
+      "geprobeerd": 1
     },
     "foundation-rest.test.js": {
       "soort": "server",

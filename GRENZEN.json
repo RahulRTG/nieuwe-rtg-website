@@ -696,6 +696,10 @@
       "boardroomAuth",
       "ledenregister"
     ],
+    "leerhuis": [
+      "kluisAuth",
+      "volwassen"
+    ],
     "leerstof": [
       "leerstof",
       "vervolg"

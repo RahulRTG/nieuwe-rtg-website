@@ -74,6 +74,11 @@ module.exports = function hangRoutesOp(kern) {
      om dezelfde reden als concern -- het stuk is van het LID, RTG tekent het af
      in het kantoor, en de zaak wil weten of haar ploeg erdoor komt. */
   require('../routes/vakbewijs')(grens('vakbewijs'));
+  /* RTG Academy, het leerhuis (ACADEMY.md): naast de domeinen om dezelfde reden
+     als het vakbewijs -- de lus raakt het lid (leren, bewijs), het kantoor (een
+     leerhuis openen op naam) en straks de zaak. De kern laadt het routebestand
+     zelf; er komt geen naam op de kern bij. */
+  require('../routes/leerhuis')(grens('leerhuis'));
   require('../routes/gateway')(grens('gateway'));
   require('../routes/fiscaal-vooruit')(grens('fiscaal-vooruit'));
   /* RTG Festival (FESTIVAL.md): naast de domeinen om dezelfde reden als concern

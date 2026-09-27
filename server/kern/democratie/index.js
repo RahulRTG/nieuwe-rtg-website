@@ -29,6 +29,7 @@ const { maakKwestieSchrijver } = require('./kwestie');
 const { maakBeeld } = require('./beeld');
 const { maakLid } = require('./lid');
 const { maakKoppeling } = require('./koppeling');
+const { maakWek } = require('./wek');
 const { meet } = require('./meter');
 const { EINDSTANDEN } = require('./eindstanden');
 const AFHANKELIJK = require('./afhankelijkheden');
@@ -67,30 +68,7 @@ function maakDemocratie({ db, save, bijeen, inBundel, crypto, meldLid, codenaamV
   const betrokken = (k, sleutel) => !!sleutel && ontvangersVan(k).some(ref => koppeling.sleutelVan(ref) === sleutel);
   const eigenKwestie = { status: 409, error: 'U bent zelf betrokken bij deze kwestie. Een collega op naam behandelt hem.' };
 
-  /* De wek na een vastgelegde eindstand. Mislukt hij, dan blijft de trede
-     `klaargezet` staan: verklaard, en herbezorgbaar. */
-  async function wek(k) {
-    const r = schrijver.huidige(k);
-    if (r.stand !== 'afgesloten') return 0;
-    let n = 0;
-    for (const ref of ontvangersVan(k)) {
-      const t = r.terugkoppeling && r.terugkoppeling[ref];
-      const sleutel = koppeling.sleutelVan(ref);
-      if (!t || t.stand !== 'klaargezet' || !sleutel) continue;
-      let gewekt = null;
-      try {
-        /* De wek zegt NIET welke kwestie en niet welke uitkomst: een bericht op
-           de sleutel van het lid met het kwestienummer erin is een koppeling
-           tussen mens en kwestie buiten ./koppeling.js om. */
-        gewekt = meldLid(sleutel, { icon: 'kwestie', scope: 'democratie', title: 'Er is nieuws in je kwesties',
-          body: 'Open je kwesties om te lezen wat er is besloten en waarom.' });
-      } catch (e) { console.warn('[democratie] wek mislukt voor ' + k.id + ': ' + e.message); }
-      if (!gewekt) continue;
-      const mis = await vastleggen(() => { schrijver.trede(k, ref, 'gewekt'); });
-      if (!mis) n++;
-    }
-    return n;
-  }
+  const { wek, herbezorg } = maakWek({ schrijver, koppeling, vastleggen, meldLid, ontvangersVan, kijk });
 
   function lijst() {
     const alle = Object.values(kijk()).sort((a, b) => String(a.at).localeCompare(String(b.at)));
@@ -151,13 +129,6 @@ function maakDemocratie({ db, save, bijeen, inBundel, crypto, meldLid, codenaamV
     if (reden.length < 15) return { status: 400, error: 'Zeg in minstens vijftien tekens welk nieuw feit een nieuwe ronde rechtvaardigt.' };
     const mis = await vastleggen(() => { schrijver.heropen(k, door, reden); });
     return mis || { ok: true, kwestie: publiek(k, null) };
-  }
-
-  /* Haalt elke wek in die niet uitging. Raakt geen eindstand aan. */
-  async function herbezorg() {
-    let gewekt = 0;
-    for (const k of Object.values(kijk())) gewekt += await wek(k);
-    return { ok: true, gewekt };
   }
 
   /* De meter zegt er ook bij waar deze laag van RTG afhangt (proef P3): een

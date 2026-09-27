@@ -32,10 +32,7 @@ module.exports = (kern) => {
   const NIET_IN_KLOON = ['democratieKwesties', 'democratieJournaal', 'democratieInbrengers'];
   app.get('/api/doos/kloon', (req, res) => {
     if (!doosSleutelOk(req, res)) return;
-    /* Geen DemocratieOS in de kloon (POLITIEK.md fase C4): een zaakdoos heeft er
-       niets aan, en `democratieInbrengers` is de koppeling van kwestie naar mens.
-       Een kopie van de hele opslag naar een kastje in een zaak is de ruimste
-       omweg om die koppeling heen die er was. De rest blijft ongemoeid. */
+    // geen DemocratieOS in de kloon: daar staat de koppeling kwestie-mens (POLITIEK.md C4)
     const data = Object.assign({}, db.data);
     for (const tak of NIET_IN_KLOON) delete data[tak];
     res.json({ data });

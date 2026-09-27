@@ -39,10 +39,10 @@ const BEWIJSSTAND = [
       'geheugen en overleven een herstart niet' },
   /* Fase C (aanvalsfase). Elke bewezen bewering is met een mutatie aan het
      zakken gezien; de grens zegt wat de toets NIET dekt. */
-  { code: 'PARTIJNEUTRAAL', stand: 'bewezen',
-    wat: 'vier actoren (geen partij, Noord, Midden, Zuid) met hetzelfde scenario eindigen in dezelfde toestand',
+  { code: 'NEUTRAAL_C1', stand: 'bewezen',
+    wat: 'vier synthetische actoren (Noord, Midden, Zuid en een zonder binding) met hetzelfde scenario eindigen in dezelfde toestand',
     toets: 'test/democratie-aanval.test.js',
-    grens: 'fase C kent geen partijregister: de partij staat alleen in wat de burger zelf aanlevert. Een register in een latere fase vraagt deze proef opnieuw' },
+    grens: 'deze laag kent geen register van politieke bindingen: de binding staat alleen in wat de burger zelf aanlevert. Een register in een latere fase vraagt deze proef opnieuw' },
   { code: 'MACHTSNEUTRAAL', stand: 'bewezen',
     wat: 'eigenaar, kantoor, gedeelde code, zaak en bord krijgen geen voordeel; wie inbracht beslist niet, en een ingetrokken kwestie heropent het kantoor niet',
     toets: 'test/democratie-aanval.test.js',

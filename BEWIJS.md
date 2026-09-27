@@ -15,10 +15,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 2079 |
 | losse beweringen (`test(...)`) | 14665 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 177 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1416 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1417 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 74 |
-| alleen in de kop *genoemd*, nog niet gemeten | 171 |
+| alleen in de kop *genoemd*, nog niet gemeten | 170 |
 | niets van beide | 418 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -319,7 +319,7 @@ toets omvalt.
 | `connection-edge-experience.test.js` | 10 | genoemd | RONDE 4: CONNECTION EDGE EXPERIENCE De renderer krijgt geen eigen productwaarheid. Deze toetsen leggen vast dat DOM-acties uitsluitend uit de actuele serverprojectie komen, dat stale en geblokkeerde contexten... |
 | `connection-final-routes.test.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `connection-final.test.js` | 8 | genoemd | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `connection-product-state.test.js` | 12 | genoemd | RONDE 3: PRODUCT STATE & EDGE CONTRACT Deze toetsen bewijzen dat producttoestand, capabilities, Edge-projecties en transities uitsluitend door de server worden bepaald. Ze beproeven vooral wat niet mag ontstaan:... |
+| `connection-product-state.test.js` | 12 | gezakt op `liegpoort /api/` | RONDE 3: PRODUCT STATE & EDGE CONTRACT Deze toetsen bewijzen dat producttoestand, capabilities, Edge-projecties en transities uitsluitend door de server worden bepaald. Ze beproeven vooral wat niet mag ontstaan:... |
 | `connection-profile-media.test.js` | 8 | -- | RONDE 6 -- veilige Profile Media. De toets loopt via de echte Vonk-routes: concept -> publicatie -> projection -> tijdelijke levering -> intrekken en blokkeren. |
 | `connection-projection.test.js` | 12 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `consent-dekking.test.js` | 4 | geen bronmutatie mogelijk | De handhaver onder het Consent Center. Dat scherm zei van zichzelf: "dit register wordt met de hand bijgehouden; komt er ergens een nieuwe soort toestemming bij, dan verschijnt hij hier niet vanzelf". |

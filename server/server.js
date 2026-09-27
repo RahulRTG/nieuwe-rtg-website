@@ -805,6 +805,7 @@ const startPostgresMetSalon = () => {
     if (!kern.lucht || typeof kern.lucht.migreerBoardingPasses !== 'function')
       throw new Error('TravelOS boarding-passmigratie ontbreekt bij de opslagstart.');
     await kern.lucht.migreerBoardingPasses();
+    await kern.bedrijf.migreerSleutels(bewerkCollectie);
   })).then(gestart => {
     salonMigratieKlaar = true;
     rtfSamenMigratieKlaar = true;
@@ -2415,16 +2416,11 @@ require('./opzet/kernlaag6b')(kern, hulp);
 require('./opzet/kernlaag7')(kern, hulp);
 require('./opzet/kernlaag7b')(kern, hulp);   // de routers ophangen; zie de kop daar waarom dat NA alle Object.assign moet
 
-/* JSON/SQLite/geheugen zijn al autoritatief geladen. Verwijder oude kale
-   Salon-, FoundationOS-Samen- en boarding-passcodes daarom vóór een schrijvende
-   instance verkeer kan aannemen. De lokale collectiemotor moet hier synchroon
-   committen; als dat ooit verandert, weigert de start in plaats van een half
-   gemigreerde instance vrij te geven. */
-/* Een losse server begint schrijvend en migreert vóór listen(). Een
-   trio-server begint bewust als standby: die mag de gedeelde SQLite-opslag niet
-   wijzigen en migreert pas in /api/cluster/promote, direct na zijn verse load().
-   Zo blijft opslag fail-closed zonder dat elke gezonde standby in een
-   opstart-crashlus belandt. */
+/* JSON/SQLite/geheugen zijn al geladen: verwijder oude kale codes (Salon,
+   Samen, boarding, WerkOS) vóór verkeer. Lokaal commit dat synchroon, anders
+   weigert de start. */
+/* Een losse server migreert vóór listen(); een trio-standby pas in
+   /api/cluster/promote, na zijn verse load() (fail-closed, geen crashlus). */
 if (STORE !== 'postgres' && db.writable) migreerLokaleToegang();
 function migreerLokaleToegang() {
   if (STORE !== 'postgres') {
@@ -2447,6 +2443,8 @@ function migreerLokaleToegang() {
     if (boardingMigratie && typeof boardingMigratie.then === 'function')
       throw new Error('Lokale TravelOS boarding-passmigratie committe niet synchroon.');
     boardingPassMigratieKlaar = true;
+    if (kern.bedrijf.migreerSleutels(bewerkCollectie) instanceof Promise)
+      throw new Error('Lokale WerkOS-sleutelmigratie committe niet synchroon.');
   }
 }
 

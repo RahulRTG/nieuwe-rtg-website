@@ -227,7 +227,46 @@ restrisico: bijladen is niet economisch gesleuteld, dus twee hervattingen die
 elkaars lease overschrijden kunnen de eigen wallet van het lid twee keer
 bijladen -- geld naar het lid zelf, geen dubbele betaling.
 
-Blijven over van B9: Invisible Arrival en WorkOS-werkruimtetokens.
+**B9, Invisible Arrival gemigreerd (`livingos.invisible_arrival_pass`).** De
+browser koos vroeger zelf de pass; met `randomUUID` was de geheime helft 122
+bits. Nu maakt de server hem (`AR.`, 128 bits) en bewaart alleen de hash in
+`arrivalToegang` (`server/kern/arrivalpas.js`).
+- De pass staat kaal alleen in het antwoord op de aanvraag en op een rotatie.
+  De aanvraagcode van de browser is nog alleen de idempotentiesleutel: een
+  herhaling roteert (binnen een kwartier, zolang de pass ongebruikt is, hooguit
+  drie keer) en toont de eerste pass nooit opnieuw.
+- De pass vervalt op aankomst plus twaalf uur, en een aanvraag mag hooguit
+  zestig dagen vooruit. Hij telt pulsen (hooguit zestig).
+- De gast roteert of trekt in. Een reservering die de zaak weigert, of die
+  geannuleerd, no-show of afgerond is, sluit de pass.
+- Uitgifte, rotatie, puls met de eenmalige voorbereidingsclaim en intrekking
+  lopen in een collectietransactie; beproefd over twee PostgreSQL-instances.
+
+Er ligt een besluit voor de eigenaar. De oude, door de browser gekozen passen
+zijn zonder datamigratie ongeldig: hun hash opent niets meer. De reservering
+blijft staan, maar de gast kan voor die aankomst geen status meer delen. Het
+alternatief is ze tot hun verval als legacy te laten werken.
+
+**B9, WorkOS-werkruimtesleutels gemigreerd (`workos.workspace_access_tokens`).**
+In productie bestaat er geen werkruimtebearer: `/api/bedrijf` en `/api/tenant`
+openen alleen met het RTG-account. Elk verzoek leest eerst een verse stand
+van tenants en werkruimtes uit PostgreSQL (`db.verversVerzoekCollectie`, nieuw
+in `server/db/postgres-poorten.js`). De tijdelijke grendel is weg, en oude kale
+sleutels verdwijnen bij de opslagstart.
+- Buiten productie zijn beheer- en lidsleutels sessies uit
+  `server/bedrijf/sleutels.js`: 128 bits, alleen als hash op de werkruimte,
+  lid zeven dagen en beheer dertig. `/api/bedrijf/mijn`, de bootstraps en de
+  accountstart geven een VERSE sessie en nooit de oude terug.
+- Een sessie telt geen gebruik (max_gebruik 0). Wat haar begrenst is de
+  vervaltijd, acht sessies per lid, en een epoch: uit dienst, afwijzen,
+  deprovisioning, bewaring en import sluiten elke sessie van dat lid tegelijk.
+- De houder roteert of trekt in (`/api/bedrijf/sleutel/roteer` en `/intrek`).
+- Oude 192-bit sleutels worden hash met het merkteken `legacy192` en krijgen
+  een vervaltijd.
+
+**Daarmee zijn alle negen typen uit B9 gemigreerd.** Wat de codecredentialpoort
+nog blokkeert zijn de andere echte deuren uit de indeling, niet de geldcodes en
+tickets van V1.
 
 **Juridisch open (E8), en niet door code te beslissen:** een opwaardeerkaart die
 tegen nominale waarde in een uitbetaalbare wallet landt, is vermoedelijk

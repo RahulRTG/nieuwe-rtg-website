@@ -27,6 +27,9 @@
       leden komen terug ZONDER sleutel: toegang teruggeven is een besluit.
    ========================================================================== */
 'use strict';
+
+const { sluit, maak: maakSleutels } = require('../../bedrijf/sleutels');
+const sleutels = maakSleutels();
 const { datum: klokDatum } = require('../../lib/klok');
 
 const crypto = require('crypto');
@@ -40,7 +43,7 @@ const VERSIE = 1;
    VERBORGEN-lijst van kern/command/object.js. Op naam en recursief, dus ook
    een sleutel die morgen ergens dieper opduikt gaat eruit -- te veel weghalen
    is hier de goede kant om fout te gaan. */
-const GEHEIM = ['beheerToken', 'token', 'lidToken', 'rtgKey'];
+const GEHEIM = ['beheerToken', 'token', 'lidToken', 'rtgKey', 'beheerSessies', 'sessies', 'beheerEpoch', 'sessieEpoch'];
 
 /* Metadata van de werkruimte zelf: die staat in de kop van de uitvoer en hoeft
    niet nog een keer in de inhoud. */
@@ -158,17 +161,18 @@ module.exports = ({ db, save, crypto: crypt, register, merkVan }) => {
     const w = { code, naam: o.naam || kop.naam || 'Herstelde werkruimte',
       land: kop.land || 'NL', valuta: kop.valuta || 'EUR', taal: kop.taal || 'nl',
       moeder: null, kvk: kop.kvk || null, btwNummer: kop.btwNummer || null,
-      beheerToken: PRODUCTIE ? null : munt.randomBytes(24).toString('hex'), at: klokDatum().toISOString() };
+      at: klokDatum().toISOString() };
     for (const k of Object.keys(uitvoer.inhoud)) w[k] = JSON.parse(JSON.stringify(uitvoer.inhoud[k]));
 
     w.leden = w.leden || {};
-    for (const l of Object.values(w.leden)) { l.token = null; }
+    for (const l of Object.values(w.leden)) sluit(l);
+    const beheerToken = PRODUCTIE ? null : sleutels.geefBeheer(w);
     W[code] = w;
     save();
     const antwoord = { ok: true, werkruimte: code, catalogus: c.catalogus,
       let: 'De leden zijn hersteld ZONDER sleutel: toegang teruggeven is een besluit en geen bijwerking van een herstel. ' +
         'De moederwerkruimte reist niet mee -- die verwijst naar een code die hier niet hoeft te bestaan.' };
-    if (!PRODUCTIE) antwoord.beheerToken = w.beheerToken;
+    if (!PRODUCTIE) antwoord.beheerToken = beheerToken;
     return antwoord;
   }
 

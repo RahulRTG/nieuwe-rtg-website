@@ -129,4 +129,5 @@ Object.assign(module.exports, require('./idemsleutels-nooit-carriere'));
 Object.assign(module.exports, require('./idemsleutels-nooit-ledger'));
 Object.assign(module.exports, require('./idemsleutels-nooit-vakschema'));
 Object.assign(module.exports, require('./idemsleutels-nooit-codes'));
+Object.assign(module.exports, require('./idemsleutels-nooit-sessies'));
 Object.freeze(module.exports);

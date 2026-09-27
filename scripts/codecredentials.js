@@ -116,6 +116,7 @@ const REQUIRED_ROUTES = [
   'POST /api/appstore/uitgever/voorbeeld', 'POST /api/appstore/verleen',
   'POST /api/appstore/vernietig', 'POST /api/appstore/weg',
   'POST /api/appstore/wis-opslag',
+  'POST /api/bedrijf/sleutel/roteer', 'POST /api/bedrijf/sleutel/intrek',
   'POST /api/bedrijf/werkruimte/maak', 'POST /api/bedrijf/werkruimte',
   'POST /api/bedrijf/lid/aanmeld', 'POST /api/bedrijf/lid/besluit',
   'POST /api/bedrijf/leden', 'POST /api/bedrijf/mijn',

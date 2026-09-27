@@ -12,7 +12,8 @@
 'use strict';
 
 module.exports = (sctx) => {
-  const { app, save, crypto, schoon, nu, rid, dag, ruimteVan, beheerVan, eigenVeld } = sctx;
+  const { app, save, schoon, nu, rid, dag, ruimteVan, beheerVan, lidVan, eigenVeld, sleutels } = sctx;
+  const { sluit } = require('./sleutels');
   const PRODUCTIE = String(process.env.NODE_ENV || '') === 'production';
 
   app.post('/api/bedrijf/lid/aanmeld', (req, res) => {
@@ -32,14 +33,16 @@ module.exports = (sctx) => {
     if (!naam) return res.status(400).json({ error: 'Onder welke naam werkt u hier?' });
     const l = { id: rid(4), naam, functie: schoon(req.body.functie, 60) || null,
       afdeling: schoon(req.body.afdeling, 40) || null, extern: req.body.extern === true,
-      rollen: [], status: 'wacht', token: PRODUCTIE ? null : crypto.randomBytes(24).toString('hex'),
+      rollen: [], status: 'wacht',
       rtgKey: PRODUCTIE ? c.accountKey : null,
       rtgCodenaam: PRODUCTIE && c.account ? c.account.codename || null : null,
       gekoppeldAt: PRODUCTIE ? nu() : null, at: nu() };
     w.leden[l.id] = l;
+    // buiten productie: een lidsessie die alleen als hash op het lid staat
+    const lidToken = PRODUCTIE ? null : sleutels.geefLid(w, l);
     save();
     const antwoord = { ok: true, lidId: l.id, status: l.status };
-    if (!PRODUCTIE) antwoord.lidToken = l.token;
+    if (!PRODUCTIE) antwoord.lidToken = lidToken;
     antwoord.let = PRODUCTIE
       ? 'Uw RTG-account staat op de lijst. Een huidige beheerder moet dit lidmaatschap nog toelaten.'
       : 'U staat op de lijst maar bent nog niet toegelaten. Tot iemand met het beheer-token u toelaat, werkt dit token nergens voor.';
@@ -52,7 +55,7 @@ module.exports = (sctx) => {
     if (!l) return res.status(404).json({ error: 'Dat lid kennen we niet.' });
     const akkoord = req.body.akkoord === true;
     if (!akkoord) {
-      l.status = 'afgewezen'; l.token = null; l.afgewezenAt = nu();
+      l.status = 'afgewezen'; sluit(l); l.afgewezenAt = nu();
       save();
       return res.json({ ok: true, lid: { id: l.id, status: l.status } });
     }
@@ -71,11 +74,35 @@ module.exports = (sctx) => {
     if (l.status === 'uit dienst') return res.status(409).json({ error: 'Dit lid staat al uit dienst.' });
     const reden = schoon(req.body.reden, 120);
     if (!reden) return res.status(400).json({ error: 'Noteer waarom dit lidmaatschap eindigt; een lege uitstroom is later niet te reconstrueren.' });
-    l.status = 'uit dienst'; l.token = null; l.uitReden = reden; l.uitAt = nu();
+    l.status = 'uit dienst'; sluit(l); l.uitReden = reden; l.uitAt = nu();
     l.laatsteDag = schoon(req.body.laatsteDag, 10) || dag();
     save();
     res.json({ ok: true, lid: { id: l.id, naam: l.naam, status: l.status, laatsteDag: l.laatsteDag },
       let: 'De sleutel is per direct ingetrokken. Wat er van deze persoon in de werkruimte staat blijft staan, met zijn naam erbij -- werk uitwissen maakt een dossier onleesbaar.' });
+  });
+
+  /* De houder van een beheer- of lidsessie roteert of trekt hem zelf in
+     (./sleutels.js). Productie heeft geen sessiesleutels: daar is het
+     RTG-account de sleutel. */
+  function eigenSleutel(req, res) {
+    if (PRODUCTIE) { res.status(404).json({ error: 'In productie is uw RTG-account de sleutel.' }); return null; }
+    res.set('Cache-Control', 'no-store');
+    const beheer = !!String((req.body || {}).beheerToken || '');
+    const w = beheer ? beheerVan(req, res) : (lidVan(req, res) || {}).w;
+    return w ? { w, beheer, raw: beheer ? req.body.beheerToken : req.body.lidToken } : null;
+  }
+  app.post('/api/bedrijf/sleutel/roteer', (req, res) => {
+    const s = eigenSleutel(req, res); if (!s) return;
+    const nieuw = sleutels.roteer(s.w, s.raw, s.beheer ? 'beheer' : 'lid');
+    save();
+    res.json({ ok: true, eenmalig: true, [s.beheer ? 'beheerToken' : 'lidToken']: nieuw,
+      let: 'De vorige sleutel werkt niet meer. Deze wordt maar een keer getoond.' });
+  });
+  app.post('/api/bedrijf/sleutel/intrek', (req, res) => {
+    const s = eigenSleutel(req, res); if (!s) return;
+    sleutels.intrek(s.w, s.raw, s.beheer ? 'beheer' : 'lid');
+    save();
+    res.json({ ok: true, let: 'Deze sleutel is ingetrokken. Andere sessies van hetzelfde lid blijven werken.' });
   });
 
   app.post('/api/bedrijf/leden', (req, res) => {

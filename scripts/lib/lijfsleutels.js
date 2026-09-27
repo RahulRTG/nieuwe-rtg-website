@@ -406,9 +406,9 @@ const FAMILIES = [
     velden: ['pass'],
     waarom: 'arrivalPassAuth zoekt de Arrival Pass op `pass` uit het lijf; die ontstaat bij ' +
       '/api/arrival/request, dat een aanvraagcode inwisselt voor een reservering',
-    /* DE AANVRAAGCODE KIEST DE CLIENT ZELF, en dat is met opzet zo: de server
-       bewaart alleen de HASH ervan (arrival-toegang.js). De fixture mag hem dus
-       zelf verzinnen -- dat is geen omzeiling maar precies het ontwerp. Wat hij
+    /* DE AANVRAAGCODE KIEST DE CLIENT ZELF: het is alleen de idempotentiesleutel
+       (hash op de rij); de pass maakt de server (kern/arrivalpas.js). De fixture
+       mag hem dus zelf verzinnen -- dat is precies het ontwerp. Wat hij
        niet mag overslaan is de aanvraag zelf: zonder een echte reservering
        bestaat er geen pass om mee te herkennen. */
     async bouw({ post, tokens }) {

@@ -69,7 +69,15 @@ const ROUTES = new Set([
   'POST /api/pay/tikcode',
   // de Arrival Pass: aanvragen en roteren tonen een pass die de server maakt (kern/arrivalpas.js)
   'POST /api/arrival/request',
-  'POST /api/arrival/pass/roteer'
+  'POST /api/arrival/pass/roteer',
+  /* De sessiesleutels van een werkruimte buiten productie (bedrijf/sleutels.js):
+     elk van deze antwoorden draagt een verse sessie die alleen als hash blijft. */
+  'POST /api/bedrijf/werkruimte/maak',
+  'POST /api/bedrijf/lid/aanmeld',
+  'POST /api/bedrijf/mijn',
+  'POST /api/bedrijf/sleutel/roteer',
+  'POST /api/tenant/bootstrap/mijn',
+  'POST /api/account/start'
 ]);
 
 const isEenmalig = (methode, pad) => ROUTES.has(

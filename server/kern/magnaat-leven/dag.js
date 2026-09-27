@@ -23,7 +23,7 @@
 const R = require('./regels');
 const { meld, euro } = require('./staat');
 const { voerUit } = require('./tijd');
-const { startDag } = require('./geld');
+const { startDag, ontvangen } = require('./geld');
 const { klantDag } = require('./opdracht');
 const { kansen } = require('./gesprek');
 const { teamDag } = require('./team');
@@ -31,12 +31,9 @@ const { handelDag } = require('./voorraad');
 const { contractDag } = require('./contract');
 const { marktDag } = require('./markt');
 const { huurDag } = require('./vestiging');
+const { groeiDag } = require('./groei');
 
 /* Wat je bedrijf de afgelopen vier weken op je rekening bracht. */
-function ontvangen(st, dagen) {
-  return st.deals.filter(d => d.fase === 'betaald' && d.betaaldOp > st.dag - dagen)
-    .reduce((s, d) => s + d.afspraak.bedrag, 0);
-}
 const loonPer = (st, dagen) => st.baan.urenPerWeek * st.baan.uurloon * dagen / 7;
 
 function wieJeBent(st) {
@@ -85,6 +82,7 @@ function volgendeDag(st) {
   teamDag(st);
   huurDag(st);
   marktDag(st);
+  groeiDag(st);
   handelDag(st);
   startDag(st);
   uitzetting(st);

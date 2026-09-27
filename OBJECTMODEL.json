@@ -2,14 +2,14 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-27",
   "gemeten": {
-    "bestanden": 2431,
-    "vormen": 1442,
-    "velden": 2085,
-    "modules": 800,
-    "domeinen": 284,
+    "bestanden": 2433,
+    "vormen": 1445,
+    "velden": 2087,
+    "modules": 801,
+    "domeinen": 285,
     "envelopDrempel": 18,
     "envelop": 29,
-    "veldenDomeineigen": 1469,
+    "veldenDomeineigen": 1471,
     "veldenGedeeldVanafVier": 209,
     "gelijkendeVormparen": 20
   },
@@ -82,6 +82,18 @@
       ]
     },
     {
+      "veld": "supplierCode",
+      "domeinen": 16,
+      "waar": [
+        "kern/arrivalpas",
+        "kern/autoverkoop",
+        "kern/beveiliging",
+        "kern/comm",
+        "kern/commercie",
+        "kern/ervaring"
+      ]
+    },
+    {
       "veld": "naar",
       "domeinen": 16,
       "waar": [
@@ -127,18 +139,6 @@
         "kern/atelier",
         "kern/beroepenbieb",
         "kern/boerderij"
-      ]
-    },
-    {
-      "veld": "supplierCode",
-      "domeinen": 15,
-      "waar": [
-        "kern/autoverkoop",
-        "kern/beveiliging",
-        "kern/comm",
-        "kern/commercie",
-        "kern/ervaring",
-        "kern/gastzorg"
       ]
     },
     {
@@ -691,6 +691,19 @@
       ]
     },
     {
+      "gelijkenis": 0.8,
+      "a": "server/kern/tenant/brug.js",
+      "b": "server/bedrijf/leden.js",
+      "domeinA": "kern/tenant",
+      "domeinB": "bedrijf",
+      "gedeeld": [
+        "afdeling",
+        "extern",
+        "functie",
+        "rollen"
+      ]
+    },
+    {
       "gelijkenis": 0.78,
       "a": "server/kern/samen.js",
       "b": "server/kern/samenrtf.js",
@@ -794,19 +807,6 @@
         "huis",
         "kritiek",
         "updatedAt"
-      ]
-    },
-    {
-      "gelijkenis": 0.67,
-      "a": "server/kern/tenant/brug.js",
-      "b": "server/bedrijf/leden.js",
-      "domeinA": "kern/tenant",
-      "domeinB": "bedrijf",
-      "gedeeld": [
-        "afdeling",
-        "extern",
-        "functie",
-        "rollen"
       ]
     },
     {

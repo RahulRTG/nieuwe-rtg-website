@@ -1,30 +1,30 @@
 {
  "stempel": {
-  "op": "2026-09-27T14:23:24.747Z",
-  "commit": "d8bf1cba",
+  "op": "2026-09-27T14:34:04.092Z",
+  "commit": "228c5eb6",
   "boomVuil": false,
-  "boomAnders": 9,
+  "boomAnders": 2,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5039,
-  "geclassificeerd": 5039,
+  "totaal": 5043,
+  "geclassificeerd": 5043,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3190,
    "NOT_APPLICABLE": 1211,
-   "PROTECTED": 491,
-   "INTENTIONALLY_NON_IDEMPOTENT": 147
+   "PROTECTED": 493,
+   "INTENTIONALLY_NON_IDEMPOTENT": 149
   },
-  "vastgesteldDoorMens": 1898,
+  "vastgesteldDoorMens": 1902,
   "afgeleidDoorScript": 3141,
   "toegangWaargenomen": {
    "AUTHENTICATED": 4148,
-   "PUBLIC": 124,
+   "PUBLIC": 126,
    "OBJECT_SCOPED": 746,
-   "(niet af te leiden -- vraagt een verklaring)": 5,
+   "(niet af te leiden -- vraagt een verklaring)": 7,
    "SERVICE_TO_SERVICE": 15,
    "SYSTEM_INTERNAL": 1
   },
@@ -32,12 +32,24 @@
    "kale ronde: beschermd": 136,
    "kale ronde: onbeschermd": 123,
    "kale ronde: geen uitspraak": 4713,
-   "niet gemeten": 67
+   "niet gemeten": 71
   },
   "voorstellen": {},
   "metingVan": "2026-09-19T17:45:58.177Z"
  },
  "tegenspraken": [
+  {
+   "route": "POST /api/arrival/pass/intrek",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "PUBLIC",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/arrival/pass/roteer",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "PUBLIC",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
   {
    "route": "POST /api/cluster/:actie",
    "bedoeld": "SYSTEM_INTERNAL",
@@ -2815,6 +2827,48 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "arrival.pass.intrekken",
+   "route": "POST /api/arrival/pass/intrek",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "PUBLIC",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "arrival.pass.roteren",
+   "route": "POST /api/arrival/pass/roteer",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "PUBLIC",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -6558,6 +6612,44 @@
     "hindernis": null
    },
    "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "bedrijf.sleutel.intrekken",
+   "route": "POST /api/bedrijf/sleutel/intrek",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": null,
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "bedrijf.sleutel.roteren",
+   "route": "POST /api/bedrijf/sleutel/roteer",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": null,
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null

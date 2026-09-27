@@ -2,8 +2,8 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-09-27",
   "gemeten": {
-    "bestanden": 2431,
-    "domeinenTotaal": 642,
+    "bestanden": 2433,
+    "domeinenTotaal": 643,
     "koopbareVormen": 604,
     "koopbareDomeinen": 121,
     "envelopDrempel": 8,
@@ -13,7 +13,7 @@
     "gelijkendeVormparen": 17,
     "werkwoordenVolledig": 2,
     "werkwoordenOveral": 0,
-    "werkwoordCombinaties": 46,
+    "werkwoordCombinaties": 47,
     "wagenVormen": 33,
     "wagenVormenUniek": 30,
     "wagenDomeinen": 22,
@@ -75,7 +75,7 @@
     "reserveer": 28,
     "bevestig": 57,
     "lever": 23,
-    "annuleer": 32,
+    "annuleer": 33,
     "retour": 8
   },
   "overalAanwezig": [],
@@ -630,6 +630,26 @@
       "telt": 5
     },
     {
+      "domein": "bedrijf",
+      "heeft": {
+        "toon": true,
+        "prijs": true,
+        "beschikbaarheid": true,
+        "reserveer": false,
+        "bevestig": false,
+        "lever": false,
+        "annuleer": true,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "beeld",
+        "prijs": "som",
+        "beschikbaarheid": "open",
+        "annuleer": "intrek"
+      },
+      "telt": 4
+    },
+    {
       "domein": "kern/assets",
       "heeft": {
         "toon": true,
@@ -988,25 +1008,6 @@
         "annuleer": "vervalt"
       },
       "telt": 4
-    },
-    {
-      "domein": "bedrijf",
-      "heeft": {
-        "toon": true,
-        "prijs": true,
-        "beschikbaarheid": true,
-        "reserveer": false,
-        "bevestig": false,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "beeld",
-        "prijs": "som",
-        "beschikbaarheid": "open"
-      },
-      "telt": 3
     },
     {
       "domein": "kern/aanmeldingen",

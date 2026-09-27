@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 5164 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 5168 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 5164 |
-| servermodules (`server/**/*.js`) | 3729 |
+| API-endpoints | 5168 |
+| servermodules (`server/**/*.js`) | 3733 |
 | routebestanden (`server/routes/**`) | 614 |
-| kernmodules (`server/kern/**`) | 2341 |
+| kernmodules (`server/kern/**`) | 2342 |
 | schermen (`public/**/*.html`) | 320 |
 | gedeelde browsermodules (`public/shared/*.js`) | 398 |
-| toetsbestanden (`test/*.test.js`) | 1824 |
+| toetsbestanden (`test/*.test.js`) | 1826 |
 | schermtoetsen (`test/*.e2e.js`) | 262 |
 
 ## 2. De weg van een verzoek
@@ -112,7 +112,7 @@ zie §5 -- er zijn nog 245 kern-namen die meer dan één domein aanraakt.
 |---|---|---|---|---|
 | `auth` | 20 | 6 | 8 | 52 |
 | `member` | 703 | 73 | 16 | 430 |
-| `supplier` | 627 | 128 | 6 | 339 |
+| `supplier` | 629 | 129 | 6 | 339 |
 | `office` | 74 | 21 | 3 | 84 |
 | `staff` | 26 | 8 | 1 | 42 |
 | `social` | 76 | 10 | 31 | 71 |
@@ -128,7 +128,7 @@ lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
 bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
 publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 3519 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 3521 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 

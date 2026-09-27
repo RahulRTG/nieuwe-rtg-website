@@ -19,6 +19,7 @@ module.exports = (kern) => {
 
   app.post('/api/member/magnaat/leven/staat', auth, (req, res) => alsLid(req, res, key => magnaatWereld.leven.staat(key)));
   app.post('/api/member/magnaat/leven/actie', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.leven.actie(key, b)));
+  require('./magnaatstad')({ app, auth, geenGast, magnaatWereld }); // samen in een Oudwijk
   app.post('/api/member/magnaat/overzicht', auth, (req, res) => alsLid(req, res, key => magnaatWereld.overzicht(key)));
   app.post('/api/member/magnaat/taak/start', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.taakStart(key, b.functieId, b.apparaat)));
   app.post('/api/member/magnaat/taak/antwoord', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.taakAntwoord(key, b.taakId, b.keuze)));

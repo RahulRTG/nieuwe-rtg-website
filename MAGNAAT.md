@@ -585,6 +585,104 @@ De balans van 1.0 is afgestemd op een automatische speler. Of dag 97 op normaal 
 
 **Wat hiermee nog niet gebeurt:** de balans verschuiven. Dat is een besluit op grond van wat er binnenkomt, en de getallen staan klaar in de tabel MOEILIJKHEID van `regels.js`.
 
+### NA 1.0: waar je begint (27 september 2026)
+
+Niet iedereen begint in de keuken. Op dag 1 kies je, naast de moeilijkheid, ook waar je begint. Later kan dat alleen door opnieuw te beginnen, en dan kies je het onder Wereld. De tabel staat in `regels-start.js` (STARTPOSITIES).
+
+| | De keuken | Student | Een kleine erfenis |
+|---|---|---|---|
+| Baan | 24 uur, Brasserie De Haven | 20 uur, Supermarkt De Linde | 16 uur, Bakkerij Van Dam |
+| Kamer | gewone huur | studentenkamer (€ 420 per vier weken op normaal) | gewone huur |
+| Op de bank bovenop het startgeld | niets | niets | € 8.000 van je tante |
+| Eigen vaste last | geen | aflossing studieschuld, € 60 per vier weken, een week uit te stellen | geen |
+
+**Wat een startpositie verschuift, en wat niet:**
+- Een startpositie verschuift drie dingen: de baan, het geld op de bank en eventueel een eigen vaste last.
+- De keten zelf verandert niet.
+- De drempel om zelfstandig te worden rekent met het loon van *deze* baan. Wie minder verdient, hoeft minder te vervangen, maar heeft ook minder om op terug te vallen.
+- De studieschuld is een echte terugkerende betaling door het grootboek, naar de tegenpartij `financier`.
+- Het geld van de erfenis zit in de openingsboeking.
+- Een oude save zonder startpositie is de keuken.
+
+**Wat de automatische speler zegt:**
+- Het einde ligt voor alle drie op dezelfde dag, rond 97 op normaal. Wat daar bindt, is hoe lang je bedrijf moet bestaan.
+- Het verschil zit in het begin en in de fouten: slecht spel op zwaar is in de keuken en als student rond dag 92 voorbij, met een erfenis pas rond dag 120.
+- Een eerste versie van de student (12 uur, gewone huur) verloor als hij *niets* deed. Daarmee brak de belofte van 1.0 dat niets doen geen verlies is. Daarom werkt de student nu 20 uur en heeft hij een studentenkamer. `test/magnaatstart.test.js` houdt die belofte per startpositie vast.
+
+**De toetsen:**
+- `test/magnaatstart.test.js` (8 toetsen).
+- `test/magnaatstart.e2e.js`: op een telefoon kies je een erfenis op dag 1, en daarna begin je onder Wereld opnieuw als student.
+
+### NA 1.0: groeien (27 september 2026)
+
+Wie van zijn eigen bedrijf leeft, krijgt drie nieuwe deuren. Voor die dag zijn ze er niet, en een weigering zegt waarom. De module is `groei.js`, de getallen staan in `regels-groei.js`, en wat de markt ervan merkt staat in `bereik.js`.
+
+| | Wat het kost | Wat het oplevert |
+|---|---|---|
+| **Krediet** bij de Oudwijkse Bank | 6% rente over het hele bedrag, terug in 6 termijnen van vier weken | geld nu: hooguit twee keer wat klanten de laatste acht weken betaalden, tussen € 1.000 en € 25.000 |
+| **Filiaal** in een tweede wijk | inrichten plus huur per vier weken, en iemand van je team die er staat | de helft van de zichtbaarheid van die wijk erbij, en plek voor twee mensen meer |
+| **Overname** van een concurrent | € 30 per promille van zijn marktaandeel, minstens € 6.000 | het bedrijf verdwijnt van de markt, een ervaren medewerker komt mee, en zijn vaste klanten zoeken voortaan jou |
+
+**Hoe het in de boeken staat:**
+- Een krediet is een schuld aan de `financier`. Een aflossing verlaagt die schuld; alleen de rente is een kostenpost. Zo zie je in je resultaat wat lenen je echt kost.
+- De huur van een filiaal is huisvesting, net als de huur van je hoofdplek.
+- Een overname is in Magnaat een kostenpost en geen bezit: je koopt klanten en een mens, geen spullen. Dat is een vereenvoudiging.
+
+**Twee grenzen:**
+- Er blijft altijd minstens één concurrent over. Een stad met één bedrijf is geen markt.
+- Een overname brengt iemand mee. Met een vol team kan het dus niet, en de weigering wijst naar een filiaal.
+
+**Wat de automatische speler zei, en wat daardoor veranderde:**
+- De eerste versie maakte een overname slechter dan niets doen. Wie een concurrent kocht, kreeg *minder* klanten, want klanten uit de markt komen van de fouten van concurrenten, en een gekochte concurrent maakt geen fouten meer. Daarom komen zijn vaste klanten nu zelf naar jou.
+- Daarna bleek de rem geen vraag maar capaciteit: een speler met een klein team laat 16 tot 28 opdrachten liggen, en meer klanten helpen dan niets. Daarom brengt een overname een mens mee en geeft een filiaal plek voor meer.
+- Na 24 weken, bij een speler met twee mensen in dienst:
+  - bij websites en foto verdient een overname zijn loon ruim terug, en de koopsom in een tot anderhalf jaar;
+  - bij administratie niet, want daar is juist de vraag de rem;
+  - een filiaal levert de automatische speler niets op, omdat hij niet handelt en het extra team niet vult.
+- Groeien is dus een weddenschap en geen knop die altijd wint. Het basisspel verandert er niet door: alle toetsen van 1.0 en van de startposities blijven groen.
+
+**De toetsen:**
+- `test/magnaatgroei.test.js` (7 toetsen).
+- `test/magnaatgroei.e2e.js`: op een telefoon toont Mijn bedrijf het blok Groeien, en een overname gaat naar de echte server, die hem met reden weigert.
+
+### NA 1.0: samen in een Oudwijk (27 september 2026)
+
+Twee tot vier spelers delen een stad. Ieder houdt zijn eigen leven en zijn eigen grootboek; wat ze delen is de markt. Dit is de keuze van de eigenaar uit drie vormen:
+- **gekozen:** samen in één Oudwijk;
+- **niet gekozen:** samen één bedrijf, en handel tussen spelers.
+
+Het tempo is "de volgende dag als iedereen klaar is", en je komt binnen met een code uit je eigen kring. De module is `stad.js`, en de routes staan in `server/routes/magnaatstad.js`.
+
+**Hoe het werkt:**
+- **Een stad maken.** Wie een stad maakt, kiest de moeilijkheid en waar iedereen begint, en krijgt een code van zes tekens.
+- **Meedoen.** Met die code doe je mee, maar alleen zolang de stad nog wacht. Er kunnen hooguit vier spelers in.
+- **Beginnen.** Wie de stad maakte, zet hem in gang, vanaf twee spelers. Dan krijgt iedereen een nieuw leven met hetzelfde begin.
+- **De dag.** De echte klok telt niet. Wie zijn dag afsluit, wacht op de rest, en de laatste die klaar is, zet de stad voor iedereen een dag verder. Iedereen krijgt daarvan een seintje; de schermen verversen zichzelf.
+- **De markt.** De andere spelers nemen de plekken van verzonnen concurrenten in (`bereik.js`, de kring). Een speler:
+  - verkoopt tegen zijn eigen prijs, en alleen als hij handelt;
+  - zit waar zijn bedrijf zit;
+  - heet bij klanten zoals zijn onderneming;
+  - verliest een klant aan jou als hij die week echt te laat leverde.
+- **Overnemen.** Een andere speler neem je niet over; met mensen concurreer je.
+- **Vertrekken en het einde.**
+  - Wie vertrekt, laat de rest niet wachten.
+  - Na 112 dagen is de stad afgelopen.
+  - Beginnen, versnellen en opnieuw beginnen kunnen in een stad niet.
+
+**De grenzen:**
+- Er gaat geen geld tussen spelers, dus het grootboek verandert niet.
+- Een sessiesleutel verlaat `stad.js` nooit: een speler heet zijn codenaam, ook in het seintje.
+- Er is geen ranglijst. Aan het eind staan de verhalen naast elkaar in de volgorde waarin spelers binnenkwamen, niet op winst.
+- Een stad is een potje. 28 dagen na afloop verdwijnt hij, met de levens erin; het journaal blijft staan, want een journaal groeit alleen en kent geen leden. Daarom mag iedereen meespelen, ook onder de 18.
+
+**Een vondst onderweg.** `stad/staat` stond eerst als "zelfde verzoek" in het idempotentieregister. Een speler die ververste nadat een ander de dag afsloot, kreeg dan vijf seconden lang het oude antwoord terug, en dat is in een gedeelde stad juist het moment waarop je ververst. De route verandert niets en heet daarom `leest`.
+
+**Wat het niet bewijst.** De gelijktijdigheid is net als in V5 alleen binnen één proces beproefd: twee spelers die op exact hetzelfde moment als laatste klaar zijn, worden door Node na elkaar afgehandeld. Met meerdere serverprocessen hoort de stad onder een slot, zoals de Teamkamers dat met `bewerkCollectie` doen.
+
+**De toetsen:**
+- `test/magnaatstad.test.js` (8 toetsen, waarvan één tegen een echte server over alle zes routes).
+- `test/magnaatstad.e2e.js`: twee telefoons, een stad maken, meedoen met de code, en samen een dag verder via het seintje van de server.
+
 ---
 
 ## 8. De regels

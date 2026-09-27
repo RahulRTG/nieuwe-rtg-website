@@ -11,12 +11,12 @@ const { klantenVan } = require('./klanten');
 
 const MAX_MELDINGEN = 60;
 
-function nieuw({ wereld, nu, moeilijkheid = 'normaal' }) {
+function nieuw({ wereld, nu, moeilijkheid = 'normaal', start = 'keuken' }) {
   const st = {
-    versie: 2, regelversie: R.REGELVERSIE, wereld, moeilijkheid,
+    versie: 2, regelversie: R.REGELVERSIE, wereld, moeilijkheid, start,
     dag: 1, dagMs: R.DAG_MS, begonnen: nu, gerekendTot: nu,
     kas: 0,
-    baan: Object.assign({ actief: true }, R.BAAN),
+    baan: Object.assign({ actief: true }, R.BAAN, R.STARTPOSITIES[start].baan),
     bezit: ['telefoon', 'eenvoudige laptop'],
     agenda: {},
     aanbod: null, portfolio: 0, geleerd: 0,
@@ -28,7 +28,7 @@ function nieuw({ wereld, nu, moeilijkheid = 'normaal' }) {
     rtg: [], meldingen: [],
     boek: null
   };
-  for (const v of R.VERPLICHTINGEN) post(st, { soort: v.id, naam: v.naam, bedrag: R.verplichtingBedrag(st, v), dag: v.eerste });
+  for (const v of R.verplichtingenVan(st)) post(st, { soort: v.id, naam: v.naam, bedrag: R.verplichtingBedrag(st, v), dag: v.eerste });
   return zorgBedrijf(st);
 }
 
@@ -48,7 +48,7 @@ function ontgrendel(st, id) {
    id komt uit een teller en nooit uit de lengte van de lijst: dat id is ook de
    grootboeksleutel, en een sleutel die terugkomt boekt niets. */
 const AAN_WIE = { huur: 'je verhuurder', vast: 'je provider en je verzekeraar', uitstel: 'je provider en je verzekeraar',
-  software: 'de maker van je software', aanmaning: 'het incassobureau', aflossing: 'je familie' };
+  software: 'de maker van je software', aanmaning: 'het incassobureau', aflossing: 'je familie', studie: 'de studiefinanciering' };
 /* Een betaling van het bedrijf (V2) zegt zelf naar welke rekening hij gaat
    (`naar`, met de soort boeking), en bij loon voor wie hij is. */
 function post(st, { soort, naam, bedrag, dag, leverancier, naar, boekSoort, medewerker }) {

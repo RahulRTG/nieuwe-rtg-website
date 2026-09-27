@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2070 bestanden en 14599 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2074 bestanden en 14623 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2070 |
-| losse beweringen (`test(...)`) | 14599 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 174 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1416 |
+| toetsbestanden | 2074 |
+| losse beweringen (`test(...)`) | 14623 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 177 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1419 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 74 |
 | alleen in de kop *genoemd*, nog niet gemeten | 168 |
-| niets van beide | 412 |
+| niets van beide | 413 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1806 bestanden, 14135 beweringen.
+1810 bestanden, 14159 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -67,7 +67,7 @@ toets omvalt.
 | `afbouwafloop.test.js` | 7 | geen bronmutatie mogelijk | GEEN WERK ZONDER EIGENAAR, GEEN OPVOLGER ZOLANG WERK VAN DE VOORGANGER LEEFT. scripts/lib/afbouw-afloop.js legt vast wat er van een meetronde overblijft. |
 | `afbouwketen.test.js` | 2 | geen bronmutatie mogelijk | DE VOLLEDIGE LEVENSLOOP VAN EEN BRONMUTERENDE RONDE -- met echte processen. test/afbouwafloop.test.js beproeft de module op zichzelf. |
 | `afbouwoordeel.test.js` | 6 | gezakt op `===->!==#0` | DE GEZAGSPOORT -- alleen BEWEZEN mag door. `afbouw:software` is de softwarepoort voor een uitrol, en hij reeg vier stappen aan elkaar met `&&`. |
-| `afbouwpoort.test.js` | 8 | gezakt op `===->!==#3` | MEET NIEMAND TERWIJL EEN MOTOR DE BRON VERBOUWT? Twee motoren in dit huis muteren met opzet echte bestanden en zetten ze in een finally terug: scripts/mutatie.js (de mutatiemotor) en test/meterijk.test.js (de ijking,... |
+| `afbouwpoort.test.js` | 9 | gezakt op `===->!==#3` | MEET NIEMAND TERWIJL EEN MOTOR DE BRON VERBOUWT? Twee motoren in dit huis muteren met opzet echte bestanden en zetten ze in een finally terug: scripts/mutatie.js (de mutatiemotor) en test/meterijk.test.js (de ijking,... |
 | `afgeleid.test.js` | 9 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `afleidbaar.test.js` | 9 | gezakt op `===->!==#0` | WAT IS ER AFLEIDBAAR UIT EEN CODENAAM -- en meet die meter dat werkelijk? MAGNAATLAB.md par. |
 | `afleidrest-dubbeltik.test.js` | 3 | -- | DE VIJF DUBBELTIKKEN -- en de eis dat "geen tweede effect" niet genoeg is. server/lib/idemsleutels-afleidrest.js verklaart vijf routes als `zelfdeVerzoek` omdat de idemproef ze GEMETEN onbeschermd vond: "een... |
@@ -274,7 +274,7 @@ toets omvalt.
 | `chaos.pg.test.js` | 3 | slaat zichzelf over | Chaos-/concurrency-test: meerdere gelijktijdige schrijvers naar DEZELFDE Postgres-collectie, om te bewijzen dat er onder contentie niets verloren gaat. Elke "schrijver" is een eigen pg-adapterinstance (eigen... |
 | `chaos.test.js` | 7 | gezakt op `>=->>#0` | De meetkant van de chaosproef (scripts/lib/chaosmeet.js). HET OMLEGGEN ZELF IS EEN SCRIPT (scripts/chaos.js): dat start een eigen trio, schiet de ACTIEVE server met SIGKILL om en meet door. |
 | `charter.test.js` | 8 | gezakt op `liegpoort /api/` | Charter (boten en jachten), eerlijk verhuren: vaste dagprijs vooraf betaald, met of zonder schipper, bareboat alleen met vaarbewijs, dubbele boekingen onmogelijk, staat met foto's VOOR het uitvaren en NA de... |
-| `ci-keten.test.js` | 6 | gezakt op `+->-#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `ci-keten.test.js` | 7 | gezakt op `+->-#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `ci-lokaal.test.js` | 18 | gezakt op `<=-><#0` | DE LOKALE KETEN -- draait hier wat de CI straks draait? Deze toetsen bewaken twee dingen die uit elkaar kunnen lopen zonder dat iemand het merkt: de AFLEIDING (leest scripts/lib/werkstroom.js de werkstromen goed... |
 | `cijferopmens.test.js` | 8 | gezakt op `===->!==#0` | CAR-05 OVER DE HELE CARRIEREKANT -- er komt geen cijfer op een mens. DEZE TOETS BESTAAT OMDAT DE GRENS VIER DOCUMENTEN HAD EN EEN HANDHAVER, en die ene dekte precies EEN map. |
 | `claims-btw.test.js` | 11 | gezakt op `===->!==#0` | BTW EN CLAIMS: het tarief op EEN plek, en geen bewering zonder dekking. TWEE GATEN uit de doorlichting van 20 augustus 2026: 4.10 `* 1.21` stond hard in kern/fonds.js en kern/lid/facturen.js, terwijl het platform... |
@@ -1009,6 +1009,9 @@ toets omvalt.
 | `namensversmalling.test.js` | 8 | -- | DE VERSMALLING ALS MACHINEWET -- kan deze doorsnede ooit iets TOEVOEGEN? REPRESENTATIE.md REP-03 zegt: een gedelegeerde bevoegdheid kan nooit groter zijn dan de effectieve bevoegdheid van de gever. |
 | `namensvorm.test.js` | 7 | -- | DE NAMENSVORM-METER: kan hij nog vinden wat hij beweert niet te vinden? REPRESENTATIE.md par. |
 | `naslag.test.js` | 9 | genoemd | HET NASLAGWERK -- één bron voor de CLI en het uitgeversbureau. `rtg sdk` schreef de typings en de documentatie al uit de code. |
+| `native-artifact.test.js` | 11 | gezakt op `true->false#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `native-process.test.js` | 2 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `native-source-binding.test.js` | 1 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `navigatie-index.test.js` | 13 | genoemd | DE GEBIEDSINDEX: wat er van de bron overblijft, en wat er wordt geweigerd. scripts/navigatie-index.js is met opzet in twee helften geschreven. |
 | `navigatie.test.js` | 14 | gezakt op `+->-#0` | RTG Navigatie (server/kern/navigatie.js): het huiseigen navigatiesysteem. Getoetst als pure motor met de echte haversine en fakes voor de Flits-koppeling: het eigen wegennet + A*-route, de bocht-voor-bocht en ETA per... |
 | `navigatiegebieden.test.js` | 19 | genoemd | DE GEBIEDEN VAN DE NAVIGATIE -- de catalogus, de gebiedsbepaling en de licentiepoort. Deze laag bestaat omdat de motor precies EEN gebied kende (Nederland, met een bbox en een bestandsnaam in de code). |
@@ -1197,7 +1200,7 @@ toets omvalt.
 | `productie-installatie.test.js` | 4 | gezakt op `+->-#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `productie-motor.test.js` | 8 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `productie-promotie.test.js` | 5 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `productie-status.test.js` | 20 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `productie-status.test.js` | 22 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `productie-vrijgave.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `productie.test.js` | 23 | gezakt op `===->!==#0` | Tests voor de productie-hardening: config-validatie, duurzame opslag, betaal-naad (idempotentie + webhook-verificatie) en de logger. NB: STRIPE_WEBHOOK_SECRET wordt hier gezet vóór het laden van betaal.js, omdat die... |
 | `productieseed.test.js` | 3 | genoemd | DE PRODUCTIESEED HOUDT ZIJN EIGEN BELOFTE. server/seed/index.js droeg de sleutel `trip` TWEE KEER in hetzelfde objectliteraal: `trip: null` met een uitleg erboven, en drie regels lager `trip: { dest: '', dates: '',... |
@@ -1230,7 +1233,7 @@ toets omvalt.
 | `rechterhand-wissen.test.js` | 9 | gezakt op `liegpoort /api/` | DE RECHTERHAND: WAT ER WEGGEGOOID WORDT. Dit bestand bestaat omdat de WAARGENOMEN dekkingsmeting (scripts/dekking.js) een patroon liet zien dat een tekstzoektocht nooit had opgeleverd. |
 | `rechterhand.test.js` | 18 | gezakt op `liegpoort /api/` | Integratietests voor de extra premium ROS-apps van de Lifestyle Pass: Reisboek (reisdossier + documenten-attentie), Cellier (wijnkelder + drinkvenster), Table (diners: gasten + menu) en Maison (staf + taken). Gated... |
 | `redactie.test.js` | 7 | gezakt op `liegpoort /api/` | RTG Redactie: het persbureau (krant, magazine en drukkerij) plus de eigen Nieuws-app voor de leden. Getest: de statusketen van een artikel (publiceren is een mensbesluit; daarna is het stuk onwijzigbaar), de... |
-| `redis.test.js` | 4 | gezakt op `===->!==#0` | Eigen Redis-client (server/redis.js), die het pakket `redis` verving. We starten een ECHTE redis-server op een vrije poort en toetsen: set/get, publish/subscribe, en kruisvalidatie met de nog geïnstalleerde... |
+| `redis.test.js` | 4 | gezakt op `===->!==#0` | Eigen Redis-client (server/redis.js), die het pakket `redis` verving. We starten een ECHTE redis-server op een vrije poort en toetsen: set/get, publish/subscribe, en kruisvalidatie met de officiële redis-cli (mijn... |
 | `redisbus-failclosed.test.js` | 2 | -- | Redis is bij een geconfigureerd cluster geen versneller maar een deel van de bevoegdheidsketen. Een ongeldige verbinding en een vollopende wachtrij mogen daarom nooit als gezonde in-procesbus eindigen. |
 | `refundmigratie.test.js` | 9 | gezakt op `===->!==#0` | DE MIGRATIEKAART VAN DE BETAALSTAND (scripts/refundmigratie.js). De eigenaar heeft besloten dat een terugstorting een TEGENBOEKING is en geen wisser. |
 | `regexmutatie.test.js` | 13 | gezakt op `===->!==#0` | DE REGEX-OPERATOR VAN DE MUTATIEMOTOR. scripts/lib/regexmutatie.js laat het laatste alternatief van een regex vallen, zodat de mutatiemotor ook beweringen kan beproeven die aan een regex hangen. |
@@ -1562,6 +1565,7 @@ toets omvalt.
 | `stuurplafond.test.js` | 9 | gezakt op `===->!==#0` | HET UITVOERINGSPLAFOND (server/kern/stuur/plafond.js). Dit bestand bewaakt de regel waarop de hele omlegging van de vraagbalk rust: geen enkele bestaande vraag mag door een routewissel automatisch een side effect... |
 | `stuurrail.test.js` | 14 | gezakt op `===->!==#0` | DE INTERPRETATIERAIL -- is hij werkelijk vervangbaar, en grendelt hij dicht? Dit bestand bewaakt één belofte: de RTG-keten (resolver -> plan -> gevolg -> plafond -> capability) moet te beproeven zijn ZONDER extern... |
 | `stuurspoor.test.js` | 12 | gezakt op `===->!==#0` | HET STUURSPOOR -- observeert het, en bewijst het iets? Twee beloften. |
+| `suite-pg.test.js` | 6 | -- | Release-testisolatie: gewone tests mogen geen gedeelde CI-database erven. Alle verplichte PG-bestanden blijven uitgevoerd via hun eigen database; verouderde, onvolledige en vervalste tellingen mogen niet bij de suite... |
 | `supplier-activity.test.js` | 6 | gezakt op `&&->||#2` | HET LOGBOEK VAN EEN ZAAK IS TERUG TE LEZEN -- POST /api/supplier/activity. WAAROM DEZE TOETS BESTAAT. |
 | `supplier-comm-mob-payroll.test.js` | 11 | gezakt op `liegpoort /api/` | NEGENTIEN ZAKELIJKE INGANGEN DIE DOOR GEEN ENKELE TOETS WERDEN AANGEROEPEN. Ze staan in vier bestanden, ze zitten alle vier in de zaak-app, en de suite kwam er nooit langs: routes/supplier/comm.js inbox, gesprek,... |
 | `supplier-comm-routes.test.js` | 5 | gezakt op `liegpoort /api/` | HET COLLEGA-GESPREK VAN EEN ZAAK, EN DE IDENTITEITSOPVRAAG. Zeven comm-deuren en twee identiteitsdeuren werden door geen enkele toets geopend. |

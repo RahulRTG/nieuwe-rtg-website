@@ -3,7 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { BRONNEN, leesProductiestatus } = require('./productie-vrijgave');
+const { bewijsBronnen, leesProductiestatus } = require('./productie-vrijgave');
 const trust = require('../../server/config/release-trust');
 
 const REL = Object.freeze({ document:'.release/productie-promotie.json',
@@ -37,18 +37,25 @@ function geldigeKandidaat(k) {
     HASH.test(String(k.bewijsBestandSha256 || k.herkomstSha256 || ''));
 }
 
-function bewijskaart(root) {
+function bewijskaart(root, soort = 'oci') {
   const uit = {};
-  for (const [naam, rel] of Object.entries(BRONNEN)) {
-    const bytes = leesRegulier(path.join(root, rel));
-    uit[naam] = { pad:rel, sha256:sha256(bytes), bytes:bytes.length };
+  for (const [naam, rel] of Object.entries(bewijsBronnen(soort))) {
+    if (rel.endsWith('.rtgp')) {
+      const file = path.join(root, rel);
+      uit[naam] = { pad:rel, sha256:require('./native-artifact').hashFile(file), bytes:fs.statSync(file).size };
+    } else {
+      const bytes = leesRegulier(path.join(root, rel));
+      uit[naam] = { pad:rel, sha256:sha256(bytes), bytes:bytes.length };
+    }
   }
   return uit;
 }
 
 function maak(root, commit, env = process.env) {
   const status = leesProductiestatus(commit, root);
-  const kandidaat = require('./live-kandidaat').controleer(root, commit);
+  const isNative = status.artifactSoort === 'native';
+  const kandidaat = isNative ? require('./native-kandidaat').controleer(root, commit)
+    : require('./live-kandidaat').controleer(root, commit);
   const approver = String(env.RTG_PROMOTION_APPROVER || '').trim();
   const ticket = String(env.RTG_PROMOTION_TICKET || '').trim();
   const bevestiging = String(env.RTG_PROMOTION_CONFIRM || '');
@@ -57,23 +64,24 @@ function maak(root, commit, env = process.env) {
     throw new Error('Promotie vereist een geldige release-authority en besluitreferentie.');
   if (bevestiging !== 'PROMOVEER-' + commit.slice(0, 12))
     throw new Error('Expliciete RTG_PROMOTION_CONFIRM voor deze commit ontbreekt.');
-  return { formaat:'rtg-productie-promotie-v2', ondertekenDomein:trust.ROLES.PROMOTION.domain, gemaakt:new Date().toISOString(),
+  return { formaat:isNative ? 'rtg-native-promotie-v1' : 'rtg-productie-promotie-v2', ondertekenDomein:trust.ROLES.PROMOTION.domain, gemaakt:new Date().toISOString(),
     commit, release:status.release, goedgekeurdDoor:approver, besluit:ticket,
     productionStatus:{ pad:'.release/productie-status.json',
       sha256:sha256(leesRegulier(path.join(root, '.release', 'productie-status.json'))),
       bewijsSha256:status.bewijsSha256 },
-    kandidaat:{ image:{ immutable:kandidaat.image.immutable, id:kandidaat.image.id,
+    kandidaat:isNative ? kandidaat : { image:{ immutable:kandidaat.image.immutable, id:kandidaat.image.id,
       digest:kandidaat.image.digest, bewijsBestandSha256:kandidaat.image.bewijsBestandSha256 },
     backup:{ immutable:kandidaat.backup.immutable, id:kandidaat.backup.id,
       digest:kandidaat.backup.digest, herkomstSha256:kandidaat.backup.herkomstSha256 } },
-    bewijzen:bewijskaart(root),
+    bewijzen:bewijskaart(root, status.artifactSoort || 'oci'),
     externeBewijzen:status.externeVrijgave && status.externeVrijgave.bewijsBestanden };
 }
 
 function teken(documentBytes, key) { return trust.sign('PROMOTION', documentBytes, key); }
 
 function controleerStructuur(document, commit, status, kaart) {
-  if (!document || document.formaat !== 'rtg-productie-promotie-v2' ||
+  const isNative = status.artifactSoort === 'native';
+  if (!document || document.formaat !== (isNative ? 'rtg-native-promotie-v1' : 'rtg-productie-promotie-v2') ||
       document.ondertekenDomein !== trust.ROLES.PROMOTION.domain ||
       document.commit !== commit || document.release !== status.release ||
       !Number.isFinite(Date.parse(document.gemaakt)) ||
@@ -82,12 +90,14 @@ function controleerStructuur(document, commit, status, kaart) {
       !document.productionStatus || document.productionStatus.pad !== '.release/productie-status.json' ||
       !HASH.test(String(document.productionStatus.sha256 || '')) ||
       document.productionStatus.bewijsSha256 !== status.bewijsSha256 ||
-      !geldigeKandidaat(document.kandidaat && document.kandidaat.image) ||
-      !geldigeKandidaat(document.kandidaat && document.kandidaat.backup) ||
+      !(isNative ? require('./native-kandidaat').geldig(document.kandidaat)
+        : geldigeKandidaat(document.kandidaat && document.kandidaat.image) &&
+          geldigeKandidaat(document.kandidaat && document.kandidaat.backup)) ||
       JSON.stringify(document.bewijzen) !== JSON.stringify(kaart) ||
       JSON.stringify(document.externeBewijzen) !==
         JSON.stringify(status.externeVrijgave && status.externeVrijgave.bewijsBestanden)) return false;
   const statusKandidaat = status.kandidaatVrijgave || {};
+  if (isNative) return JSON.stringify(document.kandidaat) === JSON.stringify(statusKandidaat);
   return document.kandidaat.image.immutable === ((statusKandidaat.image || {}).immutable) &&
     document.kandidaat.image.id === ((statusKandidaat.image || {}).id) &&
     document.kandidaat.backup.immutable === ((statusKandidaat.backup || {}).immutable) &&
@@ -110,7 +120,7 @@ function controleer(root, commit) {
       !trust.verify('PROMOTION', documentBytes, sigTekst, key))
     throw new Error('Productiepromotie heeft geen geldige release-authority-handtekening.');
   const status = leesProductiestatus(commit, root);
-  const kaart = bewijskaart(root);
+  const kaart = bewijskaart(root, status.artifactSoort || 'oci');
   const statusHash = sha256(leesRegulier(path.join(root, '.release', 'productie-status.json')));
   if (!controleerStructuur(document, commit, status, kaart) ||
       document.productionStatus.sha256 !== statusHash)

@@ -147,6 +147,10 @@ const BRON = require('./lib/meetbron').bron();
 
 const env = { ...process.env, RTG_ROUTELOG: journaal, RTG_AFBOUW_SLOT_ACTIEF: '1',
   NODE_OPTIONS: nodeOpties, RTG_TOETSDUUR: duurpad, RTG_TOETSBRON: BRON };
+const pgSuite = require('./lib/suite-pg');
+const opslagPlan = pgSuite.plan(bestanden, env, !selectie.length && !deel && !zonderIjkingen && !zonderZware);
+const lokaleBestanden = opslagPlan.bestanden;
+let pgBron = null;
 
 /* HET JOURNAAL LEEGGOOIEN DOET ALLEEN WIE OOK ECHT GAAT DRAAIEN, en die regel
    is duur geleerd. De unlink stond hier onvoorwaardelijk, boven de --toon-poort
@@ -231,7 +235,7 @@ function draai(namen, parallel, metVloer, tijdgrens) {
   const metDekking = !!(dekkingMap || (metVloer && dekkingVloer.length === 3));
   const r = spawnSync(process.execPath, args, {
     cwd: WORTEL, stdio: 'inherit', timeout: 90 * 60 * 1000,
-    env: { ...env, RTG_TOETSMODUS: metDekking ? 'dekking' : 'normaal' }
+    env: { ...opslagPlan.env, RTG_TOETSMODUS: metDekking ? 'dekking' : 'normaal' }
   });
   try {
     batchBewijzen.push(tapSamenvatting(fs.readFileSync(tapPad, 'utf8')));
@@ -245,9 +249,9 @@ function draai(namen, parallel, metVloer, tijdgrens) {
   return r.status == null ? 2 : r.status;
 }
 
-const gewoon = verdeel(bestanden.filter(n => !isGeisoleerd(n) &&
+const gewoon = verdeel(lokaleBestanden.filter(n => !isGeisoleerd(n) &&
   (!zonderZware || selectie.length || !ZWAAR.includes(n))), deel);
-const geïsoleerd = verdeel(bestanden.filter(n => isGeisoleerd(n) &&
+const geïsoleerd = verdeel(lokaleBestanden.filter(n => isGeisoleerd(n) &&
   (!zonderIjkingen || selectie.length || !IJKINGEN.includes(n))), deel);
 
 /* WAT ZOU JE DOEN? -- `--toon` drukt de indeling af en draait niets.
@@ -264,7 +268,7 @@ const geïsoleerd = verdeel(bestanden.filter(n => isGeisoleerd(n) &&
    er straks apart draait, krijgt hetzelfde antwoord. */
 if (argv.includes('--toon')) {
   console.log(JSON.stringify({ parallel: gewoon, geisoleerd: geïsoleerd, concurrency,
-    dekking: dekkingMap || dekkingVloer, journaal }, null, 2));
+    dekking: dekkingMap || dekkingVloer, journaal, postgres:opslagPlan.pg }, null, 2));
   geefAfbouwSlotVrij();
   process.exit(0);
 }
@@ -280,6 +284,15 @@ for (const naam of geïsoleerd) {
   console.log('[tests] geïsoleerd: ' + naam);
   const uit = draai([naam], 1, false, IJKINGEN.includes(naam) ? TIJDGRENS_IJKING : TIJDGRENS);
   if (uit && !code) code = uit;
+}
+if (opslagPlan.apart) {
+  try {
+    const pg = pgSuite.draai(WORTEL, env);
+    batchBewijzen.push(pg.telling); pgBron = pg.bron;
+  } catch (e) {
+    console.error('[tests] ' + e.message);
+    batchBewijzen.push(tapSamenvatting('')); if (!code) code = 1;
+  }
 }
 geefAfbouwSlotVrij();
 
@@ -323,7 +336,8 @@ if (!selectie.length && !deel && !zonderIjkingen && !zonderZware) {
         'Hij zegt alleen dat er een volle ronde is geweest, wanneer, en met welke uitkomst.',
       hoe: 'npm test',
       gemeten: { volledig: true, bestanden: bestanden.length, bestandenSha256,
-        afsluitcode: code, groen: code === 0, ...telling }
+        afsluitcode: code, groen: code === 0, ...telling },
+      postgres: pgBron
     }, null, 1) + '\n');
   } catch (e) {
     console.error('[tests] kon SUITE.json niet schrijven: ' + e.message);

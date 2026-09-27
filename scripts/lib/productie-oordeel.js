@@ -167,10 +167,18 @@ function beoordeel(invoer) {
       .foundationReleaseBlokkades(externControle, golive && golive.foundation))
       eis(false, blokkade);
   const keten = kandidaatControle;
-  eis(!!keten && keten.ok === true && keten.commit === commit && pin(keten.bewijsSha256) &&
+  if (invoer.artifactSoort === 'native') {
+    eis(!!keten && keten.ok === true && keten.commit === commit && pin(keten.bewijsSha256) &&
+      require('./native-kandidaat').geldig(keten),
+    'Een exact ondertekend native pakket met runtime- en beoordeeld rollbackbewijs ontbreekt' +
+      (keten && keten.reden ? ' (' + keten.reden + ')' : '') + '.');
+  } else {
+    eis(!invoer.artifactSoort || invoer.artifactSoort === 'oci', 'Onbekende productie-artifactsoort.');
+    eis(!!keten && keten.ok === true && keten.commit === commit && pin(keten.bewijsSha256) &&
       geldigKandidaatDeel(keten.image, false) && geldigKandidaatDeel(keten.backup, true),
     'Een getekende CI-kandidaat met volledige SBOM, registrydigest en probereis ontbreekt' +
       (keten && keten.reden ? ' (' + keten.reden + ')' : '') + '.');
+  }
   return { status: blokkades.length ? 'BLOCKED' : 'READY', blokkades };
 }
 

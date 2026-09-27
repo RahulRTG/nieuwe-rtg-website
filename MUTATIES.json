@@ -6200,6 +6200,30 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "native-artifact.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/native-artifact.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "native-process.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/native-process.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "native-source-binding.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/native-artifact.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
     "navigatie.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -10990,5 +11014,26 @@
       "gezakt": 1,
       "geprobeerd": 1
     }
+  },
+  "samengevoegd": {
+    "uitleg": "Historische mutatie-uitkomsten uit beide takken behouden; geen nieuwe meetronde of kandidaatbewijs.",
+    "bronnen": [
+      {
+        "op": "2026-09-27T00:53:34.233Z",
+        "commit": "f48f86399",
+        "boomVuil": false,
+        "boomAnders": 1,
+        "instrument": "scripts/mutatie.js",
+        "node": "v26.10.0"
+      },
+      {
+        "op": "2026-09-27T13:56:18.282Z",
+        "commit": "43461f914",
+        "boomVuil": false,
+        "boomAnders": 1,
+        "instrument": "scripts/mutatie.js",
+        "node": "v22.22.2"
+      }
+    ]
   }
 }

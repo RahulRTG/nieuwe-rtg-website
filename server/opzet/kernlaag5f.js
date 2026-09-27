@@ -1,4 +1,5 @@
-/* DE KERN SAMENSTELLEN -- deel 5f: RTG Festival.
+/* DE KERN SAMENSTELLEN -- deel 5f: RTG Festival (en de horecabon en de
+   promotiecode van RTG Eten, onderaan).
 
    Een eigen deel en niet een regel in ./kernlaag5.js, om twee redenen. Die
    staat met 9,4 kB tegen de omvangsgrens aan, en belangrijker: deze wereld
@@ -24,4 +25,11 @@ module.exports = (kern, hulp) => {
      een volgende laag kan er nog bij zetten. Een functie leest laat; een waarde
      bevriest wat er nu is (zelfde reden als de Proxy in ./domeingrens.js). */
   kern.festival = require('../kern/festival')({ db, save, bewerkCollectie, crypto, schoon, kern: () => kern });
+  /* Twee geldwaardige codes met een eigen collectietransactie (CODECREDENTIALS.json):
+     de horecabon/polsband (horeca.bon_en_polsbandsaldo) en de promotiecode van RTG
+     Eten (eten.kortingscode). Hier en niet in een router: EEN instantie per proces,
+     en een router krijgt geen bewerkCollectie. Onder een eigen naam, om dezelfde
+     reden als kern.festival hierboven. */
+  kern.horecaBonlaag = require('../kern/horeca/bon')({ db, bewerkCollectie, crypto });
+  kern.etenKorting = require('../kern/eten/kortingscode')({ db, bewerkCollectie, crypto });
 };

@@ -81,12 +81,11 @@ test('de echte credentials uit de classificatieronde blokkeren de release', () =
   const register = poort.lees();
   const uit = poort.controleer(register);
   const echte = ['office.gedeelde_kantoorcode', 'partnerkanaal.personeels_en_partnercode',
-    'horeca.bon_en_polsbandsaldo', 'link.capability_aanvaarden', 'travelos.ov_incheckcode',
+    'link.capability_aanvaarden', 'travelos.ov_incheckcode',
     'mode.bezorgcode', 'workos.concern_uitnodiging', 'festivalos.toegangspas',
     'magnaat.teamkamer_toegangscode', 'identity.sso_client_secret',
     'rtfos.activiteit_incheckcode', 'office.kantooruitnodiging', 'service.balie_bevestigingscode',
-    'foundation.onderwijs_les_tokens', 'foundation.family_profile_token_buiten_harde_poort',
-    'eten.kortingscode'];
+    'foundation.onderwijs_les_tokens', 'foundation.family_profile_token_buiten_harde_poort'];
   // gemigreerd op 27 september 2026 (B9, de vier restdeuren): zie de toets hieronder
   const restdeuren = new Set(['travelos.ov_incheckcode', 'mode.bezorgcode', 'festivalos.toegangspas',
     'rtfos.activiteit_incheckcode']);
@@ -158,6 +157,13 @@ test('iedere resterende deur blokkeert de release', () => {
   assert.ok(!uit.blockers.some(x => x.id === 'pay.giftcard_value_code'),
     'de cadeaukaart is gemigreerd (27 september 2026) en blokkeert niet meer');
   assert.equal(poort.lees().deuren.find(x => x.id === 'pay.giftcard_value_code').status, 'migrated');
+  /* Besluiten B11 en B13 (27 september 2026): de horecabon is gemigreerd, de
+     kortingscode van RTG Eten is een promotiecode -- geen geheim, wel begrensd. */
+  assert.ok(!uit.blockers.some(x => x.id === 'horeca.bon_en_polsbandsaldo'));
+  assert.equal(poort.lees().deuren.find(x => x.id === 'horeca.bon_en_polsbandsaldo').status, 'migrated');
+  const promo = poort.lees().deuren.find(x => x.id === 'eten.kortingscode');
+  assert.ok(!uit.blockers.some(x => x.id === 'eten.kortingscode'));
+  assert.deepEqual([promo.status, promo.classificatie, promo.release_blocker], ['closed', 'public_identifier', false]);
   assert.ok(!uit.blockers.some(x => x.id === 'travelos.airport_boarding_pass'));
   assert.equal(poort.lees().deuren.find(x =>
     x.id === 'travelos.airport_boarding_pass').status, 'migrated');

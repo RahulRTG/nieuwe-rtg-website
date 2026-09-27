@@ -105,7 +105,13 @@ const ROUTES = new Set([
   /* De sleutel per Zaakdoos (kern/zaakdoos/sleutels.js): uitgeven is roteren, en
      het antwoord draagt de kale sleutel die daarna alleen als hash bestaat. */
   'POST /api/office/doos/sleutel',
-  'POST /api/supplier/doos/sleutel'
+  'POST /api/supplier/doos/sleutel',
+  /* De horecabon en de polsband (kern/horeca/bon.js): de code staat alleen in
+     het antwoord op maken, de eerste band-opwaardering en een rotatie; een
+     herhaling krijgt de bon zonder code. */
+  'POST /api/supplier/horeca/bon/maak',
+  'POST /api/supplier/horeca/bon/roteer',
+  'POST /api/supplier/horeca/club/band'
 ]);
 
 const isEenmalig = (methode, pad) => ROUTES.has(

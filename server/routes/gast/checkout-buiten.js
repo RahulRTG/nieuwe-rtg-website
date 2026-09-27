@@ -3,7 +3,7 @@
 'use strict';
 const product = require('../../kern/eten/product');
 
-module.exports = ({ kern, horeca, bezorglaag, beleid, schoon }) => function checkoutVan(s, b, kanaal) {
+module.exports = ({ kern, horeca, bezorglaag, beleid, schoon, korting }) => function checkoutVan(s, b, kanaal, lidKey) {
   const magBestellen = beleid.magBestellen(s.code, kanaal);
   if (!magBestellen.mag) return { status: 403, error: magBestellen.uitleg, code: magBestellen.code };
   const wensen = Array.isArray(b.items) ? b.items.slice(0, 40) : [];
@@ -51,12 +51,16 @@ module.exports = ({ kern, horeca, bezorglaag, beleid, schoon }) => function chec
       bevestigbaar = false; blokkade = 'Vul het bezorgadres in voordat je bevestigt.'; blokkadeCode = 'adres';
     }
   }
+  /* Een promotiecode (kern/eten/kortingscode.js): vervaldatum, maximum en
+     grens per lid worden hier GETOOND; het tellen gebeurt atomair bij bestellen. */
   const kortingscode = String(schoon(b.kortingscode, 30) || '').toUpperCase() || null;
-  const korting = kortingscode && (s.kortingscodes || []).find(k => String(k.code || '').toUpperCase() === kortingscode && k.actief !== false);
-  if (kortingscode && !korting) { bevestigbaar = false; blokkade = 'Deze kortingscode is niet geldig.'; blokkadeCode = 'kortingscode'; }
-  const kortingCenten = korting ? Math.min(subtotaalCenten,
-    korting.procent ? Math.round(subtotaalCenten * Math.max(0, Math.min(100, Number(korting.procent))) / 100)
-      : Math.max(0, Number(korting.centen) || 0)) : 0;
+  const open = rid => { const r = horeca.Hlees(s.code).rekeningen[rid]; return !!(r && r.status === 'open'); };
+  const oordeel = kortingscode ? korting.geldig(s.code, s.kortingscodes, kortingscode, lidKey, open) : {};
+  const kortingRegel = oordeel.korting || null;
+  if (kortingscode && !kortingRegel) { bevestigbaar = false; blokkade = korting.UITLEG[oordeel.reden]; blokkadeCode = 'kortingscode'; }
+  const kortingCenten = kortingRegel ? Math.min(subtotaalCenten,
+    kortingRegel.procent ? Math.round(subtotaalCenten * Math.max(0, Math.min(100, Number(kortingRegel.procent))) / 100)
+      : Math.max(0, Number(kortingRegel.centen) || 0)) : 0;
   const fooiCenten = Math.max(0, Math.min(50000, parseInt(b.fooiCenten, 10) || 0));
   const prijsversie = product.prijsversie(regels);
   const genoemdeAllergie = schoon(b.allergie, 120).toLowerCase();
@@ -69,10 +73,10 @@ module.exports = ({ kern, horeca, bezorglaag, beleid, schoon }) => function chec
     bezorg: check ? { bezorgbaar: !!check.bezorgbaar, zone: check.zone || null,
       minuten: check.zone ? check.zone.minuten : null, minimumCenten: check.minimumCenten || 0,
       tekortCenten: check.tekort || 0, gratisBezorging: !!check.gratisBezorging } : null,
-    kortingscode, waarschuwingen,
+    kortingscode, kortingReden: kortingscode && !kortingRegel ? oordeel.reden : null, waarschuwingen,
     bevestiging: beleid.bevestigingNodig(s.code, { allergie: schoon(b.allergie, 120), totaalCenten: subtotaalCenten }),
     betaling: { status: 'openstaand', wijze: 'bij-ontvangst',
       label: kanaal === 'bezorging' ? 'Betaling volgt bij ontvangst' : 'Betaling volgt bij afhalen',
       onlineAfschrijving: false },
-    gecontroleerdAt: horeca.nu(), _check: check };
+    gecontroleerdAt: horeca.nu(), _check: check, _korting: kortingRegel };
 };

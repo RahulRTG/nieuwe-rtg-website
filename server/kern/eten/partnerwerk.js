@@ -80,7 +80,8 @@ module.exports = (kern, horeca) => {
     });
     return { ok:true, rol, rollen:actor && actor.manager ? ['keuken','expeditie','frontoffice','management'] : [rol], orders:publiek,
       capaciteit:capaciteitVan(s), kortingscodes:(s.kortingscodes || []).map(k => ({ code:k.code,
-        procent:Number(k.procent) || 0, centen:Number(k.centen) || 0, actief:k.actief !== false })),
+        procent:Number(k.procent) || 0, centen:Number(k.centen) || 0, actief:k.actief !== false,
+        geldigTot:k.geldigTot || null, maxGebruik:k.maxGebruik || null, perLid:k.perLid || null })),
       samenvatting:{ zichtbaar:publiek.length, nieuw:publiek.filter(o => ['ontvangen','bevestigd'].includes(o.fase)).length,
         keuken:publiek.filter(o => o.fase === 'keuken').length, klaar:publiek.filter(o => o.fase === 'klaar').length,
         problemen:publiek.filter(o => o.statussen.incident !== 'geen').length } };

@@ -61,5 +61,13 @@ module.exports = Object.freeze({
   'POST /api/rtfos/activiteit/inschrijven':
     'het inschrijfantwoord toont de incheckcode eenmaal; dezelfde codenaam opnieuw inschrijven weigert de kern zelf (400), zonder code',
   'POST /api/rtfos/activiteit/incheckcode':
-    'een nieuwe incheckcode trekt de vorige in (kern/rtfos/activiteiten-deur.js); een herhaald antwoord zou een ingetrokken code tonen'
+    'een nieuwe incheckcode trekt de vorige in (kern/rtfos/activiteiten-deur.js); een herhaald antwoord zou een ingetrokken code tonen',
+  'POST /api/supplier/horeca/bon/maak':
+    'uitgifte toont een 128-bit boncode eenmaal; een herhaling met dezelfde sleutel geeft in kern/horeca/bon.js dezelfde bon zonder code, en een antwoordcache zou de code heronthullen',
+  'POST /api/supplier/horeca/club/band':
+    'de eerste opwaardering maakt de band en toont zijn 128-bit code eenmaal; een herhaald antwoord zou die code heronthullen, en opwaarderen is een geldhandeling die de bontransactie zelf beoordeelt',
+  'POST /api/supplier/horeca/bon/roteer':
+    'roteren toont een nieuwe boncode eenmaal en trekt de vorige in; de kern weigert dezelfde sleutel daarna met 409 zonder code',
+  'POST /api/supplier/horeca/bon/intrek':
+    'intrekken leest de actuele stand in kern/horeca/bon-beheer.js; een tweede keer is een toestandscontrole, geen gecachet antwoord'
 });

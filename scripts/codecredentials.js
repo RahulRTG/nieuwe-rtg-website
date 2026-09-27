@@ -185,7 +185,8 @@ const REQUIRED_ROUTES = [
   'POST /api/rtf/social/dm/send', 'POST /api/rtf/social/goedkeuren',
   'POST /api/rtf/social/oudervoeg', 'POST /api/rtf/social/respond',
   'POST /api/rtf/social/snap/send', 'POST /api/rtf/social/unblock',
-  'POST /api/supplier/eten/instellingen', 'POST /api/gast/bezorg/checkout'
+  'POST /api/supplier/eten/instellingen', 'POST /api/gast/bezorg/checkout',
+  'POST /api/supplier/horeca/bon/intrek', 'POST /api/supplier/horeca/bon/roteer', 'POST /api/gast/band'
 ];
 const CONTROLES = ['hash_only_at_rest', 'issuer_doel_scope', 'issued_at_expires_at',
   'max_gebruik_gebruik', 'server_side_intrekken_roteren', 'constant_time_lookup',

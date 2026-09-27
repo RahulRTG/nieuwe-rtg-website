@@ -268,7 +268,12 @@ test('afrekenen doet alleen wat er echt kan, en zegt wat er niet kan', async () 
   // met een echte cadeaubon van de zaak lukt het wel, en dan is hij ook echt betaald
   const bon = await post('/api/supplier/horeca/bon/maak', { soort: 'cadeaubon', centen: 1000 }, zaak);
   const bonCode = bon.body.bon.code;
-  const betaal = await post('/api/gast/betaal', { sleutel: a.sleutel, wijze: 'bon', bonCode });
+  // de bon hangt eerst aan DEZE sessie (koppelen met de code in de hand); betalen noemt geen code
+  const los = await post('/api/gast/betaal', { sleutel: a.sleutel, wijze: 'bon', bonCode });
+  assert.equal(los.status, 409, 'een code in het betaalverzoek opent niets');
+  assert.equal(los.body.code, 'bon-niet-gekoppeld');
+  assert.equal((await post('/api/gast/band', { sleutel: a.sleutel, bonCode })).status, 200);
+  const betaal = await post('/api/gast/betaal', { sleutel: a.sleutel, wijze: 'bon' });
   assert.equal(betaal.status, 200, JSON.stringify(betaal.body).slice(0, 200));
   assert.equal(betaal.body.gesloten, true);
   assert.equal(betaal.body.openstaand, 0);

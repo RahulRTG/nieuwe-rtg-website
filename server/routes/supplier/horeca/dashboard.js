@@ -108,10 +108,11 @@ module.exports = (kern) => {
           tekst: regel.naam + ' voor ' + (r.tafel || r.kanaal) + ' loopt al ' + loopt + ' minuten.' });
       }
     }
-    const banden = Object.values((h.club || {}).banden || {});
-    const openSaldo = banden.reduce((t, b) => t + ((h.bonnen[b.bonCode] || {}).saldo || 0), 0);
+    // het saldo van de banden woont in horecaBonnen (kern/horeca/bon.js)
+    const banden = (horeca.bonlaag ? horeca.bonlaag.kijk() : []).filter(b => b && b.zaak === req.supplier.code && b.band && b.saldo);
+    const openSaldo = banden.reduce((t, b) => t + b.saldo, 0);
     if (openSaldo) uit.push({ soort: 'polsbanden', tekst: 'Er staat nog ' + (openSaldo / 100).toFixed(2) + ' euro op ' +
-      banden.filter(b => (h.bonnen[b.bonCode] || {}).saldo).length + ' polsband(en); dat is geld van gasten.' });
+      banden.length + ' polsband(en); dat is geld van gasten.' });
 
     const folios = Object.values(h.folios || {}).filter(f => f.status === 'open');
     const zonderNacht = folios.filter(f => !f.nachten.includes(nu().slice(0, 10)));

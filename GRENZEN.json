@@ -699,7 +699,8 @@
     "leerhuis": [
       "employmentVanPersoon",
       "entiteitVind",
-      "kluisAuth"
+      "kluisAuth",
+      "rtfos"
     ],
     "leerstof": [
       "leerstof",

@@ -10,15 +10,16 @@
      entiteit  haar eigenaar, of een LOPEND dienstverband (kern/concern). Een
                mandaat telt niet: dat is inzage of bevoegdheid, geen werken hier.
      zaak      een actieve plek in het personeel (supplier_staff, via accounts).
-     rtf-stad  nog niet vast te stellen: vrijwilligers hangen niet aan een
-               account (stap B2b, ACADEMY.md par. 5). Dat telt als nee.
+     rtf-stad  een zetel in die stad, of een ACTIEVE vrijwilliger die zijn
+               dossier zelf aan zijn account koppelde, met zijn eigen code
+               (stap B2b, kern/rtfos/vrijwilligeraccount.js).
 
    Een sleutel buiten lid: kan geen bron bevestigen, en een bron die gooit is
    geen ja (fail closed).
    ========================================================================== */
 'use strict';
 
-function maakBronToets({ accounts, employmentVanPersoon, entiteitVind }) {
+function maakBronToets({ accounts, employmentVanPersoon, entiteitVind, rtfInStad }) {
   return function bronToets(bron, persoon) {
     const m = /^lid:(\d+)$/.exec(String(persoon || ''));
     if (!m || !bron) return false;
@@ -31,6 +32,7 @@ function maakBronToets({ accounts, employmentVanPersoon, entiteitVind }) {
         if (e.eigenaar === key) return true;
         return (employmentVanPersoon(key) || []).some(x => x.entiteit === bron.id && x.soort === 'employment');
       }
+      if (bron.soort === 'rtf-stad') return typeof rtfInStad === 'function' && rtfInStad(key, bron.id) === true;
     } catch (e) { return false; }
     return false;
   };

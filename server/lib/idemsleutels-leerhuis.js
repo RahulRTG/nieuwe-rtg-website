@@ -10,10 +10,22 @@
        route geeft zelf een vaste sleutel mee. */
 'use strict';
 
+const STAND = 'de kern vergelijkt met de huidige stand en ontdubbelt daarop zelf; een bewaard antwoord zou een stand van eerder teruggeven';
+
 const SLEUTELS = {
   'POST /api/leerhuis/lees': { leest: true },
   'POST /api/leerhuis/doe': { velden: ['org', 'actie', 'sleutel'] },
-  'POST /api/office/leerhuis/open': { velden: ['id'] }
+  'POST /api/office/leerhuis/open': { velden: ['id'] },
+  /* Besluit B2b, de bron van een RTF-stad (kern/rtfos/vrijwilligeraccount.js).
+     Alle drie ontdubbelt de KERN op de stand van dat moment: koppelen aan
+     hetzelfde account geeft `al: true`, en loskoppelen van wat al los is doet
+     niets. Een bewaard eerste antwoord is hier fout en geen vangnet: wie
+     koppelt, door de coordinator wordt losgemaakt en binnen het venster
+     opnieuw koppelt, kreeg "gekoppeld" terug zonder dat er iets gebeurde
+     (test/leerhuis-rtfbron.test.js toets 6 vond het). */
+  'POST /api/rtfos/portaal/vrijwilliger/koppel': { nietIdempotent: true, waarom: STAND },
+  'POST /api/rtfos/portaal/vrijwilliger/ontkoppel': { nietIdempotent: true, waarom: STAND },
+  'POST /api/rtfos/vrijwilliger/account-los': { nietIdempotent: true, waarom: STAND }
 };
 
 module.exports = { SLEUTELS };

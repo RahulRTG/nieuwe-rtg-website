@@ -44,7 +44,7 @@ const [E, KO, CO, Q, A, T, M, N, N2] = ['lid:1', 'lid:2', 'lid:4', 'lid:5', 'lid
 const BLOKKADES = [
   { id: 'UI', klasse: 'UX', wat: 'er is nog geen scherm (My Academy, Trainer, Manager, Knowledge Governance)', sluit: 'fase B-UI' },
   { id: 'DOMEINPOORT', klasse: 'AUTHORITY', wat: 'een RTG-handeling (de factuurcorrectie) leest de geschiktheid mee, maar alleen in de schaduw: geschiktheid verandert nog nergens een recht', sluit: 'afdwingen als de schaduw rijp is en nul keer oneens staat (een volgend besluit na B1)' },
-  { id: 'IDENTITEIT', klasse: 'TENANT_ISOLATION', wat: 'entiteit en zaak zijn een bron, maar RTG heeft nog geen entiteit en RTF-vrijwilligers hangen niet aan een account: juist die leerhuizen draaien nog op een verklaring', sluit: 'RTG als entiteit (de eigenaar) en stap B2b voor RTF' }
+  { id: 'IDENTITEIT', klasse: 'TENANT_ISOLATION', wat: 'entiteit, zaak en RTF-stad zijn een bron, maar RTG zelf heeft nog geen entiteit: juist het leerhuis van RTG Operations draait nog op een verklaring', sluit: 'RTG als entiteit in RTG Concern (de eigenaar)' }
 ];
 
 function meet() {

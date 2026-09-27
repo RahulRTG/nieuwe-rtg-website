@@ -491,7 +491,8 @@ test('20. B2: de bron-toets per soort, en alles wat hij niet kan vaststellen is 
   const t = maakBronToets({
     accounts: { staffByMember: (code, id) => (code === 'KIKUNOI' && id === 7 ? { id: 1, active: 1 } : null) },
     entiteitVind: (id) => (id === 'E1' ? { id: 'E1', eigenaar: 'user-1' } : null),
-    employmentVanPersoon: (key) => ({ 'user-2': [{ entiteit: 'E1', soort: 'employment' }], 'user-3': [{ entiteit: 'E1', soort: 'mandaat' }] })[key] || []
+    employmentVanPersoon: (key) => ({ 'user-2': [{ entiteit: 'E1', soort: 'employment' }], 'user-3': [{ entiteit: 'E1', soort: 'mandaat' }] })[key] || [],
+    rtfInStad: (key, stad) => (key === 'user-4' && stad === 'AMS') ? true : (key === 'user-5' ? 'ja' : false)
   });
   assert.equal(t({ soort: 'zaak', id: 'KIKUNOI' }, 'lid:7'), true, 'een actieve plek bij de zaak');
   assert.equal(t({ soort: 'zaak', id: 'KIKUNOI' }, 'lid:8'), false);
@@ -499,7 +500,10 @@ test('20. B2: de bron-toets per soort, en alles wat hij niet kan vaststellen is 
   assert.equal(t({ soort: 'entiteit', id: 'E1' }, 'lid:2'), true, 'een lopend dienstverband');
   assert.equal(t({ soort: 'entiteit', id: 'E1' }, 'lid:3'), false, 'een mandaat is geen werken hier');
   assert.equal(t({ soort: 'entiteit', id: 'E2' }, 'lid:1'), false, 'een entiteit die niet bestaat');
-  assert.equal(t({ soort: 'rtf-stad', id: 'AMS' }, 'lid:1'), false, 'RTF is nog niet vast te stellen (B2b)');
+  assert.equal(t({ soort: 'rtf-stad', id: 'AMS' }, 'lid:4'), true, 'een zetel of een gekoppelde, actieve vrijwilliger (B2b)');
+  assert.equal(t({ soort: 'rtf-stad', id: 'AMS' }, 'lid:1'), false);
+  assert.equal(t({ soort: 'rtf-stad', id: 'AMS' }, 'lid:5'), false, 'alleen een echte true telt, geen waarde die er waar uitziet');
+  assert.equal(maakBronToets({})({ soort: 'rtf-stad', id: 'AMS' }, 'lid:4'), false, 'zonder rtfos geen ja');
   assert.equal(t({ soort: 'zaak', id: 'KIKUNOI' }, 'concern:x'), false, 'een sleutel buiten lid: bevestigt niets');
   const kapot = maakBronToets({ accounts: { staffByMember: () => { throw new Error('db weg'); } } });
   assert.equal(kapot({ soort: 'zaak', id: 'KIKUNOI' }, 'lid:7'), false, 'een bron die gooit is geen ja');

@@ -34,8 +34,11 @@ const LEESROLLEN = ['ACADEMY_OWNER', 'QUALITY_AUTHORITY', 'KNOWLEDGE_OWNER', 'AS
 
 module.exports = (kern) => {
   const { app, auth, db, save, accounts, kluisAuth, employmentVanPersoon, entiteitVind } = kern;
-  /* Besluit B2: de relatie komt uit de bron van het leerhuis (kern/leerhuis/bron.js). */
-  const bronToets = require('../kern/leerhuis/bron').maakBronToets({ accounts, employmentVanPersoon, entiteitVind });
+  /* Besluit B2: de relatie komt uit de bron van het leerhuis (kern/leerhuis/bron.js).
+     rtfos wordt pas NA dit bestand opgehangen (opzet/kernlaag7.js), dus die
+     bron wordt bij de vraag opgezocht en niet bij het ophangen. */
+  const rtfInStad = (key, stad) => !!(kern.rtfos && kern.rtfos.vrijwilligerportaal.account.inStad(key, stad));
+  const bronToets = require('../kern/leerhuis/bron').maakBronToets({ accounts, employmentVanPersoon, entiteitVind, rtfInStad });
   const leerhuis = maakLeerhuis({ db, save, bijeen, inBundel, bronToets });
   /* Alleen om de schaduwtellers van besluit B1 te LEZEN; de meelezer zelf hangt
      in opzet/kantoordeur.js. */

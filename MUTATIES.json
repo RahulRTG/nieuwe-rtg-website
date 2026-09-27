@@ -163,6 +163,14 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "activiteitincheck.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/codelevenscyclus.js",
+      "operator": "!==->===#0",
+      "gezakt": 8,
+      "geprobeerd": 2
+    },
     "actorvormen.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -1324,6 +1332,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "bezorgcode.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/modebezorg/bezorgcode.js",
+      "operator": "!==->===#0",
+      "gezakt": 8,
+      "geprobeerd": 1
     },
     "bezorging.test.js": {
       "soort": "server",
@@ -3172,6 +3188,14 @@
       "module": "server/kern/util.js",
       "operator": "!==->===#0",
       "gezakt": 20,
+      "geprobeerd": 2
+    },
+    "festivalpas.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/util.js",
+      "operator": "!==->===#0",
+      "gezakt": 7,
       "geprobeerd": 2
     },
     "first-steps.e2e.js": {
@@ -6927,6 +6951,13 @@
       "operator": "===->!==#0",
       "gezakt": 5,
       "geprobeerd": 1
+    },
+    "ovincheckcode.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "ovkaart.test.js": {
       "soort": "server",

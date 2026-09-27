@@ -26,6 +26,9 @@ Object.assign(kern, require('../kern/magnaatwereld')({
 /* Magnaat Van Nul (V1): een leven per lid, met al het geld door het grootboek.
    Het hangt onder Magnaat Wereld en krijgt geen eigen kernnaam. */
 kern.magnaatWereld.leven = require('../kern/magnaat-leven').maakLeven({ db, save });
+/* Samen in een Oudwijk: de gedeelde stad hangt aan hetzelfde leven, met de codenaam en het seintje erbij. */
+kern.magnaatWereld.leven.stad = require('../kern/magnaat-leven/stad').maakStad({
+  eigen: kern.magnaatWereld.leven.intern.eigen, leven: kern.magnaatWereld.leven, crypto, codenaamVan: kern.codenaamVan, sseToCustomer });
 
 /* De positie van de RTFoundation in RTG Pay (kern/rtfwallet.js): waar een gift
    landt en wie hem uitbetaalt. Hij hangt hier en niet bij de andere

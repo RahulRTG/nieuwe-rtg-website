@@ -286,6 +286,8 @@ module.exports = [
     reden: 'routes/geld.js r.118 hangt de Rahul-kant van dezelfde ingang op' },
   { van: 'ingang:kantoren', naar: 'ingang:papieren-deur', soort: 'PRESENTATIE',
     reden: 'routes/kantoren/regie.js r.28: dezelfde papierendeur wordt door meerdere ingangen opgehangen, en dat is precies een deur en geen kopie' },
+  { van: 'ingang:magnaatwereld', naar: 'ingang:magnaatstad', soort: 'PRESENTATIE',
+    reden: 'routes/magnaatwereld.js r.22 hangt de stadkant van dezelfde ingang op (samen in een Oudwijk); apart omdat magnaatwereld.js op de 10 kB-grens staat, en met alleen app, auth, geenGast en magnaatWereld zodat het geen tweede domein op de kern wordt' },
   { van: 'ingang:leven', naar: 'ingang:levenmentor', soort: 'PRESENTATIE',
     reden: 'routes/leven.js r.61 hangt de mentorkant van dezelfde ingang op' },
   { van: 'ingang:sociaal', naar: 'ingang:socialerahul', soort: 'PRESENTATIE',

@@ -438,7 +438,7 @@
    },
    {
     "bestand": "scripts/gluurronde.js",
-    "regel": 787,
+    "regel": 798,
     "leest": [
      "NORM.json"
     ],

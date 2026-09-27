@@ -5498,6 +5498,20 @@
       "gezakt": 6,
       "geprobeerd": 2
     },
+    "magnaatstad.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "magnaatstad.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "magnaatstart.e2e.js": {
       "soort": "server",
       "staat": "gezakt",

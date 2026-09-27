@@ -37,8 +37,9 @@ function verkopers(st) {
   const w = B.HANDELSWAAR[st.aanbod];
   if (!w) return [];
   /* `bron` zegt wiens prijs het is: die van een concurrent, of die van jou. */
-  const uit = concurrenten(st).map(c => ({ id: c.id, naam: c.naam, bron: 'concurrent', zicht: M.WIJKEN[c.wijk].zichtbaar, kwaliteit: c.kwaliteit,
-    prijs: Math.round(w.advies * st.markt.prijzen[c.id] / 100) }));
+  /* Een speler verkoopt alleen als hij zelf handel drijft, en dan tegen zijn eigen prijs. */
+  const uit = concurrenten(st).filter(c => !c.speler || c.prijsVast != null).map(c => ({ id: c.id, naam: c.naam, bron: 'concurrent', zicht: M.WIJKEN[c.wijk].zichtbaar, kwaliteit: c.kwaliteit,
+    prijs: c.speler ? c.prijsVast : Math.round(w.advies * st.markt.prijzen[c.id] / 100) }));
   if (st.handel) uit.unshift({ id: 'jij', naam: st.onderneming ? st.onderneming.naam : 'jij', bron: 'jij', zicht: zichtbaarheid(st), kwaliteit: kwaliteit(st), prijs: st.handel.prijs });
   return uit;
 }
@@ -76,7 +77,7 @@ function concurrentenReageren(st) {
   const h = st.handel, w = B.HANDELSWAAR[st.aanbod];
   if (!h || !w) return;
   const a = aandelen(st), bodem = Math.max(M.REACTIE.bodem, Math.ceil(w.inkoop * 110 / w.advies));
-  for (const c of concurrenten(st)) {
+  for (const c of concurrenten(st).filter(x => !x.speler)) {
     const pct = st.markt.prijzen[c.id], prijs = Math.round(w.advies * pct / 100);
     let nieuw = pct;
     if (h.prijs < prijs && a.jij > a[c.id]) nieuw = Math.max(bodem, pct - M.REACTIE.stap);
@@ -138,7 +139,7 @@ function marktBeeld(st) {
     wijken: Object.entries(M.WIJKEN).map(([id, x]) => ({ id, naam: x.naam, huur: x.huur, verhuis: x.verhuis, zichtbaar: x.zichtbaar, jij: st.vestiging.wijk === id })),
     kopers: Object.values(M.KOPERS).map(k => ({ naam: k.naam, aandeel: k.aandeel })),
     concurrenten: st.aanbod ? concurrenten(st).map(c => ({ naam: c.naam, wijk: M.WIJKEN[c.wijk].naam, kwaliteit: c.kwaliteit,
-      tarief: Math.round(M.MARKTTARIEF[st.aanbod] * c.tarief / 100), prijs: w ? Math.round(w.advies * st.markt.prijzen[c.id] / 100) : null, aandeel: a[c.id] })) : [],
+      tarief: Math.round(M.MARKTTARIEF[st.aanbod] * c.tarief / 100), prijs: c.speler ? c.prijsVast : w ? Math.round(w.advies * st.markt.prijzen[c.id] / 100) : null, aandeel: a[c.id], speler: !!c.speler })) : [],
     jouwAandeel: a.jij == null ? null : a.jij, markttarief: st.aanbod ? M.MARKTTARIEF[st.aanbod] : null,
     uitleg: 'Een klant uit de markt heeft een offerte van een concurrent. Hij betaalt je meer naarmate je naam beter is: ' +
       M.MARKTKLANTEN.reputatie.perPunt + '% per opdracht die op tijd betaald werd, tot ' + M.MARKTKLANTEN.reputatie.max + '%. Werk van ' + tijd(60) + ' kost bij hen gemiddeld ' +
@@ -146,4 +147,4 @@ function marktBeeld(st) {
   };
 }
 
-module.exports = { marktDag, aandelen, mijnVraag, reputatie, marktBeeld, marktklant };
+module.exports = { marktDag, aandelen, mijnVraag, reputatie, kwaliteit, marktBeeld, marktklant };

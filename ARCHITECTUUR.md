@@ -19,9 +19,9 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | Wat | Aantal |
 |---|---|
 | API-endpoints | 5152 |
-| servermodules (`server/**/*.js`) | 3722 |
+| servermodules (`server/**/*.js`) | 3723 |
 | routebestanden (`server/routes/**`) | 613 |
-| kernmodules (`server/kern/**`) | 2346 |
+| kernmodules (`server/kern/**`) | 2347 |
 | schermen (`public/**/*.html`) | 320 |
 | gedeelde browsermodules (`public/shared/*.js`) | 398 |
 | toetsbestanden (`test/*.test.js`) | 1806 |
@@ -112,7 +112,7 @@ zie §5 -- er zijn nog 243 kern-namen die meer dan één domein aanraakt.
 |---|---|---|---|---|
 | `auth` | 20 | 6 | 8 | 52 |
 | `member` | 699 | 72 | 16 | 428 |
-| `supplier` | 624 | 127 | 6 | 337 |
+| `supplier` | 624 | 127 | 6 | 338 |
 | `office` | 74 | 21 | 3 | 84 |
 | `staff` | 26 | 8 | 1 | 42 |
 | `social` | 76 | 10 | 31 | 71 |
@@ -154,7 +154,7 @@ app(208) auth(128) supplierAuth(65) officeAuth(46) db(38) liveCodename(35) statu
 accounts(27) schoon(23) codenaamVan(19) managerOnly(18) rtf(18) boardroomWie(17)
 save(17) tooManyTries(14) geenGast(14) express(13) crypto(12) findSupplier(12)
 appUrl(11) keyVanCodenaam(11) pay(11) anthropic(11) noteFailedTry(10) boardroomAuth(10)
-rtmail(10) kern(9) gegevensStop(9) sseToOffice(9) payrollOS(9) loginFails(8) stuur(8)
+payrollOS(10) rtmail(10) kern(9) gegevensStop(9) sseToOffice(9) loginFails(8) stuur(8)
 logActivity(8) mail(7) sseToSupplier(7) onboarding(6) notifySupplier(6) talen(6)
 tenant(5) logInlog(5) veilig(5) openVacatures(5) overheid(5) sseToCustomer(5)
 ```

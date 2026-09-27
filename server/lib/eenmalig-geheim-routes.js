@@ -76,6 +76,17 @@ const ROUTES = new Set([
   'POST /api/supplier/ticket/toon',
   'POST /api/supplier/ticket/deurverkoop',
   'POST /api/mob/kaart/toon',
+  /* De vier restdeuren van B9: OV-incheckcode, bezorgcode, festivalpas en de
+     incheckcode van een Foundation-activiteit. Elk antwoord hier draagt de kale
+     code precies een keer (kern/ov/incheckcode.js, kern/modebezorg/bezorgcode.js,
+     kern/festival/pas-toegang.js, kern/rtfos/activiteiten-deur.js). */
+  'POST /api/ov/code',
+  'POST /api/mode/bezorg/code',
+  'POST /api/festival/pas',
+  'POST /api/festival/verkoop/rond',
+  'POST /api/festival/gast/pas/toon',
+  'POST /api/rtfos/activiteit/inschrijven',
+  'POST /api/rtfos/activiteit/incheckcode',
   /* kascode en tikcode (kern/pay/kasbak.js): uitgeven is roteren, en een retry
      met dezelfde sleutel krijgt 409 zonder code in plaats van een kopie. */
   'POST /api/pay/kascode',

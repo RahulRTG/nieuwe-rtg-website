@@ -1732,15 +1732,12 @@ const { agentKoppel, agentPubliek, agentVoorstel, agentBeslis, roosterVoorstel, 
   accounts, weekdagFactor, SHIFT_NAMES, save, logActivity
 });
 
-/* Mode-bezorging (kern/modebezorg.js): een modewinkel zet in een tik een slimme,
-   veilige bezorgdienst op. Veilig voor beide kanten (bezorgcode, foto-bewijs,
-   geverifieerde koerier, live volgen, ID bij dure stukken, retour aan de deur)
-   en efficient (de koerier krijgt de kortste route). */
+// Mode-bezorging (kern/modebezorg.js): bezorgcode, foto, ID bij dure stukken, retour.
 const {
-  MODEBEZORG_KETEN, mbSetup, mbInstel, mbMagLeveren, mbAanvraag, mbWinkelOverzicht,
+  MODEBEZORG_KETEN, mbSetup, mbInstel, mbMagLeveren, mbAanvraag, mbCode, mbWinkelOverzicht,
   mbRoute, mbNeem, mbGps, mbOverhandig, mbRetour, mbMijn
 } = maakModebezorg({
-  db, save, crypto, findSupplier, accounts, notify, notifySupplier, sseToCustomer,
+  db, save, crypto, bewerkCollectie, dataDir: DATA_DIR, findSupplier, accounts, notify, notifySupplier, sseToCustomer,
   sseToSupplier, sseToOffice, haversine, etaMinutes, leesUploadDataUrl
 });
 
@@ -2325,7 +2322,7 @@ const kern = {
     ghBijbestelVoorstel },
   agentKoppel, agentPubliek, agentVoorstel, agentBeslis, roosterVoorstel, roosterBeslis,
   // de mode-bezorging (kern/modebezorg.js)
-  mbSetup, mbInstel, mbMagLeveren, mbAanvraag, mbWinkelOverzicht, mbRoute, mbNeem, mbGps, mbOverhandig, mbRetour, mbMijn,
+  mbSetup, mbInstel, mbMagLeveren, mbAanvraag, mbCode, mbWinkelOverzicht, mbRoute, mbNeem, mbGps, mbOverhandig, mbRetour, mbMijn,
   // de eigen mini-boardroom per zaak (kern/zaak.js)
   ZAAK_CAPS, zaakFunctieAan, zaakFunctieLijst, zaakZet, zaakHr, zaakMarketing, zaakBoard,
   lidboard,

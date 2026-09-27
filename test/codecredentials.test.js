@@ -87,7 +87,10 @@ test('de echte credentials uit de classificatieronde blokkeren de release', () =
     'rtfos.activiteit_incheckcode', 'office.kantooruitnodiging', 'service.balie_bevestigingscode',
     'foundation.onderwijs_les_tokens', 'foundation.family_profile_token_buiten_harde_poort',
     'eten.kortingscode'];
-  for (const id of echte) {
+  // gemigreerd op 27 september 2026 (B9, de vier restdeuren): zie de toets hieronder
+  const restdeuren = new Set(['travelos.ov_incheckcode', 'mode.bezorgcode', 'festivalos.toegangspas',
+    'rtfos.activiteit_incheckcode']);
+  for (const id of echte.filter(x => !restdeuren.has(x))) {
     const d = register.deuren.find(x => x.id === id);
     assert.ok(d, id + ' hoort geregistreerd te zijn');
     assert.equal(d.status, 'remaining', id + ' is niet gemigreerd');
@@ -107,6 +110,27 @@ test('de echte credentials uit de classificatieronde blokkeren de release', () =
       assert.equal(vrijgave.isNogGeslotenCredentialroute(methode, pad, {}) ||
         vrijgave.VEILIGE_UITGANGEN.includes(route), true, route + ' hoort in NOG_GESLOTEN');
     }
+});
+
+test('de vier restdeuren zijn gemigreerd, en de korte bezorgcode alleen met haar grenzen', () => {
+  const uit = poort.controleer(poort.lees());
+  for (const id of ['travelos.ov_incheckcode', 'mode.bezorgcode', 'festivalos.toegangspas', 'rtfos.activiteit_incheckcode']) {
+    const d = poort.lees().deuren.find(x => x.id === id);
+    assert.equal(d.status, 'migrated', id);
+    assert.ok(!uit.blockers.some(x => x.id === id), id + ' blokkeert niet meer');
+    for (const route of d.routes) assert.ok(poort.REQUIRED_ROUTES.includes(route), route + ' hoort bewaakt te zijn');
+  }
+  assert.equal(poort.lees().deuren.find(x => x.id === 'mode.bezorgcode').controls.entropy_bits, false,
+    'vier cijfers halen de 128 bits niet, en dat staat er eerlijk');
+  /* Haal een compenserende grens weg, of maak er geld van, en de uitzondering
+     vervalt: dan is het weer een gemigreerde credential zonder 128 bits. */
+  for (const wijzig of [d => { d.korte_code.rem_met_vergrendeling = false; }, d => { delete d.korte_code; },
+    d => { d.korte_code.max_fout = 50; }, d => { d.korte_code.reden = 'kort'; },
+    d => { d.classificatie = 'money_credential'; }, d => { d.controls.entropy_bits = 13; }]) {
+    const register = JSON.parse(JSON.stringify(poort.lees()));
+    wijzig(register.deuren.find(x => x.id === 'mode.bezorgcode'));
+    assert.ok(poort.controleer(register).fouten.some(f => f.startsWith('mode.bezorgcode: gemigreerde credential mist minimaal 128-bit')));
+  }
 });
 
 test('een routermount kan niet alleen met zijn interne schijnpad groen worden', () => {

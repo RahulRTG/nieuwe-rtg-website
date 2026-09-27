@@ -36,11 +36,18 @@
       if (!adres || !adres.trim()) return;
       try {
         const r = await API.call('/mode/bezorg/aanvraag', { supplierCode: code, adres: adres.trim(), items });
-        toast('' + T('mb.aangevraagd','Bezorging aangevraagd. Bezorgcode:') + ' ' + r.bezorging.bezorgcode);
+        // de bezorgcode komt uit een eigen uitgifte (eenmalig getoond), niet uit de aanvraag
+        const c = await API.call('/mode/bezorg/code', { ref: r.bezorging.ref });
+        toast('' + T('mb.aangevraagd','Bezorging aangevraagd. Bezorgcode:') + ' ' + c.bezorgcode);
         try { menuState.modeBezorg = (await API.call('/mode/bezorg/mijn', {})).bezorgingen || []; } catch(e){}
         renderMenuSheet();
       } catch(e){ toast(e.message); }
     });
+    // de bezorgcode staat alleen in dit antwoord; een nieuwe maakt de vorige ongeldig
+    document.querySelectorAll('[data-mbcode]').forEach(b => b.addEventListener('click', async () => {
+      try { const r = await API.call('/mode/bezorg/code', { ref: b.dataset.mbcode }); b.textContent = T('mb.code','Bezorgcode') + ': ' + r.bezorgcode; }
+      catch(e){ toast(e.message); }
+    }));
     document.querySelectorAll('[data-rfav]').forEach(b => b.addEventListener('click', async () => {
       try {
         const d = await API.call('/retail/wishlist', { code, artikelId: b.dataset.rfav });

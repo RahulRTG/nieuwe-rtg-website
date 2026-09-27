@@ -190,6 +190,16 @@
     {
       "datum": "2026-09-27",
       "soort": "schuld",
+      "sleutel": "zelfpoortendeToetsen",
+      "van": 35,
+      "vervalt": "2026-12-27",
+      "meter": "zelfpoortendeToetsen 35 -> 36",
+      "reden": "test/restdeuren.pg.test.js is nieuw (de vier restdeuren van RELEASEKANDIDAAT.md B9: OV-incheckcode, bezorgcode, festivalpas en de incheckcode van een Foundation-activiteit): per deur racen twee echte PostgreSQL-instances om dezelfde claim (en om foute pogingen, afleveren tegen retour, inchecken tegen een nieuwe code), en een intrekking op A sluit de code op B. Dat kan niet eerlijk zonder PostgreSQL en Redis en slaat lokaal zonder DATABASE_URL over. Hij staat in scripts/lib/pg-toetslijst.js (verplicht in CI) en als uitzondering onder zelfpoortende-toets. Lokaal tegen echte PostgreSQL en Redis groen, en zonder advisory lock plus FOR UPDATE in pg/collectietransactie.js zakte hij 3 van 3 keer.",
+      "waarheen": "Dezelfde aflossing als de andere pg-toetsen: de standaardomgeving levert PostgreSQL, en het nul-skipbewijs hangt aan de releasecommit."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
       "sleutel": "toetsenNietGemeten",
       "van": 634,
       "vervalt": "2026-12-27",
@@ -3348,6 +3358,12 @@
     "edgeVeldContextZelf": "2026-09-23"
   },
   "uitzonderingen": [
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/restdeuren.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "de raceproef van de vier restdeuren (OV-incheckcode, bezorgcode, festivalpas, activiteit-incheckcode) over twee instances vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl lokaal zonder die infrastructuur expliciet wordt overgeslagen in plaats van een lichtere opslag als bewijs te laten gelden"
+    },
     {
       "regel": "inline-stijl",
       "pad": "public/apps/app-main/app-main-56c.js",

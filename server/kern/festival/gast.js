@@ -52,9 +52,9 @@ module.exports = (ctx) => {
     return { ok: true, edities: uit };
   }
 
-  /* De passen van deze gast, met de rechten in leesbare vorm. De CODE staat
-     erbij -- dat is het hele punt van dit scherm -- en die is van hem: hij komt
-     alleen langs zijn eigen codenaam naar buiten. */
+  /* De passen van deze gast, met de rechten in leesbare vorm. De CODE staat er
+     NIET bij: die staat alleen als hash op de pas, en de gast haalt een verse
+     met /api/festival/gast/pas/toon (dat de vorige intrekt). */
   function gastPassen(fid, eid, codenaam) {
     const e = editieVind(fid, eid);
     if (!e) return { status: 404, error: 'Deze editie bestaat niet.' };
@@ -62,7 +62,7 @@ module.exports = (ctx) => {
     if (!wie) return { status: 400, error: 'Geen codenaam in deze sessie.' };
 
     const uit = mijnPassen(e, wie).map(p => ({
-      code: p.code, soort: p.soort, at: p.at,
+      id: p.id, soort: p.soort, at: p.at,
       rechten: (p.rechten || []).map(r => ({
         soort: r.soort,
         dagen: (r.dagen || []).map(id => (dagVind(e, id) || {}).datum).filter(Boolean),

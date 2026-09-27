@@ -138,6 +138,11 @@ const REQUIRED_ROUTES = [
   'POST /api/supplier/horeca/betaal', 'POST /api/gast/betaal',
   'POST /api/link/cap/aanvaard', 'POST /api/link/cap/trek', 'POST /api/ov/code',
   'POST /api/staff/ov/checkin', 'POST /api/mode/bezorg/aanvraag',
+  'POST /api/ov/code/intrek', 'POST /api/mode/bezorg/code', 'POST /api/festival/gast/pas/toon',
+  'POST /api/rtfos/activiteit/incheckcode', 'POST /api/rtfos/activiteit/inschrijven',
+  'POST /api/rtfos/activiteit/afmelden', 'POST /api/mode/bezorg/mijn',
+  'POST /api/supplier/mode/bezorg/retour', 'POST /api/festival/gast/passen',
+  'POST /api/festival/scan/bundel',
   'POST /api/supplier/mode/bezorg/overhandig', 'POST /api/concern/uitnodigen',
   'POST /api/concern/uitnodigingen', 'POST /api/concern/uitnodiging/accepteer',
   'POST /api/concern/uitnodiging/intrek', 'POST /api/concern/bulk/verstuur',
@@ -320,6 +325,21 @@ function bronCensus(root = ROOT, register = null) {
     sha256: crypto.createHash('sha256').update(JSON.stringify(routes)).digest('hex') };
 }
 
+/* KORT EN VOORGELEZEN. Een code die een mens hardop voorleest (de bezorgcode
+   aan de deur) haalt de 128 bits niet, en een langere code zou het product
+   slopen. Zo'n deur mag alleen gemigreerd heten als hij het EERLIJK zegt --
+   `entropy_bits` blijft onwaar -- en de compenserende grenzen draagt: nooit
+   voor geld, gebonden aan EEN object, een rem met vergrendeling, een plafond
+   op het aantal nieuwe codes, en een reden in woorden. */
+const KORT_VEREIST = ['een_object_gebonden', 'rem_met_vergrendeling'];
+function korteCodeGedragen(d) {
+  const k = d && d.korte_code;
+  return d.classificatie === 'credential' && d.controls.entropy_bits === false && !!k &&
+    KORT_VEREIST.every(x => k[x] === true) && Number.isSafeInteger(k.max_fout) && k.max_fout > 0 &&
+    k.max_fout <= 10 && Number.isSafeInteger(k.max_rotatie) && k.max_rotatie > 0 &&
+    Number.isFinite(k.bits) && String(k.reden || '').trim().length >= 80;
+}
+
 function lees(pad = PAD) { return JSON.parse(fs.readFileSync(pad, 'utf8')); }
 
 function bestandHash(root, rel) {
@@ -393,7 +413,8 @@ function controleer(register, root = ROOT) {
     if (d.status !== 'remaining' && d.release_blocker === true)
       fouten.push(d.id + ': afgeronde deur mag geen releaseblokkade blijven');
     if ((d.classificatie === 'credential' || d.classificatie === 'money_credential') && d.status === 'migrated') {
-      if (!d.controls || Number(d.controls.entropy_bits) < Number(register.beleid.credential_min_entropy_bits))
+      if (!d.controls || (Number(d.controls.entropy_bits) < Number(register.beleid.credential_min_entropy_bits) &&
+          !korteCodeGedragen(d)))
         fouten.push(d.id + ': gemigreerde credential mist minimaal 128-bit bewijs');
       for (const c of CONTROLES) if (!d.controls || d.controls[c] !== true)
         fouten.push(d.id + ': gemigreerde credential mist control ' + c);

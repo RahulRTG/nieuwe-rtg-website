@@ -272,6 +272,19 @@ sleutels verdwijnen bij de opslagstart.
 nog blokkeert zijn de andere echte deuren uit de indeling, niet de geldcodes en
 tickets van V1.
 
+**Vier restdeuren naar hetzelfde beleid (27 september 2026):** de OV-incheckcode
+(`travelos.ov_incheckcode`, `kern/ov/incheckcode.js`: niet langer een 24-bit code
+in procesgeheugen maar een 128-bit hash-only credential per lid, gebonden aan de
+gekozen vervoerder, en een betaalde rit start alleen na een atomaire claim), de
+incheckcode van een Foundation-activiteit (`rtfos.activiteit_incheckcode`), de
+festivalpas (`festivalos.toegangspas`, de scan is de claim) en de bezorgcode
+(`mode.bezorgcode`). Die laatste blijft met opzet vier cijfers omdat het lid hem
+voorleest: `entropy_bits` staat eerlijk op onwaar, en de deur draagt `korte_code`
+(gebonden aan een bezorging, eenmalig, zeven dagen, vergrendeld na vijf fouten,
+hooguit tien codes, HMAC met serversleutel) -- zonder die grenzen weigert
+`scripts/codecredentials.js` de migratie. Oude codes van alle vier worden niet
+gehonoreerd; dat staat per deur als open besluit.
+
 **Juridisch open (E8), en niet door code te beslissen:** een opwaardeerkaart die
 tegen nominale waarde in een uitbetaalbare wallet landt, is vermoedelijk
 elektronisch geld (terugstortstand `open`, `WAARDE.md`, `TOKEN.md`). Wie contant

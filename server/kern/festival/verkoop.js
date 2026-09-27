@@ -90,13 +90,11 @@ module.exports = (ctx) => {
 
     const rechten = productRechten(e, v.product);
     if (!rechten || !rechten.length) return { status: 409, error: 'Dit product geeft nergens toegang toe.' };
-    const uit = pasUitgeven(fid, eid, { drager: v.koper, soort: d.soort, rechten });
+    const uit = pasUitgeven(fid, eid, { drager: v.koper, soort: d.soort, rechten, product: v.product, issuer: 'verkoop' });
     if (uit.error) return uit;
-    /* De pas draagt het product waar hij uit komt. pasUitgeven zet dat alleen
-       bij een los product; bij een bundel zijn de rechten hier samengesteld, dus
-       het label wordt hier gezet -- op een pas zonder herkomst is een verkoop
-       later niet meer na te lopen. */
-    uit.pas.product = v.product;
+    /* De pas draagt het product waar hij uit komt (pasUitgeven zet het, ook bij
+       een bundel) -- op een pas zonder herkomst is een verkoop later niet meer
+       na te lopen. De code staat alleen in dit antwoord. */
     v.stand = 'betaald';
     v.pas = uit.pas.id;
     v.betaald = { methode: schoon(b.methode, 30), betaler: schoon(b.betaler, 60) || null,

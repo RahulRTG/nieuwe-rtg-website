@@ -655,6 +655,45 @@ test('30. de control is managerwerk, en wie afzwakt komt uit de sessie', async (
   assert.match(stand.zin, /afgezwakt/);
 });
 
+test('31. de pascode: kaal alleen bij uitgifte en bij tonen, tonen maakt de vorige ongeldig, intrekken op id', async () => {
+  /* festivalos.toegangspas (kern/festival/pas-toegang.js): de passenlijst van
+     de gast draagt geen code, tonen roteert, een andere gast kan andermans pas
+     niet tonen, en intrekken op het pas-id sluit de nieuwste code. */
+  const u = Date.now().toString().slice(-7);
+  const reg = await post('/api/auth/register', { name: 'Pas Gast', email: 'pg' + u + '@x.nl', phone: '063' + u,
+    password: 'geheim12345', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
+  const naam = reg.state.user.codename;
+  const uit = await post('/api/festival/pas', { festival: fid, editie: eid, drager: naam,
+    rechten: [{ soort: 'festival.entree', dagen: [vandaagId] }] }, manager);
+  assert.match(uit.pas.code, /^FP\.[0-9A-F]{32}$/, 'een 128-bit pascode');
+  assert.equal(uit.pas.toegang.doel, 'festival-toegang');
+  assert.equal(uit.pas.toegang.code_hash, undefined, 'de hash gaat niet naar buiten');
+  const dubbel = await api('/api/festival/pas', { festival: fid, editie: eid, drager: naam,
+    rechten: [{ soort: 'festival.entree', dagen: [vandaagId] }] }, manager);
+  assert.equal(dubbel.status, 409, 'een dubbeltik maakt geen tweede pas');
+  assert.equal((await dubbel.json()).pas.code, undefined, 'en toont de code niet opnieuw');
+  const lijst = await post('/api/festival/gast/passen', { festival: fid, editie: eid }, reg.token);
+  assert.equal(lijst.passen.length, 1);
+  assert.ok(!JSON.stringify(lijst).includes(uit.pas.code) && lijst.passen[0].code === undefined,
+    'de lijst toont de code niet opnieuw');
+  const vreemd = await api('/api/festival/gast/pas/toon', { festival: fid, editie: eid, id: uit.pas.id }, lidB);
+  assert.equal(vreemd.status, 404, 'een andere gast toont andermans pas niet');
+  const toon = await post('/api/festival/gast/pas/toon', { festival: fid, editie: eid, id: uit.pas.id }, reg.token);
+  assert.match(toon.code, /^FP\.[0-9A-F]{32}$/);
+  assert.notEqual(toon.code, uit.pas.code);
+  const oud = await api('/api/festival/scan', { festival: fid, editie: eid, code: uit.pas.code, plek: ingangId, poort: 'Noord' }, deur);
+  assert.equal(oud.status, 404, 'de vervangen code kent de poort niet meer');
+  const goed = await post('/api/festival/scan', { festival: fid, editie: eid, code: toon.code, plek: ingangId, poort: 'Noord' }, deur);
+  assert.equal(goed.stand, 'groen');
+  const weg = await post('/api/festival/pas/intrek', { festival: fid, editie: eid, id: uit.pas.id, reden: 'kwijt' }, manager);
+  assert.equal(weg.ok, true);
+  assert.equal(weg.pas.toegang.ingetrokken_at != null, true);
+  const na = await post('/api/festival/scan', { festival: fid, editie: eid, code: toon.code, plek: ingangId, poort: 'Noord', richting: 'uit' }, deur);
+  assert.equal(na.stand, 'groen', 'naar buiten mag nog steeds');
+  const erin = await post('/api/festival/scan', { festival: fid, editie: eid, code: toon.code, plek: ingangId, poort: 'Noord' }, deur);
+  assert.equal(erin.stand, 'rood', 'maar een ingetrokken pas komt er niet meer in');
+});
+
 /* ============================================================================
    DE MUTATIES, EN WAT ERVAN ZAKTE (LAT-regel 2)
 

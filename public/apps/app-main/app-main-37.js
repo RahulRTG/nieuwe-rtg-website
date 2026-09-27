@@ -73,7 +73,7 @@
     // lopende bezorgingen van deze winkel
     const bez = (menuState.modeBezorg || []).filter(b => b.supplierName === r.supplier.name && !['afgeleverd','retour','geannuleerd'].includes(b.status));
     if (bez.length) html += bez.map(b => '<div style="background:var(--card);border:1px solid var(--gold);border-radius:0;padding:0.7rem 0.9rem;margin-bottom:0.7rem;"><div style="font-size:0.7rem;color:var(--rtg-leesgoud,var(--gold));letter-spacing:0.08em;text-transform:uppercase;">' + T('mb.onderweg','Bezorging') + ' · ' + esc(b.status) + '</div>' +
-      '<div style="font-size:0.85rem;margin-top:0.3rem;">' + T('mb.code','Bezorgcode') + ': <b style="letter-spacing:0.2em;font-size:1.05rem;">' + esc(b.bezorgcode) + '</b></div>' +
+      '<button data-mbcode="' + esc(b.ref) + '" style="margin-top:0.4rem;background:none;border:1px solid var(--gold);color:inherit;border-radius:0;padding:0.35rem 0.7rem;font-family:inherit;cursor:pointer;">' + T('mb.toon','Nieuwe bezorgcode') + '</button>' +
       '<div style="font-size:0.68rem;color:var(--soft);margin-top:0.2rem;">' + (b.koerier ? T('mb.koerieris','Koerier') + ': ' + esc(b.koerier) + (b.etaMin != null ? ' · ETA ' + b.etaMin + ' min' : '') : T('mb.geefcode','Geef deze code alleen aan de RTG-koerier aan de deur.')) + '</div></div>').join('');
     const styling = (mijn.styling || []).filter(v => v.supplierName === r.supplier.name);
     if (styling.length) html += styling.map(v => '<div style="background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.7rem 0.9rem;margin-bottom:0.7rem;"><div style="font-size:0.7rem;color:var(--rtg-leesgoud,var(--gold));letter-spacing:0.08em;text-transform:uppercase;">' + esc(v.titel) + '</div>' +

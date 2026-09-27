@@ -1037,6 +1037,7 @@
       "maisonTaakWeg",
       "mall",
       "mbAanvraag",
+      "mbCode",
       "mbMijn",
       "mecBetaald",
       "mecGift",
@@ -1486,6 +1487,7 @@
     "ov": [
       "ovCheckUit",
       "ovCodeIn",
+      "ovCodeIntrek",
       "ovCodeMaak",
       "ovDienst",
       "ovHierIn",

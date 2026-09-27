@@ -951,6 +951,7 @@ console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoor
        gestolen code dichtzetten mag geen drempel hebben. */
     ['/api/order/afhaalcode', 'de afhaal-QR van een bestelling die al langs de poort ging; de zaak krijgt hier niets nieuws'],
     ['/api/order/afhaalcode/intrek', 'een eigen afhaalcode intrekken; beveiliging hoort geen drempel te hebben'],
+    ['/api/mode/bezorg/code', 'een nieuwe bezorgcode voor een eigen bezorging die al langs de poort ging; de winkel krijgt niets nieuws'],
     ['/api/ticket/toon', 'de entreecode van een eigen ticket dat al langs de poort ging; de zaak krijgt niets nieuws'],
     ['/api/mob/kaart/toon', 'idem: de code van een eigen vervoerbewijs'],
     /* De winkel van de RTFoundation. Deze route KWAM eerst door de poort met

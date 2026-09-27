@@ -2,14 +2,14 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-09-27",
   "gemeten": {
-    "bestanden": 2441,
+    "bestanden": 2447,
     "domeinenTotaal": 644,
-    "koopbareVormen": 604,
+    "koopbareVormen": 607,
     "koopbareDomeinen": 121,
     "envelopDrempel": 8,
-    "envelop": 42,
-    "veldenDomeineigen": 779,
-    "veldenNietEnvelop": 1042,
+    "envelop": 43,
+    "veldenDomeineigen": 780,
+    "veldenNietEnvelop": 1045,
     "gelijkendeVormparen": 17,
     "werkwoordenVolledig": 2,
     "werkwoordenOveral": 0,
@@ -66,16 +66,17 @@
     "van",
     "voorraad",
     "vraag",
-    "wat"
+    "wat",
+    "zaak"
   ],
   "perWerkwoord": {
     "toon": 93,
     "prijs": 39,
     "beschikbaarheid": 54,
-    "reserveer": 30,
+    "reserveer": 31,
     "bevestig": 57,
     "lever": 24,
-    "annuleer": 34,
+    "annuleer": 35,
     "retour": 8
   },
   "overalAanwezig": [],
@@ -148,6 +149,29 @@
         "lever": "maakUitgifte",
         "annuleer": "intrekkenKaal",
         "retour": "maakTeruggave"
+      },
+      "telt": 7
+    },
+    {
+      "domein": "kern/horeca",
+      "heeft": {
+        "toon": true,
+        "prijs": true,
+        "beschikbaarheid": true,
+        "reserveer": true,
+        "bevestig": true,
+        "lever": true,
+        "annuleer": true,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "beeld",
+        "prijs": "bereken",
+        "beschikbaarheid": "geefSlotTerug",
+        "reserveer": "claims",
+        "bevestig": "bevestig",
+        "lever": "bezorgCheck",
+        "annuleer": "intrek"
       },
       "telt": 7
     },
@@ -327,28 +351,6 @@
         "bevestig": "boekingStand",
         "lever": "uitgifte",
         "annuleer": "intrekken"
-      },
-      "telt": 6
-    },
-    {
-      "domein": "kern/horeca",
-      "heeft": {
-        "toon": true,
-        "prijs": true,
-        "beschikbaarheid": true,
-        "reserveer": true,
-        "bevestig": true,
-        "lever": true,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "beeld",
-        "prijs": "bereken",
-        "beschikbaarheid": "geefSlotTerug",
-        "reserveer": "claims",
-        "bevestig": "bevestig",
-        "lever": "bezorgCheck"
       },
       "telt": 6
     },
@@ -773,6 +775,26 @@
       "telt": 4
     },
     {
+      "domein": "kern/eten",
+      "heeft": {
+        "toon": true,
+        "prijs": true,
+        "beschikbaarheid": true,
+        "reserveer": true,
+        "bevestig": false,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "zoek",
+        "prijs": "bereken",
+        "beschikbaarheid": "capaciteitVan",
+        "reserveer": "claim"
+      },
+      "telt": 4
+    },
+    {
       "domein": "kern/fonds",
       "heeft": {
         "toon": true,
@@ -1143,25 +1165,6 @@
         "toon": "kaartIntrek",
         "lever": "uitgeef",
         "annuleer": "kaartIntrek"
-      },
-      "telt": 3
-    },
-    {
-      "domein": "kern/eten",
-      "heeft": {
-        "toon": true,
-        "prijs": true,
-        "beschikbaarheid": true,
-        "reserveer": false,
-        "bevestig": false,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "zoek",
-        "prijs": "bereken",
-        "beschikbaarheid": "capaciteitVan"
       },
       "telt": 3
     },

@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-27T18:16:41.924Z",
-  "commit": "db964f9f",
+  "op": "2026-09-27T18:32:47.387Z",
+  "commit": "aa676a49",
   "boomVuil": false,
   "boomAnders": 2,
   "instrument": "scripts/mutatiecontract.js",
@@ -10,18 +10,18 @@
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5053,
-  "geclassificeerd": 5053,
+  "totaal": 5055,
+  "geclassificeerd": 5055,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3190,
    "NOT_APPLICABLE": 1212,
-   "PROTECTED": 495,
+   "PROTECTED": 497,
    "INTENTIONALLY_NON_IDEMPOTENT": 156
   },
-  "vastgesteldDoorMens": 1912,
+  "vastgesteldDoorMens": 1914,
   "afgeleidDoorScript": 3141,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4158,
+   "AUTHENTICATED": 4160,
    "PUBLIC": 126,
    "OBJECT_SCOPED": 746,
    "(niet af te leiden -- vraagt een verklaring)": 7,
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 136,
    "kale ronde: onbeschermd": 123,
    "kale ronde: geen uitspraak": 4713,
-   "niet gemeten": 81
+   "niet gemeten": 83
   },
   "voorstellen": {},
   "metingVan": "2026-09-19T17:45:58.177Z"
@@ -106733,6 +106733,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "supplier.horeca.bon.intrekken",
+   "route": "POST /api/supplier/horeca/bon/intrek",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "supplier.horeca.bon.maak",
    "route": "POST /api/supplier/horeca/bon/maak",
    "semantiek": {
@@ -106755,6 +106776,27 @@
     "hindernis": null
    },
    "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "supplier.horeca.bon.roteren",
+   "route": "POST /api/supplier/horeca/bon/roteer",
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "manager",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null

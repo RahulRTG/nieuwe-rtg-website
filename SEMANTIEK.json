@@ -1,9 +1,9 @@
 {
-  "catalogi": 1144,
+  "catalogi": 1145,
   "verschillendeNamen": 686,
   "namenInMeerDomeinen": 128,
   "woordenMetMeerBetekenissen": 110,
-  "betekenissenTotaal": 409,
+  "betekenissenTotaal": 410,
   "ergsteWoord": "SOORTEN",
   "ergsteAantal": 49,
   "dubbelingen": 33,
@@ -3109,6 +3109,73 @@
       ]
     },
     {
+      "naam": "UITLEG",
+      "domeinen": 5,
+      "betekenissen": 5,
+      "hoogsteOverlap": 0,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/appstore/toegankelijk.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "in-orde",
+            "blokkeert",
+            "niet-vast-te-stellen"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/eten/kortingscode.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "onbekend",
+            "uit",
+            "onvolledig",
+            "verlopen"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/platformregister.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "gezakt",
+            "ongemeten",
+            "beproefd"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rtfos/deelnemerportaal.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "ontvangen",
+            "intake",
+            "toestemming",
+            "gekoppeld"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/routes/pay.js"
+          ],
+          "leden": 12,
+          "voorbeeld": [
+            "reden",
+            "opheffbaar",
+            "klasse",
+            "ruimte"
+          ]
+        }
+      ]
+    },
+    {
       "naam": "KETEN",
       "domeinen": 5,
       "betekenissen": 4,
@@ -3563,63 +3630,7 @@
           ]
         }
       ]
-    },
-    {
-      "naam": "HANDELINGEN",
-      "domeinen": 4,
-      "betekenissen": 4,
-      "hoogsteOverlap": 0,
-      "soort": "botsing",
-      "waar": [
-        {
-          "bestanden": [
-            "server/kern/horeca/rahul-register.js"
-          ],
-          "leden": 9,
-          "voorbeeld": [
-            "werklijst.samenvatten",
-            "gang.voorstellen",
-            "mise.adviseren",
-            "allergie.aanpassen"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/ogen.js"
-          ],
-          "leden": 5,
-          "voorbeeld": [
-            "naheffing.vaststellen",
-            "naheffing.bezwaar",
-            "naheffing.dwangbevel",
-            "kwijtschelding.besluit"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/persoonseis-lijst.js"
-          ],
-          "leden": 3,
-          "voorbeeld": [
-            "voorschrijven",
-            "verwijzen",
-            "uitreiken"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/stadsweefsel/ainiveau.js"
-          ],
-          "leden": 16,
-          "voorbeeld": [
-            "melding-samenvoegen",
-            "werkorder-uit-zaak",
-            "bericht-sturen",
-            "meting-vragen"
-          ]
-        }
-      ]
     }
   ],
-  "bestanden": 3724
+  "bestanden": 3733
 }

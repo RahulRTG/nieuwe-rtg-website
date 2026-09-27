@@ -2868,7 +2868,13 @@ console.log('\n38) camera en microfoon: een deur, elk kader geeft het recht door
        string" niet te onderscheiden van gewone markup -- elk aanhalingsteken
        eerder op de pagina maakt hem waar. createElement telt wel: wie een kader
        BOUWT, zegt zelf wat het meekrijgt. Gemeten toen deze regel erbij kwam:
-       in de hele public/ draagt precies een bestand een leeg allow. */
+       in de hele public/ draagt precies een bestand een leeg allow.
+
+       En een GEBOUWD kader kan hetzelfde besluit dragen, met
+       setAttribute('allow', ''): de toestelcel (shared/toestel/rekenaar.js,
+       TOESTEL.md) krijgt geluid en beeld als BYTES en nooit een eigen camera of
+       microfoon. Zonder deze tak was RTGMedia.kader() ook daar de enige uitweg,
+       en dan kreeg een rekencel juist rechten die zij niet hoort te hebben. */
     let kaderloos = 0, kaders = 0, leegBesluit = 0;
     for (const f of bronnen) {
       if (bundelPaden.has(web(f))) continue;
@@ -2883,6 +2889,7 @@ console.log('\n38) camera en microfoon: een deur, elk kader geeft het recht door
       if (statisch && !maakt && /<iframe\b[^>]*\ballow=/.test(s)) continue;
       // en een statisch kader met een LEEG allow is het omgekeerde besluit
       if (statisch && !bouwt && /<iframe\b[^>]*\ballow=""/.test(s)) { leegBesluit++; continue; }
+      if (bouwt && /\.setAttribute\(\s*['"]allow['"]\s*,\s*(['"])\1\s*\)/.test(s)) { leegBesluit++; continue; }
       kaderloos++;
       fout(web(f) + ' maakt een iframe zonder RTGMedia.kader(); camera en microfoon vallen daarin stil weg');
     }

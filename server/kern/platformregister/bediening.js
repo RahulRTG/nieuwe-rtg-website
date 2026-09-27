@@ -86,5 +86,8 @@ module.exports = [
   ['/scriptblok.js', 'Afgesplitst scriptblok', 'Een kaal <script>-blok dat als eigen bestand wordt bezorgd.',
     'de bezorging van de pagina zelf: zonder deze weg laadt het blok niet en is de pagina stuk, niet uitgeschakeld'],
   ['/stijlblok.css', 'Afgesplitst stijlblok', 'Een kaal <style>-blok dat als eigen bestand wordt bezorgd.',
-    'zie het scriptblok: sinds style-src een nonce eist verhuist het blok naar een eigen adres, en dat is geen functie']
+    'zie het scriptblok: sinds style-src een nonce eist verhuist het blok naar een eigen adres, en dat is geen functie'],
+  /* Ook als BEKENDE onvolkomenheid, net als /werken hierboven (TOESTEL.md par. 10). */
+  ['/toestel', 'De toestelrekenlaag', 'De afgesloten rekencel, haar script en de ondertekende artefacten voor rekenen op het toestel van het lid.',
+    'hij hoort op termijn aan een schakelaar, maar de functiepoort dwingt alleen /api af; tot dat verandert is de uitknop een lege sleutellijst en geen uitgerold manifest, en die staat standaard uit']
 ].concat(RECHT);

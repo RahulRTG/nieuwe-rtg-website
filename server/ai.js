@@ -20,6 +20,7 @@ const meter = require('./ai-meter');
 const { geleverdModel } = require('./ai-prijzen');
 const rem = require('./ai-rem');
 const budget = require('./ai-budget');
+const aiContext = require('./ai-context');
 
 // welke aanbieders in welke volgorde; env kan de volgorde overschrijven
 function bouwKetting(opts) {
@@ -49,7 +50,7 @@ function maakAI(opts) {
   const client = {
     aanbieders: ketting.map(c => c.naam),
     providerInfo: ketting.map(c => ({ naam: c.naam, lokaal: !!c.lokaal,
-      verwerking: c.lokaal ? (c.verwerking || 'op-dit-apparaat') : 'externe-provider' })),
+      verwerking: c.lokaal ? (c.verwerking || 'rtg-server') : 'externe-provider' })),
     actief: ketting[0].naam,
     bron: ketting[0].lokaal ? 'lokaal' : 'extern',
     kan(params) { return ketting.some(a => typeof a.kan !== 'function' || a.kan(params)); },
@@ -107,8 +108,11 @@ function maakAI(opts) {
           }
           try {
             const uit = await aanbieder.messages.create(params);
+            // diagnostiek, geen herkomst: gedeeld object; herkomst zie ai-context.js
             client.actief = aanbieder.naam;
             client.bron = aanbieder.lokaal ? 'lokaal' : 'extern';
+            aiContext.noteerUitvoering(aanbieder.naam,
+              aanbieder.lokaal ? (aanbieder.verwerking || 'rtg-server') : 'externe-provider');
             /* DE KOSTENMETER (kern/kosten/haak.js), op de enige plek waar elke
                modelaanroep langskomt. Geen usage: dan melden we niets.
 

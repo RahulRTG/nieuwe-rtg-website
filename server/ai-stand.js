@@ -20,6 +20,7 @@
    ========================================================================== */
 'use strict';
 const { kompasStatus } = require('./ai-kompas');
+const aiContext = require('./ai-context');
 
 /* Eén eerlijk contract voor schermen en routes. Beschikbaarheid zegt alleen of
    vrije modelverrijking mogelijk is; nooit of de onderliggende app werkt. */
@@ -37,7 +38,7 @@ function beschikbaarheid(ai) {
   const pTools = { tools: [{ name: 'doe' }], messages: [{ role: 'user', content: 'x' }] };
   const pBeeld = { messages: [{ role: 'user', content: [{ type: 'image' }, { type: 'text', text: 'x' }] }] };
   const hybride = heeftLokaal && heeftExtern;
-  const lokaleGrens = lokaalViaNetwerk ? 'eigen-netwerk' : 'op-dit-apparaat';
+  const lokaleGrens = lokaalViaNetwerk ? 'eigen-netwerk' : 'rtg-server';
   const modus = hybride ? 'hybride' : heeftLokaal ? 'lokaal' : beschikbaar ? 'ondersteund' : 'handmatig';
   const verwerking = hybride ? 'lokaal-met-externe-uitwijk' : heeftLokaal ? lokaleGrens : beschikbaar ? 'externe-provider' : 'geen-model';
   return {
@@ -63,4 +64,26 @@ function beschikbaarheid(ai) {
   };
 }
 
-module.exports = { beschikbaarheid };
+/* WAT ER BIJ DIT ANTWOORD WERKELIJK GEBEURDE -- naast de stand hierboven en
+   nooit in plaats ervan. De stand zegt wat er KAN ("externe uitwijk mogelijk"),
+   dit zegt wat er DEED. Leest uit ./ai-context.js, dus alleen de aanroepen van
+   DIT verzoek. Drie plaatsen, en ze blijven apart:
+     rtg-server / eigen-netwerk   de eigen modelserver van RTG
+     externe-provider             een aanbieder buiten RTG
+   `toestel` (inferentie in de browser van het lid) komt hier nooit voor: dat
+   ziet de server per definitie niet, en hij mag het dus ook niet beweren.
+   Geen enkele modelaanroep is een eersteklas uitslag (`zonderModel`), geen
+   leeg veld: dan kwam het antwoord uit regels of de handmatige werkmodus. */
+function uitgevoerd() {
+  const lijst = aiContext.uitvoeringen();
+  const plaatsen = [...new Set(lijst.map(u => u.plaats).filter(Boolean))];
+  return {
+    zonderModel: lijst.length === 0,
+    plaatsen,
+    aanbieders: [...new Set(lijst.map(u => u.aanbieder).filter(Boolean))],
+    extern: plaatsen.includes('externe-provider'),
+    aanroepen: lijst.length
+  };
+}
+
+module.exports = { beschikbaarheid, uitgevoerd };

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-23T18:32:44.389Z",
-    "commit": "692d9cdb",
+    "op": "2026-09-27T15:05:02.587Z",
+    "commit": "5ad3db97",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/edgedekking.js",
@@ -12171,6 +12171,81 @@
       "gebreken": [],
       "stabiel": true
     },
+    "/apps/leerhuis.html": {
+      "status": "gemeten",
+      "http": 200,
+      "velden": {
+        "identiteit": "nee",
+        "wereld": "ja",
+        "context": "ja",
+        "object": "nee",
+        "activiteit": "nee",
+        "presence": "nee",
+        "voortzetting": "nee",
+        "hoofdactie": "nvt",
+        "trust": "nee"
+      },
+      "herkomst": {
+        "identiteit": "geen",
+        "wereld": "route",
+        "context": "edge-casco",
+        "object": "geen",
+        "activiteit": "geen",
+        "presence": "geen",
+        "voortzetting": "geen",
+        "hoofdactie": "geen",
+        "trust": "geen"
+      },
+      "acties": {
+        "RTGAdaptief": {
+          "totaal": 0,
+          "perStaat": {
+            "AFWEZIG": 0,
+            "GEBLOKKEERD": 0,
+            "BESCHIKBAAR": 0,
+            "LOPEND": 0
+          },
+          "zonderStaat": 0,
+          "gezagBekend": 0,
+          "geblokkeerdZonderWaarom": 0,
+          "gevolg": {
+            "bekend": 0,
+            "onvolledig": 0,
+            "onbekend": 0,
+            "zonder": 0
+          },
+          "herstelBekend": 0,
+          "metGewicht": 0,
+          "metGebreken": 0
+        },
+        "edge-compat": {
+          "totaal": 0,
+          "perStaat": {
+            "AFWEZIG": 0,
+            "GEBLOKKEERD": 0,
+            "BESCHIKBAAR": 0,
+            "LOPEND": 0
+          },
+          "zonderStaat": 0,
+          "gezagBekend": 0,
+          "geblokkeerdZonderWaarom": 0,
+          "gevolg": {
+            "bekend": 0,
+            "onvolledig": 0,
+            "onbekend": 0,
+            "zonder": 0
+          },
+          "herstelBekend": 0,
+          "metGewicht": 0,
+          "metGebreken": 0
+        }
+      },
+      "gebreken": [],
+      "stabiel": true,
+      "redenen": {
+        "hoofdactie": "een leesscherm: leren, bewijs en beoordeling lopen via uw trainer en de assessor, niet via een knop hier"
+      }
+    },
     "/apps/lesmaker.html": {
       "status": "gemeten",
       "http": 200,
@@ -13292,7 +13367,7 @@
         "activiteit": "nee",
         "presence": "nee",
         "voortzetting": "nee",
-        "hoofdactie": "nee",
+        "hoofdactie": "ja",
         "trust": "nee"
       },
       "herkomst": {
@@ -13303,7 +13378,7 @@
         "activiteit": "geen",
         "presence": "geen",
         "voortzetting": "geen",
-        "hoofdactie": "geen",
+        "hoofdactie": "scherm:data-hoofdactie",
         "trust": "geen"
       },
       "acties": {
@@ -20803,10 +20878,10 @@
     }
   },
   "telling": {
-    "schermen": 310,
-    "metBlikveld": 280,
+    "schermen": 311,
+    "metBlikveld": 281,
     "perStatus": {
-      "gemeten": 280,
+      "gemeten": 281,
       "geen-blikveld": 1,
       "omgeleid": 29,
       "fout": 0
@@ -20821,13 +20896,13 @@
       "identiteit": {
         "ja": 0,
         "zelf": 0,
-        "nee": 280,
+        "nee": 281,
         "nvt": 0,
         "na-openen": 0,
         "zonderMeting": 30
       },
       "wereld": {
-        "ja": 279,
+        "ja": 280,
         "zelf": 0,
         "nee": 1,
         "nvt": 0,
@@ -20835,7 +20910,7 @@
         "zonderMeting": 30
       },
       "context": {
-        "ja": 280,
+        "ja": 281,
         "zelf": 11,
         "nee": 0,
         "nvt": 0,
@@ -20845,7 +20920,7 @@
       "object": {
         "ja": 0,
         "zelf": 0,
-        "nee": 278,
+        "nee": 279,
         "nvt": 0,
         "na-openen": 2,
         "zonderMeting": 30
@@ -20853,7 +20928,7 @@
       "activiteit": {
         "ja": 0,
         "zelf": 0,
-        "nee": 280,
+        "nee": 281,
         "nvt": 0,
         "na-openen": 0,
         "zonderMeting": 30
@@ -20861,7 +20936,7 @@
       "presence": {
         "ja": 0,
         "zelf": 0,
-        "nee": 280,
+        "nee": 281,
         "nvt": 0,
         "na-openen": 0,
         "zonderMeting": 30
@@ -20869,23 +20944,23 @@
       "voortzetting": {
         "ja": 0,
         "zelf": 0,
-        "nee": 280,
+        "nee": 281,
         "nvt": 0,
         "na-openen": 0,
         "zonderMeting": 30
       },
       "hoofdactie": {
-        "ja": 58,
-        "zelf": 51,
-        "nee": 222,
-        "nvt": 0,
+        "ja": 59,
+        "zelf": 52,
+        "nee": 221,
+        "nvt": 1,
         "na-openen": 0,
         "zonderMeting": 30
       },
       "trust": {
         "ja": 0,
         "zelf": 0,
-        "nee": 280,
+        "nee": 281,
         "nvt": 0,
         "na-openen": 0,
         "zonderMeting": 30

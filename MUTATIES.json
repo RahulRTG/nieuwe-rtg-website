@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T14:26:43.665Z",
-    "commit": "501d998a",
+    "op": "2026-09-27T14:52:33.092Z",
+    "commit": "2bc86b5c",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -8061,6 +8061,14 @@
       "gezakt": 5,
       "geprobeerd": 2
     },
+    "rtghuis.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/rtghuis.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "rtgid.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -10212,6 +10220,13 @@
       "operator": "!==->===#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "vrijheid-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
     },
     "vrijheid-teambeeld.test.js": {
       "soort": "puur",

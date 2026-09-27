@@ -83,16 +83,17 @@ test('de eigenaar bevestigt zware handelingen met een passkey, vanaf de schermen
     await p.locator('#kuMaak').click();
     assert.equal((await uitn).status(), 200, 'de uitnodiging is met de passkey bevestigd');
     await p.locator('#kuUit', { hasText: 'geldig tot' }).waitFor();
-    const code = ((await p.locator('#kuUit').innerText()).match(/[A-Z2-9]{10}/) || [])[0];
+    const code = ((await p.locator('#kuUit').innerText()).match(/KU\.[0-9A-F]{32}/) || [])[0];
     assert.ok(code, 'de code staat een keer op het scherm');
 
     await p.locator('#dsSectie').waitFor({ state: 'visible' });
     await p.locator('#dsNaam').fill('doos-proef');
+    await p.locator('#dsZaak').fill('KIKUNOI'); // een sleutel hoort bij een zaak (B12)
     const doos = antwoord(p, '/api/office/doos/sleutel');
     await p.locator('#dsGeef').click();
     assert.equal((await doos).status(), 200, 'de doossleutel is met de passkey bevestigd');
     await p.locator('#dsUit', { hasText: 'RTG_DOOS_ID=doos-proef' }).waitFor();
-    assert.match(await p.locator('#dsUit').innerText(), /[0-9a-f]{48}/);
+    assert.match(await p.locator('#dsUit').innerText(), /ZD\.[0-9A-F]{32}/);
     await p.locator('#dsEigen', { hasText: 'doos-proef' }).waitFor();
     /* de gedeelde doos-sleutel dicht en weer open, met de vinger: hier meldt geen
        doos met de gedeelde sleutel, dus dicht mag */

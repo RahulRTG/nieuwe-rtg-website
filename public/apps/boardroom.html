@@ -101,9 +101,7 @@
       <p class="rtg-uitleg" id="kuUit" aria-live="polite"></p>
     </section>
 
-    <!-- De zaakdozen (AUTHORITY.md fase 7): welke dozen melden nog met de gedeelde
-         sleutel. Die gaat pas dicht als deze lijst leeg blijft (besluit van
-         23 september 2026). Uitgeven en intrekken is van de eigenaar, met de vinger. -->
+    <!-- Zaakdozen (AUTHORITY.md fase 7, B12): een sleutel per doos en zaak. -->
     <section class="rtg-groep" id="dsSectie" hidden>
       <h2 data-i18n="ds.h">De zaakdozen</h2>
       <p class="rtg-uitleg" data-i18n="ds.sub">Een doos met een eigen sleutel is bewezen; een doos op de gedeelde sleutel noemt alleen zijn eigen naam. De gedeelde sleutel gaat dicht zodra hieronder niemand meer staat.</p>
@@ -111,6 +109,7 @@
       <div id="dsEigen"></div>
       <div class="rtg-rij" id="dsGeven" hidden>
         <input class="rtg-veld h-flex1" id="dsNaam" maxlength="40" data-i18n-ph="ds.ph" placeholder="Naam van de doos">
+        <input class="rtg-veld" id="dsZaak" maxlength="24" data-i18n-ph="ds.zaak" placeholder="Code van de zaak">
         <button class="rtg-knop vol" id="dsGeef" type="button" data-i18n="ds.geef">Geef een eigen sleutel</button>
       </div>
       <p class="rtg-uitleg" id="dsUit" aria-live="polite"></p>
@@ -514,11 +513,11 @@ window.I18N = { en: {
       .catch(function () { /* geen boardroom, geen dozen: de sectie blijft verborgen */ });
   }
   function geefDoosSleutel() {
-    var v = $('dsNaam').value.trim();
-    if (!v) { zeg(T('ds.leeg', 'Vul eerst de naam van de doos in.'), 'let'); return; }
+    var v = $('dsNaam').value.trim(), z = $('dsZaak').value.trim();
+    if (!v || !z) { zeg(T('ds.leeg', 'Vul de doos en de code van de zaak in.'), 'let'); return; }
     var b = $('dsGeef');
     b.disabled = true;
-    metVinger('/api/office/doos/sleutel', { doos: v }).then(function (d) {
+    metVinger('/api/office/doos/sleutel', { doos: v, zaak: z }).then(function (d) {
       $('dsNaam').value = '';
       $('dsUit').textContent = T('ds.sleutel', 'Sleutel (een keer getoond): ') + d.sleutel + ' · ' + (d.let || '');
       return laadDozen();

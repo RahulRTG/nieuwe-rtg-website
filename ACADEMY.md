@@ -27,7 +27,7 @@ uit dezelfde lijst (`BLOKKADES` in `scripts/leerhuisproef.js`).
 
 | blokkade | klasse | wat er ontbreekt | sluit met |
 |---|---|---|---|
-| `UI` | UX | geen scherm voor My Academy, Trainer, Manager en Knowledge Governance | fase B-UI (par. 6) |
+| `UI` | UX | Mijn leerhuis staat (`/apps/leerhuis.html`, alleen lezen, bereikbaar vanuit Mijn loopbaan); er is nog geen scherm voor trainer, manager en kennisbeheer | fase B-UI, de drie andere schermen (par. 6) |
 | `DOMEINPOORT` | AUTHORITY | `POST /api/office/pay/factuurcorrectie` leest de geschiktheid mee, maar alleen in de schaduw (besluit B1): geschiktheid verandert nog nergens een recht | afdwingen als de schaduw rijp is en nul keer oneens staat; dat is een volgend besluit |
 | `IDENTITEIT` | TENANT_ISOLATION | een leerhuis met een bron (entiteit, zaak of RTF-stad) volgt die bron; maar RTG zelf heeft nog geen entiteit, dus juist het leerhuis van RTG Operations draait nog op een verklaring | RTG als entiteit in RTG Concern (de eigenaar) |
 

@@ -28,8 +28,8 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4628,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1601,
-    "kernGedeeld": 244,
+    "kernBreedte": 1603,
+    "kernGedeeld": 245,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
@@ -149,6 +149,25 @@
     "edgeVeldContextZelf": 11
   },
   "notities": [
+    {
+      "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 244,
+      "meter": "kernGedeeld 244 -> 245; kernBreedte 1601 -> 1603",
+      "reden": "Het entreeticket en het vervoerskaartje als gemigreerde credentials (RELEASEKANDIDAAT.md B9). De ene naam kern.tickettoegang wordt door twee domeinen gelezen: het lid toont zijn entreecode (routes/member/kopen/tickets.js), de zaak scant hem aan de deur en vernieuwt een deurticket (routes/supplier/tickets-deur.js, tickets.js). Dat is de bedoelde koppeling: EEN plek die weet hoe een entreecode wordt uitgegeven, geclaimd en geroteerd; een kopie per kant zou twee claimwegen opleveren die uiteenlopen, precies de dubbele toegang die de claimtransactie voorkomt. De tweede nieuwe naam, kaartToonVoor, raakt alleen het domein mobiliteit (breedte, geen koppeling).",
+      "waarheen": "GRENZEN.json (lid en leverancier dragen tickettoegang, mobiliteit kaartToonVoor) en test/tickettoegang.test.js, test/kaarttoegang.test.js plus test/ticketcodes.pg.test.js"
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 633,
+      "vervalt": "2026-12-27",
+      "meter": "toetsenNietGemeten 633 -> 634",
+      "reden": "test/ticketcodes.pg.test.js is nieuw en slaat zichzelf zonder DATABASE_URL en REDIS_URL over; de mutatiemotor kan hem daardoor niet meten (zoals elke pg-proef). Met de hand nagetrokken tegen echte PostgreSQL en Redis: zonder advisory lock plus FOR UPDATE in pg/collectietransactie.js zakt hij. De twee andere nieuwe toetsen (tickettoegang, kaarttoegang) zijn wel door de motor gemeten en zakken allebei.",
+      "waarheen": "De pg-scherf in CI; het nul-skipbewijs hangt aan de releasecommit."
+    },
     {
       "datum": "2026-09-27",
       "soort": "schuld",

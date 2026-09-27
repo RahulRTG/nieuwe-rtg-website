@@ -453,9 +453,28 @@ function testBewijsOordeel(r) {
     telling[naam] = tapTelling(tap, naam);
   const compleet = Object.values(telling).every(Number.isInteger);
   const geslaagd = !!r && r.status === 0 && !r.error && compleet &&
-    telling.tests > 0 && telling.pass > 0 && telling.fail === 0 &&
+    telling.tests > 0 && telling.pass === telling.tests && telling.fail === 0 &&
     telling.cancelled === 0 && telling.skipped === 0 && telling.todo === 0;
   return { geslaagd, telling, tapGelezen: compleet };
+}
+
+/* PG-control-tests zijn al per eigen database uitgevoerd door pgtoetsen.js.
+   Nogmaals draaien binnen de lokale releaseomgeving gaf zeven SKIP-resultaten.
+   Consumeer de oorspronkelijke bytes, met exacte commit en volledige telling;
+   de gewone control-tests blijven in hun eigen lokale opslag draaien. */
+function pgControlBewijs(root, commit, tests) {
+  if (!/^[a-f0-9]{40}$/.test(String(commit || ''))) throw Error('PG-control-bewijs mist de volledige kandidaatcommit.');
+  const { bewijs, sha256 } = require('./ci-pg-bewijs').controleer(root, commit);
+  const rel = '.release/pg-bewijs.json';
+  const controles = tests.map(bestand => {
+    const controle = bewijs.controles.find(c => c.bestand === bestand);
+    if (!controle) throw Error('PG-control-test ontbreekt: ' + bestand);
+    return controle;
+  });
+  const velden = { tests:'tests', pass:'geslaagd', fail:'mislukt', cancelled:'geannuleerd', skipped:'overgeslagen', todo:'todo' };
+  return { status:'PASS', commit, pad:rel, sha256,
+    controles, telling:Object.fromEntries(Object.entries(velden).map(([naam,veld]) =>
+      [naam,controles.reduce((n,c) => n + c[veld],0)])) };
 }
 
 function voerUit() {
@@ -469,14 +488,28 @@ function voerUit() {
   let status = uit.fouten.length ? 'INVALID' : (uit.blockers.length ? 'BLOCKED' : 'READY');
   if (!uit.fouten.length && (status === 'READY' || process.argv.includes('--bewijs'))) {
     const cp = require('node:child_process');
+    const pgSet = new Set(require('./lib/pg-toetslijst').TOETSEN);
+    const pgTests = uit.bewijs.tests.filter(p => pgSet.has(p));
+    const lokaleTests = uit.bewijs.tests.filter(p => !pgSet.has(p));
     const r = cp.spawnSync(process.execPath,
-      ['--test', '--test-reporter=tap', '--test-concurrency=1', ...uit.bewijs.tests], {
-      cwd: ROOT, env: process.env, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024
+      ['--test', '--test-reporter=tap', '--test-concurrency=1', ...lokaleTests], {
+      cwd: ROOT, env: require('./lib/suite-pg').lokaleOmgeving(process.env), encoding: 'utf8', maxBuffer: 16 * 1024 * 1024
     });
     const testOordeel = testBewijsOordeel(r);
+    let pg = null;
+    if (pgTests.length) {
+      try {
+        const bron = require('./lib/stempel').exactStempel();
+        if (bron.boomVuil) throw Error('PG-control-bewijs vereist een schone kandidaat.');
+        pg = pgControlBewijs(ROOT, bron.commit, pgTests);
+      } catch (e) { pg = { status:'FAIL', tests:pgTests, fout:String(e.message) }; }
+    }
     uit.bewijs.uitgevoerd = true;
-    uit.bewijs.status = testOordeel.geslaagd ? 'PASS' : 'FAIL';
-    uit.bewijs.telling = testOordeel.telling;
+    uit.bewijs.status = testOordeel.geslaagd && (!pg || pg.status === 'PASS') ? 'PASS' : 'FAIL';
+    uit.bewijs.lokaal = { tests:lokaleTests, ...testOordeel };
+    uit.bewijs.postgres = pg;
+    uit.bewijs.telling = Object.fromEntries(Object.entries(testOordeel.telling)
+      .map(([naam,n]) => [naam, Number.isInteger(n) ? n + (pg?.telling?.[naam] || 0) : null]));
     uit.bewijs.tapGelezen = testOordeel.tapGelezen;
     if (r.error) uit.bewijs.foutcode = String(r.error.code || 'SPAWN_ERROR');
     if (r.signal) uit.bewijs.signaal = String(r.signal);
@@ -493,4 +526,4 @@ function voerUit() {
 
 if (require.main === module) voerUit();
 module.exports = { PAD, REQUIRED_ROUTES, CONTROLES, lees, effectieveRoutes,
-  bronCensus, bewijsManifest, controleer, testBewijsOordeel, voerUit };
+  bronCensus, bewijsManifest, controleer, testBewijsOordeel, pgControlBewijs, voerUit };

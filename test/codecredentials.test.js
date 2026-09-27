@@ -200,6 +200,8 @@ test('credentialbewijs weigert exit-nul met skips, todo of ontbrekende TAP-total
     false, 'onvolledig TAP-uitvoer is geen bewijs');
   assert.equal(poort.testBewijsOordeel({ status: 1, stdout: tap(basis) }).geslaagd,
     false, 'een rode processtatus blijft rood');
+  assert.equal(poort.testBewijsOordeel({ status: 0, stdout: tap({...basis,tests:999}) }).geslaagd,
+    false, 'een vervalst totaal is geen geslaagd bewijs');
 });
 
 test('de niet-omzeilbare release- en READY-keten voeren deze poort uit', () => {
@@ -257,4 +259,36 @@ test('de census blokkeert wat hij niet kent, en laat zich niet door commentaar m
     assert.ok(uit.fouten.some(f => /app\.get\(weg, h\);: deze aanroep bestaat niet meer/.test(f)), 'een verouderde verklaring is een fout');
     assert.ok(!uit.fouten.some(f => /bundelPad/.test(f)), 'de geldige verklaring is geen fout');
   } finally { fs.rmSync(root, { recursive: true, force: true }); }
+});
+
+test('PG-control-bewijs verifieert oorspronkelijke suitebytes en telt uitsluitend de gevraagde controles', (t) => {
+  const fs = require('node:fs'), os = require('node:os'), crypto = require('node:crypto');
+  const { TOETSEN, toetslijstSha256 } = require('../scripts/lib/pg-toetslijst');
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'credential-pg-binding-'));
+  t.after(() => fs.rmSync(root, { recursive:true, force:true }));
+  fs.mkdirSync(path.join(root, '.release'));
+  const commit = 'a'.repeat(40);
+  const fixture = { formaat:'rtg-pg-bewijs-v1',bron:{commit,boomVuil:false},toetslijstSha256,
+    geslaagd:true,tapVolledig:true,bestanden:TOETSEN.length,tests:TOETSEN.length,
+    geslaagdeTests:TOETSEN.length,mislukt:0,geannuleerd:0,overgeslagen:0,todo:0,
+    controles:TOETSEN.map(bestand => ({bestand,tests:1,geslaagd:1,mislukt:0,geannuleerd:0,overgeslagen:0,todo:0})) };
+  const bytes = JSON.stringify(fixture);
+  const sha = crypto.createHash('sha256').update(bytes).digest('hex');
+  const pgPad = path.join(root, '.release/pg-bewijs.json');
+  fs.writeFileSync(pgPad,bytes);
+  fs.writeFileSync(path.join(root,'SUITE.json'),JSON.stringify({stempel:{commit,boomVuil:false},
+    postgres:{pad:'.release/pg-bewijs.json',sha256:sha}}));
+  const gevraagd = ['test/boarding-pass.pg.test.js','test/contactpin-live.pg.test.js'];
+  const r = poort.pgControlBewijs(root,commit,gevraagd);
+  assert.equal(r.status,'PASS');assert.equal(r.sha256,sha);
+  assert.deepEqual(r.controles.map(c=>c.bestand),gevraagd);
+  assert.deepEqual(r.telling,{tests:2,pass:2,fail:0,cancelled:0,skipped:0,todo:0});
+  assert.equal(fs.readFileSync(pgPad,'utf8'),bytes,'bewijs wordt gelezen, nooit vervangen');
+  assert.throws(()=>poort.pgControlBewijs(root,'b'.repeat(40),gevraagd));
+  assert.throws(()=>poort.pgControlBewijs(root,commit,['test/geen-pg-proef.test.js']));
+  fs.writeFileSync(pgPad,bytes+' ');
+  assert.throws(()=>poort.pgControlBewijs(root,commit,gevraagd),/wijkt af/);
+  fs.writeFileSync(pgPad,bytes);
+  fs.unlinkSync(path.join(root,'SUITE.json'));
+  assert.throws(()=>poort.pgControlBewijs(root,commit,gevraagd),'zonder oorspronkelijke suitebinding geen PASS');
 });

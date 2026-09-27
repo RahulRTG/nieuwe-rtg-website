@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T13:00:45.065Z",
-    "commit": "da1b1d24",
+    "op": "2026-09-27T13:16:18.823Z",
+    "commit": "49faab11",
     "boomVuil": false,
     "boomAnders": 6,
     "instrument": "scripts/bedrijfsmaat.js",

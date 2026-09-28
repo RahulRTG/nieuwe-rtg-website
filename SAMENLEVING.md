@@ -326,12 +326,10 @@ functies achter betaling (Metier, vrienden verbinden, de kring, Buurtruil, de
 stadsraad), en alle vijf gaven de `geenGast`-zin. Met een echt gratis account
 langs `/api/auth/register` zijn het er nog **een**. Twee gevolgen:
 
-- **`DOELGROEPBEREIK.json` zegt over RTG Community niets.** Het register rekent
+- **`DOELGROEPBEREIK.json` zei over RTG Community niets.** Het register rekent
   bezoeker en gratis account allebei tot de doelgroep `gast`
-  (`tierNaarDoelgroep`), maar de meter draagt alleen de bezoeker. Dezelfde vorm
-  als `foundation` daar (drie sessievormen, een gemeten), en dezelfde uitweg:
-  een tweede sessie of `onbepaald` met de reden. Niet in deze ronde gerepareerd;
-  het verschuift een andere meter en hoort een eigen wijziging te zijn.
+  (`tierNaarDoelgroep`), maar de meter droeg alleen de bezoeker. Dat is sinds
+  28 september 2026 gerepareerd (stap 4b, par. 11.3).
 - **Een account opent meer dan een pas.** Voor de bodem is het verschil tussen
   zonder en met account groter dan tussen gratis en betaald: leren, verbinden
   en rust gaan pas open met een account. Een gratis account vraagt een paspoort
@@ -377,6 +375,49 @@ VOORSTEL en door geen mens afgetekend (`AFGETEKEND` in de verklaring). Of de
 kamer werkt: er gaat een leeg lichaam heen. En niets over de betaalde treden
 onderling of over het gezin in FoundationOS; die rijen blijven `?`.
 
+### 11.3 De doelgroepmeter draagt nu beide gasten (stap 4b)
+
+`gast` heeft in `scripts/lib/doelgroepsessies.js` twee **vormen**: de bezoeker
+(de demo-inlog, en nog steeds wat `draag()` geeft, zodat de bodemmeter hem als
+eigen kolom houdt) en een gratis account waarvan RTG het paspoort heeft gezien.
+Het registreren en keuren woont in `scripts/lib/gratisaccount.js`, zodat de
+bodemmeter en de doelgroepmeter hetzelfde gratis lid meten en niet twee
+versies ervan. Een cel is open zodra **een** vorm erlangs komt, en draagt dan
+`openVorm`; komt geen vorm erlangs en gaf er een een onbepaald antwoord, dan is
+de cel onbepaald en niet dicht (`klopVormen` in `scripts/doelgroepbereik.js`).
+
+Verse meting ervoor en erna, op dezelfde code verder:
+
+| `gast` | alleen bezoeker | bezoeker + account |
+|---|---|---|
+| waar | 43 | **48** |
+| onbepaald | 52 | **40** |
+| bereikbaar zonder verklaring | 73 | **82** |
+| geen deur | 16 | 14 |
+| correct afgesloten | 37 | 37 |
+| registerleugen | 1 | 1 |
+
+Geen andere doelgroep bewoog, en het totaal aan registerleugens bleef 18: die
+zitten allemaal in `gemengde-deuren`, en de enige van de gast (`tg-sso`) stond
+er met alleen de bezoeker ook al en komt ook met een account niet langs. Drie
+dingen uit de nieuwe cellen:
+
+- **Vijf functies die het register aan de gast belooft, waren tot nu toe
+  onbewezen** (democratie, de RTG Pay-wallet, `/api/ik`, `/api/comm`,
+  festivalgast) en zijn nu `waar` -- alleen met een account, en dat is wat de
+  belofte ook bedoelde.
+- **Negen cellen bedienen het gratis lid zonder dat het register het zegt.**
+  Zeven waren onbepaald (vrienden verbinden, ontmoetingen, spellen, de kring,
+  Metier, genootschap, kosten) en twee heetten `geen-deur` (passkeys en
+  werving). Acht daarvan antwoorden precies zoals een verklaarde doelgroep
+  (`gelijk-aan-verklaard`). Dat is een BESTUURSgat en geen toegangsfout: het
+  bord kan die functies niet voor de gast uitzetten. De bodem draagt daarmee
+  meer dan het register weet.
+- **Eén cel is een toegangsvraag**: `POST /api/werving/verbind` weigert elke
+  verklaarde doelgroep en laat een gratis account door (`ruimer-dan-verklaard`).
+  Of dat bedoeld is, is een vraag voor een mens; deze meter beantwoordt hem
+  niet.
+
 ## 12. De volgorde
 
 | # | wat | stand |
@@ -385,7 +426,7 @@ onderling of over het gezin in FoundationOS; die rijen blijven `?`.
 | 2 | De naamsbesluiten van par. 9, vóór de eerste identifier | **genomen**: `onvervreemdbaar`, `insluiting`, `samenkomst` |
 | 3 | De nulmeting van par. 11.2 | **staat** voor het gratis account; de verklaring wacht op aftekening |
 | 4 | SAM-01 als ratel | **staat** (`test/onvervreemdbaar.test.js`) |
-| 4b | De doelgroepmeter een gratis-accountsessie geven naast de bezoeker | een stap weg (par. 11.2) |
+| 4b | De doelgroepmeter een gratis-accountsessie geven naast de bezoeker | **staat** (par. 11.3); de toegangsvraag bij `werving/verbind` wacht op een mens |
 | 4c | Gemeenteafspraak, aangifte en zorgintake voor een Community-lid | **staat**: open na paspoortcontrole (`server/kern/onvervreemdbaar.js`) |
 | 5 | `guest` splitsen in *bezoeker* en *lid op de bodem* | de code maakt het onderscheid al via `session.account`; 65 van de 101 bestanden zijn niet nagelopen |
 | 6 | Rust verhuizen van Veiligheid naar de bodem, plus de vijf eisen van par. 6 | een stap weg |

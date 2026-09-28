@@ -28,6 +28,11 @@
     var c = content[world], details = U.el('details', 'wp-domain'), summary = U.el('summary', '', 'Uw volledige overzicht');
     var native = U.el('div', 'wp-domain-content'); while (home.firstChild) native.appendChild(home.firstChild);
     details.append(summary, native); details.id = 'reisoverzicht';
+    // Een adres met een anker wijst IN de eigen inhoud (een element daarin, of een
+    // leesstand die de app zelf herstelt, zoals #saloon-artikel): dan staat de vouw open,
+    // anders herstelt die stand zich onzichtbaar achter "Uw volledige overzicht".
+    var anker = w.location.hash.slice(1), doel; try { anker = decodeURIComponent(anker); } catch (e) {} doel = anker && d.getElementById(anker);
+    if (anker && (!doel || details.contains(doel))) details.open = true;
     var scene = U.el('section', 'wp-scene'), heading = U.el('div', 'wp-heading'), overline = U.el('p', 'wp-overline', c[0]), title = U.el('h2', '', c[1]);
     var link = U.el('a', 'wp-action', c[2] + ' ↗'); link.href = c[3];
     if (world === 'travel') link.onclick = function () { details.open = true; };

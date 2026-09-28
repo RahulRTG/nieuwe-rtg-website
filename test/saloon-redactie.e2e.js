@@ -4,6 +4,16 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
 const pw = require('playwright');
 const { startServer, stop, browserOpties, geenBrowser, letOpFouten } = require('./helper');
+
+/* #413 zet de eigen inhoud van een wereldhuis (hier de Saloon op /apps/wereld.html)
+   bewust in een ingeklapt "Uw volledige overzicht" (details.wp-domain) onder de warme
+   scene; test/world-homes.e2e.js opent hem net zo. Deze proef gaat over de Saloon
+   zelf, dus hij opent die vouw eerst -- zoals een lid dat doet -- en zwakt verder niets af. */
+async function openOverzicht(page) {
+  const vouw = page.locator('details.wp-domain');
+  await vouw.waitFor({ state: 'attached' });
+  if (!(await vouw.evaluate(d => d.open))) await page.locator('details.wp-domain > summary').click();
+}
 test('van interne redactie via review naar Saloon, met een zichtbare correctie', { skip: geenBrowser(pw) }, async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-redactielus-'));
   let srv, browser;
@@ -46,6 +56,7 @@ test('van interne redactie via review naar Saloon, met een zichtbare correctie',
     await editor.locator('#a_pub').click(); await lijstKlaar();
     const lees = await context.newPage(); letOpFouten(lees, fouten);
     await lees.goto(srv.base + '/apps/wereld.html?embed=1');
+    await openOverzicht(lees);
     const kaart = lees.locator('[data-saloon-id="nieuws:BODE:' + id + '"]');
     await kaart.getByRole('button', { name: 'Lees artikel', exact: true }).click();
     await lees.locator('#saloonArtikel').getByText('Het plein gaat maandag open.', { exact: true }).waitFor();
@@ -67,7 +78,11 @@ test('van interne redactie via review naar Saloon, met een zichtbare correctie',
     if (process.env.SALOON_REDACTIE_SCREENSHOT) await lees.screenshot({ path: process.env.SALOON_REDACTIE_SCREENSHOT });
     await lees.goto(srv.base + '/apps/krant.html?zaak=BODE#' + id);
     await lees.locator('article').getByText('Het plein gaat dinsdag open.', { exact: true }).waitFor();
-    await lees.locator('article summary').click();
+    // Niet 'article summary': de desktopstandaard (#413) zet in de agendawidget een
+    // eigen <details> "Week kiezen", ook in een <article>. Deze stap gaat over de
+    // correctievouw van DIT krantenartikel, dus zoeken we hem in dat artikel.
+    await lees.locator('article').filter({ hasText: 'Het plein gaat dinsdag open.' })
+      .getByText('Correcties en actualiseringen', { exact: true }).click();
     await lees.locator('article').getByText('Correctie: de opening is op dinsdag.', { exact: true }).waitFor();
     assert.deepEqual(fouten, []);
   } finally { if (browser) await browser.close(); stop(srv?.child); fs.rmSync(tmp, { recursive: true, force: true }); }

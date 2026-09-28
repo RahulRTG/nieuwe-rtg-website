@@ -6,6 +6,14 @@
     if (started || w.self !== w.top || d.body.dataset.publicPlatform) return;
     if (!d.body.dataset.rtgWorld || d.body.dataset.rtgWorld === 'redirect') return;
     started = true;
+    // De vaste bovenrand heeft in de warme compositie geen eigen grond, zodat het
+    // sfeerbeeld eronder doorloopt. Zodra er inhoud onder hem schuift, zou die tekst
+    // door de kop heen te lezen zijn; dan krijgt hij de grond van de wereld (CSS).
+    var kop = function () {
+      var onder = String((w.scrollY || d.documentElement.scrollTop || 0) > 0);
+      if (d.body.dataset.rtgScrolled !== onder) d.body.dataset.rtgScrolled = onder;
+    };
+    w.addEventListener('scroll', kop, { passive: true }); kop();
     var projection = d.body.hasAttribute('data-rtg-projectie');
     var names = ['module-sdk', 'workspace-world-catalog', 'workspace-registries', 'workspace-session',
       'workspace-policy', 'workspace-context', 'workspace-navigation', 'workspace-state', 'workspace-orchestrator',

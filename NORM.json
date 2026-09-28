@@ -6,7 +6,7 @@
     "activeringZonderReden": 0,
     "appwerktDefecten": 0,
     "beweringenZonderVulcontrole": 100,
-    "bewijsAchterstand": 2418,
+    "bewijsAchterstand": 2712,
     "bewijsAlleenKeten": 18,
     "bewijsCellenBewezen": 26449,
     "bronBlindeBestanden": 3,
@@ -3544,6 +3544,16 @@
       "meter": "toetsenNietGemeten 654 -> 721",
       "reden": "DE TWEEDE BIJTREKRONDE VAN DE SAMENVOEGING DRAAGT DE GROEI VAN DE TAKKEN, EN GEEN GROEI VAN ZICHZELF. Na de eerste ronde zijn de nieuwe commits van alle open takken en #414 bijgetrokken (#413 is op besluit van de eigenaar weer uit deze tak gehaald, want hij was in zijn eigen CI nooit groen). Elke tak schreef voor zijn eigen verhoging hier al een notitie; de vereniging telt die op. De nieuwe stand is de GEMETEN stand op de samengevoegde boom, er is geen lucht bijgeteld, en vanaf hier geldt weer: alleen omlaag. De mutatiemotor is niet langs de nieuwe toetsbestanden van de takken geweest.",
       "waarheen": "Een volledige npm run mutatie op een schone boom neemt ze mee; die draait aan het eind van deze samenvoeging."
+    },
+    {
+      "datum": "2026-09-28",
+      "soort": "schuld",
+      "sleutel": "bewijsAchterstand",
+      "van": 2418,
+      "vervalt": "2026-12-28",
+      "meter": "bewijsAchterstand 2418 -> 2712",
+      "reden": "DEZELFDE VORM ALS DE NOTITIE VAN 12 SEPTEMBER: EEN GROTERE NOEMER, GEEN ACHTERUITGANG. OUTPUTPROEF.json is voor het eerst sinds 3 september hermeten, uit het routejournaal van een volle suite (74e97d99). Die zag 5151 routes tegen 4747: +404, en scripts/routenoemer.js reproduceert dat als leeftijd (+416 routes sinds df1a581a, 0 verdwenen, 0 onverklaard). De 4151 bewezen OUTPUT-cellen bleven EXACT gelijk; de nieuwe routes landden als 294 onbeslist (output-niet-toerekenbaar 285 -> 579, want een inhoudgevoelige toets die ze raakt, raakt ook andere) en 110 ongemeten. De hele groei van 294 zit in die ene post.\n\nWAAROM NIET NIET HERMETEN: een register van 25 dagen oud over een router die 416 routes groeide, is precies de schijnzekerheid waar PROOF.md par. 2a nu per cel op let -- 1416 OUTPUT-cellen stonden op verouderd.",
+      "waarheen": "de 294 onbesliste routes toerekenbaar maken (een toets die er alleen die route raakt, of een verklaring in BEWIJSSCHULD.json). Vervalt 2026-12-28: staat hij dan nog op 2712 of hoger, dan is dit geen noemergroei meer maar achterstand die niemand aflost."
     }
   ],
   "prestatie": {

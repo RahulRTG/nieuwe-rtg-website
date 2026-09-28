@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-22T17:12:04.581Z",
-    "commit": "0f88d9cf1",
-    "boomVuil": false,
-    "boomAnders": 0,
+    "op": "2026-09-28T10:02:18.690Z",
+    "commit": "05d5da18b",
+    "boomVuil": true,
+    "boomAnders": 24,
     "instrument": "scripts/bewijsladder.js",
     "node": "v24.18.0"
   },
@@ -19,7 +19,7 @@
       "mechanismen": [
         {
           "doel": "git diff",
-          "lokaal": true,
+          "lokaal": false,
           "keten": [
             "ci.yml"
           ],
@@ -751,8 +751,24 @@
           "graad": "vermoed"
         },
         {
+          "doel": "scripts/desktop-audit.js",
+          "lokaal": false,
+          "keten": [
+            "desktop-standard.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null,
+          "graad": "vermoed"
+        },
+        {
           "doel": "scripts/e2e.js",
-          "lokaal": true,
+          "lokaal": false,
           "keten": [
             "ci.yml",
             "wacht.yml"
@@ -782,6 +798,22 @@
           "register": "NORM.json",
           "stempel": false,
           "grond": "schrijft",
+          "graad": "vermoed"
+        },
+        {
+          "doel": "test/warm-presentation.e2e.js",
+          "lokaal": false,
+          "keten": [
+            "desktop-standard.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null,
           "graad": "vermoed"
         }
       ]
@@ -872,7 +904,7 @@
         },
         {
           "doel": "scripts/bron-release-bewijs.js",
-          "lokaal": true,
+          "lokaal": false,
           "keten": [
             "release-image.yml"
           ],
@@ -1111,7 +1143,7 @@
   "uitleg": "Welk bewijsmechanisme op welke sport van de bewijsladder staat, afgeleid uit de keten in .github/workflows en uit de scripts zelf. Per sport de stand (staat, een stap weg, bestaat niet) en per mechanisme of het lokaal draait, alleen in de keten, of beide.",
   "grens": "De SPORTEN zijn verklaard en niet gemeten: dat een soort bewijs hier ontbreekt, zegt deze meter niet. Van de mechanismen erop meet hij dat ze DRAAIEN en waar -- niet of het bewijs dat ze leveren goed is, en niet of het genoeg is. `alleenKeten` telt en oordeelt niet: zeven van die mechanismen lezen een artefact uit een andere job en kunnen lokaal per definitie niet draaien. En er staat met opzet geen samengesteld eindoordeel onder deze tabel (KEURING.md par. 5).",
   "telling": {
-    "mechanismen": 61,
+    "mechanismen": 63,
     "sporten": 12,
     "staat": 6,
     "stap": 6,
@@ -1120,8 +1152,8 @@
     "graadGemeten": 0,
     "graadVermoed": 12,
     "graadOnbekend": 0,
-    "alleenKeten": 17,
-    "vermeldingenAlleenKeten": 18,
+    "alleenKeten": 22,
+    "vermeldingenAlleenKeten": 23,
     "zonderTrede": 0
   }
 }

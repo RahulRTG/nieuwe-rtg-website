@@ -31,7 +31,7 @@
   var summary=node('span',null,'pp-itinerary');summary.translate=false;summary.hidden=company;
   featureCopy.append(overline,title,summary,body,action);
   featureCopy.append(node('small',company?'illustration':'demoBoundary','pp-boundary'));
-  feature.append(picture,featureCopy);
+  var photoFrame=node('div',null,'wp-photo');photoFrame.appendChild(picture);feature.append(photoFrame,featureCopy);
   var stepper=node('div',null,'pp-stepper');data.stories.forEach(function(story){var b=button(null,function(){select(story.id,true);},'pp-step');b.dataset.publicStep=story.id;b.setAttribute('aria-label',copy(story.label));b.dataset.i18nAria='public.'+story.label;stepper.append(b);});
   home.append(stories,intro,feature,stepper);
   var focus=node('section',null,'wd-focus pp-detail');focus.hidden=true;

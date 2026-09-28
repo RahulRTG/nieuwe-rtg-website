@@ -26,3 +26,5 @@ body[data-public-platform][data-rtg-desktop] .pp-context{margin-inline-end:auto}
 body[data-public-platform] .pp-detail-content{overflow-wrap:anywhere}
 body[data-public-platform] .pp-detail-content :is(h1,h2,h3){font-family:Inter,sans-serif!important;line-height:1.15;letter-spacing:-.035em}
 body[data-public-platform] .pp-detail-content :is(.world-header,.site-header){display:none}
+
+.pp-feature>.wp-photo{order:2}.pp-feature>.wp-photo>.pp-feature-photo{height:100%!important}

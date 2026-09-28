@@ -1,10 +1,9 @@
 /* Magnaat FROM ZERO (V1, MAGNAAT.md): een leven per lid, van bijna niets tot
    een eigen bedrijf.
 
-   DE KLOK REKENT BIJ EN TIKT NIET, zoals in World: bij elke aanraking draaien
-   de dagen die sinds `gerekendTot` echt verstreken zijn (hooguit
-   MAX_DAGEN_PER_KEER tegelijk), en pas daarna de handeling. Wie klaar is met
-   zijn dag, sluit hem zelf af (`slaap`); de klok telt dan vanaf nu opnieuw.
+   DE KLOK REKENT BIJ EN TIKT NIET: bij elke aanraking draaien de dagen die
+   sinds `gerekendTot` echt verstreken zijn (hooguit MAX_DAGEN_PER_KEER), en pas
+   daarna de handeling. Wie klaar is, sluit zijn dag zelf af (`slaap`).
 
    Het leven hangt aan de sessiesleutel, de wereld in het grootboek aan een hash
    ervan: het journaal kent geen leden. Al het geld loopt door ./boek.js, en na
@@ -24,16 +23,14 @@ const KIES_START = 'Kies waar je begint: ' + Object.values(R.STARTPOSITIES).map(
 
 function maakLeven({ db, save = () => {}, nu = () => Date.now() } = {}) {
   const boek = maakBoek({ db });
-  const eigen = require('../eigencollectie')({ db, domein: 'kern/magnaat-leven', bezit: { magnaatLeven: 'kaart', magnaatOordelen: 'lijst' } });
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/magnaat-leven', bezit: { magnaatLeven: 'kaart', magnaatOordelen: 'lijst', magnaatSteden: 'kaart' } });
   const levens = () => eigen.bak('magnaatLeven');
 
   function haal(key, opnieuw, moeilijkheid, start) {
     const alle = levens();
     let st = alle[key];
-    /* Een leven uit de eerste opzet (versie 1) had geen week en geen agenda; het
-       begint opnieuw in plaats van half te worden omgebouwd. Wie zelf opnieuw
-       begint, krijgt een NIEUWE wereld in het grootboek: het oude journaal
-       blijft staan en wordt niet overschreven, want een journaal groeit alleen. */
+    /* Een leven van versie 1 begint opnieuw. Wie zelf opnieuw begint, krijgt een
+       NIEUWE wereld in het grootboek: een journaal groeit alleen. */
     if (!st || st.versie !== 2 || opnieuw) {
       const ronde = opnieuw ? (st.ronde || 0) + 1 : 0;
       const niveau = moeilijkheid || (st && st.moeilijkheid) || 'normaal';
@@ -54,6 +51,7 @@ function maakLeven({ db, save = () => {}, nu = () => Date.now() } = {}) {
   }
 
   function bijrekenen(st) {
+    if (st.stad) return 0; // in een gedeelde stad gaat de dag door als iedereen klaar is (./stad.js)
     const t = nu();
     let n = 0;
     while (t - st.gerekendTot >= st.dagMs && n < R.MAX_DAGEN_PER_KEER && !st.voorbij) {
@@ -107,10 +105,8 @@ function maakLeven({ db, save = () => {}, nu = () => Date.now() } = {}) {
     }
   }
 
-  /* V5: een handeling op een leven, met een vangnet eromheen (./bewaking.js).
-     Een verzoek met een `verzoek`-sleutel die al is uitgevoerd, wordt niet
-     nog eens uitgevoerd: wie na een verbroken verbinding opnieuw verstuurt,
-     sluit geen dag twee keer af. */
+  /* V5: een handeling met een vangnet eromheen (./bewaking.js). Een `verzoek`-sleutel
+     die al is uitgevoerd, gaat niet nog eens: geen dag twee keer afsluiten. */
   function actie(key, invoer) {
     const body = invoer && typeof invoer === 'object' && !Array.isArray(invoer) ? invoer : {};
     if (typeof body.actie !== 'string') return { status: 400, error: 'Die handeling bestaat niet in Magnaat.' };
@@ -167,7 +163,10 @@ function maakLeven({ db, save = () => {}, nu = () => Date.now() } = {}) {
   /* De speelronde voor het kantoor (./oordeel.js): anoniem, en lezen schept niets. */
   const oordelen = () => oordeelOverzicht(eigen.kijk('magnaatOordelen') || []);
 
-  return { staat, actie, oordelen, verifieer: (key) => boek.verifieer(haal(key)) };
+  /* Voor een gedeelde stad (./stad.js): een leven op een interne sleutel, en een dag verder onder hetzelfde vangnet. */
+  const intern = { eigen, haal, actie, toon: (key) => bewaarEnToon(haal(key)),
+    dag: (key) => { const st = haal(key); return st.voorbij || st.bevroren ? null : beschermd(st, () => { volgendeDag(st); return bewaarEnToon(st); }); } };
+  return { staat, actie, oordelen, intern, verifieer: (key) => boek.verifieer(haal(key)) };
 }
 
 module.exports = { maakLeven };

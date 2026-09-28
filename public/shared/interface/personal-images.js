@@ -79,6 +79,14 @@
     w.addEventListener('pagehide', function () { observer.disconnect(); w.clearInterval(timer); bytes.clear(); });
   }
   w.RTGPersonalImages = { register: register, start: start, api: api, file: file,
+    source: function (img, url, label) {
+      var record = Array.from(slots.values()).find(function (r) { return r.nodes.includes(img); });
+      if (record && new URL(record.original, d.baseURI).href === url) { apply(record); return; }
+      if (record) record.nodes = record.nodes.filter(function (n) { return n !== img; });
+      var box = img.closest('.wp-photo,.wd-app-photo'), oldButton = box && box.querySelector('.pi-change'); if (oldButton) oldButton.remove();
+      delete img.dataset.personalImageRegistered; img.src = url; img.style.objectPosition = ''; img.style.transform = ''; img.style.transformOrigin = '';
+      register(img, 'beeld-' + hash(url), label);
+    },
     list: function () { return Array.from(slots.values()).filter(function (r) { return r.nodes.some(function (n) { return n.isConnected; }); }); },
     choice: function (id) { return preferences[id] || null; }, authenticated: function () { return !!token(); },
     save: function (slot, image) { return api('/api/ik/beelden/zet', { slot: slot, image: image }).then(function (j) { preferences = j.images; slots.forEach(apply); }); }

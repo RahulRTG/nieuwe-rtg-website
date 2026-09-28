@@ -6,7 +6,8 @@
   var selected=data.stories[0],lastFocus=null,savedScroll=0,current=null,moved=null;
   function select(id,notify){
    var story=data.stories.find(function(s){return s.id===id;});if(!story)return;selected=story;
-   if(picture.src!==photo(story.photo).src)picture.src=photo(story.photo).src;
+   var source=photo(story.photo).src;
+   if(w.RTGPersonalImages)w.RTGPersonalImages.source(picture,source,copy(story.label));else if(picture.src!==source)picture.src=source;
    [title,body].forEach(function(el,i){var key=i?story.body:story.title;el.dataset.i18n='public.'+key;el.dataset.i18nSource=D.words[key][0];el.textContent=copy(key);});
    stories.querySelectorAll('[data-public-story]').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.publicStory===id));});
    stepper.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.publicStep===id));});

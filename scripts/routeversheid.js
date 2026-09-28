@@ -124,6 +124,11 @@ function sluiting(start, buren) {
    vorm stond er in de eerste versie niet in, en daardoor stond
    server/routes/rtfos/governance.js op `vers` terwijl kern/rtfos/ sindsdien was
    gewijzigd -- dezelfde fout als hierboven, alleen een regel hoger. */
+/* VOLLEDIG ONTSNAPPEN EN NIET ALLEEN DE DOLLAR -- dezelfde les als in
+   scripts/activering.js: een ontsnapping die klopt DOORDAT de invoer elders
+   beperkt is ([A-Za-z_$]), klopt alleen zolang niemand die beperking verruimt.
+   CodeQL wees het hier opnieuw aan. */
+const ontsnap = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const PARAM = '(\\{[^{}]*\\}|[A-Za-z_$][\\w$]*)';
 function fabriekParam(bron) {
   const s = bron || '';
@@ -132,7 +137,7 @@ function fabriekParam(bron) {
   if (m) return m[1];
   const n = /module\.exports\s*=\s*([A-Za-z_$][\w$]*)\s*;?\s*(?:\n|$)/.exec(s);
   if (!n) return null;
-  const N = n[1].replace(/\$/g, '\\$');
+  const N = ontsnap(n[1]);
   m = new RegExp('function\\s+' + N + '\\s*\\(\\s*' + PARAM).exec(s) ||
     new RegExp('\\b' + N + '\\s*=\\s*(?:async\\s*)?(?:function\\s*[\\w$]*\\s*)?\\(\\s*' + PARAM).exec(s) ||
     new RegExp('\\b' + N + '\\s*=\\s*(?:async\\s*)?([A-Za-z_$][\\w$]*)\\s*=>').exec(s);
@@ -159,7 +164,7 @@ function kernGebruik(bron) {
     const open = namenUit(param.slice(1, -1), namen);
     return { param, namen: [...namen].sort(), open };
   }
-  const p = param.replace(/\$/g, '\\$');
+  const p = ontsnap(param);
   let open = false;
   const tas = '\\b' + p + '(?:\\.kern)?';
   for (const d of bron.matchAll(new RegExp('\\{([^{}]*)\\}\\s*=\\s*' + tas + '\\b(?!\\s*\\.\\s*(?!kern\\b)[\\w$])', 'g'))) {

@@ -45,11 +45,15 @@ const A = arg('--ander', 'POST /api/office/bewaarverzoek');
 /* Een meting in de worktree, in een eigen proces zodat elke stap de code en de
    registers leest zoals ze DAAR nu zijn. */
 function meet(dir) {
+  /* De modules worden via de werkmap geladen en niet met een letterlijk pad:
+     dit is code die IN de worktree draait, en een letterlijke require hier
+     leest de keuring als een require vanuit scripts/ (kapot). */
   const code = `
-    const rv = require('./scripts/routeversheid');
-    const { staatVan } = require('./scripts/vertrouwen');
+    const laad = (n) => require(require('path').join(process.cwd(), 'scripts', n));
+    const rv = laad('routeversheid');
+    const { staatVan } = laad('vertrouwen');
     const b = rv.bouwer();
-    const m = require('./scripts/bewijsmatrix').bouw();
+    const m = laad('bewijsmatrix').bouw();
     const uit = {};
     for (const route of ${JSON.stringify([R, A])}) {
       const rij = m.rijen.find((r) => r.methode + ' ' + r.pad === route);

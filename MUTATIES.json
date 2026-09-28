@@ -376,7 +376,7 @@
       "module": "server/ai.js",
       "operator": "===->!==#0",
       "gezakt": 3,
-      "geprobeerd": 1
+      "geprobeerd": 3
     },
     "ai-regie.test.js": {
       "soort": "server",

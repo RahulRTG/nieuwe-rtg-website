@@ -42,7 +42,7 @@ const GEINJECTEERD = {
     vervangbaar: 'deels: de nieuwe organisatie heeft een eigen identiteitsdienst nodig' }
 };
 
-/* Namen die de routes uit de kern-zak van RTG halen. */
+/* Namen die de routes aan hun expliciete RTG-grens ontvangen. */
 const ROUTES = {
   app: { wat: 'de webserver', vervangbaar: 'ja' },
   auth: { wat: 'een ingelogde sessie van een lid', vervangbaar: 'deels: eigen inlog nodig' },

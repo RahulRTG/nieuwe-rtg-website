@@ -1,4 +1,5 @@
 'use strict';
+const { SLEUTEL } = require('./economische-identiteit');
 
 /* Opslagkeuze voor de atomische economische boeking. Productie krijgt nooit
    de proceslokale fallback: zonder PostgreSQL/SQLite wordt vóór het werk
@@ -8,7 +9,7 @@ module.exports = ({ db, store, postgres, sqlite, bijeen, save }) => {
   return async function boekEenmaal(invoer, werk) {
     if (!db.writable) throw new Error('De opslag is niet schrijfbaar.');
     return bijeen(async () => {
-      if (!/^payout-terug:[a-f0-9]{64}$/.test(String(invoer && invoer.sleutel || '')))
+      if (!SLEUTEL.test(String(invoer && invoer.sleutel || '')))
         throw new Error('Economische boeking vereist een vaste hash-sleutel.');
       if (store === 'postgres') return postgres.economischeBoekingPostgres(invoer, werk);
       if (store === 'sqlite') return sqlite.economischeBoekingSqlite(invoer, werk);

@@ -85,7 +85,7 @@ module.exports = (ctx) => {
     return {
       naam: v.naam, stad: stad.naam || null, status: v.status,
       beschikbaar: v.beschikbaar || [], talen: v.talen || [], vaardigheden: v.vaardigheden || [],
-      rijbewijs: !!v.rijbewijs, voertuig: !!v.voertuig,
+      rijbewijs: !!v.rijbewijs, voertuig: !!v.voertuig, gekoppeld: !!v.account,
       gedragscode: !!v.gedragscode, vogGeldigTot: v.vogGeldigTot || null, vogGeldig: vogGeldig(v),
       trainingen: v.trainingen || [], urenTotaal: Math.round(urenVan(v) * 10) / 10,
       urenRecent: (v.uren || []).slice(-12).reverse().map(u => ({ datum: u.datum, uren: u.uren, km: u.km })),
@@ -166,7 +166,9 @@ module.exports = (ctx) => {
      keuringsregel 13. */
   const kantoor = require('./vrijwilligerportaal-kantoor')(ctx, { vindCode, urenVan, DOEL, SOORT, SCOPE });
 
-  return { portaal, zetEigen, meldUren, codeVoor: kantoor.codeVoor,
+  const account = require('./vrijwilligeraccount')(ctx, { metCode, deurIn: kantoor.deurIn, SCOPE });
+
+  return { portaal, zetEigen, meldUren, account, codeVoor: kantoor.codeVoor,
     codeIntrekken: kantoor.codeIntrekken, codeRoteren: kantoor.codeRoteren,
     bevestigUren: kantoor.bevestigUren, vindCode, DAGDELEN, SCOPE };
 };

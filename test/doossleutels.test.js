@@ -1,39 +1,33 @@
-/* EEN SLEUTEL PER ZAAKDOOS (AUTHORITY.md fase 7, in de schaduw).
-
-   Vijf dingen die niet mogen sneuvelen:
-   1. alleen de eigenaar geeft een doossleutel; de gedeelde code niet, en ook
-      niet wie boardroomtoegang kreeg;
-   2. met een eigen sleutel is de naam van de doos BEWEZEN: hij komt uit het
-      register en een andere naam in het verzoek verandert daar niets aan;
-   3. met de gedeelde sleutel blijft het werken (schaduw), maar de naam heet dan
-      onbewezen -- het wereldbord laat het verschil zien;
-   4. een ingetrokken of verkeerde eigen sleutel is niets waard;
-   5. elke geldige aanroep telt mee onder de weg waarlangs hij kwam, en de
-      sleutel zelf staat niet in de opslag.
-
-   Draai los: node --test test/doossleutels.test.js */
+/* EEN SLEUTEL PER ZAAKDOOS, GEBONDEN AAN ZIJN ZAAK (devices.zaakdoos_sleutel, B12).
+   Uitgeven doet een mens op naam (de eigenaar of een manager van DE zaak); met
+   een eigen sleutel zijn doos en zaak bewezen, niet opgegeven; scope per familie,
+   rotatie en intrekken; een manager raakt alleen zijn eigen zaak; de gedeelde
+   sleutel telt buiten productie nog als zelfopgave. Het register zonder server:
+   test/doossleutels-register.test.js. Draai los: node --test test/doossleutels.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const crypto = require('crypto');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop, kantoorAlsPersoon, kantoorKoppelBody } = require('./helper');
-const { maakDoosSleutels } = require('../server/kern/zaakdoos/sleutels');
-const { doosKoppen } = require('../server/kern/zaakdoos/koppen');
+const { FAMILIES, MAX_DAGEN } = require('../server/kern/zaakdoos/sleutels');
 
 const CODE = 'DOOS-KANTOOR';
 const GEDEELD = 'gedeelde-doos-sleutel-voor-de-toets';
+const VORM = /^ZD\.[0-9A-F]{32}$/;
 const mappen = [];
-let MEDE = null; // een medewerker met boardroomtoegang die NIET de eigenaar is (toets 1)
+let MEDE = null; // een medewerker met boardroomtoegang die NIET de eigenaar is
 let srv, gedeeld, eig;
 function api(pad, body, token, koppen) {
   return fetch(srv.base + pad, { method: 'POST',
     headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}, koppen || {}),
     body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
+const eigen = (doos, sleutel) => ({ 'x-doos-id': doos, 'x-doos-eigen-sleutel': sleutel });
 const meet = (naam, koppen) => api('/api/doos/meting', { doos: naam, rtt: 12, modus: 'cloud' }, null, koppen);
-const opBord = async (naam) => ((await api('/api/office/wereld', {}, gedeeld)).body.items || []).find(i => i.soort === 'doos' && i.naam === naam);
+const opBord = async (naam) => ((await api('/api/office/wereld', {}, eig)).body.items || []).find(i => i.soort === 'doos' && i.naam === naam);
+const kloon = (koppen, q) => fetch(srv.base + '/api/doos/kloon' + (q || ''), { headers: koppen })
+  .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
 test.before(async () => {
   const m = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-doossleutel-')); mappen.push(m);
@@ -47,157 +41,142 @@ test.after(() => {
   for (const m of mappen) { try { fs.rmSync(m, { recursive: true, force: true }); } catch (e) {} }
 });
 
-test('1-4. uitgeven, bewezen naam, schaduw en intrekken', async () => {
-  assert.equal((await api('/api/office/doos/sleutel', { doos: 'doos-a' }, gedeeld)).status, 403, 'de gedeelde code geeft geen doossleutel');
-  // ook wie boardroomtoegang KREEG, is de eigenaar niet
+let A = null; // de sleutel van doos-a bij KIKUNOI
+
+test('1. uitgeven: de eigenaar, met een zaak, 128 bits, een keer getoond', async () => {
+  assert.equal((await api('/api/office/doos/sleutel', { doos: 'doos-a', zaak: 'KIKUNOI' }, gedeeld)).status, 403, 'gedeelde code');
   const reg = (await api('/api/auth/register', { name: 'Doos Toets', email: 'doos' + Date.now() + '@voorbeeld.test',
     password: 'geheim123', geboortedatum: '1985-05-05', pasApp: 'rtg' })).body;
   await api('/api/auth/me', {}, reg.token);
   assert.equal((await api('/api/account/koppel', await kantoorKoppelBody(srv.base, reg.token), reg.token)).status, 200);
   assert.equal((await api('/api/office/boardroom/toegang/geef', { codenaam: reg.state.user.codename }, eig)).status, 200);
-  const mede = MEDE = (await api('/api/account/start', { rol: 'kantoor' }, reg.token)).body.token;
-  assert.equal((await api('/api/office/doos/sleutels', {}, mede)).status, 200, 'hij komt de boardroom in');
-  assert.equal((await api('/api/office/doos/sleutel', { doos: 'doos-a' }, mede)).status, 403, 'maar geeft geen doossleutel');
-  const r = await api('/api/office/doos/sleutel', { doos: 'doos-a' }, eig);
-  assert.equal(r.status, 200, JSON.stringify(r.body));
-  assert.match(r.body.sleutel, /^[0-9a-f]{48}$/);
-  const eigen = { 'x-doos-id': 'doos-a', 'x-doos-eigen-sleutel': r.body.sleutel };
-
-  assert.equal((await meet('iemand-anders', eigen)).status, 200);
-  const a = await opBord('doos-a');
-  assert.ok(a, 'de meting staat onder de BEWEZEN naam, niet onder wat het verzoek zei');
-  assert.equal(a.bewezen, true);
-  assert.equal(await opBord('iemand-anders'), undefined, 'de naam in het verzoek telt niet bij een eigen sleutel');
-
-  assert.equal((await meet('doos-b', { 'x-doos-sleutel': GEDEELD })).status, 200, 'de gedeelde sleutel werkt nog (schaduw)');
-  assert.equal((await opBord('doos-b')).bewezen, false, 'maar die naam is een zelfopgave');
-
-  assert.equal((await meet('doos-a', { 'x-doos-id': 'doos-a', 'x-doos-eigen-sleutel': '0'.repeat(48) })).status, 403,
-    'een verkeerde eigen sleutel zonder gedeelde sleutel komt er niet in');
-  assert.equal((await api('/api/office/doos/sleutel/weg', { doos: 'doos-a' }, eig)).body.ingetrokken, true);
-  assert.equal((await meet('doos-a', eigen)).status, 403, 'een ingetrokken sleutel is niets meer waard');
-
+  MEDE = (await api('/api/account/start', { rol: 'kantoor' }, reg.token)).body.token;
+  assert.equal((await api('/api/office/doos/sleutels', {}, MEDE)).status, 200, 'hij komt de boardroom in');
+  assert.equal((await api('/api/office/doos/sleutel', { doos: 'doos-a', zaak: 'KIKUNOI' }, MEDE)).status, 403, 'maar geeft geen doossleutel');
+  assert.equal((await api('/api/office/doos/sleutel', { doos: 'doos-a' }, eig)).status, 400, 'zonder zaak geen sleutel');
+  assert.equal((await api('/api/office/doos/sleutel', { doos: 'doos-a', zaak: 'BESTAATNIET' }, eig)).status, 400);
+  assert.equal((await api('/api/office/doos/sleutel', { doos: 'doos-a', zaak: 'KIKUNOI', dagen: MAX_DAGEN + 1 }, eig)).status, 400,
+    'max ' + MAX_DAGEN + ' dagen');
+  const r = await fetch(srv.base + '/api/office/doos/sleutel', { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + eig }, body: JSON.stringify({ doos: 'doos-a', zaak: 'kikunoi' }) });
+  const b = await r.json();
+  assert.equal(r.status, 200, JSON.stringify(b));
+  assert.equal(r.headers.get('cache-control'), 'no-store');
+  assert.match(b.sleutel, VORM);
+  assert.equal(b.zaak, 'KIKUNOI');
+  assert.deepEqual(b.scope, FAMILIES.slice());
+  const dagen = (Date.parse(b.expires_at) - Date.now()) / 86400000;
+  assert.ok(dagen > 179 && dagen <= 180, 'standaard 180 dagen, niet ' + dagen);
+  A = b.sleutel;
   const o = await api('/api/office/doos/sleutels', {}, eig);
-  assert.equal(o.status, 200);
-  assert.equal(o.body.wegen.eigen, 1);
-  assert.equal(o.body.wegen.gedeeld, 1);
-  assert.ok(!/hash|[0-9a-f]{48}/.test(JSON.stringify(o.body)), 'het overzicht draagt geen sleutel en geen hash');
-  /* Welke dozen melden nog met de gedeelde sleutel: dat bepaalt wanneer die dicht
-     kan (besluit van 23 september 2026). doos-a meldde alleen met een eigen sleutel. */
-  assert.deepEqual(o.body.nogGedeeld.map(d => [d.doos, d.aantal, d.heeftEigen]), [['doos-b', 1, false]]);
+  assert.ok(!JSON.stringify(o.body).includes(A.slice(3)), 'het overzicht draagt de sleutel niet');
+  assert.ok(!/code_hash|[0-9a-f]{64}/.test(JSON.stringify(o.body)), 'en geen hash');
 });
 
-test('6. de lijst dozen op de gedeelde sleutel: zelfopgave, zeven dagen, en begrensd', () => {
-  let t = Date.parse('2026-09-23T09:00:00Z');
-  const db = { data: {} };
-  const s = maakDoosSleutels({ db, save: () => {}, crypto, nu: () => t });
-  s.geef('doos-x');
-  s.telWeg('gedeeld', 'Doos-X');
-  s.telWeg('gedeeld', 'doos-x');
-  s.telWeg('gedeeld', '../etc');
-  s.telWeg('eigen', 'doos-y');
-  let o = s.overzicht();
-  assert.deepEqual(o.nogGedeeld.map(d => [d.doos, d.aantal, d.heeftEigen]),
-    [['(geen geldige naam)', 1, false], ['doos-x', 2, true]], 'een eigen sleutel die nog niet op de doos staat, valt op');
-  assert.match(o.nogGedeeldUitleg, /zelfopgave/);
-  t += 8 * 86400000;
-  assert.deepEqual(s.overzicht().nogGedeeld, [], 'na zeven dagen stilte staat hij niet meer op de lijst');
-  t += 30 * 86400000;
-  s.telWeg('gedeeld', 'doos-z');
-  assert.deepEqual(Object.keys(db.data.doosGedeeldGezien), ['doos-z'], 'wat dertig dagen niet is gezien, valt uit de opslag');
-  for (let i = 0; i < 250; i++) s.telWeg('gedeeld', 'verzonnen-' + i);
-  assert.equal(Object.keys(db.data.doosGedeeldGezien).length, 200, 'wie de gedeelde sleutel heeft, laat de lijst niet groeien');
+test('2. doos en zaak bewezen, niet opgegeven', async () => {
+  assert.equal((await meet('iemand-anders', eigen('doos-a', A))).status, 200);
+  const a = await opBord('doos-a');
+  assert.ok(a, 'onder de BEWEZEN naam');
+  assert.equal(a.bewezen, true);
+  assert.equal(await opBord('iemand-anders'), undefined);
+  // het rapport: de doos meldt alleen over zichzelf en haar zaak
+  const rap = { doos: 'doos-van-hoshi', datum: '2026-09-27', pings: 3 };
+  assert.equal((await api('/api/doos/rapport', rap, null, eigen('doos-a', A))).status, 200);
+  assert.equal((await api('/api/doos/rapport', Object.assign({ zaak: 'HOSHI' }, rap), null, eigen('doos-a', A))).status, 403,
+    'niet voor HOSHI');
+  assert.equal((await meet('doos-a', eigen('doos-a', 'ZD.' + '0'.repeat(32)))).status, 403, 'verkeerde sleutel');
+  assert.equal((await meet('doos-a', eigen('doos-b', A))).status, 403, 'een sleutel hoort bij een doos');
 });
 
-test('5. de sleutel staat niet in de opslag, en de koppen gaan mee als de doos er een heeft', () => {
-  const db = { data: {} };
-  const s = maakDoosSleutels({ db, save: () => {}, crypto });
-  const r = s.geef('Doos-X');
-  assert.equal(r.doos, 'doos-x');
-  assert.ok(!JSON.stringify(db.data).includes(r.sleutel), 'alleen een hash in de opslag');
-  assert.equal(s.welke('doos-x', r.sleutel), 'doos-x');
-  assert.equal(s.welke('doos-y', r.sleutel), null, 'een sleutel hoort bij een doos');
-  assert.equal(s.geef('../etc').status, 400);
-  // een tweede sleutel voor dezelfde doos maakt de eerste ongeldig
-  const tweede = s.geef('doos-x');
-  assert.equal(s.welke('doos-x', r.sleutel), null, 'de oude sleutel is niets meer waard');
-  assert.equal(s.welke('doos-x', tweede.sleutel), 'doos-x');
-  // twee keer intrekken is hetzelfde als een keer
-  assert.equal(s.trekIn('doos-x').ingetrokken, true);
-  const na = JSON.stringify(db.data);
-  assert.equal(s.trekIn('doos-x').ingetrokken, false);
-  assert.equal(JSON.stringify(db.data), na, 'de tweede intrekking verandert niets');
-  r.sleutel = tweede.sleutel;
-
-  const oud = { id: process.env.RTG_DOOS_ID, s: process.env.RTG_DOOS_EIGEN_SLEUTEL };
-  delete process.env.RTG_DOOS_ID; delete process.env.RTG_DOOS_EIGEN_SLEUTEL;
-  assert.deepEqual(doosKoppen({ a: 1 }, 'g'), { a: 1, 'x-doos-sleutel': 'g' }, 'zonder eigen sleutel verandert er niets');
-  process.env.RTG_DOOS_ID = 'doos-x'; process.env.RTG_DOOS_EIGEN_SLEUTEL = r.sleutel;
-  assert.deepEqual(doosKoppen({}, 'g'), { 'x-doos-sleutel': 'g', 'x-doos-id': 'doos-x', 'x-doos-eigen-sleutel': r.sleutel });
-  if (oud.id) process.env.RTG_DOOS_ID = oud.id; else delete process.env.RTG_DOOS_ID;
-  if (oud.s) process.env.RTG_DOOS_EIGEN_SLEUTEL = oud.s; else delete process.env.RTG_DOOS_EIGEN_SLEUTEL;
+test('3. de kloon: de positieve lijst, de zaak van de sleutel', async () => {
+  const { KLOON, ZAAK_VELDEN } = require('../server/kern/zaakdoos/kloon');
+  const k = await kloon(eigen('doos-a', A));
+  assert.equal(k.status, 200, JSON.stringify(k.body).slice(0, 200));
+  assert.equal(k.body.zaak, 'KIKUNOI');
+  assert.deepEqual(Object.keys(k.body.data).sort(), Object.keys(KLOON).sort(), 'precies de collecties uit de lijst');
+  assert.deepEqual(k.body.data.suppliers.map(s => s.code), ['KIKUNOI'], 'geen andere zaak');
+  for (const v of Object.keys(k.body.data.suppliers[0])) assert.ok(ZAAK_VELDEN.includes(v), 'veld buiten de lijst: ' + v);
+  const plat = JSON.stringify(k.body);
+  assert.ok(!plat.includes('HOSHI') && !plat.includes('SAKURA'), 'geen spoor van een andere zaak');
+  assert.equal((await kloon(eigen('doos-a', A), '?zaak=HOSHI')).status, 403, 'een andere zaak vragen wordt geweigerd');
+  assert.equal((await kloon(eigen('doos-a', A), '?zaak=kikunoi')).status, 200, 'de eigen zaak noemen mag');
+  assert.equal((await kloon({})).status, 403, 'zonder sleutel niets');
 });
 
-/* 7. DE GEDEELDE SLEUTEL DICHT (besluit van 23 september 2026: pas als elke doos
-   er een heeft). Dichtzetten weigert zolang er nog een doos met de gedeelde
-   sleutel meldt, met de namen erbij; is hij dicht, dan komt een GOEDE gedeelde
-   sleutel niet meer binnen -- en een eigen sleutel wel. */
-test('7a. dichtzetten wacht tot geen doos meer de gedeelde sleutel gebruikt', () => {
-  let t = Date.parse('2026-09-24T09:00:00Z');
-  const db = { data: {} };
-  const s = maakDoosSleutels({ db, save: () => {}, crypto, nu: () => t });
-  assert.equal(s.gedeeldeSleutel().dicht, false, 'standaard open');
-  s.telWeg('gedeeld', 'doos-oud');
-  const te = s.gedeeldZet({ dicht: true, wie: 'eigenaar' });
-  assert.equal(te.status, 409, JSON.stringify(te));
-  assert.deepEqual(te.nogGedeeld, ['doos-oud'], 'de weigering noemt de doos');
-  assert.equal(s.gedeeldZet({ dicht: 'ja' }).status, 400);
-  t += 8 * 86400000;
-  const ok = s.gedeeldZet({ dicht: true, wie: 'eigenaar' });
-  assert.equal(ok.dicht, true, JSON.stringify(ok));
-  assert.equal(s.overzicht().gedeeldeSleutel.dicht, true);
-  assert.match(s.overzicht().uitleg, /is dicht/);
-  assert.equal(s.gedeeldZet({ dicht: false, wie: 'eigenaar' }).dicht, false, 'weer open kan altijd');
+test('4. scope per familie, rotatie en intrekken', async () => {
+  const m = await api('/api/office/doos/sleutel', { doos: 'doos-m', zaak: 'KIKUNOI', scope: ['meting'], dagen: 30 }, eig);
+  assert.equal(m.status, 200, JSON.stringify(m.body));
+  assert.equal((await meet('doos-m', eigen('doos-m', m.body.sleutel))).status, 200);
+  const ks = await kloon(eigen('doos-m', m.body.sleutel));
+  assert.equal(ks.status, 403);
+  assert.equal(ks.body.code, 'doos-sleutel-scope-ontbreekt', 'de doos hoort waarom');
+  assert.equal((await api('/api/doos/rapport', {}, null, eigen('doos-m', m.body.sleutel))).status, 403);
+  assert.equal((await api('/api/office/doos/sleutel', { doos: 'doos-m', zaak: 'KIKUNOI', scope: ['alles'] }, eig)).status, 400);
+
+  // roteren: de oude sleutel is meteen niets meer waard
+  const IK = { 'Idempotency-Key': 'doos-a-rot-1' };
+  const r0 = await api('/api/office/doos/sleutel', { doos: 'doos-a', zaak: 'KIKUNOI' }, eig, IK);
+  const r = await api('/api/office/doos/sleutel', { doos: 'doos-a', zaak: 'KIKUNOI' }, eig, IK);
+  assert.deepEqual([r0.body.rotatie, r.body.rotatie], [2, 3], 'geen antwoordcache');
+  assert.notEqual(r.body.sleutel, r0.body.sleutel);
+  for (const oud of [A, r0.body.sleutel]) assert.equal((await meet('doos-a', eigen('doos-a', oud))).status, 403, 'oud opent niets');
+  assert.equal((await meet('doos-a', eigen('doos-a', r.body.sleutel))).status, 200);
+  A = r.body.sleutel;
+
+  // intrekken
+  assert.equal((await api('/api/office/doos/sleutel/weg', { doos: 'doos-m' }, eig)).body.ingetrokken, true);
+  const na = await meet('doos-m', eigen('doos-m', m.body.sleutel));
+  assert.equal(na.status, 403);
+  assert.equal(na.body.code, 'doos-sleutel-ingetrokken');
+  assert.equal((await api('/api/office/doos/sleutel/weg', { doos: 'doos-m' }, eig)).body.ingetrokken, false, 'twee keer is een keer');
 });
 
-test('7b. dicht: de goede gedeelde sleutel komt niet binnen, een eigen sleutel wel', () => {
-  const vorig = process.env.RTG_DOOS_SLEUTEL;
-  process.env.RTG_DOOS_SLEUTEL = GEDEELD;
-  try {
-    const db = { data: {} };
-    const s = require('../server/kern/zaakdoos/sleutels').doosSleutelsVan({ db, save: () => {}, crypto });
-    const eigenSleutel = s.geef('doos-q').sleutel;
-    const wacht = require('../server/routes/doos-wacht')({ db, save: () => {}, crypto, beveilig: null, noteerAfketser: () => {} });
-    const roep = (koppen) => {
-      const uit = { status: 200, body: null };
-      const res = { status(c) { uit.status = c; return this; }, json(b) { uit.body = b; return this; } };
-      const req = { ip: '10.0.0.' + Math.floor(Math.random() * 200), body: {}, get: (k) => koppen[k] };
-      return { door: wacht(req, res), uit, req };
-    };
-    assert.equal(roep({ 'x-doos-sleutel': GEDEELD, 'x-doos-id': 'doos-q' }).door, true, 'open: de gedeelde sleutel werkt');
-    db.data.doosGedeeldGezien = {};
-    assert.equal(s.gedeeldZet({ dicht: true, wie: 'eigenaar' }).dicht, true);
-    const g = roep({ 'x-doos-sleutel': GEDEELD, 'x-doos-id': 'doos-q' });
-    assert.equal(g.door, false);
-    assert.equal(g.uit.status, 403);
-    assert.match(g.uit.body.error, /eigen sleutel nodig/, 'de doos hoort waarom');
-    assert.deepEqual(s.overzicht().nogGedeeld.map(d => d.doos), ['doos-q'], 'en blijft zichtbaar als doos die nog om moet');
-    const e = roep({ 'x-doos-id': 'doos-q', 'x-doos-eigen-sleutel': eigenSleutel });
-    assert.equal(e.door, true, 'een eigen sleutel komt gewoon binnen');
-    assert.equal(e.req.doosBewezen, 'doos-q');
-  } finally {
-    if (vorig === undefined) delete process.env.RTG_DOOS_SLEUTEL; else process.env.RTG_DOOS_SLEUTEL = vorig;
-  }
+test('5. de manager: alleen zijn eigen zaak, en alleen op naam', async () => {
+  // een doos van een ANDERE zaak, uitgegeven door het kantoor
+  const b = await api('/api/office/doos/sleutel', { doos: 'doos-b', zaak: 'HOSHI' }, eig);
+  assert.equal(b.status, 200);
+  const zaak = (await api('/api/supplier/login', { username: 'rahul', password: 'Imran' })).body.token;
+  assert.equal((await api('/api/supplier/doos/sleutel', { doos: 'doos-k' }, zaak)).status, 403, 'geen naam');
+  // een manager met een eigen account, langs de gewone weg
+  const stamp = Date.now(), login = 'doosbaas' + stamp + '@e.test';
+  await api('/api/auth/register', { name: 'Doos Baas', email: login, phone: '06' + String(stamp).slice(-8),
+    password: 'geheim123', geboortedatum: '1985-01-01', tier: 'rtg' });
+  const inv = await api('/api/supplier/staff/invite', { name: 'Doos Baas', role: 'manager', func: 'Directie' }, zaak);
+  assert.equal(inv.status, 200, JSON.stringify(inv.body).slice(0, 200));
+  const join = await api('/api/supplier/staff/join', { bedrijf: inv.body.bedrijf, kassacode: inv.body.invite.kassacode, login, password: 'geheim123' });
+  assert.equal(join.status, 200, JSON.stringify(join.body).slice(0, 200));
+  const baas = (await api('/api/supplier/mijn/login', { login, password: 'geheim123' })).body.token;
+  assert.ok(baas, 'manager ingelogd');
+
+  const k = await api('/api/supplier/doos/sleutel', { doos: 'doos-k', zaak: 'HOSHI' }, baas);
+  assert.equal(k.status, 200, JSON.stringify(k.body));
+  assert.equal(k.body.zaak, 'KIKUNOI', 'zaak uit de sessie');
+  assert.match(k.body.sleutel, VORM);
+  assert.equal((await kloon(eigen('doos-k', k.body.sleutel))).body.zaak, 'KIKUNOI');
+
+  assert.equal((await api('/api/supplier/doos/sleutel/weg', { doos: 'doos-b' }, baas)).status, 404, 'andere zaak: 404');
+  assert.equal((await api('/api/supplier/doos/sleutel', { doos: 'doos-b' }, baas)).status, 409, 'niet overnemen');
+  assert.equal((await meet('doos-b', eigen('doos-b', b.body.sleutel))).status, 200, 'HOSHI werkt door');
+  const lijst = await api('/api/supplier/doos/sleutels', {}, baas);
+  assert.deepEqual(lijst.body.dozen.map(d => d.doos).sort(), ['doos-a', 'doos-k', 'doos-m'], 'alleen de eigen dozen');
+  assert.ok(!/code_hash|ZD\./.test(JSON.stringify(lijst.body)));
+  assert.equal((await api('/api/supplier/doos/sleutel/weg', { doos: 'doos-k' }, baas)).body.ingetrokken, true);
+  assert.equal((await meet('doos-k', eigen('doos-k', k.body.sleutel))).status, 403);
 });
 
-test('7c. de schakelaar is van de eigenaar, en dicht weigert zolang een doos nog meldt', async () => {
-  const code = await api('/api/office/doos/gedeeld/zet', { dicht: true }, gedeeld);
-  assert.equal(code.status, 403, 'de gedeelde code zet hem niet');
-  const mede = await api('/api/office/doos/gedeeld/zet', { dicht: false }, MEDE);
-  assert.equal(mede.status, 403, 'wie de boardroom in mag, is de eigenaar nog niet: ' + JSON.stringify(mede.body));
+test('6. de schaduw: de gedeelde sleutel buiten productie', async () => {
+  assert.equal((await meet('doos-g', { 'x-doos-sleutel': GEDEELD })).status, 200);
+  assert.equal((await opBord('doos-g')).bewezen, false);
+  const o = await api('/api/office/doos/sleutels', {}, eig);
+  assert.ok(o.body.wegen.eigen >= 3 && o.body.wegen.gedeeld >= 1, JSON.stringify(o.body.wegen));
+  assert.deepEqual(o.body.nogGedeeld.map(d => d.doos), ['doos-g']);
+});
+
+test('7. de schakelaar van de gedeelde sleutel', async () => {
+  assert.equal((await api('/api/office/doos/gedeeld/zet', { dicht: true }, gedeeld)).status, 403, 'de gedeelde code zet hem niet');
+  assert.equal((await api('/api/office/doos/gedeeld/zet', { dicht: false }, MEDE)).status, 403, 'boardroomtoegang is niet de eigenaar');
   const r = await api('/api/office/doos/gedeeld/zet', { dicht: true }, eig);
-  assert.equal(r.status, 409, 'doos-b meldde in toets 1 met de gedeelde sleutel: ' + JSON.stringify(r.body));
-  assert.ok(r.body.nogGedeeld.includes('doos-b'));
-  assert.equal((await api('/api/office/doos/sleutels', {}, eig)).body.gedeeldeSleutel.dicht, false, 'hij staat nog open');
+  assert.equal(r.status, 409, 'doos-g meldde in toets 6 met de gedeelde sleutel: ' + JSON.stringify(r.body));
+  assert.ok(r.body.nogGedeeld.includes('doos-g'));
   assert.equal((await api('/api/office/doos/gedeeld/zet', { dicht: false }, eig)).status, 200, 'openzetten kan altijd');
 });

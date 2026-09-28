@@ -42,7 +42,7 @@
         const skV = b.order.servicekosten;
         const sk = skV ? ' ' + T('bz.service','(incl. EUR {bedrag} servicekosten ex btw voor niet-leden)')
           .replace('{bedrag}', String(skV.exBtw).replace('.', ',')) : '';
-        toast((bzLevering === 'ophalen' ? T('bz.ok.oph','Betaald. Uw ophaalcode: ') + b.order.pickup : T('bz.ok.bez','Betaald. U volgt de bezorging hierboven live.')) + sk);
+        toast((bzLevering === 'ophalen' ? T('bz.ok.oph','Betaald. Uw bonnummer: ') + b.order.pickup + T('bz.ok.qr','. Bij het ophalen toont u de afhaal-QR onder Mijn bestellingen.') : T('bz.ok.bez','Betaald. U volgt de bezorging hierboven live.')) + sk);
         bzZaak = null; bzMand = {};
         renderBestellen(); laadBzMijn();
       } catch(e){ toast(e.message); }
@@ -105,7 +105,7 @@
             '<div class="acts">' + (o.paid
               ? '<span class="mo-paid">✓ '+T('app.paid','Betaald')+'</span>'
               : '<button class="mo-pay js-opay">' + FID_MINI + T('app.paywithfid','Betaal met Face ID') + '</button>') +
-              (o.pickup ? '<button class="mo-code js-ocode">' + T('app.showcode','Toon ophaalcode') + '</button>' : '') +
+              (o.pickup && (o.paid || o.aanBalie) && o.levering !== 'bezorgen' && !o.refunded && !['geserveerd','opgehaald','bezorgd','geweigerd','terugbetaald','geannuleerd'].includes(o.status) ? '<button class="mo-code js-ocode">' + T('app.showcode','Toon afhaal-QR') + '</button>' : '') +
               (['nieuw','wacht-op-betaling'].includes(o.status) ? '<button class="mo-code js-oann">✕ ' + T('erv.annuleer','Annuleer') + '</button>' : '') +
               (o.paid && !o.splitst ? '<button class="mo-code js-osplit">' + T('erv.splits','Splits') + '</button>' : '') +
               (['geserveerd','bezorgd','opgehaald'].includes(o.status) ? '<button class="mo-code js-orev">' + T('erv.review','Beoordeel') + '</button>' : '') +

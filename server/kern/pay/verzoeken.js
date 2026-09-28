@@ -4,7 +4,7 @@
    wallet zelf bij (autolaad in de kern) en betaalt door. Krijgt de gedeelde ctx van
    kern/pay/index.js. */
 module.exports = (ctx) => {
-  const { crypto, save, schoon, nu, d, klompjes, klompjesKijk, tikcodes, grootboek, grootboekKijk, rekLid, saldoVan, walletRuimte,
+  const { crypto, save, schoon, nu, d, klompjes, klompjesKijk, grootboek, grootboekKijk, rekLid, saldoVan, walletRuimte,
     id, metIdem, boekAsync, zorgSaldo, seintje, bestaatLid, waarde,
     MIN_CENTEN, MAX_CENTEN, walletMax, KASCODE_MS } = ctx;
 
@@ -119,7 +119,8 @@ module.exports = (ctx) => {
      blijft staan tot iemand betaalt -- en de tik over een moment tussen twee
      mensen die naast elkaar staan. Het betalen zelf loopt bij allebei via
      `stuur`: er is maar een plek waar geld beweegt. */
-  const { tikCode, tikBetaal, tikFeed } = require('./tik')({ crypto, save, nu, tikcodes, grootboek, rekLid, KASCODE_MS, stuur });
+  const { tikCode, tikIntrek, tikBetaal, tikFeed } = require('./tik')({ crypto, save, nu, d, bewerkCollectie: ctx.bewerkCollectie,
+    grootboek, rekLid, KASCODE_MS, stuur });
 
   /* ---------- het overzicht voor het lid (alles in een scherm) ---------- */
   function overzicht(codenaam) {
@@ -148,5 +149,5 @@ module.exports = (ctx) => {
       geschiedenis: rijen, aanMij: v.aanMij, vanMij: v.vanMij };
   }
 
-  return { stuur, huisIn, huisUit, verzoekMaak, verzoekenVoor, verzoekBetaal, verzoekIntrek, tikCode, tikBetaal, tikFeed, overzicht };
+  return { stuur, huisIn, huisUit, verzoekMaak, verzoekenVoor, verzoekBetaal, verzoekIntrek, tikCode, tikIntrek, tikBetaal, tikFeed, overzicht };
 };

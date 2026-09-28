@@ -347,7 +347,7 @@ test('het lid toont zijn kaartje als QR en de conducteur keurt hem op de PDA',
     assert.ok(qr.breed > 40, 'met een leesbaar formaat (' + qr.breed + 'px)');
     // de code staat er ook als tekst bij: zonder camera moet het nog kunnen
     const tekst = await page.textContent('#qrCode');
-    assert.equal(tekst, koop.kaartje.code, 'de code staat er in leesbare tekens onder');
+    assert.match(tekst, /^OV\.[0-9A-F]{32}$/, 'de code (tonen is roteren) staat er in leesbare tekens onder');
 
     /* En dan de andere kant: de conducteur op de dienst-PDA. Hij tikt dezelfde
        code in en krijgt een oordeel -- met het bewijs erbij en niet de persoon. */
@@ -368,7 +368,7 @@ test('het lid toont zijn kaartje als QR en de conducteur keurt hem op de PDA',
         const v = document.querySelector('#bewijsVeld');
         return v && v.offsetParent !== null;
       }, null, { timeout: 20000 });
-      await pg.fill('#bewijsVeld', koop.kaartje.code);
+      await pg.fill('#bewijsVeld', tekst);
       await pg.evaluate(() => { document.querySelector('#bewijsForm').requestSubmit(); });
       await pg.waitForFunction(() => {
         const u = document.querySelector('#bewijsUit');
@@ -380,7 +380,7 @@ test('het lid toont zijn kaartje als QR en de conducteur keurt hem op de PDA',
       assert.ok(!/@/.test(uit), 'en geen e-mailadres: hij controleert een kaartje, geen persoon');
 
       // een tweede keer is het enkeltje op, en dat zegt hij ook
-      await pg.fill('#bewijsVeld', koop.kaartje.code);
+      await pg.fill('#bewijsVeld', tekst);
       await pg.evaluate(() => { document.querySelector('#bewijsForm').requestSubmit(); });
       await pg.waitForFunction(() => /Niet geldig/.test(document.querySelector('#bewijsUit').textContent),
         null, { timeout: 20000 });

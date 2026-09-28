@@ -38,6 +38,9 @@ const PUBLIEK = new Map([
      nooit het ledger, en de deurrem van 300/minuut hangt ervoor. */
   ['/api/carriere/regel/toon', 'een deelbewijs wordt getoond aan iemand zonder RTG-account; de deelcode is de sleutel, verloopt en is te stoppen'],
   ['/api/muziek/luister/:ticket', 'de tijdelijke luisterkaart IS de geloofsbrief: 192 willekeurige bits, vijftien minuten geldig en alleen uitgegeven aan een ingelogd lid voor een gepubliceerd nummer'],
+  ['/api/vonk/profile-photo/delivery/:ticket', 'het kortlevende versleutelde ticket IS de beperkte geloofsbrief; levering hercontroleert versie, publicatie, disclosure, match en blokkade en geeft nooit een opslagadres prijs'],
+  ['/api/connection/vonk/message-media/delivery/:ticket', 'het kortlevende doelgebonden ticket IS de beperkte geloofsbrief; levering hercontroleert product, gesprek, purpose en blokkade en geeft nooit een opslagadres prijs'],
+  ['/api/connection/rendezvous/message-media/delivery/:ticket', 'het kortlevende doelgebonden ticket IS de beperkte geloofsbrief; levering hercontroleert product, gesprek, purpose en blokkade en geeft nooit een opslagadres prijs'],
   ['/api/herstel/eigenaar/start', 'herstel zonder toestel: er kan per definitie geen sessie zijn; het quorum, de wachttijd en de afbreekbaarheid doen het werk'],
   ['/api/herstel/eigenaar/voltooien', 'zelfde ceremonie, tweede helft: opnieuw twee delen en de wachttijd moet om zijn'],
   /* De twee passkey-loketten van dezelfde ceremonie staan hier NIET: de
@@ -103,7 +106,9 @@ const PUBLIEK = new Map([
   ['/api/gast/tafel', 'de QR op tafel IS het bewijs; een gast is vaak geen lid (met rem per ip)'],
   ['/api/gast/aanschuiven', 'aanschuiven maakt de tafelsessie die alle andere gastroutes eist (met rem per ip)'],
   ['/api/arrival/interpret', 'publieke wensontleding zonder opslag of uitvoering (met rem per ip)'],
-  ['/api/arrival/request', 'gast maakt zelf een aanvraag; sterke bezitssleutel, idempotentie en rem per ip'],
+  ['/api/arrival/request', 'gast maakt zelf een aanvraag; de server geeft een 128-bit pass (kern/arrivalpas.js), idempotentie en rem per ip'],
+  ['/api/arrival/pass/roteer', 'de houder roteert zijn eigen pass: de 128-bit pass uit het lijf is de deur (kern/arrivalpas.js), rem per ip'],
+  ['/api/arrival/pass/intrek', 'de houder trekt zijn eigen pass in; beveiliging hoort geen drempel te hebben, rem per ip'],
   ['/api/supplier/apply', 'solliciteren bij een zaak kan zonder account'],
   ['/api/supplier/staff/join', 'personeel meldt zich aan met een uitnodigingscode'],
   ['/api/werving/kijk', 'wie een wervingslink krijgt heeft nog geen account; toont alleen de bedrijfsnaam en de functie, met een rem per ip'],

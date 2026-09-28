@@ -12,6 +12,25 @@ is geen volledige B2B2C-productierelease. Voor de status `READY` zijn echte en
 beproefde inkomende betaling, uitbetaling, webhookafhandeling, settlement en
 reconciliatie verplicht.
 
+### De beperkte releasestand zonder kaartrail (besluit van 27 september 2026)
+
+Zolang er geen kaartprovider is, mag V1 live als **beperkte release**. Dat is een
+eigen stand, `PRODUCTION_STATUS=READY_ZONDER_RAIL`, en **nooit** READY:
+
+- hij geldt alleen met `RTG_BETALEN_UIT=1` **én** `RTG_RELEASE_ZONDER_RAIL=1`; de
+  tweede vlag zonder de eerste is een go-live-blokkade;
+- elk ander bewijs moet even groen zijn als voor READY (suites, pg, staging,
+  releasepoort, go-live, extern dossier, getekende kandidaat) -- alleen de
+  inkomende en uitgaande rail en de geldmotor vallen weg;
+- zaken rekenen extern af (contant, pin van de eigen terminal, op rekening); elke
+  RTG Pay-, cadeaukaart- en tegoedweg blijft 503 (`server/opzet/betaalstop.js`);
+- de promotie draagt de stand in het getekende document, en wie promoveert typt
+  `RTG_PROMOTION_CONFIRM=PROMOVEER-ZONDER-RAIL-<commit12>` in plaats van
+  `PROMOVEER-<commit12>`. Het woord van de ene stand promoveert de andere niet.
+
+De volledige B2B2C-release blijft READY, met de eisen hieronder. Zie
+`RELEASEKANDIDAAT.md` (B2, B2a, B2b).
+
 ## Wat deze stand afdwingt
 
 - `RTG_AI_UIT=1`: geen OpenAI, Anthropic, Gemini, Qwen of andere modelserver
@@ -86,7 +105,11 @@ ondertekende externe dossier staan.
    twee unieke kandidaat-tags over in `deploy/live.env` als
    `RTG_CANDIDATE_IMAGE` en `RTG_CANDIDATE_BACKUP_IMAGE`.
 4. Plaats de echte onafhankelijke bewijsbestanden in
-   `.release/external-evidence/`, vul `.release/external-release.json` op basis
+   `.release/external-evidence/`. Vier ervan maakt de host zelf, als verslag van
+   een proef die hij echt uitvoert (`npm run extern:bewijs -- malware`,
+   `objectopslag`, `rollback` en `herstel <stempel>`; herstel blijft OPEN tot een
+   mens met naam verklaart dat een lid inlogt en zijn echte naam ziet). Vul
+   daarna `.release/external-release.json` op basis
    van `deploy/external-release.example.json` en laat de aangewezen
    releasebeoordelaar het dossier ondertekenen met `npm run external:teken`.
 5. Keur de host en exact dezelfde CI-kandidaat. `live:golive` bouwt niets en

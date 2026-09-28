@@ -82,7 +82,8 @@ test('elke leverancier heeft de optie: het profiel reist ook mee met rit, reserv
   assert.equal((await api('booking/pay', { ref: tk.body.ticket.ref }, lid)).status, 200);
   const slot = (await api('supplier/programma', {}, bar)).body.slots.find(x => x.activiteitId === actId);
   assert.ok(slot.gasten.some(g => g.zorg && g.zorg.allergenen.includes('noten')), 'de deurlijst kent de allergenen');
-  const inche = await api('supplier/ticket/checkin', { code: tk.body.ticket.code }, bar);
+  const toon = await api('ticket/toon', { ref: tk.body.ticket.ref }, lid);
+  const inche = await api('supplier/ticket/checkin', { code: toon.body.code }, bar);
   assert.equal(inche.status, 200);
   assert.ok(inche.body.ticket.zorg && inche.body.ticket.zorg.medisch, 'de check-in toont het zorgprofiel');
 });

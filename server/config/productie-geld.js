@@ -90,6 +90,12 @@ function stand(env) {
   const betalingenUit = env.RTG_BETALEN_UIT === '1';
   return {
     betalingenUit,
+    /* Besluit van de eigenaar (27 september 2026, RELEASEKANDIDAAT.md B2a): een
+       release ZONDER kaartrail is een eigen, beperkte releasestand
+       (READY_ZONDER_RAIL) en nooit READY. Hij geldt alleen als betalen echt uit
+       staat EN iemand hem met een tweede vlag bewust aanzet -- een ontbrekende
+       provider alleen maakt er nooit een beperkte release van. */
+    releaseZonderRail: betalingenUit && env.RTG_RELEASE_ZONDER_RAIL === '1',
     inkomendProviders,
     inkomendGeconfigureerd: !betalingenUit && inkomendProviders.length > 0,
     uitgaandGeconfigureerd: false,

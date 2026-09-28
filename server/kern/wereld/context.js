@@ -33,7 +33,7 @@ const eventSignaal = i => ['event', 'activity', 'live', 'offer'].includes(i.type
 
 function doorLens(items, lens) {
   if (lens === 'all') return items;
-  if (lens === 'friends') return items.filter(i => i.bron !== 'zakelijk');
+  if (lens === 'friends') return items.filter(i => i.kring === true);
   if (lens === 'dating') return items.filter(i => i.type === 'dating');
   if (lens === 'business') return items.filter(i => i.bron === 'zakelijk' || i.partner || i.type === 'offer');
   if (lens === 'travel') return items.filter(reisSignaal);

@@ -227,12 +227,21 @@ plaats van punten.
 - **Verzuim dat de planning bedient zonder een gezondheidsgegeven prijs te
   geven**: `/api/supplier/verzuim/planning` levert "afwezig" plus wat iemand nog
   kan, en nooit wat hij heeft.
+- **Verlof en ziekte wegen mee in de twee autoplanners en het weekrooster**
+  (27 september 2026, `kern/payroll/inplanbaar.js`). Het AI-weekrooster
+  (`kern/agent.js`) en de autoplanner van de beveiliging plannen automatisch
+  alleen wie er volledig is; wie deels of aangepast inzetbaar is, plant een mens
+  in, want een machine weet niet welk werk "aangepast" is. Het getoonde
+  weekrooster (`kern/personeel.js`) zet een afwezige op vrij met alleen DAT hij
+  afwezig is -- het hele team ziet dat rooster, dus geen verlofsoort. Een
+  onleesbaar register is geen "niemand afwezig": dan wordt er gepland en staat
+  erbij dat afwezigheid niet is meegewogen. `test/rooster-verzuim.test.js`.
+  Wat het NIET doet: de festival-, OV-, taxi- en schoolplanners lezen verzuim
+  nog niet, en een al vastgestelde dienst van de beveiliging wordt niet
+  vanzelf geschrapt als iemand zich daarna ziek meldt.
 
 ### Een stap weg
 
-- **Verlof en ziekte laten meewegen in de twee autoplanners.** Dit is vandaag een
-  echt gebrek en geen toekomstmuziek: géén roostermotor leest verzuim, dus een
-  zieke medewerker kan gewoon worden ingepland. De gegevens liggen er al.
 - **Het werkdruksignaal op rooster en klok** (`ONDERNEMEN.md` par. 7, stap 4,
   open). Nooit *"deze medewerker voelt zich somber"*, wel *"de sluitdiensten zijn
   zes weken onevenredig over drie mensen verdeeld"* — te meten uit `db.data.klok`,
@@ -269,7 +278,7 @@ Niet op aantrekkelijkheid maar op wat de volgende stap mogelijk maakt.
 
 | # | Stap | Waarom nu |
 |---|---|---|
-| 1 | Verlof en ziekte in de twee autoplanners | het enige dat vandaag écht fout kan gaan in een echt rooster |
+| 1 | ~~Verlof en ziekte in de twee autoplanners~~ | staat (par. 6); de overige planners en een al vastgestelde dienst volgen |
 | 2 | Transitietijd als primitief | staat op nul, en is het enige dat alle domeinen delen |
 | 3 | De ATW-rekenlaag uit taxi trekken | hij is al data-met-bron en al instelbaar per regime |
 | 4 | Het werkdruksignaal op rooster en klok | raakt geen gezondheidsgegeven, en is de helft die wél mag |

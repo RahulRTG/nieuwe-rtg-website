@@ -186,8 +186,12 @@ test('de go-live-keuring keurt af zonder geheimen, en met alle geheimen blijft h
     'proceslokale frauderem en realtime krijgen geen B2B2C-go-live');
   assert.match(goed.stdout, /RTG_OWNER_BOOTSTRAP staat nog/,
     'het eenmalige eigenaarsgeheim mag niet in de vrijgegeven omgeving achterblijven');
-  assert.match(goed.stdout, /PG_ACCOUNTS_ATOMAIR_ONTBREEKT/,
-    'read-only accountveiligheid mag niet als productierijpe identiteit tellen');
+  /* Sinds 27 september 2026 zijn accountmutaties transactioneel (werkkopie als
+     deelnemer aan de PostgreSQL-requestcommit). De keuring meldt dat nu als
+     goed, en niet meer als blokkade. */
+  assert.doesNotMatch(goed.stdout, /PG_ACCOUNTS_ATOMAIR_ONTBREEKT/,
+    'de accountlaag is transactioneel en blokkeert de keuring niet meer');
+  assert.match(goed.stdout, /B2B2C-identiteit: accountmutaties zijn gedeeld en transactioneel duurzaam/);
   assert.match(goed.stdout, /open plek\(ken\)/, 'de blokkade telt de open plekken in de AVG-documenten');
   assert.match(goed.stdout, /vragen staan nog open/, 'en wijst naar de vragen die Rahul nog moet stellen');
 });
@@ -234,4 +238,22 @@ test('EN DE ANDERE KANT OP: alles ingevuld en de AVG-poort laat los', () => {
     assert.match(na.stdout, /VERWERKINGSREGISTER\.md: (is ingevuld|\d+ punt\(en\) die een jurist)/,
       'het verwerkingsregister is ingevuld, met hooguit een jurist-punt erover');
   } finally { fs.rmSync(map, { recursive: true, force: true }); }
+});
+
+/* DE BEPERKTE RELEASE ZONDER KAARTRAIL (besluit B2a, RELEASEKANDIDAAT.md).
+   Met RTG_BETALEN_UIT=1 EN RTG_RELEASE_ZONDER_RAIL=1 blokkeert de keuring niet
+   meer op de ontbrekende rails, maar zegt hij met zoveel woorden dat de stand
+   READY_ZONDER_RAIL wordt. De vlag zonder dat betalen uit staat, is een
+   blokkade -- en de andere blokkades blijven gewoon staan. */
+test('zonder kaartrail: de keuring meldt de beperkte stand en blokkeert niet op de rails', () => {
+  const script = path.join(__dirname, '..', 'scripts', 'golive.js');
+  const zonder = spawnSync(process.execPath, [script],
+    { env: Object.assign({}, PROD_ENV, { RTG_RELEASE_ZONDER_RAIL: '1' }), timeout: 20000, encoding: 'utf8' });
+  assert.match(zonder.stdout, /bewuste release ZONDER kaartrail/);
+  assert.doesNotMatch(zonder.stdout, /inkomende betaalrail heeft geen provider/);
+  assert.doesNotMatch(zonder.stdout, /geen werkende productie-uitbetaalrail/);
+  assert.match(zonder.stdout, /B2B2C-opslag: DATABASE_URL ontbreekt/, 'de andere blokkades blijven staan');
+  const scheef = spawnSync(process.execPath, [script],
+    { env: Object.assign({}, PROD_ENV, { RTG_RELEASE_ZONDER_RAIL: '1', RTG_BETALEN_UIT: '' }), timeout: 20000, encoding: 'utf8' });
+  assert.match(scheef.stdout, /RTG_RELEASE_ZONDER_RAIL=1 zonder RTG_BETALEN_UIT=1/);
 });

@@ -35,7 +35,7 @@ function zorgTabel(db) {
 const idsVan = ids => [...new Set((ids || []).map(v => String(v || '').trim()).filter(Boolean))];
 
 function markeer(org, ids, reden) {
-  const q = S.db.prepare(`INSERT INTO scim_groep_sync (org, user_id, reden, created_at)
+  const q = S.huidigeDb().prepare(`INSERT INTO scim_groep_sync (org, user_id, reden, created_at)
     VALUES (?, ?, ?, ?)
     ON CONFLICT(org, user_id) DO UPDATE SET reden = excluded.reden`);
   const nu = klokDatum().toISOString();
@@ -43,20 +43,20 @@ function markeer(org, ids, reden) {
 }
 
 function wachtende(org) {
-  return S.db.prepare('SELECT user_id FROM scim_groep_sync WHERE org = ? ORDER BY user_id')
+  return S.huidigeDb().prepare('SELECT user_id FROM scim_groep_sync WHERE org = ? ORDER BY user_id')
     .all(String(org)).map(r => String(r.user_id));
 }
 
 function klaar(org, userId) {
   const o = String(org);
-  S.db.prepare('DELETE FROM scim_groep_sync WHERE org = ? AND user_id = ?')
+  S.huidigeDb().prepare('DELETE FROM scim_groep_sync WHERE org = ? AND user_id = ?')
     .run(o, String(userId));
   /* Een SSO-inlog kan de laatste wachtende persoon herstellen zonder dat de
      IdP zijn POST herhaalt. Zodra niemand meer wacht, zijn ook alle create-
      retries van deze org afgerond; laat anders een toekomstige gewone
      duplicate ten onrechte als herstelverzoek lezen. */
-  const over = S.db.prepare('SELECT 1 AS x FROM scim_groep_sync WHERE org = ? LIMIT 1').get(o);
-  if (!over) S.db.prepare('DELETE FROM scim_groep_create_retry WHERE org = ?').run(o);
+  const over = S.huidigeDb().prepare('SELECT 1 AS x FROM scim_groep_sync WHERE org = ? LIMIT 1').get(o);
+  if (!over) S.huidigeDb().prepare('DELETE FROM scim_groep_create_retry WHERE org = ?').run(o);
 }
 
 function vingerafdruk(naam, leden, externeId) {
@@ -69,30 +69,34 @@ function vingerafdruk(naam, leden, externeId) {
    het nieuwe id terug. Geen await binnen deze transactie: er bestaat dus geen
    venster waarin een ander verzoek op dezelfde verbinding ertussen komt. */
 function maakAtomair(org, leden, afdruk, schrijfGroep) {
-  S.db.exec('BEGIN IMMEDIATE');
+  /* Binnen een verzoek met een open accountwerkkopie IS dat de transactie
+     (../accounts/transactie.js): daar komt geen tweede BEGIN omheen. */
+  const d = S.huidigeDb();
+  const eigen = d === S.db;
+  if (eigen) d.exec('BEGIN IMMEDIATE');
   try {
     const id = Number(schrijfGroep());
     markeer(org, leden, 'groep gemaakt');
-    S.db.prepare(`INSERT INTO scim_groep_create_retry
+    d.prepare(`INSERT INTO scim_groep_create_retry
       (org, groep_id, vingerafdruk, created_at) VALUES (?, ?, ?, ?)`)
       .run(String(org), id, String(afdruk), klokDatum().toISOString());
-    S.db.exec('COMMIT');
+    if (eigen) d.exec('COMMIT');
     return id;
   } catch (e) {
-    try { S.db.exec('ROLLBACK'); } catch (_) {}
+    if (eigen) try { d.exec('ROLLBACK'); } catch (_) {}
     throw e;
   }
 }
 
 function isCreateRetry(org, groepId, afdruk) {
-  const r = S.db.prepare(`SELECT 1 AS x FROM scim_groep_create_retry
+  const r = S.huidigeDb().prepare(`SELECT 1 AS x FROM scim_groep_create_retry
     WHERE org = ? AND groep_id = ? AND vingerafdruk = ?`)
     .get(String(org), Number(groepId), String(afdruk));
   return !!r;
 }
 
 function createKlaar(org, groepId) {
-  S.db.prepare('DELETE FROM scim_groep_create_retry WHERE org = ? AND groep_id = ?')
+  S.huidigeDb().prepare('DELETE FROM scim_groep_create_retry WHERE org = ? AND groep_id = ?')
     .run(String(org), Number(groepId));
 }
 

@@ -43,7 +43,7 @@ function zorgTabel(db) {
      overnemen -- dat is precies wat de domeinlijst bevestigt). */
 function binnenOrg(accounts, org, user) {
   if (!user) return false;
-  const viaSso = S.db.prepare('SELECT 1 AS x FROM sso_identiteiten WHERE org = ? AND user_id = ?').get(org, user.id);
+  const viaSso = S.huidigeDb().prepare('SELECT 1 AS x FROM sso_identiteiten WHERE org = ? AND user_id = ?').get(org, user.id);
   if (viaSso) return true;
   const k = koppelingen.vind(org);
   if (!k) return false;

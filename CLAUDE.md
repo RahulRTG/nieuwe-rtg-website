@@ -211,6 +211,30 @@ LEZER op `levensgraaf/termijnen.js`. Par. 7 zet de volgorde vast, en de eerste
 twee regels (uitstapknop, hulpwijzer verbreden) kosten samen twee dagen en doen
 meer voor de mens uit de missie dan de acht eronder.
 
+**`SAMENLEVING.md` is de grondwet boven de hele ladder** -- hoe RTG en de
+RTFoundation elke plek in de samenleving bedienen met één infrastructuur en
+verschillende routes voor betalen, uitvoeren, beschermen en deelnemen. Lees die
+vóór je een trede, een Foundation-functie of een poort op identiteit toevoegt.
+De kern: er is een **universele bodem** die achter geen enkele betaling
+verdwijnt (leren, ontwikkelen, oriënteren, verbinden, rust, hulp vinden, opnieuw
+beginnen), en RTG modelleert *mens → huidige behoefte → passende mogelijkheid*
+en nooit *mens → klasse → product* -- een positie is een toestand, de pas zegt
+niets over de mens, en er komt nergens een maatschappelijke score. **Identiteit
+begrenst handelingen, niet het mens-zijn.** Let op de namen: `bodem` is bezet
+door de prijsondergrens in `kern/pasladder.js` (in code heet het
+`onvervreemdbaar`, de RTF-functie Toegang `insluiting` en Gemeenschap
+`samenkomst` -- `nabijheid` was de eerste keus en bleek bezet). **De nulmeting
+staat** (`npm run onvervreemdbaar`, `ONVERVREEMDBAAR.json`): voor een gratis
+account is elk werkwoord aanwezig en *opnieuw beginnen* heeft geen eigenaar. Een
+gemeenteafspraak, aangifte en zorgintake zaten achter de pas en staan sinds
+besluit 4c open voor een gratis account NA een paspoortcontrole
+(`server/kern/onvervreemdbaar.js`, dat `idGeverifieerd()` hergebruikt en een
+betaalde pas niets nieuws oplegt); de meter meet daarom een GECONTROLEERD gratis
+account. Let op de meetfout die eraan voorafging:
+`tier === 'guest'` is TWEE mensen -- een bezoeker zonder account (die `geenGast()`
+weigert) en een Community-lid met account -- en de demo-inlog `gast` van de
+doelgroepmeter is alleen de eerste. Wie "gratis" meet, registreert een account.
+
 **`CONNECT.md` is het diepte-document van Foundation Connect** -- het
 ontdeknetwerk van FoundationOS, op het scherm **Ontdekken**. In een zin: *je komt
 omdat het leuk is, je blijft omdat je nieuwsgierig wordt, en je gaat weg met iets
@@ -899,9 +923,36 @@ is geen resource** -- een optimizer die op geschiktheid rangschikt maakt een
 cijfer op een mens (CAR-05), en de uitweg staat al in
 `kern/beveiliging/rooster/aanvragen.js`: sorteren op de minste uren, dus op wat
 iemand TOEKOMT en nooit op wat hij waard is. Par. 6 zet per onderdeel of het
-staat, een stap weg is, een besluit vraagt of jaren weg is; het eerste dat vandaag
-écht fout kan gaan staat bovenaan par. 7: **géén roostermotor leest verzuim**,
-dus een zieke medewerker kan gewoon worden ingepland.
+staat, een stap weg is, een besluit vraagt of jaren weg is. Wat bovenaan par. 7
+stond is sinds 27 september gedaan: **de twee autoplanners en het weekrooster
+lezen verzuim** (`kern/payroll/inplanbaar.js`) en plannen automatisch alleen wie
+er volledig is -- deels inzetbaar plant een mens in, en het teamrooster zegt DAT
+iemand afwezig is en nooit waarom. De festival-, OV-, taxi- en schoolplanners
+lezen het nog niet.
+
+**`VRIJHEID.md` is de mens die in dat rooster staat** -- RTG Vrijheid: tijd,
+rust, vrijheid en eerlijkheid voor wie bij RTG of een zaak werkt, in
+`server/kern/vrijheid/`. De vraag is niet "waarom zouden we dit toestaan?" maar
+**"is er een concrete reden waarom dit niet kan?"** -- en is die er, dan krijgt
+de mens hem in een zin en eerst een alternatief. Lees die vóór je aan verlof,
+een vrije dag, eerder naar huis of een eerlijke verdeling werkt. Drie dingen die
+niet mogen sneuvelen: **de tijdcategorieën zijn hard gescheiden** (een RTG Day,
+verjaardagvrijheid en eerder naar huis hebben geen of een eigen teller, en er
+bestaat geen functie die de ene van het saldo van de andere afschrijft);
+**WORK_COMPLETE is nooit een lege takenlijst** (een kritieke verantwoordelijkheid
+die alleen de houder zelf afvinkte is UNKNOWN, anders wordt vrijheid een race);
+en **een geweigerd verzoek is een capaciteitsvraag en geen gedragsvraag** --
+blokkeert PAYMENT_L3 steeds de vrijdagmiddag, dan is de uitkomst een tweede
+bevoegde en geen strengere regel. Wat de eigenaar besloot staat in
+`server/kern/vrijheid/rtgbeleid.js` (27 september 2026: tien RTG Days, en een
+verjaardag op een vrije dag schuift naar de vorige werkdag), nog zonder
+juridische toets; wat niet besloten is (nachtdienst, schrikkeldag, drempels)
+staat met opzet OPEN en de motor zegt dan UNKNOWN of BLOCKED met de reden. `server/kern/vrijheid/lus.js` is de
+PEOPLE_TIME_LOOP_COMPLETENESS_CHECK en staat op BLOCKED: de motor is bewezen op
+een teambeeld, de routes en twee schermen staan (Mijn tijd in de personeelsapp,
+Tijd van het team in het Kantoor), en een toegekende hele vrije dag staat via
+het verzuimregister op de loonstrook en vrij in het rooster, maar de bron van dat
+teambeeld en het vakantiesaldo zijn nog niet aangesloten.
 
 **`OFFICE.md` is de richting van RTG Office Next** -- van zes editors naar
 werk: alles wat een bedrijf van Microsoft 365 of Google Workspace verwacht,
@@ -1174,6 +1225,22 @@ verantwoordelijkheidsgraaf hoort een PROJECTIE te zijn in de vorm van
 `kern/levensgraaf/graaf.js` — er komt geen `humans`-tabel, dezelfde grens als
 HDI.md par. 5.1. Par. 13 is de eerlijke stand: van de tien wetten hebben er zes
 vandaag geen handhaver.
+**`PERSONEEL.md` is wat die mens ERVAART** — niet een HR-lus maar een
+belevingslus: *RTG behandelt iedere medewerker alsof zijn werkdag speciaal voor
+hem is voorbereid, ook degene die de kantine draait.* Lees die vóór je een
+personeelsscherm, een ochtendkaart of een aanbod van Fluister bouwt. De toets:
+de kaart van de kantine en die van de eigenaar zijn HETZELFDE onderdeel, en
+**status ≠ aandacht** (niemand ziet meer omdat hij hoger staat; stilte is
+volgorde en nooit weglating). De meting die de volgorde stuurt: het personeel van
+een ZAAK heeft het meeste al (Team Room, `/api/staff/*`: klok, verlof,
+ziekmelden zonder reden-veld, Fluister voor de vloer met een geheugen dat de
+werkgever nooit ziet), terwijl RTG's eigen kantoor er niets van heeft -- dus er
+komt geen tweede personeelsportaal maar **RTG wordt de eerste klant van zijn
+eigen WorkOS** (besluit B1). "Staff Concierge", "Passport" en "Mijn RTG" zijn
+bezet; de concierge bestaat al en heet Fluister, het paspoort is een lezing van
+`kern/carriereledger/`. En geen score op een mens, geen "waarschijnlijk" zonder
+meting, en alles wat een tweede persoon bereikt (een ruil, ook voor een
+verjaardag) bevestigt een mens.
 **`MUTATIECONTRACT.md` is de laag ernaast** — niet wie iets mag (dat is
 CONTROLPLANE.md) maar wat een TWEEDE aanroep doet, en hoe hard dit huis dat weet.
 Lees die vóór je een schrijfroute toevoegt of aan idempotentie werkt. De kern in
@@ -1345,8 +1412,8 @@ in de ontwikkelaarsroute** (de beproevingsomgeving voor software is een eigen
 ding, met `scripts/aanval.js` en `scripts/chaos.js` als eerste bouwstenen), de
 App Store-keuring keek niet naar toegankelijkheid (inmiddels wél, en als POORT:
 zie par. 9.2), en er is geen kostenvlak. En
-par. 10 draait één aanname om die vaak fout gaat: van <!--getal:idem.routesMetRol-->4219<!--/getal--> routes met een rol
-zijn er <!--getal:idem.beoordeeld-->1716<!--/getal--> beproefd op herhaalbaarheid en <!--getal:idem.ongemeten-->3256<!--/getal--> ongemeten (`IDEMPROEF.json`,
+par. 10 draait één aanname om die vaak fout gaat: van <!--getal:idem.routesMetRol-->4258<!--/getal--> routes met een rol
+zijn er <!--getal:idem.beoordeeld-->1730<!--/getal--> beproefd op herhaalbaarheid en <!--getal:idem.ongemeten-->3290<!--/getal--> ongemeten (`IDEMPROEF.json`,
 levend getal — `npm run getallen` houdt het bij),
 maar het doel is **niet alles idempotent — het is alles geclassificeerd**, met
 `UNKNOWN` verboden voor nieuwe publiek aanroepbare ontwikkelaarsopdrachten.
@@ -1374,8 +1441,8 @@ weigert wat op een contactgegeven lijkt, want met `REDIS_URL` gaat hij over een
 netwerk), **`onbekend` is geen `openbaar`** (en een gevolg erft de classificatie
 niet — dat zou raden zijn), en **de levering gaat voor** (een geweigerde actor
 houdt een melding nooit tegen, maar verdwijnt ook nooit stil). Wat er nog niet is,
-staat er met de meting erbij: van de <!--getal:idem.beoordeeld-->1716<!--/getal--> beproefde muterende routes zijn er
-<!--getal:idem.beschermd-->1715<!--/getal--> retry-veilig, en een schemaregister (`payment.authorized.v1` met een vorm
+staat er met de meting erbij: van de <!--getal:idem.beoordeeld-->1730<!--/getal--> beproefde muterende routes zijn er
+<!--getal:idem.beschermd-->1729<!--/getal--> retry-veilig, en een schemaregister (`payment.authorized.v1` met een vorm
 erachter) bestaat niet — de envelop zegt met opzet nooit WAT. Zeven punten die een besluit van de eigenaar vragen staan in par. 4.
 **Het goedkoopste daarvan is genomen (27 augustus 2026):** het woord dat in twee
 lagenmodellen niet hetzelfde betekende, is hernoemd — laag 4 van `PLATFORM.md`
@@ -1459,8 +1526,8 @@ dat RTG vandaag klopt (`MAGNAATLAB.md`) maar of hij kan voorspellen dat RTG
 mórgen nog klopt. Lees die vóór je een begrip introduceert, een register aanlegt
 of een scorecard bouwt. De opzet vraagt een semantisch register naar aanleiding
 van de twee `VERMOGENS`; de vraag ervóór is gemeten (`scripts/semantiek.js`,
-`SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->129<!--/getal--> namen die in meer dan
-één domein staan, dragen er **<!--getal:semantiek.betekenissen-->111<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->410<!--/getal-->
+`SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->131<!--/getal--> namen die in meer dan
+één domein staan, dragen er **<!--getal:semantiek.betekenissen-->113<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->418<!--/getal-->
 betekenissen, met `SOORTEN` op **39**. Daarnaast **29** betekenissen die op meer
 dan één plek wonen én **106** paren die dezelfde waarheid onder een ándere naam
 dragen — die tweede ronde bestaat omdat de eerste ze miste, en de duurste
@@ -1908,7 +1975,7 @@ afkapgrens van vijftien sneed midden in een GELIJKE score, dus /api/bank/pas/bet
 viel op alfabet af terwijl /api/bank/advies bleef. Een gelijke score afkappen is
 willekeur, en willekeur verbergt een vermogen zonder dat iemand het merkt.
 **En meetgetallen in de documenten verouderen niet meer**: `npm run getallen`
-schrijft ze tussen merktekens uit de registers (`<!--getal:idem.ongemeten-->3256<!--/getal--> randen,
+schrijft ze tussen merktekens uit de registers (`<!--getal:idem.ongemeten-->3290<!--/getal--> randen,
 <!--getal:verstrengeling.onverklaard-->0<!--/getal--> onverklaard — en dát getal moet naar nul, niet het
 aantal randen), de activering per functie, de deltapoort die er niets bij laat
 komen, de tredeproef over alle zeven treden van LAUNCH.md (0 lekken), en de
@@ -2110,9 +2177,9 @@ en het pad gaat nooit via `incident` of `geannuleerd` -- dat zou een gebeurtenis
 verzinnen die niet plaatsvond. De standen worden VERTAALD en niet overgetypt
 (toets 4 zakt zodra een ritstand naar `rijdt` vertaalt). En de brug loopt ÉÉN
 KANT OP: twee lijsten die elkaar bijwerken hebben geen waarheid meer. **De migratie is in kaart en staat stil op EEN besluit**
-(`scripts/ritmigratie.js`): van de <!--getal:ritmigratie.bestanden-->21<!--/getal-->
+(`scripts/ritmigratie.js`): van de <!--getal:ritmigratie.bestanden-->23<!--/getal-->
 plekken die `db.data.rides` noemen lezen er <!--getal:ritmigratie.stand-->7<!--/getal-->
-de lopende rit, tellen <!--getal:ritmigratie.historie-->9<!--/getal--> historie af,
+de lopende rit, tellen <!--getal:ritmigratie.historie-->10<!--/getal--> historie af,
 schrijven er 2 en noemen er 3 hem alleen in commentaar. De kaart bewees haar nut
 binnen het uur: de eerste versie zei "zeven kunnen nu om", maar een rit ZONDER
 opdracht valt dan uit beeld -- en dan ziet een lid zijn eigen taxi niet meer in
@@ -2128,7 +2195,7 @@ geen afstand, geen vaste prijs, wel een plek op het dispatchbord. Neemt hij hem
 niet aan, dan weigert `kern/lidacties/ritten.js` met de reden en de weg
 eromheen. Zo of zo heeft elke rit die BESTAAT voortaan een opdracht. Stand nu:
 <!--getal:ritmigratie.kanNu-->7<!--/getal--> lezers kunnen om (de stand-lezers),
-daarna <!--getal:ritmigratie.daarna-->11<!--/getal--> (historie, dan de
+daarna <!--getal:ritmigratie.daarna-->12<!--/getal--> (historie, dan de
 schrijvers). **De losse chauffeur is geen bijzonder geval**: hij is een zaak met
 een persoon erin, meldt zich aan op eigen naam en wijst zichzelf de rit toe met
 `self: true` -- wie met het BEDRIJFSaccount inlogt heeft geen `staffId` en kan
@@ -2330,6 +2397,28 @@ stappen zijn geen bouwwerk maar een besluit (`mandaat.js` een aanroeper geven, e
 `RTG_HERKOMST_AFDWINGEN` omzetten -- die prijs is gemeten: een lid gaat van 120
 naar 36 paden, een zaak van 53 naar 9).
 
+**`AUTONOMIE.md` is de RTG Autonomy Kernel** -- de organisatorische intelligentie
+BOVEN de bestaande motoren: RTG bestuurt zichzelf binnen een door mensen
+vastgestelde constitutie. De machine krijgt initiatief, niet vanzelf gezag. Lees
+die vóór je iets bouwt dat over RTG als ONDERNEMING rekent (omzet, cohorten,
+churn, cash, marge). Twee constitutionele besluiten van 25 september 2026: **C1**
+-- een waarnemend brein is niet een portemonnee (RTG en de RTFoundation samen
+waargenomen, elke maat draagt precies een economische wereld, de firewall blijft)
+-- en **C2** -- het kantoor is een AI-rol uitsluitend op tonen, op naam, met drie
+gemeten leespaden en geen bevestigroute. De fundering is gemeten en niet
+verklaard: `npm run bedrijfsmaat` (`BEDRIJFSMAAT.json`, catalogus in
+`server/kern/bedrijfsmaat/`) houdt per maat vier elementen tegen de code --
+bron, definitie, projectie, bewijs -- met vier gatsoorten en een
+afhankelijkheidsgraaf; <!--getal:bedrijfsmaat.bestaat-->44<!--/getal--> van <!--getal:bedrijfsmaat.maten-->67<!--/getal--> maten bestaan en
+<!--getal:bedrijfsmaat.ketensGegrond-->4<!--/getal--> van zes ketens is gegrond. Drie dingen die niet mogen sneuvelen: **lenzen,
+geen breinen** (geen eigen opslag per lens), **de groepspoort staat aan de bron
+van een maat** (`bedrijfsmaat/poort.js`: onder de grens geen waarde, geen nul en
+geen aantal, ook op het kantoorscherm; werklijsten per persoon blijven voor een
+mens op naam en komen niet op het stuur), en **autonome actie alleen als geen
+dimensie van de streefstand buiten haar tolerantie verslechtert** -- geen gewogen
+som. De definities (nieuw lid, cohort, activatie, churn, retentie, omzet,
+brutomarge) staan met een versie in `bedrijfsmaat/definities.js`.
+
 **`CODE.md` is de laag waarin RTG naar zijn EIGEN software kijkt** -- de Code
 Intelligence Plane, als richtingsdocument met per onderdeel of het **staat**,
 **een stap weg** is, **een besluit vraagt** of **jaren weg** is. Lees die vóór je
@@ -2348,8 +2437,8 @@ in plaats van aangenomen -- zelfde reden als bij `Asset`: <!--getal:codewereld.r
 loopt over de as ROUTE. De as SYMBOOL is **nul** -- geen register kent een
 functienaam met een plaats, dus het objectvoorbeeld `pay.boeken` met een
 `symbol`-veld belooft iets wat geen enkele meter vult. Die as is
-inmiddels GEBOUWD (`npm run symbolen`, `SYMBOLEN.json`): <!--getal:symbolen.totaal-->22665<!--/getal--> benoemde symbolen
-met een regelnummer en <!--getal:symbolen.kanten-->5742<!--/getal--> require-kanten heen en terug, met de eigen parser
+inmiddels GEBOUWD (`npm run symbolen`, `SYMBOLEN.json`): <!--getal:symbolen.totaal-->23473<!--/getal--> benoemde symbolen
+met een regelnummer en <!--getal:symbolen.kanten-->6083<!--/getal--> require-kanten heen en terug, met de eigen parser
 en <!--getal:symbolen.parsefout-->0<!--/getal--> parsefouten. De <!--getal:symbolen.nietGelezen-->309<!--/getal--> niet-gelezen bestanden staan er MET reden in
 (bundeldelen die pas samengevoegd een programma vormen) -- weglaten zou ze
 onzichtbaar maken. Wat hij met opzet niet doet: aanroepers raden (een naam in
@@ -2369,11 +2458,11 @@ grens vandaag niet -- en dat ene getal verbergt nog iets, want `server/` haalt
 vrijwel niets (6,6%) tot `SCHERMROUTES.json` erbij kwam, dat per bestand in
 public/ leest welke API-paden het noemt en daarmee de keten scherm -> route legt.
 De aanroepgraaf ligt er sinds dezelfde dag naast (`AANROEPGRAAF.json`,
-<!--getal:graaf.kanten-->26516<!--/getal--> kanten): wie roept wie aan, en welk symbool handelt welke route af
-(<!--getal:graaf.routesMetSymbool-->3131<!--/getal--> routes). Daarmee loopt de impactketen scherm -> route -> bestand ->
+<!--getal:graaf.kanten-->27314<!--/getal--> kanten): wie roept wie aan, en welk symbool handelt welke route af
+(<!--getal:graaf.routesMetSymbool-->3159<!--/getal--> routes). Daarmee loopt de impactketen scherm -> route -> bestand ->
 functie uit registers alleen. Let daar op twee dingen. Ten eerste is
 <!--getal:graaf.opgelostPct-->25.9<!--/getal-->% opgelost geen tekort maar een indeling: het meeste dat overblijft is
-`res.json()` of `String()`, en <!--getal:graaf.contextobject-->15676<!--/getal--> aanroepen lopen via het CONTEXTOBJECT dat
+`res.json()` of `String()`, en <!--getal:graaf.contextobject-->16017<!--/getal--> aanroepen lopen via het CONTEXTOBJECT dat
 in server/opzet/ wordt samengesteld. Dat leek statisch onherleidbaar tot
 `CONTEXTPROEF.json` het NAMAT (`npm run contextproef`, een runtime-meting in de
 domeingrens-Proxy): van de <!--getal:context.aanHetWerk-->3214<!--/getal--> routes die werk deden reiken er maar
@@ -2383,12 +2472,12 @@ keerde de voorspelling om, en dat is precies waarom hij er is. `KERNHERKOMST.jso
 (`npm run kernherkomst`) volgt die aanwijzing en beantwoordt wie welke naam in de
 zak legt: <!--getal:kern.namen-->1246<!--/getal--> namen over <!--getal:kern.vulplekken-->300<!--/getal--> vulplekken, met <!--getal:kern.onopgelost-->29<!--/getal--> plekken die
 niet te volgen zijn (elk met een reden, geen daarvan geraden). Dat leverde
-<!--getal:graaf.viaKern-->5912<!--/getal--> nieuwe kanten en bracht de graaf van 18,1% naar <!--getal:graaf.opgelostPct-->25.9<!--/getal-->%; de restbak
-van de graaf ging in dezelfde ronde van 3071 naar <!--getal:graaf.overig-->402<!--/getal--> aanroepen (0,27%), en
+<!--getal:graaf.viaKern-->5942<!--/getal--> nieuwe kanten en bracht de graaf van 18,1% naar <!--getal:graaf.opgelostPct-->25.9<!--/getal-->%; de restbak
+van de graaf ging in dezelfde ronde van 3071 naar <!--getal:graaf.overig-->416<!--/getal--> aanroepen (0,27%), en
 daar zat geen raadsel in maar vijf BEKENDE vormen die de meter niet herkende --
 een restbak vol bekende vormen laat je denken dat je code ondoorgrondelijk is
 terwijl je meter te weinig weet. Twee
-dingen daar niet wegpoetsen: <!--getal:graaf.viaKernZonderSymbool-->4105<!--/getal--> van die kanten wijzen alleen het BESTAND
+dingen daar niet wegpoetsen: <!--getal:graaf.viaKernZonderSymbool-->4127<!--/getal--> van die kanten wijzen alleen het BESTAND
 aan en niet de functie (een fabriek mag `{ walletVoeg: voeg }` teruggeven, en dan
 is de zaknaam niet de symboolnaam), en een parameter die `save` heet wordt NIET
 op zijn naam als kernnaam herkend maar op zijn functie -- alleen de fabrieken die
@@ -2407,13 +2496,15 @@ dekkingsgetal doordat er een meter bij komt die zwijgt. Die meter begon
 op 118 "dode paden" en eindigde op <!--getal:schermroutes.dood-->0<!--/getal-->; de aanroepgraaf begon op 587 onbekende
 doelen en eindigde op <!--getal:graaf.doelOnbekend-->0<!--/getal-->, en in beide gevallen zat de fout in de METER en niet
 in de code. Dat laatste nul is sinds 20 september 2026 een ANDER nul: er staat een derde
-soort naast, `bewaakteVooruitwijzing` (<!--getal:graaf.bewaakteVooruitwijzing-->1<!--/getal-->), voor een aanroep naar een integratie die
+soort naast, `bewaakteVooruitwijzing` (<!--getal:graaf.bewaakteVooruitwijzing-->0<!--/getal-->), voor een aanroep naar een integratie die
 met opzet nog niet gebouwd is en waar het bestand ZELF afbreekt als de andere kant
 ontbreekt -- `server/accounts/transactie.js` toetst op regel 102 of
 `verzoekcontext.registreerDeelnemer` bestaat en gooit anders
-`PG_ACCOUNTS_DEELNEMER_ONTBREEKT`. Dat is een gedeclareerd gat en geen vergissing,
+`PG_ACCOUNTS_DEELNEMER_ONTBREEKT`. Dat was een gedeclareerd gat en geen vergissing,
 en het was twee weken onzichtbaar omdat het register van 3 september ouder was dan
-de code van 6 september. De ratel blijft op nul staan en blijft bijten: haal de
+de code van 6 september. Op 27 september 2026 is het gesloten: accountmutaties
+zijn in productie een deelnemer aan de PostgreSQL-requestcommit
+(`server/db/deelnemers.js`), dus de aanroep lost op en de teller staat op nul. De ratel blijft op nul staan en blijft bijten: haal de
 wacht weg, of laat hem alleen waarschuwen, en de aanroep valt terug in
 `doelOnbekend`. Wat ertussen zat zijn regels die overal gelden -- een pad kan VERDERGAAN (`'/api/agenda/' + id`),
 een pad kan een GEGEVEN zijn in plaats van een doel (in een `.replace()`), en
@@ -2453,7 +2544,26 @@ is met opzet LEEG tot er een echte sleutel bij een mens ligt), en een cel als
 niet wegpoetsen: de ONNX-runtime is een ondertekend ARTEFACT en geen
 afhankelijkheid (keuringsregel 14), en het celscript woont op `/toestel/cel.js`
 omdat de cel geen origin heeft en het huis elk statisch bestand `same-origin`
-geeft -- alleen de echte browser vond dat.
+geeft -- alleen de echte browser vond dat. **`spraak.naartekst` loopt**
+(par. 11, 27 september 2026): Whisper in de cel, 11 s spraak in 6,3 s op
+WASM, woordfout 0 op een opname, en het spectrogram gelijk aan dat van
+transformers tot op float32 (`test/fixtures/whisper-mel-toon.json` is een
+ONAFHANKELIJKE referentie, geen afdruk van onze eigen code). De gemeten bytes
+kwamen van een anonieme npm-kopie omdat Hugging Face geweigerd wordt, en zijn
+daarom met opzet NIET ondertekend: eerst de hashes naast de bron leggen.
+**`tekst.vector` loopt ook** (par. 12), zonder nieuwe uitvoerder, en het meten
+vond twee regels: in een BATCH hangt de vector van een tekst af van zijn buren
+(het gekwantiseerde model schaalt over de hele invoer), dus elke tekst krijgt
+een eigen run; en twee runtimes geven op dezelfde bytes een andere vector
+(cosinus 0,993), dus een vector draagt een VINGERAFDRUK en wordt alleen naast
+een vector met dezelfde vingerafdruk gelegd. **In het Nederlands is gemeten**
+(par. 13): whisper-tiny haalt 88,5% woordfout op een Nederlandse set tegen 58% in
+het Engels met dezelfde synthetische stem, en de meting vond een lus die tot het
+plafond doorrekende -- de cel stopt nu en meldt `herhaling`. Zoeken met MiniLM
+wint op omschrijvingen van een woordtelling (0,38 tegen 0,13 treffer@1) en
+verliest op letterlijke vragen; samenvoegen (RRF) is gemeten en niet overgenomen.
+De zoekindex hangt NAAST de bestaande Toestelkluis (par. 14), een index per
+vingerafdruk, en de kluis blijft de waarheid.
 
 **`MACHINE.md` is de laag die de motoren aan elkaar riemt** -- RTG Execution
 Physics (de uitvoeringskant van hetzelfde voorstel waarvan RUNTIME.md de
@@ -2463,8 +2573,8 @@ zeventiende motor bouwt. De kern in één zin: **dit huis heeft geen tekort aan
 motoren, het heeft een tekort aan handelingen die erlangs gaan** -- en dat is
 gemeten in plaats van beweerd. `npm run machinedekking` (`MACHINEDEKKING.json`)
 legt zestien motoren naast elkaar op DEZELFDE route, iets wat geen enkele
-bestaande meter deed: van de <!--getal:machine.muterend-->3821<!--/getal-->
-muterende routes raken er <!--getal:machine.zonderAs-->2791<!--/getal--> geen
+bestaande meter deed: van de <!--getal:machine.muterend-->3938<!--/getal-->
+muterende routes raken er <!--getal:machine.zonderAs-->2819<!--/getal--> geen
 enkele as, <!--getal:machine.motorenZonderRoute-->1<!--/getal--> motoren bereiken
 geen enkele route (bewijstoken, veiligheidskern, gevolgmeting), en de hoogst
 geïntegreerde handeling buiten de hubs raakt DRIE assen -- er is dus geen enkele

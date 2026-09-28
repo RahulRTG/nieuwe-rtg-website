@@ -176,4 +176,19 @@ function eisGeenAfbouw(naam, lees) {
       'weer weg; een meting ernaast telt die aanbouw mee. Wacht tot hij klaar is.' };
 }
 
-module.exports = { pak, actief, eisGeenAfbouw, procesLeeft, procesStart, eigenaarLeeft };
+/* DE OMGEVING VOOR EEN KIND VAN DE SLOTHOUDER, op een plek. Wie het slot
+   pakt en daarna zelf metingen start (de testrunner, de releasepoort), moet
+   RTG_AFBOUW_SLOT_ACTIEF=1 doorgeven -- anders ziet eisGeenAfbouw() in dat kind
+   het slot van zijn eigen ouder als een vreemde motor en weigert hij.
+
+   DAT GING MIS IN DE RELEASEPOORT: die gaf `process.env` ongewijzigd door, dus
+   scripts/kaart.js binnen check.js weigerde met "kan niet draaien terwijl er een
+   afbouw loopt: releasepoort (PID ...)" -- het PID van de poort zelf. De poort
+   zakte daardoor bij elke run op "Bron- en securityregels", ook in
+   release-image.yml via afbouw:software. De testrunner zet de vlag al inline
+   (scripts/test-runner.js); een nieuwe slothouder gebruikt deze functie. */
+function kindOmgeving(env) {
+  return { ...(env || process.env), RTG_AFBOUW_SLOT_ACTIEF: '1' };
+}
+
+module.exports = { pak, actief, eisGeenAfbouw, kindOmgeving, procesLeeft, procesStart, eigenaarLeeft };

@@ -457,7 +457,10 @@
   });
 
   if (!TOKEN) { toon(RTGFirstSteps.welcome('genootschappen', true)); }
-  else { laad(); }
+  else {
+    var groepId = new URLSearchParams(location.search).get('groep');
+    if (groepId) openGroep(groepId); else laad();
+  }
 })();
 </script>
 <script src="/shared/metgezel.js" defer></script>

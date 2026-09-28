@@ -87,19 +87,13 @@ module.exports = (kern, { stuur }) => {
      beweegt. De snede loopt langs de tijd. */
   require('./pay-zaak-treasury')(kern, { stuurZaak });
 
-  /* HET ZAAKTEGOED, hierheen verhuisd bij de samenvoeging van 26 augustus 2026.
-     Deze drie stonden in routes/pay.js; main splitste de zaakkant af naar dit
-     bestand en toen stond /api/supplier/pay/in twee keer geregistreerd -- de
-     tweede registratie wint stil, en dan hangt een route aan een andere poort
-     dan je leest. Ze horen hier: dit is het bestand waar niets binnenkomt dat
-     niet langs supplierAuth is geweest, en managerOnly woont hier ook. */
-  /* De zaak zet tegoed klaar voor personeel of klanten (kern/pay/tegoed-zaak.js).
-     Klaarzetten en terugnemen zijn van de MANAGER en niet van elke ingelegde
-     medewerker, om dezelfde reden als bij uitbetalen hieronder: het haalt geld
-     uit de kas op een moment dat de eigenaar niet koos. Kijken mag iedereen --
-     dat is het werk. */
-  app.post('/api/supplier/pay/tegoed', supplierAuth, (req, res) => {
-    res.json(pay.tegoedZaakOverzicht(req.supplier.code));
+  /* HET ZAAKTEGOED (kern/pay/tegoed-zaak.js) hoort hier: niets komt binnen
+     dat niet langs supplierAuth is geweest (een tweede registratie in
+     routes/pay.js won ooit stil). Klaarzetten, terugnemen en een nieuwe code
+     zijn van de MANAGER, om dezelfde reden als uitbetalen: het raakt de kas of
+     de bon op een moment dat de eigenaar niet koos. Kijken mag iedereen. */
+  app.post('/api/supplier/pay/tegoed', supplierAuth, async (req, res) => {
+    res.json(await pay.tegoedZaakOverzicht(req.supplier.code));
   });
   app.post('/api/supplier/pay/tegoed/zet', supplierAuth, async (req, res) => {
     if (!managerOnly(req, res)) return;
@@ -107,7 +101,12 @@ module.exports = (kern, { stuur }) => {
   });
   app.post('/api/supplier/pay/tegoed/terug', supplierAuth, async (req, res) => {
     if (!managerOnly(req, res)) return;
-    stuur(res, await pay.tegoedZaakTerug({ supplierCode: req.supplier.code, tegoedId: String(req.body.id || ''), idem: req.body.idem }));
+    stuur(res, await pay.tegoedZaakTerug({ supplierCode: req.supplier.code, tegoedId: String(req.body.id || ''),
+      intrekken: req.body.intrekken === true, idem: req.body.idem }));
+  });
+  app.post('/api/supplier/pay/tegoed/roteer', supplierAuth, async (req, res) => {
+    if (!managerOnly(req, res)) return;
+    stuur(res, await pay.tegoedZaakRoteer({ supplierCode: req.supplier.code, tegoedId: String(req.body.id || ''), idem: req.body.idem }));
   });
 
   app.post('/api/supplier/pay/in', supplierAuth, async (req, res) => {

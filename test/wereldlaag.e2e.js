@@ -81,7 +81,7 @@ test('LivingOS editorial home: responsive example, real destinations, language a
     assert.equal(await page.locator('#livingAccess').isVisible(), false);
     await page.unroute('**/api/wereld/feed');
     await page.locator('[data-living-retry]').click();
-    await page.waitForSelector('.living-welcome');
+    await page.waitForFunction(() => document.getElementById('saloonStatus').textContent.includes('resultaten'));
     assert.equal(await page.locator('.living-load-error').count(), 0);
     assert.equal(await page.locator('#fout').isVisible(), false);
     assert.deepEqual(errors, []);
@@ -145,7 +145,7 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
       'een net account mag geen vals afgerond identiteitsvinkje krijgen');
     const lenzen = await page.evaluate(() => [...document.querySelectorAll('#lenzen > *')]
       .map(x => ({ naam: x.childNodes[0] && x.childNodes[0].textContent, dicht: x.getAttribute('aria-disabled') === 'true' })));
-    assert.deepEqual(lenzen.map(x => x.naam), ['Dating', 'Friends', 'Business', 'Travel', 'Events']);
+    assert.deepEqual(lenzen.map(x => x.naam), ['Alles', 'Dating', 'Friends', 'Business', 'Travel', 'Events']);
     assert.equal(lenzen.find(x => x.naam === 'Dating').dicht, true, 'Dating is Signature');
     assert.equal(lenzen.find(x => x.naam === 'Business').dicht, true, 'Business is Signature');
     const werelden = await page.evaluate(() => [...document.querySelectorAll('#werelden button')]
@@ -322,20 +322,21 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
     // de projectie, nooit een eigen bericht of iemands identiteit.
     await api(base, '/api/wereld/modus', { modus: 'prive' }, b);
     await page2.goto(base + '/apps/wereld.html', { waitUntil: 'domcontentloaded' });
-    await page2.waitForSelector('.living-welcome', { timeout: 15000 });
-    assert.match(await page2.locator('.living-note').innerText(), /Sfeerbeeld/);
-    assert.equal(await page2.locator('.living-welcome .tel,.living-welcome .auteur').count(), 0);
+    await page2.waitForSelector('#feed .leeg', { timeout: 15000 });
+    assert.match(await page2.locator('#feed .leeg').innerText(), /Geen resultaten/);
+    assert.equal(await page2.locator('#feed .tel,#feed .auteur').count(), 0);
+    await page2.waitForFunction(() => window.RTGi18n && typeof window.RTGi18n.set === 'function');
     await page2.evaluate(() => RTGi18n.set('en'));
-    await page2.waitForFunction(() => document.getElementById('livingWelcomeTitle').textContent === 'Everything tastes better together.');
+    await page2.waitForFunction(() => document.querySelector('#feed .leeg').textContent === 'No results within your current choices.');
     assert.equal((await api(base, '/api/wereld/state', {}, b)).modus, 'prive');
     await page2.evaluate(() => RTGi18n.set('nl'));
-    assert.match(await page2.locator('#livingWelcomeTitle').innerText(), /Samen smaakt alles beter/);
+    assert.match(await page2.locator('#feed .leeg').innerText(), /Geen resultaten/);
 
     // Dezelfde route in een werkvlak houdt de inhoud, maar geen tweede balk.
     // Voor deze regel verscheen hier aantoonbaar nog de oude social-nav.
     await page2.goto(base + '/apps/wereld.html?embed=1', { waitUntil: 'domcontentloaded' });
     await page2.waitForSelector('body.rtg-edge-embed');
-    await page2.waitForSelector('.living-welcome');
+    await page2.waitForSelector('#feed .leeg');
     assert.equal(await page2.locator('.social-nav').isVisible(), false);
     assert.equal(await page2.locator('main .living-intro').isVisible(), true);
     assert.equal(await page2.locator('.rtg-adaptive-bar').count(), 0);

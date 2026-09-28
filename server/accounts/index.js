@@ -129,6 +129,9 @@ const api = {
   init, zetGelijktijdigheid, checkpoint, schrijfKluisRing, RING_FILE,
   startPostgres: mirror.startPostgres, postgresKlaar: mirror.postgresKlaar,
   onExternalChange: mirror.onExternalChange, flushBijAfsluiten: mirror.flushBijAfsluiten,
+  /* Een accountmutatie buiten een HTTP-verzoek (timers, de AVG-veger): in
+     productie een eigen PostgreSQL-transactie, zie ./achtergrond.js. */
+  achtergrondWerk: (fn) => require('./achtergrond').buitenVerzoek(fn),
   verifyPassword: kluis.verifyPassword,
   moetVernieuwen: kluis.moetVernieuwen,
   /* Een afgeleide sleutel voor een ander doel; de ruwe sessiesleutel verlaat de

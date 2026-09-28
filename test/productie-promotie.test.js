@@ -26,7 +26,7 @@ function kandidaat(backup) {
     sbomSha256:'c'.repeat(64) };
 }
 
-function opstelling(t) {
+function opstelling(t, stand = 'READY', documentStand = stand) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-promotie-'));
   t.after(() => fs.rmSync(root, { recursive:true, force:true }));
   const { trustKeys } = maakGetekendeVrijgave(root, { commit:COMMIT });
@@ -41,7 +41,7 @@ function opstelling(t) {
   }
   const image = kandidaat(false), backup = kandidaat(true);
   const status = { formaat:'rtg-production-status-v1', gemaakt:new Date().toISOString(),
-    commit:COMMIT, release:'1.2.3', PRODUCTION_STATUS:'READY', blokkades:[], bronnen,
+    commit:COMMIT, release:'1.2.3', PRODUCTION_STATUS:stand, blokkades:[], bronnen,
     externeVrijgave:extern.samenvatting(extern.controleerReleaseRoot(root, COMMIT)),
     kandidaatVrijgave:{ ok:true, commit:COMMIT, bewijsSha256:'d'.repeat(64), image, backup } };
   status.bewijsSha256 = sha(JSON.stringify(status));
@@ -50,6 +50,7 @@ function opstelling(t) {
   const keys = trustKeys.PROMOTION;
   const document = { formaat:'rtg-productie-promotie-v2', ondertekenDomein:trust.ROLES.PROMOTION.domain, gemaakt:new Date().toISOString(),
     commit:COMMIT, release:status.release, goedgekeurdDoor:'Release Authority', besluit:'CAB-123',
+    productieStand:documentStand,
     productionStatus:{ pad:'.release/productie-status.json',
       sha256:sha(fs.readFileSync(statusPad)), bewijsSha256:status.bewijsSha256 },
     kandidaat:{ image:{ immutable:image.immutable, id:image.id, digest:image.digest,
@@ -119,4 +120,32 @@ test('a valid promotion signature never upgrades a legacy or relabelled statemen
     fs.writeFileSync(path.join(s.root, promotie.REL.handtekening), promotie.teken(bytes, s.trustKeys.PROMOTION.privateKey));
     assert.throws(() => promotie.controleer(s.root, COMMIT), /niet exact/);
   }
+});
+
+/* DE BEPERKTE RELEASE (besluit B2a, RELEASEKANDIDAAT.md): zonder kaartrail
+   heet de stand READY_ZONDER_RAIL. De promotie draagt die stand in het
+   getekende document, een ander label faalt, en wie promoveert typt een ander
+   bevestigingswoord -- het woord van een volle release promoveert geen
+   beperkte, en omgekeerd. */
+test('een beperkte release promoveert alleen als beperkte release', t => {
+  const { root } = opstelling(t, 'READY_ZONDER_RAIL');
+  assert.equal(promotie.controleer(root, COMMIT).productieStand, 'READY_ZONDER_RAIL');
+});
+
+test('een promotie met het label READY over een beperkte stand faalt gesloten', t => {
+  const { root } = opstelling(t, 'READY_ZONDER_RAIL', 'READY');
+  assert.throws(() => promotie.controleer(root, COMMIT));
+});
+
+test('het bevestigingswoord volgt de stand', t => {
+  const { root } = opstelling(t, 'READY_ZONDER_RAIL');
+  const env = { RTG_PROMOTION_APPROVER: 'Release Authority', RTG_PROMOTION_TICKET: 'CAB-9' };
+  assert.throws(() => promotie.maak(root, COMMIT, Object.assign({}, env, { RTG_PROMOTION_CONFIRM: 'PROMOVEER-' + COMMIT.slice(0, 12) })),
+    /PROMOVEER-ZONDER-RAIL-/);
+  assert.throws(() => promotie.maak(root, COMMIT, Object.assign({}, env,
+    { RTG_PROMOTION_CONFIRM: 'PROMOVEER-ZONDER-RAIL-' + COMMIT.slice(0, 12) })),
+  e => !/RTG_PROMOTION_CONFIRM/.test(e.message), 'met het juiste woord komt hij voorbij de bevestiging');
+  const vol = opstelling(t, 'READY');
+  assert.throws(() => promotie.maak(vol.root, COMMIT, Object.assign({}, env,
+    { RTG_PROMOTION_CONFIRM: 'PROMOVEER-ZONDER-RAIL-' + COMMIT.slice(0, 12) })), /RTG_PROMOTION_CONFIRM/);
 });

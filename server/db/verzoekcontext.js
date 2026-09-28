@@ -10,6 +10,7 @@ const { losWaarde, objectProxy } = require('./verzoekwikkel')({
   vakVoor: (ctx, sleutel) => vakVoor(ctx, sleutel),
   eisMutatieOpen: (ctx) => eisMutatieOpen(ctx)
 });
+const deelnemers = require('./deelnemers');
 const winkel = new AsyncLocalStorage();
 const heeft = (o, k) => !!o && Object.prototype.hasOwnProperty.call(o, k);
 let achtergrondEffecten = null;
@@ -37,7 +38,7 @@ function nieuw(req) {
   return {
     req: req || null, open: true, opslaan: false, stroom: false,
     bron: null, wortel: null, vakken: new Map(), proxies: new Map(), handlers: new Map(),
-    voorCommit: [], naCommit: [], commitEigen: new Set()
+    voorCommit: [], naCommit: [], commitEigen: new Set(), deelnemers: new Map()
   };
 }
 
@@ -206,12 +207,34 @@ function voltooiAchtergrond() {
 }
 function annuleerAchtergrond() { achtergrondEffecten = null; }
 
+/* Opslag buiten de kv-collecties die in DEZELFDE commit moet landen (de
+   accountcache). Het protocol staat in ./deelnemers.js. Een streaming antwoord
+   heeft geen commit meer voor zich, dus daar mag niemand zich nog aanmelden. */
+function registreerDeelnemer(naam, d) {
+  const ctx = huidige();
+  if (!ctx || !ctx.open || !ctx.deelnemers || ctx.deelnemers.has(naam)) return false;
+  eisMutatieOpen(ctx);
+  d.fase = 'open';
+  ctx.deelnemers.set(naam, d);
+  return true;
+}
+function deelnemersMetWerk(ctx) {
+  return ctx && ctx.deelnemers ? deelnemers.metWerk([...ctx.deelnemers.values()]) : [];
+}
+function heeftDeelnemers(ctx) { return !!(ctx && ctx.deelnemers && ctx.deelnemers.size); }
+
+/* sluit() is de enige plek waar een verzoek eindigt -- geslaagd, gezakt of
+   verbroken. Een deelnemer die nog 'open' staat heeft dus geen commit gehad en
+   gaat terug; een deelnemer in 'toepassen' is van de lopende commit. */
 function sluit(ctx) {
   if (!ctx) return;
-  ctx.open = false; ctx.voorCommit.length = 0; ctx.naCommit.length = 0;
+  ctx.open = false;
+  if (ctx.voorCommit) ctx.voorCommit.length = 0;
+  if (ctx.naCommit) ctx.naCommit.length = 0;
+  if (ctx.deelnemers && ctx.deelnemers.size) deelnemers.annuleer([...ctx.deelnemers.values()], false);
 }
 
 module.exports = { nieuw, huidige, voer, zonder, eigenWerk, dataVoor, zetWortel, noteerSave,
   haakVoorCommit, haakNaCommit, draaiVoorCommit, draaiNaCommit, wijzigingen,
   onbevestigdeWijzigingen, eigenCommit, beginAchtergrond, voltooiAchtergrond,
-  annuleerAchtergrond, sluit };
+  annuleerAchtergrond, sluit, registreerDeelnemer, deelnemersMetWerk, heeftDeelnemers };

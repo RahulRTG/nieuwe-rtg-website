@@ -12,35 +12,42 @@
    en de cadeaukaart een betaalwijze werd. Beide horen bij de VERKOOP; het innen
    stond er alleen naast. Dit is dus de naad die er al lag.
 
-   GEEN HERHALINGSLAAG HIER, en dat is geen vergeten regel. Deze route is uit
-   zichzelf al eenmalig: hij weigert een code die al is uitgegeven met een 409
-   ("Code X is al uitgegeven"), en de tweede oproep komt dus nooit bij het
-   afrekenen. Een idem-sleutel zou daar niets aan toevoegen. */
-const moneyCredentialBlokkade = require('../../../middleware/money-credential-productiepoort').blokkade;
+   DE CODE IS GEEN BONNUMMER MEER. Tot 27 september 2026 zocht deze route op
+   `o.pickup`: vier tekens, ongeveer 20 bits, kaal opgeslagen en overal te zien.
+   Dat veld is nu een label voor keuken en pas en autoriseert niets. De kassa
+   scant de afhaal-QR van het lid (128 bits) en kern/afhaalcode.js claimt die
+   in EEN collectietransactie, samen met het besluit of hier wordt afgerekend.
+   Deze route voert daarna alleen de projectie op de order uit.
 
+   HERHALEN. Een tweede scan van dezelfde code geeft 409. Stuurt de kassa een
+   `idem` mee en herhaalt ze na een time-out, dan krijgt ze het vastgelegde
+   besluit terug (`herhaald`) -- zonder tweede afrekening, en met de projectie
+   alsnog als die bij de eerste poging niet was gelukt. */
 module.exports = (kern) => {
   const { app, broadcastSync, crypto, db, facturatie, logActivity, notify, pickupCode, save,
-          sseToCustomer, sseToOffice, sseToSupplier, supplierAuth, ordersVanZaak } = kern;
+          sseToCustomer, sseToOffice, sseToSupplier, supplierAuth, orderMetRef, afhaalcode } = kern;
   // dezelfde factuurroutine als de app-kant; zie kern/lidacties/factuur.js
   const { maakFactuurVoorLid, regelsVanItems } = require('../../../kern/lidacties/factuur');
   const factuurVoorLid = maakFactuurVoorLid(facturatie);
 
-app.post('/api/supplier/pos/redeem', supplierAuth, (req, res) => {
-  const dicht = moneyCredentialBlokkade('pay.order_pickup_code');
-  if (dicht) return res.status(dicht.status).json(dicht);
-  const code = String(req.body.code || '').trim().toUpperCase();
-  if (!code) return res.status(400).json({ error: 'Voer een ophaalcode in.' });
-  /* Een interne spoedbon gebruikt `pickupCode()` alleen als werknummer op de
-     keukenlijn. Hij heeft geen klant en geen uitgifterecht. Zonder de expliciete
-     scheiding hieronder maakte dit algemene loket van dat werknummer alsnog
-     een bearer waarmee iemand de interne bon kon laten aftekenen. */
-  const o = ordersVanZaak(req.supplier.code).find(x => !x.intern && x.pickup === code);
-  if (!o) return res.status(404).json({ error: 'Onbekende code voor dit bedrijf.' });
-  if (o.refunded || o.status === 'geweigerd') return res.status(409).json({ error: 'Deze bestelling is geannuleerd.' });
-  if (o.status === 'geserveerd') return res.status(409).json({ error: 'Deze ophaalcode is al uitgegeven.' });
-  const wasPaid = o.paid;
+app.post('/api/supplier/pos/redeem', supplierAuth, async (req, res) => {
+  let uit;
+  try {
+    uit = await afhaalcode.claim({ code: req.body.code, supplierCode: req.supplier.code,
+      actor: req.actor && (req.actor.staffId || req.actor.name),
+      idempotentieSleutel: req.body.idem, orderVan: orderMetRef });
+  } catch (e) {
+    return res.status(503).json({ error: 'De afhaalcode kon niet veilig worden gecontroleerd. Er is niets uitgegeven.' });
+  }
+  if (uit.error) return res.status(uit.status).json({ error: uit.error });
+  const o = orderMetRef(uit.ref);
+  if (!o) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
+  /* De projectie van het vastgelegde besluit. Afrekenen gebeurt alleen als de
+     claim dat besliste EN de order nog niet op betaald staat: een herhaling na
+     een geslaagde projectie rekent dus nooit een tweede keer af. */
+  const wasPaid = !uit.afgerekend;
   let sale = null;
-  if (!o.paid) {
+  if (uit.afgerekend && !o.paid) {
     // afrekenen via RTG-lidmaatschap; komt als omzet in het dagoverzicht
     o.paid = true;
     o.betaaldMet = 'rtg'; // de werkelijke betaalwijze, voor de dagafsluiting (TAKEN.md 4.59)
@@ -76,6 +83,9 @@ app.post('/api/supplier/pos/redeem', supplierAuth, (req, res) => {
     factuurVoorLid({ supplierCode: req.supplier.code, supplierNaam: req.supplier.name,
       codenaam: o.customerCodename, ref: o.ref, methode: 'rtg', regels: regelsVanItems(o.items) });
   }
+  if (uit.herhaald && o.status === 'geserveerd' && !sale)
+    return res.json({ ok: true, herhaald: true, order: { ref: o.ref, codename: o.customerCodename,
+      bon: o.pickup || null, items: o.items, total: o.total, wasPaid }, sale: null });
   o.status = 'geserveerd';
   save();
   logActivity(req.supplier.code, req.actor, 'gaf bestelling ' + o.ref + ' uit'
@@ -85,7 +95,8 @@ app.post('/api/supplier/pos/redeem', supplierAuth, (req, res) => {
   sseToOffice('sync', { scope: 'orders' });
   sseToSupplier(req.supplier.code, 'sync', { scope: 'pos' });
   notify(o.customerTier, { icon: 'ster', title: req.supplier.name, body: 'Uw bestelling is uitgegeven. Veel plezier.', scope: 'orders' });
-  res.json({ ok: true, order: { ref: o.ref, codename: o.customerCodename, items: o.items, total: o.total, wasPaid }, sale });
+  res.json({ ok: true, herhaald: !!uit.herhaald, order: { ref: o.ref, codename: o.customerCodename, bon: o.pickup || null,
+    items: o.items, total: o.total, wasPaid }, sale });
 });
 
 };

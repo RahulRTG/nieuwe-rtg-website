@@ -1,0 +1,18 @@
+{
+  "taal": "nl",
+  "uitleg": "Twaalf Nederlandse zinnen uit het dagelijks gebruik van RTG, voor spraak.naartekst (TOESTEL.md par. 13). De opnamen staan NIET in de repo: scripts/spraakset.js maakt ze met espeak-ng, een synthetische stem. Een woordfout op deze set zegt iets over het model en de keten, niet over hoe goed een echt lid wordt verstaan; die maat vraagt opnamen van mensen.",
+  "zinnen": [
+    "Ik wil mijn vlucht naar Lissabon verzetten naar volgende week dinsdag.",
+    "Kun je een tafel voor vier personen reserveren om half acht?",
+    "Mijn koffer is niet aangekomen op Schiphol.",
+    "Hoeveel kost de reis naar Barcelona inclusief het hotel?",
+    "Stuur de factuur naar mijn zakelijke adres.",
+    "Ik heb een allergie voor noten en schaaldieren.",
+    "Zet een herinnering voor de afspraak bij de tandarts op donderdag.",
+    "Wat is het weer morgen in Amsterdam?",
+    "Mijn dochter gaat volgende maand naar de middelbare school.",
+    "Ik wil graag met een medewerker spreken over mijn rekening.",
+    "De trein naar Utrecht vertrekt over tien minuten van spoor vijf.",
+    "Kunnen we de vergadering met het team een uur later laten beginnen?"
+  ]
+}

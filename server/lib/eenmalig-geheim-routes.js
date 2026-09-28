@@ -35,12 +35,66 @@ const ROUTES = new Set([
   'POST /api/projectie/koppel',
   'POST /api/rtgid/start',
   'POST /api/rtgid/roteer',
+  /* Machine- en herstelsleutels (CODECREDENTIALS.json): API-poort, Stadsdoos,
+     algemene pin, SCIM en IMAP. Elk antwoord draagt een geheim dat alleen als
+     hash blijft, of trekt atomair een vorige in. */
+  'POST /api/command/apipoort/sleutel',
+  'POST /api/command/apipoort/roteer',
+  'POST /api/office/stad/sleutel',
+  'POST /api/office/stad/node/aanmeld',
+  'POST /api/pin/vergeten',
+  'POST /api/techniek/sso/scimsleutel',
+  'POST /api/member/rtmail/imap/sleutel',
+  'POST /api/supplier/rtmail/imap/sleutel',
+  'POST /api/member/rtmail/imap/roteer',
+  'POST /api/supplier/rtmail/imap/roteer',
   'POST /api/salon/deal/claim',
   'POST /api/salon/deal/claim/roteer',
   'POST /api/supplier/vracht/maak',
   'POST /api/supplier/vracht/volgcode/roteer',
   'POST /api/member/vluchten/incheck',
-  'POST /api/member/vluchten/pass/roteer'
+  'POST /api/member/vluchten/pass/roteer',
+  /* De tegoedbon draagt geld: de kale code staat alleen in het antwoord op de
+     koop en op een rotatie. De koop is wel idempotent (lib/idem.js), maar het
+     bewaarde antwoord draagt met opzet geen code (kern/pay/tegoed-uitgifte.js). */
+  'POST /api/pay/tegoed/koop',
+  'POST /api/pay/tegoed/roteer',
+  'POST /api/supplier/pay/tegoed/zet',
+  'POST /api/supplier/pay/tegoed/roteer',
+  // de afhaalcode van een bestelling: uitgeven is roteren (kern/afhaalcode.js)
+  'POST /api/order/afhaalcode',
+  /* De cadeaukaart (kern/cadeaukaart.js): de code staat alleen in het antwoord
+     op de koop, de kassaverkoop en een rotatie; een herhaling krijgt de kaart
+     zonder code. */
+  'POST /api/giftcard/buy',
+  'POST /api/giftcard/roteer',
+  'POST /api/supplier/giftcard/sell',
+  'POST /api/supplier/giftcard/roteer',
+  // entreecode van een activiteitenticket en code van een vervoerbewijs:
+  // tonen is roteren (kern/tickettoegang.js, kern/mobiliteit/kaarttoegang.js)
+  'POST /api/ticket/toon',
+  'POST /api/supplier/ticket/toon',
+  'POST /api/supplier/ticket/deurverkoop',
+  'POST /api/mob/kaart/toon',
+  /* kascode en tikcode (kern/pay/kasbak.js): uitgeven is roteren, en een retry
+     met dezelfde sleutel krijgt 409 zonder code in plaats van een kopie. */
+  'POST /api/pay/kascode',
+  'POST /api/pay/tikcode',
+  // de Arrival Pass: aanvragen en roteren tonen een pass die de server maakt (kern/arrivalpas.js)
+  'POST /api/arrival/request',
+  'POST /api/arrival/pass/roteer',
+  /* De sessiesleutels van een werkruimte buiten productie (bedrijf/sleutels.js):
+     elk van deze antwoorden draagt een verse sessie die alleen als hash blijft. */
+  'POST /api/bedrijf/werkruimte/maak',
+  'POST /api/bedrijf/lid/aanmeld',
+  'POST /api/bedrijf/mijn',
+  'POST /api/bedrijf/sleutel/roteer',
+  'POST /api/tenant/bootstrap/mijn',
+  'POST /api/account/start',
+  /* De sleutel per Zaakdoos (kern/zaakdoos/sleutels.js): uitgeven is roteren, en
+     het antwoord draagt de kale sleutel die daarna alleen als hash bestaat. */
+  'POST /api/office/doos/sleutel',
+  'POST /api/supplier/doos/sleutel'
 ]);
 
 const isEenmalig = (methode, pad) => ROUTES.has(

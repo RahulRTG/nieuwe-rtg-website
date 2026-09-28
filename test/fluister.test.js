@@ -167,7 +167,10 @@ test('Rahul bestelt en rekent af: voorstel, "ja", ophaalcode en een echte order'
   assert.ok(/38,00/.test(r.body.antwoord), 'het totaal staat er eerlijk bij');
   const ja = await api('fluister', { q: 'ja' }, lid);
   assert.ok(ja.body.gedaan, 'besteld en betaald');
-  assert.ok(/ophaalcode/i.test(ja.body.antwoord));
+  /* Het bonnummer opent niets meer (kern/afhaalcode.js): het antwoord noemt het
+     een bonnummer en wijst naar de afhaal-QR, en noemt het nooit een ophaalcode. */
+  assert.ok(/bonnummer/i.test(ja.body.antwoord) && /afhaal-QR/.test(ja.body.antwoord), ja.body.antwoord);
+  assert.ok(!/ophaalcode/i.test(ja.body.antwoord), 'een bonnummer is geen ophaalcode');
   const mijn = (await api('orders/mine', {}, lid)).body.orders || [];
   const o = mijn.find(x => x.supplierCode === 'PONTO' && x.paid);
   assert.ok(o, 'de bestelling staat echt in het systeem en is betaald');

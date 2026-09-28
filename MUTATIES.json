@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-28T11:41:56.537Z",
-    "commit": "ef77e00db",
+    "op": "2026-09-28T13:37:20.417Z",
+    "commit": "114f4dbe",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5524,6 +5524,13 @@
       "gezakt": 2,
       "scherp": "gezakt"
     },
+    "kantoorhuis.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
     "kantoorintrekking.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -8162,6 +8169,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "scherp": "gezakt"
+    },
+    "ochtendkaart.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "office-ai-classificatie.test.js": {
@@ -13356,6 +13370,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "scherp": "gezakt"
+    },
+    "verzuimrooster.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
       "scherp": "gezakt"
     },
     "vijandigerand.test.js": {

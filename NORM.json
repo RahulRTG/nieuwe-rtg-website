@@ -12,7 +12,7 @@
     "bronBlindeBestanden": 3,
     "browserpoortToetsen": 399,
     "carriereDomeinenGemeten": 15,
-    "dbDeuren": 531,
+    "dbDeuren": 532,
     "dbDeurenSchrijvend": 275,
     "dekkingPct": 83,
     "dekkingWaargenomenPct": 100,
@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4627,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1667,
+    "kernBreedte": 1668,
     "kernGedeeld": 250,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1851,
-    "toetsenNietGemeten": 297,
+    "toetsenNietGemeten": 298,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -3544,6 +3544,34 @@
       "meter": "toetsenNietGemeten 654 -> 721",
       "reden": "DE TWEEDE BIJTREKRONDE VAN DE SAMENVOEGING DRAAGT DE GROEI VAN DE TAKKEN, EN GEEN GROEI VAN ZICHZELF. Na de eerste ronde zijn de nieuwe commits van alle open takken en #414 bijgetrokken (#413 is op besluit van de eigenaar weer uit deze tak gehaald, want hij was in zijn eigen CI nooit groen). Elke tak schreef voor zijn eigen verhoging hier al een notitie; de vereniging telt die op. De nieuwe stand is de GEMETEN stand op de samengevoegde boom, er is geen lucht bijgeteld, en vanaf hier geldt weer: alleen omlaag. De mutatiemotor is niet langs de nieuwe toetsbestanden van de takken geweest.",
       "waarheen": "Een volledige npm run mutatie op een schone boom neemt ze mee; die draait aan het eind van deze samenvoeging."
+    },
+    {
+      "datum": "2026-09-28",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1667,
+      "meter": "kernBreedte 1667 -> 1668; kernGedeeld blijft gelijk",
+      "reden": "De ochtendkaart (PERSONEEL.md par. 4, besluit B4), na de samenvoeging met main opnieuw geteld. Het domein staff krijgt EEN naam uit de kern-tas: kern.ochtendkaart, gezet in server/opzet/kernlaag2c.js. De kaart leest het rooster, de verzuimregel van main (kern/payroll/inplanbaar.js), de klok, de groothandelsorders en de reserveringen; de route krijgt de samengestelde functie en niet die bronnen apart.",
+      "waarheen": "GRENZEN.json (staff draagt ochtendkaart) en test/ochtendkaart.test.js toets 6, tegen een echte server"
+    },
+    {
+      "datum": "2026-09-28",
+      "soort": "structureel",
+      "sleutel": "dbDeuren",
+      "van": 531,
+      "meter": "dbDeuren 531 -> 532 (server/kern/ochtendkaart.js), dbDeurenSchrijvend blijft gelijk",
+      "reden": "De ochtendkaart telt de bevestigde groothandelsleveringen en de reserveringen van vandaag. Voor geen van beide bestaat een lezer in server/db/ (ordersVanZaak gaat over ledenbestellingen, niet over db.data.groothandelOrders). De module LEEST alleen en schrijft niets in db.data; een lezer in server/db/ bouwen voor een telling op een kaart zou de schrijvende laag groter maken om een leesmeter te sparen.",
+      "waarheen": "Een lezer voor groothandelOrders en reserveringen per zaak in server/db/ zodra een tweede module dezelfde telling nodig heeft; dan daalt deze meter met een."
+    },
+    {
+      "datum": "2026-09-28",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 297,
+      "vervalt": "2026-12-28",
+      "meter": "toetsenNietGemeten 297 -> 298 (test/ochtendkaart.e2e.js)",
+      "reden": "De browsertoets van de ochtendkaart (het scherm Vandaag tot en met het inklokken) is nieuw. De mutatiemotor muteert toetsen die een module requiren of een server via de liegpoort raken; een Playwright-toets die het scherm bedient valt daarbuiten. De serverkant van dezelfde kaart is wel gemeten: test/ochtendkaart.test.js zakt zowel op de liegpoort als scherp.",
+      "waarheen": "npm run mutatie:scherm (scripts/schermmutatie.js) kan de schermkant meten; tot die er langs is, staat de schuld hier."
     }
   ],
   "prestatie": {

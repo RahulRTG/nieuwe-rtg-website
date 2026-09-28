@@ -1271,6 +1271,36 @@
       "maturity": "L0"
     },
     {
+      "id": "foundation-kwestiekantoor",
+      "url": "/apps/foundation/kwestiekantoor.html",
+      "name": "Kwesties behandelen · RTF-kantoor",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "workspace",
+      "icon": "grid",
+      "sections": [],
+      "description": "",
+      "maturity": "L0"
+    },
+    {
+      "id": "foundation-kwesties",
+      "url": "/apps/foundation/kwesties.html",
+      "name": "Wat speelt er · RTFoundation",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "workspace",
+      "icon": "grid",
+      "sections": [
+        "' + esc(def.naam) + '"
+      ],
+      "description": "",
+      "maturity": "L0"
+    },
+    {
       "id": "foundation-leerpaspoort",
       "url": "/apps/foundation/leerpaspoort.html",
       "name": "Mijn leerpaspoort",

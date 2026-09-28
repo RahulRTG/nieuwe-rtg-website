@@ -3230,6 +3230,18 @@
       "url": "/apps/foundation/vrienden.html"
     },
     {
+      "label": "Inbrengen",
+      "app": "Wat speelt er",
+      "wereld": "FoundationOS",
+      "url": "/apps/foundation/kwesties.html"
+    },
+    {
+      "label": "Naar het inlogscherm",
+      "app": "Wat speelt er",
+      "wereld": "FoundationOS",
+      "url": "/apps/foundation/kwesties.html"
+    },
+    {
       "label": "Desktop",
       "app": "Website",
       "wereld": "WorkOS",

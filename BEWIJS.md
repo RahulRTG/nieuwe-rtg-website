@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2077 bestanden en 14635 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2078 bestanden en 14636 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2077 |
-| losse beweringen (`test(...)`) | 14635 |
+| toetsbestanden | 2078 |
+| losse beweringen (`test(...)`) | 14636 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 174 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1423 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 74 |
 | alleen in de kop *genoemd*, nog niet gemeten | 169 |
-| niets van beide | 411 |
+| niets van beide | 412 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -1852,7 +1852,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-265 bestanden, 465 beweringen.
+266 bestanden, 466 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1963,6 +1963,7 @@ toets omvalt.
 | `klimaatfonds-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | HET KLIMAATFONDS (/apps/foundation/klimaatfonds.html) IN EEN ECHTE BROWSER. Het Klimaatfonds is een VENSTER op het Living Lab en geen tweede lab: de bewonersdeuren van kern/livinglab (thema aandragen, stemmen,... |
 | `kosten.e2e.js` | 2 | genoemd | HET KOSTENBORD IN EEN ECHTE BROWSER. test/kosten.test.js bewijst wat de SERVER doet. |
 | `kostenklant.e2e.js` | 2 | genoemd | DE KLANTKANT VAN DE KOSTPRIJSLAAG, IN EEN ECHTE BROWSER. test/kosten.e2e.js beproeft het BORD van de boardroom; dit is de andere kant: wat een LID (de stand Kosten in RTG Geld) en een ZAAK (/apps/zaakkosten.html) te... |
+| `kwesties-scherm.e2e.js` | 1 | -- | DEMOCRATIEOS V1 IN EEN ECHTE BROWSER: /apps/foundation/kwesties.html (de burger) en /apps/foundation/kwestiekantoor.html (het kantoor op naam). test/democratie.test.js en test/democratie-aanval.test.js bewijzen de... |
 | `kwijtschelding-scherm.e2e.js` | 1 | -- | Schermtoets: de kwijtschelding in het Belastingkantoor gaat door TWEE inspecteurs, en dat moet je op het scherm ook ZIEN. De regel zelf staat vast in test/belastingkantoor.test.js (de server weigert dezelfde ogen). |
 | `laatstedrie.e2e.js` | 1 | -- | De laatste drie schermen zonder eigen toets: RTG Camera, RTG Eye en het tweede scherm. WAAROM DEZE DRIE OVERBLEVEN, en waarom dat geen toeval is: twee ervan vragen de CAMERA (`getUserMedia`) en de derde is een tweede... |
 | `ledenschermen.e2e.js` | 3 | gezakt op `liegpoort /api/` | DE LEDENSCHERMEN: WAT HET HUIS OVER ZICHZELF ZEGT. Achttien schermen uit de lijst van TAKEN 4.9, en ze hebben iets gemeen dat de andere groepen niet hebben: ze staan het dichtst bij het lid, en juist daar doet dit... |

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-28T14:37:54.502Z",
-    "commit": "03fcc85df",
+    "op": "2026-09-28T14:40:12.783Z",
+    "commit": "f7c9ac592",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5854,13 +5854,11 @@
     },
     "meetronde.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
+      "staat": "geen bruikbare mutatie",
       "modules": [
-        "scripts/meetronde.js"
+        "scripts/lib/valom.js"
       ],
-      "geprobeerd": 40,
-      "posities": 1000,
-      "dekking": "beproefd"
+      "posities": 1000
     },
     "meetserver-schorspoort.test.js": {
       "soort": "puur",

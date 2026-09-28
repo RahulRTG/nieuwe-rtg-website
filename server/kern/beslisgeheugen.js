@@ -96,7 +96,7 @@ module.exports = ({ db, save, nu, bedrijfsmaat }) => {
 
   /* De uitkomst per maat, uitgerekend bij het lezen uit de maand van de toets.
      Niets hiervan wordt opgeslagen: de maat is de bron, dit is een projectie. */
-  function uitkomst(b) {
+  function uitkomstVan(b) {
     if (klok() < b.toetsOp) return { stand: 'NOG_NIET', toetsOp: b.toetsOp };
     const toets = bedrijfsmaat.stand({ maand: b.toetsOp.slice(0, 7) });
     return { stand: 'GETOETST', maand: toets.maand, perMaat: b.verwachting.map(v => {
@@ -114,7 +114,7 @@ module.exports = ({ db, save, nu, bedrijfsmaat }) => {
     verwachting: b.verwachting, toetsOp: b.toetsOp, ingetrokken: b.ingetrokken });
 
   /* Het geheugen, nieuwste eerst, met de uitkomst erbij. Lezen maakt niets aan. */
-  const lijst = () => Object.entries(eigen.kijk(NAAM)).map(([id, b]) => Object.assign(vorm(id, b), { uitkomst: uitkomst(b) }))
+  const lijst = () => Object.entries(eigen.kijk(NAAM)).map(([id, b]) => Object.assign(vorm(id, b), { uitkomst: uitkomstVan(b) }))
     .sort((a, b) => (a.op < b.op ? 1 : a.op > b.op ? -1 : 0));
 
   return { beslisgeheugen: lijst, beslisgeheugenLeg: leg, beslisgeheugenTrekIn: trekIn, BESLIS_RICHTINGEN: RICHTINGEN };

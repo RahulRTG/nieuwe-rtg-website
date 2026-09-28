@@ -65,7 +65,7 @@ test('3 en 4. een saldo is vermoed, bonnen staan op nul met reden, en wie het ze
   assert.equal(s.saldo.centen, 1234500);
   assert.notEqual(s.saldo.gezetDoor, 'iemand anders', 'de naam komt uit de sessie, niet uit het verzoek');
   assert.equal(s.bonnenVerplichting.centen, 0);
-  assert.match(s.bonnenVerplichting.reden, /geen eigen cadeaubonnen/);
+  assert.match(s.bonnenVerplichting.reden, /geen eigen cadeaubon/, 'de reden komt uit het register van de bon (C14)');
   assert.equal(s.vrij.centen, 1234500);
   const c = await api('/api/office/bankpositie/zet', { maand: '2026-08', centen: 1200000, peildatum: '2026-08-31',
     bron: 'gecorrigeerd afschrift' }, eig);

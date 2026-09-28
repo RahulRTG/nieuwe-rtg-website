@@ -57,14 +57,29 @@ const SLEUTELS = {
      hetzelfde afschrift is een keer (kern/bankpositie.js geeft ongewijzigd terug). */
   'POST /api/office/bankpositie': { leest: true },
   'POST /api/office/rtgboek': { leest: true },                               // het boek van RTG lezen (C8)
+  'POST /api/office/rtgcampagne': { leest: true },                           // het campagneregister lezen (C12)
   'POST /api/office/aanmeldkanaal': { leest: true },                          // een telling lezen (C6)
   /* Het streefbeeld (C7): lezen leest; tekenen gaat over een vingerafdruk en
      intrekken is een stand, dus een tweede gelijke oproep is dezelfde. */
   'POST /api/office/streefbeeld': { leest: true },
   'POST /api/office/streefbeeld/teken': { zelfdeVerzoek: true },
   'POST /api/office/streefbeeld/intrek': { zelfdeVerzoek: true },
+  /* Het beslisgeheugen (C13): hetzelfde besluit nog eens is hetzelfde besluit;
+     intrekken een tweede keer verandert niets. */
+  'POST /api/office/beslisgeheugen': { leest: true },
+  'POST /api/office/beslisgeheugen/leg': { zelfdeVerzoek: true },
+  'POST /api/office/beslisgeheugen/intrek': { zelfdeVerzoek: true },
+  /* De cadeaubon (C14): lezen leest. De stand zetten volgt de terugstortstand
+     (idemsleutels-geld.js): dicht, open, weer dicht binnen het venster zijn drie
+     bewuste zetten over de e-geldpositie, en de derde mag niet als herhaling van de
+     eerste verdwijnen. Dezelfde stand nog eens vangt de kern zelf (ongewijzigd). */
+  'POST /api/office/cadeaubon': { leest: true },
+  'POST /api/office/cadeaubon/stand': { nietIdempotent: true,
+    waarom: 'een herhaalde zet is een bewuste zet over de e-geldpositie: terugzetten binnen het venster zou stil verdwijnen, samen met de auditregel' },
   'POST /api/office/bankpositie/zet': { zelfdeVerzoek: true },             // maand + saldo + afschrift
   'POST /api/office/rtgboek/zet': { zelfdeVerzoek: true },                  // maand + post + bedrag + bron
+  'POST /api/office/rtgboek/campagne': { zelfdeVerzoek: true },             // maand + campagne + bedrag + bron (C12)
+  'POST /api/office/rtgcampagne/maak': { zelfdeVerzoek: true },             // dezelfde campagne nog eens: ongewijzigd (C12)
   /* Naar gast (besluit C5, server/routes/naargast.js): de standcontrole weet het al. */
   'POST /api/office/pas/gast/regels': { leest: true },
   'POST /api/office/pas/gast/regels/zet': { zelfdeVerzoek: true },          // regel + aan + getal

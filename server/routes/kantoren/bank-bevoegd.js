@@ -90,4 +90,23 @@ module.exports = (ctx) => {
       return r;
     });
   });
+
+  /* DE CADEAUBON VAN RTG (kern/cadeaubon.js, besluit C14). Een bon die ook bij
+     zaken te besteden is, is elektronisch geld; de schakelaar IS die positie, en
+     staat daarom naast de terugstortstand, achter dezelfde boardroom en met
+     dezelfde verse passkey. Het beeld zegt ook wat de bevoegdheidsvraag ervan
+     vindt, want de schakelaar alleen is niet genoeg: open zonder vergunning
+     weigert nog steeds. */
+  app.post('/api/office/cadeaubon', boardroomAuth, (req, res) =>
+    res.json(Object.assign({ ok: true, uitgifte: kern.bevoegd.mag('RTG_CADEAUBON') }, kern.cadeaubonBeeld())));
+  app.post('/api/office/cadeaubon/stand', boardroomAuth, async (req, res) => {
+    const bewijs = await zwaar.eis(boardroomUser(req), 'eigenaar-cadeaubon',
+      zwaar.sessieSleutel(req), req, 'Het omzetten van de cadeaubon');
+    if (bewijs.error) return zwaar.stuur(res, bewijs);
+    return veilig(res, () => {
+      const r = kern.cadeaubonStandZet({ stand: String((req.body || {}).stand || ''), wie: naam(req) });
+      if (r.ok && !r.ongewijzigd) { afdelingen.audit(naam(req), 'De cadeaubon op "' + r.stand + '" gezet. ' + r.uitleg); sync(); }
+      return r.ok ? Object.assign(r, { uitgifte: kern.bevoegd.mag('RTG_CADEAUBON') }) : r;
+    });
+  });
 };

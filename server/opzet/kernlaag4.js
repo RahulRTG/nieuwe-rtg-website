@@ -158,12 +158,17 @@ Object.assign(kern, require('../kern/economie')({ db, save }));
    overgang). */
 kern.aanwezigheid = require('../kern/aanwezigheid')({ db, save, bewerkCollectie });
 kern.pasgeschiedenis = require('../kern/pasgeschiedenis')({ db, save, bewerkCollectie, accounts });
-// het banksaldo van RTG, handmatig met het afschrift als bron (besluit C4)
-Object.assign(kern, require('../kern/bankpositie')({ db, save }));
+// de cadeaubon van RTG (besluit C14): de schakelaar die de e-geldpositie IS, standaard dicht
+Object.assign(kern, require('../kern/cadeaubon')({ db, save }));
+// het banksaldo van RTG, handmatig met het afschrift als bron (besluit C4); de bonnen komen uit C14
+Object.assign(kern, require('../kern/bankpositie')({ db, save, bonnen: kern.cadeaubonVerplichting }));
 // hoe leden bij RTG kwamen: een telling per maand, nooit per lid (besluit C6)
-Object.assign(kern, require('../kern/aanmeldkanaal')({ db, save }));
+Object.assign(kern, require('../kern/aanmeldkanaal')({ db, save,
+  campagneKanaal: (c) => { const x = kern.rtgCampagneVan && kern.rtgCampagneVan(c); return x ? x.kanaal : null; } }));
+// de campagnes van RTG zelf (besluit C12): een code onder precies een kanaal
+Object.assign(kern, require('../kern/rtgcampagne')({ db, save, kanalen: () => kern.AANMELDKANALEN }));
 // het boek van RTG zelf, gevuld door Financien op naam (besluiten C8-C11)
-Object.assign(kern, require('../kern/rtgboek')({ db, save, kanalen: kern.AANMELDKANALEN }));
+Object.assign(kern, require('../kern/rtgboek')({ db, save, kanalen: kern.AANMELDKANALEN, campagnes: kern.rtgCampagnesInMaand }));
 kern.bedrijfsmaat = require('../kern/bedrijfsmaat/stand')({
   lees: { ritten: () => db.data.rides, bestellingen: () => db.data.orders,
     betaalschemas: () => db.data.lidmaatschapBetalingen,
@@ -175,6 +180,8 @@ kern.bedrijfsmaat = require('../kern/bedrijfsmaat/stand')({
   ledentegoed: () => (kern.pay && kern.pay.ledentegoed ? kern.pay.ledentegoed() : null) });
 // het streefbeeld (besluit C7): de machine stelt voor uit de bedrijfsmaten, de eigenaar tekent
 Object.assign(kern, require('../kern/streefbeeld')({ db, save, bedrijfsmaat: kern.bedrijfsmaat }));
+// het beslisgeheugen (besluit C13): besluit, gronden van toen, verwachting en de uitkomst na de termijn
+Object.assign(kern, require('../kern/beslisgeheugen')({ db, save, bedrijfsmaat: kern.bedrijfsmaat }));
 Object.assign(kern, require('../kern/kosten')({ db, save, bewerkCollectie, accounts, economie: kern.economie,
   keyVanCodenaam, bestandenOpslag: kern.bestandenOpslag,
   geldPasprijzen: () => (kern.geldPasprijzen ? kern.geldPasprijzen() : null),

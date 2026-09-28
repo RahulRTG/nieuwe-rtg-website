@@ -1,11 +1,13 @@
 /* Schermtoets op het boek van RTG in de kamer Financiën (kantoren.html,
    public/apps/kantoren-rtgboek.js, besluit C8).
 
-   Drie beweringen, en alle drie kunnen ze zakken:
+   Vier beweringen, en alle vier kunnen ze zakken:
    1. het paneel staat in de kamer Financiën, en in geen andere kamer;
    2. een bedrag invullen en bewaren legt het echt vast: daarna geeft de API
       hetzelfde bedrag, op naam;
-   3. een half ingevuld deel toont geen totaal maar zegt wat er nog leeg is.
+   3. een half ingevuld deel toont geen totaal maar zegt wat er nog leeg is;
+   4. een campagne maken en haar uitgave boeken legt beide vast, en een kanaal
+      zonder eigen post staat er als tegenspraak (C12).
 
    Draait alleen waar een browser is. */
 const test = require('node:test');
@@ -41,6 +43,15 @@ test('Financien vult het boek van RTG, en het scherm liegt niet over een half bo
     await page.waitForSelector('#vKamer:not([hidden])', { timeout: 20000 });
     assert.equal(await page.locator('#kRtgBoek').isHidden(), true, 'Inkoop heeft het boek niet');
 
+    /* DE WEDLOOP DIE CI VOND: de scripts van dit paneel laden onderaan de pagina,
+       terwijl de kamer al opengaat zodra de server antwoordt. Op een trage runner is
+       de kamer open voordat ze er zijn, en dan bleef het paneel leeg. Ze hier
+       tegenhouden tot de kamer Financien open op het scherm staat, maakt die volgorde
+       vast in plaats van haar aan het toeval te laten -- op een toestand, niet op een klok. */
+    await page.route(/\/apps\/kantoren-rtg(boek|campagne)\.js/, async (route) => {
+      await page.waitForSelector('#vKamer:not([hidden]) #kRtgBoek:not([hidden])', { timeout: 20000 });
+      await route.continue();
+    });
     await page.goto(srv.base + '/apps/kantoren.html?kamer=financien', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#kRtgBoek:not([hidden]) [data-rbdeel="vast"][data-rbpost="huisvesting"]', { timeout: 20000 });
     const maand = await page.locator('#kRbMaand').inputValue();
@@ -63,6 +74,27 @@ test('Financien vult het boek van RTG, en het scherm liegt niet over een half bo
       const tekst = await page.locator('#kRbDelen .rb-deel').first().textContent();
       assert.match(tekst, /Nog leeg: Personeel \(totaal\), Diensten en abonnementen, Overig/);
       assert.doesNotMatch(tekst, /Totaal/);
+    });
+
+    await t.test('een campagne maken en haar uitgave boeken, op naam (C12)', async () => {
+      const dag = maand + '-01';
+      await page.fill('#rbc-code', 'e2e-herfst');
+      await page.fill('#rbc-naam', 'Herfst e2e');
+      await page.selectOption('#rbc-kanaal', 'sociaal');
+      await page.fill('#rbc-van', dag);
+      await page.fill('#rbc-tot', dag);
+      await page.click('[data-rbcmaak]');
+      await page.waitForSelector('[data-rbccode="e2e-herfst"]', { timeout: 20000 });
+      await page.fill('#rbc-b-e2e-herfst', '250');
+      await page.fill('#rbc-s-e2e-herfst', 'factuur sociale media');
+      const klaar = page.waitForResponse(r => r.url().endsWith('/api/office/rtgboek/campagne') && r.status() === 200);
+      await page.click('[data-rbccode="e2e-herfst"]');
+      await klaar;
+      const api = (await post('/api/office/rtgboek', { maand }, persoon)).body.boek;
+      const r = api.campagnes.rijen.find(x => x.code === 'e2e-herfst');
+      assert.equal(r.centen, 25000);
+      assert.ok(r.gezetDoor, 'op naam, gezet door de server');
+      await page.waitForFunction(() => /Sociale media: De campagnes zijn geboekt/.test(document.querySelector('#kRbCampagnes').textContent));
     });
 
     assert.deepEqual(fouten, [], 'geen fouten in de console');

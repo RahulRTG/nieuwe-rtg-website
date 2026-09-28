@@ -42,12 +42,11 @@ const bevoegd = require('../kern/bevoegdheid').maakBevoegdheid({
      bevoegdheidsvraag te laten doorwerken -- anders is hij een manier om
      eromheen te komen. */
   terugstorting: bankregie.bankTerugstorting,
-  /* EN DE TWEEDE SCHAKELAAR, op naam. RUGDEKKING_BEURS hangt aan
-     `rugdekkingBeurs` en niet aan de terugstortstand -- die twee heten allebei
-     `gesloten` en `open`, dus zonder deze kaart zou de beurs stilletjes de
-     bankknop lezen. Ontbreekt hij, dan valt het vermogen terug op `gesloten`:
-     bij twijfel gaat er geen geld naar een mens. */
-  standen: { rugdekkingBeurs: () => kern.rugdekking.beursStand() }
+  /* DE ANDERE SCHAKELAARS, op naam (de beurs, en de cadeaubon van C14). Elk
+     vermogen hangt aan zijn eigen `hangtAf`: ze heten allemaal `gesloten` en
+     `open`, dus zonder deze kaart zou er een stilletjes de bankknop lezen.
+     Ontbreekt er een, dan geldt `gesloten`: bij twijfel beweegt er geen geld. */
+  standen: { rugdekkingBeurs: () => kern.rugdekking.beursStand(), cadeaubon: () => kern.cadeaubonStand() }
 });
 kern.bevoegd = bevoegd;
 /* DE TERUGSTORTING AANSLUITEN OP DE BEVOEGDHEID. Sinds leden hun saldo kunnen

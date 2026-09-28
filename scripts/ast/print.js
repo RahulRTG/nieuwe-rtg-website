@@ -111,7 +111,7 @@ function printer() {
     },
     ForStatement: (n) => 'for(' + (n.init ? forKop(n.init) : '') + ';' + (n.test ? pr(n.test) : '') + ';' + (n.update ? pr(n.update) : '') + ')' + pr(n.body),
     ForInStatement: (n) => 'for(' + lus(n.left) + ' in ' + pr(n.right) + ')' + pr(n.body),
-    ForOfStatement: (n) => 'for(' + lus(n.left) + ' of ' + subToe(n.right) + ')' + pr(n.body),
+    ForOfStatement: (n) => (n.await ? 'for await(' : 'for(') + lus(n.left) + ' of ' + subToe(n.right) + ')' + pr(n.body),
     WhileStatement: (n) => 'while(' + pr(n.test) + ')' + pr(n.body),
     DoWhileStatement: (n) => plak('do', pr(n.body)) + 'while(' + pr(n.test) + ');',
     SwitchStatement: (n) => 'switch(' + pr(n.discriminant) + '){' + n.cases.map(c => (c.test ? plak('case', pr(c.test)) + ':' : 'default:') + c.consequent.map(pr).join('')).join('') + '}',

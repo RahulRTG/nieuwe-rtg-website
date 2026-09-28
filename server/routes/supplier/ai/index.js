@@ -9,7 +9,7 @@ const { maakLiveTwin } = require('../../../ai-live-twin');
 module.exports = (kern) => {
   // alleen wat deze AI-module echt gebruikt (de rest van de gedeelde kern hoort
   // hier niet thuis; opgeruimd om dode destructuring te vermijden)
-  const { aiFindDoor, aiFindRoom, app, db, guestsFor, posDay, scheduleFor, supplierAuth, ordersVanZaak, commGast } = kern;
+  const { aiFindDoor, aiFindRoom, app, db, guestsFor, posDay, roosterMetVerzuim, supplierAuth, ordersVanZaak, commGast } = kern;
   const { fluisterZeg } = kern.fluister;
   const ambtenaar = require('./ambtenaar')(kern);
 
@@ -124,7 +124,7 @@ app.post('/api/supplier/ai', supplierAuth, async (req, res) => {
       : 'Er zijn geen open bestellingen.');
   }
   if (/(rooster|dienst|schedule|shift)/.test(ql)) {
-    const wk = scheduleFor(s.code);
+    const wk = roosterMetVerzuim(s.code, false); // wie afwezig is heet Afwezig, zonder reden
     const today = wk.days[0];
     return A('Vandaag: ' + today.staff.map(x => x.name + ' ' + x.shift).join('; ') + '. Het volledige rooster staat in de personeels-app.');
   }

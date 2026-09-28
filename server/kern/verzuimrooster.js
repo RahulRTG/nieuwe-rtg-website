@@ -60,7 +60,31 @@ function maakVerzuimRooster(lezer) {
     return uit;
   }
 
-  return { stand, verzuimZin, naKijken };
+  /* HET WEEKROOSTER VAN DE TEAM ROOM, TEGEN DE VERZUIMLAAG GELEGD (PERSONEEL.md
+     par. 4). Zonder dit stond een zieke collega er gewoon op zijn dienst.
+
+     Het rooster is een lijst NAMEN die elke collega ziet, dus de reden blijft
+     eruit: wie afwezig is heet voor iedereen "Afwezig" -- niet ziek, niet
+     vakantie. Alleen de MANAGER krijgt `afwezig` (wat) en `inzetbaarheid`
+     erbij, want die plant, en bij 'deels' of 'aangepast' is dat een mens.
+     Wie vrij stond, blijft vrij: daar valt niets te melden, en een wijziging
+     zou alleen verraden dat er iets speelt. Het geplande rooster wordt niet
+     aangeraakt; dit geeft een nieuw object. Zonder verzuimlaag staat er
+     `verzuimNagekeken: false`, want stil doorlaten leest als "niemand ziek". */
+  function legOp(code, week, { manager } = {}, vrij) {
+    let onbekend = 0;
+    const days = (week.days || []).map(dag => ({ ...dag, staff: (dag.staff || []).map(m => {
+      if (m.shift === vrij) return m;
+      const v = stand(code, m.id, dag.date);
+      if (v.stand === 'onbekend') onbekend++;
+      if (v.stand !== 'afwezig') return m;
+      return manager ? { ...m, shift: 'Afwezig', gepland: m.shift, afwezig: v.wat, inzetbaarheid: v.inzetbaarheid }
+        : { ...m, shift: 'Afwezig' };
+    }) }));
+    return { ...week, days, verzuimNagekeken: onbekend === 0 };
+  }
+
+  return { stand, verzuimZin, naKijken, legOp };
 }
 
 /* De verzuimlaag (kern.payrollOS, opzet/kernlaag2.js) bestaat pas ruim nadat

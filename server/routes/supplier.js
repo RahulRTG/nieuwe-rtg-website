@@ -2,7 +2,7 @@
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 const { eigenVeld } = require('../kern/util'); // veilige objecttoegang (geen prototype-pollution)
 module.exports = (kern) => {
-  const { app, db, save, scheduleFor, sseToSupplier, supplierAuth, supplierState } = kern;
+  const { app, db, save, roosterMetVerzuim, sseToSupplier, supplierAuth, supplierState } = kern;
 
 
 
@@ -29,7 +29,8 @@ require('./supplier/genreblik')(kern);
 require('./supplier/eten')(kern); // een operationeel orderbeeld boven horeca + oudere orders
 require('./supplier/onderneming')(kern); // de onderneming ACHTER deze zaak; brug een kant op, zie de kop
 
-app.post('/api/supplier/schedule', supplierAuth, (req, res) => res.json(scheduleFor(req.supplier.code)));
+app.post('/api/supplier/schedule', supplierAuth, (req, res) =>
+  res.json(roosterMetVerzuim(req.supplier.code, !!(req.actor && req.actor.manager))));
 
 app.post('/api/supplier/team/message', supplierAuth, (req, res) => {
   const text = String(req.body.text || '').trim().slice(0, 500);

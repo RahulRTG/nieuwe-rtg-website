@@ -10,8 +10,11 @@
 module.exports = (kern, hulp) => {
   const { db } = hulp;
   const verzuim = require('../kern/verzuimrooster').uitKern(() => kern);
+  const vrij = require('../kern/personeel').SHIFT_NAMES[2];
   kern.ochtendkaart = require('../kern/ochtendkaart').maakOchtendkaart({
-    db, scheduleFor: kern.scheduleFor, klokVan: kern.klokVan, verzuim,
-    vrij: require('../kern/personeel').SHIFT_NAMES[2]
+    db, scheduleFor: kern.scheduleFor, klokVan: kern.klokVan, verzuim, vrij
   }).kaart;
+  /* Het rooster van de Team Room (/api/supplier/schedule), tegen de
+     verzuimlaag gelegd; wat de manager extra ziet staat in legOp(). */
+  kern.roosterMetVerzuim = (code, manager) => verzuim.legOp(code, kern.scheduleFor(code), { manager }, vrij);
 };

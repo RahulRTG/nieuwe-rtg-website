@@ -63,23 +63,38 @@ function lus(stappen) {
 }
 const LUSSYSTEEM = rahul.RAHUL_LEAD + 'Je helpt een RTG-lid (codenaam Amberen Vos, pas: rtg) in de leden-app. \n' + LUS_REGELS;
 
+/* De boardroom met de registerblik: drie blikken met ECHTE uitkomsten uit de
+   registers van deze boom, zoals de lus ze terugstuurt. */
+const { REGISTERBLIK_TOOLS, kijk } = require('../server/kern/registerblik/gereedschap');
+const BLIKSYSTEEM = rahul.RAHUL_LEAD + 'je denkt mee met de RTG-boardroom. ' + require('../server/kern/registerblik/lus').REGELS;
+function blik() {
+  const m = [{ role: 'user', content: 'Waarom staat RTG nog niet productieklaar?' }];
+  [['vraagProductiestandOp', {}], ['vraagBewijsOp', {}], ['inspecteerRoute', { pad: '/api/bank/pas/betaal' }]].forEach(([naam, invoer], i) => {
+    m.push({ role: 'assistant', content: [{ type: 'tool_use', id: 'b' + i, name: naam, input: invoer }] });
+    m.push({ role: 'user', content: [{ type: 'tool_result', tool_use_id: 'b' + i, content: JSON.stringify(kijk(naam, invoer)).slice(0, 4000) }] });
+  });
+  return m;
+}
+
 const SITUATIES = [
   { naam: 'chat, eerste vraag', maak: (v) => chatPakket({ delen: aiSystemPrompt('rtg', 'nl', 'demo', true), convo: gesprek(0), venster: v, antwoord: 1024, toon: AI_TONE }), antwoord: 1024 },
   { naam: 'chat, na 12 beurten', maak: (v) => chatPakket({ delen: aiSystemPrompt('rtg', 'nl', 'demo', true), convo: gesprek(12), venster: v, antwoord: 1024, toon: AI_TONE }), antwoord: 1024 },
   { naam: 'chat, vraag over Rahul', maak: (v) => chatPakket({ delen: aiSystemPrompt('rtg', 'nl', 'demo', true), convo: gesprek(4, 'Waar kom je eigenlijk vandaan?'), venster: v, antwoord: 1024, toon: AI_TONE }), antwoord: 1024 },
   { naam: 'stuurlus, eerste beurt', maak: (v) => lusPakket({ systeem: LUSSYSTEEM, messages: lus(0), tools: TOOLS, venster: v, antwoord: 1400 }), antwoord: 1400, tools: true },
-  { naam: 'stuurlus, na 4 stappen', maak: (v) => lusPakket({ systeem: LUSSYSTEEM, messages: lus(4), tools: TOOLS, venster: v, antwoord: 1400 }), antwoord: 1400, tools: true }
+  { naam: 'stuurlus, na 4 stappen', maak: (v) => lusPakket({ systeem: LUSSYSTEEM, messages: lus(4), tools: TOOLS, venster: v, antwoord: 1400 }), antwoord: 1400, tools: true },
+  { naam: 'boardroom, na 3 blikken', maak: (v) => lusPakket({ systeem: BLIKSYSTEEM, messages: blik(), tools: REGISTERBLIK_TOOLS, venster: v, antwoord: 900 }), antwoord: 900, tools: REGISTERBLIK_TOOLS }
 ];
 
 function meet() {
   return SITUATIES.map((s) => {
     const heel = s.maak(null);
-    const nodig = schatVerzoek({ system: heel.system, messages: heel.messages, tools: s.tools ? TOOLS : null, max_tokens: s.antwoord });
+    const gereed = s.tools === true ? TOOLS : (s.tools || null);
+    const nodig = schatVerzoek({ system: heel.system, messages: heel.messages, tools: gereed, max_tokens: s.antwoord });
     const perVenster = VENSTERS.map((v) => {
       const p = s.maak(v);
       const afgekapt = Math.max(0, nodig - v);
       return { venster: v, zonder: afgekapt ? 'kapt ~' + afgekapt + ' van het begin af' : 'past',
-        met: p.ok ? 'past (' + (p.verantwoording.gebruikt + s.antwoord + (s.tools ? schatTokens(TOOLS) : 0)) + ')' : p.code,
+        met: p.ok ? 'past (' + (p.verantwoording.gebruikt + s.antwoord + schatTokens(gereed)) + ')' : p.code,
         ingekort: p.ok ? p.verantwoording.ingekort.length : null,
         weggelaten: p.ok ? p.verantwoording.weggelaten.filter(w => w.id !== 'voorloper').length : null,
         bovenPlafond: p.verantwoording && p.verantwoording.perSoort

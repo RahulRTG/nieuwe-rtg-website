@@ -34,7 +34,12 @@ const INGANGEN = ['server/kern/stuur/lus.js', 'server/kern/stuur/gereedschap.js'
      gewired) en valt dus buiten de sluiting van lus.js. Juist daarom staat hij
      hier: een stuurbestand dat niemand laadt, is het bestand waar een
      readFileSync het langst onopgemerkt kan blijven staan. */
-  'server/kern/stuur/menscontext-ref.js'];
+  'server/kern/stuur/menscontext-ref.js',
+  /* De registerblik (kern/registerblik/) is de tweede runtime-AI met
+     gereedschap: de boardroom-Rahul die RTG's registers LEEST. Precies de
+     uitzondering die deze toets verklaart -- een register lezen mag -- en dus
+     precies de plek waar een bronlezer het eerst zou binnensluipen. */
+  'server/kern/registerblik/lus.js', 'server/kern/registerblik/gereedschap.js', 'server/kern/registerblik/bronnen.js'];
 
 function sluiting(start) {
   const gezien = new Set(); const rij = start.filter(f => fs.existsSync(path.join(WORTEL, f)));
@@ -93,4 +98,22 @@ test('3. het model kan niet meer gereedschappen dan hier staan', () => {
   const { TOOLS } = require('../server/kern/stuur/gereedschap');
   assert.deepStrictEqual(TOOLS.map(t => t.name).sort(), ['doe', 'kaart', 'plan'],
     'er is een gereedschap bij of af. Is het een bron-lezer? Dan hoort hij bij de Architect en niet hier.');
+});
+
+test('4. de registerblik leest alleen registers bij naam, en krijgt geen stuurgereedschap', () => {
+  /* De registerblik mag lezen wat de meters publiceerden, en niets anders: zijn
+     lijst bestaat uit JSON-registers, hij heeft geen gereedschap dat een bestand
+     of pad aanneemt, en hij deelt geen enkel gereedschap met het stuur -- lezen
+     en uitvoeren blijven twee werelden. */
+  const { REGISTERS } = require('../server/kern/registerblik/bronnen');
+  const { REGISTERBLIK_TOOLS } = require('../server/kern/registerblik/gereedschap');
+  const { TOOLS } = require('../server/kern/stuur/gereedschap');
+  assert.ok(Object.values(REGISTERS).every(r => /\.json$/.test(r)), 'een register is JSON, nooit bron');
+  assert.deepStrictEqual(REGISTERBLIK_TOOLS.map(t => t.name).sort(),
+    ['inspecteerRoute', 'vraagBewijsOp', 'vraagProductiestandOp', 'vraagVertrouwenOp', 'zoekRegister'],
+    'er is een registerblik-gereedschap bij of af. Neemt het een bestand aan? Dan hoort het bij de Architect en niet hier.');
+  const velden = REGISTERBLIK_TOOLS.flatMap(t => Object.keys(t.input_schema.properties || {}));
+  assert.ok(!velden.some(v => /bestand|file|pad_op_schijf|path/i.test(v)), 'geen gereedschap neemt een bestand aan: ' + velden.join(', '));
+  const stuur = new Set(TOOLS.map(t => t.name));
+  assert.ok(REGISTERBLIK_TOOLS.every(t => !stuur.has(t.name)), 'de registerblik deelt geen gereedschap met het stuur');
 });

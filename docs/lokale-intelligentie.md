@@ -101,6 +101,37 @@ van de server: `npm run ai:lokaal:check` stuurt een lange tekst met vooraan een
 codewoord, vraagt dat terug en legt de telling van de server naast de
 schatting. Komt het codewoord niet terug, dan kapt de server af.
 
+## De registerblik: opzoeken in plaats van weten
+
+Een klein model weet niet hoe RTG ervoor staat, en hoeft dat ook niet te weten.
+De boardroom-Rahul (`/api/office/boardroom/ai`) krijgt vijf gereedschappen die
+RTG's eigen registers LEZEN (`server/kern/registerblik/`):
+
+| Gereedschap | Leest | Zegt |
+|---|---|---|
+| `inspecteerRoute` | `EXECUTION_MAP.json`, `VERTROUWEN.json`, `ROUTEBRON.json` | wat de AI met een route mag, of herhalen schade doet, de vervalstaat en waarom, en het bestand |
+| `vraagVertrouwenOp` | `VERTROUWEN.json` | de vervalstaat, over alles of per route |
+| `vraagBewijsOp` | `BEWIJSSCHULD.json` | wat RTG weet dat het nog niet heeft gemeten, met de sluitweg |
+| `vraagProductiestandOp` | `.release/productie-status.json` | de release-uitspraak, doorgegeven en nooit samengesteld |
+| `zoekRegister` | `EXECUTION_MAP.json`, `BEWIJSSCHULD.json` | routes en posten bij een woord |
+
+De gereedschappen zijn rijk, zodat het redeneerprobleem klein blijft:
+`inspecteerRoute` legt zelf drie registers naast elkaar. Elk antwoord noemt
+zijn register, hoe oud de meting is en zijn graad. Een meting die ouder is dan
+haar houdbaarheid zakt naar `vermoed`: vervallen bewijs is geen bewijs.
+
+Grenzen:
+
+- Er is geen `leesBestand(pad)`. Het model noemt een route of een zoekwoord,
+  nooit een bestand. CODE-AI-001 (`test/codegrens.test.js`) houdt dat vast.
+- De registerblik deelt geen gereedschap met het stuur. Lezen en uitleggen
+  mogen zelfstandig; wijzigen en uitvoeren lopen langs mandaat, beleid en een
+  mens.
+- Hij staat alleen achter de boardroomdeur. De registers beschrijven hoe RTG
+  intern werkt, en dat hoort niet bij een lid of partner.
+- Zonder model dat gereedschap kan, valt de boardroom terug op de korte blik,
+  en daarna op de regels.
+
 ## Externe uitwijk
 
 Externe aanbieders doen alleen mee als hun sleutel expliciet is ingesteld en

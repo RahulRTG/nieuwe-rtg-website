@@ -133,7 +133,11 @@ const MIGRATIES = [
     soort TEXT NOT NULL,
     waarde TEXT NOT NULL,
     verloopt INTEGER NOT NULL
-  )`) }
+  )`) },
+  /* Een SCIM-sleutel vervalt (CODECREDENTIALS.json, identity.scim_bearer_sleutel).
+     Een rij van voor deze kolom blijft leeg en vervalt op de legacydatum uit
+     scim/sleutels.js -- een werkende IdP breekt niet bij de migratie. */
+  { n: 11, naam: 'scim-sleutel-vervalt', op: (db) => voegKolomToe(db, 'scim_sleutels', 'vervalt_at', 'TEXT') }
 ];
 
 module.exports = { MIGRATIES, voegKolomToe, accountsBasis };

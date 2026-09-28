@@ -198,6 +198,7 @@
     "leven.vooruitzicht": "apps/living-os.html",
     "onderzoek.lab": "apps/livinglab.html",
     "loon.strook": "apps/loonstrook.html",
+    "leerhuis.mijn": "apps/leerhuis.html",
     "loopbaan.ledger": "apps/loopbaan.html",
     "loopbaan.bewijs": "apps/loopbaanbewijs.html",
     "luchthaven.operatie": "apps/luchthaven.html",
@@ -1843,6 +1844,12 @@
       "rol": "eigenaar",
       "doelgroep": "lid",
       "doel": "Een werknemer bekijkt zijn loonstroken en ziet wie er in zijn loongegevens heeft gekeken."
+    },
+    "apps/leerhuis.html": {
+      "capability": "leerhuis.mijn",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een lid ziet in het leerhuis van een organisatie wat hij leert, oefent en bewezen heeft, en wat vandaag aan de beurt is."
     },
     "apps/loopbaan.html": {
       "capability": "loopbaan.ledger",

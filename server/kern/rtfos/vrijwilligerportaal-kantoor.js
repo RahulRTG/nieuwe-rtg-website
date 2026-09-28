@@ -126,5 +126,5 @@ module.exports = (ctx, eigen) => {
     return { ok: true, urenTotaal: Math.round(urenVan(v) * 10) / 10, open: v.gemeldeUren.length };
   }
 
-  return { codeVoor, codeIntrekken, codeRoteren, bevestigUren };
+  return { codeVoor, codeIntrekken, codeRoteren, bevestigUren, deurIn };
 };

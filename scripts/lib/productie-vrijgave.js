@@ -21,6 +21,15 @@ const BRONNEN = Object.freeze({
   backupSbom:'.release/sbom-backup.json', backupHerkomst:'.release/herkomst-backup.json'
 });
 
+function bewijsBronnen(soort = 'oci') {
+  if (soort === 'oci') return BRONNEN;
+  if (soort !== 'native') throw new Error('Onbekende productie-artifactsoort.');
+  const oci = new Set(['releaseBewijs', 'liveKandidaat', 'kandidaatImageBewijs', 'kandidaatRuntime',
+    'imageSbom', 'imageHerkomst', 'backupSbom', 'backupHerkomst']);
+  return Object.freeze({ ...Object.fromEntries(Object.entries(BRONNEN).filter(([name]) => !oci.has(name))),
+    ...require('./native-kandidaat').REL });
+}
+
 function sha256Bestand(pad) {
   return crypto.createHash('sha256').update(fs.readFileSync(pad)).digest('hex');
 }
@@ -56,7 +65,8 @@ function leesProductiestatus(commit, root = ROOT) {
   let rapport;
   try { rapport = JSON.parse(fs.readFileSync(pad, 'utf8')); }
   catch (e) { throw new Error('Productiestatus ontbreekt of is onleesbaar; de afbouw heeft geen READY-bewijs gemaakt.'); }
-  if (rapport.formaat !== 'rtg-production-status-v1' || rapport.PRODUCTION_STATUS !== 'READY')
+  if (rapport.formaat !== 'rtg-production-status-v1' ||
+      !['READY', 'READY_ZONDER_RAIL'].includes(rapport.PRODUCTION_STATUS))
     throw new Error('Productiestatus is niet READY.');
   if (String(rapport.commit || '') !== String(commit || ''))
     throw new Error('Productiestatus hoort niet bij de releasecommit.');
@@ -65,7 +75,7 @@ function leesProductiestatus(commit, root = ROOT) {
   const echt = crypto.createHash('sha256').update(JSON.stringify(zonder)).digest('hex');
   if (!/^[a-f0-9]{64}$/.test(verwacht) || echt !== verwacht)
     throw new Error('Productiestatus heeft geen geldige SHA-256-pin.');
-  for (const [naam, rel] of Object.entries(BRONNEN)) {
+  for (const [naam, rel] of Object.entries(bewijsBronnen(rapport.artifactSoort || 'oci'))) {
     const bron = rapport.bronnen && rapport.bronnen[naam];
     if (!bron || bron.pad !== rel || !/^[a-f0-9]{64}$/.test(String(bron.sha256 || '')))
       throw new Error('Productiestatus mist een vaste bewijsbron: ' + naam + '.');
@@ -79,7 +89,9 @@ function leesProductiestatus(commit, root = ROOT) {
   const huidigeExtern = extern.samenvatting(extern.controleerReleaseRoot(root, commit));
   if (JSON.stringify(huidigeExtern) !== JSON.stringify(rapport.externeVrijgave || null))
     throw new Error('Het ondertekende externe dossier of een bewijsbestand wijzigde na de READY-uitspraak.');
+  if (rapport.artifactSoort === 'native' && JSON.stringify(require('./native-kandidaat').controleer(root, commit)) !==
+      JSON.stringify(rapport.kandidaatVrijgave)) throw new Error('Native kandidaat wijzigde na READY.');
   return rapport;
 }
 
-module.exports = { BRONNEN, onbekendeWijzigingen, eisSchoneReleasebron, leesProductiestatus };
+module.exports = { BRONNEN, bewijsBronnen, onbekendeWijzigingen, eisSchoneReleasebron, leesProductiestatus };

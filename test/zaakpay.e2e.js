@@ -115,7 +115,7 @@ test('de zaakkant van RTG Pay: innen vult de kas, tegoed haalt het eruit, en de 
     await zaak.click('#tZet');
     await zaak.waitForSelector('#tNieuw:not([hidden])', { timeout: 12000 });
     const code = (await zaak.textContent('#tCode') || '').trim();
-    assert.match(code, /^[0-9A-F]{4}(-[0-9A-F]{4}){5}$/, 'er komt een tegoedcode uit: ' + code);
+    assert.match(code, /^TG(-[0-9A-F]{4}){8}$/, 'er komt een tegoedcode uit: ' + code);
     await zaak.waitForFunction(t => document.querySelector('#saldo').textContent !== t, saldoNaInnen, { timeout: 12000 });
     await zaak.waitForSelector('#tKlaarKaart:not([hidden])', { timeout: 12000 });
     assert.match(await zaak.textContent('#tKlaar'), /wacht op ophalen/, 'en hij staat als klaargezet in beeld');

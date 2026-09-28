@@ -26,7 +26,7 @@
    Alle acht staan met een reden op de publieke lijst van check.js regel 28. */
 const rem = require('../../rem');
 
-module.exports = ({ app, officeAuth, rtfos, veilig, H }) => {
+module.exports = ({ app, auth, officeAuth, rtfos, veilig, H }) => {
   const codeVan = req => String((req.body && req.body.code) || '').trim().slice(0, 40).toUpperCase();
   const ipRem = rem({ windowMs: 60000, limit: 20, key: req => 'rtfoscode-ip|' + String(req.ip) });
   const codeRem = rem({ windowMs: 60000, limit: 60, key: req => 'rtfoscode|' + codeVan(req) });
@@ -39,6 +39,14 @@ module.exports = ({ app, officeAuth, rtfos, veilig, H }) => {
     veilig(res, () => rtfos.vrijwilligerportaal.zetEigen(codeVan(req), req.body || {})));
   app.post('/api/rtfos/portaal/vrijwilliger/uren', ipRem, codeRem, (req, res) =>
     veilig(res, () => rtfos.vrijwilligerportaal.meldUren(codeVan(req), req.body || {})));
+
+  /* Zijn dossier aan zijn EIGEN account koppelen: ingelogd EN met zijn code,
+     allebei tegelijk (kern/rtfos/vrijwilligeraccount.js). Het account komt uit
+     de sessie, nooit uit het lijf. Loskoppelen kan zonder code. */
+  app.post('/api/rtfos/portaal/vrijwilliger/koppel', auth, ipRem, codeRem, (req, res) =>
+    veilig(res, () => rtfos.vrijwilligerportaal.account.koppel(codeVan(req), req.session && req.session.key)));
+  app.post('/api/rtfos/portaal/vrijwilliger/ontkoppel', auth, (req, res) =>
+    veilig(res, () => rtfos.vrijwilligerportaal.account.ontkoppel(req.session && req.session.key)));
 
   // ---------- de hulpvrager, op zijn eigen code ----------
   app.post('/api/rtfos/portaal/deelnemer', ipRem, codeRem, (req, res) =>
@@ -61,6 +69,8 @@ module.exports = ({ app, officeAuth, rtfos, veilig, H }) => {
     H((req, b) => rtfos.vrijwilligerportaal.codeIntrekken(req, b.id, b.reden)));
   app.post('/api/rtfos/vrijwilliger/code/roteren', officeAuth,
     H((req, b) => rtfos.vrijwilligerportaal.codeRoteren(req, b.id, b)));
+  app.post('/api/rtfos/vrijwilliger/account-los', officeAuth,
+    H((req, b) => rtfos.vrijwilligerportaal.account.kantoorLos(req, b.id, b.reden)));
   app.post('/api/rtfos/vrijwilliger/uren-bevestig', officeAuth, H((req, b) => rtfos.vrijwilligerportaal.bevestigUren(req, b.id, b.meldingId)));
   app.post('/api/rtfos/casus/code', officeAuth, H((req, b) => rtfos.deelnemerportaal.codeVoor(req, b.id, b)));
   app.post('/api/rtfos/casus/code/intrekken', officeAuth,

@@ -111,6 +111,7 @@
         kantoorMsg = '\u2705 '+T('sup.salondone','Gepubliceerd op De Salon.');
         await refresh(); } catch(e){ toast(e.message); }
     });
+    laadTijdKaart(el);
   }
 
   async function refresh(){ try { applyState((await API.call('/supplier/state')).state); renderAll(); } catch(e){} }

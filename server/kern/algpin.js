@@ -11,7 +11,7 @@
 
    maakAlgPin(state) volgt het vaste kern-patroon. */
 
-function maakAlgPin({ db, save, crypto, slot }) {
+function maakAlgPin({ db, save, crypto, slot, bewerkCollectie }) {
   const eigen = require('./eigencollectie')({ db, domein: 'kern/algpin', bezit: { algPin: 'kaart', algPinHerstel: 'kaart' } });
   const rij = () => eigen.bak('algPin');
   /* Lezen zonder scheppen (zie kijk() in kern/eigencollectie.js). Hier telt het
@@ -91,27 +91,25 @@ function maakAlgPin({ db, save, crypto, slot }) {
      heeft, kon het wachtwoord toch al herstellen; de pin wordt daarmee niet
      zwakker dan de deur die eromheen zit. */
   const HERSTEL_MS = 3600000;   // een uur, net als de wachtwoordlink
-  const herstelRij = () => eigen.bak('algPinHerstel');
-  const leesHerstel = () => eigen.kijk('algPinHerstel');   // zie de uitleg bij leesRij
   const sleutelHash = t => crypto.createHash('sha256').update(String(t)).digest('hex');
+  /* De levenscyclus (CODECREDENTIALS.json, identity.algpin_herstelsleutel) staat
+     in ./algpin-herstel.js: uitgeven trekt ATOMAIR elke eerdere sleutel van
+     hetzelfde lid in, en claimen zoekt in constante tijd en verbruikt in
+     dezelfde collectietransactie. */
+  const herstel = require('./algpin-herstel')({ crypto, bewerkCollectie, sleutelHash, HERSTEL_MS });
 
-  function pinHerstelStart(key) {
-    const t = crypto.randomBytes(24).toString('hex');
-    herstelRij()[sleutelHash(t)] = { key, tot: Date.now() + HERSTEL_MS };
-    // afgelopen sleutels meteen opruimen: anders groeit deze rij eeuwig door
-    for (const [h, r] of Object.entries(herstelRij())) if (!r || r.tot < Date.now()) delete herstelRij()[h];
-    save();
-    return { ok: true, sleutel: t, geldigTot: new Date(Date.now() + HERSTEL_MS).toISOString() };
+  async function pinHerstelStart(key) {
+    const r = await herstel.geef(key);
+    return { ok: true, sleutel: r.sleutel, geldigTot: r.geldigTot };
   }
 
   /* Eenmalig: de sleutel gaat weg zodra hij is gebruikt, ook als het zetten
      daarna misgaat. Een sleutel die na een misgreep nog werkt is geen sleutel. */
   async function pinHerstelZet(sleutel, pin) {
     const h = sleutelHash(String(sleutel || ''));
-    const r = leesHerstel()[h];
-    if (!r || r.tot < Date.now()) return { status: 400, error: 'Deze herstellink is verlopen of al gebruikt. Vraag een nieuwe aan.' };
-    delete herstelRij()[h];
-    if (!PIN_RE.test(String(pin || ''))) { save(); return { status: 400, error: 'Kies een pincode van 4 tot 8 cijfers.' }; }
+    const r = await herstel.claim(h);
+    if (!r) return { status: 400, error: 'Deze herstellink is verlopen of al gebruikt. Vraag een nieuwe aan.' };
+    if (!PIN_RE.test(String(pin || ''))) return { status: 400, error: 'Kies een pincode van 4 tot 8 cijfers.' };
     const zout = crypto.randomBytes(16);
     rij()[r.key] = { zout: zout.toString('base64'), hash: await hash(pin, zout), at: new Date().toISOString() };
     slot.goed(doel(r.key));   // schone lei: het slot van de oude pin telt niet meer mee

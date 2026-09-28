@@ -13,13 +13,14 @@
 'use strict';
 
 module.exports = (kern, hulp) => {
-  const { PERSONAS, accounts, alcoholGrensVan, annuleerReservering, anthropic, beveilig, crypto, db, entreeCode, facturatie, findSupplier, fooiUit, geborenVan, haversine, idGeverifieerd, keyVanCodenaam, klantProfiel, ledenPrijs, leeftijdVan, legApart, liveCodename, log, logActivity, maakOntmoeting, notify, notifySupplier, optieAan, pasTegoedToe, herstelTegoed, pickupCode, pushLive, reserveerTafel, save, schoon, sseToCustomer, sseToOffice, sseToSupplier, ticketsVoorSlot, verdienPunten, zorgContact } = hulp;
+  const { PERSONAS, accounts, alcoholGrensVan, annuleerReservering, anthropic, beveilig, crypto, db, entreeCode, facturatie, findSupplier, fooiUit, afhaalcode, geborenVan, haversine, idGeverifieerd, keyVanCodenaam, klantProfiel, ledenPrijs, leeftijdVan, legApart, liveCodename, log, logActivity, maakOntmoeting, notify, notifySupplier, optieAan, pasTegoedToe, herstelTegoed, pickupCode, pushLive, reserveerTafel, save, schoon, sseToCustomer, sseToOffice, sseToSupplier, ticketsVoorSlot, verdienPunten, zorgContact } = hulp;
 
 /* RTG Stad (kern/stad): het slimme-stad-platform op EIGEN hardware (de
    Stadsdoos-vloot, dezelfde familie als de Zaakdoos) en eigen software --
    domeinen met regimes, een scenario-knop in de boardroom en een
    AI-stadsregisseur. Privacy by design: de stad meet dingen, geen mensen. */
-Object.assign(kern, require('../kern/stad')({ db, save, crypto, schoon, anthropic, sseToOffice, beveilig, keyVanCodenaam, sseToCustomer, weefsel: kern.weefsel }));
+Object.assign(kern, require('../kern/stad')({ db, save, crypto, schoon, anthropic, sseToOffice, beveilig, keyVanCodenaam, sseToCustomer, weefsel: kern.weefsel,
+  manifestBasis: () => accounts.sleutelVoor('stadsdoos-manifest-v1') }));
 /* De stad in het gezamenlijke rampbeeld: tijdens een calamiteit ziet de hele
    keten (korpsen, zorg, defensie, boardroom) ook het stadsscenario, de
    bord-waarschuwingen en de vloot -- operationele toestand, geen
@@ -54,7 +55,7 @@ Object.assign(kern, require('../kern/lidacties')({
   // zie de kop van kern/lidacties/factuur.js
   facturatie,
   zorgVoor: kern.zorgVoor, zorgMee: kern.zorgMee, zorgContact, keuken: kern.keuken,
-  ledenvoordeelVoor: kern.ledenvoordeelVoor
+  ledenvoordeelVoor: kern.ledenvoordeelVoor, afhaalcode
 }));
 kern.rahulActies = {
   plaatsOrder: kern.plaatsOrderVoor, betaalOrder: kern.betaalOrderVoor,

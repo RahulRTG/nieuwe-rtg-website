@@ -25,7 +25,7 @@ const { startServer, stop } = require('./helper');
 
 /* ---------- 1. de definitie zelf ---------- */
 
-test('de definitie leent alles van RTG Pay en verzint geen tweede waarheid', () => {
+test('de definitie leent alles van RTG Pay en verzint geen tweede waarheid', async () => {
   const gevraagd = [];
   const pay = { KASCODE_MS: 5 * 60 * 1000,
     kasCode: (x) => { gevraagd.push(x); return { ok: true, code: 'A1B2C3', maxCenten: 15000 }; },
@@ -38,10 +38,10 @@ test('de definitie leent alles van RTG Pay en verzint geen tweede waarheid', () 
   assert.equal(def.ttlMs, pay.KASCODE_MS, 'exact zolang als de code eronder leeft');
   assert.equal(def.eenmalig, true);
 
-  const o = def.lees({ maxCenten: 15000 }, { soort: 'lid', key: 'A', codenaam: 'Lid A' });
+  const o = await def.lees({ maxCenten: 15000 }, { soort: 'lid', key: 'A', codenaam: 'Lid A' });
   assert.deepEqual(o, { code: 'A1B2C3', maxCenten: 15000 });
   assert.deepEqual(gevraagd, [{ codenaam: 'Lid A', maxCenten: 15000 }], 'de code komt van RTG Pay');
-  assert.equal(def.lees({}, { soort: 'lid', key: 'A' }).status, 403, 'zonder codenaam geen kassacode');
+  assert.equal((await def.lees({}, { soort: 'lid', key: 'A' })).status, 403, 'zonder codenaam geen kassacode');
 
   // de kaart toont het maximum en NOOIT de code zelf
   const kaart = def.beschrijf(o);
@@ -94,7 +94,7 @@ test.after(() => { stop(child); try { fs.rmSync(TMP, { recursive: true, force: t
 test('de kassa scant, ziet WIE en TOT HOEVEEL, en rekent dan pas af', async () => {
   const cap = await maakCap(lid.token, 20000);
   assert.match(cap.token, /^RTG1\./);
-  assert.equal(cap.eigen.code.length, 6, 'het lid krijgt zijn code wel, om voor te lezen');
+  assert.match(cap.eigen.code, /^KC(-[0-9A-F]{4}){8}$/, 'het lid krijgt zijn code wel, om voor te lezen');
 
   // stap 1: scannen. De kassa ziet een kaart -- en nergens de code zelf.
   const gezien = await json(await api('/api/link/los', { tekst: cap.token }, zaak));
@@ -124,7 +124,7 @@ test('het scherm krijgt precies de vier dingen die het toont', async () => {
      precies het soort stille breuk waar deze toets voor staat. */
   const cap = await maakCap(lid.token, 7500);
   assert.match(cap.token, /^RTG1\./, 'de QR draagt het token');
-  assert.match(cap.eigen.code, /^[0-9A-F]{6}$/, 'de code om voor te lezen');
+  assert.match(cap.eigen.code, /^KC(-[0-9A-F]{4}){8}$/, 'de code om voor te lezen (128 bits, kern/pay/kasbak.js)');
   assert.equal(cap.eigen.maxCenten, 7500);
   assert.ok(cap.exp > Date.now(), 'geldig tot');
   const bron = fs.readFileSync(path.join(__dirname, '..', 'public/apps/pay.html'), 'utf8');
@@ -176,7 +176,7 @@ test('de oude weg blijft precies zo werken: er is maar EEN plek die een kassacod
   /* De verhuizing gaat over de DRAGER. Wie zijn code voorleest aan een kassa
      zonder camera, rekent nog gewoon af -- en langs dezelfde functie. */
   const k = await json(await api('/api/pay/kascode', { maxCenten: 2500 }, lid.token));
-  assert.match(k.code, /^[0-9A-F]{6}$/);
+  assert.match(k.code, /^KC(-[0-9A-F]{4}){8}$/);
   const inn = await json(await api('/api/supplier/pay/in', { code: k.code, centen: 800, oms: 'Bar', idem: 'oud-' + Date.now() }, zaak));
   assert.equal(inn.ok, true);
   assert.equal(inn.centen, 800);

@@ -34,7 +34,12 @@
   var gevraagd = false, af = null, gemeld = false;
 
   function pasToken() {
-    try { return localStorage.getItem('rtg_arrival_pass'); } catch (e) { return null; }
+    /* arrival.html bewaart { p, tot }: de pass en zijn vervaltijd. Een
+       verlopen pass wordt hier niet meer gebruikt. */
+    try {
+      var w = JSON.parse(localStorage.getItem('rtg_arrival_pass') || 'null');
+      return w && w.p && Date.parse(w.tot) > Date.now() ? w.p : null;
+    } catch (e) { return null; }
   }
   function lid() {
     try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; }

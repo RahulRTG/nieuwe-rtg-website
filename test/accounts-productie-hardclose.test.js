@@ -19,7 +19,12 @@ async function luister(app) {
     stop: () => new Promise(r => srv.close(r)) };
 }
 
-test('accountwrites zijn in productie vóór SQLite dicht en een ingeslikte fout wordt nooit 2xx', async () => {
+/* Sinds 27 september 2026 is een accountmutatie in productie niet meer altijd
+   dicht: binnen een verzoek opent hij een werkkopie die in de PostgreSQL-commit
+   landt (test/accounts-transactie.test.js). Wat BLIJFT, en wat deze proef
+   vasthoudt: buiten een verzoek is er geen weg, en kan de werkkopie niet open,
+   dan raakt de lokale cache niets en wordt een ingeslikte fout nooit 2xx. */
+test('accountwrites zonder werkkopie zijn in productie vóór SQLite dicht en een ingeslikte fout wordt nooit 2xx', async () => {
   const oudNode = process.env.NODE_ENV, oudUrl = process.env.DATABASE_URL;
   let sqliteWrites = 0, commits = 0;
   try {
@@ -30,7 +35,7 @@ test('accountwrites zijn in productie vóór SQLite dicht en een ingeslikte fout
     }) };
 
     const zin = accountState.zin('UPDATE users SET reset_hash = NULL WHERE id = ?');
-    assert.throws(() => zin.run(1), e => e && e.code === 'PG_ACCOUNTS_ATOMAIR_ONTBREEKT');
+    assert.throws(() => zin.run(1), e => e && e.code === 'PG_ACCOUNTS_GEEN_REQUEST');
     assert.equal(sqliteWrites, 0, 'de lokale cache wijzigde vóór de productiegrendel');
     duurzaamheid.internePublicatie(() => zin.run(1));
     assert.equal(sqliteWrites, 1, 'autoritatieve PG-replicatie mag de lokale leescache bijwerken');
@@ -99,10 +104,12 @@ test('broncensus vindt alle accountwrites achter S.zin en faalt op een directe C
   } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
 });
 
-test('accountstatus blijft machineleesbaar BLOCKED tot gedeelde requesttransacties bestaan', () => {
+test('accountstatus is machineleesbaar en draagt precies de vorm die go-live eist', () => {
+  /* Groen omdat de STRUCTUUR er is (deelnemersprotocol + commitlaag); dat hij
+     terugvalt als die wegvalt, beproeft test/accounts-transactie.test.js toets 9. */
   assert.deepEqual(duurzaamheid.releaseStand(), {
-    code: 'PG_ACCOUNTS_ATOMAIR_ONTBREEKT', gereed: false, transactioneel: false,
-    productieMutaties: 'gesloten', vereist: 'gedeelde-pg-requesttransactie'
+    code: 'PG_ACCOUNTS_ATOMAIR_BEVESTIGD', gereed: true, transactioneel: true,
+    productieMutaties: 'duurzaam', vereist: 'gedeelde-pg-requesttransactie'
   });
 });
 

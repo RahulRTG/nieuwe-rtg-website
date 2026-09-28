@@ -114,16 +114,16 @@ module.exports = ({ db, register, brug, merkVan, bedrijf, contract, levensloop, 
   function voorAccount(code, lid) { return bouw(code, lid, 'rtg-account'); }
 
   /* De weg via de RTG-sessie: alle werkruimtes waar dit account aan hangt.
-     Hier komt het LID-TOKEN mee naar buiten, en dat is met opzet: wie via zijn
-     eigen provider is binnengekomen, heeft geen tweede sleutel gekregen om in
-     te typen. Het gaat over een POST achter de gewone auth-poort en dus niet
-     via een URL -- dezelfde reden waarom routes/sso.js geen sessietoken in de
-     terugkeer-URL zet. */
-  function voorRtg(rtgKey) {
-    return brug.werkruimtesVan(rtgKey).map(({ werkruimte, lid }) => {
+     Buiten productie komt er een VERSE lid-sessie mee (bedrijf/sleutels.js):
+     wie via zijn provider binnenkwam heeft geen sleutel om in te typen, en
+     een oude wordt nooit opnieuw getoond -- er staat alleen een hash. POST
+     achter de auth-poort, dus nooit in een URL. De route bewaart. */
+  function voorRtg(rtgKey, alleen) {
+    const zl = bedrijf && bedrijf() && bedrijf().sleutels;
+    return brug.werkruimtesVan(rtgKey).filter(x => !alleen || x.werkruimte === alleen).map(({ werkruimte, lid }) => {
       const b = bouw(werkruimte, lid, 'rtg-sessie');
-      if (process.env.NODE_ENV !== 'production' && b && lid.status === 'actief' && lid.token)
-        b.lidToken = lid.token;
+      if (process.env.NODE_ENV !== 'production' && b && lid.status === 'actief' && zl)
+        b.lidToken = zl.geefLid(ruimte(werkruimte), lid);
       return b;
     }).filter(Boolean);
   }

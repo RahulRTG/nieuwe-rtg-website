@@ -193,7 +193,14 @@ test('4. elke route hoort bij een functie of bij de bediening', () => {
      in kern/bestuursroutes.js EN in kern/platformregister/bediening.js, en
      test/platformregister.test.js was groen -- 7 van 7 -- voordat dit getal
      werd verzet. `onverklaard <= 10` beweegt niet mee en staat nog op 10. */
-  assert.ok(zonder.length <= 147,
+  /* 147 -> 148: ZELF GAST WORDEN (besluit C5, 27 september 2026). /api/mijn/pas/gast
+     staat naast /api/mijn/abonnement: wie zich mag verbinden, mag zich losmaken,
+     en een schakelaar daarop houdt een lid vast aan een pas die hij niet meer wil.
+     Met dezelfde reden in kern/bestuursroutes.js EN in
+     kern/platformregister/bediening-recht.js, en test/platformregister.test.js was
+     groen -- 7 van 7 -- voordat dit getal werd verzet. `onverklaard <= 10` beweegt
+     niet mee. */
+  assert.ok(zonder.length <= 148,
     zonder.length + ' routes hangen aan geen enkele functie. Dat is de bediening van ' +
     'het platform (boardroom, techniek, gezondheid, isolatie) en die hoort niet schakelbaar ' +
     'te zijn, maar bij deze aantallen is er iets anders aan de hand.');

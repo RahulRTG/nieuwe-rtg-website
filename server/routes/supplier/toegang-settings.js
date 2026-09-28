@@ -9,6 +9,7 @@ module.exports = (kern) => {
   const { app, supplierAuth, managerOnly, ZAAK_OPTIES, LANDEN, save, logActivity,
     broadcastSync, sseToSupplier, shiftSamenvatting, notifySupplier } = kern;
   const G = require('../../kern/geschikt');
+  const ConnectionPartner = require('../../kern/connection-partner');
 
   app.post('/api/supplier/settings', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;
@@ -16,6 +17,11 @@ module.exports = (kern) => {
     const changed = [];
     if (typeof req.body.ordersOpen === 'boolean' && st.ordersOpen !== req.body.ordersOpen) { st.ordersOpen = req.body.ordersOpen; changed.push('bestellingen ' + (st.ordersOpen ? 'open' : 'dicht')); }
     if (typeof req.body.reservationsOpen === 'boolean' && st.reservationsOpen !== req.body.reservationsOpen) { st.reservationsOpen = req.body.reservationsOpen; changed.push('reserveringen ' + (st.reservationsOpen ? 'open' : 'dicht')); }
+    /* Een algemene reserveringsdeur is geen toestemming voor een Connection-
+       programma. De manager kiest deze deelname afzonderlijk; ontbrekend is
+       altijd uit. Lopende reserveringen worden niet aangeraakt. */
+    const connectionChanged = ConnectionPartner.update(req.supplier, req.body.connectionParticipation);
+    if (connectionChanged.length) changed.push('Connection-deelname voor ' + connectionChanged.join(', '));
     /* WAT DE ZAAK KAN. Dit is een uitspraak van de ondernemer en geen keuring
        door RTG -- net als de allergenen bij een gerecht. Wat er niet staat,
        geldt nergens als toegezegd: een lid met een harde eis krijgt deze zaak
@@ -86,6 +92,6 @@ module.exports = (kern) => {
         notifySupplier(req.supplier.code, { icon: 'logboek', title: 'Shift-samenvatting ' + sh.datum, body: delen.join(' · ') });
       } catch (e) {}
     }
-    res.json({ ok: true, settings: st });
+    res.json({ ok: true, settings: st, connectionParticipation: ConnectionPartner.project(req.supplier) });
   });
 };

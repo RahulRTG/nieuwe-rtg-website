@@ -7,9 +7,7 @@ module.exports = (kern) => {
     notify, findSupplier, salonZichtbaar, talen, AUTHOR_TIER, PERSONAS,
     zorgContact, liveCodename, salonClaimcode } = kern;
 
-  /* Zodra een lid echt in contact komt met een partner (hier: de partner volgen
-     of zijn Salon-etalage bekijken) openen we automatisch een open chatlijn. Zo
-     zijn ze nooit vreemden. Idempotent en stil voor gasten (geen ledenchat). */
+  // Een echt contact met de partner opent de bestaande ledenchatlijn.
   const openLijnVoor = (s, session) => {
     if (!s || session.tier === 'guest') return;
     try { zorgContact(s, session.key, liveCodename(session), session.tier); } catch (e) {}
@@ -18,7 +16,7 @@ module.exports = (kern) => {
 
   app.post('/api/like', auth, (req, res) => {
     const post = db.data.posts.find(p => p.id === Number(req.body.postId));
-    if (!post) return res.status(404).json({ error: 'Post niet gevonden.' });
+    if (!kern.salon.magLezen(req.session, post)) return res.status(404).json({ error: 'Post niet gevonden.' });
     // Gratis gebruikers (zonder pas) bekijken de Salon, maar liken en reageren niet
     // bij particulieren. Berichten van partners mogen ze wel waarderen.
     if (req.session.tier === 'guest' && !post.partner)
@@ -39,7 +37,7 @@ module.exports = (kern) => {
 
   app.post('/api/comment', auth, (req, res) => {
     const post = db.data.posts.find(p => p.id === Number(req.body.postId));
-    if (!post) return res.status(404).json({ error: 'Post niet gevonden.' });
+    if (!kern.salon.magLezen(req.session, post)) return res.status(404).json({ error: 'Post niet gevonden.' });
     if (!canEngage(req.session, post)) {
       return res.status(403).json({ error: engageError(req.session.tier) });
     }
@@ -67,7 +65,7 @@ module.exports = (kern) => {
 
   app.post('/api/dm', auth, (req, res) => {
     const post = db.data.posts.find(p => p.id === Number(req.body.postId));
-    if (!post) return res.status(404).json({ error: 'Post niet gevonden.' });
+    if (!kern.salon.magLezen(req.session, post)) return res.status(404).json({ error: 'Post niet gevonden.' });
     if (!canEngage(req.session, post)) {
       return res.status(403).json({ error: engageError(req.session.tier) });
     }
@@ -122,7 +120,7 @@ module.exports = (kern) => {
     const key = req.session.key;
     openLijn(s, req); // vanaf nu geen vreemden meer: open lijn zodra je de Salon bekijkt
     const t = db.data.supplierTypes[s.type] || {};
-    const eigen = db.data.posts.filter(p => p.partnerCode === s.code);
+    const eigen = db.data.posts.filter(p => p.partnerCode === s.code && kern.salon.magLezen(req.session, p));
     const claimVan = p => p.deal ? salonClaimcode.vindVanLid(p, key) : null;
     const items = eigen.map(p => ({
       id: p.id, at: p.at || null, text: p.text, photo: p.photo || null,
@@ -156,7 +154,7 @@ module.exports = (kern) => {
   app.post('/api/salon/poll/stem', auth, (req, res) => {
     if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
     const p = db.data.posts.find(x => x.id === Number(req.body.postId));
-    if (!p || !p.poll) return res.status(404).json({ error: 'Poll niet gevonden.' });
+    if (!kern.salon.magLezen(req.session, p) || !p.poll) return res.status(404).json({ error: 'Poll niet gevonden.' });
     if (p.poll.opties.some(o => o.stemmen.includes(req.session.key))) return res.status(409).json({ error: 'U heeft al gestemd.' });
     const i = Number(req.body.optie);
     if (!p.poll.opties[i]) return res.status(400).json({ error: 'Onbekende optie.' });

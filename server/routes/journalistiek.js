@@ -45,8 +45,8 @@ module.exports = (kern) => {
     res.json({ artikel: a });
   }));
   app.post('/api/supplier/redactie/artikel/bewaar', supplierAuth, doe((req, res) => stuur(res, journalistiek.bewaarArtikel(code(req), req.body || {}, req.actor))));
-  app.post('/api/supplier/redactie/artikel/publiceer', supplierAuth, doe((req, res) => stuur(res, journalistiek.publiceer(code(req), (req.body || {}).id, req.actor))));
-  app.post('/api/supplier/redactie/artikel/concept', supplierAuth, doe((req, res) => stuur(res, journalistiek.naarConcept(code(req), (req.body || {}).id))));
+  app.post('/api/supplier/redactie/artikel/publiceer', supplierAuth, doe((req, res) => stuur(res, journalistiek.publiceer(code(req), (req.body || {}).id, req.actor, req.body || {}))));
+  app.post('/api/supplier/redactie/artikel/concept', supplierAuth, doe((req, res) => stuur(res, journalistiek.naarConcept(code(req), (req.body || {}).id, req.actor, req.body || {}))));
   app.post('/api/supplier/redactie/artikel/verwijder', supplierAuth, doe((req, res) => stuur(res, journalistiek.verwijderArtikel(code(req), (req.body || {}).id))));
   app.post('/api/supplier/redactie/snel', supplierAuth, doe((req, res) => stuur(res, journalistiek.snel(code(req), req.body || {}, req.actor))));
   app.post('/api/supplier/redactie/rubriek/bewaar', supplierAuth, doe((req, res) => stuur(res, journalistiek.rubriekBewaar(code(req), (req.body || {}).naam))));

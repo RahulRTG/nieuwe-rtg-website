@@ -19,7 +19,7 @@
 const { idVanKey } = require('../lib/lidsleutel');
 
 module.exports = (kern, hulp) => {
-  const { accounts, archief, bewerkCollectie, crypto, db, etaMinutes, findSupplier, onboarding, haversine, keyVanCodenaam, klokVan, leeftijdVan, logActivity, notify, openVacatures, notifySupplier, path, rememberSession, save, schoon, sseToCustomer, sseToOffice, supplierState, zetRtgai } = hulp;
+  const { accounts, archief, bewerkCollectie, crypto, db, etaMinutes, findSupplier, onboarding, haversine, keyVanCodenaam, klokVan, leeftijdVan, logActivity, media, notify, openVacatures, notifySupplier, path, rememberSession, save, schoon, sseToCustomer, sseToOffice, supplierState, zetRtgai } = hulp;
 
 /* De gegevenspoort (kern/gegevenspoort.js + kern/gegevensgesprek.js): een gratis
    account vraagt vier dingen; pas als er een DERDE PARTIJ bij komt (een zaak, een
@@ -49,14 +49,8 @@ Object.assign(kern, require('../kern/werkbijlogin').maakWerkBijLogin({
   logInlog: kern.logInlog, logActivity, supplierState, persoonsPoort: kern.persoonsPoort,
   sessieregister: hulp.sessieregister
 }));
-/* RTG Vonk (kern/vonk.js): dating op codenaam met de Salon-veiligheidslat
-   (18+ en KYC via de podium-poort), een eindige dagselectie, en bij een
-   match automatisch een tafel bij een partner rond het midden van de twee
-   woonplaatsen (EUR 10 p.p. vooraf: EUR 5 RTG, EUR 5 aanbetaling zaak). */
-Object.assign(kern, require('../kern/vonk').maakVonk({
-  db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan: kern.codenaamVan, keyVanCodenaam,
-  haversine, etaMinutes, findSupplier, reserveerTafel: kern.reserveerTafel, pay: kern.pay, notify, sseToCustomer, sseToOffice
-}));
+/* RTG Vonk: de eigen bedrading staat naast deze samenstellingslaag. */
+require('./kernlaag7-vonk')(kern, hulp);
 /* De voorspeller (kern/voorspel.js): leert het ritme van elk lid en elke
    zaak uit het RTG Pay-grootboek (de ene bron waar elke app in boekt) en
    zet verwachtingen klaar voor de apps en voor Rahul. */

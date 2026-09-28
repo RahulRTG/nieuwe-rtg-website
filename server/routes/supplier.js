@@ -28,6 +28,7 @@ require('./supplier/genreplan')(kern);
 require('./supplier/genreblik')(kern);
 require('./supplier/eten')(kern); // een operationeel orderbeeld boven horeca + oudere orders
 require('./supplier/onderneming')(kern); // de onderneming ACHTER deze zaak; brug een kant op, zie de kop
+require('./supplier/doossleutels')(kern); // de sleutels van de eigen Zaakdozen (B12)
 
 app.post('/api/supplier/schedule', supplierAuth, (req, res) => res.json(scheduleFor(req.supplier.code)));
 

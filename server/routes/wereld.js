@@ -86,6 +86,7 @@ module.exports = (kern) => {
     if (!rechten.TRAP.includes(tier))
       return res.status(403).json({ error: 'RTG Wereld is er voor leden met een pas.' });
     res.json({
+      saloon: { voorkeuren: feed.saloon.voorkeuren(req.session.key), bronnen: feed.saloon.bronnen },
       ik: { codenaam: liveCodename(req.session) || 'Een lid', pas: tier },
       lidmaatschap: lidmaatschap.voorSessie(req.session),
       lenzen: lidmaatschap.lenzenVoor(tier),
@@ -115,10 +116,11 @@ module.exports = (kern) => {
       return res.status(403).json({ error: 'Deze wereld hoort bij een andere pas.' });
     W().modus[req.session.key] = modus;
     save();
-    res.json({ ok: true, modus });
+    const saloon = req.body.saloon ? feed.saloon.zetVoorkeuren(req.session.key, req.body.saloon) : null;
+    res.json({ ok: true, modus, saloon });
   });
 
-  app.post('/api/wereld/feed', auth, (req, res) => {
+  app.post('/api/wereld/feed', auth, async (req, res) => {
     const tier = req.session.tier;
     if (!rechten.TRAP.includes(tier))
       return res.status(403).json({ error: 'RTG Wereld is er voor leden met een pas.' });
@@ -128,6 +130,10 @@ module.exports = (kern) => {
       const gekozen = lidmaatschap.lenzenVoor(tier).find(x => x.id === lens);
       if (!gekozen || !gekozen.open)
         return res.status(403).json({ error: (gekozen && gekozen.reden) || 'Deze lens is niet beschikbaar.' });
+    }
+    if (req.body.ervaring === 'saloon') {
+      const d = await feed.saloon.lees(req.session, { ...req.body, modus, lens });
+      return res.status(d.error ? 403 : 200).json(d);
     }
     const uit = feed({ tier, key: req.session.key, modus, lens,
       vanaf: req.body.vanaf, hoeveel: req.body.hoeveel });

@@ -47,14 +47,12 @@ const OVERGANG = {
   gewist: ['afgevoerd'],
   afgevoerd: []
 };
-const SLEUTEL_OVERLAP_MS = 24 * 60 * 60 * 1000;   // de oude sleutel blijft een dag geldig
 const KALIBRATIE_MAANDEN = 24;                     // daarna is een meting geen meting meer
 const BUFFER_DAGEN = 30;                           // zo ver mag een doos nabestellen
 
 module.exports = (ctx) => {
-  const { d, save, crypto, schoon, nu, nodes, seintje, beveilig } = ctx;
+  const { d, save, schoon, nu, nodes, seintje, sleutels } = ctx;
 
-  const hash = s => crypto.createHash('sha256').update(String(s)).digest('hex');
   const paspoorten = () => { if (!d().stadPaspoort || typeof d().stadPaspoort !== 'object') d().stadPaspoort = {}; return d().stadPaspoort; };
 
   /* Het paspoort van een doos. Bestaat er nog geen (alle dozen die er al
@@ -76,7 +74,7 @@ module.exports = (ctx) => {
     return p[n.serial];
   }
 
-  const publiek = (pp, n) => ({ ...pp, naam: n.naam, zone: n.zone, sensoren: n.sensoren,
+  const publiek = (pp, n) => ({ ...pp, naam: n.naam, zone: n.zone, sensoren: n.sensoren, sleutel: sleutels.stand(n),
     demo: !!n.demo, kalibratieGeldigMaanden: KALIBRATIE_MAANDEN,
     kalibratieVerlopen: verlopenSensoren(pp, n), mag: OVERGANG[pp.fase] || [] });
 
@@ -115,25 +113,20 @@ module.exports = (ctx) => {
     return { ok: true, paspoort: publiek(pp, n) };
   }
 
-  /* Sleutelrotatie. De nieuwe sleutel wordt EEN keer getoond; de oude blijft
-     SLEUTEL_OVERLAP_MS geldig zodat een doos die net offline was hem nog kan
-     ophalen. Zonder die overlap sluit je precies de apparaten buiten waar je
-     het minst vaak bij kunt. */
+  /* Sleutelrotatie. De nieuwe sleutel (met vervaldatum en manifestsleutel)
+     wordt EEN keer getoond; de oude overlapt kort, zie ./doossleutel.js. */
   function sleutelNieuw({ serial, wie }) {
     const n = nodes()[String(serial || '')];
     if (!n) return { status: 404, error: 'Onbekende Stadsdoos.' };
     if (n.demo) return { status: 400, error: 'Een demodoos heeft geen sleutel; die bestaat alleen op papier.' };
     const pp = paspoort(n.serial);
     if (['gewist', 'afgevoerd'].includes(pp.fase)) return { status: 400, error: 'Deze doos is ' + pp.fase + '; die krijgt geen sleutel meer.' };
-    const nieuw = crypto.randomBytes(16).toString('hex');
-    n.oudeSleutel = n.sleutelHash ? { hash: n.sleutelHash, tot: nu() + SLEUTEL_OVERLAP_MS } : null;
-    n.sleutelHash = hash(nieuw);
-    n.sleutelAt = nu();
+    const s = sleutels.geef(n, wie);
     save(); seintje();
-    return { ok: true, serial: n.serial, sleutel: nieuw,
+    return { ok: true, serial: n.serial, ...s,
       oudeGeldigTot: n.oudeSleutel ? n.oudeSleutel.tot : null,
-      let_op: 'Bewaar de sleutel nu; hij wordt niet nog eens getoond. De oude blijft ' +
-        (SLEUTEL_OVERLAP_MS / 3600000) + ' uur geldig, zodat een doos die offline was hem nog kan ophalen.',
+      let_op: 'Bewaar de sleutel en de manifestsleutel nu; ze worden niet nog eens getoond. De oude sleutel blijft ' +
+        (sleutels.OVERLAP_MS / 3600000) + ' uur geldig, zodat een doos die offline was niet buitengesloten wordt.',
       wie: schoon(wie, 60) || 'kantoor' };
   }
 

@@ -82,13 +82,13 @@ function maakOchtendkaart({ db, scheduleFor, klokVan, verzuim, vrij, vandaag }) 
         : 'Nog geen reserveringen voor vandaag.' };
   }
 
-  const WAT = { dienst: 'je dienst', team: 'of het team compleet is', levering: 'de leveringen', gasten: 'de reserveringen' };
+  const NAKIJKWOORD = { dienst: 'je dienst', team: 'of het team compleet is', levering: 'de leveringen', gasten: 'de reserveringen' };
   /* De kop noemt de OORZAAK en niet elke regel die eraan lijdt: een rooster dat
      niet is vastgesteld maakt zowel de dienst als het team een vermoeden, en
      dat is één ding en geen twee. Wat niet na te kijken was, gaat voor. */
   function kop(regels, vast) {
     const onbekend = regels.filter(r => r.graad === 'onbekend');
-    if (onbekend.length) return 'Ik kon niet nakijken: ' + onbekend.map(r => WAT[r.soort] || r.soort).join(' en ') + '.';
+    if (onbekend.length) return 'Ik kon niet nakijken: ' + onbekend.map(r => NAKIJKWOORD[r.soort] || r.soort).join(' en ') + '.';
     if (!vast && regels.some(r => r.graad === 'vermoed'))
       return 'Het rooster van vandaag is nog niet vastgesteld: dit is het standaardpatroon.';
     const aandacht = regels.filter(r => r.aandacht);

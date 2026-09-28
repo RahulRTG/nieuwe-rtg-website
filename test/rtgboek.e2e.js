@@ -46,8 +46,12 @@ test('Financien vult het boek van RTG, en het scherm liegt niet over een half bo
     /* DE WEDLOOP DIE CI VOND: de scripts van dit paneel laden onderaan de pagina,
        terwijl de kamer al opengaat zodra de server antwoordt. Op een trage runner is
        de kamer open voordat ze er zijn, en dan bleef het paneel leeg. Ze hier
-       vertragen maakt die volgorde vast in plaats van haar aan het toeval te laten. */
-    await page.route(/\/apps\/kantoren-rtg(boek|campagne)\.js/, async (route) => { await new Promise(r => setTimeout(r, 2500)); await route.continue(); });
+       tegenhouden tot de kamer Financien open op het scherm staat, maakt die volgorde
+       vast in plaats van haar aan het toeval te laten -- op een toestand, niet op een klok. */
+    await page.route(/\/apps\/kantoren-rtg(boek|campagne)\.js/, async (route) => {
+      await page.waitForSelector('#vKamer:not([hidden]) #kRtgBoek:not([hidden])', { timeout: 20000 });
+      await route.continue();
+    });
     await page.goto(srv.base + '/apps/kantoren.html?kamer=financien', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#kRtgBoek:not([hidden]) [data-rbdeel="vast"][data-rbpost="huisvesting"]', { timeout: 20000 });
     const maand = await page.locator('#kRbMaand').inputValue();

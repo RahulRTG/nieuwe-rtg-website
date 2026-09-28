@@ -54,6 +54,11 @@ const WORTEL = path.join(__dirname, '..', '..');
    er geen programma is en dat een mens of een keuring hem onderhoudt -- dan hoort
    er een LEZER bij te staan, want een register dat niemand leest is geen register. */
 const EIGENAAR = {
+  /* Uit ONVERKLAARDE_BOTSING gehaald op 28 september 2026, toen een verse
+     outputproef voor het eerst een instrument in zijn stempel droeg. De reden
+     staat in de kop van scripts/outputband.js zelf en is hier niet verzonnen. */
+  'OUTPUTPROEF.json': { schrijver: 'scripts/outputproef.js',
+    waarom: 'outputband.js is "GEEN TWEEDE METING": de selectie (kiesKandidaten) en de meting (meetEen) komen allebei uit outputproef.js; de band bepaalt alleen wie wat wanneer meet en houdt EEN schrijver op het register. De meetronde draait outputproef.js, en die zet zich in de stempel.' },
   /* Twee registers uit de afbouw van APPWERKT (24 september 2026). Beide zijn
      een bron voor een bewijs en worden via versheid() gelezen, dus hun eigenaar
      staat hier en niet alleen in de detectie. */
@@ -371,7 +376,6 @@ function wortelregisters() {
    en een reden verzinnen is precies wat regel 13 verbiedt. */
 const ONVERKLAARDE_BOTSING = {
   'ENVELOP.json': 'scripts/actorvormen.js en scripts/envelopvelden.js schrijven er allebei naar',
-  'OUTPUTPROEF.json': 'scripts/outputband.js en scripts/outputproef.js schrijven er allebei naar',
 };
 
 module.exports = { EIGENAAR, ONVERKLAARDE_BOTSING, detecteer, wortelregisters, WORTEL };

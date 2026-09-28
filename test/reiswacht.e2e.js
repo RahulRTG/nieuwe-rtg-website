@@ -22,6 +22,20 @@ const { startServer, stop, letOpFouten, browserOpties, geenBrowser, laadPlaywrig
 const pw = laadPlaywright();
 const dag = (n) => { const x = new Date(); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };
 
+/* HET OVERZICHT OPENEN. Sinds de warme desktopstandaard (#413) staat de eigen
+   inhoud van een wereldhuis -- hier het reisoverzicht met de wacht -- onder een
+   INGEKLAPT <details class="wp-domain"> "Uw volledige overzicht", met de sfeer
+   en de hoofdactie erboven. Dat is een bewuste keuze van dat ontwerp en geen
+   verborgen fout, dus opent deze toets het overzicht zoals een lid dat doet: op
+   de summary. Pas daarna is de wacht ZICHTBAAR en heeft innerText iets te
+   lezen. De toets verzwakt daarmee niets: wat hij van de wacht eist, blijft
+   gelijk. Zonder die laag (een scherm zonder de standaard) doet dit niets. */
+async function openOverzicht(page) {
+  await page.waitForFunction(() => !!document.body.dataset.rtgDesktopState, null, { timeout: 20000 });
+  const dicht = page.locator('details.wp-domain:not([open]) > summary');
+  if (await dicht.count()) await dicht.click();
+}
+
 test('de reiswacht op het scherm: signalen met bron, de ontbrekende bronnen, en rust die gezegd wordt',
   { skip: geenBrowser(pw) }, async (t) => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-wacht-e2e-'));
@@ -47,6 +61,7 @@ test('de reiswacht op het scherm: signalen met bron, de ontbrekende bronnen, en 
 
     /* ---- eerst de rust: een lid zonder reizen ---- */
     await page.goto(srv.base + '/apps/reizen.html', { waitUntil: 'domcontentloaded' });
+    await openOverzicht(page);
     /* Op ZICHTBARE tekst wachten, zoals de tweede wacht hieronder al doet:
        innerText is leeg zolang de wereldstart-laag de inhoud nog verbergt, en
        textContent staat er dan al. Wie op textContent leest, meet de leegte
@@ -71,6 +86,7 @@ test('de reiswacht op het scherm: signalen met bron, de ontbrekende bronnen, en 
     assert.equal(bev.status, 200);
 
     await page.reload({ waitUntil: 'domcontentloaded' });
+    await openOverzicht(page);
     await page.waitForFunction(() => {
       const el = document.querySelector('#wacht');
       return el && !/Laden/.test(el.textContent) && /India/.test(el.innerText);
@@ -124,6 +140,7 @@ test('de knop "Los het op": van visumvraag naar een taak in de agenda, in twee k
     const fouten = [];
     letOpFouten(page, fouten);
     await page.goto(srv.base + '/apps/reizen.html', { waitUntil: 'domcontentloaded' });
+    await openOverzicht(page);
     await page.waitForSelector('#wacht [data-los]', { timeout: 20000 });
 
     await page.click('#wacht [data-los]');

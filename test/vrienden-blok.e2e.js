@@ -70,6 +70,35 @@ const NA_DE_BREUK = ['#pinNoodKnop', '#chatSend', '#chatX', '#chatBel', '#chatVi
   '#snapBtn', '#stWis', '#studioX', '#snapX', '#storyX', '#belWeg',
   '#inkJa', '#inkNee', '#fotoIn'];
 
+/* WIE VROEG DE CONTACTENLIJST OP? Sinds de gedeelde desktopstandaard (#413)
+   staat ook dit scherm in het kader met het paneel "Uw mensen", en dat paneel
+   haalt voor een gezin DEZELFDE route op (world-desktop-people.js ->
+   familyRequest('/api/rtf/social/connections'), met hetzelfde lichaam). Spoor 1
+   en 4 lazen dat verzoek als bewijs dat laad() had gedraaid, en de zelfijking
+   zag het meteen: zonder #pinNoodKnop brak het blok wel af, maar de lijst werd
+   toch opgehaald -- door het kader. De toets mat dus niet meer wat hij beweert.
+
+   Het kader wordt daarom niet weggelaten (het is een bewuste laag van dat
+   ontwerp) maar herkend: een verzoek naar /api/rtf/social/ dat uit
+   /shared/interface/ komt, krijgt in deze toets een merkkop, en telt niet als
+   spoor van het scriptblok. De stapel is het enige dat de twee verzoeken
+   onderscheidt; de route, de methode en het lichaam zijn gelijk. */
+const KADER_KOP = 'x-toets-herkomst';
+function merkKaderVerzoeken() {
+  Error.stackTraceLimit = 50;
+  const orig = window.fetch;
+  window.fetch = function (bron, opties) {
+    try {
+      const url = String((bron && bron.url) || bron);
+      if (url.indexOf('/api/rtf/social/') >= 0 && /\/shared\/interface\//.test(new Error().stack || '')) {
+        opties = Object.assign({}, opties, { headers: Object.assign({}, opties && opties.headers, { 'X-Toets-Herkomst': 'kader' }) });
+      }
+    } catch (e) { /* meten mag het scherm nooit breken */ }
+    return orig.call(this, bron, opties);
+  };
+}
+const vanHetKader = (r) => r.headers()[KADER_KOP] === 'kader';
+
 test('RTG Vrienden: het scriptblok loopt tot het einde -- lijst, stream, verversing en de late knoppen',
   { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-vrienden-blok-'));
@@ -91,12 +120,13 @@ test('RTG Vrienden: het scriptblok loopt tot het einde -- lijst, stream, ververs
       localStorage.setItem('rtg_lang', 'nl');
       localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, { code: g.code, token: g.token, profiel: { naam: 'Papa', beheerder: true } });
+    await ctx.addInitScript(merkKaderVerzoeken);
     const page = await ctx.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
     const paden = [];
     page.on('request', (r) => { const u = r.url().replace(base, '');
-      if (u.startsWith('/api/rtf/social')) paden.push(u.split('?')[0]); });
+      if (u.startsWith('/api/rtf/social') && !vanHetKader(r)) paden.push(u.split('?')[0]); });
 
     await page.goto(base + '/apps/foundation/vrienden.html', { waitUntil: 'domcontentloaded' });
 
@@ -174,9 +204,10 @@ test('RTG Vrienden: het scriptblok loopt tot het einde -- lijst, stream, ververs
       const html = (await res.text()).replace('id="pinNoodKnop"', 'id="pinNoodKnopWEG"');
       await route.fulfill({ response: res, body: html, headers: { ...res.headers(), 'content-length': undefined } });
     });
+    await ctx2.addInitScript(merkKaderVerzoeken);
     const page2 = await ctx2.newPage();
     page2.on('request', (r) => { const u = r.url().replace(base, '');
-      if (u.startsWith('/api/rtf/social')) zonderKnop.push(u.split('?')[0]); });
+      if (u.startsWith('/api/rtf/social') && !vanHetKader(r)) zonderKnop.push(u.split('?')[0]); });
     await page2.goto(base + '/apps/foundation/vrienden.html', { waitUntil: 'domcontentloaded' });
     /* Op afwezigheid kun je niet wachten; wel tot de pagina is uitgepraat. */
     await wachtOpNetstilte(page2, { stilMs: 1500, maxMs: 8000 });

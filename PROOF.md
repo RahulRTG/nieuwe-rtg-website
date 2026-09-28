@@ -219,6 +219,16 @@ aan: `POST /api/office/bank/incasso` -> IDEMPOTENCY uit IDEMPROEF.json (adc9db1b
 `vertrouwen.js --vastleggen` terecht**: een van de elf bronnen hoort niet bij
 deze code. VERTROUWEN.json staat nog op zijn meting van 3 september.
 
+**Ook de faalproef bleef op zijn oude meting.** De verse ronde zag
+`/api/office/magnaat/scan` niet meer zakken, maar niet omdat de route beter
+werd: onder `schrijf-verloren` staat "het verraad greep hier niet aan". De
+sabotage bereikte de schrijfweg niet, en waarom is niet vastgesteld. Een verse
+meting die een bekend, verklaard gebrek niet kan reproduceren, overschrijft de
+meting die het wel zag niet -- dezelfde regel als bij IDEMPROEF -- dus
+FAALPROEF.json staat op 14 september en HERREKENBAAR.json houdt zijn onderwerp.
+(`test/herrekenbaar.test.js` zag het meteen: een besluitregister zonder gezakte
+route is geheugen geworden.)
+
 **De verdeling**, oud (VERTROUWEN.json, df1a581a, 4738 routes) tegenover vers
 berekend (5154 routes):
 

@@ -23,6 +23,22 @@ test('hetzelfde veld krijgt per deelgebied een ander ding', () => {
   assert.deepEqual(idVoor(extra, '/api/lab2/mijn/observatie'), { id: 'P1' });
 });
 
+/* De hele tabel, per ding. Vier voorbeelden hierboven laten elf deelgebieden
+   vrij: /themas van 'lab' naar 'studie' zetten bleef groen, en dan meet de
+   proef stil het verkeerde ding (de 1938 -> 1936 uit ./idperdeel.js). */
+test('elk deelgebied wijst naar het ding dat zijn weigering noemt', () => {
+  const perDing = {};
+  for (const [sub, wat] of Object.entries(ID_BETEKENIS))
+    (perDing[wat] = perDing[wat] || []).push(sub.slice('/api/lab2/'.length));
+  for (const l of Object.values(perDing)) l.sort();
+  assert.deepEqual(perDing, {
+    apparaat: ['app'],
+    labpas: ['mijn'],
+    lab: ['impact', 'lab', 'opbrengst', 'overzicht', 'themas'],
+    studie: ['bewijs', 'bewoner', 'coach', 'ethiek', 'mens', 'plan', 'studie', 'uit', 'werk']
+  });
+});
+
 /* Een deelgebied dat er niet in staat krijgt GEEN id. Een gok zou hier een
    404 vervangen door een stille meting op het verkeerde ding. */
 test('een onbekend deelgebied krijgt niets mee', () => {

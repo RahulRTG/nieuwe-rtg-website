@@ -1344,7 +1344,15 @@ const GEEN_BRONMUTATIE = new Map([
      definieert een genre buiten het register, elk genre heeft een bestaande
      sector. Een liegpoort die antwoorden leegmaakt raakt een registervergelijking
      niet. */
-  ['genreregister.test.js', 'een census over de genre-definities (staat elk genre in het register, heeft elke sector genres); een leeggemaakt antwoord raakt een registervergelijking niet']
+  ['genreregister.test.js', 'een census over de genre-definities (staat elk genre in het register, heeft elke sector genres); een leeggemaakt antwoord raakt een registervergelijking niet'],
+  /* DE SAMENVOEGING VAN 27-28 SEPTEMBER 2026 (PR #412): vijf toetsen die de
+     motor voor het eerst mat en die hij niet kon laten zakken. Elk is met de
+     hand beproefd; de regel noemt wat er raak was. */
+  ['modelkeuze.test.js', 'bewaakt bestandsinhoud (welke modelnaam in welk server-bestand) en de prijstabel in ai-prijzen.js, niet ai-meter.js dat PRIJZEN alleen doorgeeft; geen operator verandert een tekenreeks; 3 handmutaties raak: kern/bijles.js naar claude-haiku-4-5 laat toets 1 zakken, kern/agenda.js naar claude-opus-4-8 toets 4, de haiku-rij uit ai-prijzen.js toets 5'],
+  ['signatureroutes.test.js', 'datamodule met twee voorvoegsels, een VANAF-set en een rolnaam; de motor vond maar 2 operatorplekken (dun) en raakt geen set-lid, tekenreeks of padgrens; 3 handmutaties raak: startsWith in plaats van dekt() laat toets 2 zakken (/api/vonkelend), member-zakelijk in VANAF toets 4, rol member-account in plaats van member-signature toets 3'],
+  ['rtfos-context.test.js', 'toetst kern/rtfos/basis.js, dat via require(path.join(MAP, \'basis\')) laadt en dus buiten het zicht van de motor valt (die koos server/kluis.js, dat alleen als passagier op ctx gaat); 3 handmutaties raak: euro deelt door 10 laat toets 2 zakken, een negatief bedrag doorlaten in naarCenten toets 2, euro uit het teruggegeven object halen toets 1 en 2'],
+  ['livinglab-observatorium.test.js', 'motor muteerde de bedrading in livinglab/index.js; 4 handmutaties in observatorium(seinen).js, alle vier raak: zwaarste() omgedraaid laat toets 2, 3 en 4 zakken, klachtfilter !== open toets 3, geldbron-grendel weg toets 4, stilgelegd/klachten nooit storing toets 2 en 3'],
+  ['travel-bearer-productiepoort.test.js', 'sinds de migratie van #403 is PER_ROUTE leeg: de poort houdt niets tegen, dus een mutatie in de methode- of NODE_ENV-grendel verandert niets waarneembaars (isProductie omgedraaid: 8/8 groen, terecht); wat er wel te zien is, is bewaakt: een route terug aan de grendel (/api/arrival/request) laat toets 1, 2, 6 en 8 zakken'],
 ]);
 
 /* Welke SERVERMODULE toetst dit bestand? Uit zijn eigen requires: een pure toets

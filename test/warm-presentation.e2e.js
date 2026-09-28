@@ -63,6 +63,12 @@ test('four worlds share the drawn desktop and mobile composition, and editor sav
   }finally{await ctx.close();}
 });
 test('family photo uploads, gallery, cancel and profile switches use only the selected family identity',async()=>{
+  for (const route of ['/api/foundation/gezin/beelden', '/api/foundation/gezin/beelden/zet',
+    '/api/foundation/gezin/beelden/mijn', '/api/foundation/gezin/beelden/haal',
+    '/api/foundation/gezin/beelden/upstart', '/api/foundation/gezin/beelden/updeel',
+    '/api/foundation/gezin/beelden/upklaar', '/api/foundation/gezin/beelden/upload']) {
+    assert.equal((await api(route, {}, first)).status, 401, route + ' rejects a member token without the chosen family profile');
+  }
   async function family(route,body){return api('/api/foundation/gezin/'+route,body,null);}
   const made=await family('maak',{gezinsnaam:'Eigen beelden',naam:'Ouder',pin:'1234',bevoegdGezin:true,privacyAkkoord:true});assert.equal(made.status,200);const parent=made.body;
   const child=await family('profiel/maak',{code:parent.code,token:parent.token,naam:'Milan',rol:'kind',geboortedatum:'2015-04-04',pin:'5678'});assert.equal(child.status,200);

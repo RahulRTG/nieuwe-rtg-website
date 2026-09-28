@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1761,
-    "toetsenNietGemeten": 631,
+    "toetsenNietGemeten": 632,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -3087,6 +3087,16 @@
       "meter": "bewijsAchterstand 2418 -> 2712",
       "reden": "DEZELFDE VORM ALS DE NOTITIE VAN 12 SEPTEMBER: EEN GROTERE NOEMER, GEEN ACHTERUITGANG. OUTPUTPROEF.json is voor het eerst sinds 3 september hermeten, uit het routejournaal van een volle suite (74e97d99). Die zag 5151 routes tegen 4747: +404, en scripts/routenoemer.js reproduceert dat als leeftijd (+416 routes sinds df1a581a, 0 verdwenen, 0 onverklaard). De 4151 bewezen OUTPUT-cellen bleven EXACT gelijk; de nieuwe routes landden als 294 onbeslist (output-niet-toerekenbaar 285 -> 579, want een inhoudgevoelige toets die ze raakt, raakt ook andere) en 110 ongemeten. De hele groei van 294 zit in die ene post.\n\nWAAROM NIET NIET HERMETEN: een register van 25 dagen oud over een router die 416 routes groeide, is precies de schijnzekerheid waar PROOF.md par. 2a nu per cel op let -- 1416 OUTPUT-cellen stonden op verouderd.",
       "waarheen": "de 294 onbesliste routes toerekenbaar maken (een toets die er alleen die route raakt, of een verklaring in BEWIJSSCHULD.json). Vervalt 2026-12-28: staat hij dan nog op 2712 of hoger, dan is dit geen noemergroei meer maar achterstand die niemand aflost."
+    },
+    {
+      "datum": "2026-09-28",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 631,
+      "vervalt": "2026-12-28",
+      "meter": "toetsenNietGemeten 631 -> 632",
+      "reden": "test/meetronde.test.js is nieuw: hij houdt vast dat een instrument dat omvalt geen 'klaar' is (de auditproef laadde drie weken niet en de meetronde meldde elke keer klaar) en dat elk instrument in de ronde laadt. Zijn module (scripts/lib/valom.js) is een regex plus een ||, en geen van de vier operatoren van de motor komt erin voor: 0 pogingen, dus staat hij in GEEN_BRONMUTATIE en telt hij eerlijk als niet gemeten. Met de hand nagetrokken: || -> && laat toets 1 zakken, en de oorspronkelijke kapotte auditproef laat toets 2 zakken.",
+      "waarheen": "een operator in de motor die || en && omdraait zou deze toets meetbaar maken; tot die tijd is de handmutatie het bewijs. Vervalt 2026-12-28."
     }
   ],
   "prestatie": {

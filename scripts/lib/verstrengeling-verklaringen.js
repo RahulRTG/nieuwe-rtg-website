@@ -319,6 +319,8 @@ module.exports = [
     reden: 'routes/kantoren/regie.js r.28: dezelfde papierendeur wordt door meerdere ingangen opgehangen, en dat is precies een deur en geen kopie' },
   { van: 'ingang:magnaatwereld', naar: 'ingang:magnaatstad', soort: 'PRESENTATIE',
     reden: 'routes/magnaatwereld.js r.22 hangt de stadkant van dezelfde ingang op (samen in een Oudwijk); apart omdat magnaatwereld.js op de 10 kB-grens staat, en met alleen app, auth, geenGast en magnaatWereld zodat het geen tweede domein op de kern wordt' },
+  { van: 'ingang:ik', naar: 'ingang:presentatie-beelden', soort: 'PRESENTATIE',
+    reden: 'routes/ik.js r.16 hangt de persoonlijke beeldkeuze (#413) aan dezelfde ik-ingang: /api/ik/beelden is het eigen scherm van het lid, achter auth en in de eigen bestandenkluis' },
   { van: 'ingang:leven', naar: 'ingang:levenmentor', soort: 'PRESENTATIE',
     reden: 'routes/leven.js r.61 hangt de mentorkant van dezelfde ingang op' },
   { van: 'ingang:sociaal', naar: 'ingang:socialerahul', soort: 'PRESENTATIE',

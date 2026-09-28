@@ -42,3 +42,11 @@
 .wk-merk-naam span{display:block;font-size:8px;color:var(--wk-soft)}
 .wk-merk-voet{grid-column:1/-1;font-size:8px;line-height:1.5;color:var(--wk-soft);border-top:1px solid var(--wk-line);padding-top:.5rem}
 .wk-merk-voet .stil{display:block}
+/* Desktopstandaard (#413): het wereldkader zet de werkruimte in een schermvlak
+   van 656 breed, en dat vlak (`contain:layout`) is het bevattende blok van wat
+   hier `fixed` staat. De volledige Rahul-pagina hield zijn venstermaten --
+   64px onder de Edge, 150px zijmarge -- en kreeg zo 200px om in te schrijven:
+   zijn vraagveld schoof onder het vlak door, tot onder de zwevende Edge, en
+   was niet meer aan te tikken. In het vlak begint hij bovenaan, met een marge
+   die bij een vlak past, en scrolt hij zelf als zijn gesprek langer wordt. */
+body[data-rtg-desktop] .wd-page .wk-main>.wk-rahul.page{top:0;padding:clamp(20px,3vw,32px);overflow:auto}

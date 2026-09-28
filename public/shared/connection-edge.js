@@ -17,7 +17,7 @@
     try { ingebed = w.self !== w.top || new URLSearchParams(w.location.search).get('embed') === '1'; } catch (e) { ingebed = true; }
     var staat = { product:o.product, huidig:'root', context:{ kind:'root' }, model:null, root:null,
       kind:null, kindContext:null, gekozen:'', teller:0, weg:false, sleutel:'' };
-    var host = d.createElement('div'); host.className = 'connection-edge connection-edge--' + o.product + (ingebed ? ' is-embedded' : ''); host.hidden = true;
+    var host = d.createElement('div'); host.className = 'connection-edge connection-edge--' + o.product + (ingebed ? ' is-embedded' : ' is-inline'); host.hidden = true;
     host.setAttribute('role', 'navigation');
     host.setAttribute('aria-label', o.product === 'vonk' ? 'Vonk bediening' : 'Rendez-vous bediening');
     host.setAttribute('data-i18n-aria', 'connection.edge.label.' + o.product);
@@ -37,20 +37,16 @@
     d.body.setAttribute(ingebed ? 'data-connection-edge-embedded' : 'data-connection-edge', o.product);
     var plaatser = null, valTerug = w.setTimeout(function () { host.hidden = !staat.model; }, 1800);
     function plaats() {
-      var adaptief = ingebed ? null : d.querySelector('.rtg-adaptive-edge');
-      var voet = ingebed ? d.querySelector('#tabs.dating-tabs') : adaptief || d.querySelector('.rtg-edge-bottom'); if (!voet) return false;
-      var vorige = host.parentElement;
-      if (vorige && vorige !== voet) vorige.classList.remove('connection-edge-owner');
-      if (host.parentNode !== voet) voet.appendChild(host);
+      var voet = ingebed ? d.querySelector('#tabs.dating-tabs') : d.querySelector('.wd-page');
+      if (!voet) return false;
+      if (host.parentNode !== voet) voet.prepend(host);
       if (ingebed) voet.hidden = false;
-      else voet.classList.add('connection-edge-owner');
       host.hidden = !staat.model;
-      if ((ingebed || adaptief) && plaatser) { plaatser.disconnect(); plaatser = null; }
-      if (ingebed || adaptief) w.clearTimeout(valTerug);
+      if (plaatser) { plaatser.disconnect(); plaatser = null; }
+      w.clearTimeout(valTerug);
       return true;
     }
-    var eerstePlaats = plaats();
-    if ((!eerstePlaats || (!ingebed && !d.querySelector('.rtg-adaptive-edge'))) && w.MutationObserver) {
+    if (!plaats() && w.MutationObserver) {
       plaatser = new w.MutationObserver(plaats); plaatser.observe(d.body, { childList:true, subtree:true });
     }
     function tekst(actie) {

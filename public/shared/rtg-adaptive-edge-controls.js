@@ -1,11 +1,9 @@
-/* App controls are projected into the shared Edge panel. The original DOM
-   stays with its owner: delegated handlers, current permissions and forms
-   remain authoritative. Declared capabilities use the existing weight gate. */
+
 (function (w, d) {
   'use strict';
   // iOS moves overflow actions out of its visible header. Its menu is replaced
   // by Edge, so these original controls must remain reachable here as well.
-  var ROOTS = '.cmd-balk,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-tabs,body>nav.balk,.wd-page>nav.balk,.rtg-edge-owned-bar,.rtgsprong-greep,.rtm-nav,.ios-nav-acties,.ios-nav-extra';
+  var ROOTS = '.connection-edge,.cmd-balk,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-tabs,body>nav.balk,.wd-page>nav.balk,.rtg-edge-owned-bar,.rtgsprong-greep,.rtm-nav,.ios-nav-acties,.ios-nav-extra';
 
   function label(el) { return (el.getAttribute('aria-label') || el.title || el.textContent || '').replace(/\s+/g, ' ').trim(); }
   function available(el, root) {

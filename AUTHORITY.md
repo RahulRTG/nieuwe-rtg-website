@@ -492,8 +492,15 @@ De kamer staat in het lichaam van het verzoek (`id` of `kamer`) en niet in het p
   gegaan, een verzonnen kamer toelaten, een werkwoord zonder route, en de
   kantine bestuurlijk maken.
 
-**Wat nog niet staat, en waarom.** Er is nog geen zetel per werkwoord en geen
-toewijzing aan een kamer, en er wordt niets tegengehouden. Wie welk werkwoord
+**De toewijzing aan een kamer bestaat sinds 28 september 2026**, in de RTG-zaak
+(`kern/vrijheid/rtghuis.js` en `rtgzetel.js`, VRIJHEID.md par. 6a): een
+leidinggevende van RTG zet een medewerker op naam in kamers, en die zetel is ook
+zijn kantoorsleutel. De motor telt sindsdien per kamer of de aanroeper er zit
+(`naarToewijzing` in de stand: eigen, vreemd, zonder toewijzing, onbekend), nog
+steeds zonder wie. Dat is het getal waarop een kamer ooit kan afdwingen.
+
+**Wat nog niet staat, en waarom.** Er is nog geen zetel per werkwoord, en er
+wordt niets tegengehouden. Wie welk werkwoord
 krijgt is een besluit van de eigenaar, en dat hoort op een getal te staan: deze
 telling levert dat getal. Afdwingen wacht op fase 2, omdat een werkwoord niet toe
 te wijzen is aan de gedeelde code, die geen mens draagt. De uitrol gaat daarna per

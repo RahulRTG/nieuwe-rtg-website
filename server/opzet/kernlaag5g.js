@@ -20,7 +20,7 @@ module.exports = (kern, hulp) => {
   const nodig = ['scheduleFor', 'findSupplier', 'vestigingVanUnit', 'employmentVanPersoon', 'vakbewijzenVan',
     'makeSupplierCode', 'ensureSupplierDefaults'];
   const mist = nodig.filter(n => typeof kern[n] !== 'function');
-  for (const n of ['listStaff', 'findByLogin', 'createAccountStaff'])
+  for (const n of ['listStaff', 'findByLogin', 'createAccountStaff', 'staffByMember'])
     if (!kern.accounts || typeof kern.accounts[n] !== 'function') mist.push('accounts.' + n);
   if (!kern.afdelingen || !Array.isArray(kern.afdelingen.KAMER_IDS)) mist.push('afdelingen.KAMER_IDS');
   if (!kern.economie || typeof kern.economie.identiteitZet !== 'function') mist.push('economie.identiteitZet');

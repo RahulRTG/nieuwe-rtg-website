@@ -33,6 +33,8 @@ module.exports = ({ db, save, bijeen, inBundel, kern }) => {
   const rooster = require('./verzuimbrug')({ verzuim: () => (kern().payrollOS || {}).verzuim });
   const motor = maakVrijheid({ opslag: { bak: (naam) => eigen.bak(naam), kijk: (naam) => eigen.kijk(naam) }, save, rooster });
   const rtghuis = require('./rtghuis')({ db, save, kern });
+  /* stap twee: een zetel in de RTG-zaak is de kantoorsleutel (./rtgzetel.js) */
+  const rtgZetel = require('./rtgzetel')({ accounts: kern().accounts, rtghuis });
   const { teambeeld } = require('./teambeeld')({ bronnen: () => ({ ...kern(), rtghuis }), instellingen });
 
   /* Welk beleid geldt voor welke organisatie. Voor RTG zelf is er een besluit
@@ -55,5 +57,5 @@ module.exports = ({ db, save, bijeen, inBundel, kern }) => {
     ? require('../../lib/duurzaam')({ bijeen, save, inBundel, bron: 'vrijheid' })
     : async (werk) => { await werk(); return null; };
 
-  return Object.freeze({ motor, instellingen, teambeeld, beleidVoor, vastleggen, rtghuis, rtgStand: STAND });
+  return Object.freeze({ motor, instellingen, teambeeld, beleidVoor, vastleggen, rtghuis, rtgZetel, rtgStand: STAND });
 };

@@ -38,7 +38,9 @@ Object.assign(kern, require('../kern/eenaccount').maakEenAccount({
   // en dezelfde persoonseis als /api/supplier/login: het ene account is geen achterdeur
   persoonsPoort: kern.persoonsPoort,
   // MIJN RTG blok 3: hier ontstaat een tweede context voor dezelfde mens
-  sessieregister
+  sessieregister,
+  // stap twee (VRIJHEID.md par. 6a): een zetel in de RTG-zaak is de kantoorsleutel
+  rtgZetel: (key) => kern.vrijheid.rtgZetel.zetelVan(key)
 }));
 /* Het kantoorgesprek (kern/kantoorgesprek.js): de backoffice binnenkomen door
    met Rahul te praten in plaats van een codeveld in te vullen. Zelfde slot als

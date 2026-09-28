@@ -83,7 +83,10 @@ test('de eigenaar bevestigt zware handelingen met een passkey, vanaf de schermen
     await p.locator('#kuMaak').click();
     assert.equal((await uitn).status(), 200, 'de uitnodiging is met de passkey bevestigd');
     await p.locator('#kuUit', { hasText: 'geldig tot' }).waitFor();
-    const code = ((await p.locator('#kuUit').innerText()).match(/[A-Z2-9]{10}/) || [])[0];
+    /* De kantooruitnodiging draagt sinds het credentialbeleid (c31f89df3,
+       server/kern/kantoor/uitnodiging.js) 128 bit: KU.<32 hex>. Het oude
+       patroon van tien tekens knipte er een willekeurig stuk uit. */
+    const code = ((await p.locator('#kuUit').innerText()).match(/KU\.[0-9A-F]{32}/i) || [])[0];
     assert.ok(code, 'de code staat een keer op het scherm');
 
     await p.locator('#dsSectie').waitFor({ state: 'visible' });

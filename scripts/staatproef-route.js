@@ -293,6 +293,16 @@ if (require.main !== module) { module.exports = {}; return; }
      Vijfenzestig seconden: elk venster van meer dan zestig seconden bevat ten
      minste een tik van een minuutschakelaar. */
   const STIL_LANG_MS = Number(process.env.RTG_STAATPROEF_STIL_LANG_MS || 65000);
+  /* NA EEN VERZOEK, en niet in een leeg huis (28 september 2026). `rtgai`
+     traint elke zestig seconden, maar schrijft alleen als er sinds de vorige
+     tik iets is waargenomen. In een stilte zonder verzoek vooraf bewoog hij dus
+     nooit, en in de meetronde viel zijn tik tussen de twee oproepen van
+     /api/pay/kascode: "de herhaling bewoog de toestand opnieuw: rtgai", en de
+     route stond op GEZAKT. Dezelfde vorm als de naloop hierboven, op een
+     tragere klok. Wat hier gevonden wordt blijft VOORWAARDELIJK (zonderTijdtik):
+     alleen overgeslagen als de route het bij zijn eerste oproep niet raakte. */
+  await post('/api/notities/mijn', {}, tokens.member);
+  await post('/api/office/asset/overzicht', {}, tokens.office);
   const v0 = await vingerafdruk();
   await new Promise(r => setTimeout(r, STIL_LANG_MS));
   const v1 = await vingerafdruk();

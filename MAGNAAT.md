@@ -677,10 +677,16 @@ Het tempo is "de volgende dag als iedereen klaar is", en je komt binnen met een 
 
 **Een vondst onderweg.** `stad/staat` stond eerst als "zelfde verzoek" in het idempotentieregister. Een speler die ververste nadat een ander de dag afsloot, kreeg dan vijf seconden lang het oude antwoord terug, en dat is in een gedeelde stad juist het moment waarop je ververst. De route verandert niets en heet daarom `leest`.
 
-**Wat het niet bewijst.** De gelijktijdigheid is net als in V5 alleen binnen één proces beproefd: twee spelers die op exact hetzelfde moment als laatste klaar zijn, worden door Node na elkaar afgehandeld. Met meerdere serverprocessen hoort de stad onder een slot, zoals de Teamkamers dat met `bewerkCollectie` doen.
+**Onder een slot (28 september 2026).** Met meer dan een serverproces kunnen twee spelers op precies hetzelfde moment als laatste hun dag afsluiten. Daarom loopt elke zet in een stad door één collectietransactie op `magnaatSteden` (`stad-slot.js`), net als bij de Teamkamers; in PostgreSQL is dat een echt databaseslot. Precies één proces beslist dat de laatste klaar is, en zet de stad dus één dag verder en niet twee.
+
+Twee dingen horen erbij:
+- **Een seintje gaat pas uit na de commit.** Wie het krijgt en ververst, vindt de nieuwe stand. Mislukt de commit, dan gaat er niets uit.
+- **Een leven bewaart niet binnen het slot.** De transactie schrijft alleen de stad weg, en een gewone `save()` erbinnen opende in SQLite een transactie in de transactie. Dat vond de toets tegen een echte server meteen. Het leven onthoudt daarom tijdens het slot alleen dat er bewaard moet worden, en bewaart één keer erna.
+
+**Wat het slot niet dekt.** De levens zelf (`magnaatLeven`) hebben, zoals in heel Van Nul sinds V5, geen eigen collectietransactie. Het slot maakt het besluit dat de dag verder gaat eenduidig, niet elke schrijfbeweging erna.
 
 **De toetsen:**
-- `test/magnaatstad.test.js` (8 toetsen, waarvan één tegen een echte server over alle zes routes).
+- `test/magnaatstad.test.js` (9 toetsen): één tegen een echte server over alle zes routes, en één met een nagemaakte opslag die doet wat PostgreSQL doet. Daarin zijn twee spelers tegelijk als laatste klaar, en gaat de stad precies één dag verder. Een seintje gaat pas na de commit uit, en na een mislukte commit gaat er niets uit.
 - `test/magnaatstad.e2e.js`: twee telefoons, een stad maken, meedoen met de code, en samen een dag verder via het seintje van de server.
 
 ---

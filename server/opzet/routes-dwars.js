@@ -49,13 +49,7 @@ module.exports = function hangDwarseRoutersOp(grens) {
      domein; dat is precies wat CARRIEREVORM.json meet (0 velden gedeeld over
      de vijftien talentdomeinen). */
   require('../routes/carriereledger')(grens('carriereledger'));
-  /* Democratie krijgt, net als Experience hieronder, zijn grens expliciet.
-     Daarmee reist de domeinmotor niet als een nieuwe eigenschap in de gedeelde
-     kernzak door tot in de router; de vijf werkelijk benodigde afhankelijkheden
-     staan hier zichtbaar op de naad. */
-  const democratieGrens = grens('democratie');
-  require('../routes/democratie')(democratieGrens.app, democratieGrens.auth,
-    democratieGrens.officeAuth, democratieGrens.boardroomWie, democratieGrens.democratie);
+  require('./democratie-router')(grens);
   require('../routes/bestanden')(grens('bestanden'));
   require('../routes/meet')(grens('meet'));
   require('../routes/galerij')(grens('galerij'));

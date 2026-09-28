@@ -1,26 +1,26 @@
 {
  "stempel": {
-  "op": "2026-09-19T18:08:19.456Z",
-  "commit": "adc9db1b",
+  "op": "2026-09-28T12:02:59.614Z",
+  "commit": "ecef9a3fc",
   "boomVuil": false,
-  "boomAnders": 4,
+  "boomAnders": 7,
   "instrument": "scripts/uitvoerproef-route.js",
   "node": "v22.22.2",
   "begrenzing": "geen"
  },
  "uitleg": "Per route: met de JUISTE rol en plausibele invoer, en of het 2xx-antwoord gegevens van een ANDER account bevatte (kanaries) of een geheim veld. Een route die hier NIET in staat is niet beproefd. Een route met uitvoer:\"poort\" gaf nooit een 2xx en is ONGEMETEN, geen groen. Zie scripts/lib/uitvoerproef.js voor de grens en waarom de lekmerkers niet blind over een 2xx mogen.",
- "kanariekenmerk": "274753",
+ "kanariekenmerk": "941106",
  "gemeten": {
-  "routesMetRol": 3898,
-  "gemeten": 1143,
-  "pogingen": 3905,
-  "schoon": 1135,
+  "routesMetRol": 3928,
+  "gemeten": 1149,
+  "pogingen": 3935,
+  "schoon": 1141,
   "gezakt": 0,
   "verklaard": 8,
   "verklaardAfgetekend": 0,
   "verklaardVoorgedragen": 8,
   "voorgedragenRatel": 8,
-  "achterEenPoort": 2755,
+  "achterEenPoort": 2779,
   "tokensHernieuwd": 7,
   "begrenzing": 0
  },
@@ -889,6 +889,12 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/bestanden/actie",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/bestanden/deel",
    "rol": "member",
    "uitvoer": "poort"
@@ -998,6 +1004,12 @@
   {
    "methode": "POST",
    "pad": "/api/bestanden/wijzig",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bestanden/wis",
    "rol": "member",
    "uitvoer": "poort"
   },
@@ -2287,6 +2299,12 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/concern/feit/duid",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/concern/feit/zet",
    "rol": "member",
    "uitvoer": "poort"
@@ -2431,6 +2449,18 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/concern/rekening",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/rekening/open",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/concern/tekenen",
    "rol": "member",
    "uitvoer": "poort"
@@ -2480,6 +2510,18 @@
   {
    "methode": "POST",
    "pad": "/api/concern/verloopt",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/vestiging/inhaal",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/vestiging/inhaal/bevestig",
    "rol": "member",
    "uitvoer": "poort"
   },
@@ -3226,12 +3268,6 @@
    "pad": "/api/foodcourt/tijden",
    "rol": "member",
    "uitvoer": "poort"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/registratie/catalogus",
-   "rol": "office",
-   "uitvoer": "schoon"
   },
   {
    "methode": "POST",
@@ -6325,6 +6361,30 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/democratie/kwestie/gezien",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/democratie/kwestie/inbreng",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/democratie/kwestie/intrek",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/democratie/kwestie/mijn",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/dm",
    "rol": "member",
    "uitvoer": "poort"
@@ -6715,6 +6775,18 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/magnaat/leven/actie",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/leven/staat",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/magnaat/overzicht",
    "rol": "member",
    "uitvoer": "schoon"
@@ -6730,6 +6802,42 @@
    "pad": "/api/member/magnaat/partner/start",
    "rol": "member",
    "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/stad/actie",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/stad/doe",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/stad/maak",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/stad/staat",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/stad/start",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/stad/verlaat",
+   "rol": "member",
+   "uitvoer": "schoon"
   },
   {
    "methode": "POST",
@@ -8774,9 +8882,39 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/muziek/bestand",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/muziek/bestand-ticket",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/muziek/bestand-weg",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/muziek/bestanden",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/muziek/bewaar",
    "rol": "member",
    "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/muziek/feed",
+   "rol": "member",
+   "uitvoer": "schoon"
   },
   {
    "methode": "POST",
@@ -8789,6 +8927,12 @@
    "pad": "/api/muziek/mijn",
    "rol": "member",
    "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/muziek/mooi",
+   "rol": "member",
+   "uitvoer": "poort"
   },
   {
    "methode": "POST",
@@ -9565,6 +9709,42 @@
    "pad": "/api/office/conversations",
    "rol": "office",
    "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/democratie/kwestie/behandel",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/democratie/kwestie/eindstand",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/democratie/kwestie/herbezorg",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/democratie/kwestie/heropen",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/democratie/kwestie/lijst",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/democratie/meter",
+   "rol": "office",
+   "uitvoer": "poort"
   },
   {
    "methode": "POST",
@@ -10379,19 +10559,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/office/payroll/run/definitief",
-   "rol": "office",
-   "uitvoer": "poort"
-  },
-  {
-   "methode": "POST",
    "pad": "/api/office/payroll/run/een",
-   "rol": "office",
-   "uitvoer": "poort"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/payroll/run/keur",
    "rol": "office",
    "uitvoer": "poort"
   },
@@ -15265,7 +15433,19 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/salon/media",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/salon/meld",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/salon/ondertitels",
    "rol": "member",
    "uitvoer": "poort"
   },

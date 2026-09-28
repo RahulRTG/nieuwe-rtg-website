@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-25T08:51:19.565Z",
-  "commit": "20f1a782",
+  "op": "2026-09-28T10:48:45.550Z",
+  "commit": "ecef9a3fc",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 1,
   "instrument": "scripts/rolproef-route.js",
   "node": "v22.22.2"
  },
@@ -827,7 +827,7 @@
    ]
   }
  ],
- "routesGevonden": 5057,
+ "routesGevonden": 5073,
  "nietTeKruisen": [
   {
    "methode": "POST",
@@ -1641,8 +1641,8 @@
   }
  ],
  "gemeten": {
-  "routesMetRol": 4295,
-  "beproefd": 3889,
+  "routesMetRol": 4311,
+  "beproefd": 3894,
   "pogingen": 8000,
   "nietTeKruisen": 135,
   "aclOpen": 0,
@@ -13462,6 +13462,50 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/democratie/kwestie/gezien",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/democratie/kwestie/inbreng",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/democratie/kwestie/intrek",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/democratie/kwestie/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/dm",
    "rol": "member",
    "geprobeerd": [
@@ -14222,6 +14266,72 @@
   {
    "methode": "POST",
    "pad": "/api/member/magnaat/partner/start",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/stad/actie",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/stad/doe",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/stad/maak",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/stad/staat",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/stad/start",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/stad/verlaat",
    "rol": "member",
    "geprobeerd": [
     "supplier",
@@ -20074,6 +20184,72 @@
   {
    "methode": "POST",
    "pad": "/api/office/conversations",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/democratie/kwestie/behandel",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/democratie/kwestie/eindstand",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/democratie/kwestie/herbezorg",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/democratie/kwestie/heropen",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/democratie/kwestie/lijst",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/democratie/meter",
    "rol": "office",
    "geprobeerd": [
     "member",
@@ -44517,138 +44693,7 @@
    "pad": "/api/supplier/zorgpolis/stop",
    "rol": "supplier",
    "geprobeerd": [
-    "member",
-    "office"
-   ],
-   "acl": "dicht",
-   "privacy": "schoon"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/suppliers",
-   "rol": "member",
-   "geprobeerd": [
-    "supplier",
-    "office"
-   ],
-   "acl": "dicht",
-   "privacy": "schoon"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/ai",
-   "rol": "techniek",
-   "geprobeerd": [
-    "member",
-    "supplier",
-    "office"
-   ],
-   "acl": "dicht",
-   "privacy": "schoon"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/alarm/proef",
-   "rol": "techniek",
-   "geprobeerd": [
-    "member",
-    "supplier",
-    "office"
-   ],
-   "acl": "dicht",
-   "privacy": "schoon"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/archief",
-   "rol": "techniek",
-   "geprobeerd": [
-    "member",
-    "supplier",
-    "office"
-   ],
-   "acl": "dicht",
-   "privacy": "schoon"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/betalingen/keuze",
-   "rol": "techniek",
-   "geprobeerd": [
-    "member",
-    "supplier",
-    "office"
-   ],
-   "acl": "dicht",
-   "privacy": "schoon"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/betalingen/proef",
-   "rol": "techniek",
-   "geprobeerd": [
-    "member",
-    "supplier",
-    "office"
-   ],
-   "acl": "dicht",
-   "privacy": "schoon"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/betalingen/stap",
-   "rol": "techniek",
-   "geprobeerd": [
-    "member",
-    "supplier",
-    "office"
-   ],
-   "acl": "dicht",
-   "privacy": "schoon"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/beveiliging/afhandelen",
-   "rol": "techniek",
-   "geprobeerd": [
-    "member",
-    "supplier",
-    "office"
-   ],
-   "acl": "dicht",
-   "privacy": "schoon"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/beveiliging/auto",
-   "rol": "techniek",
-   "geprobeerd": [
-    "member",
-    "supplier",
-    "office"
-   ],
-   "acl": "dicht",
-   "privacy": "schoon"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/bevestig/opties",
-   "rol": "techniek",
-   "geprobeerd": [
-    "member",
-    "supplier",
-    "office"
-   ],
-   "acl": "dicht",
-   "privacy": "schoon"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/bewaren/veeg",
-   "rol": "techniek",
-   "geprobeerd": [
-    "member",
-    "supplier"
+    "member"
    ],
    "acl": "dicht",
    "privacy": "schoon"

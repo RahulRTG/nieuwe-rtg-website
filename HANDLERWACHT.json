@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-27T14:33:46.240Z",
-  "commit": "4dc809df",
+  "op": "2026-09-28T11:37:27.563Z",
+  "commit": "944ef46f",
   "boomVuil": false,
-  "boomAnders": 9,
+  "boomAnders": 4,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.2"
  },
@@ -3911,7 +3911,7 @@
   },
   {
    "sleutel": "POST /api/staff",
-   "bestand": "server/routes/staff.js:38",
+   "bestand": "server/routes/staff.js:41",
    "staat": "eigenControle"
   },
   {

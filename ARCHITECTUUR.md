@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 5169 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 5170 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,14 +18,14 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 5169 |
-| servermodules (`server/**/*.js`) | 3730 |
-| routebestanden (`server/routes/**`) | 616 |
-| kernmodules (`server/kern/**`) | 2344 |
+| API-endpoints | 5170 |
+| servermodules (`server/**/*.js`) | 3735 |
+| routebestanden (`server/routes/**`) | 617 |
+| kernmodules (`server/kern/**`) | 2345 |
 | schermen (`public/**/*.html`) | 320 |
 | gedeelde browsermodules (`public/shared/*.js`) | 398 |
-| toetsbestanden (`test/*.test.js`) | 1814 |
-| schermtoetsen (`test/*.e2e.js`) | 265 |
+| toetsbestanden (`test/*.test.js`) | 1815 |
+| schermtoetsen (`test/*.e2e.js`) | 266 |
 
 ## 2. De weg van een verzoek
 
@@ -114,7 +114,7 @@ zie §5 -- er zijn nog 243 kern-namen die meer dan één domein aanraakt.
 | `member` | 699 | 72 | 16 | 428 |
 | `supplier` | 624 | 127 | 6 | 338 |
 | `office` | 75 | 21 | 3 | 84 |
-| `staff` | 26 | 8 | 1 | 42 |
+| `staff` | 27 | 9 | 1 | 43 |
 | `social` | 76 | 10 | 31 | 71 |
 | `techniek` | 77 | 19 | 1 | 64 |
 | `zakelijk` | 13 | 2 | 0 | 0 |
@@ -136,9 +136,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1602 |
+| kern-namen die routes aanraken | 1603 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 243 |
-| daarvan door precies één domein | 1359 |
+| daarvan door precies één domein | 1360 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -170,7 +170,7 @@ tenant(5) logInlog(5) veilig(5) openVacatures(5) overheid(5) sseToCustomer(5)
 | 41 | `server/routes/member/voertuigen.js` |
 | 40 | `server/routes/member/voertuigen/verkoop.js` |
 | 39 | `server/routes/member/voertuigen/ontmoeten.js` |
-| 38 | `server/routes/staff.js` |
+| 39 | `server/routes/staff.js` |
 | 35 | `server/routes/auth.js` |
 | 34 | `server/routes/auth/herstel.js` |
 

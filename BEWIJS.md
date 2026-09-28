@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2163 bestanden en 15117 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2163 bestanden en 15118 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2163 |
-| losse beweringen (`test(...)`) | 15117 |
+| losse beweringen (`test(...)`) | 15118 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 196 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1426 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1888 bestanden, 14642 beweringen.
+1888 bestanden, 14643 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1007,7 +1007,7 @@ toets omvalt.
 | `migraties.test.js` | 9 | gezakt op `&&->||#0` | Schemamigraties: genummerd, precies een keer, en met een weigering om te starten op een database die nieuwer is dan de code. |
 | `mijnrtg-routes.test.js` | 12 | gezakt op `liegpoort /api/` | MIJN RTG: ELF ROUTES VAN DE IDENTITEITSLAAG DIE GEEN TOETS OVER DE DRAAD HADDEN. Toestelbinding (server/routes/member/toestellen.js), de tweede factor en de commerciele post (server/routes/member/tweefactor.js)... |
 | `mijnsessies.test.js` | 15 | genoemd | MIJN RTG blok 2 -- de sessielijst en het sluiten. DE BEWERING DIE ERTOE DOET staat in toets 2: sluiten werkt ECHT. |
-| `minify.test.js` | 3 | gezakt op `===->!==#0` | Test voor de eigen minifier (scripts/ast/minify.js + print.js), die terser verving. Kern: de minifier levert NOOIT iets uit dat een andere boom oplevert dan de bron -- klopt de geprinte code niet exact, dan valt hij... |
+| `minify.test.js` | 4 | gezakt op `===->!==#0` | Test voor de eigen minifier (scripts/ast/minify.js + print.js), die terser verving. Kern: de minifier levert NOOIT iets uit dat een andere boom oplevert dan de bron -- klopt de geprinte code niet exact, dan valt hij... |
 | `mn01-bevoegdheidsvoordeel.test.js` | 7 | gezakt op `liegpoort /api/` | MN-01 -- GEEN BEVOEGDHEIDSVOORDEEL, ALS TOETS IN PLAATS VAN ALS ZIN. > Geen organisatorische relatie met RTG kan menselijke toestemming > vervangen, verruimen, doorgeven of reconstrueren. |
 | `mn02-hoedanigheidsscheiding.test.js` | 4 | gezakt op `liegpoort /api/` | MN-02 -- SCHEIDING VAN HOEDANIGHEDEN, als contaminatieproef. > Kennis die actor X rechtmatig verkrijgt in hoedanigheid A, mag niet zonder > afzonderlijke grond beschikbaar worden in hoedanigheid B. |
 | `mn02ai-contextbesmetting.test.js` | 7 | gezakt op `liegpoort /api/` | MN-02-AI: BESMET EEN HANDELING IN HOEDANIGHEID A DE CONTEXT VAN RAHUL IN B? MENSNETWERK.md par. |

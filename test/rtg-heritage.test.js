@@ -43,7 +43,7 @@ test('vier vaste werelden delen één volledige token- en dieptegrammatica', () 
     assert.match(PALETTE, /--rtg-world-photo:none!important;/, wereld + ' mag geen foto wereldwijd herhalen');
   }
   for (const token of ['--rtg-depth-content:', '--rtg-depth-focus:', '--rtg-depth-system:',
-    '--rtg-radius-content:16px', '--rtg-radius-editorial:16px', '--rtg-radius-system:22px', '--rtg-target:48px']) {
+    '--rtg-radius-content:4px', '--rtg-radius-editorial:4px', '--rtg-radius-system:16px', '--rtg-target:48px']) {
     assert.ok(TOKENS.includes(token), token + ' ontbreekt');
   }
 });
@@ -52,8 +52,9 @@ test('LivingOS blijft champagne; routes hebben geen eigen donker thema meer', ()
   assert.doesNotMatch(TOKENS, /data-rtg-eigenvlak/);
   assert.doesNotMatch(SIMPLE, /--rtg-world-bg:/);
   const living = PALETTE.match(/data-rtg-world="living"[^}]+/)[0];
-  assert.match(living, /--rtg-world-bg:#f4efe6!important/);
-  assert.match(living, /--rtg-world-ink:#302b25!important/);
+  /* het warme palet van de desktopstandaard (#413) */
+  assert.match(living, /--rtg-world-bg:#faf8f3!important/);
+  assert.match(living, /--rtg-world-ink:#181918!important/);
   assert.match(living, /--rtg-world-schema:light!important/);
   assert.match(PALETTE, /--edge-bar-bg:var\(--rtg-world-card\)!important/);
 });

@@ -258,7 +258,7 @@ test('elke routehandler die een id uit het verzoek pakt, noemt ook de sessie', (
      onder een document komt. Zonder deze naam meldde de scan
      POST /api/office/uitgifte/teken als "geen poortwachter", terwijl daar juist
      de strengere van de twee kantoorsloten op zit. */
-  const POORT = /,\s*(auth|supplierAuth|officeAuth|techAuth|boardroomAuth|huisAuth|baasAuth|eigenaarAlleen|scimAuth|gezinsPoort|kluisAuth|naamAuth)\s*[,)]|\.\.\.lid\b/;
+  const POORT = /,\s*(auth|supplierAuth|officeAuth|techAuth|boardroomAuth|huisAuth|baasAuth|eigenaarAlleen|scimAuth|gezinsPoort|gezinBeeldAuth|kluisAuth|naamAuth)\s*[,)]|\.\.\.lid\b/;
   /* Niet elke poort staat in de registratie. Een flink deel van het huis
      controleert in de handler zelf -- rtfSociaal(req, res), profiel(req, res),
      appSessie(req), rtf.verifieerProfiel(code, token) -- en stuurt bij twijfel
@@ -288,12 +288,16 @@ test('elke routehandler die een id uit het verzoek pakt, noemt ook de sessie', (
      test verderop dat de handler req.scimOrg echt gebruikt, en is een SCIM-route
      die de organisatie vergeet net zo goed een fout als een member-route die de
      sessie vergeet. */
-  const VEELPARTIJ = /,\s*(auth|supplierAuth|huisAuth|scimAuth|gezinsPoort)\s*[,)]/;
+  /* gezinBeeldAuth (routes/presentatie-gezinsbeelden.js, #413) is dezelfde soort
+     poort als gezinsPoort: rtf.verifieerProfiel(code, token) en anders 401. Een
+     gezin is een van duizenden, dus hij staat ook in VEELPARTIJ en de handler
+     moet req.beeldKey gebruiken, de sleutel die de poort uit DEZE request zette. */
+  const VEELPARTIJ = /,\s*(auth|supplierAuth|huisAuth|scimAuth|gezinsPoort|gezinBeeldAuth)\s*[,)]/;
   /* req.<iets> dat een poortwachter zelf heeft gezet telt ook: huisAuth zet
      req.werkplekCode, de zaak-poort zet req.actor. En een helper mag naast de
      request ook het antwoord meekrijgen -- eisAccount(req, res) is net zo goed
      een afleiding uit DEZE request als cn(req). */
-  const GEBRUIKT = /req\.(session|techUser|supplier|staff|user|eigenaar|account|werkplekCode|actor|scimOrg|gezinslid)\b|\b[a-zA-Z_$][a-zA-Z0-9_$]*\(req[,)]/;
+  const GEBRUIKT = /req\.(session|techUser|supplier|staff|user|eigenaar|account|werkplekCode|actor|scimOrg|gezinslid|beeldKey)\b|\b[a-zA-Z_$][a-zA-Z0-9_$]*\(req[,)]/;
   const VRAAGID = /req\.(body|params|query)\.(id|ref|userId|memberId|key|code|codenaam)\b/;
   /* ---- de beoordeelde uitzonderingen ----
      Wat hierna nog opduikt is stuk voor stuk nagelopen en valt in twee soorten.

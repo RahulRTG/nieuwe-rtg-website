@@ -238,8 +238,13 @@ plaats van punten.
   vond een tweede gebrek: een verlofAANVRAAG gaat bij het indienen al naar de
   verzuimlaag, en een afgewezen aanvraag bleef daar staan, zodat de loonrun
   vakantie rekende over dagen waarop iemand werkte. Afwijzen schrapt hem nu
-  (`test/verzuimrooster.test.js`). Wat NIET is gedaan: een mens die met de hand
-  een dienst zet, krijgt nog geen waarschuwing.
+  (`test/verzuimrooster.test.js`). En een MENS die toch een afwezige
+  medewerker inplant, wordt niet tegengehouden maar ziet het erbij (28 september
+  2026): een losse dienst bij de beveiliging draagt `verzuimWaarschuwing`, en
+  het vaststellen van het weekrooster kijkt verzuim opnieuw na
+  (`verzuimBijVaststellen`), want tussen voorstel en akkoord kan iemand afwezig
+  worden. De automaat heeft er een tweede grendel bij, in de vorm van de
+  rustregel.
 
 ### Een stap weg
 
@@ -279,7 +284,7 @@ Niet op aantrekkelijkheid maar op wat de volgende stap mogelijk maakt.
 
 | # | Stap | Waarom nu |
 |---|---|---|
-| ~~1~~ | ~~Verlof en ziekte in de twee autoplanners~~ | **staat** (27 september 2026, par. 6); de waarschuwing bij het handmatig zetten van een dienst nog niet |
+| ~~1~~ | ~~Verlof en ziekte in de twee autoplanners~~ | **staat** (27 september 2026, par. 6), met een waarschuwing voor een mens die met de hand plant (28 september) |
 | 2 | Transitietijd als primitief | staat op nul, en is het enige dat alle domeinen delen |
 | 3 | De ATW-rekenlaag uit taxi trekken | hij is al data-met-bron en al instelbaar per regime |
 | 4 | Het werkdruksignaal op rooster en klok | raakt geen gezondheidsgegeven, en is de helft die wél mag |

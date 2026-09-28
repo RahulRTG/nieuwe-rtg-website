@@ -447,7 +447,7 @@ Waar een functie botst met een grens, vervalt de functie.
 | **0** | RTG wordt werkgever in zijn eigen Concern, en RTG's eigen werk (ook de kantine) draait op de WorkOS-personeelslaag | **half**: besloten (B1), de huisentiteit en het werkverband in de toegangsreview staan in de schaduw; de entiteit zelf richt de eigenaar in |
 | **1** | dienstverband ↔ kantoorrol; einde dienstverband roept `intrekking.js` aan | een stap weg |
 | **2** | toegang per kamer op het dienstverband — de kantine krijgt alleen de kantine | een stap weg |
-| **3** | de ochtendkaart (par. 4) op gegevens die al bestaan; het rooster leest verzuim | half: het rooster leest verzuim (27 sep 2026), de kaart is een stap weg |
+| **3** | de ochtendkaart (par. 4) op gegevens die al bestaan; het rooster leest verzuim | half: het rooster leest verzuim (27 sep 2026) en waarschuwt een mens die met de hand plant (28 sep); de kaart is een stap weg |
 | **4** | de aandachtskaart van de eigenaar (par. 5): besluitenwachtrij plus stilte met bewijsgraad | een stap weg |
 | **5** | het loopbaanbewijs als lezing van het ledger (par. 8) | een stap weg |
 | **6** | de waardige uitgang (par. 9), behalve de overdracht | een stap weg |

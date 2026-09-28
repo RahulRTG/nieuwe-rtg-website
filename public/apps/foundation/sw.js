@@ -1,5 +1,5 @@
 
-const CACHE = 'rtf-premium-foundation-meedoen-ontdekken-322aa35a';
+const CACHE = 'rtf-premium-foundation-meedoen-ontdekken-17b9d4a9';
 const SHELL = [
   /* The mandatory desktop standard is available offline too. */
   '/shared/interface/module-sdk.js',

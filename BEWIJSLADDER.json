@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-28T11:34:47.577Z",
-    "commit": "bb527e3fd",
+    "op": "2026-09-28T11:59:25.699Z",
+    "commit": "55d4fa004",
     "boomVuil": true,
-    "boomAnders": 7,
+    "boomAnders": 29,
     "instrument": "scripts/bewijsladder.js",
     "node": "v24.18.0"
   },

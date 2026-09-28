@@ -166,7 +166,7 @@
       "bewijs": {
         "toon": "beeld",
         "prijs": "kostenPerSoort",
-        "beschikbaarheid": "oordeelOpen",
+        "beschikbaarheid": "onderSlot",
         "reserveer": "geblokkeerd",
         "bevestig": "akkoord",
         "lever": "lever",

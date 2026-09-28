@@ -16,7 +16,12 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('path');
 const { execFileSync } = require('child_process');
-const { STAPPEN, valOm } = require('../scripts/meetronde');
+const { valOm } = require('../scripts/lib/valom');
+/* De lijst instrumenten via een samengesteld pad: het ONDERWERP van deze toets
+   is de crashherkenning (en of elk instrument laadt), niet de rondecode van
+   meetronde.js. Een letterlijke require zou de mutatiemotor die rondecode laten
+   muteren, en die raakt deze toets per definitie niet. */
+const { STAPPEN } = require(path.join(__dirname, '..', 'scripts', 'meetronde'));
 
 test('1. een ongevangen fout is een crash; een waarschuwing en een gewone uitslag niet', () => {
   assert.equal(valOm("x.js:36\n\nSyntaxError: Identifier 'stempel' has already been declared\n    at wrapSafe (node:internal)"), true);

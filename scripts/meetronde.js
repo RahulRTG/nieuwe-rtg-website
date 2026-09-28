@@ -153,10 +153,7 @@ const vingerafdruk = (naam) => {
   catch (e) { return null; }
 };
 
-/* Viel het instrument om? Een ongevangen fout van Node: een regel `...Error: ...`
-   met direct daaronder een stapelspoor. Een waarschuwing (`ExperimentalWarning`)
-   heeft geen stapelspoor en telt niet. */
-const valOm = (fout) => /(^|\n)[A-Za-z]*Error: [^\n]*\n\s+at /.test(String(fout || ''));
+const { valOm } = require('./lib/valom');
 
 function draai(cmd, extraEnv) {
   const r = spawnSync(process.execPath, cmd, {

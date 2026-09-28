@@ -40,7 +40,7 @@
   function start(o) {
     U = w.RTGDesktopUI; world = d.body.dataset.rtgWorld; P = w.RTGPersonalImages;
     if (!content[world]) return;
-    var atmosphere = photo('/images/world-homes/' + world + '-sfeer.jpg', 'sfeer', 'Sfeerbeeld', 'wp-atmosphere'); d.body.prepend(atmosphere);
+    var atmosphere = photo('/images/world-homes/' + world + '-sfeer.jpg', 'sfeer', 'Sfeerbeeld', 'wp-atmosphere'); d.body.appendChild(atmosphere);
     tabs(o.root, o.home, o.people, o.favorites);
     if (d.body.dataset.worldHome && !d.body.dataset.publicPlatform) homeScene(o.home, o.root);
     function toolbar() {

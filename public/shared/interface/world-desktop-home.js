@@ -77,6 +77,8 @@
       edge();
       // Home hangt aan window en niet aan het model van de Edge: dat begint bij elke start leeg.
       w.addEventListener('rtg-edge-home', function (e) {
+        root.dataset.mobilePanel = 'home';
+        root.querySelectorAll('.wp-tabs button').forEach(function (b, i) { b.setAttribute('aria-expanded', String(i === 0)); });
         if (frame.isOpen()) { e.preventDefault(); frame.collapse(); }
         else if (d.body.dataset.worldHome) { e.preventDefault(); home.scrollIntoView({ block: 'start' }); }
       });

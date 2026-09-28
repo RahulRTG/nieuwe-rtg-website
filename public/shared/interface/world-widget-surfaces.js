@@ -28,7 +28,7 @@
       nav.appendChild(prev); var next = button('next', function () { o.offset(7); }, 'wd-text-button'); next.disabled = o.days() >= 28; nav.appendChild(next);
       if (o.compact) {
         var more = U.el('details', 'wd-date-controls'); more.open = !!o.state.calendarExpanded;
-        more.append(copy('summary', '', 'calendar'), nav); more.ontoggle = function () { if (more.isConnected) o.state.calendarExpanded = more.open; }; root.appendChild(more);
+        more.append(copy('summary', '', 'week'), nav); more.ontoggle = function () { if (more.isConnected) o.state.calendarExpanded = more.open; }; root.appendChild(more);
       } else root.appendChild(nav); root.appendChild(open('calendar'));
     }
     function notes(j) {

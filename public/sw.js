@@ -1,6 +1,6 @@
 
 
-const CACHE = 'rtg-app-a61dda88';
+const CACHE = 'rtg-app-0f9f44e6';
 const SHELL = [
   /* The mandatory desktop standard is available offline too. */
   '/shared/interface/module-sdk.js',

@@ -1,0 +1,11 @@
+/* Details retain real actions; the approved scene owns the visual introduction. */
+body[data-rtg-desktop][data-rtg-layout="standard"][data-rtg-world="living"] .wp-domain-content .dagkop{display:block!important;background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;min-height:0!important}
+body[data-rtg-desktop][data-rtg-world="living"] .wp-domain-content .dagkop :is(h1,.ey),body[data-rtg-desktop][data-rtg-world="living"] .wp-domain-content .dagkop::after{display:none!important}
+body[data-rtg-desktop] .wp-atmosphere::after{content:"";position:absolute;inset:0;background:linear-gradient(color-mix(in srgb,var(--rtg-world-bg) 78%,transparent),transparent 85%);pointer-events:none}
+body[data-rtg-desktop] .wp-atmosphere .pi-change{z-index:1}
+body[data-rtg-desktop] .rtg-edge-profile{display:flex!important;align-items:center;justify-content:center;min-width:44px!important;min-height:44px!important;width:44px!important;height:44px!important;padding:0!important;border:0!important;font:400 18px/1 Inter,sans-serif!important}
+
+body[data-rtg-desktop][data-rtg-layout="standard"] .wp-domain-content .rtg-dashboard-hero-cta{background:var(--rtg-world-action)!important;color:var(--rtg-world-action-ink)!important;box-shadow:none!important}
+
+/* The closed-room gate keeps private content hidden; the shared atmosphere is public. */
+html.rtf-toegang-dicht body[data-rtg-desktop-access="locked"]>.wp-atmosphere{visibility:visible!important}

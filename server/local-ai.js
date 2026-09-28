@@ -17,6 +17,24 @@
 'use strict';
 const OpenAI = require('./openai');
 const { Poort } = require('./local-ai-poort');
+const { schatVerzoek } = require('./kern/ai/contextpakket');
+
+/* HET CONTEXTVENSTER. De server kapt STIL af wat er niet in past, vanaf het
+   begin -- en daar staat de grondwet. LOCAL_AI_CONTEXT verklaart hoe groot het
+   venster is (gelijk aan OLLAMA_CONTEXT_LENGTH of num_ctx); dan weigert deze
+   laag een verzoek dat niet past met CONTEXT_PAST_NIET, en de keten wijkt uit.
+   Zonder verklaring nemen we de standaard van Ollama AAN (4096) en telt deze
+   laag alleen hoe vaak een verzoek daar niet in zou passen: een schaduw, want
+   een grens die nooit heeft meegelopen dwingen we niet af. */
+const AANGENOMEN_VENSTER = 4096;
+function leesVenster(opts) {
+  const rauw = opts.contextVenster != null ? opts.contextVenster : process.env.LOCAL_AI_CONTEXT;
+  if (rauw == null || rauw === '') return { tokens: AANGENOMEN_VENSTER, herkomst: 'aangenomen' };
+  const n = Number(rauw);
+  if (!Number.isInteger(n) || n < 1024)
+    throw new Error('LOCAL_AI_CONTEXT moet een heel aantal tokens van minstens 1024 zijn (gelijk aan OLLAMA_CONTEXT_LENGTH).');
+  return { tokens: n, herkomst: 'verklaard' };
+}
 
 function heeftBeeld(params) {
   return (params && params.messages || []).some(m => Array.isArray(m.content) &&
@@ -88,14 +106,38 @@ class LocalAI extends OpenAI {
        ./local-ai-poort.js -- dat is CAPACITEIT, en dit bestand gaat over
        modelkeuze en de netwerkgrens. */
     this.poort = new Poort(opts);
+    this.venster = leesVenster(opts);
+    /* geschat tegenover wat de server zelf telde: zo wordt de schatting gemeten */
+    this.contexttelling = { aanroepen: 0, geschat: 0, geteld: 0, geweigerd: 0, zouNietPassen: 0 };
 
     const rauweCreate = this.messages.create;
     const zelf = this;
-    this.messages = { create: (params) => zelf.poort.door(() => rauweCreate(params)) };
+    this.messages = { create: (params) => {
+      const t = zelf.contexttelling;
+      const nodig = schatVerzoek(params);
+      if (nodig > zelf.venster.tokens) {
+        if (zelf.venster.herkomst === 'verklaard') {
+          t.geweigerd++;
+          return Promise.reject(Object.assign(new Error('Het verzoek (' + nodig + ' tokens, geschat) past niet in het lokale venster van ' +
+            zelf.venster.tokens + '. Niet verstuurd: de server zou het begin stil afkappen.'), { code: 'CONTEXT_PAST_NIET', nodig, venster: zelf.venster.tokens }));
+        }
+        t.zouNietPassen++;
+      }
+      return zelf.poort.door(() => rauweCreate(params)).then((uit) => {
+        const u = uit && uit.usage;
+        const geteld = u ? (Number(u.input_tokens) || 0) + (Number(u.cache_read_input_tokens) || 0) : 0;
+        if (geteld > 0) { t.aanroepen++; t.geschat += nodig - (Number(params && params.max_tokens) || 0); t.geteld += geteld; }
+        return uit;
+      });
+    } };
   }
 
-  /* De stand van de poort, voor het luik op de meter. */
-  staat(nu) { return this.poort.staat(nu); }
+  /* De stand van de poort en het venster, voor het luik op de meter. */
+  staat(nu) {
+    const t = this.contexttelling;
+    return Object.assign(this.poort.staat(nu), { venster: this.venster, context: Object.assign({}, t,
+      { schattingPerGeteld: t.geteld ? Math.round(t.geschat / t.geteld * 100) / 100 : null }) });
+  }
 
   kan(params) {
     // een open onderbreker betekent: sla deze aanbieder over, betaal geen timeout
@@ -108,4 +150,4 @@ class LocalAI extends OpenAI {
 
 module.exports = LocalAI;
 module.exports.LocalAI = LocalAI;
-module.exports._intern = { heeftBeeld, netwerkGrens, normaliseerUrl };
+module.exports._intern = { heeftBeeld, netwerkGrens, normaliseerUrl, leesVenster };

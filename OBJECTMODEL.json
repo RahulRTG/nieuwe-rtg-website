@@ -1,17 +1,17 @@
 {
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
-  "vastgelegd": "2026-09-27",
+  "vastgelegd": "2026-09-28",
   "gemeten": {
-    "bestanden": 2432,
-    "vormen": 1435,
-    "velden": 2077,
-    "modules": 797,
-    "domeinen": 283,
-    "envelopDrempel": 17,
-    "envelop": 32,
+    "bestanden": 2435,
+    "vormen": 1444,
+    "velden": 2080,
+    "modules": 800,
+    "domeinen": 284,
+    "envelopDrempel": 18,
+    "envelop": 28,
     "veldenDomeineigen": 1463,
-    "veldenGedeeldVanafVier": 205,
-    "gelijkendeVormparen": 20
+    "veldenGedeeldVanafVier": 212,
+    "gelijkendeVormparen": 22
   },
   "envelop": [
     "aantal",
@@ -21,7 +21,6 @@
     "code",
     "codenaam",
     "datum",
-    "doel",
     "door",
     "gemaakt",
     "id",
@@ -29,12 +28,10 @@
     "label",
     "naam",
     "notitie",
-    "ok",
     "omschrijving",
     "prijs",
     "reden",
     "ref",
-    "sinds",
     "soort",
     "stand",
     "status",
@@ -44,20 +41,67 @@
     "tot",
     "uitleg",
     "van",
-    "wat",
-    "wie"
+    "wat"
   ],
   "gedeeld": [
     {
-      "veld": "naar",
-      "domeinen": 16,
+      "veld": "sinds",
+      "domeinen": 17,
       "waar": [
         "bedrijf",
+        "kern/afdelingen",
+        "kern/clubs",
+        "kern/command",
+        "kern/commercie",
+        "kern/ledenbalie-inzage"
+      ]
+    },
+    {
+      "veld": "naar",
+      "domeinen": 17,
+      "waar": [
+        "bedrijf",
+        "kern/ai",
         "kern/bank",
         "kern/command",
         "kern/lidboard",
-        "kern/mailwachtrij",
-        "kern/mobiliteit"
+        "kern/mailwachtrij"
+      ]
+    },
+    {
+      "veld": "ok",
+      "domeinen": 17,
+      "waar": [
+        "kern/appstore",
+        "kern/festival",
+        "kern/fiscaal",
+        "kern/foundationregistratie-register",
+        "kern/koppel",
+        "kern/leren"
+      ]
+    },
+    {
+      "veld": "doel",
+      "domeinen": 17,
+      "waar": [
+        "kern/appstore",
+        "kern/codelevenscyclus",
+        "kern/commercie",
+        "kern/consent-register",
+        "kern/defensie",
+        "kern/labfonds"
+      ]
+    },
+    {
+      "veld": "wie",
+      "domeinen": 17,
+      "waar": [
+        "bedrijf",
+        "kern/comm",
+        "kern/commerce",
+        "kern/consent-lezers",
+        "kern/factuurcorrectie-gronden",
+        "kern/horeca"
       ]
     },
     {
@@ -145,6 +189,18 @@
       ]
     },
     {
+      "veld": "vervalt",
+      "domeinen": 13,
+      "waar": [
+        "kern/aanmeldingen",
+        "kern/ai",
+        "kern/command",
+        "kern/commerce",
+        "kern/koppel",
+        "kern/levensband"
+      ]
+    },
+    {
       "veld": "vraag",
       "domeinen": 13,
       "waar": [
@@ -166,18 +222,6 @@
         "kern/groothandel",
         "kern/keuken",
         "kern/kosten"
-      ]
-    },
-    {
-      "veld": "vervalt",
-      "domeinen": 12,
-      "waar": [
-        "kern/aanmeldingen",
-        "kern/command",
-        "kern/commerce",
-        "kern/koppel",
-        "kern/levensband",
-        "kern/levensgraaf"
       ]
     },
     {
@@ -479,54 +523,6 @@
         "kern/reisgezelschap",
         "kern/reisgezelschap-delen"
       ]
-    },
-    {
-      "veld": "name",
-      "domeinen": 10,
-      "waar": [
-        "kern/experience",
-        "kern/gast",
-        "kern/kantoor",
-        "kern/leverancier",
-        "kern/lidacties",
-        "kern/personeel"
-      ]
-    },
-    {
-      "veld": "dagen",
-      "domeinen": 10,
-      "waar": [
-        "kern/gewoonten",
-        "kern/klok",
-        "kern/levensgraaf",
-        "kern/levenslijn",
-        "kern/magnaat-leven",
-        "kern/mobiliteit"
-      ]
-    },
-    {
-      "veld": "bewijs",
-      "domeinen": 10,
-      "waar": [
-        "kern/horeca",
-        "kern/invoer",
-        "kern/livinglab",
-        "kern/magnaat-controle",
-        "kern/magnaat-trainingslobby-acties",
-        "kern/magnaatwereld"
-      ]
-    },
-    {
-      "veld": "geldigTot",
-      "domeinen": 9,
-      "waar": [
-        "bedrijf",
-        "kern/aanmeldingen",
-        "kern/concern",
-        "kern/festival",
-        "kern/mobiliteit",
-        "kern/navigatie"
-      ]
     }
   ],
   "paren": [
@@ -711,6 +707,21 @@
     },
     {
       "gelijkenis": 0.75,
+      "a": "server/kern/ai/contextpakket.js",
+      "b": "server/kern/stuur/luspakket.js",
+      "domeinA": "kern/ai",
+      "domeinB": "kern/stuur",
+      "gedeeld": [
+        "berichten",
+        "graad",
+        "kort",
+        "magSamenvatten",
+        "magVervallen",
+        "prioriteit"
+      ]
+    },
+    {
+      "gelijkenis": 0.75,
       "a": "server/kern/architect/index.js",
       "b": "server/kern/atelier/index.js",
       "domeinA": "kern/architect",
@@ -824,6 +835,18 @@
         "gratis",
         "nr",
         "prijsCenten"
+      ]
+    },
+    {
+      "gelijkenis": 0.6,
+      "a": "server/kern/appstore/context.js",
+      "b": "server/kern/mailsleutel.js",
+      "domeinA": "kern/appstore",
+      "domeinB": "kern/mailsleutel",
+      "gedeeld": [
+        "let",
+        "ok",
+        "sleutel"
       ]
     },
     {

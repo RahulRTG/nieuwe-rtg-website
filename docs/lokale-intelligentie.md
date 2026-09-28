@@ -40,6 +40,7 @@ LOCAL_AI_MODEL=<tekstmodel>
 LOCAL_AI_MODEL_KORT=<optioneel-kort-model>
 LOCAL_AI_MODEL_TOOLS=<optioneel-toolmodel>
 LOCAL_AI_MODEL_VISION=<optioneel-visionmodel>
+LOCAL_AI_CONTEXT=12288
 LOCAL_AI_REASONING=none
 LOCAL_AI_REASONING_TOOLS=none
 RTG_EXTERNE_AI_UIT=1
@@ -58,6 +59,47 @@ Voer na configuratie uit:
 ```bash
 npm run ai:lokaal:check
 ```
+
+## Het contextvenster: nooit stil afkappen
+
+Een eigen modelserver heeft een venster (Ollama staat standaard op 4096 tokens)
+en kapt wat er niet in past STIL af, vanaf het begin. Daar staan juist de
+grondwet, de veiligheidsgrenzen en wie Rahul is. Het model antwoordt dan
+gewoon, alleen zonder zijn regels, en dat leest als "de lokale AI is dom".
+
+`LOCAL_AI_CONTEXT` verklaart hoe groot het venster is, gelijk aan
+`OLLAMA_CONTEXT_LENGTH` en `num_ctx`. Dan gebeuren er twee dingen:
+
+- `server/kern/ai/contextpakket.js` stelt per verzoek een pakket samen dat
+  past. Elk blok draagt een soort (grondwet, identiteit, opdracht,
+  gereedschap, feiten, gesprek, werk), een bron, een bewijsgraad, een
+  prioriteit, en of het verplicht is, mag worden ingekort of mag vervallen.
+  De verdeling per soort bestaat uit **plafonds en geen quota**: wat een soort
+  niet nodig heeft, wordt niet gevuld. Grondwet, veiligheidsgrenzen en de
+  opdracht vallen nooit weg. Eerst wordt ingekort, dan weggelaten, het oudste
+  gesprek eerst. De ledenchat (`kern/ai/chatpakket.js`) en de stuurlus
+  (`kern/stuur/luspakket.js`) gebruiken hem allebei.
+- `server/local-ai.js` weigert een verzoek dat toch niet past met
+  `CONTEXT_PAST_NIET`. Het verzoek gaat dan niet de deur uit en de keten wijkt
+  uit. Er wordt nooit een afgekapt verzoek verstuurd.
+
+Zonder `LOCAL_AI_CONTEXT` neemt RTG 4096 aan en dwingt het niets af. Deze laag
+telt dan alleen hoe vaak een verzoek niet zou passen (`zouNietPassen` op het
+luik van de meter). Een grens die nooit heeft meegelopen, dwingen we niet af.
+
+Twee dingen staan in de laag zelf, en niet in dit document:
+
+- **Het levensverhaal van Rahul valt weg, tenzij het lid naar hem vraagt.**
+  Dat is het moment waarop hij het volgens zijn karakter mag delen.
+- **Oudere stappen van de stuurlus worden ingekort, nooit weggelaten.** Een lus
+  die vergeet dat hij een afspraak al had gezet, zet hem nog een keer.
+
+`npm run contextmeting` laat per situatie en venster zien wat er zonder
+samensteller zou worden afgekapt en wat er met samensteller gebeurt. De tokens
+zijn GESCHAT (tekens gedeeld door drie, graad `vermoed`). De echte telling komt
+van de server: `npm run ai:lokaal:check` stuurt een lange tekst met vooraan een
+codewoord, vraagt dat terug en legt de telling van de server naast de
+schatting. Komt het codewoord niet terug, dan kapt de server af.
 
 ## Externe uitwijk
 
@@ -80,9 +122,24 @@ het model lokaal of extern draait.
 
 ## RTG Kompas op een Mac mini
 
-`scripts/mac/ollama-kompas.sh` maakt de lokale route reproduceerbaar. De
-standaard is `qwen3.5:4b` onder de naam `rtg-kompas`: compact genoeg voor een
-Apple Silicon Mac met 8 GB, maar met tekst, beeld en tool-calling in één model.
+`scripts/mac/ollama-kompas.sh` maakt de lokale route reproduceerbaar, in twee
+profielen:
+
+- **16gb** (standaard): `qwen3.5:4b` als `rtg-kompas` voor korte vragen en beeld,
+  plus `qwen3:8b` als `rtg-kompas-brein` voor gesprek en gereedschap. Beide
+  blijven tegelijk geladen (`OLLAMA_MAX_LOADED_MODELS=2`), zodat de server niet
+  bij elke stap van model hoeft te wisselen. Het venster is 12288 tokens.
+- **8gb** (`--profiel=8gb`): alleen `rtg-kompas`, met een venster van 8192.
+  Bij 4096 past de ledenprompt van Rahul niet, en dan krijgt het model zijn
+  regels niet mee.
+
+Het venster staat op drie plekken gelijk: de server (`OLLAMA_CONTEXT_LENGTH`),
+het model (`num_ctx`) en RTG (`LOCAL_AI_CONTEXT`). Het brein wordt uit dezelfde
+`Modelfile.rtg-kompas` gebouwd als het kleine model, zodat hun gedragsgrenzen
+niet uiteen kunnen lopen. Denken staat in beide profielen uit
+(`LOCAL_AI_REASONING_TOOLS=none`), omdat denktokens van hetzelfde
+antwoordbudget eten. Zet het pas aan nadat `npm run railvergelijk` op de eigen
+machine laat zien dat het helpt.
 De installatie bindt uitsluitend aan `127.0.0.1`, schakelt Ollama Cloud dubbel
 uit (omgeving én `server.json`), gebruikt Metal, laat maar één verzoek tegelijk
 rekenen en haalt het model na drie minuten rust uit het geheugen.

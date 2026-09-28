@@ -126,12 +126,23 @@ test('de centrale healthroute meldt de werkelijke modelgrens, niet claude of dem
   assert.doesNotMatch(health, /anthropic \? 'claude' : 'demo'/);
 });
 
-test('Ollama is hard lokaal, cloud-uit en begrensd voor een 8 GB Mac', () => {
+test('Ollama is hard lokaal, cloud-uit en begrensd per geheugenprofiel', () => {
   const plist = lees('scripts/mac/ollama/nl.rtg.ollama.plist.sjabloon');
+  const script = lees('scripts/mac/ollama-kompas.sh');
   assert.match(plist, /<key>OLLAMA_HOST<\/key>\s*<string>127\.0\.0\.1:11434<\/string>/);
   assert.match(plist, /<key>OLLAMA_NO_CLOUD<\/key>\s*<string>1<\/string>/);
   assert.match(plist, /<key>OLLAMA_NUM_PARALLEL<\/key>\s*<string>1<\/string>/);
-  assert.match(plist, /<key>OLLAMA_MAX_LOADED_MODELS<\/key>\s*<string>1<\/string>/);
+  /* Het venster en het aantal geladen modellen komen uit het profiel: 16 GB
+     draagt het kleine model en het brein tegelijk, 8 GB alleen het kleine. */
+  assert.match(plist, /<key>OLLAMA_MAX_LOADED_MODELS<\/key>\s*<string>@@GELADEN@@<\/string>/);
+  assert.match(plist, /<key>OLLAMA_CONTEXT_LENGTH<\/key>\s*<string>@@CONTEXT@@<\/string>/);
+  assert.match(script, /16gb\) CONTEXT=12288; GELADEN=2/);
+  assert.match(script, /8gb\) CONTEXT=8192; GELADEN=1; BREIN=""/);
+  /* EEN venster op DRIE plekken: server, model en RTG. Loopt er een uit, dan
+     denkt RTG dat er iets past wat de server stil afkapt. */
+  assert.match(script, /\/\/@@CONTEXT@@\/\$CONTEXT/);
+  assert.match(script, /s\|\^PARAMETER num_ctx \.\*\|PARAMETER num_ctx \$CONTEXT\|/);
+  assert.match(script, /LOCAL_AI_CONTEXT=\$CONTEXT/);
   assert.match(plist, /<key>OLLAMA_KEEP_ALIVE<\/key>\s*<string>3m<\/string>/);
   assert.match(plist, /<key>ProcessType<\/key>\s*<string>Interactive<\/string>/);
   assert.doesNotMatch(plist, /<string>Background<\/string>/);
@@ -153,7 +164,10 @@ test('installatie controleert loopback, cloud-uit, Metal en het eigen model', ()
   assert.match(script, /Ollama cloud disabled: true/);
   assert.match(script, /library=Metal/);
   assert.match(script, /RTG_EXTERNE_AI_UIT=1/);
-  assert.match(script, /LOCAL_AI_MODEL_TOOLS=\$NAAM/);
+  /* Het brein doet gesprek en gereedschap; het kleine model korte vragen en beeld. */
+  assert.match(script, /LOCAL_AI_MODEL_TOOLS=\$TEKST/);
+  assert.match(script, /LOCAL_AI_MODEL_KORT=\$NAAM/);
+  assert.match(script, /"\$OLLAMA" list \| grep -q "\^\$BREINNAAM"/, 'de controle eist het brein als het profiel er een heeft');
 });
 
 test('RTG Live Twin haalt bron, uitvoering en autoriteit alleen uit applicatieregels', () => {

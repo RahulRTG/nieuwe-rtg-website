@@ -15,6 +15,8 @@ const { LUS_REGELS, CONTEXT_REGELS } = require('./lusregels');
 const { inhoudswoorden } = require('./resolver-woorden');
 const beleid = require('./beleid');
 const { maakIsolatiefilter } = require('./isolatiefilter');
+const { lusPakket } = require('./luspakket');
+const { vensterVan } = require('../ai/contextpakket');
 
 module.exports = ({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, parseSubs, isolatie, railNaam }) => {
   /* Of het spoor naar buiten mag, beslist ./spoor.js -- die keuze hoort bij het
@@ -91,8 +93,13 @@ module.exports = ({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, pa
          dus context kan hier structureel geen vermogen toevoegen. */
       const kaartVraag = [vraag, deeltaak, ctxEigen.join(' ')].filter(Boolean).join(' ');
       for (let s = 0; s < budget; s++) {
+        /* Per beurt een pakket dat in het venster past (./luspakket.js). Past
+           zelfs het verplichte deel niet, dan stopt de lus met die reden en
+           vangen de vaste antwoorden het op -- nooit een stil afgekapt verzoek. */
+        const pak = lusPakket({ systeem, messages, tools: TOOLS, venster: vensterVan(anthropic), antwoord: 1400 });
+        if (!pak.ok) throw Object.assign(new Error(pak.uitleg), { code: pak.code });
         const resp = await anthropic.messages.create({
-          model: 'claude-sonnet-5', max_tokens: 1400, system: systeem, tools: TOOLS, messages
+          model: 'claude-sonnet-5', max_tokens: 1400, system: pak.system, tools: TOOLS, messages: pak.messages
         });
         const wilTools = resp.content.filter(c => c.type === 'tool_use');
         if (!wilTools.length || resp.stop_reason !== 'tool_use') {

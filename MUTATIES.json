@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-27T14:24:07.236Z",
-    "commit": "ab1dc80e0",
-    "boomVuil": false,
-    "boomAnders": 1,
+    "op": "2026-09-28T13:01:22.177Z",
+    "commit": "e9c8cf23",
+    "boomVuil": true,
+    "boomAnders": 11,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -2114,6 +2114,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "contextpakket.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/ai/contextpakket.js",
+      "operator": "===->!==#0",
+      "gezakt": 8,
+      "geprobeerd": 1
     },
     "contextspoor.test.js": {
       "soort": "puur",

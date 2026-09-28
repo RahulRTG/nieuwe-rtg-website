@@ -89,7 +89,7 @@ Kolommen: **code** / **extern** / **besluit** = JA/NEE; *bewijs* = wat
 | B9 | **Alle negen dichtgezette geldcode- en tickettypes gaan mee in V1**: opwaardeerkaarten (tegoedbon), cadeaukaart, bestellen en bezorgen, RTG Pay aan de kassa (kascode, vooraf, tikcode), entreetickets, vervoerskaartjes, Invisible Arrival, WorkOS-werkruimtetokens | elk type naar het beleid in `CODECREDENTIALS.json` (128-bit, hash-only, eenmalig tonen, vervaldatum, intrekken en roteren, constante-tijd, atomisch claimen), met toetsen als `bewijs` |
 | A1b | Keuringsregel 71 mag een lopende ronde doorlaten die aantoonbaar de eigen ouder is | gedaan: `eigenLijn()` |
 | A2b | Accountmutaties met een schrijver per proces, en de bewaarveger meteen mee | gedaan: `server/db/deelnemers.js`, `server/accounts/achtergrond.js` |
-| B10 | **Kantoortoegang in productie op naam met een passkey**; de gedeelde `OFFICE_CODE` werkt alleen nog buiten productie | deur `office.gedeelde_kantoorcode`; bestaande poort aansluiten (`kern/kantoor/kluispoort.js`, `server/webauthn/`) |
+| B10 | **Kantoortoegang in productie op naam met een passkey**; de gedeelde `OFFICE_CODE` werkt alleen nog buiten productie | **gebouwd**: deur `office.gedeelde_kantoorcode` staat op `closed`. `server/kern/kantoor/productiedeur.js`: in productie weigeren `/api/office/login` en het kantoorgesprek de code vóór de vergelijking; een kantoorsessie ontstaat alleen via `/api/account/start` (rol kantoor) met een verse passkey (zware poort, actie `kantoor-binnen`, zonder terugval); `officeAuth` en de query-tokenpoorten weigeren elke kantoorsessie zonder dat bewijs en het kale lid-token van de eigenaar; zonder passkeylaag of `APP_URL` 503. Toetsen: `test/kantoordeur-productie.test.js` (echte productieserver), `test/kantoor-productiedeur.test.js` |
 | B11 | **Bon- en polsbandsaldo naar 128 bits** met een atomische claim; een gast boekt alleen af wat aan zijn eigen sessie hangt | deur `horeca.bon_en_polsbandsaldo`, patroon van de cadeaukaart |
 | B12 | **Zaakdoos-sleutel per zaak** (128 bits, hash-only, intrekken en roteren), met een kloon die alleen de eigen zaak bevat | deur `devices.zaakdoos_sleutel` |
 | B13 | **De kortingscode van RTG Eten is een promotiecode** en geen geheim: wel een vervaldatum, een maximum, een grens per lid en een rem tegen raden | deur `eten.kortingscode` |
@@ -271,6 +271,19 @@ sleutels verdwijnen bij de opslagstart.
 **Daarmee zijn alle negen typen uit B9 gemigreerd.** Wat de codecredentialpoort
 nog blokkeert zijn de andere echte deuren uit de indeling, niet de geldcodes en
 tickets van V1.
+
+**Vier restdeuren naar hetzelfde beleid (27 september 2026):** de OV-incheckcode
+(`travelos.ov_incheckcode`, `kern/ov/incheckcode.js`: niet langer een 24-bit code
+in procesgeheugen maar een 128-bit hash-only credential per lid, gebonden aan de
+gekozen vervoerder, en een betaalde rit start alleen na een atomaire claim), de
+incheckcode van een Foundation-activiteit (`rtfos.activiteit_incheckcode`), de
+festivalpas (`festivalos.toegangspas`, de scan is de claim) en de bezorgcode
+(`mode.bezorgcode`). Die laatste blijft met opzet vier cijfers omdat het lid hem
+voorleest: `entropy_bits` staat eerlijk op onwaar, en de deur draagt `korte_code`
+(gebonden aan een bezorging, eenmalig, zeven dagen, vergrendeld na vijf fouten,
+hooguit tien codes, HMAC met serversleutel) -- zonder die grenzen weigert
+`scripts/codecredentials.js` de migratie. Oude codes van alle vier worden niet
+gehonoreerd; dat staat per deur als open besluit.
 
 **Juridisch open (E8), en niet door code te beslissen:** een opwaardeerkaart die
 tegen nominale waarde in een uitbetaalbare wallet landt, is vermoedelijk

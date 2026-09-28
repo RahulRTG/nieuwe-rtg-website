@@ -96,6 +96,8 @@ module.exports = ({ app, officeAuth, rtfos, H }) => {
   app.post('/api/rtfos/activiteit/inschrijven', officeAuth, H((req, b) => rtfos.activiteiten.inschrijven(req, b.id, b)));
   app.post('/api/rtfos/activiteit/afmelden', officeAuth, H((req, b) => rtfos.activiteiten.afmelden(req, b.id, b.inschrijvingId)));
   app.post('/api/rtfos/activiteit/incheck', officeAuth, H((req, b) => rtfos.activiteiten.inchecken(req, b.id, b.checkinCode)));
+  // een nieuwe incheckcode: de kale code staat alleen in dit antwoord, de vorige vervalt
+  app.post('/api/rtfos/activiteit/incheckcode', officeAuth, H((req, b) => rtfos.activiteiten.nieuweCode(req, b.id, b.inschrijvingId)));
 
   // ---------- communicatie ----------
   // Naar binnen stuurt de stad zelf; naar buiten pas na een landelijk besluit.

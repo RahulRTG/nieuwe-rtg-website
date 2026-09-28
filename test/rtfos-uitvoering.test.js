@@ -267,7 +267,7 @@ test('vol is een wachtlijst, en een kind zonder oudertoestemming komt er niet in
 
   // de incheckcode is per inschrijving verschillend en geen volgnummer
   assert.notEqual(een.body.inschrijving.checkinCode, twee.body.inschrijving.checkinCode);
-  assert.match(een.body.inschrijving.checkinCode, /^IN-[A-Z0-9]{7}$/);
+  assert.match(een.body.inschrijving.checkinCode, /^IN\.[0-9A-F]{32}$/, 'een 128-bit incheckcode');
 
   // het kind zonder toestemming van de ouders komt er niet in
   const kind = await os_('activiteit/incheck', { id, checkinCode: twee.body.inschrijving.checkinCode });
@@ -284,6 +284,15 @@ test('vol is een wachtlijst, en een kind zonder oudertoestemming komt er niet in
   assert.equal(binnen.body.fototoestemming, false, 'fototoestemming werd afgeleid uit meedoen');
   const nogmaals = await os_('activiteit/incheck', { id, checkinCode: een.body.inschrijving.checkinCode });
   assert.equal(nogmaals.body.alBinnen, true, 'twee keer inchecken gaf geen duidelijk antwoord');
+
+  // een nieuwe incheckcode (kwijt): de vorige opent daarna niets meer, de nieuwe wel
+  const vervang = await os_('activiteit/incheckcode', { id, inschrijvingId: twee.body.inschrijving.id });
+  assert.equal(vervang.status, 200, 'POST /api/rtfos/activiteit/incheckcode: ' + JSON.stringify(vervang.body).slice(0, 200));
+  assert.match(vervang.body.inschrijving.checkinCode, /^IN\.[0-9A-F]{32}$/);
+  assert.equal((await os_('activiteit/incheck', { id, checkinCode: twee.body.inschrijving.checkinCode })).status, 404,
+    'de vervangen code kent de deur niet meer');
+  assert.equal((await os_('activiteit/incheckcode', { id, inschrijvingId: een.body.inschrijving.id })).status, 409,
+    'wie al binnen is krijgt geen nieuwe code');
 
   // afmelden schuift de wachtlijst op, en zegt wie
   const af = await os_('activiteit/afmelden', { id, inschrijvingId: twee.body.inschrijving.id });

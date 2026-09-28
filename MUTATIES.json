@@ -14338,7 +14338,10 @@
     "zaakdoos-kloon.test.js": {
       "soort": "server",
       "staat": "al rood",
-      "gezakteZonderMutatie": 1
+      "gezakteZonderMutatie": 1,
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "zaakdoos-productie.test.js": {
       "soort": "server",
@@ -14617,6 +14620,126 @@
       "lekt": true,
       "reden": "de asserties deden hun werk, maar het proces sloot niet af: deze toets LEKT een handle. Uitslag gemeten met --test-force-exit; het lek is een eigen gebrek en hoort gerepareerd.",
       "operator": "liegpoort /api/",
+      "scherp": "gezakt"
+    },
+    "activiteitincheck.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/codelevenscyclus.js",
+      "operator": "!==->===#0",
+      "gezakt": 8,
+      "geprobeerd": 2
+    },
+    "bezorgcode.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/modebezorg/bezorgcode.js",
+      "operator": "!==->===#0",
+      "gezakt": 8,
+      "geprobeerd": 1
+    },
+    "codecredentials-kortecode.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/codecredentials.js",
+      "operator": "return-weg#0",
+      "gezakt": 2,
+      "geprobeerd": 8
+    },
+    "concern-uitnodiging-credential.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "eten-kortingscode-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "eten-kortingscode.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/collectie-bewerken.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "festivalpas.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/util.js",
+      "operator": "!==->===#0",
+      "gezakt": 7,
+      "geprobeerd": 2
+    },
+    "horecabon-credential.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/collectie-bewerken.js",
+      "operator": "===->!==#0",
+      "gezakt": 9,
+      "geprobeerd": 1
+    },
+    "horecabon-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "kantoor-productiedeur.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/kantoor/productiedeur.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
+    "kantoordeur-productie.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "kantooruitnodiging-credential.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "magnaat-teamkamer-credential.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "ovincheckcode.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "personeelsuitnodiging-montage.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/routes/supplier/werving/uitnodiging.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "service-bevestigingscode.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     }
   }

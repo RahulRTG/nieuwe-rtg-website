@@ -26,7 +26,7 @@
 'use strict';
 
 module.exports = (ctx) => {
-  const { save, editieVind, plekVind, plekPad, magHier, PLEK_SOORTEN } = ctx;
+  const { editieVind, plekVind, plekPad, magHier, PLEK_SOORTEN, pasTransactie, pasEditieIn, pasTelBinnen } = ctx;
 
   /* De plek WAAR JE BINNEN BENT als je hier scant. Een poort is geen
      verblijfplaats: wie bij hek Noord scant, staat daarna in de zone erachter.
@@ -61,14 +61,18 @@ module.exports = (ctx) => {
     return n;
   }
 
-  function scan(fid, eid, data) {
-    const e = editieVind(fid, eid);
+  /* De scan is een CLAIM: oordeel, "al binnen", capaciteit en de telling lopen
+     in EEN collectietransactie (./pas-toegang.js), dus twee poorten zetten een
+     pas nooit allebei binnen. Met PostgreSQL komt er een Promise terug. */
+  const scan = (fid, eid, data) => pasTransactie(bron => scanIn(pasEditieIn(bron, fid, eid), fid, eid, data));
+
+  function scanIn(e, fid, eid, data) {
     if (!e) return { status: 404, stand: 'rood', zin: 'Deze editie bestaat niet.' };
     if (!Array.isArray(e.scans)) e.scans = [];
     const d = data || {};
     const richting = d.richting === 'uit' ? 'uit' : 'in';
 
-    const oordeel = magHier(fid, eid, d);
+    const oordeel = magHier(fid, eid, d, e);
     if (!oordeel.ok) {
       /* Naar buiten mag altijd. Een pas die om welke reden dan ook niet meer
          geldig is -- ingetrokken, dag voorbij -- moet het terrein wel kunnen
@@ -120,7 +124,7 @@ module.exports = (ctx) => {
       door: d.door ? String(d.door).slice(0, 60) : null,
       offline: !!d.offline, at: new Date().toISOString() };
     e.scans.push(s);
-    save();
+    if (richting === 'in') pasTelBinnen(oordeel.pas);
     return { stand, zin, pas: oordeel.pas, plek: oordeel.plek, telplek, scan: s };
   }
 
@@ -142,14 +146,23 @@ module.exports = (ctx) => {
       .map(r => ({ ...r, offline: true }))
       .sort((a, b) => String(a.datum + a.tijd).localeCompare(String(b.datum + b.tijd)));
     const dubbel = [], geweigerd = [];
-    let verwerkt = 0;
-    for (const r of rijen) {
-      const uit = scan(fid, eid, r);
+    let verwerkt = 0, i = 0;
+    const tel = (uit, r) => {
       if (uit.stand === 'groen') verwerkt++;
       else if (uit.stand === 'oranje') dubbel.push({ code: r.code, poort: r.poort, tijd: r.tijd, eerder: uit.eerdere || null });
       else geweigerd.push({ code: r.code, poort: r.poort, tijd: r.tijd, reden: uit.zin });
-    }
-    return { ok: true, aangeboden: rijen.length, verwerkt, dubbel, geweigerd };
+    };
+    // een scan per transactie, op volgorde; synchroon of met Promises
+    const volgende = () => {
+      while (i < rijen.length) {
+        const r = rijen[i++];
+        const uit = scan(fid, eid, r);
+        if (uit && typeof uit.then === 'function') return uit.then(u => { tel(u, r); return volgende(); });
+        tel(uit, r);
+      }
+      return { ok: true, aangeboden: rijen.length, verwerkt, dubbel, geweigerd };
+    };
+    return volgende();
   }
 
   return { scan, scanBundel, telplekVan, aanwezig };

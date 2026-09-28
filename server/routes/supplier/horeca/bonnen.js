@@ -1,6 +1,6 @@
-/* Horeca OS (deellaag): cadeaubonnen en tegoed, de offline-wachtrij en de
-   instellingen (happy hour en arrangementen). Hoort bij horeca/betalen.js;
-   inwisselen loopt daar via dezelfde betaalweg.
+/* Horeca OS (deellaag): de offline-wachtrij en de instellingen (happy hour
+   en arrangementen). De bonnen staan in horeca/bonkaart.js; inwisselen loopt
+   via horeca/betalen.js.
 
    OFFLINE IS EEN ECHTE STAND. Bonnen die tijdens een internetstoring op het
    apparaat zijn gemaakt, komen met hun EIGEN tijdstip binnen en met een
@@ -12,29 +12,11 @@ module.exports = (kern) => {
   /* Samenvoegen is iets anders dan herhalen; zie de kop van dit bestand bij
      /offline/handelingen en kern/horeca/samenvoegen.js. */
   const samenvoegen = require('../../../kern/horeca/samenvoegen')({ horeca, schoon });
-  const { H, Hlees, nu, id, heleCenten, uitEuro, totaal, bonMaak } = horeca;
+  const { H, nu, id, heleCenten, uitEuro, totaal } = horeca;
   const WIJZEN = ['contant', 'pin', 'online', 'rekening', 'kamer', 'bon', 'tegoed', 'munt'];
 
-  /* ---------- bonnen ---------- */
-  app.post('/api/supplier/horeca/bon/maak', supplierAuth, (req, res) => {
-    const bedrag = req.body.centen != null ? heleCenten(req.body.centen) : uitEuro(req.body.bedrag);
-    if (!bedrag) return res.status(400).json({ error: 'Voor welk bedrag?' });
-    const b = bonMaak(req.supplier.code, { soort: req.body.soort, centen: bedrag,
-      naam: req.body.naam, geldigTot: req.body.geldigTot });
-    logActivity(req.supplier.code, req.actor, 'gaf een ' + b.soort + ' uit van ' + (bedrag / 100).toFixed(2));
-    res.json({ ok: true, bon: b });
-  });
-
-  /* OPZOEKEN IS KIJKEN: H() zet de doos van een zaak neer zodra iemand ernaar
-     vraagt, ook bij een 404 (kern/horeca.js). */
-  app.post('/api/supplier/horeca/bon', supplierAuth, (req, res) => {
-    const h = Hlees(req.supplier.code);
-    const code = String(req.body.bonCode || '').toUpperCase();
-    const b = Object.prototype.hasOwnProperty.call(h.bonnen, code) ? h.bonnen[code] : null;
-    if (!b) return res.status(404).json({ error: 'Deze bon kennen we niet.' });
-    res.json({ ok: true, bon: { code: b.code, soort: b.soort, saldo: b.saldo, uitgegeven: b.uitgegeven,
-      geldigTot: b.geldigTot, mutaties: b.mutaties.slice(0, 10) } });
-  });
+  /* De bonnen zelf (cadeaubon, tegoed) staan sinds 27 september 2026 in
+     ./bonkaart.js, op hun eigen collectie met een 128-bit code als hash. */
 
   /* ---------- offline ----------
      Een apparaat dat zonder netwerk doorwerkt, stuurt zijn bonnen later alsnog

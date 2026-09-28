@@ -3,7 +3,7 @@ module.exports = (wctx) => {
   const { kern } = wctx;
   const { DEMO, accounts, app, logActivity, loginFails, noteFailedTry,
     notifySupplier, schoon, supplierAuth, tooManyTries, werkmail } = kern;
-  const uitnodiging = require('./uitnodiging')({ kern });
+  const uitnodiging = kern.personeelsUitnodiging || require('./uitnodiging')({ kern });
   const { findSupplierByName, maakInvite, wervingsBasis, wervingsLink, verbindCode,
     lijstInvites, trekInviteIn, roteerInvite } = uitnodiging;
 app.post('/api/supplier/staff/add', supplierAuth, async (req, res) => {

@@ -94,6 +94,7 @@ const BESCHERMDE_ROUTES = Object.freeze([
   '/api/rtfos/activiteit/open',
   '/api/rtfos/activiteit/status',
   '/api/rtfos/activiteit/incheck',
+  '/api/rtfos/activiteit/incheckcode',
   '/api/rtfos/meldcodes',
   '/api/lab2/bewoner/thema',
   '/api/lab2/bewoner/stem',

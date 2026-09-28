@@ -92,9 +92,16 @@
           var ey = document.createElement('div');
           ey.className = 'rv-ey';
           ey.textContent = pas.soort.toUpperCase();
-          var code = document.createElement('div');
+          // de code staat niet in de lijst: tonen haalt een verse, de vorige vervalt
+          var code = document.createElement('button');
+          code.type = 'button';
           code.className = 'fg-code';
-          code.textContent = pas.code;
+          code.textContent = 'Toon pascode';
+          code.style.fontSize = '1.1rem'; code.style.wordBreak = 'break-all';
+          code.addEventListener('click', function () {
+            api('/api/festival/gast/pas/toon', { festival: staat.fid, editie: staat.eid, id: pas.id })
+              .then(function (r) { code.textContent = (r.body && r.body.code) || (r.body && r.body.error) || 'Dat lukte niet.'; });
+          });
           kaart.appendChild(ey);
           kaart.appendChild(code);
           pas.rechten.forEach(function (r) {

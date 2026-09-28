@@ -43,7 +43,7 @@ module.exports = ({ save, schoon, horeca, beleid, orderlaag, verdeling }) => {
   }
 
   /* ---------- afrekenen ---------- */
-  function betaal(zaakcode, rek, deelnemer, { wijze, centen: bedrag, bonCode, kamer, idem, apparaat, folioBoek }) {
+  async function betaal(zaakcode, rek, deelnemer, { wijze, centen: bedrag, kamer, idem, apparaat, folioBoek }) {
     const magHet = beleid.magAfrekenen(zaakcode);
     if (!magHet.mag) return { status: 403, error: magHet.uitleg, code: magHet.code };
     if (rek.status !== 'open') return { status: 409, error: 'Deze rekening is al ' + rek.status + '.', code: 'gesloten' };
@@ -72,15 +72,31 @@ module.exports = ({ save, schoon, horeca, beleid, orderlaag, verdeling }) => {
     if (wil > open) return { status: 400, code: 'meer-dan-open',
       error: 'Dat is meer dan er openstaat (€ ' + (open / 100).toFixed(2) + ').' };
 
+    /* BON OF TEGOED: ALLEEN WAT AAN DEZE SESSIE HANGT. Er gaat geen code mee;
+       de bon is eerder met de code in de hand gekoppeld (/api/gast/band), en
+       de claim vindt hem op de deelnemer en niets anders. Afboeken is atomair
+       (kern/horeca/bon.js); veranderde de rekening intussen, dan gaat het
+       terug. De idem-sleutel maakt een herhaling na een crash tot dezelfde
+       afboeking. */
     let bonUit = null;
     if (w === 'bon' || w === 'tegoed') {
-      const uit = horeca.bonBoek(zaakcode, bonCode, wil);
-      if (uit.error) return { status: uit.status || 400, error: uit.error, code: 'bon' };
+      if (!deelnemer) return { status: 409, error: 'Koppel eerst je bon aan deze tafel.', code: 'bon-niet-gekoppeld' };
+      const bl = horeca.bonlaag;
+      const uit = await bl.boek({ zaak: zaakcode, centen: wil, idem: idem ? 'gast:' + rek.id + ':' + idem : null,
+        bron: 'gast ' + rek.id, vind: bl.opSessie(zaakcode, rek.id, deelnemer.hash) });
+      if (uit.error) return { status: uit.status || 400, error: uit.error, code: uit.code || 'bon' };
+      const al = uit.herhaald && (rek.betalingen || []).find(p => p && p.bonRef === uit.ref);
+      if (al) return { ok: true, herhaald: true, betaald: al.centen, openstaand: openstaand(rek),
+        gesloten: rek.status === 'betaald', bonSaldo: uit.saldo, rekening: gastBeeld(rek, deelnemer) };
+      if (!uit.herhaald && (rek.status !== 'open' || openstaand(rek) < uit.geboekt)) {
+        await bl.herstel({ zaak: zaakcode, id: uit.bon, ref: uit.ref });
+        return { status: 409, error: 'De rekening veranderde terwijl je betaalde; er is niets van je bon afgegaan.', code: 'rekening-veranderd' };
+      }
       bonUit = uit; wil = uit.geboekt;
     }
     const betaling = { id: id(3), wijze: w, centen: wil, at: nu(),
       door: deelnemer ? deelnemer.handle : 'gast', gastNr: deelnemer ? deelnemer.nr : null,
-      bon: bonUit ? bonUit.bon : null, kamer: w === 'kamer' ? (rek.kamer || schoon(kamer, 20)) : null };
+      bonId: bonUit ? bonUit.bon : null, bonRef: bonUit ? bonUit.ref : null, kamer: w === 'kamer' ? (rek.kamer || schoon(kamer, 20)) : null };
 
     if (w === 'kamer') {
       if (!betaling.kamer) return { status: 400, error: 'Op welke kamer moet dit geboekt worden?', code: 'kamer-leeg' };

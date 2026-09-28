@@ -80,14 +80,17 @@ test('geen_credential is alleen een gesloten, onderbouwd oordeel', () => {
 test('de echte credentials uit de classificatieronde blokkeren de release', () => {
   const register = poort.lees();
   const uit = poort.controleer(register);
-  const echte = ['office.gedeelde_kantoorcode', 'partnerkanaal.personeels_en_partnercode',
-    'horeca.bon_en_polsbandsaldo', 'link.capability_aanvaarden', 'travelos.ov_incheckcode',
-    'mode.bezorgcode', 'workos.concern_uitnodiging', 'festivalos.toegangspas',
-    'magnaat.teamkamer_toegangscode', 'identity.sso_client_secret',
-    'rtfos.activiteit_incheckcode', 'office.kantooruitnodiging', 'service.balie_bevestigingscode',
-    'foundation.onderwijs_les_tokens', 'foundation.family_profile_token_buiten_harde_poort',
-    'eten.kortingscode'];
-  for (const id of echte) {
+  // office.gedeelde_kantoorcode is in productie gesloten (B10): zie de toets hieronder
+  const echte = ['partnerkanaal.personeels_en_partnercode',
+    'link.capability_aanvaarden', 'travelos.ov_incheckcode',
+    'mode.bezorgcode', 'festivalos.toegangspas',
+    'identity.sso_client_secret',
+    'rtfos.activiteit_incheckcode',
+    'foundation.onderwijs_les_tokens', 'foundation.family_profile_token_buiten_harde_poort'];
+  // gemigreerd op 27 september 2026 (B9, de vier restdeuren): zie de toets hieronder
+  const restdeuren = new Set(['travelos.ov_incheckcode', 'mode.bezorgcode', 'festivalos.toegangspas',
+    'rtfos.activiteit_incheckcode']);
+  for (const id of echte.filter(x => !restdeuren.has(x))) {
     const d = register.deuren.find(x => x.id === id);
     assert.ok(d, id + ' hoort geregistreerd te zijn');
     assert.equal(d.status, 'remaining', id + ' is niet gemigreerd');
@@ -107,6 +110,47 @@ test('de echte credentials uit de classificatieronde blokkeren de release', () =
       assert.equal(vrijgave.isNogGeslotenCredentialroute(methode, pad, {}) ||
         vrijgave.VEILIGE_UITGANGEN.includes(route), true, route + ' hoort in NOG_GESLOTEN');
     }
+});
+
+/* B10 (27 september 2026): de gedeelde kantoorcode is in productie gesloten. Dat
+   is geen migratie van de code -- die blijft buiten productie gedeeld en niet
+   hash-only, en dat staat er eerlijk bij -- maar de deur opent in productie niets. */
+test('de gedeelde kantoorcode is in productie gesloten, met eerlijke controls en een proef op een productieserver', () => {
+  const register = poort.lees();
+  const uit = poort.controleer(register);
+  const d = register.deuren.find(x => x.id === 'office.gedeelde_kantoorcode');
+  assert.equal(d.status, 'closed');
+  assert.equal(d.release_blocker, false);
+  assert.ok(!uit.blockers.some(x => x.id === d.id), 'blokkeert niet meer');
+  assert.ok(d.bewijs.includes('test/kantoordeur-productie.test.js'), 'bewezen op een echte productieserver');
+  for (const c of ['productie_code_opent_niets', 'productie_passkey_per_kantoorsessie', 'fail_closed_zonder_passkeyconfig'])
+    assert.equal(d.controls[c], true, c);
+  for (const c of ['code_zelf_hash_only', 'code_zelf_persoonsgebonden'])
+    assert.equal(d.controls[c], false, c + ': de code zelf is niet gemigreerd, en dat staat er');
+  assert.ok(String(d.notitie).length >= 40);
+  const pd = require('../server/kern/kantoor/productiedeur');
+  assert.equal(pd.codeDicht({ NODE_ENV: 'production' }).code, pd.CODE_DICHT, 'de bron sluit hem echt');
+});
+
+test('de vier restdeuren zijn gemigreerd, en de korte bezorgcode alleen met haar grenzen', () => {
+  const uit = poort.controleer(poort.lees());
+  for (const id of ['travelos.ov_incheckcode', 'mode.bezorgcode', 'festivalos.toegangspas', 'rtfos.activiteit_incheckcode']) {
+    const d = poort.lees().deuren.find(x => x.id === id);
+    assert.equal(d.status, 'migrated', id);
+    assert.ok(!uit.blockers.some(x => x.id === id), id + ' blokkeert niet meer');
+    for (const route of d.routes) assert.ok(poort.REQUIRED_ROUTES.includes(route), route + ' hoort bewaakt te zijn');
+  }
+  assert.equal(poort.lees().deuren.find(x => x.id === 'mode.bezorgcode').controls.entropy_bits, false,
+    'vier cijfers halen de 128 bits niet, en dat staat er eerlijk');
+  /* Haal een compenserende grens weg, of maak er geld van, en de uitzondering
+     vervalt: dan is het weer een gemigreerde credential zonder 128 bits. */
+  for (const wijzig of [d => { d.korte_code.rem_met_vergrendeling = false; }, d => { delete d.korte_code; },
+    d => { d.korte_code.max_fout = 50; }, d => { d.korte_code.reden = 'kort'; },
+    d => { d.classificatie = 'money_credential'; }, d => { d.controls.entropy_bits = 13; }]) {
+    const register = JSON.parse(JSON.stringify(poort.lees()));
+    wijzig(register.deuren.find(x => x.id === 'mode.bezorgcode'));
+    assert.ok(poort.controleer(register).fouten.some(f => f.startsWith('mode.bezorgcode: gemigreerde credential mist minimaal 128-bit')));
+  }
 });
 
 test('een routermount kan niet alleen met zijn interne schijnpad groen worden', () => {
@@ -134,6 +178,13 @@ test('iedere resterende deur blokkeert de release', () => {
   assert.ok(!uit.blockers.some(x => x.id === 'pay.giftcard_value_code'),
     'de cadeaukaart is gemigreerd (27 september 2026) en blokkeert niet meer');
   assert.equal(poort.lees().deuren.find(x => x.id === 'pay.giftcard_value_code').status, 'migrated');
+  /* Besluiten B11 en B13 (27 september 2026): de horecabon is gemigreerd, de
+     kortingscode van RTG Eten is een promotiecode -- geen geheim, wel begrensd. */
+  assert.ok(!uit.blockers.some(x => x.id === 'horeca.bon_en_polsbandsaldo'));
+  assert.equal(poort.lees().deuren.find(x => x.id === 'horeca.bon_en_polsbandsaldo').status, 'migrated');
+  const promo = poort.lees().deuren.find(x => x.id === 'eten.kortingscode');
+  assert.ok(!uit.blockers.some(x => x.id === 'eten.kortingscode'));
+  assert.deepEqual([promo.status, promo.classificatie, promo.release_blocker], ['closed', 'public_identifier', false]);
   assert.ok(!uit.blockers.some(x => x.id === 'travelos.airport_boarding_pass'));
   assert.equal(poort.lees().deuren.find(x =>
     x.id === 'travelos.airport_boarding_pass').status, 'migrated');

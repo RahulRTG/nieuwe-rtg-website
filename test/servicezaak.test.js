@@ -137,7 +137,10 @@ test('een zaak bevestigt toegang net als een lid', async () => {
 
     const wacht = await o.p('/api/supplier/service/bevestigingen', {}, o.zaakToken);
     assert.equal(wacht.body.verzoeken.length, 1, 'er stond niets klaar op de werkplek van de zaak');
-    assert.match(String(wacht.body.verzoeken[0].code), /^\d{6}$/);
+    assert.equal(wacht.body.verzoeken[0].code, undefined, 'de lijst op de werkplek draagt geen code');
+    const toon = await o.p('/api/supplier/service/bevestiging/toon', { id: wacht.body.verzoeken[0].id }, o.zaakToken);
+    assert.equal(toon.status, 200, JSON.stringify(toon.body).slice(0, 200));
+    assert.match(String(toon.body.code), /^\d{6}$/, 'de zaak kan de terugvalcode zelf opvragen');
 
     const ok = await o.p('/api/supplier/service/bevestig', { id: wacht.body.verzoeken[0].id }, o.zaakToken);
     assert.equal(ok.status, 200, JSON.stringify(ok.body).slice(0, 200));
@@ -224,12 +227,13 @@ test('een AI krijgt alleen de actieve capability; verwijderde namen maken geen m
    op naam van een mens staat. */
 test('de AI-onderzoeker opent pas iets nadat het lid heeft bevestigd, en leent nooit', async () => {
   const crypto = require('crypto');
-  const db = { data: {} };
+  const db = { data: {}, writable: true };
   const save = () => {};
+  const bewerkCollectie = require('../server/db/collectie-bewerken')({ store: 'json', db, save });
   const zaken = require('../server/kern/service/zaak')({ db, save, crypto });
   const loop = require('../server/kern/service/loop')({ zaken, save });
   const mach = require('../server/kern/service/machtiging')({ db, save, crypto, zaken });
-  const bev = require('../server/kern/service/bevestiging')({ db, save, crypto, zaken, machtigingen: mach });
+  const bev = require('../server/kern/service/bevestiging')({ db, save, crypto, zaken, machtigingen: mach, bewerkCollectie });
   const ond = require('../server/kern/service/onderzoeker')({ zaken, loop, machtigingen: mach, bevestiging: bev, save });
 
   const z = zaken.open({ melder: 'lid-77', doelgroep: 'lid', onderwerp: 'zaak',
@@ -257,7 +261,7 @@ test('de AI-onderzoeker opent pas iets nadat het lid heeft bevestigd, en leent n
   assert.equal(v.bevestiging.machtiging, null, 'er ontstond een machtiging zonder het lid');
   assert.equal(ond.poort(null, cap, { zaakId: z.id }).mag, false);
 
-  const b = bev.bevestig(v.bevestiging.id, { melder: 'lid-77' });
+  const b = await bev.bevestig(v.bevestiging.id, { melder: 'lid-77' });
   assert.ok(b.ok, JSON.stringify(b));
   assert.equal(ond.poort(b.machtiging.id, cap, { zaakId: z.id }).mag, true, 'de poort ging niet open na bevestiging');
 

@@ -31,7 +31,8 @@ module.exports = (kern) => {
   require('./horeca/schuif')(ctx);     // verplaatsen, samenvoegen, splitsen
   require('./horeca/verdeling')(ctx);  // wie betaalt welk deel -- één rekening, geen knip
   require('./horeca/betalen')(ctx);    // korting, fooi, betalen, oninbaar
-  require('./horeca/bonnen')(ctx);     // cadeaubon en tegoed, offline-sync, happy hour
+  require('./horeca/bonnen')(ctx);     // offline-sync, happy hour
+  require('./horeca/bonkaart')(ctx);   // cadeaubon en tegoed: 128 bits, intrekken, roteren
   require('./horeca/keuken')(ctx);     // het keukenscherm: stations en standen
   require('./horeca/keuken-regie')(ctx); // het regiescherm van de chef en de drukterem
   require('./horeca/pas')(ctx);        // de werklijst van de pas: oppakken, overnemen, uitgeven

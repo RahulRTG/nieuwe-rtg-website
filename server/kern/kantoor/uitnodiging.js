@@ -1,70 +1,95 @@
-/* DE KANTOORUITNODIGING -- AUTHORITY.md fase 2, gebouwd naast de gedeelde code.
+/* DE KANTOORUITNODIGING -- AUTHORITY.md fase 2, en sinds 27 september 2026
+   een credential volgens het releasebeleid (office.kantooruitnodiging, B9).
 
-   Besluit van de eigenaar (23 september 2026): bouwen, en daarna dezelfde dag
-   de gedeelde code dicht voor nieuwe koppelingen. Tot dan kwam
-   iedereen de kantoorrol binnen met EEN code die het hele kantoor kent, en die
-   code is daarmee geen bewijs van wie er koppelt. Een uitnodiging is dat wel:
+   Besluit van de eigenaar (23 september 2026): de gedeelde code koppelt geen
+   kantoorrol meer. Een uitnodiging bewijst WIE er koppelt:
 
-     - OP NAAM: aan een sleutel gebonden, en alleen die sleutel kan hem verzilveren;
-     - EENMALIG: na gebruik is hij op;
-     - MET EEN VERVALDATUM: zeven dagen, en een verlopen uitnodiging is dicht;
-     - ZONDER DE CODE OP TE SLAAN: alleen een hash. De code wordt een keer getoond,
-       aan de eigenaar die hem maakt, en verder nergens.
+     - OP NAAM: aan een sleutel gebonden, en alleen die sleutel verzilvert hem;
+     - EENMALIG: max_gebruik 1, en de claim staat in een collectietransactie,
+       dus twee instances kunnen hem niet allebei verzilveren;
+     - ZEVEN DAGEN geldig, met issuer/doel/scope;
+     - 128 BIT (KU.<32 hex, ../bearercode.js), alleen als hash bewaard en
+       constant-time gezocht; kaal alleen in het antwoord op de uitgifte;
+     - INTREKBAAR door de eigenaar, en een nieuwe uitgifte voor dezelfde sleutel
+       IS de rotatie: de open uitnodiging wordt daarbij ingetrokken.
 
-   DE TELLING: elke koppeling telt mee onder de weg waarlangs hij kwam. Sinds
-   later op 23 september 2026 koppelt de gedeelde code niet meer (besluit van de
-   eigenaar, kern/eenaccount/koppelen.js); `gedeeldeCode` telt de koppelingen van
-   daarvoor en `gedeeldeCodeGeweigerd` de pogingen erna.
+   Uitnodigingen van voor de migratie hebben alleen een ongenaamruimde hash van
+   een code van circa 50 bit en openen niets meer; de eigenaar geeft opnieuw uit.
 
    Wat hier NIET gebeurt: een recht verlenen. Een verzilverde uitnodiging levert
-   precies de kantoorrol die de gedeelde code ook gaf; niet meer. */
+   precies de kantoorrol, niet meer. */
 'use strict';
 
 const GELDIG_DAGEN = 7;
 const DAG = 86400000;
-const ALFABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const DOEL = 'kantoorrol-koppelen';
+const SCOPE = Object.freeze(['kantoor.koppel']);
+const VORM = /^KU\.[0-9A-F]{32}$/i;
+const FOUT = { status: 401, error: 'Deze uitnodiging is niet geldig voor uw account, al gebruikt of verlopen.' };
 
-function maakUitnodiging({ db, save, crypto, nu }) {
+function maakUitnodiging({ db, save, crypto, nu, bewerkCollectie }) {
   const tijd = nu || Date.now;
+  const iso = () => new Date(tijd()).toISOString();
+  const bearer = require('../bearercode')({ crypto, namespace: 'office.kantooruitnodiging', nu: iso });
   const eigen = require('../eigencollectie')({ db, domein: 'kern/kantoor/uitnodiging',
     bezit: { kantoorUitnodigingen: 'lijst', kantoorKoppelwegen: 'kaart' } });
-  const lijst = () => eigen.bak('kantoorUitnodigingen');
-  const hash = (code) => crypto.createHash('sha256').update(String(code || '').trim().toUpperCase()).digest('hex');
+  const transactie = werk => {
+    if (typeof bewerkCollectie !== 'function') return { status: 503, error: 'De kantooruitnodiging is niet bedraad in deze server.' };
+    eigen.bak('kantoorUitnodigingen'); // een lege collectie is een lijst en geen kaart
+    return bewerkCollectie('kantoorUitnodigingen', l => {
+      if (!Array.isArray(l)) throw new Error('kantoorUitnodigingen hoort een lijst te zijn');
+      return werk(l);
+    });
+  };
+  // constant-time over de hele lijst; een verkeerd gevormde code wordt niet eens gehasht
+  const zoek = (l, code) => VORM.test(String(code || '').trim()) ? bearer.vind(l, code, u => u.toegang && u.toegang.code_hash) : null;
+  const stand = u => !u.toegang ? 'ongeldig' : u.toegang.gebruik >= u.toegang.max_gebruik ? 'gebruikt'
+    : u.toegang.ingetrokken_at ? 'ingetrokken' : bearer.reden(u.toegang) === 'verlopen' ? 'verlopen' : 'open';
 
-  /* Een nieuwe uitnodiging voor een sleutel. Een open uitnodiging voor dezelfde
-     sleutel vervalt meteen: twee geldige codes voor een mens is een code te veel. */
+  /* Een nieuwe uitnodiging voor een sleutel; een open uitnodiging voor dezelfde
+     sleutel wordt in dezelfde transactie ingetrokken (dat is de rotatie). */
   function maak({ voorKey, codenaam, door }) {
     if (!/^user-\d+$/.test(String(voorKey || '')))
       return { status: 400, error: 'Een uitnodiging hangt aan een persoonlijke RTG-inlog.' };
-    const bytes = crypto.randomBytes(10);
-    let code = '';
-    for (const b of bytes) code += ALFABET[b % ALFABET.length];
-    const nuT = tijd();
-    const l = lijst();
-    for (const u of l) if (u.voorKey === voorKey && !u.gebruikt && !u.ingetrokken) u.ingetrokken = new Date(nuT).toISOString();
-    l.push({ id: 'uitn_' + crypto.randomBytes(6).toString('hex'), voorKey, codenaam: codenaam || null, door: door || null,
-      hash: hash(code), gemaakt: new Date(nuT).toISOString(), verloopt: new Date(nuT + GELDIG_DAGEN * DAG).toISOString(),
-      gebruikt: null, ingetrokken: null });
-    save();
-    return { ok: true, code, verloopt: new Date(nuT + GELDIG_DAGEN * DAG).toISOString(),
-      let: 'Deze code wordt maar een keer getoond. Geef hem op een veilige manier aan de medewerker.' };
+    return transactie(l => {
+      for (const u of l) if (u.voorKey === voorKey && u.toegang && !u.toegang.ingetrokken_at && u.toegang.gebruik < 1)
+        bearer.intrekken(u.toegang, door || 'eigenaar', 'vervangen door een nieuwe uitnodiging');
+      const id = 'uitn_' + crypto.randomBytes(8).toString('hex');
+      const g = bearer.maak({ prefix: 'KU', issuer: 'rtg.kantoor.eigenaar', doel: DOEL, scope: SCOPE,
+        onderwerp: { soort: 'kantooruitnodiging', id, voorKey }, geldigMs: GELDIG_DAGEN * DAG, maxGebruik: 1 });
+      l.push({ id, voorKey, codenaam: codenaam || null, door: door || null, toegang: g.toegang,
+        gemaakt: g.toegang.issued_at, verloopt: g.toegang.expires_at });
+      if (l.length > 2000) l.splice(0, l.length - 2000);
+      return { ok: true, id, code: g.code, verloopt: g.toegang.expires_at,
+        let: 'Deze code wordt maar een keer getoond. Geef hem op een veilige manier aan de medewerker.' };
+    });
   }
 
   /* Verzilveren: alleen door de sleutel waarvoor hij is gemaakt, een keer, en
-     binnen de vervaldatum. Een foute poging zegt niet WELKE voorwaarde viel --
-     dat zou een raadspel makkelijker maken. */
+     binnen de vervaldatum. Een foute poging zegt niet WELKE voorwaarde viel. De
+     proef leest de werkkopie en verbruikt niets: de tweede factor komt nog. */
+  function magVerzilveren(u, key) {
+    return !!(u && u.voorKey === key && u.toegang && u.toegang.onderwerp && u.toegang.onderwerp.id === u.id &&
+      u.toegang.onderwerp.voorKey === key && !bearer.reden(u.toegang, { doel: DOEL, scope: SCOPE }));
+  }
   function verzilver(key, code, opties) {
-    const h = hash(code);
-    const u = lijst().find(x => x.hash === h);
-    const nuT = tijd();
-    if (!u || u.voorKey !== key || u.gebruikt || u.ingetrokken || Date.parse(u.verloopt) < nuT)
-      return { status: 401, error: 'Deze uitnodiging is niet geldig voor uw account, al gebruikt of verlopen.' };
-    /* Een proef verbruikt niets: de tweede factor komt nog, en een uitnodiging
-       die opgaat aan een verkeerd getypte authenticatorcode is een gemene val. */
-    if (opties && opties.proef) return { ok: true };
-    u.gebruikt = new Date(nuT).toISOString();
-    save();
-    return { ok: true };
+    if (opties && opties.proef) return magVerzilveren(zoek(eigen.kijk('kantoorUitnodigingen') || [], code), key) ? { ok: true } : FOUT;
+    return transactie(l => {
+      const u = zoek(l, code);
+      if (!magVerzilveren(u, key)) return FOUT;
+      bearer.gebruik(u.toegang);
+      return { ok: true };
+    });
+  }
+
+  function intrek(id, door) {
+    return transactie(l => {
+      const u = l.find(x => x && x.id === String(id || ''));
+      if (!u || !u.toegang) return { status: 404, error: 'Deze uitnodiging bestaat niet.' };
+      if (u.toegang.gebruik >= u.toegang.max_gebruik) return { status: 409, error: 'Deze uitnodiging is al gebruikt; ontkoppel de kantoorrol in plaats daarvan.' };
+      bearer.intrekken(u.toegang, door || 'eigenaar', 'ingetrokken door de eigenaar');
+      return { ok: true, id: u.id, stand: stand(u) };
+    });
   }
 
   /* De schaduw van fase 2: langs welke weg de kantoorrol werd gekoppeld. */
@@ -75,18 +100,17 @@ function maakUitnodiging({ db, save, crypto, nu }) {
   }
 
   function overzicht() {
-    const nuT = tijd();
     return {
-      uitnodigingen: lijst().slice(-100).reverse().map(u => ({ id: u.id, codenaam: u.codenaam, gemaakt: u.gemaakt,
-        verloopt: u.verloopt, stand: u.gebruikt ? 'gebruikt' : u.ingetrokken ? 'ingetrokken'
-          : Date.parse(u.verloopt) < nuT ? 'verlopen' : 'open' })),
+      uitnodigingen: (eigen.kijk('kantoorUitnodigingen') || []).slice(-100).reverse().map(u => ({ id: u.id,
+        codenaam: u.codenaam, gemaakt: u.gemaakt, verloopt: u.verloopt, stand: stand(u),
+        toegang: bearer.publiek(u.toegang) })),
       koppelwegen: Object.assign({ gedeeldeCode: 0, gedeeldeCodeGeweigerd: 0, uitnodiging: 0 }, eigen.kijk('kantoorKoppelwegen') || {}),
       uitleg: 'Sinds 23 september 2026 koppelt de gedeelde kantoorcode geen kantoorrol meer aan een account (besluit ' +
         'van de eigenaar); gedeeldeCode telt de koppelingen van daarvoor, gedeeldeCodeGeweigerd de pogingen erna.'
     };
   }
 
-  return { maak, verzilver, telWeg, overzicht, GELDIG_DAGEN };
+  return { maak, verzilver, intrek, telWeg, overzicht, GELDIG_DAGEN };
 }
 
 module.exports = { maakUitnodiging };

@@ -63,16 +63,21 @@ test('2. de dienst: de chauffeur deelt GPS en het lid ziet de bus live aankomen'
   assert.ok(bus.overMin >= 1 && bus.overMin <= 15, 'met een echte aanrijtijd uit de GPS');
 });
 
-test('3. snelle optie 1: de oplichtende code; het personeel tikt hem in en u bent binnen', async () => {
-  const c = await api('/api/ov/code', {}, lidA);
+test('3. snelle optie 1: de oplichtende code; het personeel scant hem en u bent binnen', async () => {
+  const zonder = await api('/api/ov/code', {}, lidA);
+  assert.equal(zonder.status, 400, 'zonder vervoerder geen code: hij hoort bij EEN zaak');
+  const c = await api('/api/ov/code', { zaak: 'TRANSIT' }, lidA);
   assert.equal(c.status, 200);
-  assert.match(c.body.code, /^[0-9A-F]{6}$/, 'een korte oplichtende code');
+  assert.match(c.body.code, /^OVI\.[0-9A-F]{32}$/, 'een 128-bit incheckcode');
+  assert.equal(c.body.toegang.doel, 'ov-incheck');
   const fout = await api('/api/staff/ov/checkin', { code: 'ZZZZZZ' }, pda);
   assert.equal(fout.status, 404);
   const inch = await api('/api/staff/ov/checkin', { code: c.body.code }, pda);
   assert.equal(inch.status, 200);
   assert.equal(inch.body.rit.status, 'in');
-  const dubbel = await api('/api/ov/code', {}, lidA);
+  const nogmaals = await api('/api/staff/ov/checkin', { code: c.body.code }, pda);
+  assert.equal(nogmaals.status, 404, 'een verzilverde code start geen tweede rit');
+  const dubbel = await api('/api/ov/code', { zaak: 'TRANSIT' }, lidA);
   assert.equal(dubbel.status, 409, 'wie al ingecheckt is, checkt eerst uit');
   const stand = await api('/api/staff/ov/stand', {}, pda);
   assert.equal(stand.body.aanBoord, 1, 'de chauffeur ziet de teller lopen');

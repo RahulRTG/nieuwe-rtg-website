@@ -32,6 +32,15 @@ module.exports = (kern) => {
       liveCodename(req.session)));      // uit de SESSIE, nooit uit het lichaam
   });
 
+  /* De drager toont zijn eigen pas: dat roteert, en de kale code staat alleen
+     in dit antwoord (kern/festival/pas-toegang.js). */
+  app.post('/api/festival/gast/pas/toon', auth, async (req, res) => {
+    if (geenGast(req, res)) return;
+    const b = req.body || {};
+    stuur(res, await festival.pasToon(String(b.festival || ''), String(b.editie || ''),
+      liveCodename(req.session), String(b.id || '')));
+  });
+
   /* Het programma is niet persoonlijk, maar staat toch achter `auth`: er is in
      dit huis geen publieke kant, en een line-up is het eerste dat er een van
      zou maken. */

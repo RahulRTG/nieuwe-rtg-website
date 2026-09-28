@@ -24,6 +24,12 @@ const EIGEN = [
   '/api/supplier/salon/deal/redeem',
   '/api/office/bank/mislukking',
   '/api/festival/verkoop/rond',
+  // de pascode en de horecabon/polsband beslissen zelf over een herhaling (B9, B11)
+  '/api/festival/pas',
+  '/api/supplier/horeca/betaal',
+  '/api/supplier/horeca/bon/maak',
+  '/api/supplier/horeca/bon/roteer',
+  '/api/supplier/horeca/club/band',
   '/api/giftcard/buy',
   '/api/giftcard/roteer',
   '/api/supplier/betaalverzoek',

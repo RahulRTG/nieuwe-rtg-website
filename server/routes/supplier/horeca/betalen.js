@@ -16,7 +16,7 @@
       lade. Een bon die op -3,40 uitkomt, klopt nooit meer met de kas. */
 module.exports = (kern) => {
   const { app, save, schoon, supplierAuth, logActivity, sseToSupplier, horeca } = kern;
-  const { nu, id, heleCenten, uitEuro, openstaand, bonBoek } = horeca;
+  const { nu, id, heleCenten, uitEuro, openstaand } = horeca;
   const rekVan = kern.horecaRekVan;
   const publiek = kern.horecaPubliek;
   const WIJZEN = ['contant', 'pin', 'online', 'rekening', 'kamer', 'bon', 'tegoed', 'munt'];
@@ -48,7 +48,7 @@ module.exports = (kern) => {
   });
 
   /* ---------- betalen ---------- */
-  app.post('/api/supplier/horeca/betaal', supplierAuth, (req, res) => {
+  app.post('/api/supplier/horeca/betaal', supplierAuth, async (req, res) => {
     const r = rekVan(req, res); if (!r) return;
     if (r.status !== 'open') return res.status(409).json({ error: 'Deze rekening is al ' + r.status + '.' });
     const wijze = String(req.body.wijze || 'pin');
@@ -58,18 +58,30 @@ module.exports = (kern) => {
     let bedrag = req.body.centen != null ? heleCenten(req.body.centen) : (req.body.bedrag != null ? uitEuro(req.body.bedrag) : open);
     if (!bedrag) return res.status(400).json({ error: 'Vul het bedrag in.' });
 
-    // bon of tegoed: eerst afboeken op de bon, dan pas noteren als betaling
+    /* bon of tegoed: eerst afboeken (atomair, kern/horeca/bon.js), dan pas
+       noteren. Staat de rekening na het wachten niet meer open voor dit bedrag,
+       dan gaat de afboeking terug en wordt er niets genoteerd. */
     let bonUit = null;
     if (wijze === 'bon' || wijze === 'tegoed') {
-      const uit = bonBoek(req.supplier.code, req.body.bonCode, Math.min(bedrag, open));
-      if (uit.error) return res.status(uit.status || 400).json({ error: uit.error });
+      const bl = horeca.bonlaag, zaak = req.supplier.code;
+      const uit = await bl.boek({ zaak, centen: Math.min(bedrag, open), idem: req.body.idem, bron: 'kassa ' + r.id,
+        vind: req.body.bonId ? bl.opId(zaak, req.body.bonId) : bl.opCode(zaak, String(req.body.bonCode || '').slice(0, 80)) });
+      if (uit.error) return res.status(uit.status || 400).json({ error: uit.error, code: uit.code });
+      if (!uit.herhaald && (r.status !== 'open' || openstaand(r) < uit.geboekt)) {
+        await bl.herstel({ zaak, id: uit.bon, ref: uit.ref });
+        return res.status(409).json({ error: 'De rekening veranderde tijdens het afboeken; er is niets van de bon afgegaan.', code: 'rekening-veranderd' });
+      }
+      // dezelfde sleutel na een volledige betaling: de eerste betaling terug, geen tweede
+      const al = uit.herhaald && (r.betalingen || []).find(p => p && p.bonRef === uit.ref);
+      if (al) return res.json({ ok: true, herhaald: true, betaling: al, openstaand: openstaand(r),
+        gesloten: r.status === 'betaald', rekening: publiek(r), bonSaldo: uit.saldo });
       bonUit = uit; bedrag = uit.geboekt;
     }
     if (bedrag > open) return res.status(400).json({ error: 'Dat is meer dan er openstaat (' + (open / 100).toFixed(2) + '). Wisselgeld gaat uit de lade, niet over de bon.' });
 
     const betaling = { id: id(3), wijze, centen: bedrag, at: nu(), door: req.actor.name,
       valuta: schoon(req.body.valuta, 3) || 'EUR', koers: req.body.koers ? Number(req.body.koers) : null,
-      bon: bonUit ? bonUit.bon : null, kamer: wijze === 'kamer' ? (r.kamer || schoon(req.body.kamer, 20)) : null };
+      bonId: bonUit ? bonUit.bon : null, bonRef: bonUit ? bonUit.ref : null, kamer: wijze === 'kamer' ? (r.kamer || schoon(req.body.kamer, 20)) : null };
     if (wijze === 'kamer' && !betaling.kamer) return res.status(400).json({ error: 'Op welke kamer moet dit geboekt worden?' });
     /* Op de kamer boeken kan alleen als daar een open gastrekening staat. Zo
        verdwijnt een rekening nooit in een kamer die leegstaat -- dat merkt

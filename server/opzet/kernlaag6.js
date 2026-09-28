@@ -27,7 +27,7 @@ module.exports = (kern, hulp) => {
    voertuigen via de PDA, twee snelle check-ins (oplichtende code of GPS) en
    uitchecken met eerlijke km-prijs via RTG Pay. Na pay en sociaal gemount. */
 Object.assign(kern, require('../kern/ov').maakOv({
-  db, save, crypto, schoon, codenaamVan: kern.codenaamVan, haversine, etaMinutes, pay: kern.pay, notify
+  db, save, crypto, bewerkCollectie: hulp.bewerkCollectie, schoon, codenaamVan: kern.codenaamVan, haversine, etaMinutes, pay: kern.pay, notify
 }));
 /* Het Mobility OS (kern/mobiliteit/): de vervoerskern onder alles wat rijdt,
    vaart of vliegt. Een moduleregister met afhankelijkheden (welk vervoer

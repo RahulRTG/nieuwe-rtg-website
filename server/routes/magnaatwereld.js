@@ -41,6 +41,8 @@ module.exports = (kern) => {
   app.post('/api/member/magnaat/teamkamer/mijn', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.teamkamerMijn(key, b.id)));
   app.post('/api/member/magnaat/teamkamer/maak', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.teamkamerMaak(key, b)));
   app.post('/api/member/magnaat/teamkamer/deelnemen', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.teamkamerDeelnemen(key, b.code)));
+  app.post('/api/member/magnaat/teamkamer/code', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.teamkamerCode(key, b.id)));
+  app.post('/api/member/magnaat/teamkamer/code/intrek', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.teamkamerCodeIntrek(key, b.id)));
   app.post('/api/member/magnaat/teamkamer/rol', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.teamkamerRol(key, b.id, b.rolId, b.revisie)));
   app.post('/api/member/magnaat/teamkamer/start', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.teamkamerStart(key, b.id, b.revisie, b.commandoId)));
   app.post('/api/member/magnaat/teamkamer/actie', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.teamkamerActie(key, b.id, b)));

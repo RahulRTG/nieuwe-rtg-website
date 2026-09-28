@@ -76,6 +76,17 @@ const ROUTES = new Set([
   'POST /api/supplier/ticket/toon',
   'POST /api/supplier/ticket/deurverkoop',
   'POST /api/mob/kaart/toon',
+  /* De vier restdeuren van B9: OV-incheckcode, bezorgcode, festivalpas en de
+     incheckcode van een Foundation-activiteit. Elk antwoord hier draagt de kale
+     code precies een keer (kern/ov/incheckcode.js, kern/modebezorg/bezorgcode.js,
+     kern/festival/pas-toegang.js, kern/rtfos/activiteiten-deur.js). */
+  'POST /api/ov/code',
+  'POST /api/mode/bezorg/code',
+  'POST /api/festival/pas',
+  'POST /api/festival/verkoop/rond',
+  'POST /api/festival/gast/pas/toon',
+  'POST /api/rtfos/activiteit/inschrijven',
+  'POST /api/rtfos/activiteit/incheckcode',
   /* kascode en tikcode (kern/pay/kasbak.js): uitgeven is roteren, en een retry
      met dezelfde sleutel krijgt 409 zonder code in plaats van een kopie. */
   'POST /api/pay/kascode',
@@ -94,7 +105,19 @@ const ROUTES = new Set([
   /* De sleutel per Zaakdoos (kern/zaakdoos/sleutels.js): uitgeven is roteren, en
      het antwoord draagt de kale sleutel die daarna alleen als hash bestaat. */
   'POST /api/office/doos/sleutel',
-  'POST /api/supplier/doos/sleutel'
+  'POST /api/supplier/doos/sleutel',
+  /* De horecabon en de polsband (kern/horeca/bon.js): de code staat alleen in
+     het antwoord op maken, de eerste band-opwaardering en een rotatie; een
+     herhaling krijgt de bon zonder code. */
+  'POST /api/supplier/horeca/bon/maak',
+  'POST /api/supplier/horeca/bon/roteer',
+  'POST /api/supplier/horeca/club/band',
+  /* De vier codedeuren van 27 september 2026 (lib/idemsleutels-nooit-codedeuren.js):
+     elk van deze antwoorden draagt een kale code die alleen als hash blijft. */
+  'POST /api/concern/uitnodigen', 'POST /api/concern/bulk/verstuur', 'POST /api/concern/uitnodiging/roteer',
+  'POST /api/member/magnaat/teamkamer/maak', 'POST /api/member/magnaat/teamkamer/code',
+  'POST /api/service/bevestiging/toon', 'POST /api/supplier/service/bevestiging/toon',
+  'POST /api/office/kantoor/uitnodiging'
 ]);
 
 const isEenmalig = (methode, pad) => ROUTES.has(

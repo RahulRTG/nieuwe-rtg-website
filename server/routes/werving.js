@@ -42,7 +42,7 @@ module.exports = (kern) => {
   /* De uitnodiging-helpers wonen bij de supplier-werving; die module wordt daar
      gemount en levert ze hier aan via de kern. Zo is er een plek die weet wat
      een uitnodiging is (zie routes/supplier/werving/uitnodiging.js). */
-  const uitnodiging = require('./supplier/werving/uitnodiging')({ kern });
+  const uitnodiging = kern.personeelsUitnodiging || require('./supplier/werving/uitnodiging')({ kern });
   const { zoekInvite, verbindCode } = uitnodiging;
 
   /* Wat staat er achter deze link? Genoeg om te weten waar je bent. */

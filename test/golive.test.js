@@ -150,12 +150,15 @@ test('de veilige productiestart komt op en gedraagt zich als productie', async (
     eigenaarSleutel: 'proef-eenmalige-eigenaarssleutel' });
   const tech = await (await post('/api/techniek/inloggen', { login: 'eigenaar@echtdomein.nl', wachtwoord: 'eigenaar123' })).json();
   assert.equal(tech.eigenaar, true, 'de echte eigenaar heeft de technische pagina');
-  // en de backoffice draait op de eigen (niet-demo) code
-  assert.equal((await post('/api/office/login', { code: 'RTG-OFFICE' })).status, 401, 'de demo-backofficecode werkt niet');
-  assert.equal((await post('/api/office/login', { code: 'KEURING-CODE-12' })).status, 401,
-    'de juiste code alleen is niet genoeg meer: de tweede factor is verplicht in productie');
-  assert.equal((await post('/api/office/login', { code: 'KEURING-CODE-12', totp: totpCode('JBSWY3DPEHPK3PXP') })).status, 200,
-    'met code EN tweede factor wel');
+  /* en de backoffice opent in productie niet meer met een gedeelde code, ook niet
+     met code EN tweede factor (besluit B10): alleen op naam, met een passkey
+     (kern/kantoor/productiedeur.js, test/kantoordeur-productie.test.js) */
+  for (const lijf of [{ code: 'RTG-OFFICE' }, { code: 'KEURING-CODE-12' },
+    { code: 'KEURING-CODE-12', totp: totpCode('JBSWY3DPEHPK3PXP') }]) {
+    const r = await post('/api/office/login', lijf);
+    assert.equal(r.status, 403, 'de gedeelde kantoorcode opent in productie niets');
+    assert.equal((await r.json()).code, 'KANTOORCODE_NIET_IN_PRODUCTIE');
+  }
 });
 
 test.after(() => {

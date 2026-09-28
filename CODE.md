@@ -134,8 +134,8 @@ elke dekkingsvraag triviaal waar; alleen de tweede teller zegt nog iets.
 bronboom aflopen (dat doet `SCHRIJFANALYSE.json`) maar het de **router** vragen —
 wat de server werkelijk aanbiedt — en daar de plek in de bron bij zoeken.
 
-<!--getal:routebron.vergeleken-->4122<!--/getal--> routes kennen beide wegen (was 32), <!--getal:routebron.gelijk-->4094<!--/getal--> geven hetzelfde bestand,
-**<!--getal:routebron.tegenspraak-->0<!--/getal--> echte tegenspraken** en <!--getal:routebron.verouderd-->28<!--/getal--> verschil dat er geen is.
+<!--getal:routebron.vergeleken-->4122<!--/getal--> routes kennen beide wegen (was 32), <!--getal:routebron.gelijk-->4090<!--/getal--> geven hetzelfde bestand,
+**<!--getal:routebron.tegenspraak-->0<!--/getal--> echte tegenspraken** en <!--getal:routebron.verouderd-->32<!--/getal--> verschil dat er geen is.
 
 Dat ene verschil is de opbrengst van de hele oefening. `POST /api/auth/me` staat
 volgens de router in `inlog-pas.js` en volgens `SCHRIJFANALYSE.json` in
@@ -197,11 +197,11 @@ geldt:
    bestaan er". Daardoor heette `/api/instant-reality/event` dood terwijl de
    router hem gewoon aanbiedt — zijn routebestand staat op één regel, dus de
    bronindex vond hem niet. `ROUTEBRON.json` draagt daarom **twee** lijsten:
-   `alleRoutes` (<!--getal:routebron.routerRoutes-->5152<!--/getal-->, bestaan) en `perRoute` (met bestand), en
+   `alleRoutes` (<!--getal:routebron.routerRoutes-->5186<!--/getal-->, bestaan) en `perRoute` (met bestand), en
    <!--getal:routebron.zonderBestand-->4<!--/getal--> routes zitten wél in de eerste en niet in de tweede.
 
 Nul dode paden is hier geen lege controle: <!--getal:schermroutes.paden-->925<!--/getal--> exacte paden zijn tegen
-<!--getal:routebron.routerRoutes-->5152<!--/getal--> echte routes gehouden.
+<!--getal:routebron.routerRoutes-->5186<!--/getal--> echte routes gehouden.
 
 ### 0.4 De aanroepgraaf en de brug route → symbool (3 september 2026)
 

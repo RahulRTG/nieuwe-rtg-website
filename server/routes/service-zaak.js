@@ -37,8 +37,8 @@ module.exports = (kern) => {
   const { app, supplierAuth, serviceZaken, serviceLoop, serviceBevestiging, serviceKeuzes, serviceMens,
     servicePersoonlijk } = kern;
 
-  const veilig = (res, werk) => {
-    try { const r = werk(); res.status(r && r.status ? r.status : 200).json(r); }
+  const veilig = async (res, werk) => {
+    try { const r = await werk(); res.status(r && r.status ? r.status : 200).json(r); }
     catch (e) { console.error('[service-zaak]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   };
   const lijf = (req) => req.body || {};
@@ -105,6 +105,9 @@ module.exports = (kern) => {
 
   app.post('/api/supplier/service/weiger', supplierAuth, (req, res) => veilig(res, () =>
     serviceBevestiging.weiger(kort(lijf(req).id, 40), { melder: melder(req) })));
+
+  app.post('/api/supplier/service/bevestiging/toon', supplierAuth, (req, res) => veilig(res, () =>
+    serviceBevestiging.toon(kort(lijf(req).id, 40), { melder: melder(req) })));
 
   /* De persoonlijke stand werkt ongewijzigd voor een zaak: hij leest de eigen
      lopende zaken en de storingen die daaraan gekoppeld zijn. En hij belooft ook

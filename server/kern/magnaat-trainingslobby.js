@@ -1,12 +1,14 @@
 /* Magnaat Teamkamers: samen oefenen in de bevroren digitale tweeling van een
    gepubliceerd partnerbedrijf. De kamer bewaart uitsluitend synthetische
    spelstaat. Sleutels van leden verlaten de server niet; alle mutaties zijn
-   server-authoritatief, revisiegebonden en idempotent per commando. */
+   server-authoritatief, revisiegebonden en idempotent per commando. De
+   toegangscode is een 128-bit credential (./magnaat-teamkamer-toegang.js). */
 'use strict';
 
 const klok = require('../lib/klok');
 const maakActies = require('./magnaat-trainingslobby-acties');
 const maakRegie = require('./magnaat-trainingslobby-regie');
+const maakToegang = require('./magnaat-teamkamer-toegang');
 const VERSIE = 1;
 const MAX_DEELNEMERS = 12;
 const MAX_KAMERS_PER_HOST = 10;
@@ -19,12 +21,14 @@ module.exports = ({ db, save, bewerkCollectie = null, crypto, partnerstudio, cod
   const id = voor => voor + '-' + crypto.randomBytes(7).toString('hex');
   const kopie = v => JSON.parse(JSON.stringify(v));
   const fout = (error, status = 400) => ({ error, status });
+  const toegang = maakToegang({ crypto, nu, maxDeelnemers: MAX_DEELNEMERS });
 
   let actieveStaat = null;
   function normaliseer(s) {
     if (!s || typeof s !== 'object') s = {};
     s.versie = VERSIE;
     if (!s.kamers || typeof s.kamers !== 'object') s.kamers = {};
+    for (const k of Object.values(s.kamers)) toegang.schoon(k);
     return s;
   }
   const eigen = require('./eigencollectie')({ db, domein: 'kern/magnaat-trainingslobby', bezit: { magnaatTrainingslobbies: 'kaart' } });
@@ -32,10 +36,8 @@ module.exports = ({ db, save, bewerkCollectie = null, crypto, partnerstudio, cod
     if (actieveStaat) return normaliseer(actieveStaat);
     return normaliseer(eigen.bak('magnaatTrainingslobbies'));
   }
-  /* In productie levert de opslag een database-slot. De callback zelf blijft
-     synchroon; PostgreSQL mag vóór de callback op het slot wachten en commit
-     erna. Tests en losse modulegebruikers zonder opslagprimitive houden het
-     bestaande synchrone contract. */
+  /* Productie: een database-slot rond een synchrone callback. Zonder
+     opslagprimitive blijft het synchrone contract. */
   function metActueleStaat(werk) {
     if (typeof bewerkCollectie !== 'function') return werk();
     return bewerkCollectie('magnaatTrainingslobbies', bron => {
@@ -48,12 +50,6 @@ module.exports = ({ db, save, bewerkCollectie = null, crypto, partnerstudio, cod
     let naam = null;
     try { naam = codenaamVan && codenaamVan(key); } catch (e) {}
     return tekst(naam, 80) || 'Teamspeler';
-  }
-  function toegangscode() {
-    let code;
-    do { code = crypto.randomBytes(8).toString('base64url').replace(/[-_]/g, '').slice(0, 9).toUpperCase(); }
-    while (!code || Object.values(staat().kamers).some(k => k.toegangscode === code));
-    return code;
   }
   function deelnemer(kamer, key) { return kamer.deelnemers.find(d => d.key === tekst(key, 150)); }
   function vind(key, kamerId) {
@@ -86,8 +82,8 @@ module.exports = ({ db, save, bewerkCollectie = null, crypto, partnerstudio, cod
     };
     if (kort) return basis;
     return Object.assign(basis, {
-      toegangscode: kamer.status === 'wacht' ? kamer.toegangscode : null,
-      host: kamer.hostKey === tekst(key, 150), ik: ik && { id: ik.id, naam: ik.naam, rolId: ik.rolId },
+      host: kamer.hostKey === tekst(key, 150),
+      toegang: kamer.hostKey === tekst(key, 150) && kamer.status === 'wacht' ? toegang.publiek(kamer.toegang) : null, ik: ik && { id: ik.id, naam: ik.naam, rolId: ik.rolId },
       rollen: kamer.rollen.map(r => ({ id: r.id, naam: r.naam, rechten: r.rechten.slice() })),
       team: kamer.deelnemers.map(d => ({ id: d.id, naam: d.naam, rolId: d.rolId, ik: d === ik })),
       werkproces: kopie(kamer.werkproces), taak: taakPubliek(kamer),
@@ -125,7 +121,7 @@ module.exports = ({ db, save, bewerkCollectie = null, crypto, partnerstudio, cod
     if (!proces || !Array.isArray(proces.stappen) || proces.stappen.length < 3) return fout('Dit bedrijf heeft geen volledig gepubliceerd werkproces.', 409);
     const host = { id: id('speler'), key: tekst(key, 150), naam: label(key), rolId: null, erbijAt: nu() };
     const kamer = {
-      id: id('kamer'), toegangscode: toegangscode(), hostKey: host.key,
+      id: id('kamer'), hostKey: host.key,
       bedrijf: { code: snapshot.code, naam: snapshot.naam, type: snapshot.type, stad: snapshot.stad,
         releaseHash: model.meta.hash, releaseModel: model.meta.releaseModel || 'legacy' },
       rollen: snapshot.rollen.map(r => ({ id: r.id, naam: r.naam, rechten: Array.isArray(r.rechten) ? r.rechten.slice() : [] })),
@@ -133,17 +129,30 @@ module.exports = ({ db, save, bewerkCollectie = null, crypto, partnerstudio, cod
       deelnemers: [host], status: 'wacht', revisie: 1, taakIndex: 0, taken: [],
       commandos: {}, log: [], gemaaktAt: nu(), bijgewerktAt: nu(), voltooidAt: null
     };
+    const code = toegang.geef(kamer, host.key);
     log(kamer, host, 'teamkamer-gemaakt', snapshot.naam + ' · release ' + model.meta.hash);
     staat().kamers[kamer.id] = kamer; if (!actieveStaat) save();
-    return { ok: true, kamer: publiek(kamer, key) };
+    return { ok: true, kamer: Object.assign(publiek(kamer, key), { toegangscode: code }) };
+  }
+  // alleen de host, alleen zolang de kamer wacht; de kale code staat uitsluitend in dit antwoord
+  function codeBinnen(key, kamerId, intrekken) {
+    const v = vind(key, kamerId); if (v.fout) return v.fout;
+    if (v.kamer.hostKey !== tekst(key, 150)) return fout('Alleen de host beheert de toegangscode.', 403);
+    if (v.kamer.status !== 'wacht') return fout('Na de start laat deze teamkamer niemand meer toe.', 409);
+    if (intrekken) { toegang.intrek(v.kamer, v.d.key, 'ingetrokken door de host'); muteer(v.kamer, v.d, 'toegangscode-ingetrokken', 'De toegangscode werkt niet meer.'); return { ok: true, kamer: publiek(v.kamer, key) }; }
+    const code = toegang.geef(v.kamer, v.d.key);
+    muteer(v.kamer, v.d, 'toegangscode-vernieuwd', 'De vorige toegangscode werkt niet meer.');
+    return { ok: true, kamer: Object.assign(publiek(v.kamer, key), { toegangscode: code }) };
   }
   function deelnemenBinnen(key, codeIn) {
-    const code = tekst(codeIn, 20).toUpperCase();
-    const kamer = Object.values(staat().kamers).find(k => k.toegangscode === code);
+    const kamer = toegang.vind(Object.values(staat().kamers), codeIn);
     if (!kamer || kamer.status !== 'wacht') return fout('Deze toegangscode is niet geldig of de teamkamer is al gestart.', 404);
     const bestaand = deelnemer(kamer, key); if (bestaand) return { ok: true, herhaald: true, kamer: publiek(kamer, key) };
-    if (kamer.deelnemers.length >= MAX_DEELNEMERS) return fout('Deze teamkamer is vol.', 409);
+    const waarom = toegang.reden(kamer);
+    if (waarom === 'opgebruikt' || kamer.deelnemers.length >= MAX_DEELNEMERS) return fout('Deze teamkamer is vol.', 409);
+    if (waarom) return fout('Deze toegangscode is niet geldig of de teamkamer is al gestart.', 404);
     const d = { id: id('speler'), key: tekst(key, 150), naam: label(key), rolId: null, erbijAt: nu() };
+    toegang.gebruik(kamer);
     kamer.deelnemers.push(d); muteer(kamer, d, 'deelnemer-erbij', d.naam + ' trad veilig toe.');
     return { ok: true, kamer: publiek(kamer, key) };
   }
@@ -156,8 +165,9 @@ module.exports = ({ db, save, bewerkCollectie = null, crypto, partnerstudio, cod
   }
 
   const acties = maakActies({ tekst, fout, vind, revisie, commando, legCommandoVast,
-    muteer, publiek, rolVan: teamkamerRolVan, nu, id });
+    muteer, publiek, rolVan: teamkamerRolVan, nu, id,
+    sluitToegang: (kamer, door) => toegang.intrek(kamer, door, 'de training is gestart') });
 
   return Object.assign(maakRegie({ sseToCustomer, staat, tekst, publiek, metActueleStaat,
-    maakBinnen, deelnemenBinnen, mijnBinnen, acties }), { _staat: staat });
+    maakBinnen, deelnemenBinnen, mijnBinnen, codeBinnen, acties }), { _staat: staat });
 };

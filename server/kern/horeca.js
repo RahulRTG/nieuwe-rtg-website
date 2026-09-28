@@ -1,6 +1,6 @@
 /* RTG Horeca OS (kern): de gedeelde rekenlaag onder het horecasysteem --
-   rekeningen, regels, gangen, kortingen, fooi en de bonnen (cadeaubon en
-   tegoed). De routes eromheen staan in server/routes/supplier/horeca/.
+   rekeningen, regels, gangen, kortingen en fooi; de bonnen (cadeaubon, tegoed,
+   polsband) staan in ./horeca/bon.js. De routes eromheen staan in server/routes/supplier/horeca/.
 
    Waarom dit een eigen laag is naast de bestaande kassa (`routes/supplier/
    kassa/`): die kassa rekent EEN bon af. Een horecarekening leeft langer dan
@@ -29,7 +29,8 @@ const KANALEN = ['tafel', 'bar', 'club', 'terras', 'afhaal', 'bezorging', 'rooms
   'hotelrestaurant', 'foodtruck', 'event', 'kiosk', 'qr', 'online'];
 const REGELSTANDEN = ['besteld', 'gestart', 'bereid', 'klaar', 'uitgegeven'];
 
-module.exports = ({ db, save, crypto, schoon }) => {
+module.exports = (kern) => {
+  const { db, crypto } = kern;
   const nu = () => new Date().toISOString();
   const id = (n = 5) => crypto.randomBytes(n).toString('hex');
   /* HEET heleCenten EN NIET `centen`. Hij verandert de eenheid NIET: hij maakt
@@ -46,10 +47,9 @@ module.exports = ({ db, save, crypto, schoon }) => {
   function H(code) {
     const alles = eigen.bak('horeca');
     const c = String(code || '');
-    if (!alles[c]) alles[c] = { rekeningen: {}, bonnen: {}, instel: {}, wachtrij: [] };
+    if (!alles[c]) alles[c] = { rekeningen: {}, instel: {}, wachtrij: [] };
     const h = alles[c];
     if (!h.rekeningen) h.rekeningen = {};
-    if (!h.bonnen) h.bonnen = {};
     if (!h.instel) h.instel = {};
     if (!Array.isArray(h.wachtrij)) h.wachtrij = [];
     return h;
@@ -67,7 +67,7 @@ module.exports = ({ db, save, crypto, schoon }) => {
     const c = String(code || '');
     // bak() maakt hooguit de lege wortel aan; de doos van een zaak nooit
     return eigen.bak('horeca')[c] ? H(c)
-      : { rekeningen: {}, bonnen: {}, instel: {}, wachtrij: [] };
+      : { rekeningen: {}, instel: {}, wachtrij: [] };
   }
 
   // de som van een regel en van een hele rekening, altijd op dezelfde manier
@@ -130,37 +130,13 @@ module.exports = ({ db, save, crypto, schoon }) => {
     return null;
   }
 
-  /* ---------- de bonnen: cadeaubon en tegoed ----------
-     Een bon is geld dat vooruit is betaald, dus hij kan nooit onder nul en het
-     saldo staat op de bon zelf. Bij inwisselen wordt hij AFGEBOEKT voordat de
-     betaling wordt genoteerd; andersom zou een dubbele klik twee keer betalen
-     met hetzelfde tegoed. */
-  function bonMaak(code, { soort, centen: waarde, naam, geldigTot }) {
-    const h = H(code);
-    let bonCode;
-    do { bonCode = crypto.randomBytes(4).toString('hex').toUpperCase(); } while (h.bonnen[bonCode]);
-    h.bonnen[bonCode] = { code: bonCode, soort: soort === 'tegoed' ? 'tegoed' : 'cadeaubon',
-      uitgegeven: heleCenten(waarde), saldo: heleCenten(waarde), naam: schoon(naam, 60) || null,
-      geldigTot: schoon(geldigTot, 10) || null, at: nu(), mutaties: [] };
-    save();
-    return h.bonnen[bonCode];
-  }
-  function bonBoek(code, bonCode, bedrag) {
-    const h = H(code);
-    const b = Object.prototype.hasOwnProperty.call(h.bonnen, String(bonCode || '')) ? h.bonnen[String(bonCode)] : null;
-    if (!b) return { status: 404, error: 'Deze bon kennen we niet.' };
-    if (b.geldigTot && b.geldigTot < nu().slice(0, 10)) return { status: 409, error: 'Deze bon is verlopen op ' + b.geldigTot + '.' };
-    const wil = heleCenten(bedrag);
-    if (!wil) return { status: 400, error: 'Vul het bedrag in.' };
-    const echt = Math.min(wil, b.saldo);
-    if (!echt) return { status: 409, error: 'Deze bon heeft geen saldo meer.' };
-    b.saldo -= echt;
-    b.mutaties.unshift({ at: nu(), centen: -echt });
-    b.mutaties = b.mutaties.slice(0, 50);
-    save();
-    return { ok: true, geboekt: echt, restVraag: wil - echt, saldo: b.saldo, bon: b.code };
-  }
-
+  /* De bonnen (cadeaubon, tegoed, polsband) wonen NIET in deze doos maar in
+     hun eigen collectie `horecaBonnen`, met een 128-bit code als hash en een
+     afboeking in een collectietransactie: ./horeca/bon.js, EEN instantie op de
+     kern als `horecaBonlaag` (opzet/kernlaag5f.js). Een getter en geen waarde:
+     wie de bonnen niet raakt (de avondplanner, een unittoets), reikt er ook niet
+     naar -- en de domeingrens telt alleen wat er werkelijk wordt gelezen. */
   return { KANALEN, REGELSTANDEN, H, Hlees, nu, id, centen: heleCenten, heleCenten, uitEuro, regelSom, kortingCenten, waarde,
-    totaal, openstaand, controleerSom, happyKorting, bonMaak, bonBoek };
+    totaal, openstaand, controleerSom, happyKorting,
+    get bonlaag() { return kern.horecaBonlaag || null; } };
 };

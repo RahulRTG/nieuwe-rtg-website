@@ -75,12 +75,11 @@ test('productie is op slot: demo-inloggen zijn dicht, de backoffice-code is niet
   // demo-inlog voor leden en zaken is dicht
   assert.equal((await api('/api/login', { username: 'Rahul', password: 'Imran' })).status, 403);
   assert.equal((await api('/api/supplier/login', { username: 'Rahul', password: 'Imran' })).status, 403);
-  // de demo-backoffice-code werkt niet; de echte (uit de omgeving) wel
-  assert.equal((await api('/api/office/login', { code: 'RTG-OFFICE' })).status, 401);
-  assert.equal((await api('/api/office/login', { code: 'GEHEIME-CODE-123' })).status, 401,
-    'de code alleen is niet genoeg: in productie is de tweede factor verplicht');
-  assert.equal((await api('/api/office/login', { code: 'GEHEIME-CODE-123', totp: totpCode('JBSWY3DPEHPK3PXP') })).status, 200,
-    'met code EN tweede factor komt het kantoor binnen');
+  /* geen gedeelde kantoorcode opent in productie het kantoor, ook de echte met
+     tweede factor niet (besluit B10): alleen op naam met een passkey */
+  for (const lijf of [{ code: 'RTG-OFFICE' }, { code: 'GEHEIME-CODE-123' },
+    { code: 'GEHEIME-CODE-123', totp: totpCode('JBSWY3DPEHPK3PXP') }])
+    assert.equal((await api('/api/office/login', lijf)).status, 403, 'de kantoorcode opent in productie niets');
 });
 
 test('de rate-limiter staat aan in productie (429 boven de grens)', async () => {

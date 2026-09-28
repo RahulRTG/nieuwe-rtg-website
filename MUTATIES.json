@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-27T14:24:07.236Z",
-    "commit": "ab1dc80e0",
+    "op": "2026-09-28T12:34:39.342Z",
+    "commit": "51f3074ee",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
-    "node": "v22.22.2"
+    "node": "v24.18.0"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -4444,6 +4444,14 @@
       "gezakt": 11,
       "scherp": "gezakt"
     },
+    "journalistiek-versies.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/journalistiek.js",
+      "operator": "getal+1#0",
+      "gezakt": 3,
+      "geprobeerd": 6
+    },
     "kaart.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -8294,6 +8302,44 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "saloon-edge.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
+    "saloon-lus.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
+    },
+    "saloon-projectie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/wereld/saloon/index.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 3
+    },
+    "saloon-redactie.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
+    "saloon-zicht.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/salon/zichtbaarheid.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 3
+    },
+    "saloon.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
     "samen.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -8569,6 +8615,14 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/scim/groepen.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "script-bronnen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/script-bronnen.js",
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
@@ -10338,6 +10392,13 @@
       "operator": ">=->>#0",
       "gezakt": 1,
       "geprobeerd": 2
+    },
+    "warm-presentation.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
     },
     "wauw.test.js": {
       "soort": "server",

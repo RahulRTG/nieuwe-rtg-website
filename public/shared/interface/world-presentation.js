@@ -28,12 +28,14 @@
     var c = content[world], details = U.el('details', 'wp-domain'), summary = U.el('summary', '', 'Uw volledige overzicht');
     var native = U.el('div', 'wp-domain-content'); while (home.firstChild) native.appendChild(home.firstChild);
     details.append(summary, native); details.id = 'reisoverzicht';
+    if (d.body.classList.contains('saloon-leest')) details.open = true;
     var scene = U.el('section', 'wp-scene'), heading = U.el('div', 'wp-heading'), overline = U.el('p', 'wp-overline', c[0]), title = U.el('h2', '', c[1]);
     var link = U.el('a', 'wp-action', c[2] + ' ↗'); link.href = c[3];
     if (world === 'travel') link.onclick = function () { details.open = true; };
     heading.append(overline, title); scene.append(heading, photo('/images/world-homes/' + world + '-warm.jpg', 'hoofd', 'Hoofdfoto', 'wp-photo'), link);
     if (world === 'foundation') scene.appendChild(U.copy(U.el('p', 'wp-free'), 'free'));
     var story = U.el('section', 'wp-story'), label = U.el('p', 'wp-overline', c[4]), a = U.el('a', '', c[5] + ' ↗'); a.href = c[6];
+    if (world === 'living') { a.href = '#reisoverzicht'; a.onclick = function () { details.open = true; }; }
     story.append(label, photo(c[7], 'beeld-00000001', 'Verhaalbeeld', 'wd-app-photo'), a);
     home.append(scene); root.append(story, details); home.dataset.warmHome = 'true';
   }

@@ -46,6 +46,7 @@ test('van interne redactie via review naar Saloon, met een zichtbare correctie',
     await editor.locator('#a_pub').click(); await lijstKlaar();
     const lees = await context.newPage(); letOpFouten(lees, fouten);
     await lees.goto(srv.base + '/apps/wereld.html?embed=1');
+    await lees.locator('.wp-story a').click();
     const kaart = lees.locator('[data-saloon-id="nieuws:BODE:' + id + '"]');
     await kaart.getByRole('button', { name: 'Lees artikel', exact: true }).click();
     await lees.locator('#saloonArtikel').getByText('Het plein gaat maandag open.', { exact: true }).waitFor();
@@ -67,7 +68,7 @@ test('van interne redactie via review naar Saloon, met een zichtbare correctie',
     if (process.env.SALOON_REDACTIE_SCREENSHOT) await lees.screenshot({ path: process.env.SALOON_REDACTIE_SCREENSHOT });
     await lees.goto(srv.base + '/apps/krant.html?zaak=BODE#' + id);
     await lees.locator('article').getByText('Het plein gaat dinsdag open.', { exact: true }).waitFor();
-    await lees.locator('article summary').click();
+    await lees.getByText('Correcties en actualiseringen', { exact: true }).click();
     await lees.locator('article').getByText('Correctie: de opening is op dinsdag.', { exact: true }).waitFor();
     assert.deepEqual(fouten, []);
   } finally { if (browser) await browser.close(); stop(srv?.child); fs.rmSync(tmp, { recursive: true, force: true }); }

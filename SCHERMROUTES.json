@@ -3,16 +3,16 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-09-28",
-  "commit": "d71b6795"
+  "commit": "40ca52a8"
  },
  "grens": "Een voorvoegsel uit een sjabloon met een gat is GEEN route en wordt nooit tegen de routelijst gelegd. Exacte paden wel: een exact pad dat niet bestaat, is een dood pad.",
  "gemetenTegen": {
   "register": "ROUTEBRON.json",
   "stempel": {
-   "op": "2026-09-19T19:07:50.269Z",
-   "commit": "6083f652"
+   "op": "2026-09-28T01:43:06.436Z",
+   "commit": "40ca52a8"
   },
-  "bekendePaden": 5081
+  "bekendePaden": 5147
  },
  "gemeten": {
   "schermenMetPad": 415,
@@ -21,71 +21,14 @@
   "verwijzingen": 1127,
   "voorvoegsels": 142,
   "basisPaden": 2,
-  "doodPad": 14,
-  "doodPadVerwijzingen": 14
+  "doodPad": 0,
+  "doodPadVerwijzingen": 0
  },
  "basisPadLijst": [
   "/api/foundation",
   "/api/rtf/social"
  ],
- "doodPad": [
-  {
-   "pad": "/api/office/bank/entiteitrekening",
-   "scherm": "public/apps/boardroom.html"
-  },
-  {
-   "pad": "/api/office/bank/entiteitrekening/zet",
-   "scherm": "public/apps/boardroom.html"
-  },
-  {
-   "pad": "/api/office/beleidsmotor",
-   "scherm": "public/apps/boardroom.html"
-  },
-  {
-   "pad": "/api/office/beleidsmotor/afdwingen/zet",
-   "scherm": "public/apps/boardroom.html"
-  },
-  {
-   "pad": "/api/office/doos/gedeeld/zet",
-   "scherm": "public/apps/boardroom.html"
-  },
-  {
-   "pad": "/api/office/doos/sleutel",
-   "scherm": "public/apps/boardroom.html"
-  },
-  {
-   "pad": "/api/office/doos/sleutel/weg",
-   "scherm": "public/apps/boardroom.html"
-  },
-  {
-   "pad": "/api/office/doos/sleutels",
-   "scherm": "public/apps/boardroom.html"
-  },
-  {
-   "pad": "/api/office/kantoor/uitnodiging",
-   "scherm": "public/apps/boardroom.html"
-  },
-  {
-   "pad": "/api/office/werkos/bankpad",
-   "scherm": "public/apps/boardroom.html"
-  },
-  {
-   "pad": "/api/office/werkos/bankpad/zet",
-   "scherm": "public/apps/boardroom.html"
-  },
-  {
-   "pad": "/api/muziek/bestand",
-   "scherm": "public/apps/muziek-feed.js"
-  },
-  {
-   "pad": "/api/salon/media",
-   "scherm": "public/apps/salon.html"
-  },
-  {
-   "pad": "/api/salon/ondertitels",
-   "scherm": "public/apps/salon.html"
-  }
- ],
+ "doodPad": [],
  "nietGelezen": [
   {
    "bestand": "public/shared/werkos/werkos-01.js",

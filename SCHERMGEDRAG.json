@@ -3,7 +3,7 @@
  "uitleg": "Wat een scherm in public/ via de API kan veroorzaken: schrijft het, welke rol vraagt het, wat is het bewijs waard, en wat doet een tweede aanroep. Samengesteld uit bestaande metingen -- hier wordt niets nieuws gemeten en niets geraden.",
  "stempel": {
   "op": "2026-09-28",
-  "commit": "d71b6795"
+  "commit": "40ca52a8"
  },
  "grond": [
   "SCHERMROUTES.json",
@@ -16,8 +16,8 @@
  "samenstelregel": "schrijven: de ZWAARSTE uitkomst wint (een van de tien routes schrijft = dit scherm kan iets veranderen). Bewijs: het ZWAKSTE telt, want een keten is zo sterk als zijn zwakste schakel. Onbekend is in beide gevallen niet de gunstige uitkomst.",
  "gemeten": {
   "schermen": 415,
-  "metGrond": 264,
-  "zonderGrond": 151,
+  "metGrond": 265,
+  "zonderGrond": 150,
   "schrijftJa": 65,
   "schrijftNee": 1,
   "schrijftOnbekend": 156,
@@ -31,7 +31,7 @@
   "bewijsVerzwakt": 210,
   "bewijsNietVastTeStellen": 173,
   "onbekendeBewijswaarden": [],
-  "zonderRol": 44
+  "zonderRol": 45
  },
  "zonderUitspraak": [
   "public/apps/app-main/app-main-43.js",
@@ -130,7 +130,6 @@
   "public/apps/merken.html",
   "public/apps/move.html",
   "public/apps/muziek-bestanden.js",
-  "public/apps/muziek-feed.js",
   "public/apps/navigatie.html",
   "public/apps/nieuws.html",
   "public/apps/notities/app/app-01.js",
@@ -288,6 +287,22 @@
    "reden": null
   },
   {
+   "bestand": "public/apps/salon.html",
+   "padenGenoemd": 21,
+   "voorvoegsels": 0,
+   "routesGeraakt": 21,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
    "bestand": "public/apps/geld/metierc.js",
    "padenGenoemd": 20,
    "voorvoegsels": 0,
@@ -309,22 +324,6 @@
    "voorvoegsels": 0,
    "routesGeraakt": 20,
    "schrijft": "onbekend",
-   "bewijs": "verzwakt",
-   "rollen": [
-    "member"
-   ],
-   "herhaling": [
-    "beschermd",
-    "ongemeten"
-   ],
-   "reden": null
-  },
-  {
-   "bestand": "public/apps/salon.html",
-   "padenGenoemd": 21,
-   "voorvoegsels": 0,
-   "routesGeraakt": 19,
-   "schrijft": "ja",
    "bewijs": "verzwakt",
    "rollen": [
     "member"
@@ -392,6 +391,23 @@
    "bewijs": "verzwakt",
    "rollen": [
     "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/boardroom.html",
+   "padenGenoemd": 16,
+   "voorvoegsels": 0,
+   "routesGeraakt": 16,
+   "schrijft": "ja",
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "boardroom",
+    "kantoor-op-naam"
    ],
    "herhaling": [
     "beschermd",
@@ -1096,23 +1112,6 @@
    "bewijs": "verzwakt",
    "rollen": [
     "member"
-   ],
-   "herhaling": [
-    "beschermd",
-    "ongemeten"
-   ],
-   "reden": null
-  },
-  {
-   "bestand": "public/apps/boardroom.html",
-   "padenGenoemd": 16,
-   "voorvoegsels": 0,
-   "routesGeraakt": 5,
-   "schrijft": "ja",
-   "bewijs": "ONBEPAALD",
-   "rollen": [
-    "boardroom",
-    "kantoor-op-naam"
    ],
    "herhaling": [
     "beschermd",
@@ -3459,6 +3458,17 @@
    "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
   },
   {
+   "bestand": "public/apps/muziek-feed.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 1,
+   "routesGeraakt": 1,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
    "bestand": "public/apps/muziek.html",
    "padenGenoemd": 1,
    "voorvoegsels": 1,
@@ -5199,17 +5209,6 @@
   {
    "bestand": "public/apps/muziek-bestanden.js",
    "padenGenoemd": 0,
-   "voorvoegsels": 1,
-   "routesGeraakt": 0,
-   "schrijft": "niet vast te stellen",
-   "bewijs": "niet vast te stellen",
-   "rollen": [],
-   "herhaling": [],
-   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
-  },
-  {
-   "bestand": "public/apps/muziek-feed.js",
-   "padenGenoemd": 1,
    "voorvoegsels": 1,
    "routesGeraakt": 0,
    "schrijft": "niet vast te stellen",

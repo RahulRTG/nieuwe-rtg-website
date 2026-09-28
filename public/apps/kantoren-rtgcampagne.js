@@ -75,4 +75,6 @@
   }
 
   window.RTGCampagneKamer = { laad: laad };
+  /* te laat geladen: de kamer Financien staat al open (zie openKamer in kantoren.html) */
+  if (window.RTGFinancien) laad(window.RTGFinancien.api, window.RTGFinancien.meld);
 })();

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T16:54:29.157Z",
-    "commit": "8d372bf1",
+    "op": "2026-09-28T13:25:35.142Z",
+    "commit": "0aee1b3e",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bedrijfsmaat.js",
@@ -120,33 +120,63 @@
       "kort": "Welk kanaal werkt, en niet een gemiddelde over alles.",
       "handhaving": "kern/rtgboek.js en kern/bedrijfsmaat/stand-rtgboek.js; test/rtgboek.test.js. Per kanaal, langs de groepspoort van het aanmeldkanaal; vriend heeft geen post.",
       "stand": "gebouwd"
+    },
+    {
+      "id": "C12",
+      "naam": "Een campagne is een code onder een kanaal",
+      "besloten": "28 september 2026, door de eigenaar",
+      "herkomst": "mens",
+      "regel": "Een campagne is een benoemde linkcode met een begin en een einde, onder precies een aanmeldkanaal. Financien boekt per campagne wat die kostte, als deel van de kanaalpost; het effect is het aantal nieuwe leden met die code, langs de groepspoort. Geen klikken en geen attributiemodel.",
+      "kort": "Welke campagne werkt, zonder een lid te volgen.",
+      "handhaving": "kern/rtgcampagne.js (het register), kern/rtgboek.js (de uitgave per campagne) en kern/aanmeldkanaal.js (een geregistreerde code telt onder haar kanaal); test/rtgcampagne.test.js.",
+      "stand": "gebouwd"
+    },
+    {
+      "id": "C13",
+      "naam": "Het beslisgeheugen: besluit plus uitkomst",
+      "besloten": "28 september 2026, door de eigenaar",
+      "herkomst": "mens",
+      "regel": "Per besluit wie besloot, op welke gronden (de bedrijfsmaten met hun graad op dat moment) en wat er verwacht werd; na een vaste termijn per maat wat die werkelijk deed. Een geheugen dat alleen leest, zeven jaar bewaard, en de machine stelt er nog niets uit voor.",
+      "kort": "Terugkijken op een besluit met de getallen van toen.",
+      "handhaving": "kern/beslisgeheugen.js (gronden van toen, uitkomst per maat bij het lezen, intrekken met reden, geen voorstel); test/beslisgeheugen.test.js.",
+      "stand": "gebouwd"
+    },
+    {
+      "id": "C14",
+      "naam": "De cadeaubon van RTG, ook te besteden bij zaken",
+      "besloten": "28 september 2026, door de eigenaar",
+      "herkomst": "mens",
+      "regel": "RTG verkoopt een eigen cadeaubon die bij RTG en bij de zaken op het platform te besteden is. Dat is elektronisch geld: de schakelaar in de boardroom is die positie, staat standaard dicht, en ook open vraagt de uitgifte een e-geldvergunning over de eigen rails. Het geld van een verkochte bon telt als verplichting op de bank.",
+      "kort": "Een bon bij derden is geld, en dat staat er als positie en niet als instelling.",
+      "handhaving": "kern/cadeaubon.js (de schakelaar, standaard dicht, en de verplichting die kern/bankpositie.js leest) en RTG_CADEAUBON in kern/bevoegdheid/lijst-afhankelijk.js; test/cadeaubon.test.js. Verkopen, inwisselen en afrekenen zijn met opzet niet gebouwd: die vragen eerst een e-geldvergunning of vrijstelling.",
+      "stand": "gebouwd"
     }
   ],
   "telling": {
     "maten": 67,
     "domeinen": 28,
     "perStatus": {
-      "bestaat": 44,
-      "half": 20,
+      "bestaat": 45,
+      "half": 19,
       "ontbreekt": 3,
       "onbekend": 0
     },
     "primairGat": {
       "BRON_ONTBREEKT": 3,
-      "DEFINITIE_ONTBREEKT": 12,
+      "DEFINITIE_ONTBREEKT": 11,
       "PROJECTIE_ONTBREEKT": 3,
       "BEWIJS_ONTBREEKT": 5
     },
     "perGat": {
       "BRON_ONTBREEKT": 3,
-      "DEFINITIE_ONTBREEKT": 15,
-      "PROJECTIE_ONTBREEKT": 15,
-      "BEWIJS_ONTBREEKT": 23
+      "DEFINITIE_ONTBREEKT": 14,
+      "PROJECTIE_ONTBREEKT": 14,
+      "BEWIJS_ONTBREEKT": 22
     },
     "ketens": 6,
-    "ketensGegrond": 4,
-    "bestaatGedeeltelijk": 16,
-    "rustOpGat": 2,
+    "ketensGegrond": 5,
+    "bestaatGedeeltelijk": 17,
+    "rustOpGat": 1,
     "privacyGaten": 0,
     "verworpen": 0,
     "vormfouten": 0
@@ -280,8 +310,8 @@
     },
     "campagnes": {
       "maten": 2,
-      "bestaat": 0,
-      "half": 2,
+      "bestaat": 1,
+      "half": 1,
       "ontbreekt": 0
     },
     "infrastructuur": {
@@ -401,19 +431,15 @@
     {
       "id": "werving",
       "naam": "van campagne naar wervingskosten",
-      "gegrond": false,
-      "eersteBreuk": "campagnes.rtg-marketing",
-      "bestaand": 2,
+      "gegrond": true,
+      "eersteBreuk": null,
+      "bestaand": 3,
       "van": 3,
       "schakels": [
         {
           "id": "campagnes.rtg-marketing",
-          "status": "half",
-          "gaten": [
-            "DEFINITIE_ONTBREEKT",
-            "PROJECTIE_ONTBREEKT",
-            "BEWIJS_ONTBREEKT"
-          ]
+          "status": "bestaat",
+          "gaten": []
         },
         {
           "id": "acquisitie.kanaal",
@@ -517,12 +543,6 @@
       "id": "omzet.leden-maand",
       "zwakkeSchakels": [
         "groei.leden-per-pas"
-      ]
-    },
-    {
-      "id": "cac.per-kanaal",
-      "zwakkeSchakels": [
-        "campagnes.rtg-marketing"
       ]
     }
   ],
@@ -662,11 +682,6 @@
         "domein": "churn"
       },
       {
-        "id": "campagnes.rtg-marketing",
-        "status": "half",
-        "domein": "campagnes"
-      },
-      {
         "id": "campagnes.rtf-werving",
         "status": "half",
         "domein": "campagnes"
@@ -790,6 +805,11 @@
         "id": "cac.per-kanaal",
         "status": "bestaat",
         "domein": "cac"
+      },
+      {
+        "id": "campagnes.rtg-marketing",
+        "status": "bestaat",
+        "domein": "campagnes"
       },
       {
         "id": "capaciteit.partners",
@@ -991,7 +1011,7 @@
       {
         "van": "campagnes.rtg-marketing",
         "naar": "cac.per-kanaal",
-        "gegrond": false
+        "gegrond": true
       },
       {
         "van": "support.klokken",
@@ -3168,70 +3188,6 @@
       "gedeeltelijk": null
     },
     {
-      "id": "campagnes.rtg-marketing",
-      "versie": 1,
-      "domein": "campagnes",
-      "betekenis": "De campagnes van RTG zelf: wat ze kostten, wie ze bereikten, wat ze opleverden.",
-      "wereld": "rtg-intern",
-      "bronnen": [
-        "server/kern/rtgboek.js"
-      ],
-      "berekening": "nog niet vastgesteld",
-      "eenheid": "euro en bereik per campagne",
-      "graad": "onbekend",
-      "actualiteit": "onbekend",
-      "minimaleGroep": null,
-      "privacyklasse": "huis",
-      "eigenaar": null,
-      "eigenaarReden": "Niemand.",
-      "afhankelijk": [],
-      "status": "half",
-      "gaten": [
-        "DEFINITIE_ONTBREEKT",
-        "PROJECTIE_ONTBREEKT",
-        "BEWIJS_ONTBREEKT"
-      ],
-      "elementen": {
-        "bron": {
-          "aanwezig": true,
-          "citaten": [
-            {
-              "bestand": "server/kern/rtgboek.js",
-              "citaat": "marketing: Object.freeze(KANALEN",
-              "klopt": true
-            }
-          ],
-          "reden": null
-        },
-        "definitie": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Wat een campagne is (naast een kanaal) en hoe het effect wordt gemeten (incrementeel, niet klikken) is niet besloten."
-        },
-        "projectie": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Niet gebouwd."
-        },
-        "bewijs": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Volgt uit de projectie."
-        }
-      },
-      "groepsgrens": {
-        "vereist": false,
-        "afgedwongen": null,
-        "citaten": [],
-        "reden": null
-      },
-      "keten": {
-        "gegrond": false,
-        "zwakkeSchakels": []
-      },
-      "gedeeltelijk": "De uitgave per aanmeldkanaal per maand staat in het boek van RTG (C8, C11); per campagne en het bereik nog niet."
-    },
-    {
       "id": "campagnes.rtf-werving",
       "versie": 1,
       "domein": "campagnes",
@@ -5193,12 +5149,100 @@
         "reden": null
       },
       "keten": {
-        "gegrond": false,
-        "zwakkeSchakels": [
-          "campagnes.rtg-marketing"
-        ]
+        "gegrond": true,
+        "zwakkeSchakels": []
       },
       "gedeeltelijk": "Alleen leden die een kanaal opgaven; wie de vraag oversloeg en zonder campagnelink kwam, telt nergens."
+    },
+    {
+      "id": "campagnes.rtg-marketing",
+      "versie": 1,
+      "domein": "campagnes",
+      "betekenis": "De campagnes van RTG zelf: wat ze kostten en hoeveel nieuwe leden er met hun code binnenkwamen.",
+      "wereld": "rtg-intern",
+      "bronnen": [
+        "server/kern/rtgcampagne.js",
+        "server/kern/rtgboek.js"
+      ],
+      "berekening": "de uitgave per campagne uit het boek gedeeld door de nieuwe leden met haar code in dezelfde maand",
+      "eenheid": "eurocent per nieuw lid, per campagne",
+      "graad": "vermoed",
+      "actualiteit": "periode",
+      "minimaleGroep": null,
+      "privacyklasse": "huis",
+      "eigenaar": "kern/rtgcampagne",
+      "eigenaarReden": null,
+      "afhankelijk": [],
+      "status": "bestaat",
+      "gaten": [],
+      "elementen": {
+        "bron": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/rtgcampagne.js",
+              "citaat": "function maak(",
+              "klopt": true
+            },
+            {
+              "bestand": "server/kern/rtgboek.js",
+              "citaat": "function zetCampagne(",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "definitie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/definities.js",
+              "citaat": "campagne: d28(12, 1",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "projectie": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand-rtgboek.js",
+              "citaat": "const perCampagne = ",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        },
+        "bewijs": {
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/rtgboek.js",
+              "citaat": "reden: p.centen == null ? 'De campagnes zijn geboekt",
+              "klopt": true
+            }
+          ],
+          "reden": null
+        }
+      },
+      "groepsgrens": {
+        "vereist": false,
+        "afgedwongen": null,
+        "citaten": [
+          {
+            "bestand": "server/kern/bedrijfsmaat/stand-rtgboek.js",
+            "citaat": "g.stand !== 'TOONBAAR' || !g.aantal) return Object.assign(basis",
+            "klopt": true
+          }
+        ],
+        "reden": null
+      },
+      "keten": {
+        "gegrond": true,
+        "zwakkeSchakels": []
+      },
+      "gedeeltelijk": "Alleen wie met de campagnelink binnenkwam: geen klikken, geen bereik en geen attributie, dus een ondergrens."
     },
     {
       "id": "capaciteit.partners",

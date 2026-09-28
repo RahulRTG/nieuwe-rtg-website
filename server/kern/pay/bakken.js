@@ -1,7 +1,7 @@
 /* DE OPSLAGVORM VAN RTG PAY: waar de saldi, het grootboek, de Klompjes en de
    codes staan, en hoe een rekening heet.
 
-   Vijf bakken in db.data en vier naamregels. Ze staan hier bij elkaar omdat ze
+   Drie bakken in db.data en vier naamregels. Ze staan hier bij elkaar omdat ze
    samen ÉÉN ding beschrijven -- de vorm waarin deze laag zijn gegevens bewaart --
    en omdat elk van hen op precies één plek hoort te staan. De naamregel
    'lid:' + codenaam werd tot voor kort op vier plekken nagetikt (ov, mobiliteit,
@@ -32,8 +32,9 @@ module.exports = ({ db, crypto }) => {
   function saldi() { if (!d().paySaldi || typeof d().paySaldi !== 'object') d().paySaldi = {}; return d().paySaldi; }
   function grootboek() { if (!Array.isArray(d().payBoekingen)) d().payBoekingen = []; return d().payBoekingen; }
   function klompjes() { if (!Array.isArray(d().payVerzoeken)) d().payVerzoeken = []; return d().payVerzoeken; }
-  function kascodes() { if (!Array.isArray(d().payCodes)) d().payCodes = []; return d().payCodes; }
-  function tikcodes() { if (!Array.isArray(d().payTikCodes)) d().payTikCodes = []; return d().payTikCodes; }
+  /* De kas- en tikcodes staan hier niet meer: ze wonen hash-only in hun eigen
+     collectie (./kasbak.js), en een lege payCodes-lijst aanmaken zou alleen de
+     oude vorm terugbrengen. */
 
   const rekLid = c => 'lid:' + c;
   const rekPartner = c => 'partner:' + c;
@@ -43,6 +44,6 @@ module.exports = ({ db, crypto }) => {
   const saldoVan = rek => Math.round(saldiKijk()[rek] || 0);
   const id = p => (p || 'P') + crypto.randomBytes(5).toString('hex').toUpperCase();
 
-  return { d, saldi, grootboek, klompjes, kascodes, tikcodes,
+  return { d, saldi, grootboek, klompjes,
     saldiKijk, grootboekKijk, klompjesKijk, rekLid, rekPartner, saldoVan, id };
 };

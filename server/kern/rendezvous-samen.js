@@ -32,7 +32,7 @@
    stelt nooit voor wat er hoort te komen, en er komt geen cijfer of reeks op het
    leven tussen mensen. */
 module.exports = (ctx) => {
-  const { R, mag, codenaam, nu, save } = ctx;
+  const { R, mag, codenaam, nu, save, geblokkeerd, Projection } = ctx;
 
   function S() { const r = R(); if (!r.samen || typeof r.samen !== 'object') r.samen = {}; return r.samen; }
 
@@ -49,9 +49,10 @@ module.exports = (ctx) => {
     if (!poort.ok) return { status: 403, error: poort.reden };
     const mijn = S()[key];
     const p = partnerVan(key);
-    return { status: 200, samen: !!p, met: p ? codenaam(p) : null,
+    return { status: 200, ...Projection.project(Projection.NAMES.RENDEZVOUS_TOGETHER,
+      { samen: !!p, met: p ? codenaam(p) : null,
       // uw eigen helft, zodat u ziet wat u zelf heeft gezegd
-      ikVerklaarde: mijn && mijn.met ? codenaam(mijn.met) : null };
+      ikVerklaarde: mijn && mijn.met ? codenaam(mijn.met) : null }) };
   }
 
   /* Uw eigen helft zetten of intrekken. `met` is een sessiesleutel; wie dat is
@@ -64,6 +65,7 @@ module.exports = (ctx) => {
     const doel = String(met || '');
     if (!doel || doel === key) return { status: 400, error: 'Onbekend lid.' };
     if (!R().profielen[doel]) return { status: 404, error: 'Dit lid bestaat niet in Rendez-vous.' };
+    if (geblokkeerd && geblokkeerd(R(), key, doel)) return { status: 403, error: 'Dit contact is geblokkeerd.' };
     S()[key] = { met: doel, at: nu() };
     save();
     const p = partnerVan(key);

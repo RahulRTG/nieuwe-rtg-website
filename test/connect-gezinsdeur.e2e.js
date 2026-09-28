@@ -42,8 +42,9 @@ async function bezoek(browser, base, opslag) {
 test('Ontdekken: een gezin neemt de gezinsdeur, een lid de ledendeur', { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-connect-gezin-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
-  const browser = await pw.chromium.launch(browserOpties(pw));
+  let browser;
   try {
+    browser = await pw.chromium.launch(browserOpties(pw));
     const gezin = await ROLLEN.gezin.haal(base);
     assert.ok(gezin && gezin.code && gezin.token, 'geen gezinssessie');
     const lid = await ROLLEN.lid.haal(base);
@@ -58,10 +59,11 @@ test('Ontdekken: een gezin neemt de gezinsdeur, een lid de ledendeur', { skip: g
     assert.ok(l.paden.includes('/api/connect/ontdek'), 'een lid nam de ledendeur niet: ' + l.paden.join(', '));
     assert.ok(!l.paden.some((p) => p.startsWith('/api/rtf/connect/')), 'een lid klopte aan bij de gezinsdeur');
   } finally {
-    await browser.close();
-    /* Wachten tot de server echt weg is: hij schrijft bij het afsluiten nog in
-       zijn datamap, en een rmSync die daar tussendoor loopt geeft ENOTEMPTY. */
-    await stopNet(child, 5000);
-    fs.rmSync(TMP, { recursive: true, force: true, maxRetries: 3, retryDelay: 100 });
+    try { if (browser) await browser.close(); }
+    finally {
+      await stopNet(child);
+      assert.ok(child.exitCode != null || child.signalCode != null, 'de testserver moet vóór het opruimen volledig gestopt zijn');
+      fs.rmSync(TMP, { recursive: true, force: true });
+    }
   }
 });

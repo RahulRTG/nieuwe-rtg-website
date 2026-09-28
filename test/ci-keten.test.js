@@ -97,3 +97,27 @@ test('de echte werkstromen voldoen aan alle vier de regels', () => {
   const map = path.join(__dirname, '..', '.github', 'workflows');
   assert.deepEqual(controleer(map), []);
 });
+
+test('volledige bewijsconsumenten hangen niet transitief aan de overgeslagen incrementele route', () => {
+  const fs = require('node:fs');
+  const workflow = fs.readFileSync(path.join(__dirname, '..', '.github/workflows/ci.yml'), 'utf8');
+  function afhankelijkheden(tekst, doel, gezien = new Set()) {
+    if (gezien.has(doel)) return gezien;
+    gezien.add(doel);
+    const blok = tekst.match(new RegExp('^  ' + doel + ':\\n([\\s\\S]*?)(?=^  [a-zA-Z][\\w-]*:|$(?![\\s\\S]))', 'm'));
+    assert.ok(blok, 'workflowjob bestaat: ' + doel);
+    const needs = blok[1].match(/^    needs: (.+)$/m)?.[1];
+    for (const naam of (needs || '').replace(/[\[\]]/g, '').split(/[,\s]+/).filter(Boolean))
+      afhankelijkheden(tekst, naam, gezien);
+    return gezien;
+  }
+  for (const job of ['dekking', 'evidence-publish']) {
+    const needs = afhankelijkheden(workflow, job);
+    assert.ok(needs.has('test-volledig'), job + ' vereist de volledige suite');
+    assert.ok(!needs.has('incremental'), job + ' mag niet worden overgeslagen door de alternatieve route');
+  }
+  const oudeFout = workflow.replace('needs: [preflight, test-volledig, schermen-oordeel]',
+    'needs: [preflight, test, test-volledig, schermen-oordeel]');
+  assert.notEqual(oudeFout, workflow, 'negatieve controle wijzigt de echte afhankelijkheid');
+  assert.ok(afhankelijkheden(oudeFout, 'dekking').has('incremental'), 'oude transitieve skip wordt gedetecteerd');
+});

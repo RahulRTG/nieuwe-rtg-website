@@ -123,9 +123,15 @@ test('3. het beleid is van het management, niet van iedereen met een inlog', asy
 });
 
 test('4. verlof: de aanvrager vraagt, het management beslist, en maar een keer', async () => {
-  const aan = await api('/api/staff/leave/request',
+  /* Voor gewoon verlof is een reden geen vraag (VRIJHEID.md, regel 2.11):
+     een meegegeven reden wordt geweigerd en niet stil weggegooid. */
+  const metReden = await api('/api/staff/leave/request',
     { soort: 'verlof', van: '2027-08-10', tot: '2027-08-17', reden: 'Vakantie met het gezin' }, werker);
+  assert.equal(metReden.status, 422, 'een reden bij verlof wordt geweigerd');
+  const aan = await api('/api/staff/leave/request',
+    { soort: 'verlof', van: '2027-08-10', tot: '2027-08-17' }, werker);
   assert.equal(aan.status, 200);
+  assert.equal(aan.body.entry.reden, undefined, 'er wordt geen reden bewaard');
   const mijn = await api('/api/staff/mine', {}, werker);
   verlofId = (mijn.body.verlof || [])[0].id;
   assert.ok(verlofId, 'de aanvraag staat op zijn naam');

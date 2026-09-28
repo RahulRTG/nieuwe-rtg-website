@@ -61,7 +61,7 @@ const VOORVOEGSELS = [
 
 /* En de losse paden, in domeinen waar de PASsessie wel werk heeft. */
 const PADEN = [
-  '/api/auth/password', '/api/auth/resend',
+  '/api/auth/aanmeldkanaal', '/api/auth/password', '/api/auth/resend',
   '/api/chat/send',
   '/api/member/dossier', '/api/member/identiteit/verzoeken', '/api/member/loonstroken',
   '/api/podium/kanaal/aanmeld', '/api/podium/kanalen',

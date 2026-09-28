@@ -8,9 +8,9 @@
 module.exports = (ctx) => {
   const { schoon, findSupplier, modAan, magVerkopen, kaartenVan, kaartStand, KAART_PRODUCTEN: PRODUCTEN } = ctx;
 
-  /* Wat de reiziger ziet. `eigen` geeft de CODE erbij -- die is het kaartje, en
-     hoort alleen bij de eigenaar en bij het personeel dat hem controleert. */
-  function kaartBeeld(k, eigen) {
+  /* Wat de reiziger ziet. Nooit de code: die is een bearer in ./kaarttoegang
+     en staat alleen kaal in het antwoord op Toon. */
+  function kaartBeeld(k) {
     const p = PRODUCTEN[k.product] || {};
     const st = kaartStand(k);
     const b = { id: k.id, product: k.product, productNaam: p.naam || k.product,
@@ -21,7 +21,6 @@ module.exports = (ctx) => {
       stand: st.stand, reden: st.reden, rittenOver: st.rittenOver != null ? st.rittenOver : 0,
       validaties: (k.validaties || []).map(v => ({ at: v.at, lijn: v.lijnNaam || null })),
       terugbetaald: k.terugbetaald || null, gekocht: k.gekocht };
-    if (eigen) b.code = k.code;
     return b;
   }
 

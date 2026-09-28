@@ -114,6 +114,7 @@
   .inlog a{display:inline-block;padding:.25rem 0;min-height:24px;}
   .inlog a{color:var(--rtg-leesgoud,var(--gold));}
   .hint{color:var(--soft);font-size:.82rem;line-height:1.6;}
+  .kaart summary{min-height:30px;padding:.4rem 0;cursor:pointer;}
   @media(max-width:560px){ .kpis{grid-template-columns:1fr 1fr;} }
 
   /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
@@ -164,6 +165,7 @@
 
 <!-- uitvoer.js zonder defer en voor het eigen script: dat meldt hieronder zijn eigen model aan -->
 <script src="/shared/uitvoer.js"></script>
+<script src="/apps/redactie/artikel.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -176,7 +178,7 @@ const BEELDEN=['bamboe','hero','huis-omslag','jet','kaiseki','kyoto-suite','onse
 const ACCENTEN=['#7F1634','#9E1C40','#C23A5E','#857007','#A98F1C','#0C0C0B','#2E5D48'];
 
 /* ---------- newsroom ---------- */
-async function laad(){ try{ STAAT=await api('staat'); $('#krantNaam').textContent=STAAT.huisstijl.naam||'Redactie'; vulRubrieken(); toon(HUIDIG); }catch(e){ meld(e.message); } }
+async function laad(){ try{ STAAT=await api('staat'); const kop=$('#krantNaam'); if(kop)kop.textContent=STAAT.huisstijl.naam||'Redactie'; vulRubrieken(); toon(HUIDIG); }catch(e){ meld(e.message); } }
 function vulRubrieken(){ const s=$('#snRubriek'); if(s){ s.innerHTML=(STAAT.rubrieken||[]).map(r=>'<option>'+esc(r)+'</option>').join(''); } }
 
 let HUIDIG='vandaag';
@@ -206,12 +208,12 @@ function vandaag(){
 }
 function artRij(a){
   const el=document.createElement('div'); el.className='art';
-  el.innerHTML='<div class="t"><b>'+esc(a.titel)+'</b><small>'+esc(a.rubriek)+' · '+esc(a.auteur||'Redactie')+' · '+(a.gelezen||0)+' gelezen</small></div>'+
+  el.innerHTML='<div class="t"><b>'+esc(a.titel)+'</b><small>'+esc(a.rubriek)+' · '+esc(a.auteur||'Redactie')+' · '+esc(a.redactiestand||'concept')+' · '+(a.gelezen||0)+' gelezen</small></div>'+
     '<span class="badge '+(a.status==='live'?'live">Live':'concept">Concept')+'</span>';
   const acties=document.createElement('div'); acties.className='rij';
   const bew=document.createElement('button'); bew.className='mini'; bew.textContent='Bewerk'; bew.addEventListener('click',()=>editArtikel(a.id)); acties.appendChild(bew);
-  const pub=document.createElement('button'); pub.className='mini'; pub.textContent=a.status==='live'?'Naar concept':'Publiceer';
-  pub.addEventListener('click',async()=>{ try{ await api(a.status==='live'?'artikel/concept':'artikel/publiceer',{id:a.id}); await laad(); }catch(e){meld(e.message);} }); acties.appendChild(pub);
+  const pub=document.createElement('button'); pub.className='mini'; pub.textContent=a.status==='live'?'Intrekken':'Open redactie';
+  pub.addEventListener('click',async()=>{ if(a.status!=='live'){editArtikel(a.id);return;} try{ await api('artikel/concept',{id:a.id,revisie:a.revisie}); await laad(); }catch(e){meld(e.message);} }); acties.appendChild(pub);
   const weg=document.createElement('button'); weg.className='mini'; weg.textContent='×'; weg.title='Verwijderen';
   weg.addEventListener('click',async()=>{ if(!confirm('Verwijderen?'))return; try{ await api('artikel/verwijder',{id:a.id}); await laad(); }catch(e){meld(e.message);} }); acties.appendChild(weg);
   el.appendChild(acties); return el;
@@ -220,7 +222,7 @@ async function artikelenTab(){
   $('#hoofd').innerHTML='<div class="kaart"><div class="rij"><h3 class="h-flex1">Artikelen</h3><button class="knop prim" id="nieuwArt">Nieuw artikel</button></div>'+
     '<div class="rij" id="filters" style="margin:0.5rem 0;"></div><div id="artlijst"></div></div>';
   $('#nieuwArt').addEventListener('click',()=>editArtikel(null));
-  const f=$('#filters'); ['alle','concept','live'].forEach(s=>{const c=document.createElement('button');c.className='chip'+(s==='alle'?' aan':'');c.textContent=s==='alle'?'Alle':(s==='live'?'Live':'Concept');c.dataset.s=s;c.addEventListener('click',()=>laadArtikelen(s));f.appendChild(c);});
+  const f=$('#filters'); ['alle','concept','eindredactie','live'].forEach(s=>{const c=document.createElement('button');c.className='chip'+(s==='alle'?' aan':'');c.textContent=s==='alle'?'Alle':(s==='live'?'Live':s==='eindredactie'?'Eindredactie':'Concept');c.dataset.s=s;c.addEventListener('click',()=>laadArtikelen(s));f.appendChild(c);});
   laadArtikelen('alle');
 }
 async function laadArtikelen(status){
@@ -230,26 +232,9 @@ async function laadArtikelen(status){
     d.lijst.forEach(a=>l.appendChild(artRij(a)));
   }catch(e){ meld(e.message); }
 }
-async function editArtikel(id){
-  LIJST=null;   // in de editor staat er geen lijst in beeld
-  let a={titel:'',chapo:'',inhoud:'',rubriek:(STAAT.rubrieken[0]||'Voorpagina'),beeld:''};
-  if(id){ try{ const d=await api('artikel/haal',{id}); a=d.artikel; }catch(e){ meld(e.message); return; } }
-  const rubOpts=(STAAT.rubrieken||[]).map(r=>'<option'+(r===a.rubriek?' selected':'')+'>'+esc(r)+'</option>').join('');
-  $('#hoofd').innerHTML='<div class="kaart"><div class="rij"><button class="mini" id="a_terug">← terug</button><span class="sp"></span>'+
-    '<button class="knop" id="a_assist">Rahul: kop &amp; chapo</button><button class="knop" id="a_bewaar">Bewaren</button><button class="knop groen" id="a_pub">Publiceren</button></div>'+
-    '<label class="lab">Kop</label><input class="veld" id="a_titel" maxlength="160" value="'+esc(a.titel)+'">'+
-    '<div class="rij"><div class="h-flex1"><label class="lab">Rubriek</label><select id="a_rubriek">'+rubOpts+'</select></div>'+
-    '<div class="h-flex1"><label class="lab">Beeld</label><button class="knop" id="a_beeld" style="width:100%;">'+(a.beeld?'Beeld gekozen':'Kies beeld')+'</button></div></div>'+
-    '<label class="lab">Chapo (samenvatting)</label><textarea id="a_chapo" rows="2" maxlength="300">'+esc(a.chapo)+'</textarea>'+
-    '<label class="lab">Tekst</label><textarea id="a_inhoud" rows="12" maxlength="20000">'+esc(a.inhoud)+'</textarea>'+
-    '<div id="a_ai" class="hint h-mt60"></div></div>';
-  let beeld=a.beeld||'', artId=a.id||null;
-  const verzamel=()=>({id:artId,titel:$('#a_titel').value,rubriek:$('#a_rubriek').value,chapo:$('#a_chapo').value,inhoud:$('#a_inhoud').value,beeld});
-  $('#a_terug').addEventListener('click',()=>toon('artikelen'));
-  $('#a_beeld').addEventListener('click',()=>kiesBeeld({zet:src=>{beeld=src;$('#a_beeld').textContent='Beeld gekozen';}}));
-  $('#a_bewaar').addEventListener('click',async()=>{ try{ const r=await api('artikel/bewaar',verzamel()); artId=r.artikel.id; meld('Bewaard.'); }catch(e){meld(e.message);} });
-  $('#a_pub').addEventListener('click',async()=>{ try{ const r=await api('artikel/bewaar',verzamel()); artId=r.artikel.id; await api('artikel/publiceer',{id:artId}); meld('Gepubliceerd.'); toon('artikelen'); laad(); }catch(e){meld(e.message);} });
-  $('#a_assist').addEventListener('click',async()=>{ try{ const r=await api('assist',{titel:$('#a_titel').value,inhoud:$('#a_inhoud').value}); if(r.chapo&&!$('#a_chapo').value)$('#a_chapo').value=r.chapo; $('#a_ai').innerHTML='Kop-ideeën: '+ (r.koppen||[]).map(esc).join(' · ') + (r.ai?('<br>'+esc(r.ai)):''); }catch(e){meld(e.message);} });
+function editArtikel(id){
+  LIJST=null;
+  return window.RTGRedactieArtikel({ api, esc, meld, $, rubrieken:STAAT.rubrieken||[], kiesBeeld, toon, laad }, id);
 }
 function cijfersTab(){
   const T=STAAT.tellers||{}; const top=(STAAT.recent||[]).filter(a=>a.status==='live').sort((a,b)=>(b.gelezen||0)-(a.gelezen||0)).slice(0,8);
@@ -339,7 +324,7 @@ function huisstijlTab(){
     '<div class="doekwrap"><div class="doek" id="doek" data-thema="donker"></div></div></div>';
   const sw=$('#h_swatches'); ACCENTEN.forEach(c=>{const b=document.createElement('button');b.className='swatch'+(c===H.accent?' actief':'');b.style.background=c;b.title=c;b.addEventListener('click',()=>{H.accent=c;document.querySelectorAll('#h_swatches .swatch').forEach(x=>x.classList.toggle('actief',x.style.background===b.style.background));teken();});sw.appendChild(b);});
   $('#h_thema').addEventListener('click',()=>{H.thema=H.thema==='donker'?'licht':'donker';$('#h_thema').textContent='Thema: '+(H.thema==='licht'?'Licht':'Donker');teken();});
-  $('#h_bewaar').addEventListener('click',async()=>{ try{ await api('huisstijl',{naam:$('#h_naam').value,payoff:$('#h_payoff').value,accent:H.accent,thema:H.thema}); STAAT.huisstijl.naam=$('#h_naam').value; $('#krantNaam').textContent=$('#h_naam').value; meld('Huisstijl bewaard.'); }catch(e){meld(e.message);} });
+  $('#h_bewaar').addEventListener('click',async()=>{ try{ await api('huisstijl',{naam:$('#h_naam').value,payoff:$('#h_payoff').value,accent:H.accent,thema:H.thema}); STAAT.huisstijl.naam=$('#h_naam').value; const kop=$('#krantNaam'); if(kop)kop.textContent=$('#h_naam').value; meld('Huisstijl bewaard.'); }catch(e){meld(e.message);} });
   $('#b_blok').addEventListener('click',()=>$('#blokSheet').classList.add('open'));
   $('#b_voorbeeld').addEventListener('click',()=>{BEWERK=!BEWERK;$('#b_voorbeeld').textContent=BEWERK?'Voorbeeld':'Bewerken';teken();});
   $('#b_bewaar').addEventListener('click',async()=>{ try{ await api('site/bewaar',{design:DESIGN}); STAAT.site=JSON.parse(JSON.stringify(DESIGN)); meld('Site bewaard.'); }catch(e){meld(e.message);} });

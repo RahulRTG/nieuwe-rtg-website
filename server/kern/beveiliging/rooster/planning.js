@@ -6,7 +6,8 @@ module.exports = (ctx) => {
   const { db, save, accounts, findSupplier, notify, notifySupplier, sseToSupplier, sseToOffice, logActivity, haversine,
     BEV_FUNCTIES, BEV_SHIFTS, BEV_ERNST, AANVR_KLAAR,
     id, nu, vandaag, schoon, getal, shiftVan, isBeveiliging, defaults, functieAan,
-    diensten, aanvragen, incidenten, rondes, guards, guardNaam, postVan, functieLijst, zetPost, verzuim } = ctx;
+    diensten, aanvragen, incidenten, rondes, guards, guardNaam, postVan, functieLijst, zetPost } = ctx;
+  const inplanbaar = require('../../payroll/inplanbaar').maakInplanbaar(ctx.afwezigOp);
   /* ---- budget: geplande uren x tarief tegen het contractbudget ---- */
   function budget(s, opts) {
     opts = opts || {};
@@ -120,9 +121,9 @@ module.exports = (ctx) => {
     if (rust && door === 'autoplan') return { status: 409, error: rust };
     /* Verzuim, in dezelfde vorm: de automaat plant nooit wie afwezig is, een
        MENS mag het (aangepast werk, een misverstand) maar ziet het erbij. Een
-       reden staat er nooit in (kern/verzuimrooster.js). */
-    const vz = verzuim ? verzuim.stand(s.code, gid, datum) : { stand: 'onbekend' };
-    const afwezig = vz.stand === 'afwezig' ? guardNaam(s, gid) + ' staat op ' + datum + ' als ' + vz.wat +
+       reden staat er nooit in (kern/payroll/inplanbaar.js). */
+    const vz = inplanbaar(s.code, gid, datum);
+    const afwezig = !vz.plan ? guardNaam(s, gid) + ' staat op ' + datum + ' als ' + vz.wat +
       (vz.inzetbaarheid ? ' (inzetbaar: ' + vz.inzetbaarheid + ')' : '') + ' in de verzuimlaag.' : null;
     if (afwezig && door === 'autoplan') return { status: 409, error: afwezig };
     const dienst = { id: id('d'), supplierCode: s.code, datum, shiftId: sh.id, postId: p.id,
@@ -132,7 +133,7 @@ module.exports = (ctx) => {
     save();
     sseToSupplier(s.code, 'sync', { scope: 'beveiliging' });
     return { status: 200, ok: true, dienst: dienstPubliek(s, dienst), ...(rust ? { rustWaarschuwing: rust } : {}),
-      ...(afwezig ? { verzuimWaarschuwing: afwezig } : {}), verzuimNagekeken: vz.stand !== 'onbekend' };
+      ...(afwezig ? { verzuimWaarschuwing: afwezig } : {}), verzuimNagekeken: !vz.onbekend };
   }
   function schrapDienst(s, dienstId) {
     const d = diensten().find(x => x.id === dienstId && x.supplierCode === s.code);

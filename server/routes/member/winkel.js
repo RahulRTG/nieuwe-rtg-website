@@ -84,6 +84,12 @@ app.post('/api/reisbureau/afzeggen', auth, async (req, res) => {
   if (r.error) return res.status(r.status || 400).json({ error: r.error });
   res.json(r);
 });
+// de reis is voorbij en je bent terug (kern/reisbureau-thuis.js) -- alleen je eigen reis
+app.post('/api/reisbureau/thuis', auth, (req, res) => {
+  const r = reisbureau.markeerThuis({ ref: String((req.body || {}).ref || ''), doorLid: true, key: req.session.key });
+  if (r.error) return res.status(r.status || 400).json({ error: r.error });
+  res.json(r);
+});
 // AI-reisadvies: vertel je wens, de reisadviseur wijst de best passende reis aan
 app.post('/api/reisbureau/advies', auth, async (req, res) => {
   const r = await reisbureau.advies(String(req.body.wens || ''));

@@ -46,7 +46,7 @@ module.exports = (sctx, beeld) => {
     const dochters = Object.values(W()).filter(x => x.moeder === w.code);
     const mee = [], zonder = [];
     for (const d of dochters) {
-      if (eigenVeld(sleutels, d.code) === d.beheerToken) mee.push(d); else zonder.push(d.code);
+      if (sctx.sleutels.beheerVan(d, eigenVeld(sleutels, d.code))) mee.push(d); else zonder.push(d.code);
     }
     const delen = [w].concat(mee).map(beeld);
     res.json({ ok: true, werkruimtes: delen.map(d => d.werkruimte),

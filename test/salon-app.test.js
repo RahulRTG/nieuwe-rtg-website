@@ -199,6 +199,7 @@ test('een lid volgen maakt zijn posts zichtbaar in de feed', async () => {
 
 test('reageren, antwoorden en iemand noemen; de maker mag opruimen', async () => {
   const a = await lid(), b = await lid(), c = await lid();
+  for (const wie of [b, c]) await raw('/salon/volg-lid', { wie: a.codenaam, aan: true }, wie.token);
   const post = await json(await raw('/salon/plaats', { tekst: 'Wie gaat er mee zondag?' }, a.token));
   const id = post.post.id;
 
@@ -309,6 +310,7 @@ test('de AI stelt voor en plaatst nooit zelf; zonder AI een eerlijke 503', async
 
 test('de reactie-samenvatting kan alleen op je eigen post', async () => {
   const a = await lid(), b = await lid();
+  await raw('/salon/volg-lid', { wie: a.codenaam, aan: true }, b.token);
   const post = await json(await raw('/salon/plaats', { tekst: 'Een post met een gesprek eronder.' }, a.token));
   await raw('/salon/reageer', { id: post.post.id, tekst: 'Mooi.' }, b.token);
   const vreemd = await json(await raw('/salon/ai/reacties', { id: post.post.id }, b.token));
@@ -339,6 +341,7 @@ test('je eigen post mag weg, die van een ander niet; en een gast plaatst niet', 
 
 test('inzicht is je eigen spiegel: cijfers wel, namen niet', async () => {
   const a = await lid(), b = await lid(), c = await lid();
+  for (const wie of [b, c]) await raw('/salon/volg-lid', { wie: a.codenaam, aan: true }, wie.token);
   const post = await json(await raw('/salon/plaats', { tekst: 'Een avond die bleef hangen. #avond' }, a.token));
   const id = post.post.id;
   for (const wie of [b, c]) await raw('/salon/volg-lid', { wie: a.codenaam, aan: true }, wie.token);

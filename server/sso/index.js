@@ -62,11 +62,11 @@ function zorgTabel(db) {
 }
 
 function vindIdentiteit(org, subject) {
-  return S.db.prepare('SELECT * FROM sso_identiteiten WHERE org = ? AND subject = ?').get(String(org), String(subject)) || null;
+  return S.huidigeDb().prepare('SELECT * FROM sso_identiteiten WHERE org = ? AND subject = ?').get(String(org), String(subject)) || null;
 }
 function legVast(org, subject, userId) {
   const nu = new Date().toISOString();
-  S.db.prepare(`INSERT INTO sso_identiteiten (org, subject, user_id, laatste_inlog, created_at)
+  S.huidigeDb().prepare(`INSERT INTO sso_identiteiten (org, subject, user_id, laatste_inlog, created_at)
     VALUES (?, ?, ?, ?, ?)
     ON CONFLICT(org, subject) DO UPDATE SET user_id = excluded.user_id, laatste_inlog = excluded.laatste_inlog`)
     .run(String(org), String(subject), Number(userId), nu, nu);
@@ -74,7 +74,7 @@ function legVast(org, subject, userId) {
 /* Alles wat een organisatie via SSO heeft binnengebracht. De SCIM-laag gebruikt
    dit straks om iemand die uit dienst gaat ook echt overal weg te halen. */
 function identiteitenVan(org) {
-  return S.db.prepare('SELECT * FROM sso_identiteiten WHERE org = ? ORDER BY created_at').all(String(org));
+  return S.huidigeDb().prepare('SELECT * FROM sso_identiteiten WHERE org = ? ORDER BY created_at').all(String(org));
 }
 
 /* Een wachtwoord dat niemand kent en niemand nodig heeft.
@@ -114,7 +114,7 @@ async function aanmelden(accounts, koppeling, claims) {
     const u = accounts.getUserById(bekend.user_id);
     if (u) { legVast(koppeling.org, subject, u.id); return { user: u, nieuw: false, gekoppeld: false }; }
     // het account is verwijderd (AVG-vergetelheid); de oude verwijzing mag weg
-    S.db.prepare('DELETE FROM sso_identiteiten WHERE org = ? AND subject = ?').run(koppeling.org, subject);
+    S.huidigeDb().prepare('DELETE FROM sso_identiteiten WHERE org = ? AND subject = ?').run(koppeling.org, subject);
   }
 
   /* 2. bestaat er al een RTG-account op dit adres? Dan koppelen we daaraan.

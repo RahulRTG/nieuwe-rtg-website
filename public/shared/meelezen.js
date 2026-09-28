@@ -203,7 +203,8 @@
         return Array.prototype.map.call(baan.children, function (x) { return x.textContent; });
       },
       leeg: function () { while (baan.firstChild) baan.removeChild(baan.firstChild); },
-      luistert: function () { return !!(luister && luister.loopt); }
+      luistert: function () { return !!(luister && luister.loopt); },
+      stop: function () { if (luister) luister.stop(); }
     };
   }
 

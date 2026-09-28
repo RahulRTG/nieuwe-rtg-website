@@ -1,0 +1,231 @@
+/* VONK 2.0: warm Connection-product bovenop de bestaande projecties.
+   Geen dating-cliches, geen score en geen gesimuleerde fotografie. Als de
+   profielprojectie later echte media krijgt kan het identiteitsvlak die tonen;
+   tot die tijd blijft het eerlijk grafisch. */
+body[data-rtg-dating="vonk"]{
+  --vonk-night:#140e0f;
+  --vonk-night-soft:#251417;
+  --vonk-wine:#651d31;
+  --vonk-wine-bright:#8b2d49;
+  --vonk-ember:#b85c3e;
+  --vonk-cream:#f5eee4;
+  --vonk-cream-deep:#e8ddcf;
+  --vonk-brass:#bb9651;
+  --vonk-ink:#201719;
+  --vonk-muted:#665b58;
+  --vonk-line:rgba(71,43,43,.18);
+  --vonk-shadow:0 24px 70px rgba(56,25,31,.14);
+  background:
+    radial-gradient(900px 540px at 90% 0,rgba(139,45,73,.12),transparent 66%),
+    linear-gradient(180deg,#f7f1e8,#efe5d8)!important;
+}
+body[data-rtg-dating="vonk"] main#inhoud{width:min(1320px,100%)!important;padding-top:clamp(1rem,2.2vw,2rem)!important;}
+body[data-rtg-dating="vonk"] .rtg-suitehero,
+body[data-rtg-dating="vonk"] .rtg-intel-strip{display:none!important;}
+body[data-rtg-dating="vonk"] .rtguitvoer-knop{display:none!important;}
+body[data-rtg-dating="vonk"] .dating-command{display:none;}
+body[data-rtg-dating="vonk"] .dating-layout{display:block;border:0;background:transparent;}
+body[data-rtg-dating="vonk"] .dating-work{padding:0;background:transparent;}
+body[data-rtg-dating="vonk"] .dating-context{display:none;}
+
+.vonk-arrival{position:relative;isolation:isolate;overflow:hidden;min-height:clamp(220px,34vw,430px);display:grid;align-items:end;padding:clamp(1.4rem,4vw,4.25rem);color:var(--vonk-cream);background:linear-gradient(125deg,var(--vonk-night) 0%,#2b121b 52%,#572039 110%);border:1px solid rgba(74,40,40,.3);box-shadow:var(--vonk-shadow);}
+.vonk-arrival::before{content:"";position:absolute;z-index:-1;width:min(58vw,650px);aspect-ratio:1;right:-12%;top:-75%;border:1px solid rgba(222,185,112,.27);border-radius:50%;box-shadow:0 0 0 70px rgba(188,81,65,.045),0 0 0 150px rgba(188,81,65,.03);}
+.vonk-arrival::after{content:"";position:absolute;z-index:-1;inset:auto 0 0;height:42%;background:linear-gradient(transparent,rgba(8,5,5,.34));}
+.vonk-arrival__kicker,.vonk-kicker{display:block;color:#d4b36b;font:700 .62rem/1.2 Inter,system-ui,sans-serif;letter-spacing:.2em;text-transform:uppercase;}
+.vonk-arrival h2{max-width:10ch;margin:.7rem 0 0;color:#fff8ef;font:500 clamp(3.1rem,8vw,7.5rem)/.83 "Bodoni Moda",Georgia,serif;letter-spacing:-.055em;}
+.vonk-arrival__foot{display:flex;justify-content:space-between;align-items:end;gap:2rem;margin-top:clamp(2rem,7vw,6.5rem);}
+.vonk-arrival__foot p{max-width:50ch;margin:0;color:rgba(255,245,235,.7);font-size:clamp(.85rem,1.2vw,1rem);line-height:1.65;}
+.vonk-count{flex:none;text-align:right;}
+.vonk-count strong{display:block;color:#fff7e9;font:500 clamp(2.4rem,5vw,4.5rem)/.85 "Bodoni Moda",Georgia,serif;}
+.vonk-count span{color:rgba(255,245,235,.52);font-size:.67rem;letter-spacing:.13em;text-transform:uppercase;}
+.vonk-network{display:inline-flex;align-items:center;gap:.45rem;margin-top:.8rem;color:rgba(255,245,235,.62);font-size:.72rem;}
+.vonk-network::before{content:"";width:.46rem;height:.46rem;border-radius:50%;background:#78ad86;box-shadow:0 0 0 .28rem rgba(120,173,134,.13);}
+.vonk-network.offline::before{background:#ca745d;box-shadow:0 0 0 .28rem rgba(202,116,93,.13);}
+
+.vonk-manifest{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(240px,.7fr);gap:clamp(1.2rem,3vw,3rem);margin:clamp(2.4rem,5vw,5rem) 0 1.6rem;padding:0 clamp(.1rem,2vw,1.2rem);align-items:end;}
+.vonk-manifest h2{max-width:12ch;margin:.65rem 0 0;color:var(--vonk-ink);font:500 clamp(2.5rem,5vw,5.2rem)/.92 "Bodoni Moda",Georgia,serif;letter-spacing:-.05em;}
+.vonk-manifest p{margin:0 0 .25rem;color:var(--vonk-muted);font-size:.88rem;line-height:1.75;}
+
+.vonk-six{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--vonk-line);border:1px solid var(--vonk-line);}
+.vonk-card{position:relative;min-width:0;display:grid;grid-template-rows:minmax(270px,42vw) auto;background:var(--vonk-cream);}
+.vonk-card__portrait{position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;padding:1.15rem;color:#fff8ef;background:
+  radial-gradient(circle at 70% 22%,rgba(230,166,105,.42),transparent 22%),
+  radial-gradient(circle at 28% 78%,rgba(132,50,74,.72),transparent 38%),
+  linear-gradient(145deg,#1c1214,#553044 58%,#a55e4b);}
+.vonk-card:nth-child(2n) .vonk-card__portrait{background:radial-gradient(circle at 72% 65%,rgba(211,170,98,.34),transparent 25%),radial-gradient(circle at 20% 20%,rgba(119,57,79,.75),transparent 42%),linear-gradient(145deg,#171316,#3b2632 55%,#79502f);}
+.vonk-card:nth-child(3n) .vonk-card__portrait{background:radial-gradient(circle at 40% 20%,rgba(224,126,91,.3),transparent 24%),radial-gradient(circle at 74% 80%,rgba(130,42,64,.72),transparent 36%),linear-gradient(155deg,#231416,#6a2b40 60%,#bd7955);}
+.vonk-card__portrait.has-photo{background:#211317;}
+.vonk-card__photo{position:absolute;z-index:0;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;filter:saturate(.84) contrast(1.03);}
+.vonk-card__portrait.has-photo::before{display:none;}
+.vonk-card__portrait.has-photo::after{z-index:0;opacity:1;background:linear-gradient(180deg,rgba(20,10,12,.3),transparent 35%,rgba(20,10,12,.62));}
+.vonk-card__portrait.has-photo>*:not(.vonk-card__photo){position:relative;z-index:1;}
+.vonk-card__portrait::before{content:"";position:absolute;z-index:-1;inset:10%;border:1px solid rgba(255,239,221,.26);border-radius:50%;transform:translate(20%,-14%);}
+.vonk-card__portrait::after{content:"";position:absolute;z-index:-1;inset:0;opacity:.16;background-image:linear-gradient(110deg,transparent 48%,rgba(255,255,255,.4) 49%,transparent 50%);background-size:14px 100%;}
+.vonk-card__sequence{font:700 .58rem/1 Inter,system-ui,sans-serif;letter-spacing:.19em;text-transform:uppercase;}
+.vonk-card__initials{align-self:center;margin:auto;color:rgba(255,248,239,.94);font:500 clamp(4.5rem,10vw,8rem)/1 "Bodoni Moda",Georgia,serif;letter-spacing:-.08em;text-shadow:0 18px 45px rgba(30,7,13,.3);}
+.vonk-card__verified{display:flex;align-items:center;justify-content:space-between;gap:1rem;font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;}
+.vonk-card__verified span:last-child{opacity:.65;}
+.vonk-card__body{display:flex;flex-direction:column;padding:clamp(1.25rem,2.8vw,2.25rem);}
+.vonk-card__body h3{margin:0;color:var(--vonk-ink);font:500 clamp(2rem,4vw,3.8rem)/.92 "Bodoni Moda",Georgia,serif;letter-spacing:-.045em;}
+.vonk-card__meta{margin:.65rem 0 0;color:#815063;font-size:.68rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;}
+.vonk-card__bio{max-width:48ch;margin:1.25rem 0 0;color:#4e4240;font-size:.88rem;line-height:1.7;}
+.vonk-card__shared{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:1.2rem;}
+.vonk-card__shared span{min-height:30px;display:inline-flex;align-items:center;padding:.28rem .65rem;color:#5c403c;background:rgba(148,86,70,.07);border:1px solid rgba(106,56,56,.18);font-size:.67rem;}
+.vonk-card__why{margin-top:1.45rem;padding-top:1.1rem;border-top:1px solid var(--vonk-line);}
+.vonk-card__why strong{color:#6a4f42;font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;}
+.vonk-card__why ul{display:grid;gap:.45rem;margin:.75rem 0 0;padding:0;list-style:none;}
+.vonk-card__why li{position:relative;padding-left:1rem;color:#4f4541;font-size:.76rem;line-height:1.45;}
+.vonk-card__why li::before{content:"";position:absolute;left:0;top:.48rem;width:.34rem;height:.34rem;border-radius:50%;background:var(--vonk-brass);}
+.vonk-card__why li.open::before{background:transparent;border:1px solid var(--vonk-brass);}
+.vonk-card__actions{display:grid;grid-template-columns:1fr 1.25fr;gap:.55rem;margin-top:auto;padding-top:1.65rem;}
+.vonk-action{min-height:52px;padding:.72rem .9rem;border:1px solid rgba(85,46,47,.25);border-radius:0;color:#4d3f3c;background:transparent;font:700 .68rem/1 Inter,system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;}
+.vonk-action.primary{color:#fff7ef;border-color:var(--vonk-wine);background:linear-gradient(135deg,#4e1628,var(--vonk-wine-bright));box-shadow:0 12px 26px rgba(101,29,49,.17);}
+.vonk-action:disabled{opacity:.45;cursor:wait;}
+.vonk-profile-link{width:max-content;margin-top:1rem;padding:.4rem 0;border:0;border-bottom:1px solid rgba(101,29,49,.32);color:#6d2c43;background:none;font:650 .69rem/1 Inter,system-ui,sans-serif;letter-spacing:.06em;cursor:pointer;}
+.vonk-disclosure{margin-top:1.1rem;padding:.9rem 0 0;border-top:1px solid var(--vonk-line);color:#6a5d58;font-size:.7rem;line-height:1.55;}
+
+.vonk-empty{min-height:360px;display:grid;place-items:center;padding:3rem;text-align:center;color:var(--vonk-ink);border:1px solid var(--vonk-line);background:rgba(255,251,245,.5);}
+.vonk-empty h3{margin:0;font:500 clamp(2rem,5vw,4rem)/.95 "Bodoni Moda",Georgia,serif;}
+.vonk-empty p{max-width:48ch;margin:.9rem auto 0;color:var(--vonk-muted);line-height:1.7;}
+
+/* Connection Passport */
+.vonk-passport-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2rem;align-items:end;padding:clamp(2rem,5vw,5rem);color:#fff7ed;background:linear-gradient(140deg,var(--vonk-night),#3d1724 70%,#6c2a3f);}
+.vonk-passport-head h2{max-width:9ch;margin:.7rem 0 0;font:500 clamp(3.3rem,7vw,7rem)/.86 "Bodoni Moda",Georgia,serif;letter-spacing:-.055em;}
+.vonk-passport-head p{max-width:40ch;margin:1rem 0 0;color:rgba(255,245,235,.65);font-size:.82rem;line-height:1.65;}
+.vonk-passport-seal{width:clamp(88px,12vw,150px);aspect-ratio:1;display:grid;place-items:center;border:1px solid rgba(224,189,116,.44);border-radius:50%;color:#e1c277;font:500 clamp(2.6rem,5vw,4.5rem)/1 "Bodoni Moda",Georgia,serif;}
+.vonk-passport-nav{position:sticky;z-index:5;top:var(--suite-stack,0);display:flex;overflow-x:auto;background:rgba(247,241,232,.92);border:1px solid var(--vonk-line);backdrop-filter:blur(16px);}
+.vonk-passport-nav a{min-height:48px;display:flex;align-items:center;padding:0 1rem;color:#665754;text-decoration:none;font-size:.64rem;font-weight:700;letter-spacing:.08em;white-space:nowrap;text-transform:uppercase;border-right:1px solid var(--vonk-line);}
+.vonk-passport-section,.vonk-passport-section.rtgdeel-weg{display:block!important;scroll-margin-top:calc(var(--suite-stack,0px) + 58px);padding:clamp(1.5rem,4vw,3.6rem);border:1px solid var(--vonk-line);border-top:0;background:rgba(255,251,245,.65);}
+.vonk-passport-section__intro{display:grid;grid-template-columns:minmax(180px,.45fr) minmax(0,1fr);gap:clamp(1.5rem,5vw,5rem);margin-bottom:2rem;}
+.vonk-passport-section__intro h2{margin:.5rem 0 0;color:var(--vonk-ink);font:500 clamp(2rem,4vw,3.7rem)/.95 "Bodoni Moda",Georgia,serif;letter-spacing:-.04em;}
+.vonk-passport-section__intro p{max-width:55ch;margin:1.55rem 0 0;color:var(--vonk-muted);font-size:.8rem;line-height:1.7;}
+.vonk-passport-section .vonk-blok{margin:0;}
+.vonk-passport-section .dating-section-head{display:none;}
+.vonk-passport-section .dating-copy{max-width:74ch;margin:0 0 1.5rem;}
+.vonk-passport-privacy{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:1rem;align-items:center;margin:0;padding:1rem 1.1rem;color:#f7eee5;background:var(--vonk-night-soft);border:1px solid rgba(255,255,255,.08);}
+.vonk-passport-privacy strong,.vonk-passport-privacy small{display:block;}
+.vonk-passport-privacy small{margin-top:.3rem;color:rgba(247,238,229,.62);line-height:1.5;}
+.vonk-photo-studio{display:grid;grid-template-columns:minmax(0,1fr) minmax(230px,.55fr);gap:1.4rem;margin-bottom:1.5rem;padding:1.25rem;color:#f9f1e8;background:linear-gradient(135deg,#1b1114,#3d1925);border:1px solid rgba(224,189,116,.24);}
+.vonk-photo-studio h3{margin:.45rem 0 0;font:500 clamp(1.9rem,4vw,3rem)/.95 "Bodoni Moda",Georgia,serif;}
+.vonk-photo-studio p{max-width:58ch;margin:.7rem 0 0;color:rgba(249,241,232,.65);font-size:.74rem;line-height:1.65;}
+.vonk-photo-upload{display:grid;gap:.55rem;align-content:start;}
+.vonk-photo-upload>label,.vonk-photo-item label{font-size:.61rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;}
+.vonk-photo-upload small,.vonk-photo-item small{display:block;color:rgba(249,241,232,.58);font-size:.64rem;line-height:1.5;}
+.vonk-photo-list{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,.12);}
+.vonk-photo-item{display:grid;grid-template-columns:130px minmax(0,1fr);gap:.85rem;padding:.7rem;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);}
+.vonk-photo-item img{width:130px;height:160px;object-fit:cover;}
+.vonk-photo-item strong{display:block;margin-bottom:.25rem;font-size:.75rem;}
+.vonk-photo-item label{display:grid;gap:.35rem;margin-top:.65rem;}
+.vonk-photo-actions{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.6rem;}
+.vonk-photo-empty{grid-column:1/-1;padding:1rem;border:1px dashed rgba(255,255,255,.18);color:rgba(249,241,232,.62);font-size:.72rem;}
+
+/* Matches, conversation, Meet Halfway and Date */
+.vonk-connections-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2rem;align-items:end;margin-bottom:1.5rem;padding:clamp(1.7rem,4vw,3.8rem);color:#fff6ec;background:linear-gradient(130deg,#1b1113,#3a1923);}
+.vonk-connections-head h2{margin:.7rem 0 0;font:500 clamp(3rem,6vw,6rem)/.87 "Bodoni Moda",Georgia,serif;letter-spacing:-.055em;}
+.vonk-connections-head p{max-width:45ch;margin:0;color:rgba(255,245,235,.62);font-size:.8rem;line-height:1.65;}
+.vonk-connections{display:grid;gap:1rem;}
+.vonk-connection{overflow:hidden;border:1px solid var(--vonk-line);background:rgba(255,251,245,.72);box-shadow:0 18px 50px rgba(68,36,36,.08);}
+.vonk-connection__head{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:1rem;align-items:center;padding:1.2rem 1.3rem;border-bottom:1px solid var(--vonk-line);}
+.vonk-miniature{width:58px;height:58px;overflow:hidden;display:grid;place-items:center;border-radius:50%;color:#fff4e9;background:linear-gradient(145deg,#30151e,#8d3b55);font:500 1.4rem/1 "Bodoni Moda",Georgia,serif;}
+.vonk-miniature img{width:100%;height:100%;object-fit:cover;}
+.vonk-connection__head h3{margin:0;color:var(--vonk-ink);font:500 1.75rem/1 "Bodoni Moda",Georgia,serif;}
+.vonk-connection__state{margin-top:.35rem;color:#7b5d54;font-size:.61rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;}
+.vonk-connection__trust{color:#77654e;font-size:.62rem;letter-spacing:.08em;text-align:right;text-transform:uppercase;}
+.vonk-connection__body{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(280px,.85fr);}
+.vonk-conversation,.vonk-meeting{min-width:0;padding:clamp(1.2rem,3vw,2.25rem);}
+.vonk-meeting{border-left:1px solid var(--vonk-line);background:rgba(235,222,208,.43);}
+.vonk-panel-title{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;margin-bottom:1rem;}
+.vonk-panel-title h4{margin:0;color:var(--vonk-ink);font:500 1.55rem/1 "Bodoni Moda",Georgia,serif;}
+.vonk-panel-title span{color:#806449;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;}
+.vonk-chat{min-height:150px;max-height:300px;overflow:auto;display:flex;flex-direction:column;gap:.65rem;padding:1rem 0;border-block:1px solid var(--vonk-line);}
+.vonk-message{max-width:84%;align-self:flex-start;padding:.72rem .82rem;color:#473c39;background:#efe4d8;border:1px solid rgba(89,52,52,.1);font-size:.79rem;line-height:1.5;}
+.vonk-message.mine{align-self:flex-end;color:#fff6ee;background:#592035;border-color:#592035;}
+.vonk-message b{display:block;margin-bottom:.24rem;color:inherit;font-size:.58rem;letter-spacing:.09em;text-transform:uppercase;opacity:.7;}
+.vonk-prompts{display:flex;gap:.4rem;overflow-x:auto;margin:.75rem 0 0;padding-bottom:.2rem;}
+.vonk-prompt{flex:none;min-height:38px;padding:.48rem .65rem;border:1px solid var(--vonk-line);border-radius:var(--rtg-radius-system);color:#6a5049;background:rgba(255,255,255,.4);font-size:.65rem;cursor:pointer;}
+.vonk-composer{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.55rem;margin-top:.7rem;}
+.vonk-composer input{min-height:50px!important;}
+.vonk-meet-progress{display:grid;grid-template-columns:repeat(4,1fr);margin:1rem 0 1.2rem;counter-reset:meet;}
+.vonk-meet-progress span{position:relative;padding-top:1.6rem;color:#87776f;font-size:.57rem;letter-spacing:.05em;text-align:center;text-transform:uppercase;}
+.vonk-meet-progress span::before{counter-increment:meet;content:counter(meet);position:absolute;top:0;left:50%;width:1.25rem;height:1.25rem;display:grid;place-items:center;transform:translateX(-50%);border:1px solid rgba(105,63,62,.3);border-radius:50%;background:#f4ece2;font-size:.55rem;}
+.vonk-meet-progress span+span::after{content:"";position:absolute;top:.62rem;right:50%;width:100%;height:1px;background:rgba(105,63,62,.22);}
+.vonk-meet-card{margin-top:.6rem;padding:1rem;border:1px solid var(--vonk-line);background:rgba(255,255,255,.4);}
+.vonk-meet-card.is-picked{border-color:var(--vonk-brass);box-shadow:inset 3px 0 var(--vonk-brass);}
+.vonk-meet-card h5{margin:0;color:#35292a;font:600 .88rem/1.35 Inter,system-ui,sans-serif;}
+.vonk-meet-card p{margin:.35rem 0 0;color:#70625d;font-size:.7rem;line-height:1.55;}
+.vonk-date{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,.7fr) minmax(0,1.3fr);min-height:330px;color:#fff6ec;background:linear-gradient(135deg,#171012,#2c151c 58%,#5c2437);}
+.vonk-date__mark{display:grid;place-items:center;padding:2rem;border-right:1px solid rgba(255,255,255,.1);}
+.vonk-date__mark span{font:500 clamp(4rem,9vw,8rem)/1 "Bodoni Moda",Georgia,serif;color:#d7b66f;}
+.vonk-date__detail{display:flex;flex-direction:column;justify-content:center;padding:clamp(2rem,5vw,5rem);}
+.vonk-date__detail h4{margin:.8rem 0 0;color:#fff6ec;font:500 clamp(2.5rem,5vw,5rem)/.9 "Bodoni Moda",Georgia,serif;letter-spacing:-.045em;}
+.vonk-date__detail p{margin:1rem 0 0;color:rgba(255,245,235,.68);font-size:.86rem;line-height:1.7;}
+.vonk-date__facts{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-top:1.6rem;background:rgba(255,255,255,.12);}
+.vonk-date__facts div{padding:1rem;background:rgba(15,9,10,.42);}
+.vonk-date__facts span{display:block;color:rgba(255,245,235,.46);font-size:.55rem;letter-spacing:.11em;text-transform:uppercase;}
+.vonk-date__facts strong{display:block;margin-top:.4rem;color:#fff6ec;font-size:.78rem;line-height:1.4;}
+.vonk-safety-link{min-height:44px;display:inline-flex;align-items:center;width:max-content;margin-top:1rem;padding:0;border:0;border-bottom:1px solid rgba(128,75,77,.34);color:#744457;background:none;font-size:.66rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;}
+
+/* Geprojecteerd kandidaatprofiel */
+body[data-rtg-dating="vonk"] dialog.vonk-profile-dialog{width:min(780px,calc(100% - 1.3rem));max-height:calc(100dvh - 1.3rem);padding:0;border:1px solid rgba(214,175,105,.42);border-radius:0;background:var(--vonk-cream);box-shadow:0 34px 100px rgba(24,8,12,.48);}
+body[data-rtg-dating="vonk"] dialog.vonk-profile-dialog::backdrop{background:rgba(16,8,10,.78);backdrop-filter:blur(12px);}
+.vonk-profile-sheet__hero{min-height:250px;display:flex;flex-direction:column;justify-content:space-between;padding:1.4rem;color:#fff5ea;background:radial-gradient(circle at 78% 20%,rgba(218,162,91,.36),transparent 23%),linear-gradient(145deg,#1a1012,#62243b);}
+.vonk-profile-sheet__hero.has-photo{position:relative;min-height:min(68dvh,620px);overflow:hidden;}
+.vonk-profile-sheet__hero.has-photo>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.85);}
+.vonk-profile-sheet__hero.has-photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,7,9,.28),transparent 38%,rgba(15,7,9,.76));}
+.vonk-profile-sheet__hero.has-photo>*:not(img){position:relative;z-index:1;}
+.vonk-profile-sheet__close{align-self:flex-end;width:46px;height:46px;border:1px solid rgba(255,255,255,.35);border-radius:50%;color:#fff;background:rgba(15,8,9,.28);font-size:1.4rem;cursor:pointer;}
+.vonk-profile-sheet__hero h2{margin:0;font:500 clamp(2.8rem,7vw,5.5rem)/.9 "Bodoni Moda",Georgia,serif;letter-spacing:-.05em;}
+.vonk-profile-sheet__body{padding:clamp(1.3rem,4vw,3rem);padding-bottom:max(clamp(1.3rem,4vw,3rem),env(safe-area-inset-bottom,0px));}
+.vonk-profile-sheet__body>p{color:#514441;font-size:.9rem;line-height:1.75;}
+.vonk-profile-sheet__section{margin-top:1.4rem;padding-top:1.1rem;border-top:1px solid var(--vonk-line);}
+.vonk-profile-sheet__section h3{margin:0 0 .75rem;color:#6a4a3d;font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;}
+.vonk-profile-sheet__actions{display:grid;grid-template-columns:1fr 1.3fr;gap:.6rem;margin-top:1.5rem;}
+
+@media(max-width:900px){
+  .vonk-six{grid-template-columns:1fr;}
+  .vonk-card{grid-template-columns:minmax(220px,.82fr) minmax(0,1.18fr);grid-template-rows:minmax(430px,58vw);}
+  .vonk-connection__body{grid-template-columns:1fr;}
+  .vonk-meeting{border-left:0;border-top:1px solid var(--vonk-line);}
+}
+@media(max-width:620px){
+  body[data-rtg-dating="vonk"] main#inhoud{padding-inline:.65rem!important;}
+  .vonk-arrival{min-height:430px;padding:1.35rem;}
+  .vonk-arrival h2{font-size:clamp(3.7rem,17vw,5.5rem);}
+  .vonk-arrival__foot{display:block;}
+  .vonk-count{margin-top:2rem;text-align:left;}
+  .vonk-manifest{display:block;margin-block:2.5rem 1.2rem;padding:.35rem;}
+  .vonk-manifest p{margin-top:1rem;}
+  .vonk-card{display:block;}
+  .vonk-card__portrait{min-height:62dvh;}
+  .vonk-card__body{padding:1.35rem;}
+  .vonk-card__actions,.vonk-profile-sheet__actions{grid-template-columns:1fr;}
+  .vonk-passport-head{display:block;padding:2rem 1.3rem;}
+  .vonk-passport-head h2{max-width:none;font-size:clamp(2.75rem,13vw,3.6rem);}
+  .vonk-passport-seal{margin-top:2rem;}
+  .vonk-passport-section{padding:1.25rem 1rem;}
+  .vonk-passport-section__intro{display:block;}
+  .vonk-passport-section__intro p{margin-top:.8rem;}
+  .vonk-photo-studio{grid-template-columns:1fr;}
+  .vonk-photo-list{grid-template-columns:1fr;}
+  .vonk-passport-privacy{grid-template-columns:1fr auto;}
+  .vonk-connections-head{display:block;padding:2rem 1.3rem;}
+  .vonk-connections-head p{margin-top:1rem;}
+  .vonk-connection__head{grid-template-columns:auto 1fr;}
+  .vonk-connection__trust{grid-column:1/-1;text-align:left;}
+  .vonk-composer{grid-template-columns:1fr;}
+  .vonk-date{grid-template-columns:1fr;}
+  .vonk-date__mark{min-height:150px;border-right:0;border-bottom:1px solid rgba(255,255,255,.1);}
+  .vonk-date__detail{padding:1.5rem;}
+  .vonk-date__facts{grid-template-columns:1fr;}
+}
+@media(max-width:390px){
+  .vonk-photo-item{grid-template-columns:92px minmax(0,1fr);}
+  .vonk-photo-item img{width:92px;height:126px;}
+}
+@media(prefers-reduced-motion:reduce){
+  .vonk-arrival::before,.vonk-card__portrait::before{transform:none;}
+  body[data-rtg-dating="vonk"] dialog.vonk-profile-dialog::backdrop{backdrop-filter:none;}
+}
+@media(forced-colors:active){
+  .vonk-arrival,.vonk-card__portrait,.vonk-passport-head,.vonk-connections-head,.vonk-date{background:Canvas;color:CanvasText;border:2px solid CanvasText;}
+}

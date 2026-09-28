@@ -70,7 +70,7 @@ Per stap van de systeemlus, waar hij vandaag woont:
 | Stap | Woont al in | Stand |
 |---|---|---|
 | signaleren | `kern/envelop.js` (elk bericht draagt `correlatie` + `oorzaak`) | **staat** |
-| begrijpen | nog geen module; de naam `weerklank` is ervoor gereserveerd in KANTOOR.md par. 6 | **een stap weg** |
+| begrijpen | `weerklank` — de naam is gereserveerd in KANTOOR.md par. 6, het bestand bestaat nog niet | **een stap weg** |
 | voorbereiden | `kern/commercie/voornemen.js` (een plan dat niet meer kan veranderen) | **staat**, niet op personeel |
 | aanbieden | Fluister voor de vloer (par. 6) | **staat** als gesprek, niet als aanbod |
 | mens beslist | `kern/kantoor/tweedehandtekening.js`, de boardroom | **staat** voor geld |
@@ -159,16 +159,13 @@ OORZAAK en niet elke regel die eraan lijdt: *"Het rooster van vandaag is nog nie
 vastgesteld: dit is het standaardpatroon."* is één ding en geen twee. Het bouwen
 vond ook iets dat eerder niemand zag: het rooster dat de Team Room toont
 (`scheduleFor`) las verzuim NIET, dus een zieke collega stond daar vandaag
-gewoon op zijn dienst. De kaart legt het rooster daarom zelf tegen de
-verzuimlaag, en sinds dezelfde dag doet het rooster in de Team Room dat ook
-(`legOp()` in `kern/verzuimrooster.js`, achter `/api/supplier/schedule`). Een
-rooster is een lijst NAMEN die elke collega ziet, dus daar geldt dezelfde grens
-als op de kaart, alleen per rij: wie afwezig is heet voor iedereen **"Afwezig"**,
-zonder soort en zonder inzetbaarheid. Alleen de MANAGER ziet wat er gepland was,
-wat voor verzuim het is en hoeveel iemand nog kan, want die plant. Wie vrij
-stond blijft vrij: een wijziging zou alleen verraden dat er iets speelt. Het
-AI-antwoord op "wie staat er vandaag?" leest hetzelfde rooster met de
-collega-blik.
+gewoon op zijn dienst. Een parallelle ronde repareerde dat op dezelfde dag
+(`kern/payroll/inplanbaar.js`, samengekomen in main): het rooster zet wie
+afwezig is op vrij met alleen DAT hij afwezig is -- het hele team ziet dat
+rooster, dus geen soort; die ziet de leidinggevende in
+`/api/supplier/verzuim/planning`. De kaart leest dezelfde regel en telt zo'n
+collega als AFWEZIG en niet als vrij, anders zou hij verdwijnen in plaats van
+ontbreken.
 
 Per regel: waar hij vandaan komt, wat hij mag zeggen, en wat hij NOOIT mag
 zeggen.
@@ -472,7 +469,7 @@ Waar een functie botst met een grens, vervalt de functie.
 | **6** | de waardige uitgang (par. 9), behalve de overdracht | een stap weg |
 | **7** | Fluister biedt aan (par. 6), met de verdeling los van beveiliging | een stap weg; alleen op vraag (B4) |
 | **8** | overdracht via de verantwoordelijkheidsgraaf | vraagt een besluit (KANTOOR.md par. 5) |
-| **9** | vooraf regelen: apparatuur en verjaardag (par. 7) | apparatuur jaren weg; verjaardag een stap weg (B2 besloten) |
+| **9** | vooraf regelen: apparatuur en verjaardag (par. 7) | apparatuur jaren weg; verjaardag staat (B2, `VRIJHEID.md`) |
 
 Blok 0 gaat voor alles, en is goedkoper dan het lijkt: het meeste van deze
 ervaring hoeft niet gebouwd te worden, alleen te worden OPENGEZET voor RTG zelf.
@@ -507,8 +504,10 @@ ervaring hoeft niet gebouwd te worden, alleen te worden OPENGEZET voor RTG zelf.
   want status is geen aandacht. Twee dingen blijven gelden: het staat standaard
   UIT en de medewerker zet het zelf aan (de geboortedatum staat er voor het
   jeugdloon, en een nieuw doel is zijn keuze), en een ruil van zijn dienst
-  bereikt een tweede mens, dus die collega bevestigt zelf. Niet gebouwd; een
-  stap weg.
+  bereikt een tweede mens, dus die collega bevestigt zelf. Gebouwd in een
+  parallelle ronde als verjaardagvrijheid in RTG Vrijheid (`VRIJHEID.md`,
+  `server/kern/vrijheid/`): de medewerker geeft zelf alleen `MM-DD` op, en de
+  geboortedatum uit het lidprofiel gaat niet naar de werkgever (MN-02).
 - **B3 — Hoe heet het loopbaanbewijs op het scherm? BESLOTEN (28 september
   2026): Mijn loopbaan.** Het blijft een lezing van `kern/carriereledger/`
   zonder score; "Paspoort" en "Mijn RTG" blijven voor hun eigen betekenis.

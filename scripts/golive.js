@@ -116,9 +116,13 @@ function leesEnvBestand(pad) {
     modus: String(env.RTG_MOTOR_GELD || 'schaduw').toLowerCase(),
     bereikbaar: false, native: [], duurzaam:null, bank:null,
     verwachtGenesis: String(env.RTG_MOTOR_EXPECT_GENESIS || '') };
-  if (!geldStand.inkomendGeconfigureerd)
+  if (env.RTG_RELEASE_ZONDER_RAIL === '1' && !geldStand.betalingenUit)
+    blokkeer('RTG_RELEASE_ZONDER_RAIL=1 zonder RTG_BETALEN_UIT=1: een release zonder kaartrail kan alleen als elke betaalweg echt dicht staat.');
+  if (geldStand.releaseZonderRail)
+    goed('B2B2C-geld: bewuste release ZONDER kaartrail (RTG_BETALEN_UIT=1 en RTG_RELEASE_ZONDER_RAIL=1). De releasestand wordt READY_ZONDER_RAIL en nooit READY; extern afrekenen blijft open.');
+  if (!geldStand.inkomendGeconfigureerd && !geldStand.releaseZonderRail)
     blokkeer('B2B2C-geld: de echte inkomende betaalrail heeft geen provider geconfigureerd.');
-  if (!geldStand.uitgaandGeconfigureerd)
+  if (!geldStand.uitgaandGeconfigureerd && !geldStand.releaseZonderRail)
     blokkeer('B2B2C-geld: er is geen werkende productie-uitbetaalrail geconfigureerd. ' + geldStand.uitgaandWaarom);
   if (!geldStand.foundationRekeningGeconfigureerd)
     blokkeer('B2B2C-geld: RTF_IBAN ontbreekt of is geen geldig IBAN voor Foundation-settlement.');

@@ -236,8 +236,10 @@ test('10. een naamgenoot wordt geteld en gemeld, niet weggemoffeld', async () =>
 
 test('11. de sleutels van een mens staan niet in zijn dossier', async () => {
   const d = (await api('/dossier', Object.assign({ type: 'lid', id: PIA_ID }, HR))).body;
-  const token = d.feiten.find(f => f.veld === 'token');
-  assert.ok(token && token.kluis, 'het lid-token staat als kluisveld en niet als waarde');
+  // sinds bedrijf/sleutels.js staat er geen token meer op het lid, alleen sessiehashes -- en ook die in de kluis
+  const token = d.feiten.find(f => f.veld === 'sessies');
+  assert.ok(token && token.kluis, 'de lid-sessies staan als kluisveld en niet als waarde');
+  assert.ok(!d.feiten.some(f => f.veld === 'token'), 'en er is geen kaal tokenveld meer');
   assert.ok(!JSON.stringify(d.feiten).includes(PIA_TOKEN), 'nergens staat het echte token');
 
   /* `rtgKey` ONTSTAAT pas als een medewerker zijn persoonlijke RTG-account

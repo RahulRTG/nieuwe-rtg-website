@@ -50,5 +50,12 @@ module.exports = ({ db, findSupplier, zijnVrienden }) => {
     return salonviraal.toonInSalon(post, r);
   }
 
-  return { magZien: magSalonPostZien, PUBLIEKEN: vorm.PUBLIEKEN };
+  // De leespoort geldt ook voor reacties, onderwerpen en andere projecties.
+  // Archiefbeheer blijft een eigen handeling van de auteur, buiten ontdekking.
+  function magSalonPublicatieLezen(sess, post) {
+    if (!post || post.weg || post.verborgen || post.archief) return false;
+    const verborgen = (((db.data.salon || {}).verborgen || {})[(sess || {}).key]) || [];
+    return !verborgen.some(id => String(id) === String(post.id)) && magSalonPostZien(sess, post);
+  }
+  return { magZien: magSalonPostZien, magLezen: magSalonPublicatieLezen, PUBLIEKEN: vorm.PUBLIEKEN };
 };

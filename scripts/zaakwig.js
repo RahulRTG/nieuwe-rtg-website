@@ -19,7 +19,8 @@
 
      lid vindt zaak -> leest de kaart -> bestelt -> BETAALT -> pas dan ziet de
      zaak hem -> de zaak zet een status -> het lid ziet die status -> de kassa
-     haalt hem op met de afhaalcode.
+     haalt hem op met de afhaalcode (de QR uit /api/order/afhaalcode; het
+     bonnummer `pickup` opent niets).
 
    Die volgorde stond eerst anders (de zaak zou hem meteen zien), en dat was
    fout. Een bon met status `wacht-op-betaling` wordt op DRIE plekken uit het
@@ -46,7 +47,8 @@
      GELDIGE STATUS   een status buiten de lijst wordt geweigerd (400), en een
                       geldige status komt bij het lid terug zoals de zaak hem zette.
      ZELFDE BON       de kassa vindt de bon die het lid plaatste, op de
-                      afhaalcode -- niet een andere en niet een kopie.
+                      afhaalcode -- niet een andere en niet een kopie, en
+                      niet op het bonnummer.
      GELD VOLGT DE TREDE  onder trede 4 weigert elke betaalweg, ook de
                       administratieve (de kassa die "voldaan" zet). Dat laatste
                       staat met zoveel woorden in opzet/betaalstop.js: zonder
@@ -155,7 +157,7 @@ async function meet(tredeId) {
   const gerecht = ((kaart.d && kaart.d.menu) || [])[0];
   stap('het lid leest de kaart', kaart, !!gerecht);
 
-  let ref = null, pickup = null;
+  let ref = null, pickup = null, afhaal = null;
   if (gerecht) {
     const ord = await post('/api/order', { supplierCode: code, items: [{ id: gerecht.id, qty: 1 }] }, lid);
     ref = ord.d && ord.d.order && ord.d.order.ref;
@@ -221,12 +223,28 @@ async function meet(tredeId) {
     inv('het lid ziet dezelfde status als de zaak zette', zet.s === 200,
       !!bijLid && bijLid.status === 'in bereiding', 'bij het lid: ' + (bijLid && bijLid.status));
 
-    const kassa1 = await post('/api/supplier/pos/redeem', { code: pickup }, zt);
-    stap('de kassa vindt hem op de afhaalcode', kassa1, kassa1.s === 200 || kassa1.s === 409);
-    const kassa2 = await post('/api/supplier/pos/redeem', { code: pickup }, zt);
-    inv('geen dubbele bon: de tweede keer weigert', !!pickup, kassa2 && kassa2.s === 409,
+    /* De kassa geeft uit op de AFHAALCODE (128 bits, kern/afhaalcode.js) die het
+       lid in de app laat zien -- niet op het bonnummer `pickup`, dat alleen een
+       label voor keuken en pas is. */
+    const qr = await post('/api/order/afhaalcode', { ref }, lid);
+    afhaal = qr.d && qr.d.code;
+    stap('het lid toont zijn afhaal-QR', qr, qr.s === 200 && !!afhaal);
+    const label = pickup ? await post('/api/supplier/pos/redeem', { code: pickup }, zt) : null;
+    inv('het bonnummer alleen geeft niets uit', !!pickup, label && label.s === 404,
+      'antwoord: ' + (label && label.s) + ' -- 200 zou betekenen dat vier tekens een bestelling uitgeven');
+    const kassa1 = await post('/api/supplier/pos/redeem', { code: afhaal }, zt);
+    stap('de kassa vindt hem op de afhaalcode', kassa1, kassa1.s === 200);
+    inv('de kassa geeft DEZELFDE bon uit', kassa1.s === 200,
+      !!(kassa1.d && kassa1.d.order && kassa1.d.order.ref === ref), 'uitgegeven: ' + (kassa1.d && kassa1.d.order && kassa1.d.order.ref));
+    const kassa2 = await post('/api/supplier/pos/redeem', { code: afhaal }, zt);
+    inv('geen dubbele bon: de tweede keer weigert', !!afhaal, kassa2 && kassa2.s === 409,
       'antwoord: ' + (kassa2 && kassa2.s) + ' -- 200 zou betekenen dat dezelfde bon twee keer uitgaat');
   } else {
+    /* Een onbetaalde bon die niet aan de balie loopt, krijgt geen afhaalcode:
+       er valt niets af te halen dat de zaak nooit te zien kreeg. */
+    const qr = ref ? await post('/api/order/afhaalcode', { ref }, lid) : null;
+    inv('een onbetaalde bon krijgt geen afhaalcode', !!ref, qr && qr.s === 409,
+      'antwoord: ' + (qr && qr.s));
     /* Zonder betaalrail hoort ook de KASSA te weigeren: administratief
        "voldaan" zetten is ook betalen (opzet/betaalstop.js). */
     const kassa1 = pickup ? await post('/api/supplier/pos/redeem', { code: pickup }, zt) : null;

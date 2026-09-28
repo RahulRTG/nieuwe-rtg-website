@@ -86,8 +86,7 @@
     if (!week){ $('#roosterWrap').innerHTML = ''; return; }
     $('#roosterWrap').innerHTML = week.days.map((d,i) =>
       '<div class="rooster-day"><div class="dh">'+d.label+' · '+d.date.slice(8,10)+'-'+d.date.slice(5,7)+'</div>'+
-      d.staff.map(m => '<div class="rrow'+(m.id===me.staffId?' me':'')+'"><b>'+esc(m.name)+(m.id===me.staffId?' ('+T('pd.you','u')+')':'')+'</b><span>'+esc(m.shift)+
-        (m.gepland ? ' ('+esc(m.gepland)+')' : '')+'</span></div>').join('')+
+      d.staff.map(m => '<div class="rrow'+(m.id===me.staffId?' me':'')+'"><b>'+esc(m.name)+(m.id===me.staffId?' ('+T('pd.you','u')+')':'')+'</b><span>'+m.shift+'</span></div>').join('')+
       '</div>'
     ).join('');
   }

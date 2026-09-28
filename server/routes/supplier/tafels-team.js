@@ -5,7 +5,7 @@
 const { coord } = require('../../kern/util');
 module.exports = (kern) => {
   const { TABLE_STATUSES, accounts, app, broadcastSync, crypto, db, logActivity, managerOnly,
-          notifySupplier, save, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth } = kern;
+          notifySupplier, payrollOS, save, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth } = kern;
 
 
 
@@ -96,12 +96,13 @@ app.post('/api/supplier/leave/decide', supplierAuth, (req, res) => {
   if (v.status !== 'nieuw') return res.status(409).json({ error: 'Deze aanvraag is al behandeld.' });
   v.status = req.body.action === 'goedkeuren' ? 'goedgekeurd' : 'afgewezen';
   v.decidedBy = req.actor.name;
-  /* De aanvraag ging bij het indienen al als 'vakantie' naar de verzuimlaag
-     (routes/staff/dienst.js). Afgewezen verlof is geen verlof: zonder deze regel
-     rekende de loonrun het toch als vakantie, en hield het rooster hem vrij. */
-  if (v.status === 'afgewezen' && v.soort === 'verlof' && typeof kern.verlofAfgewezen === 'function') {
-    const w = kern.verlofAfgewezen(req.supplier.code, v.staffId, v.van);
-    if (w && w.error && w.status !== 404) console.error('[verzuim] afgewezen verlof niet geschrapt:', w.error);
+  /* PAS NU NAAR DE VERZUIMLAAG. De aanvraag (staff/dienst.js) meldde verlof
+     vroeger meteen als vakantie, ook als het daarna werd afgewezen. Nu krijgt
+     de payroll alleen goedgekeurd verlof te zien. Een ziekmelding komt hier
+     niet langs (die heeft status 'gemeld' en is geen aanvraag). */
+  if (v.status === 'goedgekeurd' && v.soort === 'verlof' && payrollOS && payrollOS.verzuim) {
+    const m = payrollOS.verzuim.meld(req.supplier.code, v.staffId, { soort: 'vakantie', van: v.van, tot: v.tot }, req.actor.name);
+    if (m && m.error) console.error('[verzuim] goedgekeurd verlof niet vastgelegd:', m.error, m.bezwaren || '');
   }
   save();
   logActivity(req.supplier.code, req.actor, (v.status === 'goedgekeurd' ? 'keurde verlof goed van ' : 'wees verlof af van ') + v.name);

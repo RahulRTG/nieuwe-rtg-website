@@ -30,6 +30,7 @@ const { maakGegevenspoort } = require('../server/kern/gegevenspoort.js');
 const { maakGegevensgesprek } = require('../server/kern/gegevensgesprek.js');
 const maakLedenregister = require('../server/kern/ledenregister.js');
 
+const TIEN = 10;
 const schoon = (s, n) => String(s == null ? '' : s).replace(/[<>]/g, '').slice(0, n || 200).trim();
 
 /* De hele keten, met de echte modules aan elkaar. Alleen de accountlaag is
@@ -46,7 +47,12 @@ function keten() {
     phoneOf: (u) => telefoons.get(u && u.id) || null,
     realNameOf: () => 'Vera Verhuis',
     emailOf: () => 'vera@voorbeeld.test',
-    ledenRegisterRijen: () => [{ id: 7, key: 'user-7', tier: 'rtg', codename: 'Anemoon', geslacht: 'v', land: 'NL' }]
+    /* TIEN rijen voor hetzelfde lid: het register telt per stad langs de
+       groepspoort (kern/bedrijfsmaat/poort.js, grens 10), en een stad met een
+       lid zou onder "Overige (kleine groepen)" verdwijnen. De toets gaat over de
+       AFLEIDING van de stad, niet over de poort -- die heeft zijn eigen toetsen. */
+    ledenRegisterRijen: () => Array.from({ length: TIEN }, (_, i) =>
+      ({ id: 7 + i, key: 'user-7', tier: 'rtg', codename: 'Anemoon', geslacht: 'v', land: 'NL' }))
   };
   const onboarding = maakOnboarding({ db, save: () => {}, crypto: nodeCrypto, accounts, anthropic: null, schoon });
   const gegevenspoort = maakGegevenspoort({ accounts, getMemberState: accounts.getMemberState });
@@ -54,7 +60,7 @@ function keten() {
     saveMemberState: accounts.saveMemberState, getMemberState: accounts.getMemberState, schoon, onboarding });
   const { ledenregister } = maakLedenregister({ accounts, onboarding,
     geldPasprijzen: () => ({ passen: { rtg: { maandCenten: 6500 }, lifestyle: { maandCenten: 2000000 } } }),
-    ledenAantal: () => 1 });
+    ledenAantal: () => TIEN });
   const sessie = { key: 'user-7', tier: 'rtg', account: { id: 7, verified: '' } };
   return { db, accounts, onboarding, gesprek, ledenregister, sessie, dossiers };
 }
@@ -75,7 +81,7 @@ test('1. de intake vraagt de woonplaats niet meer -- dat is de aanleiding', () =
   const st = k.onboarding.status('rtg', k.sessie);
   assert.equal(st.velden.some(v => v.id === 'woonplaats'), false, 'niet aan de voordeur');
   assert.equal(st.laterVelden.some(v => v.id === 'woonplaats'), true, 'wel als later-veld');
-  assert.deepEqual(steden(k.ledenregister), { Onbekend: 1 }, 'en dus is de stad nog onbekend');
+  assert.deepEqual(steden(k.ledenregister), { Onbekend: TIEN }, 'en dus is de stad nog onbekend');
 });
 
 test('2. de adresstap van de poort schrijft de woonplaats mee, en de boardroom ziet hem', () => {
@@ -92,7 +98,7 @@ test('2. de adresstap van de poort schrijft de woonplaats mee, en de boardroom z
   assert.equal(woon.waarde, 'Amsterdam', 'de woonplaats komt uit de zin die het lid zelf typte');
   assert.equal(woon.ingevuld, true);
   /* De echte bewering, want dit is wat er zonder deze reparatie stil verdween. */
-  assert.deepEqual(steden(k.ledenregister), { Amsterdam: 1 }, 'de boardroom telt hem in Amsterdam');
+  assert.deepEqual(steden(k.ledenregister), { Amsterdam: TIEN }, 'de boardroom telt hem in Amsterdam');
 });
 
 test('3. zonder komma en zonder postcode: hij RAADT niet, hij vraagt het', () => {
@@ -103,16 +109,16 @@ test('3. zonder komma en zonder postcode: hij RAADT niet, hij vraagt het', () =>
   assert.equal(na.klaar, undefined, 'het gesprek is nog niet rond');
   assert.equal(na.veld, 'adres');
   assert.match(na.tekst, /welke plaats/i, 'hij vraagt de plaats gewoon: ' + na.tekst);
-  assert.deepEqual(steden(k.ledenregister), { Onbekend: 1 }, 'en tot dan staat er niets verzonnen in het register');
+  assert.deepEqual(steden(k.ledenregister), { Onbekend: TIEN }, 'en tot dan staat er niets verzonnen in het register');
 
   // onzin wordt niet geslikt: een huisnummer is geen plaatsnaam
   const onzin = k.gesprek.gegevensZeg(k.sessie, s.id, '12345');
   assert.match(onzin.tekst, /geen plaatsnaam/i, onzin.tekst);
-  assert.deepEqual(steden(k.ledenregister), { Onbekend: 1 });
+  assert.deepEqual(steden(k.ledenregister), { Onbekend: TIEN });
 
   const klaar = k.gesprek.gegevensZeg(k.sessie, s.id, 'Berlijn');
   assert.equal(klaar.klaar, true, JSON.stringify(klaar));
-  assert.deepEqual(steden(k.ledenregister), { Berlijn: 1 });
+  assert.deepEqual(steden(k.ledenregister), { Berlijn: TIEN });
 });
 
 test('4. een buitenlandse postcode wordt niet tot een Nederlandse afgehakt', () => {
@@ -125,7 +131,7 @@ test('4. een buitenlandse postcode wordt niet tot een Nederlandse afgehakt', () 
   const na = k.gesprek.gegevensZeg(k.sessie, s.id, 'Hauptstrasse 5, 10115 Berlin');
   assert.match(na.tekst, /welke plaats/i, 'geen gok op een Nederlandse postcode: ' + na.tekst);
   k.gesprek.gegevensZeg(k.sessie, s.id, 'Berlin');
-  assert.deepEqual(steden(k.ledenregister), { Berlin: 1 });
+  assert.deepEqual(steden(k.ledenregister), { Berlin: TIEN });
   const woon = k.onboarding.status('rtg', k.sessie).laterVelden.find(v => v.id === 'woonplaats');
   assert.equal(woon.waarde, 'Berlin', 'precies wat het lid zei, niets bijgeschaafd');
 });
@@ -134,7 +140,7 @@ test('5. een adres zonder postcode maar met komma levert de plaats gewoon op', (
   const k = keten();
   const beurten = bezorging(k, ['0612345678', 'Kerkstraat 12, Utrecht']);
   assert.equal(beurten[2].klaar, true, JSON.stringify(beurten[2]));
-  assert.deepEqual(steden(k.ledenregister), { Utrecht: 1 });
+  assert.deepEqual(steden(k.ledenregister), { Utrecht: TIEN });
 });
 
 test('6. wie halverwege afhaakt houdt zijn bezorgadres; alleen de stad blijft leeg', () => {
@@ -146,5 +152,5 @@ test('6. wie halverwege afhaakt houdt zijn bezorgadres; alleen de stad blijft le
   k.gesprek.gegevensZeg(k.sessie, s.id, 'Damstraat 5 Berlijn');   // vraagt de plaats
   k.gesprek.gegevensZeg(k.sessie, s.id, 'laat maar');
   assert.equal(k.accounts.getMemberState(7).adres, 'Damstraat 5 Berlijn', 'het adres staat er');
-  assert.deepEqual(steden(k.ledenregister), { Onbekend: 1 }, 'de stad niet, en er is niets verzonnen');
+  assert.deepEqual(steden(k.ledenregister), { Onbekend: TIEN }, 'de stad niet, en er is niets verzonnen');
 });

@@ -45,7 +45,7 @@ const BEV_SHIFTS = [
 const BEV_ERNST = ['laag', 'midden', 'hoog', 'kritiek'];
 const AANVR_KLAAR = { gepland: true, afgewezen: true, geannuleerd: true };
 
-function maakBeveiliging({ db, save, crypto, accounts, findSupplier, notify, notifySupplier, sseToSupplier, sseToOffice, logActivity, haversine, verzuim }) {
+function maakBeveiliging({ db, save, crypto, accounts, findSupplier, notify, notifySupplier, sseToSupplier, sseToOffice, logActivity, haversine, afwezigOp }) {
   const id = (p) => (p || 'b') + crypto.randomBytes(4).toString('hex');
   const nu = () => new Date().toISOString();
   const vandaag = () => new Date().toISOString().slice(0, 10);
@@ -127,7 +127,7 @@ function maakBeveiliging({ db, save, crypto, accounts, findSupplier, notify, not
      Blijft hij leeg, dan is het antwoord "niets te zeggen" en niet "afwezig". */
   const laat = { plaats: null, codenaamVanGuard: null };
 
-  const ctx = { db, save, accounts, findSupplier, notify, notifySupplier, sseToSupplier, sseToOffice, logActivity, haversine, laat, verzuim,
+  const ctx = { db, save, accounts, findSupplier, notify, notifySupplier, sseToSupplier, sseToOffice, logActivity, haversine, laat, afwezigOp,
     BEV_FUNCTIES, BEV_SHIFTS, BEV_ERNST, AANVR_KLAAR,
     id, nu, vandaag, schoon, getal, shiftVan, isBeveiliging, defaults, functieAan,
     diensten, aanvragen, incidenten, rondes, guards, guardNaam, postVan, functieLijst, zetPost };

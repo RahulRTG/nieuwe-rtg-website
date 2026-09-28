@@ -168,5 +168,8 @@ module.exports = ({ rij, save, nu, dossier, visum, meldLid }) => {
   const { vraagWijziging, besluitWijziging } =
     require('./reisbureau-wijziging')({ pak, spoor, herbereken, meld, reisNaam, schoon, nu, save });
 
-  return { vraagWijziging, besluitWijziging, zegAf, lidBeeld, spoor, OPEN_STANDEN, ROND_STANDEN };
+  // thuis: de reis is voorbij (./reisbureau-thuis.js, besluit C3)
+  const { markeerThuis } = require('./reisbureau-thuis')({ pak, spoor, schoon, nu, save });
+
+  return { vraagWijziging, besluitWijziging, zegAf, markeerThuis, lidBeeld, spoor, OPEN_STANDEN, ROND_STANDEN };
 };

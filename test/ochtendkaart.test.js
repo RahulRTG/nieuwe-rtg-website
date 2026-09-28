@@ -18,16 +18,16 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { maakOchtendkaart } = require('../server/kern/ochtendkaart');
-const { maakVerzuimRooster } = require('../server/kern/verzuimrooster');
+const { maakInplanbaar } = require('../server/kern/payroll/inplanbaar');
 const { startServer, stop } = require('./helper');
 
 const DAG = '2026-09-28';
-function wereld({ vast = true, lezer = () => [], orders = [], reserveringen = [], open = false, shifts } = {}) {
+function wereld({ vast = true, lezer = () => [], orders = [], reserveringen = [], open = false, shifts, afw = [] } = {}) {
   const staff = [
     { id: 1, name: 'Amir', role: 'staff', shift: 'Ochtend 07:00-15:00' },
     { id: 2, name: 'Bo', role: 'staff', shift: 'Ochtend 07:00-15:00' },
     { id: 3, name: 'Cas', role: 'staff', shift: 'Vrij' }
-  ].map((m, i) => (shifts ? { ...m, shift: shifts[i] } : m));
+  ].map((m, i) => (shifts ? { ...m, shift: shifts[i] } : m)).map(m => (afw.includes(m.id) ? { ...m, afwezig: true } : m));
   const db = { data: {
     suppliers: [{ code: 'Z', roosterVast: vast ? { [DAG]: {} } : {} }],
     groothandelOrders: orders, reserveringen
@@ -36,7 +36,8 @@ function wereld({ vast = true, lezer = () => [], orders = [], reserveringen = []
     db, vrij: 'Vrij', vandaag: () => DAG,
     scheduleFor: () => ({ days: [{ date: DAG, staff }] }),
     klokVan: () => ({ open }),
-    verzuim: lezer === null ? null : maakVerzuimRooster(lezer)
+    /* de lezer geeft regels in de vorm van voorPlanning; null = geen register */
+    inplanbaar: maakInplanbaar(lezer === null ? undefined : (c, id) => (lezer(c, id)[0] || null))
   }).kaart;
 }
 
@@ -66,13 +67,21 @@ test('2. een niet vastgesteld rooster en een stille verzuimlaag zegt de kop hard
 test('3. een afwezige collega is een aantal, zonder naam en zonder reden', () => {
   const k = wereld({ lezer: (c, id) => (id === 2 ? [{ wat: 'afwezig', inzetbaarheid: 'niets' }] : []) })('Z', 1);
   const team = k.regels.find(r => r.soort === 'team');
-  assert.equal(team.tekst, 'Eén ingeroosterde collega is vandaag afwezig.');
+  assert.equal(team.tekst, 'Eén collega is vandaag afwezig.');
   assert.equal(team.aandacht, true);
   assert.equal(k.kop, 'Eén ding vraagt je aandacht.');
   assert.ok(!/Bo\b/.test(JSON.stringify(k)), 'de naam van de afwezige collega staat niet op jouw kaart');
   /* een vrije collega telt niet mee: Cas staat op vrij en is ook afwezig */
   const vrij = wereld({ lezer: (c, id) => (id === 3 ? [{ wat: 'Vakantie', inzetbaarheid: null }] : []) })('Z', 1);
   assert.equal(vrij.regels.find(r => r.soort === 'team').tekst, 'Team compleet.');
+  /* het echte rooster (kern/personeel.js) zet wie afwezig is op vrij MET
+     afwezig: true; die collega verdwijnt niet, hij ontbreekt */
+  const ziekBo = (c, id) => (id === 2 ? [{ wat: 'afwezig', inzetbaarheid: 'niets' }] : []);
+  const echt = wereld({ shifts: ['Ochtend 07:00-15:00', 'Vrij', 'Vrij'], afw: [2], lezer: ziekBo });
+  assert.equal(echt('Z', 1).regels.find(r => r.soort === 'team').tekst, 'Eén collega is vandaag afwezig.');
+  const zonderVlag = wereld({ shifts: ['Ochtend 07:00-15:00', 'Vrij', 'Vrij'], lezer: ziekBo });
+  assert.equal(zonderVlag('Z', 1).regels.find(r => r.soort === 'team').tekst, 'Er werkt vandaag verder niemand.',
+    'tegenproef: wie gewoon vrij stond, telt niet mee');
 });
 
 test('4. wie zelf afwezig of vrij is, wordt niet gevraagd te beginnen', () => {

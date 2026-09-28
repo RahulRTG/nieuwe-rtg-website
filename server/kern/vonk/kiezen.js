@@ -19,7 +19,7 @@
    staan ook als niemand kiest -- de automatische tafel in het midden is nog
    steeds de bodem, geen tussenstap die je eerst moet nemen. */
 module.exports = (ctx) => {
-  const { d, save, nu, mag, codenaamVan, notify, sseToCustomer, tafelkaart } = ctx;
+  const { d, save, nu, mag, codenaamVan, notify, sseToCustomer, tafelkaart, partnerEligible, geblokkeerd } = ctx;
 
   const matchVan = (key, mid) => d().matches.find(x => x.id === mid && (x.a === key || x.b === key));
 
@@ -30,6 +30,7 @@ module.exports = (ctx) => {
     if (!poort.ok) return { status: 403, error: poort.reden };
     const m = matchVan(key, mid);
     if (!m) return { status: 404, error: 'Deze match bestaat niet.' };
+    if (geblokkeerd(key, m.a === key ? m.b : m.a)) return { status: 403, error: 'Dit contact is geblokkeerd.' };
     const hw = m.halfweg || { opties: [], waarom: null, keuzes: {} };
     const ander = m.a === key ? m.b : m.a;
     const beide = !!(hw.keuzes[key] && hw.keuzes[ander]);
@@ -45,10 +46,13 @@ module.exports = (ctx) => {
     if (!poort.ok) return { status: 403, error: poort.reden };
     const m = matchVan(key, mid);
     if (!m) return { status: 404, error: 'Deze match bestaat niet.' };
+    if (geblokkeerd(key, m.a === key ? m.b : m.a)) return { status: 403, error: 'Dit contact is geblokkeerd.' };
     const hw = m.halfweg;
     if (!hw || !(hw.opties || []).length) return { status: 409, error: 'Er staan geen plekken klaar voor deze match.' };
     const optie = hw.opties.find(o => o.id === String(optieId || ''));
     if (!optie) return { status: 400, error: 'Die plek staat niet in uw drie.' };
+    if (!partnerEligible(optie.supplierCode, { date: m.tafel && m.tafel.datum, time: m.tafel && m.tafel.tijd, service: optie.soort }))
+      return { status: 409, error: 'Deze partner neemt niet meer deel aan nieuwe Vonk-dates. Vernieuw de plaatskeuzes.' };
     hw.keuzes[key] = optie.id;
 
     const ander = m.a === key ? m.b : m.a;

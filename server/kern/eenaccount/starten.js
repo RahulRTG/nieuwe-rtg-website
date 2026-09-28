@@ -17,6 +17,7 @@
    sleutelbos meer maar een omweg. */
 'use strict';
 const klok = require('../../lib/klok');
+const werkSleutels = require('../../bedrijf/sleutels').maak();
 
 module.exports = (ctx) => {
   const { db, save, crypto, accounts, findSupplier, rememberSession, logInlog,
@@ -76,16 +77,16 @@ module.exports = (ctx) => {
       });
     }
 
-    /* De werkruimte munt geen nieuwe sessie: hij HEEFT er al een, en dat is de
-       code plus het lid-token dat deze persoon zelf in handen had toen hij
-       koppelde. We geven dus terug wat hij al bezit -- geen escalatie, wel het
-       einde van de tweede inlog. Vers opgezocht, zodat losmaken of een
-       schorsing meteen telt. */
+    /* Buiten productie een VERSE lid-sessie (bedrijf/sleutels.js): de oude staat
+       alleen als hash en wordt nooit opnieuw getoond. Vers opgezocht, zodat
+       losmaken of een schorsing meteen telt; productie opent met het account. */
     if (r.rol === 'werkruimte') {
       const wl = afgeleid.werkruimteLid(key, r.code);
       if (!wl) return { status: 403, error: 'Deze werkruimte is niet (meer) aan uw account gekoppeld.' };
       logInlog('werkruimte', true, wl.w.code + ' · ' + (wl.l.functie || wl.l.naam) + ' via RTG-account', req);
-      return { status: 200, ok: true, rol: 'werkruimte', token: wl.l.token,
+      const token = process.env.NODE_ENV === 'production' ? null : werkSleutels.geefLid(wl.w, wl.l);
+      if (token) save();
+      return { status: 200, ok: true, rol: 'werkruimte', token,
         code: wl.w.code, naam: wl.w.naam, functie: wl.l.functie || null };
     }
     if (r.rol === 'kantoor') {

@@ -227,24 +227,26 @@ plaats van punten.
 - **Verzuim dat de planning bedient zonder een gezondheidsgegeven prijs te
   geven**: `/api/supplier/verzuim/planning` levert "afwezig" plus wat iemand nog
   kan, en nooit wat hij heeft.
-- **Verlof en ziekte in de twee autoplanners** (27 september 2026). Tot dan las
-  géén roostermotor verzuim, dus een zieke medewerker kon gewoon worden
-  ingepland. `kern/verzuimrooster.js` is nu de ene regel die de
-  beveiligingsplanner en het AI-weekrooster lezen: afwezig of niet volledig
-  inzetbaar plant de machine niet in (`deels` en `aangepast` plant een MENS, want
-  welk werk nog past is een oordeel over een mens), en ontbreekt de verzuimlaag,
-  dan zegt de uitslag dat er niet is nagekeken -- stil doorplannen zou lezen als
-  "niemand is ziek". De uitslag noemt afwezigheid en nooit ziekte. Het bouwen
-  vond een tweede gebrek: een verlofAANVRAAG gaat bij het indienen al naar de
-  verzuimlaag, en een afgewezen aanvraag bleef daar staan, zodat de loonrun
-  vakantie rekende over dagen waarop iemand werkte. Afwijzen schrapt hem nu
-  (`test/verzuimrooster.test.js`). En een MENS die toch een afwezige
-  medewerker inplant, wordt niet tegengehouden maar ziet het erbij (28 september
-  2026): een losse dienst bij de beveiliging draagt `verzuimWaarschuwing`, en
-  het vaststellen van het weekrooster kijkt verzuim opnieuw na
-  (`verzuimBijVaststellen`), want tussen voorstel en akkoord kan iemand afwezig
-  worden. De automaat heeft er een tweede grendel bij, in de vorm van de
-  rustregel.
+- **Verlof en ziekte wegen mee in de twee autoplanners en het weekrooster**
+  (27 september 2026, `kern/payroll/inplanbaar.js`). Het AI-weekrooster
+  (`kern/agent.js`) en de autoplanner van de beveiliging plannen automatisch
+  alleen wie er volledig is; wie deels of aangepast inzetbaar is, plant een mens
+  in, want een machine weet niet welk werk "aangepast" is. Het getoonde
+  weekrooster (`kern/personeel.js`) zet een afwezige op vrij met alleen DAT hij
+  afwezig is -- het hele team ziet dat rooster, dus geen verlofsoort. Een
+  onleesbaar register is geen "niemand afwezig": dan wordt er gepland en staat
+  erbij dat afwezigheid niet is meegewogen. `test/rooster-verzuim.test.js`.
+  Wat het NIET doet: de festival-, OV-, taxi- en schoolplanners lezen verzuim
+  nog niet, en een al vastgestelde dienst van de beveiliging wordt niet
+  vanzelf geschrapt als iemand zich daarna ziek meldt.
+- **Een MENS die toch een afwezige medewerker inplant, ziet het erbij** (28
+  september 2026, op dezelfde regel). Een losse dienst bij de beveiliging gaat
+  door en draagt `verzuimWaarschuwing` (aangepast werk is het besluit van een
+  mens); de automaat wordt ook langs `zetDienst` tegengehouden, in de vorm van
+  de rustregel. Het vaststellen van het weekrooster kijkt opnieuw na
+  (`naKijken()` in `kern/payroll/inplanbaar.js`, `verzuimBijVaststellen`),
+  want tussen voorstel en akkoord kan iemand afwezig worden.
+  `test/verzuimrooster.test.js`.
 
 ### Een stap weg
 
@@ -284,7 +286,7 @@ Niet op aantrekkelijkheid maar op wat de volgende stap mogelijk maakt.
 
 | # | Stap | Waarom nu |
 |---|---|---|
-| ~~1~~ | ~~Verlof en ziekte in de twee autoplanners~~ | **staat** (27 september 2026, par. 6), met een waarschuwing voor een mens die met de hand plant (28 september) |
+| ~~1~~ | ~~Verlof en ziekte in de twee autoplanners~~ | **staat** (par. 6), met een waarschuwing voor een mens die met de hand plant (28 september); de overige planners en een al vastgestelde dienst volgen |
 | 2 | Transitietijd als primitief | staat op nul, en is het enige dat alle domeinen delen |
 | 3 | De ATW-rekenlaag uit taxi trekken | hij is al data-met-bron en al instelbaar per regime |
 | 4 | Het werkdruksignaal op rooster en klok | raakt geen gezondheidsgegeven, en is de helft die wél mag |

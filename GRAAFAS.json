@@ -1,10 +1,10 @@
 {
  "uitleg": "Per graaf: de velden van zijn eenheid, en het veld waarop dringendheid wordt afgelezen. Zie de kop van scripts/graafas.js voor wat deze meter wel en niet zegt. Een gedeelde veldnaam is geen gedeelde betekenis.",
- "vastgelegd": "2026-09-10",
+ "vastgelegd": "2026-09-27",
  "gemeten": {
-  "grafen": 7,
+  "grafen": 8,
   "metEenEigenEenheid": 3,
-  "zonderEigenEenheid": 4,
+  "zonderEigenEenheid": 5,
   "metEenAs": 3,
   "verschillendeAssen": 3,
   "assenGedeeld": 0,
@@ -122,6 +122,14 @@
    "waaromGeenEenheid": "De waardegraaf telt stromen op uit grootboekregels; er is geen eenheid die hij zelf vormt.",
    "as": null,
    "waarom": "Waar ging deze euro heen -- een herkomstvraag over het verleden, niet over wat er nu moet."
+  },
+  {
+   "id": "leerhuisgraaf",
+   "bestand": "server/kern/leerhuis/graaf.js",
+   "eenheidVastgesteld": false,
+   "waaromGeenEenheid": "De afhankelijkheden van het leerhuis worden per vraag uit het spoor van een organisatie afgeleid; er is geen functie die een knoop maakt.",
+   "as": null,
+   "waarom": "Wie en wat raakt een kenniswijziging -- een vraag naar afhankelijkheid. Wat haast heeft, zegt de impactklasse die een mens koos, niet de graaf (ACADEMY.md par. 4)."
   }
  ],
  "gedeeld": [

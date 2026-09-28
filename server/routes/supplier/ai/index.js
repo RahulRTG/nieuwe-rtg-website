@@ -9,7 +9,7 @@ const { maakLiveTwin } = require('../../../ai-live-twin');
 module.exports = (kern) => {
   // alleen wat deze AI-module echt gebruikt (de rest van de gedeelde kern hoort
   // hier niet thuis; opgeruimd om dode destructuring te vermijden)
-  const { aiFindDoor, aiFindRoom, app, db, guestsFor, posDay, roosterMetVerzuim, supplierAuth, ordersVanZaak, commGast } = kern;
+  const { aiFindDoor, aiFindRoom, app, db, guestsFor, posDay, scheduleFor, supplierAuth, ordersVanZaak, commGast } = kern;
   const { fluisterZeg } = kern.fluister;
   const ambtenaar = require('./ambtenaar')(kern);
 
@@ -120,11 +120,11 @@ app.post('/api/supplier/ai', supplierAuth, async (req, res) => {
   if (/(bestelling|orders?|bon(nen)?\b)/.test(ql)) {
     const open = ordersVanZaak(s.code).filter(o => !['geserveerd', 'geweigerd', 'terugbetaald', 'bezorgd', 'opgehaald'].includes(o.status));
     return A(open.length
-      ? open.length + ' open bestelling(en): ' + open.map(o => o.customerCodename + ' € ' + o.total + ' (' + o.status + ', code ' + o.pickup + ')').join('; ') + '.'
+      ? open.length + ' open bestelling(en): ' + open.map(o => o.customerCodename + ' € ' + o.total + ' (' + o.status + ', bon ' + o.pickup + ')').join('; ') + '.'
       : 'Er zijn geen open bestellingen.');
   }
   if (/(rooster|dienst|schedule|shift)/.test(ql)) {
-    const wk = roosterMetVerzuim(s.code, false); // wie afwezig is heet Afwezig, zonder reden
+    const wk = scheduleFor(s.code);
     const today = wk.days[0];
     return A('Vandaag: ' + today.staff.map(x => x.name + ' ' + x.shift).join('; ') + '. Het volledige rooster staat in de personeels-app.');
   }

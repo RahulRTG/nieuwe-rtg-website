@@ -51,7 +51,7 @@
           '<input class="st-in" id="gcBedrag" type="number" placeholder="€ 50" style="flex:1;min-width:80px;">'+
           '<button class="obtn primary" id="gcSell">'+T('fn.gcsell','Verkoop kaart')+'</button></div>'+
           '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.25rem;">'+
-          '<input class="st-in" id="gcCode" placeholder="RTG-GC-XXXXXX" style="flex:2;min-width:130px;">'+
+          '<input class="st-in" id="gcCode" placeholder="GC-XXXX-XXXX-…" style="flex:2;min-width:130px;">'+
           '<input class="st-in" id="gcInBedrag" type="number" placeholder="€" style="flex:1;min-width:70px;">'+
           '<button class="obtn" id="gcRedeem">'+T('fn.gcredeem','In te wisselen')+'</button></div></div>';
         html += '<div class="tkc"><h3>'+T('fn.regels','Regels in ')+f.landNaam+'</h3>'+

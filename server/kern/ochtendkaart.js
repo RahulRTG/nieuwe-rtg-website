@@ -29,7 +29,12 @@
 const OPEN_LEVERING = ['bevestigd', 'onderweg'];
 const TELT_GAST = ['aangevraagd', 'bevestigd', 'aangekomen'];
 
-function maakOchtendkaart({ db, scheduleFor, klokVan, verzuim, vrij, vandaag }) {
+function maakOchtendkaart({ db, scheduleFor, klokVan, inplanbaar, vrij, vandaag }) {
+  /* inplanbaar (kern/payroll/inplanbaar.js) als stand: onbekend, afwezig of inplanbaar */
+  const standVan = (code, id, dag) => {
+    const ip = inplanbaar ? inplanbaar(code, id, dag) : { onbekend: true };
+    return ip.onbekend ? { stand: 'onbekend' } : ip.plan ? { stand: 'inplanbaar' } : { stand: 'afwezig', wat: ip.wat };
+  };
   const dagVan = vandaag || (() => new Date().toISOString().slice(0, 10));
 
   function regelDienst(ik, rooster) {
@@ -44,20 +49,23 @@ function maakOchtendkaart({ db, scheduleFor, klokVan, verzuim, vrij, vandaag }) 
   }
 
   /* Het team: wie vandaag werkt, tegen de verzuimlaag gelegd. Alleen een
-     AANTAL, want de naam van een afwezige collega hoort niet op jouw kaart. */
+     AANTAL, want de naam van een afwezige collega hoort niet op jouw kaart.
+     Het rooster (kern/personeel.js) zet wie afwezig is al op vrij met
+     `afwezig: true`; die telt mee, anders zou een zieke collega verdwijnen
+     in plaats van ontbreken. */
   function regelTeam(code, staffId, dag, rooster) {
-    const werkt = rooster.staff.filter(m => m.shift !== vrij && m.id !== staffId);
+    const werkt = rooster.staff.filter(m => (m.shift !== vrij || m.afwezig) && m.id !== staffId);
     let onbekend = 0, afwezig = 0;
     for (const m of werkt) {
-      const v = verzuim ? verzuim.stand(code, m.id, dag) : { stand: 'onbekend' };
+      const v = standVan(code, m.id, dag);
       if (v.stand === 'onbekend') onbekend++;
-      else if (v.stand === 'afwezig') afwezig++;
+      else if (m.afwezig || v.stand === 'afwezig') afwezig++;
     }
     if (!werkt.length) return { soort: 'team', graad: rooster.vast ? 'gemeten' : 'vermoed', bron: 'rooster', tekst: 'Er werkt vandaag verder niemand.' };
     if (onbekend) return { soort: 'team', graad: 'onbekend', bron: 'verzuimlaag',
       tekst: 'Ik kon niet nakijken of het team compleet is.' };
     if (afwezig) return { soort: 'team', graad: 'gemeten', bron: 'rooster en verzuimlaag', aandacht: true,
-      tekst: afwezig === 1 ? 'Eén ingeroosterde collega is vandaag afwezig.' : afwezig + ' ingeroosterde collega\'s zijn vandaag afwezig.' };
+      tekst: afwezig === 1 ? 'Eén collega is vandaag afwezig.' : afwezig + ' collega\'s zijn vandaag afwezig.' };
     return { soort: 'team', graad: rooster.vast ? 'gemeten' : 'vermoed', bron: 'rooster en verzuimlaag', tekst: 'Team compleet.' };
   }
 
@@ -105,7 +113,7 @@ function maakOchtendkaart({ db, scheduleFor, klokVan, verzuim, vrij, vandaag }) 
     const rooster = {
       staff: d0.staff || [],
       vast: !!(sup && sup.roosterVast && sup.roosterVast[dag]),
-      mijnVerzuim: verzuim ? verzuim.stand(code, staffId, dag) : { stand: 'onbekend' }
+      mijnVerzuim: standVan(code, staffId, dag)
     };
     const ik = rooster.staff.find(m => m.id === staffId) || null;
     const regels = [regelDienst(ik, rooster), regelTeam(code, staffId, dag, rooster), regelLevering(code), regelGasten(code, dag)].filter(Boolean);

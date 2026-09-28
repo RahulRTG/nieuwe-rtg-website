@@ -16,7 +16,7 @@
    scenario-knop in ./scenario en de AI in ./advies. */
 
 module.exports = (deps) => {
-  const { db, save, crypto, schoon, anthropic, sseToOffice, beveilig, weefsel } = deps;
+  const { db, save, crypto, schoon, anthropic, sseToOffice, beveilig, weefsel, manifestBasis } = deps;
   /* Het stadsweefsel is geen optie maar een voorwaarde: de zones, de plaats van
      elke Stadsdoos, het geheugen achter de metingen en de zaken achter de
      bewonersmeldingen wonen daar. Een stille terugval op een eigen zonelijstje
@@ -55,7 +55,9 @@ module.exports = (deps) => {
 
   // de gedeelde context voor de deelbestanden
   const ctx = { db, save, crypto, schoon, anthropic, beveilig, nu, d, weefsel,
-    ONLINE_MS, MAX_METINGEN, zones, nodes, metingen, regie, seintje };
+    ONLINE_MS, MAX_METINGEN, zones, nodes, metingen, regie, seintje,
+    // de apparaatsleutel: vervaldatum, constante tijd, afgeleide manifestsleutel
+    sleutels: require('./doossleutel')({ crypto, nu, manifestBasis }) };
 
   // de OV-telling ook voor de deelbestanden (o.a. het bewonersbeeld)
   ctx.verkeerExtra = () => { if (!verkeerBron) return null; try { return verkeerBron(); } catch (e) { return null; } };

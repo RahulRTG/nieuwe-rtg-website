@@ -35,7 +35,12 @@ const SOORTEN = {
   geboorte:        { betaald: 1.0, opbouwend: true,  naam: 'Geboorteverlof' },
   zorg:            { betaald: 0.7, opbouwend: true,  naam: 'Zorgverlof' },
   onbetaald:       { betaald: 0.0, opbouwend: false, naam: 'Onbetaald verlof' },
-  bijzonder:       { betaald: 1.0, opbouwend: true,  naam: 'Bijzonder verlof' }
+  bijzonder:       { betaald: 1.0, opbouwend: true,  naam: 'Bijzonder verlof' },
+  /* Twee betaalde dagen uit RTG Vrijheid (kern/vrijheid/verzuimbrug.js). Eigen
+     soorten en geen `vakantie`: ze gaan van geen enkel saldo af, en op de strook
+     hoort te staan WAAROM iemand betaald vrij was. */
+  rtgdag:          { betaald: 1.0, opbouwend: true,  naam: 'RTG Day' },
+  verjaardag:      { betaald: 1.0, opbouwend: true,  naam: 'Verjaardag' }
 };
 const INZETBAARHEID = ['niets', 'aangepast', 'deels', 'volledig'];
 const isDatum = (d) => /^\d{4}-\d{2}-\d{2}$/.test(String(d || ''));
@@ -74,8 +79,14 @@ function maakVerzuim({ opslag, save, nu }) {
     const bez = keur(melding);
     if (bez.length) return { status: 422, error: 'Deze melding is afgekeurd.', bezwaren: bez };
     if (!door) return { status: 400, error: 'Noteer wie deze melding vastlegt.' };
+    /* `bron` zegt welk besluit deze afwezigheid neerzette (een verzoek in RTG
+       Vrijheid). Hij zit in het id, zodat een melding uit een andere weg op
+       dezelfde dag nooit wordt overschreven -- en nooit door `bronWeg` wordt
+       weggehaald. */
+    const bron = melding.bron ? String(melding.bron).slice(0, 80) : null;
     const m = {
-      id: 'vz_' + String(staffId) + '-' + String(melding.van).replace(/-/g, '') + '-' + melding.soort,
+      id: 'vz_' + String(staffId) + '-' + String(melding.van).replace(/-/g, '') + '-' + melding.soort + (bron ? '-' + bron : ''),
+      ...(bron ? { bron } : {}),
       soort: melding.soort, van: melding.van, tot: melding.tot || null,
       inzetbaarheid: melding.inzetbaarheid || (SOORTEN[melding.soort].medisch ? 'niets' : null),
       door, at: tijd()
@@ -88,13 +99,8 @@ function maakVerzuim({ opslag, save, nu }) {
     return { ok: true, melding: m };
   }
 
-  /* LEZEN SCHEPT NIETS. rijVan() legt een lege rij aan, en dat hoort bij
-     schrijven; een rooster dat voor elke medewerker vraagt of hij er is, zou
-     anders voor iedereen een lege verzuimrij achterlaten. */
-  const inPeriode = (code, staffId, van, tot) => {
-    const rij = bak()[sleutel(code, staffId)];
-    return (Array.isArray(rij) ? rij : []).filter(m => m.van <= tot && (!m.tot || m.tot >= van));
-  };
+  const inPeriode = (code, staffId, van, tot) => rijVan(code, staffId)
+    .filter(m => m.van <= tot && (!m.tot || m.tot >= van));
 
   /* Wat iemand nog wel kan, bijgesteld terwijl het verzuim loopt. Ziek zijn is
      geen toestand die op dag een vaststaat: na een week kan iemand aangepast
@@ -120,6 +126,19 @@ function maakVerzuim({ opslag, save, nu }) {
     return { ok: true, melding: { van: m.van, tot: m.tot, inzetbaarheid: m.inzetbaarheid } };
   }
 
+  /* Een afwezigheid die een besluit neerzette, haalt dat besluit weer weg.
+     Alleen op `bron`: een melding zonder bron raakt deze functie nooit. */
+  function bronWeg(code, staffId, bron) {
+    if (!bron) return { status: 400, error: 'Zonder bron wordt er niets ingetrokken.' };
+    const rij = rijVan(code, staffId);
+    const voor = rij.length;
+    for (let i = rij.length - 1; i >= 0; i--) if (rij[i].bron === String(bron)) rij.splice(i, 1);
+    if (rij.length === voor) return { status: 404, error: 'Er staat geen afwezigheid met deze bron.' };
+    save();
+    return { ok: true, weg: voor - rij.length };
+  }
+  const heeftBron = (code, staffId, bron) => !!bron && rijVan(code, staffId).some(m => m.bron === String(bron));
+
   /* Wat een leidinggevende ziet: er is afwezigheid, en dit kan iemand nog.
      Geen soort bij ziekte -- "ziek" is al een gezondheidsgegeven, dus dat wordt
      "afwezig". Bij verlof mag de soort er wel bij: dat is geen medisch gegeven
@@ -133,6 +152,13 @@ function maakVerzuim({ opslag, save, nu }) {
     });
   }
 
+  /* EEN dag voor een planner, in de vorm van voorPlanning. null = er staat
+     niets; een register dat er niet IS meldt de aanroeper (server.js). */
+  function afwezigOp(code, staffId, datum) {
+    const r = voorPlanning(code, staffId, datum, datum)[0];
+    return r ? { wat: r.wat, inzetbaarheid: r.inzetbaarheid } : null;
+  }
+
   /* Wat de payroll nodig heeft: de soort (voor het doorbetalingspercentage) en
      of het UWV eraan te pas komt. De payroll rekent, hij toont niets aan een
      leidinggevende, dus hier mag de soort wel staan. */
@@ -144,23 +170,7 @@ function maakVerzuim({ opslag, save, nu }) {
     });
   }
 
-  /* Een verlofAANVRAAG staat hier al voordat iemand erop heeft beslist, zodat de
-     planning ziet wat er aankomt. Wordt hij afgewezen, dan is er geen verlof
-     geweest: de melding gaat weg, anders rekent de loonrun vakantie over dagen
-     waarop iemand gewoon werkte en houdt een rooster hem ten onrechte vrij.
-     Alleen niet-medische soorten: een ziekmelding wordt niet afgewezen. */
-  function schrap(code, staffId, van, soort) {
-    if (!SOORTEN[soort] || SOORTEN[soort].medisch) return { status: 400, error: 'Alleen verlof kan worden geschrapt.' };
-    const rij = bak()[sleutel(code, staffId)];
-    const id = 'vz_' + String(staffId) + '-' + String(van).replace(/-/g, '') + '-' + soort;
-    const idx = Array.isArray(rij) ? rij.findIndex(x => x.id === id) : -1;
-    if (idx < 0) return { status: 404, error: 'Deze verlofmelding staat er niet.' };
-    rij.splice(idx, 1);
-    save();
-    return { ok: true };
-  }
-
-  return { meld, zetInzetbaarheid, voorPlanning, voorPayroll, schrap, keur, SOORTEN, INZETBAARHEID };
+  return { meld, bronWeg, heeftBron, zetInzetbaarheid, voorPlanning, afwezigOp, voorPayroll, keur, SOORTEN, INZETBAARHEID };
 }
 
 module.exports = { maakVerzuim, keur, SOORTEN, INZETBAARHEID };

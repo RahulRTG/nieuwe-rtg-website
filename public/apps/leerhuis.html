@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="nl" data-rtg-thema="bordeaux">
+<head>
+<script src="/shared/id.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mijn leerhuis</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-ontwerp.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --line:var(--rtg-line);
+    --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft); --gold:#A98F1C; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:5;background:var(--bg);padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
+  header h1{font-size:1.5rem;margin-top:.15rem;}
+  main{padding:1.1rem;max-width:680px;margin:0 auto;}
+  section{margin-bottom:2.2rem;}
+  section > h2{font-size:1.12rem;margin-bottom:.2rem;}
+  .uitleg{font-size:.85rem;color:var(--muted);line-height:1.6;margin-bottom:.9rem;}
+  .kaart{border:1px solid var(--line);padding:.95rem 1.05rem;margin-bottom:.7rem;background:var(--card);}
+  .kaart h3{font-size:1.05rem;}
+  .meta{font-size:.78rem;color:var(--muted);margin-top:.25rem;line-height:1.55;}
+  .stand{display:inline-block;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;padding:.12rem .5rem;border:1px solid var(--line);color:var(--muted);margin-left:.4rem;}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.8rem;align-items:center;}
+  .rij .veld{flex:1 1 12rem;}
+  .knop{background:var(--gold);color:#000;border:none;font:inherit;font-weight:600;font-size:.84rem;padding:.55rem 1.1rem;cursor:pointer;min-height:2.75rem;min-width:2.75rem;}
+  .veld{background:var(--bg);border:1px solid var(--line);color:var(--txt);font:inherit;font-size:.87rem;padding:.5rem .6rem;min-height:2.75rem;}
+  label{font-size:.8rem;color:var(--muted);display:block;}
+  .leeg{color:var(--soft);font-size:.9rem;padding:1rem .2rem;line-height:1.6;}
+  .let{border-left:2px solid var(--gold);padding:.5rem 0 .5rem .8rem;margin-top:.8rem;font-size:.82rem;color:var(--muted);line-height:1.6;}
+</style>
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/ios.css" rel="stylesheet">
+<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl" data-rtg-world="work" data-rtg-skin="heritage"
+  data-rtg-edge-nvt-hoofdactie="een leesscherm: leren, bewijs en beoordeling lopen via uw trainer en de assessor, niet via een knop hier">
+<header>
+  <div class="ey">RTG Academy</div>
+  <h1>Mijn leerhuis</h1>
+</header>
+<main id="inhoud">
+  <section>
+    <h2>Welk leerhuis</h2>
+    <p class="uitleg">Elke organisatie heeft haar eigen leerhuis: wat u bij de ene leert, telt bij de andere niet vanzelf mee. Vul de code in die u van uw organisatie kreeg.</p>
+    <form id="kies" class="rij">
+      <label for="org">Code van de organisatie</label>
+      <input id="org" class="veld" name="org" autocomplete="off" maxlength="60" placeholder="bijvoorbeeld RTG-OPS">
+      <button class="knop" type="submit">Toon</button>
+    </form>
+    <p id="melding" class="let" role="status" aria-live="polite">Nog geen leerhuis gekozen.</p>
+  </section>
+  <section id="vandaagBlok">
+    <h2>Vandaag</h2>
+    <p class="uitleg">Wat nu aan de beurt is, met de reden erbij. Niet meer dan drie dingen tegelijk.</p>
+    <div id="vandaag"><p class="leeg">Kies eerst een leerhuis.</p></div>
+  </section>
+  <section>
+    <h2>Mijn leerpaden</h2>
+    <p class="uitleg">Waar u staat in elk curriculum, en wat de volgende stap is.</p>
+    <div id="pad"><p class="leeg">Kies eerst een leerhuis.</p></div>
+  </section>
+  <section>
+    <h2>Oefenen</h2>
+    <p class="uitleg">Oefeningen zonder gevolgen: er wordt niets verstuurd en niemand geraakt.</p>
+    <div id="oefenen"><p class="leeg">Kies eerst een leerhuis.</p></div>
+  </section>
+  <section>
+    <h2>Wat ik kan</h2>
+    <p class="uitleg">Vaardigheden die een assessor op naam heeft vastgesteld, en uw certificaten. Er staat geen cijfer op u: alleen wat is bewezen, door wie, en of het nog vers is.</p>
+    <div id="kan"><p class="leeg">Kies eerst een leerhuis.</p></div>
+    <p class="let">Wat hier staat, geeft zelf geen bevoegdheid. Of u een handeling mag uitvoeren, beslist de organisatie op de plek waar die handeling woont.</p>
+  </section>
+</main>
+<script src="/apps/leerhuis.js"></script>
+<script src="/shared/schermbeeld.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

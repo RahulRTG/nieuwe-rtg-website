@@ -4,7 +4,7 @@
    routes/member/kopen.js. */
 module.exports = (kern) => {
   const { app, auth, crypto, db, findSupplier, liveCodename, notifySupplier, save, schoon, sseToOffice,
-          sseToSupplier, salonZichtbaar, zorgMee, koopTicketVoor, gegevensStop } = kern;
+          sseToSupplier, salonZichtbaar, zorgMee, koopTicketVoor, gegevensStop, tickettoegang } = kern;
 /* ================== tickets: activiteiten, tours en musea ==================
    Tijdsloten met capaciteit; betalen vooraf via de bestaande boekingstroom
    (/api/booking/pay). Het ticket krijgt een entreecode die het personeel aan
@@ -27,6 +27,18 @@ app.post('/api/ticket/koop', auth, (req, res) => {
   res.json(r);
 });
 
+/* De entreecode TONEN is hem roteren (kern/tickettoegang.js): elk antwoord
+   draagt een nieuwe 128-bit code en trekt de vorige in. Dit antwoord is de
+   enige plek waar het lid hem kaal krijgt (eenmalig-geheim-routes). */
+app.post('/api/ticket/toon', auth, async (req, res) => {
+  const b = kern.boekingMetRef(String(req.body.ref || '').slice(0, 40));
+  let r;
+  try { tickettoegang.ruimLegacy(); r = await tickettoegang.uitgeven({ boeking: b, key: req.session.key }); }
+  catch (e) { return res.status(503).json({ error: 'De ticketcode kon nu niet veilig worden gemaakt. Probeer het zo opnieuw.' }); }
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json({ ok: true, eenmalig: true, ref: b.ref, code: r.code, toegang: r.toegang });
+});
+
 app.post('/api/tickets/mijn', auth, (req, res) => {
   const mijn = db.data.boekingen
     .filter(b => b.kind === 'ticket' && (b.customerKey || b.customerTier) === req.session.key && b.status !== 'geweigerd' && b.paid)
@@ -34,7 +46,8 @@ app.post('/api/tickets/mijn', auth, (req, res) => {
     .map(b => {
       const zaak = findSupplier(b.supplierCode);
       const rit = db.data.rides.find(r => r.ticketRef === b.ref && !['afgerond', 'geweigerd'].includes(r.status));
-      return { ref: b.ref, code: b.code, supplierName: b.supplierName, naam: b.service.name,
+      // nooit de code: die toont /api/ticket/toon eenmalig
+      return { ref: b.ref, supplierName: b.supplierName, naam: b.service.name,
         datum: b.datum, tijd: b.tijd, personen: b.personen, prijs: b.price,
         gebruikt: !!b.checkin, checkin: b.checkin || null,
         // de eigen transferdienst van de zaak, en de lopende rit met chauffeur

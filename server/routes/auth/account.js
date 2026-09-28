@@ -45,6 +45,13 @@ app.post('/api/auth/register', async (req, res) => {
     if (pl) mdNieuw.plaats = pl;
     const vtok = accounts.issueActionToken(user.id, 'verify-email', 3 * 86400000);
     mdNieuw.emailBevestiging = { bewijs: accounts.hashActiebewijs(vtok) };
+    /* Het aanmeldkanaal (kern/aanmeldkanaal.js, besluit C6): een telling per maand
+       en niets over het KANAAL bij dit account. Telde de link niets, dan mag het
+       lid de vraag een keer beantwoorden op het welkomstscherm -- de vlag zegt
+       alleen DAT hij nog mag, nooit wat hij koos. */
+    let kanaalGeteld = false;
+    try { kanaalGeteld = !!(kern.aanmeldkanaalTel && kern.aanmeldkanaalTel({ kanaal: req.body.aanmeldkanaal, campagne: req.body.campagne }).geteld); } catch (e) { /* een telling houdt geen registratie tegen */ }
+    if (!kanaalGeteld && kern.aanmeldkanaalKeuzes) mdNieuw.aanmeldkanaalOpen = true;
     accounts.saveMemberState(user.id, mdNieuw);
     try { require('../../kern/mail-publiek')({ accounts }).geefLid({
       user, naam:accounts.realNameOf(user), tier:user.tier }); } catch (e) {}
@@ -69,7 +76,7 @@ app.post('/api/auth/register', async (req, res) => {
       type: 'wachtwoord', assurance: 'kennis', methode: 'gemeten', bron: 'auth/registratie' });
     if (email === eigenaar.eigenaarEmail()) delete process.env.RTG_OWNER_BOOTSTRAP;
     res.json({ token, state: stateFor(sess, req.body.lang), needsEmailVerify: true,
-      ...(werk ? { werk } : {}), ...(DEV_VELDEN(req) ? { devVerifyUrl: verifyUrl } : {}) });
+      ...(werk ? { werk } : {}), ...(mdNieuw.aanmeldkanaalOpen ? { aanmeldkanaalVraag: { kanalen: kern.aanmeldkanaalKeuzes() } } : {}), ...(DEV_VELDEN(req) ? { devVerifyUrl: verifyUrl } : {}) });
   } catch (e) {
     return res.status(503).json({ error: 'Registreren lukte even niet. Probeer het zo opnieuw.' });
   }
@@ -101,5 +108,23 @@ app.post('/api/auth/resend', auth, (req, res) => {
   const url = appUrl(req) + '/apps/app.html?pas=' + pasAppVan(u.tier) + '&verify=' + vtok;
   mail.send(accounts.emailOf(u), 'Bevestig uw e-mailadres', 'Bevestig uw e-mailadres via deze link:\n' + url);
   res.json({ ok: true, ...(DEV_VELDEN(req) ? { devVerifyUrl: url } : {}) });
+});
+
+/* De herkomstvraag op het welkomstscherm (besluit C6, keuze van de eigenaar: NA de
+   registratie). Een keer per account, en alleen als de link bij de aanmelding
+   niets telde. Overslaan (geen kanaal) sluit de vraag ook; een onbekend kanaal
+   sluit hem niet, want dan telt er niets en zou het lid zijn antwoord kwijt zijn. */
+app.post('/api/auth/aanmeldkanaal', auth, (req, res) => {
+  const u = req.session.account;
+  if (!u) return res.status(403).json({ error: 'Alleen voor accounts.' });
+  const md = accounts.getMemberState(u.id) || {};
+  if (!md.aanmeldkanaalOpen) return res.status(409).json({ error: 'Deze vraag is al beantwoord, of hoort niet bij dit account.' });
+  const k = (req.body || {}).kanaal;
+  const kanaal = k == null || k === '' ? null : String(k);
+  if (kanaal && !kern.aanmeldkanaalKeuzes().some(x => x.id === kanaal)) return res.status(400).json({ error: 'Kies een van de antwoorden, of sla de vraag over.' });
+  const geteld = kanaal ? kern.aanmeldkanaalTel({ kanaal }).geteld === true : false;
+  delete md.aanmeldkanaalOpen;
+  accounts.saveMemberState(u.id, md);
+  res.json({ ok: true, geteld });
 });
 };

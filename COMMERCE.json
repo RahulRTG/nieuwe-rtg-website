@@ -2,8 +2,8 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-09-28",
   "gemeten": {
-    "bestanden": 2565,
-    "domeinenTotaal": 682,
+    "bestanden": 2563,
+    "domeinenTotaal": 679,
     "koopbareVormen": 612,
     "koopbareDomeinen": 123,
     "envelopDrempel": 8,
@@ -17,9 +17,9 @@
     "wagenVormen": 33,
     "wagenVormenUniek": 30,
     "wagenDomeinen": 22,
-    "optellingen": 121,
-    "optelDomeinen": 61,
-    "optelCenten": 66,
+    "optellingen": 120,
+    "optelDomeinen": 60,
+    "optelCenten": 65,
     "optelEuro": 5,
     "optelGemengd": 0,
     "optelOnbekend": 50
@@ -71,7 +71,7 @@
   "perWerkwoord": {
     "toon": 93,
     "prijs": 39,
-    "beschikbaarheid": 55,
+    "beschikbaarheid": 54,
     "reserveer": 28,
     "bevestig": 59,
     "lever": 24,
@@ -166,7 +166,7 @@
       "bewijs": {
         "toon": "beeld",
         "prijs": "kostenPerSoort",
-        "beschikbaarheid": "oordeelOpen",
+        "beschikbaarheid": "onderSlot",
         "reserveer": "geblokkeerd",
         "bevestig": "akkoord",
         "lever": "lever",
@@ -1586,24 +1586,6 @@
       "telt": 2
     },
     {
-      "domein": "kern/rtgboek",
-      "heeft": {
-        "toon": false,
-        "prijs": false,
-        "beschikbaarheid": true,
-        "reserveer": false,
-        "bevestig": true,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "beschikbaarheid": "lopend",
-        "bevestig": "boek"
-      },
-      "telt": 2
-    },
-    {
       "domein": "kern/rugdekking",
       "heeft": {
         "toon": true,
@@ -1962,6 +1944,23 @@
       },
       "bewijs": {
         "toon": "overzicht"
+      },
+      "telt": 1
+    },
+    {
+      "domein": "kern/rtgboek",
+      "heeft": {
+        "toon": false,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": false,
+        "bevestig": true,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "bevestig": "boek"
       },
       "telt": 1
     },

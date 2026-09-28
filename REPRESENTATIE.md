@@ -63,8 +63,8 @@ doen en weten als één laag (punt 12 en 44), dus worden ze ook samen gemeten.
 
 **As 1 — de vorm.** Over de mechanismen die iets opslaan:
 <!--getal:namens.inAlle-->0<!--/getal--> van
-<!--getal:namens.velden-->49<!--/getal--> velden staan in álle mechanismen, 0 in
-zelfs maar de helft, en <!--getal:namens.eigenPct-->91.8<!--/getal-->% in precies één.
+<!--getal:namens.velden-->51<!--/getal--> velden staan in álle mechanismen, 0 in
+zelfs maar de helft, en <!--getal:namens.eigenPct-->90.2<!--/getal-->% in precies één.
 Ruim gemeten: 0 van 73, en 93,2% in precies één.
 
 **En die as is met opzet niet de dragende.** Er zijn maar tien bewaarde vormen

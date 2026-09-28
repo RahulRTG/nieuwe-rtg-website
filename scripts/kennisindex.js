@@ -29,6 +29,9 @@ const path = require('path');
 const crypto = require('crypto');
 const cp = require('child_process');
 const { stempel } = require('./lib/stempel');
+/* De getal-merktekens hebben EEN eigenaar (scripts/getallen.js); hier wordt
+   zijn patroon gebruikt en niet nageschreven, anders zijn er twee. */
+const { MERK } = require('./getallen');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'KENNISINDEX.json');
@@ -53,7 +56,7 @@ function gewijzigd(rel) {
 /* Knip op koppen, en een te lange sectie op alinea's. De kop reist mee als pad
    ("H1 > H2"), zodat een los stuk nog zegt waar het staat. */
 function knip(tekst) {
-  const regels = tekst.replace(/<!--getal:[^>]*-->|<!--\/getal-->/g, '').split('\n');
+  const regels = tekst.replace(new RegExp(MERK.source, 'g'), '$2').split('\n');
   const stukken = [];
   const koppen = [];
   let buf = [];

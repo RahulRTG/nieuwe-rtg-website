@@ -3,9 +3,9 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-09-28T20:52:02.207Z",
-  "commit": "94f5a17ac",
-  "boomVuil": false,
+  "op": "2026-09-28T20:55:27.231Z",
+  "commit": "7d5e61153",
+  "boomVuil": true,
   "boomAnders": 0,
   "instrument": "scripts/afgeleid.js",
   "node": "v22.22.2"
@@ -18,7 +18,7 @@
   "momentopname": 1,
   "onbeslist": 105,
   "afgeleidZonderEigenaar": 2,
-  "metEigenaar": 181,
+  "metEigenaar": 207,
   "afgeleidEigenaarHard": 180,
   "afgeleidGrendelt": 21,
   "metStempel": 112,
@@ -200,13 +200,13 @@
   {
    "naam": "ARBEID.md",
    "soort": "FRAGMENTEN",
-   "eigenaar": null,
-   "graad": null,
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
    "schrijvers": [],
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
-   "grendelt": null,
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
@@ -252,13 +252,13 @@
   {
    "naam": "AUTONOMIE.md",
    "soort": "FRAGMENTEN",
-   "eigenaar": null,
-   "graad": null,
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
    "schrijvers": [],
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
-   "grendelt": null,
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
@@ -456,13 +456,13 @@
   {
    "naam": "BEWIJSMACHINE.md",
    "soort": "FRAGMENTEN",
-   "eigenaar": null,
-   "graad": null,
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
    "schrijvers": [],
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
-   "grendelt": null,
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
@@ -562,25 +562,25 @@
   {
    "naam": "CLAUDE.md",
    "soort": "FRAGMENTEN",
-   "eigenaar": null,
-   "graad": null,
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
    "schrijvers": [],
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
-   "grendelt": null,
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
    "naam": "CODE.md",
    "soort": "FRAGMENTEN",
-   "eigenaar": null,
-   "graad": null,
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
    "schrijvers": [],
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
-   "grendelt": null,
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
@@ -662,13 +662,13 @@
   {
    "naam": "CONNECT.md",
    "soort": "FRAGMENTEN",
-   "eigenaar": null,
-   "graad": null,
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
    "schrijvers": [],
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
-   "grendelt": null,
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
@@ -818,13 +818,13 @@
   {
    "naam": "CREATE.md",
    "soort": "FRAGMENTEN",
-   "eigenaar": null,
-   "graad": null,
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
    "schrijvers": [],
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
-   "grendelt": null,
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
@@ -990,13 +990,13 @@
   {
    "naam": "EDGE.md",
    "soort": "FRAGMENTEN",
-   "eigenaar": null,
-   "graad": null,
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
    "schrijvers": [],
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
-   "grendelt": null,
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
@@ -1083,13 +1083,13 @@
   {
    "naam": "EXECUTIE.md",
    "soort": "FRAGMENTEN",
-   "eigenaar": null,
-   "graad": null,
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
    "schrijvers": [],
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
-   "grendelt": null,
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
@@ -1197,13 +1197,13 @@
   {
    "naam": "FRANCHISE.md",
    "soort": "FRAGMENTEN",
-   "eigenaar": null,
-   "graad": null,
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
    "schrijvers": [],
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
-   "grendelt": null,
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
@@ -1494,13 +1494,13 @@
   {
    "naam": "HDI.md",
    "soort": "FRAGMENTEN",
-   "eigenaar": null,
-   "graad": null,
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
    "schrijvers": [],
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
-   "grendelt": null,
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
@@ -1742,13 +1742,13 @@
   {
    "naam": "ISOLATIE.md",
    "soort": "FRAGMENTEN",
-   "eigenaar": null,
-   "graad": null,
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
    "schrijvers": [],
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
-   "grendelt": null,
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
@@ -1794,13 +1794,13 @@
   {
    "naam": "KANTOOR.md",
    "soort": "FRAGMENTEN",
-   "eigenaar": null,
-   "graad": null,
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
    "schrijvers": [],
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
-   "grendelt": null,
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
@@ -1902,13 +1902,13 @@
   {
    "naam": "KEURING.md",
    "soort": "FRAGMENTEN",
-   "eigenaar": null,
-   "graad": null,
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
    "schrijvers": [],
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
-   "grendelt": null,
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
@@ -2196,25 +2196,25 @@
   {
    "naam": "MAATSTAF.md",
    "soort": "FRAGMENTEN",
-   "eigenaar": null,
-   "graad": null,
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
    "schrijvers": [],
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
-   "grendelt": null,
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
    "naam": "MACHINE.md",
    "soort": "FRAGMENTEN",
-   "eigenaar": null,
-   "graad": null,
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
    "schrijvers": [],
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
-   "grendelt": null,
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
@@ -2378,13 +2378,13 @@
   {
    "naam": "MENS.md",
    "soort": "FRAGMENTEN",
-   "eigenaar": null,
-   "graad": null,
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
    "schrijvers": [],
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
-   "grendelt": null,
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
@@ -2456,13 +2456,13 @@
   {
    "naam": "MODULAIR.md",
    "soort": "FRAGMENTEN",
-   "eigenaar": null,
-   "graad": null,
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
    "schrijvers": [],
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
-   "grendelt": null,
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
@@ -2729,13 +2729,13 @@
   {
    "naam": "OFFICE.md",
    "soort": "FRAGMENTEN",
-   "eigenaar": null,
-   "graad": null,
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
    "schrijvers": [],
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
-   "grendelt": null,
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
@@ -2795,13 +2795,13 @@
   {
    "naam": "ONDERNEMEN.md",
    "soort": "FRAGMENTEN",
-   "eigenaar": null,
-   "graad": null,
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
    "schrijvers": [],
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
-   "grendelt": null,
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
@@ -2992,13 +2992,13 @@
   {
    "naam": "PLANNING.md",
    "soort": "FRAGMENTEN",
-   "eigenaar": null,
-   "graad": null,
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
    "schrijvers": [],
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
-   "grendelt": null,
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
@@ -3194,13 +3194,13 @@
   {
    "naam": "REPRESENTATIE.md",
    "soort": "FRAGMENTEN",
-   "eigenaar": null,
-   "graad": null,
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
    "schrijvers": [],
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
-   "grendelt": null,
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
@@ -3610,13 +3610,13 @@
   {
    "naam": "SOEVEREIN.md",
    "soort": "FRAGMENTEN",
-   "eigenaar": null,
-   "graad": null,
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
    "schrijvers": [],
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
-   "grendelt": null,
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
@@ -3964,13 +3964,13 @@
   {
    "naam": "TRAVELCOMMERCE.md",
    "soort": "FRAGMENTEN",
-   "eigenaar": null,
-   "graad": null,
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
    "schrijvers": [],
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
-   "grendelt": null,
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
@@ -4032,13 +4032,13 @@
   {
    "naam": "VERANDERING.md",
    "soort": "FRAGMENTEN",
-   "eigenaar": null,
-   "graad": null,
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
    "schrijvers": [],
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
-   "grendelt": null,
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
@@ -4214,13 +4214,13 @@
   {
    "naam": "WEERBAARHEID.md",
    "soort": "FRAGMENTEN",
-   "eigenaar": null,
-   "graad": null,
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
    "schrijvers": [],
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
-   "grendelt": null,
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {

@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-28T13:26:49.855Z",
-  "commit": "3029812d",
+  "op": "2026-09-28T15:00:28.078Z",
+  "commit": "47b546d1",
   "boomVuil": false,
   "boomAnders": 1,
   "instrument": "scripts/mutatiecontract.js",
@@ -67676,7 +67676,7 @@
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "officeAuth"
+     "naamAuth"
     ]
    },
    "bewijs": null,
@@ -67697,7 +67697,7 @@
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "officeAuth"
+     "naamAuth"
     ]
    },
    "bewijs": null,
@@ -67739,7 +67739,7 @@
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "officeAuth"
+     "naamAuth"
     ]
    },
    "bewijs": null,

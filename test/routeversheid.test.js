@@ -146,6 +146,21 @@ test('3c. defect en ontbrekend gaan voor, maar verouderd blijft zichtbaar in de 
   assert.deepEqual([u.soorten.defect, u.soorten.ontbrekend, u.soorten.verouderd], [1, 1, 1]);
 });
 
+test('3d. de hele cyclus op routeniveau: bewezen -> verschaald -> hermeting -> bewezen', () => {
+  const cellen = alleBewezen();
+  const wereld = { commit: 'c1', gewijzigdSinds: { c1: [] } };
+  const stand = () => staatVan(cellen, 1, 30, [], rv.vervalVan({ cellen, afh,
+    registerVan: () => ({ ...reg, commit: wereld.commit }),
+    gewijzigdVoor: (c) => ({ gewijzigd: new Set(wereld.gewijzigdSinds[c] || []) }) })).staat;
+  assert.equal(stand(), 'bewezen');
+  wereld.gewijzigdSinds.c1 = ['server/routes/a.js'];        // de handler verandert na c1
+  assert.equal(stand(), 'verschaald');
+  wereld.commit = 'c2'; wereld.gewijzigdSinds.c2 = [];      // het register wordt op c2 hermeten
+  assert.equal(stand(), 'bewezen', 'alleen een hermeting brengt hem terug -- geen knop');
+  wereld.gewijzigdSinds.c2 = ['server/routes/ander.js'];    // en een niet-gerelateerde wijziging raakt hem niet
+  assert.equal(stand(), 'bewezen');
+});
+
 test('4. staatVan kent geen nieuwe standen', () => {
   const cellen = alleBewezen();
   const verval = rv.vervalVan({ cellen, afh, registerVan, gewijzigdVoor: sinds('server/routes/a.js') });

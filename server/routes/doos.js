@@ -29,7 +29,7 @@ module.exports = (kern) => {
 
   /* De Zaakdoos: een verse kloon van de data voor het kastje in de zaak.
      De doos zelf meldt zijn status onbeschermd op het eigen net. */
-  const NIET_IN_KLOON = ['democratieKwesties', 'democratieJournaal', 'democratieInbrengers'];
+  const NIET_IN_KLOON = ['democratieKwesties', 'democratieJournaal', 'democratieInbrengers', 'democratieActies'];
   app.get('/api/doos/kloon', (req, res) => {
     if (!doosSleutelOk(req, res)) return;
     // geen DemocratieOS in de kloon: daar staat de koppeling kwestie-mens (POLITIEK.md C4)

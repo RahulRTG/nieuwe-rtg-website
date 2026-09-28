@@ -167,9 +167,18 @@ async function lijst() {
     const stand = r.stand === 'afgesloten' ? 'Afgesloten' : (LOPEND[r.stand] || r.stand);
     return '<div class="kwestie"><div class="rij"><div class="kern"><b>' + esc(k.onderwerp) + '</b>' +
       '<div class="meta">' + esc(k.id) + (k.gebied ? ' · ' + esc(k.gebied) : '') + ' · ingebracht ' + esc(k.at) + ' · ronde ' + esc(r.nr) + '</div></div>' +
-      '<span class="stand">' + esc(stand) + '</span></div>' + werkblok(k, r) + '</div>';
+      '<span class="stand">' + esc(stand) + '</span></div>' + samen(k) + werkblok(k, r) + '</div>';
   }).join('') : '<div class="leeg">Er zijn nog geen kwesties.</div>';
   koppel();
+}
+
+/* Een actie uit het DoeNetwerk: wat, stand, hoeveel mensen, en het resultaat
+   dat de starter vastlegde. Wie meedoet, staat er niet: dit is de grond onder
+   `samen-opgelost`, en die zet een mens van het kantoor. */
+function samen(k) {
+  return (k.acties || []).map(a => '<div class="uitleg">Samen: ' + esc(a.wat) + ' · ' + esc(a.deelnemers) + ' doen mee · ' +
+    esc(a.stand === 'klaar' ? 'resultaat vastgelegd' : a.stand === 'gestopt' ? 'gestopt' : 'loopt') +
+    (a.resultaat ? '<br><b>Resultaat:</b> ' + esc(a.resultaat) : '') + '</div>').join('');
 }
 
 async function doe(werk, goed) {

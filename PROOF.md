@@ -91,6 +91,55 @@ codewijziging vers bewijs, een modelwissel maakt alle gedragsbewijzen van een
 agent in een keer verschaald. En **niemand zet een staat met de hand op
 BEWEZEN** -- alleen een hermeting kan dat. Een staat is een uitkomst, geen knop.
 
+## 2a. Verval per route: de afhankelijkheden (schaduw, 28 september 2026)
+
+`scripts/vertrouwen.js` rekent de ouderdom per REGISTER, en zegt zelf waarom:
+per-route-versheid wachtte op de slagveld-koppeling van par. 7. Die ligt er nu
+als meting, `npm run routeversheid` (`scripts/routeversheid.js`). Per route
+volgt hij de sluiting: het bestand uit ROUTEBRON.json, de requires, de opgeloste
+kern-kanten uit AANROEPGRAAF.json, de namen die een fabrieksmodule uit de tas
+haalt (opgelost via KERNHERKOMST.json), en een naam uit de montagewortel naar
+zijn require. Die sluiting legt hij naast `git diff` sinds de commit van het
+oudste bronregister. Drie standen: **geraakt** (een bestand in de sluiting is
+gewijzigd, en dat is zeker ook als de sluiting een gat heeft), **vers** (de
+VOLLEDIGE sluiting is ongewijzigd) en **onbepaald** (met de reden). Er is geen
+"waarschijnlijk vers".
+
+Het is een SCHADUWMETING en dat is een besluit: hij verandert de staat in
+VERTROUWEN.json niet en schrijft geen register. De schorspoort leest dat register
+en zet routes echt dicht, en een nieuwe regel loopt eerst mee. Bovendien hangt de
+uitslag aan HEAD, dus een ingecheckt "vers" is bij de volgende commit al een
+bewering over het verleden.
+
+Vier dingen uit de eerste ronde, en alle vier staan ze als toets in
+`test/routeversheid.test.js`:
+
+- **Drie blinde vlekken gaven een valse `vers`.** De aanroepgraaf ziet een
+  kern-kant alleen als `kern.x()` in aanroeppositie staat, en mist daarom:
+  `const { a } = kern` (rechterhand.js), de tas gedestructureerd in de PARAMETER
+  (`({ app, rtfos }) =>`, rtfos/governance.js), en 525 namen die KERNHERKOMST.json
+  alleen kent als "basisobject van server.js", met domeinmodules zoals
+  `journalistiek` erbij. De eerste ronde meldde 1028 routes `vers`. Na de drie
+  reparaties waren dat er, tegen dezelfde commit, 0. **Een versheidsmeter die
+  een gat als "niets gewijzigd" leest, is de gevaarlijkste soort groen.**
+- **De meetcommit stond niet in de kloon.** Deze checkout was ondiep, en dan is
+  de uitslag `niet vast te stellen` met de weg erbij (`git fetch --unshallow`),
+  nooit "niets gewijzigd".
+- **Twee hubs bepalen de grofheid.** Tegen HEAD~1 verschalen `server/lib/keten.js`
+  en `server/opzet/meldaan.js` elk ruim 4100 routes. Dat is geen fout maar echte
+  afhankelijkheid op bestandsniveau. De fijnere stap is per SYMBOOL
+  (SYMBOLEN.json heeft de regels van elke functie): een route hangt dan aan de
+  functies die hij bereikt en niet aan het hele bestand.
+- **De stand op 28 september.** Tegen df1a581a (OUTPUTPROEF.json, 3 september,
+  4348 gewijzigde bestanden sindsdien) zijn 4993 routes geraakt, 0 vers en 105
+  onbepaald. Dat is geen oordeel over de code maar over de leeftijd van het
+  bewijs: een verse meetronde is de enige weg terug.
+
+Wat nog niet staat: de meetcommit per CEL in plaats van die van het oudste
+register, de koppeling per symbool, en de promotie uit de schaduw (`geraakt`
+wordt `verschaald` in VERTROUWEN.json). Die laatste is een besluit, omdat hij
+bepaalt wat de schorspoort ziet.
+
 ## 3. Tegenspraak is een eigen uitslag
 
 Naast groen en rood bestaat er een derde uitslag: TEGENSPRAAK. Een toets zegt

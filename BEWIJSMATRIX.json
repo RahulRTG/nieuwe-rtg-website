@@ -1,103 +1,108 @@
 {
   "stempel": {
-    "op": "2026-09-06T15:04:45.816Z",
-    "commit": "b53eaa5e",
+    "op": "2026-09-28T14:35:27.416Z",
+    "commit": "dfad7e512",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 1,
     "instrument": "scripts/bewijsmatrix.js",
     "node": "v22.22.2"
   },
   "herkomst": "routekaart (draaiende server)",
   "gedegradeerd": false,
-  "journaalGelezen": null,
-  "routes": 4971,
+  "journaalGelezen": ".routejournaal",
+  "routes": 5154,
   "schakels": 11,
-  "cellen": 54681,
+  "cellen": 56694,
   "telling": {
-    "bewezen": 26449,
-    "verklaard": 117,
-    "nvt": 578,
-    "ongemeten": 27512,
-    "gezakt": 25
+    "bewezen": 26928,
+    "verklaard": 0,
+    "nvt": 594,
+    "ongemeten": 29172,
+    "gezakt": 0
   },
   "perSchakel": {
     "AUTH": {
-      "bewezen": 4516,
-      "verklaard": 117,
+      "bewezen": 4814,
+      "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 338,
+      "ongemeten": 340,
       "gezakt": 0
     },
     "ACL": {
-      "bewezen": 3902,
+      "bewezen": 3894,
       "verklaard": 0,
-      "nvt": 133,
-      "ongemeten": 936,
+      "nvt": 135,
+      "ongemeten": 1125,
       "gezakt": 0
     },
     "INPUT": {
-      "bewezen": 3444,
+      "bewezen": 3466,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1527,
+      "ongemeten": 1688,
       "gezakt": 0
     },
     "OUTPUT": {
       "bewezen": 4151,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 820,
+      "ongemeten": 1003,
       "gezakt": 0
     },
     "STATE": {
-      "bewezen": 438,
+      "bewezen": 408,
       "verklaard": 0,
-      "nvt": 78,
-      "ongemeten": 4455,
+      "nvt": 81,
+      "ongemeten": 4665,
       "gezakt": 0
     },
     "SIDE_EFFECT": {
-      "bewezen": 438,
+      "bewezen": 408,
       "verklaard": 0,
-      "nvt": 78,
-      "ongemeten": 4455,
+      "nvt": 81,
+      "ongemeten": 4665,
       "gezakt": 0
     },
     "AUDIT": {
-      "bewezen": 1059,
+      "bewezen": 1109,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 3912,
+      "ongemeten": 4045,
       "gezakt": 0
     },
     "IDEMPOTENCY": {
-      "bewezen": 1662,
+      "bewezen": 1797,
       "verklaard": 0,
-      "nvt": 78,
-      "ongemeten": 3231,
+      "nvt": 81,
+      "ongemeten": 3276,
       "gezakt": 0
     },
     "FAILURE": {
-      "bewezen": 115,
+      "bewezen": 78,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 4832,
-      "gezakt": 24
+      "ongemeten": 5076,
+      "gezakt": 0
     },
     "ROLLBACK": {
-      "bewezen": 2822,
+      "bewezen": 2909,
       "verklaard": 0,
-      "nvt": 78,
-      "ongemeten": 2070,
-      "gezakt": 1
+      "nvt": 81,
+      "ongemeten": 2164,
+      "gezakt": 0
     },
     "PRIVACY": {
-      "bewezen": 3902,
+      "bewezen": 3894,
       "verklaard": 0,
-      "nvt": 133,
-      "ongemeten": 936,
+      "nvt": 135,
+      "ongemeten": 1125,
       "gezakt": 0
     }
+  },
+  "verslechteringToegestaan": {
+    "reden": "noemergroei: 4971 -> 5154 routes onder bewijs sinds 6 september (scripts/routenoemer.js: leeftijd, 0 onverklaard). De nieuwe routes staan in elke kolom als ongemeten; de daling van ACL/PRIVACY (-8) zijn routes die de rolproef niet meer bereikte, en FAILURE telt nu uit een verse faalproef (76 bewezen, 0 gezakt).",
+    "cellenVoor": 54681,
+    "cellenNa": 56694
   },
   "uitleg": "Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN."
 }

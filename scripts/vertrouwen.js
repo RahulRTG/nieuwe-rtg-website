@@ -30,11 +30,15 @@
    hieronder komt uit bouw() van scripts/bewijsmatrix.js, dezelfde ene waarheid
    waar het routedossier en de normtanden op staan (LAT.md regel 4).
 
-   DE HALFWAARDETIJD IS IN FASE 1 GROF: hij geldt per REGISTER (de oudste
-   stempel van de bronregisters bepaalt de ouderdom van het hele bewijs), niet
-   per route. Dat is bewust: per-route-versheid vraagt de slagveld-koppeling
-   van PROOF.md paragraaf 7 en die bestaat nog niet. Grof en eerlijk wint van
-   fijn en verzonnen.
+   DE HALFWAARDETIJD IS GROF: hij geldt per REGISTER (de oudste stempel van de
+   bronregisters bepaalt de ouderdom van het hele bewijs), niet per route.
+   Daarbovenop staat sinds 28 september 2026 het VERVAL PER CEL
+   (scripts/routeversheid.js, PROOF.md par. 2a): elke bewezen cel kent het
+   register dat hem bewees en diens commit, en verschaalt als een GEMETEN
+   afhankelijkheid van de route sindsdien veranderde. Een VERMOEDE
+   afhankelijkheid (de statische sluiting) laat niets vervallen; die staat erbij.
+   Grof en eerlijk wint nog steeds van fijn en verzonnen -- het fijne deel is
+   daarom beperkt tot wat gemeten is.
 
    Draai:  node scripts/vertrouwen.js
            node scripts/vertrouwen.js --vastleggen
@@ -78,7 +82,7 @@ const BRONNEN = ['POORTWACHT.json', 'ROLPROEF.json', 'KETENS.json', 'INVOERPROEF
 
    `cellen` is het object uit een matrixrij: { AUTH: { staat: 'bewezen' }, .. }
    `ouderdomDagen` is een getal; NaN of undefined is een gezakte meting. */
-function staatVan(cellen, ouderdomDagen, halfwaardetijd, onreproduceerbaar) {
+function staatVan(cellen, ouderdomDagen, halfwaardetijd, onreproduceerbaar, verval) {
   if (!cellen || typeof cellen !== 'object' || !Object.keys(cellen).length) {
     throw new Error('een route zonder cellen heeft geen staat; dit is een gezakte meting en geen ongemeten');
   }
@@ -109,6 +113,23 @@ function staatVan(cellen, ouderdomDagen, halfwaardetijd, onreproduceerbaar) {
       reden: 'het bewijs draagt minder dan het lijkt: ' + per.ongemeten.length +
         ' schakel(s) nooit gemeten (' + per.ongemeten.join(', ') + ')',
       heropent: 'meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json' };
+  }
+  /* HET VERVAL PER CEL (PROOF.md par. 2a, scripts/routeversheid.js). Een
+     bewezen cel waarvan een GEMETEN afhankelijkheid veranderde sinds het
+     register hem bewees, spreekt over een vorige wereld. Dat maakt de route
+     `verschaald` -- geen nieuwe stand, en geen oordeel over de code: het oude
+     bewijs is alleen niet meer actueel genoeg. Het staat NA verzwakt en
+     geschorst in de rangorde, want een route kan maar een stand hebben; wat er
+     verder mis is, staat ernaast in `defect`, `ontbrekend` en `verouderd`. */
+  const oud = verval && Array.isArray(verval.verouderd) ? verval.verouderd : [];
+  if (oud.length) {
+    const eerste = oud[0].geraakt[0];
+    return { staat: 'verschaald',
+      reden: oud.length + ' bewezen schakel(s) spreken over een vorige wereld (' +
+        oud.map((c) => c.schakel).join(', ') + '): ' + eerste.bestand + ' veranderde sinds ' + oud[0].commit +
+        ' (' + eerste.koppeling + ', ' + eerste.graad + ')',
+      heropent: 'draai opnieuw: ' + [...new Set(oud.map((c) => c.herdraai))].join('; ') +
+        ' -- het bewijs zelf is niet in twijfel, alleen of het nog over deze code gaat' };
   }
   if (ouderdomDagen > hw) {
     return { staat: 'verschaald',
@@ -216,15 +237,35 @@ function dossierAanvulling(rij, lees, nu) {
 
 /* Alle routes: de matrixrijen door de staatmachine. Losgetrokken van meet()
    zodat de toets hem verzonnen rijen kan voeren zonder de echte registers. */
-function bereken(rijen, ouderdomDagen, halfwaardetijd, onreproduceerbaar) {
+function bereken(rijen, ouderdomDagen, halfwaardetijd, onreproduceerbaar, vervalVoor) {
   const telling = { bewezen: 0, verschaald: 0, verzwakt: 0, geschorst: 0, ongemeten: 0 };
+  /* Wat er aan een route mankeert, per SOORT en los van zijn stand -- want de
+     stand laat er maar een zien. Deze drie worden nooit bij elkaar opgeteld. */
+  const soorten = { defect: 0, ontbrekend: 0, verouderd: 0, verouderdVermoed: 0, vervalOnbekend: 0 };
   const perRoute = {};
   for (const rij of rijen) {
-    const uit = staatVan(rij.cellen, ouderdomDagen, halfwaardetijd, onreproduceerbaar);
+    const k = rij.methode + ' ' + rij.pad;
+    const verval = typeof vervalVoor === 'function' ? vervalVoor(k, rij.cellen) : null;
+    const uit = staatVan(rij.cellen, ouderdomDagen, halfwaardetijd, onreproduceerbaar, verval);
     telling[uit.staat]++;
-    perRoute[rij.methode + ' ' + rij.pad] = uit;
+    const naar = (st) => Object.entries(rij.cellen).filter(([, c]) => c && c.staat === st).map(([s]) => s);
+    const defect = naar('gezakt');
+    const ontbrekend = naar('ongemeten');
+    if (defect.length) { uit.defect = defect; soorten.defect++; }
+    if (ontbrekend.length) { uit.ontbrekend = ontbrekend; soorten.ontbrekend++; }
+    if (verval) {
+      if (verval.verouderd.length) {
+        soorten.verouderd++;
+        uit.verouderd = verval.verouderd.map((c) => ({ schakel: c.schakel, register: c.register, commit: c.commit,
+          bestand: c.geraakt[0].bestand, koppeling: c.geraakt[0].koppeling, graad: c.geraakt[0].graad,
+          aantal: c.geraakt.length, herdraai: c.herdraai }));
+      } else if (verval.vermoed.length) soorten.verouderdVermoed++;
+      if (verval.vermoed.length) uit.vermoedVerouderd = verval.vermoed.map((c) => c.schakel);
+      if (verval.onbekend.length) { uit.vervalOnbekend = verval.onbekend.map((c) => c.schakel); soorten.vervalOnbekend++; }
+    }
+    perRoute[k] = uit;
   }
-  return { telling, perRoute };
+  return { telling, soorten, perRoute };
 }
 
 /* De ouderdom van het bewijs: dagen sinds de OUDSTE stempel van de bronnen
@@ -270,14 +311,16 @@ function meet() {
       'halve routelijst is gevaarlijker dan geen');
   }
   const oud = ouderdom(Date.now());
-  const uit = bereken(matrix.rijen, oud.dagen, HALFWAARDETIJD_DAGEN, oud.onreproduceerbaar);
+  const rv = require('./routeversheid').bouwer();
+  const uit = bereken(matrix.rijen, oud.dagen, HALFWAARDETIJD_DAGEN, oud.onreproduceerbaar, rv.verval);
   return {
     stempel: stempel(),
     uitleg: 'De vervalstaat per route (PROOF.md par. 2): bewezen, verschaald, verzwakt, geschorst of ' +
       'ongemeten, met per route de reden en wat de staat zou veranderen. Berekend uit bouw() van ' +
       'scripts/bewijsmatrix.js en de stempels van de bronregisters. NIEMAND zet een staat met de hand ' +
       'omhoog; alleen een hermeting kan dat.',
-    grens: 'De halfwaardetijd geldt in fase 1 per register (oudste stempel), niet per route; en een ' +
+    grens: 'De halfwaardetijd geldt per register (oudste stempel); het verval per cel komt daar BOVENOP en ' +
+      'kijkt alleen naar GEMETEN afhankelijkheden (het handlerbestand, en kern-namen uit CONTEXTPROEF). En een ' +
       'staat zegt wat de PROEVEN dragen, niet wat de code waard is. Een bewezen route met een gat dat ' +
       'geen proef bedacht heeft, staat hier gewoon op bewezen -- dit register is geen dekkingsbewijs.',
     halfwaardetijdDagen: HALFWAARDETIJD_DAGEN,
@@ -289,6 +332,18 @@ function meet() {
     onreproduceerbaar: oud.onreproduceerbaar,
     routes: matrix.routes,
     telling: uit.telling,
+    /* Per SOORT, los van de stand: hoeveel routes een gezakte cel hebben
+       (defect), een ongemeten cel (ontbrekend), en een bewezen cel waarvan een
+       gemeten afhankelijkheid veranderde (verouderd). `verouderdVermoed` en
+       `vervalOnbekend` zijn de onzekere randen: alleen een VERMOED afhankelijke
+       wijziging, of een meetcommit die niet vast te stellen is. */
+    soorten: uit.soorten,
+    verval: {
+      uitleg: 'Bewijsverval per cel (PROOF.md par. 2a, scripts/routeversheid.js): een bewezen cel verschaalt ' +
+        'als een GEMETEN afhankelijkheid van de route veranderde na de commit van het register dat hem bewees. ' +
+        'Een VERMOED afhankelijke wijziging (statische sluiting) staat erbij en laat niets vervallen.',
+      bronnen: rv.bronnen
+    },
     perRoute: uit.perRoute
   };
 }

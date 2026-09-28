@@ -14556,6 +14556,27 @@
       "operator": "liegpoort /api/",
       "gezakt": 2,
       "scherp": "gezakt"
+    },
+    "meetronde.test.js": {
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "regex plus ||, geen operator van de motor (0 pogingen); handmutatie || -> && laat toets 1 zakken, en de kapotte auditproef laat toets 2 zakken"
+    },
+    "routenoemer.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/routenoemer.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "routeversheid.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/routeversheid.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     }
   }
 }

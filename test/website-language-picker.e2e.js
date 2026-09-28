@@ -24,8 +24,13 @@ test('de nieuwe taalkeuze volgt de RTG-stijl en blijft binnen elke schermrand',
           'taalkaart blijft horizontaal binnen ' + viewport.width + 'px');
         assert.ok(vak.y >= 0 && vak.y + vak.height <= viewport.height,
           'taalkaart blijft verticaal binnen ' + viewport.height + 'px');
-        assert.ok(parseFloat(await kaart.evaluate(el => getComputedStyle(el).borderRadius)) >= 20,
-          'taalkaart gebruikt de afgeronde RTG-systeemvorm');
+        /* De ondergrens was 20px, gemeten tegen de terugval (22px) van
+           var(--rtg-radius-system) toen dat token nog nergens bestond. #413 zette het
+           token centraal (16px, 18px onder de Heritage-huid); HERITAGE.md legt de
+           systeemlaag vast op 16-28px, en daar toetsen we nu op -- beide kanten. */
+        const hoek = parseFloat(await kaart.evaluate(el => getComputedStyle(el).borderRadius));
+        assert.ok(hoek >= 16 && hoek <= 28,
+          'taalkaart gebruikt de afgeronde RTG-systeemvorm (16-28px), gemeten: ' + hoek);
         assert.equal(await page.locator('.rtg-lang-quick').count(), 4, 'vier directe taalkeuzes zijn zichtbaar');
         assert.equal(await page.locator('#rtg-lang-modal canvas').count(), 0, 'geen losse sterrenlaag achter de taalkeuze');
 

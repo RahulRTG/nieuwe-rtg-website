@@ -6,9 +6,14 @@
   function node(tag,cls,text){var e=d.createElement(tag);e.className=cls||'';if(text)e.textContent=text;return e;}
   function link(label,url){var a=node('a','wd-person',label);a.href=url;return a;}
   var world=d.body.dataset.rtgWorld||'living', base=P.asset();
-  var root=node('div','wd-shell pp-detail-shell'), head=node('header','rtg-edge-top pp-header');
+  var root=node('div','wd-shell pp-detail-shell'), head=node('header','rtg-edge-top pp-header pp-detail-header');
   head.append(link('RTG',new URL('../',base).href));head.firstChild.className='rtg-edge-mark pp-brand';
-  var language=node('button','pp-icon-button pp-language','Taal');language.type='button';language.onclick=function(){w.RTGi18n.openModal();};
+  /* De taalknop van de pagina VERHUIST naar de nieuwe kop in plaats van te worden
+     nagebouwd: .world-header staat hier op display:none, en een kopie zonder
+     data-language-picker liet de echte (door i18n.js gebonden) knop onbereikbaar achter. */
+  var language=source.querySelector('[data-language-picker]');
+  if(language)language.classList.add('pp-icon-button','pp-language');
+  else{language=node('button','pp-icon-button pp-language','Taal');language.type='button';language.setAttribute('data-language-picker','');language.setAttribute('data-language-picker-ready','true');language.setAttribute('aria-label','Taal kiezen');language.onclick=function(){w.RTGi18n.openModal();};}
   head.append(node('span','pp-context','Ontdek RTG'),language);
   var greeting=node('header','wd-greeting'), title=source.querySelector('h1');
   greeting.append(node('h1','',title?title.textContent:d.title));

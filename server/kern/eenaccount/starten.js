@@ -10,10 +10,9 @@
 
    HET ENE ACCOUNT IS GEEN ACHTERDEUR, en dat wordt HIER waargemaakt. accStart()
    munt precies dezelfde sessie als de losse inlog: dezelfde rememberSession met
-   dezelfde velden, dezelfde logregel, hetzelfde werkvenster. Zou hier ook maar
-   een controle worden overgeslagen omdat "hij al is ingelogd", dan is het ene
-   account een tweede toegangspad met soepeler regels -- en dan is het geen
-   sleutelbos meer maar een omweg. */
+   dezelfde velden, dezelfde logregel, hetzelfde werkvenster. Een controle die
+   hier wordt overgeslagen omdat "hij al is ingelogd", maakt van de sleutelbos
+   een omweg met soepeler regels. */
 'use strict';
 const klok = require('../../lib/klok');
 const werkSleutels = require('../../bedrijf/sleutels').maak();

@@ -1,19 +1,19 @@
 {
   "schemaVersion": 1,
-  "startedAt": "2026-09-28T17:25:57.875Z",
-  "completedAt": "2026-09-28T17:26:40.439Z",
+  "startedAt": "2026-09-28T20:20:14.196Z",
+  "completedAt": "2026-09-28T20:21:13.923Z",
   "node": "v22.22.2",
   "command": "npm run language:proof",
   "testExitCode": 0,
-  "testOutputSha256": "535e7b549e444d127c44f05392d6c10c3e83d2cee2e01e14ba25efcb91a3a025",
+  "testOutputSha256": "4117db96d332169f3b426def1caddd2db0887fb47dc6adb87847deab77086eb6",
   "sources": {
     "public/apps/access/meaning.js": "268dc805c892ee0e351c14fd2f8d955aa292b556a20af8109bece178559c8bf4",
-    "public/apps/access/portal.css": "50a4099d085813b3b8e00021f62e0e8a30e5170779f1613c5d3dc9f2d0b34b90",
-    "public/apps/app.html": "46cd04823d80fcc7b34ecfa4696dc783fc4d1b6e593992c78ee3ccdb5f5216f9",
-    "public/apps/app-main.js": "87b699cd6bf02d5e0e63f3943fdf71b0fda95b7ceead5769b5704c223adb1666",
-    "public/shared/rtg-edge-2.css": "fc3153499c5f02634a5f49922eb4e36a0932a58f8899d7cd0821449b9577a68d",
-    "public/shared/rtg-adaptive-edge.css": "214b903989e7e5a168dba64116312c1ece31051cebac7ad4d668fb5999dca83c",
-    "public/shared/rtg-simple.css": "b433583a5585f0fbd10fea808261b91e107168f6a31a350eacd3b0803e7fac23",
+    "public/apps/access/portal.css": "c64ed828377fa9bfd188c804bcbcd874aa0cedb7585aec2a2f92db5c60c3128d",
+    "public/apps/app.html": "e0d0797cf97e850b5f6cdf1c61e75237dfe25bbcf847d481922ac42745f20b18",
+    "public/apps/app-main.js": "a9031fe8617a0c28ddcf3c3a5384fdcda16d0d3ea6e475810dac54056e4a8744",
+    "public/shared/rtg-edge-2.css": "94083105a4c1ae3a53d48fe653c22adad06a781818b57bdfa4a01dc88cde54dd",
+    "public/shared/rtg-adaptive-edge.css": "6cd12ee90a6275b240df042eb4ee0056110c41ff2181a5ac393f5555aae81f31",
+    "public/shared/rtg-simple.css": "90e520e135c9799a863a291cdf0ba31f22b0ae3d428f80b623241474b77d6397",
     "public/shared/rtg-edge-appbar.js": "59de3b2e49addd8a5a708969a3d0399f3dd53cb39a5666f8bd2f4525ea998c7c",
     "public/shared/verbinding.js": "d13755da3102050cc29d32972e2442eb8662a70018f7970baf76c4ca153f2825",
     "public/shared/i18n.js": "20429613a962e49e858e95a711ecd6a589b42cd28a4edaa2f7c93e90eea78ff5",
@@ -24,14 +24,14 @@
     "server/talen.js": "993c59f4fe76ef1110c384d6fc91d2f4e3aeece2fbca12bbda2922ae898a84c2",
     "server/routes/onboarding.js": "08d74042f7846b0cd177e2dfca7d25f9bea7b1103774e85a4616b3f61d09d2dd",
     "server/kern/onboarding/lid.js": "9a725122b4ee6ada6434479bd99aa68d19026355dc2eebfc3c1a4f9f9d469bc6",
-    "test/helper.js": "b02e97995cadb967da5bbc45e598cca35086bbf17cbbd8ae24b16992c5ff991b",
+    "test/helper.js": "a628be7eb3cc9ebd639419abcd07511a86428aeb098ff9e09b72645252772dc8",
     "scripts/lib/scherm.js": "9bb3c9eb5390baabb2c69dc798a1e88cfe9d07238f394273221548f53685eb5b",
     "server/translate/batch-model.js": "160464622941708e22843d7e50c6bc92e62512ca2e622f98dd70646543295a6c",
     "server/translate.js": "a9bdd5f0ec8b41494dde3cd2c15aa074087045a162ae65890c52e19fde58cf70",
     "server/translate/cache.js": "51fb8ae3cfe124f8da256f9ef20378990f290a85f24c32c49e59a01fb8a1f32a",
     "server/translate/uitslag.js": "98446b05189312cdda8e60a56685d2f2affad1d226fcc6a3bafad6845c7346dd",
     "server/kern/taalkeuring.js": "0110a0f1fa1e5a23a1676210778a148c3589fe38361197cbe29b73c518c7b271",
-    "server/server.js": "36e8e26776d37131c70fa24dcc50a4f72692c53c4d6b1ecab2b61cb417ed4997",
+    "server/server.js": "494d9d285cfb4fedf78b4508dbbd471a975bc3b8851a260e723a20bf5604ebdf",
     "server/lib/ui-vertaling.js": "f0b120a51a1dce2b573bea44b0f59d3879a985d6cbfec243ce4c3a2d76c5b8c7",
     "server/local-ai.js": "05e2de3bf8be5b432cf1af6d7a077471770757c44b519eab126be51d8a485213",
     "server/ai.js": "ba5c8c6e951f8585e33f95b6c17ae4b515e0dd21ab0dd066e5b6d065093a2b4a",
@@ -81,7 +81,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -128,7 +128,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -175,7 +175,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -222,7 +222,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -269,7 +269,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -316,7 +316,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -363,7 +363,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -410,7 +410,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -457,7 +457,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -504,7 +504,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -551,7 +551,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -598,7 +598,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -645,7 +645,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -692,7 +692,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -739,7 +739,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -786,7 +786,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -833,7 +833,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -880,7 +880,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -927,7 +927,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -974,7 +974,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1021,7 +1021,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1068,7 +1068,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1115,7 +1115,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1162,7 +1162,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1209,7 +1209,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1256,7 +1256,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1303,7 +1303,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1350,7 +1350,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1397,7 +1397,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1444,7 +1444,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1491,7 +1491,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1538,7 +1538,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1585,7 +1585,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1632,7 +1632,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1679,7 +1679,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1726,7 +1726,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1773,7 +1773,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1820,7 +1820,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1867,7 +1867,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1914,7 +1914,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1961,7 +1961,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2008,7 +2008,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2055,7 +2055,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2102,7 +2102,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2149,7 +2149,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2196,7 +2196,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2243,7 +2243,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2290,7 +2290,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2337,7 +2337,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2384,7 +2384,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2431,7 +2431,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2478,7 +2478,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2525,7 +2525,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2572,7 +2572,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2619,7 +2619,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2666,7 +2666,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2713,7 +2713,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2760,7 +2760,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2807,7 +2807,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2854,7 +2854,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2901,7 +2901,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2948,7 +2948,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2995,7 +2995,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3042,7 +3042,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3089,7 +3089,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3136,7 +3136,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3183,7 +3183,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3230,7 +3230,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3277,7 +3277,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3324,7 +3324,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3371,7 +3371,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3418,7 +3418,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3465,7 +3465,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3512,7 +3512,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3559,7 +3559,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3606,7 +3606,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3653,7 +3653,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3700,7 +3700,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3747,7 +3747,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3794,7 +3794,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3841,7 +3841,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3888,7 +3888,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3935,7 +3935,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3982,7 +3982,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4029,7 +4029,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4076,7 +4076,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4123,7 +4123,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4170,7 +4170,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4217,7 +4217,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4264,7 +4264,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4311,7 +4311,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4358,7 +4358,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4405,7 +4405,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4452,7 +4452,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4499,7 +4499,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4546,7 +4546,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4593,7 +4593,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4640,7 +4640,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4687,7 +4687,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4734,7 +4734,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4781,7 +4781,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4828,7 +4828,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4875,7 +4875,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4922,7 +4922,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4969,7 +4969,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -5016,7 +5016,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -5063,7 +5063,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -5110,7 +5110,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -5157,7 +5157,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -5204,7 +5204,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -5251,7 +5251,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -5298,7 +5298,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -5345,7 +5345,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -5392,7 +5392,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, system-ui, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {

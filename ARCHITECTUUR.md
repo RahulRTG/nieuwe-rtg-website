@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 5168 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 5169 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 5168 |
-| servermodules (`server/**/*.js`) | 3726 |
+| API-endpoints | 5169 |
+| servermodules (`server/**/*.js`) | 3730 |
 | routebestanden (`server/routes/**`) | 616 |
-| kernmodules (`server/kern/**`) | 2342 |
+| kernmodules (`server/kern/**`) | 2344 |
 | schermen (`public/**/*.html`) | 320 |
 | gedeelde browsermodules (`public/shared/*.js`) | 398 |
-| toetsbestanden (`test/*.test.js`) | 1812 |
+| toetsbestanden (`test/*.test.js`) | 1814 |
 | schermtoetsen (`test/*.e2e.js`) | 265 |
 
 ## 2. De weg van een verzoek
@@ -112,8 +112,8 @@ zie §5 -- er zijn nog 243 kern-namen die meer dan één domein aanraakt.
 |---|---|---|---|---|
 | `auth` | 20 | 6 | 8 | 52 |
 | `member` | 699 | 72 | 16 | 428 |
-| `supplier` | 624 | 127 | 6 | 337 |
-| `office` | 74 | 21 | 3 | 84 |
+| `supplier` | 624 | 127 | 6 | 338 |
+| `office` | 75 | 21 | 3 | 84 |
 | `staff` | 26 | 8 | 1 | 42 |
 | `social` | 76 | 10 | 31 | 71 |
 | `techniek` | 77 | 19 | 1 | 64 |
@@ -136,9 +136,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1601 |
+| kern-namen die routes aanraken | 1602 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 243 |
-| daarvan door precies één domein | 1358 |
+| daarvan door precies één domein | 1359 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 

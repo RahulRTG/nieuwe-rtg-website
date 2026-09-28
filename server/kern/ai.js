@@ -25,7 +25,7 @@ const meting = require('./ai/routermeting');
    kent, is geen eigenschap van de AI. Pure module, geen state -- zie
    kern/service/mens.js. */
 const mensLaag = require('./service/mens');
-const { chatPakket } = require('./ai/chatpakket');
+const { chatPakket, gesprekVan } = require('./ai/chatpakket');
 const { vensterVan } = require('./ai/contextpakket');
 
 function maakAi({ db, save, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice, i18n, ledenInhoudVan, stemmingVoor, geloofRegel }) {
@@ -48,10 +48,8 @@ function maakAi({ db, save, PERSONAS, anthropic, accounts, broadcastSync, sseToO
      het Nederlands, eerlijk gelabeld met de echte taal van de tekst. */
   async function generateAiReply(tier, convo, lang, key) {
     lang = lang || 'nl';
-    // het gesprek als contextpakket: nooit stil afgekapt (kern/ai/chatpakket.js)
-    const pak = chatPakket({ delen: aiSystemPrompt(tier, lang, key, true), convo, toon: AI_TONE,
-      venster: vensterVan(anthropic), antwoord: 1024 });
-    const last = pak.laatste;
+    const gesprek = gesprekVan(convo);
+    const last = gesprek.length ? gesprek[gesprek.length - 1].content : '';
 
     // de eigen reis mee: zonder reis noemt Rahul geen bestemming. Staat hier
     // omdat de schaduwmeting hem ook nodig heeft; tweemaal opzoeken is twee
@@ -59,9 +57,12 @@ function maakAi({ db, save, PERSONAS, anthropic, accounts, broadcastSync, sseToO
     const eigenReis = (ledenInhoudVan ? (ledenInhoudVan(key) || {}) : {}).trip || null;
 
     let modelTekst = null;
-    if (!pak.ok) console.error('[ai] rahul: ' + pak.uitleg);
-    else if (anthropic && pak.vraagtAntwoord) {
+    if (anthropic && gesprek.length && gesprek[gesprek.length - 1].role === 'user') {
       try {
+        // de prompt pas met een model: nooit stil afgekapt (kern/ai/chatpakket.js)
+        const pak = chatPakket({ delen: aiSystemPrompt(tier, lang, key, true), convo, toon: AI_TONE,
+          venster: vensterVan(anthropic), antwoord: 1024 });
+        if (!pak.ok) throw new Error(pak.uitleg);
         const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 1024, system: pak.system, messages: pak.messages });
         const reply = r.content.filter(b => b.type === 'text').map(b => b.text).join('\n').trim();
         if (reply) modelTekst = reply;

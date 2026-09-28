@@ -97,6 +97,16 @@ const GEHEIM = ['0644433322', 'saskia@example.org', 'te streng tegen', 'Peter de
 
 function lekken(tekst) { return GEHEIM.filter(g => tekst.includes(g)); }
 
+/* #413 zet de eigen inhoud van een wereldhuis bewust in een ingeklapt
+   "Uw volledige overzicht" (details.wp-domain) onder de warme scene, en
+   test/world-homes.e2e.js opent hem net zo. Dicht is die inhoud niet
+   gerenderd -- ook niet in innerText -- dus de buurtproef opent hem na elke
+   navigatie eerst, zoals een bezoeker dat doet; de beweringen blijven gelijk. */
+async function openOverzicht(page) {
+  await page.locator('details.wp-domain').waitFor({ state: 'attached', timeout: 15000 });
+  if (!(await page.locator('details.wp-domain').evaluate(d => d.open))) await page.locator('details.wp-domain > summary').click();
+}
+
 async function schermMet(base, pw, pad) {
   const browser = await pw.chromium.launch(browserOpties(pw));
   const ctx = await browser.newContext({ serviceWorkers: 'block' });
@@ -201,6 +211,7 @@ test('de buurt-app toont activiteiten en geen enkel gegeven over een mens',
   try {
     const d = await decor(srv.base);
     s = await schermMet(srv.base, pw, '/apps/foundation/os-publiek.html?stad=almere');
+    await openOverzicht(s.page);
     await s.page.waitForSelector('#uit .buurtkaart', { timeout: 15000 });
     await s.page.waitForSelector('body[data-rtg-world-dashboard-ready="true"]',
       { timeout: 15000 });
@@ -231,6 +242,7 @@ test('de buurt-app toont activiteiten en geen enkel gegeven over een mens',
     const vanaf = s.verzoeken.length;
     await s.page.goto(srv.base + '/apps/foundation/os-publiek.html?stad=almere',
       { waitUntil: 'domcontentloaded' });
+    await openOverzicht(s.page);
     await s.page.waitForSelector('#uit .buurtkaart', { timeout: 15000 });
     assert.equal(s.verzoeken.slice(vanaf).some(url => url.includes('/api/experience/')), false,
       'de publieke stadsroute vraagt geen persoonlijke Experience-projectie op');
@@ -238,6 +250,7 @@ test('de buurt-app toont activiteiten en geen enkel gegeven over een mens',
     /* Een onbekende slug wordt geen intern zoekpad en houdt de kiezer open. */
     await s.page.goto(srv.base + '/apps/foundation/os-publiek.html?stad=niet-openbaar',
       { waitUntil: 'domcontentloaded' });
+    await openOverzicht(s.page);
     await s.page.waitForSelector('#stadmelding', { timeout: 15000 });
     assert.match(await s.page.textContent('#stadmelding'), /niet openbaar|kies een stad/i);
     assert.ok(await s.page.$('[data-stad]'), 'de veilige stedenkiezer blijft beschikbaar');
@@ -245,6 +258,7 @@ test('de buurt-app toont activiteiten en geen enkel gegeven over een mens',
     /* In Command/Edge tekent de app alleen zijn eigen publieke inhoud. */
     await s.page.goto(srv.base + '/apps/foundation/os-publiek.html?stad=almere&embed=1',
       { waitUntil: 'domcontentloaded' });
+    await openOverzicht(s.page);
     await s.page.waitForSelector('#uit .buurtkaart', { timeout: 15000 });
     assert.equal(await s.page.getAttribute('body', 'data-rtg-vandaag-luxe'), 'home',
       'de embed behoudt hetzelfde Foundation-palet na publieke validatie');

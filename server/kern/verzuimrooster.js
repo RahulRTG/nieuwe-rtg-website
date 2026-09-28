@@ -45,7 +45,22 @@ function maakVerzuimRooster(lezer) {
     return delen.length ? delen.join('; ') + '.' : '';
   }
 
-  return { stand, verzuimZin };
+  /* Een rooster dat een MENS vaststelt, opnieuw nakijken: tussen voorstel en
+     akkoord kan iemand zich ziek melden. Geeft per dag wie er ingepland staat
+     terwijl hij afwezig is -- een waarschuwing, geen weigering, want vaststellen
+     is het besluit van die mens. `vrij` is de naam van de vrije dienst. De
+     aanroeper geeft null als er geen verzuimlaag is: niet nagekeken. */
+  function naKijken(code, dagen, vrij) {
+    const uit = [];
+    for (const dag of dagen || []) for (const m of dag.staff || []) {
+      if (m.shift === vrij) continue;
+      const v = stand(code, m.id, dag.date);
+      if (v.stand === 'afwezig') uit.push({ datum: dag.date, id: m.id, naam: m.name, wat: v.wat, inzetbaarheid: v.inzetbaarheid });
+    }
+    return uit;
+  }
+
+  return { stand, verzuimZin, naKijken };
 }
 
 /* De verzuimlaag (kern.payrollOS, opzet/kernlaag2.js) bestaat pas ruim nadat

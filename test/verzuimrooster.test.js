@@ -13,7 +13,11 @@
         nooit "ziek";
      4. tegen een echte server: het AI-weekrooster zet een zieke kok op vrij;
      5. tegen een echte server: afgewezen verlof verdwijnt uit de verzuimlaag,
-        want het ging er al bij het AANVRAGEN in.
+        want het ging er al bij het AANVRAGEN in;
+     7-10. een MENS die toch een afwezige medewerker inplant, krijgt het erbij
+        te zien en wordt niet tegengehouden -- bij een losse dienst van de
+        beveiliging en bij het vaststellen van het weekrooster. De automaat
+        krijgt een tweede grendel.
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -169,4 +173,77 @@ test('6. vragen of iemand er is, laat geen lege verzuimrij achter', () => {
     'een rooster dat het hele team afloopt, schreef voor iedereen een lege rij');
   assert.equal(v.schrap('Z', 7, '2026-09-24', 'ziek').status, 400, 'een ziekmelding wordt niet afgewezen');
   assert.equal(v.schrap('Z', 7, '2026-09-24', 'vakantie').status, 404);
+});
+
+test('7. een mens mag een afwezige bewaker zetten maar ziet het erbij; de automaat niet', () => {
+  const ziek = wereld((code, gid) => (gid === 1 ? [{ wat: 'afwezig', inzetbaarheid: 'deels' }] : []));
+  const dienst = { postId: 'P', shiftId: 'dag', datum: '2026-09-24', guardId: 1 };
+  const mens = ziek.zetDienst({ code: 'Z' }, dienst);
+  assert.equal(mens.status, 200, 'een mens wordt niet tegengehouden: aangepast werk is zijn besluit');
+  assert.match(mens.verzuimWaarschuwing, /Bewaker 1 staat op 2026-09-24 als afwezig/);
+  assert.match(mens.verzuimWaarschuwing, /inzetbaar: deels/);
+  assert.equal(mens.verzuimNagekeken, true);
+  /* een andere week, zodat de rustregel niet meespeelt: alleen verzuim kan hier weigeren */
+  const auto = ziek.zetDienst({ code: 'Z' }, { ...dienst, datum: '2026-10-08' }, { door: 'autoplan' });
+  assert.equal(auto.status, 409, 'de automaat plant nooit wie afwezig is, ook niet langs zetDienst');
+  assert.match(auto.error, /als afwezig/);
+
+  const gezond = wereld(() => []).zetDienst({ code: 'Z' }, dienst);
+  assert.equal(gezond.status, 200);
+  assert.equal(gezond.verzuimWaarschuwing, undefined, 'tegenproef: niemand afwezig, geen waarschuwing');
+  const blind = wereld(undefined).zetDienst({ code: 'Z' }, dienst);
+  assert.equal(blind.status, 200);
+  assert.equal(blind.verzuimNagekeken, false, 'zonder verzuimlaag zegt het antwoord dat er niet is gekeken');
+});
+
+test('8. naKijken: wie op een dienst staat terwijl hij afwezig is, en niemand op vrij', () => {
+  const r = maakVerzuimRooster((code, id, van) => (id === 1 && van === '2026-09-25' ? [{ wat: 'Vakantie', inzetbaarheid: null }] : []));
+  const dagen = [
+    { date: '2026-09-24', staff: [{ id: 1, name: 'Kok', shift: 'Ochtend' }] },
+    { date: '2026-09-25', staff: [{ id: 1, name: 'Kok', shift: 'Ochtend' }, { id: 2, name: 'Bar', shift: 'Avond' }] },
+    { date: '2026-09-26', staff: [{ id: 1, name: 'Kok', shift: 'Vrij' }] }
+  ];
+  assert.deepEqual(r.naKijken('Z', dagen, 'Vrij'),
+    [{ datum: '2026-09-25', id: 1, naam: 'Kok', wat: 'Vakantie', inzetbaarheid: null }]);
+  const vrij = maakVerzuimRooster(() => [{ wat: 'afwezig', inzetbaarheid: 'niets' }]);
+  assert.deepEqual(vrij.naKijken('Z', [{ date: 'd', staff: [{ id: 1, shift: 'Vrij' }] }], 'Vrij'), [],
+    'wie al vrij staat, hoeft niet gemeld te worden');
+});
+
+test('9. echte server: een manager zet toch een dienst voor een zieke bewaker, en ziet het', async () => {
+  const login = await api(base, '/api/supplier/login', { username: 'rahul', password: 'Imran' });
+  const mgr = login.body.token;
+  const guards = (login.body.state.staff || []).filter(x => x.role === 'staff');
+  const ziek = guards[0];   // meldde zich in toets 3 ziek
+  const rooster = (await api(base, '/api/supplier/beveiliging/rooster', { van: vandaag(), dagen: 1 }, mgr)).body;
+  const post = rooster.dagen[0].posten[0];
+  const r = await api(base, '/api/supplier/beveiliging/dienst',
+    { postId: post.postId, shiftId: post.shifts[post.shifts.length - 1].shiftId, datum: vandaag(), guardId: ziek.id }, mgr);
+  assert.equal(r.status, 200, JSON.stringify(r.body).slice(0, 200));
+  assert.match(r.body.verzuimWaarschuwing || '', /staat op \d{4}-\d{2}-\d{2} als afwezig .*in de verzuimlaag/, JSON.stringify(r.body).slice(0, 400));
+  assert.equal(r.body.verzuimNagekeken, true);
+  assert.ok(!/ziek/i.test(JSON.stringify(r.body)), 'de waarschuwing noemt geen ziekte');
+});
+
+test('10. echte server: wie na het voorstel afwezig wordt, staat erbij als het rooster wordt vastgesteld', async () => {
+  const roster = (await api(base, '/api/supplier/roster', { code: 'KIKUNOI' })).body;
+  const man = roster.staff.find(x => x.role === 'manager');
+  const baas = (await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: man.id, pin: '1234' })).body.token;
+  const v = await api(base, '/api/supplier/rooster/voorstel', {}, baas);
+  assert.equal(v.status, 200);
+  /* KIKUNOI heeft een manager en een medewerker, en die staat sinds toets 4 ziek
+     op vrij. De manager werkt elke dag; hij vraagt daarna voor morgen verlof aan. */
+  const dag = v.body.rooster.days[1].date;
+  const rij = v.body.rooster.days[1].staff.find(x => x.id === man.id);
+  assert.notEqual(rij.shift, 'Vrij', 'de manager werkt morgen in het voorstel');
+  assert.equal((await api(base, '/api/staff/leave/request', { soort: 'verlof', van: dag, tot: dag }, baas)).status, 200);
+
+  const r = await api(base, '/api/supplier/rooster/beslis', { actie: 'akkoord' }, baas);
+  assert.equal(r.status, 200, 'vaststellen wordt niet tegengehouden');
+  const w = r.body.verzuimBijVaststellen;
+  assert.ok(Array.isArray(w), 'de verzuimlaag is nagekeken');
+  assert.ok(w.some(x => x.id === rij.id && x.datum === dag && x.wat === 'Vakantie'),
+    'de manager ziet wie er intussen afwezig is: ' + JSON.stringify(w));
+  /* de zieke kok uit toets 4 staat in dit voorstel al op vrij, dus die hoort er niet in */
+  assert.ok(!/ziek/i.test(JSON.stringify(w)), 'en noemt geen ziekte');
 });

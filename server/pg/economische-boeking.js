@@ -6,7 +6,7 @@
 'use strict';
 
 const { KANAAL } = require('./schrijflanen');
-const { vind: heeftRegel, vindBeweging, bewegingGelijk, saldoSamen,
+const { SLEUTEL, vind: heeftRegel, vindBeweging, bewegingGelijk, saldoSamen,
   boekingenSamen } = require('../db/economische-identiteit');
 const publiceerCollectie = require('../db/collectie-publicatie');
 
@@ -20,7 +20,7 @@ module.exports = (ctx) => {
 
   function geldig(invoer, werk) {
     const i = invoer || {};
-    if (!/^payout-terug:[a-f0-9]{64}$/.test(String(i.sleutel || '')) ||
+    if (!SLEUTEL.test(String(i.sleutel || '')) ||
         !/^[a-f0-9]{64}$/.test(String(i.afdruk || '')) ||
         !i.identiteit || !['pay', 'bank'].includes(i.identiteit.domein) ||
         !i.identiteit.van || !i.identiteit.naar || !Number.isSafeInteger(i.identiteit.centen) ||

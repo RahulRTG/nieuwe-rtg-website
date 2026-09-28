@@ -5,7 +5,12 @@
    rijksbekendmakingen. Alleen routes; de logica woont in kern/overheid.js.
    Gemount vanuit routes/member.js. */
 module.exports = (kern) => {
-  const { app, auth, liveCodename, overheid } = kern;
+  const { app, auth, liveCodename, overheid, idGeverifieerd } = kern;
+  /* Aangifte doen hoort bij de universele bodem (SAMENLEVING.md, besluit 4c):
+     open voor een gratis account na een paspoortcontrole, zonder pas. Een
+     aanslag BETALEN blijft bij de leden: dat is geld, en daar gaat dit besluit
+     niet over. */
+  const paspoortdeur = require('../../kern/onvervreemdbaar').maakPaspoortdeur({ idGeverifieerd });
   const lid = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'Alleen voor leden.' }); return false; }
     return true;
@@ -18,7 +23,7 @@ module.exports = (kern) => {
 
   // pijler 2: Belastingdienst
   app.post('/api/overheid/belasting/bereken', auth, (req, res) => res.json({ ok: true, uitkomst: overheid.berekenIB(req.body.inkomen, req.body.aftrek, req.body.ingehouden) }));
-  app.post('/api/overheid/aangifte', auth, (req, res) => { if (!lid(req, res)) return; stuur(res, overheid.aangifteDoe(req.session, liveCodename(req.session), req.body || {})); });
+  app.post('/api/overheid/aangifte', auth, (req, res) => { if (!paspoortdeur(req, res)) return; stuur(res, overheid.aangifteDoe(req.session, liveCodename(req.session), req.body || {})); });
   app.post('/api/overheid/aanslagen/mijn', auth, (req, res) => res.json(overheid.mijnAanslagen(req.session.key)));
   // een aanslag betalen loopt via de geld-drempel van de AI (pad bevat "betaal")
   app.post('/api/overheid/aanslag/betaal', auth, (req, res) => { if (!lid(req, res)) return; stuur(res, overheid.aanslagBetaal(req.session.key, String(req.body.ref || ''))); });

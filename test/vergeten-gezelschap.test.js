@@ -125,7 +125,7 @@ test('vergetelheid werkt voor elke pas, niet alleen voor een RTG-lid', async () 
     /* En het verkeer tussen de passen, want dat maakt contacten aan: een hoger
        lid dat een RTG-lid aanspreekt legt een regel vast in db.data.contacts.
        Precies zo'n tak die je pas ziet als je een HOGER lid verwijdert. */
-    const salonPost = await post('/api/salon/plaats', { tekst: 'Hallo van Rita.' }, g.passen.rtg.token);
+    const salonPost = await post('/api/salon/plaats', { publiek: 'salon', tekst: 'Onderwijs in de buurt, van Rita.' }, g.passen.rtg.token);
     const pid = (salonPost.body.post && salonPost.body.post.id) != null ? salonPost.body.post.id : salonPost.body.id;
     for (const hoger of ['lifestyle', 'business']) {
       const r = await post('/api/dm', { postId: pid, text: 'Dag Rita.' }, g.passen[hoger].token);

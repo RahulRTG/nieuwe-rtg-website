@@ -141,7 +141,11 @@ function parse(bron, opties) {
 
   function forStatement() {
     const start = volgende();
-    if (isSleutel('await')) volgende(); // for await
+    /* for await: de vlag hoort in de knoop (ESTree `await`), anders drukt de
+       printer een gewone for-of af en loopt de lus over een async iterator
+       synchroon -- in de geminificeerde bouw een TypeError */
+    let wacht = false;
+    if (isSleutel('await')) { volgende(); wacht = true; }
     eetLees('(');
     let init = null;
     if (isLees(';')) { /* leeg */ }
@@ -151,7 +155,7 @@ function parse(bron, opties) {
       const soort = volgende().value; const right = soort === 'of' ? toewijzing() : expressie();
       eetLees(')');
       const left = init;
-      return af(knoop(soort === 'of' ? 'ForOfStatement' : 'ForInStatement', start, { left, right, body: statement() }));
+      return af(knoop(soort === 'of' ? 'ForOfStatement' : 'ForInStatement', start, soort === 'of' ? { await: wacht, left, right, body: statement() } : { left, right, body: statement() }));
     }
     eetLees(';');
     const test = isLees(';') ? null : expressie(); eetLees(';');

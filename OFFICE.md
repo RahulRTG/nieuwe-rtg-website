@@ -274,9 +274,10 @@ spoor. Wat ontbreekt is het GETAL in het voorbeeld. *"€ 1.840 verwachte extra
 loonkosten"* is een voorspelling, en `kern/stuur/gevolg.js` weet van 96 van de 176
 bereikbare paden niet wat ze aanraken. Een scherm dat dan toch een bedrag toont,
 geeft een geruststelling zonder grond. De regel uit `KOSTEN.md` geldt: **er
-staat nooit een getal waar er geen is.** Bovendien leest vandaag geen enkele
-roostermotor verzuim (`PLANNING.md` par. 7), dus "maak een nieuwe planning voor
-Haarlem" kan een zieke medewerker inplannen.
+staat nooit een getal waar er geen is.** Het AI-weekrooster en de autoplanner
+van de beveiliging lezen sinds 27 september wel verzuim (`PLANNING.md` par. 6),
+maar de overige planners niet -- een nieuwe planning voor Haarlem kan dus nog
+steeds een zieke medewerker inplannen, afhankelijk van welke planner hem maakt.
 
 **12. Specialistische profielen** — *staat als grammatica.* Een Finance-, HR- of
 Legal-profiel is een **mandaat** op `kern/stuur/mandaat.js`: een doorsnede van

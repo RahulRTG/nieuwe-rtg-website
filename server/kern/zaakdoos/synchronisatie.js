@@ -33,6 +33,15 @@ module.exports = (ctx) => {
       if (!r.ok) return;
       const d = await r.json();
       if (!d || typeof d.data !== 'object' || !d.data) return;
+      /* De kloon PER ZAAK (B12, ./kloon.js): alleen de collecties uit de lijst,
+         en de rest van de doos blijft van de doos. */
+      if (d.formaat) {
+        if (require('./kloon').pasToe(db, d) == null) return;
+        save();
+        st.laatsteKloon = klokNu();
+        return;
+      }
+      // de volledige kloon: alleen buiten productie, met de gedeelde sleutel
       delete d.data.doosJournaal; // het journaal is van de doos zelf
       delete d.data.doosRefKaart;
       // in-place, zodat alles wat naar db.data verwijst gewoon blijft werken

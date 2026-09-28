@@ -577,7 +577,17 @@ function wachtOpSchoneBoom() {
   const wacht = maakWereldwacht({ post, tokenVoor, extras: wereldExtras,
     elke: Number(process.env.RTG_WERELDWACHT || 250) });
 
-  const uit = await draaiIdemproef({ post, routes, tokenVoor, hernieuw, naInlog, wacht,
+  /* DE GELDROUTES ZONDER TERUGVAL krijgen een eigen medewerker met een passkey
+     (./lib/idempasskey.js). Alleen de oproepen van de proef gaan langs hem; de
+     wereld, de wacht en de sleutelbos blijven de gewone post gebruiken. */
+  const { bouwPasskeyMedewerker, metPasskey } = require('./lib/idempasskey');
+  let passkey = { klaar: null, reden: 'niet geprobeerd' };
+  try { passkey = await bouwPasskeyMedewerker({ post, basis, boardroom: tokens.boardroom }); }
+  catch (e) { passkey = { klaar: null, reden: 'de bouwer viel om: ' + e.message }; }
+  console.log('  passkeymedewerker                    : ' +
+    (passkey.klaar ? 'klaar voor ' + passkey.klaar.routes.join(', ') : 'NIET -- ' + passkey.reden));
+
+  const uit = await draaiIdemproef({ post: metPasskey(post, passkey.klaar), routes, tokenVoor, hernieuw, naInlog, wacht,
     lijfVoor: (r) => {
       const vv = voorvoegselVan(r.pad);
       return { ...plausibelLijf(r.pad), ...extra, ...(vv ? schoonLijf(vv.lijf) : {}), ...(geldLijven[r.pad] || {}) };
@@ -775,6 +785,8 @@ function wachtOpSchoneBoom() {
          deze lijst om te bepalen of een route werkelijk zonder sleutel zat of
          alleen zonder OPSTELLING -- twee heel verschillende reparaties. */
       lijfsleutelsGebouwd: lijfsleutels.gebouwd.map(g => g.naam),
+      /* Welke routes door de passkeymedewerker zijn gedaan, of waarom niet. */
+      passkeyMedewerker: passkey.klaar ? { routes: passkey.klaar.routes } : { routes: [], reden: passkey.reden },
       /* WAT DE PLATFORMLAAG VING, EN WAT DE ROUTE ZELF DOET -- twee getallen,
          want ze gaan niet over hetzelfde. Alle oproepen hierboven dragen `idem`
          in het lijf, en server/middleware/idempotentie.js is precies daarop

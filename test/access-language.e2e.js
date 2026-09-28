@@ -164,6 +164,13 @@ test('alle toegangsschermen bewegen mee zonder invoer, voortgang of akkoord te v
       assert.match(await page.locator('#onbLees').innerText(),/eigen risico/);
       await page.locator('#onbConsent').check();
       await page.locator('#onbGo').click();await page.waitForSelector('#onbGate',{state:'hidden'});
+      /* Na de onboarding de herkomstvraag (besluit C6): een keer, met de antwoorden
+         van de server, en overslaan sluit hem. */
+      await page.waitForSelector('#kanaalVraag',{state:'visible'});
+      assert.equal(await page.locator('#kanaalVraag [data-kanaal]:not([data-kanaal=""])').count(),6);
+      const dicht=page.waitForResponse(r=>r.url().endsWith('/api/auth/aanmeldkanaal') && r.status()===200);
+      await page.locator('#kanaalVraag [data-kanaal=""]').click();await dicht;
+      await page.waitForSelector('#kanaalVraag',{state:'detached'});
     });
     await t.test('herstel en wachtwoord hebben dezelfde taalroute',async()=>{
       // Second-factor behaviour is covered by rtg-id-family; copy switches through login/recovery here.

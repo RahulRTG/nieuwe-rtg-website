@@ -53,7 +53,8 @@ function koopTicketVoor(session, body) {
   const codename = session.account ? session.account.codename : PERSONAS[session.tier].codename;
   const ticket = {
     ref: 'RTG-T-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
-    kind: 'ticket', code: entreeCode(),
+    // geen code op de boeking: de entreecode is een bearer in kern/tickettoegang.js
+    kind: 'ticket',
     supplierCode: s.code, supplierName: s.name,
     customerTier: session.tier, customerKey: session.key, customerCodename: codename,
     service: { id: act.id, name: act.name, soort: 'ticket' },

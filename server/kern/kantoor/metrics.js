@@ -7,63 +7,9 @@ module.exports = (ctx) => {
   const { db, accounts, conciergeInbox, beveilig } = ctx;
   const dagVan = iso => String(iso || '').slice(0, 10);
 
-  // de weektrend en de dagcijfers, plus foundation-afdracht en munt-ontvangsten
-  function weekEnStats(betaaldeOrders, betaaldeRitten, live, nu) {
-    const week = [];
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date(nu - i * 86400000).toISOString().slice(0, 10);
-      const dagOrders = betaaldeOrders.filter(o => dagVan(o.paidAt || o.at) === d);
-      const dagRitten = betaaldeRitten.filter(r => dagVan(r.paidAt || r.at) === d);
-      week.push({
-        date: d,
-        label: new Date(d + 'T12:00:00').toLocaleDateString('nl-NL', { weekday: 'short' }),
-        omzet: dagOrders.reduce((s2, o) => s2 + (o.total || 0), 0) + dagRitten.reduce((s2, r) => s2 + (r.quote || 0), 0),
-        aantal: dagOrders.length + dagRitten.length
-      });
-    }
-    // De RTFoundation krijgt 30% van de abonnementsbijdragen (ex btw); RTG
-    // verdient niets aan boekingen, dus die tellen hier niet mee.
-    const fonds = db.data.invoices
-      .filter(i => (i.status === 'paid' || i.status === 'betaald') && /lidmaatschap|jaarbijdrage|maandbijdrage/i.test(i.desc || ''))
-      .reduce((s2, i) => s2 + Math.round((i.bijdrage || 0) / 1.21 * 0.3), 0);
-    // Het echte afdracht-grootboek (kern/fonds.js boekt hier per betaling).
-    const afdrachten = Array.isArray(db.data.fondsAfdrachten) ? db.data.fondsAfdrachten : [];
-    let afTotaal = 0, afTeStorten = 0, afIngepland = 0, afGestort = 0;
-    for (const a of afdrachten) {
-      const c = a.centen || 0;
-      afTotaal += c;
-      if (a.status === 'gestort') afGestort += c;
-      else if (a.status === 'ingepland') afIngepland += c;
-      else afTeStorten += c;
-    }
-    const fondsAfdracht = {
-      aantal: afdrachten.length,
-      totaal: Math.round(afTotaal) / 100,
-      teStorten: Math.round(afTeStorten) / 100,
-      ingepland: Math.round(afIngepland) / 100,
-      gestort: Math.round(afGestort) / 100,
-      iban: (process.env.RTF_IBAN || '').trim(),
-      begunstigde: (process.env.RTF_BEGUNSTIGDE || 'Stichting RTFoundation').trim()
-    };
-    // Munt-ontvangsten (crypto meteen omgezet naar euro).
-    const muntRijen = Array.isArray(db.data.muntOntvangsten) ? db.data.muntOntvangsten : [];
-    let muntEuroCenten = 0, muntWacht = 0;
-    for (const r of muntRijen) {
-      if (r.status === 'ontvangen') muntEuroCenten += (r.settledEuroCenten || r.euroCenten || 0);
-      else muntWacht++;
-    }
-    const muntOntvangst = {
-      aan: process.env.MUNT_AAN === '1',
-      aantal: muntRijen.length, wacht: muntWacht,
-      ontvangen: Math.round(muntEuroCenten) / 100
-    };
-    const stats = {
-      omzetVandaag: week[6].omzet, aantalVandaag: week[6].aantal,
-      omzetWeek: week.reduce((s2, d) => s2 + d.omzet, 0),
-      foundation: fonds, fondsAfdracht, muntOntvangst, liveNu: live.length
-    };
-    return { week, stats };
-  }
+  // de weektrend en de dagcijfers: ./metrics-week.js
+  const { weekEnStats } = require('./metrics-week')({ invoices: () => db.data.invoices,
+    fondsAfdrachten: () => db.data.fondsAfdrachten, muntOntvangsten: () => db.data.muntOntvangsten });
 
   /* Partnerprestaties: NIET per zaak over alle orders filteren (dat is
      O(zaken x orders) en loopt met miljoenen restaurants volledig vast).

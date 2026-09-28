@@ -30,6 +30,10 @@ function ensureSupplierDefaults(s) {
     ];
   for (const r of (s.rooms || [])) if (!r.hk) r.hk = { status: 'schoon' };
   if (!s.settings) s.settings = { ordersOpen: true, reservationsOpen: true };
+  /* Connection-programma's worden hier niet automatisch aangezet. Afwezig is
+     bewust dezelfde betekenis als expliciet uit; deelname vraagt een keuze van
+     de partner en mag niet uit een algemene reserveringsinstelling volgen. */
+  if (!s.settings.connectionParticipation) s.settings.connectionParticipation = { version: 1, programs: {} };
   // land van het bedrijf (voor btw, alcoholgrens en het zoeken op land in de
   // RTFoundation-vacatures). RTG is internationaal; onze demopartners staan op
   // Ibiza en horen dus bij Spanje.

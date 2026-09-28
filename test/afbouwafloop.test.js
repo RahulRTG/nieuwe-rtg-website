@@ -208,3 +208,29 @@ test('6. klaar() weigert een niet-terminale stand', () => {
   r.klaar('FAILED');
   fs.rmSync(map, { recursive: true, force: true });
 });
+
+/* EIGEN LIJN: regel 71 van check.js laat een LOPENDE ronde alleen door als die
+   ronde aantoonbaar de voorouder van de keuring is (de releasepoort draait
+   check.js als stap). De proef bewijst beide kanten: de eigen ouder telt, een
+   levend maar vreemd proces niet, en een PID met een andere starttijd evenmin. */
+test('eigenLijn: alleen een levende voorouder met dezelfde starttijd', () => {
+  const fsx = require('fs');
+  const cpx = require('child_process');
+  const afloopMod = require('../scripts/lib/afbouw-afloop');
+  const start = pid => {
+    const s = fsx.readFileSync('/proc/' + pid + '/stat', 'utf8');
+    return Number(s.slice(s.lastIndexOf(')') + 2).split(' ')[19]);
+  };
+  if (!fsx.existsSync('/proc/self/stat')) return; // zonder /proc is het antwoord altijd nee
+  const ouder = { wortel: { pid: process.ppid, start: start(process.ppid) } };
+  assert.equal(afloopMod.eigenLijn(ouder), true, 'de eigen ouder is eigen lijn');
+  assert.equal(afloopMod.eigenLijn({ wortel: { pid: process.pid, start: start(process.pid) } }), true, 'het eigen proces ook');
+  const vreemd = cpx.spawn(process.execPath, ['-e', 'setTimeout(()=>{},30000)'], { stdio: 'ignore' });
+  try {
+    const w = { wortel: { pid: vreemd.pid, start: start(vreemd.pid) } };
+    assert.equal(afloopMod.eigenLijn(w), false, 'een levend proces buiten de ouderketen is geen eigen lijn');
+  } finally { vreemd.kill('SIGKILL'); }
+  const geerfd = { wortel: { pid: process.ppid, start: start(process.ppid) + 1 } };
+  assert.equal(afloopMod.eigenLijn(geerfd), false, 'zelfde PID, andere starttijd: een ander proces');
+  assert.equal(afloopMod.eigenLijn({}), false, 'zonder wortel: nee');
+});

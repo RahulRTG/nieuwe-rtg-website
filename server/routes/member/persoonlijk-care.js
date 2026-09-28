@@ -9,7 +9,11 @@ module.exports = (kern) => {
     careOverzicht, careBoek, careBetaal, careAnnuleer, careMijn, careIntakeDeel, careIntakeStop,
     carePakketOverzicht, carePakketBoek, carePakketBetaal, carePakketMijn, gegevensStop,
     vastleggingDeel, vastleggingStop, vastleggingenVan,
-    wachtlijstZet, wachtlijstAf, wachtlijstVan } = kern;
+    wachtlijstZet, wachtlijstAf, wachtlijstVan, idGeverifieerd } = kern;
+  /* Een intake delen met een zorgaanbieder hoort bij de universele bodem
+     (SAMENLEVING.md, besluit 4c): open voor een gratis account na een
+     paspoortcontrole. Een behandeling BOEKEN blijft een ledenfunctie. */
+  const paspoortdeur = require('../../kern/onvervreemdbaar').maakPaspoortdeur({ idGeverifieerd });
 
   app.post('/api/care', auth, (req, res) => res.json(careOverzicht(req.session.key)));
   app.post('/api/care/boek', auth, (req, res) => {
@@ -31,7 +35,7 @@ module.exports = (kern) => {
   app.post('/api/care/mijn', auth, (req, res) => res.json(careMijn(req.session.key)));
   // de veilige, aparte intake-deling met een aanbieder (uitdrukkelijk, tijdelijk)
   app.post('/api/care/intake/deel', auth, (req, res) => {
-    if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+    if (!paspoortdeur(req, res)) return;
     const r = careIntakeDeel(req.session.key, req.body.aanbiederId, req.body.medisch);
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json(r);

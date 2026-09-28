@@ -2,24 +2,24 @@
  "soort": "index",
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
-  "op": "2026-09-28",
-  "commit": "f17c6065"
+  "op": "2026-09-27",
+  "commit": "c19c916e"
  },
  "grens": "Dit register kent GEEN symbool-naar-symboolaanroepen: een naam in aanroeppositie is geen verwijzing. De kanten hier zijn require-kanten, en die wijzen naar een bestand dat bestaat.",
  "gemeten": {
-  "bestandenGezien": 4893,
-  "gelezen": 4584,
+  "bestandenGezien": 4869,
+  "gelezen": 4560,
   "nietGelezen": 309,
   "waarvanBundeldeel": 309,
   "waarvanParsefout": 0,
-  "symbolen": 23592,
-  "bestandenMetUitvoer": 3779,
-  "uitvoerMetNamen": 1620,
+  "symbolen": 23473,
+  "bestandenMetUitvoer": 3757,
+  "uitvoerMetNamen": 1604,
   "uitvoerOnvolledig": 3,
-  "uitvoerZonderNamen": 2156,
-  "zonderUitvoer": 805,
-  "requireKanten": 6128,
-  "seconden": 9.1
+  "uitvoerZonderNamen": 2150,
+  "zonderUitvoer": 803,
+  "requireKanten": 6083,
+  "seconden": 7.8
  },
  "nietGelezen": [
   {
@@ -1570,6 +1570,40 @@
  ],
  "perBestand": [
   {
+   "bestand": "server/accounts/achtergrond.js",
+   "symbolen": [
+    {
+     "naam": "buitenVerzoek",
+     "soort": "functie",
+     "lijn": 15,
+     "geexporteerd": true
+    },
+    {
+     "naam": "eigenTransactie",
+     "soort": "functie",
+     "lijn": 32,
+     "geexporteerd": false
+    }
+   ],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "buitenVerzoek"
+    ]
+   },
+   "requires": [
+    "server/accounts/duurzaamheid.js",
+    "server/accounts/mirror.js",
+    "server/accounts/transactie.js",
+    "server/db/deelnemers.js",
+    "server/db/verzoekcontext.js"
+   ],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/accounts/index.js"
+   ]
+  },
+  {
    "bestand": "server/accounts/actiebewijs.js",
    "symbolen": [
     {
@@ -1701,43 +1735,43 @@
     {
      "naam": "gesloten",
      "soort": "functie",
-     "lijn": 14,
+     "lijn": 17,
      "geexporteerd": true
-    },
-    {
-     "naam": "fout",
-     "soort": "functie",
-     "lijn": 18,
-     "geexporteerd": false
     },
     {
      "naam": "eisMutatie",
      "soort": "functie",
-     "lijn": 25,
+     "lijn": 21,
      "geexporteerd": true
     },
     {
      "naam": "transactieDatabase",
      "soort": "functie",
-     "lijn": 38,
+     "lijn": 36,
      "geexporteerd": true
     },
     {
      "naam": "internePublicatie",
      "soort": "functie",
-     "lijn": 43,
+     "lijn": 41,
      "geexporteerd": true
     },
     {
      "naam": "isAccountSchrijfzin",
      "soort": "pijl",
-     "lijn": 70,
+     "lijn": 68,
      "geexporteerd": true
     },
     {
      "naam": "releaseStand",
      "soort": "functie",
-     "lijn": 78,
+     "lijn": 77,
+     "geexporteerd": true
+    },
+    {
+     "naam": "werkkopieOpen",
+     "soort": "functie",
+     "lijn": 94,
      "geexporteerd": true
     }
    ],
@@ -1750,17 +1784,22 @@
      "internePublicatie",
      "isAccountSchrijfzin",
      "releaseStand",
-     "transactieDatabase"
+     "transactieDatabase",
+     "werkkopieOpen"
     ]
    },
    "requires": [
     "server/accounts/transactie.js",
+    "server/db/deelnemers.js",
+    "server/db/verzoekcommit.js",
     "server/db/verzoekcontext.js"
    ],
    "extern": [],
    "gebruiktDoor": [
+    "server/accounts/achtergrond.js",
     "server/accounts/mirror.js",
     "server/accounts/state.js",
+    "server/scim/user-sync.js",
     "server/sso/index.js"
    ]
   },
@@ -1966,6 +2005,7 @@
     "namen": null
    },
    "requires": [
+    "server/accounts/achtergrond.js",
     "server/accounts/actiebewijs.js",
     "server/accounts/kluis.js",
     "server/accounts/mirror.js",
@@ -2008,31 +2048,31 @@
     {
      "naam": "trekIn",
      "soort": "functie",
-     "lijn": 74,
+     "lijn": 79,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "trekInActie",
      "soort": "functie",
-     "lijn": 104,
+     "lijn": 109,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "trekInSessie",
      "soort": "functie",
-     "lijn": 141,
+     "lijn": 146,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "sessieIngetrokken",
      "soort": "functie",
-     "lijn": 153,
+     "lijn": 158,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "isIngetrokken",
      "soort": "functie",
-     "lijn": 163,
+     "lijn": 168,
      "geexporteerd": "onbekend"
     }
    ],
@@ -2044,6 +2084,7 @@
     "server/accounts/kluis.js",
     "server/accounts/mirror.js",
     "server/accounts/state.js",
+    "server/accounts/transactie.js",
     "server/kern/intreksignaal.js",
     "server/lib/klok.js"
    ],
@@ -2228,7 +2269,7 @@
      "naam": "planAccountHerstel",
      "soort": "functie",
      "lijn": 16,
-     "geexporteerd": false
+     "geexporteerd": true
     },
     {
      "naam": "rawUser",
@@ -2273,69 +2314,75 @@
      "geexporteerd": true
     },
     {
-     "naam": "eisIntrekkingen",
+     "naam": "accountPool",
      "soort": "functie",
      "lijn": 73,
+     "geexporteerd": true
+    },
+    {
+     "naam": "eisIntrekkingen",
+     "soort": "functie",
+     "lijn": 76,
      "geexporteerd": false
     },
     {
      "naam": "bewaarIntrekking",
      "soort": "functie",
-     "lijn": 81,
+     "lijn": 84,
      "geexporteerd": true
     },
     {
      "naam": "gedeeldeIntrekkingen",
      "soort": "functie",
-     "lijn": 85,
+     "lijn": 88,
      "geexporteerd": true
     },
     {
      "naam": "voltooiIntrekkingen",
      "soort": "functie",
-     "lijn": 89,
+     "lijn": 92,
      "geexporteerd": true
     },
     {
      "naam": "upsertLocalUser",
      "soort": "functie",
-     "lijn": 95,
+     "lijn": 98,
      "geexporteerd": false
     },
     {
      "naam": "upsertLocalStaff",
      "soort": "functie",
-     "lijn": 101,
+     "lijn": 104,
      "geexporteerd": false
     },
     {
      "naam": "pullEen",
      "soort": "functie",
-     "lijn": 107,
+     "lijn": 110,
      "geexporteerd": false
     },
     {
      "naam": "startPostgresEenmaal",
      "soort": "functie",
-     "lijn": 143,
+     "lijn": 150,
      "geexporteerd": false
     },
     {
      "naam": "startPostgres",
      "soort": "functie",
-     "lijn": 186,
+     "lijn": 199,
      "geexporteerd": true
     },
     {
      "naam": "onExternalChange",
      "soort": "functie",
-     "lijn": 192,
+     "lijn": 205,
      "geexporteerd": true
     },
     {
      "naam": "flushBijAfsluiten",
      "soort": "functie",
-     "lijn": 193,
+     "lijn": 206,
      "geexporteerd": true
     }
    ],
@@ -2343,6 +2390,7 @@
     "vorm": "object",
     "namen": [
      "PGMODE",
+     "accountPool",
      "authoriteitKlaar",
      "bewaarIntrekking",
      "commitAccountWijzigingen",
@@ -2353,6 +2401,7 @@
      "markUser",
      "nieuwId",
      "onExternalChange",
+     "planAccountHerstel",
      "postgresKlaar",
      "rawStaff",
      "rawUser",
@@ -2364,10 +2413,12 @@
     "server/accounts/duurzaamheid.js",
     "server/accounts/mirror-wachtrij.js",
     "server/accounts/state.js",
+    "server/accounts/transactie.js",
     "server/pgaccounts.js"
    ],
    "extern": [],
    "gebruiktDoor": [
+    "server/accounts/achtergrond.js",
     "server/accounts/dossier.js",
     "server/accounts/herstel.js",
     "server/accounts/index.js",
@@ -2838,61 +2889,109 @@
     {
      "naam": "fout",
      "soort": "pijl",
-     "lijn": 26,
-     "geexporteerd": false
+     "lijn": 36,
+     "geexporteerd": true
     },
     {
      "naam": "q",
      "soort": "pijl",
-     "lijn": 28,
+     "lijn": 38,
      "geexporteerd": false
     },
     {
      "naam": "kolommen",
      "soort": "functie",
-     "lijn": 30,
+     "lijn": 40,
      "geexporteerd": false
     },
     {
      "naam": "maakVolgers",
      "soort": "functie",
-     "lijn": 34,
+     "lijn": 44,
      "geexporteerd": false
     },
     {
      "naam": "rij",
      "soort": "functie",
-     "lijn": 60,
+     "lijn": 70,
      "geexporteerd": false
     },
     {
      "naam": "wijzigingenVan",
      "soort": "functie",
-     "lijn": 62,
+     "lijn": 72,
+     "geexporteerd": false
+    },
+    {
+     "naam": "herstelCache",
+     "soort": "functie",
+     "lijn": 86,
      "geexporteerd": false
     },
     {
      "naam": "ruim",
      "soort": "functie",
-     "lijn": 76,
+     "lijn": 90,
      "geexporteerd": false
+    },
+    {
+     "naam": "bezet",
+     "soort": "functie",
+     "lijn": 117,
+     "geexporteerd": true
+    },
+    {
+     "naam": "bezetDoorAnder",
+     "soort": "functie",
+     "lijn": 118,
+     "geexporteerd": true
+    },
+    {
+     "naam": "generatie",
+     "soort": "functie",
+     "lijn": 121,
+     "geexporteerd": true
+    },
+    {
+     "naam": "vrijeGeneratie",
+     "soort": "functie",
+     "lijn": 125,
+     "geexporteerd": true
+    },
+    {
+     "naam": "nogVers",
+     "soort": "pijl",
+     "lijn": 129,
+     "geexporteerd": true
+    },
+    {
+     "naam": "wachtVrij",
+     "soort": "functie",
+     "lijn": 130,
+     "geexporteerd": true
+    },
+    {
+     "naam": "eisVrij",
+     "soort": "functie",
+     "lijn": 135,
+     "geexporteerd": true
     },
     {
      "naam": "begin",
      "soort": "functie",
-     "lijn": 90,
+     "lijn": 144,
      "geexporteerd": true
     },
     {
      "naam": "database",
      "soort": "functie",
-     "lijn": 141,
+     "lijn": 208,
      "geexporteerd": true
     },
     {
      "naam": "resetVoorToets",
      "soort": "functie",
-     "lijn": 146,
+     "lijn": 213,
      "geexporteerd": true
     }
    ],
@@ -2900,8 +2999,16 @@
     "vorm": "object",
     "namen": [
      "begin",
+     "bezet",
+     "bezetDoorAnder",
      "database",
-     "resetVoorToets"
+     "eisVrij",
+     "fout",
+     "generatie",
+     "nogVers",
+     "resetVoorToets",
+     "vrijeGeneratie",
+     "wachtVrij"
     ]
    },
    "requires": [
@@ -2913,7 +3020,11 @@
     "node:sqlite"
    ],
    "gebruiktDoor": [
-    "server/accounts/duurzaamheid.js"
+    "server/accounts/achtergrond.js",
+    "server/accounts/duurzaamheid.js",
+    "server/accounts/intreklijst.js",
+    "server/accounts/mirror.js",
+    "server/accounts/users.js"
    ]
   },
   {
@@ -3030,7 +3141,7 @@
     {
      "naam": "publicUser",
      "soort": "functie",
-     "lijn": 267,
+     "lijn": 270,
      "geexporteerd": true
     }
    ],
@@ -3093,7 +3204,8 @@
     "server/accounts/onderhoud.js",
     "server/accounts/publiekmail.js",
     "server/accounts/state.js",
-    "server/accounts/tokens.js"
+    "server/accounts/tokens.js",
+    "server/accounts/transactie.js"
    ],
    "extern": [
     "crypto"
@@ -6425,21 +6537,33 @@
      "geexporteerd": true
     },
     {
+     "naam": "account",
+     "soort": "pijl",
+     "lijn": 41,
+     "geexporteerd": false
+    },
+    {
+     "naam": "meldAccountFout",
+     "soort": "functie",
+     "lijn": 47,
+     "geexporteerd": false
+    },
+    {
      "naam": "wisDossier",
      "soort": "functie",
-     "lijn": 38,
+     "lijn": 55,
      "geexporteerd": false
     },
     {
      "naam": "veeg",
      "soort": "functie",
-     "lijn": 44,
+     "lijn": 63,
      "geexporteerd": false
     },
     {
      "naam": "start",
      "soort": "functie",
-     "lijn": 107,
+     "lijn": 126,
      "geexporteerd": false
     }
    ],
@@ -7387,6 +7511,58 @@
    "extern": [],
    "gebruiktDoor": [
     "server/db/sqlite.js"
+   ]
+  },
+  {
+   "bestand": "server/db/deelnemers.js",
+   "symbolen": [
+    {
+     "naam": "meld",
+     "soort": "functie",
+     "lijn": 24,
+     "geexporteerd": false
+    },
+    {
+     "naam": "metWerk",
+     "soort": "functie",
+     "lijn": 28,
+     "geexporteerd": true
+    },
+    {
+     "naam": "pasToe",
+     "soort": "functie",
+     "lijn": 32,
+     "geexporteerd": true
+    },
+    {
+     "naam": "publiceer",
+     "soort": "functie",
+     "lijn": 39,
+     "geexporteerd": true
+    },
+    {
+     "naam": "annuleer",
+     "soort": "functie",
+     "lijn": 49,
+     "geexporteerd": true
+    }
+   ],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "annuleer",
+     "metWerk",
+     "pasToe",
+     "publiceer"
+    ]
+   },
+   "requires": [],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/accounts/achtergrond.js",
+    "server/accounts/duurzaamheid.js",
+    "server/db/verzoekcontext.js",
+    "server/pg/verzoektransactie.js"
    ]
   },
   {
@@ -8343,45 +8519,39 @@
      "geexporteerd": "onbekend"
     },
     {
-     "naam": "commit",
-     "soort": "functie",
-     "lijn": 96,
-     "geexporteerd": "onbekend"
-    },
-    {
      "naam": "middleware",
      "soort": "functie",
-     "lijn": 110,
+     "lijn": 100,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "herstel",
      "soort": "pijl",
-     "lijn": 121,
+     "lijn": 111,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "stroomMagOpen",
      "soort": "pijl",
-     "lijn": 128,
+     "lijn": 118,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openStroom",
      "soort": "pijl",
-     "lijn": 130,
+     "lijn": 121,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "ruim",
      "soort": "pijl",
-     "lijn": 167,
+     "lijn": 158,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "stop",
      "soort": "functie",
-     "lijn": 207,
+     "lijn": 198,
      "geexporteerd": "onbekend"
     }
    ],
@@ -8392,6 +8562,7 @@
    "requires": [
     "server/db/opslagfout.js",
     "server/db/resync.js",
+    "server/db/verzoekcommit.js",
     "server/db/verzoekcontext.js"
    ],
    "extern": [],
@@ -9360,168 +9531,215 @@
    ]
   },
   {
+   "bestand": "server/db/verzoekcommit.js",
+   "symbolen": [
+    {
+     "naam": "teCommitten",
+     "soort": "functie",
+     "lijn": 13,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "commit",
+     "soort": "functie",
+     "lijn": 17,
+     "geexporteerd": "onbekend"
+    }
+   ],
+   "uitvoer": {
+    "vorm": "functie",
+    "namen": null
+   },
+   "requires": [
+    "server/db/verzoekcontext.js"
+   ],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/accounts/duurzaamheid.js",
+    "server/db/postgres-verzoeken.js"
+   ]
+  },
+  {
    "bestand": "server/db/verzoekcontext.js",
    "symbolen": [
     {
      "naam": "heeft",
      "soort": "pijl",
-     "lijn": 14,
+     "lijn": 15,
      "geexporteerd": false
     },
     {
      "naam": "eisMutatieOpen",
      "soort": "functie",
-     "lijn": 17,
+     "lijn": 18,
      "geexporteerd": false
     },
     {
      "naam": "kloonMetKaart",
      "soort": "functie",
-     "lijn": 23,
+     "lijn": 24,
      "geexporteerd": false
     },
     {
      "naam": "loop",
      "soort": "functie",
-     "lijn": 25,
+     "lijn": 26,
      "geexporteerd": false
     },
     {
      "naam": "nieuw",
      "soort": "functie",
-     "lijn": 36,
+     "lijn": 37,
      "geexporteerd": true
     },
     {
      "naam": "huidige",
      "soort": "functie",
-     "lijn": 44,
+     "lijn": 45,
      "geexporteerd": true
     },
     {
      "naam": "voer",
      "soort": "functie",
-     "lijn": 45,
+     "lijn": 46,
      "geexporteerd": true
     },
     {
      "naam": "zonder",
      "soort": "functie",
-     "lijn": 46,
+     "lijn": 47,
      "geexporteerd": true
     },
     {
      "naam": "eigenWerk",
      "soort": "functie",
-     "lijn": 50,
+     "lijn": 51,
      "geexporteerd": true
     },
     {
      "naam": "vakVoor",
      "soort": "functie",
-     "lijn": 52,
+     "lijn": 53,
      "geexporteerd": false
     },
     {
      "naam": "wortelVoor",
      "soort": "functie",
-     "lijn": 67,
+     "lijn": 68,
      "geexporteerd": false
     },
     {
      "naam": "dataVoor",
      "soort": "functie",
-     "lijn": 119,
+     "lijn": 120,
      "geexporteerd": true
     },
     {
      "naam": "zetWortel",
      "soort": "functie",
-     "lijn": 124,
+     "lijn": 125,
      "geexporteerd": true
     },
     {
      "naam": "noteerSave",
      "soort": "functie",
-     "lijn": 136,
+     "lijn": 137,
      "geexporteerd": true
     },
     {
      "naam": "haakVoorCommit",
      "soort": "functie",
-     "lijn": 148,
+     "lijn": 149,
      "geexporteerd": true
     },
     {
      "naam": "haakNaCommit",
      "soort": "functie",
-     "lijn": 153,
+     "lijn": 154,
      "geexporteerd": true
     },
     {
      "naam": "draaiVoorCommit",
      "soort": "functie",
-     "lijn": 160,
+     "lijn": 161,
      "geexporteerd": true
     },
     {
      "naam": "meldEffectFout",
      "soort": "functie",
-     "lijn": 163,
+     "lijn": 164,
      "geexporteerd": false
     },
     {
      "naam": "draaiNaCommit",
      "soort": "functie",
-     "lijn": 168,
+     "lijn": 169,
      "geexporteerd": true
     },
     {
      "naam": "verzamelWijzigingen",
      "soort": "functie",
-     "lijn": 177,
+     "lijn": 178,
      "geexporteerd": false
     },
     {
      "naam": "wijzigingen",
      "soort": "functie",
-     "lijn": 189,
+     "lijn": 190,
      "geexporteerd": true
     },
     {
      "naam": "onbevestigdeWijzigingen",
      "soort": "functie",
-     "lijn": 190,
+     "lijn": 191,
      "geexporteerd": true
     },
     {
      "naam": "eigenCommit",
      "soort": "functie",
-     "lijn": 192,
+     "lijn": 193,
      "geexporteerd": true
     },
     {
      "naam": "beginAchtergrond",
      "soort": "functie",
-     "lijn": 199,
+     "lijn": 200,
      "geexporteerd": true
     },
     {
      "naam": "voltooiAchtergrond",
      "soort": "functie",
-     "lijn": 202,
+     "lijn": 203,
      "geexporteerd": true
     },
     {
      "naam": "annuleerAchtergrond",
      "soort": "functie",
-     "lijn": 207,
+     "lijn": 208,
+     "geexporteerd": true
+    },
+    {
+     "naam": "registreerDeelnemer",
+     "soort": "functie",
+     "lijn": 213,
+     "geexporteerd": true
+    },
+    {
+     "naam": "deelnemersMetWerk",
+     "soort": "functie",
+     "lijn": 221,
+     "geexporteerd": true
+    },
+    {
+     "naam": "heeftDeelnemers",
+     "soort": "functie",
+     "lijn": 224,
      "geexporteerd": true
     },
     {
      "naam": "sluit",
      "soort": "functie",
-     "lijn": 209,
+     "lijn": 229,
      "geexporteerd": true
     }
    ],
@@ -9531,16 +9749,19 @@
      "annuleerAchtergrond",
      "beginAchtergrond",
      "dataVoor",
+     "deelnemersMetWerk",
      "draaiNaCommit",
      "draaiVoorCommit",
      "eigenCommit",
      "eigenWerk",
      "haakNaCommit",
      "haakVoorCommit",
+     "heeftDeelnemers",
      "huidige",
      "nieuw",
      "noteerSave",
      "onbevestigdeWijzigingen",
+     "registreerDeelnemer",
      "sluit",
      "voer",
      "voltooiAchtergrond",
@@ -9550,12 +9771,14 @@
     ]
    },
    "requires": [
+    "server/db/deelnemers.js",
     "server/db/verzoekwikkel.js"
    ],
    "extern": [
     "async_hooks"
    ],
    "gebruiktDoor": [
+    "server/accounts/achtergrond.js",
     "server/accounts/duurzaamheid.js",
     "server/accounts/transactie.js",
     "server/bus.js",
@@ -9566,6 +9789,7 @@
     "server/db/postgres-verzoeken.js",
     "server/db/state.js",
     "server/db/tx/index.js",
+    "server/db/verzoekcommit.js",
     "server/kern/sessies.js",
     "server/lib/dubbeltik.js",
     "server/lib/handelingsspoor.js",
@@ -11583,21 +11807,6 @@
    ]
   },
   {
-   "bestand": "server/functies/register/cat-democratie.js",
-   "symbolen": [],
-   "uitvoer": {
-    "vorm": "anders",
-    "namen": null
-   },
-   "requires": [
-    "server/functies/register/doelgroepen.js"
-   ],
-   "extern": [],
-   "gebruiktDoor": [
-    "server/functies/register/index.js"
-   ]
-  },
-  {
    "bestand": "server/functies/register/cat-domeinen.js",
    "symbolen": [],
    "uitvoer": {
@@ -11825,7 +12034,6 @@
    "gebruiktDoor": [
     "server/functies/register/cat-apps.js",
     "server/functies/register/cat-apps2.js",
-    "server/functies/register/cat-democratie.js",
     "server/functies/register/cat-domeinen.js",
     "server/functies/register/cat-domeinen2.js",
     "server/functies/register/cat-domeinen3.js",
@@ -11910,7 +12118,6 @@
     "server/functies/register/cat-apps.js",
     "server/functies/register/cat-apps2.js",
     "server/functies/register/cat-command.js",
-    "server/functies/register/cat-democratie.js",
     "server/functies/register/cat-domeinen.js",
     "server/functies/register/cat-domeinen2.js",
     "server/functies/register/cat-domeinen3.js",
@@ -11976,43 +12183,43 @@
     {
      "naam": "heeftLandRegels",
      "soort": "functie",
-     "lijn": 91,
+     "lijn": 86,
      "geexporteerd": true
     },
     {
      "naam": "plaatsNorm",
      "soort": "functie",
-     "lijn": 102,
+     "lijn": 97,
      "geexporteerd": true
     },
     {
      "naam": "heeftPlaatsRegels",
      "soort": "functie",
-     "lijn": 108,
+     "lijn": 103,
      "geexporteerd": true
     },
     {
      "naam": "heeftGenreRegels",
      "soort": "functie",
-     "lijn": 115,
+     "lijn": 110,
      "geexporteerd": true
     },
     {
      "naam": "volgKoppels",
      "soort": "functie",
-     "lijn": 128,
+     "lijn": 123,
      "geexporteerd": true
     },
     {
      "naam": "effectief",
      "soort": "pijl",
-     "lijn": 132,
+     "lijn": 127,
      "geexporteerd": false
     },
     {
      "naam": "padGeblokkeerd",
      "soort": "functie",
-     "lijn": 149,
+     "lijn": 144,
      "geexporteerd": true
     }
    ],
@@ -13863,37 +14070,37 @@
     {
      "naam": "schakelGenre",
      "soort": "functie",
-     "lijn": 49,
+     "lijn": 48,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "genreRegels",
      "soort": "functie",
-     "lijn": 66,
+     "lijn": 64,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "genreStandaard",
      "soort": "functie",
-     "lijn": 77,
+     "lijn": 75,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "schakelFase",
      "soort": "functie",
-     "lijn": 86,
+     "lijn": 84,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "schakelAlles",
      "soort": "functie",
-     "lijn": 107,
+     "lijn": 105,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "schakelFijn",
      "soort": "functie",
-     "lijn": 127,
+     "lijn": 125,
      "geexporteerd": "onbekend"
     }
    ],
@@ -28688,49 +28895,49 @@
     {
      "naam": "breder",
      "soort": "functie",
-     "lijn": 97,
+     "lijn": 96,
      "geexporteerd": false
     },
     {
      "naam": "terug",
      "soort": "functie",
-     "lijn": 118,
+     "lijn": 117,
      "geexporteerd": false
     },
     {
      "naam": "af",
      "soort": "functie",
-     "lijn": 138,
+     "lijn": 137,
      "geexporteerd": false
     },
     {
      "naam": "meting5xx",
      "soort": "functie",
-     "lijn": 150,
+     "lijn": 149,
      "geexporteerd": false
     },
     {
      "naam": "kaartVan",
      "soort": "functie",
-     "lijn": 165,
+     "lijn": 164,
      "geexporteerd": false
     },
     {
      "naam": "lopende",
      "soort": "functie",
-     "lijn": 182,
+     "lijn": 181,
      "geexporteerd": false
     },
     {
      "naam": "weeg",
      "soort": "functie",
-     "lijn": 195,
+     "lijn": 194,
      "geexporteerd": false
     },
     {
      "naam": "stand",
      "soort": "functie",
-     "lijn": 208,
+     "lijn": 207,
      "geexporteerd": false
     }
    ],
@@ -29467,31 +29674,31 @@
     {
      "naam": "wisActor",
      "soort": "functie",
-     "lijn": 112,
+     "lijn": 109,
      "geexporteerd": false
     },
     {
      "naam": "controleer",
      "soort": "functie",
-     "lijn": 139,
+     "lijn": 136,
      "geexporteerd": false
     },
     {
      "naam": "overObject",
      "soort": "functie",
-     "lijn": 151,
+     "lijn": 148,
      "geexporteerd": false
     },
     {
      "naam": "recent",
      "soort": "functie",
-     "lijn": 156,
+     "lijn": 153,
      "geexporteerd": false
     },
     {
      "naam": "herbeleef",
      "soort": "functie",
-     "lijn": 168,
+     "lijn": 165,
      "geexporteerd": false
     }
    ],
@@ -37336,642 +37543,6 @@
    ]
   },
   {
-   "bestand": "server/kern/democratie/afhankelijkheden.js",
-   "symbolen": [],
-   "uitvoer": {
-    "vorm": "object",
-    "namen": [
-     "GEINJECTEERD",
-     "MODULES",
-     "ROUTES"
-    ]
-   },
-   "requires": [],
-   "extern": [],
-   "gebruiktDoor": [
-    "server/kern/democratie/index.js"
-   ]
-  },
-  {
-   "bestand": "server/kern/democratie/beeld.js",
-   "symbolen": [
-    {
-     "naam": "maakBeeld",
-     "soort": "functie",
-     "lijn": 19,
-     "geexporteerd": true
-    },
-    {
-     "naam": "tijd",
-     "soort": "pijl",
-     "lijn": 21,
-     "geexporteerd": false
-    }
-   ],
-   "uitvoer": {
-    "vorm": "object",
-    "namen": [
-     "maakBeeld"
-    ]
-   },
-   "requires": [],
-   "extern": [],
-   "gebruiktDoor": [
-    "server/kern/democratie/index.js"
-   ]
-  },
-  {
-   "bestand": "server/kern/democratie/bewijsstand.js",
-   "symbolen": [],
-   "uitvoer": {
-    "vorm": "object",
-    "namen": [
-     "BEWIJSSTAND"
-    ]
-   },
-   "requires": [],
-   "extern": [],
-   "gebruiktDoor": [
-    "server/kern/democratie/index.js"
-   ]
-  },
-  {
-   "bestand": "server/kern/democratie/doe-bijeenkomst.js",
-   "symbolen": [
-    {
-     "naam": "plan",
-     "soort": "pijl",
-     "lijn": 16,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "afgelast",
-     "soort": "pijl",
-     "lijn": 34,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "antwoord",
-     "soort": "pijl",
-     "lijn": 38,
-     "geexporteerd": "onbekend"
-    }
-   ],
-   "uitvoer": {
-    "vorm": "functie",
-    "namen": null
-   },
-   "requires": [],
-   "extern": [],
-   "gebruiktDoor": [
-    "server/kern/democratie/doe.js"
-   ]
-  },
-  {
-   "bestand": "server/kern/democratie/doe.js",
-   "symbolen": [
-    {
-     "naam": "maakDoe",
-     "soort": "functie",
-     "lijn": 42,
-     "geexporteerd": true
-    },
-    {
-     "naam": "vind",
-     "soort": "pijl",
-     "lijn": 43,
-     "geexporteerd": false
-    },
-    {
-     "naam": "mijnRefs",
-     "soort": "pijl",
-     "lijn": 44,
-     "geexporteerd": false
-    },
-    {
-     "naam": "doetMee",
-     "soort": "pijl",
-     "lijn": 45,
-     "geexporteerd": false
-    },
-    {
-     "naam": "startte",
-     "soort": "pijl",
-     "lijn": 46,
-     "geexporteerd": false
-    },
-    {
-     "naam": "dag",
-     "soort": "pijl",
-     "lijn": 47,
-     "geexporteerd": false
-    },
-    {
-     "naam": "tel",
-     "soort": "pijl",
-     "lijn": 48,
-     "geexporteerd": false
-    },
-    {
-     "naam": "beeld",
-     "soort": "functie",
-     "lijn": 50,
-     "geexporteerd": false
-    },
-    {
-     "naam": "opKwestie",
-     "soort": "pijl",
-     "lijn": 69,
-     "geexporteerd": false
-    },
-    {
-     "naam": "start",
-     "soort": "functie",
-     "lijn": 73,
-     "geexporteerd": false
-    },
-    {
-     "naam": "lijst",
-     "soort": "pijl",
-     "lijn": 98,
-     "geexporteerd": false
-    },
-    {
-     "naam": "op",
-     "soort": "functie",
-     "lijn": 104,
-     "geexporteerd": false
-    },
-    {
-     "naam": "aansluit",
-     "soort": "pijl",
-     "lijn": 117,
-     "geexporteerd": false
-    },
-    {
-     "naam": "verlaat",
-     "soort": "pijl",
-     "lijn": 130,
-     "geexporteerd": false
-    },
-    {
-     "naam": "resultaat",
-     "soort": "pijl",
-     "lijn": 136,
-     "geexporteerd": false
-    },
-    {
-     "naam": "stop",
-     "soort": "pijl",
-     "lijn": 140,
-     "geexporteerd": false
-    }
-   ],
-   "uitvoer": {
-    "vorm": "object",
-    "namen": [
-     "maakDoe"
-    ]
-   },
-   "requires": [
-    "server/kern/democratie/doe-bijeenkomst.js",
-    "server/kern/util.js"
-   ],
-   "extern": [],
-   "gebruiktDoor": [
-    "server/kern/democratie/index.js"
-   ]
-  },
-  {
-   "bestand": "server/kern/democratie/eindstanden.js",
-   "symbolen": [],
-   "uitvoer": {
-    "vorm": "object",
-    "namen": [
-     "EINDSTANDEN",
-     "EINDSTAND_VAN",
-     "LOPEND",
-     "TERUGKOPPELING"
-    ]
-   },
-   "requires": [],
-   "extern": [],
-   "gebruiktDoor": [
-    "server/kern/democratie/index.js",
-    "server/kern/democratie/kwestie.js",
-    "server/kern/democratie/lid.js",
-    "server/kern/democratie/meter.js"
-   ]
-  },
-  {
-   "bestand": "server/kern/democratie/index.js",
-   "symbolen": [
-    {
-     "naam": "maakDemocratie",
-     "soort": "functie",
-     "lijn": 39,
-     "geexporteerd": true
-    },
-    {
-     "naam": "kaart",
-     "soort": "pijl",
-     "lijn": 43,
-     "geexporteerd": false
-    },
-    {
-     "naam": "kijk",
-     "soort": "pijl",
-     "lijn": 44,
-     "geexporteerd": false
-    },
-    {
-     "naam": "wie",
-     "soort": "pijl",
-     "lijn": 53,
-     "geexporteerd": false
-    },
-    {
-     "naam": "zoek",
-     "soort": "pijl",
-     "lijn": 58,
-     "geexporteerd": false
-    },
-    {
-     "naam": "ontvangersVan",
-     "soort": "pijl",
-     "lijn": 61,
-     "geexporteerd": false
-    },
-    {
-     "naam": "betrokken",
-     "soort": "pijl",
-     "lijn": 69,
-     "geexporteerd": false
-    },
-    {
-     "naam": "metActies",
-     "soort": "pijl",
-     "lijn": 76,
-     "geexporteerd": false
-    },
-    {
-     "naam": "lijst",
-     "soort": "functie",
-     "lijn": 78,
-     "geexporteerd": false
-    },
-    {
-     "naam": "behandel",
-     "soort": "functie",
-     "lijn": 83,
-     "geexporteerd": false
-    },
-    {
-     "naam": "sluit",
-     "soort": "functie",
-     "lijn": 99,
-     "geexporteerd": false
-    },
-    {
-     "naam": "heropen",
-     "soort": "functie",
-     "lijn": 122,
-     "geexporteerd": false
-    },
-    {
-     "naam": "meter",
-     "soort": "pijl",
-     "lijn": 141,
-     "geexporteerd": false
-    },
-    {
-     "naam": "vergeet",
-     "soort": "pijl",
-     "lijn": 148,
-     "geexporteerd": false
-    },
-    {
-     "naam": "mijn",
-     "soort": "pijl",
-     "lijn": 152,
-     "geexporteerd": false
-    }
-   ],
-   "uitvoer": {
-    "vorm": "object",
-    "namen": [
-     "maakDemocratie"
-    ]
-   },
-   "requires": [
-    "server/kern/democratie/afhankelijkheden.js",
-    "server/kern/democratie/beeld.js",
-    "server/kern/democratie/bewijsstand.js",
-    "server/kern/democratie/doe.js",
-    "server/kern/democratie/eindstanden.js",
-    "server/kern/democratie/koppeling.js",
-    "server/kern/democratie/kwestie.js",
-    "server/kern/democratie/lid.js",
-    "server/kern/democratie/meter.js",
-    "server/kern/democratie/wek.js",
-    "server/kern/eigencollectie.js",
-    "server/kern/util.js",
-    "server/lib/duurzaam.js",
-    "server/lib/klok.js"
-   ],
-   "extern": [],
-   "gebruiktDoor": [
-    "server/opzet/kernlaag7-ruimtes.js"
-   ]
-  },
-  {
-   "bestand": "server/kern/democratie/koppeling.js",
-   "symbolen": [
-    {
-     "naam": "maakKoppeling",
-     "soort": "functie",
-     "lijn": 22,
-     "geexporteerd": true
-    },
-    {
-     "naam": "nieuwNummer",
-     "soort": "pijl",
-     "lijn": 23,
-     "geexporteerd": false
-    },
-    {
-     "naam": "koppel",
-     "soort": "functie",
-     "lijn": 26,
-     "geexporteerd": false
-    },
-    {
-     "naam": "sleutelVan",
-     "soort": "functie",
-     "lijn": 35,
-     "geexporteerd": false
-    },
-    {
-     "naam": "bekend",
-     "soort": "functie",
-     "lijn": 41,
-     "geexporteerd": false
-    },
-    {
-     "naam": "vergeten",
-     "soort": "functie",
-     "lijn": 46,
-     "geexporteerd": false
-    },
-    {
-     "naam": "nummersVan",
-     "soort": "functie",
-     "lijn": 52,
-     "geexporteerd": false
-    },
-    {
-     "naam": "vergeet",
-     "soort": "functie",
-     "lijn": 58,
-     "geexporteerd": false
-    }
-   ],
-   "uitvoer": {
-    "vorm": "object",
-    "namen": [
-     "maakKoppeling"
-    ]
-   },
-   "requires": [],
-   "extern": [],
-   "gebruiktDoor": [
-    "server/kern/democratie/index.js"
-   ]
-  },
-  {
-   "bestand": "server/kern/democratie/kwestie.js",
-   "symbolen": [
-    {
-     "naam": "maakKwestieSchrijver",
-     "soort": "functie",
-     "lijn": 27,
-     "geexporteerd": true
-    },
-    {
-     "naam": "iso",
-     "soort": "pijl",
-     "lijn": 28,
-     "geexporteerd": false
-    },
-    {
-     "naam": "noteer",
-     "soort": "functie",
-     "lijn": 32,
-     "geexporteerd": false
-    },
-    {
-     "naam": "huidige",
-     "soort": "pijl",
-     "lijn": 38,
-     "geexporteerd": false
-    },
-    {
-     "naam": "loopt",
-     "soort": "pijl",
-     "lijn": 39,
-     "geexporteerd": false
-    },
-    {
-     "naam": "nieuw",
-     "soort": "functie",
-     "lijn": 41,
-     "geexporteerd": false
-    },
-    {
-     "naam": "behandel",
-     "soort": "functie",
-     "lijn": 50,
-     "geexporteerd": false
-    },
-    {
-     "naam": "sluit",
-     "soort": "functie",
-     "lijn": 63,
-     "geexporteerd": false
-    },
-    {
-     "naam": "toetsEindstand",
-     "soort": "functie",
-     "lijn": 77,
-     "geexporteerd": false
-    },
-    {
-     "naam": "heropen",
-     "soort": "functie",
-     "lijn": 93,
-     "geexporteerd": false
-    },
-    {
-     "naam": "volg",
-     "soort": "functie",
-     "lijn": 102,
-     "geexporteerd": false
-    },
-    {
-     "naam": "actie",
-     "soort": "functie",
-     "lijn": 109,
-     "geexporteerd": false
-    },
-    {
-     "naam": "trede",
-     "soort": "functie",
-     "lijn": 114,
-     "geexporteerd": false
-    }
-   ],
-   "uitvoer": {
-    "vorm": "object",
-    "namen": [
-     "maakKwestieSchrijver"
-    ]
-   },
-   "requires": [
-    "server/kern/democratie/eindstanden.js",
-    "server/lib/keten.js"
-   ],
-   "extern": [],
-   "gebruiktDoor": [
-    "server/kern/democratie/index.js"
-   ]
-  },
-  {
-   "bestand": "server/kern/democratie/lid.js",
-   "symbolen": [
-    {
-     "naam": "maakLid",
-     "soort": "functie",
-     "lijn": 17,
-     "geexporteerd": true
-    },
-    {
-     "naam": "nieuwId",
-     "soort": "pijl",
-     "lijn": 18,
-     "geexporteerd": false
-    },
-    {
-     "naam": "inbreng",
-     "soort": "functie",
-     "lijn": 20,
-     "geexporteerd": false
-    },
-    {
-     "naam": "mijn",
-     "soort": "functie",
-     "lijn": 37,
-     "geexporteerd": false
-    },
-    {
-     "naam": "eigenHandeling",
-     "soort": "functie",
-     "lijn": 46,
-     "geexporteerd": false
-    },
-    {
-     "naam": "gezien",
-     "soort": "pijl",
-     "lijn": 54,
-     "geexporteerd": false
-    },
-    {
-     "naam": "intrek",
-     "soort": "pijl",
-     "lijn": 59,
-     "geexporteerd": false
-    }
-   ],
-   "uitvoer": {
-    "vorm": "object",
-    "namen": [
-     "maakLid"
-    ]
-   },
-   "requires": [
-    "server/kern/democratie/eindstanden.js",
-    "server/kern/util.js"
-   ],
-   "extern": [],
-   "gebruiktDoor": [
-    "server/kern/democratie/index.js"
-   ]
-  },
-  {
-   "bestand": "server/kern/democratie/meter.js",
-   "symbolen": [
-    {
-     "naam": "meet",
-     "soort": "functie",
-     "lijn": 33,
-     "geexporteerd": true
-    },
-    {
-     "naam": "breuk",
-     "soort": "pijl",
-     "lijn": 37,
-     "geexporteerd": false
-    }
-   ],
-   "uitvoer": {
-    "vorm": "object",
-    "namen": [
-     "meet"
-    ]
-   },
-   "requires": [
-    "server/kern/democratie/eindstanden.js",
-    "server/lib/keten.js"
-   ],
-   "extern": [],
-   "gebruiktDoor": [
-    "server/kern/democratie/index.js"
-   ]
-  },
-  {
-   "bestand": "server/kern/democratie/wek.js",
-   "symbolen": [
-    {
-     "naam": "maakWek",
-     "soort": "functie",
-     "lijn": 12,
-     "geexporteerd": true
-    },
-    {
-     "naam": "wek",
-     "soort": "functie",
-     "lijn": 15,
-     "geexporteerd": false
-    },
-    {
-     "naam": "herbezorg",
-     "soort": "functie",
-     "lijn": 39,
-     "geexporteerd": false
-    }
-   ],
-   "uitvoer": {
-    "vorm": "object",
-    "namen": [
-     "maakWek"
-    ]
-   },
-   "requires": [],
-   "extern": [],
-   "gebruiktDoor": [
-    "server/kern/democratie/index.js"
-   ]
-  },
-  {
    "bestand": "server/kern/demostand.js",
    "symbolen": [
     {
@@ -39785,7 +39356,6 @@
     "server/kern/commercie/tegoed.js",
     "server/kern/commercie/voornemen.js",
     "server/kern/commercie/zaakabonnement.js",
-    "server/kern/democratie/index.js",
     "server/kern/directpay/index.js",
     "server/kern/doelen.js",
     "server/kern/drm.js",
@@ -70771,25 +70341,25 @@
     {
      "naam": "fout",
      "soort": "pijl",
-     "lijn": 26,
+     "lijn": 25,
      "geexporteerd": false
     },
     {
      "naam": "kies",
      "soort": "functie",
-     "lijn": 28,
+     "lijn": 27,
      "geexporteerd": false
     },
     {
      "naam": "onderneming",
      "soort": "functie",
-     "lijn": 38,
+     "lijn": 37,
      "geexporteerd": false
     },
     {
      "naam": "ontslag",
      "soort": "functie",
-     "lijn": 54,
+     "lijn": 53,
      "geexporteerd": false
     }
    ],
@@ -70805,7 +70375,6 @@
     "server/kern/magnaat-leven/geld.js",
     "server/kern/magnaat-leven/gesprek.js",
     "server/kern/magnaat-leven/gids.js",
-    "server/kern/magnaat-leven/groei.js",
     "server/kern/magnaat-leven/klanten.js",
     "server/kern/magnaat-leven/opdracht.js",
     "server/kern/magnaat-leven/regels.js",
@@ -70821,70 +70390,18 @@
    ]
   },
   {
-   "bestand": "server/kern/magnaat-leven/bereik.js",
-   "symbolen": [
-    {
-     "naam": "zetKring",
-     "soort": "pijl",
-     "lijn": 17,
-     "geexporteerd": true
-    },
-    {
-     "naam": "concurrenten",
-     "soort": "functie",
-     "lijn": 19,
-     "geexporteerd": true
-    },
-    {
-     "naam": "zichtbaarheid",
-     "soort": "functie",
-     "lijn": 26,
-     "geexporteerd": true
-    },
-    {
-     "naam": "teamMax",
-     "soort": "pijl",
-     "lijn": 32,
-     "geexporteerd": true
-    }
-   ],
-   "uitvoer": {
-    "vorm": "object",
-    "namen": [
-     "concurrenten",
-     "teamMax",
-     "zetKring",
-     "zichtbaarheid"
-    ]
-   },
-   "requires": [
-    "server/kern/magnaat-leven/regels-bedrijf.js",
-    "server/kern/magnaat-leven/regels-groei.js",
-    "server/kern/magnaat-leven/regels-markt.js"
-   ],
-   "extern": [],
-   "gebruiktDoor": [
-    "server/kern/magnaat-leven/bewaking.js",
-    "server/kern/magnaat-leven/groei.js",
-    "server/kern/magnaat-leven/markt.js",
-    "server/kern/magnaat-leven/stad.js",
-    "server/kern/magnaat-leven/team.js",
-    "server/kern/magnaat-leven/volgende-bedrijf.js"
-   ]
-  },
-  {
    "bestand": "server/kern/magnaat-leven/bewaking.js",
    "symbolen": [
     {
      "naam": "controleer",
      "soort": "functie",
-     "lijn": 24,
+     "lijn": 23,
      "geexporteerd": true
     },
     {
      "naam": "bevries",
      "soort": "functie",
-     "lijn": 47,
+     "lijn": 46,
      "geexporteerd": true
     }
    ],
@@ -70896,7 +70413,6 @@
     ]
    },
    "requires": [
-    "server/kern/magnaat-leven/bereik.js",
     "server/kern/magnaat-leven/regels-bedrijf.js"
    ],
    "extern": [],
@@ -71007,7 +70523,6 @@
    "gebruiktDoor": [
     "server/kern/magnaat-leven/acties.js",
     "server/kern/magnaat-leven/geld.js",
-    "server/kern/magnaat-leven/groei.js",
     "server/kern/magnaat-leven/index.js",
     "server/kern/magnaat-leven/opdracht.js",
     "server/kern/magnaat-leven/team.js",
@@ -71099,39 +70614,45 @@
    "bestand": "server/kern/magnaat-leven/dag.js",
    "symbolen": [
     {
+     "naam": "ontvangen",
+     "soort": "functie",
+     "lijn": 36,
+     "geexporteerd": true
+    },
+    {
      "naam": "loonPer",
      "soort": "pijl",
-     "lijn": 37,
+     "lijn": 40,
      "geexporteerd": true
     },
     {
      "naam": "wieJeBent",
      "soort": "functie",
-     "lijn": 39,
+     "lijn": 42,
      "geexporteerd": false
     },
     {
      "naam": "weken",
      "soort": "pijl",
-     "lijn": 56,
+     "lijn": 59,
      "geexporteerd": false
     },
     {
      "naam": "keer",
      "soort": "pijl",
-     "lijn": 57,
+     "lijn": 60,
      "geexporteerd": false
     },
     {
      "naam": "uitzetting",
      "soort": "functie",
-     "lijn": 62,
+     "lijn": 65,
      "geexporteerd": false
     },
     {
      "naam": "volgendeDag",
      "soort": "functie",
-     "lijn": 79,
+     "lijn": 82,
      "geexporteerd": true
     }
    ],
@@ -71147,7 +70668,6 @@
     "server/kern/magnaat-leven/contract.js",
     "server/kern/magnaat-leven/geld.js",
     "server/kern/magnaat-leven/gesprek.js",
-    "server/kern/magnaat-leven/groei.js",
     "server/kern/magnaat-leven/markt.js",
     "server/kern/magnaat-leven/opdracht.js",
     "server/kern/magnaat-leven/regels.js",
@@ -71209,15 +70729,9 @@
      "geexporteerd": true
     },
     {
-     "naam": "ontvangen",
-     "soort": "functie",
-     "lijn": 120,
-     "geexporteerd": true
-    },
-    {
      "naam": "volgendeLoondag",
      "soort": "functie",
-     "lijn": 125,
+     "lijn": 119,
      "geexporteerd": false
     }
    ],
@@ -71226,7 +70740,6 @@
     "namen": [
      "betaalWatVervalt",
      "lenen",
-     "ontvangen",
      "startDag",
      "uitstel"
     ]
@@ -71241,7 +70754,6 @@
     "server/kern/magnaat-leven/acties.js",
     "server/kern/magnaat-leven/dag.js",
     "server/kern/magnaat-leven/gesprek.js",
-    "server/kern/magnaat-leven/groei.js",
     "server/kern/magnaat-leven/team.js",
     "server/kern/magnaat-leven/vestiging.js"
    ]
@@ -71376,113 +70888,10 @@
     "server/kern/magnaat-leven/acties.js",
     "server/kern/magnaat-leven/contract.js",
     "server/kern/magnaat-leven/gesprek.js",
-    "server/kern/magnaat-leven/groei.js",
     "server/kern/magnaat-leven/opdracht.js",
     "server/kern/magnaat-leven/team.js",
     "server/kern/magnaat-leven/vestiging.js",
     "server/kern/magnaat-leven/voorraad.js",
-    "server/kern/magnaat-leven/weergave.js"
-   ]
-  },
-  {
-   "bestand": "server/kern/magnaat-leven/groei.js",
-   "symbolen": [
-    {
-     "naam": "fout",
-     "soort": "pijl",
-     "lijn": 28,
-     "geexporteerd": false
-    },
-    {
-     "naam": "groei",
-     "soort": "pijl",
-     "lijn": 29,
-     "geexporteerd": false
-    },
-    {
-     "naam": "eerst",
-     "soort": "pijl",
-     "lijn": 30,
-     "geexporteerd": false
-    },
-    {
-     "naam": "kredietRuimte",
-     "soort": "functie",
-     "lijn": 33,
-     "geexporteerd": true
-    },
-    {
-     "naam": "krediet",
-     "soort": "functie",
-     "lijn": 37,
-     "geexporteerd": true
-    },
-    {
-     "naam": "filiaal",
-     "soort": "functie",
-     "lijn": 61,
-     "geexporteerd": true
-    },
-    {
-     "naam": "filiaalHuur",
-     "soort": "functie",
-     "lijn": 80,
-     "geexporteerd": false
-    },
-    {
-     "naam": "overnamePrijs",
-     "soort": "functie",
-     "lijn": 87,
-     "geexporteerd": true
-    },
-    {
-     "naam": "neemOver",
-     "soort": "functie",
-     "lijn": 91,
-     "geexporteerd": true
-    },
-    {
-     "naam": "groeiDag",
-     "soort": "functie",
-     "lijn": 111,
-     "geexporteerd": true
-    },
-    {
-     "naam": "groeiBeeld",
-     "soort": "functie",
-     "lijn": 129,
-     "geexporteerd": true
-    }
-   ],
-   "uitvoer": {
-    "vorm": "object",
-    "namen": [
-     "filiaal",
-     "groeiBeeld",
-     "groeiDag",
-     "krediet",
-     "kredietRuimte",
-     "neemOver",
-     "overnamePrijs"
-    ]
-   },
-   "requires": [
-    "server/kern/magnaat-leven/bereik.js",
-    "server/kern/magnaat-leven/boek.js",
-    "server/kern/magnaat-leven/geld.js",
-    "server/kern/magnaat-leven/gids.js",
-    "server/kern/magnaat-leven/markt.js",
-    "server/kern/magnaat-leven/regels-groei.js",
-    "server/kern/magnaat-leven/regels-markt.js",
-    "server/kern/magnaat-leven/regels.js",
-    "server/kern/magnaat-leven/staat.js",
-    "server/kern/magnaat-leven/team.js"
-   ],
-   "extern": [],
-   "gebruiktDoor": [
-    "server/kern/magnaat-leven/acties.js",
-    "server/kern/magnaat-leven/dag.js",
-    "server/kern/magnaat-leven/volgende-bedrijf.js",
     "server/kern/magnaat-leven/weergave.js"
    ]
   },
@@ -71492,61 +70901,61 @@
     {
      "naam": "maakLeven",
      "soort": "functie",
-     "lijn": 24,
+     "lijn": 23,
      "geexporteerd": true
     },
     {
      "naam": "levens",
      "soort": "pijl",
-     "lijn": 27,
+     "lijn": 26,
      "geexporteerd": false
     },
     {
      "naam": "haal",
      "soort": "functie",
-     "lijn": 29,
+     "lijn": 28,
      "geexporteerd": false
     },
     {
      "naam": "bijrekenen",
      "soort": "functie",
-     "lijn": 53,
+     "lijn": 51,
      "geexporteerd": false
     },
     {
      "naam": "bewaarEnToon",
      "soort": "functie",
-     "lijn": 65,
+     "lijn": 62,
      "geexporteerd": false
     },
     {
      "naam": "staat",
      "soort": "functie",
-     "lijn": 73,
+     "lijn": 70,
      "geexporteerd": false
     },
     {
      "naam": "beschermd",
      "soort": "functie",
-     "lijn": 86,
+     "lijn": 83,
      "geexporteerd": false
     },
     {
      "naam": "actie",
      "soort": "functie",
-     "lijn": 110,
+     "lijn": 109,
      "geexporteerd": false
     },
     {
      "naam": "voerUit",
      "soort": "functie",
-     "lijn": 125,
+     "lijn": 124,
      "geexporteerd": false
     },
     {
      "naam": "oordelen",
      "soort": "pijl",
-     "lijn": 164,
+     "lijn": 156,
      "geexporteerd": false
     }
    ],
@@ -71670,79 +71079,79 @@
     {
      "naam": "opKwartje",
      "soort": "pijl",
-     "lijn": 25,
+     "lijn": 23,
      "geexporteerd": false
     },
     {
      "naam": "tussen",
      "soort": "pijl",
-     "lijn": 26,
+     "lijn": 24,
      "geexporteerd": false
     },
     {
      "naam": "reputatie",
      "soort": "functie",
-     "lijn": 28,
+     "lijn": 26,
      "geexporteerd": true
     },
     {
      "naam": "kwaliteit",
      "soort": "pijl",
-     "lijn": 33,
-     "geexporteerd": true
+     "lijn": 31,
+     "geexporteerd": false
     },
     {
      "naam": "verkopers",
      "soort": "functie",
-     "lijn": 36,
+     "lijn": 34,
      "geexporteerd": false
     },
     {
      "naam": "aandelen",
      "soort": "functie",
-     "lijn": 48,
+     "lijn": 45,
      "geexporteerd": true
     },
     {
      "naam": "stadsvraag",
      "soort": "functie",
-     "lijn": 67,
+     "lijn": 64,
      "geexporteerd": false
     },
     {
      "naam": "mijnVraag",
      "soort": "pijl",
-     "lijn": 73,
+     "lijn": 70,
      "geexporteerd": true
     },
     {
      "naam": "concurrentenReageren",
      "soort": "functie",
-     "lijn": 76,
+     "lijn": 73,
      "geexporteerd": false
     },
     {
      "naam": "marktklant",
      "soort": "functie",
-     "lijn": 93,
-     "geexporteerd": true
+     "lijn": 90,
+     "geexporteerd": false
     },
     {
      "naam": "leads",
      "soort": "functie",
-     "lijn": 112,
+     "lijn": 107,
      "geexporteerd": false
     },
     {
      "naam": "marktDag",
      "soort": "functie",
-     "lijn": 128,
+     "lijn": 120,
      "geexporteerd": true
     },
     {
      "naam": "marktBeeld",
      "soort": "functie",
-     "lijn": 135,
+     "lijn": 127,
      "geexporteerd": true
     }
    ],
@@ -71750,19 +71159,15 @@
     "vorm": "object",
     "namen": [
      "aandelen",
-     "kwaliteit",
      "marktBeeld",
      "marktDag",
-     "marktklant",
      "mijnVraag",
      "reputatie"
     ]
    },
    "requires": [
-    "server/kern/magnaat-leven/bereik.js",
     "server/kern/magnaat-leven/kalender.js",
     "server/kern/magnaat-leven/regels-bedrijf.js",
-    "server/kern/magnaat-leven/regels-groei.js",
     "server/kern/magnaat-leven/regels-markt.js",
     "server/kern/magnaat-leven/regels.js",
     "server/kern/magnaat-leven/staat.js"
@@ -71770,8 +71175,6 @@
    "extern": [],
    "gebruiktDoor": [
     "server/kern/magnaat-leven/dag.js",
-    "server/kern/magnaat-leven/groei.js",
-    "server/kern/magnaat-leven/stad.js",
     "server/kern/magnaat-leven/voorraad.js",
     "server/kern/magnaat-leven/weergave-bedrijf.js",
     "server/kern/magnaat-leven/weergave.js"
@@ -71923,7 +71326,6 @@
    "requires": [],
    "extern": [],
    "gebruiktDoor": [
-    "server/kern/magnaat-leven/bereik.js",
     "server/kern/magnaat-leven/bewaking.js",
     "server/kern/magnaat-leven/contract.js",
     "server/kern/magnaat-leven/markt.js",
@@ -71931,26 +71333,6 @@
     "server/kern/magnaat-leven/volgende-bedrijf.js",
     "server/kern/magnaat-leven/voorraad.js",
     "server/kern/magnaat-leven/weergave-bedrijf.js"
-   ]
-  },
-  {
-   "bestand": "server/kern/magnaat-leven/regels-groei.js",
-   "symbolen": [],
-   "uitvoer": {
-    "vorm": "object",
-    "namen": [
-     "FILIAAL",
-     "KREDIET",
-     "OVERNAME"
-    ]
-   },
-   "requires": [],
-   "extern": [],
-   "gebruiktDoor": [
-    "server/kern/magnaat-leven/bereik.js",
-    "server/kern/magnaat-leven/groei.js",
-    "server/kern/magnaat-leven/markt.js",
-    "server/kern/magnaat-leven/volgende-bedrijf.js"
    ]
   },
   {
@@ -71976,27 +71358,12 @@
    "requires": [],
    "extern": [],
    "gebruiktDoor": [
-    "server/kern/magnaat-leven/bereik.js",
-    "server/kern/magnaat-leven/groei.js",
     "server/kern/magnaat-leven/kalender.js",
     "server/kern/magnaat-leven/markt.js",
     "server/kern/magnaat-leven/staat.js",
     "server/kern/magnaat-leven/vestiging.js",
     "server/kern/magnaat-leven/volgende-bedrijf.js",
     "server/kern/magnaat-leven/weergave-bedrijf.js"
-   ]
-  },
-  {
-   "bestand": "server/kern/magnaat-leven/regels-start.js",
-   "symbolen": [],
-   "uitvoer": {
-    "vorm": "functie",
-    "namen": null
-   },
-   "requires": [],
-   "extern": [],
-   "gebruiktDoor": [
-    "server/kern/magnaat-leven/regels.js"
    ]
   },
   {
@@ -72021,27 +71388,9 @@
      "geexporteerd": true
     },
     {
-     "naam": "startVan",
-     "soort": "pijl",
-     "lijn": 95,
-     "geexporteerd": true
-    },
-    {
-     "naam": "beginKas",
-     "soort": "pijl",
-     "lijn": 96,
-     "geexporteerd": true
-    },
-    {
-     "naam": "verplichtingenVan",
-     "soort": "pijl",
-     "lijn": 97,
-     "geexporteerd": true
-    },
-    {
      "naam": "verplichtingBedrag",
      "soort": "pijl",
-     "lijn": 98,
+     "lijn": 92,
      "geexporteerd": true
     }
    ],
@@ -72067,25 +71416,19 @@
      "REGELVERSIE",
      "RTG",
      "SOFTWARE",
-     "STARTPOSITIES",
      "START_KAS",
      "TEMPO",
      "VERPLICHTINGEN",
      "VOORFINANCIERING",
      "VRIJ",
      "ZELFSTANDIG",
-     "beginKas",
      "dagNaam",
      "niveauVan",
-     "startVan",
      "verplichtingBedrag",
-     "verplichtingenVan",
      "weekdag"
     ]
    },
-   "requires": [
-    "server/kern/magnaat-leven/regels-start.js"
-   ],
+   "requires": [],
    "extern": [],
    "gebruiktDoor": [
     "server/kern/magnaat-leven/acties.js",
@@ -72095,14 +71438,12 @@
     "server/kern/magnaat-leven/geld.js",
     "server/kern/magnaat-leven/gesprek.js",
     "server/kern/magnaat-leven/gids.js",
-    "server/kern/magnaat-leven/groei.js",
     "server/kern/magnaat-leven/index.js",
     "server/kern/magnaat-leven/markt.js",
     "server/kern/magnaat-leven/oordeel.js",
     "server/kern/magnaat-leven/opdracht.js",
     "server/kern/magnaat-leven/speelronde.js",
     "server/kern/magnaat-leven/staat.js",
-    "server/kern/magnaat-leven/stad.js",
     "server/kern/magnaat-leven/team.js",
     "server/kern/magnaat-leven/tijd.js",
     "server/kern/magnaat-leven/vestiging.js",
@@ -72230,7 +71571,6 @@
     "server/kern/magnaat-leven/geld.js",
     "server/kern/magnaat-leven/gesprek.js",
     "server/kern/magnaat-leven/gids.js",
-    "server/kern/magnaat-leven/groei.js",
     "server/kern/magnaat-leven/index.js",
     "server/kern/magnaat-leven/markt.js",
     "server/kern/magnaat-leven/oordeel.js",
@@ -72246,240 +71586,72 @@
    ]
   },
   {
-   "bestand": "server/kern/magnaat-leven/stad.js",
-   "symbolen": [
-    {
-     "naam": "fout",
-     "soort": "pijl",
-     "lijn": 25,
-     "geexporteerd": false
-    },
-    {
-     "naam": "maakStad",
-     "soort": "functie",
-     "lijn": 27,
-     "geexporteerd": true
-    },
-    {
-     "naam": "steden",
-     "soort": "pijl",
-     "lijn": 28,
-     "geexporteerd": false
-    },
-    {
-     "naam": "levenKey",
-     "soort": "pijl",
-     "lijn": 29,
-     "geexporteerd": false
-    },
-    {
-     "naam": "naamVan",
-     "soort": "pijl",
-     "lijn": 30,
-     "geexporteerd": false
-    },
-    {
-     "naam": "actief",
-     "soort": "pijl",
-     "lijn": 31,
-     "geexporteerd": false
-    },
-    {
-     "naam": "mijnStad",
-     "soort": "functie",
-     "lijn": 33,
-     "geexporteerd": false
-    },
-    {
-     "naam": "code",
-     "soort": "functie",
-     "lijn": 37,
-     "geexporteerd": false
-    },
-    {
-     "naam": "opruimen",
-     "soort": "functie",
-     "lijn": 43,
-     "geexporteerd": false
-    },
-    {
-     "naam": "sein",
-     "soort": "functie",
-     "lijn": 51,
-     "geexporteerd": false
-    },
-    {
-     "naam": "wijzig",
-     "soort": "pijl",
-     "lijn": 57,
-     "geexporteerd": false
-    },
-    {
-     "naam": "kringVan",
-     "soort": "functie",
-     "lijn": 61,
-     "geexporteerd": false
-    },
-    {
-     "naam": "metKring",
-     "soort": "pijl",
-     "lijn": 69,
-     "geexporteerd": false
-    },
-    {
-     "naam": "publiek",
-     "soort": "functie",
-     "lijn": 71,
-     "geexporteerd": false
-    },
-    {
-     "naam": "beeld",
-     "soort": "pijl",
-     "lijn": 88,
-     "geexporteerd": false
-    },
-    {
-     "naam": "maak",
-     "soort": "functie",
-     "lijn": 93,
-     "geexporteerd": false
-    },
-    {
-     "naam": "doe",
-     "soort": "functie",
-     "lijn": 106,
-     "geexporteerd": false
-    },
-    {
-     "naam": "start",
-     "soort": "functie",
-     "lijn": 118,
-     "geexporteerd": false
-    },
-    {
-     "naam": "verlaatStad",
-     "soort": "functie",
-     "lijn": 132,
-     "geexporteerd": false
-    },
-    {
-     "naam": "sluit",
-     "soort": "functie",
-     "lijn": 146,
-     "geexporteerd": false
-    },
-    {
-     "naam": "volgendeAlsKlaar",
-     "soort": "functie",
-     "lijn": 149,
-     "geexporteerd": false
-    },
-    {
-     "naam": "staat",
-     "soort": "functie",
-     "lijn": 159,
-     "geexporteerd": false
-    },
-    {
-     "naam": "actie",
-     "soort": "functie",
-     "lijn": 167,
-     "geexporteerd": false
-    }
-   ],
-   "uitvoer": {
-    "vorm": "object",
-    "namen": [
-     "DUUR",
-     "MAX",
-     "MIN",
-     "maakStad"
-    ]
-   },
-   "requires": [
-    "server/kern/magnaat-leven/bereik.js",
-    "server/kern/magnaat-leven/markt.js",
-    "server/kern/magnaat-leven/regels.js"
-   ],
-   "extern": [],
-   "gebruiktDoor": [
-    "server/opzet/kernlaag7-ruimtes.js"
-   ]
-  },
-  {
    "bestand": "server/kern/magnaat-leven/team.js",
    "symbolen": [
     {
      "naam": "fout",
      "soort": "pijl",
-     "lijn": 22,
+     "lijn": 21,
      "geexporteerd": false
     },
     {
      "naam": "teamlid",
      "soort": "pijl",
-     "lijn": 23,
+     "lijn": 22,
      "geexporteerd": true
     },
     {
      "naam": "dagenVan",
      "soort": "pijl",
-     "lijn": 24,
+     "lijn": 23,
      "geexporteerd": false
     },
     {
      "naam": "werkminuten",
      "soort": "functie",
-     "lijn": 28,
+     "lijn": 27,
      "geexporteerd": true
     },
     {
      "naam": "werkplek",
      "soort": "functie",
-     "lijn": 33,
+     "lijn": 32,
      "geexporteerd": false
     },
     {
      "naam": "werf",
      "soort": "functie",
-     "lijn": 41,
-     "geexporteerd": true
-    },
-    {
-     "naam": "komtErbij",
-     "soort": "functie",
-     "lijn": 51,
+     "lijn": 40,
      "geexporteerd": true
     },
     {
      "naam": "afrekenen",
      "soort": "functie",
-     "lijn": 72,
+     "lijn": 66,
      "geexporteerd": false
     },
     {
      "naam": "laatGaan",
      "soort": "functie",
-     "lijn": 93,
+     "lijn": 87,
      "geexporteerd": false
     },
     {
      "naam": "teamDag",
      "soort": "functie",
-     "lijn": 102,
+     "lijn": 96,
      "geexporteerd": true
     },
     {
      "naam": "ontsla",
      "soort": "functie",
-     "lijn": 116,
+     "lijn": 110,
      "geexporteerd": true
     }
    ],
    "uitvoer": {
     "vorm": "object",
     "namen": [
-     "komtErbij",
      "ontsla",
      "teamDag",
      "teamlid",
@@ -72488,7 +71660,6 @@
     ]
    },
    "requires": [
-    "server/kern/magnaat-leven/bereik.js",
     "server/kern/magnaat-leven/boek.js",
     "server/kern/magnaat-leven/geld.js",
     "server/kern/magnaat-leven/gids.js",
@@ -72500,7 +71671,6 @@
    "gebruiktDoor": [
     "server/kern/magnaat-leven/acties.js",
     "server/kern/magnaat-leven/dag.js",
-    "server/kern/magnaat-leven/groei.js",
     "server/kern/magnaat-leven/tijd.js",
     "server/kern/magnaat-leven/weergave-bedrijf.js"
    ]
@@ -72640,26 +71810,20 @@
     {
      "naam": "contractAanbod",
      "soort": "functie",
-     "lijn": 15,
+     "lijn": 12,
      "geexporteerd": true
     },
     {
      "naam": "kandidaat",
      "soort": "functie",
-     "lijn": 24,
+     "lijn": 21,
      "geexporteerd": false
     },
     {
      "naam": "bedrijfHandelingen",
      "soort": "functie",
-     "lijn": 29,
+     "lijn": 26,
      "geexporteerd": true
-    },
-    {
-     "naam": "groeiHandelingen",
-     "soort": "functie",
-     "lijn": 69,
-     "geexporteerd": false
     }
    ],
    "uitvoer": {
@@ -72670,10 +71834,7 @@
     ]
    },
    "requires": [
-    "server/kern/magnaat-leven/bereik.js",
-    "server/kern/magnaat-leven/groei.js",
     "server/kern/magnaat-leven/regels-bedrijf.js",
-    "server/kern/magnaat-leven/regels-groei.js",
     "server/kern/magnaat-leven/regels-markt.js",
     "server/kern/magnaat-leven/staat.js",
     "server/kern/magnaat-leven/tijd.js",
@@ -72858,31 +72019,31 @@
     {
      "naam": "dealBeeld",
      "soort": "functie",
-     "lijn": 21,
+     "lijn": 20,
      "geexporteerd": false
     },
     {
      "naam": "weekAgenda",
      "soort": "functie",
-     "lijn": 32,
+     "lijn": 31,
      "geexporteerd": false
     },
     {
      "naam": "aandacht",
      "soort": "functie",
-     "lijn": 46,
+     "lijn": 45,
      "geexporteerd": false
     },
     {
      "naam": "toon",
      "soort": "pijl",
-     "lijn": 66,
+     "lijn": 65,
      "geexporteerd": true
     },
     {
      "naam": "beeld",
      "soort": "functie",
-     "lijn": 68,
+     "lijn": 67,
      "geexporteerd": false
     }
    ],
@@ -72895,7 +72056,6 @@
    "requires": [
     "server/kern/magnaat-leven/gesprek.js",
     "server/kern/magnaat-leven/gids.js",
-    "server/kern/magnaat-leven/groei.js",
     "server/kern/magnaat-leven/kalender.js",
     "server/kern/magnaat-leven/klanten.js",
     "server/kern/magnaat-leven/markt.js",
@@ -123692,9 +122852,6 @@
     "server/kern/beveiliging.js",
     "server/kern/beveiliging/pda/index.js",
     "server/kern/command/apipoort.js",
-    "server/kern/democratie/doe.js",
-    "server/kern/democratie/index.js",
-    "server/kern/democratie/lid.js",
     "server/kern/economie/runtime/intent.js",
     "server/kern/economie/runtime/opslag.js",
     "server/kern/experience/broker.js",
@@ -134045,38 +133202,6 @@
    "gebruiktDoor": []
   },
   {
-   "bestand": "server/lib/burgerpad.js",
-   "symbolen": [
-    {
-     "naam": "isBurgerpad",
-     "soort": "pijl",
-     "lijn": 26,
-     "geexporteerd": true
-    },
-    {
-     "naam": "dag",
-     "soort": "pijl",
-     "lijn": 30,
-     "geexporteerd": true
-    }
-   ],
-   "uitvoer": {
-    "vorm": "object",
-    "namen": [
-     "BURGERPADEN",
-     "PSEUDONIEM",
-     "dag",
-     "isBurgerpad"
-    ]
-   },
-   "requires": [],
-   "extern": [],
-   "gebruiktDoor": [
-    "server/lib/handelingsspoor.js",
-    "server/opzet/auditspoor.js"
-   ]
-  },
-  {
    "bestand": "server/lib/ca.js",
    "symbolen": [
     {
@@ -134472,7 +133597,6 @@
     "server/kern/carriereledger/deel.js",
     "server/kern/carriereledger/index.js",
     "server/kern/command/lagen.js",
-    "server/kern/democratie/index.js",
     "server/kern/kantoorwissen.js",
     "server/kern/notities.js",
     "server/kern/rugdekking/index.js",
@@ -134587,55 +133711,55 @@
     {
      "naam": "afdrukVan",
      "soort": "functie",
-     "lijn": 78,
+     "lijn": 77,
      "geexporteerd": false
     },
     {
      "naam": "wieVan",
      "soort": "functie",
-     "lijn": 90,
+     "lijn": 89,
      "geexporteerd": false
     },
     {
      "naam": "maakHandelingsspoor",
      "soort": "functie",
-     "lijn": 99,
+     "lijn": 98,
      "geexporteerd": false
     },
     {
      "naam": "rij",
      "soort": "pijl",
-     "lijn": 104,
+     "lijn": 103,
      "geexporteerd": false
     },
     {
      "naam": "noteer",
      "soort": "functie",
-     "lijn": 106,
+     "lijn": 105,
      "geexporteerd": false
     },
     {
      "naam": "ketenstand",
      "soort": "functie",
-     "lijn": 119,
+     "lijn": 118,
      "geexporteerd": false
     },
     {
      "naam": "lijst",
      "soort": "functie",
-     "lijn": 129,
+     "lijn": 128,
      "geexporteerd": false
     },
     {
      "naam": "middleware",
      "soort": "functie",
-     "lijn": 159,
+     "lijn": 158,
      "geexporteerd": false
     },
     {
      "naam": "schrijf",
      "soort": "pijl",
-     "lijn": 161,
+     "lijn": 160,
      "geexporteerd": false
     }
    ],
@@ -134650,7 +133774,6 @@
    "requires": [
     "server/db/verzoekcontext.js",
     "server/kern/eigencollectie.js",
-    "server/lib/burgerpad.js",
     "server/lib/keten.js",
     "server/lib/klok.js"
    ],
@@ -135275,21 +134398,6 @@
    ]
   },
   {
-   "bestand": "server/lib/idemsleutels-democratie.js",
-   "symbolen": [],
-   "uitvoer": {
-    "vorm": "object",
-    "namen": [
-     "SLEUTELS"
-    ]
-   },
-   "requires": [],
-   "extern": [],
-   "gebruiktDoor": [
-    "server/lib/idemsleutels.js"
-   ]
-  },
-  {
    "bestand": "server/lib/idemsleutels-document.js",
    "symbolen": [],
    "uitvoer": {
@@ -135513,19 +134621,6 @@
    ]
   },
   {
-   "bestand": "server/lib/idemsleutels-nooit-democratie.js",
-   "symbolen": [],
-   "uitvoer": {
-    "vorm": "anders",
-    "namen": null
-   },
-   "requires": [],
-   "extern": [],
-   "gebruiktDoor": [
-    "server/lib/idemsleutels-nooit-routes.js"
-   ]
-  },
-  {
    "bestand": "server/lib/idemsleutels-nooit-ledger.js",
    "symbolen": [],
    "uitvoer": {
@@ -135547,7 +134642,6 @@
    },
    "requires": [
     "server/lib/idemsleutels-nooit-carriere.js",
-    "server/lib/idemsleutels-nooit-democratie.js",
     "server/lib/idemsleutels-nooit-ledger.js",
     "server/lib/idemsleutels-nooit-vakschema.js"
    ],
@@ -135791,7 +134885,6 @@
     "server/lib/idemsleutels-carriere.js",
     "server/lib/idemsleutels-commerce.js",
     "server/lib/idemsleutels-connect.js",
-    "server/lib/idemsleutels-democratie.js",
     "server/lib/idemsleutels-document.js",
     "server/lib/idemsleutels-eigenaar.js",
     "server/lib/idemsleutels-geld.js",
@@ -135977,8 +135070,6 @@
    "gebruiktDoor": [
     "server/inzagelog-lezen.js",
     "server/inzagelog.js",
-    "server/kern/democratie/kwestie.js",
-    "server/kern/democratie/meter.js",
     "server/kern/kantoor/geldketen.js",
     "server/kern/kantoor/geldketen/boeken.js",
     "server/kern/lidboard/journaal.js",
@@ -136086,7 +135177,6 @@
     "server/kern/commercie/voornemen.js",
     "server/kern/commercie/zaakabonnement.js",
     "server/kern/consent-lezers.js",
-    "server/kern/democratie/index.js",
     "server/kern/directpay/index.js",
     "server/kern/doelen.js",
     "server/kern/dubbelemelding.js",
@@ -136845,40 +135935,6 @@
      "naam": "gemeten",
      "soort": "pijl",
      "lijn": 86,
-     "geexporteerd": false
-    }
-   ],
-   "uitvoer": {
-    "vorm": "object",
-    "namen": [
-     "CONTRACTEN"
-    ]
-   },
-   "requires": [],
-   "extern": [],
-   "gebruiktDoor": [
-    "server/lib/mutatiecontracten.js"
-   ]
-  },
-  {
-   "bestand": "server/lib/mutatiecontracten-democratie.js",
-   "symbolen": [
-    {
-     "naam": "leest",
-     "soort": "pijl",
-     "lijn": 33,
-     "geexporteerd": false
-    },
-    {
-     "naam": "schrijft",
-     "soort": "pijl",
-     "lijn": 43,
-     "geexporteerd": false
-    },
-    {
-     "naam": "doeSchrijft",
-     "soort": "pijl",
-     "lijn": 61,
      "geexporteerd": false
     }
    ],
@@ -138425,7 +137481,6 @@
     "server/lib/mutatiecontracten-connect3.js",
     "server/lib/mutatiecontracten-connect4.js",
     "server/lib/mutatiecontracten-credential.js",
-    "server/lib/mutatiecontracten-democratie.js",
     "server/lib/mutatiecontracten-document.js",
     "server/lib/mutatiecontracten-effect.js",
     "server/lib/mutatiecontracten-effectguard.js",
@@ -142871,31 +141926,31 @@
     {
      "naam": "maakAuditspoor",
      "soort": "functie",
-     "lijn": 65,
+     "lijn": 64,
      "geexporteerd": true
     },
     {
      "naam": "vak",
      "soort": "pijl",
-     "lijn": 71,
+     "lijn": 70,
      "geexporteerd": false
     },
     {
      "naam": "wie",
      "soort": "functie",
-     "lijn": 78,
+     "lijn": 77,
      "geexporteerd": false
     },
     {
      "naam": "middleware",
      "soort": "functie",
-     "lijn": 94,
+     "lijn": 93,
      "geexporteerd": false
     },
     {
      "naam": "noteer",
      "soort": "pijl",
-     "lijn": 104,
+     "lijn": 103,
      "geexporteerd": false
     }
    ],
@@ -142910,8 +141965,7 @@
    "requires": [
     "server/db/verzoekcontext.js",
     "server/kern/command/journaal.js",
-    "server/kern/eigencollectie.js",
-    "server/lib/burgerpad.js"
+    "server/kern/eigencollectie.js"
    ],
    "extern": [
     "crypto"
@@ -144194,10 +143248,8 @@
    "requires": [
     "server/functies.js",
     "server/kern/connect/index.js",
-    "server/kern/democratie/index.js",
     "server/kern/leerstof.js",
     "server/kern/magnaat-leven/index.js",
-    "server/kern/magnaat-leven/stad.js",
     "server/kern/magnaat-partnerstudio.js",
     "server/kern/magnaatwereld.js",
     "server/kern/rtfwallet.js",
@@ -144716,7 +143768,6 @@
     "server/routes/boeken.js",
     "server/routes/borden.js",
     "server/routes/carriereledger.js",
-    "server/routes/democratie/index.js",
     "server/routes/economie.js",
     "server/routes/experience.js",
     "server/routes/facturatie.js",
@@ -145890,31 +144941,31 @@
     {
      "naam": "lengte",
      "soort": "pijl",
-     "lijn": 17,
+     "lijn": 18,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "fout",
      "soort": "pijl",
-     "lijn": 19,
+     "lijn": 20,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "voegSamen",
      "soort": "functie",
-     "lijn": 21,
+     "lijn": 22,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "commitVerzoek",
      "soort": "functie",
-     "lijn": 51,
+     "lijn": 55,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openstaandeWijzigingen",
      "soort": "functie",
-     "lijn": 123,
+     "lijn": 134,
      "geexporteerd": "onbekend"
     }
    ],
@@ -145923,6 +144974,7 @@
     "namen": null
    },
    "requires": [
+    "server/db/deelnemers.js",
     "server/pg/schrijflanen.js",
     "server/pg/verzoekbijzonder.js",
     "server/pg/verzoekmerge.js"
@@ -148603,54 +147655,6 @@
    ]
   },
   {
-   "bestand": "server/routes/democratie/index.js",
-   "symbolen": [
-    {
-     "naam": "stuur",
-     "soort": "pijl",
-     "lijn": 12,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "alsLid",
-     "soort": "pijl",
-     "lijn": 16,
-     "geexporteerd": "onbekend"
-    }
-   ],
-   "uitvoer": {
-    "vorm": "functie",
-    "namen": null
-   },
-   "requires": [
-    "server/routes/democratie/kantoor.js"
-   ],
-   "extern": [],
-   "gebruiktDoor": [
-    "server/opzet/routes-dwars.js"
-   ]
-  },
-  {
-   "bestand": "server/routes/democratie/kantoor.js",
-   "symbolen": [
-    {
-     "naam": "opNaam",
-     "soort": "pijl",
-     "lijn": 12,
-     "geexporteerd": "onbekend"
-    }
-   ],
-   "uitvoer": {
-    "vorm": "functie",
-    "namen": null
-   },
-   "requires": [],
-   "extern": [],
-   "gebruiktDoor": [
-    "server/routes/democratie/index.js"
-   ]
-  },
-  {
    "bestand": "server/routes/doelen.js",
    "symbolen": [
     {
@@ -148710,7 +147714,7 @@
     {
      "naam": "meting",
      "soort": "functie",
-     "lijn": 51,
+     "lijn": 47,
      "geexporteerd": "onbekend"
     }
    ],
@@ -151890,26 +150894,6 @@
    ]
   },
   {
-   "bestand": "server/routes/magnaatstad.js",
-   "symbolen": [
-    {
-     "naam": "deur",
-     "soort": "pijl",
-     "lijn": 7,
-     "geexporteerd": "onbekend"
-    }
-   ],
-   "uitvoer": {
-    "vorm": "functie",
-    "namen": null
-   },
-   "requires": [],
-   "extern": [],
-   "gebruiktDoor": [
-    "server/routes/magnaatwereld.js"
-   ]
-  },
-  {
    "bestand": "server/routes/magnaatwereld.js",
    "symbolen": [
     {
@@ -151933,19 +150917,19 @@
     {
      "naam": "alsPartner",
      "soort": "pijl",
-     "lijn": 49,
+     "lijn": 48,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "wie",
      "soort": "pijl",
-     "lijn": 65,
+     "lijn": 64,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "boardroomActor",
      "soort": "pijl",
-     "lijn": 66,
+     "lijn": 65,
      "geexporteerd": "onbekend"
     }
    ],
@@ -151954,8 +150938,7 @@
     "namen": null
    },
    "requires": [
-    "server/opzet/envelop.js",
-    "server/routes/magnaatstad.js"
+    "server/opzet/envelop.js"
    ],
    "extern": [],
    "gebruiktDoor": [
@@ -165521,13 +164504,13 @@
     {
      "naam": "isCreateRetry",
      "soort": "functie",
-     "lijn": 87,
+     "lijn": 91,
      "geexporteerd": true
     },
     {
      "naam": "createKlaar",
      "soort": "functie",
-     "lijn": 94,
+     "lijn": 98,
      "geexporteerd": true
     }
    ],
@@ -165827,55 +164810,55 @@
     {
      "naam": "zorgTabel",
      "soort": "functie",
-     "lijn": 16,
+     "lijn": 17,
      "geexporteerd": true
     },
     {
      "naam": "markeer",
      "soort": "functie",
-     "lijn": 36,
+     "lijn": 37,
      "geexporteerd": false
     },
     {
      "naam": "klaar",
      "soort": "functie",
-     "lijn": 47,
+     "lijn": 48,
      "geexporteerd": false
     },
     {
      "naam": "geblokkeerd",
      "soort": "functie",
-     "lijn": 53,
+     "lijn": 54,
      "geexporteerd": true
     },
     {
      "naam": "pak",
      "soort": "functie",
-     "lijn": 67,
+     "lijn": 68,
      "geexporteerd": false
     },
     {
      "naam": "fout",
      "soort": "functie",
-     "lijn": 88,
+     "lijn": 89,
      "geexporteerd": false
     },
     {
      "naam": "tijd",
      "soort": "pijl",
-     "lijn": 102,
+     "lijn": 103,
      "geexporteerd": false
     },
     {
      "naam": "zetActief",
      "soort": "functie",
-     "lijn": 105,
+     "lijn": 106,
      "geexporteerd": false
     },
     {
      "naam": "ronde",
      "soort": "functie",
-     "lijn": 147,
+     "lijn": 153,
      "geexporteerd": false
     }
    ],
@@ -165888,6 +164871,7 @@
     ]
    },
    "requires": [
+    "server/accounts/duurzaamheid.js",
     "server/accounts/state.js"
    ],
    "extern": [
@@ -172569,1549 +171553,1549 @@
     {
      "naam": "werkrolOk",
      "soort": "pijl",
-     "lijn": 4361,
+     "lijn": 4360,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "vraagPositie",
      "soort": "pijl",
-     "lijn": 4399,
+     "lijn": 4398,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "metAlgPin",
      "soort": "functie",
-     "lijn": 4420,
+     "lijn": 4419,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "doe",
      "soort": "pijl",
-     "lijn": 4443,
+     "lijn": 4442,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openWerkKiezer",
      "soort": "functie",
-     "lijn": 4468,
+     "lijn": 4467,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "mapNamen",
      "soort": "functie",
-     "lijn": 4549,
+     "lijn": 4548,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "mapNaam",
      "soort": "functie",
-     "lijn": 4550,
+     "lijn": 4549,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zetMapNaam",
      "soort": "functie",
-     "lijn": 4551,
+     "lijn": 4550,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "gebruik",
      "soort": "functie",
-     "lijn": 4564,
+     "lijn": 4563,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "telGebruik",
      "soort": "functie",
-     "lijn": 4565,
+     "lijn": 4564,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "topGebruik",
      "soort": "functie",
-     "lijn": 4587,
+     "lijn": 4586,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "sleutelVan",
      "soort": "pijl",
-     "lijn": 4597,
+     "lijn": 4596,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "RIJEN",
      "soort": "pijl",
-     "lijn": 4599,
+     "lijn": 4598,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "bewaardeVolgorde",
      "soort": "functie",
-     "lijn": 4600,
+     "lijn": 4599,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "bewaarVolgorde",
      "soort": "functie",
-     "lijn": 4601,
+     "lijn": 4600,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "gesorteerd",
      "soort": "functie",
-     "lijn": 4602,
+     "lijn": 4601,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "tabKnop",
      "soort": "pijl",
-     "lijn": 4613,
+     "lijn": 4612,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "tabZichtbaar",
      "soort": "pijl",
-     "lijn": 4614,
+     "lijn": 4613,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "tabNaam",
      "soort": "pijl",
-     "lijn": 4615,
+     "lijn": 4614,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "itemDef",
      "soort": "functie",
-     "lijn": 4617,
+     "lijn": 4616,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "monogram",
      "soort": "functie",
-     "lijn": 4622,
+     "lijn": 4621,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "glyfVoor",
      "soort": "functie",
-     "lijn": 4631,
+     "lijn": 4630,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "tegelInhoud",
      "soort": "functie",
-     "lijn": 4635,
+     "lijn": 4634,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "itemNaam",
      "soort": "functie",
-     "lijn": 4643,
+     "lijn": 4642,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "itemZichtbaar",
      "soort": "functie",
-     "lijn": 4655,
+     "lijn": 4654,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "gast",
      "soort": "pijl",
-     "lijn": 4666,
+     "lijn": 4665,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openItem",
      "soort": "functie",
-     "lijn": 4668,
+     "lijn": 4667,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openen",
      "soort": "pijl",
-     "lijn": 4679,
+     "lijn": 4678,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openOsApp",
      "soort": "functie",
-     "lijn": 4693,
+     "lijn": 4692,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "aiMond",
      "soort": "functie",
-     "lijn": 4756,
+     "lijn": 4755,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "mount",
      "soort": "functie",
-     "lijn": 4762,
+     "lijn": 4761,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "maakAppIcoon",
      "soort": "functie",
-     "lijn": 4773,
+     "lijn": 4772,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "maakMapIcoon",
      "soort": "functie",
-     "lijn": 4789,
+     "lijn": 4788,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "badgeVan",
      "soort": "pijl",
-     "lijn": 4833,
+     "lijn": 4832,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "afdruk",
      "soort": "pijl",
-     "lijn": 4839,
+     "lijn": 4838,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "bouw",
      "soort": "functie",
-     "lijn": 4856,
+     "lijn": 4855,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openMap",
      "soort": "functie",
-     "lijn": 4913,
+     "lijn": 4912,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openHernoem",
      "soort": "functie",
-     "lijn": 4952,
+     "lijn": 4951,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "sluitScrims",
      "soort": "functie",
-     "lijn": 4967,
+     "lijn": 4966,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "alleItems",
      "soort": "functie",
-     "lijn": 4973,
+     "lijn": 4972,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "voeg",
      "soort": "pijl",
-     "lijn": 4975,
+     "lijn": 4974,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "osActies",
      "soort": "functie",
-     "lijn": 4984,
+     "lijn": 4983,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "vraagRahul",
      "soort": "functie",
-     "lijn": 5003,
+     "lijn": 5002,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zoekSectie",
      "soort": "functie",
-     "lijn": 5024,
+     "lijn": 5023,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zoekRij",
      "soort": "functie",
-     "lijn": 5041,
+     "lijn": 5040,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zoek",
      "soort": "functie",
-     "lijn": 5061,
+     "lijn": 5060,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openZoek",
      "soort": "functie",
-     "lijn": 5126,
+     "lijn": 5125,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "ccSync",
      "soort": "functie",
-     "lijn": 5142,
+     "lijn": 5141,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zetHelder",
      "soort": "functie",
-     "lijn": 5223,
+     "lijn": 5222,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zetWiebel",
      "soort": "functie",
-     "lijn": 5239,
+     "lijn": 5238,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laat",
      "soort": "pijl",
-     "lijn": 5269,
+     "lijn": 5268,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "actieveTab",
      "soort": "functie",
-     "lijn": 5275,
+     "lijn": 5274,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "sync",
      "soort": "functie",
-     "lijn": 5276,
+     "lijn": 5275,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "bouwAlsAnders",
      "soort": "pijl",
-     "lijn": 5300,
+     "lijn": 5299,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "naarHome",
      "soort": "pijl",
-     "lijn": 5314,
+     "lijn": 5313,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "pillLos",
      "soort": "pijl",
-     "lijn": 5341,
+     "lijn": 5340,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "verf",
      "soort": "pijl",
-     "lijn": 5393,
+     "lijn": 5392,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "bannerToon",
      "soort": "functie",
-     "lijn": 5408,
+     "lijn": 5407,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "bannerWeg",
      "soort": "functie",
-     "lijn": 5429,
+     "lijn": 5428,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "alleDoelen",
      "soort": "functie",
-     "lijn": 5454,
+     "lijn": 5453,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "osCommando",
      "soort": "functie",
-     "lijn": 5460,
+     "lijn": 5459,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "kaal",
      "soort": "pijl",
-     "lijn": 5479,
+     "lijn": 5478,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "draadBel",
      "soort": "functie",
-     "lijn": 5574,
+     "lijn": 5573,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "draadTips",
      "soort": "functie",
-     "lijn": 5593,
+     "lijn": 5592,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "osRahulOpent",
      "soort": "functie",
-     "lijn": 5610,
+     "lijn": 5609,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "osRahulVraag",
      "soort": "functie",
-     "lijn": 5649,
+     "lijn": 5648,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zet",
      "soort": "pijl",
-     "lijn": 5657,
+     "lijn": 5656,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "osRahulKijkt",
      "soort": "functie",
-     "lijn": 5704,
+     "lijn": 5703,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "wereldBij",
      "soort": "functie",
-     "lijn": 5750,
+     "lijn": 5749,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "systeemBij",
      "soort": "functie",
-     "lijn": 5782,
+     "lijn": 5781,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "isAan",
      "soort": "functie",
-     "lijn": 5863,
+     "lijn": 5862,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadBoardroom",
      "soort": "functie",
-     "lijn": 5868,
+     "lijn": 5867,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zetWall",
      "soort": "functie",
-     "lijn": 5897,
+     "lijn": 5896,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "toon",
      "soort": "functie",
-     "lijn": 5957,
+     "lijn": 5956,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openSound",
      "soort": "functie",
-     "lijn": 5966,
+     "lijn": 5965,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "bedien",
      "soort": "functie",
-     "lijn": 5971,
+     "lijn": 5970,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "tRide",
      "soort": "pijl",
-     "lijn": 6003,
+     "lijn": 6002,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderLive",
      "soort": "functie",
-     "lijn": 6005,
+     "lijn": 6004,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderLiveStart",
      "soort": "functie",
-     "lijn": 6013,
+     "lijn": 6012,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderAssets",
      "soort": "functie",
-     "lijn": 6046,
+     "lijn": 6045,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "posVan",
      "soort": "pijl",
-     "lijn": 6054,
+     "lijn": 6053,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderFluister",
      "soort": "functie",
-     "lijn": 6151,
+     "lijn": 6150,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderZorg",
      "soort": "functie",
-     "lijn": 6229,
+     "lijn": 6228,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "startLive",
      "soort": "functie",
-     "lijn": 6264,
+     "lijn": 6263,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "projectPoints",
      "soort": "functie",
-     "lijn": 6271,
+     "lijn": 6270,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderLivePanel",
      "soort": "functie",
-     "lijn": 6281,
+     "lijn": 6280,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "stopLive",
      "soort": "functie",
-     "lijn": 6371,
+     "lijn": 6370,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "requestTaxi",
      "soort": "functie",
-     "lijn": 6377,
+     "lijn": 6376,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "verstuurRit",
      "soort": "functie",
-     "lijn": 6387,
+     "lijn": 6386,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "shareMyLocation",
      "soort": "functie",
-     "lijn": 6415,
+     "lijn": 6414,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "stopSim",
      "soort": "functie",
-     "lijn": 6424,
+     "lijn": 6423,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "simulateRide",
      "soort": "functie",
-     "lijn": 6425,
+     "lijn": 6424,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openMenu",
      "soort": "functie",
-     "lijn": 6445,
+     "lijn": 6444,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderMenuSheet",
      "soort": "functie",
-     "lijn": 6466,
+     "lijn": 6465,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "deur",
      "soort": "pijl",
-     "lijn": 6584,
+     "lijn": 6583,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "retailMenuBlock",
      "soort": "functie",
-     "lijn": 6652,
+     "lijn": 6651,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "bindRetailMenu",
      "soort": "functie",
-     "lijn": 6698,
+     "lijn": 6697,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "placeOrder",
      "soort": "functie",
-     "lijn": 6734,
+     "lijn": 6733,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "payOrder",
      "soort": "functie",
-     "lijn": 6771,
+     "lijn": 6770,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "loadCv",
      "soort": "functie",
-     "lijn": 6797,
+     "lijn": 6796,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderCvCard",
      "soort": "functie",
-     "lijn": 6801,
+     "lijn": 6800,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openCvSheet",
      "soort": "functie",
-     "lijn": 6821,
+     "lijn": 6820,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "closeCvSheet",
      "soort": "functie",
-     "lijn": 6833,
+     "lijn": 6832,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "memberApply",
      "soort": "functie",
-     "lijn": 6847,
+     "lijn": 6846,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "loadVacatures",
      "soort": "functie",
-     "lijn": 6863,
+     "lijn": 6862,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderVacatures",
      "soort": "functie",
-     "lijn": 6873,
+     "lijn": 6872,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "isApplied",
      "soort": "pijl",
-     "lijn": 6880,
+     "lijn": 6879,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "applyVac",
      "soort": "functie",
-     "lijn": 6909,
+     "lijn": 6908,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "apMsgHtml",
      "soort": "functie",
-     "lijn": 6926,
+     "lijn": 6925,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "ensureApChatEl",
      "soort": "functie",
-     "lijn": 6932,
+     "lijn": 6931,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadApplyChat",
      "soort": "functie",
-     "lijn": 6948,
+     "lijn": 6947,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openApplyChat",
      "soort": "functie",
-     "lijn": 6956,
+     "lijn": 6955,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "closeApplyChat",
      "soort": "functie",
-     "lijn": 6962,
+     "lijn": 6961,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "sendApplyChat",
      "soort": "functie",
-     "lijn": 6963,
+     "lijn": 6962,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "tDept",
      "soort": "pijl",
-     "lijn": 6971,
+     "lijn": 6970,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openPChat",
      "soort": "functie",
-     "lijn": 6972,
+     "lijn": 6971,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderPChatDepts",
      "soort": "functie",
-     "lijn": 6984,
+     "lijn": 6983,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "closePChat",
      "soort": "functie",
-     "lijn": 6996,
+     "lijn": 6995,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "loadPChat",
      "soort": "functie",
-     "lijn": 7001,
+     "lijn": 7000,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderPChat",
      "soort": "functie",
-     "lijn": 7008,
+     "lijn": 7007,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "sendPChat",
      "soort": "functie",
-     "lijn": 7024,
+     "lijn": 7023,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "sparBlokHtml",
      "soort": "functie",
-     "lijn": 7050,
+     "lijn": 7049,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "bindSparBlok",
      "soort": "functie",
-     "lijn": 7070,
+     "lijn": 7069,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "park",
      "soort": "pijl",
-     "lijn": 7085,
+     "lijn": 7084,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "showGlow",
      "soort": "functie",
-     "lijn": 7094,
+     "lijn": 7093,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderVerifyBanner",
      "soort": "functie",
-     "lijn": 7111,
+     "lijn": 7110,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadPaspoortInbox",
      "soort": "functie",
-     "lijn": 7157,
+     "lijn": 7156,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderPaspoortInbox",
      "soort": "functie",
-     "lijn": 7162,
+     "lijn": 7161,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderHome",
      "soort": "functie",
-     "lijn": 7190,
+     "lijn": 7189,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderHomeGuest",
      "soort": "functie",
-     "lijn": 7274,
+     "lijn": 7273,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "loadGuestHistory",
      "soort": "functie",
-     "lijn": 7305,
+     "lijn": 7304,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "esc",
      "soort": "functie",
-     "lijn": 7337,
+     "lijn": 7336,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderFoundation",
      "soort": "functie",
-     "lijn": 7338,
+     "lijn": 7337,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "rtfBerichtHtml",
      "soort": "functie",
-     "lijn": 7364,
+     "lijn": 7363,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderGezin",
      "soort": "functie",
-     "lijn": 7369,
+     "lijn": 7368,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadGezinChat",
      "soort": "functie",
-     "lijn": 7388,
+     "lijn": 7387,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "grtMsgHtml",
      "soort": "functie",
-     "lijn": 7406,
+     "lijn": 7405,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "scrollGrt",
      "soort": "functie",
-     "lijn": 7407,
+     "lijn": 7406,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openGrtThread",
      "soort": "functie",
-     "lijn": 7408,
+     "lijn": 7407,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "grtStuur",
      "soort": "functie",
-     "lijn": 7418,
+     "lijn": 7417,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "onGrtChat",
      "soort": "functie",
-     "lijn": 7419,
+     "lijn": 7418,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "telHref",
      "soort": "pijl",
-     "lijn": 7420,
+     "lijn": 7419,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "geleden",
      "soort": "functie",
-     "lijn": 7421,
+     "lijn": 7420,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "datumKort",
      "soort": "functie",
-     "lijn": 7422,
+     "lijn": 7421,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadGezinInfo",
      "soort": "functie",
-     "lijn": 7423,
+     "lijn": 7422,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "infoRij",
      "soort": "functie",
-     "lijn": 7452,
+     "lijn": 7451,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "rtfReply",
      "soort": "functie",
-     "lijn": 7453,
+     "lijn": 7452,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "rtfKoppelStart",
      "soort": "functie",
-     "lijn": 7459,
+     "lijn": 7458,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "urlB64ToUint8",
      "soort": "functie",
-     "lijn": 7470,
+     "lijn": 7469,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "ensurePush",
      "soort": "functie",
-     "lijn": 7475,
+     "lijn": 7474,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderTrip",
      "soort": "functie",
-     "lijn": 7494,
+     "lijn": 7493,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "uitleg",
      "soort": "pijl",
-     "lijn": 7499,
+     "lijn": 7498,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderAgenda",
      "soort": "functie",
-     "lijn": 7524,
+     "lijn": 7523,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "dagNaam",
      "soort": "pijl",
-     "lijn": 7535,
+     "lijn": 7534,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "executePay",
      "soort": "functie",
-     "lijn": 7555,
+     "lijn": 7554,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "payWithFaceId",
      "soort": "functie",
-     "lijn": 7573,
+     "lijn": 7572,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "muntStop",
      "soort": "functie",
-     "lijn": 7609,
+     "lijn": 7608,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openMuntSheet",
      "soort": "functie",
-     "lijn": 7611,
+     "lijn": 7610,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "muntVraag",
      "soort": "functie",
-     "lijn": 7633,
+     "lijn": 7632,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "betaalPartner",
      "soort": "functie",
-     "lijn": 7678,
+     "lijn": 7677,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "dpLees",
      "soort": "pijl",
-     "lijn": 7699,
+     "lijn": 7698,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "betaalVerzoekPay",
      "soort": "functie",
-     "lijn": 7724,
+     "lijn": 7723,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadBetaalVerzoeken",
      "soort": "functie",
-     "lijn": 7732,
+     "lijn": 7731,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderPay",
      "soort": "functie",
-     "lijn": 7737,
+     "lijn": 7736,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "eurC",
      "soort": "pijl",
-     "lijn": 7746,
+     "lijn": 7745,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "specRow",
      "soort": "pijl",
-     "lijn": 7747,
+     "lijn": 7746,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "bizSpec",
      "soort": "pijl",
-     "lijn": 7749,
+     "lijn": 7748,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "isContrib",
      "soort": "pijl",
-     "lijn": 7768,
+     "lijn": 7767,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "tegel",
      "soort": "pijl",
-     "lijn": 7774,
+     "lijn": 7773,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "jaarVan",
      "soort": "pijl",
-     "lijn": 7789,
+     "lijn": 7788,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "chip",
      "soort": "pijl",
-     "lijn": 7794,
+     "lijn": 7793,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderPunten",
      "soort": "functie",
-     "lijn": 7874,
+     "lijn": 7873,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "kaart",
      "soort": "pijl",
-     "lijn": 7890,
+     "lijn": 7889,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderGiftcards",
      "soort": "functie",
-     "lijn": 7937,
+     "lijn": 7936,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderBoekhouder",
      "soort": "functie",
-     "lijn": 7970,
+     "lijn": 7969,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "rij",
      "soort": "pijl",
-     "lijn": 8036,
+     "lijn": 8035,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "aiOpener",
      "soort": "functie",
-     "lijn": 8060,
+     "lijn": 8059,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "aiAnswer",
      "soort": "functie",
-     "lijn": 8098,
+     "lijn": 8097,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "bubble",
      "soort": "functie",
-     "lijn": 8137,
+     "lijn": 8136,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "escHtml",
      "soort": "pijl",
-     "lijn": 8146,
+     "lijn": 8145,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "voorstelChips",
      "soort": "functie",
-     "lijn": 8149,
+     "lijn": 8148,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "ask",
      "soort": "functie",
-     "lijn": 8167,
+     "lijn": 8166,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderChatMsgs",
      "soort": "functie",
-     "lijn": 8202,
+     "lijn": 8201,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderChat",
      "soort": "functie",
-     "lijn": 8222,
+     "lijn": 8221,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "kiesPartnerEnBetaal",
      "soort": "functie",
-     "lijn": 8239,
+     "lijn": 8238,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "chatSend",
      "soort": "functie",
-     "lijn": 8258,
+     "lijn": 8257,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "verwerkWebsiteAanvraag",
      "soort": "functie",
-     "lijn": 8270,
+     "lijn": 8269,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "standaardChips",
      "soort": "functie",
-     "lijn": 8296,
+     "lijn": 8295,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderAI",
      "soort": "functie",
-     "lijn": 8303,
+     "lijn": 8302,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zakOpen",
      "soort": "functie",
-     "lijn": 8324,
+     "lijn": 8323,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zakDicht",
      "soort": "functie",
-     "lijn": 8325,
+     "lijn": 8324,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zakStatusKnop",
      "soort": "pijl",
-     "lijn": 8334,
+     "lijn": 8333,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zakProfielKaart",
      "soort": "functie",
-     "lijn": 8340,
+     "lijn": 8339,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zakRender",
      "soort": "functie",
-     "lijn": 8361,
+     "lijn": 8360,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zoek",
      "soort": "pijl",
-     "lijn": 8398,
+     "lijn": 8397,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laad",
      "soort": "pijl",
-     "lijn": 8423,
+     "lijn": 8422,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "kaart",
      "soort": "pijl",
-     "lijn": 8425,
+     "lijn": 8424,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "opt",
      "soort": "pijl",
-     "lijn": 8458,
+     "lijn": 8457,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "veld",
      "soort": "pijl",
-     "lijn": 8493,
+     "lijn": 8492,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "agendaBadgeLid",
      "soort": "functie",
-     "lijn": 8535,
+     "lijn": 8534,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadAgendaLid",
      "soort": "functie",
-     "lijn": 8546,
+     "lijn": 8545,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "agendaToeLid",
      "soort": "functie",
-     "lijn": 8547,
+     "lijn": 8546,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderAgendaLid",
      "soort": "functie",
-     "lijn": 8549,
+     "lijn": 8548,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "dagLbl",
      "soort": "pijl",
-     "lijn": 8553,
+     "lijn": 8552,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "doe",
      "soort": "pijl",
-     "lijn": 8565,
+     "lijn": 8564,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadFacturenLid",
      "soort": "functie",
-     "lijn": 8570,
+     "lijn": 8569,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderFacturenLid",
      "soort": "functie",
-     "lijn": 8571,
+     "lijn": 8570,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "doe",
      "soort": "pijl",
-     "lijn": 8585,
+     "lijn": 8584,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadVooruit",
      "soort": "functie",
-     "lijn": 8616,
+     "lijn": 8615,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderVooruit",
      "soort": "functie",
-     "lijn": 8620,
+     "lijn": 8619,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "dagLbl",
      "soort": "pijl",
-     "lijn": 8631,
+     "lijn": 8630,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "regel",
      "soort": "pijl",
-     "lijn": 8632,
+     "lijn": 8631,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadPostDatums",
      "soort": "functie",
-     "lijn": 8672,
+     "lijn": 8671,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderPostDatums",
      "soort": "functie",
-     "lijn": 8676,
+     "lijn": 8675,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "dagLbl",
      "soort": "pijl",
-     "lijn": 8691,
+     "lijn": 8690,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "opnieuw",
      "soort": "pijl",
-     "lijn": 8713,
+     "lijn": 8712,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderKluisLid",
      "soort": "functie",
-     "lijn": 8729,
+     "lijn": 8728,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "boOpen",
      "soort": "functie",
-     "lijn": 8755,
+     "lijn": 8754,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "boDicht",
      "soort": "functie",
-     "lijn": 8756,
+     "lijn": 8755,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "naarTab",
      "soort": "pijl",
-     "lijn": 8760,
+     "lijn": 8759,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "boRender",
      "soort": "functie",
-     "lijn": 8762,
+     "lijn": 8761,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "kaart",
      "soort": "pijl",
-     "lijn": 8765,
+     "lijn": 8764,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "rij",
      "soort": "pijl",
-     "lijn": 8766,
+     "lijn": 8765,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "knopje",
      "soort": "pijl",
-     "lijn": 8767,
+     "lijn": 8766,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "knop",
      "soort": "pijl",
-     "lijn": 8824,
+     "lijn": 8823,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "bind",
      "soort": "pijl",
-     "lijn": 8849,
+     "lijn": 8848,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zegelStijlEenmalig",
      "soort": "functie",
-     "lijn": 8874,
+     "lijn": 8873,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "sluitZegel",
      "soort": "functie",
-     "lijn": 8903,
+     "lijn": 8902,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openZegel",
      "soort": "functie",
-     "lijn": 8904,
+     "lijn": 8903,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "maakZegel",
      "soort": "functie",
-     "lijn": 8920,
+     "lijn": 8919,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "labelVoor",
      "soort": "pijl",
-     "lijn": 8934,
+     "lijn": 8933,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "tik",
      "soort": "functie",
-     "lijn": 8947,
+     "lijn": 8946,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "scanRoute",
      "soort": "functie",
-     "lijn": 9008,
+     "lijn": 9007,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "openEtalage",
      "soort": "functie",
-     "lijn": 9049,
+     "lijn": 9048,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "eur2",
      "soort": "pijl",
-     "lijn": 9062,
+     "lijn": 9061,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderSalon",
      "soort": "functie",
-     "lijn": 9106,
+     "lijn": 9105,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "toonSalonCode",
      "soort": "functie",
-     "lijn": 9113,
+     "lijn": 9112,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "sluit",
      "soort": "pijl",
-     "lijn": 9135,
+     "lijn": 9134,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "salonClaimBediening",
      "soort": "functie",
-     "lijn": 9144,
+     "lijn": 9143,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadOntmoet",
      "soort": "functie",
-     "lijn": 9354,
+     "lijn": 9353,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "stopOntmoetTimer",
      "soort": "functie",
-     "lijn": 9362,
+     "lijn": 9361,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "beheerOntmoetTimer",
      "soort": "functie",
-     "lijn": 9364,
+     "lijn": 9363,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "ontmoetPositie",
      "soort": "functie",
-     "lijn": 9370,
+     "lijn": 9369,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "ontmoetTick",
      "soort": "functie",
-     "lijn": 9381,
+     "lijn": 9380,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "ontmoetActBtns",
      "soort": "functie",
-     "lijn": 9393,
+     "lijn": 9392,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "renderOntmoet",
      "soort": "functie",
-     "lijn": 9399,
+     "lijn": 9398,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "kaart",
      "soort": "pijl",
-     "lijn": 9403,
+     "lijn": 9402,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "bindOntmoet",
      "soort": "functie",
-     "lijn": 9473,
+     "lijn": 9472,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "ontmoetKies",
      "soort": "functie",
-     "lijn": 9487,
+     "lijn": 9486,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "ontmoetTeken",
      "soort": "functie",
-     "lijn": 9493,
+     "lijn": 9492,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "ontmoetStop",
      "soort": "functie",
-     "lijn": 9499,
+     "lijn": 9498,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "ontmoetSos",
      "soort": "functie",
-     "lijn": 9503,
+     "lijn": 9502,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "ontmoetSosLive",
      "soort": "functie",
-     "lijn": 9514,
+     "lijn": 9513,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "ontmoetSosStop",
      "soort": "functie",
-     "lijn": 9528,
+     "lijn": 9527,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "opOntmoetSignaal",
      "soort": "functie",
-     "lijn": 9532,
+     "lijn": 9531,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laadVakbewijs",
      "soort": "functie",
-     "lijn": 9649,
+     "lijn": 9648,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "stand",
      "soort": "pijl",
-     "lijn": 9671,
+     "lijn": 9670,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "vakIndienen",
      "soort": "functie",
-     "lijn": 9706,
+     "lijn": 9705,
      "geexporteerd": "onbekend"
     }
    ],
@@ -179147,69 +178131,6 @@
      "naam": "kijk",
      "soort": "functie",
      "lijn": 150,
-     "geexporteerd": "onbekend"
-    }
-   ],
-   "uitvoer": null,
-   "requires": [],
-   "extern": [],
-   "gebruiktDoor": []
-  },
-  {
-   "bestand": "public/apps/foundation/samendoen.js",
-   "symbolen": [
-    {
-     "naam": "$",
-     "soort": "pijl",
-     "lijn": 14,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "api",
-     "soort": "pijl",
-     "lijn": 16,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "zeg",
-     "soort": "functie",
-     "lijn": 25,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "bijeenkomst",
-     "soort": "functie",
-     "lijn": 31,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "beheer",
-     "soort": "functie",
-     "lijn": 47,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "kaart",
-     "soort": "functie",
-     "lijn": 64,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "teken",
-     "soort": "functie",
-     "lijn": 80,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "doe",
-     "soort": "functie",
-     "lijn": 88,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "veld",
-     "soort": "pijl",
-     "lijn": 92,
      "geexporteerd": "onbekend"
     }
    ],
@@ -190515,12 +189436,6 @@
      "soort": "functie",
      "lijn": 16,
      "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "groei",
-     "soort": "functie",
-     "lijn": 20,
-     "geexporteerd": "onbekend"
     }
    ],
    "uitvoer": null,
@@ -190552,19 +189467,19 @@
     {
      "naam": "lichaam",
      "soort": "functie",
-     "lijn": 39,
+     "lijn": 37,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "v",
      "soort": "functie",
-     "lijn": 40,
+     "lijn": 38,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zonderVelden",
      "soort": "functie",
-     "lijn": 62,
+     "lijn": 58,
      "geexporteerd": "onbekend"
     }
    ],
@@ -190586,69 +189501,6 @@
      "naam": "regels",
      "soort": "functie",
      "lijn": 15,
-     "geexporteerd": "onbekend"
-    }
-   ],
-   "uitvoer": null,
-   "requires": [],
-   "extern": [],
-   "gebruiktDoor": []
-  },
-  {
-   "bestand": "public/apps/magnaat-leven-stad.js",
-   "symbolen": [
-    {
-     "naam": "q",
-     "soort": "functie",
-     "lijn": 10,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "esc",
-     "soort": "functie",
-     "lijn": 11,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "vraag",
-     "soort": "functie",
-     "lijn": 14,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "loopt",
-     "soort": "functie",
-     "lijn": 22,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "herlaad",
-     "soort": "functie",
-     "lijn": 23,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "zet",
-     "soort": "functie",
-     "lijn": 25,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "spelers",
-     "soort": "functie",
-     "lijn": 32,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "teken",
-     "soort": "functie",
-     "lijn": 38,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "doe",
-     "soort": "functie",
-     "lijn": 73,
      "geexporteerd": "onbekend"
     }
    ],
@@ -190718,87 +189570,81 @@
      "geexporteerd": "onbekend"
     },
     {
-     "naam": "STAD",
-     "soort": "functie",
-     "lijn": 23,
-     "geexporteerd": "onbekend"
-    },
-    {
      "naam": "vraag",
      "soort": "functie",
-     "lijn": 24,
+     "lijn": 22,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "meldFout",
      "soort": "functie",
-     "lijn": 35,
+     "lijn": 30,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "laad",
      "soort": "functie",
-     "lijn": 36,
+     "lijn": 31,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "doe",
      "soort": "functie",
-     "lijn": 40,
+     "lijn": 35,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "klaar",
      "soort": "functie",
-     "lijn": 43,
+     "lijn": 38,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "klok",
      "soort": "functie",
-     "lijn": 52,
+     "lijn": 47,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "invoerVoor",
      "soort": "functie",
-     "lijn": 66,
+     "lijn": 60,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "lichaam",
      "soort": "functie",
-     "lijn": 67,
+     "lijn": 61,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "vrijeInvoer",
      "soort": "functie",
-     "lijn": 68,
+     "lijn": 62,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "tekenAgenda",
      "soort": "functie",
-     "lijn": 70,
+     "lijn": 64,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "tekenVandaag",
      "soort": "functie",
-     "lijn": 83,
+     "lijn": 77,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "li",
      "soort": "functie",
-     "lijn": 100,
+     "lijn": 94,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "teken",
      "soort": "functie",
-     "lijn": 107,
+     "lijn": 101,
      "geexporteerd": "onbekend"
     }
    ],

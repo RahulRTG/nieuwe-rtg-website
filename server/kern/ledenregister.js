@@ -39,6 +39,8 @@ const ladder = require('./pasladder');
 const PAS_VOLGORDE = ladder.treden().filter(t => t.beschikbaar).map(t => t.id);
 const PAS_NAAM = Object.fromEntries(ladder.treden().map(t => [t.id, t.naam]));
 const { pasVan } = require('./passen');
+const { groepeer, TE_KLEINE_GROEP, KLASSEN } = require('./bedrijfsmaat/poort');
+const LEDEN_GRENS = KLASSEN.leden.grens;
 const GESLACHT_NAAM = { v: 'Vrouw', m: 'Man', x: 'X' };
 
 const { maandCentenVoor, contractueel } = require('./pasprijs');
@@ -115,19 +117,31 @@ module.exports = ({ accounts, onboarding, geldPasprijzen, ledenAantal, db }) => 
 
     const { omzet, split } = omzetstaat(passen);
 
+    /* DE GROEPSPOORT (server/kern/bedrijfsmaat/poort.js; besluit van de eigenaar,
+       25 september 2026: ook op het kantoorscherm). Onder de tien leden geen
+       aantal: pas en geslacht houden hun naam met secundaire onderdrukking, en
+       land, stad en werkgever gaan samen op in "Overige", want daar verraadt de
+       naam al dat er iemand woont of werkt. De ledenlijst per persoon eronder
+       blijft: dat is een werklijst voor een mens op naam, geen telling. */
+    const groepstelling = (rijen2, benoemd) => groepeer(rijen2, { grens: LEDEN_GRENS, benoemd });
+    const perPasOpen = groepstelling(PAS_VOLGORDE.map(p => ({ naam: PAS_NAAM[p], pas: p, aantal: perPas[p] || 0 })), true);
+    const dichtePas = new Set(perPasOpen.filter(p => p.aantal == null).map(p => p.pas));
+    const omzetOpen = omzet.map(o => dichtePas.has(o.pas)
+      ? { pas: o.pas, pasNaam: o.pasNaam, opMaat: o.opMaat, aantal: null, maandOmzet: null, stand: TE_KLEINE_GROEP, grens: LEDEN_GRENS }
+      : o);
     return { ok: true,
       totaalGeteld: rijen.length,
       totaalLeden: typeof ledenAantal === 'function' ? ledenAantal() : rijen.length,
       metCodenaam,
-      perPas: PAS_VOLGORDE.map(p => ({ naam: PAS_NAAM[p], pas: p, aantal: perPas[p] || 0 })),
-      perGeslacht: sorteerTelling(perGeslacht),
-      perLand: sorteerTelling(perLand).slice(0, 60),
-      perStad: sorteerTelling(perStad).slice(0, 60),
+      perPas: perPasOpen,
+      perGeslacht: groepstelling(sorteerTelling(perGeslacht), true),
+      perLand: groepstelling(sorteerTelling(perLand)).slice(0, 60),
+      perStad: groepstelling(sorteerTelling(perStad)).slice(0, 60),
       // aanwas per bedrijf: de naam erbij, want een zaakcode zegt niemand iets
       viaBedrijf,
-      perBedrijf: sorteerTelling(perBedrijf).slice(0, 60)
-        .map(x => ({ naam: bedrijfsnaam[x.naam] || x.naam, code: x.naam, aantal: x.aantal })),
-      omzet, split,
+      perBedrijf: groepstelling(sorteerTelling(perBedrijf)
+        .map(x => ({ naam: bedrijfsnaam[x.naam] || x.naam, code: x.naam, aantal: x.aantal }))).slice(0, 60),
+      omzet: omzetOpen, split,
       filter: { pas: filter.pas || null, land: filter.land || null, stad: filter.stad || null, geslacht: filter.geslacht || null },
       lijst };
   }

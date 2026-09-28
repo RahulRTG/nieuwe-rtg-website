@@ -56,17 +56,17 @@ function nieuwId() { return '_' + crypto.randomBytes(20).toString('hex'); }
 
 function bewaarVerzoek(org, terug) {
   const id = nieuwId();
-  S.db.prepare('DELETE FROM saml_verzoeken WHERE tot < ?').run(klokNu());
-  S.db.prepare('INSERT INTO saml_verzoeken (id, org, terug, tot) VALUES (?, ?, ?, ?)')
+  S.huidigeDb().prepare('DELETE FROM saml_verzoeken WHERE tot < ?').run(klokNu());
+  S.huidigeDb().prepare('INSERT INTO saml_verzoeken (id, org, terug, tot) VALUES (?, ?, ?, ?)')
     .run(id, String(org), String(terug || '/'), klokNu() + VERZOEK_MS);
   return id;
 }
 /* Ophalen EN meteen weghalen: een verzoek is voor een keer. Twee antwoorden op
    hetzelfde verzoek is per definitie een herhaling. */
 function neemVerzoekBijId(id) {
-  const r = S.db.prepare('SELECT * FROM saml_verzoeken WHERE id = ?').get(String(id || ''));
+  const r = S.huidigeDb().prepare('SELECT * FROM saml_verzoeken WHERE id = ?').get(String(id || ''));
   if (!r) return null;
-  S.db.prepare('DELETE FROM saml_verzoeken WHERE id = ?').run(r.id);
+  S.huidigeDb().prepare('DELETE FROM saml_verzoeken WHERE id = ?').run(r.id);
   return r.tot < klokNu() ? null : r;
 }
 /* De org komt UIT de rij en niet uit het verzoek van de bezoeker. Dat is geen
@@ -81,9 +81,9 @@ function neemVerzoek(id, org) {
 /* Eenmalig gebruik van een assertie. Geeft false als hij al gebruikt is. */
 function markeerGebruikt(assertieId, org, tot) {
   if (!assertieId) return false;         // geen ID = niet te ontdubbelen = weigeren
-  S.db.prepare('DELETE FROM saml_gebruikt WHERE tot < ?').run(klokNu());
+  S.huidigeDb().prepare('DELETE FROM saml_gebruikt WHERE tot < ?').run(klokNu());
   try {
-    S.db.prepare('INSERT INTO saml_gebruikt (assertie_id, org, tot) VALUES (?, ?, ?)')
+    S.huidigeDb().prepare('INSERT INTO saml_gebruikt (assertie_id, org, tot) VALUES (?, ?, ?)')
       .run(String(assertieId), String(org), Number(tot) || klokNu() + VERZOEK_MS);
     return true;
   } catch (e) { return false; }          // schending van de sleutel = al gebruikt
@@ -119,7 +119,7 @@ function esc(s) {
    een SSO-adres en zonder certificaat zou een deur zijn zonder slot. */
 function zetSaml({ org, entityId, ssoUrl, certificaat }) {
   const o = String(org || '').trim().toLowerCase();
-  const rij = S.db.prepare('SELECT id FROM sso_koppelingen WHERE org = ?').get(o);
+  const rij = S.huidigeDb().prepare('SELECT id FROM sso_koppelingen WHERE org = ?').get(o);
   if (!rij) throw new Error('Maak eerst de koppeling voor "' + o + '" aan.');
   const e = String(entityId || '').trim();
   const u = String(ssoUrl || '').trim();
@@ -130,12 +130,12 @@ function zetSaml({ org, entityId, ssoUrl, certificaat }) {
   /* Nu al proberen te lezen: een certificaat dat pas bij de eerste inlog
      onleesbaar blijkt, is een storing op het slechtste moment. */
   require('./handtekening').sleutelUit(c);
-  S.db.prepare('UPDATE sso_koppelingen SET soort = ?, saml_entity_id = ?, saml_sso_url = ?, saml_cert = ? WHERE org = ?')
+  S.huidigeDb().prepare('UPDATE sso_koppelingen SET soort = ?, saml_entity_id = ?, saml_sso_url = ?, saml_cert = ? WHERE org = ?')
     .run('saml', e, u, c, o);
   return samlVan(o);
 }
 function samlVan(org) {
-  const r = S.db.prepare('SELECT org, naam, soort, saml_entity_id, saml_sso_url, saml_cert, actief FROM sso_koppelingen WHERE org = ?')
+  const r = S.huidigeDb().prepare('SELECT org, naam, soort, saml_entity_id, saml_sso_url, saml_cert, actief FROM sso_koppelingen WHERE org = ?')
     .get(String(org || '').trim().toLowerCase());
   if (!r || r.soort !== 'saml') return null;
   return { org: r.org, naam: r.naam, soort: 'saml', samlEntityId: r.saml_entity_id,

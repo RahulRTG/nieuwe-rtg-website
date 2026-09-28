@@ -3209,6 +3209,24 @@
       "maturity": "L0"
     },
     {
+      "id": "leerhuis",
+      "url": "/apps/leerhuis.html",
+      "name": "Mijn leerhuis",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "workspace",
+      "icon": "grid",
+      "sections": [
+        "Welk leerhuis",
+        "Vandaag",
+        "Mijn leerpaden"
+      ],
+      "description": "",
+      "maturity": "L0"
+    },
+    {
       "id": "lesmaker",
       "url": "/apps/lesmaker.html",
       "name": "RTG Lesmaker",

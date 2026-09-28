@@ -14,36 +14,42 @@
 module.exports = (ctx) => {
   const { save, schoon, nu, logActivity, kaartMet, kaartStand, ensureKaartjes } = ctx;
 
-  /* De controle. Het personeel tikt of scant de code; het antwoord is kort en
-     eenduidig, want een conducteur staat in een rijdende bus. */
-  function kaartControle(supplier, actor, body = {}) {
+  /* De controle. Het personeel scant de code; het antwoord is kort en
+     eenduidig, want een conducteur staat in een rijdende bus. De rit wordt
+     geteld in de collectietransactie van de code (./kaarttoegang: claim), dus
+     twee conducteurs die tegelijk scannen tellen hem een keer; `validaties`
+     op het kaartje is daarna de projectie. */
+  async function kaartControle(supplier, actor, body = {}) {
     ensureKaartjes();
-    const code = schoon(body.code, 40).toUpperCase();
+    const code = schoon(body.code, 80);
     if (!code) return { status: 400, error: 'Geen code.' };
-    const k = kaartMet(code);
-    if (!k) return { status: 404, error: 'Dit vervoerbewijs kennen wij niet.', geldig: false };
-    if (k.vervoerder !== supplier.code)
-      return { status: 403, error: 'Dit kaartje is van een andere vervoerder (' + k.vervoerderNaam + ').', geldig: false };
-
-    const st = kaartStand(k);
-    if (st.stand !== 'geldig')
-      return { status: 409, error: 'Niet geldig: ' + st.reden, geldig: false, stand: st.stand, kaartje: kort(k, st) };
-
+    ctx.kaartLegacyRuim();
     /* Een lijn mag meegegeven worden (de conducteur zit op lijn X); staat het
        kaartje op een andere lijn, dan is het hier niet geldig. Zonder deze
        controle is een goedkoop kaartje op de stadslijn ook geldig op de ferry.
        Een ABONNEMENT hangt niet aan een lijn maar aan de lijnen die de
        overeenkomst dekte toen het werd gekocht; die lijst beslist. */
     const lijnId = schoon(body.lijnId, 40);
-    const past = k.product === 'abonnement'
-      ? (!lijnId || (ctx.aboGeldtOp && ctx.aboGeldtOp(k, lijnId)))
-      : (!lijnId || lijnId === k.lijnId);
-    if (!past)
-      return { status: 409, error: k.product === 'abonnement'
+    const uit = await ctx.kaartClaim({ code, vervoerder: supplier.code, controleer: id => {
+      const k = kaartMet(id);
+      if (!k) return { status: 404, error: 'Dit vervoerbewijs kennen wij niet.' };
+      const st = kaartStand(k);
+      if (st.stand !== 'geldig') return { status: 409, error: 'Niet geldig: ' + st.reden, stand: st.stand };
+      const past = k.product === 'abonnement'
+        ? (!lijnId || (ctx.aboGeldtOp && ctx.aboGeldtOp(k, lijnId)))
+        : (!lijnId || lijnId === k.lijnId);
+      if (!past) return { status: 409, error: k.product === 'abonnement'
         ? 'Dit abonnement geldt niet op deze lijn.'
-        : 'Dit kaartje geldt voor ' + k.lijnNaam + ', niet voor deze lijn.',
-        geldig: false, kaartje: kort(k, st) };
-
+        : 'Dit kaartje geldt voor ' + k.lijnNaam + ', niet voor deze lijn.' };
+      return null;
+    } });
+    const k = uit.id ? kaartMet(uit.id) : null;
+    if (uit.error) {
+      const w = { status: uit.status, error: uit.error, geldig: false };
+      if (uit.stand) w.stand = uit.stand;
+      if (k && uit.status === 409) w.kaartje = kort(k, kaartStand(k));
+      return w;
+    }
     k.validaties = (k.validaties || []).concat([{ at: nu(), door: schoon(actor, 60) || 'personeel',
       lijnId: k.lijnId, lijnNaam: k.lijnNaam }]);
     save();

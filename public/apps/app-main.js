@@ -13,7 +13,11 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
+<<<<<<< HEAD
 var RTG_BOUW = '7433e1d6';
+=======
+var RTG_BOUW = '66f7b80b';
+>>>>>>> origin/main
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -230,6 +234,8 @@ var RTG_BOUW = '7433e1d6';
      globale verwijzing; niets wordt in local/sessionStorage bewaard. */
   let wervingscode = String(window.__RTG_WERVING_CODE || '').trim().toUpperCase();
   try { delete window.__RTG_WERVING_CODE; } catch (e) { window.__RTG_WERVING_CODE = null; }
+  // de campagnecode uit de link (app.html, besluit C6): alleen een telling bij de aanmelding
+  const campagne = String(window.__RTG_CAMPAGNE || '') || undefined;
   magnaatProef = zoekParams.get('magnaat') === '1';
   if (magnaatProef) API.enabled = false;
   let vastePas = zoekParams.get('pas');
@@ -440,9 +446,10 @@ var RTG_BOUW = '7433e1d6';
         try {
           const data = cred.response || (cred.register
             ? await accessRequest('identity.account.create', { name:cred.name,email:cred.u,geboortedatum:cred.geboortedatum,password:cred.p,
-                wervingscode:wervingscode || undefined })
+                wervingscode:wervingscode || undefined, campagne })
             : await accessRequest('identity.session.open', {login:cred.u,password:cred.p,pasApp:vastePas || undefined}));
           if (data.tweedeFactorNodig) return data;
+          if (data.aanmeldkanaalVraag) aanmeldkanaalVraag = data.aanmeldkanaalVraag;
           if (!data.token || !data.state) throw new Error('De server heeft nog geen geldige sessie bevestigd.');
           API.token = data.token;
           applyState(data.state);           // user = het echte account
@@ -984,6 +991,7 @@ var RTG_BOUW = '7433e1d6';
 
   // Na de onboarding kiest het lid zelf een wereld; de inlog opent niets voor.
   function naarWereldkeuze(){
+    vraagAanmeldkanaal();
     if (window.RTGCommand && typeof RTGCommand.land === 'function') RTGCommand.land();
   }
 
@@ -1046,6 +1054,36 @@ var RTG_BOUW = '7433e1d6';
     onbZeg(onbVraagTekst(v));
     if (inp && !preserve) inp.focus();
   }
+  /* ---------- de herkomstvraag op het welkomstscherm (besluit C6) ----------
+     De eigenaar koos voor NA de registratie: het aanmeldformulier blijft even
+     kort, en wie de vraag overslaat is gewoon lid. De server zegt bij de
+     registratie OF de vraag open is en geeft de antwoorden mee (er is geen
+     tweede lijst hier); de vraag komt pas als de onboarding klaar is, zodat hij
+     het verplichte gesprek niet onderbreekt. Een keer: het antwoord en het
+     overslaan sluiten hem allebei, op de server. */
+  var aanmeldkanaalVraag = null;
+  function vraagAanmeldkanaal(){
+    const v = aanmeldkanaalVraag; aanmeldkanaalVraag = null;
+    if (!v || !Array.isArray(v.kanalen) || !v.kanalen.length || !API.live || document.getElementById('kanaalVraag')) return;
+    const d = document.createElement('section');
+    d.id = 'kanaalVraag'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-labelledby', 'kanaalVraagTitel');
+    d.innerHTML = '<div class="kv-in">' +
+      '<div id="kanaalVraagTitel" class="big kv-titel">' + escT(T('kanaal.vraag', 'Hoe kent u RTG?')) + '</div>' +
+      '<div class="meta kv-meta">' + escT(T('kanaal.uitleg', 'Eén vraag, en niet verplicht. We tellen alleen hoeveel mensen elk antwoord gaven; bij uw account komt het niet te staan.')) + '</div>' +
+      '<div class="kv-rij">' +
+      v.kanalen.map(function(k){ return '<button class="go" data-kanaal="' + escT(k.id) + '">' + escT(k.label) + '</button>'; }).join('') +
+      '</div><button class="go kv-over" data-kanaal="">' + escT(T('kanaal.over', 'Overslaan')) + '</button></div>';
+    document.body.appendChild(d);
+    d.querySelectorAll('[data-kanaal]').forEach(function(b){ b.addEventListener('click', async function(){
+      d.querySelectorAll('button').forEach(function(x){ x.disabled = true; });
+      try {
+        await API.call('/auth/aanmeldkanaal', { kanaal: b.dataset.kanaal || null });
+        if (b.dataset.kanaal) toast(T('kanaal.dank', 'Dank u.'));
+      } catch (e) { /* een telling is een extra; de vraag gaat hoe dan ook dicht */ }
+      d.remove();
+    }); });
+  }
+
 /* Language changes only presentation; agreement, identity and focus are preserved. */
   window.addEventListener('rtglang',()=>{
     if(!onbSt || onbEl('onbGate').hidden) return;
@@ -2560,8 +2598,10 @@ var RTG_BOUW = '7433e1d6';
       '<div style="margin-top:0.35rem;font-size:0.92rem;"><b>'+esc(t.naam)+'</b> \u00B7 '+t.datum+' '+t.tijd+' \u00B7 '+t.personen+'p</div>'+
       (t.gebruikt
         ? '<div style="margin-top:0.4rem;font-size:0.8rem;color:var(--rtg-leesgroen,var(--green));">\u2705 '+T('tk.gebruikt','Binnen; ingecheckt door ')+esc(t.checkin.door)+'</div>'
+        // de code staat nergens bewaard: tonen maakt een nieuwe (en trekt de vorige in)
         : '<div style="margin-top:0.5rem;text-align:center;background:rgba(208,172,87,0.12);border:1px dashed rgba(208,172,87,0.5);border-radius:0;padding:0.55rem;">'+
-          '<span style="font-size:1.3rem;letter-spacing:0.35em;color:var(--rtg-leesgoud,var(--gold));font-weight:700;">'+esc(t.code)+'</span>'+
+          '<span id="tkCode-'+esc(t.ref)+'" style="font-size:0.9rem;letter-spacing:0.08em;color:var(--rtg-leesgoud,var(--gold));font-weight:700;word-break:break-all;"></span>'+
+          '<button class="bz-btn" data-tktoon="'+esc(t.ref)+'">'+T('tk.toon','Toon ticketcode')+'</button>'+
           '<div style="font-size:0.66rem;color:var(--soft);margin-top:0.2rem;">'+T('tk.laatzien','Laat deze code zien aan de deur')+'</div></div>')+
       // de eigen transferdienst van de zaak: aanvragen, of live zien wie er komt
       (t.transfer
@@ -2575,6 +2615,13 @@ var RTG_BOUW = '7433e1d6';
             '<button class="bz-btn" data-trvraag="'+t.ref+'" data-trprijs="'+t.transferPrijs+'">\uD83D\uDE90 '+(t.transferPrijs ? eur(t.transferPrijs) : T('tk.tr.gratis','Gratis'))+'</button></div>'
           : ''))+
       '</div>').join('');
+    document.querySelectorAll('[data-tktoon]').forEach(b => b.addEventListener('click', async () => {
+      try {
+        const r = await API.call('/ticket/toon', { ref: b.dataset.tktoon });
+        const el = document.getElementById('tkCode-' + b.dataset.tktoon);
+        if (el) el.textContent = r.code;
+      } catch(e){ toast(e.message); }
+    }));
     document.querySelectorAll('[data-trvraag]').forEach(b => b.addEventListener('click', async () => {
       const veld = document.getElementById('trVan-' + b.dataset.trvraag);
       try {
@@ -3367,7 +3414,7 @@ var RTG_BOUW = '7433e1d6';
         '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--burgundy);display:flex;align-items:center;gap:0.4rem;"><span class="livedot"></span>'+esc(o.supplierName)+' \u00B7 '+(o.levering==='ophalen'?T('bz.m.ophalen','ophalen'):T('bz.m.bezorgen','bezorging'))+'</div>'+
         '<div style="margin-top:0.4rem;font-size:0.9rem;"><b>'+st+'</b><span id="bzEta-'+o.ref+'">'+(o.status==='onderweg'&&o.etaMin?' \u00B7 \u23F1 '+o.etaMin+' min':'')+'</span></div>'+
         '<div style="margin-top:0.3rem;font-size:0.78rem;color:var(--muted);">'+o.items.map(i=>i.qty+'x '+esc(i.name)).join(', ')+
-        (o.levering==='ophalen' ? ' \u00B7 '+T('bz.m.code','code')+' <b style="color:var(--rtg-leesgoud,var(--gold));">'+o.pickup+'</b>' : (o.bezorger?' \u00B7 \uD83D\uDEF5 '+esc(o.bezorger.name):''))+'</div></div>';
+        (o.levering==='ophalen' ? ' \u00B7 '+T('bz.m.code','bon')+' <b style="color:var(--rtg-leesgoud,var(--gold));">'+o.pickup+'</b>' : (o.bezorger?' \u00B7 \uD83D\uDEF5 '+esc(o.bezorger.name):''))+'</div></div>';
     }).join('');
   }
   function opBezorg(d){
@@ -3448,7 +3495,7 @@ var RTG_BOUW = '7433e1d6';
         const skV = b.order.servicekosten;
         const sk = skV ? ' ' + T('bz.service','(incl. EUR {bedrag} servicekosten ex btw voor niet-leden)')
           .replace('{bedrag}', String(skV.exBtw).replace('.', ',')) : '';
-        toast((bzLevering === 'ophalen' ? T('bz.ok.oph','Betaald. Uw ophaalcode: ') + b.order.pickup : T('bz.ok.bez','Betaald. U volgt de bezorging hierboven live.')) + sk);
+        toast((bzLevering === 'ophalen' ? T('bz.ok.oph','Betaald. Uw bonnummer: ') + b.order.pickup + T('bz.ok.qr','. Bij het ophalen toont u de afhaal-QR onder Mijn bestellingen.') : T('bz.ok.bez','Betaald. U volgt de bezorging hierboven live.')) + sk);
         bzZaak = null; bzMand = {};
         renderBestellen(); laadBzMijn();
       } catch(e){ toast(e.message); }
@@ -3511,7 +3558,7 @@ var RTG_BOUW = '7433e1d6';
             '<div class="acts">' + (o.paid
               ? '<span class="mo-paid">✓ '+T('app.paid','Betaald')+'</span>'
               : '<button class="mo-pay js-opay">' + FID_MINI + T('app.paywithfid','Betaal met Face ID') + '</button>') +
-              (o.pickup ? '<button class="mo-code js-ocode">' + T('app.showcode','Toon ophaalcode') + '</button>' : '') +
+              (o.pickup && (o.paid || o.aanBalie) && o.levering !== 'bezorgen' && !o.refunded && !['geserveerd','opgehaald','bezorgd','geweigerd','terugbetaald','geannuleerd'].includes(o.status) ? '<button class="mo-code js-ocode">' + T('app.showcode','Toon afhaal-QR') + '</button>' : '') +
               (['nieuw','wacht-op-betaling'].includes(o.status) ? '<button class="mo-code js-oann">✕ ' + T('erv.annuleer','Annuleer') + '</button>' : '') +
               (o.paid && !o.splitst ? '<button class="mo-code js-osplit">' + T('erv.splits','Splits') + '</button>' : '') +
               (['geserveerd','bezorgd','opgehaald'].includes(o.status) ? '<button class="mo-code js-orev">' + T('erv.review','Beoordeel') + '</button>' : '') +
@@ -7090,16 +7137,22 @@ var RTG_BOUW = '7433e1d6';
       sparIn.addEventListener('keydown', e => { if (e.key === 'Enter') park(); });
     }
   }
-  /* ---------- oplichtend ophaalcode-scherm ---------- */
-  function showGlow(o){
+  /* ---------- oplichtend afhaalscherm ----------
+     De QR draagt de AFHAALCODE: 128 bits, en de server geeft hem alleen in het
+     antwoord op /order/afhaalcode. Elke keer tonen maakt dus een nieuwe code en
+     trekt de vorige in -- er staat niets van op dit toestel. Het bonnummer
+     eronder is voor mensen (keuken, pas) en opent niets. */
+  async function showGlow(o){
+    let d;
+    try { d = await API.call('/order/afhaalcode', { ref: o.ref }); }
+    catch(e){ toast(e.message); return; }
     $('#gcSup').textContent = o.supplierName;
-    $('#gcCode').textContent = o.pickup;
-    // een echte, scanbare QR van de ophaalcode: de kassa scant hem, of typt de code
+    $('#gcCode').textContent = o.pickup ? T('app.gc.bon','Bon') + ' ' + o.pickup : '';
     const qh = $('#gcQr');
     if (qh){
       qh.innerHTML = ''; qh.style.display = 'none';
-      if (window.RTGQRteken && o.pickup){
-        try { qh.appendChild(RTGQRteken.teken(String(o.pickup), { schaal: 5, ecc: 'M' })); qh.style.display = 'inline-block'; } catch(e){}
+      if (window.RTGQRteken && d && d.code){
+        try { qh.appendChild(RTGQRteken.teken(String(d.code), { schaal: 4, ecc: 'M' })); qh.style.display = 'inline-block'; } catch(e){}
       }
     }
     $('#glowCode').classList.add('open');
@@ -7948,12 +8001,20 @@ var RTG_BOUW = '7433e1d6';
       '<div style="font-size:0.72rem;color:var(--muted);margin-top:0.3rem;line-height:1.5;">' + T('gc.s','Koop een cadeaukaart van een partner en geef de code cadeau. Inwisselen gaat bij de zaak.') + '</div>' +
       (kaarten.length ? kaarten.map(k =>
         '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.7rem;padding:0.55rem 0;border-bottom:1px solid var(--line);font-size:0.8rem;">' +
-        '<span>' + k.supplierName + '<span style="display:block;font-size:0.66rem;color:var(--rtg-leesgoud,var(--gold));letter-spacing:0.06em;">' + k.code + '</span></span>' +
-        '<b>' + eur(k.saldo) + '</b></div>').join('') : '') +
+        '<span>' + k.supplierName + '<span style="display:block;font-size:0.66rem;color:var(--muted);letter-spacing:0.06em;">' + (k.stand === 'actief' ? T('gc.getoond','Code getoond bij aankoop') : T('gc.dicht','Code niet meer geldig')) + '</span></span>' +
+        '<b>' + eur(k.saldo) + '</b>' + (k.saldo > 0 ? '<button class="vbtn gcRot" data-id="' + k.id + '">' + T('gc.nieuw','Nieuwe code') + '</button>' : '') + '</div>').join('') : '') +
       '<div style="display:flex;gap:0.5rem;margin-top:0.7rem;flex-wrap:wrap;">' +
       '<select id="gcSup" style="flex:2;min-width:120px;background:var(--bg);border:1px solid var(--line);border-radius:0;padding:0.6rem;color:var(--txt);font-family:inherit;">' + opties + '</select>' +
       '<input id="gcAmt" type="number" placeholder="€ 50" style="flex:1;min-width:70px;background:var(--bg);border:1px solid var(--line);border-radius:0;padding:0.6rem;color:var(--txt);font-family:inherit;">' +
       '<button id="gcBuy" style="background:var(--knop);color:var(--knop-txt);border:none;border-radius:0;padding:0.6rem 1rem;font-size:0.74rem;font-weight:600;font-family:inherit;">' + T('gc.koop','Koop') + '</button></div></div>';
+    /* De code staat alleen in het antwoord op de koop. Kwijt? Een nieuwe code
+       maakt de oude ongeldig en wordt ook maar een keer getoond. */
+    wrap.querySelectorAll('.gcRot').forEach(b => b.addEventListener('click', async () => {
+      try {
+        const d = await API.call('/giftcard/roteer', { id: b.dataset.id, idem: RTGIdem('gc-rot') });
+        toast(T('gc.nieuwecode','Nieuwe code (de oude werkt niet meer):') + ' ' + d.code);
+      } catch(e){ toast(e.message); }
+    }));
     const kb = $('#gcBuy');
     if (kb) kb.addEventListener('click', () => {
       const bedrag = Math.round(Number($('#gcAmt').value));

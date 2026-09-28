@@ -46,7 +46,7 @@ test.before(async () => {
     body: JSON.stringify({ login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' }) })).json();
   office = o.token;
   const a = await oapi('stad/node/aanmeld', { doosNaam: 'Stadsdoos Testkade', zone: 'Marina', sensoren: ['water', 'waterstand'] });
-  doos = { serial: a.body.serial, sleutel: a.body.sleutel };
+  doos = { serial: a.body.serial, sleutel: a.body.sleutel, m: a.body.manifestSleutel };
   assert.ok(doos.serial && doos.sleutel, 'er hangt een echte doos met een eigen sleutel');
 });
 test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
@@ -137,7 +137,7 @@ test('sleutelrotatie: de nieuwe werkt meteen, de oude blijft nog even geldig', a
   const metOnzin = await fetch(base + '/api/stad/doos/hartslag', { method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ serial: doos.serial, sleutel: 'zomaarwat' }) });
   assert.equal(metOnzin.status, 401, 'en een verzonnen sleutel niet');
-  doos.sleutel = n.body.sleutel;
+  doos.sleutel = n.body.sleutel; doos.m = n.body.manifestSleutel;
 });
 
 /* ---------------- 4. Ondertekende updates en sabotage ----------------
@@ -163,13 +163,12 @@ test('updates dragen een handtekening die de doos zelf kan narekenen, en sabotag
      over wat de server als bericht meestuurt. Dat verschil is de hele toets:
      wie de server zijn eigen tekst laat aanleveren, controleert alleen dat de
      server consequent is -- niet dat de handtekening aan versie, hash en tijd
-     vastzit. (Mijn eerste versie deed precies dat, en een mutatie die over een
-     vaste tekst tekende bleef daardoor groen.) */
+     vastzit. */
   const verwachtBericht = hb.update.versie + '|' + hb.update.sha256 + '|' + hb.update.at;
   assert.equal(hb.update.bericht, verwachtBericht, 'het ondertekende bericht is versie|hash|tijd');
-  const eigenHash = crypto.createHash('sha256').update(doos.sleutel).digest('hex');
-  const zelfGerekend = crypto.createHmac('sha256', eigenHash).update(verwachtBericht).digest('hex');
-  assert.equal(zelfGerekend, hb.update.handtekening, 'de doos kan de handtekening met zijn eigen sleutel narekenen');
+  // met de manifestsleutel uit de uitgifte, nooit de opgeslagen hash (kern/stad/doossleutel.js)
+  const zelfGerekend = crypto.createHmac('sha256', Buffer.from(doos.m, 'hex')).update(verwachtBericht).digest('hex');
+  assert.equal(zelfGerekend, hb.update.handtekening, 'de doos kan de handtekening met zijn manifestsleutel narekenen');
 
   // hij installeert en meldt dat terug; daarna ligt er niets meer klaar
   await fetch(base + '/api/stad/doos/hartslag', { method: 'POST', headers: { 'Content-Type': 'application/json' },

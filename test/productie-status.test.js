@@ -75,9 +75,35 @@ function kandidaatDeel(naam) {
     immutable:verwijzing + '@' + digest, herkomstSha256:'9'.repeat(64), sbomSha256:'a'.repeat(64) };
 }
 
+function nativeGroen() {
+  const v = groen(); v.artifactSoort = 'native';
+  v.kandidaatControle = { ok:true, soort:'native', commit:COMMIT, bewijsSha256:'4'.repeat(64),
+    artifact:{ platform:'darwin', arch:'arm64', digest:'sha256:' + '5'.repeat(64), manifestSha256:'6'.repeat(64),
+      runtimeProofSha256:'7'.repeat(64), attestationSha256:'8'.repeat(64) },
+    rollback:{ previousDigest:'sha256:' + '9'.repeat(64), proofSha256:'a'.repeat(64), externalEvidenceBound:true } };
+  return v;
+}
+test('native kandidaat vervangt alleen de artifactpoort; alle productiegates blijven vereist', () => {
+  assert.equal(beoordeel(nativeGroen()).status, 'READY');
+  for (const field of ['suite', 'schermsuite', 'pg', 'releaseGate', 'staging', 'golive', 'externControle']) {
+    const v = nativeGroen(); v[field] = null;
+    assert.equal(beoordeel(v).status, 'BLOCKED', field);
+  }
+  const money = nativeGroen(); money.golive.geld.inkomendGeconfigureerd = false;
+  assert.equal(beoordeel(money).status, 'BLOCKED');
+});
+test('native runtimeherstart, onbekende artifactsoort en onbeoordeelde rollback geven geen READY', () => {
+  const same = nativeGroen(); same.kandidaatControle.rollback.previousDigest = same.kandidaatControle.artifact.digest;
+  assert.equal(beoordeel(same).status, 'BLOCKED');
+  const unknown = groen(); unknown.artifactSoort = 'anything';
+  assert.equal(beoordeel(unknown).status, 'BLOCKED');
+  const unsigned = nativeGroen(); unsigned.kandidaatControle.rollback.externalEvidenceBound = false;
+  assert.equal(beoordeel(unsigned).status, 'BLOCKED');
+});
+
 test('alleen vier verse groene poorten op exact dezelfde code geven READY', () => {
   const uit = beoordeel(groen());
-  assert.deepEqual(uit, { status: 'READY', blokkades: [] });
+  assert.deepEqual(uit, { status: 'READY', blokkades: [], zonderRail: false });
   assert.equal(hoortBij(COMMIT, COMMIT.slice(0, 7)), true);
   assert.equal(hoortBij(COMMIT, 'abc'), false, 'een te korte stempel is geen commitbewijs');
 });
@@ -94,13 +120,19 @@ test('dirty code, stale suite en een ontbrekende controle kunnen niet worden weg
   assert.ok(uit.blokkades.some(x => /Servicebevoegdheden/.test(x)));
 });
 
-test('tijdelijk gesloten accountwrites blijven een machineleesbare releaseblokkade', () => {
+test('gesloten accountwrites zijn een machineleesbare releaseblokkade, de transactionele stand niet', () => {
+  /* De rode kant blijft beproefd met de vorm die duurzaamheid.js teruggeeft als
+     het deelnemersprotocol ontbreekt; de groene kant is de echte releaseStand. */
   const invoer = groen();
-  invoer.golive.accounts = require('../server/accounts/duurzaamheid').releaseStand();
+  invoer.golive.accounts = { code: 'PG_ACCOUNTS_ATOMAIR_ONTBREEKT', gereed: false, transactioneel: false,
+    productieMutaties: 'gesloten', vereist: 'gedeelde-pg-requesttransactie' };
   const uit = beoordeel(invoer);
   assert.equal(uit.status, 'BLOCKED');
   assert.ok(uit.blokkades.some(x => /Accountmutaties.*PostgreSQL-requesttransactie/.test(x)));
-  assert.equal(invoer.golive.accounts.code, 'PG_ACCOUNTS_ATOMAIR_ONTBREEKT');
+  const echt = groen();
+  echt.golive.accounts = require('../server/accounts/duurzaamheid').releaseStand();
+  assert.ok(!beoordeel(echt).blokkades.some(x => /Accountmutaties/.test(x)),
+    'de transactionele accountlaag blokkeert de release niet');
 });
 
 test('een groene selectie of een suite van vóór een nieuw testbestand is nooit volledig bewijs', () => {
@@ -266,4 +298,46 @@ test('Foundation-settlement vraagt een echt mod-97-geldig IBAN', () => {
   assert.equal(geld.geldigIban('NL91 ABNA 0417 1643 00'), true);
   assert.equal(geld.geldigIban('NL91 ABNA 0417 1643 01'), false);
   assert.equal(geld.geldigIban('ingevuld'), false);
+});
+
+/* DE BEPERKTE RELEASE ZONDER KAARTRAIL (besluit B2a, RELEASEKANDIDAAT.md).
+   Alles moet even groen zijn, alleen de rails en de geldmotor vallen weg -- en
+   de uitkomst is dan nooit READY maar READY_ZONDER_RAIL. */
+function zonderRail() {
+  const invoer = groen();
+  invoer.golive.geld = { betalingenUit: true, releaseZonderRail: true,
+    inkomendGeconfigureerd: false, uitgaandGeconfigureerd: false, foundationRekeningGeconfigureerd: true };
+  delete invoer.golive.geldMotor;
+  return invoer;
+}
+
+test('zonder kaartrail, maar verder alles groen: READY_ZONDER_RAIL en nooit READY', () => {
+  const uit = beoordeel(zonderRail());
+  assert.equal(uit.status, 'READY_ZONDER_RAIL');
+  assert.deepEqual(uit.blokkades, []);
+});
+
+test('de beperkte stand wist geen enkele andere blokkade', () => {
+  const invoer = zonderRail();
+  invoer.golive.geld.foundationRekeningGeconfigureerd = false;
+  invoer.releaseGate.geslaagd = false;
+  const uit = beoordeel(invoer);
+  assert.equal(uit.status, 'BLOCKED');
+  assert.ok(uit.blokkades.some(x => /Foundation-settlement/.test(x)));
+});
+
+test('een vlag zonder dat betalen echt uit staat, is geen beperkte release', () => {
+  const invoer = zonderRail();
+  invoer.golive.geld.betalingenUit = false;
+  const uit = beoordeel(invoer);
+  assert.equal(uit.status, 'BLOCKED');
+  assert.ok(uit.blokkades.some(x => /inkomende betaalprovider/.test(x)));
+  assert.ok(uit.blokkades.some(x => /geldrails zijn niet aan de bereikbare duurzame geldmotor/.test(x)));
+});
+
+test('de geldstand leidt de beperkte release alleen af uit BEIDE vlaggen', () => {
+  const { stand } = require('../server/config/productie-geld');
+  assert.equal(stand({ RTG_BETALEN_UIT: '1', RTG_RELEASE_ZONDER_RAIL: '1' }).releaseZonderRail, true);
+  assert.equal(stand({ RTG_RELEASE_ZONDER_RAIL: '1' }).releaseZonderRail, false);
+  assert.equal(stand({ RTG_BETALEN_UIT: '1' }).releaseZonderRail, false);
 });

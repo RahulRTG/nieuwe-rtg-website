@@ -49,7 +49,7 @@
    bestand houdt de organisatie: de boom, de steden, de zetels, de partners en
    de projecten. */
 module.exports = (kern) => {
-  const { app, officeAuth, rtfos } = kern;
+  const { app, auth, officeAuth, rtfos } = kern;
 
   const stuur = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const veilig = async (res, werk) => {
@@ -101,7 +101,7 @@ module.exports = (kern) => {
 
   require('./uitvoering')({ app, officeAuth, rtfos, H });
   require('./netwerk')({ app, officeAuth, rtfos, H });
-  require('./doelgroepen')({ app, officeAuth, rtfos, veilig, H });
+  require('./doelgroepen')({ app, auth, officeAuth, rtfos, veilig, H });
   require('./governance')({ app, officeAuth, rtfos, veilig, H });
   require('./afmaak')({ app, officeAuth, rtfos, veilig, H });
   /* De buurtruil hangt aan de LEDENdeur en niet aan de kantoordeur; hij krijgt

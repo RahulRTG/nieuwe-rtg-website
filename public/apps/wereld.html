@@ -231,10 +231,10 @@
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 
 <link href="/apps/wereld-feed.css" rel="stylesheet">
-<link href="/shared/rtg-world-home.css" rel="stylesheet">
-<link rel="stylesheet" href="/shared/rtg-world-desktop.css">
-<link rel="stylesheet" href="/shared/rtg-world-widgets.css">
-<script src="/shared/rtg-world-desktop.js" defer></script>
+<link href="/apps/saloon/saloon.css" rel="stylesheet">
+<link href="/apps/saloon/redactioneel.css" rel="stylesheet">
+<link href="/apps/saloon/edge.css" rel="stylesheet">
+<script src="/apps/redactie/publicatie.js"></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl rtg-social-experience" data-world-home="living" data-rtg-world="living" data-rtg-eigenvlak="onyx" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage">
@@ -318,6 +318,12 @@
 <script src="/shared/glyf.js"></script>
 <script src="/apps/wereld-welcome.js"></script>
 <script src="/apps/wereld-feed.js"></script>
+<script src="/shared/ondertitelband.js"></script>
+<script src="/apps/saloon/acties.js"></script>
+<script src="/apps/saloon/kaart.js"></script>
+<script src="/apps/saloon/opbouw.js"></script>
+<script src="/apps/saloon/lezer.js"></script>
+<script src="/apps/saloon/saloon.js"></script>
 <script>
 (function () {
   'use strict';
@@ -336,6 +342,10 @@
 
   var staat = { modus: 'alles', lens: 'friends', modi: [], lenzen: [], vanaf: 0, items: [], kaart: {},
     secties: [], context: null, weergave: 'feed', zichtbaarheden: [], vermogens: [] };
+  var saloon = RTGSaloon.start({ api: api, fout: toon, modus: function () { return staat.modus; },
+    laad: function () { staat.vanaf = 0; return laad(); } });
+  saloon.zichtbaar(false);
+  var laadNummer = 0;
   var mag = function (v) { return staat.vermogens.indexOf(v) >= 0; };
 
   function toon(bericht) {
@@ -351,7 +361,7 @@
     return d.getDate() + '/' + (d.getMonth() + 1);
   };
   var BRONNAAM = { salon: 'De Salon', pulse: 'Pulse', zakelijk: 'Zakelijk',
-    genootschap: 'Genootschap', verhalen: 'Verhaal' };
+    genootschap: 'Genootschap', verhalen: 'Verhaal', nieuws: 'Journalistiek', makers: 'Makers', plekken: 'Zaken en plekken', persoonlijk: 'Mijn reizen' };
 
   function tekenPassport(d) {
     var lid = d.lidmaatschap;
@@ -427,10 +437,10 @@
     var n = $('#feed');
     n.textContent = '';
     if (!staat.items.length) {
-      n.innerHTML = RTGLivingFeed.welcome('empty');
+      n.innerHTML = saloon.parameters().ervaring ? '<p class="leeg">' + RTGLivingFeed.text('noResults', 'Geen resultaten binnen uw huidige keuzes.') + '</p>' : RTGLivingFeed.welcome('empty');
       return;
     }
-    var secties = staat.secties || [];
+    var secties = saloon.vorm() === 'agenda' ? [] : (staat.secties || []);
     secties.forEach(function (sectie) {
       var items = staat.items.filter(function (i) { return i.sectie === sectie.id; });
       if (!items.length) return;
@@ -452,7 +462,7 @@
 
   var TYPENAAM = { moment: 'Moment', story: 'Story', place: 'Plek', plan: 'Plan', event: 'Event',
     travel: 'Reis', food: 'Aan tafel', activity: 'Activiteit', question: 'Vraag', offer: 'Aanbod',
-    live: 'Live', business: 'Business', community: 'Community' };
+    article: 'Artikel', work: 'Werk', live: 'Live', business: 'Business', community: 'Community' };
   function tekenKaart(n, i) {
     var k = document.createElement('article');
     k.className = 'kaart' + (RTGLivingFeed.photoCard(i) ? ' living-photo' : '');
@@ -461,6 +471,7 @@
       (TYPENAAM[i.type] || 'Moment') + ', ' + (BRONNAAM[i.bron] || i.bron),
       klok(i.at), i.begint ? klok(i.begint) : '');
     n.appendChild(k);
+    if (i.bronGroep) saloon.kaart(k, i);
   }
 
   /* Openen gebruikt de koppelkaart die de SERVER bij het opstarten meegaf. Dit
@@ -626,11 +637,12 @@
   function toonWeergave(welke) {
     staat.weergave = welke;
     $('#feed').hidden = welke !== 'feed';
+    saloon.zichtbaar(welke === 'feed' && !!token);
     $('#profiel').hidden = welke !== 'profiel';
     $('#ontdek').hidden = welke !== 'ontdek';
     $('#werelden').hidden = welke !== 'feed';
     $('#lenzen').hidden = welke !== 'feed';
-    $('#feedHeading').hidden = welke !== 'feed';
+    $('#feedHeading').hidden = true;
     $('#membership').hidden = welke !== 'feed' || !staat.modi.length;
     $('#livingAccess').hidden = welke !== 'feed' || !!token;
     $('#livingNearby').hidden = welke !== 'feed';
@@ -653,23 +665,28 @@
   });
 
   function laad(aanvullen) {
-    return api('/feed', { modus: staat.modus, lens: staat.lens, vanaf: staat.vanaf })
+    var nummer = ++laadNummer;
+    var vraag = Object.assign({ modus: staat.modus, lens: staat.lens, vanaf: aanvullen ? staat.vanaf : 0 }, saloon.parameters());
+    return api('/feed', vraag)
       .then(function (d) {
-        staat.items = aanvullen ? staat.items.concat(d.items) : d.items;
+        if (nummer !== laadNummer) return;
+        staat.items = aanvullen ? Array.from(new Map(staat.items.concat(d.items).map(function (i) { return [i.id, i]; })).values()) : d.items;
+        saloon.ontvang(d, vraag, aanvullen);
         staat.secties = d.secties || []; staat.context = d.context || null;
         toon(null);
         tekenLensContext();
         tekenFeed(d.meer);
       })
-      .catch(function (e) { toon(e.message); if (!staat.items.length) $('#feed').innerHTML = RTGLivingFeed.welcome('error'); });
+      .catch(function (e) { if (nummer !== laadNummer) return; toon(e.message); if (!staat.items.length) $('#feed').innerHTML = RTGLivingFeed.welcome('error'); });
   }
 
   function start() { return api('/state', {})
     .then(function (d) {
       /* Onvolledig antwoord: langs de foutweg hieronder, niet om vallen (LIEGRONDE.json). */
       if (!(d && Array.isArray(d.modi))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.');
-      staat.modus = d.modus; staat.lens = d.lens || 'friends'; staat.modi = d.modi; staat.kaart = d.koppelkaart || {};
-      staat.vermogens = d.vermogens || []; staat.lenzen = d.lenzen || [];
+      staat.modus = d.modus; staat.lens = 'all'; staat.modi = d.modi; staat.kaart = d.koppelkaart || {};
+      staat.vermogens = d.vermogens || []; staat.lenzen = [{ id: 'all', naam: RTGLivingFeed.T('all', 'Alles'), open: true }].concat(d.lenzen || []);
+      if (d.saloon) { saloon.init(d.saloon, d.ik); saloon.zichtbaar(true); $('#feedHeading').hidden = true; }
       $('#membership').hidden = staat.weergave !== 'feed'; $('#livingAccess').hidden = true;
       /* De modus reist mee naar de aparte berichten-app: de la die bij deze
          wereld hoort komt van de SERVER (kern/wereld/koppel.js), zodat dit

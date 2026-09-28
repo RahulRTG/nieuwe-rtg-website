@@ -1,0 +1,54 @@
+{
+  "schema": "rtg-owner-custody-v1",
+  "repository": "RahulRTG/nieuwe-rtg-website",
+  "ownerAccount": "RahulRTG",
+  "authorizedCustodians": "De eigenaar van RTG en zijn gekozen personeel",
+  "authorization": "Owner instruction in this conversation, 2026-09-26: Fix alles; De eigenaar van RTG en zijn gekozen personeel.",
+  "createdAt": "2026-09-26T20:21:41.993Z",
+  "roles": {
+    "BUILD": {
+      "publicFile": "deploy/release-sleutel.pub",
+      "publicKeySha256": "8220ff9534229e7e9d86ac8e2ec47ae683356fd217f5d6bdc7e51911ac614d4b",
+      "domain": "RTG:BUILD:v1",
+      "custodian": "RTG owner; access delegation requires explicit owner assignment",
+      "store": {
+        "provider": "GitHub Actions",
+        "repository": "RahulRTG/nieuwe-rtg-website",
+        "secret": "RTG_RELEASE_SIGN_KEY"
+      },
+      "initialized": true
+    },
+    "EVIDENCE": {
+      "publicFile": "deploy/evidence-sleutel.pub",
+      "publicKeySha256": "920cab498f815108127262e35d152f414fd09cf9d11f41aabb1e049007fa67fd",
+      "domain": "RTG:EXTERNAL-EVIDENCE:v1",
+      "custodian": "RTG owner; access delegation requires explicit owner assignment",
+      "store": {
+        "provider": "macOS owner login Keychain",
+        "service": "nl.rtg.release.evidence.ed25519.v1",
+        "account": "rtg-owner",
+        "unattendedReadApplications": 0
+      },
+      "initialized": true
+    },
+    "PROMOTION": {
+      "publicFile": "deploy/promotie-sleutel.pub",
+      "publicKeySha256": "0e33834e43591c6b99409ef47a98a00a7be6a5b4d3affa47a98ba469ed764dc8",
+      "domain": "RTG:PROMOTION:v1",
+      "custodian": "RTG owner; access delegation requires explicit owner assignment",
+      "store": {
+        "provider": "macOS owner login Keychain",
+        "service": "nl.rtg.release.promotion.ed25519.v1",
+        "account": "rtg-owner",
+        "unattendedReadApplications": 0
+      },
+      "initialized": true
+    }
+  },
+  "attestations": {
+    "externalEvidence": "NOT_SIGNED",
+    "promotion": "NOT_SIGNED"
+  },
+  "releaseReady": false,
+  "completedAt": "2026-09-26T20:21:42.981Z"
+}

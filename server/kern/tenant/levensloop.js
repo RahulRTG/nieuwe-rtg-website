@@ -32,6 +32,8 @@
    werken, want de klant moet zijn uitvoer nog kunnen ophalen.
    ========================================================================== */
 'use strict';
+
+const { sluit, heeftSessie } = require('../../bedrijf/sleutels');
 const { nu: klokNu, datum: klokDatum } = require('../../lib/klok');
 
 const { schrijf } = require('./journaal');
@@ -90,8 +92,8 @@ module.exports = ({ db, save, schoon, register, uitgang }) => {
       for (const l of Object.values(w.leden || {})) {
         /* Productieleden hebben bewust geen tweede token. Hun actuele status
            IS daar de deur, dus ook een al tokenloos actief lid moet sluiten. */
-        if (!l.token && l.status !== 'actief') continue;
-        l.token = null;
+        if (!heeftSessie(l) && l.status !== 'actief') continue;
+        sluit(l);  // epoch omhoog: elke sessie van dit lid vervalt tegelijk
         if (l.status === 'actief') { l.status = 'uit dienst'; l.uitReden = reden; l.uitAt = nu(); }
         n++;
       }

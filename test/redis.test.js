@@ -1,7 +1,7 @@
 /* Eigen Redis-client (server/redis.js), die het pakket `redis` verving. We
    starten een ECHTE redis-server op een vrije poort en toetsen: set/get,
-   publish/subscribe, en kruisvalidatie met de nog geïnstalleerde npm-client
-   (mijn publish -> npm ontvangt, en npm publish -> ik ontvang) zodat het
+   publish/subscribe, en kruisvalidatie met de officiële redis-cli
+   (mijn publish -> CLI ontvangt, en CLI publish -> ik ontvang) zodat het
    wireprotocol echt klopt. Zonder redis-server worden de tests overgeslagen.
    Los: node --test test/redis.test.js */
 const { test, before, after } = require('node:test');
@@ -178,42 +178,62 @@ test('publish/subscribe binnen de eigen client', { skip: !HEEFT_REDIS }, async (
   } finally { await sluit([sub, pub]); }
 });
 
-test('kruisvalidatie met de npm-client: beide kanten op', { skip: !HEEFT_REDIS }, async () => {
-  let npm; try { npm = require('redis'); } catch (e) { return; } // npm-client (nog) niet aanwezig: overslaan
+test('kruisvalidatie met redis-cli: beide kanten op', { skip: !HEEFT_REDIS }, async () => {
+  // Een ontbrekende scheidsrechter mag nooit een lege PASS opleveren.
+  assert.strictEqual(spawnSync('sh', ['-c', 'command -v redis-cli']).status, 0,
+    'redis-cli is vereist voor onafhankelijke protocolvalidatie');
   const open = [];
+  let cli, cliExit;
+  const roepCli = (...args) => {
+    const r = spawnSync('redis-cli', ['--raw', '-h', '127.0.0.1', '-p', String(POORT), ...args],
+      { encoding: 'utf8', timeout: 8000 });
+    assert.strictEqual(r.status, 0, r.error ? r.error.message : r.stderr);
+    return r.stdout.trim();
+  };
   try {
-  // mijn publish -> npm ontvangt
-  const npmSub = npm.createClient({ url: URL }); npmSub.on('error', () => {}); open.push(npmSub);
-  const mijnPub = eigen.createClient({ url: URL }); mijnPub.on('error', () => {}); open.push(mijnPub);
-  await metDeadline(npmSub.connect(), 8000, 'npmSub connect');
-  await metDeadline(mijnPub.connect(), 8000, 'mijnPub connect');
-  const naarNpm = [];
-  await npmSub.subscribe('kruis:a', m => naarNpm.push(m));   // bevestigd, zie hierboven
-  await mijnPub.publish('kruis:a', 'van-mij');
-  for (let i = 0; i < 50 && naarNpm.length === 0; i++) await wacht(20);
-  assert.deepStrictEqual(naarNpm, ['van-mij'], 'npm-client ontvangt wat mijn client publiceert');
+    // Eigen publish -> de onafhankelijke CLI ontvangt.
+    cli = spawn('redis-cli', ['--raw', '-h', '127.0.0.1', '-p', String(POORT), 'SUBSCRIBE', 'kruis:a'],
+      { stdio: ['ignore', 'pipe', 'pipe'] });
+    cliExit = new Promise(resolve => cli.once('exit', resolve));
+    let ontvangen = '', cliFout;
+    cli.on('error', e => { cliFout = e; });
+    cli.stdout.on('data', b => { ontvangen += b.toString(); });
+    const cliZegt = async tekst => {
+      const einde = Date.now() + 8000;
+      while (!ontvangen.includes(tekst) && Date.now() < einde) {
+        if (cliFout) throw cliFout;
+        assert.strictEqual(cli.exitCode, null, 'redis-cli stopte vóór ontvangst');
+        await wacht(20);
+      }
+      assert.ok(ontvangen.includes(tekst), 'redis-cli ontving niet: ' + tekst);
+    };
+    await cliZegt('subscribe\nkruis:a\n1\n');
+    const mijnPub = eigen.createClient({ url: URL }); mijnPub.on('error', () => {}); open.push(mijnPub);
+    await metDeadline(mijnPub.connect(), 8000, 'mijnPub connect');
+    assert.strictEqual(await metDeadline(mijnPub.publish('kruis:a', 'van-mij'), 8000, 'publish naar CLI'), 1);
+    await cliZegt('message\nkruis:a\nvan-mij\n');
 
-  // npm publish -> mijn client ontvangt
-  const mijnSub = eigen.createClient({ url: URL }); mijnSub.on('error', () => {}); open.push(mijnSub);
-  const npmPub = npm.createClient({ url: URL }); npmPub.on('error', () => {}); open.push(npmPub);
-  await metDeadline(mijnSub.connect(), 8000, 'mijnSub connect');
-  await metDeadline(npmPub.connect(), 8000, 'npmPub connect');
-  const naarMij = [];
-  await mijnSub.subscribe('kruis:b', m => naarMij.push(m));   // bevestigd, zie hierboven
-  await npmPub.publish('kruis:b', 'van-npm');
-  for (let i = 0; i < 50 && naarMij.length === 0; i++) await wacht(20);
-  assert.deepStrictEqual(naarMij, ['van-npm'], 'mijn client ontvangt wat de npm-client publiceert');
+    // CLI publish -> de eigen client ontvangt.
+    const mijnSub = eigen.createClient({ url: URL }); mijnSub.on('error', () => {}); open.push(mijnSub);
+    await metDeadline(mijnSub.connect(), 8000, 'mijnSub connect');
+    const naarMij = [];
+    await metDeadline(mijnSub.subscribe('kruis:b', m => naarMij.push(m)), 8000, 'mijn subscribe');
+    assert.strictEqual(roepCli('PUBLISH', 'kruis:b', 'van-cli'), '1');
+    for (let i = 0; i < 50 && naarMij.length === 0; i++) await wacht(20);
+    assert.deepStrictEqual(naarMij, ['van-cli'], 'de eigen client ontvangt wat redis-cli publiceert');
 
-  // en set via de een is leesbaar via de ander
-  await metDeadline(npmPub.set('kruis:sleutel', 'gedeeld'), 8000, 'npm set');
-  assert.strictEqual(await metDeadline(mijnPub.get('kruis:sleutel'), 8000, 'mijn get'), 'gedeeld');
-
+    // Beide schrijfrichtingen moeten door de andere client leesbaar zijn.
+    assert.strictEqual(roepCli('SET', 'kruis:sleutel', 'gedeeld'), 'OK');
+    assert.strictEqual(await metDeadline(mijnPub.get('kruis:sleutel'), 8000, 'mijn get'), 'gedeeld');
+    assert.strictEqual(await metDeadline(mijnPub.set('kruis:terug', 'antwoord'), 8000, 'mijn set'), 'OK');
+    assert.strictEqual(roepCli('GET', 'kruis:terug'), 'antwoord');
   } finally {
-    /* GEEN wacht(100) MEER NA HET SLUITEN. sluit() doet `await c.quit()` per
-       client, en quit() geeft zijn belofte pas terug als de verbinding echt
-       dicht is -- dat is het teken. De 100 ms erna waren een vangnet voor een
-       lek dat er niet is; als het er wel was, zou 100 ms het ook niet redden,
-       en dan hoort de toets te hangen zodat iemand het ziet (TAKEN.md 6.10). */
-    await sluit(open);
+    try { await sluit(open); }
+    finally {
+      if (cli && cli.pid && cli.exitCode === null && cli.signalCode === null) {
+        cli.kill('SIGKILL');
+        await metDeadline(cliExit, 8000, 'eigen CLI stoppen');
+      }
+    }
   }
 });

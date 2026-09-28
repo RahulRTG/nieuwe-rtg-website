@@ -242,13 +242,13 @@
       "url": "/apps/commerce.html"
     },
     {
-      "label": "Aandeel controleren",
+      "label": "Alleen blokkeren",
       "app": "Daten",
       "wereld": "LivingOS",
       "url": "/apps/vonk.html"
     },
     {
-      "label": "Alleen blokkeren",
+      "label": "Bekijk Connection Passport",
       "app": "Daten",
       "wereld": "LivingOS",
       "url": "/apps/vonk.html"
@@ -266,13 +266,25 @@
       "url": "/apps/vonk.html"
     },
     {
-      "label": "Interesse",
+      "label": "Connection Passport bewaren",
       "app": "Daten",
       "wereld": "LivingOS",
       "url": "/apps/vonk.html"
     },
     {
-      "label": "Kies de plek",
+      "label": "Eerder",
+      "app": "Daten",
+      "wereld": "LivingOS",
+      "url": "/apps/vonk.html"
+    },
+    {
+      "label": "Kies een foto",
+      "app": "Daten",
+      "wereld": "LivingOS",
+      "url": "/apps/vonk.html"
+    },
+    {
+      "label": "Later",
       "app": "Daten",
       "wereld": "LivingOS",
       "url": "/apps/vonk.html"
@@ -284,25 +296,37 @@
       "url": "/apps/vonk.html"
     },
     {
-      "label": "Profiel veilig bewaren",
+      "label": "Open to connect",
       "app": "Daten",
       "wereld": "LivingOS",
       "url": "/apps/vonk.html"
     },
     {
-      "label": "Veiligheid",
+      "label": "Opnieuw proberen",
       "app": "Daten",
       "wereld": "LivingOS",
       "url": "/apps/vonk.html"
     },
     {
-      "label": "Voorbij",
+      "label": "Overslaan",
       "app": "Daten",
       "wereld": "LivingOS",
       "url": "/apps/vonk.html"
     },
     {
-      "label": "Zelf versturen",
+      "label": "Publiceer",
+      "app": "Daten",
+      "wereld": "LivingOS",
+      "url": "/apps/vonk.html"
+    },
+    {
+      "label": "Trek terug",
+      "app": "Daten",
+      "wereld": "LivingOS",
+      "url": "/apps/vonk.html"
+    },
+    {
+      "label": "Verwijder",
       "app": "Daten",
       "wereld": "LivingOS",
       "url": "/apps/vonk.html"
@@ -1196,6 +1220,12 @@
       "url": "/apps/loopbaan.html"
     },
     {
+      "label": "Mijn leerhuis",
+      "app": "Mijn loopbaan",
+      "wereld": "WorkOS",
+      "url": "/apps/loopbaan.html"
+    },
+    {
       "label": "Stoppen",
       "app": "Mijn loopbaan",
       "wereld": "WorkOS",
@@ -1868,6 +1898,18 @@
       "url": "/apps/reizen-veilig.html"
     },
     {
+      "label": "Aanpassen",
+      "app": "Rendez-vous",
+      "wereld": "LivingOS",
+      "url": "/apps/rendezvous.html"
+    },
+    {
+      "label": "Accept",
+      "app": "Rendez-vous",
+      "wereld": "LivingOS",
+      "url": "/apps/rendezvous.html"
+    },
+    {
       "label": "Alleen blokkeren",
       "app": "Rendez-vous",
       "wereld": "LivingOS",
@@ -1892,6 +1934,30 @@
       "url": "/apps/rendezvous.html"
     },
     {
+      "label": "Decline",
+      "app": "Rendez-vous",
+      "wereld": "LivingOS",
+      "url": "/apps/rendezvous.html"
+    },
+    {
+      "label": "Eerder",
+      "app": "Rendez-vous",
+      "wereld": "LivingOS",
+      "url": "/apps/rendezvous.html"
+    },
+    {
+      "label": "Foto toevoegen",
+      "app": "Rendez-vous",
+      "wereld": "LivingOS",
+      "url": "/apps/rendezvous.html"
+    },
+    {
+      "label": "Goedkeuren",
+      "app": "Rendez-vous",
+      "wereld": "LivingOS",
+      "url": "/apps/rendezvous.html"
+    },
+    {
       "label": "Graag",
       "app": "Rendez-vous",
       "wereld": "LivingOS",
@@ -1905,6 +1971,12 @@
     },
     {
       "label": "Interesse",
+      "app": "Rendez-vous",
+      "wereld": "LivingOS",
+      "url": "/apps/rendezvous.html"
+    },
+    {
+      "label": "Later",
       "app": "Rendez-vous",
       "wereld": "LivingOS",
       "url": "/apps/rendezvous.html"
@@ -1934,6 +2006,12 @@
       "url": "/apps/rendezvous.html"
     },
     {
+      "label": "Open Society",
+      "app": "Rendez-vous",
+      "wereld": "LivingOS",
+      "url": "/apps/rendezvous.html"
+    },
+    {
       "label": "Periode toevoegen",
       "app": "Rendez-vous",
       "wereld": "LivingOS",
@@ -1947,6 +2025,12 @@
     },
     {
       "label": "Profiel bewaren",
+      "app": "Rendez-vous",
+      "wereld": "LivingOS",
+      "url": "/apps/rendezvous.html"
+    },
+    {
+      "label": "Profiel openen",
       "app": "Rendez-vous",
       "wereld": "LivingOS",
       "url": "/apps/rendezvous.html"
@@ -2391,6 +2475,12 @@
     },
     {
       "label": "Neem terug",
+      "app": "RTG Pay",
+      "wereld": "LivingOS",
+      "url": "/apps/pay.html"
+    },
+    {
+      "label": "Nieuwe code",
       "app": "RTG Pay",
       "wereld": "LivingOS",
       "url": "/apps/pay.html"

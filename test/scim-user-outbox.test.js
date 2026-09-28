@@ -51,10 +51,16 @@ test('SCIM-uitdienst zet account en outbox samen dicht en herstelt na herstart',
     assert.equal(accounts.getUserById(7).actief, 0);
     assert.equal(maakSync.geblokkeerd('user-7'), true, 'de liddeur is direct fail-closed');
 
-    const W = () => ({ W1: { code: 'W1', leden: { L1: lid } } });
-    const deur = maakDeuren({ kern: { accounts }, W, eigenVeld: (o, k) => o[k] }).lidVan;
+    /* Een echte lid-sessie (bedrijf/sleutels.js): de deur moet weigeren op de
+       accountwaarheid, niet omdat hij het token niet kent. */
+    const sleutels = require('../server/bedrijf/sleutels').maak();
+    const w1 = { code: 'W1', leden: { L1: lid } };
+    const sessie = sleutels.geefLid(w1, lid);
+    const W = () => ({ W1: w1 });
+    const deur = maakDeuren({ kern: { accounts }, W, eigenVeld: (o, k) => o[k], sleutels }).lidVan;
     const res = antwoord();
-    assert.equal(deur({ body: { werkruimte: 'W1', lidToken: 'lid-token' } }, res), null);
+    assert.equal(deur({ body: { werkruimte: 'W1', lidToken: sessie } }, res), null);
+    assert.match(String(res.body && res.body.error), /ingetrokken/, 'geweigerd op het account, niet op een onbekend token');
     assert.equal(res.code, 403);
 
     const naHerstart = maakSync({ accounts, scim, cascade, log: { error() {} }, klok: () => 7000 });
@@ -66,9 +72,9 @@ test('SCIM-uitdienst zet account en outbox samen dicht en herstelt na herstart',
 
     /* Zelfs als een verouderde werkruimteprojectie het oude token nog zou
        tonen, blijft de centrale deur dicht op de accountwaarheid. */
-    lid.status = 'actief'; lid.token = 'oud-token';
+    lid.status = 'actief';
     const oudRes = antwoord();
-    assert.equal(deur({ body: { werkruimte: 'W1', lidToken: 'oud-token' } }, oudRes), null);
+    assert.equal(deur({ body: { werkruimte: 'W1', lidToken: sessie } }, oudRes), null);
     assert.equal(oudRes.code, 403);
   } finally {
     db.close();

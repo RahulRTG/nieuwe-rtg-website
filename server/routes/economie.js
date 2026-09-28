@@ -16,8 +16,18 @@
    dat nu geweigerd wordt, legt de relatie vast met een grondslag en een
    plafond; daarna gaat het langs dezelfde poort als al het andere. Een
    noodknop naast een firewall is de deur waar iedereen op mikt. */
+const { toon } = require('../kern/bedrijfsmaat/poort');
+/* Welke groepsklasse bij welke wereld hoort: leden, zaken, gezinnen -- en het huis
+   telt geen mensen. Onder de grens van die klasse geen aantal gebruikers
+   (besluit van de eigenaar, 25 september 2026: ook op het kantoorscherm). */
+const KLASSE_VAN_WERELD = { consument: 'leden', commercieel: 'zaken', rtfoundation: 'gezinnen', 'rtg-intern': 'huis' };
+
 module.exports = (kern) => {
   const { app, boardroomAuth, boardroomWie, economie, kosten } = kern;
+  const gebruikersVan = (w, n) => {
+    const t = toon({ privacy: KLASSE_VAN_WERELD[w.id] || 'leden' }, { waarde: n, n });
+    return t.stand === 'TOONBAAR' ? { gebruikers: n } : { gebruikers: null, gebruikersStand: t.stand, gebruikersGrens: t.grens };
+  };
 
   app.post('/api/office/economie/werelden', boardroomAuth, (req, res) => {
     const p = String((req.body || {}).periode || '').trim();
@@ -25,9 +35,8 @@ module.exports = (kern) => {
     const verbruik = kosten.verbruikPerWereld(periode);
     res.json({ ok: true, periode,
       werelden: economie.werelden().map(w => Object.assign({}, w, {
-        gemetenGewicht: (verbruik[w.id] || {}).gewicht || 0,
-        gebruikers: ((verbruik[w.id] || {}).dragers || []).length
-      })),
+        gemetenGewicht: (verbruik[w.id] || {}).gewicht || 0
+      }, gebruikersVan(w, ((verbruik[w.id] || {}).dragers || []).length))),
       relaties: economie.relaties(),
       /* De verdeling van de nota's over de werelden staat in hetzelfde antwoord
          als de werelden zelf. Twee endpoints zouden twee schermen opleveren die

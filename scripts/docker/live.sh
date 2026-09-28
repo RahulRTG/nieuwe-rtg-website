@@ -338,7 +338,7 @@ case "$opdracht" in
       --image-verwijzing="$kandidaat" --image-digest="$kandidaat_digest" \
       --image-id="$kandidaat_id" --backup-verwijzing="$kandidaat_backup" \
       --backup-digest="$backup_digest" --backup-id="$kandidaat_backup_id"
-    echo "[live] kandidaat is intern groen; maak nu PRODUCTION_STATUS=READY vóór live:deploy"
+    echo "[live] kandidaat is intern groen; maak nu PRODUCTION_STATUS=READY (of READY_ZONDER_RAIL voor een beperkte release) vóór live:deploy"
     ;;
   probe)
     [ -n "$APP_URL" ] || { echo "[live] APP_URL ontbreekt in $PRODUCTIE_ENV" >&2; exit 78; }

@@ -122,7 +122,3 @@
       catch(e){ toast(e.message); }
     });
   }
-
-  restoreSession();
-  if ('serviceWorker' in navigator && (location.protocol==='http:'||location.protocol==='https:')) navigator.serviceWorker.register('/sw.js').catch(()=>{});
-})();

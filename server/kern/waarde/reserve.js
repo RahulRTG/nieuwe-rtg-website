@@ -66,14 +66,26 @@ function maakReserve({ db, save, crypto, nu = klokNu }) {
      lijkt. */
   function vind(id) { return kijk().find(r => r.id === String(id || '')) || null; }
 
-  function reserveer({ rek, centen, doel, ref, msGeldig }) {
+  /* `vast.id` is optioneel en maakt reserveren herhaalbaar: een hervatte
+     kascode-claim (kern/pay/kas-claim.js) geeft een id mee dat uit de claim
+     volgt, en vindt dan zijn eigen reservering terug in plaats van een tweede
+     te zetten. Het staat NAAST het verzoek en niet erin: het verzoek zelf is
+     hetzelfde als altijd, het id zegt alleen welke het is. */
+  function reserveer({ rek, centen, doel, ref, msGeldig }, vast = {}) {
+    const id = vast.id;
     const c = Math.round(Number(centen));
     if (!rek) return { status: 400, error: 'Op welke rekening?' };
+    if (id != null) {
+      if (!/^RS[0-9A-F]{10}$/.test(String(id))) return { status: 400, error: 'Ongeldig reserveringsnummer.' };
+      const eerder = vind(id);
+      if (eerder) return eerder.rek === rek && eerder.centen === c
+        ? { ok: true, reservering: eerder, herhaald: true } : { status: 409, error: 'Deze reservering bestaat al.' };
+    }
     if (!Number.isFinite(c) || c <= 0) return { status: 400, error: 'Dat bedrag kan niet.' };
     if (open(rek).length >= MAX_PER_REKENING)
       return { status: 429, error: 'Er staan te veel reserveringen open op deze rekening.' };
     const ms = Math.min(MAX_MS, Math.max(60000, Math.round(Number(msGeldig) || STANDAARD_MS)));
-    const r = { id: 'RS' + crypto.randomBytes(5).toString('hex').toUpperCase(),
+    const r = { id: id != null ? String(id) : 'RS' + crypto.randomBytes(5).toString('hex').toUpperCase(),
       rek, centen: c, doel: String(doel || 'reservering').slice(0, 60),
       ref: ref || null, status: 'open', at: nu(), tot: nu() + ms };
     bak().unshift(r);

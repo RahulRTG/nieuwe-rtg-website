@@ -7,12 +7,10 @@
    daar bestaat de bestelling al, hier ontstaat de bon op dat moment. Dit
    bestand kwam op 10,4 kB en daarmee over keuringsregel 13. */
 module.exports = (kern, herhaling) => {
-  const { POS_METHODS, app, crypto, db, facturatie, logActivity, pickupCode, save, sseToSupplier, supplierAuth } = kern;
+  const { POS_METHODS, app, cadeaukaart, crypto, db, facturatie, logActivity, pickupCode, save, sseToSupplier, supplierAuth } = kern;
   // dezelfde factuurroutine als de app-kant; zie kern/lidacties/factuur.js
   const { maakFactuurVoorLid, regelsVanItems } = require('../../../kern/lidacties/factuur');
   const factuurVoorLid = maakFactuurVoorLid(facturatie);
-  // dezelfde drie grenzen als de losse inwisseling aan de balie; zie ./kaart.js
-  const { verzilver: verzilverKaart } = require('./kaart');
 /* DE HELE VERKOOP STAAT BINNEN eenmalig(), en niet alleen de betaling. De
    sleutel lag hier al jaren (kassa.html stuurt `idem` mee) maar ging alleen
    naar RTG Pay, en dan nog alleen bij method 'rtgpay'. Contant en pin kenden
@@ -67,21 +65,21 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
      bon zonder betaling is een gat in de kas. De bon draagt de omzet met zijn
      eigen regels; de verzilvering wordt gemerkt met `viaBon` zodat de
      maandboekhouding hem niet nog een keer telt (TAKEN.md 4.27). */
-  const bonId = crypto.randomBytes(4).toString('hex');
-  let kaartCode = null;
+  let bonId = crypto.randomBytes(4).toString('hex');
+  let kaartId = null, kaartRest = null;
   if (method === 'cadeaukaart') {
-    const k = verzilverKaart(db, req.supplier.code, req.body.giftcardCode || req.body.gcCode || req.body.payCode,
-      total, req.actor.name, bonId);
-    /* EEN OBJECT EN GEEN res.status(), net als elke andere uitgang hierboven.
-       Deze tak is ouder dan de idempotentiewikkel van main: binnen eenmalig()
-       verstuurde hij zelf het antwoord EN gaf hij `res` terug, waarna de wikkel
-       er `res.json(antwoord)` achteraan deed -- een tweede antwoord op hetzelfde
-       verzoek. Erger nog: eenmalig() bewaart wat de callback teruggeeft als HET
-       antwoord voor die sleutel, dus een herhaling van dezelfde bon kreeg dat
-       res-object terug in plaats van de fout. */
-    if (k.error) return { status: k.status, error: k.error };
-    kaartCode = k.kaart.code;
-    req.body.gcRest = k.kaart.saldo;
+    /* De claim is atomair (kern/cadeaukaart.js) en onthoudt de sleutel van de
+       kassa: een herhaling na een crash boekt niet opnieuw af maar krijgt de
+       eerste verzilvering terug, met het bonnummer dat daarbij hoorde. */
+    const k = await cadeaukaart.verzilver({ supplierCode: req.supplier.code,
+      code: req.body.giftcardCode || req.body.gcCode || req.body.payCode,
+      bedrag: total, actor: req.actor.name, viaBon: bonId, idem: req.body.idem });
+    if (!k.ok) return { status: k.status, error: k.error };
+    if (k.herhaald && k.verzilvering && k.verzilvering.viaBon) bonId = k.verzilvering.viaBon;
+    const al = (db.data.posSales[req.supplier.code] || []).find(b => b && b.id === bonId);
+    if (al) return { ok: true, sale: al, betaler: null };
+    kaartId = k.kaart.id;
+    kaartRest = k.kaart.saldo;
   }
   const sale = {
     id: bonId,
@@ -94,8 +92,9 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
       ? { bedrag: Math.round(Number(req.body.korting.bedrag) * 100) / 100, reden: String(req.body.korting.reden || '').slice(0, 80) } : null,
     desc: String(req.body.desc || '').slice(0, 140),
     room: req.body.room ? String(req.body.room).slice(0, 60) : null,
-    items, total, method, betaler, luchtzijde, kaartCode,
-    gcCode: kaartCode, gcRest: method === 'cadeaukaart' ? req.body.gcRest : null,
+    /* de kaart bij haar id en nooit bij haar code: een bon wordt getoond, gedeeld
+       en bewaard, en een code erop is de code op schijf */
+    items, total, method, betaler, luchtzijde, kaartId, gcRest: kaartRest,
     betaaldienstKosten: betaaldienstKosten || null,
     /* EEN BON UIT DE OFFLINE-WACHTRIJ DRAAGT ZIJN EIGEN MOMENT, maar bepaalt er
        niets mee. `at` blijft de tijd van AANKOMST, want dat is de tijd die de

@@ -65,7 +65,10 @@ function maakJournaal({ db, save, crypto, vak, opslag }) {
     const vorige = rij.length ? rij[rij.length - 1] : null;
     const kern = {
       id: crypto.randomUUID(),
-      at: new Date().toISOString(),
+      /* Een aanroeper mag een GROVERE tijd meegeven (lib/burgerpad.js); nooit
+         een tijd die niet van nu is, want de keten gaat over volgorde. */
+      at: typeof regel.at === 'string' && regel.at.slice(0, 10) === new Date().toISOString().slice(0, 10)
+        ? regel.at : new Date().toISOString(),
       actor: String(regel.actor || 'onbekend'),
       actie: String(regel.actie || ''),
       objectType: regel.objectType ? String(regel.objectType) : null,

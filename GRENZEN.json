@@ -921,6 +921,7 @@
       "crGastTerug",
       "crWaarheen",
       "cvReady",
+      "democratieVergeet",
       "dmSleutel",
       "dpBetaalDirect",
       "dpBetaalVerzoek",
@@ -2677,6 +2678,9 @@
       "status",
       "wallet",
       "zorgpolis"
+    ],
+    "democratie": [
+      "democratie"
     ]
   }
 }

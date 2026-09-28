@@ -29,6 +29,14 @@ kern.magnaatWereld.leven = require('../kern/magnaat-leven').maakLeven({ db, save
 /* Samen in een Oudwijk: de gedeelde stad hangt aan hetzelfde leven, met de codenaam en het seintje erbij. */
 kern.magnaatWereld.leven.stad = require('../kern/magnaat-leven/stad').maakStad({
   eigen: kern.magnaatWereld.leven.intern.eigen, leven: kern.magnaatWereld.leven, crypto, codenaamVan: kern.codenaamVan, sseToCustomer });
+/* DemocratieOS fase B (kern/democratie/, POLITIEK.md): de minimale burgerlus.
+   `meldLid` wordt LUI doorgegeven: hij hangt pas later aan de kern. */
+kern.democratie = require('../kern/democratie').maakDemocratie({ db, save, crypto,
+  bijeen: hulp.bijeen, inBundel: hulp.inBundel, codenaamVan: kern.codenaamVan,
+  meldLid: (sleutel, bericht) => kern.meldLid(sleutel, bericht) });
+/* Het recht op vergetelheid draait in het domein `member`; dat krijgt deze ENE
+   functie en niet de hele laag (GRENZEN.json). */
+kern.democratieVergeet = kern.democratie.vergeet;
 
 /* De positie van de RTFoundation in RTG Pay (kern/rtfwallet.js): waar een gift
    landt en wie hem uitbetaalt. Hij hangt hier en niet bij de andere

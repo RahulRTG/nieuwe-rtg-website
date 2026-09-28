@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2074 bestanden en 14620 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2077 bestanden en 14635 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2074 |
-| losse beweringen (`test(...)`) | 14620 |
+| toetsbestanden | 2077 |
+| losse beweringen (`test(...)`) | 14635 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 174 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1420 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1423 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 74 |
-| alleen in de kop *genoemd*, nog niet gemeten | 168 |
-| niets van beide | 412 |
+| alleen in de kop *genoemd*, nog niet gemeten | 169 |
+| niets van beide | 411 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1809 bestanden, 14155 beweringen.
+1812 bestanden, 14170 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -343,6 +343,11 @@ toets omvalt.
 | `dekking.test.js` | 2 | gezakt op `===->!==#0` | DE DEKKINGSMETER LEEST ALLE JOURNALEN, NIET EEN (scripts/dekking.js). WAAROM DEZE TOETS ER IS. |
 | `delen.test.js` | 30 | gezakt op `===->!==#0` | DE SUITE IN DELEN, EN DE VLOER DAAROVERHEEN. Sinds de CI de unit-suite en de schermtoetsen over vier runners verdeelt, hangen er twee nieuwe manieren aan waarop deze keten stil minder kan gaan toetsen dan hij belooft: 1. |
 | `deltapoort.test.js` | 23 | gezakt op `===->!==#0` | DE IJKING VAN DE DELTAPOORT -- regel 2 van de lat, op de poort zelf. scripts/deltapoort.js houdt nieuw werk aan de norm. |
+| `democratie-aanval.test.js` | 3 | gezakt op `liegpoort /api/` | DEMOCRATIEOS FASE C -- de aanvalsfase (POLITIEK.md par. 18.2). |
+| `democratie-afhankelijk.test.js` | 6 | gezakt op `===->!==#0` | UNDECLARED_RTG_DEPENDENCY = 0 -- proef P3 wordt meetbaar (POLITIEK.md par. 1.1). |
+| `democratie-grondwet.test.js` | 4 | gezakt op `&&->||#0` | DEMOCRATIEOS FASE C4 -- de omwegen om de grondwet heen (POLITIEK.md par. 18.2). |
+| `democratie-verlies.test.js` | 2 | genoemd | NIEMAND KWIJT, ONDER STORINGEN -- de verliesproef van fase B (POLITIEK.md par. 18.1). |
+| `democratie.test.js` | 12 | gezakt op `liegpoort /api/` | DEMOCRATIEOS FASE B -- de minimale burgerlus (POLITIEK.md par. 18.1). |
 | `demokosten.test.js` | 5 | -- | WAT DE DEMOSEED KOST, EN WAAROM DAT EEN METER VERDIENT. De demostand zet bij een verse database 183 personeelsrijen neer (71 zaken, server/kern/staffseed.js en staffseed2.js). |
 | `demostand.test.js` | 7 | gezakt op `liegpoort /api/` | De demo-stand hoort UIT te staan als niemand erom vraagt. WAT ER OPENSTOND, op de echte server, op het open internet: 1. |
 | `demozaken.test.js` | 4 | gezakt op `liegpoort /api/` | DE LIVEGANG-SCHOONMAAK: welke zaken verdwijnen er zonder RTG_DEMO, en welke niet. WAT ER MISGING De opruiming stond in initdata/deel7-salon.js en draaide dus VOOR deel8, deel9 en deel10. |
@@ -1095,7 +1100,6 @@ toets omvalt.
 | `ontvanger.test.js` | 9 | gezakt op `===->!==#0` | DE ONTVANGEROPLOSSING -- wie krijgt een bericht, en wat als niemand het kreeg. server/kern/ontvanger.js vervangt `if (!a.key) return;` in kern/werk.js. |
 | `ontwerp.test.js` | 9 | geen module gevonden | RTG Interface Operating Standard: de visuele regels uit ONTWERP.md, machinaal gehandhaafd. Waarom deze toets bestaat. |
 | `ontwerpbank.test.js` | 5 | gezakt op `+->-#0` | DE GEDEELDE REKENKERN VAN DE VIER ONTWERPBANKEN. hash, kies en palet stonden byte voor byte gelijk in kern/architect/bank.js, kern/atelier/bank.js, kern/hardwarelab/bank.js en kern/studio/bank.js. |
-| `onvervreemdbaar.test.js` | 7 | gezakt op `===->!==#0` | DE UNIVERSELE BODEM -- de nulmeting, en vooral wat zij niet mag beweren. scripts/onvervreemdbaar.js vraagt voor SAMENLEVING.md SAM-01 of een werkwoord van de bodem (leren, ontwikkelen, orienteren, verbinden, rust,... |
 | `oog.test.js` | 4 | gezakt op `liegpoort /api/` | RTG Eye: de camerabril van de werkvloer. De visielaag draait op het toestel; de server bewaart compacte, gecodeerde regels: nulmetingen en schouwen per voertuig, aangeleerde spullen en het knoploze uitgifteregister... |
 | `openbare-bouwstand.test.js` | 12 | gezakt op `true->false#0` | De grendel op een OPENBARE installatie die in Magnaat Test draait. WAAR HIJ VANDAAN KOMT. |
 | `oplaadgat.test.js` | 4 | gezakt op `===->!==#0` | AFGESCHREVEN MOET BIJGESCHREVEN WORDEN. WAT ER MISGING. |
@@ -1128,7 +1132,6 @@ toets omvalt.
 | `pas-escalatie.test.js` | 5 | gezakt op `liegpoort /api/` | Merkregel-poort: de Lifestyle- en Business Pass komen UITSLUITEND na een menselijk besluit. Zelf-registreren mag ze nooit geven -- eerder gaf het tier-veld bij /api/auth/register direct een Business Pass (gevonden... |
 | `pasladder.test.js` | 9 | -- | DE LADDER: vijf treden, elk met een bodem. Het besluit van 20 augustus 2026 zet een MKB-laag tussen consument en enterprise (Business Lite, 150 euro) en maakt de twee bovenste treden contractueel met een "vanaf". |
 | `paspoort.test.js` | 11 | gezakt op `liegpoort /api/` | End-to-end tests voor de paspoort-/identiteitslaag (kern/paspoort.js): het gecontroleerde, toestemmingsgestuurde kanaal waarlangs een partner de identiteit achter een codenaam opvraagt. Dekt: de directe... |
-| `paspoortdeur.test.js` | 5 | gezakt op `liegpoort /api/` | DE DEUR VAN DE UNIVERSELE BODEM (server/kern/onvervreemdbaar.js), tegen een echte server. Het besluit van 27 september 2026 (SAMENLEVING.md, besluit 4c): een afspraak bij de gemeente, aangifte bij de overheid en een... |
 | `pasprijs.test.js` | 6 | gezakt op `===->!==#0` | WAT KOST EEN PAS PER MAAND? EEN ANTWOORD. |
 | `pasroutes.test.js` | 5 | -- | De pasroutes: deuren die om een betaalde pas vragen. De eenvoudigste van de vijf verfijningen -- geen account, geen persoon, geen geverifieerde identiteit, gewoon een andere pas. |
 | `passkeys-eerste.test.js` | 4 | -- | HET PASSKEY-SCHERM VOOR WIE ER NOG GEEN HEEFT. WAAROM DIT BESTAAT. |
@@ -1977,7 +1980,7 @@ toets omvalt.
 | `loopbaan.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE TWEE LOOPBAANSCHERMEN IN EEN ECHTE BROWSER. test/carriereledger.test.js bewijst het besluit en test/carriereledger.e2e.test.js dat een verzoek over HTTP bij dat besluit aankomt. |
 | `magnaat-partnerstudio.e2e.js` | 1 | gezakt op `liegpoort /api/` | De Magnaat Partnerstudio in een echte browser. De kernproeven bewijzen de publicatie- en vier-ogenregels. |
 | `magnaatafwerking.e2e.js` | 1 | gezakt op `liegpoort /api/` | MAGNAAT V4 OP EEN TELEFOON, in een echte browser. Wat hier vastligt en geen servertoets kan zien: geen horizontale scroll op de FROM ZERO-schermen bij 390 pixels, de gids staat erboven, de moeilijkheid kies je via de... |
-| `magnaatgroei.e2e.js` | 1 | -- | Magnaat na 1.0, GROEIEN IN EEN ECHTE BROWSER, op een telefoon. Een leven dat van zijn bedrijf leeft, speelt de toets in de kern (de automatische speler); de browser krijgt die staat als antwoord op /staat. |
+| `magnaatgroei.e2e.js` | 1 | gezakt op `liegpoort /api/` | Magnaat na 1.0, GROEIEN IN EEN ECHTE BROWSER, op een telefoon. Een leven dat van zijn bedrijf leeft, speelt de toets in de kern (de automatische speler); de browser krijgt die staat als antwoord op /staat. |
 | `magnaathardening.e2e.js` | 1 | gezakt op `liegpoort /api/` | MAGNAAT V5 IN EEN ECHTE BROWSER: het antwoord gaat verloren nadat de server de handeling al had uitgevoerd. Dat is het lastige geval van een verbroken verbinding: de speler ziet een fout, maar de dag is wel afgesloten. |
 | `magnaatleven.e2e.js` | 1 | gezakt op `liegpoort /api/` | MAGNAAT FROM ZERO IN EEN ECHTE BROWSER: van de voorzijde naar Vandaag, en de eerste dag met de Edge als bediening -- kiezen wat je maakt, tijd plannen in je agenda, een blok schrappen, en de dag afsluiten. Wat deze... |
 | `magnaatonderneming.e2e.js` | 1 | gezakt op `liegpoort /api/` | MAGNAAT V2 ONDERNEMING IN EEN ECHTE BROWSER. Het leven wordt eerst via de gewone route tot een ingeschreven onderneming gespeeld (dezelfde handelingen die een speler doet); daarna gaat het in de browser verder:... |

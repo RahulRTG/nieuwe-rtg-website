@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-28T05:29:40.510Z",
-    "commit": "82da07644",
+    "op": "2026-09-28T13:47:37.779Z",
+    "commit": "4da80399e",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/doelgroepbereik.js",
@@ -988,9 +988,9 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/wereld.js",
-        "regel": 121,
+        "regel": 123,
         "samengesteld": false,
-        "rauw": ", auth, (req, res) => {"
+        "rauw": ", auth, async (req, res) => {"
       },
       "beproefd": 4,
       "onbepaaldeRoutes": 3,
@@ -2488,7 +2488,7 @@
       "naam": "Bestellen & bezorgen",
       "doelgroep": "rtg",
       "verklaard": true,
-      "routes": 6,
+      "routes": 8,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/bezorg/bestel",
@@ -2498,7 +2498,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/kopen/bezorg.js",
-        "regel": 33,
+        "regel": 32,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -2512,7 +2512,7 @@
       "naam": "Bestellen & bezorgen",
       "doelgroep": "lifestyle",
       "verklaard": true,
-      "routes": 6,
+      "routes": 8,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/bezorg/bestel",
@@ -2522,7 +2522,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/kopen/bezorg.js",
-        "regel": 33,
+        "regel": 32,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -2536,7 +2536,7 @@
       "naam": "Bestellen & bezorgen",
       "doelgroep": "business",
       "verklaard": true,
-      "routes": 6,
+      "routes": 8,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/bezorg/bestel",
@@ -2546,7 +2546,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/kopen/bezorg.js",
-        "regel": 33,
+        "regel": 32,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -2560,7 +2560,7 @@
       "naam": "Bestellen & bezorgen",
       "doelgroep": "gast",
       "verklaard": true,
-      "routes": 6,
+      "routes": 8,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/bezorg/bestel",
@@ -2570,7 +2570,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/kopen/bezorg.js",
-        "regel": 33,
+        "regel": 32,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -2585,32 +2585,32 @@
       "naam": "Bestellen & bezorgen",
       "doelgroep": "leverancier",
       "verklaard": false,
-      "routes": 6,
-      "beproefd": 6,
-      "onbepaaldeRoutes": 6,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 8,
       "open": null,
       "uitslag": "onbepaald",
-      "reden": "6 van de 6 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+      "reden": "8 van de 8 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
     },
     {
       "functie": "bestellen",
       "naam": "Bestellen & bezorgen",
       "doelgroep": "personeel",
       "verklaard": false,
-      "routes": 6,
-      "beproefd": 6,
-      "onbepaaldeRoutes": 6,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 8,
       "open": null,
       "uitslag": "onbepaald",
-      "reden": "6 van de 6 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+      "reden": "8 van de 8 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
     },
     {
       "functie": "bestellen",
       "naam": "Bestellen & bezorgen",
       "doelgroep": "foundation",
       "verklaard": false,
-      "routes": 6,
-      "beproefd": 6,
+      "routes": 8,
+      "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
       "uitslag": "onbepaald",
@@ -2621,12 +2621,12 @@
       "naam": "Bestellen & bezorgen",
       "doelgroep": "intern",
       "verklaard": false,
-      "routes": 6,
-      "beproefd": 6,
-      "onbepaaldeRoutes": 6,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 8,
       "open": null,
       "uitslag": "onbepaald",
-      "reden": "6 van de 6 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+      "reden": "8 van de 8 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
     },
     {
       "functie": "tickets",
@@ -3247,7 +3247,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/winkel.js",
-        "regel": 96,
+        "regel": 102,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -3271,7 +3271,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/winkel.js",
-        "regel": 96,
+        "regel": 102,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -3295,7 +3295,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/winkel.js",
-        "regel": 96,
+        "regel": 102,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -3319,7 +3319,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/winkel.js",
-        "regel": 96,
+        "regel": 102,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -5719,20 +5719,20 @@
       "routes": 8,
       "openRoute": {
         "methode": "POST",
-        "pad": "/api/vonk/bericht",
+        "pad": "/api/vonk/blokkeer",
         "bewakers": [
           "auth"
         ],
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/vonk.js",
-        "regel": 19,
+        "regel": 101,
         "samengesteld": false,
-        "rauw": ", auth, (req, res) => { if (gast(req, res)) return; stuur(res, vonkBericht(req.session.key, String(req.body.id || ''), req.body.tekst)); });"
+        "rauw": ", auth, lid('connection.safety.block', async (req, res) => stuur(res, await vonkBlokkeer(req.session.key, req.body.codenaam, req.body.meld))));"
       },
-      "beproefd": 1,
-      "onbepaaldeRoutes": 0,
-      "open": "POST /api/vonk/bericht",
+      "beproefd": 3,
+      "onbepaaldeRoutes": 2,
+      "open": "POST /api/vonk/blokkeer",
       "uitslag": "waar"
     },
     {
@@ -5743,20 +5743,20 @@
       "routes": 8,
       "openRoute": {
         "methode": "POST",
-        "pad": "/api/vonk/bericht",
+        "pad": "/api/vonk/blokkeer",
         "bewakers": [
           "auth"
         ],
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/vonk.js",
-        "regel": 19,
+        "regel": 101,
         "samengesteld": false,
-        "rauw": ", auth, (req, res) => { if (gast(req, res)) return; stuur(res, vonkBericht(req.session.key, String(req.body.id || ''), req.body.tekst)); });"
+        "rauw": ", auth, lid('connection.safety.block', async (req, res) => stuur(res, await vonkBlokkeer(req.session.key, req.body.codenaam, req.body.meld))));"
       },
-      "beproefd": 1,
-      "onbepaaldeRoutes": 0,
-      "open": "POST /api/vonk/bericht",
+      "beproefd": 3,
+      "onbepaaldeRoutes": 2,
+      "open": "POST /api/vonk/blokkeer",
       "uitslag": "waar"
     },
     {
@@ -5767,20 +5767,20 @@
       "routes": 8,
       "openRoute": {
         "methode": "POST",
-        "pad": "/api/vonk/bericht",
+        "pad": "/api/vonk/blokkeer",
         "bewakers": [
           "auth"
         ],
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/vonk.js",
-        "regel": 19,
+        "regel": 101,
         "samengesteld": false,
-        "rauw": ", auth, (req, res) => { if (gast(req, res)) return; stuur(res, vonkBericht(req.session.key, String(req.body.id || ''), req.body.tekst)); });"
+        "rauw": ", auth, lid('connection.safety.block', async (req, res) => stuur(res, await vonkBlokkeer(req.session.key, req.body.codenaam, req.body.meld))));"
       },
-      "beproefd": 1,
-      "onbepaaldeRoutes": 0,
-      "open": "POST /api/vonk/bericht",
+      "beproefd": 3,
+      "onbepaaldeRoutes": 2,
+      "open": "POST /api/vonk/blokkeer",
       "uitslag": "waar"
     },
     {
@@ -5842,6 +5842,183 @@
       "open": null,
       "uitslag": "onbepaald",
       "reden": "8 van de 8 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+    },
+    {
+      "functie": "connectionos",
+      "naam": "RTG Connection OS",
+      "doelgroep": "rtg",
+      "verklaard": true,
+      "routes": 8,
+      "openRoute": {
+        "methode": "GET",
+        "pad": "/api/connection/rendezvous/message-media/delivery/:ticket",
+        "bewakers": [],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/member/rendezvous-connection.js",
+        "regel": 30,
+        "samengesteld": false,
+        "rauw": ",async(req,res)=>{try{const item=await rvCommMediaLever(req.params.ticket);return item"
+      },
+      "beproefd": 8,
+      "onbepaaldeRoutes": 7,
+      "open": "GET /api/connection/rendezvous/message-media/delivery/:ticket",
+      "uitslag": "waar"
+    },
+    {
+      "functie": "connectionos",
+      "naam": "RTG Connection OS",
+      "doelgroep": "lifestyle",
+      "verklaard": true,
+      "routes": 8,
+      "openRoute": {
+        "methode": "GET",
+        "pad": "/api/connection/rendezvous/message-media/delivery/:ticket",
+        "bewakers": [],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/member/rendezvous-connection.js",
+        "regel": 30,
+        "samengesteld": false,
+        "rauw": ",async(req,res)=>{try{const item=await rvCommMediaLever(req.params.ticket);return item"
+      },
+      "beproefd": 8,
+      "onbepaaldeRoutes": 7,
+      "open": "GET /api/connection/rendezvous/message-media/delivery/:ticket",
+      "uitslag": "waar"
+    },
+    {
+      "functie": "connectionos",
+      "naam": "RTG Connection OS",
+      "doelgroep": "business",
+      "verklaard": true,
+      "routes": 8,
+      "openRoute": {
+        "methode": "GET",
+        "pad": "/api/connection/rendezvous/message-media/delivery/:ticket",
+        "bewakers": [],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/member/rendezvous-connection.js",
+        "regel": 30,
+        "samengesteld": false,
+        "rauw": ",async(req,res)=>{try{const item=await rvCommMediaLever(req.params.ticket);return item"
+      },
+      "beproefd": 8,
+      "onbepaaldeRoutes": 7,
+      "open": "GET /api/connection/rendezvous/message-media/delivery/:ticket",
+      "uitslag": "waar"
+    },
+    {
+      "functie": "connectionos",
+      "naam": "RTG Connection OS",
+      "doelgroep": "gast",
+      "verklaard": false,
+      "routes": 8,
+      "openRoute": {
+        "methode": "GET",
+        "pad": "/api/connection/rendezvous/message-media/delivery/:ticket",
+        "bewakers": [],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/member/rendezvous-connection.js",
+        "regel": 30,
+        "samengesteld": false,
+        "rauw": ",async(req,res)=>{try{const item=await rvCommMediaLever(req.params.ticket);return item"
+      },
+      "openVorm": "bezoeker",
+      "beproefd": 8,
+      "onbepaaldeRoutes": 7,
+      "open": "GET /api/connection/rendezvous/message-media/delivery/:ticket",
+      "uitslag": "geen-deur"
+    },
+    {
+      "functie": "connectionos",
+      "naam": "RTG Connection OS",
+      "doelgroep": "leverancier",
+      "verklaard": false,
+      "routes": 8,
+      "openRoute": {
+        "methode": "GET",
+        "pad": "/api/connection/rendezvous/message-media/delivery/:ticket",
+        "bewakers": [],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/member/rendezvous-connection.js",
+        "regel": 30,
+        "samengesteld": false,
+        "rauw": ",async(req,res)=>{try{const item=await rvCommMediaLever(req.params.ticket);return item"
+      },
+      "beproefd": 8,
+      "onbepaaldeRoutes": 7,
+      "open": "GET /api/connection/rendezvous/message-media/delivery/:ticket",
+      "uitslag": "geen-deur"
+    },
+    {
+      "functie": "connectionos",
+      "naam": "RTG Connection OS",
+      "doelgroep": "personeel",
+      "verklaard": false,
+      "routes": 8,
+      "openRoute": {
+        "methode": "GET",
+        "pad": "/api/connection/rendezvous/message-media/delivery/:ticket",
+        "bewakers": [],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/member/rendezvous-connection.js",
+        "regel": 30,
+        "samengesteld": false,
+        "rauw": ",async(req,res)=>{try{const item=await rvCommMediaLever(req.params.ticket);return item"
+      },
+      "beproefd": 8,
+      "onbepaaldeRoutes": 7,
+      "open": "GET /api/connection/rendezvous/message-media/delivery/:ticket",
+      "uitslag": "geen-deur"
+    },
+    {
+      "functie": "connectionos",
+      "naam": "RTG Connection OS",
+      "doelgroep": "foundation",
+      "verklaard": false,
+      "routes": 8,
+      "openRoute": {
+        "methode": "GET",
+        "pad": "/api/connection/rendezvous/message-media/delivery/:ticket",
+        "bewakers": [],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/member/rendezvous-connection.js",
+        "regel": 30,
+        "samengesteld": false,
+        "rauw": ",async(req,res)=>{try{const item=await rvCommMediaLever(req.params.ticket);return item"
+      },
+      "beproefd": 8,
+      "onbepaaldeRoutes": 0,
+      "open": "GET /api/connection/rendezvous/message-media/delivery/:ticket",
+      "uitslag": "geen-deur"
+    },
+    {
+      "functie": "connectionos",
+      "naam": "RTG Connection OS",
+      "doelgroep": "intern",
+      "verklaard": false,
+      "routes": 8,
+      "openRoute": {
+        "methode": "GET",
+        "pad": "/api/connection/rendezvous/message-media/delivery/:ticket",
+        "bewakers": [],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/member/rendezvous-connection.js",
+        "regel": 30,
+        "samengesteld": false,
+        "rauw": ",async(req,res)=>{try{const item=await rvCommMediaLever(req.params.ticket);return item"
+      },
+      "beproefd": 8,
+      "onbepaaldeRoutes": 7,
+      "open": "GET /api/connection/rendezvous/message-media/delivery/:ticket",
+      "uitslag": "geen-deur"
     },
     {
       "functie": "mediaos",
@@ -6701,7 +6878,7 @@
       "naam": "RTG Invisible Arrival",
       "doelgroep": "rtg",
       "verklaard": true,
-      "routes": 4,
+      "routes": 6,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/arrival/request",
@@ -6711,11 +6888,11 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/supplier/horeca/invisible-arrival.js",
-        "regel": 27,
+        "regel": 25,
         "samengesteld": false,
-        "rauw": ",requestRem,(req,res)=>{const b=req.body||{},cred=toegang(b.requestToken),s=findSupplier(String(b.supplierCode||''));if(!cred)return res.status(400).json({error"
+        "rauw": ",requestRem,async(req,res)=>{res.set('Cache-Control','no-store');const b=req.body||{},rt=String(b.requestToken||''),s=findSupplier(String(b.supplierCode||''));i"
       },
-      "beproefd": 4,
+      "beproefd": 6,
       "onbepaaldeRoutes": 0,
       "open": "POST /api/arrival/request",
       "uitslag": "waar"
@@ -6725,7 +6902,7 @@
       "naam": "RTG Invisible Arrival",
       "doelgroep": "lifestyle",
       "verklaard": true,
-      "routes": 4,
+      "routes": 6,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/arrival/request",
@@ -6735,11 +6912,11 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/supplier/horeca/invisible-arrival.js",
-        "regel": 27,
+        "regel": 25,
         "samengesteld": false,
-        "rauw": ",requestRem,(req,res)=>{const b=req.body||{},cred=toegang(b.requestToken),s=findSupplier(String(b.supplierCode||''));if(!cred)return res.status(400).json({error"
+        "rauw": ",requestRem,async(req,res)=>{res.set('Cache-Control','no-store');const b=req.body||{},rt=String(b.requestToken||''),s=findSupplier(String(b.supplierCode||''));i"
       },
-      "beproefd": 4,
+      "beproefd": 6,
       "onbepaaldeRoutes": 0,
       "open": "POST /api/arrival/request",
       "uitslag": "waar"
@@ -6749,7 +6926,7 @@
       "naam": "RTG Invisible Arrival",
       "doelgroep": "business",
       "verklaard": true,
-      "routes": 4,
+      "routes": 6,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/arrival/request",
@@ -6759,11 +6936,11 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/supplier/horeca/invisible-arrival.js",
-        "regel": 27,
+        "regel": 25,
         "samengesteld": false,
-        "rauw": ",requestRem,(req,res)=>{const b=req.body||{},cred=toegang(b.requestToken),s=findSupplier(String(b.supplierCode||''));if(!cred)return res.status(400).json({error"
+        "rauw": ",requestRem,async(req,res)=>{res.set('Cache-Control','no-store');const b=req.body||{},rt=String(b.requestToken||''),s=findSupplier(String(b.supplierCode||''));i"
       },
-      "beproefd": 4,
+      "beproefd": 6,
       "onbepaaldeRoutes": 0,
       "open": "POST /api/arrival/request",
       "uitslag": "waar"
@@ -6773,7 +6950,7 @@
       "naam": "RTG Invisible Arrival",
       "doelgroep": "gast",
       "verklaard": true,
-      "routes": 4,
+      "routes": 6,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/arrival/request",
@@ -6783,12 +6960,12 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/supplier/horeca/invisible-arrival.js",
-        "regel": 27,
+        "regel": 25,
         "samengesteld": false,
-        "rauw": ",requestRem,(req,res)=>{const b=req.body||{},cred=toegang(b.requestToken),s=findSupplier(String(b.supplierCode||''));if(!cred)return res.status(400).json({error"
+        "rauw": ",requestRem,async(req,res)=>{res.set('Cache-Control','no-store');const b=req.body||{},rt=String(b.requestToken||''),s=findSupplier(String(b.supplierCode||''));i"
       },
       "openVorm": "bezoeker",
-      "beproefd": 4,
+      "beproefd": 6,
       "onbepaaldeRoutes": 0,
       "open": "POST /api/arrival/request",
       "uitslag": "waar"
@@ -6798,7 +6975,7 @@
       "naam": "RTG Invisible Arrival",
       "doelgroep": "leverancier",
       "verklaard": false,
-      "routes": 4,
+      "routes": 6,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/arrival/request",
@@ -6808,11 +6985,11 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/supplier/horeca/invisible-arrival.js",
-        "regel": 27,
+        "regel": 25,
         "samengesteld": false,
-        "rauw": ",requestRem,(req,res)=>{const b=req.body||{},cred=toegang(b.requestToken),s=findSupplier(String(b.supplierCode||''));if(!cred)return res.status(400).json({error"
+        "rauw": ",requestRem,async(req,res)=>{res.set('Cache-Control','no-store');const b=req.body||{},rt=String(b.requestToken||''),s=findSupplier(String(b.supplierCode||''));i"
       },
-      "beproefd": 4,
+      "beproefd": 6,
       "onbepaaldeRoutes": 0,
       "open": "POST /api/arrival/request",
       "uitslag": "geen-deur"
@@ -6822,7 +6999,7 @@
       "naam": "RTG Invisible Arrival",
       "doelgroep": "personeel",
       "verklaard": false,
-      "routes": 4,
+      "routes": 6,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/arrival/request",
@@ -6832,11 +7009,11 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/supplier/horeca/invisible-arrival.js",
-        "regel": 27,
+        "regel": 25,
         "samengesteld": false,
-        "rauw": ",requestRem,(req,res)=>{const b=req.body||{},cred=toegang(b.requestToken),s=findSupplier(String(b.supplierCode||''));if(!cred)return res.status(400).json({error"
+        "rauw": ",requestRem,async(req,res)=>{res.set('Cache-Control','no-store');const b=req.body||{},rt=String(b.requestToken||''),s=findSupplier(String(b.supplierCode||''));i"
       },
-      "beproefd": 4,
+      "beproefd": 6,
       "onbepaaldeRoutes": 0,
       "open": "POST /api/arrival/request",
       "uitslag": "geen-deur"
@@ -6846,7 +7023,7 @@
       "naam": "RTG Invisible Arrival",
       "doelgroep": "foundation",
       "verklaard": false,
-      "routes": 4,
+      "routes": 6,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/arrival/request",
@@ -6856,11 +7033,11 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/supplier/horeca/invisible-arrival.js",
-        "regel": 27,
+        "regel": 25,
         "samengesteld": false,
-        "rauw": ",requestRem,(req,res)=>{const b=req.body||{},cred=toegang(b.requestToken),s=findSupplier(String(b.supplierCode||''));if(!cred)return res.status(400).json({error"
+        "rauw": ",requestRem,async(req,res)=>{res.set('Cache-Control','no-store');const b=req.body||{},rt=String(b.requestToken||''),s=findSupplier(String(b.supplierCode||''));i"
       },
-      "beproefd": 4,
+      "beproefd": 6,
       "onbepaaldeRoutes": 0,
       "open": "POST /api/arrival/request",
       "uitslag": "geen-deur"
@@ -6870,7 +7047,7 @@
       "naam": "RTG Invisible Arrival",
       "doelgroep": "intern",
       "verklaard": false,
-      "routes": 4,
+      "routes": 6,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/arrival/interpret",
@@ -6880,11 +7057,11 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/supplier/horeca/invisible-arrival.js",
-        "regel": 26,
+        "regel": 22,
         "samengesteld": false,
         "rauw": ",interpretRem,(req,res)=>res.json({ok:true,plan:interpreteer(schoon(req.body.tekst,500)),let:'Controleer dit plan; er is nog niets aangevraagd.'}));"
       },
-      "beproefd": 3,
+      "beproefd": 5,
       "onbepaaldeRoutes": 0,
       "open": "POST /api/arrival/interpret",
       "uitslag": "geen-deur"
@@ -10084,6 +10261,199 @@
       "reden": "8 van de 8 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
     },
     {
+      "functie": "leerhuis",
+      "naam": "RTG Academy (leren, bewijzen, certificeren)",
+      "doelgroep": "rtg",
+      "verklaard": true,
+      "routes": 3,
+      "openRoute": {
+        "methode": "POST",
+        "pad": "/api/office/leerhuis/open",
+        "bewakers": [
+          "kluisAuth"
+        ],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/leerhuis.js",
+        "regel": 128,
+        "samengesteld": false,
+        "rauw": ", kluisAuth, async (req, res) => {"
+      },
+      "beproefd": 3,
+      "onbepaaldeRoutes": 0,
+      "open": "POST /api/office/leerhuis/open",
+      "uitslag": "waar"
+    },
+    {
+      "functie": "leerhuis",
+      "naam": "RTG Academy (leren, bewijzen, certificeren)",
+      "doelgroep": "lifestyle",
+      "verklaard": true,
+      "routes": 3,
+      "openRoute": {
+        "methode": "POST",
+        "pad": "/api/office/leerhuis/open",
+        "bewakers": [
+          "kluisAuth"
+        ],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/leerhuis.js",
+        "regel": 128,
+        "samengesteld": false,
+        "rauw": ", kluisAuth, async (req, res) => {"
+      },
+      "beproefd": 3,
+      "onbepaaldeRoutes": 0,
+      "open": "POST /api/office/leerhuis/open",
+      "uitslag": "waar"
+    },
+    {
+      "functie": "leerhuis",
+      "naam": "RTG Academy (leren, bewijzen, certificeren)",
+      "doelgroep": "business",
+      "verklaard": true,
+      "routes": 3,
+      "openRoute": {
+        "methode": "POST",
+        "pad": "/api/office/leerhuis/open",
+        "bewakers": [
+          "kluisAuth"
+        ],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/leerhuis.js",
+        "regel": 128,
+        "samengesteld": false,
+        "rauw": ", kluisAuth, async (req, res) => {"
+      },
+      "beproefd": 3,
+      "onbepaaldeRoutes": 0,
+      "open": "POST /api/office/leerhuis/open",
+      "uitslag": "waar"
+    },
+    {
+      "functie": "leerhuis",
+      "naam": "RTG Academy (leren, bewijzen, certificeren)",
+      "doelgroep": "gast",
+      "verklaard": false,
+      "routes": 3,
+      "openRoute": {
+        "methode": "POST",
+        "pad": "/api/office/leerhuis/open",
+        "bewakers": [
+          "kluisAuth"
+        ],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/leerhuis.js",
+        "regel": 128,
+        "samengesteld": false,
+        "rauw": ", kluisAuth, async (req, res) => {"
+      },
+      "openVorm": "bezoeker",
+      "beproefd": 3,
+      "onbepaaldeRoutes": 0,
+      "open": "POST /api/office/leerhuis/open",
+      "uitslag": "geen-deur"
+    },
+    {
+      "functie": "leerhuis",
+      "naam": "RTG Academy (leren, bewijzen, certificeren)",
+      "doelgroep": "leverancier",
+      "verklaard": false,
+      "routes": 3,
+      "openRoute": {
+        "methode": "POST",
+        "pad": "/api/office/leerhuis/open",
+        "bewakers": [
+          "kluisAuth"
+        ],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/leerhuis.js",
+        "regel": 128,
+        "samengesteld": false,
+        "rauw": ", kluisAuth, async (req, res) => {"
+      },
+      "beproefd": 3,
+      "onbepaaldeRoutes": 0,
+      "open": "POST /api/office/leerhuis/open",
+      "uitslag": "geen-deur"
+    },
+    {
+      "functie": "leerhuis",
+      "naam": "RTG Academy (leren, bewijzen, certificeren)",
+      "doelgroep": "personeel",
+      "verklaard": false,
+      "routes": 3,
+      "openRoute": {
+        "methode": "POST",
+        "pad": "/api/office/leerhuis/open",
+        "bewakers": [
+          "kluisAuth"
+        ],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/leerhuis.js",
+        "regel": 128,
+        "samengesteld": false,
+        "rauw": ", kluisAuth, async (req, res) => {"
+      },
+      "beproefd": 3,
+      "onbepaaldeRoutes": 0,
+      "open": "POST /api/office/leerhuis/open",
+      "uitslag": "geen-deur"
+    },
+    {
+      "functie": "leerhuis",
+      "naam": "RTG Academy (leren, bewijzen, certificeren)",
+      "doelgroep": "foundation",
+      "verklaard": false,
+      "routes": 3,
+      "openRoute": {
+        "methode": "POST",
+        "pad": "/api/office/leerhuis/open",
+        "bewakers": [
+          "kluisAuth"
+        ],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/leerhuis.js",
+        "regel": 128,
+        "samengesteld": false,
+        "rauw": ", kluisAuth, async (req, res) => {"
+      },
+      "beproefd": 3,
+      "onbepaaldeRoutes": 0,
+      "open": "POST /api/office/leerhuis/open",
+      "uitslag": "geen-deur"
+    },
+    {
+      "functie": "leerhuis",
+      "naam": "RTG Academy (leren, bewijzen, certificeren)",
+      "doelgroep": "intern",
+      "verklaard": false,
+      "routes": 3,
+      "openRoute": {
+        "methode": "POST",
+        "pad": "/api/office/leerhuis/open",
+        "bewakers": [
+          "kluisAuth"
+        ],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/leerhuis.js",
+        "regel": 128,
+        "samengesteld": false,
+        "rauw": ", kluisAuth, async (req, res) => {"
+      },
+      "beproefd": 3,
+      "onbepaaldeRoutes": 0,
+      "open": "POST /api/office/leerhuis/open",
+      "uitslag": "geen-deur"
+    },
+    {
       "functie": "supplier",
       "naam": "Partner-app (algemeen)",
       "doelgroep": "rtg",
@@ -10279,7 +10649,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/kopen/bezorg.js",
-        "regel": 13,
+        "regel": 12,
         "samengesteld": false,
         "rauw": ", (req, res) => {"
       },
@@ -10301,7 +10671,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/kopen/bezorg.js",
-        "regel": 13,
+        "regel": 12,
         "samengesteld": false,
         "rauw": ", (req, res) => {"
       },
@@ -11457,8 +11827,8 @@
         "samengesteld": false,
         "rauw": ", officeAuth, (req, res) => {"
       },
-      "beproefd": 1,
-      "onbepaaldeRoutes": 0,
+      "beproefd": 2,
+      "onbepaaldeRoutes": 1,
       "open": "POST /api/office/afdelingshotel",
       "uitslag": "waar"
     },
@@ -12128,12 +12498,12 @@
       "open": null,
       "uitslag": "registerleugen",
       "deuren": {
-        "routes": 116,
-        "zonderRoldeur": 116,
+        "routes": 118,
+        "zonderRoldeur": 118,
         "rollen": []
       },
       "triage": "gemengde-deuren",
-      "triageReden": "116 routes met geen roldeur(en) en 116 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
+      "triageReden": "118 routes met geen roldeur(en) en 118 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "bedrijf",
@@ -12157,12 +12527,12 @@
       "open": null,
       "uitslag": "registerleugen",
       "deuren": {
-        "routes": 116,
-        "zonderRoldeur": 116,
+        "routes": 118,
+        "zonderRoldeur": 118,
         "rollen": []
       },
       "triage": "gemengde-deuren",
-      "triageReden": "116 routes met geen roldeur(en) en 116 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
+      "triageReden": "118 routes met geen roldeur(en) en 118 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "bedrijf",
@@ -12175,12 +12545,12 @@
       "open": null,
       "uitslag": "registerleugen",
       "deuren": {
-        "routes": 116,
-        "zonderRoldeur": 116,
+        "routes": 118,
+        "zonderRoldeur": 118,
         "rollen": []
       },
       "triage": "gemengde-deuren",
-      "triageReden": "116 routes met geen roldeur(en) en 116 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
+      "triageReden": "118 routes met geen roldeur(en) en 118 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "bedrijf",
@@ -12205,12 +12575,12 @@
       "open": null,
       "uitslag": "registerleugen",
       "deuren": {
-        "routes": 116,
-        "zonderRoldeur": 116,
+        "routes": 118,
+        "zonderRoldeur": 118,
         "rollen": []
       },
       "triage": "gemengde-deuren",
-      "triageReden": "116 routes met geen roldeur(en) en 116 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
+      "triageReden": "118 routes met geen roldeur(en) en 118 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "betalen",
@@ -12891,7 +13261,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/winkel.js",
-        "regel": 126,
+        "regel": 132,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -12915,7 +13285,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/winkel.js",
-        "regel": 126,
+        "regel": 132,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -12939,7 +13309,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/winkel.js",
-        "regel": 126,
+        "regel": 132,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -12963,7 +13333,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/winkel.js",
-        "regel": 122,
+        "regel": 128,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -13462,7 +13832,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/stuur.js",
-        "regel": 108,
+        "regel": 109,
         "samengesteld": false,
         "rauw": ", auth, doeHandler('member'));"
       },
@@ -13486,7 +13856,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/stuur.js",
-        "regel": 108,
+        "regel": 109,
         "samengesteld": false,
         "rauw": ", auth, doeHandler('member'));"
       },
@@ -13510,7 +13880,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/stuur.js",
-        "regel": 108,
+        "regel": 109,
         "samengesteld": false,
         "rauw": ", auth, doeHandler('member'));"
       },
@@ -13534,7 +13904,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/stuur.js",
-        "regel": 108,
+        "regel": 109,
         "samengesteld": false,
         "rauw": ", auth, doeHandler('member'));"
       },
@@ -13559,7 +13929,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/stuur.js",
-        "regel": 112,
+        "regel": 113,
         "samengesteld": false,
         "rauw": ", supplierAuth, doeHandler('staff'));"
       },
@@ -13583,7 +13953,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/stuur.js",
-        "regel": 112,
+        "regel": 113,
         "samengesteld": false,
         "rauw": ", supplierAuth, doeHandler('staff'));"
       },
@@ -17775,11 +18145,11 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/doos.js",
-        "regel": 40,
+        "regel": 34,
         "samengesteld": false,
         "rauw": ", (req, res) => res.json(zaakdoos.status()));"
       },
-      "beproefd": 5,
+      "beproefd": 6,
       "onbepaaldeRoutes": 0,
       "open": "GET /api/doos/status",
       "uitslag": "geen-deur"
@@ -17797,11 +18167,11 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/doos.js",
-        "regel": 40,
+        "regel": 34,
         "samengesteld": false,
         "rauw": ", (req, res) => res.json(zaakdoos.status()));"
       },
-      "beproefd": 1,
+      "beproefd": 2,
       "onbepaaldeRoutes": 0,
       "open": "GET /api/doos/status",
       "uitslag": "geen-deur"
@@ -17819,11 +18189,11 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/doos.js",
-        "regel": 40,
+        "regel": 34,
         "samengesteld": false,
         "rauw": ", (req, res) => res.json(zaakdoos.status()));"
       },
-      "beproefd": 1,
+      "beproefd": 2,
       "onbepaaldeRoutes": 0,
       "open": "GET /api/doos/status",
       "uitslag": "waar"
@@ -17841,12 +18211,12 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/doos.js",
-        "regel": 40,
+        "regel": 34,
         "samengesteld": false,
         "rauw": ", (req, res) => res.json(zaakdoos.status()));"
       },
       "openVorm": "bezoeker",
-      "beproefd": 1,
+      "beproefd": 2,
       "onbepaaldeRoutes": 0,
       "open": "GET /api/doos/status",
       "uitslag": "geen-deur"
@@ -17864,11 +18234,11 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/doos.js",
-        "regel": 40,
+        "regel": 34,
         "samengesteld": false,
         "rauw": ", (req, res) => res.json(zaakdoos.status()));"
       },
-      "beproefd": 1,
+      "beproefd": 2,
       "onbepaaldeRoutes": 0,
       "open": "GET /api/doos/status",
       "uitslag": "waar"
@@ -17886,11 +18256,11 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/doos.js",
-        "regel": 40,
+        "regel": 34,
         "samengesteld": false,
         "rauw": ", (req, res) => res.json(zaakdoos.status()));"
       },
-      "beproefd": 1,
+      "beproefd": 2,
       "onbepaaldeRoutes": 0,
       "open": "GET /api/doos/status",
       "uitslag": "waar"
@@ -17908,11 +18278,11 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/doos.js",
-        "regel": 40,
+        "regel": 34,
         "samengesteld": false,
         "rauw": ", (req, res) => res.json(zaakdoos.status()));"
       },
-      "beproefd": 1,
+      "beproefd": 2,
       "onbepaaldeRoutes": 0,
       "open": "GET /api/doos/status",
       "uitslag": "geen-deur"
@@ -17930,11 +18300,11 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/doos.js",
-        "regel": 40,
+        "regel": 34,
         "samengesteld": false,
         "rauw": ", (req, res) => res.json(zaakdoos.status()));"
       },
-      "beproefd": 1,
+      "beproefd": 2,
       "onbepaaldeRoutes": 0,
       "open": "GET /api/doos/status",
       "uitslag": "waar"
@@ -22891,9 +23261,9 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/pay-tegoed.js",
-        "regel": 62,
+        "regel": 74,
         "samengesteld": false,
-        "rauw": ", auth, (req, res) => {"
+        "rauw": ", auth, async (req, res) => {"
       },
       "beproefd": 1,
       "onbepaaldeRoutes": 0,
@@ -22915,9 +23285,9 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/pay-tegoed.js",
-        "regel": 62,
+        "regel": 74,
         "samengesteld": false,
-        "rauw": ", auth, (req, res) => {"
+        "rauw": ", auth, async (req, res) => {"
       },
       "beproefd": 1,
       "onbepaaldeRoutes": 0,
@@ -22939,9 +23309,9 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/pay-tegoed.js",
-        "regel": 62,
+        "regel": 74,
         "samengesteld": false,
-        "rauw": ", auth, (req, res) => {"
+        "rauw": ", auth, async (req, res) => {"
       },
       "beproefd": 1,
       "onbepaaldeRoutes": 0,
@@ -22963,9 +23333,9 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/pay-tegoed.js",
-        "regel": 62,
+        "regel": 74,
         "samengesteld": false,
-        "rauw": ", auth, (req, res) => {"
+        "rauw": ", auth, async (req, res) => {"
       },
       "openVorm": "account",
       "beproefd": 1,
@@ -23026,7 +23396,7 @@
       "naam": "Tegoed voor een ander",
       "doelgroep": "rtg",
       "verklaard": true,
-      "routes": 4,
+      "routes": 5,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/pay/tegoed",
@@ -23036,9 +23406,9 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/pay-tegoed.js",
-        "regel": 24,
+        "regel": 26,
         "samengesteld": false,
-        "rauw": ", auth, (req, res) => {"
+        "rauw": ", auth, async (req, res) => {"
       },
       "beproefd": 1,
       "onbepaaldeRoutes": 0,
@@ -23050,7 +23420,7 @@
       "naam": "Tegoed voor een ander",
       "doelgroep": "lifestyle",
       "verklaard": true,
-      "routes": 4,
+      "routes": 5,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/pay/tegoed",
@@ -23060,9 +23430,9 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/pay-tegoed.js",
-        "regel": 24,
+        "regel": 26,
         "samengesteld": false,
-        "rauw": ", auth, (req, res) => {"
+        "rauw": ", auth, async (req, res) => {"
       },
       "beproefd": 1,
       "onbepaaldeRoutes": 0,
@@ -23074,7 +23444,7 @@
       "naam": "Tegoed voor een ander",
       "doelgroep": "business",
       "verklaard": true,
-      "routes": 4,
+      "routes": 5,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/pay/tegoed",
@@ -23084,9 +23454,9 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/pay-tegoed.js",
-        "regel": 24,
+        "regel": 26,
         "samengesteld": false,
-        "rauw": ", auth, (req, res) => {"
+        "rauw": ", auth, async (req, res) => {"
       },
       "beproefd": 1,
       "onbepaaldeRoutes": 0,
@@ -23098,44 +23468,44 @@
       "naam": "Tegoed voor een ander",
       "doelgroep": "gast",
       "verklaard": false,
-      "routes": 4,
-      "beproefd": 4,
-      "onbepaaldeRoutes": 4,
+      "routes": 5,
+      "beproefd": 5,
+      "onbepaaldeRoutes": 5,
       "open": null,
       "uitslag": "onbepaald",
-      "reden": "4 van de 4 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+      "reden": "5 van de 5 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
     },
     {
       "functie": "dom-pay-tegoed",
       "naam": "Tegoed voor een ander",
       "doelgroep": "leverancier",
       "verklaard": false,
-      "routes": 4,
-      "beproefd": 4,
-      "onbepaaldeRoutes": 4,
+      "routes": 5,
+      "beproefd": 5,
+      "onbepaaldeRoutes": 5,
       "open": null,
       "uitslag": "onbepaald",
-      "reden": "4 van de 4 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+      "reden": "5 van de 5 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
     },
     {
       "functie": "dom-pay-tegoed",
       "naam": "Tegoed voor een ander",
       "doelgroep": "personeel",
       "verklaard": false,
-      "routes": 4,
-      "beproefd": 4,
-      "onbepaaldeRoutes": 4,
+      "routes": 5,
+      "beproefd": 5,
+      "onbepaaldeRoutes": 5,
       "open": null,
       "uitslag": "onbepaald",
-      "reden": "4 van de 4 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+      "reden": "5 van de 5 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
     },
     {
       "functie": "dom-pay-tegoed",
       "naam": "Tegoed voor een ander",
       "doelgroep": "foundation",
       "verklaard": false,
-      "routes": 4,
-      "beproefd": 4,
+      "routes": 5,
+      "beproefd": 5,
       "onbepaaldeRoutes": 0,
       "open": null,
       "uitslag": "onbepaald",
@@ -23146,20 +23516,20 @@
       "naam": "Tegoed voor een ander",
       "doelgroep": "intern",
       "verklaard": false,
-      "routes": 4,
-      "beproefd": 4,
-      "onbepaaldeRoutes": 4,
+      "routes": 5,
+      "beproefd": 5,
+      "onbepaaldeRoutes": 5,
       "open": null,
       "uitslag": "onbepaald",
-      "reden": "4 van de 4 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+      "reden": "5 van de 5 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
     },
     {
       "functie": "dom-pay-tegoed-zaak",
       "naam": "Tegoed vanuit een zaak",
       "doelgroep": "rtg",
       "verklaard": false,
-      "routes": 3,
-      "beproefd": 3,
+      "routes": 4,
+      "beproefd": 4,
       "onbepaaldeRoutes": 0,
       "open": null,
       "uitslag": "correct-afgesloten"
@@ -23169,8 +23539,8 @@
       "naam": "Tegoed vanuit een zaak",
       "doelgroep": "lifestyle",
       "verklaard": false,
-      "routes": 3,
-      "beproefd": 3,
+      "routes": 4,
+      "beproefd": 4,
       "onbepaaldeRoutes": 0,
       "open": null,
       "uitslag": "correct-afgesloten"
@@ -23180,8 +23550,8 @@
       "naam": "Tegoed vanuit een zaak",
       "doelgroep": "business",
       "verklaard": false,
-      "routes": 3,
-      "beproefd": 3,
+      "routes": 4,
+      "beproefd": 4,
       "onbepaaldeRoutes": 0,
       "open": null,
       "uitslag": "correct-afgesloten"
@@ -23191,8 +23561,8 @@
       "naam": "Tegoed vanuit een zaak",
       "doelgroep": "gast",
       "verklaard": false,
-      "routes": 3,
-      "beproefd": 3,
+      "routes": 4,
+      "beproefd": 4,
       "onbepaaldeRoutes": 0,
       "open": null,
       "uitslag": "correct-afgesloten"
@@ -23202,7 +23572,7 @@
       "naam": "Tegoed vanuit een zaak",
       "doelgroep": "leverancier",
       "verklaard": true,
-      "routes": 3,
+      "routes": 4,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/supplier/pay/tegoed",
@@ -23212,9 +23582,9 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/pay-zaak.js",
-        "regel": 101,
+        "regel": 95,
         "samengesteld": false,
-        "rauw": ", supplierAuth, (req, res) => {"
+        "rauw": ", supplierAuth, async (req, res) => {"
       },
       "beproefd": 1,
       "onbepaaldeRoutes": 0,
@@ -23226,7 +23596,7 @@
       "naam": "Tegoed vanuit een zaak",
       "doelgroep": "personeel",
       "verklaard": false,
-      "routes": 3,
+      "routes": 4,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/supplier/pay/tegoed",
@@ -23236,9 +23606,9 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/pay-zaak.js",
-        "regel": 101,
+        "regel": 95,
         "samengesteld": false,
-        "rauw": ", supplierAuth, (req, res) => {"
+        "rauw": ", supplierAuth, async (req, res) => {"
       },
       "beproefd": 1,
       "onbepaaldeRoutes": 0,
@@ -23258,8 +23628,8 @@
       "naam": "Tegoed vanuit een zaak",
       "doelgroep": "foundation",
       "verklaard": false,
-      "routes": 3,
-      "beproefd": 3,
+      "routes": 4,
+      "beproefd": 4,
       "onbepaaldeRoutes": 0,
       "open": null,
       "uitslag": "onbepaald",
@@ -23270,8 +23640,8 @@
       "naam": "Tegoed vanuit een zaak",
       "doelgroep": "intern",
       "verklaard": false,
-      "routes": 3,
-      "beproefd": 3,
+      "routes": 4,
+      "beproefd": 4,
       "onbepaaldeRoutes": 0,
       "open": null,
       "uitslag": "correct-afgesloten"
@@ -23578,7 +23948,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/pay-zaak.js",
-        "regel": 138,
+        "regel": 137,
         "samengesteld": false,
         "rauw": ", supplierAuth, async (req, res) => {"
       },
@@ -23783,20 +24153,20 @@
       "routes": 8,
       "openRoute": {
         "methode": "POST",
-        "pad": "/api/auth/me",
+        "pad": "/api/auth/aanmeldkanaal",
         "bewakers": [
           "auth"
         ],
         "bewakersBekend": true,
         "viaRouter": false,
-        "bestand": "server/routes/auth/inlog-pas.js",
-        "regel": 70,
+        "bestand": "server/routes/auth/account.js",
+        "regel": 117,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
-      "beproefd": 3,
+      "beproefd": 1,
       "onbepaaldeRoutes": 0,
-      "open": "POST /api/auth/me",
+      "open": "POST /api/auth/aanmeldkanaal",
       "uitslag": "waar"
     },
     {
@@ -23818,8 +24188,8 @@
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
-      "beproefd": 3,
-      "onbepaaldeRoutes": 0,
+      "beproefd": 4,
+      "onbepaaldeRoutes": 1,
       "open": "POST /api/auth/me",
       "uitslag": "waar"
     },
@@ -23842,8 +24212,8 @@
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
-      "beproefd": 3,
-      "onbepaaldeRoutes": 0,
+      "beproefd": 4,
+      "onbepaaldeRoutes": 1,
       "open": "POST /api/auth/me",
       "uitslag": "waar"
     },
@@ -23855,21 +24225,21 @@
       "routes": 8,
       "openRoute": {
         "methode": "POST",
-        "pad": "/api/auth/me",
+        "pad": "/api/auth/aanmeldkanaal",
         "bewakers": [
           "auth"
         ],
         "bewakersBekend": true,
         "viaRouter": false,
-        "bestand": "server/routes/auth/inlog-pas.js",
-        "regel": 70,
+        "bestand": "server/routes/auth/account.js",
+        "regel": 117,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
-      "openVorm": "bezoeker",
-      "beproefd": 3,
+      "openVorm": "account",
+      "beproefd": 1,
       "onbepaaldeRoutes": 0,
-      "open": "POST /api/auth/me",
+      "open": "POST /api/auth/aanmeldkanaal",
       "uitslag": "waar"
     },
     {
@@ -23890,7 +24260,7 @@
         "rauw": ", async (req, res) => {"
       },
       "beproefd": 8,
-      "onbepaaldeRoutes": 3,
+      "onbepaaldeRoutes": 4,
       "open": "POST /api/auth/reset",
       "uitslag": "waar"
     },
@@ -23912,7 +24282,7 @@
         "rauw": ", async (req, res) => {"
       },
       "beproefd": 8,
-      "onbepaaldeRoutes": 3,
+      "onbepaaldeRoutes": 4,
       "open": "POST /api/auth/reset",
       "uitslag": "waar"
     },
@@ -23956,7 +24326,7 @@
         "rauw": ", async (req, res) => {"
       },
       "beproefd": 8,
-      "onbepaaldeRoutes": 3,
+      "onbepaaldeRoutes": 4,
       "open": "POST /api/auth/reset",
       "uitslag": "geen-deur"
     },
@@ -24285,7 +24655,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/algpin.js",
-        "regel": 51,
+        "regel": 55,
         "samengesteld": false,
         "rauw": ", async (req, res) => {"
       },
@@ -24307,7 +24677,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/algpin.js",
-        "regel": 51,
+        "regel": 55,
         "samengesteld": false,
         "rauw": ", async (req, res) => {"
       },
@@ -24329,7 +24699,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/algpin.js",
-        "regel": 51,
+        "regel": 55,
         "samengesteld": false,
         "rauw": ", async (req, res) => {"
       },
@@ -24352,7 +24722,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/algpin.js",
-        "regel": 51,
+        "regel": 55,
         "samengesteld": false,
         "rauw": ", async (req, res) => {"
       },
@@ -24374,7 +24744,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/algpin.js",
-        "regel": 51,
+        "regel": 55,
         "samengesteld": false,
         "rauw": ", async (req, res) => {"
       },
@@ -24396,7 +24766,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/algpin.js",
-        "regel": 51,
+        "regel": 55,
         "samengesteld": false,
         "rauw": ", async (req, res) => {"
       },
@@ -24418,7 +24788,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/algpin.js",
-        "regel": 51,
+        "regel": 55,
         "samengesteld": false,
         "rauw": ", async (req, res) => {"
       },
@@ -24573,7 +24943,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/server.js",
-        "regel": 1421,
+        "regel": 1422,
         "samengesteld": false,
         "rauw": ", (req, res) => {"
       },
@@ -25444,7 +25814,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/winkel.js",
-        "regel": 140,
+        "regel": 146,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -25468,7 +25838,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/winkel.js",
-        "regel": 140,
+        "regel": 146,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -25492,7 +25862,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/winkel.js",
-        "regel": 140,
+        "regel": 146,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -25516,7 +25886,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/winkel.js",
-        "regel": 140,
+        "regel": 146,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -26017,7 +26387,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/server.js",
-        "regel": 1503,
+        "regel": 1504,
         "samengesteld": false,
         "rauw": ", uiVertaalPerIp, uiVertaalGlobaal,"
       },
@@ -26042,7 +26412,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/server.js",
-        "regel": 1503,
+        "regel": 1504,
         "samengesteld": false,
         "rauw": ", uiVertaalPerIp, uiVertaalGlobaal,"
       },
@@ -26067,7 +26437,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/server.js",
-        "regel": 1503,
+        "regel": 1504,
         "samengesteld": false,
         "rauw": ", uiVertaalPerIp, uiVertaalGlobaal,"
       },
@@ -26092,7 +26462,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/server.js",
-        "regel": 1503,
+        "regel": 1504,
         "samengesteld": false,
         "rauw": ", uiVertaalPerIp, uiVertaalGlobaal,"
       },
@@ -26897,7 +27267,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/salon.js",
-        "regel": 40,
+        "regel": 38,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -26921,7 +27291,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/salon.js",
-        "regel": 40,
+        "regel": 38,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -26945,7 +27315,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/salon.js",
-        "regel": 40,
+        "regel": 38,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -26969,7 +27339,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/salon.js",
-        "regel": 40,
+        "regel": 38,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -27668,7 +28038,7 @@
       "naam": "Tickets en evenementen",
       "doelgroep": "rtg",
       "verklaard": true,
-      "routes": 7,
+      "routes": 8,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/event/rsvp",
@@ -27692,7 +28062,7 @@
       "naam": "Tickets en evenementen",
       "doelgroep": "lifestyle",
       "verklaard": true,
-      "routes": 7,
+      "routes": 8,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/event/rsvp",
@@ -27716,7 +28086,7 @@
       "naam": "Tickets en evenementen",
       "doelgroep": "business",
       "verklaard": true,
-      "routes": 7,
+      "routes": 8,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/event/rsvp",
@@ -27740,7 +28110,7 @@
       "naam": "Tickets en evenementen",
       "doelgroep": "gast",
       "verklaard": false,
-      "routes": 7,
+      "routes": 8,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/event/rsvp/annuleer",
@@ -27773,32 +28143,32 @@
       "naam": "Tickets en evenementen",
       "doelgroep": "leverancier",
       "verklaard": false,
-      "routes": 7,
-      "beproefd": 7,
-      "onbepaaldeRoutes": 7,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 8,
       "open": null,
       "uitslag": "onbepaald",
-      "reden": "7 van de 7 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+      "reden": "8 van de 8 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
     },
     {
       "functie": "bk-tickets",
       "naam": "Tickets en evenementen",
       "doelgroep": "personeel",
       "verklaard": false,
-      "routes": 7,
-      "beproefd": 7,
-      "onbepaaldeRoutes": 7,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 8,
       "open": null,
       "uitslag": "onbepaald",
-      "reden": "7 van de 7 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+      "reden": "8 van de 8 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
     },
     {
       "functie": "bk-tickets",
       "naam": "Tickets en evenementen",
       "doelgroep": "foundation",
       "verklaard": false,
-      "routes": 7,
-      "beproefd": 7,
+      "routes": 8,
+      "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
       "uitslag": "onbepaald",
@@ -27809,12 +28179,12 @@
       "naam": "Tickets en evenementen",
       "doelgroep": "intern",
       "verklaard": false,
-      "routes": 7,
-      "beproefd": 7,
-      "onbepaaldeRoutes": 7,
+      "routes": 8,
+      "beproefd": 8,
+      "onbepaaldeRoutes": 8,
       "open": null,
       "uitslag": "onbepaald",
-      "reden": "7 van de 7 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+      "reden": "8 van de 8 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
     },
     {
       "functie": "bk-bezorgen",
@@ -28658,7 +29028,7 @@
       "naam": "Cadeaukaarten",
       "doelgroep": "rtg",
       "verklaard": true,
-      "routes": 2,
+      "routes": 3,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/giftcard/buy",
@@ -28668,7 +29038,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/cadeaukaart.js",
-        "regel": 34,
+        "regel": 38,
         "samengesteld": false,
         "rauw": ", auth, async (req, res) => {"
       },
@@ -28682,7 +29052,7 @@
       "naam": "Cadeaukaarten",
       "doelgroep": "lifestyle",
       "verklaard": true,
-      "routes": 2,
+      "routes": 3,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/giftcard/buy",
@@ -28692,7 +29062,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/cadeaukaart.js",
-        "regel": 34,
+        "regel": 38,
         "samengesteld": false,
         "rauw": ", auth, async (req, res) => {"
       },
@@ -28706,7 +29076,7 @@
       "naam": "Cadeaukaarten",
       "doelgroep": "business",
       "verklaard": true,
-      "routes": 2,
+      "routes": 3,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/giftcard/buy",
@@ -28716,7 +29086,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/cadeaukaart.js",
-        "regel": 34,
+        "regel": 38,
         "samengesteld": false,
         "rauw": ", auth, async (req, res) => {"
       },
@@ -28730,7 +29100,7 @@
       "naam": "Cadeaukaarten",
       "doelgroep": "gast",
       "verklaard": false,
-      "routes": 2,
+      "routes": 3,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/giftcards/mine",
@@ -28740,13 +29110,13 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/cadeaukaart.js",
-        "regel": 77,
+        "regel": 74,
         "samengesteld": false,
-        "rauw": ", auth, (req, res) => {"
+        "rauw": ", auth, async (req, res) => {"
       },
       "openVorm": "bezoeker",
-      "beproefd": 2,
-      "onbepaaldeRoutes": 1,
+      "beproefd": 3,
+      "onbepaaldeRoutes": 2,
       "open": "POST /api/giftcards/mine",
       "uitslag": "bereikbaar-zonder-verklaring",
       "triageBewijs": {
@@ -28763,32 +29133,32 @@
       "naam": "Cadeaukaarten",
       "doelgroep": "leverancier",
       "verklaard": false,
-      "routes": 2,
-      "beproefd": 2,
-      "onbepaaldeRoutes": 2,
+      "routes": 3,
+      "beproefd": 3,
+      "onbepaaldeRoutes": 3,
       "open": null,
       "uitslag": "onbepaald",
-      "reden": "2 van de 2 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+      "reden": "3 van de 3 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
     },
     {
       "functie": "gld-cadeau",
       "naam": "Cadeaukaarten",
       "doelgroep": "personeel",
       "verklaard": false,
-      "routes": 2,
-      "beproefd": 2,
-      "onbepaaldeRoutes": 2,
+      "routes": 3,
+      "beproefd": 3,
+      "onbepaaldeRoutes": 3,
       "open": null,
       "uitslag": "onbepaald",
-      "reden": "2 van de 2 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+      "reden": "3 van de 3 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
     },
     {
       "functie": "gld-cadeau",
       "naam": "Cadeaukaarten",
       "doelgroep": "foundation",
       "verklaard": false,
-      "routes": 2,
-      "beproefd": 2,
+      "routes": 3,
+      "beproefd": 3,
       "onbepaaldeRoutes": 0,
       "open": null,
       "uitslag": "onbepaald",
@@ -28799,12 +29169,12 @@
       "naam": "Cadeaukaarten",
       "doelgroep": "intern",
       "verklaard": false,
-      "routes": 2,
-      "beproefd": 2,
-      "onbepaaldeRoutes": 2,
+      "routes": 3,
+      "beproefd": 3,
+      "onbepaaldeRoutes": 3,
       "open": null,
       "uitslag": "onbepaald",
-      "reden": "2 van de 2 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+      "reden": "3 van de 3 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
     },
     {
       "functie": "gld-punten",
@@ -32448,17 +32818,17 @@
     }
   ],
   "telling": {
-    "cellen": 1776,
-    "waar": 613,
+    "cellen": 1792,
+    "waar": 619,
     "correct-afgesloten": 195,
     "registerleugen": 18,
     "bereikbaar-zonder-verklaring": 122,
-    "geen-deur": 135,
+    "geen-deur": 145,
     "onbepaald": 689,
     "niet-beproefd": 4,
     "sessie-ontbreekt": 0
   },
-  "routesGezien": 5133,
+  "routesGezien": 5242,
   "leugens": [
     {
       "functie": "social",
@@ -32579,12 +32949,12 @@
       "open": null,
       "uitslag": "registerleugen",
       "deuren": {
-        "routes": 116,
-        "zonderRoldeur": 116,
+        "routes": 118,
+        "zonderRoldeur": 118,
         "rollen": []
       },
       "triage": "gemengde-deuren",
-      "triageReden": "116 routes met geen roldeur(en) en 116 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
+      "triageReden": "118 routes met geen roldeur(en) en 118 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "bedrijf",
@@ -32597,12 +32967,12 @@
       "open": null,
       "uitslag": "registerleugen",
       "deuren": {
-        "routes": 116,
-        "zonderRoldeur": 116,
+        "routes": 118,
+        "zonderRoldeur": 118,
         "rollen": []
       },
       "triage": "gemengde-deuren",
-      "triageReden": "116 routes met geen roldeur(en) en 116 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
+      "triageReden": "118 routes met geen roldeur(en) en 118 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "bedrijf",
@@ -32615,12 +32985,12 @@
       "open": null,
       "uitslag": "registerleugen",
       "deuren": {
-        "routes": 116,
-        "zonderRoldeur": 116,
+        "routes": 118,
+        "zonderRoldeur": 118,
         "rollen": []
       },
       "triage": "gemengde-deuren",
-      "triageReden": "116 routes met geen roldeur(en) en 116 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
+      "triageReden": "118 routes met geen roldeur(en) en 118 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "bedrijf",
@@ -32633,12 +33003,12 @@
       "open": null,
       "uitslag": "registerleugen",
       "deuren": {
-        "routes": 116,
-        "zonderRoldeur": 116,
+        "routes": 118,
+        "zonderRoldeur": 118,
         "rollen": []
       },
       "triage": "gemengde-deuren",
-      "triageReden": "116 routes met geen roldeur(en) en 116 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
+      "triageReden": "118 routes met geen roldeur(en) en 118 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "tenant",
@@ -33208,7 +33578,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/winkel.js",
-        "regel": 96,
+        "regel": 102,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -34676,7 +35046,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/winkel.js",
-        "regel": 122,
+        "regel": 128,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -35903,7 +36273,7 @@
       "naam": "Tegoed vanuit een zaak",
       "doelgroep": "personeel",
       "verklaard": false,
-      "routes": 3,
+      "routes": 4,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/supplier/pay/tegoed",
@@ -35913,9 +36283,9 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/pay-zaak.js",
-        "regel": 101,
+        "regel": 95,
         "samengesteld": false,
-        "rauw": ", supplierAuth, (req, res) => {"
+        "rauw": ", supplierAuth, async (req, res) => {"
       },
       "beproefd": 1,
       "onbepaaldeRoutes": 0,
@@ -36257,7 +36627,7 @@
       "naam": "Tickets en evenementen",
       "doelgroep": "gast",
       "verklaard": false,
-      "routes": 7,
+      "routes": 8,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/event/rsvp/annuleer",
@@ -36389,7 +36759,7 @@
       "naam": "Cadeaukaarten",
       "doelgroep": "gast",
       "verklaard": false,
-      "routes": 2,
+      "routes": 3,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/giftcards/mine",
@@ -36399,13 +36769,13 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/member/cadeaukaart.js",
-        "regel": 77,
+        "regel": 74,
         "samengesteld": false,
-        "rauw": ", auth, (req, res) => {"
+        "rauw": ", auth, async (req, res) => {"
       },
       "openVorm": "bezoeker",
-      "beproefd": 2,
-      "onbepaaldeRoutes": 1,
+      "beproefd": 3,
+      "onbepaaldeRoutes": 2,
       "open": "POST /api/giftcards/mine",
       "uitslag": "bereikbaar-zonder-verklaring",
       "triageBewijs": {

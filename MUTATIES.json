@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-28T13:09:00.323Z",
-    "commit": "7e624c0d1",
+    "op": "2026-09-28T17:27:01.717Z",
+    "commit": "c87dbec8",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 13,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -376,7 +376,7 @@
       "module": "server/ai.js",
       "operator": "===->!==#0",
       "gezakt": 3,
-      "geprobeerd": 3
+      "geprobeerd": 1
     },
     "ai-regie.test.js": {
       "soort": "server",
@@ -2017,11 +2017,15 @@
     },
     "codegrens.test.js": {
       "soort": "puur",
-      "staat": "geen bruikbare mutatie",
+      "staat": "overleefd",
       "modules": [
-        "server/kern/stuur/gereedschap.js"
+        "server/kern/stuur/gereedschap.js",
+        "server/kern/registerblik/bronnen.js",
+        "server/kern/registerblik/gereedschap.js"
       ],
-      "posities": 1
+      "geprobeerd": 49,
+      "posities": 1000,
+      "dekking": "beproefd"
     },
     "codewereld.test.js": {
       "soort": "puur",
@@ -2410,6 +2414,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "contextpakket.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/ai/contextpakket.js",
+      "operator": "===->!==#0",
+      "gezakt": 8,
+      "geprobeerd": 1
     },
     "contextspoor.test.js": {
       "soort": "puur",
@@ -9662,6 +9674,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 7,
       "scherp": "gezakt"
+    },
+    "registerblik.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/registerblik/gereedschap.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "registereigenaar.test.js": {
       "soort": "puur",

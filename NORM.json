@@ -12,7 +12,7 @@
     "bronBlindeBestanden": 3,
     "browserpoortToetsen": 388,
     "carriereDomeinenGemeten": 15,
-    "dbDeuren": 529,
+    "dbDeuren": 530,
     "dbDeurenSchrijvend": 275,
     "dekkingPct": 82,
     "dekkingWaargenomenPct": 100,
@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4628,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1602,
+    "kernBreedte": 1603,
     "kernGedeeld": 243,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
@@ -3106,6 +3106,24 @@
       "meter": "toetsenNietGemeten 632 -> 633",
       "reden": "test/kantoorhuis.test.js is nieuw (besluit B1: welke entiteit is RTG, en loopt er een dienstverband). Met de hand nagetrokken met zeven mutaties: de entiteit genegeerd, een mandaat dat meetelt, oude dienstverbanden die meetellen, geen in plaats van onbekend, de eigenaarscontrole weg, de review niet bedraad, en de aanwijzing die niet idempotent is; alle zeven zakken op de toets die erover gaat. De mutatiemotor is er nog niet langs geweest.",
       "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
+    {
+      "datum": "2026-09-28",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1602,
+      "meter": "kernBreedte 1602 -> 1603; kernGedeeld blijft gelijk",
+      "reden": "De ochtendkaart (PERSONEEL.md par. 4, besluit B4). Het domein staff krijgt EEN naam uit de kern-tas: kern.ochtendkaart, gezet in server/opzet/kernlaag2c.js. De kaart is een lezing op het rooster, de verzuimlaag, de klok, de groothandelsorders en de reserveringen; de route krijgt de samengestelde functie en niet die vijf bronnen apart, dus staff leest geen payrollOS of groothandel rechtstreeks.",
+      "waarheen": "GRENZEN.json (staff draagt ochtendkaart) en test/ochtendkaart.test.js toets 6, tegen een echte server"
+    },
+    {
+      "datum": "2026-09-28",
+      "soort": "structureel",
+      "sleutel": "dbDeuren",
+      "van": 529,
+      "meter": "dbDeuren 529 -> 530 (server/kern/ochtendkaart.js), dbDeurenSchrijvend blijft gelijk",
+      "reden": "De ochtendkaart telt de bevestigde groothandelsleveringen en de reserveringen van vandaag. Voor geen van beide bestaat een lezer in server/db/ (ordersVanZaak gaat over ledenbestellingen, niet over db.data.groothandelOrders), en server/db/index.js staat op 9437 bytes. De module LEEST alleen: hij schrijft niets in db.data. Een lezer in server/db/ bouwen voor een telling op een kaart zou de schrijvende laag groter maken om een leesmeter te sparen.",
+      "waarheen": "Een lezer groothandelOrdersVanKlant en reserveringenVanZaak in server/db/ zodra een tweede module dezelfde telling nodig heeft; dan daalt deze meter met een."
     }
   ],
   "prestatie": {

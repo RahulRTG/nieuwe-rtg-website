@@ -737,7 +737,14 @@
   // het merk gaat ook buiten de kopbalk weg, maar dan met de smalle bezem
   merkWegPagina();
 
-  var kop = d.querySelector('body > header');
+  /* De kop is de eerste header van het scherm zelf. De desktopstandaard
+     (shared/interface/world-desktop-surface.js) verhuist de kinderen van body
+     naar een schermvlak in het wereldkader, en of dat vóór of na dit bestand
+     gebeurt, is een wedloop tussen twee uitgestelde laders. Kwam het kader
+     eerst, dan vond `body > header` niets en kreeg rit.html zijn hero, en elk
+     ander scherm zijn navigatiebalk, niet. Het schermvlak is dezelfde plek. */
+  var kop = d.querySelector('body > header') ||
+    d.querySelector('[data-rtg-screen-surface] > header');
   if (kop && !isThuis) {
     bouwBalk(kop);
     /* Pas inmeten als de balk er echt staat -- en na deze tik, want de

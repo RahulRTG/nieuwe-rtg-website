@@ -86,12 +86,27 @@
      smaller is. De hero van rit.html blijft vallen op de eerste voorwaarde: die
      is niet vast. */
   var RAND = 48;
+  /* HET VLAK WAARBINNEN EEN BALK EEN BALK IS. De desktopstandaard
+     (shared/interface/world-desktop-surface.js) zet de inhoud van elk scherm
+     in een eigen vlak (`[data-rtg-screen-surface]`) in de middenkolom van het
+     wereldkader. Dat vlak is het bevattende blok van wat erin `fixed` staat:
+     de suitebalk van Berichten staat dan vast tegen de bovenrand van dat vlak,
+     656 breed op een venster van 1280 -- en werd op vensterbreedte gemeten
+     geen balk meer. Dan bleef de dubbele platformnavigatie staan naast de
+     Edge, en werden zijn knoppen nergens geoogst. De maat van een balk hoort
+     bij het vlak waarin hij staat; zonder zo'n vlak is dat het venster. */
+  function vlakVan(el, win) {
+    var vlak = el.closest && el.closest('[data-rtg-screen-surface]');
+    if (!vlak) return { top: 0, bottom: win.innerHeight, width: win.innerWidth };
+    var v = vlak.getBoundingClientRect();
+    return { top: v.top, bottom: Math.min(v.bottom, win.innerHeight), width: v.width };
+  }
   function isBalk(el, win) {
     var stijl = win.getComputedStyle(el);
     if (stijl.position !== 'fixed' && stijl.position !== 'sticky') return false;
-    var r = el.getBoundingClientRect();
-    var tegenRand = stijl.position === 'fixed' && (r.top <= RAND || win.innerHeight - r.bottom <= RAND);
-    if (r.width < win.innerWidth * 0.6 && !tegenRand) return false;
+    var r = el.getBoundingClientRect(), vlak = vlakVan(el, win);
+    var tegenRand = stijl.position === 'fixed' && (r.top - vlak.top <= RAND || vlak.bottom - r.bottom <= RAND);
+    if (r.width < vlak.width * 0.6 && !tegenRand) return false;
     return r.height >= 28 && r.height <= win.innerHeight * 0.4;
   }
   /* EERST ALLES METEN, DAN PAS MARKEREN -- en dat is geen nettigheid maar een

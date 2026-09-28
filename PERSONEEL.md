@@ -158,9 +158,17 @@ bestaande inklokknop; wie vrij of afwezig is krijgt er geen. De kop noemt de
 OORZAAK en niet elke regel die eraan lijdt: *"Het rooster van vandaag is nog niet
 vastgesteld: dit is het standaardpatroon."* is één ding en geen twee. Het bouwen
 vond ook iets dat eerder niemand zag: het rooster dat de Team Room toont
-(`scheduleFor`) leest verzuim NIET, dus een zieke collega staat daar vandaag
+(`scheduleFor`) las verzuim NIET, dus een zieke collega stond daar vandaag
 gewoon op zijn dienst. De kaart legt het rooster daarom zelf tegen de
-verzuimlaag; het rooster in de Team Room zelf is een stap weg.
+verzuimlaag, en sinds dezelfde dag doet het rooster in de Team Room dat ook
+(`legOp()` in `kern/verzuimrooster.js`, achter `/api/supplier/schedule`). Een
+rooster is een lijst NAMEN die elke collega ziet, dus daar geldt dezelfde grens
+als op de kaart, alleen per rij: wie afwezig is heet voor iedereen **"Afwezig"**,
+zonder soort en zonder inzetbaarheid. Alleen de MANAGER ziet wat er gepland was,
+wat voor verzuim het is en hoeveel iemand nog kan, want die plant. Wie vrij
+stond blijft vrij: een wijziging zou alleen verraden dat er iets speelt. Het
+AI-antwoord op "wie staat er vandaag?" leest hetzelfde rooster met de
+collega-blik.
 
 Per regel: waar hij vandaan komt, wat hij mag zeggen, en wat hij NOOIT mag
 zeggen.

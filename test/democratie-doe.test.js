@@ -108,9 +108,14 @@ test('4. de bijeenkomst: alleen de starter plant, de plaatsgrens is eerlijk, opn
   assert.equal((await d.doe.antwoord('user-3', a.id, { wat: 'misschien' })).ok, true);
   const b = d.doe.lijst('user-3').acties[0].bijeenkomst;
   assert.deepEqual([b.ja, b.misschien, b.vol, b.mijnAntwoord], [2, 1, true, 'misschien']);
+  await d.doe.plan('user-1', a.id, plan);
+  assert.equal(d.doe.lijst('user-1').acties[0].bijeenkomst.ja, 2, 'hetzelfde plan nog eens is geen nieuwe bijeenkomst');
   await d.doe.plan('user-1', a.id, Object.assign({}, plan, { datum: '2026-10-16' }));
   assert.equal(d.doe.lijst('user-1').acties[0].bijeenkomst.ja, 0, 'wie ja zei tegen de veertiende, zei niet ja tegen de zestiende');
   assert.equal((await d.doe.afgelast('user-1', a.id, { reden: 'Het buurthuis is dicht' })).ok, true);
+  const eerst = d.doe.lijst('user-1').acties[0].bijeenkomst.afgelast;
+  await d.doe.afgelast('user-1', a.id, { reden: 'Nog eens' });
+  assert.deepEqual(d.doe.lijst('user-1').acties[0].bijeenkomst.afgelast, eerst, 'afgelast is afgelast, de eerste reden blijft');
   assert.equal((await d.doe.antwoord('user-2', a.id, { wat: 'ja' })).status, 409, 'op een afgelaste bijeenkomst antwoordt niemand');
 });
 
@@ -205,5 +210,70 @@ test('9. over HTTP tegen een echte server: de hele lus, elke route van het DoeNe
     if (demo.body && demo.body.token) {
       assert.equal((await api(A + 'lijst', {}, demo.body.token)).status, 403, 'een demosessie doet niet mee');
     }
+  } finally { stop(child); }
+});
+
+/* 10. De grond onder server/lib/mutatiecontracten-democratie.js: elke route
+   twee keer met hetzelfde lijf, tegen een echte server. Echte idempotentie en
+   een TOESTANDSCONTROLE staan apart, zoals bij de kwestie zelf. */
+test('10. twee keer hetzelfde verzoek: wat idempotent is en wat een toestandscontrole is', async () => {
+  const { child, base } = await startServer({ env: { SMTP_URL: '' } });
+  const api = (pad, body, token) => fetch(base + pad, { method: 'POST', signal: AbortSignal.timeout(20000),
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+    body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+  let n = 0;
+  const lid = async () => {
+    const u = String(Date.now() + (++n)).slice(-8);
+    const r = await fetch(base + '/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'Twee ' + u, email: 'twee' + u + '@x.nl', phone: '06' + u,
+        password: 'geheim12345', geboortedatum: '1990-03-03', tier: 'rtg', pasApp: 'rtg' }) }).then(r => r.json());
+    assert.ok(r.token, 'registreren');
+    return r.token;
+  };
+  const twee = async (pad, body, token) => [await api(pad, body, token), await api(pad, body, token)];
+  try {
+    const [a, b] = [await lid(), await lid()];
+    const A = '/api/member/democratie/actie/';
+    const k = (await api('/api/member/democratie/kwestie/inbreng', { onderwerp: 'Losliggende stoeptegels bij de bakker' }, a)).body.kwestie;
+    const [s1, s2] = await twee(A + 'start', { kwestie: k.id, wat: 'Samen melden en markeren', zichtbaar: true }, a);
+    assert.equal(s1.status, 200);
+    assert.equal(s2.status, 409, 'een tweede start weigert en noemt de actie die al loopt');
+    assert.equal(s2.body.actie, s1.body.actie.id);
+    const id = s1.body.actie.id;
+    const aantal = async () => (await api(A + 'lijst', {}, a)).body.acties.filter(x => x.id === id).length;
+    assert.equal(await aantal(), 1, 'er is precies een actie');
+
+    const [l1, l2] = await twee(A + 'lijst', {}, b);
+    assert.deepEqual(l1.body, l2.body, 'de lijst lezen verandert niets');
+    const [j1, j2] = await twee(A + 'aansluit', { id }, b);
+    assert.equal(j1.status, 200); assert.equal(j2.status, 200);
+    assert.equal(j2.body.actie.deelnemers, 2, 'nog eens aansluiten telt niet dubbel');
+    const plan = { id, datum: '2026-10-20', tijd: '10:00', waar: 'Voor de bakker', plaatsen: 5 };
+    const [p1, p2] = await twee(A + 'plan', plan, a);
+    assert.equal(p1.status, 200); assert.equal(p2.status, 200);
+    const [r1, r2] = await twee(A + 'antwoord', { id, wat: 'ja' }, b);
+    assert.equal(r1.status, 200); assert.equal(r2.status, 200);
+    assert.equal(r2.body.actie.bijeenkomst.ja, 1, 'nog eens ja zeggen telt niet dubbel');
+    /* Het antwoord op de derde kan het afgespeelde van de eerste zijn; de stand
+       zelf lezen we daarom uit de lijst. */
+    assert.equal((await api(A + 'plan', plan, a)).status, 200);
+    assert.equal((await api(A + 'lijst', {}, b)).body.acties.find(x => x.id === id).bijeenkomst.ja, 1,
+      'hetzelfde plan nog eens wiste de antwoorden');
+    const [g1, g2] = await twee(A + 'afgelast', { id, reden: 'Wegwerkzaamheden' }, a);
+    assert.equal(g1.status, 200); assert.equal(g2.status, 200);
+    assert.deepEqual(g2.body.actie.bijeenkomst.afgelast, g1.body.actie.bijeenkomst.afgelast, 'afgelasten is afgelast');
+    const [v1, v2] = await twee(A + 'verlaat', { id }, b);
+    assert.equal(v1.status, 200);
+    assert.equal(v2.status, 403, 'wie al vertrok, vertrekt niet nog eens');
+    const tekst = 'De gemeente legde de tegels binnen een week recht.';
+    const [u1, u2] = await twee(A + 'resultaat', { id, tekst }, a);
+    assert.equal(u1.status, 200);
+    assert.equal(u2.status, 409, 'een resultaat verandert niet achteraf');
+
+    const k2 = (await api('/api/member/democratie/kwestie/inbreng', { onderwerp: 'Te weinig fietsenrekken bij het station' }, a)).body.kwestie;
+    const id2 = (await api(A + 'start', { kwestie: k2.id, wat: 'Samen tellen hoeveel fietsen er staan', zichtbaar: true }, a)).body.actie.id;
+    const [t1, t2] = await twee(A + 'stop', { id: id2, reden: 'De gemeente plaatst ze al' }, a);
+    assert.equal(t1.status, 200);
+    assert.equal(t2.status, 409, 'een gestopte actie stopt niet nog eens');
   } finally { stop(child); }
 });

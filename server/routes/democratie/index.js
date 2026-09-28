@@ -10,7 +10,7 @@
 module.exports = (kern) => {
   const { app, auth, officeAuth, boardroomWie, democratie } = kern;
   const stuur = (res, r) => (r && r.error)
-    ? res.status(r.status || 400).json({ error: r.error })
+    ? res.status(r.status || 400).json(r.actie ? { error: r.error, actie: r.actie } : { error: r.error })
     : res.json(r);
 
   const alsLid = async (req, res, werk) => {

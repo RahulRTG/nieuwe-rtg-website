@@ -22,14 +22,18 @@ module.exports = ({ op, schoon, DATUM, TIJD, ANTWOORDEN, tel, doetMee, nu }) => 
     },
     doe: (x) => {
       const plaatsen = Number(b.plaatsen);
-      x.bijeenkomst = { datum: String(b.datum), tijd: b.tijd ? String(b.tijd) : null, waar: schoon(b.waar, 120),
-        plaatsen: Number.isInteger(plaatsen) && plaatsen > 0 && plaatsen <= 500 ? plaatsen : null,
-        antwoorden: {}, afgelast: null, at: nu() };
+      const nieuw = { datum: String(b.datum), tijd: b.tijd ? String(b.tijd) : null, waar: schoon(b.waar, 120),
+        plaatsen: Number.isInteger(plaatsen) && plaatsen > 0 && plaatsen <= 500 ? plaatsen : null };
+      /* Hetzelfde plan nog eens is een herhaling en geen nieuwe bijeenkomst: een
+         dubbeltik mag de antwoorden van anderen niet wissen. */
+      const oud = x.bijeenkomst;
+      if (oud && !oud.afgelast && Object.keys(nieuw).every(s => oud[s] === nieuw[s])) return;
+      x.bijeenkomst = { ...nieuw, antwoorden: {}, afgelast: null, at: nu() };
     } });
 
   const afgelast = (sleutel, id, b) => op(sleutel, id, 'starter', {
     toets: (x) => (!x.bijeenkomst ? { status: 409, error: 'Er is geen bijeenkomst om af te gelasten.' } : null),
-    doe: (x) => { x.bijeenkomst.afgelast = { reden: schoon(b.reden, 200), at: nu() }; } });
+    doe: (x) => { if (!x.bijeenkomst.afgelast) x.bijeenkomst.afgelast = { reden: schoon(b.reden, 200), at: nu() }; } });
 
   const antwoord = (sleutel, id, b) => op(sleutel, id, 'deelnemer', {
     toets: (x, refs) => {

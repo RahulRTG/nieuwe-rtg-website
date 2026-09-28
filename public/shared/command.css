@@ -52,15 +52,20 @@ body.rtg-command{display:block;background:var(--onyx-glans,#0C0C0B);overflow:hid
    -- en dat is deze schil -- met de levende dagkleur, en doet dat zo. Zonder
    dit lag er een ondoorzichtige lap over de werktafel waar je alleen de kleur
    van zag dat er iets mis was. */
-body.rtg-command > #shell{position:relative;z-index:240;margin-inline:auto;
+/* Afstammeling en geen kind (`body > #shell`): de gedeelde desktopstandaard
+   (shared/interface/world-desktop-surface.js) verhuist de kinderen van <body>
+   in een .wd-page. Met het kindteken hield de schil dan zijn z-index 240 niet
+   meer, lag de werktafel (210) over een geopende tab en ving hij elke klik. Een
+   id is uniek, dus de ruimere selector raakt niets anders. */
+body.rtg-command #shell{position:relative;z-index:240;margin-inline:auto;
   background:none!important;border:0;box-shadow:none;pointer-events:none;}
-body.rtg-command > #shell #app{background:none!important;}
-body.rtg-command > #shell #app:not(.os-open) > .topbar,
-body.rtg-command > #shell #app:not(.os-open) > #content{display:none!important;}
-body.rtg-command > #shell #app.os-open{pointer-events:auto;background:var(--bg)!important;}
-body.rtg-command > #shell .os-scrim,
-body.rtg-command > #shell .notif-scrim,
-body.rtg-command > #shell .notif-panel{pointer-events:auto;}
+body.rtg-command #shell #app{background:none!important;}
+body.rtg-command #shell #app:not(.os-open) > .topbar,
+body.rtg-command #shell #app:not(.os-open) > #content{display:none!important;}
+body.rtg-command #shell #app.os-open{pointer-events:auto;background:var(--bg)!important;}
+body.rtg-command #shell .os-scrim,
+body.rtg-command #shell .notif-scrim,
+body.rtg-command #shell .notif-panel{pointer-events:auto;}
 /* En de balk van Rahul, die aan <body> hangt en niet aan de schil: z-index 38
    (shared/handenvrij-balk.js) ligt onder de werktafel, dus je riep hem en er
    gebeurde zichtbaar niets.

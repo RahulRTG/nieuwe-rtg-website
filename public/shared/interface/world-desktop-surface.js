@@ -15,6 +15,9 @@
     });
     d.body.prepend(surface);
     nodes.forEach(function (el) { surface.appendChild(el); });
+    // A skip link stays the first tab stop (WCAG 2.4.1); the frame comes after it.
+    Array.from(d.body.querySelectorAll(':scope>.rtg-spring,:scope>.skip,:scope>.skip-link')).reverse()
+      .forEach(function (el) { d.body.prepend(el); });
     var canvas = w.RTGHeritageRegistry && w.RTGHeritageRegistry.canvas[w.location.pathname];
     if (canvas) { surface.dataset.rtgCanvasSurface = 'true'; fit(surface); }
     return surface;

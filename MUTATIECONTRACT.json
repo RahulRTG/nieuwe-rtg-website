@@ -1,29 +1,29 @@
 {
  "stempel": {
-  "op": "2026-09-27T14:00:49.504Z",
-  "commit": "47bebad83",
-  "boomVuil": false,
-  "boomAnders": 1,
+  "op": "2026-09-28T05:07:11.296Z",
+  "commit": "1e7f0437b",
+  "boomVuil": true,
+  "boomAnders": 6,
   "instrument": "scripts/mutatiecontract.js",
-  "node": "v22.22.2"
+  "node": "v24.18.0"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5027,
-  "geclassificeerd": 5027,
+  "totaal": 5037,
+  "geclassificeerd": 5037,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3190,
-   "NOT_APPLICABLE": 1211,
-   "PROTECTED": 483,
-   "INTENTIONALLY_NON_IDEMPOTENT": 143
+   "NOT_APPLICABLE": 1215,
+   "PROTECTED": 485,
+   "INTENTIONALLY_NON_IDEMPOTENT": 147
   },
-  "vastgesteldDoorMens": 1886,
+  "vastgesteldDoorMens": 1896,
   "afgeleidDoorScript": 3141,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4136,
+   "AUTHENTICATED": 4138,
    "PUBLIC": 124,
-   "OBJECT_SCOPED": 746,
+   "OBJECT_SCOPED": 754,
    "(niet af te leiden -- vraagt een verklaring)": 5,
    "SERVICE_TO_SERVICE": 15,
    "SYSTEM_INTERNAL": 1
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 136,
    "kale ronde: onbeschermd": 123,
    "kale ronde: geen uitspraak": 4713,
-   "niet gemeten": 55
+   "niet gemeten": 65
   },
   "voorstellen": {},
   "metingVan": "2026-09-19T17:45:58.177Z"
@@ -19123,6 +19123,174 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "foundation.gezin.beelden.lezen",
+   "route": "POST /api/foundation/gezin/beelden",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "gezinBeeldAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.gezin.beelden.haal",
+   "route": "POST /api/foundation/gezin/beelden/haal",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "gezinBeeldAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.gezin.beelden.mijn",
+   "route": "POST /api/foundation/gezin/beelden/mijn",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "gezinBeeldAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.gezin.beelden.updeel",
+   "route": "POST /api/foundation/gezin/beelden/updeel",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "gezinBeeldAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.gezin.beelden.upklaar",
+   "route": "POST /api/foundation/gezin/beelden/upklaar",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "gezinBeeldAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.gezin.beelden.upload",
+   "route": "POST /api/foundation/gezin/beelden/upload",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "gezinBeeldAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.gezin.beelden.upstart",
+   "route": "POST /api/foundation/gezin/beelden/upstart",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "gezinBeeldAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.gezin.beelden.zet",
+   "route": "POST /api/foundation/gezin/beelden/zet",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "gezinBeeldAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "foundation.gezin.bel",
    "route": "POST /api/foundation/gezin/bel",
    "semantiek": {
@@ -30813,6 +30981,48 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "ik.beelden.lezen",
+   "route": "POST /api/ik/beelden",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "ik.beelden.zetten",
+   "route": "POST /api/ik/beelden/zet",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

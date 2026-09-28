@@ -63,6 +63,7 @@
   search.addEventListener('input',controller.filterCards);filter.addEventListener('change',controller.filterCards);
   data.cards.filter(function(c){return c.id!=='support';}).forEach(function(card){catalog.append(widgets.widget(card));});
   widgets.favoritesPaint();controller.setView(false);select(selected.id,false);
+  ['bestand-upload.js','interface/world-desktop-copy.js','interface/personal-images.js','interface/personal-image-editor.js','interface/world-presentation.js','interface/public-presentation.js'].forEach(function(file){var script=d.createElement('script');script.src=new URL('shared/'+file,asset()).href;script.async=false;d.head.appendChild(script);});
   w.addEventListener('rtglang',function(){refresh();controller.filterCards();var lang=w.RTGi18n.lang;languageNotice.hidden=lang==='nl'||lang==='en'||Object.keys(D.words).every(function(key){return w.I18N[lang]&&typeof w.I18N[lang]['public.'+key]==='string';});});
   root.addEventListener('keydown',function(e){if(e.key==='Escape'&&controller.current()&&!d.querySelector('dialog[open]')){e.preventDefault();collapse();}});
   return controller;

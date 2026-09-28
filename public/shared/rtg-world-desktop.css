@@ -1,116 +1,59 @@
-/* Shared geometry, with the current world's heritage signature as a quiet accent. */
-.wd-shell{display:contents}
-.wd-people,.wd-favorites,.wd-library,.wd-greeting{display:none}
-body[data-rtg-desktop]{--wd-accent:var(--rtg-world-signature);--wd-line:var(--rtg-world-line);--wd-surface:var(--rtg-world-card)}
+/* Approved warm composition, shared by every route and both viewport modes. */
+body[data-rtg-desktop]{--wd-accent:var(--rtg-world-signature);--wd-line:var(--rtg-world-line);--wd-surface:var(--rtg-world-card);--wp-inset:40px}
+body[data-rtg-layout="standard"][data-rtg-skin="heritage"][data-rtg-world][data-rtg-desktop]{--edge-top:64px!important;--edge-bottom:104px!important;margin:0!important;padding:64px 0 0!important;height:auto!important;min-height:100dvh;overflow:visible!important;font-family:Inter,system-ui,sans-serif!important}
+body[data-rtg-desktop="living"]{--wp-inset:90px}
+body[data-rtg-desktop] .wd-shell{display:grid;grid-template-columns:216px minmax(0,1fr) 280px;grid-template-rows:min-content min-content auto auto;align-items:start;gap:24px;max-width:1840px;width:calc(100% - 80px);margin:var(--wp-inset) auto 120px!important;padding:0;position:relative;isolation:isolate}
 body[data-rtg-desktop] .wd-shell [hidden]{display:none!important}
-.wd-shell :is(button,a,input):focus-visible{outline:2px solid var(--wh-gold);outline-offset:4px}
-.wd-focus{min-width:0;border:1px solid var(--wd-line);border-radius:var(--rtg-radius-editorial);overflow:hidden;background:var(--wd-surface);scroll-margin-top:6rem}
-.wd-focus-head{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center;padding:1rem 1.4rem;border-bottom:1px solid var(--wd-line)}
-.wd-focus-head h2{font:400 1.65rem/1.25 "Bodoni Moda",serif;color:var(--wh-ink);margin:0;margin-inline-end:auto}
-.wd-app-frame{width:100%;height:calc(100dvh - 17rem);min-height:34rem;display:block;border:0;background:var(--wh-bg)}
-.wd-frame-notice,.wd-direct,.wd-frame-retry{margin:1rem;line-height:1.6}
-.wd-shell .wd-text-button,.wd-shell .wd-frame-retry{font:500 .8rem/1.5 Inter,sans-serif;min-height:44px;padding:.5rem .2rem;border:0;border-bottom:1px solid var(--wd-line);border-radius:0;background:transparent;color:var(--wh-gold);cursor:pointer}
-.wd-announcement{grid-column:1/-1;line-height:1.6;padding:1rem;border:1px solid var(--wd-line);color:var(--wh-ink)}
-@media(min-width:1000px){
-  body.rtg-stijl[data-rtg-desktop]{padding-inline:0!important}
-  body[data-rtg-layout="standard"][data-rtg-skin="heritage"][data-rtg-world][data-rtg-desktop]{--edge-top:64px!important;--edge-bottom:104px!important;margin:0!important;padding:64px 0 0!important;height:auto!important;min-height:100dvh;overflow:visible!important}
-  body[data-rtg-desktop] .rtg-edge-side{display:none!important}
-  body[data-rtg-desktop] .rtg-edge-crumbs,body[data-rtg-desktop] .rtg-edge-worldbar{display:none!important}
-  body[data-rtg-desktop] .rtg-edge-top{display:flex;align-items:center;padding-inline:40px!important;height:64px;min-height:64px}
-  body[data-rtg-desktop] .rtg-edge-mark{display:flex;align-items:center;flex:0 0 auto;border:0;font-size:2.25rem;color:var(--wh-gold)!important}
-  body[data-rtg-desktop] .rtg-edge-state{margin-inline-start:auto}
-  body[data-rtg-desktop] .rtg-edge-mark::after{font:400 1rem/1.2 Inter,sans-serif}
-  body[data-rtg-desktop] .reisapp{max-width:none!important;width:auto!important;padding-inline:0!important}
-  body[data-rtg-desktop] .wd-shell{display:grid;grid-template-columns:216px minmax(0,1fr) 280px;align-items:start;gap:24px;max-width:1840px;width:calc(100% - 80px);margin:24px auto 120px!important;padding:0;isolation:isolate}
-  body[data-rtg-desktop] .wd-home,body[data-rtg-desktop] main.wd-home#inhoud,body[data-rtg-desktop] main.wd-home#hoofd,body[data-rtg-desktop] main.wd-home#main{grid-column:2;min-width:0;width:100%;max-width:none!important;max-height:none;margin:0!important;padding:0 .2rem .2rem!important;overflow:visible!important;box-sizing:border-box;scrollbar-width:thin;scrollbar-color:var(--wd-line) transparent}
-  body[data-rtg-desktop] .living-example-photo>img{height:clamp(360px,31vw,460px);aspect-ratio:auto}
-  body[data-rtg-desktop] .living-intro .momenten{padding-block:.5rem 1rem}
-  body[data-rtg-desktop] .living-intro .moment i{width:3.5rem;height:3.5rem}
-  body[data-rtg-desktop] .living-intro .moment img{width:3.5rem;height:3.5rem}
-  body[data-rtg-desktop] .living-feed-heading h2{font-size:2.3rem;margin:.5rem 0 1rem}
-  body[data-rtg-desktop] .wd-home .wh-travel-layout{display:block}
-  body[data-rtg-desktop] .wd-home .wh-travel-help{margin-top:1.5rem}
-  /* The expanded trip details now occupy one central column, not the viewport. */
-  body[data-rtg-desktop="travel"][data-rtg-world-dashboard-ready="true"] .wd-home .dagdek{grid-template-columns:minmax(0,1fr)!important}
-  body[data-rtg-desktop="travel"][data-rtg-world-dashboard-ready="true"] .wd-home .daghoofd{display:flex!important;flex-direction:column}
-  body[data-rtg-desktop="travel"][data-rtg-world-dashboard-ready="true"] .wd-home .dagtitel{padding:1.25rem!important;align-self:stretch;pointer-events:auto}
-  body[data-rtg-desktop="travel"] .wd-home .travel-hero-actie{position:static!important;margin-top:1rem}
-  body[data-rtg-desktop="travel"][data-rtg-world-dashboard-ready="true"] .wd-home .kaartraster{min-height:18rem!important}
-  body[data-rtg-desktop] .wd-home :is(.wh-photo,.wh-card){border-color:var(--wd-line)}
-  body[data-rtg-desktop] .wd-home .wh-home h1{font-size:clamp(2.6rem,3.3vw,4.2rem)}
-  body[data-rtg-desktop] .wd-home .wh-work-hero,body[data-rtg-desktop] .wd-home .wh-foundation-hero{min-height:31rem}
-  body[data-rtg-desktop] .wd-home .wh-pair{grid-template-columns:1fr}
-  body[data-rtg-desktop] .wd-home .living-intro{padding-inline:0}
-  /* De oorspronkelijke LivingOS-schil blijft de mobiele fallback. Zodra de
-     gedeelde desktop-home actief is, draagt die schil geen eigen kolommen of
-     hoogte meer en kan hetzelfde middenvlak als WorkOS worden gebruikt. */
-  body[data-rtg-desktop="living"] .schil{display:contents!important;min-height:0!important}
-  body[data-rtg-desktop="living"] .schil>.bank,body[data-rtg-desktop="living"] .schil>.topbar{display:none!important}
-  body[data-rtg-desktop="living"] .wd-home .dag{grid-template-columns:minmax(0,1fr)!important}
-  body[data-rtg-desktop="living"] .wd-home .kompas{position:static}
-  /* De publieke Foundation-home houdt zijn eigen stadsinhoud en nachtblauwe
-     materiaal, maar gedraagt zich in de middelste kolom als de WorkOS-home.
-     De stadkiezer valt daarom onder de hero in plaats van er als een tweede
-     dashboardkolom naast te staan. */
-  body[data-rtg-desktop="foundation"] .wd-home .onthaal{display:block!important;margin:0 0 1rem!important;padding:0!important;border:0!important;outline:0!important;box-shadow:none!important;background:transparent!important}
-  body[data-rtg-desktop="foundation"] .wd-home .onthaal-beeld{min-height:31rem;border:1px solid var(--wd-line);background:var(--rtg-world-photo-mask),var(--rtg-world-photo) var(--rtg-world-photo-position,center)/cover no-repeat,var(--rtg-world-ground,#071522)}
-  body[data-rtg-desktop="foundation"] .wd-home .onthaal-kies{margin-top:1.5rem;border:1px solid var(--wd-line);background:var(--wd-surface)}
-  body[data-rtg-desktop="foundation"] .wd-home .tweeluik{grid-template-columns:minmax(0,1fr)}
-  /* Side panels belong to the story row and scroll away before the full-width library. */
-  body[data-rtg-desktop] .wd-people,body[data-rtg-desktop] .wd-favorites{display:block;position:relative;min-width:0;max-height:none;overflow:visible;scrollbar-width:thin;scrollbar-color:var(--wd-line) transparent}
-  body[data-rtg-desktop] .wd-people{grid-column:1;grid-row:2;background:var(--wd-surface);border:1px solid var(--wd-line);border-radius:var(--rtg-radius-editorial);padding:1.15rem}
-  .wd-people .rtg-ss-module-head h3{font:400 1.8rem/1.2 "Bodoni Moda",serif;color:var(--wh-ink);margin:0 0 1.2rem}
-  .wd-people .rtg-module-head-tools{display:none}
-  .wd-people h4{margin:1.6rem 0 .5rem;font:500 .8rem/1.5 Inter,sans-serif;color:var(--wh-ink)}
-  .wd-shell .wd-muted{color:var(--wh-soft);font:400 .76rem/1.6 Inter,sans-serif;overflow-wrap:anywhere}
-  .wd-person{display:flex;align-items:flex-start;gap:.65rem;padding:1rem 0;border-bottom:1px solid var(--wd-line);color:var(--wh-ink);text-decoration:none;font:400 .82rem/1.5 Inter,sans-serif;overflow-wrap:anywhere}
-  .wd-person strong,.wd-person span.wd-muted{display:block}
-  .wd-avatar{display:grid;place-items:center;flex:0 0 2.2rem;width:2.2rem;height:2.2rem;border-radius:50%;border:1px solid var(--wd-line);background:var(--rtg-world-card-strong);color:var(--wh-gold)}
-  .wd-favorites{grid-column:3;grid-row:2}
-  .wd-greeting{display:grid;grid-template-columns:1fr auto;grid-column:1/-1;gap:.25rem 1rem;border-bottom:1px solid var(--wd-line);min-height:64px;padding-bottom:16px}
-  .wd-greeting h1{font:400 1.45rem/1.3 "Bodoni Moda",serif;color:var(--wh-ink);margin:0;letter-spacing:0;text-transform:none}
-  .wd-greeting time{font:400 .73rem/1.5 Inter,sans-serif;color:var(--wh-soft);grid-column:1}
-  .wd-greeting p{font:400 .7rem/1.5 Inter,sans-serif;color:var(--wh-gold);grid-column:2;grid-row:1/3;align-self:center;margin:0}
-  .wd-favorites h2{font:500 .68rem/1.6 Inter,sans-serif;letter-spacing:.15em;text-transform:uppercase;color:var(--wh-gold);margin:0 0 1rem}
-  .wd-shell .wd-widget{border:1px solid var(--wd-line);border-radius:var(--rtg-radius-editorial);background:var(--wd-surface);overflow:hidden;min-width:0;margin:0 0 .85rem;transition:border-color .2s,background .2s}
-  .wd-shell .wd-widget:hover{border-color:var(--wh-gold)}
-  .wd-shell .wd-widget-open{display:block;text-align:start;background:transparent;color:var(--wh-ink);width:100%;padding:1.05rem;border:0;min-width:0;cursor:pointer;font:400 .78rem/1.55 Inter,sans-serif;border-radius:0;box-shadow:none}
-  .wd-widget-title{display:flex;gap:.6rem;align-items:center;font-weight:600;margin-bottom:1rem}
-  .wd-expand{margin-inline-start:auto;color:var(--wh-gold)}
-  .wd-icon{display:inline-flex;flex:0 0 1rem;width:1rem;height:1rem;color:var(--wh-gold)}
-  .wd-icon svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
-  .wd-widget-parts{display:grid;gap:.7rem;min-height:3.8rem;align-content:start}
-  .wd-widget-parts>span{display:flex;align-items:center;gap:.65rem;overflow-wrap:anywhere}
-  .wd-widget-foot{display:block;border-top:1px solid var(--wd-line);padding-top:.7rem;margin-top:1rem;font-size:.68rem;color:var(--wh-soft)}
-  .wd-shell .wd-widget-pin{position:absolute;top:8px;inset-inline-end:8px;background:transparent!important;color:var(--wh-soft);font-size:0!important;border:0;min-height:44px!important;min-width:44px!important;padding:0!important;text-align:center;width:44px!important;cursor:pointer;border-radius:0;box-shadow:none!important}
-  .wd-widget-pin[aria-pressed="true"]{color:var(--wh-gold)}
-  .wd-library{display:block;grid-column:1/-1;border-top:1px solid var(--wd-line);padding-top:1.6rem;scroll-margin-top:6rem}
-  .wd-library-heading{display:flex;justify-content:space-between;gap:2rem;align-items:center;margin-bottom:1.5rem}
-  .wd-library-heading h2{font:400 2.4rem/1.2 "Bodoni Moda",serif;color:var(--wh-ink);margin:0}
-  .wd-search-label{font:400 .7rem/1.4 Inter,sans-serif;color:var(--wh-soft)}
-  .wd-shell input.wd-search{display:block;margin-top:.4rem;width:280px;min-height:44px;border:1px solid var(--wd-line);background:var(--wd-surface);border-radius:var(--rtg-radius-editorial);color:var(--wh-ink);padding:.65rem .85rem;font:400 .85rem/1.5 Inter,sans-serif}
-  .wd-catalog{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
-  .wd-pages{display:flex;justify-content:center;align-items:center;gap:1rem;color:var(--wh-soft);font:400 .75rem/1.5 Inter,sans-serif}
-  .wd-pages button{background:transparent;border:1px solid var(--wd-line);color:var(--wh-ink);border-radius:var(--rtg-radius-editorial);padding:.65rem .9rem;min-height:44px;cursor:pointer}
-  .wd-pages button:disabled{opacity:.45;cursor:default}
-  .wd-expanded .wd-focus{grid-column:2;grid-row:2}
-}
-/* Function screens keep their real DOM inside the same middle column. Fixed
-   camera/editor tools are contained by that column, not by the viewport. */
-@media(min-width:1000px){
-  .wd-page{position:relative;contain:layout;min-height:560px;isolation:isolate}
-  body[data-rtg-desktop] .wd-page :is(main,[data-rtg-screen-root],.wrap,.shell,.schil){width:100%!important;max-width:none!important;margin:0!important;padding:0!important;min-height:0!important}
-  body[data-rtg-desktop] .wd-page>[data-rtg-screen-root],body[data-rtg-desktop] .wd-page>main{position:relative!important;inset:auto!important;height:auto!important;overflow:visible!important}
-  body[data-rtg-desktop] .wd-page>[data-rtg-screen-root="immersive"]{min-height:560px!important}
-  body[data-rtg-desktop] .wd-page>header{position:relative!important;inset:auto!important;max-width:100%;margin-bottom:16px}
-  body[data-rtg-desktop] .wd-page[data-rtg-canvas-surface]{height:max(560px,calc(100dvh - 240px));overflow:hidden!important}
-  body[data-rtg-desktop] .wd-page[data-rtg-canvas-surface]>[data-rtg-screen-root="immersive"]{height:100%!important}
-  body[data-rtg-desktop] .wd-page :is(.saloon-shell,.saloon-feed-layout){max-width:100%;grid-template-columns:minmax(0,1fr)}
-  body[data-rtg-desktop] .wd-home{grid-row:2}
-  body[data-rtg-desktop] .rtg-adaptive-edge:not([data-rtg-adaptive-state="peek"]){bottom:20px!important;width:min(600px,calc(100% - 40px))!important;height:64px!important;left:50%!important}
-  body[data-rtg-desktop] .rtg-adaptive-bar{inset:0!important}
-}
-@media(min-width:1000px) and (max-width:1199px){
-  body[data-rtg-desktop] .wd-shell{grid-template-columns:176px minmax(0,1fr) 232px;width:calc(100% - 48px);gap:20px}
+body[data-rtg-desktop] .wd-home,body[data-rtg-desktop] main.wd-home:is(#inhoud,#hoofd,#main){grid-column:2;grid-row:2;min-width:0;width:100%;max-width:none!important;max-height:none;margin:0!important;padding:0!important;overflow:visible!important;box-sizing:border-box}
+body[data-rtg-desktop] .wd-people,body[data-rtg-desktop] .wd-favorites{display:block;min-width:0;position:relative;max-height:none;overflow:visible;background:transparent;border:0;border-radius:0;padding:0;box-shadow:none}
+body[data-rtg-desktop] .wd-people{grid-column:1;grid-row:1/5;border-inline-end:1px solid var(--wd-line);padding-inline-end:20px;align-self:stretch}
+body[data-rtg-desktop] .wd-favorites{grid-column:3;grid-row:1/3;border-inline-start:1px solid var(--wd-line);padding-inline-start:24px}
+body[data-rtg-desktop] .wd-greeting{grid-column:2;grid-row:1;display:block;border:0;min-width:0;padding:0;margin:0}
+.wd-greeting time,.wd-greeting p{display:none}
+.wd-greeting h1{margin:0;font:400 clamp(24px,2.4vw,36px)/1.2 Inter,sans-serif;letter-spacing:-.04em;color:var(--wh-ink)}
+.wd-shell :is(button,a,input,select,summary):focus-visible{outline:2px solid var(--wh-gold);outline-offset:4px}
+.wd-shell :is(button,input,select){font-family:Inter,sans-serif}
+.wd-shell .wd-muted{color:var(--wh-soft);font:400 13px/1.6 Inter,sans-serif;overflow-wrap:anywhere}
+.wd-people .rtg-ss-module-head h3,.wd-favorites>h2{font:600 11px/1.6 Inter,sans-serif;letter-spacing:.2em;text-transform:uppercase;margin:0 0 20px;color:var(--wh-ink)}
+.wd-people .rtg-module-head-tools{display:none}
+.wd-people h4{font:500 13px/1.5 Inter,sans-serif;margin:28px 0 8px}
+.wd-person{display:flex;align-items:center;gap:12px;padding:16px 0;color:var(--wh-ink);text-decoration:none;font:400 15px/1.4 Inter,sans-serif;overflow-wrap:anywhere;border:0}
+.wd-person strong,.wd-person .wd-muted{display:block}.wd-avatar{display:grid;place-items:center;flex:0 0 34px;width:34px;height:34px;border-radius:50%;background:var(--rtg-world-card-strong)}
+.wd-shell .wd-widget{position:relative;border:0;border-bottom:1px solid var(--wd-line);border-radius:0;background:transparent;min-width:0;margin:0 0 16px;box-shadow:none}
+.wd-shell .wd-widget-open{display:block;width:100%;text-align:start;padding:12px 44px 12px 0;min-height:44px;border:0;border-radius:0;background:transparent;color:var(--wh-ink);cursor:pointer;font:500 15px/1.5 Inter,sans-serif}
+.wd-widget-title{display:flex;align-items:center;gap:12px;margin:0}.wd-expand{margin-inline-start:auto}.wd-icon{display:inline-flex;flex:0 0 20px;width:20px;height:20px;color:currentColor}.wd-icon svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.wd-widget-content{padding:0 0 20px;font:400 14px/1.6 Inter,sans-serif;color:var(--wh-ink)}
+.wd-shell .wd-widget-pin{position:absolute;top:0;inset-inline-end:0;width:44px!important;min-width:44px!important;min-height:44px!important;padding:0!important;background:transparent!important;border:0;box-shadow:none!important;color:var(--wh-soft);font-size:0!important;cursor:pointer}
+.wd-widget-pin[aria-pressed="true"]{color:var(--wh-gold)!important}
+.wd-shell .wd-text-button,.wd-frame-retry{min-height:44px;padding:8px 0;border:0;border-bottom:1px solid var(--wd-line);border-radius:0;background:transparent;color:var(--wh-ink);font:400 13px/1.5 Inter,sans-serif;cursor:pointer}
+body[data-rtg-desktop] .wd-library{display:block;grid-column:2/-1;grid-row:4;border-top:1px solid var(--wd-line);padding-top:16px;min-width:0;scroll-margin-top:80px}
+.wd-library-heading{display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;align-items:center;margin-bottom:16px}.wd-library-heading h2{font:400 22px/1.3 Inter,sans-serif;margin:0;color:var(--wh-ink)}
+.wd-search-label{font:400 12px/1.5 Inter,sans-serif;color:var(--wh-soft)}.wd-shell input.wd-search{display:block;width:200px;max-width:100%;min-height:44px;border:1px solid var(--wd-line);border-radius:var(--rtg-radius-editorial);background:transparent;color:var(--wh-ink);padding:8px 12px}
+.wd-catalog{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}.wd-pages{display:flex;align-items:center;justify-content:center;gap:16px;font-size:13px}.wd-pages button{min-height:44px;border:1px solid var(--wd-line);border-radius:var(--rtg-radius-editorial);background:transparent;color:var(--wh-ink);padding:8px 12px}.wd-pages button:disabled{opacity:.5}
+.wd-focus{min-width:0;border:1px solid var(--wd-line);border-radius:var(--rtg-radius-editorial);overflow:hidden;background:var(--wd-surface);scroll-margin-top:80px}.wd-focus-head{display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:16px;border-bottom:1px solid var(--wd-line)}.wd-focus-head h2{font:500 24px/1.3 Inter,sans-serif;margin:0;margin-inline-end:auto}.wd-app-frame{display:block;width:100%;height:calc(100dvh - 220px);min-height:500px;border:0;background:var(--wh-bg)}.wd-frame-notice,.wd-direct,.wd-frame-retry{margin:16px;line-height:1.6}.wd-expanded .wd-focus{grid-column:2;grid-row:2}.wd-announcement{grid-column:2/-1;line-height:1.6;padding:16px;border:1px solid var(--wd-line)}
+.wd-page{position:relative;contain:layout;min-height:560px;isolation:isolate}
+body[data-rtg-desktop] .wd-page :is(main,[data-rtg-screen-root],.wrap,.shell,.schil){width:100%!important;max-width:none!important;margin:0!important;padding:0!important;min-height:0!important}
+body[data-rtg-desktop] .wd-page>:is([data-rtg-screen-root],main,header){position:relative!important;inset:auto!important;height:auto!important;overflow:visible!important}
+body[data-rtg-desktop] .wd-page[data-rtg-canvas-surface]{height:max(560px,calc(100dvh - 240px));overflow:hidden!important}
+body[data-rtg-desktop] .wd-page[data-rtg-canvas-surface]>[data-rtg-screen-root="immersive"]{height:100%!important}
+body[data-rtg-desktop] :is(.saloon-shell,.saloon-feed-layout,.wd-home .dag,.wd-home .wh-travel-layout,.wd-home .tweeluik){max-width:100%;grid-template-columns:minmax(0,1fr)!important}
+body[data-rtg-desktop="living"] .schil{display:contents!important;min-height:0!important}body[data-rtg-desktop="living"] .schil>:is(.bank,.topbar){display:none!important}
+body[data-rtg-desktop] .wd-home .kompas{position:static}.wp-tabs{display:none}
+@media(min-width:1000px) and (max-width:1199px){body[data-rtg-desktop] .wd-shell{grid-template-columns:176px minmax(0,1fr) 232px;width:calc(100% - 48px);gap:20px}}
+@media(max-width:999px){
+ body[data-rtg-layout="standard"][data-rtg-skin="heritage"][data-rtg-world][data-rtg-desktop]{padding:64px 0 0!important}
+ body[data-rtg-desktop] .wd-shell{display:flex;flex-direction:column;width:calc(100% - 32px);margin:72px auto calc(110px + env(safe-area-inset-bottom,0px))!important;gap:20px;max-width:680px}
+ body[data-rtg-desktop] .wd-shell>*{width:100%;box-sizing:border-box}.wd-greeting{order:0}.wd-greeting h1{font-size:25px}.wp-tabs{order:1;display:flex;border-bottom:1px solid var(--wd-line);gap:4px}.wp-tabs button{flex:1;min-height:48px;padding:8px 4px;border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;color:var(--wh-ink);font:400 13px/1.4 Inter,sans-serif}.wp-tabs button[aria-expanded="true"]{border-bottom-color:var(--wh-gold)}
+ body[data-rtg-desktop] .wd-home{order:2}body[data-rtg-desktop] .wd-people{order:2;display:none;border:0;padding:0}body[data-rtg-desktop] .wd-favorites{order:3;border:0;padding:0}body[data-rtg-desktop] .wd-library{order:4}.wd-focus{order:2}.wd-announcement{order:3}
+ body[data-rtg-desktop] .wd-shell[data-mobile-panel="people"]>.wd-people{display:block}body[data-rtg-desktop] .wd-shell[data-mobile-panel="people"]>:is(.wd-home,.wd-favorites,.wd-library){display:none!important}body[data-rtg-desktop] .wd-shell[data-mobile-panel="favorites"]>:is(.wd-home,.wd-library){display:none!important}
+ .wd-catalog{gap:12px;grid-template-columns:repeat(3,minmax(0,1fr))}.wd-library-heading{gap:12px}.wd-search-label{flex:1}.wd-search-label .wd-search{width:100%}.wd-widget-title{font-size:13px;gap:6px;overflow-wrap:anywhere}.wd-icon{flex-basis:16px;width:16px;height:16px}.wd-catalog .wd-widget-content{font-size:12px}
+ .wd-page{min-height:400px}.wd-app-frame{min-height:420px;height:calc(100dvh - 240px)}
 }
 @media(prefers-reduced-motion:reduce){.wd-shell *{transition:none!important;scroll-behavior:auto!important}}
+.wd-app-controls{font:400 13px/1.5 Inter,sans-serif;max-width:100%;color:var(--wh-soft)}.wd-app-controls>summary{min-height:44px;display:flex;align-items:center;cursor:pointer}.wd-app-controls[open]{display:flex;flex-wrap:wrap;gap:12px}.wd-app-controls .wd-filters{margin-top:8px}
+
+html:has(body[data-rtg-desktop]){scroll-padding-block:80px 150px}
+body[data-rtg-desktop] .wd-shell{padding-bottom:150px}
+body[data-rtg-desktop] :is(button,summary,a,input,select,textarea){scroll-margin-block:80px 150px}
+
+.wd-app-controls .wd-filters{flex-wrap:wrap}.wd-app-controls .wd-filters select{max-width:100%;min-width:0}

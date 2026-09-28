@@ -91,7 +91,7 @@ function gewenst(bestand, bron) {
   bodyNieuw = zetAttribuut(bodyNieuw, 'data-rtg-layout', 'standard');
   bodyNieuw = bodyNieuw.replace(/\sdata-rtg-eigenvlak=["'][^"']*["']/gi, '');
   let uit = bron.replace(body[0], bodyNieuw);
-  uit = uit.replace(/<script\b[^>]*src=["']\/shared\/rtg-world-desktop\.js["'][^>]*><\/script>\s*/gi, '');
+  uit = require('./lib/script-bronnen')(uit, src => src === '/shared/rtg-world-desktop.js');
   uit = uit.replace(/<link\b[^>]*href=["']\/shared\/rtg-world-desktop\.css["'][^>]*>\s*/gi, '');
 
   const heritageLinks = uit.match(/<link\b[^>]*href=["']\/?shared\/rtg-heritage\.css(?:[?#][^"']*)?["'][^>]*>/gi) || [];

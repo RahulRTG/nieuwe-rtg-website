@@ -46,7 +46,7 @@ test('four desktop worlds use one composition and one Edge; the mobile home stay
       await page.locator('.wd-library').scrollIntoViewIfNeeded();
       const overlap = await page.evaluate(() => {
         const top = document.querySelector('.wd-library').getBoundingClientRect().top;
-        return [...document.querySelectorAll('.wd-people,.wd-favorites')]
+        return [...document.querySelectorAll('.wd-favorites')]
           .some(el => el.getBoundingClientRect().bottom > top + 1);
       });
       assert.equal(overlap, false, route + ': the side panels must not cover the library when scrolling');
@@ -144,10 +144,14 @@ test('Foundation widgets read the chosen family profile without a paid member ac
     await open(page, '/apps/foundation/index.html');
     await page.waitForSelector('.wd-favorites [data-widget="foundation-agenda"] [data-state="ready"]');
     assert.match(await page.locator('.wd-favorites [data-widget="foundation-agenda"]').innerText(), /Samen wandelen/);
+    await page.locator('.wd-app-controls>summary').click();
+    await page.locator('#wdSearch').fill('schrijven');
+    await page.locator('.wd-library [data-widget="foundation-schrijven"]').hover();
+    await page.locator('.wd-library [data-widget="foundation-schrijven"] .wd-widget-pin').click();
     for (const id of ['foundation-leren', 'foundation-schrijven']) {
       await page.waitForSelector('.wd-favorites [data-widget="' + id + '"] [data-state="ready"]');
     }
-    assert.match(await page.locator('.wd-greeting').innerText(), /100% gratis/);
+    assert.match(await page.locator('.wp-free').innerText(), /100% gratis/);
     await page.evaluate(() => window.RTGi18n.set('ar'));
     assert.equal(await page.locator('html').getAttribute('dir'), 'rtl');
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true);
@@ -189,6 +193,7 @@ test('Vrienden stands in the Foundation library because its world says so, not b
   try {
     await open(page, '/apps/foundation/index.html');
     await page.waitForSelector('.wd-library .wd-catalog [data-widget]');
+    await page.locator('.wd-app-controls>summary').click();
     await page.fill('.wd-library #wdSearch', 'Contacten');
     await page.waitForSelector('.wd-library .wd-catalog [data-widget="foundation-vrienden"]', { timeout: 5000 });
     assert.equal(await page.locator('.wd-library .wd-catalog [data-widget="foundation-vrienden"]').count(), 1);
@@ -207,7 +212,7 @@ test('direct function screens keep their inputs when the common frame changes si
     await page.setViewportSize({ width: 1440, height: 1050 });
     assert.equal(await page.locator('#zoek').inputValue(), 'Desktop taken');
     assert.equal(await page.locator('.wd-shell').count(), 1);
-    const expected = 'rgb(244, 239, 230)';
+    const expected = 'rgb(250, 248, 243)';
     assert.equal(await page.locator('body').evaluate(e => getComputedStyle(e).backgroundColor), expected);
     // Control experiment: the rendered check detects the retired dark Living theme.
     await page.addStyleTag({ content: 'body[data-rtg-layout][data-rtg-world][data-rtg-skin][data-rtg-desktop]{background:#000!important}' });

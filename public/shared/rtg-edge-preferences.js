@@ -10,7 +10,7 @@
   function bind() {
     var e = w.RTGEdge && w.RTGEdge.active;
     if (!e) return;
-    if (w.RTGEdge2 && d.querySelector('body > .ws-balk')) {
+    if (w.RTGEdge2 && d.querySelector('body > .ws-balk, .wd-page > .ws-balk')) {
       var tokens=(d.body.getAttribute('data-rtg-edge-2-context') || '').split(',').filter(function(x){return x && x !== 'none';});
       if (tokens.indexOf('world-shell') < 0) w.RTGEdge2.registerContext(tokens.concat('world-shell'));
     }

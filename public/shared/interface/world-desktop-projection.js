@@ -27,6 +27,7 @@
     var ai=chrome.querySelector('[data-rtg-adaptive-action="ai"]');
     if(ai){ai.disabled=true;ai.setAttribute('aria-label','Rahul is beschikbaar op uw eigen toestel');}
     d.body.dataset.rtgDesktop=d.body.dataset.rtgWorld;
+    w.RTGWorldPresentation.start({root:root,home:home,people:people,favorites:favorites});
     d.body.dataset.rtgDesktopState='ready';
   }
   w.RTGDesktopProjection={start:start};

@@ -14,6 +14,7 @@
       home.before(root); home.classList.add('wd-home'); root.appendChild(people); root.appendChild(home);
       root.appendChild(favorites); root.appendChild(surface); root.appendChild(announcement); root.appendChild(library);
       w.RTGDesktopSurface.guard(root, home);
+      w.RTGWorldPresentation.start({root:root,home:home,people:people,favorites:favorites});
     var loadingHeader = U.el('header','wd-greeting'), loadingTitle=U.el('h1','',d.title);
     loadingHeader.appendChild(loadingTitle);root.prepend(loadingHeader);
     library.setAttribute('aria-busy','true');
@@ -60,7 +61,7 @@
         name = j.user && (j.user.full || j.user.name || j.user.codename) || ''; greet();
       }).catch(function () {});
       var defaults = { living: ['agenda', 'notities'], travel: ['reizen', 'agenda', 'notities'],
-        work: ['agenda', 'notities', 'bestanden'], foundation: ['foundation-agenda', 'foundation-leren', 'foundation-schrijven'] };
+        work: ['agenda', 'notities'], foundation: ['foundation-agenda', 'foundation-leren'] };
       var cards = w.RTGDesktopCards({ world: world, apps: apps, favorites: favorites, library: library, runtime: runtime,
         defaults: defaults[world].filter(function (id) { return apps.some(function (a) { return a.id === id; }); }),
         open: function (app, trigger, action) { runtime.navigation.open(app.url, app.name, 'desktop-catalog'); if (action) frame.prepare(action); } });
@@ -76,7 +77,8 @@
       edge();
       // Home hangt aan window en niet aan het model van de Edge: dat begint bij elke start leeg.
       w.addEventListener('rtg-edge-home', function (e) {
-        e.preventDefault(); if (frame.isOpen()) frame.collapse(); else { home.scrollIntoView({ block: 'start' }); }
+        if (frame.isOpen()) { e.preventDefault(); frame.collapse(); }
+        else if (d.body.dataset.worldHome) { e.preventDefault(); home.scrollIntoView({ block: 'start' }); }
       });
       var watch = new MutationObserver(function () { if (d.body.dataset.rtgAdaptiveReady === 'true') { edge(); watch.disconnect(); } });
       if (d.body.dataset.rtgAdaptiveReady !== 'true') watch.observe(d.body, { attributes: true, attributeFilter: ['data-rtg-adaptive-ready'] });

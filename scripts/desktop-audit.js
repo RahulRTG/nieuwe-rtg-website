@@ -15,7 +15,7 @@ const all = site ? fs.readdirSync(site,{recursive:true}).filter(f=>f.endsWith('.
 const selected = arg('routes') || process.env.RTG_DESKTOP_ROUTES;
 const routes = selected ? selected.split(',') : all;
 const shots = new Set(['/apps/rtg.html', '/apps/wereld.html', '/apps/kantoor.html', '/apps/reizen.html', '/apps/foundation/os-publiek.html', '/apps/agenda.html', '/apps/camera.html', '/apps/office.html', '/apps/foundation/agenda.html', '/apps/app.html', '/']);
-const results = [];
+const results = [], width = Number(arg('width') || 1440), mobile = width < 1000;
 async function main() {
   const pw = laadPlaywright();
   if (!pw) throw new Error('A real browser is required; this audit cannot be skipped.');
@@ -24,7 +24,7 @@ async function main() {
   let browser;
   try {
     browser = await pw.chromium.launch(browserOpties(pw));
-    const ctx = await browser.newContext({ viewport: { width: 1440, height: 1000 }, serviceWorkers: 'block', reducedMotion: 'reduce' });
+    const ctx = await browser.newContext({ viewport: { width, height: 1000 }, serviceWorkers: 'block', reducedMotion: 'reduce' });
     await ctx.addInitScript(() => { localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); });
     let next = 0;
     await Promise.all(Array.from({ length: 3 }, async () => {
@@ -35,10 +35,14 @@ async function main() {
         page.on('pageerror', onError);
         const row = { route };
         try {
+          const started = Date.now();
           const response = await page.goto(srv.base + route, { waitUntil: 'domcontentloaded', timeout: 25000 });
           row.http = response.status();
           await page.waitForSelector('body[data-rtg-desktop-state="ready"],body[data-public-platform]', { timeout: 12000 });
-          await page.waitForSelector('.rtg-adaptive-bar', { timeout: 6000 });
+          row.contentReadyMs = Date.now() - started;
+          await page.waitForSelector('.rtg-adaptive-bar', { timeout: 12000 });
+          row.edgeReadyMs = Date.now() - started;
+          await page.waitForFunction(() => { const photos = [...document.querySelectorAll('.wp-atmosphere img,.wp-photo>img')]; return photos.length && photos.every(img => img.complete && img.naturalWidth > 0); }, null, { timeout: 12000 });
           // Edge can append styles after DOMContentLoaded; wait for the shared
           // desktop stylesheet to finish applying before measuring its grid.
           await page.waitForFunction(() => getComputedStyle(document.body).paddingTop === '64px', null, { timeout: 6000 });
@@ -57,17 +61,17 @@ async function main() {
           const s = row.state;
           row.failures = [];
           if (row.http !== 200 && route !== '/site/404.html') row.failures.push('http-'+row.http);
-          if (Math.abs(s.shell?.y+s.pageScroll-88) > 2) row.failures.push('nonstandard-top-inset');
+          if (Math.abs(s.shell?.y+s.pageScroll-(mobile ? 136 : !s.public && s.world === 'living' ? 154 : 104)) > 2) row.failures.push('nonstandard-top-inset');
           if (s.shells !== 1 || s.edges !== 1) row.failures.push('duplicate-or-missing-frame');
           if (s.overflow) row.failures.push('horizontal-overflow');
-          if (!s.left || !s.right || !s.content || !s.shell || s.left.w < 100 || s.right.w < 100) row.failures.push('missing-column');
-          else {
+          if (!s.left || !s.right || !s.content || !s.shell || (!mobile && (s.left.w < 100 || s.right.w < 100))) row.failures.push('missing-column');
+          else if (!mobile) {
             if (Math.abs(s.shell.x-40) > 2 || Math.abs(s.left.w-216) > 2 || Math.abs(s.right.w-280) > 2) row.failures.push('nonstandard-geometry');
             if (s.content.x < s.left.right || s.content.right > s.right.x + 1) row.failures.push('overlapping-columns');
             if (s.content.scroll === 'auto' || s.left.scroll === 'auto' || s.right.scroll === 'auto') row.failures.push('nested-page-scroll');
-            if (s.library && Math.max(s.left.bottom,s.content.bottom,s.right.bottom) > s.library.y+1) row.failures.push('library-overlap');
+            if (s.library && Math.max(s.content.bottom,s.right.bottom) > s.library.y+1) row.failures.push('library-overlap');
           }
-          const palettes = {living:'rgb(244, 239, 230)',work:'rgb(20, 26, 26)',travel:'rgb(33, 23, 27)',foundation:'rgb(17, 28, 41)'};
+          const palettes = {living:'rgb(250, 248, 243)',work:'rgb(20, 26, 24)',travel:'rgb(28, 24, 24)',foundation:'rgb(20, 32, 42)'};
           if(s.layout !== 'standard')row.failures.push('legacy-layout');
           if (s.background !== (s.public ? 'rgb(18, 18, 16)' : palettes[s.world])) row.failures.push('nonstandard-world-palette');
         } catch (e) { row.failures = [e.message.split('\n')[0]]; }
@@ -78,7 +82,7 @@ async function main() {
           try { fs.writeFileSync(path.join(out,name+'.html'), await page.content()); } catch (_) {}
         }
         results.push(row); page.off('pageerror', onError);
-        fs.writeFileSync(path.join(out,'report.json'), JSON.stringify({ total:all.length, scope:routes.length, checked:results.length, results },null,2));
+        fs.writeFileSync(path.join(out,'report.json'), JSON.stringify({ viewport:width, total:all.length, scope:routes.length, checked:results.length, results },null,2));
         console.log((row.failures.length ? 'FAIL ' : 'PASS ') + route + (row.failures.length ? ' '+row.failures.join(', ') : ''));
       }
       await page.close();

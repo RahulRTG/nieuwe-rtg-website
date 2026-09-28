@@ -314,8 +314,8 @@ async function controleerRoute(page, route, scherm) {
   assertEenRand(overzicht, label + ' · overzicht');
   assertStand(overzicht, { ...verwachtOverzicht, reveal: false }, label + ' · overzicht');
   assert.equal(overzicht.wereld, route.wereld, label + ': verkeerde wereldkleur/context');
-  assert.equal(overzicht.bottom.materiaal, '#0a0805',
-    label + ': de adaptieve Edge gebruikt niet het vaste marketingmateriaal');
+  assert.equal(overzicht.bottom.materiaal.toLowerCase(), {living:'#fffdf9',work:'#1c2524',travel:'#2d2025',foundation:'#1b293a'}[route.wereld],
+    label + ': de adaptieve Edge volgt niet het wereldmateriaal');
   assert.equal(overzicht.randHerstel, 2, label + ': boven- en onderrand missen hun herstelzone');
   assert.equal(overzicht.randHerstelZichtbaar, 0, label + ': herstelzones zijn buiten compact zichtbaar');
   assertContext(overzicht, route, label);

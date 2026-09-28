@@ -1,5 +1,3 @@
-/* Native compact surfaces. Each visual is driven by its domain's records;
-   no decorative chart is presented as a personal measurement. */
 (function (w, d) {
   'use strict';
   w.RTGWidgetSurfaces = function (app, root, o) {
@@ -21,14 +19,17 @@
         return String(a.datum + (a.tijd || '')).localeCompare(String(b.datum + (b.tijd || ''))); });
       var first = items[0];
       if (first) { var hero = U.el('div', 'wd-date-hero'), tile = U.el('time', 'wd-date-tile'); tile.dateTime = first.datum;
-        tile.appendChild(text('b', '', date(first.datum, { day: 'numeric' }))); tile.appendChild(text('span', '', date(first.datum, { month: 'short' })));
-        hero.appendChild(tile); var info = U.el('div'); info.appendChild(text('strong', '', first.tijd || date(first.datum, { weekday: 'long' })));
+        tile.appendChild(text('span', '', date(first.datum, { weekday: 'long', day: 'numeric', month: 'short' }))); tile.appendChild(text('b', '', first.tijd || date(first.datum, { day: 'numeric' })));
+        hero.appendChild(tile); var info = U.el('div');
         info.appendChild(text('p', '', first.titel)); if (first.locatie) info.appendChild(text('small', '', first.locatie)); hero.appendChild(info); root.appendChild(hero);
-        items.slice(1, 3).forEach(function (x) { row(x.titel, [date(x.datum), x.tijd].filter(Boolean).join(' · '), 'calendar'); });
+        if (!o.compact) items.slice(1, 3).forEach(function (x) { row(x.titel, [date(x.datum), x.tijd].filter(Boolean).join(' · '), 'calendar'); });
       } else empty('calendarEmpty');
       var nav = U.el('div', 'wd-date-nav'); var prev = button('previous', function () { o.offset(-7); }, 'wd-text-button'); prev.disabled = o.days() === 0;
       nav.appendChild(prev); var next = button('next', function () { o.offset(7); }, 'wd-text-button'); next.disabled = o.days() >= 28; nav.appendChild(next);
-      root.appendChild(nav); root.appendChild(open('calendar'));
+      if (o.compact) {
+        var more = U.el('details', 'wd-date-controls'); more.open = !!o.state.calendarExpanded;
+        more.append(copy('summary', '', 'calendar'), nav); more.ontoggle = function () { if (more.isConnected) o.state.calendarExpanded = more.open; }; root.appendChild(more);
+      } else root.appendChild(nav); root.appendChild(open('calendar'));
     }
     function notes(j) {
       var notes = array(j, 'eigen').concat(j.gedeeld || []).filter(function (n) { return !n.archief; }), count = 0;

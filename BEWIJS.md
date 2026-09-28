@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2077 bestanden en 14620 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2079 bestanden en 14624 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2077 |
-| losse beweringen (`test(...)`) | 14620 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 180 |
+| toetsbestanden | 2079 |
+| losse beweringen (`test(...)`) | 14624 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 182 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1423 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 74 |
 | alleen in de kop *genoemd*, nog niet gemeten | 168 |
-| niets van beide | 412 |
+| niets van beide | 414 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1810 bestanden, 14148 beweringen.
+1811 bestanden, 14149 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1434,6 +1434,7 @@ toets omvalt.
 | `scim-user-outbox.test.js` | 2 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `scim.test.js` | 20 | gezakt op `return-weg#0` | SCIM: de IdP van een klant mag zelf accounts aanmaken en uitzetten. Dat is de gevaarlijkste bevoegdheid die we buiten de deur geven, want de sleutel ligt bij de klant. |
 | `scimgroepen.test.js` | 6 | gezakt op `===->!==#0` | SCIM /Groups -- een groepswijziging bij de klant werkt METEEN door. Waarom deze laag er is: de identiteitsbrug las de claim `groups` uit het ID-token, en dat gebeurt alleen bij een inlog. |
+| `script-bronnen.test.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `scriptafsplitsing.test.js` | 8 | -- | HET AFGESPLITSTE SCRIPTBLOK: WAT ER WEG MAG, EN VOORAL WAT NIET. 146 inline <script>-blokken in 143 schermen, samen 2,33 MB, die bij elk bezoek opnieuw over de lijn gaan -- een pagina draagt een eigen nonce, dus er... |
 | `scriptbundel.test.js` | 7 | geen bronmutatie mogelijk | De uitgestelde scripts in een verzoek -- en waarom dat lang NIET mocht. In de kop van server/middleware/stijlbundel.js staat het argument dat scripts met rust liet: "gooit de eerste een fout, dan draait de tweede in... |
 | `seclock.test.js` | 6 | genoemd | DE SEC-LOCK-INVARIANTEN -- software mag beveiliging automatisch verhogen, maar nooit zelfstandig verlagen. WAAROM DEZE VIER VOOR ELKE FEATURE UIT GAAN. |
@@ -1850,7 +1851,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-267 bestanden, 472 beweringen.
+268 bestanden, 475 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2092,6 +2093,7 @@ toets omvalt.
 | `voertuigscherm.e2e.js` | 8 | geen bronmutatie mogelijk | HET VOERTUIGSCHERM: het adres dat een verwijzing nodig had. De verwijsvorm van dit huis kon nergens heen voor een voertuig -- er was geen app die er EEN opende. |
 | `vooruitscherm.e2e.js` | 1 | -- | SCHERM-TOETS voor de twee kaarten in Mijn backoffice: "Vooruit" en "Uit uw post". WAAROM DEZE ER MOET ZIJN. |
 | `vrienden-blok.e2e.js` | 1 | gezakt op `liegpoort /api/` | RTG VRIENDEN: HET HELE SCRIPTBLOK DRAAIT, EN NIET ALLEEN HET BEGIN. WAT HIER FOUT GING, want dat bepaalt wat deze toets moet meten. |
+| `warm-presentation.e2e.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `website-language-picker.e2e.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `website-screen-edges.e2e.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `wegwijzerscherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | SCHERMTOETS VOOR DE TWEE VEILIGHEIDSSCHERMEN VAN DE RTFOUNDATION: /apps/foundation/onveilig.html en /apps/foundation/wegwijzer.html. WAAROM DEZE TWEE EEN BROWSER NODIG HEBBEN. |

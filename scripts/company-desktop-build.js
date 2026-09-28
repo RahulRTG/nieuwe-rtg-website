@@ -27,7 +27,7 @@ function copy(rel){
   copy(path.join(path.dirname(rel),url.split('?')[0]));
  }
 }
-[...styles,...scripts].forEach(copy);
+[...styles,...scripts,'public/shared/bestand-upload.js','public/shared/interface/world-desktop-copy.js','public/shared/interface/personal-images.js','public/shared/interface/personal-image-editor.js','public/shared/interface/world-presentation.js','public/shared/interface/public-presentation.js'].forEach(copy);
 for(const folder of ['public/images/platform','public/images/world-homes','public/images/editorial','public/fonts','public/shared/taalschil']){
  for(const rel of fs.readdirSync(path.join(root,folder)))if(!rel.endsWith('.css')&&fs.statSync(path.join(root,folder,rel)).isFile())copy(path.join(folder,rel));
 }
@@ -37,7 +37,7 @@ write('404.html','<!doctype html><html lang="en"><head><meta charset="utf-8"><me
 const pages=[];
 for(const rel of fs.readdirSync(out,{recursive:true}).filter(f=>f.endsWith('.html')&&!f.startsWith('public/'))){
  let html=fs.readFileSync(path.join(out,rel),'utf8');
- html=html.replace(/<script\b[^>]+src="[^"]*(?:language|script|site)\.js[^"]*"[^>]*>\s*<\/script>/g,'');
+ html=require('./lib/script-bronnen')(html,src=>/(?:^|\/)(?:language|script|site)\.js(?:[?#]|$)/.test(src));
  html=html.replace(/<link\b[^>]+href="[^"]*\b(?:site|styles)\.css[^"]*"[^>]*>/g,'');
  html=html.replace(/(src|href|srcset)="\.\//g,'$1="/');
  html=html.replace('<body','<body class="rtg-stijl" data-rtg-skin="heritage" data-rtg-world="living" data-rtg-layout="standard" data-public-platform="company" data-company-page="'+(rel==='index.html'?'home':rel)+'"');
@@ -47,5 +47,5 @@ const previous=JSON.parse(fs.readFileSync(path.join(config,'current-version.json
 const settings=previous.resources.script_runtime.assets;
 write('_headers',settings.raw_headers);write('_redirects',settings.raw_redirects);
 write('.assetsignore','DESKTOP-PROVENANCE.json\nsnapshot-manifest.json\nSTORYLINE-PROVENANCE.json\n');
-write('DESKTOP-PROVENANCE.json',JSON.stringify({standard:'shared-desktop-v1',builtAt:new Date().toISOString(),previousVersion:previous.id,pages,shared},null,2)+'\n');
+write('DESKTOP-PROVENANCE.json',JSON.stringify({standard:'shared-warm-desktop-mobile-v2',builtAt:new Date().toISOString(),previousVersion:previous.id,pages,shared},null,2)+'\n');
 console.log(pages.length+' company pages use '+shared.length+' canonical shared assets: '+out);

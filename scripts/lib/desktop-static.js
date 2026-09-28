@@ -2,7 +2,7 @@
 const http = require('node:http'), fs = require('node:fs'), path = require('node:path');
 module.exports = async function (directory) {
   const root = path.resolve(directory);
-  const types = { '.html':'text/html; charset=utf-8', '.css':'text/css', '.js':'text/javascript', '.json':'application/json', '.webp':'image/webp', '.png':'image/png', '.svg':'image/svg+xml', '.woff2':'font/woff2' };
+  const types = { '.html':'text/html; charset=utf-8', '.css':'text/css', '.js':'text/javascript', '.json':'application/json', '.webp':'image/webp', '.png':'image/png', '.jpg':'image/jpeg', '.svg':'image/svg+xml', '.woff2':'font/woff2' };
   const server = http.createServer((req,res) => {
     let file;
     try {

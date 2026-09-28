@@ -1,6 +1,6 @@
 /* Domein "supplier" (deelmodule): tickets. Draait op de gedeelde kern. */
 module.exports = (kern) => {
-  const { app, crypto, db, logActivity, pay, ticketsVoorSlot, managerOnly, save, schoon, sseToCustomer, sseToSupplier, supplierAuth } = kern;
+  const { app, crypto, db, logActivity, pay, ticketsVoorSlot, managerOnly, save, schoon, sseToSupplier, supplierAuth, tickettoegang } = kern;
 
 /* ================== tickets: activiteiten, tours en musea ================== */
 function heeftTickets(s) {
@@ -64,7 +64,7 @@ app.post('/api/supplier/programma', supplierAuth, (req, res) => {
         verkocht: kaartjes.reduce((n, t) => n + (t.personen || 1), 0),
         binnen: kaartjes.filter(t => t.checkin).reduce((n, t) => n + (t.personen || 1), 0),
         // VIP eerst: aan de deur wil je die namen bovenaan zien staan
-        gasten: kaartjes.map(t => ({ codename: t.customerCodename, personen: t.personen || 1, code: t.code, binnen: !!t.checkin, vip: !!t.vip, zorg: t.zorg || null }))
+        gasten: kaartjes.map(t => ({ codename: t.customerCodename, personen: t.personen || 1, ref: t.ref, deur: !!t.deur, binnen: !!t.checkin, vip: !!t.vip, zorg: t.zorg || null }))
           .sort((a, b) => (b.vip ? 1 : 0) - (a.vip ? 1 : 0))
       });
     }
@@ -73,27 +73,8 @@ app.post('/api/supplier/programma', supplierAuth, (req, res) => {
   res.json({ datum, slots });
 });
 
-/* Check-in aan de deur: het personeelslid (security, gids, balie) vinkt de
-   entreecode af, op eigen naam. Een ticket kan maar een keer naar binnen. */
-app.post('/api/supplier/ticket/checkin', supplierAuth, (req, res) => {
-  const s = req.supplier;
-  if (!heeftTickets(s)) return res.status(409).json({ error: 'Deze sector verkoopt geen tickets.' });
-  const code = String(req.body.code || '').trim().toUpperCase();
-  if (!code) return res.status(400).json({ error: 'Voer de entreecode in.' });
-  const t = kern.boekingenVanZaak(s.code).find(b => b.kind === 'ticket' && b.code === code);
-  if (!t) return res.status(404).json({ error: 'Deze code hoort niet bij een ticket van uw zaak.' });
-  if (!t.paid) return res.status(409).json({ error: 'Dit ticket is nog niet betaald.' });
-  if (t.checkin) return res.status(409).json({ error: 'Al binnen: om ' + String(t.checkin.at).slice(11, 16) + ' afgevinkt door ' + t.checkin.door + '.' });
-  const vandaag = new Date().toISOString().slice(0, 10);
-  if (t.datum !== vandaag) return res.status(409).json({ error: 'Dit ticket is voor ' + t.datum + ' (' + t.tijd + '), niet voor vandaag.' });
-  t.checkin = { at: new Date().toISOString(), door: req.actor.name, staffId: req.actor.staffId || null };
-  t.status = 'afgerond';
-  save();
-  logActivity(s.code, req.actor, 'checkte ' + t.customerCodename + ' in (' + t.service.name + ', ' + (t.personen || 1) + 'p' + (t.vip ? ', VIP' : '') + ')');
-  if (t.customerKey || t.customerTier) sseToCustomer(t.customerKey || t.customerTier, 'sync', { scope: 'tickets' });
-  sseToSupplier(s.code, 'sync', { scope: 'tickets' });
-  res.json({ ok: true, ticket: { naam: t.service.name, tijd: t.tijd, personen: t.personen || 1, codename: t.customerCodename, vip: !!t.vip, zorg: t.zorg || null } });
-});
+// check-in aan de deur en het vernieuwen van een deurticket: ./tickets-deur.js
+require('./tickets-deur')(kern, { heeftTickets });
 
 /* Deurverkoop en VIP-entree: de kassa aan de deur. Het personeelslid verkoopt
    op de PDA (of het kassascherm) een kaartje voor een tijdslot van vandaag,
@@ -119,10 +100,9 @@ app.post('/api/supplier/ticket/deurverkoop', supplierAuth, async (req, res) => {
     if (p.error) return res.status(p.status || 400).json({ error: p.error });
     betaler = p.van;
   }
-  const code = crypto.randomBytes(3).toString('hex').toUpperCase();
   const ticket = {
     ref: 'D' + crypto.randomBytes(4).toString('hex'),
-    kind: 'ticket', code,
+    kind: 'ticket',
     supplierCode: s.code, supplierName: s.name,
     customerTier: null, customerKey: null, customerCodename: betaler || 'Deurverkoop',
     service: { id: act.id, name: act.name, soort: 'ticket' },
@@ -133,7 +113,7 @@ app.post('/api/supplier/ticket/deurverkoop', supplierAuth, async (req, res) => {
   kern.boekingenVoegToe(ticket);
   const bonnen = db.data.posSales[s.code] = (db.data.posSales[s.code] || []);
   bonnen.unshift({
-    id: crypto.randomBytes(4).toString('hex'), bon: code, actor: req.actor.name,
+    id: crypto.randomBytes(4).toString('hex'), bon: ticket.ref, actor: req.actor.name,
     desc: 'Deurverkoop ' + act.name + (vip ? ' (VIP)' : ''), room: null,
     items: [{ name: act.name + (vip ? ' VIP' : ''), qty: personen, price: act.prijs || 0 }],
     total, method, betaler, at: new Date().toISOString()
@@ -142,8 +122,16 @@ app.post('/api/supplier/ticket/deurverkoop', supplierAuth, async (req, res) => {
   save();
   logActivity(s.code, req.actor, 'verkocht ' + personen + 'x ' + act.name + (vip ? ' (VIP)' : '') + ' aan de deur (' + method + ', € ' + total + ')');
   sseToSupplier(s.code, 'sync', { scope: 'tickets' });
-  res.json({ ok: true, ticket: { code, naam: act.name, tijd, personen, vip, total, method } });
+  /* De entreecode is een 128-bit bearer (kern/tickettoegang.js) en staat
+     alleen in DIT antwoord kaal. Lukt hij niet, dan is het kaartje wel
+     verkocht: de deur vernieuwt hem vanuit het dagprogramma. */
+  let code = null;
+  try { const t = await tickettoegang.uitgeven({ boeking: ticket, supplierCode: s.code, actor: req.actor.name }); code = t.code || null; }
+  catch (e) { code = null; }
+  res.set('Cache-Control', 'no-store');
+  res.json({ ok: true, eenmalig: true, ticket: { ref: ticket.ref, code, naam: act.name, tijd, personen, vip, total, method } });
 });
+
 
 /* De eigen transferdienst van een activiteitenzaak: chauffeurs van de zaak
    halen gasten op; prijs 0 = inclusief bij het ticket, anders het afgesproken

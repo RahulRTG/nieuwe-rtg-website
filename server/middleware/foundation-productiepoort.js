@@ -103,31 +103,14 @@ const BESCHERMDE_ROUTES = Object.freeze([
   '/api/lab2/publicatie/zet'
 ]);
 
-/* Een juridisch/DPIA-dossier maakt een verouderde bezitssleutel niet ineens
-   technisch veilig. Deze families blijven daarom ook na een externe
-   Foundation-vrijgave dicht totdat hun eigen credentialregister op
-   `migrated` staat. Beperkende uitgangen hieronder blijven wel beschikbaar.
-
-   Dit is tevens de productiescheiding uit de eerste RTG-release: scholen,
-   gezinnen, lessen, onderzoeksdeelnemers en stadiontickets kunnen de veilige
-   algemene Foundation-laag niet gijzelen en worden ook niet per ongeluk mee
-   vrijgegeven door één brede vlag. */
-const NOG_GESLOTEN_CREDENTIALFAMILIES = Object.freeze([
-  '/api/foundation/gezin',
-  '/api/foundation/school',
-  '/api/lab2/mijn',
-  '/api/les'
-]);
-const NOG_GESLOTEN_CREDENTIALROUTES = Object.freeze([
-  '/api/lab2/bewoner/paspoort',
-  '/api/lab2/bewoner/paspoort-maak',
-  '/api/member/sport/ticket/koop',
-  '/api/member/sport/tickets',
-  '/api/sport/scan',
-  '/api/foundation/registratie/status',
-  '/api/office/foundation/registratie/besluit',
-  '/api/rtf/social/stream'
-]);
+/* Wat ook na een externe Foundation-vrijgave dicht blijft (een dossier maakt
+   een verouderde bezitssleutel niet veilig), per drager ingedeeld, staat in
+   ./foundation-nog-gesloten.js. Scholen, gezinnen, lessen, onderzoeksdeel-
+   nemers en stadiontickets worden zo niet mee vrijgegeven door één vlag. */
+const NOG_GESLOTEN = require('./foundation-nog-gesloten');
+const NOG_GESLOTEN_CREDENTIALFAMILIES = NOG_GESLOTEN.FAMILIES;
+const NOG_GESLOTEN_CREDENTIALROUTES = NOG_GESLOTEN.ROUTES;
+const nogGeslotenRoutes = new Set(NOG_GESLOTEN_CREDENTIALROUTES);
 
 /* De beperkende en verwijderende uitgangen vormen een zelfstandig beleid.
    Ze staan apart zodat deze universele requestpoort klein en controleerbaar
@@ -176,7 +159,7 @@ function isNogGeslotenCredentialroute(methode, waarde, body) {
   const pad = normaliseerPad(waarde);
   const sleutel = String(methode || '').toUpperCase() + ' ' + pad;
   if (veiligeUitgangen.has(sleutel) || isVeiligeBodyUitgang(sleutel, body)) return false;
-  if (NOG_GESLOTEN_CREDENTIALROUTES.includes(pad)) return true;
+  if (nogGeslotenRoutes.has(pad)) return true;
   return NOG_GESLOTEN_CREDENTIALFAMILIES.some(familie => binnenRoutefamilie(pad, familie));
 }
 

@@ -41,6 +41,8 @@
       die je niet kunt naspelen.
    ========================================================================== */
 'use strict';
+
+const { sluitBeheer } = require('../../bedrijf/sleutels');
 const { nu: klokNu, datum: klokDatum } = require('../../lib/klok');
 
 /* Hoe lang een geslaagde proef meetelt. Een halfjaar: lang genoeg dat niemand
@@ -94,7 +96,7 @@ module.exports = ({ db, save, register, uitgang, log }) => {
       proefCode = in1.werkruimte;
       /* REGEL 2: geen deur, en herkenbaar voor de opruiming -- maar dat tweede
          staat in het register en NIET op de werkruimte. */
-      W()[proefCode].beheerToken = null;
+      sluitBeheer(W()[proefCode]);
       bak().push(proefCode);
       save();
 

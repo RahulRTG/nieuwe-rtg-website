@@ -30,7 +30,7 @@
      lopen. De bron blijft in de DOM staan met zijn eigen handlers en rechten;
      de Edge klikt hem aan. */
   var CLAIM = '.rtg-suitebar,.rtg-suitenav,.tos-opsnav,.rtg-social-commandbar,' +
-    '.salon-socialnav,.rtg-intel-strip,.rtd-nav,.one-nav';
+    '.salon-socialnav,.rtg-intel-strip,.rtd-nav,.one-nav,.dr-nav,.pr-nav';
 
   /* `.ios-nav` STOND HIER EN IS ERUIT GEHAALD, en dat is een besluit met een
      prijs: het was 108 van de 135 schermen. De reden staat in wat de keten
@@ -78,11 +78,20 @@
     }
     return true;
   }
+  /* OVER DE BREEDTE, OF TEGEN EEN RAND. De tabbalk van Decision Room en Project
+     Room is 544 en 464 punten breed en zweeft gecentreerd onderin -- op 1280
+     breed nog geen 60%, en dus bleef hij staan, precies onder de onderbalk van
+     de Edge: alle vier de tabs volledig bedekt (gemeten 27 september 2026). Een
+     vaste balk die tegen de boven- of onderrand ligt, IS een balk, ook als hij
+     smaller is. De hero van rit.html blijft vallen op de eerste voorwaarde: die
+     is niet vast. */
+  var RAND = 48;
   function isBalk(el, win) {
     var stijl = win.getComputedStyle(el);
     if (stijl.position !== 'fixed' && stijl.position !== 'sticky') return false;
     var r = el.getBoundingClientRect();
-    if (r.width < win.innerWidth * 0.6) return false;
+    var tegenRand = stijl.position === 'fixed' && (r.top <= RAND || win.innerHeight - r.bottom <= RAND);
+    if (r.width < win.innerWidth * 0.6 && !tegenRand) return false;
     return r.height >= 28 && r.height <= win.innerHeight * 0.4;
   }
   /* EERST ALLES METEN, DAN PAS MARKEREN -- en dat is geen nettigheid maar een

@@ -78,6 +78,7 @@
 
   // Na de onboarding kiest het lid zelf een wereld; de inlog opent niets voor.
   function naarWereldkeuze(){
+    vraagAanmeldkanaal();
     if (window.RTGCommand && typeof RTGCommand.land === 'function') RTGCommand.land();
   }
 

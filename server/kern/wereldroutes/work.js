@@ -45,6 +45,9 @@ module.exports = [
   '/apps/klankwerk-kantoor.html',
   '/apps/klankwerk.html',
   '/apps/kosten.html',
+  /* RTG ACADEMY (ACADEMY.md): leren voor het werk, naast de loopbaan die
+     vastlegt wat er gebeurde. */
+  '/apps/leerhuis.html',
   '/apps/lesmaker.html',
   '/apps/leverancier-aanvragen.html',
   '/apps/leverancier-commerce.html',

@@ -187,12 +187,12 @@ async function pgPing() {
 // Pool-verzadiging (alleen in Postgres-modus) voor de health/ready-checks.
 function pgPoolStatus() { return (pg && pg.poolStatus) ? pg.poolStatus() : null; }
 function klaar() { return pgKlaar && verzoeken.klaar(); }
-const { bewerkCollectiePostgres, economischeBoekingPostgres } = require('./postgres-poorten')({
+const { bewerkCollectiePostgres, economischeBoekingPostgres, verversPostgres } = require('./postgres-poorten')({
   store: STORE, db, motor: () => pg,
   klaar: () => pgBasisKlaar && (pgOpstart || (pgKlaar && verzoeken.klaar())), slot: metOpslagSlot,
   onFout: verzoeken.ongezond
 });
 
-module.exports = { planFlush, planSave, flushVoorrangDirect, bewerkCollectiePostgres, economischeBoekingPostgres,
+module.exports = { planFlush, planSave, flushVoorrangDirect, bewerkCollectiePostgres, economischeBoekingPostgres, verversPostgres,
   startPostgres, flushBijAfsluiten, pgPing, pgPoolStatus, klaar,
   verzoekMiddleware: verzoeken.middleware, schrijfStand: verzoeken.stand, herstelNu: verzoeken.herstelNu };

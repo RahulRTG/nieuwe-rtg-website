@@ -31,6 +31,8 @@ module.exports = function maakIntreklijst(strikt) {
        een BEGIN omheen zetten faalt, en op S.db beginnen terwijl S.zin naar de
        werkkopie wijst zou zelfs twee verschillende transacties veinzen. */
     if (doelDb !== S.db) return doe();
+    // liever 503 dan een schijnuitlog (./transactie.js)
+    require('./transactie').eisVrij('tokenintrekking');
     doelDb.exec('BEGIN IMMEDIATE');
     try { doe(); doelDb.exec('COMMIT'); }
     catch (e) { try { doelDb.exec('ROLLBACK'); } catch (e2) {} throw e; }
@@ -45,7 +47,7 @@ module.exports = function maakIntreklijst(strikt) {
         .all(klok.nu());
     },
     voltooi(sleutels) {
-      if (!S.db) return 0;
+      if (!S.db || require('./transactie').bezet()) return 0;
       const weg = S.zin('DELETE FROM intrekking_outbox WHERE sleutel = ?');
       let aantal = 0;
       for (const sleutel of sleutels || []) aantal += Number((weg.run(sleutel) || {}).changes || 0);

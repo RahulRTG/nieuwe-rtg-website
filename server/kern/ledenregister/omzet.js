@@ -21,7 +21,8 @@
    dan een die eerlijk zegt dat het er niet in zit. */
 'use strict';
 
-function maakOmzet({ db, geldPasprijzen, PAS_VOLGORDE, PAS_NAAM, contractueel, maandCentenVoor, eur }) {
+function maakOmzet({ db, geldPasprijzen, PAS_VOLGORDE, PAS_NAAM, contractueel, maandCentenVoor, eur, nu }) {
+  const klok = typeof nu === 'function' ? nu : Date.now;
   /* De contracten, voor de omzet van de contractuele treden. Laat-gebonden en
      defensief: dit is een RAPPORTAGE, en een omzetstaat die omvalt omdat de
      contractentabel er nog niet is, is erger dan een omzetstaat zonder die
@@ -101,6 +102,19 @@ function maakOmzet({ db, geldPasprijzen, PAS_VOLGORDE, PAS_NAAM, contractueel, m
        mee -- nu telt alleen wie geen contract heeft nog buiten de boot. */
     businessOpMaat: omzet.filter(o => o.opMaat).reduce((n, o) => n + (o.zonderContract || 0), 0)
   };
+  /* WAT DIT GETAL IS, in het antwoord zelf (AUTONOMIE.md par. 7, stap 4). Een
+     terugkerend bedrag uit AFSPRAKEN, geen ontvangen geld -- dat is
+     omzet.leden-ontvangen in de bedrijfsmaten. Zonder deze drie velden las een
+     lezer een stand van vandaag als een kasstroom, en kon hij niet zien wanneer
+     hij gepeild was of wat erbuiten viel. De graad is `gemeten` (een som van
+     wat er staat, niets geschat); wat hij NIET dekt staat in `dektNiet`. */
+  const dektNiet = ['Een terugkerend bedrag uit afspraken (prijslijst en lopende contracten), geen ontvangen geld; dat is omzet.leden-ontvangen.'];
+  if (split.businessOpMaat > 0) dektNiet.push(split.businessOpMaat + ' leden op een contractuele trede zonder lopend contract tellen niet mee.');
+  if (!prijslijst) dektNiet.push('Er is geen prijslijst ingesteld in de boardroom; de treden met een lijstprijs rekenen met de standaardprijs uit kern/pasprijs.js.');
+  split.aard = 'afgesproken';
+  split.graad = 'gemeten';
+  split.peilmoment = new Date(klok()).toISOString();
+  split.dektNiet = dektNiet;
     return { omzet, split };
   }
 

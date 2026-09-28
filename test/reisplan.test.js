@@ -179,7 +179,7 @@ test('6. met kaartverkoop erbij: het kaartje is betaald, de rit nog niet', async
 
   // het kaartje staat ook gewoon in de kaartjeslijst van het lid
   const mijn = await api('/api/mob/kaart/mijn', {}, ander);
-  assert.ok(mijn.body.kaartjes.some(k => k.code === ov.kaartje), 'het kaartje staat in de app van de reiziger');
+  assert.ok(mijn.body.kaartjes.some(k => k.id === ov.kaartje), 'het kaartje staat in de app van de reiziger');
 });
 
 test('7. de planner belooft geen kaartje dat de verkoop niet kan leveren', async () => {
@@ -222,7 +222,7 @@ test('8. annuleren: de ritten gaan weg, een betaald kaartje blijft geldig', asyn
   assert.match(a.body.uitleg, /blijven geldig/, 'het kaartje wordt niet stilletjes ingetrokken');
 
   const mijn = await api('/api/mob/kaart/mijn', {}, vierde);
-  const k = mijn.body.kaartjes.find(x => x.code === kaartCode);
+  const k = mijn.body.kaartjes.find(x => x.id === kaartCode);
   assert.equal(k.stand, 'geldig', 'het betaalde kaartje is nog steeds geldig');
 
   const weer = await api('/api/mob/reis/annuleer', { id: b.body.reis.id }, vierde);

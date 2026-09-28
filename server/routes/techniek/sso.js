@@ -92,10 +92,14 @@ module.exports = (tctx) => {
   app.post('/api/techniek/sso/scimsleutel', techAuth, eigenaarAlleen, (req, res) => {
     const k = koppelingen.vind(req.body && req.body.org);
     if (!k) return res.status(404).json({ error: 'Maak eerst de SSO-koppeling aan; een SCIM-sleutel hoort bij een organisatie.' });
-    const nieuw = scim.sleutels.draai(k.org);
+    /* Draaien IS roteren: de oude is in dezelfde schrijfactie weg. De sleutel
+       vervalt (standaard 90, hoogstens 365 dagen; zie scim/sleutels.js). */
+    let nieuw;
+    try { nieuw = scim.sleutels.draai(k.org, { dagen: req.body && req.body.dagen }); }
+    catch (e) { if (e && e.status === 400) return res.status(400).json({ error: e.message }); throw e; }
     log.warn('scim.sleutel gedraaid', { org: k.org, door: wie(req) });
     res.json({
-      ok: true, org: k.org, sleutel: nieuw.sleutel, hint: nieuw.hint,
+      ok: true, org: k.org, sleutel: nieuw.sleutel, hint: nieuw.hint, vervalt: nieuw.vervalt,
       let_op: 'Dit is het enige moment waarop deze sleutel te zien is. Zet hem nu in de SCIM-instellingen van de klant.',
       endpoint: '/api/scim/v2'
     });

@@ -1,25 +1,56 @@
-/* De publieke voordeur van Invisible Arrival. De route bewaart uitsluitend de
-   hash van een tijdelijke bezitssleutel; deze laag remt, herkent en laat een
-   geldige, niet-verlopen pass door. */
+/* De publieke voordeur van Invisible Arrival: remmen, de pass herkennen, en de
+   drie handelingen van de houder op zijn eigen pass (lezen, roteren,
+   intrekken). De pass zelf -- uitgifte, hash-only opslag, verval, de
+   transactie -- woont in kern/arrivalpas.js; hier staat alleen wat HTTP is.
+
+   Een pass die bij het lezen dicht blijkt (reservering geweigerd, geannuleerd,
+   no-show of afgerond) wordt ook als ingetrokken vastgelegd, zodat de stand
+   in de opslag zegt wat de deur al deed. */
 'use strict';
 
-/* De tijd komt van de tijdmachine (server/lib/klok.js) en niet van het
-   besturingssysteem. Wie rechtstreeks aan het OS vraagt hoe laat het is, doet
-   niet mee aan RTG_KLOK en is dus niet te beproeven op een schrikkeldag, een
-   zomertijdgrens of een verlopen mandaat -- en dan is de tijdmachine precies
-   zoveel waard als het aantal modules dat meedoet (scripts/klok.js). */
-const klok = require('../../../lib/klok');
-const rem=require('../../../rem');
+const rem = require('../../../rem');
 
-module.exports=({crypto,db})=>{
-  const interpretRem=rem({windowMs:60000,limit:30,key:req=>'arrival-interpret|'+req.ip});
-  const requestRem=rem({windowMs:15*60000,limit:8,key:req=>'arrival-request|'+req.ip});
-  const passRem=rem({windowMs:60000,limit:60,key:req=>'arrival-pass|'+req.ip});
-  const pulseRem=rem({windowMs:60000,limit:20,key:req=>'arrival-pulse|'+req.ip});
-  function hash(waarde){return crypto.createHash('sha256').update(String(waarde)).digest('hex')}
-  function gelijk(a,b){const x=Buffer.from(String(a||''),'hex'),y=Buffer.from(String(b||''),'hex');return x.length===32&&y.length===32&&crypto.timingSafeEqual(x,y)}
-  function toegang(raw){const token=String(raw||'');if(!/^[A-Za-z0-9_-]{20,80}\.[A-Za-z0-9_-]{20,80}$/.test(token))return null;return{token,id:token.split('.')[0]}}
-  function vind(raw){const cred=toegang(raw);if(!cred)return null;for(const [code,h]of Object.entries(db.data.horeca||{})){const a=(h.arrivals||{})[cred.id];if(a&&gelijk(a.passHash,hash(cred.token)))return{code,a}}return null}
-  function arrivalPassAuth(req,res,next){const v=vind((req.body||{}).pass);if(!v)return res.status(401).json({error:'Deze Arrival Pass is niet geldig.'});if(Date.parse(v.a.vervaltAt)<klok.nu())return res.status(410).json({error:'Deze Arrival Pass is verlopen.'});req.arrival=v;next()}
-  return{interpretRem,requestRem,passRem,pulseRem,hash,gelijk,toegang,arrivalPassAuth};
+module.exports = ({ app, db, arrivalpas }) => {
+  const interpretRem = rem({ windowMs: 60000, limit: 30, key: req => 'arrival-interpret|' + req.ip });
+  const requestRem = rem({ windowMs: 15 * 60000, limit: 8, key: req => 'arrival-request|' + req.ip });
+  const passRem = rem({ windowMs: 60000, limit: 60, key: req => 'arrival-pass|' + req.ip });
+  const pulseRem = rem({ windowMs: 60000, limit: 20, key: req => 'arrival-pulse|' + req.ip });
+  const reserveringVan = id => (db.data.reserveringen || []).find(x => x.id === id) || null;
+  const arrivalVan = rij => {
+    const a = rij && ((db.data.horeca || {})[rij.supplierCode] || {}).arrivals;
+    return a && Object.prototype.hasOwnProperty.call(a, rij.id) ? a[rij.id] : null;
+  };
+  const geenOpslag = res => res.status(503).json({ error: 'De pass kon nu niet veilig worden bijgewerkt. Probeer het zo opnieuw.' });
+
+  async function arrivalPassAuth(req, res, next) {
+    res.set('Cache-Control', 'no-store');
+    const uit = arrivalpas.lees((req.body || {}).pass, reserveringVan);
+    if (uit.status !== 200) {
+      if (uit.dicht) try { await arrivalpas.sluitDicht(uit.rij.id, 'reservering gaat niet door'); } catch (e) { /* de deur is al dicht */ }
+      return res.status(uit.status).json({ error: uit.error });
+    }
+    const a = arrivalVan(uit.rij);
+    if (!a) return res.status(401).json({ error: 'Deze Arrival Pass is niet geldig.' });
+    req.arrival = { code: uit.rij.supplierCode, a, rij: uit.rij };
+    next();
+  }
+
+  app.post('/api/arrival/pass/roteer', passRem, async (req, res) => {
+    res.set('Cache-Control', 'no-store');
+    let uit;
+    try { uit = await arrivalpas.roteer((req.body || {}).pass, reserveringVan); } catch (e) { return geenOpslag(res); }
+    if (uit.status !== 200) return res.status(uit.status).json({ error: uit.error });
+    res.json({ ok: true, eenmalig: true, accessToken: uit.code,
+      let: 'Dit is uw nieuwe pass; de vorige werkt niet meer.' });
+  });
+
+  app.post('/api/arrival/pass/intrek', passRem, async (req, res) => {
+    res.set('Cache-Control', 'no-store');
+    let uit;
+    try { uit = await arrivalpas.intrek((req.body || {}).pass); } catch (e) { return geenOpslag(res); }
+    if (uit.status !== 200) return res.status(uit.status).json({ error: uit.error });
+    res.json({ ok: true, let: 'De pass is ingetrokken. Uw reservering zelf blijft staan.' });
+  });
+
+  return { interpretRem, requestRem, passRem, pulseRem, arrivalPassAuth, reserveringVan, geenOpslag };
 };

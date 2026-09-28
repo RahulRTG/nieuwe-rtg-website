@@ -259,8 +259,11 @@ test('tokenobjecten: sessie A kan het lidToken van B niet lezen, ontkoppelen of 
   assert.equal(mijnB.status, 200);
   assert.equal(mijnB.body.aantal, 1);
   assert.equal(mijnB.body.werkruimtes[0].werkruimte, B.werkruimte);
-  assert.equal(mijnB.body.werkruimtes[0].lidToken, B.lidToken,
-    'de aanval roteerde of wijzigde het tokenobject van B');
+  /* /mijn geeft een VERSE sessie (bedrijf/sleutels.js) en nooit de oude terug;
+     dat de oude van B nog werkt, bewijst /start hierboven. */
+  assert.notEqual(mijnB.body.werkruimtes[0].lidToken, B.lidToken, 'de oude sessie wordt nooit opnieuw getoond');
+  assert.equal((await bedrijf('/start', { werkruimte: B.werkruimte, lidToken: mijnB.body.werkruimtes[0].lidToken }, B.sessie)).status, 200,
+    'en de verse sessie van B werkt');
 });
 
 test('documenten en bestanden: bekende ids van B blijven onzichtbaar en ongewijzigd', async () => {

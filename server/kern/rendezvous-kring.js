@@ -1,10 +1,5 @@
-/* Rendez-vous, deelbestand "kring": THE TABLE, MOMENT EN ENCOUNTER.
+/* Rendez-vous Society: The Table, Moment en Encounter.
 
-   Niet elke ontmoeting hoeft een date te zijn (ONTMOETEN.md par. 2.6). Dit
-   bestand doet de vormen waarbij de FYSIEKE WERELD het werk doet en de software
-   alleen de deur openzet.
-
-   ---------------------------------------------------------------------------
    EEN MECHANISME, TWEE MOMENTEN
 
    Moment en Encounter lijken twee functies maar zijn er een. Allebei is het:
@@ -26,8 +21,7 @@
    dat je moeilijk kunt afslaan. Een nee wordt daarom ook nooit gemeld -- de
    ander leest niets, en dat is precies de bedoeling.
 
-   ---------------------------------------------------------------------------
-   ENCOUNTER DRAAIT OP DE CONTACTPIN, EN LEENT NIETS ANDERS
+   ENCOUNTER DRAAIT OP DE CONTACTPIN
 
    De pin (kern/sociaal/pin.js) is een ADRES en geen geheim: hij bewijst niets,
    hij wijst alleen aan, en hij werkt pas als u hem zelf afgeeft. Dat is precies
@@ -46,7 +40,6 @@
    wanneer hij de app opent. Zo staat er niets in de code dat doet alsof er een
    planner is die er niet is.
 
-   ---------------------------------------------------------------------------
    THE TABLE: NIEMAND HOORT OOIT WIE ER NOG MEER IS
 
    Een tafel is zes of acht leden, en een genodigde ziet de tafel -- stad, dag,
@@ -55,11 +48,9 @@
    kunst, en het werkt alleen zolang niemand het merkt. Zou de lijst zichtbaar
    zijn, dan was het een koppelavond met een ander woord ervoor.
 
-   Een tafel wordt door RTG samengesteld en niet door een lid. Er is nog geen
-   backofficescherm waar dat gebeurt; de kern kan het wel, en dat gat staat zo in
-   ONTMOETEN.md. */
+   Een tafel wordt door RTG samengesteld en niet door een lid. */
 module.exports = (ctx) => {
-  const { R, mag, codenaam, schoon, nu, save, crypto, notify, handleVanPin } = ctx;
+  const { R, mag, codenaam, schoon, nu, save, crypto, notify, handleVanPin, sociaalRate, geblokkeerd, Projection, profileMedia, partnerCandidates, partnerEligible } = ctx;
 
   const id = () => 'rv' + crypto.randomBytes(4).toString('hex');
   const isDatum = d => /^\d{4}-\d{2}-\d{2}$/.test(String(d || ''));
@@ -68,7 +59,7 @@ module.exports = (ctx) => {
 
   function T() { const r = R(); if (!r.tafels || typeof r.tafels !== 'object') r.tafels = {}; return r.tafels; }
   // de kantoorkant (samenstellen en overzicht) woont in ./rendezvous-tafels.js
-  const kantoor = require('./rendezvous-tafels')({ T, id, isDatum: d => /^\d{4}-\d{2}-\d{2}$/.test(String(d || '')), schoon, nu, save, notify, codenaam });
+  const kantoor = require('./rendezvous-tafels')({ T, id, isDatum: d => /^\d{4}-\d{2}-\d{2}$/.test(String(d || '')), schoon, nu, save, notify, codenaam, geblokkeerd, R, Projection, partnerCandidates, partnerEligible });
   function I() { const r = R(); if (!r.introducties || typeof r.introducties !== 'object') r.introducties = {}; return r.introducties; }
 
   /* ---- The Table ---- */
@@ -81,8 +72,9 @@ module.exports = (ctx) => {
     if (!poort.ok) return { status: 403, error: poort.reden };
     const uit = Object.values(T())
       .filter(t => t.genodigden[key])
-      .map(t => ({ id: t.id, naam: t.naam, stad: t.stad, datum: t.datum, tijd: t.tijd,
-        thema: t.thema, plaatsen: t.plaatsen, mijnStatus: t.genodigden[key].status }))
+      .map(t => Projection.project(Projection.NAMES.RENDEZVOUS_TABLE_MEMBER,
+        { id: t.id, naam: t.naam, stad: t.stad, datum: t.datum, tijd: t.tijd,
+          thema: t.thema, plaatsen: t.plaatsen, mijnStatus: t.genodigden[key].status }))
       .sort((a, b) => String(a.datum).localeCompare(String(b.datum)));
     return { status: 200, tafels: uit };
   }
@@ -92,6 +84,9 @@ module.exports = (ctx) => {
     if (!poort.ok) return { status: 403, error: poort.reden };
     const t = T()[String(tid || '')];
     if (!t || !t.genodigden[key]) return { status: 404, error: 'Deze uitnodiging staat niet op uw naam.' };
+    if (ja !== false && geblokkeerd && Object.keys(t.genodigden).some(other => other !== key &&
+      t.genodigden[other].status === 'ja' && geblokkeerd(R(), key, other)))
+      return { status: 409, error: 'Deze tafelsamenstelling is door een veiligheidswijziging vervallen.' };
     t.genodigden[key] = { status: ja === false ? 'nee' : 'ja', at: nu() };
     save();
     return { status: 200, ok: true, mijnStatus: t.genodigden[key].status };
@@ -101,6 +96,7 @@ module.exports = (ctx) => {
 
   function introBied(soort, a, b, aanleiding) {
     if (!SOORTEN.includes(soort) || !a || !b || a === b) return null;
+    if (geblokkeerd && geblokkeerd(R(), a, b)) return null;
     const sl = paar(a, b);
     const bestaand = I()[sl];
     if (bestaand && !bestaand.gesloten) return bestaand;
@@ -123,8 +119,11 @@ module.exports = (ctx) => {
       const [x, y] = v.id.split('|');
       if (x !== key && y !== key) continue;
       const met = x === key ? y : x;
-      uit.push({ id: v.id, soort: v.soort, aanleiding: v.aanleiding, codenaam: codenaam(met),
-        ikAntwoordde: v.ja[key] === undefined ? null : !!v.ja[key], geopend: !!v.geopend, at: v.at });
+      if (geblokkeerd && geblokkeerd(R(), key, met)) continue;
+      uit.push(Projection.project(Projection.NAMES.RENDEZVOUS_INTRODUCTION,
+        { id: v.id, soort: v.soort, aanleiding: v.aanleiding, codenaam: codenaam(met),
+          ikAntwoordde: v.ja[key] === undefined ? null : !!v.ja[key], geopend: !!v.geopend, at: v.at,
+          media: profileMedia ? profileMedia.projecteer(key, met, v.geopend ? 'match' : 'discovery') : [] }));
     }
     return { status: 200, introducties: uit.sort((a, b) => String(b.at).localeCompare(String(a.at))) };
   }
@@ -137,6 +136,7 @@ module.exports = (ctx) => {
     const [x, y] = v.id.split('|');
     if (x !== key && y !== key) return { status: 404, error: 'Deze vraag staat niet voor u open.' };
     const met = x === key ? y : x;
+    if (geblokkeerd && geblokkeerd(R(), key, met)) return { status: 403, error: 'Dit contact is geblokkeerd.' };
     v.ja[key] = ja !== false;
 
     /* Een nee sluit de vraag, en de ander hoort niets. Zou er een melding komen,
@@ -161,17 +161,26 @@ module.exports = (ctx) => {
   function encounter(key, pin) {
     const poort = mag(key);
     if (!poort.ok) return { status: 403, error: poort.reden };
+    if (sociaalRate && !sociaalRate(key, 'rendezvous-encounter', 8, 15 * 60 * 1000))
+      return { status: 429, error: 'Te veel Encounter-pogingen. Probeer het later opnieuw.' };
     const doel = handleVanPin ? handleVanPin(String(pin || '').trim()) : null;
     if (!doel || doel === key) return { status: 404, error: 'Die pin wijst niemand aan.' };
     const r = R();
+    if (geblokkeerd && geblokkeerd(r, key, doel)) return { status: 403, error: 'Dit contact is geblokkeerd.' };
     if (!r.ontmoetingen || typeof r.ontmoetingen !== 'object') r.ontmoetingen = {};
     const sl = paar(key, doel);
-    const o = r.ontmoetingen[sl] || (r.ontmoetingen[sl] = { wie: {}, at: nu() });
+    let o = r.ontmoetingen[sl];
+    if (o && o.completed) return { status: 409, error: 'Deze Encounter-code is al gebruikt.' };
+    if (o && Date.now() - Date.parse(o.at) > 12 * 60 * 60 * 1000) o = null;
+    o = o || (r.ontmoetingen[sl] = { wie: {}, at: nu() });
     o.wie[key] = nu();
     save();
-    if (!o.wie[doel]) return { status: 200, ok: true, wacht: true };
+    if (!o.wie[doel]) return { status: 200,
+      ...Projection.project(Projection.NAMES.RENDEZVOUS_ENCOUNTER, { ok: true, wacht: true }) };
+    o.completed = nu();
     introBied('encounter', key, doel, 'u heeft elkaar ontmoet');
-    return { status: 200, ok: true, wacht: false, codenaam: codenaam(doel) };
+    return { status: 200, ...Projection.project(Projection.NAMES.RENDEZVOUS_ENCOUNTER,
+      { ok: true, wacht: false, codenaam: codenaam(doel) }) };
   }
 
   return { ...kantoor, rvTafels: tafels, rvTafelAntwoord: tafelAntwoord,

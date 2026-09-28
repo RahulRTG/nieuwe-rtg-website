@@ -1,8 +1,8 @@
 /* HET GEVOLGCONTRACT VAN DE TIK -- twee mensen die naast elkaar staan.
 
    APART VAN ./register-pay-stuur.js, en de naad is de CODE. Sturen wijst een ontvanger
-   aan met zijn codenaam; tikken doet dat met een code van zes tekens die vijf minuten
-   leeft en die ALLEEN de ontvanger aanwijst. Daar hangt een eigen voorwaarde aan (een
+   aan met zijn codenaam; tikken doet dat met een code van 128 bits die vijf minuten
+   leeft, hoogstens 25 keer werkt en ALLEEN de ontvanger aanwijst (kern/pay/kasbak.js). Daar hangt een eigen voorwaarde aan (een
    geldige, niet-eigen tik) en een eigen mislukking (de tik is verlopen) -- en dat zijn
    precies de twee velden waar een gevolgcontract over gaat.
 
@@ -80,11 +80,11 @@ const TIK = Object.freeze({
          hieronder, en dat is precies de juiste plek: wat er bij de aanbieder gebeurt, is
          geen collectie van dit huis. En de achtergrondronde zelf staat sindsdien stil
          tijdens een meetronde -- zie scripts/idemproef-route.js. */
-      { soort: 'afgeleid', graad: 'vermoed',
-        wat: 'de tik blijft geldig: hij wordt NIET verbruikt, dus dezelfde code kan binnen zijn ' +
-          'vijf minuten door meer mensen gebruikt worden',
-        reden: 'kern/pay/tik.js zet `geldigTot` niet op 0 na een betaling -- met opzet, want de code ' +
-          'wijst alleen de ontvanger aan en er kan dus enkel geld naar hem toe' },
+      { soort: 'direct', graad: 'vermoed', collectie: 'payTikToegang',
+        wat: 'de tik blijft geldig maar telt een gebruik (hoogstens 25), een keer per betaler en ' +
+          'idem-sleutel; een geweigerde betaling geeft haar gebruik terug',
+        reden: 'kern/pay/tik.js claimt het gebruik in de collectietransactie VOOR stuur; beproefd in ' +
+          'test/kascode-tik-vooraf.test.js, nog niet door de idempotentieproef gemeten' },
       { soort: 'buiten', graad: 'vermoed',
         wat: 'is er te weinig saldo, dan wordt er eerst bijgeladen langs de betaalaanbieder',
         uitkomsten: ['niet bijgeladen', 'bijgeladen', 'bijladen mislukt'],

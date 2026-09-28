@@ -32,6 +32,12 @@ function api(pad, body, token) {
   return fetch(base + pad, { method: 'POST', headers: h, body: JSON.stringify(body || {}) })
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
+/* De code staat niet op het kaartje: tonen is roteren (/api/mob/kaart/toon). */
+async function toonCode(id, token) {
+  const t = await api('/api/mob/kaart/toon', { id }, token);
+  assert.equal(t.status, 200, t.body.error || '');
+  return t.body.code;
+}
 let seq = 0;
 async function lid() {
   const u = (Date.now() + (++seq)).toString().slice(-8);
@@ -117,7 +123,8 @@ test('3. een kaartje: prijs uit het lijntarief, op codenaam, met een code die ni
      het uitstappen -- en dat merkt niemand tot een klant het narekent. */
   const verwacht = Math.round(180 + k.km * 22);
   assert.ok(Math.abs(k.prijs - verwacht) <= 1, 'prijs ' + k.prijs + ' volgt het lijntarief (' + verwacht + ')');
-  assert.ok(k.code && k.code.length >= 12, 'de code is lang genoeg om niet te raden');
+  assert.equal(k.code, undefined, 'de code staat niet op het kaartje');
+  assert.match(await toonCode(k.id, lidA), /^OV\.[0-9A-F]{32}$/, 'de code is een 128-bit bearer');
   assert.ok(!/Reiziger \d/.test(JSON.stringify(k)), 'er staat geen echte naam op het kaartje');
 });
 
@@ -142,7 +149,7 @@ test('4. de overeenkomst bepaalt WAT er verkocht mag worden, niet de app', async
 test('5. de controle is de enige plek waar een kaartje opgaat', async () => {
   const r = await api('/api/mob/kaart/koop', { vervoerder: 'TRANSIT', lijnId: 'L1',
     van: 'h-stad', naar: 'h-mar', product: 'enkel', idem: 'k4' }, lidB);
-  const code = r.body.kaartje.code;
+  const code = await toonCode(r.body.kaartje.id, lidB);
 
   // eerst het verkeerde: een andere lijn, en een code die niet bestaat
   const anders = await api('/api/staff/mob/kaart/controle', { code, lijnId: 'F1' }, pda);
@@ -179,7 +186,7 @@ test('6. een retour heeft twee ritten, en is goedkoper dan twee enkeltjes', asyn
   assert.ok(retour.body.kaartje.prijs < enkel.body.kaartje.prijs * 2,
     'de terugweg heeft korting: ' + retour.body.kaartje.prijs + ' < 2x' + enkel.body.kaartje.prijs);
 
-  const code = retour.body.kaartje.code;
+  const code = await toonCode(retour.body.kaartje.id, lidA);
   const een = await api('/api/staff/mob/kaart/controle', { code, lijnId: 'L1' }, pda);
   assert.equal(een.body.kaartje.rittenOver, 1, 'na de heenweg is er nog een rit over');
   const twee = await api('/api/staff/mob/kaart/controle', { code, lijnId: 'L1' }, pda);
@@ -236,7 +243,7 @@ test('7. de teruggave: een keer, door wie erover gaat, en alleen wie het raakte'
      dat elke teruggave het kaartje afsloot, en dan pakt de compensatie voor een
      late bus zijn rit af -- precies andersom dan bedoeld. */
   assert.equal(vergoed.stand, 'geldig', 'een vergoeding voor vertraging kost je je rit niet');
-  const rijdt = await api('/api/staff/mob/kaart/controle', { code: vergoed.code, lijnId: 'L1' }, pda);
+  const rijdt = await api('/api/staff/mob/kaart/controle', { code: await toonCode(vergoed.id, lidB), lijnId: 'L1' }, pda);
   assert.equal(rijdt.status, 200, 'en de conducteur laat hem gewoon door: ' + (rijdt.body.error || ''));
 
   /* Bij UITVAL is het omgekeerd: die rit is niet gereden, het geld is helemaal
@@ -244,12 +251,13 @@ test('7. de teruggave: een keer, door wie erover gaat, en alleen wie het raakte'
   const nieuw = await api('/api/mob/kaart/koop', { vervoerder: 'TRANSIT', lijnId: 'L1',
     van: 'h-stad', naar: 'h-tal', product: 'enkel', idem: 'k7b' }, lidB);
   assert.equal(nieuw.status, 200, nieuw.body.error || '');
+  const nieuwCode = await toonCode(nieuw.body.kaartje.id, lidB);   // getoond VOOR de uitval
   const st2 = await api('/api/staff/mob/kaart/storing', { lijnId: 'L1', soort: 'uitval',
     oorzaak: 'geen chauffeur', van, tot }, pda);
   const uit2 = await api('/api/supplier/mob/kaart/teruggave', { id: st2.body.storing.id }, baas);
   assert.equal(uit2.status, 200, uit2.body.error || '');
   assert.equal(uit2.body.deel, 1, 'bij uitval alles terug');
-  const naUitval = await api('/api/staff/mob/kaart/controle', { code: nieuw.body.kaartje.code, lijnId: 'L1' }, pda);
+  const naUitval = await api('/api/staff/mob/kaart/controle', { code: nieuwCode, lijnId: 'L1' }, pda);
   assert.equal(naUitval.status, 409, 'een volledig terugbetaald kaartje is geen vervoerbewijs meer');
   assert.match(naUitval.body.error, /uitgevallen/);
 });
@@ -282,10 +290,10 @@ test('8. een verlopen of ingetrokken overeenkomst sluit de verkoop meteen', asyn
      punt: de reiziger heeft betaald toen het mocht, en het opzeggen van een
      contract tussen twee bedrijven is geen reden om zijn rit af te pakken. */
   const mijn = await api('/api/mob/kaart/mijn', {}, lidA);
-  const mijnKaart = mijn.body.kaartjes.find(k => k.code === voor.body.kaartje.code);
+  const mijnKaart = mijn.body.kaartjes.find(k => k.id === voor.body.kaartje.id);
   assert.ok(mijnKaart, 'het kaartje staat nog in de app');
   assert.equal(mijnKaart.stand, 'geldig', 'en is nog steeds geldig na het intrekken');
-  const rijdt = await api('/api/staff/mob/kaart/controle', { code: mijnKaart.code, lijnId: 'L1' }, pda);
+  const rijdt = await api('/api/staff/mob/kaart/controle', { code: await toonCode(mijnKaart.id, lidA), lijnId: 'L1' }, pda);
   assert.equal(rijdt.status, 200, 'de conducteur laat hem gewoon door: ' + (rijdt.body.error || ''));
 
   // een overeenkomst die pas volgend jaar begint, verkoopt vandaag niets
@@ -364,7 +372,8 @@ test('11. een abonnement: prijs uit het contract, onbeperkt reizen, een per verv
   assert.equal(ab.dagPrijs, 200, 'de dagprijs is de periodeprijs gedeeld door de dagen');
   assert.deepEqual(ab.lijnen, ['L1', 'M1'], 'hij geldt op de lijnen uit de overeenkomst');
   assert.equal(ab.stand, 'geldig');
-  assert.ok(ab.code && ab.code.length >= 12);
+  assert.equal(ab.code, undefined);
+  const abCode = await toonCode(ab.id, lidD);
 
   const dubbel = await api('/api/mob/abo/koop', { vervoerder: 'TRANSIT', idem: 'a4' }, lidD);
   assert.equal(dubbel.status, 409, 'twee lopende abonnementen bij dezelfde vervoerder kan niet');
@@ -372,7 +381,7 @@ test('11. een abonnement: prijs uit het contract, onbeperkt reizen, een per verv
   /* Onbeperkt is echt onbeperkt: drie controles achter elkaar en hij blijft
      geldig. Een enkeltje was na de eerste op. */
   for (let i = 1; i <= 3; i++) {
-    const c = await api('/api/staff/mob/kaart/controle', { code: ab.code, lijnId: 'L1' }, pda);
+    const c = await api('/api/staff/mob/kaart/controle', { code: abCode, lijnId: 'L1' }, pda);
     assert.equal(c.status, 200, 'rit ' + i + ': ' + (c.body.error || ''));
     assert.equal(c.body.geldig, true);
     assert.match(c.body.melding, /abonnement/i);
@@ -390,7 +399,7 @@ test('11. een abonnement: prijs uit het contract, onbeperkt reizen, een per verv
     'het abonnement staat niet ook nog eens bij de losse kaartjes');
 
   // en niet op een lijn die de overeenkomst niet dekt
-  const ferry = await api('/api/staff/mob/kaart/controle', { code: ab.code, lijnId: 'F1' }, pda);
+  const ferry = await api('/api/staff/mob/kaart/controle', { code: abCode, lijnId: 'F1' }, pda);
   assert.equal(ferry.status, 409, 'de ferry staat niet in de overeenkomst');
   assert.match(ferry.body.error, /niet op deze lijn/);
 });
@@ -417,6 +426,6 @@ test('12. de teruggave bij een storing rekent een abonnement op DAGbasis af', as
     'de teruggave is een dagprijs (' + ab.dagPrijs + '), niet de periodeprijs (' + ab.prijs + ')');
   assert.equal(na.stand, 'geldig', 'en het abonnement loopt gewoon door');
 
-  const nog = await api('/api/staff/mob/kaart/controle', { code: ab.code, lijnId: 'L1' }, pda);
+  const nog = await api('/api/staff/mob/kaart/controle', { code: await toonCode(ab.id, lidE), lijnId: 'L1' }, pda);
   assert.equal(nog.status, 200, 'de reiziger mag er nog steeds mee reizen');
 });

@@ -57,9 +57,9 @@ module.exports = (kern) => {
   app.post('/api/tenant/bootstrap/mijn', authEenmaal, (req, res) => {
     const key = req.session && req.session.key;
     if (!key) return res.status(403).json({ error: 'Geen RTG-sessie gevonden.' });
-    let rijen = tenant.bootstrap.voorRtg(key);
     const gekozen = String((req.body || {}).werkruimte || '').trim().toUpperCase();
-    if (gekozen) rijen = rijen.filter(r => r.werkruimte && r.werkruimte.code === gekozen);
+    const rijen = tenant.bootstrap.voorRtg(key, gekozen || null);
+    if (rijen.some(r => r.lidToken)) kern.save();  // een verse lid-sessie, alleen als hash bewaard
     res.json({ ok: true, aantal: rijen.length, werkruimtes: rijen,
       let: rijen.length ? null : 'Uw RTG-account hangt aan geen enkele werkruimte. Dat gebeurt pas als uw werkgever een groep van zijn identiteitsprovider aan een rol koppelt.' });
   });

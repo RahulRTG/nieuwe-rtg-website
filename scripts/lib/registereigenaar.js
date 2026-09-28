@@ -54,6 +54,8 @@ const WORTEL = path.join(__dirname, '..', '..');
    er geen programma is en dat een mens of een keuring hem onderhoudt -- dan hoort
    er een LEZER bij te staan, want een register dat niemand leest is geen register. */
 const EIGENAAR = {
+  'SALOON.md': { soort: 'BRON',
+    waarom: 'Handmatig onderhouden implementatie- en bereikbeschrijving van Saloon; bron-, integratie- en schermtests leveren het afzonderlijke bewijs.' },
   /* Twee registers uit de afbouw van APPWERKT (24 september 2026). Beide zijn
      een bron voor een bewijs en worden via versheid() gelezen, dus hun eigenaar
      staat hier en niet alleen in de detectie. */
@@ -80,16 +82,30 @@ const EIGENAAR = {
     waarom: 'Handmatig onderhouden ontwerp- en implementatienotitie voor de drie goedgekeurde homes, met de daadwerkelijk uitgevoerde proeven en hun grenzen.' },
   'LANGUAGE.md': { soort: 'BRON',
     waarom: 'Handmatig onderhouden architectuur- en bereikbeschrijving; de drie taalrapporten dragen het afzonderlijke uitvoerbare bewijs.' },
+  'VRIJHEID.md': { soort: 'BRON',
+    waarom: 'Handmatig geschreven richtingsdocument (RTG Vrijheid: tijd, rust, vrijheid en eerlijkheid); de machineleesbare lusstand staat in server/kern/vrijheid/lus.js en wordt door test/vrijheid-lus.test.js tegen de boom gehouden, er is geen generator die het schrijft.' },
   'TOESTEL.md': { soort: 'BRON',
     waarom: 'Handmatig geschreven richtingsdocument (AI op het toestel van het lid); de gerepareerde herkomst staat in test/ai-herkomst.test.js, er is geen generator die het schrijft.' },
+  'RELEASEKANDIDAAT.md': { soort: 'BRON',
+    waarom: 'Handmatig geschreven blocker-matrix voor de release candidate V1 met de besluiten van de eigenaar; de getallen erin zijn met de hand uit productie-status, golive en de releasepoort overgenomen, er is geen generator die het schrijft.' },
   'AUTHORITY.md': { soort: 'BRON',
     waarom: 'Handmatig geschreven richtingsdocument (RTG Authority Engine); de bronverwijzingen zijn met de hand nagelopen, er is geen generator die het schrijft.' },
   'BENOEMING.md': { soort: 'BRON',
     waarom: 'Handmatig geschreven richtingsdocument (RTFoundation Roles & Governance 2.0); de bronverwijzingen erin zijn met de hand nagelopen, er is geen generator die het schrijft.' },
   'POLITIEK.md': { soort: 'BRON',
     waarom: 'Handmatig geschreven richtingsdocument (DemocratieOS en de partij); de bronverwijzingen erin zijn met de hand nagelopen, er is geen generator die het schrijft.' },
+  'ACADEMY.md': { soort: 'BRON',
+    waarom: 'Handmatig geschreven richtings- en bouwdocument (RTG Academy, het leerhuis); de blokkades erin worden door test/leerhuis-lus.test.js tegen scripts/leerhuisproef.js gehouden, er is geen generator die het schrijft.' },
+  'PERSONEEL.md': { soort: 'BRON',
+    waarom: 'Handmatig geschreven richtingsdocument (de werkervaring van RTG, van eigenaar tot kantine); de bronverwijzingen erin zijn met de hand nagelopen, er is geen generator die het schrijft.' },
   'BEWIJSLUS.md': { soort: 'BRON',
     waarom: 'Handmatig geschreven richtingsdocument (de terugweg van productie naar bewijs); de namen en bronverwijzingen erin zijn met de hand gemeten, er is geen generator die het schrijft.' },
+  /* De nulmeting van de universele bodem (SAMENLEVING.md par. 11). De meting is
+     afgeleid; de indeling van functies in werkwoorden is een VERKLARING in
+     scripts/lib/onvervreemdbaar-verklaring.js en nog door geen mens afgetekend. */
+  'ONVERVREEMDBAAR.json': { schrijver: 'scripts/onvervreemdbaar.js' },
+  'SAMENLEVING.md': { soort: 'BRON',
+    waarom: 'Handmatig geschreven grondwet (de universele bodem en SAM-01 t/m 07); de meetgetallen erin komen uit ONVERVREEMDBAAR.json en zijn met de hand overgenomen, er is geen generator die het schrijft.' },
   'LANGUAGE-AUDIT.md': { soort: 'BRON',
     waarom: 'Handmatig beoordeelde bevindingen en resterende taalgrenzen; geen automatisch gegenereerd register.' },
   /* De aanleiding zelf. Er is geen schrijvend script: de lijst wordt met de hand
@@ -189,10 +205,18 @@ const EIGENAAR = {
   'BEWIJSKOSTEN.json': { soort: 'MOMENTOPNAME', schrijver: 'scripts/bewijskosten.js' },
 
   /* De lagen die in deze tak zijn gebouwd. */
+  'CONNECTION_OS.md': { soort: 'BRON',
+    waarom: 'Handmatig onderhouden bouwspecificatie en architectuurbesluiten voor Connection OS; de uitvoerbare toetsen en CONNECTION_CONSTITUTION.json leveren het afzonderlijke bewijs.' },
+  'CONNECTION_OS_FINAL.md': { soort: 'BRON',
+    waarom: 'Handmatig onderhouden finale productscope en acceptatiegrenzen voor Vonk en Rendez-vous; geen generator schrijft dit document.' },
   'IDEMIDENTITEIT.json': { schrijver: 'scripts/idemidentiteit.js' },
   'DOCTRINE.json': { schrijver: 'scripts/doctrine.js' },
   'VERBAND.json': { schrijver: 'scripts/verband.js' },
   'GELDING.json': { schrijver: 'scripts/gelding.js' },
+  'CONNECTION_CONSTITUTION.json': { schrijver: 'scripts/connection-constitution.js',
+    waarom: 'de machinaal afgeleide Connection OS-grondwet: capability-, policy-, consent-, projectie- en ' +
+      'productstatebewijzen worden door scripts/connection-constitution.js uit de levende bron en toetsen ' +
+      'samengebracht; het bestand wordt niet handmatig onderhouden' },
 
   /* De dragende registers van de bewijsmachine. */
   'WETTEN.json': { handmatig: true, lezer: 'scripts/wetten.js',
@@ -232,6 +256,10 @@ const EIGENAAR = {
       'namens-iemand-handelen een vorm en een woordenschat? Geschreven met --vastleggen, ' +
       'gelezen door test/namensvorm.test.js, scripts/norm.js (de ratel namensMechanismenGemeten) ' +
       'en scripts/getallen.js (zeven levende getallen in het document).' },
+  'BEDRIJFSMAAT.json': { schrijver: 'scripts/bedrijfsmaat.js',
+    waarom: 'het bedrijfsmaatregister: per maat over RTG als onderneming of hij bestaat en welk element ' +
+      'ontbreekt, met de ketens en de groepsgrens. De catalogus woont in server/kern/bedrijfsmaat/; ' +
+      'geschreven met --vastleggen, gelezen door test/bedrijfsmaat.test.js.' },
   'SPOORVORM.json': { schrijver: 'scripts/spoorvorm.js',
     waarom: 'de convergentiematrix achter REPRESENTATIE.md par. 8.1: hoeveel van de zeven ' +
       'mechanismen halen de vier spoor-eigenschappen die kern/vertegenwoordiging/handelen.js ' +

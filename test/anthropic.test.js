@@ -118,15 +118,21 @@ test('messages.create stuurt de juiste headers + body en geeft het antwoord teru
 });
 
 test('429 wordt herprobeerd en daarna slaagt het', async () => {
+  /* Tel alleen de pogingen van DEZE client: een hergebruikte poort kan een
+     verdwaald verzoek van een andere toets ontvangen (in CI telde de toets
+     een keer 7 in plaats van 3), en dat is geen poging van deze client. */
+  const SLEUTEL = 'sk-test-429-' + process.pid + '-' + Date.now();
   let n = 0;
   const { srv, poort } = await nepApi((req, body, res) => {
+    if (req.headers['x-api-key'] !== SLEUTEL) { res.writeHead(503); res.end('{}'); return; }
     n++;
     if (n < 3) { res.writeHead(429); res.end('{"error":"overloaded"}'); return; }
     res.writeHead(200, { 'content-type': 'application/json' });
     res.end(JSON.stringify({ content: [{ type: 'text', text: 'eindelijk' }], stop_reason: 'end_turn' }));
   });
   try {
-    const msg = await metDeadline(client(poort).messages.create({ model: 'x', max_tokens: 10, messages: [] }), 'messages.create met herproberen');
+    const eigen = new Anthropic({ apiKey: SLEUTEL, baseURL: 'http://127.0.0.1:' + poort, maxRetries: 3 });
+    const msg = await metDeadline(eigen.messages.create({ model: 'x', max_tokens: 10, messages: [] }), 'messages.create met herproberen');
     assert.strictEqual(msg.content[0].text, 'eindelijk');
     assert.strictEqual(n, 3, 'twee keer geprobeerd, derde keer raak');
   } finally { sluitServer(srv); }

@@ -6,13 +6,15 @@
    bestelling echt bij de gekoppelde groothandel geplaatst. */
 
 const { dagContext } = require('./context');
+const { maakInplanbaar, NIET_GELEZEN } = require('./payroll/inplanbaar');
 /* Een vastgesteld weekrooster schrijft zeven dagen maal het hele personeel in
    EEN veld op de zaak (s.roosterVast). Nul rijen verschil, dus onzichtbaar voor
    de rij-telling van server/opzet/handeling.js -- daarom meldt hij zijn omvang
    zelf. */
 const handeling = require('../opzet/handeling');
 
-function maakAgent({ db, crypto, findSupplier, notifySupplier, ghBijbestelVoorstel, ghPlaatsBestelling, accounts, weekdagFactor, SHIFT_NAMES, save, logActivity }) {
+function maakAgent({ db, crypto, findSupplier, notifySupplier, ghBijbestelVoorstel, ghPlaatsBestelling, accounts, weekdagFactor, SHIFT_NAMES, save, logActivity, afwezigOp }) {
+  const inplanbaar = maakInplanbaar(afwezigOp);
   const agentVan = s => {
     const a = (s.agent = s.agent || { partnerCode: null, auto: false, voorstellen: [], rooster: null });
     // een zaak kan meerdere groothandels hebben; oude databases (een enkele
@@ -123,12 +125,16 @@ function maakAgent({ db, crypto, findSupplier, notifySupplier, ghBijbestelVoorst
   function roosterVoorstel(s) {
     const staff = accounts.listStaff(s.code).map(accounts.publicStaff);
     if (!staff.length) return { status: 409, error: 'Geen personeel gevonden.' };
-    const days = [];
+    const days = []; let nietGelezen = false, vrijgehouden = 0;
     for (let d = 0; d < 7; d++) {
       const date = new Date(Date.now() + d * 86400000);
       const [factor, label] = weekdagFactor(date);
       const druk = factor >= 1.1;
       const rows = staff.map((m, i) => {
+        // ziek of vrij: niet inplannen
+        const ip = inplanbaar(s.code, m.id, date.toISOString().slice(0, 10));
+        if (ip.onbekend) nietGelezen = true;
+        if (!ip.plan) { vrijgehouden++; return { id: m.id, name: m.name, role: m.role, shift: SHIFT_NAMES[2], afwezig: ip.zin }; }
         let shift;
         if (m.role === 'manager') shift = SHIFT_NAMES[0];
         else if (!druk && (i + d) % Math.max(2, staff.length) === 0) shift = SHIFT_NAMES[2];
@@ -137,7 +143,8 @@ function maakAgent({ db, crypto, findSupplier, notifySupplier, ghBijbestelVoorst
       });
       days.push({ date: date.toISOString().slice(0, 10), label, factor, staff: rows });
     }
-    agentVan(s).rooster = { days, status: 'voorstel', at: new Date().toISOString() };
+    agentVan(s).rooster = { days, status: 'voorstel', at: new Date().toISOString(),
+      afwezigheid: nietGelezen ? NIET_GELEZEN : vrijgehouden + ' dienst(en) vrijgehouden voor wie afwezig is.' };
     save();
     return { status: 200, ok: true, rooster: agentVan(s).rooster };
   }

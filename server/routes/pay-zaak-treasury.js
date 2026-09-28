@@ -60,8 +60,8 @@ module.exports = (kern, { stuurZaak }) => {
     if (r.ok) sseToOffice('sync', { scope: 'pay' });
     stuurZaak(res, r);
   });
-  app.post('/api/supplier/pay/vrijgeef', supplierAuth, (req, res) => {
-    stuurZaak(res, pay.kasVrijgeef({ supplierCode: req.supplier.code, reservering: req.body.reservering }));
+  app.post('/api/supplier/pay/vrijgeef', supplierAuth, async (req, res) => {
+    stuurZaak(res, await pay.kasVrijgeef({ supplierCode: req.supplier.code, reservering: req.body.reservering }));
   });
   app.post('/api/supplier/pay/vooraf/lijst', supplierAuth, (req, res) => {
     stuurZaak(res, pay.voorafVanZaak(req.supplier.code));

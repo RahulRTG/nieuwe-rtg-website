@@ -774,22 +774,22 @@ zetWacht(wacht);
    Lifestyle & Business: volledige interactie met alle leden.
    Wederkerigheid: spreekt een hoger lid een RTG-lid aan (reactie of DM
    op diens post), dan mag dat RTG-lid bij die persoon terugpraten. */
-/* De leden-laag (contactregels, memberTemplate, de leden-app-state en de
-   eigen sollicitaties) staat in server/kern/lid.js. findSupplier en geborenVan
-   zijn hoisted functies en dus hier al bruikbaar. */
-/* Wereldtalen (server/talen.js): de Boardroom zet per taal een schakelaar aan of
-   uit; iedereen chat in de eigen taal en de ander leest alles in de zijne. Vroeg
-   opgezet zodat de leden-laag (en alles daarna) taalVan kan gebruiken. */
+/* De leden-laag (contactregels, memberTemplate, leden-app-state, eigen
+   sollicitaties) staat in server/kern/lid.js; findSupplier en geborenVan
+   zijn hoisted. */
+/* Wereldtalen (server/talen.js): de Boardroom zet per taal een schakelaar;
+   iedereen chat in de eigen taal. Vroeg, zodat de leden-laag taalVan kent. */
 const talen = maakTalen({ db, save });
-/* Salon-claimcodes zijn bearers en delen daarom een eigen transactionele kern
-   tussen de leden- en leveranciersroute. Hij staat vóór de ledenprojectie,
-   zodat die uitsluitend statusmetadata en nooit de kale code teruggeeft. */
+/* Salon-claim-, afhaal- en ticketcodes: bearers met een eigen transactionele
+   kern, vóór de ledenprojectie (die nooit de kale code toont). */
 const salonClaimcode = require('./kern/salon-claimcode')({
   db, save, bewerkCollectie, crypto
 });
-/* PostgreSQL neemt zijn waarheid pas asynchroon over; die variant draait daarom
-   in startPostgresMetSalon en niet vóór de pull. De drie lokale migraties
-   draaien verderop samen, zodra ook Samen en Luchthaven zijn opgebouwd. */
+const afhaalcode = require('./kern/afhaalcode')({ db, bewerkCollectie, crypto });
+const tickettoegang = require('./kern/tickettoegang')({ db, save, bewerkCollectie, crypto,
+  oudeRijen: () => ({ boekingen: db.data.boekingen, posSales: db.data.posSales }) });
+/* PostgreSQL neemt pas asynchroon over (startPostgresMetSalon); de lokale
+   migraties draaien na Samen. */
 const startPostgresMetSalon = () => {
   /* opslagstart roept deze ingang voor elke motor aan. Een lokale standby mag
      daardoor niet via de inerte Postgres-tak ten onrechte "gemigreerd" worden. */
@@ -805,6 +805,7 @@ const startPostgresMetSalon = () => {
     if (!kern.lucht || typeof kern.lucht.migreerBoardingPasses !== 'function')
       throw new Error('TravelOS boarding-passmigratie ontbreekt bij de opslagstart.');
     await kern.lucht.migreerBoardingPasses();
+    await kern.bedrijf.migreerSleutels(bewerkCollectie);
   })).then(gestart => {
     salonMigratieKlaar = true;
     rtfSamenMigratieKlaar = true;
@@ -1722,13 +1723,16 @@ const {
   }
 });
 
+// afwezigheid voor de planners, laat gelezen: zie kern/payroll/afwezig-laat.js
+const afwezigOp = require('./kern/payroll/afwezig-laat')(() => kern);
+
 /* De AI-bedrijfsagent (kern/agent.js): vaste leverancier koppelen, AI-inkoop-
    voorstellen op verkoop + mise en place + verwachte drukte, en het AI-week-
    rooster; de gemachtigde (manager) keurt goed, past aan of wijst af. */
 const { maakAgent } = require('./kern/agent');
 const { agentKoppel, agentPubliek, agentVoorstel, agentBeslis, roosterVoorstel, roosterBeslis } = maakAgent({
   db, crypto, findSupplier, notifySupplier, ghBijbestelVoorstel, ghPlaatsBestelling,
-  accounts, weekdagFactor, SHIFT_NAMES, save, logActivity
+  accounts, weekdagFactor, SHIFT_NAMES, save, logActivity, afwezigOp
 });
 
 /* Mode-bezorging (kern/modebezorg.js): een modewinkel zet in een tik een slimme,
@@ -1793,7 +1797,7 @@ const {
   bevMeldIncident, bevBeslisIncident, bevSos, bevCommand,
   // de sleuf waar opzet/plaatsbronnen.js de plaatslaag in hangt (late binding)
   bevKoppelPlaats
-} = maakBeveiliging({ db, save, crypto, accounts, findSupplier, notify, notifySupplier, sseToSupplier, sseToOffice, logActivity, haversine });
+} = maakBeveiliging({ db, save, crypto, accounts, findSupplier, notify, notifySupplier, sseToSupplier, sseToOffice, logActivity, haversine, afwezigOp });
 
 /* De idempotentie-administratie van de betaal-naad (server/betaal.js) durable
    maken: dezelfde idempotentiesleutel geeft ook NA een herstart hetzelfde
@@ -2050,7 +2054,7 @@ const { runItem, runKey, sortRunsheet, fallbackRunsheet, parseRunsheetText, cate
 /* De personeelslaag (klok, vertrouwenslijn, weekrooster) staat in
    server/kern/personeel.js. SHIFT_NAMES komt daar rechtstreeks vandaan; de
    functies dragen db + accounts. */
-const { urenVan, klokVan, trustVan, scheduleFor } = maakPersoneel({ db, accounts });
+const { urenVan, klokVan, trustVan, scheduleFor } = maakPersoneel({ db, accounts, afwezigOp });
 
 // backoffice: de vertrouwenspersoon leest en antwoordt
 
@@ -2071,11 +2075,9 @@ const BOEK_KETEN = ['aangevraagd', 'bevestigd', 'afgerond'];
 
 // dienstenbeheer: de zelfstandige is baas over het eigen aanbod
 
-/* ---- cadeaukaarten ----
-   Kopen via de leden-app (Face ID) of verkopen aan de kassa; innen door de
-   zaak op code. Boekhoudkundig correct: de verkoop is nog geen omzet (het
-   saldo is een verplichting op de balans), de btw hoort bij de inwisseling. */
-const gcCode = () => 'RTG-GC-' + crypto.randomBytes(3).toString('hex').toUpperCase();
+/* cadeaukaarten: 128-bit code, alleen als hash, verzilverd in een
+   collectietransactie (kern/cadeaukaart.js, pay.giftcard_value_code). */
+const cadeaukaart = require('./kern/cadeaukaart')({ db, bewerkCollectie, crypto });
 
 
 
@@ -2283,7 +2285,7 @@ const kern = {
   chatKeyOf, chatStuur, checkCred, coachCache, coachRules, conciergeInbox, connectedSupplierCodes, convOf,
   crypto, cvReady, db, bijeen, deptsFor, dirTouch, eisAccount, engageError, ensureApplyChat, foutmelder,
   ensureSupplierDefaults, etaMinutes, eventCovers, express, fallbackRunsheet, financeVoor, dagrapport, shiftSamenvatting, findPartner, findStaffPartner,
-  findSupplier, forgetSession, forgetSessionDuurzaam, fs, gcCode, geborenVan, geenGast, idGeverifieerd, generateAiReply,
+  findSupplier, forgetSession, forgetSessionDuurzaam, fs, cadeaukaart, geborenVan, geenGast, idGeverifieerd, generateAiReply,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   eersteBijdrageFactuur, ledenInhoudVan, leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
   mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, handelsketen, agenda, notities, vertegenwoordiging, rugdekking, carriereledger, bestanden, bestandenOpslag, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, factuurSaldo, corrigeerFactuur, markt,
@@ -2295,7 +2297,7 @@ const kern = {
   sseSend, sseToCustomer, sseToOffice, sseToSupplier, stateFor, stationsForOrder, supplierAuth, supplierState, persoonsPoort,
   toRad, tokenHash, tooManyTries, totpOk, trChat, trustVan, unlockDoor, urenVan, validDept, veiligGelijk, logInlog,
   securityLogKeten, handelingsspoor, ankerdienst, ankerpost,
-  zorgContact, klantSalon, salonClaimcode,
+  zorgContact, klantSalon, salonClaimcode, afhaalcode, tickettoegang,
   // de stemming van Rahul + de geloofslaag (kern/rahul/stemming.js, kern/geloof/)
   geloof, stemmingToon: stemming.stemmingToon, stemmingZet: stemming.stemmingZet,
   stemmingVoor: stemming.stemmingVoor,
@@ -2382,7 +2384,7 @@ const hulp = {
      "herstelTegoed is not a function": het lid kreeg een 500 waar een nette
      409 hoorde, en het tegoed bleef verrekend. Nooit de ene helft van dit
      paar doorgeven zonder de andere. */
-  ordersVanKlant, ordersVanZaak, pasTegoedToe, herstelTegoed, path, pickupCode, pinSlot, pushLive, rememberSession,
+  ordersVanKlant, ordersVanZaak, pasTegoedToe, herstelTegoed, path, pickupCode, afhaalcode, pinSlot, pushLive, rememberSession,
   reserveerTafel, rtf, rtmail, save, schoon, sessieregister, sendPush, sendPushToUser, sociaal, sseToCustomer,
   sseToOffice, sseToSupplier, supplierState, ticketsVoorSlot, verdienPunten, zetRtgai, zetServiceOverdracht, zorgContact,
   /* Voor "wie van je vrienden is er nu" (kern/spellen/presence.js): de levende
@@ -2412,21 +2414,17 @@ require('./opzet/kernlaag4b')(kern, hulp);
 require('./opzet/kernlaag4c')(kern, hulp);   // de drie kantoorkamers; NA 4b, want regering leest kern.bank
 require('./opzet/kernlaag5')(kern, hulp);
 require('./opzet/kernlaag5f')(kern, hulp);  // RTG Festival; hangt onder EEN naam, zie de kop daar
+require('./opzet/kernlaag5g')(kern, hulp);  // RTG Vrijheid; hangt onder EEN naam (kern.vrijheid), zie VRIJHEID.md
 require('./opzet/kernlaag6')(kern, hulp);
 require('./opzet/kernlaag6b')(kern, hulp);
 require('./opzet/kernlaag7')(kern, hulp);
 require('./opzet/kernlaag7b')(kern, hulp);   // de routers ophangen; zie de kop daar waarom dat NA alle Object.assign moet
 
-/* JSON/SQLite/geheugen zijn al autoritatief geladen. Verwijder oude kale
-   Salon-, FoundationOS-Samen- en boarding-passcodes daarom vóór een schrijvende
-   instance verkeer kan aannemen. De lokale collectiemotor moet hier synchroon
-   committen; als dat ooit verandert, weigert de start in plaats van een half
-   gemigreerde instance vrij te geven. */
-/* Een losse server begint schrijvend en migreert vóór listen(). Een
-   trio-server begint bewust als standby: die mag de gedeelde SQLite-opslag niet
-   wijzigen en migreert pas in /api/cluster/promote, direct na zijn verse load().
-   Zo blijft opslag fail-closed zonder dat elke gezonde standby in een
-   opstart-crashlus belandt. */
+/* JSON/SQLite/geheugen zijn al geladen: verwijder oude kale codes (Salon,
+   Samen, boarding, WerkOS) vóór verkeer. Lokaal commit dat synchroon, anders
+   weigert de start. */
+/* Een losse server migreert vóór listen(); een trio-standby pas in
+   /api/cluster/promote, na zijn verse load() (fail-closed, geen crashlus). */
 if (STORE !== 'postgres' && db.writable) migreerLokaleToegang();
 function migreerLokaleToegang() {
   if (STORE !== 'postgres') {
@@ -2449,6 +2447,8 @@ function migreerLokaleToegang() {
     if (boardingMigratie && typeof boardingMigratie.then === 'function')
       throw new Error('Lokale TravelOS boarding-passmigratie committe niet synchroon.');
     boardingPassMigratieKlaar = true;
+    if (kern.bedrijf.migreerSleutels(bewerkCollectie) instanceof Promise)
+      throw new Error('Lokale WerkOS-sleutelmigratie committe niet synchroon.');
   }
 }
 

@@ -193,6 +193,11 @@ function openResto(ds){
   $('#blad').classList.add('open');
   laadTijden();
 }
+/* Escape sluit het reserveerblad via dezelfde weg terug als de knop erop;
+   zonder dit zat een toetsenbordgebruiker erachter (gemeten 27 september 2026). */
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && $('#blad').classList.contains('open')) $('#bladTerug').click();
+});
 async function laadTijden(){
   $('#rSlots').innerHTML = '<div class="leeg">Laden...</div>';
   let d;

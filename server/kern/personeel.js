@@ -5,9 +5,11 @@
    De vertrouwenslijn is strikt vertrouwelijk: de werkgever ziet er niets van
    (geen activiteit, geen melding); alleen de backoffice leest en antwoordt. */
 
+const { maakInplanbaar } = require('./payroll/inplanbaar');
 const SHIFT_NAMES = ['Ochtend 07:00-15:00', 'Avond 15:00-23:00', 'Vrij'];
 
-function maakPersoneel({ db, accounts }) {
+function maakPersoneel({ db, accounts, afwezigOp }) {
+  const inplanbaar = maakInplanbaar(afwezigOp);
   const urenVan = ms => Math.round(ms / 360000) / 10; // uren met een decimaal
 
   function klokVan(code, staffId) {
@@ -44,11 +46,16 @@ function maakPersoneel({ db, accounts }) {
       days.push({
         date: dstr,
         label: (d === 0 ? 'Vandaag' : d === 1 ? 'Morgen' : dayNames[date.getDay()]),
-        staff: staff.map((m, i) => ({
-          id: m.id, name: m.name, role: m.role,
+        staff: staff.map((m, i) => {
           // managers vaker overdag; iedereen om de paar dagen vrij
-          shift: (vast[dstr] && vast[dstr][m.id]) || SHIFT_NAMES[(m.id * 3 + doy + (m.role === 'manager' ? 0 : i)) % 3]
-        }))
+          const shift = (vast[dstr] && vast[dstr][m.id]) || SHIFT_NAMES[(m.id * 3 + doy + (m.role === 'manager' ? 0 : i)) % 3];
+          /* Wie afwezig is, staat hier VRIJ -- met alleen DAT hij afwezig is:
+             dit rooster ziet het hele team, dus geen verlofsoort (die ziet de
+             leidinggevende in /api/supplier/verzuim/planning). */
+          const ip = inplanbaar(code, m.id, dstr);
+          return ip.plan ? { id: m.id, name: m.name, role: m.role, shift }
+            : { id: m.id, name: m.name, role: m.role, shift: SHIFT_NAMES[2], afwezig: true };
+        })
       });
     }
     return { days, shifts: SHIFT_NAMES };

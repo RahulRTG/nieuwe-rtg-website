@@ -1,23 +1,23 @@
 {
   "stempel": {
-    "op": "2026-09-19T19:06:20.794Z",
-    "commit": "6083f652",
+    "op": "2026-09-27T11:13:24.087Z",
+    "commit": "fb52862c",
     "boomVuil": false,
-    "boomAnders": 32,
+    "boomAnders": 0,
     "instrument": "scripts/zaakwig.js",
     "node": "v22.22.2"
   },
   "hoe": "npm run zaakwig:vast",
   "grens": "Dit is EEN scenario in EEN zaak op drie treden, geen dekking. Het bewijst dat deze keten rondkomt en dat deze invarianten houden -- niet dat elke bestelweg, elk genre of elke betaalvorm klopt. `niet-gedraaid` is hier met opzet geen geslaagde uitslag.",
-  "gemetenOp": "2026-09-19",
+  "gemetenOp": "2026-09-27",
   "treden": [
     {
       "trede": "bestellen",
       "tredeNaam": "Trede 3 · De vloer draait",
       "geldAan": false,
       "zaak": "KIKUNOI",
-      "ref": "RTG-O-C5CA58",
-      "pickup": "5UPJ",
+      "ref": "RTG-O-1DB5FA",
+      "pickup": "RBQU",
       "stappen": [
         {
           "wat": "lid logt in",
@@ -83,6 +83,12 @@
           "goed": true
         },
         {
+          "wat": "een onbetaalde bon krijgt geen afhaalcode",
+          "uitleg": "antwoord: 409",
+          "uitkomst": "ok",
+          "goed": true
+        },
+        {
           "wat": "zonder betaalrail weigert ook de KASSA",
           "uitleg": "antwoord: 503 -- administratief \"voldaan\" zetten is ook betalen",
           "uitkomst": "ok",
@@ -97,8 +103,8 @@
       "tredeNaam": "Trede 4 · Het fundament (de wig)",
       "geldAan": true,
       "zaak": "KIKUNOI",
-      "ref": "RTG-O-95B6E4",
-      "pickup": "AFAB",
+      "ref": "RTG-O-3B976D",
+      "pickup": "TBFZ",
       "stappen": [
         {
           "wat": "lid logt in",
@@ -141,6 +147,11 @@
           "geslaagd": true
         },
         {
+          "wat": "het lid toont zijn afhaal-QR",
+          "status": 200,
+          "geslaagd": true
+        },
+        {
           "wat": "de kassa vindt hem op de afhaalcode",
           "status": 200,
           "geslaagd": true
@@ -161,13 +172,13 @@
         },
         {
           "wat": "de betaling hoort bij DEZELFDE bon",
-          "uitleg": "betaald: RTG-O-95B6E4",
+          "uitleg": "betaald: RTG-O-3B976D",
           "uitkomst": "ok",
           "goed": true
         },
         {
           "wat": "de zaak ziet DEZELFDE bon",
-          "uitleg": "op ref RTG-O-95B6E4",
+          "uitleg": "op ref RTG-O-3B976D",
           "uitkomst": "ok",
           "goed": true
         },
@@ -180,6 +191,18 @@
         {
           "wat": "het lid ziet dezelfde status als de zaak zette",
           "uitleg": "bij het lid: in bereiding",
+          "uitkomst": "ok",
+          "goed": true
+        },
+        {
+          "wat": "het bonnummer alleen geeft niets uit",
+          "uitleg": "antwoord: 404 -- 200 zou betekenen dat vier tekens een bestelling uitgeven",
+          "uitkomst": "ok",
+          "goed": true
+        },
+        {
+          "wat": "de kassa geeft DEZELFDE bon uit",
+          "uitleg": "uitgegeven: RTG-O-3B976D",
           "uitkomst": "ok",
           "goed": true
         },
@@ -198,8 +221,8 @@
       "tredeNaam": "Trede 6 · Alles open",
       "geldAan": true,
       "zaak": "KIKUNOI",
-      "ref": "RTG-O-FDB186",
-      "pickup": "J6A9",
+      "ref": "RTG-O-8BF058",
+      "pickup": "VJKM",
       "stappen": [
         {
           "wat": "lid logt in",
@@ -242,6 +265,11 @@
           "geslaagd": true
         },
         {
+          "wat": "het lid toont zijn afhaal-QR",
+          "status": 200,
+          "geslaagd": true
+        },
+        {
           "wat": "de kassa vindt hem op de afhaalcode",
           "status": 200,
           "geslaagd": true
@@ -262,13 +290,13 @@
         },
         {
           "wat": "de betaling hoort bij DEZELFDE bon",
-          "uitleg": "betaald: RTG-O-FDB186",
+          "uitleg": "betaald: RTG-O-8BF058",
           "uitkomst": "ok",
           "goed": true
         },
         {
           "wat": "de zaak ziet DEZELFDE bon",
-          "uitleg": "op ref RTG-O-FDB186",
+          "uitleg": "op ref RTG-O-8BF058",
           "uitkomst": "ok",
           "goed": true
         },
@@ -281,6 +309,18 @@
         {
           "wat": "het lid ziet dezelfde status als de zaak zette",
           "uitleg": "bij het lid: in bereiding",
+          "uitkomst": "ok",
+          "goed": true
+        },
+        {
+          "wat": "het bonnummer alleen geeft niets uit",
+          "uitleg": "antwoord: 404 -- 200 zou betekenen dat vier tekens een bestelling uitgeven",
+          "uitkomst": "ok",
+          "goed": true
+        },
+        {
+          "wat": "de kassa geeft DEZELFDE bon uit",
+          "uitleg": "uitgegeven: RTG-O-8BF058",
           "uitkomst": "ok",
           "goed": true
         },

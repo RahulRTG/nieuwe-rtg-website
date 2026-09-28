@@ -119,7 +119,7 @@ test('2-4. echte server: aanwijzen, in dienst, uit dienst -- en de review blijft
   assert.equal(zet.status, 200, JSON.stringify(zet.body));
   /* dezelfde aanwijzing nog een keer is een dubbeltik: niets verandert, ook de
      datum niet. Binnen het venster antwoordt de idem-poort
-     (lib/idemsleutels-kantoorhuis.js), daarbuiten de route met `ongewijzigd`;
+     (lib/idemsleutels-personeel.js), daarbuiten de route met `ongewijzigd`;
      de unittoets hierboven houdt die tweede weg vast. */
   const nogEens = await api(base, '/api/office/beleidsmotor/huis/zet', { entiteit: entId }, eigKantoor);
   assert.equal(nogEens.status, 200);

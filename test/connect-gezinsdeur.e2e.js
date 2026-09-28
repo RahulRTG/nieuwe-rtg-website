@@ -16,7 +16,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stopNet, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const { ROLLEN } = require('../scripts/lib/proefsessies');
 
 const pw = laadPlaywright();
@@ -59,7 +59,9 @@ test('Ontdekken: een gezin neemt de gezinsdeur, een lid de ledendeur', { skip: g
     assert.ok(!l.paden.some((p) => p.startsWith('/api/rtf/connect/')), 'een lid klopte aan bij de gezinsdeur');
   } finally {
     await browser.close();
-    child.kill();
-    fs.rmSync(TMP, { recursive: true, force: true });
+    /* Wachten tot de server echt weg is: hij schrijft bij het afsluiten nog in
+       zijn datamap, en een rmSync die daar tussendoor loopt geeft ENOTEMPTY. */
+    await stopNet(child, 5000);
+    fs.rmSync(TMP, { recursive: true, force: true, maxRetries: 3, retryDelay: 100 });
   }
 });

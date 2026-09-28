@@ -65,6 +65,34 @@ const GELDACTIES = [
   /\/(?:betaal|pay|afrekenen|refund|uitbetaal|overboeken|verreken|betaald)$/
 ];
 
+/* EXTERN AFREKENEN BLIJFT OPEN (besluit van de eigenaar, 27 september 2026).
+   Zonder RTG-betaalrail rekent een zaak gewoon af zoals elke zaak dat doet:
+   contant, met de pin van haar eigen terminal, of op rekening. Dat is geen
+   gesimuleerde betaling maar een registratie van geld dat BUITEN RTG is
+   ontvangen -- en zonder die registratie kan geen rekening ooit sluiten, en
+   draait trede 3 ("de vloer draait op de rekening") niet.
+
+   Deze stop staat vóór de body-parser en ziet de gekozen wijze dus niet. Hij
+   laat deze routes daarom door met `req.alleenExterneWijzen`, en
+   externWijzePoort() -- gemount direct NA de body-parser (opzet/lijfpoort.js)
+   -- weigert elke andere wijze (RTG Pay, cadeaukaart, tegoed, bon, kamer)
+   met dezelfde 503. De wijze wordt gelezen zoals de ROUTE hem leest, met
+   dezelfde standaardwaarde; alleen een exacte toegestane waarde komt door.
+   test/extern-afrekenen.test.js houdt beide helften vast. */
+const EXTERN_AFREKENEN = [
+  { pad: /^\/api\/supplier\/horeca\/betaal$/, wijze: b => String(b.wijze || 'pin') },
+  { pad: /^\/api\/supplier\/horeca\/folio\/afrekenen$/, wijze: b => String(b.wijze || 'pin') },
+  // kassa/afrekenen.js maakt van alles buiten deze drie 'contant'
+  { pad: /^\/api\/supplier\/tafelticket\/afrekenen$/,
+    wijze: b => (['rtgpay', 'contant', 'rtg'].includes(b.method) ? b.method : 'contant') }
+];
+const EXTERNE_WIJZEN = Object.freeze(['contant', 'pin', 'rekening']);
+function externRegel(pad) {
+  const schoonPad = String(pad || '').split('?')[0];
+  return EXTERN_AFREKENEN.find(r => r.pad.test(schoonPad)) || null;
+}
+function isExternAfrekenen(pad) { return !!externRegel(pad); }
+
 function isBetaalactie(methode, pad) {
   if (!MUTEREND.has(String(methode || '').toUpperCase())) return false;
   const schoonPad = String(pad || '').split('?')[0];
@@ -78,9 +106,28 @@ function antwoord(res) {
 module.exports = function betaalstop({ app, uit } = {}) {
   const actief = uit == null ? process.env.RTG_BETALEN_UIT === '1' : uit === true;
   if (!actief) return { actief: false };
-  app.use((req, res, next) => isBetaalactie(req.method, req.path || req.url) ? antwoord(res) : next());
+  app.use((req, res, next) => {
+    const pad = req.path || req.url;
+    if (!isBetaalactie(req.method, pad)) return next();
+    if (isExternAfrekenen(pad)) { req.alleenExterneWijzen = EXTERNE_WIJZEN; return next(); }
+    return antwoord(res);
+  });
   return { actief: true };
 };
 
+/* Na de body-parser: alleen een externe wijze komt door. Doet niets als de
+   betaalstop deze route niet als extern afrekenen heeft doorgelaten. */
+function externWijzePoort(req, res, next) {
+  if (!req.alleenExterneWijzen) return next();
+  const regel = externRegel(req.path || req.url);
+  const wijze = regel ? regel.wijze(req.body && typeof req.body === 'object' ? req.body : {}) : null;
+  if (regel && EXTERNE_WIJZEN.includes(wijze)) return next();
+  return res.status(503).json({ error: BERICHT + ' Afrekenen kan wel contant, met de pin van de zaak of op rekening.',
+    code: 'betalingen-uit', toegestaan: EXTERNE_WIJZEN });
+}
+
 module.exports.isBetaalactie = isBetaalactie;
+module.exports.isExternAfrekenen = isExternAfrekenen;
+module.exports.externWijzePoort = externWijzePoort;
+module.exports.EXTERNE_WIJZEN = EXTERNE_WIJZEN;
 module.exports.BERICHT = BERICHT;

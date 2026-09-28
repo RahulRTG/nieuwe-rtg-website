@@ -54,13 +54,13 @@ const uitRij = (r) => (r ? { id: String(r.id), org: r.org, naam: r.naam, externe
   leden: JSON.parse(r.leden || '[]'), bij: r.created_at } : null);
 
 function vind(org, id) {
-  return uitRij(S.db.prepare('SELECT * FROM scim_groepen WHERE org = ? AND id = ?').get(String(org), Number(id)));
+  return uitRij(S.huidigeDb().prepare('SELECT * FROM scim_groepen WHERE org = ? AND id = ?').get(String(org), Number(id)));
 }
 function opNaam(org, naam) {
-  return uitRij(S.db.prepare('SELECT * FROM scim_groepen WHERE org = ? AND naam = ?').get(String(org), String(naam)));
+  return uitRij(S.huidigeDb().prepare('SELECT * FROM scim_groepen WHERE org = ? AND naam = ?').get(String(org), String(naam)));
 }
 function lijst(org) {
-  return S.db.prepare('SELECT * FROM scim_groepen WHERE org = ? ORDER BY naam').all(String(org)).map(uitRij);
+  return S.huidigeDb().prepare('SELECT * FROM scim_groepen WHERE org = ? ORDER BY naam').all(String(org)).map(uitRij);
 }
 
 /* Waar de identiteitsbrug om vraagt: in welke groepen zit dit account. Puur
@@ -77,7 +77,7 @@ function maak(org, naam, leden, externeId) {
   if (!n) { const e = new Error('Een groep heeft een displayName nodig.'); e.status = 400; e.scimType = 'invalidValue'; throw e; }
   if (opNaam(org, n)) { const e = new Error('Deze groep bestaat al.'); e.status = 409; e.scimType = 'uniqueness'; throw e; }
   const nu = klokDatum().toISOString();
-  const r = S.db.prepare('INSERT INTO scim_groepen (org, naam, externe_id, leden, created_at) VALUES (?, ?, ?, ?, ?)')
+  const r = S.huidigeDb().prepare('INSERT INTO scim_groepen (org, naam, externe_id, leden, created_at) VALUES (?, ?, ?, ?, ?)')
     .run(String(org), n, externeId ? String(externeId) : null, JSON.stringify(schoonLeden(leden)), nu);
   return vind(org, r.lastInsertRowid);
 }
@@ -94,7 +94,7 @@ function maakMetSync(org, naam, leden, externeId) {
   const nu = klokDatum().toISOString();
   const afdruk = groepSync.vingerafdruk(n, schoon, extern);
   const id = groepSync.maakAtomair(org, schoon, afdruk, () =>
-    S.db.prepare('INSERT INTO scim_groepen (org, naam, externe_id, leden, created_at) VALUES (?, ?, ?, ?, ?)')
+    S.huidigeDb().prepare('INSERT INTO scim_groepen (org, naam, externe_id, leden, created_at) VALUES (?, ?, ?, ?, ?)')
       .run(String(org), n, extern, JSON.stringify(schoon), nu).lastInsertRowid);
   return vind(org, id);
 }
@@ -130,7 +130,7 @@ function schoonLeden(leden) {
 function zetLeden(org, id, leden) {
   const g = vind(org, id);
   if (!g) { const e = new Error('Onbekende groep binnen deze organisatie.'); e.status = 404; throw e; }
-  S.db.prepare('UPDATE scim_groepen SET leden = ? WHERE org = ? AND id = ?')
+  S.huidigeDb().prepare('UPDATE scim_groepen SET leden = ? WHERE org = ? AND id = ?')
     .run(JSON.stringify(schoonLeden(leden)), String(org), Number(id));
   return vind(org, id);
 }
@@ -142,7 +142,7 @@ function hernoem(org, id, naam) {
   if (!n) return g;
   const botst = opNaam(org, n);
   if (botst && botst.id !== g.id) { const e = new Error('Er bestaat al een groep met die naam.'); e.status = 409; e.scimType = 'uniqueness'; throw e; }
-  S.db.prepare('UPDATE scim_groepen SET naam = ? WHERE org = ? AND id = ?').run(n, String(org), Number(id));
+  S.huidigeDb().prepare('UPDATE scim_groepen SET naam = ? WHERE org = ? AND id = ?').run(n, String(org), Number(id));
   return vind(org, id);
 }
 
@@ -153,7 +153,7 @@ function hernoem(org, id, naam) {
 function haalWeg(org, id) {
   const g = vind(org, id);
   if (!g) { const e = new Error('Onbekende groep binnen deze organisatie.'); e.status = 404; throw e; }
-  S.db.prepare('DELETE FROM scim_groepen WHERE org = ? AND id = ?').run(String(org), Number(id));
+  S.huidigeDb().prepare('DELETE FROM scim_groepen WHERE org = ? AND id = ?').run(String(org), Number(id));
   return g;
 }
 

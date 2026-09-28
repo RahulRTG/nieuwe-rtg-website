@@ -227,6 +227,13 @@ body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"] .rtg-edge-2
 .rtg-edge-2-edge-reveal--bottom{bottom:0}.rtg-edge-2-edge-reveal--bottom::after{bottom:0}
 .rtg-edge-2-edge-reveal:focus-visible{outline:2px solid var(--edge-bar-accent)!important;outline-offset:-4px}
 body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="compact"] .rtg-edge-2-edge-reveal{display:block}
+/* WAT DE BOVENSTROOK INNEEMT, ZEGT DE EDGE ZELF -- zoals --edge-bottom voor de
+   onderbalk. Een scherm met een eigen balk die bovenin moet blijven (omdat de
+   Edge hem niet kan dragen, zoals een adresveld) schuift daarmee onder
+   de strook uit. Zonder dit lag de werkbalk van browser.html volledig onder
+   deze onzichtbare knop (gemeten 27 september 2026): een tik op Ga haalde de
+   Edge terug in plaats van de pagina te openen. */
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="compact"]:not([data-rtg-edge-venster-open="true"]){--edge-randboven:44px}
 body[data-rtg-edge-venster-open="true"] .rtg-edge-2-edge-reveal{display:none!important}
 
 .rtg-edge-2-context-button{min-width:44px!important;min-height:44px!important;flex:0 0 auto;padding:0 10px!important;border:1px solid var(--edge2-line)!important;color:var(--edge2-metal)!important;font-size:10px!important;letter-spacing:.08em;text-transform:uppercase}

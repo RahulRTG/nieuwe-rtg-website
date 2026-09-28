@@ -9,6 +9,10 @@
    EN DAAROM IS `PLAFOND_WIJZIGEN` GEEN VAN BEIDE. De code draagt zijn eigen maximum, en
    dat maximum wordt door KASCODE_MAX hard afgekapt (`Math.min` in kern/pay/kassa.js): er
    bestaat geen invoer waarmee dit pad een bestaande grens ruimer maakt.
+
+   SINDS 27 SEPTEMBER 2026 is de code een credential (kern/pay/kasbak.js): 128 bits,
+   hash-only in payKasToegang. De idempotentieproef mat nog de oude lijst payCodes;
+   tot hij opnieuw draait staat de nieuwe collectie hier op `vermoed`.
    ========================================================================== */
 'use strict';
 
@@ -25,13 +29,15 @@ const KASCODE = Object.freeze({
     voorwaarden: [
       { wat: 'een echt account; een demo-sessie komt er niet in',
         bron: 'geenEchtAccount in routes/pay-tegoed.js' },
-      { wat: 'de geldvergunningpoort staat open voor pay.kascode_en_vooraf',
-        bron: 'moneyCredentialBlokkade in kern/pay/kassa.js' }
+      { wat: 'een idem-sleutel die nog geen code heeft gemaakt; een herhaling krijgt 409 zonder code',
+        bron: 'uitgeven in kern/pay/kasbak.js' }
     ],
     gevolgen: [
-      { soort: 'direct', graad: 'gemeten', collectie: 'payCodes',
-        wat: 'er komt een code bij, en de vorige ongebruikte code van dit lid gaat op `gebruikt`',
-        reden: 'de idempotentieproef zag deze collectie veranderen; beide bewegingen wonen erin' },
+      { soort: 'direct', graad: 'vermoed', collectie: 'payKasToegang',
+        wat: 'er komt een rij bij met alleen de hash van de code, en de vorige open code van dit lid ' +
+          'wordt ingetrokken',
+        reden: 'kern/pay/kasbak.js#uitgeven doet beide in een collectietransactie; beproefd in ' +
+          'test/kascode-credential.test.js, nog niet door de idempotentieproef gemeten' },
       { soort: 'afgeleid', graad: 'vermoed',
         wat: 'een kaart of token dat naar de VORIGE code verwijst, wijst na dit verzoek naar niets',
         reden: 'kern/pay/kassa.js#kasStand bestaat juist hiervoor: RTG Pay houdt per lid EEN code ' +
@@ -43,19 +49,17 @@ const KASCODE = Object.freeze({
         reden: 'dat is de handeling van de zaak (/api/supplier/pay/in) en niet deze; dit pad zet ' +
           'alleen het recht klaar' },
       { soort: 'mislukking', graad: 'vermoed',
-        wat: 'staat de geldvergunningpoort dicht, dan gebeurt er niets: geen nieuwe code, en de ' +
-          'vorige blijft geldig',
-        reden: 'moneyCredentialBlokkade staat in kern/pay/kassa.js als EERSTE regel van kasCode, ' +
-          'dus voor de lus die de oude codes op `gebruikt` zet' }
+        wat: 'een herhaling met dezelfde idem-sleutel maakt geen code en trekt de vorige niet in',
+        reden: 'kasbak.js#uitgeven weigert VOOR de lus die open codes intrekt; beproefd in ' +
+          'test/kascode-credential.test.js toets 2' }
     ],
     onzeker: [],
     raakt: { objecten: ['de eigen kascodes'] },
     herstel: { bron: 'HERSTELPROEF.json',
       reden: 'niet verklaard maar gemeten; een code intrekken is een NIEUWE handeling -- en de ' +
         'goedkoopste terugweg bestaat al: vijf minuten wachten' },
-    nagekeken: 'Claude (Opus 5), 2026-09-14: de gemeten collectie uit kern/stuur/gevolg.js, de ' +
-      'volgorde en het plafond uit kern/pay/kassa.js, de deur uit routes/pay-tegoed.js; niet door ' +
-      'een mens nagelezen'
+    nagekeken: 'Claude (Opus 5), 2026-09-14, bijgewerkt 2026-09-27 na de migratie naar ' +
+      'kern/pay/kasbak.js; niet door een mens nagelezen'
   }
 });
 

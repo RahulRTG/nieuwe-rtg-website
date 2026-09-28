@@ -39,6 +39,9 @@
   .inlog input{width:100%;background:var(--card);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;padding:.6rem .8rem;margin:1rem 0;text-align:center;letter-spacing:.1em;}
   .inlog .knop{width:100%;background:var(--gold);color:#000;border-color:var(--gold);font-weight:600;padding:.6rem;}
   .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);border-radius:0;padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;z-index:30;pointer-events:none;}
+  .sectie{margin:2.2rem 0 .8rem;padding-bottom:.55rem;border-bottom:1px solid var(--line)}
+  .sectie span{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold))}
+  .sectie h2{font-size:1.65rem;margin-top:.2rem}.veldblok{display:grid;gap:.45rem;margin-top:.7rem}.veldblok textarea{min-height:5rem;resize:vertical}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/dagkleur.css" rel="stylesheet">
@@ -83,12 +86,20 @@ if(window.RTGUitvoer) RTGUitvoer.bron(()=>({
     v.status, v.laatste||'', v.details||''])
 }));
 async function laad(){
-  let d; try{ d = await api('concierge'); }catch(e){ if(e.status===401){ TOKEN=null; return inlog(); } $('#main').innerHTML='<div class="leeg">Kon het bureau niet laden.</div>'; return; }
+  let d, rv, arrangements, circles; try{
+    [d,rv,arrangements,circles] = await Promise.all([api('concierge'),api('rendezvous/concierge'),api('rendezvous/arrangements'),api('rendezvous/circles')]);
+  }catch(e){ if(e.status===401){ TOKEN=null; return inlog(); } $('#main').innerHTML='<div class="leeg">Kon het bureau niet laden.</div>'; return; }
   STATUS = d.statussen||[];
   VERZOEKEN = d.verzoeken||[];
-  if(!d.verzoeken.length){ $('#main').innerHTML='<div class="leeg">Geen open verzoeken. Alles is voor de leden geregeld.</div>'; return; }
-  $('#main').innerHTML = d.verzoeken.map(kaart).join('');
+  const oud=d.verzoeken.length?d.verzoeken.map(kaart).join(''):'<div class="leeg">Geen algemene verzoeken.</div>';
+  const rvCards=(rv.requests||[]).length?(rv.requests||[]).map(rvKaart).join(''):'<div class="leeg">Geen Rendez-vous Concierge-verzoeken.</div>';
+  const arrangeCards=(arrangements.requests||[]).length?(arrangements.requests||[]).map(arrangeKaart).join(''):'<div class="leeg">Geen Arrange It-verzoeken.</div>';
+  $('#main').innerHTML = '<div class="sectie"><span>Rendez-vous</span><h2>Concierge-verzoeken</h2></div>'+rvCards+
+    '<div class="sectie"><span>Rendez-vous</span><h2>Arrange It</h2></div>'+arrangeCards+
+    '<div class="sectie"><span>Society</span><h2>Circles</h2></div>'+circleBureau(circles.circles||[])+
+    '<div class="sectie"><span>RTG</span><h2>Algemene Concierge</h2></div>'+oud;
   d.verzoeken.forEach(bind);
+  (rv.requests||[]).forEach(bindRv);(arrangements.requests||[]).forEach(bindArrange);bindCircles(circles.circles||[]);
 }
 let STATUS=[];
 function kaart(v){
@@ -111,6 +122,17 @@ function bind(v){
     catch(e){ meld(e.message); }
   });
 }
+
+function rvKaart(v){
+  const nodig=v.state==='IN_PROGRESS'?'Voorstel voor het lid':v.state==='MEMBER_APPROVAL'?'Werkelijke bevestiging':'';
+  const next={REQUESTED:['ACKNOWLEDGED','CANNOT_FULFIL'],ACKNOWLEDGED:['IN_PROGRESS','CANNOT_FULFIL'],IN_PROGRESS:['PROPOSED','CANNOT_FULFIL'],MEMBER_APPROVAL:['CONFIRMED','CANNOT_FULFIL']}[v.state]||[];
+  return '<div class="kaart" data-rv="'+esc(v.id)+'"><div class="kop"><span class="nm">'+esc(v.subject)+'</span><span class="status">'+esc(v.state)+'</span></div><div class="cn">'+esc(v.city||'Geen stad')+' · '+esc(v.window||'Geen datumvenster')+'</div><div class="meta">'+esc(v.request)+'</div>'+(v.proposal?'<div class="meta">Voorstel: '+esc(v.proposal)+'</div>':'')+(nodig?'<div class="veldblok"><textarea class="veld rv-inhoud" placeholder="'+esc(nodig)+'"></textarea></div>':'')+'<div class="acties">'+next.map(s=>'<button class="knop '+(s==='CONFIRMED'?'doe':s==='CANNOT_FULFIL'?'af':'')+'" data-rv-step="'+esc(s)+'">'+esc(s)+'</button>').join('')+'</div></div>';
+}
+function bindRv(v){const el=$('[data-rv="'+CSS.escape(v.id)+'"]');if(!el)return;el.querySelectorAll('[data-rv-step]').forEach(b=>b.onclick=async()=>{const value=(el.querySelector('.rv-inhoud')||{}).value||'';try{await api('rendezvous/concierge/step',{id:v.id,state:b.dataset.rvStep,proposal:value,confirmation:value});meld('Rendez-vous-verzoek bijgewerkt.');laad();}catch(e){meld(e.message);}});}
+function arrangeKaart(v){const next={REQUESTED:['ACKNOWLEDGED','CANNOT_FULFIL'],ACKNOWLEDGED:['IN_PROGRESS','CANNOT_FULFIL'],IN_PROGRESS:['CONFIRMED','CANNOT_FULFIL']}[v.state]||[];return '<div class="kaart" data-arrange="'+esc(v.id)+'"><div class="kop"><span class="nm">'+esc(v.setting||'Arrangement')+'</span><span class="status">'+esc(v.state)+'</span></div><div class="cn">'+esc((v.members||[]).join(' · '))+'</div><div class="meta">'+esc([v.city,v.from,v.to,v.daypart].filter(Boolean).join(' · '))+'</div>'+(v.state==='IN_PROGRESS'?'<div class="veldblok"><textarea class="veld arrange-confirmation" placeholder="Bevestigde locatie, datum, tijd en reserveringsinformatie"></textarea></div>':'')+'<div class="acties">'+next.map(s=>'<button class="knop '+(s==='CONFIRMED'?'doe':s==='CANNOT_FULFIL'?'af':'')+'" data-arrange-step="'+esc(s)+'">'+esc(s)+'</button>').join('')+'</div></div>';}
+function bindArrange(v){const el=$('[data-arrange="'+CSS.escape(v.id)+'"]');if(!el)return;el.querySelectorAll('[data-arrange-step]').forEach(b=>b.onclick=async()=>{try{await api('rendezvous/arrangement/step',{id:v.id,state:b.dataset.arrangeStep,confirmation:(el.querySelector('.arrange-confirmation')||{}).value||''});meld('Arrangement bijgewerkt.');laad();}catch(e){meld(e.message);}});}
+function circleBureau(circles){return '<div class="kaart"><div class="kop"><span class="nm">Nieuwe Circle</span></div><input class="veld" id="circleName" maxlength="80" placeholder="Naam"><input class="veld" id="circleTheme" maxlength="60" placeholder="Thema"><input class="veld" id="circleContext" maxlength="400" placeholder="Besloten context"><div class="acties"><button class="knop doe" id="circleCreate">Circle maken</button></div></div>'+circles.map(c=>'<div class="kaart" data-circle-office="'+esc(c.id)+'"><div class="kop"><span class="nm">'+esc(c.name)+'</span><span class="status">'+c.members+' leden · '+c.gatherings+' gatherings</span></div><div class="meta">'+esc(c.theme||'Private Society')+'</div><input class="veld circle-codename" maxlength="80" placeholder="Codenaam uitnodigen"><div class="acties"><button class="knop" data-circle-invite>Uitnodigen</button></div><input class="veld circle-title" maxlength="100" placeholder="Gathering"><input class="veld circle-city" maxlength="60" placeholder="Stad"><input class="veld circle-date" type="date"><input class="veld circle-context" maxlength="400" placeholder="Context"><div class="acties"><button class="knop" data-circle-gathering>Gathering toevoegen</button></div></div>').join('');}
+function bindCircles(circles){const create=$('#circleCreate');if(create)create.onclick=async()=>{try{await api('rendezvous/circle/create',{name:$('#circleName').value,theme:$('#circleTheme').value,context:$('#circleContext').value,idempotencyKey:RTGId('rv-circle')});laad();}catch(e){meld(e.message);}};circles.forEach(c=>{const el=$('[data-circle-office="'+CSS.escape(c.id)+'"]');if(!el)return;el.querySelector('[data-circle-invite]').onclick=async()=>{try{await api('rendezvous/circle/invite',{circleId:c.id,codename:el.querySelector('.circle-codename').value});meld('Uitnodiging verwerkt.');laad();}catch(e){meld(e.message);}};el.querySelector('[data-circle-gathering]').onclick=async()=>{try{await api('rendezvous/circle/gathering',{circleId:c.id,title:el.querySelector('.circle-title').value,city:el.querySelector('.circle-city').value,date:el.querySelector('.circle-date').value,context:el.querySelector('.circle-context').value,idempotencyKey:RTGId('rv-gathering')});laad();}catch(e){meld(e.message);}};});}
 
 if(TOKEN) laad(); else inlog();
 </script>

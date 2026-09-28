@@ -14,6 +14,10 @@
 <link href="/shared/webblok.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
 <style>
+/* De werkbalk draagt het adresveld en blijft dus bij het scherm (de Edge kan
+   een invoerveld niet overnemen). In de compacte stand schuift hij onder de
+   bovenstrook van de Edge uit; ios.css zet margin met !important op nul. */
+header.ios-nav{top:var(--edge-randboven,0px);margin-top:var(--edge-randboven,0px)!important}
   :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
     --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft); --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75; }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}

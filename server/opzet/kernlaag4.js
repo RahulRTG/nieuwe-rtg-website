@@ -16,8 +16,16 @@ kern.huis = require('../kern/huis')({
     : (sess && sess.tier !== 'guest' ? db.data.trip : null)) || null,
   entourageVan: (sess) => { try { return kern.entourage(sess.key); } catch (e) { return null; } }
 });
+/* Connection OS formaliseert wat de twee producten al delen. De policy is een
+   contract en geen vervangende backend; de blokkadelaag is wel een gedeelde
+   waarheid, zodat een veiligheidsactie niet bij de grens van een app stopt. */
+kern.connectionPolicy = require('../kern/connection-policy');
+kern.connectionBlocking = require('../kern/connection-blocking')({ db, save });
 // Rendez-vous deelt zijn 18+/KYC-poort met Vonk; de route bewaakt de pas.
 Object.assign(kern, require('../kern/rendezvous')({ db, save, crypto, anthropic, notify, accounts, leeftijdVan,
+  connectionBlocking: kern.connectionBlocking,
+  partnerSuppliers: () => db.data.suppliers || [], partnerBookings: () => db.data.reserveringen || [],
+  media, sseToCustomer: hulp.sseToCustomer, connectionMediaTicketSecret: process.env.RTG_ENC_KEY,
   /* codenaamVan en niet liveCodename: zie de kop van kern/rendezvous.js. Laat
      gebonden, want de sociale laag wordt later samengesteld. */
   codenaamVan: (k) => kern.codenaamVan(k),
@@ -26,7 +34,8 @@ Object.assign(kern, require('../kern/rendezvous')({ db, save, crypto, anthropic,
   tableZet: kern.tableZet,
   /* De contactpin uit kern/sociaal: Encounter LEENT hem als adres en maakt geen
      eigen koppelcode. Zie de kop van kern/rendezvous-kring.js. */
-  handleVanPin: (pin) => kern.handleVanPin(pin) }));
+  handleVanPin: (pin) => kern.handleVanPin(pin),
+  sociaalRate: (...args) => kern.sociaalRate(...args) }));
 // De wauw-laag: stemming, verjaardagsglans en De Terugblik over alle socials
 Object.assign(kern, require('../kern/wauw')({ db, save, accounts, socialConnecties: kern.socialConnecties }));
 // RTG Pulse: het eigen 9+-microblog (chronologisch, zonder verslavende trucs)
@@ -139,6 +148,33 @@ Object.assign(kern, require('../kern/ledenregister')({ accounts, onboarding, gel
    NA de geldregie om de pasprijs; het fonds gaat laat gebonden mee. Zet ook de
    kostenhaak aan, die tot hier leeg was. */
 Object.assign(kern, require('../kern/economie')({ db, save }));
+/* De eerste sensor van AUTONOMIE (server/kern/bedrijfsmaat/): de bedrijfsmaten
+   uitgerekend op de pasgeschiedenis, de laatste bezoekdag, de uitkomsten en de
+   lidmaatschapstermijnen, en elk getal over mensen langs de groepspoort. Leest
+   alleen; na de economielaag omdat elke maat een economische wereld draagt. */
+/* De twee bronnen eronder (besluiten van 25 september 2026): de dag van het
+   laatste bezoek per lid (kern/aanwezigheid.js; de ledengids raakt hem aan) en
+   de pasgeschiedenis (kern/pasgeschiedenis.js; de accountlaag meldt elke
+   overgang). */
+kern.aanwezigheid = require('../kern/aanwezigheid')({ db, save, bewerkCollectie });
+kern.pasgeschiedenis = require('../kern/pasgeschiedenis')({ db, save, bewerkCollectie, accounts });
+// het banksaldo van RTG, handmatig met het afschrift als bron (besluit C4)
+Object.assign(kern, require('../kern/bankpositie')({ db, save }));
+// hoe leden bij RTG kwamen: een telling per maand, nooit per lid (besluit C6)
+Object.assign(kern, require('../kern/aanmeldkanaal')({ db, save }));
+// het boek van RTG zelf, gevuld door Financien op naam (besluiten C8-C11)
+Object.assign(kern, require('../kern/rtgboek')({ db, save, kanalen: kern.AANMELDKANALEN }));
+kern.bedrijfsmaat = require('../kern/bedrijfsmaat/stand')({
+  lees: { ritten: () => db.data.rides, bestellingen: () => db.data.orders,
+    betaalschemas: () => db.data.lidmaatschapBetalingen,
+    /* klantwaarde per wereld (besluit C3): drie lezers erbij, niets schrijvends */
+    reizen: () => db.data.reisAanvragen, loonruns: () => db.data.payrollRunsV2,
+    casussen: () => (db.data.rtfos && db.data.rtfos.casussen) },
+  pasgeschiedenis: kern.pasgeschiedenis, aanwezigheid: kern.aanwezigheid,
+  kosten: () => kern.kosten, bank: kern.bankpositie, boek: kern.rtgBoek, kanalen: kern.aanmeldkanaalStand,
+  ledentegoed: () => (kern.pay && kern.pay.ledentegoed ? kern.pay.ledentegoed() : null) });
+// het streefbeeld (besluit C7): de machine stelt voor uit de bedrijfsmaten, de eigenaar tekent
+Object.assign(kern, require('../kern/streefbeeld')({ db, save, bedrijfsmaat: kern.bedrijfsmaat }));
 Object.assign(kern, require('../kern/kosten')({ db, save, bewerkCollectie, accounts, economie: kern.economie,
   keyVanCodenaam, bestandenOpslag: kern.bestandenOpslag,
   geldPasprijzen: () => (kern.geldPasprijzen ? kern.geldPasprijzen() : null),

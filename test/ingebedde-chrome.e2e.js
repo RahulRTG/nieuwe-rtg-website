@@ -50,7 +50,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, elevateTier, wachtTot } = require('./helper');
+const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, elevateTier, keurLidGoed, wachtTot } = require('./helper');
 
 const pw = laadPlaywright();
 
@@ -211,6 +211,7 @@ test('ingebedde schermen tonen geen tweede platformbediening, en zonder kader we
     const lid = await api('/api/auth/register', { name: 'Kaderproef', email: 'kader' + stempel + '@v.test',
       phone: '06' + String(stempel).slice(-8), password: 'geheim123', geboortedatum: '1990-02-02', tier: 'rtg' });
     const kantoor = (await api('/api/office/login', { code: 'RTG-OFFICE' })).token;
+    await keurLidGoed(base, lid.token, lid.state.user.codename, '1990-02-02');
     /* Business ziet alle vier de werelden; een smallere pas zou schermen
        overslaan en dat leest als een geslaagde proef. */
     await elevateTier(base, lid.token, 'business', kantoor);

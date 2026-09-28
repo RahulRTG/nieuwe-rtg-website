@@ -1,41 +1,19 @@
-/* Kern-module "vonk": RTG Vonk, de datingkant van het ledenbestand. Leden
-   (18+, met actief RTG-geverifieerd paspoort, net als het Podium) maken een
-   profiel op CODENAAM met hun wensen; de app stelt elke dag een eindige,
-   wederzijds passende selectie voor (geen oneindige swipe-stroom). Liken
-   twee mensen elkaar, dan is het een match: de chatlijn gaat open en RTG
-   zet automatisch een tafel voor twee klaar bij een partner rond het
-   geografische MIDDEN van hun twee woonplaatsen. De date kost EUR 10 p.p.
-   (vooraf, via RTG Pay): EUR 5 voor RTG en EUR 5 als aanbetaling bij de
-   zaak. Veiligheid op Salon-niveau: alleen stad zichtbaar (nooit adres),
-   chat pas na een match, blokkeren en melden met backoffice-opvolging.
-
-   DE VOORKEURSTAAL (./wensen.js) is wat Vonk onderscheidt van matchen op
-   afstand en interesses: per as kan een lid zeggen of iets VERPLICHT is, een
-   STERKE VOORKEUR of LEUK MEEGENOMEN, en alleen het eerste filtert -- en dan nog
-   alleen op een uitgesproken tegenstelling. Wat een lid van een ander vraagt
-   (`wensen`) is voor niemand zichtbaar; wat een lid over zichzelf zegt
-   (`kenmerken`) is per as zelf op zichtbaar/na-een-match/alleen-de-engine te
-   zetten. De reden bij een kandidaat noemt daarom nooit een waarde die het lid
-   verborgen houdt. Zie de kop van ./wensen.js voor het waarom.
-
-   maakVonk(state) volgt het vaste kern-patroon. Dit is de orkestrator: de
-   poort, het profiel/de wensen en de dagselectie wonen hier; de voorkeurstaal
-   in ./wensen; de like/match, het betalen, de chat en het blokkeren/melden in
-   ./match. */
+/* Vonk-orkestrator: identiteit, profiel, selectie, match, Meet en veiligheid. */
 const { coord } = require('../util');
 const { maakOntmoetpoort, MIN_LEEFTIJD } = require('../ontmoetpoort');
 const W = require('./wensen');
 const B = require('../beschikbaar');
 const H = require('./halfweg');
+const Projection = require('../connection-projection');
+const ConnectionPartner = require('../connection-partner');
 
 const DAG_MAX = 6;            // de eindige dagselectie
 const PRIJS_CENTEN = 1000;    // EUR 10 p.p.
 const RTG_CENTEN = 500;       // waarvan EUR 5 voor RTG; de rest is aanbetaling bij de zaak
 
-const { maakLidstand } = require('../betrouwbaarheid');
-
 function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan, keyVanCodenaam,
-  haversine, etaMinutes, reserveerTafel, pay, notify, sseToCustomer, sseToOffice }) {
+  haversine, etaMinutes, reserveerTafel, pay, notify, sseToCustomer, sseToOffice, connectionBlocking,
+  media, connectionMediaTicketSecret }) {
   const id = () => 'vonk' + crypto.randomBytes(5).toString('hex');
   const nu = () => new Date().toISOString();
   function d() {
@@ -87,37 +65,12 @@ function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan
     save();
     return { status: 200, ok: true, profiel: publiek(key, p, true) };
   }
-  /* HOE ZEKER RTG WEET DAT DIT DEZE MENS IS, en waarom dat hier hoort.
-
-     De poort hierboven zegt tegen wie hem niet haalt: "Activeer eerst uw
-     RTG-geverifieerde paspoort (KYC); zo weet iedereen op Vonk dat de ander
-     echt is." Dat is een belofte aan de ANDER -- en die bereikte hem nooit. Op
-     een kaartje stond een codenaam, een leeftijd en een stad, precies zoals op
-     elk ander datingprofiel ter wereld.
-
-     De poort garandeert al minstens A3, dus dit is geen zeef maar een
-     onderscheid: A4 betekent dat RTG de selfie naast het document heeft gelegd
-     en dus dat dit gezicht bij dat paspoort hoort. Dat is exact wat je wilt
-     weten voordat je met een vreemde afspreekt, en het staat nergens anders in
-     dit huis waar iemand het kan lezen. */
-  const lidstandVan = maakLidstand({ accounts });
-  const niveauVan = key => {
-    try { const st = lidstandVan(key); return st && st.niveau ? { id: st.niveau.id, naam: st.niveau.naam } : null; }
-    catch (e) { return null; }
-  };
-
   /* `zelf` is het eigen profiel en krijgt alles, INCLUSIEF de wensen -- die gaan
      alleen naar de eigenaar terug. `niveau` bepaalt wat een ander ziet:
      'kandidaten' in de dagselectie, 'match' na een wederzijdse like. */
-  const publiek = (key, p, zelf, niveau) => ({ codenaam: codenaamVan(key), over: p.over, leeftijd: p.leeftijd,
-    stad: p.stad, interesses: p.interesses, betrouwbaarheid: niveauVan(key), kenmerken: W.toonKenmerken(p, zelf ? 'match' : (niveau || 'kandidaten')),
-    ...(zelf ? { geslacht: p.geslacht, zoekt: p.zoekt, leeftijdMin: p.leeftijdMin, leeftijdMax: p.leeftijdMax,
-      /* afstandActief komt uit de dating-premium-ronde op main: het scherm zegt
-         ermee of de afstandsfilter iets kan meten (er is een eigen plek bekend)
-         of dood staat. Alleen voor de eigenaar, net als de rest van dit blok. */
-      maxKm: p.maxKm, actief: p.actief, afstandActief: isFinite(p.lat) && isFinite(p.lng),
-      wensen: p.wensen || {}, zicht: p.zicht || {},
-      beschikbaar: p.beschikbaar || [], datewens: p.datewens || H.zetDatewens(null, {}) } : {}) });
+  let profileMedia = null;
+  const { publiek, niveauVan } = require('./projecties')({ accounts, codenaamVan, W, H, Projection,
+    mediaVan: () => profileMedia });
 
   /* ---- de dagselectie: eindig en wederzijds passend ----
      pastBij dekt de drie eisen die ALTIJD hard zijn en die daarom niet in de
@@ -131,10 +84,30 @@ function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan
      allebei krijgen (LAT.md regel 4). */
   const likeVan = (van, naar) => d().likes.find(l => l.van === van && l.naar === naar);
   const matchTussen = (a, b) => d().matches.find(m => (m.a === a && m.b === b) || (m.a === b && m.b === a));
+  const geblokkeerd = (a, b) => !!(((d().profielen[a] || {}).blokkade || []).includes(b)
+    || ((d().profielen[b] || {}).blokkade || []).includes(a)
+    || (connectionBlocking && connectionBlocking.isGeblokkeerd(a, b)));
 
-  const ctx = { db, save, schoon, id, nu, d, mag, likeVan, matchTussen, publiek, DAG_MAX, niveauVan,
+  profileMedia = require('../connection-profile-media')({ db, save, crypto, media, schoon, gate: mag,
+    isBlocked: geblokkeerd, isMatch: (a, b) => !!matchTussen(a, b),
+    profileActive: owner => !!(d().profielen[owner] && d().profielen[owner].actief !== false),
+    ticketSecret: connectionMediaTicketSecret });
+
+  const communication = require('../connection-communication')({ product: 'vonk', db, save, crypto, media, schoon,
+    ticketSecret: connectionMediaTicketSecret, notify, signal: sseToCustomer,
+    isBlocked: geblokkeerd,
+    resolveContext: (actor, input) => {
+      const m = d().matches.find(x => x.id === String(input && input.id || '') && (x.a === actor || x.b === actor));
+      return m ? { counterpart: m.a === actor ? m.b : m.a, scope: m.id } : null;
+    } });
+  if (connectionBlocking && connectionBlocking.onBlock)
+    connectionBlocking.onBlock((a, b) => communication.terminatePair(a, b, 'BLOCKED'));
+
+  const ctx = { db, save, schoon, id, nu, d, mag, likeVan, matchTussen, publiek, DAG_MAX, niveauVan, geblokkeerd,
+    Projection,
+    profileMedia, communication,
     codenaamVan, keyVanCodenaam, haversine,
-    reserveerTafel, pay, notify, sseToCustomer, sseToOffice, PRIJS_CENTEN, RTG_CENTEN,
+    reserveerTafel, pay, notify, sseToCustomer, sseToOffice, PRIJS_CENTEN, RTG_CENTEN, connectionBlocking,
     /* Pas na een wederzijdse like gaan de assen open die op 'match' staan. Dat
        is wat die zichtbaarheidskeuze BETEKENT; zonder deze regel was het een
        knop die niets doet (LAT.md regel 8). */
@@ -146,15 +119,31 @@ function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan
     rooster: B.rooster,
     /* De drie plekken rond het midden. De aardrijkskunde blijft hier -- halfweg
        rekent niet zelf aan afstanden maar krijgt ze aangeleverd. */
-    optiesVoor: (pa, pb) => {
+    optiesVoor: (pa, pb, planning) => {
       if (!pa || !pb || !isFinite(pa.lat) || !isFinite(pa.lng) || !isFinite(pb.lat) || !isFinite(pb.lng)) return null;
       return H.drieOpties({ a: pa, b: pb, suppliers: db.data.suppliers,
         mid: { lat: (pa.lat + pb.lat) / 2, lng: (pa.lng + pb.lng) / 2 },
         afstandM: (p, l) => haversine({ lat: p.lat, lng: p.lng }, { lat: l.lat, lng: l.lng }),
-        reisMin: m => etaMinutes(m, 'driving') });
+        reisMin: m => etaMinutes(m, 'driving'), date: planning && planning.date,
+        time: planning && planning.time, bookings: db.data.reserveringen || [] });
+    },
+    partnerEligible: (supplierCode, context) => {
+      const s = Object.values(db.data.suppliers || {}).find(x => x.code === supplierCode);
+      return !!(s && ConnectionPartner.eligible(s, 'vonk', { ...context,
+        bookings: db.data.reserveringen || [], activeBookings: ConnectionPartner.activeBookings(
+          db.data.reserveringen || [], s.code, context && context.date, context && context.time) }).ok);
     },
     tafelkaart: H.tafelkaart };
-  const api = { vonkProfielZet: profielZet };
+  const api = { vonkProfielZet: profielZet,
+    vonkFotoUpload: profileMedia.upload, vonkFotoPubliceer: profileMedia.publiceer,
+    vonkFotoVerwijder: profileMedia.verwijder, vonkFotoOrden: profileMedia.orden, vonkFotoLever: profileMedia.lever,
+    vonkCommStatus: communication.status, vonkCommConsent: communication.consent, vonkCommText: communication.sendText,
+    vonkCommRemove: communication.removeMessage, vonkCommReport: communication.reportMessage,
+    vonkCommMedia: communication.sendMedia, vonkCommCallStart: communication.startCall,
+    vonkCommCallAnswer: communication.answer, vonkCommCallSignal: communication.sendSignal,
+    vonkCommCallPoll: communication.poll, vonkCommCallEnd: communication.end,
+    vonkCommMediaLever: communication.deliver };
+  Object.assign(api, require('./state')({ d, mag, nu, geblokkeerd, communication }));
   Object.assign(api, require('./selectie')(ctx));
   Object.assign(api, require('./kiezen')(ctx));
   Object.assign(api, require('./match')(ctx));

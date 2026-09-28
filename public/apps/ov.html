@@ -869,16 +869,15 @@
       const l = document.createElement('span');
       l.innerHTML = '<strong></strong><span class="sub" style="display:block;font-size:0.72rem;color:var(--soft);"></span>';
       l.querySelector('strong').textContent = k.productNaam + ' · ' + k.lijnNaam;
-      l.querySelector('.sub').textContent = k.reden + (k.stand === 'geldig' ? ' · code ' + k.code : '');
+      l.querySelector('.sub').textContent = k.reden;
       d.appendChild(l);
-      /* Een geldig kaartje kun je TONEN. De QR is de code zelf; de conducteur
-         scant hem met dezelfde overlay als de kassa. Zonder de tekenmodule
-         blijft de code als tekst staan -- tonen mag nooit een doodlopende weg
-         zijn omdat een script niet laadde. */
+      /* Een geldig kaartje kun je TONEN: dat vraagt een nieuwe code (tonen is
+         roteren) en trekt de vorige in. De QR is de code; zonder de
+         tekenmodule blijft hij als tekst staan. */
       if (k.stand === 'geldig') {
         const b = document.createElement('button'); b.className = 'knop';
         b.textContent = 'Toon';
-        b.addEventListener('click', () => toonQr(k.productNaam + ' · ' + k.lijnNaam, k.code));
+        b.addEventListener('click', () => toonCode(k.productNaam + ' · ' + k.lijnNaam, k.id));
         d.appendChild(b);
       } else {
         const st = document.createElement('span'); st.className = 'stil'; st.textContent = k.stand;
@@ -889,8 +888,12 @@
     await verversAbo();
   }
 
-  /* Het toonscherm: de code als echte, scanbare QR (shared/qr.js + qrteken.js),
-     met de code er in cijfers onder voor het geval de camera niet meewerkt. */
+  async function toonCode(titel, id) {
+    const r = await mob('kaart/toon', { id });
+    if (r.body.error) return zeg(r.body.error);
+    toonQr(titel, r.body.code);
+  }
+  /* Het toonscherm: de code als scanbare QR, met de tekst eronder. */
   function toonQr(titel, code) {
     $('#qrTitel').textContent = titel;
     $('#qrCode').textContent = code;
@@ -923,7 +926,7 @@
       d.appendChild(l);
       if (ab.stand === 'geldig') {
         const b = document.createElement('button'); b.className = 'knop'; b.textContent = 'Toon';
-        b.addEventListener('click', () => toonQr('Abonnement ' + ab.vervoerderNaam, ab.code));
+        b.addEventListener('click', () => toonCode('Abonnement ' + ab.vervoerderNaam, ab.id));
         d.appendChild(b);
       } else {
         const st = document.createElement('span'); st.className = 'stil'; st.textContent = ab.stand;

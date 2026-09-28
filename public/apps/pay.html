@@ -71,7 +71,8 @@
   .hist .min{color:var(--burgundy);font-variant-numeric:tabular-nums;font-weight:700;}
   .hist span:first-child{color:var(--muted);}
   .kascode{font-family:'Bodoni Moda',serif;font-size:2.6rem;letter-spacing:.35em;text-align:center;color:var(--leesgoud);text-shadow:0 0 24px rgba(169,143,28,.8);padding:.6rem 0 .2rem;}
-  /* De tegoedcode is 24 tekens en moet met de hand overgetikt kunnen worden.
+  /* De tegoedcode is 42 tekens (TG en 32 hextekens in groepjes van vier) en
+     moet met de hand overgetikt kunnen worden.
      Dus met opzet GEEN .kascode hierboven: die is Bodoni op 2,6rem met 0,35em
      letterruimte -- gemaakt voor zes tekens die je van een afstand voorleest, en
      bij vierentwintig loopt hij dwars door een telefoonscherm. En het is ook de
@@ -194,7 +195,7 @@
         <input class="veld h-rek10" id="gOms" placeholder="Waarvoor? (mag leeg)" maxlength="80" aria-label="Waarvoor is het tegoed">
       </div>
       <button class="knop hoofd h-mt70" id="gZet">Zet tegoed klaar</button>
-      <p class="leeg h-mt60">Laat je de codenaam leeg, dan kan iedereen met de code het ophalen. Een tegoed verloopt na een jaar; daarna haal je het zelf terug.</p>
+      <p class="leeg h-mt60">Laat je de codenaam leeg, dan kan iedereen met de code het ophalen. De code zie je maar een keer; kwijt of gelekt, vraag dan een nieuwe of trek het tegoed in. Een tegoed verloopt na een jaar; daarna haal je het zelf terug.</p>
       <div id="gNieuw" hidden>
         <div class="boncode" id="gCode" aria-live="polite"></div>
         <div class="rij h-centreer"><button class="knop stil" id="gKopieer">Kopieer de code</button></div>
@@ -203,7 +204,7 @@
 
     <div class="kaart">
       <div class="rij">
-        <input class="veld h-rek10" id="gIn" placeholder="Kreeg je een tegoedcode?" maxlength="40" autocomplete="off" aria-label="Tegoedcode om te verzilveren">
+        <input class="veld h-rek10" id="gIn" placeholder="Kreeg je een tegoedcode?" maxlength="60" autocomplete="off" aria-label="Tegoedcode om te verzilveren">
         <button class="knop" id="gVerzilver">Verzilver</button>
       </div>
     </div>
@@ -459,8 +460,10 @@ async function verversTegoed(){
        staat al in zijn eigen overzicht, dus dit is EEN knop. */
     el.innerHTML = voor.map(t =>
       '<div class="tikkie"><div class="wie"><b>'+esc(t.van)+'</b><small>'+esc(t.oms)+'</small></div>'+
-      '<button class="knop hoofd" data-in="'+esc(t.code)+'" style="width:auto;flex:1;min-width:9rem;">Zet '+esc(euro(t.centen))+' eur op mijn saldo</button></div>').join('');
-    el.querySelectorAll('[data-in]').forEach(b => b.addEventListener('click', () => verzilverCode(b.dataset.in, b)));
+      '<button class="knop hoofd" data-in="'+esc(t.id)+'" style="width:auto;flex:1;min-width:9rem;">Zet '+esc(euro(t.centen))+' eur op mijn saldo</button></div>').join('');
+    /* Een gericht tegoed gaat met zijn ID: de code staat nergens meer in een
+       overzicht, en voor wie hij bedoeld is, is de sessie het bewijs. */
+    el.querySelectorAll('[data-in]').forEach(b => b.addEventListener('click', () => verzilverCode({ id: b.dataset.in }, b)));
   }
 
   const open = (d.gekocht || []).filter(t => t.status === 'open');
@@ -470,26 +473,37 @@ async function verversTegoed(){
     g.innerHTML = '<div style="font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin-bottom:.4rem;">Klaargezet door jou</div>' +
       open.map(t =>
       '<div class="tikkie"><div class="wie"><b>'+esc(euro(t.centen))+' eur</b>'+
-        '<small>'+(t.aan ? 'voor '+esc(t.aan) : 'vrij, met code')+' · '+esc(t.code || '')+'</small></div>'+
+        '<small>'+(t.aan ? 'voor '+esc(t.aan) : 'vrij, met code')+'</small></div>'+
         (t.verlopen
           ? '<button class="knop stil" data-terug="'+esc(t.id)+'">Neem terug</button>'
-          : '<span style="color:var(--leesgoud);font-size:.82rem;">wacht op ophalen</span>')+
+          : '<span style="color:var(--leesgoud);font-size:.82rem;">wacht op ophalen</span>'+
+            '<button class="knop stil" data-roteer="'+esc(t.id)+'">Nieuwe code</button>'+
+            '<button class="knop stil" data-intrek="'+esc(t.id)+'">Trek in</button>')+
       '</div>').join('');
-    g.querySelectorAll('[data-terug]').forEach(b => b.addEventListener('click', async () => {
+    /* De code staat hier met opzet NIET: hij bestaat alleen in het antwoord op
+       het klaarzetten. Kwijt of gelekt? Een nieuwe code maakt de oude dood;
+       intrekken zet het geld terug op je saldo. */
+    const doe = (sel, pad, extra, klaar) => g.querySelectorAll(sel).forEach(b => b.addEventListener('click', async () => {
       b.disabled = true;
       try {
-        const r = await api('pay/tegoed/terug', { id: b.dataset.terug, idem: idem() });
-        meld(euro(r.centen) + ' eur is terug op je saldo.');
-        ververs(); verversTegoed();
+        const r = await api(pad, Object.assign({ id: b.getAttribute(sel.slice(1, -1)), idem: idem() }, extra));
+        klaar(r); ververs(); verversTegoed();
       } catch (e) { meld(e.message); b.disabled = false; }
     }));
+    doe('[data-terug]', 'pay/tegoed/terug', {}, r => meld(euro(r.centen) + ' eur is terug op je saldo.'));
+    doe('[data-intrek]', 'pay/tegoed/terug', { intrekken: true }, r => meld('Ingetrokken: ' + euro(r.centen) + ' eur is terug op je saldo.'));
+    doe('[data-roteer]', 'pay/tegoed/roteer', {}, r => {
+      $('#gNieuw').hidden = false;
+      $('#gCode').textContent = r.tegoed.code;
+      meld('Nieuwe code. De oude werkt niet meer.');
+    });
   }
 }
 
-async function verzilverCode(code, knop){
+async function verzilverCode(wat, knop){
   if (knop) knop.disabled = true;
   try {
-    const r = await api('pay/tegoed/verzilver', { code, idem: idem() });
+    const r = await api('pay/tegoed/verzilver', Object.assign({ idem: idem() }, wat));
     meld(euro(r.centen) + ' eur staat op je saldo.');
     $('#gIn').value = '';
     ververs(); verversTegoed();
@@ -521,7 +535,7 @@ $('#gKopieer').addEventListener('click', async () => {
 $('#gVerzilver').addEventListener('click', () => {
   const code = $('#gIn').value.trim();
   if (!code) { meld('Vul de tegoedcode in.'); return; }
-  verzilverCode(code, null);
+  verzilverCode({ code }, null);
 });
 
 /* de kassacode */

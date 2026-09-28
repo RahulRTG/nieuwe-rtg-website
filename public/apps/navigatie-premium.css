@@ -29,7 +29,8 @@ body.travel-os-map:before{
 .res button:hover,.res button:focus-visible{background:rgba(215,181,109,.08);outline:0;}
 .res .pun{border-radius:0;transform:rotate(45deg);}
 
-.intelligence-dock{position:fixed;right:1.5rem;top:calc(env(safe-area-inset-top,0px) + 5rem);z-index:5;width:300px;padding:1.2rem;background:rgba(12,12,12,.78);backdrop-filter:blur(22px);border:1px solid var(--nav-line);box-shadow:0 24px 70px rgba(0,0,0,.44);transition:opacity .25s,transform .25s;}
+/* Onder de vaste kop (die eindigt op 1280 breed op 186px): op 5rem lag het paneel over de knop Kaarten, volledig. */
+.intelligence-dock{position:fixed;right:1.5rem;top:calc(env(safe-area-inset-top,0px) + 12.5rem);z-index:5;width:300px;padding:1.2rem;background:rgba(12,12,12,.78);backdrop-filter:blur(22px);border:1px solid var(--nav-line);box-shadow:0 24px 70px rgba(0,0,0,.44);transition:opacity .25s,transform .25s;}
 .intelligence-dock .eyebrow,.route-insight .eyebrow{font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--nav-gold);}
 .intelligence-dock h2{font-family:"Bodoni Moda",serif;font-size:1.35rem;font-weight:500;margin:.35rem 0 .25rem;}
 .intelligence-dock>p{color:var(--soft);font-size:.75rem;line-height:1.55;}
@@ -41,7 +42,8 @@ body.travel-os-map:before{
 .privacy-line i{width:7px;height:7px;background:var(--nav-green);box-shadow:0 0 12px rgba(99,214,146,.7);}
 body.nav-route .intelligence-dock{opacity:0;transform:translateX(18px);pointer-events:none;}
 
-.lagen{right:1.5rem;top:auto;bottom:1.5rem;transform:none;flex-direction:row;background:rgba(10,10,10,.76);backdrop-filter:blur(18px);border:1px solid var(--nav-line);padding:.3rem;}
+/* Boven de onderbalk van de Edge (--edge-bottom): op 1280 breed lag de eerste laag (bank) er volledig onder. */
+.lagen{right:1.5rem;top:auto;bottom:calc(1.5rem + var(--edge-bottom,0px));transform:none;flex-direction:row;background:rgba(10,10,10,.76);backdrop-filter:blur(18px);border:1px solid var(--nav-line);padding:.3rem;}
 .lagen button{border:0;border-left:1px solid rgba(255,255,255,.08);box-shadow:none;background:transparent;width:42px;height:42px;}
 .lagen button:first-child{border-left:0;}
 .lagen button[aria-pressed="true"]{border-color:rgba(255,255,255,.08);background:rgba(215,181,109,.16);color:var(--nav-gold);}

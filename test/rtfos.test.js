@@ -356,6 +356,7 @@ test('een hulpvraag gaat niet naar een partner zonder vastgelegde toestemming', 
   const af = await os_('casus/status', { id, status: 'afgerond' }, LEIDER);
   assert.equal(af.status, 200, JSON.stringify(af.body).slice(0, 200));
   assert.ok(af.body.casus.bewaarTot, 'er is geen bewaartermijn gezet bij afronding');
+  assert.match(af.body.casus.afgerondOp || '', /^\d{4}-\d{2}-\d{2}$/, 'afronden zet de dag van afronden (besluit C3)');
 });
 
 /* ---------------------------------------------------------------------------

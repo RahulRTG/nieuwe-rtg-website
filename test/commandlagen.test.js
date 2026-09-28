@@ -9,9 +9,8 @@
    fouten die deze ronde twee keer opleverde (een receptenboek dat de verkeerde
    id-kaart kreeg, en een laag die pas na aanbouw bestond).
 
-   EN ELKE INGANG MOET DICHT ZITTEN ZONDER SESSIE. Dat staat hier per laag en
-   niet één keer aan het eind: een enkele vergeten officeAuth is genoeg, en
-   "de meeste routes zijn dicht" is geen uitspraak waar iemand iets aan heeft.
+   EN ELKE INGANG MOET DICHT ZITTEN ZONDER SESSIE, per laag: een enkele
+   vergeten officeAuth is genoeg.
 
    MUTATIES die zijn gedraaid en welke toets erop zakte (LAT.md regel 2):
    - de canary-routes uit routes/command/meten.js gehaald
@@ -31,14 +30,14 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-lagen-'));
 const CODE = 'KANTOOR-LAGEN-1';
 let srv, base, office;
 
-const api = (pad, body) => fetch(base + '/api/' + pad, {
-  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + office },
+const api = (pad, body, tok) => fetch(base + '/api/' + pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (tok || office) },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
@@ -70,7 +69,7 @@ test('elke laag heeft een ingang die antwoordt', async () => {
 test('geen enkele ingang staat open zonder kantoorsessie', async () => {
   for (const pad of ['command/canary', 'command/canary/start', 'command/zandbak', 'command/zandbak/maak',
     'command/mdm', 'command/mdm/samen', 'command/overname', 'command/overname/lees',
-    'command/apipoort', 'command/apipoort/sleutel', 'command/land', 'command/land/activeer',
+    'command/apipoort', 'command/apipoort/sleutel', 'command/apipoort/roteer', 'command/land', 'command/land/activeer',
     'command/stad', 'command/stad/start', 'command/alarm', 'command/alarm/stil',
     'command/gezondheid', 'command/gezondheid/vermogen', 'command/gezondheid/controleer',
     'command/incidenten', 'command/incident', 'command/incident/weeg', 'command/incident/open',
@@ -141,8 +140,8 @@ test('de API-poort geeft een geheim dat nergens terugkomt', async () => {
     'buiten de toelating komt er geen sleutel');
   assert.equal((await api('command/apipoort/toelaten', { pad: '/api/extern/proef' })).status, 200);
 
-  const s = await api('command/apipoort/sleutel', { naam: 'Routetoets',
-    scopes: [{ pad: '/api/extern/proef', methoden: ['GET'] }], quotaPerUur: 5 });
+  const s = await api('command/apipoort/sleutel', { naam: 'Routetoets',   // op naam (naamAuth)
+    scopes: [{ pad: '/api/extern/proef', methoden: ['GET'] }], quotaPerUur: 5 }, await kantoorAlsPersoon(base, CODE));
   assert.match(s.body.geheim, /^RTG-/);
 
   const stand = await api('command/apipoort');

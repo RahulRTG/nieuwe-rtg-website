@@ -10,6 +10,7 @@
 const { KANAAL } = require('./schrijflanen');
 const { voegVeilig } = require('./verzoekmerge');
 const { voegBijzonderSamen } = require('./verzoekbijzonder');
+const deelnemerProtocol = require('../db/deelnemers');
 
 module.exports = (ctx) => {
   const { pool, uitStore, naarStore, toegepast, laatsteJson,
@@ -48,8 +49,13 @@ module.exports = (ctx) => {
     return { bestaat: true, waarde, dbJson: JSON.stringify(waarde) };
   }
 
-  async function commitVerzoek(dataNu, wijzigingen) {
-    if (!Array.isArray(wijzigingen) || !wijzigingen.length) return { geschreven: 0, sleutels: [] };
+  /* `deelnemers` (./db/deelnemers.js) landen in DEZELFDE transactie: na de
+     collecties, zodat hun advisory locks altijd na de collectielocks komen en
+     twee verzoeken nooit in omgekeerde volgorde op elkaar wachten. */
+  async function commitVerzoek(dataNu, wijzigingen, deelnemers = []) {
+    const mee = Array.isArray(deelnemers) ? deelnemers : [];
+    wijzigingen = Array.isArray(wijzigingen) ? wijzigingen : [];
+    if (!wijzigingen.length && !mee.length) return { geschreven: 0, sleutels: [] };
     const lijst = wijzigingen.slice().sort((a, b) => a.sleutel.localeCompare(b.sleutel));
     for (const w of lijst) {
       if (!/^[A-Za-z_$][A-Za-z0-9_$-]{0,119}$/.test(String(w.sleutel || '')))
@@ -57,7 +63,7 @@ module.exports = (ctx) => {
     }
     const client = await pool.connect();
     const publicaties = [];
-    let gecommit = false;
+    let gecommit = false, commitVerstuurd = false;
     try {
       await client.query('BEGIN');
       for (const w of lijst)
@@ -89,10 +95,13 @@ module.exports = (ctx) => {
         }
         publicaties.push({ sleutel: w.sleutel, ...samen, versie });
       }
+      await deelnemerProtocol.pasToe(mee, client);
+      commitVerstuurd = true;
       await client.query('COMMIT');
       gecommit = true;
     } catch (e) {
       if (!gecommit) try { await client.query('ROLLBACK'); } catch (x) {}
+      deelnemerProtocol.annuleer(mee, commitVerstuurd);
       throw e;
     } finally { client.release(); }
 
@@ -113,7 +122,9 @@ module.exports = (ctx) => {
         laatsteGrootte.delete(p.sleutel); laatsteLengte.delete(p.sleutel); laatsteCheck.delete(p.sleutel);
       }
     }
-    return { geschreven: publicaties.length, sleutels: publicaties.map(p => p.sleutel) };
+    deelnemerProtocol.publiceer(mee);
+    return { geschreven: publicaties.length, sleutels: publicaties.map(p => p.sleutel),
+      deelnemers: mee.map(d => d.naam) };
   }
 
   /* Alleen voor mutaties buiten een HTTP-context. Zij krijgen nooit een 2xx,

@@ -600,6 +600,15 @@ test('10. verzuim voor de planning: afwezig, met wat iemand nog kan -- en zonder
   const verlof = await api('/api/staff/leave/request',
     { soort: 'verlof', van: verlofVan, tot: verlofTot }, novaTok);
   assert.equal(verlof.status, 200, JSON.stringify(verlof.body).slice(0, 160));
+  /* EEN AANVRAAG IS NOG GEEN AFWEZIGHEID (VRIJHEID.md par. 4). Het verlof
+     stond meteen als vakantie in de verzuimlaag, ook als het daarna werd
+     afgewezen; nu pas na de goedkeuring. */
+  const voor = await api('/api/supplier/verzuim/planning', { van: verlofVan, tot: verlofTot }, baas.token);
+  const voorNova = (voor.body.afwezig || []).find(a => a.staffId === novaStaff);
+  assert.ok(!voorNova || voorNova.regels.every(r => r.wat !== 'Vakantie'),
+    'een nog niet besliste aanvraag staat niet als vakantie op het planbord');
+  const ja = await api('/api/supplier/leave/decide', { id: verlof.body.entry.id, action: 'goedkeuren' }, baas.token);
+  assert.equal(ja.status, 200, JSON.stringify(ja.body).slice(0, 160));
   const later = await api('/api/supplier/verzuim/planning', { van: verlofVan, tot: verlofTot }, baas.token);
   const vak = (later.body.afwezig || []).find(a => a.staffId === novaStaff);
   assert.ok(vak, 'het verlof staat op het planbord van die weken');

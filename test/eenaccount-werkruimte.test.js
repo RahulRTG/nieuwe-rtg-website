@@ -93,7 +93,8 @@ test('een gekoppelde werkruimte is een sleutel aan het ene account, met eigen fu
     // 4) en openen gaat zonder tweede inlog: het account levert de werksessie
     const start = await post(base, '/api/account/start', { rol: 'werkruimte', code: wr.code }, lid);
     assert.equal(start.status, 200, 'starten lukt: ' + JSON.stringify(start.data).slice(0, 200));
-    assert.equal(start.data.token, wr.lidToken, 'en levert precies de sleutel die hij al had');
+    assert.match(start.data.token, /^WL\.[0-9A-F]{32}$/, 'een verse 128-bit lid-sessie');
+    assert.notEqual(start.data.token, wr.lidToken, 'de oude sessie wordt nooit opnieuw getoond');
     assert.equal(start.data.code, wr.code);
 
     // 5) die sleutel opent de werkruimte ook echt

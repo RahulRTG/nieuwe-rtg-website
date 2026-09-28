@@ -187,7 +187,11 @@ test('een retry bevestigt de opslag opnieuw nadat de eerste cascade-save gooide'
 
   assert.throws(() => brug.deprovisioneer('O-KLANT', 'user-9'), /opslagpoging mislukt/);
   assert.equal(lid.status, 'uit dienst', 'de fail-closed RAM-stand blijft al dicht');
-  assert.equal(lid.token, null);
+  /* bedrijf/sleutels.js sluit(): geen kaal token meer, geen sessie, en de
+     epoch omhoog zodat ook een sessie van elders niet meer past */
+  assert.equal('token' in lid, false);
+  assert.deepEqual(lid.sessies, []);
+  assert.ok(lid.sessieEpoch >= 1);
 
   const herhaald = brug.deprovisioneer('O-KLANT', 'user-9');
   assert.equal(herhaald.ok, true);

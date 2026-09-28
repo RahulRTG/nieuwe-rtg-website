@@ -68,7 +68,11 @@ body[data-rtg-world="living"] .onder{
   gap:.75rem!important;
   padding:4.2rem 1rem 1rem!important;
   background:linear-gradient(transparent,rgba(8,5,4,.78) 32%,rgba(8,5,4,.96))!important;
+  /* De lege verloopband bovenin (4.2rem) is beeld en geen bediening: hij liet
+     klikken niet door, en lag zo over "Camera opnieuw openen". */
+  pointer-events:none;
 }
+body[data-rtg-world="living"] .onder>*{pointer-events:auto}
 
 body[data-rtg-world="living"] .rahul{
   margin:0!important;
@@ -135,7 +139,10 @@ body[data-rtg-world="living"] .geen-cam{
   z-index:3;
   align-items:flex-start;
   justify-content:flex-end;
-  padding:0 1.25rem 17rem;
+  /* Vrij van de onderbalk, en die staat boven de Edge (--edge-bottom): met een
+     vaste 17rem lag de knop "Camera opnieuw openen" -- de enige weg uit deze
+     stand -- er volledig onder (gemeten 27 september 2026). */
+  padding:0 1.25rem calc(17rem + var(--edge-bottom,64px));
   text-align:left;
   color:var(--camera-ivory);
   background:linear-gradient(180deg,rgba(7,5,4,.16),rgba(7,5,4,.9)),url('/images/editorial/camera-studio.webp') center/cover no-repeat!important;
@@ -201,5 +208,5 @@ body[data-rtg-world="living"] .studio-kop,body[data-rtg-world="living"] .studio-
   body[data-rtg-world="living"] header.boven .ios-nav-titel::before{content:"RTG";font:500 1.55rem/1 'Bodoni Moda',Georgia,serif}
   body[data-rtg-world="living"] header.boven .ios-nav-titel::after{content:"Camera";font:600 .58rem/1 Inter,system-ui,sans-serif;letter-spacing:.16em;text-transform:uppercase}
   body[data-rtg-world="living"] header.boven .ios-nav-acties{display:flex!important;gap:.35rem!important}
-  body[data-rtg-world="living"] .geen-cam{padding-bottom:21.5rem}
+  body[data-rtg-world="living"] .geen-cam{padding-bottom:calc(21.5rem + var(--edge-bottom,64px))}
 }

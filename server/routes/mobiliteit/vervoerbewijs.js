@@ -18,7 +18,7 @@
    maar een vinkje. */
 module.exports = (kern, hulp) => {
   const { app, auth, supplierAuth, managerOnly, officeAuth, gegevensStop,
-    kaartKoop, kaartMijn, kaartAanbod, kaartControle,
+    kaartKoop, kaartMijn, kaartAanbod, kaartControle, kaartToonVoor,
     aboKoop, aboMijn, aboAanbod,
     storingMeld, storingLijst, storingTeruggave,
     overeenkomstZet, overeenkomstLijst,
@@ -52,6 +52,15 @@ module.exports = (kern, hulp) => {
   app.post('/api/mob/kaart/mijn', auth, (req, res) => {
     if (geenGast(req, res)) return;
     stuur(res, kaartMijn(req.session));
+  });
+  /* TONEN IS ROTEREN (kern/mobiliteit/kaarttoegang.js): een los kaartje of een
+     abonnement, op id. Het antwoord is de enige plek waar de code kaal staat. */
+  app.post('/api/mob/kaart/toon', auth, async (req, res) => {
+    if (geenGast(req, res)) return;
+    let r;
+    try { r = await kaartToonVoor(req.session, req.body || {}); }
+    catch (e) { return res.status(503).json({ error: 'Het vervoerbewijs kon nu niet veilig worden getoond. Probeer het zo opnieuw.' }); }
+    stuur(res, r);
   });
 
   /* Het abonnement. Zelfde poort als een los kaartje: het is een doorlopende
@@ -92,9 +101,12 @@ module.exports = (kern, hulp) => {
   });
 
   /* ---------------- het personeel: controleren ---------------- */
-  app.post('/api/staff/mob/kaart/controle', supplierAuth, (req, res) => {
+  app.post('/api/staff/mob/kaart/controle', supplierAuth, async (req, res) => {
     if (ovZaakOnly(req, res)) return;
-    stuur(res, kaartControle(req.supplier, req.actor && req.actor.name, req.body || {}));
+    let r;
+    try { r = await kaartControle(req.supplier, req.actor && req.actor.name, req.body || {}); }
+    catch (e) { return res.status(503).json({ error: 'Het vervoerbewijs kon nu niet veilig worden gecontroleerd.', geldig: false }); }
+    stuur(res, r);
   });
   app.post('/api/staff/mob/kaart/storing', supplierAuth, (req, res) => {
     if (ovZaakOnly(req, res)) return;

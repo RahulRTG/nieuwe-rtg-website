@@ -68,17 +68,23 @@ module.exports = (ctx) => {
       } catch (e) { /* deze buur ook niet; de volgende proberen */ }
     }
   }
-  // de ontvangende kant: de melding van een buurdoos doorsturen naar de cloud
-  async function buurDoorgeven(b) {
+  /* De ontvangende kant: de melding van een buurdoos doorsturen naar de cloud.
+     Heeft de buur een EIGEN sleutel (`eigen`), dan reist die ongewijzigd mee en
+     keurt de cloud hem (scope buurmelding); deze doos stuurt dan niet haar eigen
+     sleutel mee, want dan zou de melding op haar naam binnenkomen. Een weigering
+     van de cloud komt terug als 403. */
+  async function buurDoorgeven(b, eigen) {
     if (st.modus !== 'cloud') return false; // onze eigen lijn ligt er ook uit
     b = b || {};
+    const koppen = eigen ? Object.assign({ 'Content-Type': 'application/json' }, eigen)
+      : require('./koppen').doosKoppen({ 'Content-Type': 'application/json' }, SLEUTEL);
     try {
       const r = await fetch(CLOUD() + '/api/doos/meting', {
-        method: 'POST', headers: require('./koppen').doosKoppen({ 'Content-Type': 'application/json' }, SLEUTEL),
+        method: 'POST', headers: koppen,
         body: JSON.stringify({ doos: b.doos, rtt: b.rtt, modus: b.modus, journaal: b.journaal, via: DOOS_NAAM }),
         signal: AbortSignal.timeout(10000)
       });
-      return r.ok;
+      return r.status === 403 ? 403 : r.ok;
     } catch (e) { return false; }
   }
 

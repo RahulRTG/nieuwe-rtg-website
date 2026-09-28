@@ -14,7 +14,7 @@ async function context() {
     localStorage.setItem('rtg_cookieinfo_v1', '1'); }, token); return ctx;
 }
 async function open(page) {
-  await page.goto(srv.base + '/apps/wereld.html', { waitUntil: 'domcontentloaded' });
+  await page.goto(srv.base + '/apps/rtg.html', { waitUntil: 'domcontentloaded' }); // het LivingOS-bureau; wereld.html is de Saloon (#402)
   await page.waitForSelector('body[data-rtg-desktop]');
 }
 test.before(async () => {

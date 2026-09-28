@@ -22,6 +22,18 @@
   }
   $('#knopGids').addEventListener('click', toonGids);
   $('#gidsDicht').addEventListener('click', () => $('#gidsLaag').classList.remove('open'));
+  /* ESCAPE SLUIT DE BOVENSTE LAAG, via zijn eigen sluitknop, zodat sluiten doet
+     wat het altijd deed. De gids, het atelier en de huistelefoon hadden alleen
+     die knop; een toetsenbordgebruiker kwam er niet meer uit (gemeten 27
+     september 2026). Een LOPEND spel sluit Escape met opzet niet: #spelWeg
+     verlaat het potje, en dat hoort een bewuste tik te zijn en geen toets die je
+     per ongeluk raakt. De keuze- en uitslagschermen van het spel sluiten wel. */
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    const open = Array.from(document.querySelectorAll('section.laag.open')).pop();
+    const knop = open && open.querySelector('#gidsDicht,#atelierDicht,#belDicht,#spelKeuzeWeg,#paarKeuzeWeg,#kiesWeg,#spelUitslagWeg');
+    if (knop && knop.offsetParent !== null) knop.click();
+  });
 
   /* mijn suite: binnenlopen en het atelier openen */
   async function naarMijnSuite() {

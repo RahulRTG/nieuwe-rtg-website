@@ -12,15 +12,16 @@
    de klussenlijst maar bij de beveiligingslaag, naast de rest van de
    inbraakmeldingen. Krijgt de gedeelde ctx plus de paspoorthelpers. */
 module.exports = (ctx, H) => {
-  const { d, save, crypto, schoon, nu, seintje, beveilig } = ctx;
+  const { d, save, schoon, nu, seintje, beveilig } = ctx;
   const { paspoort } = H;
 
   const updates = () => { if (!Array.isArray(d().stadUpdates)) d().stadUpdates = []; return d().stadUpdates; };
 
-  /* Een ondertekend updatemanifest. De handtekening is een HMAC met de EIGEN
-     sleutel van het apparaat: alleen deze doos kan hem narekenen, en alleen
-     deze stad kan hem zetten. Er staat altijd een TERUGVALVERSIE bij -- een
-     update zonder weg terug is een fout die je maar een keer maakt. */
+  /* Een ondertekend updatemanifest. De handtekening is een HMAC met de
+     MANIFESTSLEUTEL van deze doos: afgeleid uit een servergeheim, dus niet uit
+     de database te halen (./doossleutel.js), en eenmaal aan de doos gegeven.
+     Er staat altijd een TERUGVALVERSIE bij -- een update zonder weg terug is
+     een fout die je maar een keer maakt. */
   function updateUit({ versie, sha256, notitie, wie }) {
     const v = schoon(versie, 20);
     if (!/^\d+\.\d+\.\d+$/.test(v)) return { status: 400, error: 'Geef een versie als 1.2.3.' };
@@ -38,13 +39,15 @@ module.exports = (ctx, H) => {
   }
 
   // wat een doos te horen krijgt als hij vraagt of er iets nieuws is
-  function updateVoor(n) {
+  function updateVoor(n, epoch) {
     const u = updates()[0];
     if (!u) return { ok: true, update: null, reden: 'er is nog geen versie uitgegeven' };
     const pp = paspoort(n.serial);
     if (pp.firmware === u.versie) return { ok: true, update: null, reden: 'deze doos draait al ' + u.versie };
     const bericht = u.versie + '|' + u.sha256 + '|' + u.at;
-    const handtekening = crypto.createHmac('sha256', n.sleutelHash || 'geen').update(bericht).digest('hex');
+    const handtekening = ctx.sleutels.onderteken(n.serial, epoch, bericht);
+    if (!handtekening) return { ok: true, update: null,
+      reden: 'er is geen ondertekensleutel op deze server; een manifest zonder handtekening gaat er niet uit' };
     return { ok: true, update: { ...u, bericht, handtekening },
       let_op: 'Controleer de handtekening met je eigen apparaatsleutel voordat je iets installeert, en houd ' +
         (u.terugval || 'de huidige versie') + ' als terugval.' };

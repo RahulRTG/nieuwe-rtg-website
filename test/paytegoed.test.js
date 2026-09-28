@@ -271,6 +271,10 @@ test('een tegoed verloopt, en dan gaat het terug naar de koper en niet naar RTG'
     },
     zorgSaldo: async () => ({ ok: true, bijgeladen: 0 }),
     seintje: () => {}, bestaatLid: async () => true,
+    /* Het grootboek als lijst: de escrowboeking gaat via
+       betaalopdracht/terugboeking.js, en die kijkt daar eerst of dezelfde
+       beweging er al staat (zie tegoedbon-credential.test.js voor de rest). */
+    grootboek: () => [], geldModus: 'schaduw',
     MIN_CENTEN: 1, MAX_CENTEN: 500000
   };
   const tegoed = require('../server/kern/pay/tegoed')(ctx);

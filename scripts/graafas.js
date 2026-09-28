@@ -83,7 +83,11 @@ const REGISTER = [
   { id: 'waardegraaf', bestand: 'server/kern/pay/graaf.js', maker: null, eenheid: 'stroom',
     as: null,
     waaromGeenEenheid: 'De waardegraaf telt stromen op uit grootboekregels; er is geen eenheid die hij zelf vormt.',
-    waarom: 'Waar ging deze euro heen -- een herkomstvraag over het verleden, niet over wat er nu moet.' }
+    waarom: 'Waar ging deze euro heen -- een herkomstvraag over het verleden, niet over wat er nu moet.' },
+  { id: 'leerhuisgraaf', bestand: 'server/kern/leerhuis/graaf.js', maker: null, eenheid: 'impact',
+    as: null,
+    waaromGeenEenheid: 'De afhankelijkheden van het leerhuis worden per vraag uit het spoor van een organisatie afgeleid; er is geen functie die een knoop maakt.',
+    waarom: 'Wie en wat raakt een kenniswijziging -- een vraag naar afhankelijkheid. Wat haast heeft, zegt de impactklasse die een mens koos, niet de graaf (ACADEMY.md par. 4).' }
 ];
 
 /* Commentaar en tekenreeksen eruit, zodat een veldnaam in een uitleg niet

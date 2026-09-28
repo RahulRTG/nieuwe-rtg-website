@@ -47,14 +47,18 @@ const CONTRACTEN = Object.assign({},
      ./idemsleutels.js, die om precies dezelfde reden vier zijbestanden heeft. */
   require('./mutatiecontracten-beschermd').CONTRACTEN,
   require('./mutatiecontracten-leest').CONTRACTEN,
+  require('./mutatiecontracten-connection').CONTRACTEN,
   require('./mutatiecontracten-beleidsmotor').CONTRACTEN,
   require('./mutatiecontracten-werkbetaling').CONTRACTEN,
   require('./mutatiecontracten-vertegenwoordiging').CONTRACTEN,
   require('./mutatiecontracten-staffgemoed').CONTRACTEN,
   require('./mutatiecontracten-zaakkant').CONTRACTEN,
   require('./mutatiecontracten-rugdekking').CONTRACTEN,
+  /* RTG Vrijheid en RTG zelf als werkgever (VRIJHEID.md). */
+  require('./mutatiecontracten-vrijheid').CONTRACTEN,
   require('./mutatiecontracten-magnaatleven').CONTRACTEN,
   require('./mutatiecontracten-democratie').CONTRACTEN,
+  require('./mutatiecontracten-leerhuis').CONTRACTEN,
   require('./mutatiecontracten-carriereledger').CONTRACTEN,
   require('./mutatiecontracten-vakschema').CONTRACTEN,
   require('./mutatiecontracten-tweedehandeling').CONTRACTEN,
@@ -91,6 +95,7 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-vracht').CONTRACTEN,
   require('./mutatiecontracten-rtgid').CONTRACTEN,
   require('./mutatiecontracten-salon').CONTRACTEN,
+  require('./mutatiecontracten-codes').CONTRACTEN,
   require('./mutatiecontracten-muziekfeed').CONTRACTEN,
   require('./mutatiecontracten-hardening-checkpoint').CONTRACTEN,
   require('./mutatiecontracten-beschermzaak').CONTRACTEN,
@@ -138,6 +143,10 @@ const CONTRACTEN = Object.assign({},
   /* Het eigenaarsherstel: zeven routes, per stuk beantwoord of een herhaling
      een ander antwoord krijgt. Eigen bestand, zie de kop daar. */
   require('./mutatiecontracten-herstel').CONTRACTEN,
+  /* Het kantoor aan het stuur, uitsluitend op tonen (besluit C2). Zie de kop. */
+  require('./mutatiecontracten-kantoorstuur').CONTRACTEN,
+  /* Van een betaalde pas naar gast (besluit C5). Zie de kop. */
+  require('./mutatiecontracten-naargast').CONTRACTEN,
   /* De zevenenveertig die uit de afleidgang vielen toen die een grens erbij
      kreeg, met de hand gelezen op 13 september 2026. Drie bestanden omdat ze
      drie verschillende dingen bleken: lezers, lezers-met-een-seeder, en wat

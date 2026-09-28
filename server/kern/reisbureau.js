@@ -164,7 +164,7 @@ function maakReisbureau({ db, save, crypto, visumtaakVan, accounts, meldLidVan }
     aanvraagVan, tripVan, markeerBetaald,
     bevestig, wijsAf, besluit,
     vraagWijziging: nazorg.vraagWijziging, besluitWijziging: nazorg.besluitWijziging,
-    zegAf: nazorg.zegAf } };
+    zegAf: nazorg.zegAf, markeerThuis: nazorg.markeerThuis } };
 }
 
 module.exports = { maakReisbureau, reisAanbod };

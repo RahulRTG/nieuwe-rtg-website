@@ -15,13 +15,22 @@
     history.replaceState(null, '', location.pathname + location.search);
   } catch (e) {}
 })();
+/* De campagnecode uit de link (?c=...), besluit C6: alleen een vorm die niets
+   over een mens kan zeggen, en hij reist mee met de aanmelding als TELLING --
+   er komt niets van bij het account te staan (server/kern/aanmeldkanaal.js). */
+(function () {
+  try {
+    var c = String(new URLSearchParams(location.search).get('c') || '').trim().toLowerCase();
+    if (/^[a-z0-9][a-z0-9-]{1,31}$/.test(c)) window.__RTG_CAMPAGNE = c;
+  } catch (e) {}
+})();
 </script>
 <!-- De bouwstempel. npm run build zet hier en in app-main.js hetzelfde getal;
      wijken ze af, dan draait er nieuwe html naast een oud script (of andersom)
      en bouwt het beginscherm zichzelf niet meer op: een zwart scherm zonder
      foutmelding. app-main-01.js vergelijkt de twee en haalt zichzelf dan een
      keer vers op. -->
-<meta name="rtg-bouw" content="b07acdef">
+<meta name="rtg-bouw" content="66f7b80b">
 <!-- De foutmelder staat bewust VOORAAN: hij moet de fouten van het opstarten
      kunnen zien, en die gebeuren voordat de rest geladen is. -->
 <script src="/shared/meelezen.js"></script>
@@ -1027,6 +1036,14 @@ try {
      inlog (Bodoni-zin, één invoerregel), geen formulier. Blokkeert tot rond. */
   #onbGate{position:fixed;inset:0;z-index:130;background:radial-gradient(130% 100% at 50% -10%, #141013, #000 82%);overflow-y:auto;display:flex;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 1.4rem) 1.2rem calc(env(safe-area-inset-bottom,0px) + 1.6rem);}
   #onbGate[hidden]{display:none;}
+  /* de herkomstvraag na de registratie (app-main-070.js, besluit C6): BOVEN de Edge,
+     die onderin blijft staan en bereikbaar moet blijven (ADAPTIEF.md), en boven de werktafel (#rtgCommand, 210) */
+  #kanaalVraag{position:fixed;left:0;right:0;bottom:var(--rtg-adaptive-inset,0px);z-index:220;background:var(--card);color:var(--txt);border-top:1px solid var(--line);padding:1.25rem 1rem calc(1.25rem + env(safe-area-inset-bottom,0px));}
+  #kanaalVraag .kv-in{max-width:32rem;margin:0 auto;}
+  #kanaalVraag .kv-titel{font-size:1.02rem;}
+  #kanaalVraag .kv-meta{margin:0.25rem 0 0.9rem;}
+  #kanaalVraag .kv-rij{display:flex;flex-wrap:wrap;gap:0.5rem;}
+  #kanaalVraag .kv-over{margin-top:0.75rem;background:transparent;color:var(--muted);}
   .onb-card{max-width:30rem;width:100%;margin:0 auto;text-align:center;}
   .onb-mond{display:block;margin:0 auto .5rem;width:170px;height:auto;}
   .onb-zin{font-family:'Bodoni Moda',serif;font-weight:400;font-size:1.22rem;line-height:1.5;color:var(--txt);min-height:3.6rem;text-wrap:balance;margin:.2rem 0 1.1rem;animation:agZin .5s ease;}
@@ -1734,46 +1751,46 @@ try {
   .privrij{display:flex;gap:0.5rem;}
   .privknop.wis{border-color:rgba(194,58,94,0.4);}
 </style>
-<script src="/shared/command/catalog.js?v=b07acdef" defer></script>
-<script src="/shared/command/console.js?v=b07acdef" defer></script>
-<script src="/shared/command/verdeler.js?v=b07acdef" defer></script>
-<script src="/shared/interface/module-sdk.js?v=b07acdef" defer></script>
-<script src="/shared/interface/workspace-world-catalog.js?v=b07acdef" defer></script>
-<script src="/shared/interface/workspace-continuity.js?v=b07acdef" defer></script>
-<script src="/shared/interface/workspace-composer.js?v=b07acdef" defer></script>
-<script src="/shared/interface/workspace-registries.js?v=b07acdef" defer></script>
-<script src="/shared/interface/workspace-session.js?v=b07acdef" defer></script>
-<script src="/shared/interface/workspace-policy.js?v=b07acdef" defer></script>
-<script src="/shared/interface/workspace-context.js?v=b07acdef" defer></script>
-<script src="/shared/interface/workspace-navigation.js?v=b07acdef" defer></script>
-<script src="/shared/interface/workspace-state.js?v=b07acdef" defer></script>
-<script src="/shared/interface/workspace-orchestrator.js?v=b07acdef" defer></script>
-<script src="/shared/interface/workspace-blueprints.js?v=b07acdef" defer></script>
-<script src="/shared/interface/workspace-broker.js?v=b07acdef" defer></script>
-<script src="/shared/interface/workspace-module-host.js?v=b07acdef" defer></script>
-<script src="/shared/interface/workspace-runtime.js?v=b07acdef" defer></script>
-<script src="/shared/interface/workspace-legacy.js?v=b07acdef" defer></script>
-<script src="/shared/interface/workspace-empty.js?v=b07acdef" defer></script>
+<script src="/shared/command/catalog.js?v=66f7b80b" defer></script>
+<script src="/shared/command/console.js?v=66f7b80b" defer></script>
+<script src="/shared/command/verdeler.js?v=66f7b80b" defer></script>
+<script src="/shared/interface/module-sdk.js?v=66f7b80b" defer></script>
+<script src="/shared/interface/workspace-world-catalog.js?v=66f7b80b" defer></script>
+<script src="/shared/interface/workspace-continuity.js?v=66f7b80b" defer></script>
+<script src="/shared/interface/workspace-composer.js?v=66f7b80b" defer></script>
+<script src="/shared/interface/workspace-registries.js?v=66f7b80b" defer></script>
+<script src="/shared/interface/workspace-session.js?v=66f7b80b" defer></script>
+<script src="/shared/interface/workspace-policy.js?v=66f7b80b" defer></script>
+<script src="/shared/interface/workspace-context.js?v=66f7b80b" defer></script>
+<script src="/shared/interface/workspace-navigation.js?v=66f7b80b" defer></script>
+<script src="/shared/interface/workspace-state.js?v=66f7b80b" defer></script>
+<script src="/shared/interface/workspace-orchestrator.js?v=66f7b80b" defer></script>
+<script src="/shared/interface/workspace-blueprints.js?v=66f7b80b" defer></script>
+<script src="/shared/interface/workspace-broker.js?v=66f7b80b" defer></script>
+<script src="/shared/interface/workspace-module-host.js?v=66f7b80b" defer></script>
+<script src="/shared/interface/workspace-runtime.js?v=66f7b80b" defer></script>
+<script src="/shared/interface/workspace-legacy.js?v=66f7b80b" defer></script>
+<script src="/shared/interface/workspace-empty.js?v=66f7b80b" defer></script>
 <!-- RTG_WORKSPACE_MODULES_START: nieuwe modules komen via scripts/workspace-module.js binnen -->
-<script src="/shared/interface/second-screen-modules.js?v=b07acdef" defer></script>
-<script src="/shared/interface/modules/context.js?v=b07acdef" defer></script>
-<script src="/shared/interface/modules/travel.js?v=b07acdef" defer></script>
-<script src="/shared/interface/modules/safety.js?v=b07acdef" defer></script>
+<script src="/shared/interface/second-screen-modules.js?v=66f7b80b" defer></script>
+<script src="/shared/interface/modules/context.js?v=66f7b80b" defer></script>
+<script src="/shared/interface/modules/travel.js?v=66f7b80b" defer></script>
+<script src="/shared/interface/modules/safety.js?v=66f7b80b" defer></script>
 <!-- RTG_WORKSPACE_MODULES_END -->
-<script src="/shared/interface/workspace-experience.js?v=b07acdef" defer></script>
-<script src="/shared/interface/second-screen.js?v=b07acdef" defer></script>
-<script src="/shared/interface/second-screen-personal.js?v=b07acdef" defer></script>
-<script src="/shared/command/bank.js?v=b07acdef" defer></script>
-<script src="/shared/command/praat.js?v=b07acdef" defer></script>
-<script src="/shared/command/inlogpoort.js?v=b07acdef" defer></script>
-<script src="/shared/command/bladhaak.js?v=b07acdef" defer></script>
-<script src="/shared/command/romp.js?v=b07acdef" defer></script>
-<script src="/shared/command/geheugen.js?v=b07acdef" defer></script>
+<script src="/shared/interface/workspace-experience.js?v=66f7b80b" defer></script>
+<script src="/shared/interface/second-screen.js?v=66f7b80b" defer></script>
+<script src="/shared/interface/second-screen-personal.js?v=66f7b80b" defer></script>
+<script src="/shared/command/bank.js?v=66f7b80b" defer></script>
+<script src="/shared/command/praat.js?v=66f7b80b" defer></script>
+<script src="/shared/command/inlogpoort.js?v=66f7b80b" defer></script>
+<script src="/shared/command/bladhaak.js?v=66f7b80b" defer></script>
+<script src="/shared/command/romp.js?v=66f7b80b" defer></script>
+<script src="/shared/command/geheugen.js?v=66f7b80b" defer></script>
 <script src="/shared/rahul-tab/helpers.js" defer></script>
-<script src="/shared/command/beginscherm.js?v=b07acdef" defer></script>
-<script src="/shared/command/bladstand.js?v=b07acdef" defer></script>
-<script src="/shared/command/werktafel.js?v=b07acdef" defer></script>
-<script src="/shared/command.js?v=b07acdef" defer></script>
+<script src="/shared/command/beginscherm.js?v=66f7b80b" defer></script>
+<script src="/shared/command/bladstand.js?v=66f7b80b" defer></script>
+<script src="/shared/command/werktafel.js?v=66f7b80b" defer></script>
+<script src="/shared/command.js?v=66f7b80b" defer></script>
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
 <script src="/shared/media.js"></script>
 <link href="/shared/ios.css" rel="stylesheet">
@@ -2458,8 +2475,8 @@ try {
 <script src="/shared/glyf.js"></script>
 <script src="/shared/emoji.js"></script>
 <script src="/shared/uitvoer.js"></script>
-<script src="/apps/magnaat-sandbox.js?v=b07acdef"></script>
-<script src="/apps/magnaat-data.js?v=b07acdef"></script>
+<script src="/apps/magnaat-sandbox.js?v=66f7b80b"></script>
+<script src="/apps/magnaat-data.js?v=66f7b80b"></script>
 <script src="/apps/access/meaning.js"></script>
 <script src="/apps/app-main.js" defer></script>
 <script>
@@ -2836,7 +2853,7 @@ window.I18N = { en: {
   'inv.foundation':'of which to the RTFoundation (30%)', 'inv.vat':'VAT 21% (included in the contribution)',
   'inv.toms':'Travel part: VAT margin scheme for travel services', 'inv.total':'Total',
   'inv.ledger':'Ledger code (posting)',
-  'app.showcode':'Show pickup code', 'app.gc.hint':'Show this screen when collecting', 'app.gc.close':'Tap to close',
+  'app.showcode':'Show pickup QR', 'app.gc.bon':'Ticket', 'app.gc.hint':'Show this screen when collecting', 'app.gc.close':'Tap to close',
   'app.roomsfree':'room(s) available', 'app.tp.view':'View',
   'app.ms.closed':'Orders are temporarily closed. The menu remains on view.',
   'app.ms.rooms':'Available rooms', 'app.ms.pernight':'p.n.', 'app.ms.roomnote':'Booking goes via your concierge or Rahul, at net price.',
@@ -2929,12 +2946,12 @@ window.I18N = { en: {
   // --- Bezorgen / bestellen (leden) ---
   'bz.m.nieuw':'received by the business', 'bz.m.bereid':'being prepared', 'bz.m.haal':'ready for pickup',
   'bz.m.wachtb':'ready, waiting for the courier', 'bz.m.weg':'on the way to you', 'bz.m.ophalen':'pickup',
-  'bz.m.bezorgen':'delivery', 'bz.m.code':'code', 'bz.m.klaar2':'Enjoy! Your order has arrived.',
+  'bz.m.bezorgen':'delivery', 'bz.m.code':'ticket', 'bz.m.klaar2':'Enjoy! Your order has arrived.',
   'bz.geen':'No partners with a delivery service at your destination yet. As soon as a business opens the service, it appears here.',
   'bz.kan.bez':'delivery', 'bz.kan.oph':'pickup', 'bz.prod':'products', 'bz.terug':'All partners',
   'bz.adres':'Delivery address', 'bz.adresph':'Street, number, city', 'bz.hierok':'Location shared for the ETA',
   'bz.hier':'Share my location for a live ETA', 'bz.bestel':'Order and pay', 'bz.geengps':'This device shares no location.',
-  'bz.gpsfout':'Location sharing was denied; the ETA then stays an estimate.', 'bz.ok.oph':'Paid. Your pickup code: ',
+  'bz.gpsfout':'Location sharing was denied; the ETA then stays an estimate.', 'bz.ok.oph':'Paid. Your ticket number: ', 'bz.ok.qr':'. When collecting, show the pickup QR under My orders.',
   'bz.ok.bez':'Paid. You follow the delivery live above.',
   // --- Bestellen-tab + aandacht ---
   'app.v.bz':'Order.', 'app.v.bz.sub':'Have it delivered or pick it up at RTG partners, and follow your courier live.',

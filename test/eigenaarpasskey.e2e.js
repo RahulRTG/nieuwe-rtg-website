@@ -88,11 +88,13 @@ test('de eigenaar bevestigt zware handelingen met een passkey, vanaf de schermen
 
     await p.locator('#dsSectie').waitFor({ state: 'visible' });
     await p.locator('#dsNaam').fill('doos-proef');
+    /* een doossleutel hangt aan de zaak waar de doos staat (B12) */
+    await p.locator('#dsZaak').fill('KIKUNOI');
     const doos = antwoord(p, '/api/office/doos/sleutel');
     await p.locator('#dsGeef').click();
     assert.equal((await doos).status(), 200, 'de doossleutel is met de passkey bevestigd');
     await p.locator('#dsUit', { hasText: 'RTG_DOOS_ID=doos-proef' }).waitFor();
-    assert.match(await p.locator('#dsUit').innerText(), /[0-9a-f]{48}/);
+    assert.match(await p.locator('#dsUit').innerText(), /ZD\.[0-9A-F]{32}/, 'de eigen sleutel van 128 bit (B12)');
     await p.locator('#dsEigen', { hasText: 'doos-proef' }).waitFor();
     /* de gedeelde doos-sleutel dicht en weer open, met de vinger: hier meldt geen
        doos met de gedeelde sleutel, dus dicht mag */

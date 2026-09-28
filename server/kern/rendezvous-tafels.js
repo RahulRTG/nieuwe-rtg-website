@@ -20,16 +20,33 @@
    dezelfde uitnodiging sturen; er is met opzet GEEN veld om dat vast te leggen,
    want zodra het genoteerd wordt, is het iets dat kan uitlekken. Wie het bedacht,
    weet het; de software hoeft het niet te weten. */
-module.exports = ({ T, id, isDatum, schoon, nu, save, notify, codenaam }) => {
+module.exports = ({ T, id, isDatum, schoon, nu, save, notify, codenaam, geblokkeerd, R, Projection,
+  partnerCandidates = () => [], partnerEligible = () => false }) => {
+
+  const botsing = leden => {
+    if (!geblokkeerd) return false;
+    for (let i = 0; i < leden.length; i++) for (let j = i + 1; j < leden.length; j++) {
+      if (geblokkeerd(R(), leden[i], leden[j])) return true;
+    }
+    return false;
+  };
 
   function tafelMaak(b) {
     const naam = schoon(b.naam, 80);
     if (!naam) return { status: 400, error: 'Geef de tafel een naam.' };
     const plaatsen = Math.max(2, Math.min(12, parseInt(b.plaatsen, 10) || 8));
+    const genodigden = (Array.isArray(b.genodigden) ? b.genodigden : []).slice(0, plaatsen);
+    if (botsing(genodigden)) return { status: 409, error: 'Deze samenstelling bevat een geblokkeerd contact.' };
+    const datum = isDatum(b.datum) ? b.datum : '', tijd = /^\d{2}:\d{2}$/.test(b.tijd || '') ? b.tijd : '';
+    const supplierCode = schoon(b.supplierCode, 30).toUpperCase();
+    const service = ['diner', 'borrel'].includes(b.service) ? b.service : 'diner';
+    if (supplierCode && !partnerEligible(supplierCode, 'table', { city: schoon(b.stad, 40), date: datum, time: tijd, service }))
+      return { status: 409, error: 'Deze partner of locatie neemt voor dit moment niet deel aan The Table.' };
+    const partner = supplierCode ? (partnerCandidates('table', { city: schoon(b.stad, 40), date: datum, time: tijd, service }).find(x => x.code === supplierCode)) : null;
     const t = { id: id(), naam, stad: schoon(b.stad, 40), datum: isDatum(b.datum) ? b.datum : '',
-      tijd: /^\d{2}:\d{2}$/.test(b.tijd || '') ? b.tijd : '', thema: schoon(b.thema, 120),
+      tijd, thema: schoon(b.thema, 120), supplierCode: partner && partner.code, supplierName: partner && partner.name,
       plaatsen, genodigden: {}, at: nu() };
-    for (const k of (Array.isArray(b.genodigden) ? b.genodigden : []).slice(0, plaatsen)) t.genodigden[k] = { status: 'open', at: nu() };
+    for (const k of genodigden) t.genodigden[k] = { status: 'open', at: nu() };
     T()[t.id] = t; save();
     for (const k of Object.keys(t.genodigden)) {
       try { notify(k, { title: 'Rendez-vous', body: 'Een uitnodiging: ' + naam + (t.stad ? ', ' + t.stad : '') + '.', scope: 'lifestyle' }); } catch (e) {}
@@ -37,7 +54,11 @@ module.exports = ({ T, id, isDatum, schoon, nu, save, notify, codenaam }) => {
     /* Ook het antwoord op MAKEN draagt de lijst niet terug. Het kantoor ziet hem
        in het overzicht hieronder; hier zou hij alleen maar meeliften naar een
        plek waar niemand hem nodig heeft. */
-    return { status: 200, ok: true, tafel: { ...t, genodigden: undefined, aantal: Object.keys(t.genodigden).length } };
+    return { status: 200, ok: true,
+      tafel: Projection.project(Projection.NAMES.RENDEZVOUS_TABLE_OFFICE,
+        { id: t.id, naam: t.naam, stad: t.stad, datum: t.datum, tijd: t.tijd,
+          thema: t.thema, plaatsen: t.plaatsen, at: t.at, aantal: Object.keys(t.genodigden).length,
+          supplierCode: t.supplierCode, supplierName: t.supplierName }) };
   }
 
   // iemand later toevoegen aan een tafel die nog niet vol zit
@@ -47,6 +68,7 @@ module.exports = ({ T, id, isDatum, schoon, nu, save, notify, codenaam }) => {
     if (!key) return { status: 400, error: 'Onbekend lid.' };
     if (t.genodigden[key]) return { status: 200, ok: true, al: true };
     if (Object.keys(t.genodigden).length >= t.plaatsen) return { status: 409, error: 'De tafel zit vol.' };
+    if (botsing(Object.keys(t.genodigden).concat(key))) return { status: 409, error: 'Deze samenstelling bevat een geblokkeerd contact.' };
     t.genodigden[key] = { status: 'open', at: nu() };
     save();
     try { notify(key, { title: 'Rendez-vous', body: 'Een uitnodiging: ' + t.naam + (t.stad ? ', ' + t.stad : '') + '.', scope: 'lifestyle' }); } catch (e) {}
@@ -56,13 +78,14 @@ module.exports = ({ T, id, isDatum, schoon, nu, save, notify, codenaam }) => {
   /* Het overzicht voor het kantoor: wel de gastenlijst, op codenaam, met wie er
      heeft toegezegd. Dit is de enige plek waar die lijst het kern uit komt. */
   function tafelKantoor() {
-    const uit = Object.values(T()).map(t => ({
+    const uit = Object.values(T()).map(t => Projection.project(Projection.NAMES.RENDEZVOUS_TABLE_OFFICE, {
       id: t.id, naam: t.naam, stad: t.stad, datum: t.datum, tijd: t.tijd, thema: t.thema,
       plaatsen: t.plaatsen, at: t.at,
+      supplierCode: t.supplierCode, supplierName: t.supplierName,
       genodigden: Object.entries(t.genodigden).map(([k, g]) => ({ codenaam: codenaam(k), status: g.status })),
       toegezegd: Object.values(t.genodigden).filter(g => g.status === 'ja').length
     })).sort((a, b) => String(b.datum || b.at).localeCompare(String(a.datum || a.at)));
-    return { status: 200, tafels: uit };
+    return { status: 200, tafels: uit, partners: partnerCandidates('table', {}) };
   }
 
   return { rvTafelMaak: tafelMaak, rvTafelNodig: tafelNodig, rvTafelKantoor: tafelKantoor };

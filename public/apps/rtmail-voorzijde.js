@@ -7,6 +7,7 @@
   var staat = { berichten: [], huidig: null, adres: '', paneel: 'aandacht' };
   var oudeKop = d.querySelector('body > header');
   var oudeInhoud = d.querySelector('body > #main');
+  var overgang = 0;
 
   function vind(q, inRoot) { return (inRoot || root).querySelector(q); }
   function alle(q, inRoot) { return Array.prototype.slice.call((inRoot || root).querySelectorAll(q)); }
@@ -134,16 +135,28 @@
     w.RTGMailWerkstroom.teken(root, m);
   }
 
-  function diep(soort) {
+  async function diep(soort) {
+    var dezeOvergang = ++overgang;
+    root.setAttribute('aria-busy', 'true');
+    try {
+      if (soort === 'bericht' && staat.huidig && mail.open) await mail.open(staat.huidig);
+      else await mail.laad();
+    } catch (e) {
+      if (dezeOvergang === overgang) melding('Uw post kon niet worden geopend. Probeer het opnieuw.');
+      return;
+    } finally {
+      if (dezeOvergang === overgang) root.removeAttribute('aria-busy');
+    }
+    if (dezeOvergang !== overgang) return;
     root.hidden = true;
     d.body.classList.remove('rtm-voorzijde-actief');
     if (oudeKop) oudeKop.setAttribute('aria-hidden', 'false');
     if (oudeInhoud) oudeInhoud.setAttribute('aria-hidden', 'false');
-    if (soort === 'bericht' && staat.huidig && mail.open) mail.open(staat.huidig);
-    else mail.laad();
     w.scrollTo(0, 0);
   }
   function voorzijde() {
+    overgang++;
+    root.removeAttribute('aria-busy');
     root.hidden = false;
     d.body.classList.add('rtm-voorzijde-actief');
     if (oudeKop) oudeKop.setAttribute('aria-hidden', 'true');

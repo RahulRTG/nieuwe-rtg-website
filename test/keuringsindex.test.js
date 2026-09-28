@@ -134,3 +134,13 @@ test('4. de kap is een grens en geen stilte', () => {
   assert.equal(snel(route), traagGedekt(tekst, route), 'net onder de kap horen ze gelijk te zijn');
   assert.equal(snel(route), true);
 });
+
+test('5. een pad ZONDER /api-prefix (de tak van scripts/deltapoort.js) volgt de volle zoektocht', () => {
+  /* Toets 1 t/m 4 geven alleen /api/-paden, dus de tweede tak van gedekt()
+     raakte geen enkele toets: daar `return true` omdraaien bleef groen. */
+  const tekst = "// POST naar /extern/haak/ruw?x=1\nawait call('webhook/kaal');";
+  const snel = maakDekkingsIndex(tekst);
+  assert.equal(snel('/extern/haak/ruw'), true, 'letterlijk in de tekst: de includes-weg');
+  assert.equal(snel('/webhook/kaal'), true, 'kaal tussen quotes: de letterlijk-weg');
+  assert.equal(snel('/extern/haak/weg'), false, 'wat er niet staat is ook zonder prefix niet gedekt');
+});

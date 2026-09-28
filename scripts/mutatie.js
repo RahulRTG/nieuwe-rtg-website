@@ -1353,6 +1353,7 @@ const GEEN_BRONMUTATIE = new Map([
   ['rtfos-context.test.js', 'toetst kern/rtfos/basis.js, dat via require(path.join(MAP, \'basis\')) laadt en dus buiten het zicht van de motor valt (die koos server/kluis.js, dat alleen als passagier op ctx gaat); 3 handmutaties raak: euro deelt door 10 laat toets 2 zakken, een negatief bedrag doorlaten in naarCenten toets 2, euro uit het teruggegeven object halen toets 1 en 2'],
   ['livinglab-observatorium.test.js', 'motor muteerde de bedrading in livinglab/index.js; 4 handmutaties in observatorium(seinen).js, alle vier raak: zwaarste() omgedraaid laat toets 2, 3 en 4 zakken, klachtfilter !== open toets 3, geldbron-grendel weg toets 4, stilgelegd/klachten nooit storing toets 2 en 3'],
   ['travel-bearer-productiepoort.test.js', 'sinds de migratie van #403 is PER_ROUTE leeg: de poort houdt niets tegen, dus een mutatie in de methode- of NODE_ENV-grendel verandert niets waarneembaars (isProductie omgedraaid: 8/8 groen, terecht); wat er wel te zien is, is bewaakt: een route terug aan de grendel (/api/arrival/request) laat toets 1, 2, 6 en 8 zakken'],
+  ['toestel-routes.test.js', 'raakt geen enkel /api/-pad (alleen /toestel/cel, /cel.js, /manifest.json en /artefact/:sha, zonder authpoort), dus de liegpoort zit naast zijn onderwerp; 3 handmutaties in server/routes/toestel.js raak: connect-src self in de cel-CSP laat toets 1 zakken, de sha-formaatcontrole weg en immutable weg allebei toets 5'],
 ]);
 
 /* Welke SERVERMODULE toetst dit bestand? Uit zijn eigen requires: een pure toets

@@ -215,6 +215,33 @@ function deurstand(antwoord, anoniemAntwoord) {
   return ONBEPAALD;
 }
 
+/* EEN DOELGROEP KAN MEER DAN EEN VORM HEBBEN, en dan telt de deur voor de
+   doelgroep als EEN van zijn vormen erlangs komt. `gast` is een bezoeker EN
+   een gratis account (lib/doelgroepsessies.js); een route die alleen het
+   account opent, bedient de doelgroep -- en een route die geen van beide
+   opent, is pas dan dicht.
+
+   Daartussen geldt dezelfde terughoudendheid als bij een enkele vorm: is geen
+   vorm erlangs en gaf een vorm een ONBEPAALD antwoord (een andere weigering,
+   een rem of een netwerkfout), dan is de route onbepaald en niet dicht. Een
+   vorm die niets zei, had de vorm kunnen zijn die er wel langs kwam.
+
+   Geeft { stand, vorm } met stand LANGS, DICHT of ONBEPAALD, of null als geen
+   enkele vorm een antwoord gaf (dan is de route niet gezien). */
+async function klopVormen(basis, route, vormen, anoniemAntwoord) {
+  let gezien = false, twijfel = false;
+  for (const v of vormen) {
+    const a = await klop(basis, route, v);
+    if (a.onbepaald) { twijfel = true; continue; }
+    gezien = true;
+    const stand = deurstand(a, anoniemAntwoord);
+    if (stand === LANGS) return { stand: LANGS, vorm: v.vorm };
+    if (stand === ONBEPAALD) twijfel = true;
+  }
+  if (!gezien) return null;
+  return { stand: twijfel ? ONBEPAALD : DICHT, vorm: null };
+}
+
 async function meet() {
   const uit = {
     stempel: stempel(),
@@ -226,8 +253,10 @@ async function meet() {
       '-- negen dichte routes naast een open route zijn hier geen leugen. `dicht` betekent bovendien precies een ' +
       'ding: de sessie van deze doelgroep maakte geen enkel verschil met een anoniem verzoek. Dat is meestal een ' +
       'bewaker en soms een handler die iedereen gelijk afwijst; sterker is van buiten niet te meten. Een doelgroep ' +
-      'met meer dan een sessievorm (foundation dekt gezin, leerling en school) krijgt daarom nooit een leugen maar ' +
-      'een `onbepaald` met de reden. En hij beantwoordt geen productvraag: ' +
+      'met meer sessievormen dan de meter draagt (foundation dekt gezin, leerling en school) krijgt daarom nooit ' +
+      'een leugen maar een `onbepaald` met de reden. `gast` draagt er twee -- een bezoeker zonder account en een ' +
+      'gratis account met paspoortcontrole -- en een cel is open zodra een van beide erlangs komt (`openVorm`). ' +
+      'En hij beantwoordt geen productvraag: ' +
       'een doelgroep die niet is verklaard en niet binnenkomt heet `correct-afgesloten`, ook als iemand vindt ' +
       'dat hij erbij zou moeten kunnen. Dat is een besluit van de eigenaar en geen meetuitslag.',
     doelgroepen: DOELGROEP_IDS, sessies: {}, overgeslagen: [], cellen: [], telling: null
@@ -238,14 +267,20 @@ async function meet() {
   try {
     const { sessies, overgeslagen } = await haalDoelgroepen(srv.basis);
     uit.overgeslagen = overgeslagen;
-    for (const [naam, s] of Object.entries(sessies)) uit.sessies[naam] = s.uitleg;
+    for (const [naam, s] of Object.entries(sessies)) {
+      uit.sessies[naam] = s.vormen.length > 1
+        ? s.uitleg + ' [' + s.vormen.map((v) => v.vorm + ': ' + v.uitleg).join('; ') + ']'
+        : s.uitleg;
+    }
 
-    /* De dragers een keer klaarzetten; `draag()` geeft per doelgroep de kop en
-       het lichaam waarmee hij zich aanmeldt. */
+    /* De dragers een keer klaarzetten: per doelgroep een LIJST, een per vorm.
+       `draag()` geeft per vorm de kop en het lichaam waarmee hij zich aanmeldt. */
     const dragers = {};
     for (const [naam, s] of Object.entries(sessies)) {
-      const d = s.draag();
-      dragers[naam] = { kop: d.kop, lijf: d.lijf, gezinCode: d.lijf && d.lijf.code };
+      dragers[naam] = s.vormen.map((v) => {
+        const d = v.draag();
+        return { vorm: v.vorm, kop: d.kop, lijf: d.lijf, gezinCode: d.lijf && d.lijf.code };
+      });
     }
 
     const routes = alleRoutes().filter((r) => r.pad.startsWith('/api/') && !VERBODEN.has(r.pad));
@@ -280,15 +315,16 @@ async function meet() {
 
         let open = null, openMetDeur = null, gezien = 0, twijfel = 0;
         for (const r of mijn) {
-          const a = await klop(srv.basis, r, dragers[d]);
-          if (a.onbepaald) continue;
-          gezien++;
           const an = await anoniemVoor(r);
-          const stand = deurstand(a, an);
+          const uitslag = await klopVormen(srv.basis, r, dragers[d], an);
+          if (!uitslag) continue;
+          gezien++;
+          const stand = uitslag.stand;
           if (stand === ONBEPAALD) { twijfel++; continue; }
           if (stand === DICHT) continue;
           open = r.methode + ' ' + r.pad;
           cel.openRoute = r;
+          if (dragers[d].length > 1) cel.openVorm = uitslag.vorm;
           if (heeftDeur(an)) { openMetDeur = open; break; }   // langs een echte deur is het sterkste bewijs
         }
         cel.beproefd = gezien;
@@ -339,13 +375,24 @@ async function meet() {
         cel.triageReden = 'geen enkele verklaarde doelgroep heeft hier een sessie, dus er is niets om mee te vergelijken';
         continue;
       }
-      const mijnA = await klop(srv.basis, cel.openRoute, dragers[cel.doelgroep]);
+      /* De vorm die erlangs kwam is de meetlat; bij een doelgroep met een vorm
+         is dat die ene. Een verklaarde doelgroep met meer vormen krijgt
+         `zelfde` als EEN vorm hetzelfde antwoord krijgt, en `geweigerd` alleen
+         als ELKE vorm geweigerd werd -- anders is het onbekend. */
+      const mijnDragers = dragers[cel.doelgroep];
+      const mijnA = await klop(srv.basis, cel.openRoute,
+        mijnDragers.find((v) => v.vorm === cel.openVorm) || mijnDragers[0]);
       let zelfde = 0, geweigerd = 0, onbekend = 0;
       for (const d of verklaarde) {
-        const a = await klop(srv.basis, cel.openRoute, dragers[d]);
-        if (a.onbepaald || mijnA.onbepaald) { onbekend++; continue; }
-        if (a.status === mijnA.status && a.reden === mijnA.reden) zelfde++;
-        else if (WEIGERSTATUS.has(a.status)) geweigerd++;
+        let gelijk = false, allesGeweigerd = true;
+        for (const v of dragers[d]) {
+          const a = await klop(srv.basis, cel.openRoute, v);
+          if (a.onbepaald || mijnA.onbepaald) { allesGeweigerd = false; continue; }
+          if (a.status === mijnA.status && a.reden === mijnA.reden) { gelijk = true; break; }
+          if (!WEIGERSTATUS.has(a.status)) allesGeweigerd = false;
+        }
+        if (gelijk) zelfde++;
+        else if (allesGeweigerd) geweigerd++;
         else onbekend++;
       }
       cel.triageBewijs = { zelfde, geweigerd, onbekend, vergeleken: verklaarde.length };

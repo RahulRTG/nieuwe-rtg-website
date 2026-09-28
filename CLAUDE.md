@@ -232,8 +232,10 @@ besluit 4c open voor een gratis account NA een paspoortcontrole
 betaalde pas niets nieuws oplegt); de meter meet daarom een GECONTROLEERD gratis
 account. Let op de meetfout die eraan voorafging:
 `tier === 'guest'` is TWEE mensen -- een bezoeker zonder account (die `geenGast()`
-weigert) en een Community-lid met account -- en de demo-inlog `gast` van de
-doelgroepmeter is alleen de eerste. Wie "gratis" meet, registreert een account.
+weigert) en een Community-lid met account -- en de demo-inlog `gast` is alleen
+de eerste. Wie "gratis" meet, registreert een account: daarvoor is er
+`scripts/lib/gratisaccount.js`, en de doelgroepmeter draagt `gast` sindsdien in
+twee vormen (bezoeker en gratis account, SAMENLEVING.md par. 11.3).
 
 **`CONNECT.md` is het diepte-document van Foundation Connect** -- het
 ontdeknetwerk van FoundationOS, op het scherm **Ontdekken**. In een zin: *je komt

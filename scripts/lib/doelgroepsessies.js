@@ -31,6 +31,7 @@
 'use strict';
 
 const { ROLLEN } = require('./proefsessies');
+const { gecontroleerdGratis } = require('./gratisaccount');
 
 async function post(url, lijf) {
   const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -64,10 +65,32 @@ const DOELGROEPEN = {
     haal: async (basis) => (await post(basis + '/api/login', { tier: 'business' }) || {}).token || null,
     draag: viaKop
   },
+  /* `gast` IS TWEE MENSEN (SAMENLEVING.md par. 11.2): een bezoeker zonder
+     account en een RTG Community-lid MET account. Het register rekent ze
+     allebei tot deze doelgroep, en tot 28 september 2026 droeg deze module
+     alleen de eerste -- de demo-inlog, die `geenGast()` in server/server.js met
+     opzet weigert. Een functie die voor gratis leden open staat heette dan
+     een registerleugen omdat een BEZOEKER er niet in kwam.
+
+     Daarom twee VORMEN, in deze volgorde. De eerste is de bezoeker en blijft
+     wat `draag()` geeft, zodat wie alleen de bezoeker wil (de bodemmeter, als
+     eigen kolom) niets merkt. De tweede is een gratis account waarvan RTG het
+     paspoort heeft gezien: dat is het ruimste wat deze doelgroep zonder pas
+     kan zijn, en een route die daar opengaat bedient de doelgroep. */
   gast: {
-    uitleg: 'de gratis app zonder pas',
-    haal: async (basis) => (await post(basis + '/api/login', { tier: 'guest' }) || {}).token || null,
-    draag: viaKop
+    uitleg: 'de gratis app zonder pas: een bezoeker en een gratis account met paspoortcontrole',
+    vormen: {
+      bezoeker: {
+        uitleg: 'een bezoeker zonder account (demo-inlog)',
+        haal: async (basis) => (await post(basis + '/api/login', { tier: 'guest' }) || {}).token || null,
+        draag: viaKop
+      },
+      account: {
+        uitleg: 'een gratis RTG-account waarvan RTG het paspoort heeft gezien',
+        haal: async (basis) => ((await gecontroleerdGratis(basis)) || {}).token || null,
+        draag: viaKop
+      }
+    }
   },
   leverancier: {
     uitleg: 'de manager van een zaak in de partner-app',
@@ -117,17 +140,28 @@ const DOELGROEPEN = {
 };
 
 /* Haalt alle (of de gevraagde) doelgroepsessies op tegen een draaiende server.
-   Geeft { sessies, overgeslagen }. */
+   Geeft { sessies, overgeslagen }. Elke sessie draagt `vormen` (minstens een);
+   `draag()` is die van de eerste vorm. */
 async function haalDoelgroepen(basis, welke) {
   const namen = welke && welke.length ? welke : Object.keys(DOELGROEPEN);
   const sessies = {}, overgeslagen = [];
   for (const naam of namen) {
     const d = DOELGROEPEN[naam];
     if (!d) { overgeslagen.push({ doelgroep: naam, reden: 'onbekende doelgroep' }); continue; }
-    let waarde = null, fout = null;
-    try { waarde = await d.haal(basis); } catch (e) { fout = String((e && e.message) || e); }
-    if (!waarde) { overgeslagen.push({ doelgroep: naam, reden: fout || ('inloggen als ' + naam + ' leverde geen sessie op') }); continue; }
-    sessies[naam] = { doelgroep: naam, waarde, uitleg: d.uitleg, draag: () => d.draag(waarde) };
+    /* Een doelgroep zonder `vormen` heeft er precies een, onder zijn eigen naam. */
+    const soorten = d.vormen ? Object.entries(d.vormen) : [[naam, d]];
+    const vormen = [];
+    for (const [vorm, v] of soorten) {
+      let waarde = null, fout = null;
+      try { waarde = await v.haal(basis); } catch (e) { fout = String((e && e.message) || e); }
+      const wie = d.vormen ? naam + ' (' + vorm + ')' : naam;
+      /* Een ontbrekende VORM is net zo min stil als een ontbrekende doelgroep:
+         de doelgroep wordt dan maar half gemeten, en dat hoort in overgeslagen. */
+      if (!waarde) { overgeslagen.push({ doelgroep: wie, reden: fout || ('inloggen als ' + wie + ' leverde geen sessie op') }); continue; }
+      vormen.push({ vorm, waarde, uitleg: v.uitleg, draag: () => v.draag(waarde) });
+    }
+    if (!vormen.length) continue;
+    sessies[naam] = { doelgroep: naam, waarde: vormen[0].waarde, uitleg: d.uitleg, vormen, draag: vormen[0].draag };
   }
   return { sessies, overgeslagen };
 }

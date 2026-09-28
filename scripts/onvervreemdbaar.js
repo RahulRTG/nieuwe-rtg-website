@@ -100,21 +100,10 @@ function klasseWerkwoord(functieStanden) {
 
 /* ---- de meting tegen een wegwerpserver ---- */
 
-/* Een gratis account langs de echte route, nooit een nagebouwd token. Zelfde
-   vorm als het proeflid in lib/proefsessies.js, met `tier: 'guest'` -- de
-   registratie laat dat toe (routes/auth/aanmeldcontrole.js: "de gratis
-   gast-laag"). */
-async function registreerGratis(basis) {
-  const u = Date.now().toString().slice(-8) + Math.floor(Math.random() * 90 + 10);
-  const r = await fetch(basis + '/api/auth/register', { method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name: 'Proefgenoot', email: 'gr' + u + '@voorbeeld.nl', phone: '06' + u.slice(0, 8),
-      password: 'geheim12345', geboortedatum: '1985-05-05', tier: 'guest' }) }).catch(() => null);
-  if (!r) return null;
-  const j = await r.json().catch(() => null);
-  const gebruiker = j && j.state && j.state.user;
-  return (j && j.token && gebruiker && gebruiker.tier === 'guest') ? { token: j.token, codenaam: gebruiker.codename } : null;
-}
+/* Een gratis account langs de echte route, nooit een nagebouwd token. Het
+   registreren woont in lib/gratisaccount.js, omdat de doelgroepmeter hetzelfde
+   gratis lid nodig heeft (SAMENLEVING.md par. 12, stap 4b). */
+const { registreerGratis } = require('./lib/gratisaccount');
 
 function onderVoorvoegsel(pad, prefix) {
   if (!pad.startsWith(prefix)) return false;

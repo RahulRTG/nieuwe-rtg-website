@@ -1195,7 +1195,11 @@ IS (`kern/kantoor/huis.js`), en de toegangsreview rekent per kantoorhouder uit
 of er een dienstverband loopt -- uitgerekend en niet opgeslagen, want een
 dienstverband eindigt op een datum. Afdwingen is een volgend besluit. "Staff Concierge", "Passport" en "Mijn RTG" zijn
 bezet; de concierge bestaat al en heet Fluister, het paspoort is een lezing van
-`kern/carriereledger/`. En geen score op een mens, geen "waarschijnlijk" zonder
+`kern/carriereledger/`. De drie andere besluiten zijn op 28 september genomen: een
+vrije verjaardag is een RECHT voor iedereen (standaard uit, zelf aanzetten),
+het loopbaanbewijs heet op het scherm **Mijn loopbaan**, en Fluister biedt
+**alleen op vraag** aan -- de ochtendkaart toont dus wat er staat en stelt niets
+voor. En geen score op een mens, geen "waarschijnlijk" zonder
 meting, en alles wat een tweede persoon bereikt (een ruil, ook voor een
 verjaardag) bevestigt een mens.
 **`MUTATIECONTRACT.md` is de laag ernaast** — niet wie iets mag (dat is

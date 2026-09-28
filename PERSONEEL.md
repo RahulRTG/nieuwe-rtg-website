@@ -127,7 +127,7 @@ Stand: **besloten** (B1, 27 september 2026: ja, helemaal) -- de eerste stap staa
 | Voorgesteld | Stand | Uitweg |
 |---|---|---|
 | **Staff Concierge** | **bezet** — `concierge` staat in 80 bestanden: de menselijke concierge van de Lifestyle Pass (SERVICE.md), `kern/mall/concierge.js`, De Rechterhand | niet nodig: **Fluister voor de vloer IS de staff concierge** en staat al (par. 5) |
-| **RTG Passport** | **bezet** — `paspoort` staat in 209 bestanden en is het identiteitsdocument (de 18+-poort, `volwassen()`) | het ding bestaat al als `kern/carriereledger/`; de SCHERMnaam is open (B3) |
+| **RTG Passport** | **bezet** — `paspoort` staat in 209 bestanden en is het identiteitsdocument (de 18+-poort, `volwassen()`) | het ding bestaat al als `kern/carriereledger/`; de SCHERMnaam is **Mijn loopbaan** (B3, besloten) |
 | **Mijn RTG** | **bezet** — `MIJNRTG.md` is de persoonlijke vertrouwenslaag (identiteit, data, rechten, apparaten, bewijs) | niet gebruiken als kop van het loopbaanbewijs |
 | **erkenning** | 40 bestanden, meerdere betekenissen | eerst meten vóór het een veldnaam wordt; in dit document is het een soort regel in het ledger |
 | **stilte** | 94 bestanden | "gezonde stilte" is een begrip uit KANTOOR.md par. 7, geen nieuwe module |
@@ -275,7 +275,8 @@ er een eerlijke verdelingsmachine achter zit. Drie grenzen:
   zich voelt.
 
 Stand: **een stap weg** — de verdeling staat voor beveiliging en moet worden
-losgemaakt van dat ene domein. Of Fluister ongevraagd mag aanbieden is **B4**.
+losgemaakt van dat ene domein. Fluister biedt **alleen op vraag** aan (B4,
+besloten): wie niets vraagt, krijgt niets.
 
 ## 7. Regelen vóórdat iemand erom vraagt
 
@@ -303,8 +304,9 @@ Donderdag ben je jarig. Je bent vrij. 🎂
 
 Mooi, en het botst op drie plekken — alle drie op te lossen:
 
-1. **Een verjaardag vrij is een arbeidsvoorwaarde, geen functie.** Dat besluit
-   de werkgever (B2), niet de software.
+1. **Een verjaardag vrij is een arbeidsvoorwaarde, geen functie.** De werkgever
+   heeft besloten (B2): bij RTG is hij een RECHT, voor iedereen van kantine tot
+   eigenaar. De software legt het recht niet op; zij zet het klaar.
 2. **De geboortedatum staat er voor iets anders.** De payroll kent hem voor het
    jeugdloon. Hem gebruiken voor iets anders is een nieuw doel, en dus een keuze
    van de medewerker: niet iedereen wil dat zijn verjaardag in het werk
@@ -360,7 +362,7 @@ met de vaardigheden uit Métier (`kern/metier/`, de bron volgens ARBEID.md par.
   kwaliteit mag, lock-in door gijzeling zakt.*
 
 Stand: het ledger **staat**; deze kaart is **een stap weg**; de schermnaam is
-**B3**.
+**Mijn loopbaan** (B3, besloten).
 
 ## 9. Een waardige uitgang
 
@@ -449,9 +451,9 @@ Waar een functie botst met een grens, vervalt de functie.
 | **4** | de aandachtskaart van de eigenaar (par. 5): besluitenwachtrij plus stilte met bewijsgraad | een stap weg |
 | **5** | het loopbaanbewijs als lezing van het ledger (par. 8) | een stap weg |
 | **6** | de waardige uitgang (par. 9), behalve de overdracht | een stap weg |
-| **7** | Fluister biedt aan (par. 6), met de verdeling los van beveiliging | vraagt een besluit (B4) |
+| **7** | Fluister biedt aan (par. 6), met de verdeling los van beveiliging | een stap weg; alleen op vraag (B4) |
 | **8** | overdracht via de verantwoordelijkheidsgraaf | vraagt een besluit (KANTOOR.md par. 5) |
-| **9** | vooraf regelen: apparatuur en verjaardag (par. 7) | jaren weg / B2 |
+| **9** | vooraf regelen: apparatuur en verjaardag (par. 7) | apparatuur jaren weg; verjaardag een stap weg (B2 besloten) |
 
 Blok 0 gaat voor alles, en is goedkoper dan het lijkt: het meeste van deze
 ervaring hoeft niet gebouwd te worden, alleen te worden OPENGEZET voor RTG zelf.
@@ -481,15 +483,20 @@ ervaring hoeft niet gebouwd te worden, alleen te worden OPENGEZET voor RTG zelf.
      schaduw, dan waarschuwen, dan afdwingen); de intrekking van lopende sessies
      staat al klaar (`kern/kantoor/intrekking.js`);
   4. RTG's eigen werk (ook de kantine) op de Team Room.
-- **B2 — Is een verjaardag vrij een arbeidsvoorwaarde bij RTG?** Ja (en dan per
-  medewerker zelf aan te zetten) of nee (dan alleen een felicitatie, ook zelf aan
-  te zetten).
-- **B3 — Hoe heet het loopbaanbewijs op het scherm?** "Paspoort" en "Mijn RTG"
-  zijn bezet. Voorstellen: *Mijn loopbaan* (aanbevolen, zegt wat het is) of *Mijn
-  werk bij RTG* (tijdgebonden, maar het gaat mee als je vertrekt).
-- **B4 — Mag Fluister ongevraagd iets aanbieden?** Aanbevolen: ja, maximaal één
-  kaart per dienst, altijd weg te tikken, en uit te zetten door de medewerker
-  zelf. Alternatief: alleen op vraag.
+- **B2 — Is een verjaardag vrij een arbeidsvoorwaarde bij RTG? BESLOTEN (28
+  september 2026): ja, als RECHT** -- voor iedereen, van kantine tot eigenaar,
+  want status is geen aandacht. Twee dingen blijven gelden: het staat standaard
+  UIT en de medewerker zet het zelf aan (de geboortedatum staat er voor het
+  jeugdloon, en een nieuw doel is zijn keuze), en een ruil van zijn dienst
+  bereikt een tweede mens, dus die collega bevestigt zelf. Niet gebouwd; een
+  stap weg.
+- **B3 — Hoe heet het loopbaanbewijs op het scherm? BESLOTEN (28 september
+  2026): Mijn loopbaan.** Het blijft een lezing van `kern/carriereledger/`
+  zonder score; "Paspoort" en "Mijn RTG" blijven voor hun eigen betekenis.
+- **B4 — Mag Fluister ongevraagd iets aanbieden? BESLOTEN (28 september 2026):
+  nee, alleen op vraag.** Fluister zegt niets uit zichzelf; de ochtendkaart is
+  daarom geen aanbod maar een weergave van wat er al staat (rooster, verzuim,
+  verlof), en een voorstel verschijnt pas als de medewerker erom vraagt.
 
 ## 13. Wat dit document niet zegt
 

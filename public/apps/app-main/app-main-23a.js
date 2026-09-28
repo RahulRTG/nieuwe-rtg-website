@@ -84,7 +84,7 @@
     rtfbuurt:    { naam: 'RTFoundation in jouw buurt', url: '/apps/foundation/os-publiek.html' },
     klimaat:     { naam: 'Klimaatfonds', url: '/apps/foundation/klimaatfonds.html' },
     buurtruil:   { naam: 'Buurtruil', url: '/apps/foundation/buurtruil.html' },
-    kwesties:    { naam: 'Wat speelt er', url: '/apps/foundation/kwesties.html' },
+    kwesties:    { naam: T('app.kwesties', 'Wat speelt er'), url: '/apps/foundation/kwesties.html' },
     geven:       { naam: 'Geven', url: '/apps/foundation/geven.html' },
     rtfwinkel:   { naam: 'Winkel van de RTFoundation', url: '/apps/foundation/winkel.html' },
     spelen:      { naam: 'Spelen',       url: '/apps/spelen.html?pas=' + encodeURIComponent(pas) },

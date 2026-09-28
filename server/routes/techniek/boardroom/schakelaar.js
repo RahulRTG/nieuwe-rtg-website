@@ -27,6 +27,9 @@ module.exports = (b) => {
        functie-stand achter EN wiste het automaat-merk van een bestaande -- dus
        een 404 die de storingswachter stilzette. */
     let as = '', sleutel = '';
+    if (f.alleenGlobaal && (req.body.persoon || req.body.plaats || req.body.land || req.body.doelgroep)) {
+      return res.status(409).json({ error: 'Deze functie gaat alleen voor iedereen tegelijk aan of uit, niet per persoon, plaats, land of pas.' });
+    }
     if (req.body.persoon) {
       const p = await herleidPersoon(req.body.persoon);
       if (!p) return res.status(404).json({ error: 'Geen account gevonden op die codenaam of e-mail.' });

@@ -278,6 +278,41 @@ drukken. De zes vragen per bewijsstuk (`stelt`, `nietZegt`, `doorWie`, `graad`,
 `werkwoord`, `herkomst`) gebruiken met opzet de woorden van
 `kern/carriereledger/regels.js` en geen tweede vocabulaire.
 
+**`POLITIEK.md` is het masterplan voor DemocratieOS en de partij** -- twee
+projecten die bewust uit elkaar worden gehouden: DemocratieOS (werknaam) is
+partijneutrale burgerinfrastructuur in FoundationOS voor burgers, organisaties,
+overheden en alle partijen, en een toekomstige partij van de eigenaar is daarop
+een gewone deelnemer, als klant en met exact dezelfde rechten. Dat moet
+technisch gelden, ook als de oprichter RTG bezit. Twee proeven houden het
+eerlijk: P1 (de partij verdwijnt en DemocratieOS draait door) is machinaal te
+bewijzen, P2 (de oprichter verdwijnt uit RTG en de partij draait door) maar half
+-- de rest staat in statuten en contracten, en dat staat er liever dan een groen
+vinkje. Dertien grondwetsregels (DO-01 t/m DO-13) met per regel wie hem vandaag
+handhaaft (meestal niemand), een lus van twaalf stappen waarvan bijna elke stap
+al in een ander domein staat (`livinglab/vraagbesluit.js` IS al *Niemand kwijt*
+voor een domein), en een kwestie die niets bezit en alleen verwijst. Let op de
+namen: `zaak` en `tafel` zijn ernstig bezet (de kern heet `kwestie`),
+**`toezegging` is een financiele belofte van het mecenaat** in de geldgraaf (de
+politieke heet `politiekeToezegging`), en `partij` is een contractpartij of een
+potje (`politiekePartij`). De scherpste regels: er is geen overtuigings-API en
+dat is geen promptfilter maar een capability die niet bestaat, volgorde is ook
+een rangorde (dus nooit alfabetisch of op zetels), en een toets beschermt tegen
+vergissingen en niet tegen de eigenaar -- de echte bescherming van de grondwet
+zit in statuten, een extern verankerd wijzigingslog en review die ook voor
+beheerders geldt. Wetgeving (Wfpp, de aanstaande Wpp) komt er als
+`POLITICAL_LAW_PROFILE_NL` in, met per waarde rechtsgrond, toepassingsbereik,
+bron, geldig-vanaf en laatst-gecontroleerd -- nooit als constante. **Fase A is
+gesloten (25 september 2026)**: DemocratieOS krijgt een eigen rechtspersoon (de
+RTFoundation is initiatiefnemer, geen bestuurder), de grondwet heeft drie
+wijzigingsniveaus (NORMAAL, BESCHERMD, GRONDWET met wachttijd en extern anker) en
+een noodprocedure die alleen mag UITZETTEN en nooit een partijprivilege mag
+maken, en er is een derde proef (P3: RTG verdwijnt) die vandaag niet haalbaar is
+en daarom vanaf de eerste regel een eigen map met verklaarde afhankelijkheden
+eist. Fase B bouwt alleen kwestie -> eindstand -> terugkoppeling -> NIEMAND_KWIJT
+en kent geen partij; fase C probeert dat kapot te maken met drie synthetische
+partijen (Noord, Midden, Zuid). Pas als B en C groen zijn, komt er een echte
+partij aan de runtime -- en dat is niet die van de oprichter.
+
 **`ONTMOETEN.md` is het diepte-document van de twee datingapps** — Vonk en
 Rendez-vous, en vooral waarom het er twee zijn en geen drie. In één zin: **Vonk
 zoekt de juiste mensen, Rendez-vous maakt de juiste ontmoeting** — bij Vonk is de
@@ -1424,8 +1459,8 @@ dat RTG vandaag klopt (`MAGNAATLAB.md`) maar of hij kan voorspellen dat RTG
 mórgen nog klopt. Lees die vóór je een begrip introduceert, een register aanlegt
 of een scorecard bouwt. De opzet vraagt een semantisch register naar aanleiding
 van de twee `VERMOGENS`; de vraag ervóór is gemeten (`scripts/semantiek.js`,
-`SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->128<!--/getal--> namen die in meer dan
-één domein staan, dragen er **<!--getal:semantiek.betekenissen-->110<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->408<!--/getal-->
+`SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->129<!--/getal--> namen die in meer dan
+één domein staan, dragen er **<!--getal:semantiek.betekenissen-->111<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->410<!--/getal-->
 betekenissen, met `SOORTEN` op **39**. Daarnaast **29** betekenissen die op meer
 dan één plek wonen én **106** paren die dezelfde waarheid onder een ándere naam
 dragen — die tweede ronde bestaat omdat de eerste ze miste, en de duurste

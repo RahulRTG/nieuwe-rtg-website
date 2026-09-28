@@ -48,6 +48,7 @@
    ========================================================================== */
 'use strict';
 
+const burger = require('../lib/burgerpad');
 const crypto = require('crypto');
 const { maakJournaal } = require('../kern/command/journaal');
 const verzoekcontext = require('../db/verzoekcontext');
@@ -102,8 +103,11 @@ function maakAuditspoor(deps) {
          een gescande deurklink straks tussen de echte besluiten. */
       const noteer = () => {
         if (res.statusCode < 200 || res.statusCode >= 300) return;
+        /* Een burgerpad: geen sleutel en alleen de dag (lib/burgerpad.js). */
+        const pseudoniem = burger.isBurgerpad(pad);
         journaal.noteer({
-            actor: wie(req),
+            actor: pseudoniem ? burger.PSEUDONIEM : wie(req),
+            at: pseudoniem ? burger.dag() : undefined,
             actie: req.method + ' ' + pad,
             niveau: 'api',
             uitslag: String(res.statusCode),

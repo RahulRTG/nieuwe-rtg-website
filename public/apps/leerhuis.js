@@ -90,6 +90,33 @@
     zet('kan', kan, 'Er is nog niets op uw naam vastgesteld.');
   }
 
+  /* De twee cockpits verschijnen alleen voor wie ze betreffen: een lid dat geen
+     trainer is en geen team heeft, ziet geen leeg vak met "u bent geen trainer". */
+  var wie = function (x) { return x.naam || 'een lid zonder codenaam'; };
+  function cockpits(org) {
+    lees(org, 'trainerCockpit').then(function (t) {
+      var aan = !!(t && t.ok);
+      $('trainerBlok').hidden = !aan;
+      if (!aan) return;
+      zet('trainer', (t.LEERLINGEN || []).map(function (x) {
+        return kaart(wie(x), x.stand, ['Leerpad ' + x.curriculum, x.volgende ? 'Volgende stap: ' + x.volgende : null]);
+      }), 'Er volgt nog niemand een leerpad bij u.');
+      $('trainerNiet').textContent = t.nietZichtbaar ? 'Niet zichtbaar: ' + t.nietZichtbaar + '.' : '';
+    }).catch(function () { $('trainerBlok').hidden = true; });
+    lees(org, 'managerCockpit').then(function (m) {
+      var team = (m && m.TEAM) || [];
+      $('teamBlok').hidden = !team.length;
+      if (!team.length) return;
+      zet('team', team.map(function (x) {
+        var regels = (x.gereed || []).map(function (g) {
+          return 'Rol ' + g.rol + ': ' + (g.klaar ? 'gereed' : 'nog niet gereed' + (g.ontbreekt && g.ontbreekt.length ? ', ontbreekt ' + g.ontbreekt.join(', ') : '')) + (g.verloopt && g.verloopt.length ? '; let op: ' + g.verloopt.join(', ') : '');
+        });
+        return kaart(wie(x), null, regels.length ? regels : ['Nog geen rol toegewezen.']);
+      }), '');
+      $('teamNiet').textContent = m.nietZichtbaar ? 'Niet zichtbaar: ' + m.nietZichtbaar + '.' : '';
+    }).catch(function () { $('teamBlok').hidden = true; });
+  }
+
   function laad(org) {
     if (!org) return;
     try { localStorage.setItem(BEWAAR, org); } catch (e) {}
@@ -97,8 +124,10 @@
     lees(org, 'mijn').then(function (m) {
       toon(m || {});
       meld('Leerhuis ' + org + '.');
+      cockpits(org);
     }).catch(function (e) {
       ['vandaag', 'pad', 'oefenen', 'kan'].forEach(function (id) { zet(id, [], 'Niet te tonen: ' + e.message); });
+      $('trainerBlok').hidden = true; $('teamBlok').hidden = true;
       meld(e.message);
     });
   }

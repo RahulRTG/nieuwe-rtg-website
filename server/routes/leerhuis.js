@@ -4,23 +4,21 @@
    DE ACTOR KOMT UIT DE SESSIE, NOOIT UIT HET LIJF (AUTHORITY.md grens 1): de
    kern krijgt `lid:<account-id>` uit `req.session.key`.
 
-   BESLUITEN (ACADEMY.md par. 5). B5: leren op elke leeftijd, een certificaat
-   alleen voor wie `volwassen()` haalt, fail closed buiten `lid:`; wie jonger
-   is ziet geen niveau. B4: certificaat en beoordeling antwoorden pas na een
+   BESLUITEN (ACADEMY.md par. 5). B5: een certificaat alleen voor wie
+   `volwassen()` haalt (fail closed), en wie jonger is ziet geen niveau. B4: certificaat en beoordeling antwoorden pas na een
    bevestigde commit; een 503 daar is "onbekend" (eerst `uitkomst`, dan opnieuw
    met dezelfde sleutel). B2: de relatie komt uit de bron van het leerhuis.
    B7: een startpakket zet concepten klaar via dezelfde handelingen.
 
-   STANDAARD UIT (functie `leerhuis`), en elke handeling draagt een SLEUTEL:
-   zonder sleutel is een herhaling een tweede handeling. */
+   STANDAARD UIT (functie `leerhuis`), en elke handeling draagt een SLEUTEL. */
 'use strict';
 
 const { maakLeerhuis } = require('../kern/leerhuis');
 const { relatieActief } = require('../kern/leerhuis/oordeel');
 const { idVanKey } = require('../lib/lidsleutel');
 const { maakVolwassen } = require('../kern/volwassen');
-/* Zelfde weg als routes/supplier/kassa.js: de bundel komt uit de opslag zelf,
-   niet van de kern, zodat de kern er niet breder van wordt. */
+const { maakNaamVan, metNamen } = require('../kern/leerhuis/namen');
+/* De bundel komt uit de opslag zelf (zoals supplier/kassa.js), niet van de kern. */
 const { bijeen, inBundel } = require('../db');
 
 /* Wat een LID mag vragen, en wat alleen het bestuur van de organisatie mag
@@ -41,12 +39,12 @@ module.exports = (kern) => {
   const rtfInStad = (key, stad) => !!(kern.rtfos && kern.rtfos.vrijwilligerportaal.account.inStad(key, stad));
   const bronToets = require('../kern/leerhuis/bron').maakBronToets({ accounts, employmentVanPersoon, entiteitVind, rtfInStad });
   const leerhuis = maakLeerhuis({ db, save, bijeen, inBundel, bronToets });
-  /* Alleen om de schaduwtellers van besluit B1 te LEZEN; de meelezer zelf hangt
-     in opzet/kantoordeur.js. */
+  /* Alleen de schaduwtellers van B1 LEZEN; de meelezer hangt in opzet/kantoordeur.js. */
   const schaduw = require('../kern/leerhuis/schaduw').maakLeerhuisSchaduw({ db, save });
-  /* Dezelfde fabriek als kern.volwassen (opzet/kernlaag1.js): dezelfde regel,
-     en de kern wordt er niet breder van (de ratel kernBreedte). */
+  /* Dezelfde fabriek als kern.volwassen: de kern wordt niet breder (kernBreedte). */
   const volwassen = maakVolwassen({ accounts });
+  /* Een cockpit toont mensen op codenaam. */
+  const naamVan = maakNaamVan((k) => kern.codenaamVan(k));
 
   function actor(req, res) {
     const id = idVanKey(req.session && req.session.key);
@@ -99,7 +97,7 @@ module.exports = (kern) => {
         : Object.assign({}, v, { vaardigheden: (v.vaardigheden || []).map(x => Object.assign({}, x, { niveau: null })) });
       const a = { mijn: () => { const m = l.mijn(org, door); return Object.assign({}, m, { VAARDIGHEDEN: zonderNiveau(m.VAARDIGHEDEN) }); },
         vakstaat: () => zonderNiveau(l.vakstaat(org, door)),
-        trainerCockpit: () => l.trainerCockpit(org, door), managerCockpit: () => l.managerCockpit(org, door),
+        trainerCockpit: () => metNamen(l.trainerCockpit(org, door), naamVan), managerCockpit: () => metNamen(l.managerCockpit(org, door), naamVan),
         waaromLeren: () => l.waaromLeren(org, door, String(b.curriculum || '')), waaromVerversen: () => l.waaromVerversen(org, door),
         waaromNietGereed: () => l.waaromNietGereed(org, door, String(b.rol || '')),
         geschiktheid: () => l.geschiktheid(org, door, String(b.handeling || '')), loopbaan: () => l.loopbaan(org, door, String(b.rol || '')),

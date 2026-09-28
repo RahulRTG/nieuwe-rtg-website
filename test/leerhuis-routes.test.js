@@ -19,6 +19,7 @@
      - besluit B1: de factuurcorrectie wordt meegelezen en niemand wordt
        tegengehouden (haal de meelezer uit opzet/kantoordeur.js)   -> toets 7
      - besluit B2: de bron-eis bij het openen weg                 -> toets 8
+     - de cockpits op codenaam (laat metNamen de naam weg)        -> toets 10
        (en de leesroute las eerst zijn eigen kopie van de relatie; toets 8
        vond dat wie uit dienst was, nog meelas)
 
@@ -211,4 +212,17 @@ test('9. B7: het startpakket laden kan alleen de curriculumeigenaar, en opnieuw 
   assert.equal(r.body.gezet.length, 8);
   const nog = await laad(N, 'pak-2');
   assert.equal(nog.body.gezet.length, 0, 'wat er al staat, wordt overgeslagen en niet overschreven');
+});
+
+test('10. fase B-UI: de cockpits noemen mensen op codenaam, en wie geen trainer is krijgt geen trainerbeeld', async () => {
+  /* N heeft sinds toets 3 een relatie met E als manager. */
+  const m = await lees(E, 'managerCockpit');
+  assert.equal(m.status, 200, JSON.stringify(m.body));
+  const lidN = (m.body.antwoord.TEAM || []).find(x => x.persoon === 'lid:' + nId);
+  assert.ok(lidN, 'N staat in het team van E');
+  assert.equal(lidN.naam, await codeVan(N), 'het team toont de codenaam, niet de sleutel en niet de echte naam');
+  assert.doesNotMatch(JSON.stringify(m.body), /Nieuwe Collega/, 'de echte naam komt nergens in het antwoord');
+  const t = await lees(E, 'trainerCockpit');
+  assert.equal(t.status, 200);
+  assert.equal(t.body.antwoord.ok, false, 'E is geen trainer, dus het scherm toont dat vak niet');
 });

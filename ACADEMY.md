@@ -27,7 +27,7 @@ uit dezelfde lijst (`BLOKKADES` in `scripts/leerhuisproef.js`).
 
 | blokkade | klasse | wat er ontbreekt | sluit met |
 |---|---|---|---|
-| `UI` | UX | Mijn leerhuis staat (`/apps/leerhuis.html`, alleen lezen, bereikbaar vanuit Mijn loopbaan); er is nog geen scherm voor trainer, manager en kennisbeheer | fase B-UI, de drie andere schermen (par. 6) |
+| `UI` | UX | Mijn leerhuis staat (`/apps/leerhuis.html`, alleen lezen, bereikbaar vanuit Mijn loopbaan), en toont wie trainer is of een team heeft ook dat beeld, met mensen op codenaam (`kern/leerhuis/namen.js`); de handelingen van trainer en assessor en het kennisbeheer hebben nog geen scherm | fase B-UI, een werkscherm voor trainer, assessor en kenniseigenaar (par. 6) |
 | `DOMEINPOORT` | AUTHORITY | `POST /api/office/pay/factuurcorrectie` leest de geschiktheid mee, maar alleen in de schaduw (besluit B1): geschiktheid verandert nog nergens een recht | afdwingen als de schaduw rijp is en nul keer oneens staat; dat is een volgend besluit |
 | `IDENTITEIT` | TENANT_ISOLATION | een leerhuis met een bron (entiteit, zaak of RTF-stad) volgt die bron; maar RTG zelf heeft nog geen entiteit, dus juist het leerhuis van RTG Operations draait nog op een verklaring | RTG als entiteit in RTG Concern (de eigenaar) |
 
@@ -59,7 +59,7 @@ andere betekenis, dus niet aanraken en een eigen naam kiezen).
 | beoordeling | DEELS: `toetsbouw`, `toetsspiegel`, `schooladvies` (leerlingen) | NIEUW | |
 | certificering | ONTBREEKT (`onderwijs-ladder.js`: "wij claimen geen diploma's") | NIEUW | niet `vakbewijs`: dat is een EXTERN stuk dat RTG zag |
 | trainer / mentor / assessor | ONTBREEKT voor werk; `trainer` en `mentor` zijn bezet (sport, school) | NIEUW | eigen ladder in `standen.js` |
-| manager-, trainercockpit | ONTBREEKT | NIEUW (leeskant), scherm is fase B-UI | `leerhuis/zicht.js` |
+| manager-, trainercockpit | ONTBREEKT | NIEUW (leeskant); als leesdeel van Mijn leerhuis, op codenaam | `leerhuis/zicht.js`, `leerhuis/namen.js` |
 | workforce readiness | DEELS: `concern/readiness.js` meet een ENTITEIT | NIEUW voor mensen, dezelfde vorm | `leerhuis/gereedheid.js` |
 | impactanalyse | ONTBREEKT | NIEUW, als projectie | `leerhuis/graaf.js` |
 | audit / historie | BESTAAT | HERGEBRUIKEN | `lib/keten.js` |

@@ -37,6 +37,7 @@ const GEEN_METING = new Set([
   'package.json', 'package-lock.json',
   'NORM.json',              // de ratel zelf; die wordt door normverval.js bewaakt
   'LANDEN.json',            // landpakketten: welke munt, welke voertaal -- gegevens
+  'KENNISINDEX.json',       // de documenten opgeknipt voor de registerblik -- tekst, geen getal
   /* TOETSDUUR.json draagt hoe lang elk toetsbestand duurde. Dat is een
      PLANNINGSgetal en geen kwaliteitsgetal: een toets die langzamer wordt is
      niet slechter, en een die sneller wordt niet beter. Het bestand voedt de

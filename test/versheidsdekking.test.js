@@ -73,6 +73,7 @@ const BUITEN = {
      afdruktoets, net als bij de twee hieronder. */
   'MUTATIESEMANTIEK.json': 'een afdruk uit de code, met een eigen toets (test/mutatiesemantiek.test.js, toets 9) -- hij lift NIET mee op de ronde van MUTATIES.json, zie de opmerking hierboven',
   'BEGROTING.json': 'een begroting is een voornemen en geen meting',
+  'KENNISINDEX.json': 'de documenten opgeknipt voor de registerblik; versheid meet codepaden en een document is geen code -- de index draagt zijn eigen stempel en de registerblik zegt de leeftijd bij elke vondst',
   'A11Y-INGELOGD.json': 'wordt door een schermtoets geschreven, niet door een meetronde',
   'CONTROLS.json': 'een beleidsafdruk; de meting eronder staat in andere registers',
   'BEDRADING.json': 'de bedradingskaart wordt door de keuring zelf ververst',

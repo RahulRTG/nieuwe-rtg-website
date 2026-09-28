@@ -1,8 +1,8 @@
 /* DE REGISTERBLIK ALS LUS -- Rahul zoekt het op in plaats van het te weten.
 
    "Waarom staat RTG nog niet productieklaar?" is geen vraag die een klein model
-   uit zijn hoofd kan beantwoorden. Hier krijgt het vijf gereedschappen die
-   RTG's eigen registers lezen (./gereedschap.js), en verder niets: geen `doe`,
+   uit zijn hoofd kan beantwoorden. Hier krijgt het zes gereedschappen die
+   RTG's eigen registers en documenten lezen (./gereedschap.js), en verder niets: geen `doe`,
    geen `kaart`, geen `plan`. Lezen en uitleggen mag zelfstandig; wijzigen en
    uitvoeren lopen elders, langs mandaat, beleid en een mens.
 
@@ -22,8 +22,9 @@ const { vensterVan } = require('../ai/contextpakket');
 const STAPPEN = 5;
 const ANTWOORD = 900;
 
-const REGELS = 'Je hebt de registerblik: vijf gereedschappen die RTG\'s eigen registers LEZEN. Wat je over de staat van RTG ' +
+const REGELS = 'Je hebt de registerblik: zes gereedschappen die RTG\'s eigen registers en documenten LEZEN. Wat je over de staat van RTG ' +
   'zegt, komt uit een gereedschap en nergens anders; noem bij elke bewering het register en hoe oud de meting is. ' +
+  'Wat een document zegt (zoekKennis) is een bewering: toets het aan een register voordat je het als stand van zaken brengt. ' +
   'Staat er "niet vast te stellen" of is een meting vervallen, zeg dat dan hardop -- dat is een antwoord en geen gat om te vullen. ' +
   'Tel geen losse registers op tot een oordeel over productie: de productiestand geef je door zoals hij er staat. ' +
   'Je kunt niets wijzigen of uitvoeren, en je belooft ook niet dat iets geregeld wordt.';

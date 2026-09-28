@@ -273,6 +273,21 @@ Wat er met opzet NIET is: rollen invullen (een rol is een woord in de actie,
 geen plek die iemand claimt), benodigdheden, toestemming van een derde en
 financiering. Die laatste vraagt `GELD.md` en staat op de V2-lijst.
 
+**Wat deze laag de machine kost, en dat staat hier en niet in een register.**
+De acht schrijvende actieroutes raken geen enkele as van `npm run
+machinedekking`, en de ratel `mutatiesZonderEnigeAs` ging daarmee van 2819 naar
+2827 (MACHINEDEKKING.json; de kwestieroutes van fase B brachten hem eerder van
+2791 naar 2819, toen zonder uitleg). Wat ze wel doen ziet die meter met opzet
+niet: ze schrijven langs de kern-tas naar een duurzame collectie en een regel in
+de hashketen van de kwestie. Er is geen woord in een commentaar gezet om hem te
+laten tellen. De weg omlaag: een volle `npm run idemproef` op een schone boom zet
+de vier herhaalbare routes (aansluit, plan, antwoord, afgelast) op `beschermd` en
+haalt er vier af; de andere vier weigeren een herhaling met een
+toestandscontrole en krijgen die as met opzet nooit. De rest daalt pas als de
+meter de kern-tas per functie leest. Deze uitleg staat hier omdat een notitie in
+NORM.json alleen een meter uit NORM kan innen, en MACHINEDEKKING.json bij elke
+vastlegging in zijn geheel wordt herschreven.
+
 ---
 
 ## 7. Het politieke protocol

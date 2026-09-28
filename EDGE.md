@@ -65,21 +65,21 @@ ledensessie, gelezen uit `RTGEdgeBlikveld.lees()` — nooit geraden uit de bron.
 Per veld een telling, en met opzet **geen samengesteld percentage**: een
 gemiddelde over tien velden verbergt welk veld bewoog (`BEWIJSMACHINE.md`).
 
-Uitslag over <!--getal:edgedekking.schermen-->310<!--/getal--> schermen, waarvan er
-<!--getal:edgedekking.metBlikveld-->280<!--/getal--> een blikveld laden (de rest is
+Uitslag over <!--getal:edgedekking.schermen-->312<!--/getal--> schermen, waarvan er
+<!--getal:edgedekking.metBlikveld-->282<!--/getal--> een blikveld laden (de rest is
 een doorverwijzing, een scherm zonder Edge, of een scherm dat een lid niet
 opent — elk met de reden in het register):
 
 | Veld | Schermen met een waarde | waarvan het scherm hem zelf levert |
 |---|---|---|
 | identiteit | <!--getal:edgedekking.identiteit-->0<!--/getal--> | <!--getal:edgedekking.identiteitZelf-->0<!--/getal--> |
-| wereld | <!--getal:edgedekking.wereld-->279<!--/getal--> | <!--getal:edgedekking.wereldZelf-->0<!--/getal--> |
-| context | <!--getal:edgedekking.context-->280<!--/getal--> | <!--getal:edgedekking.contextZelf-->11<!--/getal--> |
+| wereld | <!--getal:edgedekking.wereld-->281<!--/getal--> | <!--getal:edgedekking.wereldZelf-->0<!--/getal--> |
+| context | <!--getal:edgedekking.context-->282<!--/getal--> | <!--getal:edgedekking.contextZelf-->13<!--/getal--> |
 | object | <!--getal:edgedekking.object-->0<!--/getal--> | <!--getal:edgedekking.objectZelf-->0<!--/getal--> |
 | activiteit | <!--getal:edgedekking.activiteit-->0<!--/getal--> | <!--getal:edgedekking.activiteitZelf-->0<!--/getal--> |
 | presence | <!--getal:edgedekking.presence-->0<!--/getal--> | <!--getal:edgedekking.presenceZelf-->0<!--/getal--> |
 | voortzetting | <!--getal:edgedekking.voortzetting-->0<!--/getal--> | <!--getal:edgedekking.voortzettingZelf-->0<!--/getal--> |
-| hoofdactie | <!--getal:edgedekking.hoofdactie-->58<!--/getal--> | <!--getal:edgedekking.hoofdactieZelf-->51<!--/getal--> |
+| hoofdactie | <!--getal:edgedekking.hoofdactie-->60<!--/getal--> | <!--getal:edgedekking.hoofdactieZelf-->53<!--/getal--> |
 | trust | <!--getal:edgedekking.trust-->0<!--/getal--> | <!--getal:edgedekking.trustZelf-->0<!--/getal--> |
 
 Lees ook de ja's goed, want een `ja` zegt dat er een waarde is en niet wie hem

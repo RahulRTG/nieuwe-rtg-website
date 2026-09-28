@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T14:24:07.236Z",
-    "commit": "ab1dc80e0",
+    "op": "2026-09-28T01:07:40.654Z",
+    "commit": "791b517b",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -4756,6 +4756,15 @@
       "operator": "===->!==#0",
       "gezakt": 6,
       "geprobeerd": 1
+    },
+    "kwesties-scherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "gezakt": 1,
+      "lekt": true,
+      "reden": "de asserties deden hun werk, maar het proces sloot niet af: deze toets LEKT een handle. Uitslag gemeten met --test-force-exit; het lek is een eigen gebrek en hoort gerepareerd.",
+      "operator": "liegpoort /api/",
+      "scherp": "gezakt"
     },
     "laatste-negen.test.js": {
       "soort": "server",

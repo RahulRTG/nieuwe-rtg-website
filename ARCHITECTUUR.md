@@ -19,9 +19,9 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | Wat | Aantal |
 |---|---|
 | API-endpoints | 5277 |
-| servermodules (`server/**/*.js`) | 3896 |
+| servermodules (`server/**/*.js`) | 3897 |
 | routebestanden (`server/routes/**`) | 626 |
-| kernmodules (`server/kern/**`) | 2471 |
+| kernmodules (`server/kern/**`) | 2472 |
 | schermen (`public/**/*.html`) | 321 |
 | gedeelde browsermodules (`public/shared/*.js`) | 409 |
 | toetsbestanden (`test/*.test.js`) | 1888 |
@@ -152,7 +152,7 @@ domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
 app(214) auth(131) supplierAuth(66) officeAuth(49) db(40) liveCodename(35) status(31)
-accounts(29) schoon(23) boardroomWie(21) managerOnly(19) codenaamVan(19) save(19)
+accounts(29) schoon(23) boardroomWie(21) codenaamVan(20) managerOnly(19) save(19)
 rtf(18) tooManyTries(14) geenGast(14) express(14) findSupplier(13) boardroomAuth(13)
 crypto(12) appUrl(11) keyVanCodenaam(11) pay(11) anthropic(11) noteFailedTry(10)
 payrollOS(10) rtmail(10) kern(9) gegevensStop(9) sseToOffice(9) loginFails(8) stuur(8)

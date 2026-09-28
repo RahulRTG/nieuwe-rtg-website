@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-28T10:23:07.883Z",
-    "commit": "8cf0e7afe",
+    "op": "2026-09-28T10:52:29.316Z",
+    "commit": "10307dfc7",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -7786,6 +7786,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 2,
       "scherp": "gezakt"
+    },
+    "routenoemer.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/routenoemer.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "routerindex.test.js": {
       "soort": "puur",

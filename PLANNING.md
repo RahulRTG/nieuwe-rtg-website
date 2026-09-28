@@ -244,6 +244,14 @@ plaats van punten.
   vanzelf weer gedekt. Herplannen doet een mens. Wat het NIET doet: de
   festival-, OV-, taxi- en schoolplanners lezen verzuim nog niet, en er gaat
   geen melding naar de leidinggevende -- hij ziet het in het rooster.
+- **Een MENS die toch een afwezige medewerker inplant, ziet het erbij** (28
+  september 2026, op dezelfde regel). Een losse dienst bij de beveiliging gaat
+  door en draagt `verzuimWaarschuwing` (aangepast werk is het besluit van een
+  mens); de automaat wordt ook langs `zetDienst` tegengehouden, in de vorm van
+  de rustregel. Het vaststellen van het weekrooster kijkt opnieuw na
+  (`naKijken()` in `kern/payroll/inplanbaar.js`, `verzuimBijVaststellen`),
+  want tussen voorstel en akkoord kan iemand afwezig worden.
+  `test/verzuimrooster.test.js`.
 
 ### Een stap weg
 
@@ -283,7 +291,7 @@ Niet op aantrekkelijkheid maar op wat de volgende stap mogelijk maakt.
 
 | # | Stap | Waarom nu |
 |---|---|---|
-| 1 | ~~Verlof en ziekte in de twee autoplanners~~ | staat (par. 6), ook voor een al vastgestelde dienst van de beveiliging; de overige planners volgen |
+| ~~1~~ | ~~Verlof en ziekte in de twee autoplanners~~ | **staat** (par. 6), ook voor een al vastgestelde dienst van de beveiliging, en met een waarschuwing voor een mens die met de hand plant (28 september); de overige planners volgen |
 | 2 | Transitietijd als primitief | staat op nul, en is het enige dat alle domeinen delen |
 | 3 | De ATW-rekenlaag uit taxi trekken | hij is al data-met-bron en al instelbaar per regime |
 | 4 | Het werkdruksignaal op rooster en klok | raakt geen gezondheidsgegeven, en is de helft die wél mag |

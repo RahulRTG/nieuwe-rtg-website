@@ -37,4 +37,20 @@ function maakInplanbaar(afwezigOp) {
 /* De zin die een planner meegeeft als het register niet te lezen was. */
 const NIET_GELEZEN = 'Het verzuimregister was niet te lezen; afwezigheid is in dit rooster NIET meegewogen.';
 
-module.exports = { maakInplanbaar, NIET_GELEZEN };
+/* Een rooster dat een MENS vaststelt, opnieuw nakijken (PERSONEEL.md par. 4):
+   tussen voorstel en akkoord kan iemand zich ziek melden of verlof krijgen.
+   Per dag wie er op een dienst staat terwijl hij niet inplanbaar is -- een
+   waarschuwing en geen weigering, want vaststellen is het besluit van die
+   mens. null als het register niet te lezen was: niet nagekeken. */
+function naKijken(inplanbaar, code, dagen, vrij) {
+  const uit = [];
+  for (const dag of dagen || []) for (const m of dag.staff || []) {
+    if (m.shift === vrij) continue;
+    const ip = inplanbaar(code, m.id, dag.date);
+    if (ip.onbekend) return null;
+    if (!ip.plan) uit.push({ datum: dag.date, id: m.id, naam: m.name, wat: ip.wat, inzetbaarheid: ip.inzetbaarheid });
+  }
+  return uit;
+}
+
+module.exports = { maakInplanbaar, naKijken, NIET_GELEZEN };

@@ -19,7 +19,7 @@
 
 const { kan, DEUREN } = require('./regels');
 
-function maakReview({ kantoorHouders, boardroomLijst, magBoardroom, boardroomBaas, magBalie, balieZetels, codenaamVan, laatstGebruikt }) {
+function maakReview({ kantoorHouders, boardroomLijst, magBoardroom, boardroomBaas, magBalie, balieZetels, codenaamVan, laatstGebruikt, werkverband, huis }) {
   const probeer = (fn, anders) => { try { return fn(); } catch (e) { return anders; } };
 
   function houders() {
@@ -61,8 +61,11 @@ function maakReview({ kantoorHouders, boardroomLijst, magBoardroom, boardroomBaa
       const cn = probeer(() => codenaamVan(h.key), null);
       const deuren = {};
       for (const d of Object.keys(DEUREN)) deuren[d] = kan(f, d).uitkomst;
+      /* B1 (PERSONEEL.md): loopt er een dienstverband bij de entiteit die RTG
+         is? Schaduw: het staat erbij en beslist niets (kern/kantoor/huis.js). */
+      const wv = typeof werkverband === 'function' ? probeer(() => werkverband(h.key), null) : null;
       return { codenaam: cn && cn !== h.key ? cn : null, key: h.key, eigenaar: f.eigenaar === true,
-        zetels: h.zetels, deuren,
+        zetels: h.zetels, deuren, werkverband: wv || { stand: 'onbekend', reden: 'Niet bedraad in deze server.' },
         /* Een zetel zonder kantoorrol opent niets: de boardroom en de balie
            hangen aan een kantoorsessie op naam. Die houders zijn het eerst aan
            een besluit toe, dus ze staan erbij en worden niet verborgen. */
@@ -78,7 +81,16 @@ function maakReview({ kantoorHouders, boardroomLijst, magBoardroom, boardroomBaa
       nietGezien: ['de gedeelde kantoorcode (die heeft geen houder)', 'rollen binnen RTFOS (BENOEMING.md)',
         'rollen in het Werk OS van een klant (bedrijf/rollen.js)'],
       houders: rijen,
-      aantal: rijen.length
+      aantal: rijen.length,
+      /* Drie getallen en geen percentage: `geen` is wat afdwingen zou kosten,
+         `onbekend` is wat nog niet te zeggen valt, en die twee tellen nooit op. */
+      werkverband: {
+        huis: typeof huis === 'function' ? probeer(() => huis(), null) : null,
+        loopt: rijen.filter(r => r.werkverband.stand === 'loopt').length,
+        geen: rijen.filter(r => r.werkverband.stand === 'geen').length,
+        onbekend: rijen.filter(r => r.werkverband.stand === 'onbekend').length,
+        grens: 'Schaduw: dit houdt niemand tegen. De eigenaar is eigenaar, ook zonder dienstverband.'
+      }
     };
   }
 

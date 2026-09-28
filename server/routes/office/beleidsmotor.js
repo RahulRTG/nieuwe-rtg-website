@@ -55,6 +55,19 @@ module.exports = (octx) => {
     res.json(Object.assign({ ok: true, codenaam: t.codename }, beleidsmotor.simuleer(t.key, { plus: b.plus, min: b.min })));
   });
 
+  /* WELKE ENTITEIT IS RTG (besluit B1, PERSONEEL.md par. 12). Alleen de
+     eigenaar wijst aan; de toegangsreview toont daarna per houder of er een
+     dienstverband loopt. Lezen gaat via de review -- dit is alleen de
+     schrijfweg, en hij houdt niemand tegen. */
+  app.post('/api/office/beleidsmotor/huis/zet', boardroomAuth, (req, res) => {
+    if (!beleidsmotor || typeof beleidsmotor.huisZet !== 'function') {
+      return res.status(503).json({ error: 'De beleidsmotor is niet bedraad in deze server.' });
+    }
+    const r = beleidsmotor.huisZet(req, (req.body || {}).entiteit);
+    if (r.error) return res.status(r.status || 400).json({ error: r.error });
+    res.json(r);
+  });
+
   /* WAAROM MAG IK HIER (NIET) IN? Alleen over zichzelf, en dus alleen voor wie
      een zelf HEEFT: een kantoorsessie op naam (kluisAuth). De gedeelde code
      krijgt de weigering van die poort, en die zegt precies wat hij wilde weten

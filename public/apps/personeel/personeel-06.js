@@ -26,8 +26,10 @@
   let horecaOverdrachten = []; // pas van eigenaar na akkoord van de opvolger
   let wisselOpties = []; // verbonden zaken waar dit personeelslid ook op het rooster staat
   let mijnPosities = []; // eigen werkplekken (RTG-account) om tussen te wisselen na 1x aanmelden
+  let ochtend = null;     // de ochtendkaart (PERSONEEL.md par. 4): een lezing, stelt niets voor
   async function laadZaken(){
     try { zaken = await API.call('/staff/mine', {}); } catch(e){ zaken = null; }
+    try { ochtend = (await API.call('/staff/ochtend', {})).kaart || null; } catch(e){ ochtend = null; }
     try { wisselOpties = (await API.call('/supplier/wissel/opties', {})).opties || []; } catch(e){ wisselOpties = []; }
     try { mijnPosities = (await API.call('/supplier/mijn/opties', {})).posities || []; } catch(e){ mijnPosities = []; }
     try { pdContracten = (await API.call('/supplier/contracten', {})).contracten || []; } catch(e){ pdContracten = []; }

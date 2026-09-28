@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-28T13:33:45.849Z",
-  "commit": "294990aa",
+  "op": "2026-09-28T20:10:17.126Z",
+  "commit": "8c60bfd3c",
   "boomVuil": false,
-  "boomAnders": 6,
+  "boomAnders": 4,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.2"
  },
@@ -3149,7 +3149,7 @@
   },
   {
    "sleutel": "POST /api/office/login",
-   "bestand": "server/routes/office/toegang.js:8",
+   "bestand": "server/routes/office/toegang.js:9",
    "staat": "eigenControle"
   },
   {

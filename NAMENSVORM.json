@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-28T17:25:54.123Z",
-    "commit": "c87dbec8",
+    "op": "2026-09-28T20:10:18.652Z",
+    "commit": "8c60bfd3c",
     "boomVuil": false,
-    "boomAnders": 6,
+    "boomAnders": 5,
     "instrument": "scripts/namensvorm.js",
     "node": "v22.22.2"
   },
@@ -17,12 +17,12 @@
       "zonderVormen": [
         "ai-mandaat"
       ],
-      "velden": 49,
+      "velden": 50,
       "inAlleMechanismen": 0,
       "inMinstensDeHelft": 0,
       "helftDrempel": 3,
-      "veldenMechanismeEigen": 45,
-      "eigenPct": 91.8,
+      "veldenMechanismeEigen": 46,
+      "eigenPct": 92,
       "perMechanisme": [
         {
           "mechanisme": "app-machtiging",
@@ -34,7 +34,7 @@
         },
         {
           "mechanisme": "fiscaal-mandaat",
-          "velden": 7
+          "velden": 8
         },
         {
           "mechanisme": "sepa-machtiging",
@@ -91,12 +91,12 @@
         "ai-mandaat",
         "rtgid-claims"
       ],
-      "velden": 74,
+      "velden": 75,
       "inAlleMechanismen": 0,
       "inMinstensDeHelft": 0,
       "helftDrempel": 5,
-      "veldenMechanismeEigen": 70,
-      "eigenPct": 94.6,
+      "veldenMechanismeEigen": 71,
+      "eigenPct": 94.7,
       "perMechanisme": [
         {
           "mechanisme": "app-machtiging",
@@ -112,7 +112,7 @@
         },
         {
           "mechanisme": "fiscaal-mandaat",
-          "velden": 7
+          "velden": 8
         },
         {
           "mechanisme": "ledenbalie-inzage",
@@ -591,15 +591,15 @@
         }
       ]
     },
-    "envelopVelden": 29
+    "envelopVelden": 28
   },
   "woordenschat": [
     {
       "woord": "doel",
-      "bestanden": 277,
-      "domeinen": 146,
-      "samengesteld": 189,
-      "samengesteldDomeinen": 87,
+      "bestanden": 287,
+      "domeinen": 149,
+      "samengesteld": 190,
+      "samengesteldDomeinen": 88,
       "stand": "bezet",
       "waar": [
         "bedrijf",
@@ -642,8 +642,8 @@
     },
     {
       "woord": "claim",
-      "bestanden": 38,
-      "domeinen": 24,
+      "bestanden": 43,
+      "domeinen": 27,
       "samengesteld": 42,
       "samengesteldDomeinen": 24,
       "stand": "bezet",
@@ -687,6 +687,29 @@
       ]
     },
     {
+      "woord": "machtiging",
+      "bestanden": 21,
+      "domeinen": 8,
+      "samengesteld": 40,
+      "samengesteldDomeinen": 12,
+      "stand": "bezet",
+      "waar": [
+        "kern/appstore",
+        "kern/isolatie",
+        "kern/magnaat-kantoorregels",
+        "kern/rtfos",
+        "kern/rtgid-regie"
+      ],
+      "vormen": [
+        "KLASSE_VAN_MACHTIGING",
+        "MACHTIGINGEN",
+        "MACHTIGING_NOOIT",
+        "RTG_MACHTIGING_NIET_GEVRAAGD",
+        "RTG_MACHTIGING_NIET_VERLEEND",
+        "RTG_MACHTIGING_VERSMALD"
+      ]
+    },
+    {
       "woord": "kans",
       "bestanden": 23,
       "domeinen": 9,
@@ -707,29 +730,6 @@
         "dealkansen",
         "dealkansenVoor",
         "foutkans"
-      ]
-    },
-    {
-      "woord": "machtiging",
-      "bestanden": 20,
-      "domeinen": 8,
-      "samengesteld": 39,
-      "samengesteldDomeinen": 12,
-      "stand": "bezet",
-      "waar": [
-        "kern/appstore",
-        "kern/isolatie",
-        "kern/magnaat-kantoorregels",
-        "kern/rtfos",
-        "kern/rtgid-regie"
-      ],
-      "vormen": [
-        "KLASSE_VAN_MACHTIGING",
-        "MACHTIGINGEN",
-        "MACHTIGING_NOOIT",
-        "RTG_MACHTIGING_NIET_GEVRAAGD",
-        "RTG_MACHTIGING_NIET_VERLEEND",
-        "RTG_MACHTIGING_VERSMALD"
       ]
     },
     {
@@ -960,7 +960,7 @@
       "woord": "mandaat",
       "bestanden": 11,
       "domeinen": 5,
-      "samengesteld": 8,
+      "samengesteld": 9,
       "samengesteldDomeinen": 4,
       "stand": "bezet",
       "waar": [
@@ -973,10 +973,31 @@
       "vormen": [
         "MANDAATPOORT",
         "RTG_MANDAAT_AFDWINGEN",
+        "alleenMandaat",
         "maakMandaat",
         "mandaatBron",
-        "mandaatContext",
-        "mandaatGeldig"
+        "mandaatContext"
+      ]
+    },
+    {
+      "woord": "verplichting",
+      "bestanden": 5,
+      "domeinen": 3,
+      "samengesteld": 10,
+      "samengesteldDomeinen": 6,
+      "stand": "bezet",
+      "waar": [
+        "kern/cadeaubon",
+        "kern/magnaat-leven",
+        "kern/spellen"
+      ],
+      "vormen": [
+        "VERPLICHTINGEN",
+        "bonnenVerplichting",
+        "cadeaubonVerplichting",
+        "maakVerplichting",
+        "verplichtingBedrag",
+        "verplichtingOp"
       ]
     },
     {
@@ -1015,26 +1036,6 @@
         "intentsVoorPrincipal",
         "principalRef",
         "principalVoorSession"
-      ]
-    },
-    {
-      "woord": "verplichting",
-      "bestanden": 4,
-      "domeinen": 2,
-      "samengesteld": 9,
-      "samengesteldDomeinen": 5,
-      "stand": "bezet",
-      "waar": [
-        "kern/magnaat-leven",
-        "kern/spellen"
-      ],
-      "vormen": [
-        "VERPLICHTINGEN",
-        "bonnenVerplichting",
-        "maakVerplichting",
-        "verplichtingBedrag",
-        "verplichtingOp",
-        "verplichtingen"
       ]
     },
     {

@@ -44,6 +44,11 @@ function functieAanVoor(id, doelgroep, staat) {
 // Geeft de reden terug: 'globaal' | 'pas' | 'land' | 'persoon' | 'genre' | null.
 function blokkadeReden(id, staat, ctx) {
   if (!functieAan(id, staat)) return 'globaal';
+  /* Een functie met `alleenGlobaal` is voor iedereen open of voor iedereen
+     dicht. Geen fijne as telt, ook niet een die er via een oude stand, een
+     voorstel of een schrijver buiten de kast om al lag: dit is de enige plek die
+     beslist, dus de regel staat hier en niet bij elke schrijver. */
+  if (OP_ID[id] && OP_ID[id].alleenGlobaal) return null;
   const s = staat && staat[id];
   const c = ctx || {};
   if (s) {

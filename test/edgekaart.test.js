@@ -198,8 +198,14 @@ test('de afgeleide controles vinden wat de kaart moet dragen, en kunnen zakken',
     /proef\.js: zet data-rtg-world op body en staat niet op de kaart als wereld:s/, 'een nieuwe wereldschrijver');
   zakt(met('public/apps/proef.html', "document.body.setAttribute('data-rtg-edge-2-state', 'focus');"),
     /proef\.html: zet data-rtg-edge-2-state op body/, 'een nieuwe schrijver van de Edge 2-stand, ook in een .html');
-  zakt(met('public/apps/proef.html', '<script src="/site/platform-app.js"></script>'),
-    /platform-app\.js: staat als zonder lader uitgezonderd, maar public\/apps\/proef\.html noemt/, 'een uitzondering waarvan de grond vervalt');
+  /* Synthetisch: sinds de desktopstandaard laadt index.html de platformbestanden
+     echt, dus er staat geen echte uitzondering meer om op te laten vallen. */
+  kaart.ZONDER_LADER.push('public/site/proef-wereld.js');
+  try {
+    zakt(kaart.afgeleid(wand.concat([['public/site/proef-wereld.js', "d.body.dataset.rtgWorld = 'work';"],
+      ['public/apps/proef.html', '<script src="/site/proef-wereld.js"></script>']])).fouten,
+    /proef-wereld\.js: staat als zonder lader uitgezonderd, maar public\/apps\/proef\.html noemt/, 'een uitzondering waarvan de grond vervalt');
+  } finally { kaart.ZONDER_LADER.pop(); }
 
   /* Een uitzondering die niets meer uitzondert, zakt -- net als een WAAROM
      zonder dubbele eigenaar. */

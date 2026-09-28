@@ -7,12 +7,12 @@
     "appwerktDefecten": 0,
     "beweringenZonderVulcontrole": 100,
     "bewijsAchterstand": 2418,
-    "bewijsAlleenKeten": 17,
+    "bewijsAlleenKeten": 18,
     "bewijsCellenBewezen": 26449,
     "bronBlindeBestanden": 3,
     "browserpoortToetsen": 399,
     "carriereDomeinenGemeten": 15,
-    "dbDeuren": 530,
+    "dbDeuren": 531,
     "dbDeurenSchrijvend": 275,
     "dekkingPct": 83,
     "dekkingWaargenomenPct": 100,
@@ -28,8 +28,8 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4627,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1660,
-    "kernGedeeld": 247,
+    "kernBreedte": 1667,
+    "kernGedeeld": 250,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1851,
-    "toetsenNietGemeten": 654,
+    "toetsenNietGemeten": 721,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -3498,6 +3498,52 @@
       "meter": "zelfpoortendeToetsen 35 -> 36; toetsenNietGemeten 635 -> 636",
       "reden": "test/algpin-herstel.pg.test.js is nieuw (CODECREDENTIALS.json, identity.algpin_herstelsleutel, beleid B9): twee echte PostgreSQL-instances racen om dezelfde herstelsleutel (precies een claim wint), om twee aanvragen van hetzelfde lid tegelijk (er blijft een werkende sleutel over) en een aanvraag op B trekt de sleutel in die A net uitgaf. Dat kan niet eerlijk zonder database; zonder DATABASE_URL slaat hij zichzelf over. Hij staat in scripts/lib/pg-toetslijst.js (verplicht in CI) en als uitzondering onder zelfpoortende-toets. Lokaal gedraaid tegen postgresql://localhost: 1 van 1 groen, en met claim() gesplitst in lezen en schrijven in twee transacties zakte hij (beide instances claimden). Daarom telt hij ook als niet-gemeten toets: de mutatiemotor draait zonder PostgreSQL. De vijf gewone toetsen van deze ronde (apipoort-levensduur, stadsdoossleutel, algpin-herstel, scim-sleutelverval, imap-sleutelverval) zijn wel door de motor gemeten.",
       "waarheen": "Dezelfde aflossing als de andere pg-toetsen: de standaardomgeving levert PostgreSQL, en dan meet de motor ze mee."
+    },
+    {
+      "datum": "2026-09-28",
+      "soort": "structureel",
+      "sleutel": "bewijsAlleenKeten",
+      "van": 17,
+      "meter": "bewijsAlleenKeten 17 -> 18",
+      "reden": "DE TWEEDE BIJTREKRONDE VAN DE SAMENVOEGING DRAAGT DE GROEI VAN DE TAKKEN, EN GEEN GROEI VAN ZICHZELF. Na de eerste ronde zijn de nieuwe commits van alle open takken en #414 bijgetrokken (#413 is op besluit van de eigenaar weer uit deze tak gehaald, want hij was in zijn eigen CI nooit groen). Elke tak schreef voor zijn eigen verhoging hier al een notitie; de vereniging telt die op. De nieuwe stand is de GEMETEN stand op de samengevoegde boom, er is geen lucht bijgeteld, en vanaf hier geldt weer: alleen omlaag. Het nieuwe mechanisme is scripts/native-rehearsal.js uit #400: de native repetitie draait alleen in release-native.yml, omdat hij een gebouwd native artefact nodig heeft.",
+      "waarheen": "BEWIJSLADDER.json (sport storing, scripts/native-rehearsal.js) en .github/workflows/release-native.yml"
+    },
+    {
+      "datum": "2026-09-28",
+      "soort": "structureel",
+      "sleutel": "dbDeuren",
+      "van": 530,
+      "meter": "dbDeuren 530 -> 531",
+      "reden": "DE TWEEDE BIJTREKRONDE VAN DE SAMENVOEGING DRAAGT DE GROEI VAN DE TAKKEN, EN GEEN GROEI VAN ZICHZELF. Na de eerste ronde zijn de nieuwe commits van alle open takken en #414 bijgetrokken (#413 is op besluit van de eigenaar weer uit deze tak gehaald, want hij was in zijn eigen CI nooit groen). Elke tak schreef voor zijn eigen verhoging hier al een notitie; de vereniging telt die op. De nieuwe stand is de GEMETEN stand op de samengevoegde boom, er is geen lucht bijgeteld, en vanaf hier geldt weer: alleen omlaag.",
+      "waarheen": "De notities van de afzonderlijke takken hieronder, elk met hun GRENZEN.json-verwijzing."
+    },
+    {
+      "datum": "2026-09-28",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1660,
+      "meter": "kernBreedte 1660 -> 1667",
+      "reden": "DE TWEEDE BIJTREKRONDE VAN DE SAMENVOEGING DRAAGT DE GROEI VAN DE TAKKEN, EN GEEN GROEI VAN ZICHZELF. Na de eerste ronde zijn de nieuwe commits van alle open takken en #414 bijgetrokken (#413 is op besluit van de eigenaar weer uit deze tak gehaald, want hij was in zijn eigen CI nooit groen). Elke tak schreef voor zijn eigen verhoging hier al een notitie; de vereniging telt die op. De nieuwe stand is de GEMETEN stand op de samengevoegde boom, er is geen lucht bijgeteld, en vanaf hier geldt weer: alleen omlaag.",
+      "waarheen": "De notities van de afzonderlijke takken hieronder, elk met hun GRENZEN.json-verwijzing."
+    },
+    {
+      "datum": "2026-09-28",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 247,
+      "meter": "kernGedeeld 247 -> 250",
+      "reden": "DE TWEEDE BIJTREKRONDE VAN DE SAMENVOEGING DRAAGT DE GROEI VAN DE TAKKEN, EN GEEN GROEI VAN ZICHZELF. Na de eerste ronde zijn de nieuwe commits van alle open takken en #414 bijgetrokken (#413 is op besluit van de eigenaar weer uit deze tak gehaald, want hij was in zijn eigen CI nooit groen). Elke tak schreef voor zijn eigen verhoging hier al een notitie; de vereniging telt die op. De nieuwe stand is de GEMETEN stand op de samengevoegde boom, er is geen lucht bijgeteld, en vanaf hier geldt weer: alleen omlaag.",
+      "waarheen": "De notities van de afzonderlijke takken hieronder, elk met hun GRENZEN.json-verwijzing."
+    },
+    {
+      "datum": "2026-09-28",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 654,
+      "vervalt": "2026-12-28",
+      "meter": "toetsenNietGemeten 654 -> 721",
+      "reden": "DE TWEEDE BIJTREKRONDE VAN DE SAMENVOEGING DRAAGT DE GROEI VAN DE TAKKEN, EN GEEN GROEI VAN ZICHZELF. Na de eerste ronde zijn de nieuwe commits van alle open takken en #414 bijgetrokken (#413 is op besluit van de eigenaar weer uit deze tak gehaald, want hij was in zijn eigen CI nooit groen). Elke tak schreef voor zijn eigen verhoging hier al een notitie; de vereniging telt die op. De nieuwe stand is de GEMETEN stand op de samengevoegde boom, er is geen lucht bijgeteld, en vanaf hier geldt weer: alleen omlaag. De mutatiemotor is niet langs de nieuwe toetsbestanden van de takken geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt ze mee; die draait aan het eind van deze samenvoeging."
     }
   ],
   "prestatie": {
@@ -3518,7 +3564,7 @@
   "sinds": {
     "keuringOmvang": "2026-09-27",
     "testbestanden": "2026-09-27",
-    "toetsenNietGemeten": "2026-09-27",
+    "toetsenNietGemeten": "2026-09-28",
     "inlineStijlAttributen": "2026-09-27",
     "ratelTanden": "2026-09-23",
     "metingenZonderRatel": "2026-08-18",
@@ -3530,7 +3576,7 @@
     "keuringTeGroot": "2026-09-05",
     "keuringDubbeling": "2026-09-15",
     "keuringDekkingAdvies": "2026-09-06",
-    "dbDeuren": "2026-09-15",
+    "dbDeuren": "2026-09-28",
     "dbDeurenSchrijvend": "2026-08-28",
     "browserpoortToetsen": "2026-09-27",
     "e2eBestanden": "2026-09-27",
@@ -3549,8 +3595,8 @@
     "wekkersZonderTrede": "2026-09-02",
     "wekkersOnverklaard": "2026-09-02",
     "meetleerBlind": "2026-09-02",
-    "kernBreedte": "2026-09-15",
-    "kernGedeeld": "2026-09-05",
+    "kernBreedte": "2026-09-28",
+    "kernGedeeld": "2026-09-28",
     "registersUitVuileBoom": "2026-09-10",
     "laatSpoorVerdacht": "2026-09-03",
     "rollbackUitzonderingen": "2026-09-03",
@@ -3629,7 +3675,8 @@
     "edgeVeldVoortzetting": "2026-09-23",
     "edgeVeldHoofdactie": "2026-09-27",
     "edgeVeldTrust": "2026-09-23",
-    "edgeVeldContextZelf": "2026-09-23"
+    "edgeVeldContextZelf": "2026-09-23",
+    "bewijsAlleenKeten": "2026-09-28"
   },
   "uitzonderingen": [
     {

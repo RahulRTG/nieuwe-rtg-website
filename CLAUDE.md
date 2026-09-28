@@ -2401,10 +2401,10 @@ voor de schermen pas op gang met `SCHERMGEDRAG.json`, dat per scherm SAMENSTELT
 wat de routes eronder al gemeten hadden (schrijft het, welke rol, wat is het
 bewijs waard). Twee dingen daar niet wegpoetsen: het is AFGELEID gedrag, dus
 `schrijft: nee` betekent "verandert niets aan de SERVERKANT" en niet "verandert
-niets"; en de <!--getal:schermgedrag.zonderGrond-->151<!--/getal--> schermen waarover het niets kan zeggen staan er MET reden
+niets"; en de <!--getal:schermgedrag.zonderGrond-->150<!--/getal--> schermen waarover het niets kan zeggen staan er MET reden
 in maar tellen niet als dekking (`zonderUitspraak`) -- anders stijgt een
 dekkingsgetal doordat er een meter bij komt die zwijgt. Die meter begon
-op 118 "dode paden" en eindigde op <!--getal:schermroutes.dood-->14<!--/getal-->; de aanroepgraaf begon op 587 onbekende
+op 118 "dode paden" en eindigde op <!--getal:schermroutes.dood-->0<!--/getal-->; de aanroepgraaf begon op 587 onbekende
 doelen en eindigde op <!--getal:graaf.doelOnbekend-->0<!--/getal-->, en in beide gevallen zat de fout in de METER en niet
 in de code. Dat laatste nul is sinds 20 september 2026 een ANDER nul: er staat een derde
 soort naast, `bewaakteVooruitwijzing` (<!--getal:graaf.bewaakteVooruitwijzing-->1<!--/getal-->), voor een aanroep naar een integratie die

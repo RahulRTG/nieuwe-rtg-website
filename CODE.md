@@ -134,8 +134,8 @@ elke dekkingsvraag triviaal waar; alleen de tweede teller zegt nog iets.
 bronboom aflopen (dat doet `SCHRIJFANALYSE.json`) maar het de **router** vragen —
 wat de server werkelijk aanbiedt — en daar de plek in de bron bij zoeken.
 
-<!--getal:routebron.vergeleken-->4122<!--/getal--> routes kennen beide wegen (was 32), <!--getal:routebron.gelijk-->4104<!--/getal--> geven hetzelfde bestand,
-**<!--getal:routebron.tegenspraak-->0<!--/getal--> echte tegenspraken** en <!--getal:routebron.verouderd-->18<!--/getal--> verschil dat er geen is.
+<!--getal:routebron.vergeleken-->4122<!--/getal--> routes kennen beide wegen (was 32), <!--getal:routebron.gelijk-->4094<!--/getal--> geven hetzelfde bestand,
+**<!--getal:routebron.tegenspraak-->0<!--/getal--> echte tegenspraken** en <!--getal:routebron.verouderd-->28<!--/getal--> verschil dat er geen is.
 
 Dat ene verschil is de opbrengst van de hele oefening. `POST /api/auth/me` staat
 volgens de router in `inlog-pas.js` en volgens `SCHRIJFANALYSE.json` in
@@ -179,7 +179,7 @@ het register (nul gevonden — de werkos-bundel noemt geen enkel API-pad).
 #### Wat dat gat kostte om eerlijk te krijgen
 
 De eerste versie meldde **118 dode paden**. Vrijwel allemaal onzin, in drie
-rondes teruggebracht tot <!--getal:schermroutes.dood-->14<!--/getal--> — en elke ronde is een regel die elders net zo
+rondes teruggebracht tot <!--getal:schermroutes.dood-->0<!--/getal--> — en elke ronde is een regel die elders net zo
 geldt:
 
 1. **Een pad kan verdergaan.** `'/api/agenda/' + id` is geen route maar een
@@ -197,11 +197,11 @@ geldt:
    bestaan er". Daardoor heette `/api/instant-reality/event` dood terwijl de
    router hem gewoon aanbiedt — zijn routebestand staat op één regel, dus de
    bronindex vond hem niet. `ROUTEBRON.json` draagt daarom **twee** lijsten:
-   `alleRoutes` (<!--getal:routebron.routerRoutes-->5102<!--/getal-->, bestaan) en `perRoute` (met bestand), en
+   `alleRoutes` (<!--getal:routebron.routerRoutes-->5168<!--/getal-->, bestaan) en `perRoute` (met bestand), en
    <!--getal:routebron.zonderBestand-->4<!--/getal--> routes zitten wél in de eerste en niet in de tweede.
 
 Nul dode paden is hier geen lege controle: <!--getal:schermroutes.paden-->946<!--/getal--> exacte paden zijn tegen
-<!--getal:routebron.routerRoutes-->5102<!--/getal--> echte routes gehouden.
+<!--getal:routebron.routerRoutes-->5168<!--/getal--> echte routes gehouden.
 
 ### 0.4 De aanroepgraaf en de brug route → symbool (3 september 2026)
 
@@ -330,7 +330,7 @@ EXECUTION_MAP    welke rol vraagt hij, wat is het bewijs waard
 IDEMPROEF        wat doet een tweede aanroep
 ```
 
-<!--getal:schermgedrag.schermen-->415<!--/getal--> schermen, waarvan <!--getal:schermgedrag.metGrond-->264<!--/getal--> met een echte uitspraak:
+<!--getal:schermgedrag.schermen-->415<!--/getal--> schermen, waarvan <!--getal:schermgedrag.metGrond-->265<!--/getal--> met een echte uitspraak:
 <!--getal:schermgedrag.schrijftJa-->65<!--/getal--> schermen kunnen via de API iets veranderen, <!--getal:schermgedrag.verzwakt-->210<!--/getal--> raken een route
 met verzwakt bewijs, en **<!--getal:schermgedrag.bewezen-->0<!--/getal--> schermen raken uitsluitend bewezen routes** — dat
 laatste is geen verrassing (`VERTROUWEN.json` staat huisbreed op 0 bewezen)
@@ -360,7 +360,7 @@ uitkomst.
 
 #### Dezelfde val, een derde keer — en nu vooraf gezien
 
-<!--getal:schermgedrag.zonderGrond-->151<!--/getal--> van de 368 schermen krijgen `niet vast te stellen`, elk met een reden:
+<!--getal:schermgedrag.zonderGrond-->150<!--/getal--> van de 368 schermen krijgen `niet vast te stellen`, elk met een reden:
 134 bouwen hun paden op uit een sjabloon of een optelling, 3 noemen een stam.
 Die schermen staan wél in het register — dat is de helft van zijn waarde — maar
 ze mogen niet als dekking tellen. Anders stijgt de gedragsteller doordat er een
@@ -826,7 +826,7 @@ niet.
 Drie stappen, in deze volgorde:
 
 1. ~~**Gedragsdekking van `public/`**~~ — gedaan in §0.5: 6,6% → <!--getal:codewereld.bronPublicPct-->28.5<!--/getal-->%.
-   Wat er nu nog onder zit zijn de <!--getal:schermgedrag.zonderGrond-->151<!--/getal--> schermen die hun paden opbouwen; die
+   Wat er nu nog onder zit zijn de <!--getal:schermgedrag.zonderGrond-->150<!--/getal--> schermen die hun paden opbouwen; die
    zijn statisch niet te volgen en vallen onder punt 2.
 2. ~~**De <!--getal:graaf.contextobject-->15676<!--/getal--> contextobject-aanroepen via een runtime-meting**~~ — gemeten in
    §0.6, en de uitkomst keert de stap om: maar <!--getal:context.metSpoor-->213<!--/getal--> routes reiken tijdens een
@@ -860,7 +860,7 @@ Wat er ná deze ronde nog ligt, in volgorde van wat het waard is:
 En twee dingen die hier horen te blijven staan, allebei omdat ze iets zeggen over
 wat een register waard is:
 
-- De meetronde van §0.3 vond <!--getal:schermroutes.dood-->14<!--/getal--> dode paden, maar begon op 118. Die van §0.4
+- De meetronde van §0.3 vond <!--getal:schermroutes.dood-->0<!--/getal--> dode paden, maar begon op 118. Die van §0.4
   vond <!--getal:graaf.doelOnbekend-->0<!--/getal--> onbekende doelen, maar begon op 587. Beide keren zat de fout in
   de meter en niet in de code. Wie een Architect bouwt op een register dat zijn
   eigen zekerheid niet kent, bouwt een machine die 705 fouten met overtuiging

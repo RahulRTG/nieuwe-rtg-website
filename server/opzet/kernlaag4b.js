@@ -47,7 +47,9 @@ const bevoegd = require('../kern/bevoegdheid').maakBevoegdheid({
      `gesloten` en `open`, dus zonder deze kaart zou de beurs stilletjes de
      bankknop lezen. Ontbreekt hij, dan valt het vermogen terug op `gesloten`:
      bij twijfel gaat er geen geld naar een mens. */
-  standen: { rugdekkingBeurs: () => kern.rugdekking.beursStand() }
+  standen: { rugdekkingBeurs: () => kern.rugdekking.beursStand(),
+    /* de cadeaubon (C14): een bon die ook bij zaken te besteden is, is e-geld */
+    cadeaubon: () => kern.cadeaubonStand() }
 });
 kern.bevoegd = bevoegd;
 /* DE TERUGSTORTING AANSLUITEN OP DE BEVOEGDHEID. Sinds leden hun saldo kunnen

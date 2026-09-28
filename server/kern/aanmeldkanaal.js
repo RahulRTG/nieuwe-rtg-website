@@ -31,7 +31,10 @@ const CODE = /^[a-z0-9][a-z0-9-]{1,31}$/;
 const BEWAAR_MAANDEN = 13;
 const { groepeer } = require('./bedrijfsmaat/poort');
 
-module.exports = ({ db, save, nu }) => {
+/* Een campagnecode die in het register van RTG staat (kern/rtgcampagne.js, C12)
+   telt onder ZIJN kanaal; een onbekende code blijft onder 'campagne' vallen, zoals
+   voordien. `campagneKanaal` komt binnen, zodat dit domein het register niet kent. */
+module.exports = ({ db, save, nu, campagneKanaal }) => {
   const eigen = require('./eigencollectie')({ db, domein: 'kern/aanmeldkanaal', bezit: { [NAAM]: 'kaart' } });
   const klok = () => (typeof nu === 'function' ? nu() : new Date().toISOString());
 
@@ -46,7 +49,8 @@ module.exports = ({ db, save, nu }) => {
     const maand = klok().slice(0, 7);
     const kaart = eigen.bak(NAAM);
     const m = kaart[maand] || (kaart[maand] = { kanalen: {}, campagnes: {}, totaal: 0 });
-    const kan = k || 'campagne';
+    const geregistreerd = c && typeof campagneKanaal === 'function' ? campagneKanaal(c) : null;
+    const kan = k || geregistreerd || 'campagne';
     m.kanalen[kan] = (m.kanalen[kan] || 0) + 1;
     if (c) m.campagnes[c] = (m.campagnes[c] || 0) + 1;
     m.totaal += 1;

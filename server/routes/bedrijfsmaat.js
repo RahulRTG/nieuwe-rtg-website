@@ -14,7 +14,8 @@ const { BESLUITEN } = require('../kern/bedrijfsmaat/besluiten');
 
 module.exports = (kern) => {
   const { app, boardroomAuth, boardroomWie, bedrijfsmaat, bankpositie, bankpositieZet, aanmeldkanaalStand, streefbeeld,
-    officeAuth, rtgBoek, rtgBoekZet, RTGBOEK_DELEN } = kern;
+    officeAuth, rtgBoek, rtgBoekZet, rtgBoekCampagne, RTGBOEK_DELEN, rtgCampagnes, rtgCampagneMaak, AANMELDKANALEN,
+    beslisgeheugen, beslisgeheugenLeg, beslisgeheugenTrekIn } = kern;
   app.post('/api/office/bedrijfsmaat', boardroomAuth, (req, res) => {
     const uit = bedrijfsmaat.stand({ maand: (req.body || {}).maand });
     res.json(Object.assign({ ok: true, besluiten: BESLUITEN.map(b => ({ id: b.id, naam: b.naam, kort: b.kort })) }, uit));
@@ -62,5 +63,29 @@ module.exports = (kern) => {
       centen: b.centen, bron: b.bron, wie: boardroomWie(req) });
     if (r.error) return res.status(r.status || 400).json({ error: r.error });
     res.json(r);
+  });
+  /* DE CAMPAGNES VAN RTG (kern/rtgcampagne.js, besluit C12): het register lezen,
+     een campagne aanmaken en wat hij in een maand kostte boeken -- allemaal in de
+     kamer Financien, en schrijven alleen op naam. */
+  app.post('/api/office/rtgcampagne', officeAuth, (req, res) =>
+    res.json({ ok: true, campagnes: rtgCampagnes(), kanalen: AANMELDKANALEN.filter(k => k !== 'vriend') }));
+  app.post('/api/office/rtgcampagne/maak', officeAuth, (req, res) => {
+    const b = req.body || {};
+    uit(res, rtgCampagneMaak({ code: b.code, naam: b.naam, kanaal: b.kanaal, van: b.van, tot: b.tot, wie: boardroomWie(req) }));
+  });
+  app.post('/api/office/rtgboek/campagne', officeAuth, (req, res) => {
+    const b = req.body || {};
+    uit(res, rtgBoekCampagne({ maand: b.maand, code: b.code, centen: b.centen, bron: b.bron, wie: boardroomWie(req) }));
+  });
+  /* HET BESLISGEHEUGEN (kern/beslisgeheugen.js, besluit C13): lezen mag de
+     boardroom; een besluit vastleggen of intrekken alleen een mens op naam. */
+  app.post('/api/office/beslisgeheugen', boardroomAuth, (req, res) => res.json({ ok: true, besluiten: beslisgeheugen() }));
+  app.post('/api/office/beslisgeheugen/leg', boardroomAuth, (req, res) => {
+    const b = req.body || {};
+    uit(res, beslisgeheugenLeg({ besluit: b.besluit, verwachting: b.verwachting, termijnDagen: b.termijnDagen, wie: boardroomWie(req) }));
+  });
+  app.post('/api/office/beslisgeheugen/intrek', boardroomAuth, (req, res) => {
+    const b = req.body || {};
+    uit(res, beslisgeheugenTrekIn({ id: b.id, reden: b.reden, wie: boardroomWie(req) }));
   });
 };

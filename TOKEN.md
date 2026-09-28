@@ -324,3 +324,16 @@ waarvan de reden verdwijnt, wordt over een jaar opnieuw gevoerd.
    puntenplafond hoort bij een besteding van € 50.000 en is dus ruim; lager
    zetten raakt echte leden eerder dan je denkt. Het verschil met hiervoor is
    dat dat nu een besluit van de boardroom is en niet van een commit.
+6. **De eigen cadeaubon van RTG, ook te besteden bij zaken** -- **besloten op 28
+   september 2026 (C14 in `AUTONOMIE.md` par. 2.6), en daarmee een e-moneyvraag.**
+   Een bon die alleen bij RTG te besteden is zou een beperkt netwerk zijn; de
+   eigenaar koos voor meer, en dan geeft RTG waarde uit die bij DERDEN inwisselbaar
+   is tegen de nominale waarde. Gebouwd is de vorm van de terugstortstand: een
+   schakelaar die de positie IS (`kern/cadeaubon.js`, standaard dicht, omzetten met
+   een verse passkey) en het vermogen `RTG_CADEAUBON` met twee gezichten -- dicht
+   bestaat de handeling niet, open is het een rail met de eis
+   `elektronischgeldinstelling` over de eigen rails en, net als bij punt 2, GEEN
+   partnerrail. Zonder vergunning weigert de uitgifte dus ook als de knop open
+   staat. Verkopen, inwisselen en afrekenen met een zaak zijn met opzet niet
+   gebouwd. Wat openstaat is geen bouwtaak maar de vergunning of vrijstelling
+   zelf.

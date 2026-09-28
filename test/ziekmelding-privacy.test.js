@@ -141,18 +141,21 @@ test('een OUDE ziekmelding met een omschrijving komt niet meer bij de werkgever'
     staffId = roster.staff.find(x => x.role === 'manager').id;
     let tok = (await post(s.base, '/api/supplier/login',
       { code: 'KIKUNOI', staffId, pin: '1234' })).data.token;
+    /* Een reden gaat via de route nergens meer in, ook niet bij verlof
+       (VRIJHEID.md, regel 2.11). De oude melding MET omschrijving wordt dus in
+       de opslag geplant: een aanvraag zonder reden, en daarna de velden zoals
+       een ziekmelding van voor de reparatie eruitzag. */
     const aanvraag = await post(s.base, '/api/staff/leave/request',
-      { soort: 'verlof', van: '2026-09-01', tot: '2026-09-05', reden: GEHEIM }, tok);
+      { soort: 'verlof', van: '2026-09-01', tot: '2026-09-05' }, tok);
     assert.equal(aanvraag.status, 200, JSON.stringify(aanvraag.data));
-    assert.equal(aanvraag.data.entry.reden, GEHEIM, 'bij VERLOF mag een reden gewoon');
     await stopNet(s.child);
 
     const dbPad = path.join(TMP, 'db.json');
     const db = JSON.parse(fs.readFileSync(dbPad, 'utf8'));
     const rij = (db.verlof || {}).KIKUNOI || [];
-    const oud = rij.find(v => v.reden === GEHEIM);
+    const oud = rij.find(v => v.id === aanvraag.data.entry.id);
     assert.ok(oud, 'de aanvraag staat in de opslag');
-    oud.soort = 'ziek'; oud.status = 'gemeld';   // zoals een oude ziekmelding eruitzag
+    oud.soort = 'ziek'; oud.status = 'gemeld'; oud.reden = GEHEIM;   // zoals een oude ziekmelding eruitzag
     /* De melding die bij de VERLOFaanvraag naar de werkgever ging, gaat er ook
        uit. Niet om de toets te laten slagen: die notificatie hoort bij de
        gebeurtenis van toen (een verlofaanvraag, en daar mag een reden bij), en

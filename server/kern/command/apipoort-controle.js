@@ -20,7 +20,7 @@
 'use strict';
 const { nu: klokNu } = require('../../lib/klok');
 
-module.exports = ({ vak, save, hash, veiligGelijk, binnenToelating, kort, UUR }) => {
+module.exports = ({ vak, save, hash, veiligGelijk, binnenToelating, kort, UUR, vervaltVan }) => {
 
   /* ---------- de controle, voor de middleware ---------- */
 
@@ -31,7 +31,9 @@ module.exports = ({ vak, save, hash, veiligGelijk, binnenToelating, kort, UUR })
     const s = vak().sleutels[m[1]];
     if (!s) return { ok: false, status: 401, reden: 'onbekende sleutel' };
     if (s.ingetrokken) return { ok: false, status: 401, reden: 'deze sleutel is ingetrokken' };
-    if (s.vervalt && Date.parse(s.vervalt) < t) return { ok: false, status: 401, reden: 'deze sleutel is verlopen' };
+    /* Elke sleutel vervalt: zonder eigen datum (van voor de verplichte
+       levensduur) geldt de legacydatum uit ./apipoort.js, nooit "nooit". */
+    if (!(Date.parse(vervaltVan(s)) > t)) return { ok: false, status: 401, reden: 'deze sleutel is verlopen' };
     /* veiligGelijk en niet !==: een vergelijking die bij het eerste
        verschillende teken stopt, lekt hoe ver een gok goed was. Overal elders
        in dit huis staat veiligGelijk; hier dus ook. */
@@ -64,6 +66,10 @@ module.exports = ({ vak, save, hash, veiligGelijk, binnenToelating, kort, UUR })
         herstartOver: Math.ceil(((emmer + 1) * UUR - t) / 1000) };
     }
     s.teller.n++;
+    /* Gebruik wordt geteld en niet begrensd: een machinesleutel wordt bij elk
+       verzoek gebruikt. Wat hem begrenst is het quotum per uur, de scope, de
+       verplichte vervaldatum en intrekken of roteren. */
+    s.gebruik = (s.gebruik || 0) + 1;
     s.laatst = new Date(t).toISOString();
     save();
     return {

@@ -93,19 +93,9 @@ module.exports = function maakPostgresVerzoeken(o) {
     return true;
   }
 
-  async function commit(ctx) {
-    if (!gezond) throw Object.assign(new Error(reden || 'PostgreSQL is niet schrijfgezond.'), { code: 'PG_ONGEZOND' });
-    const p = motor();
-    if (!p || typeof p.commitVerzoek !== 'function')
-      throw Object.assign(new Error('PostgreSQL-requestcommit ontbreekt.'), { code: 'PG_GEEN_COMMIT' });
-    const w = context.wijzigingen(ctx);
-    if (!w.length) return { geschreven: 0 };
-    try { return await slot(() => p.commitVerzoek(state.getRuweData(), w)); }
-    catch (e) {
-      if (!e || e.code !== 'PG_REQUEST_CONFLICT') ongezond(e, 'requestcommit');
-      throw e;
-    }
-  }
+  /* De commit zelf (collecties + deelnemers): ./verzoekcommit.js. */
+  const commits = require('./verzoekcommit')({ motor, slot, state,
+    gezond: () => gezond, reden: () => reden, ongezond });
 
   function middleware() {
     if (!actief()) return (_req, _res, next) => next();
@@ -126,7 +116,8 @@ module.exports = function maakPostgresVerzoeken(o) {
         if (echtFlush) res.flushHeaders = echtFlush;
       };
       const stroomMagOpen = () => (req.method === 'GET' || req.method === 'HEAD') &&
-        !ctx.opslaan && !ctx.voorCommit.length && !context.onbevestigdeWijzigingen(ctx).length;
+        !ctx.opslaan && !ctx.voorCommit.length && !context.heeftDeelnemers(ctx) &&
+        !context.onbevestigdeWijzigingen(ctx).length;
       const openStroom = (soort, args) => {
         if (!stroomMagOpen()) return false;
         if (!gezond && !vrij(req.path)) throw Object.assign(
@@ -190,7 +181,7 @@ module.exports = function maakPostgresVerzoeken(o) {
             if (stil2.length && !ctx.opslaan)
               throw Object.assign(new Error('Een voor-commithaak muteerde zonder save(): ' + namenVan(stil2)),
                 { code: 'PG_SAVE_ONTBREEKT' });
-            if (ctx.opslaan) await commit(ctx);
+            if (commits.teCommitten(ctx)) await commits.commit(ctx);
             context.draaiNaCommit(ctx);
           }
           context.sluit(ctx);

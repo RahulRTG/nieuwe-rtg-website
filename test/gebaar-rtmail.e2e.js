@@ -20,7 +20,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten, veegDoor, laadPlaywright, browserOpties, geenBrowser, edgeActies } = require('./helper');
+const { startServer, stopNet, letOpFouten, veegDoor, laadPlaywright, browserOpties, geenBrowser, edgeActies } = require('./helper');
 
 const pw = laadPlaywright();
 const BROWSER = process.env.RTG_CHROMIUM || undefined;
@@ -100,15 +100,33 @@ test('een veeg bergt post op, de weg terug haalt hem terug, en een weigering ook
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, reg.token);
     await page.goto(base + '/apps/rtmail.html', { waitUntil: 'domcontentloaded' });
+    // Laat de oude, verborgen lijst eerst bestaan. Houd daarna de echte nieuwe
+    // serverreactie vast: deze overgang mag geen bedienbare verouderde rij tonen.
+    await page.waitForSelector('#main .rij[data-i]', { state: 'attached' });
+    let vrijgeven, aangevraagd;
+    const wachtOpVrijgave = new Promise(r => { vrijgeven = r; });
+    const nieuweLijst = new Promise(r => { aangevraagd = r; });
+    await page.route('**/api/member/rtmail/vak', async route => {
+      const response = await route.fetch();
+      aangevraagd();
+      await wachtOpVrijgave;
+      await route.fulfill({ response });
+    });
     /* De rustige voorzijde is nu de echte ingang. De veeg hoort in Alle post:
        ga erheen via dezelfde zichtbare knop als het lid, zodat deze proef niet
        door aria-hidden heen in het oude postvak probeert te grijpen. */
     await edgeActies(page);
     await page.locator('.rtg-adaptive-controls').getByRole('button', { name: /Alle post$/i }).click();
+    await nieuweLijst;
+    try {
+      assert.equal(await page.locator('#main').getAttribute('aria-hidden'), 'true',
+        'oude post mag niet bedienbaar worden terwijl de nieuwe serverlijst nog onderweg is');
+    } finally { vrijgeven(); }
     await page.waitForFunction(() => !document.body.classList.contains('rtm-voorzijde-actief') &&
       document.getElementById('main') && document.getElementById('main').getAttribute('aria-hidden') === 'false',
     null, { timeout: 5000 });
     await page.waitForSelector('#main .rij[data-i].gb-rij', { timeout: 20000 });
+    await page.unroute('**/api/member/rtmail/vak');
 
     // 1. doorvegen bergt het bericht ECHT op, en opent het NIET
     const eersteVak = await meetVerseRij(page, '#main .rij[data-i]',
@@ -130,6 +148,34 @@ test('een veeg bergt post op, de weg terug haalt hem terug, en een weigering ook
     await page.locator('.gb-terug button').click();
     await wachtTot(() => mapVan(onderwerp), (m) => m === 'in',
       'Terugdraaien hoort het bericht terug in het postvak te zetten');
+
+    // Bewaar een echt oud serverantwoord, wijzig de authoritative map en laad
+    // daarna de nieuwe lijst. De vertraagde oude reactie mag de rij niet terugbrengen.
+    let geefOudVrij, oudOntvangen, eerste = true;
+    const oudWacht = new Promise(r => { geefOudVrij = r; });
+    const oudKlaar = new Promise(r => { oudOntvangen = r; });
+    await page.route('**/api/member/rtmail/vak', async route => {
+      if (!eerste) return route.continue();
+      eerste = false;
+      const response = await route.fetch();
+      oudOntvangen();
+      await oudWacht;
+      await route.fulfill({ response });
+    });
+    await page.evaluate(() => { window.oudePostKlaar = false; RTGMail.laad().then(() => { window.oudePostKlaar = true; }); });
+    await oudKlaar;
+    try {
+      await api('verplaats', { id: post.id, map: 'archief' });
+      assert.equal(await mapVan(onderwerp), 'archief');
+      await page.evaluate(() => RTGMail.laad());
+    } finally { geefOudVrij(); }
+    await page.waitForFunction(() => window.oudePostKlaar === true);
+    assert.equal(await page.locator('#main .rij .nm').filter({ hasText: onderwerp }).count(), 0,
+      'een oud antwoord mag gearchiveerde post niet in de nieuwe lijst terugbrengen');
+    assert.equal(await mapVan(onderwerp), 'archief');
+    await page.unroute('**/api/member/rtmail/vak');
+    await api('verplaats', { id: post.id, map: 'in' });
+    await page.evaluate(() => RTGMail.laad());
 
     // 3. de andere kant draagt de acties die niets verplaatsen
     /* OP TELEFOONBREEDTE, want daar bijt de regel die hieronder gemeten wordt.
@@ -216,8 +262,11 @@ test('een veeg bergt post op, de weg terug haalt hem terug, en een weigering ook
 
     assert.deepEqual(paginaFouten, [], 'geen JS-fouten tijdens het vegen');
   } finally {
-    if (browser) await browser.close();
-    stop(child);
-    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+    try { if (browser) await browser.close(); }
+    finally {
+      await stopNet(child);
+      assert.ok(child.exitCode != null || child.signalCode != null, 'de testserver moet vóór het opruimen volledig gestopt zijn');
+      fs.rmSync(TMP, { recursive: true, force: true });
+    }
   }
 });

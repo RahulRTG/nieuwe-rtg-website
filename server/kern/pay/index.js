@@ -29,7 +29,7 @@
    met een zaak in ./zaakbetaling. */
 
 module.exports = (ctxIn) => {
-  const { db, save, bijeen, economischeBoekingEenmaal, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon,
+  const { db, save, bijeen, economischeBoekingEenmaal, bewerkCollectie, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon,
     betaaldienstKosten, betaalOpdrachten, waarde, accounts, payBoekingenVoegToe, betaalWaarheid } = ctxIn;
   if (typeof payBoekingenVoegToe !== 'function')
     throw new Error('pay: payBoekingenVoegToe ontbreekt. Zonder die weg landt geen enkele grootboekregel in het transactiegrootboek.');
@@ -41,9 +41,9 @@ module.exports = (ctxIn) => {
      nog steeds aan het OS. Zonder RTG_KLOK geeft klok.nu() exact
      Date.now(); in productie weigert een verzette klok bij het laden. */
   const nu = require('../../lib/klok').nu;
-  /* De opslagvorm -- de vijf bakken in db.data en de vier naamregels ('lid:',
+  /* De opslagvorm -- de drie bakken in db.data en de vier naamregels ('lid:',
      'partner:', het saldo van een rekening, een nieuw id) -- staat in ./bakken.js. */
-  const { d, saldi, grootboek, klompjes, kascodes, tikcodes,
+  const { d, saldi, grootboek, klompjes,
     saldiKijk, grootboekKijk, klompjesKijk, rekLid, rekPartner, saldoVan, id } =
     require('./bakken')({ db, crypto });
   /* De stand van deze laag -- de drie schakelaars uit de omgeving en de zes
@@ -96,12 +96,12 @@ module.exports = (ctxIn) => {
      aan het grootboek, het seintje naar het lid en de schaduwstand voor het
      statusbord -- staat in ./kijken.js. Daar komen save noch boek binnen: wie
      er iets verandert kan per definitie geen geld verplaatsen. */
-  const { sluitcontrole, boekingenVan, seintje, schaduwStand } =
+  const { sluitcontrole, boekingenVan, seintje, schaduwStand, ledentegoed } =
     require('./kijken')({ saldi, grootboek, keyVanCodenaam, sseToCustomer, schaduw });
 
   const ctx = {
-    db, save, economischeBoekingEenmaal, crypto, betaal, schoon, nu, d,
-    saldi, grootboek, klompjes, kascodes, tikcodes, saldiKijk, grootboekKijk, klompjesKijk,
+    db, save, economischeBoekingEenmaal, bewerkCollectie, crypto, betaal, schoon, nu, d,
+    saldi, grootboek, klompjes, saldiKijk, grootboekKijk, klompjesKijk,
     rekLid, rekPartner, saldoVan, id, metIdem, boek, boekAsync, geldModus, zorgSaldo, seintje, bestaatLid,
     betaaldienstKosten: betaaldienstKosten || (() => 0), waarde, accounts,
     opdrachten: betaalOpdrachten,
@@ -115,7 +115,7 @@ module.exports = (ctxIn) => {
   /* KASCODE_* staat OP DE API en niet alleen in de ctx: ./kassacode.js leest
      pay.KASCODE_MS voor zijn eigen ttl. Main kent dat bestand niet, dus was het
      undefined en weigerde de linklaag bij het opstarten. */
-  const api = { MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX, boek, boekAsync, geldModus, sluitcontrole, laadOp, oplaadAfronden, saldoVan, rekLid, boekingenVan, koppelBank, koppelKosten, reconcileVanMotor };
+  const api = { MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX, boek, boekAsync, geldModus, sluitcontrole, laadOp, oplaadAfronden, saldoVan, rekLid, boekingenVan, koppelBank, koppelKosten, reconcileVanMotor, ledentegoed };
   api.schaduw = schaduwStand;
   // de portefeuille: de waardelaag kent de betekenis, dit grootboek de bedragen
   if (waarde) api.portefeuille = c => waarde.portefeuille(c, saldoVan);

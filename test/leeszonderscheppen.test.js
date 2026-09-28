@@ -7,11 +7,9 @@
    maken: db.data groeit door verzoeken die NIETS mochten. Op openbare routes is
    dat door een vreemde te sturen.
 
-   Deze toets is met opzet EEN bestand met een blok per module, en niet veertig
-   losse bestanden. De vorm is per module identiek -- roep het weigerpad aan op
-   een verse db en eis dat de collectie er daarna niet staat -- dus veertig
-   scenario's zijn hier veertig regels en geen veertig scenario's. Elk blok
-   draait volledig in het geheugen: geen server, geen db.json, geen accounts.
+   Een bestand met een blok per module: de vorm is per module identiek (roep
+   het weigerpad aan op een verse db en eis dat de collectie er daarna niet
+   staat). Elk blok draait in het geheugen: geen server, geen db.json.
 
    Elk blok draagt ook de TEGENPROEF: het schrijfpad moet heel blijven. Wie een
    bak() te breed omzet, laat een net weggeschreven waarde in een vluchtig
@@ -29,10 +27,11 @@ const geenMeubilair = (db, naam, wat) =>
 /* ------------------------------------------------------------------ algpin */
 test('algpin: een pin opzoeken die er niet is, schept geen collectie', async () => {
   const { maakAlgPin } = require('../server/kern/algpin');
-  const db = { data: {} };
+  const db = { data: {}, writable: true };
   const k = maakAlgPin({
     db, save: () => {}, crypto: require('node:crypto'),
     slot: { dicht: () => false, fout: () => {}, goed: () => {} },
+    bewerkCollectie: require('../server/db/collectie-bewerken')({ store: 'json', db, save() {} }),
   });
 
   assert.equal(k.pinInfo('lid-1').gezet, false);

@@ -2329,7 +2329,7 @@
           '<input class="st-in" id="gcBedrag" type="number" placeholder="€ 50" style="flex:1;min-width:80px;">'+
           '<button class="obtn primary" id="gcSell">'+T('fn.gcsell','Verkoop kaart')+'</button></div>'+
           '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.25rem;">'+
-          '<input class="st-in" id="gcCode" placeholder="RTG-GC-XXXXXX" style="flex:2;min-width:130px;">'+
+          '<input class="st-in" id="gcCode" placeholder="GC-XXXX-XXXX-…" style="flex:2;min-width:130px;">'+
           '<input class="st-in" id="gcInBedrag" type="number" placeholder="€" style="flex:1;min-width:70px;">'+
           '<button class="obtn" id="gcRedeem">'+T('fn.gcredeem','In te wisselen')+'</button></div></div>';
         html += '<div class="tkc"><h3>'+T('fn.regels','Regels in ')+f.landNaam+'</h3>'+
@@ -2599,12 +2599,14 @@
       const verlofRest = (state.verlof || []).filter(v => v.status !== 'nieuw').slice(0, 8);
       html += '<div class="tkc"><h3>\uD83C\uDF34 '+T('kt.verlof','Verlof & ziek')+(verlofOpen.length ? ' ('+verlofOpen.length+')' : '')+'</h3>'+
         (verlofOpen.length ? verlofOpen.map(v =>
-          '<div class="st-row h-wrap"><span>'+v.name+'<span class="sub">'+v.van+' t/m '+(v.tot||'')+(v.reden?' \u00B7 '+v.reden:'')+'</span></span>'+
+          '<div class="st-row h-wrap"><span>'+v.name+'<span class="sub">'+v.van+' t/m '+(v.tot||'')+'</span></span>'+
           '<span class="acts"><button class="obtn primary" data-kvja="'+v.id+'">'+T('kt.vja','Goedkeuren')+'</button><button class="obtn warn" data-kvnee="'+v.id+'">'+T('kt.vnee','Afwijzen')+'</button></span></div>').join('')
           : '<div class="tkc-who">'+T('kt.geenverlof','Geen open aanvragen. Personeel vraagt verlof aan via de PDA; ziekmeldingen komen hier ook binnen.')+'</div>')+
         (verlofRest.length ? verlofRest.map(v =>
           '<div class="st-row"><span>'+v.name+'<span class="sub">'+(v.soort==='ziek'?T('kt.ziek','ziek gemeld')+' '+v.van:v.van+' t/m '+(v.tot||''))+'</span></span>'+
           '<span class="sub" style="text-transform:uppercase;font-size:0.6rem;letter-spacing:0.06em;">'+(v.status==='goedgekeurd'?'\u2705 '+T('kt.vok','goedgekeurd'):v.status==='afgewezen'?'\u2715 '+T('kt.vno','afgewezen'):'\uD83E\uDD12 '+T('kt.vzm','gemeld'))+'</span></div>').join('') : '')+'</div>';
+      // RTG Vrijheid: wat op een mens wacht en de bezetting; laadTijdKaart vult hem (leverancier-55e.js)
+      html += '<div class="tkc h-volbreed" id="tijdKaart"><h3>'+T('kt.tijd','Tijd van het team')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
       const klok2 = state.klok || { vandaag: [], binnen: [] };
       html += '<div class="tkc"><h3>\u23F1 '+T('kt.klok','Nu ingeklokt')+' ('+klok2.binnen.length+')</h3>'+
         (klok2.binnen.length ? klok2.binnen.map(n => '<div class="st-row"><span>\uD83D\uDFE2 '+n+'</span></div>').join('')
@@ -3199,7 +3201,9 @@
       gS.disabled = true;
       try {
         const d = await API.call('/supplier/giftcard/sell', { bedrag: Number(el.querySelector('#gcBedrag').value) });
-        finMsg = ''+T('fn.gcklaar','Cadeaukaart verkocht. Geef deze code mee:')+' <b style="color:var(--rtg-leesgoud,var(--gold));">'+d.kaart.code+'</b> (€ '+d.kaart.bedrag+')';
+        finMsg = d.kaart.code
+          ? ''+T('fn.gcklaar','Cadeaukaart verkocht. Geef deze code mee:')+' <b style="color:var(--rtg-leesgoud,var(--gold));">'+d.kaart.code+'</b> (€ '+d.kaart.bedrag+')'
+          : T('fn.gceenmaal','Deze kaart is al verkocht; de code wordt maar een keer getoond.');
         finData = null;
         renderStation();   // hertekent het scherm, dus de knop komt vers terug
       } catch(e){ gS.disabled = false; toast(e.message); }
@@ -3835,6 +3839,7 @@
         kantoorMsg = '\u2705 '+T('sup.salondone','Gepubliceerd op De Salon.');
         await refresh(); } catch(e){ toast(e.message); }
     });
+    laadTijdKaart(el);
   }
 
   async function refresh(){ try { applyState((await API.call('/supplier/state')).state); renderAll(); } catch(e){} }
@@ -6350,6 +6355,107 @@
       catch(e){ toast(e.message); }
     }));
   }
+/* TIJD VAN HET TEAM (VRIJHEID.md): de kaart in het Kantoor waarin een
+   leidinggevende beoordeelt wat op een MENS wacht en de bezetting per weekdag
+   vastlegt. leverancier-16.js zet de lege kaart neer, bindKantoor roept
+   laadTijdKaart aan. Dit deel staat tussen twee hele functies (na
+   leverancier-55d.js): een deel dat midden in een functie valt, is onzichtbaar.
+
+   Het overzicht opent alleen met een PERSOONLIJKE login: bij bijzonder verlof
+   kan de reden erin staan, en die leest niet een gedeeld bedrijfsaccount. Wie
+   met het bedrijfsaccount binnen is, krijgt de zin van de server te zien en
+   geen lege kaart. Een afwijzing vraagt een reden, want de medewerker leest
+   hem. */
+  let tijdOv = null, tijdEisen = [];
+  const TIJD_DAGEN = ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'];
+  const TIJD_STAP = { werkstand: 'Werk', dekking: 'Bezetting', bevoegdheden: 'Bevoegdheden', rust: 'Rust', eerlijkheid: 'Eerlijkheid', teamImpact: 'Team' };
+
+  function tijdNaam(id){
+    const m = ((state && state.staff) || []).find(x => String(x.id) === String(id));
+    return m ? m.name : T('kt.tijd.onbekend', 'Onbekende medewerker');
+  }
+
+  function tijdWachtHtml(v){
+    const stappen = Object.keys(TIJD_STAP).filter(k => v[k]).map(k =>
+      '<div class="tkc-who">' + escT(T('kt.tijd.s.' + k, TIJD_STAP[k])) + ': ' + escT(v[k].stand) + (v[k].uitleg ? ' · ' + escT(v[k].uitleg) : '') + '</div>').join('');
+    const alts = (v.alternatieven || []).map(a => '<div class="tkc-who">→ ' + escT(a.zin || '') + '</div>').join('');
+    return '<div class="st-row h-stapel"><span>' + escT(tijdNaam(v.persoon)) + '<span class="sub">' + escT(v.datum) + (v.vanaf ? ' ' + escT(v.vanaf) : '') +
+      ' · ' + escT(v.soort) + '</span></span>' + stappen + alts +
+      (v.reden ? '<div class="tkc-who">' + T('kt.tijd.reden', 'Reden (alleen voor u)') + ': ' + escT(v.reden) + '</div>' : '') +
+      '<input class="h-volbreed h-mt40" data-tijdreden="' + escT(v.id) + '" maxlength="500" placeholder="' + T('kt.tijd.waarom', 'Reden bij afwijzen (de medewerker leest hem)') + '">' +
+      '<span class="acts h-mt40"><button class="obtn primary" data-tijdja="' + escT(v.id) + '">' + T('kt.vja', 'Goedkeuren') + '</button>' +
+      '<button class="obtn warn" data-tijdnee="' + escT(v.id) + '">' + T('kt.vnee', 'Afwijzen') + '</button></span></div>';
+  }
+
+  function tijdEisHtml(e, i){
+    const ver = Object.entries(e.vereist || {}).map(([c, n]) => c + ' ×' + n).join(', ');
+    return '<div class="st-row"><span>' + TIJD_DAGEN[e.weekdag] + ' ' + escT(e.van) + ' ' + T('kt.tijd.tot', 'tot') + ' ' + escT(e.tot) + '<span class="sub">' +
+      T('kt.tijd.min', 'minstens') + ' ' + e.minBezetting + (e.kamer ? ' · ' + escT(e.kamer) : '') + (ver ? ' · ' + escT(ver) : '') + '</span></span>' +
+      '<span class="acts"><button class="obtn" data-tijdeisweg="' + i + '">' + T('kt.tijd.weg', 'Weg') + '</button></span></div>';
+  }
+
+  function renderTijdKaart(el, fout){
+    const k = el.querySelector('#tijdKaart'); if (!k) return;
+    const kop = '<h3>' + T('kt.tijd', 'Tijd van het team') + (tijdOv && tijdOv.wachtend.length ? ' (' + tijdOv.wachtend.length + ')' : '') + '</h3>';
+    if (fout || !tijdOv){ k.innerHTML = kop + '<div class="tkc-who">' + escT(fout || T('kt.laden', 'Laden...')) + '</div>'; return; }
+    const o = tijdOv;
+    k.innerHTML = kop +
+      '<div class="tkc-who">' + T('kt.tijd.deck', 'Wat het systeem niet zelf mag besluiten, wacht hier op u. Een verzoek dat veilig is, keurt het zelf goed; een dat niet kan, krijgt alternatieven.') + '</div>' +
+      (o.wachtend.length ? o.wachtend.map(tijdWachtHtml).join('') : '<div class="tkc-who h-mt40">' + T('kt.tijd.leeg', 'Er wacht niets op u.') + '</div>') +
+      '<div class="tkc-who h-mt60"><b>' + T('kt.tijd.bez', 'Bezetting per weekdag') + '</b></div>' +
+      (tijdEisen.length ? tijdEisen.map(tijdEisHtml).join('') : '<div class="tkc-who">' + T('kt.tijd.geeneis', 'Nog geen bezetting vastgelegd, dus kan het systeem niet zeggen of iemand gemist kan worden: dan beslist u.') + '</div>') +
+      '<div class="st-row h-wrap h-mt40"><select id="tijdDag">' + TIJD_DAGEN.map((d, i) => '<option value="' + i + '">' + d + '</option>').join('') + '</select>' +
+      '<input type="time" id="tijdVan" value="09:00" aria-label="van"><input type="time" id="tijdTot" value="17:00" aria-label="tot">' +
+      '<input type="number" id="tijdMin" min="0" value="1" aria-label="' + T('kt.tijd.min', 'minstens') + '">' +
+      (o.kamers ? '<select id="tijdKamer"><option value="">' + T('kt.tijd.alle', 'hele huis') + '</option>' + o.kamers.map(c => '<option>' + escT(c) + '</option>').join('') + '</select>' : '') +
+      '<button class="obtn" id="tijdEisPlus">+ ' + T('kt.tijd.plus', 'Voeg toe') + '</button></div>' +
+      '<div class="tkc-act"><button class="tkc-ready" id="tijdEisBewaar">' + T('kt.tijd.bewaar', 'Bewaar de bezetting') + '</button></div>' +
+      '<div class="tkc-who h-mt60"><b>' + T('kt.tijd.fd', 'Feestdagen') + '</b></div>' +
+      '<div class="st-row h-wrap"><input class="h-flex1" id="tijdFd" value="' + escT(o.feestdagen.join(', ')) + '" placeholder="2026-12-25, 2026-12-26">' +
+      '<button class="obtn" id="tijdFdBewaar">' + T('kt.tijd.bewaar2', 'Bewaar') + '</button></div>' +
+      (o.ontbreekt.length ? '<div class="tkc-who h-mt60"><b>' + T('kt.tijd.niet', 'Wat het systeem niet weet') + '</b></div>' +
+        o.ontbreekt.map(r => '<div class="tkc-who">' + escT(r) + '</div>').join('') : '');
+    bindTijdKaart(el, k);
+  }
+
+  async function tijdKaartDoe(el, pad, lijf, klaar){
+    try { await API.call(pad, lijf); if (klaar) toast(klaar); await laadTijdKaart(el); }
+    catch(e){ toast(e.message); }
+  }
+
+  function bindTijdKaart(el, k){
+    k.querySelectorAll('[data-tijdja]').forEach(b => b.addEventListener('click', () =>
+      tijdKaartDoe(el, '/supplier/tijd/beoordeel', { id: b.dataset.tijdja, besluit: 'APPROVED' }, T('kt.tijd.ok', 'Goedgekeurd; de medewerker ziet het direct.'))));
+    k.querySelectorAll('[data-tijdnee]').forEach(b => b.addEventListener('click', () => {
+      const r = k.querySelector('[data-tijdreden="' + b.dataset.tijdnee + '"]');
+      const reden = r ? r.value.trim() : '';
+      if (!reden){ toast(T('kt.tijd.moet', 'Geef een reden: de medewerker leest hem.')); if (r) r.focus(); return; }
+      tijdKaartDoe(el, '/supplier/tijd/beoordeel', { id: b.dataset.tijdnee, besluit: 'DECLINED', reden });
+    }));
+    k.querySelectorAll('[data-tijdeisweg]').forEach(b => b.addEventListener('click', () => {
+      tijdEisen.splice(Number(b.dataset.tijdeisweg), 1); renderTijdKaart(el);
+    }));
+    const plus = k.querySelector('#tijdEisPlus'); if (plus) plus.addEventListener('click', () => {
+      const kamer = k.querySelector('#tijdKamer');
+      const e = { weekdag: Number(k.querySelector('#tijdDag').value), van: k.querySelector('#tijdVan').value, tot: k.querySelector('#tijdTot').value,
+        minBezetting: Math.max(0, parseInt(k.querySelector('#tijdMin').value, 10) || 0), vereist: {} };
+      if (kamer && kamer.value) e.kamer = kamer.value;
+      tijdEisen.push(e); renderTijdKaart(el);
+    });
+    const bewaar = k.querySelector('#tijdEisBewaar'); if (bewaar) bewaar.addEventListener('click', () =>
+      tijdKaartDoe(el, '/supplier/tijd/bezetting', { eisen: tijdEisen }, T('kt.tijd.bewaard', 'Bezetting bewaard.')));
+    const fd = k.querySelector('#tijdFdBewaar'); if (fd) fd.addEventListener('click', () => {
+      const lijst = k.querySelector('#tijdFd').value.split(/[\s,]+/).filter(Boolean);
+      tijdKaartDoe(el, '/supplier/tijd/feestdagen', { feestdagen: lijst }, T('kt.tijd.bewaard2', 'Feestdagen bewaard.'));
+    });
+  }
+
+  async function laadTijdKaart(el){
+    if (!el.querySelector('#tijdKaart')) return;
+    try { tijdOv = await API.call('/supplier/tijd/overzicht', {}); tijdEisen = (tijdOv.eisen || []).map(e => ({ ...e, vereist: { ...(e.vereist || {}) } })); }
+    catch(e){ tijdOv = null; return renderTijdKaart(el, e.message); }
+    renderTijdKaart(el);
+  }
 /* een cel op het zaakbord, en de samenvatting van schakelaars */
   function zbCel(n, label, waarschuw){
     return '<div class="b" style="flex:1;min-width:4.5rem;"><div class="v'+(waarschuw?' a':'')+'">'+n+'</div><div class="l">'+label+'</div></div>';
@@ -7144,8 +7250,8 @@
       '</div>'+
       // gast toont het oplichtende scherm; sla de code aan om de bestelling uit te geven
       '<div class="card"><div class="tt-h">'+T('pos.redeemh','RTG-ophaalcode innen')+'</div>'+
-      '<div style="margin-top:0.5rem;font-size:0.78rem;color:var(--muted);">'+T('pos.redeemsub','De gast laat het oplichtende scherm zien. Sla de code aan; de bestelling wordt gekoppeld, zo nodig afgerekend en uitgegeven.')+'</div>'+
-      '<div class="tt-add"><input id="posCode" placeholder="'+T('pos.codeph','Bijv. TBS9')+'" maxlength="4" autocapitalize="characters" style="text-transform:uppercase;letter-spacing:0.2em;font-weight:700;"><button id="posScan" title="'+T('pos.scan','Scan de code')+'" aria-label="'+T('pos.scan','Scan de code')+'"></button><button id="posRedeem">'+T('pos.redeem','Innen')+'</button></div>'+
+      '<div style="margin-top:0.5rem;font-size:0.78rem;color:var(--muted);">'+T('pos.redeemsub','De gast laat de afhaal-QR in zijn app zien. Scan hem; de bestelling wordt gekoppeld, zo nodig afgerekend en uitgegeven. Het bonnummer alleen opent niets.')+'</div>'+
+      '<div class="tt-add"><input id="posCode" placeholder="'+T('pos.codeph','Scan de afhaal-QR')+'" maxlength="80" autocapitalize="characters" autocomplete="off" spellcheck="false"><button id="posScan" title="'+T('pos.scan','Scan de code')+'" aria-label="'+T('pos.scan','Scan de code')+'"></button><button id="posRedeem">'+T('pos.redeem','Innen')+'</button></div>'+
       '<div id="posRedeemResult"></div></div>';
   }
 
@@ -7222,7 +7328,7 @@
     const posScan = $('#posScan'); if (posScan) posScan.addEventListener('click', () => {
       if (!window.RTGScanknop){ toast(T('pos.scannietklaar','De scanner is nog niet geladen.')); return; }
       RTGScanknop.open({ titel: T('pos.scan','Scan de ophaalcode'), hint: T('pos.scanhint','Scan de QR op het scherm van het lid.'), onCode: (c) => {
-        const el = $('#posCode'); if (el) el.value = String(c.tekst || '').trim().toUpperCase().slice(0, 4);
+        const el = $('#posCode'); if (el) el.value = String(c.tekst || '').trim().toUpperCase().slice(0, 80);
         redeemCode();
       } });
     });
@@ -7272,12 +7378,12 @@
   async function redeemCode(){
     const inp = $('#posCode');
     const code = (inp.value||'').trim().toUpperCase();
-    if (!code){ toast(T('pos.entercode','Voer een ophaalcode in.')); return; }
+    if (!code){ toast(T('pos.entercode','Scan de afhaal-QR van het lid.')); return; }
     const box = $('#posRedeemResult');
     try {
-      const d = await API.call('/supplier/pos/redeem', { code });
+      const d = await API.call('/supplier/pos/redeem', { code, idem: RTGIdem('afhaal') });
       const o = d.order;
-      box.innerHTML = '<div class="enroute here h-mt80">✓ '+code+' · '+T('sup.guest','Gast')+' <b>'+o.codename+'</b> · '+
+      box.innerHTML = '<div class="enroute here h-mt80">✓ '+T('pos.bon','Bon')+' '+esc(o.bon || o.ref)+' · '+T('sup.guest','Gast')+' <b>'+o.codename+'</b> · '+
         o.items.map(i=>i.qty+'× '+i.name).join(', ')+' · '+eur(o.total)+
         (o.wasPaid ? ' · '+T('pos.waspaid','al betaald in de app') : ' · '+T('pos.chargedrtg','afgerekend via RTG'))+'</div>';
       inp.value = '';
@@ -7318,14 +7424,14 @@
        handeling. Daarom hoort de code hier en niet in het boekhoudscherm --
        daar boekt hij alleen saldo af en telt er niets als omzet. */
     if (method === 'cadeaukaart'){
-      body.gcCode = (window.prompt(T('pos.gcvraag','Code van de cadeaukaart (bijv. RTG-GC-A1B2C3):'))||'').trim();
+      body.gcCode = (window.prompt(T('pos.gcvraag','Code van de cadeaukaart (bijv. GC-1A2B-…):'))||'').trim();
       if (!body.gcCode) return;
     }
     try {
       const d = await API.call('/supplier/pos/sale', body);
       bon = {};
       toast(T('pos.done','Afgerekend:')+' '+eur(d.sale.total)+' ('+methodLabel(d.sale.method)+'), '+T('pos.bonnr','bon')+' '+d.sale.bon+
-        (d.sale.gcCode ? ' · '+T('pos.gcrest','restsaldo')+' '+eur(d.sale.gcRest) : '')+
+        (d.sale.kaartId ? ' · '+T('pos.gcrest','restsaldo')+' '+eur(d.sale.gcRest) : '')+
         (d.sale.betaaldienstKosten ? ' · '+T('pos.kosten','betaaldienst')+' '+eur(d.sale.betaaldienstKosten/100)+' '+T('pos.kostendirect','direct verrekend') : ''));
       await refresh(); openTab('kassa');
     } catch(e){ toast(e.message); }
@@ -7362,7 +7468,7 @@
         '<div class="mitem"><div class="r1"><span class="nm">'+sl.tijd+' \u00B7 '+esc(sl.naam)+'</span>'+
         '<span class="pr">'+sl.binnen+'/'+sl.verkocht+' '+T('tk2.binnenkort','binnen')+' \u00B7 '+sl.verkocht+'/'+sl.capaciteit+'</span></div>'+
         (sl.gasten.length ? '<div class="ds"><button class="obtn" data-tkg="'+i+'" style="padding:0.2rem 0.8rem;font-size:0.7rem;">'+T('tk2.gasten','Gastenlijst')+' ('+sl.gasten.length+')</button>'+
-          '<span id="tkGast-'+i+'" style="display:none;">'+sl.gasten.map(g => '<br>'+(g.binnen?'\u2705':'\u25CB')+' '+esc(g.codename)+' \u00B7 '+g.personen+'p \u00B7 '+g.code).join('')+'</span></div>' : '')+
+          '<span id="tkGast-'+i+'" style="display:none;">'+sl.gasten.map(g => '<br>'+(g.binnen?'\u2705':'\u25CB')+' '+esc(g.codename)+' \u00B7 '+g.personen+'p \u00B7 '+esc(g.ref)).join('')+'</span></div>' : '')+
         '</div>').join('')
       : '<div class="empty">'+T('tk2.leeg','Nog geen tijdsloten. '+(canEdit?'Voeg hieronder een activiteit toe.':''))+'</div>')+'</div>';
     // de eigen transferdienst (chauffeurs van de zaak rijden; ritten in de Ritten-tab)

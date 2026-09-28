@@ -78,6 +78,10 @@ module.exports = (ctx, eigen) => {
       const gedaan = (c.stappen || []).some(s => s.soort === 'hulpactie');
       if (!gedaan) return { status: 400, error: 'Er staat nog geen hulpactie in het dossier. Noteer eerst wat er is gedaan.' };
       c.bewaarTot = new Date(Date.now() + BEWAARDAGEN * 86400000).toISOString().slice(0, 10);
+      /* De DAG van afronden (besluit C3, AUTONOMIE.md): zonder datum kon FoundationOS
+         geen afgeronde casussen per maand tellen. Een dag en geen tijdstip, net als de
+         bewaartermijn hierboven: meer precisie zegt niets extra over de uitkomst. */
+      c.afgerondOp = new Date().toISOString().slice(0, 10);
     }
     const oud = c.status;
     c.status = st;

@@ -14,7 +14,9 @@ async function context(auth = token) {
   await ctx.addInitScript(token => { localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     if (token) localStorage.setItem('rtg_member_token', token); }, auth); return ctx;
 }
-async function open(page, route = '/apps/wereld.html') {
+/* Het bureau van LivingOS woont op /apps/rtg.html. /apps/wereld.html is sinds
+   #402 de Saloon en draagt het bureau bewust niet meer. */
+async function open(page, route = '/apps/rtg.html') {
   await page.goto(srv.base + route, { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('body[data-rtg-desktop]'); await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
   await page.waitForFunction(() => !document.body.hasAttribute('data-rtg-world-start') || document.body.dataset.rtgWorldStart === 'ready');
@@ -161,7 +163,7 @@ test('Foundation widgets read the chosen family profile without a paid member ac
 test('Home on the world desktop survives a restart of the Edge', { skip }, async () => {
   const ctx = await context(), page = await ctx.newPage();
   try {
-    for (const route of ['/apps/wereld.html', '/apps/rtg.html', '/apps/kantoor.html', '/apps/reizen.html']) {
+    for (const route of ['/apps/rtg.html', '/apps/kantoor.html', '/apps/reizen.html']) {
       await open(page, route);
       await page.evaluate(() => { window.RTGAdaptiveEdge.destroy(); window.RTGAdaptiveEdge.start(document, window); window.__rtgMerk = route => route; });
       await page.waitForSelector('.rtg-adaptive-bar [data-rtg-adaptive-action="home"]');

@@ -79,7 +79,11 @@ function perItem(data, regel, doe) {
       if (!Array.isArray(bron[sleutel])) continue;
       const houd = [];
       for (const item of bron[sleutel]) if (!doe(item)) houd.push(item);
-      bron[sleutel] = houd;
+      /* `leegWeg`: bij een tak die op CODENAAM is gesleuteld is de sleutel zelf
+         een gegeven; een lege lijst eronder zou de codenaam laten staan. Alleen
+         als er iets UIT ging: rapport() loopt hier ook langs en wijzigt niets. */
+      if (regel.leegWeg && !houd.length && bron[sleutel].length) delete bron[sleutel];
+      else bron[sleutel] = houd;
     }
   }
 }

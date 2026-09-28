@@ -74,7 +74,10 @@ test('de eigenaar krijgt zijn werkruimte, een keer, met zichzelf als directie', 
   const nogmaals = (await api('/mijn', {}, token)).body;
   assert.equal(nogmaals.aantal, 1, 'een tweede aanroep maakt geen tweede werkruimte');
   assert.equal(nogmaals.aangemaakt, null, 'en zegt dat er niets is aangemaakt');
-  assert.equal(nogmaals.werkruimtes[0].lidToken, w.lidToken, 'het lidmaatschap wordt niet overschreven');
+  assert.equal(nogmaals.werkruimtes[0].lidnaam || nogmaals.werkruimtes[0].lidNaam, w.lidNaam, 'het lidmaatschap wordt niet overschreven');
+  assert.notEqual(nogmaals.werkruimtes[0].lidToken, w.lidToken, 'elke aanroep geeft een verse sessie en nooit de oude terug');
+  assert.equal((await api('/mijn-rechten', { werkruimte: w.werkruimte, lidToken: w.lidToken })).status, 200,
+    'de eerste sessie blijft gewoon werken');
 });
 
 test('een gewoon lid krijgt niets automatisch, en vindt na koppelen zijn eigen werkruimte', async () => {
@@ -98,7 +101,9 @@ test('een gewoon lid krijgt niets automatisch, en vindt na koppelen zijn eigen w
 
   const na = (await api('/mijn', {}, lidToken)).body;
   assert.equal(na.aantal, 1, 'na koppelen vindt hij zijn werkruimte terug');
-  assert.equal(na.werkruimtes[0].lidToken, a.lidToken, 'met zijn eigen token');
+  assert.notEqual(na.werkruimtes[0].lidToken, a.lidToken, 'met een verse sessie; de oude wordt nooit opnieuw getoond');
+  assert.equal((await api('/mijn-rechten', { werkruimte: w.werkruimte, lidToken: na.werkruimtes[0].lidToken })).status, 200,
+    'en die verse sessie opent zijn eigen werkruimte');
   assert.equal(na.werkruimtes[0].lidNaam, 'Nieuwe collega', 'met de identiteit voor de persoonlijke kop');
   assert.deepEqual(na.werkruimtes[0].rollen, ['medewerker']);
   assert.equal(na.werkruimtes[0].eigenaarsRuimte, false);

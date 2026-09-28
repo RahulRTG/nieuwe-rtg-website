@@ -16,6 +16,31 @@
    Een rand daarheen verplaatsen is een besluit dat je kunt terugvinden; hem
    DOMEINRELATIE noemen om van het getal af te zijn, is de meter kapotmaken. */
 module.exports = [
+  /* DE LEDENGIDS RAAKT DE AANWEZIGHEID AAN (besluit van de eigenaar, 25 september
+     2026: retentie ook als aanwezigheid, een dag per lid). kern/gids.js dirTouch
+     is het ene keelgat waar elk ledenverzoek langskomt; daar wordt ook de dag van
+     het laatste bezoek aangeraakt, zodat "aanwezig" en "in de gids" niet op twee
+     deuren iets anders betekenen. De gids leest niets terug: het is een melding,
+     via een late binding (kern/aanwezigheid.js `raak`), omdat de gids eerder
+     wordt gebouwd dan de module die de dag bewaart. */
+  { van: 'domein:gids', naar: 'domein:aanwezigheid', soort: 'DOMEINRELATIE',
+    reden: 'de ledengids meldt bij elk ledenverzoek de bezoekdag aan kern/aanwezigheid.js; hetzelfde keelgat, geen tweede definitie van aanwezig' },
+  /* HET RECHT OP VERGETELHEID RAAKT DE PASGESCHIEDENIS. kern/vergeten.js is de
+     ene plek die weet wat er bij een verwijdering met elke tak gebeurt; de
+     pasovergangen verliezen daar hun codenaam (en blijven onder een willekeurig
+     kenmerk staan). test/vergeten.test.js veegt de hele database na. */
+  { van: 'domein:vergeten', naar: 'domein:pasgeschiedenis', soort: 'BELEID',
+    reden: 'bij een verwijdering haalt kern/vergeten.js de codenaam van de pasovergangen; de regel woont in kern/pasgeschiedenis.js `vergeet`' },
+  /* EEN SCHRIJVER BUITEN DE REQUESTCOMMIT, gedeeld door de twee meetbronnen van
+     25 september 2026. Beide schrijven vanuit gewone verzoeken in een gedeelde
+     collectie en botsten in PostgreSQL met twee instanties (409 op registratie,
+     5xx in de sloophamer). kern/eigentransactie.js legt de ene weg vast: via
+     bewerkCollectie, als haak voor de commit, en een fout telt in plaats van het
+     verzoek te laten vallen. Twee kopieen zouden twee faalgedragen worden. */
+  { van: 'domein:pasgeschiedenis', naar: 'domein:eigentransactie', soort: 'GEDEELDE_PRIMITIEF',
+    reden: 'de pasovergang schrijft via kern/eigentransactie.js in een eigen collectietransactie, zodat gelijktijdige registraties niet in de requestcommit botsen' },
+  { van: 'domein:aanwezigheid', naar: 'domein:eigentransactie', soort: 'GEDEELDE_PRIMITIEF',
+    reden: 'de bezoekdag schrijft via kern/eigentransactie.js in een eigen collectietransactie, zodat eerste bezoeken van de dag niet in de requestcommit botsen' },
   /* DE ZWARE POORT LEEST DE LIJST ZWARE HANDELINGEN. kern/zwaarbewijs.js weigert
      een actienaam die kern/webauthn-acties.js niet kent bij de EERSTE aanroep:
      zonder die controle ging zo'n route op de terugval door zolang de eigenaar

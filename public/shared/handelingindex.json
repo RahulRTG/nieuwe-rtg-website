@@ -1220,6 +1220,12 @@
       "url": "/apps/loopbaan.html"
     },
     {
+      "label": "Mijn leerhuis",
+      "app": "Mijn loopbaan",
+      "wereld": "WorkOS",
+      "url": "/apps/loopbaan.html"
+    },
+    {
       "label": "Stoppen",
       "app": "Mijn loopbaan",
       "wereld": "WorkOS",
@@ -2469,6 +2475,12 @@
     },
     {
       "label": "Neem terug",
+      "app": "RTG Pay",
+      "wereld": "LivingOS",
+      "url": "/apps/pay.html"
+    },
+    {
+      "label": "Nieuwe code",
       "app": "RTG Pay",
       "wereld": "LivingOS",
       "url": "/apps/pay.html"

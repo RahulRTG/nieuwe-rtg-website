@@ -1,19 +1,19 @@
 {
   "stempel": {
-    "op": "2026-09-27T08:06:46.720Z",
-    "commit": "054f55417",
+    "op": "2026-09-28T07:53:35.725Z",
+    "commit": "e366ad79d",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/vindbaar.js",
-    "node": "v24.18.0"
+    "node": "v22.22.2"
   },
   "uitleg": "Per bestemming in de sprong: welk aandeel van de ONDERSCHEIDENDE woorden van dat scherm (woorden uit zijn koppen die op hooguit 3 bestemmingen voorkomen) er ook naartoe leidt in de zoekfilter van shared/sprong.js. Meet woorden, geen mensen: of iemand op het idee komt dat woord te typen, weet deze meter niet.",
   "vloer": 0.6,
   "drempel": 3,
   "bestemmingen": 99,
-  "woorden": 1245,
-  "gevonden": 786,
-  "dekking": 0.6313,
+  "woorden": 1247,
+  "gevonden": 787,
+  "dekking": 0.6311,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -532,6 +532,20 @@
       ]
     },
     {
+      "naam": "Mijn loopbaan",
+      "url": "/apps/loopbaan.html",
+      "woorden": 13,
+      "gevonden": 7,
+      "mist": [
+        "reeks",
+        "zeven",
+        "voorraden",
+        "gedeeld",
+        "leren",
+        "ingetrokken"
+      ]
+    },
+    {
       "naam": "RTMail",
       "url": "/apps/rtmail.html",
       "woorden": 24,
@@ -652,19 +666,6 @@
         "reacties",
         "feeddata",
         "einde"
-      ]
-    },
-    {
-      "naam": "Mijn loopbaan",
-      "url": "/apps/loopbaan.html",
-      "woorden": 11,
-      "gevonden": 6,
-      "mist": [
-        "reeks",
-        "zeven",
-        "voorraden",
-        "gedeeld",
-        "ingetrokken"
       ]
     },
     {

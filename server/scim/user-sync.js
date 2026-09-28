@@ -8,6 +8,7 @@
 
 const crypto = require('crypto');
 const S = require('../accounts/state');
+const accountDuurzaamheid = require('../accounts/duurzaamheid');
 
 const HERSTEL_MS = 15000;
 const CLAIM_MS = 30000;
@@ -46,7 +47,7 @@ function markeer(db, org, userId, nu) {
 
 function klaar(org, userId) {
   zorgTabel();
-  S.db.prepare('DELETE FROM scim_user_deprovision WHERE org = ? AND user_id = ?')
+  S.huidigeDb().prepare('DELETE FROM scim_user_deprovision WHERE org = ? AND user_id = ?')
     .run(String(org), String(userId));
 }
 
@@ -55,7 +56,7 @@ function geblokkeerd(rtgKey, env) {
   if (!m) return false;
   try {
     zorgTabel();
-    return !!S.db.prepare('SELECT 1 AS x FROM scim_user_deprovision WHERE user_id = ? LIMIT 1').get(m[1]);
+    return !!S.huidigeDb().prepare('SELECT 1 AS x FROM scim_user_deprovision WHERE user_id = ? LIMIT 1').get(m[1]);
   } catch (_) {
     /* Zonder de intrekkingswaarheid mag productie een gekoppeld bedrijfstoken
        niet goedkeuren. Tests en losse ontwikkelschermen hebben vaak bewust
@@ -106,15 +107,20 @@ module.exports = function maakGebruikerSync({ accounts, scim, cascade, log, klok
     /* Eerst de organisatiegrens toetsen, daarna accountstand en outbox samen
        schrijven. Binnen een synchrone SQLite-transactie kan geen verzoek ertussen. */
     const bestaand = scim.lees(accounts, org, id);
-    const db = S.db;
-    db.exec('BEGIN IMMEDIATE');
+    /* In productie opent de accountmutatie een request-werkkopie; die moet er
+       zijn VOORDAT we een verbinding kiezen, anders houdt S.db het schrijfslot
+       en krijgt de werkkopie het nooit (../accounts/transactie.js). */
+    accountDuurzaamheid.eisMutatie('SCIM-accountstand');
+    const db = S.huidigeDb();
+    const eigen = db === S.db;
+    if (eigen) db.exec('BEGIN IMMEDIATE');
     try {
       const user = accounts.zetActief(bestaand.id, !!aan);
       if (!user) throw new Error('SCIM-account kon niet worden bijgewerkt');
       if (aan) db.prepare('DELETE FROM scim_user_deprovision WHERE org = ? AND user_id = ?')
         .run(String(org), String(user.id));
       else markeer(db, org, user.id, tijd());
-      db.exec('COMMIT');
+      if (eigen) db.exec('COMMIT');
       if (aan) return user;
       try {
         const uit = cascade(org, user);
@@ -137,7 +143,7 @@ module.exports = function maakGebruikerSync({ accounts, scim, cascade, log, klok
         throw e;
       }
     } catch (e) {
-      if (db.inTransaction) {
+      if (eigen && db.inTransaction) {
         try { db.exec('ROLLBACK'); } catch (_) {}
       }
       throw e;
@@ -145,6 +151,9 @@ module.exports = function maakGebruikerSync({ accounts, scim, cascade, log, klok
   }
 
   function ronde() {
+    /* Een herstelronde op een timer wacht een beurt als er een
+       accountwerkkopie open staat; S.db wacht dan niet. */
+    if (accountDuurzaamheid.werkkopieOpen()) return { bekeken: 0, hersteld: 0, uitgesteld: true };
     const db = S.db;
     zorgTabel(db);
     const taken = pak(db, tijd(), 25);

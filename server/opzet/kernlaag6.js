@@ -41,8 +41,8 @@ Object.assign(kern, require('../kern/mobiliteit').maakMobiliteit({
   // de kaartverkoop rekent af via dezelfde betaalkern en met dezelfde
   // OV-prijsformule als het uitchecken; geen tweede som, geen tweede grootboek
   pay: kern.pay, ovPrijsVan: kern.ovPrijsVan,
-  // voor de dienstverbandcontrole bij zakelijke ritten
-  accounts
+  // voor de dienstverbandcontrole bij zakelijke ritten; de kaartcode claimt atomair
+  accounts, bewerkCollectie: hulp.bewerkCollectie
 }));
 /* DE APPBRUG: een app-rit wordt ook een vervoersOPDRACHT en komt zo op het
    dispatchbord. HIER en niet in kern/lidacties, dat vóór mobiliteit staat en
@@ -150,6 +150,6 @@ Object.assign(kern, require('../kern/aanmeldgesprek').maakAanmeldgesprek({ db, s
 /* De algemene pin (kern/algpin.js): een pincode van het lid die de
    privacygevoelige apps op het OS beschermt en waarmee de werk-apps openen
    (het ene account = bevoegdheid, de pin = bewijs). */
-Object.assign(kern, require('../kern/algpin').maakAlgPin({ db, save, crypto, slot: pinSlot }));
+Object.assign(kern, require('../kern/algpin').maakAlgPin({ db, save, crypto, slot: pinSlot, bewerkCollectie: hulp.bewerkCollectie }));
 
 };

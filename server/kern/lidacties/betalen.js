@@ -14,7 +14,7 @@ const subsidie = require('../commercie/subsidie');
 
 module.exports = (ctx) => {
   const { save, findSupplier, fooiUit, pasTegoedToe, verdienPunten, ledenvoordeelVoor,
-    keuken, notifySupplier, sseToSupplier, sseToOffice, orderMetRef, factuurVoorLid } = ctx;
+    keuken, notifySupplier, sseToSupplier, sseToOffice, orderMetRef, factuurVoorLid, afhaalcode } = ctx;
   const { regelsVanItems } = require('./factuur');
   const { rekenAf } = require('./afrekenen')(ctx);
 async function betaalOrderVoor(session, body) {
@@ -41,6 +41,18 @@ async function betaalOrderVoor(session, body) {
   if (o.paid) return { status: 409, error: 'Al betaald.' };
   // de verloopgrens geldt alleen voor vooraf betalen; achteraf mag later
   if (o.status === 'wacht-op-betaling' && Date.now() - new Date(o.at) > 30 * 60000) return { status: 410, error: 'Deze bestelling is verlopen. Plaats hem opnieuw.' };
+  /* EEN BALIE-BON HEEFT TWEE BETAALWEGEN: deze app, en de kassa die op de
+     afhaalcode afrekent. Wie eerst is, legt dat vast in de collectietransactie
+     van kern/afhaalcode.js; de ander krijgt daarna 409 in plaats van een tweede
+     afrekening. Een bon die niet aan de balie loopt krijgt pas een afhaalcode
+     als hij betaald is, dus daar is geen tweede weg om tegen te houden. */
+  const balie = !!(o.aanBalie && afhaalcode);
+  if (balie) {
+    let weg;
+    try { weg = await afhaalcode.betaalBegin(o); }
+    catch (e) { return { status: 503, error: 'De betaling kon niet veilig worden vastgelegd. Er is niets afgeschreven.' }; }
+    if (weg.error) return weg;
+  }
   // fooi (gaat naar het team), punten-tegoed (RTG legt bij) en spaarpunten
   const fooi = fooiUit(body, o.total);
   if (fooi) o.fooi = fooi;
@@ -67,6 +79,12 @@ async function betaalOrderVoor(session, body) {
      (lid -> zaak, RTG -> zaak) en waarom die alles-of-niets is. */
   const geld = await rekenAf({ session, supplierCode: o.supplierCode, supplierNaam: o.supplierName,
     bedrag: o.total, fooi, korting, voordeel, soort: 'bestelling', ref: o.ref, idem: 'order:' + o.ref });
+  /* Mislukt het afmelden, dan blijft de betaalweg 'app' open staan en wacht de
+     kassa het venster af; dat is de voorzichtige kant, en het staat in het log. */
+  /* In SQLite en JSON is de transactie synchroon, in PostgreSQL een belofte;
+     Promise.resolve().then() vangt allebei, ook een synchrone worp. */
+  if (balie) await Promise.resolve().then(() => afhaalcode.betaalEinde(o, !geld.error))
+    .catch(e => require('../../log').log.uitzondering(e, { bron: 'afhaalcode-betaalweg', ref: o.ref }));
   if (geld.error) return geld;   // rekenAf gaf het tegoed al terug
   /* EEN HERHALING IS GEEN TWEEDE BETALING, en mag dus ook de gevolgen niet nog
      eens hebben. De grendel hierboven (`o.paid`) vangt de tweede tik pas als de

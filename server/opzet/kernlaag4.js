@@ -46,11 +46,20 @@ Object.assign(kern, require('../kern/pulse')({ db, save, crypto, liveCodename, n
    bij de bron; er wordt geen tweede opslag of selectiebeleid gemaakt. */
 const salonZicht = require('../kern/salon/zichtbaarheid')({ db, findSupplier, zijnVrienden: kern.zijnVrienden });
 kern.wereldFeed = require('../kern/wereld/feed')({ db, codenaamVan: kern.codenaamVan,
-  zijnVrienden: kern.zijnVrienden, salonToegang: salonZicht.magZien,
+  zijnVrienden: kern.zijnVrienden, salonToegang: salonZicht.magLezen,
   pulseLezen: key => ((kern.pulseFeed(key, 'volgend') || {}).feed || []) }).feed;
+kern.wereldFeed.saloon = require('../kern/wereld/saloon')({ kern, sociaal: kern.wereldFeed,
+  voorkeurOpslag: {
+    haal: key => (((db.data.wereld || {}).saloon || {})[key]),
+    schrijf: (key, keuze) => {
+      const w = db.data.wereld = db.data.wereld || {};
+      w.saloon = w.saloon || {}; w.saloon[key] = keuze; save();
+    }
+  }
+});
 // De Salon bewaart zijn eigen posts en publicatierechten.
 kern.salon = require('../kern/salon')({ db, save, media, liveCodename, codenaamVan: kern.codenaamVan,
-  crypto, broadcastSync, spraaktekst: kern.spraaktekst });
+  crypto, broadcastSync, spraaktekst: kern.spraaktekst, magLezen: salonZicht.magLezen });
 kern.salonProfiel = require('../kern/salon/profiel')({ db, save, codenaamVan: kern.codenaamVan,
   keyVanCodenaam: kern.keyVanCodenaam, liveCodename, salon: kern.salon });
 kern.salonReacties = require('../kern/salon/reacties')({ db, save, liveCodename, codenaamVan: kern.codenaamVan,
@@ -139,6 +148,33 @@ Object.assign(kern, require('../kern/ledenregister')({ accounts, onboarding, gel
    NA de geldregie om de pasprijs; het fonds gaat laat gebonden mee. Zet ook de
    kostenhaak aan, die tot hier leeg was. */
 Object.assign(kern, require('../kern/economie')({ db, save }));
+/* De eerste sensor van AUTONOMIE (server/kern/bedrijfsmaat/): de bedrijfsmaten
+   uitgerekend op de pasgeschiedenis, de laatste bezoekdag, de uitkomsten en de
+   lidmaatschapstermijnen, en elk getal over mensen langs de groepspoort. Leest
+   alleen; na de economielaag omdat elke maat een economische wereld draagt. */
+/* De twee bronnen eronder (besluiten van 25 september 2026): de dag van het
+   laatste bezoek per lid (kern/aanwezigheid.js; de ledengids raakt hem aan) en
+   de pasgeschiedenis (kern/pasgeschiedenis.js; de accountlaag meldt elke
+   overgang). */
+kern.aanwezigheid = require('../kern/aanwezigheid')({ db, save, bewerkCollectie });
+kern.pasgeschiedenis = require('../kern/pasgeschiedenis')({ db, save, bewerkCollectie, accounts });
+// het banksaldo van RTG, handmatig met het afschrift als bron (besluit C4)
+Object.assign(kern, require('../kern/bankpositie')({ db, save }));
+// hoe leden bij RTG kwamen: een telling per maand, nooit per lid (besluit C6)
+Object.assign(kern, require('../kern/aanmeldkanaal')({ db, save }));
+// het boek van RTG zelf, gevuld door Financien op naam (besluiten C8-C11)
+Object.assign(kern, require('../kern/rtgboek')({ db, save, kanalen: kern.AANMELDKANALEN }));
+kern.bedrijfsmaat = require('../kern/bedrijfsmaat/stand')({
+  lees: { ritten: () => db.data.rides, bestellingen: () => db.data.orders,
+    betaalschemas: () => db.data.lidmaatschapBetalingen,
+    /* klantwaarde per wereld (besluit C3): drie lezers erbij, niets schrijvends */
+    reizen: () => db.data.reisAanvragen, loonruns: () => db.data.payrollRunsV2,
+    casussen: () => (db.data.rtfos && db.data.rtfos.casussen) },
+  pasgeschiedenis: kern.pasgeschiedenis, aanwezigheid: kern.aanwezigheid,
+  kosten: () => kern.kosten, bank: kern.bankpositie, boek: kern.rtgBoek, kanalen: kern.aanmeldkanaalStand,
+  ledentegoed: () => (kern.pay && kern.pay.ledentegoed ? kern.pay.ledentegoed() : null) });
+// het streefbeeld (besluit C7): de machine stelt voor uit de bedrijfsmaten, de eigenaar tekent
+Object.assign(kern, require('../kern/streefbeeld')({ db, save, bedrijfsmaat: kern.bedrijfsmaat }));
 Object.assign(kern, require('../kern/kosten')({ db, save, bewerkCollectie, accounts, economie: kern.economie,
   keyVanCodenaam, bestandenOpslag: kern.bestandenOpslag,
   geldPasprijzen: () => (kern.geldPasprijzen ? kern.geldPasprijzen() : null),

@@ -42,13 +42,14 @@ const { datum: klokDatum } = require('../../lib/klok');
 
 const crypto = require('crypto');
 const { ROLLEN } = require('../../bedrijf/rollen-register');
+// sessies komen uit bedrijf/sleutels.js (op aanvraag, via bootstrap/mijn); sluiten = epoch omhoog
+const { sluit } = require('../../bedrijf/sleutels');
 const { schrijf: schrijfJournaal } = require('./journaal');
 
 const REDEN_UIT = 'Identiteitsprovider: groepslidmaatschap vervallen.';
 const REDEN_SCIM = 'Identiteitsprovider: account gedeactiveerd (SCIM).';
 
 module.exports = ({ db, save, register }) => {
-  const PRODUCTIE = String(process.env.NODE_ENV || '') === 'production';
   const nu = () => klokDatum().toISOString();
   const dag = () => nu().slice(0, 10);
   const bestaatRol = (id) => ROLLEN.some(r => r.id === id);
@@ -89,7 +90,7 @@ module.exports = ({ db, save, register }) => {
         l.rollen = handmatig(l);
         journaal(w, 'idp-rollen-ingetrokken', l.id, REDEN_UIT);
         if (l.bron === 'idp' && !l.rollen.length && l.status === 'actief') {
-          l.status = 'uit dienst'; l.token = null; l.uitReden = REDEN_UIT;
+          l.status = 'uit dienst'; sluit(l); l.uitReden = REDEN_UIT;
           l.uitAt = nu(); l.laatsteDag = dag();
           journaal(w, 'idp-uit-dienst', l.id, REDEN_UIT);
         }
@@ -101,7 +102,7 @@ module.exports = ({ db, save, register }) => {
       if (!l) {
         l = { id: crypto.randomBytes(4).toString('hex'), naam: naam || 'Onbekend', functie: null,
           afdeling: null, extern: false, rollen: [], status: 'actief',
-          token: PRODUCTIE ? null : crypto.randomBytes(24).toString('hex'), bron: 'idp', rtgKey,
+          bron: 'idp', rtgKey,
           at: nu(), toegelatenAt: nu() };
         w.leden = w.leden || {};
         w.leden[l.id] = l;
@@ -114,7 +115,7 @@ module.exports = ({ db, save, register }) => {
           uit.push({ werkruimte: code, rollen: [], lidId: l.id, status: l.status, geblokkeerd: true });
           continue;
         }
-        l.status = 'actief'; l.token = PRODUCTIE ? null : crypto.randomBytes(24).toString('hex');
+        l.status = 'actief';
         delete l.uitReden; delete l.uitAt; delete l.laatsteDag;
         journaal(w, 'idp-lid-hersteld', l.id, 'Groepslidmaatschap opnieuw vastgesteld.');
       }
@@ -158,8 +159,8 @@ module.exports = ({ db, save, register }) => {
          glippen: pas de herhaalde schrijfactie maakt de eerdere 503
          herstelbaar. Een al handmatig gesloten lid houden we inhoudelijk met
          rust; alleen het opnieuw bevestigen van de opslag is hier nodig. */
-      if (l.status === 'uit dienst' && l.token == null) continue;
-      l.status = 'uit dienst'; l.token = null;
+      if (l.status === 'uit dienst' && !l.token && !(l.sessies || []).length) continue;
+      l.status = 'uit dienst'; sluit(l);
       l.uitReden = reden || REDEN_SCIM; l.uitAt = nu(); l.laatsteDag = dag();
       l.rollen = handmatig(l);
       journaal(w, 'idp-deprovisioning', l.id, l.uitReden);

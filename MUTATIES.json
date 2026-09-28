@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-28T17:27:01.717Z",
-    "commit": "c87dbec8",
+    "op": "2026-09-28T17:31:04.237Z",
+    "commit": "2457b55f",
     "boomVuil": false,
-    "boomAnders": 13,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -2017,15 +2017,11 @@
     },
     "codegrens.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
+      "staat": "geen bruikbare mutatie",
       "modules": [
-        "server/kern/stuur/gereedschap.js",
-        "server/kern/registerblik/bronnen.js",
-        "server/kern/registerblik/gereedschap.js"
+        "server/kern/stuur/gereedschap.js"
       ],
-      "geprobeerd": 49,
-      "posities": 1000,
-      "dekking": "beproefd"
+      "posities": 1
     },
     "codewereld.test.js": {
       "soort": "puur",

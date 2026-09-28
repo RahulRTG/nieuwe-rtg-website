@@ -5,6 +5,13 @@
    surfaces en lifecycle-hooks binnen die gecontroleerde grens. */
 (function (w) {
   'use strict';
+  /* EEN catalogus per document. De desktopstandaard (shared/rtg-world-desktop.js)
+     laadt deze SDK ook, en op app.html stond de Second Screen hem dan al te
+     gebruiken: een tweede lading verving RTGModuleSDK door een lege catalogus,
+     en de modules die second-screen-modules.js had aangemeld (profiel, context,
+     ...) waren weg -- 'Nu relevant' verscheen nergens meer. Een tweede lading is
+     dus een no-op. */
+  if (w.RTGModuleSDK) return;
   var VERSION = '0.1.0', STATES = ['peek', 'panel', 'workspace', 'focus'];
   var LEVELS = ['L0', 'L1', 'L2', 'L3', 'L4'], PERSIST = ['none', 'session', 'workspace', 'user'];
   var ID = /^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)*$/, EVENT = /^[a-z][a-z0-9]*(?:\.[a-z0-9-]+)+$/;

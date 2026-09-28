@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-28T17:25:54.123Z",
-    "commit": "c87dbec8",
+    "op": "2026-09-28T20:48:50.362Z",
+    "commit": "82d1d2e50",
     "boomVuil": false,
-    "boomAnders": 6,
+    "boomAnders": 7,
     "instrument": "scripts/namensvorm.js",
     "node": "v22.22.2"
   },

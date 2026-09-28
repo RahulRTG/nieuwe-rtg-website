@@ -63,4 +63,15 @@ module.exports = {
       'Afrekenen gaat van je RTG Pay-wallet naar de wallet van de stichting, dezelfde weg als een gift',
       'Volg onderaan wat je hebt gekocht; wanneer het verstuurd of klaargelegd is, zet een mens van de stichting dat erbij'],
     'Dit is een winkel en geen collectebus: er staat iets tegenover, dus een aankoop is GEEN aftrekbare gift en je krijgt er geen giftbewijs voor. Wil je geven, ga dan naar Geven \u2014 daar is het wel een gift.'),
+  /* DemocratieOS (POLITIEK.md par. 18.4): de burgerkant en de kantoorkant. */
+  '/apps/foundation/kwesties.html': G('Iets in je straat, buurt of stad dat beter moet? Breng het in en je krijgt altijd een uitkomst terug, met de reden erbij.',
+    ['Schrijf op wat er speelt, zoals je het tegen een buur zou zeggen, en zet erbij waar het speelt',
+      'Volg in je lijst hoe het ermee staat; zolang er niets is besloten kun je hem intrekken',
+      'Is er besloten, klap de kwestie open: je leest de uitkomst, de reden en wie besliste'],
+    'Je naam staat er niet bij: wie je kwestie behandelt, ziet alleen de kwestie. Een uitkomst verandert niet meer; komt er iets nieuws, dan wordt hij heropend en begint een nieuwe ronde.'),
+  '/apps/foundation/kwestiekantoor.html': G('Kwesties van burgers behandelen, op naam: oppakken, een eindstand met reden vastleggen en zien dat niemand kwijtraakt.',
+    ['Pak een kwestie op of zet hem bij wie erover gaat',
+      'Leg een eindstand vast met de reden in gewone taal; de inbrenger leest precies wat u schrijft',
+      'Houd de meter bij: onverklaard hoort altijd nul te zijn'],
+    'Dit gaat alleen op naam, nooit met de gedeelde kantoorcode. U ziet nooit wie een kwestie inbracht, en een kwestie waar u zelf bij betrokken bent behandelt een collega.'),
 };

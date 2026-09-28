@@ -22,6 +22,8 @@
   },
   "capabilities": {
     "agenda.afspraken": "apps/agenda.html",
+    "democratie.kwestie": "apps/foundation/kwesties.html",
+    "kantoor.democratie": "apps/foundation/kwestiekantoor.html",
     "kern.app": "apps/app.html",
     "appstore.cel": "apps/appcel.html",
     "appstore.dossier": "apps/appstore-dossier.html",
@@ -1180,6 +1182,18 @@
       "rol": "eigenaar",
       "doelgroep": "rtf-kind",
       "doel": "Als tiener praten met een AI-buddy over dingen die spelen (school, groepsdruk, thuis, verliefdheid) en hulplijnen vinden bij nood."
+    },
+    "apps/foundation/kwestiekantoor.html": {
+      "capability": "kantoor.democratie",
+      "rol": "eigenaar",
+      "doelgroep": "kantoor",
+      "doel": "Kwesties op naam behandelen, een eindstand met reden vastleggen en de meter Niemand kwijt lezen."
+    },
+    "apps/foundation/kwesties.html": {
+      "capability": "democratie.kwestie",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een burger brengt een kwestie in en leest de uitkomst met de reden (DemocratieOS V1)."
     },
     "apps/foundation/leerpaspoort.html": {
       "capability": "leren.school",

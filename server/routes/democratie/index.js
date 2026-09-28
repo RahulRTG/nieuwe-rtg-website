@@ -10,7 +10,7 @@
 module.exports = (kern) => {
   const { app, auth, officeAuth, boardroomWie, democratie } = kern;
   const stuur = (res, r) => (r && r.error)
-    ? res.status(r.status || 400).json({ error: r.error })
+    ? res.status(r.status || 400).json(r.actie ? { error: r.error, actie: r.actie } : { error: r.error })
     : res.json(r);
 
   const alsLid = async (req, res, werk) => {
@@ -33,6 +33,19 @@ module.exports = (kern) => {
 
   app.post('/api/member/democratie/kwestie/intrek', auth, (req, res) =>
     alsLid(req, res, (k, b) => democratie.intrek(k, b.id)));
+
+  /* Het DoeNetwerk (kern/democratie/doe.js): een actie die bij de burger begint.
+     Dezelfde deur en dezelfde regel voor de sleutel als hierboven. */
+  const doe = democratie.doe;
+  app.post('/api/member/democratie/actie/start', auth, (req, res) => alsLid(req, res, (k, b) => doe.start(k, b)));
+  app.post('/api/member/democratie/actie/lijst', auth, (req, res) => alsLid(req, res, (k) => doe.lijst(k)));
+  app.post('/api/member/democratie/actie/aansluit', auth, (req, res) => alsLid(req, res, (k, b) => doe.aansluit(k, b.id)));
+  app.post('/api/member/democratie/actie/verlaat', auth, (req, res) => alsLid(req, res, (k, b) => doe.verlaat(k, b.id)));
+  app.post('/api/member/democratie/actie/plan', auth, (req, res) => alsLid(req, res, (k, b) => doe.plan(k, b.id, b)));
+  app.post('/api/member/democratie/actie/afgelast', auth, (req, res) => alsLid(req, res, (k, b) => doe.afgelast(k, b.id, b)));
+  app.post('/api/member/democratie/actie/antwoord', auth, (req, res) => alsLid(req, res, (k, b) => doe.antwoord(k, b.id, b)));
+  app.post('/api/member/democratie/actie/resultaat', auth, (req, res) => alsLid(req, res, (k, b) => doe.resultaat(k, b.id, b)));
+  app.post('/api/member/democratie/actie/stop', auth, (req, res) => alsLid(req, res, (k, b) => doe.stop(k, b.id, b)));
 
   require('./kantoor')({ app, officeAuth, boardroomWie, democratie, stuur });
 };

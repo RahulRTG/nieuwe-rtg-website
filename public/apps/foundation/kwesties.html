@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<script src="/shared/id.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0C0C0B">
+<title>Wat speelt er · RTFoundation</title>
+<link rel="icon" href="/icons/foundation.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="premium.css" rel="stylesheet">
+<style>
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--line:var(--rtg-line);--txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--burgundy:#A6002F;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
+  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;}
+  main{padding:1rem;max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:1.1rem;}
+  .kkaart{background:var(--card);border:1px solid var(--line);padding:.95rem 1rem;}
+  .ksec{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--rtg-goud,#C9A24B);margin-bottom:.6rem;}
+  .kknop{background:transparent;color:var(--txt);border:1px solid var(--line);padding:.6rem 1rem;font:inherit;font-weight:500;font-size:.86rem;cursor:pointer;min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:.4rem;text-decoration:none;}
+  .kknop.vol{background:var(--burgundy);color:#fff;border-color:var(--burgundy);font-weight:600;}
+  .kveld{flex:1;min-width:11rem;background:var(--bg);border:1px solid var(--line);color:var(--txt);font:inherit;font-size:.95rem;padding:.6rem .7rem;min-height:44px;}
+  textarea.kveld{min-height:6rem;width:100%;resize:vertical;line-height:1.5;}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
+  .uitleg{font-size:.9rem;color:var(--muted);line-height:1.65;}
+  .leeg{color:var(--muted);font-size:.92rem;padding:.5rem 0;line-height:1.6;}
+  .melder{font-size:.9rem;padding:.6rem .8rem;border:1px solid #5C1B2C;color:#F0A9BB;}
+  .melder.goed{border-color:#2F5E42;color:#9FD6B4;}
+  .ruimte{margin-top:.7rem;}
+  /* Zie buurtruil.html: shared/rtg-ui.css zet .rij op flex met een zwaardere
+     kiezer, dus een verbergklasse zonder !important verbergt soms niet. */
+  .verborgen{display:none!important;}
+  input[type=checkbox]{width:24px;height:24px;flex:none;accent-color:var(--burgundy);}
+
+  .onthaal{position:relative;overflow:hidden;padding:2rem 2rem 1.8rem;
+    background:linear-gradient(155deg,#1B1817 0%,#151312 54%,#0C0C0B 100%);color:#F4F0E9;border:1px solid var(--line);}
+  .onthaal .ey{font-size:.66rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-goud,#C9A24B);margin-bottom:.6rem;}
+  #kkop{font-size:clamp(1.7rem,4vw,2.5rem);line-height:1.14;font-family:'Bodoni Moda',Georgia,serif!important;font-weight:400!important;text-transform:none!important;}
+  .onthaal p{font-size:1rem;line-height:1.6;max-width:46ch;margin-top:.9rem;color:#F4F0E9;}
+
+  .kwestie{border-bottom:1px solid var(--line);padding:.9rem 0;}
+  .kwestie:last-child{border-bottom:none;}
+  .kwestie summary{cursor:pointer;list-style:none;display:flex;gap:.8rem;align-items:flex-start;flex-wrap:wrap;min-height:44px;}
+  .kwestie summary::-webkit-details-marker{display:none;}
+  .kwestie .kern{flex:1;min-width:12rem;}
+  .kwestie b{font-size:1rem;font-weight:600;line-height:1.45;}
+  .kwestie .meta{font-size:.78rem;color:var(--soft);margin-top:.3rem;}
+  .stand{font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);padding:.2rem .55rem;color:var(--muted);white-space:nowrap;}
+  .stand.klaar{color:var(--rtg-goud,#C9A24B);border-color:#5C4E10;}
+  .stand.nieuw{color:#fff;border-color:var(--burgundy);background:var(--burgundy);}
+  .uitkomst{margin-top:.8rem;border-left:3px solid var(--rtg-goud,#C9A24B);padding:.2rem 0 .2rem .9rem;}
+  .uitkomst h2{font-size:1.15rem;margin-bottom:.3rem;}
+  .uitkomst p{font-size:.95rem;line-height:1.6;}
+  .ronde{font-size:.85rem;color:var(--muted);margin-top:.7rem;line-height:1.55;}
+  .verloop{margin-top:.7rem;font-size:.84rem;color:var(--muted);line-height:1.6;}
+  .verloop li{margin-left:1.1rem;}
+
+  @media (max-width:760px){ .onthaal{padding:1.4rem 1.1rem 1.2rem;} }
+</style>
+<link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
+<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl" data-rtg-world="foundation" data-rtg-skin="heritage">
+<main id="main">
+
+  <section class="onthaal" aria-labelledby="kkop">
+    <div class="ey">FoundationOS · Wat speelt er</div>
+    <h1 id="kkop">Wat speelt er<br>bij jou?</h1>
+    <p>Iets in je straat, je buurt of je stad dat beter moet? Schrijf het op. Je krijgt altijd
+      een uitkomst terug, met de reden erbij. Je kwestie raakt nooit kwijt.</p>
+  </section>
+
+  <div id="poort" class="kkaart verborgen">
+    <div class="ksec">Even inloggen</div>
+    <div class="uitleg">Dit werkt met je eigen RTG-account. Zo kan de uitkomst altijd bij jou terugkomen.</div>
+    <div class="rij ruimte"><a class="kknop vol" href="/apps/app.html">Naar het inlogscherm</a></div>
+  </div>
+
+  <div id="app" class="verborgen">
+    <div class="kkaart">
+      <div class="ksec">Nieuwe kwestie</div>
+      <label class="uitleg" for="kOnderwerp">Wat speelt er? Schrijf het zoals je het tegen een buur zou zeggen.</label>
+      <textarea class="kveld ruimte" id="kOnderwerp" maxlength="600" placeholder="Bijvoorbeeld: de oversteek bij de school is onveilig"></textarea>
+      <div class="rij ruimte">
+        <input class="kveld" id="kGebied" maxlength="80" placeholder="Waar? Straat, buurt of plaats (mag leeg)" aria-label="Waar speelt het">
+        <button class="kknop vol" id="inbreng" type="button" data-hoofdactie>Inbrengen</button>
+      </div>
+      <div id="melding" role="status" aria-live="polite"></div>
+      <div class="uitleg ruimte">Je naam staat er niet bij. Wie je kwestie behandelt, ziet alleen de kwestie
+        zelf, niet wie hem inbracht. Wil je stoppen, dan kun je hem intrekken zolang er nog niets is besloten.</div>
+    </div>
+
+    <div class="kkaart">
+      <div class="ksec">Jouw kwesties</div>
+      <div id="lijst"><div class="leeg">Laden...</div></div>
+    </div>
+
+    <div class="kkaart">
+      <div class="ksec">Samen doen</div>
+      <div class="uitleg">Soms los je iets beter samen op dan via een loket. Hier staan acties van leden bij
+        hun eigen kwestie. Je ziet hoeveel mensen meedoen, nooit wie. Niemand krijgt een uitnodiging:
+        wie mee wil doen, sluit zelf aan.</div>
+      <div id="samenStart" class="verborgen ruimte">
+        <input type="hidden" id="samenKwestie">
+        <label class="uitleg" for="samenWat">Wat wil je samen doen?</label>
+        <textarea class="kveld ruimte" id="samenWat" maxlength="300" placeholder="Bijvoorbeeld: met ouders klaar-overs regelen voor de ochtend"></textarea>
+        <input class="kveld ruimte" id="samenRollen" maxlength="300" placeholder="Wie is er nodig? Met komma's, mag leeg" aria-label="Wie is er nodig">
+        <label class="uitleg rij ruimte"><input type="checkbox" id="samenZichtbaar">
+          Andere leden mogen het onderwerp van mijn kwestie zien, zonder mijn naam.</label>
+        <div class="rij ruimte"><button class="kknop vol" id="samenBegin" type="button">Actie openen</button></div>
+      </div>
+      <div id="samenMelding" role="status" aria-live="polite"></div>
+      <div id="acties" class="ruimte"><div class="leeg">Laden...</div></div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+/* Wat speelt er: de burgerkant van DemocratieOS (POLITIEK.md par. 18.4, V1).
+
+   Dit scherm doet vijf dingen en niet meer: vragen wat er speelt, inbrengen,
+   de voortgang tonen, de uitkomst met de reden tonen, en melden dat de burger
+   hem heeft gelezen. Er is geen partij, geen stemadvies en geen score; de
+   namen en uitleg van de eindstanden komen van de server (kern/democratie/
+   eindstanden.js), zodat er geen tweede lijst in een scherm ontstaat.
+
+   GELEZEN is een handeling van de burger zelf: pas als hij de uitkomst
+   openklapt, gaat `gezien` naar de server. Een lijst laden is geen lezen. */
+const $ = s => document.querySelector(s);
+const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+function token() { try { return localStorage.getItem('rtg_member_token') || ''; } catch (e) { return ''; } }
+
+const api = (pad, body) => fetch('/api/member/democratie/kwestie/' + pad, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token() },
+  body: JSON.stringify(body || {})
+}).then(async r => {
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok || d.error) { const e = new Error(d.error || 'Er ging iets mis.'); e.status = r.status; throw e; }
+  return d;
+});
+
+/* De lopende standen in gewone taal. Dit zijn geen eindstanden (die komen van
+   de server); het zijn de drie standen waarin iemand er nog mee bezig is. */
+const LOPEND = {
+  'ingebracht': 'Ontvangen',
+  'in-behandeling': 'Iemand werkt eraan',
+  'wacht-op-bevoegde': 'Ligt bij wie erover gaat'
+};
+
+let EINDSTANDEN = {};
+
+function zeg(tekst, goed) {
+  $('#melding').innerHTML = tekst ? '<div class="melder ruimte' + (goed ? ' goed' : '') + '">' + esc(tekst) + '</div>' : '';
+}
+
+function dag(iso) {
+  const d = new Date(iso);
+  return isNaN(d) ? '' : d.toLocaleDateString(document.documentElement.lang || undefined, { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+function uitkomst(r) {
+  const e = r.eindstand;
+  if (!e) return '';
+  const def = EINDSTANDEN[e.stand] || { naam: e.stand, uitleg: '' };
+  let extra = '';
+  if (e.bevoegdheid) extra += '<p>Besloten door wie erover gaat: ' + esc(e.bevoegdheid) + '.</p>';
+  if (e.naar) extra += '<p>Doorgestuurd naar: ' + esc(e.naar) + '.</p>';
+  if (e.in) extra += '<p>Gaat verder in kwestie ' + esc(e.in) + '. Je volgt die vanzelf mee.</p>';
+  return '<div class="uitkomst"><h2>' + esc(def.naam) + '</h2>' +
+    (def.uitleg ? '<p>' + esc(def.uitleg) + '</p>' : '') +
+    (e.toelichting ? '<p><b>De reden:</b> ' + esc(e.toelichting) + '</p>' : '') + extra +
+    '<div class="meta">' + (e.door ? 'Besloten door ' + esc(e.door) + ', ' : '') + esc(dag(e.at)) + '</div></div>';
+}
+
+/* De acties bij een kwestie (./samendoen.js): alleen wat, stand en aantal. */
+function acties(k, loopt) {
+  const l = k.acties || [];
+  const bezig = l.some(a => a.stand === 'open');
+  return l.map(a => '<p class="ronde">Samen: ' + esc(a.wat) + ' (' + esc(a.deelnemers) + ' doen mee' +
+      (a.stand === 'klaar' ? ', resultaat vastgelegd' : a.stand === 'gestopt' ? ', gestopt' : '') + ')</p>').join('') +
+    (loopt && !bezig ? '<div class="rij ruimte"><button class="kknop" type="button" data-samen="' + esc(k.id) + '">Maak er samen iets van</button></div>' : '');
+}
+
+function kaart(k) {
+  const r = k.rondes[k.rondes.length - 1];
+  const loopt = r.stand !== 'afgesloten';
+  const tk = r.terugkoppeling && r.terugkoppeling.stand;
+  const nieuw = !loopt && tk !== 'gezien';
+  const standTekst = loopt ? (LOPEND[r.stand] || r.stand) : ((EINDSTANDEN[r.eindstand && r.eindstand.stand] || {}).naam || 'Afgerond');
+  const eerder = k.rondes.slice(0, -1).map(x => '<div class="ronde">Eerdere ronde ' + esc(x.nr) + ': ' +
+    esc(((EINDSTANDEN[x.eindstand && x.eindstand.stand] || {}).naam) || 'afgerond') +
+    (x.eindstand && x.eindstand.toelichting ? '. ' + esc(x.eindstand.toelichting) : '') + '</div>').join('');
+  return '<details class="kwestie" data-id="' + esc(k.id) + '" data-nieuw="' + (nieuw ? '1' : '') + '">' +
+    '<summary><div class="kern"><b>' + esc(k.onderwerp) + '</b>' +
+      '<div class="meta">' + esc(k.id) + (k.gebied ? ' · ' + esc(k.gebied) : '') + ' · ingebracht ' + esc(dag(k.at)) + '</div></div>' +
+      '<span class="stand' + (nieuw ? ' nieuw' : (loopt ? '' : ' klaar')) + '">' + esc(nieuw ? 'Nieuw: ' + standTekst : standTekst) + '</span></summary>' +
+    (loopt
+      ? '<p class="ronde">Er is nog niets besloten. Zodra dat zo is, zie je hier de uitkomst en de reden.</p>' +
+        (r.nr > 1 ? '<p class="ronde">Dit is ronde ' + esc(r.nr) + ': de kwestie is opnieuw geopend.</p>' : '') +
+        '<div class="rij ruimte"><button class="kknop" type="button" data-intrek="' + esc(k.id) + '">Intrekken</button></div>'
+      : uitkomst(r)) + acties(k, loopt) +
+    eerder + '</details>';
+}
+
+async function teken() {
+  try {
+    const d = await api('mijn');
+    EINDSTANDEN = {};
+    (d.eindstanden || []).forEach(e => { EINDSTANDEN[e.stand] = e; });
+    const l = d.kwesties || [];
+    $('#lijst').innerHTML = l.length ? l.map(kaart).join('')
+      : '<div class="leeg">Je hebt nog geen kwestie ingebracht. Wat je hierboven opschrijft, komt hier te staan, met de voortgang erbij.</div>';
+    $('#lijst').querySelectorAll('details[data-nieuw="1"]').forEach(el => el.addEventListener('toggle', async () => {
+      if (!el.open || !el.dataset.nieuw) return;
+      el.dataset.nieuw = '';
+      try { await api('gezien', { id: el.dataset.id }); } catch (e) { /* lezen blijft lezen; de server houdt het bij */ }
+    }));
+    $('#lijst').querySelectorAll('[data-intrek]').forEach(b => b.addEventListener('click', async () => {
+      try { await api('intrek', { id: b.dataset.intrek }); zeg('Ingetrokken. Hij blijft in je lijst staan.', true); teken(); }
+      catch (e) { zeg(e.message); }
+    }));
+  } catch (e) {
+    if (e.status === 401 || e.status === 403) { $('#app').classList.add('verborgen'); $('#poort').classList.remove('verborgen'); return; }
+    $('#lijst').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>';
+  }
+}
+
+$('#inbreng').addEventListener('click', async () => {
+  const onderwerp = $('#kOnderwerp').value.trim();
+  if (onderwerp.length < 10) { zeg('Schrijf er iets meer over, minstens een korte zin.'); return; }
+  try {
+    const d = await api('inbreng', { onderwerp, gebied: $('#kGebied').value.trim() });
+    $('#kOnderwerp').value = ''; $('#kGebied').value = '';
+    zeg('Ontvangen als ' + (d.kwestie && d.kwestie.id) + '. Je ziet hieronder hoe het ermee staat.', true);
+    teken();
+  } catch (e) { zeg(e.message); }
+});
+
+window.KwestiesScherm = { token, esc, dag, teken };
+
+if (token()) { $('#app').classList.remove('verborgen'); teken(); }
+else $('#poort').classList.remove('verborgen');
+
+document.addEventListener('DOMContentLoaded', function () {
+  if (window.RTGAdaptief) RTGAdaptief.context({ bron: 'democratie.kwestie', titel: 'Wat speelt er' });
+}, { once: true });
+</script>
+<script src="samendoen.js" defer></script>
+<script src="/shared/deelmenu.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+<script src="/shared/adaptief.js" defer></script>
+<script src="/shared/adaptief/grammatica.js" defer></script>
+<script src="/shared/objectverwijzing.js" defer></script>
+<script src="/shared/adaptief/vorm.js" defer></script>
+<script src="/shared/adaptief/register.js" defer></script>
+<script src="schil-os.js" defer></script>
+<script src="premium.js" defer></script>
+</body>
+</html>

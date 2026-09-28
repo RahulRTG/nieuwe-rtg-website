@@ -3,7 +3,7 @@
   "gemeten": {
     "op": "2026-09-28T08:27:00.034Z",
     "commit": "8f5a6f159",
-    "routesToen": 5277
+    "routesToen": 5285
   },
   "aangeraakt": [
     "GET /",
@@ -2269,6 +2269,9 @@
     "POST /api/office/beleidsmotor/review",
     "POST /api/office/beleidsmotor/simulatie",
     "POST /api/office/beleidsmotor/waarom",
+    "POST /api/office/beslisgeheugen",
+    "POST /api/office/beslisgeheugen/intrek",
+    "POST /api/office/beslisgeheugen/leg",
     "POST /api/office/betalingen/status",
     "POST /api/office/bewaarverzoek",
     "POST /api/office/boardroom",
@@ -2290,6 +2293,8 @@
     "POST /api/office/briefing",
     "POST /api/office/bureau",
     "POST /api/office/bureau/voortgang",
+    "POST /api/office/cadeaubon",
+    "POST /api/office/cadeaubon/stand",
     "POST /api/office/carriere/ledger/bevestig",
     "POST /api/office/catalogus-wens/besluit",
     "POST /api/office/catalogus-wensen",
@@ -2604,7 +2609,10 @@
     "POST /api/office/rtgai/roer/terug",
     "POST /api/office/rtgai/train",
     "POST /api/office/rtgboek",
+    "POST /api/office/rtgboek/campagne",
     "POST /api/office/rtgboek/zet",
+    "POST /api/office/rtgcampagne",
+    "POST /api/office/rtgcampagne/maak",
     "POST /api/office/rtghuis",
     "POST /api/office/rtghuis/maak",
     "POST /api/office/rugdekking/alle",

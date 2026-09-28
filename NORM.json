@@ -6,7 +6,7 @@
     "activeringZonderReden": 0,
     "appwerktDefecten": 0,
     "beweringenZonderVulcontrole": 100,
-    "bewijsAchterstand": 2418,
+    "bewijsAchterstand": 2712,
     "bewijsAlleenKeten": 17,
     "bewijsCellenBewezen": 26449,
     "bronBlindeBestanden": 3,
@@ -3077,6 +3077,16 @@
       "meter": "kernBreedte 1600 -> 1601",
       "reden": "DemocratieOS fase B (POLITIEK.md par. 18.1) krijgt een eigen kernnaam `democratie` en hangt NIET onder een bestaande naam. Dat is een keuze en geen slordigheid: proef P3 (RTG verdwijnt) eist dat deze laag als geheel kan verhuizen, en een laag die onder de naam van een ander domein hangt, is precies de afhankelijkheid die P3 moet voorkomen. Wat hij van RTG gebruikt staat in server/kern/democratie/afhankelijkheden.js en wordt door test/democratie-afhankelijk.test.js bewaakt.",
       "waarheen": "GRENZEN.json (democratie), server/kern/democratie/afhankelijkheden.js en test/democratie-afhankelijk.test.js"
+    },
+    {
+      "datum": "2026-09-28",
+      "soort": "schuld",
+      "sleutel": "bewijsAchterstand",
+      "van": 2418,
+      "vervalt": "2026-12-28",
+      "meter": "bewijsAchterstand 2418 -> 2712",
+      "reden": "DEZELFDE VORM ALS DE NOTITIE VAN 12 SEPTEMBER: EEN GROTERE NOEMER, GEEN ACHTERUITGANG. OUTPUTPROEF.json is voor het eerst sinds 3 september hermeten, uit het routejournaal van een volle suite (74e97d99). Die zag 5151 routes tegen 4747: +404, en scripts/routenoemer.js reproduceert dat als leeftijd (+416 routes sinds df1a581a, 0 verdwenen, 0 onverklaard). De 4151 bewezen OUTPUT-cellen bleven EXACT gelijk; de nieuwe routes landden als 294 onbeslist (output-niet-toerekenbaar 285 -> 579, want een inhoudgevoelige toets die ze raakt, raakt ook andere) en 110 ongemeten. De hele groei van 294 zit in die ene post.\n\nWAAROM NIET NIET HERMETEN: een register van 25 dagen oud over een router die 416 routes groeide, is precies de schijnzekerheid waar PROOF.md par. 2a nu per cel op let -- 1416 OUTPUT-cellen stonden op verouderd.",
+      "waarheen": "de 294 onbesliste routes toerekenbaar maken (een toets die er alleen die route raakt, of een verklaring in BEWIJSSCHULD.json). Vervalt 2026-12-28: staat hij dan nog op 2712 of hoger, dan is dit geen noemergroei meer maar achterstand die niemand aflost."
     }
   ],
   "prestatie": {

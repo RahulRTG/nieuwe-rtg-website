@@ -3,23 +3,23 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-09-28",
-  "commit": "f17c6065"
+  "commit": "ebd7424c"
  },
  "grens": "Een voorvoegsel uit een sjabloon met een gat is GEEN route en wordt nooit tegen de routelijst gelegd. Exacte paden wel: een exact pad dat niet bestaat, is een dood pad.",
  "gemetenTegen": {
   "register": "ROUTEBRON.json",
   "stempel": {
-   "op": "2026-09-28T09:56:59.412Z",
-   "commit": "f17c6065"
+   "op": "2026-09-28T22:38:22.188Z",
+   "commit": "ebd7424c"
   },
-  "bekendePaden": 5156
+  "bekendePaden": 5265
  },
  "gemeten": {
-  "schermenMetPad": 416,
+  "schermenMetPad": 420,
   "nietGelezen": 3,
-  "exactePaden": 946,
-  "verwijzingen": 1127,
-  "voorvoegsels": 143,
+  "exactePaden": 951,
+  "verwijzingen": 1136,
+  "voorvoegsels": 144,
   "basisPaden": 2,
   "doodPad": 0,
   "doodPadVerwijzingen": 0
@@ -76,11 +76,12 @@
     "public/apps/foundation/vrienden.html",
     "public/apps/meet/kamer.js",
     "public/apps/podium.html",
+    "public/shared/connection-communication.js",
     "public/shared/schoolbel.js",
     "public/shared/servicebel.js",
     "public/shared/teamcall/teamcall-01.js"
    ],
-   "aantal": 9
+   "aantal": 10
   },
   {
    "pad": "/api/supplier/login",
@@ -280,6 +281,15 @@
     "public/apps/horeca/app.js",
     "public/apps/scherm.html",
     "public/shared/horeca-enterprise.js"
+   ],
+   "aantal": 3
+  },
+  {
+   "pad": "/api/salon/plaats",
+   "schermen": [
+    "public/apps/isolatie.js",
+    "public/apps/salon.html",
+    "public/apps/saloon/acties.js"
    ],
    "aantal": 3
   },
@@ -697,14 +707,6 @@
    "aantal": 2
   },
   {
-   "pad": "/api/salon/plaats",
-   "schermen": [
-    "public/apps/isolatie.js",
-    "public/apps/salon.html"
-   ],
-   "aantal": 2
-  },
-  {
    "pad": "/api/pasprijzen",
    "schermen": [
     "public/apps/juridisch/partnervoorwaarden.html",
@@ -909,6 +911,22 @@
    "schermen": [
     "public/apps/rtg-vandaag.js",
     "public/apps/sociaal.html"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/salon/reacties",
+   "schermen": [
+    "public/apps/salon.html",
+    "public/apps/saloon/acties.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/salon/reageer",
+   "schermen": [
+    "public/apps/salon.html",
+    "public/apps/saloon/acties.js"
    ],
    "aantal": 2
   },
@@ -3536,6 +3554,13 @@
    "aantal": 1
   },
   {
+   "pad": "/api/leerhuis/lees",
+   "schermen": [
+    "public/apps/leerhuis.js"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/les/apps",
    "schermen": [
     "public/apps/lesmaker.html"
@@ -5307,6 +5332,13 @@
    "aantal": 1
   },
   {
+   "pad": "/api/member/rendezvous/profile-photo",
+   "schermen": [
+    "public/apps/rendezvous.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/residentie/betreed",
    "schermen": [
     "public/apps/residentie/residentie-03.js"
@@ -5755,20 +5787,6 @@
    "aantal": 1
   },
   {
-   "pad": "/api/salon/reacties",
-   "schermen": [
-    "public/apps/salon.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/salon/reageer",
-   "schermen": [
-    "public/apps/salon.html"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/salon/verberg",
    "schermen": [
     "public/apps/salon.html"
@@ -5786,6 +5804,20 @@
    "pad": "/api/salon/weg",
    "schermen": [
     "public/apps/salon.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/mediaos/volg",
+   "schermen": [
+    "public/apps/saloon/acties.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/krant/artikel",
+   "schermen": [
+    "public/apps/saloon/lezer.js"
    ],
    "aantal": 1
   },
@@ -6318,6 +6350,13 @@
    "pad": "/api/voeding/zet",
    "schermen": [
     "public/apps/voeding.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/vonk/profile-photo",
+   "schermen": [
+    "public/apps/vonk.html"
    ],
    "aantal": 1
   },
@@ -8582,6 +8621,13 @@
    ]
   },
   {
+   "bestand": "public/apps/leerhuis.js",
+   "exact": [
+    "/api/leerhuis/lees"
+   ],
+   "voorvoegsels": []
+  },
+  {
    "bestand": "public/apps/lesmaker.html",
    "exact": [
     "/api/les/apps",
@@ -9531,7 +9577,9 @@
   },
   {
    "bestand": "public/apps/rendezvous.html",
-   "exact": [],
+   "exact": [
+    "/api/member/rendezvous/profile-photo"
+   ],
    "voorvoegsels": [
     "/api/member/rendezvous/"
    ]
@@ -9796,6 +9844,23 @@
     "/api/salon/verberg",
     "/api/salon/volg-lid",
     "/api/salon/weg"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/saloon/acties.js",
+   "exact": [
+    "/api/mediaos/volg",
+    "/api/salon/plaats",
+    "/api/salon/reacties",
+    "/api/salon/reageer"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/saloon/lezer.js",
+   "exact": [
+    "/api/krant/artikel"
    ],
    "voorvoegsels": []
   },
@@ -10183,7 +10248,9 @@
   },
   {
    "bestand": "public/apps/vonk.html",
-   "exact": [],
+   "exact": [
+    "/api/vonk/profile-photo"
+   ],
    "voorvoegsels": [
     "/api/vonk/"
    ]
@@ -10347,6 +10414,15 @@
    "exact": [],
    "voorvoegsels": [
     "/api/stream?token="
+   ]
+  },
+  {
+   "bestand": "public/shared/connection-communication.js",
+   "exact": [
+    "/api/ice"
+   ],
+   "voorvoegsels": [
+    "/api/connection/"
    ]
   },
   {

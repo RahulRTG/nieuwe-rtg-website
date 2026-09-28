@@ -3,7 +3,7 @@
  "uitleg": "Wat een scherm in public/ via de API kan veroorzaken: schrijft het, welke rol vraagt het, wat is het bewijs waard, en wat doet een tweede aanroep. Samengesteld uit bestaande metingen -- hier wordt niets nieuws gemeten en niets geraden.",
  "stempel": {
   "op": "2026-09-28",
-  "commit": "f17c6065"
+  "commit": "ebd7424c"
  },
  "grond": [
   "SCHERMROUTES.json",
@@ -15,23 +15,23 @@
  "grens": "AFGELEID gedrag: wat het scherm via de API kan veroorzaken. NIET wat het scherm zelf doet (localStorage, DOM, een berekening). `schrijft: nee` betekent dus \"verandert niets aan de serverkant\" en niet \"verandert niets\".",
  "samenstelregel": "schrijven: de ZWAARSTE uitkomst wint (een van de tien routes schrijft = dit scherm kan iets veranderen). Bewijs: het ZWAKSTE telt, want een keten is zo sterk als zijn zwakste schakel. Onbekend is in beide gevallen niet de gunstige uitkomst.",
  "gemeten": {
-  "schermen": 416,
-  "metGrond": 265,
-  "zonderGrond": 151,
+  "schermen": 420,
+  "metGrond": 271,
+  "zonderGrond": 149,
   "schrijftJa": 65,
   "schrijftNee": 1,
-  "schrijftOnbekend": 156,
-  "schrijftNietVastTeStellen": 194,
+  "schrijftOnbekend": 158,
+  "schrijftNietVastTeStellen": 196,
   "bewijsVerdeling": {
-   "verzwakt": 210,
-   "niet vast te stellen": 174,
-   "ONBEPAALD": 32
+   "verzwakt": 211,
+   "niet vast te stellen": 175,
+   "ONBEPAALD": 34
   },
   "bewijsBewezen": 0,
-  "bewijsVerzwakt": 210,
-  "bewijsNietVastTeStellen": 174,
+  "bewijsVerzwakt": 211,
+  "bewijsNietVastTeStellen": 175,
   "onbekendeBewijswaarden": [],
-  "zonderRol": 45
+  "zonderRol": 48
  },
  "zonderUitspraak": [
   "public/apps/app-main/app-main-43.js",
@@ -146,7 +146,6 @@
   "public/apps/redactie.html",
   "public/apps/redactiekantoor.html",
   "public/apps/reisuitnodiging.html",
-  "public/apps/rendezvous.html",
   "public/apps/rtg-dossier.js",
   "public/apps/rtgid.html",
   "public/apps/rtgkantoor.html",
@@ -165,7 +164,6 @@
   "public/apps/vertegenwoordiging.html",
   "public/apps/vluchten.html",
   "public/apps/voertuig.js",
-  "public/apps/vonk.html",
   "public/apps/websitestudio.html",
   "public/apps/wereld.html",
   "public/apps/werk/bijstand.js",
@@ -293,7 +291,7 @@
    "voorvoegsels": 0,
    "routesGeraakt": 21,
    "schrijft": "ja",
-   "bewijs": "verzwakt",
+   "bewijs": "ONBEPAALD",
    "rollen": [
     "member"
    ],
@@ -1688,6 +1686,22 @@
   },
   {
    "bestand": "public/apps/rtgschool/leer/leer-04.js",
+   "padenGenoemd": 4,
+   "voorvoegsels": 0,
+   "routesGeraakt": 4,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/saloon/acties.js",
    "padenGenoemd": 4,
    "voorvoegsels": 0,
    "routesGeraakt": 4,
@@ -3351,6 +3365,17 @@
    "reden": null
   },
   {
+   "bestand": "public/apps/leerhuis.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
    "bestand": "public/apps/leverancier/leverancier-04.js",
    "padenGenoemd": 1,
    "voorvoegsels": 0,
@@ -3464,9 +3489,13 @@
    "voorvoegsels": 1,
    "routesGeraakt": 1,
    "schrijft": "niet vast te stellen",
-   "bewijs": "niet vast te stellen",
-   "rollen": [],
-   "herhaling": [],
+   "bewijs": "ONBEPAALD",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
    "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
   },
   {
@@ -3653,6 +3682,17 @@
    "reden": null
   },
   {
+   "bestand": "public/apps/rendezvous.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 1,
+   "routesGeraakt": 1,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
    "bestand": "public/apps/routedekking.html",
    "padenGenoemd": 1,
    "voorvoegsels": 0,
@@ -3706,6 +3746,21 @@
    "bewijs": "verzwakt",
    "rollen": [
     "member"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/saloon/lezer.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "openbaar"
    ],
    "herhaling": [
     "ongemeten"
@@ -3825,6 +3880,17 @@
    "reden": null
   },
   {
+   "bestand": "public/apps/vonk.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 1,
+   "routesGeraakt": 1,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
    "bestand": "public/apps/werk/kern.js",
    "padenGenoemd": 1,
    "voorvoegsels": 1,
@@ -3907,6 +3973,17 @@
     "ongemeten"
    ],
    "reden": null
+  },
+  {
+   "bestand": "public/shared/connection-communication.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 1,
+   "routesGeraakt": 1,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
   },
   {
    "bestand": "public/shared/deur.js",
@@ -5395,17 +5472,6 @@
    "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
   },
   {
-   "bestand": "public/apps/rendezvous.html",
-   "padenGenoemd": 0,
-   "voorvoegsels": 1,
-   "routesGeraakt": 0,
-   "schrijft": "niet vast te stellen",
-   "bewijs": "niet vast te stellen",
-   "rollen": [],
-   "herhaling": [],
-   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
-  },
-  {
    "bestand": "public/apps/rtg-dossier.js",
    "padenGenoemd": 0,
    "voorvoegsels": 1,
@@ -5594,17 +5660,6 @@
   },
   {
    "bestand": "public/apps/voertuig.js",
-   "padenGenoemd": 0,
-   "voorvoegsels": 1,
-   "routesGeraakt": 0,
-   "schrijft": "niet vast te stellen",
-   "bewijs": "niet vast te stellen",
-   "rollen": [],
-   "herhaling": [],
-   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
-  },
-  {
-   "bestand": "public/apps/vonk.html",
    "padenGenoemd": 0,
    "voorvoegsels": 1,
    "routesGeraakt": 0,

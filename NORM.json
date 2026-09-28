@@ -3544,6 +3544,16 @@
       "meter": "toetsenNietGemeten 654 -> 721",
       "reden": "DE TWEEDE BIJTREKRONDE VAN DE SAMENVOEGING DRAAGT DE GROEI VAN DE TAKKEN, EN GEEN GROEI VAN ZICHZELF. Na de eerste ronde zijn de nieuwe commits van alle open takken en #414 bijgetrokken (#413 is op besluit van de eigenaar weer uit deze tak gehaald, want hij was in zijn eigen CI nooit groen). Elke tak schreef voor zijn eigen verhoging hier al een notitie; de vereniging telt die op. De nieuwe stand is de GEMETEN stand op de samengevoegde boom, er is geen lucht bijgeteld, en vanaf hier geldt weer: alleen omlaag. De mutatiemotor is niet langs de nieuwe toetsbestanden van de takken geweest.",
       "waarheen": "Een volledige npm run mutatie op een schone boom neemt ze mee; die draait aan het eind van deze samenvoeging."
+    },
+    {
+      "datum": "2026-09-28",
+      "soort": "schuld",
+      "sleutel": "mutatiesZonderEnigeAs",
+      "van": 2819,
+      "vervalt": "2026-12-28",
+      "meter": "mutatiesZonderEnigeAs 2819 -> 2827",
+      "reden": "HET DOENETWERK (POLITIEK.md par. 6a) VOEGT ACHT MUTERENDE LEDENROUTES TOE DIE GEEN ENKELE AS VAN DE MACHINE RAKEN, en dat is precies +8. Het zijn dezelfde soort handelingen als de kwestieroutes van fase B, die dezelfde teller van 2791 naar 2819 brachten zonder notitie. Wat ze WEL doen, ziet deze meter met opzet niet: ze schrijven via de kern-tas naar een duurzame collectie en een hashketen op de kwestie (kern/democratie/kwestie.js noteer), en die tas telt deze meter bewust niet mee (zie de kop van scripts/machinedekking.js). Vier ervan zijn herhaalbaar via de duplicaatlaag (aansluit, plan, antwoord, afgelast; lib/idemsleutels-democratie.js), gemeten in test/democratie-doe.test.js toets 10, maar de as herhaling komt uit EXECUTION_MAP.json via IDEMPROEF.json, en die volle ronde (vijfduizend routes, uren) is in deze tak niet opnieuw gedraaid. De andere vier (start, verlaat, resultaat, stop) weigeren een herhaling met een toestandscontrole en krijgen die as nooit, en dat is met opzet (MUTATIECONTRACT.md: een weigering is geen idempotentie). Er is geen woord in een commentaar gezet om de meter te laten tellen.",
+      "waarheen": "Een volle npm run idemproef op een schone boom zet de vier herhaalbare routes op beschermd en haalt er 4 af. De rest daalt pas als de meter de kern-tas per functie kan lezen, zoals zijn eigen kop als open punt noemt."
     }
   ],
   "prestatie": {

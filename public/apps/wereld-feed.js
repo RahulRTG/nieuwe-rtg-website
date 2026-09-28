@@ -47,6 +47,8 @@
     'living.story': 'Your story', 'living.travel': 'Travel', 'living.table': 'At the table', 'living.friends': 'Friends',
     'living.feed': 'Your moments', 'living.order': 'The newest moments appear first within each group.',
     'living.welcome': 'Life is better when you share it.',
+    'living.all': 'All',
+    'living.noResults': 'No results within your current choices.',
     'living.empty': 'Your story starts here. When there are posts for you, they appear here, with the newest first.',
     'living.guest': 'Open your LivingOS. The moments from your people, journeys and places come together here.',
     'living.failed': 'Your moments could not be loaded. Please try again; your data is safe.',
@@ -84,6 +86,6 @@
   }
   w.addEventListener('rtglang', labels);
   labels();
-  function photoCard(i) { return !i.offer && !i.plaats && !i.begint && i.beeld && i.beeld.length === 1 && photo(i.beeld[0].src) && String(i.tekst || '').length < 220; }
+  function photoCard(i) { return !i.offer && !i.plaats && !i.begint && i.beeld && i.beeld.length === 1 && i.beeld[0].type !== 'video' && photo(i.beeld[0].src) && String(i.tekst || '').length < 220; }
   w.RTGLivingFeed = { welcome: welcome, item: item, text: text, T: T, photoCard: photoCard };
 }(window));

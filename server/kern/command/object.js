@@ -33,7 +33,7 @@ const MAX_PER_SOORT = 8;
    Dat veld koppelt een medewerker van een organisatie aan zijn PERSOONLIJKE
    RTG-account; een dossier dat het uitprint, legt buiten de kluis om een
    verband tussen twee identiteiten dat juist gescheiden hoort te blijven. */
-const VERBORGEN = new Set(['email', 'e-mail', 'realName', 'naamEcht', 'wachtwoord', 'password', 'token', 'secret', 'iban', 'foto', 'image', 'avatar', 'rtgKey']);
+const VERBORGEN = new Set(['email', 'e-mail', 'realName', 'naamEcht', 'wachtwoord', 'password', 'token', 'sessies', 'beheerSessies', 'secret', 'iban', 'foto', 'image', 'avatar', 'rtgKey']);
 
 function feiten(r) {
   const uit = [];

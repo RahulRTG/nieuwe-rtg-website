@@ -45,6 +45,8 @@ module.exports = (kern) => {
   require('./member/onderweg')(kern);
   // Boeken en bestellen: diensten, historie, cadeaukaarten, partnerlijst, orders.
   require('./member/boeken')(kern);
+  // de afhaalcode van een eigen bestelling: tonen (= roteren) en intrekken
+  require('./member/afhaalcode')(kern);
   require('./member/cadeaukaart')(kern);
   require('./member/gegevens')(kern);
   require('./member/vakpro')(kern);

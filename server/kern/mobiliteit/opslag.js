@@ -53,6 +53,7 @@ const REGISTER = {
   mobOpdrachten:        { soort: 'lijst', wat: 'vervoersopdrachten: de kern van dit domein' },
   mobReizen:            { soort: 'lijst', wat: 'reizen van een lid, nieuwste eerst' },
   mobKaartjes:          { soort: 'lijst', wat: 'kaartjes en abonnementen' },
+  mobKaartToegang:      { soort: 'kaart', wat: 'hash-only codes van vervoerbewijzen (./kaarttoegang)' },
   mobPendels:           { soort: 'lijst', wat: 'pendeldiensten van een werkgever' },
   mobOvereenkomsten:    { soort: 'lijst', wat: 'overeenkomsten met een vervoerder' },
   mobDiensten:          { soort: 'lijst', wat: 'gereden diensten (CDT), gekapt op DIENST_MAX' },

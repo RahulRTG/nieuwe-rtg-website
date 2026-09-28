@@ -11,7 +11,8 @@
    (keuringsregel 13) en dit de naad is die er al lag: de kop in dat bestand
    heette letterlijk "publiek: de krant lezen". Wat ze delen -- de opslag, scho()
    en kortArt() -- komt via ctx mee; er ontstaat geen tweede waarheid. */
-module.exports = ({ lees, kijk, save, scho, kortArt }) => {
+const { publicatieVan, publiekeKop } = require('./journalistiek-artikelen');
+module.exports = ({ lees, kijk, save, scho }) => {
   /* De gids: alle kranten met minstens een gepubliceerd artikel. Leest de hele
      kaart, dus met kijk() -- een bezoeker die langskomt terwijl er nog geen
      enkele redactie bestaat, mag die kaart niet aanleggen. */
@@ -26,9 +27,9 @@ module.exports = ({ lees, kijk, save, scho, kortArt }) => {
   function krant(code) {
     const r = lees(code);
     if (!r) return { error: 'Geen krant op dit adres.', status: 404 };
-    const live = r.artikelen.filter(a => a.status === 'live')
+    const live = r.artikelen.filter(a => a.status === 'live').map(publiekeKop)
       .sort((a, b) => String(b.gepubliceerd || b.bij).localeCompare(String(a.gepubliceerd || a.bij)));
-    return { ok: true, huisstijl: r.huisstijl, site: r.site, rubrieken: r.rubrieken, artikelen: live.map(kortArt) };
+    return { ok: true, huisstijl: r.huisstijl, site: r.site, rubrieken: r.rubrieken, artikelen: live };
   }
 
   /* De teller loopt op de ECHTE redactie, want lees() geeft die terug zodra hij
@@ -39,7 +40,11 @@ module.exports = ({ lees, kijk, save, scho, kortArt }) => {
     const a = r.artikelen.find(x => x.id === scho(artId, 20) && x.status === 'live');
     if (!a) return { error: 'Artikel niet gevonden.', status: 404 };
     a.gelezen = (a.gelezen || 0) + 1; save();
-    return { ok: true, artikel: { id: a.id, titel: a.titel, chapo: a.chapo, inhoud: a.inhoud, rubriek: a.rubriek, beeld: a.beeld || '', auteur: a.auteur, bij: a.gepubliceerd || a.bij, naam: r.huisstijl.naam, accent: r.huisstijl.accent, thema: r.huisstijl.thema } };
+    const p = publicatieVan(a);
+    return { ok: true, artikel: { id: a.id, titel: p.titel, chapo: p.chapo, inhoud: p.inhoud,
+      rubriek: p.rubriek, beeld: p.beeld || '', auteur: p.auteur, bij: p.bij,
+      gepubliceerd: p.gepubliceerd, versie: p.versie, correcties: p.correcties || [],
+      naam: r.huisstijl.naam, accent: r.huisstijl.accent, thema: r.huisstijl.thema } };
   }
 
   return { krantGids, krant, leesArtikel };

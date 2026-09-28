@@ -1,0 +1,100 @@
+.connection-voice-copy {
+  display: grid;
+  gap: .3rem;
+  min-width: min(100%, 18rem);
+  font-size: .78rem;
+}
+
+.connection-voice-copy input,
+.connection-call .meelees-veld {
+  min-height: 48px;
+}
+
+.connection-voice-copy input {
+  border: 1px solid currentColor;
+  background: transparent;
+  color: inherit;
+  padding: .65rem;
+}
+
+.connection-transcript {
+  margin: .45rem 0 0;
+  font-size: .9rem;
+  line-height: 1.5;
+}
+
+.connection-call .meelees {
+  margin: 1rem;
+}
+
+body[data-rtg-dating="rendezvous"] .dating-person > .rv-photo {
+  grid-column: 1 / -1;
+  width: 100%;
+  max-height: 32rem;
+  object-fit: cover;
+}
+
+.connection-message-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .7rem;
+  margin-top: .35rem;
+}
+
+.connection-message-meta time {
+  margin: 0;
+}
+
+.connection-message-meta button {
+  min-height: 32px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: .68rem;
+  text-decoration: underline;
+  text-underline-offset: .18em;
+  opacity: .68;
+  cursor: pointer;
+}
+
+body[data-rtg-dating="rendezvous"] .rv-today-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0 0 clamp(3rem, 8vw, 8rem);
+  border-top: 1px solid var(--rv-line);
+  border-left: 1px solid var(--rv-line);
+}
+
+body[data-rtg-dating="rendezvous"] .rv-today-block {
+  min-height: 15rem;
+  padding: clamp(1.4rem, 4vw, 3rem);
+  border-right: 1px solid var(--rv-line);
+  border-bottom: 1px solid var(--rv-line);
+}
+
+body[data-rtg-dating="rendezvous"] .rv-today-block > span {
+  color: var(--rv-gold);
+  font-size: .68rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+
+body[data-rtg-dating="rendezvous"] .rv-today-block h3 {
+  margin: .8rem 0;
+  font-size: clamp(2rem, 4vw, 3.8rem);
+  line-height: 1;
+}
+
+body[data-rtg-dating="rendezvous"] .rv-today-block p {
+  max-width: 32rem;
+  color: var(--rv-muted);
+  line-height: 1.7;
+}
+
+@media (max-width: 720px) {
+  body[data-rtg-dating="rendezvous"] .rv-today-grid { grid-template-columns: 1fr; }
+  body[data-rtg-dating="rendezvous"] .rv-today-block { min-height: 0; }
+}

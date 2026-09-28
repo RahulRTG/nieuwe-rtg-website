@@ -90,12 +90,14 @@ test('PIN- en tokenuitgiftes zijn uitgesloten van antwoordreplay en browsercache
   }
 });
 
-test('cadeaukaartcodes komen bij verkoop en afboeking niet in activiteitenlogs', async () => {
-  const routes = {}, logs = [], kaartCode = 'RTG-GC-A1B2C3';
-  const db = { data: { giftcards: [] } };
+test('cadeaukaartcodes komen bij verkoop, afboeking en rotatie niet in activiteitenlogs', async () => {
+  const routes = {}, logs = [];
+  const db = { data: { giftcards: [] }, writable: true };
+  const bewerkCollectie = require('../server/db/collectie-bewerken')({ store: 'json', db, save() {} });
   const kern = {
     app: { post(pad, ...lagen) { routes[pad] = lagen.at(-1); } }, db,
-    gcCode() { return kaartCode; }, supplierAuth() {}, save() {},
+    cadeaukaart: require('../server/kern/cadeaukaart')({ db, bewerkCollectie, crypto }),
+    supplierAuth() {}, save() {}, managerOnly: () => true,
     logActivity(...delen) { logs.push(JSON.stringify(delen)); }
   };
   const herhaling = { metEigenAfdruk: async (_id, _vinger, werk) => werk() };
@@ -105,40 +107,84 @@ test('cadeaukaartcodes komen bij verkoop en afboeking niet in activiteitenlogs',
   await routes['/api/supplier/giftcard/sell'](
     Object.assign({ body: { bedrag: 100, idem: 'kaart-1' } }, basis), verkocht);
   assert.equal(verkocht.statusCode, 200);
-  assert.equal(verkocht.body.kaart.code, kaartCode);
+  const kaartCode = verkocht.body.kaart.code;
+  assert.match(kaartCode, /^GC(-[0-9A-F]{4}){8}$/);
 
   const verzilverd = antwoord();
-  routes['/api/supplier/giftcard/redeem'](
+  await routes['/api/supplier/giftcard/redeem'](
     Object.assign({ body: { code: kaartCode, bedrag: 10 } }, basis), verzilverd);
   assert.equal(verzilverd.statusCode, 200);
+  assert.equal(JSON.stringify(verzilverd.body).includes(kaartCode), false, 'het antwoord noemt de kaart bij haar id');
+  const nieuw = antwoord();
+  await routes['/api/supplier/giftcard/roteer'](
+    Object.assign({ body: { id: verkocht.body.kaart.id, idem: 'rot-1' } }, basis), nieuw);
+  assert.equal(nieuw.statusCode, 200);
   assert.ok(!logs.join('\n').includes(kaartCode));
+  assert.ok(!logs.join('\n').includes(nieuw.body.code));
+  assert.ok(!logs.join('\n').replace(/-/g, '').includes(kaartCode.replace(/-/g, '').slice(2)));
 });
 
-test('ophaalcode komt niet in fout, kassabontekst of activiteitenlog', () => {
-  const routes = {}, logs = [], code = 'ABCD';
-  const order = { ref: 'ORDER-1', pickup: code, paid: false, refunded: false,
-    status: 'klaar', items: [{ name: 'Lunch', qty: 1, price: 12 }], total: 12,
+test('afhaalcode komt niet in fout, kassabontekst, activiteitenlog of antwoord', async () => {
+  const routes = {}, logs = [], code = 'AH.' + 'C'.repeat(32);
+  const order = { ref: 'ORDER-1', pickup: 'AB12', paid: false, refunded: false, aanBalie: true,
+    status: 'klaar', items: [{ name: 'Lunch', qty: 1, price: 12 }], total: 12, supplierCode: 'ZAAK',
     customerCodename: 'Kobalt', customerKey: 'lid:1', customerTier: 'rtg' };
-  const db = { data: { posSales: {} } };
+  const db = { data: { posSales: {} }, writable: true };
+  const bewerkCollectie = require('../server/db/collectie-bewerken')({ store: 'json', db, save() {} });
+  const afhaalcode = require('../server/kern/afhaalcode')({ db, bewerkCollectie, crypto });
+  const echt = afhaalcode.uitgeven({ order, key: 'lid:1' }).code;
   const kern = {
     app: { post(pad, ...lagen) { routes[pad] = lagen.at(-1); } },
-    broadcastSync() {}, crypto: require('node:crypto'), db,
+    broadcastSync() {}, crypto, db,
     facturatie: { boekMetCodenaam() { return Promise.resolve({ ok: true }); } },
     logActivity(...delen) { logs.push(JSON.stringify(delen)); }, notify() {},
     pickupCode() { return 'BONX'; }, save() {}, sseToCustomer() {}, sseToOffice() {},
-    sseToSupplier() {}, supplierAuth() {}, ordersVanZaak() { return [order]; }
+    sseToSupplier() {}, supplierAuth() {}, orderMetRef: ref => (ref === order.ref ? order : null), afhaalcode
   };
   require('../server/routes/supplier/kassa/innen')(kern);
-  const req = { body: { code }, supplier: { code: 'ZAAK', name: 'De Zaak' }, actor: { name: 'Kassier' } };
+  const basis = { supplier: { code: 'ZAAK', name: 'De Zaak' }, actor: { name: 'Kassier' } };
+  const fout = antwoord();
+  await routes['/api/supplier/pos/redeem'](Object.assign({ body: { code } }, basis), fout);
+  assert.equal(fout.statusCode, 404);
+  assert.ok(!JSON.stringify(fout.body).includes(code), 'een onbekende code komt niet terug in de fout');
   const eerste = antwoord();
-  routes['/api/supplier/pos/redeem'](req, eerste);
+  await routes['/api/supplier/pos/redeem'](Object.assign({ body: { code: echt } }, basis), eerste);
   assert.equal(eerste.statusCode, 200);
   assert.equal(order.status, 'geserveerd');
-  assert.ok(!db.data.posSales.ZAAK[0].desc.includes(code));
-  assert.ok(!logs.join('\n').includes(code));
+  assert.ok(!JSON.stringify(eerste.body).includes(echt));
+  assert.ok(!db.data.posSales.ZAAK[0].desc.includes(echt));
+  assert.ok(!JSON.stringify(db.data.afhaalToegang).includes(echt), 'alleen de hash staat in de collectie');
+  assert.ok(!logs.join('\n').includes(echt));
 
   const tweede = antwoord();
-  routes['/api/supplier/pos/redeem'](req, tweede);
+  await routes['/api/supplier/pos/redeem'](Object.assign({ body: { code: echt } }, basis), tweede);
   assert.equal(tweede.statusCode, 409);
-  assert.ok(!JSON.stringify(tweede.body).includes(code));
+  assert.ok(!JSON.stringify(tweede.body).includes(echt));
+});
+
+test('de kassaprojectie rekent alleen af als de claim dat besliste', async () => {
+  /* De claim (kern/afhaalcode.js) is de waarheid over "hier afrekenen". Ziet
+     het RAM van deze instance de bon nog als onbetaald terwijl de claim zegt
+     dat er al betaald is, dan hoort er GEEN kassabon en geen factuur te komen. */
+  const routes = {}, facturen = [];
+  const order = { ref: 'ORDER-2', pickup: 'CD34', paid: false, status: 'klaar', supplierCode: 'ZAAK',
+    items: [{ name: 'Lunch', qty: 1, price: 12 }], total: 12, customerCodename: 'Kobalt', customerTier: 'rtg' };
+  const db = { data: { posSales: {} } };
+  const kern = {
+    app: { post(pad, ...lagen) { routes[pad] = lagen.at(-1); } },
+    broadcastSync() {}, crypto, db,
+    facturatie: { boekMetCodenaam(x) { facturen.push(x); return Promise.resolve({ ok: true }); } },
+    logActivity() {}, notify() {}, pickupCode() { return 'BONX'; }, save() {}, sseToCustomer() {},
+    sseToOffice() {}, sseToSupplier() {}, supplierAuth() {}, orderMetRef: () => order,
+    afhaalcode: { claim: async () => ({ status: 200, ok: true, ref: 'ORDER-2', afgerekend: false }) }
+  };
+  require('../server/routes/supplier/kassa/innen')(kern);
+  const res = antwoord();
+  await routes['/api/supplier/pos/redeem']({ body: { code: 'AH.' + 'D'.repeat(32) },
+    supplier: { code: 'ZAAK', name: 'De Zaak' }, actor: { name: 'Kassier' } }, res);
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.body.sale, null, 'geen kassabon');
+  assert.equal(res.body.order.wasPaid, true);
+  assert.equal((db.data.posSales.ZAAK || []).length, 0);
+  assert.equal(facturen.length, 0, 'en geen tweede factuur');
 });

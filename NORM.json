@@ -1,5 +1,5 @@
 {
-  "vastgelegd": "2026-09-27",
+  "vastgelegd": "2026-09-28",
   "meters": {
     "activeringOnbepaald": 3,
     "activeringOndergrens": 49,
@@ -7,29 +7,29 @@
     "appwerktDefecten": 0,
     "beweringenZonderVulcontrole": 100,
     "bewijsAchterstand": 2418,
-    "bewijsAlleenKeten": 17,
+    "bewijsAlleenKeten": 18,
     "bewijsCellenBewezen": 26449,
     "bronBlindeBestanden": 3,
-    "browserpoortToetsen": 388,
+    "browserpoortToetsen": 399,
     "carriereDomeinenGemeten": 15,
-    "dbDeuren": 529,
+    "dbDeuren": 531,
     "dbDeurenSchrijvend": 275,
-    "dekkingPct": 82,
+    "dekkingPct": 83,
     "dekkingWaargenomenPct": 100,
     "delenZonderOnderwerp": 0,
     "dependencies": 0,
     "devPakketten": 1,
-    "e2eBestanden": 252,
+    "e2eBestanden": 272,
     "endpointsNooitAangeraakt": 0,
-    "endpointsZonderTest": 896,
+    "endpointsZonderTest": 884,
     "faalproefGezakt": 1,
     "gluurGaten": 0,
     "gluurGecontroleerd": 2417,
     "gluurOnbewaakt": 0,
-    "inlineStijlAttributen": 4628,
+    "inlineStijlAttributen": 4627,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1601,
-    "kernGedeeld": 246,
+    "kernBreedte": 1667,
+    "kernGedeeld": 250,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
@@ -59,8 +59,8 @@
     "taalCellenVerkeerdSchrift": 0,
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
-    "testbestanden": 1761,
-    "toetsenNietGemeten": 631,
+    "testbestanden": 1851,
+    "toetsenNietGemeten": 297,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -71,7 +71,7 @@
     "wekkersZonderTrede": 0,
     "wettenOnbewezen": 5,
     "zaakwigGezakt": 0,
-    "zelfpoortendeToetsen": 28,
+    "zelfpoortendeToetsen": 37,
     "geldRoutesPubliek": 0,
     "geldRoutesZonderSemantiek": 1,
     "geldRoutesZonderIdemBewijs": 3,
@@ -123,12 +123,12 @@
     "veranderbereikZonderBereik": 530,
     "stilLezing": 5,
     "stilLezingMeters": 61,
-    "stilLezingBereik": 575,
+    "stilLezingBereik": 596,
     "bewijsOnderscheidt": 6,
     "connectDomeinenGemeten": 23,
     "afgeleidZonderEigenaar": 2,
     "afgeleidOnbeslist": 105,
-    "afgeleidMetEigenaar": 197,
+    "afgeleidMetEigenaar": 202,
     "herbouwVerschilt": 0,
     "herbouwBewezen": 14,
     "veranderbereikStatisch": 1164,
@@ -138,17 +138,227 @@
     "edgeDubbeleEigenaars": 12,
     "rtgDodeKanalen": 0,
     "edgeVeldIdentiteit": 0,
-    "edgeVeldWereld": 279,
-    "edgeVeldContext": 280,
+    "edgeVeldWereld": 280,
+    "edgeVeldContext": 281,
     "edgeVeldObject": 0,
     "edgeVeldActiviteit": 0,
     "edgeVeldPresence": 0,
     "edgeVeldVoortzetting": 0,
-    "edgeVeldHoofdactie": 58,
+    "edgeVeldHoofdactie": 59,
     "edgeVeldTrust": 0,
     "edgeVeldContextZelf": 11
   },
   "notities": [
+    {
+      "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "keuringOmvang",
+      "van": 331,
+      "meter": "keuringOmvang 331 -> 332",
+      "reden": "Terug naar de stand van main. De samenvoeging zette routes-dwars.js even boven de 10 kB-grens (twee takken hingen er elk een route aan), waardoor hij tijdelijk uit deze telling viel en --vastleggen de lat een tel strakker zette; na het inkorten van een commentaar staat hij weer vlak onder de grens, precies zoals op main.",
+      "waarheen": "server/opzet/routes-dwars.js opknippen zodra er weer een route bij komt."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1651,
+      "meter": "kernBreedte 1651 -> 1660",
+      "reden": "DE SAMENVOEGING DRAAGT DE GROEI VAN DE TAKKEN, EN GEEN GROEI VAN ZICHZELF. Deze tak voegt de open PR's #394, #395, #400, #401, #402, #404, #405, #408, #409, #410 en #411 samen. Elke tak vertakte van een main waar de norm gold en schreef voor zijn eigen verhoging hier al een notitie; de vereniging telt die op. De nieuwe stand is de GEMETEN stand op de samengevoegde boom, er is geen lucht bijgeteld, en vanaf hier geldt weer: alleen omlaag. toetsenNietGemeten is de grootste post: de mutatiemotor is niet langs de nieuwe toetsbestanden van de takken geweest, en die ronde hoort bij de wekelijkse ronde.",
+      "waarheen": "De notities van de afzonderlijke takken hieronder, elk met hun GRENZEN.json-verwijzing."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 246,
+      "meter": "kernGedeeld 246 -> 247",
+      "reden": "DE SAMENVOEGING DRAAGT DE GROEI VAN DE TAKKEN, EN GEEN GROEI VAN ZICHZELF. Deze tak voegt de open PR's #394, #395, #400, #401, #402, #404, #405, #408, #409, #410 en #411 samen. Elke tak vertakte van een main waar de norm gold en schreef voor zijn eigen verhoging hier al een notitie; de vereniging telt die op. De nieuwe stand is de GEMETEN stand op de samengevoegde boom, er is geen lucht bijgeteld, en vanaf hier geldt weer: alleen omlaag. toetsenNietGemeten is de grootste post: de mutatiemotor is niet langs de nieuwe toetsbestanden van de takken geweest, en die ronde hoort bij de wekelijkse ronde.",
+      "waarheen": "De notities van de afzonderlijke takken hieronder, elk met hun GRENZEN.json-verwijzing."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 641,
+      "vervalt": "2026-12-27",
+      "meter": "toetsenNietGemeten 641 -> 654",
+      "reden": "DE SAMENVOEGING DRAAGT DE GROEI VAN DE TAKKEN, EN GEEN GROEI VAN ZICHZELF. Deze tak voegt de open PR's #394, #395, #400, #401, #402, #404, #405, #408, #409, #410 en #411 samen. Elke tak vertakte van een main waar de norm gold en schreef voor zijn eigen verhoging hier al een notitie; de vereniging telt die op. De nieuwe stand is de GEMETEN stand op de samengevoegde boom, er is geen lucht bijgeteld, en vanaf hier geldt weer: alleen omlaag. toetsenNietGemeten is de grootste post: de mutatiemotor is niet langs de nieuwe toetsbestanden van de takken geweest, en die ronde hoort bij de wekelijkse ronde.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt ze mee."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 640,
+      "vervalt": "2026-12-27",
+      "meter": "toetsenNietGemeten 640 -> 641",
+      "reden": "Niet van deze tak maar uit de samenvoeging met main (#407): test/magnaatgroei.e2e.js is daar nieuw en de mutatiemotor is er nog niet langs geweest. Op main zelf telt hij net zo; hier staat hij nu naast de schuld van deze tak.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee, op main of hier."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 639,
+      "vervalt": "2026-12-27",
+      "meter": "toetsenNietGemeten 639 -> 640",
+      "reden": "test/streefbeeld.test.js is nieuw (besluit C7). Met de hand nagetrokken met drie mutaties in server/kern/streefbeeld.js: een meerderheid in plaats van elke dimensie (toets 4b zakt -- de eerste versie van de toets had maar twee dimensies en zag deze mutatie NIET, en kreeg er daarom een bij), tekenen zonder vingerafdruk (toets 2 en 6 zakken) en onbekend als binnen (toets 4 zakt). De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1606,
+      "meter": "kernBreedte 1606 -> 1607",
+      "reden": "De herkomstvraag na de registratie (besluit C6, keuze van de eigenaar: op het welkomstscherm). Het domein auth leest kern.aanmeldkanaalKeuzes: de antwoorden en hun woorden gaan met de registratie mee naar het scherm, zodat er geen tweede lijst in de client ontstaat, en de antwoordroute toetst tegen diezelfde keuzes in plaats van een tweede naam (AANMELDKANALEN) erbij te lezen.",
+      "waarheen": "GRENZEN.json (auth draagt aanmeldkanaalKeuzes) en test/aanmeldkanaal.test.js toets 6"
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1605,
+      "meter": "kernBreedte 1605 -> 1606",
+      "reden": "Het streefbeeld (besluit C7 van de eigenaar, 27 september 2026). Het domein bedrijfsmaat leest kern.streefbeeld: het voorstel rekent uit dezelfde bedrijfsmaten die die route al toont, en een eigen instantie in het routebestand zou een tweede getekend streefbeeld naast het eerste kunnen maken.",
+      "waarheen": "GRENZEN.json (bedrijfsmaat draagt streefbeeld) en test/streefbeeld.test.js"
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 638,
+      "vervalt": "2026-12-27",
+      "meter": "toetsenNietGemeten 638 -> 639",
+      "reden": "test/aanmeldkanaal.test.js is nieuw (besluit C6). Met de hand nagetrokken met twee mutaties in server/kern/aanmeldkanaal.js: de groepspoort op de kanalen weggehaald (toets 1 zakt: onder de grens stond een getal) en een onbekend kanaal als anders geteld (toets 1 zakt). En een echte fout gevonden bij het schrijven: zonder aanmeldkanaalTel in de GRENZEN van auth telde een aanmelding stil niets. De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1603,
+      "meter": "kernBreedte 1603 -> 1605",
+      "reden": "Het aanmeldkanaal (besluit C6 van de eigenaar, 27 september 2026). Twee domeinen lezen elk een naam uit kern/aanmeldkanaal.js: auth telt bij het aanmelden (aanmeldkanaalTel) en bedrijfsmaat leest de telling voor de boardroom (aanmeldkanaalStand). Een eigen instantie per domein zou twee tellingen naast elkaar maken.",
+      "waarheen": "GRENZEN.json (auth draagt aanmeldkanaalTel, bedrijfsmaat aanmeldkanaalStand) en test/aanmeldkanaal.test.js"
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 637,
+      "vervalt": "2026-12-27",
+      "meter": "toetsenNietGemeten 637 -> 638",
+      "reden": "test/naargast.test.js is nieuw (besluit C5). Met de hand nagetrokken met drie mutaties in server/kern/aanmeldingen/naargast.js: de sessiegrens weggehaald (toets 1 en 5 zakken: de oude pas bleef in de sessie), een lid zonder contract toch automatisch naar gast (toets 8 zakt), en afgelopen laten winnen van wacht (toets 7 zakt). De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 243,
+      "meter": "kernGedeeld 243 -> 244",
+      "reden": "Van een betaalde pas naar gast (besluit C5 van de eigenaar, 27 september 2026). Het nieuwe domein naargast (server/routes/naargast.js) leest kern.aanmeldingen, dat tot nu alleen het domein aanmeldingen las: de weg naar gast draait op dezelfde contracten en dezelfde opzegweg als het eigen lidmaatschap, en een eigen instantie zou een tweede contractmotor naast de eerste zetten. Eigen routebestand omdat routes-dwars.js en de aanmeldingsroutes allebei al bij de omvanggrens zitten.",
+      "waarheen": "GRENZEN.json (naargast draagt aanmeldingen, accounts, boardroomAuth en boardroomWie) en test/naargast.test.js"
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 636,
+      "vervalt": "2026-12-27",
+      "meter": "toetsenNietGemeten 636 -> 637",
+      "reden": "test/bankpositie.test.js is nieuw (het banksaldo van RTG, besluit C4). Met de hand nagetrokken met drie mutaties: de bron niet verplicht (toets 2 zakt), de naam uit het verzoek in plaats van de sessie (toets 3-4 en 5 zakken), en de controle op een gelijke tweede invoer weggehaald (toets 4b zakt: een dubbelklik wiste de echte vorige stand). De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1601,
+      "meter": "kernBreedte 1601 -> 1603",
+      "reden": "Het banksaldo van RTG (besluit C4 van de eigenaar, 27 september 2026). Het domein bedrijfsmaat leest nu ook kern.bankpositie en kern.bankpositieZet: het saldo woont in server/kern/bankpositie.js (een eigen collectie via eigencollectie), en de route staat naast de bedrijfsmaten omdat het dezelfde boardroomkamer is en de maat cash.rtg-bankpositie hetzelfde saldo leest. Een eigen instantie in het routebestand zou een tweede saldo naast het eerste maken.",
+      "waarheen": "GRENZEN.json (bedrijfsmaat draagt bankpositie en bankpositieZet) en test/bankpositie.test.js"
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 635,
+      "vervalt": "2026-12-27",
+      "meter": "toetsenNietGemeten 635 -> 636",
+      "reden": "test/klantwaarde.test.js is nieuw (klantwaarde per wereld, besluit C3). Met de hand nagetrokken met een mutatie in server/kern/bedrijfsmaat/klantwaarde.js: de zaakgroep van WorkOS telde elke loonrun als een eigen zaak (toets 3 zakt: de groepspoort zou naar het verkeerde getal kijken). De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 634,
+      "vervalt": "2026-12-27",
+      "meter": "toetsenNietGemeten 634 -> 635",
+      "reden": "test/reisbureau-thuis.test.js is nieuw (de stand thuis, besluit C3). Met de hand nagetrokken met twee mutaties in server/kern/reisbureau-thuis.js: de vertrekcontrole weggehaald (toets 1 zakt: een reis die nog moet vertrekken werd thuis) en de controle op de eigen reis weggehaald (toets 3-5 zakt: een ander lid kon de reis thuis melden). De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
+    {
+      "datum": "2026-09-25",
+      "soort": "structureel",
+      "sleutel": "toetsenNietGemeten",
+      "van": 633,
+      "meter": "toetsenNietGemeten 633 -> 634",
+      "reden": "Het samengaan met main (tweede merge van 25 september). Main meet 630, en deze tak voegt vier nieuwe toetsen toe waar de mutatiemotor nog niet langs is geweest: test/bedrijfsmaat-stand.test.js en test/pasbronnen.test.js (elk met een eigen post hieronder), plus test/bedrijfsmaat.test.js en test/stuur-kantoor.test.js (de twee posten hierna). Tot nu stonden main en deze tak elk los op 631 met ELK hun eigen twee posten; in een boom zijn dat 634. Er komt met deze samenvoeging geen toets bij -- de vier posten worden niet samengevat, zodat elk bestand zijn eigen reden en sluitweg houdt.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt alle vier mee."
+    },
+    {
+      "datum": "2026-09-25",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 632,
+      "vervalt": "2026-12-25",
+      "meter": "toetsenNietGemeten 632 -> 633",
+      "reden": "test/stuur-kantoor.test.js is nieuw (besluit C2: het kantoor als AI-rol, alleen op tonen). Met de hand nagetrokken met twee mutaties: /api/office/bank/incasso in LEZEN.office gezet (toets 2 en 4 zakken: een schrijvende route hoort geweigerd te worden) en naamAuth op /api/office/doe vervangen door officeAuth (toets 3 zakt: de gedeelde code komt aan het stuur). De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
+    {
+      "datum": "2026-09-25",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 631,
+      "vervalt": "2026-12-25",
+      "meter": "toetsenNietGemeten 631 -> 632",
+      "reden": "test/bedrijfsmaat.test.js is nieuw (de catalogus, de groepspoort en de meter van AUTONOMIE.md). Met de hand nagetrokken met twee mutaties: de groepspoort liet een waarde onder de grens door (toets 1 zakt) en een citaat in de catalogus verwees naar een regel die er niet staat (toets 5 zakt: verworpen). De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
+    {
+      "datum": "2026-09-25",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1600,
+      "meter": "kernBreedte 1600 -> 1601",
+      "reden": "De eerste sensor van AUTONOMIE (besluiten C1 en C2 van de eigenaar, 25 september 2026). Het domein bedrijfsmaat leest kern.bedrijfsmaat: de stand van de bedrijfsmaten, uitgerekend in server/kern/bedrijfsmaat/stand.js en langs de groepspoort gestuurd. Een eigen instantie in het routebestand zou een tweede stand naast de eerste maken; de route leest daarom de ene uit de kern-tas.",
+      "waarheen": "GRENZEN.json (bedrijfsmaat draagt bedrijfsmaat en boardroomAuth) en test/bedrijfsmaat-stand.test.js"
+    },
+    {
+      "datum": "2026-09-25",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 630,
+      "vervalt": "2026-12-25",
+      "meter": "toetsenNietGemeten 630 -> 631",
+      "reden": "test/bedrijfsmaat-stand.test.js is nieuw. Met de hand nagetrokken met twee mutaties: de melding van de pasovergang in server/accounts/users.js uitgezet (toets 3 en 4 zakken: geen nieuwe leden) en de groepspoort in kern/ledenregister.js vervangen door de ruwe telling (toets 6 zakt: 'perPas RTG Business Pass toont 1'). De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
+    {
+      "datum": "2026-09-25",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 629,
+      "vervalt": "2026-12-25",
+      "meter": "toetsenNietGemeten 629 -> 630",
+      "reden": "test/pasbronnen.test.js is nieuw. Met de hand nagetrokken met twee mutaties: de weigering van een niet-overgang (van === naar) in kern/pasgeschiedenis.js weg (toets 1 zakt) en de binding van de index aan zijn lijst in kern/aanwezigheid.js weg (toets 4 zakt). De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
     {
       "datum": "2026-09-24",
       "soort": "structureel",
@@ -195,15 +405,6 @@
       "meter": "stilLezingBereik 586 -> 575 (scripts/ 503 -> 492)",
       "reden": "Er is geen bewijslezing verdwenen: elf VALSE treffers vielen weg. De meter telt elke require( of readFileSync( met binnen 200 tekens een registernaam als bewijslezing. In de ketenproeven telden daardoor require('path') en require('./lib/wegwerpserver') mee, omdat 'TAFELPROEF.json' (en de vier andere) er vlak onder stond; in scripts/appwerkt.js een require naast APPWERKT.json. De tak van het samenstellen van bewijs (BETROUWBAARHEID.md par. 4a) zette er een commentaarblok en een stempel-require tussen, en daarmee kwam de registernaam net buiten de 200 tekens. Per bestand nagemeten tegen main (26c1fee7): tafel-, rit-, toelatings-, moment- en zaakliveproef elk 3 -> 1, appwerkt.js 4 -> 3, verder geen enkel verschil. Het commentaar terugschuiven om de treffers terug te krijgen zou de meter voor de gek houden.",
       "waarheen": "scripts/stillezing.js: het bereik telt een lezing op NABIJHEID van een registernaam; een lezing die het register werkelijk als argument draagt, is de strengere vorm en zou deze ruis wegnemen."
-    },
-    {
-      "datum": "2026-09-27",
-      "soort": "structureel",
-      "sleutel": "kernGedeeld",
-      "van": 243,
-      "meter": "kernGedeeld 243 -> 246; kernBreedte blijft gelijk",
-      "reden": "Leerhuis besluit B2 (ACADEMY.md par. 5): de relatie van een persoon met een organisatie komt uit haar BRON en niet uit een verklaring van het leerhuis. Voor een entiteit is dat het dienstverband, dus het leerhuis leest employmentVanPersoon en entiteitVind, twee namen die concern al deelt. Een eigen kopie van de dienstverbandsopzoeking zou deze meter sparen en een tweede werkrelatiemodel opleveren, precies de naad die ARBEID.md par. 7a met een besluit dichtzette (employment aan een entiteit is de waarheid). Stap B2b voegt rtfos toe: een leerhuis van een RTF-stad vraagt aan kern/rtfos of een account daar een zetel heeft of een zelfgekoppelde, actieve vrijwilliger is. Die vraag leest alleen een ja of nee; een kopie van de zetels of het vrijwilligersregister in het leerhuis zou binnen een dag een tweede waarheid zijn.",
-      "waarheen": "GRENZEN.json (leerhuis draagt employmentVanPersoon, entiteitVind en rtfos), test/leerhuis-routes.test.js toets 8 (wie uit dienst gaat verliest de relatie) en test/leerhuis-rtfbron.test.js (wie losgemaakt of inactief is, leest niet meer mee)"
     },
     {
       "datum": "2026-09-24",
@@ -3086,6 +3287,263 @@
       "meter": "kernBreedte 1600 -> 1601",
       "reden": "DemocratieOS fase B (POLITIEK.md par. 18.1) krijgt een eigen kernnaam `democratie` en hangt NIET onder een bestaande naam. Dat is een keuze en geen slordigheid: proef P3 (RTG verdwijnt) eist dat deze laag als geheel kan verhuizen, en een laag die onder de naam van een ander domein hangt, is precies de afhankelijkheid die P3 moet voorkomen. Wat hij van RTG gebruikt staat in server/kern/democratie/afhankelijkheden.js en wordt door test/democratie-afhankelijk.test.js bewaakt.",
       "waarheen": "GRENZEN.json (democratie), server/kern/democratie/afhankelijkheden.js en test/democratie-afhankelijk.test.js"
+    },
+    {
+      "datum": "2026-09-26",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1600,
+      "meter": "kernBreedte 1600 -> 1651",
+      "reden": "Connection OS voegt 51 smalle, routegerichte kernnamen toe voor constitution, consent, projections, productstate, Edge, profielmedia en communicatie. De gedeelde kernbreedte blijft 243 en het breedste kernbestand blijft 71; de namen onder een verzamelobject verbergen zou dezelfde koppeling alleen aan het zicht onttrekken. De publieke contracten worden bewaakt door de Connection Constitution en de gerichte producttests.",
+      "waarheen": "Bevroren op 1651. Nieuwe Connection-kernnamen vereisen opnieuw een expliciet contract en testdekking; splitsing blijft de voorkeur wanneer een bestand zelf te breed wordt."
+    },
+    {
+      "datum": "2026-09-26",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 631,
+      "vervalt": "2026-12-26",
+      "meter": "toetsenNietGemeten 631 -> 639",
+      "reden": "Acht nieuwe Connection-testsuites zijn functioneel groen en draaien onder de Constitution- en productpoorten, maar zijn nog niet opgenomen in het bestaande mutatieregister. De mutatiemeter loopt bewust niet impliciet mee met iedere testtoevoeging en daarom wordt dit verschil zichtbaar als tijdelijke meetschuld, niet als bewezen mutatiedekking.",
+      "waarheen": "Neem deze acht Connection-testsuites mee in de eerstvolgende volledige mutatieronde en verlaag de baseline met de werkelijk gemeten uitkomst."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 243,
+      "meter": "kernGedeeld 243 -> 246; kernBreedte blijft gelijk",
+      "reden": "Leerhuis besluit B2 (ACADEMY.md par. 5): de relatie van een persoon met een organisatie komt uit haar BRON en niet uit een verklaring van het leerhuis. Voor een entiteit is dat het dienstverband, dus het leerhuis leest employmentVanPersoon en entiteitVind, twee namen die concern al deelt. Een eigen kopie van de dienstverbandsopzoeking zou deze meter sparen en een tweede werkrelatiemodel opleveren, precies de naad die ARBEID.md par. 7a met een besluit dichtzette (employment aan een entiteit is de waarheid). Stap B2b voegt rtfos toe: een leerhuis van een RTF-stad vraagt aan kern/rtfos of een account daar een zetel heeft of een zelfgekoppelde, actieve vrijwilliger is. Die vraag leest alleen een ja of nee; een kopie van de zetels of het vrijwilligersregister in het leerhuis zou binnen een dag een tweede waarheid zijn.",
+      "waarheen": "GRENZEN.json (leerhuis draagt employmentVanPersoon, entiteitVind en rtfos), test/leerhuis-routes.test.js toets 8 (wie uit dienst gaat verliest de relatie) en test/leerhuis-rtfbron.test.js (wie losgemaakt of inactief is, leest niet meer mee)"
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1600,
+      "meter": "kernBreedte 1600 -> 1601 (VERHOOGD, met reden)",
+      "reden": "RTG Vrijheid (VRIJHEID.md) is een nieuwe laag met een eigen kernnaam, kern.vrijheid, en routes die hem aanraken. Er komt precies EEN naam bij, niet twee: de zaak van RTG zelf als werkgever (kern/vrijheid/rtghuis.js) hangt met opzet BINNEN kern.vrijheid (kern.vrijheid.rtghuis) in plaats van als eigen kernnaam, en beide routebestanden staan in een map (routes/vrijheid/) zodat ze een domein zijn en kernGedeeld niet beweegt. Wie deze tand weer omlaag wil: dat kan alleen door de laag weg te halen, en dat is een productbesluit.",
+      "waarheen": "GRENZEN.json (vrijheid draagt vrijheid) en test/vrijheid-routes.test.js plus test/vrijheid.test.js"
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "dbDeuren",
+      "van": 529,
+      "meter": "dbDeuren 529 -> 530 (VERHOOGD, met reden)",
+      "reden": "kern/vrijheid/rtghuis.js maakt de zaak van RTG zelf aan (besluit van de eigenaar, 27 september 2026) en schrijft daarvoor in db.data.suppliers -- precies zoals kern/rtfwallet.js de RTFoundation-positie maakt. Er bestaat in dit huis geen gedeelde zaakmaker om langs te gaan: acht kernmodules duwen zelf een zaak in db.data.suppliers. De eigen afdelingen van RTG staan WEL in een eigen collectie (eigencollectie, rtgAfdelingen) en tellen hier dus niet. Wie deze tand omlaag wil: een gedeelde zaakmaker bouwen waar alle negen doorheen gaan.",
+      "waarheen": "Een gedeelde zaakmaker voor de negen modules die een zaak aanmaken."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 634,
+      "vervalt": "2026-12-27",
+      "meter": "toetsenNietGemeten 634 -> 635 (de som van drie takken, geen nieuwe toets)",
+      "reden": "De cadeaukaart, de ticketcodes en de kascodes kwamen elk met een eigen pg-raceproef (test/giftcard-credential.pg.test.js, test/ticketcodes.pg.test.js, test/kascode-credential.pg.test.js) en zetten deze meter elk op hun eigen tak van 633 naar 634. Samengevoegd staan ze naast elkaar. Zonder DATABASE_URL slaan ze zichzelf over, dus de mutatiemotor meet ze hier niet; in CI draaien ze in de pg-scherf met echte PostgreSQL en Redis.",
+      "waarheen": "Dezelfde aflossing als de andere pg-toetsen: de standaardomgeving levert PostgreSQL, en dan meet de motor ze mee."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 633,
+      "vervalt": "2026-12-27",
+      "meter": "toetsenNietGemeten 633 -> 634",
+      "reden": "test/kascode-credential.pg.test.js is nieuw (kas- en tikcode, RELEASEKANDIDAAT.md B9). Zonder DATABASE_URL slaat hij zichzelf over, dus de mutatiemotor kan er niet langs; de drie gewone kascodetoetsen zijn wel gemeten (MUTATIES.json). Met de hand nagetrokken tegen echte PostgreSQL: de collectietransactie overslaan en een niet-vaste ref onder de economische sleutel laten hem allebei zakken.",
+      "waarheen": "Een mutatieronde met DATABASE_URL, of de pg-scherf als meetomgeving."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "zelfpoortendeToetsen",
+      "van": 31,
+      "vervalt": "2026-12-27",
+      "meter": "zelfpoortendeToetsen 31 -> 32",
+      "reden": "test/kascode-credential.pg.test.js is nieuw (RELEASEKANDIDAAT.md B9, deuren pay.kascode_en_vooraf en pay.tikcode): twee echte PostgreSQL-instances racen op dezelfde kascode, een derde hervat na een crash na de commit van de boeking, en tikken vanaf twee instances tegelijk mag geen gebruik verliezen. Dat kan niet eerlijk zonder database; zonder DATABASE_URL slaat hij zichzelf over. Hij staat in scripts/lib/pg-toetslijst.js (verplicht in CI) en als uitzondering onder zelfpoortende-toets. Lokaal gedraaid tegen postgresql://localhost met Redis: 1 van 1 groen; zonder collectietransactie in kern/pay/kasbak.js zakte hij, en met een niet-vaste ref onder de economische sleutel ook (3 boekingen in plaats van 2).",
+      "waarheen": "Dezelfde aflossing als de notitie van 5 september: de standaardomgeving levert PostgreSQL, en het nul-skipbewijs hangt aan de releasecommit."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 244,
+      "meter": "kernGedeeld 244 -> 245; kernBreedte 1601 -> 1603",
+      "reden": "Het entreeticket en het vervoerskaartje als gemigreerde credentials (RELEASEKANDIDAAT.md B9). De ene naam kern.tickettoegang wordt door twee domeinen gelezen: het lid toont zijn entreecode (routes/member/kopen/tickets.js), de zaak scant hem aan de deur en vernieuwt een deurticket (routes/supplier/tickets-deur.js, tickets.js). Dat is de bedoelde koppeling: EEN plek die weet hoe een entreecode wordt uitgegeven, geclaimd en geroteerd; een kopie per kant zou twee claimwegen opleveren die uiteenlopen, precies de dubbele toegang die de claimtransactie voorkomt. De tweede nieuwe naam, kaartToonVoor, raakt alleen het domein mobiliteit (breedte, geen koppeling).",
+      "waarheen": "GRENZEN.json (lid en leverancier dragen tickettoegang, mobiliteit kaartToonVoor) en test/tickettoegang.test.js, test/kaarttoegang.test.js plus test/ticketcodes.pg.test.js"
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 633,
+      "vervalt": "2026-12-27",
+      "meter": "toetsenNietGemeten 633 -> 634",
+      "reden": "test/ticketcodes.pg.test.js is nieuw en slaat zichzelf zonder DATABASE_URL en REDIS_URL over; de mutatiemotor kan hem daardoor niet meten (zoals elke pg-proef). Met de hand nagetrokken tegen echte PostgreSQL en Redis: zonder advisory lock plus FOR UPDATE in pg/collectietransactie.js zakt hij. De twee andere nieuwe toetsen (tickettoegang, kaarttoegang) zijn wel door de motor gemeten en zakken allebei.",
+      "waarheen": "De pg-scherf in CI; het nul-skipbewijs hangt aan de releasecommit."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "zelfpoortendeToetsen",
+      "van": 32,
+      "vervalt": "2026-12-27",
+      "meter": "zelfpoortendeToetsen 32 -> 33",
+      "reden": "Een nieuwe pg-proef: test/ticketcodes.pg.test.js bewijst dat de entreecode van een activiteitenticket en de code van een OV-vervoerbewijs (RELEASEKANDIDAAT.md B9) over twee echte PostgreSQL-instances een keer binnenlaten en een rit een keer tellen, ook als een scan tegen een rotatie racet. Dat kan niet eerlijk zonder database; zonder DATABASE_URL en REDIS_URL slaat hij zichzelf over. Hij staat in scripts/lib/pg-toetslijst.js (verplicht in de pg-scherf en het releasebewijs) en als uitzondering onder zelfpoortende-toets. Lokaal tegen echte PostgreSQL en Redis groen, en zonder advisory lock plus FOR UPDATE in pg/collectietransactie.js zakte hij: beide poorten lieten hetzelfde ticket binnen (2 in plaats van 1).",
+      "waarheen": "Dezelfde als de andere pg-toetsen: de CI-dienstmatrix zonder skips afdwingen."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "zelfpoortendeToetsen",
+      "van": 31,
+      "vervalt": "2026-12-27",
+      "meter": "zelfpoortendeToetsen 31 -> 32; toetsenNietGemeten 633 -> 634",
+      "reden": "test/giftcard-credential.pg.test.js is nieuw (de cadeaukaart als gemigreerde money-credential, RELEASEKANDIDAAT.md B9): twee instances racen op hetzelfde saldo, op deelbedragen, op dezelfde kassasleutel, op rotatie tegen inwisseling, op intrekken en op de migratie van een oude 24-bitkaart. Dat kan niet eerlijk zonder database en slaat lokaal zonder DATABASE_URL over; hij staat in scripts/lib/pg-toetslijst.js (verplicht in CI) en als uitzondering onder zelfpoortende-toets. Lokaal tegen echte PostgreSQL en Redis groen, en zonder advisory lock plus FOR UPDATE in pg/collectietransactie.js zakte hij (twee instances boekten dezelfde oude kaart allebei af). Daarom telt hij ook als niet-gemeten toets: de mutatiemotor draait zonder PostgreSQL. De twee andere nieuwe toetsen (giftcard-credential.test.js, giftcard-routes.test.js) zijn wel door de motor gemeten en zakken.",
+      "waarheen": "Dezelfde aflossing als de notitie van 5 september: de standaardomgeving levert PostgreSQL, en het nul-skipbewijs hangt aan de releasecommit."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 243,
+      "meter": "kernGedeeld 243 -> 244; kernBreedte 1600 -> 1601",
+      "reden": "De afhaalcode als gemigreerde money-credential (RELEASEKANDIDAAT.md B9). De ene naam kern.afhaalcode wordt door twee domeinen gelezen: het lid haalt en trekt zijn code in (routes/member/afhaalcode.js), de zaak claimt hem aan de kassa en trekt hem in bij afhandelen en terugstorten (routes/supplier/kassa/innen.js, orders/afhandeling.js). Dat is de bedoelde koppeling: EEN plek die weet hoe een afhaalcode wordt uitgegeven, geclaimd en ingetrokken. Een kopie per kant zou deze meter sparen en twee claimwegen opleveren die uiteenlopen -- precies de dubbele-afrekenfout die de claimtransactie voorkomt.",
+      "waarheen": "GRENZEN.json (lid en leverancier dragen afhaalcode) en test/afhaalcode.test.js plus test/afhaalcode.pg.test.js"
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 631,
+      "vervalt": "2026-12-27",
+      "meter": "toetsenNietGemeten 631 -> 633",
+      "reden": "test/tegoedbon-credential.test.js en test/tegoedbon-routes.test.js zijn nieuw (de tegoedbon als gemigreerde money-credential, besluit van de eigenaar van 27 september 2026). Met de hand nagetrokken met twintig mutaties op kern/pay/tegoed-*.js, db/economische-identiteit.js, lib/eenmalig-geheim-routes.js en de twee routebestanden; negentien raakten de juiste toets, een (alleen bearer.intrekken weghalen bij roteren) sloeg af omdat de toegang in zijn geheel wordt vervangen -- de twee mutaties die dan wel iets openen, raakten allebei. De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt ze mee."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "zelfpoortendeToetsen",
+      "van": 31,
+      "vervalt": "2026-12-27",
+      "meter": "zelfpoortendeToetsen 31 -> 32",
+      "reden": "test/arrivalpas.pg.test.js is nieuw (Invisible Arrival als gemigreerde credential, besluit B9): twee instances racen om dezelfde aanvraag, om de eenmalige voorbereidingsclaim, om rotatie tegen een puls, en een intrekking op A sluit de pass op B. Dat kan niet eerlijk zonder PostgreSQL en Redis en slaat lokaal zonder DATABASE_URL over. Hij staat in scripts/lib/pg-toetslijst.js (verplicht in CI) en als uitzondering onder zelfpoortende-toets. Lokaal tegen echte PostgreSQL en Redis groen, en zonder advisory lock plus FOR UPDATE in pg/collectietransactie.js zakte hij 3 van 3 keer. De WorkOS-sleutels kregen geen pg-proef: een sessie heeft geen eenmalige claim.",
+      "waarheen": "Dezelfde aflossing als de notitie van 5 september: de standaardomgeving levert PostgreSQL, en het nul-skipbewijs hangt aan de releasecommit."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "zelfpoortendeToetsen",
+      "van": 28,
+      "vervalt": "2026-12-27",
+      "meter": "zelfpoortendeToetsen 28 -> 31",
+      "reden": "Twee nieuwe pg-proeven. (1) test/accounts-requestcommit.pg.test.js is nieuw: de accountwerkkopie als deelnemer aan de PostgreSQL-requestcommit (RELEASEKANDIDAAT.md A2), tegen een ECHTE PostgreSQL -- registratie, verouderde basis 409, unieke botsing 409 en een gedode backend die niets achterlaat. Zonder DATABASE_URL slaat hij zichzelf over, zoals elke pg-proef. Hij staat in scripts/lib/pg-toetslijst.js en draait dus zonder skips in de pg-scherf en in het releasebewijs (ci-pg-bewijs.json); lokaal nagetrokken met een mutatie op de accountstap in verzoektransactie.js (alle vier zakken). (2) test/tegoedbon-credential.pg.test.js bewijst de claim en de escrowboeking over twee echte PostgreSQL-instances plus het hervatten door een derde na een crash; dat kan niet eerlijk zonder database en slaat lokaal zonder DATABASE_URL over. Hij staat in scripts/lib/pg-toetslijst.js (verplicht in CI) en als uitzondering onder zelfpoortende-toets hieronder. Lokaal gedraaid tegen postgresql://localhost: 1 van 1 groen, en met de collectietransactie uitgeschakeld zakte hij (2 boekingen uit de escrow in plaats van 1). (3) test/afhaalcode.pg.test.js: twee instances racen op de claim, op claim tegen rotatie, op de betaalweg en op intrekken; lokaal tegen echte PostgreSQL en Redis groen, en zonder advisory lock plus FOR UPDATE in pg/collectietransactie.js zakte hij.",
+      "waarheen": "Dezelfde aflossing als de notitie van 5 september: de standaardomgeving levert PostgreSQL, en het nul-skipbewijs hangt aan de releasecommit."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1607,
+      "meter": "kernBreedte 1607 -> 1610",
+      "reden": "Het boek van RTG (besluiten C8 tot en met C11). Het domein bedrijfsmaat leest nu rtgBoek, rtgBoekZet en RTGBOEK_DELEN, en de twee routes hangen achter officeAuth omdat de kamer Financien ze vult en niet de boardroom. Ze staan bij de bedrijfsmaten en niet in een eigen ingang: een route-ingang die een andere laadt was een nieuwe onverklaarde verstrengeling, en een eigen mount liet routes-dwars.js over de omvanggrens gaan.",
+      "waarheen": "GRENZEN.json (bedrijfsmaat draagt de drie namen en officeAuth) en test/rtgboek.test.js toets 8"
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 641,
+      "vervalt": "2026-12-27",
+      "meter": "toetsenNietGemeten 641 -> 643",
+      "reden": "test/rtgboek.test.js en test/rtgboek.e2e.js zijn nieuw (C8-C11). Met de hand nagetrokken: een half boek dat toch een totaal krijgt (toets 2), het ledentegoed dat wordt afgetrokken (toets 5), een netto runway zonder verbruik (toets 6), een bedrag op de gedeelde code (toets 8) en negatieve lid-rekeningen die meetellen (toets 3) laten elk de toets zakken; in de browser zakt de toets als het paneel in elke kamer staat of als een bedrag met een komma niet wordt gelezen. De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt ze mee."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 245,
+      "meter": "kernGedeeld 245 -> 246; kernBreedte 1603 -> 1604",
+      "reden": "De sleutel per Zaakdoos als gemigreerde credential (RELEASEKANDIDAAT.md B12). De ene naam kern.doosSleutels (kern/zaakdoos/sleutels.js, gemonteerd in opzet/kernlaag6b.js met de collectietransactie) wordt door drie domeinen gelezen: de vloot keurt er de doossleutel mee (routes/doos.js), het kantoor geeft en trekt in (routes/kantoren/doossleutels.js) en de manager van de zaak doet dat voor zijn eigen dozen (routes/supplier/doossleutels.js). Een instantie is met opzet: drie instanties zouden elk een eigen greep op dezelfde collectie hebben, en de routes kregen bewerkCollectie niet eens (kern draagt hem niet). kantoren leest daarnaast findSupplier om de zaak van een uitgifte te controleren.",
+      "waarheen": "GRENZEN.json (doos, kantoren en supplier dragen doosSleutels; kantoren findSupplier) en test/doossleutels.test.js plus test/zaakdoos-sleutel.pg.test.js"
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "dbDeuren",
+      "van": 529,
+      "meter": "dbDeuren 529 -> 530",
+      "reden": "routes/doos-kloon.js is afgesplitst uit routes/doos.js (dat op 9400 bytes stond) toen de kloon per zaak (B12) erbij kwam. Het bestand leest db.data voor de kloon van EEN zaak (via de positieve lijst van kern/zaakdoos/kloon.js) en schrijft doosUpdateStatus, precies wat doos.js hiervoor zelf deed; er komt geen nieuwe collectie bij, alleen een tweede bestand achter dezelfde deur.",
+      "waarheen": "Wie de vloot-opslag achter een eigen kern/zaakdoos-opslagcontract zet, haalt beide bestanden tegelijk van de lijst."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "zelfpoortendeToetsen",
+      "van": 36,
+      "vervalt": "2026-12-27",
+      "meter": "zelfpoortendeToetsen 36 -> 37; toetsenNietGemeten 636 -> 637",
+      "reden": "test/zaakdoos-sleutel.pg.test.js is nieuw (de sleutel per Zaakdoos, besluit B12): twee instances racen om twee rotaties van dezelfde doos (precies een sleutel blijft geldig), om de laatste plek onder het plafond per zaak, en een intrekking op A tegen een uitgifte op B (de intrekking gaat niet verloren). Dat kan niet eerlijk zonder PostgreSQL en Redis en slaat lokaal zonder DATABASE_URL over, dus de mutatiemotor kan er niet langs. Lokaal tegen echte PostgreSQL en Redis groen, en zonder advisory lock plus FOR UPDATE in pg/collectietransactie.js zakte hij 3 van 3 keer. Hij staat in scripts/lib/pg-toetslijst.js (verplicht in CI) en als uitzondering onder zelfpoortende-toets.",
+      "waarheen": "Dezelfde aflossing als de notitie van 5 september: de standaardomgeving levert PostgreSQL, en het nul-skipbewijs hangt aan de releasecommit."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "zelfpoortendeToetsen",
+      "van": 35,
+      "vervalt": "2026-12-27",
+      "meter": "zelfpoortendeToetsen 35 -> 36; toetsenNietGemeten 635 -> 636",
+      "reden": "test/algpin-herstel.pg.test.js is nieuw (CODECREDENTIALS.json, identity.algpin_herstelsleutel, beleid B9): twee echte PostgreSQL-instances racen om dezelfde herstelsleutel (precies een claim wint), om twee aanvragen van hetzelfde lid tegelijk (er blijft een werkende sleutel over) en een aanvraag op B trekt de sleutel in die A net uitgaf. Dat kan niet eerlijk zonder database; zonder DATABASE_URL slaat hij zichzelf over. Hij staat in scripts/lib/pg-toetslijst.js (verplicht in CI) en als uitzondering onder zelfpoortende-toets. Lokaal gedraaid tegen postgresql://localhost: 1 van 1 groen, en met claim() gesplitst in lezen en schrijven in twee transacties zakte hij (beide instances claimden). Daarom telt hij ook als niet-gemeten toets: de mutatiemotor draait zonder PostgreSQL. De vijf gewone toetsen van deze ronde (apipoort-levensduur, stadsdoossleutel, algpin-herstel, scim-sleutelverval, imap-sleutelverval) zijn wel door de motor gemeten.",
+      "waarheen": "Dezelfde aflossing als de andere pg-toetsen: de standaardomgeving levert PostgreSQL, en dan meet de motor ze mee."
+    },
+    {
+      "datum": "2026-09-28",
+      "soort": "structureel",
+      "sleutel": "bewijsAlleenKeten",
+      "van": 17,
+      "meter": "bewijsAlleenKeten 17 -> 18",
+      "reden": "DE TWEEDE BIJTREKRONDE VAN DE SAMENVOEGING DRAAGT DE GROEI VAN DE TAKKEN, EN GEEN GROEI VAN ZICHZELF. Na de eerste ronde zijn de nieuwe commits van alle open takken en #414 bijgetrokken (#413 is op besluit van de eigenaar weer uit deze tak gehaald, want hij was in zijn eigen CI nooit groen). Elke tak schreef voor zijn eigen verhoging hier al een notitie; de vereniging telt die op. De nieuwe stand is de GEMETEN stand op de samengevoegde boom, er is geen lucht bijgeteld, en vanaf hier geldt weer: alleen omlaag. Het nieuwe mechanisme is scripts/native-rehearsal.js uit #400: de native repetitie draait alleen in release-native.yml, omdat hij een gebouwd native artefact nodig heeft.",
+      "waarheen": "BEWIJSLADDER.json (sport storing, scripts/native-rehearsal.js) en .github/workflows/release-native.yml"
+    },
+    {
+      "datum": "2026-09-28",
+      "soort": "structureel",
+      "sleutel": "dbDeuren",
+      "van": 530,
+      "meter": "dbDeuren 530 -> 531",
+      "reden": "DE TWEEDE BIJTREKRONDE VAN DE SAMENVOEGING DRAAGT DE GROEI VAN DE TAKKEN, EN GEEN GROEI VAN ZICHZELF. Na de eerste ronde zijn de nieuwe commits van alle open takken en #414 bijgetrokken (#413 is op besluit van de eigenaar weer uit deze tak gehaald, want hij was in zijn eigen CI nooit groen). Elke tak schreef voor zijn eigen verhoging hier al een notitie; de vereniging telt die op. De nieuwe stand is de GEMETEN stand op de samengevoegde boom, er is geen lucht bijgeteld, en vanaf hier geldt weer: alleen omlaag.",
+      "waarheen": "De notities van de afzonderlijke takken hieronder, elk met hun GRENZEN.json-verwijzing."
+    },
+    {
+      "datum": "2026-09-28",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1660,
+      "meter": "kernBreedte 1660 -> 1667",
+      "reden": "DE TWEEDE BIJTREKRONDE VAN DE SAMENVOEGING DRAAGT DE GROEI VAN DE TAKKEN, EN GEEN GROEI VAN ZICHZELF. Na de eerste ronde zijn de nieuwe commits van alle open takken en #414 bijgetrokken (#413 is op besluit van de eigenaar weer uit deze tak gehaald, want hij was in zijn eigen CI nooit groen). Elke tak schreef voor zijn eigen verhoging hier al een notitie; de vereniging telt die op. De nieuwe stand is de GEMETEN stand op de samengevoegde boom, er is geen lucht bijgeteld, en vanaf hier geldt weer: alleen omlaag.",
+      "waarheen": "De notities van de afzonderlijke takken hieronder, elk met hun GRENZEN.json-verwijzing."
+    },
+    {
+      "datum": "2026-09-28",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 247,
+      "meter": "kernGedeeld 247 -> 250",
+      "reden": "DE TWEEDE BIJTREKRONDE VAN DE SAMENVOEGING DRAAGT DE GROEI VAN DE TAKKEN, EN GEEN GROEI VAN ZICHZELF. Na de eerste ronde zijn de nieuwe commits van alle open takken en #414 bijgetrokken (#413 is op besluit van de eigenaar weer uit deze tak gehaald, want hij was in zijn eigen CI nooit groen). Elke tak schreef voor zijn eigen verhoging hier al een notitie; de vereniging telt die op. De nieuwe stand is de GEMETEN stand op de samengevoegde boom, er is geen lucht bijgeteld, en vanaf hier geldt weer: alleen omlaag.",
+      "waarheen": "De notities van de afzonderlijke takken hieronder, elk met hun GRENZEN.json-verwijzing."
+    },
+    {
+      "datum": "2026-09-28",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 654,
+      "vervalt": "2026-12-28",
+      "meter": "toetsenNietGemeten 654 -> 721",
+      "reden": "DE TWEEDE BIJTREKRONDE VAN DE SAMENVOEGING DRAAGT DE GROEI VAN DE TAKKEN, EN GEEN GROEI VAN ZICHZELF. Na de eerste ronde zijn de nieuwe commits van alle open takken en #414 bijgetrokken (#413 is op besluit van de eigenaar weer uit deze tak gehaald, want hij was in zijn eigen CI nooit groen). Elke tak schreef voor zijn eigen verhoging hier al een notitie; de vereniging telt die op. De nieuwe stand is de GEMETEN stand op de samengevoegde boom, er is geen lucht bijgeteld, en vanaf hier geldt weer: alleen omlaag. De mutatiemotor is niet langs de nieuwe toetsbestanden van de takken geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt ze mee; die draait aan het eind van deze samenvoeging."
     }
   ],
   "prestatie": {
@@ -3104,24 +3562,24 @@
     "waarom": "Vanaf deze datum heeft elke notitie een soort: \"structureel\" (het gemetene veranderde van vorm; zeg dan met waarheen waar de belofte heen ging) of \"schuld\" (we konden het even niet; zeg dan met sleutel, van en vervalt wanneer hij terug is). scripts/normverval.js keurt alleen wat vanaf hier bij komt. DE GRENS IS NU TWEE KEER OPGESCHOVEN, en dat is geen verzachting maar twee keer dezelfde oorzaak. De eerste keer (18 -> 19 augustus) schreef main twee notities op een eigen tak waar deze regel niet bestond. De tweede keer (19 -> 21 augustus) kwamen bij de samenvoeging van 23 PR-takken elf notities van 20 augustus mee, geschreven op takken die van dezelfde dag zijn als de regel en hem dus niet kenden. WAAROM ZE NIET ALSNOG WORDEN INGEDEELD: een soort toekennen aan andermans notitie betekent hem woorden in de mond leggen -- en bij een schuld ook een vervaldatum, dus een afspraak die hij nooit heeft gemaakt. Dat is precies de reden die de eerste verschuiving al gaf. WAT DAT KOST, EERLIJK: elf verlagingen uit die ronde staan nu zonder soort in het register. Ze dragen wel allemaal een uitgeschreven reden -- wat ze missen is het VELD. En om te laten zien dat dit geen uitweg voor mezelf is: alle acht notities die deze samenvoeging zelf schrijft (2026-08-21) dragen een soort, zeven daarvan als schuld met een sleutel, een van-waarde en een einddatum. Vanaf 21 augustus geldt de eis onverkort; test/normverval.test.js toetst de logica met eigen data en staat dus niet stil tot die datum."
   },
   "sinds": {
-    "keuringOmvang": "2026-09-23",
-    "testbestanden": "2026-09-23",
-    "toetsenNietGemeten": "2026-09-14",
-    "inlineStijlAttributen": "2026-09-23",
+    "keuringOmvang": "2026-09-27",
+    "testbestanden": "2026-09-27",
+    "toetsenNietGemeten": "2026-09-28",
+    "inlineStijlAttributen": "2026-09-27",
     "ratelTanden": "2026-09-23",
     "metingenZonderRatel": "2026-08-18",
     "bewijsAchterstand": "2026-09-23",
     "toetsenOngevoeligPct": "2026-09-05",
-    "endpointsZonderTest": "2026-09-23",
-    "dekkingPct": "2026-09-06",
+    "endpointsZonderTest": "2026-09-27",
+    "dekkingPct": "2026-09-27",
     "keuringScheef": "2026-09-05",
     "keuringTeGroot": "2026-09-05",
     "keuringDubbeling": "2026-09-15",
     "keuringDekkingAdvies": "2026-09-06",
-    "dbDeuren": "2026-09-15",
+    "dbDeuren": "2026-09-28",
     "dbDeurenSchrijvend": "2026-08-28",
-    "browserpoortToetsen": "2026-09-23",
-    "e2eBestanden": "2026-09-23",
+    "browserpoortToetsen": "2026-09-27",
+    "e2eBestanden": "2026-09-27",
     "schermenZonderVormtaal": "2026-08-28",
     "bewijsCellenBewezen": "2026-09-06",
     "beweringenZonderVulcontrole": "2026-09-05",
@@ -3137,8 +3595,8 @@
     "wekkersZonderTrede": "2026-09-02",
     "wekkersOnverklaard": "2026-09-02",
     "meetleerBlind": "2026-09-02",
-    "kernBreedte": "2026-09-15",
-    "kernGedeeld": "2026-09-05",
+    "kernBreedte": "2026-09-28",
+    "kernGedeeld": "2026-09-28",
     "registersUitVuileBoom": "2026-09-10",
     "laatSpoorVerdacht": "2026-09-03",
     "rollbackUitzonderingen": "2026-09-03",
@@ -3194,12 +3652,12 @@
     "veranderbereikZonderBereik": "2026-09-16",
     "stilLezing": "2026-09-15",
     "stilLezingMeters": "2026-09-15",
-    "stilLezingBereik": "2026-09-23",
+    "stilLezingBereik": "2026-09-27",
     "bewijsOnderscheidt": "2026-09-23",
     "connectDomeinenGemeten": "2026-09-15",
     "afgeleidZonderEigenaar": "2026-09-16",
     "afgeleidOnbeslist": "2026-09-16",
-    "afgeleidMetEigenaar": "2026-09-23",
+    "afgeleidMetEigenaar": "2026-09-27",
     "herbouwVerschilt": "2026-09-16",
     "herbouwBewezen": "2026-09-16",
     "veranderbereikStatisch": "2026-09-23",
@@ -3209,15 +3667,16 @@
     "edgeDubbeleEigenaars": "2026-09-23",
     "rtgDodeKanalen": "2026-09-23",
     "edgeVeldIdentiteit": "2026-09-23",
-    "edgeVeldWereld": "2026-09-23",
-    "edgeVeldContext": "2026-09-23",
+    "edgeVeldWereld": "2026-09-27",
+    "edgeVeldContext": "2026-09-27",
     "edgeVeldObject": "2026-09-23",
     "edgeVeldActiviteit": "2026-09-23",
     "edgeVeldPresence": "2026-09-23",
     "edgeVeldVoortzetting": "2026-09-23",
-    "edgeVeldHoofdactie": "2026-09-23",
+    "edgeVeldHoofdactie": "2026-09-27",
     "edgeVeldTrust": "2026-09-23",
-    "edgeVeldContextZelf": "2026-09-23"
+    "edgeVeldContextZelf": "2026-09-23",
+    "bewijsAlleenKeten": "2026-09-28"
   },
   "uitzonderingen": [
     {
@@ -3426,6 +3885,48 @@
     },
     {
       "regel": "zelfpoortende-toets",
+      "pad": "test/kascode-credential.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "de kas- en tikcode-raceproef (claim over twee instances, hervatten na een crash, tikteller) vereist echte PostgreSQL; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die dienst, terwijl hij lokaal zonder die infrastructuur expliciet wordt overgeslagen in plaats van een lichtere opslag als bewijs te laten gelden"
+    },
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/algpin-herstel.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "de raceproef voor de herstelsleutel van de algemene pin (claim, heruitgifte die intrekt, over twee instances) vereist een echte PostgreSQL-dienst; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die dienst, terwijl hij lokaal zonder die infrastructuur expliciet wordt overgeslagen in plaats van een lichtere opslag als bewijs te laten gelden"
+    },
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/zaakdoos-sleutel.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "de raceproef voor de sleutel per Zaakdoos (twee rotaties van dezelfde doos, het plafond per zaak en een intrekking tegen een uitgifte over twee instances) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl hij lokaal zonder die infrastructuur expliciet overslaat"
+    },
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/arrivalpas.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "de Arrival Pass-raceproef (aanvraag, voorbereidingsclaim, rotatie en intrekking over twee instances) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl lokaal zonder die infrastructuur expliciet wordt overgeslagen in plaats van een lichtere opslag als bewijs te laten gelden"
+    },
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/afhaalcode.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "de afhaalcode-raceproef (claim, rotatie en betaalweg over twee instances) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl lokaal zonder die infrastructuur expliciet wordt overgeslagen in plaats van een lichtere opslag als bewijs te laten gelden"
+    },
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/giftcard-credential.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "de cadeaukaart-raceproef (saldo, deelbedragen, kassasleutel, rotatie, intrekking en de migratie van oude codes over twee instances) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl lokaal zonder die infrastructuur expliciet wordt overgeslagen in plaats van een lichtere opslag als bewijs te laten gelden"
+    },
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/ticketcodes.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "de raceproef voor de entreecode van een activiteitenticket en de code van een OV-vervoerbewijs (twee poorten, twee conducteurs, scan tegen rotatie, over twee instances) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl lokaal zonder die infrastructuur expliciet wordt overgeslagen in plaats van een lichtere opslag als bewijs te laten gelden"
+    },
+    {
+      "regel": "zelfpoortende-toets",
       "pad": "test/boarding-pass.pg.test.js",
       "vervalt": "2026-10-15",
       "reden": "de boardingpass-raceproef vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl lokaal zonder die infrastructuur expliciet wordt overgeslagen in plaats van een lichtere opslag als bewijs te laten gelden"
@@ -3480,9 +3981,21 @@
     },
     {
       "regel": "zelfpoortende-toets",
+      "pad": "test/tegoedbon-credential.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "de tegoedbonrace en de hervatte saga na een crash over twee instances bewijzen juist de PostgreSQL-collectie- en economische transactie; scripts/lib/pg-toetslijst.js maakt hem verplicht in CI en lokaal zonder database blijft het ontbreken zichtbaar als skip"
+    },
+    {
+      "regel": "zelfpoortende-toets",
       "pad": "test/spelprojectie.pg.test.js",
       "vervalt": "2026-10-15",
       "reden": "de spelprojectie-claimrace vereist echte PostgreSQL; scripts/lib/pg-toetslijst.js laat CI hem verplicht uitvoeren en lokaal zonder die dienst wordt geen zwakker resultaat als equivalent bewijs geaccepteerd"
+    },
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/accounts-requestcommit.pg.test.js",
+      "vervalt": "2026-12-27",
+      "reden": "de accountwerkkopie als deelnemer aan de PostgreSQL-requestcommit vereist echte PostgreSQL (unieke botsing, verouderde basis en een gedode backend bestaan alleen daar); scripts/lib/pg-toetslijst.js laat CI hem verplicht zonder skip draaien, en een lokale skip is eerlijker dan dezelfde invariant op een nagemaakte client te veinzen -- dat deel dekt test/accounts-transactie.test.js al"
     }
   ]
 }

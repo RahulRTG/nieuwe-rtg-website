@@ -66,7 +66,28 @@ function maakClamd(opties) {
     });
   }
 
-  return { scanBestand, host, port };
+  /* VERSION: welke engine en vooral welke DEFINITIES draaien er. Een scanner
+     die EICAR herkent maar definities van een maand oud heeft, keurt vandaag
+     niets meer goed; het bewijsverslag (scripts/extern-bewijs.js) leest dit. */
+  function definitieVersie() {
+    return new Promise((resolve, reject) => {
+      let klaar = false;
+      let antwoord = Buffer.alloc(0);
+      const sok = net.createConnection({ host, port });
+      const stop = (fout, uit) => { if (klaar) return; klaar = true; sok.destroy(); if (fout) reject(fout); else resolve(uit); };
+      sok.setTimeout(timeout, () => stop(new Error('ClamAV antwoordde niet op tijd.')));
+      sok.on('error', e => stop(new Error('ClamAV is niet bereikbaar: ' + e.message)));
+      sok.on('connect', () => sok.write(Buffer.from('zVERSION\0')));
+      sok.on('data', stuk => {
+        antwoord = Buffer.concat([antwoord, stuk]);
+        if (antwoord.length > MAX_ANTWOORD) return stop(new Error('ClamAV gaf een onbegrensd antwoord.'));
+        if (antwoord.includes(0)) stop(null, antwoord.subarray(0, antwoord.indexOf(0)).toString('utf8').trim());
+      });
+      sok.on('end', () => stop(new Error('ClamAV sloot de verbinding zonder versie.')));
+    });
+  }
+
+  return { scanBestand, definitieVersie, host, port };
 }
 
 module.exports = { maakClamd };

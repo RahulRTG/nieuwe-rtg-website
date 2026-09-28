@@ -121,6 +121,33 @@ function zelfdeProces(p) {
 }
 const merk = (pid) => ({ pid: Number(pid), start: procesStart(Number(pid)) });
 
+/* IS DE LOPENDE RONDE MIJN EIGEN VOOROUDER? De releasepoort pakt het slot, zet
+   een afloop op RUNNING en start daarna check.js -- en regel 71 daarin las die
+   RUNNING-stand als "de vorige ronde loopt nog" en zakte. De poort blokkeerde
+   zichzelf, net als eerder met het slot in scripts/afbouw-slot.js.
+
+   Dit is met opzet GEEN omgevingsvlag: een vlag kan iedereen zetten, en dan
+   verdwijnt de bescherming tegen een echte tweede ronde. Hier wordt de
+   OUDERKETEN gelopen (veld 4 van /proc/<pid>/stat) en moet de wortel van de
+   ronde daarin staan met dezelfde starttijd. Zonder /proc is het antwoord nee:
+   dan blijft de oude, strenge uitslag staan. */
+function ouderVan(pid) {
+  try {
+    const stat = fs.readFileSync('/proc/' + pid + '/stat', 'utf8');
+    return Number(stat.slice(stat.lastIndexOf(')') + 2).split(' ')[1]) || 0;
+  } catch (e) { return 0; }
+}
+function eigenLijn(afloop, vanaf = process.pid) {
+  const w = afloop && afloop.wortel;
+  if (!w || !zelfdeProces(w)) return false;
+  let pid = Number(vanaf);
+  for (let stap = 0; pid > 1 && stap < 64; stap++) {
+    if (pid === Number(w.pid)) return true;
+    pid = ouderVan(pid);
+  }
+  return false;
+}
+
 /* De proceskring: alle nakomelingen van een wortel-PID. Linux levert ze uit
    /proc; op macOS bestaat die boom niet en gebruiken we pgrep met een losse
    argumentlijst (dus zonder shell). Recursief, want een toets die een server
@@ -277,6 +304,41 @@ function magStarten(taak) {
       ? 'de vorige ronde is PASSED en haar proceskring is leeg'
       : 'de vorige ronde eindigde op ' + a.stand + ' en haar proceskring is leeg: zij is voltooid, ' +
         'dus er mag gewerkt worden -- haar UITKOMST telt niet als bewijs' };
+}
+
+/* Een controle BINNEN de releasepoort start geen nieuwe ronde. Alleen een
+   werkelijk kind van de vastgelegde eigenaar, met diens exacte run-id, mag de
+   lopende ronde inspecteren. magStarten blijft dicht en het journal blijft
+   RUNNING: dit is geen geslaagde afloop en geen toestemming voor een opvolger.
+   De releasepoort beoordeelt de vorige afloop VOOR zij haar eigen ronde opent. */
+function eigenVoorouder(pid) {
+  let ouder = process.ppid;
+  const gezien = new Set();
+  while (ouder > 1 && !gezien.has(ouder)) {
+    if (ouder === pid) return true;
+    gezien.add(ouder);
+    try {
+      const stat = fs.readFileSync('/proc/' + ouder + '/stat', 'utf8');
+      ouder = Number(stat.slice(stat.lastIndexOf(')') + 2).split(' ')[1]);
+    } catch (e) {
+      try { ouder = Number(execFileSync('ps', ['-o', 'ppid=', '-p', String(ouder)], { encoding: 'utf8' }).trim()); }
+      catch (geenOuder) { return false; }
+    }
+  }
+  return false;
+}
+
+function magControleren() {
+  const a = lees();
+  const eigenaar = require('../afbouw-slot').actief();
+  if (a && a.stand === 'RUNNING' && ['releasepoort', 'productiereleasepoort'].includes(a.taak) &&
+      eigenaar && eigenaar.pid === a.wortel.pid && eigenaar.taak === a.taak &&
+      process.env.RTG_AFBOUW_SLOT_ACTIEF === '1' && process.env.RTG_AFBOUW_RUN_ID === a.runId &&
+      zelfdeProces(a.wortel) && eigenVoorouder(a.wortel.pid)) {
+    return { mag: true, stand: 'RUNNING', oordeel: 'EIGEN_CONTROLE', resultaatBruikbaar: false,
+      reden: 'controle binnen de eigen releasepoort; de ronde is nog niet afgerond' };
+  }
+  return magStarten();
 }
 
 /* Bekende wezen beeindigen. Alleen processen die ALS ZELFDE PROCES herkend
@@ -467,4 +529,4 @@ function begin({ taak, commit, basis, verwachteUitvoer, poorten, uitExitcode } =
   };
 }
 
-module.exports = { begin, lees, magStarten, ruimOp, herstel, diagnose, wezenVan, kringVan, zelfdeProces, procesLeeft, AFLOOP, STANDEN, TERMINAAL };
+module.exports = { begin, lees, magStarten, magControleren, ruimOp, herstel, diagnose, wezenVan, kringVan, zelfdeProces, procesLeeft, eigenLijn, AFLOOP, STANDEN, TERMINAAL };

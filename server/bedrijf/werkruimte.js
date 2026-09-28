@@ -6,7 +6,7 @@
 'use strict';
 
 module.exports = (sctx) => {
-  const { app, save, crypto, schoon, kern, W, nu, rid, beheerVan, eigenVeld } = sctx;
+  const { app, save, crypto, schoon, kern, W, nu, rid, beheerVan, eigenVeld, sleutels } = sctx;
   const PRODUCTIE = String(process.env.NODE_ENV || '') === 'production';
 
   const code = () => {
@@ -55,7 +55,7 @@ module.exports = (sctx) => {
       /* Een bekende werkruimtecode is geen bevoegdheid om aan die holding te
          schrijven. Bestaande en onbekende ouders krijgen bewust hetzelfde
          antwoord, zodat deze grens ook geen werkruimtes laat enumereren. */
-      if (!ouder || !moederBeheerToken || ouder.beheerToken !== moederBeheerToken) {
+      if (!ouder || !moederBeheerToken || !sleutels.beheerVan(ouder, moederBeheerToken)) {
         return res.status(404).json({ error: 'Die moederwerkruimte kennen we niet of u mag er geen werkruimte aan koppelen.' });
       }
     }
@@ -64,7 +64,6 @@ module.exports = (sctx) => {
       valuta: schoon(req.body.valuta, 3).toUpperCase() || 'EUR',
       taal: schoon(req.body.taal, 5) || 'nl', moeder: moeder || null,
       kvk: schoon(req.body.kvk, 20) || null, btwNummer: schoon(req.body.btw, 20) || null,
-      beheerToken: PRODUCTIE ? null : crypto.randomBytes(24).toString('hex'),
       leden: {}, journaal: [], at: nu()
     };
     if (PRODUCTIE) {
@@ -79,11 +78,13 @@ module.exports = (sctx) => {
         gekoppeldAt: nu(), toegelatenAt: nu(), at: nu() };
       w.leden[l.id] = l;
     }
+    // buiten productie: een beheersessie die alleen als hash op w staat (./sleutels.js)
+    const beheerToken = PRODUCTIE ? null : sleutels.geefBeheer(w);
     W()[w.code] = w;
     save();
     const antwoord = { ok: true, werkruimte: w.code, naam: w.naam };
     if (!PRODUCTIE) {
-      antwoord.beheerToken = w.beheerToken;
+      antwoord.beheerToken = beheerToken;
       antwoord.let = 'Bewaar dit beheer-token: het wordt EEN keer getoond en is de sleutel van deze werkruimte. Leden krijgen straks hun eigen lid-token; dat is bewust een andere sleutel.';
     } else antwoord.let = 'De werkruimte is aan uw RTG-account gekoppeld. Uw huidige directierol bepaalt wat u mag.';
     res.json(antwoord);

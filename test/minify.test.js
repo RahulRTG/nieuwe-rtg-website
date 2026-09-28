@@ -57,3 +57,15 @@ test('minify levert nooit iets kapots: elke serveerbare frontend-JS blijft dezel
   }
   assert.ok(min < bron * 0.9, 'de frontend wordt echt kleiner (' + Math.round((1 - min / bron) * 100) + '% kleiner, niet louter terugval)');
 });
+
+/* `for await` viel stil weg: de parser at het woord op zonder het in de knoop
+   te zetten, dus bron en uitvoer gaven dezelfde (verkeerde) boom en de
+   boomvergelijking hierboven kon het niet zien. In de gebouwde versie liep de
+   lus van de Toestelkluis-index daardoor synchroon over een async iterator. */
+test('for await blijft for await, en de boom onderscheidt het van for-of', () => {
+  const bron = 'async function f(d){for await (const [naam, h] of d.entries()){ gebruik(naam, h); gebruik(naam, h); }}';
+  assert.match(minifyCode(bron + '\n'.repeat(40)), /for await ?\(/);
+  const knoop = (c) => parse(c).body[0].body.body[0];
+  assert.strictEqual(knoop(bron).await, true);
+  assert.strictEqual(knoop('async function f(d){for (const x of d){}}').await, false);
+});

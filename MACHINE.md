@@ -60,7 +60,7 @@ van stil meegeteld.
 
 ## 1. Wat er gemeten is
 
-<!--getal:machine.muterend-->3821<!--/getal--> muterende routes. Per as het
+<!--getal:machine.muterend-->3938<!--/getal--> muterende routes. Per as het
 aantal routes dat hem raakt (`handler` / `bestand`):
 
 | as | handler | bestand | motor |
@@ -79,10 +79,10 @@ aantal routes dat hem raakt (`handler` / `bestand`):
 | assurance (passkey, stap-op) | 2 | 49 | `kern/identiteit/vertrouwen.js` |
 | frictie | 2 | 98 | `kern/frictie/motor.js` |
 | simulatie | 10 | 103 | `kern/command/simulatie.js` |
-| envelop (oorzaak, correlatie) | 2 | <!--getal:machine.envelop-->144<!--/getal--> | `kern/envelop.js` |
+| envelop (oorzaak, correlatie) | 2 | <!--getal:machine.envelop-->180<!--/getal--> | `kern/envelop.js` |
 | idempotentie | 13 | 114 | `lib/idem-poort.js` |
 | aiVindbaar | 173 | 173 | `kern/stuur/beleid.js` |
-| mensAanDeDeur | 234 | <!--getal:machine.mensAanDeDeur-->238<!--/getal--> | `kern/kantoor/kluispoort.js` |
+| mensAanDeDeur | 234 | <!--getal:machine.mensAanDeDeur-->290<!--/getal--> | `kern/kantoor/kluispoort.js` |
 | herhaling (beschermd) | 1675 | 1675 | `IDEMPROEF.json` |
 
 Vier assen staan als **ongemeten met een reden** en nooit als 0: doelvindbaarheid
@@ -101,8 +101,8 @@ de teller zakt naar 0 met de naam van die as erbij; dat is nagetrokken door
 
 **De drie getallen die de richting bepalen:**
 
-1. <!--getal:machine.zonderAs-->2791<!--/getal--> van de
-   <!--getal:machine.muterend-->3821<!--/getal--> muterende routes raken **geen
+1. <!--getal:machine.zonderAs-->2819<!--/getal--> van de
+   <!--getal:machine.muterend-->3938<!--/getal--> muterende routes raken **geen
    enkele** as — zelfs niet op de ruime bestandsas.
 
    **Let op de noemer: die is op 14 september 2026 verschoven, en een ronde van
@@ -207,9 +207,9 @@ afgehandeld (**World Model** is bezet met zes betekenissen en heet hier
 levensgraaf, **Capability Mesh** half, **Trust Kernel** half, **Intent Engine**
 vrij, **Situation** let op); die worden hier niet herhaald. Dit zijn de zeven die
 uit de uitvoeringskant komen. `SEMANTIEK.json` meet dat dit huis
-<!--getal:semantiek.namen-->129<!--/getal--> namen in meer dan één domein heeft,
-waarvan <!--getal:semantiek.betekenissen-->111<!--/getal--> met meer dan één
-betekenis (samen <!--getal:semantiek.betekenissenTotaal-->410<!--/getal-->
+<!--getal:semantiek.namen-->131<!--/getal--> namen in meer dan één domein heeft,
+waarvan <!--getal:semantiek.betekenissen-->113<!--/getal--> met meer dan één
+betekenis (samen <!--getal:semantiek.betekenissenTotaal-->418<!--/getal-->
 betekenissen).
 
 1. **`envelop`** — bezet en gesloten (zie par. 2).

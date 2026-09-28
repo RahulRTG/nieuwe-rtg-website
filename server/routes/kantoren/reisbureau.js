@@ -76,6 +76,16 @@ module.exports = ({ app, officeAuth, veilig, stuur, afdelingen, kern }) => {
     } catch (e) { console.error('[kantoren]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   });
 
+  // de reis is voorbij (kern/reisbureau-thuis.js): het kantoor meldt hem als het lid dat niet doet
+  app.post('/api/office/reisbureau/thuis', officeAuth, (req, res) => {
+    const wie = kern.boardroomWie(req) || 'backoffice (gedeelde code)';
+    veilig(res, () => {
+      const r = kern.reisbureau.markeerThuis({ ref: String((req.body || {}).ref || ''), door: wie });
+      if (r.ok) afdelingen.audit(wie, 'Reisbureau: reis ' + r.aanvraag.ref + ' thuis (' + r.aanvraag.titel + ')');
+      return r;
+    });
+  });
+
   /* De losse ingangen naast /besluit. Ze bestaan omdat het dossier van het lid
      eraan hangt: bevestigen zet de reis daar op bevestigd, afwijzen haalt hem
      eruit (kern/lid/reisdossier.js). De regel eronder is dezelfde als bij

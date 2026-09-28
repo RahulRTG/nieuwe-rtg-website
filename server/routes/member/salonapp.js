@@ -71,7 +71,7 @@ module.exports = (kern) => {
 
   // waar gaat het over: de onderwerpen die leven, met hun aantallen
   app.post('/api/salon/onderwerpen', auth, (req, res) => {
-    try { res.json({ ok: true, onderwerpen: salon.onderwerpen(req.body.limiet) }); } catch (e) { fout(res, e); }
+    try { res.json({ ok: true, onderwerpen: salon.onderwerpen(req.body.limiet, req.session) }); } catch (e) { fout(res, e); }
   });
 
   // ---- profielen ----
@@ -164,6 +164,6 @@ module.exports = (kern) => {
   });
 
   app.post('/api/salon/ai/waarover', auth, async (req, res) => {
-    try { res.json(await salon.ai.waarOverGaatHet()); } catch (e) { fout(res, e); }
+    try { res.json(await salon.ai.waarOverGaatHet(req.session)); } catch (e) { fout(res, e); }
   });
 };

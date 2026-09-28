@@ -79,6 +79,8 @@ const SLEUTELS = {
   'POST /api/supplier/pay/treasury/apart': { zelfdeVerzoek: true }, // doel + bedrag
   'POST /api/supplier/pay/treasury/vrij': { velden: ['id'] },       // welke pot vrij
   'POST /api/supplier/pay/vrijgeef': { velden: ['reservering'] },   // welke reservering
+  'POST /api/pay/kascode/intrek': { zelfdeVerzoek: true },          // eigen open code dicht
+  'POST /api/pay/tikcode/intrek': { zelfdeVerzoek: true },
 
   /* ---- DE ROUTES MET EEN EIGEN SLEUTEL, en dit is de belangrijkste alinea van
      dit bestand. Ze dragen `idem` in hun body -- en `idem` staat in

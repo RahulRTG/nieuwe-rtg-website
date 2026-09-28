@@ -50,6 +50,7 @@
 /* De eisen zelf wonen bij de ZAAK en niet hier: kern/geschikt.js. Vonk is een
    afnemer van die woordenlijst, niet de eigenaar ervan -- zie de kop daar. */
 const G = require('../geschikt');
+const ConnectionPartner = require('../connection-partner');
 const EISEN = G.EISEN;
 
 /* De soorten uitje, en welke zaaktypen ze bedienen. De typen komen uit de
@@ -101,18 +102,20 @@ function budgetPlafond(a, b) {
    schatting -- allebei aangeleverd, want deze module rekent niet zelf aan
    aardbollen. `waarom` telt wat er per reden afviel, zodat een lege of korte
    lijst zichzelf verklaart. */
-function drieOpties({ a, b, suppliers, mid, afstandM, reisMin }) {
+function drieOpties({ a, b, suppliers, mid, afstandM, reisMin, date, time, bookings }) {
   const wa = a.datewens || {}, wb = b.datewens || {};
   const eisen = [...new Set([...(wa.eisen || []), ...(wb.eisen || [])])].filter(e => eisIds.has(e));
   const plafond = budgetPlafond(wa.budget, wb.budget);
   const gewild = [...new Set([...(wa.soorten || []), ...(wb.soorten || [])])];
-  const waarom = { eis: 0, budget: 0, soort: 0, zonderPlek: 0 };
+  const waarom = { deelname: 0, eis: 0, budget: 0, soort: 0, zonderPlek: 0 };
 
   const kandidaten = [];
   for (const s of Object.values(suppliers || {})) {
     if (!(s.tables || []).length) continue;
     if (s.settings && s.settings.reservationsOpen === false) continue;
     if (!s.loc || !isFinite(s.loc.lat) || !isFinite(s.loc.lng)) { waarom.zonderPlek++; continue; }
+    const basis = { date, time, bookings, activeBookings: ConnectionPartner.activeBookings(bookings, s.code, date, time) };
+    if (!ConnectionPartner.eligible(s, 'vonk', basis).ok) { waarom.deelname++; continue; }
 
     // de eisen: alleen wat de zaak ZELF heeft verklaard telt (zie de kop)
     if (eisen.length && !G.voldoet(s, eisen)) { waarom.eis++; continue; }
@@ -122,12 +125,13 @@ function drieOpties({ a, b, suppliers, mid, afstandM, reisMin }) {
 
     const soorten = SOORTEN.filter(x => x.types.includes(s.type))
       .filter(x => !gewild.length || gewild.includes(x.id));
-    if (!soorten.length) { waarom.soort++; continue; }
+    const toegestaneSoorten = soorten.filter(x => ConnectionPartner.eligible(s, 'vonk', { ...basis, service: x.id }).ok);
+    if (!toegestaneSoorten.length) { waarom.soort++; continue; }
 
     const naarA = afstandM(a, s.loc), naarB = afstandM(b, s.loc);
     if (naarA == null || naarB == null) { waarom.zonderPlek++; continue; }
     kandidaten.push({
-      s, klasse, soorten,
+      s, klasse, soorten: toegestaneSoorten,
       /* "Gelijke reistijd" is de belofte, dus het verschil weegt zwaarder dan de
          som: een plek om de hoek bij de een en een uur rijden voor de ander is
          geen halverwege. */

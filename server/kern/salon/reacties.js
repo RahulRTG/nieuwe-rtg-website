@@ -57,7 +57,7 @@ module.exports = ({ db, save, liveCodename, codenaamVan, keyVanCodenaam, zijnVri
 
   async function reageer(sess, postId, tekst, opId) {
     const p = salon.postMet(postId);
-    if (!p) return { error: 'Deze post bestaat niet.' };
+    if (!salon.magLezen(sess, p)) return { error: 'Deze post is niet beschikbaar.', status: 404 };
     if (!magReageren(sess, p)) return { error: 'De maker heeft reacties beperkt.' };
     const t = String(tekst || '').trim().slice(0, TEKST_MAX);
     if (!t) return { error: 'Schrijf eerst iets.' };
@@ -94,7 +94,7 @@ module.exports = ({ db, save, liveCodename, codenaamVan, keyVanCodenaam, zijnVri
   // De reacties van een post, nieuwste onderaan, met de antwoorden eronder.
   function reacties(sess, postId) {
     const p = salon.postMet(postId);
-    if (!p) return { error: 'Deze post bestaat niet.' };
+    if (!salon.magLezen(sess, p)) return { error: 'Deze post is niet beschikbaar.', status: 404 };
     const alle = (p.comments || []).map(c => publiekeReactie(c, sess));
     const hoofd = alle.filter(c => !c.op);
     return {

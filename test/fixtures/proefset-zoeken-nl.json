@@ -1,0 +1,38 @@
+{
+  "taal": "nl",
+  "uitleg": "Zoekproefset voor tekst.vector (TOESTEL.md par. 13). Twaalf notities zoals een lid ze in zijn eigen kluis zou hebben, en achttien vragen met per vraag de notities die er het antwoord op zijn. De oordelen zijn van de BOUWER en niet van leden: een vraag waar een lid iets anders bij zou verwachten, staat hier niet in. Elke vraag draagt een soort, omdat een gemiddelde over alles verbergt waar een methode faalt: 'letterlijk' deelt woorden met het antwoord, 'omschrijving' zegt hetzelfde met andere woorden, 'andere-taal' vraagt in het Engels naar een Nederlandse notitie.",
+  "notities": [
+    { "id": "vlucht", "tekst": "Vlucht KL1693 naar Lissabon op dinsdag 14 oktober, vertrek 07:25 vanaf Schiphol, stoel 12A." },
+    { "id": "hotel", "tekst": "Hotelboeking in Barcelona van 3 tot 6 november, kamer met balkon, ontbijt inbegrepen, annuleren kan tot 48 uur vooraf." },
+    { "id": "tandarts", "tekst": "Controle bij de tandarts donderdag om 10:15, praktijk aan de Vondelstraat, verzekeringspas meenemen." },
+    { "id": "allergie", "tekst": "Ik ben allergisch voor noten en schaaldieren; bij een reactie de EpiPen in de binnenzak van mijn jas gebruiken." },
+    { "id": "school", "tekst": "Emma begint na de zomer in de brugklas van het Barlaeus; kennismakingsavond voor ouders op 28 augustus." },
+    { "id": "factuur", "tekst": "Facturen voor de zaak graag naar Keizersgracht 100, Amsterdam, ter attentie van de administratie." },
+    { "id": "koffer", "tekst": "Bagage niet aangekomen na de terugreis uit Rome; claimnummer AMS-44871 bij de bagagebalie ingediend." },
+    { "id": "auto", "tekst": "De APK van de Volvo verloopt eind maart; garage belt voor een afspraak." },
+    { "id": "huur", "tekst": "De huurverhoging van dit jaar is 4,5 procent vanaf 1 juli; bezwaar maken kan binnen zes weken." },
+    { "id": "sport", "tekst": "Zaterdag hockey bij Pinoké, Lucas moet om 8:30 aanwezig zijn, rijden is deze week onze beurt." },
+    { "id": "recept", "tekst": "Herhaalrecept voor de bloeddrukpillen aangevraagd bij de huisarts, ophalen bij de apotheek vanaf vrijdag." },
+    { "id": "verjaardag", "tekst": "Oma wordt 80 op 2 december; cadeau regelen en de zaal bij het restaurant reserveren voor twintig personen." }
+  ],
+  "vragen": [
+    { "vraag": "hoe laat vertrekt mijn vlucht naar Lissabon", "relevant": ["vlucht"], "soort": "letterlijk" },
+    { "vraag": "tot wanneer kan ik het hotel in Barcelona annuleren", "relevant": ["hotel"], "soort": "letterlijk" },
+    { "vraag": "wanneer is de afspraak bij de tandarts", "relevant": ["tandarts"], "soort": "letterlijk" },
+    { "vraag": "waar moeten de facturen naartoe", "relevant": ["factuur"], "soort": "letterlijk" },
+    { "vraag": "wanneer verloopt de APK", "relevant": ["auto"], "soort": "letterlijk" },
+    { "vraag": "hoeveel is de huurverhoging", "relevant": ["huur"], "soort": "letterlijk" },
+    { "vraag": "waar ligt mijn medicijn tegen een allergische aanval", "relevant": ["allergie"], "soort": "omschrijving" },
+    { "vraag": "naar welke middelbare school gaat mijn dochter", "relevant": ["school"], "soort": "omschrijving" },
+    { "vraag": "mijn koffer is kwijt, wat is het nummer van de melding", "relevant": ["koffer"], "soort": "omschrijving" },
+    { "vraag": "moet ik dit weekend de kinderen naar de wedstrijd brengen", "relevant": ["sport"], "soort": "omschrijving" },
+    { "vraag": "wanneer kan ik mijn medicijnen ophalen", "relevant": ["recept"], "soort": "omschrijving" },
+    { "vraag": "feest voor de grootmoeder", "relevant": ["verjaardag"], "soort": "omschrijving" },
+    { "vraag": "wat mag ik niet eten", "relevant": ["allergie"], "soort": "omschrijving" },
+    { "vraag": "wanneer moet de auto gekeurd worden", "relevant": ["auto"], "soort": "omschrijving" },
+    { "vraag": "what time is my flight to Lisbon", "relevant": ["vlucht"], "soort": "andere-taal" },
+    { "vraag": "I lost my luggage, what is the claim number", "relevant": ["koffer"], "soort": "andere-taal" },
+    { "vraag": "which foods am I allergic to", "relevant": ["allergie"], "soort": "andere-taal" },
+    { "vraag": "when is the dentist appointment", "relevant": ["tandarts"], "soort": "andere-taal" }
+  ]
+}

@@ -3,7 +3,16 @@
    kern een keer bij het opstarten vanuit routes/supplier/orders.js. */
 module.exports = (kern) => {
   const { app, broadcastSync, logActivity, managerOnly, notify, save, sectiesForOrder, sseToOffice,
-          sseToSupplier, stationsForOrder, supplierAuth, orderMetRef } = kern;
+          sseToSupplier, stationsForOrder, supplierAuth, orderMetRef, afhaalcode } = kern;
+  /* Sluit de zaak een bestelling af, weigert of stort terug, dan gaat de
+     afhaalcode EERST dicht (kern/afhaalcode.js) en pas daarna verandert de
+     order. Lukt het intrekken niet, dan verandert er ook niets: een order die
+     "geweigerd" zegt terwijl zijn code nog werkt, is erger dan een 503. */
+  const sluitCode = async (o, req, reden) => {
+    try { await afhaalcode.sluit({ order: o, actor: 'zaak:' + req.supplier.code, reden }); return true; }
+    catch (e) { return false; }
+  };
+  const CODE_DICHT = ['geserveerd', 'geweigerd', 'opgehaald', 'bezorgd'];
 app.post('/api/supplier/order/sectie', supplierAuth, (req, res) => {
   const o = (x => x && x.supplierCode === req.supplier.code ? x : undefined)(orderMetRef(req.body.ref));
   if (!o) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
@@ -32,7 +41,7 @@ app.post('/api/supplier/order/sectie', supplierAuth, (req, res) => {
     sseToSupplier(req.supplier.code, 'pas', { ref: o.ref, pickup: o.pickup, table: o.table || null });
   sseToOffice('sync', { scope: 'orders' });
   if (o.status === 'klaar' && !wasKlaar && o.customerTier)
-    notify(o.customerTier, { icon: '\u2705', title: req.supplier.name, body: 'Uw bestelling is klaar. Ophaalcode: ' + o.pickup + '.', scope: 'orders' });
+    notify(o.customerTier, { icon: '\u2705', title: req.supplier.name, body: 'Uw bestelling is klaar (bon ' + o.pickup + '). Toon bij het ophalen uw afhaal-QR in de app.', scope: 'orders' });
   logActivity(req.supplier.code, req.actor, sectie + ': ' + o.ref + ' ' + (phase === 'klaar' ? 'klaar' : 'in bereiding'));
   res.json({ ok: true, order: o });
 });
@@ -58,12 +67,12 @@ app.post('/api/supplier/order/station', supplierAuth, (req, res) => {
     sseToSupplier(req.supplier.code, 'pas', { ref: o.ref, pickup: o.pickup, table: o.table || null });
   sseToOffice('sync', { scope: 'orders' });
   if (o.status === 'klaar' && !wasKlaar && o.customerTier)
-    notify(o.customerTier, { icon: '\u2705', title: req.supplier.name, body: 'Uw bestelling is klaar. Ophaalcode: ' + o.pickup + '.', scope: 'orders' });
+    notify(o.customerTier, { icon: '\u2705', title: req.supplier.name, body: 'Uw bestelling is klaar (bon ' + o.pickup + '). Toon bij het ophalen uw afhaal-QR in de app.', scope: 'orders' });
   logActivity(req.supplier.code, req.actor, (station === 'bar' ? 'bar' : 'keuken') + ': ' + o.ref + ' ' + (phase === 'klaar' ? 'klaar' : 'in bereiding'));
   res.json({ ok: true, order: o });
 });
 
-app.post('/api/supplier/order/status', supplierAuth, (req, res) => {
+app.post('/api/supplier/order/status', supplierAuth, async (req, res) => {
   const o = (x => x && x.supplierCode === req.supplier.code ? x : undefined)(orderMetRef(req.body.ref));
   if (!o) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
   const allowed = ['nieuw', 'in bereiding', 'klaar', 'geserveerd', 'geweigerd', 'onderweg', 'bezorgd', 'opgehaald'];
@@ -73,6 +82,8 @@ app.post('/api/supplier/order/status', supplierAuth, (req, res) => {
   // inpakker (tas + bonnummer) en de bezorger (alles gepakt) hebben afgevinkt
   if (status === 'onderweg' && o.levering && !(o.inpak && o.pakcheck))
     return res.status(409).json({ error: 'Eerst afvinken: de inpakker (tas + bonnummer) en de bezorger (alles gepakt). Dan pas vertrekken.' });
+  if (CODE_DICHT.includes(status) && !(await sluitCode(o, req, 'bestelling ' + status)))
+    return res.status(503).json({ error: 'De afhaalcode kon niet worden ingetrokken; de status is niet veranderd.' });
   o.status = status;
   save();
   broadcastSync([o.customerTier], 'orders');
@@ -84,7 +95,7 @@ app.post('/api/supplier/order/status', supplierAuth, (req, res) => {
 
 // tafelreservering bevestigen of weigeren (elke medewerker, op eigen naam)
 
-app.post('/api/supplier/refund', supplierAuth, (req, res) => {
+app.post('/api/supplier/refund', supplierAuth, async (req, res) => {
   if (!managerOnly(req, res)) return; // geld terugstorten is een management-handeling
   const o = (x => x && x.supplierCode === req.supplier.code ? x : undefined)(orderMetRef(req.body.ref));
   if (!o) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
@@ -110,6 +121,8 @@ app.post('/api/supplier/refund', supplierAuth, (req, res) => {
      `paid` zegt dus: er IS betaald. `refunded` zegt: het geld ligt niet meer bij
      de zaak. Wie wil weten of er nu geld staat, leest ze allebei -- en dat doen
      de vier plekken die dat bedoelen sinds deze wijziging ook. */
+  if (!(await sluitCode(o, req, 'bestelling teruggestort')))
+    return res.status(503).json({ error: 'De afhaalcode kon niet worden ingetrokken; er is niets teruggestort.' });
   o.refunded = true;
   o.refundedAt = new Date().toISOString();
   o.terugbetaling = { bedrag: o.total, op: o.refundedAt, door: (req.actor && req.actor.id) || null };

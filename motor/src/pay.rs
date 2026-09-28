@@ -487,13 +487,10 @@ impl State {
         (klopt, som)
     }
 
-    /* Vingerafdruk over ALLE saldi (niet alleen de som). Twee grootboeken kunnen
-       dezelfde som hebben terwijl losse rekeningen tegen elkaar wegvallen; deze
-       afdruk vangt zulke per-rekening-drift die de som mist. FNV-1a (64-bit) over
-       een canonieke bytestroom: rekeningen met saldo != 0, gesorteerd op de rauwe
-       bytes van de sleutel, elk als `sleutel 0x1f <decimaal saldo> 0x0a`. De
-       JS-kant (server/kern/pay/vingerafdruk.js) berekent dit BYTE-VOOR-BYTE
-       hetzelfde, zodat de schaduw-drift-detector ze kan vergelijken. */
+    /* Vingerafdruk over ALLE saldi: vangt per-rekening-drift die de som mist.
+       FNV-1a (64-bit) over rekeningen met saldo != 0, gesorteerd op de rauwe
+       sleutelbytes, elk `sleutel 0x1f <saldo> 0x0a`; byte voor byte gelijk aan
+       server/kern/pay/vingerafdruk.js. */
     pub fn vingerafdruk(&self) -> String { vingerafdruk_van(&self.grb.saldi) }
 
     // ---------- bank-grootboek (cutover stap 3): tweede, aparte Ledger ----------
@@ -551,12 +548,10 @@ impl State {
     }
 
     /* ---------- motor-autoriteit (cutover): geguard boeken ----------
-       I.t.t. spiegel_boek (dat een AL-genomen JS-beslissing rauw herspeelt)
-       NEEMT dit de beslissing zelf, met de volle saldo-guard: onvoldoende saldo
-       -> 402, bedrag buiten bereik -> 400. Bij succes komt de VOLLEDIGE boeking
-       terug, zodat de JS-spiegel exact dezelfde regel toepast (lockstep). Dit is
-       het primitief waarmee de JS-engine in RTG_MOTOR_GELD=motor de motor het
-       enige autoritatieve grootboek maakt. */
+       I.t.t. spiegel_boek NEEMT dit de beslissing zelf, met de volle
+       saldo-guard (402/400). Bij succes komt de VOLLEDIGE boeking terug, zodat
+       de JS-spiegel exact dezelfde regel toepast; zo is de motor in
+       RTG_MOTOR_GELD=motor het enige autoritatieve grootboek. */
     pub fn boek_guard(&mut self, van: &str, naar: &str, centen: i64, soort: &str, oms: &str, ref_: Option<String>) -> Resp {
         match self.grb.boek(BoekArgs { van, naar, centen, soort, oms, ref_ }) {
             Ok(b) => {
@@ -837,9 +832,16 @@ fn boeking_is(boeking: &Json, van: &str, naar: &str, centen: i64,
         boeking.str_at("ref") == ref_
 }
 
+/* Drie soorten economische sleutel, gelijk aan SLEUTEL in
+   server/db/economische-identiteit.js: een teruggeboekte uitbetaling
+   (`payout-terug:`), geld dat een tegoedbon uit de escrow haalt
+   (`pay-tegoed:`) en een deel onder een kascode-claim (`pay-kas:`).
+   Daarachter altijd een SHA-256 en nooit vrije tekst. */
 fn economische_sleutel_geldig(sleutel: &str) -> bool {
     let rest = sleutel.strip_prefix("pay:").or_else(|| sleutel.strip_prefix("bank:"));
-    let hash = match rest.and_then(|r| r.strip_prefix("payout-terug:")) {
+    let hash = match rest.and_then(|r| r.strip_prefix("payout-terug:")
+        .or_else(|| r.strip_prefix("pay-tegoed:"))
+        .or_else(|| r.strip_prefix("pay-kas:"))) {
         Some(v) => v,
         None => return false,
     };
@@ -1209,6 +1211,27 @@ mod tests {
             Some("heen-1".into()), Some(sleutel));
         assert_eq!(botsing.status, 409);
         assert_eq!(herstart.grb.saldo_van("lid:A"), 137);
+    }
+
+    #[test]
+    fn economische_tegoedclaim_boekt_eenmaal_en_andere_soort_blijft_geweigerd() {
+        let mut s = State::new();
+        let sleutel = "pay-tegoed:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+        let een = s.boek_guard_eenmaal("extern:tegoed", "lid:B", 2500, "tegoed", "verzilverd",
+            Some("TG1/claim-1".into()), Some(sleutel));
+        assert_eq!(een.status, 200);
+        let twee = s.boek_guard_eenmaal("extern:tegoed", "lid:B", 2500, "tegoed", "retry",
+            Some("TG1/claim-1".into()), Some(sleutel));
+        assert_eq!(twee.status, 200);
+        assert_eq!(twee.body.bool_at("herhaald"), true);
+        assert_eq!(s.grb.saldo_van("lid:B"), 2500);
+        let kas = "pay-kas:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+        assert_eq!(s.boek_guard_eenmaal("lid:B", "partner:Z", 500, "kassa", "k",
+            Some("KC/c/0".into()), Some(kas)).status, 200);
+        let vrij = "vrije-tekst:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+        assert_eq!(s.boek_guard_eenmaal("extern:tegoed", "lid:B", 1, "tegoed", "x",
+            Some("TG2/claim-1".into()), Some(vrij)).status, 400);
+        assert_eq!(s.grb.saldo_van("lid:B"), 2000);
     }
 
     #[test]

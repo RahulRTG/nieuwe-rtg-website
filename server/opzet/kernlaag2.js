@@ -126,9 +126,9 @@ Object.assign(kern, require('../kern/werkplek')({ db, save, crypto }));
    alleen het accepteren of afwijzen blijft mensenwerk. De AI kent nooit zelf
    Lifestyle/Business toe. */
 Object.assign(kern, require('../kern/aanmeldingen')({ db, save, crypto, schoon, accounts,
-  // laat gebonden: de geld-regie wordt verderop gemount; bij het accepteren
-  // (request-tijd) is kern.geldPasprijzen al beschikbaar voor het betaalschema.
-  geldPasprijzen: () => (kern.geldPasprijzen ? kern.geldPasprijzen() : null) }));
+  // laat gebonden: geld-regie en meldingen (naar gast, C5) staan er pas later
+  geldPasprijzen: () => (kern.geldPasprijzen ? kern.geldPasprijzen() : null),
+  meldLid: (...a) => kern.meldLid && kern.meldLid(...a) }));
 /* De pestgrens (kern/pestgrens.js): drie waarschuwingen bij pesten, dan een
    vurig slotantwoord en 24 uur weg; daarna opent alleen een excuus de deur. */
 Object.assign(kern, require('../kern/pestgrens')({ db, save }));

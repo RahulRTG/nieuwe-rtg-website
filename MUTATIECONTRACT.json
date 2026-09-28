@@ -1,27 +1,27 @@
 {
  "stempel": {
-  "op": "2026-09-27T18:38:46.301Z",
-  "commit": "7f8c6331",
+  "op": "2026-09-28T01:38:21.418Z",
+  "commit": "ed5f4a32",
   "boomVuil": false,
-  "boomAnders": 3,
+  "boomAnders": 9,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5043,
-  "geclassificeerd": 5043,
+  "totaal": 5049,
+  "geclassificeerd": 5049,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3190,
-   "NOT_APPLICABLE": 1214,
-   "PROTECTED": 495,
+   "NOT_APPLICABLE": 1215,
+   "PROTECTED": 500,
    "INTENTIONALLY_NON_IDEMPOTENT": 144
   },
-  "vastgesteldDoorMens": 1902,
+  "vastgesteldDoorMens": 1908,
   "afgeleidDoorScript": 3141,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4152,
+   "AUTHENTICATED": 4158,
    "PUBLIC": 124,
    "OBJECT_SCOPED": 746,
    "(niet af te leiden -- vraagt een verklaring)": 5,
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 136,
    "kale ronde: onbeschermd": 123,
    "kale ronde: geen uitspraak": 4713,
-   "niet gemeten": 71
+   "niet gemeten": 77
   },
   "voorstellen": {},
   "metingVan": "2026-09-19T17:45:58.177Z"
@@ -35781,6 +35781,48 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "leerhuis.doe",
+   "route": "POST /api/leerhuis/doe",
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
+   "duplicaatregel": "velden",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "een zaak in de sessie",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "leerhuis.lees",
+   "route": "POST /api/leerhuis/lees",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "een zaak in de sessie",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "leerstof.antwoord",
    "route": "POST /api/leerstof/antwoord",
    "semantiek": {
@@ -61485,6 +61527,27 @@
     "hindernis": null
    },
    "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.leerhuis.open",
+   "route": "POST /api/office/leerhuis/open",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "velden",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "kluisAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
@@ -90282,6 +90345,50 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "rtfos.vrijwilliger.account.koppel",
+   "route": "POST /api/rtfos/portaal/vrijwilliger/koppel",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth",
+     "mw",
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "rtfos.vrijwilliger.account.ontkoppel",
+   "route": "POST /api/rtfos/portaal/vrijwilliger/ontkoppel",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "rtfos.portaal.vrijwilliger.uren",
    "route": "POST /api/rtfos/portaal/vrijwilliger/uren",
    "semantiek": {
@@ -91933,6 +92040,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "rtfos.vrijwilliger.account.los",
+   "route": "POST /api/rtfos/vrijwilliger/account-los",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

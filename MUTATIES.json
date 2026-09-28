@@ -2281,6 +2281,36 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
+    "democratie-aanval.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "democratie-afhankelijk.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "democratie-grondwet.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 3
+    },
+    "democratie.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
     "demostand.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -5428,6 +5458,13 @@
       "operator": "return-weg#1",
       "gezakt": 4,
       "geprobeerd": 13
+    },
+    "magnaatgroei.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "magnaatgroei.test.js": {
       "soort": "puur",

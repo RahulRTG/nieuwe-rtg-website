@@ -49,6 +49,7 @@ module.exports = function hangDwarseRoutersOp(grens) {
      domein; dat is precies wat CARRIEREVORM.json meet (0 velden gedeeld over
      de vijftien talentdomeinen). */
   require('../routes/carriereledger')(grens('carriereledger'));
+  require('../routes/democratie')(grens('democratie'));
   require('../routes/bestanden')(grens('bestanden'));
   require('../routes/meet')(grens('meet'));
   require('../routes/galerij')(grens('galerij'));

@@ -21,8 +21,8 @@ het?**
 | Bedrijfsgenres | **78** in 28 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
-| Kernmodules (`server/kern/**`) | **2355** |
-| App-pagina's (`public/apps/**.html`) | **311** |
+| Kernmodules (`server/kern/**`) | **2342** |
+| App-pagina's (`public/apps/**.html`) | **310** |
 | Testbestanden | **2077** |
 
 ## De vier werelden
@@ -56,7 +56,7 @@ ook blokkeert.
 
 # 1. De 222 functieschakelaars
 
-### Leden (RTG-app) — 25
+### Leden (RTG-app) — 26
 
 - **Leden-app (algemeen)** (`member`) — Alle ledenfuncties in de RTG-app. Zet je dit uit, dan valt de hele ledenkant stil (behalve wat hieronder apart aan staat).  
   _voor: rtg, lifestyle, business, gast_
@@ -84,6 +84,8 @@ ook blokkeert.
   _voor: rtg, lifestyle, business_
 - **Het Privékantoor (Lifestyle)** (`privekantoor`) — De ene app van de Lifestyle Pass: de levensgraaf over de premium-apps heen, de Control Tower met alle termijnen, het mandaat (wat mag het kantoor zelf) en zaken met een team en een tijdlijn. Uit zetten laat de onderliggende apps staan; alleen de samenhang verdwijnt.  
   _voor: lifestyle, business_
+- **Kwesties inbrengen (DemocratieOS)** (`democratie`) — Een burger brengt een kwestie in en volgt wat ermee gebeurt. Alleen voor iedereen tegelijk aan of uit: nooit per persoon, plaats, pas of canary.  
+  _voor: rtg, lifestyle, business, gast_
 - **De app-staat** (`kern-state`) — De ene aanroep waarmee de app zijn hele beeld ophaalt. Uit betekent een lege app voor iedereen.  
   _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
 - **De live-verbinding** (`kern-live`) — De open lijn (SSE) waarover meldingen en verversingen binnenkomen, plus de verbindingsgegevens voor bellen.  
@@ -143,7 +145,7 @@ ook blokkeert.
 - **RTG Commerce (mand & retour)** (`commerce`) — De verkooplaag boven de domeinen: wat er te koop staat en wat NIET met de reden erbij, een mand over verkopers heen met een afrekening per verkoper, de overdracht naar de deur die bevestigt, en de weg terug. RTG bevestigt hier zelf niets.  
   _voor: rtg, lifestyle, business_
 
-### Eigen apps — 42
+### Eigen apps — 41
 
 - **Spelen (spellen met vrienden)** (`spellen`) — Alle spellen: schaken, dammen, rummi, Magnaat, sudoku en de partyspellen.  
   _voor: rtg, lifestyle, business, foundation_
@@ -227,8 +229,6 @@ ook blokkeert.
   _voor: rtg, lifestyle, business_
 - **Ontdekken (leren, doen, doorgeven)** (`connect`) — Een ontdeklijst die wordt samengesteld uit lagen die RTG al heeft: leerstof en wat er in de buurt gebeurt. Bezit zelf geen inhoud. Er wordt niets gerangschikt en er staat geen cijfer op iets of iemand; elke plek zegt welke motor hem koos en waarom. Wat u hebt gezien, begrepen, geoefend, gemaakt of doorgegeven blijft als lijst staan -- nooit als niveau, en nooit vergeleken met iemand anders. Uitzetten haalt uw leerdossier niet weg; het sluit alleen de ingang.  
   _voor: rtg, lifestyle, business, foundation_
-- **RTG Academy (leren, bewijzen, certificeren)** (`leerhuis`) — Het leerhuis: van rol en officiele kennis via oefenen, simulatie, werk onder toezicht en een onafhankelijke beoordeling naar een certificaat, en terug via verbetervoorstellen uit de praktijk. Staat uit tot de besluiten in ACADEMY.md par. 5 zijn uitgevoerd. Een certificaat verleent geen bevoegdheid; het maakt iemand hoogstens geschikt volgens een beleid dat twee mensen hebben vastgesteld.  
-  _voor: rtg, lifestyle, business_
 
 ### Partners (leveranciers) — 11
 

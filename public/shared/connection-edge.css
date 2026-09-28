@@ -100,7 +100,7 @@ html.rtg-tekst-groot .connection-edge__action,html.rtg-tekst-groter .connection-
 /* Standalone products share the world frame; their domain actions stay inline. */
 body[data-rtg-layout="standard"] .connection-edge.is-inline{
   position:relative;inset:auto;z-index:auto;width:100%;margin:0 0 20px;padding:8px;
-  border:1px solid var(--rtg-world-line);border-radius:4px;background:var(--rtg-world-card);
+  border:1px solid var(--rtg-world-line);border-radius:var(--rtg-radius-system,22px);background:var(--rtg-world-card);
   color:var(--rtg-world-ink);box-shadow:none;backdrop-filter:none;transform:none;
 }
 .connection-edge.is-inline::before{display:none;}
@@ -108,7 +108,7 @@ body[data-rtg-layout="standard"] .connection-edge.is-inline{
 .connection-edge.is-inline{grid-template-columns:auto minmax(0,1fr);}
 .connection-edge.is-inline .connection-edge__context,.connection-edge.is-inline .connection-edge__mark{color:var(--rtg-world-metal);}
 .connection-edge.is-inline .connection-edge__rail{overflow-x:auto;}
-.connection-edge.is-inline .connection-edge__action{border-radius:4px;min-height:44px;}
+.connection-edge.is-inline .connection-edge__action{border-radius:var(--rtg-radius-system,22px);min-height:44px;}
 .connection-edge.is-inline .connection-edge__action:hover,
 .connection-edge.is-inline .connection-edge__action[aria-current="page"]{
   color:var(--rtg-world-ink);border-color:var(--rtg-world-line);background:var(--rtg-world-card-strong);

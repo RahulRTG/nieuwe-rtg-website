@@ -3,23 +3,23 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-09-28",
-  "commit": "40ca52a8"
+  "commit": "f17c6065"
  },
  "grens": "Een voorvoegsel uit een sjabloon met een gat is GEEN route en wordt nooit tegen de routelijst gelegd. Exacte paden wel: een exact pad dat niet bestaat, is een dood pad.",
  "gemetenTegen": {
   "register": "ROUTEBRON.json",
   "stempel": {
-   "op": "2026-09-28T01:43:06.436Z",
-   "commit": "40ca52a8"
+   "op": "2026-09-28T09:56:59.412Z",
+   "commit": "f17c6065"
   },
-  "bekendePaden": 5147
+  "bekendePaden": 5156
  },
  "gemeten": {
-  "schermenMetPad": 415,
+  "schermenMetPad": 416,
   "nietGelezen": 3,
   "exactePaden": 946,
   "verwijzingen": 1127,
-  "voorvoegsels": 142,
+  "voorvoegsels": 143,
   "basisPaden": 2,
   "doodPad": 0,
   "doodPadVerwijzingen": 0
@@ -7856,6 +7856,13 @@
    "exact": [],
    "voorvoegsels": [
     "/api/foundation/gezin/"
+   ]
+  },
+  {
+   "bestand": "public/apps/foundation/samendoen.js",
+   "exact": [],
+   "voorvoegsels": [
+    "/api/member/democratie/actie/"
    ]
   },
   {

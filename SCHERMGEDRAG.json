@@ -3,7 +3,7 @@
  "uitleg": "Wat een scherm in public/ via de API kan veroorzaken: schrijft het, welke rol vraagt het, wat is het bewijs waard, en wat doet een tweede aanroep. Samengesteld uit bestaande metingen -- hier wordt niets nieuws gemeten en niets geraden.",
  "stempel": {
   "op": "2026-09-28",
-  "commit": "40ca52a8"
+  "commit": "f17c6065"
  },
  "grond": [
   "SCHERMROUTES.json",
@@ -15,21 +15,21 @@
  "grens": "AFGELEID gedrag: wat het scherm via de API kan veroorzaken. NIET wat het scherm zelf doet (localStorage, DOM, een berekening). `schrijft: nee` betekent dus \"verandert niets aan de serverkant\" en niet \"verandert niets\".",
  "samenstelregel": "schrijven: de ZWAARSTE uitkomst wint (een van de tien routes schrijft = dit scherm kan iets veranderen). Bewijs: het ZWAKSTE telt, want een keten is zo sterk als zijn zwakste schakel. Onbekend is in beide gevallen niet de gunstige uitkomst.",
  "gemeten": {
-  "schermen": 415,
+  "schermen": 416,
   "metGrond": 265,
-  "zonderGrond": 150,
+  "zonderGrond": 151,
   "schrijftJa": 65,
   "schrijftNee": 1,
   "schrijftOnbekend": 156,
-  "schrijftNietVastTeStellen": 193,
+  "schrijftNietVastTeStellen": 194,
   "bewijsVerdeling": {
    "verzwakt": 210,
-   "niet vast te stellen": 173,
+   "niet vast te stellen": 174,
    "ONBEPAALD": 32
   },
   "bewijsBewezen": 0,
   "bewijsVerzwakt": 210,
-  "bewijsNietVastTeStellen": 173,
+  "bewijsNietVastTeStellen": 174,
   "onbekendeBewijswaarden": [],
   "zonderRol": 45
  },
@@ -83,6 +83,7 @@
   "public/apps/foundation/registreren.js",
   "public/apps/foundation/samen-thuis.js",
   "public/apps/foundation/samen/samen-01.js",
+  "public/apps/foundation/samendoen.js",
   "public/apps/foundation/schoolbieb.html",
   "public/apps/foundation/schrijven.html",
   "public/apps/foundation/sessie/sessie-01.js",
@@ -4691,6 +4692,17 @@
   },
   {
    "bestand": "public/apps/foundation/samen-thuis.js",
+   "padenGenoemd": 0,
+   "voorvoegsels": 1,
+   "routesGeraakt": 0,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
+  },
+  {
+   "bestand": "public/apps/foundation/samendoen.js",
    "padenGenoemd": 0,
    "voorvoegsels": 1,
    "routesGeraakt": 0,

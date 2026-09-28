@@ -600,6 +600,16 @@
     },
     {
       "schermen": [
+        "apps/salon.html",
+        "apps/wereld.html"
+      ],
+      "klasse": "gedeeltelijk",
+      "stand": "blijft",
+      "eigenaar": "apps/salon.html",
+      "reden": "De Saloon op \"Alles bij elkaar\" (public/apps/saloon/*.js) is een tweede PRESENTATIE van De Salon en geen tweede Salon: plaatsen, reageren en reacties lezen gaan langs de routes en de opslag van De Salon zelf (/api/salon/plaats, /reageer, /reacties), zoals saloon.js in zijn kop zegt: de Saloon bepaalt de presentatie, de bronapp voert de handeling uit. Het overlappende deel heeft dus al een eigenaar. Vastgelegd op 28 september 2026, toen een verse SCHERMROUTES.json dit paar liet zien dat het oude register nog niet kende."
+    },
+    {
+      "schermen": [
         "apps/wereld.html",
         "apps/sociaal.html"
       ],

@@ -46,7 +46,7 @@ test('het manifest dekt 295 echte schermen en 18 redirects precies eenmaal', () 
   const echtManifest = identiteit.VALUES.flatMap((wereld) => identiteit.MANIFEST[wereld]);
   const allesManifest = echtManifest.concat(identiteit.REDIRECTS);
 
-  assert.equal(BESTANDEN.length, 311, 'de appboom hoort 311 HTML-bestanden te bevatten');
+  assert.equal(BESTANDEN.length, 313, 'de appboom hoort 313 HTML-bestanden te bevatten');
   assert.equal(ECHTE_ROUTES.length, 295, 'exact 295 blijvende schermen horen basis.js te laden');
   assert.equal(DOORWIJZERS.length, 18, 'exact 18 oude adressen horen doorwijzers te blijven');
   assert.equal(echtManifest.length, 295, 'het vierwereldenmanifest hoort 295 schermen te bevatten');

@@ -9,7 +9,6 @@ module.exports = (ctx) => {
     BEV_FUNCTIES, BEV_SHIFTS, BEV_ERNST, AANVR_KLAAR,
     id, nu, vandaag, schoon, getal, shiftVan, isBeveiliging, defaults, functieAan,
     diensten, aanvragen, incidenten, rondes, guards, guardNaam, postVan, functieLijst, zetPost } = ctx;
-  const inplanbaar = require('../../payroll/inplanbaar').maakInplanbaar(ctx.afwezigOp);
   /* ---- budget: geplande uren x tarief tegen het contractbudget ---- */
   function budget(s, opts) {
     opts = opts || {};

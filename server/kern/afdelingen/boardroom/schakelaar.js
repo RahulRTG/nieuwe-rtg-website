@@ -27,6 +27,7 @@ module.exports = (ctx) => {
     if (!st[id]) st[id] = {};
     // de hand wint van de automaat: een bewuste schakeling wist het
     // automaat-merk, zodat de storingswachter deze stand met rust laat
+    if (doelgroep && functies.OP_ID[id].alleenGlobaal) return { status: 409, error: 'Deze functie gaat alleen voor iedereen tegelijk aan of uit, niet per ' + 'pas' + '.' };
     delete st[id].automaat;
     if (doelgroep) {
       if (!functies.DOELGROEP_IDS.includes(doelgroep)) return { status: 400, error: 'Onbekende doelgroep.' };
@@ -48,6 +49,7 @@ module.exports = (ctx) => {
   function schakelGenre(id, genre, aan, wie) {
     const f = functies.OP_ID[id];
     if (!f) return { status: 404, error: 'Onbekende functie.' };
+    if (f.alleenGlobaal) return { status: 409, error: 'Deze functie gaat alleen voor iedereen tegelijk aan of uit, niet per ' + 'genre' + '.' };
     if (!d().supplierTypes || !d().supplierTypes[genre]) return { status: 404, error: 'Dit genre bestaat niet.' };
     const st = functiesStand();
     if (!st[id]) st[id] = {};
@@ -127,6 +129,7 @@ module.exports = (ctx) => {
     const VELD = { plaats: 'perPlaats', land: 'perLand', persoon: 'perPersoon' };
     const veld = VELD[as];
     if (!veld) return { status: 400, error: 'Onbekende as (plaats, land of persoon).' };
+    if (functies.OP_ID[id].alleenGlobaal) return { status: 409, error: 'Deze functie gaat alleen voor iedereen tegelijk aan of uit, niet per ' + as + '.' };
     const s = as === 'plaats' ? functies.plaatsNorm(sleutel)
       : as === 'land' ? (String(sleutel || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2) || null)
       : (/^user-\d+$/.test(String(sleutel || '')) ? String(sleutel) : null);

@@ -55,12 +55,16 @@ module.exports = ({ kern, db, save, crypto, sseToCustomer, sendPush, sendPushToU
       try { process.kill(process.pid, 'SIGKILL'); } catch (e) { process.abort(); }
     }
     const n = { id: crypto.randomBytes(4).toString('hex'), read: false, at: new Date().toISOString(), ...note };
-    if (kern.rustMagDoor && !kern.rustMagDoor(handle, n)) return n;
+    /* Tegengehouden is NIET bezorgd, en het antwoord zegt dat: null. Wie op de
+       uitslag leunt (kern/democratie legt er de trede `gewekt` op vast), mag een
+       melding die de rust of de voorkeur van het lid tegenhield niet als
+       verstuurd boeken. */
+    if (kern.rustMagDoor && !kern.rustMagDoor(handle, n)) return null;
     /* De voorkeur van het lid geldt alleen voor gewone berichten. Afwezig
        betekent aan -- dezelfde regel als in notify(). */
     if (!veiligheid && n.scope) {
       const vk = (db.data.meldingVoorkeur || {})[handle];
-      if (vk && vk[n.scope] === false) return n;
+      if (vk && vk[n.scope] === false) return null;
     }
     db.data.notifications[handle] = (db.data.notifications[handle] || []);
     db.data.notifications[handle].unshift(n);

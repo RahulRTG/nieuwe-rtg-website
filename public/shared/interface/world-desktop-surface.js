@@ -2,8 +2,8 @@
    Embedded apps use their parent's frame; only the outer document owns Edge. */
 (function (w, d) {
   'use strict';
-  var overlays = 'script,style,link,template,dialog,[role="dialog"],.scrim,.palet,.melding,.toast,.first-message,.skip,.skip-link,.vis-verborgen,.rtg-edge-chrome,.rtg-adaptive-shell,.rtg-adaptive-bar,.rnd-toets,.rnd-hint,.ios-thuis,.rtg-spring,#rtfOnb';
-  // Wat op het scherm ZWEEFT (melding, toast, first-message) blijft buiten .wd-page:
+  var overlays = 'script,style,link,template,dialog,[role="dialog"],.scrim,.palet,.melding,.toast,.first-message,.rtg-deep-nav,.skip,.skip-link,.vis-verborgen,.rtg-edge-chrome,.rtg-adaptive-shell,.rtg-adaptive-bar,.rnd-toets,.rnd-hint,.ios-thuis,.rtg-spring,#rtfOnb';
+  // Wat op het scherm ZWEEFT (melding, toast, first-message, de vaste deep-nav) blijft buiten .wd-page:
   // die draagt contain:layout, en daarbinnen is position:fixed niet meer aan het
   // venster vast maar aan de pagina -- een melding landde dan midden op de inhoud.
   function prepare() {

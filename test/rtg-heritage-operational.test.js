@@ -87,8 +87,7 @@ test('ieder gemarkeerd wereldscherm krijgt dezelfde buitenmaat en veilige Edge-r
 
 test('de gedeelde schermlaag overschrijft geen lokaal bewezen achtergrondparen', () => {
   const hoofdregel = WERELDSCHERMEN.match(
-    /* sinds de desktopstandaard (#413) sluit de regel het bureau uit in plaats van de wereldhome */
-    /body\[data-rtg-skin="heritage"\]\[data-rtg-world\]\[data-rtg-screen\]:not\(\[data-rtg-(?:screen="world-home"|desktop)\]\)\{([^}]*)\}/
+    /body\[data-rtg-skin="heritage"\]\[data-rtg-world\]\[data-rtg-screen\]:not\(\[data-rtg-screen="world-home"\]\)\{([^}]*)\}/
   );
   assert.ok(hoofdregel, 'de centrale schermgrens ontbreekt');
   assert.doesNotMatch(hoofdregel[1], /background(?:-color|-image|-attachment)?\s*:/,

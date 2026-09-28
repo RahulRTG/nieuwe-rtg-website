@@ -1120,7 +1120,7 @@ function laadPlaywright(opties) {
          met "Executable doesn't exist", en dat is rood dat niets over de code
          zegt. Deze controle komt uit scripts/lib/scherm.js en staat sinds de
          samenvoeging van 20 augustus 2026 hier, op de ene plek. */
-      if (mod && mod.chromium && fs.existsSync(process.env.RTG_BROWSER_PATH || mod.chromium.executablePath())) {
+      if (mod && mod.chromium && fs.existsSync(mod.chromium.executablePath())) {
         const endpoint = process.env.RTG_SHARED_BROWSER_ENDPOINT;
         if (!endpoint) return mod;
         /* Een verbonden client ruimt bij `browser.close()` zijn eigen

@@ -143,10 +143,10 @@ body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"] .rtg-edge-bottom .rtg-edg
 body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="overview"] .rtg-edge-top,
 body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="overview"] .rtg-edge-side,
 body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="overview"] .rtg-edge-bottom{transform:none!important}
-body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="compact"]:not([data-rtg-desktop]) .rtg-edge-top{transform:translateY(-101%)!important;visibility:hidden;pointer-events:none}
+body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="compact"] .rtg-edge-top{transform:translateY(-101%)!important;visibility:hidden;pointer-events:none}
 body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="compact"] .rtg-edge-side{transform:translateX(-101%)!important;visibility:hidden;pointer-events:none}
 body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="compact"] .rtg-edge-bottom{transform:translateY(101%)!important;visibility:hidden;pointer-events:none}
-body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"]:not([data-rtg-desktop]) .rtg-edge-top{transform:translateY(-101%)!important;visibility:hidden;pointer-events:none}
+body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"] .rtg-edge-top{transform:translateY(-101%)!important;visibility:hidden;pointer-events:none}
 body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"] .rtg-edge-side{transform:translateX(-101%)!important;visibility:hidden;pointer-events:none}
 body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"] .rtg-edge-bottom{transform:translateY(101%)!important;visibility:hidden;pointer-events:none}
 /* ============================================================================
@@ -176,8 +176,8 @@ body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="fo
    Zolang dat niet is opgelost staan de werelden met hun NAAM op het
    beginscherm zelf (shared/command/beginscherm.js), waar ruimte is; de
    pictogrammen in de rand zijn de snelweg voor wie de weg al kent. */
-body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="compact"]:not([data-rtg-desktop]){padding:0!important}
-body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"]:not([data-rtg-desktop]){padding:0!important}
+body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="compact"]{padding:0!important}
+body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"]{padding:0!important}
 body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="compact"]>header:not(.rtg-edge-top),
 body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"]>header:not(.rtg-edge-top){top:0!important}
 body.rtg-edge-host[data-rtg-edge-2-rendered="true"]:is([data-rtg-edge-2-state="compact"],[data-rtg-edge-2-state="focus"]) .pda-nav{bottom:0!important}

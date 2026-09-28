@@ -93,10 +93,10 @@ test('Saloon houdt Edge bereikbaar bij lezen, bewaren, teruggaan en bronuitval',
     await page.getByRole('tab', { name: 'Heel RTG', exact: true }).click();
     await page.locator('.rtg-edge-face-all:not([hidden])').waitFor();
     assert.equal(await page.locator('.rtg-edge-smart-worlds a').count(), 4);
-    const menuLicht = await page.locator('.rtg-edge-faces').evaluate(n => {
-      const rgb = getComputedStyle(n).backgroundColor.match(/[\d.]+/g).map(Number); return rgb.slice(0, 3).every(x => x > 220);
+    const menuDonker = await page.locator('.rtg-edge-faces').evaluate(n => {
+      const rgb = getComputedStyle(n).backgroundColor.match(/[\d.]+/g).map(Number); return rgb.slice(0, 3).every(x => x < 60);
     });
-    assert.equal(menuLicht, true, 'het echte Edge-menu gebruikt het lichte LivingOS-materiaal');
+    assert.equal(menuDonker, true, 'het echte Edge-menu behoudt het donkere Saloon-materiaal');
     assert.match(await page.locator('.rtg-edge-top').evaluate(n => getComputedStyle(n).backgroundColor), /^rgb\(/,
       'de bovenrand is dekkend wanneer de artikelkop eronder scrollt');
     await foto('saloon-menu-gebouwd'); await page.keyboard.press('Escape');

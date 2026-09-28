@@ -76,7 +76,7 @@
       current = x; title.textContent = name; direct.href = url; direct.hidden = true; retry.hidden = true;
       U.copy(notice, 'frameLoading'); notice.hidden = x.ready;
       entries.forEach(function (entry) { entry.frame.hidden = entry !== x; });
-      o.home.hidden = true; o.favorites.hidden = false; o.surface.hidden = false; o.root.classList.add('wd-expanded');
+      o.home.hidden = true; o.favorites.hidden = true; o.surface.hidden = false; o.root.classList.add('wd-expanded');
       o.surface.scrollIntoView({ block: 'start', behavior: 'instant' }); title.focus({ preventScroll: true }); refreshEdge(); return true;
     }
     function controls(container, collect) {

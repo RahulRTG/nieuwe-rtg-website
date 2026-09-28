@@ -1,4 +1,7 @@
-/* Saloon uses the same light LivingOS palette, including the Edge menu. */
+/* De bestaande Edge houdt alle navigatie en focus. Alleen het materiaal
+   sluit in Saloon aan bij de goedgekeurde donkere leesomgeving. */
+body.rtg-saloon-experience .rtg-edge-index:has(.rtg-edge-faces){--edge-bg:#100e0d;--edge-panel:#191513;--edge-copy:#f6efe3;--edge-dim:#c9c0b6;--edge-line:rgba(226,195,137,.34);--edge-accent:#e2c389;--edge-accent-soft:rgba(226,195,137,.08);--edge-metal:#e2c389;color-scheme:dark}
+body.rtg-saloon-experience[data-rtg-edge-2][data-rtg-edge-2-rendered="true"] .rtg-edge-top{background:#100e0d!important}
 body.rtg-saloon-experience .rtg-edge-face-tabs{border:0;border-bottom:1px solid var(--edge-line)}
 body.rtg-saloon-experience .rtg-edge-face-tabs button{font:400 14px/1.4 Inter,sans-serif!important;border-bottom:2px solid transparent!important}
 body.rtg-saloon-experience .rtg-edge-face-tabs button[aria-selected="true"]{background:transparent!important;border-bottom-color:var(--edge-metal)!important;color:var(--edge-copy)!important}

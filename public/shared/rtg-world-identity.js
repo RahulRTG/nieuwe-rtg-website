@@ -72,6 +72,13 @@
       rechtbank rijksloket schoolpartner zorgbalie')
   });
 
+  /* Bestaande functionele materiaalgrenzen: routes kunnen geen vrij thema kiezen. */
+  var MATERIALS = Object.freeze({
+    onyx: routes('agenda bestanden galerij genootschap notities pulse reisbureau salon berichten camera comm festival foundation/onveilig foundation/registreren foundation/wegwijzer geld-command horeca-beheer horeca-bezorg horeca-club horeca-events horeca-expeditie horeca-haccp horeca-hotel horeca hotels ik juridisch/partnervoorwaarden juridisch/privacy juridisch/voorwaarden leven leverancier living-os loopbaan loopbaanbewijs media move muziek office reisboek rit sociaal veilig verificatie vertegenwoordiging vluchten werkruimte wereld'),
+    bordeaux: routes('appstore-dossier arrival boeken cellier chauffeur clips commerce flits foodcourt foundation/vrienden garderobe geld hangar krant lifestyle luchthaven maison mall mijnmall navigatie nieuws ov ovcontrol ovdienst ovroutes pay podium reizen reizen-veilig residentie routedossier scherm spelen spelscherm sport stad table theater thuis uitgaan vandaag'),
+    pearl: routes('attenties cercle entourage rendezvous vonk')
+  });
+
   var REDIRECTS = routes('\
     balans bank berichten codewoord geld-command labfonds logboek mecenaat metier nalatenschap rtgcode thuisrust \
     thuiswacht toestemming vandaag vitaal wallet wbw');
@@ -113,7 +120,9 @@
     var wereld = classificeer(huidig);
     if (wereld && wereld !== 'redirect') {
       body.setAttribute('data-rtg-world', wereld);
-      if (body.removeAttribute) body.removeAttribute('data-rtg-eigenvlak');
+      var material = Object.keys(MATERIALS).find(function (key) { return MATERIALS[key].indexOf(normaliseer(huidig)) >= 0; });
+      if (material) body.setAttribute('data-rtg-eigenvlak', material);
+      else if (body.removeAttribute) body.removeAttribute('data-rtg-eigenvlak');
     }
     return wereld;
   }
@@ -121,6 +130,7 @@
   return Object.freeze({
     VALUES: Object.freeze(['living', 'travel', 'work', 'foundation']),
     MANIFEST: MANIFEST,
+    MATERIALS: MATERIALS,
     REDIRECTS: REDIRECTS,
     normalizePath: normaliseer,
     classify: classificeer,

@@ -1,27 +1,20 @@
-/* One desktop composition for every world screen. */
+/* One desktop composition for all four existing world homes. */
 (function (w, d) {
   'use strict';
   function start() {
-    if (d.querySelector('.wd-shell')) return;
-    var home = w.RTGDesktopSurface.prepare(), world = d.body.dataset.rtgWorld, U = w.RTGDesktopUI;
-    if (!home) throw new Error('desktop-content-missing');
-    d.body.dataset.rtgDesktop = world;
-    d.body.dataset.rtgDesktopState = 'loading';
+    var home = d.querySelector('main'), world = d.body.dataset.worldHome, U = w.RTGDesktopUI;
+    if (!home || d.querySelector('.wd-shell')) return;
+    w.fetch('/shared/interface/world-widget-catalog.json', { credentials: 'same-origin' }).then(function (r) {
+      if (!r.ok) throw new Error('catalog-unavailable'); return r.json();
+    }).then(function (catalog) {
+      var all = catalog.apps, apps = all.filter(function (a) { return a.worlds.includes(world) &&
+        (world !== 'foundation' || a.world === 'foundation' || a.url.includes('pas=foundation')); });
       var root = U.el('div', 'wd-shell'), people = U.label(U.el('aside', 'wd-people'), 'people');
       var favorites = U.label(U.el('aside', 'wd-favorites'), 'favorites'), surface = U.el('section', 'wd-focus');
       var library = U.label(U.el('section', 'wd-library'), 'library'), announcement = U.el('p', 'wd-announcement');
       announcement.setAttribute('role', 'status'); announcement.hidden = true; surface.hidden = true;
       home.before(root); home.classList.add('wd-home'); root.appendChild(people); root.appendChild(home);
       root.appendChild(favorites); root.appendChild(surface); root.appendChild(announcement); root.appendChild(library);
-      w.RTGDesktopSurface.guard(root, home);
-    var loadingHeader = U.el('header','wd-greeting'), loadingTitle=U.el('h1','',d.title);
-    loadingHeader.appendChild(loadingTitle);root.prepend(loadingHeader);
-    library.setAttribute('aria-busy','true');
-    w.fetch('/shared/interface/world-widget-catalog.json', { credentials: 'same-origin' }).then(function (r) {
-      if (!r.ok) throw new Error('catalog-unavailable'); return r.json();
-    }).then(function (catalog) {
-      var all = catalog.apps, apps = all.filter(function (a) { return a.worlds.includes(world) &&
-        (world !== 'foundation' || a.world === 'foundation' || a.url.includes('pas=foundation')); });
       var frame = w.RTGDesktopFrameHost({ root: root, home: home, favorites: favorites, surface: surface,
         paths: new Set((world === 'foundation' ? apps : all).map(function (a) { return a.url.split(/[?#]/)[0]; })),
         announce: function (text) { announcement.textContent = text; announcement.hidden = false; announcement.scrollIntoView({ block: 'nearest' }); } });
@@ -44,13 +37,11 @@
       runtime.mount(people); runtime.setHidden('desktop.widgets', true); runtime.setState('workspace');
       var greeting = U.el('header', 'wd-greeting'), welcome = U.el('h1'), calendar = U.el('time'), name = '';
       greeting.appendChild(welcome); greeting.appendChild(calendar); greeting.appendChild(U.copy(U.el('p'), world === 'foundation' ? 'free' : 'tagline'));
-      loadingHeader.replaceWith(greeting);
-      library.removeAttribute('aria-busy');
+      root.prepend(greeting);
       function greet() {
         welcome.textContent = ''; welcome.appendChild(U.copy(U.el('span'), 'greeting'));
         if (name) { var personal = U.el('span', '', ', ' + name); personal.dataset.userContent = ''; personal.translate = false; welcome.appendChild(personal); }
         welcome.appendChild(d.createTextNode('.'));
-        if (!d.body.dataset.worldHome) welcome.textContent = d.title.replace(/^(RTG|LivingOS|TravelOS|WorkOS|FoundationOS)\s*[·\u2014:|-]?\s*/, '') || 'RTG';
         calendar.textContent = new Intl.DateTimeFormat(d.documentElement.lang || 'nl', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date());
         calendar.dateTime = w.RTGWidgetData.date();
       }
@@ -64,7 +55,7 @@
       var cards = w.RTGDesktopCards({ world: world, apps: apps, favorites: favorites, library: library, runtime: runtime,
         defaults: defaults[world].filter(function (id) { return apps.some(function (a) { return a.id === id; }); }),
         open: function (app, trigger, action) { runtime.navigation.open(app.url, app.name, 'desktop-catalog'); if (action) frame.prepare(action); } });
-      d.body.dataset.rtgDesktopState = 'ready';
+      d.body.dataset.rtgDesktop = world;
       function edge() {
         if (!w.RTGAdaptiveEdge) return;
         var brand = d.querySelector('.rtg-edge-mark');
@@ -83,12 +74,10 @@
       w.addEventListener('rtglang', function () { cards.refresh(); runtime.setState('workspace'); edge(); greet(); });
       w.addEventListener('pagehide', function () { watch.disconnect(); runtime.destroy(); });
       w.RTGDesktopHome.current = { runtime: runtime, cards: cards, frame: frame };
-    }).catch(function (error) {
-      d.body.dataset.rtgDesktopState = 'error';
-      library.removeAttribute('aria-busy');
-      announcement.textContent = (d.documentElement.lang === 'en' ? 'The app library could not be loaded.' : 'De appbibliotheek kon niet worden geladen.');
-      announcement.hidden = false;
-      console.error('RTG desktop: ' + error.message);
+    }).catch(function () {
+      // Catalog failure does not replace or conceal the functioning world home.
+      var shell = d.querySelector('.wd-shell'); if (shell) { shell.before(home); home.hidden = false; shell.remove(); }
+      delete d.body.dataset.rtgDesktop;
     });
   }
   w.RTGDesktopHome = { start: start };

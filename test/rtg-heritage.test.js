@@ -14,7 +14,6 @@ const MATERIALEN = lees('public/shared/rtg-heritage-materials.css');
 const ADAPTERS = lees('public/shared/rtg-heritage-adapters.css');
 const COMPONENTEN = lees('public/shared/rtg-heritage-components.css');
 const SIMPLE = lees('public/shared/rtg-simple.css');
-const PALETTE = lees('public/shared/rtg-world-palette.css');
 const WERELDSCHERMEN = lees('public/shared/rtg-world-screen.css');
 const EDGE = lees('public/shared/rtg-edge-library.js');
 const CHECK = lees('scripts/check.js');
@@ -35,27 +34,33 @@ test('de centrale laag blijft klein, gesplitst en laat alle delen één keer bin
 
 test('vier vaste werelden delen één volledige token- en dieptegrammatica', () => {
   for (const wereld of ['living', 'travel', 'work', 'foundation']) {
-    const blok = new RegExp('data-rtg-world="' + wereld + '"\\][^{]*\\{([^]*?)\\n\\}').exec(PALETTE);
+    const blok = new RegExp('data-rtg-world="' + wereld + '"\\]\\{([^]*?)\\n\\}').exec(TOKENS);
     assert.ok(blok, wereld + ' mist een vaste wereldidentiteit');
     for (const token of ['bg', 'card', 'card-strong', 'ink', 'muted', 'line', 'signature', 'metal']) {
       assert.match(blok[1], new RegExp('--rtg-world-' + token + ':'), wereld + ' mist ' + token);
     }
-    assert.match(PALETTE, /--rtg-world-photo:none!important;/, wereld + ' mag geen foto wereldwijd herhalen');
+    assert.match(blok[1], /--rtg-world-photo:none;/, wereld + ' mag geen foto wereldwijd herhalen');
   }
   for (const token of ['--rtg-depth-content:', '--rtg-depth-focus:', '--rtg-depth-system:',
-    '--rtg-radius-content:16px', '--rtg-radius-editorial:16px', '--rtg-radius-system:22px', '--rtg-target:48px']) {
+    '--rtg-radius-content:2px', '--rtg-radius-editorial:16px', '--rtg-radius-system:22px', '--rtg-target:48px']) {
     assert.ok(TOKENS.includes(token), token + ' ontbreekt');
   }
 });
 
-test('LivingOS blijft champagne; routes hebben geen eigen donker thema meer', () => {
-  assert.doesNotMatch(TOKENS, /data-rtg-eigenvlak/);
-  assert.doesNotMatch(SIMPLE, /--rtg-world-bg:/);
-  const living = PALETTE.match(/data-rtg-world="living"[^}]+/)[0];
-  assert.match(living, /--rtg-world-bg:#f4efe6!important/);
-  assert.match(living, /--rtg-world-ink:#302b25!important/);
-  assert.match(living, /--rtg-world-schema:light!important/);
-  assert.match(PALETTE, /--edge-bar-bg:var\(--rtg-world-card\)!important/);
+test('eigen donkere routevlakken dragen hun volledige Heritage-inktset', () => {
+  assert.match(TOKENS, /\[data-rtg-world="living"\]\{[^}]*--rtg-world-muted:#51493f/s);
+  for (const vlak of ['onyx', 'bordeaux']) {
+    const blok = TOKENS.match(new RegExp(`body\\[data-rtg-skin="heritage"\\]\\[data-rtg-eigenvlak="${vlak}"\\]\\{([^}]+)\\}`));
+    assert.ok(blok, `${vlak} heeft een eigen Heritage-contract`);
+    for (const token of ['bg', 'ground', 'card', 'card-strong', 'ink', 'muted', 'line',
+      'signature', 'signature-soft', 'metal', 'action', 'action-ink', 'schema', 'photo', 'photo-mask']) {
+      assert.match(blok[1], new RegExp(`--rtg-world-${token}:`), `${vlak} zet ${token}`);
+    }
+  }
+  assert.match(TOKENS, /--rtg-opgoud:var\(--rtg-world-action-ink\)/);
+  assert.match(TOKENS, /--rtg-goud-hoog:var\(--rtg-world-action\)/);
+  assert.match(TOKENS, /--rtg-oppervlak:linear-gradient\([^;]+var\(--rtg-world-card\)/s);
+  assert.match(TOKENS, /--rtg-oppervlak-2:linear-gradient\([^;]+var\(--rtg-world-card-strong\)/s);
 });
 
 test('Bodoni blijft redactioneel en Inter blijft operationeel', () => {
@@ -117,7 +122,7 @@ test('bestaande echte DOM wordt geadapteerd zonder knoppen of data te kopiëren'
 });
 
 test('Heritage laadt de centrale visuele standaard als laatste laag', () => {
-  assert.equal([...TOKENS.matchAll(/@import url\('([^']+)'\);/g)].at(-1)[1], './rtg-world-palette.css',
+  assert.equal([...TOKENS.matchAll(/@import url\('([^']+)'\);/g)].at(-1)[1], './rtg-world-screen.css',
     'last import is shared and project-relative; no query that the CSS bundler would discard');
   assert.equal((TOKENS.match(/rtg-simple\.css/g) || []).length, 1);
   assert.match(WERELDSCHERMEN, /data-rtg-screen-root="content"/);
@@ -126,13 +131,27 @@ test('Heritage laadt de centrale visuele standaard als laatste laag', () => {
   assert.match(WERELDSCHERMEN, /data-rtg-component="ContextStrip"/);
 });
 
-test('iedere wereld krijgt een rustig eigen accent zonder globale herhaalfoto', () => {
-  const accents = {living:'#89704b',travel:'#c4a0a6',work:'#91b7a9',foundation:'#cbb681'};
-  for (const [world,accent] of Object.entries(accents)) {
-    const block = PALETTE.match(new RegExp('data-rtg-world="'+world+'"[^}]+'))[0];
-    assert.ok(block.includes('--rtg-world-signature:'+accent+'!important'));
+test('de vier werelden houden hun merkaccent zonder globale herhaalfoto', () => {
+  const werelden = {
+    living: '#ebcc94',
+    travel: '#a82c51',
+    work: '#c8bda9',
+    foundation: '#3d68c9'
+  };
+  for (const [wereld, accent] of Object.entries(werelden)) {
+    const omgeving = SIMPLE.match(new RegExp(
+      'body\\[data-rtg-skin="heritage"\\]\\[data-rtg-world="' + wereld +
+      '"\\]:not\\(\\[data-rtg-eigenvlak\\]\\)\\{([^}]+)\\}'
+    ));
+    assert.ok(omgeving, wereld + ' mist de gedeelde wereldomgeving');
+    assert.match(omgeving[1], /--rtg-world-photo:none/, wereld + ' mag geen foto aan iedere app opdringen');
+    assert.ok(SIMPLE.includes('--edge-bar-accent:' + accent), wereld + ' mist het juiste accent');
+    const kaart = SIMPLE.match(new RegExp(
+      '\\.cmd-startwereld\\[data-world="' + wereld + '"\\]\\{([^}]+)\\}'
+    ));
+    assert.ok(kaart, wereld + ' mist de wereldkaart');
+    assert.match(kaart[1], /--rtg-card-photo:none/, wereld + ' navigatiekaart gebruikt eigen materiaal');
   }
-  assert.match(PALETTE,/--rtg-world-photo:none!important/);
 });
 
 test('de vaste volgorde is Home, Werelden, AI, Acties, Menu', () => {
@@ -205,20 +224,22 @@ test('de volledige Heritage-laag reist mee in beide offline schillen', () => {
 test('routevarianten en canvaskeuzes zijn volledig herleidbaar tot het centrale register', () => {
   const identity = require('../public/shared/rtg-world-identity');
   const registry = require('../public/shared/rtg-heritage-registry');
+  const seen = new Map();
+  for (const [material, routes] of Object.entries(identity.MATERIALS)) for (const route of routes) {
+    assert.equal(seen.has(route), false, route + ' heeft twee materiaalidentiteiten');
+    seen.set(route, material);
+    assert.ok(fs.existsSync(path.join(ROOT, 'public', route)), route + ' bestaat niet');
+  }
   const variants = new Set([...Object.values(registry.profiles).flatMap(p => p.rules), ...registry.common].map(r => r.variant));
   for (const file of fs.readdirSync(path.join(ROOT, 'public/apps'), { recursive: true }).filter(f => f.endsWith('.html'))) {
     const html = lees('public/apps/' + file);
-    const body = (html.match(/<body\b[^>]*>/i) || [''])[0];
+    const body = (html.match(/^<body\b[^>]*>/im) || [''])[0];
     const material = (body.match(/data-rtg-eigenvlak="([^"]+)"/) || [])[1];
-    assert.equal(material, undefined, file + ' gebruikt nog een oude materiaalvariant');
-    if (identity.classify('/apps/'+file) !== 'redirect') {
-      assert.match(body, /data-rtg-layout="standard"/, file+' mist de standaard');
-      assert.equal((html.match(/src="\/shared\/rtg-world-desktop\.js"/g)||[]).length,1,file+' mist de desktoploader');
-    }
+    if (material) assert.equal(seen.get('/apps/' + file), material, file + ' kiest een ongeoorloofde materiaalvariant');
     for (const match of html.matchAll(/data-rtg-component-variant="([^"]+)"/g)) assert.ok(variants.has(match[1]), file + ': onbekende componentvariant ' + match[1]);
   }
   for (const route of Object.keys(registry.canvas)) {
-    const body = lees('public' + route).match(/<body\b[^>]*>/i)[0];
+    const body = lees('public' + route).match(/^<body\b[^>]*>/im)[0];
     assert.match(body, /data-rtg-edge-2-state="compact"/, route + ': canvas opent compact');
     assert.match(body, /data-rtg-edge-2-auto="false"/, route + ': bediening wacht op de gebruiker');
   }

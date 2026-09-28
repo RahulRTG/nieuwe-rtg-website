@@ -59,7 +59,6 @@
     "sprongindex": "node scripts/sprongindex.js",
     "sprongindex:controle": "node scripts/sprongindex.js --controle",
     "heritage:controle": "node scripts/heritage-uitrol.js",
-    "desktop:controle": "node scripts/desktop-audit.js",
     "heritage:vast": "node scripts/heritage-uitrol.js --vastleggen",
     "wereldstijl": "node scripts/wereldstijl.js",
     "wereldrooster": "node scripts/wereldrooster.js",

@@ -56,7 +56,7 @@
   greeting.append(languageNotice);root.append(greeting,people,home,favorites,focus,library);
   var footer=node('footer',null,'pp-footer');footer.append(node('p','freeFull'),node('span','footer'));
   source.before(header,root,footer,menuPanel,worldPanel);source.classList.add('pp-source');source.setAttribute('aria-hidden','true');
-  d.body.classList.add('rtg-stijl');d.body.dataset.rtgSkin='heritage';d.body.dataset.rtgLayout='standard';d.body.dataset.publicPlatform=kind;d.body.dataset.worldHome='living';d.body.dataset.rtgDesktop='living';
+  d.body.classList.add('rtg-stijl');d.body.dataset.rtgSkin='heritage';d.body.dataset.publicPlatform=kind;d.body.dataset.worldHome='living';d.body.dataset.rtgDesktop='living';
   var skip=d.querySelector('.skip-link');if(skip)skip.href='#platform-home';
   controller=w.RTGPublicController({o:o,data:data,company:company,root:root,detail:detail,focus:focus,focusTitle:focusTitle,home:home,favorites:favorites,library:library,title:title,body:body,picture:picture,stories:stories,stepper:stepper,overline:overline,summary:summary,language:language,search:search,filter:filter,catalog:catalog,empty:empty,gridButton:gridButton,listButton:listButton,menuPanel:menuPanel,worldPanel:worldPanel});
   var widgets=(company?w.RTGCompanyWidgets:w.RTGPublicWidgets)({o:o,data:data,company:company,favorites:favorites,refresh:refresh});

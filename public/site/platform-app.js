@@ -3,13 +3,7 @@
  'use strict';
  var P=w.RTGPublicPlatform,X=w.RTGExperience;if(!P||!X)return;
  var hash=new URLSearchParams(w.location.hash.replace(/^#rtg\?/,'')),shell;
- var source=d.getElementById('inhoud');
  var titles={verhaal:'originCardTitle',versnippering:'originCardTitle',moment:'proposalOpen',rahul:'rahulAppCardTitle','uw-rtg':'why',werelden:'worlds',regie:'regie',service:'support',foundation:'foundationAppCardTitle',passen:'accessCardTitle',vragen:'faq',begin:'createCardTitle'};
- source.querySelectorAll('[data-scene]').forEach(function(el){
-  if(titles[el.id])return;
-  var key='section'+el.id, title=el.dataset.scene;
-  w.RTGPublicContent.words[key]=[title,title];w.I18N.en['public.'+key]=title;titles[el.id]=key;
- });
  function open(id){
   if(id==='top'||id==='platform-home'){shell.collapse();return;}
   if(id==='language'){w.RTGi18n.openModal();return;}
@@ -23,9 +17,6 @@
   select:function(story){X.choose(story.id==='travelWorld'?'travel':story.id,false);},
   calendar:function(value){X.permission('calendar',value);}});
  w.RTGPublicApp={shell:shell,open:open};
- var sections=P.node('nav',null,'pp-section-index');sections.setAttribute('aria-label','Alle onderdelen');
- source.querySelectorAll('[data-scene]').forEach(function(el){var b=P.button(titles[el.id],function(){open(el.id);},'pp-button');sections.append(b);});
- d.querySelector('.wd-library').append(sections);
  var footer=d.querySelector('.pp-footer'),nav=P.node('nav',null,'pp-footer-links');
  [['support','mailto:roellie.i@gmail.com'],['privacy','https://app.rahultravelgroup.com/apps/juridisch/privacy.html'],['terms','https://app.rahultravelgroup.com/apps/juridisch/voorwaarden.html']].forEach(function(row){var a=P.node('a',row[0],'pp-button');a.href=row[1];nav.append(a);});footer.append(nav);
  X.permission('calendar',false);

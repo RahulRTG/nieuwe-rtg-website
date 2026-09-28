@@ -122,7 +122,7 @@
     setTimeout(function () { if (aiWatcher) { aiWatcher.disconnect(); aiWatcher = null; } }, 10000);
   }
   function context(c) { if (!A) return; A.ctx = Object.assign({}, A.ctx, c || {}); teken(); }
-  function setLayout(n) { if (!A) return; A.layout = innerWidth < 768 ? 1 : ([1, 2, 4].indexOf(+n) >= 0 ? +n : 1); d.body.dataset.rtgPanelLayout = A.layout; A.root.querySelector('.rtg-edge-layout small').textContent = A.layout; w.dispatchEvent(new CustomEvent('rtg-edge-layout', { detail: { layout: A.layout } })); }
+  function setLayout(n) { if (!A) return; A.layout = innerWidth < 768 ? 1 : ([1, 2, 4].indexOf(+n) >= 0 ? +n : 1); d.body.dataset.rtgLayout = A.layout; A.root.querySelector('.rtg-edge-layout small').textContent = A.layout; w.dispatchEvent(new CustomEvent('rtg-edge-layout', { detail: { layout: A.layout } })); }
   var api = { start: start, setContext: context, setLayout: setLayout, openFunctions: function () { openIndex(true); }, get config() { return C; }, get layout() { return A ? A.layout : 1; }, get active() { return A; } };
   w.RTGEdge=api;
 })(window,document);

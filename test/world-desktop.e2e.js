@@ -151,9 +151,6 @@ test('Foundation widgets read the chosen family profile without a paid member ac
     await page.evaluate(() => window.RTGi18n.set('ar'));
     assert.equal(await page.locator('html').getAttribute('dir'), 'rtl');
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true);
-    await open(page, '/apps/foundation/agenda.html');
-    await page.waitForFunction(() => !document.documentElement.classList.contains('rtf-toegang-dicht'));
-    assert.equal(await page.locator('.wd-home').isVisible(), true, 'the authorized family can still use the actual agenda');
   } finally { await ctx.close(); }
 });
 /* HOME OVERLEEFT EEN HERSTART VAN DE EDGE. Het tweede register begint bij elke
@@ -193,78 +190,5 @@ test('Vrienden stands in the Foundation library because its world says so, not b
     await page.waitForSelector('.wd-library .wd-catalog [data-widget="foundation-vrienden"]', { timeout: 5000 });
     assert.equal(await page.locator('.wd-library .wd-catalog [data-widget="foundation-vrienden"]').count(), 1);
     assert.deepEqual(errors, []);
-  } finally { await ctx.close(); }
-});
-
-test('direct function screens keep their inputs when the common frame changes size', { skip }, async () => {
-  const ctx = await context(), page = await ctx.newPage();
-  try {
-    await open(page, '/apps/notities.html');
-    await page.locator('#zoek').fill('Desktop taken');
-    await page.setViewportSize({ width: 390, height: 844 });
-    assert.equal(await page.locator('#zoek').inputValue(), 'Desktop taken');
-    assert.equal(await page.locator('.wd-people').isVisible(), false);
-    await page.setViewportSize({ width: 1440, height: 1050 });
-    assert.equal(await page.locator('#zoek').inputValue(), 'Desktop taken');
-    assert.equal(await page.locator('.wd-shell').count(), 1);
-    const expected = 'rgb(244, 239, 230)';
-    assert.equal(await page.locator('body').evaluate(e => getComputedStyle(e).backgroundColor), expected);
-    // Control experiment: the rendered check detects the retired dark Living theme.
-    await page.addStyleTag({ content: 'body[data-rtg-layout][data-rtg-world][data-rtg-skin][data-rtg-desktop]{background:#000!important}' });
-    assert.notEqual(await page.locator('body').evaluate(e => getComputedStyle(e).backgroundColor), expected);
-  } finally { await ctx.close(); }
-});
-
-test('the Foundation access gate uses the standard while protected controls stay inaccessible', { skip }, async () => {
-  const ctx = await context(null), page = await ctx.newPage();
-  try {
-    await open(page, '/apps/foundation/agenda.html');
-    await page.waitForSelector('.wd-access');
-    assert.equal(await page.locator('.wd-home').isVisible(), false);
-    assert.equal(await page.locator('.wd-home').evaluate(e => e.inert), true);
-    assert.equal(await page.locator('.wd-access [data-rtf-wissel]').isVisible(), true);
-    assert.equal(await page.locator('.rtg-adaptive-bar').isVisible(), true);
-    assert.equal(await page.locator('body').getAttribute('data-rtg-desktop-access'), 'locked');
-  } finally { await ctx.close(); }
-});
-
-test('a missing catalogue reports failure inside the standard without restoring an old layout', { skip }, async () => {
-  const ctx = await context(null), page = await ctx.newPage();
-  try {
-    await page.route('**/shared/interface/world-widget-catalog.json', r => r.fulfill({ status:503, body:'unavailable' }));
-    await page.goto(srv.base + '/apps/agenda.html');
-    await page.waitForSelector('body[data-rtg-desktop-state="error"]');
-    assert.equal(await page.locator('.wd-shell').count(), 1);
-    assert.equal(await page.locator('.wd-home').isVisible(), true);
-    assert.match(await page.locator('.wd-announcement').innerText(), /kon niet worden geladen/);
-    const x = await page.locator('.wd-shell').evaluate(e => e.getBoundingClientRect().x);
-    assert.equal(x, 40);
-  } finally { await ctx.close(); }
-});
-
-test('a shared projector never loads the signed-in member’s personal desktop widgets', { skip }, async () => {
-  const ctx = await context(), page = await ctx.newPage(), reads = [];
-  page.on('request', r => { if (/\/api\/(?:comm\/|agenda\/|notities\/|member\/connect)/.test(r.url())) reads.push(r.url()); });
-  try {
-    await open(page, '/apps/spelscherm.html');
-    assert.equal(await page.locator('.wd-shell').count(), 1);
-    assert.equal(await page.locator('.wd-widget').count(), 0);
-    assert.deepEqual(reads, []);
-    assert.equal(await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]').isDisabled(), true);
-  } finally { await ctx.close(); }
-});
-
-test('the public website keeps the same side columns when opening existing content', { skip }, async () => {
-  const ctx = await context(null), page = await ctx.newPage();
-  try {
-    await page.goto(srv.base + '/');
-    await page.waitForSelector('body[data-public-platform="app"] .wd-shell');
-    await page.evaluate(() => window.RTGPublicApp.open('platform'));
-    assert.equal(await page.locator('#platform').isVisible(), true);
-    assert.equal(await page.locator('.wd-people').isVisible(), true);
-    assert.equal(await page.locator('.wd-favorites').isVisible(), true);
-    assert.equal(await page.locator('.rtg-adaptive-bar').count(), 1);
-    await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="home"]').click();
-    assert.equal(await page.locator('.wd-home').isVisible(), true);
   } finally { await ctx.close(); }
 });

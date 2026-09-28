@@ -1,43 +1,43 @@
 /* Four editorial rooms, one shared Edge. Content remains real HTML, so text
    size, language and reading direction can change independently of the photos. */
-body.rtg-first-page{background:var(--rtg-world-bg)!important;color:#f4f0e9;--bg:var(--rtg-world-bg);--txt:var(--rtg-world-ink);--muted:var(--rtg-world-muted);--soft:#c7bdad;--line:rgba(215,189,139,.24)}
+body.rtg-first-page{background:#0C0C0B!important;color:#f4f0e9;--bg:#0C0C0B;--txt:#f4f0e9;--muted:#d1c9be;--soft:#c7bdad;--line:rgba(215,189,139,.24)}
 body.rtg-first-page main{max-width:1100px!important;padding:0!important;margin:0 auto!important;width:100%;min-width:0}
 body.rtg-first-page .salon-werkveld{max-width:none;padding:0;margin:0;display:block}
 body.rtg-first-page .salon-stage{display:block;margin:0;padding:0}
 body[data-rtg-editorial-room] .salon-kringlink{display:inline-flex;align-items:center;min-height:44px;padding-block:10px}
 body.rtg-first-page :is(.salon-briefing,.salon-socialnav,.rtg-social-commandbar,.salon-werkveld>header> .kop,.gallery-explanation){display:none!important}
-body.rtg-first-page>header,body.rtg-first-page .salon-werkveld>header{background:var(--rtg-world-bg);border:0;padding:0;position:static;min-height:0}
+body.rtg-first-page>header,body.rtg-first-page .salon-werkveld>header{background:#0C0C0B;border:0;padding:0;position:static;min-height:0}
 body.rtg-first-page>header>:not(.tabs){display:none}
 body.rtg-first-page .rtg-duimbalk{position:static;min-height:0;padding:0;border:0;background:none}
-.rtg-first-steps{position:relative;isolation:isolate;background:var(--rtg-world-bg);color:#f4f0e9;overflow:hidden;text-align:start;padding-bottom:28px}
+.rtg-first-steps{position:relative;isolation:isolate;background:#0C0C0B;color:#f4f0e9;overflow:hidden;text-align:start;padding-bottom:28px}
 .rtg-first-steps *{box-sizing:border-box}
 .rtg-first-steps .first-hero{position:relative;isolation:isolate;min-height:440px;display:flex;flex-direction:column;justify-content:flex-end;padding:170px 26px 30px}
 .rtg-first-steps .first-photo{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;object-position:center 45%}
-.rtg-first-steps .first-hero::after{content:'';position:absolute;z-index:-1;inset:0;background:linear-gradient(180deg,rgba(12,12,11,.06),rgba(12,12,11,.03) 28%,rgba(12,12,11,.58) 65%,var(--rtg-world-bg) 100%)}
+.rtg-first-steps .first-hero::after{content:'';position:absolute;z-index:-1;inset:0;background:linear-gradient(180deg,rgba(12,12,11,.06),rgba(12,12,11,.03) 28%,rgba(12,12,11,.58) 65%,#0C0C0B 100%)}
 .rtg-first-steps .first-eyebrow{margin:0 0 16px;color:#dfc491;font:500 10px/1.6 Inter,sans-serif;letter-spacing:.25em;text-transform:uppercase}
 .rtg-first-steps .first-heading h1{font:400 clamp(44px,12.6vw,66px)/1.02 'Bodoni Moda',Georgia,serif;letter-spacing:-.045em;max-width:12ch;margin:0;color:#f4f0e9;text-wrap:balance;overflow-wrap:normal}
 .rtg-first-steps .first-caption{margin:20px 0 0;color:#ddd2c2;font:italic 11px/1.6 'Bodoni Moda',Georgia,serif;text-align:end}
 .rtg-first-steps .first-copy{padding:0 26px;position:relative}
-.rtg-first-steps .first-intro{font:400 14px/1.7 Inter,sans-serif;color:var(--rtg-world-muted);margin:0 0 22px;max-width:50ch}
-.rtg-first-steps .first-action{display:flex;align-items:center;justify-content:space-between;gap:18px;width:100%;min-height:54px;margin:0;padding:12px 20px;background:transparent;border:1px solid var(--rtg-world-metal);border-radius:0;color:var(--rtg-world-metal);font:400 21px/1.25 'Bodoni Moda',Georgia,serif;text-align:start;text-decoration:none;cursor:pointer;white-space:normal}
+.rtg-first-steps .first-intro{font:400 14px/1.7 Inter,sans-serif;color:#e6dfd5;margin:0 0 22px;max-width:50ch}
+.rtg-first-steps .first-action{display:flex;align-items:center;justify-content:space-between;gap:18px;width:100%;min-height:54px;margin:0;padding:12px 20px;background:transparent;border:1px solid #d7bd8b;border-radius:0;color:#e8cea0;font:400 21px/1.25 'Bodoni Moda',Georgia,serif;text-align:start;text-decoration:none;cursor:pointer;white-space:normal}
 .rtg-first-steps .first-action:hover{background:rgba(215,189,139,.08)}
 .rtg-first-steps :is(button,a):focus-visible{outline:2px solid #f2d39b;outline-offset:4px}
 .rtg-first-steps .first-arrow{font:300 25px/1 Inter,sans-serif;flex-shrink:0}
 [dir="rtl"] .rtg-first-steps .first-arrow{transform:scaleX(-1)}
-.rtg-first-steps .first-secondary{border:0;display:flex;justify-content:center;width:fit-content;max-width:100%;margin:10px auto 0;padding:10px 2px;font:400 13px/1.5 Inter,sans-serif;color:var(--rtg-world-muted);text-decoration:underline;text-underline-offset:6px}
+.rtg-first-steps .first-secondary{border:0;display:flex;justify-content:center;width:fit-content;max-width:100%;margin:10px auto 0;padding:10px 2px;font:400 13px/1.5 Inter,sans-serif;color:#e6dfd5;text-decoration:underline;text-underline-offset:6px}
 .rtg-first-steps .first-note{margin-top:24px;padding-top:22px;border-top:1px solid rgba(215,189,139,.25);font:400 12px/1.6 Inter,sans-serif;color:#cfc3b1}
 .rtg-first-steps .first-note p{margin:0 0 4px}
 .rtg-first-steps .first-note .first-eyebrow{margin-bottom:12px}
 .rtg-first-steps .first-closing{font:400 24px/1.4 'Bodoni Moda',Georgia,serif;color:#f4f0e9}
 .rtg-first-steps .first-subheading{font:400 24px/1.2 'Bodoni Moda',Georgia,serif;margin:20px 0 12px;color:#f4f0e9}
 .rtg-first-steps .first-interests{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:24px}
-.rtg-first-steps .first-interests button{min-width:0;border:0;background:none;color:var(--rtg-world-muted);text-align:start;font:400 11px/1.5 Inter,sans-serif;padding:0 0 8px;cursor:pointer}
+.rtg-first-steps .first-interests button{min-width:0;border:0;background:none;color:#e6dfd5;text-align:start;font:400 11px/1.5 Inter,sans-serif;padding:0 0 8px;cursor:pointer}
 .rtg-first-steps .first-interests img{width:100%;height:auto;aspect-ratio:1;object-fit:cover;display:block;margin-bottom:7px;border-radius:0}
-.rtg-first-steps .first-interest-mark{display:grid;place-items:center;aspect-ratio:1;margin-bottom:7px;border:1px solid var(--rtg-world-metal)50;color:#dfc491;background:radial-gradient(ellipse at center,#61412455,#14110e)}
+.rtg-first-steps .first-interest-mark{display:grid;place-items:center;aspect-ratio:1;margin-bottom:7px;border:1px solid #d7bd8b50;color:#dfc491;background:radial-gradient(ellipse at center,#61412455,#14110e)}
 .rtg-first-steps .first-interest-mark svg{width:36px;height:36px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .rtg-first-steps .first-preferences{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
-.rtg-first-steps .first-preferences button{flex:1 1 90px;min-height:44px;padding:8px;border:1px solid rgba(215,189,139,.45);background:none;color:var(--rtg-world-muted);font:400 11px/1.5 Inter,sans-serif;cursor:pointer;border-radius:0}
-.rtg-first-steps .first-preferences button[aria-pressed="true"]{background:var(--rtg-world-metal);color:var(--rtg-world-bg);border-color:var(--rtg-world-metal)}
+.rtg-first-steps .first-preferences button{flex:1 1 90px;min-height:44px;padding:8px;border:1px solid rgba(215,189,139,.45);background:none;color:#e6dfd5;font:400 11px/1.5 Inter,sans-serif;cursor:pointer;border-radius:0}
+.rtg-first-steps .first-preferences button[aria-pressed="true"]{background:#d7bd8b;color:#0C0C0B;border-color:#d7bd8b}
 .rtg-first-steps.first-genootschappen .first-hero{min-height:365px;padding-top:200px}
 .rtg-first-steps.first-genootschappen h1{font-size:clamp(40px,10.8vw,60px);max-width:13ch}
 .rtg-first-steps.first-reisbureau .first-hero{min-height:470px;padding-top:285px}
@@ -46,10 +46,10 @@ body.rtg-first-page .rtg-duimbalk{position:static;min-height:0;padding:0;border:
 .rtg-first-steps.first-galerij h1{max-width:14ch;font-size:clamp(42px,11.3vw,64px)}
 .rtg-first-steps .first-memories{margin:8px 0 24px;position:relative}
 .rtg-first-steps .first-memories img{width:100%;height:auto;display:block;aspect-ratio:4/3;object-fit:contain}
-.rtg-first-steps .first-memories figcaption{text-align:end;padding:0 26px;font:italic 13px/1.6 'Bodoni Moda',Georgia,serif;color:var(--rtg-world-metal)}
+.rtg-first-steps .first-memories figcaption{text-align:end;padding:0 26px;font:italic 13px/1.6 'Bodoni Moda',Georgia,serif;color:#d7bd8b}
 .rtg-first-steps.first-galerij .first-copy{text-align:center}
 .rtg-first-steps .first-privacy{font:400 11px/1.7 Inter,sans-serif;color:#cfc3b1;margin:24px 0 0}
-.rtg-first-steps .first-privacy::before{content:'';display:block;width:20px;height:1px;background:var(--rtg-world-metal);margin:0 auto 18px}
+.rtg-first-steps .first-privacy::before{content:'';display:block;width:20px;height:1px;background:#d7bd8b;margin:0 auto 18px}
 body.rtg-first-page #lijst:has(.rtg-first-steps){display:block;margin:0}
 body.rtg-first-page #travelAdvice{margin:24px;scroll-margin-top:90px}
 body.rtg-first-page #mijnWrap:not(:empty){margin:24px}
@@ -72,7 +72,7 @@ body.rtg-first-page .first-guest-controls{display:none}
 body.rtg-first-page[data-rtg-adaptive-ready="true"]>header,
 body.rtg-first-page[data-rtg-adaptive-ready="true"] .salon-werkveld>header,
 body.rtg-first-page main>:is(.ios-groot,.ios-boven,.ios-onder){display:none!important}
-body.rtg-first-page .salon-werkveld{background:var(--rtg-world-bg);min-height:0}
+body.rtg-first-page .salon-werkveld{background:#0C0C0B;min-height:0}
 body.rtg-first-page .salon-werkveld>header::before,
 body.rtg-first-page .salon-werkveld>header::after{display:none}
 body[data-rtg-adaptive-ready="true"] .salon-socialnav,
@@ -90,5 +90,3 @@ body.rtg-first-page.rtg-edge-embed .salon-werkveld>header{display:none!important
 body[data-rtg-editorial-room] .melding{bottom:calc(var(--rtg-adaptive-inset,100px) + 16px);z-index:8895;max-width:min(90vw,520px)}
 .first-message:not([hidden]){position:fixed;inset:auto 20px calc(var(--rtg-adaptive-inset,100px) + 16px);z-index:8895;max-width:560px;margin-inline:auto;padding:14px 16px;display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);color:var(--txt);font:400 14px/1.5 Inter,sans-serif}
 .first-message button{border:0;background:transparent;color:inherit;min-width:44px;min-height:44px;font:inherit;cursor:pointer}
-
-.rtg-first-steps .first-hero::after{background:linear-gradient(180deg,transparent 8%,rgba(12,12,11,.14) 32%,rgba(12,12,11,.8) 65%,#0C0C0B 100%)}

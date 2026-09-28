@@ -299,7 +299,7 @@ const KAART = [
     ['beslist', '-', 'hooguit vier frames', "if (!x && entries.length >= 4) { o.announce(U.value('limit')); return false; }"],
     ['leest', 'identiteit:l', 'herlaadt bij een sessiewissel', "e.key === 'rtg_member_token' || e.key === 'rtf_sessie'"]]],
   ['interface/world-desktop-home.js', 'schil', 'wereld:sl', [
-    ['leest', 'wereld:l', 'de wereld van het bureau', 'world = d.body.dataset.rtgWorld'],
+    ['leest', 'wereld:l', 'de wereld van het bureau', 'world = d.body.dataset.worldHome'],
     ['schrijft', 'wereld:s', 'wereldlabel in het merk van de Edge', 'label.translate = false; brand.appendChild(label);'],
     ['beslist', '-', 'Home klapt het frame in en annuleert de navigatie', "w.addEventListener('rtg-edge-home', function (e) {"]]],
   ['rtg-continue-key-core.js', 'continuiteit', 'hoofdactie:sb', [
@@ -393,14 +393,7 @@ const KAART = [
   ['public/site/start/experience.js', 'afnemer', 'wereld:s', [
     ['schrijft', 'wereld:s', 'wereld op body in de werelden-scene', 'd.body.dataset.rtgWorld = currentWorld;']]],
   ['public/site/start/experience-graph.js', 'afnemer', 'wereld:s', [
-    ['schrijft', 'wereld:s', 'wereld op body bij een keuze in de graaf', 'd.body.dataset.rtgWorld = id;']]],
-  /* De platformlanding (index.html) sinds de desktopstandaard: de controller
-     zet de wereld per verhaal en per keuze, de app in de werelden-scene. */
-  ['public/site/platform-controller.js', 'afnemer', 'wereld:s', [
-    ['schrijft', 'wereld:s', 'wereld op body per verhaal', 'd.body.dataset.rtgWorld=story.world;'],
-    ['schrijft', 'wereld:s', 'wereld op body bij een keuze', 'd.body.dataset.rtgWorld=selected.world;']]],
-  ['public/site/platform-app.js', 'afnemer', 'wereld:s', [
-    ['schrijft', 'wereld:s', 'wereld op body in de werelden-scene', "if(id==='werelden'){d.body.dataset.rtgWorld=X.currentWorld();"]]]
+    ['schrijft', 'wereld:s', 'wereld op body bij een keuze in de graaf', 'd.body.dataset.rtgWorld = id;']]]
 ];
 
 /* Waarom een dubbele eigenaar dubbel is. Afgeleid wordt WIE; dit zegt WAAROM.
@@ -639,7 +632,7 @@ const ANDERE_REGISTERS = [
 /* Een schrijver zonder lader is geen eigenaar. Of de lader ontbreekt, wordt bij
    elke meting opnieuw nagekeken: noemt een bestand in de wandeling de naam, dan
    vervalt de uitzondering en zakt de controle. */
-const ZONDER_LADER = [];
+const ZONDER_LADER = ['public/site/platform-controller.js', 'public/site/platform-app.js'];
 const ATTR = { wereld: 'data-rtg-world', zichtbaarheidsstand: 'data-rtg-edge-2-state' };
 
 function afgeleid(lijst = wandeling()) {

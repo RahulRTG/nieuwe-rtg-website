@@ -277,6 +277,8 @@
     "bewijsmatrix:vast": "node scripts/bewijsmatrix.js --vastleggen",
     "vertrouwen": "node scripts/vertrouwen.js",
     "routeversheid": "node scripts/routeversheid.js",
+    "routenoemer": "node scripts/routenoemer.js",
+    "vervalproef": "node scripts/vervalproef.js",
     "vertrouwen:vast": "node scripts/vertrouwen.js --vastleggen",
     "klok": "node scripts/klok.js",
     "klokwacht": "node scripts/klokwacht.js",

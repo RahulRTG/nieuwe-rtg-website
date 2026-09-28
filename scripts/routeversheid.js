@@ -1,70 +1,58 @@
 #!/usr/bin/env node
 /* ============================================================================
-   DE ROUTEVERSHEID -- vervalt het bewijs van een route omdat iets waar hij van
-   AFHANGT is veranderd?
+   HET BEWIJSVERVAL PER ROUTE -- welk bewijs van deze route spreekt over een
+   vorige wereld, omdat iets waar hij AANTOONBAAR van afhangt is veranderd?
 
    WAAROM DIT ER IS
 
-   PROOF.md par. 2 zegt dat bewijs veroudert, en scripts/vertrouwen.js maakt dat
-   waar -- maar grof, en dat staat er zelf in: "de halfwaardetijd geldt per
-   REGISTER (de oudste stempel), niet per route. Per-route-versheid vraagt de
-   slagveld-koppeling van PROOF.md paragraaf 7 en die bestaat nog niet."
+   PROOF.md par. 2 zegt dat bewijs veroudert, en scripts/vertrouwen.js maakte dat
+   waar -- maar grof, per REGISTER (de oudste stempel). Deze module is de
+   koppeling die daar ontbrak: per route, per bewezen CEL, het register dat die
+   cel bewees, de commit waarop dat gebeurde, en de vraag of er sindsdien iets is
+   gewijzigd waar deze route van afhangt.
 
-   Die koppeling kan nu wel gelegd worden, want de twee helften liggen er:
+   Er komen GEEN nieuwe standen bij. De uitkomst gaat naar staatVan() in
+   scripts/vertrouwen.js en wordt daar een van de standen die PROOF.md al kent:
+   een route waarvan een bewezen cel aantoonbaar verouderd is, heet `verschaald`.
+   En drie dingen blijven strikt uit elkaar, ook als de stand er maar een kan
+   zijn: DEFECT (een cel is gezakt -- `geschorst`), ONTBREKEND (een cel is nooit
+   gemeten -- `verzwakt`) en VEROUDERD (een bewezen cel spreekt over een oudere
+   commit -- `verschaald`). Een wijziging bewijst niet dat een route fout is; zij
+   bewijst alleen dat het oude bewijs niet meer actueel genoeg is.
 
-     ROUTEBRON.json      in welk bestand wordt deze route afgehandeld (uit de
-                         ROUTER, niet uit een regex)
-     de require-graaf    wat dat bestand transitief laadt (scripts/lib/
-                         werkelijkheid.js, dezelfde index als impactbereik.js)
-     AANROEPGRAAF.json   wat het via de KERN-TAS bereikt -- de meeste
-                         routebestanden hebben nul requires en krijgen hun domein
-                         via `(kern) => ...`, dus zonder deze kanten ziet de
-                         sluiting vrijwel niets
+   DE KOPPELING DRAAGT EEN GRAAD (BESTUUR.md: onbekend, vermoed, gemeten,
+   bewezen), en alleen `gemeten` laat bewijs vervallen:
 
-   Leg de sluiting van een route naast `git diff` sinds de commit waarop zijn
-   bewijs is gemeten, en je weet per route of zijn bewijs over een vorige wereld
-   spreekt. Dat is de vraag uit het voorstel voor een levende bewijsgraaf:
-   PROVEN -> STALE -> REPROVE_REQUIRED, en alleen voor het deel dat geraakt is.
+     gemeten   het BESTAND waarin de router deze route afhandelt (ROUTEBRON.json,
+               uit de draaiende router en niet uit een regex), en de kern-namen
+               die de route TIJDENS een verzoek aanraakte (CONTEXTPROEF.json,
+               een runtime-meting in de domeingrens-Proxy)
+     vermoed   de statische sluiting daarachter: requires, kern-kanten uit de
+               aanroepgraaf, de namen die een fabrieksmodule uit de tas haalt
+               (KERNHERKOMST.json), en de montagewortel naar zijn require. Dat
+               een bestand een ander LAADT, bewijst niet dat deze route die code
+               RAAKT -- server/lib/keten.js hangt statisch onder ruim 4100 routes.
+               Een wijziging hier staat bij de route, met de keten erbij, en laat
+               het bewijs NIET vervallen. Niet gokken; de graad tonen.
+     onbekend  de route heeft geen gemeten bestand, of de meetcommit van het
+               register is niet vast te stellen (geen commit in de stempel, of
+               een ondiepe kloon). Dan geldt de bestaande grove regel van
+               vertrouwen.js (de halfwaardetijd per register) en niets fijners.
 
-   DRIE STANDEN, EN WAAROM ER GEEN "WAARSCHIJNLIJK VERS" BIJ ZIT
+   DE UITLEGKETEN. Voor elke verouderde cel is te zeggen: welk bestand veranderde
+   -> via welke gemeten koppeling -> welke route -> welk bewijs (cel, register,
+   commit) -> wat opnieuw moet draaien (uit scripts/versheid.js, de ene lijst
+   register -> opdracht; hier staat geen tweede).
 
-     geraakt     een bestand in de sluiting is gewijzigd sinds de meting. Dit is
-                 zeker, ook als de sluiting onvolledig is: wat we WEL zien, is
-                 veranderd.
-     vers        de sluiting is volledig gevolgd en er is niets in gewijzigd.
-     onbepaald   niet vast te stellen, met de reden: de route heeft geen bekend
-                 bronbestand, de meetcommit is niet in de geschiedenis (een
-                 ondiepe kloon), of de sluiting loopt via een kern-naam die niet
-                 te volgen is. Dat laatste is met opzet geen `vers`: een sluiting
-                 met een gat erin die "niets gewijzigd" meldt, is precies de
-                 blinde vlek die impactbereik.js voor Affected Proof Selection
-                 tegenhield -- "de stilste vorm van kapot die dit huis kent".
-
-   WAT DIT NIET IS
-
-   Het is een SCHADUWMETING. Het verandert de staat in VERTROUWEN.json niet, en
-   het schrijft geen register. Twee redenen:
-
-     1. VERTROUWEN.json is geen rapport: server/middleware/schorspoort.js leest
-        hem en zet routes dicht. Een nieuwe regel loopt eerst mee zonder te
-        blokkeren (CONTROLPLANE.md, `schaduw.js`) -- je kunt niet afdwingen wat
-        nooit in de schaduw heeft gelopen.
-     2. De uitslag hangt aan HEAD. Een ingecheckt register met "vers" erin is
-        bij de volgende commit al een bewering over het verleden. Een levende
-        meting wordt dus uitgerekend wanneer iemand hem vraagt.
-
-   En de meetcommit is GROF, net als de ouderdom in vertrouwen.js: het bewijs
-   van een route is zo vers als het OUDSTE bronregister, want de elf cellen
-   komen uit verschillende registers en een verse outputproef maakt een oude
-   rolproef niet vers. Per cel de eigen commit is de fijnere stap daarna.
+   WAT DIT NIET IS: een oordeel over de code. En het schrijft niets; het is een
+   bibliotheek voor vertrouwen.js plus een lezer voor mensen.
 
    Draai:  npm run routeversheid
            npm run routeversheid -- --route "POST /api/pay/oplaad"
+           npm run routeversheid -- --sinds HEAD~1   (stel dat al het bewijs op
+                                                    HEAD~1 gemeten was)
            npm run routeversheid -- --json
-           npm run routeversheid -- --sinds HEAD~1   (wat raakte de laatste commit)
-
-   UITGANG  0 gemeten (ook als alles geraakt is -- dit is geen poort)
-            2 niet vast te stellen: geen meetcommit, geen git, of geen ROUTEBRON
+   UITGANG 0 gemeten, 2 niet vast te stellen
    ========================================================================== */
 'use strict';
 const fs = require('fs');
@@ -74,22 +62,33 @@ const { stempelVan } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 
-/* Dezelfde montagewortel als in veranderbereik.js. server/server.js en
-   server/opzet/ MONTEREN alles; wie erdoorheen blijft lopen, krijgt het hele
-   huis in elke sluiting en dan is elke route altijd geraakt. Ze komen er wel
-   IN (een route die in server.js woont hangt aan server.js), maar er wordt niet
-   DOORHEEN gelopen. */
+/* Dezelfde montagewortel als in veranderbereik.js: erin, maar niet doorheen. */
 const MONTAGE = /^server\/(server\.js$|opzet\/)/;
 const BRONMAPPEN = ['server/', 'scripts/', 'public/'];
 const isBron = (p) => BRONMAPPEN.some((m) => p.startsWith(m));
 
-/* De voorwaartse sluiting van een route. `buren(bestand)` geeft
-   { naar: [bestanden], ongevolgd: n } -- `ongevolgd` telt de kern-namen die
-   niet naar een bestand zijn op te lossen. Pure functie. */
+/* WELK REGISTER BEWEES DEZE CEL. De bewijsmatrix zet op elke cel een `bron`;
+   dit is de vertaling naar het register dat die bron schrijft. Een cel zonder
+   register (`verklaard` uit de bewakers van de router, `leesroute`) wordt op
+   HEAD afgeleid en veroudert dus niet. test/routeversheid.test.js houdt deze
+   lijst tegen de bron-labels in scripts/bewijsmatrix.js. */
+const CEL_REGISTER = {
+  poortwacht: 'POORTWACHT.json', rolproef: 'ROLPROEF.json', invoerproef: 'INVOERPROEF.json',
+  outputproef: 'OUTPUTPROEF.json', staatproef: 'STAATPROEF.json', handelingproef: 'HANDELINGPROEF.json',
+  auditproef: 'AUDITPROEF.json', 'auditproef-journaal': 'AUDITPROEF-JOURNAAL.json',
+  ketenronde: 'KETENS.json', faalproef: 'FAALPROEF.json', idemproef: 'IDEMPROEF.json',
+  uitvoerproef: 'UITVOERPROEF.json'
+};
+const ZONDER_REGISTER = new Set(['leesroute']);
+
+/* De sluiting met herkomst: per bestand de ouder waarlangs hij bereikt werd, zodat
+   de keten uit te leggen is ("handler -> a.js -> b.js"). Pure functie. */
 function sluiting(start, buren) {
-  const gezien = new Set();
+  const ouder = new Map();
   const ongevolgd = [];
-  const stapel = start.filter(Boolean).filter(isBron);
+  const stapel = [];
+  for (const s of start.filter(Boolean).filter(isBron)) { ouder.set(s, null); stapel.push(s); }
+  const gezien = new Set();
   while (stapel.length) {
     const b = stapel.pop();
     if (gezien.has(b)) continue;
@@ -97,31 +96,14 @@ function sluiting(start, buren) {
     if (MONTAGE.test(b)) continue;
     const v = buren(b) || { naar: [], ongevolgd: 0 };
     if (v.ongevolgd > 0) ongevolgd.push(b);
-    for (const n of v.naar) if (isBron(n) && !gezien.has(n)) stapel.push(n);
+    for (const n of v.naar) {
+      if (!isBron(n) || ouder.has(n)) continue;
+      ouder.set(n, b);
+      stapel.push(n);
+    }
   }
-  return { bestanden: gezien, ongevolgd };
-}
-
-/* De stand van EEN route. Pure functie; de toets voert hem elke tak. */
-function standVan({ bestanden, ongevolgd, gewijzigd, meetcommit }) {
-  if (!bestanden || !bestanden.size) {
-    return { stand: 'onbepaald', reden: 'geen bronbestand bekend voor deze route (ROUTEBRON.json kent hem niet)' };
-  }
-  const geraakt = [...bestanden].filter((b) => gewijzigd.has(b)).sort();
-  if (geraakt.length) {
-    return { stand: 'geraakt', geraakt, sluiting: bestanden.size,
-      reden: geraakt.length + ' bestand(en) in de sluiting gewijzigd sinds ' + meetcommit +
-        '; het bewijs spreekt over een vorige wereld',
-      heropent: 'meet de proeven van deze route opnieuw' };
-  }
-  if (ongevolgd && ongevolgd.length) {
-    return { stand: 'onbepaald', sluiting: bestanden.size, ongevolgd: ongevolgd.slice().sort(),
-      reden: 'niets gewijzigd in wat te volgen is, maar ' + ongevolgd.length + ' bestand(en) in de ' +
-        'sluiting roepen een kern-naam aan die niet naar een bestand is op te lossen ' +
-        '(KERNHERKOMST.json) -- "niets gewijzigd" over een sluiting met een gat is geen uitslag' };
-  }
-  return { stand: 'vers', sluiting: bestanden.size,
-    reden: 'de volledige sluiting (' + bestanden.size + ' bestanden) is ongewijzigd sinds ' + meetcommit };
+  const keten = (b) => { const k = []; for (let x = b; x; x = ouder.get(x)) k.unshift(x); return k; };
+  return { bestanden: gezien, ongevolgd, keten };
 }
 
 /* WAT EEN FABRIEKSMODULE UIT DE KERN-TAS HAALT. De aanroepgraaf ziet een
@@ -271,24 +253,13 @@ function montageHerkomst(bestanden, bestaat) {
   return kaart;
 }
 
-/* De meetcommit: die van het OUDSTE bronregister van de vervalstaten. */
-function meetcommit(bronnen) {
-  let oudste = null;
-  for (const naam of bronnen) {
-    const st = stempelVan(naam);
-    if (!st || !st.op) continue;
-    if (!oudste || new Date(st.op) < new Date(oudste.op)) oudste = { naam, op: st.op, commit: st.commit || null };
-  }
-  return oudste;
-}
-
 function git(args) {
   return execFileSync('git', args, { cwd: WORTEL, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
 }
 
 /* De gewijzigde bestanden sinds een commit, of een reden waarom dat niet kan. */
 function gewijzigdSinds(commit) {
-  if (!commit) return { reden: 'het oudste bronregister draagt geen commit in zijn stempel' };
+  if (!commit) return { reden: 'het register draagt geen commit in zijn stempel' };
   try { git(['cat-file', '-e', commit + '^{commit}']); }
   catch (e) {
     let ondiep = false;
@@ -300,101 +271,178 @@ function gewijzigdSinds(commit) {
   return { gewijzigd: new Set(uit.split('\n').filter(Boolean)) };
 }
 
-function meet(opties) {
-  const o = opties || {};
-  const { BRONNEN } = require('./vertrouwen');
-  const rb = JSON.parse(fs.readFileSync(path.join(WORTEL, 'ROUTEBRON.json'), 'utf8'));
-  /* `sinds` vervangt de meetcommit: "stel dat het bewijs op X gemeten was,
-     wat is er dan nu geraakt". Zo is de meter te ijken op een korte afstand, en
-     beantwoordt hij ook de omgekeerde vraag: wat raakt de laatste commit? */
-  const mc = o.sinds ? { naam: '--sinds', op: null, commit: o.sinds } : meetcommit(o.bronnen || BRONNEN);
-  const sinds = gewijzigdSinds(mc && mc.commit);
-  const kop = {
-    soort: 'schaduw',
-    uitleg: 'Per route: is een bestand waar hij van afhangt gewijzigd sinds zijn bewijs is gemeten? ' +
-      'Verandert de vervalstaat in VERTROUWEN.json NIET en schrijft geen register.',
-    meetcommit: mc,
-    grens: 'De meetcommit is die van het OUDSTE bronregister, niet per cel. De sluiting volgt ' +
-      'requires, opgeloste kern-kanten en de namen die een fabrieksmodule uit de tas haalt ' +
-      '(KERNHERKOMST.json), en een naam uit de montagewortel wordt naar zijn require gevolgd -- ' +
-      'is hij daar zelf gedefinieerd, dan hangt de route aan dat hele bestand (grof, per symbool is ' +
-      'de volgende stap). Een route die via een ongevolgde kern-naam loopt kan ' +
-      'hooguit `geraakt` of `onbepaald` zijn, nooit `vers`.'
-  };
-  if (!mc || sinds.reden) {
-    return { ...kop, vastTeStellen: false, reden: mc ? sinds.reden : 'geen enkel bronregister draagt een stempel' };
+/* DE AFHANKELIJKHEDEN VAN EEN ROUTE, met graad. `handler` komt uit
+   ROUTEBRON.json, `runtime` is de lijst kern-namen uit CONTEXTPROEF.json,
+   `naamNaarBestand` lost een kern-naam op. Pure functie over zijn invoer. */
+function afhankelijkhedenVan({ handler, runtime, naamNaarBestand, buren }) {
+  const gemeten = new Map();
+  const vermoed = new Map();
+  if (!handler) return { handler: null, gemeten, vermoed, ongevolgd: [] };
+  gemeten.set(handler, { graad: 'gemeten', koppeling: 'ROUTEBRON.json: de router handelt deze route af in dit bestand' });
+  for (const naam of runtime || []) {
+    for (const b of naamNaarBestand(naam) || []) {
+      if (!gemeten.has(b)) {
+        gemeten.set(b, { graad: 'gemeten', koppeling: 'CONTEXTPROEF.json: kern-naam `' + naam + '` aangeraakt tijdens het verzoek' });
+      }
+    }
   }
+  const s = sluiting([handler], buren);
+  for (const b of s.bestanden) {
+    if (gemeten.has(b)) continue;
+    vermoed.set(b, { graad: 'vermoed', koppeling: 'statische sluiting: ' + s.keten(b).join(' -> ') });
+  }
+  return { handler, gemeten, vermoed, ongevolgd: s.ongevolgd };
+}
+
+/* HET VERVAL VAN EEN ROUTE, per bewezen cel. Pure functie:
+     cellen          { SCHAKEL: { staat, bron } } uit de bewijsmatrix
+     afh             afhankelijkhedenVan()
+     registerVan     bron-label -> { register, commit, herdraai } of null
+     gewijzigdVoor   commit -> { gewijzigd: Set } of { reden }
+   Terug: { verouderd, vermoed, onbekend } -- elk een lijst per cel. */
+function vervalVan({ cellen, afh, registerVan, gewijzigdVoor }) {
+  const verouderd = [], vermoed = [], onbekend = [];
+  for (const [schakel, cel] of Object.entries(cellen || {})) {
+    if (!cel || cel.staat !== 'bewezen') continue;
+    if (ZONDER_REGISTER.has(cel.bron)) continue;
+    const reg = registerVan(cel.bron);
+    if (!reg) { onbekend.push({ schakel, reden: 'onbekend welk register de bron `' + cel.bron + '` schrijft' }); continue; }
+    const basis = { schakel, register: reg.register, commit: reg.commit, herdraai: reg.herdraai };
+    if (!afh || !afh.handler) { onbekend.push({ ...basis, reden: 'geen gemeten bestand voor deze route (ROUTEBRON.json kent hem niet)' }); continue; }
+    const ch = gewijzigdVoor(reg.commit);
+    if (!ch || ch.reden) { onbekend.push({ ...basis, reden: (ch && ch.reden) || 'meetcommit onbekend' }); continue; }
+    const gm = [...afh.gemeten].filter(([b]) => ch.gewijzigd.has(b)).map(([bestand, k]) => ({ bestand, ...k }));
+    if (gm.length) { verouderd.push({ ...basis, geraakt: gm }); continue; }
+    const vm = [...afh.vermoed].filter(([b]) => ch.gewijzigd.has(b)).map(([bestand, k]) => ({ bestand, ...k }));
+    if (vm.length) vermoed.push({ ...basis, aantal: vm.length, geraakt: vm.slice(0, 3) });
+  }
+  return { verouderd, vermoed, onbekend };
+}
+
+/* DE UITLEGKETEN van een verouderde cel, in de vijf stappen van de vraag. */
+function uitleg(route, v) {
+  return v.geraakt.map((g) => ({
+    bestand: g.bestand,
+    koppeling: g.koppeling + ' (' + g.graad + ')',
+    route,
+    bewijs: v.schakel + ' uit ' + v.register + ', gemeten op ' + v.commit,
+    herdraai: v.herdraai
+  }));
+}
+
+/* DE BOUWER: leest de registers eenmaal en geeft per route zijn verval.
+   `opties.sinds` vervangt elke meetcommit (hypothetisch: "stel dat al het bewijs
+   op X gemeten was"). */
+function bouwer(opties) {
+  const o = opties || {};
+  const leesJ = (n) => { try { return JSON.parse(fs.readFileSync(path.join(WORTEL, n), 'utf8')); } catch (e) { return null; } };
   const { index } = require('./lib/werkelijkheid');
-  const ix = index(['server', 'scripts', 'public']);
-  const ag = JSON.parse(fs.readFileSync(path.join(WORTEL, 'AANROEPGRAAF.json'), 'utf8'));
-  const kh = JSON.parse(fs.readFileSync(path.join(WORTEL, 'KERNHERKOMST.json'), 'utf8'));
-  const herkomst = new Map((kh.perNaam || []).map((x) => [x.naam, x.herkomsten || []]));
-  /* Zonder commentaar: een `kern.x` in een toelichting is geen afhankelijkheid
-     (scripts/lib/bron.js is de gedeelde verwijderaar; geen tweede). */
   const { zonderCommentaar } = require('./lib/bron');
+  const ix = index(['server', 'scripts', 'public']);
+  const ag = leesJ('AANROEPGRAAF.json') || { kanten: [] };
+  const kh = leesJ('KERNHERKOMST.json') || { perNaam: [] };
+  const rb = leesJ('ROUTEBRON.json') || { perRoute: [] };
+  const ctx = leesJ('CONTEXTPROEF.json') || { perVerzoek: [] };
+  const herkomst = new Map((kh.perNaam || []).map((x) => [x.naam, x.herkomsten || []]));
   const lees = (p) => { try { return zonderCommentaar(fs.readFileSync(path.join(WORTEL, p), 'utf8')); } catch (e) { return ''; } };
   const montageBron = {};
   for (const b of ix.bestanden.values()) if (MONTAGE.test(b.pad)) montageBron[b.pad] = lees(b.pad);
   const montage = montageHerkomst(montageBron, (p) => ix.bestanden.has(p));
   const buren = burenIndex(ix, ag.kanten, herkomst, lees, montage);
-
-  const telling = { geraakt: 0, vers: 0, onbepaald: 0 };
-  const perRoute = {};
-  const cache = new Map();
-  const perBestand = new Map();
-  let alleenMontage = 0;
-  for (const r of rb.perRoute || []) {
-    if (!r || !r.route) continue;
-    let s = cache.get(r.bestand);
-    if (!s) { s = sluiting([r.bestand], buren); cache.set(r.bestand, s); }
-    const uit = standVan({ ...s, gewijzigd: sinds.gewijzigd, meetcommit: mc.commit });
-    telling[uit.stand]++;
-    if (uit.geraakt) {
-      if (uit.geraakt.every((b) => MONTAGE.test(b))) alleenMontage++;
-      for (const b of uit.geraakt) perBestand.set(b, (perBestand.get(b) || 0) + 1);
+  const handlerVan = new Map((rb.perRoute || []).filter((r) => r && r.route).map((r) => [r.route, r.bestand || null]));
+  const runtimeVan = new Map((ctx.perVerzoek || []).map((v) => [v.verzoek, (v.namen || []).map((n) => n.naam)]));
+  const naamNaarBestand = (volledig) => {
+    const naam = String(volledig).split('.').pop();
+    const uit = [];
+    for (const h of herkomst.get(naam) || []) {
+      if (!h.bestand) continue;
+      if (!MONTAGE.test(h.bestand)) uit.push(h.bestand);
+      else if (montage.get(naam)) uit.push(montage.get(naam));
     }
-    perRoute[r.route] = { bestand: r.bestand || null, ...uit };
-  }
-  return { ...kop, vastTeStellen: true, gewijzigdeBestanden: sinds.gewijzigd.size, telling,
-    /* Hoeveel `geraakt` ALLEEN via de montagewortel binnenkwam. Ze blijven
-       geraakt -- te ruim is de veilige kant -- maar apart geteld, anders leest
-       een breed getal als precisie (dezelfde regel als veranderbereik.js). */
-    alleenViaMontage: alleenMontage,
-    /* De gewijzigde bestanden die het meeste bewijs verschalen: de impactvraag
-       ("wat raakt deze wijziging") en tegelijk de lijst hubs die de grofheid
-       van deze meting bepalen. */
-    meestGeraakt: [...perBestand].sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1)).slice(0, 15)
-      .map(([bestand, routes]) => ({ bestand, routes })),
-    perRoute };
+    return uit;
+  };
+  const { REGISTERS } = require('./versheid');
+  const herdraaiVan = new Map(REGISTERS.map((r) => [r[0], r[1]]));
+  const regCache = new Map();
+  const registerVan = (bron) => {
+    const register = CEL_REGISTER[bron];
+    if (!register) return null;
+    if (!regCache.has(register)) {
+      const st = stempelVan(register);
+      regCache.set(register, { register, commit: o.sinds || (st && st.commit) || null,
+        herdraai: herdraaiVan.get(register) || 'onbekend -- ' + register + ' staat niet in scripts/versheid.js' });
+    }
+    return regCache.get(register);
+  };
+  const diffCache = new Map();
+  const gewijzigdVoor = (commit) => {
+    if (!diffCache.has(commit)) diffCache.set(commit, gewijzigdSinds(commit));
+    return diffCache.get(commit);
+  };
+  const afhCache = new Map();
+  const afhVan = (route) => {
+    if (!afhCache.has(route)) {
+      afhCache.set(route, afhankelijkhedenVan({ handler: handlerVan.get(route) || null,
+        runtime: runtimeVan.get(route), naamNaarBestand, buren }));
+    }
+    return afhCache.get(route);
+  };
+  return {
+    verval: (route, cellen) => vervalVan({ cellen, afh: afhVan(route), registerVan, gewijzigdVoor }),
+    afhankelijkheden: afhVan,
+    bronnen: { routebron: rb.stempel || null, contextproef: ctx.stempel || null }
+  };
 }
 
 function main() {
   const argv = process.argv.slice(2);
-  if (!fs.existsSync(path.join(WORTEL, 'ROUTEBRON.json'))) {
-    console.error('\n  ROUTEBRON.json ontbreekt; draai eerst `npm run routebron`.\n');
-    return 2;
-  }
   const si = argv.indexOf('--sinds');
-  const u = meet({ sinds: si > -1 ? argv[si + 1] : null });
-  if (argv.includes('--json')) { console.log(JSON.stringify(u, null, 2)); return u.vastTeStellen ? 0 : 2; }
-  console.log('\n  ROUTEVERSHEID (schaduw -- de vervalstaat verandert hier niet)\n');
-  if (!u.vastTeStellen) { console.log('  niet vast te stellen: ' + u.reden + '\n'); return 2; }
-  console.log('  gemeten tegen   ' + u.meetcommit.commit + (u.meetcommit.op ? ' (' + u.meetcommit.naam + ', ' + u.meetcommit.op + ')' : ' (' + u.meetcommit.naam + ')'));
-  console.log('  gewijzigd sinds ' + String(u.gewijzigdeBestanden).padStart(6) + ' bestanden');
-  for (const [k, v] of Object.entries(u.telling)) console.log('  ' + k.padEnd(15) + String(v).padStart(6));
-  console.log('    waarvan geraakt alleen via de montagewortel ' + u.alleenViaMontage);
-  console.log('\n  meest geraakt (routes waarvan het bewijs door dit bestand verschaalt):');
-  for (const m of u.meestGeraakt.slice(0, 10)) console.log('  ' + String(m.routes).padStart(6) + '  ' + m.bestand);
-  const i = argv.indexOf('--route');
-  if (i > -1) {
-    const r = u.perRoute[argv[i + 1]];
-    console.log('\n  ' + argv[i + 1] + ': ' + (r ? r.stand + ' -- ' + r.reden : 'onbekende route'));
-    if (r && r.geraakt) for (const b of r.geraakt.slice(0, 20)) console.log('    ' + b);
+  const b = bouwer({ sinds: si > -1 ? argv[si + 1] : null });
+  const matrix = require('./bewijsmatrix').bouw();
+  if (matrix.gedegradeerd) { console.error('  de routekaart viel om: ' + matrix.reden); return 2; }
+  const telling = { verouderd: 0, alleenVermoed: 0, onbekend: 0, actueel: 0, zonderBewezenCel: 0 };
+  const perRoute = {};
+  for (const rij of matrix.rijen) {
+    const k = rij.methode + ' ' + rij.pad;
+    const v = b.verval(k, rij.cellen);
+    perRoute[k] = v;
+    const bewezen = Object.values(rij.cellen).some((c) => c && c.staat === 'bewezen');
+    if (!bewezen) telling.zonderBewezenCel++;
+    else if (v.verouderd.length) telling.verouderd++;
+    else if (v.onbekend.length) telling.onbekend++;
+    else if (v.vermoed.length) telling.alleenVermoed++;
+    else telling.actueel++;
   }
-  console.log('\n  ' + u.grens + '\n');
+  if (argv.includes('--json')) { console.log(JSON.stringify({ telling, perRoute }, null, 2)); return 0; }
+  console.log('\n  BEWIJSVERVAL PER ROUTE (graad van de koppeling: gemeten laat vervallen, vermoed staat erbij)\n');
+  const uitleg0 = {
+    verouderd: 'minstens een bewezen cel, en een GEMETEN afhankelijkheid veranderde sinds die meting',
+    alleenVermoed: 'alleen een VERMOED afhankelijke wijziging; bewijs blijft staan, de keten staat erbij',
+    onbekend: 'meetcommit of gemeten bestand ontbreekt; de grove halfwaardetijd geldt',
+    actueel: 'geen enkele afhankelijkheid van een bewezen cel is gewijzigd',
+    zonderBewezenCel: 'niets om te laten vervallen (ontbrekend of defect -- dat is een andere vraag)'
+  };
+  for (const [k, n] of Object.entries(telling)) console.log('  ' + k.padEnd(18) + String(n).padStart(6) + '  ' + uitleg0[k]);
+  const ri = argv.indexOf('--route');
+  if (ri > -1) {
+    const k = argv[ri + 1];
+    const v = perRoute[k];
+    console.log('\n  ' + k);
+    if (!v) console.log('    onbekende route');
+    else {
+      for (const c of v.verouderd) for (const u of uitleg(k, c)) {
+        console.log('    bestand   ' + u.bestand + '\n    koppeling ' + u.koppeling + '\n    bewijs    ' + u.bewijs +
+          '\n    herdraai  ' + u.herdraai + '\n');
+      }
+      for (const c of v.vermoed) console.log('    (vermoed) ' + c.schakel + ': ' + c.aantal + ' bestand(en), o.a. ' + c.geraakt[0].koppeling);
+      for (const c of v.onbekend) console.log('    (onbekend) ' + c.schakel + ': ' + c.reden);
+    }
+  }
+  console.log('');
   return 0;
 }
 
-module.exports = { sluiting, standVan, burenIndex, kernGebruik, fabriekParam, montageHerkomst, meetcommit, gewijzigdSinds, meet, MONTAGE };
+module.exports = { sluiting, afhankelijkhedenVan, vervalVan, uitleg, bouwer, burenIndex, kernGebruik,
+  fabriekParam, montageHerkomst, gewijzigdSinds, CEL_REGISTER, ZONDER_REGISTER, MONTAGE };
 
 if (require.main === module) process.exitCode = main();

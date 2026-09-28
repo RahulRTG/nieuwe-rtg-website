@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-28T11:41:56.537Z",
-    "commit": "ef77e00db",
+    "op": "2026-09-28T13:11:52.179Z",
+    "commit": "7674541a",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -10563,6 +10563,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "rtgzetel.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "rtmail-ai.test.js": {

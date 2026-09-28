@@ -1,27 +1,27 @@
 {
  "stempel": {
-  "op": "2026-09-28T13:33:26.300Z",
-  "commit": "294990aa",
+  "op": "2026-09-28T13:09:23.985Z",
+  "commit": "afd09a670",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 9,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5150,
-  "geclassificeerd": 5150,
+  "totaal": 5148,
+  "geclassificeerd": 5148,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3193,
-   "NOT_APPLICABLE": 1241,
-   "PROTECTED": 561,
+   "NOT_APPLICABLE": 1240,
+   "PROTECTED": 560,
    "INTENTIONALLY_NON_IDEMPOTENT": 155
   },
-  "vastgesteldDoorMens": 2009,
+  "vastgesteldDoorMens": 2007,
   "afgeleidDoorScript": 3141,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4255,
+   "AUTHENTICATED": 4253,
    "PUBLIC": 126,
    "OBJECT_SCOPED": 746,
    "(niet af te leiden -- vraagt een verklaring)": 7,
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 134,
    "kale ronde: onbeschermd": 125,
    "kale ronde: geen uitspraak": 4761,
-   "niet gemeten": 130
+   "niet gemeten": 128
   },
   "voorstellen": {},
   "metingVan": "2026-09-27T12:22:52.912Z"
@@ -59017,27 +59017,6 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "office.beleidsmotor.huis.zet",
-   "route": "POST /api/office/beleidsmotor/huis/zet",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "velden",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "boardroomAuth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
    "mutatieId": "office.beleidsmotor.review",
    "route": "POST /api/office/beleidsmotor/review",
    "semantiek": {
@@ -99854,27 +99833,6 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "staff.ochtend.lezen",
-   "route": "POST /api/staff/ochtend",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "leest",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "supplierAuth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 5279 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 5277 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,14 +18,14 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 5279 |
-| servermodules (`server/**/*.js`) | 3902 |
-| routebestanden (`server/routes/**`) | 627 |
-| kernmodules (`server/kern/**`) | 2473 |
+| API-endpoints | 5277 |
+| servermodules (`server/**/*.js`) | 3897 |
+| routebestanden (`server/routes/**`) | 626 |
+| kernmodules (`server/kern/**`) | 2472 |
 | schermen (`public/**/*.html`) | 321 |
 | gedeelde browsermodules (`public/shared/*.js`) | 409 |
-| toetsbestanden (`test/*.test.js`) | 1891 |
-| schermtoetsen (`test/*.e2e.js`) | 276 |
+| toetsbestanden (`test/*.test.js`) | 1888 |
+| schermtoetsen (`test/*.e2e.js`) | 275 |
 
 ## 2. De weg van een verzoek
 
@@ -114,8 +114,8 @@ zie §5 -- er zijn nog 250 kern-namen die meer dan één domein aanraakt.
 | `auth` | 21 | 6 | 8 | 54 |
 | `member` | 726 | 74 | 17 | 453 |
 | `supplier` | 632 | 130 | 6 | 341 |
-| `office` | 84 | 21 | 3 | 94 |
-| `staff` | 27 | 9 | 1 | 43 |
+| `office` | 83 | 21 | 3 | 94 |
+| `staff` | 26 | 8 | 1 | 42 |
 | `social` | 76 | 10 | 31 | 71 |
 | `techniek` | 77 | 19 | 1 | 64 |
 | `zakelijk` | 13 | 2 | 0 | 0 |
@@ -137,9 +137,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1668 |
+| kern-namen die routes aanraken | 1667 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 250 |
-| daarvan door precies één domein | 1418 |
+| daarvan door precies één domein | 1417 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -172,7 +172,7 @@ sseToCustomer(5)
 | 41 | `server/routes/member/voertuigen.js` |
 | 40 | `server/routes/member/voertuigen/verkoop.js` |
 | 39 | `server/routes/member/voertuigen/ontmoeten.js` |
-| 39 | `server/routes/staff.js` |
+| 38 | `server/routes/staff.js` |
 | 35 | `server/routes/auth.js` |
 | 34 | `server/routes/auth/herstel.js` |
 

@@ -3,25 +3,25 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-09-27T14:33:41.268Z",
-  "commit": "4dc809df",
+  "op": "2026-09-28T01:15:06.300Z",
+  "commit": "4d90b0ced",
   "boomVuil": false,
-  "boomAnders": 8,
+  "boomAnders": 0,
   "instrument": "scripts/afgeleid.js",
   "node": "v22.22.2"
  },
  "gemeten": {
-  "artefacten": 322,
-  "bron": 13,
-  "afgeleid": 178,
+  "artefacten": 324,
+  "bron": 14,
+  "afgeleid": 179,
   "fragmenten": 25,
   "momentopname": 1,
   "onbeslist": 105,
   "afgeleidZonderEigenaar": 2,
-  "metEigenaar": 202,
-  "afgeleidEigenaarHard": 176,
+  "metEigenaar": 203,
+  "afgeleidEigenaarHard": 177,
   "afgeleidGrendelt": 20,
-  "metStempel": 110,
+  "metStempel": 111,
   "stempelAnders": 0
  },
  "artefacten": [
@@ -2793,6 +2793,20 @@
    "botsingVerklaard": null
   },
   {
+   "naam": "ONVERVREEMDBAAR.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/onvervreemdbaar.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/onvervreemdbaar.js"
+   ],
+   "stempelInstrument": "scripts/onvervreemdbaar.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run onvervreemdbaar:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
    "naam": "OS.md",
    "soort": "ONBESLIST",
    "eigenaar": null,
@@ -3241,6 +3255,18 @@
    "stempelAnders": false,
    "versheidOpdracht": "node scripts/sabotage.js",
    "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "SAMENLEVING.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
    "botsingVerklaard": null
   },
   {

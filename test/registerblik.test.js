@@ -14,7 +14,9 @@
      4. de lus kent alleen deze vijf -- geen `doe`, geen `kaart`, geen `plan`;
      5. de lus gaat door de contextsamensteller en stuurt niets dat niet past;
      6. de boardroom gebruikt de registerblik, en valt terug als het model geen
-        gereedschap kan.
+        gereedschap kan;
+     7. CODE-AI-001: de lijst is JSON, geen gereedschap neemt een bestand aan, en
+        niets wordt gedeeld met het stuur.
 
    Nagetrokken met mutaties (elk zakt minstens een toets):
      a. `leesRegister` leest elk pad dat binnenkomt      -> toets 1 zakt
@@ -152,4 +154,22 @@ test('6. de boardroom gebruikt de registerblik, en valt terug als het model geen
   assert.equal(z.antwoord, 'Korte blik zonder registers.');
   assert.equal(zonder.gekregen.length, 1);
   assert.equal(zonder.gekregen[0].tools, undefined, 'de terugval is de korte blik, zonder gereedschap');
+});
+
+test('7. CODE-AI-001: alleen registers bij naam, en geen stuurgereedschap', () => {
+  /* De registerblik mag lezen wat de meters publiceerden, en niets anders: zijn
+     lijst bestaat uit JSON-registers, hij heeft geen gereedschap dat een bestand
+     of pad aanneemt, en hij deelt geen enkel gereedschap met het stuur -- lezen
+     en uitvoeren blijven twee werelden. */
+  const { REGISTERS } = require('../server/kern/registerblik/bronnen');
+  const { REGISTERBLIK_TOOLS } = require('../server/kern/registerblik/gereedschap');
+  const { TOOLS } = require('../server/kern/stuur/gereedschap');
+  assert.ok(Object.values(REGISTERS).every(r => /\.json$/.test(r)), 'een register is JSON, nooit bron');
+  assert.deepEqual(REGISTERBLIK_TOOLS.map(t => t.name).sort(),
+    ['inspecteerRoute', 'vraagBewijsOp', 'vraagProductiestandOp', 'vraagVertrouwenOp', 'zoekRegister'],
+    'er is een registerblik-gereedschap bij of af. Neemt het een bestand aan? Dan hoort het bij de Architect en niet hier.');
+  const velden = REGISTERBLIK_TOOLS.flatMap(t => Object.keys(t.input_schema.properties || {}));
+  assert.ok(!velden.some(v => /bestand|file|pad_op_schijf|path/i.test(v)), 'geen gereedschap neemt een bestand aan: ' + velden.join(', '));
+  const stuur = new Set(TOOLS.map(t => t.name));
+  assert.ok(REGISTERBLIK_TOOLS.every(t => !stuur.has(t.name)), 'de registerblik deelt geen gereedschap met het stuur');
 });

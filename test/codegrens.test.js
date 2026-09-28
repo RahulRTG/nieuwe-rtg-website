@@ -100,20 +100,8 @@ test('3. het model kan niet meer gereedschappen dan hier staan', () => {
     'er is een gereedschap bij of af. Is het een bron-lezer? Dan hoort hij bij de Architect en niet hier.');
 });
 
-test('4. de registerblik leest alleen registers bij naam, en krijgt geen stuurgereedschap', () => {
-  /* De registerblik mag lezen wat de meters publiceerden, en niets anders: zijn
-     lijst bestaat uit JSON-registers, hij heeft geen gereedschap dat een bestand
-     of pad aanneemt, en hij deelt geen enkel gereedschap met het stuur -- lezen
-     en uitvoeren blijven twee werelden. */
-  const { REGISTERS } = require('../server/kern/registerblik/bronnen');
-  const { REGISTERBLIK_TOOLS } = require('../server/kern/registerblik/gereedschap');
-  const { TOOLS } = require('../server/kern/stuur/gereedschap');
-  assert.ok(Object.values(REGISTERS).every(r => /\.json$/.test(r)), 'een register is JSON, nooit bron');
-  assert.deepStrictEqual(REGISTERBLIK_TOOLS.map(t => t.name).sort(),
-    ['inspecteerRoute', 'vraagBewijsOp', 'vraagProductiestandOp', 'vraagVertrouwenOp', 'zoekRegister'],
-    'er is een registerblik-gereedschap bij of af. Neemt het een bestand aan? Dan hoort het bij de Architect en niet hier.');
-  const velden = REGISTERBLIK_TOOLS.flatMap(t => Object.keys(t.input_schema.properties || {}));
-  assert.ok(!velden.some(v => /bestand|file|pad_op_schijf|path/i.test(v)), 'geen gereedschap neemt een bestand aan: ' + velden.join(', '));
-  const stuur = new Set(TOOLS.map(t => t.name));
-  assert.ok(REGISTERBLIK_TOOLS.every(t => !stuur.has(t.name)), 'de registerblik deelt geen gereedschap met het stuur');
-});
+/* De registerblik staat hierboven in de INGANGEN, dus toets 1 en 2 lezen zijn
+   bron. Dat hij alleen JSON-registers bij naam leest en geen gereedschap met het
+   stuur deelt, bewijst test/registerblik.test.js (toets 7): die toets laadt de
+   modules, en hier zou dat de mutatiemotor bronnen laten muteren waar een
+   grenstoets per definitie niet naar kijkt. */

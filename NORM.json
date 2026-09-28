@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4628,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1610,
+    "kernBreedte": 1611,
     "kernGedeeld": 244,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
@@ -149,6 +149,15 @@
     "edgeVeldContextZelf": 11
   },
   "notities": [
+    {
+      "datum": "2026-09-28",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1610,
+      "meter": "kernBreedte 1610 -> 1611",
+      "reden": "De samenvoeging met main (#394). Main bracht het domein democratie mee (1600 -> 1601, met zijn eigen besluit daar), deze tak de bedrijfsmaten en het boek van RTG (1600 -> 1610, elk met een besluit hieronder). Opgeteld is het 1611: geen nieuwe naam, alleen twee verklaarde groeiposten die elkaar voor het eerst in een boom tegenkomen.",
+      "waarheen": "de besluiten van 27 september hieronder en die van main voor democratie"
+    },
     {
       "datum": "2026-09-27",
       "soort": "structureel",

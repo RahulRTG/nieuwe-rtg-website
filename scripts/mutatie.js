@@ -1085,6 +1085,12 @@ const EIGEN_MODULE = new Map([
    Elke reden noemt hoeveel mutaties er zijn geprobeerd, want een reden zonder
    poging is een vermoeden. */
 const GEEN_BRONMUTATIE = new Map([
+  /* De crashherkenning van de meetronde (scripts/lib/valom.js) is een regex en
+     een `||`; geen van de vier operatoren komt erin voor (0 pogingen, 28
+     september 2026). Met de hand gemeten: `fout || ''` -> `fout && ''` laat
+     toets 1 zakken, en de oorspronkelijke kapotte auditproef (dubbele
+     declaratie van `stempel`) laat toets 2 zakken. Beide daarna teruggezet. */
+  ['meetronde.test.js', 'regex plus ||, geen operator van de motor (0 pogingen); handmutatie || -> && laat toets 1 zakken, en de kapotte auditproef laat toets 2 zakken'],
   /* Deze broncontracten lezen HTML/tekst via fs. TALEN is alleen hun noemer;
      diens migratieversie muteren raakt de tekstbewering niet. Op 20-09-2026
      afzonderlijk gemeten: AI in de paginatitel respectievelijk een ontbrekende

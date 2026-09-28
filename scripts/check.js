@@ -1930,6 +1930,7 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     /* spread van [auth, geenGast], zoals `lid` hierboven; werd zichtbaar toen
        de kantoorpakket-paden voluit kwamen te staan (regel 45) */
     'ledenAuth', 'rtfPoort']);
+  POORT_MW.add('gezinBeeldAuth'); // verifieert gezinscode en profieltoken vóór eigen foto’s worden gelezen of geschreven
   POORT_MW.add('arrivalPassAuth'); // bezit van de tijdelijke, gehashte Arrival Pass
   /* `scimAuth` (routes/scim.js) -- de deur waar de IdP van een klant zelf
      doorheen loopt: Bearer-sleutel, opgezocht met scim.sleutels.vanSleutel(),
@@ -4763,7 +4764,8 @@ console.log('\n58) vaste hoekgrammatica: rechte inhoud, afgeronde systeemlagen e
     ['public/shared/rtg-world-home.css', new Set(['var(--rtg-radius-editorial)', 'var(--rtg-radius-system)'])],
     ['public/shared/vonk-2.css', new Set(['var(--rtg-radius-system)'])],
     ['public/shared/rtg-world-desktop.css', new Set(['var(--rtg-radius-editorial)'])],
-    ['public/shared/rtg-desktop-components.css', new Set(['var(--rtg-radius-editorial)'])],
+    ['public/shared/rtg-desktop-components.css', new Set(['var(--rtg-radius-editorial)', 'var(--rtg-radius-editorial)!important', 'var(--rtg-radius-system)!important'])],
+    ['public/shared/rtg-personal-images.css', new Set(['var(--rtg-radius-editorial)', 'var(--rtg-radius-editorial)!important', 'var(--rtg-radius-system)'])],
     ['public/shared/rtg-world-widgets.css', new Set(['var(--rtg-radius-editorial)'])],
     ['public/shared/rtg-world-screen.css', new Set(['var(--rtg-radius-content)!important'])],
     ['public/site/storyline.css', new Set(['var(--rtg-radius-editorial)'])],

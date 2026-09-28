@@ -10,8 +10,7 @@ const ROOT = path.join(__dirname, '..');
 const lees = naam => fs.readFileSync(path.join(ROOT, naam), 'utf8');
 const EDGE = lees('public/shared/rtg-edge-system.css');
 const EDGE2 = lees('public/shared/rtg-edge-2.css');
-/* Sinds de desktopstandaard (#413) wonen de wereldtokens in het palet. */
-const PALET = lees('public/shared/rtg-world-palette.css');
+const HERITAGE = lees('public/shared/rtg-world-palette.css');
 const COMPONENTEN = lees('public/shared/rtg-heritage-components.css');
 const CHAUFFEUR = lees('public/apps/chauffeur.css');
 const VERBINDING = lees('public/shared/verbinding/verbinding-02.js');
@@ -105,7 +104,7 @@ test('functionele Edge-labels zakken niet terug naar 6-9 pixels', () => {
 });
 
 test('Living-statuswoorden halen WCAG AA op alle centrale ivoorvlakken', () => {
-  const living = PALET.match(/data-rtg-world="living"\](?::not\(\[data-public-platform\]\))?\{([\s\S]*?)\n\}/);
+  const living = HERITAGE.match(/data-rtg-world="living"\]:not\(\[data-public-platform\]\)\{([\s\S]*?)\n\}/);
   assert.ok(living, 'Living-tokens ontbreken');
   const voorgronden = ['rtg-status-ok', 'rtg-status-warn', 'rtg-status-danger']
     .map(token => [token, variabele(living[1], token)]);

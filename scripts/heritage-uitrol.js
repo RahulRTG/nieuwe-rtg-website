@@ -105,9 +105,9 @@ function gewenst(bestand, bron) {
   bodyNieuw = zetAttribuut(bodyNieuw, 'data-rtg-layout', 'standard');
   bodyNieuw = bodyNieuw.replace(/\sdata-rtg-eigenvlak=["'][^"']*["']/gi, '');
   let uit = bron.replace(body[0], bodyNieuw);
+  uit = require('./lib/script-bronnen')(uit, src => src === '/shared/rtg-world-desktop.js');
   for (let vorig = null; vorig !== uit;) {
     vorig = uit;
-    uit = schrap(uit, /<script\b[^>]*src=["']\/shared\/rtg-world-desktop\.js["'][^>]*><\/script>\s*/gi);
     uit = schrap(uit, /<link\b[^>]*href=["']\/shared\/rtg-world-desktop\.css["'][^>]*>\s*/gi);
   }
 

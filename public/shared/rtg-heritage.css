@@ -1,3 +1,5 @@
+@import url("./rtg-warm-details.css");
+@import url("./rtg-personal-images.css");
 @import url('./rtg-heritage-motion.css');
 @import url('./rtg-continue-key.css');
 @import url('./rtg-heritage-materials.css');
@@ -30,7 +32,7 @@ body[data-rtg-skin="heritage"]{
   --rtg-space-4:16px;--rtg-space-6:24px;--rtg-space-8:32px;
   --rtg-space-12:48px;--rtg-space-16:64px;--rtg-space-24:96px;
   --rtg-space-32:128px;--rtg-grid-gap:clamp(20px,2vw,32px);
-  --rtg-radius-content:16px;--rtg-radius-system:22px;--rtg-radius-editorial:16px;
+  --rtg-radius-content:4px;--rtg-radius-system:10px;--rtg-radius-editorial:4px;
   --rtg-target:48px;
 
   --rtg-world-bg:#0c0b0a;

@@ -31,7 +31,7 @@
   var summary=node('span',null,'pp-itinerary');summary.translate=false;summary.hidden=company;
   featureCopy.append(overline,title,summary,body,action);
   featureCopy.append(node('small',company?'illustration':'demoBoundary','pp-boundary'));
-  feature.append(picture,featureCopy);
+  var photoFrame=node('div',null,'wp-photo');photoFrame.appendChild(picture);feature.append(photoFrame,featureCopy);
   var stepper=node('div',null,'pp-stepper');data.stories.forEach(function(story){var b=button(null,function(){select(story.id,true);},'pp-step');b.dataset.publicStep=story.id;b.setAttribute('aria-label',copy(story.label));b.dataset.i18nAria='public.'+story.label;stepper.append(b);});
   home.append(stories,intro,feature,stepper);
   var focus=node('section',null,'wd-focus pp-detail');focus.hidden=true;
@@ -63,6 +63,7 @@
   search.addEventListener('input',controller.filterCards);filter.addEventListener('change',controller.filterCards);
   data.cards.filter(function(c){return c.id!=='support';}).forEach(function(card){catalog.append(widgets.widget(card));});
   widgets.favoritesPaint();controller.setView(false);select(selected.id,false);
+  ['bestand-upload.js','interface/world-desktop-copy.js','interface/personal-images.js','interface/personal-image-editor.js','interface/world-presentation.js','interface/public-presentation.js'].forEach(function(file){var script=d.createElement('script');script.src=new URL('shared/'+file,asset()).href;script.async=false;d.head.appendChild(script);});
   w.addEventListener('rtglang',function(){refresh();controller.filterCards();var lang=w.RTGi18n.lang;languageNotice.hidden=lang==='nl'||lang==='en'||Object.keys(D.words).every(function(key){return w.I18N[lang]&&typeof w.I18N[lang]['public.'+key]==='string';});});
   root.addEventListener('keydown',function(e){if(e.key==='Escape'&&controller.current()&&!d.querySelector('dialog[open]')){e.preventDefault();collapse();}});
   return controller;

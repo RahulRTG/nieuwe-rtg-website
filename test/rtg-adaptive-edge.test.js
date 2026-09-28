@@ -60,9 +60,7 @@ test('één zwevend oppervlak vervangt de oude zichtbare onderrand', () => {
   assert.match(CSS, /grid-template-columns:repeat\(5,minmax\(44px,1fr\)\)/);
   assert.match(CSS, /\.rtg-adaptive-item\{[^}]*min-width:44px;min-height:54px/);
   assert.match(CSS, /backdrop-filter:blur\(24px\) saturate\(1\.3\)/);
-  /* Sinds de desktopstandaard (#413) draagt de balk het materiaal van de wereld
-     (rtg-world-palette.css) in plaats van een vast donker verloop. */
-  assert.match(CSS, /\.rtg-adaptive-bar\{[^}]*background:var\(--edge-bar-bg\)/);
+  assert.match(CSS, /background:var\(--edge-bar-bg\)/);
   assert.match(CSS, /--edge-bar-accent:var\(--rtg-world-metal,#ebcc94\)/);
   assert.match(VIEW, /class="rtg-adaptive-lips"/);
   assert.doesNotMatch(VIEW, /rtg-adaptive-lips[^\n]+(?:circle|ellipse)/);

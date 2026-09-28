@@ -1,4 +1,4 @@
-name: Desktopstandaard
+name: Desktop- en mobielstandaard
 on:
   pull_request:
   push:
@@ -11,7 +11,11 @@ concurrency:
   cancel-in-progress: true
 jobs:
   all-screens:
-    name: Alle schermen gebruiken dezelfde desktopstandaard
+    name: Alle schermen op ${{ matrix.width }} px
+    strategy:
+      fail-fast: false
+      matrix:
+        width: [1440, 390]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -24,11 +28,13 @@ jobs:
           cache: npm
       - run: npm ci
       - run: node scripts/browserinstall.js
-      - run: npm run desktop:controle
+      - run: npm run desktop:controle -- --width ${{ matrix.width }}
+      - if: matrix.width == 1440
+        run: node --test --test-concurrency=1 test/warm-presentation.e2e.js test/world-desktop-identity.e2e.js
       - name: Bewaar rapport en schermafbeeldingen
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: desktop-standard
+          name: desktop-standard-${{ matrix.width }}
           path: artifacts/desktop-standard/
           if-no-files-found: error

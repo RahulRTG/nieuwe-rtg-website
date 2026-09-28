@@ -5,14 +5,14 @@
    entiteit is de hele handeling. Twee keer dezelfde aanwijzing binnen het
    venster is een dubbeltik, en de route zelf antwoordt dan al met
    `ongewijzigd: true` zonder `sinds` te verzetten (het contract in
-   ./mutatiecontracten-kantoorhuis.js zegt PROTECTED). Een ANDERE entiteit is
+   ./mutatiecontracten-personeel.js zegt PROTECTED). Een ANDERE entiteit is
    wel een nieuw besluit van de eigenaar en hoort door te komen; daarom telt
    alleen dat ene veld.
 
    `POST /api/staff/ochtend` -- de ochtendkaart (par. 4, kern/ochtendkaart.js).
    `leest: true`, en dat is een BESLUIT en geen gat: de route is een POST omdat
    dit huis geen GET met een sessie kent, niet omdat hij iets verandert (zie het
-   contract in ./mutatiecontracten-ochtend.js). Een tweede oproep hoort de kaart
+   contract in ./mutatiecontracten-personeel.js). Een tweede oproep hoort de kaart
    van NU te krijgen -- wie inklokt of zich net ziek meldde, moet er meteen op
    staan -- dus de idempotentiepoort speelt hier geen bewaard antwoord terug. */
 'use strict';

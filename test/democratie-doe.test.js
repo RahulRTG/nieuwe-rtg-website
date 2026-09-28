@@ -181,19 +181,18 @@ test('9. over HTTP tegen een echte server: de hele lus, elke route van het DoeNe
   };
   try {
     const [inbrenger, buur] = [await lid(), await lid()];
-    const A = '/api/member/democratie/actie/';
     const k = (await api('/api/member/democratie/kwestie/inbreng', { onderwerp: 'Zwerfvuil rond het speelveld' }, inbrenger)).body.kwestie;
-    const s = await api(A + 'start', { kwestie: k.id, wat: 'Samen een opruimochtend houden', zichtbaar: true }, inbrenger);
+    const s = await api('/api/member/democratie/actie/start', { kwestie: k.id, wat: 'Samen een opruimochtend houden', zichtbaar: true }, inbrenger);
     assert.equal(s.status, 200, 'start: ' + JSON.stringify(s.body));
     const id = s.body.actie.id;
-    assert.equal((await api(A + 'lijst', {}, buur)).body.acties[0].id, id);
-    assert.equal((await api(A + 'aansluit', { id }, buur)).status, 200);
-    assert.equal((await api(A + 'plan', { id, datum: '2026-10-18', waar: 'Bij het speelveld', plaatsen: 10 }, inbrenger)).status, 200);
-    assert.equal((await api(A + 'antwoord', { id, wat: 'ja' }, buur)).status, 200);
-    assert.equal((await api(A + 'afgelast', { id, reden: 'Regen voorspeld' }, inbrenger)).status, 200);
-    assert.equal((await api(A + 'verlaat', { id }, buur)).status, 200);
-    assert.equal((await api(A + 'resultaat', { id, tekst: 'Twaalf buren ruimden drie zakken zwerfvuil op.' }, inbrenger)).status, 200);
-    assert.equal((await api(A + 'stop', { id, reden: 'Is al afgerond, dit mag niet' }, inbrenger)).status, 409,
+    assert.equal((await api('/api/member/democratie/actie/lijst', {}, buur)).body.acties[0].id, id);
+    assert.equal((await api('/api/member/democratie/actie/aansluit', { id }, buur)).status, 200);
+    assert.equal((await api('/api/member/democratie/actie/plan', { id, datum: '2026-10-18', waar: 'Bij het speelveld', plaatsen: 10 }, inbrenger)).status, 200);
+    assert.equal((await api('/api/member/democratie/actie/antwoord', { id, wat: 'ja' }, buur)).status, 200);
+    assert.equal((await api('/api/member/democratie/actie/afgelast', { id, reden: 'Regen voorspeld' }, inbrenger)).status, 200);
+    assert.equal((await api('/api/member/democratie/actie/verlaat', { id }, buur)).status, 200);
+    assert.equal((await api('/api/member/democratie/actie/resultaat', { id, tekst: 'Twaalf buren ruimden drie zakken zwerfvuil op.' }, inbrenger)).status, 200);
+    assert.equal((await api('/api/member/democratie/actie/stop', { id, reden: 'Is al afgerond, dit mag niet' }, inbrenger)).status, 409,
       'een afgeronde actie stopt niet meer');
 
     const kantoor = await kantoorAlsPersoon(base, OFFICE_CODE);
@@ -208,7 +207,7 @@ test('9. over HTTP tegen een echte server: de hele lus, elke route van het DoeNe
 
     const demo = await api('/api/auth/demo', { tier: 'rtg' });
     if (demo.body && demo.body.token) {
-      assert.equal((await api(A + 'lijst', {}, demo.body.token)).status, 403, 'een demosessie doet niet mee');
+      assert.equal((await api('/api/member/democratie/actie/lijst', {}, demo.body.token)).status, 403, 'een demosessie doet niet mee');
     }
   } finally { stop(child); }
 });

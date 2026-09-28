@@ -156,7 +156,7 @@ accounts(29) schoon(23) boardroomWie(21) managerOnly(19) codenaamVan(19) save(19
 rtf(18) tooManyTries(14) geenGast(14) express(14) findSupplier(13) boardroomAuth(13)
 crypto(12) appUrl(11) keyVanCodenaam(11) pay(11) anthropic(11) noteFailedTry(10)
 payrollOS(10) rtmail(10) kern(9) gegevensStop(9) sseToOffice(9) loginFails(8) stuur(8)
-logActivity(8) mail(7) sseToSupplier(7) onboarding(6) naamAuth(6) notifySupplier(6)
+logActivity(8) mail(7) naamAuth(7) sseToSupplier(7) onboarding(6) notifySupplier(6)
 talen(6) tenant(5) logInlog(5) veilig(5) afdelingen(5) openVacatures(5) overheid(5)
 sseToCustomer(5)
 ```

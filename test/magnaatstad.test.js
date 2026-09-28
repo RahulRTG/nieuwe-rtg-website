@@ -201,3 +201,46 @@ test('de zes routes werken met een ledensessie op een echte server', async () =>
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });
+
+/* Met meer dan een serverproces: elke zet loopt door een collectietransactie op
+   magnaatSteden (./server/kern/magnaat-leven/stad-slot.js). De nagemaakte opslag
+   hieronder doet wat PostgreSQL doet: wachten op het slot, het werk op een VERSE
+   KOPIE draaien, en pas daarna vastleggen -- of niet, als de commit mislukt. */
+test('onder een slot: twee spelers die tegelijk als laatste klaar zijn, zetten de stad precies een dag verder', async () => {
+  let t = 1e12;
+  const db = { data: {} };
+  /* Zoals server/opzet/kernlaag7-ruimtes.js: binnen het slot onthoudt het leven alleen dat er bewaard moet worden. */
+  const opslag = { inSlot: false, nodig: false, bewaard: 0, naSlot() { if (this.nodig) { this.nodig = false; this.bewaard++; } } };
+  const L = maakLeven({ db, nu: () => t, save: () => { if (opslag.inSlot) opslag.nodig = true; } });
+  const log = [];
+  let rij = Promise.resolve(), faal = false;
+  const bewerkCollectie = (sleutel, werk) => {
+    const beurt = rij.then(async () => {
+      await new Promise(r => setImmediate(r));
+      const kopie = JSON.parse(JSON.stringify(db.data[sleutel] || {}));
+      const uit = werk(kopie);
+      if (faal) throw new Error('commit mislukt');
+      db.data[sleutel] = kopie;
+      log.push('commit');
+      return uit;
+    });
+    rij = beurt.catch(() => {});
+    return beurt;
+  };
+  const S = maakStad({ eigen: L.intern.eigen, leven: L, crypto, nu: () => t, bewerkCollectie, opslag,
+    sseToCustomer: (key, soort, data) => log.push('sein:' + key + ':' + data.dag) });
+  const code = (await S.maak('sleutel-A', {})).stad.code;
+  await S.doe('sleutel-B', { code });
+  assert.equal((await S.start('sleutel-A')).stad.status, 'loopt');
+  log.length = 0;
+  const [a, b] = await Promise.all([S.actie('sleutel-A', { actie: 'slaap' }), S.actie('sleutel-B', { actie: 'slaap' })]);
+  assert.deepEqual([a.stad.dag, b.stad.dag].sort(), [1, 2], 'de een wacht nog, de ander zet de stad verder');
+  assert.equal(db.data.magnaatSteden[code].dag, 2, 'precies een dag verder, niet twee');
+  assert.equal(L.intern.haal('stad:' + code + ':0').dag, 2);
+  assert.ok(log.indexOf('commit') < log.findIndex(x => x.startsWith('sein:')), 'een seintje gaat pas na de commit uit');
+  assert.ok(opslag.bewaard > 0, 'de levens zijn bewaard na het slot, niet erin');
+  faal = true; log.length = 0;
+  await assert.rejects(S.actie('sleutel-A', { actie: 'slaap' }));
+  assert.deepEqual(log, [], 'mislukt de commit, dan gaat er geen seintje uit');
+  assert.equal(db.data.magnaatSteden[code].klaar[0], undefined, 'en is er niets vastgelegd');
+});

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2078 bestanden en 14636 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2080 bestanden en 14647 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2078 |
-| losse beweringen (`test(...)`) | 14636 |
+| toetsbestanden | 2080 |
+| losse beweringen (`test(...)`) | 14647 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 174 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1424 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 74 |
-| alleen in de kop *genoemd*, nog niet gemeten | 169 |
-| niets van beide | 411 |
+| alleen in de kop *genoemd*, nog niet gemeten | 170 |
+| niets van beide | 412 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1812 bestanden, 14170 beweringen.
+1813 bestanden, 14180 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -345,6 +345,7 @@ toets omvalt.
 | `deltapoort.test.js` | 23 | gezakt op `===->!==#0` | DE IJKING VAN DE DELTAPOORT -- regel 2 van de lat, op de poort zelf. scripts/deltapoort.js houdt nieuw werk aan de norm. |
 | `democratie-aanval.test.js` | 3 | gezakt op `liegpoort /api/` | DEMOCRATIEOS FASE C -- de aanvalsfase (POLITIEK.md par. 18.2). |
 | `democratie-afhankelijk.test.js` | 6 | gezakt op `===->!==#0` | UNDECLARED_RTG_DEPENDENCY = 0 -- proef P3 wordt meetbaar (POLITIEK.md par. 1.1). |
+| `democratie-doe.test.js` | 10 | genoemd | HET DOENETWERK -- een actie die bij de burger begint (POLITIEK.md par. 6, release-trein stap 4). |
 | `democratie-grondwet.test.js` | 4 | gezakt op `&&->||#0` | DEMOCRATIEOS FASE C4 -- de omwegen om de grondwet heen (POLITIEK.md par. 18.2). |
 | `democratie-verlies.test.js` | 2 | genoemd | NIEMAND KWIJT, ONDER STORINGEN -- de verliesproef van fase B (POLITIEK.md par. 18.1). |
 | `democratie.test.js` | 12 | gezakt op `liegpoort /api/` | DEMOCRATIEOS FASE B -- de minimale burgerlus (POLITIEK.md par. 18.1). |
@@ -1852,7 +1853,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-266 bestanden, 466 beweringen.
+267 bestanden, 467 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2059,6 +2060,7 @@ toets omvalt.
 | `rtmail-team.e2e.js` | 1 | -- | Scherm-test voor de RTMAIL-teams. De unit-toetsen (test/rtmail-team.test.js) bewijzen de server-kant; deze bewijst dat het scherm het doet: een team oprichten, iemand erbij zetten, een bericht oppakken en afhandelen,... |
 | `rtmail-vak.e2e.js` | 1 | -- | Schermtoets voor het POSTVAK in RTG Mail: de mappenbalk, zoeken, opbergen, de ster en het gesprek. De servertoetsen (test/rtmail-vak.test.js) bewijzen dat de laag klopt; deze bewijst dat een mens er ook echt bij kan. |
 | `salon-app.e2e.js` | 1 | -- | Scherm-test voor De Salon-app. De unit-toetsen (test/salon-app.test.js) bewijzen de server-kant; deze bewijst dat het SCHERM het doet: plaatsen vanaf het tabblad zelf, de post die daarna in je eigen profiel staat,... |
+| `samendoen-scherm.e2e.js` | 1 | -- | HET DOENETWERK IN EEN ECHTE BROWSER: de kaart "Samen doen" op /apps/foundation/kwesties.html, en wat het kantoor ervan ziet. test/democratie-doe.test.js bewijst de regels op de routes. |
 | `scan-tafel.e2e.js` | 1 | -- | Scherm-test: de tafel-QR-stroom in de leden-app. We loggen als lid in (token in localStorage), openen de app, klikken op de scan-knop en voeren met de hand een tafel-QR-payload in (headless heeft geen camera). |
 | `scanner.e2e.js` | 2 | -- | Scherm-test voor RTG Scanner: foto's kiezen (de weg die ook zonder camera werkt), de paginastrook, en bewaren als PDF die als gewoon bestand in de Bestanden-kluis belandt (map Scans). De camera zelf valt buiten... |
 | `schuif.e2e.js` | 1 | -- | GEEN SCHERM SCHUIFT ZIJWAARTS. Waarom deze toets bestaat. |

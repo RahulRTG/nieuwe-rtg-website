@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-28T11:50:00.438Z",
-    "commit": "50ca7c10",
+    "op": "2026-09-28T13:15:04.454Z",
+    "commit": "c61ce1c2",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -9492,6 +9492,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "teamrooster.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "techniek-functies.test.js": {

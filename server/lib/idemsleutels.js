@@ -158,6 +158,7 @@ Object.assign(SLEUTELS,
   require('./idemsleutels-reisherkomst').SLEUTELS,
   require('./idemsleutels-bundel').SLEUTELS,
   require('./idemsleutels-kantoorhuis').SLEUTELS,
+  require('./idemsleutels-ochtend').SLEUTELS,
   require('./idemsleutels-magnaatleven').SLEUTELS,
   require('./idemsleutels-democratie').SLEUTELS);
 

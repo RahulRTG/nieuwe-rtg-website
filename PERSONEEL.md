@@ -151,17 +151,28 @@ Lunch: 73 aangemeld
 
 Niet *Dashboard → HR → Mijn rooster → Taken.* Eén kaart, één knop.
 
+**De kaart staat** (28 september 2026): `kern/ochtendkaart.js`, route
+`/api/staff/ochtend`, bovenaan het scherm Vandaag van de personeelsapp. Hij
+bezit niets en schrijft niets, en hij STELT NIETS VOOR (B4). De knop is de
+bestaande inklokknop; wie vrij of afwezig is krijgt er geen. De kop noemt de
+OORZAAK en niet elke regel die eraan lijdt: *"Het rooster van vandaag is nog niet
+vastgesteld: dit is het standaardpatroon."* is één ding en geen twee. Het bouwen
+vond ook iets dat eerder niemand zag: het rooster dat de Team Room toont
+(`scheduleFor`) leest verzuim NIET, dus een zieke collega staat daar vandaag
+gewoon op zijn dienst. De kaart legt het rooster daarom zelf tegen de
+verzuimlaag; het rooster in de Team Room zelf is een stap weg.
+
 Per regel: waar hij vandaan komt, wat hij mag zeggen, en wat hij NOOIT mag
 zeggen.
 
 | Regel | Bron | Stand | Grens |
 |---|---|---|---|
 | **Goedemorgen, Amir** | het eigen account: zelf-inzage is vrij | **staat** | de echte naam wordt op het toestel getoond en gaat nooit mee naar een model (`dienst-fluister.js` noemt de medewerker al niet bij naam) |
-| **Alles staat voor je klaar** | de optelsom van de regels eronder | **een stap weg** | mag er alleen staan als ELKE regel eronder gemeten is; anders: *"Eén ding kon ik niet nakijken: …"* — `niet vast te stellen` is een eersteklas uitslag (BESTUUR.md) |
+| **Alles staat voor je klaar** | de optelsom van de regels eronder | **staat** (28 sep 2026) | mag er alleen staan als ELKE regel eronder gemeten is; anders: *"Eén ding kon ik niet nakijken: …"* — `niet vast te stellen` is een eersteklas uitslag (BESTUUR.md) |
 | **Kantine · 08:00–16:30** | het rooster van de zaak | **staat** voor zaken | — |
-| **Team compleet** | rooster × verzuim | **een stap weg** | de autoplanners lezen verzuim sinds 27 september 2026 (`kern/verzuimrooster.js`) en plannen een zieke medewerker niet meer in. De KAART bestaat nog niet; zij zegt "compleet" alleen als de verzuimlaag is nagekeken (`verzuimNagekeken`), anders wie er ingeroosterd is |
-| **Eerste levering 08:20** | de inkoop van de zaak (`/api/supplier/inkoop`) | **een stap weg** | alleen een BEVESTIGDE levering; een verwachte levering heet zo |
-| **Lunch: 73 aangemeld** | aanmeldingen of reserveringen | **een stap weg** | een GETELD getal mag. Een VOORSPELD getal pas als de trefzekerheid over drie afgesloten perioden is gemeten, en dan met bandbreedte (INT-04, `kern/kosten/vooruitblik.js`). "73 personen" zonder die meting is een verzonnen zekerheid |
+| **Team compleet** | rooster × verzuim | **staat** (28 sep 2026) | "compleet" alleen als de verzuimlaag antwoordde; anders zegt de kop dat het niet na te kijken was. Een afwezige collega is een AANTAL op jouw kaart, nooit een naam of een reden. Een rooster uit het standaardpatroon maakt het een vermoeden |
+| **Eerste levering 08:20** | de groothandelsorders van de zaak | **staat, zonder tijd** (28 sep 2026) | alleen BEVESTIGDE leveringen (`bevestigd`, `onderweg`), en de kaart zegt hoeveel en NIET hoe laat: een order draagt geen aflevertijd, dus "08:20" zou verzonnen zijn. Een aflevertijd is een stap weg in de groothandelslaag |
+| **Lunch: 73 aangemeld** | reserveringen, geteld | **staat** (28 sep 2026) voor het tellen | een GETELD getal mag. Een VOORSPELD getal pas als de trefzekerheid over drie afgesloten perioden is gemeten, en dan met bandbreedte (INT-04, `kern/kosten/vooruitblik.js`). "73 personen" zonder die meting is een verzonnen zekerheid |
 | **Begin mijn dag** | inklokken (`/api/staff/clock`) | **staat** | — |
 
 Wat er daarnaast vóór 08:00 moet zijn gebeurd, en waarom je het NIET ziet:
@@ -447,7 +458,7 @@ Waar een functie botst met een grens, vervalt de functie.
 | **0** | RTG wordt werkgever in zijn eigen Concern, en RTG's eigen werk (ook de kantine) draait op de WorkOS-personeelslaag | **half**: besloten (B1), de huisentiteit en het werkverband in de toegangsreview staan in de schaduw; de entiteit zelf richt de eigenaar in |
 | **1** | dienstverband ↔ kantoorrol; einde dienstverband roept `intrekking.js` aan | een stap weg |
 | **2** | toegang per kamer op het dienstverband — de kantine krijgt alleen de kantine | een stap weg |
-| **3** | de ochtendkaart (par. 4) op gegevens die al bestaan; het rooster leest verzuim | half: het rooster leest verzuim (27 sep 2026) en waarschuwt een mens die met de hand plant (28 sep); de kaart is een stap weg |
+| **3** | de ochtendkaart (par. 4) op gegevens die al bestaan; het rooster leest verzuim | **staat**: het rooster leest verzuim (27 sep 2026), waarschuwt een mens die met de hand plant, en de kaart staat (28 sep); het Team Room-rooster leest verzuim nog niet |
 | **4** | de aandachtskaart van de eigenaar (par. 5): besluitenwachtrij plus stilte met bewijsgraad | een stap weg |
 | **5** | het loopbaanbewijs als lezing van het ledger (par. 8) | een stap weg |
 | **6** | de waardige uitgang (par. 9), behalve de overdracht | een stap weg |

@@ -11,11 +11,23 @@
     const tasks = taskList();
     $('#todaySub').textContent = new Date().toLocaleDateString(lang()==='en'?'en-GB':'nl-NL', { weekday:'long', day:'numeric', month:'long' });
     const klok = zaken && zaken.klok;
+    /* De ochtendkaart: dezelfde kaart voor iedereen, van kantine tot eigenaar.
+       Zonder kaart (oudere server, storing) blijft de gewone dienstkop staan. */
+    const kaart = ochtend;
+    const uur = new Date().getHours();
+    const groet = uur < 12 ? T('pd.o.morgen','Goedemorgen') : uur < 18 ? T('pd.o.middag','Goedemiddag') : T('pd.o.avond','Goedenavond');
+    const graad = r => r.graad === 'gemeten' ? r.bron : r.graad === 'vermoed' ? T('pd.o.vermoed','vermoed')+' · '+r.bron : T('pd.o.onbekend','niet vast te stellen');
+    const kop = kaart
+      ? '<div class="k">'+esc(groet+(kaart.naam ? ', '+kaart.naam : ''))+'</div><div class="shift-big">'+esc(kaart.kop)+'</div>'+
+        kaart.regels.map(r => '<div class="task"><div class="t"><b>'+esc(r.tekst)+'</b><span>'+esc(graad(r))+'</span></div></div>').join('')
+      : '<div class="k">'+T('pd.myshift','Uw dienst vandaag')+'</div><div class="shift-big">'+(shift||T('pd.noshift','Geen dienst'))+'</div>';
+    const klokTekst = klok && klok.open ? T('pd.k.uit','Klok uit')
+      : '▶ '+(kaart && kaart.knop ? kaart.knop.tekst : T('pd.k.in','Klok in'));
     $('#todayWrap').innerHTML =
-      '<div class="card"><div class="k">'+T('pd.myshift','Uw dienst vandaag')+'</div><div class="shift-big">'+(shift||T('pd.noshift','Geen dienst'))+'</div>'+
+      '<div class="card">'+kop+
       (klok ? '<div style="display:flex;align-items:center;justify-content:space-between;gap:0.8rem;margin-top:0.75rem;padding-top:0.7rem;border-top:1px solid var(--line);">'+
         '<span style="font-size:0.76rem;color:var(--soft);">'+T('pd.k.vandaag','Vandaag')+' <b style="color:var(--txt);">'+klok.vandaagUren+' u</b> · '+T('pd.k.week','deze week')+' <b style="color:var(--txt);">'+klok.weekUren+' u</b></span>'+
-        '<button class="abtn'+(klok.open?'':' ghost')+'" id="klokBtn">'+(klok.open?''+T('pd.k.uit','Klok uit'):'▶ '+T('pd.k.in','Klok in'))+'</button></div>' : '')+
+        '<button class="abtn'+(klok.open?'':' ghost')+'" id="klokBtn">'+esc(klokTekst)+'</button></div>' : '')+
       pauzeBlok()+
       '</div>'+
       '<div class="card"><div class="k">'+T('pd.tasksnow','Nu aandacht nodig')+' ('+tasks.length+')</div>'+

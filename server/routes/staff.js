@@ -5,7 +5,7 @@ module.exports = (kern) => {
     // payrollOS gaat door naar staff/dienst.js: een ziekmelding raakt ook de
     // loondoorbetaling. Hij mag ontbreken (een kaal testproces mount de
     // loonlaag niet), dus de aanroepen daar controleren dat.
-    payrollOS } = kern;
+    payrollOS, ochtendkaart } = kern;
   /* De fluisterlaag als EEN naam, en die geven we ook als een naam door. Zou
      staff.js hier de vier losse namen uitpakken en die in actx zetten, dan staan
      ze weer los in de subcontext -- en dan zegt geen enkel bestand meer dat dit
@@ -29,11 +29,14 @@ module.exports = (kern) => {
        ./staff/dienst.js vraagt hem of het toestel van deze mens binnen het hek
        van de zaak stond. Hij mag ontbreken -- dan is "niet gemeten" het
        antwoord, en dat is iets anders dan "niet bevestigd". */
-    plaats, codenaamVan };
+    plaats, codenaamVan,
+    // de ochtendkaart (kern/ochtendkaart.js): een lezing, via ./staff/ochtend.js
+    ochtendkaart };
   require('./staff/collega')(actx);
   require('./staff/dienst')(actx);
   require('./staff/inzetbaarheid')(actx);
   require('./staff/oog')(actx);
+  require('./staff/ochtend')(actx);
 
 app.post('/api/staff', (req, res) => {
   let partner;

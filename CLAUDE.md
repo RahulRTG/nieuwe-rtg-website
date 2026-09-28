@@ -1199,7 +1199,10 @@ bezet; de concierge bestaat al en heet Fluister, het paspoort is een lezing van
 vrije verjaardag is een RECHT voor iedereen (standaard uit, zelf aanzetten),
 het loopbaanbewijs heet op het scherm **Mijn loopbaan**, en Fluister biedt
 **alleen op vraag** aan -- de ochtendkaart toont dus wat er staat en stelt niets
-voor. En geen score op een mens, geen "waarschijnlijk" zonder
+voor. Die kaart staat (`kern/ochtendkaart.js`, `/api/staff/ochtend`, bovenaan
+Vandaag in de personeelsapp): "Alles staat voor je klaar" alleen als elke regel
+GEMETEN is, een afwezige collega is een aantal en nooit een naam, en een
+levering heeft geen tijd omdat een order er geen draagt. En geen score op een mens, geen "waarschijnlijk" zonder
 meting, en alles wat een tweede persoon bereikt (een ruil, ook voor een
 verjaardag) bevestigt een mens.
 **`MUTATIECONTRACT.md` is de laag ernaast** — niet wie iets mag (dat is

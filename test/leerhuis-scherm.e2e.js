@@ -11,6 +11,10 @@
    3. EEN ORGANISATIE MET RELATIE. De vier vakken zeggen wat er (nog) niet is,
       en het scherm onthoudt de gekozen code voor de volgende keer.
 
+   4. DE COCKPITS. Wie geen trainer is en geen team heeft, ziet die vakken
+      niet. De manager ziet zijn teamlid op CODENAAM, nooit op de sleutel
+      `lid:<id>` en nooit op de echte naam.
+
    En er staat nergens een procent of een score: dat is een grens van de laag
    (geen cijfer op een mens), dus hij hoort ook op het scherm te houden.
 
@@ -77,6 +81,23 @@ test('Mijn leerhuis: uit, zonder relatie en met relatie, telkens met woorden en 
       assert.match(await page.textContent('#pad'), /nog geen curriculum/);
       assert.match(await page.textContent('#kan'), /nog niets op uw naam/);
       assert.doesNotMatch(await page.textContent('main'), /\d+\s*%|score/i, 'geen cijfer op een mens');
+      assert.equal(await page.isVisible('#trainerBlok'), false, 'geen trainer, geen trainervak');
+      assert.equal(await page.isVisible('#teamBlok'), false, 'geen team, geen teamvak');
+
+      /* 4. De eigenaar is manager van N: hij ziet N op codenaam. */
+      assert.equal((await post('/api/leerhuis/doe', { org: 'RTG-OPS', actie: 'relatieZet',
+        invoer: { persoon: 'lid:' + nId, soort: 'EMPLOYEE', manager: 'lid:' + eId }, sleutel: 'scherm-rel-m' }, E)).status, 200);
+      const codeN = (await post('/api/state', {}, N)).body.state.user.codename;
+      const eigenaar = await browser.newContext({ viewport: { width: 420, height: 900 } });
+      await eigenaar.addInitScript((token) => { try { localStorage.setItem('rtg_member_token', token); } catch (e) {} }, E);
+      const pe = await eigenaar.newPage();
+      letOpFouten(pe);
+      await pe.goto(base + '/apps/leerhuis.html?org=RTG-OPS', { waitUntil: 'domcontentloaded' });
+      await pe.waitForSelector('#teamBlok:not([hidden])');
+      const team = await pe.textContent('#team');
+      assert.ok(team.includes(codeN), 'de codenaam van het teamlid staat er: ' + team);
+      assert.doesNotMatch(team, /lid:\d+|Leerhuis Collega/, 'geen sleutel en geen echte naam');
+      assert.equal(await pe.isVisible('#trainerBlok'), false);
     } finally {
       if (browser) await browser.close().catch(() => {});
       await stop(child);

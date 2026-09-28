@@ -16,8 +16,17 @@
     d.body.prepend(surface);
     nodes.forEach(function (el) { surface.appendChild(el); });
     var canvas = w.RTGHeritageRegistry && w.RTGHeritageRegistry.canvas[w.location.pathname];
-    if (canvas) surface.dataset.rtgCanvasSurface = 'true';
+    if (canvas) { surface.dataset.rtgCanvasSurface = 'true'; fit(surface); }
     return surface;
+  }
+  // A canvas ends above the Edge: its height is the viewport minus where it starts.
+  function fit(surface) {
+    function set() {
+      var top = Math.max(0, Math.round(surface.getBoundingClientRect().top + (w.scrollY || 0)));
+      if (surface.style.getPropertyValue('--wd-canvas-top') !== top + 'px') surface.style.setProperty('--wd-canvas-top', top + 'px');
+    }
+    w.requestAnimationFrame(set); w.addEventListener('resize', set);
+    if (w.ResizeObserver) new w.ResizeObserver(set).observe(d.body);
   }
   function guard(root, home) {
     var locked = false, oldHidden = false;

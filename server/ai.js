@@ -49,7 +49,7 @@ function maakAI(opts) {
   const log = opts && opts.log;
   const client = {
     aanbieders: ketting.map(c => c.naam),
-    providerInfo: ketting.map(c => ({ naam: c.naam, lokaal: !!c.lokaal,
+    providerInfo: ketting.map(c => ({ naam: c.naam, lokaal: !!c.lokaal, venster: c.venster || null,
       verwerking: c.lokaal ? (c.verwerking || 'rtg-server') : 'externe-provider' })),
     actief: ketting[0].naam,
     bron: ketting[0].lokaal ? 'lokaal' : 'extern',

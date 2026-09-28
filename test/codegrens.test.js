@@ -34,7 +34,12 @@ const INGANGEN = ['server/kern/stuur/lus.js', 'server/kern/stuur/gereedschap.js'
      gewired) en valt dus buiten de sluiting van lus.js. Juist daarom staat hij
      hier: een stuurbestand dat niemand laadt, is het bestand waar een
      readFileSync het langst onopgemerkt kan blijven staan. */
-  'server/kern/stuur/menscontext-ref.js'];
+  'server/kern/stuur/menscontext-ref.js',
+  /* De registerblik (kern/registerblik/) is de tweede runtime-AI met
+     gereedschap: de boardroom-Rahul die RTG's registers LEEST. Precies de
+     uitzondering die deze toets verklaart -- een register lezen mag -- en dus
+     precies de plek waar een bronlezer het eerst zou binnensluipen. */
+  'server/kern/registerblik/lus.js', 'server/kern/registerblik/gereedschap.js', 'server/kern/registerblik/bronnen.js'];
 
 function sluiting(start) {
   const gezien = new Set(); const rij = start.filter(f => fs.existsSync(path.join(WORTEL, f)));
@@ -94,3 +99,9 @@ test('3. het model kan niet meer gereedschappen dan hier staan', () => {
   assert.deepStrictEqual(TOOLS.map(t => t.name).sort(), ['doe', 'kaart', 'plan'],
     'er is een gereedschap bij of af. Is het een bron-lezer? Dan hoort hij bij de Architect en niet hier.');
 });
+
+/* De registerblik staat hierboven in de INGANGEN, dus toets 1 en 2 lezen zijn
+   bron. Dat hij alleen JSON-registers bij naam leest en geen gereedschap met het
+   stuur deelt, bewijst test/registerblik.test.js (toets 7): die toets laadt de
+   modules, en hier zou dat de mutatiemotor bronnen laten muteren waar een
+   grenstoets per definitie niet naar kijkt. */

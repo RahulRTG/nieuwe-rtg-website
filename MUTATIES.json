@@ -376,7 +376,7 @@
       "module": "server/ai.js",
       "operator": "===->!==#0",
       "gezakt": 3,
-      "geprobeerd": 3
+      "geprobeerd": 1
     },
     "ai-regie.test.js": {
       "soort": "server",
@@ -14577,6 +14577,22 @@
       "operator": "!==->===#0",
       "gezakt": 1,
       "geprobeerd": 2
+    },
+    "contextpakket.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/ai/contextpakket.js",
+      "operator": "===->!==#0",
+      "gezakt": 8,
+      "geprobeerd": 1
+    },
+    "registerblik.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/registerblik/gereedschap.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     }
   }
 }

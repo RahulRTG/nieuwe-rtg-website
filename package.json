@@ -29,6 +29,7 @@
     "live:rollback": "sh scripts/docker/live.sh rollback",
     "live:restore": "sh scripts/docker/live.sh restore",
     "ai:lokaal:check": "node scripts/lokale-ai-check.js",
+    "contextmeting": "node scripts/contextmeting.js",
     "kluisbeheer": "node scripts/kluisbeheer.js",
     "outbox": "node scripts/outbox.js",
     "eigenpost": "node scripts/eigenpost.js",

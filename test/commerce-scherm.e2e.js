@@ -48,7 +48,7 @@ test('RTG Commerce: een leverancier opent zijn verkoopwegen en maakt er een aan'
       await page.goto(base + '/apps/leverancier-commerce.html', { waitUntil: 'domcontentloaded' });
       await page.waitForSelector('#n-maak', { state: 'visible', timeout: 20000 });
 
-      assert.equal((await page.getByRole('heading',
+      assert.equal((await page.locator('.wd-page').getByRole('heading',
         { name: 'Verkoopwegen en retouren', exact: true }).textContent()).trim(),
       'Verkoopwegen en retouren');
       assert.ok(await page.locator('#n-soort option').count() > 0, 'het scherm toont de soorten uit de server');

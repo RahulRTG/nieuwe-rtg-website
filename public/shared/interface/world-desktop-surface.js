@@ -13,15 +13,17 @@
     var nodes = Array.from(d.body.children).filter(function (el) {
       return !el.matches(overlays) && !el.className.toString().startsWith('rtg-edge-') && !el.className.toString().startsWith('rtg-adaptive-');
     });
-    d.body.prepend(surface);
+    d.body.insertBefore(surface, nodes[0] || null);
     nodes.forEach(function (el) { surface.appendChild(el); });
     var canvas = w.RTGHeritageRegistry && w.RTGHeritageRegistry.canvas[w.location.pathname];
-    if (canvas) surface.dataset.rtgCanvasSurface = 'true';
+    if (canvas && nodes.some(function (el) { return el.matches(canvas); })) surface.dataset.rtgCanvasSurface = 'true';
     return surface;
   }
   function guard(root, home) {
     var locked = false, oldHidden = false;
     function sync() {
+      var command = d.getElementById('rtgCommand');
+      if (command && home.classList.contains('wd-page') && command.parentNode !== home) home.appendChild(command);
       var gate = d.getElementById('rtf-toegang-slot');
       if (gate && d.documentElement.classList.contains('rtf-toegang-dicht')) {
         if (gate.tagName === 'DIALOG') {

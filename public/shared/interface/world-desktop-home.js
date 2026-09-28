@@ -73,6 +73,9 @@
           var label = U.el('span', 'wd-world-label', { living: 'LivingOS', travel: 'TravelOS', work: 'WorkOS', foundation: 'FoundationOS' }[world]);
           label.translate = false; brand.appendChild(label);
         }
+        var activeLabel = brand && brand.querySelector('.wd-world-label');
+        var activeTitle = {living:'LivingOS',work:'WorkOS',travel:'TravelOS',foundation:'FoundationOS'}[d.body.dataset.rtgBladWereld] || {living:'LivingOS',work:'WorkOS',travel:'TravelOS',foundation:'FoundationOS'}[world];
+        if (activeLabel && activeLabel.textContent !== activeTitle) activeLabel.textContent = activeTitle;
       }
       edge();
       // Home hangt aan window en niet aan het model van de Edge: dat begint bij elke start leeg.
@@ -82,8 +85,8 @@
         if (frame.isOpen()) { e.preventDefault(); frame.collapse(); }
         else if (d.body.dataset.worldHome) { e.preventDefault(); home.scrollIntoView({ block: 'start' }); }
       });
-      var watch = new MutationObserver(function () { if (d.body.dataset.rtgAdaptiveReady === 'true') { edge(); watch.disconnect(); } });
-      if (d.body.dataset.rtgAdaptiveReady !== 'true') watch.observe(d.body, { attributes: true, attributeFilter: ['data-rtg-adaptive-ready'] });
+      var watch = new MutationObserver(edge);
+      watch.observe(d.body, { attributes: true, attributeFilter: ['data-rtg-adaptive-ready','data-rtg-blad-wereld'] });
       w.addEventListener('rtglang', function () { cards.refresh(); runtime.setState('workspace'); edge(); greet(); });
       w.addEventListener('pagehide', function () { watch.disconnect(); runtime.destroy(); });
       w.RTGDesktopHome.current = { runtime: runtime, cards: cards, frame: frame };

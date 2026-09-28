@@ -30,7 +30,7 @@
      lopen. De bron blijft in de DOM staan met zijn eigen handlers en rechten;
      de Edge klikt hem aan. */
   var CLAIM = '.rtg-suitebar,.rtg-suitenav,.tos-opsnav,.rtg-social-commandbar,' +
-    '.salon-socialnav,.rtg-intel-strip,.rtd-nav,.one-nav';
+    '.salon-socialnav,.rtg-intel-strip,.rtd-nav,.one-nav,.rtg-deep-nav';
 
   /* `.ios-nav` STOND HIER EN IS ERUIT GEHAALD, en dat is een besluit met een
      prijs: het was 108 van de 135 schermen. De reden staat in wat de keten
@@ -82,7 +82,8 @@
     var stijl = win.getComputedStyle(el);
     if (stijl.position !== 'fixed' && stijl.position !== 'sticky') return false;
     var r = el.getBoundingClientRect();
-    if (r.width < win.innerWidth * 0.6) return false;
+    var surface = el.closest('.wd-page');
+    if (r.width < (surface ? surface.getBoundingClientRect().width : win.innerWidth) * 0.6) return false;
     return r.height >= 28 && r.height <= win.innerHeight * 0.4;
   }
   /* EERST ALLES METEN, DAN PAS MARKEREN -- en dat is geen nettigheid maar een

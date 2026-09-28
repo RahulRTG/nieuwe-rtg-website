@@ -35,7 +35,7 @@ body[data-rtg-adaptive-ready="true"]:has(:is(dialog[open],.scrim.open[role="dial
 @media print{.rtg-adaptive-edge{display:none!important}}
 
 /* Every domain uses the same Edge surface; hidden sources retain only their handlers. */
-body[data-rtg-adaptive-ready="true"] :is(#rtgCommand .cmd-balk,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-bank,.rv-tabs,body>nav.balk,.rtg-edge-owned-bar){display:none!important}
+body[data-rtg-adaptive-ready="true"] :is(#rtgCommand .cmd-balk,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-bank,.rv-tabs,body>nav.balk,.wd-page>nav.balk,.rtg-edge-owned-bar){display:none!important}
 
 /* DE RUIMTE GAAT MEE MET DE BALK. Een balk die zijn eigen hoogte op de body
    reserveert, laat anders geen tweede bediening achter maar wel het gat waar hij

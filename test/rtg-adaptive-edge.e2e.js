@@ -27,7 +27,9 @@ test('LivingOS Home keert vanuit de routevergelijker en een app terug naar de ve
         await page.waitForLoadState('domcontentloaded');
         assert.equal(new URL(page.url()).pathname, '/apps/wereld.html', source + ' op ' + width);
         await wacht(page, '/apps/wereld.html');
-        await page.waitForSelector('.living-intro');
+        await page.waitForSelector('.wp-scene');
+        await page.locator('.wp-story a').click();
+        await page.waitForSelector('.wp-domain[open] #feed');
         assert.equal(await page.locator('#feed').count(), 1, 'de vernieuwde momentenfeed staat er');
         assert.equal(await page.locator('.lo-rail').count(), 0, 'geen routevergelijker als home');
         assert.equal((await meet(page)).bars, 1);

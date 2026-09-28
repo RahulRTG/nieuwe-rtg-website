@@ -231,7 +231,7 @@ test('Leden-app: de ledenpas ligt in de wallet, niet meer op het beginscherm',
   }
 });
 
-test('Leden-app: in het Engels is de startpagina echt Engels (i18n-dekking)',
+test('Leden-app: de dynamische passregel behoudt de Engelse vertaling',
   { skip: geenBrowser(pw) }, async () => {
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
@@ -251,7 +251,7 @@ test('Leden-app: in het Engels is de startpagina echt Engels (i18n-dekking)',
        eronder loopt langs dezelfde weg (T('app.membersince',...) uit het
        EN-woordenboek) en bewijst dus hetzelfde: de door JS gevulde tekst komt
        vertaald uit het woordenboek en niet in het Nederlands terug. */
-    await page.waitForSelector('#homeSub', { timeout: 5000 });
+    await page.waitForSelector('#homeSub', { state: 'attached', timeout: 5000 });
     await page.waitForFunction(() => {
       const e = document.getElementById('homeSub');
       return e && e.textContent.trim().length > 0;
@@ -656,6 +656,7 @@ test('Inlogportaal: inhoud en standaard Edge overlappen niet',
       await ctx.addInitScript(()=>{localStorage.setItem('rtg_lang','nl');localStorage.setItem('rtg_cookieinfo_v1','1');});
       const page=await ctx.newPage(); await page.goto(base+'/apps/app.html');
       await page.waitForSelector('.rtg-adaptive-bar');
+      await page.locator('#agNieuw').scrollIntoViewIfNeeded();
       const shape=await page.evaluate(()=>({
         bars:document.querySelectorAll('.rtg-adaptive-bar').length,
         legacy:document.querySelectorAll('#gate .rtg-ring,#gate .ag-mond').length,
@@ -719,7 +720,8 @@ test('Leden-app: een verse start begint thuis, een onderbreking van seconden nie
     }, [reg.token]);
     const pVers = await ctxVers.newPage();
     await pVers.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
-    await pVers.waitForSelector('.view.active', { timeout: 15000 });
+    await pVers.waitForSelector('.view.active', { state: 'attached', timeout: 15000 });
+    await pVers.waitForFunction(() => document.querySelector('.view.active')?.dataset.view === 'home');
     assert.equal(await actieveView(pVers), 'home',
       'een verse start toont het beginscherm, niet de app waar u het laatst was');
   } finally {

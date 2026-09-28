@@ -24,9 +24,9 @@ const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrows
 const pw = laadPlaywright();
 
 const rahulStaat = () => {
-  const tab = document.querySelector('.rtg-rahul-tab');
+  const tab = document.querySelector('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]');
   if (!tab) return 'geen tab';
-  return tab.hidden || !tab.getClientRects().length ? 'weg' : 'zichtbaar';
+  return tab.hidden || !tab.getClientRects().length || getComputedStyle(tab).visibility === 'hidden' ? 'weg' : 'zichtbaar';
 };
 
 const edgeStaat = () => {
@@ -72,10 +72,11 @@ test('de metgezel wijkt voor een venster en komt daarna terug',
     /* Clips, want daar kwam de melding vandaan: een blad dat onderaan opent,
        met zijn sluitknop precies op de plek van de balk. */
     await page.goto(base + '/apps/clips.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForFunction(() => !!document.querySelector('.rtg-rahul-tab'), null, { timeout: 20000 });
+    await page.waitForFunction(() => !!document.querySelector('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]'), null, { timeout: 20000 });
     await page.waitForFunction(() => document.body.getAttribute('data-rtg-edge-2-rendered') === 'true',
       null, { timeout: 20000 });
     await page.waitForSelector('body[data-rtg-adaptive-ready="true"] .rtg-adaptive-bar');
+    await page.waitForFunction(() => { const r = document.querySelector('.rtg-adaptive-bar').getBoundingClientRect(); return r.height === 64 && r.top < innerHeight; });
     assert.equal(await page.evaluate(rahulStaat), 'zichtbaar', 'in rust is de centrale Rahul-tab bereikbaar');
     assert.deepEqual(await page.evaluate(edgeStaat), { roots: 1, balk: 'zichtbaar', venster: false },
       'in rust staat exact het ene Edge-casco klaar');
@@ -90,7 +91,7 @@ test('de metgezel wijkt voor een venster en komt daarna terug',
        Bewaak dat die opsplitsing niet alleen compileert, maar ook echt landt
        en beide veilige voorbereidingsknoppen blijft bedienen. */
     await page.waitForSelector('.rtg-one [data-one-decision]', { state: 'attached', timeout: 10000 });
-    await page.click('.rtg-rahul-tab');
+    await page.click('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]');
 
     /* HIER STOND EEN VASTGEPINDE DECORTEKST, en dat is precies waarom deze
        twee regels omvielen. De knop schreef vroeger zelf "5 DOMEINEN
@@ -133,7 +134,7 @@ test('de metgezel wijkt voor een venster en komt daarna terug',
     await require('./helper').edgeActies(page);
     await page.click('.rtg-edge-action button');
     await page.waitForSelector('#studio.open', { timeout: 5000 });
-    await page.waitForFunction(() => document.querySelector('.rtg-rahul-tab').hidden, null, { timeout: 5000 });
+    await page.waitForFunction(() => getComputedStyle(document.querySelector('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]')).visibility === 'hidden', null, { timeout: 5000 });
     await page.waitForFunction(() => document.body.hasAttribute('data-rtg-edge-venster-open'), null, { timeout: 5000 });
     assert.equal(await page.evaluate(rahulStaat), 'weg', 'het geopende venster krijgt voorrang op Rahul');
     assert.deepEqual(await page.evaluate(edgeStaat), { roots: 1, balk: 'weg', venster: true },
@@ -143,7 +144,7 @@ test('de metgezel wijkt voor een venster en komt daarna terug',
        onder de balk en meldt Playwright "intercepts pointer events". */
     await page.click('#studioDicht', { timeout: 10000 });
     await page.waitForFunction(() => !document.querySelector('#studio').classList.contains('open'), null, { timeout: 5000 });
-    await page.waitForFunction(() => !document.querySelector('.rtg-rahul-tab').hidden, null, { timeout: 5000 });
+    await page.waitForFunction(() => getComputedStyle(document.querySelector('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]')).visibility === 'visible', null, { timeout: 5000 });
     await page.waitForFunction(() => !document.body.hasAttribute('data-rtg-edge-venster-open'), null, { timeout: 5000 });
     assert.equal(await page.evaluate(rahulStaat), 'zichtbaar', 'en daarna is Rahul direct weer bereikbaar');
     assert.deepEqual(await page.evaluate(edgeStaat), { roots: 1, balk: 'zichtbaar', venster: false },
@@ -156,12 +157,12 @@ test('de metgezel wijkt voor een venster en komt daarna terug',
     await page.waitForSelector('.clip .laag .knop', { timeout: 20000 });
     await page.locator('.clip .laag .knop', { hasText: 'Bewerken' }).first().click();
     await page.waitForSelector('#knipSheet.open', { timeout: 5000 });
-    await page.waitForFunction(() => document.querySelector('.rtg-rahul-tab').hidden, null, { timeout: 5000 });
+    await page.waitForFunction(() => getComputedStyle(document.querySelector('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]')).visibility === 'hidden', null, { timeout: 5000 });
     await page.waitForFunction(() => document.body.hasAttribute('data-rtg-edge-venster-open'), null, { timeout: 5000 });
     assert.equal(await page.evaluate(rahulStaat), 'weg', 'ook het tweede venster krijgt voorrang');
     await page.click('#knipDicht');
     await page.waitForFunction(() => !document.querySelector('#knipSheet').classList.contains('open'), null, { timeout: 5000 });
-    await page.waitForFunction(() => !document.querySelector('.rtg-rahul-tab').hidden, null, { timeout: 5000 });
+    await page.waitForFunction(() => getComputedStyle(document.querySelector('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]')).visibility === 'visible', null, { timeout: 5000 });
     await page.waitForFunction(() => !document.body.hasAttribute('data-rtg-edge-venster-open'), null, { timeout: 5000 });
     assert.equal(await page.evaluate(rahulStaat), 'zichtbaar', 'en hij blijft terugkomen');
 

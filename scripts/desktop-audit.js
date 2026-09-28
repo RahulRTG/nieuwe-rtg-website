@@ -45,13 +45,13 @@ async function main() {
           await page.waitForFunction(() => { const photos = [...document.querySelectorAll('.wp-atmosphere img,.wp-photo>img')]; return photos.length && photos.every(img => img.complete && img.naturalWidth > 0); }, null, { timeout: 12000 });
           // Edge can append styles after DOMContentLoaded; wait for the shared
           // desktop stylesheet to finish applying before measuring its grid.
-          await page.waitForFunction(() => getComputedStyle(document.body).paddingTop === '64px', null, { timeout: 6000 });
+          await page.waitForFunction(() => getComputedStyle(document.body).paddingTop === (/^(compact|focus)$/.test(document.body.dataset.rtgEdge2State || '') ? '0px' : '64px'), null, { timeout: 6000 });
           await page.evaluate(() => document.fonts.ready);
           row.state = await page.evaluate(() => {
             const b = document.body, css = getComputedStyle(b);
             const rect = s => { const e = document.querySelector(s); if (!e) return null; const r = e.getBoundingClientRect(); return { x:r.x,y:r.y,w:r.width,h:r.height,right:r.right,bottom:r.bottom,scroll: getComputedStyle(e).overflowY }; };
             return { url: location.pathname, world:b.dataset.rtgWorld, desktop:b.dataset.rtgDesktop, layout:b.dataset.rtgLayout, public:b.dataset.publicPlatform,
-              background:css.backgroundColor, padding:css.padding, pageScroll:scrollY, scheme:css.colorScheme, shells:document.querySelectorAll('.wd-shell').length,
+              background:css.backgroundColor, edgeState:b.dataset.rtgEdge2State, padding:css.padding, pageScroll:scrollY, scheme:css.colorScheme, shells:document.querySelectorAll('.wd-shell').length,
               edges:document.querySelectorAll('.rtg-adaptive-bar').length,
               shell:rect('.wd-shell'), content:rect(b.dataset.rtgDesktopAccess === 'locked' ? '.wd-access' : document.querySelector('.wd-focus:not([hidden])') ? '.wd-focus:not([hidden])' : '.wd-home'), left:rect('.wd-people'), right:rect('.wd-favorites'), library:rect('.wd-library'),
               overflow:document.documentElement.scrollWidth > innerWidth + 1,
@@ -61,7 +61,8 @@ async function main() {
           const s = row.state;
           row.failures = [];
           if (row.http !== 200 && route !== '/site/404.html') row.failures.push('http-'+row.http);
-          if (Math.abs(s.shell?.y+s.pageScroll-(mobile ? 136 : !s.public && s.world === 'living' ? 154 : 104)) > 2) row.failures.push('nonstandard-top-inset');
+          const expectedTop = (mobile ? 136 : !s.public && s.world === 'living' ? 154 : 104) - (/^(compact|focus)$/.test(s.edgeState || '') ? 64 : 0);
+          if (Math.abs(s.shell?.y+s.pageScroll-expectedTop) > 2) row.failures.push('nonstandard-top-inset');
           if (s.shells !== 1 || s.edges !== 1) row.failures.push('duplicate-or-missing-frame');
           if (s.overflow) row.failures.push('horizontal-overflow');
           if (!s.left || !s.right || !s.content || !s.shell || (!mobile && (s.left.w < 100 || s.right.w < 100))) row.failures.push('missing-column');

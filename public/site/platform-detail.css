@@ -14,6 +14,8 @@
  body[data-rtg-desktop]>.pp-header .pp-language{margin-inline-start:auto}
 
 .pp-detail-shell .wd-home{overflow-wrap:anywhere}
+body:has(.pp-detail-shell) .pp-header>.pp-language{display:inline-flex!important;min-width:44px;min-height:44px}
+@media(max-width:370px){body:has(.pp-detail-shell) .pp-header>.pp-context{font-size:12px}}
 .pp-detail-shell .wd-home :is(h1,h2,h3){font-family:Inter,sans-serif!important;letter-spacing:-.035em}
 .pp-detail-shell .world-hero::before,.pp-detail-shell .world-hero::after{display:none}
 .pp-detail-shell .world-hero h1{font-size:clamp(30px,4vw,44px);margin-block:12px 20px}

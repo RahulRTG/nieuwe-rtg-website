@@ -50,7 +50,8 @@ test('Daily rooms: first visit to real content, Edge, language, layout and recov
       assert.equal(await page.locator('#dailyIntro h1').count(), 1);
       assert.equal(await page.locator('.rtg-adaptive-bar:visible').count(), 1);
       assert.equal(await page.locator('.rtg-reality-graph,.rtg-deep-nav,.kantoor-intro').count(), 0);
-      assert.ok((await page.locator('#dailyIntro').boundingBox()).y < 100, app + ': no duplicate top bar');
+      const intro = await page.locator('#dailyIntro').boundingBox(), surface = await page.locator('.wd-page').boundingBox();
+      assert.ok(intro.y >= surface.y && intro.y < surface.y + 100, app + ': introduction begins inside the common content surface');
       for (const width of [320, 390, 1440]) {
         await page.setViewportSize({ width, height: width === 1440 ? 1000 : 844 });
         assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), app + ': no overflow at ' + width);

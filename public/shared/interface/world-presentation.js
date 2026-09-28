@@ -18,6 +18,7 @@
     var names = d.body.dataset.publicPlatform ? ['Verhalen', 'Contact', 'Onderwerpen'] : { living: ['Dichtbij', 'Uw mensen', 'Bewaard'], work: ['Werkruimtes', 'Uw team', 'Vandaag'], travel: ['Overzicht', 'Reisgezelschap', 'Voor vertrek'], foundation: ['Samen leren', 'Uw omgeving', 'Vandaag'] }[world];
     [home, people, favorites].forEach(function (panel, i) {
       panel.id = panel.id || 'wp-panel-' + i; var b = U.el('button', '', names[i]); b.type = 'button'; b.setAttribute('aria-controls', panel.id);
+      b.prepend(U.icon(i === 0 ? (world === 'living' ? 'pin' : 'grid') : i === 1 ? 'people' : 'bookmark'));
       b.setAttribute('aria-expanded', String(i === 0)); b.onclick = function () {
         root.dataset.mobilePanel = ['home', 'people', 'favorites'][i];
         nav.querySelectorAll('button').forEach(function (other) { other.setAttribute('aria-expanded', String(other === b)); });
@@ -38,6 +39,16 @@
     if (world === 'living') { a.href = '#reisoverzicht'; a.onclick = function () { details.open = true; }; }
     story.append(label, photo(c[7], 'beeld-00000001', 'Verhaalbeeld', 'wd-app-photo'), a);
     home.append(scene); root.append(story, details); home.dataset.warmHome = 'true';
+    function revealTarget() {
+      var key; try { key = decodeURIComponent(w.location.hash.slice(1)); } catch (_) { return; }
+      var target = key && d.getElementById(key);
+      if (target && details.contains(target)) details.open = true;
+      if (key && Array.from(native.querySelectorAll('[data-blad]')).some(function (el) { return el.dataset.blad === key; })) details.open = true;
+      if (native.querySelector('.living-load-error,#stadmelding')) details.open = true;
+    }
+    revealTarget(); w.addEventListener('hashchange', revealTarget);
+    var feedWatch = new MutationObserver(revealTarget); feedWatch.observe(native, { childList: true, subtree: true });
+    w.addEventListener('pagehide', function () { feedWatch.disconnect(); });
   }
   function start(o) {
     U = w.RTGDesktopUI; world = d.body.dataset.rtgWorld; P = w.RTGPersonalImages;

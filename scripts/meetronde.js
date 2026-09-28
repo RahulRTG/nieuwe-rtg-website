@@ -153,6 +153,11 @@ const vingerafdruk = (naam) => {
   catch (e) { return null; }
 };
 
+/* Viel het instrument om? Een ongevangen fout van Node: een regel `...Error: ...`
+   met direct daaronder een stapelspoor. Een waarschuwing (`ExperimentalWarning`)
+   heeft geen stapelspoor en telt niet. */
+const valOm = (fout) => /(^|\n)[A-Za-z]*Error: [^\n]*\n\s+at /.test(String(fout || ''));
+
 function draai(cmd, extraEnv) {
   const r = spawnSync(process.execPath, cmd, {
     cwd: WORTEL, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
@@ -207,7 +212,7 @@ async function poortwachtRonde() {
    Die wacht ontbrak hier omdat dit bestand zelf geen register schrijft en dus
    buiten het bereik van scripts/meetkeuring.js viel. Hij schrijft ze alleen
    allemaal via zijn kinderen -- wat erger is en niet minder erg. */
-module.exports = { STAPPEN };
+module.exports = { STAPPEN, valOm };
 if (require.main !== module) return;
 
 (async () => {
@@ -227,7 +232,18 @@ if (require.main !== module) return;
     let r;
     try {
       r = s.id === 'poortwacht' ? await poortwachtRonde()
-        : (() => { const d = draai(s.cmd); return { ok: d.code === 0 || d.code === 1, melding: laatsteRegel(d.uit) }; })();
+        : (() => {
+          const d = draai(s.cmd);
+          /* UITGANG 1 IS EEN BEVINDING -- MAAR OOK EEN CRASH. Node eindigt een
+             ongevangen fout met dezelfde 1, en dan las een instrument dat niet
+             eens laadde als "klaar (register onveranderd)". Dat is gebeurd: de
+             auditproef gaf een SyntaxError (dubbele declaratie) en AUDITPROEF.json
+             stond drie weken stil terwijl elke ronde "klaar" meldde. Een fout met
+             een stapelspoor op stderr is geen bevinding. */
+          const crash = valOm(d.fout);
+          return { ok: !crash && (d.code === 0 || d.code === 1),
+            melding: crash ? 'het instrument viel om: ' + String(d.fout).split('\n').find((l) => /Error: /.test(l)) : laatsteRegel(d.uit) };
+        })();
     } catch (e) { r = { ok: false, melding: String(e.message) }; }
     const na = vingerafdruk(s.register);
     const veranderd = voor !== na;

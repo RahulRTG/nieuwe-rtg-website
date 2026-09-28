@@ -80,6 +80,10 @@
       if ([1, 2, 4].indexOf(limiet) < 0) limiet = 1;
       var zichtbaar = schil.surfaces.slice(0, limiet);
       if (schil.actief && zichtbaar.indexOf(schil.actief) < 0) zichtbaar[zichtbaar.length - 1] = schil.actief;
+      if (schil.vak.hasAttribute('data-sleept-object')) {
+        var doelen = schil.surfaces.filter(function (s) { return !!sleepAanbod[s.id]; });
+        zichtbaar = doelen.concat(zichtbaar.filter(function (s) { return doelen.indexOf(s) < 0; })).slice(0, limiet);
+      }
       schil.surfaces.forEach(function (s) { s.el.toggleAttribute('data-edge-visible', zichtbaar.indexOf(s) >= 0); });
       var k = zichtbaar.length;
       var sk = k === 4 ? 2 : (k === 2 && m.b >= 760 ? 2 : 1);
@@ -642,6 +646,7 @@
     s.el.setAttribute('data-kan-vangen', '');
     var tab = tabVanSurface(s);
     if (tab) tab.setAttribute('data-kan-vangen', '');
+    if (standaard()) schik();
   }
 
   function tabVanSurface(s) {
@@ -701,6 +706,7 @@
     if (schil.tabs) schil.tabs.querySelectorAll('[data-kan-vangen],[data-vangt]').forEach(function (tab) {
       tab.removeAttribute('data-kan-vangen'); tab.removeAttribute('data-vangt');
     });
+    if (standaard()) schik();
     var doel = sleepDoel, object = sleepObject;
     sleepDoel = null;
     if (!doel || !object) { sleepObject = null; return; }

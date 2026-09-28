@@ -1,5 +1,6 @@
 /* Uses the member boundary and the existing private file vault. */
 'use strict';
+const { wie: envelopWie } = require('../opzet/envelop');
 module.exports = function (kern) {
   require('./presentatie-gezinsbeelden')(kern);
   const { app, auth, accounts, bestanden } = kern, preferences = require('../kern/presentatie-beelden');
@@ -15,7 +16,7 @@ module.exports = function (kern) {
   app.post('/api/ik/beelden/zet', auth, (req, res) => {
     const id = member(req, res); if (id == null) return;
     const md = accounts.getMemberState(id) || {};
-    const r = preferences.zet(md, req.body, bestanden.bestandenLijst(req.session.key).items);
+    const r = preferences.zet(md, req.body, bestanden.bestandenLijst(envelopWie(req) || req.session.key).items);
     if (r.error) return res.status(r.status).json({ error: r.error });
     accounts.saveMemberState(id, md); res.json(r);
   });

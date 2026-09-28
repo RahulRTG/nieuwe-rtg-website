@@ -76,13 +76,7 @@
     laag.querySelector('button').focus();
   }
 
-  /* Binnen beeld, in de breedte. Een kop van een app is vaak een flexrij die
-     NIET afbreekt (display:flex zonder flex-wrap) en bovendien position:fixed:
-     staat die rij op telefoonmaat al vol, dan schuift onze knop er aan de
-     rechterkant uit, en juist doordat de rij vast staat valt er niet naartoe te
-     scrollen. Gemeten op 390 breed viel hij zo van het scherm bij navigatie en
-     ov. Vandaar deze toets na het plaatsen: een knop die je niet kunt zien is
-     geen knop. */
+  // Flex headers must keep the export button within the viewport.
   function inBeeld(k) {
     var r = k.getBoundingClientRect();
     var breed = window.innerWidth || document.documentElement.clientWidth;
@@ -114,18 +108,18 @@
     }
   }
 
-  /* De app verandert (gegevens komen later binnen, een scherm wordt
-     hertekend), dus de knop wordt telkens opnieuw gewogen. rtgdeel-vast
-     zegt tegen het deelmenu: geen inhoud -- zo telt de knop niet als deel
-     en verdwijnt hij niet bij een deelwissel.
-
-     Een knop die niet meer GETEKEND wordt telt hier als weg: op app.html
-     sluit de gastheer ([role=main] #gate) zodra de app opstart, en dan zou
-     de bediening stil verdwijnen. Na vijf verhuizingen houdt hij op, want
-     een pagina waar geen enkele plek zichtbaar is hoort geen eeuwige
-     verhuizing te betalen (LAT regel 5: dan is het stil, maar niet druk). */
+  // Reassess actual data and host visibility when the screen changes.
   function herzie() {
     if (!document.body) return;
+    // Standalone pages share one visible content frame. A former workspace
+    // drawer must not keep the real export control inside a permanently closed host.
+    var frame = document.body.hasAttribute('data-rtg-desktop') && document.querySelector('.wd-page');
+    if (frame) {
+      var output = frame.querySelector(':scope > .wd-output');
+      if (!output) { output = document.createElement('div'); output.className = 'wd-output'; frame.prepend(output); }
+      gastKnop = output; gastLaag = document.body;
+      if (laag && laag.parentNode !== gastLaag) gastLaag.appendChild(laag);
+    }
     /* hidden alleen is niet genoeg: sommige gastschermen laten #gate bestaan
        maar nemen hem via de indeling uit beeld. Alleen een werkelijk zichtbare
        poort onderdrukt de uitvoerknop. */

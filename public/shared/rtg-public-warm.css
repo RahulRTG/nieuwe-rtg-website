@@ -29,3 +29,5 @@ body[data-public-platform] .pp-detail-content :is(.world-header,.site-header){di
 
 .pp-feature>.wp-photo{order:2}.pp-feature>.wp-photo>.pp-feature-photo{height:100%!important}
 @media(max-width:999px){body[data-public-platform][data-rtg-desktop] .pp-shell{width:calc(100% - 32px)!important;margin-inline:auto!important}.pp-shell>*{min-width:0}}
+
+@media(max-width:599px){body[data-public-platform][data-rtg-desktop] .pp-stories{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;overflow:visible}body[data-public-platform][data-rtg-desktop] .pp-story{min-width:0;max-width:100%}}

@@ -4,7 +4,7 @@ Alle zelfstandige RTG-appschermen, de publieke appwebsite, wereld- en paspagina�
 
 LivingOS en Saloon gebruiken champagne/licht. WorkOS gebruikt grafiet met gedempt groen, TravelOS gedempt bordeaux en FoundationOS nachtblauw met zacht goud. Openbare platformpagina’s gebruiken neutraal warm onyx met subtiel brons. Foto’s, documenten en tekenvlakken behouden hun eigen inhoudskleuren.
 
-`public/shared/rtg-world-palette.css` bezit de wereldkleuren. De gedeelde desktopbestanden bezitten de geometrie. `scripts/heritage-uitrol.js` bewaakt alle 292 zelfstandige appingangen; de 18 bestaande aliases verwijzen door en bevatten geen tweede scherm. Een ingesloten app deelt het buitenste kader. Het gedeelde speelscherm laadt geen persoonlijke widgets.
+`public/shared/rtg-world-palette.css` bezit de wereldkleuren. De gedeelde desktopbestanden bezitten de geometrie. `scripts/heritage-uitrol.js` bewaakt alle 293 zelfstandige appingangen; de 18 bestaande aliases verwijzen door en bevatten geen tweede scherm. Een ingesloten app deelt het buitenste kader. Het gedeelde speelscherm laadt geen persoonlijke widgets.
 
 ## Controle
 

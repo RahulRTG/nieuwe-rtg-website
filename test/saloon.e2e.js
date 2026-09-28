@@ -63,7 +63,6 @@ test('Saloon: publiceren, reageren, bewaren, filters en mobiele bediening', { sk
     await post('/api/supplier/redactie/snel', { titel: 'Een tweede blik op de buurt', inhoud: 'Een tweede verslag.', rubriek: 'Stad' }, zaak.token);
     await post('/api/wereld/modus', { modus: 'alles', saloon: { bronnen: ['sociaal', 'nieuws'], plaats: '', vorm: 'overzicht' } }, reg.token);
     await page.goto(srv.base + '/apps/wereld.html?embed=1');
-    await page.locator('.wp-story a').click();
     const nieuws = page.locator('[data-saloon-id="nieuws:BODE:' + bericht.artikel.id + '"]');
     await nieuws.waitFor();
     await nieuws.getByRole('button', { name: 'Lees artikel' }).click();
@@ -83,7 +82,7 @@ test('Saloon: publiceren, reageren, bewaren, filters en mobiele bediening', { sk
     const clip = await post('/api/clips/maak', { titel: 'Een creator aan het werk', duurS: 20, mbGeschat: 4 }, maker.token);
     assert.ok(clip.id);
     await post('/api/wereld/modus', { modus: 'alles', saloon: { bronnen: ['makers'], plaats: '', vorm: 'overzicht' } }, reg.token);
-    await page.reload(); await page.locator('.wp-story a').click();
+    await page.reload();
     const werk = page.locator('[data-saloon-id="makers:clip:' + clip.id + '"]');
     await werk.getByRole('button', { name: 'Maker gratis volgen', exact: true }).click();
     await werk.getByRole('button', { name: 'Maker ontvolgen', exact: true }).waitFor();

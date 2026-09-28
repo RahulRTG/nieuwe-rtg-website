@@ -46,7 +46,6 @@ test('van interne redactie via review naar Saloon, met een zichtbare correctie',
     await editor.locator('#a_pub').click(); await lijstKlaar();
     const lees = await context.newPage(); letOpFouten(lees, fouten);
     await lees.goto(srv.base + '/apps/wereld.html?embed=1');
-    await lees.locator('.wp-story a').click();
     const kaart = lees.locator('[data-saloon-id="nieuws:BODE:' + id + '"]');
     await kaart.getByRole('button', { name: 'Lees artikel', exact: true }).click();
     await lees.locator('#saloonArtikel').getByText('Het plein gaat maandag open.', { exact: true }).waitFor();

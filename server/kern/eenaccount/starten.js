@@ -22,7 +22,7 @@ const werkSleutels = require('../../bedrijf/sleutels').maak();
 module.exports = (ctx) => {
   const { db, save, crypto, accounts, findSupplier, rememberSession, logInlog,
     logActivity, supplierState, officeState, magWerken, pinInfo, pinCheck,
-    lijst, zelfde, eigenaarKantoor, afgeleid, nu, persoonsPoort, sessieregister } = ctx;
+    lijst, zelfde, eigenaarKantoor, kantoorVanZetel, afgeleid, nu, persoonsPoort, sessieregister } = ctx;
 
   /* Het lidnummer uit de lidsleutel. De sleutel is 'user-<id>' -- dezelfde vorm
      die kernlaag1, kernlaag7 en kern/wauw.js al lezen. Geen tweede opzoeking in
@@ -40,7 +40,7 @@ module.exports = (ctx) => {
     let r = lijst(key).find(x => x.rol === wens.rol && (!wens.code || x.code === wens.code)
       && (wens.staffId == null || x.staffId === wens.staffId));
     // de eigenaar opent de kantoordeur zonder koppeling; zie eigenaarKantoor()
-    if (!r && wens.rol === 'kantoor' && !wens.code) r = eigenaarKantoor(key);
+    if (!r && wens.rol === 'kantoor' && !wens.code) r = eigenaarKantoor(key) || kantoorVanZetel(key);
     // een werkruimte staat niet in de opslag maar in de koppeling zelf
     if (!r && wens.rol === 'werkruimte') {
       r = afgeleid.werkruimtes(key).find(x => !wens.code || x.code === wens.code) || null;
@@ -96,7 +96,7 @@ module.exports = (ctx) => {
       const oSess = { role: 'office', lidKey: key };
       rememberSession(token, oSess);
       legContext(oSess, key, 'kantoor', 'rtg-kantoor');
-      logInlog('office', true, 'backoffice via RTG-account', req);
+      logInlog('office', true, r.viaRtgZaak ? 'backoffice via zetel in de RTG-zaak' : 'backoffice via RTG-account', req);
       return { status: 200, ok: true, rol: 'kantoor', token, state: officeState() };
     }
     const s = findSupplier(r.code);

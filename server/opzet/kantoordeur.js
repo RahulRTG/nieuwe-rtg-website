@@ -17,7 +17,8 @@ module.exports = function kantoordeur(app, kern, deps) {
   const beleidsmotor = require('../kern/beleidsmotor').maakBeleidsmotor({
     db: deps.db, save: deps.save, bewerkCollectie: deps.bewerkCollectie, sessionFor: deps.sessionFor,
     accounts: deps.accounts, eigenaar: deps.eigenaar, boardroomWie: rauw.boardroomWie,
-    magBoardroom: rauw.magBoardroom, boardroomBaas: rauw.boardroomBaas, balieBron: () => kern().magBalie });
+    magBoardroom: rauw.magBoardroom, boardroomBaas: rauw.boardroomBaas, balieBron: () => kern().magBalie,
+    kamersVan: (key) => kern().vrijheid.rtgZetel.kamersVan(key) });
   app.use('/api/office', beleidsmotor.meelezer);
   /* Besluit B1 van het leerhuis (ACADEMY.md par. 5): een echte handeling leest
      de geschiktheid mee, in de schaduw en zonder iemand tegen te houden. Zie de

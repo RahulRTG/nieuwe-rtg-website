@@ -45,7 +45,7 @@ const SCHAKELS = Object.freeze([
 const OVERIG = Object.freeze([
   'De schermen staan (Mijn tijd in de personeelsapp, Tijd van het team in het Kantoor; test/vrijheid-scherm.e2e.js), maar de gouden lus -- vragen, dekking, besluit, vrij -- is in een browser nog nooit rond gelopen: zonder dienstverband eindigt elk verzoek op het scherm bij die reden.',
   'Drie routes zijn niet beproefd omdat de proefopstelling de wereld niet kan bouwen (intrekken, beoordelen, afdelingen zetten): BLOCKED_BY_TEST_FIXTURE in server/lib/mutatiecontracten-vrijheid.js.',
-  'Het kantoor logt nog in met de gedeelde OFFICE_CODE in plaats van als personeel van de RTG-zaak; dat is stap twee van het besluit van 27 september 2026.',
+  'Een zetel met een kamer in de RTG-zaak opent het kantoor op naam (rtgzetel.js), maar de gedeelde OFFICE_CODE werkt nog en de kamers worden alleen in de schaduw geteld: afdwingen per kamer is een apart besluit.',
   'Geen productiebewijs.'
 ]);
 

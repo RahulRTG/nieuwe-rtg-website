@@ -8,7 +8,7 @@
     "public/apps/leverancier.html",
     "public/apps/app.html"
   ],
-  "sourceHash": "5987cddb28c4ee11a03a6d8920fcd74904a5baee1abc4e59e5ce4c5123e6c080",
+  "sourceHash": "ca0228bf0ddf3c9051d94e41f414ed66079b7113fc6616f8f9fa40f081e29cf8",
   "platform": [
     {
       "id": "organisatie",
@@ -39,7 +39,7 @@
         "Stuur uw team aan met rooster en taken"
       ],
       "note": "Kijk elke ochtend één minuut naar het actiecentrum; dan begint de dag zonder verrassingen.",
-      "sourceHash": "67ff25fa96ab4c0774e776730f6e0899b5ccf6f82385d07c4e4e0607263a8e8e"
+      "sourceHash": "04fa1c7cf762ae2fed6d4b4894c4de5b6fbfc7f320c4fa88d73d021084709d9c"
     },
     {
       "id": "gebruiker",

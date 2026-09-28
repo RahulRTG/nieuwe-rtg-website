@@ -105,4 +105,21 @@ const EXPORTEN = Object.freeze({
     wat: 'de complete AI-dataset (JSONL)' }
 });
 
-module.exports = { WERKWOORDEN, werkwoordVan, KAMERSOORT, KAMERROUTES, kamerVan, EXPORTEN };
+/* DE KAMER EN WIE ER ZIT (stap twee, kern/vrijheid/rtgzetel.js), in de schaduw.
+   Naast "kamer X" telt de motor of de aanroeper in die kamer zit (`eigen`), in
+   een andere (`vreemd`), of geen toewijzing heeft (`zonderToewijzing`: de
+   gedeelde code, een uitnodiging, de eigenaar). Niet WIE -- alleen de soort.
+   Een bron die niet antwoordt is `onbekend` en nooit `vreemd`. */
+function kamerTelling(sleutel, body, kamersVan, key) {
+  const kamer = kamerVan(sleutel, body);
+  if (!kamer) return [];
+  let soort = 'zonderToewijzing';
+  if (key && typeof kamersVan === 'function') {
+    let k;
+    try { k = kamersVan(key); } catch (e) { k = undefined; }
+    soort = k === undefined ? 'onbekend' : k === null ? 'zonderToewijzing' : k.includes(kamer) ? 'eigen' : 'vreemd';
+  }
+  return ['kamer ' + kamer, 'kamer ' + kamer + ' ' + soort];
+}
+
+module.exports = { WERKWOORDEN, werkwoordVan, KAMERSOORT, KAMERROUTES, kamerVan, kamerTelling, EXPORTEN };

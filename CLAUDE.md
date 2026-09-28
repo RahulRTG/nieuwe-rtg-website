@@ -2343,8 +2343,8 @@ het meten: de sluiting van het stuur is klein en precies één module leest van
 schijf -- `VERTROUWEN.json`, een REGISTER. Een register lezen mag, een `.js`
 lezen niet; dát onderscheid is de invariant. De vraag of de 77 registers samen
 één Codewereld vormen is eerst GEMETEN (`npm run codewereld`, `CODEWERELD.json`)
-in plaats van aangenomen -- zelfde reden als bij `Asset`: <!--getal:codewereld.ruggengraat-->5492<!--/getal--> van
-<!--getal:codewereld.paden-->6290<!--/getal--> paden staan in meer dan één register, dus er IS een ruggengraat, maar hij
+in plaats van aangenomen -- zelfde reden als bij `Asset`: <!--getal:codewereld.ruggengraat-->5976<!--/getal--> van
+<!--getal:codewereld.paden-->6417<!--/getal--> paden staan in meer dan één register, dus er IS een ruggengraat, maar hij
 loopt over de as ROUTE. De as SYMBOOL is **nul** -- geen register kent een
 functienaam met een plaats, dus het objectvoorbeeld `pay.boeken` met een
 `symbol`-veld belooft iets wat geen enkele meter vult. Die as is
@@ -2358,14 +2358,14 @@ afhandelt. Twee dingen daar niet wegpoetsen: de brug route -> bestand rustte
 op ÉÉN register, dus de nul tegenspraken erin was `niet vast te stellen` en geen
 groen -- er ligt sinds 3 september een tweede bron naast (`ROUTEBRON.json`, uit de
 ROUTER in plaats van uit de bronboom), de dekking staat op
-<!--getal:codewereld.brugDekkingPct-->96.2<!--/getal-->% en er zijn <!--getal:routebron.tegenspraak-->0<!--/getal--> echte tegenspraken. Let daarbij op het onderscheid
+<!--getal:codewereld.brugDekkingPct-->95.2<!--/getal-->% en er zijn <!--getal:routebron.tegenspraak-->0<!--/getal--> echte tegenspraken. Let daarbij op het onderscheid
 dat die meting afdwong: een verschil tussen twee registers van VERSCHILLENDE
 leeftijd is een leeftijdsverschil en geen tegenspraak, en die twee worden nooit
 opgeteld. Verder is het bronbereik voor gedrag
-<!--getal:codewereld.bronGedragPct-->51.7<!--/getal-->% -- over de meerderheid van de bronbestanden zegt geen enkel
+<!--getal:codewereld.bronGedragPct-->55.1<!--/getal-->% -- over de meerderheid van de bronbestanden zegt geen enkel
 register iets over gedrag, dus een "80-95% zonder bron te beantwoorden" haalt die
 grens vandaag niet -- en dat ene getal verbergt nog iets, want `server/` haalt
-<!--getal:codewereld.bronServerPct-->58.7<!--/getal-->% en `public/` <!--getal:codewereld.bronPublicPct-->28.5<!--/getal-->%: over de schermen wisten de registers
+<!--getal:codewereld.bronServerPct-->59.4<!--/getal-->% en `public/` <!--getal:codewereld.bronPublicPct-->41.4<!--/getal-->%: over de schermen wisten de registers
 vrijwel niets (6,6%) tot `SCHERMROUTES.json` erbij kwam, dat per bestand in
 public/ leest welke API-paden het noemt en daarmee de keten scherm -> route legt.
 De aanroepgraaf ligt er sinds dezelfde dag naast (`AANROEPGRAAF.json`,
@@ -2396,7 +2396,7 @@ het register aanwijst leveren zaknamen. Ten tweede telt CODEWERELD.json sinds
 die dag DRIE dingen apart (structuur, relatie, gedrag), omdat een index die elk
 bestand noemt elke dekkingsvraag triviaal waar maakt: dat gebeurde twee keer op
 rij, en het zag er beide keren uit als vooruitgang. Alleen de gedragsteller
-(<!--getal:codewereld.bronGedragPct-->51.7<!--/getal-->%) is de bovengrens voor een vraag als "klopt het" -- en die kwam
+(<!--getal:codewereld.bronGedragPct-->55.1<!--/getal-->%) is de bovengrens voor een vraag als "klopt het" -- en die kwam
 voor de schermen pas op gang met `SCHERMGEDRAG.json`, dat per scherm SAMENSTELT
 wat de routes eronder al gemeten hadden (schrijft het, welke rol, wat is het
 bewijs waard). Twee dingen daar niet wegpoetsen: het is AFGELEID gedrag, dus

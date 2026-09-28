@@ -67,9 +67,9 @@ function leeftijd(inhoud, nu) {
 /* De graad van wat een register zegt: gemeten zolang de meting vers is. Een
    vervallen meting zakt naar vermoed, en een meting zonder datum ook -- van
    geen van beide weet je of het nu nog zo is. */
-function graadVan(l) {
+function graadUitLeeftijd(l) {
   if (!l || l.vervallen === null) return 'vermoed';
   return l.vervallen ? 'vermoed' : 'gemeten';
 }
 
-module.exports = { leesRegister, leeftijd, graadVan, REGISTERS };
+module.exports = { leesRegister, leeftijd, graadUitLeeftijd, REGISTERS };

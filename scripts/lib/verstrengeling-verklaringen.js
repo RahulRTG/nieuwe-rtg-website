@@ -16,6 +16,12 @@
    Een rand daarheen verplaatsen is een besluit dat je kunt terugvinden; hem
    DOMEINRELATIE noemen om van het getal af te zijn, is de meter kapotmaken. */
 module.exports = [
+  /* DE BOARDROOM ZOEKT HET OP. kern/afdelingen/kameradvies.js laat de
+     boardroom-Rahul RTG's eigen registers lezen via kern/registerblik/ in plaats
+     van het uit zijn hoofd te moeten weten. De rand loopt een kant op: de
+     registerblik kent de afdelingen niet, en leest alleen registers bij naam. */
+  { van: 'domein:afdelingen', naar: 'domein:registerblik', soort: 'DOMEINRELATIE',
+    reden: 'het boardroomadvies vraagt de registerblik wat de registers over productie, bewijs en routes zeggen; de registerblik leest alleen, en kent de afdelingen niet' },
   /* DE ZWARE POORT LEEST DE LIJST ZWARE HANDELINGEN. kern/zwaarbewijs.js weigert
      een actienaam die kern/webauthn-acties.js niet kent bij de EERSTE aanroep:
      zonder die controle ging zo'n route op de terugval door zolang de eigenaar

@@ -18,7 +18,7 @@
 
    Nagetrokken met mutaties (elk zakt minstens een toets):
      a. `leesRegister` leest elk pad dat binnenkomt      -> toets 1 zakt
-     b. `graadVan` zegt altijd `gemeten`                 -> toets 2 zakt
+     b. `graadUitLeeftijd` zegt altijd `gemeten`                 -> toets 2 zakt
      c. de lus geeft ook de stuurgereedschappen mee      -> toets 4 zakt
      d. de lus slaat de contextsamensteller over         -> toets 5 zakt
 
@@ -31,7 +31,7 @@ const os = require('os');
 const path = require('path');
 
 const { kijk, REGISTERBLIK_TOOLS } = require('../server/kern/registerblik/gereedschap');
-const { leesRegister, leeftijd, graadVan, REGISTERS } = require('../server/kern/registerblik/bronnen');
+const { leesRegister, leeftijd, graadUitLeeftijd, REGISTERS } = require('../server/kern/registerblik/bronnen');
 const { registerblikVraag } = require('../server/kern/registerblik/lus');
 
 function tijdelijkeWortel(bestanden) {
@@ -64,9 +64,9 @@ test('1. alleen de registers op de lijst, en nooit een bestand dat het model noe
 test('2. elk antwoord draagt register, leeftijd en graad; een vervallen meting is vermoed', () => {
   const oud = new Date(Date.now() - 90 * 86400000).toISOString();
   const vers = new Date(Date.now() - 2 * 86400000).toISOString();
-  assert.equal(graadVan(leeftijd({ stempel: { op: vers } })), 'gemeten');
-  assert.equal(graadVan(leeftijd({ stempel: { op: oud } })), 'vermoed', 'vervallen bewijs is geen bewijs');
-  assert.equal(graadVan(leeftijd({})), 'vermoed', 'een meting zonder datum weet niet of het nu nog zo is');
+  assert.equal(graadUitLeeftijd(leeftijd({ stempel: { op: vers } })), 'gemeten');
+  assert.equal(graadUitLeeftijd(leeftijd({ stempel: { op: oud } })), 'vermoed', 'vervallen bewijs is geen bewijs');
+  assert.equal(graadUitLeeftijd(leeftijd({})), 'vermoed', 'een meting zonder datum weet niet of het nu nog zo is');
   assert.equal(leeftijd({ stempel: { op: oud }, halfwaardetijdDagen: 120 }).vervallen, false, 'het register mag zijn eigen houdbaarheid zeggen');
 
   const u = kijk('inspecteerRoute', { pad: '/api/bank/pas/betaal' });

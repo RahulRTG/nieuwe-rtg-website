@@ -15,7 +15,7 @@
    keuringsregel 48). Elk antwoord noemt zijn register, zijn leeftijd en zijn
    graad. */
 'use strict';
-const { leesRegister, leeftijd, graadVan } = require('./bronnen');
+const { leesRegister, leeftijd, graadUitLeeftijd } = require('./bronnen');
 const { segmentPatroon } = require('../../lib/padvorm');
 
 const MAX_RIJEN = 12;
@@ -40,7 +40,7 @@ const REGISTERBLIK_TOOLS = [
 ];
 
 const bron = (r, l) => ({ register: r.register, gemetenOp: l.gemetenOp, dagenOud: l.dagenOud,
-  vervallen: l.vervallen, graad: graadVan(l), ...(l.reden ? { leeftijd: l.reden } : {}) });
+  vervallen: l.vervallen, graad: graadUitLeeftijd(l), ...(l.reden ? { leeftijd: l.reden } : {}) });
 const nietVast = (r) => ({ stand: 'niet vast te stellen', register: r.register, reden: r.reden });
 
 function past(patroon, pad) {

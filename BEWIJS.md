@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 2078 |
 | losse beweringen (`test(...)`) | 14651 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 174 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1423 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1424 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 74 |
 | alleen in de kop *genoemd*, nog niet gemeten | 169 |
-| niets van beide | 412 |
+| niets van beide | 411 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -1295,7 +1295,7 @@ toets omvalt.
 | `routerindex.test.js` | 9 | gezakt op `===->!==#0` | DE DISPATCH-INDEX VAN DE ROUTER (server/web/routing.js). De router liep bij elk verzoek de hele lagenlijst af. |
 | `routermeting.test.js` | 21 | gezakt op `===->!==#0` | DE SCHADUWMETING VAN DE INTELLIGENTIEROUTER (server/kern/ai/routermeting.js, EXECUTIE.md blok 8). WAT DEZE TOETS BEWAAKT, en waarom elk stuk. |
 | `routesbron.test.js` | 5 | genoemd | WAAR STAAT DEZE ROUTE? -- de bronverrijking van scripts/lib/routes.js. |
-| `routeversheid.test.js` | 16 | -- | DE ROUTEVERSHEID -- vervalt het bewijs van een route als iets waar hij van afhangt verandert? (scripts/routeversheid.js, PROOF.md par. |
+| `routeversheid.test.js` | 16 | gezakt op `!==->===#0` | DE ROUTEVERSHEID -- vervalt het bewijs van een route als iets waar hij van afhangt verandert? (scripts/routeversheid.js, PROOF.md par. |
 | `rtdocs-voorzijde.test.js` | 4 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rtf-labfonds-deur.test.js` | 10 | gezakt op `liegpoort /api/` | DE GEZINSDEUR VAN HET LABFONDS -- wie komt er door, en wat doet een TWEEDE aanroep. WAAROM DEZE TOETS BESTAAT. |
 | `rtf-samen-credential.pg.test.js` | 1 | -- | Echte PostgreSQL-proef voor FoundationOS Samen. Twee onafhankelijke app- instances delen alleen de kamercollectie; uitgifte, capaciteit, gebruik, rotatie en intrekking moeten onder hetzelfde advisory slot serialiseren. |

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-27T20:33:35.823Z",
-    "commit": "72070708",
+    "op": "2026-09-28T05:29:44.234Z",
+    "commit": "bf1dba962",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 1,
     "instrument": "scripts/edgekaart.js",
     "node": "v22.22.2"
   },
@@ -1774,7 +1774,7 @@
           "rol": "leest",
           "etiket": "wereld:l",
           "wat": "de wereld van het bureau",
-          "citaat": "world = d.body.dataset.rtgWorld"
+          "citaat": "world = d.body.dataset.worldHome"
         },
         {
           "rol": "schrijft",
@@ -1810,8 +1810,7 @@
           "rtglang"
         ],
         "attributen": [
-          "data-rtg-desktop",
-          "data-rtg-desktop-state"
+          "data-rtg-desktop"
         ],
         "opslag": [],
         "fetch": []
@@ -3008,7 +3007,7 @@
         "luistert": [],
         "attributen": [
           "data-rtg-edge-ready",
-          "data-rtg-panel-layout",
+          "data-rtg-layout",
           "data-rtg-world"
         ],
         "opslag": [],
@@ -3214,6 +3213,7 @@
         "zendt": [],
         "luistert": [],
         "attributen": [
+          "data-rtg-eigenvlak",
           "data-rtg-skin",
           "data-rtg-world"
         ],
@@ -3284,76 +3284,6 @@
         ],
         "luistert": [],
         "attributen": [],
-        "opslag": [],
-        "fetch": []
-      }
-    },
-    {
-      "pad": "public/site/platform-app.js",
-      "laag": "afnemer",
-      "rollen": [
-        {
-          "rol": "schrijft",
-          "etiket": "wereld:s",
-          "wat": "wereld op body in de werelden-scene",
-          "citaat": "if(id==='werelden'){d.body.dataset.rtgWorld=X.currentWorld();"
-        }
-      ],
-      "verantwoordelijkheden": [
-        {
-          "naam": "wereld",
-          "als": "schrijver"
-        }
-      ],
-      "gemeten": {
-        "globals": [
-          "RTGPublicApp"
-        ],
-        "zendt": [],
-        "luistert": [
-          "rtg-public-state"
-        ],
-        "attributen": [
-          "data-rtg-desktop",
-          "data-rtg-world"
-        ],
-        "opslag": [],
-        "fetch": []
-      }
-    },
-    {
-      "pad": "public/site/platform-controller.js",
-      "laag": "afnemer",
-      "rollen": [
-        {
-          "rol": "schrijft",
-          "etiket": "wereld:s",
-          "wat": "wereld op body per verhaal",
-          "citaat": "d.body.dataset.rtgWorld=story.world;"
-        },
-        {
-          "rol": "schrijft",
-          "etiket": "wereld:s",
-          "wat": "wereld op body bij een keuze",
-          "citaat": "d.body.dataset.rtgWorld=selected.world;"
-        }
-      ],
-      "verantwoordelijkheden": [
-        {
-          "naam": "wereld",
-          "als": "schrijver"
-        }
-      ],
-      "gemeten": {
-        "globals": [
-          "RTGPublicController"
-        ],
-        "zendt": [],
-        "luistert": [],
-        "attributen": [
-          "data-rtg-desktop",
-          "data-rtg-world"
-        ],
         "opslag": [],
         "fetch": []
       }
@@ -3695,8 +3625,6 @@
         "public/shared/rtg-edge-system.js",
         "public/shared/rtg-edge-worlds.js",
         "public/shared/rtg-world-identity.js",
-        "public/site/platform-app.js",
-        "public/site/platform-controller.js",
         "public/site/start/experience-edge.js",
         "public/site/start/experience-graph.js",
         "public/site/start/experience.js"
@@ -3766,8 +3694,6 @@
       "public/shared/gebaar/gebaar-03b.js",
       "public/shared/rtg-daily.js",
       "public/shared/social-intelligence-runtime.js",
-      "public/site/platform-app.js",
-      "public/site/platform-controller.js",
       "public/site/start/experience-edge.js",
       "public/site/start/experience-graph.js",
       "public/site/start/experience.js"
@@ -4000,8 +3926,6 @@
         "public/shared/rtg-edge-system.js",
         "public/shared/rtg-edge-worlds.js",
         "public/shared/rtg-world-identity.js",
-        "public/site/platform-app.js",
-        "public/site/platform-controller.js",
         "public/site/start/experience-edge.js",
         "public/site/start/experience-graph.js",
         "public/site/start/experience.js"
@@ -4061,8 +3985,6 @@
       "public/shared/randen.js",
       "public/shared/rtg-edge-system.js",
       "public/shared/rtg-world-identity.js",
-      "public/site/platform-app.js",
-      "public/site/platform-controller.js",
       "public/site/start/experience-edge.js",
       "public/site/start/experience-graph.js",
       "public/site/start/experience.js"
@@ -4072,15 +3994,18 @@
       "public/apps/werk/command-entry.js",
       "public/shared/rtg-edge-2-loader.js"
     ],
-    "zonderLader": [],
+    "zonderLader": [
+      "public/site/platform-app.js",
+      "public/site/platform-controller.js"
+    ],
     "andereRegisters": [
       "public/shared/interface/workspace-broker.js (registries)",
       "public/shared/interface/workspace-module-host.js (o)"
     ]
   },
   "telling": {
-    "bestanden": 75,
-    "rollen": 214,
+    "bestanden": 73,
+    "rollen": 211,
     "dubbeleEigenaars": 12,
     "dodeKanalen": 0,
     "levendeKanalen": 14

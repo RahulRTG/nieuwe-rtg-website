@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-28T13:09:00.323Z",
-    "commit": "7e624c0d1",
+    "op": "2026-09-28T16:04:17.962Z",
+    "commit": "8c67492f9",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -7341,6 +7341,11 @@
       "gezakt": 1,
       "geprobeerd": 2
     },
+    "meetronde.test.js": {
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "regex plus ||, geen operator van de motor (0 pogingen); handmutatie || -> && laat toets 1 zakken, en de kapotte auditproef laat toets 2 zakken"
+    },
     "meetserver-schorspoort.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -10062,6 +10067,14 @@
       "gezakt": 2,
       "scherp": "gezakt"
     },
+    "routenoemer.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/routenoemer.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
     "routerindex.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -10084,6 +10097,14 @@
       "module": "scripts/lib/routes.js",
       "operator": "!==->===#0",
       "gezakt": 3,
+      "geprobeerd": 2
+    },
+    "routeversheid.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/routeversheid.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
       "geprobeerd": 2
     },
     "rtdocs-voorzijde.test.js": {

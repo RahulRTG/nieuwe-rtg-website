@@ -1,22 +1,6 @@
-/* RTG Wereld -- DE ENE FEED. De bron bepaalt waar een object woont, de modus
-   bepaalt welke wereld meedoet en de lens vanuit welke intentie u kijkt.
-
-   WAAROM DIT LEEST EN NIET SCHRIJFT, en dat is de belangrijkste keuze hier.
-   De Salon, Pulse, het zakelijke prikbord en de verhalen bestaan al, met elk
-   hun eigen poort, hun eigen 9+-keuring en hun eigen opruimregels. Dit bestand
-   maakt daar GEEN vijfde opslag naast: het leest de vier en zet ze naast elkaar
-   op één tijdlijn. Een eigen `db.data.wereld.posts` zou de vijfde plek zijn die
-   dezelfde waarheid vasthoudt (LAT-regel 4), en de eerste keer dat iemand een
-   Salon-post verwijdert zou hij hier blijven staan.
-
-   Plaatsen loopt dus ook nooit via deze module. Wie in Lifestyle plaatst,
-   plaatst in De Salon; wie in Business plaatst, plaatst op het zakelijke
-   prikbord. Die routes houden hun keuring, hun rem en hun eigenaarschap. De
-   feed is een LEESLAAG, en dat is precies waarom hij goedkoop en veilig is.
-
-   GEEN VERBORGEN SCORE. Binnen een contextvak blijft alles chronologisch. De
-   vakken (Nu, Vandaag, uw mensen, uw plekken, communities, binnenkort) volgen
-   uitsluitend uit zichtbare feiten zoals soort, tijd en bron. */
+/* Wereld projecteert bronobjecten zonder ze te kopiëren. Elke bron houdt haar
+   eigen toegang, moderatie en levensduur. De lens bepaalt de selectie; binnen
+   contextvakken blijft de volgorde chronologisch. */
 'use strict';
 
 const rechten = require('./rechten');
@@ -52,6 +36,7 @@ module.exports = ({ db, codenaamVan, zijnVrienden, salonToegang, pulseLezen }) =
     open: 'rtg://' + bron + '/' + o.id,
     type: o.type || 'moment', plaats: o.plaats || null,
     begint: o.begint || null, eindigt: o.eindigt || null,
+    kring: !!o.kring, url: o.url || null,
     partner: !!o.partner, offer: o.offer || null,
     onderwerpen: Array.isArray(o.onderwerpen) ? o.onderwerpen.slice(0, 10) : []
   });
@@ -66,7 +51,7 @@ module.exports = ({ db, codenaamVan, zijnVrienden, salonToegang, pulseLezen }) =
          posts in plaats van de opslag publiek te behandelen. */
       .filter(p => salonToegang ? salonToegang({ key: mij, tier }, p) : p.authorKey === mij)
       .map(p => item('salon', {
-        id: p.id, wereld: 'lifestyle', auteur: p.author, tekst: p.text, at: p.at,
+        id: p.id, kring: p.authorKey === mij || !!(zijnVrienden && zijnVrienden(mij, p.authorKey)), wereld: 'lifestyle', auteur: p.author, tekst: p.text, at: p.at,
         beeld: Array.isArray(p.media) && p.media.length ? p.media : (p.photo ? [{ src: p.photo, alt: '' }] : []),
         likes: (p.baseLikes || 0) + Object.keys(p.likedBy || {}).length,
         reacties: (p.comments || []).length,
@@ -80,7 +65,7 @@ module.exports = ({ db, codenaamVan, zijnVrienden, salonToegang, pulseLezen }) =
     pulse: (mij) => (pulseLezen ? pulseLezen(mij) : (((db.data.pulse || {}).posts) || [])
       .filter(p => p.key === mij && !p.weg && !p.verborgen))
       .map(p => item('pulse', {
-        id: p.id, wereld: 'lifestyle', auteur: p.codenaam, tekst: p.tekst, at: p.at,
+        id: p.id, kring: p.eigen || p.key === mij || !!(zijnVrienden && zijnVrienden(mij, p.van || p.key)), wereld: 'lifestyle', auteur: p.codenaam, tekst: p.tekst, at: p.at,
         likes: Number.isFinite(p.likes) ? p.likes : Object.keys(p.likes || {}).length,
         reacties: (p.reacties || []).length,
         type: 'moment'
@@ -109,7 +94,8 @@ module.exports = ({ db, codenaamVan, zijnVrienden, salonToegang, pulseLezen }) =
         for (const b of ((G.prikbord || {})[gr.id] || [])) {
           if (b.weg) continue;
           uit.push(item('genootschap', {
-            id: b.id, wereld: 'genootschap',
+            id: String(gr.id) + '_' + String(b.id), kring: true, wereld: 'genootschap',
+            url: '/apps/genootschap.html?groep=' + encodeURIComponent(gr.id),
             auteur: (codenaamVan ? codenaamVan(b.vanKey) : '') || 'Een lid',
             tekst: b.tekst, at: b.at, reacties: (b.reacties || []).length,
             type: b.poll ? 'question' : 'community'
@@ -120,7 +106,8 @@ module.exports = ({ db, codenaamVan, zijnVrienden, salonToegang, pulseLezen }) =
         for (const b of ((G.bijeenkomst || {})[gr.id] || [])) {
           if (b.afgelast) continue;
           uit.push(item('genootschap', {
-            id: String(gr.id) + '_' + String(b.id), wereld: 'genootschap',
+            id: String(gr.id) + '_' + String(b.id), kring: true, wereld: 'genootschap',
+            url: '/apps/genootschap.html?groep=' + encodeURIComponent(gr.id),
             auteur: gr.naam || 'Genootschap', tekst: b.wat, at: b.at,
             type: 'event', plaats: b.waar || null,
             begint: b.datum ? b.datum + (b.tijd ? 'T' + b.tijd + ':00' : 'T00:00:00') : null,
@@ -135,9 +122,10 @@ module.exports = ({ db, codenaamVan, zijnVrienden, salonToegang, pulseLezen }) =
        enige bron die niet publiek is, en hij loopt daarom langs zijnVrienden --
        dezelfde graaf die de Salon en de chat gebruiken, niet een tweede lijst. */
     verhalen: (mij) => (db.data.stories || [])
+      .filter(s => Date.now() - tijd(s.at) < 86400000)
       .filter(s => s.van === mij || (zijnVrienden && zijnVrienden(mij, s.van)))
       .map(s => item('verhalen', {
-        id: s.id, wereld: 'prive',
+        id: s.id, kring: true, wereld: 'prive',
         /* codenaamVan(sleutel), NIET liveCodename: die laatste verwacht een
            SESSIE en geeft voor een kale sleutel altijd null -- waarna elke
            auteur hier stil "Een lid" heette. Gevonden doordat de genootschap-

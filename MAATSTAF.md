@@ -77,7 +77,7 @@ de tabel na en zakt zodra de telregel eronder niet meer klopt.
 | U28 | Elke objectpagina draagt dezelfde structuur: samenvatting, status, volgende actie, tijdlijn, betrokkenen, geld, documenten, bewijs, rechten, probleem oplossen | ONTWERP.md (Context Pane, Reference, Action Line); `kern/objectlaag/` | `kern/objectlaag/pagina.js` stelt de tien secties SAMEN uit aangemelde bijdragers; een sectie zonder bijdrager komt terug als `nietGevraagd` | `test/objectpagina.test.js`: elf secties knallen, een verzonnen sectie knalt, `leeg` ≠ `nietGevraagd` | route `POST /api/sociaal/object/pagina` | **staat** |
 | U29 | Interactiesnelheid is een releasebudget (50 ms reactie, 400 ms warme weergave, 300 ms opdracht ontvangen) | KEURING.md; `scripts/tikken.js` draait al een echte browser | `scripts/prestaties.js` meet de motor, niet de interface | geen | geen | **stap weg** |
 | U30 | Uitkomstsnelheid wordt gemeten: van bedoeling tot boeking, van klacht tot besluit, van verkoop tot afwikkeling | nergens | niets meet een doorlooptijd over actoren heen | geen | geen | **jaren weg** |
-| U31 | Dezelfde opdracht twee keer versturen veroorzaakt niet twee bestellingen | MUTATIECONTRACT.md: 100% geclassificeerd, niet 100% idempotent | `IDEMPROEF.json`, `lib/idemsleutels.js` | toetsen op de classificatie | <!--getal:idem.beoordeeld-->1716<!--/getal--> beoordeeld | **staat** |
+| U31 | Dezelfde opdracht twee keer versturen veroorzaakt niet twee bestellingen | MUTATIECONTRACT.md: 100% geclassificeerd, niet 100% idempotent | `IDEMPROEF.json`, `lib/idemsleutels.js` | toetsen op de classificatie | <!--getal:idem.beoordeeld-->1730<!--/getal--> beoordeeld | **staat** |
 | U32 | Optimistische interface waar veilig, nooit bij geld: opdracht ontvangen → wordt bevestigd → voltooid | GELD.md: geld verlaat het huis nooit vanzelf; bewijsbord met drie standen en geen groen | `kern/pay/bewijs.js` | toetsen | toetsen | **staat** |
 | U33 | Een organisatie start bijna zonder configuratie: per branche een veilige standaard, en de klant past alleen afwijkingen aan | PLATFORM.md par. 5: veertig sectormotoren is jaren werk; TENANT.md levenscyclus | 73 genres met werkvormen; geen branchestandaard als voorstel | geen | geen | **jaren weg** |
 | U34 | De organisatie is een digitale tweeling die voorspelt ("71% kan automatisch worden verplaatst") | BESTUUR.md: nooit een getal waar geen meting is; KOSTEN.md: bandbreedte pas na drie gemeten maanden | `kern/kosten/vooruitblik.js` (trefzekerheid meet zichzelf), gevolgsimulatie in TENANT met `nietGerekend` | toetsen | per voorspelling een graad | **geprojecteerd** |
@@ -649,10 +649,10 @@ vast:
 De aanvraag verschijnt nu op het dispatchbord, en schakel 1 sluit.
 
 **De migratie is in kaart gebracht, en de kaart stopte hem meteen.**
-`scripts/ritmigratie.js` (`npm run ritmigratie`) deelt de <!--getal:ritmigratie.bestanden-->21<!--/getal-->
+`scripts/ritmigratie.js` (`npm run ritmigratie`) deelt de <!--getal:ritmigratie.bestanden-->23<!--/getal-->
 plekken die `db.data.rides` noemen in naar wat ze ermee doen:
 <!--getal:ritmigratie.stand-->7<!--/getal--> lezen de **lopende** rit,
-<!--getal:ritmigratie.historie-->9<!--/getal--> tellen **historie** af,
+<!--getal:ritmigratie.historie-->10<!--/getal--> tellen **historie** af,
 2 **schrijven**, en 3 noemen hem alleen in commentaar.
 
 Die kaart is geschreven vóór er een regel verplaatst werd, en zij bewees haar
@@ -695,7 +695,7 @@ Wat er gebeurt bij een rit zonder bestemming:
 Zo of zo heeft elke rit die bestáát voortaan een opdracht. De teller in de
 migratiekaart staat daarmee op **<!--getal:ritmigratie.kanNu-->7<!--/getal-->
 lezers die om kunnen** (de stand-lezers), daarna
-<!--getal:ritmigratie.daarna-->11<!--/getal--> (historie, dan de schrijvers).
+<!--getal:ritmigratie.daarna-->12<!--/getal--> (historie, dan de schrijvers).
 
 **En de losse chauffeur is geen bijzonder geval.** Hij is een zaak met één
 persoon erin: hij meldt zich aan op eigen naam (`staffId` + pincode), wijst

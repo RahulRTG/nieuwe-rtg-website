@@ -47,6 +47,7 @@
 
   function openTab(tab, focusView){
     if (tab === 'regie') renderPdRegie();
+    if (tab === 'tijd') laadTijd();
     document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.dataset.view===tab));
     document.querySelectorAll('.tabbar button').forEach(b => {
       const on = b.dataset.tab===tab;

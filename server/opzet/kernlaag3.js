@@ -115,9 +115,8 @@ Object.assign(kern, require('../kern/defensie')({ db, save, crypto, anthropic, f
    een overzicht, met een coordinatieniveau. */
 Object.assign(kern, require('../kern/rampbeeld')({ db, save, findSupplier, anthropic }));
 /* Vakwerk (kern/vakwerk.js): het slimme dashboard voor de dienstverlenende
-   genres (zzp, chef, wellness). Zelfde aanbod-/boekingsmodel als voorheen,
-   maar met een vandaag-bord, KPI's en een genre-bewuste AI-assistent, zodat
-   deze apps op het niveau van de horeca- en hoteltorens komen. */
+   genres (zzp, chef, wellness), met een vandaag-bord, KPI's en een
+   genre-bewuste AI-assistent op het niveau van horeca en hotel. */
 /* ordersVanZaak komt erbij voor het gedeelde klantenboek (kern/klantenboek.js):
    wie bij dezelfde zaak at maar niet boekte, was daar eerst geen klant. */
 Object.assign(kern, require('../kern/vakwerk').maakVakwerk({ db, save, anthropic, findSupplier,
@@ -129,8 +128,9 @@ Object.assign(kern, require('../kern/vakwerk').maakVakwerk({ db, save, anthropic
    betekenis aan de rekeningen die RTG Pay hieronder gebruikt. VOOR pay gemount,
    want pay raadpleegt hem bij elke boeking en niet andersom. */
 Object.assign(kern, require('../kern/waarde').maakWaarde({ db, save, crypto }));
-/* RTG Pay: wallet, grootboek en automatisch bijladen. */
-Object.assign(kern, require('../kern/pay')({ db, save, bijeen, economischeBoekingEenmaal, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon, betaalOpdrachten, waarde: kern.waarde,
+/* RTG Pay: wallet, grootboek en automatisch bijladen (bewerkCollectie: de
+   transactie van een tegoedbon). */
+Object.assign(kern, require('../kern/pay')({ db, save, bijeen, economischeBoekingEenmaal, bewerkCollectie, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon, betaalOpdrachten, waarde: kern.waarde,
   betaalWaarheid: kern.betaalWaarheid,
   payBoekingenVoegToe: require('../db').payBoekingenVoegToe,
   accounts, // alleen voor het uitbetaal-IBAN: dat hoort in de kluis, niet naast een codenaam

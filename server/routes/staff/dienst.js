@@ -58,13 +58,20 @@ app.post('/api/staff/leave/request', supplierAuth, (req, res) => {
      dit breekt niets; het sluit een deur die openstond. */
   if (soort === 'ziek' && schoon(req.body.reden, 140))
     return res.status(422).json({ error: 'Een ziekmelding draagt geen omschrijving. Wat je hebt, hoort bij de arbodienst; hier staat alleen dat je er niet bent en wat je nog kunt.' });
+  /* EN GEWOON VERLOF DRAAGT OOK GEEN REDEN (VRIJHEID.md par. 1, regel 2.11).
+     Waarom iemand vrij wil, is voor gewone persoonlijke tijd geen vraag: het
+     veld stond in de app als "mag leeg blijven", werd bewaard en ging mee in de
+     melding aan de manager -- en een veld dat er is, wordt gevuld. Dezelfde
+     regel als hierboven: weigeren en niet stil opschonen. Bijzonder verlof, waar
+     een reden wel nodig kan zijn, loopt niet via deze route. */
+  if (soort === 'verlof' && schoon(req.body.reden, 140))
+    return res.status(422).json({ error: 'Voor verlof is geen reden nodig, en die wordt ook niet bewaard. Vraag het aan zonder toelichting.' });
   const lijst = db.data.verlof[req.supplier.code] = db.data.verlof[req.supplier.code] || [];
   const entry = {
     id: crypto.randomBytes(4).toString('hex'),
     staffId: req.actor.staffId, name: req.actor.name, soort,
     van: soort === 'ziek' ? new Date().toISOString().slice(0, 10) : van,
     tot: soort === 'ziek' ? null : tot,
-    reden: schoon(req.body.reden, 140),
     status: soort === 'ziek' ? 'gemeld' : 'nieuw',
     at: new Date().toISOString()
   };
@@ -81,9 +88,13 @@ app.post('/api/staff/leave/request', supplierAuth, (req, res) => {
      -> goedgekeurd/afgewezen); de verzuimlaag is wat de payroll ervan moet
      weten. Zou een mens ze allebei moeten invullen, dan lopen ze uiteen en
      klopt de loondoorbetaling niet met het rooster. */
-  if (payrollOS && payrollOS.verzuim) {
+  /* ALLEEN ZIEKTE GAAT NU AL NAAR DE VERZUIMLAAG. Verlof is een AANVRAAG en
+     nog geen afwezigheid: het stond hier meteen als `vakantie` in de
+     payrollinvoer, en een afgewezen aanvraag bleef daar staan. Verlof gaat nu
+     pas naar de verzuimlaag bij de goedkeuring (/api/supplier/leave/decide). */
+  if (soort === 'ziek' && payrollOS && payrollOS.verzuim) {
     const v = payrollOS.verzuim.meld(req.supplier.code, req.actor.staffId, {
-      soort: soort === 'ziek' ? 'ziek' : 'vakantie', van: entry.van, tot: entry.tot
+      soort: 'ziek', van: entry.van, tot: entry.tot
     }, req.actor.name);
     // een bezwaar hier is een fout in ONZE vertaling, niet in de invoer van de
     // medewerker; hij hoort zichtbaar te zijn en de melding niet te blokkeren
@@ -95,7 +106,7 @@ app.post('/api/staff/leave/request', supplierAuth, (req, res) => {
     notifySupplier(req.supplier.code, { icon: 'zorg', title: 'Ziekmelding', body: req.actor.name + ' heeft zich ziek gemeld. Denk aan de bezetting van vandaag.' });
   } else {
     logActivity(req.supplier.code, req.actor, 'vroeg verlof aan (' + entry.van + ' t/m ' + entry.tot + ')');
-    notifySupplier(req.supplier.code, { icon: 'parasol', title: 'Verlofaanvraag', body: req.actor.name + ': ' + entry.van + ' t/m ' + entry.tot + (entry.reden ? ' · ' + entry.reden : '') });
+    notifySupplier(req.supplier.code, { icon: 'parasol', title: 'Verlofaanvraag', body: req.actor.name + ': ' + entry.van + ' t/m ' + entry.tot });
   }
   sseToSupplier(req.supplier.code, 'sync', { scope: 'verlof' });
   res.json({ ok: true, entry });

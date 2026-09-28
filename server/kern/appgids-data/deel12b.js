@@ -49,6 +49,12 @@ module.exports = {
      'Zie per bevestiging wat zij WEL vaststelt en wat zij niet zegt - RTG valideert de prestatie zelf nooit',
      'Deel EEN regel met een code die verloopt, zodat een club of sponsor iets kan nakijken zonder uw loopbaan te zien'],
     'Er staat hier geen cijfer, geen niveau en geen vergelijking met iemand anders; de zeven voorraden hebben met opzet geen totaal. Intrekken haalt niets weg - de regel blijft staan met uw reden erbij, want een loopbaan die je kunt poetsen is geen bewijs.'),
+  /* RTG Academy: wat een lid in een leerhuis leert, oefent en bewezen heeft. */
+  '/apps/leerhuis.html': G('Mijn leerhuis: wat u in een organisatie leert, oefent en bewezen heeft, en wat vandaag aan de beurt is.',
+    ['Kies het leerhuis van uw organisatie met de code die u kreeg',
+     'Zie per leerpad waar u staat en wat de volgende stap is',
+     'Zie wat een assessor op naam heeft vastgesteld, en of het nog vers is'],
+    'Er staat geen cijfer op u. Wat hier staat geeft zelf geen bevoegdheid: of u iets mag, beslist de organisatie waar die handeling woont.'),
   '/apps/loopbaanbewijs.html': G('Een regel uit een loopbaan, geopend met de code die iemand u stuurde. Geen account nodig.',
     ['Bekijk het ene feit dat met u gedeeld is, met de dag waarop het gebeurde',
      'Lees per bevestiging wie ervoor instaat, en wat die bevestiging niet zegt',

@@ -74,7 +74,6 @@ test('de twaalf geldhandelingen dragen de verklaring werkelijk', () => {
     'server/kern/bank/zakelijk.js': ["'batch:"],
     'server/kern/pay/verzoeken.js': ["'stuur:", "'klompje:"],
     'server/kern/pay/opladen.js': ["'oplaad:"],
-    'server/kern/pay/kassa.js': ["'kas:"],
     'server/kern/pay/tegoed.js': ["'tegoedkoop:"],
   };
   let n = 0;
@@ -92,7 +91,13 @@ test('de twaalf geldhandelingen dragen de verklaring werkelijk', () => {
       n++;
     }
   }
-  assert.equal(n, 12, 'er horen er twaalf te zijn');
+  /* De kascode gaat sinds 27 september 2026 niet meer langs metIdem maar langs
+     de claim-saga (kern/pay/kas-claim.js); die weigert zonder sleutel zelf, na
+     de codetoets. MUTATIEPROEF: haal idemVerplicht weg en dit zakt. */
+  const lees = f => fs.readFileSync(path.join(__dirname, '..', f), 'utf8');
+  assert.match(lees('server/kern/pay/kassa.js'), /idemVerplicht: '/, 'kasInt verklaart dat hij geld verplaatst');
+  assert.match(lees('server/kern/pay/kas-claim.js'), /if \(idemVerplicht && !idemHash\) return \{ fout: \{ status: 400/);
+  assert.equal(n, 11, 'er horen er elf te zijn, plus de kascode hierboven');
 });
 
 test('de weigering is geen 500 en geen stilte', async () => {

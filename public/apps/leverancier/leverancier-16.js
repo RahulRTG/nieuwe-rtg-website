@@ -58,12 +58,14 @@
       const verlofRest = (state.verlof || []).filter(v => v.status !== 'nieuw').slice(0, 8);
       html += '<div class="tkc"><h3>\uD83C\uDF34 '+T('kt.verlof','Verlof & ziek')+(verlofOpen.length ? ' ('+verlofOpen.length+')' : '')+'</h3>'+
         (verlofOpen.length ? verlofOpen.map(v =>
-          '<div class="st-row h-wrap"><span>'+v.name+'<span class="sub">'+v.van+' t/m '+(v.tot||'')+(v.reden?' \u00B7 '+v.reden:'')+'</span></span>'+
+          '<div class="st-row h-wrap"><span>'+v.name+'<span class="sub">'+v.van+' t/m '+(v.tot||'')+'</span></span>'+
           '<span class="acts"><button class="obtn primary" data-kvja="'+v.id+'">'+T('kt.vja','Goedkeuren')+'</button><button class="obtn warn" data-kvnee="'+v.id+'">'+T('kt.vnee','Afwijzen')+'</button></span></div>').join('')
           : '<div class="tkc-who">'+T('kt.geenverlof','Geen open aanvragen. Personeel vraagt verlof aan via de PDA; ziekmeldingen komen hier ook binnen.')+'</div>')+
         (verlofRest.length ? verlofRest.map(v =>
           '<div class="st-row"><span>'+v.name+'<span class="sub">'+(v.soort==='ziek'?T('kt.ziek','ziek gemeld')+' '+v.van:v.van+' t/m '+(v.tot||''))+'</span></span>'+
           '<span class="sub" style="text-transform:uppercase;font-size:0.6rem;letter-spacing:0.06em;">'+(v.status==='goedgekeurd'?'\u2705 '+T('kt.vok','goedgekeurd'):v.status==='afgewezen'?'\u2715 '+T('kt.vno','afgewezen'):'\uD83E\uDD12 '+T('kt.vzm','gemeld'))+'</span></div>').join('') : '')+'</div>';
+      // RTG Vrijheid: wat op een mens wacht en de bezetting; laadTijdKaart vult hem (leverancier-55e.js)
+      html += '<div class="tkc h-volbreed" id="tijdKaart"><h3>'+T('kt.tijd','Tijd van het team')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
       const klok2 = state.klok || { vandaag: [], binnen: [] };
       html += '<div class="tkc"><h3>\u23F1 '+T('kt.klok','Nu ingeklokt')+' ('+klok2.binnen.length+')</h3>'+
         (klok2.binnen.length ? klok2.binnen.map(n => '<div class="st-row"><span>\uD83D\uDFE2 '+n+'</span></div>').join('')

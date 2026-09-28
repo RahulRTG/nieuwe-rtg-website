@@ -2,7 +2,7 @@
    matchselectie los van mutaties tussen twee leden en van de meldingen voor
    kantoor. Naar de routelaag blijft dit bewust twee kernnamen breed: kiezen
    en meldingen lezen. */
-module.exports = ({ R, save, crypto, notify, schoon, nu, codenaam, gedeeld, geblokkeerd, mag }) => {
+module.exports = ({ R, save, crypto, notify, schoon, nu, codenaam, gedeeld, geblokkeerd, mag, connectionBlocking, Projection }) => {
   /* DE ONTMOETPOORT STAAT OOK OP DE MUTATIES, en dat komt uit de samenvoeging
      van twee rondes. Deze module komt uit de dating-premium-ronde (blokkades en
      meldingen); de 18+-poort met geverifieerd paspoort komt uit de
@@ -50,6 +50,7 @@ module.exports = ({ R, save, crypto, notify, schoon, nu, codenaam, gedeeld, gebl
       return { status: 400, error: 'Onbekend lid.' };
     if (!r.blokkades[key]) r.blokkades[key] = {};
     r.blokkades[key][targetKey] = nu();
+    if (connectionBlocking) connectionBlocking.blokkeer(key, targetKey, 'rendezvous');
     if (r.likes[key]) delete r.likes[key][targetKey];
     if (r.likes[targetKey]) delete r.likes[targetKey][key];
     const melding = schoon(reden, 200);
@@ -68,7 +69,8 @@ module.exports = ({ R, save, crypto, notify, schoon, nu, codenaam, gedeeld, gebl
     if (actie === 'blokkeer') return blokkeer(key, targetKey, reden);
     return { status: 400, error: 'Onbekende keuze.' };
   }
-  function rvMeldingen() { return { status: 200, meldingen: R().meldingen.slice(0, 200) }; }
+  function rvMeldingen() { return { status: 200,
+    meldingen: Projection.projectList(Projection.NAMES.BACKOFFICE_SAFETY, R().meldingen.slice(0, 200)) }; }
 
   return { rvKies, rvMeldingen };
 };

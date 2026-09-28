@@ -26,7 +26,7 @@ const BANK = Object.freeze({
        zonder adres is een wens. Alle drie zijn na te lopen in de route. */
     voorwaarden: [
       { wat: 'een kantoorsessie op naam', bron: 'kluisAuth (kern/kantoor/kluispoort.js)' },
-      { wat: 'een passkey onder deze handeling, of de gemelde terugval', bron: 'kern/zwaarbewijs.js' },
+      { wat: 'een passkey onder deze handeling, zonder terugval', bron: 'kern/zwaarbewijs.js' },
       { wat: 'er staat minstens een vaste betaling aan de beurt', bron: 'bankIncassoVooruitblik' }
     ],
     gevolgen: [
@@ -43,7 +43,11 @@ const BANK = Object.freeze({
          sinds zij een eigen weekreeks zet en een grens meestuurt, loopt de route echt.
          Twee collecties die in het eerste verschil meekwamen staan er met opzet NIET bij:
          `kantoorMensdeur` en `techniek` bewegen op een klok en een buffer, niet op deze
-         handeling -- zie de stille ronde in scripts/idemproef-route.js. */
+         handeling -- zie de stille ronde in scripts/idemproef-route.js.
+         Sinds de passkey zonder terugval (25 september) doet de proef deze route met een
+         eigen medewerker met passkey (scripts/lib/idempasskey.js); zonder die medewerker
+         kreeg hij 403 en zag hij niets. `sessions` en `webauthn` in het verschil zijn
+         die ceremonie, niet deze handeling. */
       { soort: 'direct', graad: 'gemeten', collectie: 'kantoorHandtekeningen',
         wat: 'er komt een openstaande aanvraag voor een tweede mens bij',
         reden: 'de idempotentieproef zag deze collectie veranderen; ook uitgevoerd in ' +

@@ -100,12 +100,20 @@
       '<div style="font-size:0.72rem;color:var(--muted);margin-top:0.3rem;line-height:1.5;">' + T('gc.s','Koop een cadeaukaart van een partner en geef de code cadeau. Inwisselen gaat bij de zaak.') + '</div>' +
       (kaarten.length ? kaarten.map(k =>
         '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.7rem;padding:0.55rem 0;border-bottom:1px solid var(--line);font-size:0.8rem;">' +
-        '<span>' + k.supplierName + '<span style="display:block;font-size:0.66rem;color:var(--rtg-leesgoud,var(--gold));letter-spacing:0.06em;">' + k.code + '</span></span>' +
-        '<b>' + eur(k.saldo) + '</b></div>').join('') : '') +
+        '<span>' + k.supplierName + '<span style="display:block;font-size:0.66rem;color:var(--muted);letter-spacing:0.06em;">' + (k.stand === 'actief' ? T('gc.getoond','Code getoond bij aankoop') : T('gc.dicht','Code niet meer geldig')) + '</span></span>' +
+        '<b>' + eur(k.saldo) + '</b>' + (k.saldo > 0 ? '<button class="vbtn gcRot" data-id="' + k.id + '">' + T('gc.nieuw','Nieuwe code') + '</button>' : '') + '</div>').join('') : '') +
       '<div style="display:flex;gap:0.5rem;margin-top:0.7rem;flex-wrap:wrap;">' +
       '<select id="gcSup" style="flex:2;min-width:120px;background:var(--bg);border:1px solid var(--line);border-radius:0;padding:0.6rem;color:var(--txt);font-family:inherit;">' + opties + '</select>' +
       '<input id="gcAmt" type="number" placeholder="€ 50" style="flex:1;min-width:70px;background:var(--bg);border:1px solid var(--line);border-radius:0;padding:0.6rem;color:var(--txt);font-family:inherit;">' +
       '<button id="gcBuy" style="background:var(--knop);color:var(--knop-txt);border:none;border-radius:0;padding:0.6rem 1rem;font-size:0.74rem;font-weight:600;font-family:inherit;">' + T('gc.koop','Koop') + '</button></div></div>';
+    /* De code staat alleen in het antwoord op de koop. Kwijt? Een nieuwe code
+       maakt de oude ongeldig en wordt ook maar een keer getoond. */
+    wrap.querySelectorAll('.gcRot').forEach(b => b.addEventListener('click', async () => {
+      try {
+        const d = await API.call('/giftcard/roteer', { id: b.dataset.id, idem: RTGIdem('gc-rot') });
+        toast(T('gc.nieuwecode','Nieuwe code (de oude werkt niet meer):') + ' ' + d.code);
+      } catch(e){ toast(e.message); }
+    }));
     const kb = $('#gcBuy');
     if (kb) kb.addEventListener('click', () => {
       const bedrag = Math.round(Number($('#gcAmt').value));

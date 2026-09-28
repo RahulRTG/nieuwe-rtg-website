@@ -15,6 +15,9 @@ module.exports = ({ db, save, liveCodename, ledenGidsActief, ledenGidsHaal, lede
     if (!sess) return;
     if (sess.tier === 'guest' && !sess.account) return;
     const cn = liveCodename(sess);
+    /* De dag van het laatste bezoek (kern/aanwezigheid.js) op hetzelfde keelgat,
+       zodat "aanwezig" en "in de gids" niet op twee deuren iets anders betekenen. */
+    require('./aanwezigheid').raak(cn);
     // Met Postgres gaat het lid naar de geindexeerde ledengids (member_dir) en
     // NIET naar db.data.memberDir: zo groeit de gids buiten het geheugen en
     // staan er bij miljoenen leden geen miljoenen rijen in het proces.

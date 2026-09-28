@@ -16,14 +16,14 @@ het?**
 
 | | |
 |---|---|
-| Functieschakelaars (aan/uit per functie) | **222** in 17 categorieën |
+| Functieschakelaars (aan/uit per functie) | **224** in 17 categorieën |
 | Apps in de leden-catalogus | **89** in 8 categorieën |
-| Bedrijfsgenres | **78** in 28 sectoren |
+| Bedrijfsgenres | **79** in 28 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
-| Kernmodules (`server/kern/**`) | **2348** |
-| App-pagina's (`public/apps/**.html`) | **310** |
-| Testbestanden | **2079** |
+| Kernmodules (`server/kern/**`) | **2472** |
+| App-pagina's (`public/apps/**.html`) | **311** |
+| Testbestanden | **2163** |
 
 ## De vier werelden
 
@@ -54,7 +54,7 @@ ook blokkeert.
 
 ---
 
-# 1. De 222 functieschakelaars
+# 1. De 224 functieschakelaars
 
 ### Leden (RTG-app) — 26
 
@@ -145,7 +145,7 @@ ook blokkeert.
 - **RTG Commerce (mand & retour)** (`commerce`) — De verkooplaag boven de domeinen: wat er te koop staat en wat NIET met de reden erbij, een mand over verkopers heen met een afrekening per verkoper, de overdracht naar de deur die bevestigt, en de weg terug. RTG bevestigt hier zelf niets.  
   _voor: rtg, lifestyle, business_
 
-### Eigen apps — 41
+### Eigen apps — 43
 
 - **Spelen (spellen met vrienden)** (`spellen`) — Alle spellen: schaken, dammen, rummi, Magnaat, sudoku en de partyspellen.  
   _voor: rtg, lifestyle, business, foundation_
@@ -172,6 +172,8 @@ ook blokkeert.
 - **RTG Ondernemers-OS** (`ondernemersos`) — Van "ik denk erover na" tot een draaiend bedrijf in een scherm: de verkenning en de stress test, de rechtsvorm en het oprichtingsproject, het dagbeeld met debiteuren, btw, kas en capaciteit, de verkooppijplijn en het bestuur met de UBO-afleiding.  
   _voor: rtg, lifestyle, business_
 - **RTG Vonk (dating)** (`vonk`) — Dating op codenaam met de Salon-veiligheidslat: 18+, geverifieerd paspoort, een eindige dagselectie, en bij een match automatisch een tafel rond het midden van beide woonplaatsen (EUR 10 p.p., waarvan EUR 5 voor RTG).  
+  _voor: rtg, lifestyle, business_
+- **RTG Connection OS** (`connectionos`) — De gedeelde, afschakelbare communicatie- en medialaag onder Vonk en Rendez-vous. Productbeleid, wederzijdse toestemming en blokkades blijven per product beslissen welke capability daadwerkelijk beschikbaar is.  
   _voor: rtg, lifestyle, business_
 - **RTG Media (één mediawereld)** (`mediaos`) — De laag die Klankwerk, Theater, Clips en Podium tot één wereld maakt: drie standen (muziek, kijk, flow) op dezelfde catalogus, één makersprofiel, één volgrelatie, één bibliotheek en de eigen smaakregelaars. Zet u hem uit, dan blijven de vier apps eronder gewoon werken.  
   _voor: rtg, lifestyle, business_
@@ -229,6 +231,8 @@ ook blokkeert.
   _voor: rtg, lifestyle, business_
 - **Ontdekken (leren, doen, doorgeven)** (`connect`) — Een ontdeklijst die wordt samengesteld uit lagen die RTG al heeft: leerstof en wat er in de buurt gebeurt. Bezit zelf geen inhoud. Er wordt niets gerangschikt en er staat geen cijfer op iets of iemand; elke plek zegt welke motor hem koos en waarom. Wat u hebt gezien, begrepen, geoefend, gemaakt of doorgegeven blijft als lijst staan -- nooit als niveau, en nooit vergeleken met iemand anders. Uitzetten haalt uw leerdossier niet weg; het sluit alleen de ingang.  
   _voor: rtg, lifestyle, business, foundation_
+- **RTG Academy (leren, bewijzen, certificeren)** (`leerhuis`) — Het leerhuis: van rol en officiele kennis via oefenen, simulatie, werk onder toezicht en een onafhankelijke beoordeling naar een certificaat, en terug via verbetervoorstellen uit de praktijk. Staat uit tot de besluiten in ACADEMY.md par. 5 zijn uitgevoerd. Een certificaat verleent geen bevoegdheid; het maakt iemand hoogstens geschikt volgens een beleid dat twee mensen hebben vastgesteld.  
+  _voor: rtg, lifestyle, business_
 
 ### Partners (leveranciers) — 11
 
@@ -492,9 +496,9 @@ ook blokkeert.
   _voor: rtg, lifestyle, business, gast_
 - **Walletsaldo en betalen binnen RTG** (`dom-pay-wallet`) — Saldo aanhouden, opladen, tikken en betaalverzoeken binnen het gesloten RTG-circuit.  
   _voor: rtg, lifestyle, business, gast_
-- **Tegoed voor een ander** (`dom-pay-tegoed`) — Tegoed kopen voor iemand anders, verzilveren met een code, en verlopen tegoed terugnemen.  
+- **Tegoed voor een ander** (`dom-pay-tegoed`) — Tegoed kopen voor iemand anders, verzilveren met een code, een nieuwe code maken, intrekken, en verlopen tegoed terugnemen.  
   _voor: rtg, lifestyle, business_
-- **Tegoed vanuit een zaak** (`dom-pay-tegoed-zaak`) — Een zaak zet tegoed klaar voor personeel of klanten, en neemt verlopen tegoed terug.  
+- **Tegoed vanuit een zaak** (`dom-pay-tegoed-zaak`) — Een zaak zet tegoed klaar voor personeel of klanten, maakt een nieuwe code of trekt in, en neemt verlopen tegoed terug.  
   _voor: leverancier_
 - **Saldo terugstorten naar het lid** (`dom-pay-terug`) — Het eigen walletsaldo terugstorten naar de eigen bankrekening.  
   _voor: rtg, lifestyle, business_
@@ -669,7 +673,7 @@ ze werken; dit is wat hij ziet.
 - **RTF-Bibliotheek** `/apps/foundation/bieb.html` — Gratis kind- en gezinsapps van de RTFoundation.
 - **Geloof & Wijsheid** `/apps/foundation/geloofbieb.html` — De Geloof & Wijsheid-Bibliotheek: alle tradities als gelijken, met echte leesbare teksten.
 
-# 3. De 78 genres in 28 sectoren
+# 3. De 79 genres in 28 sectoren
 
 Er is **één** partner-app en **één** personeels-PDA. Welke schermen een zaak
 krijgt volgt niet uit zijn genre maar uit zijn *genre-caps*: een hotel en een
@@ -695,7 +699,7 @@ is de reden dat er geen 130 losse apps zijn.
 - **mobility** (6) — Taxi (`taxi`), Autoverhuur (`verhuur`), Tweewielers & quads (`tweewielers`), Vervoer & transfers (`vervoer`), Openbaar vervoer (`ov`), Vracht & expeditie (`vracht`)
 - **nonprofit** (1) — RTFoundation (`rtfoundation`)
 - **pharmacy** (1) — Apotheek (`apotheek`)
-- **professional** (3) — Professionele diensten (`professioneel`), Zelfstandig professional (`zzp`), Zelfstandig talent (`talentmens`)
+- **professional** (4) — Professionele diensten (`professioneel`), Zelfstandig professional (`zzp`), Zelfstandig talent (`talentmens`), RTG (het huis zelf) (`rtg`)
 - **realestate** (1) — Vastgoed & makelaar (`vastgoed`)
 - **retail** (3) — Mode & retail (`retail`), Modehuis & atelier (`modehuis`), Juwelier & horloges (`juwelier`)
 - **safety** (7) — Politie (`politie`), Brandweer (`brandweer`), Ambulance (`ambulance`), Marechaussee (`marechaussee`), Defensie (`defensie`), Special Forces (`specials`), Beveiliging & security (`beveiliging`)

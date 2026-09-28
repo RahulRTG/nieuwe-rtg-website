@@ -32,7 +32,7 @@
 'use strict';
 
 module.exports = (sctx) => {
-  const { app, save, nu, rid, W, kern } = sctx;
+  const { app, save, nu, rid, W, kern, sleutels } = sctx;
   const { auth, accounts, eigenaar, crypto } = kern;
   const PRODUCTIE = String(process.env.NODE_ENV || '') === 'production';
   const authEenmaal = (req, res, next) => req.session ? next() : auth(req, res, next);
@@ -67,7 +67,6 @@ module.exports = (sctx) => {
         const code = (() => { let c; do { c = 'W' + crypto.randomBytes(3).toString('hex').toUpperCase().slice(0, 5); } while (W()[c]); return c; })();
         w = { code, naam: 'Rahul Travel Group', land: 'NL', valuta: 'EUR', taal: 'nl',
           moeder: null, kvk: null, btwNummer: null, eigenaarsRuimte: true,
-          beheerToken: crypto.randomBytes(24).toString('hex'),
           leden: {}, journaal: [], at: nu() };
         W()[code] = w;
         gemaakt = code;
@@ -76,7 +75,7 @@ module.exports = (sctx) => {
         const l = { id: rid(4), naam: accounts.realNameOf(req.session.account) || 'Eigenaar',
           functie: 'eigenaar', afdeling: 'directie', extern: false,
           rollen: [{ id: 'directie', van: null, tot: null, at: nu() }],
-          status: 'actief', token: crypto.randomBytes(24).toString('hex'),
+          status: 'actief',
           rtgKey: key, rtgCodenaam: codenaamVan(req.session), gekoppeldAt: nu(), at: nu() };
         w.leden[l.id] = l;
         gemaakt = gemaakt || w.code;
@@ -92,15 +91,18 @@ module.exports = (sctx) => {
       const rij = { werkruimte: w.code, naam: w.naam,
         lidNaam: l.naam, rollen: (l.rollen || []).map(r => r.id), functie: l.functie || null,
         eigenaarsRuimte: !!w.eigenaarsRuimte };
-      if (!PRODUCTIE) rij.lidToken = l.token;
+      /* Een NIEUWE sessie per keer (./sleutels.js): de oude wordt nooit opnieuw
+         getoond, want op de werkruimte staat alleen haar hash. */
+      if (!PRODUCTIE) rij.lidToken = sleutels.geefLid(w, l);
       return rij;
     }).filter(Boolean);
+    if (!PRODUCTIE && mijne.length) save();
 
     res.json({ ok: true, aantal: mijne.length, werkruimtes: mijne, eigenaar: baas,
       aangemaakt: gemaakt,
       let: mijne.length
         ? (PRODUCTIE ? 'Kies zelf welke werkruimte u opent; uw actuele accountrollen bepalen de toegang.'
-          : 'Dit zijn uw eigen lid-tokens; het beheer-token van een werkruimte reist hier nooit mee.')
+          : 'Dit zijn verse lid-sessies, alleen in dit antwoord; het beheer-token van een werkruimte reist hier nooit mee.')
         : (baas && !PRODUCTIE ? null : 'U bent nog aan geen enkele actieve werkruimte gekoppeld.') });
   });
 };

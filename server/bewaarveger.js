@@ -30,15 +30,34 @@ const DAG = 86400000;
    register liegen zodra hier iets verandert (LAT-regel 4). */
 const STANDAARD = { locatieDagen: 7, idDagen: 365 };
 
-function maakBewaarveger({ db, save, accounts, identiteitsmap, lidmaatschapTot, log, nu, instel }) {
+function maakBewaarveger({ db, save, accounts, identiteitsmap, lidmaatschapTot, log, nu, instel, accountWerk }) {
   const I = Object.assign({}, STANDAARD, instel || {});
+  /* ACCOUNTMUTATIES LOPEN HIER BUITEN EEN HTTP-VERZOEK, en in productie mocht
+     dat niet: de identiteitscache commit alleen als deelnemer aan een
+     PostgreSQL-transactie (accounts/transactie.js). Tot 27 september 2026 faalde
+     deze AVG-wisregel daar dus bij elke ronde. accounts/achtergrond.js geeft
+     hem een eigen transactie; buiten productie voert hij direct uit. */
+  const alsAccount = accountWerk || accounts.achtergrondWerk || (fn => fn());
+  const account = (fn) => {
+    try {
+      const uit = alsAccount(fn);
+      if (uit && typeof uit.catch === 'function') uit.catch(e => meldAccountFout(e));
+    } catch (e) { meldAccountFout(e); }
+  };
+  function meldAccountFout(e) {
+    if (log && log.schrijf) {
+      try { log.schrijf('warn', 'bewaarveger-account', { fout: String((e && e.code) || (e && e.message) || e) }); } catch (x) {}
+    }
+  }
   const klok = nu || (() => Date.now());
   const lidTot = lidmaatschapTot || (() => 0);
 
   function wisDossier(u, md) {
     try { identiteitsmap.wisAllesVan(u.id); } catch (e) { /* map al leeg: prima */ }
-    if (u.id_doc) accounts.setVerification(u.id, u.verified, null);
-    if (md && md.selfie) { delete md.selfie; accounts.saveMemberState(u.id, md); }
+    account(() => {
+      if (u.id_doc) accounts.setVerification(u.id, u.verified, null);
+      if (md && md.selfie) { delete md.selfie; accounts.saveMemberState(u.id, md); }
+    });
   }
 
   function veeg() {
@@ -58,7 +77,7 @@ function maakBewaarveger({ db, save, accounts, identiteitsmap, lidmaatschapTot, 
       const md = accounts.getMemberState(u.id) || {};
       if (!md.geverifieerdOp) {
         md.geverifieerdOp = new Date(t).toISOString();
-        accounts.saveMemberState(u.id, md);
+        account(() => accounts.saveMemberState(u.id, md));
         klokGestart++;
         continue;
       }

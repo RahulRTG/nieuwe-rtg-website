@@ -39,7 +39,8 @@ module.exports = (kern) => {
 
   /* De twee deuren staan in ./deuren.js: het contractquotum en de
      organisatiemeting hangen eraan, en die horen op één plek te hangen. */
-  const { ruimteVan, beheerVan, lidVan } = require('./deuren')({ kern, W, eigenVeld });
+  const sleutels = require('./sleutels').maak();
+  const { ruimteVan, beheerVan, lidVan } = require('./deuren')({ kern, W, eigenVeld, sleutels });
 
   /* In productie komt ELKE bedrijfsroute eerst langs de centrale RTG-
      accountpoort en een verse PostgreSQL-baseline. Deze mount staat bewust
@@ -52,7 +53,7 @@ module.exports = (kern) => {
     zonderWerkruimte: ['/api/bedrijf/mijn', '/api/bedrijf/werkruimte/maak']
   });
 
-  const sctx = { app, db, save, crypto, schoon, kern, W, nu, rid, dag, ruimteVan, beheerVan, lidVan, eigenVeld };
+  const sctx = { app, db, save, crypto, schoon, kern, W, nu, rid, dag, ruimteVan, beheerVan, lidVan, eigenVeld, sleutels };
 
   // de deellagen; de volgorde is gedrag (rollen zet de poort die de rest
   // gebruikt, en start zet de blokkenregistratie waar de rest zich op meldt)
@@ -111,5 +112,10 @@ module.exports = (kern) => {
      save() in. */
   require('./gevolg')(sctx);
   sctx.hangProductieIdentiteit = productieIdentiteit.hang;
+  /* Bij de opslagstart (server.js): oude kale sleutels uit de werkruimtes.
+     Productie houdt er geen enkele over; elders worden ze hash (legacy192). */
+  sctx.migreerSleutels = bewerkCollectie => String(process.env.NODE_ENV || '') === 'production'
+    ? require('./legacy-token-migratie')({ bewerkCollectie, productie: true }).migreerAlles()
+    : bewerkCollectie('werkruimtes', ws => ({ ok: true, sleutels: sleutels.migreer(ws) }));
   return sctx;
 };

@@ -15,7 +15,7 @@
 const metingTenant = require('../meting-tenant');
 const scimUserSync = require('../scim/user-sync');
 
-module.exports = ({ kern, W, eigenVeld }) => {
+module.exports = ({ kern, W, eigenVeld, sleutels }) => {
   const PRODUCTIE = String(process.env.NODE_ENV || '') === 'production';
   function rtgAccountOpen(l, req) {
     if (PRODUCTIE) {
@@ -84,7 +84,8 @@ module.exports = ({ kern, W, eigenVeld }) => {
       }
       return quotumOk(req, res, w) ? w : null;
     }
-    if (!w || w.beheerToken !== String((req.body || {}).beheerToken || '')) {
+    // buiten productie: een gehashte beheersessie (./sleutels.js), constant-time gezocht
+    if (!w || !sleutels.beheerVan(w, (req.body || {}).beheerToken)) {
       res.status(403).json({ error: 'Onbekende werkruimte of verkeerd beheer-token.' });
       return null;
     }
@@ -100,7 +101,8 @@ module.exports = ({ kern, W, eigenVeld }) => {
       return quotumOk(req, res, w) ? { w, l } : null;
     }
     const tok = String(req.body.lidToken || '');
-    const l = w && tok ? Object.values(w.leden || {}).find(x => x.token === tok) : null;
+    const hit = w && tok ? sleutels.lidVan(w, tok) : null;
+    const l = hit ? hit.l : null;
     if (!l) { res.status(403).json({ error: 'Onbekende werkruimte of verkeerd lid-token.' }); return null; }
     if (l.status !== 'actief') { res.status(403).json({ error: 'Dit lidmaatschap staat op ' + l.status + '.' }); return null; }
     if (!rtgAccountOpen(l, req)) {

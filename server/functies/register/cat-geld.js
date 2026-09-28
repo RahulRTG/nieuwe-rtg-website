@@ -70,12 +70,12 @@ module.exports = [
      bekend is. Wie dat wil uitzetten -- een land, een stad, een pas -- moet dat
      kunnen zonder de wallet zelf te sluiten. */
   { id: 'dom-pay-tegoed', categorie: 'Geld', naam: 'Tegoed voor een ander', standaard: true, doelgroepen: LEDEN,
-    uitleg: 'Tegoed kopen voor iemand anders, verzilveren met een code, en verlopen tegoed terugnemen.',
-    paden: ['/api/pay/tegoed', '/api/pay/tegoed/koop', '/api/pay/tegoed/verzilver', '/api/pay/tegoed/terug'],
+    uitleg: 'Tegoed kopen voor iemand anders, verzilveren met een code, een nieuwe code maken, intrekken, en verlopen tegoed terugnemen.',
+    paden: ['/api/pay/tegoed', '/api/pay/tegoed/koop', '/api/pay/tegoed/verzilver', '/api/pay/tegoed/terug', '/api/pay/tegoed/roteer'],
     vermogen: 'WALLET_SALDO' },
   { id: 'dom-pay-tegoed-zaak', categorie: 'Geld', naam: 'Tegoed vanuit een zaak', standaard: true, doelgroepen: ['leverancier'],
-    uitleg: 'Een zaak zet tegoed klaar voor personeel of klanten, en neemt verlopen tegoed terug.',
-    paden: ['/api/supplier/pay/tegoed', '/api/supplier/pay/tegoed/zet', '/api/supplier/pay/tegoed/terug'],
+    uitleg: 'Een zaak zet tegoed klaar voor personeel of klanten, maakt een nieuwe code of trekt in, en neemt verlopen tegoed terug.',
+    paden: ['/api/supplier/pay/tegoed', '/api/supplier/pay/tegoed/zet', '/api/supplier/pay/tegoed/terug', '/api/supplier/pay/tegoed/roteer'],
     vermogen: 'WALLET_SALDO' },
   /* De partneruitbetaling hoort aan DEZELFDE partnerrail als de bank-SEPA, en
      dat was hij niet: de boardroom kon de sepa-rail uitzetten, waarna de bank

@@ -1,75 +1,102 @@
-/* DE BON ZELF (kern/pay/tegoed-bon.js): zijn vorm, zijn code, en hoe hij wordt
-   opgeborgen. De handelingen -- kopen, verzilveren, terugnemen -- staan in
-   ./tegoed.js (de ledenkant) en ./tegoed-zaak.js (de zaakkant); die twee delen
-   alles wat hier staat.
+/* DE BON ZELF (kern/pay/tegoed-bon.js): zijn vorm, zijn code, en de ENE
+   collectietransactie waarin hij leeft. De handelingen staan in ./tegoed.js
+   (de ledenkant), ./tegoed-zaak.js (de zaakkant) en ./tegoed-claim.js (geld
+   uit de escrow halen); die delen alles wat hier staat.
 
-   Waarom apart: dit is het stuk dat NIET verschilt tussen een lid en een zaak.
-   Zou het in ./tegoed.js blijven staan, dan is dat bestand de eigenaar van de
-   bon én van een van de twee kanten, en pakt de andere kant zijn helpers uit een
-   broer -- een vorm die er pas op lijkt als je weet waar hij vandaan komt. En
-   praktisch: met deze vier functies erbij ging ./tegoed.js over de grens uit
-   keuringsregel 13. */
+   DE CODE IS DRAGER VAN WAARDE, en daarom staat hij hier niet. De kale code
+   bestaat precies een keer: in het antwoord op de uitgifte of de rotatie. Op
+   schijf staat alleen `toegang.code_hash` (../bearercode.js: 128 bits,
+   SHA-256 met een vaste namespace), en zoeken vergelijkt hashes met
+   timingSafeEqual over ALLE rijen in plaats van te stoppen bij de eerste.
+   Het overzicht van de koper toont de code dus ook niet meer: wie hem kwijt
+   is, roteert -- dan komt er een nieuwe en is de oude dood.
+
+   EEN COLLECTIE, EEN SLOT. Elke controle en elke overgang van een bon loopt
+   door `transactie()` -- in PostgreSQL een advisory lock plus FOR UPDATE op
+   deze rij, in SQLite BEGIN IMMEDIATE (db/collectie-bewerken.js). Twee
+   instances die tegelijk dezelfde code verzilveren, zien elkaar dus: de
+   tweede leest de claim van de eerste. Zonder `bewerkCollectie` (een losse
+   toets zonder opslag) werkt hij op een kopie en publiceert pas na de
+   bewerking; in productie weigert hij dan hard.
+
+   DE OUDE BONNEN. Tot 27 september 2026 stonden bonnen in `payTegoed`, als
+   lijst, met een kale code van 96 bits. ./tegoed-migratie.js haalt ze hierheen
+   en hasht die code op zijn plek: de houder heeft de kale code nog en die
+   blijft werken, dus er gaat geen waarde verloren. */
 'use strict';
 
-const moneyCredentialBlokkade = require('../../middleware/money-credential-productiepoort').blokkade;
-
+const COL = 'payTegoedBon';
 const REK_TEGOED = 'extern:tegoed';
 const VERVAL_MS = 365 * 24 * 60 * 60 * 1000;   // een jaar; daarna haalt de koper het terug
-const MAX_RIJEN = 20000;
+const DOEL = 'pay-tegoedbon';
+const SCOPE = ['tegoed.verzilveren'];
 
-module.exports = ({ d, save, crypto, nu }) => {
-  function bonnen() { if (!Array.isArray(d().payTegoed)) d().payTegoed = []; return d().payTegoed; }
+module.exports = ({ d, save, crypto, nu, bewerkCollectie }) => {
+  const iso = () => new Date(nu()).toISOString();
+  const bearer = require('../bearercode')({ crypto, namespace: 'pay-tegoed', nu: iso });
+  /* Opmaak telt niet: een mens tikt `TG-1A2B-...` of plakt `tg1a2b...`.
+     Streepjes, punten en spaties vallen weg vóór het hashen, bij de uitgifte
+     en bij het zoeken hetzelfde. */
+  const kaal = s => String(s == null ? '' : s).toUpperCase().replace(/[^0-9A-Z]/g, '');
+  const codeHash = code => bearer.hash(kaal(code));
+  const weergave = code => {
+    const k = kaal(code);
+    return k.slice(0, 2) + '-' + k.slice(2).match(/.{1,4}/g).join('-');
+  };
 
-  /* Deze helper is ook buiten de HTTP-routes bruikbaar. Zolang de bon nog raw
-     wordt opgeslagen en credentialclaim + grootboek niet in een database-
-     transactie staan, mag een taak of toekomstige route hem in productie niet
-     rechtstreeks uitgeven of bewaren. De normale domeinfuncties retourneren
-     vóór dit punt hun 503; een directe helperaanroep faalt hard. */
-  function eisVrijgegeven() {
-    const dicht = moneyCredentialBlokkade('pay.tegoedbon');
-    if (!dicht) return;
-    const fout = new Error(dicht.error);
-    fout.code = dicht.code;
-    fout.status = dicht.status;
-    throw fout;
+  function transactie(werk) {
+    const doe = bron => {
+      if (!bron || typeof bron !== 'object' || Array.isArray(bron))
+        throw new Error(COL + ' hoort een kaart te zijn');
+      return werk(bron);
+    };
+    if (typeof bewerkCollectie === 'function') return bewerkCollectie(COL, doe);
+    if (process.env.NODE_ENV === 'production')
+      throw new Error('Tegoedbonnen vragen in productie een collectietransactie.');
+    const oud = d()[COL];
+    const kopie = JSON.parse(JSON.stringify(oud && typeof oud === 'object' ? oud : {}));
+    const voor = JSON.stringify(kopie);
+    const r = doe(kopie);
+    if (r && typeof r.then === 'function') throw new Error('Een tegoedtransactie mag niet asynchroon zijn.');
+    if (JSON.stringify(kopie) !== voor) { d()[COL] = kopie; save(); }
+    return r;
   }
 
-  /* De code is DRAGER van waarde: wie hem heeft, kan hem verzilveren. Twaalf
-     bytes uit crypto.randomBytes (96 bits) en niet uit een teller of een tijd --
-     een code die te raden is, is een wallet die openstaat. In vieren geschreven
-     zodat een mens hem kan overtikken; bij het zoeken wordt de opmaak genegeerd. */
-  function nieuweCode() {
-    eisVrijgegeven();
-    const rauw = crypto.randomBytes(12).toString('hex').toUpperCase();
-    return rauw.match(/.{1,4}/g).join('-');
-  }
-  const normaliseer = s => String(s || '').toUpperCase().replace(/[^0-9A-F]/g, '');
+  /* Lezen zonder slot, voor het overzicht: wie kijkt, verandert niets. */
+  const kijk = () => {
+    const v = d()[COL];
+    return v && typeof v === 'object' && !Array.isArray(v) ? v : {};
+  };
 
-  /* Een bon opbergen, met de opruiming erbij. DIE MAG NOOIT EEN OPEN BON
-     RAKEN: de bon is de enige plek waar staat dat er geld van iemand in de
-     escrow zit, en anders dan bij het grootboek -- waar de saldi de waarheid
-     blijven en de rijen alleen weergave zijn -- is hier het weggooien van de
-     rij het weggooien van de aanspraak. Een afgeronde bon is geschiedenis en
-     mag van achteren af; open en bezig blijven staan, hoe oud ook. */
-  function bewaar(t) {
-    eisVrijgegeven();
-    const rijen = bonnen();
-    rijen.unshift(t);
-    for (let i = rijen.length - 1; i >= 0 && rijen.length > MAX_RIJEN; i--) {
-      if (rijen[i].status !== 'open' && rijen[i].status !== 'bezig') rijen.splice(i, 1);
-    }
-    save();
+  /* Een nieuwe toegang: 128 bits, doel en scope vast, een keer te gebruiken.
+     `vervalt` (ms) is de vervaldatum van de BON; een rotatie houdt hem gelijk. */
+  function nieuweToegang(issuer, bonId, vervalt) {
+    const g = bearer.maak({ prefix: 'TG', issuer, doel: DOEL, scope: SCOPE,
+      onderwerp: { soort: 'tegoedbon', id: bonId }, geldigMs: vervalt - nu(), maxGebruik: 1 });
+    g.toegang.code_hash = codeHash(g.code);
+    g.toegang.expires_at = new Date(vervalt).toISOString();
+    return { code: weergave(g.code), toegang: g.toegang };
   }
 
-  /* Wat er naar buiten gaat. `verlopen` wordt GEREKEND en niet bewaard: een
-     bewaarde vlag zou moeten worden bijgewerkt door iets dat langsloopt, en dan
-     hangt "is deze bon nog geldig" af van of dat iets heeft gedraaid. */
+  /* Constant-time over de hele collectie: bearer.vind loopt ALLE rijen af en
+     stopt niet bij de eerste treffer. Een geroteerde code staat alleen nog in
+     `historie` en wordt dus niet gevonden. */
+  const zoek = (bron, code) => bearer.vind(Object.values(bron), kaal(code),
+    rij => rij && rij.toegang && rij.toegang.code_hash);
+  const vervalt = t => Date.parse(t && t.toegang && t.toegang.expires_at);
+  const verlopen = t => !(vervalt(t) > nu());
+
+  /* Wat er naar buiten gaat: GEEN code en GEEN hash. `verlopen` wordt
+     gerekend en niet bewaard. */
   const naarBuiten = t => ({
-    id: t.id, code: t.code, centen: t.centen, oms: t.oms, status: t.status,
-    van: t.van, aan: t.aan || null, at: t.at, vervalt: t.vervalt,
-    verlopen: t.status === 'open' && t.vervalt < nu(),
-    verzilverdDoor: t.verzilverdDoor || null, verzilverdAt: t.verzilverdAt || null
+    id: t.id, centen: t.centen, oms: t.oms, status: t.status,
+    van: t.van, aan: t.aan || null, at: t.at, vervalt: vervalt(t),
+    verlopen: t.status === 'open' && verlopen(t),
+    verzilverdDoor: t.verzilverdDoor || null, verzilverdAt: t.verzilverdAt || null,
+    toegang: bearer.publiek(t.toegang), legacy96: !!t.legacy96
   });
+  const kopie = t => JSON.parse(JSON.stringify(t));
 
-  return { REK_TEGOED, VERVAL_MS, bonnen, bewaar, nieuweCode, normaliseer, naarBuiten };
+  return { COL, REK_TEGOED, VERVAL_MS, DOEL, SCOPE, bearer, kaal, codeHash,
+    transactie, kijk, nieuweToegang, zoek, vervalt, verlopen, naarBuiten, kopie, iso };
 };

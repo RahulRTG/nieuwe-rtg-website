@@ -44,7 +44,7 @@ blijven.
 | # | bewijs | de vraag | stand |
 |---|---|---|---|
 | 1 | **bereikbaar** | vindt de gebruiker de functie vanaf de plek waar RTG haar presenteert? | **staat** (`APPWERKT.json`) |
-| 2 | **bedienbaar** | doen de knoppen, tabs, velden, uploads en gebaren iets, zonder te breken? | **een kwart** — knoppen wel, formulieren/uploads/toetsenbord niet; en een groot deel van wat er staat is niet aan te tikken omdat er iets overheen ligt (zie par. 5) |
+| 2 | **bedienbaar** | doen de knoppen, tabs, velden, uploads en gebaren iets, zonder te breken? | **knoppen wel, de rest niet** — 83 van 112 onderdelen bewezen op hun eigen knoppen (de schil telt niet mee, par. 4g); formulieren, uploads, toetsenbord en gebaren worden niet gemeten |
 | 3 | **voltooibaar** | kan de hele stroom worden afgemaakt, tot en met de bevestiging? | **een stap weg** (vraagt de testwereld uit par. 4) |
 | 4 | **waarheidsgetrouw** | toont de UI nooit een sterkere toestand dan de backend heeft bewezen? | **staat, voor een leeg antwoord** (`LIEGRONDE.json`, per onderdeel; zie par. 4e) |
 | 5 | **persistent** | komt de juiste toestand terug na refresh, nieuwe sessie, andere browser? | **een stap weg** |
@@ -479,6 +479,67 @@ BEWEZEN, 0 defect**. Bij de meeste ledenschermen staat minstens een route op
 en een route die niet gekruist is, is niet gemeten. Wat die rijen omhoog brengt
 is dus IDOR laten reiken tot die routes (een wereld waarin A daar iets bezit),
 niet de regel versoepelen.
+
+## 4g. Bedienbaar meet het scherm en niet de schil — en vond vier bedekte knoppen
+
+**Staat** (27 september 2026). Na de samenvoeging met de meter van main stond
+`bedienbaar` op 1 van 112 BEWEZEN. De verklaring in par. 4c ("58 rijen stranden
+op *outside of the viewport*") klopte niet: dat was per scherm hoogstens één
+knop, de toetsknop van het veeggebaar (`.rnd-toets`, met opzet buiten beeld tot
+hij focus krijgt). De echte oorzaak was rekenkunde:
+
+| fout | gemeten | reparatie |
+|---|---|---|
+| de schil telde mee | op `geven.html` waren alle 23 zichtbare knoppen van de Edge en nul van het scherm; de proef tikte eerst de schil aan | `.rtg-edge-chrome` en `.rnd-toets` tellen niet; per rij staat hoeveel er van de schil waren (`schil`) |
+| dubbelen telden meer keer | vier kaarten met "Bekijken" stonden vier keer in de noemer en werden één keer aangetikt | elke knop telt één keer, op hetzelfde merk als waarop de proef tikt |
+| het plafond | hoogstens 14 tikken tegen "minstens de helft": elk scherm met meer dan 28 knoppen was per definitie onbewijsbaar | 40 tikken |
+| bedekt heette ongemeten | een eigen knop onder de Edge heette "niet aan te tikken", en de rij bleef NIET_GETEST | alle 45 meetpunten op de schil = GEBLOKKEERD_DOOR_DEFECT, gemeten NA `data-rtg-adaptive-ready` |
+
+Die laatste meting vond vier echte defecten, alle vier gerepareerd en bewaakt
+door `test/edge-enige-balk.e2e.js` (elke reparatie teruggedraaid laat zijn
+deeltoets zakken). Het besluit van de eigenaar (27 september 2026) was **de Edge
+is de enige balk, en de Edge is altijd leidend**: een scherm wijkt voor de Edge,
+nooit andersom. Wat de Edge kan dragen neemt hij over; wat hij niet kan dragen
+schuift uit op de maat die de Edge zelf opgeeft. Wat daarmee nog NIET besloten
+is: `.ios-nav` (108 schermen) staat bewust buiten de claim, omdat die kop vaak de
+hoofdhandeling draagt; overnemen hoort pas als die hoofdhandeling een eigen plek
+in de Edge krijgt (zie de kop van `rtg-adaptive-edge-claim.js`).
+
+- **Decision Room en Project Room**: de eigen tabbalk lag volledig onder de
+  onderbalk van de Edge. De claim herkende hem niet, omdat hij smaller is dan
+  60% van het scherm; een vaste balk tegen de boven- of onderrand telt nu ook.
+  De tabs staan in het Edge-blad, zoals die van RTG One.
+- **Browser**: de werkbalk draagt het adresveld en kan dus niet worden
+  overgenomen. Hij lag in de compacte stand onder de onzichtbare herstelstrook
+  van de Edge. De Edge zegt nu met `--edge-randboven` wat die strook inneemt.
+- **Navigatie**: de kaartlagen zijn bediening op de kaart en geen balk. Op 1280
+  breed lag de eerste laag onder de Edge; ze liggen nu boven `--edge-bottom`.
+
+Office en Residentie leken eerst ook bedekt. Dat was een tussenstand van vóór de
+Edge klaar was, en dat is precies waarom de meter daar nu op wacht: een meting
+in die tussenstand had twee valse defecten opgeleverd.
+
+Uitslag: **78 van 112 BEWEZEN**, 0 defecten. Van de 34 NIET_GETEST hebben er
+twintig geen eigen scherm of geen eigen knop (een stand of kiezer in de app,
+een dichte deur, alleen links). Bij de veertien andere raakte de proef minder
+dan de helft, en de oorzaak ligt nu bij het scherm zelf: een eigen laag die
+na een tik open blijft en niet met Escape sluit (de gids van Residentie, een
+scrim, een blad), of een knop die na de vorige tik verdwijnt. Dat is de
+volgende vraag, en hij is kleiner dan de vorige.
+
+**Vervolg, dezelfde dag.** Die veertien leverden vijf productdefecten op, alle
+vijf gerepareerd. Escape sloot de laag niet op Residentie (gids, atelier,
+huistelefoon; een lopend spel sluit hij met opzet niet), Food Court
+(reserveerblad) en Office (documentwerkstroom) -- `test/escape-lagen.e2e.js`.
+En een eigen laag lag volledig over een eigen knop: het statuspaneel van
+Navigatie over Kaarten, en de onderbalk van Camera over "Camera opnieuw
+openen", de enige weg uit die stand -- `test/eigen-bedekking.e2e.js`. Beide
+toetsen klikken met de muis en zakken zonder de reparatie.
+
+Hermeting: **83 van 112 BEWEZEN**, 0 defecten. Van de negen die overblijven
+met eigen knoppen stopt de proef bij een deel te vroeg (Leven 1/9): een tik
+verandert de weergave, de andere knoppen verdwijnen, en de proef noemt dat
+klaar. Dat is een tekort van de meter en geen bevinding over het scherm.
 
 ## 5. Wat er vandaag gemeten wordt, en wat dat niet bewijst
 

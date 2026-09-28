@@ -12,9 +12,13 @@
        sleutels laden niets, en weigeren op de juiste stap;
      - in de cel zelf zijn netwerk, ouder en OPFS dicht (Playwright rekent IN
        het sandboxframe, dus dit is gemeten en niet afgeleid uit de kop).
+     - het rekentijdplafond: een ondertekende module die NOOIT stopt wordt
+       afgebroken, de pagina blijft ondertussen reageren en de cel is weg. De
+       eerste meting hiervan bevroor de hele pagina (TOESTEL.md par. 10.2);
+     - een worker IN de cel erft haar CSP: ook daar is fetch dicht.
    Wat hier NIET bewezen is: WebGPU (headless Chromium heeft hier geen
-   adapter), echte spraak of vectoren, en het rekentijdplafond (dat vraagt een
-   uitvoerder die bewust te lang rekent). */
+   adapter) en echte spraak of vectoren (dat meten scripts/spraakproef.js en
+   scripts/vectorproef.js). */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -26,6 +30,10 @@ const { nieuweSleutel, teken, sha256 } = require('../scripts/lib/toestelteken');
 /* (func (export "maal") (param f64 f64) (result f64) local.get 0 local.get 1 f64.mul) */
 const MAAL = Buffer.from([0, 97, 115, 109, 1, 0, 0, 0, 1, 7, 1, 96, 2, 124, 124, 1, 124, 3, 2, 1, 0, 7, 8, 1, 4,
   109, 97, 97, 108, 0, 0, 10, 9, 1, 7, 0, 32, 0, 32, 1, 162, 11]);
+/* (func (export "maal") (param f64 f64) (result f64) loop br 0 end f64.const 0)
+   -- een lus die nooit eindigt: de uitvoerder die bewust te lang rekent. */
+const LUS = Buffer.from([0, 97, 115, 109, 1, 0, 0, 0, 1, 7, 1, 96, 2, 124, 124, 1, 124, 3, 2, 1, 0, 7, 8, 1, 4,
+  109, 97, 97, 108, 0, 0, 10, 10, 1, 8, 0, 3, 64, 12, 0, 11, 0, 11]);
 const MODULES = ['licenties', 'manifest', 'poorten', 'meting', 'opslag', 'rekenaar'];
 
 const pw = laadPlaywright();
@@ -41,6 +49,9 @@ test('de toestelrekenlaag rekent in een afgesloten cel, en alleen met onderteken
     const regel = teken({ id: 'maal-proef', versie: '1', soort: 'uitvoerder', sha256: sha256(MAAL), grootte: MAAL.length,
       licentie: 'MIT', bron: 'RTG, test/toestel.e2e.js', naamsvermelding: 'RTG', contracten: ['proef.vermenigvuldig'] },
       { id: sleutel.id, stand: 'actief' }, sleutel.privateKey);
+    const lusRegel = teken({ id: 'lus-proef', versie: '1', soort: 'uitvoerder', sha256: sha256(LUS), grootte: LUS.length,
+      licentie: 'MIT', bron: 'RTG, test/toestel.e2e.js', naamsvermelding: 'RTG', contracten: ['proef.lus'] },
+      { id: sleutel.id, stand: 'actief' }, sleutel.privateKey);
     fs.writeFileSync(path.join(DIR, 'manifest.json'), JSON.stringify({ versie: 1, artefacten: [regel] }));
     const srv = await startServer({ env: { RTG_DATA_DIR: TMP, RTG_TOESTEL_DIR: DIR, SMTP_URL: '' } });
     const browser = await pw.chromium.launch(browserOpties(pw));
@@ -49,7 +60,11 @@ test('de toestelrekenlaag rekent in een afgesloten cel, en alleen met onderteken
       await page.goto(srv.base + '/site/404.html');
       for (const m of MODULES) await page.addScriptTag({ url: '/shared/toestel/' + m + '.js' });
 
-      const u = await page.evaluate(async (vertrouwd) => {
+      /* Een bevroren pagina geeft nooit antwoord: dan zakt de toets op deze klok
+         in plaats van eeuwig te wachten. */
+      let klok;
+      const bevroren = new Promise((r) => { klok = setTimeout(() => r({ bevroren: true }), 60000); });
+      const u = await Promise.race([bevroren, page.evaluate(async ({ vertrouwd, lusRegel, lusBytes }) => {
         const M = await (await fetch('/toestel/manifest.json')).json();
         const regel = M.artefacten[0], O = window.RTGToestelOpslag, uit = {};
         uit.zonderTik = await O.haal(regel, {});
@@ -85,8 +100,21 @@ test('de toestelrekenlaag rekent in een afgesloten cel, en alleen met onderteken
         uit.onbekend = await R.voer({ contract, kandidaat: Object.assign({}, keus.gekozen, { uitvoerder: 'verzonnen' }),
           artefacten: art(tweede.bytes), invoer: {}, sleutels: vertrouwd });
         uit.celResten = document.querySelectorAll('iframe').length;
+        /* Het plafond: de lus rekent door, de pagina moet ondertussen blijven
+           tikken, en na 1,5 s is het afgelopen. */
+        const tikken = []; const hart = setInterval(() => tikken.push(performance.now()), 100);
+        const t0 = performance.now();
+        uit.lus = await R.voer({ contract: { taak: 'proef.lus', last: { rekenMaxMs: 1500 } },
+          kandidaat: { plaats: 'toestel', uitvoerder: 'wasm-proef' },
+          artefacten: { module: { regel: lusRegel, bytes: Uint8Array.from(lusBytes).buffer } }, invoer: { a: 1, b: 2 }, sleutels: vertrouwd });
+        uit.lusMs = performance.now() - t0;
+        clearInterval(hart);
+        uit.tikken = tikken.length;
+        uit.lusResten = document.querySelectorAll('iframe').length;
         return uit;
-      }, vertrouwd);
+      }, { vertrouwd, lusRegel, lusBytes: [...LUS] })]);
+      clearTimeout(klok);
+      assert.ok(!u.bevroren, 'de pagina van het lid bevroor: het rekenen blokkeerde de thread en het plafond ging nooit af');
 
       assert.equal(u.zonderTik.ok, false); assert.equal(u.zonderTik.vraag, 'toestemming');
       assert.equal(u.eenTik.ok, false, 'headless Chromium laat de verbinding niet zien: dan nog eens vragen');
@@ -105,6 +133,11 @@ test('de toestelrekenlaag rekent in een afgesloten cel, en alleen met onderteken
       assert.equal(u.productielijst.stap, 'sleutel', 'de lege productielijst laadt niets');
       assert.equal(u.onbekend.stap, 'uitvoerder');
       assert.equal(u.celResten, 0, 'elke cel is na afloop weg');
+      assert.equal(u.lus.ok, false);
+      assert.equal(u.lus.stap, 'last', JSON.stringify(u.lus));
+      assert.ok(u.lusMs >= 1400 && u.lusMs < 5000, 'afgebroken op het plafond, niet ervoor en niet veel erna: ' + u.lusMs);
+      assert.ok(u.tikken >= 8, 'de pagina van het lid bleef reageren terwijl de cel rekende: ' + u.tikken + ' tikken');
+      assert.equal(u.lusResten, 0, 'de afgebroken cel is weg');
       assert.ok(u.sandbox.length >= 2, 'de rekenaar opende zelf cellen');
       assert.ok(u.sandbox.every(x => x === 'allow-scripts'), 'elke cel is sandbox allow-scripts, zonder same-origin: ' + u.sandbox);
 
@@ -120,9 +153,15 @@ test('de toestelrekenlaag rekent in een afgesloten cel, en alleen met onderteken
         try { o.ouder = String(parent.document.title); } catch (e) { o.ouder = 'dicht'; }
         try { await navigator.storage.getDirectory(); o.opfs = 'open'; } catch (e) { o.opfs = 'dicht'; }
         o.origin = String(self.origin);
+        /* Een worker uit een blob erft de CSP van de cel: ook daar geen netwerk. */
+        o.worker = await new Promise((klaar) => {
+          const w = new Worker(URL.createObjectURL(new Blob([
+            "fetch('/toestel/manifest.json').then(() => postMessage('open'), () => postMessage('dicht'))"])));
+          w.onmessage = (e) => klaar(e.data); w.onerror = () => klaar('fout');
+        });
         return o;
       });
-      assert.deepEqual(binnen, { fetch: 'dicht', ouder: 'dicht', opfs: 'dicht', origin: 'null' });
+      assert.deepEqual(binnen, { fetch: 'dicht', ouder: 'dicht', opfs: 'dicht', origin: 'null', worker: 'dicht' });
     } finally {
       await browser.close();
       await stop(srv);

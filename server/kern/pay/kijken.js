@@ -65,5 +65,16 @@ module.exports = ({ saldi, grootboek, keyVanCodenaam, sseToCustomer, schaduw }) 
   const schaduwStand = { aan: schaduw.aan,
     stand: () => schaduw.stand(sluitcontrole().som, vingerafdruk(saldi())) };
 
-  return { sluitcontrole, boekingenVan, seintje, schaduwStand };
+  /* Het tegoed dat leden bij RTG hebben staan: de som van de lid-rekeningen
+     (vorm 'lid:' + codenaam, ./bakken.js). Een totaal en een aantal, nooit per
+     lid. Het boek van RTG (kern/rtgboek.js) zet dit NAAST de liquiditeit en trekt
+     het er niet van af (besluit C10). */
+  function ledentegoed() {
+    let centen = 0, rekeningen = 0;
+    for (const [rek, c] of Object.entries(saldi()))
+      if (rek.startsWith('lid:') && c > 0) { centen += c; rekeningen++; }
+    return { centen, rekeningen };
+  }
+
+  return { sluitcontrole, boekingenVan, seintje, schaduwStand, ledentegoed };
 };

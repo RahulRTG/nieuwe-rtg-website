@@ -24,8 +24,9 @@ const MAX = 4, MIN = 2, DUUR = 112, BEWAAR_MS = 28 * 86400000;
 const NIET_IN_STAD = ['opnieuw', 'start', 'moeilijkheid', 'tempo', 'doorspoelen'];
 const fout = (error, status = 400) => ({ status, error });
 
-function maakStad({ eigen, leven, crypto, codenaamVan = () => null, sseToCustomer = null, nu = () => Date.now() }) {
-  const steden = () => eigen.bak('magnaatSteden');
+function maakStad({ eigen, leven, crypto, codenaamVan = () => null, sseToCustomer = null, bewerkCollectie = null, opslag = null, nu = () => Date.now() }) {
+  /* Elke zet onder een slot; een seintje na de commit (./stad-slot.js). */
+  const { steden, sein, onderSlot } = require('./stad-slot')({ eigen, bewerkCollectie, sseToCustomer, opslag });
   const levenKey = (s, lid) => 'stad:' + s.code + ':' + lid.plek;
   const naamVan = (key) => { try { return String(codenaamVan(key) || '').slice(0, 60) || 'Speler'; } catch (e) { return 'Speler'; } };
   const actief = (s) => s.leden.filter(l => !l.weg && !leven.intern.haal(levenKey(s, l)).voorbij);
@@ -48,16 +49,9 @@ function maakStad({ eigen, leven, crypto, codenaamVan = () => null, sseToCustome
       delete alle[s.code];
     }
   }
-  function sein(s) {
-    if (typeof sseToCustomer !== 'function') return;
-    for (const l of s.leden) {
-      try { sseToCustomer(l.key, 'sync', { scope: 'magnaat-stad', code: s.code, dag: s.dag, revisie: s.revisie }); } catch (e) {}
-    }
-  }
   const wijzig = (s) => { s.revisie += 1; sein(s); };
 
-  /* Wat de andere spelers van elkaar op de markt zien: naam, wijk, naam bij
-     klanten, prijs als ze handelen, en of ze deze week te laat leverden. */
+  /* Wat spelers van elkaar op de markt zien: naam, wijk, prijs, en of ze deze week te laat leverden. */
   function kringVan(s, ik) {
     return s.leden.filter(l => l !== ik && !l.weg).map(l => {
       const st = leven.intern.haal(levenKey(s, l));
@@ -182,7 +176,8 @@ function maakStad({ eigen, leven, crypto, codenaamVan = () => null, sseToCustome
     return { stad: publiek(s, key), leven: r };
   }
 
-  return { maak, doe, start, verlaat: verlaatStad, staat, actie };
+  const slot = (f) => (...a) => onderSlot(() => f(...a));
+  return { maak: slot(maak), doe: slot(doe), start: slot(start), verlaat: slot(verlaatStad), staat: slot(staat), actie: slot(actie) };
 }
 
 module.exports = { maakStad, MAX, MIN, DUUR };

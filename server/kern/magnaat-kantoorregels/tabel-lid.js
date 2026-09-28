@@ -78,6 +78,10 @@ module.exports = [
      (/api/factuur, /api/bank/akkoord), en deze routes verplaatsen niets -- ze
      beeindigen een verplichting. Het bedrag komt van het contract. */
   [/(?:^|\/)mijn[-/]abonnement/, 'balie', 'De Ledenbalie'],
+  /* Zelf gast worden (/api/mijn/pas/gast, besluit C5) is dezelfde ledenkant van het
+     lidmaatschap: de kantoorkant (/api/office/pas/gast) is een balieHANDELING op
+     naam, en de opzegweg eronder is exact die van /api/mijn/abonnement. */
+  [/(?:^|\/)mijn[-/]pas(?:\/|$)/, 'balie', 'De Ledenbalie'],
 
   /* RTG Vertegenwoordiging (CARRIERE.md par. 6a en 6b) hoort in deze familie en
      niet bij de Ledenbalie: die doet inzage in het dossier van een lid met een

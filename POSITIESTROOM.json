@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T18:10:20.804Z",
-    "commit": "4ba511e4d",
+    "op": "2026-09-29T18:27:18.986Z",
+    "commit": "747aa293d",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/positiestroom.js",
@@ -16,7 +16,7 @@
     "wat": "Elk citaat moet letterlijk in zijn bestand staan. Staat er een niet, dan is een stroom verhuisd of verdwenen, en telt deze meter iets wat hij niet meer ziet."
   },
   "gemeten": {
-    "kandidaten": 52,
+    "kandidaten": 53,
     "onverklaard": 0,
     "stromen": 35,
     "nietGedetecteerd": 9,
@@ -500,7 +500,7 @@
       "van": "lid",
       "termijn": {
         "soort": "lid",
-        "bestand": "server/kern/vonk/index.js"
+        "bestand": "server/kern/vonk/vak.js"
       },
       "vergeten": true,
       "gedetecteerd": true,

@@ -155,8 +155,8 @@
       "sleutel": "zelfpoortendeToetsen",
       "van": 42,
       "vervalt": "2026-12-29",
-      "meter": "zelfpoortendeToetsen 42 -> 43; toetsenNietGemeten 642 -> 645",
-      "reden": "Het partnerkanaal gesplitst (RELEASEKANDIDAAT.md B14): drie nieuwe toetsen. test/partnerpersoneelscode.pg.test.js is een raceproef over twee PostgreSQL-instances (twee boekingen op het laatste gebruik van een personeelscode, een rotatie tegen een boeking met de oude code, een intrekking tegen een uitgifte); die kan niet eerlijk zonder PostgreSQL en Redis, slaat lokaal zonder DATABASE_URL over en staat daarom in scripts/lib/pg-toetslijst.js en onder zelfpoortende-toets. Lokaal tegen echte PostgreSQL en Redis groen, en zonder advisory lock plus FOR UPDATE in pg/collectietransactie.js zakte hij 3 van 3 keer. test/partnerpersoneelscode.test.js (echte server) en test/partnerpersoneelscode-register.test.js (zonder server) zijn gewone toetsen die met de hand gemuteerd zijn (21 van 24 handmutaties rood; de drie groene -- de naameis naast boardroomAuth, de losse no-store naast koppen.js, en alleen de idemsleutels-nooit-regel -- zijn gelijkwaardig en staan in het commitbericht) maar nog niet in MUTATIES.json staan; dat register vult de hoofdsessie op een schone boom.",
+      "meter": "zelfpoortendeToetsen 42 -> 43; toetsenNietGemeten 642 -> 643",
+      "reden": "Het partnerkanaal gesplitst (RELEASEKANDIDAAT.md B14): drie nieuwe toetsen. test/partnerpersoneelscode.pg.test.js is een raceproef over twee PostgreSQL-instances (twee boekingen op het laatste gebruik van een personeelscode, een rotatie tegen een boeking met de oude code, een intrekking tegen een uitgifte); die kan niet eerlijk zonder PostgreSQL en Redis, slaat lokaal zonder DATABASE_URL over en staat daarom in scripts/lib/pg-toetslijst.js en onder zelfpoortende-toets. Lokaal tegen echte PostgreSQL en Redis groen, en zonder advisory lock plus FOR UPDATE in pg/collectietransactie.js zakte hij 3 van 3 keer. test/partnerpersoneelscode.test.js (echte server) en test/partnerpersoneelscode-register.test.js (zonder server) zijn gewone toetsen die met de hand gemuteerd zijn (21 van 24 handmutaties rood; de drie groene -- de naameis naast boardroomAuth, de losse no-store naast koppen.js, en alleen de idemsleutels-nooit-regel -- zijn gelijkwaardig en staan in het commitbericht) maar nog niet in MUTATIES.json staan; dat register vult de hoofdsessie op een schone boom. De twee gewone toetsen zijn daarna door de mutatiemotor gemeten (beide zakken); alleen de pg-proef blijft ongemeten.",
       "waarheen": "toetsenNietGemeten zakt met 2 zodra MUTATIES.json de twee gewone toetsen meet; de pg-proef lost af zoals de andere pg-proeven: de standaardomgeving levert PostgreSQL, en het nul-skipbewijs hangt aan de releasecommit."
     },
     {
@@ -847,8 +847,8 @@
       "sleutel": "toetsenNietGemeten",
       "van": 645,
       "vervalt": "2026-12-15",
-      "meter": "toetsenNietGemeten 643 -> 672",
-      "reden": "De vier RTG-werelden voegen 27 gerichte scherm-, route- en integratietoetsen toe die de volledige lokale schermsuite en projectcheck halen, maar waar de mutatiemotor nog niet langs is geweest. Dit is instrumentdekking en geen groenverklaring over ongemeten mutaties. De twee gewone toetsen zijn daarna door de mutatiemotor gemeten (beide zakken), dus de norm ging weer naar 643: alleen de pg-proef blijft ongemeten.",
+      "meter": "toetsenNietGemeten 645 -> 672",
+      "reden": "De vier RTG-werelden voegen 27 gerichte scherm-, route- en integratietoetsen toe die de volledige lokale schermsuite en projectcheck halen, maar waar de mutatiemotor nog niet langs is geweest. Dit is instrumentdekking en geen groenverklaring over ongemeten mutaties.",
       "waarheen": "laat de mutatiemotor precies over de 27 nieuwe toetsbestanden lopen en leg MUTATIES.json opnieuw uit een schone commit vast"
     },
     {

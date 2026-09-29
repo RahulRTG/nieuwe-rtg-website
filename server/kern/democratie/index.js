@@ -31,6 +31,7 @@ const { maakLid } = require('./lid');
 const { maakKoppeling } = require('./koppeling');
 const { maakWek } = require('./wek');
 const { maakDoe } = require('./doe');
+const { maakConnector } = require('./connector');
 const { meet } = require('./meter');
 const { EINDSTANDEN } = require('./eindstanden');
 const AFHANKELIJK = require('./afhankelijkheden');
@@ -38,7 +39,8 @@ const { BEWIJSSTAND } = require('./bewijsstand');
 
 function maakDemocratie({ db, save, bijeen, inBundel, crypto, meldLid, codenaamVan }) {
   const eigen = require('../eigencollectie')({ db, domein: 'kern/democratie',
-    bezit: { democratieKwesties: 'kaart', democratieJournaal: 'lijst', democratieInbrengers: 'kaart', democratieActies: 'kaart' } });
+    bezit: { democratieKwesties: 'kaart', democratieJournaal: 'lijst', democratieInbrengers: 'kaart', democratieActies: 'kaart',
+      democratiePartijen: 'kaart', democratieVoorstellen: 'kaart' } });
   const vastleggen = require('../../lib/duurzaam')({ bijeen, save, inBundel, bron: 'democratie' });
   const kaart = () => eigen.bak('democratieKwesties');
   const kijk = () => eigen.kijk('democratieKwesties') || {};
@@ -73,7 +75,11 @@ function maakDemocratie({ db, save, bijeen, inBundel, crypto, meldLid, codenaamV
 
   const doe = maakDoe({ kaart: () => eigen.bak('democratieActies'), kijk: () => eigen.kijk('democratieActies') || {},
     zoek, schrijver, koppeling, vastleggen, ontvangersVan, crypto, nu: () => new Date(nu()).toISOString() });
-  const metActies = (v) => Object.assign(v, { acties: doe.opKwestie(v.id) });
+  /* De Political Connector (./connector.js): het partijenregister en de
+     voorstellen, naast de burgerlus en niet erin. */
+  const connector = maakConnector({ eigen, vastleggen, crypto, nu, zoek, schrijver, wie, zonderNaam, betrokken });
+
+  const metActies = (v) => Object.assign(v, { acties: doe.opKwestie(v.id), voorstellen: connector.bijKwestie(v.id) });
 
   function lijst() {
     const alle = Object.values(kijk()).sort((a, b) => String(a.at).localeCompare(String(b.at)));
@@ -152,7 +158,9 @@ function maakDemocratie({ db, save, bijeen, inBundel, crypto, meldLid, codenaamV
   const mijn = (sleutel) => { const r = lid.mijn(sleutel); r.kwesties.forEach(metActies); return r; };
   const { opKwestie, ...doeLid } = doe;
 
-  return { ...lid, mijn, doe: doeLid, lijst, behandel, sluit, heropen, herbezorg, meter, vergeet };
+  return { ...lid, mijn, doe: doeLid, lijst, behandel, sluit, heropen, herbezorg, meter, vergeet,
+    voorstellenBij: connector.voorstellenBij, partij: connector.partij, register: connector.register,
+    partijVanSleutel: connector.partijVanSleutel };
 }
 
 module.exports = { maakDemocratie };

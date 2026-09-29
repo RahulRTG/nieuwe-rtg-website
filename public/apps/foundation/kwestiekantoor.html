@@ -51,6 +51,7 @@
   .eind{font-size:.88rem;line-height:1.55;margin-top:.5rem;border-left:3px solid var(--rtg-goud,#C9A24B);padding-left:.8rem;}
 </style>
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
+<script src="voorstelbeeld.js"></script>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -77,6 +78,27 @@
     </div>
 
     <div id="melding" role="status" aria-live="polite"></div>
+
+    <div class="kkaart">
+      <div class="ksec">Partijenregister</div>
+      <div class="uitleg">Een partij komt erin op grond van een officiele registratie, niet op grond van een oordeel van ons. Elke
+        partij krijgt dezelfde deur en dezelfde limieten. De sleutel ziet u een keer; geef hem aan de partij.</div>
+      <div id="pSleutel" class="ruimte" role="status" aria-live="polite"></div>
+      <div class="rij ruimte">
+        <input class="kveld" id="pAanduiding" maxlength="120" placeholder="Aanduiding zoals in de registratie" aria-label="Aanduiding">
+        <select class="kveld" id="pNiveau" aria-label="Verkiezingsniveau"></select>
+        <select class="kveld" id="pCategorie" aria-label="Categorie">
+          <option value="geregistreerd">Geregistreerde aanduiding</option>
+          <option value="deelnemer">Neemt deel, ook zonder aanduiding</option>
+        </select>
+      </div>
+      <div class="rij ruimte">
+        <input class="kveld" id="pBron" maxlength="300" placeholder="Waar staat de officiele registratie?" aria-label="Bron van de registratie">
+        <input class="kveld" id="pGecontroleerd" type="date" aria-label="Nagekeken op">
+        <button class="kknop" type="button" id="pRegistreer">Inschrijven</button>
+      </div>
+      <div id="partijen" class="ruimte"><div class="leeg">Laden...</div></div>
+    </div>
 
     <div class="kkaart">
       <div class="ksec">Kwesties</div>
@@ -168,7 +190,7 @@ async function lijst() {
     const stand = r.stand === 'afgesloten' ? 'Afgesloten' : (LOPEND[r.stand] || r.stand);
     return '<div class="kwestie"><div class="rij"><div class="kern"><b>' + esc(k.onderwerp) + '</b>' +
       '<div class="meta">' + esc(k.id) + (k.gebied ? ' · ' + esc(k.gebied) : '') + ' · ingebracht ' + esc(k.at) + ' · ronde ' + esc(r.nr) + '</div></div>' +
-      '<span class="stand">' + esc(stand) + '</span></div>' + samen(k) + werkblok(k, r) + '</div>';
+      '<span class="stand">' + esc(stand) + '</span></div>' + samen(k) + VoorstelBeeld.html(k.voorstellen, esc) + werkblok(k, r) + '</div>';
   }).join('') : '<div class="leeg">Er zijn nog geen kwesties.</div>';
   koppel();
 }
@@ -210,9 +232,12 @@ async function vernieuw() { await Promise.all([meter(), lijst()]); }
 
 $('#herbezorg').addEventListener('click', () => doe(() => api('kwestie/herbezorg'), 'Gemiste meldingen zijn opnieuw gestuurd.'));
 
+window.KwestieKantoor = { api, esc, zeg, lijst: () => lijst().catch(e => zeg(e.message)), aan: () => !!TOKEN };
+
 if (TOKEN) { $('#app').classList.remove('verborgen'); vernieuw().catch(e => zeg(e.message)); }
 else dicht();
 </script>
+<script src="partijregister.js" defer></script>
 <script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

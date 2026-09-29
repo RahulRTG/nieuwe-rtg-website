@@ -16,7 +16,7 @@ module.exports = (kern, doosSleutelOk) => {
   const { app, db } = kern;
   const kloon = require('../kern/zaakdoos/kloon');
   const productie = () => process.env.NODE_ENV === 'production';
-  const NIET_IN_KLOON = ['democratieKwesties', 'democratieJournaal', 'democratieInbrengers', 'democratieActies'];
+  const NIET_IN_KLOON = ['democratieKwesties', 'democratieJournaal', 'democratieInbrengers', 'democratieActies', 'democratiePartijen', 'democratieVoorstellen'];
 
   app.get('/api/doos/kloon', async (req, res) => {
     res.set('Cache-Control', 'no-store');

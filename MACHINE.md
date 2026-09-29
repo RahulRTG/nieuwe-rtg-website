@@ -60,7 +60,7 @@ van stil meegeteld.
 
 ## 1. Wat er gemeten is
 
-<!--getal:machine.muterend-->3938<!--/getal--> muterende routes. Per as het
+<!--getal:machine.muterend-->3952<!--/getal--> muterende routes. Per as het
 aantal routes dat hem raakt (`handler` / `bestand`):
 
 | as | handler | bestand | motor |
@@ -79,7 +79,7 @@ aantal routes dat hem raakt (`handler` / `bestand`):
 | assurance (passkey, stap-op) | 2 | 49 | `kern/identiteit/vertrouwen.js` |
 | frictie | 2 | 98 | `kern/frictie/motor.js` |
 | simulatie | 10 | 103 | `kern/command/simulatie.js` |
-| envelop (oorzaak, correlatie) | 2 | <!--getal:machine.envelop-->180<!--/getal--> | `kern/envelop.js` |
+| envelop (oorzaak, correlatie) | 2 | <!--getal:machine.envelop-->201<!--/getal--> | `kern/envelop.js` |
 | idempotentie | 13 | 114 | `lib/idem-poort.js` |
 | aiVindbaar | 173 | 173 | `kern/stuur/beleid.js` |
 | mensAanDeDeur | 234 | <!--getal:machine.mensAanDeDeur-->290<!--/getal--> | `kern/kantoor/kluispoort.js` |
@@ -101,8 +101,8 @@ de teller zakt naar 0 met de naam van die as erbij; dat is nagetrokken door
 
 **De drie getallen die de richting bepalen:**
 
-1. <!--getal:machine.zonderAs-->2759<!--/getal--> van de
-   <!--getal:machine.muterend-->3938<!--/getal--> muterende routes raken **geen
+1. <!--getal:machine.zonderAs-->2757<!--/getal--> van de
+   <!--getal:machine.muterend-->3952<!--/getal--> muterende routes raken **geen
    enkele** as — zelfs niet op de ruime bestandsas.
 
    **Let op de noemer: die is op 14 september 2026 verschoven, en een ronde van

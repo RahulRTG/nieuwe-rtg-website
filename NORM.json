@@ -155,6 +155,26 @@
       "sleutel": "zelfpoortendeToetsen",
       "van": 42,
       "vervalt": "2026-12-29",
+      "meter": "zelfpoortendeToetsen 42 -> 43",
+      "reden": "test/linkcap-credential.pg.test.js is nieuw (de RTG Link-drager gemigreerd, RELEASEKANDIDAAT.md B15, link.capability_aanvaarden): twee echte PostgreSQL-instances racen om dezelfde drager (precies een claim wint), een intrekking op B tegen een claim op A (precies een van de twee), en PostgreSQL draagt alleen de hash en een versleutelde opdracht. Zonder DATABASE_URL en REDIS_URL slaat hij over. Hij staat in scripts/lib/pg-toetslijst.js en als uitzondering onder zelfpoortende-toets. Lokaal tegen echte PostgreSQL en Redis groen; met de hand zonder advisory lock plus FOR UPDATE in pg/collectietransactie.js nagetrokken (zie het commitbericht).",
+      "waarheen": "Dezelfde aflossing als de notitie van 5 september: de standaardomgeving levert PostgreSQL, en het nul-skipbewijs hangt aan de releasecommit."
+    },
+    {
+      "datum": "2026-09-29",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 642,
+      "vervalt": "2026-12-29",
+      "meter": "toetsenNietGemeten 642 -> 645",
+      "reden": "Drie nieuwe toetsen voor de RTG Link-drager (B15): test/linkcap-credential.test.js (controls per regel), test/linkcap-productie.test.js (twee kassa's op een echte server en de grendel eraf op een echte productieserver) en test/linkcap-credential.pg.test.js (vraagt PostgreSQL). De mutatiemotor is er nog niet langs geweest -- MUTATIES.json is een register en wordt op een schone boom gemeten, niet in deze tak. Met de hand nagetrokken: elke control een keer weggehaald, en welke toets dan zakt staat in het commitbericht.",
+      "waarheen": "De volgende registerronde (MUTATIES.json en BEWIJS.md op een schone boom) meet de twee gewone toetsen; de pg-proef volgt de aflossing van de andere pg-toetsen."
+    },
+    {
+      "datum": "2026-09-29",
+      "soort": "schuld",
+      "sleutel": "zelfpoortendeToetsen",
+      "van": 42,
+      "vervalt": "2026-12-29",
       "meter": "zelfpoortendeToetsen 42 -> 43; toetsenNietGemeten 642 -> 643",
       "reden": "Het partnerkanaal gesplitst (RELEASEKANDIDAAT.md B14): drie nieuwe toetsen. test/partnerpersoneelscode.pg.test.js is een raceproef over twee PostgreSQL-instances (twee boekingen op het laatste gebruik van een personeelscode, een rotatie tegen een boeking met de oude code, een intrekking tegen een uitgifte); die kan niet eerlijk zonder PostgreSQL en Redis, slaat lokaal zonder DATABASE_URL over en staat daarom in scripts/lib/pg-toetslijst.js en onder zelfpoortende-toets. Lokaal tegen echte PostgreSQL en Redis groen, en zonder advisory lock plus FOR UPDATE in pg/collectietransactie.js zakte hij 3 van 3 keer. test/partnerpersoneelscode.test.js (echte server) en test/partnerpersoneelscode-register.test.js (zonder server) zijn gewone toetsen die met de hand gemuteerd zijn (21 van 24 handmutaties rood; de drie groene -- de naameis naast boardroomAuth, de losse no-store naast koppen.js, en alleen de idemsleutels-nooit-regel -- zijn gelijkwaardig en staan in het commitbericht) maar nog niet in MUTATIES.json staan; dat register vult de hoofdsessie op een schone boom. De twee gewone toetsen zijn daarna door de mutatiemotor gemeten (beide zakken); alleen de pg-proef blijft ongemeten.",
       "waarheen": "toetsenNietGemeten zakt met 2 zodra MUTATIES.json de twee gewone toetsen meet; de pg-proef lost af zoals de andere pg-proeven: de standaardomgeving levert PostgreSQL, en het nul-skipbewijs hangt aan de releasecommit."
@@ -3807,6 +3827,12 @@
       "pad": "test/personeelsuitnodiging.pg.test.js",
       "vervalt": "2026-10-15",
       "reden": "de raceproef voor de personeelsuitnodiging (twee leden op twee instances om dezelfde eenmalige code) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl hij lokaal zonder die infrastructuur expliciet overslaat"
+    },
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/linkcap-credential.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "de raceproef voor de RTG Link-drager (link.capability_aanvaarden, B15: twee claims op twee instances, intrekken tegen claimen, en alleen hashes in PostgreSQL) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl hij lokaal zonder die infrastructuur expliciet overslaat"
     }
   ]
 }

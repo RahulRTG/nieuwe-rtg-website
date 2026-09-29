@@ -196,7 +196,7 @@ test('de Capability Graph maakt de gekozen motorstand zichtbaar', () => {
    vlek. Geen nieuwe vorm, geen tweede oorzaak: de andere 33 routes van deze tak
    schrijven hun volle adres wel op en worden alle 33 gewoon gezien.
    ========================================================================== */
-const GEMIST_MAX = 579;   // +2: imap/roteer, zelfde p.pad-vorm als de 6 IMAP
+const GEMIST_MAX = 583;   // +2 imap/roteer, +4 foundation/les: bekende vorm
 const SPOOK_MAX = 6;      // routes die de bronscanner noemt en de router niet
 
 test('de bronscanner loopt niet verder achter op de router dan is vastgelegd', () => {

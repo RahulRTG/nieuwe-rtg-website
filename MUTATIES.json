@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T15:00:30.170Z",
-    "commit": "1c747985f",
+    "op": "2026-09-29T15:19:39.542Z",
+    "commit": "c27c2ac93",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -14262,6 +14262,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "world-palette.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-world-identity.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "world-widget-catalog.test.js": {
       "soort": "puur",

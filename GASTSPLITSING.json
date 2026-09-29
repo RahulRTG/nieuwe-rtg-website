@@ -1,13 +1,14 @@
 {
   "stempel": {
-    "op": "2026-09-29T15:11:37.817Z",
-    "commit": "a11078edb",
+    "op": "2026-09-29T15:15:29.019Z",
+    "commit": "33d8ba87e",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/gastsplitsing.js",
     "node": "v22.22.2"
   },
   "graad": "vermoed",
+  "grens": "Lexicaal ingedeeld. Dit zegt NIET of een gratis account er werkelijk langs komt (dat meet npm run doelgroepbereik, met een echte gratis-accountsessie), en NIET of een deur voor een gratis account open hoort te staan -- dat is een productvraag (SAMENLEVING.md, de verklaring van de bodem). `leden` is geen fout: het woord is dubbelzinnig omdat een Community-lid ook lid heet. Een toets die het onderscheid via een andere poort maakt dan account of idGeverifieerd, telt hier als weigering.",
   "uitleg": "Per plek in server/ die op de gast toetst: maakt de code het onderscheid tussen bezoeker en gratis account, en wat zegt de weigering dat er nodig is. account-belofte = de tekst zegt dat een account of profiel volstaat, terwijl de code ook het gratis account weigert.",
   "gemeten": {
     "bestanden": 124,

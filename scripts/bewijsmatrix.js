@@ -267,6 +267,9 @@ function vormfout(pad, verwacht, gekregen) {
    gerepareerd, dus als de meting hem dan nog onbeschermd noemt, is dat een
    TEGENSPRAAK en geen vrijstelling. */
 const BESLOTEN_ONBESCHERMD = new Set(['code-maker', 'creatie', 'berekening', 'teller']);
+/* De klassen uit HERREKENBAAR.json waarin een verloren gevolg zichzelf herstelt;
+   zie de FAILURE-tak. `duurzaam-vereist` hoort er nooit bij. */
+const HERSTELT_ZICHZELF = new Set(['cache', 'herrekenbaar-uit-bron']);
 /* En hetzelfde voor de ROLLBACK-as: `veilige-kant` betekent dat de handeling met
    OPZET naar die kant faalt en dat de andere kant aantoonbaar erger is.
    `tebeslissen` staat er om dezelfde reden niet bij als daar. */
@@ -633,6 +636,20 @@ function bouw(invoer) {
           const fp = faal && faal.get(sleutel);
           if (fp && fp.failure === 'bewezen') {
             cellen[s.id] = { staat: 'bewezen', bron: 'faalproef', reden: fp.reden }; continue;
+          }
+          /* HET BESLUIT UIT HERREKENBAAR.json, in de vorm van het idembesluit
+             hieronder. faalproef.js zet het naast de meting en laat `gezakt`
+             staan; hier maakt het de belofte niet-van-toepassing waar het
+             verloren gevolg zichzelf herstelt (`cache`, `herrekenbaar-uit-bron`).
+             Zonder deze koppeling werd /api/office/magnaat/scan -- die alleen
+             een tijdstempel wegschrijft -- een gezakte cel, in VERTROUWEN.json
+             `geschorst`, en zette de schorspoort hem met een 503 dicht.
+             `duurzaam-vereist` staat er met opzet niet bij: daar is een gezakte
+             route werk en geen verklaring. */
+          if (fp && fp.failure === 'gezakt' && fp.besluit && HERSTELT_ZICHZELF.has(fp.besluit.klasse)) {
+            cellen[s.id] = { staat: 'nvt', bron: 'faalproef+herrekenbaar', reden: fp.reden,
+              besluit: fp.besluit.klasse, waarom: fp.besluit.grond };
+            continue;
           }
           if (fp && fp.failure === 'gezakt') {
             cellen[s.id] = { staat: 'gezakt', bron: 'faalproef', reden: fp.reden }; continue;

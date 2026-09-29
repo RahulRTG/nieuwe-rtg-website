@@ -1,10 +1,9 @@
 /* The approved daily rooms use the standard Edge; these are content surfaces. */
 body.rtg-daily{background:var(--rtg-world-bg)!important;color:var(--rtg-world-ink);--bg:var(--rtg-world-bg);--card:var(--rtg-world-card);--card2:var(--rtg-world-card-strong);--txt:var(--rtg-world-ink);--muted:var(--rtg-world-muted);--soft:var(--rtg-world-muted);--gold:var(--rtg-world-metal);--line:rgba(215,189,139,.25);--rtg-leesgoud:var(--rtg-world-metal);color-scheme:var(--rtg-world-schema)}
 body.rtg-daily main{width:100%;max-width:1040px!important;margin:0 auto!important;padding:0!important;min-width:0}
-/* In the shared desktop frame (#413) the room's own header lives in .wd-page, not in body. */
-body.rtg-daily>header,body.rtg-daily .wd-page>header{position:static;border:0;min-height:0;background:none;padding:0}
-body.rtg-daily>header>:not([data-rtg-edge-bar]),body.rtg-daily .wd-page>header>:not([data-rtg-edge-bar]){display:none}
-body.rtg-daily[data-rtg-adaptive-ready="true"]>header,body.rtg-daily[data-rtg-adaptive-ready="true"] .wd-page>header,body.rtg-daily.rtg-edge-embed>header{display:none!important}
+body.rtg-daily>header{position:static;border:0;min-height:0;background:none;padding:0}
+body.rtg-daily>header>:not([data-rtg-edge-bar]){display:none}
+body.rtg-daily[data-rtg-adaptive-ready="true"]>header,body.rtg-daily.rtg-edge-embed>header{display:none!important}
 body.rtg-daily main>:is(.ios-groot,.ios-boven,.ios-onder){display:none!important}
 body.rtg-daily .rtg-duimbalk{position:static;padding:0;border:0;min-height:0;background:none}
 body.rtg-daily [hidden]{display:none!important}
@@ -21,7 +20,7 @@ body.rtg-daily .paneel :is(input,textarea,select){color:var(--rtg-world-ink);bac
 body.rtg-daily .paneel .knop.vol{color:var(--rtg-world-bg);background:var(--rtg-world-metal)}
 .daily-hero{position:relative;isolation:isolate;padding:36px 26px 26px;overflow:hidden}
 .daily-heading{position:relative;z-index:1}
-.daily-eyebrow{margin:0 0 16px;color:#dfc491;font:500 10px/1.6 Inter,sans-serif;letter-spacing:.24em;text-transform:uppercase}
+.daily-eyebrow{margin:0 0 16px;color:var(--rtg-world-ink);font:500 10px/1.6 Inter,sans-serif;letter-spacing:.24em;text-transform:uppercase}
 body.rtg-daily .daily-heading h1{font:400 clamp(40px,10.8vw,60px)/1.06 'Bodoni Moda',Georgia,serif;letter-spacing:-.035em;max-width:16ch;margin:0;color:var(--rtg-world-ink);text-wrap:balance;overflow-wrap:break-word}
 .daily-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 36%;z-index:-2}
 .daily-hero:has(.daily-photo){min-height:390px;padding-top:175px;display:flex;flex-direction:column;justify-content:flex-end}
@@ -41,7 +40,7 @@ body.rtg-daily:is([data-rtg-daily="bestanden"],[data-rtg-daily="notities"])[data
 body.rtg-daily :is(#zoek,.schrijf textarea){padding:16px;background:transparent;border:1px solid var(--line);font-size:14px;line-height:1.7;color:var(--txt);border-radius:0}
 body.rtg-daily #zoek{margin-bottom:24px!important;min-height:50px}
 body.rtg-daily :is(input,textarea)::placeholder{color:#bcb3a5;opacity:1}
-body.rtg-daily .kop{margin-block:24px 12px;font:500 11px/1.6 Inter,sans-serif;letter-spacing:.14em;color:#dfc491}
+body.rtg-daily .kop{margin-block:24px 12px;font:500 11px/1.6 Inter,sans-serif;letter-spacing:.14em;color:var(--rtg-world-metal)}
 @media(min-width:800px){
   body.rtg-daily .daily-content{padding-inline:54px}
   .daily-hero{padding:46px 54px 32px}.daily-copy{padding:0 54px 40px}

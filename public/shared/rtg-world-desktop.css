@@ -34,11 +34,8 @@ body[data-rtg-desktop] .wd-library{display:block;grid-column:2/-1;grid-row:4;bor
 .wd-page{position:relative;contain:layout;min-height:560px;isolation:isolate}
 body[data-rtg-desktop] .wd-page :is(main,[data-rtg-screen-root],.wrap,.shell,.schil){width:100%!important;max-width:none!important;margin:0!important;padding:0!important;min-height:0!important}
 body[data-rtg-desktop] .wd-page>:is([data-rtg-screen-root],main,header){position:relative!important;inset:auto!important;height:auto!important;overflow:visible!important}
-/* A canvas fills what is left between its own top and the Edge; the surface measures that top (--wd-canvas-top).
-   Its own header stays above the work area, so the root takes the remaining height instead of 100%. */
-body[data-rtg-desktop] .wd-page[data-rtg-canvas-surface]{display:flex;flex-direction:column;height:max(560px,calc(100dvh - var(--wd-canvas-top,240px) - var(--edge-bottom,104px)));overflow:hidden!important}
-body[data-rtg-desktop] .wd-page[data-rtg-canvas-surface]>*{flex:0 0 auto}
-body[data-rtg-desktop] .wd-page[data-rtg-canvas-surface]>[data-rtg-screen-root="immersive"]{flex:1 1 0;min-height:0!important;height:auto!important}
+body[data-rtg-desktop] .wd-page[data-rtg-canvas-surface]{height:max(560px,calc(100dvh - 240px));overflow:hidden!important}
+body[data-rtg-desktop] .wd-page[data-rtg-canvas-surface]>[data-rtg-screen-root="immersive"]{height:100%!important}
 body[data-rtg-desktop] :is(.saloon-shell,.saloon-feed-layout,.wd-home .dag,.wd-home .wh-travel-layout,.wd-home .tweeluik){max-width:100%;grid-template-columns:minmax(0,1fr)!important}
 body[data-rtg-desktop="living"] .schil{display:contents!important;min-height:0!important}body[data-rtg-desktop="living"] .schil>:is(.bank,.topbar){display:none!important}
 body[data-rtg-desktop] .wd-home .kompas{position:static}.wp-tabs{display:none}
@@ -46,11 +43,11 @@ body[data-rtg-desktop] .wd-home .kompas{position:static}.wp-tabs{display:none}
 @media(max-width:999px){
  body[data-rtg-layout="standard"][data-rtg-skin="heritage"][data-rtg-world][data-rtg-desktop]{padding:64px 0 0!important}
  body[data-rtg-desktop] .wd-shell{display:flex;flex-direction:column;width:calc(100% - 32px);margin:72px auto calc(110px + env(safe-area-inset-bottom,0px))!important;gap:20px;max-width:680px}
- body[data-rtg-desktop] .wd-shell>*{width:100%;box-sizing:border-box}.wd-greeting{order:0}.wd-greeting h1{font-size:25px}.wp-tabs{order:1;display:flex;border-bottom:1px solid var(--wd-line);gap:4px}.wp-tabs button{flex:1 1 auto;min-height:48px;padding:8px 4px;border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;color:var(--wh-ink);font:400 13px/1.4 Inter,sans-serif}.wp-tabs button[aria-expanded="true"]{border-bottom-color:var(--wh-gold)}
+ body[data-rtg-desktop] .wd-shell>*{width:100%;box-sizing:border-box}.wd-greeting{order:0}.wd-greeting h1{font-size:25px}.wp-tabs{order:1;display:flex;border-bottom:1px solid var(--wd-line);gap:4px}.wp-tabs button{flex:1;min-height:48px;padding:8px 4px;border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;color:var(--wh-ink);font:400 13px/1.4 Inter,sans-serif}.wp-tabs button[aria-expanded="true"]{border-bottom-color:var(--wh-gold)}
  body[data-rtg-desktop] .wd-home{order:2}body[data-rtg-desktop] .wd-people{order:2;display:none;border:0;padding:0}body[data-rtg-desktop] .wd-favorites{order:3;border:0;padding:0}body[data-rtg-desktop] .wd-library{order:4}.wd-focus{order:2}.wd-announcement{order:3}
  body[data-rtg-desktop] .wd-shell[data-mobile-panel="people"]>.wd-people{display:block}body[data-rtg-desktop] .wd-shell[data-mobile-panel="people"]>:is(.wd-home,.wd-favorites,.wd-library){display:none!important}body[data-rtg-desktop] .wd-shell[data-mobile-panel="favorites"]>:is(.wd-home,.wd-library){display:none!important}
  .wd-catalog{gap:12px;grid-template-columns:repeat(3,minmax(0,1fr))}.wd-library-heading{gap:12px}.wd-search-label{flex:1}.wd-search-label .wd-search{width:100%}.wd-widget-title{font-size:13px;gap:6px;overflow-wrap:anywhere}.wd-icon{flex-basis:16px;width:16px;height:16px}.wd-catalog .wd-widget-content{font-size:12px}
- .wd-page{min-height:400px}/* Phone: the column is the viewport, so fixed layers (a PDA nav, a map with its panels, a sheet) stay on the viewport and above the library. Containing them in the column clipped panels and covered the map. */.wd-page[data-rtg-canvas-surface],.wd-page:has(.pda-nav){contain:none;isolation:auto}body[data-rtg-desktop] .wd-page[data-rtg-canvas-surface]{height:max(400px,calc(100dvh - var(--wd-canvas-top,240px) - var(--edge-bottom,104px)))}.wd-app-frame{min-height:420px;height:calc(100dvh - 240px)}
+ .wd-page{min-height:400px}.wd-app-frame{min-height:420px;height:calc(100dvh - 240px)}
 }
 @media(prefers-reduced-motion:reduce){.wd-shell *{transition:none!important;scroll-behavior:auto!important}}
 .wd-app-controls{font:400 13px/1.5 Inter,sans-serif;max-width:100%;color:var(--wh-soft)}.wd-app-controls>summary{min-height:44px;display:flex;align-items:center;cursor:pointer}.wd-app-controls[open]{display:flex;flex-wrap:wrap;gap:12px}.wd-app-controls .wd-filters{margin-top:8px}
@@ -60,26 +57,3 @@ body[data-rtg-desktop] .wd-shell{padding-bottom:150px}
 body[data-rtg-desktop] :is(button,summary,a,input,select,textarea){scroll-margin-block:80px 150px}
 
 .wd-app-controls .wd-filters{flex-wrap:wrap}.wd-app-controls .wd-filters select{max-width:100%;min-width:0}
-
-/* RTG Command (apps/app.html) legt zijn werktafel als vaste laag (#rtgCommand,
-   z-index 210) aan <body>, en de schil (#shell, 240), de herkomstvraag (220) en
-   Rahuls balk (260) horen daar BOVEN te kunnen liggen. Het kader mag daarom op
-   dit scherm geen eigen stapelcontext of houder voor vaste lagen maken: met
-   isolation/contain zakte alles wat in .wd-page woont onder de werktafel, en die
-   ving dan elke tik af (de sociale balk, de pin, de instellingen). */
-body.rtg-command[data-rtg-desktop] :is(.wd-shell,.wd-page){isolation:auto;contain:none}
-/* De leden-app (apps/app.html) maakt zijn #shell op een telefoon 100vw breed.
-   In het kader staat hij in de goot van 16px, dus 100vw stak er 16px uit: de
-   hele pagina werd breder dan het scherm, en met een mobiele viewport schoof de
-   Edge onder een tik vandaan. In het kader is het vlak de maat, niet het venster. */
-body[data-rtg-desktop] .wd-page #shell{width:100%!important;max-width:100%!important}
-
-/* Een app die het venster bezit (world-desktop-surface.js zet data-rtg-viewport-app)
-   vult het canvasvlak in plaats van 100dvh, en het document scrolt in het kader
-   altijd: anders waren de bibliotheek en de kolommen onder zo'n app onbereikbaar. */
-body[data-rtg-desktop] .wd-page[data-rtg-canvas-surface]>[data-rtg-viewport-app]{flex:1 1 0;min-height:0!important;height:auto!important;max-height:none!important}
-html:has(>body[data-rtg-desktop]){overflow-y:auto!important}
-/* De drie tabbladen van het kader delen de breedte, ook op 320px: zonder
-   min-width:0 hield "Onderwerpen" (publieke landing) zijn woordbreedte vast en
-   werd de hele pagina 5px breder dan het scherm. */
-.wp-tabs button{min-width:0;overflow-wrap:anywhere}

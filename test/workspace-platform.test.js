@@ -31,6 +31,15 @@ test('Module SDK verklaart semver, surfaces, isolatie, state en migratieniveau v
   assert.throws(() => S.add(S.define(spec('oud', { runtime: { minVersion: '2.0.0' } }), () => ({}))), /nieuwere/i);
 });
 
+test('een tweede shell-loader bewaart geregistreerde modules en hun fabrieken', () => {
+  const w = platform('module-sdk.js'), sdk = w.RTGModuleSDK;
+  const definition = sdk.add(sdk.define(spec('messages'), () => ({ title: 'Berichten' })));
+  vm.runInNewContext(fs.readFileSync(path.join(ROOT, 'module-sdk.js'), 'utf8'), { window: w });
+  assert.equal(w.RTGModuleSDK, sdk);
+  assert.equal(w.RTGModuleSDK.catalog()[0], definition);
+  assert.throws(() => w.RTGModuleSDK.add(definition), /Dubbele RTG-module/);
+});
+
 test('Module Registry kent LivingOS, WorkOS en iedere canonieke functie zonder tweede handlijst', () => {
   const w = platform('workspace-world-catalog.js', 'workspace-registries.js'), r = w.RTGWorkspaceRegistries();
   r.registerWorldCatalog(w.RTGWorkspaceWorldCatalog);

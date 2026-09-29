@@ -34,25 +34,11 @@ for(const folder of ['public/images/platform','public/images/world-homes','publi
 for(const rel of fs.readdirSync(path.join(root,'public/shared')))if(/taal.*\.json$/.test(rel))copy('public/shared/'+rel);
 const assets='<meta name="rtg-asset-base" content="/public"><meta name="rtg-api-base" content="https://app.rahultravelgroup.com"><meta name="rtg-app-base" content="https://app.rahultravelgroup.com/">'+styles.map(s=>'<link rel="stylesheet" href="/'+s+'">').join('')+scripts.map(s=>'<script src="/'+s+'" defer></script>').join('');
 write('404.html','<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Page not found | RTG</title></head><body><main><h1>Page not found</h1><p>This address is no longer available.</p><p><a href="/">Go to RTG</a></p></main></body></html>');
-/* Knipt elke treffer van `re` (met g-vlag) uit `tekst`, en herhaalt dat tot er
-   niets meer verandert: een geknipte tag kan anders een nieuwe laten ontstaan.
-   Bewust knippen op positie in plaats van .replace() (CodeQL
-   js/incomplete-multi-character-sanitization). */
-function schrap(tekst, re) {
-  for (;;) {
-    let uit = '', vanaf = 0;
-    for (const m of tekst.matchAll(re)) { uit += tekst.slice(vanaf, m.index); vanaf = m.index + m[0].length; }
-    uit += tekst.slice(vanaf);
-    if (uit === tekst) return uit;
-    tekst = uit;
-  }
-}
 const pages=[];
 for(const rel of fs.readdirSync(out,{recursive:true}).filter(f=>f.endsWith('.html')&&!f.startsWith('public/'))){
  let html=fs.readFileSync(path.join(out,rel),'utf8');
  html=require('./lib/script-bronnen')(html,src=>/(?:^|\/)(?:language|script|site)\.js(?:[?#]|$)/.test(src));
- for(let vorig=null;vorig!==html;){vorig=html;
-  html=schrap(html,/<link\b[^>]+href="[^"]*\b(?:site|styles)\.css[^"]*"[^>]*>/g);}
+ html=html.replace(/<link\b[^>]+href="[^"]*\b(?:site|styles)\.css[^"]*"[^>]*>/g,'');
  html=html.replace(/(src|href|srcset)="\.\//g,'$1="/');
  html=html.replace('<body','<body class="rtg-stijl" data-rtg-skin="heritage" data-rtg-world="living" data-rtg-layout="standard" data-public-platform="company" data-company-page="'+(rel==='index.html'?'home':rel)+'"');
  html=html.replace('</head>',assets+'</head>');write(rel,html);pages.push(rel);

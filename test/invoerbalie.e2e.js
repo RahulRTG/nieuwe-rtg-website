@@ -50,11 +50,7 @@ test('de invoerbalie leest voor, zegt wat onzeker is, en voegt pas toe na bevest
     const fouten = [];
     letOpFouten(page, fouten);
     await page.goto(srv.base + '/apps/reizen.html', { waitUntil: 'domcontentloaded' });
-    /* Sinds de warme wereldcompositie (PR #413) staat het reisoverzicht, en
-       daarmee de invoerbalie, achter "Uw volledige overzicht"; het wereldhuis
-       opent met de scène. Open het zoals een mens (en test/world-homes.e2e.js)
-       dat doet -- de invoerbalie zelf is ongewijzigd. */
-    await page.locator('#reisoverzicht.wp-domain > summary').click();
+    await page.locator('.wp-domain > summary').click();
     await page.locator('#worldTravelImport > summary').click();
     await page.waitForSelector('#invLees', { timeout: 20000 });
 

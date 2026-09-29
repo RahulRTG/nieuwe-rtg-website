@@ -27,18 +27,9 @@ test('LivingOS Home keert vanuit de routevergelijker en een app terug naar de ve
         await page.waitForLoadState('domcontentloaded');
         assert.equal(new URL(page.url()).pathname, '/apps/wereld.html', source + ' op ' + width);
         await wacht(page, '/apps/wereld.html');
-        /* Sinds de warme presentatie (#413, shared/interface/world-presentation.js)
-           staat de eigen inhoud van een wereldhuis achter "Uw volledige
-           overzicht", een dichte <details> onder de scene. Dat is een
-           ontwerpkeuze: de momentenfeed is er wel, een mens klapt hem open. De
-           proef doet dat ook, met een klik op de samenvatting, en eist daarna
-           dat de feed zichtbaar is -- de bewering zelf blijft even streng. */
-        await page.waitForFunction(() => ['ready', 'error'].includes(document.body.dataset.rtgDesktopState) &&
-          !!document.querySelector('.living-intro'), null, { timeout: 20000 });
-        if (await page.evaluate(() => { const d = document.querySelector('.living-intro').closest('details'); return !!(d && !d.open); })) {
-          await page.locator('details:has(.living-intro) > summary').click();
-        }
-        await page.waitForSelector('.living-intro');
+        await page.waitForSelector('.wp-scene');
+        await page.locator('.wp-story a').click();
+        await page.waitForSelector('.wp-domain[open] #feed');
         assert.equal(await page.locator('#feed').count(), 1, 'de vernieuwde momentenfeed staat er');
         assert.equal(await page.locator('.lo-rail').count(), 0, 'geen routevergelijker als home');
         assert.equal((await meet(page)).bars, 1);

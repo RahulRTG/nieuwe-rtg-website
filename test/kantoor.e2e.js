@@ -57,19 +57,13 @@ test('Kantoor: wat in de specialist staat komt hier terug, en werken doe je daar
     const fouten = [];
     letOpFouten(page, fouten);
     await page.goto(base + '/apps/kantoor.html', { waitUntil: 'domcontentloaded' });
+    await page.locator('.wp-domain > summary').click();
     await page.evaluate((tok) => {
       localStorage.setItem('rtg_member_token', tok);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, reg.token);
     await page.goto(base + '/apps/kantoor.html', { waitUntil: 'domcontentloaded' });
-    /* Sinds de warme wereldcompositie (PR #413, world-presentation.js) opent
-       het wereldhuis met de scène en staat het samenhangoverzicht achter
-       "Uw volledige overzicht" -- ingeklapt, maar met dezelfde knopen en
-       dezelfde bron. Dat is een ontwerpkeuze en geen verlies: de toets opent
-       het zoals een mens dat doet (net als test/world-homes.e2e.js) en meet
-       daarna precies wat hij altijd mat. */
-    await page.waitForSelector('.wp-domain>summary', { timeout: 15000 });
-    await page.locator('.wp-domain>summary').click();
+    await page.locator('.wp-domain > summary').click();
     await page.waitForSelector('#werkdag .reis', { timeout: 15000 });
 
     const beeld = await page.evaluate(() => {
@@ -106,12 +100,8 @@ test('Kantoor: wat in de specialist staat komt hier terug, en werken doe je daar
            headerstandaard in de kop van elke app en zegt niets over deze laag.
            Alles wat overblijft is wel een bediening die schrijft, en die hoort
            hier niet te bestaan. */
-        /* Een derde uitzondering sinds PR #413: `.pi-change` op de scènefoto
-           kiest het EIGEN achtergrondbeeld van wie kijkt (een voorkeur van de
-           wereldschil in /api/ik/beelden), en schrijft niets in de lagen
-           waarover dit scherm samenhang toont. */
-        schrijfdingen: [...document.querySelectorAll('#inhoud button, #inhoud input, #inhoud textarea, #inhoud select')]
-          .filter(e => !e.classList.contains('rtg-ref') && e.id !== 'osMenuBtn' && !e.classList.contains('pi-change'))
+        schrijfdingen: [...document.querySelectorAll('.wp-domain-content button, .wp-domain-content input, .wp-domain-content textarea, .wp-domain-content select')]
+          .filter(e => !e.classList.contains('rtg-ref') && e.id !== 'osMenuBtn')
           .map(e => e.tagName + '.' + (e.className || '-'))
       };
     });
@@ -173,6 +163,6 @@ test('Kantoor: wat in de specialist staat komt hier terug, en werken doe je daar
   } finally {
     if (browser) await browser.close().catch(() => {});
     child.kill();
-    fs.rmSync(TMP, { recursive: true, force: true });
+    fs.rmSync(TMP, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
   }
 });

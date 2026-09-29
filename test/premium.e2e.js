@@ -291,6 +291,8 @@ test('premium: de knop blijft getekend als de app zijn gastheer sluit',
     const token = await lidMetNotities(base);
     browser = await pw.chromium.launch(browserOpties(pw));
     const context = await browser.newContext();
+    // This checks the signed-in export host after the separate onboarding flow.
+    await context.route('**/api/onboarding/status', r => r.fulfill({ json: { klaar: true } }));
     await context.addInitScript((t) => {
       localStorage.setItem('rtg_member_token', t);
       localStorage.setItem('rtg_cookieinfo_v1', '1');
@@ -356,7 +358,7 @@ test('premium: de meeneemknop staat op telefoonmaat overal binnen beeld',
     const buiten = [];
     for (const pad of ['/apps/navigatie.html', '/apps/ov.html', '/apps/balans.html', '/apps/home.html']) {
       await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
-      await page.waitForFunction(() => !!window.RTGUitvoer, null, { timeout: 12000 });
+      await page.waitForFunction(() => !!window.RTGUitvoer && document.body.dataset.rtgDesktopState === 'ready', null, { timeout: 12000 });
       // een bron aanmelden zoals een ingelogde app dat doet; zonder bron is er
       // geen knop, en dan meet deze toets niets
       await page.evaluate(() => RTGUitvoer.bron(function () { return { kolommen: ['a'], rijen: [['1']] }; }));

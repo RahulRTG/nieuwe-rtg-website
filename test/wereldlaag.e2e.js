@@ -24,16 +24,6 @@ const api = async (base, pad, body, token) => (await fetch(base + pad, {
   body: JSON.stringify(body || {})
 })).json();
 
-/* Sinds de warme desktopstandaard (#413, shared/interface/world-presentation.js)
-   staat de eigen inhoud van een wereldhuis onder "Uw volledige overzicht"
-   (.wp-domain), onder de hoofdfoto en de verhaalregel en niet meer in <main>.
-   Deze toetsen gaan over die inhoud, dus openen ze het overzicht eerst -- net
-   als test/world-homes.e2e.js. */
-async function overzicht(page) {
-  await page.waitForSelector('body[data-rtg-desktop-state="ready"]', { timeout: 15000 });
-  if (await page.locator('.wp-domain:not([open])>summary').count()) await page.locator('.wp-domain>summary').click();
-}
-
 test('LivingOS editorial home: responsive example, real destinations, language and source failure',
   { skip: geenBrowser(pw) }, async () => {
   const srv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1', RTG_DEMO: '0' } });
@@ -46,9 +36,9 @@ test('LivingOS editorial home: responsive example, real destinations, language a
     letOpFouten(page, errors);
     page.on('request', r => { if (/\/api\/(like|salon\/(bewaar|reageer|plaats))$/.test(new URL(r.url()).pathname)) writes.push(r.url()); });
     await page.goto(srv.base + '/apps/wereld.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForSelector('.living-welcome[data-example="true"]', { state: 'attached' });
+    await page.waitForSelector('.wp-scene');
+    await page.locator('.wp-story a').click();
     await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
-    await overzicht(page);
     assert.match(await page.locator('.living-example-head').innerText(), /Voorbeeldmoment/);
     assert.equal(await page.locator('.living-welcome .tel,.living-welcome .auteur').count(), 0, 'example is never a fabricated post');
     assert.equal(await page.locator('.moment').count(), 4);
@@ -87,7 +77,6 @@ test('LivingOS editorial home: responsive example, real destinations, language a
     await page.evaluate(t => localStorage.setItem('rtg_member_token', t), member.token);
     await page.route('**/api/wereld/feed', route => route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ error: 'Bron tijdelijk niet bereikbaar.' }) }));
     await page.reload({ waitUntil: 'domcontentloaded' });
-    await overzicht(page);
     await page.waitForSelector('.living-load-error');
     assert.equal(await page.locator('.living-welcome').count(), 0);
     assert.equal(await page.locator('#livingAccess').isVisible(), false);
@@ -144,10 +133,10 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
 
     // 1. de vijf werelden staan er, en Business is voor de gratis pas DICHT --
     //    zichtbaar, want wegstoppen wat je niet hebt is oneerlijk naar beide kanten
-    await page.waitForSelector('#werelden button', { state: 'attached', timeout: 15000 });
+    await page.locator('.wp-story a').click();
+    await page.waitForSelector('#werelden button', { timeout: 15000 });
     await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
-    await overzicht(page);
-    assert.equal(await page.locator('.wp-domain .living-intro').isVisible(), true,
+    assert.equal(await page.locator('main .wp-scene').isVisible(), true,
       'het verhaal en de fotografische ingangen blijven inhoud, ook nadat de Edge de bediening overneemt');
     assert.equal(await page.locator('.moment img').count(), 3, 'de snelle ingangen dragen echte fotografie');
     await page.waitForSelector('#passport:not([hidden])', { timeout: 15000 });
@@ -213,6 +202,7 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
     }, a);
     await page.setViewportSize({ width: 320, height: 720 });
     await page.goto(base + '/apps/wereld.html', { waitUntil: 'domcontentloaded' });
+    await page.locator('.wp-story a').click();
     await page.waitForSelector('#werelden button', { timeout: 15000 });
     await page.waitForSelector('body[data-rtg-edge-2-rendered="true"]', { timeout: 15000 });
     assert.equal(await page.locator('.rtg-edge-chrome').count(), 1,
@@ -303,9 +293,9 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, b);
     await page2.goto(base + '/apps/wereld.html', { waitUntil: 'domcontentloaded' });
-    await page2.waitForSelector('#werelden button', { state: 'attached', timeout: 15000 });
+    await page2.locator('.wp-story a').click();
+    await page2.waitForSelector('#werelden button', { timeout: 15000 });
     await page2.waitForSelector('body[data-rtg-edge-2-rendered="true"]', { timeout: 15000 });
-    await overzicht(page2);
     assert.match(await page2.locator('#passport').innerText(), /Signature/i,
       'Lifestyle hoort als Signature in het member passport te staan');
     assert.equal(await page2.locator('#lenzen [aria-disabled="true"]').count(), 0,
@@ -336,7 +326,7 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
     // de projectie, nooit een eigen bericht of iemands identiteit.
     await api(base, '/api/wereld/modus', { modus: 'prive' }, b);
     await page2.goto(base + '/apps/wereld.html', { waitUntil: 'domcontentloaded' });
-    await overzicht(page2);
+    await page2.locator('.wp-domain > summary').click();
     await page2.waitForSelector('#feed .leeg', { timeout: 15000 });
     assert.match(await page2.locator('#feed .leeg').innerText(), /Geen resultaten/);
     assert.equal(await page2.locator('#feed .tel,#feed .auteur').count(), 0);
@@ -345,6 +335,7 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
     await page2.waitForFunction(() => document.querySelector('#feed .leeg').textContent === 'No results within your current choices.');
     assert.equal((await api(base, '/api/wereld/state', {}, b)).modus, 'prive');
     await page2.evaluate(() => RTGi18n.set('nl'));
+    await page2.waitForFunction(() => /Geen resultaten/.test(document.querySelector('#feed .leeg').textContent));
     assert.match(await page2.locator('#feed .leeg').innerText(), /Geen resultaten/);
 
     // Dezelfde route in een werkvlak houdt de inhoud, maar geen tweede balk.

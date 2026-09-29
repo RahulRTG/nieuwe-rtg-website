@@ -9,3 +9,61 @@ body[data-rtg-desktop][data-rtg-layout="standard"] .wp-domain-content .rtg-dashb
 
 /* The closed-room gate keeps private content hidden; the shared atmosphere is public. */
 html.rtf-toegang-dicht body[data-rtg-desktop-access="locked"]>.wp-atmosphere{visibility:visible!important}
+
+body[data-rtg-desktop] .wd-page>#rtgCommand{position:absolute!important;inset:0!important;min-height:560px}
+body[data-rtg-desktop] .wd-page:has(>#rtgCommand){min-height:640px}
+body[data-rtg-desktop] .wd-page:has(>#cel){display:flex;flex-direction:column;height:max(640px,calc(100dvh - 240px))!important}
+body[data-rtg-desktop] .wd-page>#cel{flex:1;min-height:400px!important}
+body[data-rtg-desktop][data-rtg-world] .wd-page>.rtg-werkruimte{height:max(640px,calc(100dvh - 240px))!important;overflow:hidden!important}
+body[data-rtg-desktop] .wd-page .pda-nav{position:relative;inset:auto!important;transform:none;width:100%;margin-top:24px}
+body[data-rtg-desktop] .wd-page .wk-rahul.page{position:absolute!important;inset:0!important;overflow:auto!important;padding:24px!important}
+body[data-rtg-desktop] .wd-page:has(.bestel-layout){container-type:inline-size}
+body[data-rtg-desktop] .wd-page:has(>#rtgCommand){contain:none;isolation:auto}
+body[data-rtg-desktop] .wd-page #editor>.balk{flex-wrap:wrap}
+body[data-rtg-desktop] .wd-page:has(#kaart) .paneel{max-height:min(70dvh,calc(100% - 140px));overflow-y:auto}
+body[data-rtg-desktop][data-rtg-edge-2-hoofdactie="edge"] .wd-page>.rtg-duimbalk{display:none!important}
+body[data-rtg-desktop] .wd-page #editor.aan{height:680px!important;min-height:680px}
+body[data-rtg-desktop] .wd-page .first-message:not([hidden]){position:relative!important;inset:auto!important}
+@container(max-width:700px){.wd-page .bestel-layout{grid-template-columns:minmax(0,1fr)!important}.wd-page .bestel-layout .zij{position:relative;top:auto}}
+body[data-rtg-desktop]:is([data-rtg-edge-2-state="compact"],[data-rtg-edge-2-state="focus"]) .rtg-edge-top{opacity:0!important;pointer-events:none!important}
+body[data-rtg-layout="standard"][data-rtg-skin="heritage"][data-rtg-world][data-rtg-desktop]:is([data-rtg-edge-2-state="compact"],[data-rtg-edge-2-state="focus"]){padding-top:0!important}
+
+body[data-rtg-desktop] .wd-page>#shell{width:100%!important;max-width:100%!important}
+
+/* The mobile drawing uses a compact agenda row; the Today tab keeps its full controls. */
+@media(max-width:999px){
+ body[data-rtg-desktop][data-world-home] .wd-shell{gap:12px}
+ body[data-rtg-desktop] .wp-tabs button{display:flex;align-items:center;justify-content:center;gap:7px;min-height:44px}
+ body[data-rtg-desktop] .wp-tabs .wd-icon{width:18px;height:18px;flex-basis:18px}
+ body[data-rtg-desktop][data-world-home] .wp-heading{gap:4px;margin-bottom:8px}
+ body[data-rtg-desktop][data-world-home] .wp-heading .wp-overline{margin:0;font-size:10px}
+ body[data-rtg-desktop][data-world-home] .wp-heading h2{font-size:30px!important}
+ body[data-rtg-desktop][data-world-home] .wp-scene>.wp-action{align-items:center;margin-top:4px;padding:0}
+ body[data-rtg-desktop][data-world-home] .wd-shell[data-mobile-panel="home"] .wd-favorites>.wd-widget{margin:0;border-top:1px solid var(--wd-line)}
+ body[data-rtg-desktop][data-world-home] .wd-shell[data-mobile-panel="home"] .wd-favorites .wd-widget-content{position:relative;min-height:64px;padding:8px 44px 8px 0;display:flex;align-items:center;gap:10px}
+ body[data-rtg-desktop][data-world-home] .wd-shell[data-mobile-panel="home"] .wd-favorites .wd-widget-empty{margin:0;font-size:12px;line-height:1.5}
+ body[data-rtg-desktop][data-world-home] .wd-shell[data-mobile-panel="home"] .wd-favorites .wd-primary{position:absolute;right:0;top:50%;transform:translateY(-50%);width:44px;min-height:44px;font-size:0!important;border:0!important;text-align:center}
+ body[data-rtg-desktop][data-world-home] .wd-shell[data-mobile-panel="home"] .wd-favorites .wd-primary::after{content:'›';font:400 26px/1 Inter,sans-serif}
+ body[data-rtg-desktop][data-world-home] .wd-shell[data-mobile-panel="home"] .wd-date-controls{display:none}
+ body[data-rtg-desktop][data-world-home] .wd-shell[data-mobile-panel="home"] .wd-date-hero{gap:14px;margin:0}
+ body[data-rtg-desktop][data-world-home] .wd-shell[data-mobile-panel="home"] .wd-date-tile{gap:2px;flex:0 0 auto}
+ body[data-rtg-desktop][data-world-home] .wd-shell[data-mobile-panel="home"] .wd-date-tile span{font-size:10px}
+ body[data-rtg-desktop][data-world-home] .wd-shell[data-mobile-panel="home"] .wd-date-hero p{margin:0;font-size:14px}
+ body[data-rtg-desktop][data-world-home] .wp-story{border-top:0;padding-top:0}
+ body[data-rtg-desktop][data-world-home] .wd-library{border-top:0;padding-top:0}
+}
+
+body[data-rtg-desktop] .wd-page>#rtgCommand .cmd-rail{position:fixed;inset-inline:16px;bottom:calc(88px + env(safe-area-inset-bottom,0px));z-index:10001;background:var(--rtg-world-card);color:var(--rtg-world-muted);max-width:600px;margin-inline:auto}
+body[data-rtg-desktop] .wd-page:has(#kaart) .intelligence-dock{top:auto;bottom:calc(80px + var(--edge-bottom,0px));max-height:calc(100% - 280px);overflow-y:auto}
+@media(max-width:999px){body[data-rtg-desktop] .wd-page:has(#kaart) .intelligence-dock{left:12px;right:80px;width:auto;max-height:calc(100% - 180px);overflow-y:auto}}
+
+body[data-rtg-desktop] .wp-story>a{display:flex;align-items:center;min-height:44px}
+
+@media(max-width:359px){body[data-rtg-desktop] .wp-tabs button{min-width:0;white-space:normal;overflow-wrap:anywhere;gap:4px;font-size:12px;padding-inline:2px}}
+.wd-skip{position:fixed!important;left:-9999px!important;top:8px!important;z-index:99999;background:var(--rtg-world-card)!important;color:var(--rtg-world-ink)!important;padding:12px!important}
+.wd-skip:focus{left:8px!important}
+
+.wd-output{display:flex;justify-content:flex-end;min-width:0}.wd-output:empty{display:none}.wd-output .rtguitvoer-knop{margin:0 0 16px!important}
+body[data-rtg-desktop][data-rtg-layout="standard"]>.wd-skip{display:block!important}
+
+body[data-rtg-desktop] .wd-page>header a{display:inline-flex;align-items:center;min-width:44px;min-height:44px}

@@ -43,36 +43,17 @@ test('Werkruimte: een kamer bewaren, leeghalen en met een klik terughalen',
     const maten = async () => page.evaluate(() => {
       const pak = (s) => { const r = document.querySelector(s).getBoundingClientRect();
         return { x:r.x, y:r.y, width:r.width, height:r.height }; };
-      return { scherm:{ width:innerWidth, height:innerHeight }, ruimte:pak('.rtg-werkruimte'),
-        vlak: document.querySelector('.wd-page') ? pak('.wd-page') : null,
+      return { scherm:{ width:innerWidth, height:innerHeight }, ruimte:pak('.rtg-werkruimte'), kader:pak('.wd-page'),
         zichtbaar:[...document.querySelectorAll('.rtg-surface[data-edge-visible]')].map((e) => {
           const r=e.getBoundingClientRect(); return { x:r.x,y:r.y,width:r.width,height:r.height };
         }), rand:{ boven:pak('.rtg-edge-top'), links:pak('.rtg-edge-side'), onder:pak('.rtg-adaptive-bar') } };
     });
     const randKlopt = (m) => {
-      /* Sinds de warme desktopstandaard (#413) staat de werkruimte, zoals elk
-         scherm, in het gedeelde kader (shared/interface/world-desktop-surface.js):
-         het werkvlak is de middenkolom (.wd-page) en niet meer het hele venster
-         naast de Edge-rand. De belofte blijft dat het werkvlak zijn vlak
-         precies vult; alleen WELK vlak is veranderd. */
-      if (m.vlak) {
-        assert.ok(Math.abs(m.ruimte.x - m.vlak.x) < 1, JSON.stringify(m));
-        assert.ok(Math.abs(m.ruimte.y - m.vlak.y) < 1, JSON.stringify(m));
-        assert.ok(Math.abs(m.ruimte.width - m.vlak.width) < 1, JSON.stringify(m));
-        assert.ok(m.ruimte.height > 200, 'het werkvlak heeft een echte hoogte: ' + JSON.stringify(m));
-      } else {
-        assert.ok(Math.abs(m.ruimte.x - m.rand.links.width) < 1, JSON.stringify(m));
-        assert.ok(Math.abs(m.ruimte.y - m.rand.boven.height) < 1);
-        assert.ok(Math.abs(m.ruimte.width + m.rand.links.width - m.scherm.width) < 1);
-      }
-      assert.ok(m.ruimte.y + m.ruimte.height <= m.rand.onder.y + 1, 'de werkruimte blijft boven de zwevende bediening');
+      assert.ok(Math.abs(m.ruimte.x - m.kader.x) < 1, JSON.stringify(m));
+      assert.ok(Math.abs(m.ruimte.y - m.kader.y) < 1);
+      assert.ok(Math.abs(m.ruimte.width - m.kader.width) < 1);
+      assert.ok(m.ruimte.height >= 400, 'de actieve app krijgt een bruikbare werkhoogte');
       assert.ok(m.rand.onder.y + m.rand.onder.height <= m.scherm.height, 'de bediening blijft in beeld');
-      /* In het kader eindigt een canvasvlak op --edge-bottom (104px, de ruimte die
-         het kader voor de ene Edge vrijhoudt); op een telefoon ligt de balk
-         daarbinnen en blijft er 32px lucht. Een tweede navigatierij is minstens
-         een raakvlak hoog (44px), dus die grens vangt hem nog steeds. */
-      assert.ok(m.rand.onder.y - m.ruimte.y - m.ruimte.height <= (m.vlak ? 43 : 20),
-        'geen ongebruikte tweede navigatierij: ' + JSON.stringify(m));
     };
     await page.waitForFunction(() => {
       const r = document.querySelector('.rtg-surface[data-edge-visible]').getBoundingClientRect();

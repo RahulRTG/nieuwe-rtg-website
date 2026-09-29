@@ -14,12 +14,10 @@
  body[data-rtg-desktop]>.pp-header .pp-language{margin-inline-start:auto}
 
 .pp-detail-shell .wd-home{overflow-wrap:anywhere}
+body:has(.pp-detail-shell) .pp-header>.pp-language{display:inline-flex!important;min-width:44px;min-height:44px}
+@media(max-width:370px){body:has(.pp-detail-shell) .pp-header>.pp-context{font-size:12px}}
 .pp-detail-shell .wd-home :is(h1,h2,h3){font-family:Inter,sans-serif!important;letter-spacing:-.035em}
 .pp-detail-shell .world-hero::before,.pp-detail-shell .world-hero::after{display:none}
 .pp-detail-shell .world-hero h1{font-size:clamp(30px,4vw,44px);margin-block:12px 20px}
 .pp-detail-shell .world-hero .wp-photo{margin-top:24px}
 @media(max-width:999px){.pp-detail-shell .wd-library{display:flex!important}.pp-detail-shell .world-hero h1{font-size:32px}}
-/* Op de startpagina verbergt platform-shell.css de kopknoppen onder 1000px omdat het
-   menu daar een regel "Taal" heeft. Een artikelpagina heeft dat menu niet: zonder deze
-   regel was de taalkeuze op een telefoon nergens meer te bereiken. */
-@media(max-width:999px){body[data-rtg-desktop] .pp-detail-header>.pp-language{display:inline-grid}}

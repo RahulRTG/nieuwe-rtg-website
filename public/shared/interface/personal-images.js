@@ -60,7 +60,7 @@
   function refresh() {
     if (loading) return loading;
     var version = epoch;
-    loading = api('/api/ik/beelden').then(function (j) { if (version === epoch) { preferences = j.images || {}; slots.forEach(apply); } })
+    loading = api('/api/ik/beelden').then(function (j) { if (version === epoch) { preferences = j.images && typeof j.images === 'object' ? j.images : {}; slots.forEach(apply); } })
       .finally(function () { loading = null; }); return loading;
   }
   function identity() {
@@ -89,6 +89,6 @@
     },
     list: function () { return Array.from(slots.values()).filter(function (r) { return r.nodes.some(function (n) { return n.isConnected; }); }); },
     choice: function (id) { return preferences[id] || null; }, authenticated: function () { return !!token(); },
-    save: function (slot, image) { return api('/api/ik/beelden/zet', { slot: slot, image: image }).then(function (j) { preferences = j.images || {}; slots.forEach(apply); }); }
+    save: function (slot, image) { return api('/api/ik/beelden/zet', { slot: slot, image: image }).then(function (j) { preferences = j.images && typeof j.images === 'object' ? j.images : {}; slots.forEach(apply); }); }
   };
 })(window, document);

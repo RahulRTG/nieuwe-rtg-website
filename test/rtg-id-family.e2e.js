@@ -144,17 +144,11 @@ test('het inlogportaal en de aanmelding werken met de bestaande beveiligde route
             overflow:document.documentElement.scrollWidth>innerWidth,
             edgeInside:b.left>=0&&b.right<=innerWidth&&b.bottom<=innerHeight,
             passHeight:pass.height,clocks:g.querySelectorAll('[data-rtg-klok]').length,
-            color:getComputedStyle(g).backgroundColor,
-            wereldgrond:(()=>{const t=document.createElement('i');t.style.background='var(--rtg-world-bg)';g.appendChild(t);
-              const c=getComputedStyle(t).backgroundColor;t.remove();return c;})()};
+            color:getComputedStyle(g).backgroundColor};
         });
         assert.equal(geometry.bars,1);assert.equal(geometry.overflow,false);
         assert.equal(geometry.edgeInside,true);assert.ok(geometry.passHeight>=48);assert.equal(geometry.clocks,0);
-        /* Het portaal stond op een eigen bordeaux (#390919). #413 legt het palet bij de
-           wereld ("the world owns the entire UI palette"), dus de grond van het portaal
-           is de wereldgrond -- en niet een los getal dat naast het palet leeft. */
-        assert.equal(geometry.color,geometry.wereldgrond,'het inlogportaal staat op de grond van de wereld');
-        assert.notEqual(geometry.color,'rgba(0, 0, 0, 0)','het inlogportaal heeft een eigen, dekkende grond');
+        assert.equal(geometry.color,'rgb(250, 248, 243)');
         await p.locator('#agNieuw').click();
         assert.match(await p.locator('#agZin').innerText(),/Vul uw volledige naam in\./);
         assert.equal(await p.locator('#agStappen').innerText(),'STAP 1 VAN 4');

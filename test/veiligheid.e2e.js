@@ -181,19 +181,20 @@ test('RTG Veilig: de vier standen staan echt', { skip: geenBrowser(pw) }, async 
       // op een stand ZONDER seconde-teller beginnen, zodat de nulmeting klopt
       await p.goto(srv.base + '/apps/veilig.html#rust', { waitUntil: 'domcontentloaded' });
       await p.waitForFunction(() => document.querySelector('#paneel').innerText.includes('Zet aan'), null, { timeout: 15000 });
-      assert.equal(await p.evaluate(() => window.__tellersMet(1000)), 0,
-        'de stand Thuisrust hoort geen seconde-teller te hebben');
+      await p.locator('body[data-rtg-desktop-state="ready"]').waitFor();
+      const gedeeldeTellers = await p.evaluate(() => window.__tellersMet(1000));
+      assert.equal(gedeeldeTellers, 1, 'alleen de gedeelde identiteitscontrole loopt; Thuisrust heeft geen eigen teller');
 
       // naar de Thuiswacht: die loopt nu, dus daar hoort de klok te tikken
       await toonStand(p, 'wacht');
       await p.waitForFunction(() => document.querySelector('#paneel').innerText.includes('Ik ben thuis'), null, { timeout: 15000 });
-      assert.equal(await p.evaluate(() => window.__tellersMet(1000)), 1,
+      assert.equal(await p.evaluate(() => window.__tellersMet(1000)), gedeeldeTellers + 1,
         'een lopende wacht hoort precies een seconde-teller te hebben');
 
       // en weg ervan: de klok hoort opgeruimd te zijn
       await toonStand(p, 'rust');
       await p.waitForFunction(() => document.querySelector('#paneel').innerText.includes('Zet aan'), null, { timeout: 15000 });
-      assert.equal(await p.evaluate(() => window.__tellersMet(1000)), 0,
+      assert.equal(await p.evaluate(() => window.__tellersMet(1000)), gedeeldeTellers,
         'na het verlaten van de Thuiswacht hoort de seconde-teller gestopt te zijn');
 
       /* En wat juist NIET mag stoppen: het levensteken. shared/veiligheid.js

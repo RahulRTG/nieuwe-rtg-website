@@ -7,16 +7,6 @@ const path = require('node:path');
 const pw = require('playwright');
 const { startServer, stop, browserOpties, geenBrowser, letOpFouten } = require('./helper');
 
-/* #413 zet de eigen inhoud van een wereldhuis (hier de Saloon op /apps/wereld.html)
-   bewust in een ingeklapt "Uw volledige overzicht" (details.wp-domain) onder de warme
-   scene; test/world-homes.e2e.js opent hem net zo. Deze proef gaat over de Saloon
-   zelf, dus hij opent die vouw eerst -- zoals een lid dat doet -- en zwakt verder niets af. */
-async function openOverzicht(page) {
-  const vouw = page.locator('details.wp-domain');
-  await vouw.waitFor({ state: 'attached' });
-  if (!(await vouw.evaluate(d => d.open))) await page.locator('details.wp-domain > summary').click();
-}
-
 test('Saloon: publiceren, reageren, bewaren, filters en mobiele bediening', { skip: geenBrowser(pw) }, async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-saloon-ui-'));
   let srv, browser;
@@ -33,7 +23,7 @@ test('Saloon: publiceren, reageren, bewaren, filters en mobiele bediening', { sk
     const fouten = []; letOpFouten(page, fouten);
     await page.addInitScript(token => { localStorage.setItem('rtg_member_token', token); localStorage.setItem('rtg_lang', 'nl'); }, reg.token);
     await page.goto(srv.base + '/apps/wereld.html');
-    await openOverzicht(page);
+    await page.locator('.wp-story a').click();
     await page.locator('#saloon:not([hidden])').waitFor();
     await page.locator('[data-saloon-maken]').click();
     await page.locator('dialog textarea[name="tekst"]').fill('Samen de buurt ontdekken. #saloonproef');
@@ -52,7 +42,7 @@ test('Saloon: publiceren, reageren, bewaren, filters en mobiele bediening', { sk
     await page.locator('[data-vorm="bewaard"][aria-pressed="true"]').waitFor();
     await page.waitForFunction(() => document.querySelectorAll('[data-saloon-id]').length === 1);
     assert.equal(await page.locator('[data-saloon-id]').count(), 1);
-    await page.reload(); await openOverzicht(page); await kaart.waitFor();
+    await page.reload(); await page.locator('.wp-story a').click(); await kaart.waitFor();
     assert.equal(await page.locator('[data-vorm="bewaard"]').getAttribute('aria-pressed'), 'true');
     await page.locator('[data-keuzes]').click();
     await page.locator('#saloonFilters input[name="plaats"]').fill('Rotterdam');
@@ -73,7 +63,6 @@ test('Saloon: publiceren, reageren, bewaren, filters en mobiele bediening', { sk
     await post('/api/supplier/redactie/snel', { titel: 'Een tweede blik op de buurt', inhoud: 'Een tweede verslag.', rubriek: 'Stad' }, zaak.token);
     await post('/api/wereld/modus', { modus: 'alles', saloon: { bronnen: ['sociaal', 'nieuws'], plaats: '', vorm: 'overzicht' } }, reg.token);
     await page.goto(srv.base + '/apps/wereld.html?embed=1');
-    await openOverzicht(page);
     const nieuws = page.locator('[data-saloon-id="nieuws:BODE:' + bericht.artikel.id + '"]');
     await nieuws.waitFor();
     await nieuws.getByRole('button', { name: 'Lees artikel' }).click();
@@ -93,7 +82,7 @@ test('Saloon: publiceren, reageren, bewaren, filters en mobiele bediening', { sk
     const clip = await post('/api/clips/maak', { titel: 'Een creator aan het werk', duurS: 20, mbGeschat: 4 }, maker.token);
     assert.ok(clip.id);
     await post('/api/wereld/modus', { modus: 'alles', saloon: { bronnen: ['makers'], plaats: '', vorm: 'overzicht' } }, reg.token);
-    await page.reload(); await openOverzicht(page);
+    await page.reload();
     const werk = page.locator('[data-saloon-id="makers:clip:' + clip.id + '"]');
     await werk.getByRole('button', { name: 'Maker gratis volgen', exact: true }).click();
     await werk.getByRole('button', { name: 'Maker ontvolgen', exact: true }).waitFor();

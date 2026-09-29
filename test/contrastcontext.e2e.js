@@ -104,16 +104,7 @@ test('een contrastmelding noemt de wereld, de tokens en de ondergrond',
     /* En de token die de melding noemt is de ECHTE waarde van deze wereld, niet
        een naam die toevallig meeloopt: zonder deze rij zou `muted=` ook groen
        blijven met een lege of doorgegeven waarde. */
-    /* De waarde komt uit het wereldpalet zelf en staat hier niet overgetypt: de
-       warme desktopstandaard (#413) verhuisde de wereldtokens van
-       rtg-heritage.css naar shared/rtg-world-palette.css en gaf LivingOS een
-       ander grijs (#51493f werd #5e5c57). Een overgetypte kleur maakt van een
-       paletbesluit een rode toets zonder dat de melding iets fout doet. */
-    const palet = fs.readFileSync(path.join(__dirname, '../public/shared/rtg-world-palette.css'), 'utf8');
-    const living = palet.match(/\[data-rtg-world="living"\][^{]*\{([^}]*)\}/);
-    const mutedLiving = living && (living[1].match(/--rtg-world-muted:\s*(#[0-9a-f]{6})/i) || [])[1];
-    assert.ok(mutedLiving, 'het wereldpalet noemt geen muted voor LivingOS');
-    assert.match(waar, new RegExp('muted=\\s*' + mutedLiving, 'i'), 'de gemelde tokenwaarde is niet die van LivingOS');
+    assert.match(waar, /muted=\s*#5e5c57/i, 'de gemelde tokenwaarde is niet die van LivingOS');
   } finally {
     if (browser) await browser.close().catch(() => {});
     await stop(srv);

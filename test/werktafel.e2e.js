@@ -129,6 +129,7 @@ const stand = () => {
       .map(x => x.textContent + (x.classList.contains('actief') ? '*' : '')),
     sluitknop: (() => { const k = document.querySelector('.cmd-balksluit'); return !!k && !k.hidden; })(),
     // begint de wereld bovenaan? Zo niet, dan staat er weer schil-chroom boven
+    kader: (() => { const r = document.querySelector('.wd-page').getBoundingClientRect(); return { top: Math.round(r.top), bottom: Math.round(r.bottom) }; })(),
     bladVanaf: (() => { const f = document.querySelector('.cmd-pane.actief iframe');
       return f ? Math.round(f.getBoundingClientRect().top) : null; })(),
     leegstaat: !!document.querySelector('.cmd-leeg'),
@@ -300,26 +301,12 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     /* Edge is ook op een telefoon de ene globale schil: context bovenaan
        en de globale bediening onderaan. Command draagt zijn echte functies in
        diezelfde lichte onderrand; het voegt geen tweede zwarte rij meer toe. */
-    /* DE MATEN KOMEN UIT DE EDGE ZELF. Hier stonden 44, 68 en 94-96: de maten
-       van de Edge van voor de warme desktopstandaard (#413). Die zet de
-       bovenbalk en de onderrand in tokens (--edge-top 64px en --edge-bottom op
-       body[data-rtg-desktop], shared/rtg-world-desktop.css) en de balk op 64px
-       (shared/rtg-desktop-components.css). De belofte is dezelfde gebleven --
-       het blad begint direct onder de ENE bovenbalk en houdt de ruimte van de
-       ENE onderrand vrij -- dus wordt die belofte gemeten en niet het getal. */
-    const edgeMaat = await page.evaluate(() => {
-      const b = getComputedStyle(document.body), top = document.querySelector('.rtg-edge-top');
-      return { top: parseFloat(b.getPropertyValue('--edge-top')), bottom: parseFloat(b.getPropertyValue('--edge-bottom')),
-        balkOnder: top ? Math.round(top.getBoundingClientRect().bottom) : null };
-    });
-    assert.equal(smalBlad.bladVanaf, edgeMaat.top, 'de wereld hoort direct onder de enige Edge-bovenbalk te beginnen');
-    assert.equal(smalBlad.bladVanaf, edgeMaat.balkOnder, 'en die bovenbalk is ook echt zo hoog');
+    assert.equal(smalBlad.bladVanaf, smalBlad.kader.top, 'de wereld begint bovenaan het gedeelde inhoudskader');
     assert.equal(smalBlad.balk, 0, 'Command heeft geen eigen zichtbare balk');
-    assert.equal(smalBlad.edgeOnder, 64, 'de standaard Edge (64px, warme desktopstandaard) draagt de bediening');
+    assert.equal(smalBlad.edgeOnder, 64, 'de standaard marketing-Edge draagt de bediening');
     assert.ok(smalBlad.edgeVanaf > 0, 'Edge staat binnen het scherm');
-    assert.ok(Math.abs(smalBlad.bladTotOnder - edgeMaat.bottom) <= 1,
-      'het blad respecteert de hoogte, afstand en leesruimte van de gedeelde Edge (' + edgeMaat.bottom +
-      'px); gemeten ' + smalBlad.bladTotOnder + 'px');
+    assert.ok(Math.abs(844 - smalBlad.bladTotOnder - smalBlad.kader.bottom) <= 1,
+      'de wereld vult het gedeelde inhoudskader zonder een tweede onderbalk');
     assert.deepEqual(smalBlad.chips, ['Vandaag*'], 'de balk hoort te tonen waar je bent');
     assert.equal(smalBlad.sluitknop, true, 'met een weg-hier ernaast');
 
@@ -706,7 +693,7 @@ test('na inloggen landt een lid rechtstreeks op de lege wereldkiezer',
       'er staat geen ingang in gewone taal');
     /* WAT DEZE REGEL BEWAAKT is dat er ONDERAAN NIETS ANDERS STAAT: een tweede
        rij, een tabbalk of een teruggekeerd springboard maakt deze strook meteen
-       ~96px of meer. De canonieke marketing-Edge is CSS-vast op 68px.
+       ~96px of meer. De canonieke marketing-Edge is CSS-vast op 64px.
 
        Waarom het geen `equal(48)` meer is: op 26 augustus 2026 zakte deze toets
        in de CI op "47 !== 48" -- een verschil van een pixel in een gemeten
@@ -716,11 +703,8 @@ test('na inloggen landt een lid rechtstreeks op de lege wereldkiezer',
        bovendien niet de taak van deze toets: die staat in scripts/raakvlakkeuring.js
        en wordt over elk scherm gemeten. Zakt hij toch nog, dan zegt de melding
        nu ook WAT er stond. */
-    /* 64 en niet meer 68: de warme desktopstandaard (#413) zet de Edge op elk
-       scherm op 64px (shared/rtg-desktop-components.css). Wat deze regel bewaakt
-       blijft hetzelfde: een tweede rij onderaan maakt de strook ~96px of meer. */
     assert.ok(geland.balk >= 63 && geland.balk <= 65,
-      'onderaan hoort alleen de standaard Edge te staan (64px), gemeten: ' + geland.balk +
+      'onderaan hoort alleen de standaard marketing-Edge te staan (64px), gemeten: ' + geland.balk +
       ' (ruw ' + geland.balkRuw + ', computed ' + geland.balkStijl + ')');
     assert.match(geland.uitnodiging, /Kies een wereld/);
 

@@ -28,6 +28,10 @@
       if ([1, 2, 4].indexOf(limiet) < 0) limiet = 1;
       var zichtbaar = schil.surfaces.slice(0, limiet);
       if (schil.actief && zichtbaar.indexOf(schil.actief) < 0) zichtbaar[zichtbaar.length - 1] = schil.actief;
+      if (schil.vak.hasAttribute('data-sleept-object')) {
+        var doelen = schil.surfaces.filter(function (s) { return !!sleepAanbod[s.id]; });
+        zichtbaar = doelen.concat(zichtbaar.filter(function (s) { return doelen.indexOf(s) < 0; })).slice(0, limiet);
+      }
       schil.surfaces.forEach(function (s) { s.el.toggleAttribute('data-edge-visible', zichtbaar.indexOf(s) >= 0); });
       var k = zichtbaar.length;
       var sk = k === 4 ? 2 : (k === 2 && m.b >= 760 ? 2 : 1);

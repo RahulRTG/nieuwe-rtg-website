@@ -31,10 +31,7 @@
       huidig = i; slaOp = bewaar || function () { return host.bewaar(i); };
       if (!vervang) history.pushState({ saloonArtikel: i }, '', '#saloon-artikel');
       vlak.hidden = false; document.body.classList.add('saloon-leest'); host.veranderd(true);
-      // Een geopend verhaal moet ook te ZIEN zijn. De warme wereldcompositie zet de
-      // Saloon in een ingeklapt "volledig overzicht"; herstelt de lezer zich na een
-      // herlaadbeurt of Vooruit, dan stond hij onzichtbaar in die dichte vouw.
-      for (var vouw = vlak.closest('details:not([open])'); vouw; vouw = vouw.parentElement && vouw.parentElement.closest('details:not([open])')) vouw.open = true;
+      var overzicht = vlak.closest('details.wp-domain'); if (overzicht) overzicht.open = true;
       vlak.innerHTML = '<nav class="saloon-lezerkop" aria-label="Artikelbediening"><button type="button" data-terug>‹ Saloon</button>'
         + '<button type="button" data-lezer-bewaar aria-pressed="' + String(!!i.bewaard) + '">' + (i.bewaard ? 'Bewaard' : 'Bewaren') + '</button></nav>'
         + '<div class="saloon-leesinhoud"><p role="status">Artikel ophalen…</p></div>';

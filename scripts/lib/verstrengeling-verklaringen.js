@@ -22,6 +22,8 @@ module.exports = [
      registerblik kent de afdelingen niet, en leest alleen registers bij naam. */
   { van: 'domein:afdelingen', naar: 'domein:registerblik', soort: 'DOMEINRELATIE',
     reden: 'het boardroomadvies vraagt de registerblik wat de registers over productie, bewijs en routes zeggen; de registerblik leest alleen, en kent de afdelingen niet' },
+  { van: 'ingang:ik', naar: 'ingang:presentatie-beelden', soort: 'ORKESTRATIE',
+    reden: 'De ik-route registreert de persoonlijke presentatievoorkeuren als onderdeel van de eigen accountinstellingen; de beeldmodule bewaakt zelf lid- en gezinsprofielauthenticatie en eigendom van privébestanden.' },
   /* DE LEDENGIDS RAAKT DE AANWEZIGHEID AAN (besluit van de eigenaar, 25 september
      2026: retentie ook als aanwezigheid, een dag per lid). kern/gids.js dirTouch
      is het ene keelgat waar elk ledenverzoek langskomt; daar wordt ook de dag van
@@ -319,8 +321,6 @@ module.exports = [
     reden: 'routes/kantoren/regie.js r.28: dezelfde papierendeur wordt door meerdere ingangen opgehangen, en dat is precies een deur en geen kopie' },
   { van: 'ingang:magnaatwereld', naar: 'ingang:magnaatstad', soort: 'PRESENTATIE',
     reden: 'routes/magnaatwereld.js r.22 hangt de stadkant van dezelfde ingang op (samen in een Oudwijk); apart omdat magnaatwereld.js op de 10 kB-grens staat, en met alleen app, auth, geenGast en magnaatWereld zodat het geen tweede domein op de kern wordt' },
-  { van: 'ingang:ik', naar: 'ingang:presentatie-beelden', soort: 'PRESENTATIE',
-    reden: 'routes/ik.js r.16 hangt de persoonlijke beeldkeuze (#413) aan dezelfde ik-ingang: /api/ik/beelden is het eigen scherm van het lid, achter auth en in de eigen bestandenkluis' },
   { van: 'ingang:leven', naar: 'ingang:levenmentor', soort: 'PRESENTATIE',
     reden: 'routes/leven.js r.61 hangt de mentorkant van dezelfde ingang op' },
   { van: 'ingang:sociaal', naar: 'ingang:socialerahul', soort: 'PRESENTATIE',

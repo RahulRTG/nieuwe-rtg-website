@@ -6,8 +6,8 @@ body.rtg-first-page .salon-werkveld{max-width:none;padding:0;margin:0;display:bl
 body.rtg-first-page .salon-stage{display:block;margin:0;padding:0}
 body[data-rtg-editorial-room] .salon-kringlink{display:inline-flex;align-items:center;min-height:44px;padding-block:10px}
 body.rtg-first-page :is(.salon-briefing,.salon-socialnav,.rtg-social-commandbar,.salon-werkveld>header> .kop,.gallery-explanation){display:none!important}
-body.rtg-first-page>header,body.rtg-first-page .salon-werkveld>header{background:var(--rtg-world-bg);border:0;padding:0;position:static;min-height:0}
-body.rtg-first-page>header>:not(.tabs){display:none}
+body.rtg-first-page .wd-page>header,body.rtg-first-page>header,body.rtg-first-page .salon-werkveld>header{background:var(--rtg-world-bg);border:0;padding:0;position:static;min-height:0}
+body.rtg-first-page .wd-page>header>:not(.tabs),body.rtg-first-page>header>:not(.tabs){display:none}
 body.rtg-first-page .rtg-duimbalk{position:static;min-height:0;padding:0;border:0;background:none}
 .rtg-first-steps{position:relative;isolation:isolate;background:var(--rtg-world-bg);color:#f4f0e9;overflow:hidden;text-align:start;padding-bottom:28px}
 .rtg-first-steps *{box-sizing:border-box}
@@ -68,11 +68,8 @@ body.rtg-first-page .first-guest-controls{display:none}
 }
 @media(max-width:359px){.rtg-first-steps .first-copy{padding-inline:20px}.rtg-first-steps .first-hero{padding-inline:20px}.rtg-first-steps .first-action{font-size:19px;padding-inline:14px}.rtg-first-steps .first-interests{gap:8px}}
 @media(prefers-reduced-motion:reduce){.rtg-first-steps *{scroll-behavior:auto!important;transition:none!important}}
-/* Retire the old heading after its functional controls have moved to Edge.
-   In the shared desktop frame (#413) that heading is no longer a child of body
-   but of the page surface (.wd-page), hence the second selector. */
+/* Retire the old heading after its functional controls have moved to Edge. */
 body.rtg-first-page[data-rtg-adaptive-ready="true"]>header,
-body.rtg-first-page[data-rtg-adaptive-ready="true"] .wd-page>header,
 body.rtg-first-page[data-rtg-adaptive-ready="true"] .salon-werkveld>header,
 body.rtg-first-page main>:is(.ios-groot,.ios-boven,.ios-onder){display:none!important}
 body.rtg-first-page .salon-werkveld{background:var(--rtg-world-bg);min-height:0}

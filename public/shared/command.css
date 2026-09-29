@@ -52,11 +52,6 @@ body.rtg-command{display:block;background:var(--onyx-glans,#0C0C0B);overflow:hid
    -- en dat is deze schil -- met de levende dagkleur, en doet dat zo. Zonder
    dit lag er een ondoorzichtige lap over de werktafel waar je alleen de kleur
    van zag dat er iets mis was. */
-/* Afstammeling en geen kind (`body > #shell`): de gedeelde desktopstandaard
-   (shared/interface/world-desktop-surface.js) verhuist de kinderen van <body>
-   in een .wd-page. Met het kindteken hield de schil dan zijn z-index 240 niet
-   meer, lag de werktafel (210) over een geopende tab en ving hij elke klik. Een
-   id is uniek, dus de ruimere selector raakt niets anders. */
 body.rtg-command #shell{position:relative;z-index:240;margin-inline:auto;
   background:none!important;border:0;box-shadow:none;pointer-events:none;}
 body.rtg-command #shell #app{background:none!important;}

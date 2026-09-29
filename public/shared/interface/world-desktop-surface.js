@@ -2,10 +2,7 @@
    Embedded apps use their parent's frame; only the outer document owns Edge. */
 (function (w, d) {
   'use strict';
-  var overlays = 'script,style,link,template,dialog,[role="dialog"],.scrim,.palet,.melding,.toast,.first-message,.rtg-deep-nav,.skip,.skip-link,.vis-verborgen,.rtg-edge-chrome,.rtg-adaptive-shell,.rtg-adaptive-bar,.rnd-toets,.rnd-hint,.ios-thuis,.rtg-spring,#rtfOnb';
-  // Wat op het scherm ZWEEFT (melding, toast, first-message, de vaste deep-nav) blijft buiten .wd-page:
-  // die draagt contain:layout, en daarbinnen is position:fixed niet meer aan het
-  // venster vast maar aan de pagina -- een melding landde dan midden op de inhoud.
+  var overlays = 'script,style,link,template,dialog,[role="dialog"],.scrim,.palet,.melding,.toast,.skip,.skip-link,.vis-verborgen,.rtg-edge-chrome,.rtg-adaptive-shell,.rtg-adaptive-bar,.rnd-toets,.rnd-hint,.ios-thuis,.rtg-spring,#rtfOnb';
   function prepare() {
     if (d.body.dataset.worldHome) return d.querySelector('main');
     var surface = d.createElement('div');
@@ -16,56 +13,29 @@
     var nodes = Array.from(d.body.children).filter(function (el) {
       return !el.matches(overlays) && !el.className.toString().startsWith('rtg-edge-') && !el.className.toString().startsWith('rtg-adaptive-');
     });
-    d.body.prepend(surface);
-    nodes.forEach(function (el) { move(surface, el); });
-    // A skip link stays the first tab stop (WCAG 2.4.1); the frame comes after it.
-    Array.from(d.body.querySelectorAll(':scope>.rtg-spring,:scope>.skip,:scope>.skip-link')).reverse()
-      .forEach(function (el) { d.body.prepend(el); });
+    d.body.insertBefore(surface, nodes[0] || null);
+    nodes.forEach(function (el) { surface.appendChild(el); });
     var canvas = w.RTGHeritageRegistry && w.RTGHeritageRegistry.canvas[w.location.pathname];
-    /* De losse werkruimte (apps/werkruimte.html, body.rtg-edge-workspace) is zelf
-       een werkvlak met absoluut geplaatste surfaces, net als een canvas: hij
-       heeft geen inhoudshoogte. Zonder vaste maat zakte hij in het kader naar
-       0px en stond er een lege kolom. rtg-heritage-components.js behandelt hem
-       om dezelfde reden al als immersive. */
-    if (canvas || d.body.classList.contains('rtg-edge-workspace')) { surface.dataset.rtgCanvasSurface = 'true'; fit(surface); }
-    else {
-      /* Een app die het hele venster bezit (html/body overflow:hidden en een schil
-         van 100dvh: partner-network, living-os, reizen-veilig, ...) scrolt
-         BINNEN zijn artikelen. In het kader begon die schil lager, stak hij onder
-         het venster uit, en omdat het document niet scrolt was zijn onderste
-         navigatie onbereikbaar. Zo'n schil krijgt dezelfde maat als een canvas:
-         van waar het vlak begint tot boven de Edge. */
-      var eigen = /hidden|clip/.test(w.getComputedStyle(d.documentElement).overflowY) && nodes.filter(function (el) {
-        return el.offsetHeight >= w.innerHeight - 2 && !/fixed|absolute/.test(w.getComputedStyle(el).position);
-      })[0];
-      if (eigen) { eigen.setAttribute('data-rtg-viewport-app', ''); surface.dataset.rtgCanvasSurface = 'true'; fit(surface); }
-    }
+    if (canvas && nodes.some(function (el) { return el.matches(canvas); })) surface.dataset.rtgCanvasSurface = 'true';
     return surface;
-  }
-  /* Verhuizen zonder herladen. Een gewone appendChild haalt een element los en
-     zet het terug, en een <iframe> laadt dan opnieuw: de surfaces van de
-     werkruimte (apps/werkruimte.html) laadden daardoor twee keer, verloren hun
-     stand, en een frame waar net iets naartoe gestuurd was bestond niet meer.
-     moveBefore() verhuist atomisch (iframes, focus en lopende animaties blijven);
-     waar hij ontbreekt blijft het de gewone verhuizing. */
-  function move(parent, node, before) {
-    if (parent.moveBefore && node.isConnected && parent.isConnected) {
-      try { parent.moveBefore(node, before || null); return node; } catch (e) {}
-    }
-    return parent.insertBefore(node, before || null);
-  }
-  // A canvas ends above the Edge: its height is the viewport minus where it starts.
-  function fit(surface) {
-    function set() {
-      var top = Math.max(0, Math.round(surface.getBoundingClientRect().top + (w.scrollY || 0)));
-      if (surface.style.getPropertyValue('--wd-canvas-top') !== top + 'px') surface.style.setProperty('--wd-canvas-top', top + 'px');
-    }
-    w.requestAnimationFrame(set); w.addEventListener('resize', set);
-    if (w.ResizeObserver) new w.ResizeObserver(set).observe(d.body);
   }
   function guard(root, home) {
     var locked = false, oldHidden = false;
+    // The new people column precedes the original main. Keep bypass navigation
+    // first in document order, including routes whose main appears after login.
+    var skip = d.querySelector('.rtg-spring,a[href^="#"][class*="skip"]') || d.createElement('a');
+    skip.classList.add('wd-skip'); skip.textContent = skip.textContent || 'Naar de inhoud';
+    if (!home.id) home.id = 'rtgWorldContent';
+    home.setAttribute('tabindex', '-1'); skip.href = '#' + home.id;
+    d.body.prepend(skip);
+    skip.addEventListener('click', function (e) {
+      e.preventDefault();
+      var target = locked ? d.getElementById('rtf-toegang-slot') : home;
+      if (target) { target.setAttribute('tabindex', '-1'); target.focus(); target.scrollIntoView({block:'start'}); }
+    });
     function sync() {
+      var command = d.getElementById('rtgCommand');
+      if (command && home.classList.contains('wd-page') && command.parentNode !== home) home.appendChild(command);
       var gate = d.getElementById('rtf-toegang-slot');
       if (gate && d.documentElement.classList.contains('rtf-toegang-dicht')) {
         if (gate.tagName === 'DIALOG') {
@@ -94,5 +64,5 @@
     watch.observe(d.body, { childList:true });
     sync(); w.addEventListener('pagehide', function () { watch.disconnect(); });
   }
-  w.RTGDesktopSurface = { prepare: prepare, guard: guard, move: move };
+  w.RTGDesktopSurface = { prepare: prepare, guard: guard };
 })(window, document);

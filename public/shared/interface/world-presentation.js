@@ -18,6 +18,7 @@
     var names = d.body.dataset.publicPlatform ? ['Verhalen', 'Contact', 'Onderwerpen'] : { living: ['Dichtbij', 'Uw mensen', 'Bewaard'], work: ['Werkruimtes', 'Uw team', 'Vandaag'], travel: ['Overzicht', 'Reisgezelschap', 'Voor vertrek'], foundation: ['Samen leren', 'Uw omgeving', 'Vandaag'] }[world];
     [home, people, favorites].forEach(function (panel, i) {
       panel.id = panel.id || 'wp-panel-' + i; var b = U.el('button', '', names[i]); b.type = 'button'; b.setAttribute('aria-controls', panel.id);
+      b.prepend(U.icon(i === 0 ? (world === 'living' ? 'pin' : 'grid') : i === 1 ? 'people' : 'bookmark'));
       b.setAttribute('aria-expanded', String(i === 0)); b.onclick = function () {
         root.dataset.mobilePanel = ['home', 'people', 'favorites'][i];
         nav.querySelectorAll('button').forEach(function (other) { other.setAttribute('aria-expanded', String(other === b)); });
@@ -26,49 +27,28 @@
   }
   function homeScene(home, root) {
     var c = content[world], details = U.el('details', 'wp-domain'), summary = U.el('summary', '', 'Uw volledige overzicht');
-    var native = U.el('div', 'wp-domain-content');
+    var native = U.el('div', 'wp-domain-content'); while (home.firstChild) native.appendChild(home.firstChild);
     details.append(summary, native); details.id = 'reisoverzicht';
-    /* Eerst in het document, dan verhuizen: zo kan moveBefore() de eigen inhoud
-       atomisch meenemen (een frame of een lopende invoer herlaadt niet). */
-    root.append(details);
-    while (home.firstChild) w.RTGDesktopSurface.move(native, home.firstChild);
+    if (d.body.classList.contains('saloon-leest')) details.open = true;
     var scene = U.el('section', 'wp-scene'), heading = U.el('div', 'wp-heading'), overline = U.el('p', 'wp-overline', c[0]), title = U.el('h2', '', c[1]);
     var link = U.el('a', 'wp-action', c[2] + ' ↗'); link.href = c[3];
     if (world === 'travel') link.onclick = function () { details.open = true; };
     heading.append(overline, title); scene.append(heading, photo('/images/world-homes/' + world + '-warm.jpg', 'hoofd', 'Hoofdfoto', 'wp-photo'), link);
     if (world === 'foundation') scene.appendChild(U.copy(U.el('p', 'wp-free'), 'free'));
     var story = U.el('section', 'wp-story'), label = U.el('p', 'wp-overline', c[4]), a = U.el('a', '', c[5] + ' ↗'); a.href = c[6];
+    if (world === 'living') { a.href = '#reisoverzicht'; a.onclick = function () { details.open = true; }; }
     story.append(label, photo(c[7], 'beeld-00000001', 'Verhaalbeeld', 'wd-app-photo'), a);
-    home.append(scene); details.before(story); home.dataset.warmHome = 'true';
-    /* Een diepe link (reizen.html#rahul, #samen, een anker) wijst naar een blad
-       IN de eigen inhoud, of naar een leesstand die de app zelf herstelt (zoals
-       #saloon-artikel, zonder element met die id). Die inhoud staat nu onder het
-       overzicht; bleef dat dicht, dan landde de link op de hoofdfoto met het
-       gevraagde blad onzichtbaar. Alleen een anker BUITEN de eigen inhoud laat
-       het overzicht dicht. */
-    function reveal() {
-      var h = ''; try { h = decodeURIComponent(w.location.hash.slice(1)); } catch (e) { return; }
-      if (!h) return;
-      var sel = w.CSS && w.CSS.escape ? w.CSS.escape(h) : h.replace(/[^\w-]/g, '');
-      var target = native.querySelector('#' + sel + ',[data-blad="' + sel + '"],[data-tab="' + sel + '"],[data-view="' + sel + '"]');
-      var doel = d.getElementById(h);
-      if (target || !doel || details.contains(doel)) details.open = true;
+    home.append(scene); root.append(story, details); home.dataset.warmHome = 'true';
+    function revealTarget() {
+      var key; try { key = decodeURIComponent(w.location.hash.slice(1)); } catch (_) { return; }
+      var target = key && d.getElementById(key);
+      if (target && details.contains(target)) details.open = true;
+      if (key && Array.from(native.querySelectorAll('[data-blad]')).some(function (el) { return el.dataset.blad === key; })) details.open = true;
+      if (native.querySelector('.living-load-error,#stadmelding')) details.open = true;
     }
-    reveal(); w.addEventListener('hashchange', reveal);
-    /* Ook een eigen bediening van het huis (een tab uit de verborgen app-balk die
-       de Edge doorgeeft, zoals "Wereld" op wereld.html) wisselt een weergave IN
-       het overzicht. Een tik door een mens op zo'n bediening opent dat overzicht,
-       anders gebeurt er zichtbaar niets. De eigen lagen van het kader (scene,
-       verhaal, tabbladen, bibliotheek) en de Edge zelf tellen niet mee, en een
-       klik uit een script zonder gebruikersgebaar ook niet: bij het laden blijft
-       het overzicht dicht. */
-    d.addEventListener('click', function (e) {
-      if (details.open || !(e.isTrusted || (w.navigator.userActivation && w.navigator.userActivation.isActive))) return;
-      var t = e.target && e.target.closest ? e.target : null;
-      if (!t || t.closest('.rtg-edge-chrome,[class*="rtg-adaptive-"],.wp-domain>summary,dialog,[role="dialog"]')) return;
-      if (root.contains(t) && !native.contains(t)) return;
-      details.open = true;
-    }, true);
+    revealTarget(); w.addEventListener('hashchange', revealTarget);
+    var feedWatch = new MutationObserver(revealTarget); feedWatch.observe(native, { childList: true, subtree: true });
+    w.addEventListener('pagehide', function () { feedWatch.disconnect(); });
   }
   function start(o) {
     U = w.RTGDesktopUI; world = d.body.dataset.rtgWorld; P = w.RTGPersonalImages;

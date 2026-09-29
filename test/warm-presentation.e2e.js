@@ -63,6 +63,12 @@ test('four worlds share the drawn desktop and mobile composition, and editor sav
   }finally{await ctx.close();}
 });
 test('family photo uploads, gallery, cancel and profile switches use only the selected family identity',async()=>{
+  for (const route of ['/api/foundation/gezin/beelden', '/api/foundation/gezin/beelden/zet',
+    '/api/foundation/gezin/beelden/mijn', '/api/foundation/gezin/beelden/haal',
+    '/api/foundation/gezin/beelden/upstart', '/api/foundation/gezin/beelden/updeel',
+    '/api/foundation/gezin/beelden/upklaar', '/api/foundation/gezin/beelden/upload']) {
+    assert.equal((await api(route, {}, first)).status, 401, route + ' rejects a member token without the chosen family profile');
+  }
   async function family(route,body){return api('/api/foundation/gezin/'+route,body,null);}
   const made=await family('maak',{gezinsnaam:'Eigen beelden',naam:'Ouder',pin:'1234',bevoegdGezin:true,privacyAkkoord:true});assert.equal(made.status,200);const parent=made.body;
   const child=await family('profiel/maak',{code:parent.code,token:parent.token,naam:'Milan',rol:'kind',geboortedatum:'2015-04-04',pin:'5678'});assert.equal(child.status,200);
@@ -91,5 +97,38 @@ test('family photo uploads, gallery, cancel and profile switches use only the se
     await page.evaluate(other=>localStorage.setItem('rtf_sessie',JSON.stringify(other)),{...other,profiel:parent.profiel});
     await page.waitForFunction(()=>!document.querySelector('.wp-photo img').src.startsWith('data:'));
     assert.deepEqual(memberRequests,[]);assert.deepEqual(errors,[]);
+  }finally{await ctx.close();}
+});
+test('Connection actions preserve the shared navigation on desktop and mobile',async()=>{
+  const ctx=await browser.newContext({viewport:{width:1440,height:1000},serviceWorkers:'block',reducedMotion:'reduce'});
+  await ctx.addInitScript(()=>{localStorage.setItem('rtg_lang','nl');localStorage.setItem('rtg_cookieinfo_v1','1');});
+  const page=await ctx.newPage();
+  try {
+    for(const product of ['vonk','rendezvous']) {
+      await page.goto(srv.base+'/apps/notities.html');
+      await page.waitForSelector('.rtg-adaptive-bar');
+      await page.addStyleTag({url:srv.base+'/shared/connection-edge.css'});
+      for(const file of ['connection-edge-core','connection-edge-input','connection-edge'])await page.addScriptTag({url:srv.base+'/shared/'+file+'.js'});
+      await page.evaluate(async product=>{
+        window.connectionCalls=0;
+        window.connectionTest=RTGConnectionEdge.create({product,load:async()=>({surface:product.toUpperCase()+'_ROOT',state:'DISCOVERY',availableCapabilities:['connection.discover'],actions:[{id:'discover',capability:'connection.discover',labelKey:'connection.edge.discover'}]}),onAction:()=>{window.connectionCalls++;}});
+        await window.connectionTest.setRoot();
+      },product);
+      for(const width of [1440,390]) {
+        await page.setViewportSize({width,height:1000});
+        const action=page.locator('.wd-page .connection-edge [data-connection-action="discover"]');
+        await action.waitFor();
+        assert.equal(await page.locator('.rtg-adaptive-bar:visible').count(),1);
+        assert.equal(await page.locator('.connection-edge').evaluate(e=>getComputedStyle(e).position),'relative');
+        await action.click();
+        await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="context"]').click();
+        const projected=page.locator('.rtg-adaptive-controls').getByRole('button',{name:await action.innerText(),exact:true});
+        await projected.click();
+        assert.equal(await page.evaluate(()=>window.connectionCalls),width===1440?2:4);
+        assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true);
+      }
+      await page.evaluate(()=>window.connectionTest.destroy());
+      assert.equal(await page.locator('.rtg-adaptive-bar').isVisible(),true);
+    }
   }finally{await ctx.close();}
 });

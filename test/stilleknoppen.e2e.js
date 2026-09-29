@@ -75,18 +75,7 @@ test('een knop die niet kan, zegt waarom', { skip: geenBrowser(pw) }, async () =
 
     // FoundationOS-home zonder open afdeling: de kaart blijft staan en zegt het.
     await naar('/apps/foundation/os-publiek.html');
-    /* Sinds de warme presentatie (#413, shared/interface/world-presentation.js)
-       staan de eigen kaarten van een wereldhuis achter "Uw volledige
-       overzicht", een dichte <details> onder de scene. Dat is een ontwerpkeuze;
-       een mens klapt het overzicht eerst open, en de proef doet dat ook. De
-       bewering daarna -- de kaart zegt waarom hij nergens heen gaat -- is
-       ongewijzigd. */
-    await page.waitForFunction(() => ['ready', 'error'].includes(document.body.dataset.rtgDesktopState),
-      null, { timeout: 20000 });
-    if (await page.evaluate(() => {
-      const d = document.querySelector('[data-heen="projecten"]').closest('details');
-      return !!(d && !d.open);
-    })) await page.locator('details:has([data-heen="projecten"]) > summary').click();
+    await page.locator('.wp-domain > summary').click();
     await page.locator('[data-heen="projecten"]').click();
     assert.match(await tekstVan('#doenReden'), /afdeling|stad/, 'de kaart zegt niet waarom hij nergens heen gaat');
 

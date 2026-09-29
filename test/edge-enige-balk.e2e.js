@@ -226,10 +226,10 @@ test('de Edge neemt de eigen balk van een scherm over, met knoppen en ruimte',
       await page.goto(base + '/apps/rit.html', { waitUntil: 'domcontentloaded' });
       await wachtTot(page, () => document.body &&
         document.body.getAttribute('data-rtg-adaptive-ready') === 'true' &&
-        !!document.querySelector('header.ritkop.ios-nav'), null,
-        { wat: 'de hero van rit.html met zijn ios-nav-klasse' });
+        !!document.querySelector('header.ritkop'), null,
+        { wat: 'de inhoudelijke hero van rit.html' });
       const hero = await page.evaluate(() => {
-        const el = document.querySelector('header.ritkop.ios-nav');
+        const el = document.querySelector('header.ritkop');
         const s = getComputedStyle(el), r = el.getBoundingClientRect();
         return { geclaimd: el.classList.contains('rtg-edge-owned-bar'), positie: s.position,
           hoogte: Math.round(r.height), zichtbaar: s.display !== 'none' && r.height > 0 };

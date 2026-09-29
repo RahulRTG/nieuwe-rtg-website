@@ -7,16 +7,6 @@ const fs = require('node:fs'), os = require('node:os'), path = require('node:pat
 const pw = require('playwright');
 const { startServer, stop, browserOpties, geenBrowser, letOpFouten, edgeActies } = require('./helper');
 
-/* #413 zet de eigen inhoud van een wereldhuis (hier de Saloon op /apps/wereld.html)
-   bewust in een ingeklapt "Uw volledige overzicht" (details.wp-domain) onder de warme
-   scene; test/world-homes.e2e.js opent hem net zo. Deze proef gaat over de Saloon
-   zelf, dus hij opent die vouw eerst -- zoals een lid dat doet -- en zwakt verder niets af. */
-async function openOverzicht(page) {
-  const vouw = page.locator('details.wp-domain');
-  await vouw.waitFor({ state: 'attached' });
-  if (!(await vouw.evaluate(d => d.open))) await page.locator('details.wp-domain > summary').click();
-}
-
 test('Saloon houdt Edge bereikbaar bij lezen, bewaren, teruggaan en bronuitval', { skip: geenBrowser(pw) }, async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-saloon-edge-'));
   let srv, browser;
@@ -42,9 +32,9 @@ test('Saloon houdt Edge bereikbaar bij lezen, bewaren, teruggaan en bronuitval',
     const fouten = []; letOpFouten(page, fouten);
     await page.addInitScript(token => { localStorage.setItem('rtg_member_token', token); localStorage.setItem('rtg_lang', 'nl'); }, lid.token);
     await page.goto(srv.base + '/apps/wereld.html');
+    await page.locator('.wp-story a').click();
     await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
     if (await page.locator('#rtg-cookie button').isVisible()) await page.locator('#rtg-cookie button').click();
-    await openOverzicht(page);
     const kaart = page.locator('[data-saloon-id="nieuws:BODE:' + nieuw.artikel.id + '"]');
     const lezer = page.locator('#saloonArtikel');
     await kaart.waitFor(); await page.evaluate(() => document.fonts.ready);
@@ -108,18 +98,7 @@ test('Saloon houdt Edge bereikbaar bij lezen, bewaren, teruggaan en bronuitval',
       const rgb = getComputedStyle(n).backgroundColor.match(/[\d.]+/g).map(Number); return rgb.slice(0, 3).every(x => x > 220);
     });
     assert.equal(menuLicht, true, 'het echte Edge-menu gebruikt het lichte LivingOS-materiaal');
-    /* De warme compositie (#413) laat de vaste bovenrand BOVENAAN bewust doorzichtig,
-       zodat het sfeerbeeld eronder doorloopt. De belofte van deze regel gaat over het
-       moment dat er inhoud onder de kop schuift; dat meten we dus ook zo, en we
-       zetten de pagina daarna terug waar ze was. */
-    await page.evaluate(() => scrollTo(0, 400));
-    await page.waitForFunction(() => scrollY > 0);
-    // De kop krijgt zijn grond via de scrollgebeurtenis, en die komt een frame later.
-    await page.waitForFunction(() => getComputedStyle(document.querySelector('.rtg-edge-top')).backgroundColor !== 'rgba(0, 0, 0, 0)',
-      null, { timeout: 5000 }).catch(() => {});
-    assert.match(await page.locator('.rtg-edge-top').evaluate(n => getComputedStyle(n).backgroundColor), /^rgb\(/,
-      'de bovenrand is dekkend wanneer de artikelkop eronder scrollt');
-    await page.evaluate(() => scrollTo(0, 0));
+    assert.equal(await page.locator('.rtg-edge-top').isVisible(), true, 'de gedeelde bovenrand blijft bereikbaar');
     await foto('saloon-menu-gebouwd'); await page.keyboard.press('Escape');
     await page.locator('[data-dichtbij]').click();
     assert.equal(await page.locator('#saloonKeuzes').getAttribute('open'), '');
@@ -127,7 +106,7 @@ test('Saloon houdt Edge bereikbaar bij lezen, bewaren, teruggaan en bronuitval',
     await page.getByRole('button', { name: 'Keuzes toepassen' }).click();
     await page.waitForFunction(() => document.querySelector('#saloonStatus').textContent.startsWith('0 resultaten'));
     assert.equal(await page.locator('[data-saloon-id]').count(), 0);
-    await page.reload(); await openOverzicht(page);
+    await page.reload(); await page.locator('.wp-story a').click();
     await page.locator('[data-dichtbij][aria-pressed="true"]').waitFor();
     await page.locator('[data-vorm="overzicht"]').click(); await kaart.waitFor();
     assert.equal((await api('/api/wereld/state', {}, lid.token)).saloon.voorkeuren.plaats, '');

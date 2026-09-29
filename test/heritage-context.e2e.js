@@ -18,13 +18,6 @@ test('Heritage context returns through real navigation without writes', async t 
       await page.goto(server.base + path);
       await page.waitForFunction(() => window.RTGRouteMemory && document.body.getAttribute('data-rtg-world-start') !== 'loading' && document.body.getAttribute('data-rtg-edge-2-rendered') === 'true', null, {timeout:geduld(12000)});
     }
-    /* Sinds de warme desktopstandaard (#413, shared/interface/world-presentation.js)
-       staat de eigen inhoud van een wereldhuis onder "Uw volledige overzicht"
-       (.wp-domain). Wie daar een tab kiest, opent dat overzicht eerst -- net als
-       test/world-homes.e2e.js. */
-    async function overzicht() {
-      if (await page.locator('.wp-domain:not([open])>summary').count()) await page.locator('.wp-domain>summary').click();
-    }
     async function returnTo(path) {
       await page.evaluate(() => window.RTGRouteMemory.save());
       await visit('/apps/bestanden.html');
@@ -59,7 +52,7 @@ test('Heritage context returns through real navigation without writes', async t 
       assert.deepEqual(writes,[]);
     });
     await t.test('Living restores its selected tab', async () => {
-      await visit('/apps/rtg.html'); await overzicht(); await page.click('[data-paneel="mensen"]');
+      await visit('/apps/rtg.html'); await page.locator('.wp-domain > summary').click(); await page.click('[data-paneel="mensen"]');
       await returnTo('/apps/rtg.html');
       await page.waitForFunction(() => document.querySelector('[data-paneel="mensen"]').classList.contains('actief'));
     });
@@ -73,7 +66,7 @@ test('Heritage context returns through real navigation without writes', async t 
     });
     await t.test('Work restores audience and respects a direct address', async () => {
       await visit('/apps/kantoor.html');
-      await overzicht();
+      await page.locator('.wp-domain > summary').click();
       await page.locator('#worldWorkDetails > summary').click();
       await page.click('[data-work-kies="ondernemers"]');
       await page.evaluate(() => history.replaceState(null,'',location.pathname));

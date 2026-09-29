@@ -69,16 +69,10 @@ test('werktafel op een telefoon: wereld open, erin, terug, Home -- en je blijft 
     }, token);
     await page.goto(srv.base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded', timeout: 45000 });
     await page.waitForSelector('#rtgCommand[data-stand="open"] .cmd-leeg', { timeout: 20000 });
+    await page.waitForSelector('body[data-rtg-desktop-state="ready"]');
     const label = () => page.evaluate(() => ({
       wereld: document.body.getAttribute('data-rtg-blad-wereld'),
-      /* Sinds de warme desktopstandaard (#413) draagt de Edge de wereldnaam als
-         eigen label (.wd-world-label, shared/interface/world-desktop-home.js) en
-         staat het oude ::after-label op content:none. Gemeten wordt wat er
-         staat: het label als het er is, anders het ::after. */
-      kop: (() => {
-        const l = document.querySelector('.rtg-edge-mark .wd-world-label');
-        return l ? JSON.stringify(l.textContent) : getComputedStyle(document.querySelector('.rtg-edge-mark'), '::after').content;
-      })()
+      kop: document.querySelector('.wd-world-label')?.textContent || ''
     }));
     assert.equal((await label()).wereld, 'geen', 'op het beginscherm kies je nog een wereld');
 
@@ -91,7 +85,7 @@ test('werktafel op een telefoon: wereld open, erin, terug, Home -- en je blijft 
     assert.ok(duur < 8000, 'TravelOS hing ' + duur + ' ms op het laadscherm (de noodtimer staat op 12 s)');
 
     // 4) De kop noemt de wereld waar je bent.
-    assert.deepEqual(await label(), { wereld: 'travel', kop: '"TravelOS"' });
+    assert.deepEqual(await label(), { wereld: 'travel', kop: 'TravelOS' });
 
     // 2) Terug binnen de wereld, en dan terug naar de lege tafel -- niet de app uit.
     await blad.locator('a[href="/apps/reisboek.html"]').first().click();
@@ -113,6 +107,7 @@ test('werktafel op een telefoon: wereld open, erin, terug, Home -- en je blijft 
        frame, niet zijn src-attribuut (bladhaak.js werkt dat niet bij). */
     await page.evaluate(() => { document.querySelector('.cmd-pane.actief iframe').contentWindow.location.href = '/apps/reizen.html'; });
     await page.waitForFunction(() => document.body.getAttribute('data-rtg-blad-wereld') === 'travel', null, { timeout: 20000 });
+    assert.equal(await page.evaluate(() => innerWidth), 390, 'het werkblad mag de mobiele viewport niet verbreden');
     await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="home"]').click();
     await page.waitForSelector('#rtgCommand .cmd-leeg', { timeout: 20000 });
     assert.equal(new URL(page.url()).pathname, '/apps/app.html', 'Home ging de schil uit');

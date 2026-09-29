@@ -5,7 +5,6 @@ body[data-rtg-desktop] .wd-shell>.wd-greeting h1{font:400 clamp(24px,2.4vw,36px)
 body[data-rtg-desktop] :is(.rtg-edge-side,.rtg-edge-crumbs,.rtg-edge-worldbar){display:none!important}
 body[data-rtg-layout="standard"][data-rtg-skin="heritage"][data-rtg-desktop] .rtg-edge-top{display:flex;align-items:center;padding-inline:40px!important;height:72px;min-height:64px;background:transparent!important;backdrop-filter:none!important;box-shadow:none!important;border-bottom:1px solid var(--wd-line)}
 body[data-rtg-desktop] .rtg-edge-top::after{display:none}
-body[data-rtg-layout="standard"][data-rtg-skin="heritage"][data-rtg-desktop][data-rtg-scrolled="true"] .rtg-edge-top{background:var(--rtg-world-bg)!important}
 body[data-rtg-desktop] .rtg-edge-mark{display:flex;align-items:center;flex:0 0 auto;border:0;font-size:36px;color:var(--wh-ink)!important;letter-spacing:-.04em}
 body[data-rtg-desktop] .rtg-edge-mark .wd-world-label{font:400 16px/1.4 Inter,sans-serif!important;margin-inline:24px;color:var(--rtg-world-ink)!important;letter-spacing:0;border-inline-start:1px solid var(--wd-line);padding-inline-start:24px}
 body[data-rtg-desktop] .rtg-edge-state{margin-inline-start:auto;font-size:10px}

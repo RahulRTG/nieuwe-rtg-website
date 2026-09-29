@@ -257,6 +257,49 @@ reden en een notitie in NORM.json (vervalt 2026-12-28). En
 `/journaal` (de server valt om) -- ook op de merge-base met main, dus niet van
 deze tak.
 
+## 2c. De vastlegging van 29 september 2026
+
+VERTROUWEN.json is nu wel vastgelegd, op een verse meetronde, een volle suite
+met routejournaal, een verse faalproef en een staatproef op een schone boom.
+Oud (df1a581a, 4738 routes) tegenover vastgelegd (5273 routes): bewezen 0 -> 0,
+verschaald 0 -> 0, verzwakt 4716 -> 5258, geschorst 0 -> 0, ongemeten 22 -> 15.
+Elke verzwakte route mist minstens een schakel; FAILURE (5178), STATE en
+SIDE_EFFECT (elk 4767) en AUDIT (4146) ontbreken het vaakst.
+
+**Vijf routes waren geschorst, en geen ervan terecht op dezelfde manier.**
+`bedrijf/werkruimte/maak` was een echte regressie: een retry met dezelfde
+sleutel maakte een tweede werkruimte, en krijgt nu 409 zonder token.
+`rtmail/imap/sleutel` (lid en zaak) geeft met opzet elke keer een verse
+sleutel en staat als `code-maker` in IDEMBESLUIT.json. `office/doos/sleutel`
+laat na een weigering met opzet een melding op het beveiligingsbord staan
+(`veilige-kant` in ROLLBACKBESLUIT.json). En `rtfos/vrijwilliger/account-los`
+werd geschorst op een eenmalige inrichting naast een deurteller -- de
+staatproef past de eerste-aanrakingsregel nu per collectie toe.
+
+**Drie meetfouten, gevonden doordat een getal niet klopte.** De staatproef
+berekende de voorwaardelijke klokruis en paste hem niet toe (de aanroep viel
+weg bij #95). De meetronde gaf de rol- en invoerproef een begrenzing van 8000
+POGINGEN terwijl de router er 8832 vraagt, zodat de laatste 108 routes in het
+alfabet stil buiten de ronde vielen. En de outputproef schreef zijn register
+op een journaal van een handvol losse toetsen terug van 5151 naar 420 routes;
+een journaal dat minder dan de helft van de vorige ronde dekt, wordt nu
+geweigerd.
+
+**Wat de besluiten de machine kosten.** `mutatiesZonderEnigeAs` gaat van 2757
+naar 2758. De as `herhaling` komt uit EXECUTION_MAP.json en telt alleen
+`beschermd`; de vier `code-maker`-besluiten van deze ronde (`rtmail/imap/sleutel`
+twee keer, `bedrijf/lid/aanmeld`, `bedrijf/mijn`) halen die as daar met opzet
+weg, want een route die elke keer iets nieuws hoort te geven is niet beschermd
+tegen een herhaling. Andere routes kregen hem er in dezelfde ronde bij; per
+saldo is het een. De weg omlaag is niet de besluiten terugdraaien maar die
+routes een andere as geven (een spoor of een gevolgmeting). De uitleg staat hier
+en niet in NORM.json omdat MACHINEDEKKING.json bij elke vastlegging in zijn
+geheel wordt herschreven, zoals in POLITIEK.md voor de kwestieroutes.
+
+**Na de merge met main** (#415) zijn de proefregisters formeel weer verouderd:
+ze zijn op de code van voor die merge gemeten. VERTROUWEN.json blijft op de
+vastlegging hierboven staan tot een volgende meetronde.
+
 ## 3. Tegenspraak is een eigen uitslag
 
 Naast groen en rood bestaat er een derde uitslag: TEGENSPRAAK. Een toets zegt

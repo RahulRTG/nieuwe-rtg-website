@@ -16,13 +16,17 @@
      6. de boardroom gebruikt de registerblik, en valt terug als het model geen
         gereedschap kan;
      7. CODE-AI-001: de lijst is JSON, geen gereedschap neemt een bestand aan, en
-        niets wordt gedeeld met het stuur.
+        niets wordt gedeeld met het stuur;
+     8-10. de kennisindex: een document is een bewering, noemt zijn registers,
+        en is zonder index `niet vast te stellen`.
 
    Nagetrokken met mutaties (elk zakt minstens een toets):
      a. `leesRegister` leest elk pad dat binnenkomt      -> toets 1 zakt
      b. `graadUitLeeftijd` zegt altijd `gemeten`                 -> toets 2 zakt
      c. de lus geeft ook de stuurgereedschappen mee      -> toets 4 zakt
      d. de lus slaat de contextsamensteller over         -> toets 5 zakt
+     e. zoekKennis brengt een document als `gemeten`     -> toets 8 zakt
+     f. de kop weegt niet meer zwaarder                  -> toets 9 zakt
 
    Draai los: node --test test/registerblik.test.js
    ========================================================================== */
@@ -116,7 +120,7 @@ test('4. de lus kent alleen de vijf leesgereedschappen', async () => {
   assert.equal(uit.stand, 'beantwoord');
   for (const p of model.gekregen) {
     assert.deepEqual(p.tools.map(t => t.name).sort(),
-      ['inspecteerRoute', 'vraagBewijsOp', 'vraagProductiestandOp', 'vraagVertrouwenOp', 'zoekRegister']);
+      ['inspecteerRoute', 'vraagBewijsOp', 'vraagProductiestandOp', 'vraagVertrouwenOp', 'zoekKennis', 'zoekRegister']);
   }
   const tweede = model.gekregen[2].messages.at(-1).content[0].content;
   assert.match(tweede, /onbekend gereedschap: doe/, 'een gevraagde doe wordt geweigerd als antwoord, niet uitgevoerd');
@@ -166,10 +170,49 @@ test('7. CODE-AI-001: alleen registers bij naam, en geen stuurgereedschap', () =
   const { TOOLS } = require('../server/kern/stuur/gereedschap');
   assert.ok(Object.values(REGISTERS).every(r => /\.json$/.test(r)), 'een register is JSON, nooit bron');
   assert.deepEqual(REGISTERBLIK_TOOLS.map(t => t.name).sort(),
-    ['inspecteerRoute', 'vraagBewijsOp', 'vraagProductiestandOp', 'vraagVertrouwenOp', 'zoekRegister'],
+    ['inspecteerRoute', 'vraagBewijsOp', 'vraagProductiestandOp', 'vraagVertrouwenOp', 'zoekKennis', 'zoekRegister'],
     'er is een registerblik-gereedschap bij of af. Neemt het een bestand aan? Dan hoort het bij de Architect en niet hier.');
   const velden = REGISTERBLIK_TOOLS.flatMap(t => Object.keys(t.input_schema.properties || {}));
   assert.ok(!velden.some(v => /bestand|file|pad_op_schijf|path/i.test(v)), 'geen gereedschap neemt een bestand aan: ' + velden.join(', '));
   const stuur = new Set(TOOLS.map(t => t.name));
   assert.ok(REGISTERBLIK_TOOLS.every(t => !stuur.has(t.name)), 'de registerblik deelt geen gereedschap met het stuur');
+});
+
+test('8. zoekKennis vindt het document, noemt de registers, en brengt het als bewering', () => {
+  const u = kijk('zoekKennis', { vraag: 'Waarom hebben we MONEY-012 zo gemaakt?' });
+  assert.equal(u.vondsten[0].document, 'docs/money-012.md', 'een code als MONEY-012 blijft een heel woord en vindt zijn eigen document');
+  assert.equal(u.graad, 'vermoed', 'een document is een bewering en geen meting');
+  assert.match(u.let, /toets/);
+  assert.ok(u.bron.register === 'KENNISINDEX.json' && u.bron.gemetenOp, 'de index draagt zijn leeftijd');
+  const code = kijk('zoekKennis', { vraag: 'CODE-AI-001 grens runtime bron' });
+  assert.ok(code.vondsten.some(v => v.noemt.bestanden.includes('test/codegrens.test.js')),
+    'een vondst noemt waar de werkelijkheid staat');
+  assert.match(kijk('zoekKennis', { vraag: '' }).reden, /vraag/);
+});
+
+test('9. zonder index is de kennis niet vast te stellen, en een kop weegt zwaarder dan een terloopse zin', () => {
+  const vorige = process.env.RTG_REGISTERWORTEL;
+  try {
+    process.env.RTG_REGISTERWORTEL = tijdelijkeWortel({});
+    assert.equal(kijk('zoekKennis', { vraag: 'terugstorting' }).stand, 'niet vast te stellen');
+    process.env.RTG_REGISTERWORTEL = tijdelijkeWortel({ 'KENNISINDEX.json': {
+      kop: { stempel: { op: new Date().toISOString(), commit: 'abc' } },
+      docs: [{ pad: 'A.md', titel: 'A' }, { pad: 'B.md', titel: 'B' }],
+      stukken: [
+        { d: 0, k: 'Iets anders', r: 1, t: 'Hier staat terloops het woord zakgeld tussen veel andere woorden over reizen en hotels.' },
+        { d: 1, k: 'Zakgeld', r: 1, t: 'Hier staat terloops het woord potje tussen veel andere woorden over reizen en hotels.' }] } });
+    const u = kijk('zoekKennis', { vraag: 'zakgeld' });
+    assert.equal(u.vondsten[0].document, 'B.md', 'waar een stuk OVER gaat weegt zwaarder dan wat er terloops in staat');
+  } finally {
+    if (vorige === undefined) delete process.env.RTG_REGISTERWORTEL; else process.env.RTG_REGISTERWORTEL = vorige;
+  }
+});
+
+test('10. de index knipt op koppen, slaat afdrukken over, en ziet geen kop in een codeblok', () => {
+  const { knip, AFDRUKKEN } = require('../scripts/kennisindex');
+  const s = knip('# Titel\n\nintro\n\n## Deel\n\n```\n# geen kop\n```\n\ntekst');
+  assert.deepEqual(s.map(x => x.k), ['Titel', 'Titel > Deel']);
+  assert.ok(AFDRUKKEN.has('BEWIJS.md'), 'een afdruk van een register is niet de bron');
+  const idx = require('../KENNISINDEX.json');
+  assert.ok(idx.kop.overgeslagen.some(o => o.pad === 'BEWIJS.md'), 'en het register zegt dat hij is overgeslagen');
 });

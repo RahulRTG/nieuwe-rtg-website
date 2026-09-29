@@ -140,6 +140,8 @@ const EIGENAAR = {
      bijkomen zonder dat iemand zegt wie ze bezit. */
   'VERANDERBEREIK-KENNIS.json': { schrijver: 'scripts/veranderbereik.js' },
   'VERANDERBEREIK-RONDE.json': { schrijver: 'scripts/veranderbereik.js' },
+  'KENNISINDEX.json': { schrijver: 'scripts/kennisindex.js',
+    waarom: 'kennisindex.js knipt de documenten per kop op voor de registerblik; server/kern/registerblik/kennis.js leest het via bronnen.js, want de runtime-AI leest registers en nooit een .md (CODE-AI-001).' },
   /* DE EDGE (EDGE.md par. 9). Twee meters en elk zijn eigen bestand: de kaart
      leest de BRON (wie schrijft, beslist en leest), de dekking een echte
      BROWSER (welk veld heeft elk scherm, en waar komt het vandaan). Hun ratels

@@ -105,7 +105,7 @@ schatting. Komt het codewoord niet terug, dan kapt de server af.
 
 Een klein model weet niet hoe RTG ervoor staat, en hoeft dat ook niet te weten.
 De boardroom-Rahul (`/api/office/boardroom/ai`) krijgt vijf gereedschappen die
-RTG's eigen registers LEZEN (`server/kern/registerblik/`):
+RTG's eigen registers LEZEN (`server/kern/registerblik/`), plus een zesde dat de documenten doorzoekt:
 
 | Gereedschap | Leest | Zegt |
 |---|---|---|
@@ -114,11 +114,25 @@ RTG's eigen registers LEZEN (`server/kern/registerblik/`):
 | `vraagBewijsOp` | `BEWIJSSCHULD.json` | wat RTG weet dat het nog niet heeft gemeten, met de sluitweg |
 | `vraagProductiestandOp` | `.release/productie-status.json` | de release-uitspraak, doorgegeven en nooit samengesteld |
 | `zoekRegister` | `EXECUTION_MAP.json`, `BEWIJSSCHULD.json` | routes en posten bij een woord |
+| `zoekKennis` | `KENNISINDEX.json` | de passende stukken uit de documenten, met de registers en bestanden die ze noemen |
 
 De gereedschappen zijn rijk, zodat het redeneerprobleem klein blijft:
 `inspecteerRoute` legt zelf drie registers naast elkaar. Elk antwoord noemt
 zijn register, hoe oud de meting is en zijn graad. Een meting die ouder is dan
 haar houdbaarheid zakt naar `vermoed`: vervallen bewijs is geen bewijs.
+
+**De kennisindex** (`npm run kennisindex`, `KENNISINDEX.json`) knipt de
+documenten van dit huis op per kop. Productie krijgt geen enkel `.md` mee, en
+de runtime-AI leest alleen registers, dus de index is een register. Er zijn
+geen embeddings: een woordindex (BM25) over 162 documenten is uit te leggen en
+te beproeven, en een code als `MONEY-012` blijft een heel woord. Afdrukken die
+een script uit een register schrijft (`BEWIJS.md`, `FUNCTIES.md`, ...) staan er
+met opzet niet in: het register zelf is de bron. Een vondst draagt altijd de
+graad `vermoed`, want een document is een bewering. Wat het stuk NOEMT
+(registers, bestanden, commando's, datums) staat erbij, zodat Rahul de bewering
+aan de huidige werkelijkheid kan toetsen. De index veroudert met de documenten
+en niet met de code; hij draagt zijn eigen stempel en de registerblik noemt die
+leeftijd bij elke vondst.
 
 Grenzen:
 

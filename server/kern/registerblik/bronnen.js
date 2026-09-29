@@ -24,7 +24,8 @@ const REGISTERS = Object.freeze({
   vertrouwen: 'VERTROUWEN.json',
   routebron: 'ROUTEBRON.json',
   bewijsschuld: 'BEWIJSSCHULD.json',
-  productiestand: '.release/productie-status.json'
+  productiestand: '.release/productie-status.json',
+  kennisindex: 'KENNISINDEX.json'
 });
 
 /* Hoe oud een meting mag zijn voor hij als vervallen geldt, tenzij het register

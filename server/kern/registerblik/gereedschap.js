@@ -1,4 +1,4 @@
-/* DE REGISTERBLIK -- vijf gereedschappen die RTG's eigen waarheid LEZEN.
+/* DE REGISTERBLIK -- zes gereedschappen die RTG's eigen waarheid LEZEN.
 
    Het kleine model hoeft niet te weten hoe RTG ervoor staat; het zoekt het op.
    Daarom zijn de gereedschappen RIJK en het redeneerprobleem KLEIN:
@@ -34,6 +34,9 @@ const REGISTERBLIK_TOOLS = [
   { name: 'vraagProductiestandOp', description: 'De laatste release-uitspraak zoals scripts/productie-status.js hem schreef: ' +
       'de stand en de blokkades. Ontbreekt die meting in deze omgeving, dan zegt het dat.',
     input_schema: { type: 'object', properties: {} } },
+  { name: 'zoekKennis', description: 'Zoek in de documenten van RTG (besluiten, grenzen, waarom iets zo is gebouwd). ' +
+      'Je krijgt de passende stukken met de registers die ze noemen: een document is een bewering, toets hem daaraan.',
+    input_schema: { type: 'object', properties: { vraag: { type: 'string', description: 'de vraag of een paar woorden, bijvoorbeeld "waarom MONEY-012"' } }, required: ['vraag'] } },
   { name: 'zoekRegister', description: 'Zoek routes en bewijsposten die bij een woord horen (bijvoorbeeld "wallet" of "incasso"), ' +
       'om daarna met inspecteerRoute verder te kijken.',
     input_schema: { type: 'object', properties: { term: { type: 'string' } }, required: ['term'] } }
@@ -124,7 +127,8 @@ function zoekRegister({ term }) {
   return uit;
 }
 
-const HANDEN = { inspecteerRoute, vraagVertrouwenOp, vraagBewijsOp, vraagProductiestandOp, zoekRegister };
+const { zoekKennis } = require('./kennis');
+const HANDEN = { inspecteerRoute, vraagVertrouwenOp, vraagBewijsOp, vraagProductiestandOp, zoekRegister, zoekKennis };
 
 /* De enige ingang. Een onbekend gereedschap is een antwoord en geen crash. */
 function kijk(naam, invoer) {

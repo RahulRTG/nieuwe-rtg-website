@@ -759,6 +759,10 @@ const EIGEN_MODULE = new Map([
      bevestigd. */
   ['werktafel-lussen.e2e.js', ['public/shared/command/bladstand.js']],
   // De kleurproef bezoekt echte apps; muteer hun wereldtoewijzing, niet hun API-antwoorden.
+  ['living-experience.test.js', ['scripts/lib/experience/compiler.js']],
+  ['experience-intent.test.js', ['public/shared/experience-intent.js']],
+  ['experience-dinner.test.js', ['server/kern/reservering/capaciteit.js']],
+  ['experience-dinner.e2e.js', ['public/apps/foodcourt-intent.js']],
   ['world-palette.e2e.js', ['public/shared/rtg-world-identity.js']],
   /* KNOPPEN DIE NIET KUNNEN, ZEGGEN WAAROM. Zes plekken in een toets. De
      gedeelde kantoor-inlog lag voor de hand, maar daar overleefde de toets de

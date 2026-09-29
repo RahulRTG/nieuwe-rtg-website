@@ -2,6 +2,7 @@
    tafelplanning - van losse aanvragen naar een gedekte avond, met walk-ins
    en komst-meldingen. Verbatim afgesplitst uit kern/ervaring.js. */
 const beleid = require('../reservering/beleid');
+const capaciteit = require('../reservering/capaciteit');
 
 module.exports = (ctx) => {
   const { db, save, findSupplier, notify, notifySupplier, sseToCustomer, sseToSupplier, sseToOffice, zijnVrienden, ticketsVoorSlot, optieAan,
@@ -29,6 +30,9 @@ module.exports = (ctx) => {
     if ((db.data.reserveringen || []).some(r => r.customerKey === sess.key && r.supplierCode === s.code &&
       r.datum === datum && r.tijd === tijd && ['aangevraagd', 'bevestigd'].includes(r.status)))
       return { status: 409, error: 'U heeft hier al een reservering voor dit moment.' };
+    // Beschikbaarheid opnieuw beoordelen bij uitvoering, niet alleen bij tonen.
+    if (!capaciteit.past(s,db.data.reserveringen,datum,tijd,personen))
+      return {status:409,error:'Dit tijdstip is inmiddels vol. Kies een andere tijd.'};
     const r = {
       id: id(), supplierCode: s.code, supplierName: s.name,
       customerKey: sess.key, customerCodename: codename, tier: sess.tier,
@@ -47,10 +51,10 @@ module.exports = (ctx) => {
     sseToOffice('sync', { scope: 'orders' });
     return { ok: true, reservering: r };
   }
-  function mijnReserveringen(key) {
+  function mijnReserveringen(key, limiet = 25) {
     const mijn = (db.data.reserveringen || []).filter(r => r.customerKey === key);
     rijpMaak(mijn);
-    return mijn.slice(0, 25);
+    return mijn.slice(0, limiet);
   }
   function annuleerReservering(key, rid) {
     const r = (db.data.reserveringen || []).find(x => x.id === rid && x.customerKey === key);

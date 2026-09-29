@@ -1211,7 +1211,8 @@ lidDeps.zijnVrienden = zijnVrienden;
    alleen-lezen laag met eigen RTG-boekingen. Ligt hier omdat hij
    codenaamVan uit de sociale kern nodig heeft. */
 Object.assign(agenda, require('./kern/agenda-pro').maakAgendaPro({
-  db, save, bijeen, inBundel, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer, boekingenVanKlant }));
+  db, save, bijeen, inBundel, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer, boekingenVanKlant,
+  reserveringenVanKlant: key => mijnReserveringen(key, Infinity) }));
 /* Notities & Taken (kern/notities.js): het bord met notities en lijstjes.
    Krijgt de agenda mee, want een notitie met datum en tijd wordt een
    gekoppelde afspraak -- een wekkerlaag, niet drie.

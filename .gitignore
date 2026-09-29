@@ -130,3 +130,6 @@ zzijk*
 artifacts/desktop-standard/
 artifacts/mobile-content/
 artifacts/world-palette/
+
+# Local Experience Observatory and measured test logs
+artifacts/experience/

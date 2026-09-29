@@ -65,6 +65,11 @@
   .slot:hover:not(:disabled){border-color:var(--gold);}
   .slot:disabled{opacity:.35;cursor:not-allowed;text-decoration:line-through;}
   .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:0;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
+  .dinner-context{margin:1rem 0;padding:1rem;border:1px solid var(--line);line-height:1.6;}
+  .dinner-context button{margin:.5rem;}
+  #blad .paneel{padding-bottom:calc(140px + env(safe-area-inset-bottom,0px));}
+  #rReview,#rStatus{margin:1rem 0;line-height:1.6;}
+  [hidden]{display:none!important;}
   .inlog{max-width:420px;margin:4rem auto;text-align:center;padding:0 1.2rem;}
   .inlog a{color:var(--rtg-leesgoud,var(--gold));border-bottom:1px solid var(--gold);}
 </style>
@@ -104,6 +109,11 @@
   </section>
   <nav class="night-switch" aria-label="Kies wat u wilt ontdekken"><a href="/apps/foodcourt.html" aria-current="page">Restaurants</a><a href="/apps/uitgaan.html#ontdekken">Bars en avonden</a></nav>
   <input class="night-search" id="avondZoek" type="search" maxlength="80" placeholder="Zoek op restaurant, keuken of plaats" aria-label="Restaurants zoeken">
+  <section aria-label="Uw avond" class="dinner-context">
+    <label><input id="intentRemember" type="checkbox"> Bewaar mijn keuzes voor deze avond</label>
+    <button type="button" class="terug" id="intentForget">Nieuwe avond</button>
+    <p id="intentStatus" role="status">U bepaalt of datum, gezelschap en zoekkeuzes tijdelijk meegaan.</p>
+  </section>
   <h2 class="night-title">Voor u gevonden</h2>
   <div class="chips" id="keukens"></div>
   <div class="lijst" id="lijst"></div>
@@ -117,16 +127,26 @@
   <div class="paneel">
     <div id="bladDeal"></div>
     <div class="rij" style="margin-top:0.75rem;gap:1rem;align-items:flex-end;">
-      <div><div class="lbl">Datum</div><input class="veld" id="rDatum" type="date"></div>
-      <div><div class="lbl">Gezelschap</div><div class="step"><button type="button" id="rMin">−</button><span id="rAantal" style="min-width:2.5rem;text-align:center;font-size:1.05rem;">2</span><button type="button" id="rPlus">+</button></div></div>
+      <div><label class="lbl" for="rDatum">Datum</label><input class="veld" id="rDatum" type="date"></div>
+      <div><div class="lbl">Gezelschap</div><div class="step"><button type="button" id="rMin" aria-label="Een persoon minder">−</button><span id="rAantal" style="min-width:2.5rem;text-align:center;font-size:1.05rem;">2</span><button type="button" id="rPlus" aria-label="Een persoon meer">+</button></div></div>
     </div>
     <div class="sec">Vrije tijden</div>
     <div id="rSlots"><div class="leeg">Kies een datum.</div></div>
+    <section id="rReview" hidden aria-label="Controleer uw aanvraag">
+      <p id="rSummary"></p><p>Het restaurant ontvangt uw aanvraag en bevestigt zelf. U heeft nu nog niets aangevraagd.</p>
+      <button class="terug" type="button" id="rSubmit">Vraag deze tafel aan</button>
+    </section>
+    <p id="rStatus" role="status" aria-live="polite"></p>
+    <button class="terug" type="button" id="rCheck" hidden>Controleer mijn aanvraag</button>
+    <button class="terug" type="button" id="rRetry" hidden>Laad vrije tijden opnieuw</button>
+    <a id="rAgenda" class="terug" href="/apps/agenda.html" hidden>Bekijk in mijn agenda</a>
   </div>
 </section>
 
 <div class="melding" id="melding" role="status"></div>
 <script src="/shared/uitvoer.js"></script>
+<script src="/shared/experience-intent.js"></script>
+<script src="/apps/foodcourt-intent.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -140,15 +160,16 @@ const api = (pad, body, herkans) => fetch(pad, {
   // 428 = de gegevenspoort: Rahul vraagt wat er mist en daarna gaat dit gewoon door
   const p = herkans ? null : (window.RTGGegevensPoort && window.RTGGegevensPoort.vang(d, r.status, () => api(pad, body, true), api));
   if (p) return p;
-  if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+  if (!r.ok) { const e = new Error(d.error || 'Er ging iets mis.'); e.status = r.status; throw e; } return d; });
 
 if (!TOKEN) {
   $('#main').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log eerst in</h2>'+
     '<p style="color:var(--muted);margin-top:0.5rem;line-height:1.6;">De Food Court is er voor leden. Open de app en log in met je RTG-account.</p>'+
     '<p class="h-mt100"><a href="/apps/app.html">Naar de app →</a></p></div>';
-} else { laad(); }
+}
 
 let ALLE = [], keuken = '', zoek = '';
+let HUIDIG = null, AANTAL = 2, DATUM = '', TIJD = '', bezig = false, laadVersie = 0;
 /* Meenemen (shared/uitvoer.js): de restaurantlijst met de velden die de kaart
    toont. Wie een tafel zoekt, wil die lijst ook naast zich kunnen leggen. */
 if (window.RTGUitvoer) RTGUitvoer.bron(() => ({
@@ -158,11 +179,11 @@ if (window.RTGUitvoer) RTGUitvoer.bron(() => ({
 }));
 async function laad(){
   let d;
-  try { d = await api('/api/foodcourt'); } catch(e){ $('#lijst').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  try { d = await api('/api/foodcourt'); } catch(e){ $('#lijst').innerHTML = '<div class="leeg">'+esc(e.message)+'</div><button class="terug" id="zoekOpnieuw">Opnieuw laden</button>'; $('#zoekOpnieuw').addEventListener('click',laad); return; }
   ALLE = d.restaurants || [];
   $('#keukens').innerHTML = '<button class="chip'+(keuken===''?' aan':'')+'" data-k="">Alle keukens</button>' +
     (d.keukens||[]).map(k => '<button class="chip'+(keuken===k?' aan':'')+'" data-k="'+esc(k)+'">'+esc(k)+'</button>').join('');
-  $('#keukens').querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => { keuken = b.dataset.k; tekenRestaurants(); }));
+  $('#keukens').querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => { keuken = b.dataset.k; RTGDinnerIntent.changed(); tekenRestaurants(); }));
   tekenRestaurants();
 }
 function tekenRestaurants(){
@@ -180,53 +201,98 @@ function tekenRestaurants(){
   $('#lijst').querySelectorAll('.resto').forEach(b => b.addEventListener('click', () => openResto(b.dataset)));
 }
 const avondZoek = $('#avondZoek');
-if (avondZoek) avondZoek.addEventListener('input', function(){ zoek = this.value.trim(); tekenRestaurants(); });
+if (avondZoek) avondZoek.addEventListener('input', function(){ zoek = this.value.trim(); RTGDinnerIntent.changed(); tekenRestaurants(); });
 
-let HUIDIG = null, AANTAL = 2;
-function openResto(ds){
-  HUIDIG = ds.code; AANTAL = 2;
-  $('#bladNaam').textContent = ds.naam;
-  $('#bladMeta').textContent = ds.keuken;
-  $('#bladDeal').innerHTML = ds.deal ? '<span class="deal">'+esc(ds.deal)+'</span>' : '';
-  $('#rAantal').textContent = AANTAL;
-  const t = new Date(); const iso = t.toISOString().slice(0,10);
-  $('#rDatum').min = iso; $('#rDatum').value = iso;
-  $('#blad').classList.add('open');
-  laadTijden();
+function datumVandaag(){ const t = new Date(); return [t.getFullYear(),String(t.getMonth()+1).padStart(2,'0'),String(t.getDate()).padStart(2,'0')].join('-'); }
+function contextLees(){ return {date:DATUM,participants:AANTAL,search:zoek,cuisine:keuken}; }
+function contextZet(v){
+  DATUM = v.date && v.date >= datumVandaag() ? v.date : datumVandaag(); AANTAL = v.participants || 2;
+  zoek = v.search || ''; keuken = v.cuisine || ''; $('#avondZoek').value = zoek;
+  $('#rDatum').value = DATUM; $('#rAantal').textContent = AANTAL;
+  tekenRestaurants(); if (HUIDIG && $('#blad').classList.contains('open')) laadTijden();
 }
-/* Escape sluit het reserveerblad via dezelfde weg terug als de knop erop;
-   zonder dit zat een toetsenbordgebruiker erachter (gemeten 27 september 2026). */
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && $('#blad').classList.contains('open')) $('#bladTerug').click();
-});
+function openResto(ds){
+  HUIDIG = ds.code; DATUM = DATUM && DATUM >= datumVandaag() ? DATUM : datumVandaag();
+  $('#bladNaam').textContent = ds.naam; $('#bladMeta').textContent = ds.keuken;
+  $('#bladDeal').innerHTML = ds.deal ? '<span class="deal">'+esc(ds.deal)+'</span>' : '';
+  $('#rAantal').textContent = AANTAL; $('#rDatum').min = datumVandaag(); $('#rDatum').value = DATUM;
+  $('#blad').classList.add('open'); $('#bladTerug').focus(); laadTijden();
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !bezig) $('#bladTerug').click(); });
 async function laadTijden(){
+  if (bezig) return;
+  const versie = ++laadVersie;
+  TIJD = ''; $('#rReview').hidden = true; $('#rCheck').hidden = true; $('#rAgenda').hidden = true;
+  $('#rRetry').hidden = true; $('#rStatus').textContent = '';
   $('#rSlots').innerHTML = '<div class="leeg">Laden...</div>';
   let d;
-  try { d = await api('/api/foodcourt/tijden', { code: HUIDIG, datum: $('#rDatum').value, personen: AANTAL }); }
-  catch(e){ $('#rSlots').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
-  if (!d.open){ $('#rSlots').innerHTML = '<div class="leeg">Dit restaurant neemt nu geen reserveringen aan.</div>'; return; }
-  const diensten = [['lunch','Lunch'],['diner','Diner']];
+  try { d = await api('/api/foodcourt/tijden',{code:HUIDIG,datum:DATUM,personen:AANTAL}); }
+  catch(e){ if (versie !== laadVersie) return; $('#rSlots').textContent = e.message; $('#rRetry').hidden = false; return; }
+  if (versie !== laadVersie) return;
+  if (!d.open){ $('#rSlots').textContent = 'Dit restaurant neemt nu geen reserveringen aan. Kies een andere zaak.'; return; }
   let html = '';
-  for (const [id,label] of diensten){
-    const sl = d.slots.filter(s => s.dienst === id);
-    if (!sl.length) continue;
-    html += '<div class="dienst">'+label+'</div><div class="slots">'+
-      sl.map(s => '<button class="slot" data-tijd="'+s.tijd+'"'+(s.vol?' disabled':'')+'>'+s.tijd+'</button>').join('')+'</div>';
+  for (const [id,label] of [['lunch','Lunch'],['diner','Diner']]) {
+    const sl = d.slots.filter(s => s.dienst === id); if (!sl.length) continue;
+    html += '<div class="dienst">'+label+'</div><div class="slots">'+sl.map(s =>
+      '<button class="slot" data-tijd="'+s.tijd+'"'+(s.vol?' disabled':'')+'>'+s.tijd+'</button>').join('')+'</div>';
   }
-  $('#rSlots').innerHTML = html || '<div class="leeg">Geen vrije tijden meer op deze dag. Kies een andere datum.</div>';
-  $('#rSlots').querySelectorAll('.slot:not([disabled])').forEach(b => b.addEventListener('click', () => reserveer(b.dataset.tijd)));
+  $('#rSlots').innerHTML = html || '<div class="leeg">Geen vrije tijden. Kies een andere datum.</div>';
+  $('#rSlots').querySelectorAll('.slot:not([disabled])').forEach(b => b.addEventListener('click',() => {
+    TIJD = b.dataset.tijd; $('#rReview').hidden = false;
+    $('#rSummary').textContent = $('#bladNaam').textContent+' · '+DATUM+' · '+TIJD+' · '+AANTAL+' personen';
+    $('#rSubmit').focus();
+  }));
 }
-async function reserveer(tijd){
+function slotVast(aan){
+  bezig = aan;
+  ['rDatum','rMin','rPlus','rSubmit','bladTerug'].forEach(id => $('#'+id).disabled = aan);
+  $('#rSlots').querySelectorAll('button').forEach(b => { if (aan) b.disabled = true; });
+}
+function ontvangen(r){
+  $('#rReview').hidden = true; $('#rCheck').hidden = true; $('#rRetry').hidden = true;
+  $('#rStatus').textContent = r.status === 'bevestigd' ? 'Uw tafel is bevestigd door het restaurant.' :
+    r.status === 'aangevraagd' ? 'Aanvraag ontvangen. Het restaurant heeft nog niet bevestigd.' : 'De actuele status is: '+r.status+'.';
+  $('#rAgenda').hidden = false; $('#rAgenda').href = '/apps/agenda.html?datum='+encodeURIComponent(r.datum);
+  RTGDinnerIntent.finish();
+}
+async function controleer(){
+  $('#rCheck').disabled = true;
   try {
-    await api('/api/reserveer', { supplierCode: HUIDIG, datum: $('#rDatum').value, tijd, personen: AANTAL });
-    $('#blad').classList.remove('open');
-    meld('Reservering aangevraagd voor ' + tijd + '. Het restaurant bevestigt hem.');
-  } catch(e){ meld(e.message); }
+    const d = await api('/api/reserveringen/mijn');
+    const r = (d.reserveringen||[]).find(x => x.supplierCode === HUIDIG && x.datum === DATUM && x.tijd === TIJD);
+    if (r) {
+      if (r.personen === AANTAL) ontvangen(r);
+      else {
+        $('#rStatus').textContent = 'Er bestaat al een aanvraag voor '+r.personen+' personen. Uw nieuwe aantal is niet doorgevoerd. Bekijk de bestaande aanvraag in uw agenda.';
+        $('#rAgenda').hidden = false; $('#rAgenda').href = '/apps/agenda.html?datum='+encodeURIComponent(r.datum);
+      }
+    }
+    else { $('#rStatus').textContent = 'Geen overeenkomende aanvraag gevonden. Controleer de vrije tijden voordat u opnieuw aanvraagt.'; $('#rRetry').hidden = false; }
+  } catch(e){ $('#rStatus').textContent = 'De uitkomst is nog onbekend. Uw invoer blijft staan. Controleer opnieuw zodra u verbinding heeft.'; }
+  finally { $('#rCheck').disabled = false; }
 }
-$('#bladTerug').addEventListener('click', () => $('#blad').classList.remove('open'));
-$('#rDatum').addEventListener('change', laadTijden);
-$('#rMin').addEventListener('click', () => { AANTAL = Math.max(1, AANTAL-1); $('#rAantal').textContent = AANTAL; laadTijden(); });
-$('#rPlus').addEventListener('click', () => { AANTAL = Math.min(20, AANTAL+1); $('#rAantal').textContent = AANTAL; laadTijden(); });
+async function reserveer(){
+  if (bezig || !TIJD) return;
+  slotVast(true); $('#rStatus').textContent = 'Aanvraag wordt verstuurd. Nog niet bevestigd.';
+  try {
+    const d = await api('/api/reserveer',{supplierCode:HUIDIG,datum:DATUM,tijd:TIJD,personen:AANTAL});
+    if (!d.reservering || !d.reservering.id) throw new Error('Geen bevestiging ontvangen.');
+    ontvangen(d.reservering);
+  } catch(e){
+    $('#rReview').hidden = true;
+    $('#rStatus').textContent = e.status ? e.message : 'De uitkomst is onbekend. Controleer eerst uw aanvraag; uw invoer blijft staan.';
+    $('#rCheck').hidden = false;
+    if (e.status && e.status !== 409) $('#rRetry').hidden = false;
+  } finally { slotVast(false); }
+}
+$('#rSubmit').addEventListener('click',reserveer);
+$('#rCheck').addEventListener('click',controleer);
+$('#rRetry').addEventListener('click',laadTijden);
+$('#bladTerug').addEventListener('click',() => { if (!bezig) { $('#blad').classList.remove('open'); const b = $('#lijst').querySelector('[data-code="'+HUIDIG+'"]'); if(b) b.focus(); } });
+$('#rDatum').addEventListener('change',() => { DATUM = $('#rDatum').value; RTGDinnerIntent.changed(); laadTijden(); });
+$('#rMin').addEventListener('click',() => { AANTAL = Math.max(1,AANTAL-1); $('#rAantal').textContent = AANTAL; RTGDinnerIntent.changed(); laadTijden(); });
+$('#rPlus').addEventListener('click',() => { AANTAL = Math.min(20,AANTAL+1); $('#rAantal').textContent = AANTAL; RTGDinnerIntent.changed(); laadTijden(); });
+if (TOKEN) RTGDinnerIntent.init(TOKEN,contextLees,contextZet).then(laad);
 </script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

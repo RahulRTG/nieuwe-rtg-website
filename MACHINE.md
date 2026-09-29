@@ -318,7 +318,7 @@ betekenissen).
   zonder terugweg is een tweede poging bovenop een half effect.
 - **Runtime evidence scores.** `VERTROUWEN.json` staat op
   <!--getal:vertrouwen.bewezen-->0<!--/getal--> bewezen en
-  <!--getal:vertrouwen.routes-->4716<!--/getal--> verzwakt. Een
+  <!--getal:vertrouwen.routes-->5258<!--/getal--> verzwakt. Een
   promotiesysteem boven nul bewijs promoveert niets; eerst één keten écht
   bewijzen, dan het systeem eromheen.
 - **Routes als bijproduct.** Kan pas als de capability-laag is **afgeleid**;

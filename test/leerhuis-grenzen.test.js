@@ -635,3 +635,54 @@ test('24. B-UI inrichten: de manager ziet de rollen en welk startplan er ligt, d
   assert.equal(l.curriculumWerk(ORG, P.Q).ok, true, 'de kwaliteitsautoriteit mag curricula van stand veranderen en ziet ze dus');
   assert.ok(!JSON.stringify(l.curriculumWerk(ORG, P.CO)).includes(P.N), 'geen leerling in het curriculumwerk');
 });
+
+test('25. aanwijzen op codenaam: alleen de eigenaar, met reden, en niets gebruikt zonder vaststaand spoor', async () => {
+  const { maakAanwijzen } = require('../server/kern/leerhuis/aanwijzen');
+  const w = basis();
+  const st = w.lh.stand(ORG);
+  let gezocht = 0; let spoor = []; let spoorOk = true;
+  const a = maakAanwijzen({
+    keyVanCodenaam: async (c) => { gezocht++; return c === 'Blauwe Reiger' ? { key: 'user-77' } : null; },
+    idVanKey: (k) => { const m = /^user-(\d+)$/.exec(String(k)); return m ? Number(m[1]) : null; },
+    noteerVast: async (r) => { spoor.push(r); return spoorOk ? { ok: true } : { ok: false, status: 503 }; }
+  });
+  const zet = { codenaam: 'Blauwe Reiger', soort: 'EMPLOYEE', reden: 'nieuwe collega bij Operations' };
+
+  const door = await a(st, 'relatieZet', { persoon: 'lid:5', soort: 'EMPLOYEE' }, P.KO);
+  assert.equal(door.ok, true, 'zonder codenaam gaat de invoer ongewijzigd door');
+  assert.equal(gezocht + spoor.length, 0);
+
+  const vreemd = await a(st, 'relatieZet', zet, P.KO);
+  assert.equal(vreemd.status, 403, 'wie geen eigenaar is, kan geen codenaam nagaan');
+  assert.equal(gezocht + spoor.length, 0, 'en er is dus ook niet gezocht');
+  const zonder = await a(st, 'relatieZet', Object.assign({}, zet, { reden: '' }), P.E);
+  assert.equal(zonder.status, 400, 'zonder reden geen opzoeking');
+  assert.equal(gezocht, 0);
+
+  spoorOk = false;
+  const geenSpoor = await a(st, 'relatieZet', zet, P.E);
+  assert.equal(geenSpoor.ok, false, 'staat het spoor niet vast, dan gaat er niets door');
+  assert.ok(!geenSpoor.invoer, 'en de sleutel komt niet bij de handeling');
+  spoorOk = true; spoor = [];
+
+  const goed = await a(st, 'relatieZet', Object.assign({}, zet, { managerCodenaam: 'Blauwe Reiger' }), P.E);
+  assert.equal(goed.ok, true);
+  assert.equal(goed.invoer.persoon, 'lid:77');
+  assert.equal(goed.invoer.manager, 'lid:77');
+  assert.ok(!('codenaam' in goed.invoer) && !('reden' in goed.invoer), 'de handeling krijgt een sleutel en geen codenaam of reden');
+  assert.equal(spoor.length, 2, 'elke opzoeking een eigen regel');
+  assert.equal(spoor[0].waarom, 'nieuwe collega bij Operations');
+  assert.equal(spoor[0].over.codenaam, 'Blauwe Reiger');
+  assert.equal(spoor[0].over.id, 77, 'met het id van het lid, zodat hij op zijn eigen inzagekaart staat');
+
+  const onbekend = await a(st, 'bestuurZet', { codenaam: 'Niemand Hier', rol: 'ASSESSOR', reden: 'nieuwe assessor' }, P.E);
+  assert.equal(onbekend.status, 404);
+  assert.equal(spoor.length, 2, 'een codenaam die niet bestaat, raakt geen lid en schrijft geen regel');
+  const l = w.lh.lees;
+  assert.equal(l.eigenaarWerk(ORG, P.CO).ok, false, 'alleen de eigenaar ziet het beheer');
+  const e = l.eigenaarWerk(ORG, P.E);
+  assert.ok(e.BESTUUR.some(x => x.persoon === P.KO && x.rollen.includes('KNOWLEDGE_OWNER')), 'wie welke bestuursrol draagt');
+  assert.deepEqual(e.relatieSoorten, require('../server/kern/leerhuis/standen').RELATIESOORTEN, 'geen eigen kopie op het scherm');
+  const ander = await a(st, 'rolToewijzen', { codenaam: 'Blauwe Reiger', rol: 'ops', reden: 'nieuwe rol' }, P.E);
+  assert.deepEqual(ander.invoer, { codenaam: 'Blauwe Reiger', rol: 'ops', reden: 'nieuwe rol' }, 'alleen relatie en bestuursrol lopen via de codenaam');
+});

@@ -101,8 +101,8 @@
   function laad() {
     if (!ORG) return Promise.resolve();
     try { localStorage.setItem(BEWAAR, ORG); } catch (e) {}
-    return Promise.all([lees('trainerCockpit'), lees('assessorWerk'), lees('kennisWerk'), lees('managerCockpit'), lees('curriculumWerk')]).then(function (r) {
-      var t = r[0], a = r[1], w = r[2], m = r[3], c = r[4];
+    return Promise.all([lees('trainerCockpit'), lees('assessorWerk'), lees('kennisWerk'), lees('managerCockpit'), lees('curriculumWerk'), lees('eigenaarWerk')]).then(function (r) {
+      var t = r[0], a = r[1], w = r[2], m = r[3], c = r[4], e = r[5];
       /* De managercockpit kent geen `ok`: wie geen team heeft, heeft hier niets in te richten. */
       var team = !!(m && m.TEAM && m.TEAM.length);
       $('trainerBlok').hidden = !(t && t.ok); if (t && t.ok) K.trainer(t);
@@ -110,10 +110,11 @@
       $('kennisBlok').hidden = !(w && w.ok); if (w && w.ok) K.kennis(w);
       $('managerBlok').hidden = !team; if (team) I.manager(m);
       $('curriculumBlok').hidden = !(c && c.ok); if (c && c.ok) I.curriculum(c);
-      $('geenRol').hidden = !!((t && t.ok) || (a && a.ok) || (w && w.ok) || team || (c && c.ok));
+      $('eigenaarBlok').hidden = !(e && e.ok); if (e && e.ok) I.eigenaar(e);
+      $('geenRol').hidden = !!((t && t.ok) || (a && a.ok) || (w && w.ok) || team || (c && c.ok) || (e && e.ok));
       if (/^Bezig|^Leerhuis .* wordt geladen/.test($('melding').textContent)) meld('Leerhuis ' + ORG + '.');
     }).catch(function (e) {
-      ['trainerBlok', 'assessorBlok', 'kennisBlok', 'managerBlok', 'curriculumBlok', 'geenRol'].forEach(function (id) { $(id).hidden = true; });
+      ['trainerBlok', 'assessorBlok', 'kennisBlok', 'managerBlok', 'curriculumBlok', 'eigenaarBlok', 'geenRol'].forEach(function (id) { $(id).hidden = true; });
       meld(e.message);
     });
   }

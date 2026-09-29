@@ -19,7 +19,7 @@
 'use strict';
 
 const { heeftBestuur } = require('./oordeel');
-const { IMPACT, MACHINES } = require('./standen');
+const { IMPACT, MACHINES, BESTUUR, RELATIESOORTEN } = require('./standen');
 
 function assessorWerk(st, door) {
   if (!heeftBestuur(st, door, 'ASSESSOR')) return { ok: false, reden: 'u bent in deze organisatie geen assessor' };
@@ -67,4 +67,14 @@ function curriculumWerk(st, door) {
   nietZichtbaar: 'wie een curriculum volgt en hoe ver hij is; dat ziet zijn trainer en zijn manager' };
 }
 
-module.exports = { assessorWerk, kennisWerk, curriculumWerk };
+/* Het beheer van de eigenaar: wie welke bestuursrol draagt (op codenaam, via
+   namen.js), en de soorten die hij kan kiezen. Een mens aanwijzen gaat op
+   codenaam met een reden (aanwijzen.js); dit zegt alleen wat er staat. */
+function eigenaarWerk(st, door) {
+  if (!heeftBestuur(st, door, 'ACADEMY_OWNER')) return { ok: false, reden: 'u bent geen eigenaar van dit leerhuis' };
+  return { ok: true, relatieSoorten: RELATIESOORTEN, bestuursrollen: BESTUUR,
+    BESTUUR: Object.entries(st.bestuur).filter(([, r]) => r.length).map(([persoon, rollen]) => ({ persoon, rollen })),
+    nietZichtbaar: 'echte namen en sleutels; een mens wijst u aan op zijn codenaam, en elke opzoeking staat op zijn inzagekaart' };
+}
+
+module.exports = { assessorWerk, kennisWerk, curriculumWerk, eigenaarWerk };

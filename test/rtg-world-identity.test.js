@@ -1,14 +1,15 @@
 /* DE HERITAGE-ROUTEKAART IS FAIL-CLOSED.
    Een nieuw echt scherm mag niet ongemerkt een vijfde kleur erven en een oude
    redirect mag geen tweede productoppervlak worden. Daarom wordt het manifest
-   hier tegen de werkelijke HTML-boom gehouden: 295 schermen, 18 doorwijzers,
+   hier tegen de werkelijke HTML-boom gehouden: 296 schermen, 18 doorwijzers,
    (290 sinds deze tak /apps/verificatie.html en /apps/vertegenwoordiging.html
    toevoegde, 292 sinds /apps/loopbaan.html en /apps/loopbaanbewijs.html erbij
    kwamen, 293 sinds /apps/mijn-neigingen.html en 294 sinds /apps/connect.html,
    en terug naar 293 met 17 doorwijzers sinds /apps/vandaag.html in RTG Life
    opging (SCHERMEIGENAAR.json), en 292 met 18 sinds /apps/toestemming.html een
    weergave van Wie heeft toegang tot mij werd, en 293 sinds /apps/leerhuis.html, en 295 sinds DemocratieOS V1
-   (/apps/foundation/kwesties.html en kwestiekantoor.html) --
+   (/apps/foundation/kwesties.html en kwestiekantoor.html), en 296 sinds
+   /apps/leerhuis-werk.html --
    het getal is een grendel tegen
    een scherm dat er stil bij komt, en hoort dus mee te bewegen met een scherm
    dat er BEWUST bij komt), ieder exact eenmaal. */
@@ -40,16 +41,16 @@ const ECHTE_ROUTES = BESTANDEN.filter((bestand) =>
 const DOORWIJZERS = BESTANDEN.filter((bestand) =>
   !/\/shared\/basis\.js/.test(fs.readFileSync(bestand, 'utf8'))).map(route).sort();
 
-test('het manifest dekt 295 echte schermen en 18 redirects precies eenmaal', () => {
+test('het manifest dekt 296 echte schermen en 18 redirects precies eenmaal', () => {
   /* DE MUTATIE: voeg een HTML-scherm toe zonder manifestregel, of zet één pad
      in twee werelden. De setvergelijking of de lengtetoets moet dan zakken. */
   const echtManifest = identiteit.VALUES.flatMap((wereld) => identiteit.MANIFEST[wereld]);
   const allesManifest = echtManifest.concat(identiteit.REDIRECTS);
 
-  assert.equal(BESTANDEN.length, 313, 'de appboom hoort 313 HTML-bestanden te bevatten');
-  assert.equal(ECHTE_ROUTES.length, 295, 'exact 295 blijvende schermen horen basis.js te laden');
+  assert.equal(BESTANDEN.length, 314, 'de appboom hoort 314 HTML-bestanden te bevatten');
+  assert.equal(ECHTE_ROUTES.length, 296, 'exact 296 blijvende schermen horen basis.js te laden');
   assert.equal(DOORWIJZERS.length, 18, 'exact 18 oude adressen horen doorwijzers te blijven');
-  assert.equal(echtManifest.length, 295, 'het vierwereldenmanifest hoort 295 schermen te bevatten');
+  assert.equal(echtManifest.length, 296, 'het vierwereldenmanifest hoort 296 schermen te bevatten');
   assert.deepEqual(identiteit.VALUES, ['living', 'travel', 'work', 'foundation'],
     'Core ondersteunt de werelden maar mag geen vijfde zichtbare wereld zijn');
   assert.equal(identiteit.REDIRECTS.length, 18, 'het redirectmanifest hoort 18 adressen te bevatten');

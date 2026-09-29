@@ -74,7 +74,7 @@ module.exports = ({ lees, pasgeschiedenis, aanwezigheid, kosten, bank, boek, kan
     const kl = (f, x) => { try { const k = typeof kosten === 'function' ? kosten() : null; return k && k[f] ? k[f](x) : null; } catch (e) { return null; } };
     const cijfers = (x) => { const o = P.omzet(termijnen(), x); return { ontvangen: o.ontvangenCenten, bruto: P.brutomarge(o.ontvangenCenten, kl('afstemming', x)) }; };
     const bm = cijfers(m).bruto;
-    // klantwaarde per wereld (C3): vier maten, elk langs zijn poort, geen totaal
+    // klantwaarde per wereld (C3): vier maten, elk met poort, geen totaal
     const lees0 = (f) => (typeof f === 'function' ? lijst(f()) : []);
     const kw = { living: K.klantwaardeLiving(lees.ritten(), lees.bestellingen(), m), travel: K.klantwaardeTravel(lees0(lees.reizen), m),
       work: K.klantwaardeWork(lees0(lees.loonruns), m), foundation: K.klantwaardeFoundation(lees0(lees.casussen), m) };

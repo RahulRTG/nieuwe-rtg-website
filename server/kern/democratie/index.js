@@ -30,6 +30,7 @@ const { maakBeeld } = require('./beeld');
 const { maakLid } = require('./lid');
 const { maakKoppeling } = require('./koppeling');
 const { maakWek } = require('./wek');
+const { maakDoe } = require('./doe');
 const { meet } = require('./meter');
 const { EINDSTANDEN } = require('./eindstanden');
 const AFHANKELIJK = require('./afhankelijkheden');
@@ -37,7 +38,7 @@ const { BEWIJSSTAND } = require('./bewijsstand');
 
 function maakDemocratie({ db, save, bijeen, inBundel, crypto, meldLid, codenaamVan }) {
   const eigen = require('../eigencollectie')({ db, domein: 'kern/democratie',
-    bezit: { democratieKwesties: 'kaart', democratieJournaal: 'lijst', democratieInbrengers: 'kaart' } });
+    bezit: { democratieKwesties: 'kaart', democratieJournaal: 'lijst', democratieInbrengers: 'kaart', democratieActies: 'kaart' } });
   const vastleggen = require('../../lib/duurzaam')({ bijeen, save, inBundel, bron: 'democratie' });
   const kaart = () => eigen.bak('democratieKwesties');
   const kijk = () => eigen.kijk('democratieKwesties') || {};
@@ -70,9 +71,13 @@ function maakDemocratie({ db, save, bijeen, inBundel, crypto, meldLid, codenaamV
 
   const { wek, herbezorg } = maakWek({ schrijver, koppeling, vastleggen, meldLid, ontvangersVan, kijk });
 
+  const doe = maakDoe({ kaart: () => eigen.bak('democratieActies'), kijk: () => eigen.kijk('democratieActies') || {},
+    zoek, schrijver, koppeling, vastleggen, ontvangersVan, crypto, nu: () => new Date(nu()).toISOString() });
+  const metActies = (v) => Object.assign(v, { acties: doe.opKwestie(v.id) });
+
   function lijst() {
     const alle = Object.values(kijk()).sort((a, b) => String(a.at).localeCompare(String(b.at)));
-    return { ok: true, kwesties: alle.map(k => publiek(k, null)), eindstanden: EINDSTANDEN };
+    return { ok: true, kwesties: alle.map(k => metActies(publiek(k, null))), eindstanden: EINDSTANDEN };
   }
 
   async function behandel(doorSleutel, b) {
@@ -144,7 +149,10 @@ function maakDemocratie({ db, save, bijeen, inBundel, crypto, meldLid, codenaamV
 
   const lid = maakLid({ kaart, kijk, zoek, schrijver, koppeling, vastleggen, publiek, wek, ontvangersVan, crypto });
 
-  return { ...lid, lijst, behandel, sluit, heropen, herbezorg, meter, vergeet };
+  const mijn = (sleutel) => { const r = lid.mijn(sleutel); r.kwesties.forEach(metActies); return r; };
+  const { opKwestie, ...doeLid } = doe;
+
+  return { ...lid, mijn, doe: doeLid, lijst, behandel, sluit, heropen, herbezorg, meter, vergeet };
 }
 
 module.exports = { maakDemocratie };

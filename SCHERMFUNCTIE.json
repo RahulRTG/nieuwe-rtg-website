@@ -2,17 +2,17 @@
   "soort": "schermfunctie",
   "uitleg": "Feiten per scherm (paden, domeinen, rol, wereld, inkomende links, alias) en de paren schermen die dezelfde API-paden raken. Het oordeel over die paren staat in SCHERMEIGENAAR.json; dit register stelt niets vast behalve wat er gemeten is.",
   "stempel": {
-    "op": "2026-09-23",
-    "commit": "d905585"
+    "op": "2026-09-29",
+    "commit": "2ae19049"
   },
   "bronnen": {
     "schermroutes": {
-      "op": "2026-09-20",
-      "commit": "def8834c"
+      "op": "2026-09-29",
+      "commit": "2ae19049"
     },
     "schermgedrag": {
-      "op": "2026-09-19",
-      "commit": "6083f652"
+      "op": "2026-09-29",
+      "commit": "2ae19049"
     }
   },
   "ruis": [
@@ -44,7 +44,7 @@
     },
     {
       "script": "public/apps/foundation/premium.js",
-      "schermen": 85
+      "schermen": 87
     },
     {
       "script": "public/apps/foundation/samen.js",
@@ -52,7 +52,7 @@
     },
     {
       "script": "public/apps/foundation/schil-os.js",
-      "schermen": 15
+      "schermen": 17
     },
     {
       "script": "public/apps/foundation/sessie.js",
@@ -73,6 +73,10 @@
     {
       "script": "public/apps/util.js",
       "schermen": 6
+    },
+    {
+      "script": "public/shared/adaptief/grammatica.js",
+      "schermen": 9
     },
     {
       "script": "public/shared/i18n.js",
@@ -96,6 +100,18 @@
     },
     {
       "script": "public/shared/rtg-edge-icons.js",
+      "schermen": 9
+    },
+    {
+      "script": "public/site/platform-data.js",
+      "schermen": 9
+    },
+    {
+      "script": "public/site/platform-detail.js",
+      "schermen": 9
+    },
+    {
+      "script": "public/site/platform-elements.js",
       "schermen": 9
     },
     {
@@ -132,9 +148,9 @@
     "server/kern/wereldroutes/work.js"
   ],
   "totaal": {
-    "schermen": 320,
+    "schermen": 323,
     "aliassen": 20,
-    "zonderServer": 52,
+    "zonderServer": 53,
     "zonderInkomend": 0,
     "overlapParen": 14,
     "titelbotsingen": 1,
@@ -215,17 +231,6 @@
       ]
     },
     {
-      "a": "public/apps/avond.html",
-      "b": "public/apps/leven.html",
-      "gedeeld": 2,
-      "jaccard": 0.4,
-      "omvatting": 1,
-      "voorbeeld": [
-        "/api/avond/aanvragen",
-        "/api/avond/voorstel"
-      ]
-    },
-    {
       "a": "public/apps/foundation/gezondheid-welzijn.html",
       "b": "public/apps/foundation/zorg.html",
       "gedeeld": 2,
@@ -270,17 +275,6 @@
       ]
     },
     {
-      "a": "public/apps/muziek.html",
-      "b": "public/apps/rtg.html",
-      "gedeeld": 2,
-      "jaccard": 0.11,
-      "omvatting": 1,
-      "voorbeeld": [
-        "/api/fluister",
-        "/api/samen/"
-      ]
-    },
-    {
       "a": "public/apps/reizen.html",
       "b": "public/apps/rit.html",
       "gedeeld": 4,
@@ -291,6 +285,18 @@
         "/api/mob/mijn",
         "/api/mob/plekken",
         "/api/mob/vraag"
+      ]
+    },
+    {
+      "a": "public/apps/salon.html",
+      "b": "public/apps/wereld.html",
+      "gedeeld": 3,
+      "jaccard": 0.12,
+      "omvatting": 0.5,
+      "voorbeeld": [
+        "/api/salon/plaats",
+        "/api/salon/reacties",
+        "/api/salon/reageer"
       ]
     },
     {
@@ -313,6 +319,17 @@
       "voorbeeld": [
         "/api/supplier/doe/bevestig",
         "/api/supplier/roster"
+      ]
+    },
+    {
+      "a": "public/apps/muziek.html",
+      "b": "public/apps/rtg.html",
+      "gedeeld": 2,
+      "jaccard": 0.1,
+      "omvatting": 0.5,
+      "voorbeeld": [
+        "/api/fluister",
+        "/api/samen/"
       ]
     }
   ],
@@ -424,6 +441,7 @@
       ],
       "paden": [
         "/api/",
+        "/api/account/rollen",
         "/api/bank/overzicht",
         "/api/foundation",
         "/api/member/apps",
@@ -436,13 +454,14 @@
       ],
       "domeinen": [
         "/api/",
+        "/api/account",
         "/api/bank",
         "/api/foundation",
         "/api/member",
         "/api/push"
       ],
       "zonderServer": false,
-      "inkomend": 192,
+      "inkomend": 195,
       "inIndex": 2,
       "inkomendVan": [
         "public/apps/agenda.html",
@@ -1045,7 +1064,19 @@
         "/api/office/balie/zetel",
         "/api/office/balie/zetels",
         "/api/office/balie/zoek",
-        "/api/office/ledenregister"
+        "/api/office/bank/entiteitrekening",
+        "/api/office/bank/entiteitrekening/zet",
+        "/api/office/beleidsmotor",
+        "/api/office/beleidsmotor/afdwingen/zet",
+        "/api/office/boardroom/bevestig/opties",
+        "/api/office/doos/gedeeld/zet",
+        "/api/office/doos/sleutel",
+        "/api/office/doos/sleutel/weg",
+        "/api/office/doos/sleutels",
+        "/api/office/kantoor/uitnodiging",
+        "/api/office/ledenregister",
+        "/api/office/werkos/bankpad",
+        "/api/office/werkos/bankpad/zet"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -1247,7 +1278,7 @@
         "/api/member"
       ],
       "zonderServer": false,
-      "inkomend": 10,
+      "inkomend": 9,
       "inIndex": 6,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
@@ -1258,8 +1289,7 @@
         "public/shared/social-suite.js",
         "server/kern/appcatalogus-rijen/deel1.js",
         "server/kern/appgids-data/deel2.js",
-        "server/kern/bureau/plattegrond.js",
-        "server/kern/wereld/koppel.js"
+        "server/kern/bureau/plattegrond.js"
       ]
     },
     {
@@ -1499,12 +1529,13 @@
         "/api/onderneming"
       ],
       "zonderServer": false,
-      "inkomend": 4,
+      "inkomend": 5,
       "inIndex": 2,
       "inkomendVan": [
         "public/apps/kantoor.html",
         "public/apps/onderneming.html",
         "server/kern/appgids-data/deel7.js",
+        "server/kern/concern/aanname.js",
         "server/kern/werkplek-kantoren-bovenbouw.js"
       ]
     },
@@ -1548,10 +1579,13 @@
           "sleutel": "link:connect"
         }
       ],
-      "rollen": [],
-      "schrijft": "onbekend",
+      "rollen": [
+        "member"
+      ],
+      "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
+        "/api/connect/",
         "/api/connect/dossier",
         "/api/connect/horizon",
         "/api/connect/ontdek",
@@ -1559,11 +1593,13 @@
         "/api/connect/portfolio",
         "/api/connect/schuif",
         "/api/connect/signaal",
-        "/api/connect/werk"
+        "/api/connect/werk",
+        "/api/rtf/connect/"
       ],
       "schilPaden": [],
       "domeinen": [
-        "/api/connect"
+        "/api/connect",
+        "/api/rtf"
       ],
       "zonderServer": false,
       "inkomend": 3,
@@ -2828,12 +2864,13 @@
         "/api/rtfos"
       ],
       "zonderServer": false,
-      "inkomend": 11,
+      "inkomend": 12,
       "inIndex": 2,
       "inkomendVan": [
         "public/apps/command.js",
         "public/apps/command/command-02.js",
         "public/apps/foundation/clubswerk.html",
+        "public/apps/foundation/kwestiekantoor.html",
         "public/apps/foundation/os.html",
         "public/apps/foundation/vrienden.html",
         "public/apps/kantoren.html",
@@ -3045,6 +3082,72 @@
       ]
     },
     {
+      "bestand": "public/apps/foundation/kwestiekantoor.html",
+      "url": "/apps/foundation/kwestiekantoor.html",
+      "titel": "Kwesties behandelen · RTF-kantoor",
+      "h1": "Kwesties behandelen",
+      "soort": "scherm",
+      "aliasNaar": null,
+      "wereld": [],
+      "rollen": [],
+      "schrijft": "niet vast te stellen",
+      "schil": [
+        "public/apps/foundation/schil-os.js",
+        "public/apps/foundation/premium.js"
+      ],
+      "paden": [
+        "/api/office/democratie/"
+      ],
+      "schilPaden": [],
+      "domeinen": [
+        "/api/office"
+      ],
+      "zonderServer": false,
+      "inkomend": 2,
+      "inIndex": 2,
+      "inkomendVan": [
+        "public/apps/foundation/kantoor.html",
+        "server/kern/appgids-data/deel11.js"
+      ]
+    },
+    {
+      "bestand": "public/apps/foundation/kwesties.html",
+      "url": "/apps/foundation/kwesties.html",
+      "titel": "Wat speelt er · RTFoundation",
+      "h1": "Wat speelt er bij jou?",
+      "soort": "scherm",
+      "aliasNaar": null,
+      "wereld": [
+        {
+          "wereld": "FoundationOS",
+          "onderdeel": "Wat speelt er",
+          "sleutel": "link:kwesties"
+        }
+      ],
+      "rollen": [],
+      "schrijft": "niet vast te stellen",
+      "schil": [
+        "public/apps/foundation/schil-os.js",
+        "public/apps/foundation/premium.js"
+      ],
+      "paden": [
+        "/api/member/democratie/actie/",
+        "/api/member/democratie/kwestie/"
+      ],
+      "schilPaden": [],
+      "domeinen": [
+        "/api/member"
+      ],
+      "zonderServer": false,
+      "inkomend": 3,
+      "inIndex": 6,
+      "inkomendVan": [
+        "public/apps/app-main/app-main-23a.js",
+        "public/apps/foundation/os-publiek.html",
+        "server/kern/appgids-data/deel11.js"
+      ]
+    },
+    {
       "bestand": "public/apps/foundation/leerpaspoort.html",
       "url": "/apps/foundation/leerpaspoort.html",
       "titel": "Mijn leerpaspoort · RTF Campus",
@@ -3112,7 +3215,7 @@
       "aliasNaar": null,
       "wereld": [],
       "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "onbekend",
       "schil": [
         "public/apps/foundation/sessie.js",
         "public/apps/foundation/samen.js",
@@ -3325,10 +3428,11 @@
         "/api/rtfos"
       ],
       "zonderServer": false,
-      "inkomend": 6,
+      "inkomend": 7,
       "inIndex": 4,
       "inkomendVan": [
         "public/apps/foundation/index.html",
+        "public/shared/interface/world-presentation.js",
         "public/shared/rtg-world-home.js",
         "server/kern/appcatalogus-rijen/deel2.js",
         "server/kern/appgids-data/deel4.js",
@@ -4693,7 +4797,7 @@
         "/api/rtf"
       ],
       "zonderServer": false,
-      "inkomend": 12,
+      "inkomend": 11,
       "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-23a.js",
@@ -4701,7 +4805,6 @@
         "public/apps/foundation/os-publiek.html",
         "public/apps/foundation/sessie/sessie-03.js",
         "public/apps/rtg.html",
-        "public/shared/interface/world-desktop-home.js",
         "public/shared/interface/world-desktop-people.js",
         "public/shared/rosapps.js",
         "server/kern/appcatalogus-rijen/deel2.js",
@@ -5355,17 +5458,20 @@
       "schilPaden": [],
       "domeinen": [],
       "zonderServer": true,
-      "inkomend": 8,
+      "inkomend": 11,
       "inIndex": 2,
       "inkomendVan": [
         "public/apps/salon.html",
+        "public/apps/saloon/acties.js",
         "public/apps/sociaal.html",
         "public/shared/social-intelligence.js",
         "public/shared/social-suite.js",
         "server/kern/appcatalogus-rijen/deel1.js",
         "server/kern/appgids-data/deel1.js",
         "server/kern/objectlaag/caps.js",
-        "server/kern/socialewereld.js"
+        "server/kern/socialewereld.js",
+        "server/kern/wereld/feed.js",
+        "server/kern/wereld/koppel.js"
       ]
     },
     {
@@ -5914,10 +6020,8 @@
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
-      "rollen": [
-        "member"
-      ],
-      "schrijft": "ja",
+      "rollen": [],
+      "schrijft": "onbekend",
       "schil": [],
       "paden": [
         "/api/hotels",
@@ -6189,7 +6293,7 @@
         "/api/kantoor"
       ],
       "zonderServer": false,
-      "inkomend": 70,
+      "inkomend": 71,
       "inIndex": 6,
       "inkomendVan": [
         "public/apps/app-main/app-main-24a2.js",
@@ -6237,6 +6341,7 @@
       "wereld": [],
       "rollen": [
         "boardroom",
+        "member",
         "office"
       ],
       "schrijft": "onbekend",
@@ -6425,14 +6530,15 @@
         "/api/krant"
       ],
       "zonderServer": false,
-      "inkomend": 5,
+      "inkomend": 6,
       "inIndex": 5,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
         "public/apps/media.html",
         "public/apps/rtg.html",
         "server/kern/appcatalogus-rijen/deel1b.js",
-        "server/kern/appgids-data/deel7.js"
+        "server/kern/appgids-data/deel7.js",
+        "server/kern/wereld/saloon/bronnen.js"
       ]
     },
     {
@@ -6516,6 +6622,32 @@
       ]
     },
     {
+      "bestand": "public/apps/leerhuis.html",
+      "url": "/apps/leerhuis.html",
+      "titel": "Mijn leerhuis",
+      "h1": "Mijn leerhuis",
+      "soort": "scherm",
+      "aliasNaar": null,
+      "wereld": [],
+      "rollen": [],
+      "schrijft": "onbekend",
+      "schil": [],
+      "paden": [
+        "/api/leerhuis/lees"
+      ],
+      "schilPaden": [],
+      "domeinen": [
+        "/api/leerhuis"
+      ],
+      "zonderServer": false,
+      "inkomend": 2,
+      "inIndex": 2,
+      "inkomendVan": [
+        "public/apps/loopbaan.html",
+        "server/kern/appgids-data/deel12b.js"
+      ]
+    },
+    {
       "bestand": "public/apps/lesmaker.html",
       "url": "/apps/lesmaker.html",
       "titel": "RTG Lesmaker",
@@ -6564,17 +6696,12 @@
         }
       ],
       "rollen": [],
-      "schrijft": "onbekend",
+      "schrijft": "nee",
       "schil": [],
-      "paden": [
-        "/api/avond/aanvragen",
-        "/api/avond/voorstel"
-      ],
+      "paden": [],
       "schilPaden": [],
-      "domeinen": [
-        "/api/avond"
-      ],
-      "zonderServer": false,
+      "domeinen": [],
+      "zonderServer": true,
       "inkomend": 8,
       "inIndex": 7,
       "inkomendVan": [
@@ -6804,7 +6931,7 @@
       ],
       "zonderServer": false,
       "inkomend": 15,
-      "inIndex": 5,
+      "inIndex": 6,
       "inkomendVan": [
         "public/apps/app-main/app-main-23a.js",
         "public/apps/attenties.html",
@@ -7015,7 +7142,7 @@
         }
       ],
       "rollen": [],
-      "schrijft": "onbekend",
+      "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
         "/api/carriere/ledger"
@@ -7041,8 +7168,10 @@
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
-      "rollen": [],
-      "schrijft": "onbekend",
+      "rollen": [
+        "openbaar"
+      ],
+      "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
         "/api/carriere/regel/toon"
@@ -7187,6 +7316,7 @@
       "schil": [],
       "paden": [
         "/api/member/magnaat/",
+        "/api/member/magnaat/stad/",
         "/api/member/spel/"
       ],
       "schilPaden": [],
@@ -7433,28 +7563,32 @@
       "paden": [
         "/api/mediaos/",
         "/api/member/dm/send",
-        "/api/muziek/uitgave"
+        "/api/muziek/uitgave",
+        "/api/ondertiteling/fragment"
       ],
       "schilPaden": [],
       "domeinen": [
         "/api/mediaos",
         "/api/member",
-        "/api/muziek"
+        "/api/muziek",
+        "/api/ondertiteling"
       ],
       "zonderServer": false,
-      "inkomend": 10,
+      "inkomend": 12,
       "inIndex": 6,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
         "public/apps/clips.html",
         "public/apps/rtg.html",
+        "public/apps/saloon/acties.js",
         "public/apps/sociaal.html",
         "public/shared/clipdeler.js",
         "public/shared/clipdeler/clipdeler-01.js",
         "public/shared/rosapps.js",
         "public/shared/split.js",
         "server/kern/appcatalogus-rijen/deel1b.js",
-        "server/kern/appgids-data/deel6.js"
+        "server/kern/appgids-data/deel6.js",
+        "server/kern/wereld/saloon/bronnen.js"
       ]
     },
     {
@@ -7564,10 +7698,10 @@
       "schrijft": "onbekend",
       "schil": [],
       "paden": [
+        "/api/bestanden/",
         "/api/bestanden/haal",
         "/api/bestanden/mijn",
         "/api/bestanden/upload",
-        "/api/bestanden/weg",
         "/api/bestanden/wijzig",
         "/api/memo/samenvat"
       ],
@@ -7713,8 +7847,10 @@
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
-      "rollen": [],
-      "schrijft": "onbekend",
+      "rollen": [
+        "member"
+      ],
+      "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
         "/api/neiging/antwoord",
@@ -7782,20 +7918,24 @@
       "rollen": [
         "member"
       ],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "onbekend",
       "schil": [],
       "paden": [
+        "/api/inzagekaart",
+        "/api/toestemming",
+        "/api/toestemming/intrek",
         "/api/toestemming/relatie/gevolgen",
         "/api/toestemming/relatie/sluit",
         "/api/toestemming/relaties"
       ],
       "schilPaden": [],
       "domeinen": [
+        "/api/inzagekaart",
         "/api/toestemming"
       ],
       "zonderServer": false,
       "inkomend": 9,
-      "inIndex": 4,
+      "inIndex": 5,
       "inkomendVan": [
         "public/apps/app-main/app-main-23a.js",
         "public/apps/bewijsmap.html",
@@ -7906,7 +8046,7 @@
         }
       ],
       "rollen": [],
-      "schrijft": "onbekend",
+      "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
         "/api/move/"
@@ -7946,11 +8086,14 @@
       "schil": [],
       "paden": [
         "/api/fluister",
+        "/api/muziek/",
+        "/api/muziek/bestand",
         "/api/samen/"
       ],
       "schilPaden": [],
       "domeinen": [
         "/api/fluister",
+        "/api/muziek",
         "/api/samen"
       ],
       "zonderServer": false,
@@ -8015,7 +8158,7 @@
         "/api/nav"
       ],
       "zonderServer": false,
-      "inkomend": 17,
+      "inkomend": 18,
       "inIndex": 7,
       "inkomendVan": [
         "public/apps/app-main/app-main-23a.js",
@@ -8029,7 +8172,7 @@
         "public/apps/rtg.html",
         "public/apps/sport.html",
         "public/apps/uitgaan.html",
-        "public/shared/rosapps.js"
+        "public/shared/interface/world-presentation.js"
       ]
     },
     {
@@ -8213,12 +8356,13 @@
         "/api/onderneming"
       ],
       "zonderServer": false,
-      "inkomend": 6,
+      "inkomend": 7,
       "inIndex": 7,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
         "public/apps/concern.html",
         "public/apps/kantoor.html",
+        "public/apps/saloon/acties.js",
         "public/shared/randen.js",
         "server/kern/appgids-data/deel7.js",
         "server/kern/werkplek-kantoren-bovenbouw.js"
@@ -8715,15 +8859,17 @@
       "paden": [
         "/api/account/koppel",
         "/api/account/rollen",
+        "/api/auth/login",
         "/api/office/"
       ],
       "schilPaden": [],
       "domeinen": [
         "/api/account",
+        "/api/auth",
         "/api/office"
       ],
       "zonderServer": false,
-      "inkomend": 45,
+      "inkomend": 46,
       "inIndex": 4,
       "inkomendVan": [
         "public/apps/app-main/app-main-24b.js",
@@ -8733,11 +8879,11 @@
         "public/apps/command/command-02.js",
         "public/apps/foundation/clubswerk.html",
         "public/apps/foundation/kantoor.html",
+        "public/apps/foundation/kwestiekantoor.html",
         "public/apps/foundation/os.html",
         "public/apps/gemeentepda.html",
         "public/apps/handel.js",
-        "public/apps/horeca/kern.js",
-        "public/apps/kantoor.html"
+        "public/apps/horeca/kern.js"
       ]
     },
     {
@@ -8979,11 +9125,12 @@
         "/api/supplier"
       ],
       "zonderServer": false,
-      "inkomend": 4,
+      "inkomend": 5,
       "inIndex": 2,
       "inkomendVan": [
         "public/apps/kantoor.html",
         "public/apps/redactie-pda.html",
+        "public/apps/saloon/acties.js",
         "server/kern/appgids-data/deel7.js",
         "server/kern/werkplek-kantoren-onderbouw.js"
       ]
@@ -9031,7 +9178,7 @@
         }
       ],
       "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "onbekend",
       "schil": [],
       "paden": [
         "/api/member/rechterhand/reis/item",
@@ -9050,7 +9197,7 @@
         "/api/reis"
       ],
       "zonderServer": false,
-      "inkomend": 15,
+      "inkomend": 16,
       "inIndex": 6,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
@@ -9060,11 +9207,11 @@
         "public/apps/reizen.html",
         "public/apps/rtg.html",
         "public/apps/sociaal.html",
+        "public/shared/interface/world-presentation.js",
         "public/shared/rosapps.js",
         "public/shared/rtg-edge-2-loader.js",
         "public/shared/travel-os-config.js",
-        "public/site/website-truth.json",
-        "public/site/werelden/travelos.html"
+        "public/site/website-truth.json"
       ]
     },
     {
@@ -9230,7 +9377,7 @@
         "/api/reis"
       ],
       "zonderServer": false,
-      "inkomend": 66,
+      "inkomend": 67,
       "inIndex": 6,
       "inkomendVan": [
         "public/apps/app-main/app-main-24a2b.js",
@@ -9265,7 +9412,8 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/member/rendezvous/"
+        "/api/member/rendezvous/",
+        "/api/member/rendezvous/profile-photo"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -9835,7 +9983,9 @@
         "/api/salon/feed",
         "/api/salon/inzicht",
         "/api/salon/lid",
+        "/api/salon/media",
         "/api/salon/meld",
+        "/api/salon/ondertitels",
         "/api/salon/plaats",
         "/api/salon/reactie-weg",
         "/api/salon/reacties",
@@ -9851,9 +10001,10 @@
         "/api/salon"
       ],
       "zonderServer": false,
-      "inkomend": 10,
+      "inkomend": 11,
       "inIndex": 2,
       "inkomendVan": [
+        "public/apps/saloon/acties.js",
         "public/apps/sociaal.html",
         "public/apps/wereld-welcome.js",
         "public/shared/command/console.js",
@@ -10195,7 +10346,7 @@
         }
       ],
       "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "onbekend",
       "schil": [
         "public/apps/foundation/palet.js"
       ],
@@ -10658,21 +10809,12 @@
       "soort": "alias",
       "aliasNaar": "/apps/mijn-relaties.html#soort",
       "wereld": [],
-      "rollen": [
-        "member"
-      ],
-      "schrijft": "onbekend",
+      "rollen": [],
+      "schrijft": "nee",
       "schil": [],
-      "paden": [
-        "/api/inzagekaart",
-        "/api/toestemming",
-        "/api/toestemming/intrek"
-      ],
+      "paden": [],
       "schilPaden": [],
-      "domeinen": [
-        "/api/inzagekaart",
-        "/api/toestemming"
-      ],
+      "domeinen": [],
       "zonderServer": false,
       "inkomend": 5,
       "inIndex": 0,
@@ -10849,7 +10991,7 @@
       "aliasNaar": null,
       "wereld": [],
       "rollen": [],
-      "schrijft": "onbekend",
+      "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
         "/api/verify"
@@ -10914,7 +11056,7 @@
         }
       ],
       "rollen": [],
-      "schrijft": "onbekend",
+      "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
         "/api/vertegenwoordiging"
@@ -11072,7 +11214,8 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/vonk/"
+        "/api/vonk/",
+        "/api/vonk/profile-photo"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -11191,19 +11334,29 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
+        "/api/krant/artikel",
+        "/api/mediaos/volg",
+        "/api/salon/plaats",
+        "/api/salon/reacties",
+        "/api/salon/reageer",
         "/api/wereld"
       ],
       "schilPaden": [],
       "domeinen": [
+        "/api/krant",
+        "/api/mediaos",
+        "/api/salon",
         "/api/wereld"
       ],
       "zonderServer": false,
-      "inkomend": 9,
+      "inkomend": 11,
       "inIndex": 7,
       "inkomendVan": [
         "public/apps/app-main/app-main-23a.js",
         "public/apps/comm.html",
         "public/apps/rtg.html",
+        "public/shared/command.js",
+        "public/shared/interface/world-presentation.js",
         "public/site/website-truth.json",
         "public/sw.js",
         "server/kern/appgids-data/deel1.js",
@@ -11307,11 +11460,12 @@
       "schilPaden": [],
       "domeinen": [],
       "zonderServer": true,
-      "inkomend": 7,
+      "inkomend": 8,
       "inIndex": 3,
       "inkomendVan": [
         "public/apps/kantoor.html",
         "public/apps/kantoren.html",
+        "public/shared/interface/world-presentation.js",
         "public/shared/rtg-world-identity.js",
         "public/shared/workos-premium.js",
         "public/site/website-truth.json",
@@ -11599,12 +11753,16 @@
         "public/shared/i18n.js",
         "public/shared/rtg-edge-icons.js",
         "public/shared/rtg-adaptive-edge-core.js",
+        "public/shared/adaptief/grammatica.js",
         "public/shared/rtg-adaptive-edge-input.js",
         "public/shared/rtg-adaptive-edge-controls.js",
         "public/shared/rtg-adaptive-edge.js",
         "public/site/start/experience-core.js",
         "public/site/storyline-stage.js",
         "public/site/storyline-world.js",
+        "public/site/platform-data.js",
+        "public/site/platform-elements.js",
+        "public/site/platform-detail.js",
         "public/site/storyline-edge.js"
       ],
       "paden": [],
@@ -11635,12 +11793,16 @@
         "public/shared/i18n.js",
         "public/shared/rtg-edge-icons.js",
         "public/shared/rtg-adaptive-edge-core.js",
+        "public/shared/adaptief/grammatica.js",
         "public/shared/rtg-adaptive-edge-input.js",
         "public/shared/rtg-adaptive-edge-controls.js",
         "public/shared/rtg-adaptive-edge.js",
         "public/site/start/experience-core.js",
         "public/site/storyline-stage.js",
         "public/site/storyline-world.js",
+        "public/site/platform-data.js",
+        "public/site/platform-elements.js",
+        "public/site/platform-detail.js",
         "public/site/storyline-edge.js"
       ],
       "paden": [],
@@ -11671,12 +11833,16 @@
         "public/shared/i18n.js",
         "public/shared/rtg-edge-icons.js",
         "public/shared/rtg-adaptive-edge-core.js",
+        "public/shared/adaptief/grammatica.js",
         "public/shared/rtg-adaptive-edge-input.js",
         "public/shared/rtg-adaptive-edge-controls.js",
         "public/shared/rtg-adaptive-edge.js",
         "public/site/start/experience-core.js",
         "public/site/storyline-stage.js",
         "public/site/storyline-world.js",
+        "public/site/platform-data.js",
+        "public/site/platform-elements.js",
+        "public/site/platform-detail.js",
         "public/site/storyline-edge.js"
       ],
       "paden": [],
@@ -11707,12 +11873,16 @@
         "public/shared/i18n.js",
         "public/shared/rtg-edge-icons.js",
         "public/shared/rtg-adaptive-edge-core.js",
+        "public/shared/adaptief/grammatica.js",
         "public/shared/rtg-adaptive-edge-input.js",
         "public/shared/rtg-adaptive-edge-controls.js",
         "public/shared/rtg-adaptive-edge.js",
         "public/site/start/experience-core.js",
         "public/site/storyline-stage.js",
         "public/site/storyline-world.js",
+        "public/site/platform-data.js",
+        "public/site/platform-elements.js",
+        "public/site/platform-detail.js",
         "public/site/storyline-edge.js"
       ],
       "paden": [],
@@ -11743,12 +11913,16 @@
         "public/shared/i18n.js",
         "public/shared/rtg-edge-icons.js",
         "public/shared/rtg-adaptive-edge-core.js",
+        "public/shared/adaptief/grammatica.js",
         "public/shared/rtg-adaptive-edge-input.js",
         "public/shared/rtg-adaptive-edge-controls.js",
         "public/shared/rtg-adaptive-edge.js",
         "public/site/start/experience-core.js",
         "public/site/storyline-stage.js",
         "public/site/storyline-world.js",
+        "public/site/platform-data.js",
+        "public/site/platform-elements.js",
+        "public/site/platform-detail.js",
         "public/site/storyline-edge.js"
       ],
       "paden": [],
@@ -11779,12 +11953,16 @@
         "public/shared/i18n.js",
         "public/shared/rtg-edge-icons.js",
         "public/shared/rtg-adaptive-edge-core.js",
+        "public/shared/adaptief/grammatica.js",
         "public/shared/rtg-adaptive-edge-input.js",
         "public/shared/rtg-adaptive-edge-controls.js",
         "public/shared/rtg-adaptive-edge.js",
         "public/site/start/experience-core.js",
         "public/site/storyline-stage.js",
         "public/site/storyline-world.js",
+        "public/site/platform-data.js",
+        "public/site/platform-elements.js",
+        "public/site/platform-detail.js",
         "public/site/storyline-edge.js"
       ],
       "paden": [],
@@ -11814,12 +11992,16 @@
         "public/shared/i18n.js",
         "public/shared/rtg-edge-icons.js",
         "public/shared/rtg-adaptive-edge-core.js",
+        "public/shared/adaptief/grammatica.js",
         "public/shared/rtg-adaptive-edge-input.js",
         "public/shared/rtg-adaptive-edge-controls.js",
         "public/shared/rtg-adaptive-edge.js",
         "public/site/start/experience-core.js",
         "public/site/storyline-stage.js",
         "public/site/storyline-world.js",
+        "public/site/platform-data.js",
+        "public/site/platform-elements.js",
+        "public/site/platform-detail.js",
         "public/site/storyline-edge.js"
       ],
       "paden": [],
@@ -11849,12 +12031,16 @@
         "public/shared/i18n.js",
         "public/shared/rtg-edge-icons.js",
         "public/shared/rtg-adaptive-edge-core.js",
+        "public/shared/adaptief/grammatica.js",
         "public/shared/rtg-adaptive-edge-input.js",
         "public/shared/rtg-adaptive-edge-controls.js",
         "public/shared/rtg-adaptive-edge.js",
         "public/site/start/experience-core.js",
         "public/site/storyline-stage.js",
         "public/site/storyline-world.js",
+        "public/site/platform-data.js",
+        "public/site/platform-elements.js",
+        "public/site/platform-detail.js",
         "public/site/storyline-edge.js"
       ],
       "paden": [],
@@ -11884,12 +12070,16 @@
         "public/shared/i18n.js",
         "public/shared/rtg-edge-icons.js",
         "public/shared/rtg-adaptive-edge-core.js",
+        "public/shared/adaptief/grammatica.js",
         "public/shared/rtg-adaptive-edge-input.js",
         "public/shared/rtg-adaptive-edge-controls.js",
         "public/shared/rtg-adaptive-edge.js",
         "public/site/start/experience-core.js",
         "public/site/storyline-stage.js",
         "public/site/storyline-world.js",
+        "public/site/platform-data.js",
+        "public/site/platform-elements.js",
+        "public/site/platform-detail.js",
         "public/site/storyline-edge.js"
       ],
       "paden": [],

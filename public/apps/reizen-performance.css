@@ -40,6 +40,22 @@ main{min-height:calc(100dvh - var(--header));padding-bottom:calc(var(--nav) + en
 .micro{margin:0;color:#E7D3D8;font-size:.65rem;font-weight:650;letter-spacing:.22em;text-transform:uppercase}
 .sub,.sectiekop>p:last-child{color:var(--muted)}
 .tekstknop{border:0;border-bottom:1px solid var(--wine);background:none;color:var(--ivory);padding:.4rem 0;font-size:.62rem;font-weight:700;letter-spacing:.16em}
+/* De verversactie blijft naast of onder de kop binnen een smal ingebed blad. */
+.appblad[data-blad="reizen"] .sectiekop>div{flex-wrap:wrap;min-width:0}
+.appblad[data-blad="reizen"] .sectiekop h1{min-width:0;flex:1 1 240px;overflow-wrap:anywhere}
+.appblad[data-blad="reizen"] .sectiekop .tekstknop{flex:0 0 auto}
+/* Het bronregister rendert .reis/.doos/.kern; die bestaande inhoud draagt
+   dezelfde Travel-materialen als de rest van de wereld, ook in een iframe. */
+body.rtg-travel-experience .reisregister{padding:1rem;background-color:var(--rtg-world-card,var(--graphite))!important;border-color:var(--rtg-world-line,var(--line))!important}
+body.rtg-travel-experience .reisregister .regkop{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem;margin:1rem 0}
+body.rtg-travel-experience .reisregister .regkop h2{flex-basis:100%;margin:0;font-size:1.3rem}
+body.rtg-travel-experience .reisregister .reis{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:.5rem;padding:1rem 0;color:var(--rtg-world-ink,var(--ivory));text-decoration:none;border-top:1px solid var(--rtg-world-line,var(--line))}
+.reisregister .reis .stip{display:none}.reisregister .reis .doos{display:grid;grid-template-columns:64px minmax(0,1fr);gap:.8rem}.reisregister .reis .kern{min-width:0}
+.reisregister .reis .dag{display:flex;flex-direction:column;align-items:center;gap:.2rem;font-size:.75rem}.reisregister .reis .dag .wd{font-size:.6rem;overflow-wrap:anywhere}.reisregister .reis .nr{font-size:1.6rem;line-height:1.2}
+.reisregister .reis h3{margin:0 0 .6rem;font:500 1.1rem/1.4 Inter,sans-serif;overflow-wrap:anywhere}.reisregister .reis h3 .rtg-plaats{display:block;font:400 .8rem/1.5 Inter,sans-serif;color:var(--rtg-world-muted,var(--muted))}
+.reisregister .reis .status{display:block;margin:.5rem 0}.reisregister .reis .rtg-status{display:inline-block;width:auto;color:var(--rtg-world-ink,var(--ivory))}
+.reisregister .reis .feiten,.reisregister .reis .onder{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem;font-size:.8rem;overflow-wrap:anywhere}.reisregister .reis .feiten>span{display:inline-flex;align-items:center;gap:.3rem}.reisregister .reis .feiten svg{width:1rem;height:1rem}
+.reisregister .reis .onder{margin-top:.7rem;color:var(--rtg-world-muted,var(--muted))}.reisregister .reis .rtg-ref{max-width:100%;padding:0;overflow-wrap:anywhere;color:inherit;background:transparent;border:0;font-size:.7rem}
 
 .dagkop{position:relative;isolation:isolate;container-type:inline-size;min-height:clamp(230px,24vw,330px);display:flex;align-items:flex-end;padding:clamp(1.1rem,2.5vw,1.8rem);overflow:hidden;border:1px solid #4f1324;background-image:linear-gradient(90deg,rgba(24,4,10,.96) 0,rgba(24,4,10,.75) 38%,rgba(24,4,10,.16) 76%),linear-gradient(0deg,rgba(24,4,10,.93),transparent 56%),none;background-size:cover;background-position:center 58%;box-shadow:0 34px 90px rgba(0,0,0,.34)}
 .dagkop::before{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(115deg,transparent 55%,rgba(194,58,94,.08));pointer-events:none}

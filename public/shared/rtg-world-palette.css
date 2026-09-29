@@ -157,7 +157,13 @@ body[data-rtg-skin="heritage"][data-rtg-layout="standard"] .rtg-interface-second
  --rtg-txt:var(--rtg-world-ink)!important;--rtg-muted:var(--rtg-world-muted)!important;--rtg-soft:var(--rtg-world-muted)!important;
  color:var(--rtg-world-ink)!important;
 }
-body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world="work"] :is(.hm-proposal,.hm-empty,.hm-person small,.hm-mission small,.hq-stage .stil,#dtRahul,#arrival>header p){color:var(--rtg-world-muted)!important}
+body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world="work"] :is(.hm-proposal,.hm-empty,.hm-person small,.hm-mission small,.hq-stage .stil,#dtRahul,#arrival>header p,.pn-intent small,.wk-shell #inlog .stil){color:var(--rtg-world-muted)!important}
+body[data-rtg-skin="heritage"][data-rtg-layout="standard"] #bladDienst .rv-ey{color:var(--rtg-world-muted)!important}
+body[data-rtg-skin="heritage"][data-rtg-layout="standard"] .rv-specialisten{background:var(--rtg-world-card)!important;color:var(--rtg-world-ink)!important;border-color:var(--rtg-world-line)!important}
+body[data-rtg-skin="heritage"][data-rtg-layout="standard"] .rv-specialisten :is(summary,a,a:hover){color:var(--rtg-world-ink)!important}
+body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world="living"] .lv-app :is(.rv-ey,.lv-kop button,.lv-opdrachten button,.lv-filters button,.lv-hero span,.lv-grid span,.lv-tijdlijn em){color:var(--rtg-world-muted)!important}
+body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world="living"] .lv-app :is(.lv-hero,.lv-grid button){background:var(--rtg-world-card)!important;color:var(--rtg-world-ink)!important}
+body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world="living"] .lv-app :is(.lv-hero em,.lv-tijdlijn header span,.lv-tijdlijn time,.lv-live button){color:var(--rtg-world-metal)!important}
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world="work"] .rail .nav button span:first-child{color:var(--rtg-world-muted)!important}
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world="work"] #readinessRing>div{background:var(--rtg-world-card)}
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world="work"] #readinessRing:after{background:var(--rtg-world-card)}

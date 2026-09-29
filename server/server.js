@@ -1183,9 +1183,6 @@ const creator = require('./kern/creator').maakCreator({ db, save, crypto, anthro
 // De samenwerkingslaag (kern/samenwerking.js): EGn knop tussen creators en
 // leveranciers, plus oproepen voor content creators.
 const samenwerking = require('./kern/samenwerking').maakSamenwerking({ db, save, crypto, findSupplier, notifySupplier, sseToSupplier, schoon });
-// De persoonlijke, interactieve AI-agenda (kern/agenda.js) voor leveranciers en
-// leden, in de boardroom, met een ballon-badge op de voorkant.
-const agenda = require('./kern/agenda').maakAgenda({ db, save, bijeen, inBundel, crypto, anthropic, schoon });
 // De centrale facturatielaag (kern/facturatie.js): bij elke verkoop/dienst/verhuur
 // automatisch EGn tweezijdige factuur die beide partijen in de app zien, plus een
 // AI-factuurtool. Alle apps haken hierop in.
@@ -1206,12 +1203,10 @@ const {
 // laat-gebonden: de leden-kern (De Salon) mag nu de vriendschap tussen kijker en
 // auteur nakijken, zodat je een bericht van een vriend altijd ziet
 lidDeps.zijnVrienden = zijnVrienden;
-/* De pro-laag over de agenda (kern/agenda-pro.js): kalenderbereik met
-   herhalingen, uitnodigen op codenaam, herinneringen, ICS-export en de
-   alleen-lezen laag met eigen RTG-boekingen. Ligt hier omdat hij
-   codenaamVan uit de sociale kern nodig heeft. */
-Object.assign(agenda, require('./kern/agenda-pro').maakAgendaPro({
-  db, save, bijeen, inBundel, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer, boekingenVanKlant }));
+// Basisagenda en kalender delen dezelfde domeinlezers en sociale codenamen.
+const agenda = require('./kern/agenda-samenstelling')({
+  db, save, bijeen, inBundel, crypto, anthropic, schoon, keyVanCodenaam, codenaamVan, sseToCustomer, boekingenVanKlant,
+  reserveringenVanKlant: key => mijnReserveringen(key, Infinity) });
 /* Notities & Taken (kern/notities.js): het bord met notities en lijstjes.
    Krijgt de agenda mee, want een notitie met datum en tijd wordt een
    gekoppelde afspraak -- een wekkerlaag, niet drie.

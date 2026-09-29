@@ -33,7 +33,8 @@ test('Ontdekken en Mijn avond gebruiken de bestaande horeca- en aanbiederdata', 
     assert.match(ontdekken, new RegExp(route));
   }
   assert.match(ontdekken, /id="avondZoek"/);
-  assert.match(ontdekken, /Het restaurant bevestigt hem/);
+  assert.match(ontdekken, /Het restaurant ontvangt uw aanvraag en bevestigt zelf/);
+  assert.match(ontdekken, /U heeft nu nog niets aangevraagd/);
 
   for (const route of ['/api/uitgaan', '/api/uitgaan/mijn', '/api/mall/bestellingen']) {
     assert.match(avond, new RegExp(route));

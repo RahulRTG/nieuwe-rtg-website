@@ -1,0 +1,148 @@
+{
+  "id": "guest-travel",
+  "version": 1,
+  "proofRefs": [
+    "contract"
+  ],
+  "purpose": "manual_guest_itinerary",
+  "humanIntent": "Ik wil een reis van deur tot deur handmatig samenstellen en zonder account delen.",
+  "audience": "advisor and guest",
+  "emotionalMode": "reassurance",
+  "owner": "RTG-reisbureau",
+  "domainObject": "reisUitnodigingen.programma",
+  "requiredStates": [
+    "loading",
+    "empty",
+    "normal",
+    "unavailable",
+    "changed",
+    "offline",
+    "uncertain",
+    "error"
+  ],
+  "effortBudget": {
+    "duplicateInput": 0,
+    "deadEnds": 0,
+    "unexplainedStatusChanges": 0
+  },
+  "steps": [
+    {
+      "id": "compose",
+      "world": "work",
+      "screen": "/apps/kantoren.html",
+      "capability": "travel.programme.compose",
+      "primaryAction": "travel.programme.compose",
+      "destination": "/api/office/reisbureau/klaarzetten",
+      "result": "Een privéconcept, of een expliciet uitgegeven gastlink met einddatum.",
+      "authority": "officeAuth; naam uit sessie; versiegebonden update",
+      "recovery": "/apps/kantoren.html",
+      "states": [
+        "loading",
+        "empty",
+        "normal",
+        "unavailable",
+        "changed",
+        "offline",
+        "uncertain",
+        "error"
+      ]
+    },
+    {
+      "id": "read",
+      "world": "travel",
+      "screen": "/apps/reisuitnodiging.html",
+      "capability": "travel.programme.read",
+      "primaryAction": "travel.programme.read",
+      "destination": "/api/reis/uitnodiging/open",
+      "result": "Alleen het bewust gedeelde handmatige programma, zonder account, boeking of betaling.",
+      "authority": "128-bit leescode; doel, scope, verval en intrekking bij iedere serverlezing",
+      "recovery": "/apps/reisuitnodiging.html",
+      "states": [
+        "loading",
+        "empty",
+        "normal",
+        "unavailable",
+        "changed",
+        "offline",
+        "uncertain",
+        "error"
+      ]
+    },
+    {
+      "id": "revoke",
+      "world": "work",
+      "screen": "/apps/kantoren.html",
+      "capability": "travel.programme.revoke",
+      "primaryAction": "travel.programme.revoke",
+      "destination": "/api/office/reisbureau/uitnodiging-weg",
+      "result": "Nieuwe serverlezingen geven geen reisdetails meer terug.",
+      "authority": "officeAuth; kantoor-eigendom",
+      "recovery": "/apps/kantoren.html",
+      "states": [
+        "loading",
+        "empty",
+        "normal",
+        "unavailable",
+        "changed",
+        "offline",
+        "uncertain",
+        "error"
+      ]
+    }
+  ],
+  "handoffs": [
+    {
+      "to": "read",
+      "carry": [
+        "explicitly shared itinerary"
+      ],
+      "exclude": [
+        "office credentials",
+        "account authority"
+      ],
+      "returnTo": "/apps/kantoren.html",
+      "revalidate": [
+        "current access",
+        "current revision"
+      ],
+      "from": "compose"
+    },
+    {
+      "to": "revoke",
+      "carry": [
+        "explicitly shared itinerary"
+      ],
+      "exclude": [
+        "office credentials",
+        "account authority"
+      ],
+      "returnTo": "/apps/kantoren.html",
+      "revalidate": [
+        "current access",
+        "current revision"
+      ],
+      "from": "read"
+    }
+  ],
+  "proofs": [
+    {
+      "id": "guest-travel-domain",
+      "layer": "OPERATIONAL",
+      "test": "test/reisprogramma.test.js",
+      "scope": "Concept/publicatie, veldvalidatie, wereldwijde locaties/tijdzones, versiebotsing, hash-only code, herhaalsleutel, rotatie, intrekking, verval en geen accountclaim."
+    },
+    {
+      "id": "guest-travel-browser",
+      "layer": "EXPERIENCE",
+      "test": "test/reisprogramma.e2e.js",
+      "scope": "Echte lokale server en Chromium 390/1440: acht onderdelen handmatig invullen, concept heropenen, gastvoorbeeld, gast zonder account, wijzigen en intrekken. Geen fysieke iPhone of leverancierscontrole."
+    }
+  ],
+  "humanReview": {
+    "status": "NOT_TESTED",
+    "questions": [
+      "Kan een reisadviseur zelfstandig de eerste klantreis samenstellen?",
+      "Begrijpt de gast dat de getoonde status handmatig is bijgewerkt?"
+    ]
+  }
+}

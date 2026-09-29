@@ -87,7 +87,7 @@ module.exports.maakReisuitnodiging = ({ db, save, bewerkCollectie, crypto, invoe
   function vindCode(bron, code) {
     return bearer.vind(Object.values(bron || {}), code, u => u && u.toegang && u.toegang.code_hash);
   }
-  const statusReden = u => bearer.reden(u && u.toegang, { doel: DOEL, scope: SCOPE });
+  const statusReden = u => bearer.reden(u && u.toegang, { doel: DOEL, scope: u && u.programma ? ['reis.programma.lezen'] : SCOPE });
   const publiek = (u, delen = false) => {
     const p = { id: u.id, soort: u.soort, doorCodenaam: u.doorCodenaam || null,
       bestemming: u.bestemming, venster: u.venster, aantal: (u.onderdelen || []).length,
@@ -95,6 +95,7 @@ module.exports.maakReisuitnodiging = ({ db, save, bewerkCollectie, crypto, invoe
       ingetrokken: !!(u.toegang && u.toegang.ingetrokken_at),
       claim: u.claim ? { status: u.claim.status, at: u.claim.at, voltooid_at: u.claim.voltooid_at || null } : null };
     if (delen) p.onderdelen = u.onderdelen;
+    if(u.programma)Object.assign(p,{programmaReis:true,titel:u.programma.titel,versie:u.versie,gewijzigd:u.gewijzigd,aantal:u.programma.onderdelen.length});
     return p;
   };
 
@@ -167,7 +168,7 @@ module.exports.maakReisuitnodiging = ({ db, save, bewerkCollectie, crypto, invoe
 
   const gebruik = require('./reisuitnodiging-gebruik')({ transactie, vindCode, statusReden,
     publiek, bearer, invoer, idGeverifieerd, nu, crypto, DOEL, SCOPE, vasteAppBasis });
-  return { reisuitnodiging: Object.assign({ zetKlaar, nodigUit }, gebruik) };
+  return { reisuitnodiging: Object.assign({ zetKlaar, nodigUit }, gebruik, require('./reisuitnodiging/programma')({transactie,bearer,crypto,nu,vasteAppBasis,publiek,DOEL})) };
 };
 
 module.exports.DOEL = DOEL;

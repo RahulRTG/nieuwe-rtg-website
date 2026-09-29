@@ -26,6 +26,7 @@ const DINER = ['18:30', '19:00', '19:30', '20:00', '20:30', '21:00', '21:30', '2
    kern/tijdzone.js, dezelfde die de vakwerk-agenda en de Mall gebruiken. */
 const { nuBijZaak } = require('./tijdzone');
 const etenCapaciteit = require('./eten/capaciteit');
+const tafelCapaciteit = require('./reservering/capaciteit');
 const naarMinuten = (t) => Number(String(t).slice(0, 2)) * 60 + Number(String(t).slice(3, 5));
 
 function maakFoodcourt({ db, save, crypto }) {
@@ -55,12 +56,7 @@ function maakFoodcourt({ db, save, crypto }) {
     if (veranderd) save();
   }
 
-  function capaciteit(s) { return (s.tables || []).reduce((n, t) => n + (t.seats || 0), 0); }
-  function bezetOp(s, datum, tijd) {
-    return (db.data.reserveringen || [])
-      .filter(r => r.supplierCode === s.code && r.datum === datum && r.tijd === tijd && r.status !== 'geannuleerd' && r.status !== 'geweigerd')
-      .reduce((n, r) => n + (r.personen || 0), 0);
-  }
+  const capaciteit = tafelCapaciteit.plaatsen;
 
   function kaart(s) {
     const fc = s.foodcourt || {};
@@ -127,10 +123,9 @@ function maakFoodcourt({ db, save, crypto }) {
     if (datum < hier.datum) return { status: 400, error: 'Kies een datum vanaf vandaag.' };
     const personen = Math.min(20, Math.max(1, parseInt(personenIn, 10) || 2));
     const open = !(s.settings && s.settings.reservationsOpen === false);
-    const cap = capaciteit(s);
     const bouw = (lijst, dienst) => lijst
       .filter(t => datum > hier.datum || naarMinuten(t) > hier.minuten)
-      .map(t => ({ tijd: t, dienst, vol: !open || (bezetOp(s, datum, t) + personen > cap) }));
+      .map(t => ({ tijd: t, dienst, vol: !open || !tafelCapaciteit.past(s, db.data.reserveringen, datum, t, personen) }));
     return {
       ok: true, restaurant: { code: s.code, naam: s.name, keuken: (s.foodcourt || {}).keuken || 'Restaurant', deal: (s.foodcourt || {}).deal || null },
       datum, personen, open,

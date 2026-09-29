@@ -1,0 +1,185 @@
+{
+  "id": "travel",
+  "proofRefs": ["contract", "intent"],
+  "version": 1,
+  "purpose": "travel_request",
+  "humanIntent": "Ik wil een reis aanvragen en weten wat de reisadviseur heeft bevestigd.",
+  "audience": "member",
+  "emotionalMode": "explore",
+  "owner": "RTG-reisbureau",
+  "domainObject": "reisaanvraag",
+  "requiredStates": [
+    "loading",
+    "empty",
+    "normal",
+    "unavailable",
+    "changed",
+    "offline",
+    "uncertain",
+    "error"
+  ],
+  "effortBudget": {
+    "duplicateInput": 0,
+    "deadEnds": 0,
+    "unexplainedStatusChanges": 0,
+    "meaningfulActions": 8
+  },
+  "steps": [
+    {
+      "id": "discover",
+      "screen": "/apps/reizen.html",
+      "world": "travel",
+      "capability": "travel.discover",
+      "primaryAction": "open-travel-agency",
+      "destination": "/apps/reisbureau.html",
+      "result": "Het reisaanbod opent zonder aanvraag, boeking of betaling.",
+      "recovery": "/apps/reizen.html",
+      "authority": "member session",
+      "states": [
+        "loading",
+        "empty",
+        "normal",
+        "unavailable",
+        "changed",
+        "offline",
+        "uncertain",
+        "error"
+      ]
+    },
+    {
+      "id": "request",
+      "screen": "/apps/reisbureau.html",
+      "world": "travel",
+      "capability": "travel.request",
+      "primaryAction": "request-trip",
+      "destination": "/api/reisbureau/boek",
+      "result": "Een expliciete aanvraag met datum en reizigers; de reisadviseur heeft nog niet bevestigd.",
+      "recovery": "/apps/reisbureau.html",
+      "authority": "auth + gegevensStop + member ownership",
+      "states": [
+        "loading",
+        "empty",
+        "normal",
+        "unavailable",
+        "changed",
+        "offline",
+        "uncertain",
+        "error"
+      ]
+    },
+    {
+      "id": "confirm",
+      "screen": "/apps/kantoren.html",
+      "world": "work",
+      "capability": "travel.decide",
+      "primaryAction": "decide-trip",
+      "destination": "/api/office/reisbureau/besluit",
+      "result": "Alleen een bevoegde reisadviseur beslist; een afwijzing heeft een reden.",
+      "recovery": "/apps/kantoren.html",
+      "authority": "officeAuth + named staff authority",
+      "states": [
+        "loading",
+        "empty",
+        "normal",
+        "unavailable",
+        "changed",
+        "offline",
+        "uncertain",
+        "error"
+      ]
+    },
+    {
+      "id": "overview",
+      "screen": "/apps/reizen.html",
+      "world": "travel",
+      "capability": "travel.read",
+      "primaryAction": "read-trip",
+      "destination": "/api/reis/reizen",
+      "result": "Het reisoverzicht leest de actuele bron; aanvraag en bevestiging blijven onderscheiden.",
+      "recovery": "/apps/reisbureau.html",
+      "authority": "auth + member ownership",
+      "states": [
+        "loading",
+        "empty",
+        "normal",
+        "unavailable",
+        "changed",
+        "offline",
+        "uncertain",
+        "error"
+      ]
+    }
+  ],
+  "handoffs": [
+    {
+      "from": "discover",
+      "to": "request",
+      "carry": [],
+      "exclude": [
+        "credentials",
+        "authority"
+      ],
+      "returnTo": "/apps/reizen.html",
+      "revalidate": [
+        "session",
+        "catalogue"
+      ]
+    },
+    {
+      "from": "request",
+      "to": "confirm",
+      "carry": [
+        "request reference",
+        "explicit travel request"
+      ],
+      "exclude": [
+        "session credentials",
+        "temporary search context"
+      ],
+      "returnTo": "/apps/reisbureau.html",
+      "revalidate": [
+        "staff authority",
+        "current request status"
+      ]
+    },
+    {
+      "from": "confirm",
+      "to": "overview",
+      "carry": [
+        "source request"
+      ],
+      "exclude": [
+        "staff authority",
+        "internal staff key",
+        "credentials"
+      ],
+      "returnTo": "/apps/reisbureau.html",
+      "revalidate": [
+        "member ownership",
+        "current request status"
+      ]
+    }
+  ],
+  "proofs": [
+    {
+      "id": "travel-domain",
+      "layer": "OPERATIONAL",
+      "test": "test/experience-travel.test.js",
+      "scope": "Echte HTTP-keten: aanvraag, adviseursbesluit, reisagenda, afwijzen, afzeggen, dubbeltik en eigenaarsgrenzen; geen betaling."
+    },
+    {
+      "id": "travel-browser",
+      "layer": "RESILIENCE",
+      "test": "test/experience-travel.e2e.js",
+      "scope": "Chromium op 390 en 1440 px: Travel-ingang, expliciet contextbehoud, antwoordverlies, mislukte broncontrole, herstel en bevestigd reisoverzicht. Geen fysieke iPhone-proef."
+    }
+  ],
+  "humanReview": {
+    "status": "NOT_TESTED",
+    "questions": [
+      "Is duidelijk dat aanvragen niet definitief boeken is?",
+      "Begrijpt iemand wie de reiswens ontvangt?",
+      "Kan iemand bij antwoordverlies zelfstandig verder?"
+    ]
+  }
+}

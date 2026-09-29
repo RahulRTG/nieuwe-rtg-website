@@ -404,6 +404,24 @@
       "url": "/apps/foodcourt.html"
     },
     {
+      "label": "Controleer mijn aanvraag",
+      "app": "Food Court",
+      "wereld": "LivingOS",
+      "url": "/apps/foodcourt.html"
+    },
+    {
+      "label": "Nieuwe avond",
+      "app": "Food Court",
+      "wereld": "LivingOS",
+      "url": "/apps/foodcourt.html"
+    },
+    {
+      "label": "Opnieuw laden",
+      "app": "Food Court",
+      "wereld": "LivingOS",
+      "url": "/apps/foodcourt.html"
+    },
+    {
       "label": "Koppel scherm",
       "app": "Game Night",
       "wereld": "LivingOS",

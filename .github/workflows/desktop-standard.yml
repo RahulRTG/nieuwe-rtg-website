@@ -37,6 +37,9 @@ jobs:
         run: node --test --test-concurrency=1 test/mobile-content.e2e.js test/pass-startup.e2e.js test/world-palette.e2e.js
         env:
           RTG_TEST_WEBKIT: '1'
+      - if: matrix.width == 390
+        name: Living Experience contract en daadwerkelijke pilotproeven
+        run: npm run experience:prove
       - name: Bewaar rapport en schermafbeeldingen
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -46,4 +49,5 @@ jobs:
             artifacts/desktop-standard/
             artifacts/mobile-content/
             artifacts/world-palette/
+            artifacts/experience/
           if-no-files-found: error

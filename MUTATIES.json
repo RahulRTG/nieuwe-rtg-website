@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T16:49:28.434Z",
-    "commit": "c07deb1fc",
+    "op": "2026-09-29T18:25:19.558Z",
+    "commit": "a559eb23c",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -1518,6 +1518,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "scherp": "gezakt"
+    },
+    "bezorgpunt.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 9,
       "scherp": "gezakt"
     },
     "bezorgvolgen.test.js": {
@@ -5931,6 +5938,13 @@
       "gezakt": 1,
       "geprobeerd": 2
     },
+    "kringronde.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "kruisscan.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -7841,6 +7855,13 @@
       "gezakt": 9,
       "scherp": "gezakt"
     },
+    "n21stromen.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 9,
+      "scherp": "gezakt"
+    },
     "naamlaag.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -8733,6 +8754,14 @@
       "operator": "===->!==#0",
       "gezakt": 5,
       "geprobeerd": 1
+    },
+    "ovhalte.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/geo.js",
+      "operator": "+->-#0",
+      "gezakt": 4,
+      "geprobeerd": 2
     },
     "ovkaart.test.js": {
       "soort": "server",
@@ -10018,6 +10047,13 @@
       "operator": "&&->||#0",
       "gezakt": 1,
       "geprobeerd": 3
+    },
+    "ritpunten.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
     },
     "rollbackbesluit.test.js": {
       "soort": "puur",
@@ -11584,6 +11620,14 @@
       "operator": "&&->||#1",
       "gezakt": 1,
       "geprobeerd": 9
+    },
+    "sospositie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/sospositie.js",
+      "operator": "true->false#0",
+      "gezakt": 3,
+      "geprobeerd": 1
     },
     "sparren.test.js": {
       "soort": "server",

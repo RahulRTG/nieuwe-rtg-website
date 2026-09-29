@@ -30,6 +30,7 @@
     noRoute: ['Kies in Navigatie een bestemming om uw route te berekenen.', 'Choose a destination in Navigation to calculate your route.'],
     safeEmpty: ['Er is geen actieve wacht. Open Veilig om uw instellingen te bekijken.', 'There is no active watch. Open Safety to review your settings.'],
     current: ['Opgehaald', 'Retrieved'], grid: ['Toon kaarten', 'Show cards'], list: ['Toon een lijst', 'Show a list'],
+    week: ['Week kiezen', 'Choose week'],
     all: ['Alle apps', 'All apps'], favorites: ['Mijn widgets', 'My widgets']
   };
   w.I18N = w.I18N || {}; w.I18N.en = w.I18N.en || {};

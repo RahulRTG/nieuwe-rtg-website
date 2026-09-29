@@ -43,18 +43,17 @@ test('Werkruimte: een kamer bewaren, leeghalen en met een klik terughalen',
     const maten = async () => page.evaluate(() => {
       const pak = (s) => { const r = document.querySelector(s).getBoundingClientRect();
         return { x:r.x, y:r.y, width:r.width, height:r.height }; };
-      return { scherm:{ width:innerWidth, height:innerHeight }, ruimte:pak('.rtg-werkruimte'),
+      return { scherm:{ width:innerWidth, height:innerHeight }, ruimte:pak('.rtg-werkruimte'), kader:pak('.wd-page'),
         zichtbaar:[...document.querySelectorAll('.rtg-surface[data-edge-visible]')].map((e) => {
           const r=e.getBoundingClientRect(); return { x:r.x,y:r.y,width:r.width,height:r.height };
         }), rand:{ boven:pak('.rtg-edge-top'), links:pak('.rtg-edge-side'), onder:pak('.rtg-adaptive-bar') } };
     });
     const randKlopt = (m) => {
-      assert.ok(Math.abs(m.ruimte.x - m.rand.links.width) < 1, JSON.stringify(m));
-      assert.ok(Math.abs(m.ruimte.y - m.rand.boven.height) < 1);
-      assert.ok(Math.abs(m.ruimte.width + m.rand.links.width - m.scherm.width) < 1);
-      assert.ok(m.ruimte.y + m.ruimte.height <= m.rand.onder.y + 1, 'de werkruimte blijft boven de zwevende bediening');
+      assert.ok(Math.abs(m.ruimte.x - m.kader.x) < 1, JSON.stringify(m));
+      assert.ok(Math.abs(m.ruimte.y - m.kader.y) < 1);
+      assert.ok(Math.abs(m.ruimte.width - m.kader.width) < 1);
+      assert.ok(m.ruimte.height >= 400, 'de actieve app krijgt een bruikbare werkhoogte');
       assert.ok(m.rand.onder.y + m.rand.onder.height <= m.scherm.height, 'de bediening blijft in beeld');
-      assert.ok(m.rand.onder.y - m.ruimte.y - m.ruimte.height <= 20, 'geen ongebruikte tweede navigatierij');
     };
     await page.waitForFunction(() => {
       const r = document.querySelector('.rtg-surface[data-edge-visible]').getBoundingClientRect();

@@ -62,6 +62,7 @@
       if (!view.hidden) view.querySelector('button').focus();
     });
     uitvoer.addEventListener('click', function () {
+      if (w.RTGUitvoer) w.RTGUitvoer.herzie();
       var open = shell.querySelector('.rtg-ss-header .rtguitvoer-knop'); if (open) open.click();
     });
   }

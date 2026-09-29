@@ -16,6 +16,8 @@
    Een rand daarheen verplaatsen is een besluit dat je kunt terugvinden; hem
    DOMEINRELATIE noemen om van het getal af te zijn, is de meter kapotmaken. */
 module.exports = [
+  { van: 'ingang:ik', naar: 'ingang:presentatie-beelden', soort: 'ORKESTRATIE',
+    reden: 'De ik-route registreert de persoonlijke presentatievoorkeuren als onderdeel van de eigen accountinstellingen; de beeldmodule bewaakt zelf lid- en gezinsprofielauthenticatie en eigendom van privébestanden.' },
   /* DE LEDENGIDS RAAKT DE AANWEZIGHEID AAN (besluit van de eigenaar, 25 september
      2026: retentie ook als aanwezigheid, een dag per lid). kern/gids.js dirTouch
      is het ene keelgat waar elk ledenverzoek langskomt; daar wordt ook de dag van

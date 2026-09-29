@@ -1,0 +1,23 @@
+/* Article content changes, the surrounding desktop grid does not. */
+ body[data-rtg-desktop] .pp-detail-shell>.world-shell{max-width:none;width:100%;margin:0;padding:0;overflow:visible}
+ .pp-detail-shell .world-header{display:none}
+ .pp-detail-shell .world-hero{min-height:0;height:auto;margin:0;padding:0;background:transparent;color:var(--rtg-world-ink);border:0;border-radius:var(--rtg-radius-editorial)}
+ .pp-detail-shell .world-hero-inner{display:block;padding:0;min-height:0}
+ .pp-detail-shell .world-hero h1{font-size:44px;line-height:1.1;max-width:none}
+ .pp-detail-shell .world-hero img{max-width:100%;height:auto}
+ .pp-detail-shell main,.pp-detail-shell section{max-width:100%;min-width:0}
+ .pp-detail-shell main{padding:24px 0}
+ .pp-detail-shell :is(.world-lead,.world-section p,.world-section h2){color:var(--rtg-world-ink)}
+ .pp-detail-shell .wd-library{display:flex;flex-wrap:wrap;gap:24px}
+ .pp-detail-shell .wd-favorites a{font-size:13px}
+ .pp-detail-shell .wd-people h2{font:500 22px/1.3 Inter,sans-serif;margin:0 0 16px}
+ body[data-rtg-desktop]>.pp-header .pp-language{margin-inline-start:auto}
+
+.pp-detail-shell .wd-home{overflow-wrap:anywhere}
+body:has(.pp-detail-shell) .pp-header>.pp-language{display:inline-flex!important;min-width:44px;min-height:44px}
+@media(max-width:370px){body:has(.pp-detail-shell) .pp-header>.pp-context{font-size:12px}}
+.pp-detail-shell .wd-home :is(h1,h2,h3){font-family:Inter,sans-serif!important;letter-spacing:-.035em}
+.pp-detail-shell .world-hero::before,.pp-detail-shell .world-hero::after{display:none}
+.pp-detail-shell .world-hero h1{font-size:clamp(30px,4vw,44px);margin-block:12px 20px}
+.pp-detail-shell .world-hero .wp-photo{margin-top:24px}
+@media(max-width:999px){.pp-detail-shell .wd-library{display:flex!important}.pp-detail-shell .world-hero h1{font-size:32px}}

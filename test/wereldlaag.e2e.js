@@ -36,7 +36,8 @@ test('LivingOS editorial home: responsive example, real destinations, language a
     letOpFouten(page, errors);
     page.on('request', r => { if (/\/api\/(like|salon\/(bewaar|reageer|plaats))$/.test(new URL(r.url()).pathname)) writes.push(r.url()); });
     await page.goto(srv.base + '/apps/wereld.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForSelector('.living-welcome[data-example="true"]');
+    await page.waitForSelector('.wp-scene');
+    await page.locator('.wp-story a').click();
     await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
     assert.match(await page.locator('.living-example-head').innerText(), /Voorbeeldmoment/);
     assert.equal(await page.locator('.living-welcome .tel,.living-welcome .auteur').count(), 0, 'example is never a fabricated post');
@@ -132,9 +133,10 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
 
     // 1. de vijf werelden staan er, en Business is voor de gratis pas DICHT --
     //    zichtbaar, want wegstoppen wat je niet hebt is oneerlijk naar beide kanten
+    await page.locator('.wp-story a').click();
     await page.waitForSelector('#werelden button', { timeout: 15000 });
     await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
-    assert.equal(await page.locator('main .living-intro').isVisible(), true,
+    assert.equal(await page.locator('main .wp-scene').isVisible(), true,
       'het verhaal en de fotografische ingangen blijven inhoud, ook nadat de Edge de bediening overneemt');
     assert.equal(await page.locator('.moment img').count(), 3, 'de snelle ingangen dragen echte fotografie');
     await page.waitForSelector('#passport:not([hidden])', { timeout: 15000 });
@@ -200,6 +202,7 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
     }, a);
     await page.setViewportSize({ width: 320, height: 720 });
     await page.goto(base + '/apps/wereld.html', { waitUntil: 'domcontentloaded' });
+    await page.locator('.wp-story a').click();
     await page.waitForSelector('#werelden button', { timeout: 15000 });
     await page.waitForSelector('body[data-rtg-edge-2-rendered="true"]', { timeout: 15000 });
     assert.equal(await page.locator('.rtg-edge-chrome').count(), 1,
@@ -290,6 +293,7 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, b);
     await page2.goto(base + '/apps/wereld.html', { waitUntil: 'domcontentloaded' });
+    await page2.locator('.wp-story a').click();
     await page2.waitForSelector('#werelden button', { timeout: 15000 });
     await page2.waitForSelector('body[data-rtg-edge-2-rendered="true"]', { timeout: 15000 });
     assert.match(await page2.locator('#passport').innerText(), /Signature/i,
@@ -322,6 +326,7 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
     // de projectie, nooit een eigen bericht of iemands identiteit.
     await api(base, '/api/wereld/modus', { modus: 'prive' }, b);
     await page2.goto(base + '/apps/wereld.html', { waitUntil: 'domcontentloaded' });
+    await page2.locator('.wp-domain > summary').click();
     await page2.waitForSelector('#feed .leeg', { timeout: 15000 });
     assert.match(await page2.locator('#feed .leeg').innerText(), /Geen resultaten/);
     assert.equal(await page2.locator('#feed .tel,#feed .auteur').count(), 0);
@@ -330,6 +335,7 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
     await page2.waitForFunction(() => document.querySelector('#feed .leeg').textContent === 'No results within your current choices.');
     assert.equal((await api(base, '/api/wereld/state', {}, b)).modus, 'prive');
     await page2.evaluate(() => RTGi18n.set('nl'));
+    await page2.waitForFunction(() => /Geen resultaten/.test(document.querySelector('#feed .leeg').textContent));
     assert.match(await page2.locator('#feed .leeg').innerText(), /Geen resultaten/);
 
     // Dezelfde route in een werkvlak houdt de inhoud, maar geen tweede balk.

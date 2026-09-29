@@ -3,23 +3,23 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-09-29",
-  "commit": "4984ab46"
+  "commit": "eaacb8c3"
  },
  "grens": "Dit register kent GEEN symbool-naar-symboolaanroepen: een naam in aanroeppositie is geen verwijzing. De kanten hier zijn require-kanten, en die wijzen naar een bestand dat bestaat.",
  "gemeten": {
-  "bestandenGezien": 5108,
-  "gelezen": 4799,
+  "bestandenGezien": 5109,
+  "gelezen": 4800,
   "nietGelezen": 309,
   "waarvanBundeldeel": 309,
   "waarvanParsefout": 0,
   "symbolen": 24640,
-  "bestandenMetUitvoer": 3967,
-  "uitvoerMetNamen": 1716,
+  "bestandenMetUitvoer": 3968,
+  "uitvoerMetNamen": 1717,
   "uitvoerOnvolledig": 3,
   "uitvoerZonderNamen": 2248,
   "zonderUitvoer": 832,
-  "requireKanten": 6482,
-  "seconden": 10.1
+  "requireKanten": 6483,
+  "seconden": 8.7
  },
  "nietGelezen": [
   {
@@ -144686,6 +144686,28 @@
    ]
   },
   {
+   "bestand": "server/lib/mutatiecontracten-democratie-connector.js",
+   "symbolen": [
+    {
+     "naam": "pc",
+     "soort": "pijl",
+     "lijn": 20,
+     "geexporteerd": false
+    }
+   ],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "CONNECTOR"
+    ]
+   },
+   "requires": [],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/lib/mutatiecontracten-democratie.js"
+   ]
+  },
+  {
    "bestand": "server/lib/mutatiecontracten-democratie.js",
    "symbolen": [
     {
@@ -144705,12 +144727,6 @@
      "soort": "pijl",
      "lijn": 61,
      "geexporteerd": false
-    },
-    {
-     "naam": "pc",
-     "soort": "pijl",
-     "lijn": 100,
-     "geexporteerd": false
     }
    ],
    "uitvoer": {
@@ -144719,7 +144735,9 @@
      "CONTRACTEN"
     ]
    },
-   "requires": [],
+   "requires": [
+    "server/lib/mutatiecontracten-democratie-connector.js"
+   ],
    "extern": [],
    "gebruiktDoor": [
     "server/lib/mutatiecontracten.js"

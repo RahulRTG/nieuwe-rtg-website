@@ -3,13 +3,13 @@
  "uitleg": "De symbool-naar-symboolgraaf van server/: welke functie roept welke functie aan. Elke kant draagt HOE hij is afgeleid (lokaal, ingevoerd, lid). Wat niet af te leiden viel staat als onopgelost in de uitslag, met aantallen -- niet weggelaten.",
  "stempel": {
   "op": "2026-09-29",
-  "commit": "4984ab46"
+  "commit": "eaacb8c3"
  },
  "grens": "Liever geen kant dan een verzonnen kant. Er wordt geen kant gelegd op naamgelijkenis alleen: een aanroep telt pas als de naam lokaal bestaat of aantoonbaar uit een require komt, EN het doelbestand dat symbool ook echt kent.",
  "gemeten": {
-  "bestanden": 3910,
+  "bestanden": 3911,
   "nietGelezen": 0,
-  "aanroepen": 161492,
+  "aanroepen": 161493,
   "kanten": 28850,
   "kantenLokaal": 18040,
   "kantenIngevoerd": 2177,
@@ -20,10 +20,10 @@
   "kantenUitFabriek": 249,
   "kantenViaKernZonderSymbool": 4223,
   "kernherkomstGelezen": 1246,
-  "onopgelosteAanroepen": 118969,
+  "onopgelosteAanroepen": 118970,
   "onopgelosteNamen": 12428,
   "onopgelostNaarSoort": {
-   "ingebouwd": 31707,
+   "ingebouwd": 31708,
    "externeModule": 834,
    "kader": 11878,
    "contextobject": 16715,
@@ -26440,7 +26440,7 @@
   },
   {
    "naam": "require",
-   "aantal": 6996
+   "aantal": 6997
   },
   {
    "naam": "app.post",
@@ -26601,7 +26601,7 @@
     },
     {
      "naam": "require",
-     "aantal": 6996
+     "aantal": 6997
     },
     {
      "naam": "Number",
@@ -190089,6 +190089,14 @@
    "lijn": 98
   },
   {
+   "vanBestand": "server/lib/mutatiecontracten-democratie-connector.js",
+   "van": "(module)",
+   "naarBestand": "server/lib/mutatiecontracten-democratie-connector.js",
+   "naar": "pc",
+   "hoe": "lokaal",
+   "lijn": 26
+  },
+  {
    "vanBestand": "server/lib/mutatiecontracten-democratie.js",
    "van": "(module)",
    "naarBestand": "server/lib/mutatiecontracten-democratie.js",
@@ -190100,17 +190108,9 @@
    "vanBestand": "server/lib/mutatiecontracten-democratie.js",
    "van": "(module)",
    "naarBestand": "server/lib/mutatiecontracten-democratie.js",
-   "naar": "pc",
-   "hoe": "lokaal",
-   "lijn": 106
-  },
-  {
-   "vanBestand": "server/lib/mutatiecontracten-democratie.js",
-   "van": "(module)",
-   "naarBestand": "server/lib/mutatiecontracten-democratie.js",
    "naar": "leest",
    "hoe": "lokaal",
-   "lijn": 131
+   "lijn": 94
   },
   {
    "vanBestand": "server/lib/mutatiecontracten-democratie.js",
@@ -190118,7 +190118,7 @@
    "naarBestand": "server/lib/mutatiecontracten-democratie.js",
    "naar": "schrijft",
    "hoe": "lokaal",
-   "lijn": 138
+   "lijn": 101
   },
   {
    "vanBestand": "server/lib/mutatiecontracten-effectmeter.js",

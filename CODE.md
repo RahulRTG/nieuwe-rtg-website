@@ -30,7 +30,7 @@ gevonden. Dus eerst meten — `npm run codewereld`, uitslag in `CODEWERELD.json`
 | Ruggengraat | **<!--getal:codewereld.ruggengraat-->6119<!--/getal--> van <!--getal:codewereld.paden-->6564<!--/getal--> paden (<!--getal:codewereld.ruggengraatPct-->93.2<!--/getal-->%) staan in meer dan één register** |
 | Brug route → bestand | <!--getal:codewereld.brugPaden-->5612<!--/getal--> paden, uit **2** registers |
 | Verschillen in die brug | 1, getoetst op <!--getal:codewereld.brugToetsbaar-->5383<!--/getal--> paden (<!--getal:codewereld.brugDekkingPct-->95.9<!--/getal-->%) — soort: zie §0.3 |
-| Bronbereik **structuur** | <!--getal:codewereld.bronGenoemd-->5108<!--/getal--> van <!--getal:codewereld.bronBestanden-->5108<!--/getal--> (<!--getal:codewereld.bronPct-->100<!--/getal-->%) — welke functies er wonen, wie ervan afhangt |
+| Bronbereik **structuur** | <!--getal:codewereld.bronGenoemd-->5109<!--/getal--> van <!--getal:codewereld.bronBestanden-->5109<!--/getal--> (<!--getal:codewereld.bronPct-->100<!--/getal-->%) — welke functies er wonen, wie ervan afhangt |
 | Bronbereik **gedrag** | **<!--getal:codewereld.bronGedrag-->2871<!--/getal--> van 3987 (<!--getal:codewereld.bronGedragPct-->56.2<!--/getal-->%)** — schrijft het, is het bewezen, is het herhaalbaar |
 | — gedrag in `server/` | <!--getal:codewereld.bronServerPct-->60.5<!--/getal-->% |
 | — gedrag in `public/` | <!--getal:codewereld.bronPublicPct-->42.2<!--/getal-->% |
@@ -77,7 +77,7 @@ verschilt.
 parser in `scripts/ast/` (lexer, recursive-descent parser, walker — geen enkele
 dependency) is over de hele serverboom gehaald:
 
-**<!--getal:codewereld.geparsed-->3910<!--/getal--> bestanden geparsed, <!--getal:codewereld.parseFout-->0<!--/getal--> gefaald, <!--getal:codewereld.symbolen-->17210<!--/getal--> benoemde
+**<!--getal:codewereld.geparsed-->3911<!--/getal--> bestanden geparsed, <!--getal:codewereld.parseFout-->0<!--/getal--> gefaald, <!--getal:codewereld.symbolen-->17210<!--/getal--> benoemde
 symbolen, in vijf seconden.**
 
 Nul gefaald telt hier dubbel, want deze parser gooit op wat hij niet begrijpt in
@@ -90,8 +90,8 @@ het voorstel voorlopig een oplossing voor een probleem dat niemand heeft.
 
 `scripts/symbolen.js` → `SYMBOLEN.json` (`npm run symbolen`):
 
-**<!--getal:symbolen.gelezen-->4799<!--/getal--> bestanden gelezen, <!--getal:symbolen.totaal-->24640<!--/getal--> benoemde symbolen met een regelnummer,
-<!--getal:symbolen.kanten-->6482<!--/getal--> require-kanten** — heen (waar hang ik van af) én terug (wie hangt van
+**<!--getal:symbolen.gelezen-->4800<!--/getal--> bestanden gelezen, <!--getal:symbolen.totaal-->24640<!--/getal--> benoemde symbolen met een regelnummer,
+<!--getal:symbolen.kanten-->6483<!--/getal--> require-kanten** — heen (waar hang ik van af) én terug (wie hangt van
 mij af). Die tweede richting is de dure kant om met de hand te zoeken, en precies
 wat een impactvraag nodig heeft.
 
@@ -227,7 +227,7 @@ uit een `require` komt, **én** het doelbestand dat symbool ook echt kent.
 
 #### Een kwart opgelost is hier geen tekort
 
-Van de <!--getal:graaf.aanroepen-->161492<!--/getal--> aanroepen is <!--getal:graaf.opgelostPct-->26.3<!--/getal-->% naar een symbool te herleiden (18,1%
+Van de <!--getal:graaf.aanroepen-->161493<!--/getal--> aanroepen is <!--getal:graaf.opgelostPct-->26.3<!--/getal-->% naar een symbool te herleiden (18,1%
 toen deze meter werd gebouwd; §0.7 bracht de rest). Dat getal zonder indeling
 nodigt uit tot de verkeerde reparatie — iemand gaat de resolver "verbeteren" tot
 hij `res.json` aan een bestand knoopt. Daarom staat de rest ingedeeld:
@@ -312,7 +312,7 @@ boom, dan is hij het, wat hij ook beweert).
 | teller | wat het zegt | stand |
 |---|---|---|
 | structuur | dit bestand bestaat, en dit woont erin | <!--getal:codewereld.bronPct-->100<!--/getal-->% |
-| relatie | waar hangt het mee samen, welk scherm gebruikt het | <!--getal:codewereld.relatie-->5108<!--/getal--> bestanden |
+| relatie | waar hangt het mee samen, welk scherm gebruikt het | <!--getal:codewereld.relatie-->5109<!--/getal--> bestanden |
 | **gedrag** | schrijft het, klopt het, is het bewezen | **<!--getal:codewereld.bronGedragPct-->56.2<!--/getal-->%** |
 
 Alleen die laatste is de bovengrens voor een Architect die over gedrag wordt

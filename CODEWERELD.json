@@ -2,7 +2,7 @@
   "uitleg": "Kan er een canonieke Codewereld bestaan? Gemeten over de registers in de wortel: op welke as staan ze, hoeveel sleutels delen ze, en spreken ze elkaar tegen. Deze meter voegt niets samen en kiest bij tegenspraak geen winnaar.",
   "stempel": {
     "op": "2026-09-29",
-    "commit": "4984ab46"
+    "commit": "eaacb8c3"
   },
   "registers": {
     "geteld": 190,
@@ -17,7 +17,7 @@
       "registers": 82
     },
     "bestand": {
-      "sleutels": 5812,
+      "sleutels": 5813,
       "registers": 154
     },
     "symbool": {
@@ -28,8 +28,8 @@
       "gereedschap": "scripts/ast/ (eigen parser, met lijn- en positie-informatie)",
       "proef": {
         "gedraaid": true,
-        "bestanden": 3910,
-        "geparsed": 3910,
+        "bestanden": 3911,
+        "geparsed": 3911,
         "gefaald": 0,
         "gefaaldLijst": [],
         "symbolen": 17210,
@@ -168,11 +168,11 @@
       },
       {
         "registers": 4,
-        "paden": 56
+        "paden": 62
       },
       {
         "registers": 3,
-        "paden": 351
+        "paden": 345
       },
       {
         "registers": 2,
@@ -670,12 +670,12 @@
   },
   "bronbereik": {
     "uitleg": "twee getallen, met opzet. `genoemd` = door enig register (de symboolindex noemt alles, dus dit meet STRUCTUUR: welke functies, wat uitgevoerd, wie hangt ervan af). `gedrag` = door minstens een register buiten die index (schrijft het, is het bewezen, is het herhaalbaar). Alleen het tweede is de bovengrens voor een vraag over gedrag.",
-    "bestanden": 5108,
-    "genoemd": 5108,
+    "bestanden": 5109,
+    "genoemd": 5109,
     "pct": 100,
     "gedrag": 2871,
     "gedragPct": 56.2,
-    "relatie": 5108,
+    "relatie": 5109,
     "indexregisters": [
       {
         "register": "AANROEPGRAAF.json",
@@ -708,8 +708,8 @@
     "perBoom": [
       {
         "boom": "server",
-        "bestanden": 3910,
-        "genoemd": 3910,
+        "bestanden": 3911,
+        "genoemd": 3911,
         "pct": 100,
         "gedrag": 2365,
         "gedragPct": 60.5
@@ -814,7 +814,7 @@
       },
       {
         "register": "MACHINEDEKKING.json",
-        "paden": 3949
+        "paden": 3955
       },
       {
         "register": "HANDELINGPROEF.json",
@@ -915,7 +915,7 @@
       "register": "AANROEPGRAAF.json",
       "as": "bestand",
       "paden": 3244,
-      "bestanden": 3421,
+      "bestanden": 3422,
       "symbolen": 0,
       "paren": 3253
     },
@@ -947,7 +947,7 @@
       "register": "SYMBOLEN.json",
       "as": "symbool",
       "paden": 0,
-      "bestanden": 5114,
+      "bestanden": 5115,
       "symbolen": 24495,
       "paren": 0
     },
@@ -1018,10 +1018,10 @@
     {
       "register": "MACHINEDEKKING.json",
       "as": "route",
-      "paden": 3949,
-      "bestanden": 691,
+      "paden": 3955,
+      "bestanden": 692,
       "symbolen": 0,
-      "paren": 3952
+      "paren": 3958
     },
     {
       "register": "ONBEWEZEN.json",

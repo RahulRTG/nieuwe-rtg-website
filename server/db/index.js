@@ -117,6 +117,8 @@ const bewerkCollectie = require('./collectie-bewerken')({
 // De tx-veegronde kapt pas na de duurzame grootboek-upsert en doet dat via de
 // autoritatieve collectiepoort; nooit als kale achtergrond-save.
 tx.wire(bewerkCollectie);
+// Verse basis voor een gezagsbesluit (bedrijf/productie-identiteit.js); zonder PostgreSQL is de werkkopie al de waarheid.
+db.verversVerzoekCollectie = async () => { if (STORE === 'postgres') await postgres.verversPostgres(); };
 
 // De kern zet hier een functie neer die na een externe wijziging draait.
 function onExternalChange(cb) { state.setExternCb(cb); }

@@ -4,6 +4,18 @@
 'use strict';
 
 const normRef = v => v == null ? null : String(v);
+const heeft = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
+
+/* DE VORM VAN EEN ECONOMISCHE SLEUTEL, op een plek voor alle drie de opslagen
+   (sqlite, PostgreSQL, de proceslokale ontwikkelweg). Drie soorten en geen
+   vrije tekst: `payout-terug` voor een teruggeboekte uitbetaling en
+   `pay-tegoed` voor geld dat een tegoedbon uit de escrow haalt
+   (kern/pay/tegoed-claim.js), plus `pay-kas` voor de delen onder een
+   kascode-claim (kern/pay/kas-boek.js). Achter de dubbele punt staat altijd een
+   SHA-256, want deze sleutel wordt een permanente primaire sleutel en een
+   providerref of codenaam hoort daar niet in. De Rust-motor kent dezelfde drie
+   (motor/src/pay.rs, economische_sleutel_geldig). */
+const SLEUTEL = /^(?:payout-terug|pay-tegoed|pay-kas):[a-f0-9]{64}$/;
 
 function gelijk(a, b) {
   return !!a && !!b && typeof a.id === 'string' && a.id.length > 0 &&
@@ -32,7 +44,18 @@ function vindBeweging(data, collecties, identiteit) {
 
 /* Saldi zijn geen gewone objectvelden maar de som van boekingsdelta's. Als een
    normale mutatie tijdens database-I/O dezelfde rekening raakte, moet haar
-   delta naast de gecommitte delta blijven bestaan. */
+   delta naast de gecommitte delta blijven bestaan.
+
+   EEN SALDO VAN NUL IS EEN SALDO, GEEN AFWEZIGE REKENING. Hier stond
+   `if (waarde)`, en dat liet een rekening die door de commit op precies nul
+   uitkwam uit de levende kopie vallen terwijl de database hem met 0 bewaarde.
+   Het volgende verzoek dat die rekening raakte zag dan als basis "geen
+   rekening", als database "0" en als eigen stand het nieuwe bedrag -- en de
+   conflictvaste requestmerge (pg/verzoekmerge.js) weigerde terecht met 409.
+   Gevonden met de tegoedbon: de escrow `extern:tegoed` staat na een
+   verzilvering vaak op exact nul (test/tegoedbon-routes.test.js tegen
+   PostgreSQL). Alleen een rekening die in geen van de drie standen voorkomt,
+   blijft weg. */
 const saldoSamen = begin => ({ live, commit }) => {
   const uit = {}, huidig = live && typeof live === 'object' && !Array.isArray(live) ? live : {};
   const voor = begin && typeof begin === 'object' && !Array.isArray(begin) ? begin : {};
@@ -40,7 +63,7 @@ const saldoSamen = begin => ({ live, commit }) => {
   for (const rekening of new Set([...Object.keys(huidig), ...Object.keys(voor), ...Object.keys(na)])) {
     const waarde = Math.round(Number(huidig[rekening] || 0)) +
       (Math.round(Number(na[rekening] || 0)) - Math.round(Number(voor[rekening] || 0)));
-    if (waarde) uit[rekening] = waarde;
+    if (waarde || heeft(huidig, rekening) || heeft(na, rekening)) uit[rekening] = waarde;
   }
   return uit;
 };
@@ -55,4 +78,4 @@ const boekingenSamen = ({ live, commit }) => {
   return uit;
 };
 
-module.exports = { gelijk, bewegingGelijk, vind, vindBeweging, saldoSamen, boekingenSamen };
+module.exports = { SLEUTEL, gelijk, bewegingGelijk, vind, vindBeweging, saldoSamen, boekingenSamen };

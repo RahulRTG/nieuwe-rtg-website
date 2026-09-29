@@ -56,7 +56,7 @@
       const van = document.getElementById('vlVan').value, tot = document.getElementById('vlTot').value;
       if (!van || !tot){ toast(T('pd.ad.datum','Kies een begin- en einddatum.')); return; }
       try {
-        await API.call('/staff/leave/request', { soort: 'verlof', van, tot, reden: document.getElementById('vlReden').value.trim() });
+        await API.call('/staff/leave/request', { soort: 'verlof', van, tot });
         toast(''+T('pd.ad.gevraagd','Verlof aangevraagd; de manager beslist in het Kantoor.'));
         await laadZaken(); renderHulp(); openTab('hulp');
       } catch(e){ toast(e.message); }

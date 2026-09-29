@@ -19,12 +19,17 @@
   var duur = function (m) { var u = Math.floor(m / 60), r = m % 60; return (u ? u + 'u' : '') + (r ? (u ? ' ' : '') + r + 'm' : u ? '' : '0m'); };
   var LEVEN = null, KEUZE = null, KLOK = null;
 
+  /* Loopt er een gedeelde stad (./magnaat-leven-stad.js), dan gaat alles naar de stad, en komt het leven terug naast de stand van de stad. */
+  var STAD = function () { return !!(window.RTGMagnaatStad && window.RTGMagnaatStad.loopt()); };
   function vraag(pad, body) {
-    return fetch('/api/member/magnaat/leven/' + pad, { method: 'POST',
+    var stad = STAD();
+    return fetch('/api/member/magnaat/' + (stad ? 'stad/' : 'leven/') + pad, { method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN }, body: JSON.stringify(body || {}) })
       .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) {
         if (!r.ok) throw new Error(d.error || 'Magnaat kon dit niet doen.');
-        return d;
+        if (!stad) return d;
+        window.RTGMagnaatStad.zet(d.stad);
+        return d.leven || vraag('staat');
       }); });
   }
   function meldFout(t) { var e = q('#vnFout'); e.textContent = t; e.hidden = !t; }
@@ -46,6 +51,7 @@
 
   function klok(s) {
     clearTimeout(KLOK);
+    if (STAD()) { q('#vnKlok').textContent = 'Week ' + s.week + ' · nog ' + duur(s.vrijVandaag) + ' vrij vandaag · de dag gaat door als iedereen hem heeft afgesloten'; return; }
     KLOK = setTimeout(laad, Math.max(1000, s.volgendeDagOver + 500));
     var t = q('#vnTempo');
     if (t && !t.options.length) t.innerHTML = s.tempo.standen.map(function (x) { return '<option value="' + esc(x) + '">' + esc(x) + '</option>'; }).join('');
@@ -74,6 +80,15 @@
     }).join('');
   }
 
+  /* Wie een eigen hoofdactie heeft (#vnHoofd, data-hoofdactie), zegt ook zelf
+     waar je bent (EDGE.md par. 8, besluit 11). De adaptieve laag laadt met
+     defer, dus bij de eerste tekening kan hij er nog niet zijn: daarom ook bij
+     DOMContentLoaded. */
+  function meldContext() {
+    if (window.RTGAdaptief) window.RTGAdaptief.context({ bron: 'spel.magnaat', titel: 'Magnaat' });
+  }
+  document.addEventListener('DOMContentLoaded', meldContext);
+
   function tekenVandaag(s) {
     var v = s.vandaag;
     q('#vnDag').textContent = s.dagNaam + ', dag ' + s.dag;
@@ -82,6 +97,7 @@
     var hoofd = q('#vnHoofd'), eerste = v.volgende[0];
     hoofd.hidden = !eerste;
     hoofd.textContent = eerste ? eerste.label : '';
+    meldContext();
     q('#vnActies').innerHTML = v.volgende.slice(1).map(function (a, n) {
       return '<button type="button" class="btn" data-vn-actie="' + (n + 1) + '">' + esc(a.label) + '</button>';
     }).join('');
@@ -117,7 +133,7 @@
     /* Opnieuw beginnen gooit een leven weg en kan niet terug: de eerste tik vraagt
        het, de tweede doet het. */
     if (t.dataset.vnOpnieuw != null) {
-      if (t.dataset.zeker) { var nv = q('#vnNiveau'); doe({ actie: 'opnieuw', zeker: true, moeilijkheid: nv ? nv.value : undefined }); return; }
+      if (t.dataset.zeker) { var nv = q('#vnNiveau'), ns = q('#vnStart'); doe({ actie: 'opnieuw', zeker: true, moeilijkheid: nv ? nv.value : undefined, begin: ns ? ns.value : undefined }); return; }
       t.dataset.zeker = '1';
       t.textContent = 'Ja, gooi dit leven weg en begin opnieuw';
       return;
@@ -132,5 +148,6 @@
     var gekozen = LEVEN.vandaag.volgende[KEUZE];
     if (gekozen) doe(lichaam(gekozen));
   });
+  window.RTGMagnaatLeven = { laad: laad };
   laad();
 }());

@@ -40,6 +40,9 @@ const REDENEN = [
      hetzelfde te zeggen. */
   ['/api/mijn/abonnement', 'een schakelaar op zien en opzeggen houdt een lid in een contract dat hij niet meer wil; ' +
     'dat is geen dienst die je uitzet maar de andere kant van een afspraak'],
+  /* Zelf gast worden (besluit C5): dezelfde afweging, en ook hier staat hij in
+     kern/platformregister/bediening-recht.js met dezelfde reden. */
+  ['/api/mijn/pas/gast', 'een schakelaar op zelf gast worden houdt een lid vast aan een pas die hij niet meer wil'],
   ['/api/metrics', 'de meetlijn mag bij een incident niet blind worden gemaakt'],
   ['/api/cluster', 'de clusterlaag bestuurt instances en blijft buiten een instance-schakelaar'],
   ['/api/sat', 'de satellietping voorkomt dat een zaakdoos gezond verkeer als offline leest'],

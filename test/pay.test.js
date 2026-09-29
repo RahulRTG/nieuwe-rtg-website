@@ -88,7 +88,8 @@ test('geld sturen op codenaam werkt met een knop; onbekende namen ketsen af', as
 test('de kassacode: het lid toont een code, de zaak int, en uitbetalen leegt de partnerpot', async () => {
   const k = await api('pay/kascode', { maxCenten: 5000 }, lidA.token);
   assert.equal(k.status, 200);
-  assert.match(k.body.code, /^[0-9A-F]{6}$/);
+  // 128 bits, leesbaar in groepjes van vier (kern/pay/kasbak.js)
+  assert.match(k.body.code, /^KC(-[0-9A-F]{4}){8}$/);
   // boven het maximum weigert de kassa
   assert.equal((await api('supplier/pay/in', { idem: 'proef-' + Math.random(), code: k.body.code, centen: 9000 }, supToken)).status, 402);
   const inn = await api('supplier/pay/in', { code: k.body.code, centen: 2500, oms: 'Lunch aan zee', idem: 'kas-1' }, supToken);
@@ -172,7 +173,7 @@ test('de tik: ontvangen met een aanraking, betalen met een knop', async () => {
   // B zet zijn toestel op ontvangen; A tikt en betaalt
   const t = await api('pay/tikcode', {}, lidB.token);
   assert.equal(t.status, 200);
-  assert.match(t.body.code, /^[0-9A-F]{6}$/);
+  assert.match(t.body.code, /^TK(-[0-9A-F]{4}){8}$/);
   const voorB = (await api('pay/overzicht', {}, lidB.token)).body.saldo;
   const r = await api('pay/tik', { code: t.body.code, centen: 750, oms: 'Koffie terug', idem: 'tik-1' }, lidA.token);
   assert.equal(r.status, 200);
@@ -373,33 +374,30 @@ test('twee keer een code vragen laat er een leven, niet twee (kascode en tikcode
 
 /* EN DE ANDERE KANT VAN DEZELFDE VRAAG: EEN RETRY MAG GEEN NIEUWE CODE MAKEN.
 
-   De toets hierboven zegt dat twee LOSSE keren vragen er een laat leven. Dat is
-   het goede gedrag voor iemand die twee keer op de knop drukt. Maar een
-   herhaling van HETZELFDE verzoek -- een load balancer die één keer opnieuw
-   probeert -- is iets anders: die hoort de code terug te krijgen die de gast al
-   op zijn scherm heeft, in plaats van hem te verdringen. De staatproef betrapte
-   dat: dezelfde sleutel legde een tweede rij in `payCodes`.
-
-   /api/pay/* gaat met opzet om de dubbeltik heen (geld heeft een duurzame,
-   strengere laag), maar deze twee verplaatsen geen geld -- ze maken een token
-   van vijf minuten. Ze staan daarom bij naam op de uitzonderingslijst in
-   server/opzet/geldwegen.js. Mutatie: `GEEN_GELD` daar leegmaken laat deze
-   toets zakken op "de herhaling gaf een nieuwe code". */
-test('een retry met dezelfde sleutel geeft dezelfde code terug, en verdringt de vorige niet', async () => {
+   De toets hierboven zegt dat twee LOSSE keren vragen er een laat leven. Een
+   herhaling van HETZELFDE verzoek (dezelfde idem-sleutel) is iets anders: die
+   hoort de code die de gast al op zijn scherm heeft niet te verdringen. Tot 27
+   september 2026 gaf de dubbeltik dan dezelfde code nog eens terug -- een
+   geheugencache die een kale betaalcode bewaart. Nu staan beide routes in
+   lib/eenmalig-geheim-routes.js en weigert de bak (kern/pay/kasbak.js) de
+   herhaling met 409 ZONDER code, en zonder de eerste in te trekken. Mutatie: de
+   idem-controle in kasbak.uitgeven weghalen laat deze toets zakken op "de
+   herhaling maakte geen tweede code". */
+test('een retry met dezelfde sleutel maakt geen tweede code, toont de eerste niet opnieuw en verdringt hem niet', async () => {
   const sleutel = 'kascode-retry-' + Date.now().toString(36);
   const a = await api('pay/kascode', { maxCenten: 5000, idem: sleutel }, lidA.token);
   const b = await api('pay/kascode', { maxCenten: 5000, idem: sleutel }, lidA.token);
-  assert.equal(b.status, 200);
-  assert.equal(b.body.code, a.body.code, 'de herhaling geeft dezelfde code');
-  assert.equal(b.body.herhaald, true, 'en de server zegt zelf dat hij de herhaling herkende');
+  assert.equal(a.status, 200);
+  assert.equal(b.status, 409, 'de herhaling maakte geen tweede code');
+  assert.equal(b.body.code, undefined, 'en toont de eerste niet opnieuw');
   assert.equal((await api('supplier/pay/in', { code: a.body.code, centen: 100, idem: 'kas-retry-in' }, supToken)).status, 200,
     'de code van de eerste oproep leeft nog: er is er geen verdrongen');
 
   const tSleutel = 'tikcode-retry-' + Date.now().toString(36);
   const t1 = await api('pay/tikcode', { idem: tSleutel }, lidB.token);
   const t2 = await api('pay/tikcode', { idem: tSleutel }, lidB.token);
-  assert.equal(t2.body.code, t1.body.code, 'ook de tikcode overleeft een retry');
-  assert.equal(t2.body.herhaald, true);
+  assert.equal(t2.status, 409);
+  assert.equal(t2.body.code, undefined);
   assert.equal((await api('pay/tik', { code: t1.body.code, centen: 100, idem: 'tik-retry-1' }, lidA.token)).status, 200,
     'en die code doet het nog');
 

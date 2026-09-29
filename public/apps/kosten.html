@@ -97,9 +97,10 @@
   .melding{position:fixed;left:50%;transform:translateX(-50%);bottom:1.4rem;background:var(--card);border:1px solid var(--line);
     border-radius:0;padding:.6rem .9rem;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:9;max-width:88vw;}
 </style>
+<script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body data-rtg-modus="command" data-rtg-world="work" data-rtg-skin="heritage">
+<body data-rtg-modus="command" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard">
 
 <!-- Geen eigen springlink: shared/basis.js zet er al een neer op elk scherm dat
      hem laadt, met de juiste maat. Hier stond er wel een, en de a11y-keuring wees
@@ -351,7 +352,7 @@ function tekenWerelden(w, posten){
     '<p class="sub">Kosten van de ene economie komen nooit bij een gebruiker van de andere. De RTFoundation is een eigen rechtspersoon met een eigen vermogen; wat zij kost wordt uit haar eigen begroting betaald, niet uit die van RTG-gebruikers.</p>'+
     '<div class="schuif"><table><thead><tr><th>Economie</th><th class="getal">Gebruikers</th><th>Factureert</th><th>Grond</th></tr></thead><tbody>'+
     w.werelden.map(x => '<tr><td><b>'+esc(x.naam)+'</b><br><code>'+esc(x.id)+'</code></td>'+
-      '<td class="getal">'+x.gebruikers+'</td>'+
+      '<td class="getal">'+(x.gebruikers == null ? '<span class="sub">te kleine groep</span>' : x.gebruikers)+'</td>'+
       '<td>'+(x.factureerbaar ? 'ja' : '<span class="st">nee</span>')+'</td>'+
       '<td class="sub">'+esc(x.grond)+'</td></tr>').join('')+
     '</tbody></table></div>'+

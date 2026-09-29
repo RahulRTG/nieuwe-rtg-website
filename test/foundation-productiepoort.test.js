@@ -57,7 +57,7 @@ test('productie sluit iedere expliciete minderjarigen-, moderatie- en DPIA-famil
   assert.deepEqual(s.geraakt, [], 'geen gesloten aanvraag bereikte een domeinhandler');
 });
 
-test('publieke catalogi, volwassen FoundationOS en voorbereidend bestuur blijven open', async t => {
+test('publieke informatie, volwassen FoundationOS en voorbereidend bestuur blijven open', async t => {
   const s = await serverVoor();
   t.after(() => s.sluit());
   const open = [
@@ -65,10 +65,6 @@ test('publieke catalogi, volwassen FoundationOS en voorbereidend bestuur blijven
     ['/api/foundation/bespaartip', { methode:'GET' }],
     ['/api/rtfos/boom', {}],
     ['/api/rtfos/ruil/plaats', {}],
-    ['/api/rtf/bieb/catalogus', {}],
-    ['/api/rtf/geloof/catalogus', {}],
-    ['/api/rtf/beroepen/catalogus', {}],
-    ['/api/rtf/toegang', {}],
     ['/api/lab2/ethiek/privacy', {}],
     ['/api/lab2/bewoner/labs', {}],
     ['/api/lab2/publiek/apparatuur', {}]
@@ -147,12 +143,12 @@ test('een env-vlag zonder extern dossier opent beschermde functies nooit', async
   for (const waarde of ongeldig) {
     const s = await serverVoor({ env:{ [maakPoort.ENV_NAAM]:waarde } });
     t.after(() => s.sluit());
-    assert.equal((await vraag(s, '/api/rtf/leerling/paspoort')).status, 503, JSON.stringify(waarde));
+    assert.equal((await vraag(s, '/api/rtfos/casussen')).status, 503, JSON.stringify(waarde));
     assert.equal(s.geraakt.length, 0);
   }
   const vrij = await serverVoor({ env:{ [maakPoort.ENV_NAAM]:'1' } });
   t.after(() => vrij.sluit());
-  assert.equal((await vraag(vrij, '/api/rtf/leerling/paspoort')).status, 503);
+  assert.equal((await vraag(vrij, '/api/rtfos/casussen')).status, 503);
   assert.equal(vrij.geraakt.length, 0);
 });
 
@@ -168,16 +164,15 @@ test('alleen een PASS-dossier van exact de releasecommit opent de routepoort', a
   }));
   const fout = await serverVoor({ env, root:foutRoot });
   t.after(() => fout.sluit());
-  assert.equal((await vraag(fout, '/api/rtf/leerling/paspoort')).status, 503, 'andere commit blijft dicht');
+  assert.equal((await vraag(fout, '/api/rtfos/casussen')).status, 503, 'andere commit blijft dicht');
   assert.equal(fout.geraakt.length, 0);
 
   maakGetekendeVrijgave(goedRoot);
   const goed = await serverVoor({ env, root:goedRoot });
   t.after(() => goed.sluit());
-  assert.equal((await vraag(goed, '/api/rtf/leerling/paspoort')).status, 200);
-  assert.equal((await vraag(goed, '/api/rtf/samen/mee')).status, 200,
-    'de gemigreerde 128-bit Samen-credential blijft juridisch beschermd maar is niet technisch hard gesloten');
+  assert.equal((await vraag(goed, '/api/rtfos/casussen')).status, 200);
   for (const pad of ['/api/foundation/gezin/inloggen', '/api/foundation/school/school/activeren',
+    '/api/rtf/samen/mee', '/api/rtf/leerling/paspoort', '/api/foundation/les/join',
     '/api/lab2/mijn', '/api/lab2/bewoner/paspoort',
     '/api/les/mee', '/api/member/sport/tickets', '/api/sport/scan',
     '/api/foundation/registratie/status', '/api/rtf/social/stream']) {
@@ -194,7 +189,7 @@ test('alleen een PASS-dossier van exact de releasecommit opent de routepoort', a
     'een echte verwijderuitgang blijft mogelijk');
   assert.equal((await vraag(goed, '/api/foundation/registratie/aanvragen',
     { body:{ minderjarig:false } })).status, 503, 'clientleeftijd blijft ook na procesvrijgave onbruikbaar');
-  assert.equal(goed.geraakt.length, 4);
+  assert.equal(goed.geraakt.length, 3);
 });
 
 test('iedere bekende onvolwassen Foundation-credential heeft een blijvende productiesluiting', () => {
@@ -238,10 +233,9 @@ test('iedere bekende onvolwassen Foundation-credential heeft een blijvende produ
     const spatie = route.indexOf(' '), methode = route.slice(0, spatie), pad = route.slice(spatie + 1);
     assert.equal(gesloten(methode, pad, { action:'goedkeuren' }), true, route);
   }
-  assert.equal(maakPoort.isNogGeslotenCredentialroute('POST', '/api/rtf/samen/mee'), false,
-    'de gemigreerde Samen-bearer staat niet langer tussen de technisch onvolwassen credentials');
-  assert.equal(maakPoort.isBeschermdeRoute('POST', '/api/rtf/samen/mee'), true,
-    'Samen blijft wel achter de afzonderlijke juridische, DPIA- en minderjarigenvrijgave');
+  /* De Samen-deelcode is gemigreerd, maar Samen draagt het gezinsprofieltoken als
+     sessie (rtfschool.js samenSess -> rtf.verifieerProfiel) en blijft dus dicht. */
+  assert.equal(maakPoort.isNogGeslotenCredentialroute('POST', '/api/rtf/samen/mee'), true);
 });
 
 test('development en test zijn zonder vrijgave expliciet open', async t => {
@@ -275,7 +269,8 @@ test('de poort is één keer gemount na JSON en vóór idem, spoor en alle route
   const lijf = fs.readFileSync(path.join(root, 'server/opzet/lijfpoort.js'), 'utf8');
   const keten = fs.readFileSync(path.join(root, 'server/opzet/verzoekketen.js'), 'utf8');
   const wachters = fs.readFileSync(path.join(root, 'server/opzet/poortwachters.js'), 'utf8');
-  const dwars = fs.readFileSync(path.join(root, 'server/opzet/routes-dwars.js'), 'utf8');
+  const dwarsHoofd = fs.readFileSync(path.join(root, 'server/opzet/routes-dwars.js'), 'utf8');
+  const dwars = [dwarsHoofd, fs.readFileSync(path.join(root, 'server/opzet/routes-dwars-vervolg.js'), 'utf8')].join('\n');
   const aanbouw = fs.readFileSync(path.join(root, 'server/opzet/aanbouw.js'), 'utf8');
   const poort = lijf.indexOf("require('../middleware/foundation-productiepoort')()");
   assert.ok(poort > lijf.indexOf("express.json({ limit: '8mb' })"), 'poort moet een begrensde body kunnen lezen');
@@ -283,6 +278,7 @@ test('de poort is één keer gemount na JSON en vóór idem, spoor en alle route
   assert.ok(poort < lijf.indexOf("require('../lib/handelingsspoor')"), 'poort moet voor het handelingsspoor staan');
   assert.ok(keten.indexOf("require('./lijfpoort')") < keten.indexOf("require('./handeling').hervat()"));
   assert.ok(wachters.includes("app.use('/api/foundation', rtf.router)"), 'vroege Foundation-router ontbreekt');
+  assert.ok(dwarsHoofd.includes("require('./routes-dwars-vervolg')"), 'vervolg van de dwarse routerlijst ontbreekt');
   assert.ok(dwars.includes("require('../routes/rtfleerling')") && dwars.includes("require('../routes/livinglab')"),
     'latere leerling- of Living-Lab-router ontbreekt');
   assert.ok(aanbouw.includes("require('../routes/rtfschool')") && aanbouw.includes("require('../routes/rtfos')"),

@@ -130,7 +130,16 @@ module.exports = (kern) => {
     app.post(p.pad + '/imap/sleutel', p.poort, (req, res) => {
       const a = p.adres(req);
       if (!a) return geen(res);
-      const r = mailSleutel.maak(a, String(body(req).naam || ''));
+      const r = mailSleutel.maak(a, String(body(req).naam || ''), body(req).dagen);
+      if (r.error) return fout(res, r);
+      res.json(r);
+    });
+
+    // roteren: zelfde apparaat, nieuw geheim, de oude werkt meteen niet meer
+    app.post(p.pad + '/imap/roteer', p.poort, (req, res) => {
+      const a = p.adres(req);
+      if (!a) return geen(res);
+      const r = mailSleutel.roteer(a, String(body(req).id || ''), body(req).dagen);
       if (r.error) return fout(res, r);
       res.json(r);
     });

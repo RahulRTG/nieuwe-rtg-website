@@ -118,7 +118,8 @@ test('5. een groep wordt een tijdgebonden lidmaatschap met een rol', () => {
   assert.equal(l.rtgKey, 'user-7', 'gekoppeld aan het RTG-account');
   assert.equal(l.bron, 'idp', 'en herkenbaar als beheerd door de provider');
   assert.equal(l.rollen[0].bron, 'idp', 'ook de rol draagt zijn herkomst');
-  assert.ok(l.token, 'met een eigen werkruimtesleutel');
+  assert.ok(!('token' in l), 'geen kale sleutel: een sessie ontstaat pas op aanvraag (bedrijf/sleutels.js)');
+  assert.equal(l.sessieEpoch || 0, 0, 'en de sessie-epoch staat nog op nul');
   assert.ok(w.journaal.some(r => r.wat === 'idp-lid-aangemaakt'), 'het staat in het journaal');
 
   // tweede keer inloggen verandert niets: dit is een synchronisatie, geen stapel
@@ -148,7 +149,7 @@ test('6. valt de groep weg, dan valt de rol weg -- en het handwerk blijft staan'
   brug.uitClaims('O-A', ['Haarlem-Managers'], 'user-7', 'Imran');
   brug.uitClaims('O-A', [], 'user-7', 'Imran');
   assert.equal(l.status, 'uit dienst', 'geen groep meer, geen toegang meer');
-  assert.equal(l.token, null, 'en de sleutel is ingetrokken');
+  assert.ok(l.sessieEpoch >= 1 && !(l.sessies || []).length, 'en elke sessie is ingetrokken (epoch omhoog)');
 });
 
 test('7. een IdP herstelt geen ontslag', () => {
@@ -166,7 +167,7 @@ test('7. een IdP herstelt geen ontslag', () => {
 
   const uit = brug.uitClaims('O-A', ['Haarlem-Managers'], 'user-7', 'Imran');
   assert.equal(l.status, 'uit dienst', 'de groep brengt hem niet terug');
-  assert.equal(l.token, null, 'en er komt geen nieuwe sleutel');
+  assert.ok(!l.token && !(l.sessies || []).length, 'en er komt geen nieuwe sleutel');
   assert.equal(uit.werkruimtes[0].geblokkeerd, true, 'het antwoord zegt dat er iets in de weg staat');
 });
 
@@ -192,13 +193,13 @@ test('8. intrekken raakt ELKE werkruimte van de tenant, in hetzelfde verzoek', (
   const uit = brug.deprovisioneer('O-A', 'user-7');
   assert.equal(uit.geraakt.length, 2, 'beide werkruimtes van deze tenant');
   assert.equal(Object.values(a.leden)[0].status, 'uit dienst');
-  assert.equal(Object.values(b.leden)[0].token, null);
+  assert.ok(Object.values(b.leden)[0].sessieEpoch >= 1, 'de sessies in W2 zijn ingetrokken');
 
   /* DE GRENS DIE HIER ECHT TOE DOET. Een deprovisioning van de ene klant mag
      niet de werkplek bij de andere klant sluiten -- dat zou betekenen dat een
      IdP-beheerder van A iemand uit de systemen van B kan zetten. */
   assert.equal(Object.values(c.leden)[0].status, 'actief', 'de andere tenant blijft ongemoeid');
-  assert.ok(Object.values(c.leden)[0].token, 'inclusief zijn sleutel daar');
+  assert.equal(Object.values(c.leden)[0].sessieEpoch || 0, 0, 'inclusief zijn sessies daar');
 });
 
 test('9. alleen een rol die bestaat, en het journaal noemt geen namen', () => {
@@ -327,7 +328,7 @@ test('12b. de bewaring trekt de SLEUTEL in, en niet alleen de status', () => {
   tenant.levensloop.zet('O-W', { naar: 'bewaring', reden: 'Uitloop.' });
 
   const lid = db.data.werkruimtes.W1.leden.a;
-  assert.equal(lid.token, null, 'de sleutel is weg uit de opslag');
+  assert.ok(!('token' in lid) && lid.sessieEpoch === 1 && !lid.sessies.length, 'de sleutel is weg uit de opslag en de epoch staat hoger');
   assert.equal(lid.status, 'uit dienst', 'en de status staat erop');
   assert.match(lid.uitReden, /Bewaring/, 'met de reden erbij');
 });

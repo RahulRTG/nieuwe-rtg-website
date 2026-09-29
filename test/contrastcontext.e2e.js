@@ -104,7 +104,7 @@ test('een contrastmelding noemt de wereld, de tokens en de ondergrond',
     /* En de token die de melding noemt is de ECHTE waarde van deze wereld, niet
        een naam die toevallig meeloopt: zonder deze rij zou `muted=` ook groen
        blijven met een lege of doorgegeven waarde. */
-    assert.match(waar, /muted=\s*#51493f/i, 'de gemelde tokenwaarde is niet die van LivingOS');
+    assert.match(waar, /muted=\s*#5e5c57/i, 'de gemelde tokenwaarde is niet die van LivingOS');
   } finally {
     if (browser) await browser.close().catch(() => {});
     await stop(srv);

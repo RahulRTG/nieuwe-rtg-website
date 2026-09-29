@@ -31,11 +31,11 @@ module.exports = (ctx) => {
     // bestellen: plaatsen en direct afrekenen via exact dezelfde functies
     // als de app-knoppen (ledenprijs, 86, leeftijd, zorgprofiel incluis)
     if (w.soort === 'bestelling' && sess && acties && acties.plaatsOrder) {
-      const r = acties.plaatsOrder(sess, { supplierCode: w.supplierCode, items: w.items });
+      const r = await acties.plaatsOrder(sess, { supplierCode: w.supplierCode, items: w.items });
       if (r.error) return { tekst: 'Dat lukt niet: ' + r.error };
       const b = await acties.betaalOrder(sess, { ref: r.order.ref });
       if (b.error) return { tekst: 'De bestelling staat klaar (' + r.order.ref + '), maar het afrekenen lukte niet: ' + b.error + ' Rond hem af in de Bestellen-tab.', gedaan: true };
-      return { tekst: 'Besteld en betaald bij ' + r.order.supplierName + ': ' + w.oms + ', samen ' + eur(b.order.total * 100) + '. Uw ophaalcode is ' + r.order.pickup + '; de zaak gaat er direct mee aan de slag.', gedaan: true };
+      return { tekst: 'Besteld en betaald bij ' + r.order.supplierName + ': ' + w.oms + ', samen ' + eur(b.order.total * 100) + '. Uw bonnummer is ' + r.order.pickup + '; de zaak gaat er direct mee aan de slag. Bij het ophalen toont u de afhaal-QR onder Mijn bestellingen.', gedaan: true };
     }
     if (w.soort === 'blok' && assetGebruik) {
       const r = assetGebruik({ key }, w.assetId, w.datum);

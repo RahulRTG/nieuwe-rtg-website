@@ -125,3 +125,6 @@ dump.rdb
 # van in de repo te belanden.
 zzijk*
 **/zzijk*
+
+# Generated browser coverage and screenshots for the desktop standard.
+artifacts/desktop-standard/

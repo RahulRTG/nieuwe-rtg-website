@@ -118,7 +118,12 @@ const controle = process.argv.includes('--controle');
 const stil = process.argv.includes('--stil');
 const filter = (process.argv.find((a) => a.startsWith('--filter=')) || '').slice(9);
 const PAR = Number((process.argv.find((a) => a.startsWith('--par=')) || '').slice(6) || 6);
-const MAXKLIK = 14;
+/* Hoogstens zoveel tikken per scherm. Het oordeel eist dat de proef minstens
+   de helft van de eigen knoppen raakt, dus een plafond van 14 maakte elk scherm
+   met meer dan 28 eigen knoppen per definitie onbewijsbaar (routedossier.html
+   heeft er 55). Met 40 kan dat tot 80; wat daarboven zit blijft NIET_GETEST,
+   met de telling erbij. */
+const MAXKLIK = 40;
 
 /* Knoppen die iets doen wat je niet wilt uitlokken op een proefserver met een
    echte sessie. Ze worden NIET stil overgeslagen: elke rij noemt ze bij naam,
@@ -369,6 +374,8 @@ async function meetRij(rij, base, persoonlijk, rollen) {
   const bediening = await bedien(eigen, base, rij.pad);
   r.gevonden = bediening.gevonden;
   r.geklikt = bediening.geklikt;
+  r.schil = bediening.schil;
+  r.bedekt = bediening.bedekt;
   r.overgeslagen = bediening.overgeslagen;
   r.nietKlikbaar = bediening.nietKlikbaar;
   r.onderschept = bediening.onderschept;
@@ -383,13 +390,18 @@ async function meetRij(rij, base, persoonlijk, rollen) {
      weet niemand of dat alles was of het topje. */
   const redenenTelling = {};
   for (const n of bediening.nietKlikbaar) { const w = n.split(': ').pop(); redenenTelling[w] = (redenenTelling[w] || 0) + 1; }
-  const uitsplitsing = bediening.geklikt + ' van ' + bediening.gevonden + ' zichtbare knoppen aangetikt zonder fout'
+  const uitsplitsing = bediening.geklikt + ' van ' + bediening.gevonden + ' eigen knoppen aangetikt zonder fout'
+    + (bediening.schil ? ' (plus ' + bediening.schil + ' van de gedeelde schil, die hier niet telt)' : '')
     + (bediening.nietKlikbaar.length ? ', ' + bediening.nietKlikbaar.length + ' niet aan te tikken (' + Object.entries(redenenTelling).map(([w, n]) => n + 'x ' + w).join(', ') + ')' : '')
     + (bediening.overgeslagen.length ? ', ' + bediening.overgeslagen.length + ' overgeslagen omdat ze onomkeerbaar zijn' : '');
   if (bediening.geklikt === 0 && !bediening.gevonden) {
-    r.bewijzen.bedienbaar = { status: 'NIET_GETEST', reden: 'geen zichtbare knop zonder bestemming gevonden; wat dit scherm doet, loopt via links of formulieren', bewijs: null };
+    r.bewijzen.bedienbaar = { status: 'NIET_GETEST', reden: 'geen eigen knop zonder bestemming gevonden' + (bediening.schil ? ' (alleen ' + bediening.schil + ' van de gedeelde schil)' : '') + '; wat dit scherm doet, loopt via links of formulieren', bewijs: null };
   } else if (stuk.length) {
     r.bewijzen.bedienbaar = { status: 'GEBLOKKEERD_DOOR_DEFECT', reden: stuk[0], bewijs: bediening.crash.concat(bediening.serverfout).slice(0, 5).join(' | ') };
+  } else if (bediening.bedekt.length) {
+    r.bewijzen.bedienbaar = { status: 'GEBLOKKEERD_DOOR_DEFECT',
+      reden: bediening.bedekt.length + ' eigen knop(pen) volledig bedekt door de gedeelde schil; een muis komt er niet bij',
+      bewijs: bediening.bedekt.slice(0, 5).join(' | ') };
   } else if (bediening.config.length) {
     r.bewijzen.bedienbaar = { status: 'GEBLOKKEERD_DOOR_CONFIG', reden: bediening.config[0], bewijs: null };
   } else if (bediening.gevonden > 0 && bediening.geklikt * 2 < bediening.gevonden) {
@@ -485,13 +497,22 @@ function onderschepper(log) {
 
 async function bedien(ctx, base, pad) {
   const page = await ctx.newPage();
-  const crash = [], config = [], serverfout = [], rem = [], weigering = [], gezegd = [], taalWissel = [];
+  const crash = [], config = [], serverfout = [], rem = [], weigering = [], gezegd = [], taalWissel = [], bedekt = [];
   let laatste = null;
-  let geklikt = 0, gevonden = 0;
+  let geklikt = 0, gevonden = 0, schil = 0;
   const overgeslagen = [], nietKlikbaar = [], onderschept = [], instrument = [];
   try {
     await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
     await page.waitForTimeout(2200);
+    /* Pas meten als de Edge staat. Daarvoor ligt de onderste herstelstrook er
+       nog en is een balk die de Edge overneemt nog niet overgenomen; een meting
+       in die tussenstand meldde Office als bedekt terwijl zijn balk een tel
+       later in de Edge zat. Een scherm zonder adaptieve Edge wordt nooit klaar,
+       vandaar de grens. */
+    await page.waitForFunction(() => document.body && document.body.getAttribute('data-rtg-adaptive-ready') === 'true',
+      null, { timeout: 8000 }).catch(() => {});
+    await page.waitForTimeout(400);
+    bedekt.push(...await bedektDoorSchil(page));
     luister(page, base, { crash, config, serverfout, rem, weigering });   // pas NA het laden: laadfouten horen bij bewijs 1
     /* Welke tik de taal van de persona verandert: een vertaalverzoek naar een
        andere taal dan nl na een tik, met de knop erbij. */
@@ -517,6 +538,7 @@ async function bedien(ctx, base, pad) {
         catch (x) { instrument.push('opnieuw openen lukte niet: ' + String(x.message || x).split('\n')[0].slice(0, 80)); break; }
       }
       gevonden = Math.max(gevonden, k.zichtbaar || 0);
+      schil = Math.max(schil, k.schil || 0);
       if (k.klaar) break;
       gehad.add(k.merk);
       if (ONOMKEERBAAR.test(k.tekst)) { overgeslagen.push(k.tekst || '(naamloos)'); continue; }
@@ -558,7 +580,7 @@ async function bedien(ctx, base, pad) {
   }
   await beoordeelWeigeringen(page, weigering, gezegd, serverfout);
   await page.close();
-  return { geklikt, gevonden, overgeslagen, nietKlikbaar, onderschept, instrument, crash, config, serverfout, rem, gezegd, taalWissel };
+  return { geklikt, gevonden, schil, bedekt, overgeslagen, nietKlikbaar, onderschept, instrument, crash, config, serverfout, rem, gezegd, taalWissel };
 }
 
 /* WAT STAAT ER NU, EN WAT HEBBEN WE NOG NIET GEHAD.
@@ -588,6 +610,48 @@ async function beoordeelWeigeringen(page, weigering, gezegd, serverfout) {
   }
 }
 
+/* EEN EIGEN KNOP DIE DE SCHIL HELEMAAL BEDEKT, IS EEN DEFECT en geen
+   ongemeten knop. Gevonden op 27 september 2026: de tabbalk van Decision Room
+   lag onder de onderbalk van de Edge, en de werkbalk van de browser onder de
+   herstelstrook die de Edge in de compacte stand over de bovenrand legt. Een
+   muis kwam er niet bij; de proef meldde dat als "niet aan te tikken" en de rij
+   bleef NIET_GETEST, waarmee het defect uit beeld verdween.
+
+   Streng met opzet: pas als ALLE 45 meetpunten van de knop (na hem in beeld te
+   schuiven, zoals een mens scrolt) op de schil vallen. Een knop die half
+   bedekt is, is nog aan te tikken en blijft een zaak voor de gewone tik. */
+async function bedektDoorSchil(page) {
+  try {
+    return await page.evaluate(() => {
+      const SCHIL = '.rtg-edge-chrome, .rnd-toets, .rtg-edge-2-edge-reveal';
+      const zie = (el) => { if (!el || el.hidden || el.disabled) return false;
+        if (!el.offsetParent && getComputedStyle(el).position !== 'fixed') return false;
+        const b = el.getBoundingClientRect(); return b.width > 1 && b.height > 1; };
+      const uit = [];
+      const knoppen = Array.from(document.querySelectorAll('button,[role=button],[data-tab],[data-stand]'))
+        .filter(zie).filter((el) => !el.closest(SCHIL) && !el.closest('#rtg-lang-modal'));
+      for (const el of knoppen) {
+        el.scrollIntoView({ block: 'center', inline: 'center' });
+        const r = el.getBoundingClientRect();
+        let punten = 0, onderSchil = 0, door = null;
+        for (let a = 1; a < 10; a++) for (let c = 1; c < 6; c++) {
+          const x = r.x + r.width * a / 10, y = r.y + r.height * c / 6;
+          if (x < 0 || y < 0 || x > innerWidth || y > innerHeight) continue;
+          punten++;
+          const t = document.elementFromPoint(x, y);
+          const s = t && !el.contains(t) && t.closest(SCHIL);
+          if (s) { onderSchil++; door = door || (t.tagName.toLowerCase() + '.' + Array.from(t.classList).slice(0, 2).join('.')); }
+        }
+        if (punten && onderSchil === punten) {
+          uit.push((el.innerText || el.getAttribute('aria-label') || el.title || '(naamloos)').trim().replace(/\s+/g, ' ').slice(0, 30) + ' onder ' + door);
+        }
+      }
+      window.scrollTo(0, 0);
+      return uit;
+    });
+  } catch (e) { return []; }
+}
+
 async function kijkRonde(page, gehad) {
   return page.evaluate((alGehad) => {
     const zie = (el) => { if (!el || el.hidden || el.disabled) return false;
@@ -598,14 +662,31 @@ async function kijkRonde(page, gehad) {
     /* De taalkeuze wordt niet aangetikt: een taal kiezen verandert de persona
        voor ELK volgend scherm (en liet elk scherm daarna vertalingen vragen).
        Dat is een instelling, geen functie van het scherm onder de meting. */
-    const alle = Array.from(document.querySelectorAll('button,[role=button],[data-tab],[data-stand]'))
+    const kandidaten = Array.from(document.querySelectorAll('button,[role=button],[data-tab],[data-stand]'))
       .filter(zie).filter((el) => !el.getAttribute('href') && !el.getAttribute('data-url'))
       .filter((el) => !el.closest('#rtg-lang-modal'));
+    /* DE SCHIL IS NIET DIT SCHERM. De Edge (.rtg-edge-chrome) en de toetsknop
+       van het veeggebaar (.rnd-toets, randen.js) staan op ELK scherm en worden
+       daar door hun eigen toetsen beproefd (test/appmenu.e2e.js e.a.). Telden
+       ze mee, dan mat elke rij vooral de schil: op geven.html waren alle 23
+       knoppen schil en nul van het scherm zelf, en met hoogstens MAXKLIK tikken
+       tegen "minstens de helft van wat zichtbaar is" kon een scherm met meer dan
+       28 knoppen nooit bewezen worden (gemeten 27 september 2026: 111 van 112
+       rijen NIET_GETEST, geen enkele boven de 14 tikken). De .rnd-toets staat
+       bovendien met opzet buiten beeld tot hij focus krijgt; zijn "outside of
+       the viewport" was de proef, niet het scherm. */
+    const SCHIL = '.rtg-edge-chrome, .rnd-toets';
+    const alle = kandidaten.filter((el) => !el.closest(SCHIL));
+    /* En een knop telt EEN keer: vier kaarten met "Bekijken" zijn een handeling,
+       en de proef tikt er ook maar een aan (hetzelfde merk). In de noemer
+       stonden ze vier keer. */
+    const zichtbaar = new Set(alle.map(merk)).size;
+    const schil = kandidaten.length - alle.length;
     document.querySelectorAll('[data-appwerkt]').forEach((el) => el.removeAttribute('data-appwerkt'));
     const nieuwe = alle.filter((el) => !alGehad.includes(merk(el)));
-    if (!nieuwe.length) return { klaar: true, zichtbaar: alle.length };
+    if (!nieuwe.length) return { klaar: true, zichtbaar, schil };
     nieuwe[0].setAttribute('data-appwerkt', '1');
-    return { klaar: false, zichtbaar: alle.length, merk: merk(nieuwe[0]),
+    return { klaar: false, zichtbaar, schil, merk: merk(nieuwe[0]),
       tekst: (nieuwe[0].innerText || nieuwe[0].getAttribute('aria-label') || nieuwe[0].title || '').trim().slice(0, 40) };
   }, [...gehad]);
 }

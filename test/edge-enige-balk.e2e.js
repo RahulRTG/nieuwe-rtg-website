@@ -43,7 +43,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, elevateTier, wachtTot } = require('./helper');
+const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, elevateTier, wachtTot, kantoorAlsPersoon } = require('./helper');
 
 const pw = laadPlaywright();
 
@@ -57,7 +57,24 @@ const SCHERMEN = [
   { pad: '/apps/vonk.html', balk: '.rtg-suitebar', ook: ['.rtg-suitenav'] },
   { pad: '/apps/sociaal.html', balk: '.rtg-social-commandbar' },
   { pad: '/apps/luchthaven.html', balk: '.tos-opsnav' },
-  { pad: '/apps/ovcontrol.html', balk: '.tos-opsnav' }
+  { pad: '/apps/ovcontrol.html', balk: '.tos-opsnav' },
+  /* De tabbalk van de twee kamers is smaller dan 60% van het scherm en werd
+     daarom niet als balk herkend; hij bleef staan, precies onder de onderbalk
+     van de Edge (27 september 2026: alle tabs volledig bedekt). */
+  { pad: '/apps/decision-room.html', balk: '.dr-nav', knop: 'Afweging' },
+  { pad: '/apps/project-room.html', balk: '.pr-nav', knop: 'Dossier' }
+];
+
+/* Wat de Edge NIET overneemt, hoort ook niet onder hem te liggen. In de
+   compacte stand legt de Edge een onzichtbare herstelstrook over de bovenrand;
+   de werkbalk van browser.html (met adresveld, dus niet over te nemen) lag er
+   volledig onder. Hij schuift nu uit met --edge-randboven. */
+const VRIJ = [
+  { pad: '/apps/browser.html', knop: 'header.ios-nav button.ga', compact: true },
+  /* De kaartlagen zijn bediening OP de kaart, geen balk: die blijven bij het
+     scherm. navigatie-premium.css zette ze op 1280 breed rechtsonder, en de
+     eerste laag (bank) lag volledig onder de onderbalk van de Edge. */
+  { pad: '/apps/navigatie.html', knop: 'nav.lagen button' }
 ];
 
 /* Deze functies reizen naar de BROWSER, dus ze mogen niets uit deze module
@@ -121,10 +138,14 @@ test('de Edge neemt de eigen balk van een scherm over, met knoppen en ruimte',
 
     browser = await pw.chromium.launch(browserOpties(pw));
     const context = await browser.newContext({ viewport: { width: 1280, height: 860 } });
-    await context.addInitScript((sleutel) => {
-      try { localStorage.setItem('rtg_member_token', sleutel); } catch (e) {}
+    /* De twee kamers zijn van WorkOS en openen alleen voor een medewerker op
+       naam; het lid en die medewerker delen hier een browser. */
+    const medewerker = await kantoorAlsPersoon(base);
+    await context.addInitScript((s) => {
+      try { localStorage.setItem('rtg_member_token', s.lid); } catch (e) {}
+      try { if (s.kantoor) localStorage.setItem('rtg_office_token', s.kantoor); } catch (e) {}
       try { localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {}
-    }, lid.token);
+    }, { lid: lid.token, kantoor: medewerker });
     const page = await context.newPage();
     page.on('dialog', d => d.dismiss().catch(() => {}));
 
@@ -152,6 +173,24 @@ test('de Edge neemt de eigen balk van een scherm over, met knoppen en ruimte',
             scherm.pad + ': ' + scherm.vrijVan + ' begint op ' + m.vrijTop +
             ' en loopt daarmee onder de Edge-bovenbalk door (die eindigt op ' + m.topOnder + ')');
         }
+      });
+    }
+
+    for (const scherm of VRIJ) {
+      await t.test(scherm.pad + ': de eigen bediening ligt niet onder de Edge', async () => {
+        await page.goto(base + scherm.pad, { waitUntil: 'domcontentloaded' });
+        await wachtTot(page, (g) => document.body &&
+          document.body.getAttribute('data-rtg-adaptive-ready') === 'true' &&
+          (!g.compact || document.body.getAttribute('data-rtg-edge-2-state') === 'compact') &&
+          !!document.querySelector(g.knop), { knop: scherm.knop, compact: !!scherm.compact },
+          { wat: scherm.pad + ': de Edge staat en ' + scherm.knop + ' is er' });
+        /* Een gewone klik: die struikelt als er iets anders over de knop ligt
+           ("intercepts pointer events"). En de stand van de Edge is daarna
+           dezelfde: de klik haalde niet in plaats daarvan de Edge terug. */
+        const voor = await page.evaluate(() => document.body.getAttribute('data-rtg-edge-2-state'));
+        await page.locator(scherm.knop).first().click({ timeout: 5000 });
+        const na = await page.evaluate(() => document.body.getAttribute('data-rtg-edge-2-state'));
+        assert.equal(na, voor, scherm.pad + ': de klik op de eigen knop veranderde de Edge');
       });
     }
 
@@ -187,10 +226,10 @@ test('de Edge neemt de eigen balk van een scherm over, met knoppen en ruimte',
       await page.goto(base + '/apps/rit.html', { waitUntil: 'domcontentloaded' });
       await wachtTot(page, () => document.body &&
         document.body.getAttribute('data-rtg-adaptive-ready') === 'true' &&
-        !!document.querySelector('header.ritkop.ios-nav'), null,
-        { wat: 'de hero van rit.html met zijn ios-nav-klasse' });
+        !!document.querySelector('header.ritkop'), null,
+        { wat: 'de inhoudelijke hero van rit.html' });
       const hero = await page.evaluate(() => {
-        const el = document.querySelector('header.ritkop.ios-nav');
+        const el = document.querySelector('header.ritkop');
         const s = getComputedStyle(el), r = el.getBoundingClientRect();
         return { geclaimd: el.classList.contains('rtg-edge-owned-bar'), positie: s.position,
           hoogte: Math.round(r.height), zichtbaar: s.display !== 'none' && r.height > 0 };

@@ -115,7 +115,14 @@ function capMaak(uitgever, invoer) {
      token bij hoort -- en die verdringt bij dat lid de code die hij wel had. */
   opruimen();
   if (open.size > MAX_OPEN) return { status: 503, error: 'Even te druk. Probeer het zo opnieuw.' };
-  const opdracht = def.lees(invoer, uitgever);
+  const gelezen = def.lees(invoer, uitgever);
+  /* Een handeling mag asynchroon lezen (de kascode maakt een code in een
+     collectietransactie); de rest van deze functie blijft dan hetzelfde. */
+  if (gelezen && typeof gelezen.then === 'function') return gelezen.then(o => capMaakVerder(def, uitgever, o));
+  return capMaakVerder(def, uitgever, gelezen);
+}
+function capMaakVerder(def, uitgever, opdracht) {
+  const d = dyn();
   if (!opdracht || opdracht.error) return opdracht || { status: 400, error: 'Deze opdracht kan niet.' };
   const verwijzing = crypto.randomBytes(9).toString('base64url');
   /* TWEE NAMEN VOOR EEN CODE, EN DAT IS GEEN VERDUBBELING. De VERWIJZING zit in

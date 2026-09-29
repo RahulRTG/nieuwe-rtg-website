@@ -86,6 +86,7 @@ function sleutelVoor(methode, pad) {
    zonder reden was daar dus gewoon toegestaan. Een controle die niet over alles
    loopt is geen controle. */
 Object.assign(SLEUTELS,
+  require('./idemsleutels-beelden').SLEUTELS,
   require('./idemsleutels-document').SLEUTELS,
   require('./idemsleutels-basis').SLEUTELS,
   /* De vijf dubbeltikken uit de leesronde van 13 september; zie de kop daar. */
@@ -157,7 +158,10 @@ Object.assign(SLEUTELS,
   /* Reisbetalingen verklaren hun eigen replay-antwoorden in het deelbestand. */
   require('./idemsleutels-reisherkomst').SLEUTELS,
   require('./idemsleutels-bundel').SLEUTELS,
-  require('./idemsleutels-magnaatleven').SLEUTELS);
+  require('./idemsleutels-magnaatleven').SLEUTELS,
+  require('./idemsleutels-democratie').SLEUTELS,
+  require('./idemsleutels-connection-final').SLEUTELS,
+  require('./idemsleutels-leerhuis').SLEUTELS);
 
 /* Drie keuringen bij het laden, en ze staan bij elkaar in ./idemsleutels-nooit.js:
    geen route in twee zijbestanden, elke verklaring compleet, en vier routes die

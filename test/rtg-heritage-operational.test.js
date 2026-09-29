@@ -35,7 +35,7 @@ test('alle echte appschermen lopen door dezelfde gedeelde schermlaag', () => {
     assert.match(html, /<link\b[^>]*href=["']\/shared\/rtg-heritage\.css["'][^>]*>/i,
       route + ' mist de gedeelde schermstijl');
   }
-  assert.equal(echt, 292);
+  assert.equal(echt, 293);
 });
 
 test('representatieve operationele schermen houden een vaste wereld en echte bediening', () => {
@@ -87,7 +87,7 @@ test('ieder gemarkeerd wereldscherm krijgt dezelfde buitenmaat en veilige Edge-r
 
 test('de gedeelde schermlaag overschrijft geen lokaal bewezen achtergrondparen', () => {
   const hoofdregel = WERELDSCHERMEN.match(
-    /body\[data-rtg-skin="heritage"\]\[data-rtg-world\]\[data-rtg-screen\]:not\(\[data-rtg-screen="world-home"\]\)\{([^}]*)\}/
+    /body\[data-rtg-skin="heritage"\]\[data-rtg-world\]\[data-rtg-screen\]:not\(\[data-rtg-desktop\]\)\{([^}]*)\}/
   );
   assert.ok(hoofdregel, 'de centrale schermgrens ontbreekt');
   assert.doesNotMatch(hoofdregel[1], /background(?:-color|-image|-attachment)?\s*:/,

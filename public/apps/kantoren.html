@@ -44,6 +44,17 @@
   .veld:focus{border-color:var(--burgundy);}
   .knop{background:var(--txt);color:var(--bg);border:none;border-radius:0;padding:.7rem 1.5rem;font-size:.9rem;font-weight:600;cursor:pointer;font-family:inherit;}
   .knop:hover{background:var(--burgundy);color:#fff;}
+  /* het boek van RTG in de kamer Financien (kantoren-rtgboek.js) */
+  #kRtgBoek{padding:1.1rem 1.25rem;margin-top:1rem;}
+  #kRtgBoek h4{margin:0 0 .25rem;}
+  .rb-maand{display:flex;gap:.5rem;align-items:center;margin:.75rem 0;font-size:.85rem;}
+  .rb-deel{margin-top:1rem;}
+  .rb-deel h5{margin:0 0 .2rem;font-size:.9rem;}
+  .rb-rij{display:flex;flex-wrap:wrap;gap:.45rem;align-items:center;padding:.5rem 0;border-bottom:1px solid var(--line);}
+  .rb-post{flex:1 1 14rem;display:flex;flex-direction:column;}
+  .rb-post .stil{font-size:.76rem;color:var(--soft);}
+  .rb-bedrag{flex:0 1 8rem;min-width:6rem;}
+  .rb-bron{flex:1 1 10rem;}
   .knop.stil{background:var(--card2);color:var(--txt);border:1px solid var(--line);}
   .fout{color:var(--burgundy);font-size:.85rem;min-height:1.2rem;margin-top:.5rem;}
   /* kamergrid in de Werk-OS-taal: scherpe tegels, haarlijnen, korte beweging */
@@ -238,9 +249,10 @@
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
 <script src="/shared/media.js"></script>
 <link href="/shared/ios.css" rel="stylesheet">
+<script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-world="work" data-rtg-skin="heritage">
+<body class="rtg-stijl" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard">
 <a class="skip" href="#hoofd">Naar de inhoud</a>
 <header><div class="wrap">
   <div class="brand"><span class="merkvlak">RTG Kantoren</span><small>Elke afdeling een eigen kamer</small></div>
@@ -286,6 +298,12 @@
       <div class="kpis h-mt80" id="kBetaalKpis"></div>
       <div class="betaal-providers" id="kBetaalProviders"></div>
       <div id="kBetaalProblemen" style="margin-top:0.75rem;"></div>
+    </div>
+    <div class="kaart" id="kRtgBoek" hidden>
+      <h4>Het boek van RTG</h4>
+      <div class="stil">Wat RTG zelf uitgeeft en verschuldigd is, per maand. Elk bedrag met een bron en op uw naam; personeel als totaal, nooit per medewerker. Hier rusten de operationele marge, de liquiditeit, de runway en de kosten per nieuw lid op.</div>
+      <label class="rb-maand">Maand <input type="month" class="veld" id="kRbMaand"></label>
+      <div id="kRbDelen"></div>
     </div>
     <h3 class="sec">De werklijst van deze kamer</h3>
     <div class="kaart lijst">
@@ -1249,6 +1267,9 @@ async function openKamer(id){
     '<div class="kaart lijst"><h4>'+esc(l.titel)+'</h4>'+(l.items.length ? '<ul>'+l.items.map(i => '<li>'+esc(i)+'</li>').join('')+'</ul>' : '<div class="leeg">Niets openstaand.</div>')+'</div>').join('');
   $('#kBetaal').hidden = (id !== 'financien' && id !== 'intern');
   if (id === 'financien' || id === 'intern') laadBetaalKamer(id);
+  // het boek van RTG zelf: Financien vult het op naam (besluit C8)
+  $('#kRtgBoek').hidden = (id !== 'financien');
+  if (id === 'financien' && window.RTGBoekKamer) RTGBoekKamer.laad(api, meld);
   tekenTaken(d.taken);
   // Rahul denkt mee in deze kamer -- schoon starten bij elke kamer
   $('#kRahulUit').textContent = '';
@@ -3597,7 +3618,7 @@ function stadRenderNodeAan(){
     try {
       const r = await api('stad/node/aanmeld', { doosNaam: $('#stadDoosNaam').value, zone: $('#stadZoneSel').value,
         sensoren: $('#stadSens').value.split(',').map(s => s.trim()).filter(Boolean), naam: stadWie });
-      $('#stadSleutel').innerHTML = '<div style="padding:.55rem .7rem;border:1px solid var(--gold);border-radius:0;"><strong>' + esc(r.serial) + '</strong> · apparaat-sleutel: <code>' + esc(r.sleutel) + '</code><br><span style="color:var(--soft);">' + esc(r.let_op) + '</span></div>';
+      $('#stadSleutel').innerHTML = '<div style="padding:.55rem .7rem;border:1px solid var(--gold);border-radius:0;"><strong>' + esc(r.serial) + '</strong> · apparaat-sleutel: <code>' + esc(r.sleutel) + '</code> · manifestsleutel: <code>' + esc(r.manifestSleutel || '-') + '</code><br><span style="color:var(--soft);">' + esc(r.let_op) + '</span></div>';
       $('#stadDoosNaam').value = ''; $('#stadSens').value = '';
       stadVervers();
     } catch (e) { meld(e.message); }
@@ -4183,11 +4204,13 @@ async function laadLedenregister(){
   const eur = c => '€ ' + (Math.round(Number(c)*100)/100).toLocaleString('nl-NL', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   const kop = t => '<div style="font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:0.75rem 0 0.25rem;">'+t+'</div>';
   const tegels = arr => '<div style="display:flex;flex-wrap:wrap;gap:.5rem;">'+arr.map(x =>
-    '<span style="background:var(--paneel2,#1B1817);border:1px solid var(--line);border-radius:0;padding:.35rem .7rem;font-size:.82rem;"><b>'+esc(x.naam)+'</b> <span style="color:var(--rtg-leesgoud,var(--gold));">'+x.aantal+'</span></span>').join('')+'</div>';
+    '<span style="background:var(--paneel2,#1B1817);border:1px solid var(--line);border-radius:0;padding:.35rem .7rem;font-size:.82rem;"><b>'+esc(x.naam)+'</b> <span style="color:var(--rtg-leesgoud,var(--gold));">'+(x.aantal == null ? 'te kleine groep' : x.aantal)+'</span></span>').join('')+'</div>';
   // de omzet + 30%-split
+  /* Een pas onder de groepsgrens toont geen aantal en geen omzet: prijs maal
+     aantal zou het aantal alsnog verraden (server/kern/bedrijfsmaat/poort.js). */
   const omzetRijen = (d.omzet||[]).map(o =>
-    '<div class="taakrij" style="border-bottom:1px solid var(--line);padding:.4rem 0;gap:.6rem;"><span style="flex:1;"><b>'+esc(o.pasNaam)+'</b> <span class="stil" style="color:var(--soft);font-size:.72rem;">'+o.aantal+' leden'+(o.opMaat?'':' · '+eur(o.prijsPP)+' p/m ex btw')+'</span></span>'+
-    '<span style="color:var(--rtg-leesgoud,var(--gold));font-size:.82rem;">'+(o.opMaat?'op maat':eur(o.maandOmzet)+' /mnd')+'</span></div>').join('');
+    '<div class="taakrij" style="border-bottom:1px solid var(--line);padding:.4rem 0;gap:.6rem;"><span style="flex:1;"><b>'+esc(o.pasNaam)+'</b> <span class="stil" style="color:var(--soft);font-size:.72rem;">'+(o.aantal == null ? 'te kleine groep' : o.aantal+' leden'+(o.opMaat?'':' · '+eur(o.prijsPP)+' p/m ex btw'))+'</span></span>'+
+    '<span style="color:var(--rtg-leesgoud,var(--gold));font-size:.82rem;">'+(o.aantal == null ? '' : (o.opMaat?'op maat':eur(o.maandOmzet)+' /mnd'))+'</span></div>').join('');
   const s = d.split || {};
   box.innerHTML =
     kop('Per pas') + tegels((d.perPas||[]).map(p => ({ naam: p.naam, aantal: p.aantal }))) +
@@ -4210,10 +4233,11 @@ async function laadLedenregister(){
       : '<div class="leeg">Geen leden in deze selectie.</div>');
   // de keuzelijsten eenmalig vullen uit de facetten
   if (!LR_OPTIES_KLAAR) {
-    const vul = (sel, items, waardeVeld) => { const cur = sel.value; items.forEach(x => { const o = document.createElement('option'); o.value = waardeVeld ? x[waardeVeld] : x.naam; o.textContent = x.naam + ' (' + x.aantal + ')'; sel.appendChild(o); }); sel.value = cur; };
-    vul($('#lrPas'), (d.perPas||[]).filter(p=>p.aantal), 'pas');
-    vul($('#lrLand'), (d.perLand||[]).filter(x=>x.naam!=='Onbekend'));
-    vul($('#lrStad'), (d.perStad||[]).filter(x=>x.naam!=='Onbekend'));
+    const vul = (sel, items, waardeVeld) => { const cur = sel.value; items.forEach(x => { const o = document.createElement('option'); o.value = waardeVeld ? x[waardeVeld] : x.naam; o.textContent = x.aantal == null ? x.naam : x.naam + ' (' + x.aantal + ')'; sel.appendChild(o); }); sel.value = cur; };
+    // een pas onder de groepsgrens blijft kiesbaar; de samengevoegde regel "Overige" niet
+    vul($('#lrPas'), (d.perPas||[]).filter(p=>p.aantal==null||p.aantal), 'pas');
+    vul($('#lrLand'), (d.perLand||[]).filter(x=>x.naam!=='Onbekend'&&!x.samengevoegd));
+    vul($('#lrStad'), (d.perStad||[]).filter(x=>x.naam!=='Onbekend'&&!x.samengevoegd));
     LR_OPTIES_KLAAR = true;
     ['#lrPas','#lrGeslacht','#lrLand','#lrStad'].forEach(id => $(id).addEventListener('change', laadLedenregister));
   }
@@ -4309,6 +4333,7 @@ else uitgelogd();
 <script src="/shared/drie.js"></script>
 <script src="/apps/kantoren-atelier3d.js"></script>
 <script src="/apps/kantoren-collectieboek.js"></script>
+<script src="/apps/kantoren-rtgboek.js"></script>
 <script src="/shared/glyf.js"></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>

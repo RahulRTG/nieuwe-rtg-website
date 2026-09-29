@@ -402,8 +402,10 @@
     }, 5000);
   }
   function sluitEditor() {
-    clearInterval(leesT); stopSamen(); $('#editor').classList.remove('aan'); $('#lijst').style.display = '';
-    open = null; vuil = false; $('#voetbalk').textContent = ''; tekenTabs(); laadLijst();
+    clearInterval(leesT); stopSamen(); $('#editor').classList.remove('aan');
+    open = null; vuil = false; $('#voetbalk').textContent = ''; tekenTabs();
+    // Show only the refreshed rows; a pending reply must not erase an open gesture.
+    return laadLijst().finally(function () { $('#lijst').style.display = ''; });
   }
   $('#editTerug').addEventListener('click', function () {
     Promise.resolve(vuil ? bewaarNu() : true).then(function (veilig) { if (veilig !== false) sluitEditor(); });
@@ -641,6 +643,12 @@
   });
   $('#faseHoofd').addEventListener('click', function () { zetFase(this.dataset.naar); });
   $('#faseDicht').addEventListener('click', function () { $('#faseScrim').classList.remove('open'); });
+  /* Escape sluit de werkstroom, zoals elk venster met role="dialog" hoort te
+     doen; alleen de sluitknop liet een toetsenbordgebruiker erachter zitten
+     (gemeten 27 september 2026, APPWERKT: de scrim bleef over de pagina liggen). */
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && $('#faseScrim').classList.contains('open')) $('#faseDicht').click();
+  });
 
   /* ---------- delen ---------- */
   $('#deelBtn').addEventListener('click', function () { if (!open) return; toonDeel(); $('#deelScrim').classList.add('open'); });

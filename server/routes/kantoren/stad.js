@@ -7,6 +7,9 @@
 module.exports = (ctx) => {
   const { app, officeAuth, veilig, afdelingen, kern } = ctx;
   const stad = kern.stad;
+  /* Een apparaatsleutel wordt OP NAAM uitgegeven (naamAuth): een sleutel die
+     jaren buiten hangt, hoort een uitgever te hebben en geen gedeelde code. */
+  const naamAuth = kern.naamAuth;
   /* Wie het deed komt uit de sessie, nooit uit het verzoek (hier stond
      `req.body.naam`). Zonder naam op de sessie zegt het spoor dat eerlijk. */
   const naam = req => require('../../opzet/envelop').wie(req) || 'kantoor (gedeelde code)';
@@ -30,7 +33,7 @@ module.exports = (ctx) => {
 
   /* De vloot: een echte Stadsdoos aanmelden (de sleutel wordt EEN keer
      getoond) of uit dienst nemen. */
-  app.post('/api/office/stad/node/aanmeld', officeAuth, (req, res) => veilig(res, () => {
+  app.post('/api/office/stad/node/aanmeld', naamAuth, (req, res) => veilig(res, () => {
     const r = stad.stadNodeAanmeld({ naam: req.body.doosNaam, zone: req.body.zone, sensoren: req.body.sensoren, wie: naam(req) });
     if (r.ok) afdelingen.audit(naam(req), 'Stadsdoos ' + r.serial + ' aangemeld');
     return r;
@@ -72,7 +75,7 @@ module.exports = (ctx) => {
     if (r.ok) afdelingen.audit(naam(req), 'Stadsdoos ' + req.body.serial + ' -> fase ' + r.paspoort.fase);
     return r;
   }));
-  app.post('/api/office/stad/sleutel', officeAuth, (req, res) => veilig(res, () => {
+  app.post('/api/office/stad/sleutel', naamAuth, (req, res) => veilig(res, () => {
     const r = stad.stadSleutelNieuw({ serial: req.body.serial, wie: naam(req) });
     if (r.ok) afdelingen.audit(naam(req), 'Nieuwe apparaatsleutel voor ' + r.serial + '; de oude blijft nog even geldig');
     return r;

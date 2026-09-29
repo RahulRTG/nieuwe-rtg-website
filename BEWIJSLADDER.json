@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-22T17:12:04.581Z",
-    "commit": "0f88d9cf1",
+    "op": "2026-09-29T07:58:57.545Z",
+    "commit": "d055489cb",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 6,
     "instrument": "scripts/bewijsladder.js",
     "node": "v24.18.0"
   },
@@ -333,8 +333,7 @@
           "doel": "scripts/pgtoetsen.js",
           "lokaal": false,
           "keten": [
-            "ci.yml",
-            "release-image.yml"
+            "ci.yml"
           ],
           "aanleiding": [
             "pull_request",
@@ -393,6 +392,21 @@
           "register": null,
           "stempel": null,
           "grond": null,
+          "graad": "vermoed"
+        },
+        {
+          "doel": "test/native-artifact.test.js",
+          "lokaal": true,
+          "keten": [
+            "release-native.yml"
+          ],
+          "aanleiding": [
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": "HOST-CONFIG.json",
+          "stempel": null,
+          "grond": "schrijft",
           "graad": "vermoed"
         }
       ]
@@ -583,6 +597,21 @@
           "graad": "bewezen"
         },
         {
+          "doel": "scripts/native-rehearsal.js",
+          "lokaal": false,
+          "keten": [
+            "release-native.yml"
+          ],
+          "aanleiding": [
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null,
+          "graad": "vermoed"
+        },
+        {
           "doel": "scripts/tot-crash.js",
           "lokaal": true,
           "keten": [
@@ -751,6 +780,22 @@
           "graad": "vermoed"
         },
         {
+          "doel": "scripts/desktop-audit.js",
+          "lokaal": true,
+          "keten": [
+            "desktop-standard.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null,
+          "graad": "vermoed"
+        },
+        {
           "doel": "scripts/e2e.js",
           "lokaal": true,
           "keten": [
@@ -782,6 +827,22 @@
           "register": "NORM.json",
           "stempel": false,
           "grond": "schrijft",
+          "graad": "vermoed"
+        },
+        {
+          "doel": "test/warm-presentation.e2e.js",
+          "lokaal": true,
+          "keten": [
+            "desktop-standard.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null,
           "graad": "vermoed"
         }
       ]
@@ -874,7 +935,8 @@
           "doel": "scripts/bron-release-bewijs.js",
           "lokaal": true,
           "keten": [
-            "release-image.yml"
+            "release-image.yml",
+            "release-native.yml"
           ],
           "aanleiding": [
             "push",
@@ -893,6 +955,21 @@
           ],
           "aanleiding": [
             "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null,
+          "graad": "vermoed"
+        },
+        {
+          "doel": "scripts/ci-pg-bewijs.js",
+          "lokaal": true,
+          "keten": [
+            "release-image.yml"
+          ],
+          "aanleiding": [
             "push",
             "workflow_dispatch"
           ],
@@ -1000,7 +1077,7 @@
       "naam": "Onveranderlijke kandidaat",
       "wat": "het image gebonden aan een digest en een handtekening",
       "stand": "stap",
-      "waarom": "draait maar aan een kant: alleen in de keten",
+      "waarom": "draait aan beide kanten, maar laat geen gestempeld register achter",
       "graad": "vermoed",
       "graadWaarom": "de zwakste premisse is scripts/imageherkomst.js (vermoed)",
       "mechanismen": [
@@ -1017,6 +1094,21 @@
           "register": null,
           "stempel": null,
           "grond": null,
+          "graad": "vermoed"
+        },
+        {
+          "doel": "scripts/native-release.js",
+          "lokaal": true,
+          "keten": [
+            "release-native.yml"
+          ],
+          "aanleiding": [
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": ".attestation.json",
+          "stempel": null,
+          "grond": "schrijft",
           "graad": "vermoed"
         }
       ]
@@ -1111,7 +1203,7 @@
   "uitleg": "Welk bewijsmechanisme op welke sport van de bewijsladder staat, afgeleid uit de keten in .github/workflows en uit de scripts zelf. Per sport de stand (staat, een stap weg, bestaat niet) en per mechanisme of het lokaal draait, alleen in de keten, of beide.",
   "grens": "De SPORTEN zijn verklaard en niet gemeten: dat een soort bewijs hier ontbreekt, zegt deze meter niet. Van de mechanismen erop meet hij dat ze DRAAIEN en waar -- niet of het bewijs dat ze leveren goed is, en niet of het genoeg is. `alleenKeten` telt en oordeelt niet: zeven van die mechanismen lezen een artefact uit een andere job en kunnen lokaal per definitie niet draaien. En er staat met opzet geen samengesteld eindoordeel onder deze tabel (KEURING.md par. 5).",
   "telling": {
-    "mechanismen": 61,
+    "mechanismen": 67,
     "sporten": 12,
     "staat": 6,
     "stap": 6,
@@ -1120,8 +1212,8 @@
     "graadGemeten": 0,
     "graadVermoed": 12,
     "graadOnbekend": 0,
-    "alleenKeten": 17,
-    "vermeldingenAlleenKeten": 18,
+    "alleenKeten": 18,
+    "vermeldingenAlleenKeten": 19,
     "zonderTrede": 0
   }
 }

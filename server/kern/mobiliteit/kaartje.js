@@ -36,7 +36,8 @@ module.exports = (ctx) => {
   function ensureKaartjes() {
     opslag.bak('mobKaartjes');
   }
-  const kaartMet = code => { ensureKaartjes(); return opslag.bak('mobKaartjes').find(k => k.code === code) || null; };
+  // op ID: de code is een bearer in ./kaarttoegang en staat niet op het kaartje
+  const kaartMet = id => { ensureKaartjes(); return (id && opslag.bak('mobKaartjes').find(k => k.id === id)) || null; };
   const kaartenVan = key => { ensureKaartjes(); return opslag.bak('mobKaartjes').filter(k => k.key === key); };
 
   const lijnVanZaak = (zaak, lijnId) => (zaak.lijnen || []).find(l => l.id === lijnId) || null;
@@ -127,8 +128,6 @@ module.exports = (ctx) => {
     const start = new Date();
     const k = {
       id: id('kt'),
-      // de code is het vervoerbewijs zelf: uit de CSPRNG, want wie hem raadt reist gratis
-      code: crypto.randomBytes(9).toString('base64url').toUpperCase(),
       key: session.key, codenaam,
       vervoerder: zaak.code, vervoerderNaam: zaak.name,
       lijnId: lijn.id, lijnNaam: lijn.naam, soort: lijn.soort,

@@ -335,6 +335,7 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
                 zichtbaar(document.querySelector('.rtg-edge-menu')) ||
                 zichtbaar(document.querySelector('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]')) ||
                 edgeGreep ||
+                [...document.querySelectorAll('[data-rtg-safe-exit]')].some(zichtbaar) ||
                 zichtbaar(document.querySelector('#rtf-toegang-slot [data-rtf-uitweg]'));
             }, null, { timeout: 8000 });
             const deuren = await page.evaluate(() => {
@@ -350,6 +351,7 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
                 edge: zichtbaar(document.querySelector('.rtg-edge-menu')),
                 edgeGreep: [...document.querySelectorAll(
                   '.rtg-edge-2-reveal,.rtg-edge-2-edge-reveal')].some(zichtbaar),
+                veiligeUitgang: [...document.querySelectorAll('[data-rtg-safe-exit]')].some(zichtbaar),
                 uitweg: zichtbaar(document.querySelector('#rtf-toegang-slot [data-rtf-uitweg]')),
                 roots: document.querySelectorAll('.rtg-edge-chrome').length
               };
@@ -435,7 +437,8 @@ test('het zichtbare Edge-menu opent en houdt home en instellingen bereikbaar',
     await thuis.click();
     await page.waitForURL(/\/apps\/wereld\.html$/, { timeout: 8000 });
     assert.equal(new URL(page.url()).pathname, '/apps/wereld.html', 'Home opent de vernieuwde momentenfeed');
-    await page.waitForSelector('.living-intro');
+    await page.waitForSelector('.wp-scene');
+    await page.locator('.wp-story a').click();
     assert.equal(await page.locator('#feed').isVisible(), true, 'de momentenfeed is zichtbaar voor het ingelogde lid');
     await page.close();
   });

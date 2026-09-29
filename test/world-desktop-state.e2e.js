@@ -14,7 +14,7 @@ async function context() {
     localStorage.setItem('rtg_cookieinfo_v1', '1'); }, token); return ctx;
 }
 async function open(page) {
-  await page.goto(srv.base + '/apps/wereld.html', { waitUntil: 'domcontentloaded' });
+  await page.goto(srv.base + '/apps/rtg.html', { waitUntil: 'domcontentloaded' }); // het LivingOS-bureau; wereld.html is de Saloon (#402)
   await page.waitForSelector('body[data-rtg-desktop]');
 }
 test.before(async () => {
@@ -41,6 +41,9 @@ test('a failed preference read cannot overwrite stored widgets; explicit changes
     await page.route('**/api/ik/workspace', r => r.fulfill({ status: 503, contentType: 'application/json', body: '{}' }));
     await open(page);
     await page.waitForFunction(() => /konden niet worden opgehaald/.test(document.querySelector('.wd-favorites').textContent));
+    if (await page.locator('.wd-app-controls').getAttribute('open') === null) await page.locator('.wd-app-controls>summary').click();
+    await page.locator('#wdSearch').fill('geld');
+    await page.locator('.wd-library [data-widget="geld"]').hover();
     await page.locator('.wd-library [data-widget="geld"] .wd-widget-pin').click();
     assert.equal(writes, 0);
     assert.deepEqual((await post('/api/ik/workspace', { scope: 'living' })).workspace.order, ['notities']);
@@ -48,6 +51,9 @@ test('a failed preference read cannot overwrite stored widgets; explicit changes
     await page.locator('.wd-favorites').getByRole('button', { name: 'Probeer opnieuw' }).click();
     await page.waitForFunction(() => /zijn bewaard/.test(document.querySelector('.wd-favorites').textContent));
     const saved = page.waitForResponse(r => r.url().endsWith('/api/ik/workspace/zet'));
+    if (await page.locator('.wd-app-controls').getAttribute('open') === null) await page.locator('.wd-app-controls>summary').click();
+    await page.locator('#wdSearch').fill('geld');
+    await page.locator('.wd-library [data-widget="geld"]').hover();
     await page.locator('.wd-library [data-widget="geld"] .wd-widget-pin').click(); await saved;
     await page.reload(); await page.waitForSelector('.wd-favorites [data-widget="geld"]');
     assert.deepEqual((await post('/api/ik/workspace', { scope: 'living' })).workspace.order, ['notities', 'geld']);
@@ -59,8 +65,10 @@ test('search, week selection and real conversation selection survive desktop int
   const ctx = await context(), page = await ctx.newPage(), errors = []; letOpFouten(page, errors);
   try {
     await open(page); await page.waitForSelector('.wd-favorites [data-widget="agenda"] [data-state="ready"]');
+    await page.locator('.wd-date-controls>summary').click();
     await page.locator('.wd-favorites').getByRole('button', { name: 'Een week vooruit' }).click();
     await page.waitForSelector('.wd-favorites [data-widget="agenda"] [data-state="ready"]');
+    await page.locator('.wd-app-controls>summary').click();
     await page.locator('#wdSearch').fill('agenda');
     await page.evaluate(() => window.RTGi18n.set('en'));
     assert.equal(await page.locator('#wdSearch').inputValue(), 'agenda');

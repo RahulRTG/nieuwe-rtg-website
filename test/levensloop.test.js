@@ -187,7 +187,7 @@ test('de levensloop: van aanmelding tot tweede baan, en er weer uit', async () =
     assert.equal(slecht.status, 400, 'een einddatum voor de begindatum wordt geweigerd');
 
     const verlof = await P('/api/staff/leave/request',
-      { soort: 'verlof', van: '2026-09-01', tot: '2026-09-10', reden: 'Familiebezoek' }, werk1.token);
+      { soort: 'verlof', van: '2026-09-01', tot: '2026-09-10' }, werk1.token);
     assert.equal(verlof.status, 200, 'het verlof is aangevraagd');
     assert.equal(verlof.body.entry.status, 'nieuw', 'en wacht op de werkgever -- niet vanzelf goedgekeurd');
 

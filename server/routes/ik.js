@@ -13,6 +13,7 @@ const klok = require('../lib/klok');
 const workspace = require('../kern/workspace-voorkeur');
 const workspaceAudit = require('../kern/workspace-audit');
 module.exports = (kern) => {
+  require('./presentatie-beelden')(kern);
   const { app, auth, schoon, accounts, geloof, toegankelijkVan, toegankelijkZet, TOEGANKELIJK_KEUZES } = kern;
 
   const uid = (req) => (req.session && req.session.account) ? req.session.account.id : null;

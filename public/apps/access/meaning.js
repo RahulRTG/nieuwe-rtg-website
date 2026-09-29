@@ -10,7 +10,7 @@
   const definitions={
     'identity.account.create':{route:'/auth/register',goal:'identity.account.available',risk:'decision',
       required:{name:'string',email:'string',geboortedatum:'string',password:'string'},
-      optional:{wervingscode:'string'},fixed:{tier:'guest',pasApp:'rtg'},
+      optional:{wervingscode:'string',campagne:'string',aanmeldkanaal:'string'},fixed:{tier:'guest',pasApp:'rtg'},
       authority:'server authentication, age and account policy',effect:'FREE_ACCOUNT_CREATED'},
     'identity.session.open':{route:'/auth/login',goal:'identity.session.authenticated',risk:'decision',
       required:{login:'string',password:'string'},optional:{pasApp:'string'},authority:'server password and second-factor policy',effect:'SESSION_OR_SECOND_FACTOR'},

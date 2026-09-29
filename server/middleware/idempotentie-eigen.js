@@ -25,6 +25,7 @@ const EIGEN = [
   '/api/office/bank/mislukking',
   '/api/festival/verkoop/rond',
   '/api/giftcard/buy',
+  '/api/giftcard/roteer',
   '/api/supplier/betaalverzoek',
   '/api/appstore/koop',
   '/api/appstore/kantoor/teruggave'

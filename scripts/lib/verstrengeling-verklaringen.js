@@ -16,6 +16,33 @@
    Een rand daarheen verplaatsen is een besluit dat je kunt terugvinden; hem
    DOMEINRELATIE noemen om van het getal af te zijn, is de meter kapotmaken. */
 module.exports = [
+  { van: 'ingang:ik', naar: 'ingang:presentatie-beelden', soort: 'ORKESTRATIE',
+    reden: 'De ik-route registreert de persoonlijke presentatievoorkeuren als onderdeel van de eigen accountinstellingen; de beeldmodule bewaakt zelf lid- en gezinsprofielauthenticatie en eigendom van privébestanden.' },
+  /* DE LEDENGIDS RAAKT DE AANWEZIGHEID AAN (besluit van de eigenaar, 25 september
+     2026: retentie ook als aanwezigheid, een dag per lid). kern/gids.js dirTouch
+     is het ene keelgat waar elk ledenverzoek langskomt; daar wordt ook de dag van
+     het laatste bezoek aangeraakt, zodat "aanwezig" en "in de gids" niet op twee
+     deuren iets anders betekenen. De gids leest niets terug: het is een melding,
+     via een late binding (kern/aanwezigheid.js `raak`), omdat de gids eerder
+     wordt gebouwd dan de module die de dag bewaart. */
+  { van: 'domein:gids', naar: 'domein:aanwezigheid', soort: 'DOMEINRELATIE',
+    reden: 'de ledengids meldt bij elk ledenverzoek de bezoekdag aan kern/aanwezigheid.js; hetzelfde keelgat, geen tweede definitie van aanwezig' },
+  /* HET RECHT OP VERGETELHEID RAAKT DE PASGESCHIEDENIS. kern/vergeten.js is de
+     ene plek die weet wat er bij een verwijdering met elke tak gebeurt; de
+     pasovergangen verliezen daar hun codenaam (en blijven onder een willekeurig
+     kenmerk staan). test/vergeten.test.js veegt de hele database na. */
+  { van: 'domein:vergeten', naar: 'domein:pasgeschiedenis', soort: 'BELEID',
+    reden: 'bij een verwijdering haalt kern/vergeten.js de codenaam van de pasovergangen; de regel woont in kern/pasgeschiedenis.js `vergeet`' },
+  /* EEN SCHRIJVER BUITEN DE REQUESTCOMMIT, gedeeld door de twee meetbronnen van
+     25 september 2026. Beide schrijven vanuit gewone verzoeken in een gedeelde
+     collectie en botsten in PostgreSQL met twee instanties (409 op registratie,
+     5xx in de sloophamer). kern/eigentransactie.js legt de ene weg vast: via
+     bewerkCollectie, als haak voor de commit, en een fout telt in plaats van het
+     verzoek te laten vallen. Twee kopieen zouden twee faalgedragen worden. */
+  { van: 'domein:pasgeschiedenis', naar: 'domein:eigentransactie', soort: 'GEDEELDE_PRIMITIEF',
+    reden: 'de pasovergang schrijft via kern/eigentransactie.js in een eigen collectietransactie, zodat gelijktijdige registraties niet in de requestcommit botsen' },
+  { van: 'domein:aanwezigheid', naar: 'domein:eigentransactie', soort: 'GEDEELDE_PRIMITIEF',
+    reden: 'de bezoekdag schrijft via kern/eigentransactie.js in een eigen collectietransactie, zodat eerste bezoeken van de dag niet in de requestcommit botsen' },
   /* DE ZWARE POORT LEEST DE LIJST ZWARE HANDELINGEN. kern/zwaarbewijs.js weigert
      een actienaam die kern/webauthn-acties.js niet kent bij de EERSTE aanroep:
      zonder die controle ging zo'n route op de terugval door zolang de eigenaar
@@ -286,6 +313,8 @@ module.exports = [
     reden: 'routes/geld.js r.118 hangt de Rahul-kant van dezelfde ingang op' },
   { van: 'ingang:kantoren', naar: 'ingang:papieren-deur', soort: 'PRESENTATIE',
     reden: 'routes/kantoren/regie.js r.28: dezelfde papierendeur wordt door meerdere ingangen opgehangen, en dat is precies een deur en geen kopie' },
+  { van: 'ingang:magnaatwereld', naar: 'ingang:magnaatstad', soort: 'PRESENTATIE',
+    reden: 'routes/magnaatwereld.js r.22 hangt de stadkant van dezelfde ingang op (samen in een Oudwijk); apart omdat magnaatwereld.js op de 10 kB-grens staat, en met alleen app, auth, geenGast en magnaatWereld zodat het geen tweede domein op de kern wordt' },
   { van: 'ingang:leven', naar: 'ingang:levenmentor', soort: 'PRESENTATIE',
     reden: 'routes/leven.js r.61 hangt de mentorkant van dezelfde ingang op' },
   { van: 'ingang:sociaal', naar: 'ingang:socialerahul', soort: 'PRESENTATIE',
@@ -417,5 +446,25 @@ module.exports = [
      hele systeem wantrouwen. De som staat nu in kern/afgeleid.js, waar btwSplit
      al stond, en beide kanten tellen dezelfde afgeronde centen op. */
   { van: 'domein:fiscaal', naar: 'domein:afgeleid', soort: 'DOMEINRELATIE',
-    reden: 'kern/fiscaal/index.js en kern/fiscaal/btwtelling.js lezen allebei btwCenten uit kern/afgeleid.js. Dat is met opzet EEN plek: de aangifte telt per factuurregel en de maandboekhouding per bestelregel, en alleen met dezelfde afrondregel komen die twee op hetzelfde getal uit. Stond de som in het fiscale domein zelf, dan had de boekhouding hem opnieuw geschreven -- wat zij deed, en wat de cent opleverde' }
+    reden: 'kern/fiscaal/index.js en kern/fiscaal/btwtelling.js lezen allebei btwCenten uit kern/afgeleid.js. Dat is met opzet EEN plek: de aangifte telt per factuurregel en de maandboekhouding per bestelregel, en alleen met dezelfde afrondregel komen die twee op hetzelfde getal uit. Stond de som in het fiscale domein zelf, dan had de boekhouding hem opnieuw geschreven -- wat zij deed, en wat de cent opleverde' },
+
+  /* ---- CONNECTION OS ----
+     Vonk en Rendez-vous delen uitsluitend de bewezen kernelmechanismen. De
+     productmodules bezitten hun eigen regels en presentatie; media,
+     communicatie en state-resolution bestaan juist eenmaal zodat consent,
+     blocking en implemented:false niet per product uiteen kunnen lopen. */
+  { van: 'domein:rendezvous-connection-setup', naar: 'domein:connection-profile-media', soort: 'GEDEELDE_PRIMITIEF',
+    reden: 'Rendez-vous monteert de gedeelde, purpose-gebonden profielmedia op zijn eigen routes; de kernel bewaakt tickets, disclosure en blokkeren zodat Rendez-vous geen tweede media-autoriteit krijgt' },
+  { van: 'domein:rendezvous-connection-setup', naar: 'domein:connection-communication', soort: 'GEDEELDE_PRIMITIEF',
+    reden: 'Rendez-vous monteert dezelfde consent- en block-veilige transportprimitieven als Vonk, terwijl zijn productpolicy onafhankelijk bepaalt welke communicatiecapability mag bestaan' },
+  { van: 'domein:rendezvous-state', naar: 'domein:connection-product-state', soort: 'BELEID',
+    reden: 'de Rendez-vous-state vraagt de gedeelde resolver om capabilities uit policy, consent, blockstatus en revision af te leiden; de client en het productdomein mogen die veiligheidsbeslissing niet zelf reconstrueren' },
+  { van: 'domein:vonk', naar: 'domein:connection-profile-media', soort: 'GEDEELDE_PRIMITIEF',
+    reden: 'Vonk gebruikt de gedeelde profielmedialaag voor purpose-gebonden, kortlevende levering; eigendom, disclosure en blokkeren horen niet nogmaals in de Vonk-route te worden geïmplementeerd' },
+  { van: 'domein:vonk', naar: 'domein:connection-communication', soort: 'GEDEELDE_PRIMITIEF',
+    reden: 'Vonk gebruikt de gedeelde communicatieprimitieven voor tekst, media en bewezen realtime capabilities; de Vonk-policy bepaalt afzonderlijk wat in iedere productstate beschikbaar is' },
+  { van: 'domein:vonk', naar: 'domein:connection-product-state', soort: 'BELEID',
+    reden: 'Vonk laat availableCapabilities en Edge-projecties door de centrale state-resolver bepalen, zodat stale clients en zelfverzonnen acties nooit productbeleid kunnen omzeilen' },
+  { van: 'domein:vonk', naar: 'domein:connection-state-vonk', soort: 'EIGEN_DATA',
+    reden: 'connection-state-vonk is de uitgeknipte Vonk-state-machine: hetzelfde productonderwerp in een kleiner bestand, met server-authoritative transitions en revisioncontrole' }
 ];

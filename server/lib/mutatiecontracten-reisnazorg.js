@@ -1,5 +1,5 @@
 /* ============================================================================
-   MUTATIECONTRACT -- de nazorg van een reisaanvraag (vier routes).
+   MUTATIECONTRACT -- de nazorg van een reisaanvraag (zes routes: vier plus thuis).
 
    Deel van server/lib/mutatiecontracten.js; zie de kop daar voor de vorm. Een
    eigen bestand omdat deze vier bij elkaar horen: ze zijn samen de weg terug uit
@@ -39,6 +39,12 @@ const AFGETEKEND = {
   door: 'Claude (Opus 5), op grond van de gemeten dubbeltik hieronder plus de afweging in de kop ' +
     'tegen MUTATIECONTRACT.md par. 5; niet door een mens nagelezen',
   op: GEMETEN_OP
+};
+
+const AFGETEKEND_THUIS = {
+  door: 'Claude, op grond van test/reisbureau-thuis.test.js en dezelfde afweging als hierboven; ' +
+    'niet door een mens nagelezen',
+  op: '2026-09-27'
 };
 
 const CONTRACTEN = {
@@ -115,6 +121,37 @@ const CONTRACTEN = {
       op: GEMETEN_OP
     },
     afgetekend: AFGETEKEND
+  },
+
+  /* THUIS (kern/reisbureau-thuis.js, 27 september 2026). Zelfde vorm: de eerste
+     oproep zet de stand, de tweede stuit op de standcontrole -- de reis is dan
+     `thuis` en dat is geen `bevestigd`. Gemeten in test/reisbureau-thuis.test.js
+     toets 3-5 en 6. */
+  'POST /api/reisbureau/thuis': {
+    mutatieId: 'reisbureau.thuis.lid',
+    herkomst: 'mens',
+    semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'OBJECT_SCOPED', objectVeld: 'ref' },
+    stand: 'PROTECTED',
+    bewijs: {
+      gemeten: '1e: 200 -> thuis | spoor +1 (thuis, door u). 2e: 409 "Deze reis is thuis; thuis kan ' +
+        'alleen na een bevestigde reis." -> thuis | een thuisregel in het spoor. Een ander lid: 404.',
+      op: '2026-09-27'
+    },
+    afgetekend: AFGETEKEND_THUIS
+  },
+  'POST /api/office/reisbureau/thuis': {
+    mutatieId: 'reisbureau.thuis.kantoor',
+    herkomst: 'mens',
+    semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'AUTHENTICATED' },
+    stand: 'PROTECTED',
+    bewijs: {
+      gemeten: '1e: 200 -> thuis | thuis.door reisbureau; het lid ziet "het reisbureau" en geen naam. ' +
+        '2e: dezelfde standcontrole als de ledenkant (409).',
+      op: '2026-09-27'
+    },
+    afgetekend: AFGETEKEND_THUIS
   }
 };
 

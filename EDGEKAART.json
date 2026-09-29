@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-23T23:21:59.000Z",
-    "commit": "81cf5fd8",
+    "op": "2026-09-29T07:58:55.571Z",
+    "commit": "d055489cb",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 3,
     "instrument": "scripts/edgekaart.js",
-    "node": "v22.22.2"
+    "node": "v24.18.0"
   },
   "uitleg": "Gemaakt met scripts/edgekaart.js; de methode staat in de kop. Rollen en verantwoordelijkheden zijn VERKLAARD en elk citaat staat letterlijk in zijn bestand. Elk citaat hangt aan het etiket (naam:letter) waar het over gaat, of aan null als het over geen van de veertien gaat; elk etiket s of b heeft minstens een citaat. schrijver = houdt of zet de toestand zelf; beslisser = kiest de uitkomst; lezer = leest haar of voedt haar via de API van de eigenaar. `gemeten` komt uit de bron zonder commentaar en kent alleen letterlijke namen: attributen alleen op body/html of een alias daarvan, opslag `onbekend` als de opslag niet letterlijk local- of sessionStorage heet. dodeKanalen gaat over rtg-events in public/ (zonder public/dist, .min.js en bundels, wel hun delen) plus index.html; een naam in luisterZonderZender kan nog een zender hebben onder `dynamisch`. `afgeleid` is wat de lexicale lezer over dezelfde wandeling vindt en naast de kaart legt: wie registerAction aanroept op de Edge-kern, wie data-rtg-world en wie data-rtg-edge-2-state op body zet. Een ondergrens: een samengestelde naam ontsnapt. Een dubbele eigenaar is een vondst en geen oordeel.",
   "bestanden": [
@@ -1774,7 +1774,7 @@
           "rol": "leest",
           "etiket": "wereld:l",
           "wat": "de wereld van het bureau",
-          "citaat": "world = d.body.dataset.worldHome"
+          "citaat": "world = d.body.dataset.rtgWorld"
         },
         {
           "rol": "schrijft",
@@ -1810,7 +1810,8 @@
           "rtglang"
         ],
         "attributen": [
-          "data-rtg-desktop"
+          "data-rtg-desktop",
+          "data-rtg-desktop-state"
         ],
         "opslag": [],
         "fetch": []
@@ -3007,7 +3008,7 @@
         "luistert": [],
         "attributen": [
           "data-rtg-edge-ready",
-          "data-rtg-layout",
+          "data-rtg-panel-layout",
           "data-rtg-world"
         ],
         "opslag": [],
@@ -3213,7 +3214,6 @@
         "zendt": [],
         "luistert": [],
         "attributen": [
-          "data-rtg-eigenvlak",
           "data-rtg-skin",
           "data-rtg-world"
         ],
@@ -3284,6 +3284,70 @@
         ],
         "luistert": [],
         "attributen": [],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/site/platform-app.js",
+      "laag": "schil",
+      "rollen": [
+        {
+          "rol": "schrijft",
+          "etiket": "wereld:s",
+          "wat": "de publieke apppagina kiest haar wereld",
+          "citaat": "d.body.dataset.rtgWorld"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "wereld",
+          "als": "schrijver"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGPublicApp"
+        ],
+        "zendt": [],
+        "luistert": [
+          "rtg-public-state"
+        ],
+        "attributen": [
+          "data-rtg-desktop",
+          "data-rtg-world"
+        ],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/site/platform-controller.js",
+      "laag": "schil",
+      "rollen": [
+        {
+          "rol": "schrijft",
+          "etiket": "wereld:s",
+          "wat": "het gekozen openbare verhaal bepaalt de wereld",
+          "citaat": "d.body.dataset.rtgWorld=story.world;"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "wereld",
+          "als": "schrijver"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGPublicController"
+        ],
+        "zendt": [],
+        "luistert": [],
+        "attributen": [
+          "data-rtg-desktop",
+          "data-rtg-world"
+        ],
         "opslag": [],
         "fetch": []
       }
@@ -3625,6 +3689,8 @@
         "public/shared/rtg-edge-system.js",
         "public/shared/rtg-edge-worlds.js",
         "public/shared/rtg-world-identity.js",
+        "public/site/platform-app.js",
+        "public/site/platform-controller.js",
         "public/site/start/experience-edge.js",
         "public/site/start/experience-graph.js",
         "public/site/start/experience.js"
@@ -3762,7 +3828,9 @@
       "public/shared/interface/workspace-context.js",
       "public/shared/interface/world-desktop-frame.js",
       "public/shared/interface/world-desktop-home.js",
-      "public/shared/rtg-themas.js"
+      "public/shared/rtg-themas.js",
+      "public/site/platform-app.js",
+      "public/site/platform-controller.js"
     ],
     "trust": [
       "public/shared/adaptief/gewicht.js",
@@ -3926,6 +3994,8 @@
         "public/shared/rtg-edge-system.js",
         "public/shared/rtg-edge-worlds.js",
         "public/shared/rtg-world-identity.js",
+        "public/site/platform-app.js",
+        "public/site/platform-controller.js",
         "public/site/start/experience-edge.js",
         "public/site/start/experience-graph.js",
         "public/site/start/experience.js"
@@ -3985,6 +4055,8 @@
       "public/shared/randen.js",
       "public/shared/rtg-edge-system.js",
       "public/shared/rtg-world-identity.js",
+      "public/site/platform-app.js",
+      "public/site/platform-controller.js",
       "public/site/start/experience-edge.js",
       "public/site/start/experience-graph.js",
       "public/site/start/experience.js"
@@ -3994,18 +4066,15 @@
       "public/apps/werk/command-entry.js",
       "public/shared/rtg-edge-2-loader.js"
     ],
-    "zonderLader": [
-      "public/site/platform-app.js",
-      "public/site/platform-controller.js"
-    ],
+    "zonderLader": [],
     "andereRegisters": [
       "public/shared/interface/workspace-broker.js (registries)",
       "public/shared/interface/workspace-module-host.js (o)"
     ]
   },
   "telling": {
-    "bestanden": 73,
-    "rollen": 211,
+    "bestanden": 75,
+    "rollen": 213,
     "dubbeleEigenaars": 12,
     "dodeKanalen": 0,
     "levendeKanalen": 14

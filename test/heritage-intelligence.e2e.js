@@ -211,8 +211,9 @@ test('Heritage Intelligence: input, route context and stable reachable controls'
         await page.click('[data-edge-2-mode="focus"]');
         await page.waitForFunction(()=>window.__canvasResizes>0);
         const r=await bounds(page,'#kaart');
-        assert.ok(Math.abs(r.x)<1 && Math.abs(r.y)<1);
-        assert.ok(Math.abs(r.width-390)<1 && Math.abs(r.height-844)<1);
+        const frame = await bounds(page,'.wd-page[data-rtg-canvas-surface]');
+        assert.ok(frame.width > 250 && frame.height > 400, 'the native map retains a usable canvas');
+        for (const key of ['x','y','width','height']) assert.ok(Math.abs(r[key]-frame[key])<1, key+' fills the shared drawing frame');
         assert.equal(await page.locator('.rtg-edge-chrome').count(),1);
         await page.click('.rtg-edge-2-reveal');
         await page.waitForFunction(()=>document.body.getAttribute('data-rtg-edge-2-state')==='overview');
@@ -360,7 +361,7 @@ test('Heritage Intelligence: input, route context and stable reachable controls'
           document.body.getAttribute('data-rtg-edge-2-state') === 'overview' &&
           document.documentElement.scrollHeight > innerHeight * 3, null, { timeout: geduld(10000) });
         /* The software scrolls (scrollIntoView, an anchor, a focus move): the stand
-           stays. Otherwise the top rail collapses, the body loses 44px of padding
+           stays. Otherwise the top rail collapses, the body loses its top padding
            and a tap that aimed at a button lands on what stood below it --
            test/appstore.e2e.js saw exactly that on "Inkoopdossier". */
         await page.evaluate(() => window.scrollTo(0, 900));
@@ -368,7 +369,7 @@ test('Heritage Intelligence: input, route context and stable reachable controls'
         await page.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(r)))));
         assert.equal(await page.evaluate(() => document.body.getAttribute('data-rtg-edge-2-state')), 'overview',
           'a programmatic scroll may not collapse the rail');
-        assert.equal(await page.evaluate(() => getComputedStyle(document.body).paddingTop), '44px',
+        assert.equal(await page.evaluate(() => getComputedStyle(document.body).paddingTop), '64px',
           'and the page keeps its top inset, so nothing moves under a finger');
         // A human scrolls down: compact. Up again: overview.
         await page.mouse.move(640, 500);

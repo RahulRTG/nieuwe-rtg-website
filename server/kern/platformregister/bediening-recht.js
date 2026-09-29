@@ -82,5 +82,8 @@ module.exports = [
      de bestaande leden opsluiten. Lezen en opzeggen staan onder EEN prefix; de
      afweging staat in AFSPRAAK.md par. 14.2. */
   ['/api/mijn/abonnement', 'Eigen lidmaatschap', 'Het lidmaatschap dat dit account heeft: wat er loopt, wat opzeggen gaat doen, en opzeggen.',
-    'wie zich mag verbinden mag zich losmaken; een schakelaar hierop houdt een lid in een contract dat hij niet meer wil']
+    'wie zich mag verbinden mag zich losmaken; een schakelaar hierop houdt een lid in een contract dat hij niet meer wil'],
+  /* Van een betaalde pas naar gast, door het lid zelf (besluit C5): dezelfde afweging. */
+  ['/api/mijn/pas/gast', 'Zelf gast worden', 'Het lid kiest zelf om gast te worden, nu of aan het eind van zijn periode.',
+    'wie zich mag verbinden mag zich losmaken; een schakelaar hierop houdt een lid vast aan een pas die hij niet meer wil']
 ];

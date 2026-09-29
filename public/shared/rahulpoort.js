@@ -271,7 +271,8 @@
 
     /* De groet wacht, het gesprek niet: wie tijdens de groet al antwoordde en
        verder is, krijgt de eerste vraag niet alsnog over zijn tweede heen. */
-    if (opt.groet) { zeg(lees(opt.groet)); setTimeout(function () { if (getoond < 0) toonStap(); }, 900); } else toonStap();
+    toonStap();
+    if (opt.groet) { zeg(lees(opt.groet)); setTimeout(function () { if (i === 0 && !bezig) zeg(lees(stappen[0].vraag)); }, 900); }
     return { zeg: zeg, misging: misging, hertaal: hertaal,
       opnieuw: function () { i = 0; antw = {}; getoond = -1; toonStap(); } };
   }

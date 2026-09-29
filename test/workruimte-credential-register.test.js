@@ -34,40 +34,50 @@ function tenantRoutes() {
   return [...routes].sort();
 }
 
-test('de oude WorkOS-werkruimtetokens blijven een zichtbare P1-releaseblokkade', () => {
+test('de WorkOS-werkruimtesleutels zijn een gemigreerde deur die elke route van de familie noemt', () => {
   const register = JSON.parse(fs.readFileSync(path.join(ROOT, 'CODECREDENTIALS.json'), 'utf8'));
   const deur = register.deuren.find(x => x.id === 'workos.workspace_access_tokens');
   assert.ok(deur);
   assert.equal(deur.classificatie, 'credential');
-  assert.equal(deur.status, 'remaining');
-  assert.equal(deur.release_blocker, true);
+  assert.equal(deur.status, 'migrated');
+  assert.equal(deur.release_blocker, false);
   for (const route of [
     'POST /api/bedrijf/werkruimte/maak', 'POST /api/bedrijf/lid/aanmeld',
-    'POST /api/bedrijf/mijn', 'POST /api/bedrijf/ticket/maak'
+    'POST /api/bedrijf/mijn', 'POST /api/bedrijf/ticket/maak',
+    'POST /api/bedrijf/sleutel/roteer', 'POST /api/bedrijf/sleutel/intrek'
   ]) assert.ok(deur.routes.includes(route), route);
   const ontbreekt = bedrijfRoutes().filter(route => !deur.routes.includes(route));
   assert.deepEqual(ontbreekt, [],
-    'elk endpoint dat dezelfde bearer accepteert hoort bij de zichtbare blokkade');
+    'elk endpoint dat dezelfde sleutel accepteert hoort bij de deur');
   assert.deepEqual(tenantRoutes().filter(route => !deur.routes.includes(route)), [],
-    'ook de Tenant Control Plane die deze bearers hergebruikt blijft zichtbaar');
+    'ook de Tenant Control Plane die deze sleutels hergebruikt');
 });
 
-test('productie bewaart of heronthult geen werkruimtebearer en blijft hard gesloten', async () => {
-  const werkruimte = fs.readFileSync(path.join(ROOT, 'server/bedrijf/werkruimte.js'), 'utf8');
-  const leden = fs.readFileSync(path.join(ROOT, 'server/bedrijf/leden.js'), 'utf8');
-  const deuren = fs.readFileSync(path.join(ROOT, 'server/bedrijf/deuren.js'), 'utf8');
-  const mijn = fs.readFileSync(path.join(ROOT, 'server/bedrijf/mijn.js'), 'utf8');
-  assert.match(werkruimte,
-    /beheerToken:\s*PRODUCTIE\s*\?\s*null\s*:\s*crypto\.randomBytes\(24\)\.toString\('hex'\)/);
-  assert.match(leden,
-    /token:\s*PRODUCTIE\s*\?\s*null\s*:\s*crypto\.randomBytes\(24\)\.toString\('hex'\)/);
-  assert.match(werkruimte, /if\s*\(!PRODUCTIE\)\s*{\s*antwoord\.beheerToken\s*=\s*w\.beheerToken/);
-  assert.match(leden, /if\s*\(!PRODUCTIE\)\s*antwoord\.lidToken\s*=\s*l\.token/);
-  assert.match(mijn, /if\s*\(!PRODUCTIE\)\s*rij\.lidToken\s*=\s*l\.token/);
+test('productie kent geen werkruimtebearer; elders zijn het hash-only sessies uit een plek', async () => {
+  const bron = rel => fs.readFileSync(path.join(ROOT, rel), 'utf8');
+  const werkruimte = bron('server/bedrijf/werkruimte.js');
+  const leden = bron('server/bedrijf/leden.js');
+  const deuren = bron('server/bedrijf/deuren.js');
+  const mijn = bron('server/bedrijf/mijn.js');
+  assert.match(werkruimte, /const beheerToken = PRODUCTIE \? null : sleutels\.geefBeheer\(w\)/);
+  assert.match(leden, /const lidToken = PRODUCTIE \? null : sleutels\.geefLid\(w, l\)/);
+  assert.match(mijn, /if \(!PRODUCTIE\) rij\.lidToken = sleutels\.geefLid\(w, l\)/);
   assert.match(deuren, /if\s*\(PRODUCTIE\)[\s\S]*?c\.autoritatief[\s\S]*?req\.session\.key\s*===\s*l\.rtgKey/,
     'in productie opent alleen de verse accountgebonden requestcontext de deur');
-  assert.match(leden, /l\.status\s*=\s*'uit dienst';\s*l\.token\s*=\s*null/,
-    'bestaande intrekking blijft expliciet als reeds aanwezige sterke kant zichtbaar');
+  /* Geen enkele plek in de werk- en tenantlaag munt nog zelf een kale sleutel
+     of vergelijkt er een met ===: dat doet alleen bedrijf/sleutels.js. */
+  for (const rel of ['server/bedrijf/werkruimte.js', 'server/bedrijf/leden.js', 'server/bedrijf/mijn.js',
+    'server/bedrijf/deuren.js', 'server/bedrijf/beeld-consolidatie.js', 'server/kern/tenant/brug.js',
+    'server/kern/tenant/uitgang.js', 'server/kern/tenant/bootstrap.js']) {
+    const b = bron(rel);
+    assert.doesNotMatch(b, /randomBytes\(24\)/, rel + ' munt geen eigen sleutel meer');
+    assert.doesNotMatch(b, /\.token\s*===|===\s*[a-z.]*beheerToken\b|beheerToken\s*!==/, rel + ' vergelijkt geen kale sleutel');
+  }
+  assert.match(bron('server/kern/eenaccount/starten.js'), /token = process\.env\.NODE_ENV === 'production' \? null : werkSleutels\.geefLid\(wl\.w, wl\.l\)/,
+    'ook de accountstart geeft een verse sessie en nooit de oude');
+  assert.equal(fs.existsSync(path.join(ROOT, 'server/middleware/workos-legacy-token-productiepoort.js')), false,
+    'de tijdelijke grendel is weg; productie-identiteit.js is de deur');
+  assert.doesNotMatch(bron('server/opzet/lijfpoort.js'), /workos-legacy-token-productiepoort'\)/);
 
   const werkruimtes = { W1: { beheerToken: 'oud-beheer', leden: {
     L1: { token: 'oud-lid' }, L2: { token: null }
@@ -89,17 +99,4 @@ test('productie bewaart of heronthult geen werkruimtebearer en blijft hard geslo
     productie: true
   }).migreerLegacyTokens(), /autoritatieve collectietransactie/,
   'productie wist oude bearers nooit via een lokale of half-bedrade schrijfweg');
-
-  const uit = { status: 200, body: null, next: 0 };
-  const res = {
-    set() { return this; },
-    status(status) { uit.status = status; return this; },
-    json(body) { uit.body = body; return this; }
-  };
-  require('../server/middleware/workos-legacy-token-productiepoort')({ productie: true })(
-    { method: 'POST', path: '/api/bedrijf/werkruimte/maak' }, res, () => { uit.next++; }
-  );
-  assert.equal(uit.status, 503);
-  assert.equal(uit.body.code, 'WORKOS_IDENTITY_NOT_RELEASED');
-  assert.equal(uit.next, 0, 'de checkpoint opent de productieroute nog niet');
 });

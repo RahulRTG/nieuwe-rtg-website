@@ -180,9 +180,9 @@ test('RTG Vrienden: het scriptblok loopt tot het einde -- lijst, stream, ververs
     await page2.goto(base + '/apps/foundation/vrienden.html', { waitUntil: 'domcontentloaded' });
     /* Op afwezigheid kun je niet wachten; wel tot de pagina is uitgepraat. */
     await wachtOpNetstilte(page2, { stilMs: 1500, maxMs: 8000 });
-    assert.ok(!zonderKnop.includes('/api/rtf/social/connections'),
-      'ZELFIJKING: zonder #pinNoodKnop hoort het blok af te breken vóór laad(). ' +
-      'Draait laad() daar wél, dan meet spoor 1 hierboven niet wat het beweert.');
+    assert.ok(!zonderKnop.some(p => p.includes('/social/stream')),
+      'ZELFIJKING: zonder #pinNoodKnop mag het eigen script zijn stream niet starten; de gedeelde mensenwidget leest zelfstandig contacten.');
+    assert.equal(await page2.locator('#storyPlus').count(), 0, 'het afgebroken script bereikt ook de verhalenrij niet');
     await ctx2.close();
   } finally {
     if (browser) await browser.close();

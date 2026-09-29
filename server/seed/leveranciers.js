@@ -2,6 +2,13 @@
    voorbeeldzaken met hun demo-inlogcodes, kamers, menu's, deuren en minibars,
    plus de lege orders/ritten/prijsvoorstellen. Afgesplitst uit seed.js; puur
    data. */
+const connectionSettings = services => ({ ordersOpen: true, reservationsOpen: true,
+  connectionParticipation: { version: 1, programs: {
+    vonk: { enabled: true, locations: ['primary'], services, days: [0,1,2,3,4,5,6], from: '00:00', to: '23:59', maxPerSlot: 20, pausedUntil: '' },
+    rendezvous: { enabled: true, locations: ['primary'], services: services.filter(x => ['diner','borrel','cultuur'].includes(x)), days: [0,1,2,3,4,5,6], from: '00:00', to: '23:59', maxPerSlot: 20, pausedUntil: '' },
+    table: { enabled: true, locations: ['primary'], services: services.filter(x => ['diner','borrel'].includes(x)), days: [0,1,2,3,4,5,6], from: '00:00', to: '23:59', maxPerSlot: 20, pausedUntil: '' },
+    concierge: { enabled: true, locations: ['primary'], services: services.concat(['cultuur']), days: [0,1,2,3,4,5,6], from: '00:00', to: '23:59', maxPerSlot: 20, pausedUntil: '' }
+  } } });
 module.exports = {
   /* ---------- leveranciers ----------
      De leverancier-app is één app die zich aanpast aan het type. Elk type
@@ -38,6 +45,9 @@ module.exports = {
     {
       code: 'KIKUNOI', name: 'Sal de Mar', type: 'restaurant', city: 'Ibiza',
       loc: { lat: 38.918, lng: 1.451, label: 'Marina Botafoch, Ibiza' }, rate: 0.15,
+      /* Demo is alleen bruikbaar wanneer ook deze fictieve partner expliciet
+         kiest. Productiedata krijgt deze toestemming nooit automatisch. */
+      settings: connectionSettings(['koffie', 'diner']),
       menu: [
         { id: 'm1', cat: 'Voorgerechten', name: 'Gazpacho de sandia', desc: 'Koude tomaten-watermeloensoep met basilicum.', price: 16, allergens: [] },
         { id: 'm2', cat: 'Voorgerechten', name: 'Pulpo a la brasa', desc: 'Gegrilde octopus, aardappelcreme, pimenton.', price: 28, allergens: ['vis'] },
@@ -70,6 +80,7 @@ module.exports = {
     {
       code: 'PONTO', name: 'Sunset Ibiza', type: 'bar', city: 'Ibiza',
       loc: { lat: 38.981, lng: 1.294, label: 'Sant Antoni, Ibiza' }, rate: 0.18,
+      settings: connectionSettings(['borrel']),
       /* elk item zegt zelf of het alcohol is: wat de zaak opgeeft wint van de
          strenge bar-standaard in kern/supplierdefaults.js, en zonder deze
          vlaggen telde de patatas bravas daar als drank */

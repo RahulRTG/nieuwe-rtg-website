@@ -3,7 +3,11 @@
    afvalkalender, aanslagen en bekendmakingen. Alleen routes; de logica woont in
    kern/gemeente.js. Gemount vanuit routes/member.js. */
 module.exports = (kern) => {
-  const { app, auth, liveCodename, gemeente } = kern;
+  const { app, auth, liveCodename, gemeente, idGeverifieerd } = kern;
+  /* Een afspraak bij de gemeente is een weg naar een instantie en hoort bij de
+     universele bodem (SAMENLEVING.md, besluit 4c): open voor een gratis account
+     na een paspoortcontrole, zonder pas. */
+  const paspoortdeur = require('../../kern/onvervreemdbaar').maakPaspoortdeur({ idGeverifieerd });
   const lid = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'Alleen voor leden.' }); return false; }
     return true;
@@ -17,7 +21,7 @@ module.exports = (kern) => {
   // pijler 2: burgerzaken & afspraken
   app.post('/api/gemeente/burgerzaken', auth, (req, res) => res.json(gemeente.burgerzakenOverzicht()));
   app.post('/api/gemeente/burgerzaken/slots', auth, (req, res) => stuur(res, gemeente.burgerzakenSlots(String(req.body.soort || ''), req.body.datum)));
-  app.post('/api/gemeente/afspraak', auth, (req, res) => { if (!lid(req, res)) return; stuur(res, gemeente.afspraakMaak(req.session, liveCodename(req.session), req.body || {})); });
+  app.post('/api/gemeente/afspraak', auth, (req, res) => { if (!paspoortdeur(req, res)) return; stuur(res, gemeente.afspraakMaak(req.session, liveCodename(req.session), req.body || {})); });
   app.post('/api/gemeente/afspraken/mijn', auth, (req, res) => res.json({ afspraken: gemeente.mijnAfspraken(req.session.key) }));
   app.post('/api/gemeente/afspraak/annuleer', auth, (req, res) => stuur(res, gemeente.afspraakAnnuleer(req.session.key, String(req.body.ref || ''))));
   app.post('/api/gemeente/verhuizing', auth, (req, res) => { if (!lid(req, res)) return; stuur(res, gemeente.verhuizingDoorgeven(req.session, liveCodename(req.session), req.body || {})); });

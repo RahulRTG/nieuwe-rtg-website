@@ -110,9 +110,10 @@
 <script src="/shared/seizoen.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/rtg-mail-2026.css" rel="stylesheet">
+<script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl rtg-work-flow rtm-voorzijde-actief" data-rtg-world="work" data-rtg-skin="heritage">
+<body class="rtg-stijl rtg-work-flow rtm-voorzijde-actief" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard">
 <section class="rtm-voorzijde" id="rtmVoorzijde" aria-label="RTMail rustig werkpostvak">
   <div class="rtm-binnen">
     <header class="rtm-kop">
@@ -177,6 +178,7 @@ let LIJST=[], TEAM=null, TEAMPOST=[];
    URL: een postvak is geen pagina om te delen, en een zoekopdracht met
    andermans post erin zou in een geschiedenis blijven staan. */
 let MAP='in', ZOEK='';
+let laadVersie=0;
 const tijd=iso=>{ if(!iso) return ''; const d=new Date(iso), nu=new Date(), dag=86400000;
   if(nu-d<dag && d.getDate()===nu.getDate()) return d.toTimeString().slice(0,5);
   if(nu-d<7*dag) return ['zo','ma','di','wo','do','vr','za'][d.getDay()];
@@ -221,13 +223,16 @@ async function api(pad, body){
   const d=await r.json().catch(()=>({})); if(!r.ok) throw new Error(d.error||'Er ging iets mis.'); return d;
 }
 async function laadInbox(){
+  const versie=++laadVersie;
   if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2><p style="color:var(--muted);margin-top:.6rem;font-size:.9rem;">Open de RTG-app en log in; daarna staat je post hier.</p></div>'; return; }
   let d, adresInfo; try{
     [d,adresInfo]=await Promise.all([
       ZOEK ? api('zoek',{vraag:ZOEK}) : api('vak',{map:MAP}), api('adres',{})
     ]);
   }
-  catch(e){ $('#main').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  catch(e){ if(versie===laadVersie) $('#main').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  // Een laat antwoord mag een nieuwere map of geopende post niet vervangen.
+  if(versie!==laadVersie) return;
   LIJST=d.berichten||[];
   const tel=d.tellingen||{};
   /* Meenemen: je post is van jou. De app kent zijn eigen model, dus geeft hij
@@ -275,14 +280,15 @@ async function laadInbox(){
   if(za) za.addEventListener('click',()=>{ ZOEK=''; laadInbox(); });
   const vs=$('#vatSamen'); if(vs) vs.addEventListener('click',vatSamenNu);
   $('#main').querySelectorAll('[data-i]').forEach(b=>b.addEventListener('click',()=>openBericht(LIJST[+b.dataset.i])));
-  teamsErbij();
+  teamsErbij(versie);
 }
 
 /* ---- teams: een adres dat je samen leest ----
    Een receptie, een keuken, een boekhouding. Onder je eigen postvak, want het
    is je tweede postvak en niet je eerste. */
-async function teamsErbij(){
+async function teamsErbij(versie){
   let d; try{ d=await api('team/mijn'); }catch(e){ return; }
+  if(versie!==laadVersie) return;
   const wrap=document.createElement('div');
   wrap.innerHTML='<div class="kop">Teams · een adres dat je samen leest</div>'+
     ((d.teams||[]).map(t=>
@@ -316,7 +322,9 @@ function nieuwTeamForm(){
 /* Het gedeelde postvak. Bij elk bericht staat wie het oppakte -- dat is het
    hele punt: zonder dat antwoorden twee mensen hetzelfde, of niemand. */
 async function openTeam(id, alles){
-  let d; try{ d=await api('team/postvak',{id,alles:!!alles}); }catch(e){ alert(e.message); return laadInbox(); }
+  const versie=++laadVersie;
+  let d; try{ d=await api('team/postvak',{id,alles:!!alles}); }catch(e){ if(versie!==laadVersie) return; alert(e.message); return laadInbox(); }
+  if(versie!==laadVersie) return;
   const t=d.team;
   $('#main').innerHTML=
     '<button class="terug" id="terug">← je eigen postvak</button>'+
@@ -404,12 +412,14 @@ async function vatSamenNu(){
   catch(e){ b.disabled=false; b.textContent='Rahul vat je postvak samen'; }
 }
 async function openBericht(m){
+  const versie=++laadVersie;
   let volledig=m;
   /* lees() geeft het bericht terug zoals RTMAIL het kent; de MAP en de ster
      komen uit de postvaklaag en zitten al op het object uit de lijst. Ze hier
      overnemen voorkomt dat de knoppen "Opbergen" tonen voor iets dat al in het
      archief ligt. */
   try{ const d=await api('lees',{id:m.id}); if(d.bericht) volledig=Object.assign({}, d.bericht, {map:m.map, favoriet:m.favoriet, labels:m.labels}); }catch(e){}
+  if(versie!==laadVersie) return;
   $('#tel').hidden=true;
   const band=bandVan(volledig);
   $('#main').innerHTML =

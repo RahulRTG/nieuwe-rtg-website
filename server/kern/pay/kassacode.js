@@ -31,6 +31,14 @@
    ophoudt. */
 'use strict';
 
+/* DE KASCODE ZELF is sinds 27 september 2026 een gemigreerde credential
+   (./kasbak.js), maar deze DRAGER niet: het ondertekende token verwijst naar een
+   opdracht in het procesgeheugen van ../link/cap.js (72 bits, niet gedeeld over
+   instances). Die laag is de deur `link.capability_aanvaarden` in
+   CODECREDENTIALS.json en staat nog open; daarom blijft de geld.kassa-handeling
+   in productie dicht, hier in de kern en niet alleen in de HTTP-poort. */
+const dicht = () => require('../../middleware/money-credential-productiepoort').blokkade('link.capability_aanvaarden');
+
 const euro = (centen) => '€ ' + (Math.round(Number(centen)) / 100).toFixed(2).replace('.', ',');
 
 module.exports = ({ pay, schoon }) => ({
@@ -47,9 +55,10 @@ module.exports = ({ pay, schoon }) => ({
   /* Uitgeven maakt de echte kassacode aan. De opdracht draagt hem, en daarmee is
      de capability gebonden aan die ene code: een verse code hoort bij een vers
      token en niet bij het oude. */
-  lees(invoer, uitgever) {
+  async lees(invoer, uitgever) {
+    if (dicht()) return dicht();
     if (!uitgever.codenaam) return { status: 403, error: 'Deze sessie kan niet afrekenen.' };
-    const r = pay.kasCode({ codenaam: uitgever.codenaam, maxCenten: invoer && invoer.maxCenten });
+    const r = await pay.kasCode({ codenaam: uitgever.codenaam, maxCenten: invoer && invoer.maxCenten });
     if (r.error) return r;
     return { code: r.code, maxCenten: r.maxCenten };
   },
@@ -61,7 +70,7 @@ module.exports = ({ pay, schoon }) => ({
   voorUitgever: (o) => ({ code: o.code, maxCenten: o.maxCenten }),
 
   // leeft de code eronder nog? (een verse code van hetzelfde lid verdringt hem)
-  nog: (o) => !!pay.kasStand(o.code),
+  nog: (o) => !dicht() && !!pay.kasStand(o.code),
 
   beschrijf: (o) => ({
     wat: 'Afrekenen',
@@ -79,6 +88,7 @@ module.exports = ({ pay, schoon }) => ({
   },
 
   doe({ opdracht, invoer, aanvaarder, idem }) {
+    if (dicht()) return dicht();
     return pay.kasInt({ supplierCode: aanvaarder.code, code: opdracht.code,
       centen: invoer.centen, oms: invoer.oms, idem });
   }

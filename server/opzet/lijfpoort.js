@@ -58,6 +58,10 @@ module.exports = function lijfpoort(deps) {
     next();
   });
 
+  /* Extern afrekenen tijdens een betaalstop: alleen contant, pin of rekening
+     (./betaalstop.js). Hier, omdat pas na de body-parser de wijze te lezen is. */
+  app.use(require('./betaalstop').externWijzePoort);
+
   /* Geld-dragende codes zonder bewezen atomaire lifecycle blijven in productie
      dicht. Dit staat na de begrensde body-parser (de algemene POS-route wordt
      alleen voor cadeaukaart/RTG Pay geraakt) en vóór idemopslag en handlers. */
@@ -68,11 +72,10 @@ module.exports = function lijfpoort(deps) {
      Dit is geen groen vinkje: het credentialregister houdt ze als blocker. */
   app.use(require('../middleware/travel-bearer-productiepoort')());
 
-  /* Alle WerkOS- en Tenant-routes leunen nu nog op dezelfde langlevende raw
-     beheer- en lidbearers. Tot de accountgebonden cutover bewezen is, sluit
-     productie de volledige familie centraal; een willekeurige nieuwe
-     bedrijfsroute kan zo niet buiten een losse route-allowlist vallen. */
-  app.use(require('../middleware/workos-legacy-token-productiepoort')());
+  /* De WerkOS-grendel die hier stond is weg (27 september 2026): productie
+     opent /api/bedrijf en /api/tenant alleen met het RTG-account en een verse
+     stand (bedrijf/productie-identiteit.js), en elders zijn de sleutels
+     hash-only sessies (bedrijf/sleutels.js). */
 
   /* De oude club-, partner- en organisatieportalen gebruiken nog codes zonder
      volledige levenscyclus. In productie gaan zij altijd dicht, ook wanneer

@@ -932,14 +932,13 @@ console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoor
     ['/api/bank/', 'de eigen bank van RTG; een overboeking gaat niet langs een derde']
   ];
   const MAG_ZONDER = new Map([
+    ['/api/vonk/profile-photo/order', 'alleen de volgorde van eigen, al opgeslagen profielmedia; er staat geen derde partij tegenover'],
+    ['/api/member/rendezvous/profile-photo/order', 'alleen de volgorde van eigen, al opgeslagen profielmedia; er staat geen derde partij tegenover'],
     ['/api/member/sport/tickets', 'je eigen ticketlijst opvragen'],
     ['/api/muziek/bestand-ticket', 'een tijdelijke luisterkaart voor muziek die al in RTG is gepubliceerd; "ticket" is hier een cryptografische toegangssleutel en geen aankoop bij een derde'],
     ['/api/member/boardroom/logboek', 'je eigen boardroom-journaal ("logboek" bevat toevallig "boek"); geen derde partij'],
-    /* Dezelfde valse vriend, nu bij De Rechterhand. Het REISBOEK is uw eigen
-       reisdagboek en het LOGBOEK het onderhoudsboek van uw eigen jacht of
-       oldtimer: eigen dossiers, geen bestelling en geen partij tegenover u.
-       Ze werden zichtbaar toen de rechterhand-paden voluit kwamen te staan
-       (regel 45); daarvoor zag ook deze regel ze niet. */
+    /* Dezelfde valse vriend bij De Rechterhand: REISBOEK en LOGBOEK zijn eigen
+       dossiers, geen bestelling en geen partij tegenover u. */
     ['/api/member/rechterhand/reisboek', 'uw eigen reisdagboek ("reisboek" bevat toevallig "boek"); geen derde partij'],
     ['/api/member/rechterhand/logboek', 'het onderhoudsboek van uw eigen bezit; geen derde partij'],
     ['/api/member/rechterhand/logboek/object', 'idem: een eigen object in het eigen logboek'],
@@ -947,6 +946,15 @@ console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoor
     ['/api/member/rechterhand/logboek/regel', 'idem: een onderhoudsregel bij eigen bezit'],
     ['/api/member/rechterhand/logboek/regel/weg', 'idem'],
     ['/api/tickets/aanbod', 'het aanbod bekijken; er gebeurt nog niets'],
+    /* De afhaalcode van een eigen bestelling. De bestelling zelf ging AL langs de
+       poort (/api/order en /api/bezorg/bestel); tonen en intrekken delen met de
+       zaak niets nieuws -- de zaak ziet alleen dat de QR bij de kassa klopt. En
+       intrekken hoort nooit achter een vraag om gegevens te staan: een
+       gestolen code dichtzetten mag geen drempel hebben. */
+    ['/api/order/afhaalcode', 'de afhaal-QR van een bestelling die al langs de poort ging; de zaak krijgt hier niets nieuws'],
+    ['/api/order/afhaalcode/intrek', 'een eigen afhaalcode intrekken; beveiliging hoort geen drempel te hebben'],
+    ['/api/ticket/toon', 'de entreecode van een eigen ticket dat al langs de poort ging; de zaak krijgt niets nieuws'],
+    ['/api/mob/kaart/toon', 'idem: de code van een eigen vervoerbewijs'],
     /* De winkel van de RTFoundation. Deze route KWAM eerst door de poort met
        soort 'bestelling', en dat was fout op een manier die het waard is op te
        schrijven: die soort vraagt een telefoonnummer met de reden "de zaak moet
@@ -1921,6 +1929,7 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     /* spread van [auth, geenGast], zoals `lid` hierboven; werd zichtbaar toen
        de kantoorpakket-paden voluit kwamen te staan (regel 45) */
     'ledenAuth', 'rtfPoort']);
+  POORT_MW.add('gezinBeeldAuth'); // verifieert gezinscode en profieltoken vóór eigen foto’s worden gelezen of geschreven
   POORT_MW.add('arrivalPassAuth'); // bezit van de tijdelijke, gehashte Arrival Pass
   /* `scimAuth` (routes/scim.js) -- de deur waar de IdP van een klant zelf
      doorheen loopt: Bearer-sleutel, opgezocht met scim.sleutels.vanSleutel(),
@@ -3416,7 +3425,11 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['server/kern/factuurcorrectie.js', 'geld terug naar een lid: de terugboeking en de correctieregel horen als een duurzame commit op schijf, net als de heenweg in kern/factuursaldo.js -- een lid dat "terugbetaald" leest terwijl de opslag het nog niet heeft, is precies de halve uitkomst waar de factuurproef voor is gebouwd'],
     ['server/kern/experience/index.js', 'menselijke bevestiging: acknowledgement en action evidence worden vóór succes duurzaam vastgelegd'],
     ['server/kern/notities.js', 'werk van een lid: een bevestigde notitie mag niet verdwijnen bij een opslagfout'],
+    ['server/kern/vrijheid/huis.js', 'een besluit over iemands vrije tijd (verzoek, goedkeuring, verjaardag) heet pas gelukt als de opslag het bevestigt (VRIJHEID.md)'],
     ['server/kern/vertegenwoordiging/index.js', 'een machtiging is de bevoegdheid van een mens over het leven van een ander: aanvaarden, intrekken en de eigen grens mogen nooit bevestigd zijn zonder dat de opslag het heeft'],
+    ['server/kern/democratie/index.js', 'NIEMAND KWIJT (POLITIEK.md, DO-02): een burger die een kwestie inbrengt en "ontvangen" leest terwijl de opslag hem nog niet heeft, is precies de mens die tussen twee systemen verdwijnt; hetzelfde geldt voor een eindstand, want de terugkoppeling hangt eraan'],
+    ['server/kern/democratie/afhankelijkheden.js', 'roept niets aan: noemt lib/duurzaam alleen als VERKLARING van wat DemocratieOS uit RTG gebruikt (proef P3), zodat een verhuizing weet dat een bevestigde commit mee moet'],
+    ['server/kern/leerhuis/index.js', 'een certificaat, zijn schorsing of intrekking en een afgeronde beoordeling zijn verklaringen over een MENS waar een bevoegdheid aan kan hangen (ACADEMY.md besluit B4): bevestigen terwijl de opslag ze nog niet heeft, betekent dat iemand denkt gecertificeerd te zijn terwijl er niets staat. Alleen die drie handelingen; de rest van het leerhuis blijft write-behind'],
     ['server/kern/rugdekking/index.js', 'een vastgelegd programma is een financiele belofte aan een MENS en de beursstand is de juridische positie van dit huis: "vastgelegd" antwoorden terwijl de opslag het nog niet heeft, betekent dat een sporter denkt dat RTG achter hem staat terwijl er niets staat'],
     ['server/kern/carriereledger/index.js', 'een ledger kan niets wissen en dus ook niets terughalen: "opgeschreven" antwoorden terwijl de opslag het nog niet heeft, laat een mens denken dat zijn titel vaststaat terwijl er niets staat -- en de bevestiging van een bond komt geen tweede keer'],
     ['server/kern/carriereledger/deel.js', 'een deelcode gaat precies EENMAAL de deur uit; bevestigen voor de opslag hem heeft, betekent dat het lid een code in handen heeft die nergens meer bij hoort -- en dat een gestopte code na een herstart weer open zou staan'],
@@ -3796,6 +3809,9 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
      een anker bestaat. */
   const SPRAAKEERLIJK = ['public/shared/meeluister.js', 'meelees-geenauto'];
   const REGISTER = new Map([
+    ['public/shared/connection-communication-view.js#1', ['ondertiteld', 'een spraakbericht wordt uitsluitend geplaatst met het zichtbare, door de afzender geschreven transcript er direct naast', ['public/shared/connection-communication-view.js', 'connection-transcript']]],
+    ['public/shared/connection-communication-view.js#2', ['gesprek', 'het beeld en geluid van de andere deelnemer in een besloten Connection-gesprek, met dezelfde meelees- en lokale ondertitelbaan', ['public/shared/connection-communication.js', 'RTGMeelezen'], ['public/apps/vonk.html', 'meeluister.js']]],
+    ['public/shared/connection-communication-view.js#3', ['spiegel', 'het eigen stille beeld in de hoek van een besloten Connection-gesprek']],
     ['public/apps/app.html#csRemote', ['gesprek', 'het beeld en geluid van de ander in een videogesprek tussen twee leden', ['public/apps/app-main.js', 'RTGMeelezen'], ['public/apps/app.html', 'meeluister.js']]],
     ['public/apps/app.html#csLocal', ['spiegel', 'je eigen beeld in de hoek van dat gesprek; stil, want jezelf terughoren is een echo']],
     ['public/apps/backoffice.html#ontLiveVid', ['uitzending', 'SOS: het kantoor kijkt live mee met de camera van een lid, met geluid erbij. Er loopt WEL een tekstbaan mee (#ontLiveTekst): het toestel van het lid zet zijn eigen stem om naar tekst en stuurt de regels langs hetzelfde seinkanaal, zonder tweede tik -- de toestemming voor beeld en geluid staat al in het veiligheidscontract. Blijft OPEN: het hangt aan een browser die de Web Speech API heeft, en dat is geen ondertiteling waar je op kunt rekenen', ['public/apps/backoffice.js', 'ontLiveTekst']]],
@@ -4735,6 +4751,9 @@ console.log('\n58) vaste hoekgrammatica: rechte inhoud, afgeronde systeemlagen e
     ['public/shared/rtg-adaptive-edge.css', new Set([
       'var(--rtg-radius-system,22px)'
     ])],
+    ['public/shared/connection-edge.css', new Set([
+      'var(--rtg-radius-system,22px)'
+    ])],
     ['public/shared/i18n/i18n-03.js', new Set([
       'var(--rtg-radius-content,2px)', 'var(--rtg-radius-system,22px)'
     ])],
@@ -4742,13 +4761,17 @@ console.log('\n58) vaste hoekgrammatica: rechte inhoud, afgeronde systeemlagen e
       'var(--rtg-radius-content,2px)', 'var(--rtg-radius-system,22px)'
     ])],
     ['public/shared/rtg-world-home.css', new Set(['var(--rtg-radius-editorial)', 'var(--rtg-radius-system)'])],
+    ['public/shared/vonk-2.css', new Set(['var(--rtg-radius-system)'])],
     ['public/shared/rtg-world-desktop.css', new Set(['var(--rtg-radius-editorial)'])],
+    ['public/shared/rtg-desktop-components.css', new Set(['var(--rtg-radius-editorial)', 'var(--rtg-radius-editorial)!important', 'var(--rtg-radius-system)!important'])],
+    ['public/shared/rtg-personal-images.css', new Set(['var(--rtg-radius-editorial)', 'var(--rtg-radius-editorial)!important', 'var(--rtg-radius-system)'])],
     ['public/shared/rtg-world-widgets.css', new Set(['var(--rtg-radius-editorial)'])],
     ['public/shared/rtg-world-screen.css', new Set(['var(--rtg-radius-content)!important'])],
     ['public/site/storyline.css', new Set(['var(--rtg-radius-editorial)'])],
     // The public company/product projection shares the native world-home tokens.
     ['public/site/platform-shell.css', new Set(['var(--rtg-radius-editorial)', 'var(--rtg-radius-system)', 'var(--rtg-radius-editorial)!important', 'var(--rtg-radius-system)!important'])],
     ['public/site/platform-company.css', new Set(['var(--rtg-radius-editorial)'])],
+    ['public/site/platform-detail.css', new Set(['var(--rtg-radius-editorial)'])],
     ['public/site/storyline-stage.css', new Set(['var(--rtg-radius-editorial)'])],
     ['public/site/website-truth.css', new Set(['var(--rtg-radius-editorial)'])],
     ['public/apps/access/portal.css', new Set(['var(--rtg-radius-content)'])], ['public/shared/rtg-simple.css', new Set([
@@ -5888,10 +5911,16 @@ console.log('\n71) de vorige bronmuterende ronde is netjes afgelopen en heeft ni
   if (!vorige) {
     ok('geen eerdere ronde vastgelegd; de eerste die pak() aanroept legt er een aan');
   } else {
-    const g = afloop.magStarten();
+    const g = afloop.magControleren();
     if (g.mag) {
-      ok('vorige ronde ' + (vorige.taak || '?') + ' (' + vorige.runId + ') staat op ' + vorige.stand +
+      ok(g.oordeel === 'EIGEN_CONTROLE' ? g.reden :
+        'vorige ronde ' + (vorige.taak || '?') + ' (' + vorige.runId + ') staat op ' + vorige.stand +
         ' en haar proceskring is leeg');
+    } else if (g.oordeel === 'LOOPT' && afloop.eigenLijn(vorige)) {
+      /* De lopende ronde is de ouder van deze keuring (de releasepoort draait
+         check.js als stap). Dat is geen achtergelaten werk maar de opdrachtgever;
+         de ouderketen komt uit /proc, niet uit een vlag. */
+      ok('de lopende ronde ' + (vorige.taak || '?') + ' (' + vorige.runId + ') is de eigen ouder van deze keuring');
     } else {
       fout(afloop.diagnose(g, vorige));
     }

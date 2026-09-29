@@ -39,11 +39,11 @@ const PUBLIEK = new Map([
   /* DE DEUR VAN EEN PARTIJ (server/routes/democratie/partij.js, POLITIEK.md
      par. 7.1). Open om de reden van de proef P3: een partij hangt niet aan een
      RTG-account, want dan kan DemocratieOS niet zonder RTG verder. Wat de deur
-     WEL heeft is een sleutel: 192 bits, uitgegeven door een kantoormens op
-     naam, alleen als hash met zout op schijf, door het kantoor te vervangen of
+     WEL heeft is een sleutel: 128 bits uit kern/bearercode, uitgegeven door een
+     kantoormens op naam, alleen als hash op schijf, een jaar geldig, te vervangen of
      in te trekken. Zonder geldige sleutel 401, en een rem per bron van
      120/minuut tegen wie sleutels probeert. Elke partij krijgt dezelfde deur. */
-  ['/api/democratie/partij/wie', 'de partijsleutel IS de geloofsbrief (hash met zout, intrekbaar door het kantoor); toont alleen de eigen registerregel'],
+  ['/api/democratie/partij/wie', 'de partijsleutel IS de geloofsbrief (alleen als hash bewaard, verloopt, intrekbaar door het kantoor); toont alleen de eigen registerregel'],
   ['/api/democratie/partij/kwesties', 'de partijsleutel IS de geloofsbrief; toont alleen kwesties die hun inbrenger zelf openbaar maakte, zonder datum of nummer'],
   ['/api/democratie/partij/voorstel/plaats', 'de partijsleutel IS de geloofsbrief; plaatst op naam van die ene partij, met dezelfde limiet voor elke partij'],
   ['/api/democratie/partij/voorstel/toelicht', 'de partijsleutel IS de geloofsbrief; raakt alleen een voorstel van die partij'],

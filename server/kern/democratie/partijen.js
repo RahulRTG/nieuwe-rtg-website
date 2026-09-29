@@ -13,34 +13,45 @@
    hoeveel een partij mag: nergens in deze laag wordt erop vertakt.
 
    DE PARTIJ HANGT NIET AAN EEN RTG-ACCOUNT (besluit van de eigenaar, 29
-   september 2026). Bij het inschrijven krijgt de partij EEN KEER een geheime
-   sleutel te zien; hier staat alleen een hash met zout, zoals in
-   kern/command/apipoort.js. Een partij die morgen geen RTG meer wil, of een
-   DemocratieOS zonder RTG (proef P3), heeft geen ledenaccount nodig om verder
-   te gaan. Het kantoor kan de sleutel vervangen of de partij uitschrijven; de
-   oude sleutel werkt dan niet meer.
+   september 2026). Bij het inschrijven krijgt de partij EEN KEER een sleutel te
+   zien. Die is een bearer uit kern/bearercode.js (namespace democratie.partij,
+   128 bits): op schijf alleen de hash, zoeken in constante tijd over ALLE
+   partijen, een vervaltijd van een jaar, en intrekken aan de serverkant. Een
+   partij die morgen geen RTG meer wil, of een DemocratieOS zonder RTG (proef
+   P3), heeft geen ledenaccount nodig om verder te gaan. Het kantoor kan de
+   sleutel vervangen of de partij uitschrijven; de oude sleutel werkt dan niet
+   meer.
+
+   HET GEBRUIK WORDT NIET GETELD. Een partijsleutel opent een koppeling die bij
+   elk verzoek wordt gebruikt; tellen zou van elke leesvraag een schrijfactie
+   maken. Wat hem begrenst is de vervaltijd, vervangen, uitschrijven en de rem
+   per bron op de deur. Er is ook geen eenmalige claim: uitgeven, vervangen en
+   intrekken zijn elk een synchrone mutatie binnen een vastlegging.
 
    UITSCHRIJVEN WIST NIETS. Wat een partij heeft geplaatst blijft staan met de
    stand van de partij erbij (DO-10: geschiedenis wordt niet herschreven). */
 'use strict';
 
-const { schoon, veiligGelijk } = require('../util');
+const { schoon } = require('../util');
 
 const NIVEAUS = ['europees', 'tweede-kamer', 'provincie', 'waterschap', 'gemeente'];
 const CATEGORIEEN = ['geregistreerd', 'deelnemer'];
 const DATUM = /^\d{4}-\d{2}-\d{2}$/;
+const JAAR = 365 * 86400000;
+const DOEL = 'partijdeur';
+const SCOPE = 'democratie.partij.voorstel';
 
 function maakPartijen({ kaart, kijk, vastleggen, crypto, nu }) {
-  const hash = (geheim, zout) => crypto.createHash('sha256').update(zout + ':' + geheim).digest('hex');
+  const bearer = require('../bearercode')({ crypto, namespace: 'democratie.partij', nu });
   const vind = (id) => kijk()[String(id || '').toUpperCase()] || null;
 
-  /* Het geheim draagt het nummer van de partij, zodat het opzoeken geen
-     vergelijking over het hele register is; het geheime deel is 192 bits. */
-  function nieuwGeheim(p) {
-    const geheim = 'pp_' + p.id + '_' + crypto.randomBytes(24).toString('base64url');
-    const zout = crypto.randomBytes(16).toString('hex');
-    p.sleutel = { hash: hash(geheim, zout), zout, sinds: nu() };
-    return geheim;
+  /* Een nieuwe sleutel voor deze partij; de vorige wordt ingetrokken. */
+  function nieuwGeheim(p, door) {
+    if (p.sleutel) bearer.intrekken(p.sleutel, door, 'vervangen');
+    const { code, toegang } = bearer.maak({ prefix: 'PP', issuer: 'democratie.kantoor', doel: DOEL, scope: SCOPE,
+      onderwerp: { partij: p.id }, geldigMs: JAAR, maxGebruik: 1 });
+    p.sleutel = toegang;
+    return code;
   }
 
   /* Wat IEDEREEN over een partij ziet: het kantoor, een lid en de partij zelf
@@ -73,7 +84,7 @@ function maakPartijen({ kaart, kijk, vastleggen, crypto, nu }) {
       let id;
       do { id = 'PP-' + crypto.randomBytes(3).toString('hex').toUpperCase(); } while (register[id]);
       p = Object.assign({ id, stand: 'actief', ingeschreven: { door, at: nu() }, historie: [] }, g);
-      geheim = nieuwGeheim(p);
+      geheim = nieuwGeheim(p, door);
       p.historie.push({ wat: 'ingeschreven', door, at: nu() });
       register[id] = p;
     });
@@ -86,7 +97,7 @@ function maakPartijen({ kaart, kijk, vastleggen, crypto, nu }) {
     if (!p) return { status: 404, error: 'Onbekende partij.' };
     if (p.stand !== 'actief') return { status: 409, error: 'Deze partij is uitgeschreven.' };
     let geheim = null;
-    const mis = await vastleggen(() => { geheim = nieuwGeheim(p); p.historie.push({ wat: 'sleutel-vervangen', door, at: nu() }); });
+    const mis = await vastleggen(() => { geheim = nieuwGeheim(p, door); p.historie.push({ wat: 'sleutel-vervangen', door, at: nu() }); });
     return mis || { ok: true, partij: beeld(p), sleutel: geheim,
       let_op: 'De vorige sleutel werkt niet meer. Deze ziet u een keer.' };
   }
@@ -99,19 +110,23 @@ function maakPartijen({ kaart, kijk, vastleggen, crypto, nu }) {
     if (reden.length < 10) return { status: 400, error: 'Zeg in minstens tien tekens waarom, met de bron: een registratie die vervalt, of een verzoek van de partij zelf.' };
     const mis = await vastleggen(() => {
       p.stand = 'uitgeschreven';
-      p.sleutel = null;
+      if (p.sleutel) bearer.intrekken(p.sleutel, door, 'uitgeschreven');
       p.historie.push({ wat: 'uitgeschreven', door, reden, at: nu() });
     });
     return mis || { ok: true, partij: beeld(p) };
   }
 
-  /* Welke partij hoort bij dit geheim. Alleen actieve partijen; de vergelijking
-     is in constante tijd. */
+  /* Welke partij hoort bij dit geheim. bearer.vind vergelijkt met ELKE sleutel
+     in het register en stopt niet bij de eerste; daarna moet de sleutel nog
+     gelden (niet ingetrokken, niet verlopen, juiste doel en scope) en de
+     partij actief zijn. */
   function vanSleutel(geheim) {
-    const m = /^pp_(PP-[0-9A-F]{6})_[A-Za-z0-9_-]{20,}$/.exec(String(geheim || ''));
-    const p = m && vind(m[1]);
-    if (!p || p.stand !== 'actief' || !p.sleutel) return null;
-    return veiligGelijk(hash(geheim, p.sleutel.zout), p.sleutel.hash) ? p : null;
+    if (!geheim) return null;
+    const alle = Object.values(kijk());
+    const toegang = bearer.vind(alle.map(p => p.sleutel).filter(Boolean), geheim);
+    if (!toegang || bearer.reden(toegang, { doel: DOEL, scope: SCOPE, negeerGebruik: true })) return null;
+    const p = vind(toegang.onderwerp && toegang.onderwerp.partij);
+    return p && p.stand === 'actief' && p.sleutel && p.sleutel.code_hash === toegang.code_hash ? p : null;
   }
 
   const lijst = () => ({ ok: true, partijen: Object.values(kijk()).sort((a, b) => a.id.localeCompare(b.id)).map(beeld),

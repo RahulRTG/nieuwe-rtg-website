@@ -79,7 +79,7 @@ test('Partijvoorstel: inschrijven op naam, plaatsen met de sleutel, lezen bij de
       await kp.locator('#pRegistreer').click();
       await wachtOpTekst(kp, /Ingeschreven/, { in: '#melding' });
       const sleutel = (await kp.locator('#pSleutel code').textContent()).trim();
-      assert.match(sleutel, /^pp_PP-[0-9A-F]{6}_/, 'de sleutel staat een keer op het scherm');
+      assert.match(sleutel, /^PP\.[0-9A-F]{32}$/, 'de sleutel staat een keer op het scherm');
       await wachtOpTekst(kp, /Partij Noord/, { in: '#partijen' });
 
       /* 2. De partij plaatst met haar sleutel. */

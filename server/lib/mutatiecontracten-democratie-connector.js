@@ -11,12 +11,12 @@ const KANTOOR = { klasse: 'AUTHENTICATED', deur: 'officeAuth' };
 /* DE POLITICAL CONNECTOR (kern/democratie/connector.js, stap 5). Gemeten in
    test/democratie-partij.test.js toets 8 (de hele lus over HTTP) en toets 9
    (twee keer hetzelfde verzoek). De partijdeur heeft geen sessie maar een eigen
-   geheim: een sleutel die een kantoormens op naam uitgeeft, als hash met zout
-   bewaard, te vervangen via /partij/sleutel en te doven via /partij/uitschrijf. */
+   geheim: een sleutel die een kantoormens op naam uitgeeft (kern/bearercode),
+   alleen als hash bewaard, te vervangen via /partij/sleutel en te doven via /partij/uitschrijf. */
 const PC_OP = '2026-09-29';
 const PC_GETEKEND = { door: 'Claude, op grond van test/democratie-partij.test.js toets 8 en 9; niet door een mens nagelezen', op: PC_OP };
-const PARTIJ = { klasse: 'PUBLIC', deur: 'geen bewakerslaag; de kop x-partij-sleutel is het geheim, 192 bits, alleen als hash ' +
-  'met zout bewaard en door een kantoormens op naam te vervangen of te doven; rem 120/minuut per bron',
+const PARTIJ = { klasse: 'PUBLIC', deur: 'geen bewakerslaag; de kop x-partij-sleutel is het geheim, 128 bits uit kern/bearercode, alleen als ' +
+  'hash bewaard, een jaar geldig en door een kantoormens op naam te vervangen of te doven; rem 120/minuut per bron',
   waarom: 'een partij hangt met opzet niet aan een RTG-account (POLITIEK.md par. 7.3, proef P3): de sleutel uit ' +
     'het register is de geloofsbrief, en zonder geldige sleutel geeft de deur 401. De rem die deze klasse eist ' +
     'hangt ervoor: 120 verzoeken per ip per minuut (routes/democratie/partij.js).' };

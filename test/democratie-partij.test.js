@@ -294,3 +294,24 @@ test('9. twee keer hetzelfde verzoek: wat idempotent is en wat een toestandscont
   assert.equal(nogEens.body.partij.stand, 'uitgeschreven');
   assert.equal((await api('/api/office/democratie/partij/sleutel', { id: pid }, kantoor)).status, 409, 'geen sleutel voor een uitgeschreven partij');
 });
+
+test('10. een partijsleutel verloopt na een jaar en is een credential uit kern/bearercode', async () => {
+  const { maakPartijen } = require('../server/kern/democratie/partijen');
+  const register = {};
+  let ms = Date.UTC(2026, 8, 29, 12);
+  const partijen = maakPartijen({ kaart: () => register, kijk: () => register, vastleggen: async (fn) => { fn(); return null; },
+    crypto, nu: () => new Date(ms).toISOString() });
+  const r = await partijen.registreer('Codenaam-kantoor', inschrijving('Partij Tijd'));
+  assert.match(r.sleutel, /^PP\.[0-9A-F]{32}$/, '128 bits in het vaste formaat van kern/bearercode');
+  const opslag = register[r.partij.id].sleutel;
+  assert.equal(opslag.doel, 'partijdeur');
+  assert.deepEqual(opslag.scope, ['democratie.partij.voorstel']);
+  assert.ok(!JSON.stringify(opslag).includes(r.sleutel.slice(3)), 'alleen de hash staat op schijf');
+  assert.equal(partijen.vanSleutel(r.sleutel.toLowerCase()).id, r.partij.id, 'de code is hoofdletterongevoelig, zoals elke bearercode');
+  ms += 364 * 86400000;
+  assert.ok(partijen.vanSleutel(r.sleutel), 'binnen het jaar werkt hij');
+  ms += 2 * 86400000;
+  assert.equal(partijen.vanSleutel(r.sleutel), null, 'na een jaar niet meer: het kantoor geeft een nieuwe uit');
+  const nieuw = await partijen.vervangSleutel('Codenaam-kantoor', r.partij.id);
+  assert.equal(partijen.vanSleutel(nieuw.sleutel).id, r.partij.id, 'vervangen geeft weer een jaar');
+});

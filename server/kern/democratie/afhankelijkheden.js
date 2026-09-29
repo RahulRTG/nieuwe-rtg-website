@@ -26,8 +26,9 @@ const MODULES = {
   '../../lib/keten': { wat: 'hashketen onder de tijdlijn en het journaal',
     vervangbaar: 'ja: zelfstandige functies zonder staat, alleen node:crypto' },
   '../../lib/klok': { wat: 'de tijd, verschuifbaar in toetsen', vervangbaar: 'ja: Date.now()' },
-  '../util': { wat: 'invoer inkorten en ontdoen van < en >, en de partijsleutel in constante tijd vergelijken',
-    vervangbaar: 'ja: een regel code en crypto.timingSafeEqual' },
+  '../util': { wat: 'invoer inkorten en ontdoen van < en >', vervangbaar: 'ja: een regel code' },
+  '../bearercode': { wat: 'de partijsleutel: 128 bits, alleen de hash op schijf, zoeken in constante tijd, vervaltijd en intrekken',
+    vervangbaar: 'ja: een zelfstandige module zonder opslag, alleen node:crypto' },
   '../../rem': { wat: 'een rem per bron voor de deur van een partij, tegen wie sleutels probeert',
     vervangbaar: 'ja: elke teller per bron en tijdvenster' }
 };

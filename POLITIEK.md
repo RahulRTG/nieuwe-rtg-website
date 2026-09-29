@@ -350,9 +350,11 @@ aan een kwestie koppelt, een toelichting, een bron en de aannamelijst van par.
 Twee besluiten van de eigenaar:
 
 - **Een partij hangt niet aan een RTG-account.** Bij het inschrijven krijgt ze
-  EEN keer een sleutel te zien (192 bits); de server bewaart alleen een hash met
-  zout, zoals `kern/command/apipoort.js`. Het kantoor kan hem vervangen of de
-  partij uitschrijven, en dan werkt de oude sleutel niet meer. Zo heeft een
+  EEN keer een sleutel te zien: een bearer uit `kern/bearercode.js` (128 bits,
+  een jaar geldig), waarvan de server alleen de hash bewaart en die hij in
+  constante tijd opzoekt. Het kantoor kan hem vervangen of de partij
+  uitschrijven, en dan werkt de oude sleutel niet meer. Hij staat als
+  credential in `CODECREDENTIALS.json`. Zo heeft een
   partij geen ledenaccount nodig om zonder RTG verder te gaan (proef P3), en
   vallen de rollen van woordvoerder en burger nooit in een sessie samen (MN-02).
   De deur staat daarom met reden in `scripts/lib/publiek.js`.

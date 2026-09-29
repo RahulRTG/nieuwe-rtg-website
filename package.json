@@ -134,6 +134,7 @@
     "test": "node scripts/test-runner.js",
     "connection:constitution": "node scripts/connection-constitution.js",
     "evidence:plan": "node scripts/evidence.js plan",
+    "preevidence:run": "npm run motor:build",
     "evidence:run": "node scripts/evidence.js run",
     "evidence:record": "node scripts/evidence.js record --trusted",
     "pretest:deel": "npm run motor:build",

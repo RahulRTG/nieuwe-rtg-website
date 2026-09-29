@@ -141,6 +141,7 @@ async function maakLijst(soort) {
   catch (e) { meld(e.message); }
 }
 
+let aanvraagVerzending = null;
 async function plaatsAanvraag() {
   const body = {
     wat: $('#aWat').value.trim(),
@@ -149,12 +150,18 @@ async function plaatsAanvraag() {
     wanneer: $('#aWanneer').value || null,
     budget: Number($('#aBudget').value) || null
   };
+  const inhoud = JSON.stringify(body);
+  if (!aanvraagVerzending || aanvraagVerzending.inhoud !== inhoud) aanvraagVerzending = { inhoud, sleutel: crypto.randomUUID() };
+  body.sleutel = aanvraagVerzending.sleutel;
+  $('#aPlaats').disabled = true;
   try {
     await api('/api/mall/aanvraag', body);
+    aanvraagVerzending = null;
     $('#aWat').value = ''; $('#aBudget').value = '';
     meld('Uw vraag staat uit. Zaken in dit vak en deze plaats zien hem.');
     tekenAanvragen();
   } catch (e) { meld(e.message); }
+  finally { $('#aPlaats').disabled = false; }
 }
 
 /* Starten pas als ALLE scripts van deze pagina zijn geladen. Deze pagina komt

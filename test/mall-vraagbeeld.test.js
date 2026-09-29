@@ -183,7 +183,7 @@ test('9. alleen een echte zoekopdracht telt mee, geen interne aanroep', () => {
     partnerTrips: [], markt: { ads: [] }
   } };
   require('../server/kern/werkvormen').haakAan(db);
-  const mall = maakMall({ db, save() {}, crypto: require('crypto'),
+  const mall = maakMall({ db, bijeen: async werk => werk(), save() {}, crypto: require('crypto'),
     isRetail: (s) => s.type === 'retail', haalThuis: () => null, haalLandVind: () => null }).mall;
 
   const tellen = () => {

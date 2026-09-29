@@ -13,5 +13,9 @@ module.exports = function maakAgendaOpslag({ db }) {
     if (!Array.isArray(r[ownerKey])) r[ownerKey] = [];
     return r[ownerKey];
   }
-  return { agendaWortel, agendaItems };
+  function agendaLees(ownerKey) {
+    const items = db.data.agendas?.[ownerKey];
+    return Array.isArray(items) ? items : [];
+  }
+  return { agendaWortel, agendaItems, agendaLees };
 };

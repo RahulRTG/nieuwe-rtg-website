@@ -517,6 +517,7 @@ function draaiToets(bestand, env, wacht, forceer) {
 const EIGEN_MODULE = new Map([
   // This worker test executes the real source in a VM, not through require.
   ['pass-cache.test.js', ['public/shared/sw-pass-assets.js']],
+  ['operationeel-meter.test.js', ['scripts/lib/operationeel/beoordeel.js']],
   /* DE SLEUTELWEDLOOP. De toets leest ook scripts/lib/bron.js (om commentaar
      te strippen), en de motor koos die als module -- een mutatie daar zegt niets
      over de sleutels. De module die hij beproeft is de helper; met de hand

@@ -5,13 +5,14 @@ const BRONNEN = Object.freeze([
   { id: 'nieuws', naam: 'Journalistiek' },
   { id: 'makers', naam: 'Makers en media' },
   { id: 'plekken', naam: 'Zaken en plekken' },
-  { id: 'persoonlijk', naam: 'Mijn reizen', prive: true }
+  { id: 'persoonlijk', naam: 'Mijn reizen', prive: true },
+  { id: 'voortgang', naam: 'Mijn aanvragen', prive: true }
 ]);
 const IDS = BRONNEN.map(x => x.id);
-const VORMEN = ['overzicht', 'agenda', 'bewaard'];
+const VORMEN = ['overzicht', 'wereld', 'mijn', 'actie', 'agenda', 'bewaard'];
 function schoonSaloonKeuzes(o = {}) {
   return {
-    bronnen: Array.isArray(o.bronnen) ? IDS.filter(x => o.bronnen.includes(x)) : IDS.filter(x => x !== 'persoonlijk'),
+    bronnen: Array.isArray(o.bronnen) ? IDS.filter(x => o.bronnen.includes(x)) : BRONNEN.filter(x => !x.prive).map(x => x.id),
     zoek: String(o.zoek || '').trim().slice(0, 100),
     plaats: String(o.plaats || '').trim().slice(0, 60),
     vorm: VORMEN.includes(o.vorm) ? o.vorm : 'overzicht',

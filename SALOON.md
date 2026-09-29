@@ -168,3 +168,18 @@ redactionele dossier- en goedkeuringsketen, creatoropdrachten met rechten,
 levering en afrekening, alle event- en transactiedomeinen in de projectie, een
 uitgebreide knowledge graph en een generatieve interface met gecontroleerde
 acties. Deze versie levert de werkende verbinding en de genoemde lussen.
+
+
+## Operationele terugkeer
+
+De optionele privébron **Mijn aanvragen** leest de bestaande Mall-aanvragen.
+Een reactie, de gekozen zaak, behandeling en het vastgelegde antwoord keren
+terug in Saloon. Wereld, Mijn leven en Actie zijn filters op dezelfde bronitems.
+De kaart en Edge verwijzen naar Mijn Mall voor de volledige handeling.
+Mijn Mall en de leverancierswerklijst gebruiken de bronacties en verplichte
+versies; Edge projecteert hun echte knoppen.
+
+[KETENS.md](KETENS.md) beschrijft de V1-afmaaknorm en `npm run operationeel`.
+Een geregistreerde functie of een geslaagde deelproef is geen volledige
+capability-certificering. Ontbrekend ketenbewijs blijft zichtbaar en blokkeert
+`OPERATIONAL_STATUS=PROVEN`.

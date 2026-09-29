@@ -85,7 +85,7 @@ test('2. een bewaard aanbod dat verdwijnt, vervalt zichtbaar', async () => {
     partnerTrips: [], markt: { ads: [] }
   } };
   require('../server/kern/werkvormen').haakAan(db);
-  const mall = maakMall({ db, save() {}, crypto: require('crypto'),
+  const mall = maakMall({ db, bijeen: async werk => werk(), save() {}, crypto: require('crypto'),
     isRetail: (s) => s.type === 'retail', haalThuis: () => null, haalLandVind: () => null }).mall;
 
   const l = mall.mallLijsten.maak('k1', { naam: 'Test' }).lijst;
@@ -198,12 +198,12 @@ test('8. een zaak reageert, het lid kiest, en er wordt niets geboekt', async () 
   const a = await api('/api/mall/aanvraag', { wat: 'Gezichtsbehandeling zaterdag', verdieping: 'beauty', plek: 'Ibiza' }, lid);
   const id = a.body.aanvraag.id;
 
-  const r1 = await api('/api/supplier/mall/aanvraag/reageer', { id, tekst: 'Kan zaterdag om 14:00', prijs: 95 }, tok.SERENA);
+  const r1 = await api('/api/supplier/mall/aanvraag/reageer', { id, versie: a.body.aanvraag.versie, tekst: 'Kan zaterdag om 14:00', prijs: 95 }, tok.SERENA);
   assert.equal(r1.status, 200);
   assert.equal(r1.body.aanvraag.aantalReacties, 1);
 
   // dezelfde zaak die zich bedenkt, wijzigt haar reactie
-  const r2 = await api('/api/supplier/mall/aanvraag/reageer', { id, tekst: 'Toch liever 15:00', prijs: 90 }, tok.SERENA);
+  const r2 = await api('/api/supplier/mall/aanvraag/reageer', { id, versie: r1.body.aanvraag.versie, tekst: 'Toch liever 15:00', prijs: 90 }, tok.SERENA);
   assert.equal(r2.body.aanvraag.aantalReacties, 1, 'geen tweede reactie van dezelfde zaak');
   assert.equal(r2.body.aanvraag.reacties[0].prijs, 90, 'de reactie is bijgewerkt');
 
@@ -211,7 +211,7 @@ test('8. een zaak reageert, het lid kiest, en er wordt niets geboekt', async () 
   const die = mijn.body.aanvragen.find(x => x.id === id);
   assert.equal(die.reacties.length, 1, 'het lid ziet de reactie');
 
-  const kies = await api('/api/mall/aanvraag/kies', { id, code: 'SERENA' }, lid);
+  const kies = await api('/api/mall/aanvraag/kies', { id, versie: die.versie, code: 'SERENA' }, lid);
   assert.equal(kies.status, 200);
   assert.equal(kies.body.aanvraag.status, 'gegund');
   assert.equal(kies.body.aanvraag.reacties[0].gekozen, true);

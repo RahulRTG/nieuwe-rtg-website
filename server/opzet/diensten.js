@@ -51,7 +51,9 @@ module.exports = function maakDiensten(deps) {
   // Onze eigen web-push (server/webpush.js): VAPID + RFC 8291-payloadversleuteling
   // op Node's crypto, i.p.v. het pakket `web-push`. Zelfde API, geen dependency.
   let webpush = null;
-  try { webpush = require('../webpush'); } catch (e) { /* zonder push: alleen SSE */ }
+  if (process.env.RTG_PUSH_UIT !== '1') {
+    try { webpush = require('../webpush'); } catch (e) { /* zonder push: alleen SSE */ }
+  }
 
   // welke persona hoort bij een auteursnaam (voor gerichte notificaties)
   const AUTHOR_TIER = {

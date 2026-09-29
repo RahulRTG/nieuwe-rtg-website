@@ -151,7 +151,7 @@ test('8. een Business Pass ziet de inkoopprijs, een lid de consumentprijs', asyn
     partnerTrips: [], markt: { ads: [] }
   } };
   require('../server/kern/werkvormen').haakAan(db);
-  const mall = maakMall({ db, save() {}, crypto: require('crypto'), isRetail: () => false,
+  const mall = maakMall({ db, bijeen: async werk => werk(), save() {}, crypto: require('crypto'), isRetail: () => false,
     haalThuis: () => null, haalLandVind: () => null,
     haalGroothandel: () => ({ ghIsGroothandel: (s) => s.type === 'groothandel',
       prijsVoor: (p, soort) => soort === 'lid' ? p.consumentPrijs : p.inkoopPrijs }) }).mall;

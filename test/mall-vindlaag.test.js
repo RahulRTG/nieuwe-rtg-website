@@ -274,7 +274,7 @@ test('17. een half aanbod-object wordt geweigerd EN gemeld, niet stil weggelaten
     partnerTrips: [], markt: { ads: [] }
   } };
   require('../server/kern/werkvormen').haakAan(db);
-  const mall = maakMall({ db, save() {}, crypto: require('crypto'),
+  const mall = maakMall({ db, bijeen: async werk => werk(), save() {}, crypto: require('crypto'),
     isRetail: (s) => s.type === 'retail', haalThuis: () => null, haalLandVind: () => null }).mall;
 
   const d = mall.aanbodAlles();

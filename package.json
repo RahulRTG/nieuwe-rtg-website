@@ -91,6 +91,7 @@
     "keuring": "node scripts/keuring.js",
     "nood": "node server/nood.js",
     "check": "node scripts/check.js",
+    "operationeel": "node scripts/operationeel.js",
     "tekstoppervlak": "node scripts/tekstoppervlak.js",
     "delta": "node scripts/deltapoort.js",
     "verval": "node scripts/normverval.js",

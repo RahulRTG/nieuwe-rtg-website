@@ -43,6 +43,10 @@ const GELDACTIES = [
      precedent staat een regel hoger: giftcard/redeem staat er al in, om dezelfde
      reden. */
   /^\/api\/supplier\/pos\/redeem$/,
+  // Ook een handmatig geregistreerde aanbetaling of uitgegeven geldbon is
+  // een financiële mutatie. De offerte en de werkvloer blijven bereikbaar.
+  /^\/api\/supplier\/horeca\/event\/aanbetaling$/,
+  /^\/api\/supplier\/horeca\/bon\/maak$/,
   /^\/api\/wallet\/munt\/(?:koop|wissel)$/,
   /^\/api\/supplier\/betaalverzoek(?:\/|$)/,
   /* `vooraf` en `vastleg` staan hier omdat ze geld bewegen: vooraf laat de
@@ -103,6 +107,14 @@ function antwoord(res) {
   return res.status(503).json({ error: BERICHT, code: 'betalingen-uit' });
 }
 
+// Gemengde routes, zoals offline synchronisatie, beoordelen de inhoud NA het
+// ontleden en vóór de eerste mutatie. Dezelfde stop en dezelfde antwoordvorm.
+function weigerIndienUit(res) {
+  if (process.env.RTG_BETALEN_UIT !== '1') return false;
+  antwoord(res);
+  return true;
+}
+
 module.exports = function betaalstop({ app, uit } = {}) {
   const actief = uit == null ? process.env.RTG_BETALEN_UIT === '1' : uit === true;
   if (!actief) return { actief: false };
@@ -131,3 +143,4 @@ module.exports.isExternAfrekenen = isExternAfrekenen;
 module.exports.externWijzePoort = externWijzePoort;
 module.exports.EXTERNE_WIJZEN = EXTERNE_WIJZEN;
 module.exports.BERICHT = BERICHT;
+module.exports.weigerIndienUit = weigerIndienUit;

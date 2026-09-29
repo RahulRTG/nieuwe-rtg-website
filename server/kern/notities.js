@@ -29,8 +29,12 @@ function maakNotities({ db, save, bijeen, inBundel, crypto, schoon, keyVanCodena
   const nu = () => new Date().toISOString();
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
   const eigenNotities = require('./eigencollectie')({ db, domein: 'kern/notities', bezit: { notities: 'kaart' } });
-  const store = () => eigenNotities.bak('notities');
-  const ruw = k => { const s = store(); if (!Array.isArray(s[k])) s[k] = []; return s[k]; };
+  const store = (schrijf = false) => schrijf ? eigenNotities.bak('notities') : eigenNotities.kijk('notities');
+  const ruw = (k, schrijf = false) => {
+    const s = store(schrijf);
+    if (!Array.isArray(s[k])) { if (!schrijf) return []; s[k] = []; }
+    return s[k];
+  };
   const alleVan = key => ruw('lid:' + key);
   const naam = k => codenaamVan(k) || 'een lid';
   const vind = (key, id) => {
@@ -92,7 +96,7 @@ function maakNotities({ db, save, bijeen, inBundel, crypto, schoon, keyVanCodena
       nieuw = true;
     }
     const mis = await vastleggen(async () => {
-      if (nieuw) alleVan(key).push(n);
+      if (nieuw) ruw('lid:' + key, true).push(n);
       if (data.titel != null) n.titel = scho(data.titel, 120);
       if (n.soort === 'notitie' && data.tekst != null) n.tekst = scho(data.tekst, 4000);
       if (n.soort === 'lijst' && Array.isArray(data.items)) {

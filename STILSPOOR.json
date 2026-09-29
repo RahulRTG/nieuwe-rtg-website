@@ -1,24 +1,24 @@
 {
   "stempel": {
-    "op": "2026-09-19T18:56:34.630Z",
-    "commit": "6083f652",
+    "op": "2026-09-29T21:44:53.421Z",
+    "commit": "9777b2086",
     "boomVuil": false,
-    "boomAnders": 2,
+    "boomAnders": 5,
     "instrument": "scripts/stilspoor.js",
-    "node": "v22.22.2"
+    "node": "v24.18.0"
   },
   "soort": "meting",
   "uitleg": "Schrijfacties waarvan het falen volledig wordt weggevangen, terwijl de aanroeper daarna succes meldt. De klasse van LAT.md regel 21: een belofte over een spoor is pas een regel als het spoor kan weigeren.",
   "grens": "Deze meting toont NIET aan dat een gesmoorde schrijfactie fout is -- server/log.js en kern/envelop.js smoren met reden. Het is een triagelijst, geen oordeel. Zij toont ook niet aan dat dit alle gevallen zijn: de herkenning van een spoor- of opslagschrijver is lexicaal, dus dit is een ONDERGRENS op de schuld. En zij zegt niets over aanroepers die de uitslag van een schrijfactie negeren zonder try/catch -- dat is dezelfde faalvorm zonder dit kenmerk.",
   "graad": "vermoed",
   "gemeten": {
-    "bestanden": 3582,
-    "vangers": 1875,
-    "leegVangers": 681,
-    "spoorAanroepen": 241,
-    "opslagAanroepen": 3248,
-    "spoorGesmoord": 18,
-    "opslagGesmoord": 25,
+    "bestanden": 3910,
+    "vangers": 1996,
+    "leegVangers": 696,
+    "spoorAanroepen": 265,
+    "opslagAanroepen": 3351,
+    "spoorGesmoord": 17,
+    "opslagGesmoord": 24,
     "spoorGesmoordMetBesluit": 0,
     "opslagGesmoordMetBesluit": 0
   },
@@ -46,10 +46,6 @@
     {
       "plek": "server/kern/ledenbalie-zaken.js:117",
       "lijf": "inzagelog.noteer({ door, over: { id: u.id, codenaam: u.codename }, waarom: r, bron: 'ledenbalie/abo' });"
-    },
-    {
-      "plek": "server/kern/payroll/identiteit.js:124",
-      "lijf": "if (inzagelog && inzagelog.noteer) inzagelog.noteer({ door: { naam: String(door || 'werkgever') + ' (' + (doorRol || 'werkgever') + ')' }, o"
     },
     {
       "plek": "server/kern/service/machtiging.js:121",
@@ -80,11 +76,11 @@
       "lijf": "routelog.noteerAudit(req.method, patroon, sporen.gegroeid(voor, sporen.standVan(db.data)), res.statusCode);"
     },
     {
-      "plek": "server/opzet/auditspoor.js:116",
+      "plek": "server/opzet/auditspoor.js:120",
       "lijf": "noteer();"
     },
     {
-      "plek": "server/routes/member/persoonlijk-rahul.js:136",
+      "plek": "server/routes/member/persoonlijk-rahul.js:137",
       "lijf": "if (!req.session.account || !antwoord) return; noteerBeurt(req.session.account, req.body.q, antwoord, req.body.lang);"
     },
     {
@@ -98,7 +94,7 @@
   ],
   "opslag": [
     {
-      "plek": "server/accounts/mirror.js:197",
+      "plek": "server/accounts/mirror.js:199",
       "lijf": "await wachtrij.flush();"
     },
     {
@@ -118,7 +114,7 @@
       "lijf": "save();"
     },
     {
-      "plek": "server/effectbon.js:160",
+      "plek": "server/effectbon.js:161",
       "lijf": "const bon = bewaar(maak({ envelop: req && req.envelop, voor, na: staatlog.stand(), teller })); if (!res.headersSent) res.setHeader('X-RTG-Ef"
     },
     {
@@ -166,10 +162,6 @@
       "lijf": "save();"
     },
     {
-      "plek": "server/kern/pay/opladen.js:64",
-      "lijf": "d().kaartWachtend = d().kaartWachtend && typeof d().kaartWachtend === 'object' ? d().kaartWachtend : {}; d().kaartWachtend[betaling.id] = { "
-    },
-    {
       "plek": "server/kern/studio/aiwerk.js:77",
       "lijf": "const sys = require('../rahul').RAHUL_LEAD + 'je bent de chef-ontwerper van RTG Ontwerpstudio. Geef een korte, scherpe maar respectvolle kri"
     },
@@ -178,23 +170,23 @@
       "lijf": "const C = lijsten(); if (C[handle]) { C[handle].mislukt = { t: nu(), reden: String(r.error).slice(0, 140) }; save(); }"
     },
     {
-      "plek": "server/kern/zaakdoos/synchronisatie.js:43",
-      "lijf": "const r = await fetch(CLOUD() + '/api/doos/kloon', { headers: { 'x-doos-sleutel': SLEUTEL }, signal: AbortSignal.timeout(60000) }); if (!r.o"
+      "plek": "server/kern/zaakdoos/synchronisatie.js:52",
+      "lijf": "const r = await fetch(CLOUD() + '/api/doos/kloon', { headers: require('./koppen').doosKoppen({}, SLEUTEL), signal: AbortSignal.timeout(60000"
     },
     {
       "plek": "server/opzet/luister.js:137",
       "lijf": "save();"
     },
     {
-      "plek": "server/server.js:149",
+      "plek": "server/server.js:148",
       "lijf": "save();"
     },
     {
-      "plek": "server/server.js:1819",
+      "plek": "server/server.js:1821",
       "lijf": "save();"
     },
     {
-      "plek": "server/server.js:1899",
+      "plek": "server/server.js:1901",
       "lijf": "save();"
     }
   ]

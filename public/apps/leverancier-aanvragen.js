@@ -33,6 +33,7 @@ function mijnReactie(a, eigenCode) {
 }
 
 async function teken() {
+  window.RTGAanvraagEdgeWis();
   let d, code = null;
   try {
     d = await api('/api/supplier/mall/aanvragen', {});
@@ -50,32 +51,36 @@ async function teken() {
 
   $('#lijst').innerHTML = d.aanvragen.map((a) => {
     const mijn = mijnReactie(a, code);
-    return '<div class="kaart">' +
+    return '<div class="kaart" data-aanvraag="' + esc(a.id) + '">' +
       '<h3>' + esc(a.wat) + '</h3>' +
-      '<div class="meta">' + esc(a.van) + ' &middot; ' + esc(a.plek || '') +
+      '<div class="meta">' + esc(a.statusLabel) + ' &middot; ' + esc(a.van) + ' &middot; ' + esc(a.plek || '') +
         (a.wanneer ? ' &middot; ' + esc(a.wanneer) : '') +
         (a.budget ? ' &middot; budget ' + euro(a.budget) : '') +
         ' &middot; ' + a.aantalReacties + (a.aantalReacties === 1 ? ' reactie' : ' reacties') + '</div>' +
       (mijn ? '<div class="mijn"><div class="oms">' + esc(mijn.tekst) + '</div>' +
         (mijn.prijs ? '<div class="meta">' + euro(mijn.prijs) + '</div>' : '') +
-        (mijn.gekozen ? '<div class="meta goed">Gekozen. Het lid verwacht dat u contact opneemt.</div>'
+        (mijn.gekozen ? '<div class="meta goed">Gekozen. Behandel de aanvraag en leg uw antwoord vast.</div>'
           : '<div class="meta">Uw reactie staat er; u kunt hem hieronder wijzigen.</div>') + '</div>' : '') +
-      '<div class="rij">' +
+      '<div class="aanvraag-acties rij"></div>' +
+      (a.resultaat ? '<p>Uw antwoord: ' + esc(a.resultaat.tekst) + '</p>' : '') +
+      ((a.acties || []).some(x => x.id === 'reageer') ? '<div class="rij">' +
         '<input class="veld tekst groei" data-id="' + esc(a.id) + '" maxlength="400" ' +
           'placeholder="Wat kunt u bieden?" value="' + esc(mijn ? mijn.tekst : '') + '">' +
         '<input class="veld prijs smaller" data-id="' + esc(a.id) + '" type="number" min="0" ' +
           'placeholder="Prijs" value="' + (mijn && mijn.prijs ? mijn.prijs : '') + '" aria-label="Prijs in euro">' +
         '<button class="knop reageer" data-id="' + esc(a.id) + '" type="button">' + (mijn ? 'Bijwerken' : 'Reageren') + '</button>' +
-      '</div>' +
+      '</div>' : '') +
     '</div>';
   }).join('');
 
+  d.aanvragen.forEach(a => window.RTGAanvraagActies($('#lijst').querySelector('[data-aanvraag="' + a.id + '"] .aanvraag-acties'), a, { zaak: true, api, meld, ververs: teken }));
   $('#lijst').querySelectorAll('.reageer').forEach((b) => b.addEventListener('click', async () => {
     const id = b.dataset.id;
     const tekst = $('.tekst[data-id="' + id + '"]').value.trim();
     const prijs = Number($('.prijs[data-id="' + id + '"]').value) || null;
-    try { await api('/api/supplier/mall/aanvraag/reageer', { id, tekst, prijs }); meld('Uw reactie staat bij het lid.'); teken(); }
-    catch (e) { meld(e.message); }
+    b.disabled = true;
+    try { await api('/api/supplier/mall/aanvraag/reageer', { id, tekst, prijs, versie: d.aanvragen.find(a => a.id === id).versie }); meld('Uw reactie staat bij het lid.'); teken(); }
+    catch (e) { meld(e.message); } finally { b.disabled = false; }
   }));
 }
 

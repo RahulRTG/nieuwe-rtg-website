@@ -251,6 +251,18 @@ het scherm zegt bij open meteen dat de uitgifte nog steeds niet mag.
   graad is `vermoed`: stroom en serverhuur zijn met een sleutel verdeeld. Daarmee is
   de kostenketen gegrond, en zijn het alle zes.
 
+Dezelfde dag, zonder nieuw besluit, vijf maten van half naar bestaand. Vier misten
+alleen hun bewijs: het ledenregister (`groei.leden-per-pas`,
+`acquisitie.via-werkgever`) draagt nu een graad, een peilmoment en of het afkapte
+-- het leest hooguit 20000 rijen, en een telling die afkapte zonder het te zeggen
+lijkt compleet (de marge per lid krijgt dan geen noemer); de RTF-campagnes
+(`campagnes.rtf-werving`) zijn `vermoed`, want een ronde is een bedrag dat het
+bestuur boekte en geen regel van de bank; de stedenboom (`geo.rtf-steden`) is
+`gemeten`. De vijfde, `risico.betalingen-onbekend`, miste zijn projectie terwijl
+de telling al bestond: `openstaand()` in `kern/betaalwaarheid/hervat.js`, die de
+veegronde ook leest. Hij is aangesloten en niet opnieuw bedacht
+(`kern/bedrijfsmaat/stand-risico.js`).
+
 ---
 
 ## 3. De architectuur, onderdeel voor onderdeel

@@ -178,7 +178,8 @@ kern.bedrijfsmaat = require('../kern/bedrijfsmaat/stand')({
   pasgeschiedenis: kern.pasgeschiedenis, aanwezigheid: kern.aanwezigheid,
   kosten: () => kern.kosten, bank: kern.bankpositie, boek: kern.rtgBoek, kanalen: kern.aanmeldkanaalStand,
   ledentegoed: () => (kern.pay && kern.pay.ledentegoed ? kern.pay.ledentegoed() : null),
-  omzetPerPas: () => kern.ledenregister.omzetPerPas() });
+  later: { omzetPerPas: () => kern.ledenregister.omzetPerPas(),
+    betalingen: () => (kern.betaalWaarheid ? kern.betaalWaarheid.openstaand() : null) } });
 // het streefbeeld (besluit C7): de machine stelt voor uit de bedrijfsmaten, de eigenaar tekent
 Object.assign(kern, require('../kern/streefbeeld')({ db, save, bedrijfsmaat: kern.bedrijfsmaat }));
 // het beslisgeheugen (besluit C13): besluit, gronden van toen, verwachting en de uitkomst na de termijn

@@ -48,7 +48,9 @@ module.exports = ({ m, peilmoment, maat, kosten, omzetPerPas }) => {
     /* De passen van de ladder (het ledenregister volgt kern/pasladder.js); een pas
        die de ladder kent blijft zichzelf, zodat een nieuwe trede niet stil bij
        RTG Pass belandt. Alleen wat de ladder niet kent, gaat langs kern/passen.js. */
-    const rijen = omzetPerPas(), bekend = new Set(rijen.map(o => o.pas));
+    const rijen = omzetPerPas();
+    if (!Array.isArray(rijen)) return niet('Het ledenregister telde niet alle leden; zonder volledige noemer geen marge per lid.');
+    const bekend = new Set(rijen.map(o => o.pas));
     const kostenPas = {};
     let zonderPasCenten = 0;
     for (const r of k.alleDragers(m)) {

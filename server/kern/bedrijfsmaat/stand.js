@@ -15,14 +15,14 @@
 const P = require('./projecties');
 const K = require('./klantwaarde');
 const RB = require('./stand-rtgboek');
-const MARGE = require('./stand-marge');
+const LATER = require('./stand-later');
 const { toon } = require('./poort');
 const { DEFINITIES } = require('./definities');
 
 const GEPEILD = 'gemeten';
 const VANAF = 'Leden van voor de ingebruikname van kern/pasgeschiedenis.js hebben geen overgang en tellen niet mee.';
 
-module.exports = ({ lees, pasgeschiedenis, aanwezigheid, kosten, bank, boek, kanalen, ledentegoed, omzetPerPas, nu }) => {
+module.exports = ({ lees, pasgeschiedenis, aanwezigheid, kosten, bank, boek, kanalen, ledentegoed, later, nu }) => {
   const klok = typeof nu === 'function' ? nu : Date.now;
   const lijst = (x) => (Array.isArray(x) ? x : []);
 
@@ -126,7 +126,7 @@ module.exports = ({ lees, pasgeschiedenis, aanwezigheid, kosten, bank, boek, kan
           ['Alleen de loonruns van de nieuwe payrollmotor (payrollRunsV2); de groep is het aantal zaken.']),
         kwMaat('uitkomst.klantwaarde-foundation', DEFINITIES.klantwaardeFoundation, { privacy: 'gezinnen', minGroep: 10 }, kw.foundation,
           ['Casussen van voor 27 september 2026 hebben geen dag van afronden en tellen niet mee.']),
-        MARGE({ m, peilmoment, maat, kosten, omzetPerPas }), // C15
+        ...LATER({ m, peilmoment, maat, kosten, later }),
         // het boek van RTG (C8-C11): operationele marge, liquiditeit, runway, CAC
         ...(typeof boek === 'function' ? RB({ m, peilmoment, maat, boek, bank, cijfers, notas: (x) => kl('posten', x),
           kanalen: typeof kanalen === 'function' ? kanalen : () => ({}), ledentegoed: typeof ledentegoed === 'function' ? ledentegoed : () => null }) : [])

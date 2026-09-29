@@ -9,17 +9,19 @@ module.exports = [
   { id: 'campagnes.rtf-werving', domein: 'campagnes', wereld: 'rtfoundation', eenheid: 'euro per campagne',
     betekenis: 'Landelijke wervingscampagnes van de RTFoundation en hoe hun opbrengst naar steden gaat.',
     berekening: 'per campagne de opgehaalde bedragen en de verdeelsleutel', actualiteit: 'live', privacy: 'huis', minGroep: null,
-    eigenaar: 'kern/rtfos', graad: 'onbekend', afhankelijk: [],
+    eigenaar: 'kern/rtfos', graad: 'vermoed', afhankelijk: [],
     bron: [c('server/kern/rtfos/campagnes.js', 'function maak')], definitie: [c('server/kern/rtfos/campagnes.js', 'landelijk werven, lokaal besteden')],
-    projectie: [c('server/kern/rtfos/campagnes.js', 'function ronde')], bewijs: null, groepsgrens: null,
-    waarom: { bewijs: 'Geen graad of peilmoment in het antwoord. Blijft binnen de wereld rtfoundation (C1).' } },
+    projectie: [c('server/kern/rtfos/campagnes.js', 'function lijst'), c('server/kern/rtfos/campagnes.js', 'function ronde')],
+    bewijs: [c('server/kern/rtfos/campagnes.js', "graad: 'vermoed', peilmoment: nu()")], groepsgrens: null,
+    waarom: {} },
 
   { id: 'groei.leden-per-pas', domein: 'commerciele-groei', wereld: 'consument', eenheid: 'leden per pas',
     betekenis: 'Hoeveel leden elke pas heeft.', berekening: 'telling per pas uit het ledenregister',
-    actualiteit: 'live', privacy: 'leden', minGroep: 10, eigenaar: 'kern/ledenregister', graad: 'onbekend', afhankelijk: [],
+    actualiteit: 'live', privacy: 'leden', minGroep: 10, eigenaar: 'kern/ledenregister', graad: 'gemeten', afhankelijk: [],
     bron: [c(DOS, 'function ledenRegisterRijen')], definitie: [c('server/kern/pasladder.js', 'const LADDER = [')],
-    projectie: [c(REG, 'const perPasOpen = groepstelling(PAS_VOLGORDE.map')], bewijs: null, groepsgrens: [c(REG, 'perPas: perPasOpen')],
-    waarom: { bewijs: 'Geen graad of peilmoment; het register telt tot 20000 rijen en zegt niet of het afkapte.' } },
+    projectie: [c(REG, 'const perPasOpen = groepstelling(PAS_VOLGORDE.map')],
+    bewijs: [c(REG, "graad: 'gemeten', peilmoment: new Date().toISOString(), afgekapt"), c(REG, 'const afgekapt = rijen.length >= MAX')],
+    groepsgrens: [c(REG, 'perPas: perPasOpen')], waarom: {} },
 
   { id: 'groei.zaken-per-genre', domein: 'commerciele-groei', wereld: 'commercieel', eenheid: 'zaken per genre',
     betekenis: 'Hoeveel actieve partnerzaken er per genre zijn, en hoe dat groeit.', berekening: 'nog niet vastgesteld',
@@ -44,8 +46,8 @@ module.exports = [
 
   { id: 'geo.rtf-steden', domein: 'geografische-groei', wereld: 'rtfoundation', eenheid: 'steden met status',
     betekenis: 'In welke steden de RTFoundation actief is, en in welke stand.', berekening: 'stedenboom met status per stad',
-    actualiteit: 'live', privacy: 'huis', minGroep: null, eigenaar: 'kern/rtfos', graad: 'onbekend', afhankelijk: [],
+    actualiteit: 'live', privacy: 'huis', minGroep: null, eigenaar: 'kern/rtfos', graad: 'gemeten', afhankelijk: [],
     bron: [c('server/kern/rtfos/steden.js', 'function stadMaak')], definitie: [c('server/kern/rtfos/steden.js', "const STATUS = ['verkend'")],
-    projectie: [c('server/kern/rtfos/steden.js', 'function boom')], bewijs: null, groepsgrens: null,
-    waarom: { bewijs: 'Geen graad of peilmoment in het antwoord.' } }
+    projectie: [c('server/kern/rtfos/steden.js', 'function boom')],
+    bewijs: [c('server/kern/rtfos/steden.js', "graad: 'gemeten', peilmoment: nu()")], groepsgrens: null, waarom: {} }
 ];

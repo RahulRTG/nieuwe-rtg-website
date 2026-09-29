@@ -94,4 +94,8 @@ test('6. een eerdere maand en een ontbrekende laag geven geen getal maar een red
   assert.equal(oud.stand, 'NIET_UIT_TE_REKENEN');
   assert.match(oud.waarom, /stand van vandaag/);
   assert.equal(reken({ kosten: () => null, omzetPerPas: o }).stand, 'NIET_UIT_TE_REKENEN');
+  /* een register dat afkapte, levert geen noemer */
+  const kap = reken({ kosten: k, omzetPerPas: () => null });
+  assert.equal(kap.stand, 'NIET_UIT_TE_REKENEN');
+  assert.match(kap.waarom, /niet alle leden/);
 });

@@ -55,7 +55,7 @@
       foundation/geld foundation/geld-later foundation/geloofbieb foundation/geven foundation/gevoel \
       foundation/gezondheid foundation/gezondheid-welzijn \
       foundation/hulpwijzer foundation/index foundation/kantoor foundation/keuken foundation/klas \
-      foundation/kleuren foundation/klimaatfonds foundation/klusjes foundation/kompas \
+      foundation/kleuren foundation/klimaatfonds foundation/klusjes foundation/kompas foundation/kwestiekantoor foundation/kwesties \
       foundation/leerpaspoort foundation/leren foundation/liedjes foundation/magazine foundation/mail \
       foundation/markt foundation/mediawijs foundation/meedoen-ontdekken foundation/memorie \
       foundation/mijnbanden foundation/ochtend \

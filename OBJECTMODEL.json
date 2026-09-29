@@ -2,15 +2,15 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-29",
   "gemeten": {
-    "bestanden": 2568,
-    "vormen": 1498,
+    "bestanden": 2570,
+    "vormen": 1499,
     "velden": 2159,
-    "modules": 829,
-    "domeinen": 300,
-    "envelopDrempel": 18,
-    "envelop": 30,
+    "modules": 830,
+    "domeinen": 301,
+    "envelopDrempel": 19,
+    "envelop": 29,
     "veldenDomeineigen": 1508,
-    "veldenGedeeldVanafVier": 219,
+    "veldenGedeeldVanafVier": 221,
     "gelijkendeVormparen": 23
   },
   "envelop": [
@@ -25,7 +25,6 @@
     "door",
     "gemaakt",
     "id",
-    "key",
     "label",
     "naam",
     "notitie",
@@ -46,6 +45,18 @@
     "wat"
   ],
   "gedeeld": [
+    {
+      "veld": "key",
+      "domeinen": 18,
+      "waar": [
+        "kern/assets",
+        "kern/care",
+        "kern/ervaring",
+        "kern/gemeente",
+        "kern/instant-reality",
+        "kern/ledenbalie-inzage"
+      ]
+    },
     {
       "veld": "sinds",
       "domeinen": 17,
@@ -512,18 +523,6 @@
         "kern/leverancier",
         "kern/mall",
         "kern/trainingsschema"
-      ]
-    },
-    {
-      "veld": "soortLabel",
-      "domeinen": 10,
-      "waar": [
-        "kern/bank",
-        "kern/boerderij",
-        "kern/concern",
-        "kern/gemeente",
-        "kern/mall",
-        "kern/overheid"
       ]
     }
   ],

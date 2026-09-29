@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2169 bestanden en 15150 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2169 bestanden en 15148 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2169 |
-| losse beweringen (`test(...)`) | 15150 |
+| losse beweringen (`test(...)`) | 15148 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 199 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1841 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1893 bestanden, 14666 beweringen.
+1891 bestanden, 14662 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -249,7 +249,6 @@ toets omvalt.
 | `boardlog-keten.test.js` | 9 | gezakt op `===->!==#0` | HET BOARDROOM-JOURNAAL VAN HET LID AAN DE HASHKETEN. Dit journaal bestaat om twee vragen te kunnen beantwoorden: "stond dat altijd al uit?" en "wie heeft dat aangezet?" -- bij een kind kan dat antwoord een ouder zijn. |
 | `boardroom-poort.test.js` | 7 | gezakt op `liegpoort /api/` | De boardroom-poort: de boardroom is de kamer van de eigenaar (Rahul Imran Ismail). De anonieme kantoorcode heeft geen identiteit en komt er nooit in; de eigenaar komt binnen met zijn eigen account (direct, of als... |
 | `boardroom.test.js` | 12 | gezakt op `liegpoort /api/` | RTG Boardroom: de complete schakelkast. Elke functie heeft een stoplicht-status (aan/uit/storing), de eigenaar schakelt direct, kan een storing melden, alles resetten en de AI om een voorstel vragen. |
-| `bodemdruk.test.js` | 5 | gezakt op `===->!==#0` | GEEN COMMERCIELE DRUK BINNEN DE BODEM -- de meter van eis 5 (SAMENLEVING.md par. 6). |
 | `boeken.test.js` | 3 | gezakt op `liegpoort /api/` | RTG Boeken: de huisbibliotheek, de leesvoortgang die met je account meereist (en alleen die plek -- geen leesstatistieken), en de dichte poort zonder token. |
 | `boekhoud.test.js` | 4 | gezakt op `liegpoort /api/` | De branchegerichte AI-boekhouder: genre-profielen, datagedreven adviezen en de leverancier-endpoints (vragen, adviezen, antwoord). Draai: npm test |
 | `boerderij.test.js` | 8 | gezakt op `liegpoort /api/` | End-to-end tests voor het boerderij-genre (kern/boerderij.js): het slimme bedrijfssysteem voor boeren. Type kiezen, percelen + gewassen (zaaien -> groeien -> oogsten), dieren (voeren, opbrengst), takenbord, de... |
@@ -367,6 +366,7 @@ toets omvalt.
 | `deltapoort.test.js` | 23 | gezakt op `===->!==#0` | DE IJKING VAN DE DELTAPOORT -- regel 2 van de lat, op de poort zelf. scripts/deltapoort.js houdt nieuw werk aan de norm. |
 | `democratie-aanval.test.js` | 3 | gezakt op `liegpoort /api/` | DEMOCRATIEOS FASE C -- de aanvalsfase (POLITIEK.md par. 18.2). |
 | `democratie-afhankelijk.test.js` | 6 | gezakt op `===->!==#0` | UNDECLARED_RTG_DEPENDENCY = 0 -- proef P3 wordt meetbaar (POLITIEK.md par. 1.1). |
+| `democratie-doe.test.js` | 10 | gezakt op `liegpoort /api/` | HET DOENETWERK -- een actie die bij de burger begint (POLITIEK.md par. 6, release-trein stap 4). |
 | `democratie-grondwet.test.js` | 4 | gezakt op `&&->||#0` | DEMOCRATIEOS FASE C4 -- de omwegen om de grondwet heen (POLITIEK.md par. 18.2). |
 | `democratie-verlies.test.js` | 2 | gezakt op `liegpoort /api/` | NIEMAND KWIJT, ONDER STORINGEN -- de verliesproef van fase B (POLITIEK.md par. 18.1). |
 | `democratie.test.js` | 12 | gezakt op `liegpoort /api/` | DEMOCRATIEOS FASE B -- de minimale burgerlus (POLITIEK.md par. 18.1). |
@@ -386,7 +386,7 @@ toets omvalt.
 | `document-revocation.test.js` | 1 | gezakt op `!==->===#1` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `doelbinding.test.js` | 12 | gezakt op `===->!==#0` | DOELBINDING -- waarvoor mag dit gegeven gebruikt worden? DE TOETS DIE DE TWEE REGISTERS AAN ELKAAR HOUDT staat in 1. |
 | `doelen.test.js` | 8 | gezakt op `liegpoort /api/` | De doelenmotor (kern/doelen.js). Het punt van deze motor is dat mijlpalen worden AFGELEID en niet bewaard: een gemiste week is dan geen mislukking maar een ander pad. |
-| `doelgroepbereik.test.js` | 15 | gezakt op `!==->===#0` | DE DOELGROEPBEREIKMETER -- en vooral: wat hij NIET mag beweren. WAAROM HIJ ZO HEET EN NIET "BEREIKBAAR". |
+| `doelgroepbereik.test.js` | 14 | gezakt op `!==->===#0` | DE DOELGROEPBEREIKMETER -- en vooral: wat hij NIET mag beweren. WAAROM HIJ ZO HEET EN NIET "BEREIKBAAR". |
 | `domeinalleen.test.js` | 2 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `domeingrens.test.js` | 8 | gezakt op `===->!==#0` | DE DOMEINGRENS: laat hij door wat mag, en houdt hij tegen wat niet mag? Waar dit over gaat: server.js geeft elke router hetzelfde object `kern` met ruim negenhonderd eigenschappen, dus kan elk domein bij alles van... |
 | `doodspoor.test.js` | 20 | gezakt op `===->!==#0` | DE DOODSPOORMETER (scripts/doodspoor.js) -- ziet hij een dood spoor? MAATSTAF.md par. |
@@ -537,7 +537,6 @@ toets omvalt.
 | `gastorder.test.js` | 12 | gezakt op `liegpoort /api/` | RTG HOSPITALITY GUEST OS -- de gastkant van de horecatoren. WAT DIT BESTAND BEWAAKT, en waarom juist deze dingen. |
 | `gastregels.test.js` | 6 | gezakt op `liegpoort /api/` | De gast-regels bij eten bestellen: een gratis account mag thuisbezorgd bestellen (met EUR 2,50 ex btw servicekosten; leden betalen die nooit), mag pas een restaurant reserveren als het ID geverifieerd is, telt tot... |
 | `gastroomservice.test.js` | 7 | gezakt op `liegpoort /api/` | HET GUEST OS OP DE KAMER: roomservice. DE DERDE NAAD, en de scherpste. |
-| `gastsplitsing.test.js` | 4 | gezakt op `===->!==#0` | DE GAST IS TWEE MENSEN -- de meter van stap 5 (SAMENLEVING.md par. 12). |
 | `gastverzoek.test.js` | 12 | gezakt op `liegpoort /api/` | WAT EEN GAST VRAAGT IN PLAATS VAN BESTELT. De gastkant kon bestellen en afrekenen, maar niet zeggen "kunt u even komen". |
 | `gastzorg.test.js` | 3 | gezakt op `liegpoort /api/` | De zorgvolle keten: het zorgprofiel reist alleen met toestemming mee met bestellingen en verblijven, en de live locatie is alleen zichtbaar voor zaken die de gast zelf aanwees, tot de zaak (of de gast) het stopt. |
 | `gebaar-omweg.test.js` | 2 | gezakt op `return-weg#1` | GEEN OMWEG LANGS veegDoor IN DE GEBAARPROEVEN (EDGE.md par. 11, ronde 2). |
@@ -1424,7 +1423,6 @@ toets omvalt.
 | `rtmail.test.js` | 13 | gezakt op `===->!==#0` | RTMAIL: het interne postsysteem (de rail voor de automatiseringen). Unit-test op de motor met een nep-db, zodat we send/postvak/ongelezen/lees los kunnen bewijzen zonder de server te starten. |
 | `rugdekking.e2e.test.js` | 15 | gezakt op `liegpoort /api/` | RUGDEKKING OVER HTTP -- staat RTG achter een mens, of koopt het iets van hem? Dit is de vork uit RUGDEKKING.md par. |
 | `runtime-release-stempel.test.js` | 1 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `rust-eindigt.test.js` | 4 | gezakt op `&&->||#0` | RUST EINDIGT VANZELF -- eis 2 van SAMENLEVING.md par. 6. |
 | `rust-migraties.test.js` | 2 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rust-noodstop.test.js` | 1 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rust.test.js` | 6 | gezakt op `liegpoort /api/` | Versleuteling in rust, gemeten in plaats van beloofd. De belofte is: met RTG_ENC_KEY staat er niets leesbaars van een lid op schijf. |
@@ -1933,7 +1931,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-276 bestanden, 484 beweringen.
+278 bestanden, 486 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2047,6 +2045,7 @@ toets omvalt.
 | `klimaatfonds-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | HET KLIMAATFONDS (/apps/foundation/klimaatfonds.html) IN EEN ECHTE BROWSER. Het Klimaatfonds is een VENSTER op het Living Lab en geen tweede lab: de bewonersdeuren van kern/livinglab (thema aandragen, stemmen,... |
 | `kosten.e2e.js` | 2 | genoemd | HET KOSTENBORD IN EEN ECHTE BROWSER. test/kosten.test.js bewijst wat de SERVER doet. |
 | `kostenklant.e2e.js` | 2 | genoemd | DE KLANTKANT VAN DE KOSTPRIJSLAAG, IN EEN ECHTE BROWSER. test/kosten.e2e.js beproeft het BORD van de boardroom; dit is de andere kant: wat een LID (de stand Kosten in RTG Geld) en een ZAAK (/apps/zaakkosten.html) te... |
+| `kwesties-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | DEMOCRATIEOS V1 IN EEN ECHTE BROWSER: /apps/foundation/kwesties.html (de burger) en /apps/foundation/kwestiekantoor.html (het kantoor op naam). test/democratie.test.js en test/democratie-aanval.test.js bewijzen de... |
 | `kwijtschelding-scherm.e2e.js` | 1 | -- | Schermtoets: de kwijtschelding in het Belastingkantoor gaat door TWEE inspecteurs, en dat moet je op het scherm ook ZIEN. De regel zelf staat vast in test/belastingkantoor.test.js (de server weigert dezelfde ogen). |
 | `laatstedrie.e2e.js` | 1 | -- | De laatste drie schermen zonder eigen toets: RTG Camera, RTG Eye en het tweede scherm. WAAROM DEZE DRIE OVERBLEVEN, en waarom dat geen toeval is: twee ervan vragen de CAMERA (`getUserMedia`) en de derde is een tweede... |
 | `ledenschermen.e2e.js` | 3 | gezakt op `liegpoort /api/` | DE LEDENSCHERMEN: WAT HET HUIS OVER ZICHZELF ZEGT. Achttien schermen uit de lijst van TAKEN 4.9, en ze hebben iets gemeen dat de andere groepen niet hebben: ze staan het dichtst bij het lid, en juist daar doet dit... |
@@ -2147,6 +2146,7 @@ toets omvalt.
 | `saloon-edge.e2e.js` | 1 | gezakt op `liegpoort /api/` | De goedgekeurde mobiele Saloon gebruikt één echte Edge, ook in de lezer. Publiceer bij de bron: geen onderschepte succesantwoorden of nepkaarten. |
 | `saloon-redactie.e2e.js` | 1 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `saloon.e2e.js` | 1 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `samendoen-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | HET DOENETWERK IN EEN ECHTE BROWSER: de kaart "Samen doen" op /apps/foundation/kwesties.html, en wat het kantoor ervan ziet. test/democratie-doe.test.js bewijst de regels op de routes. |
 | `scan-tafel.e2e.js` | 1 | -- | Scherm-test: de tafel-QR-stroom in de leden-app. We loggen als lid in (token in localStorage), openen de app, klikken op de scan-knop en voeren met de hand een tafel-QR-payload in (headless heeft geen camera). |
 | `scanner.e2e.js` | 2 | -- | Scherm-test voor RTG Scanner: foto's kiezen (de weg die ook zonder camera werkt), de paginastrook, en bewaren als PDF die als gewoon bestand in de Bestanden-kluis belandt (map Scans). De camera zelf valt buiten... |
 | `schuif.e2e.js` | 1 | -- | GEEN SCHERM SCHUIFT ZIJWAARTS. Waarom deze toets bestaat. |

@@ -17,15 +17,15 @@ Drie soorten onderdeel, en ze gedragen zich verschillend:
 
 | wereld | huis | onderdelen |
 |---|---|---|
-| **LivingOS** | `/apps/rtg.html` | 59 |
+| **LivingOS** | `/apps/rtg.html` | 58 |
 | **WorkOS** | `/apps/kantoor.html` | 17 |
 | **TravelOS** | `/apps/reizen.html` | 15 |
-| **FoundationOS** | `/apps/foundation/os-publiek.html` | 11 |
+| **FoundationOS** | `/apps/foundation/os-publiek.html` | 12 |
 | | **samen** | **102** |
 
 ## LivingOS
 
-Huis: `/apps/rtg.html` — 59 onderdelen.
+Huis: `/apps/rtg.html` — 58 onderdelen.
 
 | onderdeel | soort | komt uit op |
 |---|---|---|
@@ -35,7 +35,6 @@ Huis: `/apps/rtg.html` — 59 onderdelen.
 | Sociaal | `link:sociaal` | `/apps/sociaal.html` |
 | Geld | `link:geldcommand` | `/apps/geld.html` |
 | RTG Media | `link:mediaos` | `/apps/media.html` |
-| RTG Veilig | `link:veilig` | `/apps/veilig.html` |
 | RTFoundation | `os:rtf` | kiezer in de app |
 | Betalen | `tab:betalen` | `/apps/app.html (stand betalen)` |
 | Wallet | `link:wallet` | `/apps/geld.html#wallet` |
@@ -137,7 +136,7 @@ Huis: `/apps/reizen.html` — 15 onderdelen.
 
 ## FoundationOS
 
-Huis: `/apps/foundation/os-publiek.html` — 11 onderdelen.
+Huis: `/apps/foundation/os-publiek.html` — 12 onderdelen.
 
 | onderdeel | soort | komt uit op |
 |---|---|---|
@@ -150,6 +149,7 @@ Huis: `/apps/foundation/os-publiek.html` — 11 onderdelen.
 | Het schrift | `link:rtfschrift` | `/apps/foundation/schrift.html` |
 | Klimaatfonds | `link:klimaat` | `/apps/foundation/klimaatfonds.html` |
 | Buurtruil | `link:buurtruil` | `/apps/foundation/buurtruil.html` |
+| Wat speelt er | `link:kwesties` | `/apps/foundation/kwesties.html` |
 | Geven | `link:geven` | `/apps/foundation/geven.html` |
 | Vrienden | `link:vrienden` | `/apps/foundation/vrienden.html` |
 

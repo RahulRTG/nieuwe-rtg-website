@@ -111,7 +111,7 @@ prijs of doelgroep; ze moeten elk een stabiele menselijke context zijn.
 | **LivingOS** | `/apps/rtg.html` | mijn dagelijks leven | 59 |
 | **WorkOS** | `/apps/kantoor.html` | mijn werk en organisaties | 17 |
 | **TravelOS** | `/apps/reizen.html` | mijn reizen en onderweg zijn | 15 |
-| **FoundationOS** | `/apps/foundation/os-publiek.html` | zorg, hulp en maatschappelijke vooruitgang | 11 |
+| **FoundationOS** | `/apps/foundation/os-publiek.html` | zorg, hulp en maatschappelijke vooruitgang | 12 |
 
 Die laatste kolom telt items in `MAPPEN` en geen schermen. De tabel wordt
 machinaal vergeleken met de code, dus als hij niet meer klopt zakt de bouw.
@@ -269,6 +269,14 @@ precies wat een beschermd kind niet heeft. Er komt geen geld aan te pas en er
 staat nergens een prijs; wat een winkel wel zou vragen (een doneerknop, een
 RTF-entiteit om aan te betalen, btw en retour) staat in de kop van
 `server/kern/rtfos/ruil.js` met de reden waarom het er niet is.
+
+**Wat speelt er** (`/apps/foundation/kwesties.html`) kwam er op 28 september
+2026 bij als twaalfde: de burgerkant van DemocratieOS (`POLITIEK.md`). Een lid
+brengt een kwestie in, volgt de voortgang en leest de uitkomst met de reden. Het
+hoort hier en niet in LivingOS om dezelfde contextvraag: wie iets aankaart bij
+wie erover gaat, denkt niet dat hij in zijn huishouden zit. De kantoorkant
+(`kwestiekantoor.html`) is geen onderdeel van deze wereld maar een kamer van het
+RTF-kantoor, en telt daarom niet mee.
 
 Gemeten: van de 71 schermen onder `public/apps/foundation/` gaan er acht over de
 stichting als organisatie (`os-bestuur`, `os-donateur`, `os-vrijwilliger`,

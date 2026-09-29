@@ -30,7 +30,7 @@ function maakBeeld() {
         terugkoppeling: (eigenRefs && r.terugkoppeling)
           ? (eigenRefs.map(ref => r.terugkoppeling[ref]).find(Boolean) || null) : undefined
       })),
-      tijdlijn: regels.map(t => ({ at: tijd(t.at), wat: t.wat, ronde: t.ronde, stand: t.stand || t.naar || null }))
+      tijdlijn: regels.map(t => ({ at: tijd(t.at), wat: t.wat, ronde: t.ronde, stand: t.stand || t.naar || t.fase || null }))
     };
   };
 }

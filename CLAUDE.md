@@ -143,7 +143,10 @@ codenaam 90 dagen in `plaatsLog`. De eerste stap is daarom geen functie maar
 twee metingen (`plaatsvorm` en `positiestroom`), en de tellers worden een
 permanente meter: groen betekent dat de code aantoonbaar geen verboden
 bewegingsspoor maakt, niet dat het beleid dat zegt. Aankomst wordt nooit uit een
-opgeslagen positie bewezen. Namen: in dit huis is een `spoor` het AUDITspoor
+opgeslagen positie bewezen. Dat is geen pleidooi voor minder GPS (N11): tijdens
+een taak mag alles wat goede navigatie vraagt, en de grens gaat over wat er na
+de taak van de mens overblijft -- huidige positie en een begrensd venster wel,
+een bewegingsgeschiedenis niet. Namen: in dit huis is een `spoor` het AUDITspoor
 (`stilspoor`, `spoorvorm`), dus posities heten een bewegingsspoor; `bereik` en
 `overdracht` zijn bezet (de ETA-dienst heet `reistijd`, de overgang `doorgave`),
 en "World" botst met WERELDEN.md.

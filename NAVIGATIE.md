@@ -156,7 +156,24 @@ getal als zekerheid dat geen meting is (par. 12, gebrek 4).
 ### P-05 — Een plaats leert van haar bronnen, niet van het bewegingsspoor van haar bezoekers
 
 > Een plaats wordt rijker doordat een bron iets over haar zegt, nooit doordat
-> RTG vaststelt dat mensen er waren.
+> RTG vaststelt dat mensen er waren. **Een actieve handeling mag een positie
+> verwerken wanneer die positie noodzakelijk is voor die handeling;
+> noodzakelijke verwerking wordt niet vanzelf een blijvend bewegingsspoor.**
+
+De tweede zin is er sinds 29 september, en hij staat er om een verkeerde lezing
+tegen te houden: deze regel gaat **niet** over hoe weinig GPS RTG gebruikt. Hij
+gaat over wat er ná de taak van overblijft. Er zijn drie dingen, en alleen het
+derde is het probleem:
+
+| | wat | mag |
+|---|---|---|
+| **1. huidige positie** | *ik ben nú hier* | ja -- zonder kan niemand navigeren, herberekenen of een afslag herkennen |
+| **2. tijdelijk venster** | *voor deze rit, deze nadering, dit alarm is dit nodig* | ja -- met een doel, een einde en bevoegde ontvangers |
+| **3. bewegingsgeschiedenis** | *hier kwam deze persoon de afgelopen 90 dagen langs* | nee |
+
+De eerste twee zijn wat `PLAATS.md` een **venster** noemt; de derde is wat het
+verbiedt. Dit document voegt dus geen strengere regel toe, maar maakt de
+bestaande scherp op de plek waar hij stil werd overschreden.
 
 Mag: de ondernemer bevestigt een ingang, het kassasysteem bevestigt dat de zaak
 open is, het reserveringssysteem kent beschikbaarheid, een partner-event meldt
@@ -189,6 +206,51 @@ van `BESTUUR.md`, toegepast op een plaats.
 
 **Handhaver vandaag:** niemand. Partner-events dragen wel hun zaakcode, maar er
 is geen scherm dat een plaatsfeit met herkomst toont.
+
+### 1.1 De productlat: minstens even goede kernnavigatie (N11)
+
+De grondwet beperkt wat er ná een taak overblijft, niet wat het systeem tijdens de
+taak mag berekenen. De ambitie is dus niet minder navigatie maar **minstens even
+goede kernnavigatie, plus een veel diepere aansluiting op de bedoeling, plus
+minder blijvend bewegingsspoor**. Gelezen op 29 september 2026:
+
+| vermogen | stand |
+|---|---|
+| live positie tijdens de rit | **staat** (`public/shared/plek.js`, `navigatie.html`) |
+| bocht-voor-bocht | **staat** (`stappenVan` in `server/kern/navigatie/wegennet.js`) |
+| gesproken aanwijzingen | **staat** (`zeg()` in `navigatie.html`) |
+| auto, EV (accu en bereik), fiets, lopen | **staat** (`MODI`, `accuProcent`, `bereikKm`) |
+| verkeer en afsluitingen | **staat voor de helft**: Flits en partner-events wegen mee; een landelijke bron ontbreekt |
+| herberekenen | **een stap weg**: elke 30 seconden op de klok (`navigatie.html:952`), niet op het moment dat iemand van de route afwijkt |
+| gemiste afslag herstellen | **een stap weg**: volgt uit herberekenen bij afwijking |
+| rijstrookadvies | **jaren weg**: het NWB kent geen rijstroken of afslagbeperkingen (`NEDERLAND-WEGENNET.md`) |
+| offline routeren | **een stap weg**: de graaf staat op het toestel, de motor niet (par. 9.2) |
+| nauwkeurige ETA | **een stap weg in vorm, jaren weg in trefzekerheid**: zie hieronder |
+| juiste parkeerplaats, juiste ingang | **vraagt een besluit** (par. 4, schakel 10) |
+| nadering, doelaankomst, volgende bestemming | par. 4, schakels 11, 13-15 en 20 |
+| even betrouwbaar buiten Nederland | **spoor 2** (par. 9) |
+
+**Waar P-05 echt iets kost: de ETA in druk verkeer.** Een nauwkeurige reistijd bij
+file komt klassiek uit de snelheden van veel meerijdende toestellen -- precies het
+bewegingsspoor dat deze these niet wil. De uitweg is geen uitzondering op P-05
+maar een BRON: meldingen die leden bewust doen (Flits), wat zaken zelf publiceren
+(partner-events), en open verkeersgegevens van de wegbeheerder. Nederland heeft
+die laatste als open data (het Nationaal Dataportaal Wegverkeer); dat die hier
+bruikbaar en bereikbaar is, is **niet nagegaan** en heeft de graad `vermoed`.
+
+**En de trefzekerheid van de ETA wordt gemeten zonder bewegingsspoor.** Wat nodig
+is, is een voorspelde en een werkelijke reistijd per rit -- en die tweede komt uit
+een vertrek en een aankomst die een DOMEIN bevestigde (par. 7.4,
+`gemetenReistijd`), niet uit de punten ertussen. Wat daarvan bewaard wordt is de
+afwijking per soort route, zonder sleutel of codenaam; een lijst *deze persoon
+deed er zo lang over* is een bewegingsgeschiedenis met een andere naam.
+
+**Het ambitieuze pad is het toestel.** Als het routeren daar draait, weet de
+telefoon *je bent hier, over 220 meter rechts, je hebt de afslag gemist, nieuwe
+route, je nadert, ingang B is beter* -- en levert de server alleen het wegennet,
+de actuele afsluitingen, waar ingang B ligt en de toestand van de plaats. Dat is
+technisch zwaarder dan de positie naar de server sturen, en het is de reden dat
+spoor 2 geen bijzaak is.
 
 ---
 
@@ -508,6 +570,12 @@ vervangt:
 | `passageLog` | een regel *deze codenaam kwam langs deze plaats* die niet het doel van het venster was |
 | `aankomstUitPositie` | een domeinstand `aangekomen` (of verder) die werd gezet op grond van een positie |
 | `onbegrensdeRitlijn` | een reeks posities aan een rit of opdracht zonder termijn |
+
+**De meter telt geen gebruik als schuld.** Een positie die tijdens een taak wordt
+verwerkt (categorie 1 en 2 van P-05) is `toegestaan` of `venster`, en die klassen
+zijn groen. Een meter die *minder GPS* beloont, zou de navigatie slechter maken
+en het verkeerde getal laten dalen (N11). Wat hij telt, is wat er na de taak
+van de mens overblijft.
 
 **Groen betekent niet dat het beleid zegt dat er geen bewegingsspoor is. Groen
 betekent dat de code aantoonbaar geen verboden bewegingsspoor maakt.**
@@ -881,12 +949,13 @@ gebruikt iemand weer een hemelsbrede afstand als taxiprijs.
 De codelezing liet zien dat de these scherper is dan de implementatie: het huis
 zegt *geen bewegingsspoor*, en er ontstaat er technisch op meerdere plekken nog
 wel een. De eigenaar koos daarom eerst voor de fundering en niet voor nieuwe
-navigatiefuncties. Tien besluiten:
+navigatiefuncties. Elf besluiten; N11 kwam later die dag, om te voorkomen dat de
+andere tien als *minder GPS* worden gelezen:
 
 | # | besluit | wat het vastlegt |
 |---|---|---|
 | **N1** | **P-05 is hard** | een plaats wordt rijker uit bronnen en domeingebeurtenissen, nooit uit het bewegingsspoor van bezoekers; *technisch handig* is geen uitzondering |
-| **N2** | **centrale bewegingsopslag wordt afgebouwd** (richting van B8) | eerst de nulmeting; daarna per opslag **doel, minimale gegevens, levensduur en noodzakelijkheid** afdwingen. Niet blind verwijderen: een positie die voor een concrete veiligheids- of ritfunctie nodig blijkt, blijft -- met een termijn. `plaatsLog` met passages onder een codenaam past niet bij de these |
+| **N2** | **centrale bewegingsopslag wordt afgebouwd** (richting van B8) | eerst de nulmeting; daarna per opslag **doel, minimale gegevens, levensduur en noodzakelijkheid** afdwingen. Niet blind verwijderen: de eerste vraag bij elke opslag is *waarom bestaat hij* (rituitvoering, veiligheid, een geschil, fraude, de werkelijk gereden afstand, bescherming van bestuurder of passagier). `plaatsLog` met passages onder een codenaam past niet bij de these. De punten van een rit NA de rit bewaren is geen termijnvraag maar een besluit: zie B10 |
 | **N3** | **aankomst wordt nooit uit een opgeslagen positie bewezen** (scherper dan B9) | nadering mag binnen een venster HELPEN; het aankomstBEWIJS komt van het domein of de mens. Een hek-overgang is dus ook geen aankomst, alleen een nadering. `test/grand-integratie.pg.test.js:306-308` handhaaft vandaag het tegendeel en moet om -- hardop, als besluit, en niet als toets die stil wordt aangepast |
 | **N4** | **`reistijd` is de naam** | en de dienst geeft meer terug dan minuten: route, afstand, graad, bron, onzekerheid en de reden van een weigering (par. 7.3) |
 | **N5** | **`doorgave` is de domeingrens** | de navigatie brengt tot een overdraagbaar punt en geeft minimale context door; daarna is het ontvangende domein eigenaar. **Er komt geen centrale reiseigenaar** (par. 4, schakel 13) |
@@ -895,6 +964,7 @@ navigatiefuncties. Tien besluiten:
 | **N8** | **het restaurant is de gouden proef** (proef 1) | niet Vonk, taxi of bezorging eerst: het raakt Plaats, Navigatie, Move, Horeca, Arrival en betaling tegelijk, en staat al op 9 van 20. Het TWEEDE domein (B4) blijft open |
 | **N9** | **internationaal loopt parallel** | Nederland is de eerste bewijsomgeving en niet de architectuurgrens. Een buitenlandse bestemming komt nooit meer ongemerkt op het oefenraster terecht alsof het een echte route is |
 | **N10** | **de terughoudendheidstellers worden een permanente grondwetmeter** | geen eenmalige migratiecheck. *Groen betekent niet dat het privacybeleid zegt dat RTG geen bewegingsspoor maakt; groen betekent dat de code aantoonbaar geen verboden bewegingsspoor maakt.* De vijf tellers komen uit de nulmeting en niet uit dit document (par. 6.4) |
+| **N11** | **niet doorschieten: privacy is geen excuus voor een slechter product** | de vraag is niet *hoe weinig GPS kunnen we gebruiken* maar *hoeveel waarde halen we uit een positie op het moment dat de mens die nodig heeft, zonder er daarna meer over die mens aan over te houden dan noodzakelijk*. Tijdens een taak mag alles wat goede navigatie vraagt (par. 1.1). De server mag een positie kennen **voor een uitdrukkelijke functie, alleen wat die nodig heeft, alleen zo lang als nodig, alleen voor bevoegde ontvangers, en nooit stil hergebruikt voor een bewegingsprofiel** -- een ophaalpunt voor een taxi, een alarm, live delen met een vriend, een bezorging. Het technisch ambitieuze pad is intelligentie naar het TOESTEL verplaatsen, niet de server dom maken |
 
 Plus twee afbakeningen die bij de besluiten horen:
 
@@ -915,10 +985,19 @@ spoor" en "spoor verplicht" zouden dan in één huis over twee dingen gaan. Deze
 documenten zeggen daarom **bewegingsspoor** waar ze posities bedoelen, en de
 meter heet **`positiestroom`** (gemeten vrij).
 
+**B10 hoort erbij, en hij is door N2 zichtbaar geworden: de punten van een rit ná
+de rit.** Een vervoersopdracht bewaart tot zestig posities zonder termijn (par.
+6.2). Er kunnen goede redenen voor zijn -- een geschil over een rit, fraude, de
+werkelijk gereden afstand, bescherming van bestuurder en passagier. Maar
+`PLAATS.md` grens 1 zegt: *buiten een lopend venster bestaat er geen reeks
+punten*, en na het sluiten blijft *hoogstens de laatste bekende plek*. Punten
+bewaren nadat de rit voorbij is, mag onder die tekst niet, ook niet kort. Dus
+dit is geen termijn die je invult maar een besluit, en de opties staan in 15.1.
+
 ### 15.1 Nog open
 
-Wat hieronder staat is niet door 15.0 beslist. B3, B8 en B9 hebben een richting
-(N6, N2, N3), en de keuze tussen de uitwegen volgt uit de nulmeting. Elk met de
+Wat hieronder staat is niet door 15.0 beslist. B3, B8, B9 en B10 hebben een
+richting (N6, N2, N3, N2), en de keuze tussen de uitwegen volgt uit de nulmeting. Elk met de
 opties, wat ze betekenen en wat ze kosten; de aanbeveling staat vooraan.
 
 **B1. Mag een reservering van een lid de nadering openen?**
@@ -976,12 +1055,28 @@ opties, wat ze betekenen en wat ze kosten; de aanbeveling staat vooraan.
 - *Zo laten en de termijn verkorten.* Kost: de graaf bestaat korter, maar bestaat.
 
 **B9. Automatische aankomst uit een opgeslagen positie** (`/api/live/update`).
-- *De aankomst wordt een hek-overgang op het toestel, en de server hoort alleen
-  `binnen` (aanbevolen).* Dat is de vorm die de plaatslaag al heeft; `db.data.live`
-  bewaart dan geen punt meer. Kost: een toets die het tegenovergestelde handhaaft
-  moet om, en dat hoort hardop.
+- *De NADERING wordt een hek-overgang op het toestel en de server hoort alleen
+  `binnen`; de AANKOMST komt van het domein of de mens (aanbevolen, en de vorm
+  die N3 vraagt).* Dat is de vorm die de plaatslaag al heeft; `db.data.live`
+  bewaart dan geen punt meer. Een deur die opengaat na aankomst, gaat open na een
+  bevestiging en niet na een afstand. Kost: een toets die het tegenovergestelde
+  handhaaft moet om, en dat hoort hardop.
 - *Zo laten, en `/api/live/stop` wist de positie.* Kleiner; lost
-  `serverCoordinaatBuitenVenster` op, niet `aankomstUitGps`.
+  `serverCoordinaatBuitenVenster` op, niet `aankomstUitGps` -- en botst dus met N3.
+
+**B10. De punten van een rit ná de rit** (N2, par. 15.0).
+- *Eerst per reden meten of er één is die punten nodig heeft (aanbevolen).* Voor
+  de werkelijk gereden afstand volstaat een GETAL dat aan het eind van de rit
+  wordt uitgerekend; voor fraude en de meeste geschillen volstaan begin, eind en
+  afstand. Blijkt er een reden over die echt de reeks nodig heeft, dan wordt het
+  de volgende optie. Kost: de afstand moet tijdens de rit worden opgeteld in
+  plaats van achteraf uit punten.
+- *Een bewaarvenster met doel `geschil`:* de reeks blijft verzegeld en voor een
+  vaste termijn bestaan, alleen te openen met een reden, een journaalregel en
+  bericht aan de reiziger, en daarna weg. Kost: een uitzondering op `PLAATS.md`
+  grens 1, uitgeschreven in dat document en niet alleen hier.
+- *Alleen een termijn invullen.* Het kleinst, en het schendt `PLAATS.md` grens 1
+  terwijl het eruitziet als een reparatie.
 
 ---
 

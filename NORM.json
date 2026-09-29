@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1761,
-    "toetsenNietGemeten": 642,
+    "toetsenNietGemeten": 645,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -71,7 +71,7 @@
     "wekkersZonderTrede": 0,
     "wettenOnbewezen": 5,
     "zaakwigGezakt": 0,
-    "zelfpoortendeToetsen": 42,
+    "zelfpoortendeToetsen": 43,
     "geldRoutesPubliek": 0,
     "geldRoutesZonderSemantiek": 1,
     "geldRoutesZonderIdemBewijs": 3,
@@ -149,6 +149,16 @@
     "edgeVeldContextZelf": 11
   },
   "notities": [
+    {
+      "datum": "2026-09-29",
+      "soort": "schuld",
+      "sleutel": "zelfpoortendeToetsen",
+      "van": 42,
+      "vervalt": "2026-12-29",
+      "meter": "zelfpoortendeToetsen 42 -> 43; toetsenNietGemeten 642 -> 645",
+      "reden": "Het partnerkanaal gesplitst (RELEASEKANDIDAAT.md B14): drie nieuwe toetsen. test/partnerpersoneelscode.pg.test.js is een raceproef over twee PostgreSQL-instances (twee boekingen op het laatste gebruik van een personeelscode, een rotatie tegen een boeking met de oude code, een intrekking tegen een uitgifte); die kan niet eerlijk zonder PostgreSQL en Redis, slaat lokaal zonder DATABASE_URL over en staat daarom in scripts/lib/pg-toetslijst.js en onder zelfpoortende-toets. Lokaal tegen echte PostgreSQL en Redis groen, en zonder advisory lock plus FOR UPDATE in pg/collectietransactie.js zakte hij 3 van 3 keer. test/partnerpersoneelscode.test.js (echte server) en test/partnerpersoneelscode-register.test.js (zonder server) zijn gewone toetsen die met de hand gemuteerd zijn (21 van 24 handmutaties rood; de drie groene -- de naameis naast boardroomAuth, de losse no-store naast koppen.js, en alleen de idemsleutels-nooit-regel -- zijn gelijkwaardig en staan in het commitbericht) maar nog niet in MUTATIES.json staan; dat register vult de hoofdsessie op een schone boom.",
+      "waarheen": "toetsenNietGemeten zakt met 2 zodra MUTATIES.json de twee gewone toetsen meet; de pg-proef lost af zoals de andere pg-proeven: de standaardomgeving levert PostgreSQL, en het nul-skipbewijs hangt aan de releasecommit."
+    },
     {
       "datum": "2026-09-27",
       "soort": "structureel",
@@ -3671,6 +3681,12 @@
       "pad": "test/zaakdoos-sleutel.pg.test.js",
       "vervalt": "2026-10-15",
       "reden": "de raceproef voor de sleutel per Zaakdoos (twee rotaties van dezelfde doos, het plafond per zaak en een intrekking tegen een uitgifte over twee instances) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl hij lokaal zonder die infrastructuur expliciet overslaat"
+    },
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/partnerpersoneelscode.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "de raceproef voor de personeelscode per medewerker van het partnerkanaal (B14: twee boekingen tegelijk op het laatste gebruik, een rotatie tegen een boeking met de oude code en een intrekking tegen een uitgifte, over twee instances) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl hij lokaal zonder die infrastructuur expliciet overslaat"
     },
     {
       "regel": "zelfpoortende-toets",

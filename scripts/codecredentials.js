@@ -153,6 +153,8 @@ const REQUIRED_ROUTES = [
   'POST /api/office/doos/sleutel', 'POST /api/office/doos/sleutel/weg',
   'POST /api/supplier/doos/sleutel', 'POST /api/supplier/doos/sleutel/weg',
   'GET /api/doos/kloon', 'POST /api/doos/buurmelding',
+  'POST /api/office/partnerkanaal/personeelscode', 'POST /api/office/partnerkanaal/personeelscode/roteer',
+  'POST /api/office/partnerkanaal/personeelscode/intrek', 'POST /api/office/partnerkanaal/personeelscodes',
   'POST /api/office/stad/sleutel', 'POST /api/stad/doos/hartslag',
   'POST /api/stad/doos/meting', 'POST /api/techniek/sso',
   'POST /api/techniek/sso/scimsleutel',

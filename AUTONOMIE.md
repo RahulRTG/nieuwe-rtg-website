@@ -59,9 +59,9 @@ gedrag zonder commentaar mee te lezen):
 | bewijs | kan de uitkomst herkomst, graad of peilmoment tonen? | `BEWIJS_ONTBREEKT` |
 
 De stand: <!--getal:bedrijfsmaat.maten-->67<!--/getal--> maten over de 28 domeinen van de eigenaar.
-<!--getal:bedrijfsmaat.bestaat-->45<!--/getal--> bestaan, <!--getal:bedrijfsmaat.half-->19<!--/getal--> half en <!--getal:bedrijfsmaat.ontbreekt-->3<!--/getal--> ontbreken.
-Van de bestaande zien er <!--getal:bedrijfsmaat.gedeeltelijk-->17<!--/getal--> een deel van de werkelijkheid niet
-(`gedeeltelijk`, met de reden). <!--getal:bedrijfsmaat.ketensGegrond-->5<!--/getal--> van de zes ketens is gegrond, en er staan
+<!--getal:bedrijfsmaat.bestaat-->46<!--/getal--> bestaan, <!--getal:bedrijfsmaat.half-->18<!--/getal--> half en <!--getal:bedrijfsmaat.ontbreekt-->3<!--/getal--> ontbreken.
+Van de bestaande zien er <!--getal:bedrijfsmaat.gedeeltelijk-->18<!--/getal--> een deel van de werkelijkheid niet
+(`gedeeltelijk`, met de reden). <!--getal:bedrijfsmaat.ketensGegrond-->6<!--/getal--> van de zes ketens is gegrond, en er staan
 <!--getal:bedrijfsmaat.privacyGaten-->0<!--/getal--> projecties over mensen zonder afgedwongen groepsgrens.
 
 De eerste meting (commit `2820af35`) stond op 61 maten, 22 bestaand en 9

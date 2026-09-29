@@ -59,7 +59,9 @@ async function main() {
             };
           });
           const s = row.state;
+          row.clippedContent = await page.evaluate(require('./lib/desktop-content'));
           row.failures = [];
+          if (row.clippedContent.length) row.failures.push('clipped-app-content');
           if (row.http !== 200 && route !== '/site/404.html') row.failures.push('http-'+row.http);
           const expectedTop = (mobile ? 136 : !s.public && s.world === 'living' ? 154 : 104) - (/^(compact|focus)$/.test(s.edgeState || '') ? 64 : 0);
           if (Math.abs(s.shell?.y+s.pageScroll-expectedTop) > 2) row.failures.push('nonstandard-top-inset');

@@ -105,6 +105,9 @@ module.exports = function bouwKernAanTwee(kern, grens) {
      ronde in kern/link/rem.js. */
   Object.assign(kern, require('../kern/link')({
     db: kern.db, save: kern.save, crypto,
+    /* de capability-drager claimt in een collectietransactie (B15). Uit de
+       opslag zelf: `kern` draagt hem hier niet, en hij gaat ook niet in `kern`. */
+    bewerkCollectie: require('../db').bewerkCollectie,
     dyncodeGeef: () => kern.dyncode,
     codenaamVan: (sleutel) => kern.codenaamVan(sleutel),
     // dezelfde teller als de rest van deze laag gebruikt, per lid per onderwerp

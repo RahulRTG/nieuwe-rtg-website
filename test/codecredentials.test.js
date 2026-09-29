@@ -81,8 +81,8 @@ test('de echte credentials uit de classificatieronde blokkeren de release', () =
   const register = poort.lees();
   const uit = poort.controleer(register);
   // office.gedeelde_kantoorcode is in productie gesloten (B10): zie de toets hieronder
-  // partnerkanaal.personeels_en_partnercode is gemigreerd (B14): zie de toets hieronder
-  const echte = ['link.capability_aanvaarden', 'travelos.ov_incheckcode',
+  // partnerkanaal.personeels_en_partnercode (B14) en link.capability_aanvaarden (B15) zijn gemigreerd: zie de toetsen hieronder
+  const echte = ['travelos.ov_incheckcode',
     'mode.bezorgcode', 'festivalos.toegangspas',
     'identity.sso_client_secret',
     'rtfos.activiteit_incheckcode',
@@ -112,26 +112,8 @@ test('de echte credentials uit de classificatieronde blokkeren de release', () =
     }
 });
 
-/* B14 (29 september 2026): het partnerkanaal is gesplitst. De personeelscode is
-   een gemigreerde credential per medewerker; de partnercode een openbare
-   attributie die niets opent. */
-test('het partnerkanaal is gesplitst: personeelscode gemigreerd, partnercode een openbare attributie', () => {
-  const register = poort.lees();
-  const uit = poort.controleer(register);
-  const d = register.deuren.find(x => x.id === 'partnerkanaal.personeels_en_partnercode');
-  assert.equal(d.status, 'migrated');
-  assert.equal(d.release_blocker, false);
-  assert.ok(!uit.blockers.some(x => x.id === d.id), 'blokkeert niet meer');
-  for (const c of poort.CONTROLES) assert.equal(d.controls[c], true, c);
-  assert.equal(d.controls.entropy_bits, 128);
-  assert.ok(d.bewijs.includes('test/partnerpersoneelscode.pg.test.js'), 'de atomaire claim over twee instances');
-  for (const route of poort.effectieveRoutes(d))
-    assert.ok(poort.REQUIRED_ROUTES.includes(route), route + ' hoort bewaakt te zijn');
-  const a = register.deuren.find(x => x.id === 'partnerkanaal.partnercode_attributie');
-  assert.equal(a.classificatie, 'public_identifier');
-  assert.equal(a.status, 'closed');
-  assert.ok(a.routes.includes('POST /api/partner'));
-  assert.ok(String(a.notitie).length >= 40);
+  // partnerkanaal.personeels_en_partnercode (B14) en link.capability_aanvaarden (B15) zijn gemigreerd: zie de toetsen hieronder
+  const echte = ['travelos.ov_incheckcode',
 });
 
 /* B10 (27 september 2026): de gedeelde kantoorcode is in productie gesloten. Dat

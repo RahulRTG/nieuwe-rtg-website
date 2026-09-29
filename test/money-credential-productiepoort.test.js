@@ -51,20 +51,25 @@ test('de algemene POS blijft volledig open: cadeaukaart en RTG Pay zijn gemigree
   }
 });
 
-/* De kascode en tikcode zijn gemigreerd (27 september 2026, kern/pay/kasbak.js):
-   hun routes en de RTG-Pay-tak van elke kassa zijn open. Wat dicht blijft is de
-   ondertekende Link-drager (link.capability_aanvaarden), aan de HTTP-kant EN in
-   kern/pay/kassacode.js. Elke kascode-inning loopt langs EEN claim. */
-test('kascode en tik zijn open; de Link-drager en iedere inning blijven op een plek bewaakt', () => {
+/* De kascode en tikcode zijn gemigreerd (27 september 2026, kern/pay/kasbak.js),
+   en de ondertekende Link-drager (link.capability_aanvaarden) sinds 29 september
+   2026 ook (besluit B15, kern/link/cap-bak.js): hun routes en de RTG-Pay-tak van
+   elke kassa zijn open, ook `geld.kassa` maken en het supplier-loket. Elke
+   kascode-inning loopt nog steeds langs EEN claim. */
+test('kascode, tik en de Link-drager zijn open; iedere inning blijft op een plek bewaakt', () => {
   for (const pad of ['/api/pay/kascode', '/api/pay/kascode/intrek', '/api/supplier/pay/in',
     '/api/supplier/pay/vooraf', '/api/supplier/pay/vastleg', '/api/pay/tikcode', '/api/pay/tikcode/intrek', '/api/pay/tik'])
     assert.equal(roep({ path: pad, body: { method: 'rtgpay', methode: 'rtgpay' } }).door, 1, pad);
-  for (const [pad, body] of [['/api/link/cap/maak', { handeling: 'geld.kassa' }], ['/api/supplier/link/cap/aanvaard', {}]]) {
-    const r = roep({ path: pad, body });
-    assert.equal(r.status, 503, pad);
-    assert.equal(r.json.feature, 'link.capability_aanvaarden', pad);
-  }
-  assert.equal(roep({ path: '/api/link/cap/maak', body: { handeling: 'contact.verbinden' } }).door, 1);
+  for (const [pad, body] of [['/api/link/cap/maak', { handeling: 'geld.kassa' }], ['/api/supplier/link/cap/aanvaard', {}],
+    ['/api/link/cap/aanvaard', {}], ['/api/link/cap/trek', {}], ['/api/link/cap/maak', { handeling: 'contact.verbinden' }]])
+    assert.equal(roep({ path: pad, body }).door, 1, pad);
+  assert.equal([...maakPoort.EXACT.values()].includes('link.capability_aanvaarden'), false);
+  const deur = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'CODECREDENTIALS.json'), 'utf8'))
+    .deuren.find(d => d.id === 'link.capability_aanvaarden');
+  assert.equal(deur.status, 'migrated');
+  assert.equal(deur.release_blocker, false);
+  assert.ok(deur.bewijs.includes('test/linkcap-credential.test.js'));
+  assert.ok(deur.bewijs.includes('test/linkcap-credential.pg.test.js'));
   assert.deepEqual(serverAanroepBestanden(/\b(?:pay\.kasInt|kern\.kasInnen)\s*\(/), ['server/kern/pay/kasinnen.js',
     'server/kern/pay/kassacode.js', 'server/routes/festival/verkoop.js', 'server/routes/pay-zaak.js',
     'server/routes/supplier/kassa/afrekenen.js', 'server/routes/supplier/retail.js',
@@ -113,12 +118,18 @@ test('ontwikkeling blijft bruikbaar en geld terug vrijgeven blijft in productie 
 });
 
 test('Express-varianten met encoding, hoofdletters of een eindslash zijn geen omweg', () => {
-  for (const pad of ['/API/SUPPLIER/LINK/CAP/AANVAARD', '/api/supplier/link/cap/aanvaard/', '/api/supplier/link/cap/%61anvaard',
-    '/API/SUPPLIER/LINK/CAP/AANVAARD/?x=1']) {
-    const r = roep({ url: pad, path: undefined });
-    assert.equal(r.status, 503, pad);
-    assert.equal(r.door, 0, pad);
-  }
+  /* EXACT is sinds B15 leeg; de canonieke lezing van het pad blijft de regel
+     voor de volgende deur die hier dicht gaat. Beproefd met een tijdelijke. */
+  maakPoort.EXACT.set('/api/proef/geldcode/innen', 'proef.geldcode');
+  try {
+    for (const pad of ['/API/PROEF/GELDCODE/INNEN', '/api/proef/geldcode/innen/', '/api/proef/geldcode/%69nnen',
+      '/API/PROEF/GELDCODE/INNEN/?x=1']) {
+      const r = roep({ url: pad, path: undefined });
+      assert.equal(r.status, 503, pad);
+      assert.equal(r.door, 0, pad);
+    }
+  } finally { maakPoort.EXACT.delete('/api/proef/geldcode/innen'); }
+  assert.equal(roep({ url: '/API/PROEF/GELDCODE/INNEN', path: undefined }).door, 1, 'weg is weg');
 });
 
 test('de poort staat na begrensde body-ontleding en vóór idemopslag en domeinhandlers', () => {
@@ -149,7 +160,6 @@ test('hard sluiten wordt niet als gemigreerde money lifecycle verkocht', () => {
   /* Elke deur die deze grendel nog dicht houdt, staat eerlijk als resterende
      releaseblokkade in het register -- nooit als gemigreerd. */
   const dicht = new Set(maakPoort.EXACT.values());
-  assert.ok(dicht.size > 0, 'de grendel houdt nog minstens een deur dicht');
   for (const id of dicht) {
     const deur = register.deuren.find(d => d.id === id);
     assert.ok(deur, id);
@@ -218,9 +228,15 @@ test('kernfuncties kunnen de HTTP-poort in productie niet omzeilen', async () =>
       MIN_CENTEN: 1, MAX_CENTEN: 500000, KASCODE_MS: 1000, KASCODE_MAX: 50000 });
     await assert.rejects(kassa.kasCode({ codenaam: 'A', maxCenten: 100 }), /collectietransactie/);
     await assert.rejects(kassa.kasInt({ supplierCode: 'S', code: 'ruw', centen: 100, idem: 'i' }), /collectietransactie/);
+    /* De Link-drager is gemigreerd (B15): geen eigen grendel meer, maar ook hier
+       geen proceslokale weg -- de kascode eronder en de drager zelf vragen allebei
+       een collectietransactie. */
     const def = require('../server/kern/pay/kassacode')({ pay: kassa, schoon: s => s });
-    assert.equal((await def.lees({}, { codenaam: 'A' })).code, maakPoort.CODE, 'de Link-drager blijft dicht');
-    assert.equal(def.doe({ opdracht: {}, invoer: {}, aanvaarder: {} }).code, maakPoort.CODE);
+    await assert.rejects(def.lees({}, { codenaam: 'A' }), /collectietransactie/);
+    await assert.rejects(def.doe({ opdracht: { code: 'ruw' }, invoer: { centen: 100 }, aanvaarder: { code: 'S' }, idem: 'cap:x' }),
+      /collectietransactie/);
+    const capbak = require('../server/kern/link/cap-bak')({ db: { data: {} }, crypto });
+    assert.throws(() => capbak.claim('A'.repeat(32), { door: 'x' }), /collectietransactie/);
 
     const vooraf = require('../server/kern/pay/vooraf')({});
     assert.equal((await vooraf.kasVrijgeef({ supplierCode: 'S', reservering: 'R' })).status, 501,

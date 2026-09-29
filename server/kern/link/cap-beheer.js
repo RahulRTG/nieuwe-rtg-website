@@ -16,40 +16,32 @@
    Wat er wel mee is gebeurd, staat in ./bonnen.js en blijft staan. */
 'use strict';
 
-module.exports = ({ open, losOp, kaartVan, idVan, opruimen, klok, WEG }) => {
+module.exports = ({ lees, bak, kaartVan, idVan, WEG }) => {
 
 /* Wat er nu nog van mij openstaat. Alleen je eigen; de kaart mag mee, want
    zonder te zien WAT er openstaat valt er niets zinnigs in te trekken. */
 function capOpenVan(uitgever) {
-  opruimen();
   const wie = idVan(uitgever);
   if (!wie) return [];
-  const uit = [];
-  for (const cap of open.values()) {
-    if (cap.uitgeverId !== wie) continue;
-    uit.push({ id: cap.id, handeling: cap.handeling, kaart: kaartVan(cap),
-      tot: new Date(cap.vervalt).toISOString() });
-  }
-  return uit.sort((a, b) => (a.tot < b.tot ? -1 : 1));
+  return bak.openVan(wie).map(r => ({ id: r.id, handeling: r.handeling, kaart: kaartVan(r),
+    tot: new Date(r.vervalt).toISOString() })).sort((a, b) => (a.tot < b.tot ? -1 : 1));
 }
 
 /* Intrekken zolang er niets is gebeurd. Twee ingangen, een besluit: met het
    TOKEN trek je de code in die op je scherm staat, met het ID die je in "mijn
    koppelingen" ziet staan. Wie hem intrekt moet in beide gevallen de uitgever
-   zijn, en dat wordt hier een keer gecontroleerd. */
-function capTrek(uitgever, token, id) {
-  opruimen();
-  let verwijzing = null, cap = null;
-  if (id) {
-    for (const [v, c] of open) if (c.id === String(id)) { verwijzing = v; cap = c; break; }
-  } else {
-    const r = losOp(token);
-    if (!r.fout) { verwijzing = r.verwijzing; cap = r.cap; }
+   zijn, en dat wordt in de collectietransactie van ./cap-bak.js gecontroleerd
+   -- een code die net geclaimd wordt, is niet meer ongebruikt en trekt niet in. */
+async function capTrek(uitgever, token, id) {
+  let code = null;
+  if (!id) {
+    const t = lees(token);
+    if (t.fout) return { status: 404, error: WEG };
+    code = t.code;
   }
-  if (!cap || cap.vervalt < klok()) return { status: 404, error: WEG };
-  if (!idVan(uitgever) || idVan(uitgever) !== cap.uitgeverId)
-    return { status: 403, error: 'Deze code is niet van u.' };
-  open.delete(verwijzing);
+  const r = await bak.intrekken({ code, id: id ? String(id) : null, door: idVan(uitgever) });
+  if (r.fout === 'niet-van-u') return { status: 403, error: 'Deze code is niet van u.' };
+  if (r.fout) return { status: 404, error: WEG };
   return { status: 200, ok: true };
 }
 

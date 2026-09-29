@@ -121,7 +121,9 @@ const ROUTES = new Set([
   /* De personeelscode van het partnerkanaal (kern/partnerpersoneelscode.js, B14):
      uitgeven en roteren dragen de kale 128-bit code, daarna alleen de hash. */
   'POST /api/office/partnerkanaal/personeelscode',
-  'POST /api/office/partnerkanaal/personeelscode/roteer'
+  'POST /api/office/partnerkanaal/personeelscode/roteer',
+  // de RTG Link-drager (B15, kern/link/cap-bak.js): de 128-bit code staat alleen in dit antwoord
+  'POST /api/link/cap/maak'
 ]);
 
 const isEenmalig = (methode, pad) => ROUTES.has(

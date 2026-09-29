@@ -1260,6 +1260,7 @@ opties, wat ze betekenen en wat ze kosten; de aanbeveling staat vooraan.
 - *Zo laten en de termijn verkorten.* Kost: de graaf bestaat korter, maar bestaat.
 
 **B9. Automatische aankomst uit een opgeslagen positie** (`/api/live/update`).
+**Beslist: N13, en uitgevoerd (par. 6.7).** De opties hieronder blijven staan als verantwoording.
 - *De NADERING wordt een hek-overgang op het toestel en de server hoort alleen
   `binnen`; de AANKOMST komt van het domein of de mens (aanbevolen, en de vorm
   die N3 vraagt).* Dat is de vorm die de plaatslaag al heeft; `db.data.live`

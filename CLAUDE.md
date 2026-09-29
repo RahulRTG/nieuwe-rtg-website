@@ -2445,8 +2445,8 @@ het meten: de sluiting van het stuur is klein en precies één module leest van
 schijf -- `VERTROUWEN.json`, een REGISTER. Een register lezen mag, een `.js`
 lezen niet; dát onderscheid is de invariant. De vraag of de 77 registers samen
 één Codewereld vormen is eerst GEMETEN (`npm run codewereld`, `CODEWERELD.json`)
-in plaats van aangenomen -- zelfde reden als bij `Asset`: <!--getal:codewereld.ruggengraat-->5986<!--/getal--> van
-<!--getal:codewereld.paden-->6427<!--/getal--> paden staan in meer dan één register, dus er IS een ruggengraat, maar hij
+in plaats van aangenomen -- zelfde reden als bij `Asset`: <!--getal:codewereld.ruggengraat-->6096<!--/getal--> van
+<!--getal:codewereld.paden-->6542<!--/getal--> paden staan in meer dan één register, dus er IS een ruggengraat, maar hij
 loopt over de as ROUTE. De as SYMBOOL is **nul** -- geen register kent een
 functienaam met een plaats, dus het objectvoorbeeld `pay.boeken` met een
 `symbol`-veld belooft iets wat geen enkele meter vult. Die as is
@@ -2464,10 +2464,10 @@ ROUTER in plaats van uit de bronboom), de dekking staat op
 dat die meting afdwong: een verschil tussen twee registers van VERSCHILLENDE
 leeftijd is een leeftijdsverschil en geen tegenspraak, en die twee worden nooit
 opgeteld. Verder is het bronbereik voor gedrag
-<!--getal:codewereld.bronGedragPct-->55.1<!--/getal-->% -- over de meerderheid van de bronbestanden zegt geen enkel
+<!--getal:codewereld.bronGedragPct-->56.2<!--/getal-->% -- over de meerderheid van de bronbestanden zegt geen enkel
 register iets over gedrag, dus een "80-95% zonder bron te beantwoorden" haalt die
 grens vandaag niet -- en dat ene getal verbergt nog iets, want `server/` haalt
-<!--getal:codewereld.bronServerPct-->59.4<!--/getal-->% en `public/` <!--getal:codewereld.bronPublicPct-->41.4<!--/getal-->%: over de schermen wisten de registers
+<!--getal:codewereld.bronServerPct-->60.6<!--/getal-->% en `public/` <!--getal:codewereld.bronPublicPct-->42<!--/getal-->%: over de schermen wisten de registers
 vrijwel niets (6,6%) tot `SCHERMROUTES.json` erbij kwam, dat per bestand in
 public/ leest welke API-paden het noemt en daarmee de keten scherm -> route legt.
 De aanroepgraaf ligt er sinds dezelfde dag naast (`AANROEPGRAAF.json`,
@@ -2498,12 +2498,12 @@ het register aanwijst leveren zaknamen. Ten tweede telt CODEWERELD.json sinds
 die dag DRIE dingen apart (structuur, relatie, gedrag), omdat een index die elk
 bestand noemt elke dekkingsvraag triviaal waar maakt: dat gebeurde twee keer op
 rij, en het zag er beide keren uit als vooruitgang. Alleen de gedragsteller
-(<!--getal:codewereld.bronGedragPct-->55.1<!--/getal-->%) is de bovengrens voor een vraag als "klopt het" -- en die kwam
+(<!--getal:codewereld.bronGedragPct-->56.2<!--/getal-->%) is de bovengrens voor een vraag als "klopt het" -- en die kwam
 voor de schermen pas op gang met `SCHERMGEDRAG.json`, dat per scherm SAMENSTELT
 wat de routes eronder al gemeten hadden (schrijft het, welke rol, wat is het
 bewijs waard). Twee dingen daar niet wegpoetsen: het is AFGELEID gedrag, dus
 `schrijft: nee` betekent "verandert niets aan de SERVERKANT" en niet "verandert
-niets"; en de <!--getal:schermgedrag.zonderGrond-->151<!--/getal--> schermen waarover het niets kan zeggen staan er MET reden
+niets"; en de <!--getal:schermgedrag.zonderGrond-->149<!--/getal--> schermen waarover het niets kan zeggen staan er MET reden
 in maar tellen niet als dekking (`zonderUitspraak`) -- anders stijgt een
 dekkingsgetal doordat er een meter bij komt die zwijgt. Die meter begon
 op 118 "dode paden" en eindigde op <!--getal:schermroutes.dood-->0<!--/getal-->; de aanroepgraaf begon op 587 onbekende
@@ -2586,8 +2586,8 @@ zeventiende motor bouwt. De kern in één zin: **dit huis heeft geen tekort aan
 motoren, het heeft een tekort aan handelingen die erlangs gaan** -- en dat is
 gemeten in plaats van beweerd. `npm run machinedekking` (`MACHINEDEKKING.json`)
 legt zestien motoren naast elkaar op DEZELFDE route, iets wat geen enkele
-bestaande meter deed: van de <!--getal:machine.muterend-->3938<!--/getal-->
-muterende routes raken er <!--getal:machine.zonderAs-->2819<!--/getal--> geen
+bestaande meter deed: van de <!--getal:machine.muterend-->3946<!--/getal-->
+muterende routes raken er <!--getal:machine.zonderAs-->2827<!--/getal--> geen
 enkele as, <!--getal:machine.motorenZonderRoute-->1<!--/getal--> motoren bereiken
 geen enkele route (bewijstoken, veiligheidskern, gevolgmeting), en de hoogst
 geïntegreerde handeling buiten de hubs raakt DRIE assen -- er is dus geen enkele

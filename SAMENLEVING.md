@@ -453,10 +453,18 @@ alle drie gaven 403:
   "zonder account" is.
 
 Dat is precies de vorm van de meetfout uit par. 11.2, maar dan in de code zelf:
-de tekst gaat over een ACCOUNT, de voorwaarde over een PAS. Welke van de twee
-waar hoort te zijn, is een toegangsbesluit en staat in par. 12. Tot dat besluit
-houden twee ratels het vast: `gastTegenspraak` (3, alleen omlaag) en
-`gastOnderscheidt` (23, alleen omhoog).
+de tekst gaat over een ACCOUNT, de voorwaarde over een PAS.
+
+**Het besluit (29 september 2026): de code volgt de tekst.** Alle drie lopen nu
+langs dezelfde paspoortdeur als besluit 4c (`maakPaspoortdeur()` in
+`server/kern/onvervreemdbaar.js`): een gratis account waarvan RTG het paspoort
+zag mag, een gratis account zonder controle hoort hoe het wel kan, een bezoeker
+zonder account blijft buiten, en een betaalde pas merkt niets.
+`test/paspoortdeur.test.js` draagt de drie deuren naast de eerste drie, en zakt
+als een ervan terug achter de pas gaat. Meekijken en meelezen bleven wat ze
+waren: open. Twee ratels houden het vast: `gastTegenspraak` staat op 0 en mag
+alleen omlaag (dus niet meer omhoog), `gastOnderscheidt` op 23 en mag alleen
+omhoog.
 
 ## 12. De volgorde
 
@@ -468,7 +476,7 @@ houden twee ratels het vast: `gastTegenspraak` (3, alleen omlaag) en
 | 4 | SAM-01 als ratel | **staat** (`test/onvervreemdbaar.test.js`) |
 | 4b | De doelgroepmeter een gratis-accountsessie geven naast de bezoeker | **staat** (par. 11.3); de toegangsvraag bij `werving/verbind` wacht op een mens |
 | 4c | Gemeenteafspraak, aangifte en zorgintake voor een Community-lid | **staat**: open na paspoortcontrole (`server/kern/onvervreemdbaar.js`) |
-| 5 | `guest` splitsen in *bezoeker* en *lid op de bodem* | **gemeten** (par. 11.4, `npm run gastsplitsing`); drie weigeringen beloven een account en vragen een pas -- **vraagt een besluit** |
+| 5 | `guest` splitsen in *bezoeker* en *lid op de bodem* | **staat** (par. 11.4): gemeten met `npm run gastsplitsing`, en de drie tegenspraken zijn op 29 september besloten en dicht; de 82 weigeringen "voor leden" zijn een formuleringsvraag |
 | 6 | Rust verhuizen van Veiligheid naar de bodem, plus de vijf eisen van par. 6 | een stap weg |
 | 7 | Eenvoudige taal als deelnamevorm | een stap weg |
 | 8 | De Foundation-rekening en de ANBI-vraag (GIFT.md) | **vraagt een besluit**; sluit de eerste pijl van de kringloop |

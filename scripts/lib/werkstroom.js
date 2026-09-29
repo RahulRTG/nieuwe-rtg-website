@@ -182,6 +182,11 @@ const INRICHTING = [
   /^npm\s+(?:i|install|add)\b/,
   /^(?:yarn|pnpm)\s+(?:i|install|add)\b/,
   /^npx\s+playwright\s+install\b/,
+  /* `cargo build` BOUWT de Rust-motor die de sentinel- en de pariteitstoets
+     nodig hebben; hij velt zelf geen oordeel, net als `docker build` hieronder.
+     `cargo test` of `cargo clippy` zouden wel poorten zijn, en staan er dus
+     met opzet niet in. */
+  /^cargo\s+build\b/,
   /^sudo\b/, /^apt-get\b/,
   /^docker\s+(?:login|build|push|pull|tag|save|inspect|rm|run|compose|info)\b/,
   /^gh\s/,

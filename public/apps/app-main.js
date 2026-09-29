@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '9ff3863c';
+var RTG_BOUW = 'dafd8a8a';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -6348,7 +6348,7 @@ var RTG_BOUW = '9ff3863c';
     const proj = projectPoints(pts);
     const markers = proj.map((pt,i) => {
       const s = pts[i];
-      return '<div class="mk' + (s.me?' me':'') + '" style="left:' + pt.x.toFixed(1) + '%;top:' + pt.y.toFixed(1) + '%;">' +
+      return '<div class="mk' + (s.me?' me':'') + '" data-x="' + pt.x.toFixed(1) + '" data-y="' + pt.y.toFixed(1) + '">' +
         (s.me ? '<div class="pin"></div>' : '<div>' +RTGGlyf.tekst(s.icon)+ '</div>') +
         '<div class="lbl">' + (s.me ? T('live.you','U') : s.name) + '</div></div>';
     }).join('');
@@ -6359,7 +6359,7 @@ var RTG_BOUW = '9ff3863c';
       if (p.ride && isVeh){
         eta = p.taxiEtaMin != null && p.ride.status !== 'gearriveerd'
           ? '<div class="eta"><div class="n">' + p.taxiEtaMin + '</div><div class="u">' + T('live.mintoyou','min naar u') + '</div></div>'
-          : '<div class="eta"><div class="n" style="font-size:0.9rem;">' + tRide(p.ride.status) + '</div></div>';
+          : '<div class="eta"><div class="n n-klein">' + tRide(p.ride.status) + '</div></div>';
       } else if (p.isDest && L.arrived){
         eta = '<div class="eta arr"><div class="n">✓ ' + T('live.here','ter plaatse') + '</div></div>';
       } else {
@@ -6374,7 +6374,7 @@ var RTG_BOUW = '9ff3863c';
         if (extra.length) line2 += '<br>' + extra.join(' · ');
         // betaling achteraf: de zaak liet de rit direct rijden; afrekenen kan nu
         if (!p.ride.paid && p.ride.quote && p.ride.status !== 'wacht-op-betaling')
-          line2 += '<br><button class="js-rpay" data-rref="' + p.ride.ref + '" data-rq="' + p.ride.quote + '" style="margin-top:0.35rem;background:none;border:1px solid var(--gold);color:var(--rtg-leesgoud,var(--gold));border-radius:0;padding:0.3rem 0.8rem;font-size:0.7rem;font-weight:600;font-family:inherit;cursor:pointer;">' + T('live.betaalrit','Betaal de rit') + ' · ' + eur(p.ride.quote) + '</button>';
+          line2 += '<br><button class="js-rpay live-rpay" data-rref="' + p.ride.ref + '" data-rq="' + p.ride.quote + '">' + T('live.betaalrit','Betaal de rit') + ' · ' + eur(p.ride.quote) + '</button>';
       }
       else if (p.order) line2 += ' · ' + p.order.items + ' ' + T('app.items','item(s)') + ', ' + tStatus(p.order.status);
       return '<div class="live-partner"><span class="pic">' +RTGGlyf.tekst(p.icon)+ '</span><div class="pt"><b>' + p.name + '</b><span>' + line2 + '</span></div>' + eta + '</div>';
@@ -6410,6 +6410,9 @@ var RTG_BOUW = '9ff3863c';
         acts +
       '</div>';
 
+    /* De markers krijgen hun plek hier en niet als style-attribuut: een
+       stijlattribuut houdt style-src-attr open in de CSP (deltapoort). */
+    $('#livePanel').querySelectorAll('.mk[data-x]').forEach(m => { m.style.left = m.dataset.x + '%'; m.style.top = m.dataset.y + '%'; });
     $('#liveStop').addEventListener('click', stopLive);
     const hier = $('#liveHier');
     if (hier) hier.addEventListener('click', async () => {

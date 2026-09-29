@@ -144,6 +144,8 @@ Object.assign(kern, require('../kern/ghost').maakGhost({
    codenaam (flitser/file/ongeval/object/wegwerk) met houdbaarheid, dedupe
    als bevestiging, klopt/weg-stemmen en landregels. Bewust zonder
    spelmechaniek. Na ghost gemount (gebruikt de vooruitblik-motor). */
+// de bevestigde aankomst (NAVIGATIE.md N13); eigen module, zie de kop daar
+Object.assign(kern, require('../kern/aankomst')({ db }));
 Object.assign(kern, require('../kern/flits').maakFlits({
   db, save, crypto, haversine, ghostSimuleer: kern.ghostSimuleer
 }));

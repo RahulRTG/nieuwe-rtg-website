@@ -106,12 +106,12 @@ test('Leerhuis trainer: onder toezicht, bewijs, klaar voor beoordeling en de aan
       }
 
       browser = await pw.chromium.launch(browserOpties());
-      const opScherm = async (wie) => {
+      const opScherm = async (wie, adres) => {
         const ctx = await browser.newContext({ viewport: { width: 420, height: 900 } });
         await ctx.addInitScript((t) => { try { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {} }, wie.tok);
         const pg = await ctx.newPage();
         letOpFouten(pg);
-        await pg.goto(base + '/apps/leerhuis-werk.html?org=' + ORG, { waitUntil: 'domcontentloaded' });
+        await pg.goto(base + (adres || '/apps/leerhuis-werk.html') + '?org=' + ORG, { waitUntil: 'domcontentloaded' });
         await pg.waitForFunction(() => !/wordt geladen/.test(document.getElementById('melding').textContent));
         return pg;
       };
@@ -209,9 +209,29 @@ test('Leerhuis trainer: onder toezicht, bewijs, klaar voor beoordeling en de aan
       /* N leert tot de simulatie; daarna neemt de trainer het over op het scherm. */
       const pad = (await lees(T, 'trainerCockpit')).LEERLINGEN || [];
       if (!pad.some(x => x.persoon === N.p)) await doe(Q, 'trainerToewijzen', { persoon: N.p, curriculum: 'ops-basis', trainer: T.p });
-      for (const naar of ['LEARNING', 'PRACTICING']) await doe(N, 'lerenStand', { persoon: N.p, curriculum: 'ops-basis', naar });
-      await doe(N, 'simulatieAfronden', { scenario: 'storno', keuzes: ['controleer', 'reden', 'tweede-mens'] });
-      await doe(N, 'lerenStand', { persoon: N.p, curriculum: 'ops-basis', naar: 'SIMULATING' });
+      /* De leerling zet zijn EIGEN stappen op Mijn leerhuis: beginnen, oefenen,
+         een scenario dat mislukt (en geen bewijs achterlaat), hetzelfde scenario
+         goed, en dan de stap naar het spelen. */
+      const n = await opScherm(N, '/apps/leerhuis.html');
+      const npad = () => n.locator('#pad .kaart', { hasText: 'Terugboeken' });
+      await npad().getByRole('button', { name: 'Ik begin met leren' }).click();
+      await wachtOp(n, /Vastgelegd: u bent begonnen met leren/);
+      await npad().getByRole('button', { name: 'Ik ga oefenen' }).click();
+      await wachtOp(n, /Vastgelegd: u oefent nu/);
+      const scen = n.locator('#oefenen .kaart', { hasText: 'storno' });
+      for (const stap of ['direct-uitbetalen', 'controleer']) await scen.getByRole('button', { name: stap, exact: true }).click();
+      await scen.getByRole('button', { name: 'Scenario afronden' }).click();
+      await wachtOp(n, /Nog niet geslaagd\. Er ontbrak: reden, tweede-mens\. Dit had niet gemogen: direct-uitbetalen\./);
+      const nMijn = async () => (await post('/api/leerhuis/lees', { org: ORG, vraag: 'mijn' }, N.tok)).body.antwoord;
+      await scen.getByRole('button', { name: 'Opnieuw kiezen' }).click();
+      for (const stap of ['controleer', 'reden', 'tweede-mens']) await scen.getByRole('button', { name: stap, exact: true }).click();
+      await scen.getByText('Uw volgorde: 1. controleer, 2. reden, 3. tweede-mens').waitFor();
+      await scen.getByRole('button', { name: 'Scenario afronden' }).click();
+      await wachtOp(n, /Geslaagd: het leerhuis legde bewijs vast voor storno/);
+      await npad().getByRole('button', { name: 'Ik ga een scenario spelen' }).click();
+      await wachtOp(n, /Vastgelegd: u speelt nu scenario's/);
+      assert.equal((await nMijn()).PAD.find(x => x.curriculum === 'ops-basis').stand, 'SIMULATING');
+      assert.doesNotMatch(await n.textContent('main'), /lid:\d+/, 'geen sleutel van een mens op het scherm');
 
       const page = await opScherm(T);
       const kaart = () => page.locator('#trainer .kaart', { hasText: N.code });

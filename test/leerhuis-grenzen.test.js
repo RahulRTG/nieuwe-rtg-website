@@ -747,3 +747,17 @@ test('26. B-UI autoriteiten: wat bewezen is en nog geen certificaat draagt, en w
   assert.ok(!l.trainerWerk(ORG, P.Q).KANDIDATEN.find(x => x.persoon === P.T).curricula.includes('ops-extra'),
     'en kan er ook niet voor gekwalificeerd worden');
 });
+
+test('27. B-UI de leerling: zijn eigen sleutel, de vaardigheden per leerpad, en scenariostappen zonder de antwoorden', () => {
+  const w = basis();
+  const l = w.lh.lees;
+  w.doe(ORG, 'rolToewijzen', { persoon: P.N, rol: 'ops' }, P.M);
+  w.doe(ORG, 'startplanMaak', { persoon: P.N, rol: 'ops' }, P.M);
+  const m = () => l.mijn(ORG, P.N);
+  assert.equal(m().IK, P.N, 'de leerling zet zijn eigen stappen met zijn eigen sleutel');
+  const pad = m().PAD.find(x => x.curriculum === 'ops-basis');
+  assert.deepEqual(pad.vaardigheden, [{ id: 'terugboeken', naam: 'Een betaling terugboeken', loopt: false }]);
+  const oef = m().OEFENEN.find(x => x.scenario === 'storno');
+  assert.deepEqual(oef.stappen, ['controleer', 'direct-uitbetalen', 'reden', 'tweede-mens'], 'vereist en verboden door elkaar, op alfabet');
+  assert.ok(!('vereist' in oef) && !('verboden' in oef) && !('volgorde' in oef), 'welke stap goed is, zegt de motor pas na het spelen');
+});

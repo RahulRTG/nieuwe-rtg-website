@@ -930,7 +930,11 @@ achterlaat. Elk hoort een eigen reparatie met een toets die eerst zakt.
     daarna als live-positie van de gast aan de zaak getoond (`guestLoc` in
     `server/kern/leverancier/state.js`). Dit is gevonden bij de meting van par.
     6.5 en is ernstiger dan de verzonnen bestemming van gebrek 5: daar gaat het om
-    een pakket, hier om waar een mens zou zijn.
+    een pakket, hier om waar een mens zou zijn. **Gerepareerd op 29 september
+    2026**: de server vult geen positie meer in (ook het hotel van de eigen reis
+    niet), `liveStateFor` draagt `positie` met de reden als hij leeg is, en de app
+    vraagt bij het starten de echte positie. `test/onderweg-positie.test.js` zakte
+    vooraf op alle drie de toetsen.
 12. **Een noodoproep van personeel toont nooit het label van de plek.**
     `server/routes/supplier/tafels-team.js:88` schrijft
     `alarm.label || lat.toFixed ? ... : ''`, en door de voorrang van `||` boven
@@ -1158,7 +1162,8 @@ niets waard.
 - **Het heeft bijna niets gedraaid.** Elke stand is een lezing van de bron op 29
   september 2026, behalve de positiestroommeting van par. 6.5. De eerste proef maakt daar metingen van, en dan mogen deze
   tabellen verschuiven -- ook de kant op die dit document niet verwacht.
-- **Het heeft niets gerepareerd.** De twaalf gebreken van par. 12 en de
+- **Het heeft bijna niets gerepareerd.** Van de twaalf gebreken van par. 12 is
+  alleen gebrek 11 gerepareerd; de andere elf en de
   terughoudendheidsschuld van par. 6.2 staan open.
 - **Het zegt niet dat de rest van het huis fout zit.** Een positie in een
   vervoersopdracht of een alarm heeft vaak een echte reden. Par. 6.2 zegt alleen

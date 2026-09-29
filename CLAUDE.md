@@ -955,8 +955,10 @@ staat, een stap weg is, een besluit vraagt of jaren weg is. Wat bovenaan par. 7
 stond is sinds 27 september gedaan: **de twee autoplanners en het weekrooster
 lezen verzuim** (`kern/payroll/inplanbaar.js`) en plannen automatisch alleen wie
 er volledig is -- deels inzetbaar plant een mens in, en het teamrooster zegt DAT
-iemand afwezig is en nooit waarom. De festival-, OV-, taxi- en schoolplanners
-lezen het nog niet.
+iemand afwezig is en nooit waarom. Sinds 29 september lezen ook OV, festival en
+taxi het; bij de laatste twee hing een dienst en een voertuig eerst aan een vrije
+naam, en die kregen daarom een koppeling aan een teamlid. De school heeft een
+eigen verlofregister en hangt er met opzet niet aan.
 
 **`VRIJHEID.md` is de mens die in dat rooster staat** -- RTG Vrijheid: tijd,
 rust, vrijheid en eerlijkheid voor wie bij RTG of een zaak werkt, in

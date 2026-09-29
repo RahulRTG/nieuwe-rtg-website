@@ -114,6 +114,7 @@ module.exports = (ctx) => {
       const a = k.asset;
       const inzet = assetInzetbaar(a, waar);
       if (!inzet.inzetbaar) { afgewezen.push({ assetId: a.id, naam: a.naam || a.categorie, redenen: inzet.redenen }); continue; }
+      if (ctx.bestuurderAfwezig(a)) { afgewezen.push({ assetId: a.id, naam: a.naam || a.categorie, redenen: ['bestuurder staat vandaag als afwezig gemeld'] }); continue; }
       const geschikt = assetGeschikt(a, eisen);
       if (!geschikt.geschikt) { afgewezen.push({ assetId: a.id, naam: a.naam || a.categorie, redenen: geschikt.redenen }); continue; }
 

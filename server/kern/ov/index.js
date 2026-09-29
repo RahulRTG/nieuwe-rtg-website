@@ -24,7 +24,7 @@ const CODE_TTL_MS = 5 * 60 * 1000;    // de oplichtende code
 const GPS_CHECKIN_M = 150;            // zo dichtbij is 'bij het voertuig'
 const RITTEN_MAX = 4000;
 
-function maakOv({ db, save, crypto, bewerkCollectie, schoon, codenaamVan, haversine, etaMinutes, pay, notify }) {
+function maakOv({ db, save, crypto, bewerkCollectie, schoon, codenaamVan, haversine, etaMinutes, pay, notify, afwezigOp }) {
   const id = p => (p || 'ov') + crypto.randomBytes(4).toString('hex');
   const nu = () => new Date().toISOString();
   // de incheckcode: persistent en hash-only, nooit alleen in procesgeheugen
@@ -116,7 +116,7 @@ function maakOv({ db, save, crypto, bewerkCollectie, schoon, codenaamVan, havers
 
   // de gedeelde ctx voor de deelbestanden
   const ctx = {
-    db, save, crypto, schoon, nu, id, codenaamVan, haversine, etaMinutes, pay, notify, codes,
+    db, save, crypto, schoon, nu, id, codenaamVan, haversine, etaMinutes, pay, notify, codes, afwezigOp,
     ensureOv, ovZaak, lijnVan, ovPrijsVan, versVoertuig, actieveRit, ritStart, ritBeeld,
     SOORTEN, VOERTUIG_TTL_MS, CODE_TTL_MS, GPS_CHECKIN_M, RITTEN_MAX
   };

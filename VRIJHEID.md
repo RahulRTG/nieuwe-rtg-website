@@ -338,17 +338,18 @@ valideren:
      nooit een melding uit een andere weg.
    - Het weekrooster, het AI-roostervoorstel en de autoplanner van de
      beveiliging lezen het verzuimregister (`kern/payroll/inplanbaar.js`), dus
-     een toegekende vrije dag staat daar vrij. De overige planners (festival,
-     OV, taxi, school) lezen het nog niet, en het vakantiesaldo komt nergens
-     vandaan.
+     een toegekende vrije dag staat daar vrij. Sinds 29 september lezen ook de
+     OV-dienst, het festivalrooster en de taxidispatch het (PLANNING.md par. 6);
+     een school houdt een eigen verlofregister en hangt er met opzet niet aan.
+     Het vakantiesaldo komt nergens vandaan.
 
    `test/vrijheid-verzuim.test.js` draait de echte motor, het echte register
    en de echte samenstelling van een loonrun.
 
 **P1**
 
-- De overige planners (festival, OV, taxi, school) lezen het verzuimregister
-  nog niet; het weekrooster en de twee autoplanners wel.
+- Alle planners van een zaak lezen het verzuimregister (weekrooster, de twee
+  autoplanners, OV, festival, taxi); de school heeft een eigen register.
 - Een vervanger krijgt zijn dienst in het rooster.
 - Dienst ruilen.
 - Overdracht breder dan de horecawijk.

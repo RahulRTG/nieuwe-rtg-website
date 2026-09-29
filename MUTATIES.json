@@ -3529,6 +3529,13 @@
       "gezakt": 14,
       "geprobeerd": 2
     },
+    "festival-verzuim.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "festival-vooruit.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -8736,6 +8743,13 @@
       "gezakt": 1,
       "geprobeerd": 2
     },
+    "ov-verzuim.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "ov.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -12488,6 +12502,13 @@
       "operator": "===->!==#0",
       "gezakt": 3,
       "geprobeerd": 1
+    },
+    "taxi-verzuim.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "teacherflow.test.js": {
       "soort": "server",

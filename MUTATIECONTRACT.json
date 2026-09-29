@@ -1,28 +1,28 @@
 {
  "stempel": {
-  "op": "2026-09-29T18:14:11.186Z",
-  "commit": "6c3d6c9d",
+  "op": "2026-09-29T12:53:17.228Z",
+  "commit": "c0b0a51b",
   "boomVuil": false,
-  "boomAnders": 9,
+  "boomAnders": 4,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5166,
-  "geclassificeerd": 5141,
+  "totaal": 5167,
+  "geclassificeerd": 5142,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3168,
-   "NOT_APPLICABLE": 1247,
+   "NOT_APPLICABLE": 1245,
    "LEGACY_PENDING_CLASSIFICATION": 25,
-   "PROTECTED": 567,
+   "PROTECTED": 570,
    "INTENTIONALLY_NON_IDEMPOTENT": 159
   },
-  "vastgesteldDoorMens": 2025,
+  "vastgesteldDoorMens": 2026,
   "afgeleidDoorScript": 3116,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4263,
+   "AUTHENTICATED": 4264,
    "PUBLIC": 126,
    "OBJECT_SCOPED": 754,
    "(niet af te leiden -- vraagt een verklaring)": 7,
@@ -33,7 +33,7 @@
    "kale ronde: beschermd": 134,
    "kale ronde: onbeschermd": 125,
    "kale ronde: geen uitspraak": 4761,
-   "niet gemeten": 146
+   "niet gemeten": 147
   },
   "voorstellen": {
    "NOT_APPLICABLE": 1
@@ -43452,6 +43452,195 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "democratie.actie.aansluit",
+   "route": "POST /api/member/democratie/actie/aansluit",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "democratie.actie.afgelast",
+   "route": "POST /api/member/democratie/actie/afgelast",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "democratie.actie.antwoord",
+   "route": "POST /api/member/democratie/actie/antwoord",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "democratie.actie.lijst",
+   "route": "POST /api/member/democratie/actie/lijst",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "democratie.actie.plan",
+   "route": "POST /api/member/democratie/actie/plan",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "democratie.actie.resultaat",
+   "route": "POST /api/member/democratie/actie/resultaat",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "democratie.actie.start",
+   "route": "POST /api/member/democratie/actie/start",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "democratie.actie.stop",
+   "route": "POST /api/member/democratie/actie/stop",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "democratie.actie.verlaat",
+   "route": "POST /api/member/democratie/actie/verlaat",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "democratie.gezien",
    "route": "POST /api/member/democratie/kwestie/gezien",
    "semantiek": {
@@ -59283,69 +59472,6 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "office.beslisgeheugen",
-   "route": "POST /api/office/beslisgeheugen",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "leest",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "boardroomAuth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "office.beslisgeheugen.intrek",
-   "route": "POST /api/office/beslisgeheugen/intrek",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "boardroomAuth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "office.beslisgeheugen.leg",
-   "route": "POST /api/office/beslisgeheugen/leg",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "boardroomAuth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
    "mutatieId": "office.betalingen.status",
    "route": "POST /api/office/betalingen/status",
    "semantiek": {
@@ -59720,48 +59846,6 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "office.cadeaubon",
-   "route": "POST /api/office/cadeaubon",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "leest",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "boardroomAuth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "office.cadeaubon.stand",
-   "route": "POST /api/office/cadeaubon/stand",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "nietIdempotent",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "boardroomAuth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -67848,27 +67932,6 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "office.rtgboek.campagne",
-   "route": "POST /api/office/rtgboek/campagne",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "naamAuth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
    "mutatieId": "office.rtgboek.zet",
    "route": "POST /api/office/rtgboek/zet",
    "semantiek": {
@@ -67880,49 +67943,7 @@
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "naamAuth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "office.rtgcampagne",
-   "route": "POST /api/office/rtgcampagne",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "leest",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
      "officeAuth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "office.rtgcampagne.maak",
-   "route": "POST /api/office/rtgcampagne/maak",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "naamAuth"
     ]
    },
    "bewijs": null,

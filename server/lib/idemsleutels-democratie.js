@@ -21,7 +21,14 @@ const SLEUTELS = {
   /* Dezelfde stand nog eens zetten is een herhaling en schrijft niets. */
   'POST /api/office/democratie/kwestie/behandel': { zelfdeVerzoek: true },
   /* Haalt alleen wekken in die nog niet uitgingen; een tweede ronde vindt er geen. */
-  'POST /api/office/democratie/kwestie/herbezorg': { zelfdeVerzoek: true }
+  'POST /api/office/democratie/kwestie/herbezorg': { zelfdeVerzoek: true },
+  /* Het DoeNetwerk (kern/democratie/doe.js): lezen, en vier handelingen die bij
+     een gelijk verzoek niets nieuws doen (test/democratie-doe.test.js toets 10). */
+  'POST /api/member/democratie/actie/lijst': { leest: true },
+  'POST /api/member/democratie/actie/aansluit': { zelfdeVerzoek: true },
+  'POST /api/member/democratie/actie/plan': { zelfdeVerzoek: true },
+  'POST /api/member/democratie/actie/antwoord': { zelfdeVerzoek: true },
+  'POST /api/member/democratie/actie/afgelast': { zelfdeVerzoek: true }
 };
 
 module.exports = { SLEUTELS };

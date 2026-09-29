@@ -3561,8 +3561,8 @@
       "sleutel": "bewijsAchterstand",
       "van": 2712,
       "vervalt": "2026-12-29",
-      "meter": "bewijsAchterstand 2712 -> 2723",
-      "reden": "DE VERSE IDEMPROEF ZAG DE ROUTES VAN MAIN. IDEMPROEF.json is hermeten op 632583ce, nu met de passkeymedewerker uit main op de incassoronde (die zat in de vorige ronde niet op de tak en gaf 403). Hij riep 5148 routes aan tegen 5020; de +11 zijn allemaal idem-ongeclassificeerd (1606 -> 1617): routes die uit de merge met main komen en nog geen besluit in IDEMBESLUIT.json dragen. Er ging geen bewezen cel verloren (bewijsCellenBewezen 26449 -> 26941).",
+      "meter": "bewijsAchterstand 2712 -> 2721",
+      "reden": "DE VERSE IDEMPROEF ZAG DE ROUTES VAN MAIN. IDEMPROEF.json is hermeten op 632583ce, nu met de passkeymedewerker uit main op de incassoronde (die zat in de vorige ronde niet op de tak en gaf 403). Hij riep 5148 routes aan tegen 5020; de +11 zijn allemaal idem-ongeclassificeerd (1606 -> 1617), en daarvan kregen er twee meteen een besluit van de eigenaar (bedrijf/lid/aanmeld en bedrijf/mijn, code-maker), dus netto +9: routes die uit de merge met main komen en nog geen besluit in IDEMBESLUIT.json dragen. Er ging geen bewezen cel verloren (bewijsCellenBewezen 26449 -> 26941).",
       "waarheen": "de nieuwe routes een besluit in IDEMBESLUIT.json geven. Vervalt 2026-12-29."
     }
   ],

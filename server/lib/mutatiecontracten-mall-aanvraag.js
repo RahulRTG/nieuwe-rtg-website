@@ -7,7 +7,8 @@ const contract = (id, deur) => ({
   bewijs: { op: '2026-09-29', gemeten: 'test/mall-aanvraag-levensloop.test.js meet verplichte bronversies, ' +
     'intrekken, heropenen, wijzigen, teruggeven en herhalen zonder tweede gevolg. ' +
     'test/operationeel-aanvraag.test.js doorloopt de API, herhaalt kiezen/afronden en leest na nette herstart terug. ' +
-    'Dit bewijst geen harde opslaguitval of globale V1-certificering.' },
+    'test/operationeel-herstel.test.js meet personeelsintrekking, opslagfalen en SQLite SIGKILL na commit vóór antwoord. ' +
+    'PostgreSQL, gezamenlijke policy en globale V1-certificering blijven open.' },
   afgetekend: { door: 'Codex; bron en gerichte proeven nagekeken, niet door een mens afgetekend', op: '2026-09-29' }
 });
 module.exports.CONTRACTEN = {

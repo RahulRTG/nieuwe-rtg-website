@@ -515,6 +515,7 @@ function draaiToets(bestand, env, wacht, forceer) {
    De tien andere staan nog open; dat is een geteld gat in TAKEN.md en geen
    vergeten hoekje. */
 const EIGEN_MODULE = new Map([
+  ['operationeel-meter.test.js', ['scripts/lib/operationeel/beoordeel.js']],
   /* DE SLEUTELWEDLOOP. De toets leest ook scripts/lib/bron.js (om commentaar
      te strippen), en de motor koos die als module -- een mutatie daar zegt niets
      over de sleutels. De module die hij beproeft is de helper; met de hand

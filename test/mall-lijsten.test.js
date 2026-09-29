@@ -85,7 +85,7 @@ test('2. een bewaard aanbod dat verdwijnt, vervalt zichtbaar', async () => {
     partnerTrips: [], markt: { ads: [] }
   } };
   require('../server/kern/werkvormen').haakAan(db);
-  const mall = maakMall({ db, save() {}, crypto: require('crypto'),
+  const mall = maakMall({ db, bijeen: async werk => werk(), save() {}, crypto: require('crypto'),
     isRetail: (s) => s.type === 'retail', haalThuis: () => null, haalLandVind: () => null }).mall;
 
   const l = mall.mallLijsten.maak('k1', { naam: 'Test' }).lijst;

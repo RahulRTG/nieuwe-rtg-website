@@ -29,11 +29,7 @@
        bewijs:    { gemeten: '...', op: '...' }
      }
 
-   HIJ IS MET OPZET BIJNA LEEG. Er staan 4653 schrijfroutes tegenover, en dat
-   verschil is de eerlijke stand van zaken: dit huis weet van bijna geen enkele
-   route formeel wat een tweede aanroep hoort te doen. Elke regel die hier
-   bijkomt, is er een die iemand heeft nagekeken -- niet een die een script heeft
-   geraden. Het register vult zich dus langzaam, en dat is de bedoeling.
+   Domeinmodules hieronder dragen de afzonderlijke contracten en hun bewijs.
    ========================================================================== */
 'use strict';
 

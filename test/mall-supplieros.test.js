@@ -203,7 +203,7 @@ test('6. voorraad nul is een antwoord, geen leegte', () => {
     partnerTrips: [], markt: { ads: [] }
   } };
   require('../server/kern/werkvormen').haakAan(db);
-  const mall = maakMall({ db, save() {}, crypto: require('crypto'),
+  const mall = maakMall({ db, bijeen: async werk => werk(), save() {}, crypto: require('crypto'),
     isRetail: (s) => s.type === 'retail', haalThuis: () => null, haalLandVind: () => null }).mall;
 
   const alles = mall.mallZoek({ per: 60 }).items;

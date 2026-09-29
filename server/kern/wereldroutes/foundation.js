@@ -40,6 +40,8 @@ module.exports = [
   '/apps/foundation/klimaatfonds.html',
   '/apps/foundation/klusjes.html',
   '/apps/foundation/kompas.html',
+  '/apps/foundation/kwestiekantoor.html',
+  '/apps/foundation/kwesties.html',
   '/apps/foundation/leerpaspoort.html',
   '/apps/foundation/leren.html',
   '/apps/foundation/liedjes.html',

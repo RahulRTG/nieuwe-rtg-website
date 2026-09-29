@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-29T13:41:20.017Z",
-    "commit": "3407f8b0c",
+    "op": "2026-09-29T12:53:18.864Z",
+    "commit": "c0b0a51b",
     "boomVuil": false,
-    "boomAnders": 12,
+    "boomAnders": 6,
     "instrument": "scripts/namensvorm.js",
     "node": "v22.22.2"
   },
@@ -91,12 +91,12 @@
         "ai-mandaat",
         "rtgid-claims"
       ],
-      "velden": 74,
+      "velden": 73,
       "inAlleMechanismen": 0,
       "inMinstensDeHelft": 0,
       "helftDrempel": 5,
-      "veldenMechanismeEigen": 70,
-      "eigenPct": 94.6,
+      "veldenMechanismeEigen": 69,
+      "eigenPct": 94.5,
       "perMechanisme": [
         {
           "mechanisme": "app-machtiging",
@@ -116,7 +116,7 @@
         },
         {
           "mechanisme": "ledenbalie-inzage",
-          "velden": 6
+          "velden": 5
         },
         {
           "mechanisme": "levensband",
@@ -591,15 +591,15 @@
         }
       ]
     },
-    "envelopVelden": 29
+    "envelopVelden": 30
   },
   "woordenschat": [
     {
       "woord": "doel",
       "bestanden": 277,
       "domeinen": 146,
-      "samengesteld": 189,
-      "samengesteldDomeinen": 87,
+      "samengesteld": 190,
+      "samengesteldDomeinen": 88,
       "stand": "bezet",
       "waar": [
         "bedrijf",

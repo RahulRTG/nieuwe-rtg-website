@@ -718,6 +718,7 @@ if(window.RTGRealtime)RTGRealtime.start(TOKEN,{onSync:(scope,data)=>{if(scope===
    samenwerking loopt direct via SSE en veroorzaakt dus geen zes-secondenpoll. */
 setInterval(()=>{if(TEAM_ROOM&&!$('#teamOverlay').hidden&&!document.hidden)refreshTeamRoom(true)},60000);
 load();
+document.addEventListener('DOMContentLoaded',()=>{if(window.RTGAdaptief)RTGAdaptief.context({bron:'magnaat.spel',titel:'Magnaat'})});
 </script>
 <script src="/apps/magnaat-leven-schermen.js"></script>
 <script src="/apps/magnaat-leven-bedrijf.js"></script>

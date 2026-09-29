@@ -1130,6 +1130,13 @@
       ]
     },
     {
+      "naam": "Wat speelt er",
+      "wereld": "FoundationOS",
+      "soort": "link",
+      "sleutel": "kwesties",
+      "url": "/apps/foundation/kwesties.html"
+    },
+    {
       "naam": "Zorg",
       "wereld": "FoundationOS",
       "soort": "link",

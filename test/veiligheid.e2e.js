@@ -78,16 +78,11 @@ test('RTG Veilig: de vier standen staan echt', { skip: geenBrowser(pw) }, async 
        teller op tijdens het laden, dus wie pas na load() gaat meekijken, mist
        precies de teller waar het om gaat. */
     await ctx.addInitScript(() => {
-      /* De desktopstandaard (#413) legt om elk scherm een schil, en daarin kijkt
-         shared/interface/personal-images.js elke seconde of het account in
-         DEZELFDE tab wisselde (daar is geen storage-gebeurtenis voor). Die teller
-         hoort bij de schil en niet bij een stand van deze app, dus hij telt hier
-         niet mee; elke teller van de app zelf en van shared/veiligheid.js wel. */
       window.__levendeTellers = new Map();   // id -> tikduur in ms
       const zet = window.setInterval, weg = window.clearInterval;
       window.setInterval = function (fn, ms) {
         const id = zet.apply(this, arguments);
-        if (!/\/shared\/interface\//.test(String(new Error().stack))) window.__levendeTellers.set(id, ms);
+        window.__levendeTellers.set(id, ms);
         return id;
       };
       window.clearInterval = function (id) { window.__levendeTellers.delete(id); return weg.call(this, id); };

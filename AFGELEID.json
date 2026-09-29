@@ -3,23 +3,23 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-09-29T06:11:32.911Z",
-  "commit": "5521761e1",
+  "op": "2026-09-29T08:11:51.138Z",
+  "commit": "3f69d26d2",
   "boomVuil": false,
-  "boomAnders": 7,
+  "boomAnders": 3,
   "instrument": "scripts/afgeleid.js",
-  "node": "v24.18.0"
+  "node": "v22.22.2"
  },
  "gemeten": {
-  "artefacten": 334,
+  "artefacten": 335,
   "bron": 21,
-  "afgeleid": 181,
+  "afgeleid": 182,
   "fragmenten": 26,
   "momentopname": 1,
   "onbeslist": 105,
   "afgeleidZonderEigenaar": 2,
-  "metEigenaar": 206,
-  "afgeleidEigenaarHard": 179,
+  "metEigenaar": 207,
+  "afgeleidEigenaarHard": 180,
   "afgeleidGrendelt": 21,
   "metStempel": 112,
   "stempelAnders": 0
@@ -1827,6 +1827,20 @@
    "stempelAnders": false,
    "versheidOpdracht": null,
    "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "KENNISINDEX.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/kennisindex.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/kennisindex.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {

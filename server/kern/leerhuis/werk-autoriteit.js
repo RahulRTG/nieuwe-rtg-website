@@ -17,7 +17,7 @@
 'use strict';
 
 const { heeftBestuur, relatieActief, certStand, certTelt, trainerGeldig } = require('./oordeel');
-const { TRAINERLADDER } = require('./standen');
+const { TRAINERLADDER, MACHINES } = require('./standen');
 
 const naamVan = (st, v) => (st.vaardigheden[v] || {}).naam || v;
 
@@ -61,4 +61,29 @@ function trainerWerk(st, door, nu) {
     nietZichtbaar: 'hoe ver een leerling is en wat zijn bewijs zegt; dat ziet zijn trainer' };
 }
 
-module.exports = { certificaatWerk, trainerWerk };
+/* Kwaliteit: bezwaren, beoordelingen ongeldig verklaren, en geschiktheidsbeleid.
+   De beoordeling achter een bezwaar (uitkomst, criteria, herstelpad) ziet alleen
+   wie de review op zich nam, en pas dan -- zoals het bewijs bij een assessor.
+   Wie een oordeel zelf gaf, krijgt het hier niet om te wegen (`eigenOordeel`). */
+function kwaliteitWerk(st, door) {
+  const kwaliteit = heeftBestuur(st, door, 'QUALITY_AUTHORITY');
+  const beleid = kwaliteit || heeftBestuur(st, door, 'ACADEMY_OWNER');
+  if (!beleid) return { ok: false, reden: 'u bent in deze organisatie geen kwaliteitsautoriteit of eigenaar' };
+  const bezwaren = kwaliteit ? Object.values(st.bezwaren).filter(z => ['REVIEW_REQUEST', 'INDEPENDENT_REVIEW'].includes(z.stand)).map(z => {
+    const b = st.beoordelingen[z.beoordeling] || {};
+    const reviewer = z.stand === 'INDEPENDENT_REVIEW' && z.reviewer === door;
+    return { id: z.id, persoon: b.persoon, vaardigheidNaam: naamVan(st, b.vaardigheid), stand: z.stand, reden: z.reden, sinds: z.at,
+      eigenOordeel: b.assessor === door, anderReviewer: z.stand === 'INDEPENDENT_REVIEW' && z.reviewer !== door,
+      naar: MACHINES.bezwaar.naar[z.stand] || [],
+      oordeel: reviewer ? { stand: b.stand, criteria: b.criteria || null, herstel: b.herstel || null } : null };
+  }) : [];
+  const ongeldig = kwaliteit ? Object.values(st.beoordelingen).filter(b => ['PROVEN', 'NOT_YET_PROVEN', 'INCONCLUSIVE'].includes(b.stand) && b.assessor !== door)
+    .map(b => ({ id: b.id, persoon: b.persoon, vaardigheidNaam: naamVan(st, b.vaardigheid), stand: b.stand, sinds: b.at })) : [];
+  return { ok: true, magKwaliteit: kwaliteit, BEZWAREN: bezwaren, ONGELDIG: ongeldig,
+    BELEID: Object.values(st.beleid).map(b => ({ id: b.id, handeling: b.handeling, rol: b.rol ? ((st.rollen[b.rol] || {}).titel || b.rol) : null,
+      vaardigheden: b.vaardigheden.map(v => naamVan(st, v)), certificaat: b.certificaat, goedgekeurd: !!b.goedgekeurd, eigen: b.voorgesteldDoor === door })),
+    KEUZES: { vaardigheden: Object.values(st.vaardigheden).map(v => ({ id: v.id, naam: v.naam })), rollen: Object.values(st.rollen).map(r => ({ id: r.id, titel: r.titel })) },
+    nietZichtbaar: 'de beoordeling achter een bezwaar, tot u de review op u neemt; en oordelen die u zelf gaf' };
+}
+
+module.exports = { certificaatWerk, trainerWerk, kwaliteitWerk };

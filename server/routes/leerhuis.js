@@ -22,7 +22,7 @@ const { bijeen, inBundel } = require('../db');
 /* Wat een LID mag vragen, en wat alleen het bestuur van de organisatie mag
    lezen. Een lezer zonder relatie met de organisatie leest niets: ook dat is
    isolatie (grondwet 16). */
-const WERK = ['trainerCockpit', 'managerCockpit', 'assessorWerk', 'kennisWerk', 'curriculumWerk', 'eigenaarWerk', 'certificaatWerk', 'trainerWerk'];
+const WERK = ['trainerCockpit', 'managerCockpit', 'assessorWerk', 'kennisWerk', 'curriculumWerk', 'eigenaarWerk', 'certificaatWerk', 'trainerWerk', 'kwaliteitWerk'];
 const EIGEN_VRAGEN = ['mijn', 'vakstaat', ...WERK, 'waaromLeren', 'waaromVerversen',
   'waaromNietGereed', 'geschiktheid', 'loopbaan', 'waaromTrainer', 'grond', 'uitkomst'];
 const BESTUURSVRAGEN = ['gereedheid', 'eenheid', 'wieGeraakt', 'reconstrueer', 'certStand', 'schaduw', 'startpakket'];

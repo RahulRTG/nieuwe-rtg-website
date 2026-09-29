@@ -27,6 +27,7 @@ module.exports = (stand, klok) => {
     eigenaarWerk: (org, p) => werk.eigenaarWerk(stand(org), p),
     certificaatWerk: (org, p) => autoriteit.certificaatWerk(stand(org), p, t()),
     trainerWerk: (org, p) => autoriteit.trainerWerk(stand(org), p, t()),
+    kwaliteitWerk: (org, p) => autoriteit.kwaliteitWerk(stand(org), p),
     geschiktheid: (org, p, h) => geschiktheid(stand(org), p, h, t()),
     gereedheid: (org, eisen) => gereedheid.teamGereed(stand(org), eisen, t()),
     eenheid: (org) => gereedheid.eenheid(stand(org), t()),

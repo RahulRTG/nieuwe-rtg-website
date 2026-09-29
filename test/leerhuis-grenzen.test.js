@@ -768,3 +768,34 @@ test('27. B-UI de leerling: zijn eigen sleutel, de vaardigheden per leerpad, en 
   assert.deepEqual(oef.stappen, ['controleer', 'direct-uitbetalen', 'reden', 'tweede-mens'], 'vereist en verboden door elkaar, op alfabet');
   assert.ok(!('vereist' in oef) && !('verboden' in oef) && !('volgorde' in oef), 'welke stap goed is, zegt de motor pas na het spelen');
 });
+
+test('28. B-UI kwaliteit: bezwaren met het oordeel pas na het oppakken, ongeldig verklaren zonder eigen oordelen, en beleid', () => {
+  const w = basis();
+  const l = w.lh.lees;
+  assert.equal(l.kwaliteitWerk(ORG, P.N).ok, false, 'wie geen kwaliteitsautoriteit of eigenaar is, ziet niets');
+  const { beoordeling } = W.leidOp(w, ORG, P.N, P);
+  w.doe(ORG, 'bezwaarIndienen', { beoordeling, reden: 'de assessor keek niet naar mijn tweede poging' }, P.N);
+  const z = () => l.kwaliteitWerk(ORG, P.Q).BEZWAREN.find(x => x.persoon === P.N);
+  assert.equal(z().stand, 'REVIEW_REQUEST');
+  assert.equal(z().reden, 'de assessor keek niet naar mijn tweede poging');
+  assert.equal(z().oordeel, null, 'voor de review is opgepakt, geen criteria of uitslag');
+  assert.deepEqual(z().naar, ['INDEPENDENT_REVIEW'], 'uit de overgangstabel');
+  w.doe(ORG, 'bezwaarStand', { id: z().id, naar: 'INDEPENDENT_REVIEW' }, P.Q);
+  assert.ok(z().oordeel && z().oordeel.stand === 'PROVEN' && z().oordeel.criteria, 'wie de review oppakte, ziet het oordeel');
+  w.doe(ORG, 'bestuurZet', { persoon: P.KO2, rol: 'QUALITY_AUTHORITY' }, P.E);
+  const ander = l.kwaliteitWerk(ORG, P.KO2).BEZWAREN.find(x => x.persoon === P.N);
+  assert.equal(ander.anderReviewer, true);
+  assert.equal(ander.oordeel, null, 'een tweede kwaliteitsautoriteit ziet het oordeel niet');
+
+  assert.ok(l.kwaliteitWerk(ORG, P.Q).ONGELDIG.some(b => b.id === beoordeling), 'een afgeronde beoordeling kan ongeldig worden verklaard');
+  w.doe(ORG, 'bestuurZet', { persoon: P.A, rol: 'QUALITY_AUTHORITY' }, P.E);
+  assert.ok(!l.kwaliteitWerk(ORG, P.A).ONGELDIG.some(b => b.id === beoordeling), 'maar niet door wie hem zelf gaf');
+
+  const e = l.kwaliteitWerk(ORG, P.E);
+  assert.equal(e.magKwaliteit, false, 'de eigenaar ziet het beleid en geen bezwaren');
+  assert.deepEqual(e.BEZWAREN, []);
+  w.doe(ORG, 'beleidZet', { id: 'tb', handeling: 'betaling.terugboeken', rol: 'ops', vaardigheden: ['terugboeken'], certificaat: true }, P.E);
+  const b = l.kwaliteitWerk(ORG, P.E).BELEID.find(x => x.id === 'tb');
+  assert.deepEqual([b.eigen, b.goedgekeurd, b.rol], [true, false, 'Operations Professional'], 'wie voorstelde, keurt niet zelf goed');
+  assert.equal(l.kwaliteitWerk(ORG, P.Q).BELEID.find(x => x.id === 'tb').eigen, false);
+});

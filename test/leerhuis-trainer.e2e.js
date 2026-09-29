@@ -279,6 +279,45 @@ test('Leerhuis trainer: onder toezicht, bewijs, klaar voor beoordeling en de aan
       assert.doesNotMatch(await page.textContent('main'), /grote storno|NOT_YET_PROVEN/, 'geen herstelpad en geen ruwe uitslag bij de trainer');
       assert.match(await kaart().textContent(), /volg het herstelpad/, 'wel de stand van het leerpad dat hij begeleidt');
       assert.doesNotMatch(await page.textContent('main'), /\d+\s*%|score/i, 'geen cijfer op een mens');
+
+      /* 4. Kwaliteit op het scherm van Q. N maakt bezwaar; het oordeel erachter
+         (herstelpad) staat pas op de kaart als Q de review op zich neemt. Een
+         ongeldigverklaring zonder reden weigert de server, en een beleid dat Q
+         voorstelt, keurt de eigenaar goed -- Q zelf krijgt een zin en geen knop. */
+      await doe(N, 'bezwaarIndienen', { beoordeling: open[0].id, reden: 'de storno was klein, het herstelpad past niet' });
+      const q2 = await opScherm(Q);
+      const zkaart = q2.locator('#kwaliteit .kaart', { hasText: 'Bezwaar: Een betaling terugboeken van ' + N.code });
+      await zkaart.getByText('de storno was klein').waitFor();
+      assert.doesNotMatch(await zkaart.textContent(), /grote storno/, 'het herstelpad staat niet op de kaart voor de review is opgepakt');
+      await zkaart.getByRole('button', { name: 'Review oppakken' }).click();
+      await wachtOp(q2, /Review oppakken: Een betaling terugboeken/);
+      await zkaart.getByText(/Herstelpad: nog een keer onder toezicht bij een grote storno/).waitFor();
+      await zkaart.getByLabel('Uw bevinding').fill('herstelpad past bij het bewijs');
+      await zkaart.getByRole('button', { name: 'Het oordeel blijft staan' }).click();
+      await wachtOp(q2, /Het oordeel blijft staan: Een betaling terugboeken/);
+      assert.equal((await lees(Q, 'kwaliteitWerk')).BEZWAREN.length, 0, 'het bezwaar is afgehandeld');
+
+      const okaart = q2.locator('#kwaliteit .kaart', { hasText: 'Train-the-Trainer van ' + T.code });
+      await okaart.getByRole('button', { name: 'Ongeldig verklaren' }).click();
+      await wachtOp(q2, /Niet gelukt: ongeldig zonder reden/);
+      await okaart.getByLabel('Reden om ongeldig te verklaren').fill('de observatie is niet door een tweede mens gezien');
+      await okaart.getByRole('button', { name: 'Ongeldig verklaren' }).click();
+      await wachtOp(q2, /Ongeldig verklaard: Train-the-Trainer/);
+
+      const bform = q2.locator('#kwaliteit .kaart', { hasText: 'Nieuw beleid voorstellen' });
+      await bform.getByLabel(/Handeling/).fill('betaling.terugboeken');
+      await bform.getByText('Een betaling terugboeken', { exact: true }).click();
+      await bform.getByRole('button', { name: 'Beleid voorstellen' }).click();
+      await wachtOp(q2, /Beleid voorgesteld: betaling.terugboeken/);
+      const bkaart = q2.locator('#kwaliteit .kaart', { hasText: 'Beleid voor betaling.terugboeken' });
+      await bkaart.getByText('U stelde dit beleid voor; een ander keurt het goed.').waitFor();
+      assert.equal(await bkaart.getByRole('button', { name: 'Beleid goedkeuren' }).count(), 0, 'wie voorstelt, keurt niet goed');
+      const e2 = await opScherm(E);
+      assert.ok(await e2.locator('#kwaliteitBlok').isVisible(), 'de eigenaar ziet het beleid');
+      assert.equal(await e2.locator('#kwaliteit .kaart', { hasText: 'Bezwaar' }).count(), 0, 'geen bezwaren voor de eigenaar');
+      await e2.locator('#kwaliteit .kaart', { hasText: 'Beleid voor betaling.terugboeken' }).getByRole('button', { name: 'Beleid goedkeuren' }).click();
+      await wachtOp(e2, /Beleid goedgekeurd: betaling.terugboeken/);
+      assert.ok((await lees(E, 'kwaliteitWerk')).BELEID.find(b => b.handeling === 'betaling.terugboeken').goedgekeurd);
     } finally {
       if (browser) await browser.close().catch(() => {});
       await stop(child);

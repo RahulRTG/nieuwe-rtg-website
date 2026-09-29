@@ -27,12 +27,12 @@ function maakNaamVan(codenaamVan) {
 /* De trainer- en managercockpit (zicht.js) dragen hun mensen in LEERLINGEN,
    VANDAAG en TEAM; het werk van de assessor (werk.js) in OPEN en LOPEND, en het
    beheer van de eigenaar in BESTUUR en RELATIES, en het werk van de autoriteiten in KLAAR,
-   CERTIFICATEN, TRAINERS, ZONDER_TRAINER en KANDIDATEN. */
+   CERTIFICATEN, TRAINERS, ZONDER_TRAINER, KANDIDATEN, BEZWAREN en ONGELDIG. */
 function metNamen(antwoord, naamVan) {
   if (!antwoord || typeof antwoord !== 'object') return antwoord;
   const zet = (lijst) => Array.isArray(lijst) ? lijst.map(x => Object.assign({}, x, { naam: naamVan(x.persoon) })) : lijst;
   const uit = Object.assign({}, antwoord);
-  for (const veld of ['LEERLINGEN', 'VANDAAG', 'TEAM', 'OPEN', 'LOPEND', 'BESTUUR', 'RELATIES', 'KLAAR', 'CERTIFICATEN', 'TRAINERS', 'ZONDER_TRAINER', 'KANDIDATEN']) if (veld in uit) uit[veld] = zet(uit[veld]);
+  for (const veld of ['LEERLINGEN', 'VANDAAG', 'TEAM', 'OPEN', 'LOPEND', 'BESTUUR', 'RELATIES', 'KLAAR', 'CERTIFICATEN', 'TRAINERS', 'ZONDER_TRAINER', 'KANDIDATEN', 'BEZWAREN', 'ONGELDIG']) if (veld in uit) uit[veld] = zet(uit[veld]);
   return uit;
 }
 

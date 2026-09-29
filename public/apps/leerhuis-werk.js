@@ -21,7 +21,8 @@
     ASSESSING: 'wordt beoordeeld', REQUESTED: 'wacht op een assessor', DRAFT: 'concept', REVIEW: 'ter review',
     NOT_YET_PROVEN: 'nog niet bewezen', PROVEN: 'bewezen', ACTIVE: 'actief', PILOT: 'pilot', MONITORED: 'gevolgd',
     IMPROVEMENT: 'in verbetering', SUPERSEDED: 'vervangen', RETIRED: 'uit gebruik', SUSPENDED: 'geschorst', REVOKED: 'ingetrokken',
-    EXPIRING: 'verloopt binnenkort', EXPIRED: 'verlopen', ASSIGNED: 'toegewezen', LEARNING: 'aan het leren', PRACTICING: 'aan het oefenen' };
+    EXPIRING: 'verloopt binnenkort', EXPIRED: 'verlopen', REVIEW_REQUEST: 'bezwaar ingediend', INDEPENDENT_REVIEW: 'in review',
+    INCONCLUSIVE: 'onbeslist', INVALIDATED: 'ongeldig', ASSIGNED: 'toegewezen', LEARNING: 'aan het leren', PRACTICING: 'aan het oefenen' };
   var stand = function (s) { return STAND[s] || String(s || '').toLowerCase(); };
   var ORG = '';
 
@@ -64,6 +65,7 @@
   /* De kaarten per rol staan in leerhuis-werk-kaarten.js; dit bestand is de deur. */
   var bewijs = window.RTGLeerhuisBewijs ? window.RTGLeerhuisBewijs({ maak: maak, knop: knop, doe: doe }) : null;
   var S = window.RTGLeerhuisSchrijven ? window.RTGLeerhuisSchrijven({ $: $, maak: maak, knop: knop, doe: doe }) : null;
+  var Q = window.RTGLeerhuisKwaliteit({ maak: maak, knop: knop, kaart: kaart, zet: zet, doe: doe, wie: wie, dag: dag });
   var A = window.RTGLeerhuisAutoriteit({ maak: maak, knop: knop, kaart: kaart, zet: zet, doe: doe, wie: wie, dag: dag });
   var I = window.RTGLeerhuisInrichten({ $: $, maak: maak, knop: knop, kaart: kaart, zet: zet, doe: doe, wie: wie });
   var K = window.RTGLeerhuisKaarten({ $: $, maak: maak, knop: knop, kaart: kaart, zet: zet, doe: doe, wie: wie, dag: dag, bewijs: bewijs });
@@ -72,8 +74,8 @@
     if (!ORG) return Promise.resolve();
     try { localStorage.setItem(BEWAAR, ORG); } catch (e) {}
     return Promise.all([lees('trainerCockpit'), lees('assessorWerk'), lees('kennisWerk'), lees('managerCockpit'), lees('curriculumWerk'), lees('eigenaarWerk'),
-      lees('certificaatWerk'), lees('trainerWerk')]).then(function (r) {
-      var t = r[0], a = r[1], w = r[2], m = r[3], c = r[4], e = r[5], ca = r[6], ta = r[7];
+      lees('certificaatWerk'), lees('trainerWerk'), lees('kwaliteitWerk')]).then(function (r) {
+      var t = r[0], a = r[1], w = r[2], m = r[3], c = r[4], e = r[5], ca = r[6], ta = r[7], kw = r[8];
       /* De managercockpit kent geen `ok`: wie geen team heeft, heeft hier niets in te richten. */
       var team = !!(m && m.TEAM && m.TEAM.length);
       $('trainerBlok').hidden = !(t && t.ok); if (t && t.ok) K.trainer(t);
@@ -84,10 +86,11 @@
       $('eigenaarBlok').hidden = !(e && e.ok); if (e && e.ok) I.eigenaar(e);
       $('certificaatBlok').hidden = !(ca && ca.ok); if (ca && ca.ok) A.certificaat(ca);
       $('trainerautoriteitBlok').hidden = !(ta && ta.ok); if (ta && ta.ok) A.trainer(ta);
-      $('geenRol').hidden = !!((t && t.ok) || (a && a.ok) || (w && w.ok) || team || (c && c.ok) || (e && e.ok) || (ca && ca.ok) || (ta && ta.ok));
+      $('kwaliteitBlok').hidden = !(kw && kw.ok); if (kw && kw.ok) Q(kw);
+      $('geenRol').hidden = !!((t && t.ok) || (a && a.ok) || (w && w.ok) || team || (c && c.ok) || (e && e.ok) || (ca && ca.ok) || (ta && ta.ok) || (kw && kw.ok));
       if (/^Bezig|^Leerhuis .* wordt geladen/.test($('melding').textContent)) meld('Leerhuis ' + ORG + '.');
     }).catch(function (e) {
-      ['trainerBlok', 'assessorBlok', 'kennisBlok', 'managerBlok', 'curriculumBlok', 'eigenaarBlok', 'certificaatBlok', 'trainerautoriteitBlok', 'geenRol'].forEach(function (id) { $(id).hidden = true; });
+      ['trainerBlok', 'assessorBlok', 'kennisBlok', 'managerBlok', 'curriculumBlok', 'eigenaarBlok', 'certificaatBlok', 'trainerautoriteitBlok', 'kwaliteitBlok', 'geenRol'].forEach(function (id) { $(id).hidden = true; });
       meld(e.message);
     });
   }

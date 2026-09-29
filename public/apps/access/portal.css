@@ -17,7 +17,7 @@ body[data-ios-home][data-rtg-skin="heritage"] #onbGate{
 }
 .access-brand small{display:block;margin-top:10px;font:500 9px/1.4 Inter,sans-serif;letter-spacing:.28em}
 #gate[data-rtg-access] .access-content{width:min(100%,440px);margin:0 auto;padding:0;background:none;border:0;box-shadow:none}
-#gate[data-rtg-access] .access-title{margin:0 0 24px;color:var(--rtg-world-ink);font:400 clamp(56px,15.5vw,82px)/.98 "Bodoni Moda",Georgia,serif;letter-spacing:-.055em}
+#gate[data-rtg-access] .access-title{margin:0 0 24px;color:var(--rtg-world-ink);font:400 clamp(56px,15.5vw,82px)/.98 "Bodoni Moda",Georgia,serif;font-family:"Bodoni Moda",Georgia,serif!important;font-weight:400!important;letter-spacing:-.055em}
 #gate[data-rtg-access] .access-title em{font-weight:400}
 #gate[data-rtg-access] .access-description{font-size:16px;line-height:1.6;margin:0 0 28px;color:var(--rtg-world-muted);max-width:34ch}
 #gate[data-rtg-access] button{font-family:Inter,sans-serif;cursor:pointer;min-height:48px;touch-action:manipulation}
@@ -93,3 +93,125 @@ body:has(#onbGate:not([hidden])) .rtg-adaptive-edge{
 #gate[data-rtg-access] .access-summary bdi{unicode-bidi:isolate}
 
 #gate .access-language-notice,#onbGate .access-language-notice{font:400 13px/1.6 Inter,sans-serif;color:#e3d1d7;border-inline-start:2px solid #c63565;padding-inline-start:12px;margin:14px 0}
+
+/* The access portal owns the entire signed-out viewport. Later shared world
+   styles must not turn it back into a card inside the desktop workspace. */
+html body[data-ios-home][data-rtg-skin="heritage"] #rtgCommand #gate[data-rtg-access]:not([style*="display: none"]),
+html body[data-ios-home][data-rtg-skin="heritage"] #gate[data-rtg-access]:not([style*="display: none"]){
+ --rtg-world-ink:#f4eddc;
+ --rtg-world-muted:#dccbd0;
+ --rtg-world-bg:#17070d;
+ --rtg-world-card-strong:#4e1026;
+ --txt:#f4eddc;
+ --rtg-txt:#f4eddc;
+ --muted:#dccbd0;
+ --soft:#dccbd0;
+ position:fixed!important;
+ inset:0!important;
+ z-index:10000!important;
+ width:100%!important;
+ max-width:none!important;
+ height:100dvh!important;
+ min-height:100dvh!important;
+ margin:0!important;
+ border:0!important;
+ border-radius:0!important;
+ overflow:auto!important;
+ background:
+  radial-gradient(70rem 55rem at 8% 100%,rgba(163,46,89,.2),transparent 64%),
+  linear-gradient(135deg,#240710 0%,#390919 52%,#17070d 100%)!important;
+ background-color:#faf8f3!important;
+ box-shadow:none!important;
+}
+body:has(#gate[data-rtg-access]:not([style*="display: none"])){overflow:hidden!important}
+html body:has(#gate[data-rtg-access]:not([style*="display: none"])) .rtg-adaptive-edge{
+ display:block!important;
+ position:fixed!important;
+ z-index:10002!important;
+ left:auto!important;
+ right:max(18px,env(safe-area-inset-right,0px))!important;
+ bottom:max(16px,env(safe-area-inset-bottom,0px))!important;
+ width:58px!important;
+ max-width:58px!important;
+ height:58px!important;
+ transform:none!important;
+}
+html body:has(#gate[data-rtg-access]:not([style*="display: none"])) .rtg-adaptive-bar{
+ grid-template-columns:1fr!important;
+ padding:4px!important;
+ background:rgba(20,7,12,.82)!important;
+ box-shadow:0 12px 36px rgba(0,0,0,.28)!important;
+}
+html body:has(#gate[data-rtg-access]:not([style*="display: none"])) .rtg-adaptive-item:not([data-rtg-adaptive-action="menu"]){display:none!important}
+html body:has(#gate[data-rtg-access]:not([style*="display: none"])) .rtg-adaptive-item[data-rtg-adaptive-action="menu"]{
+ display:flex!important;
+ min-width:48px!important;
+ min-height:48px!important;
+ grid-column:1!important;
+ padding:8px!important;
+}
+html body:has(#gate[data-rtg-access]:not([style*="display: none"])) .rtg-adaptive-item[data-rtg-adaptive-action="menu"] small{display:none!important}
+html body:has(#gate[data-rtg-access]:not([style*="display: none"])) .rtg-adaptive-edge:has(.rtg-adaptive-sheet:not([hidden])){
+ left:50%!important;
+ right:auto!important;
+ width:min(720px,calc(100% - 20px))!important;
+ max-width:calc(100% - 20px)!important;
+ height:68px!important;
+ transform:translateX(-50%)!important;
+}
+html body #gate[data-rtg-access] form#agForm{
+ width:100%!important;
+ margin:0!important;
+ padding:0!important;
+ border:0!important;
+ border-radius:0!important;
+ background:transparent!important;
+ color:#f4eddc!important;
+ box-shadow:none!important;
+}
+html body #gate[data-rtg-access] form#agForm .access-field{color:#f4eddc!important}
+
+@media(min-width:900px){
+ html body[data-ios-home][data-rtg-skin="heritage"] #rtgCommand #gate[data-rtg-access]:not([style*="display: none"]),
+ html body[data-ios-home][data-rtg-skin="heritage"] #gate[data-rtg-access]:not([style*="display: none"]){
+  display:grid!important;
+  grid-template-columns:minmax(18rem,.8fr) minmax(28rem,1.2fr);
+  align-items:center;
+  gap:clamp(4rem,9vw,11rem);
+  padding:clamp(3rem,7vw,7rem) max(3rem,calc((100vw - 1320px)/2))!important;
+ }
+ #gate[data-rtg-access] .access-brand{
+  align-self:center;
+  margin:0!important;
+  color:#f4eddc;
+  font-size:clamp(5rem,10vw,10rem);
+  letter-spacing:-.055em;
+  text-align:start;
+ }
+ #gate[data-rtg-access] .access-brand small{
+  margin-top:1.5rem;
+  padding-top:1.5rem;
+  border-top:1px solid rgba(244,237,220,.28);
+  font-size:.63rem;
+  letter-spacing:.3em;
+ }
+ #gate[data-rtg-access] .access-content{
+  width:min(100%,510px);
+  margin:0;
+  padding-inline-start:clamp(2rem,5vw,5rem);
+  border-inline-start:1px solid rgba(244,237,220,.24);
+ }
+ #gate[data-rtg-access] .access-title{
+  font-size:clamp(4.25rem,6.5vw,7rem);
+  line-height:.9;
+  text-wrap:balance;
+ }
+}
+
+@media(max-width:899px){
+ html body[data-ios-home][data-rtg-skin="heritage"] #rtgCommand #gate[data-rtg-access]:not([style*="display: none"]),
+ html body[data-ios-home][data-rtg-skin="heritage"] #gate[data-rtg-access]:not([style*="display: none"]){
+  display:block!important;
+  padding:calc(env(safe-area-inset-top,0px) + 28px) 24px calc(env(safe-area-inset-bottom,0px) + 36px)!important;
+ }
+}

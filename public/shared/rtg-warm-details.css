@@ -30,6 +30,24 @@ body[data-rtg-layout="standard"][data-rtg-skin="heritage"][data-rtg-world][data-
 
 body[data-rtg-desktop] .wd-page>#shell{width:100%!important;max-width:100%!important}
 
+/* The shared frame owns document scrolling. Legacy Work grids used viewport
+   rows for navigation that Edge now hides, leaving only 58px for the page. */
+html:has(>body[data-rtg-desktop]){height:auto!important;overflow-y:auto!important}
+body[data-rtg-desktop] .wd-page>.wk-shell{position:relative!important;inset:auto!important;height:auto!important;grid-template-columns:minmax(0,1fr)!important;grid-template-rows:auto!important}
+body[data-rtg-desktop] .wd-page .wk-main{grid-row:1!important;grid-template-rows:auto!important;overflow:visible!important}
+body[data-rtg-desktop] .wd-page .wk-stage{height:auto!important;overflow:visible!important;padding-bottom:0!important}
+body[data-rtg-desktop] .wd-page .wk-stage>#inhoud{height:auto!important}
+/* Module columns are sized against the available content column, not the
+   browser width. Otherwise the action form ends up underneath favourites. */
+body[data-rtg-desktop] .wd-page :is(.wk-workspace,.wk-people,.wk-status){grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))!important}
+body[data-rtg-desktop] .wd-page .wk-modules{grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))!important}
+body[data-rtg-desktop] .wd-page .wk-modules>#mActie{height:auto!important;overflow:visible!important;grid-column:1/-1}
+/* These command pages keep their own working tabs. Their content grows in
+   the shared page instead of being cropped to a second viewport. */
+body[data-rtg-desktop] .wd-page>:is(.hq-shell,.pn-shell){position:relative!important;inset:auto!important;height:auto!important;grid-template-rows:auto auto!important}
+body[data-rtg-desktop] .wd-page :is(.hq-main,.pn-shell>main){grid-template-rows:auto minmax(0,1fr)!important;overflow:visible!important}
+body[data-rtg-desktop] .wd-page :is(.hq-stage,.pn-grid,.pn-column){overflow:visible!important;padding-bottom:16px!important}
+
 /* The mobile drawing uses a compact agenda row; the Today tab keeps its full controls. */
 @media(max-width:999px){
  body[data-rtg-desktop][data-world-home] .wd-shell{gap:12px}

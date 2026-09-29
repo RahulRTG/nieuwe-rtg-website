@@ -5,7 +5,7 @@
     "boomVuil": false,
     "boomAnders": 3,
     "instrument": "scripts/mutatie.js",
-    "node": "v22.22.2"
+    "node": "v24.18.0"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -10478,7 +10478,7 @@
       "staat": "gezakt",
       "module": "public/shared/rtg-world-identity.js",
       "operator": "===->!==#0",
-      "gezakt": 3,
+      "gezakt": 8,
       "geprobeerd": 1
     },
     "rtg.test.js": {
@@ -14807,6 +14807,22 @@
       "module": "scripts/positieproef.js",
       "operator": "===->!==#0",
       "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "pass-cache.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/sw-pass-assets.js",
+      "operator": "false->true#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "world-palette.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-world-identity.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
       "geprobeerd": 1
     }
   }

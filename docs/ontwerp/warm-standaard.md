@@ -15,3 +15,21 @@ Persoonlijke beelden vervangen uitsluitend de eigen presentatie. De bytes blijve
 De vier hoofdfoto’s en vier sfeerfoto’s zijn uit de goedgekeurde tekeningen opnieuw gegenereerd als interfacevrije productiebeelden met de ingebouwde imagegen-tool. De PNG-bronnen staan in de generated_images-map van deze taak. JPEG-encoding voegt geen retouchering toe.
 
 De volledige routecontrole wordt uitgevoerd door `scripts/desktop-audit.js`; het rapport noemt de werkelijk gemeten routeomvang en viewport. `test/warm-presentation.e2e.js` toetst foto-opslag, uitsneden, herstel en accountgrenzen. Bestaande wereld-, invoer- en toegangstoetsen blijven vereist. Dit document is geen verklaring dat publicatie al heeft plaatsgevonden.
+
+## Inhoud binnen de omlijsting
+
+De gedeelde pagina bezit de document-scroll. Oude schermschillen mogen geen viewport-hoogte of lege navigatierij behouden wanneer hun inhoud in die pagina wordt geplaatst. Werk OS had daardoor op mobiel slechts 58 pixels inhoud binnen een vlak van 400 pixels. Werkmodules moeten bovendien naar de beschikbare middenkolom schalen: vier oude minimumkolommen plaatsten de projectactie onder de favorietenkolom.
+
+`test/mobile-content.e2e.js` controleert daadwerkelijke zichtbaarheid en raakbaarheid, document-scroll, de projectactie, Pass-tabbladen, hervatte werkbladen en de inlogdeur. Met `RTG_TEST_WEBKIT=1` draait dezelfde toets in Chromium en WebKit, op 390 en 1440 pixels, met de iPhone-standalone-eigenschap. De mobiele CI-job vereist beide browsermotoren. Dit is browseremulatie, geen controle op een fysiek iPhone-toestel.
+
+De routecontrole onderzoekt ook afgeknelde inhoud binnen de buitenste pagina. Een volledige routecontrole opent de routes zonder privésessie; de gerichte toetsen dekken de genoemde ingelogde toestanden. Een groen routerapport bewijst dus niet elke accounttoestand of pixelgelijkheid met de tekeningen. De exacte pixels van de gemelde Pass-screenshot zijn niet gereproduceerd op een fysiek iPhone-toestel. Wel is een kapotte offline start na één installatie gereproduceerd: de pagina was opgeslagen, maar de serverbundels en Command-modules ontbraken. `pass-cache.js` vult na worker-overname uitsluitend openbare interfacebestanden aan, met de exacte bundeladressen. API-antwoorden, uploads en privésessies vallen daarbuiten. `pass-recovery.js` toont een bereikbare herstelknop wanneer het beginscherm niet is opgebouwd. Verbindingsverlies houdt de toegangsdeur gesloten en bewaart de sessiesleutel voor een gecontroleerde herkansing; een 401/403 wist de sleutel wel.
+
+`test/pass-startup.e2e.js` test ontbrekende opstartmodules plus herkansing in Chromium en WebKit, en een echte service-worker-installatie met offline herstart en herstel van de verbinding in Chromium. `test/pass-cache.test.js` bewaakt de toegestane openbare bestanden en weigert API-, upload- en externe adressen. WebKit-emulatie is geen test op het fysieke beginscherm van een iPhone.
+
+Alle CSS-imports van de gedeelde vormgeving horen bij de installatiecache van zowel RTG als Foundation. `test/randen.test.js` bewaakt dit; `scripts/build.js` leidt de cacheversies uit hun werkelijke inhoud af.
+
+## Wereldkleuren in geopende apps
+
+De kleurregels gelden ook binnen Pass-bladen en desktopvensters; ze mogen niet afhangen van de aanwezigheid van de desktopomlijsting. Het zichtbare palet volgt het voorste geopende scherm via `data-rtg-palette`. De vaste route-identiteit blijft apart staan voor navigatie en gegevensbronnen. Sluiten herstelt het palet van het onderliggende blad of de beginpagina. Het volledige adres telt mee, inclusief het gebied van een gedeelde werkruimte.
+
+`test/world-palette.e2e.js` vergelijkt echte achtergrond- en tekstkleuren van los geopende en ingebedde apps, de vier werelden binnen Pass, navigatie binnen een bestaand blad en terugkeren naar Home. De toets draait op 390 en 1440 pixels in Chromium en WebKit en bewaart schermafbeeldingen. De browserrand wordt opnieuw gemeten na een kleurwisseling. Bij het sluiten mag het kleine verzoek om de hervatpositie te bewaren doorlopen, zodat WebKit dat verzoek niet halverwege afbreekt.

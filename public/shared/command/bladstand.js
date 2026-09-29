@@ -30,21 +30,23 @@
   /* HET WERELDLABEL IN DE KOP. De schil zelf draagt vast data-rtg-world
      "living" (app.html hoort bij LivingOS), dus stond er "LIVINGOS" boven
      TravelOS, WorkOS en het beginscherm waar je nog een wereld KIEST. Het label
-     volgt daarom het actieve blad, in een eigen attribuut: de huisstijl van de
-     schil schuift niet mee (173 regels CSS kijken naar data-rtg-world). Geen
+     volgt daarom het actieve blad, in een eigen attribuut. Het zichtbare palet
+     volgt mee zonder de vaste route-identiteit te wijzigen. Geen
      blad, of een blad zonder wereld: geen label. rtg-edge-smart-menu leest
      hetzelfde attribuut voor "Dit scherm". */
   function kopwereld(r){
-    if(!r){d.body.removeAttribute('data-rtg-blad-wereld');return}
-    var blad=r.querySelector('.cmd-pane.actief iframe'),id=w.RTGWorldIdentity,wereld=null;
+    var id=w.RTGWorldIdentity;
+    if(!r){d.body.removeAttribute('data-rtg-blad-wereld');if(id&&id.syncPalette)id.syncPalette(d);return}
+    var blad=open(r)&&r.querySelector('.cmd-pane.actief iframe'),wereld=null;
     /* De ECHTE plek van het blad, niet het src-attribuut: bladhaak.js werkt bij
        navigatie binnen het frame alleen p.url bij, dus src bleef de eerste
        pagina en het label bleef LivingOS zeggen na een link naar TravelOS. */
-    var pad=null;if(blad){try{pad=blad.contentWindow.location.pathname}catch(e){pad=null}
-      if(!pad||pad==='blank')pad=blad.getAttribute('src')}
+    var pad=null;if(blad){try{pad=blad.contentWindow.location.href}catch(e){pad=null}
+      if(!pad||pad==='about:blank')pad=blad.getAttribute('src')}
     if(pad&&id&&typeof id.classify==='function'){try{wereld=id.classify(pad)}catch(e){wereld=null}}
     if(WERELDEN.indexOf(wereld)<0)wereld='geen';
-    if(d.body.getAttribute('data-rtg-blad-wereld')!==wereld)d.body.setAttribute('data-rtg-blad-wereld',wereld)}
+    if(d.body.getAttribute('data-rtg-blad-wereld')!==wereld)d.body.setAttribute('data-rtg-blad-wereld',wereld);
+    if(id&&id.syncPalette)id.syncPalette(d)}
 
   /* Een navigatie BINNEN een blad verandert de DOM van de schil niet; zijn
      load-event is het enige teken. */

@@ -19,12 +19,12 @@
   var BEWAAR = 'rtg_leerhuis_org';
   var STAND = { SIMULATING: 'in simulatie', SUPERVISED: 'onder toezicht', READY_FOR_ASSESSMENT: 'klaar voor beoordeling',
     ASSESSING: 'wordt beoordeeld', REQUESTED: 'wacht op een assessor', DRAFT: 'concept', REVIEW: 'ter review',
-    NOT_YET_PROVEN: 'nog niet bewezen', PROVEN: 'bewezen', ASSIGNED: 'toegewezen', LEARNING: 'aan het leren', PRACTICING: 'aan het oefenen' };
+    NOT_YET_PROVEN: 'nog niet bewezen', PROVEN: 'bewezen', ACTIVE: 'actief', PILOT: 'pilot', MONITORED: 'gevolgd',
+    IMPROVEMENT: 'in verbetering', SUPERSEDED: 'vervangen', RETIRED: 'uit gebruik', SUSPENDED: 'geschorst', REVOKED: 'ingetrokken',
+    EXPIRING: 'verloopt binnenkort', EXPIRED: 'verlopen', REVIEW_REQUEST: 'bezwaar ingediend', INDEPENDENT_REVIEW: 'in review',
+    INCONCLUSIVE: 'onbeslist', INVALIDATED: 'ongeldig', ASSIGNED: 'toegewezen', LEARNING: 'aan het leren', PRACTICING: 'aan het oefenen' };
   var stand = function (s) { return STAND[s] || String(s || '').toLowerCase(); };
-  var TOKEN = null;
-  try { TOKEN = localStorage.getItem('rtg_member_token'); } catch (e) {}
   var ORG = '';
-  var sleutels = {};
 
   function maak(tag, klas, tekst) {
     var e = document.createElement(tag);
@@ -34,40 +34,10 @@
   }
   function leeg(el) { while (el.firstChild) el.removeChild(el.firstChild); }
   function meld(t) { $('melding').textContent = String(t); }
-  /* Een sleutel per kaart en handeling, uit shared/id.js: blijft staan tot hij is aangenomen. */
-  function sleutelVoor(naam) { return sleutels[naam] || (sleutels[naam] = window.RTGId('leerhuiswerk')); }
-
-  function post(pad, lijf) {
-    return fetch(pad, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (TOKEN || '') },
-      body: JSON.stringify(lijf) }).then(function (r) {
-      return r.json().catch(function () { return {}; }).then(function (d) { return { status: r.status, d: d }; });
-    });
-  }
-  function lees(vraag, extra) {
-    return post('/api/leerhuis/lees', Object.assign({ org: ORG, vraag: vraag }, extra || {})).then(function (x) {
-      if (x.status >= 400) throw new Error(x.d.error || 'Het leerhuis antwoordde niet.');
-      return x.d.antwoord;
-    });
-  }
-
-  function doe(naam, actie, invoer, gelukt) {
-    var sleutel;
-    try { sleutel = sleutelVoor(naam); } catch (e) { meld(e.message); return Promise.resolve(); }
-    meld('Bezig: ' + gelukt.toLowerCase());
-    return post('/api/leerhuis/doe', { org: ORG, actie: actie, invoer: invoer, sleutel: sleutel }).then(function (x) {
-      if (x.status === 503) {
-        /* Onbekend: eerst navragen, niet blind opnieuw. */
-        return lees('uitkomst', { sleutel: sleutel }).then(function (u) {
-          if (u && u.bekend) { delete sleutels[naam]; return laad().then(function () { meld(gelukt + ' Dat was al vastgelegd.'); }); }
-          meld('Het is niet zeker of dit is vastgelegd. Druk nog eens; het gaat met dezelfde sleutel, dus het gebeurt hooguit een keer.');
-        });
-      }
-      if (x.status >= 400) { meld('Niet gelukt: ' + (x.d.error || 'onbekende fout') + (x.d.hoe ? ' (' + x.d.hoe + ')' : '')); return; }
-      delete sleutels[naam];
-      /* Eerst het werk opnieuw tonen, dan melden: wie het bericht hoort, vindt de kaarten al bijgewerkt. */
-      return laad().then(function () { meld(gelukt); });
-    }).catch(function () { meld('Het leerhuis antwoordde niet. Uw invoer staat er nog; druk nog eens.'); });
-  }
+  /* De deur (sleutel, navragen bij onbekend, eerst laden dan melden) staat in
+     leerhuis-deur.js, gedeeld met Mijn leerhuis. */
+  var D = window.RTGLeerhuisDeur({ meld: meld, laad: function () { return laad(); }, org: function () { return ORG; }, voorvoegsel: 'leerhuiswerk' });
+  var lees = D.lees, doe = D.doe;
 
   function knop(tekst, stil, fn) {
     var b = maak('button', 'knop' + (stil ? ' stil' : ''), tekst);
@@ -94,20 +64,33 @@
 
   /* De kaarten per rol staan in leerhuis-werk-kaarten.js; dit bestand is de deur. */
   var bewijs = window.RTGLeerhuisBewijs ? window.RTGLeerhuisBewijs({ maak: maak, knop: knop, doe: doe }) : null;
+  var S = window.RTGLeerhuisSchrijven ? window.RTGLeerhuisSchrijven({ $: $, maak: maak, knop: knop, doe: doe }) : null;
+  var Q = window.RTGLeerhuisKwaliteit({ maak: maak, knop: knop, kaart: kaart, zet: zet, doe: doe, wie: wie, dag: dag });
+  var A = window.RTGLeerhuisAutoriteit({ maak: maak, knop: knop, kaart: kaart, zet: zet, doe: doe, wie: wie, dag: dag });
+  var I = window.RTGLeerhuisInrichten({ $: $, maak: maak, knop: knop, kaart: kaart, zet: zet, doe: doe, wie: wie });
   var K = window.RTGLeerhuisKaarten({ $: $, maak: maak, knop: knop, kaart: kaart, zet: zet, doe: doe, wie: wie, dag: dag, bewijs: bewijs });
 
   function laad() {
     if (!ORG) return Promise.resolve();
     try { localStorage.setItem(BEWAAR, ORG); } catch (e) {}
-    return Promise.all([lees('trainerCockpit'), lees('assessorWerk'), lees('kennisWerk')]).then(function (r) {
-      var t = r[0], a = r[1], w = r[2];
+    return Promise.all([lees('trainerCockpit'), lees('assessorWerk'), lees('kennisWerk'), lees('managerCockpit'), lees('curriculumWerk'), lees('eigenaarWerk'),
+      lees('certificaatWerk'), lees('trainerWerk'), lees('kwaliteitWerk')]).then(function (r) {
+      var t = r[0], a = r[1], w = r[2], m = r[3], c = r[4], e = r[5], ca = r[6], ta = r[7], kw = r[8];
+      /* De managercockpit kent geen `ok`: wie geen team heeft, heeft hier niets in te richten. */
+      var team = !!(m && m.TEAM && m.TEAM.length);
       $('trainerBlok').hidden = !(t && t.ok); if (t && t.ok) K.trainer(t);
       $('assessorBlok').hidden = !(a && a.ok); if (a && a.ok) K.assessor(a);
       $('kennisBlok').hidden = !(w && w.ok); if (w && w.ok) K.kennis(w);
-      $('geenRol').hidden = !!((t && t.ok) || (a && a.ok) || (w && w.ok));
+      $('managerBlok').hidden = !team; if (team) I.manager(m);
+      $('curriculumBlok').hidden = !(c && c.ok); if (c && c.ok) { I.curriculum(c); if (S) S(c); }
+      $('eigenaarBlok').hidden = !(e && e.ok); if (e && e.ok) I.eigenaar(e);
+      $('certificaatBlok').hidden = !(ca && ca.ok); if (ca && ca.ok) A.certificaat(ca);
+      $('trainerautoriteitBlok').hidden = !(ta && ta.ok); if (ta && ta.ok) A.trainer(ta);
+      $('kwaliteitBlok').hidden = !(kw && kw.ok); if (kw && kw.ok) Q(kw);
+      $('geenRol').hidden = !!((t && t.ok) || (a && a.ok) || (w && w.ok) || team || (c && c.ok) || (e && e.ok) || (ca && ca.ok) || (ta && ta.ok) || (kw && kw.ok));
       if (/^Bezig|^Leerhuis .* wordt geladen/.test($('melding').textContent)) meld('Leerhuis ' + ORG + '.');
     }).catch(function (e) {
-      ['trainerBlok', 'assessorBlok', 'kennisBlok', 'geenRol'].forEach(function (id) { $(id).hidden = true; });
+      ['trainerBlok', 'assessorBlok', 'kennisBlok', 'managerBlok', 'curriculumBlok', 'eigenaarBlok', 'certificaatBlok', 'trainerautoriteitBlok', 'kwaliteitBlok', 'geenRol'].forEach(function (id) { $(id).hidden = true; });
       meld(e.message);
     });
   }
@@ -118,11 +101,11 @@
     $('kies').addEventListener('submit', function (ev) {
       ev.preventDefault();
       ORG = String($('org').value || '').trim();
-      sleutels = {};
+      D.vergeet();
       meld('Leerhuis ' + ORG + ' wordt geladen.');
       laad();
     });
-    if (!TOKEN) { meld('Log eerst in met uw RTG-account; het werk in het leerhuis hoort bij uw eigen account.'); return; }
+    if (!D.token) { meld('Log eerst in met uw RTG-account; het werk in het leerhuis hoort bij uw eigen account.'); return; }
     if (ORG) { meld('Leerhuis ' + ORG + ' wordt geladen.'); laad(); }
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', begin);

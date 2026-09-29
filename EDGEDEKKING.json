@@ -12390,7 +12390,7 @@
       "gebreken": [],
       "stabiel": true,
       "redenen": {
-        "hoofdactie": "een werkscherm met een handeling per kaart: elke leerling, beoordeling en elk concept heeft zijn eigen knop, er is geen handeling voor het hele scherm"
+        "hoofdactie": "een werkscherm met een handeling per kaart: elke leerling, beoordeling, elk concept, curriculum en certificaat heeft zijn eigen knop, er is geen handeling voor het hele scherm"
       }
     },
     "/apps/leerhuis.html": {

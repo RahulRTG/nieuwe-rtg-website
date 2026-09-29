@@ -31,17 +31,17 @@ window.RTGLeerhuisKaarten = function (h) {
   /* ---- assessor ---- */
   function assessor(a) {
     var open = (a.OPEN || []).map(function (b) {
-      var k = kaart(b.naam + ' van ' + wie(b), 'REQUESTED', ['Vorm: ' + (b.vorm || 'onbekend'), 'Aangevraagd op ' + dag(b.sinds)]);
+      var k = kaart(b.vaardigheidNaam + ' van ' + wie(b), 'REQUESTED', ['Vorm: ' + (b.vorm || 'onbekend'), 'Aangevraagd op ' + dag(b.sinds)]);
       var rij = maak('div', 'rij');
       rij.appendChild(knop('Beoordeling beginnen', false, function () {
-        doe('start:' + b.id, 'beoordelingStart', { id: b.id }, 'U beoordeelt nu ' + b.naam + '.');
+        doe('start:' + b.id, 'beoordelingStart', { id: b.id }, 'U beoordeelt nu ' + b.vaardigheidNaam + '.');
       }));
       k.appendChild(rij);
       return k;
     });
     var lopend = (a.LOPEND || []).map(function (b) {
       var eis = b.eis ? 'Eis: minstens ' + String(b.eis.sterkte || '').toLowerCase() + (b.eis.soorten && b.eis.soorten.length ? ', soort ' + b.eis.soorten.join(' of ').toLowerCase() : '') : null;
-      var k = kaart(b.naam + ' van ' + wie(b), 'ASSESSING', [eis]);
+      var k = kaart(b.vaardigheidNaam + ' van ' + wie(b), 'ASSESSING', [eis]);
       var gekozen = {};
       if (!(b.bewijs || []).length) k.appendChild(maak('p', 'meta', 'Er ligt geen geldig bewijs voor deze vaardigheid.'));
       (b.bewijs || []).forEach(function (x) {
@@ -62,11 +62,11 @@ window.RTGLeerhuisKaarten = function (h) {
       rij.appendChild(knop('Bewezen', false, function () {
         var bewijs = Object.keys(gekozen).filter(function (id) { return gekozen[id]; });
         doe('af:' + b.id, 'beoordelingAfronden', { id: b.id, uitkomst: 'PROVEN', bewijs: bewijs, criteria: crit.value.trim() },
-          'Vastgelegd: ' + b.naam + ' is bewezen.');
+          'Vastgelegd: ' + b.vaardigheidNaam + ' is bewezen.');
       }));
       rij.appendChild(knop('Nog niet bewezen', true, function () {
         doe('af:' + b.id, 'beoordelingAfronden', { id: b.id, uitkomst: 'NOT_YET_PROVEN', herstel: herstel.value.trim() },
-          'Vastgelegd: ' + b.naam + ' is nog niet bewezen, met het herstelpad.');
+          'Vastgelegd: ' + b.vaardigheidNaam + ' is nog niet bewezen, met het herstelpad.');
       }));
       k.appendChild(rij);
       return k;

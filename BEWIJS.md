@@ -852,9 +852,9 @@ toets omvalt.
 | `ledenladder.test.js` | 3 | gezakt op `liegpoort /api/` | DE LEDENLADDER -- van RTG Pass naar Lifestyle, en wat daar dan achter zit. WAAROM DIT DE BELANGRIJKSTE OPENSTAANDE WAS Dit huis is een membership-platform. |
 | `ledenregister.test.js` | 7 | gezakt op `===->!==#0` | Ledenregister (kern/ledenregister.js): leden op codenaam, gesplitst per stad/land/alfabet/geslacht en pas, met de omzet per pas en de 30%- foundationsplit (20% lokaal, 10% RTF). Draai: npm test |
 | `leerfabric.test.js` | 15 | gezakt op `&&->||#0` | De Learning Fabric: de structuur waar elk vak op draait. Een leerdoel is hier niet langer een naam met een zin uitleg, maar een knoop in een graaf: hij weet wat eronder ligt (vereist), hij kan zichzelf op meer dan... |
-| `leerhuis-grenzen.test.js` | 23 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `leerhuis-grenzen.test.js` | 28 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `leerhuis-lus.test.js` | 6 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `leerhuis-routes.test.js` | 11 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `leerhuis-routes.test.js` | 12 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `leerhuis-rtfbron.test.js` | 6 | gezakt op `liegpoort /api/` | HET LEERHUIS VAN EEN RTF-STAD: de relatie komt uit de zetels en uit een koppeling die de vrijwilliger ZELF legt (ACADEMY.md besluit B2, stap B2b). Tegen een echte server, want de vraag loopt over twee domeinen: het... |
 | `leerstof.test.js` | 3 | gezakt op `liegpoort /api/` | RTG School golf 2: de leerstof-motor. Elke groep heeft echte leerdoelen met een les, de oefensessie is server-authoritatief (antwoorden staan nooit in de vraag), een behaald doel komt in het leerpaspoort, en er zijn... |
 | `leerstofbreed.test.js` | 3 | gezakt op `+->-#0` | RTG School, de brede leerlijn: van twee vakken naar een echt curriculum. Basisschool: rekenen, taal, aardrijkskunde, geschiedenis, natuur, verkeer en Engels. |
@@ -2103,9 +2103,9 @@ toets omvalt.
 | `laatstedrie.e2e.js` | 1 | -- | De laatste drie schermen zonder eigen toets: RTG Camera, RTG Eye en het tweede scherm. WAAROM DEZE DRIE OVERBLEVEN, en waarom dat geen toeval is: twee ervan vragen de CAMERA (`getUserMedia`) en de derde is een tweede... |
 | `ledenschermen.e2e.js` | 3 | gezakt op `liegpoort /api/` | DE LEDENSCHERMEN: WAT HET HUIS OVER ZICHZELF ZEGT. Achttien schermen uit de lijst van TAKEN 4.9, en ze hebben iets gemeen dat de andere groepen niet hebben: ze staan het dichtst bij het lid, en juist daar doet dit... |
 | `leegtemeting.e2e.js` | 1 | genoemd | DE LEEGTE-METING, IN EEN ECHTE DOM. scripts/mobielkeuring.js beweert iets simpels: "dit scherm past, rendert, en toont een mens toch niets". |
-| `leerhuis-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | MIJN LEERHUIS IN EEN ECHTE BROWSER (ACADEMY.md, fase B-UI). test/leerhuis-routes.test.js bewijst de deur, niet het scherm. |
+| `leerhuis-scherm.e2e.js` | 1 | -- | MIJN LEERHUIS IN EEN ECHTE BROWSER (ACADEMY.md, fase B-UI). test/leerhuis-routes.test.js bewijst de deur, niet het scherm. |
 | `leerhuis-trainer.e2e.js` | 1 | -- | LEERHUIS: DE TRAINER AAN HET WERK, IN EEN ECHTE BROWSER (ACADEMY.md, fase B-UI). test/leerhuis-grenzen.test.js toets 23 bewijst dat de trainercockpit de vaardigheden van het leerpad noemt en alleen OF er een... |
-| `leerhuis-werk.e2e.js` | 1 | gezakt op `liegpoort /api/` | LEERHUIS: AAN HET WERK, IN EEN ECHTE BROWSER (ACADEMY.md, fase B-UI). test/leerhuis-routes.test.js toets 11 bewijst dat het werk over de deur komt; deze toets bewijst dat het scherm er iets mee DOET, met de weigering... |
+| `leerhuis-werk.e2e.js` | 1 | -- | LEERHUIS: AAN HET WERK, IN EEN ECHTE BROWSER (ACADEMY.md, fase B-UI). test/leerhuis-routes.test.js toets 11 bewijst dat het werk over de deur komt; deze toets bewijst dat het scherm er iets mee DOET, met de weigering... |
 | `leerpaspoort-scherm.e2e.js` | 5 | gezakt op `liegpoort /api/` | HET LEERPASPOORT IN EEN ECHTE BROWSER: de leerlijn van een leerlingprofiel. test/rtfleerlingtoegang.test.js bewijst dat /api/rtf/leerling/* de ladder op leeftijd snijdt. |
 | `leven.e2e.js` | 1 | gezakt op `liegpoort /api/` | Schermtoets voor het werkblad RTG Leven. Leven opent andere apps in panelen; een avond samenstellen is van avond.html (SCHERMEIGENAAR.json), dus hier wordt bewaakt dat Leven die eigenaar opent en haar niet opnieuw bouwt. |
 | `levenspas.e2e.js` | 1 | genoemd | De levenspas aan de GEZINSKANT (/apps/foundation/mijnbanden.html), in een echte browser. Twee dingen bewaakt deze toets, en ze bestaan allebei alleen op dit niveau. |

@@ -40,6 +40,11 @@
   details.bewijs{margin-top:.8rem;}
   details.bewijs summary{cursor:pointer;font-size:.87rem;min-height:2.75rem;display:flex;align-items:center;}
   details.bewijs .veld{display:block;width:100%;margin-top:.5rem;}
+  details.schrijf{margin-top:1rem;border-top:1px solid var(--line);padding-top:.6rem;}
+  details.schrijf summary{cursor:pointer;min-height:2.75rem;display:flex;align-items:center;font-size:.92rem;}
+  details.schrijf .veld{display:block;width:100%;margin-top:.5rem;}
+  fieldset.vinkjes{border:1px solid var(--line);margin:.6rem 0 0;padding:.4rem .7rem;}
+  fieldset.vinkjes legend{font-size:.82rem;padding:0 .3rem;}
   .keuze{display:flex;gap:.5rem;align-items:center;font-size:.84rem;margin-top:.35rem;min-height:2.75rem;}
   .keuze input{width:1.25rem;height:1.25rem;}
   .tekst{font-size:.86rem;line-height:1.6;margin-top:.5rem;white-space:pre-wrap;}
@@ -50,7 +55,7 @@
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl" data-rtg-world="work" data-rtg-skin="heritage"
-  data-rtg-edge-nvt-hoofdactie="een werkscherm met een handeling per kaart: elke leerling, beoordeling en elk concept heeft zijn eigen knop, er is geen handeling voor het hele scherm" data-rtg-layout="standard">
+  data-rtg-edge-nvt-hoofdactie="een werkscherm met een handeling per kaart: elke leerling, beoordeling, elk concept, curriculum en certificaat heeft zijn eigen knop, er is geen handeling voor het hele scherm" data-rtg-layout="standard">
 <header>
   <div class="ey">RTG Academy</div>
   <h1>Leerhuis: aan het werk</h1>
@@ -58,7 +63,7 @@
 <main id="inhoud">
   <section>
     <h2>Welk leerhuis</h2>
-    <p class="uitleg">Het werk van trainers, assessoren en kenniseigenaren in het leerhuis van uw organisatie. U ziet alleen het deel dat bij uw rol hoort. Wat u zelf leert, staat in <a href="/apps/leerhuis.html">Mijn leerhuis</a>.</p>
+    <p class="uitleg">Het werk van trainers, assessoren, kenniseigenaren, curriculumeigenaren, managers, autoriteiten en de eigenaar in het leerhuis van uw organisatie. U ziet alleen het deel dat bij uw rol hoort. Wat u zelf leert, staat in <a href="/apps/leerhuis.html">Mijn leerhuis</a>.</p>
     <form id="kies" class="rij">
       <label for="org">Code van de organisatie</label>
       <input id="org" class="veld" name="org" autocomplete="off" maxlength="60" placeholder="bijvoorbeeld RTG-OPS">
@@ -83,9 +88,45 @@
     <div id="kennis"></div>
     <p id="kennisNiet" class="let"></p>
   </section>
-  <p id="geenRol" class="leeg" hidden>U heeft in dit leerhuis geen rol als trainer, assessor of kenniseigenaar. Er ligt hier dus geen werk voor u.</p>
+  <section id="eigenaarBlok" hidden>
+    <h2>Het leerhuis beheren</h2>
+    <p class="uitleg">U legt een relatie vast of kent een bestuursrol toe aan een mens op zijn codenaam. Elke opzoeking vraagt een reden en staat op de inzagekaart van die persoon. Niemand benoemt zichzelf, ook u niet.</p>
+    <div id="eigenaar"></div>
+  </section>
+  <section id="managerBlok" hidden>
+    <h2>Uw team inrichten</h2>
+    <p class="uitleg">U wijst een rol toe aan de mensen in uw team en maakt hun startplan; het leren zelf volgt hun trainer. Een leerpad dat uit het startplan volgt, krijgt de trainer die het leerhuis ervoor heeft.</p>
+    <div id="manager"></div>
+  </section>
+  <section id="curriculumBlok" hidden>
+    <h2>Curricula</h2>
+    <p class="uitleg">Een curriculum gaat van concept via review naar actief. Het leert alleen officiële kennis: zolang een kennisitem nog een concept is, weigert het leerhuis het activeren. Als curriculumeigenaar schrijft u hier ook nieuwe kennis, vaardigheden, rollen en curricula; kennis wordt officieel als een andere kenniseigenaar hem activeert.</p>
+    <div id="curriculum"></div>
+    <div id="schrijven"></div>
+  </section>
+  <section id="certificaatBlok" hidden>
+    <h2>Certificaten</h2>
+    <p class="uitleg">Bewezen vaardigheden die nog geen certificaat dragen, en de certificaten van dit leerhuis. Wat u zelf beoordeelde bij een kritieke vaardigheid, of wat over uzelf gaat, geeft een ander uit. Schorsen en intrekken vragen een reden.</p>
+    <div id="certificaat"></div>
+  </section>
+  <section id="trainerautoriteitBlok" hidden>
+    <h2>Trainers</h2>
+    <p class="uitleg">Leerpaden zonder trainer, wie trainer kan worden en wie het al is. Trainer wordt alleen wie een geldig certificaat voor Train-the-Trainer heeft en de vaardigheden van het leerpad zelf bewees; niemand kwalificeert zichzelf.</p>
+    <div id="trainerautoriteit"></div>
+  </section>
+  <section id="kwaliteitBlok" hidden>
+    <h2>Kwaliteit</h2>
+    <p class="uitleg">Bezwaren tegen een beoordeling, beoordelingen die ongeldig moeten, en het beleid dat zegt wie geschikt is voor een handeling. Het oordeel achter een bezwaar ziet u pas als u de review op u neemt; wat u zelf beoordeelde of voorstelde, behandelt een ander.</p>
+    <div id="kwaliteit"></div>
+  </section>
+  <p id="geenRol" class="leeg" hidden>U heeft in dit leerhuis geen rol als trainer, assessor, kenniseigenaar, curriculumeigenaar, manager, eigenaar of autoriteit. Er ligt hier dus geen werk voor u.</p>
 </main>
+<script src="/apps/leerhuis-deur.js"></script>
 <script src="/apps/leerhuis-werk-bewijs.js"></script>
+<script src="/apps/leerhuis-werk-inrichten.js"></script>
+<script src="/apps/leerhuis-werk-schrijven.js"></script>
+<script src="/apps/leerhuis-werk-autoriteit.js"></script>
+<script src="/apps/leerhuis-werk-kwaliteit.js"></script>
 <script src="/apps/leerhuis-werk-kaarten.js"></script>
 <script src="/apps/leerhuis-werk.js"></script>
 <script src="/shared/schermbeeld.js" defer></script>

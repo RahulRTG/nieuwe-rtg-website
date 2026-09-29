@@ -34,7 +34,25 @@ module.exports = (sctx) => {
     return b.length > 5;
   }
 
+  /* DE HERHALING MET DEZELFDE SLEUTEL. Deze route staat in
+     lib/eenmalig-geheim-routes.js: het antwoord draagt een beheer-token dat
+     alleen als hash blijft, dus geen generieke antwoordcache mag het bewaren of
+     herhalen. Dan moet het domein de dubbele uitgifte zelf tegenhouden, zoals
+     kern/pay/kasbak.js dat doet: een retry met dezelfde idem-sleutel maakt geen
+     tweede werkruimte en toont het eerste token niet opnieuw (409 zonder token).
+     Tot 29 september 2026 ontbrak dit, en maakte een retry met dezelfde sleutel
+     een tweede werkruimte terwijl het mutatiecontract PROTECTED zei. */
+  const idemAfdruk = (req) => {
+    const s = String((req.body && req.body.idem) || req.get('Idempotency-Key') || '').slice(0, 200);
+    return s ? crypto.createHash('sha256').update('werkruimte|maak|' + s).digest('hex') : null;
+  };
+
   app.post('/api/bedrijf/werkruimte/maak', (req, res) => {
+    const idem = idemAfdruk(req);
+    if (idem && Object.values(W()).some(x => x && x.idemAfdruk === idem)) {
+      return res.status(409).json({ code: 'WERKRUIMTE_AL_GEMAAKT',
+        error: 'Met deze sleutel is al een werkruimte gemaakt. Het beheer-token wordt maar een keer getoond; vraag een nieuw via de beheerder.' });
+    }
     if (maakRem(String(req.ip || ''))) {
       return res.status(429).json({ error: 'Te veel nieuwe werkruimtes achter elkaar. Wacht een paar minuten.' });
     }
@@ -66,6 +84,7 @@ module.exports = (sctx) => {
       kvk: schoon(req.body.kvk, 20) || null, btwNummer: schoon(req.body.btw, 20) || null,
       leden: {}, journaal: [], at: nu()
     };
+    if (idem) w.idemAfdruk = idem;
     if (PRODUCTIE) {
       const sessie = req.session;
       const naamAccount = sessie && sessie.account && kern.accounts && kern.accounts.realNameOf

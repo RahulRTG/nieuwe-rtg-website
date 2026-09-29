@@ -49,7 +49,7 @@
     "onbewaakt": 0,
     "ratelTanden": 152,
     "registersUitVuileBoom": 1,
-    "rollbackUitzonderingen": 1,
+    "rollbackUitzonderingen": 2,
     "rolscheidingGaten": 0,
     "rolscheidingGemeten": 1444,
     "routesNietSchakelbaar": 0,
@@ -3564,6 +3564,16 @@
       "meter": "bewijsAchterstand 2712 -> 2721",
       "reden": "DE VERSE IDEMPROEF ZAG DE ROUTES VAN MAIN. IDEMPROEF.json is hermeten op 632583ce, nu met de passkeymedewerker uit main op de incassoronde (die zat in de vorige ronde niet op de tak en gaf 403). Hij riep 5148 routes aan tegen 5020; de +11 zijn allemaal idem-ongeclassificeerd (1606 -> 1617), en daarvan kregen er twee meteen een besluit van de eigenaar (bedrijf/lid/aanmeld en bedrijf/mijn, code-maker), dus netto +9: routes die uit de merge met main komen en nog geen besluit in IDEMBESLUIT.json dragen. Er ging geen bewezen cel verloren (bewijsCellenBewezen 26449 -> 26941).",
       "waarheen": "de nieuwe routes een besluit in IDEMBESLUIT.json geven. Vervalt 2026-12-29."
+    },
+    {
+      "datum": "2026-09-29",
+      "soort": "schuld",
+      "sleutel": "rollbackUitzonderingen",
+      "van": 1,
+      "vervalt": "2026-12-29",
+      "meter": "rollbackUitzonderingen 1 -> 2",
+      "reden": "EEN BESLUIT EN GEEN VERSOEPELING. De staatproef schorste /api/office/doos/sleutel: een weigering (400) liet iets staan in techniek. Nagetrokken met een vingerafdruk per rij: alleen de rij van het beveiligingsbord bewoog, bij elke oproep, en dat is de kritieke melding 'zwaar-zonder-passkey' die server/kern/zwaarbewijs.js met opzet schrijft zodra de zware poort via de terugval gaat -- ook als de handeling daarna nog weigert. Die melding stil laten is erger dan haar laten staan. ROLLBACKBESLUIT.json draagt het besluit met citaat; de gemeten reden blijft in de cel.",
+      "waarheen": "Zakt vanzelf terug als de zaakcontrole voor de zware poort komt of als de eigenaar een passkey heeft; dan hoort de regel uit ROLLBACKBESLUIT.json. Vervalt 2026-12-29."
     }
   ],
   "prestatie": {

@@ -113,6 +113,27 @@ test('maar de stille controle wast alleen weg wat hij zelf ZAG bewegen', () => {
     'de restlijst noemt de ruis niet meer');
 });
 
+test('EERSTE AANRAKING PER COLLECTIE: inrichting naast een deurteller zakt de route niet', () => {
+  /* /api/rtfos/vrijwilliger/account-los, 29 september 2026: `rtfos` ontstond
+     bij de eerste 404 uit het niets en bleef daarna stil; bij de herhaling
+     bewoog alleen een deurteller die later spoelt. De hele-verschilregel zag
+     "ook bij de herhaling bewoog iets" en telde de inrichting mee. */
+  const o = weegStaat({ a: nee(404), b: nee(404),
+    d01: d('rtfos'), d12: d('securityLog'), dStil: d('apiSpoor') });
+  assert.equal(o.rollback, 'bewezen', o.reden);
+  assert.match(o.reden, /eenmalige inrichting.*rtfos/);
+});
+
+test('maar wat bij de herhaling OPNIEUW beweegt, is nooit inrichting', () => {
+  /* De tegenproef: de per-collectieregel mag een collectie alleen vrijspreken
+     als hij bij de tweede, identieke weigering stil bleef. */
+  const o = weegStaat({ a: nee(404), b: nee(404),
+    d01: d('rtfos', 'saldi'), d12: d('saldi'), dStil: d('apiSpoor') });
+  assert.equal(o.rollback, 'GEZAKT');
+  assert.match(o.reden, /saldi/);
+  assert.match(o.reden, /eenmalige inrichting rtfos weggelaten/);
+});
+
 test('en een LEEG stil venster wast niets weg: dan was het geen ruis', () => {
   /* Zonder deze kant zou de stille controle een vrijbrief zijn: elke meting
      met een dStil erbij zou schoner lijken. Beweegt er in het stille venster

@@ -21,6 +21,7 @@
    ========================================================================== */
 const rem = require('../rem');
 const koppelingen = require('../sso/koppelingen');
+const clientgeheim = require('../sso/clientgeheim');
 const oidc = require('../sso/oidc');
 const staat = require('../sso/staat');
 const binnenkomst = require('../sso/binnenkomst');
@@ -45,6 +46,16 @@ module.exports = (kern) => {
      kunnen laten wijzen, en dan levert de provider de code daar af. */
   const terugAdres = (req) => appUrl(req) + '/api/sso/terug';
 
+  /* DICHT MET DE REDEN (besluit B16): zonder geldig clientgeheim -- nooit gezet,
+     verlopen, onleesbaar of zonder sleutel -- gaat er geen tokenruil naar de
+     provider, ook geen lege. De reden zegt niets over de klant, alleen wat de
+     beheerder moet doen. */
+  const dicht = (res, k, ruil) => {
+    log.warn('sso.geheim dicht', { org: k.org, code: ruil.code });
+    return res.status(503).json({ error: 'Inloggen via deze organisatie staat dicht: ' + ruil.reden + '.',
+      code: 'SSO_GEHEIM_' + ruil.code });
+  };
+
   /* ---------- 1. waar hoort dit adres thuis? ----------
      Het inlogscherm vraagt dit zodra iemand zijn werkmail typt. Het antwoord
      zegt hoogstens "dit domein logt in via zijn eigen provider" -- geen namen,
@@ -59,6 +70,8 @@ module.exports = (kern) => {
   app.get('/api/sso/start', rem({ windowMs: 60000, limit: 30 }), async (req, res) => {
     const k = koppelingen.vind(req.query.org);
     if (!k || !k.actief) return res.status(404).json({ error: 'Onbekende of uitgezette SSO-koppeling.' });
+    const ruil = koppelingen.geheimenVoorRuil(k.org);
+    if (!ruil.geheimen.length) return dicht(res, k, ruil);
     try {
       const doc = await oidc.ontdek(k.issuer);
       const verifier = staat.maakVerifier();
@@ -95,13 +108,16 @@ module.exports = (kern) => {
 
     const k = koppelingen.vind(s.org);
     if (!k || !k.actief) return fout('Deze SSO-koppeling bestaat niet meer.', 404);
+    const ruil = koppelingen.geheimenVoorRuil(k.org);
+    if (!ruil.geheimen.length) return dicht(res, k, ruil);
 
     try {
       const doc = await oidc.ontdek(k.issuer);
-      const { claims } = await oidc.wisselCode(doc, {
-        clientId: k.clientId, clientSecret: koppelingen.geheimVan(k.org),
+      // het nieuwste geheim eerst; het vorige alleen binnen de overlap en na invalid_client
+      const { claims } = await clientgeheim.probeer(ruil.geheimen, (geheim) => oidc.wisselCode(doc, {
+        clientId: k.clientId, clientSecret: geheim,
         redirectUri: terugAdres(req), code: req.query.code, verifier: s.verifier
-      }, { nonce: s.nonce });
+      }, { nonce: s.nonce }));
 
       /* Alles wat hierna gebeurt -- aanmelden, loggen, de identiteitsbrug, het
          overdrachtsbewijs, de terugreis -- staat in sso/binnenkomst.js, omdat

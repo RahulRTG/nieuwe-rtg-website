@@ -27,11 +27,11 @@
   }
   function startLes(){
     var knop=el('dStart');el('dFout').textContent='';knop.disabled=true;
-    basis('/api/foundation/les/maak',{vak:el('dVak').value,naam:el('dNaam').value}).then(function(x){w.RTGSchoolSession.zet('rtf_docent',{code:x.code,token:x.token});location.href='bord.html?code='+encodeURIComponent(x.code)},function(e){el('dFout').textContent=e.message;knop.disabled=false})
+    basis('/api/foundation/les/maak',{vak:el('dVak').value,naam:el('dNaam').value,idem:w.RTGId('les')}).then(function(x){w.RTGSchoolSession.zet('rtf_docent',{code:x.lesId,token:x.token,lescode:x.lescode});location.href='bord.html?code='+encodeURIComponent(x.lesId)},function(e){el('dFout').textContent=e.message;knop.disabled=false})
   }
   function doeMee(){
-    var knop=el('lJoin'),code=el('lCode').value.trim().toUpperCase();el('lFout').textContent='';knop.disabled=true;
-    basis('/api/foundation/les/join',{code:code,naam:el('lNaam').value}).then(function(x){w.RTGSchoolSession.zet('rtf_leerling',{code:code,token:x.token,naam:x.naam});location.href='schrift.html?code='+encodeURIComponent(code)},function(e){el('lFout').textContent=e.message;knop.disabled=false})
+    var knop=el('lJoin'),code=el('lCode').value.replace(/\s+/g,'').toUpperCase();el('lFout').textContent='';knop.disabled=true;
+    basis('/api/foundation/les/join',{lescode:code,naam:el('lNaam').value}).then(function(x){w.RTGSchoolSession.zet('rtf_leerling',{code:x.lesId,token:x.token,naam:x.naam});location.href='schrift.html?code='+encodeURIComponent(x.lesId)},function(e){el('lFout').textContent=e.message;knop.disabled=false})
   }
   function hulp(e){
     e.preventDefault();var tekst=el('lgVraag').value.trim(),knop=e.currentTarget.querySelector('[type="submit"]');if(!tekst)return;

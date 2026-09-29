@@ -1,13 +1,14 @@
-/* De niet-gemigreerde gezins- en lesdragers zijn in productie DICHT, ook met een
-   geslaagd extern Foundation-dossier; en de gedeelde Zaakdoos-sleutel opent in
+/* De niet-gemigreerde gezinsdragers zijn in productie DICHT, ook met een
+   geslaagd extern Foundation-dossier; de lesfamilie is sinds 29 september 2026
+   gemigreerd (B17) en gaat met dat dossier gewoon open; en de gedeelde Zaakdoos-sleutel opent in
    productie niets meer (B12): de kloon is dan 503 en de meting 403. Alleen de
    eigen sleutel van een doos komt door (test/zaakdoos-productie.test.js).
    CODECREDENTIALS.json:
-   foundation.family_profile_token_buiten_harde_poort,
-   foundation.onderwijs_les_tokens en devices.zaakdoos_sleutel.
+   foundation.family_profile_token_buiten_harde_poort, devices.zaakdoos_sleutel
+   (en foundation.onderwijs_les_tokens, nu migrated).
 
    De lijst wordt BRONAFGELEID nagelopen: elke route in een bestand dat het
-   profieltoken of het lestoken leest, hoort dicht te zijn of een verklaarde
+   profieltoken leest, hoort dicht te zijn of een verklaarde
    uitzondering te dragen. Een nieuwe consumer buiten de lijst laat dit zakken. */
 'use strict';
 const test = require('node:test');
@@ -26,11 +27,11 @@ const GEEN_DRAGER = new Map([
   ['/api/foundation/bespaartip', 'algemene tip, geen sessie (buddy.js)'],
   ['/api/foundation/impact', 'openbaar impactgetal (buddy.js)'],
   ['/api/foundation/gesprekskaart', 'openbare gesprekskaart (buddy.js)'],
-  ['/api/foundation/tip', 'dagtip zonder les of token (onderwijs/schrift.js)'],
-  ['/api/foundation/reis/aanvraag', 'open aanvraagformulier met IP-rem, geen token (onderwijs/schrift.js)'],
   ['/api/foundation/health', 'gezondheidsprik (foundation.js)']
 ]);
-const DRAGER = /verifieerProfiel|rtfSociaal|gezinsPoort|familieVan|sessieVan|beheerderVan|profielVan|docentCheck|leerlingVan|lesVan|tokenUit/;
+/* Zonder docentCheck, leerlingVan en lesVan sinds B17: de lesdrager is gemigreerd
+   (foundation/onderwijs/toegang.js) en leest tokenUit niet meer. */
+const DRAGER = /verifieerProfiel|rtfSociaal|gezinsPoort|familieVan|sessieVan|beheerderVan|profielVan|tokenUit/;
 
 function bestanden(map) {
   const uit = [];
@@ -54,7 +55,7 @@ function dragerRoutes() {
   return routes;
 }
 
-test('elke route in een bestand dat het gezins- of lestoken leest is in productie hard dicht', () => {
+test('elke route in een bestand dat het gezinstoken leest is in productie hard dicht', () => {
   const routes = dragerRoutes();
   assert.ok(routes.size > 150, 'de bronafleiding vond ' + routes.size + ' routes; te weinig om iets te bewijzen');
   const open = [];
@@ -67,7 +68,7 @@ test('elke route in een bestand dat het gezins- of lestoken leest is in producti
   for (const pad of GEEN_DRAGER.keys()) assert.ok(routes.has(pad), pad + ' bestaat niet meer; haal de uitzondering weg');
 });
 
-test('uitgifte en raw teruggave van het profieltoken, en de lesfamilie, blijven dicht met een PASS-dossier', async t => {
+test('uitgifte en raw teruggave van het profieltoken blijven dicht met een PASS-dossier; de lesfamilie gaat open', async t => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-gezinstoken-'));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   maakGetekendeVrijgave(root);
@@ -78,9 +79,18 @@ test('uitgifte en raw teruggave van het profieltoken, en de lesfamilie, blijven 
   });
   for (const pad of ['/api/rtf/uitnodiging/accepteer', '/api/rtf/kanaal', '/api/rtf/toegang',
     '/api/rtf/knelpunt', '/api/rtf/beroepen/mijn', '/api/rtf/bieb', '/api/rtf/geloof/lees',
-    '/api/rtf/connect/dossier', '/api/rtf/labfonds/doneer', '/api/foundation/kosten',
-    '/api/foundation/les/join', '/api/foundation/les/maak', '/api/foundation/ai', '/api/foundation/bord/stroke'])
+    '/api/rtf/connect/dossier', '/api/rtf/labfonds/doneer', '/api/foundation/kosten'])
     assert.equal(await roep(pad), 503, pad);
+  /* De gemigreerde lesfamilie (B17): met het dossier open, zonder het dossier dicht. */
+  for (const pad of ['/api/foundation/les/join', '/api/foundation/les/maak', '/api/foundation/ai',
+    '/api/foundation/bord/stroke', '/api/foundation/les/code/roteer', '/api/foundation/schrift/opslaan'])
+    assert.equal(await roep(pad), 200, pad + ' hoort met een PASS-dossier open te gaan');
+  const zonder = poort({ productie: true, env: {}, root });
+  const dicht = await new Promise(resolve => {
+    const res = { set() { return res; }, status(s) { res.s = s; return res; }, json() { resolve(res.s); } };
+    zonder({ method: 'POST', path: '/api/foundation/les/join', body: {} }, res, () => resolve(200));
+  });
+  assert.equal(dicht, 503, 'zonder vrijgaveverzoek blijft de lesfamilie onder de gewone Foundation-poort dicht');
   /* Geen gezinsdrager: het dossier opent ze gewoon (niet alles dichtgetimmerd). */
   for (const pad of ['/api/rtf/bericht', '/api/rtf/overzicht', '/api/rtf/vacatures', '/api/rtf/bieb/weg'])
     assert.equal(await roep(pad), 200, pad);
@@ -103,12 +113,18 @@ test('echte productieserver: gezinstoken-, les- en klooneindpunten weigeren vÃ³Ã
   const post = (pad, body) => fetch(base + pad, { method: 'POST', headers: PROXY,
     body: JSON.stringify(body || { code: 'GEZIN', token: 'x'.repeat(32) }) });
   for (const pad of ['/api/rtf/toegang', '/api/rtf/knelpunt', '/api/rtf/kanaal',
-    '/api/rtf/uitnodiging/accepteer', '/api/foundation/les/join']) {
+    '/api/rtf/uitnodiging/accepteer']) {
     const r = await post(pad);
     assert.equal(r.status, 503, pad);
     assert.equal((await r.json()).code, 'functie-niet-beschikbaar', pad);
   }
   assert.notEqual((await post('/api/rtf/vacatures', {})).status, 503, 'een route zonder gezinsdrager blijft open');
+  /* De lesfamilie is gemigreerd (B17): op deze server zonder vrijgavedossier is
+     hij dicht door de GEWONE Foundation-poort, en niet meer door NOG_GESLOTEN. */
+  const les = await post('/api/foundation/les/join', { lescode: 'LES.' + '0'.repeat(32), naam: 'x' });
+  assert.equal(les.status, 503);
+  assert.equal(poort.isNogGeslotenCredentialroute('POST', '/api/foundation/les/join', {}), false);
+  assert.equal(poort.isBeschermdeRoute('POST', '/api/foundation/les/join', {}), true);
   const kloon = await fetch(base + '/api/doos/kloon', { headers: { ...PROXY, 'x-doos-sleutel': SLEUTEL } });
   assert.equal(kloon.status, 503);
   const lijf = await kloon.json();

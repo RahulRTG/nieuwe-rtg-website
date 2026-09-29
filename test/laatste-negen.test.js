@@ -94,16 +94,16 @@ test('1. een open verbinding is nog steeds een deur', async () => {
 
 test('2. de leskamer en het gezinskanaal doen hetzelfde bij de deur', async () => {
   const les = (await fapi('/les/maak', { vak: 'Rekenen', naam: 'Juf Nora' })).body;
-  const leerling = (await fapi('/les/join', { code: les.code, naam: 'Sem' })).body;
+  const leerling = (await fapi('/les/join', { lescode: les.lescode, naam: 'Sem' })).body;
 
   assert.equal((await stroom('/api/foundation/les/ZZZZZZ/stream?role=docent&token=' + les.token)).status, 404,
-    'een lescode die niet bestaat');
-  assert.equal((await stroom('/api/foundation/les/' + les.code + '/stream?role=docent&token=' + leerling.token)).status, 403,
+    'een les die niet bestaat');
+  assert.equal((await stroom('/api/foundation/les/' + les.lesId + '/stream?role=docent&token=' + leerling.token)).status, 403,
     'een leerling die zich voor docent uitgeeft');
-  assert.equal((await stroom('/api/foundation/les/' + les.code + '/stream?role=leerling&token=verzonnen')).status, 403,
+  assert.equal((await stroom('/api/foundation/les/' + les.lesId + '/stream?role=leerling&token=verzonnen')).status, 403,
     'en een leerling zonder geldig token');
 
-  const doc = await stroom('/api/foundation/les/' + les.code + '/stream?role=docent&token=' + les.token);
+  const doc = await stroom('/api/foundation/les/' + les.lesId + '/stream?role=docent&token=' + les.token);
   assert.equal(doc.status, 200, 'de begeleider komt binnen');
   assert.match(doc.type, /text\/event-stream/);
 
@@ -118,30 +118,30 @@ test('2. de leskamer en het gezinskanaal doen hetzelfde bij de deur', async () =
 
 test('3. het schrift is van de leerling die erin schrijft', async () => {
   const les = (await fapi('/les/maak', { vak: 'Taal', naam: 'Meester Bram' })).body;
-  const een = (await fapi('/les/join', { code: les.code, naam: 'Fay' })).body;
-  const twee = (await fapi('/les/join', { code: les.code, naam: 'Noor' })).body;
+  const een = (await fapi('/les/join', { lescode: les.lescode, naam: 'Fay' })).body;
+  const twee = (await fapi('/les/join', { lescode: les.lescode, naam: 'Noor' })).body;
 
   const haal = (code, token) => fetch(base + '/api/foundation/schrift/' + code + '?token=' + token)
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
   assert.equal((await haal('ZZZZZZ', een.token)).status, 404, 'een les die niet bestaat');
-  assert.equal((await haal(les.code, 'verzonnen')).status >= 400, true, 'een token dat niet meedoet');
+  assert.equal((await haal(les.lesId, 'verzonnen')).status >= 400, true, 'een token dat niet meedoet');
 
-  const mijn = await haal(les.code, een.token);
+  const mijn = await haal(les.lesId, een.token);
   assert.equal(mijn.status, 200);
   assert.ok('schrift' in mijn.body, 'de leerling krijgt zijn eigen schrift');
 
   /* Twee leerlingen in dezelfde les hebben elk hun eigen schrift. Het pad
-     draagt alleen de LESCODE, dus de scheiding hangt volledig aan het token --
+     draagt alleen het (niet-geheime) les-id, dus de scheiding hangt volledig aan het token --
      precies de plek waar je wilt weten dat het klopt. Vandaar dat er eerst
      echt iets IN het ene schrift gaat: op twee lege schriften slaagt "ze zijn
      niet hetzelfde" nooit, en dan bewijst de bewering niets. */
   const opslaan = await fapi('/schrift/opslaan',
-    { code: les.code, token: een.token, pages: [{ type: 'tekst', titel: 'Som 1', inhoud: 'De som van Fay.' }] });
+    { code: les.lesId, token: een.token, pages: [{ type: 'tekst', titel: 'Som 1', inhoud: 'De som van Fay.' }] });
   assert.equal(opslaan.status, 200, 'Fay schrijft iets op: ' + JSON.stringify(opslaan.body).slice(0, 140));
 
-  const vanFay = await haal(les.code, een.token);
-  const vanNoor = await haal(les.code, twee.token);
+  const vanFay = await haal(les.lesId, een.token);
+  const vanNoor = await haal(les.lesId, twee.token);
   assert.ok((vanFay.body.schrift.pages || []).some(x => x.inhoud === 'De som van Fay.'),
     'het staat in het schrift van Fay');
   assert.ok(!(vanNoor.body.schrift.pages || []).some(x => x.inhoud === 'De som van Fay.'),

@@ -29,6 +29,7 @@ module.exports = (kern) => {
   require('./office/veiligheid')(octx);
   require('./office/partneraanvragen')(octx);
   require('./office/partners')(octx);
+  require('./office/partnerpersoneel')(octx);   // personeelscodes van het partnerkanaal, per medewerker (B14)
   require('./office/ondernemers')(octx);   // de ondernemerskant: regie, rechtsvormwacht, catalogus-wensen
   require('./office/instellingen')(octx);  // gemeente, luchthaven, OV en de andere interne genres aansluiten
   require('./office/toegang')(octx);

@@ -14832,6 +14832,73 @@
       "operator": "===->!==#0",
       "gezakt": 3,
       "geprobeerd": 1
+    },
+    "foundation-lescredential-server.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "foundation-lescredential.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/foundation/onderwijs/toegang.js",
+      "operator": "!==->===#0",
+      "gezakt": 8,
+      "geprobeerd": 2
+    },
+    "linkcap-credential.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/link/handelingen.js",
+      "operator": "===->!==#0",
+      "gezakt": 6,
+      "geprobeerd": 1
+    },
+    "linkcap-productie.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
+    "partnerpersoneelscode-register.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/partnerpersoneelscode.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 1
+    },
+    "partnerpersoneelscode.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
+    },
+    "sso-clientgeheim-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "sso-clientgeheim-scherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "sso-clientgeheim.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/accounts/index.js",
+      "operator": "return-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 3
     }
   }
 }

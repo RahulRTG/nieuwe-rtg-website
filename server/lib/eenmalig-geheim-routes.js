@@ -117,7 +117,20 @@ const ROUTES = new Set([
   'POST /api/concern/uitnodigen', 'POST /api/concern/bulk/verstuur', 'POST /api/concern/uitnodiging/roteer',
   'POST /api/member/magnaat/teamkamer/maak', 'POST /api/member/magnaat/teamkamer/code',
   'POST /api/service/bevestiging/toon', 'POST /api/supplier/service/bevestiging/toon',
-  'POST /api/office/kantoor/uitnodiging'
+  'POST /api/office/kantoor/uitnodiging',
+  /* De personeelscode van het partnerkanaal (kern/partnerpersoneelscode.js, B14):
+     uitgeven en roteren dragen de kale 128-bit code, daarna alleen de hash. */
+  'POST /api/office/partnerkanaal/personeelscode',
+  'POST /api/office/partnerkanaal/personeelscode/roteer',
+  // de RTG Link-drager (B15, kern/link/cap-bak.js): de 128-bit code staat alleen in dit antwoord
+  'POST /api/link/cap/maak',
+  /* Het SSO-clientgeheim (besluit B16): het VERZOEK draagt het geheim en het
+     antwoord alleen de stand; geen cache mag een rotatie herhalen of onthouden. */
+  'POST /api/techniek/sso', 'POST /api/techniek/sso/geheim', 'POST /api/techniek/sso/geheim/overlap/sluit',
+  /* De lescredentials van RTFoundation-onderwijs (B17, foundation/onderwijs/toegang.js):
+     maken toont lescode en leraarssleutel, meedoen de leerlingsleutel, roteren een
+     nieuwe lescode -- elk precies een keer; daarna bestaat alleen de hash. */
+  'POST /api/foundation/les/maak', 'POST /api/foundation/les/join', 'POST /api/foundation/les/code/roteer'
 ]);
 
 const isEenmalig = (methode, pad) => ROUTES.has(

@@ -8,7 +8,7 @@ const express = require('../web');
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
-const { db, save, DATA_DIR } = require('./../db');
+const { db, save, DATA_DIR, bewerkCollectie } = require('./../db');
 const { eigenVeld } = require('./../kern/util'); // veilige objecttoegang (geen prototype-pollution)
 const foutisolatie = require('../lib/foutisolatie');
 const klok = require('../lib/klok');
@@ -131,7 +131,7 @@ module.exports = function maakBasis() {
   /* De context: alles wat de submodules delen. kiesBuddy/leeftijdInstr worden
      later door de gezinslaag op dit object gezet (aanroep gebeurt pas per
      aanvraag, dus die late binding is veilig). */
-  return { db, save, DATA_DIR, eigenVeld, crypto,
+  return { db, save, DATA_DIR, bewerkCollectie, eigenVeld, crypto,
     encS, decS, teVaak, misluktePoging, goedePoging, ipVan, anthropic, tokenUit,
     router, F, nu, rid, schoon, LETTERS, SYSTEM, DEMO, TIPS };
 };

@@ -71,5 +71,11 @@ kern.doosSleutels = require('../kern/zaakdoos/sleutels').doosSleutelsVan({ db, s
    nam stil de niet-transactionele weg, over twee instances niet atomair. */
 kern.personeelsUitnodiging = require('../routes/supplier/werving/uitnodiging')({
   kern: Object.assign(Object.create(kern), { bewerkCollectie: hulp.bewerkCollectie }) });
+/* De personeelscode van het partnerkanaal (kern/partnerpersoneelscode.js, B14):
+   128 bits per medewerker, alleen als hash, en een boeking claimt een gebruik
+   in de collectietransactie. De partnercode zelf is een openbare attributie. */
+kern.partnerPersoneelscode = require('../kern/partnerpersoneelscode').personeelscodesVan({ db, crypto,
+  bewerkCollectie: hulp.bewerkCollectie,
+  zoekPartner: code => kern.findPartner(code) });
 
 };

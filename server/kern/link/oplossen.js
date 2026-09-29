@@ -61,7 +61,7 @@ async function onderwerpVan(g, wie, mij, zaakcode) {
        de handeling zelf (wie hem mag aanvaarden) en uit zijn eigen rol, en het
        bepaalt of er een knop verschijnt. Zo staat er nooit een regel die de deur
        daarna weigert. */
-    const r = cap.capKijk({ soort: wie, key: mij, code: zaakcode }, g.sleutel);
+    const r = await cap.capKijk({ soort: wie, key: mij, code: zaakcode }, g.sleutel);
     if (r.error) return { status: r.status, error: r.error };
     if (r.eigen) return { status: 400, error: 'Dat is je eigen code.' };
     return { onderwerp: r.kaart, band: null, mag: r.mag };

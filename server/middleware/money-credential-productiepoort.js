@@ -19,14 +19,11 @@ const BERICHT = 'Deze betaalwijze is nog niet voor productie vrijgegeven. Er is 
 
 const EXACT = new Map([
   /* De kascode (pay.kascode_en_vooraf) en de tikcode (pay.tikcode) staan hier
-     sinds 27 september 2026 niet meer: 128 bits, hash-only, een claim in een
-     collectietransactie en boekingen met een `pay-kas`-sleutel
-     (kern/pay/kasbak.js, kas-claim.js, kas-boek.js, tik.js). De ondertekende
-     Link-drager van de kascode is een ANDERE deur (link.capability_aanvaarden:
-     72 bits in procesgeheugen) en blijft dicht: het supplier-loket accepteert
-     uitsluitend `geld.kassa`, dus het kan exact dicht zonder een veilige
-     Link-handeling te raken. */
-  ['/api/supplier/link/cap/aanvaard', 'link.capability_aanvaarden'],
+     sinds 27 september 2026 niet meer, en de ondertekende Link-drager
+     (link.capability_aanvaarden) sinds 29 september 2026 evenmin (besluit B15):
+     128 bits, hash-only in linkCapToegang, de opdracht versleuteld onder de code,
+     en een eenmalige claim in een collectietransactie (kern/link/cap-bak.js).
+     Maken met geld.kassa en het supplier-loket zijn daarmee open. */
 
   /* pay.tegoedbon staat hier sinds 27 september 2026 niet meer: hash-only,
      128 bits, een claim in een collectietransactie en een economische sleutel
@@ -62,10 +59,10 @@ const PICKUP_CODE_ISSUERS = Object.freeze({
 
 /* De RTG-Pay-tak van de kassaschermen (pos/sale, pos/checkout, tafelticket,
    retail, deurverkoop, festival) stond hier tot 27 september 2026 als
-   KAS_CONDITIONEEL. Een kale kascode is nu gemigreerd; een ondertekend
-   Link-token in diezelfde tak gaat via kern/pay/kasinnen.js naar
-   linkCapAanvaard, en kern/pay/kassacode.js weigert daar zelf in productie
-   (blokkade 'link.capability_aanvaarden'). */
+   KAS_CONDITIONEEL. Een kale kascode is gemigreerd, en een ondertekend
+   Link-token in diezelfde tak (via kern/pay/kasinnen.js naar linkCapAanvaard)
+   sinds 29 september 2026 ook. EXACT is daarmee leeg; de poort blijft staan
+   als de plek waar een volgende nog onbewezen geld-dragende code dicht gaat. */
 
 function productie(env) {
   return String((env || process.env).NODE_ENV || '') === 'production';
@@ -90,10 +87,6 @@ function featureVoor(req) {
   if (pad.length > 1) pad = pad.replace(/\/+$/, '');
   const vast = EXACT.get(pad);
   if (vast) return vast;
-  if (pad === '/api/link/cap/maak' &&
-      String(req && req.body && req.body.handeling || '').toLowerCase() === 'geld.kassa') {
-    return 'link.capability_aanvaarden';
-  }
   return null;
 }
 

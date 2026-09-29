@@ -60,5 +60,9 @@ module.exports = Object.freeze([
   'POST /api/lab2/mens/weg',
   'POST /api/lab2/bewoner/klacht',
   'POST /api/lab2/publicatie/intrekken',
-  'POST /api/lab2/ethiek/stilleggen'
+  'POST /api/lab2/ethiek/stilleggen',
+  // een les beeindigen of een leerling/lescode intrekken (B17, foundation/onderwijs/lesbeheer.js)
+  'POST /api/foundation/les/code/intrekken',
+  'POST /api/foundation/les/leerling/intrekken',
+  'POST /api/foundation/les/sluit'
 ]);

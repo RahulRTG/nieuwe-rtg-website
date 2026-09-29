@@ -42,18 +42,20 @@ function maak(overschrijf = {}) {
     doe: async (x) => { gedaan.push(x); return { klaar: true }; }
   }, overschrijf);
   handelingen.registreer(proef);
-  const cap = maakCap({ crypto, dyncodeGeef: () => dyncode, codenaamVan: k => 'Lid ' + k,
+  const db = { data: {}, writable: true };
+  const bewerkCollectie = require('../server/db/collectie-bewerken')({ store: 'json', db, save() {} });
+  const cap = maakCap({ db, crypto, bewerkCollectie, dyncodeGeef: () => dyncode, codenaamVan: k => 'Lid ' + k,
     bonSchrijf: (b) => bonnen.push(b), handelingen, rate: () => true });
   cap.linkRemResetHulp = require('../server/kern/link/rem').remReset;
   cap.linkRemResetHulp();
-  return { cap, dyncode, bonnen, gedaan, handelingen, proef };
+  return { cap, db, dyncode, bonnen, gedaan, handelingen, proef };
 }
 const A = { soort: 'lid', key: 'A', codenaam: 'Lid A' };
 const B = { soort: 'lid', key: 'B', codenaam: 'Lid B' };
 
 /* ---------- 1. het register ---------- */
 
-test('een definitie die niet deugt komt er niet in, en zegt waarom', () => {
+test('een definitie die niet deugt komt er niet in, en zegt waarom', async () => {
   const h = maakHandelingen();
   const goed = { id: 'x.y', wat: 'iets', uitgever: ['lid'], aanvaarder: ['lid'], ttlMs: 60000,
     eenmalig: true, lees: () => ({}), beschrijf: () => ({}), doe: async () => ({}) };
@@ -72,9 +74,9 @@ test('een definitie die niet deugt komt er niet in, en zegt waarom', () => {
 
 /* ---------- 2. de code zelf ---------- */
 
-test('de code draagt de opdracht niet: een foto van de QR levert niets op', () => {
+test('de code draagt de opdracht niet: een foto van de QR levert niets op', async () => {
   const { cap } = maak({ lees: () => ({ centen: 1850, oms: 'diner bij Ritz', aanCodenaam: 'Gouden Panter' }) });
-  const r = cap.capMaak(A, { handeling: 'proef.doen' });
+  const r = await cap.capMaak(A, { handeling: 'proef.doen' });
   assert.equal(r.status, 200);
   /* De romp van een RTG-code is gewoon base64: wie hem uit elkaar haalt leest
      soort|verwijzing|verval|nonce. Daar hoort niets van de opdracht in te staan. */
@@ -90,13 +92,13 @@ test('de code draagt de opdracht niet: een foto van de QR levert niets op', () =
      test/contactpin.test.js. */
   assert.ok(!velden.includes('A'), 'de sleutel van de uitgever staat niet in de code');
   // en twee codes van dezelfde persoon lijken niet op elkaar
-  assert.notEqual(cap.capMaak(A, { handeling: 'proef.doen' }).token, r.token);
+  assert.notEqual((await cap.capMaak(A, { handeling: 'proef.doen' })).token, r.token);
 });
 
-test('de kaart zegt wie, wat, waarom, welke gegevens en hoe lang -- en geen echte naam', () => {
+test('de kaart zegt wie, wat, waarom, welke gegevens en hoe lang -- en geen echte naam', async () => {
   const { cap } = maak();
-  const r = cap.capMaak(A, { handeling: 'proef.doen' });
-  const k = cap.capKijk(B, r.token).kaart;
+  const r = await cap.capMaak(A, { handeling: 'proef.doen' });
+  const k = (await cap.capKijk(B, r.token)).kaart;
   assert.equal(k.van, 'Lid A', 'de codenaam van de uitgever, uit de gids');
   assert.equal(k.wat, 'Doen');
   assert.equal(k.waarom, 'omdat het kan');
@@ -110,9 +112,9 @@ test('de kaart zegt wie, wat, waarom, welke gegevens en hoe lang -- en geen echt
 
 test('kijken is geen daad, en twee keer kijken verbrandt de code niet', async () => {
   const { cap, gedaan, bonnen } = maak();
-  const r = cap.capMaak(A, { handeling: 'proef.doen' });
-  assert.equal(cap.capKijk(B, r.token).status, 200);
-  assert.equal(cap.capKijk(B, r.token).status, 200);
+  const r = await cap.capMaak(A, { handeling: 'proef.doen' });
+  assert.equal((await cap.capKijk(B, r.token)).status, 200);
+  assert.equal((await cap.capKijk(B, r.token)).status, 200);
   assert.deepEqual(gedaan, [], 'er is niets uitgevoerd');
   assert.deepEqual(bonnen, [], 'en dus ook geen bon');
 });
@@ -120,13 +122,13 @@ test('kijken is geen daad, en twee keer kijken verbrandt de code niet', async ()
 test('de code gaat pas op als de handeling gelukt is', async () => {
   let lukt = false;
   const { cap } = maak({ doe: async () => (lukt ? { klaar: true } : { status: 409, error: 'Even niet.' }) });
-  const r = cap.capMaak(A, { handeling: 'proef.doen' });
+  const r = await cap.capMaak(A, { handeling: 'proef.doen' });
   const mislukt = await cap.capAanvaard(B, r.token, null);
   assert.equal(mislukt.status, 409, 'de handeling weigerde');
-  assert.equal(cap.capKijk(B, r.token).status, 200, 'en de code leeft nog: anders kun je het niet opnieuw proberen');
+  assert.equal((await cap.capKijk(B, r.token)).status, 200, 'en de code leeft nog: anders kun je het niet opnieuw proberen');
   lukt = true;
   assert.equal((await cap.capAanvaard(B, r.token, null)).ok, true);
-  assert.equal(cap.capKijk(B, r.token).status, 404, 'nu is hij op');
+  assert.equal((await cap.capKijk(B, r.token)).status, 404, 'nu is hij op');
 });
 
 test('de handeling ziet alleen wat `neem` doorlaat, nooit de ruwe body', async () => {
@@ -140,14 +142,14 @@ test('de handeling ziet alleen wat `neem` doorlaat, nooit de ruwe body', async (
     neem: (ruw) => ({ hoeveel: Math.round(Number(ruw && ruw.hoeveel)) || 1 }),
     doe: async (x) => { gezien.push(x.invoer); return { klaar: true }; }
   });
-  const r = cap.capMaak(A, { handeling: 'proef.doen' });
+  const r = await cap.capMaak(A, { handeling: 'proef.doen' });
   await cap.capAanvaard(B, r.token, null, { hoeveel: '7', rommel: 'x', uitgeverKey: 'A' });
   assert.deepEqual(gezien, [{ hoeveel: 7 }], 'alleen het gekeurde veld, en omgezet');
 });
 
 test('aanvaarden schrijft twee bonnen: de dader en de eigenaar van de code', async () => {
   const { cap, bonnen } = maak();
-  const r = cap.capMaak(A, { handeling: 'proef.doen' });
+  const r = await cap.capMaak(A, { handeling: 'proef.doen' });
   await cap.capAanvaard(B, r.token, null);
   assert.equal(bonnen.length, 2);
   assert.deepEqual(bonnen.map(b => [b.wie, b.intentie]),
@@ -157,46 +159,46 @@ test('aanvaarden schrijft twee bonnen: de dader en de eigenaar van de code', asy
 
 test('je eigen code aanvaarden kan niet, en een ander mag hem niet intrekken', async () => {
   const { cap, gedaan } = maak();
-  const r = cap.capMaak(A, { handeling: 'proef.doen' });
+  const r = await cap.capMaak(A, { handeling: 'proef.doen' });
   const zelf = await cap.capAanvaard({ soort: 'lid', key: 'A' }, r.token, null);
   assert.equal(zelf.status, 400);
   assert.match(zelf.error, /eigen code/i);
   assert.deepEqual(gedaan, []);
-  assert.equal(cap.capTrek(B, r.token).status, 403, 'B trekt de code van A niet in');
-  assert.equal(cap.capTrek(A, r.token).ok, true);
-  assert.equal(cap.capKijk(B, r.token).status, 404, 'na het intrekken wijst hij niets meer aan');
+  assert.equal((await cap.capTrek(B, r.token)).status, 403, 'B trekt de code van A niet in');
+  assert.equal((await cap.capTrek(A, r.token)).ok, true);
+  assert.equal((await cap.capKijk(B, r.token)).status, 404, 'na het intrekken wijst hij niets meer aan');
   /* En nog een keer intrekken, op een code die er niet meer is. Dat pad raakte
      GEEN ENKELE toets, en juist daar greep capTrek na een herindeling naar een
      naam die in het andere bestand stond -- gevonden door regel 50 van de
      keuring en niet door deze suite. Vandaar deze twee regels. */
-  const weer = cap.capTrek(A, r.token);
+  const weer = await cap.capTrek(A, r.token);
   assert.equal(weer.status, 404);
   /* Vergeleken met de ANDERE deur, en niet met nog een intrekking: twee
      uitkomsten van dezelfde functie zijn samen net zo fout als samen goed, en
      dan meet de regel niets (dat zag ik een mutatie bewijzen). Kijken en
      intrekken horen over een code die weg is hetzelfde te zeggen. */
-  assert.equal(weer.error, cap.capKijk(A, r.token).error, 'beide deuren, hetzelfde antwoord');
+  assert.equal(weer.error, (await cap.capKijk(A, r.token)).error, 'beide deuren, hetzelfde antwoord');
 });
 
 test('verlopen, ingetrokken, opgebruikt en vervalst geven allemaal hetzelfde niets', async () => {
-  const { cap, dyncode } = maak();
-  const vers = cap.capMaak(A, { handeling: 'proef.doen' });
-  const onbekend = cap.capKijk(B, dyncode.maak({ soort: 'cap', code: 'bestaatniet' }).token);
+  const { cap, db, dyncode } = maak();
+  const vers = await cap.capMaak(A, { handeling: 'proef.doen' });
+  const onbekend = await cap.capKijk(B, dyncode.maak({ soort: 'cap', code: 'bestaatniet' }).token);
 
-  const verlopen = cap.capMaak(A, { handeling: 'proef.doen' });
-  for (const x of cap.capOpen.values()) x.vervalt = Date.now() - 1;
-  assert.deepEqual(cap.capKijk(B, verlopen.token), onbekend, 'verlopen');
+  const verlopen = await cap.capMaak(A, { handeling: 'proef.doen' });
+  for (const x of Object.values(db.data.linkCapToegang)) x.toegang.expires_at = new Date(Date.now() - 1).toISOString();
+  assert.deepEqual(await cap.capKijk(B, verlopen.token), onbekend, 'verlopen');
 
-  const getrokken = cap.capMaak(A, { handeling: 'proef.doen' });
-  cap.capTrek(A, getrokken.token);
-  assert.deepEqual(cap.capKijk(B, getrokken.token), onbekend, 'ingetrokken');
+  const getrokken = await cap.capMaak(A, { handeling: 'proef.doen' });
+  await cap.capTrek(A, getrokken.token);
+  assert.deepEqual(await cap.capKijk(B, getrokken.token), onbekend, 'ingetrokken');
 
-  const op = cap.capMaak(A, { handeling: 'proef.doen' });
+  const op = await cap.capMaak(A, { handeling: 'proef.doen' });
   await cap.capAanvaard(B, op.token, null);
-  assert.deepEqual(cap.capKijk(B, op.token), onbekend, 'opgebruikt');
+  assert.deepEqual(await cap.capKijk(B, op.token), onbekend, 'opgebruikt');
 
   const stuk = vers.token.slice(0, -2) + (vers.token.slice(-2) === 'AA' ? 'BB' : 'AA');
-  assert.deepEqual(cap.capKijk(B, stuk), onbekend, 'vervalst');
+  assert.deepEqual(await cap.capKijk(B, stuk), onbekend, 'vervalst');
 });
 
 /* ---------- 4. wie mag wat ---------- */
@@ -204,12 +206,12 @@ test('verlopen, ingetrokken, opgebruikt en vervalst geven allemaal hetzelfde nie
 test('de rollen uit het register worden aan beide kanten afgedwongen', async () => {
   const { cap } = maak();
   const zaak = { soort: 'supplier', key: 'RITZ', code: 'RITZ' };
-  assert.equal(cap.capMaak(zaak, { handeling: 'proef.doen' }).status, 403, 'een zaak maakt geen ledencode');
-  const r = cap.capMaak(A, { handeling: 'proef.doen' });
+  assert.equal((await cap.capMaak(zaak, { handeling: 'proef.doen' })).status, 403, 'een zaak maakt geen ledencode');
+  const r = await cap.capMaak(A, { handeling: 'proef.doen' });
   assert.equal((await cap.capAanvaard(zaak, r.token, null)).status, 403, 'en aanvaardt hem ook niet');
-  assert.equal(cap.capMaak(A, { handeling: 'bestaat.niet' }).status, 404);
+  assert.equal((await cap.capMaak(A, { handeling: 'bestaat.niet' })).status, 404);
   // en de opdracht zelf wordt door het DOMEIN gekeurd, niet door deze laag
-  assert.equal(cap.capMaak(A, { handeling: 'proef.doen', stuk: true }).status, 400);
+  assert.equal((await cap.capMaak(A, { handeling: 'proef.doen', stuk: true })).status, 400);
 });
 
 /* ---------- 5. de eerste echte handeling: de vraagcode van RTG Pay ---------- */

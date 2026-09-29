@@ -19,13 +19,15 @@
    Een adres dat buiten de lijst valt, wordt geweigerd -- ook als het token
    verder perfect klopt.
 
-   Het client-geheim gaat versleuteld de database in, met dezelfde kluissleutel
-   als de namen. Het is een wachtwoord van ons bij de provider; wie de database
-   steelt, hoort er niets aan te hebben.
+   Het client-geheim gaat versleuteld de database in, met een eigen sleutel per
+   organisatie, een vervaldatum en rotatie met overlap (./clientgeheim.js, besluit
+   B16). Het is een wachtwoord van ons bij de provider; wie de database steelt,
+   hoort er niets aan te hebben, en geen route geeft het terug.
    ========================================================================== */
 'use strict';
 const S = require('../accounts/state');
-const kluis = require('../accounts/kluis');
+const clientgeheim = require('./clientgeheim');
+const rotatie = require('./clientgeheim-rotatie');
 
 function zorgTabel(db) {
   (db || S.db).exec(`CREATE TABLE IF NOT EXISTS sso_koppelingen (
@@ -68,12 +70,41 @@ function rij2koppeling(r) {
     domeinen: lijstDomeinen(r.domeinen), actief: !!r.actief, aangemaakt: r.created_at
   };
 }
-/* Het geheim komt er ALLEEN uit als iemand er expliciet om vraagt (de
-   tokenwissel). Zo kan het niet per ongeluk in een overzicht of een logregel
-   belanden. */
-function geheimVan(org) {
-  const r = S.db.prepare('SELECT enc_client_secret FROM sso_koppelingen WHERE org = ?').get(org);
-  return r ? kluis.dec(r.enc_client_secret) : null;
+/* Het geheim komt er ALLEEN uit voor de tokenruil (geheimenVoorRuil), en dan als
+   lijst geldige geheimen of een reden waarom de inlog dicht is. Een rij in de
+   oude opslag wordt hier bij het laden herzegeld naar de sleutel per tenant. */
+const norm = (org) => String(org || '').trim().toLowerCase();
+function geheimWaarde(org) {
+  const o = norm(org);
+  const r = S.db.prepare('SELECT enc_client_secret FROM sso_koppelingen WHERE org = ?').get(o);
+  if (!r) return undefined;
+  const nieuw = clientgeheim.migreer(o, r.enc_client_secret);
+  if (!nieuw) return r.enc_client_secret;
+  S.db.prepare('UPDATE sso_koppelingen SET enc_client_secret = ? WHERE org = ?').run(nieuw, o);
+  return nieuw;
+}
+function geheimenVoorRuil(org) { return clientgeheim.geldige(norm(org), geheimWaarde(org)); }
+function geheimStand(org) {
+  const w = geheimWaarde(org);
+  return w === undefined ? null : clientgeheim.stand(norm(org), w);
+}
+function schrijfGeheim(o, waarde) {
+  S.db.prepare('UPDATE sso_koppelingen SET enc_client_secret = ? WHERE org = ?').run(waarde, o);
+}
+/* Roteren met overlap, alleen via de eigenaarsroutes. Bestaat de koppeling niet,
+   dan null: een geheim hoort bij een organisatie. */
+function roteerGeheim(org, geheim, opties) {
+  const w = geheimWaarde(org);
+  if (w === undefined) return null;
+  const uit = rotatie.roteer(norm(org), geheim, w, opties);
+  schrijfGeheim(norm(org), uit.waarde);
+  return { ongewijzigd: uit.ongewijzigd, stand: clientgeheim.stand(norm(org), uit.waarde) };
+}
+function sluitOverlap(org) {
+  const w = geheimWaarde(org);
+  if (w === undefined) return null;
+  schrijfGeheim(norm(org), rotatie.sluitOverlap(norm(org), w));
+  return clientgeheim.stand(norm(org), geheimWaarde(org));
 }
 
 function lijst() {
@@ -117,7 +148,7 @@ function domeinBotsing(domeinen, eigenOrg) {
   return null;
 }
 
-function zet({ org, naam, issuer, clientId, clientSecret, domeinen, actief }) {
+function zet({ org, naam, issuer, clientId, clientSecret, domeinen, actief, geheimOpties }) {
   const o = String(org || '').trim().toLowerCase();
   if (!o) throw new Error('Een koppeling hoort bij een organisatie; geef een org mee.');
   const doms = lijstDomeinen(domeinen);
@@ -128,8 +159,13 @@ function zet({ org, naam, issuer, clientId, clientSecret, domeinen, actief }) {
   if (!String(clientId || '').trim()) throw new Error('Geef de client-id die de provider ons heeft gegeven.');
 
   const bestaat = S.db.prepare('SELECT id, enc_client_secret FROM sso_koppelingen WHERE org = ?').get(o);
-  // geen nieuw geheim meegegeven bij een wijziging = het oude blijft staan
-  const geheim = clientSecret ? kluis.enc(String(clientSecret)) : (bestaat ? bestaat.enc_client_secret : null);
+  /* Geen nieuw geheim bij een wijziging = het oude blijft staan (herzegeld als het
+     nog in de oude opslag stond). Een nieuw geheim is een rotatie met overlap, en
+     zonder sleutel weigert die VOOR er iets geschreven wordt. */
+  const oud = bestaat ? bestaat.enc_client_secret : null;
+  const geheim = clientSecret
+    ? rotatie.roteer(o, clientSecret, oud, geheimOpties).waarde
+    : (clientgeheim.migreer(o, oud) || oud);
   const aan = actief === undefined ? 1 : (actief ? 1 : 0);
   if (bestaat) {
     S.db.prepare(`UPDATE sso_koppelingen SET naam = ?, issuer = ?, client_id = ?, enc_client_secret = ?,
@@ -151,4 +187,5 @@ function weg(org) {
   return had;
 }
 
-module.exports = { zorgTabel, lijst, vind, vindVoorEmail, zet, weg, geheimVan, lijstDomeinen, domeinVan, schoonDomein };
+module.exports = { zorgTabel, lijst, vind, vindVoorEmail, zet, weg, geheimenVoorRuil, geheimStand, roteerGeheim,
+  sluitOverlap, lijstDomeinen, domeinVan, schoonDomein };

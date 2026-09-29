@@ -156,7 +156,9 @@ test('15. het client-geheim staat versleuteld in de database', () => {
     .prepare('SELECT enc_client_secret FROM sso_koppelingen WHERE org = ?').get('klantje');
   assert.ok(rij.enc_client_secret, 'er staat iets');
   assert.ok(!String(rij.enc_client_secret).includes('zeer-geheim-123'), 'maar niet leesbaar');
-  assert.equal(koppelingen.geheimVan('klantje'), 'zeer-geheim-123', 'met de kluissleutel wel terug te halen');
+  // alleen de tokenruil krijgt hem terug, met de sleutel van deze tenant (B16)
+  assert.deepEqual(koppelingen.geheimenVoorRuil('klantje').geheimen, ['zeer-geheim-123'],
+    'met de sleutel van deze tenant wel terug te halen, voor de tokenruil');
 });
 
 test('16. een domein mag bij hoogstens EEN organisatie horen', () => {

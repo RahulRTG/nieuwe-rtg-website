@@ -981,7 +981,6 @@
       "factuur",
       "favorietenVan",
       "findPartner",
-      "findStaffPartner",
       "findSupplier",
       "fluister",
       "fluisterFocus",
@@ -1183,7 +1182,6 @@
       "plaatsReview",
       "postdatum",
       "prikbord",
-      "publicPartner",
       "publicSupplier",
       "publicTrip",
       "pulseBewaar",
@@ -1325,7 +1323,8 @@
       "zorgVan",
       "zorgVoor",
       "zorgZet",
-      "zzpwacht"
+      "zzpwacht",
+      "partnerPersoneelscode"
     ],
     "memo": [],
     "meting": [],
@@ -1551,7 +1550,9 @@
       "veiligGelijk",
       "vertegenwoordiging",
       "wieKijkt",
-      "zaakAbonnement"
+      "zaakAbonnement",
+      "findPartner",
+      "partnerPersoneelscode"
     ],
     "onboarding": [
       "eigenaar",
@@ -2036,7 +2037,6 @@
       "WERKBELEID_PAUZE_MINUTEN",
       "checkCred",
       "commCollega",
-      "findStaffPartner",
       "fluister",
       "fluisterFocus",
       "fluisterProfiel",
@@ -2060,7 +2060,8 @@
       "publicPartner",
       "stuurLus",
       "trustVan",
-      "werkbeleidPauzeStand"
+      "werkbeleidPauzeStand",
+      "partnerPersoneelscode"
     ],
     "stuur": [
       "isolatie",

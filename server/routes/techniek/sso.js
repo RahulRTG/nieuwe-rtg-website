@@ -34,10 +34,13 @@ module.exports = (tctx) => {
   /* Het overzicht. Per koppeling ook hoeveel mensen er via binnen zijn gekomen
      -- een aantal, geen namen. */
   app.get('/api/techniek/sso', techAuth, eigenaarAlleen, (req, res) => {
-    const lijst = koppelingen.lijst().map(k => ({
-      ...k, geheimGezet: !!koppelingen.geheimVan(k.org),
-      identiteiten: sso.identiteitenVan(k.org).length
-    }));
+    /* Van het geheim alleen de STAND: vingerafdruk, gezet, verval, overlap en of
+       het bruikbaar is (met de reden als het dat niet is). Nooit de tekst. */
+    const lijst = koppelingen.lijst().map(k => {
+      const geheim = koppelingen.geheimStand(k.org);
+      return { ...k, geheimGezet: !!(geheim && geheim.gezet), geheim,
+        identiteiten: sso.identiteitenVan(k.org).length };
+    });
     res.json({ koppelingen: lijst });
   });
 
@@ -48,18 +51,23 @@ module.exports = (tctx) => {
     try {
       const k = koppelingen.zet({
         org: b.org, naam: b.naam, issuer: b.issuer, clientId: b.clientId,
-        clientSecret: b.clientSecret, domeinen: b.domeinen, actief: b.actief
+        clientSecret: b.clientSecret, domeinen: b.domeinen, actief: b.actief,
+        geheimOpties: { dagen: b.geheimDagen, vervalt: b.geheimVervalt, overlapDagen: b.overlapDagen }
       });
       /* De ontdekking en de sleutelbos van deze provider opnieuw ophalen: anders
          blijft een gewijzigde issuer een uur lang op het oude adres kijken. */
       oidc.leegOntdek(k.issuer);
       jwks.leeg();
       log.info('sso.koppeling gezet', { org: k.org, door: wie(req), domeinen: k.domeinen.length });
-      res.json({ ok: true, koppeling: k });
+      res.json({ ok: true, koppeling: k, geheim: koppelingen.geheimStand(k.org) });
     } catch (e) {
-      res.status(400).json({ error: veiligeFout(e) });
+      // 503 als de sleutel ontbreekt (fail-closed, met de reden), anders 400
+      res.status(e && e.status === 503 ? 503 : 400).json({ error: veiligeFout(e), code: e && e.code });
     }
   });
+
+  // het geheim zetten, roteren met overlap en de overlap sluiten (besluit B16)
+  require('./sso-geheim')(tctx, wie);
 
   /* Uitzetten zonder weggooien: de koppeling blijft staan (en daarmee de
      verwijzingen naar de accounts), maar er komt niemand meer mee binnen. Dit

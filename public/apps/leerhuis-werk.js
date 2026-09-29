@@ -65,7 +65,7 @@
   var bewijs = window.RTGLeerhuisBewijs ? window.RTGLeerhuisBewijs({ maak: maak, knop: knop, doe: doe }) : null;
   var S = window.RTGLeerhuisSchrijven ? window.RTGLeerhuisSchrijven({ $: $, maak: maak, knop: knop, doe: doe }) : null;
   var A = window.RTGLeerhuisAutoriteit({ maak: maak, knop: knop, kaart: kaart, zet: zet, doe: doe, wie: wie, dag: dag });
-  var I = window.RTGLeerhuisInrichten({ maak: maak, knop: knop, kaart: kaart, zet: zet, doe: doe, wie: wie });
+  var I = window.RTGLeerhuisInrichten({ $: $, maak: maak, knop: knop, kaart: kaart, zet: zet, doe: doe, wie: wie });
   var K = window.RTGLeerhuisKaarten({ $: $, maak: maak, knop: knop, kaart: kaart, zet: zet, doe: doe, wie: wie, dag: dag, bewijs: bewijs });
 
   function laad() {

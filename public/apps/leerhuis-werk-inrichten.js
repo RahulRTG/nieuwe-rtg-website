@@ -106,7 +106,32 @@ window.RTGLeerhuisInrichten = function (h) {
         'Bestuursrol toegekend: ' + leesbaar(ROL, br.value) + ' voor ' + bc.value.trim() + '.');
     }));
     bs.appendChild(r2);
-    zet('eigenaar', [rel, bs].concat(bestuur), '');
+    var relaties = (e.RELATIES || []).map(function (x) {
+      var k = kaart(wie(x), null, [leesbaar(RELATIE, x.soort) + '.', x.rollen.length ? 'Rol: ' + x.rollen.map(function (r) { return r.titel; }).join(', ') : 'Nog geen rol.']);
+      if (x.zelf) { k.appendChild(maak('p', 'meta', 'Uzelf uit dienst melden doet een tweede eigenaar.')); return k; }
+      var reden = veld('Reden (bij intrekken verplicht)');
+      if (x.rollen.length) k.appendChild(reden);
+      x.rollen.forEach(function (r) {
+        var p = maak('div', 'rij');
+        p.appendChild(knop('Rol ' + r.titel + ' intrekken', true, function () {
+          doe('intrek:' + x.persoon + ':' + r.id, 'rolIntrekken', { persoon: x.persoon, rol: r.id, reden: reden.value.trim() }, 'Rol ingetrokken: ' + r.titel + '.');
+        }));
+        k.appendChild(p);
+      });
+      /* Uit dienst laat rollen, bestuursrollen en trainerschap vervallen; bewijs en historie blijven.
+         Daarom eerst een vinkje dat dat hardop zegt, en pas dan een knop die iets doet. */
+      var l = maak('label', 'keuze'), c = document.createElement('input'); c.type = 'checkbox';
+      l.appendChild(c); l.appendChild(document.createTextNode('Ik weet dat rollen, bestuursrollen en trainerschap vervallen; bewijs en historie blijven'));
+      k.appendChild(l);
+      var u = maak('div', 'rij');
+      u.appendChild(knop('Uit dienst melden', true, function () {
+        if (!c.checked) { h.$('melding').textContent = 'Vink eerst aan dat u weet wat er vervalt.'; return; }
+        doe('uitdienst:' + x.persoon, 'uitDienst', { persoon: x.persoon }, 'Uit dienst gemeld: ' + wie(x) + '.');
+      }));
+      k.appendChild(u);
+      return k;
+    });
+    zet('eigenaar', [rel, bs].concat(bestuur, relaties), '');
   }
 
   return { manager: manager, curriculum: curriculum, eigenaar: eigenaar };

@@ -14,6 +14,8 @@
       officiele kennis en verdwijnt het uit het werk.
    4. DE EIGENAAR wijst een nieuwe collega aan op codenaam, met een reden, en
       de collega ziet die opzoeking op zijn eigen inzagekaart.
+   5. DE EIGENAAR trekt een rol in (zonder reden geweigerd) en meldt iemand
+      uit dienst -- pas na een vinkje dat zegt wat er vervalt.
 
    Draai los: node --test test/leerhuis-werk.e2e.js */
 'use strict';
@@ -130,6 +132,30 @@ test('Leerhuis aan het werk: geen rol geen werk, en een startpakketconcept wordt
       assert.ok(kaartV.includes('nieuwe collega bij Werk') && kaartV.includes('tweede kenniseigenaar voor Werk'),
         'beide opzoekingen staan op de inzagekaart van de collega');
       assert.doesNotMatch(await e.textContent('main'), /Werk Nieuw/, 'de echte naam staat nergens op het scherm');
+
+      /* 5. De eigenaar trekt een rol in (met reden) en meldt iemand uit dienst
+         (pas na het vinkje dat zegt wat er vervalt). */
+      const gCode = (await post('/api/state', {}, G)).body.state.user.codename;
+      assert.equal((await doe(E, 'rolToewijzen', { persoon: 'lid:' + gId, rol: 'pakket-rol-start' }, 'rol-g')).status, 200);
+      await e.reload({ waitUntil: 'domcontentloaded' });
+      await e.waitForFunction(() => !/wordt geladen/.test(document.getElementById('melding').textContent));
+      const gk = () => e.locator('#eigenaar .kaart', { hasText: gCode }).filter({ hasText: 'Uit dienst melden' });
+      await gk().getByRole('button', { name: 'Rol Medewerker RTG Operations intrekken' }).click();
+      await e.waitForFunction(() => /^Niet gelukt: .*reden/.test(document.getElementById('melding').textContent));
+      await gk().getByLabel('Reden (bij intrekken verplicht)').fill('andere functie');
+      await gk().getByRole('button', { name: 'Rol Medewerker RTG Operations intrekken' }).click();
+      await e.waitForFunction(() => /^Rol ingetrokken: Medewerker RTG Operations/.test(document.getElementById('melding').textContent));
+      await gk().getByText('Nog geen rol.').waitFor();
+      const vk = () => e.locator('#eigenaar .kaart', { hasText: vCode }).filter({ hasText: 'Uit dienst melden' });
+      await vk().getByRole('button', { name: 'Uit dienst melden' }).click();
+      await e.waitForFunction(() => /Vink eerst aan/.test(document.getElementById('melding').textContent));
+      assert.equal((await post('/api/leerhuis/lees', { org: ORG, vraag: 'kennisWerk' }, V)).body.antwoord.ok, true, 'zonder vinkje is er niets gebeurd');
+      await vk().getByText('Ik weet dat rollen').click();
+      await vk().getByRole('button', { name: 'Uit dienst melden' }).click();
+      await e.waitForFunction(() => /^Uit dienst gemeld/.test(document.getElementById('melding').textContent));
+      assert.notEqual((await post('/api/leerhuis/lees', { org: ORG, vraag: 'kennisWerk' }, V)).status, 200,
+        'wie uit dienst is, heeft geen relatie en leest hier niets meer');
+      assert.equal(await e.locator('#eigenaar .kaart', { hasText: vCode }).filter({ hasText: 'Uit dienst melden' }).count(), 0);
     } finally {
       if (browser) await browser.close().catch(() => {});
       await stop(child);

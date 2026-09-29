@@ -698,6 +698,13 @@ test('25. aanwijzen op codenaam: alleen de eigenaar, met reden, en niets gebruik
   const e = l.eigenaarWerk(ORG, P.E);
   assert.ok(e.BESTUUR.some(x => x.persoon === P.KO && x.rollen.includes('KNOWLEDGE_OWNER')), 'wie welke bestuursrol draagt');
   assert.deepEqual(e.relatieSoorten, require('../server/kern/leerhuis/standen').RELATIESOORTEN, 'geen eigen kopie op het scherm');
+  w.doe(ORG, 'rolToewijzen', { persoon: P.N, rol: 'ops' }, P.M);
+  nee(w.probeer(ORG, 'rolIntrekken', { persoon: P.N, rol: 'ops', reden: '' }, P.E), 400);
+  nee(w.probeer(ORG, 'rolIntrekken', { persoon: P.N, rol: 'ops-trainer', reden: 'andere functie' }, P.E), 409);
+  assert.equal(w.doe(ORG, 'rolIntrekken', { persoon: P.N, rol: 'ops', reden: 'andere functie' }, P.E).ok, true);
+  const rel = e.RELATIES.find(x => x.persoon === P.N);
+  assert.ok(rel && Array.isArray(rel.rollen), 'de lopende relaties met hun rollen, om in te trekken of uit dienst te melden');
+  assert.equal(e.RELATIES.find(x => x.persoon === P.E).zelf, true, 'zichzelf uit dienst melden doet een tweede eigenaar');
   const ander = await a(st, 'rolToewijzen', { codenaam: 'Blauwe Reiger', rol: 'ops', reden: 'nieuwe rol' }, P.E);
   assert.deepEqual(ander.invoer, { codenaam: 'Blauwe Reiger', rol: 'ops', reden: 'nieuwe rol' }, 'alleen relatie en bestuursrol lopen via de codenaam');
 });

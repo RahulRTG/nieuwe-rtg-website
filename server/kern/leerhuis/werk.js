@@ -86,6 +86,10 @@ function eigenaarWerk(st, door) {
   if (!heeftBestuur(st, door, 'ACADEMY_OWNER')) return { ok: false, reden: 'u bent geen eigenaar van dit leerhuis' };
   return { ok: true, relatieSoorten: RELATIESOORTEN, bestuursrollen: BESTUUR,
     BESTUUR: Object.entries(st.bestuur).filter(([, r]) => r.length).map(([persoon, rollen]) => ({ persoon, rollen })),
+    /* De lopende relaties met hun rollen, om een rol in te trekken of iemand uit dienst te melden.
+       `zelf`: dat doet een tweede eigenaar (acties-mens.js uitDienst). */
+    RELATIES: Object.entries(st.relaties).filter(([, r]) => r.actief).map(([persoon, r]) => ({ persoon, soort: r.soort, zelf: persoon === door,
+      rollen: ((st.personen[persoon] || {}).rollen || []).map(id => ({ id, titel: (st.rollen[id] || {}).titel || id })) })),
     nietZichtbaar: 'echte namen en sleutels; een mens wijst u aan op zijn codenaam, en elke opzoeking staat op zijn inzagekaart' };
 }
 

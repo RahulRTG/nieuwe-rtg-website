@@ -95,6 +95,7 @@
 
   /* De kaarten per rol staan in leerhuis-werk-kaarten.js; dit bestand is de deur. */
   var bewijs = window.RTGLeerhuisBewijs ? window.RTGLeerhuisBewijs({ maak: maak, knop: knop, doe: doe }) : null;
+  var S = window.RTGLeerhuisSchrijven ? window.RTGLeerhuisSchrijven({ $: $, maak: maak, knop: knop, doe: doe }) : null;
   var I = window.RTGLeerhuisInrichten({ maak: maak, knop: knop, kaart: kaart, zet: zet, doe: doe, wie: wie });
   var K = window.RTGLeerhuisKaarten({ $: $, maak: maak, knop: knop, kaart: kaart, zet: zet, doe: doe, wie: wie, dag: dag, bewijs: bewijs });
 
@@ -109,7 +110,7 @@
       $('assessorBlok').hidden = !(a && a.ok); if (a && a.ok) K.assessor(a);
       $('kennisBlok').hidden = !(w && w.ok); if (w && w.ok) K.kennis(w);
       $('managerBlok').hidden = !team; if (team) I.manager(m);
-      $('curriculumBlok').hidden = !(c && c.ok); if (c && c.ok) I.curriculum(c);
+      $('curriculumBlok').hidden = !(c && c.ok); if (c && c.ok) { I.curriculum(c); if (S) S(c); }
       $('eigenaarBlok').hidden = !(e && e.ok); if (e && e.ok) I.eigenaar(e);
       $('geenRol').hidden = !!((t && t.ok) || (a && a.ok) || (w && w.ok) || team || (c && c.ok) || (e && e.ok));
       if (/^Bezig|^Leerhuis .* wordt geladen/.test($('melding').textContent)) meld('Leerhuis ' + ORG + '.');

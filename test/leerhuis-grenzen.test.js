@@ -633,6 +633,15 @@ test('24. B-UI inrichten: de manager ziet de rollen en welk startplan er ligt, d
   assert.deepEqual(c().naar, ['DRAFT', 'PILOT', 'ACTIVE']);
   assert.equal(w.probeer(ORG, 'curriculumStand', { id: 'ops-extra', naar: 'ACTIVE' }, P.CO).ok, false, 'de handeling weigert concept-kennis, ook als het scherm de knop toont');
   assert.equal(l.curriculumWerk(ORG, P.Q).ok, true, 'de kwaliteitsautoriteit mag curricula van stand veranderen en ziet ze dus');
+  assert.equal(l.curriculumWerk(ORG, P.Q).magSchrijven, false, 'maar schrijft niets: dat is de curriculumeigenaar');
+  assert.ok(!('KENNIS' in l.curriculumWerk(ORG, P.Q)), 'en krijgt dus ook de schrijflijsten niet');
+  const cw = l.curriculumWerk(ORG, P.CO);
+  assert.equal(cw.magSchrijven, true);
+  assert.deepEqual(cw.KEUZES.niveaus, require('../server/kern/leerhuis/standen').VAARDIGHEIDSNIVEAUS, 'geen eigen kopie op het scherm');
+  const nk = cw.KENNIS.find(k => k.id === 'nieuwe-kennis');
+  assert.equal(nk.actief, false);
+  assert.deepEqual(nk.concept, { versie: 1, stand: 'DRAFT', eigen: true }, 'de schrijver ziet zijn eigen concept, dat hij zelf ter review mag zetten');
+  assert.equal(cw.KENNIS.find(k => k.id === 'terugboeken').actief, true);
   assert.ok(!JSON.stringify(l.curriculumWerk(ORG, P.CO)).includes(P.N), 'geen leerling in het curriculumwerk');
 });
 

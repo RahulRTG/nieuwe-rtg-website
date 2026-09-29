@@ -143,6 +143,43 @@ test('Leerhuis trainer: onder toezicht, bewijs, klaar voor beoordeling en de aan
       await wachtOp(c, /Niet gelukt: .*concept/);
       assert.match(await ck().textContent(), /ter review|review/i, 'de weigering liet de stand staan');
 
+      /* De curriculumeigenaar schrijft op het scherm: kennis als concept (en
+         zet zijn eigen concept ter review), een kritieke vaardigheid die de
+         server op te zwak bewijs weigert, en een curriculum. De
+         kwaliteitsautoriteit ziet de curricula maar krijgt geen formulieren. */
+      assert.equal(await q.locator('#schrijven details').count(), 0, 'de kwaliteitsautoriteit schrijft niets');
+      const form = (titel) => c.locator('#schrijven details', { hasText: titel });
+      await form('Nieuwe kennis').locator('summary').click();
+      await form('Nieuwe kennis').getByLabel('Titel van het kennisitem').fill('Een terugboeking controleren');
+      await form('Nieuwe kennis').getByLabel('Tekst').fill('Kijk de oorspronkelijke betaling na voor je terugboekt.');
+      await form('Nieuwe kennis').getByLabel('Bron of bewijs').fill('werkinstructie Operations 2026');
+      await form('Nieuwe kennis').getByRole('button', { name: 'Kennis schrijven' }).click();
+      await wachtOp(c, /Concept geschreven: Een terugboeking controleren \(code een-terugboeking-controleren\)/);
+      await c.locator('#schrijven .rij', { hasText: 'Uw concept: Een terugboeking controleren' }).getByRole('button', { name: 'Ter review' }).click();
+      await wachtOp(c, /Ter review gezet: Een terugboeking controleren/);
+
+      await form('Nieuwe vaardigheid').locator('summary').click();
+      await form('Nieuwe vaardigheid').getByLabel('Naam van de vaardigheid').fill('Terugboeking controleren');
+      await form('Nieuwe vaardigheid').getByLabel('Niveau').selectOption('PRACTITIONER');
+      await form('Nieuwe vaardigheid').getByLabel('Minimaal bewijs').selectOption('DOCUMENTED');
+      await form('Nieuwe vaardigheid').getByText('Kritiek:').click();
+      await form('Nieuwe vaardigheid').getByRole('button', { name: 'Vaardigheid vastleggen' }).click();
+      await wachtOp(c, /Niet gelukt: een kritieke vaardigheid vraagt minstens OBSERVED/);
+      /* Een weigering laat het formulier staan, met wat er al was ingevuld. */
+      assert.equal(await form('Nieuwe vaardigheid').getByLabel('Naam van de vaardigheid').inputValue(), 'Terugboeking controleren');
+      await form('Nieuwe vaardigheid').getByLabel('Minimaal bewijs').selectOption('OBSERVED');
+      await form('Nieuwe vaardigheid').getByRole('button', { name: 'Vaardigheid vastleggen' }).click();
+      await wachtOp(c, /Vaardigheid vastgelegd: Terugboeking controleren/);
+
+      await form('Nieuw curriculum').locator('summary').click();
+      await form('Nieuw curriculum').getByLabel('Titel van het curriculum').fill('Controle voor terugboeken');
+      await form('Nieuw curriculum').getByText('Terugboeking controleren', { exact: true }).click();
+      await form('Nieuw curriculum').getByRole('button', { name: 'Curriculum vastleggen' }).click();
+      await wachtOp(c, /Curriculum vastgelegd als concept: Controle voor terugboeken/);
+      await c.locator('#curriculum .kaart', { hasText: 'Controle voor terugboeken' }).getByText('Terugboeking controleren').waitFor();
+      const nieuw = (await lees(C, 'curriculumWerk')).VAARDIGHEDEN.find(v => v.id === 'terugboeking-controleren');
+      assert.ok(nieuw, 'de vaardigheid staat er, met de code uit haar naam');
+
       /* N leert tot de simulatie; daarna neemt de trainer het over op het scherm. */
       const pad = (await lees(T, 'trainerCockpit')).LEERLINGEN || [];
       if (!pad.some(x => x.persoon === N.p)) await doe(Q, 'trainerToewijzen', { persoon: N.p, curriculum: 'ops-basis', trainer: T.p });

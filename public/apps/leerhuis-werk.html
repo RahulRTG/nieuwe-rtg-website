@@ -40,6 +40,11 @@
   details.bewijs{margin-top:.8rem;}
   details.bewijs summary{cursor:pointer;font-size:.87rem;min-height:2.75rem;display:flex;align-items:center;}
   details.bewijs .veld{display:block;width:100%;margin-top:.5rem;}
+  details.schrijf{margin-top:1rem;border-top:1px solid var(--line);padding-top:.6rem;}
+  details.schrijf summary{cursor:pointer;min-height:2.75rem;display:flex;align-items:center;font-size:.92rem;}
+  details.schrijf .veld{display:block;width:100%;margin-top:.5rem;}
+  fieldset.vinkjes{border:1px solid var(--line);margin:.6rem 0 0;padding:.4rem .7rem;}
+  fieldset.vinkjes legend{font-size:.82rem;padding:0 .3rem;}
   .keuze{display:flex;gap:.5rem;align-items:center;font-size:.84rem;margin-top:.35rem;min-height:2.75rem;}
   .keuze input{width:1.25rem;height:1.25rem;}
   .tekst{font-size:.86rem;line-height:1.6;margin-top:.5rem;white-space:pre-wrap;}
@@ -95,13 +100,15 @@
   </section>
   <section id="curriculumBlok" hidden>
     <h2>Curricula</h2>
-    <p class="uitleg">Een curriculum gaat van concept via review naar actief. Het leert alleen officiële kennis: zolang een kennisitem nog een concept is, weigert het leerhuis het activeren.</p>
+    <p class="uitleg">Een curriculum gaat van concept via review naar actief. Het leert alleen officiële kennis: zolang een kennisitem nog een concept is, weigert het leerhuis het activeren. Als curriculumeigenaar schrijft u hier ook nieuwe kennis, vaardigheden, rollen en curricula; kennis wordt officieel als een andere kenniseigenaar hem activeert.</p>
     <div id="curriculum"></div>
+    <div id="schrijven"></div>
   </section>
   <p id="geenRol" class="leeg" hidden>U heeft in dit leerhuis geen rol als trainer, assessor, kenniseigenaar, curriculumeigenaar, manager of eigenaar. Er ligt hier dus geen werk voor u.</p>
 </main>
 <script src="/apps/leerhuis-werk-bewijs.js"></script>
 <script src="/apps/leerhuis-werk-inrichten.js"></script>
+<script src="/apps/leerhuis-werk-schrijven.js"></script>
 <script src="/apps/leerhuis-werk-kaarten.js"></script>
 <script src="/apps/leerhuis-werk.js"></script>
 <script src="/shared/schermbeeld.js" defer></script>

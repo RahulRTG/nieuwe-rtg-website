@@ -19,7 +19,7 @@
 'use strict';
 
 const { heeftBestuur } = require('./oordeel');
-const { IMPACT, MACHINES, BESTUUR, RELATIESOORTEN } = require('./standen');
+const { IMPACT, MACHINES, BESTUUR, RELATIESOORTEN, VAARDIGHEIDSNIVEAUS, ROLSOORTEN, LEERFASEN, LEERBEWIJS, STERKTE } = require('./standen');
 
 function assessorWerk(st, door) {
   if (!heeftBestuur(st, door, 'ASSESSOR')) return { ok: false, reden: 'u bent in deze organisatie geen assessor' };
@@ -61,10 +61,22 @@ function curriculumWerk(st, door) {
   if (!heeftBestuur(st, door, 'CURRICULUM_OWNER') && !heeftBestuur(st, door, 'QUALITY_AUTHORITY'))
     return { ok: false, reden: 'u bent in deze organisatie geen curriculumeigenaar of kwaliteitsautoriteit' };
   const naam = (v) => (st.vaardigheden[v] || {}).naam || v;
-  return { ok: true, CURRICULA: Object.values(st.curricula).map(c => ({ id: c.id, titel: c.titel, versie: c.versie, stand: c.stand,
+  const uit = { ok: true, CURRICULA: Object.values(st.curricula).map(c => ({ id: c.id, titel: c.titel, versie: c.versie, stand: c.stand,
     vaardigheden: c.vaardigheden.map(naam), naar: MACHINES.curriculum.naar[c.stand] || [],
     kennisZonderActief: c.kennis.filter(k => !(st.kennis[k] || {}).actief) })),
   nietZichtbaar: 'wie een curriculum volgt en hoe ver hij is; dat ziet zijn trainer en zijn manager' };
+  /* SCHRIJVEN doet alleen de curriculumeigenaar (acties-bouw.js); de kwaliteitsautoriteit
+     verandert een stand en schrijft niets. Wat er te kiezen valt, komt van hier, zodat het
+     scherm geen eigen kopie van de lijsten draagt. */
+  if (!heeftBestuur(st, door, 'CURRICULUM_OWNER')) return Object.assign(uit, { magSchrijven: false });
+  const concept = (k) => { const v = Object.values(k.versies).find(x => x.stand === 'DRAFT' || x.stand === 'REVIEW');
+    return v ? { versie: v.versie, stand: v.stand, eigen: v.auteur === door } : null; };
+  return Object.assign(uit, { magSchrijven: true,
+    KEUZES: { niveaus: VAARDIGHEIDSNIVEAUS, rolsoorten: ROLSOORTEN, leerfasen: LEERFASEN, bewijssoorten: LEERBEWIJS, sterktes: STERKTE },
+    VAARDIGHEDEN: Object.values(st.vaardigheden).map(v => ({ id: v.id, naam: v.naam })),
+    KENNIS: Object.values(st.kennis).map(k => ({ id: k.id, titel: (k.versies[k.actief || Math.max(...Object.keys(k.versies).map(Number))] || {}).titel || k.id,
+      actief: !!k.actief, concept: concept(k) })),
+    ROLLEN: Object.values(st.rollen).map(r => ({ id: r.id, titel: r.titel })) });
 }
 
 /* Het beheer van de eigenaar: wie welke bestuursrol draagt (op codenaam, via

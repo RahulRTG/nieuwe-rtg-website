@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-29T15:26:20.439Z",
-    "commit": "760f20c5",
+    "op": "2026-09-29T16:46:09.113Z",
+    "commit": "0b3f00b22",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 1,
     "instrument": "scripts/positieproef.js",
     "node": "v22.22.2"
   },
@@ -12,7 +12,7 @@
   "grens": "Een doorloop meet wat DEZE stappen achterlaten, niet wat het huis in het algemeen bewaart; de bronmeter (POSITIESTROOM.json) ziet de rest. De ritlijn is niet gelopen. En de proef meet een verse server: termijnen die pas na dagen lopen (de bewaarveger, het bewaarbeleid) zijn hier nog niet verstreken, dus \"staat er nog\" betekent \"staat er na de taak\", niet \"staat er voor altijd\".",
   "besturing": {
     "inOrde": true,
-    "wat": "Onderweg bewaart de laatste positie na het stoppen (NAVIGATIE.md par. 6.2). Vindt de lezer geen enkel merkteken terug, dan is hij blind en zegt een rij nullen niets."
+    "wat": "Een verkeersmelding bewaart met opzet de plek van de melding (NAVIGATIE.md N15, noodzakelijk). Vindt de lezer dat merkteken niet terug, dan is hij blind en zegt een rij nullen niets."
   },
   "stappen": [
     {
@@ -78,9 +78,9 @@
   ],
   "tellers": {
     "blijvendeNavPositie": 0,
-    "positieNaVenster": 1,
-    "passageLog": 2,
-    "aankomstUitPositie": 1,
+    "positieNaVenster": 0,
+    "passageLog": 0,
+    "aankomstUitPositie": 0,
     "onbegrensdeRitlijn": null
   },
   "redenen": {
@@ -89,10 +89,6 @@
     "onbegrensdeRitlijn": "niet gelopen: een rit vraagt een vervoerder, een chauffeur en een betaling, en die wereld zet deze proef (nog) niet op -- geen meting is geen nul"
   },
   "vondsten": [
-    {
-      "merk": "stoep",
-      "pad": "live.rtg"
-    },
     {
       "merk": "melding",
       "pad": "flitsMeldingen[0]"

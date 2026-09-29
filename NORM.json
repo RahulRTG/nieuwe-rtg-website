@@ -152,9 +152,9 @@
     "positieNietVergeten": 20,
     "positieStromenGezien": 35,
     "positieNavBlijft": 0,
-    "positieNaTaak": 1,
-    "positiePassages": 2,
-    "aankomstUitPositie": 1
+    "positieNaTaak": 0,
+    "positiePassages": 0,
+    "aankomstUitPositie": 0
   },
   "notities": [
     {

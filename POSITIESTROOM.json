@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T16:26:45.747Z",
-    "commit": "db6d4974c",
+    "op": "2026-09-29T16:46:02.772Z",
+    "commit": "0b3f00b22",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/positiestroom.js",
@@ -24,18 +24,14 @@
     "zonderTermijn": 20,
     "nietVergeten": 20,
     "besloten": 15,
-    "besluitNietUitgevoerd": [
-      "live-onderweg",
-      "ontmoet-radar",
-      "plaats-passages"
-    ],
+    "besluitNietUitgevoerd": [],
     "klassen": {
-      "toegestaan": 0,
-      "venster": 9,
+      "toegestaan": 1,
+      "venster": 11,
       "noodzakelijk": 3,
-      "teLang": 2,
+      "teLang": 0,
       "onbegrensd": 19,
-      "verboden": 1,
+      "verboden": 0,
       "onbekend": 1
     }
   },
@@ -56,18 +52,18 @@
       },
       "vergeten": true,
       "gedetecteerd": true,
-      "klasse": "teLang",
+      "klasse": "venster",
       "status": "besloten",
       "besluit": {
         "n": "N14",
         "datum": "2026-09-29",
         "klasse": "venster",
         "uitkomst": "de positie wordt gewist zodra Onderweg stopt; de veger van zeven dagen blijft alleen als vangnet",
-        "uitgevoerd": false
+        "uitgevoerd": true
       },
       "tegenspraak": null,
       "reden": null,
-      "waarom": "/api/live/stop zet alleen active op false; de positie blijft tot de bewaarveger hem na zeven dagen weghaalt. De taak is dan al voorbij (NAVIGATIE.md P-05, derde categorie)."
+      "waarom": "sinds N14 wist /api/live/stop de positie; de bewaarveger van zeven dagen is het vangnet voor wie nooit op stop drukt. Tot 29 september zette stoppen alleen active op false (NAVIGATIE.md par. 6.2)."
     },
     {
       "naam": "rit-vertrekpunt",
@@ -352,23 +348,23 @@
       "sleutel": "sessiesleutel",
       "van": "lid",
       "termijn": {
-        "soort": "module",
-        "bestand": "server/kern/ontmoeting.js"
+        "soort": "veger",
+        "bestand": "server/bewaarveger.js"
       },
       "vergeten": true,
       "gedetecteerd": true,
-      "klasse": "teLang",
+      "klasse": "venster",
       "status": "besloten",
       "besluit": {
         "n": "N14",
         "datum": "2026-09-29",
         "klasse": "venster",
         "uitkomst": "de positie wordt gewist zodra de radar stopt",
-        "uitgevoerd": false
+        "uitgevoerd": true
       },
       "tegenspraak": null,
       "reden": null,
-      "waarom": "zes minuten telt hij als vers, maar dat wordt alleen bij het LEZEN gewogen; hij blijft staan tot het lid de functie uitzet of vergeten wordt"
+      "waarom": "sinds N14 wordt een positie die niet meer vers is gewist -- bij elke nieuwe positie, bij elke stand en door de bewaarveger. Tot 29 september werd de versheid alleen bij het LEZEN gewogen en bleef de plek staan tot het lid de functie uitzette."
     },
     {
       "naam": "date-positie",
@@ -730,18 +726,18 @@
       },
       "vergeten": false,
       "gedetecteerd": false,
-      "klasse": "verboden",
+      "klasse": "toegestaan",
       "status": "besloten",
       "besluit": {
         "n": "N12",
         "datum": "2026-09-29",
         "klasse": "toegestaan",
         "uitkomst": "alleen het doelhek wordt opgeslagen; een passage langs een ander hek wordt verwerkt en niet bewaard",
-        "uitgevoerd": false
+        "uitgevoerd": true
       },
       "tegenspraak": null,
       "reden": null,
-      "waarom": "geen coordinaat, wel een reeks zaken met tijden onder een codenaam -- een mens-plaatsgraaf; botst met P-05 en N1 ongeacht de termijn (NAVIGATIE.md par. 6.2, besluit B8)"
+      "waarom": "sinds N12 noemt een naderingsvenster zijn hek, en een overgang langs een ander hek wordt verwerkt en niet bewaard -- hij verlaat het verzoek niet. De regel die blijft gaat over het doel van het bezoek zelf. Tot 29 september legde elke passage een regel onder de codenaam vast, 90 dagen (NAVIGATIE.md par. 6.2)."
     },
     {
       "naam": "plaats-waarnemingen",

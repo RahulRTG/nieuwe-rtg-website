@@ -132,7 +132,10 @@ module.exports = (kern) => {
     if (naar === 'geleverd') {
       rek.fulfillment.status = rek.kanaal === 'afhaal' ? 'opgehaald' : 'geleverd';
       rek.fulfillment.geleverdAt = horeca.nu();
-      if (rek.bezorg) rek.bezorg.stand = 'geleverd';
+      /* Het bezorgpunt verdwijnt bij levering (NAVIGATIE.md N20): de coordinaat
+         was er voor de rit, en na de rit is hij een stukje bewegingsspoor van
+         de gast. Het adres als tekst blijft bij de bestelling. */
+      if (rek.bezorg) { rek.bezorg.stand = 'geleverd'; rek.bezorg.lat = null; rek.bezorg.lng = null; }
     }
     audit(rek, req, 'status', null, naar); save();
     logActivity(req.supplier.code, req.actor, 'zette RTG Eten-order ' + rek.id + ' op ' + naar);

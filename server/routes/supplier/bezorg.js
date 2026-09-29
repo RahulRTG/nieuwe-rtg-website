@@ -110,7 +110,9 @@ app.post('/api/supplier/bezorg/status', supplierAuth, (req, res) => {
     if (status === 'onderweg' && !(o.inpak && o.pakcheck))
       return res.status(409).json({ error: 'Eerst afvinken: de inpakker (tas + bonnummer) en de bezorger (alles gepakt). Dan pas vertrekken.' });
     o.status = status;
-    if (status !== 'onderweg') { o.finishedAt = new Date().toISOString(); delete o.etaMin; }
+    /* Bezorgd of opgehaald: het bezorgpunt verdwijnt, het adres blijft bij de
+       bestelling (NAVIGATIE.md N20). Na de rit heeft niemand de coordinaat nog nodig. */
+    if (status !== 'onderweg') { o.finishedAt = new Date().toISOString(); delete o.etaMin; if (o.geo) o.geo = null; }
     bijgewerkt.push(o.ref);
     notify(o.customerTier, { icon: status === 'onderweg' ? 'logistiek' : 'meldingen', title: s.name,
       body: status === 'onderweg' ? 'Uw bestelling is onderweg.' : status === 'bezorgd' ? 'Uw bestelling is bezorgd. Eet smakelijk!' : 'Uw bestelling is opgehaald. Dank u wel!', scope: 'orders' });

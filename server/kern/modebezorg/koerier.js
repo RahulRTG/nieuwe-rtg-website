@@ -14,6 +14,10 @@ module.exports = (ctx) => {
     return metAfstand.map(x => Object.assign(winkelBeeld(x.b), { afstandM: x.d, etaMin: x.d != null ? etaMinutes(x.d, 'driving') : null }));
   }
   function bezorging(code, ref) { return lijst().find(b => b.ref === ref && b.supplierCode === code); }
+  /* Een bezorgpunt verdwijnt bij het einde van de levering (NAVIGATIE.md N20):
+     de bestemming en de laatste positie van de koerier waren er voor de rit.
+     Het adres als tekst blijft bij de bezorging, voor de bon en een geschil. */
+  function wisPunt(b) { b.loc = null; b.gps = null; }
   function neem(code, ref, actor) {
     const b = bezorging(code, ref);
     if (!b) return { status: 404, error: 'Bezorging niet gevonden.' };
@@ -31,6 +35,9 @@ module.exports = (ctx) => {
     const b = bezorging(code, ref);
     if (!b) return { status: 404, error: 'Bezorging niet gevonden.' };
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) return { status: 400, error: 'Geen positie.' };
+    // na de levering bestaat er geen rit meer om te volgen; anders zet een
+    // achterblijvende app de laatste positie terug die net gewist is (N20)
+    if (KLAAR[b.status]) return { status: 409, error: 'Deze bezorging is al afgerond.' };
     b.gps = { lat, lng, at: nu() };   // vluchtig genoeg; we bewaren de laatste
     const eta = b.loc ? etaMinutes(haversine({ lat, lng }, b.loc), 'driving') : null;
     sseToCustomer(b.key, 'modebezorg', { ref: b.ref, kind: 'gps', lat, lng, etaMin: eta });
@@ -48,6 +55,7 @@ module.exports = (ctx) => {
     b.idOk = !!(opts && opts.idOk);
     b.status = 'afgeleverd';
     b.afgeleverdAt = nu();
+    wisPunt(b);
     b.stappen.push({ status: 'afgeleverd', at: b.afgeleverdAt, door: (actor && actor.name) || null });
     save();
     notify(b.key, { icon: 'pas', title: b.supplierName, body: 'Veilig afgeleverd. Bedankt voor uw aankoop.', scope: 'orders' });
@@ -63,6 +71,7 @@ module.exports = (ctx) => {
     const s = findSupplier(code);
     if (s && !instel(s).retourAanDeur) return { status: 409, error: 'Retour aan de deur staat uit voor deze winkel.' };
     b.status = 'retour'; b.retourReden = schoon(reden, 160) || 'Retour aan de deur';
+    wisPunt(b);
     b.stappen.push({ status: 'retour', at: nu(), door: (actor && actor.name) || null });
     save();
     notify(b.key, { icon: 'betalen', title: b.supplierName, body: 'Uw bezorging is retour genomen. Het bedrag wordt teruggestort.', scope: 'orders' });

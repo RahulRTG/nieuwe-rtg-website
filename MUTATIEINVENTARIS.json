@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-29T15:19:10.577Z",
-  "commit": "c9b845c0",
+  "op": "2026-09-29T16:13:18.305Z",
+  "commit": "abf99619",
   "boomVuil": false,
-  "boomAnders": 11,
+  "boomAnders": 3,
   "instrument": "scripts/mutatieinventaris.js",
   "node": "v22.22.2"
  },

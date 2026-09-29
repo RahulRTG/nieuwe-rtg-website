@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1761,
-    "toetsenNietGemeten": 645,
+    "toetsenNietGemeten": 646,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -155,8 +155,8 @@
       "sleutel": "zelfpoortendeToetsen",
       "van": 45,
       "vervalt": "2026-12-29",
-      "meter": "zelfpoortendeToetsen 45 -> 46",
-      "reden": "Het gezinsprofieltoken is gemigreerd (RELEASEKANDIDAAT.md B17, CODECREDENTIALS.json foundation.family_profile_token_buiten_harde_poort). test/gezinsuitnodiging.pg.test.js is nieuw: twee echte PostgreSQL-instances en twaalf tikken racen om dezelfde eenmalige gezinsuitnodiging, precies een profiel ontstaat en PostgreSQL draagt alleen de hash van de sessie. Zonder DATABASE_URL en REDIS_URL slaat hij over, dus hij telt als zelfpoortend (hij staat in scripts/lib/pg-toetslijst.js en als uitzondering onder zelfpoortende-toets).",
+      "meter": "zelfpoortendeToetsen 45 -> 46; toetsenNietGemeten 645 -> 646",
+      "reden": "Het gezinsprofieltoken is gemigreerd (RELEASEKANDIDAAT.md B17, CODECREDENTIALS.json foundation.family_profile_token_buiten_harde_poort). test/gezinsuitnodiging.pg.test.js is nieuw: twee echte PostgreSQL-instances en twaalf tikken racen om dezelfde eenmalige gezinsuitnodiging, precies een profiel ontstaat en PostgreSQL draagt alleen de hash van de sessie. Zonder DATABASE_URL en REDIS_URL slaat hij over, dus hij telt als zelfpoortend (hij staat in scripts/lib/pg-toetslijst.js en als uitzondering onder zelfpoortende-toets). Om dezelfde reden telt hij bij toetsenNietGemeten: de mutatiemotor draait hem zonder diensten en ziet hem dus overslaan. test/gezinstoken.test.js en test/gezinssessie.test.js zijn na de merge wel gemeten (MUTATIES.json: beide gezakt).",
       "waarheen": "lost af met de CI-dienstmatrix zonder skips."
     },
     {

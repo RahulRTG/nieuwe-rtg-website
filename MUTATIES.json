@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T16:48:04.947Z",
-    "commit": "fcb0cee1",
+    "op": "2026-09-29T16:49:42.516Z",
+    "commit": "c01386d5",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -27,14 +27,11 @@
     },
     "aanbouw-collectie.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/opzet/aanbouw.js",
-        "server/opzet/aanbouw2.js"
-      ],
-      "geprobeerd": 3,
-      "posities": 1000,
-      "dekking": "dun"
+      "staat": "gezakt",
+      "module": "server/opzet/aanbouw.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "aankomst-chauffeur-voorzijde.test.js": {
       "soort": "puur",

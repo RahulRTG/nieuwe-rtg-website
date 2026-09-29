@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T20:30:41.361Z",
-    "commit": "9e88576a3",
+    "op": "2026-09-29T20:31:15.360Z",
+    "commit": "ae577fbcc",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bewijsmatrix.js",

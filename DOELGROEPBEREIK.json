@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T15:37:42.920Z",
-    "commit": "83c480d38",
+    "op": "2026-09-29T15:39:17.965Z",
+    "commit": "f907b38bb",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/doelgroepbereik.js",
@@ -1672,7 +1672,7 @@
       "functie": "neiging",
       "naam": "RTG Neiging (Mijn neigingen)",
       "doelgroep": "gast",
-      "verklaard": false,
+      "verklaard": true,
       "routes": 7,
       "openRoute": {
         "methode": "POST",
@@ -1692,15 +1692,7 @@
       "beproefd": 1,
       "onbepaaldeRoutes": 0,
       "open": "POST /api/neiging/antwoord",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 3,
-        "geweigerd": 0,
-        "onbekend": 0,
-        "vergeleken": 3
-      },
-      "triage": "gelijk-aan-verklaard",
-      "triageReden": "een verklaarde doelgroep krijgt op POST /api/neiging/antwoord exact hetzelfde antwoord; het register loopt achter en het bord kan deze functie niet per doelgroep uitzetten"
+      "uitslag": "waar"
     },
     {
       "functie": "neiging",
@@ -32841,10 +32833,10 @@
   ],
   "telling": {
     "cellen": 1792,
-    "waar": 619,
+    "waar": 620,
     "correct-afgesloten": 195,
     "registerleugen": 18,
-    "bereikbaar-zonder-verklaring": 123,
+    "bereikbaar-zonder-verklaring": 122,
     "geen-deur": 145,
     "onbepaald": 688,
     "niet-beproefd": 4,
@@ -33452,40 +33444,6 @@
       },
       "triage": "gelijk-aan-verklaard",
       "triageReden": "een verklaarde doelgroep krijgt op POST /api/ondertiteling/fragment exact hetzelfde antwoord; het register loopt achter en het bord kan deze functie niet per doelgroep uitzetten"
-    },
-    {
-      "functie": "neiging",
-      "naam": "RTG Neiging (Mijn neigingen)",
-      "doelgroep": "gast",
-      "verklaard": false,
-      "routes": 7,
-      "openRoute": {
-        "methode": "POST",
-        "pad": "/api/neiging/antwoord",
-        "bewakers": [
-          "auth",
-          "lid"
-        ],
-        "bewakersBekend": true,
-        "viaRouter": false,
-        "bestand": "server/routes/neiging.js",
-        "regel": 45,
-        "samengesteld": false,
-        "rauw": ", auth, lid, (req, res) =>"
-      },
-      "openVorm": "account",
-      "beproefd": 1,
-      "onbepaaldeRoutes": 0,
-      "open": "POST /api/neiging/antwoord",
-      "uitslag": "bereikbaar-zonder-verklaring",
-      "triageBewijs": {
-        "zelfde": 3,
-        "geweigerd": 0,
-        "onbekend": 0,
-        "vergeleken": 3
-      },
-      "triage": "gelijk-aan-verklaard",
-      "triageReden": "een verklaarde doelgroep krijgt op POST /api/neiging/antwoord exact hetzelfde antwoord; het register loopt achter en het bord kan deze functie niet per doelgroep uitzetten"
     },
     {
       "functie": "ontmoetingen",

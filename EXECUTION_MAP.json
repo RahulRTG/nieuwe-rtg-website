@@ -2,7 +2,7 @@
  "uitleg": "Afgeleide executiekaart: per route wat de AI ermee mag, wat het bewijs eronder zegt en of een herhaling schade doet. De herkomst staat per veldsoort in `velden`, de vertaling naar de gedeelde gezagsnoemer in `noemer`. NOOIT met de hand wijzigen: npm run executionmap:controle zakt erop.",
  "bronnen": {
   "IDEMPROEF.json": "bc1581576a5d5e53",
-  "IDEMBESLUIT.json": "ec069fe7e9266e98",
+  "IDEMBESLUIT.json": "97f737306bcabcdc",
   "HERSTEL.json": "43f74e808fe06d72",
   "VERTROUWEN.json": "6fb6bc1a3e8ce705",
   "server/kern/stuur/beleid.js": "8dc821a9959c82e0",
@@ -75,7 +75,7 @@
   "capabilities": 5148,
   "bereikbaarPerRol": 179,
   "conflicten": 0,
-  "metBesluit": 165,
+  "metBesluit": 167,
   "metVermoedeTerugweg": 49,
   "bevestigdeTerugweg": 43
  },
@@ -15610,6 +15610,7 @@
    "herhaling": "onbeschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "herhalingBesluit": "code-maker",
    "bereik": "verboden"
   },
   {
@@ -37438,6 +37439,7 @@
    "herhaling": "onbeschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "herhalingBesluit": "code-maker",
    "bereik": "verboden"
   },
   {

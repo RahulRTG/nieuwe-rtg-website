@@ -1162,7 +1162,13 @@ indeling gelijk is aan de besloten klasse, staat hij op uitgevoerd.
 | **N12** | **alleen het doelhek wordt bewaard** | een waarneming langs een ander hek wordt tijdens het venster verwerkt en niet opgeslagen; het venster zelf blijft als auditspoor. `plaats-passages` gaat naar `toegestaan`, en `test/plaatsnadering.e2e.js` (die de opgeslagen passage als bewijs gebruikte dat de motor draaide) gaat hardop om |
 | **N13** | **aankomst bevestigt de klant of de zaak, en allebei mag** | nabijheid wordt een voorstel ("Bent u er?"); aankomst bestaat pas als het lid tikt of de zaak het zet (kassa, host, reservering). Wie van de twee het eerst bevestigt, is genoeg. De deur ter plaatse leest die bevestiging en niet de positie. Uitwerking van N3 |
 | **N14** | **wissen bij stoppen** | Onderweg en de ontmoetradar wissen de positie op het moment dat de taak stopt; de veger van zeven dagen blijft alleen als vangnet. Van `teLang` naar `venster` |
-| **N15** | **de vensters en de noodzakelijke stromen zijn aanvaard** | de negen `venster`- en drie `noodzakelijk`-voorstellen van par. 6.5 zijn besluiten zoals ze stonden. De negentien `onbegrensd`-stromen worden per stroom apart beslist (15.1) |
+| **N15** | **de vensters en de noodzakelijke stromen zijn aanvaard** | de negen `venster`- en drie `noodzakelijk`-voorstellen van par. 6.5 zijn besluiten zoals ze stonden. De negentien `onbegrensd`-stromen worden per stroom apart beslist (N16-N21) |
+| **N16** | **de rit: punten weg bij afronden** (dit beantwoordt B10) | de ritlijn wordt gewist bij afronden; afstand, duur en begin- en eindplek zoals op de factuur blijven. Het ophaalpunt is tijdens de rit exact en wordt bij afronden het adres of de plaatsnaam van de factuur |
+| **N17** | **het OV: halte in plaats van punt, een jaar** | het tarief heeft een afstand nodig en geen punt; na het rekenen blijven in- en uitstaphalte en afstand een jaar, eerder te wissen via de vergeetroute |
+| **N18** | **een SOS hoort bij de melding** | de positie blijft zolang de melding open is en 90 dagen erna (klacht, verzekeraar, politie); een proefalarm of een binnen een minuut ingetrokken SOS verdwijnt direct. Geldt voor huur, charter, date, het alarm van de kring en een incident van een bewaker |
+| **N19** | **de kring alleen in een venster, de ronde zonder GPS** | de laatste plek van de veiligheidskring bestaat alleen zolang de kring een venster open heeft; bij een patrouille bewijst het controlepunt de ronde en wordt de positie van de bewaker niet bewaard |
+| **N20** | **een bezorgpunt verdwijnt bij levering** | coordinaat en laatste koerierpositie verdwijnen bij geleverd of geannuleerd; het adres blijft bij de bestelling. Een verzonnen punt (par. 12, gebrek 5) bestaat niet meer: geen punt is geen punt |
+| **N21** | **vier stromen zonder punt** | Vonk alleen een vak van 5 km; de marktoverdracht alleen samen ja/nee en de afstand; een gemeentemelding houdt haar plek maar verliest de codenaam van de melder na afhandeling; een reis die "hier" begint, bewaart de dichtstbijzijnde plaatsnaam |
 
 Plus twee afbakeningen die bij de besluiten horen:
 
@@ -1243,6 +1249,7 @@ opties, wat ze betekenen en wat ze kosten; de aanbeveling staat vooraan.
 - *Salon-berichten per plek* -- botst met P-05 en `PLAATS.md` par. 6.
 
 **B8. Passages in het actielog van de plaatslaag** (par. 6.2).
+**Beslist: N12, en uitgevoerd (par. 6.7).** De opties hieronder blijven staan als verantwoording.
 - *Een naderingsvenster krijgt alleen het hek van zijn bezoek (aanbevolen).* Dan
   bestaat er geen passage om te loggen; de bron van het venster noemt de zaak al.
   Kost: de hek-motor krijgt een filter per venster, en de huidige proef van de
@@ -1263,6 +1270,7 @@ opties, wat ze betekenen en wat ze kosten; de aanbeveling staat vooraan.
   `serverCoordinaatBuitenVenster` op, niet `aankomstUitGps` -- en botst dus met N3.
 
 **B10. De punten van een rit ná de rit** (N2, par. 15.0).
+**Beslist: N16** -- wissen bij afronden, de samenvatting blijft. De opties hieronder blijven staan als verantwoording.
 - *Eerst per reden meten of er één is die punten nodig heeft (aanbevolen).* Voor
   de werkelijk gereden afstand volstaat een GETAL dat aan het eind van de rit
   wordt uitgerekend; voor fraude en de meeste geschillen volstaan begin, eind en

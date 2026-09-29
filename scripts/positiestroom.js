@@ -78,7 +78,34 @@ const BESLUITEN = {
     'koerier-bezorgdienst', 'ov-voertuig', 'plaats-waarnemingen', 'veilig-spoor']
     .map(naam => [naam, Object.assign({ klasse: 'venster' }, N15)])),
   ...Object.fromEntries(['favorieten', 'flits-melding', 'weefsel-zaak']
-    .map(naam => [naam, Object.assign({ klasse: 'noodzakelijk' }, N15)]))
+    .map(naam => [naam, Object.assign({ klasse: 'noodzakelijk' }, N15)])),
+  /* De negentien onbegrensde stromen, per stroom besloten (29 september 2026). */
+  'ritlijn': { n: 'N16', datum: '2026-09-29', klasse: 'venster',
+    uitkomst: 'de punten van een rit worden gewist bij afronden; afstand, duur en begin- en eindplek zoals op de factuur blijven' },
+  'rit-vertrekpunt': { n: 'N16', datum: '2026-09-29', klasse: 'toegestaan',
+    uitkomst: 'tijdens de rit het exacte ophaalpunt; bij afronden vervangen door het adres of de plaatsnaam van de factuur' },
+  'ov-uitstap': { n: 'N17', datum: '2026-09-29', klasse: 'noodzakelijk',
+    uitkomst: 'na het rekenen van het tarief blijven de uitstaphalte en de afstand, een jaar; de GPS van het lid gaat weg' },
+  'ov-instap': { n: 'N17', datum: '2026-09-29', klasse: 'noodzakelijk',
+    uitkomst: 'de instaphalte vervangt de GPS; het reisoverzicht blijft een jaar en is eerder te wissen via de vergeetroute' },
+  ...Object.fromEntries(['huur-sos', 'charter-sos', 'date-sos', 'veilig-alarm', 'beveiliging-incident']
+    .map(naam => [naam, { n: 'N18', datum: '2026-09-29', klasse: 'noodzakelijk',
+      uitkomst: 'de positie hoort bij de melding: zolang die open is en 90 dagen erna; een proefalarm of een binnen een minuut ingetrokken SOS verdwijnt direct' }])),
+  'veilig-laatste-plek': { n: 'N19', datum: '2026-09-29', klasse: 'venster',
+    uitkomst: 'de laatste plek bestaat alleen zolang de kring een venster open heeft en verdwijnt bij sluiten' },
+  'patrouille': { n: 'N19', datum: '2026-09-29', klasse: 'toegestaan',
+    uitkomst: 'het controlepunt bewijst de ronde; de GPS-positie van de bewaker wordt niet bewaard' },
+  ...Object.fromEntries(['bezorgdienst-adres', 'horeca-bezorgadres', 'mode-adres', 'koerier-mode']
+    .map(naam => [naam, { n: 'N20', datum: '2026-09-29', klasse: 'venster',
+      uitkomst: 'het punt verdwijnt bij geleverd of geannuleerd; het adres zelf blijft bij de bestelling, en een verzonnen punt bestaat niet meer' }])),
+  'vonk-profiel': { n: 'N21', datum: '2026-09-29', klasse: 'noodzakelijk',
+    uitkomst: 'alleen een grove plek (een vak van 5 km), nooit het punt, en weg bij uitzetten of vergeten' },
+  'markt-overdracht': { n: 'N21', datum: '2026-09-29', klasse: 'toegestaan',
+    uitkomst: 'alleen samen ja/nee en de afstand blijven; de punten van koper en verkoper niet' },
+  'gemeente-melding': { n: 'N21', datum: '2026-09-29', klasse: 'toegestaan',
+    uitkomst: 'de plek blijft bij de melding, de codenaam van de melder gaat eraf na afhandeling' },
+  'reis-etappes': { n: 'N21', datum: '2026-09-29', klasse: 'toegestaan',
+    uitkomst: '"hier" wordt bij het plannen vervangen door de dichtstbijzijnde plaatsnaam; de GPS van het lid wordt niet bewaard' }
 };
 
 /* ----------------------------------------------------------------------------

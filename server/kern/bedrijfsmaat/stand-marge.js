@@ -38,7 +38,7 @@ module.exports = ({ m, peilmoment, maat, kosten, omzetPerPas }) => {
     'De bijdrage is afgesproken (prijslijst en contracten), geen ontvangen geld.',
     'De pas bij de kosten is die bij de laatste meting van de maand; wie halverwege overstapte, telt met al zijn kosten bij zijn laatste pas.'];
 
-  function uitkomst() {
+  function margePerPas() {
     if (m !== peilmoment.slice(0, 7)) return niet('De bijdrage per pas is een stand van vandaag; voor een eerdere maand is die niet bewaard.');
     if (!k || typeof k.alleDragers !== 'function' || typeof omzetPerPas !== 'function')
       return niet('De kostenlaag of het ledenregister is niet beschikbaar.');
@@ -74,5 +74,5 @@ module.exports = ({ m, peilmoment, maat, kosten, omzetPerPas }) => {
     return { stand: 'PER_PAS', waarde: null, perPas };
   }
 
-  return Object.assign(maat('marge.per-lid', DEFINITIES.margePerLid, uitkomst(), dekt), { graad: 'vermoed' });
+  return Object.assign(maat('marge.per-lid', DEFINITIES.margePerLid, margePerPas(), dekt), { graad: 'vermoed' });
 };

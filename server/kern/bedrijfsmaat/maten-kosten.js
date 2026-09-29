@@ -25,7 +25,7 @@ module.exports = [
     actualiteit: 'live', privacy: 'leden', minGroep: 10, eigenaar: 'kern/bedrijfsmaat', graad: 'vermoed',
     afhankelijk: ['omzet.leden-maand', 'kosten.per-drager'],
     bron: 'afgeleid', definitie: [c('server/kern/bedrijfsmaat/definities.js', 'margePerLid: d29(15')],
-    projectie: [c(MRG, 'function uitkomst()'), c('server/kern/ledenregister.js', 'function omzetPerPas')],
+    projectie: [c(MRG, 'function margePerPas()'), c('server/kern/ledenregister.js', 'function omzetPerPas')],
     bewijs: [c(MRG, "niet('Er zijn leden op deze pas zonder lopend contract"), c(MRG, "niet('Verbruik zonder tarief")],
     groepsgrens: [c(MRG, '{ grens, benoemd: true }')],
     gedeeltelijk: 'Alleen de lopende maand: de bijdrage per pas is een stand van vandaag en wordt niet per maand bewaard. De Business Pass rekent alleen mee als elk lid een lopend contract heeft.',

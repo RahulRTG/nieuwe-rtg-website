@@ -36,7 +36,7 @@ function keerN(basis, soort, n) {
 }
 
 function maakAgendaPro({ db, save, bijeen, inBundel, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer, boekingenVanKlant, reserveringenVanKlant }) {
-  // schrijft in dezelfde agenda, dus dezelfde belofte: zie lib/duurzaam.js
+  // zelfde agenda, zelfde belofte: zie lib/duurzaam.js
   const vastleggen = require('../lib/duurzaam')({ bijeen, save, inBundel, bron: 'agenda-pro' });
   const nu = () => new Date().toISOString();
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));

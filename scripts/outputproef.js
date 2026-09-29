@@ -469,8 +469,12 @@ function teDun(nieuw, oud) {
     'deel van de suite en geen meting; draai de hele suite met RTG_ROUTELOG, of geef --kleiner mee ' +
     'als deze krimp de bedoeling is.';
 }
+/* Geen register is geen vorige ronde; een KAPOT register is iets anders en mag
+   hier niet als "geen vorige ronde" doorgaan, want dan vergelijkt de grendel
+   met niets en laat hij elk dun journaal door. Dat gooit dus gewoon. */
 function vorigeRonde() {
-  try { return JSON.parse(fs.readFileSync(UITSLAG, 'utf8')); } catch (e) { return null; }
+  if (!fs.existsSync(UITSLAG)) return null;
+  return JSON.parse(fs.readFileSync(UITSLAG, 'utf8'));
 }
 
 module.exports = { teDun, meet, oordeel, koppeling, gevoeligheid, infrastructuur, eerderGemeten, metGeheugen, onwaarneembareRoutes,

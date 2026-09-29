@@ -88,6 +88,8 @@ const DOE = [
     'de tweede gaf 409 en er kwam geen tweede tijdlijnregel. Een toestandscontrole.')
 ];
 
+const { CONNECTOR } = require('./mutatiecontracten-democratie-connector');
+
 const CONTRACTEN = Object.fromEntries([
   leest('POST /api/member/democratie/kwestie/mijn', 'democratie.mijn', LID,
     'De eigen kwesties, op de sleutel uit de sessie; een ander lid ziet ze niet.'),
@@ -115,7 +117,8 @@ const CONTRACTEN = Object.fromEntries([
   schrijft('POST /api/member/democratie/kwestie/intrek', 'democratie.intrek', LID,
     'Na een eindstand gaf intrekken 409 en bleef de eindstand staan; in een lopende ronde sloot hij de ' +
     'ronde een keer. Een toestandscontrole.'),
-  ...DOE
+  ...DOE,
+  ...CONNECTOR
 ]);
 
 module.exports = { CONTRACTEN };

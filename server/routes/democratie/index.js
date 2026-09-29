@@ -46,5 +46,11 @@ module.exports = (app, auth, officeAuth, boardroomWie, democratie) => {
   app.post('/api/member/democratie/actie/resultaat', auth, (req, res) => alsLid(req, res, (k, b) => doe.resultaat(k, b.id, b)));
   app.post('/api/member/democratie/actie/stop', auth, (req, res) => alsLid(req, res, (k, b) => doe.stop(k, b.id, b)));
 
+  /* De voorstellen van partijen bij een openbare kwestie, of bij een eigen
+     kwestie. Lezen, en voor elk lid hetzelfde beeld. */
+  app.post('/api/member/democratie/kwestie/voorstellen', auth, (req, res) =>
+    alsLid(req, res, (k, b) => democratie.voorstellenBij(k, b.id)));
+
   require('./kantoor')({ app, officeAuth, boardroomWie, democratie, stuur });
+  require('./partij')({ app, democratie, stuur });
 };

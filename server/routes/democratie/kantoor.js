@@ -35,4 +35,19 @@ module.exports = ({ app, officeAuth, boardroomWie, democratie, stuur }) => {
 
   app.post('/api/office/democratie/meter', officeAuth, (req, res) =>
     opNaam(req, res, () => democratie.meter()));
+
+  /* Het partijenregister (kern/democratie/partijen.js). Inschrijven gaat op
+     naam en op de bron van een officiele registratie; het register oordeelt
+     niet over partijen. */
+  app.post('/api/office/democratie/partij/lijst', officeAuth, (req, res) =>
+    opNaam(req, res, () => democratie.register.lijst()));
+
+  app.post('/api/office/democratie/partij/registreer', officeAuth, (req, res) =>
+    opNaam(req, res, (wie, b) => democratie.register.registreer(wie, b)));
+
+  app.post('/api/office/democratie/partij/sleutel', officeAuth, (req, res) =>
+    opNaam(req, res, (wie, b) => democratie.register.sleutel(wie, b)));
+
+  app.post('/api/office/democratie/partij/uitschrijf', officeAuth, (req, res) =>
+    opNaam(req, res, (wie, b) => democratie.register.uitschrijf(wie, b)));
 };

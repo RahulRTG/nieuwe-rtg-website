@@ -103,7 +103,7 @@ vervalt de functie.
 |---|---|---|---|
 | **DO-01 Menselijke waardigheid** | geen mens wordt score, doelgroep of politiek profiel | CAR-05, `scripts/lib/cijferopmens.js` | **gedeeltelijk**: de scan dekt deze map nog niet |
 | **DO-02 Niemand kwijt** | elke kwestie heeft een aantoonbaar vervolg of een gemotiveerde eindstand | `server/kern/livinglab/vraagbesluit.js` voor één domein | **niemand**: de meter komt in fase B |
-| **DO-03 Gelijke partijrechten** | de infrastructuur kent geen favoriete partij | — | **niemand**: fase C |
+| **DO-03 Gelijke partijrechten** | de infrastructuur kent geen favoriete partij | `server/kern/democratie/partijen.js`, `voorstellen.js` (par. 7.3) | **staat** voor de connector: `test/democratie-partij.test.js` toets 4 en `test/democratie-afhankelijk.test.js` toets 5 |
 | **DO-04 Geen eigenaarprivilege** | RTG, de oprichter en zijn partij krijgen geen bijzondere politieke capability | MN-01 (`test/mn01-bevoegdheidsvoordeel.test.js`) als vorm | **niemand** voor dit domein |
 | **DO-05 Geen politieke microtargeting** | Foundation-, Living-, Service-, RTG- en kwestiedata worden nooit gebruikt om politieke overtuigbaarheid te voorspellen | `server/kern/bureau/relaties.js` en `server/kern/vonk/selectie.js` weigeren politieke voorkeur lokaal | **gedeeltelijk** |
 | **DO-06 AI adviseert, mensen besluiten** | Rahul stelt voor, een mens besluit | `FABRIC.md`, `server/kern/stuur/beleid.js` | **staat** voor het huis, niet voor dit domein |
@@ -330,6 +330,79 @@ vaststelling en geen oordeel, en het staat voor elke partij op dezelfde plek.
 
 Een echte beleidssimulatiemotor is **jaren weg**. Zonder deze lijst eronder zou hij
 een orakel zijn.
+
+### 7.3 Wat stap 5 nu is (29 september 2026)
+
+De Political Connector V1: een register van `politiekePartij`, een voorstel dat
+aan een kwestie koppelt, een toelichting, een bron en de aannamelijst van par.
+7.2. Het staat in `server/kern/democratie/partijen.js`, `voorstellen.js` en
+`connector.js`, met drie deuren:
+
+- **het kantoor, op naam**: `/api/office/democratie/partij/lijst`,
+  `/registreer`, `/sleutel` en `/uitschrijf`, en de kaart *Partijenregister* op
+  het kwestiekantoor;
+- **de partij, met haar eigen sleutel**: `/api/democratie/partij/wie`,
+  `/kwesties`, `/voorstel/plaats`, `/voorstel/toelicht`, `/voorstel/aanname` en
+  `/voorstel/mijn`;
+- **het lid, lezend**: `/api/member/democratie/kwestie/voorstellen`, en de
+  voorstellen bij een eigen kwestie en bij een actie op *Wat speelt er*.
+
+Twee besluiten van de eigenaar:
+
+- **Een partij hangt niet aan een RTG-account.** Bij het inschrijven krijgt ze
+  EEN keer een sleutel te zien: een bearer uit `kern/bearercode.js` (128 bits,
+  een jaar geldig), waarvan de server alleen de hash bewaart en die hij in
+  constante tijd opzoekt. Het kantoor kan hem vervangen of de partij
+  uitschrijven, en dan werkt de oude sleutel niet meer. Hij staat als
+  credential in `CODECREDENTIALS.json`. Zo heeft een
+  partij geen ledenaccount nodig om zonder RTG verder te gaan (proef P3), en
+  vallen de rollen van woordvoerder en burger nooit in een sessie samen (MN-02).
+  De deur staat daarom met reden in `scripts/lib/publiek.js`.
+- **De aannamelijst hoort bij V1.** Zeven velden -- kosten, wie betaalt, wie
+  profiteert, wie heeft nadeel, welke regel, wie voert uit, wat is onzeker --
+  staan op `onbekend` tot de partij een veld MET een bron invult.
+
+Vijf grenzen, alle vijf in de code en elk met een toets die op een mutatie zakt
+(`test/democratie-partij.test.js`, `test/partijvoorstel-scherm.e2e.js`):
+
+1. **Het register oordeelt niet.** Aanduiding, verkiezingsniveau, categorie
+   (`geregistreerd` of `deelnemer`) en de bron van de registratie met de dag
+   waarop een mens hem nakeek. Er is geen veld voor ideologie, grootte of
+   betrouwbaarheid.
+2. **Een partij ziet alleen een openbare kwestie**: een kwestie waar de
+   inbrenger zelf een actie van maakte, want dat is de enige plek waar hij heeft
+   ingestemd dat anderen het onderwerp zien. Ze ziet onderwerp en gebied, geen
+   datum, geen aantal en geen nummer. De kwestie bezit het voorstel niet; ze
+   krijgt alleen de regel *voorstel* op haar tijdlijn.
+3. **Een deur, een limiet, geen tak** (DO-03). Noord, Midden en Zuid krijgen in
+   toets 4 byte voor byte dezelfde antwoorden en dezelfde daglimiet, ook met een
+   andere categorie, en `test/democratie-afhankelijk.test.js` toets 5 zakt op
+   elke vergelijking van een partij of categorie met een vaste waarde. De
+   burgerkern (kwestie, lid, koppeling, doe, beeld, eindstanden, meter, wek)
+   noemt het woord partij nog steeds niet (proef P1).
+4. **Volgorde is een rotatie, geen rangorde** (besluit 4). De partijen staan op
+   hun registernummer en de lijst schuift elke dag een plaats op, voor iedereen
+   gelijk. Er wordt niets geteld of gewogen, en wie niets aanleverde krijgt
+   dezelfde neutrale zin op dezelfde plek.
+5. **Niets wordt overschreven** (DO-10). Een voorstel draagt een eigen
+   hashketen; een nieuwe waarde of toelichting is een nieuwe regel. Uitschrijven
+   wist niets: het voorstel blijft staan met de stand van de partij erbij.
+
+**De partijdeur heeft geen duplicaatlaag, en dat is gemeten.** De laag die een
+dubbeltik opvangt (`server/lib/idem-sleutelbepaling.js`) kent een afzender aan
+Authorization of de cookie, en zonder die twee aan het ip-adres. De partijsleutel
+reist in een eigen kop, dus met de aanname als `zelfdeVerzoek` kreeg een
+herhaling het EERSTE antwoord terug -- en twee partijen achter hetzelfde adres
+hadden elkaars antwoord kunnen krijgen. De schrijvende partijroutes herkennen
+een herhaling daarom zelf (`idemsleutels-nooit-democratie.js`), en toets 9 zakt
+zodra iemand er een duplicaatlaag omheen zet.
+
+Wat er met opzet NIET is: de andere acht soorten uit par. 7.1 (standpunt,
+amendement, onderbouwing, dekking, stemming, wijziging en uitvoering; de
+toezegging is stap 6),
+een versie per partij, een partijscherm (de partij praat met een API, het is
+een connector) en een weergave per wijk of niveau. De eigenaar van RTG krijgt
+aan de partijdeur 401 zonder sleutel, net als ieder ander lid (toets 8).
 
 ---
 
@@ -757,7 +830,7 @@ De snelste route is de kortste bewijsroute naar een bruikbare V1. Een trein, in 
 2. **C, alleen de constitutionele kern**: de vier actoren, vergelijken van invoer, uitvoering en uitkomst, de owner-aanvalsmatrix en de privacy-tegenproef. Geen echte partij, geen scherm, geen AI. Groen = bevroren.
 3. **De menselijke V1**: een simpele voorkant -- *wat speelt er bij jou?*, inbrengen, voortgang, uitkomst met reden, terugkoppeling -- met B1 en toegankelijkheid. Geen honderd schermen.
 4. **DoeNetwerk**: net genoeg om `samen-opgelost` echt te laten ontstaan (aansluiten, bijeenkomst, actie, resultaat, terugkoppeling), op de regels van genootschap en bijeenkomst. **Staat** (28 september 2026, par. 6a).
-5. **Political Connector V1**: echte `politiekePartij` -- register, voorstel koppelen, toelichting, bron -- alle partijen hetzelfde contract.
+5. **Political Connector V1**: echte `politiekePartij` -- register, voorstel koppelen, toelichting, bron -- alle partijen hetzelfde contract. **Staat** (29 september 2026, par. 7.3).
 6. **`politiekeToezegging` V1**: registreren, bron, wijzigingen die alleen aangroeien, uitvoering of stemming, externe verankering. Geen score.
 7. **Rahul als laatste**: B1, samenvatten, ontbrekende bron, ontbrekend tegenargument, dekking en uitvoerbaarheid -- alleen op de kwestieprojectie, lokaal waar de grondwet dat eist.
 8. **Productieproeven**: `POSTGRES_DURABILITY` en `INBRENG_IDEMPOTENT` dicht vóór publieke ingebruikname; daarna storingen, back-up en herstel, rechten, privacy, belasting, en externe security- en juridische review.

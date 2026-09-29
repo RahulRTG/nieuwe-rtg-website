@@ -10,6 +10,11 @@ const ROUTES = new Set([
   /* Account- en personeelsroutes geven een sessie/PIN eenmalig terug. Een
      generieke retrycache zou die na intrekking vóór de echte deur herhalen. */
   'POST /api/auth/register',
+  /* De partijsleutel van DemocratieOS (kern/democratie/partijen.js): inschrijven
+     en vervangen tonen hem een keer. Een herhaalde inschrijving krijgt 409, een
+     herhaald vervangen een NIEUWE sleutel. */
+  'POST /api/office/democratie/partij/registreer',
+  'POST /api/office/democratie/partij/sleutel',
   // Human approval is consumed once; replay must reach current auth and the approval store.
   'POST /api/member/doe/bevestig',
   'POST /api/werving/verbind',

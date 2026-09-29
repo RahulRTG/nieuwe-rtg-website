@@ -3,22 +3,22 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-09-29",
-  "commit": "2ae19049"
+  "commit": "4984ab46"
  },
  "grens": "Een voorvoegsel uit een sjabloon met een gat is GEEN route en wordt nooit tegen de routelijst gelegd. Exacte paden wel: een exact pad dat niet bestaat, is een dood pad.",
  "gemetenTegen": {
   "register": "ROUTEBRON.json",
   "stempel": {
-   "op": "2026-09-29T12:53:57.135Z",
-   "commit": "2ae19049"
+   "op": "2026-09-29T19:34:03.462Z",
+   "commit": "4984ab46"
   },
-  "bekendePaden": 5275
+  "bekendePaden": 5286
  },
  "gemeten": {
   "schermenMetPad": 422,
   "nietGelezen": 3,
-  "exactePaden": 954,
-  "verwijzingen": 1141,
+  "exactePaden": 955,
+  "verwijzingen": 1142,
   "voorvoegsels": 145,
   "basisPaden": 2,
   "doodPad": 0,
@@ -2362,6 +2362,13 @@
    "pad": "/api/rtf/rahul",
    "schermen": [
     "public/apps/foundation/samen/samen-02.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/democratie/kwestie/voorstellen",
+   "schermen": [
+    "public/apps/foundation/samendoen.js"
    ],
    "aantal": 1
   },
@@ -7922,7 +7929,9 @@
   },
   {
    "bestand": "public/apps/foundation/samendoen.js",
-   "exact": [],
+   "exact": [
+    "/api/member/democratie/kwestie/voorstellen"
+   ],
    "voorvoegsels": [
     "/api/member/democratie/actie/"
    ]

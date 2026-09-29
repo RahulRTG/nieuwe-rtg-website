@@ -3,16 +3,16 @@
   "uitleg": "Feiten per scherm (paden, domeinen, rol, wereld, inkomende links, alias) en de paren schermen die dezelfde API-paden raken. Het oordeel over die paren staat in SCHERMEIGENAAR.json; dit register stelt niets vast behalve wat er gemeten is.",
   "stempel": {
     "op": "2026-09-29",
-    "commit": "2ae19049"
+    "commit": "4984ab46"
   },
   "bronnen": {
     "schermroutes": {
       "op": "2026-09-29",
-      "commit": "2ae19049"
+      "commit": "4984ab46"
     },
     "schermgedrag": {
       "op": "2026-09-29",
-      "commit": "2ae19049"
+      "commit": "4984ab46"
     }
   },
   "ruis": [
@@ -3132,7 +3132,8 @@
       ],
       "paden": [
         "/api/member/democratie/actie/",
-        "/api/member/democratie/kwestie/"
+        "/api/member/democratie/kwestie/",
+        "/api/member/democratie/kwestie/voorstellen"
       ],
       "schilPaden": [],
       "domeinen": [

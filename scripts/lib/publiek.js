@@ -36,6 +36,19 @@ const PUBLIEK = new Map([
      titel te kunnen nakijken zonder eerst lid van RTG te worden. Wat hem
      begrenst: de code verloopt, het lid kan hem stoppen, hij toont EEN feit en
      nooit het ledger, en de deurrem van 300/minuut hangt ervoor. */
+  /* DE DEUR VAN EEN PARTIJ (server/routes/democratie/partij.js, POLITIEK.md
+     par. 7.1). Open om de reden van de proef P3: een partij hangt niet aan een
+     RTG-account, want dan kan DemocratieOS niet zonder RTG verder. Wat de deur
+     WEL heeft is een sleutel: 128 bits uit kern/bearercode, uitgegeven door een
+     kantoormens op naam, alleen als hash op schijf, een jaar geldig, te vervangen of
+     in te trekken. Zonder geldige sleutel 401, en een rem per bron van
+     120/minuut tegen wie sleutels probeert. Elke partij krijgt dezelfde deur. */
+  ['/api/democratie/partij/wie', 'de partijsleutel IS de geloofsbrief (alleen als hash bewaard, verloopt, intrekbaar door het kantoor); toont alleen de eigen registerregel'],
+  ['/api/democratie/partij/kwesties', 'de partijsleutel IS de geloofsbrief; toont alleen kwesties die hun inbrenger zelf openbaar maakte, zonder datum of nummer'],
+  ['/api/democratie/partij/voorstel/plaats', 'de partijsleutel IS de geloofsbrief; plaatst op naam van die ene partij, met dezelfde limiet voor elke partij'],
+  ['/api/democratie/partij/voorstel/toelicht', 'de partijsleutel IS de geloofsbrief; raakt alleen een voorstel van die partij'],
+  ['/api/democratie/partij/voorstel/aanname', 'de partijsleutel IS de geloofsbrief; raakt alleen een voorstel van die partij, en een veld gaat alleen met bron van onbekend af'],
+  ['/api/democratie/partij/voorstel/mijn', 'de partijsleutel IS de geloofsbrief; toont alleen de voorstellen van die partij'],
   ['/api/carriere/regel/toon', 'een deelbewijs wordt getoond aan iemand zonder RTG-account; de deelcode is de sleutel, verloopt en is te stoppen'],
   ['/api/muziek/luister/:ticket', 'de tijdelijke luisterkaart IS de geloofsbrief: 192 willekeurige bits, vijftien minuten geldig en alleen uitgegeven aan een ingelogd lid voor een gepubliceerd nummer'],
   ['/api/vonk/profile-photo/delivery/:ticket', 'het kortlevende versleutelde ticket IS de beperkte geloofsbrief; levering hercontroleert versie, publicatie, disclosure, match en blokkade en geeft nooit een opslagadres prijs'],

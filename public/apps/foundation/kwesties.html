@@ -59,6 +59,7 @@
   @media (max-width:760px){ .onthaal{padding:1.4rem 1.1rem 1.2rem;} }
 </style>
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
+<script src="voorstelbeeld.js"></script>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -203,7 +204,7 @@ function kaart(k) {
       ? '<p class="ronde">Er is nog niets besloten. Zodra dat zo is, zie je hier de uitkomst en de reden.</p>' +
         (r.nr > 1 ? '<p class="ronde">Dit is ronde ' + esc(r.nr) + ': de kwestie is opnieuw geopend.</p>' : '') +
         '<div class="rij ruimte"><button class="kknop" type="button" data-intrek="' + esc(k.id) + '">Intrekken</button></div>'
-      : uitkomst(r)) + acties(k, loopt) +
+      : uitkomst(r)) + acties(k, loopt) + VoorstelBeeld.html(k.voorstellen, esc) +
     eerder + '</details>';
 }
 

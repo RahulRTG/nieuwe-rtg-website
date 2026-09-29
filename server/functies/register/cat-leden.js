@@ -70,7 +70,9 @@ module.exports = [
   { id: 'ondertiteling', categorie: 'Leden (RTG-app)', naam: 'Automatisch ondertitelen in een gesprek', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Een deelnemer laat zijn eigen stem omzetten naar tekst met een LOKAAL model; de regel komt in de meeleesbaan van het gesprek. Uit zetten laat die baan staan -- meetypen blijft werken -- maar wie doof is is dan weer afhankelijk van de anderen.',
     paden: ['/api/ondertiteling'] },
-  { id: 'neiging', categorie: 'Leden (RTG-app)', naam: 'RTG Neiging (Mijn neigingen)', standaard: true, doelgroepen: LEDEN,
+  /* `gast`: een gratis account na paspoortcontrole (SAMENLEVING.md par. 11.4);
+     de bezoeker weert de deur, niet dit register. */
+  { id: 'neiging', categorie: 'Leden (RTG-app)', naam: 'RTG Neiging (Mijn neigingen)', standaard: true, doelgroepen: LEDEN_GAST,
     uitleg: 'De intake die zichzelf afkapt, en de kaart met wat RTG van je denkt te weten. Zet je dit uit, dan wordt er niets meer bijgehouden en is de kaart dicht; wat er staat blijft tot je het zelf weghaalt of de bewaartermijn verloopt.',
     /* EEN pad en niet zeven: intake en geheugenkaart zijn twee helften van
        dezelfde functie, en los zou het bord de ene kunnen uitzetten en de andere

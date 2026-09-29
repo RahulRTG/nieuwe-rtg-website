@@ -13,17 +13,20 @@
    reden, een journaalregel en een melding aan de betrokkene, langs de weg die
    kern/ledenbalie-inzage.js al kent. Niet hier, en niet stilzwijgend.
 
-   EN GASTEN HEBBEN GEEN INTAKE. Dezelfde grond als bij de gegevenskaart: zonder
-   account is er niets om aan te hangen, en een lege lijst tonen leest als "RTG
-   weet niets van u" terwijl er domweg geen plek is om iets te bewaren. */
+   EN EEN BEZOEKER HEEFT GEEN INTAKE. Dezelfde grond als bij de gegevenskaart:
+   zonder account is er niets om aan te hangen, en een lege lijst tonen leest
+   als "RTG weet niets van u" terwijl er domweg geen plek is om iets te bewaren.
+   De grond is dus het ACCOUNT en niet de pas -- maar de toets vroeg tot 29
+   september 2026 naar de pas en weigerde ook het gratis account
+   (SAMENLEVING.md par. 11.4). Het besluit van die dag: open voor een gratis
+   account na een paspoortcontrole, langs de paspoortdeur van de bodem. */
 'use strict';
 
 module.exports = (kern) => {
-  const { app, auth } = kern;
+  const { app, auth, idGeverifieerd } = kern;
+  const paspoortdeur = require('../kern/onvervreemdbaar').maakPaspoortdeur({ idGeverifieerd });
 
-  const lid = (req, res, next) => req.session.tier === 'guest'
-    ? res.status(403).json({ error: 'Dit hoort bij een account; als gast is er niets om te bewaren.' })
-    : next();
+  const lid = (req, res, next) => { if (paspoortdeur(req, res)) next(); };
 
   /* Een uitslag met een `status` is een weigering. Dezelfde vorm als
      routes/experience.js, zodat de client er een afhandeling voor heeft. */

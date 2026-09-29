@@ -418,6 +418,54 @@ dingen uit de nieuwe cellen:
   Of dat bedoeld is, is een vraag voor een mens; deze meter beantwoordt hem
   niet.
 
+### 11.4 De 101 bestanden nagelopen (stap 5)
+
+Par. 11.1 liet 65 bestanden open die op `guest` toetsen zonder `account` te
+noemen. Die zijn nu niet met de hand nagelopen maar GEMETEN, want een handlijst
+loopt achter zodra er een deur bijkomt: `npm run gastsplitsing`
+(`GASTSPLITSING.json`, graad `vermoed`) loopt elke toets op de gast in `server/`
+na en zet naast elkaar wat de CODE doet en wat de WEIGERING belooft. Op 29
+september 2026: 143 toetsen in 124 bestanden.
+
+| wat de plek doet | aantal |
+|---|---|
+| houdt bezoeker en gratis account uit elkaar (`account` of `idGeverifieerd()`) | 23 |
+| vertakt alleen (geen weigering) | 23 |
+| weigert, en zegt dat er een betaalde pas nodig is | 11 |
+| weigert "voor leden" | 82 |
+| weigert, en belooft dat een account of profiel volstaat | **3** |
+| weigert zonder tekst | 1 |
+
+**De 82 "voor leden" zijn geen fout maar een formuleringsvraag.** Het woord is
+dubbelzinnig: een Community-lid heet ook lid, en leest *"RTG Bank is voor
+leden"* als een deur die hem open hoort te staan. Wat daar bedoeld is, is een
+betaalde pas; of dat per functie zo HOORT, zegt de bodem (par. 11.2), en daar
+verdween geen werkwoord.
+
+**De drie zijn een tegenspraak tussen tekst en code**, en ze zijn nagetrokken op
+een echte server met een gratis account waarvan RTG het paspoort had gezien --
+alle drie gaven 403:
+
+- `POST /api/stad/melding`: *"Melden kan met een RTG-profiel; meekijken mag altijd."*
+- `POST /api/stad/raadpleging/reageer`: *"Meepraten kan met een RTG-profiel; meelezen mag altijd."*
+- `routes/neiging.js` (zeven routes): *"Dit hoort bij een account; als gast is er
+  niets om te bewaren."* -- terwijl de kop van dat bestand zegt dat de grond
+  "zonder account" is.
+
+Dat is precies de vorm van de meetfout uit par. 11.2, maar dan in de code zelf:
+de tekst gaat over een ACCOUNT, de voorwaarde over een PAS.
+
+**Het besluit (29 september 2026): de code volgt de tekst.** Alle drie lopen nu
+langs dezelfde paspoortdeur als besluit 4c (`maakPaspoortdeur()` in
+`server/kern/onvervreemdbaar.js`): een gratis account waarvan RTG het paspoort
+zag mag, een gratis account zonder controle hoort hoe het wel kan, een bezoeker
+zonder account blijft buiten, en een betaalde pas merkt niets.
+`test/paspoortdeur.test.js` draagt de drie deuren naast de eerste drie, en zakt
+als een ervan terug achter de pas gaat. Meekijken en meelezen bleven wat ze
+waren: open. Twee ratels houden het vast: `gastTegenspraak` staat op 0 en mag
+alleen omlaag (dus niet meer omhoog), `gastOnderscheidt` op 23 en mag alleen
+omhoog.
+
 ## 12. De volgorde
 
 | # | wat | stand |
@@ -428,7 +476,7 @@ dingen uit de nieuwe cellen:
 | 4 | SAM-01 als ratel | **staat** (`test/onvervreemdbaar.test.js`) |
 | 4b | De doelgroepmeter een gratis-accountsessie geven naast de bezoeker | **staat** (par. 11.3); de toegangsvraag bij `werving/verbind` wacht op een mens |
 | 4c | Gemeenteafspraak, aangifte en zorgintake voor een Community-lid | **staat**: open na paspoortcontrole (`server/kern/onvervreemdbaar.js`) |
-| 5 | `guest` splitsen in *bezoeker* en *lid op de bodem* | de code maakt het onderscheid al via `session.account`; 65 van de 101 bestanden zijn niet nagelopen |
+| 5 | `guest` splitsen in *bezoeker* en *lid op de bodem* | **staat** (par. 11.4): gemeten met `npm run gastsplitsing`, en de drie tegenspraken zijn op 29 september besloten en dicht; de 82 weigeringen "voor leden" zijn een formuleringsvraag |
 | 6 | Rust verhuizen van Veiligheid naar de bodem, plus de vijf eisen van par. 6 | een stap weg |
 | 7 | Eenvoudige taal als deelnamevorm | een stap weg |
 | 8 | De Foundation-rekening en de ANBI-vraag (GIFT.md) | **vraagt een besluit**; sluit de eerste pijl van de kringloop |

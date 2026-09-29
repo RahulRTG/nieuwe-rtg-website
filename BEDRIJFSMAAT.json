@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T15:17:07.808Z",
-    "commit": "68f9678f",
+    "op": "2026-09-29T15:23:09.433Z",
+    "commit": "d526d644",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bedrijfsmaat.js",
@@ -1831,7 +1831,7 @@
           "citaten": [
             {
               "bestand": "server/kern/bedrijfsmaat/stand-marge.js",
-              "citaat": "function uitkomst()",
+              "citaat": "function margePerPas()",
               "klopt": true
             },
             {

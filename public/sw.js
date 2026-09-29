@@ -14,7 +14,7 @@
    installeerde in de periode dat de `cache: 'no-cache'` hieronder was
    gesneuveld (zie de toelichting daar). Een naam die uit de INHOUD komt kan
    niet vergeten worden. */
-const CACHE = 'rtg-app-ce2465bc';
+const CACHE = 'rtg-app-8a32ec23';
 const SHELL = [
   /* The mandatory desktop standard is available offline too. */
   '/shared/interface/module-sdk.js',
@@ -48,6 +48,7 @@ const SHELL = [
   '/shared/rtg-desktop-components.css',
   '/shared/rtg-world-palette.css',
 '/apps/app.html', '/shared/id.js',
+  '/shared/sw-pass-assets.js', '/shared/pass-cache.js', '/shared/pass-recovery.js', '/shared/pass-recovery.css',
   /* Heritage is één systeemlaag. Een offline start mag niet alleen de HTML
      bewaren en daarna identiteit, materiaal, beweging of lettertypen missen. */
   '/shared/basis.js', '/shared/rtg-world-identity.js',
@@ -92,6 +93,9 @@ const SHELL = [
   '/shared/taalschil/ar.json', '/shared/taalschil/bn.json', '/shared/taalschil/pt.json',
   '/shared/taalschil/ru.json', '/shared/taalschil/ja.json', '/shared/taalschil/fr.json',
   '/shared/taalschil/en.json'];
+
+importScripts('/shared/sw-pass-assets.js');
+self.RTGPassAssets(CACHE);
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)));

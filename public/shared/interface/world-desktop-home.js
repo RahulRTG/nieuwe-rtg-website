@@ -74,7 +74,7 @@
           label.translate = false; brand.appendChild(label);
         }
         var activeLabel = brand && brand.querySelector('.wd-world-label');
-        var activeTitle = {living:'LivingOS',work:'WorkOS',travel:'TravelOS',foundation:'FoundationOS'}[d.body.dataset.rtgBladWereld] || {living:'LivingOS',work:'WorkOS',travel:'TravelOS',foundation:'FoundationOS'}[world];
+        var activeTitle = {living:'LivingOS',work:'WorkOS',travel:'TravelOS',foundation:'FoundationOS'}[d.body.dataset.rtgPalette] || {living:'LivingOS',work:'WorkOS',travel:'TravelOS',foundation:'FoundationOS'}[world];
         if (activeLabel && activeLabel.textContent !== activeTitle) activeLabel.textContent = activeTitle;
       }
       edge();
@@ -86,7 +86,7 @@
         else if (d.body.dataset.worldHome) { e.preventDefault(); home.scrollIntoView({ block: 'start' }); }
       });
       var watch = new MutationObserver(edge);
-      watch.observe(d.body, { attributes: true, attributeFilter: ['data-rtg-adaptive-ready','data-rtg-blad-wereld'] });
+      watch.observe(d.body, { attributes: true, attributeFilter: ['data-rtg-adaptive-ready','data-rtg-palette'] });
       w.addEventListener('rtglang', function () { cards.refresh(); runtime.setState('workspace'); edge(); greet(); });
       w.addEventListener('pagehide', function () { watch.disconnect(); runtime.destroy(); });
       w.RTGDesktopHome.current = { runtime: runtime, cards: cards, frame: frame };

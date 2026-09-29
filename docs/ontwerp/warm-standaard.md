@@ -27,3 +27,9 @@ De routecontrole onderzoekt ook afgeknelde inhoud binnen de buitenste pagina. Ee
 `test/pass-startup.e2e.js` test ontbrekende opstartmodules plus herkansing in Chromium en WebKit, en een echte service-worker-installatie met offline herstart en herstel van de verbinding in Chromium. `test/pass-cache.test.js` bewaakt de toegestane openbare bestanden en weigert API-, upload- en externe adressen. WebKit-emulatie is geen test op het fysieke beginscherm van een iPhone.
 
 Alle CSS-imports van de gedeelde vormgeving horen bij de installatiecache van zowel RTG als Foundation. `test/randen.test.js` bewaakt dit; `scripts/build.js` leidt de cacheversies uit hun werkelijke inhoud af.
+
+## Wereldkleuren in geopende apps
+
+De kleurregels gelden ook binnen Pass-bladen en desktopvensters; ze mogen niet afhangen van de aanwezigheid van de desktopomlijsting. Het zichtbare palet volgt het voorste geopende scherm via `data-rtg-palette`. De vaste route-identiteit blijft apart staan voor navigatie en gegevensbronnen. Sluiten herstelt het palet van het onderliggende blad of de beginpagina. Het volledige adres telt mee, inclusief het gebied van een gedeelde werkruimte.
+
+`test/world-palette.e2e.js` vergelijkt echte achtergrond- en tekstkleuren van los geopende en ingebedde apps, de vier werelden binnen Pass, navigatie binnen een bestaand blad en terugkeren naar Home. De toets draait op 390 en 1440 pixels in Chromium en WebKit en bewaart schermafbeeldingen. De browserrand wordt opnieuw gemeten na een kleurwisseling. Bij het sluiten mag het kleine verzoek om de hervatpositie te bewaren doorlopen, zodat WebKit dat verzoek niet halverwege afbreekt.

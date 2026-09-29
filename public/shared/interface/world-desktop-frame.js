@@ -14,6 +14,11 @@
       x.frame.src = x.url; x.timer = setTimeout(function () { failed(x); }, 15000); }, 'wd-frame-retry');
     retry.hidden = true; o.surface.appendChild(retry);
     function refreshEdge() {
+      var id = w.RTGWorldIdentity, scope = active(), url = scope && scope.win.location.href;
+      var world = id && current && id.classify(url && url !== 'about:blank' ? url : current.url);
+      if (world && id.VALUES.includes(world)) d.body.setAttribute('data-rtg-frame-world', world);
+      else d.body.removeAttribute('data-rtg-frame-world');
+      if (id && id.syncPalette) id.syncPalette(d);
       if (w.RTGAdaptiveEdge && d.body.dataset.rtgAdaptiveState === 'expanded') w.RTGAdaptiveEdge.setState('expanded');
     }
     function active() {

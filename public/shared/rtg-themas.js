@@ -74,7 +74,10 @@
   }
   function geschilderd(el) {
     if (!el) return null;
-    var rgb = ontleed(getComputedStyle(el).backgroundColor);
+    var kleur = getComputedStyle(el).backgroundColor;
+    // De warme kop is transparant boven de wereldgrond, geen zwarte balk.
+    if (/^rgba\([^)]*,\s*0(?:\.0+)?\)$/.test(kleur) || /\/\s*0(?:\.0+)?\s*\)$/.test(kleur)) return null;
+    var rgb = ontleed(kleur);
     if (!rgb) return null;
     return 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')';
   }
@@ -143,12 +146,15 @@
     var start = function () {
       if (!d.documentElement) return;
       kijker.observe(d.documentElement, { attributes: true, subtree: true,
-        attributeFilter: ['data-rtg-world', 'data-rtg-skin', 'data-rtg-edge-ready',
+        attributeFilter: ['data-rtg-world', 'data-rtg-palette', 'data-rtg-skin', 'data-rtg-edge-ready',
           'data-rtg-edge-2', 'data-rtg-edge-2-rendered', 'data-rtg-edge-2-state',
           'data-rtg-eigenvlak'] });
     };
     start();
   } catch (e) { /* zonder waarnemer blijft de meting van het laadmoment staan */ }
   w.addEventListener('load', function () { hertel(); requestAnimationFrame(hertel); });
+  d.addEventListener('transitionend', function (e) {
+    if (e.propertyName === 'background-color' && (e.target === d.body || e.target.matches('.rtg-edge-top'))) hertel();
+  });
   w.RTGThemas = { themas: THEMAS, huidig: huidig, zet: zet, bovenrand: bovenrand };
 })(window, document);

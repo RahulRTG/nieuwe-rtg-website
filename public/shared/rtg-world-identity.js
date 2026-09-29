@@ -115,7 +115,21 @@
       body.setAttribute('data-rtg-world', wereld);
       if (body.removeAttribute) body.removeAttribute('data-rtg-eigenvlak');
     }
+    palet(doc);
     return wereld;
+  }
+
+  /* De zichtbare app kleurt de omlijsting. De vaste route-identiteit blijft
+     staan: die wordt ook door navigatie en gegevensbronnen gebruikt. Een
+     geopend desktopvenster ligt boven een eventueel onderliggend Pass-blad. */
+  function palet(doc) {
+    var body = doc && doc.body;
+    if (!body || !body.getAttribute) return null;
+    var wereld = ['data-rtg-frame-world','data-rtg-blad-wereld','data-rtg-world']
+      .map(function (naam) { return body.getAttribute(naam); })
+      .find(function (waarde) { return Object.prototype.hasOwnProperty.call(MANIFEST, waarde); });
+    if (wereld && body.getAttribute('data-rtg-palette') !== wereld) body.setAttribute('data-rtg-palette', wereld);
+    return wereld || null;
   }
 
   return Object.freeze({
@@ -124,6 +138,7 @@
     REDIRECTS: REDIRECTS,
     normalizePath: normaliseer,
     classify: classificeer,
-    apply: toepassen
+    apply: toepassen,
+    syncPalette: palet
   });
 }));

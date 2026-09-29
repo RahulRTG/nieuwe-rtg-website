@@ -31,6 +31,13 @@ test('De publieke B2B2C-ervaring wisselt van kant, zoekt in de echte app en past
    assert.equal(await page.locator('[data-stage-screen] img').count(),3);
    assert.equal(await page.evaluate(()=>{const r=document.querySelector('.rtg-adaptive-bar').getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&r.bottom<=innerHeight}),true);
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true);
+   /* SINDS #413 is de landing het publieke platformkader (data-public-platform="app",
+      public/site/platform-app.js): de bestaande hoofdstukken staan er nog, maar
+      je opent ze uit de bibliotheek (.pp-section-index) in plaats van door
+      een lange pagina te scrollen. Wat hier wordt beproefd is dus dezelfde
+      ervaring langs de nieuwe ingang, niet een verborgen bron. */
+   const hoofdstuk=async naam=>{await page.locator('.pp-section-index button',{hasText:naam}).click();await page.waitForSelector('.wd-focus:not([hidden])');};
+   await hoofdstuk('Organisatie, partner en gebruiker');
    await page.locator('.role-switch [data-role-select="partner"]').click();
    assert.equal(await page.locator('body').getAttribute('data-platform-role'),'partner');
    assert.match(await page.locator('#roleTitle').innerText(),/Verbind uw bedrijf/);
@@ -38,9 +45,12 @@ test('De publieke B2B2C-ervaring wisselt van kant, zoekt in de echte app en past
    await page.locator('.role-switch [data-role-select="gebruiker"]').click();
    assert.equal(await page.evaluate(()=>sessionStorage.getItem('rtg-www-role')),'gebruiker');
    assert.match(await page.locator('#roleCapabilities').innerText(),/Foundation/);
+   await hoofdstuk('De RTG Graph');
    await page.locator('[data-graph-topic="werknemer"]').click();
    assert.match(await page.locator('#graphCaption').innerText(),/uren/i);
-   await page.locator('.command-open').click();
+   /* De zoekknop van de oude kop bestaat niet meer in het kader; de zoekfunctie
+      over de echte app wel, en die opent met de sneltoets die hij altijd had. */
+   await page.keyboard.press('Control+k');
    await page.locator('#commandSearch').fill('personeel');
    await page.waitForSelector('.command-result');
    assert.match(await page.locator('.command-result').first().innerText(),/Personeel/i);
@@ -78,7 +88,11 @@ test('static project path and JavaScript-disabled visitors retain content and re
       if (javaScriptEnabled) {
         await ready(page);
         assert.equal(await page.locator('#roleCta').getAttribute('href'), 'https://app.rahultravelgroup.com/apps/werk.html');
-        assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.rtg-adaptive-bar')).getPropertyValue('--edge-bar-bg').trim()), '#0a0805');
+        /* Sinds #413 volgt de Edge het wereldmateriaal in plaats van een vast
+           marketingzwart (zie ook test/rtg-edge-2.e2e.js): de balk draagt de
+           kaartkleur van het wereldpalet waar hij in staat. */
+        assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.rtg-adaptive-bar')).getPropertyValue('--edge-bar-bg').trim()),
+          await page.evaluate(() => getComputedStyle(document.body).getPropertyValue('--rtg-world-card').trim()));
       } else {
         assert.equal(await page.locator('[data-room]:visible').count(), 4);
         assert.equal(await page.locator('[data-faq]:visible').count(), 23);
@@ -108,7 +122,7 @@ test('omhoog vegen op de landing en een sitepagina opent het paneel van de host'
   return {staat:document.querySelector('.rtg-adaptive-edge').dataset.rtgAdaptiveState,
    leeg:sheet.querySelectorAll('.rtg-adaptive-empty').length,
    kern:[...sheet.querySelectorAll('.rtg-adaptive-sheet-list:not([hidden]) .rtg-adaptive-sheet-action')].map(b=>b.textContent),
-   rijen:[...sheet.querySelectorAll('nav button')].map(b=>b.textContent)};
+   rijen:[...sheet.querySelectorAll('nav button,.pp-menu-panel button')].map(b=>b.textContent)};
  });
  try{
   browser=await pw.chromium.launch(browserOpties(pw));
@@ -122,8 +136,11 @@ test('omhoog vegen op de landing en een sitepagina opent het paneel van de host'
   const landing=await blad(page);
   assert.equal(landing.leeg,0,'geen lege melding op de landing');
   assert.deepEqual(landing.kern,[],'de kernlijst blijft weg');
-  assert.deepEqual(landing.rijen,['Bekijk het platform','Zoek in RTG'],'de rijen van de eerste scene');
-  assert.equal(await page.locator('.rtg-adaptive-sheet #contextActions').isVisible(),true);
+  /* Sinds #413 is de landing het publieke platformkader en is zijn host
+     public/site/platform-edge.js: die legt zijn eigen hoofdstukrijen in het blad
+     (.pp-menu-panel) in plaats van de rijen van de oude eerste scene. */
+  assert.deepEqual(landing.rijen,['Volgend hoofdstuk','Vorig hoofdstuk','Bekijk het voorstel','Waarom zie ik dit?','Wis mijn demokeuzes'],'de rijen van de host');
+  assert.equal(await page.locator('.rtg-adaptive-sheet .pp-menu-panel').isVisible(),true);
   await page.goto(srv.base+'/site/werelden/livingos.html');
   await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
   await veeg(page);

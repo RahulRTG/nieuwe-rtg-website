@@ -251,7 +251,13 @@ test('Leden-app: in het Engels is de startpagina echt Engels (i18n-dekking)',
        eronder loopt langs dezelfde weg (T('app.membersince',...) uit het
        EN-woordenboek) en bewijst dus hetzelfde: de door JS gevulde tekst komt
        vertaald uit het woordenboek en niet in het Nederlands terug. */
-    await page.waitForSelector('#homeSub', { timeout: 5000 });
+    /* AANWEZIG en niet zichtbaar: een vers lid is nog niet `klaar`, en sinds de
+       warme desktopstandaard (#413, apps/access/portal.css) staat de intake
+       (#onbGate) niet meer als vaste laag OVER de app maar IN het kader erboven.
+       De app heeft dan geen maat -- wat de gebruiker ziet is hetzelfde als toen
+       de laag eroverheen lag, maar "zichtbaar" meet nu die maat. Deze toets gaat
+       over de vertaling, en de waitForFunction hieronder wacht op de tekst. */
+    await page.waitForSelector('#homeSub', { state: 'attached', timeout: 5000 });
     await page.waitForFunction(() => {
       const e = document.getElementById('homeSub');
       return e && e.textContent.trim().length > 0;
@@ -706,7 +712,13 @@ test('Leden-app: een verse start begint thuis, een onderbreking van seconden nie
     }, [reg.token]);
     const pKort = await ctxKort.newPage();
     await pKort.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
-    await pKort.waitForSelector('.view.active', { timeout: 15000 });
+    /* #app.active wordt in HETZELFDE werk gezet als renderAll() de begintab
+       opent (app-main-03/04 -> openTab in app-main-12a), dus dat is het
+       synchronisatiepunt. Hier stond "wacht tot .view.active zichtbaar is", maar
+       een vers lid heeft de intake open, en die staat sinds #413 in het kader
+       boven de app (apps/access/portal.css) in plaats van er als vaste laag
+       overheen: de app heeft dan geen maat en is dus nooit "zichtbaar". */
+    await pKort.waitForSelector('#app.active', { state: 'attached', timeout: 15000 });
     assert.equal(await actieveView(pKort), 'salon',
       'na een onderbreking van seconden staat u weer waar u was');
 
@@ -719,7 +731,7 @@ test('Leden-app: een verse start begint thuis, een onderbreking van seconden nie
     }, [reg.token]);
     const pVers = await ctxVers.newPage();
     await pVers.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
-    await pVers.waitForSelector('.view.active', { timeout: 15000 });
+    await pVers.waitForSelector('#app.active', { state: 'attached', timeout: 15000 });
     assert.equal(await actieveView(pVers), 'home',
       'een verse start toont het beginscherm, niet de app waar u het laatst was');
   } finally {

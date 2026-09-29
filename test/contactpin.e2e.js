@@ -87,6 +87,12 @@ async function salonPaneel(ctx, base) {
      dus dezelfde ingang als het scherm zelf; klikken met de muis kan niet, want
      de knop is onzichtbaar. Zelfde aanpak als test/gereedschap.e2e.js. */
   await page.waitForSelector('.tabbar button[data-tab="salon"]', { state: 'attached', timeout: 60000 });
+  /* EERST DE SESSIE. De knop staat al in de HTML, dus "attached" is er meteen,
+     maar openTab() leest `user`, en dat bestaat pas als de inlog rond is
+     (app-main-03/04 zet #app.active in hetzelfde werk als renderAll). Een klik
+     daarvoor gooit "reading 'tier'" en opent niets; met de zwaardere
+     desktopstandaard (#413) werd die wedloop vaker verloren. */
+  await page.waitForSelector('#app.active', { state: 'attached', timeout: 60000 });
   await page.evaluate(() => document.querySelector('.tabbar button[data-tab="salon"]').click());
   await page.waitForSelector('#scAddBtn', { timeout: 60000 });
   await page.click('#scAddBtn');            // de la met zoeken en de pin gaat open

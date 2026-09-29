@@ -437,6 +437,13 @@ test('het zichtbare Edge-menu opent en houdt home en instellingen bereikbaar',
     await thuis.click();
     await page.waitForURL(/\/apps\/wereld\.html$/, { timeout: 8000 });
     assert.equal(new URL(page.url()).pathname, '/apps/wereld.html', 'Home opent de vernieuwde momentenfeed');
+    /* Sinds de warme desktopstandaard (#413, shared/interface/world-presentation.js)
+       staat de eigen inhoud van een wereldhuis onder "Uw volledige overzicht"
+       (.wp-domain), onder de hoofdfoto en de verhaalregel. De feed is er nog en
+       blijft het huis van het lid; hij zit een tik dieper, net als in
+       test/world-homes.e2e.js. */
+    await page.waitForSelector('body[data-rtg-desktop-state="ready"]', { timeout: 15000 });
+    if (await page.locator('.wp-domain:not([open])>summary').count()) await page.locator('.wp-domain>summary').click();
     await page.waitForSelector('.living-intro');
     assert.equal(await page.locator('#feed').isVisible(), true, 'de momentenfeed is zichtbaar voor het ingelogde lid');
     await page.close();

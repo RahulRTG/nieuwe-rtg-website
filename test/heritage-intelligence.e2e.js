@@ -363,12 +363,16 @@ test('Heritage Intelligence: input, route context and stable reachable controls'
            stays. Otherwise the top rail collapses, the body loses 44px of padding
            and a tap that aimed at a button lands on what stood below it --
            test/appstore.e2e.js saw exactly that on "Inkoopdossier". */
+        /* The inset is whatever the page had before the scroll: 44px under the
+           old Edge, 64px in the shared desktop frame of #413 (--edge-top on
+           body[data-rtg-desktop]). What may not happen is that it changes. */
+        const insetVoor = await page.evaluate(() => getComputedStyle(document.body).paddingTop);
         await page.evaluate(() => window.scrollTo(0, 900));
         await page.waitForFunction(() => Math.round(scrollY) === 900);
         await page.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(r)))));
         assert.equal(await page.evaluate(() => document.body.getAttribute('data-rtg-edge-2-state')), 'overview',
           'a programmatic scroll may not collapse the rail');
-        assert.equal(await page.evaluate(() => getComputedStyle(document.body).paddingTop), '44px',
+        assert.equal(await page.evaluate(() => getComputedStyle(document.body).paddingTop), insetVoor,
           'and the page keeps its top inset, so nothing moves under a finger');
         // A human scrolls down: compact. Up again: overview.
         await page.mouse.move(640, 500);

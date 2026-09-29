@@ -54,8 +54,16 @@ test('Four editorial first visits: responsive, language, shared Edge and real fi
       assert.equal(await page.locator('.rtg-adaptive-bar').count(), 1);
       assert.equal(await page.locator('.rtg-first-steps h1').count(), 1);
       assert.equal(await page.locator('.rtg-reality-graph,.tos-module-hero,.rtg-suite-hero').count(), 0);
-      const header = await page.locator('.rtg-first-steps').boundingBox();
-      assert.ok(header.y < 100, app + ' begins directly below the shared world header');
+      /* Since the warm desktop standard (#413) the shared world header and its
+         mobile tabs come first and the page surface (.wd-page) follows. The
+         promise is unchanged -- no old app heading stands above the first
+         visit -- so it is measured against that surface when it exists. */
+      const header = await page.evaluate(() => {
+        const y = document.querySelector('.rtg-first-steps').getBoundingClientRect().y, vlak = document.querySelector('.wd-page');
+        return { y, vlak: vlak ? vlak.getBoundingClientRect().y : null };
+      });
+      assert.ok(header.vlak === null ? header.y < 100 : header.y - header.vlak < 2,
+        app + ' begins directly below the shared world header ' + JSON.stringify(header));
       for (const width of [320, 390, 1440]) {
         await page.setViewportSize({ width, height: width === 1440 ? 1000 : 844 });
         assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), app + ': no overflow at ' + width);

@@ -71,7 +71,14 @@ test('werktafel op een telefoon: wereld open, erin, terug, Home -- en je blijft 
     await page.waitForSelector('#rtgCommand[data-stand="open"] .cmd-leeg', { timeout: 20000 });
     const label = () => page.evaluate(() => ({
       wereld: document.body.getAttribute('data-rtg-blad-wereld'),
-      kop: getComputedStyle(document.querySelector('.rtg-edge-mark'), '::after').content
+      /* Sinds de warme desktopstandaard (#413) draagt de Edge de wereldnaam als
+         eigen label (.wd-world-label, shared/interface/world-desktop-home.js) en
+         staat het oude ::after-label op content:none. Gemeten wordt wat er
+         staat: het label als het er is, anders het ::after. */
+      kop: (() => {
+        const l = document.querySelector('.rtg-edge-mark .wd-world-label');
+        return l ? JSON.stringify(l.textContent) : getComputedStyle(document.querySelector('.rtg-edge-mark'), '::after').content;
+      })()
     }));
     assert.equal((await label()).wereld, 'geen', 'op het beginscherm kies je nog een wereld');
 

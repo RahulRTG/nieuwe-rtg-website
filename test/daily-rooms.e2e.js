@@ -50,7 +50,17 @@ test('Daily rooms: first visit to real content, Edge, language, layout and recov
       assert.equal(await page.locator('#dailyIntro h1').count(), 1);
       assert.equal(await page.locator('.rtg-adaptive-bar:visible').count(), 1);
       assert.equal(await page.locator('.rtg-reality-graph,.rtg-deep-nav,.kantoor-intro').count(), 0);
-      assert.ok((await page.locator('#dailyIntro').boundingBox()).y < 100, app + ': no duplicate top bar');
+      /* Since the warm desktop standard (#413) every screen sits in the shared
+         frame: the world header and its mobile tabs come first, then the page
+         surface (.wd-page). The promise is unchanged -- nothing of the room's own
+         stands between that surface and the intro -- but it is measured against
+         the surface instead of against the top of the viewport. */
+      const top = await page.evaluate(() => {
+        const intro = document.querySelector('#dailyIntro').getBoundingClientRect().y;
+        const vlak = document.querySelector('.wd-page');
+        return { intro, vlak: vlak ? vlak.getBoundingClientRect().y : null };
+      });
+      assert.ok(top.vlak === null ? top.intro < 100 : top.intro - top.vlak < 2, app + ': no duplicate top bar ' + JSON.stringify(top));
       for (const width of [320, 390, 1440]) {
         await page.setViewportSize({ width, height: width === 1440 ? 1000 : 844 });
         assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), app + ': no overflow at ' + width);

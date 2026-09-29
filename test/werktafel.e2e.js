@@ -300,13 +300,26 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     /* Edge is ook op een telefoon de ene globale schil: context bovenaan
        en de globale bediening onderaan. Command draagt zijn echte functies in
        diezelfde lichte onderrand; het voegt geen tweede zwarte rij meer toe. */
-    assert.equal(smalBlad.bladVanaf, 44, 'de wereld hoort direct onder de enige Edge-bovenbalk te beginnen');
+    /* DE MATEN KOMEN UIT DE EDGE ZELF. Hier stonden 44, 68 en 94-96: de maten
+       van de Edge van voor de warme desktopstandaard (#413). Die zet de
+       bovenbalk en de onderrand in tokens (--edge-top 64px en --edge-bottom op
+       body[data-rtg-desktop], shared/rtg-world-desktop.css) en de balk op 64px
+       (shared/rtg-desktop-components.css). De belofte is dezelfde gebleven --
+       het blad begint direct onder de ENE bovenbalk en houdt de ruimte van de
+       ENE onderrand vrij -- dus wordt die belofte gemeten en niet het getal. */
+    const edgeMaat = await page.evaluate(() => {
+      const b = getComputedStyle(document.body), top = document.querySelector('.rtg-edge-top');
+      return { top: parseFloat(b.getPropertyValue('--edge-top')), bottom: parseFloat(b.getPropertyValue('--edge-bottom')),
+        balkOnder: top ? Math.round(top.getBoundingClientRect().bottom) : null };
+    });
+    assert.equal(smalBlad.bladVanaf, edgeMaat.top, 'de wereld hoort direct onder de enige Edge-bovenbalk te beginnen');
+    assert.equal(smalBlad.bladVanaf, edgeMaat.balkOnder, 'en die bovenbalk is ook echt zo hoog');
     assert.equal(smalBlad.balk, 0, 'Command heeft geen eigen zichtbare balk');
-    assert.equal(smalBlad.edgeOnder, 68, 'de standaard marketing-Edge draagt de bediening');
+    assert.equal(smalBlad.edgeOnder, 64, 'de standaard Edge (64px, warme desktopstandaard) draagt de bediening');
     assert.ok(smalBlad.edgeVanaf > 0, 'Edge staat binnen het scherm');
-    assert.ok(smalBlad.bladTotOnder >= 94 && smalBlad.bladTotOnder <= 96,
-      'het blad respecteert de hoogte, afstand en leesruimte van de gedeelde Edge; gemeten ' +
-      smalBlad.bladTotOnder + 'px');
+    assert.ok(Math.abs(smalBlad.bladTotOnder - edgeMaat.bottom) <= 1,
+      'het blad respecteert de hoogte, afstand en leesruimte van de gedeelde Edge (' + edgeMaat.bottom +
+      'px); gemeten ' + smalBlad.bladTotOnder + 'px');
     assert.deepEqual(smalBlad.chips, ['Vandaag*'], 'de balk hoort te tonen waar je bent');
     assert.equal(smalBlad.sluitknop, true, 'met een weg-hier ernaast');
 
@@ -703,8 +716,11 @@ test('na inloggen landt een lid rechtstreeks op de lege wereldkiezer',
        bovendien niet de taak van deze toets: die staat in scripts/raakvlakkeuring.js
        en wordt over elk scherm gemeten. Zakt hij toch nog, dan zegt de melding
        nu ook WAT er stond. */
-    assert.ok(geland.balk >= 67 && geland.balk <= 69,
-      'onderaan hoort alleen de standaard marketing-Edge te staan (68px), gemeten: ' + geland.balk +
+    /* 64 en niet meer 68: de warme desktopstandaard (#413) zet de Edge op elk
+       scherm op 64px (shared/rtg-desktop-components.css). Wat deze regel bewaakt
+       blijft hetzelfde: een tweede rij onderaan maakt de strook ~96px of meer. */
+    assert.ok(geland.balk >= 63 && geland.balk <= 65,
+      'onderaan hoort alleen de standaard Edge te staan (64px), gemeten: ' + geland.balk +
       ' (ruw ' + geland.balkRuw + ', computed ' + geland.balkStijl + ')');
     assert.match(geland.uitnodiging, /Kies een wereld/);
 

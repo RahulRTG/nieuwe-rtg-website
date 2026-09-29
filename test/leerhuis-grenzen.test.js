@@ -566,6 +566,12 @@ test('22. B-UI werkscherm: de assessor ziet wat op hem wacht en alleen zijn eige
   assert.deepEqual(na.OPEN, [], 'wat hij begon, wacht niet meer');
   assert.equal(na.LOPEND[0].id, id);
   assert.ok(na.LOPEND[0].bewijs.length >= 1 && na.LOPEND[0].bewijs.every(b => b.id), 'hij ziet het bewijs voor deze vaardigheid, met een id om te noemen');
+  /* `naam` is van namen.js (de codenaam); een eigen `naam` zou daar stil worden overschreven. */
+  const { metNamen } = require('../server/kern/leerhuis/namen');
+  assert.ok(!('naam' in na.LOPEND[0]) && !('naam' in voor.OPEN[0]), 'een rij met een mens draagt zelf geen veld naam');
+  const benoemd = metNamen(na, () => 'Rode Vos');
+  assert.equal(benoemd.LOPEND[0].naam, 'Rode Vos');
+  assert.equal(benoemd.LOPEND[0].vaardigheidNaam, 'Een betaling terugboeken', 'de naam van de vaardigheid blijft staan naast de codenaam');
   w.doe(ORG, 'bestuurZet', { persoon: P.KO2, rol: 'ASSESSOR' }, P.E);
   const tweede = l.assessorWerk(ORG, P.KO2);
   assert.equal(tweede.ok, true);
@@ -694,4 +700,50 @@ test('25. aanwijzen op codenaam: alleen de eigenaar, met reden, en niets gebruik
   assert.deepEqual(e.relatieSoorten, require('../server/kern/leerhuis/standen').RELATIESOORTEN, 'geen eigen kopie op het scherm');
   const ander = await a(st, 'rolToewijzen', { codenaam: 'Blauwe Reiger', rol: 'ops', reden: 'nieuwe rol' }, P.E);
   assert.deepEqual(ander.invoer, { codenaam: 'Blauwe Reiger', rol: 'ops', reden: 'nieuwe rol' }, 'alleen relatie en bestuursrol lopen via de codenaam');
+});
+
+test('26. B-UI autoriteiten: wat bewezen is en nog geen certificaat draagt, en wie een leerpad of trainerschap kan krijgen', () => {
+  const w = basis();
+  const l = w.lh.lees;
+  assert.equal(l.certificaatWerk(ORG, P.N).ok, false, 'wie geen autoriteit is, ziet niets klaarliggen');
+  assert.equal(l.trainerWerk(ORG, P.N).ok, false);
+  W.bewijs(w, ORG, P.N, 'terugboeken', P.A, 'storno', W.STORNO);
+  const b = W.beoordeel(w, ORG, P.N, 'terugboeken', P.A);
+  const klaar = () => l.certificaatWerk(ORG, P.Q).KLAAR.filter(x => x.persoon === P.N);
+  assert.deepEqual(klaar().map(x => x.beoordeling), [b], 'een bewezen beoordeling zonder certificaat ligt klaar');
+  assert.ok(!('naam' in klaar()[0]) && klaar()[0].vaardigheidNaam === 'Een betaling terugboeken', 'naam is van namen.js, de vaardigheid heet vaardigheidNaam');
+  assert.ok(!JSON.stringify(klaar()).includes('criteria') && !JSON.stringify(klaar()).includes('bewijs'), 'zonder bewijs of criteria erachter');
+  w.doe(ORG, 'certificaatUitgeven', { persoon: P.N, vaardigheden: ['terugboeken'], beoordelingen: [b], geldigDagen: 365 }, P.Q);
+  assert.deepEqual(klaar(), [], 'met certificaat ligt hij niet meer klaar');
+  const cert = l.certificaatWerk(ORG, P.Q).CERTIFICATEN.find(c => c.persoon === P.N);
+  assert.equal(cert.stand, 'ACTIVE');
+  assert.deepEqual(cert.vaardigheden, ['Een betaling terugboeken']);
+
+  const t = l.trainerWerk(ORG, P.Q);
+  assert.equal(t.magKwalificeren, true);
+  assert.ok(t.TRAINERS.some(x => x.persoon === P.T && x.curricula.includes('ops-basis')), 'de gekwalificeerde trainer staat erbij');
+  assert.ok(t.KANDIDATEN.some(x => x.persoon === P.T && x.curricula.includes('ops-basis')),
+    'wie een geldig Train-the-Trainer-certificaat heeft is kandidaat, met de curricula waarvan hij de vaardigheden zelf bewees');
+  assert.ok(!t.KANDIDATEN.some(x => x.persoon === P.N), 'zonder trainerschapscertificaat geen kandidaat');
+  const eig = l.trainerWerk(ORG, P.E);
+  assert.equal(eig.ok, true, 'de eigenaar mag een trainer toewijzen');
+  assert.equal(eig.magKwalificeren, false, 'maar niet kwalificeren');
+  assert.deepEqual(eig.KANDIDATEN, []);
+  w.doe(ORG, 'rolToewijzen', { persoon: P.N, rol: 'ops' }, P.M);
+  w.doe(ORG, 'startplanMaak', { persoon: P.N, rol: 'ops' }, P.M);
+  assert.ok(!l.trainerWerk(ORG, P.Q).ZONDER_TRAINER.some(x => x.persoon === P.N), 'een leerpad met trainer wacht niet');
+
+  /* Een leerpad waarvoor nog niemand trainer is: het wacht, zonder kandidaat. */
+  w.doe(ORG, 'vaardigheidZet', { id: 'escaleren', naam: 'Escaleren', niveau: 'PRACTITIONER', kennis: ['terugboeken'] }, P.CO);
+  w.doe(ORG, 'curriculumZet', { id: 'ops-extra', titel: 'Escaleren', vaardigheden: ['escaleren'], kennis: ['terugboeken'] }, P.CO);
+  w.doe(ORG, 'curriculumStand', { id: 'ops-extra', naar: 'REVIEW' }, P.CO);
+  w.doe(ORG, 'curriculumStand', { id: 'ops-extra', naar: 'ACTIVE' }, P.CO);
+  w.doe(ORG, 'rolZet', { id: 'ops2', titel: 'Escalatie', soort: 'OPERATIONS', vaardigheden: ['escaleren'] }, P.CO);
+  w.doe(ORG, 'rolToewijzen', { persoon: P.N, rol: 'ops2' }, P.M);
+  w.doe(ORG, 'startplanMaak', { persoon: P.N, rol: 'ops2' }, P.M);
+  const wacht = l.trainerWerk(ORG, P.Q).ZONDER_TRAINER.find(x => x.persoon === P.N && x.curriculum === 'ops-extra');
+  assert.ok(wacht, 'het leerpad zonder trainer staat klaar voor de trainerautoriteit');
+  assert.deepEqual(wacht.kandidaten, [], 'wie de vaardigheid niet zelf bewees, is geen kandidaat');
+  assert.ok(!l.trainerWerk(ORG, P.Q).KANDIDATEN.find(x => x.persoon === P.T).curricula.includes('ops-extra'),
+    'en kan er ook niet voor gekwalificeerd worden');
 });

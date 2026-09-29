@@ -10,6 +10,9 @@
       server, en het bewijs staat daarna in het werk van de assessor;
    2. hij vraagt de beoordeling aan, de kaart zegt dat hij loopt, en een tweede
       aanvraag weigert de server met de reden op het scherm;
+   00. de certificaatautoriteit geeft de certificaten van de trainer uit (en
+      schorst er een, wat zonder reden geweigerd wordt), en de trainerautoriteit
+      kwalificeert hem -- allemaal op het scherm;
    0. vooraf richten de manager en de curriculumeigenaar het leerhuis in op
       hetzelfde scherm: rol, startplan, en een curriculum dat de server niet
       laat activeren zolang het concept-kennis zou leren;
@@ -90,7 +93,8 @@ test('Leerhuis trainer: onder toezicht, bewijs, klaar voor beoordeling en de aan
       await doe(C, 'scenarioZet', { id: 'storno', domein: 'betalingen', vaardigheden: ['terugboeken'], vereist: ['controleer', 'reden', 'tweede-mens'], verboden: ['direct-uitbetalen'], volgorde: true });
       await doe(C, 'scenarioZet', { id: 'lesdemo', domein: 'academy', vaardigheden: ['didactiek'], vereist: ['voordoen', 'laten-doen', 'observeren'], verboden: ['zelf-beoordelen'] });
 
-      /* T wordt trainer: bewijs, beoordeling en certificaat voor beide vaardigheden. */
+      /* T wordt trainer: bewijs en beoordeling voor beide vaardigheden hier; het
+         certificaat en de kwalificatie geeft de autoriteit Q op het scherm. */
       const bewijsIds = async (v) => ((await lees(A, 'assessorWerk')).LOPEND.find(b => b.persoon === T.p && b.vaardigheid === v) || { bewijs: [] }).bewijs.map(b => b.id);
       for (const [v, sim, keuzes, soort] of [['terugboeken', 'storno', ['controleer', 'reden', 'tweede-mens'], 'OBSERVATION_EVIDENCE'],
         ['didactiek', 'lesdemo', ['voordoen', 'laten-doen', 'observeren'], 'TRAINER_EVIDENCE']]) {
@@ -99,9 +103,7 @@ test('Leerhuis trainer: onder toezicht, bewijs, klaar voor beoordeling en de aan
         const b = (await doe(T, 'beoordelingAanvragen', { persoon: T.p, vaardigheid: v })).id;
         await doe(A, 'beoordelingStart', { id: b });
         await doe(A, 'beoordelingAfronden', { id: b, uitkomst: 'PROVEN', bewijs: await bewijsIds(v), criteria: 'gezien' });
-        await doe(Q, 'certificaatUitgeven', { persoon: T.p, vaardigheden: [v], beoordelingen: [b], geldigDagen: 365 });
       }
-      await doe(Q, 'trainerKwalificeer', { persoon: T.p, trede: 'CERTIFIED_TRAINER', curricula: ['ops-basis'] });
 
       browser = await pw.chromium.launch(browserOpties());
       const opScherm = async (wie) => {
@@ -122,6 +124,30 @@ test('Leerhuis trainer: onder toezicht, bewijs, klaar voor beoordeling en de aan
          startplan; de curriculumeigenaar krijgt de weigering van de server als
          een curriculum concept-kennis zou leren. */
       const q = await opScherm(Q);
+
+      /* 00. De certificaat- en trainerautoriteit op het scherm: twee bewezen
+         beoordelingen liggen klaar en krijgen een certificaat; schorsen zonder
+         reden weigert de server; daarna wordt T gekwalificeerd als trainer. */
+      for (const naam of ['Een betaling terugboeken', 'Train-the-Trainer']) {
+        await q.locator('#certificaat .kaart', { hasText: naam + ' van ' + T.code }).filter({ hasText: 'nog geen certificaat' })
+          .getByRole('button', { name: 'Certificaat uitgeven' }).click();
+        await wachtOp(q, new RegExp('Certificaat uitgegeven: ' + naam));
+      }
+      const tcert = () => q.locator('#certificaat .kaart', { hasText: 'Een betaling terugboeken van ' + T.code });
+      await tcert().getByRole('button', { name: 'Schorsen' }).click();
+      await wachtOp(q, /Niet gelukt: zonder reden geen schorsing/);
+      await tcert().getByLabel('Reden').fill('controle na een klacht');
+      await tcert().getByRole('button', { name: 'Schorsen' }).click();
+      await wachtOp(q, /^Schorsen: Een betaling terugboeken/);
+      await tcert().getByLabel('Reden').fill('klacht onterecht');
+      await tcert().getByRole('button', { name: 'Weer actief' }).click();
+      await wachtOp(q, /^Weer actief: Een betaling terugboeken/);
+      const kand = q.locator('#trainerautoriteit .kaart', { hasText: 'Train-the-Trainer' }).filter({ hasText: T.code });
+      await kand.getByLabel('Trede voor ' + T.code).selectOption('CERTIFIED_TRAINER');
+      await kand.getByRole('button', { name: 'Kwalificeren' }).click();
+      await wachtOp(q, /Gekwalificeerd: .* als gecertificeerd trainer/);
+      assert.ok((await lees(Q, 'trainerWerk')).TRAINERS.some(x => x.persoon === T.p && x.curricula.includes('ops-basis')),
+        'T is trainer voor ops-basis, gekwalificeerd op het scherm');
       const qk = q.locator('#manager .kaart', { hasText: N.code });
       await qk.getByLabel('Rol voor ' + N.code).selectOption('ops');
       await qk.getByRole('button', { name: 'Rol toewijzen' }).click();
@@ -215,7 +241,12 @@ test('Leerhuis trainer: onder toezicht, bewijs, klaar voor beoordeling en de aan
 
       const open = (await lees(A, 'assessorWerk')).OPEN.filter(b => b.persoon === N.p);
       assert.equal(open.length, 1, 'precies een aanvraag wacht op de assessor: ' + JSON.stringify(open));
-      await doe(A, 'beoordelingStart', { id: open[0].id });
+      /* De assessor begint op zijn eigen scherm: de kaart noemt de VAARDIGHEID en de
+         codenaam van de leerling (eerst stond daar tweemaal de codenaam). */
+      const a = await opScherm(A);
+      const akaart = a.locator('#assessor .kaart', { hasText: 'Een betaling terugboeken van ' + N.code });
+      await akaart.getByRole('button', { name: 'Beoordeling beginnen' }).click();
+      await wachtOp(a, /U beoordeelt nu Een betaling terugboeken/);
       const lopend = (await lees(A, 'assessorWerk')).LOPEND.find(b => b.id === open[0].id);
       assert.ok(lopend.bewijs.some(b => b.bron === 'storno aan de balie, 29 september' && b.sterkte === 'OBSERVED'),
         'het bewijs dat de trainer op het scherm vastlegde, ligt bij de assessor: ' + JSON.stringify(lopend.bewijs));

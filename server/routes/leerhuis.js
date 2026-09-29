@@ -22,7 +22,8 @@ const { bijeen, inBundel } = require('../db');
 /* Wat een LID mag vragen, en wat alleen het bestuur van de organisatie mag
    lezen. Een lezer zonder relatie met de organisatie leest niets: ook dat is
    isolatie (grondwet 16). */
-const EIGEN_VRAGEN = ['mijn', 'vakstaat', 'trainerCockpit', 'managerCockpit', 'assessorWerk', 'kennisWerk', 'curriculumWerk', 'eigenaarWerk', 'waaromLeren', 'waaromVerversen',
+const WERK = ['trainerCockpit', 'managerCockpit', 'assessorWerk', 'kennisWerk', 'curriculumWerk', 'eigenaarWerk', 'certificaatWerk', 'trainerWerk'];
+const EIGEN_VRAGEN = ['mijn', 'vakstaat', ...WERK, 'waaromLeren', 'waaromVerversen',
   'waaromNietGereed', 'geschiktheid', 'loopbaan', 'waaromTrainer', 'grond', 'uitkomst'];
 const BESTUURSVRAGEN = ['gereedheid', 'eenheid', 'wieGeraakt', 'reconstrueer', 'certStand', 'schaduw', 'startpakket'];
 const LEESROLLEN = ['ACADEMY_OWNER', 'QUALITY_AUTHORITY', 'KNOWLEDGE_OWNER', 'ASSESSMENT_AUTHORITY'];
@@ -91,8 +92,8 @@ module.exports = (kern) => {
         : Object.assign({}, v, { vaardigheden: (v.vaardigheden || []).map(x => Object.assign({}, x, { niveau: null })) });
       const a = { mijn: () => { const m = l.mijn(org, door); return Object.assign({}, m, { VAARDIGHEDEN: zonderNiveau(m.VAARDIGHEDEN) }); },
         vakstaat: () => zonderNiveau(l.vakstaat(org, door)),
-        trainerCockpit: () => metNamen(l.trainerCockpit(org, door), naamVan), managerCockpit: () => metNamen(l.managerCockpit(org, door), naamVan),
-        assessorWerk: () => metNamen(l.assessorWerk(org, door), naamVan), kennisWerk: () => l.kennisWerk(org, door), curriculumWerk: () => l.curriculumWerk(org, door), eigenaarWerk: () => metNamen(l.eigenaarWerk(org, door), naamVan),
+        /* Het werk per rol, met mensen op codenaam (namen.js). */
+        ...Object.fromEntries(WERK.map(w => [w, () => metNamen(l[w](org, door), naamVan)])),
         waaromLeren: () => l.waaromLeren(org, door, String(b.curriculum || '')), waaromVerversen: () => l.waaromVerversen(org, door),
         waaromNietGereed: () => l.waaromNietGereed(org, door, String(b.rol || '')),
         geschiktheid: () => l.geschiktheid(org, door, String(b.handeling || '')), loopbaan: () => l.loopbaan(org, door, String(b.rol || '')),

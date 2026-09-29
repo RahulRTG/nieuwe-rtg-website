@@ -55,7 +55,7 @@
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl" data-rtg-world="work" data-rtg-skin="heritage"
-  data-rtg-edge-nvt-hoofdactie="een werkscherm met een handeling per kaart: elke leerling, beoordeling, elk concept en curriculum heeft zijn eigen knop, er is geen handeling voor het hele scherm" data-rtg-layout="standard">
+  data-rtg-edge-nvt-hoofdactie="een werkscherm met een handeling per kaart: elke leerling, beoordeling, elk concept, curriculum en certificaat heeft zijn eigen knop, er is geen handeling voor het hele scherm" data-rtg-layout="standard">
 <header>
   <div class="ey">RTG Academy</div>
   <h1>Leerhuis: aan het werk</h1>
@@ -63,7 +63,7 @@
 <main id="inhoud">
   <section>
     <h2>Welk leerhuis</h2>
-    <p class="uitleg">Het werk van trainers, assessoren, kenniseigenaren, curriculumeigenaren, managers en de eigenaar in het leerhuis van uw organisatie. U ziet alleen het deel dat bij uw rol hoort. Wat u zelf leert, staat in <a href="/apps/leerhuis.html">Mijn leerhuis</a>.</p>
+    <p class="uitleg">Het werk van trainers, assessoren, kenniseigenaren, curriculumeigenaren, managers, autoriteiten en de eigenaar in het leerhuis van uw organisatie. U ziet alleen het deel dat bij uw rol hoort. Wat u zelf leert, staat in <a href="/apps/leerhuis.html">Mijn leerhuis</a>.</p>
     <form id="kies" class="rij">
       <label for="org">Code van de organisatie</label>
       <input id="org" class="veld" name="org" autocomplete="off" maxlength="60" placeholder="bijvoorbeeld RTG-OPS">
@@ -104,11 +104,22 @@
     <div id="curriculum"></div>
     <div id="schrijven"></div>
   </section>
-  <p id="geenRol" class="leeg" hidden>U heeft in dit leerhuis geen rol als trainer, assessor, kenniseigenaar, curriculumeigenaar, manager of eigenaar. Er ligt hier dus geen werk voor u.</p>
+  <section id="certificaatBlok" hidden>
+    <h2>Certificaten</h2>
+    <p class="uitleg">Bewezen vaardigheden die nog geen certificaat dragen, en de certificaten van dit leerhuis. Wat u zelf beoordeelde bij een kritieke vaardigheid, of wat over uzelf gaat, geeft een ander uit. Schorsen en intrekken vragen een reden.</p>
+    <div id="certificaat"></div>
+  </section>
+  <section id="trainerautoriteitBlok" hidden>
+    <h2>Trainers</h2>
+    <p class="uitleg">Leerpaden zonder trainer, wie trainer kan worden en wie het al is. Trainer wordt alleen wie een geldig certificaat voor Train-the-Trainer heeft en de vaardigheden van het leerpad zelf bewees; niemand kwalificeert zichzelf.</p>
+    <div id="trainerautoriteit"></div>
+  </section>
+  <p id="geenRol" class="leeg" hidden>U heeft in dit leerhuis geen rol als trainer, assessor, kenniseigenaar, curriculumeigenaar, manager, eigenaar of autoriteit. Er ligt hier dus geen werk voor u.</p>
 </main>
 <script src="/apps/leerhuis-werk-bewijs.js"></script>
 <script src="/apps/leerhuis-werk-inrichten.js"></script>
 <script src="/apps/leerhuis-werk-schrijven.js"></script>
+<script src="/apps/leerhuis-werk-autoriteit.js"></script>
 <script src="/apps/leerhuis-werk-kaarten.js"></script>
 <script src="/apps/leerhuis-werk.js"></script>
 <script src="/shared/schermbeeld.js" defer></script>

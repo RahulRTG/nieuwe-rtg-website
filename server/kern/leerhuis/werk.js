@@ -28,9 +28,9 @@ function assessorWerk(st, door) {
   return {
     ok: true,
     OPEN: alle.filter(b => b.stand === 'REQUESTED' && b.persoon !== door)
-      .map(b => ({ id: b.id, persoon: b.persoon, vaardigheid: b.vaardigheid, naam: naam(b.vaardigheid), vorm: b.vorm, sinds: b.at })),
+      .map(b => ({ id: b.id, persoon: b.persoon, vaardigheid: b.vaardigheid, vaardigheidNaam: naam(b.vaardigheid), vorm: b.vorm, sinds: b.at })),
     LOPEND: alle.filter(b => b.stand === 'ASSESSING' && b.assessor === door).map(b => ({
-      id: b.id, persoon: b.persoon, vaardigheid: b.vaardigheid, naam: naam(b.vaardigheid), vorm: b.vorm,
+      id: b.id, persoon: b.persoon, vaardigheid: b.vaardigheid, vaardigheidNaam: naam(b.vaardigheid), vorm: b.vorm,
       eis: (st.vaardigheden[b.vaardigheid] || {}).bewijsEis || null,
       bewijs: Object.values(st.bewijs).filter(x => x.persoon === b.persoon && x.vaardigheid === b.vaardigheid && !x.ongeldig)
         .map(x => ({ id: x.id, soort: x.soort, sterkte: x.sterkte, sinds: x.at, bron: x.bron || null }))

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T13:55:12.116Z",
-    "commit": "fec260d5a",
+    "op": "2026-09-29T15:00:30.170Z",
+    "commit": "1c747985f",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -10479,7 +10479,7 @@
       "staat": "gezakt",
       "module": "public/shared/rtg-world-identity.js",
       "operator": "===->!==#0",
-      "gezakt": 3,
+      "gezakt": 8,
       "geprobeerd": 1
     },
     "rtg.test.js": {

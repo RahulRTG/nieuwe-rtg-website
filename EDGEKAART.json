@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T13:55:12.588Z",
-    "commit": "fec260d5a",
+    "op": "2026-09-29T15:00:35.534Z",
+    "commit": "1c747985f",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/edgekaart.js",
@@ -1761,7 +1761,9 @@
         "luistert": [
           "rtglang"
         ],
-        "attributen": [],
+        "attributen": [
+          "data-rtg-frame-world"
+        ],
         "opslag": [],
         "fetch": []
       }
@@ -3214,6 +3216,7 @@
         "zendt": [],
         "luistert": [],
         "attributen": [
+          "data-rtg-palette",
           "data-rtg-skin",
           "data-rtg-world"
         ],

@@ -758,6 +758,8 @@ const EIGEN_MODULE = new Map([
      kopwereld vast op living -> het label klopt niet) en door de motor
      bevestigd. */
   ['werktafel-lussen.e2e.js', ['public/shared/command/bladstand.js']],
+  // De kleurproef bezoekt echte apps; muteer hun wereldtoewijzing, niet hun API-antwoorden.
+  ['world-palette.e2e.js', ['public/shared/rtg-world-identity.js']],
   /* KNOPPEN DIE NIET KUNNEN, ZEGGEN WAAROM. Zes plekken in een toets. De
      gedeelde kantoor-inlog lag voor de hand, maar daar overleefde de toets de
      vier mutaties: de eerste plek per operator zit in dat bestand in code die

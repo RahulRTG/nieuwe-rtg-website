@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-27T20:27:27.311Z",
-  "commit": "938044c3",
+  "op": "2026-09-29T17:06:59.413Z",
+  "commit": "188f59731",
   "boomVuil": false,
-  "boomAnders": 3,
+  "boomAnders": 2,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.2"
  },
@@ -1002,7 +1002,7 @@
   },
   {
    "sleutel": "POST /api/bedrijf/werkruimte",
-   "bestand": "server/bedrijf/werkruimte.js:93",
+   "bestand": "server/bedrijf/werkruimte.js:112",
    "staat": "bewaakt",
    "wacht": "beheerVan"
   },
@@ -1020,7 +1020,7 @@
   },
   {
    "sleutel": "POST /api/bedrijf/werkruimte/maak",
-   "bestand": "server/bedrijf/werkruimte.js:37",
+   "bestand": "server/bedrijf/werkruimte.js:50",
    "staat": "bewaakt",
    "wacht": "beheerVan"
   },

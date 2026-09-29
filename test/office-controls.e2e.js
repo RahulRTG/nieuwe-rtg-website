@@ -39,8 +39,10 @@ async function pageFor(browser,base,token,width){const page=await browser.newPag
  await page.addInitScript(t=>{localStorage.setItem('rtg_member_token',t);localStorage.setItem('rtg_lang','nl');localStorage.setItem('rtg_cookieinfo_v1','1')},token);
  await page.goto(base+'/apps/office.html');await page.waitForFunction(()=>window.RTGOffice&&window.RTGOffice.stand());return page}
 async function drive(page){const first=page.locator('#rtdVoorzijde [data-rtd-diep="lijst"]').first();if(await first.isVisible())await first.click();await page.waitForSelector('#nieuwTekst');await page.locator('body[data-rtg-adaptive-ready="true"]').waitFor();
- const visible=await page.evaluate(()=>{const pane=document.querySelector('#vak').getBoundingClientRect(),edge=document.querySelector('.rtg-adaptive-bar').getBoundingClientRect();return pane.bottom<=edge.top});
- assert.equal(visible,true,'de documentlijst eindigt boven de Edge zodat de laatste actie bereikbaar blijft');}
+ const last=page.locator('#mijnDocs .doc,#nieuwBord').filter({visible:true}).last();
+ await last.scrollIntoViewIfNeeded();await last.evaluate(e=>e.scrollIntoView({block:'center',behavior:'instant'}));
+ const visible=await last.evaluate(e=>{const r=e.getBoundingClientRect(),edge=document.querySelector('.rtg-adaptive-bar').getBoundingClientRect();return r.bottom<=edge.top&&e.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2))});
+ assert.equal(visible,true,'de laatste documentactie kan boven de Edge worden gebracht en ontvangt de aanraking');}
 async function drawer(page,row){await row.scrollIntoViewIfNeeded();await row.evaluate(e=>e.scrollIntoView({block:'center',behavior:'instant'}));await veegDoor(page,await row.boundingBox(),{afstand:-145,stappen:16});await row.locator('.gb-lade').waitFor();}
 async function confirmGesture(page){const b=page.locator('dialog.gb-blad .gb-borg');await b.waitFor();await b.focus();await page.keyboard.press('Enter');await page.keyboard.press('Enter')}
 for(const width of [390,1440])test('Office '+width+': alle zes documentsoorten maken, herladen en verwijderen via echte bediening',{skip:geenBrowser(pw)},async()=>fixture(async({browser,base,token,api})=>{

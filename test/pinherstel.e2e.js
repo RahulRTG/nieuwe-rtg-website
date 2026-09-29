@@ -82,7 +82,8 @@ async function ingelogd(browser, base, token, pad) {
   const fouten = letOpFouten(page, []);
   await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('#gate', { state: 'hidden', timeout: 20000 });
-  await page.waitForSelector('#app', { state: 'visible', timeout: 10000 });
+  // The recovery dialog can cover the authenticated app before onboarding ends.
+  await page.waitForSelector('#app.active', { state: 'attached', timeout: 10000 });
   return { page, fouten };
 }
 

@@ -69,7 +69,7 @@ test('de drie bureau-PDA\'s komen op, elk met hun eigen bureau, op één werking
          .ey en de h1 wel. Toetsen op de kopbalk zou hier dus een tijdslimiet
          geven die niets zegt over dit scherm. */
       assert.equal(await page.textContent('.ey'), b.ey, b.id + ': eigen eyebrow');
-      assert.equal(await page.textContent('h1'), b.h1, b.id + ': eigen titel');
+      assert.equal(await page.textContent('.wd-page h1'), b.h1, b.id + ': eigen titel');
       assert.ok(geraakt.has(b.api), b.id + ' vraagt zijn eigen bureau op (' + [...geraakt].join(',') + ')');
       for (const ander of BUREAUS) {
         if (ander.id === b.id) continue;

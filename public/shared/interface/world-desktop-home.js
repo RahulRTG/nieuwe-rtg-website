@@ -11,7 +11,7 @@
       var favorites = U.label(U.el('aside', 'wd-favorites'), 'favorites'), surface = U.el('section', 'wd-focus');
       var library = U.label(U.el('section', 'wd-library'), 'library'), announcement = U.el('p', 'wd-announcement');
       announcement.setAttribute('role', 'status'); announcement.hidden = true; surface.hidden = true;
-      home.before(root); home.classList.add('wd-home'); root.appendChild(people); root.appendChild(home);
+      home.before(root); home.classList.add('wd-home'); root.appendChild(people); w.RTGDesktopSurface.move(root, home);
       root.appendChild(favorites); root.appendChild(surface); root.appendChild(announcement); root.appendChild(library);
       w.RTGDesktopSurface.guard(root, home);
       w.RTGWorldPresentation.start({root:root,home:home,people:people,favorites:favorites});
@@ -66,15 +66,26 @@
         defaults: defaults[world].filter(function (id) { return apps.some(function (a) { return a.id === id; }); }),
         open: function (app, trigger, action) { runtime.navigation.open(app.url, app.name, 'desktop-catalog'); if (action) frame.prepare(action); } });
       d.body.dataset.rtgDesktopState = 'ready';
+      var NAMEN = { living: 'LivingOS', travel: 'TravelOS', work: 'WorkOS', foundation: 'FoundationOS' };
+      /* De kop noemt de wereld waar je BENT. Op RTG Command (apps/app.html) is
+         dat de wereld van het open blad (data-rtg-blad-wereld, gezet door
+         shared/command.js) en niet de wereld van de schil zelf; het oude
+         ::after-label las die al, dit label moet hem dus ook volgen. */
+      function wereldNaam() { return NAMEN[d.body.dataset.rtgBladWereld] || NAMEN[world]; }
       function edge() {
         if (!w.RTGAdaptiveEdge) return;
         var brand = d.querySelector('.rtg-edge-mark');
         if (brand && !brand.querySelector('.wd-world-label')) {
-          var label = U.el('span', 'wd-world-label', { living: 'LivingOS', travel: 'TravelOS', work: 'WorkOS', foundation: 'FoundationOS' }[world]);
+          var label = U.el('span', 'wd-world-label', wereldNaam());
           label.translate = false; brand.appendChild(label);
         }
       }
       edge();
+      var bladWatch = new MutationObserver(function () {
+        var label = d.querySelector('.rtg-edge-mark .wd-world-label');
+        if (label && label.textContent !== wereldNaam()) label.textContent = wereldNaam();
+      });
+      bladWatch.observe(d.body, { attributes: true, attributeFilter: ['data-rtg-blad-wereld'] });
       // Home hangt aan window en niet aan het model van de Edge: dat begint bij elke start leeg.
       w.addEventListener('rtg-edge-home', function (e) {
         root.dataset.mobilePanel = 'home';
@@ -85,7 +96,7 @@
       var watch = new MutationObserver(function () { if (d.body.dataset.rtgAdaptiveReady === 'true') { edge(); watch.disconnect(); } });
       if (d.body.dataset.rtgAdaptiveReady !== 'true') watch.observe(d.body, { attributes: true, attributeFilter: ['data-rtg-adaptive-ready'] });
       w.addEventListener('rtglang', function () { cards.refresh(); runtime.setState('workspace'); edge(); greet(); });
-      w.addEventListener('pagehide', function () { watch.disconnect(); runtime.destroy(); });
+      w.addEventListener('pagehide', function () { watch.disconnect(); bladWatch.disconnect(); runtime.destroy(); });
       w.RTGDesktopHome.current = { runtime: runtime, cards: cards, frame: frame };
     }).catch(function (error) {
       d.body.dataset.rtgDesktopState = 'error';

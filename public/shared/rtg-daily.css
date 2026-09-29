@@ -1,9 +1,10 @@
 /* The approved daily rooms use the standard Edge; these are content surfaces. */
 body.rtg-daily{background:var(--rtg-world-bg)!important;color:var(--rtg-world-ink);--bg:var(--rtg-world-bg);--card:var(--rtg-world-card);--card2:var(--rtg-world-card-strong);--txt:var(--rtg-world-ink);--muted:var(--rtg-world-muted);--soft:var(--rtg-world-muted);--gold:var(--rtg-world-metal);--line:rgba(215,189,139,.25);--rtg-leesgoud:var(--rtg-world-metal);color-scheme:var(--rtg-world-schema)}
 body.rtg-daily main{width:100%;max-width:1040px!important;margin:0 auto!important;padding:0!important;min-width:0}
-body.rtg-daily>header{position:static;border:0;min-height:0;background:none;padding:0}
-body.rtg-daily>header>:not([data-rtg-edge-bar]){display:none}
-body.rtg-daily[data-rtg-adaptive-ready="true"]>header,body.rtg-daily.rtg-edge-embed>header{display:none!important}
+/* In the shared desktop frame (#413) the room's own header lives in .wd-page, not in body. */
+body.rtg-daily>header,body.rtg-daily .wd-page>header{position:static;border:0;min-height:0;background:none;padding:0}
+body.rtg-daily>header>:not([data-rtg-edge-bar]),body.rtg-daily .wd-page>header>:not([data-rtg-edge-bar]){display:none}
+body.rtg-daily[data-rtg-adaptive-ready="true"]>header,body.rtg-daily[data-rtg-adaptive-ready="true"] .wd-page>header,body.rtg-daily.rtg-edge-embed>header{display:none!important}
 body.rtg-daily main>:is(.ios-groot,.ios-boven,.ios-onder){display:none!important}
 body.rtg-daily .rtg-duimbalk{position:static;padding:0;border:0;min-height:0;background:none}
 body.rtg-daily [hidden]{display:none!important}

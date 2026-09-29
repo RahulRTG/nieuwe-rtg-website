@@ -17,13 +17,42 @@
       return !el.matches(overlays) && !el.className.toString().startsWith('rtg-edge-') && !el.className.toString().startsWith('rtg-adaptive-');
     });
     d.body.prepend(surface);
-    nodes.forEach(function (el) { surface.appendChild(el); });
+    nodes.forEach(function (el) { move(surface, el); });
     // A skip link stays the first tab stop (WCAG 2.4.1); the frame comes after it.
     Array.from(d.body.querySelectorAll(':scope>.rtg-spring,:scope>.skip,:scope>.skip-link')).reverse()
       .forEach(function (el) { d.body.prepend(el); });
     var canvas = w.RTGHeritageRegistry && w.RTGHeritageRegistry.canvas[w.location.pathname];
-    if (canvas) { surface.dataset.rtgCanvasSurface = 'true'; fit(surface); }
+    /* De losse werkruimte (apps/werkruimte.html, body.rtg-edge-workspace) is zelf
+       een werkvlak met absoluut geplaatste surfaces, net als een canvas: hij
+       heeft geen inhoudshoogte. Zonder vaste maat zakte hij in het kader naar
+       0px en stond er een lege kolom. rtg-heritage-components.js behandelt hem
+       om dezelfde reden al als immersive. */
+    if (canvas || d.body.classList.contains('rtg-edge-workspace')) { surface.dataset.rtgCanvasSurface = 'true'; fit(surface); }
+    else {
+      /* Een app die het hele venster bezit (html/body overflow:hidden en een schil
+         van 100dvh: partner-network, living-os, reizen-veilig, ...) scrolt
+         BINNEN zijn artikelen. In het kader begon die schil lager, stak hij onder
+         het venster uit, en omdat het document niet scrolt was zijn onderste
+         navigatie onbereikbaar. Zo'n schil krijgt dezelfde maat als een canvas:
+         van waar het vlak begint tot boven de Edge. */
+      var eigen = /hidden|clip/.test(w.getComputedStyle(d.documentElement).overflowY) && nodes.filter(function (el) {
+        return el.offsetHeight >= w.innerHeight - 2 && !/fixed|absolute/.test(w.getComputedStyle(el).position);
+      })[0];
+      if (eigen) { eigen.setAttribute('data-rtg-viewport-app', ''); surface.dataset.rtgCanvasSurface = 'true'; fit(surface); }
+    }
     return surface;
+  }
+  /* Verhuizen zonder herladen. Een gewone appendChild haalt een element los en
+     zet het terug, en een <iframe> laadt dan opnieuw: de surfaces van de
+     werkruimte (apps/werkruimte.html) laadden daardoor twee keer, verloren hun
+     stand, en een frame waar net iets naartoe gestuurd was bestond niet meer.
+     moveBefore() verhuist atomisch (iframes, focus en lopende animaties blijven);
+     waar hij ontbreekt blijft het de gewone verhuizing. */
+  function move(parent, node, before) {
+    if (parent.moveBefore && node.isConnected && parent.isConnected) {
+      try { parent.moveBefore(node, before || null); return node; } catch (e) {}
+    }
+    return parent.insertBefore(node, before || null);
   }
   // A canvas ends above the Edge: its height is the viewport minus where it starts.
   function fit(surface) {
@@ -65,5 +94,5 @@
     watch.observe(d.body, { childList:true });
     sync(); w.addEventListener('pagehide', function () { watch.disconnect(); });
   }
-  w.RTGDesktopSurface = { prepare: prepare, guard: guard };
+  w.RTGDesktopSurface = { prepare: prepare, guard: guard, move: move };
 })(window, document);

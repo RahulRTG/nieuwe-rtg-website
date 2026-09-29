@@ -68,8 +68,11 @@ body.rtg-first-page .first-guest-controls{display:none}
 }
 @media(max-width:359px){.rtg-first-steps .first-copy{padding-inline:20px}.rtg-first-steps .first-hero{padding-inline:20px}.rtg-first-steps .first-action{font-size:19px;padding-inline:14px}.rtg-first-steps .first-interests{gap:8px}}
 @media(prefers-reduced-motion:reduce){.rtg-first-steps *{scroll-behavior:auto!important;transition:none!important}}
-/* Retire the old heading after its functional controls have moved to Edge. */
+/* Retire the old heading after its functional controls have moved to Edge.
+   In the shared desktop frame (#413) that heading is no longer a child of body
+   but of the page surface (.wd-page), hence the second selector. */
 body.rtg-first-page[data-rtg-adaptive-ready="true"]>header,
+body.rtg-first-page[data-rtg-adaptive-ready="true"] .wd-page>header,
 body.rtg-first-page[data-rtg-adaptive-ready="true"] .salon-werkveld>header,
 body.rtg-first-page main>:is(.ios-groot,.ios-boven,.ios-onder){display:none!important}
 body.rtg-first-page .salon-werkveld{background:var(--rtg-world-bg);min-height:0}

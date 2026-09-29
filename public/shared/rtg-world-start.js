@@ -6,7 +6,11 @@
   function start() {
     var body=d.body, layer=d.querySelector('.rtg-world-start');
     if(!layer || body.getAttribute('data-rtg-world-start')!=='loading')return;
+    /* Ingebed is ook een werkvlak zonder frame (?embed=1, een Command-blad):
+       dan start het gedeelde kader niet (shared/rtg-world-desktop.js) en is er
+       dus ook niets om op te wachten. Zelfde regel als de Edge (isEmbedded). */
     var embedded=false;try{embedded=w.self!==w.top;}catch(e){embedded=true;}
+    if(/(?:^|[?&])embed=1(?:&|$)/.test(w.location.search||'')||d.documentElement.classList.contains('rtg-command-blad')||d.documentElement.getAttribute('data-rtg-oppervlak')==='1')embedded=true;
     var closed=false,fontsReady=!d.fonts,lastChange=performance.now(),timer=0;
     function finish() {
       if(closed)return;closed=true;observer.disconnect();w.clearTimeout(timer);w.clearTimeout(fallback);

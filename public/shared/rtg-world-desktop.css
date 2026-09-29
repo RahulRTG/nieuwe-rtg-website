@@ -60,3 +60,26 @@ body[data-rtg-desktop] .wd-shell{padding-bottom:150px}
 body[data-rtg-desktop] :is(button,summary,a,input,select,textarea){scroll-margin-block:80px 150px}
 
 .wd-app-controls .wd-filters{flex-wrap:wrap}.wd-app-controls .wd-filters select{max-width:100%;min-width:0}
+
+/* RTG Command (apps/app.html) legt zijn werktafel als vaste laag (#rtgCommand,
+   z-index 210) aan <body>, en de schil (#shell, 240), de herkomstvraag (220) en
+   Rahuls balk (260) horen daar BOVEN te kunnen liggen. Het kader mag daarom op
+   dit scherm geen eigen stapelcontext of houder voor vaste lagen maken: met
+   isolation/contain zakte alles wat in .wd-page woont onder de werktafel, en die
+   ving dan elke tik af (de sociale balk, de pin, de instellingen). */
+body.rtg-command[data-rtg-desktop] :is(.wd-shell,.wd-page){isolation:auto;contain:none}
+/* De leden-app (apps/app.html) maakt zijn #shell op een telefoon 100vw breed.
+   In het kader staat hij in de goot van 16px, dus 100vw stak er 16px uit: de
+   hele pagina werd breder dan het scherm, en met een mobiele viewport schoof de
+   Edge onder een tik vandaan. In het kader is het vlak de maat, niet het venster. */
+body[data-rtg-desktop] .wd-page #shell{width:100%!important;max-width:100%!important}
+
+/* Een app die het venster bezit (world-desktop-surface.js zet data-rtg-viewport-app)
+   vult het canvasvlak in plaats van 100dvh, en het document scrolt in het kader
+   altijd: anders waren de bibliotheek en de kolommen onder zo'n app onbereikbaar. */
+body[data-rtg-desktop] .wd-page[data-rtg-canvas-surface]>[data-rtg-viewport-app]{flex:1 1 0;min-height:0!important;height:auto!important;max-height:none!important}
+html:has(>body[data-rtg-desktop]){overflow-y:auto!important}
+/* De drie tabbladen van het kader delen de breedte, ook op 320px: zonder
+   min-width:0 hield "Onderwerpen" (publieke landing) zijn woordbreedte vast en
+   werd de hele pagina 5px breder dan het scherm. */
+.wp-tabs button{min-width:0;overflow-wrap:anywhere}

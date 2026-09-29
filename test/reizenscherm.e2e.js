@@ -77,6 +77,7 @@ test('het reisscherm groepeert per reis, en de kop zegt hetzelfde als de regels 
     const fouten = [];
     letOpFouten(page, fouten);
     await page.goto(srv.base + '/apps/reizen.html', { waitUntil: 'domcontentloaded' });
+    await page.locator('.wp-domain > summary').click();
     await page.waitForFunction(() => {
       const el = document.querySelector('#komend');
       return el && !/Laden/.test(el.textContent) && el.querySelector('.regkop');

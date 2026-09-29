@@ -42,7 +42,10 @@
     if (action === 'worlds') return legacy('.rtg-edge-worlds-trigger');
     if (action === 'menu') return legacy('.rtg-edge-menu');
     if (action === 'status') return legacy('.rtg-edge-state');
-    if (action === 'ai') return legacy('.rtg-edge-ai');
+    if (action === 'ai') {
+      if (w.RTGMetgezel && typeof w.RTGMetgezel.rahul === 'function' && d.querySelector('.rtg-rahul-page')) { w.RTGMetgezel.rahul(); return true; }
+      return legacy('.rtg-edge-ai');
+    }
     if (action === 'presence') return rt.model.presence && rt.model.presence.action ? execute(rt.model.presence.action) : false;
     if (action === 'connect') return legacy('.rtg-edge-menu');
     return false;

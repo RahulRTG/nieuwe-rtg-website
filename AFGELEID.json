@@ -3,25 +3,25 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-09-28T16:04:53.112Z",
-  "commit": "8205bc6a1",
+  "op": "2026-09-29T07:58:56.236Z",
+  "commit": "d055489cb",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 4,
   "instrument": "scripts/afgeleid.js",
-  "node": "v22.22.2"
+  "node": "v24.18.0"
  },
  "gemeten": {
-  "artefacten": 334,
-  "bron": 21,
+  "artefacten": 335,
+  "bron": 22,
   "afgeleid": 181,
   "fragmenten": 26,
   "momentopname": 1,
   "onbeslist": 105,
-  "afgeleidZonderEigenaar": 1,
-  "metEigenaar": 207,
-  "afgeleidEigenaarHard": 180,
+  "afgeleidZonderEigenaar": 2,
+  "metEigenaar": 206,
+  "afgeleidEigenaarHard": 179,
   "afgeleidGrendelt": 21,
-  "metStempel": 113,
+  "metStempel": 112,
   "stempelAnders": 0
  },
  "artefacten": [
@@ -851,6 +851,18 @@
    "stempelAnders": false,
    "versheidOpdracht": "npm run dekking:vast",
    "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "DESKTOP-STANDAARD.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
    "botsingVerklaard": null
   },
   {
@@ -2897,17 +2909,17 @@
   {
    "naam": "OUTPUTPROEF.json",
    "soort": "AFGELEID",
-   "eigenaar": "scripts/outputproef.js",
-   "graad": "verklaard",
+   "eigenaar": null,
+   "graad": "meerdere",
    "schrijvers": [
     "scripts/outputband.js",
     "scripts/outputproef.js"
    ],
-   "stempelInstrument": "scripts/outputproef.js",
+   "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": "npm run meetronde -- --alleen=outputproef",
-   "grendelt": false,
-   "botsingVerklaard": true
+   "grendelt": null,
+   "botsingVerklaard": false
   },
   {
    "naam": "OVERLEVING.json",

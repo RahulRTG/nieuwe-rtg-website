@@ -26,12 +26,12 @@ gevonden. Dus eerst meten — `npm run codewereld`, uitslag in `CODEWERELD.json`
 | Registers in de wortel | <!--getal:codewereld.registers-->190<!--/getal--> (37 op route, 31 op bestand, 1 op symbool, 9 zonder as) |
 | As **route** | 5709 paden, in 42 registers |
 | As **bestand** | 1457 bestanden, in 54 registers |
-| As **symbool** | <!--getal:codewereld.symboolSleutels-->24453<!--/getal--> symbolen — *stond op 0 tot 3 september 2026, zie §0.2* |
-| Ruggengraat | **<!--getal:codewereld.ruggengraat-->6108<!--/getal--> van <!--getal:codewereld.paden-->6553<!--/getal--> paden (<!--getal:codewereld.ruggengraatPct-->93.2<!--/getal-->%) staan in meer dan één register** |
-| Brug route → bestand | <!--getal:codewereld.brugPaden-->5601<!--/getal--> paden, uit **2** registers |
-| Verschillen in die brug | 1, getoetst op <!--getal:codewereld.brugToetsbaar-->5372<!--/getal--> paden (<!--getal:codewereld.brugDekkingPct-->95.9<!--/getal-->%) — soort: zie §0.3 |
-| Bronbereik **structuur** | <!--getal:codewereld.bronGenoemd-->5102<!--/getal--> van <!--getal:codewereld.bronBestanden-->5102<!--/getal--> (<!--getal:codewereld.bronPct-->100<!--/getal-->%) — welke functies er wonen, wie ervan afhangt |
-| Bronbereik **gedrag** | **<!--getal:codewereld.bronGedrag-->2868<!--/getal--> van 3987 (<!--getal:codewereld.bronGedragPct-->56.2<!--/getal-->%)** — schrijft het, is het bewezen, is het herhaalbaar |
+| As **symbool** | <!--getal:codewereld.symboolSleutels-->24495<!--/getal--> symbolen — *stond op 0 tot 3 september 2026, zie §0.2* |
+| Ruggengraat | **<!--getal:codewereld.ruggengraat-->6119<!--/getal--> van <!--getal:codewereld.paden-->6564<!--/getal--> paden (<!--getal:codewereld.ruggengraatPct-->93.2<!--/getal-->%) staan in meer dan één register** |
+| Brug route → bestand | <!--getal:codewereld.brugPaden-->5612<!--/getal--> paden, uit **2** registers |
+| Verschillen in die brug | 1, getoetst op <!--getal:codewereld.brugToetsbaar-->5383<!--/getal--> paden (<!--getal:codewereld.brugDekkingPct-->95.9<!--/getal-->%) — soort: zie §0.3 |
+| Bronbereik **structuur** | <!--getal:codewereld.bronGenoemd-->5108<!--/getal--> van <!--getal:codewereld.bronBestanden-->5108<!--/getal--> (<!--getal:codewereld.bronPct-->100<!--/getal-->%) — welke functies er wonen, wie ervan afhangt |
+| Bronbereik **gedrag** | **<!--getal:codewereld.bronGedrag-->2871<!--/getal--> van 3987 (<!--getal:codewereld.bronGedragPct-->56.2<!--/getal-->%)** — schrijft het, is het bewezen, is het herhaalbaar |
 | — gedrag in `server/` | <!--getal:codewereld.bronServerPct-->60.5<!--/getal-->% |
 | — gedrag in `public/` | <!--getal:codewereld.bronPublicPct-->42.2<!--/getal-->% |
 
@@ -77,7 +77,7 @@ verschilt.
 parser in `scripts/ast/` (lexer, recursive-descent parser, walker — geen enkele
 dependency) is over de hele serverboom gehaald:
 
-**<!--getal:codewereld.geparsed-->3906<!--/getal--> bestanden geparsed, <!--getal:codewereld.parseFout-->0<!--/getal--> gefaald, <!--getal:codewereld.symbolen-->17177<!--/getal--> benoemde
+**<!--getal:codewereld.geparsed-->3910<!--/getal--> bestanden geparsed, <!--getal:codewereld.parseFout-->0<!--/getal--> gefaald, <!--getal:codewereld.symbolen-->17210<!--/getal--> benoemde
 symbolen, in vijf seconden.**
 
 Nul gefaald telt hier dubbel, want deze parser gooit op wat hij niet begrijpt in
@@ -90,8 +90,8 @@ het voorstel voorlopig een oplossing voor een probleem dat niemand heeft.
 
 `scripts/symbolen.js` → `SYMBOLEN.json` (`npm run symbolen`):
 
-**<!--getal:symbolen.gelezen-->4793<!--/getal--> bestanden gelezen, <!--getal:symbolen.totaal-->24598<!--/getal--> benoemde symbolen met een regelnummer,
-<!--getal:symbolen.kanten-->6474<!--/getal--> require-kanten** — heen (waar hang ik van af) én terug (wie hangt van
+**<!--getal:symbolen.gelezen-->4799<!--/getal--> bestanden gelezen, <!--getal:symbolen.totaal-->24640<!--/getal--> benoemde symbolen met een regelnummer,
+<!--getal:symbolen.kanten-->6482<!--/getal--> require-kanten** — heen (waar hang ik van af) én terug (wie hangt van
 mij af). Die tweede richting is de dure kant om met de hand te zoeken, en precies
 wat een impactvraag nodig heeft.
 
@@ -116,7 +116,7 @@ Eén detail dat er bijna stil verkeerd in ging, en dat overal elders net zo geld
 `module.exports` kent **drie** standen, niet twee. Een bestand dat
 `module.exports = (kern) => {...}` doet, exporteert wel degelijk iets maar zonder
 namen — dat als een lege lijst noteren leest als "exporteert niets", en dat is
-onwaar voor <!--getal:symbolen.uitvoerZonderNamen-->2247<!--/getal--> bestanden hier. Het register draagt daarom de vórm
+onwaar voor <!--getal:symbolen.uitvoerZonderNamen-->2248<!--/getal--> bestanden hier. Het register draagt daarom de vórm
 (`object`, `functie`, `anders`), en `geexporteerd` staat per symbool op
 `onbekend` in plaats van op een vals `nee`.
 
@@ -159,7 +159,7 @@ twee betekenissen is precies wat `SEMANTIEK.json` hier 99 keer heeft geteld.
 **Gat 2 — over de schermen wisten de registers niets** (gedragsdekking 6,6%).
 `scripts/schermroutes.js` → `SCHERMROUTES.json` (`npm run schermroutes`) leest
 per bestand in `public/` welke API-paden het noemt: <!--getal:schermroutes.schermen-->422<!--/getal--> schermen,
-<!--getal:schermroutes.paden-->954<!--/getal--> exacte paden over <!--getal:schermroutes.verwijzingen-->1141<!--/getal--> verwijzingen, plus <!--getal:schermroutes.voorvoegsels-->145<!--/getal--> voorvoegsels.
+<!--getal:schermroutes.paden-->955<!--/getal--> exacte paden over <!--getal:schermroutes.verwijzingen-->1142<!--/getal--> verwijzingen, plus <!--getal:schermroutes.voorvoegsels-->145<!--/getal--> voorvoegsels.
 Daarmee bestaat de keten **scherm → route** die een impactvraag nodig heeft.
 
 **Correctie op een eerdere versie van deze paragraaf.** Hier stond dat `public/`
@@ -197,18 +197,18 @@ geldt:
    bestaan er". Daardoor heette `/api/instant-reality/event` dood terwijl de
    router hem gewoon aanbiedt — zijn routebestand staat op één regel, dus de
    bronindex vond hem niet. `ROUTEBRON.json` draagt daarom **twee** lijsten:
-   `alleRoutes` (<!--getal:routebron.routerRoutes-->5296<!--/getal-->, bestaan) en `perRoute` (met bestand), en
+   `alleRoutes` (<!--getal:routebron.routerRoutes-->5307<!--/getal-->, bestaan) en `perRoute` (met bestand), en
    <!--getal:routebron.zonderBestand-->4<!--/getal--> routes zitten wél in de eerste en niet in de tweede.
 
-Nul dode paden is hier geen lege controle: <!--getal:schermroutes.paden-->954<!--/getal--> exacte paden zijn tegen
-<!--getal:routebron.routerRoutes-->5296<!--/getal--> echte routes gehouden.
+Nul dode paden is hier geen lege controle: <!--getal:schermroutes.paden-->955<!--/getal--> exacte paden zijn tegen
+<!--getal:routebron.routerRoutes-->5307<!--/getal--> echte routes gehouden.
 
 ### 0.4 De aanroepgraaf en de brug route → symbool (3 september 2026)
 
 `scripts/aanroepgraaf.js` → `AANROEPGRAAF.json` (`npm run aanroepgraaf`) legt de
 laatste twee schakels: **wie roept wie aan**, en **welk symbool handelt deze
-route af**. <!--getal:graaf.kanten-->28800<!--/getal--> kanten, <!--getal:graaf.aanroepers-->10644<!--/getal--> symbolen waarvan bekend is wie ze
-aanroept, en <!--getal:graaf.routesMetSymbool-->3242<!--/getal--> routes met minstens één afgehandeld symbool.
+route af**. <!--getal:graaf.kanten-->28850<!--/getal--> kanten, <!--getal:graaf.aanroepers-->10662<!--/getal--> symbolen waarvan bekend is wie ze
+aanroept, en <!--getal:graaf.routesMetSymbool-->3253<!--/getal--> routes met minstens één afgehandeld symbool.
 
 Daarmee loopt de keten van scherm tot functie, uit registers alleen:
 
@@ -227,7 +227,7 @@ uit een `require` komt, **én** het doelbestand dat symbool ook echt kent.
 
 #### Een kwart opgelost is hier geen tekort
 
-Van de <!--getal:graaf.aanroepen-->161240<!--/getal--> aanroepen is <!--getal:graaf.opgelostPct-->26.3<!--/getal-->% naar een symbool te herleiden (18,1%
+Van de <!--getal:graaf.aanroepen-->161492<!--/getal--> aanroepen is <!--getal:graaf.opgelostPct-->26.3<!--/getal-->% naar een symbool te herleiden (18,1%
 toen deze meter werd gebouwd; §0.7 bracht de rest). Dat getal zonder indeling
 nodigt uit tot de verkeerde reparatie — iemand gaat de resolver "verbeteren" tot
 hij `res.json` aan een bestand knoopt. Daarom staat de rest ingedeeld:
@@ -236,7 +236,7 @@ hij `res.json` aan een bestand knoopt. Daarom staat de rest ingedeeld:
 |---|---|---|
 | ingebouwd | 25.345 | `String()`, `Object.freeze()`, `JSON.parse()` |
 | kader | 10.735 | `res.json()`, `app.post()`, `req.body` |
-| contextobject | <!--getal:graaf.contextobject-->16712<!--/getal--> | `k.instantMutate()` — zie hieronder (was 20.961 vóór §0.7) |
+| contextobject | <!--getal:graaf.contextobject-->16715<!--/getal--> | `k.instantMutate()` — zie hieronder (was 20.961 vóór §0.7) |
 | lokale waarde | 20.218 | `uit.push()` op iets dat hier is verklaard |
 | methode op waarde | 30.250 | `iets().nogwat()` — geen naam om op te lossen |
 | **overig** | **<!--getal:graaf.overig-->423<!--/getal-->** | de echte restbak: 2,3% van alle aanroepen |
@@ -272,7 +272,7 @@ lessen die elders net zo gelden:
    of lokale verklaring zijn, vallen daarom uit de bindingen. Grof, en met
    opzet.
 
-Wat na die vier overblijft is <!--getal:graaf.doelOnbekend-->0<!--/getal-->. Dat is hier geen lege controle: <!--getal:graaf.kanten-->28800<!--/getal-->
+Wat na die vier overblijft is <!--getal:graaf.doelOnbekend-->0<!--/getal-->. Dat is hier geen lege controle: <!--getal:graaf.kanten-->28850<!--/getal-->
 kanten zijn tegen de symbooltabel van hun doelbestand gehouden.
 
 Sinds 20 september 2026 staat er een **vijfde** soort naast die vier, en die
@@ -312,7 +312,7 @@ boom, dan is hij het, wat hij ook beweert).
 | teller | wat het zegt | stand |
 |---|---|---|
 | structuur | dit bestand bestaat, en dit woont erin | <!--getal:codewereld.bronPct-->100<!--/getal-->% |
-| relatie | waar hangt het mee samen, welk scherm gebruikt het | <!--getal:codewereld.relatie-->5102<!--/getal--> bestanden |
+| relatie | waar hangt het mee samen, welk scherm gebruikt het | <!--getal:codewereld.relatie-->5108<!--/getal--> bestanden |
 | **gedrag** | schrijft het, klopt het, is het bewezen | **<!--getal:codewereld.bronGedragPct-->56.2<!--/getal-->%** |
 
 Alleen die laatste is de bovengrens voor een Architect die over gedrag wordt
@@ -334,7 +334,7 @@ EXECUTION_MAP    welke rol vraagt hij, wat is het bewijs waard
 IDEMPROEF        wat doet een tweede aanroep
 ```
 
-<!--getal:schermgedrag.schermen-->422<!--/getal--> schermen, waarvan <!--getal:schermgedrag.metGrond-->273<!--/getal--> met een echte uitspraak:
+<!--getal:schermgedrag.schermen-->422<!--/getal--> schermen, waarvan <!--getal:schermgedrag.metGrond-->274<!--/getal--> met een echte uitspraak:
 <!--getal:schermgedrag.schrijftJa-->65<!--/getal--> schermen kunnen via de API iets veranderen, <!--getal:schermgedrag.verzwakt-->213<!--/getal--> raken een route
 met verzwakt bewijs, en **<!--getal:schermgedrag.bewezen-->0<!--/getal--> schermen raken uitsluitend bewezen routes** — dat
 laatste is geen verrassing (`VERTROUWEN.json` staat huisbreed op 0 bewezen)
@@ -364,7 +364,7 @@ uitkomst.
 
 #### Dezelfde val, een derde keer — en nu vooraf gezien
 
-<!--getal:schermgedrag.zonderGrond-->149<!--/getal--> van de 368 schermen krijgen `niet vast te stellen`, elk met een reden:
+<!--getal:schermgedrag.zonderGrond-->148<!--/getal--> van de 368 schermen krijgen `niet vast te stellen`, elk met een reden:
 134 bouwen hun paden op uit een sjabloon of een optelling, 3 noemen een stam.
 Die schermen staan wél in het register — dat is de helft van zijn waarde — maar
 ze mogen niet als dekking tellen. Anders stijgt de gedragsteller doordat er een
@@ -468,10 +468,10 @@ geen uitvoer van de fabriek.
 
 | | vóór §0.7 | na |
 |---|---|---|
-| aanroepkanten | 17.596 | <!--getal:graaf.kanten-->28800<!--/getal--> |
+| aanroepkanten | 17.596 | <!--getal:graaf.kanten-->28850<!--/getal--> |
 | aanroepen herleid | 18,1% | <!--getal:graaf.opgelostPct-->26.3<!--/getal-->% |
-| routes met een symbool | 2346 | <!--getal:graaf.routesMetSymbool-->3242<!--/getal--> |
-| post `contextobject` | 20.961 | <!--getal:graaf.contextobject-->16712<!--/getal--> |
+| routes met een symbool | 2346 | <!--getal:graaf.routesMetSymbool-->3253<!--/getal--> |
+| post `contextobject` | 20.961 | <!--getal:graaf.contextobject-->16715<!--/getal--> |
 
 <!--getal:graaf.viaKern-->6095<!--/getal--> kanten bestaan puur dankzij deze herkomst. Van die kanten wijzen er
 <!--getal:graaf.viaKernZonderSymbool-->4223<!--/getal--> alleen het **bestand** aan en niet de functie, en dat is geen slordigheid
@@ -535,7 +535,7 @@ weet.
 |---|---|---|
 | module van buiten | `path.join()`, `fs.readFileSync()` | soort `externeModule` (<!--getal:graaf.externeModule-->834<!--/getal-->) |
 | eigen zak van een domein | `const { H, heleCenten } = horeca` | soort `uitgepaktObject` (<!--getal:graaf.uitgepaktObject-->1554<!--/getal-->) |
-| module die zelf een functie is | `const rem = require('../rem'); rem({…})` | **kant** naar dat bestand (<!--getal:graaf.moduleAlsFunctie-->87<!--/getal-->) |
+| module die zelf een functie is | `const rem = require('../rem'); rem({…})` | **kant** naar dat bestand (<!--getal:graaf.moduleAlsFunctie-->88<!--/getal-->) |
 | methode op iets ingevoerds | `const { log } = require('../log'); log.warn()` | **kant** naar dat bestand (<!--getal:graaf.lidOpInvoer-->283<!--/getal-->) |
 | uitgepakt uit een fabriek | `const { publiek } = require('./beeld')({…})` | **kant** naar dat bestand (<!--getal:graaf.uitFabriek-->249<!--/getal-->) |
 
@@ -559,8 +559,8 @@ eerst door de bestaanscontrole en produceerden **303 "bevindingen"** — de mete
 beschuldigde de code van een ontbrekend symbool dat hij zelf niet had ingevuld.
 `doelOnbekend` staat weer op <!--getal:graaf.doelOnbekend-->0<!--/getal-->.
 
-Eindstand van de graaf na §0.7 en §0.8: <!--getal:graaf.kanten-->28800<!--/getal--> kanten,
-<!--getal:graaf.opgelostPct-->26.3<!--/getal-->% herleid, <!--getal:graaf.routesMetSymbool-->3242<!--/getal--> routes met een symbool.
+Eindstand van de graaf na §0.7 en §0.8: <!--getal:graaf.kanten-->28850<!--/getal--> kanten,
+<!--getal:graaf.opgelostPct-->26.3<!--/getal-->% herleid, <!--getal:graaf.routesMetSymbool-->3253<!--/getal--> routes met een symbool.
 
 **Een huisregel die twee keer moest worden geleerd:** zet geen voorbeeld met een
 letterlijk modulepad in commentaar. De keuring leest `require('../log')` in een
@@ -830,9 +830,9 @@ niet.
 Drie stappen, in deze volgorde:
 
 1. ~~**Gedragsdekking van `public/`**~~ — gedaan in §0.5: 6,6% → <!--getal:codewereld.bronPublicPct-->42.2<!--/getal-->%.
-   Wat er nu nog onder zit zijn de <!--getal:schermgedrag.zonderGrond-->149<!--/getal--> schermen die hun paden opbouwen; die
+   Wat er nu nog onder zit zijn de <!--getal:schermgedrag.zonderGrond-->148<!--/getal--> schermen die hun paden opbouwen; die
    zijn statisch niet te volgen en vallen onder punt 2.
-2. ~~**De <!--getal:graaf.contextobject-->16712<!--/getal--> contextobject-aanroepen via een runtime-meting**~~ — gemeten in
+2. ~~**De <!--getal:graaf.contextobject-->16715<!--/getal--> contextobject-aanroepen via een runtime-meting**~~ — gemeten in
    §0.6, en de uitkomst keert de stap om: maar <!--getal:context.metSpoor-->213<!--/getal--> routes reiken tijdens een
    verzoek naar de kern. De rest haalt zijn namen bij het BEDRADEN op, en dat is
    statisch zichtbaar. Wat overblijft voor runtime is de late binding, en dat is

@@ -3,17 +3,17 @@
  "uitleg": "Per handeling: hoeveel van de eigen machinerie raakt hij? Zestien motoren die ieder apart gemeten zijn, hier voor het eerst naast elkaar op DEZELFDE route.",
  "grens": "Twee assen die verschillende dingen missen, nooit opgeteld: `handler` is lexicaal binnen de tekst van de handler (mist een hulpfunctie en de kern-tas) en `bestand` rekent het routebestand plus zijn DIRECTE requires (vangt de hulpfunctie, markeert alle routes in een bestand, mist nog steeds de kern-tas). De tas zit met opzet niet in de route-as: een hub als server.js zette zo 4162 routes op \"idempotent\". Woont een route ZELF in een hub, dan vervalt de bestandsas (bestandsasOnbruikbaar) en is ook zijn handlerspan grof, want die loopt door de infrastructuur van dat bestand. Alleen `mensAanDeDeur` komt uit de ROUTER en is hard. De assen uit EXECUTION_MAP.json zijn gelezen en niet hier geteld.",
  "stempel": {
-  "op": "2026-09-29T12:54:39.128Z",
-  "commit": "bbc232a8",
-  "boomVuil": false,
-  "boomAnders": 2,
+  "op": "2026-09-29T19:34:44.170Z",
+  "commit": "4984ab46",
+  "boomVuil": true,
+  "boomAnders": 19,
   "instrument": "scripts/machinedekking.js",
   "node": "v22.22.2"
  },
  "bronnen": {
   "EXECUTION_MAP.json": "727010d489e1bc7c",
   "KERNHERKOMST.json": "2c6eefee5905f626",
-  "MUTATIECONTRACT.json": "6532dec2f598bbc0",
+  "MUTATIECONTRACT.json": "1c44691d5be05c9a",
   "server/kern/stuur/beleid.js": "8dc821a9959c82e0",
   "kernherkomstStempel": {
    "op": "2026-09-19",
@@ -214,9 +214,9 @@
   }
  },
  "gemeten": {
-  "routes": 5296,
-  "muterend": 3952,
-  "leesroutesUitRegister": 1245,
+  "routes": 5307,
+  "muterend": 3958,
+  "leesroutesUitRegister": 1250,
   "assen": 19,
   "perAs": {
    "mensAanDeDeur": {
@@ -485,17 +485,17 @@
     "motor": "bewijsketen",
     "bron": "server/lib/keten.js",
     "bestaat": true,
-    "moduleLezers": 12,
+    "moduleLezers": 13,
     "zakLezers": 0,
     "lezers": [
      "server/inzagelog-lezen.js",
      "server/inzagelog.js",
      "server/kern/democratie/kwestie.js",
      "server/kern/democratie/meter.js",
+     "server/kern/democratie/voorstellen.js",
      "server/kern/kantoor/geldketen/boeken.js",
      "server/kern/kantoor/geldketen.js",
-     "server/kern/leerhuis/index.js",
-     "server/kern/lidboard/journaal.js"
+     "server/kern/leerhuis/index.js"
     ],
     "routesHandler": 4,
     "routesBestand": 37,
@@ -580,7 +580,7 @@
     }
    }
   ],
-  "mutatiesZonderEnigeAs": 2757,
+  "mutatiesZonderEnigeAs": 2763,
   "mutatiesZonderHandlerSpan": 0,
   "bestandsasOnbruikbaar": 13,
   "hubdrempel": 40,
@@ -599,7 +599,7 @@
   "assenPerMutatie": [
    {
     "assen": 0,
-    "routes": 3062
+    "routes": 3068
    },
    {
     "assen": 1,
@@ -4400,6 +4400,27 @@
    "methode": "POST",
    "pad": "/api/cv/save",
    "bestand": "server/routes/member/werk.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/democratie/partij/voorstel/aanname",
+   "bestand": "server/routes/democratie/partij.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/democratie/partij/voorstel/plaats",
+   "bestand": "server/routes/democratie/partij.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/democratie/partij/voorstel/toelicht",
+   "bestand": "server/routes/democratie/partij.js",
    "onder": [],
    "boven": []
   },
@@ -14699,6 +14720,27 @@
   {
    "methode": "POST",
    "pad": "/api/office/democratie/kwestie/heropen",
+   "bestand": "server/routes/democratie/kantoor.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/democratie/partij/registreer",
+   "bestand": "server/routes/democratie/kantoor.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/democratie/partij/sleutel",
+   "bestand": "server/routes/democratie/kantoor.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/democratie/partij/uitschrijf",
    "bestand": "server/routes/democratie/kantoor.js",
    "onder": [],
    "boven": []

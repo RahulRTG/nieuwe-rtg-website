@@ -3,42 +3,42 @@
  "uitleg": "De symbool-naar-symboolgraaf van server/: welke functie roept welke functie aan. Elke kant draagt HOE hij is afgeleid (lokaal, ingevoerd, lid). Wat niet af te leiden viel staat als onopgelost in de uitslag, met aantallen -- niet weggelaten.",
  "stempel": {
   "op": "2026-09-29",
-  "commit": "2ae19049"
+  "commit": "4984ab46"
  },
  "grens": "Liever geen kant dan een verzonnen kant. Er wordt geen kant gelegd op naamgelijkenis alleen: een aanroep telt pas als de naam lokaal bestaat of aantoonbaar uit een require komt, EN het doelbestand dat symbool ook echt kent.",
  "gemeten": {
-  "bestanden": 3906,
+  "bestanden": 3910,
   "nietGelezen": 0,
-  "aanroepen": 161240,
-  "kanten": 28800,
-  "kantenLokaal": 18003,
-  "kantenIngevoerd": 2168,
-  "kantenLid": 1915,
+  "aanroepen": 161492,
+  "kanten": 28850,
+  "kantenLokaal": 18040,
+  "kantenIngevoerd": 2177,
+  "kantenLid": 1918,
   "kantenViaKern": 6095,
-  "kantenModuleAlsFunctie": 87,
+  "kantenModuleAlsFunctie": 88,
   "kantenLidOpInvoer": 283,
   "kantenUitFabriek": 249,
   "kantenViaKernZonderSymbool": 4223,
   "kernherkomstGelezen": 1246,
-  "onopgelosteAanroepen": 118787,
-  "onopgelosteNamen": 12404,
+  "onopgelosteAanroepen": 118969,
+  "onopgelosteNamen": 12428,
   "onopgelostNaarSoort": {
-   "ingebouwd": 31676,
+   "ingebouwd": 31707,
    "externeModule": 834,
-   "kader": 11863,
-   "contextobject": 16712,
+   "kader": 11878,
+   "contextobject": 16715,
    "uitgepaktObject": 1554,
-   "lokaleWaarde": 21024,
-   "methodeOpWaarde": 34701,
+   "lokaleWaarde": 21100,
+   "methodeOpWaarde": 34758,
    "overig": 423
   },
   "opgelostPct": 26.3,
   "doelOnbekend": 0,
   "bewaakteVooruitwijzing": 0,
   "doelNietVastTeStellen": 60,
-  "symbolenMetAanroeper": 10644,
-  "routesMetSymbool": 3242,
-  "routeSymboolKanten": 6858
+  "symbolenMetAanroeper": 10662,
+  "routesMetSymbool": 3253,
+  "routeSymboolKanten": 6869
  },
  "routeNaarSymbool": [
   {
@@ -18603,6 +18603,13 @@
    ]
   },
   {
+   "route": "POST /api/member/democratie/kwestie/voorstellen",
+   "bestand": "server/routes/democratie/index.js",
+   "symbolen": [
+    "server/routes/democratie/index.js#alsLid"
+   ]
+  },
+  {
    "route": "POST /api/office/democratie/kwestie/lijst",
    "bestand": "server/routes/democratie/kantoor.js",
    "symbolen": [
@@ -18642,6 +18649,76 @@
    "bestand": "server/routes/democratie/kantoor.js",
    "symbolen": [
     "server/routes/democratie/kantoor.js#opNaam"
+   ]
+  },
+  {
+   "route": "POST /api/office/democratie/partij/lijst",
+   "bestand": "server/routes/democratie/kantoor.js",
+   "symbolen": [
+    "server/routes/democratie/kantoor.js#opNaam"
+   ]
+  },
+  {
+   "route": "POST /api/office/democratie/partij/registreer",
+   "bestand": "server/routes/democratie/kantoor.js",
+   "symbolen": [
+    "server/routes/democratie/kantoor.js#opNaam"
+   ]
+  },
+  {
+   "route": "POST /api/office/democratie/partij/sleutel",
+   "bestand": "server/routes/democratie/kantoor.js",
+   "symbolen": [
+    "server/routes/democratie/kantoor.js#opNaam"
+   ]
+  },
+  {
+   "route": "POST /api/office/democratie/partij/uitschrijf",
+   "bestand": "server/routes/democratie/kantoor.js",
+   "symbolen": [
+    "server/routes/democratie/kantoor.js#opNaam"
+   ]
+  },
+  {
+   "route": "POST /api/democratie/partij/wie",
+   "bestand": "server/routes/democratie/partij.js",
+   "symbolen": [
+    "server/routes/democratie/partij.js#alsPartij"
+   ]
+  },
+  {
+   "route": "POST /api/democratie/partij/kwesties",
+   "bestand": "server/routes/democratie/partij.js",
+   "symbolen": [
+    "server/routes/democratie/partij.js#alsPartij"
+   ]
+  },
+  {
+   "route": "POST /api/democratie/partij/voorstel/plaats",
+   "bestand": "server/routes/democratie/partij.js",
+   "symbolen": [
+    "server/routes/democratie/partij.js#alsPartij"
+   ]
+  },
+  {
+   "route": "POST /api/democratie/partij/voorstel/toelicht",
+   "bestand": "server/routes/democratie/partij.js",
+   "symbolen": [
+    "server/routes/democratie/partij.js#alsPartij"
+   ]
+  },
+  {
+   "route": "POST /api/democratie/partij/voorstel/aanname",
+   "bestand": "server/routes/democratie/partij.js",
+   "symbolen": [
+    "server/routes/democratie/partij.js#alsPartij"
+   ]
+  },
+  {
+   "route": "POST /api/democratie/partij/voorstel/mijn",
+   "bestand": "server/routes/democratie/partij.js",
+   "symbolen": [
+    "server/routes/democratie/partij.js#alsPartij"
    ]
   },
   {
@@ -26355,27 +26432,27 @@
  "onopgelostTop": [
   {
    "naam": "MemberExpression",
-   "aantal": 32099
+   "aantal": 32155
   },
   {
    "naam": "String",
-   "aantal": 8454
+   "aantal": 8465
   },
   {
    "naam": "require",
-   "aantal": 6988
+   "aantal": 6996
   },
   {
    "naam": "app.post",
-   "aantal": 4705
+   "aantal": 4716
   },
   {
    "naam": "res.status",
-   "aantal": 3418
+   "aantal": 3420
   },
   {
    "naam": "CallExpression",
-   "aantal": 2529
+   "aantal": 2530
   },
   {
    "naam": "res.json",
@@ -26391,7 +26468,7 @@
   },
   {
    "naam": "Object.assign",
-   "aantal": 1789
+   "aantal": 1792
   },
   {
    "naam": "Math.round",
@@ -26415,7 +26492,7 @@
   },
   {
    "naam": "Object.values",
-   "aantal": 732
+   "aantal": 738
   },
   {
    "naam": "Math.min",
@@ -26427,7 +26504,7 @@
   },
   {
    "naam": "crypto.randomBytes",
-   "aantal": 578
+   "aantal": 582
   },
   {
    "naam": "veilig",
@@ -26463,7 +26540,7 @@
   },
   {
    "naam": "stuur",
-   "aantal": 316
+   "aantal": 317
   },
   {
    "naam": "router.post",
@@ -26483,19 +26560,19 @@
   },
   {
    "naam": "eigen.bak",
-   "aantal": 291
+   "aantal": 293
   },
   {
    "naam": "wie",
-   "aantal": 263
+   "aantal": 264
   },
   {
    "naam": "nu",
-   "aantal": 244
+   "aantal": 254
   },
   {
    "naam": "Math.floor",
-   "aantal": 240
+   "aantal": 241
   },
   {
    "naam": "codenaamVan",
@@ -26520,11 +26597,11 @@
    "namen": [
     {
      "naam": "String",
-     "aantal": 8454
+     "aantal": 8465
     },
     {
      "naam": "require",
-     "aantal": 6988
+     "aantal": 6996
     },
     {
      "naam": "Number",
@@ -26536,7 +26613,7 @@
     },
     {
      "naam": "Object.assign",
-     "aantal": 1789
+     "aantal": 1792
     },
     {
      "naam": "Math.round",
@@ -26556,7 +26633,7 @@
     },
     {
      "naam": "Object.values",
-     "aantal": 732
+     "aantal": 738
     },
     {
      "naam": "Math.min",
@@ -26585,11 +26662,11 @@
    "namen": [
     {
      "naam": "MemberExpression",
-     "aantal": 32086
+     "aantal": 32142
     },
     {
      "naam": "CallExpression",
-     "aantal": 2529
+     "aantal": 2530
     },
     {
      "naam": "ArrowFunctionExpression",
@@ -26622,7 +26699,7 @@
     },
     {
      "naam": "eigen.bak",
-     "aantal": 285
+     "aantal": 287
     },
     {
      "naam": "next",
@@ -26662,15 +26739,15 @@
     },
     {
      "naam": "eigen.kijk",
+     "aantal": 120
+    },
+    {
+     "naam": "nu",
      "aantal": 117
     },
     {
      "naam": "werk",
-     "aantal": 108
-    },
-    {
-     "naam": "nu",
-     "aantal": 107
+     "aantal": 111
     }
    ]
   },
@@ -26764,7 +26841,7 @@
     },
     {
      "naam": "stuur",
-     "aantal": 281
+     "aantal": 282
     },
     {
      "naam": "wie",
@@ -27698,7 +27775,7 @@
      "naam": "wek",
      "aantal": 1,
      "waar": [
-      "server/kern/democratie/index.js:118"
+      "server/kern/democratie/index.js:124"
      ]
     },
     {
@@ -27834,11 +27911,11 @@
    "namen": [
     {
      "naam": "app.post",
-     "aantal": 4705
+     "aantal": 4716
     },
     {
      "naam": "res.status",
-     "aantal": 3418
+     "aantal": 3420
     },
     {
      "naam": "res.json",
@@ -27850,11 +27927,11 @@
     },
     {
      "naam": "req.get",
-     "aantal": 121
+     "aantal": 122
     },
     {
      "naam": "res.set",
-     "aantal": 110
+     "aantal": 111
     },
     {
      "naam": "res.setHeader",
@@ -70660,6 +70737,38 @@
    "lijn": 24
   },
   {
+   "vanBestand": "server/kern/democratie/connector.js",
+   "van": "maakConnector",
+   "naarBestand": "server/kern/democratie/partijen.js",
+   "naar": "maakPartijen",
+   "hoe": "ingevoerd",
+   "lijn": 20
+  },
+  {
+   "vanBestand": "server/kern/democratie/connector.js",
+   "van": "maakConnector",
+   "naarBestand": "server/kern/democratie/voorstellen.js",
+   "naar": "maakVoorstellen",
+   "hoe": "ingevoerd",
+   "lijn": 24
+  },
+  {
+   "vanBestand": "server/kern/democratie/connector.js",
+   "van": "voorstellenBij",
+   "naarBestand": "server/kern/democratie/connector.js",
+   "naar": "openbaar",
+   "hoe": "lokaal",
+   "lijn": 31
+  },
+  {
+   "vanBestand": "server/kern/democratie/connector.js",
+   "van": "maakConnector",
+   "naarBestand": "server/kern/democratie/connector.js",
+   "naar": "opNaam",
+   "hoe": "lokaal",
+   "lijn": 51
+  },
+  {
    "vanBestand": "server/kern/democratie/doe-bijeenkomst.js",
    "van": "plan",
    "naarBestand": "server/server.js",
@@ -70905,7 +71014,7 @@
    "naarBestand": "server/kern/democratie/kwestie.js",
    "naar": "maakKwestieSchrijver",
    "hoe": "ingevoerd",
-   "lijn": 45
+   "lijn": 47
   },
   {
    "vanBestand": "server/kern/democratie/index.js",
@@ -70913,7 +71022,7 @@
    "naarBestand": "server/kern/democratie/koppeling.js",
    "naar": "maakKoppeling",
    "hoe": "ingevoerd",
-   "lijn": 46
+   "lijn": 48
   },
   {
    "vanBestand": "server/kern/democratie/index.js",
@@ -70921,7 +71030,7 @@
    "naarBestand": "server/kern/democratie/index.js",
    "naar": "kijk",
    "hoe": "lokaal",
-   "lijn": 58
+   "lijn": 60
   },
   {
    "vanBestand": "server/kern/democratie/index.js",
@@ -70929,7 +71038,7 @@
    "naarBestand": "server/kern/democratie/beeld.js",
    "naar": "maakBeeld",
    "hoe": "ingevoerd",
-   "lijn": 59
+   "lijn": 61
   },
   {
    "vanBestand": "server/kern/democratie/index.js",
@@ -70937,7 +71046,7 @@
    "naarBestand": "server/kern/democratie/index.js",
    "naar": "ontvangersVan",
    "hoe": "lokaal",
-   "lijn": 69
+   "lijn": 71
   },
   {
    "vanBestand": "server/kern/democratie/index.js",
@@ -70945,7 +71054,7 @@
    "naarBestand": "server/kern/democratie/wek.js",
    "naar": "maakWek",
    "hoe": "ingevoerd",
-   "lijn": 72
+   "lijn": 74
   },
   {
    "vanBestand": "server/kern/democratie/index.js",
@@ -70953,7 +71062,7 @@
    "naarBestand": "server/kern/democratie/doe.js",
    "naar": "maakDoe",
    "hoe": "ingevoerd",
-   "lijn": 74
+   "lijn": 76
   },
   {
    "vanBestand": "server/kern/democratie/index.js",
@@ -70961,7 +71070,15 @@
    "naarBestand": "server/lib/klok.js",
    "naar": "nu",
    "hoe": "ingevoerd",
-   "lijn": 75
+   "lijn": 77
+  },
+  {
+   "vanBestand": "server/kern/democratie/index.js",
+   "van": "maakDemocratie",
+   "naarBestand": "server/kern/democratie/connector.js",
+   "naar": "maakConnector",
+   "hoe": "ingevoerd",
+   "lijn": 80
   },
   {
    "vanBestand": "server/kern/democratie/index.js",
@@ -70969,7 +71086,7 @@
    "naarBestand": "server/kern/democratie/index.js",
    "naar": "kijk",
    "hoe": "lokaal",
-   "lijn": 79
+   "lijn": 85
   },
   {
    "vanBestand": "server/kern/democratie/index.js",
@@ -70977,7 +71094,7 @@
    "naarBestand": "server/kern/democratie/index.js",
    "naar": "metActies",
    "hoe": "lokaal",
-   "lijn": 80
+   "lijn": 86
   },
   {
    "vanBestand": "server/kern/democratie/index.js",
@@ -70985,7 +71102,7 @@
    "naarBestand": "server/kern/democratie/index.js",
    "naar": "zoek",
    "hoe": "lokaal",
-   "lijn": 84
+   "lijn": 90
   },
   {
    "vanBestand": "server/kern/democratie/index.js",
@@ -70993,31 +71110,31 @@
    "naarBestand": "server/kern/democratie/index.js",
    "naar": "wie",
    "hoe": "lokaal",
-   "lijn": 89
-  },
-  {
-   "vanBestand": "server/kern/democratie/index.js",
-   "van": "behandel",
-   "naarBestand": "server/kern/democratie/index.js",
-   "naar": "betrokken",
-   "hoe": "lokaal",
-   "lijn": 91
-  },
-  {
-   "vanBestand": "server/kern/democratie/index.js",
-   "van": "behandel",
-   "naarBestand": "server/kern/util.js",
-   "naar": "schoon",
-   "hoe": "ingevoerd",
    "lijn": 95
   },
   {
    "vanBestand": "server/kern/democratie/index.js",
+   "van": "behandel",
+   "naarBestand": "server/kern/democratie/index.js",
+   "naar": "betrokken",
+   "hoe": "lokaal",
+   "lijn": 97
+  },
+  {
+   "vanBestand": "server/kern/democratie/index.js",
+   "van": "behandel",
+   "naarBestand": "server/kern/util.js",
+   "naar": "schoon",
+   "hoe": "ingevoerd",
+   "lijn": 101
+  },
+  {
+   "vanBestand": "server/kern/democratie/index.js",
    "van": "sluit",
    "naarBestand": "server/kern/democratie/index.js",
    "naar": "zoek",
    "hoe": "lokaal",
-   "lijn": 100
+   "lijn": 106
   },
   {
    "vanBestand": "server/kern/democratie/index.js",
@@ -71025,7 +71142,7 @@
    "naarBestand": "server/kern/util.js",
    "naar": "schoon",
    "hoe": "ingevoerd",
-   "lijn": 102
+   "lijn": 108
   },
   {
    "vanBestand": "server/kern/democratie/index.js",
@@ -71033,7 +71150,7 @@
    "naarBestand": "server/kern/democratie/index.js",
    "naar": "wie",
    "hoe": "lokaal",
-   "lijn": 104
+   "lijn": 110
   },
   {
    "vanBestand": "server/kern/democratie/index.js",
@@ -71041,7 +71158,7 @@
    "naarBestand": "server/kern/democratie/index.js",
    "naar": "betrokken",
    "hoe": "lokaal",
-   "lijn": 106
+   "lijn": 112
   },
   {
    "vanBestand": "server/kern/democratie/index.js",
@@ -71049,7 +71166,7 @@
    "naarBestand": "server/kern/democratie/index.js",
    "naar": "ontvangersVan",
    "hoe": "lokaal",
-   "lijn": 114
+   "lijn": 120
   },
   {
    "vanBestand": "server/kern/democratie/index.js",
@@ -71057,7 +71174,7 @@
    "naarBestand": "server/kern/democratie/index.js",
    "naar": "zoek",
    "hoe": "lokaal",
-   "lijn": 123
+   "lijn": 129
   },
   {
    "vanBestand": "server/kern/democratie/index.js",
@@ -71065,7 +71182,7 @@
    "naarBestand": "server/kern/util.js",
    "naar": "schoon",
    "hoe": "ingevoerd",
-   "lijn": 125
+   "lijn": 131
   },
   {
    "vanBestand": "server/kern/democratie/index.js",
@@ -71073,7 +71190,7 @@
    "naarBestand": "server/kern/democratie/index.js",
    "naar": "wie",
    "hoe": "lokaal",
-   "lijn": 126
+   "lijn": 132
   },
   {
    "vanBestand": "server/kern/democratie/index.js",
@@ -71081,7 +71198,7 @@
    "naarBestand": "server/kern/democratie/index.js",
    "naar": "betrokken",
    "hoe": "lokaal",
-   "lijn": 128
+   "lijn": 134
   },
   {
    "vanBestand": "server/kern/democratie/index.js",
@@ -71089,7 +71206,7 @@
    "naarBestand": "server/kern/democratie/meter.js",
    "naar": "meet",
    "hoe": "ingevoerd",
-   "lijn": 141
+   "lijn": 147
   },
   {
    "vanBestand": "server/kern/democratie/index.js",
@@ -71097,7 +71214,7 @@
    "naarBestand": "server/kern/democratie/index.js",
    "naar": "kijk",
    "hoe": "lokaal",
-   "lijn": 141
+   "lijn": 147
   },
   {
    "vanBestand": "server/kern/democratie/index.js",
@@ -71105,7 +71222,7 @@
    "naarBestand": "server/kern/democratie/bewijsstand.js",
    "naar": null,
    "hoe": "lidOpInvoer",
-   "lijn": 144
+   "lijn": 150
   },
   {
    "vanBestand": "server/kern/democratie/index.js",
@@ -71113,7 +71230,7 @@
    "naarBestand": "server/kern/democratie/lid.js",
    "naar": "maakLid",
    "hoe": "ingevoerd",
-   "lijn": 150
+   "lijn": 156
   },
   {
    "vanBestand": "server/kern/democratie/koppeling.js",
@@ -71301,11 +71418,27 @@
   },
   {
    "vanBestand": "server/kern/democratie/kwestie.js",
+   "van": "voorstel",
+   "naarBestand": "server/kern/democratie/kwestie.js",
+   "naar": "noteer",
+   "hoe": "lokaal",
+   "lijn": 116
+  },
+  {
+   "vanBestand": "server/kern/democratie/kwestie.js",
+   "van": "voorstel",
+   "naarBestand": "server/kern/democratie/kwestie.js",
+   "naar": "huidige",
+   "hoe": "lokaal",
+   "lijn": 116
+  },
+  {
+   "vanBestand": "server/kern/democratie/kwestie.js",
    "van": "trede",
    "naarBestand": "server/kern/democratie/kwestie.js",
    "naar": "noteer",
    "hoe": "lokaal",
-   "lijn": 120
+   "lijn": 126
   },
   {
    "vanBestand": "server/kern/democratie/kwestie.js",
@@ -71313,7 +71446,7 @@
    "naarBestand": "server/kern/democratie/kwestie.js",
    "naar": "iso",
    "hoe": "lokaal",
-   "lijn": 122
+   "lijn": 128
   },
   {
    "vanBestand": "server/kern/democratie/lid.js",
@@ -71378,6 +71511,246 @@
    "naar": "top",
    "hoe": "lid",
    "lijn": 110
+  },
+  {
+   "vanBestand": "server/kern/democratie/partijen.js",
+   "van": "nieuwGeheim",
+   "naarBestand": "server/kern/democratie/partijen.js",
+   "naar": "hash",
+   "hoe": "lokaal",
+   "lijn": 42
+  },
+  {
+   "vanBestand": "server/kern/democratie/partijen.js",
+   "van": "toets",
+   "naarBestand": "server/kern/util.js",
+   "naar": "schoon",
+   "hoe": "ingevoerd",
+   "lijn": 52
+  },
+  {
+   "vanBestand": "server/kern/democratie/partijen.js",
+   "van": "registreer",
+   "naarBestand": "server/kern/democratie/partijen.js",
+   "naar": "toets",
+   "hoe": "lokaal",
+   "lijn": 65
+  },
+  {
+   "vanBestand": "server/kern/democratie/partijen.js",
+   "van": "registreer",
+   "naarBestand": "server/kern/democratie/partijen.js",
+   "naar": "nieuwGeheim",
+   "hoe": "lokaal",
+   "lijn": 76
+  },
+  {
+   "vanBestand": "server/kern/democratie/partijen.js",
+   "van": "registreer",
+   "naarBestand": "server/kern/democratie/partijen.js",
+   "naar": "beeld",
+   "hoe": "lokaal",
+   "lijn": 80
+  },
+  {
+   "vanBestand": "server/kern/democratie/partijen.js",
+   "van": "vervangSleutel",
+   "naarBestand": "server/kern/democratie/partijen.js",
+   "naar": "vind",
+   "hoe": "lokaal",
+   "lijn": 85
+  },
+  {
+   "vanBestand": "server/kern/democratie/partijen.js",
+   "van": "vervangSleutel",
+   "naarBestand": "server/kern/democratie/partijen.js",
+   "naar": "nieuwGeheim",
+   "hoe": "lokaal",
+   "lijn": 89
+  },
+  {
+   "vanBestand": "server/kern/democratie/partijen.js",
+   "van": "vervangSleutel",
+   "naarBestand": "server/kern/democratie/partijen.js",
+   "naar": "beeld",
+   "hoe": "lokaal",
+   "lijn": 90
+  },
+  {
+   "vanBestand": "server/kern/democratie/partijen.js",
+   "van": "uitschrijf",
+   "naarBestand": "server/kern/democratie/partijen.js",
+   "naar": "vind",
+   "hoe": "lokaal",
+   "lijn": 95
+  },
+  {
+   "vanBestand": "server/kern/democratie/partijen.js",
+   "van": "uitschrijf",
+   "naarBestand": "server/kern/democratie/partijen.js",
+   "naar": "beeld",
+   "hoe": "lokaal",
+   "lijn": 97
+  },
+  {
+   "vanBestand": "server/kern/democratie/partijen.js",
+   "van": "uitschrijf",
+   "naarBestand": "server/kern/util.js",
+   "naar": "schoon",
+   "hoe": "ingevoerd",
+   "lijn": 98
+  },
+  {
+   "vanBestand": "server/kern/democratie/partijen.js",
+   "van": "vanSleutel",
+   "naarBestand": "server/kern/democratie/partijen.js",
+   "naar": "vind",
+   "hoe": "lokaal",
+   "lijn": 112
+  },
+  {
+   "vanBestand": "server/kern/democratie/partijen.js",
+   "van": "vanSleutel",
+   "naarBestand": "server/kern/util.js",
+   "naar": "veiligGelijk",
+   "hoe": "ingevoerd",
+   "lijn": 114
+  },
+  {
+   "vanBestand": "server/kern/democratie/partijen.js",
+   "van": "vanSleutel",
+   "naarBestand": "server/kern/democratie/partijen.js",
+   "naar": "hash",
+   "hoe": "lokaal",
+   "lijn": 114
+  },
+  {
+   "vanBestand": "server/kern/democratie/voorstellen.js",
+   "van": "beeld",
+   "naarBestand": "server/kern/democratie/voorstellen.js",
+   "naar": "dag",
+   "hoe": "lokaal",
+   "lijn": 61
+  },
+  {
+   "vanBestand": "server/kern/democratie/voorstellen.js",
+   "van": "vandaagGeplaatst",
+   "naarBestand": "server/kern/democratie/voorstellen.js",
+   "naar": "dag",
+   "hoe": "lokaal",
+   "lijn": 76
+  },
+  {
+   "vanBestand": "server/kern/democratie/voorstellen.js",
+   "van": "plaats",
+   "naarBestand": "server/kern/util.js",
+   "naar": "schoon",
+   "hoe": "ingevoerd",
+   "lijn": 81
+  },
+  {
+   "vanBestand": "server/kern/democratie/voorstellen.js",
+   "van": "plaats",
+   "naarBestand": "server/kern/democratie/voorstellen.js",
+   "naar": "vandaagGeplaatst",
+   "hoe": "lokaal",
+   "lijn": 94
+  },
+  {
+   "vanBestand": "server/kern/democratie/voorstellen.js",
+   "van": "plaats",
+   "naarBestand": "server/kern/democratie/voorstellen.js",
+   "naar": "leeg",
+   "hoe": "lokaal",
+   "lijn": 103
+  },
+  {
+   "vanBestand": "server/kern/democratie/voorstellen.js",
+   "van": "plaats",
+   "naarBestand": "server/lib/keten.js",
+   "naar": "noteerIn",
+   "hoe": "lid",
+   "lijn": 104
+  },
+  {
+   "vanBestand": "server/kern/democratie/voorstellen.js",
+   "van": "plaats",
+   "naarBestand": "server/kern/democratie/voorstellen.js",
+   "naar": "beeld",
+   "hoe": "lokaal",
+   "lijn": 108
+  },
+  {
+   "vanBestand": "server/kern/democratie/voorstellen.js",
+   "van": "opEigen",
+   "naarBestand": "server/kern/democratie/voorstellen.js",
+   "naar": "vind",
+   "hoe": "lokaal",
+   "lijn": 113
+  },
+  {
+   "vanBestand": "server/kern/democratie/voorstellen.js",
+   "van": "opEigen",
+   "naarBestand": "server/kern/democratie/voorstellen.js",
+   "naar": "beeld",
+   "hoe": "lokaal",
+   "lijn": 118
+  },
+  {
+   "vanBestand": "server/kern/democratie/voorstellen.js",
+   "van": "toelicht",
+   "naarBestand": "server/kern/util.js",
+   "naar": "schoon",
+   "hoe": "ingevoerd",
+   "lijn": 122
+  },
+  {
+   "vanBestand": "server/kern/democratie/voorstellen.js",
+   "van": "toelicht",
+   "naarBestand": "server/kern/democratie/voorstellen.js",
+   "naar": "opEigen",
+   "hoe": "lokaal",
+   "lijn": 124
+  },
+  {
+   "vanBestand": "server/kern/democratie/voorstellen.js",
+   "van": "toelicht",
+   "naarBestand": "server/lib/keten.js",
+   "naar": "noteerIn",
+   "hoe": "lid",
+   "lijn": 133
+  },
+  {
+   "vanBestand": "server/kern/democratie/voorstellen.js",
+   "van": "aanname",
+   "naarBestand": "server/kern/util.js",
+   "naar": "schoon",
+   "hoe": "ingevoerd",
+   "lijn": 139
+  },
+  {
+   "vanBestand": "server/kern/democratie/voorstellen.js",
+   "van": "aanname",
+   "naarBestand": "server/kern/democratie/voorstellen.js",
+   "naar": "opEigen",
+   "hoe": "lokaal",
+   "lijn": 141
+  },
+  {
+   "vanBestand": "server/kern/democratie/voorstellen.js",
+   "van": "aanname",
+   "naarBestand": "server/kern/democratie/voorstellen.js",
+   "naar": "beeld",
+   "hoe": "lokaal",
+   "lijn": 146
+  },
+  {
+   "vanBestand": "server/kern/democratie/voorstellen.js",
+   "van": "aanname",
+   "naarBestand": "server/lib/keten.js",
+   "naar": "noteerIn",
+   "hoe": "lid",
+   "lijn": 150
   },
   {
    "vanBestand": "server/kern/democratie/wek.js",
@@ -189727,9 +190100,17 @@
    "vanBestand": "server/lib/mutatiecontracten-democratie.js",
    "van": "(module)",
    "naarBestand": "server/lib/mutatiecontracten-democratie.js",
+   "naar": "pc",
+   "hoe": "lokaal",
+   "lijn": 106
+  },
+  {
+   "vanBestand": "server/lib/mutatiecontracten-democratie.js",
+   "van": "(module)",
+   "naarBestand": "server/lib/mutatiecontracten-democratie.js",
    "naar": "leest",
    "hoe": "lokaal",
-   "lijn": 92
+   "lijn": 131
   },
   {
    "vanBestand": "server/lib/mutatiecontracten-democratie.js",
@@ -189737,7 +190118,7 @@
    "naarBestand": "server/lib/mutatiecontracten-democratie.js",
    "naar": "schrijft",
    "hoe": "lokaal",
-   "lijn": 99
+   "lijn": 138
   },
   {
    "vanBestand": "server/lib/mutatiecontracten-effectmeter.js",
@@ -202068,6 +202449,14 @@
    "lijn": 47
   },
   {
+   "vanBestand": "server/routes/democratie/index.js",
+   "van": "route:POST /api/member/democratie/kwestie/voorstellen",
+   "naarBestand": "server/routes/democratie/index.js",
+   "naar": "alsLid",
+   "hoe": "lokaal",
+   "lijn": 52
+  },
+  {
    "vanBestand": "server/routes/democratie/kantoor.js",
    "van": "opNaam",
    "naarBestand": "server/server.js",
@@ -202120,6 +202509,94 @@
    "van": "route:POST /api/office/democratie/meter",
    "naarBestand": "server/routes/democratie/kantoor.js",
    "naar": "opNaam",
+   "hoe": "lokaal",
+   "lijn": 37
+  },
+  {
+   "vanBestand": "server/routes/democratie/kantoor.js",
+   "van": "route:POST /api/office/democratie/partij/lijst",
+   "naarBestand": "server/routes/democratie/kantoor.js",
+   "naar": "opNaam",
+   "hoe": "lokaal",
+   "lijn": 43
+  },
+  {
+   "vanBestand": "server/routes/democratie/kantoor.js",
+   "van": "route:POST /api/office/democratie/partij/registreer",
+   "naarBestand": "server/routes/democratie/kantoor.js",
+   "naar": "opNaam",
+   "hoe": "lokaal",
+   "lijn": 46
+  },
+  {
+   "vanBestand": "server/routes/democratie/kantoor.js",
+   "van": "route:POST /api/office/democratie/partij/sleutel",
+   "naarBestand": "server/routes/democratie/kantoor.js",
+   "naar": "opNaam",
+   "hoe": "lokaal",
+   "lijn": 49
+  },
+  {
+   "vanBestand": "server/routes/democratie/kantoor.js",
+   "van": "route:POST /api/office/democratie/partij/uitschrijf",
+   "naarBestand": "server/routes/democratie/kantoor.js",
+   "naar": "opNaam",
+   "hoe": "lokaal",
+   "lijn": 52
+  },
+  {
+   "vanBestand": "server/routes/democratie/partij.js",
+   "van": "(module)",
+   "naarBestand": "server/rem.js",
+   "naar": null,
+   "hoe": "moduleAlsFunctie",
+   "lijn": 22
+  },
+  {
+   "vanBestand": "server/routes/democratie/partij.js",
+   "van": "route:POST /api/democratie/partij/wie",
+   "naarBestand": "server/routes/democratie/partij.js",
+   "naar": "alsPartij",
+   "hoe": "lokaal",
+   "lijn": 32
+  },
+  {
+   "vanBestand": "server/routes/democratie/partij.js",
+   "van": "route:POST /api/democratie/partij/kwesties",
+   "naarBestand": "server/routes/democratie/partij.js",
+   "naar": "alsPartij",
+   "hoe": "lokaal",
+   "lijn": 33
+  },
+  {
+   "vanBestand": "server/routes/democratie/partij.js",
+   "van": "route:POST /api/democratie/partij/voorstel/plaats",
+   "naarBestand": "server/routes/democratie/partij.js",
+   "naar": "alsPartij",
+   "hoe": "lokaal",
+   "lijn": 34
+  },
+  {
+   "vanBestand": "server/routes/democratie/partij.js",
+   "van": "route:POST /api/democratie/partij/voorstel/toelicht",
+   "naarBestand": "server/routes/democratie/partij.js",
+   "naar": "alsPartij",
+   "hoe": "lokaal",
+   "lijn": 35
+  },
+  {
+   "vanBestand": "server/routes/democratie/partij.js",
+   "van": "route:POST /api/democratie/partij/voorstel/aanname",
+   "naarBestand": "server/routes/democratie/partij.js",
+   "naar": "alsPartij",
+   "hoe": "lokaal",
+   "lijn": 36
+  },
+  {
+   "vanBestand": "server/routes/democratie/partij.js",
+   "van": "route:POST /api/democratie/partij/voorstel/mijn",
+   "naarBestand": "server/routes/democratie/partij.js",
+   "naar": "alsPartij",
    "hoe": "lokaal",
    "lijn": 37
   },

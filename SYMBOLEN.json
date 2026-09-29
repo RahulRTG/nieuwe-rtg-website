@@ -3,23 +3,23 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-09-29",
-  "commit": "2ae19049"
+  "commit": "4984ab46"
  },
  "grens": "Dit register kent GEEN symbool-naar-symboolaanroepen: een naam in aanroeppositie is geen verwijzing. De kanten hier zijn require-kanten, en die wijzen naar een bestand dat bestaat.",
  "gemeten": {
-  "bestandenGezien": 5102,
-  "gelezen": 4793,
+  "bestandenGezien": 5108,
+  "gelezen": 4799,
   "nietGelezen": 309,
   "waarvanBundeldeel": 309,
   "waarvanParsefout": 0,
-  "symbolen": 24598,
-  "bestandenMetUitvoer": 3963,
-  "uitvoerMetNamen": 1713,
+  "symbolen": 24640,
+  "bestandenMetUitvoer": 3967,
+  "uitvoerMetNamen": 1716,
   "uitvoerOnvolledig": 3,
-  "uitvoerZonderNamen": 2247,
-  "zonderUitvoer": 830,
-  "requireKanten": 6474,
-  "seconden": 8.8
+  "uitvoerZonderNamen": 2248,
+  "zonderUitvoer": 832,
+  "requireKanten": 6482,
+  "seconden": 10.1
  },
  "nietGelezen": [
   {
@@ -40419,6 +40419,55 @@
    ]
   },
   {
+   "bestand": "server/kern/democratie/connector.js",
+   "symbolen": [
+    {
+     "naam": "maakConnector",
+     "soort": "functie",
+     "lijn": 18,
+     "geexporteerd": true
+    },
+    {
+     "naam": "iso",
+     "soort": "pijl",
+     "lijn": 19,
+     "geexporteerd": false
+    },
+    {
+     "naam": "openbaar",
+     "soort": "pijl",
+     "lijn": 22,
+     "geexporteerd": false
+    },
+    {
+     "naam": "voorstellenBij",
+     "soort": "functie",
+     "lijn": 29,
+     "geexporteerd": false
+    },
+    {
+     "naam": "opNaam",
+     "soort": "pijl",
+     "lijn": 48,
+     "geexporteerd": false
+    }
+   ],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "maakConnector"
+    ]
+   },
+   "requires": [
+    "server/kern/democratie/partijen.js",
+    "server/kern/democratie/voorstellen.js"
+   ],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/kern/democratie/index.js"
+   ]
+  },
+  {
    "bestand": "server/kern/democratie/doe-bijeenkomst.js",
    "symbolen": [
     {
@@ -40592,91 +40641,91 @@
     {
      "naam": "maakDemocratie",
      "soort": "functie",
-     "lijn": 39,
+     "lijn": 40,
      "geexporteerd": true
     },
     {
      "naam": "kaart",
      "soort": "pijl",
-     "lijn": 43,
+     "lijn": 45,
      "geexporteerd": false
     },
     {
      "naam": "kijk",
      "soort": "pijl",
-     "lijn": 44,
+     "lijn": 46,
      "geexporteerd": false
     },
     {
      "naam": "wie",
      "soort": "pijl",
-     "lijn": 53,
+     "lijn": 55,
      "geexporteerd": false
     },
     {
      "naam": "zoek",
      "soort": "pijl",
-     "lijn": 58,
+     "lijn": 60,
      "geexporteerd": false
     },
     {
      "naam": "ontvangersVan",
      "soort": "pijl",
-     "lijn": 61,
+     "lijn": 63,
      "geexporteerd": false
     },
     {
      "naam": "betrokken",
      "soort": "pijl",
-     "lijn": 69,
+     "lijn": 71,
      "geexporteerd": false
     },
     {
      "naam": "metActies",
      "soort": "pijl",
-     "lijn": 76,
+     "lijn": 82,
      "geexporteerd": false
     },
     {
      "naam": "lijst",
      "soort": "functie",
-     "lijn": 78,
+     "lijn": 84,
      "geexporteerd": false
     },
     {
      "naam": "behandel",
      "soort": "functie",
-     "lijn": 83,
+     "lijn": 89,
      "geexporteerd": false
     },
     {
      "naam": "sluit",
      "soort": "functie",
-     "lijn": 99,
+     "lijn": 105,
      "geexporteerd": false
     },
     {
      "naam": "heropen",
      "soort": "functie",
-     "lijn": 122,
+     "lijn": 128,
      "geexporteerd": false
     },
     {
      "naam": "meter",
      "soort": "pijl",
-     "lijn": 141,
+     "lijn": 147,
      "geexporteerd": false
     },
     {
      "naam": "vergeet",
      "soort": "pijl",
-     "lijn": 148,
+     "lijn": 154,
      "geexporteerd": false
     },
     {
      "naam": "mijn",
      "soort": "pijl",
-     "lijn": 152,
+     "lijn": 158,
      "geexporteerd": false
     }
    ],
@@ -40690,6 +40739,7 @@
     "server/kern/democratie/afhankelijkheden.js",
     "server/kern/democratie/beeld.js",
     "server/kern/democratie/bewijsstand.js",
+    "server/kern/democratie/connector.js",
     "server/kern/democratie/doe.js",
     "server/kern/democratie/eindstanden.js",
     "server/kern/democratie/koppeling.js",
@@ -40847,9 +40897,15 @@
      "geexporteerd": false
     },
     {
+     "naam": "voorstel",
+     "soort": "functie",
+     "lijn": 115,
+     "geexporteerd": false
+    },
+    {
      "naam": "trede",
      "soort": "functie",
-     "lijn": 114,
+     "lijn": 120,
      "geexporteerd": false
     }
    ],
@@ -40958,6 +41014,198 @@
    "extern": [],
    "gebruiktDoor": [
     "server/kern/democratie/index.js"
+   ]
+  },
+  {
+   "bestand": "server/kern/democratie/partijen.js",
+   "symbolen": [
+    {
+     "naam": "maakPartijen",
+     "soort": "functie",
+     "lijn": 33,
+     "geexporteerd": true
+    },
+    {
+     "naam": "hash",
+     "soort": "pijl",
+     "lijn": 34,
+     "geexporteerd": false
+    },
+    {
+     "naam": "vind",
+     "soort": "pijl",
+     "lijn": 35,
+     "geexporteerd": false
+    },
+    {
+     "naam": "nieuwGeheim",
+     "soort": "functie",
+     "lijn": 39,
+     "geexporteerd": false
+    },
+    {
+     "naam": "beeld",
+     "soort": "pijl",
+     "lijn": 48,
+     "geexporteerd": false
+    },
+    {
+     "naam": "toets",
+     "soort": "functie",
+     "lijn": 51,
+     "geexporteerd": false
+    },
+    {
+     "naam": "registreer",
+     "soort": "functie",
+     "lijn": 64,
+     "geexporteerd": false
+    },
+    {
+     "naam": "vervangSleutel",
+     "soort": "functie",
+     "lijn": 84,
+     "geexporteerd": false
+    },
+    {
+     "naam": "uitschrijf",
+     "soort": "functie",
+     "lijn": 94,
+     "geexporteerd": false
+    },
+    {
+     "naam": "vanSleutel",
+     "soort": "functie",
+     "lijn": 110,
+     "geexporteerd": false
+    },
+    {
+     "naam": "lijst",
+     "soort": "pijl",
+     "lijn": 117,
+     "geexporteerd": false
+    }
+   ],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "CATEGORIEEN",
+     "NIVEAUS",
+     "maakPartijen"
+    ]
+   },
+   "requires": [
+    "server/kern/util.js"
+   ],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/kern/democratie/connector.js"
+   ]
+  },
+  {
+   "bestand": "server/kern/democratie/voorstellen.js",
+   "symbolen": [
+    {
+     "naam": "maakVoorstellen",
+     "soort": "functie",
+     "lijn": 52,
+     "geexporteerd": true
+    },
+    {
+     "naam": "vind",
+     "soort": "pijl",
+     "lijn": 53,
+     "geexporteerd": false
+    },
+    {
+     "naam": "dag",
+     "soort": "pijl",
+     "lijn": 54,
+     "geexporteerd": false
+    },
+    {
+     "naam": "leeg",
+     "soort": "pijl",
+     "lijn": 55,
+     "geexporteerd": false
+    },
+    {
+     "naam": "beeld",
+     "soort": "functie",
+     "lijn": 57,
+     "geexporteerd": false
+    },
+    {
+     "naam": "kwestieBeeld",
+     "soort": "pijl",
+     "lijn": 72,
+     "geexporteerd": false
+    },
+    {
+     "naam": "openbareKwesties",
+     "soort": "pijl",
+     "lijn": 73,
+     "geexporteerd": false
+    },
+    {
+     "naam": "vandaagGeplaatst",
+     "soort": "functie",
+     "lijn": 75,
+     "geexporteerd": false
+    },
+    {
+     "naam": "plaats",
+     "soort": "functie",
+     "lijn": 80,
+     "geexporteerd": false
+    },
+    {
+     "naam": "opEigen",
+     "soort": "functie",
+     "lijn": 112,
+     "geexporteerd": false
+    },
+    {
+     "naam": "toelicht",
+     "soort": "pijl",
+     "lijn": 121,
+     "geexporteerd": false
+    },
+    {
+     "naam": "aanname",
+     "soort": "pijl",
+     "lijn": 137,
+     "geexporteerd": false
+    },
+    {
+     "naam": "mijn",
+     "soort": "pijl",
+     "lijn": 154,
+     "geexporteerd": false
+    },
+    {
+     "naam": "bijKwestie",
+     "soort": "functie",
+     "lijn": 161,
+     "geexporteerd": false
+    }
+   ],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "AANNAMES",
+     "AFWEZIG",
+     "LIMIETEN",
+     "maakVoorstellen"
+    ]
+   },
+   "requires": [
+    "server/kern/util.js",
+    "server/lib/keten.js"
+   ],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/kern/democratie/connector.js"
    ]
   },
   {
@@ -129356,6 +129604,8 @@
     "server/kern/democratie/doe.js",
     "server/kern/democratie/index.js",
     "server/kern/democratie/lid.js",
+    "server/kern/democratie/partijen.js",
+    "server/kern/democratie/voorstellen.js",
     "server/kern/economie/runtime/intent.js",
     "server/kern/economie/runtime/opslag.js",
     "server/kern/experience/broker.js",
@@ -143352,6 +143602,7 @@
     "server/inzagelog.js",
     "server/kern/democratie/kwestie.js",
     "server/kern/democratie/meter.js",
+    "server/kern/democratie/voorstellen.js",
     "server/kern/kantoor/geldketen.js",
     "server/kern/kantoor/geldketen/boeken.js",
     "server/kern/leerhuis/index.js",
@@ -144453,6 +144704,12 @@
      "naam": "doeSchrijft",
      "soort": "pijl",
      "lijn": 61,
+     "geexporteerd": false
+    },
+    {
+     "naam": "pc",
+     "soort": "pijl",
+     "lijn": 100,
      "geexporteerd": false
     }
    ],
@@ -154683,6 +154940,7 @@
     "server/opzet/webhooks.js",
     "server/rem.js",
     "server/routes/adres.js",
+    "server/routes/democratie/partij.js",
     "server/routes/foundationregistratie.js",
     "server/routes/livinglab/bewoner.js",
     "server/routes/luchthaven.js",
@@ -156524,7 +156782,8 @@
     "namen": null
    },
    "requires": [
-    "server/routes/democratie/kantoor.js"
+    "server/routes/democratie/kantoor.js",
+    "server/routes/democratie/partij.js"
    ],
    "extern": [],
    "gebruiktDoor": [
@@ -156546,6 +156805,28 @@
     "namen": null
    },
    "requires": [],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/routes/democratie/index.js"
+   ]
+  },
+  {
+   "bestand": "server/routes/democratie/partij.js",
+   "symbolen": [
+    {
+     "naam": "alsPartij",
+     "soort": "pijl",
+     "lijn": 24,
+     "geexporteerd": "onbekend"
+    }
+   ],
+   "uitvoer": {
+    "vorm": "functie",
+    "namen": null
+   },
+   "requires": [
+    "server/rem.js"
+   ],
    "extern": [],
    "gebruiktDoor": [
     "server/routes/democratie/index.js"
@@ -187029,6 +187310,45 @@
    "gebruiktDoor": []
   },
   {
+   "bestand": "public/apps/foundation/partijregister.js",
+   "symbolen": [
+    {
+     "naam": "$",
+     "soort": "pijl",
+     "lijn": 12,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "rij",
+     "soort": "functie",
+     "lijn": 16,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "toonSleutel",
+     "soort": "functie",
+     "lijn": 27,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "teken",
+     "soort": "functie",
+     "lijn": 32,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "doe",
+     "soort": "functie",
+     "lijn": 43,
+     "geexporteerd": "onbekend"
+    }
+   ],
+   "uitvoer": null,
+   "requires": [],
+   "extern": [],
+   "gebruiktDoor": []
+  },
+  {
    "bestand": "public/apps/foundation/premium.js",
    "symbolen": [
     {
@@ -187493,19 +187813,25 @@
     {
      "naam": "teken",
      "soort": "functie",
-     "lijn": 80,
+     "lijn": 82,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "doe",
      "soort": "functie",
-     "lijn": 88,
+     "lijn": 90,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "voorstellen",
+     "soort": "functie",
+     "lijn": 96,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "veld",
      "soort": "pijl",
-     "lijn": 92,
+     "lijn": 108,
      "geexporteerd": "onbekend"
     }
    ],
@@ -188215,6 +188541,33 @@
      "naam": "deelStatus",
      "soort": "functie",
      "lijn": 27,
+     "geexporteerd": "onbekend"
+    }
+   ],
+   "uitvoer": null,
+   "requires": [],
+   "extern": [],
+   "gebruiktDoor": []
+  },
+  {
+   "bestand": "public/apps/foundation/voorstelbeeld.js",
+   "symbolen": [
+    {
+     "naam": "aannames",
+     "soort": "functie",
+     "lijn": 13,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "voorstel",
+     "soort": "functie",
+     "lijn": 18,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "html",
+     "soort": "functie",
+     "lijn": 25,
      "geexporteerd": "onbekend"
     }
    ],

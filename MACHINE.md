@@ -60,7 +60,7 @@ van stil meegeteld.
 
 ## 1. Wat er gemeten is
 
-<!--getal:machine.muterend-->3952<!--/getal--> muterende routes. Per as het
+<!--getal:machine.muterend-->3958<!--/getal--> muterende routes. Per as het
 aantal routes dat hem raakt (`handler` / `bestand`):
 
 | as | handler | bestand | motor |
@@ -101,8 +101,8 @@ de teller zakt naar 0 met de naam van die as erbij; dat is nagetrokken door
 
 **De drie getallen die de richting bepalen:**
 
-1. <!--getal:machine.zonderAs-->2757<!--/getal--> van de
-   <!--getal:machine.muterend-->3952<!--/getal--> muterende routes raken **geen
+1. <!--getal:machine.zonderAs-->2763<!--/getal--> van de
+   <!--getal:machine.muterend-->3958<!--/getal--> muterende routes raken **geen
    enkele** as — zelfs niet op de ruime bestandsas.
 
    **Let op de noemer: die is op 14 september 2026 verschoven, en een ronde van
@@ -209,7 +209,7 @@ vrij, **Situation** let op); die worden hier niet herhaald. Dit zijn de zeven di
 uit de uitvoeringskant komen. `SEMANTIEK.json` meet dat dit huis
 <!--getal:semantiek.namen-->131<!--/getal--> namen in meer dan één domein heeft,
 waarvan <!--getal:semantiek.betekenissen-->113<!--/getal--> met meer dan één
-betekenis (samen <!--getal:semantiek.betekenissenTotaal-->418<!--/getal-->
+betekenis (samen <!--getal:semantiek.betekenissenTotaal-->419<!--/getal-->
 betekenissen).
 
 1. **`envelop`** — bezet en gesloten (zie par. 2).

@@ -1,8 +1,8 @@
 {
  "stempel": {
-  "op": "2026-09-29T12:53:17.228Z",
-  "commit": "c0b0a51b",
-  "boomVuil": false,
+  "op": "2026-09-29T19:33:42.232Z",
+  "commit": "4984ab46",
+  "boomVuil": true,
   "boomAnders": 4,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
@@ -10,20 +10,20 @@
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5167,
-  "geclassificeerd": 5142,
+  "totaal": 5178,
+  "geclassificeerd": 5153,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3168,
-   "NOT_APPLICABLE": 1245,
+   "NOT_APPLICABLE": 1250,
    "LEGACY_PENDING_CLASSIFICATION": 25,
-   "PROTECTED": 570,
+   "PROTECTED": 576,
    "INTENTIONALLY_NON_IDEMPOTENT": 159
   },
-  "vastgesteldDoorMens": 2026,
+  "vastgesteldDoorMens": 2037,
   "afgeleidDoorScript": 3116,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4264,
-   "PUBLIC": 126,
+   "AUTHENTICATED": 4269,
+   "PUBLIC": 132,
    "OBJECT_SCOPED": 754,
    "(niet af te leiden -- vraagt een verklaring)": 7,
    "SERVICE_TO_SERVICE": 15,
@@ -33,7 +33,7 @@
    "kale ronde: beschermd": 134,
    "kale ronde: onbeschermd": 125,
    "kale ronde: geen uitspraak": 4761,
-   "niet gemeten": 147
+   "niet gemeten": 158
   },
   "voorstellen": {
    "NOT_APPLICABLE": 1
@@ -16834,6 +16834,132 @@
     "grond": null,
     "hindernis": null
    },
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "democratie.partij.kwesties",
+   "route": "POST /api/democratie/partij/kwesties",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "PUBLIC",
+    "uitHandler": null,
+    "bedoeld": "PUBLIC",
+    "bewakers": [
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "democratie.partij.voorstel.aanname",
+   "route": "POST /api/democratie/partij/voorstel/aanname",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "PUBLIC",
+    "uitHandler": null,
+    "bedoeld": "PUBLIC",
+    "bewakers": [
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "democratie.partij.voorstel.mijn",
+   "route": "POST /api/democratie/partij/voorstel/mijn",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "PUBLIC",
+    "uitHandler": null,
+    "bedoeld": "PUBLIC",
+    "bewakers": [
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "democratie.partij.voorstel.plaats",
+   "route": "POST /api/democratie/partij/voorstel/plaats",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "PUBLIC",
+    "uitHandler": null,
+    "bedoeld": "PUBLIC",
+    "bewakers": [
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "democratie.partij.voorstel.toelicht",
+   "route": "POST /api/democratie/partij/voorstel/toelicht",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "PUBLIC",
+    "uitHandler": null,
+    "bedoeld": "PUBLIC",
+    "bewakers": [
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "democratie.partij.wie",
+   "route": "POST /api/democratie/partij/wie",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "PUBLIC",
+    "uitHandler": null,
+    "bedoeld": "PUBLIC",
+    "bewakers": [
+     "mw"
+    ]
+   },
+   "bewijs": null,
    "stand": "NOT_APPLICABLE",
    "herkomst": "mens",
    "voorstel": null,
@@ -43725,6 +43851,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "democratie.voorstellen",
+   "route": "POST /api/member/democratie/kwestie/voorstellen",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "member.dm",
    "route": "POST /api/member/dm",
    "semantiek": {
@@ -60322,6 +60469,90 @@
    },
    "bewijs": null,
    "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "democratie.partij.lijst",
+   "route": "POST /api/office/democratie/partij/lijst",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "democratie.partij.registreer",
+   "route": "POST /api/office/democratie/partij/registreer",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "democratie.partij.sleutel",
+   "route": "POST /api/office/democratie/partij/sleutel",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "democratie.partij.uitschrijf",
+   "route": "POST /api/office/democratie/partij/uitschrijf",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null

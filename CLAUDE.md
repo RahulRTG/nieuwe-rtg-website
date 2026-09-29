@@ -126,6 +126,32 @@ standen extra, want met een gebouwd OSM-pakket onder de voeten stond er
 met de reden: de OSM-bouwer en het pakket op het TOESTEL (stap 2), plus waarom
 het OPHALEN van de index hier niet te bewijzen is (de proxy weigert de bron met
 een 403, dus het ontleden is beproefd en het ophalen niet — graad `vermoed`).
+**`NAVIGATIE.md` is de plaats-these** — een richtingsdocument boven PLAATS.md en
+KAARTEN.md: *een kaart vertelt waar iets is; RTG Plaats helpt een bedoeling op
+een plaats slagen, terwijl de positie van de mens zoveel mogelijk op diens
+toestel blijft.* Lees die vóór je aan navigatie, reistijd, aankomst of een
+plaatsgegeven van een zaak werkt. De omkering: een plaats wordt rijker uit haar
+operationele BRONNEN (kassa, reservering, partner-event), nooit uit het
+bewegingsspoor van haar bezoekers (P-05, sinds 29 september 2026 hard, par. 15.0). Zes grondwetsregels (P-01 t/m P-06), een restaurantketen
+als eerste proef met een storingsmatrix, en het **dubbelbewijs**: kunnen én
+aantoonbaar niet hoeven weten, en die twee worden nooit opgeteld. Het heet met
+opzet een these en geen categorie tot de poort van par. 13 groen staat. Let op
+de nulmeting in par. 6.2: bij lezing staat geen van de vijf
+terughoudendheidstellers op nul, en de scherpste vondst zit in de plaatslaag
+zelf — tijdens een naderingsvenster komt elke passage langs een zaak onder een
+codenaam 90 dagen in `plaatsLog`. De eerste stap is daarom geen functie maar
+twee metingen (`plaatsvorm` en `positiestroom`; de tweede staat sinds 29 september,
+`npm run positiestroom`: 35 stromen, 20 zonder termijn, 20 buiten de
+vergeetroute, elke klasse een voorstel met `besluit: null`), en de tellers worden een
+permanente meter: groen betekent dat de code aantoonbaar geen verboden
+bewegingsspoor maakt, niet dat het beleid dat zegt. Aankomst wordt nooit uit een
+opgeslagen positie bewezen. Dat is geen pleidooi voor minder GPS (N11): tijdens
+een taak mag alles wat goede navigatie vraagt, en de grens gaat over wat er na
+de taak van de mens overblijft -- huidige positie en een begrensd venster wel,
+een bewegingsgeschiedenis niet. Namen: in dit huis is een `spoor` het AUDITspoor
+(`stilspoor`, `spoorvorm`), dus posities heten een bewegingsspoor; `bereik` en
+`overdracht` zijn bezet (de ETA-dienst heet `reistijd`, de overgang `doorgave`),
+en "World" botst met WERELDEN.md.
 **`FOUNDATION.md` is het diepte-document van de RTFoundation als platform** —
 Personal & Civic Operating System, op drie niveaus tegelijk: individu,
 professional, organisatie. Het doet LEVEN.md niet over (dat blijft gelden en gaat

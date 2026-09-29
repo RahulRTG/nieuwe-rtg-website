@@ -1,0 +1,798 @@
+{
+  "stempel": {
+    "op": "2026-09-29T14:06:54.162Z",
+    "commit": "413d7d3f",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/positiestroom.js",
+    "node": "v22.22.2"
+  },
+  "graad": "vermoed",
+  "hoe": "lexicaal: de noemer is elk bestand in server/ dat een object met lat en lng/lon bouwt (geen vaste getallen) en iets opslaat; de indeling is per stroom verklaard met een citaat dat letterlijk in de bron moet staan; de termijn komt uit het bewaarbeleid, de bewaarveger en de vergeetroute.",
+  "grens": "Dit is de BRON-helft van de grondwetmeter (NAVIGATIE.md par. 6.4). Wat er na een doorloop werkelijk in de opslag staat, meet hij niet -- dat is A0c. Hij telt geen gebruik tijdens een taak als schuld (N11). De klassen zijn VOORSTELLEN en geen besluiten. En de detector ziet geen positie die in losse toewijzingen wordt opgebouwd; die stromen staan er alleen omdat ze met de hand zijn gevonden (nietGedetecteerd).",
+  "besturing": {
+    "citaatFouten": [],
+    "inOrde": true,
+    "wat": "Elk citaat moet letterlijk in zijn bestand staan. Staat er een niet, dan is een stroom verhuisd of verdwenen, en telt deze meter iets wat hij niet meer ziet."
+  },
+  "gemeten": {
+    "kandidaten": 54,
+    "onverklaard": 0,
+    "stromen": 35,
+    "nietGedetecteerd": 7,
+    "tegenspraak": 0,
+    "zonderTermijn": 20,
+    "nietVergeten": 20,
+    "besloten": 0,
+    "klassen": {
+      "toegestaan": 0,
+      "venster": 9,
+      "noodzakelijk": 3,
+      "teLang": 2,
+      "onbegrensd": 19,
+      "verboden": 1,
+      "onbekend": 1
+    }
+  },
+  "onverklaard": [],
+  "rijen": [
+    {
+      "naam": "live-onderweg",
+      "wat": "de positie van een lid dat Onderweg aanzet",
+      "bestanden": [
+        "server/routes/member/onderweg.js"
+      ],
+      "collectie": "live",
+      "sleutel": "sessiesleutel",
+      "van": "lid",
+      "termijn": {
+        "soort": "veger",
+        "bestand": "server/bewaarveger.js"
+      },
+      "vergeten": true,
+      "gedetecteerd": true,
+      "klasse": "teLang",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "/api/live/stop zet alleen active op false; de positie blijft tot de bewaarveger hem na zeven dagen weghaalt. De taak is dan al voorbij (NAVIGATIE.md P-05, derde categorie)."
+    },
+    {
+      "naam": "rit-vertrekpunt",
+      "wat": "de live-positie die bij een ritaanvraag in de vervoersopdracht wordt gekopieerd",
+      "bestanden": [
+        "server/routes/member/onderweg.js"
+      ],
+      "collectie": "mobOpdrachten",
+      "sleutel": "sessiesleutel",
+      "van": "lid",
+      "termijn": {
+        "soort": "geen"
+      },
+      "vergeten": false,
+      "gedetecteerd": true,
+      "klasse": "onbegrensd",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "de kopie ontsnapt aan de zevendagenveger van db.data.live en blijft op de opdracht staan zonder termijn"
+    },
+    {
+      "naam": "ritlijn",
+      "wat": "de posities van een lopende rit (chauffeur en dus reiziger)",
+      "bestanden": [
+        "server/kern/mobiliteit/voortgang.js"
+      ],
+      "collectie": "mobOpdrachten",
+      "sleutel": "sessiesleutel",
+      "van": "medewerker",
+      "termijn": {
+        "soort": "geen"
+      },
+      "vergeten": false,
+      "gedetecteerd": true,
+      "klasse": "onbegrensd",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "tot zestig gebeurtenissen met lat/lng blijven na de rit op de opdracht staan; een termijn ontbreekt (B10 in NAVIGATIE.md: punten na de rit zijn onder PLAATS.md grens 1 een besluit, geen termijn)"
+    },
+    {
+      "naam": "reis-etappes",
+      "wat": "vertrek- en aankomstpunten van een geboekte reis, soms de live-positie",
+      "bestanden": [
+        "server/kern/mobiliteit/reis.js"
+      ],
+      "collectie": "mobReizen",
+      "sleutel": "sessiesleutel",
+      "van": "lid",
+      "termijn": {
+        "soort": "geen"
+      },
+      "vergeten": false,
+      "gedetecteerd": true,
+      "klasse": "onbegrensd",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "begint het plan bij \"hier\", dan is dit de GPS van het lid, en de herkomst gaat verloren (bron wordt kaart)"
+    },
+    {
+      "naam": "favorieten",
+      "wat": "plekken die een lid zelf bewaart, soms de huidige positie",
+      "bestanden": [
+        "server/kern/mobiliteit/plekken.js"
+      ],
+      "collectie": "mobFavorieten",
+      "sleutel": "sessiesleutel",
+      "van": "lid",
+      "termijn": {
+        "soort": "lid",
+        "bestand": "server/kern/mobiliteit/plekken.js"
+      },
+      "vergeten": false,
+      "gedetecteerd": true,
+      "klasse": "noodzakelijk",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "het lid kiest en verwijdert ze zelf (max. tien); dat is zijn eigen inhoud en geen spoor -- maar de vergeetroute kent mobFavorieten niet (daar staat favorieten, een andere collectie)"
+    },
+    {
+      "naam": "ov-instap",
+      "wat": "het instappunt van een OV-rit",
+      "bestanden": [
+        "server/kern/ov/index.js"
+      ],
+      "collectie": "ovRitten",
+      "sleutel": "sessiesleutel",
+      "van": "lid",
+      "termijn": {
+        "soort": "geen"
+      },
+      "vergeten": false,
+      "gedetecteerd": true,
+      "klasse": "onbegrensd",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "alleen een plafond op aantal (4000), geen termijn; samen met het uitstappunt een reishistorie per lid"
+    },
+    {
+      "naam": "ov-uitstap",
+      "wat": "de eigen GPS bij uitchecken, gebruikt voor het tarief",
+      "bestanden": [
+        "server/kern/ov/reizen.js"
+      ],
+      "collectie": "ovRitten",
+      "sleutel": "sessiesleutel",
+      "van": "lid",
+      "termijn": {
+        "soort": "geen"
+      },
+      "vergeten": false,
+      "gedetecteerd": true,
+      "klasse": "onbegrensd",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "voor het tarief is een afstand nodig en geen punt; het punt blijft zonder termijn staan"
+    },
+    {
+      "naam": "ov-voertuig",
+      "wat": "de PDA-positie van een OV-chauffeur tijdens de dienst",
+      "bestanden": [
+        "server/kern/ov/dienst.js"
+      ],
+      "collectie": "ovVoertuigen",
+      "sleutel": "staffId",
+      "van": "medewerker",
+      "termijn": {
+        "soort": "venster",
+        "bestand": "server/kern/ov/dienst.js"
+      },
+      "vergeten": null,
+      "gedetecteerd": true,
+      "klasse": "venster",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "overschreven en niet opgestapeld, en weg zodra de dienst stopt"
+    },
+    {
+      "naam": "patrouille",
+      "wat": "de positie van een bewaker bij elk controlepunt",
+      "bestanden": [
+        "server/kern/beveiliging/pda/patrouille.js"
+      ],
+      "collectie": "bevRondes",
+      "sleutel": "staffId",
+      "van": "medewerker",
+      "termijn": {
+        "soort": "geen"
+      },
+      "vergeten": null,
+      "gedetecteerd": true,
+      "klasse": "onbegrensd",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "een bewegingsgeschiedenis van een medewerker met alleen een plafond op aantal; hetzelfde bestand haalde de coordinaat bij het inklokken juist weg als \"geen plaats zonder doel\""
+    },
+    {
+      "naam": "beveiliging-incident",
+      "wat": "de plek van een incident en van een SOS van een bewaker",
+      "bestanden": [
+        "server/kern/beveiliging/pda/index.js"
+      ],
+      "collectie": "bevIncidenten",
+      "sleutel": "staffId",
+      "van": "medewerker",
+      "termijn": {
+        "soort": "geen"
+      },
+      "vergeten": null,
+      "gedetecteerd": true,
+      "klasse": "onbegrensd",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "een incidentdossier heeft een reden om te bestaan, maar geen termijn; de SOS-positie blijft na afsluiten staan"
+    },
+    {
+      "naam": "veilig-laatste-plek",
+      "wat": "de laatst bekende positie voor de veiligheidskring",
+      "bestanden": [
+        "server/kern/veiligheid/plek.js"
+      ],
+      "collectie": "veilig",
+      "sleutel": "handle",
+      "van": "lid",
+      "termijn": {
+        "soort": "geen"
+      },
+      "vergeten": false,
+      "gedetecteerd": true,
+      "klasse": "onbegrensd",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "PLAATS.md grens 1 laat na een venster hoogstens de laatste plek toe -- maar hier wordt hij ook zonder open venster bewaard, en nooit weggehaald; de veiligheidslaag zegt zelf dat het bewaarbeleid haar niet kent"
+    },
+    {
+      "naam": "veilig-spoor",
+      "wat": "het korte spoor (max. twaalf punten) tijdens een open veiligheidsvenster",
+      "bestanden": [
+        "server/kern/veiligheid/plek.js"
+      ],
+      "collectie": "veilig",
+      "sleutel": "handle",
+      "van": "lid",
+      "termijn": {
+        "soort": "venster",
+        "bestand": "server/kern/veiligheid/plek.js"
+      },
+      "vergeten": false,
+      "gedetecteerd": true,
+      "klasse": "venster",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "weg bij het sluiten van het venster; een VERLOPEN venster wordt alleen niet vanzelf gesloten"
+    },
+    {
+      "naam": "veilig-alarm",
+      "wat": "de laatste positie die bij elk alarm wordt meegeschreven",
+      "bestanden": [
+        "server/kern/veiligheid/alarm.js"
+      ],
+      "collectie": "veilig",
+      "sleutel": "handle",
+      "van": "lid",
+      "termijn": {
+        "soort": "geen"
+      },
+      "vergeten": false,
+      "gedetecteerd": false,
+      "klasse": "onbegrensd",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "blijft na afsluiten staan, ook bij een proefalarm; alleen een plafond van tweehonderd alarmen"
+    },
+    {
+      "naam": "ontmoet-radar",
+      "wat": "de laatste positie voor de radar van Salon-ontmoetingen",
+      "bestanden": [
+        "server/kern/ontmoeting.js"
+      ],
+      "collectie": "ontmoetPosities",
+      "sleutel": "sessiesleutel",
+      "van": "lid",
+      "termijn": {
+        "soort": "module",
+        "bestand": "server/kern/ontmoeting.js"
+      },
+      "vergeten": true,
+      "gedetecteerd": true,
+      "klasse": "teLang",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "zes minuten telt hij als vers, maar dat wordt alleen bij het LEZEN gewogen; hij blijft staan tot het lid de functie uitzet of vergeten wordt"
+    },
+    {
+      "naam": "date-positie",
+      "wat": "de live-positie van beide deelnemers tijdens een date",
+      "bestanden": [
+        "server/kern/ontmoeting/date.js"
+      ],
+      "collectie": "ontmoetDates",
+      "sleutel": "sessiesleutel",
+      "van": "lid",
+      "termijn": {
+        "soort": "venster",
+        "bestand": "server/kern/ontmoeting/date.js"
+      },
+      "vergeten": false,
+      "gedetecteerd": true,
+      "klasse": "venster",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "weg bij het stoppen van de date, tenzij er een SOS openstaat"
+    },
+    {
+      "naam": "date-sos",
+      "wat": "de positie bij een noodknop tijdens een date",
+      "bestanden": [
+        "server/kern/ontmoeting/sos.js"
+      ],
+      "collectie": "ontmoetDates",
+      "sleutel": "sessiesleutel",
+      "van": "lid",
+      "termijn": {
+        "soort": "geen"
+      },
+      "vergeten": false,
+      "gedetecteerd": true,
+      "klasse": "onbegrensd",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "blijft in het SOS-record staan nadat de SOS is afgehandeld en de date is gestopt"
+    },
+    {
+      "naam": "vonk-profiel",
+      "wat": "de positie in een datingprofiel, voor afstand bij het matchen",
+      "bestanden": [
+        "server/kern/vonk/index.js"
+      ],
+      "collectie": "vonk",
+      "sleutel": "sessiesleutel",
+      "van": "lid",
+      "termijn": {
+        "soort": "geen"
+      },
+      "vergeten": false,
+      "gedetecteerd": true,
+      "klasse": "onbegrensd",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "een precieze coordinaat zonder termijn en buiten de vergeetroute, terwijl matchen op afstand ook met een grovere plek kan"
+    },
+    {
+      "naam": "markt-overdracht",
+      "wat": "de GPS van koper en verkoper bij de overdracht",
+      "bestanden": [
+        "server/kern/markt/handel/deal.js"
+      ],
+      "collectie": "markt",
+      "sleutel": "partij",
+      "van": "lid",
+      "termijn": {
+        "soort": "geen"
+      },
+      "vergeten": null,
+      "gedetecteerd": true,
+      "klasse": "onbegrensd",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "bewijst dat beide partijen samen waren; daarvoor volstaat de uitkomst (samen ja/nee en de afstand), de punten blijven onbeperkt op de chat"
+    },
+    {
+      "naam": "koerier-mode",
+      "wat": "de laatste positie van een koerier van een modebezorging",
+      "bestanden": [
+        "server/kern/modebezorg/koerier.js"
+      ],
+      "collectie": "modeBezorg",
+      "sleutel": "staffId",
+      "van": "medewerker",
+      "termijn": {
+        "soort": "geen"
+      },
+      "vergeten": null,
+      "gedetecteerd": true,
+      "klasse": "onbegrensd",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "het commentaar zegt \"vluchtig\", maar de positie blijft na de levering op het record staan"
+    },
+    {
+      "naam": "koerier-bezorgdienst",
+      "wat": "de positie van een bezorger van de bezorgdienst",
+      "bestanden": [
+        "server/routes/supplier/bezorg.js"
+      ],
+      "collectie": "bezorgers",
+      "sleutel": "staffId",
+      "van": "medewerker",
+      "termijn": {
+        "soort": "venster",
+        "bestand": "server/routes/supplier/bezorg-keten.js"
+      },
+      "vergeten": null,
+      "gedetecteerd": true,
+      "klasse": "venster",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "weg als de bezorger terug is; hij heet vluchtig maar gaat met de volgende save() wel naar schijf"
+    },
+    {
+      "naam": "zaak-live-locatie",
+      "wat": "de \"live locatie\" van een vervoerder, die de vaste plek van de zaak overschrijft",
+      "bestanden": [
+        "server/routes/supplier/vervoer.js"
+      ],
+      "collectie": "suppliers",
+      "sleutel": "zaakcode",
+      "van": "onbekend",
+      "termijn": {
+        "soort": "geen"
+      },
+      "vergeten": null,
+      "gedetecteerd": true,
+      "klasse": "onbekend",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": "of dit een voertuig of een mens is, kan deze meter niet vaststellen: bij een eenmanschauffeur is het een persoon, en die positie wordt als PLAATS aan elk lid getoond (P-01: een mens is geen plaats)",
+      "waarom": "zie de reden; het is een besluit welke van de twee het is"
+    },
+    {
+      "naam": "excursie-leerling",
+      "wat": "de positie van een leerling tijdens een schoolexcursie, met toestemming van een ouder",
+      "bestanden": [
+        "server/school/excursie.js"
+      ],
+      "collectie": "foundation",
+      "sleutel": "leerling",
+      "van": "kind",
+      "termijn": {
+        "soort": "venster",
+        "bestand": "server/school/excursie.js"
+      },
+      "vergeten": null,
+      "gedetecteerd": true,
+      "klasse": "venster",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "weg bij het stoppen van de excursie en direct weg bij het intrekken van de toestemming"
+    },
+    {
+      "naam": "excursie-begeleider",
+      "wat": "de positie van een begeleider tijdens een schoolexcursie",
+      "bestanden": [
+        "server/school/excursie.js"
+      ],
+      "collectie": "foundation",
+      "sleutel": "naam",
+      "van": "medewerker",
+      "termijn": {
+        "soort": "venster",
+        "bestand": "server/school/excursie.js"
+      },
+      "vergeten": null,
+      "gedetecteerd": true,
+      "klasse": "venster",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "weg bij het stoppen van de excursie"
+    },
+    {
+      "naam": "huur-delen",
+      "wat": "de positie die een huurder vrijwillig deelt",
+      "bestanden": [
+        "server/routes/member/voertuigen/huur.js"
+      ],
+      "collectie": "huurLocaties",
+      "sleutel": "boeking",
+      "van": "lid",
+      "termijn": {
+        "soort": "venster",
+        "bestand": "server/routes/member/voertuigen/huur.js"
+      },
+      "vergeten": null,
+      "gedetecteerd": false,
+      "klasse": "venster",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "weg bij uitzetten en bij het inleveren van het voertuig"
+    },
+    {
+      "naam": "charter-delen",
+      "wat": "de positie die een chartergast vrijwillig deelt",
+      "bestanden": [
+        "server/routes/member/voertuigen/charter.js"
+      ],
+      "collectie": "charterLocaties",
+      "sleutel": "boeking",
+      "van": "lid",
+      "termijn": {
+        "soort": "venster",
+        "bestand": "server/routes/member/voertuigen/charter.js"
+      },
+      "vergeten": null,
+      "gedetecteerd": false,
+      "klasse": "venster",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "weg bij uitzetten en bij afronden; een geweigerde charter laat de rij wel staan"
+    },
+    {
+      "naam": "huur-sos",
+      "wat": "de positie bij een SOS van een huurder",
+      "bestanden": [
+        "server/routes/member/voertuigen/huur.js"
+      ],
+      "collectie": "boekingen",
+      "sleutel": "boeking",
+      "van": "lid",
+      "termijn": {
+        "soort": "geen"
+      },
+      "vergeten": null,
+      "gedetecteerd": false,
+      "klasse": "onbegrensd",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "blijft zonder termijn op de boeking staan"
+    },
+    {
+      "naam": "charter-sos",
+      "wat": "de positie bij een SOS op zee",
+      "bestanden": [
+        "server/routes/member/voertuigen/charter.js"
+      ],
+      "collectie": "boekingen",
+      "sleutel": "boeking",
+      "van": "lid",
+      "termijn": {
+        "soort": "geen"
+      },
+      "vergeten": null,
+      "gedetecteerd": false,
+      "klasse": "onbegrensd",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "blijft zonder termijn op de boeking staan"
+    },
+    {
+      "naam": "flits-melding",
+      "wat": "een verkeersmelding: de plek waar het lid was, met zijn codenaam",
+      "bestanden": [
+        "server/kern/flits.js"
+      ],
+      "collectie": "flitsMeldingen",
+      "sleutel": "codenaam",
+      "van": "lid",
+      "termijn": {
+        "soort": "module",
+        "bestand": "server/kern/flits.js"
+      },
+      "vergeten": false,
+      "gedetecteerd": true,
+      "klasse": "noodzakelijk",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "een bewust gedane melding met een levensduur van 45 minuten tot een dag; de codenaam en de sleutels van wie bevestigt reizen mee, en de vergeetroute kent de collectie niet"
+    },
+    {
+      "naam": "plaats-passages",
+      "wat": "elke overgang langs een hek tijdens een naderingsvenster, onder een codenaam",
+      "bestanden": [
+        "server/kern/plaats/waarnemen.js"
+      ],
+      "collectie": "plaatsLog",
+      "sleutel": "codenaam",
+      "van": "lid",
+      "termijn": {
+        "soort": "beleid",
+        "dagen": 90,
+        "tekst": "90",
+        "bestand": "server/bewaarbeleid-operationeel.js"
+      },
+      "vergeten": false,
+      "gedetecteerd": false,
+      "klasse": "verboden",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "geen coordinaat, wel een reeks zaken met tijden onder een codenaam -- een mens-plaatsgraaf; botst met P-05 en N1 ongeacht de termijn (NAVIGATIE.md par. 6.2, besluit B8)"
+    },
+    {
+      "naam": "plaats-waarnemingen",
+      "wat": "binnen/buiten per hek binnen een venster",
+      "bestanden": [
+        "server/kern/plaats/waarnemen.js"
+      ],
+      "collectie": "plaatsWaarnemingen",
+      "sleutel": "codenaam",
+      "van": "lid",
+      "termijn": {
+        "soort": "beleid",
+        "dagen": 2,
+        "tekst": "2",
+        "bestand": "server/bewaarbeleid-operationeel.js"
+      },
+      "vergeten": false,
+      "gedetecteerd": false,
+      "klasse": "venster",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "weg met het venster en hooguit twee dagen in het bewaarbeleid"
+    },
+    {
+      "naam": "gemeente-melding",
+      "wat": "de plek van een melding openbare ruimte, vaak de GPS van de melder",
+      "bestanden": [
+        "server/kern/gemeente/meldingen.js"
+      ],
+      "collectie": "gemeenteMeldingen",
+      "sleutel": "codenaam",
+      "van": "lid",
+      "termijn": {
+        "soort": "geen"
+      },
+      "vergeten": false,
+      "gedetecteerd": true,
+      "klasse": "onbegrensd",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "de plek hoort bij het probleem, maar staat met de codenaam van de melder zonder termijn (alleen een plafond); de kopie in weefselZaken heeft wel een termijn"
+    },
+    {
+      "naam": "weefsel-zaak",
+      "wat": "de plek van een zaak openbare ruimte, met de melder erbij",
+      "bestanden": [
+        "server/kern/stadsweefsel/zaken.js"
+      ],
+      "collectie": "weefselZaken",
+      "sleutel": "codenaam",
+      "van": "lid",
+      "termijn": {
+        "soort": "beleid",
+        "dagen": null,
+        "tekst": "3 * JAAR / DAG",
+        "bestand": "server/bewaarbeleid-operationeel.js"
+      },
+      "vergeten": false,
+      "gedetecteerd": true,
+      "klasse": "noodzakelijk",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "een zaakdossier met een termijn in het bewaarbeleid; of drie jaar de melder moet dragen, is een aparte vraag"
+    },
+    {
+      "naam": "horeca-bezorgadres",
+      "wat": "het bezorgadres (vaak het woonadres) als punt op de rekening van een gast",
+      "bestanden": [
+        "server/kern/gast/buitenshuis.js",
+        "server/routes/gast/bezorgen.js"
+      ],
+      "collectie": "horeca",
+      "sleutel": "codenaam",
+      "van": "lid",
+      "termijn": {
+        "soort": "geen"
+      },
+      "vergeten": false,
+      "gedetecteerd": true,
+      "klasse": "onbegrensd",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "codenaam plus bezorgadres zonder termijn is precies wat scripts/afleidbaar.js als besluit aanwees"
+    },
+    {
+      "naam": "bezorgdienst-adres",
+      "wat": "het bezorgadres als punt op een bestelling",
+      "bestanden": [
+        "server/routes/member/kopen/bezorg.js"
+      ],
+      "collectie": "orders",
+      "sleutel": "sessiesleutel",
+      "van": "lid",
+      "termijn": {
+        "soort": "geen"
+      },
+      "vergeten": false,
+      "gedetecteerd": true,
+      "klasse": "onbegrensd",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "nodig voor de levering, niet daarna; geen termijn"
+    },
+    {
+      "naam": "mode-adres",
+      "wat": "de bestemming van een modebezorging, of een verzonnen punt als er geen is",
+      "bestanden": [
+        "server/kern/modebezorg/winkel.js",
+        "server/routes/member/handel/winkel.js"
+      ],
+      "collectie": "modeBezorg",
+      "sleutel": "sessiesleutel",
+      "van": "lid",
+      "termijn": {
+        "soort": "geen"
+      },
+      "vergeten": false,
+      "gedetecteerd": true,
+      "klasse": "onbegrensd",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "geen termijn, alleen een plafond; en zonder punt wordt er een verzonnen (NAVIGATIE.md par. 12, gebrek 5)"
+    }
+  ]
+}

@@ -4,7 +4,7 @@
 const { coord, coordPaar } = require('../../kern/util');
 module.exports = (kern) => {
   const { app, auth, db, save, findSupplier, notifySupplier, notify, pushLive,
-    liveStateFor, liveCodename, haversine, vraagRitVoor, betaalRitVoor, ledenInhoudVan } = kern;
+    liveStateFor, liveCodename, haversine, vraagRitVoor, betaalRitVoor } = kern;
 
   app.post('/api/live/start', auth, (req, res) => {
     if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
@@ -12,13 +12,13 @@ module.exports = (kern) => {
     const destCode = req.body.destCode ? String(req.body.destCode).trim().toUpperCase() : null;
     const dest = destCode ? findSupplier(destCode) : null;
     const mode = ['walking', 'driving', 'flying'].includes(req.body.mode) ? req.body.mode : 'driving';
-    // Startpositie: meegegeven, anders het hotel op de bestemming, anders vlakbij de bestemming.
-    let start = coordPaar(req.body.lat, req.body.lng);
-    // het hotel op de bestemming van de EIGEN reis (stond op db.data.trip: de
-    // demo-bestemming, en dat viel om zodra een lid geen demo-reis meer erft)
-    const eigenReis = (ledenInhoudVan ? (ledenInhoudVan(key) || {}) : {}).trip || null;
-    if (!start && eigenReis) { const hotel = db.data.suppliers.find(s => s.type === 'hotel' && s.city === eigenReis.dest); if (hotel && hotel.loc) start = { lat: hotel.loc.lat, lng: hotel.loc.lng }; }
-    if (!start && dest && dest.loc) start = { lat: dest.loc.lat + 0.012, lng: dest.loc.lng - 0.014 };
+    /* Startpositie: alleen wat het lid zelf meestuurt. Hier stond een terugval
+       op het hotel van de eigen reis en daarna op de bestemming plus een vaste
+       verschuiving -- een VERZONNEN positie van een mens, die daarna als zijn
+       live-positie werd gebruikt voor afstand, aankomsttijd en de zaak
+       (NAVIGATIE.md par. 12, gebrek 11). Geen positie is geen positie; de
+       eerste echte komt binnen via /api/live/update. */
+    const start = coordPaar(req.body.lat, req.body.lng);
     db.data.live[key] = {
       key, tier: req.session.tier, codename: liveCodename(req.session),
       active: true, mode, destCode,

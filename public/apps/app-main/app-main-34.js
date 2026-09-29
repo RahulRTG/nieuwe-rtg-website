@@ -25,9 +25,21 @@
     }));
   }
 
+  /* De positie komt van het toestel en nergens anders vandaan: de server vult
+     hem niet meer zelf in (NAVIGATIE.md par. 12, gebrek 11). Weigert het lid of
+     is er geen locatie, dan start Onderweg gewoon zonder -- het paneel zegt dat
+     hardop en de knop "Deel mijn locatie" blijft vooraan staan. */
+  function huidigePositie(){
+    return new Promise(res => {
+      if (!navigator.geolocation) return res(null);
+      navigator.geolocation.getCurrentPosition(p => res({ lat: p.coords.latitude, lng: p.coords.longitude }),
+        () => res(null), { maximumAge: 15000, timeout: 4000 });
+    });
+  }
   async function startLive(){
     const destCode = $('#liveDest').value;
-    try { liveData = (await API.call('/live/start', { destCode, mode: liveMode })).live; toast(T('live.started','U bent onderweg. Uw partners zijn op de hoogte.')); renderLivePanel(); }
+    const hier = await huidigePositie();
+    try { liveData = (await API.call('/live/start', Object.assign({ destCode, mode: liveMode }, hier || {}))).live; toast(T('live.started','U bent onderweg. Uw partners zijn op de hoogte.')); renderLivePanel(); }
     catch (e){ toast(e.message); }
   }
 
@@ -49,6 +61,7 @@
     if (L.arrived && dest){ head = T('live.arrivedh','U bent <em>gearriveerd</em>'); sub = dest.name; }
     else if (dest){ head = T('live.headingto','Onderweg naar') + ' <em>' + dest.name + '</em>'; sub = dest.etaMin != null ? T('live.aankomst','aankomst over ~') + dest.etaMin + ' ' + T('live.min','min') : ''; }
     else { head = T('live.moving','U bent <em>onderweg</em>'); }
+    if (L.positie && !L.arrived) sub = (sub ? sub + ' · ' : '') + T('live.geenpositie','uw positie is niet gedeeld');
 
     const pts = [];
     if (L.me) pts.push({ lat: L.me.lat, lng: L.me.lng, me: true });

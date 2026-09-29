@@ -3,7 +3,7 @@
     "op": "2026-09-29T15:18:32.915Z",
     "commit": "7967edbc",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 3,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -14799,6 +14799,14 @@
       "module": "server/kern/stuur/staving.js",
       "operator": "===->!==#0",
       "gezakt": 8,
+      "geprobeerd": 1
+    },
+    "positieproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/positieproef.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
       "geprobeerd": 1
     }
   }

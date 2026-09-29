@@ -78,7 +78,11 @@ function maakLive({ db, bus, nextSseId, PERSONAS, sseToSupplier, sseToOffice, fi
       };
     }).filter(Boolean);
     const destCode = L && L.destCode ? L.destCode : null;
-    return { active, mode, me, arrived: !!(L && L.arrived), destCode, dest: destCode ? (partners.find(p => p.code === destCode) || null) : null, partners };
+    /* Een lege positie draagt haar reden (NAVIGATIE.md par. 12, gebrek 11). De
+       server vult hem niet zelf in: geen hotel, geen punt naast de bestemming.
+       Het scherm kan dan vragen in plaats van een verzonnen stip te tonen. */
+    const positie = active && !me ? 'Uw positie is niet gedeeld; RTG vult hem niet zelf in.' : null;
+    return { active, mode, me, positie, arrived: !!(L && L.arrived), destCode, dest: destCode ? (partners.find(p => p.code === destCode) || null) : null, partners };
   }
 
   // Reizende leden die op dit moment met deze partner te maken hebben (voor de leverancier-app).

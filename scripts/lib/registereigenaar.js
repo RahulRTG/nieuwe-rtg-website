@@ -109,6 +109,8 @@ const EIGENAAR = {
     waarom: 'Handmatig geschreven ontwerpstandaard (de ene desktopindeling); scripts/desktop-audit.js meet de schermen ertegen, er is geen generator die het schrijft.' },
   'BEWIJSLUS.md': { soort: 'BRON',
     waarom: 'Handmatig geschreven richtingsdocument (de terugweg van productie naar bewijs); de namen en bronverwijzingen erin zijn met de hand gemeten, er is geen generator die het schrijft.' },
+  'NAVIGATIE.md': { soort: 'BRON',
+    waarom: 'Handmatig geschreven richtingsdocument (de plaats-these boven PLAATS.md en KAARTEN.md); de bronverwijzingen en de nulmeting van par. 6.2 zijn met de hand in de code gelezen, er is geen generator die het schrijft.' },
   /* De nulmeting van de universele bodem (SAMENLEVING.md par. 11). De meting is
      afgeleid; de indeling van functies in werkwoorden is een VERKLARING in
      scripts/lib/onvervreemdbaar-verklaring.js en nog door geen mens afgetekend. */
@@ -276,6 +278,15 @@ const EIGENAAR = {
       'mechanismen halen de vier spoor-eigenschappen die kern/vertegenwoordiging/handelen.js ' +
       'definieert? Geschreven met --vastleggen, gelezen door test/spoorvorm.test.js en ' +
       'scripts/norm.js (de ratel spoorConvergent, die alleen omhoog mag).' },
+  'POSITIESTROOM.json': { schrijver: 'scripts/positiestroom.js',
+    waarom: 'de bron-helft van de grondwetmeter uit NAVIGATIE.md par. 6.4: waar de positie van een mens ' +
+      'blijft staan, aan welke sleutel en met welke termijn. Geschreven met --vastleggen, gelezen door ' +
+      'test/positiestroom.test.js en scripts/norm.js (positieZonderTermijn en positieNietVergeten omlaag, ' +
+      'positieStromenGezien omhoog).' },
+  'POSITIEPROEF.json': { schrijver: 'scripts/positieproef.js',
+    waarom: 'de opslag-helft van de grondwetmeter uit NAVIGATIE.md par. 6.6: een echte doorloop met ' +
+      'herkenbare coordinaten en daarna de hele opslag gelezen. Bewaakt door test/positieproef.test.js en ' +
+      'scripts/norm.js (positieNavBlijft, positieNaTaak, positiePassages en aankomstUitPositie omlaag).' },
   /* DE ONDERNEMERSLUS. Hij staat hier omdat toets 4 dat zo bedoelt: het aantal
      registers zonder eigenaar hoort te dalen doordat er eigenaren bijkomen, en
      niet te stijgen doordat er registers bijkomen. Een nieuw register zonder

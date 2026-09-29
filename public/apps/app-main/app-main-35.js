@@ -70,7 +70,8 @@
   function stopSim(){ if (simTimer){ clearInterval(simTimer); simTimer = null; } }
   function simulateRide(){
     const L = liveData;
-    if (!L || !L.me || !L.dest || !L.dest.loc){ toast(T('live.nosim','Kies eerst een bestemming.')); return; }
+    if (!L || !L.dest || !L.dest.loc){ toast(T('live.nosim','Kies eerst een bestemming.')); return; }
+    if (!L.me){ toast(T('live.nosimpos','Deel eerst uw locatie; een simulatie begint bij waar u echt bent.')); return; }
     stopSim();
     const start = { lat: L.me.lat, lng: L.me.lng };
     const end = { lat: L.dest.loc.lat, lng: L.dest.loc.lng };

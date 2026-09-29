@@ -925,7 +925,7 @@
       },
       "bewijs": {
         "toon": "lijst",
-        "reserveer": "inhoudswoorden",
+        "reserveer": "inhoudVan",
         "bevestig": "stuurBevestig",
         "annuleer": "intrek"
       },

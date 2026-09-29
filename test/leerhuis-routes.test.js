@@ -20,6 +20,7 @@
        tegengehouden (haal de meelezer uit opzet/kantoordeur.js)   -> toets 7
      - besluit B2: de bron-eis bij het openen weg                 -> toets 8
      - de cockpits op codenaam (laat metNamen de naam weg)        -> toets 10
+     - het werkscherm: assessor- en kenniswerk alleen met de rol   -> toets 11
        (en de leesroute las eerst zijn eigen kopie van de relatie; toets 8
        vond dat wie uit dienst was, nog meelas)
 
@@ -225,4 +226,21 @@ test('10. fase B-UI: de cockpits noemen mensen op codenaam, en wie geen trainer 
   const t = await lees(E, 'trainerCockpit');
   assert.equal(t.status, 200);
   assert.equal(t.body.antwoord.ok, false, 'E is geen trainer, dus het scherm toont dat vak niet');
+});
+
+test('11. fase B-UI werkscherm: het werk van assessor en kenniseigenaar komt over de deur, alleen voor wie de rol heeft', async () => {
+  /* N is sinds toets 4 assessor en sinds toets 9 curriculumeigenaar die het startpakket laadde. */
+  const a = await lees(N, 'assessorWerk');
+  assert.equal(a.status, 200, JSON.stringify(a.body));
+  assert.equal(a.body.antwoord.ok, true);
+  assert.ok(Array.isArray(a.body.antwoord.OPEN) && Array.isArray(a.body.antwoord.LOPEND));
+  assert.equal((await lees(E, 'assessorWerk')).body.antwoord.ok, false, 'de eigenaar is geen assessor en ziet dus geen beoordelingen');
+  assert.equal((await lees(N, 'kennisWerk')).body.antwoord.ok, false, 'nog geen kenniseigenaar');
+  assert.equal((await doe(E, 'bestuurZet', { persoon: 'lid:' + nId, rol: 'KNOWLEDGE_OWNER' }, 'best-ko')).status, 200);
+  const k = await lees(N, 'kennisWerk');
+  const c = k.body.antwoord.CONCEPTEN.find(x => x.id === 'pakket-kennis-codenamen');
+  assert.ok(c, 'het concept uit het startpakket wacht op een kenniseigenaar');
+  assert.equal(c.bronNodig, true, 'een startpakketconcept vraagt de eigen bron');
+  assert.equal(c.eigen, true, 'N laadde het zelf, dus een ander activeert het');
+  assert.equal((await lees(X, 'kennisWerk')).body.antwoord.ok, false, 'een vrijwilliger zonder rol ziet geen concepten');
 });

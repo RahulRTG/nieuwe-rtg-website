@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-28T14:43:41.485Z",
-    "commit": "0e5958e0",
+    "op": "2026-09-29T15:18:32.915Z",
+    "commit": "7967edbc",
     "boomVuil": false,
     "boomAnders": 11,
     "instrument": "scripts/mutatie.js",
@@ -14776,6 +14776,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "leerhuis-werk.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     }
   }

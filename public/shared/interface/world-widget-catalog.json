@@ -3209,6 +3209,24 @@
       "maturity": "L0"
     },
     {
+      "id": "leerhuis-werk",
+      "url": "/apps/leerhuis-werk.html",
+      "name": "Leerhuis: aan het werk",
+      "world": "work",
+      "worlds": [
+        "work"
+      ],
+      "type": "workspace",
+      "icon": "grid",
+      "sections": [
+        "Welk leerhuis",
+        "Als trainer",
+        "Als assessor"
+      ],
+      "description": "",
+      "maturity": "L0"
+    },
+    {
       "id": "leerhuis",
       "url": "/apps/leerhuis.html",
       "name": "Mijn leerhuis",

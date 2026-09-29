@@ -1447,6 +1447,7 @@
       "navStatus"
     ],
     "neiging": [
+      "idGeverifieerd",
       "neiging"
     ],
     "noodkaart": [
@@ -2011,6 +2012,7 @@
       "logInlog"
     ],
     "stad": [
+      "idGeverifieerd",
       "stad",
       "weefsel"
     ],

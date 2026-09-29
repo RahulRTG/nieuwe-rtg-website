@@ -131,7 +131,7 @@ module.exports = ({ opdrachtMaak, opdrachtMet, opdrachtNaar, keten }) => {
         : (magZonderDoel ? { onbekend: true } : null));
     if (!naar) return { error: NIET_OVERBRUGD['bestemming-als-tekst'] };
     const van = (vanaf && Number.isFinite(vanaf.lat))
-      ? { lat: vanaf.lat, lng: vanaf.lng, label: vanaf.label || 'Vertrekpunt' }
+      ? { lat: vanaf.lat, lng: vanaf.lng, label: vanaf.label || ride.from || 'Vertrekpunt' }
       : { hier: true };
     return {
       lijf: {

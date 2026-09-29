@@ -40,6 +40,9 @@ async function main() {
           row.http = response.status();
           await page.waitForSelector('body[data-rtg-desktop-state="ready"],body[data-public-platform]', { timeout: 12000 });
           row.contentReadyMs = Date.now() - started;
+          if (route === '/apps/reisuitnodiging.html') {
+            await require('./lib/desktop-guest')(page, row, errors);
+          } else {
           await page.waitForSelector('.rtg-adaptive-bar', { timeout: 12000 });
           row.edgeReadyMs = Date.now() - started;
           await page.waitForFunction(() => { const photos = [...document.querySelectorAll('.wp-atmosphere img,.wp-photo>img')]; return photos.length && photos.every(img => img.complete && img.naturalWidth > 0); }, null, { timeout: 12000 });
@@ -85,6 +88,7 @@ async function main() {
           if (!s.public) for (const region of s.paletteRegions) {
             const expected = region.selector === '.rtg-adaptive-bar' ? cards[s.world] : palettes[s.world];
             if (region.background !== expected) row.failures.push('nonstandard-inner-palette:'+region.selector);
+          }
           }
         } catch (e) { row.failures = [e.message.split('\n')[0]]; }
         row.errors = errors;

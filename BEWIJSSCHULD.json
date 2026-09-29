@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-29T16:14:16.936Z",
-  "commit": "c5710a94c",
+  "op": "2026-09-29T17:03:39.461Z",
+  "commit": "616ecf99d",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/bewijsschuld.js",
@@ -13,7 +13,7 @@
   "posten": 18,
   "meetwerk": 2398,
   "instrument": 323,
-  "grens": 676
+  "grens": 686
  },
  "aflossing": {
   "doel": 0,
@@ -29,24 +29,24 @@
  "gemeten": {
   "postenTotaal": 18,
   "achterstand": 2721,
-  "randVanDeMethode": 676,
+  "randVanDeMethode": 686,
   "auth-onbeslist": 1,
-  "capability-in-handler": 558,
+  "capability-in-handler": 560,
   "objectpoort": 52,
   "output-deuren": 20,
-  "lichaamssleutel": 94,
+  "lichaamssleutel": 102,
   "output-niet-toerekenbaar": 579,
   "output-blind": 0,
   "output-onwaarneembaar": 4,
   "audit-wisselend": null,
   "audit-verklaard": null,
-  "rollback-gezakt": 0,
+  "rollback-gezakt": 2,
   "object-vooraf": 323,
   "proefruis": 1,
   "gevolg-onbekend": 96,
   "droogloop-onbeoordeeld": 2,
   "herstel-onbevestigd": 49,
-  "idem-ongeclassificeerd": 1615,
+  "idem-ongeclassificeerd": 1613,
   "wegwerpserver-kopieen": 3
  },
  "posten": [
@@ -62,7 +62,7 @@
    "id": "capability-in-handler",
    "soort": "grens",
    "wat": "routes zonder bewakerslaag: de controle zit IN de handler (een capability-token)",
-   "aantal": 558,
+   "aantal": 560,
    "waarom": "de rolproef kruist ROLLEN. Deze routes kennen geen rol -- ze eisen een token dat je alleen hebt als je het hebt gekregen (de schoolborden van foundation, rtf/social). Rollen kruisen is hier niet moeilijk maar zinloos.",
    "sluit": "niets in deze proef. Een eigen proef op capability-tokens zou de goede vraag stellen; die bestaat niet en is een project, geen achterstand."
   },
@@ -86,7 +86,7 @@
    "id": "lichaamssleutel",
    "soort": "grens",
    "wat": "routes waarvan de sleutel een VELD IN HET VERZOEK is, geen token in de kop",
-   "aantal": 94,
+   "aantal": 102,
    "waarom": "gastAuth leest req.body.sleutel, gezinsPoort en rtfPoort lezen code+token uit het lichaam. Een member-, supplier- of officetoken is voor zo n deur niet fout maar IRRELEVANT: hij kijkt er niet naar. Alle drie krijgen dezelfde 401.",
    "sluit": "niets in deze proef; die 401 als bewijs tellen zou dezelfde fout zijn die de AUTH-as al 294 cellen kostte. Een proef op sessiesleutels is een andere vraag."
   },
@@ -134,7 +134,7 @@
    "id": "rollback-gezakt",
    "soort": "meetwerk",
    "wat": "routes die weigeren en toch de toestand veranderen",
-   "aantal": 0,
+   "aantal": 2,
    "waarom": "de meeste zijn /api/rtfos/* met securityLog en sessions -- vermoedelijk de auth-laag die een geweigerde poging vastlegt, en dus mogelijk ruis in de meting en geen lek. Maar EEN ervan verspringt per ronde van plek, en een bevinding die verhuist is zelf een bevinding over de meting.",
    "sluit": "per route nalopen wat er beweegt en waarom. Dit is de oudste post op deze lijst en de enige die naar een mogelijk defect wijst."
   },
@@ -182,7 +182,7 @@
    "id": "idem-ongeclassificeerd",
    "soort": "meetwerk",
    "wat": "muterende routes zonder uitspraak over herhalen: wat gebeurt er bij een tweede keer",
-   "aantal": 1615,
+   "aantal": 1613,
    "waarom": "autonomie zonder herhaalsemantiek is niet te doen: een keten die halverwege afbreekt moet weten of opnieuw beginnen veilig is. Het doel is niet dat alles idempotent IS -- het is dat van elke route vastligt wat een tweede keer betekent.",
    "sluit": "per route beslissen en vastleggen. Het instrument staat (scripts/idemproef-route.js plus IDEMBESLUIT.json met zijn klassen); dit is meetwerk en handwerk."
   },
@@ -221,7 +221,7 @@
    },
    {
     "op": "2026-09-29",
-    "aantal": 558
+    "aantal": 560
    }
   ],
   "objectpoort": [
@@ -263,7 +263,7 @@
    },
    {
     "op": "2026-09-29",
-    "aantal": 94
+    "aantal": 102
    }
   ],
   "output-niet-toerekenbaar": [
@@ -347,7 +347,7 @@
    },
    {
     "op": "2026-09-29",
-    "aantal": 0
+    "aantal": 2
    }
   ],
   "object-vooraf": [
@@ -431,7 +431,7 @@
    },
    {
     "op": "2026-09-29",
-    "aantal": 1615
+    "aantal": 1613
    }
   ],
   "wegwerpserver-kopieen": [

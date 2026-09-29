@@ -131,6 +131,9 @@ const REGISTER = {
   'AICONTEXT.json': { meter: ['aiContextLek', 'aiContextVeldenGezien'] },
   /* Het stilspoorregister draagt twee schulden en een bereikmeter. */
   'STILSPOOR.json': { meter: ['stilSpoor', 'stilleOpslag', 'stilSpoorAanroepen'] },
+  /* De gast als twee mensen (SAMENLEVING.md stap 5): de tegenspraak omlaag, het
+     onderscheid omhoog. */
+  'GASTSPLITSING.json': { meter: ['gastTegenspraak', 'gastOnderscheidt'] },
   /* MAGNAATGRONDWET.json (npm run magnaat:grondwet -- --vastleggen) is de
      bevroren nulstand van de Magnaat-grondwet (MAGNAAT.md). De ratel woont in
      de toets en is vierledig: niet meer schendingen, niet minder PASS of

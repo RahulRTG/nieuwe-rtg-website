@@ -393,7 +393,9 @@
     var a = actor(), vloot = (staat.gegevens && staat.gegevens.vloot) || [];
     var inzetbaar = vloot.filter(function (v) { return v.inzetbaar; });
     if (!a) return inzetbaar[0] || null;
-    var eigen = inzetbaar.find(function (v) { return v.bestuurder && norm(v.bestuurder) === norm(a.name); });
+    // eerst de koppeling op teamlid (kern/mobiliteit/bestuurder.js), dan de oude naamvergelijking
+    var eigen = inzetbaar.find(function (v) { return a.staffId != null && v.bestuurderStaffId === Number(a.staffId); }) ||
+      inzetbaar.find(function (v) { return v.bestuurder && norm(v.bestuurder) === norm(a.name); });
     if (eigen) return eigen;
     return a.manager || !a.staffId ? (inzetbaar[0] || null) : null;
   }
@@ -408,10 +410,10 @@
       } else {
         var voertuig = eigenVoertuig();
         if (!voertuig) throw new Error('Er is geen inzetbaar voertuig aan uw chauffeursprofiel gekoppeld. Vraag de centrale om een voertuig toe te wijzen.');
-        await api('/api/supplier/mob/toewijzen', { ref: rit.ref, assetId: voertuig.id, bevestigd: true });
+        var toe = await api('/api/supplier/mob/toewijzen', { ref: rit.ref, assetId: voertuig.id, bevestigd: true });
         await laad();
       }
-      sluitDialoog($('#ritDialoog')); toast('Rit veilig aan u toegewezen.'); render();
+      sluitDialoog($('#ritDialoog')); toast((toe && toe.afwezigWaarschuwing) || 'Rit veilig aan u toegewezen.'); render();
     } catch (e) { toast(e.message); }
     finally { knop.disabled = false; knop.querySelector('span').textContent = 'NEEM RIT AAN'; }
   }

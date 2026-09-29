@@ -228,6 +228,7 @@
     const r = await api('dienst', { lijnId: $('#dLijn').value, voertuigNaam: $('#dNaam').value });
     if (r.body.error) return zeg(r.body.error);
     dienstLoopt(r.body.lijn.naam);
+    if (r.body.afwezigWaarschuwing) zeg(r.body.afwezigWaarschuwing);
   });
   $('#dStop').addEventListener('click', async () => {
     await api('dienst', { aan: false });

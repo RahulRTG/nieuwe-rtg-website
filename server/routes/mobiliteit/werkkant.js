@@ -17,7 +17,11 @@ module.exports = (kern, hulp) => {
 
   /* ---------------- de vervoerder en de dispatcher ---------------- */
   app.post('/api/supplier/mob/vloot', supplierAuth, (req, res) => {
-    stuur(res, assetLijst(req.supplier.code, { vervoerder: req.supplier.code }));
+    const r = assetLijst(req.supplier.code, { vervoerder: req.supplier.code });
+    // de manager kiest de bestuurder uit zijn eigen team (kern/mobiliteit/bestuurder.js)
+    if (r.ok && req.actor && req.actor.manager)
+      r.team = kern.accounts.listStaff(req.supplier.code).map(m => ({ id: m.id, name: m.name }));
+    stuur(res, r);
   });
   app.post('/api/supplier/mob/voertuig', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;

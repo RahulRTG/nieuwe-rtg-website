@@ -26,9 +26,19 @@
    rooster waarin dat kan, is geen rooster maar een verlanglijst -- en op de dag
    zelf staat er dan een bar zonder mensen terwijl het rooster groen is. */
 'use strict';
+const { maakInplanbaar } = require('../payroll/inplanbaar');
+
+/* VERZUIM (PLANNING.md par. 6). Een dienst KAN aan een teamlid van de zaak
+   hangen (`staffId`, gekozen uit het team dat de route meegeeft); dan leest het
+   rooster het verzuimregister. Een mens die toch inplant, mag dat -- maar krijgt
+   het erbij te zien, en het rooster zegt DAT iemand afwezig is, nooit waarom.
+   Een naam zonder teamlid (een vrijwilliger zonder account) blijft een naam: van
+   hem weet het register niets, en er wordt niet op naam geraden wie het is. */
+const WAARSCHUWING = ' staat die dag als afwezig gemeld. De dienst staat erin; herplan hem als dat nodig is.';
 
 module.exports = (ctx) => {
   const { save, crypto, schoon, editieVind, dagVind, offset, plekVind, plekPad } = ctx;
+  const inplanbaar = maakInplanbaar(require('../payroll/afwezig-laat')(ctx.kern || (() => null)));
 
   const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
 
@@ -46,7 +56,7 @@ module.exports = (ctx) => {
     return av < bt && bv < at;
   }
 
-  function dienstZet(fid, eid, data) {
+  function dienstZet(fid, eid, data, zaak) {
     const e = editieVind(fid, eid);
     if (!e) return { status: 404, error: 'Deze editie bestaat niet.' };
     const d = data || {};
@@ -54,7 +64,11 @@ module.exports = (ctx) => {
     if (!dag) return { status: 404, error: 'Deze dag staat niet in de editie.' };
     const plek = plekVind(e, d.plek);
     if (!plek) return { status: 404, error: 'Deze plek bestaat niet.' };
-    const wie = schoon(d.wie, 60);
+    const z = zaak || {};
+    const kies = d.staffId !== undefined && d.staffId !== null && d.staffId !== '';
+    const lid = kies ? (z.team || []).find(m => String(m.id) === String(d.staffId)) : null;
+    if (kies && !lid) return { status: 404, error: 'Dit teamlid bestaat niet bij uw zaak.' };
+    const wie = lid ? schoon(lid.name, 60) : schoon(d.wie, 60);
     if (!wie) return { status: 400, error: 'Wie draait deze dienst?' };
     if (!HHMM.test(String(d.van || '')) || !HHMM.test(String(d.tot || '')))
       return { status: 400, error: 'Geef begin en eind als uu:mm.' };
@@ -77,20 +91,22 @@ module.exports = (ctx) => {
       }
     }
 
-    const velden = { ...nieuw, rol: schoon(d.rol, 40) || null, briefing: schoon(d.briefing, 400) || null,
-      pauze: HHMM.test(String(d.pauze || '')) ? String(d.pauze) : null };
+    const velden = { ...nieuw, staffId: lid ? lid.id : null, rol: schoon(d.rol, 40) || null,
+      briefing: schoon(d.briefing, 400) || null, pauze: HHMM.test(String(d.pauze || '')) ? String(d.pauze) : null };
+    const ip = lid ? inplanbaar(z.code, lid.id, dag.datum) : { plan: true };
+    const extra = ip.plan ? {} : { afwezigWaarschuwing: wie + WAARSCHUWING };
     if (d.id) {
       const x = b[String(d.id)];
       if (!x) return { status: 404, error: 'Deze dienst bestaat niet.' };
       Object.assign(x, velden);
       save();
-      return { ok: true, dienst: x };
+      return { ok: true, dienst: x, ...extra };
     }
     if (Object.keys(b).length >= 20000) return { status: 400, error: 'Er staan te veel diensten op deze editie.' };
     const x = { id: 'dnst' + crypto.randomBytes(4).toString('hex'), ...velden };
     b[x.id] = x;
     save();
-    return { ok: true, dienst: x };
+    return { ok: true, dienst: x, ...extra };
   }
 
   function dienstWeg(fid, eid, id) {
@@ -104,12 +120,15 @@ module.exports = (ctx) => {
   }
 
   /* Alles op een dag, voor wie het rooster maakt. */
-  function dienstenVan(fid, eid, dagId) {
+  function dienstenVan(fid, eid, dagId, zaakCode) {
     const e = editieVind(fid, eid);
     if (!e) return { status: 404, error: 'Deze editie bestaat niet.' };
+    const dag = dagVind(e, dagId);
+    /* afgeleid bij het lezen en nergens opgeslagen: bij herstel staat hij vanzelf weer gewoon */
+    const weg = (x) => x.staffId != null && dag && !inplanbaar(zaakCode, x.staffId, dag.datum).plan;
     const uit = Object.values(e.diensten || {})
       .filter(x => x.dag === String(dagId || ''))
-      .map(x => ({ ...x, plekNaam: (plekVind(e, x.plek) || {}).naam || null }))
+      .map(x => ({ ...x, plekNaam: (plekVind(e, x.plek) || {}).naam || null, ...(weg(x) ? { afwezig: true } : {}) }))
       .sort((a, b) => a.van.localeCompare(b.van) || String(a.plekNaam).localeCompare(String(b.plekNaam)));
     return { ok: true, diensten: uit };
   }

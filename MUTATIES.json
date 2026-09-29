@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-28T20:48:58.210Z",
-    "commit": "82d1d2e50",
+    "op": "2026-09-29T08:05:59.459Z",
+    "commit": "eb8976f79",
     "boomVuil": false,
-    "boomAnders": 11,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -12004,6 +12004,14 @@
       "operator": "===->!==#0",
       "gezakt": 3,
       "geprobeerd": 3
+    },
+    "staving.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/registerblik/staving.js",
+      "operator": "===->!==#0",
+      "gezakt": 6,
+      "geprobeerd": 1
     },
     "stempel.test.js": {
       "soort": "puur",

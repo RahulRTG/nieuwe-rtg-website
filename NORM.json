@@ -6,7 +6,7 @@
     "activeringZonderReden": 0,
     "appwerktDefecten": 0,
     "beweringenZonderVulcontrole": 100,
-    "bewijsAchterstand": 2712,
+    "bewijsAchterstand": 2723,
     "bewijsAlleenKeten": 18,
     "bewijsCellenBewezen": 26449,
     "bronBlindeBestanden": 3,
@@ -3554,6 +3554,16 @@
       "meter": "bewijsAchterstand 2418 -> 2712",
       "reden": "DEZELFDE VORM ALS DE NOTITIE VAN 12 SEPTEMBER: EEN GROTERE NOEMER, GEEN ACHTERUITGANG. OUTPUTPROEF.json is voor het eerst sinds 3 september hermeten, uit het routejournaal van een volle suite (74e97d99). Die zag 5151 routes tegen 4747: +404, en scripts/routenoemer.js reproduceert dat als leeftijd (+416 routes sinds df1a581a, 0 verdwenen, 0 onverklaard). De 4151 bewezen OUTPUT-cellen bleven EXACT gelijk; de nieuwe routes landden als 294 onbeslist (output-niet-toerekenbaar 285 -> 579, want een inhoudgevoelige toets die ze raakt, raakt ook andere) en 110 ongemeten. De hele groei van 294 zit in die ene post.\n\nWAAROM NIET NIET HERMETEN: een register van 25 dagen oud over een router die 416 routes groeide, is precies de schijnzekerheid waar PROOF.md par. 2a nu per cel op let -- 1416 OUTPUT-cellen stonden op verouderd.",
       "waarheen": "de 294 onbesliste routes toerekenbaar maken (een toets die er alleen die route raakt, of een verklaring in BEWIJSSCHULD.json). Vervalt 2026-12-28: staat hij dan nog op 2712 of hoger, dan is dit geen noemergroei meer maar achterstand die niemand aflost."
+    },
+    {
+      "datum": "2026-09-29",
+      "soort": "schuld",
+      "sleutel": "bewijsAchterstand",
+      "van": 2712,
+      "vervalt": "2026-12-29",
+      "meter": "bewijsAchterstand 2712 -> 2723",
+      "reden": "DE VERSE IDEMPROEF ZAG DE ROUTES VAN MAIN. IDEMPROEF.json is hermeten op 632583ce, nu met de passkeymedewerker uit main op de incassoronde (die zat in de vorige ronde niet op de tak en gaf 403). Hij riep 5148 routes aan tegen 5020; de +11 zijn allemaal idem-ongeclassificeerd (1606 -> 1617): routes die uit de merge met main komen en nog geen besluit in IDEMBESLUIT.json dragen. Er ging geen bewezen cel verloren (bewijsCellenBewezen 26449 -> 26941).",
+      "waarheen": "de nieuwe routes een besluit in IDEMBESLUIT.json geven. Vervalt 2026-12-29."
     }
   ],
   "prestatie": {

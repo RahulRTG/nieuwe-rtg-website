@@ -73,7 +73,7 @@ const VERKLARING = {
     { functie: 'dom-samen', waarom: 'de stadsraad' }
   ],
   rust: [
-    { functie: 'dom-veiligheid', paden: ['/api/veiligheid/rust'], waarom: 'niet storen, de kring komt erdoor' },
+    { functie: 'rust', paden: ['/api/veiligheid/rust'], waarom: 'niet storen, de kring komt erdoor' },
     { functie: 'gemoed', waarom: 'de dagcheck-in' },
     { functie: 'gedachten', waarom: 'het gedachtenboek' }
   ],

@@ -134,6 +134,8 @@ const REGISTER = {
   /* De gast als twee mensen (SAMENLEVING.md stap 5): de tegenspraak omlaag, het
      onderscheid omhoog. */
   'GASTSPLITSING.json': { meter: ['gastTegenspraak', 'gastOnderscheidt'] },
+  /* Geen commerciele druk binnen de bodem (SAMENLEVING.md par. 6, eis 5). */
+  'BODEMDRUK.json': { meter: ['bodemDruk', 'bodemSchermen'] },
   /* MAGNAATGRONDWET.json (npm run magnaat:grondwet -- --vastleggen) is de
      bevroren nulstand van de Magnaat-grondwet (MAGNAAT.md). De ratel woont in
      de toets en is vierledig: niet meer schendingen, niet minder PASS of

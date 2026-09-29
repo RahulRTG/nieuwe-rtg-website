@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 5318 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 5328 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,14 +18,14 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 5318 |
-| servermodules (`server/**/*.js`) | 3943 |
-| routebestanden (`server/routes/**`) | 631 |
-| kernmodules (`server/kern/**`) | 2501 |
-| schermen (`public/**/*.html`) | 323 |
-| gedeelde browsermodules (`public/shared/*.js`) | 415 |
-| toetsbestanden (`test/*.test.js`) | 1923 |
-| schermtoetsen (`test/*.e2e.js`) | 280 |
+| API-endpoints | 5328 |
+| servermodules (`server/**/*.js`) | 3963 |
+| routebestanden (`server/routes/**`) | 633 |
+| kernmodules (`server/kern/**`) | 2507 |
+| schermen (`public/**/*.html`) | 324 |
+| gedeelde browsermodules (`public/shared/*.js`) | 418 |
+| toetsbestanden (`test/*.test.js`) | 1944 |
+| schermtoetsen (`test/*.e2e.js`) | 286 |
 
 ## 2. De weg van een verzoek
 
@@ -112,12 +112,12 @@ zie §5 -- er zijn nog 252 kern-namen die meer dan één domein aanraakt.
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
 | `auth` | 21 | 6 | 8 | 54 |
-| `member` | 727 | 74 | 17 | 454 |
+| `member` | 727 | 74 | 17 | 453 |
 | `supplier` | 634 | 131 | 6 | 341 |
-| `office` | 84 | 21 | 3 | 95 |
+| `office` | 88 | 22 | 3 | 97 |
 | `staff` | 27 | 9 | 1 | 43 |
 | `social` | 76 | 10 | 31 | 71 |
-| `techniek` | 77 | 19 | 1 | 64 |
+| `techniek` | 79 | 20 | 1 | 64 |
 | `zakelijk` | 13 | 2 | 0 | 0 |
 | `wereld` | 15 | 3 | 0 | 0 |
 
@@ -129,7 +129,7 @@ lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
 bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
 publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 3630 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 3634 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 

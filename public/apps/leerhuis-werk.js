@@ -93,7 +93,8 @@
   var dag = function (t) { return t ? String(t).slice(0, 10) : ''; };
 
   /* De kaarten per rol staan in leerhuis-werk-kaarten.js; dit bestand is de deur. */
-  var K = window.RTGLeerhuisKaarten({ $: $, maak: maak, knop: knop, kaart: kaart, zet: zet, doe: doe, wie: wie, dag: dag });
+  var bewijs = window.RTGLeerhuisBewijs ? window.RTGLeerhuisBewijs({ maak: maak, knop: knop, doe: doe }) : null;
+  var K = window.RTGLeerhuisKaarten({ $: $, maak: maak, knop: knop, kaart: kaart, zet: zet, doe: doe, wie: wie, dag: dag, bewijs: bewijs });
 
   function laad() {
     if (!ORG) return Promise.resolve();

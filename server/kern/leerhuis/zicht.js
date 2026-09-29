@@ -19,6 +19,7 @@
 
 const { verversen, certStand, versheid, trainerGeldig } = require('./oordeel');
 const { rolKlaar, loopbaan } = require('./gereedheid');
+const { LEERBEWIJS } = require('./standen');
 
 const VOLGENDE_STAP = {
   ASSIGNED: 'begin met lezen en kijken (UNDERSTAND, OBSERVE)', LEARNING: 'ga oefenen in de zandbak', PRACTICING: 'speel een scenario',
@@ -86,9 +87,14 @@ function trainerCockpit(st, trainer) {
   const t = st.trainers[trainer];
   if (!t) return { ok: false, reden: trainer + ' is geen trainer in deze organisatie' };
   const leerlingen = [];
+  /* Alleen OF er een beoordeling loopt, niet de uitslag of de criteria. */
+  const lopend = (k, v) => Object.values(st.beoordelingen).some(b => b.persoon === k && b.vaardigheid === v && ['REQUESTED', 'ASSESSING'].includes(b.stand));
   for (const [k, p] of Object.entries(st.personen))
-    for (const [c, l] of Object.entries(p.leren)) if (l.trainer === trainer) leerlingen.push({ persoon: k, curriculum: c, stand: l.stand, volgende: VOLGENDE_STAP[l.stand] || null });
-  return { ok: true, trede: t.trede,
+    for (const [c, l] of Object.entries(p.leren)) if (l.trainer === trainer) leerlingen.push({ persoon: k, curriculum: c, stand: l.stand, volgende: VOLGENDE_STAP[l.stand] || null,
+      vaardigheden: ((st.curricula[c] || {}).vaardigheden || []).map(v => ({ id: v, naam: (st.vaardigheden[v] || {}).naam || v, loopt: lopend(k, v) })) });
+  /* Soorten en sterktes komen mee, zodat het scherm geen eigen kopie draagt; of
+     een trainer ze MAG zetten, zegt bewijsVastleggen (acties-oordeel.js). */
+  return { ok: true, trede: t.trede, bewijsSoorten: LEERBEWIJS, sterktes: ['OBSERVED', 'DOCUMENTED'],
     VANDAAG: leerlingen.filter(x => ['SIMULATING', 'SUPERVISED'].includes(x.stand)),
     LEERLINGEN: leerlingen,
     SESSIES: t.curricula.map(c => ({ curriculum: c.id, geldig: trainerGeldig(st, trainer, c.id), gids: st.curricula[c.id] ? sessie(st, c.id) : null })),

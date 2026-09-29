@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2167 bestanden en 15141 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2169 bestanden en 15150 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2167 |
-| losse beweringen (`test(...)`) | 15141 |
+| toetsbestanden | 2169 |
+| losse beweringen (`test(...)`) | 15150 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 199 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1838 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 147 |
 | alleen in de kop *genoemd*, nog niet gemeten | 30 |
-| niets van beide | 152 |
+| niets van beide | 154 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1891 bestanden, 14657 beweringen.
+1893 bestanden, 14666 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -249,6 +249,7 @@ toets omvalt.
 | `boardlog-keten.test.js` | 9 | gezakt op `===->!==#0` | HET BOARDROOM-JOURNAAL VAN HET LID AAN DE HASHKETEN. Dit journaal bestaat om twee vragen te kunnen beantwoorden: "stond dat altijd al uit?" en "wie heeft dat aangezet?" -- bij een kind kan dat antwoord een ouder zijn. |
 | `boardroom-poort.test.js` | 7 | gezakt op `liegpoort /api/` | De boardroom-poort: de boardroom is de kamer van de eigenaar (Rahul Imran Ismail). De anonieme kantoorcode heeft geen identiteit en komt er nooit in; de eigenaar komt binnen met zijn eigen account (direct, of als... |
 | `boardroom.test.js` | 12 | gezakt op `liegpoort /api/` | RTG Boardroom: de complete schakelkast. Elke functie heeft een stoplicht-status (aan/uit/storing), de eigenaar schakelt direct, kan een storing melden, alles resetten en de AI om een voorstel vragen. |
+| `bodemdruk.test.js` | 5 | -- | GEEN COMMERCIELE DRUK BINNEN DE BODEM -- de meter van eis 5 (SAMENLEVING.md par. 6). |
 | `boeken.test.js` | 3 | gezakt op `liegpoort /api/` | RTG Boeken: de huisbibliotheek, de leesvoortgang die met je account meereist (en alleen die plek -- geen leesstatistieken), en de dichte poort zonder token. |
 | `boekhoud.test.js` | 4 | gezakt op `liegpoort /api/` | De branchegerichte AI-boekhouder: genre-profielen, datagedreven adviezen en de leverancier-endpoints (vragen, adviezen, antwoord). Draai: npm test |
 | `boerderij.test.js` | 8 | gezakt op `liegpoort /api/` | End-to-end tests voor het boerderij-genre (kern/boerderij.js): het slimme bedrijfssysteem voor boeren. Type kiezen, percelen + gewassen (zaaien -> groeien -> oogsten), dieren (voeren, opbrengst), takenbord, de... |
@@ -1423,6 +1424,7 @@ toets omvalt.
 | `rtmail.test.js` | 13 | gezakt op `===->!==#0` | RTMAIL: het interne postsysteem (de rail voor de automatiseringen). Unit-test op de motor met een nep-db, zodat we send/postvak/ongelezen/lees los kunnen bewijzen zonder de server te starten. |
 | `rugdekking.e2e.test.js` | 15 | gezakt op `liegpoort /api/` | RUGDEKKING OVER HTTP -- staat RTG achter een mens, of koopt het iets van hem? Dit is de vork uit RUGDEKKING.md par. |
 | `runtime-release-stempel.test.js` | 1 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `rust-eindigt.test.js` | 4 | -- | RUST EINDIGT VANZELF -- eis 2 van SAMENLEVING.md par. 6. |
 | `rust-migraties.test.js` | 2 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rust-noodstop.test.js` | 1 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rust.test.js` | 6 | gezakt op `liegpoort /api/` | Versleuteling in rust, gemeten in plaats van beloofd. De belofte is: met RTG_ENC_KEY staat er niets leesbaars van een lid op schijf. |

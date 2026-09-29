@@ -147,7 +147,7 @@ app.post('/api/supplier/ai', supplierAuth, async (req, res) => {
     if (lus && lus.tekst) return A(lus.tekst, lus.acties.some(a => a.status < 400), {
       stuur: lus.acties,
       goedkeuringen: lus.acties.filter(a => a.goedkeuring).map(a => a.goedkeuring),
-      goedkeuringWereld: wereld
+      goedkeuringWereld: wereld, staving: lus.staving
     });
   }
   return A('Dat begrijp ik nog niet helemaal. U kunt mij bijvoorbeeld vragen: "dagomzet", "welke kamers zijn vuil", "zet Riverside suite op schoon", "meld Garden kamer defect: douche lekt", "open de voordeur", "meld klus: lamp vervangen", "wie is er onderweg", "onbeantwoorde berichten", "welke minibars nog tellen" of "open bestellingen".');

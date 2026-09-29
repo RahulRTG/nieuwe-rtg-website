@@ -65,7 +65,7 @@ app.post('/api/staff/fluister', supplierAuth, async (req, res) => {
         'Je helpt ' + werkNaam(req) + ' (personeel, PDA) bij ' + req.supplier.name + ' (' + req.supplier.type + ').'
     });
     if (lus && lus.tekst) return res.json(metKompas({ antwoord: lus.tekst, gedaan: lus.acties.some(a => a.status < 400), stuur: lus.acties,
-      goedkeuringen: lus.acties.filter(a => a.goedkeuring).map(a => a.goedkeuring), goedkeuringWereld: 'staff' }));
+      goedkeuringen: lus.acties.filter(a => a.goedkeuring).map(a => a.goedkeuring), goedkeuringWereld: 'staff', staving: lus.staving }));
   }
   res.json(metKompas(r));
 });

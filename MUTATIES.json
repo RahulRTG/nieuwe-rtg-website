@@ -3,7 +3,7 @@
     "op": "2026-09-29T15:18:32.915Z",
     "commit": "7967edbc",
     "boomVuil": false,
-    "boomAnders": 11,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -14791,6 +14791,14 @@
       "module": "server/kern/payroll/index.js",
       "operator": "===->!==#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "staving.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/stuur/staving.js",
+      "operator": "===->!==#0",
+      "gezakt": 8,
       "geprobeerd": 1
     }
   }

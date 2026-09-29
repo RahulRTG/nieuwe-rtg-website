@@ -17,6 +17,7 @@ const beleid = require('./beleid');
 const { maakIsolatiefilter } = require('./isolatiefilter');
 const { lusPakket } = require('./luspakket');
 const { vensterVan } = require('../ai/contextpakket');
+const { staaf, uitStuur } = require('./staving');
 
 module.exports = ({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, parseSubs, isolatie, railNaam }) => {
   /* Of het spoor naar buiten mag, beslist ./spoor.js -- die keuze hoort bij het
@@ -81,6 +82,9 @@ module.exports = ({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, pa
     const systeem = (opties.systeem || '') + '\n' + LUS_REGELS +
       (ctxRegel ? '\n' + CONTEXT_REGELS : '');
     const acties = [];
+    /* Wat deze beurt zag, voor de staving (./staving.js). De vraag telt mee als
+       bron `onbekend`: een getal dat de mens zelf noemde is geen bewijs. */
+    const gezien = [{ gereedschap: 'vraag', uit: vraag, graad: 'onbekend' }];
 
     /* Eén tool-lus met een stappen-budget en een globale teller. Geeft de
        eindtekst (als de agent klaar is) en de nieuwe tellerstand terug. `label`
@@ -111,6 +115,7 @@ module.exports = ({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, pa
         for (const t of wilTools) {
           const uit = await stap.voerUit(req, t,
             { wereld: opties.wereld, kaartVraag, paden, acties, ctxWoorden: ctxEigen });
+          gezien.push(uitStuur(t, uit));
           uitkomsten.push({ type: 'tool_result', tool_use_id: t.id, content: JSON.stringify(uit).slice(0, 6000) });
         }
         tel++;
@@ -126,14 +131,16 @@ module.exports = ({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, pa
       if (!cls.zwaar) {
         const r = await loop([{ role: 'user', content: metContext(vraag) }], 4, 0, 4, 'Bezig...');
         spoor && spoor.mark('PROJECTED', r.tekst ? 'PASS' : 'NOT_RUN', { tekens: (r.tekst || '').length });
-        return { tekst: r.tekst || 'Gedaan.', acties, zwaar: false, stappen: r.tel, spoor: (spoorMag && spoor) ? spoor.uitslag() : undefined };
+        return { tekst: r.tekst || 'Gedaan.', acties, zwaar: false, stappen: r.tel, staving: staaf(r.tekst, gezien),
+          spoor: (spoorMag && spoor) ? spoor.uitslag() : undefined };
       }
 
       /* ---- zware taak: opknippen in max 3 deeltaken binnen een budget van
          24 stappen. De taakverdeling woont in ./lus-zwaar.js; elke deeltaak
          loopt door DEZELFDE `loop` en dus langs dezelfde poorten. */
-      return zwaar({ anthropic, parseSubs, loop, opStap, systeem, vraag, metContext,
+      const z = await zwaar({ anthropic, parseSubs, loop, opStap, systeem, vraag, metContext,
         totaal: cls.maxStappen, acties });
+      return z && Object.assign(z, { staving: staaf(z.tekst, gezien) });
     } catch (e) {
       try { log && log.warn && log.warn('stuurlus', { fout: (e && e.message || '').slice(0, 120) }); } catch (e2) {}
       return null; // de vaste antwoorden vangen het op

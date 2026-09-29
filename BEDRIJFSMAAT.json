@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T16:59:37.345Z",
-    "commit": "05110e5f",
+    "op": "2026-09-29T18:12:25.283Z",
+    "commit": "c7f477f8",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bedrijfsmaat.js",
@@ -160,28 +160,68 @@
       "kort": "Wat een pas oplevert, zonder een lid te bekijken.",
       "handhaving": "kern/bedrijfsmaat/stand-marge.js (per pas, alle leden in de noemer, groepspoort met secundaire onderdrukking) en omzetPerPas in kern/ledenregister.js; test/margeperlid.test.js.",
       "stand": "gebouwd"
+    },
+    {
+      "id": "C16",
+      "naam": "Land en stad van een lid",
+      "besloten": "29 september 2026, door de eigenaar",
+      "herkomst": "mens",
+      "regel": "Het land komt uit het account en de stad uit de woonplaats in de intake, allebei door het lid opgegeven en niet gecontroleerd; geteld langs de groepspoort, met kleine landen en plaatsen samen onder Overige.",
+      "kort": "Waar leden wonen, zonder dat een plaatsnaam iemand verraadt.",
+      "handhaving": "kern/ledenregister.js (land en stad langs de groepspoort, met de zin dat ze opgegeven zijn); test/bedrijfsmaatbewijs.test.js.",
+      "stand": "gebouwd"
+    },
+    {
+      "id": "C17",
+      "naam": "Zaken per genre: toegelaten en actief",
+      "besloten": "29 september 2026, door de eigenaar",
+      "herkomst": "mens",
+      "regel": "Een zaak telt in een maand als zij toegelaten is en in die maand iets via RTG deed (een verzoek door haar eigen deur); per genre, onder vijf zaken geen getal.",
+      "kort": "Gebruik, geen aanmeldingen.",
+      "handhaving": "kern/bedrijfsmaat/stand-groei.js (toegelaten en een verzoek door de eigen deur in de maand); test/bedrijfsmaatgroei.test.js.",
+      "stand": "gebouwd"
+    },
+    {
+      "id": "C18",
+      "naam": "Een contract is verlengd als het na zijn einddatum doorloopt",
+      "besloten": "29 september 2026, door de eigenaar",
+      "herkomst": "mens",
+      "regel": "Stilzwijgend of uitdrukkelijk; de maat is het aandeel verlengd van de contracten die in de maand op hun beslismoment kwamen, onder tien geen getal.",
+      "kort": "Behoud meten zonder het lid iets extra te vragen.",
+      "handhaving": "kern/bedrijfsmaat/stand-groei.js (het verloop van de contracten: verlengd tegen verlengd plus geeindigd); test/bedrijfsmaatgroei.test.js.",
+      "stand": "gebouwd"
+    },
+    {
+      "id": "C19",
+      "naam": "Transactievolume: bruto via RTG Pay, zonder btw",
+      "besloten": "29 september 2026, door de eigenaar",
+      "herkomst": "mens",
+      "regel": "Wat zaken in de maand via RTG Pay ontvingen, zonder btw, in de wereld commercieel en nooit als omzet van RTG; onder vijf zaken geen getal.",
+      "kort": "Geld van de zaken, naast de andere geldmaten te leggen.",
+      "handhaving": "kern/bedrijfsmaat/stand-groei.js (subtotalen van facturen met betaalwijze rtg); test/bedrijfsmaatgroei.test.js.",
+      "stand": "gebouwd"
     }
   ],
   "telling": {
     "maten": 67,
     "domeinen": 28,
     "perStatus": {
-      "bestaat": 51,
-      "half": 13,
+      "bestaat": 56,
+      "half": 8,
       "ontbreekt": 3,
       "onbekend": 0
     },
     "primairGat": {
       "BRON_ONTBREEKT": 3,
-      "DEFINITIE_ONTBREEKT": 10,
+      "DEFINITIE_ONTBREEKT": 5,
       "PROJECTIE_ONTBREEKT": 2,
       "BEWIJS_ONTBREEKT": 1
     },
     "perGat": {
       "BRON_ONTBREEKT": 3,
-      "DEFINITIE_ONTBREEKT": 13,
-      "PROJECTIE_ONTBREEKT": 12,
-      "BEWIJS_ONTBREEKT": 16
+      "DEFINITIE_ONTBREEKT": 8,
+      "PROJECTIE_ONTBREEKT": 10,
+      "BEWIJS_ONTBREEKT": 11
     },
     "ketens": 6,
     "ketensGegrond": 6,
@@ -194,8 +234,8 @@
   "perDomein": {
     "geld": {
       "maten": 2,
-      "bestaat": 1,
-      "half": 1,
+      "bestaat": 2,
+      "half": 0,
       "ontbreekt": 0
     },
     "cash": {
@@ -260,8 +300,8 @@
     },
     "retentie": {
       "maten": 3,
-      "bestaat": 2,
-      "half": 1,
+      "bestaat": 3,
+      "half": 0,
       "ontbreekt": 0
     },
     "churn": {
@@ -350,14 +390,14 @@
     },
     "commerciele-groei": {
       "maten": 2,
-      "bestaat": 1,
-      "half": 1,
+      "bestaat": 2,
+      "half": 0,
       "ontbreekt": 0
     },
     "geografische-groei": {
       "maten": 3,
-      "bestaat": 1,
-      "half": 2,
+      "bestaat": 3,
+      "half": 0,
       "ontbreekt": 0
     }
   },
@@ -552,7 +592,7 @@
     "knopen": [
       {
         "id": "geld.transactievolume",
-        "status": "half",
+        "status": "bestaat",
         "domein": "geld"
       },
       {
@@ -662,7 +702,7 @@
       },
       {
         "id": "retentie.contract-verlengd",
-        "status": "half",
+        "status": "bestaat",
         "domein": "retentie"
       },
       {
@@ -692,17 +732,17 @@
       },
       {
         "id": "groei.zaken-per-genre",
-        "status": "half",
+        "status": "bestaat",
         "domein": "commerciele-groei"
       },
       {
         "id": "geo.leden-per-land",
-        "status": "half",
+        "status": "bestaat",
         "domein": "geografische-groei"
       },
       {
         "id": "geo.leden-per-stad",
-        "status": "half",
+        "status": "bestaat",
         "domein": "geografische-groei"
       },
       {
@@ -1037,54 +1077,63 @@
       "betekenis": "Wat leden via partnerzaken betaalden (orders en ritten). Geld van de zaak, niet van RTG.",
       "wereld": "commercieel",
       "bronnen": [
-        "server/kern/kantoor/metrics-week.js"
+        "server/kern/facturatie/motor.js"
       ],
-      "berekening": "som van betaalde orders (total) en ritten (quote) per dag, zeven dagen terug",
-      "eenheid": "euro per dag en per week",
-      "graad": "onbekend",
+      "berekening": "som van de subtotalen van facturen met betaalwijze rtg van zaken in de maand",
+      "eenheid": "eurocent per maand, zonder btw",
+      "graad": "gemeten",
       "actualiteit": "live",
       "minimaleGroep": 5,
       "privacyklasse": "zaken",
       "eigenaar": "kern/kantoor",
       "eigenaarReden": null,
       "afhankelijk": [],
-      "status": "half",
-      "gaten": [
-        "DEFINITIE_ONTBREEKT",
-        "BEWIJS_ONTBREEKT"
-      ],
+      "status": "bestaat",
+      "gaten": [],
       "elementen": {
         "bron": {
           "aanwezig": true,
           "citaten": [
             {
-              "bestand": "server/kern/kantoor/metrics-week.js",
-              "citaat": "betaaldeOrders.filter",
+              "bestand": "server/kern/facturatie/motor.js",
+              "citaat": "regels: v.regels, subtotaal: v.subtotaal, btwBedrag: v.btwBedrag",
               "klopt": true
             }
           ],
           "reden": null
         },
         "definitie": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Het getal heet in de code `omzet`, terwijl dezelfde functie zegt dat RTG niets aan boekingen verdient: het is transactievolume van zaken en geen omzet van RTG. Die naam is nergens gedefinieerd."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/definities-later.js",
+              "citaat": "transactievolume: d29(19",
+              "klopt": true
+            }
+          ],
+          "reden": null
         },
         "projectie": {
           "aanwezig": true,
           "citaten": [
             {
-              "bestand": "server/kern/kantoor/metrics-week.js",
-              "citaat": "omzetWeek:",
+              "bestand": "server/kern/bedrijfsmaat/stand-groei.js",
+              "citaat": "function transactievolume()",
               "klopt": true
             }
           ],
           "reden": null
         },
         "bewijs": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Geen graad, geen peilmoment, en de valuta en btw van de onderliggende orders worden niet genoemd."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand-groei.js",
+              "citaat": "eenheid: 'eurocent, zonder btw', btwCenten",
+              "klopt": true
+            }
+          ],
+          "reden": null
         }
       },
       "groepsgrens": {
@@ -1092,15 +1141,15 @@
         "afgedwongen": true,
         "citaten": [
           {
-            "bestand": "server/kern/kantoor/metrics-week.js",
-            "citaat": "zaken.size < ZAKEN_GRENS ? dicht(dag) : dag",
+            "bestand": "server/kern/bedrijfsmaat/stand-groei.js",
+            "citaat": "toon(ZAKEN, { waarde: centen, n: zaken.size })",
             "klopt": true
           }
         ],
         "reden": null
       },
       "keten": {
-        "gegrond": false,
+        "gegrond": true,
         "zwakkeSchakels": []
       },
       "gedeeltelijk": null
@@ -1804,7 +1853,7 @@
           "aanwezig": true,
           "citaten": [
             {
-              "bestand": "server/kern/bedrijfsmaat/definities.js",
+              "bestand": "server/kern/bedrijfsmaat/definities-later.js",
               "citaat": "margePerLid: d29(15",
               "klopt": true
             }
@@ -2914,21 +2963,17 @@
       "bronnen": [
         "server/kern/commercie/contract.js"
       ],
-      "berekening": "nog niet vastgesteld",
+      "berekening": "verlengd gedeeld door verlengd plus geeindigd, per maand, uit het verloop van de contracten",
       "eenheid": "contracten per periode",
-      "graad": "onbekend",
+      "graad": "gemeten",
       "actualiteit": "live",
       "minimaleGroep": 10,
       "privacyklasse": "leden",
-      "eigenaar": null,
-      "eigenaarReden": "Niemand.",
+      "eigenaar": "kern/bedrijfsmaat",
+      "eigenaarReden": null,
       "afhankelijk": [],
-      "status": "half",
-      "gaten": [
-        "DEFINITIE_ONTBREEKT",
-        "PROJECTIE_ONTBREEKT",
-        "BEWIJS_ONTBREEKT"
-      ],
+      "status": "bestaat",
+      "gaten": [],
       "elementen": {
         "bron": {
           "aanwezig": true,
@@ -2942,29 +2987,53 @@
           "reden": null
         },
         "definitie": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Niet besloten; en de meeste betalende leden hebben een pas zonder contract (AFSPRAAK.md), dus deze maat ziet alleen de contractuele treden."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/definities-later.js",
+              "citaat": "contractVerlengd: d29(18",
+              "klopt": true
+            }
+          ],
+          "reden": null
         },
         "projectie": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Niet gebouwd."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand-groei.js",
+              "citaat": "function contractVerlengd()",
+              "klopt": true
+            }
+          ],
+          "reden": null
         },
         "bewijs": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Volgt uit de projectie."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand-groei.js",
+              "citaat": "niet('In deze maand kwam geen enkel contract op zijn beslismoment.')",
+              "klopt": true
+            }
+          ],
+          "reden": null
         }
       },
       "groepsgrens": {
         "vereist": true,
-        "afgedwongen": false,
-        "citaten": [],
-        "reden": "Volgt uit de projectie."
+        "afgedwongen": true,
+        "citaten": [
+          {
+            "bestand": "server/kern/bedrijfsmaat/stand-groei.js",
+            "citaat": "toon(LEDEN, { waarde: verlengd / noemer, n: noemer })",
+            "klopt": true
+          }
+        ],
+        "reden": null
       },
       "keten": {
-        "gegrond": false,
+        "gegrond": true,
         "zwakkeSchakels": []
       },
       "gedeeltelijk": null
@@ -3397,21 +3466,17 @@
       "bronnen": [
         "server/kern/kantoor/metrics.js"
       ],
-      "berekening": "nog niet vastgesteld",
+      "berekening": "toegelaten zaken met minstens een verzoek door hun eigen deur in de maand, per genre",
       "eenheid": "zaken per genre",
-      "graad": "onbekend",
+      "graad": "gemeten",
       "actualiteit": "live",
       "minimaleGroep": 5,
       "privacyklasse": "zaken",
-      "eigenaar": null,
-      "eigenaarReden": "Niemand.",
+      "eigenaar": "kern/bedrijfsmaat",
+      "eigenaarReden": null,
       "afhankelijk": [],
-      "status": "half",
-      "gaten": [
-        "DEFINITIE_ONTBREEKT",
-        "PROJECTIE_ONTBREEKT",
-        "BEWIJS_ONTBREEKT"
-      ],
+      "status": "bestaat",
+      "gaten": [],
       "elementen": {
         "bron": {
           "aanwezig": true,
@@ -3425,29 +3490,53 @@
           "reden": null
         },
         "definitie": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Wat een ACTIEVE zaak is (toegelaten, verkocht iets, is open) is niet besloten."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/definities-later.js",
+              "citaat": "zakenPerGenre: d29(17",
+              "klopt": true
+            }
+          ],
+          "reden": null
         },
         "projectie": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "De prestatielijst telt omzet per zaakcode, geen zaken per genre."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand-groei.js",
+              "citaat": "function zakenPerGenre()",
+              "klopt": true
+            }
+          ],
+          "reden": null
         },
         "bewijs": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Volgt uit de projectie."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand-groei.js",
+              "citaat": "niet('De kostenmeter is niet beschikbaar",
+              "klopt": true
+            }
+          ],
+          "reden": null
         }
       },
       "groepsgrens": {
         "vereist": true,
-        "afgedwongen": false,
-        "citaten": [],
-        "reden": "Volgt uit de projectie."
+        "afgedwongen": true,
+        "citaten": [
+          {
+            "bestand": "server/kern/bedrijfsmaat/stand-groei.js",
+            "citaat": "groepeer(rijen, { grens: KLASSEN.zaken.grens, benoemd: true })",
+            "klopt": true
+          }
+        ],
+        "reden": null
       },
       "keten": {
-        "gegrond": false,
+        "gegrond": true,
         "zwakkeSchakels": []
       },
       "gedeeltelijk": null
@@ -3463,18 +3552,15 @@
       ],
       "berekening": "telling per land uit het ledenregister",
       "eenheid": "leden per land",
-      "graad": "onbekend",
+      "graad": "vermoed",
       "actualiteit": "live",
       "minimaleGroep": 10,
       "privacyklasse": "leden",
       "eigenaar": "kern/ledenregister",
       "eigenaarReden": null,
       "afhankelijk": [],
-      "status": "half",
-      "gaten": [
-        "DEFINITIE_ONTBREEKT",
-        "BEWIJS_ONTBREEKT"
-      ],
+      "status": "bestaat",
+      "gaten": [],
       "elementen": {
         "bron": {
           "aanwezig": true,
@@ -3488,9 +3574,15 @@
           "reden": null
         },
         "definitie": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Waar het land vandaan komt (opgegeven, gecontroleerd, woon- of verblijfsland) staat niet in de maat."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/definities-later.js",
+              "citaat": "geoLand: d29(16",
+              "klopt": true
+            }
+          ],
+          "reden": null
         },
         "projectie": {
           "aanwezig": true,
@@ -3504,9 +3596,20 @@
           "reden": null
         },
         "bewijs": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Geen graad of peilmoment."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/ledenregister.js",
+              "citaat": "graad: 'gemeten', peilmoment: new Date().toISOString(), afgekapt",
+              "klopt": true
+            },
+            {
+              "bestand": "server/kern/ledenregister.js",
+              "citaat": "Land en stad zijn door het lid opgegeven",
+              "klopt": true
+            }
+          ],
+          "reden": null
         }
       },
       "groepsgrens": {
@@ -3522,7 +3625,7 @@
         "reden": null
       },
       "keten": {
-        "gegrond": false,
+        "gegrond": true,
         "zwakkeSchakels": []
       },
       "gedeeltelijk": null
@@ -3538,18 +3641,15 @@
       ],
       "berekening": "telling per stad uit het intakeprofiel",
       "eenheid": "leden per stad",
-      "graad": "onbekend",
+      "graad": "vermoed",
       "actualiteit": "live",
       "minimaleGroep": 10,
       "privacyklasse": "leden",
       "eigenaar": "kern/ledenregister",
       "eigenaarReden": null,
       "afhankelijk": [],
-      "status": "half",
-      "gaten": [
-        "DEFINITIE_ONTBREEKT",
-        "BEWIJS_ONTBREEKT"
-      ],
+      "status": "bestaat",
+      "gaten": [],
       "elementen": {
         "bron": {
           "aanwezig": true,
@@ -3563,9 +3663,15 @@
           "reden": null
         },
         "definitie": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "De stad komt uit het intakeprofiel; of dat woonplaats is, staat niet vast."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/definities-later.js",
+              "citaat": "geoStad: d29(16",
+              "klopt": true
+            }
+          ],
+          "reden": null
         },
         "projectie": {
           "aanwezig": true,
@@ -3579,9 +3685,20 @@
           "reden": null
         },
         "bewijs": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Geen graad of peilmoment."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/ledenregister.js",
+              "citaat": "graad: 'gemeten', peilmoment: new Date().toISOString(), afgekapt",
+              "klopt": true
+            },
+            {
+              "bestand": "server/kern/ledenregister.js",
+              "citaat": "Land en stad zijn door het lid opgegeven",
+              "klopt": true
+            }
+          ],
+          "reden": null
         }
       },
       "groepsgrens": {
@@ -3597,7 +3714,7 @@
         "reden": null
       },
       "keten": {
-        "gegrond": false,
+        "gegrond": true,
         "zwakkeSchakels": []
       },
       "gedeeltelijk": null
@@ -5247,7 +5364,7 @@
           "aanwezig": true,
           "citaten": [
             {
-              "bestand": "server/kern/bedrijfsmaat/definities.js",
+              "bestand": "server/kern/bedrijfsmaat/definities-later.js",
               "citaat": "campagne: d28(12, 1",
               "klopt": true
             }

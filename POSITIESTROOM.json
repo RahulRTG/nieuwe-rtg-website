@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T16:50:36.486Z",
-    "commit": "286a048b2",
+    "op": "2026-09-29T17:31:41.987Z",
+    "commit": "8dddf38e9",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/positiestroom.js",
@@ -23,8 +23,28 @@
     "tegenspraak": 0,
     "zonderTermijn": 20,
     "nietVergeten": 20,
-    "besloten": 15,
-    "besluitNietUitgevoerd": [],
+    "besloten": 34,
+    "besluitNietUitgevoerd": [
+      "rit-vertrekpunt",
+      "ritlijn",
+      "reis-etappes",
+      "ov-instap",
+      "ov-uitstap",
+      "patrouille",
+      "beveiliging-incident",
+      "veilig-laatste-plek",
+      "veilig-alarm",
+      "date-sos",
+      "vonk-profiel",
+      "markt-overdracht",
+      "koerier-mode",
+      "huur-sos",
+      "charter-sos",
+      "gemeente-melding",
+      "horeca-bezorgadres",
+      "bezorgdienst-adres",
+      "mode-adres"
+    ],
     "klassen": {
       "toegestaan": 1,
       "venster": 11,
@@ -80,8 +100,14 @@
       "vergeten": false,
       "gedetecteerd": true,
       "klasse": "onbegrensd",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "n": "N16",
+        "datum": "2026-09-29",
+        "klasse": "toegestaan",
+        "uitkomst": "tijdens de rit het exacte ophaalpunt; bij afronden vervangen door het adres of de plaatsnaam van de factuur",
+        "uitgevoerd": false
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "de kopie ontsnapt aan de zevendagenveger van db.data.live en blijft op de opdracht staan zonder termijn"
@@ -101,8 +127,14 @@
       "vergeten": false,
       "gedetecteerd": true,
       "klasse": "onbegrensd",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "n": "N16",
+        "datum": "2026-09-29",
+        "klasse": "venster",
+        "uitkomst": "de punten van een rit worden gewist bij afronden; afstand, duur en begin- en eindplek zoals op de factuur blijven",
+        "uitgevoerd": false
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "tot zestig gebeurtenissen met lat/lng blijven na de rit op de opdracht staan; een termijn ontbreekt (B10 in NAVIGATIE.md: punten na de rit zijn onder PLAATS.md grens 1 een besluit, geen termijn)"
@@ -122,8 +154,14 @@
       "vergeten": false,
       "gedetecteerd": true,
       "klasse": "onbegrensd",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "n": "N21",
+        "datum": "2026-09-29",
+        "klasse": "toegestaan",
+        "uitkomst": "\"hier\" wordt bij het plannen vervangen door de dichtstbijzijnde plaatsnaam; de GPS van het lid wordt niet bewaard",
+        "uitgevoerd": false
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "begint het plan bij \"hier\", dan is dit de GPS van het lid, en de herkomst gaat verloren (bron wordt kaart)"
@@ -171,8 +209,14 @@
       "vergeten": false,
       "gedetecteerd": true,
       "klasse": "onbegrensd",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "n": "N17",
+        "datum": "2026-09-29",
+        "klasse": "noodzakelijk",
+        "uitkomst": "de instaphalte vervangt de GPS; het reisoverzicht blijft een jaar en is eerder te wissen via de vergeetroute",
+        "uitgevoerd": false
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "alleen een plafond op aantal (4000), geen termijn; samen met het uitstappunt een reishistorie per lid"
@@ -192,8 +236,14 @@
       "vergeten": false,
       "gedetecteerd": true,
       "klasse": "onbegrensd",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "n": "N17",
+        "datum": "2026-09-29",
+        "klasse": "noodzakelijk",
+        "uitkomst": "na het rekenen van het tarief blijven de uitstaphalte en de afstand, een jaar; de GPS van het lid gaat weg",
+        "uitgevoerd": false
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "voor het tarief is een afstand nodig en geen punt; het punt blijft zonder termijn staan"
@@ -241,8 +291,14 @@
       "vergeten": null,
       "gedetecteerd": true,
       "klasse": "onbegrensd",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "n": "N19",
+        "datum": "2026-09-29",
+        "klasse": "toegestaan",
+        "uitkomst": "het controlepunt bewijst de ronde; de GPS-positie van de bewaker wordt niet bewaard",
+        "uitgevoerd": false
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "een bewegingsgeschiedenis van een medewerker met alleen een plafond op aantal; hetzelfde bestand haalde de coordinaat bij het inklokken juist weg als \"geen plaats zonder doel\""
@@ -262,8 +318,14 @@
       "vergeten": null,
       "gedetecteerd": true,
       "klasse": "onbegrensd",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "n": "N18",
+        "datum": "2026-09-29",
+        "klasse": "noodzakelijk",
+        "uitkomst": "de positie hoort bij de melding: zolang die open is en 90 dagen erna; een proefalarm of een binnen een minuut ingetrokken SOS verdwijnt direct",
+        "uitgevoerd": false
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "een incidentdossier heeft een reden om te bestaan, maar geen termijn; de SOS-positie blijft na afsluiten staan"
@@ -283,8 +345,14 @@
       "vergeten": false,
       "gedetecteerd": true,
       "klasse": "onbegrensd",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "n": "N19",
+        "datum": "2026-09-29",
+        "klasse": "venster",
+        "uitkomst": "de laatste plek bestaat alleen zolang de kring een venster open heeft en verdwijnt bij sluiten",
+        "uitgevoerd": false
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "PLAATS.md grens 1 laat na een venster hoogstens de laatste plek toe -- maar hier wordt hij ook zonder open venster bewaard, en nooit weggehaald; de veiligheidslaag zegt zelf dat het bewaarbeleid haar niet kent"
@@ -332,8 +400,14 @@
       "vergeten": false,
       "gedetecteerd": false,
       "klasse": "onbegrensd",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "n": "N18",
+        "datum": "2026-09-29",
+        "klasse": "noodzakelijk",
+        "uitkomst": "de positie hoort bij de melding: zolang die open is en 90 dagen erna; een proefalarm of een binnen een minuut ingetrokken SOS verdwijnt direct",
+        "uitgevoerd": false
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "blijft na afsluiten staan, ook bij een proefalarm; alleen een plafond van tweehonderd alarmen"
@@ -409,8 +483,14 @@
       "vergeten": false,
       "gedetecteerd": true,
       "klasse": "onbegrensd",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "n": "N18",
+        "datum": "2026-09-29",
+        "klasse": "noodzakelijk",
+        "uitkomst": "de positie hoort bij de melding: zolang die open is en 90 dagen erna; een proefalarm of een binnen een minuut ingetrokken SOS verdwijnt direct",
+        "uitgevoerd": false
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "blijft in het SOS-record staan nadat de SOS is afgehandeld en de date is gestopt"
@@ -430,8 +510,14 @@
       "vergeten": false,
       "gedetecteerd": true,
       "klasse": "onbegrensd",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "n": "N21",
+        "datum": "2026-09-29",
+        "klasse": "noodzakelijk",
+        "uitkomst": "alleen een grove plek (een vak van 5 km), nooit het punt, en weg bij uitzetten of vergeten",
+        "uitgevoerd": false
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "een precieze coordinaat zonder termijn en buiten de vergeetroute, terwijl matchen op afstand ook met een grovere plek kan"
@@ -451,8 +537,14 @@
       "vergeten": null,
       "gedetecteerd": true,
       "klasse": "onbegrensd",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "n": "N21",
+        "datum": "2026-09-29",
+        "klasse": "toegestaan",
+        "uitkomst": "alleen samen ja/nee en de afstand blijven; de punten van koper en verkoper niet",
+        "uitgevoerd": false
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "bewijst dat beide partijen samen waren; daarvoor volstaat de uitkomst (samen ja/nee en de afstand), de punten blijven onbeperkt op de chat"
@@ -472,8 +564,14 @@
       "vergeten": null,
       "gedetecteerd": true,
       "klasse": "onbegrensd",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "n": "N20",
+        "datum": "2026-09-29",
+        "klasse": "venster",
+        "uitkomst": "het punt verdwijnt bij geleverd of geannuleerd; het adres zelf blijft bij de bestelling, en een verzonnen punt bestaat niet meer",
+        "uitgevoerd": false
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "het commentaar zegt \"vluchtig\", maar de positie blijft na de levering op het record staan"
@@ -654,8 +752,14 @@
       "vergeten": null,
       "gedetecteerd": false,
       "klasse": "onbegrensd",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "n": "N18",
+        "datum": "2026-09-29",
+        "klasse": "noodzakelijk",
+        "uitkomst": "de positie hoort bij de melding: zolang die open is en 90 dagen erna; een proefalarm of een binnen een minuut ingetrokken SOS verdwijnt direct",
+        "uitgevoerd": false
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "blijft zonder termijn op de boeking staan"
@@ -675,8 +779,14 @@
       "vergeten": null,
       "gedetecteerd": false,
       "klasse": "onbegrensd",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "n": "N18",
+        "datum": "2026-09-29",
+        "klasse": "noodzakelijk",
+        "uitkomst": "de positie hoort bij de melding: zolang die open is en 90 dagen erna; een proefalarm of een binnen een minuut ingetrokken SOS verdwijnt direct",
+        "uitgevoerd": false
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "blijft zonder termijn op de boeking staan"
@@ -784,8 +894,14 @@
       "vergeten": false,
       "gedetecteerd": true,
       "klasse": "onbegrensd",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "n": "N21",
+        "datum": "2026-09-29",
+        "klasse": "toegestaan",
+        "uitkomst": "de plek blijft bij de melding, de codenaam van de melder gaat eraf na afhandeling",
+        "uitgevoerd": false
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "de plek hoort bij het probleem, maar staat met de codenaam van de melder zonder termijn (alleen een plafond); de kopie in weefselZaken heeft wel een termijn"
@@ -836,8 +952,14 @@
       "vergeten": false,
       "gedetecteerd": true,
       "klasse": "onbegrensd",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "n": "N20",
+        "datum": "2026-09-29",
+        "klasse": "venster",
+        "uitkomst": "het punt verdwijnt bij geleverd of geannuleerd; het adres zelf blijft bij de bestelling, en een verzonnen punt bestaat niet meer",
+        "uitgevoerd": false
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "codenaam plus bezorgadres zonder termijn is precies wat scripts/afleidbaar.js als besluit aanwees"
@@ -857,8 +979,14 @@
       "vergeten": false,
       "gedetecteerd": true,
       "klasse": "onbegrensd",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "n": "N20",
+        "datum": "2026-09-29",
+        "klasse": "venster",
+        "uitkomst": "het punt verdwijnt bij geleverd of geannuleerd; het adres zelf blijft bij de bestelling, en een verzonnen punt bestaat niet meer",
+        "uitgevoerd": false
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "nodig voor de levering, niet daarna; geen termijn"
@@ -879,8 +1007,14 @@
       "vergeten": false,
       "gedetecteerd": true,
       "klasse": "onbegrensd",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "n": "N20",
+        "datum": "2026-09-29",
+        "klasse": "venster",
+        "uitkomst": "het punt verdwijnt bij geleverd of geannuleerd; het adres zelf blijft bij de bestelling, en een verzonnen punt bestaat niet meer",
+        "uitgevoerd": false
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "geen termijn, alleen een plafond; en zonder punt wordt er een verzonnen (NAVIGATIE.md par. 12, gebrek 5)"

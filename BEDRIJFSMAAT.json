@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-28T16:01:52.592Z",
-    "commit": "056b41ce",
+    "op": "2026-09-29T15:17:07.808Z",
+    "commit": "68f9678f",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bedrijfsmaat.js",
@@ -150,33 +150,43 @@
       "kort": "Een bon bij derden is geld, en dat staat er als positie en niet als instelling.",
       "handhaving": "kern/cadeaubon.js (de schakelaar, standaard dicht, en de verplichting die kern/bankpositie.js leest) en RTG_CADEAUBON in kern/bevoegdheid/lijst-afhankelijk.js; test/cadeaubon.test.js. Verkopen, inwisselen en afrekenen zijn met opzet niet gebouwd: die vragen eerst een e-geldvergunning of vrijstelling.",
       "stand": "gebouwd"
+    },
+    {
+      "id": "C15",
+      "naam": "De marge per lid, per pas en over alle leden",
+      "besloten": "29 september 2026, door de eigenaar",
+      "herkomst": "mens",
+      "regel": "De marge per lid wordt per pas gerekend: de afgesproken maandbijdrage van die pas min wat de leden van die pas het huis kostten, gedeeld door alle leden van die pas, ook wie niets gebruikte. Onder tien leden geen getal, en niet per cohort: dan zou de kostenlaag een identiteit moeten opzoeken.",
+      "kort": "Wat een pas oplevert, zonder een lid te bekijken.",
+      "handhaving": "kern/bedrijfsmaat/stand-marge.js (per pas, alle leden in de noemer, groepspoort met secundaire onderdrukking) en omzetPerPas in kern/ledenregister.js; test/margeperlid.test.js.",
+      "stand": "gebouwd"
     }
   ],
   "telling": {
     "maten": 67,
     "domeinen": 28,
     "perStatus": {
-      "bestaat": 45,
-      "half": 19,
+      "bestaat": 46,
+      "half": 18,
       "ontbreekt": 3,
       "onbekend": 0
     },
     "primairGat": {
       "BRON_ONTBREEKT": 3,
-      "DEFINITIE_ONTBREEKT": 11,
+      "DEFINITIE_ONTBREEKT": 10,
       "PROJECTIE_ONTBREEKT": 3,
       "BEWIJS_ONTBREEKT": 5
     },
     "perGat": {
       "BRON_ONTBREEKT": 3,
-      "DEFINITIE_ONTBREEKT": 14,
-      "PROJECTIE_ONTBREEKT": 14,
-      "BEWIJS_ONTBREEKT": 22
+      "DEFINITIE_ONTBREEKT": 13,
+      "PROJECTIE_ONTBREEKT": 13,
+      "BEWIJS_ONTBREEKT": 21
     },
     "ketens": 6,
-    "ketensGegrond": 5,
-    "bestaatGedeeltelijk": 17,
-    "rustOpGat": 1,
+    "ketensGegrond": 6,
+    "bestaatGedeeltelijk": 18,
+    "rustOpGat": 2,
     "privacyGaten": 0,
     "verworpen": 0,
     "vormfouten": 0
@@ -202,8 +212,8 @@
     },
     "marge": {
       "maten": 3,
-      "bestaat": 2,
-      "half": 1,
+      "bestaat": 3,
+      "half": 0,
       "ontbreekt": 0
     },
     "kosten": {
@@ -456,9 +466,9 @@
     {
       "id": "kosten",
       "naam": "van verbruik naar unit economics",
-      "gegrond": false,
-      "eersteBreuk": "marge.per-lid",
-      "bestaand": 3,
+      "gegrond": true,
+      "eersteBreuk": null,
+      "bestaand": 4,
       "van": 4,
       "schakels": [
         {
@@ -478,12 +488,8 @@
         },
         {
           "id": "marge.per-lid",
-          "status": "half",
-          "gaten": [
-            "DEFINITIE_ONTBREEKT",
-            "PROJECTIE_ONTBREEKT",
-            "BEWIJS_ONTBREEKT"
-          ]
+          "status": "bestaat",
+          "gaten": []
         }
       ]
     },
@@ -544,6 +550,12 @@
       "zwakkeSchakels": [
         "groei.leden-per-pas"
       ]
+    },
+    {
+      "id": "marge.per-lid",
+      "zwakkeSchakels": [
+        "groei.leden-per-pas"
+      ]
     }
   ],
   "privacyGaten": [],
@@ -598,7 +610,7 @@
       },
       {
         "id": "marge.per-lid",
-        "status": "half",
+        "status": "bestaat",
         "domein": "marge"
       },
       {
@@ -1779,27 +1791,23 @@
       "id": "marge.per-lid",
       "versie": 1,
       "domein": "marge",
-      "betekenis": "Unit economics: wat een lid bijdraagt min wat hij kost, opgeteld per pas of cohort en nooit per mens.",
+      "betekenis": "Unit economics: wat een lid bijdraagt min wat hij kost, per pas en nooit per mens (besluit C15).",
       "wereld": "consument",
       "bronnen": [],
-      "berekening": "nog niet vastgesteld",
-      "eenheid": "euro per lid per maand",
-      "graad": "onbekend",
-      "actualiteit": "periode",
+      "berekening": "per pas: afgesproken maandbijdrage min de kosten van de leden van die pas, gedeeld door alle leden van die pas",
+      "eenheid": "eurocent per lid per maand",
+      "graad": "vermoed",
+      "actualiteit": "live",
       "minimaleGroep": 10,
       "privacyklasse": "leden",
-      "eigenaar": null,
-      "eigenaarReden": "Niemand.",
+      "eigenaar": "kern/bedrijfsmaat",
+      "eigenaarReden": null,
       "afhankelijk": [
         "omzet.leden-maand",
         "kosten.per-drager"
       ],
-      "status": "half",
-      "gaten": [
-        "DEFINITIE_ONTBREEKT",
-        "PROJECTIE_ONTBREEKT",
-        "BEWIJS_ONTBREEKT"
-      ],
+      "status": "bestaat",
+      "gaten": [],
       "elementen": {
         "bron": {
           "aanwezig": true,
@@ -1808,26 +1816,60 @@
           "reden": null
         },
         "definitie": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Kosten per drager bestaan, opbrengst per drager niet; welke van de twee de noemer is (pas, cohort) is niet besloten."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/definities.js",
+              "citaat": "margePerLid: d29(15",
+              "klopt": true
+            }
+          ],
+          "reden": null
         },
         "projectie": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Niet gebouwd."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand-marge.js",
+              "citaat": "function uitkomst()",
+              "klopt": true
+            },
+            {
+              "bestand": "server/kern/ledenregister.js",
+              "citaat": "function omzetPerPas",
+              "klopt": true
+            }
+          ],
+          "reden": null
         },
         "bewijs": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Volgt uit de projectie."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand-marge.js",
+              "citaat": "niet('Er zijn leden op deze pas zonder lopend contract",
+              "klopt": true
+            },
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand-marge.js",
+              "citaat": "niet('Verbruik zonder tarief",
+              "klopt": true
+            }
+          ],
+          "reden": null
         }
       },
       "groepsgrens": {
         "vereist": true,
-        "afgedwongen": false,
-        "citaten": [],
-        "reden": "Er is nog geen projectie om hem in af te dwingen."
+        "afgedwongen": true,
+        "citaten": [
+          {
+            "bestand": "server/kern/bedrijfsmaat/stand-marge.js",
+            "citaat": "{ grens, benoemd: true }",
+            "klopt": true
+          }
+        ],
+        "reden": null
       },
       "keten": {
         "gegrond": false,
@@ -1835,7 +1877,7 @@
           "groei.leden-per-pas"
         ]
       },
-      "gedeeltelijk": null
+      "gedeeltelijk": "Alleen de lopende maand: de bijdrage per pas is een stand van vandaag en wordt niet per maand bewaard. De Business Pass rekent alleen mee als elk lid een lopend contract heeft."
     },
     {
       "id": "kosten.per-drager",

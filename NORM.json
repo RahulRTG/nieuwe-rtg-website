@@ -153,8 +153,8 @@
       "datum": "2026-09-28",
       "soort": "structureel",
       "sleutel": "kernBreedte",
-      "van": 1667,
-      "meter": "kernBreedte 1667 -> 1676",
+      "van": 1666,
+      "meter": "kernBreedte 1666 -> 1675",
       "reden": "De besluiten C12 tot en met C14 (28 september 2026). Het domein bedrijfsmaat leest nu het campagneregister (rtgCampagnes, rtgCampagneMaak), de campagnepost van het boek (rtgBoekCampagne), de kanalen (AANMELDKANALEN) en het beslisgeheugen (beslisgeheugen, beslisgeheugenLeg, beslisgeheugenTrekIn); het domein kantoren leest de cadeaubon (cadeaubonBeeld, cadeaubonStandZet) naast de terugstortstand. Elk is een eigen kernmodule die zijn opslag bezit, en een route die hem zelf zou requiren maakt een tweede instantie met een eigen greep op de database.",
       "waarheen": "GRENZEN.json (bedrijfsmaat en kantoren dragen de namen) en test/rtgcampagne.test.js, test/beslisgeheugen.test.js en test/cadeaubon.test.js tegen een echte server"
     },

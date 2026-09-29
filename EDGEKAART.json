@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-09-28T20:18:17.809Z",
-    "commit": "3494fe6fe",
-    "boomVuil": false,
+    "op": "2026-09-29T17:59:28.861Z",
+    "commit": "0194dc11f",
+    "boomVuil": true,
     "boomAnders": 0,
     "instrument": "scripts/edgekaart.js",
     "node": "v22.22.2"
@@ -1761,7 +1761,9 @@
         "luistert": [
           "rtglang"
         ],
-        "attributen": [],
+        "attributen": [
+          "data-rtg-frame-world"
+        ],
         "opslag": [],
         "fetch": []
       }
@@ -3214,6 +3216,7 @@
         "zendt": [],
         "luistert": [],
         "attributen": [
+          "data-rtg-palette",
           "data-rtg-skin",
           "data-rtg-world"
         ],
@@ -4153,6 +4156,6 @@
     "rollen": 216,
     "dubbeleEigenaars": 12,
     "dodeKanalen": 0,
-    "levendeKanalen": 14
+    "levendeKanalen": 15
   }
 }

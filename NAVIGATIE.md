@@ -153,7 +153,7 @@ op `straal`. Een zaak met een straal is een werkgebied en nooit een pin.
 lijn waar geld van afhangt (par. 7), en het scherm van de navigatie toont een
 getal als zekerheid dat geen meting is (par. 12, gebrek 4).
 
-### P-05 — Een plaats leert van haar bronnen, niet van het spoor van haar bezoekers
+### P-05 — Een plaats leert van haar bronnen, niet van het bewegingsspoor van haar bezoekers
 
 > Een plaats wordt rijker doordat een bron iets over haar zegt, nooit doordat
 > RTG vaststelt dat mensen er waren.
@@ -279,17 +279,19 @@ gelezen en niet gedraaid.
 | 10 | parkeren geselecteerd, juiste ingang geselecteerd | **vraagt een besluit** | geen veld op een zaak. Wel bestaande vormen: zonesoorten `parking` en `ingang` in `server/kern/festival/soorten.js:37-38`. Een hek is één punt per zaak (`server/kern/plaats/hekken.js:101`) |
 | 11 | nadering | **staat -- alleen voor een Arrival-pas** | `public/shared/plaatsnadering.js` opent een venster met doel `nadering` en stuurt de puls `in-de-buurt` als het hek van de zaak omslaat; `test/plaatsnadering.e2e.js` meet dat er geen coördinaat meegaat. Geladen alleen op `arrival.html`; werkt niet voor een gewone reservering en niet voor een zaak zonder `loc` |
 | 12 | Invisible Arrival | **staat -- als parallelle wereld** | `server/routes/supplier/horeca/invisible-arrival.js`: een anonieme pas met een EIGEN reservering (`customerKey: 'arrival:' + id`). Met opzet nooit aan een codenaam gekoppeld op de server (`PLAATS.md` fase 4) |
-| 13 | **doorgave navigatie → horeca** | **vraagt een besluit** | er is niets. De navigatie kent geen aankomst, de deeplink draagt geen zaakcode, en de GPS stopt alleen op `pagehide` |
+| 13 | **doorgave navigatie → horeca** | **besloten (N5), een stap weg** | er is niets: de navigatie kent geen aankomst, de deeplink draagt geen zaakcode, en de positie stopt alleen op `pagehide`. De doorgave wordt MINIMAAL -- zie onder de tabel |
 | 14 | tafel of check-in bevestigt de aankomst | **een stap weg** | twee mechanismen die elkaar niet kennen: de zaak zet `aangekomen` met de hand (`/api/supplier/reservering/komst`), en de gast-QR (`server/routes/gast/tafel.js`) opent een anonieme tafelsessie zonder verwijzing naar een reservering |
 | 15 | de GPS heeft geen taak meer | **vraagt een besluit** | volgt uit P-02 en schakel 13 |
 | 16 | eten en afrekenen blijven van horeca | **staat** | `server/routes/supplier/horeca/betalen.js:51-105`; bewezen in `scripts/tafelproef.js` schakel 11 |
 | 17 | de betaling is voltooid | **staat** | idem |
-| 18 | Move krijgt alleen het noodzakelijke vervolgsignaal | **jaren weg in deze vorm, een stap weg in een andere** | afrekenen stuurt alleen `sseToSupplier`; niets zet de reservering op `afgerond` behalve de handknop `vertrokken`. Move is puur vragend en heeft geen gebeurtenisingang. De kleine weg: een reservering die op `afgerond` staat, geeft de reiswereld een `klaarAt` |
+| 18 | ~~Move krijgt een vervolgsignaal na de betaling~~ | **vervalt voor V1** (par. 15.0) | afrekenen stuurt alleen `sseToSupplier`, en dat is goed zo: horeca voltooit zijn eigen proces en stuurt de navigatie niets. Move leest de toekomstige verplichtingen uit de tijdlijn, en daar hoort de volgende activiteit al in te staan |
 | 19 | "haal ik activiteit Y?" | **een stap weg** | `/api/move/vooraf` kan het vandaag al, als het lid zelf de duur van het diner opgeeft; na het reserveren weet `/api/move/reis` het niet meer (schakel 8) |
 | 20 | volgende navigatie | **staat** | `public/apps/move.html:282-297` bouwt de deeplink uit `/api/move/volgende`; let op gebrek 2 in par. 12 |
 
 **Samengevat: 9 staan (waarvan 2 alleen in de parallelle Arrival-wereld), 5 zijn
-een stap weg, 5 vragen een besluit en 1 is in de voorgestelde vorm jaren weg.** Dat is geen tekort aan motoren maar aan naden --
+een stap weg, 5 vroegen een besluit en 1 was in de voorgestelde vorm jaren weg.**
+Na par. 15.0 is schakel 13 besloten en vervalt schakel 18 voor V1; dan blijven er
+19 over, en de open besluiten zitten in schakel 3, 9, 10 en 15. Dat is geen tekort aan motoren maar aan naden --
 precies wat `MACHINE.md` over het hele huis zegt.
 
 **De ene naad die het meeste oplevert** is schakel 8: een reiswereldbron voor
@@ -299,6 +301,45 @@ vorm van de bron die er voor tickets al staat (`plek: {zaak}`, `van`, `tijd`,
 `move/volgende` het diner zien. De duur van een diner is dan wel een besluit: de
 avond neemt 105 minuten aan (`server/kern/avond/samenstellen.js:28`), en dat is
 een huiskeuze die als zodanig gelabeld moet zijn.
+
+**Waarom schakel 8 de eerste echte architectonische naad is.** Zonder de
+reservering in de tijdlijn kent Move de bedoeling niet, en zonder bedoeling is
+dit een slimme routeplanner. Met die ene naad wordt het:
+
+```
+restaurant X      20:00    reistijd 31 min (graad, bron)    marge 10 min (huiskeuze)
+                           → uiterlijk vertrek 19:19
+theater Y         22:15    X → Y 24 min
+                           → haalbaar als het diner om 21:41 klaar is
+```
+
+Move hoeft daarvoor niet te weten hoe lang iemand werkelijk aan tafel zit, en al
+helemaal niet via een positie. De domeinen leveren de betekenis. **Eén ding moet
+een domein wel leveren: het einde van het diner.** Een tafelreservering heeft
+vandaag geen duur, de avond neemt 105 minuten aan (`server/kern/avond/samenstellen.js:28`),
+en zonder `klaarAt` heeft de naad naar het theater geen van-kant (`server/kern/move/index.js:64-78`).
+Die duur hoort van horeca te komen -- de zaak kent haar tafelrotatie -- en waar
+hij een huisstandaard is, draagt hij het etiket `huiskeuze`, zoals de drempel van
+Move dat al doet (`server/kern/move/naad.js:55-59`). En ook de marge van tien
+minuten is een huiskeuze en geen meting.
+
+**De doorgave is minimaal (N5).** De navigatie wordt geen superlink die restaurant,
+reservering, gebruiker, tafel en betaling meedraagt. Ze draagt vier dingen, en
+het ontvangende domein haalt zelf op wat het mag weten:
+
+| wat | betekent |
+|---|---|
+| de **plaats** | naar welke plaats, als verwijzing en niet als coördinaat |
+| het **domein** met een verwijzing die alleen dat domein kan openen | *horeca, en deze verwijzing* -- de navigatie kan hem niet lezen |
+| het **aankomstpunt** | de toegestane ingang waar de doorgave gebeurt |
+| de **terugweg** | waar de mens heen gaat als het domein klaar is |
+
+De navigatie hoeft dus niet te weten *tafel 14, drie personen, € 185*. Ze weet
+*ik breng iemand naar de toegestane ingang van plaats X voor een doorgave aan
+horeca*. De veldnamen zijn nog niet vastgelegd: `doel` is bezet (twee
+betekenissen, `MACHINE.md`) en `terugNaar` ook (een versie in
+`server/kern/command/beleid.js`, een focus in `public/shared/sprong.js`), dus ze
+worden gemeten voordat ze worden gekozen.
 
 **Drie identiteiten die elkaar met opzet niet kennen.** De reservering van het
 lid (codenaam), de Arrival-pas (anoniem, eigen reservering) en de tafelsessie van
@@ -453,6 +494,57 @@ Twee dingen volgen daaruit, en ze staan in par. 14 en 15:
    plaatselijk blijft, of dat het toestel voor een naderingsvenster maar één hek
    krijgt.
 
+### 6.4 De permanente grondwetmeter (N10)
+
+De vijf tellers van 6.1 zijn een eerste lezing. **De definitieve vijf komen uit
+de nulmeting**, niet uit dit document, en ze worden daarna geen eenmalige
+migratiecheck maar een permanente meter. Werknamen, zolang de meting ze niet
+vervangt:
+
+| teller | wat hij telt |
+|---|---|
+| `blijvendeNavPositie` | een positie uit een navigatieverzoek die na het antwoord nog ergens staat |
+| `positieNaVenster` | een positie die er nog is nadat haar venster sloot, of die er zonder venster kwam |
+| `passageLog` | een regel *deze codenaam kwam langs deze plaats* die niet het doel van het venster was |
+| `aankomstUitPositie` | een domeinstand `aangekomen` (of verder) die werd gezet op grond van een positie |
+| `onbegrensdeRitlijn` | een reeks posities aan een rit of opdracht zonder termijn |
+
+**Groen betekent niet dat het beleid zegt dat er geen bewegingsspoor is. Groen
+betekent dat de code aantoonbaar geen verboden bewegingsspoor maakt.**
+
+**De meter heeft twee helften, en ze worden nooit opgeteld.** Dat is de les van
+`STAGE.md` (bewering B bleef groen onder een mutatie, bewering D ving hem):
+
+1. **de bron** -- `positiestroom` leest statisch waar een positie binnenkomt, aan
+   welke sleutel hij wordt gehangen, in welke collectie hij landt, met welke
+   termijn en wie hem leest. Hij deelt elke stroom in één van zeven klassen in:
+
+   | klasse | betekent |
+   |---|---|
+   | `toegestaan` | verlaat het verzoek niet, of is geen positie van een mens (een zaak, een halte) |
+   | `venster` | bestaat alleen binnen een lopend venster en verdwijnt ermee |
+   | `noodzakelijk` | is nodig voor een genoemde functie en heeft een termijn die bij die functie hoort |
+   | `teLang` | heeft een termijn, maar een langere dan de functie nodig heeft |
+   | `onbegrensd` | heeft geen termijn |
+   | `verboden` | botst met P-05 of N3, ongeacht de termijn |
+   | `onbekend` | de meter kan het niet vaststellen -- met de reden, en **nooit** stil als `toegestaan` geteld |
+
+   De indeling is een BESLUIT per stroom en de uitslag een METING, en die twee
+   staan uit elkaar, zoals in `scripts/spoorvorm.js`: welke functie een positie
+   *nodig heeft* kan geen parser vinden, wat de code ermee *doet* wel.
+2. **de opslag** -- een doorloop van de keten tegen een echte server, waarna de
+   hele opslag wordt gelezen. Dat vangt wat de bron niet ziet: een collectie die
+   *vluchtig* heet en toch met de volgende `save()` naar schijf gaat (de positie
+   van een bezorger, par. 6.2).
+
+De ratel mag alleen **omlaag** op `verboden`, `onbegrensd` en `teLang`, en
+**nooit omlaag** op het aantal gelezen stromen -- een schuld die daalt doordat de
+meter blind wordt, is de gevaarlijkste vorm van vooruitgang (`MENSNETWERK.md`,
+de drie ratels van `stilspoor`). En de meter hoort in de keuring waar hij over
+gaat: een register dat door een toets wordt bewaakt, is niet gedekt door een
+groene keuring tenzij die toets onderdeel is van die keuring (`npm run
+registerklopt`).
+
 ---
 
 ## 7. De reistijddienst
@@ -496,6 +588,53 @@ Drie klassen, en een afnemer kiest er één -- de dienst kiest niet voor hem:
 De ritprijs is de zwaarste omzetting, want de belofte *de prijs staat vast* staat
 er al. Of die prijs straks op de route of achteraf wordt bepaald, is een besluit
 (par. 15) en geen bouwtaak.
+
+### 7.3 Wat de dienst teruggeeft (N4)
+
+Meer dan minuten. Een antwoord van `reistijd` draagt:
+
+| veld | inhoud |
+|---|---|
+| `route` | de geometrie, als die er is -- en alleen voor de vrager; hij wordt niet bewaard |
+| `wegafstand` | meters over het net, of `null` met de reden |
+| `reistijd` | minuten |
+| `graad` | `gemeten`, `vermoed` of `onbekend` (de vier graden van `BESTUUR.md`; `bewezen` hoort hier pas bij een gekalibreerde meting) |
+| `bron` | welk net (NWB, een gebiedspakket, het oefenraster, de rechte lijn) en welke signalen meewogen |
+| `onzekerheid` | **een bandbreedte alleen als hij gemeten is**; anders `null` met de reden |
+| `weigering` | als er geen antwoord is: waarom, en de weg eromheen (`dekking.js` heeft die vorm al) |
+
+Het veld `onzekerheid` verdient een waarschuwing, want het is precies waar N7
+vandaan komt. Een bandbreedte is een belofte over trefzekerheid, en die mag er
+pas staan als hij over afgesloten perioden is gemeten -- de vorm van
+`server/kern/kosten/vooruitblik.js`, die zijn bandbreedte pas toont na drie
+afgesloten maanden. Tot die tijd is het eerlijke antwoord `null` met *"nog niet
+gemeten"*, en niet een formule met een plus-minteken ervoor.
+
+### 7.4 Vijf grootheden die niet door elkaar mogen (G)
+
+De gebreken van par. 12 zijn geen losse fouten. Twee functies roepen `haversine`
+verkeerd aan, andere domeinen nemen een rechte lijn waar een wegafstand nodig
+is, en een ETA heet *gemeten* terwijl hij geschat is. Dat is één oorzaak: **er is
+geen afgedwongen geografische waarheidslaag.** Een kaal getal in meters of
+minuten kan elk van deze vijf zijn:
+
+| grootheid | wat het is | mag geld dragen? |
+|---|---|---|
+| `afstandRecht` | hemelsbreed, in meters | nee |
+| `wegafstand` | over het net, in meters | ja, met de bron erbij |
+| `reistijd` | een verwachting over het net | als toezegging, met de graad |
+| `gemetenReistijd` | een reistijd die achteraf is waargenomen -- door het domein, niet door een bewegingsspoor | ja |
+| `geschatteReistijd` | een rechte lijn gedeeld door een vaste snelheid | nee; alleen weergave |
+
+De reparatie hoort op de oorzaak (`LAT.md` regel 1): een API die een waarde met
+haar soort teruggeeft in plaats van een kaal getal, zodat een prijsformule een
+`afstandRecht` kan WEIGEREN in plaats van hem stil te vermenigvuldigen. Pas daarna
+de tien gebreken -- want wie ze een voor een repareert, laat de deur open voor
+het elfde.
+
+Let op één naam: `gemetenReistijd` mag nooit uit een bewegingsspoor komen (N1,
+N3). Wat hier *gemeten* heet, is een vertrek en een aankomst die een domein
+bevestigde, en niet de reeks punten ertussen.
 
 ---
 
@@ -680,7 +819,7 @@ en de datum erbij (`BESTUUR.md`: vervallen bewijs is geen bewijs):
 |---|---|---|
 | 1 | de Nederlandse restaurantketen sluit | **niet gemeten** -- er is geen proef; bij lezing staan 9 van 20 schakels, en 2 daarvan alleen voor de anonieme Arrival-pas |
 | 2 | de storingsmatrix houdt | **niet gemeten** -- bij lezing houden er 2 van 10 en 1 voor de helft |
-| 3 | het dubbelbewijs staat op nul | **gezakt bij lezing** -- geen van de vijf tellers staat op nul, en de keten raakt er twee (par. 6.2) |
+| 3 | het dubbelbewijs staat op nul, als **permanente** meter en niet als eenmalige check (N10) | **gezakt bij lezing** -- geen van de vijf tellers staat op nul, en de keten raakt er twee (par. 6.2) |
 | 4 | zaakregistratie → kaart | **gezakt bij lezing** -- `loc: null` op vijf wegen |
 | 5 | echte route → doelaankomst → doorgave aan het domein | **gezakt bij lezing** -- er is geen doorgave |
 | 6 | een tweede domein hergebruikt dezelfde keten zonder eigen locatiearchitectuur | **niet gemeten** -- en bij lezing heeft bezorging er drie |
@@ -707,8 +846,11 @@ architectuur en de meetuitslagen laten het zien, of ze laten het niet zien.
 
 | stap | wat | vorm |
 |---|---|---|
-| **A0** | de grondwet P-01..P-06 plus de `plaatsvorm`-meting (deelt een plaats iets over horeca, verblijf, mobiliteit, retail heen?) en de nulmeting van het dubbelbewijs als TOETS die de opslag leest -- die zakt vandaag, en dat is de bedoeling | meting, geen bouwwerk |
-| **A1** | besluit B8 en B9 uitvoeren: de passages uit `plaatsLog`, en aankomst als hek-overgang op het toestel | reparatie, met de toets van A0 als eerste die groen wordt |
+| **A0a** | **`plaatsvorm`**: wat verstaat RTG vandaag onder een plaats? Per bron: geometrie, etiketten, privacy, zichtbaarheid, toestand, bewijs en wie hem leest. Met de lezer van `scripts/objectmodel.js`. Niet om een schema af te dwingen maar om de inconsistenties zichtbaar te maken | meting, geen bouwwerk |
+| **A0b** | **`positiestroom`**: elke plek waar een positie binnenkomt, wordt verwerkt, aan een sleutel of codenaam wordt gekoppeld, wordt opgeslagen (hoe lang, waarvoor) en wordt gelezen -- met per stroom een van zeven klassen (par. 6.4) | meting, geen bouwwerk |
+| **A0c** | de vijf tellers als toets die de OPSLAG leest na een doorloop -- die zakt vandaag, en dat is de bedoeling; daarna een ratel die alleen omlaag mag (N10) | toets |
+| **A1** | N2 en N3 uitvoeren, in de volgorde die A0b aanwijst: de passages uit `plaatsLog`, aankomst niet meer uit een opgeslagen positie, en per positieopslag doel, minimum, termijn en noodzaak | reparatie, met A0c als de toets die groen wordt |
+| **G** | de geografische grootheden uit elkaar (par. 7.4), zodat een API het moeilijk maakt ze te verwarren -- en pas dan de tien gebreken van par. 12 | op de oorzaak, niet per gebrek |
 | **A** | een zaak krijgt een geldige plaats: de adreszoeker geeft de coördinaat mee als VOORSTEL, de zaak bevestigt, en de poort van P-03 staat aan de bron | aansluiten |
 | **R** | de reistijddienst met de drie klassen van par. 7.2 | één plek, ingespoten |
 | **D** | ingang en parkeren als plaatsfeiten die de zaak zelf levert | besluit, dan aansluiten |
@@ -723,16 +865,61 @@ routeergraaf → adresindex → plaatsindex → licentie en herkomst → offline
 **Bewust als laatste:** alles uit par. 10 dat routeren op het toestel nodig
 heeft, en alles uit par. 11 dat een voorspelling met een getal wil.
 
-De volgorde is niet vrij. Wie P1 bouwt vóór A, bouwt een proef die bij schakel 2
-zakt. Wie D bouwt vóór A0, legt een ingang aan een `Place`-type dat de meting
-misschien niet rechtvaardigt.
+De volgorde is niet vrij. Wie P1 bouwt vóór A0b, bouwt een keten waarvan niemand
+kan zeggen welk bewegingsspoor hij achterlaat (N10). Wie P1 bouwt vóór A, bouwt
+een proef die bij schakel 2 zakt. Wie D bouwt vóór A0a, legt een ingang aan een
+`Place`-type dat de meting misschien niet rechtvaardigt. En wie de gebreken van
+par. 12 een voor een repareert vóór G, repareert symptomen: over zes maanden
+gebruikt iemand weer een hemelsbrede afstand als taxiprijs.
 
 ---
 
 ## 15. Besluiten van de eigenaar
 
-Elk besluit met de opties, wat ze betekenen en wat ze kosten. De aanbeveling
-staat vooraan.
+### 15.0 Genomen op 29 september 2026
+
+De codelezing liet zien dat de these scherper is dan de implementatie: het huis
+zegt *geen bewegingsspoor*, en er ontstaat er technisch op meerdere plekken nog
+wel een. De eigenaar koos daarom eerst voor de fundering en niet voor nieuwe
+navigatiefuncties. Tien besluiten:
+
+| # | besluit | wat het vastlegt |
+|---|---|---|
+| **N1** | **P-05 is hard** | een plaats wordt rijker uit bronnen en domeingebeurtenissen, nooit uit het bewegingsspoor van bezoekers; *technisch handig* is geen uitzondering |
+| **N2** | **centrale bewegingsopslag wordt afgebouwd** (richting van B8) | eerst de nulmeting; daarna per opslag **doel, minimale gegevens, levensduur en noodzakelijkheid** afdwingen. Niet blind verwijderen: een positie die voor een concrete veiligheids- of ritfunctie nodig blijkt, blijft -- met een termijn. `plaatsLog` met passages onder een codenaam past niet bij de these |
+| **N3** | **aankomst wordt nooit uit een opgeslagen positie bewezen** (scherper dan B9) | nadering mag binnen een venster HELPEN; het aankomstBEWIJS komt van het domein of de mens. Een hek-overgang is dus ook geen aankomst, alleen een nadering. `test/grand-integratie.pg.test.js:306-308` handhaaft vandaag het tegendeel en moet om -- hardop, als besluit, en niet als toets die stil wordt aangepast |
+| **N4** | **`reistijd` is de naam** | en de dienst geeft meer terug dan minuten: route, afstand, graad, bron, onzekerheid en de reden van een weigering (par. 7.3) |
+| **N5** | **`doorgave` is de domeingrens** | de navigatie brengt tot een overdraagbaar punt en geeft minimale context door; daarna is het ontvangende domein eigenaar. **Er komt geen centrale reiseigenaar** (par. 4, schakel 13) |
+| **N6** | **een rechte lijn wordt nooit stil waarheid** (richting van B3) | `haversine` draagt de graad `vermoed`; waar geld, een harde toezegging of veiligheid ervan afhangt, is geen echte route geen verzonnen zekerheid. Ritprijs, taxi-offerte, OV-tarief, kaartjes en bezorging worden expliciet ingedeeld. Welke uitweg per afnemer (prijs achteraf, vaste prijs op de route, weigeren) blijft per afnemer een besluit |
+| **N7** | **"% aankomstzekerheid" gaat van het scherm** tot hij gekalibreerd is | de formule mag een interne heuristiek blijven, maar wordt niet als gemeten waarschijnlijkheid gepresenteerd (par. 12, gebrek 4) |
+| **N8** | **het restaurant is de gouden proef** (proef 1) | niet Vonk, taxi of bezorging eerst: het raakt Plaats, Navigatie, Move, Horeca, Arrival en betaling tegelijk, en staat al op 9 van 20. Het TWEEDE domein (B4) blijft open |
+| **N9** | **internationaal loopt parallel** | Nederland is de eerste bewijsomgeving en niet de architectuurgrens. Een buitenlandse bestemming komt nooit meer ongemerkt op het oefenraster terecht alsof het een echte route is |
+| **N10** | **de terughoudendheidstellers worden een permanente grondwetmeter** | geen eenmalige migratiecheck. *Groen betekent niet dat het privacybeleid zegt dat RTG geen bewegingsspoor maakt; groen betekent dat de code aantoonbaar geen verboden bewegingsspoor maakt.* De vijf tellers komen uit de nulmeting en niet uit dit document (par. 6.4) |
+
+Plus twee afbakeningen die bij de besluiten horen:
+
+- **Schakel 18 is voor V1 geen eis.** Na de betaling stuurt het domein de
+  navigatie niets. Horeca voltooit zijn eigen proces; Move kijkt naar de
+  expliciete toekomstige verplichtingen in de tijdlijn wanneer de mens daarom
+  vraagt of een toegestane stroom dat vereist. Een signaal *"hij is klaar met
+  eten"* zou precies de koppeling maken die de doorgave moet voorkomen.
+- **De keten wordt pas gebouwd als meetbaar is welke geografische informatie
+  hij achterlaat.** Dan kan het eind niet alleen *20 van 20 schakels bewezen*
+  zeggen, maar daarnaast *5 van 5 verboden bewegingstellers = 0*.
+
+**Een correctie op de naam.** Het voorstel noemde de tweede meter een
+*spoormeter*. In dit huis is een **spoor het auditspoor**: `scripts/stilspoor.js`,
+`spoorvorm.js` en `laatspoor.js` gaan alle drie over het logboek dat een
+handeling hoort na te laten, en `LAT.md` regel 13 eist zo'n spoor juist. "Geen
+spoor" en "spoor verplicht" zouden dan in één huis over twee dingen gaan. Deze
+documenten zeggen daarom **bewegingsspoor** waar ze posities bedoelen, en de
+meter heet **`positiestroom`** (gemeten vrij).
+
+### 15.1 Nog open
+
+Wat hieronder staat is niet door 15.0 beslist. B3, B8 en B9 hebben een richting
+(N6, N2, N3), en de keuze tussen de uitwegen volgt uit de nulmeting. Elk met de
+opties, wat ze betekenen en wat ze kosten; de aanbeveling staat vooraan.
 
 **B1. Mag een reservering van een lid de nadering openen?**
 - *Ja, op het toestel (aanbevolen).* De reservering geeft het toestel een

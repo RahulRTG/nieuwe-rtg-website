@@ -2,17 +2,17 @@
   "soort": "schermfunctie",
   "uitleg": "Feiten per scherm (paden, domeinen, rol, wereld, inkomende links, alias) en de paren schermen die dezelfde API-paden raken. Het oordeel over die paren staat in SCHERMEIGENAAR.json; dit register stelt niets vast behalve wat er gemeten is.",
   "stempel": {
-    "op": "2026-09-28",
-    "commit": "ebd7424c"
+    "op": "2026-09-29",
+    "commit": "2ae19049"
   },
   "bronnen": {
     "schermroutes": {
-      "op": "2026-09-28",
-      "commit": "ebd7424c"
+      "op": "2026-09-29",
+      "commit": "2ae19049"
     },
     "schermgedrag": {
-      "op": "2026-09-28",
-      "commit": "ebd7424c"
+      "op": "2026-09-29",
+      "commit": "2ae19049"
     }
   },
   "ruis": [
@@ -100,6 +100,18 @@
     },
     {
       "script": "public/shared/rtg-edge-icons.js",
+      "schermen": 9
+    },
+    {
+      "script": "public/site/platform-data.js",
+      "schermen": 9
+    },
+    {
+      "script": "public/site/platform-detail.js",
+      "schermen": 9
+    },
+    {
+      "script": "public/site/platform-elements.js",
       "schermen": 9
     },
     {
@@ -3416,10 +3428,11 @@
         "/api/rtfos"
       ],
       "zonderServer": false,
-      "inkomend": 6,
+      "inkomend": 7,
       "inIndex": 4,
       "inkomendVan": [
         "public/apps/foundation/index.html",
+        "public/shared/interface/world-presentation.js",
         "public/shared/rtg-world-home.js",
         "server/kern/appcatalogus-rijen/deel2.js",
         "server/kern/appgids-data/deel4.js",
@@ -8145,7 +8158,7 @@
         "/api/nav"
       ],
       "zonderServer": false,
-      "inkomend": 17,
+      "inkomend": 18,
       "inIndex": 7,
       "inkomendVan": [
         "public/apps/app-main/app-main-23a.js",
@@ -8159,7 +8172,7 @@
         "public/apps/rtg.html",
         "public/apps/sport.html",
         "public/apps/uitgaan.html",
-        "public/shared/rosapps.js"
+        "public/shared/interface/world-presentation.js"
       ]
     },
     {
@@ -9184,7 +9197,7 @@
         "/api/reis"
       ],
       "zonderServer": false,
-      "inkomend": 15,
+      "inkomend": 16,
       "inIndex": 6,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
@@ -9194,11 +9207,11 @@
         "public/apps/reizen.html",
         "public/apps/rtg.html",
         "public/apps/sociaal.html",
+        "public/shared/interface/world-presentation.js",
         "public/shared/rosapps.js",
         "public/shared/rtg-edge-2-loader.js",
         "public/shared/travel-os-config.js",
-        "public/site/website-truth.json",
-        "public/site/werelden/travelos.html"
+        "public/site/website-truth.json"
       ]
     },
     {
@@ -9364,7 +9377,7 @@
         "/api/reis"
       ],
       "zonderServer": false,
-      "inkomend": 66,
+      "inkomend": 67,
       "inIndex": 6,
       "inkomendVan": [
         "public/apps/app-main/app-main-24a2b.js",
@@ -11336,13 +11349,14 @@
         "/api/wereld"
       ],
       "zonderServer": false,
-      "inkomend": 10,
+      "inkomend": 11,
       "inIndex": 7,
       "inkomendVan": [
         "public/apps/app-main/app-main-23a.js",
         "public/apps/comm.html",
         "public/apps/rtg.html",
         "public/shared/command.js",
+        "public/shared/interface/world-presentation.js",
         "public/site/website-truth.json",
         "public/sw.js",
         "server/kern/appgids-data/deel1.js",
@@ -11446,11 +11460,12 @@
       "schilPaden": [],
       "domeinen": [],
       "zonderServer": true,
-      "inkomend": 7,
+      "inkomend": 8,
       "inIndex": 3,
       "inkomendVan": [
         "public/apps/kantoor.html",
         "public/apps/kantoren.html",
+        "public/shared/interface/world-presentation.js",
         "public/shared/rtg-world-identity.js",
         "public/shared/workos-premium.js",
         "public/site/website-truth.json",
@@ -11745,6 +11760,9 @@
         "public/site/start/experience-core.js",
         "public/site/storyline-stage.js",
         "public/site/storyline-world.js",
+        "public/site/platform-data.js",
+        "public/site/platform-elements.js",
+        "public/site/platform-detail.js",
         "public/site/storyline-edge.js"
       ],
       "paden": [],
@@ -11782,6 +11800,9 @@
         "public/site/start/experience-core.js",
         "public/site/storyline-stage.js",
         "public/site/storyline-world.js",
+        "public/site/platform-data.js",
+        "public/site/platform-elements.js",
+        "public/site/platform-detail.js",
         "public/site/storyline-edge.js"
       ],
       "paden": [],
@@ -11819,6 +11840,9 @@
         "public/site/start/experience-core.js",
         "public/site/storyline-stage.js",
         "public/site/storyline-world.js",
+        "public/site/platform-data.js",
+        "public/site/platform-elements.js",
+        "public/site/platform-detail.js",
         "public/site/storyline-edge.js"
       ],
       "paden": [],
@@ -11856,6 +11880,9 @@
         "public/site/start/experience-core.js",
         "public/site/storyline-stage.js",
         "public/site/storyline-world.js",
+        "public/site/platform-data.js",
+        "public/site/platform-elements.js",
+        "public/site/platform-detail.js",
         "public/site/storyline-edge.js"
       ],
       "paden": [],
@@ -11893,6 +11920,9 @@
         "public/site/start/experience-core.js",
         "public/site/storyline-stage.js",
         "public/site/storyline-world.js",
+        "public/site/platform-data.js",
+        "public/site/platform-elements.js",
+        "public/site/platform-detail.js",
         "public/site/storyline-edge.js"
       ],
       "paden": [],
@@ -11930,6 +11960,9 @@
         "public/site/start/experience-core.js",
         "public/site/storyline-stage.js",
         "public/site/storyline-world.js",
+        "public/site/platform-data.js",
+        "public/site/platform-elements.js",
+        "public/site/platform-detail.js",
         "public/site/storyline-edge.js"
       ],
       "paden": [],
@@ -11966,6 +11999,9 @@
         "public/site/start/experience-core.js",
         "public/site/storyline-stage.js",
         "public/site/storyline-world.js",
+        "public/site/platform-data.js",
+        "public/site/platform-elements.js",
+        "public/site/platform-detail.js",
         "public/site/storyline-edge.js"
       ],
       "paden": [],
@@ -12002,6 +12038,9 @@
         "public/site/start/experience-core.js",
         "public/site/storyline-stage.js",
         "public/site/storyline-world.js",
+        "public/site/platform-data.js",
+        "public/site/platform-elements.js",
+        "public/site/platform-detail.js",
         "public/site/storyline-edge.js"
       ],
       "paden": [],
@@ -12038,6 +12077,9 @@
         "public/site/start/experience-core.js",
         "public/site/storyline-stage.js",
         "public/site/storyline-world.js",
+        "public/site/platform-data.js",
+        "public/site/platform-elements.js",
+        "public/site/platform-detail.js",
         "public/site/storyline-edge.js"
       ],
       "paden": [],

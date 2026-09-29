@@ -2445,8 +2445,8 @@ het meten: de sluiting van het stuur is klein en precies één module leest van
 schijf -- `VERTROUWEN.json`, een REGISTER. Een register lezen mag, een `.js`
 lezen niet; dát onderscheid is de invariant. De vraag of de 77 registers samen
 één Codewereld vormen is eerst GEMETEN (`npm run codewereld`, `CODEWERELD.json`)
-in plaats van aangenomen -- zelfde reden als bij `Asset`: <!--getal:codewereld.ruggengraat-->6096<!--/getal--> van
-<!--getal:codewereld.paden-->6542<!--/getal--> paden staan in meer dan één register, dus er IS een ruggengraat, maar hij
+in plaats van aangenomen -- zelfde reden als bij `Asset`: <!--getal:codewereld.ruggengraat-->6108<!--/getal--> van
+<!--getal:codewereld.paden-->6553<!--/getal--> paden staan in meer dan één register, dus er IS een ruggengraat, maar hij
 loopt over de as ROUTE. De as SYMBOOL is **nul** -- geen register kent een
 functienaam met een plaats, dus het objectvoorbeeld `pay.boeken` met een
 `symbol`-veld belooft iets wat geen enkele meter vult. Die as is
@@ -2467,7 +2467,7 @@ opgeteld. Verder is het bronbereik voor gedrag
 <!--getal:codewereld.bronGedragPct-->56.2<!--/getal-->% -- over de meerderheid van de bronbestanden zegt geen enkel
 register iets over gedrag, dus een "80-95% zonder bron te beantwoorden" haalt die
 grens vandaag niet -- en dat ene getal verbergt nog iets, want `server/` haalt
-<!--getal:codewereld.bronServerPct-->60.6<!--/getal-->% en `public/` <!--getal:codewereld.bronPublicPct-->42<!--/getal-->%: over de schermen wisten de registers
+<!--getal:codewereld.bronServerPct-->60.5<!--/getal-->% en `public/` <!--getal:codewereld.bronPublicPct-->42.2<!--/getal-->%: over de schermen wisten de registers
 vrijwel niets (6,6%) tot `SCHERMROUTES.json` erbij kwam, dat per bestand in
 public/ leest welke API-paden het noemt en daarmee de keten scherm -> route legt.
 De aanroepgraaf ligt er sinds dezelfde dag naast (`AANROEPGRAAF.json`,

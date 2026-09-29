@@ -2,8 +2,8 @@
  "soort": "meting",
  "uitleg": "Wat een scherm in public/ via de API kan veroorzaken: schrijft het, welke rol vraagt het, wat is het bewijs waard, en wat doet een tweede aanroep. Samengesteld uit bestaande metingen -- hier wordt niets nieuws gemeten en niets geraden.",
  "stempel": {
-  "op": "2026-09-28",
-  "commit": "ebd7424c"
+  "op": "2026-09-29",
+  "commit": "2ae19049"
  },
  "grond": [
   "SCHERMROUTES.json",
@@ -15,20 +15,20 @@
  "grens": "AFGELEID gedrag: wat het scherm via de API kan veroorzaken. NIET wat het scherm zelf doet (localStorage, DOM, een berekening). `schrijft: nee` betekent dus \"verandert niets aan de serverkant\" en niet \"verandert niets\".",
  "samenstelregel": "schrijven: de ZWAARSTE uitkomst wint (een van de tien routes schrijft = dit scherm kan iets veranderen). Bewijs: het ZWAKSTE telt, want een keten is zo sterk als zijn zwakste schakel. Onbekend is in beide gevallen niet de gunstige uitkomst.",
  "gemeten": {
-  "schermen": 420,
-  "metGrond": 271,
+  "schermen": 422,
+  "metGrond": 273,
   "zonderGrond": 149,
   "schrijftJa": 65,
   "schrijftNee": 1,
-  "schrijftOnbekend": 158,
+  "schrijftOnbekend": 160,
   "schrijftNietVastTeStellen": 196,
   "bewijsVerdeling": {
-   "verzwakt": 211,
+   "verzwakt": 213,
    "niet vast te stellen": 175,
    "ONBEPAALD": 34
   },
   "bewijsBewezen": 0,
-  "bewijsVerzwakt": 211,
+  "bewijsVerzwakt": 213,
   "bewijsNietVastTeStellen": 175,
   "onbekendeBewijswaarden": [],
   "zonderRol": 48
@@ -1761,6 +1761,21 @@
     "ongemeten"
    ],
    "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
+   "bestand": "public/shared/interface/personal-images.js",
+   "padenGenoemd": 4,
+   "voorvoegsels": 2,
+   "routesGeraakt": 4,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
   },
   {
    "bestand": "public/shared/interface/world-desktop-people.js",
@@ -4094,6 +4109,21 @@
    "bestand": "public/shared/interface/modules/travel.js",
    "padenGenoemd": 1,
    "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/shared/interface/personal-image-editor.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 1,
    "routesGeraakt": 1,
    "schrijft": "onbekend",
    "bewijs": "verzwakt",

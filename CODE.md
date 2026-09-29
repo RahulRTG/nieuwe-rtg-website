@@ -26,14 +26,14 @@ gevonden. Dus eerst meten — `npm run codewereld`, uitslag in `CODEWERELD.json`
 | Registers in de wortel | <!--getal:codewereld.registers-->190<!--/getal--> (37 op route, 31 op bestand, 1 op symbool, 9 zonder as) |
 | As **route** | 5709 paden, in 42 registers |
 | As **bestand** | 1457 bestanden, in 54 registers |
-| As **symbool** | <!--getal:codewereld.symboolSleutels-->24411<!--/getal--> symbolen — *stond op 0 tot 3 september 2026, zie §0.2* |
-| Ruggengraat | **<!--getal:codewereld.ruggengraat-->6096<!--/getal--> van <!--getal:codewereld.paden-->6542<!--/getal--> paden (<!--getal:codewereld.ruggengraatPct-->93.2<!--/getal-->%) staan in meer dan één register** |
-| Brug route → bestand | <!--getal:codewereld.brugPaden-->5591<!--/getal--> paden, uit **2** registers |
-| Verschillen in die brug | 1, getoetst op <!--getal:codewereld.brugToetsbaar-->5362<!--/getal--> paden (<!--getal:codewereld.brugDekkingPct-->95.9<!--/getal-->%) — soort: zie §0.3 |
-| Bronbereik **structuur** | <!--getal:codewereld.bronGenoemd-->5088<!--/getal--> van <!--getal:codewereld.bronBestanden-->5088<!--/getal--> (<!--getal:codewereld.bronPct-->100<!--/getal-->%) — welke functies er wonen, wie ervan afhangt |
-| Bronbereik **gedrag** | **<!--getal:codewereld.bronGedrag-->2860<!--/getal--> van 3987 (<!--getal:codewereld.bronGedragPct-->56.2<!--/getal-->%)** — schrijft het, is het bewezen, is het herhaalbaar |
-| — gedrag in `server/` | <!--getal:codewereld.bronServerPct-->60.6<!--/getal-->% |
-| — gedrag in `public/` | <!--getal:codewereld.bronPublicPct-->42<!--/getal-->% |
+| As **symbool** | <!--getal:codewereld.symboolSleutels-->24453<!--/getal--> symbolen — *stond op 0 tot 3 september 2026, zie §0.2* |
+| Ruggengraat | **<!--getal:codewereld.ruggengraat-->6108<!--/getal--> van <!--getal:codewereld.paden-->6553<!--/getal--> paden (<!--getal:codewereld.ruggengraatPct-->93.2<!--/getal-->%) staan in meer dan één register** |
+| Brug route → bestand | <!--getal:codewereld.brugPaden-->5601<!--/getal--> paden, uit **2** registers |
+| Verschillen in die brug | 1, getoetst op <!--getal:codewereld.brugToetsbaar-->5372<!--/getal--> paden (<!--getal:codewereld.brugDekkingPct-->95.9<!--/getal-->%) — soort: zie §0.3 |
+| Bronbereik **structuur** | <!--getal:codewereld.bronGenoemd-->5102<!--/getal--> van <!--getal:codewereld.bronBestanden-->5102<!--/getal--> (<!--getal:codewereld.bronPct-->100<!--/getal-->%) — welke functies er wonen, wie ervan afhangt |
+| Bronbereik **gedrag** | **<!--getal:codewereld.bronGedrag-->2868<!--/getal--> van 3987 (<!--getal:codewereld.bronGedragPct-->56.2<!--/getal-->%)** — schrijft het, is het bewezen, is het herhaalbaar |
+| — gedrag in `server/` | <!--getal:codewereld.bronServerPct-->60.5<!--/getal-->% |
+| — gedrag in `public/` | <!--getal:codewereld.bronPublicPct-->42.2<!--/getal-->% |
 
 Vier dingen volgen daaruit, en ze zijn belangrijker dan het plan zelf.
 
@@ -64,7 +64,7 @@ maar omdat ze vrijwel allemaal op ROUTES kijken en een groot deel van de code
 geen route is.
 
 Het getal staat gesplitst omdat het gemengde cijfer een verschil verbergt:
-`server/` haalt <!--getal:codewereld.bronServerPct-->60.6<!--/getal-->%, `public/` <!--getal:codewereld.bronPublicPct-->42<!--/getal-->%. Dat tweede was **6,6%** tot
+`server/` haalt <!--getal:codewereld.bronServerPct-->60.5<!--/getal-->%, `public/` <!--getal:codewereld.bronPublicPct-->42.2<!--/getal-->%. Dat tweede was **6,6%** tot
 `SCHERMGEDRAG.json` er was (§0.5) — over de schermen wisten de registers
 toen niets over gedrag, en een Architect die gevraagd wordt waarom een knop niet
 werkt, stond daarmee meteen op niveau 3 van de ladder hieronder. Ook nu nog
@@ -77,7 +77,7 @@ verschilt.
 parser in `scripts/ast/` (lexer, recursive-descent parser, walker — geen enkele
 dependency) is over de hele serverboom gehaald:
 
-**<!--getal:codewereld.geparsed-->3899<!--/getal--> bestanden geparsed, <!--getal:codewereld.parseFout-->0<!--/getal--> gefaald, <!--getal:codewereld.symbolen-->17171<!--/getal--> benoemde
+**<!--getal:codewereld.geparsed-->3906<!--/getal--> bestanden geparsed, <!--getal:codewereld.parseFout-->0<!--/getal--> gefaald, <!--getal:codewereld.symbolen-->17177<!--/getal--> benoemde
 symbolen, in vijf seconden.**
 
 Nul gefaald telt hier dubbel, want deze parser gooit op wat hij niet begrijpt in
@@ -158,8 +158,8 @@ twee betekenissen is precies wat `SEMANTIEK.json` hier 99 keer heeft geteld.
 
 **Gat 2 — over de schermen wisten de registers niets** (gedragsdekking 6,6%).
 `scripts/schermroutes.js` → `SCHERMROUTES.json` (`npm run schermroutes`) leest
-per bestand in `public/` welke API-paden het noemt: <!--getal:schermroutes.schermen-->420<!--/getal--> schermen,
-<!--getal:schermroutes.paden-->951<!--/getal--> exacte paden over <!--getal:schermroutes.verwijzingen-->1136<!--/getal--> verwijzingen, plus <!--getal:schermroutes.voorvoegsels-->144<!--/getal--> voorvoegsels.
+per bestand in `public/` welke API-paden het noemt: <!--getal:schermroutes.schermen-->422<!--/getal--> schermen,
+<!--getal:schermroutes.paden-->954<!--/getal--> exacte paden over <!--getal:schermroutes.verwijzingen-->1141<!--/getal--> verwijzingen, plus <!--getal:schermroutes.voorvoegsels-->145<!--/getal--> voorvoegsels.
 Daarmee bestaat de keten **scherm → route** die een impactvraag nodig heeft.
 
 **Correctie op een eerdere versie van deze paragraaf.** Hier stond dat `public/`
@@ -167,7 +167,7 @@ daarmee van 6,6% naar 26,6% gedragsdekking ging. Dat was onjuist.
 `SCHERMROUTES.json` legt een RELATIE (welk scherm noemt welk pad) en doet geen
 uitspraak over gedrag: niet of er geschreven wordt, niet of het klopt, niet of
 het bewezen is. De gedragsteller staat onveranderd op
-<!--getal:codewereld.bronPublicPct-->42<!--/getal-->% voor `public/`; wat er wél bij kwam heeft sinds §0.4 een
+<!--getal:codewereld.bronPublicPct-->42.2<!--/getal-->% voor `public/`; wat er wél bij kwam heeft sinds §0.4 een
 eigen teller.
 
 Met de **lexer** en niet de parser, want de 303 bundeldelen parsen niet maar
@@ -312,7 +312,7 @@ boom, dan is hij het, wat hij ook beweert).
 | teller | wat het zegt | stand |
 |---|---|---|
 | structuur | dit bestand bestaat, en dit woont erin | <!--getal:codewereld.bronPct-->100<!--/getal-->% |
-| relatie | waar hangt het mee samen, welk scherm gebruikt het | <!--getal:codewereld.relatie-->5088<!--/getal--> bestanden |
+| relatie | waar hangt het mee samen, welk scherm gebruikt het | <!--getal:codewereld.relatie-->5102<!--/getal--> bestanden |
 | **gedrag** | schrijft het, klopt het, is het bewezen | **<!--getal:codewereld.bronGedragPct-->56.2<!--/getal-->%** |
 
 Alleen die laatste is de bovengrens voor een Architect die over gedrag wordt
@@ -322,7 +322,7 @@ pas omhoog toen er in §0.5 een echte gedragsmeting bij kwam.
 ### 0.5 Gedrag voor `public/` (3 september 2026)
 
 Het grootste gat uit §7 was: over een scherm was geen enkele gedragsuitspraak te
-doen (<!--getal:codewereld.bronPublicPct-->42<!--/getal-->% — daarvóór 6,6%). `scripts/schermgedrag.js` →
+doen (<!--getal:codewereld.bronPublicPct-->42.2<!--/getal-->% — daarvóór 6,6%). `scripts/schermgedrag.js` →
 `SCHERMGEDRAG.json` (`npm run schermgedrag`) lost dat op zonder iets nieuws te
 meten: het **stelt samen** uit metingen die er al zijn.
 
@@ -334,8 +334,8 @@ EXECUTION_MAP    welke rol vraagt hij, wat is het bewijs waard
 IDEMPROEF        wat doet een tweede aanroep
 ```
 
-<!--getal:schermgedrag.schermen-->420<!--/getal--> schermen, waarvan <!--getal:schermgedrag.metGrond-->271<!--/getal--> met een echte uitspraak:
-<!--getal:schermgedrag.schrijftJa-->65<!--/getal--> schermen kunnen via de API iets veranderen, <!--getal:schermgedrag.verzwakt-->211<!--/getal--> raken een route
+<!--getal:schermgedrag.schermen-->422<!--/getal--> schermen, waarvan <!--getal:schermgedrag.metGrond-->273<!--/getal--> met een echte uitspraak:
+<!--getal:schermgedrag.schrijftJa-->65<!--/getal--> schermen kunnen via de API iets veranderen, <!--getal:schermgedrag.verzwakt-->213<!--/getal--> raken een route
 met verzwakt bewijs, en **<!--getal:schermgedrag.bewezen-->0<!--/getal--> schermen raken uitsluitend bewezen routes** — dat
 laatste is geen verrassing (`VERTROUWEN.json` staat huisbreed op 0 bewezen)
 maar het staat nu per scherm.
@@ -372,7 +372,7 @@ meter bij komt die over een derde van zijn onderwerp zwijgt.
 
 Een register mag daarom nu `zonderUitspraak` declareren, en `CODEWERELD.json`
 trekt die bestanden af. Zonder die aftrek stond `public/` op 26,1%; met de
-aftrek op <!--getal:codewereld.bronPublicPct-->42<!--/getal-->%. Dat verschil van vijf punten is precies het deel waarover
+aftrek op <!--getal:codewereld.bronPublicPct-->42.2<!--/getal-->%. Dat verschil van vijf punten is precies het deel waarover
 niemand iets weet, en het hoort niet aan onze kant van de streep.
 
 ### 0.6 De runtime-meting — en waarom zij mijn eigen voorspelling omkeerde
@@ -815,7 +815,7 @@ Beide zijn gedicht op 3 september 2026, en de meting staat in §0.3:
 
 1. **De brug route → bestand heeft een tweede bron** (`ROUTEBRON.json`):
    <!--getal:codewereld.brugDekkingPct-->95.9<!--/getal-->% toetsbaar in plaats van 0,7%, met <!--getal:routebron.tegenspraak-->0<!--/getal--> echte tegenspraken.
-2. **`public/` heeft gedragsdekking** (`SCHERMROUTES.json`): <!--getal:codewereld.bronPublicPct-->42<!--/getal-->% in plaats
+2. **`public/` heeft gedragsdekking** (`SCHERMROUTES.json`): <!--getal:codewereld.bronPublicPct-->42.2<!--/getal-->% in plaats
    van 6,6%, en de keten scherm → route bestaat.
 
 ### Wat daarmee de eerstvolgende stap is
@@ -829,7 +829,7 @@ niet.
 
 Drie stappen, in deze volgorde:
 
-1. ~~**Gedragsdekking van `public/`**~~ — gedaan in §0.5: 6,6% → <!--getal:codewereld.bronPublicPct-->42<!--/getal-->%.
+1. ~~**Gedragsdekking van `public/`**~~ — gedaan in §0.5: 6,6% → <!--getal:codewereld.bronPublicPct-->42.2<!--/getal-->%.
    Wat er nu nog onder zit zijn de <!--getal:schermgedrag.zonderGrond-->149<!--/getal--> schermen die hun paden opbouwen; die
    zijn statisch niet te volgen en vallen onder punt 2.
 2. ~~**De <!--getal:graaf.contextobject-->16017<!--/getal--> contextobject-aanroepen via een runtime-meting**~~ — gemeten in

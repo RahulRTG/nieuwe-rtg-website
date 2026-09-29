@@ -542,3 +542,43 @@ test('21. B7: een startpakket zet concepten klaar, benoemt niemand en wordt niet
   W.richtIn(vreemd, 'PRJ', 'PROJECT', { eigenaar: P.E, relaties: { [P.CO]: { soort: 'EMPLOYEE' } }, bestuur: { [P.CO]: ['CURRICULUM_OWNER'] } });
   nee(vreemd.lh.startpakketLaden('PRJ', P.CO), 400);
 });
+
+test('22. B-UI werkscherm: de assessor ziet wat op hem wacht en alleen zijn eigen bewijs, de kenniseigenaar ziet wat hij niet zelf goedkeurt', () => {
+  const w = basis();
+  const l = w.lh.lees;
+  const stap = (naar, door) => w.doe(ORG, 'lerenStand', { persoon: P.N, curriculum: 'ops-basis', naar }, door);
+  w.doe(ORG, 'rolToewijzen', { persoon: P.N, rol: 'ops' }, P.M);
+  w.doe(ORG, 'startplanMaak', { persoon: P.N, rol: 'ops' }, P.M);
+  stap('LEARNING', P.N); stap('PRACTICING', P.N);
+  w.doe(ORG, 'simulatieAfronden', { scenario: 'storno', keuzes: W.STORNO }, P.N);
+  stap('SIMULATING', P.N); stap('SUPERVISED', P.T);
+  w.doe(ORG, 'bewijsVastleggen', { persoon: P.N, vaardigheid: 'terugboeken', soort: 'OBSERVATION_EVIDENCE', sterkte: 'OBSERVED', bron: 'toets' }, P.T);
+  stap('READY_FOR_ASSESSMENT', P.T);
+  const id = w.doe(ORG, 'beoordelingAanvragen', { persoon: P.N, vaardigheid: 'terugboeken' }, P.T).id;
+
+  assert.equal(l.assessorWerk(ORG, P.N).ok, false, 'wie geen assessor is, krijgt geen beoordelingen te zien');
+  const voor = l.assessorWerk(ORG, P.A);
+  assert.deepEqual(voor.OPEN.map(b => b.id), [id], 'de aangevraagde beoordeling wacht op een assessor');
+  assert.deepEqual(voor.LOPEND, []);
+  assert.ok(!JSON.stringify(voor.OPEN).includes('OBSERVATION_EVIDENCE'), 'voor hij begint, ziet de assessor geen bewijs');
+  w.doe(ORG, 'beoordelingStart', { id }, P.A);
+  const na = l.assessorWerk(ORG, P.A);
+  assert.deepEqual(na.OPEN, [], 'wat hij begon, wacht niet meer');
+  assert.equal(na.LOPEND[0].id, id);
+  assert.ok(na.LOPEND[0].bewijs.length >= 1 && na.LOPEND[0].bewijs.every(b => b.id), 'hij ziet het bewijs voor deze vaardigheid, met een id om te noemen');
+  w.doe(ORG, 'bestuurZet', { persoon: P.KO2, rol: 'ASSESSOR' }, P.E);
+  const tweede = l.assessorWerk(ORG, P.KO2);
+  assert.equal(tweede.ok, true);
+  assert.deepEqual(tweede.LOPEND, [], 'een tweede assessor ziet de beoordeling van de eerste niet als de zijne');
+  assert.deepEqual(tweede.OPEN, [], 'en ook niet als werk dat nog wacht');
+
+  assert.equal(l.kennisWerk(ORG, P.N).ok, false, 'wie geen kenniseigenaar is, krijgt geen concepten te zien');
+  w.doe(ORG, 'kennisSchrijf', { id: 'nieuw-item', domein: 'ops', titel: 'Nieuw', tekst: 'tekst', bron: 'werkinstructie' }, P.KO);
+  const zelf = l.kennisWerk(ORG, P.KO).CONCEPTEN.find(c => c.id === 'nieuw-item');
+  const ander = l.kennisWerk(ORG, P.KO2).CONCEPTEN.find(c => c.id === 'nieuw-item');
+  assert.equal(zelf.eigen, true, 'wie schreef, ziet dat hij het niet zelf goedkeurt');
+  assert.equal(ander.eigen, false);
+  assert.equal(ander.impactNodig, false, 'een eerste versie vraagt geen impactklasse');
+  assert.ok(!JSON.stringify(ander).includes(P.KO), 'de schrijver staat er niet bij');
+  assert.deepEqual(l.kennisWerk(ORG, P.KO2).impactKlassen, require('../server/kern/leerhuis/standen').IMPACT);
+});

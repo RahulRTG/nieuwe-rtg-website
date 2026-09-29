@@ -42,7 +42,7 @@ const [E, KO, CO, Q, A, T, M, N, N2] = ['lid:1', 'lid:2', 'lid:4', 'lid:5', 'lid
    Hij staat hier als DATA zodat de status niet los van het document kan lopen:
    test/leerhuis-lus.test.js zakt als ACADEMY.md een blokkade niet noemt. */
 const BLOKKADES = [
-  { id: 'UI', klasse: 'UX', wat: 'Mijn leerhuis staat (/apps/leerhuis.html, alleen lezen), met het trainer- en teambeeld op codenaam; de handelingen van trainer en assessor en het kennisbeheer hebben nog geen scherm', sluit: 'fase B-UI, een werkscherm voor trainer, assessor en kenniseigenaar' },
+  { id: 'UI', klasse: 'UX', wat: 'Mijn leerhuis en het werkscherm staan (/apps/leerhuis.html, /apps/leerhuis-werk.html: toezicht bevestigen, beoordelen, kennis activeren); bewijs vastleggen, een beoordeling aanvragen en het inrichten (rollen, curricula, relaties, startplan) hebben nog geen scherm', sluit: 'fase B-UI, de inrichting en de rest van het trainerswerk op het werkscherm' },
   { id: 'DOMEINPOORT', klasse: 'AUTHORITY', wat: 'een RTG-handeling (de factuurcorrectie) leest de geschiktheid mee, maar alleen in de schaduw: geschiktheid verandert nog nergens een recht', sluit: 'afdwingen als de schaduw rijp is en nul keer oneens staat (een volgend besluit na B1)' },
   { id: 'IDENTITEIT', klasse: 'TENANT_ISOLATION', wat: 'entiteit, zaak en RTF-stad zijn een bron, maar RTG zelf heeft nog geen entiteit: juist het leerhuis van RTG Operations draait nog op een verklaring', sluit: 'RTG als entiteit in RTG Concern (de eigenaar)' }
 ];

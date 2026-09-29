@@ -4,7 +4,7 @@
 <script src="/shared/id.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Mijn leerhuis</title>
+<title>Leerhuis: aan het werk</title>
 <link rel="icon" href="/icons/partners.svg">
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/shared/rtg-ontwerp.css" rel="stylesheet">
@@ -30,11 +30,16 @@
   .rij{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.8rem;align-items:center;}
   .rij .veld{flex:1 1 12rem;}
   .knop{background:var(--gold);color:#000;border:none;font:inherit;font-weight:600;font-size:.84rem;padding:.55rem 1.1rem;cursor:pointer;min-height:2.75rem;min-width:2.75rem;}
-  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);text-decoration:none;display:inline-flex;align-items:center;}
   .veld{background:var(--bg);border:1px solid var(--line);color:var(--txt);font:inherit;font-size:.87rem;padding:.5rem .6rem;min-height:2.75rem;}
   label{font-size:.8rem;color:var(--muted);display:block;}
   .leeg{color:var(--soft);font-size:.9rem;padding:1rem .2rem;line-height:1.6;}
   .let{border-left:2px solid var(--gold);padding:.5rem 0 .5rem .8rem;margin-top:.8rem;font-size:.82rem;color:var(--muted);line-height:1.6;}
+  .kaart .rij .knop{flex:0 0 auto;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);}
+  textarea.veld{width:100%;min-height:4.5rem;resize:vertical;}
+  .keuze{display:flex;gap:.5rem;align-items:center;font-size:.84rem;margin-top:.35rem;min-height:2.75rem;}
+  .keuze input{width:1.25rem;height:1.25rem;}
+  .tekst{font-size:.86rem;line-height:1.6;margin-top:.5rem;white-space:pre-wrap;}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
@@ -42,15 +47,15 @@
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl" data-rtg-world="work" data-rtg-skin="heritage"
-  data-rtg-edge-nvt-hoofdactie="een leesscherm: leren, bewijs en beoordeling lopen via uw trainer en de assessor, niet via een knop hier" data-rtg-layout="standard">
+  data-rtg-edge-nvt-hoofdactie="een werkscherm met een handeling per kaart: elke leerling, beoordeling en elk concept heeft zijn eigen knop, er is geen handeling voor het hele scherm" data-rtg-layout="standard">
 <header>
   <div class="ey">RTG Academy</div>
-  <h1>Mijn leerhuis</h1>
+  <h1>Leerhuis: aan het werk</h1>
 </header>
 <main id="inhoud">
   <section>
     <h2>Welk leerhuis</h2>
-    <p class="uitleg">Elke organisatie heeft haar eigen leerhuis: wat u bij de ene leert, telt bij de andere niet vanzelf mee. Vul de code in die u van uw organisatie kreeg.</p>
+    <p class="uitleg">Het werk van trainers, assessoren en kenniseigenaren in het leerhuis van uw organisatie. U ziet alleen het deel dat bij uw rol hoort. Wat u zelf leert, staat in <a href="/apps/leerhuis.html">Mijn leerhuis</a>.</p>
     <form id="kies" class="rij">
       <label for="org">Code van de organisatie</label>
       <input id="org" class="veld" name="org" autocomplete="off" maxlength="60" placeholder="bijvoorbeeld RTG-OPS">
@@ -58,42 +63,27 @@
     </form>
     <p id="melding" class="let" role="status" aria-live="polite">Nog geen leerhuis gekozen.</p>
   </section>
-  <section id="vandaagBlok">
-    <h2>Vandaag</h2>
-    <p class="uitleg">Wat nu aan de beurt is, met de reden erbij. Niet meer dan drie dingen tegelijk.</p>
-    <div id="vandaag"><p class="leeg">Kies eerst een leerhuis.</p></div>
-  </section>
-  <section>
-    <h2>Mijn leerpaden</h2>
-    <p class="uitleg">Waar u staat in elk curriculum, en wat de volgende stap is.</p>
-    <div id="pad"><p class="leeg">Kies eerst een leerhuis.</p></div>
-  </section>
-  <section>
-    <h2>Oefenen</h2>
-    <p class="uitleg">Oefeningen zonder gevolgen: er wordt niets verstuurd en niemand geraakt.</p>
-    <div id="oefenen"><p class="leeg">Kies eerst een leerhuis.</p></div>
-  </section>
-  <section>
-    <h2>Wat ik kan</h2>
-    <p class="uitleg">Vaardigheden die een assessor op naam heeft vastgesteld, en uw certificaten. Er staat geen cijfer op u: alleen wat is bewezen, door wie, en of het nog vers is.</p>
-    <div id="kan"><p class="leeg">Kies eerst een leerhuis.</p></div>
-    <p class="let">Wat hier staat, geeft zelf geen bevoegdheid. Of u een handeling mag uitvoeren, beslist de organisatie op de plek waar die handeling woont.</p>
-    <p class="rij"><a class="knop stil" href="/apps/leerhuis-werk.html">Werk als trainer, assessor of kenniseigenaar</a></p>
-  </section>
   <section id="trainerBlok" hidden>
     <h2>Als trainer</h2>
-    <p class="uitleg">Wie u begeleidt, in de leerpaden die u geeft. Van beoordelingen ziet u niets: die zijn van de assessor.</p>
+    <p class="uitleg">U bevestigt dat een leerling onder uw toezicht werkt, en daarna dat hij klaar is voor een beoordeling. Beoordelen doet u hier niet: dat doet een assessor.</p>
     <div id="trainer"></div>
-    <p id="trainerNiet" class="let"></p>
   </section>
-  <section id="teamBlok" hidden>
-    <h2>Mijn team</h2>
-    <p class="uitleg">Of uw mensen gereed zijn voor hun rol, en wat er nog ontbreekt. Geen cijfer en geen rangorde.</p>
-    <div id="team"></div>
-    <p id="teamNiet" class="let"></p>
+  <section id="assessorBlok" hidden>
+    <h2>Als assessor</h2>
+    <p class="uitleg">Beoordelingen die op een assessor wachten, en de beoordelingen die u zelf begon. Een oordeel noemt het bewijs en de criteria; een "nog niet" noemt wat er nodig is.</p>
+    <div id="assessor"></div>
+    <p id="assessorNiet" class="let"></p>
   </section>
+  <section id="kennisBlok" hidden>
+    <h2>Kennisbeheer</h2>
+    <p class="uitleg">Concepten die op een kenniseigenaar wachten. Wat u zelf schreef, activeert een ander; een concept uit het startpakket wordt pas officiële kennis met de eigen bron van uw organisatie.</p>
+    <div id="kennis"></div>
+    <p id="kennisNiet" class="let"></p>
+  </section>
+  <p id="geenRol" class="leeg" hidden>U heeft in dit leerhuis geen rol als trainer, assessor of kenniseigenaar. Er ligt hier dus geen werk voor u.</p>
 </main>
-<script src="/apps/leerhuis.js"></script>
+<script src="/apps/leerhuis-werk-kaarten.js"></script>
+<script src="/apps/leerhuis-werk.js"></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

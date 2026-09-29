@@ -27,7 +27,7 @@ uit dezelfde lijst (`BLOKKADES` in `scripts/leerhuisproef.js`).
 
 | blokkade | klasse | wat er ontbreekt | sluit met |
 |---|---|---|---|
-| `UI` | UX | Mijn leerhuis staat (`/apps/leerhuis.html`, alleen lezen, bereikbaar vanuit Mijn loopbaan), en toont wie trainer is of een team heeft ook dat beeld, met mensen op codenaam (`kern/leerhuis/namen.js`); de handelingen van trainer en assessor en het kennisbeheer hebben nog geen scherm | fase B-UI, een werkscherm voor trainer, assessor en kenniseigenaar (par. 6) |
+| `UI` | UX | Mijn leerhuis staat (`/apps/leerhuis.html`, alleen lezen, bereikbaar vanuit Mijn loopbaan), met het trainer- en teambeeld op codenaam (`kern/leerhuis/namen.js`). Het werkscherm staat ook (`/apps/leerhuis-werk.html`, leeskant in `kern/leerhuis/werk.js`): een trainer bevestigt toezicht en gereedheid, een assessor begint en rondt een beoordeling af, een kenniseigenaar zet een concept ter review of activeert het. Nog zonder scherm: bewijs vastleggen, een beoordeling aanvragen, en het inrichten (rollen, curricula, relaties, startplan) | fase B-UI, de inrichting en de rest van het trainerswerk op het werkscherm (par. 6) |
 | `DOMEINPOORT` | AUTHORITY | `POST /api/office/pay/factuurcorrectie` leest de geschiktheid mee, maar alleen in de schaduw (besluit B1): geschiktheid verandert nog nergens een recht | afdwingen als de schaduw rijp is en nul keer oneens staat; dat is een volgend besluit |
 | `IDENTITEIT` | TENANT_ISOLATION | een leerhuis met een bron (entiteit, zaak of RTF-stad) volgt die bron; maar RTG zelf heeft nog geen entiteit, dus juist het leerhuis van RTG Operations draait nog op een verklaring | RTG als entiteit in RTG Concern (de eigenaar) |
 

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-28T13:47:37.779Z",
-    "commit": "4da80399e",
+    "op": "2026-09-29T15:04:16.165Z",
+    "commit": "b818798c0",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/doelgroepbereik.js",
@@ -2377,7 +2377,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/democratie/index.js",
-        "regel": 31,
+        "regel": 30,
         "samengesteld": false,
         "rauw": ", auth, (req, res) =>"
       },
@@ -2425,7 +2425,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/democratie/index.js",
-        "regel": 31,
+        "regel": 30,
         "samengesteld": false,
         "rauw": ", auth, (req, res) =>"
       },
@@ -25516,7 +25516,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/ik.js",
-        "regel": 76,
+        "regel": 77,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -25564,7 +25564,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/ik.js",
-        "regel": 76,
+        "regel": 77,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
@@ -32828,7 +32828,7 @@
     "niet-beproefd": 4,
     "sessie-ontbreekt": 0
   },
-  "routesGezien": 5242,
+  "routesGezien": 5252,
   "leugens": [
     {
       "functie": "social",

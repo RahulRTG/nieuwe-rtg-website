@@ -1,12 +1,12 @@
 {
  "stempel": {
-  "op": "2026-09-29T19:11:57.746Z",
-  "commit": "aa1a876fe",
-  "boomVuil": true,
-  "boomAnders": 3,
+  "op": "2026-09-29T20:19:49.002Z",
+  "commit": "01e346d18",
+  "boomVuil": false,
+  "boomAnders": 0,
   "instrument": "scripts/auditproef-route.js",
   "node": "v22.22.2",
-  "begrenzing": "geen"
+  "begrenzing": 20000
  },
  "uitleg": "Per schrijfroute: is er na een geslaagde oproep een regel bijgekomen in het API-spoor (server/opzet/auditspoor.js), gelezen via dezelfde kantoorroute die een auditor gebruikt. \"gezakt\" is hier WEL een defect-oordeel: een handeling die lukt zonder spoor is achteraf niet terug te vinden. De ronde ijkt twee keer: de stand mag niet uit zichzelf oplopen, en de keten moet na afloop heel zijn.",
  "gemeten": {
@@ -22,7 +22,7 @@
   "ijkingGeweigerdStil": true,
   "ijkingGeslaagdGeteld": 1,
   "blindeRondes": 0,
-  "begrenzing": 0
+  "begrenzing": 20000
  },
  "perRoute": [
   {

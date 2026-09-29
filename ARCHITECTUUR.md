@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 5196 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 5202 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,14 +18,14 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 5196 |
-| servermodules (`server/**/*.js`) | 3772 |
-| routebestanden (`server/routes/**`) | 620 |
-| kernmodules (`server/kern/**`) | 2366 |
+| API-endpoints | 5202 |
+| servermodules (`server/**/*.js`) | 3784 |
+| routebestanden (`server/routes/**`) | 621 |
+| kernmodules (`server/kern/**`) | 2367 |
 | schermen (`public/**/*.html`) | 320 |
 | gedeelde browsermodules (`public/shared/*.js`) | 398 |
-| toetsbestanden (`test/*.test.js`) | 1863 |
-| schermtoetsen (`test/*.e2e.js`) | 265 |
+| toetsbestanden (`test/*.test.js`) | 1871 |
+| schermtoetsen (`test/*.e2e.js`) | 266 |
 
 ## 2. De weg van een verzoek
 
@@ -116,7 +116,7 @@ zie §5 -- er zijn nog 248 kern-namen die meer dan één domein aanraakt.
 | `office` | 78 | 22 | 3 | 87 |
 | `staff` | 26 | 8 | 1 | 42 |
 | `social` | 76 | 10 | 31 | 71 |
-| `techniek` | 77 | 19 | 1 | 64 |
+| `techniek` | 79 | 20 | 1 | 64 |
 | `zakelijk` | 13 | 2 | 0 | 0 |
 | `wereld` | 15 | 3 | 0 | 0 |
 
@@ -128,7 +128,7 @@ lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
 bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
 publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 3539 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 3543 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 

@@ -9,7 +9,7 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**60 bundels, 478 delen, 0 zonder onderwerp.**
+**60 bundels, 479 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
@@ -512,7 +512,7 @@ omlaag.
 
 ## `apps/techniek.js`
 
-`public/apps/techniek/` -- 9 delen, 882 regels in de delen
+`public/apps/techniek/` -- 10 delen, 944 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -524,6 +524,7 @@ omlaag.
 | `techniek-03.js` | een functie globaal aan- of uitzetten |
 | `techniek-03a.js` | het doelgroepfilter met chips, en het zoeken erin |
 | `techniek-03c.js` | de automatische noodrem aan- of uitzetten |
+| `techniek-03d-sso.js` | SSO-CLIENTGEHEIMEN (besluit B16) |
 | `techniek-04.js` | De laatste stand van het statusbord, zodat "meenemen" uit het EIGEN model leest en niet uit de kaartjes op het scherm |
 
 ## `apps/werkplek-bureaus.js`

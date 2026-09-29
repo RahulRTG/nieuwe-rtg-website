@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-29T15:49:05.754Z",
-  "commit": "4740256f",
+  "op": "2026-09-29T16:14:37.521Z",
+  "commit": "a946bf15",
   "boomVuil": false,
   "boomAnders": 10,
   "instrument": "scripts/handlerwacht.js",
@@ -9,17 +9,17 @@
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
-  "zonderBewakerslaag": 634,
-  "bewaakt": 545,
+  "zonderBewakerslaag": 638,
+  "bewaakt": 548,
   "openbaarMetReden": 51,
   "eigenControle": 19,
-  "sleutelDoorgegeven": 11,
+  "sleutelDoorgegeven": 12,
   "zonderWachtMetReden": 8,
   "laat": 0,
   "onbewaakt": 0,
   "nietGelezen": 0,
   "gezagsfuncties": 26,
-  "publiekeLijstenVerschillen": 18
+  "publiekeLijstenVerschillen": 19
  },
  "tweePubliekeLijsten": {
   "alleenInPoortwacht": [
@@ -40,7 +40,8 @@
    "/api/account/start",
    "/api/foundation/school/school/maak",
    "/api/foundation/school/personeel/inloglink",
-   "/api/foundation/les/maak"
+   "/api/foundation/les/maak",
+   "/api/foundation/les/join"
   ],
   "alleenInDeKeuring": []
  },
@@ -83,6 +84,10 @@
    "aantal": 14
   },
   {
+   "naam": "lesVan",
+   "aantal": 13
+  },
+  {
    "naam": "personeelVan",
    "aantal": 13
   },
@@ -93,10 +98,6 @@
   {
    "naam": "schoolVan",
    "aantal": 11
-  },
-  {
-   "naam": "lesVan",
-   "aantal": 10
   },
   {
    "naam": "viaBeheerOfDirectie",
@@ -1103,37 +1104,37 @@
   },
   {
    "sleutel": "POST /api/foundation/agenda",
-   "bestand": "server/foundation/onderwijs/schrift.js:64",
+   "bestand": "server/foundation/onderwijs/schrift.js:63",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
   {
    "sleutel": "POST /api/foundation/agenda/verwijder",
-   "bestand": "server/foundation/onderwijs/schrift.js:72",
+   "bestand": "server/foundation/onderwijs/schrift.js:71",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
   {
    "sleutel": "POST /api/foundation/ai",
-   "bestand": "server/foundation/onderwijs/schrift.js:82",
+   "bestand": "server/foundation/onderwijs/schrift.js:81",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
   {
    "sleutel": "POST /api/foundation/bord/stroke",
-   "bestand": "server/foundation/onderwijs/les.js:84",
-   "staat": "bewaakt",
-   "wacht": "lesVan"
-  },
-  {
-   "sleutel": "POST /api/foundation/bord/undo",
    "bestand": "server/foundation/onderwijs/les.js:104",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
   {
+   "sleutel": "POST /api/foundation/bord/undo",
+   "bestand": "server/foundation/onderwijs/les.js:124",
+   "staat": "bewaakt",
+   "wacht": "lesVan"
+  },
+  {
    "sleutel": "POST /api/foundation/bord/wis",
-   "bestand": "server/foundation/onderwijs/les.js:100",
+   "bestand": "server/foundation/onderwijs/les.js:120",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
@@ -1546,16 +1547,39 @@
    "wacht": "gezinVan"
   },
   {
+   "sleutel": "POST /api/foundation/les/code/intrekken",
+   "bestand": "server/foundation/onderwijs/lesbeheer.js:34",
+   "staat": "bewaakt",
+   "wacht": "lesVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/les/code/roteer",
+   "bestand": "server/foundation/onderwijs/lesbeheer.js:29",
+   "staat": "bewaakt",
+   "wacht": "lesVan"
+  },
+  {
    "sleutel": "POST /api/foundation/les/join",
-   "bestand": "server/foundation/onderwijs/les.js:40",
+   "bestand": "server/foundation/onderwijs/les.js:49",
+   "staat": "sleutelDoorgegeven"
+  },
+  {
+   "sleutel": "POST /api/foundation/les/leerling/intrekken",
+   "bestand": "server/foundation/onderwijs/lesbeheer.js:39",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
   {
    "sleutel": "POST /api/foundation/les/maak",
-   "bestand": "server/foundation/onderwijs/les.js:30",
+   "bestand": "server/foundation/onderwijs/les.js:32",
    "staat": "zonderWachtMetReden",
    "reden": "een les openen is als een kamer openen: wie hem maakt krijgt de docenttoken terug, en zonder lescode komt er niemand binnen"
+  },
+  {
+   "sleutel": "POST /api/foundation/les/sluit",
+   "bestand": "server/foundation/onderwijs/lesbeheer.js:49",
+   "staat": "bewaakt",
+   "wacht": "lesVan"
   },
   {
    "sleutel": "POST /api/foundation/mail/inbox",
@@ -1685,19 +1709,19 @@
   },
   {
    "sleutel": "POST /api/foundation/opgave",
-   "bestand": "server/foundation/onderwijs/schrift.js:39",
+   "bestand": "server/foundation/onderwijs/schrift.js:38",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
   {
    "sleutel": "POST /api/foundation/opgave/inleveren",
-   "bestand": "server/foundation/onderwijs/schrift.js:48",
+   "bestand": "server/foundation/onderwijs/schrift.js:47",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
   {
    "sleutel": "POST /api/foundation/reis/aanvraag",
-   "bestand": "server/foundation/onderwijs/schrift.js:122",
+   "bestand": "server/foundation/onderwijs/schrift.js:119",
    "staat": "zonderWachtMetReden",
    "reden": "een open aanvraagformulier voor gezinnen zonder foundation-account -- dat is het punt ervan. Sinds deze meting met een rem per IP-adres, want de lijst kapt op duizend en een vloed duwde echte aanvragen eruit"
   },
@@ -2983,7 +3007,7 @@
   },
   {
    "sleutel": "POST /api/foundation/schrift/opslaan",
-   "bestand": "server/foundation/onderwijs/schrift.js:10",
+   "bestand": "server/foundation/onderwijs/schrift.js:9",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },

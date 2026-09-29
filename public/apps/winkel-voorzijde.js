@@ -5,7 +5,7 @@
   'use strict';
   function nav(huidig) {
     var el = d.createElement('nav');
-    el.className = 'shop-nav'; el.setAttribute('aria-label', 'Winkel');
+    el.className = 'shop-nav rtg-edge-owned-bar'; el.setAttribute('aria-label', 'Winkel');
     el.innerHTML =
       '<a href="/apps/mall.html" data-shop="ontdekken">Ontdekken</a>' +
       '<a href="/apps/mijnmall.html#bewaard" data-shop="bewaard">Bewaard</a>' +

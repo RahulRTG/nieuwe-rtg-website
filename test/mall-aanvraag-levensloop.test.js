@@ -15,7 +15,7 @@ const reageer = (w, a) => w.api.reageer(zaak, a.id, { versie: a.versie, tekst: '
 test('de gekozen aanvraag bereikt de zaak, het antwoord bereikt het lid en overleeft herladen', () => {
   const w = wereld(); let a = reageer(w, maak(w));
   a = w.api.kies('lid', a.id, zaak.code, { versie: a.versie }).aanvraag;
-  assert.equal(w.api.voorZaak(zaak).aanvragen.find(x => x.id === a.id).status, 'gegund', 'HANDOFF: gekozen werk verdwijnt niet');
+  assert.equal(w.api.voorZaak(zaak).aanvragen.find(x => x.id === a.id)?.status, 'gegund', 'HANDOFF: gekozen werk verdwijnt niet');
   assert.deepEqual(w.api.voorZaak(zaak).aanvragen[0].acties.map(x => x.id), ['aanvaard', 'teruggeven']);
   a = w.api.zaakActie(zaak, a.id, 'aanvaard', { versie: a.versie }).aanvraag;
   a = w.api.zaakActie(zaak, a.id, 'afronden', { versie: a.versie, tekst: 'Afgesproken: zaterdag om 14 uur. Neem zelf contact op voor een boeking.' }).aanvraag;

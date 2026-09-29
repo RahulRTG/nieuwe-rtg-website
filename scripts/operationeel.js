@@ -22,6 +22,8 @@ function vingerafdruk() {
   return hash.digest('hex');
 }
 function main() {
+  const poort = require('./afbouw-slot').eisGeenAfbouw('operationeel');
+  if (!poort.ok || process.env.RTG_METEN_TIJDENS_AFBOUW === '1') throw Error(poort.reden);
   const run = randomUUID(), bron = vingerafdruk();
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-operationeel-bewijs-'));
   const journaal = path.join(tmp, 'journaal.jsonl'); fs.writeFileSync(journaal, '');

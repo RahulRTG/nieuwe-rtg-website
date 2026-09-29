@@ -30,6 +30,7 @@ test('lid en zaak sluiten de aanvraaglus via echte schermknoppen en één Edge',
       if (await p.locator('#rtg-cookie button').isVisible()) await p.locator('#rtg-cookie button').click();
     }
     await open(klant, '/apps/mijnmall.html#aanvragen');
+    assert.equal(await klant.locator('.shop-nav').isVisible(), false, 'de winkelnavigatie wordt door Edge overgenomen');
     await klant.locator('#aWat').fill('Een behandeling op zaterdag');
     await klant.locator('#aVerdieping').selectOption('beauty'); await klant.locator('#aPlek').fill('Ibiza');
     await klant.locator('#aPlaats').click();
@@ -58,12 +59,14 @@ test('lid en zaak sluiten de aanvraaglus via echte schermknoppen en één Edge',
     await api('/api/wereld/modus', { modus: 'alles', saloon: { bronnen: ['voortgang'], vorm: 'mijn' } }, lid.token);
     await open(klant, '/apps/wereld.html');
     const resultaat = klant.locator('[data-saloon-id="voortgang:' + id + '"]');
+    await resultaat.waitFor({ state: 'attached' });
     await resultaat.getByText('Uw aanvraag is behandeld. Bel ons om de afspraak vast te leggen.', { exact: true }).waitFor();
     for (const breedte of [390, 1440]) {
       await klant.setViewportSize({ width: breedte, height: 900 });
       assert.equal(await klant.locator('.rtg-adaptive-bar:visible').count(), 1);
       assert.equal(await klant.locator('.rtg-edge-chrome').count(), 1);
       assert.ok(await klant.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+      await resultaat.scrollIntoViewIfNeeded();
       if (process.env.SALOON_DESIGN_OUTPUT) await klant.screenshot({ path: path.join(process.env.SALOON_DESIGN_OUTPUT, 'saloon-aanvraag-' + breedte + '.png') });
     }
     await resultaat.focus(); await edgeActies(klant);

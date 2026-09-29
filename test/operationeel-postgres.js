@@ -1,5 +1,5 @@
 'use strict';
-const test = require('node:test'), assert = require('node:assert/strict');
+const assert = require('node:assert/strict');
 const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
 const http = require('node:http'), { randomUUID } = require('node:crypto');
 const { Pool } = require('../server/pgwire');
@@ -30,8 +30,10 @@ async function verliesAntwoord(base) {
     sluit: async () => { for (const s of sockets) s.destroy(); await new Promise(r => server.close(r)); } };
 }
 
-test('Mall op echte PostgreSQL: commitfout, twee instances, verloren antwoord en conflicterende wijzigingen',
-  { skip: !bron && 'Echte PostgreSQL ontbreekt; geen ketenbewijs', timeout: 120000 }, async () => {
+// Uitgevoerd als verplichte deelproef van postgres-requestcommit.pg.test.js.
+// Geen tweede zelfoverslaande test; de bestaande PG-draaier bezit de dienstgrens.
+module.exports = async function bewijsMallPostgres() {
+    assert.ok(bron, 'Deze deelproef vereist echte PostgreSQL.');
     const naam = 'rtg_operationeel_' + randomUUID().replace(/-/g, '');
     const beheer = new Pool({ connectionString: bron, max: 2 });
     const doel = new URL(bron); doel.pathname = '/' + naam;
@@ -124,4 +126,4 @@ test('Mall op echte PostgreSQL: commitfout, twee instances, verloren antwoord en
       if (gemaakt) await beheer.query('DROP DATABASE ' + naam + ' WITH (FORCE)');
       await beheer.end(); fs.rmSync(tmp, { recursive: true, force: true });
     }
-  });
+};

@@ -15,7 +15,7 @@ const PROEVEN = {
   'mall-route-failure': 'test/operationeel-herstel.test.js',
   'mall-policy': 'test/operationeel-aanvraag.e2e.js',
   'mall-productie': 'test/operationeel-productie.test.js',
-  'mall-postgres': 'test/operationeel-aanvraag.pg.test.js'
+  'mall-postgres': 'test/postgres-requestcommit.pg.test.js'
 };
 const aanvragen = Object.fromEntries(DIMENSIES.map(d => [d, ['mall-api']]));
 aanvragen.ENTRY.push('mall-ui', 'mall-ui-postgres');

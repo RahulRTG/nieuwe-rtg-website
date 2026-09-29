@@ -54,6 +54,8 @@ const WORTEL = path.join(__dirname, '..', '..');
    er geen programma is en dat een mens of een keuring hem onderhoudt -- dan hoort
    er een LEZER bij te staan, want een register dat niemand leest is geen register. */
 const EIGENAAR = {
+  'KETENS.md': { soort: 'BRON',
+    waarom: 'Handmatig onderhouden norm en bereik van operationele ketens; scripts/operationeel.js verzamelt vers uitvoerbaar bewijs en bewaart onbekende grenzen.' },
   'DESKTOP-STANDAARD.md': { soort: 'BRON',
     waarom: 'Handmatig onderhouden contract voor de goedgekeurde desktop- en mobiele compositie; desktop-audit en de wereld- en fototoetsen leveren het uitvoerbare bewijs.' },
   'SALOON.md': { soort: 'BRON',

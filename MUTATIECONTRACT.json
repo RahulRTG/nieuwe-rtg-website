@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-29T18:44:09.275Z",
-  "commit": "9412b51c7",
+  "op": "2026-09-29T20:51:53.757Z",
+  "commit": "024a00410",
   "boomVuil": false,
-  "boomAnders": 8,
+  "boomAnders": 5,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v24.18.0"
  },

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T15:29:03.004Z",
-    "commit": "760f20c5",
+    "op": "2026-09-29T16:01:04.696Z",
+    "commit": "6dbbd22a",
     "boomVuil": false,
     "boomAnders": 3,
     "instrument": "scripts/mutatie.js",
@@ -9193,6 +9193,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "plaatsvorm.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/plaatsvorm.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
     },
     "plafonds.test.js": {
       "soort": "server",

@@ -763,6 +763,8 @@ const EIGEN_MODULE = new Map([
   ['experience-intent.test.js', ['public/shared/experience-intent.js']],
   ['experience-dinner.test.js', ['server/kern/reservering/capaciteit.js']],
   ['experience-dinner.e2e.js', ['public/apps/foodcourt-intent.js']],
+  ['reisprogramma.test.js', ['server/kern/reisuitnodiging/programma.js']],
+  ['reisprogramma.e2e.js', ['public/apps/reisprogramma-editor.js']],
   ['experience-travel.test.js', ['server/kern/reisbureau.js']],
   ['experience-travel.e2e.js', ['public/apps/reisbureau-experience.js']],
   ['world-palette.e2e.js', ['public/shared/rtg-world-identity.js']],

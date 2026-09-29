@@ -1,7 +1,7 @@
 # RTG Living Experience System
 
 De eerste verticale versie verbindt de bestaande vier wereldmanifesten, echte
-app-ingangen, routebronnen en een restaurant- en reisaanvraag met toetsbaar bewijs. Er is geen
+app-ingangen, routebronnen en een restaurantaanvraag, reisaanvraag en handmatig gastprogramma met toetsbaar bewijs. Er is geen
 nieuwe autorisatiemotor, gebruikersscore of autonome productiewijziging.
 
 ## Gebruiken
@@ -124,3 +124,34 @@ Uitbreiden gebeurt per menselijke reis: voeg DNA en echte resultaatproeven toe,
 voer ze uit, laat de ervaring met mensen beoordelen en behoud de bestaande
 releasecontrole. Verander nooit een meetgrens om een onbekende toestand groen
 te laten lijken.
+
+## Handmatig gastprogramma
+
+Kantoor → Reisbureau bevat de planner voor elke bestemming. Een leeg concept
+of deur-tot-deur-sjabloon wordt volledig handmatig ingevuld: maximaal 80
+onderdelen, maximaal 50 reizigers, vrije locaties en afzonderlijke lokale
+tijdzones voor vertrek en aankomst. Chauffeur, lounge, meet & greet, concierge,
+privéjet, restaurant en eigen onderdelen gebruiken dezelfde planner.
+
+Concepten blijven uitsluitend voor het kantoor. Publicatie vereist een
+bewuste keuze en een einddatum (maximaal 366 dagen). De 128-bit gastcode staat
+alleen als hash in de bestaande uitnodigingscollectie; de kale code verschijnt
+eens bij uitgifte. De gast leest het volledige gedeelde programma zonder account.
+Daarom zijn alle ingevulde adressen, contacten en referenties zichtbaar voor
+iedereen die de link bezit. De planner vraagt geen paspoorten, betaalgegevens
+of medische dossiers. Deze nieuwe deelkeuze verruimt geen bestaande
+ledenuitnodigingen: die blijven hun beperkte voorvertoning en claimregels houden.
+
+Updates controleren de versie atomair, zodat een collega niet stil wordt
+overschreven. Een gepubliceerde reis bijwerken verandert ook de bestaande
+gastweergave. Een nieuwe link vervangt de vorige; intrekken/verlopen sluit iedere
+volgende serverlezing. De open gastpagina ververst op verzoek, bij terugkeer en
+elke minuut zolang zichtbaar. Reeds gelezen, opgeslagen of afgedrukte inhoud
+kan niet worden teruggehaald. Codes blijven alleen in paginageheugen: na
+herladen opent de gast de oorspronkelijke link opnieuw.
+
+Bevestigingen zijn verklaringen van de adviseur, met verplichte bronvermelding.
+Er is geen live leveranciers-, vlucht-, beschikbaarheids- of betalingscontrole.
+Een PDF is een afdruk van de bekeken versie, geen automatisch bijgewerkt ticket.
+De planner maakt geen reservering, klantaccount of pas. Gastpublicatie en
+bestaande accountoverdracht hebben verschillende rechten.

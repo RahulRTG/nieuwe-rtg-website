@@ -27,6 +27,8 @@
       was gekozen (kern/commerce/overdracht.js)
    Geen inloggegevens nodig; werkt hetzelfde in beide werelden. */
 (function () {
+  // Een gastprogramma is een zelfstandige leesweergave zonder accountshell.
+  if (document.body && document.body.dataset.publicPlatform === 'travel-guest') return;
   'use strict';
   if (window.__rtgBasis) return; window.__rtgBasis = true;
   var rtf = location.pathname.indexOf('/apps/foundation/') === 0;

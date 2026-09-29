@@ -14,7 +14,7 @@
    installeerde in de periode dat de `cache: 'no-cache'` hieronder was
    gesneuveld (zie de toelichting daar). Een naam die uit de INHOUD komt kan
    niet vergeten worden. */
-const CACHE = 'rtg-app-b00b148a';
+const CACHE = 'rtg-app-d43e8a5c';
 const SHELL = ['/apps/app.html', '/shared/id.js',
   '/shared/sw-pass-assets.js', '/shared/pass-cache.js', '/shared/pass-recovery.js', '/shared/pass-recovery.css',
   /* Heritage is één systeemlaag. Een offline start mag niet alleen de HTML

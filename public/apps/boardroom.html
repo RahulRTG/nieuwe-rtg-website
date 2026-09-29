@@ -43,6 +43,7 @@
   <div class="tabs" id="boTabs" hidden role="tablist" aria-label="Boardroom">
     <button class="tab aan" type="button" role="tab" aria-selected="true" data-paneel="tabBoard" data-i18n="bo.tab.board">Boardroom</button>
     <button class="tab" type="button" role="tab" aria-selected="false" data-paneel="tabLeden" data-i18n="bo.tab.leden">Leden</button>
+    <button class="tab" type="button" role="tab" aria-selected="false" data-paneel="tabBesluiten" data-i18n="bo.tab.besluiten">Besluiten</button>
   </div>
 
   <!-- HET KOSTENBORD WAS NERGENS VANDAAN TE BEREIKEN. /apps/kosten.html
@@ -134,6 +135,23 @@
       <h2 data-i18n="bm.h">De kantoordeuren</h2>
       <p class="rtg-uitleg" data-i18n="bm.sub">De beleidsmotor loopt mee met elke kantoordeur. In de schaduw telt hij alleen; afgedwongen weigert hij naast de poort, nooit in zijn plaats.</p>
       <div id="bmDeuren"><p class="rtg-leeg" data-i18n="bm.laden">Deuren laden&hellip;</p></div>
+    </section>
+  </div>
+
+  <!-- Besluiten van de eigenaar die een scherm nodig hadden: het beslisgeheugen
+       (C13) en de cadeaubon (C14). Gevuld door /apps/boardroom-besluiten.js;
+       de server houdt de poort, dit is de etalage. -->
+  <div id="tabBesluiten" hidden>
+    <section class="rtg-groep" id="bgSectie" hidden>
+      <h2 data-i18n="bg.h">Het beslisgeheugen</h2>
+      <p class="rtg-uitleg" data-i18n="bg.sub">Wat u besloot, op welke getallen, en wat u verwachtte. Na de termijn staat er per maat wat die werkelijk deed; er komt geen totaalcijfer, en waar toen of nu geen getal stond, staat de reden.</p>
+      <div id="bgNieuw"></div>
+      <div id="bgLijst"><p class="rtg-leeg" data-i18n="bg.laden">Beslisgeheugen laden&hellip;</p></div>
+    </section>
+    <section class="rtg-groep" id="cbSectie" hidden>
+      <h2 data-i18n="cb.h">De cadeaubon van RTG</h2>
+      <p class="rtg-uitleg" data-i18n="cb.sub">Een bon die ook bij zaken te besteden is, is elektronisch geld. Deze schakelaar is die positie; open zonder e-geldvergunning weigert de uitgifte nog steeds.</p>
+      <div id="cbStand"></div>
     </section>
   </div>
 </main>
@@ -586,6 +604,7 @@ window.I18N = { en: {
 <script src="/shared/uitvoer.js"></script>
 <script src="/apps/boardroom.js" defer></script>
 <script src="/apps/boardroom-eigenaar.js" defer></script>
+<script src="/apps/boardroom-besluiten.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>

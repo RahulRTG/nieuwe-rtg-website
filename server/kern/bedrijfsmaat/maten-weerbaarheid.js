@@ -38,11 +38,13 @@ module.exports = [
     projectie: [c('server/kern/rtfos/risico.js', 'function lijst')], bewijs: [c('server/kern/rtfos/risico.js', 'function herbeoordeel')], groepsgrens: null, waarom: {} },
 
   { id: 'risico.betalingen-onbekend', domein: 'risico', wereld: 'rtg-intern', eenheid: 'betalingen in een onbekende stand',
-    betekenis: 'Betalingen waarvan de afloop niet vaststaat na een crash, time-out of herhaling.', berekening: 'nog niet vastgesteld',
-    actualiteit: 'live', privacy: 'huis', minGroep: null, eigenaar: 'kern/betaalwaarheid', graad: 'onbekend', afhankelijk: [],
-    bron: [c('server/kern/betaalwaarheid/staten.js', 'const OVERGANGEN =')], definitie: [c('server/kern/betaalwaarheid/index.js', 'De RTG Payment Truth')],
-    projectie: null, bewijs: null, groepsgrens: null,
-    waarom: { projectie: 'De waarheid staat per betaling; een telling van onbekende standen als bedrijfsmaat bestaat niet.', bewijs: 'Volgt uit de projectie.' } },
+    betekenis: 'Betalingen waarvan de afloop niet vaststaat na een crash, time-out of herhaling.',
+    berekening: 'aantal en bedrag van gestarte betalingen zonder providerreferentie die niet definitief betaald zijn, met escalaties en controle nodig ernaast',
+    actualiteit: 'live', privacy: 'huis', minGroep: null, eigenaar: 'kern/betaalwaarheid', graad: 'gemeten', afhankelijk: [],
+    bron: [c('server/kern/betaalwaarheid/staten.js', 'const OVERGANGEN =')], definitie: [c('server/kern/betaalwaarheid/hervat.js', 'const onbekend = r =>')],
+    projectie: [c('server/kern/betaalwaarheid/hervat.js', 'function openstaand()'), c('server/kern/bedrijfsmaat/stand-risico.js', "maat('risico.betalingen-onbekend'")],
+    bewijs: [c('server/kern/bedrijfsmaat/stand-risico.js', "waarom: 'De betaalwaarheid is niet beschikbaar; er is niet gekeken.'")],
+    groepsgrens: null, waarom: {} },
 
   { id: 'weerbaarheid.backup', domein: 'weerbaarheid', wereld: 'rtg-intern', eenheid: 'laatste bruikbare back-up',
     betekenis: 'Of er een back-up is waar ook iets IN staat, en van wanneer.', berekening: 'inhoudscontrole van de laatste dagmap',

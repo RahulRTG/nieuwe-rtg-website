@@ -50,7 +50,11 @@ module.exports = (ctx) => {
       land: { naam: 'RTF Nederland', laag: 'landelijk', steden: steden.length },
       vlaggen: VLAGGEN, rollen: ROLLEN, statussen: STATUS,
       limieten: { projectleider: euro(LIMIET.projectleider), stadsbestuur: euro(LIMIET.stadsbestuur) },
-      steden: steden.map(s => Object.assign(kort(s), { rol: rolIn(w, s.id), tellers: tel(s.id) })) };
+      steden: steden.map(s => Object.assign(kort(s), { rol: rolIn(w, s.id), tellers: tel(s.id) })),
+      /* bewijs bij de telling (bedrijfsmaat geo.rtf-steden): wat er staat, wanneer
+         gepeild, en dat een stad buiten het eigen bereik hier niet meetelt */
+      graad: 'gemeten', peilmoment: nu(),
+      dektNiet: w.landelijk ? [] : ['Alleen de steden binnen uw eigen bereik; het landelijke bestuur ziet ze allemaal.'] };
   }
 
   function stad(req, id) {

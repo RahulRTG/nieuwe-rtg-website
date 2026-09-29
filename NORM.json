@@ -3828,6 +3828,16 @@
       "meter": "bewijsAchterstand 2721 -> 3178",
       "reden": "DEZELFDE VORM ALS DE NOTITIE VAN 28 SEPTEMBER: EEN GROTERE NOEMER, GEEN ACHTERUITGANG. OUTPUTPROEF.json is hermeten uit een volledige suite met routejournaal. Die raakt 353 routes die de vorige ronde door geen enkele toets geraakt werden (OUTPUT ongemeten 421 -> 68) en 111 routes die sindsdien bijkwamen (5151 -> 5262). Ze landen in output-niet-toerekenbaar (579 -> 1037): een inhoudgevoelige toets raakt ze wel, maar raakt er ook andere. De bewezen OUTPUT-cellen stegen van 4151 naar 4157; de hele groei van 457 zit in die ene post plus een extra output-deur (20 -> 21).",
       "waarheen": "de onbesliste routes toerekenbaar maken (een toets die alleen die route raakt, of een gerichte liegronde met node scripts/outputproef.js --meet=N). Vervalt 2026-12-29: staat hij dan nog op 3178 of hoger, dan is dit geen noemergroei meer maar achterstand die niemand aflost."
+    },
+    {
+      "datum": "2026-09-29",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 300,
+      "vervalt": "2026-12-29",
+      "meter": "toetsenNietGemeten 300 -> 302",
+      "reden": "test/margeperlid.test.js (C15) en test/boardroombesluiten.e2e.js (de tab Besluiten) zijn nieuw. Met de hand nagetrokken, elf mutaties die alle elf zakten: de noemer alleen over leden met verbruik, kosten van een zaak meegeteld, geen secundaire onderdrukking, een lid zonder contract genegeerd, verbruik zonder tarief genegeerd, een oude maand gerekend, guest niet als gratis gelezen, een trede van de ladder bij RTG Pass geboekt; op het scherm de cadeaubon omzetten zonder passkey, de gekozen richting kwijt, en een uitgifte die niet mag verzwegen.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt ze mee."
     }
   ],
   "prestatie": {

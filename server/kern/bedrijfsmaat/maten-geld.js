@@ -9,14 +9,13 @@ const DEF = 'server/kern/bedrijfsmaat/definities.js', PRJ = 'server/kern/bedrijf
 const STAND = 'server/kern/bedrijfsmaat/stand.js';
 
 module.exports = [
-  { id: 'geld.transactievolume', domein: 'geld', wereld: 'commercieel', eenheid: 'euro per dag en per week',
+  { id: 'geld.transactievolume', domein: 'geld', wereld: 'commercieel', eenheid: 'eurocent per maand, zonder btw',
     betekenis: 'Wat leden via partnerzaken betaalden (orders en ritten). Geld van de zaak, niet van RTG.',
-    berekening: 'som van betaalde orders (total) en ritten (quote) per dag, zeven dagen terug',
-    actualiteit: 'live', privacy: 'zaken', minGroep: 5, eigenaar: 'kern/kantoor', graad: 'onbekend', afhankelijk: [],
-    bron: [c(MET, 'betaaldeOrders.filter')], definitie: null, projectie: [c(MET, 'omzetWeek:')], bewijs: null,
-    groepsgrens: [c(MET, 'zaken.size < ZAKEN_GRENS ? dicht(dag) : dag')],
-    waarom: { definitie: 'Het getal heet in de code `omzet`, terwijl dezelfde functie zegt dat RTG niets aan boekingen verdient: het is transactievolume van zaken en geen omzet van RTG. Die naam is nergens gedefinieerd.',
-      bewijs: 'Geen graad, geen peilmoment, en de valuta en btw van de onderliggende orders worden niet genoemd.' } },
+    berekening: 'som van de subtotalen van facturen met betaalwijze rtg van zaken in de maand',
+    actualiteit: 'live', privacy: 'zaken', minGroep: 5, eigenaar: 'kern/kantoor', graad: 'gemeten', afhankelijk: [],
+    bron: [c('server/kern/facturatie/motor.js', 'regels: v.regels, subtotaal: v.subtotaal, btwBedrag: v.btwBedrag')], definitie: [c('server/kern/bedrijfsmaat/definities-later.js', 'transactievolume: d29(19')], projectie: [c('server/kern/bedrijfsmaat/stand-groei.js', 'function transactievolume()')], bewijs: [c('server/kern/bedrijfsmaat/stand-groei.js', "eenheid: 'eurocent, zonder btw', btwCenten")],
+    groepsgrens: [c('server/kern/bedrijfsmaat/stand-groei.js', 'toon(ZAKEN, { waarde: centen, n: zaken.size })')],
+    waarom: {} },
 
   { id: 'geld.foundation-afdracht', domein: 'geld', wereld: 'rtg-intern', eenheid: 'euro',
     betekenis: 'Het deel van de lidmaatschapsbijdragen dat RTG aan de RTFoundation verschuldigd is, en wat daarvan gestort is.',

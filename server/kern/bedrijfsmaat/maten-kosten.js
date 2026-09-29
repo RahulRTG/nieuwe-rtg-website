@@ -5,6 +5,7 @@
 const c = (bestand, citaat) => ({ bestand, citaat });
 const KOS = 'server/kern/kosten/';
 const PRJ = 'server/kern/bedrijfsmaat/projecties.js', STAND = 'server/kern/bedrijfsmaat/stand.js';
+const MRG = 'server/kern/bedrijfsmaat/stand-marge.js';
 
 module.exports = [
   { id: 'marge.bruto-rtg', domein: 'marge', wereld: 'rtg-intern', eenheid: 'eurocent per maand, zonder btw',
@@ -18,13 +19,17 @@ module.exports = [
     gedeeltelijk: 'De ontvangen omzet eronder ziet alleen de betaalschema\'s van aanmeldingen en niet de ledenfacturen in de kluis; zolang dat zo is, zegt deze marge iets over de vorm en weinig over het bedrag.',
     waarom: {} },
 
-  { id: 'marge.per-lid', domein: 'marge', wereld: 'consument', eenheid: 'euro per lid per maand',
-    betekenis: 'Unit economics: wat een lid bijdraagt min wat hij kost, opgeteld per pas of cohort en nooit per mens.',
-    berekening: 'nog niet vastgesteld', actualiteit: 'periode', privacy: 'leden', minGroep: 10, eigenaar: null, graad: 'onbekend',
+  { id: 'marge.per-lid', domein: 'marge', wereld: 'consument', eenheid: 'eurocent per lid per maand',
+    betekenis: 'Unit economics: wat een lid bijdraagt min wat hij kost, per pas en nooit per mens (besluit C15).',
+    berekening: 'per pas: afgesproken maandbijdrage min de kosten van de leden van die pas, gedeeld door alle leden van die pas',
+    actualiteit: 'live', privacy: 'leden', minGroep: 10, eigenaar: 'kern/bedrijfsmaat', graad: 'vermoed',
     afhankelijk: ['omzet.leden-maand', 'kosten.per-drager'],
-    bron: 'afgeleid', definitie: null, projectie: null, bewijs: null, groepsgrens: null,
-    waarom: { definitie: 'Kosten per drager bestaan, opbrengst per drager niet; welke van de twee de noemer is (pas, cohort) is niet besloten.',
-      projectie: 'Niet gebouwd.', bewijs: 'Volgt uit de projectie.', groepsgrens: 'Er is nog geen projectie om hem in af te dwingen.', eigenaar: 'Niemand.' } },
+    bron: 'afgeleid', definitie: [c('server/kern/bedrijfsmaat/definities-later.js', 'margePerLid: d29(15')],
+    projectie: [c(MRG, 'function margePerPas()'), c('server/kern/ledenregister.js', 'function omzetPerPas')],
+    bewijs: [c(MRG, "niet('Er zijn leden op deze pas zonder lopend contract"), c(MRG, "niet('Verbruik zonder tarief")],
+    groepsgrens: [c(MRG, '{ grens, benoemd: true }')],
+    gedeeltelijk: 'Alleen de lopende maand: de bijdrage per pas is een stand van vandaag en wordt niet per maand bewaard. De Business Pass rekent alleen mee als elk lid een lopend contract heeft.',
+    waarom: {} },
 
   { id: 'kosten.per-drager', domein: 'kosten', wereld: 'rtg-intern', eenheid: 'euro per drager per maand',
     betekenis: 'Wat een lid, zaak of gezin het huis deze maand kostte, per kostensoort, met de graad per regel.',

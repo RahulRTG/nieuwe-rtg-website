@@ -18,8 +18,13 @@
 'use strict';
 
 module.exports = function bouwKernAan(kern, grens) {
-  const { db, save, bewerkCollectie, STORE, crypto, schoon, sseToCustomer, accounts, anthropic, mail,
+  const { db, save, STORE, crypto, schoon, sseToCustomer, accounts, anthropic, mail,
     beveilig, fs, path, DATA_DIR, rtf, gidsHaal, keyVanCodenaam, leeftijdVan, leeftijdInstr } = kern;
+  /* De collectietransactie uit de opslag zelf: `kern` draagt hem niet, dus wie
+     hem daaruit destructureerde kreeg undefined en viel stil terug op een
+     niet-atomair pad -- ook in productie (gemeten 29 september 2026;
+     test/aanbouw-collectie.test.js). Hij gaat ook niet in `kern`. */
+  const { bewerkCollectie } = require('../db');
   /* De logger RECHTSTREEKS uit ./log, niet via kern.logboek. Bij het verhuizen
      van dit blok uit server.js kwam `logboek` hier uit de kern -- en daar is
      `logboek` de onderhoudslogboek-lezer van de Rechterhand

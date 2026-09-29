@@ -1,5 +1,6 @@
 /* DE BESLUITEN ONDER DE BEDRIJFSMAATLAAG: twee constitutionele (C1, C2) en negen
-   over wat er gemeten wordt en hoe (C3 tot en met C11).
+   over wat er gemeten wordt en hoe (C3 tot en met C11). Wat daarna kwam (C12 en
+   verder) staat in ./besluiten-later.js, in dezelfde vorm.
 
    Genomen door de eigenaar op 25 september 2026, vóór de meter werd gebouwd --
    in die volgorde, omdat een meter die RTG en de RTFoundation samen waarneemt
@@ -29,14 +30,7 @@ const HANDHAVING = {
   C8: 'kern/rtgboek.js en kern/bedrijfsmaat/stand-rtgboek.js; test/rtgboek.test.js. Posten per maand met een bron, op naam, personeel als totaal; stroom en serverhuur blijven in de huisrekening.',
   C9: 'kern/rtgboek.js en kern/bedrijfsmaat/stand-rtgboek.js; test/rtgboek.test.js. Bruto en netto naast elkaar; geen netto verbruik geeft geen getal.',
   C10: 'kern/rtgboek.js en kern/bedrijfsmaat/stand-rtgboek.js; test/rtgboek.test.js. Het ledentegoed komt uit kern/pay (ledentegoed) en wordt niet afgetrokken.',
-  C11: 'kern/rtgboek.js en kern/bedrijfsmaat/stand-rtgboek.js; test/rtgboek.test.js. Per kanaal, langs de groepspoort van het aanmeldkanaal; vriend heeft geen post.',
-  C12: 'kern/rtgcampagne.js (het register), kern/rtgboek.js (de uitgave per campagne) en kern/aanmeldkanaal.js (een ' +
-    'geregistreerde code telt onder haar kanaal); test/rtgcampagne.test.js.',
-  C13: 'kern/beslisgeheugen.js (gronden van toen, uitkomst per maat bij het lezen, intrekken met reden, geen voorstel); ' +
-    'test/beslisgeheugen.test.js.',
-  C14: 'kern/cadeaubon.js (de schakelaar, standaard dicht, en de verplichting die kern/bankpositie.js leest) en ' +
-    'RTG_CADEAUBON in kern/bevoegdheid/lijst-afhankelijk.js; test/cadeaubon.test.js. Verkopen, inwisselen en afrekenen ' +
-    'zijn met opzet niet gebouwd: die vragen eerst een e-geldvergunning of vrijstelling.'
+  C11: 'kern/rtgboek.js en kern/bedrijfsmaat/stand-rtgboek.js; test/rtgboek.test.js. Per kanaal, langs de groepspoort van het aanmeldkanaal; vriend heeft geen post.'
 };
 
 const BESLUITEN = Object.freeze([
@@ -107,24 +101,7 @@ const BESLUITEN = Object.freeze([
       'Welk kanaal werkt, en niet een gemiddelde over alles.']
   ].map(([id, naam, regel, kort]) => Object.freeze({ id, naam, besloten: '27 september 2026, door de eigenaar',
     herkomst: 'mens', regel, kort, handhaving: HANDHAVING[id], stand: 'gebouwd' })),
-  ...[
-    ['C12', 'Een campagne is een code onder een kanaal',
-      'Een campagne is een benoemde linkcode met een begin en een einde, onder precies een aanmeldkanaal. Financien boekt per ' +
-      'campagne wat die kostte, als deel van de kanaalpost; het effect is het aantal nieuwe leden met die code, langs de ' +
-      'groepspoort. Geen klikken en geen attributiemodel.',
-      'Welke campagne werkt, zonder een lid te volgen.'],
-    ['C13', 'Het beslisgeheugen: besluit plus uitkomst',
-      'Per besluit wie besloot, op welke gronden (de bedrijfsmaten met hun graad op dat moment) en wat er verwacht werd; na een ' +
-      'vaste termijn per maat wat die werkelijk deed. Een geheugen dat alleen leest, zeven jaar bewaard, en de machine stelt ' +
-      'er nog niets uit voor.',
-      'Terugkijken op een besluit met de getallen van toen.'],
-    ['C14', 'De cadeaubon van RTG, ook te besteden bij zaken',
-      'RTG verkoopt een eigen cadeaubon die bij RTG en bij de zaken op het platform te besteden is. Dat is elektronisch ' +
-      'geld: de schakelaar in de boardroom is die positie, staat standaard dicht, en ook open vraagt de uitgifte een ' +
-      'e-geldvergunning over de eigen rails. Het geld van een verkochte bon telt als verplichting op de bank.',
-      'Een bon bij derden is geld, en dat staat er als positie en niet als instelling.']
-  ].map(([id, naam, regel, kort]) => Object.freeze({ id, naam, besloten: '28 september 2026, door de eigenaar',
-    herkomst: 'mens', regel, kort, handhaving: HANDHAVING[id], stand: 'gebouwd' }))
+  ...require('./besluiten-later')
 ]);
 
 module.exports = { BESLUITEN };

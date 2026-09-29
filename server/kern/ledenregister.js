@@ -146,5 +146,17 @@ module.exports = ({ accounts, onboarding, geldPasprijzen, ledenAantal, db }) => 
       lijst };
   }
 
-  return { ledenregister: { register, PAS_VOLGORDE, PAS_NAAM } };
+  /* Alleen de omzet per pas, zonder ledenlijst en zonder facetten: de bron van de
+     bedrijfsmaat marge.per-lid (besluit C15). Het aantal per pas gaat NIET langs
+     de groepspoort; dat doet de maat zelf, op de plek waar het getal ontstaat. */
+  function omzetPerPas() {
+    const passen = {};
+    for (const r of (accounts.ledenRegisterRijen ? accounts.ledenRegisterRijen(20000) : [])) {
+      const p = pasVan(r.tier);
+      passen[p] = (passen[p] || 0) + 1;
+    }
+    return omzetstaat(passen).omzet;
+  }
+
+  return { ledenregister: { register, omzetPerPas, PAS_VOLGORDE, PAS_NAAM } };
 };

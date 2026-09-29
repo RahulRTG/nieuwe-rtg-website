@@ -232,6 +232,25 @@ Drie keuzes van de eigenaar, weer als meerkeuze gesteld, en alle drie gebouwd.
   gebouwd: een uitgifte die in geen enkele stand mag draaien, is een half aangezette
   geldlaag.
 
+Het beslisgeheugen en de cadeaubon hebben sinds 29 september een scherm: de tab
+**Besluiten** in de boardroom (`public/apps/boardroom-besluiten.js`). Een besluit
+vastleggen en intrekken gaat op naam, de cadeaubon omzetten vraagt de passkey, en
+het scherm zegt bij open meteen dat de uitgifte nog steeds niet mag.
+
+### 2.7 Het besluit van 29 september 2026
+
+- **C15, de marge per lid: per pas, over alle leden.** Per pas de afgesproken
+  maandbijdrage (lijstprijs maal aantal, of de som van de lopende contracten) min
+  wat de leden van die pas het huis die maand kostten, gedeeld door ALLE leden van
+  die pas -- ook wie niets gebruikte, want die draagt bij en kost niets
+  (`kern/bedrijfsmaat/stand-marge.js`). Per pas en niet per cohort, omdat de pas met
+  elke meting meereist en de kostenlaag dan geen identiteit hoeft op te zoeken.
+  Onder tien leden geen getal, met secundaire onderdrukking. Geen getal ook voor een
+  eerdere maand (de bijdrage per pas is een stand van vandaag), bij verbruik zonder
+  tarief, en voor een contractuele pas waar een lid geen lopend contract heeft. De
+  graad is `vermoed`: stroom en serverhuur zijn met een sleutel verdeeld. Daarmee is
+  de kostenketen gegrond, en zijn het alle zes.
+
 ---
 
 ## 3. De architectuur, onderdeel voor onderdeel
@@ -275,7 +294,7 @@ breekt, is waar het verhaal ophoudt:
 | service | **gegrond** | fout -> klokken -> opgelost zonder herhaling |
 | afdracht | **gegrond** (27 september) | de maandbijdrage zegt nu zelf dat hij afgesproken is, gemeten, wanneer gepeild en wat hij niet dekt |
 | funnel | **gegrond** (27 september) | nieuw lid, cohort, activatie, klantwaarde in LivingOS en aanwezigheid; de andere drie werelden hebben hun eigen klantwaardemaat ernaast |
-| kosten | breekt bij `marge.per-lid` | kosten per drager bestaan, opbrengst per drager niet |
+| kosten | **gegrond** (29 september) | van kosten per drager via de maandafsluiting en de vooruitblik naar de marge per lid, per pas (C15); `vermoed`, want stroom en serverhuur zijn verdeeld |
 | geld | **gegrond** (27 september) | van ontvangen omzet via bruto- en operationele marge en het banksaldo naar de runway; alles na de brutomarge draagt de graad `vermoed`, want het rust op overgetikte bedragen |
 | werving | **gegrond** (28 september) | campagne (C12) -> kanaal -> kosten per nieuw lid, per kanaal en per campagne; een ondergrens, want wie de link zag en later zelf zocht telt niet mee |
 
@@ -379,5 +398,8 @@ doorgestreept met de datum; de besluiten staan in par. 2.5.
    dimensie buiten de tolerantie of onbekend is. Er handelt nog niets autonoom.
 10. ~~**Het beslisgeheugen**~~ -- staat (28 september, C13): besluit, gronden van
     toen, verwachting per maat en de uitkomst na de termijn, zonder totaal en zonder
-    voorstel. Vijf van de zes ketens zijn gegrond; de zesde (kosten, bij
-    `marge.per-lid`) is wat het geheugen nog niet kan toetsen.
+    voorstel. Sinds 29 september met een scherm (de tab Besluiten in de
+    boardroom), en alle zes ketens zijn gegrond: de kostenketen sloot met de marge
+    per lid (C15). Die maat rekent alleen over de lopende maand, dus een besluit
+    dat hem als verwachting draagt, krijgt bij het toetsen geen oordeel maar de
+    reden -- zo hoort het, want de bijdrage per pas van toen is niet bewaard.

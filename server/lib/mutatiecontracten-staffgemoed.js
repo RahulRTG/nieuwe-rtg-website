@@ -111,4 +111,9 @@ const CONTRACTEN = {
   }
 };
 
-module.exports = { CONTRACTEN, AFGETEKEND };
+/* De personeelslus (PERSONEEL.md) hangt hier aan: dezelfde staff-kant, en het
+   hoofdbestand zit aan de 10 kB-grens. */
+module.exports = {
+  CONTRACTEN: Object.assign({}, CONTRACTEN, require('./mutatiecontracten-personeel').CONTRACTEN),
+  AFGETEKEND
+};

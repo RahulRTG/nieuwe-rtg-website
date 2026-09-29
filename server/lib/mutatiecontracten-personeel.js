@@ -1,7 +1,8 @@
 /* ============================================================================
    MUTATIECONTRACTEN -- DE PERSONEELSLUS (PERSONEEL.md).
 
-   Deel van server/lib/mutatiecontracten.js; zie de kop daar voor de vorm, en die
+   Deel van server/lib/mutatiecontracten.js (via ./mutatiecontracten-staffgemoed.js);
+   zie de kop daar voor de vorm, en die
    van ./mutatiecontracten-leest.js voor waarom NOT_APPLICABLE twee lijnen bewijs
    eist. Twee routes in een bestand, want het hoofdbestand zit aan de 10 kB-grens:
 

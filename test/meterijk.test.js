@@ -1611,6 +1611,13 @@ const IJKINGEN = {
       (j) => { j.rondes.ruim.vorm.domeinen = (j.rondes.ruim.vorm.domeinen || []).slice(0, -3); return j; },
       () => voor.planDomeinenGemeten - norm.meet().planDomeinenGemeten)
   },
+  /* DE TAND VAN 29 SEPTEMBER 2026: plaatsDomeinenGemeten, de zuster van de tand
+     hierboven voor de plaatsvorm (NAVIGATIE.md par. 14.1). */
+  plaatsDomeinenGemeten: {
+    proef: (voor) => metVervangenJson('PLAATSVORM.json',
+      (j) => { j.rondes.ruim.domeinen = (j.rondes.ruim.domeinen || []).slice(0, -3); return j; },
+      () => voor.plaatsDomeinenGemeten - norm.meet().plaatsDomeinenGemeten)
+  },
   /* DE TAND VAN 23 SEPTEMBER 2026: officeDomeinenGemeten, de zuster van de tand
      hierboven en om dezelfde reden: OFFICEVORM.json draagt een nul (0 velden in
      alle objectdomeinen onder het voorgestelde RTGObject), en ziet de meter stil

@@ -14824,6 +14824,14 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "plaatsvorm.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/plaatsvorm.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
     }
   }
 }

@@ -1027,7 +1027,7 @@ architectuur en de meetuitslagen laten het zien, of ze laten het niet zien.
 
 | stap | wat | vorm |
 |---|---|---|
-| **A0a** | **`plaatsvorm`**: wat verstaat RTG vandaag onder een plaats? Per bron: geometrie, etiketten, privacy, zichtbaarheid, toestand, bewijs en wie hem leest. Met de lezer van `scripts/objectmodel.js`. Niet om een schema af te dwingen maar om de inconsistenties zichtbaar te maken | meting, geen bouwwerk |
+| **A0a** | **`plaatsvorm`**: wat verstaat RTG vandaag onder een plaats? Per bron: geometrie, etiketten, privacy, zichtbaarheid, toestand, bewijs en wie hem leest. Met de lezer van `scripts/objectmodel.js`. Niet om een schema af te dwingen maar om de inconsistenties zichtbaar te maken | **staat** (par. 14.1): geen gedeelde vorm |
 | **A0b** | **`positiestroom`**: elke plek waar een positie binnenkomt, wordt verwerkt, aan een sleutel of codenaam wordt gekoppeld, wordt opgeslagen (hoe lang, waarvoor) en wordt gelezen -- met per stroom een van zeven klassen (par. 6.4) | **staat** (par. 6.5) |
 | **A0c** | de vijf tellers als toets die de OPSLAG leest na een doorloop, met een ratel die alleen omlaag mag (N10) | **staat** (par. 6.6): 0 / 1 / 2 / 1, de ritlijn niet gemeten |
 | **A1** | N2 en N3 uitvoeren, in de volgorde die A0b aanwijst: de passages uit `plaatsLog`, aankomst niet meer uit een opgeslagen positie, en per positieopslag doel, minimum, termijn en noodzaak | reparatie, met A0c als de toets die groen wordt |
@@ -1052,6 +1052,56 @@ een proef die bij schakel 2 zakt. Wie D bouwt vóór A0a, legt een ingang aan ee
 `Place`-type dat de meting misschien niet rechtvaardigt. En wie de gebreken van
 par. 12 een voor een repareert vóór G, repareert symptomen: over zes maanden
 gebruikt iemand weer een hemelsbrede afstand als taxiprijs.
+
+### 14.1 A0a staat: de plaatsvorm (29 september 2026)
+
+`npm run plaatsvorm` (`scripts/plaatsvorm.js`, `PLAATSVORM.json`,
+`test/plaatsvorm.test.js`). Graad `vermoed`, met de lezer van
+`scripts/objectmodel.js` zodat de getallen naast `OBJECTMODEL.json` en
+`PLANVORM.json` te leggen zijn. De domeinlijst wordt AFGELEID en niet
+geschreven: een plaatsvorm is een objectvorm die een plaats draagt, onder twee
+drempels -- RUIM (een coordinaat of een plaatsveld, adres inbegrepen) en SMAL
+(lat en lng of lon).
+
+| | RUIM | SMAL |
+|---|---|---|
+| plaatsvormen / domeinen | 57 / 30 | 18 / 8 |
+| velden naast het punt | 175 | 39 |
+| in alle domeinen | **0** | **0** |
+| in minstens de helft | 0 | 0 |
+| in precies een domein | 90,3% | 89,7% |
+| schrijfwijzen van een punt | 5 | 2 |
+| met een zichtbaarheids- of privacyveld | **0** | **0** |
+| met geen enkel aspect naast de plek | 42,1% | 38,9% |
+
+**Er komt dus geen `Place`-objecttype.** Wat overleeft is dezelfde vorm als bij
+de andere zes metingen: een projectie met etiketten, waarin elk domein zijn
+plaats houdt en de plaatslaag ernaar verwijst met een herkomst (P-06).
+
+**De leerzaamste regel is de zevende.** Geen enkele vorm die een plaats draagt,
+draagt ook een veld over wie hem mag zien. P-03 zegt dat de privacypoort aan de
+bron staat, en in de vorm van de data is die poort er vandaag niet: waar hij
+bestaat, zit hij in de code die de plaats toont en niet in de plaats zelf. Dat
+is een ondergrens (de as is lexicaal), maar een nul over 57 vormen is geen
+toeval.
+
+**De meter betrapte zichzelf bij de eerste ronde.** SMAL meldde "lat en lng
+staan in alle domeinen" -- onvermijdelijk, want SMAL selecteert op precies die
+twee velden. De velden die een vorm tot plaatsvorm maken, doen daarom niet mee
+aan de vergelijking. De vraag van de vorm-as is wat de domeinen NAAST hun punt
+delen, en dat is ook de vraag van P-01. Toets 1 zakt zodra die uitzondering
+verdwijnt.
+
+**Wat de meting niet ziet, en dat is veel.** De lezer leest alleen literalen met
+een `id` en zonder geneste accolades. De zaak zelf (`kern/leverancier`, met
+`loc`) en de plaatslaag (`kern/plaats`) komen daardoor niet in de uitslag -- de
+twee bronnen die voor dit document het meest tellen. Het woord `plek` vangt aan
+de andere kant ook dingen die geen plaats zijn (winkellijsten, een koopbaar).
+Allebei verzwakken ze een conclusie over gedeeldheid in de veilige richting:
+een gemiste vorm kan een gedeelde vorm verbergen, maar twee drempels die het
+allebei op nul zetten, maken dat onwaarschijnlijk. En wie een plaats LEEST staat
+er met opzet niet in: dat is een eigenschap van de aanroepers en niet van de
+vorm (`nietGemeten`).
 
 ---
 

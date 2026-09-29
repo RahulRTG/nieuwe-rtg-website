@@ -1,7 +1,7 @@
 /* ============================================================================
    DE STAVING -- staat wat Rahul zegt ook in wat hij heeft opgezocht?
 
-   server/kern/registerblik/staving.js legt het antwoord van de registerblik
+   server/kern/stuur/staving.js legt het antwoord van de registerblik
    naast de uitkomsten van de gereedschappen uit DIE beurt. Wat hier vastligt:
 
      1. een getal uit een register krijgt de graad van dat register;
@@ -13,7 +13,12 @@
         losse getallen, en een route wordt niet gevonden via een langere;
      6. een antwoord zonder ankers wordt niet goedgekeurd maar is `onbekend`;
      7. geen nieuwe woorden: alleen de vier graden van het huis;
-     8. de boardroom zet onder het antwoord wat niet is teruggevonden.
+     8. de boardroom zet onder het antwoord wat niet is teruggevonden;
+     9. in de stuurlus is een geslaagde aanroep `gemeten` en een weigering,
+        voorstel of plan `vermoed`;
+    10. een meegegeven graad kan door de uitkomst alleen verlaagd worden;
+    11. de stuurlus geeft de staving mee, en een getal uit de vraag van de mens
+        is geen bewijs maar ook geen verzinsel.
 
    Nagetrokken met mutaties (elk zakt minstens een toets):
      a. een anker zonder treffer krijgt `vermoed` in plaats van `onbekend` -> 2
@@ -22,6 +27,9 @@
      d. het opsommingsnummer blijft een anker                               -> 5
      e. een antwoord zonder ankers krijgt `gemeten`                         -> 6
      f. de boardroom laat de voetnoot weg                                   -> 8
+     g. uitStuur noemt elke `doe` gemeten, ook een 403                      -> 9
+     h. een meegegeven graad wint van een zachtere graad in de uitkomst     -> 10
+     i. de stuurlus laat de vraag weg als bron                              -> 11
 
    Draai los: node --test test/staving.test.js
    ========================================================================== */
@@ -32,7 +40,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const { staaf, voetnoot, getal } = require('../server/kern/registerblik/staving');
+const { staaf, voetnoot, uitStuur, getal } = require('../server/kern/stuur/staving');
 const { GRADEN } = require('../server/kern/stuur/gevolgcontract/woorden');
 
 const register = (naam, graad, extra) => Object.assign({ bron: { register: naam, graad, dagenOud: 1 } }, extra);
@@ -101,7 +109,7 @@ test('7. geen nieuwe woorden: alleen de vier graden van het huis', () => {
   const s = staaf('Er zijn 7 en 8 en VERTROUWEN.json.', [u('x', register('VERTROUWEN.json', 'bewezen', { n: 7 }))]);
   for (const a of s.ankers) assert.ok(GRADEN.includes(a.graad), a.graad);
   assert.ok(GRADEN.includes(s.graad));
-  const bron = fs.readFileSync(path.join(__dirname, '../server/kern/registerblik/staving.js'), 'utf8');
+  const bron = fs.readFileSync(path.join(__dirname, '../server/kern/stuur/staving.js'), 'utf8');
   assert.doesNotMatch(bron, /\[\s*'onbekend'\s*,/, 'de graden komen uit gevolgcontract/woorden.js, niet uit een eigen lijst');
   assert.doesNotMatch(bron, /'(ondersteund|tegengesproken|SUPPORTED|CONTRADICTED)'/);
 });
@@ -128,4 +136,46 @@ test('8. de boardroom zet onder het antwoord wat niet is teruggevonden', async (
   } finally {
     if (vorige === undefined) delete process.env.RTG_REGISTERWORTEL; else process.env.RTG_REGISTERWORTEL = vorige;
   }
+});
+
+test('9. in de stuurlus is alleen een geslaagde aanroep of de kaart gemeten', () => {
+  const doe = (status, extra) => uitStuur({ name: 'doe', input: { pad: '/api/x' } }, Object.assign({ status }, extra));
+  assert.equal(doe(200).graad, 'gemeten', 'een geslaagde aanroep is een live antwoord uit deze beurt');
+  assert.equal(doe(403).graad, 'vermoed', 'een weigering zegt niets over de stand van zaken');
+  assert.equal(doe(428, { bevestigNodig: true }).graad, 'vermoed', 'een voorstel is nog niet gebeurd');
+  assert.equal(doe(200, { bevestigNodig: true }).graad, 'vermoed');
+  assert.equal(uitStuur({ name: 'kaart' }, { paden: [] }).graad, 'gemeten');
+  assert.equal(uitStuur({ name: 'plan' }, { stappen: [] }).graad, 'vermoed', 'een plan is een voornemen');
+  assert.equal(uitStuur({ name: 'doe' }, null).graad, 'vermoed', 'zonder status geen bewering');
+});
+
+test('10. een meegegeven graad kan alleen omlaag', () => {
+  const zacht = staaf('Het zijn er 42.', [{ gereedschap: 'doe', graad: 'gemeten', uit: { n: 42, bron: { graad: 'vermoed' } } }]);
+  assert.equal(zacht.ankers[0].graad, 'vermoed', 'wat de uitkomst zelf zachter noemt, telt');
+  const hard = staaf('Het zijn er 42.', [{ gereedschap: 'doe', graad: 'vermoed', uit: { n: 42, bron: { graad: 'bewezen' } } }]);
+  assert.equal(hard.ankers[0].graad, 'vermoed', 'een uitkomst kan zichzelf niet ophogen boven wat de aanroeper weet');
+});
+
+test('11. de stuurlus geeft de staving mee; een getal uit de vraag is geen bewijs en geen verzinsel', async () => {
+  const { toegestanePaden } = require('../server/kern/stuur/beleid');
+  const { classificeer, parseSubs } = require('../server/kern/stuur/classificatie');
+  const alle = toegestanePaden(['/api/agenda/mijn'], 'member');
+  const beurten = [
+    { stop_reason: 'tool_use', content: [{ type: 'tool_use', id: 'd1', name: 'doe',
+      input: { pad: '/api/agenda/mijn', zeker: true, begrepen: 'de agenda van dit lid lezen' } }] },
+    { stop_reason: 'end_turn', content: [{ type: 'text', text: 'Je hebt 3 afspraken op de 14e, en 99 herinneringen.' }] }];
+  let i = 0;
+  const anthropic = { messages: { create: async () => beurten[i++] } };
+  const stuurRoep = async () => ({ status: 200, antwoord: { afspraken: 3 } });
+  const stuurLus = require('../server/kern/stuur/lus')({ anthropic, app: {}, log: null, stuurRoep,
+    stuurPaden: () => alle, classificeer, parseSubs, isolatie: null });
+  const r = await stuurLus({ socket: { localPort: 0 }, get: () => null, session: {} },
+    { vraag: 'Wat staat er op de 14e?', wereld: 'member' });
+  assert.ok(r && r.staving, 'de stuurlus geeft de staving mee');
+  const a = (w) => r.staving.ankers.find(x => x.waarde === w);
+  assert.equal(a('3').graad, 'gemeten', 'uit het live antwoord van de route');
+  assert.equal(a('14').graad, 'onbekend', 'de mens noemde het zelf: geen bewijs');
+  assert.equal(a('14').bron, 'vraag');
+  assert.deepEqual(r.staving.nietGevonden, ['99'], 'alleen wat nergens staat, is niet teruggevonden');
+  assert.equal(r.staving.graad, 'onbekend');
 });

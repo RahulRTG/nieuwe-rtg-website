@@ -149,7 +149,7 @@ Grenzen:
 ### De staving: staat het antwoord in wat is opgezocht?
 
 Een klein model kan een getal overschrijven, twee tellingen verwisselen of een
-route noemen die het nergens zag. `server/kern/registerblik/staving.js` legt het
+route noemen die het nergens zag. `server/kern/stuur/staving.js` legt het
 antwoord daarom naast de uitkomsten van de gereedschappen uit diezelfde beurt.
 
 - Het toetst alleen wat deterministisch terug te vinden is: getallen, API-routes
@@ -166,6 +166,18 @@ antwoord daarom naast de uitkomsten van de gereedschappen uit diezelfde beurt.
 
 Wat hij niet ziet: of een zin zonder anker klopt, en of een gevonden getal in de
 juiste betekenis is gebruikt. Een `0` staat vrijwel altijd ergens.
+
+De stuurlus (`kern/stuur/lus.js`) draagt dezelfde staving mee, voor het lid, de
+zaak en het personeel. Daar geeft de lus zelf de graad van een uitkomst mee:
+- een geslaagde `doe` is een live antwoord van een route uit deze beurt en dus
+  `gemeten`, net als de kaart;
+- een weigering, een voorstel en een plan zijn `vermoed`, want ze zeggen niets
+  over hoe het nu staat;
+- de vraag van de mens telt als bron met `onbekend`. Een getal dat het lid zelf
+  noemde is geen bewijs, maar ook geen verzinsel van het model.
+
+Een graad in de uitkomst zelf kan de meegegeven graad alleen verlagen. De routes
+geven de staving mee als veld `staving`; een scherm toont hem nog niet.
 
 ## Externe uitwijk
 

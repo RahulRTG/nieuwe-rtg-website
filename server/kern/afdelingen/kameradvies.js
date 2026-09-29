@@ -11,8 +11,7 @@
 module.exports = (ctx) => {
   const { anthropic, AFDELINGEN, kamer, taken, voorstellen } = ctx;
   const rahul = require('../rahul');
-  const { registerblikVraag } = require('../registerblik/lus');
-  const { voetnoot } = require('../registerblik/staving');
+  const { registerblikVraag, voetnoot } = require('../registerblik/lus');
 
   // De voorstellen uit de dagronde die op deze kamer slaan (of op de boardroom,
   // die overkoepelend is) -- zo krijgt Rahul dezelfde signalen als de eigenaar.

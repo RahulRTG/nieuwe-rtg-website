@@ -16,13 +16,13 @@
    model maar een bewering die geen register draagt.
 
    GEEN NIEUWE WOORDEN. De graden zijn de vier van het huis
-   (../stuur/gevolgcontract/woorden.js); er is geen `ondersteund` of
+   (./gevolgcontract/woorden.js); er is geen `ondersteund` of
    `tegengesproken`. Deze toets beslist niets en houdt niets tegen: hij
    verklaart, en het scherm laat zien wat niet is teruggevonden. De regel
    erboven: AI mag betekenis voorstellen, alleen een deterministisch systeem
    stelt waarheid vast. */
 'use strict';
-const { GRADEN } = require('../stuur/gevolgcontract/woorden');
+const { GRADEN } = require('./gevolgcontract/woorden');
 
 const MAX_ANKERS = 40;
 const RX_ROUTE = /\/api\/[\w/:.-]*[\w:]/g;
@@ -56,7 +56,7 @@ function inhoudVan(uit) {
     if (Array.isArray(x)) { for (const y of x) loop(y); return; }
     if (typeof x === 'object') for (const [k, v] of Object.entries(x)) { if (typeof k === 'string' && k.startsWith('/api/')) teksten.push(k); loop(v, k); }
   })(uit);
-  return { teksten, getallen, graad: graad || 'onbekend' };
+  return { teksten, getallen, graad };
 }
 
 function zinnen(tekst) {
@@ -89,8 +89,14 @@ function gevonden(anker, bron) {
 /* `uitkomsten` zijn wat de gereedschappen in deze beurt teruggaven:
    [{ gereedschap, invoer, uit }]. */
 function staaf(tekst, uitkomsten) {
-  const bronnen = (uitkomsten || []).map(u => Object.assign({ gereedschap: u.gereedschap,
-    register: registerVan(u.uit) }, inhoudVan(u.uit)));
+  /* Een uitkomst mag haar eigen graad meegeven (`u.graad`: de stuurlus weet dat
+     een geslaagde aanroep een live antwoord was); een graad IN de uitkomst kan
+     die alleen verlagen, nooit ophogen. */
+  const bronnen = (uitkomsten || []).map((u) => {
+    const inh = inhoudVan(u.uit);
+    const graad = u.graad ? (inh.graad ? laagste(u.graad, inh.graad) : u.graad) : (inh.graad || 'onbekend');
+    return Object.assign({ gereedschap: u.gereedschap, register: registerVan(u.uit) }, inh, { graad });
+  });
   const ankers = [];
   let ongetoetst = 0;
   for (const zin of zinnen(tekst)) {
@@ -126,6 +132,16 @@ function registerVan(uit) {
   return null;
 }
 
+/* De uitkomst van een stap van de stuurlus, met de graad die de lus kent: een
+   geslaagde `doe` is een live antwoord van een route in deze beurt (gemeten); een
+   kaart is de lijst die het beleid nu geeft (gemeten); een weigering, een
+   voorstel of een plan draagt geen stand van zaken (vermoed). */
+function uitStuur(t, uit) {
+  const st = uit && typeof uit.status === 'number' ? uit.status : null;
+  const live = t.name === 'kaart' || (t.name === 'doe' && st >= 200 && st < 300 && !uit.bevestigNodig);
+  return { gereedschap: t.name, invoer: t.input || {}, uit, graad: live ? 'gemeten' : 'vermoed' };
+}
+
 /* De zin die onder een antwoord komt als er iets niet is teruggevonden. */
 function voetnoot(s) {
   if (!s || !s.nietGevonden || !s.nietGevonden.length) return '';
@@ -133,4 +149,4 @@ function voetnoot(s) {
     ' -- lees dat als onbekend tot een register het bevestigt.';
 }
 
-module.exports = { staaf, voetnoot, ankersVan, getal };
+module.exports = { staaf, voetnoot, uitStuur, ankersVan, getal };

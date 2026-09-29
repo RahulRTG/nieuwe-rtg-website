@@ -10,7 +10,7 @@
    een lange zoektocht nooit stil het begin -- de regels -- laat afkappen. Het
    antwoord komt terug met de registers die zijn geraadpleegd en hun leeftijd,
    zodat het scherm kan laten zien waar een bewering vandaan komt, en met de
-   staving (./staving.js): welke getallen, routes en registers uit het antwoord
+   staving (../stuur/staving.js): welke getallen, routes en registers uit het antwoord
    ook echt in de opgezochte uitkomsten staan, en met welke graad.
 
    Loopt het stappenbudget op zonder antwoord, dan zegt de lus dat, met wat hij
@@ -20,7 +20,7 @@ const rahul = require('../rahul');
 const { REGISTERBLIK_TOOLS, kijk } = require('./gereedschap');
 const { lusPakket } = require('../stuur/luspakket');
 const { vensterVan } = require('../ai/contextpakket');
-const { staaf } = require('./staving');
+const { staaf, voetnoot } = require('../stuur/staving');
 
 const STAPPEN = 5;
 const ANTWOORD = 900;
@@ -66,4 +66,4 @@ async function registerblikVraag({ anthropic, rol, vraag }) {
     reden: 'binnen ' + STAPPEN + ' stappen kwam er geen antwoord; hierboven staat wat er is bekeken' };
 }
 
-module.exports = { registerblikVraag, REGELS, STAPPEN };
+module.exports = { registerblikVraag, voetnoot, REGELS, STAPPEN };

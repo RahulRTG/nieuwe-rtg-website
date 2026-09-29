@@ -872,12 +872,12 @@ omlaag.
 
 ## `shared/uitvoer.js`
 
-`public/shared/uitvoer/` -- 2 delen, 287 regels in de delen
+`public/shared/uitvoer/` -- 2 delen, 285 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `uitvoer-01.js` | Uitvoer: uw gegevens meenemen uit elke app |
-| `uitvoer-02.js` | De bediening. Die was er niet: neemMee() had als enige aanroeper de |
+| `uitvoer-02.js` | Visible export action and modal share the active host |
 
 ## `shared/verbinding.js`
 

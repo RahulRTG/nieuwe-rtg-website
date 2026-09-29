@@ -2,24 +2,24 @@
  "soort": "index",
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
-  "op": "2026-09-28",
-  "commit": "ebd7424c"
+  "op": "2026-09-29",
+  "commit": "2ae19049"
  },
  "grens": "Een voorvoegsel uit een sjabloon met een gat is GEEN route en wordt nooit tegen de routelijst gelegd. Exacte paden wel: een exact pad dat niet bestaat, is een dood pad.",
  "gemetenTegen": {
   "register": "ROUTEBRON.json",
   "stempel": {
-   "op": "2026-09-28T22:38:22.188Z",
-   "commit": "ebd7424c"
+   "op": "2026-09-29T12:53:57.135Z",
+   "commit": "2ae19049"
   },
-  "bekendePaden": 5265
+  "bekendePaden": 5275
  },
  "gemeten": {
-  "schermenMetPad": 420,
+  "schermenMetPad": 422,
   "nietGelezen": 3,
-  "exactePaden": 951,
-  "verwijzingen": 1136,
-  "voorvoegsels": 144,
+  "exactePaden": 954,
+  "verwijzingen": 1141,
+  "voorvoegsels": 145,
   "basisPaden": 2,
   "doodPad": 0,
   "doodPadVerwijzingen": 0
@@ -114,6 +114,19 @@
    "aantal": 9
   },
   {
+   "pad": "/api/bestanden/mijn",
+   "schermen": [
+    "public/apps/boeken/app.js",
+    "public/apps/memo/app.js",
+    "public/apps/reizen-samen-delen.js",
+    "public/apps/wonen.js",
+    "public/shared/interface/personal-image-editor.js",
+    "public/shared/interface/world-widget-data.js",
+    "public/shared/kluismap.js"
+   ],
+   "aantal": 7
+  },
+  {
    "pad": "/api/rtf/social/connections",
    "schermen": [
     "public/apps/foundation/arena.html",
@@ -140,18 +153,6 @@
    "aantal": 7
   },
   {
-   "pad": "/api/bestanden/mijn",
-   "schermen": [
-    "public/apps/boeken/app.js",
-    "public/apps/memo/app.js",
-    "public/apps/reizen-samen-delen.js",
-    "public/apps/wonen.js",
-    "public/shared/interface/world-widget-data.js",
-    "public/shared/kluismap.js"
-   ],
-   "aantal": 6
-  },
-  {
    "pad": "/api/account/start",
    "schermen": [
     "public/apps/decision-room.js",
@@ -161,6 +162,16 @@
     "public/apps/rtmail-voorzijde-werk.js"
    ],
    "aantal": 5
+  },
+  {
+   "pad": "/api/bestanden/haal",
+   "schermen": [
+    "public/apps/boeken/app.js",
+    "public/apps/memo/app.js",
+    "public/apps/reizen-samen-delen.js",
+    "public/shared/interface/personal-images.js"
+   ],
+   "aantal": 4
   },
   {
    "pad": "/api/member/connections",
@@ -218,15 +229,6 @@
     "public/apps/app-main/app-main-43.js",
     "public/apps/foundation/contact.html",
     "public/apps/foundation/gezin-rt/gezin-rt-01.js"
-   ],
-   "aantal": 3
-  },
-  {
-   "pad": "/api/bestanden/haal",
-   "schermen": [
-    "public/apps/boeken/app.js",
-    "public/apps/memo/app.js",
-    "public/apps/reizen-samen-delen.js"
    ],
    "aantal": 3
   },
@@ -6564,6 +6566,27 @@
    "aantal": 1
   },
   {
+   "pad": "/api/foundation/gezin/beelden",
+   "schermen": [
+    "public/shared/interface/personal-images.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/ik/beelden",
+   "schermen": [
+    "public/shared/interface/personal-images.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/ik/beelden/zet",
+   "schermen": [
+    "public/shared/interface/personal-images.js"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/ik/workspace/audit/noteer",
    "schermen": [
     "public/shared/interface/workspace-runtime.js"
@@ -10520,6 +10543,28 @@
     "/api/member/huis/dossier"
    ],
    "voorvoegsels": []
+  },
+  {
+   "bestand": "public/shared/interface/personal-image-editor.js",
+   "exact": [
+    "/api/bestanden/mijn"
+   ],
+   "voorvoegsels": [
+    "/api/bestanden/"
+   ]
+  },
+  {
+   "bestand": "public/shared/interface/personal-images.js",
+   "exact": [
+    "/api/bestanden/haal",
+    "/api/foundation/gezin/beelden",
+    "/api/ik/beelden",
+    "/api/ik/beelden/zet"
+   ],
+   "voorvoegsels": [
+    "/api/bestanden/",
+    "/api/foundation/gezin/beelden/"
+   ]
   },
   {
    "bestand": "public/shared/interface/second-screen-modules.js",

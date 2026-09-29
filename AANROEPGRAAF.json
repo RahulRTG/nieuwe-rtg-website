@@ -2,43 +2,43 @@
  "soort": "index",
  "uitleg": "De symbool-naar-symboolgraaf van server/: welke functie roept welke functie aan. Elke kant draagt HOE hij is afgeleid (lokaal, ingevoerd, lid). Wat niet af te leiden viel staat als onopgelost in de uitslag, met aantallen -- niet weggelaten.",
  "stempel": {
-  "op": "2026-09-28",
-  "commit": "ebd7424c"
+  "op": "2026-09-29",
+  "commit": "2ae19049"
  },
  "grens": "Liever geen kant dan een verzonnen kant. Er wordt geen kant gelegd op naamgelijkenis alleen: een aanroep telt pas als de naam lokaal bestaat of aantoonbaar uit een require komt, EN het doelbestand dat symbool ook echt kent.",
  "gemeten": {
-  "bestanden": 3899,
+  "bestanden": 3906,
   "nietGelezen": 0,
-  "aanroepen": 161151,
-  "kanten": 28775,
-  "kantenLokaal": 17992,
-  "kantenIngevoerd": 2159,
-  "kantenLid": 1911,
-  "kantenViaKern": 6094,
+  "aanroepen": 161240,
+  "kanten": 28800,
+  "kantenLokaal": 18003,
+  "kantenIngevoerd": 2168,
+  "kantenLid": 1915,
+  "kantenViaKern": 6095,
   "kantenModuleAlsFunctie": 87,
   "kantenLidOpInvoer": 283,
   "kantenUitFabriek": 249,
-  "kantenViaKernZonderSymbool": 4222,
+  "kantenViaKernZonderSymbool": 4223,
   "kernherkomstGelezen": 1246,
-  "onopgelosteAanroepen": 118725,
-  "onopgelosteNamen": 12400,
+  "onopgelosteAanroepen": 118787,
+  "onopgelosteNamen": 12404,
   "onopgelostNaarSoort": {
-   "ingebouwd": 31663,
+   "ingebouwd": 31676,
    "externeModule": 834,
-   "kader": 11845,
-   "contextobject": 16699,
+   "kader": 11863,
+   "contextobject": 16712,
    "uitgepaktObject": 1554,
-   "lokaleWaarde": 21019,
-   "methodeOpWaarde": 34688,
+   "lokaleWaarde": 21024,
+   "methodeOpWaarde": 34701,
    "overig": 423
   },
   "opgelostPct": 26.3,
   "doelOnbekend": 0,
   "bewaakteVooruitwijzing": 0,
   "doelNietVastTeStellen": 60,
-  "symbolenMetAanroeper": 10639,
-  "routesMetSymbool": 3232,
-  "routeSymboolKanten": 6836
+  "symbolenMetAanroeper": 10644,
+  "routesMetSymbool": 3242,
+  "routeSymboolKanten": 6858
  },
  "routeNaarSymbool": [
   {
@@ -2840,6 +2840,16 @@
     "server/routes/plaats.js#stuur",
     "server/routes/plaats.js#wie",
     "server/routes/plaats.js#sleutel"
+   ]
+  },
+  {
+   "route": "POST /api/foundation/gezin/beelden/zet",
+   "bestand": "server/routes/presentatie-gezinsbeelden.js",
+   "symbolen": [
+    "server/kern/presentatie-beelden.js#zet",
+    "server/opzet/envelop.js#wie",
+    "server/server.js#null",
+    "server/routes/presentatie-gezinsbeelden.js#send"
    ]
   },
   {
@@ -7058,6 +7068,15 @@
     "server/routes/plaats.js#geenGast",
     "server/server.js#null",
     "server/routes/plaats.js#wie"
+   ]
+  },
+  {
+   "route": "POST /api/ik/beelden/zet",
+   "bestand": "server/routes/presentatie-beelden.js",
+   "symbolen": [
+    "server/routes/presentatie-beelden.js#member",
+    "server/kern/presentatie-beelden.js#zet",
+    "server/opzet/envelop.js#wie"
    ]
   },
   {
@@ -14040,6 +14059,62 @@
    "symbolen": [
     "server/routes/podium.js#geenGast",
     "server/routes/podium.js#stuur"
+   ]
+  },
+  {
+   "route": "POST /api/ik/beelden",
+   "bestand": "server/routes/presentatie-beelden.js",
+   "symbolen": [
+    "server/routes/presentatie-beelden.js#member",
+    "server/kern/presentatie-beelden.js#lees"
+   ]
+  },
+  {
+   "route": "POST /api/foundation/gezin/beelden/mijn",
+   "bestand": "server/routes/presentatie-gezinsbeelden.js",
+   "symbolen": [
+    "server/routes/presentatie-gezinsbeelden.js#send",
+    "server/opzet/envelop.js#wie"
+   ]
+  },
+  {
+   "route": "POST /api/foundation/gezin/beelden/haal",
+   "bestand": "server/routes/presentatie-gezinsbeelden.js",
+   "symbolen": [
+    "server/opzet/envelop.js#wie",
+    "server/routes/presentatie-gezinsbeelden.js#send"
+   ]
+  },
+  {
+   "route": "POST /api/foundation/gezin/beelden/upstart",
+   "bestand": "server/routes/presentatie-gezinsbeelden.js",
+   "symbolen": [
+    "server/routes/presentatie-gezinsbeelden.js#send",
+    "server/opzet/envelop.js#wie"
+   ]
+  },
+  {
+   "route": "POST /api/foundation/gezin/beelden/updeel",
+   "bestand": "server/routes/presentatie-gezinsbeelden.js",
+   "symbolen": [
+    "server/routes/presentatie-gezinsbeelden.js#send",
+    "server/opzet/envelop.js#wie"
+   ]
+  },
+  {
+   "route": "POST /api/foundation/gezin/beelden/upklaar",
+   "bestand": "server/routes/presentatie-gezinsbeelden.js",
+   "symbolen": [
+    "server/routes/presentatie-gezinsbeelden.js#send",
+    "server/opzet/envelop.js#wie"
+   ]
+  },
+  {
+   "route": "POST /api/foundation/gezin/beelden/upload",
+   "bestand": "server/routes/presentatie-gezinsbeelden.js",
+   "symbolen": [
+    "server/routes/presentatie-gezinsbeelden.js#send",
+    "server/opzet/envelop.js#wie"
    ]
   },
   {
@@ -22721,6 +22796,13 @@
    ]
   },
   {
+   "route": "POST /api/foundation/gezin/beelden",
+   "bestand": "server/routes/presentatie-gezinsbeelden.js",
+   "symbolen": [
+    "server/kern/presentatie-beelden.js#lees"
+   ]
+  },
+  {
    "route": "POST /api/office/opvang/locatie",
    "bestand": "server/routes/regering.js",
    "symbolen": [
@@ -26273,31 +26355,31 @@
  "onopgelostTop": [
   {
    "naam": "MemberExpression",
-   "aantal": 32090
+   "aantal": 32099
   },
   {
    "naam": "String",
-   "aantal": 8453
+   "aantal": 8454
   },
   {
    "naam": "require",
-   "aantal": 6978
+   "aantal": 6988
   },
   {
    "naam": "app.post",
-   "aantal": 4695
+   "aantal": 4705
   },
   {
    "naam": "res.status",
-   "aantal": 3413
+   "aantal": 3418
   },
   {
    "naam": "CallExpression",
-   "aantal": 2525
+   "aantal": 2529
   },
   {
    "naam": "res.json",
-   "aantal": 2498
+   "aantal": 2501
   },
   {
    "naam": "Number",
@@ -26321,7 +26403,7 @@
   },
   {
    "naam": "Object.keys",
-   "aantal": 852
+   "aantal": 853
   },
   {
    "naam": "uit.push",
@@ -26329,7 +26411,7 @@
   },
   {
    "naam": "Number.isFinite",
-   "aantal": 744
+   "aantal": 745
   },
   {
    "naam": "Object.values",
@@ -26421,7 +26503,7 @@
   },
   {
    "naam": "next",
-   "aantal": 226
+   "aantal": 227
   },
   {
    "naam": "path.join",
@@ -26438,11 +26520,11 @@
    "namen": [
     {
      "naam": "String",
-     "aantal": 8453
+     "aantal": 8454
     },
     {
      "naam": "require",
-     "aantal": 6978
+     "aantal": 6988
     },
     {
      "naam": "Number",
@@ -26466,11 +26548,11 @@
     },
     {
      "naam": "Object.keys",
-     "aantal": 852
+     "aantal": 853
     },
     {
      "naam": "Number.isFinite",
-     "aantal": 744
+     "aantal": 745
     },
     {
      "naam": "Object.values",
@@ -26503,11 +26585,11 @@
    "namen": [
     {
      "naam": "MemberExpression",
-     "aantal": 32077
+     "aantal": 32086
     },
     {
      "naam": "CallExpression",
-     "aantal": 2525
+     "aantal": 2529
     },
     {
      "naam": "ArrowFunctionExpression",
@@ -26544,7 +26626,7 @@
     },
     {
      "naam": "next",
-     "aantal": 226
+     "aantal": 227
     },
     {
      "naam": "scho",
@@ -27752,15 +27834,15 @@
    "namen": [
     {
      "naam": "app.post",
-     "aantal": 4695
+     "aantal": 4705
     },
     {
      "naam": "res.status",
-     "aantal": 3413
+     "aantal": 3418
     },
     {
      "naam": "res.json",
-     "aantal": 2498
+     "aantal": 2501
     },
     {
      "naam": "router.post",
@@ -139450,6 +139532,22 @@
    "lijn": 151
   },
   {
+   "vanBestand": "server/kern/presentatie-beelden.js",
+   "van": "zet",
+   "naarBestand": "server/kern/presentatie-beelden.js",
+   "naar": "lees",
+   "hoe": "lokaal",
+   "lijn": 13
+  },
+  {
+   "vanBestand": "server/kern/presentatie-beelden.js",
+   "van": "zet",
+   "naarBestand": "server/kern/presentatie-beelden.js",
+   "naar": "crop",
+   "hoe": "lokaal",
+   "lijn": 16
+  },
+  {
    "vanBestand": "server/kern/presentielast.js",
    "van": "metMinuten",
    "naarBestand": "server/kern/presentielast.js",
@@ -201863,7 +201961,7 @@
    "naarBestand": "server/routes/democratie/index.js",
    "naar": "stuur",
    "hoe": "lokaal",
-   "lijn": 21
+   "lijn": 20
   },
   {
    "vanBestand": "server/routes/democratie/index.js",
@@ -201871,7 +201969,7 @@
    "naarBestand": "server/routes/democratie/index.js",
    "naar": "alsLid",
    "hoe": "lokaal",
-   "lijn": 26
+   "lijn": 25
   },
   {
    "vanBestand": "server/routes/democratie/index.js",
@@ -201879,7 +201977,7 @@
    "naarBestand": "server/routes/democratie/index.js",
    "naar": "alsLid",
    "hoe": "lokaal",
-   "lijn": 29
+   "lijn": 28
   },
   {
    "vanBestand": "server/routes/democratie/index.js",
@@ -201887,7 +201985,7 @@
    "naarBestand": "server/routes/democratie/index.js",
    "naar": "alsLid",
    "hoe": "lokaal",
-   "lijn": 32
+   "lijn": 31
   },
   {
    "vanBestand": "server/routes/democratie/index.js",
@@ -201895,7 +201993,7 @@
    "naarBestand": "server/routes/democratie/index.js",
    "naar": "alsLid",
    "hoe": "lokaal",
-   "lijn": 35
+   "lijn": 34
   },
   {
    "vanBestand": "server/routes/democratie/index.js",
@@ -201903,7 +202001,7 @@
    "naarBestand": "server/routes/democratie/index.js",
    "naar": "alsLid",
    "hoe": "lokaal",
-   "lijn": 40
+   "lijn": 39
   },
   {
    "vanBestand": "server/routes/democratie/index.js",
@@ -201911,7 +202009,7 @@
    "naarBestand": "server/routes/democratie/index.js",
    "naar": "alsLid",
    "hoe": "lokaal",
-   "lijn": 41
+   "lijn": 40
   },
   {
    "vanBestand": "server/routes/democratie/index.js",
@@ -201919,7 +202017,7 @@
    "naarBestand": "server/routes/democratie/index.js",
    "naar": "alsLid",
    "hoe": "lokaal",
-   "lijn": 42
+   "lijn": 41
   },
   {
    "vanBestand": "server/routes/democratie/index.js",
@@ -201927,7 +202025,7 @@
    "naarBestand": "server/routes/democratie/index.js",
    "naar": "alsLid",
    "hoe": "lokaal",
-   "lijn": 43
+   "lijn": 42
   },
   {
    "vanBestand": "server/routes/democratie/index.js",
@@ -201935,7 +202033,7 @@
    "naarBestand": "server/routes/democratie/index.js",
    "naar": "alsLid",
    "hoe": "lokaal",
-   "lijn": 44
+   "lijn": 43
   },
   {
    "vanBestand": "server/routes/democratie/index.js",
@@ -201943,7 +202041,7 @@
    "naarBestand": "server/routes/democratie/index.js",
    "naar": "alsLid",
    "hoe": "lokaal",
-   "lijn": 45
+   "lijn": 44
   },
   {
    "vanBestand": "server/routes/democratie/index.js",
@@ -201951,7 +202049,7 @@
    "naarBestand": "server/routes/democratie/index.js",
    "naar": "alsLid",
    "hoe": "lokaal",
-   "lijn": 46
+   "lijn": 45
   },
   {
    "vanBestand": "server/routes/democratie/index.js",
@@ -201959,7 +202057,7 @@
    "naarBestand": "server/routes/democratie/index.js",
    "naar": "alsLid",
    "hoe": "lokaal",
-   "lijn": 47
+   "lijn": 46
   },
   {
    "vanBestand": "server/routes/democratie/index.js",
@@ -201967,7 +202065,7 @@
    "naarBestand": "server/routes/democratie/index.js",
    "naar": "alsLid",
    "hoe": "lokaal",
-   "lijn": 48
+   "lijn": 47
   },
   {
    "vanBestand": "server/routes/democratie/kantoor.js",
@@ -205247,7 +205345,7 @@
    "naarBestand": "server/lib/klok.js",
    "naar": "datum",
    "hoe": "lid",
-   "lijn": 25
+   "lijn": 26
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205255,7 +205353,7 @@
    "naarBestand": "server/routes/ik.js",
    "naar": "leeftijdVan",
    "hoe": "lokaal",
-   "lijn": 40
+   "lijn": 41
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205263,7 +205361,7 @@
    "naarBestand": "server/kern/rahul-fases.js",
    "naar": "faseVoor",
    "hoe": "lid",
-   "lijn": 43
+   "lijn": 44
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205271,7 +205369,7 @@
    "naarBestand": "server/kern/toegankelijk.js",
    "naar": "toegankelijkVan",
    "hoe": "viaKern",
-   "lijn": 54
+   "lijn": 55
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205279,7 +205377,7 @@
    "naarBestand": "server/kern/rahul-fases.js",
    "naar": "isJeugd",
    "hoe": "lid",
-   "lijn": 62
+   "lijn": 63
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205287,7 +205385,7 @@
    "naarBestand": "server/routes/ik.js",
    "naar": "uid",
    "hoe": "lokaal",
-   "lijn": 77
+   "lijn": 78
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205295,7 +205393,7 @@
    "naarBestand": "server/routes/ik.js",
    "naar": "beeld",
    "hoe": "lokaal",
-   "lijn": 79
+   "lijn": 80
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205303,7 +205401,7 @@
    "naarBestand": "server/routes/ik.js",
    "naar": "uid",
    "hoe": "lokaal",
-   "lijn": 83
+   "lijn": 84
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205311,7 +205409,7 @@
    "naarBestand": "server/kern/rahul-fases.js",
    "naar": "faseVoor",
    "hoe": "lid",
-   "lijn": 91
+   "lijn": 92
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205319,7 +205417,7 @@
    "naarBestand": "server/routes/ik.js",
    "naar": "leeftijdVan",
    "hoe": "lokaal",
-   "lijn": 91
+   "lijn": 92
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205327,7 +205425,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 106
+   "lijn": 107
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205335,7 +205433,7 @@
    "naarBestand": "server/routes/ik.js",
    "naar": "beeld",
    "hoe": "lokaal",
-   "lijn": 109
+   "lijn": 110
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205343,7 +205441,7 @@
    "naarBestand": "server/routes/ik.js",
    "naar": "uid",
    "hoe": "lokaal",
-   "lijn": 113
+   "lijn": 114
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205351,7 +205449,7 @@
    "naarBestand": "server/routes/ik.js",
    "naar": "uit",
    "hoe": "lokaal",
-   "lijn": 116
+   "lijn": 117
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205359,7 +205457,7 @@
    "naarBestand": "server/routes/ik.js",
    "naar": "beeld",
    "hoe": "lokaal",
-   "lijn": 117
+   "lijn": 118
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205367,7 +205465,7 @@
    "naarBestand": "server/routes/ik.js",
    "naar": "uid",
    "hoe": "lokaal",
-   "lijn": 124
+   "lijn": 125
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205375,7 +205473,7 @@
    "naarBestand": "server/kern/toegankelijk.js",
    "naar": "toegankelijkVan",
    "hoe": "viaKern",
-   "lijn": 126
+   "lijn": 127
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205383,7 +205481,7 @@
    "naarBestand": "server/routes/ik.js",
    "naar": "uid",
    "hoe": "lokaal",
-   "lijn": 130
+   "lijn": 131
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205391,7 +205489,7 @@
    "naarBestand": "server/routes/ik.js",
    "naar": "uit",
    "hoe": "lokaal",
-   "lijn": 132
+   "lijn": 133
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205399,7 +205497,7 @@
    "naarBestand": "server/kern/toegankelijk.js",
    "naar": "toegankelijkZet",
    "hoe": "viaKern",
-   "lijn": 132
+   "lijn": 133
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205407,7 +205505,7 @@
    "naarBestand": "server/routes/ik.js",
    "naar": "uid",
    "hoe": "lokaal",
-   "lijn": 138
+   "lijn": 139
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205415,7 +205513,7 @@
    "naarBestand": "server/kern/workspace-voorkeur.js",
    "naar": "lees",
    "hoe": "lid",
-   "lijn": 140
+   "lijn": 141
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205423,7 +205521,7 @@
    "naarBestand": "server/routes/ik.js",
    "naar": "uit",
    "hoe": "lokaal",
-   "lijn": 141
+   "lijn": 142
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205431,7 +205529,7 @@
    "naarBestand": "server/routes/ik.js",
    "naar": "uid",
    "hoe": "lokaal",
-   "lijn": 146
+   "lijn": 147
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205439,7 +205537,7 @@
    "naarBestand": "server/kern/workspace-voorkeur.js",
    "naar": "zet",
    "hoe": "lid",
-   "lijn": 149
+   "lijn": 150
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205447,7 +205545,7 @@
    "naarBestand": "server/lib/klok.js",
    "naar": "datum",
    "hoe": "lid",
-   "lijn": 149
+   "lijn": 150
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205455,7 +205553,7 @@
    "naarBestand": "server/routes/ik.js",
    "naar": "uit",
    "hoe": "lokaal",
-   "lijn": 150
+   "lijn": 151
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205463,7 +205561,7 @@
    "naarBestand": "server/routes/ik.js",
    "naar": "uid",
    "hoe": "lokaal",
-   "lijn": 156
+   "lijn": 157
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205471,7 +205569,7 @@
    "naarBestand": "server/kern/workspace-audit.js",
    "naar": "lees",
    "hoe": "lid",
-   "lijn": 158
+   "lijn": 159
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205479,7 +205577,7 @@
    "naarBestand": "server/routes/ik.js",
    "naar": "uid",
    "hoe": "lokaal",
-   "lijn": 162
+   "lijn": 163
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205487,7 +205585,7 @@
    "naarBestand": "server/kern/workspace-audit.js",
    "naar": "noteer",
    "hoe": "lid",
-   "lijn": 165
+   "lijn": 166
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205495,7 +205593,7 @@
    "naarBestand": "server/lib/klok.js",
    "naar": "datum",
    "hoe": "lid",
-   "lijn": 165
+   "lijn": 166
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205503,7 +205601,7 @@
    "naarBestand": "server/routes/ik.js",
    "naar": "uit",
    "hoe": "lokaal",
-   "lijn": 166
+   "lijn": 167
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205511,7 +205609,7 @@
    "naarBestand": "server/routes/ik.js",
    "naar": "uid",
    "hoe": "lokaal",
-   "lijn": 174
+   "lijn": 175
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205519,7 +205617,7 @@
    "naarBestand": "server/kern/util.js",
    "naar": "coord",
    "hoe": "ingevoerd",
-   "lijn": 176
+   "lijn": 177
   },
   {
    "vanBestand": "server/routes/ik.js",
@@ -205527,7 +205625,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 185
+   "lijn": 186
   },
   {
    "vanBestand": "server/routes/instant-reality.js",
@@ -225056,6 +225154,190 @@
    "naar": "stuur",
    "hoe": "lokaal",
    "lijn": 116
+  },
+  {
+   "vanBestand": "server/routes/presentatie-beelden.js",
+   "van": "route:POST /api/ik/beelden",
+   "naarBestand": "server/routes/presentatie-beelden.js",
+   "naar": "member",
+   "hoe": "lokaal",
+   "lijn": 13
+  },
+  {
+   "vanBestand": "server/routes/presentatie-beelden.js",
+   "van": "route:POST /api/ik/beelden",
+   "naarBestand": "server/kern/presentatie-beelden.js",
+   "naar": "lees",
+   "hoe": "lid",
+   "lijn": 14
+  },
+  {
+   "vanBestand": "server/routes/presentatie-beelden.js",
+   "van": "route:POST /api/ik/beelden/zet",
+   "naarBestand": "server/routes/presentatie-beelden.js",
+   "naar": "member",
+   "hoe": "lokaal",
+   "lijn": 17
+  },
+  {
+   "vanBestand": "server/routes/presentatie-beelden.js",
+   "van": "route:POST /api/ik/beelden/zet",
+   "naarBestand": "server/kern/presentatie-beelden.js",
+   "naar": "zet",
+   "hoe": "lid",
+   "lijn": 19
+  },
+  {
+   "vanBestand": "server/routes/presentatie-beelden.js",
+   "van": "route:POST /api/ik/beelden/zet",
+   "naarBestand": "server/opzet/envelop.js",
+   "naar": "wie",
+   "hoe": "ingevoerd",
+   "lijn": 19
+  },
+  {
+   "vanBestand": "server/routes/presentatie-gezinsbeelden.js",
+   "van": "gezinBeeldAuth",
+   "naarBestand": "server/opzet/envelop.js",
+   "naar": "zet",
+   "hoe": "ingevoerd",
+   "lijn": 10
+  },
+  {
+   "vanBestand": "server/routes/presentatie-gezinsbeelden.js",
+   "van": "route:POST /api/foundation/gezin/beelden",
+   "naarBestand": "server/kern/presentatie-beelden.js",
+   "naar": "lees",
+   "hoe": "lid",
+   "lijn": 16
+  },
+  {
+   "vanBestand": "server/routes/presentatie-gezinsbeelden.js",
+   "van": "route:POST /api/foundation/gezin/beelden/zet",
+   "naarBestand": "server/kern/presentatie-beelden.js",
+   "naar": "zet",
+   "hoe": "lid",
+   "lijn": 19
+  },
+  {
+   "vanBestand": "server/routes/presentatie-gezinsbeelden.js",
+   "van": "route:POST /api/foundation/gezin/beelden/zet",
+   "naarBestand": "server/opzet/envelop.js",
+   "naar": "wie",
+   "hoe": "ingevoerd",
+   "lijn": 19
+  },
+  {
+   "vanBestand": "server/routes/presentatie-gezinsbeelden.js",
+   "van": "route:POST /api/foundation/gezin/beelden/zet",
+   "naarBestand": "server/server.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 20
+  },
+  {
+   "vanBestand": "server/routes/presentatie-gezinsbeelden.js",
+   "van": "route:POST /api/foundation/gezin/beelden/zet",
+   "naarBestand": "server/routes/presentatie-gezinsbeelden.js",
+   "naar": "send",
+   "hoe": "lokaal",
+   "lijn": 20
+  },
+  {
+   "vanBestand": "server/routes/presentatie-gezinsbeelden.js",
+   "van": "route:POST /api/foundation/gezin/beelden/mijn",
+   "naarBestand": "server/routes/presentatie-gezinsbeelden.js",
+   "naar": "send",
+   "hoe": "lokaal",
+   "lijn": 22
+  },
+  {
+   "vanBestand": "server/routes/presentatie-gezinsbeelden.js",
+   "van": "route:POST /api/foundation/gezin/beelden/mijn",
+   "naarBestand": "server/opzet/envelop.js",
+   "naar": "wie",
+   "hoe": "ingevoerd",
+   "lijn": 22
+  },
+  {
+   "vanBestand": "server/routes/presentatie-gezinsbeelden.js",
+   "van": "route:POST /api/foundation/gezin/beelden/haal",
+   "naarBestand": "server/opzet/envelop.js",
+   "naar": "wie",
+   "hoe": "ingevoerd",
+   "lijn": 25
+  },
+  {
+   "vanBestand": "server/routes/presentatie-gezinsbeelden.js",
+   "van": "route:POST /api/foundation/gezin/beelden/haal",
+   "naarBestand": "server/routes/presentatie-gezinsbeelden.js",
+   "naar": "send",
+   "hoe": "lokaal",
+   "lijn": 26
+  },
+  {
+   "vanBestand": "server/routes/presentatie-gezinsbeelden.js",
+   "van": "route:POST /api/foundation/gezin/beelden/upstart",
+   "naarBestand": "server/routes/presentatie-gezinsbeelden.js",
+   "naar": "send",
+   "hoe": "lokaal",
+   "lijn": 28
+  },
+  {
+   "vanBestand": "server/routes/presentatie-gezinsbeelden.js",
+   "van": "route:POST /api/foundation/gezin/beelden/upstart",
+   "naarBestand": "server/opzet/envelop.js",
+   "naar": "wie",
+   "hoe": "ingevoerd",
+   "lijn": 28
+  },
+  {
+   "vanBestand": "server/routes/presentatie-gezinsbeelden.js",
+   "van": "route:POST /api/foundation/gezin/beelden/updeel",
+   "naarBestand": "server/routes/presentatie-gezinsbeelden.js",
+   "naar": "send",
+   "hoe": "lokaal",
+   "lijn": 29
+  },
+  {
+   "vanBestand": "server/routes/presentatie-gezinsbeelden.js",
+   "van": "route:POST /api/foundation/gezin/beelden/updeel",
+   "naarBestand": "server/opzet/envelop.js",
+   "naar": "wie",
+   "hoe": "ingevoerd",
+   "lijn": 29
+  },
+  {
+   "vanBestand": "server/routes/presentatie-gezinsbeelden.js",
+   "van": "route:POST /api/foundation/gezin/beelden/upklaar",
+   "naarBestand": "server/routes/presentatie-gezinsbeelden.js",
+   "naar": "send",
+   "hoe": "lokaal",
+   "lijn": 30
+  },
+  {
+   "vanBestand": "server/routes/presentatie-gezinsbeelden.js",
+   "van": "route:POST /api/foundation/gezin/beelden/upklaar",
+   "naarBestand": "server/opzet/envelop.js",
+   "naar": "wie",
+   "hoe": "ingevoerd",
+   "lijn": 30
+  },
+  {
+   "vanBestand": "server/routes/presentatie-gezinsbeelden.js",
+   "van": "route:POST /api/foundation/gezin/beelden/upload",
+   "naarBestand": "server/routes/presentatie-gezinsbeelden.js",
+   "naar": "send",
+   "hoe": "lokaal",
+   "lijn": 31
+  },
+  {
+   "vanBestand": "server/routes/presentatie-gezinsbeelden.js",
+   "van": "route:POST /api/foundation/gezin/beelden/upload",
+   "naarBestand": "server/opzet/envelop.js",
+   "naar": "wie",
+   "hoe": "ingevoerd",
+   "lijn": 31
   },
   {
    "vanBestand": "server/routes/regering.js",

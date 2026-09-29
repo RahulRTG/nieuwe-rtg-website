@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2168 bestanden en 15150 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2169 bestanden en 15155 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2168 |
-| losse beweringen (`test(...)`) | 15150 |
+| toetsbestanden | 2169 |
+| losse beweringen (`test(...)`) | 15155 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 199 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1838 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1839 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 147 |
 | alleen in de kop *genoemd*, nog niet gemeten | 31 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1892 bestanden, 14666 beweringen.
+1893 bestanden, 14671 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1240,6 +1240,7 @@ toets omvalt.
 | `poortwacht-oordeel.test.js` | 7 | gezakt op `>=->>#0` | EEN DEUR DIE STRANDDE OP ZIJN VALIDATIE, IS GEEN DEUR ZONDER SLOT. HET GEVAL. |
 | `poortwacht.test.js` | 3 | gezakt op `===->!==#0` | De poortwacht-bevindingen, vastgelegd zodat ze niet terugkruipen. scripts/poortwacht.js klopt anoniem aan bij alle 2496 geregistreerde API-routes. |
 | `portemonnee.test.js` | 5 | gezakt op `liegpoort /api/` | DE PORTEMONNEE EN DE POST -- geld tussen mensen, en wat erover geschreven wordt. WAAROM DIT ER IS RTG Pay raakt het meest gevoelige dat een app kan doen: het saldo van een mens verplaatsen. |
+| `positieproef.test.js` | 5 | gezakt op `===->!==#0` | POSITIEPROEF (NAVIGATIE.md par. 6.6, A0c) -- de opslaghelft van de meter. |
 | `positiestroom.test.js` | 11 | genoemd | POSITIESTROOM -- meet hij wat hij zegt te meten, en kan hij zakken? De meter is de bron-helft van de grondwetmeter uit NAVIGATIE.md par. |
 | `postdatum.test.js` | 13 | gezakt op `liegpoort /api/` | Postdatums: de datums die in uw eigen post staan, als VOORSTEL. Wat hier bewezen wordt, en waarom juist dit: de lezer drie vormen herkend, en de twijfelgevallen NIET geraden -- "03/04/2026" wordt overgeslagen met de... |
 | `postgres-requestcommit.pg.test.js` | 1 | slaat zichzelf over | Echte PostgreSQL failure-injection: een backend wordt gedood terwijl de request op zijn eerste collectieslot wacht. Er mag geen 200 en geen halve collectiecommit ontstaan; een tweede app-instance kan daarna exact... |

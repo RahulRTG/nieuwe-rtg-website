@@ -23,7 +23,7 @@ module.exports = function maakVonkProjecties({ accounts, codenaamVan, W, H, Proj
         media: profileMedia ? profileMedia.projecteer(viewer || key, key, zelf ? 'owner' : 'discovery') : [],
         ...(extra || {}), ...(zelf ? { geslacht: p.geslacht, zoekt: p.zoekt,
           leeftijdMin: p.leeftijdMin, leeftijdMax: p.leeftijdMax, maxKm: p.maxKm,
-          actief: p.actief, afstandActief: isFinite(p.lat) && isFinite(p.lng),
+          actief: p.actief, afstandActief: !!p.vak,
           wensen: p.wensen || {}, zicht: p.zicht || {}, beschikbaar: p.beschikbaar || [],
           datewens: p.datewens || H.zetDatewens(null, {}) } : {}) }
     );

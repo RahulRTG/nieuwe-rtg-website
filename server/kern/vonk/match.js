@@ -4,6 +4,7 @@
    woonplaatsen. Betalen (EUR 10 p.p.: EUR 5 RTG, EUR 5 aanbetaling bij de zaak) via
    RTG Pay; pas als beiden betaald hebben komt de echte reservering. Plus de chat, de
    eigen matches, en blokkeren/melden. Krijgt de gedeelde ctx van kern/vonk/index.js. */
+const { plekVan } = require('./vak');
 module.exports = (ctx) => {
   const { db, save, schoon, id, nu, d, mag, likeVan, codenaamVan, keyVanCodenaam, haversine, niveauVan,
     reserveerTafel, pay, notify, sseToCustomer, sseToOffice, PRIJS_CENTEN, RTG_CENTEN,
@@ -30,7 +31,7 @@ module.exports = (ctx) => {
     // wederzijds: de match, de chatlijn en de tafel in het midden
     const m = { id: id(), a: key, b: doel, at: nu(), berichten: [], betaald: {}, status: 'wacht-op-betaling' };
     const planning = { date: volgendeDatum(), time: '19:30' };
-    m.tafel = tafelInHetMidden(d().profielen[key], d().profielen[doel], planning);
+    m.tafel = tafelInHetMidden(plekVan(d().profielen[key]), plekVan(d().profielen[doel]), planning);
     /* Meet Halfway (./halfweg + ./kiezen): drie plekken van verschillende soort
        rond hetzelfde midden. De automatische tafel hierboven blijft de bodem --
        kiest niemand, dan staat er nog steeds iets. */

@@ -16,14 +16,14 @@
    doorgaat, en dan moet iemand met de hand geld terugzoeken.
 
    EEN REIS IS GEEN ENKELE BETALING, EN DAT STAAT ER OOK. Het kaartje wordt nu
-   afgerekend, de rit bij het afronden -- want tot hij gereden is, is de ritprijs
-   een schatting. Een reis die doet alsof alles vooraf vaststaat, corrigeert
-   achteraf, en dat is precies de verrassing die niemand wil. */
+   afgerekend, de rit bij het afronden -- tot hij gereden is, is de ritprijs een
+   schatting. */
 
 module.exports = (ctx) => {
   const { db, save, id, schoon, nu, codenaamVan, notify,
     reisPlan, opdrachtMaak, opdrachtMet, opdrachtAnnuleer, opdrachtBeeld,
     kaartKoop, kaartMet, kaartBeeld, opslag } = ctx;
+  const { reisZonderGps } = require('./hiernaam')(ctx);
 
   function ensureReizen() {
     opslag.bak('mobReizen');
@@ -100,6 +100,7 @@ module.exports = (ctx) => {
     r.etappes.sort((a, b) => keuze.etappes.findIndex(x => x.wijze === a.wijze && (x.lijnId || '') === (a.lijnId || '')) -
       keuze.etappes.findIndex(x => x.wijze === b.wijze && (x.lijnId || '') === (b.lijnId || '')));
 
+    reisZonderGps(r);   // "hier" wordt een plaatsnaam, de GPS blijft niet (N21)
     opslag.bak('mobReizen').unshift(r);
     save();
     notify(session.key, { icon: 'ov', title: 'RTG Vervoer',

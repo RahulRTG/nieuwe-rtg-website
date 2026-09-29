@@ -66,6 +66,10 @@ module.exports = ({ db, lidBoardLogWis }) => {
     // meldingen weg (bij demo-profielen is dit de gedeelde demo-bel)
     if (db.data.notifications[key]) db.data.notifications[key] = [];
     for (const tak of EIGEN_TAKKEN) { if (db.data[tak]) delete db.data[tak][key]; }
+    /* HET VONK-PROFIEL, met zijn vak van 5 km (NAVIGATIE.md N21). Geen tak op de
+       sleutel maar een laag dieper (db.data.vonk.profielen), dus de lijst
+       hierboven raakte hem niet en bleef de plek van een vergeten lid staan. */
+    if (db.data.vonk && db.data.vonk.profielen) delete db.data.vonk.profielen[key];
     /* DE IDEMPOTENTIESLEUTELS VAN BETALEN. betaalIdem is geen tak op de sleutel
        van het lid maar een ring van antwoorden op een idem-sleutel, en in zo'n
        bewaard antwoord staat de codenaam. Een `delete tak[key]` raakt hem dus

@@ -43,6 +43,7 @@ test('Het Huis: het reisdossier staat op blad 02, met elke stand als woord',
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, reg.token);
     await page.goto(base + '/apps/rtg.html', { waitUntil: 'domcontentloaded' });
+    await page.locator('.wp-domain > summary').click();
 
     // het dossier vult zich met de eigen reis
     await page.waitForFunction(() => /Ibiza/.test(document.querySelector('#dossier').textContent),

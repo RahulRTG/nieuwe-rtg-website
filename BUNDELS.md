@@ -354,7 +354,7 @@ omlaag.
 
 ## `apps/office/app.js`
 
-`public/apps/office/app/` -- 9 delen, 957 regels in de delen
+`public/apps/office/app/` -- 9 delen, 959 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -798,7 +798,7 @@ omlaag.
 
 ## `shared/rahulpoort.js`
 
-`public/shared/rahulpoort/` -- 2 delen, 280 regels in de delen
+`public/shared/rahulpoort/` -- 2 delen, 281 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -816,7 +816,7 @@ omlaag.
 
 ## `shared/rtg-schil.js`
 
-`public/shared/rtg-schil/` -- 8 delen, 804 regels in de delen
+`public/shared/rtg-schil/` -- 8 delen, 810 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -872,12 +872,12 @@ omlaag.
 
 ## `shared/uitvoer.js`
 
-`public/shared/uitvoer/` -- 2 delen, 293 regels in de delen
+`public/shared/uitvoer/` -- 2 delen, 285 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `uitvoer-01.js` | Uitvoer: uw gegevens meenemen uit elke app |
-| `uitvoer-02.js` | De bediening. Die was er niet: neemMee() had als enige aanroeper de |
+| `uitvoer-02.js` | Visible export action and modal share the active host |
 
 ## `shared/verbinding.js`
 

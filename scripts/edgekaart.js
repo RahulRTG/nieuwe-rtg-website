@@ -299,7 +299,7 @@ const KAART = [
     ['beslist', '-', 'hooguit vier frames', "if (!x && entries.length >= 4) { o.announce(U.value('limit')); return false; }"],
     ['leest', 'identiteit:l', 'herlaadt bij een sessiewissel', "e.key === 'rtg_member_token' || e.key === 'rtf_sessie'"]]],
   ['interface/world-desktop-home.js', 'schil', 'wereld:sl', [
-    ['leest', 'wereld:l', 'de wereld van het bureau', 'world = d.body.dataset.worldHome'],
+    ['leest', 'wereld:l', 'de wereld van het bureau', 'world = d.body.dataset.rtgWorld'],
     ['schrijft', 'wereld:s', 'wereldlabel in het merk van de Edge', 'label.translate = false; brand.appendChild(label);'],
     ['beslist', '-', 'Home klapt het frame in en annuleert de navigatie', "w.addEventListener('rtg-edge-home', function (e) {"]]],
   ['rtg-continue-key-core.js', 'continuiteit', 'hoofdactie:sb', [
@@ -388,6 +388,10 @@ const KAART = [
   /* De landing (index.html in de wortel) draait de adaptieve Edge met een eigen
      host en zet de wereld per scene. Haar rijen staan sinds ronde 2 in haar
      eigen paneel en niet meer in het tweede register (EDGE.md, stap 15). */
+  ['public/site/platform-controller.js', 'schil', 'wereld:s', [
+    ['schrijft', 'wereld:s', 'het gekozen openbare verhaal bepaalt de wereld', 'd.body.dataset.rtgWorld=story.world;']]],
+  ['public/site/platform-app.js', 'schil', 'wereld:s', [
+    ['schrijft', 'wereld:s', 'de publieke apppagina kiest haar wereld', 'd.body.dataset.rtgWorld']]],
   ['public/site/start/experience-edge.js', 'afnemer', 'wereld:s', [
     ['schrijft', 'wereld:s', 'wereld op body per scene', "d.body.dataset.rtgWorld = active.id === 'werelden' ? X.currentWorld() : active.dataset.tone;"]]],
   ['public/site/start/experience.js', 'afnemer', 'wereld:s', [
@@ -632,7 +636,7 @@ const ANDERE_REGISTERS = [
 /* Een schrijver zonder lader is geen eigenaar. Of de lader ontbreekt, wordt bij
    elke meting opnieuw nagekeken: noemt een bestand in de wandeling de naam, dan
    vervalt de uitzondering en zakt de controle. */
-const ZONDER_LADER = ['public/site/platform-controller.js', 'public/site/platform-app.js'];
+const ZONDER_LADER = []; // Beide publieke modules worden door index.html geladen.
 const ATTR = { wereld: 'data-rtg-world', zichtbaarheidsstand: 'data-rtg-edge-2-state' };
 
 function afgeleid(lijst = wandeling()) {

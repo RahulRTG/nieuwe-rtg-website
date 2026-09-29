@@ -17,14 +17,14 @@ test('de nieuwe taalkeuze volgt de RTG-stijl en blijft binnen elke schermrand',
         await page.goto(base + '/site/werelden/livingos.html', { waitUntil: 'domcontentloaded' });
         await page.waitForFunction(() => window.RTGi18n && Array.isArray(window.RTGi18n._alleTalen) && window.RTGi18n._alleTalen.length === 114);
 
-        await page.locator('[data-language-picker]').click();
+        await page.locator('.pp-language').click();
         const kaart = page.locator('.rtg-lang-card');
         const vak = await kaart.boundingBox();
         assert.ok(vak.x >= 0 && vak.x + vak.width <= viewport.width,
           'taalkaart blijft horizontaal binnen ' + viewport.width + 'px');
         assert.ok(vak.y >= 0 && vak.y + vak.height <= viewport.height,
           'taalkaart blijft verticaal binnen ' + viewport.height + 'px');
-        assert.ok(parseFloat(await kaart.evaluate(el => getComputedStyle(el).borderRadius)) >= 20,
+        assert.equal(parseFloat(await kaart.evaluate(el => getComputedStyle(el).borderRadius)), 10,
           'taalkaart gebruikt de afgeronde RTG-systeemvorm');
         assert.equal(await page.locator('.rtg-lang-quick').count(), 4, 'vier directe taalkeuzes zijn zichtbaar');
         assert.equal(await page.locator('#rtg-lang-modal canvas').count(), 0, 'geen losse sterrenlaag achter de taalkeuze');
@@ -37,7 +37,7 @@ test('de nieuwe taalkeuze volgt de RTG-stijl en blijft binnen elke schermrand',
         await voorstel.click();
         await page.waitForFunction(() => document.documentElement.lang === 'ar' && document.documentElement.dir === 'rtl');
 
-        await page.locator('[data-language-picker]').click();
+        await page.locator('.pp-language').click();
         await page.getByRole('heading', { name: 'Choose your language', exact: true }).waitFor();
         const rtlVak = await kaart.boundingBox();
         assert.ok(rtlVak.x >= 0 && rtlVak.x + rtlVak.width <= viewport.width,

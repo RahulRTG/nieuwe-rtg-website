@@ -180,9 +180,10 @@ test('RTG Chauffeur: de PDA weigert zonder personeelssessie, neemt een rit aan e
         await knop.waitFor({ state: 'visible', timeout: 20000 });
         assert.equal(await page.locator('#werkstapel .ritkaart.actief button.hoofdactie').count(), 1,
           'er staat precies een volgende stap op de kaart, en dat is ' + label);
-        const gezet = page.waitForResponse(r => r.url().endsWith('/api/staff/mob/status'));
-        await knop.click();
-        const antwoord = await gezet;
+        const [antwoord] = await Promise.all([
+          page.waitForResponse(r => r.url().endsWith('/api/staff/mob/status'), {timeout:12000}),
+          knop.click({timeout:8000})
+        ]);
         assert.equal(antwoord.status(), 200, 'stap "' + status + '" via het scherm');
         assert.equal((await antwoord.json()).opdracht.status, status, 'de server zette de rit op ' + status);
         if (status === 'aangekomen') {

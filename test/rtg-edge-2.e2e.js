@@ -130,6 +130,7 @@ function schermToestand(route) {
   const panel = document.querySelector('.rtg-edge-2-context');
   const cs = getComputedStyle(document.body);
   return {
+    shellBottom: parseFloat(getComputedStyle(document.querySelector('.wd-shell')).paddingBottom),
     url: location.pathname + location.search + location.hash,
     wereld: document.body.getAttribute('data-rtg-world'),
     ready: document.body.getAttribute('data-rtg-edge-ready'),
@@ -236,19 +237,11 @@ function assertStand(m, verwacht, label) {
 function assertInsets(overzicht, compact, focus, mobiel, label) {
   assert.ok(overzicht.padding.top - compact.padding.top >= 30,
     label + ': compact geeft de ruimte van de bovenrand niet terug');
-  assert.ok(overzicht.padding.bottom >= 40, label + ': overzicht reserveert de onderrand niet');
-  assert.ok(compact.padding.bottom <= 4, label + ': compact houdt onnodig vaste onderruimte vast');
-  assert.ok(overzicht.padding.bottom - compact.padding.bottom >= 38,
-    label + ': compact maakt het werkvlak onder de zwevende Edge niet vrij');
-  assert.ok(focus.padding.bottom <= 4, label + ': focus houdt onnodig vaste onderruimte vast');
-  if (mobiel) {
-    assert.ok(overzicht.padding.left <= 4 && compact.padding.left <= 4 && focus.padding.left <= 4,
-      label + ': mobiel reserveert nog ruimte voor de verborgen zijrand');
-  } else {
-    assert.ok(overzicht.padding.left - compact.padding.left >= 38,
-      label + ': compact geeft de ruimte van de zijrand niet terug');
-    assert.ok(overzicht.padding.left - focus.padding.left >= 38,
-      label + ': focus geeft de ruimte van de zijrand niet terug');
+  // De nieuwe shell bewaart leesruimte onder de zwevende Edge in alle standen.
+  // De verdwenen zijbalk mag nooit een lege strook blijven reserveren.
+  for (const m of [overzicht, compact, focus]) {
+    assert.ok(m.shellBottom >= 104, label + ': de laatste handeling mist vrije scrollruimte boven Edge');
+    assert.ok(m.padding.left <= 4, label + ': de verdwenen zijrand reserveert nog ruimte');
   }
 }
 
@@ -314,8 +307,8 @@ async function controleerRoute(page, route, scherm) {
   assertEenRand(overzicht, label + ' · overzicht');
   assertStand(overzicht, { ...verwachtOverzicht, reveal: false }, label + ' · overzicht');
   assert.equal(overzicht.wereld, route.wereld, label + ': verkeerde wereldkleur/context');
-  assert.equal(overzicht.bottom.materiaal, '#0a0805',
-    label + ': de adaptieve Edge gebruikt niet het vaste marketingmateriaal');
+  assert.equal(overzicht.bottom.materiaal.toLowerCase(), {living:'#fffdf9',work:'#1c2524',travel:'#2d2025',foundation:'#1b293a'}[route.wereld],
+    label + ': de adaptieve Edge volgt niet het wereldmateriaal');
   assert.equal(overzicht.randHerstel, 2, label + ': boven- en onderrand missen hun herstelzone');
   assert.equal(overzicht.randHerstelZichtbaar, 0, label + ': herstelzones zijn buiten compact zichtbaar');
   assertContext(overzicht, route, label);

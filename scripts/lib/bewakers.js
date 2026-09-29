@@ -189,6 +189,7 @@ const KAART = new Map([
   // ---- lichaamssleutel: de sleutel staat in het verzoek, niet in de kop ----
   ['gastAuth', ['lichaamssleutel', null, 'herkent req.body.sleutel als tafelsessie']],
   ['gezinsPoort', ['lichaamssleutel', null, 'verifieerProfiel(req.body.code, req.body.token)']],
+  ['gezinBeeldAuth', ['lichaamssleutel', null, 'verifieerProfiel(req.body.code, req.body.token); eigen foto’s per gezinsprofiel']],
   ['rtfPoort', ['lichaamssleutel', null, 'verifieerProfiel(req.body.code, req.body.token)']],
   ['arrivalPassAuth', ['lichaamssleutel', null, 'zoekt req.body.pass op als Arrival Pass']],
 

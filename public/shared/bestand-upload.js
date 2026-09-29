@@ -3,7 +3,7 @@
 (function (w) {
   'use strict';
   w.RTGBestandUpload = function (file, api, context) {
-    var o = context || {}, STUK = 4 * 1024 * 1024;
+    var o = context || {}, STUK = Math.max(1024, Math.min(4 * 1024 * 1024, Number(o.chunkBytes) || 4 * 1024 * 1024));
     return new Promise(function (resolve, reject) {
       var reader = new FileReader();
       reader.onerror = function () { reject(new Error('Dit bestand kon niet worden gelezen. Probeer het opnieuw.')); };

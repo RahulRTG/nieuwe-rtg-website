@@ -148,7 +148,7 @@ test('het inlogportaal en de aanmelding werken met de bestaande beveiligde route
         });
         assert.equal(geometry.bars,1);assert.equal(geometry.overflow,false);
         assert.equal(geometry.edgeInside,true);assert.ok(geometry.passHeight>=48);assert.equal(geometry.clocks,0);
-        assert.equal(geometry.color,'rgb(57, 9, 25)');
+        assert.equal(geometry.color,'rgb(250, 248, 243)');
         await p.locator('#agNieuw').click();
         assert.match(await p.locator('#agZin').innerText(),/Vul uw volledige naam in\./);
         assert.equal(await p.locator('#agStappen').innerText(),'STAP 1 VAN 4');

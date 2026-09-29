@@ -1,6 +1,5 @@
 /* Connection Edge is de zichtbare projectie van de servertoestand. De basis
    is gedeeld; Vonk en Rendez-vous houden een eigen ritme en materiaal. */
-body[data-connection-edge]{--connection-edge-space:calc(7.6rem + env(safe-area-inset-bottom,0px));padding-bottom:var(--connection-edge-space)!important;}
 .connection-edge[hidden]{display:none!important;}
 .connection-edge{
   position:fixed;z-index:10020;inset-inline:clamp(.75rem,3vw,2rem);inset-block-end:calc(.7rem + env(safe-area-inset-bottom,0px));
@@ -10,17 +9,6 @@ body[data-connection-edge]{--connection-edge-space:calc(7.6rem + env(safe-area-i
     transform .28s cubic-bezier(.2,.8,.2,1),background-color .24s ease,box-shadow .24s ease;
   touch-action:pan-y;overscroll-behavior:contain;
 }
-.rtg-edge-bottom.connection-edge-owner{
-  display:block!important;min-height:0!important;width:auto!important;height:auto!important;padding:0!important;border:0!important;
-  background:transparent!important;box-shadow:none!important;backdrop-filter:none!important;pointer-events:none;
-}
-.rtg-edge-bottom.connection-edge-owner>:not(.connection-edge),
-.rtg-adaptive-edge.connection-edge-owner>:not(.connection-edge){display:none!important;}
-.rtg-edge-bottom.connection-edge-owner>.connection-edge,
-.rtg-adaptive-edge.connection-edge-owner>.connection-edge{pointer-events:auto;}
-.rtg-edge-bottom.connection-edge-owner .connection-edge,
-.rtg-adaptive-edge.connection-edge-owner .connection-edge{position:fixed;}
-.rtg-adaptive-edge.connection-edge-owner{pointer-events:none;border:0!important;background:transparent!important;box-shadow:none!important;}
 .dating-tabs:has(>.connection-edge.is-embedded){display:block!important;padding:0!important;overflow:visible!important;background:transparent!important;border:0!important;}
 .connection-edge.is-embedded{
   position:relative;inset:auto;width:100%;margin:0;border-radius:0;box-shadow:none;
@@ -108,3 +96,21 @@ html.rtg-tekst-groot .connection-edge__action,html.rtg-tekst-groter .connection-
   .connection-edge__action[aria-current="page"]{border-color:Highlight;color:Highlight;}
 }
 @media print{.connection-edge,.rtg-edge-bottom.connection-edge-owner{display:none!important;}}
+
+/* Standalone products share the world frame; their domain actions stay inline. */
+body[data-rtg-layout="standard"] .connection-edge.is-inline{
+  position:relative;inset:auto;z-index:auto;width:100%;margin:0 0 20px;padding:8px;
+  border:1px solid var(--rtg-world-line);border-radius:var(--rtg-radius-system,22px);background:var(--rtg-world-card);
+  color:var(--rtg-world-ink);box-shadow:none;backdrop-filter:none;transform:none;
+}
+.connection-edge.is-inline::before{display:none;}
+.connection-edge.is-inline .connection-edge__exit{display:none;}
+.connection-edge.is-inline{grid-template-columns:auto minmax(0,1fr);}
+.connection-edge.is-inline .connection-edge__context,.connection-edge.is-inline .connection-edge__mark{color:var(--rtg-world-metal);}
+.connection-edge.is-inline .connection-edge__rail{overflow-x:auto;}
+.connection-edge.is-inline .connection-edge__action{border-radius:var(--rtg-radius-system,22px);min-height:44px;}
+.connection-edge.is-inline .connection-edge__action:hover,
+.connection-edge.is-inline .connection-edge__action[aria-current="page"]{
+  color:var(--rtg-world-ink);border-color:var(--rtg-world-line);background:var(--rtg-world-card-strong);
+}
+@media(max-width:620px){.connection-edge.is-inline{grid-template-columns:minmax(0,1fr);}}

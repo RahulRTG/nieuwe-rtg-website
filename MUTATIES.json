@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T15:44:47.767Z",
-    "commit": "24639b81",
+    "op": "2026-09-29T16:01:54.881Z",
+    "commit": "41c41073",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5294,6 +5294,21 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "scherp": "gezakt"
+    },
+    "linkcap-credential.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/link/handelingen.js",
+      "operator": "===->!==#0",
+      "gezakt": 6,
+      "geprobeerd": 1
+    },
+    "linkcap-productie.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
       "scherp": "gezakt"
     },
     "livegang-pakket.test.js": {

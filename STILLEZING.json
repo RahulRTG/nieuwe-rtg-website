@@ -3,8 +3,8 @@
  "uitleg": "Lezers van bewijs- en gezagsstate die een ONLEESBAAR bestand als een AFWEZIG bestand behandelen. Bewijs kent drie toestanden (bestaat+geldig, bestaat+ongeldig, bestaat niet) en een catch die op null valt, maakt van de tweede de derde -- en leeg betekent in dit huis bijna overal \"geen beperking\". De spiegel van STILSPOOR.json: die meet schrijvers wier falen wordt opgegeten, deze meet lezers die het onderscheid verliezen. Nooit optellen.",
  "grens": "Lexicaal, dus een ONDERGRENS: de werkelijke schuld is minstens dit. server/ en scripts/ worden nooit opgeteld -- daar staat een handeling tegenover een meting. `smeltSamen` mag alleen dalen, `bewijslezingen` alleen stijgen: een schuld die daalt doordat de meter blind wordt, is de gevaarlijkste vorm van vooruitgang.",
  "stempel": {
-  "op": "2026-09-28T20:10:11.681Z",
-  "commit": "8c60bfd3c",
+  "op": "2026-09-29T16:34:25.826Z",
+  "commit": "51166d2d9",
   "boomVuil": false,
   "boomAnders": 3,
   "instrument": "scripts/stillezing.js",
@@ -21,7 +21,7 @@
    "anders": 1
   },
   "scripts": {
-   "bewijslezingen": 519,
+   "bewijslezingen": 534,
    "metVanger": 101,
    "smeltSamen": 61,
    "zegtHet": 12,
@@ -157,7 +157,7 @@
    },
    {
     "bestand": "scripts/bewijsmatrix.js",
-    "regel": 338,
+    "regel": 341,
     "leest": [
      "ROLPROEF.json"
     ],
@@ -165,7 +165,7 @@
    },
    {
     "bestand": "scripts/bewijsmatrix.js",
-    "regel": 352,
+    "regel": 355,
     "leest": [
      "HANDELINGPROEF.json"
     ],
@@ -173,7 +173,7 @@
    },
    {
     "bestand": "scripts/bewijsmatrix.js",
-    "regel": 425,
+    "regel": 428,
     "leest": [
      "POORTWACHT.json"
     ],
@@ -181,7 +181,7 @@
    },
    {
     "bestand": "scripts/bewijsmatrix.js",
-    "regel": 848,
+    "regel": 865,
     "leest": [
      "BEWIJSMATRIX.json"
     ],
@@ -253,7 +253,7 @@
    },
    {
     "bestand": "scripts/codecredentials.js",
-    "regel": 228,
+    "regel": 232,
     "leest": [
      "ROUTEBRON.json"
     ],

@@ -65,16 +65,16 @@ ledensessie, gelezen uit `RTGEdgeBlikveld.lees()` — nooit geraden uit de bron.
 Per veld een telling, en met opzet **geen samengesteld percentage**: een
 gemiddelde over tien velden verbergt welk veld bewoog (`BEWIJSMACHINE.md`).
 
-Uitslag over <!--getal:edgedekking.schermen-->313<!--/getal--> schermen, waarvan er
-<!--getal:edgedekking.metBlikveld-->283<!--/getal--> een blikveld laden (de rest is
+Uitslag over <!--getal:edgedekking.schermen-->314<!--/getal--> schermen, waarvan er
+<!--getal:edgedekking.metBlikveld-->284<!--/getal--> een blikveld laden (de rest is
 een doorverwijzing, een scherm zonder Edge, of een scherm dat een lid niet
 opent — elk met de reden in het register):
 
 | Veld | Schermen met een waarde | waarvan het scherm hem zelf levert |
 |---|---|---|
 | identiteit | <!--getal:edgedekking.identiteit-->0<!--/getal--> | <!--getal:edgedekking.identiteitZelf-->0<!--/getal--> |
-| wereld | <!--getal:edgedekking.wereld-->282<!--/getal--> | <!--getal:edgedekking.wereldZelf-->0<!--/getal--> |
-| context | <!--getal:edgedekking.context-->283<!--/getal--> | <!--getal:edgedekking.contextZelf-->13<!--/getal--> |
+| wereld | <!--getal:edgedekking.wereld-->283<!--/getal--> | <!--getal:edgedekking.wereldZelf-->0<!--/getal--> |
+| context | <!--getal:edgedekking.context-->284<!--/getal--> | <!--getal:edgedekking.contextZelf-->13<!--/getal--> |
 | object | <!--getal:edgedekking.object-->0<!--/getal--> | <!--getal:edgedekking.objectZelf-->0<!--/getal--> |
 | activiteit | <!--getal:edgedekking.activiteit-->0<!--/getal--> | <!--getal:edgedekking.activiteitZelf-->0<!--/getal--> |
 | presence | <!--getal:edgedekking.presence-->0<!--/getal--> | <!--getal:edgedekking.presenceZelf-->0<!--/getal--> |

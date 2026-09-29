@@ -269,6 +269,11 @@ const EIGENAAR = {
       'mechanismen halen de vier spoor-eigenschappen die kern/vertegenwoordiging/handelen.js ' +
       'definieert? Geschreven met --vastleggen, gelezen door test/spoorvorm.test.js en ' +
       'scripts/norm.js (de ratel spoorConvergent, die alleen omhoog mag).' },
+  'POSITIESTROOM.json': { schrijver: 'scripts/positiestroom.js',
+    waarom: 'de bron-helft van de grondwetmeter uit NAVIGATIE.md par. 6.4: waar de positie van een mens ' +
+      'blijft staan, aan welke sleutel en met welke termijn. Geschreven met --vastleggen, gelezen door ' +
+      'test/positiestroom.test.js en scripts/norm.js (positieZonderTermijn en positieNietVergeten omlaag, ' +
+      'positieStromenGezien omhoog).' },
   /* DE ONDERNEMERSLUS. Hij staat hier omdat toets 4 dat zo bedoelt: het aantal
      registers zonder eigenaar hoort te dalen doordat er eigenaren bijkomen, en
      niet te stijgen doordat er registers bijkomen. Een nieuw register zonder

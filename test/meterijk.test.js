@@ -1686,6 +1686,26 @@ const IJKINGEN = {
       (j) => { j.gemeten.volledigConvergent = (j.gemeten.volledigConvergent || 0) + 2; return j; },
       () => meet().spoorConvergent - voor.spoorConvergent)
   },
+  /* DE TANDEN VAN 29 SEPTEMBER 2026: het bewegingsspoor (POSITIESTROOM.json,
+     NAVIGATIE.md par. 6.4). Twee schulden die alleen mogen dalen en een bereik
+     dat alleen mag stijgen. De ijking duwt elke tand de VERKEERDE kant op en
+     eist dat de meter het ziet: meer stromen zonder termijn, meer stromen die
+     de vergeetroute mist, en minder stromen gezien. */
+  positieZonderTermijn: {
+    proef: (voor) => metVervangenJson('POSITIESTROOM.json',
+      (j) => { j.gemeten.zonderTermijn = (j.gemeten.zonderTermijn || 0) + 3; return j; },
+      () => meet().positieZonderTermijn - voor.positieZonderTermijn)
+  },
+  positieNietVergeten: {
+    proef: (voor) => metVervangenJson('POSITIESTROOM.json',
+      (j) => { j.gemeten.nietVergeten = (j.gemeten.nietVergeten || 0) + 3; return j; },
+      () => meet().positieNietVergeten - voor.positieNietVergeten)
+  },
+  positieStromenGezien: {
+    proef: (voor) => metVervangenJson('POSITIESTROOM.json',
+      (j) => { j.gemeten.stromen = Math.max(0, (j.gemeten.stromen || 0) - 5); return j; },
+      () => voor.positieStromenGezien - meet().positieStromenGezien)
+  },
   /* DE TAND VAN 15 SEPTEMBER 2026: connectDomeinenGemeten telt de
      ontdekkingsdomeinen die scripts/connectlus.js werkelijk heeft gezien
      (CONNECT.md par. 1). Zelfde vorm en zelfde richting als zijn drie zusters

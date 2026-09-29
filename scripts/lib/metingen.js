@@ -227,6 +227,7 @@ const REGISTER = {
      door een feit. */
   'NAMENSVORM.json': { meter: ['namensMechanismenGemeten'] },
   'SPOORVORM.json': { meter: ['spoorConvergent'] },
+  'POSITIESTROOM.json': { meter: ['positieZonderTermijn', 'positieNietVergeten', 'positieStromenGezien'] },
   /* Geen richting maar een ANKER: test/bedrijfsmaat.test.js eist nul verworpen
      citaten en nul vormfouten, en dat het register gelijk is aan een verse meting.
      Een maat die stil verdwijnt of een citaat dat niet meer klopt, laat hem zakken. */

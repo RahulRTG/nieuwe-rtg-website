@@ -140,7 +140,8 @@ function maakOntmoeting({ db, save, crypto, accounts, leeftijdVan, notify, sseTo
     ontmoetKies: kies, ontmoetTeken: teken, ontmoetHier: dateHier, ontmoetStop: stop,
     ontmoetSos: sos, ontmoetSosAf: sosAf, ontmoetSignaalKantoor: signaalNaarKantoor,
     ontmoetSignaalLid: signaalNaarLid, ontmoetMijnState: mijnState, ontmoetKantoorState: kantoorState,
-    ontmoetVergeetOudePosities: vergeetOudePosities
+    ontmoetVergeetOudePosities: vergeetOudePosities,
+    ontmoetVergeetSosPosities: deelDate.vergeetSosPosities
   };
 }
 

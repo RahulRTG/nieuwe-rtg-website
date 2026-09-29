@@ -132,7 +132,7 @@ module.exports = (kern) => {
   });
   app.post('/api/supplier/beveiliging/pda/ronde/checkpoint', supplierAuth, (req, res) => {
     if (!eisBeveiliging(req, res)) return;
-    const r = bevRondeCheckpoint(req.supplier.code, gid(req), String(req.body.id || ''), req.body.naam, req.body.lat, req.body.lng);
+    const r = bevRondeCheckpoint(req.supplier.code, gid(req), String(req.body.id || ''), req.body.naam); // geen GPS: het controlepunt bewijst de ronde (N19)
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json(r);
   });

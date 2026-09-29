@@ -135,7 +135,7 @@ function maakBeveiliging({ db, save, crypto, accounts, findSupplier, notify, not
   Object.assign(ctx, deelRooster);
   const deelPda = require('./beveiliging/pda')(ctx);
   const { budget, zetBudget, dienstPubliek, rooster, zetDienst, schrapDienst, planAuto, aanvraag, aanvraagLijst, beslisAanvraag } = deelRooster;
-  const { mijnDiensten, inklok, uitklok, rondeStart, rondeCheckpoint, rondeKlaar, meldIncident, beslisIncident, sos, command } = deelPda;
+  const { mijnDiensten, inklok, uitklok, rondeStart, rondeCheckpoint, rondeKlaar, vergeetRondePosities, meldIncident, beslisIncident, sos, command, vergeetSosPosities } = deelPda;
 
   return {
     BEVEILIGING_FUNCTIES: BEV_FUNCTIES, BEVEILIGING_SHIFTS: BEV_SHIFTS, BEVEILIGING_ERNST: BEV_ERNST,
@@ -148,7 +148,8 @@ function maakBeveiliging({ db, save, crypto, accounts, findSupplier, notify, not
     bevMijnDiensten: mijnDiensten, bevInklok: inklok, bevUitklok: uitklok,
     bevRondeStart: rondeStart, bevRondeCheckpoint: rondeCheckpoint, bevRondeKlaar: rondeKlaar,
     bevMeldIncident: meldIncident, bevBeslisIncident: beslisIncident, bevSos: sos,
-    bevCommand: command,
+    bevCommand: command, bevVergeetSosPosities: vergeetSosPosities,
+    bevVergeetRondePosities: vergeetRondePosities,
     /* De sleuf vullen. Wordt door opzet/plaatsbronnen.js aangeroepen zodra de
        plaatslaag staat; daarvoor doet de patrouillelaag geen uitspraak. */
     bevKoppelPlaats: (plaats, codenaamVanGuard) => { laat.plaats = plaats; laat.codenaamVanGuard = codenaamVanGuard; }

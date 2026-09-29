@@ -63,6 +63,26 @@ test('radar: de veger roept de wisregel van de radar aan en telt wat hij wist (N
   assert.equal(geroepen, 1);
 });
 
+test('sos: de veger roept elke wisregel van de domeinen aan met zijn klok, telt, en slaat op (NAVIGATIE.md N18, N19)', () => {
+  /* ZAKT OP: de lus over sosVeeg uit server/bewaarveger.js halen -- dan blijft
+     een SOS-plek na 90 dagen staan, en een plek van de kring buiten een venster.
+     ZAKT OP: `f(t)` vervangen door `f()` -- dan rekent een domein met de echte
+     klok in plaats van die van de veger (de 90 dagen zijn dan niet te toetsen).
+     ZAKT OP: de catch weghalen -- dan houdt een falend domein de rest tegen. */
+  const kreeg = [];
+  let saves = 0;
+  const v = maakBewaarveger({ db: { data: { live: {} } }, save: () => saves++,
+    accounts: { listByVerification: () => [] }, identiteitsmap: { wisAllesVan: () => {} },
+    nu: () => T0, sosVeeg: [
+      (t) => { kreeg.push(t); return 2; },
+      () => { throw new Error('dit domein faalt'); },
+      (t) => { kreeg.push(t); return 1; }] });
+  const r = v.veeg();
+  assert.equal(r.sosPosities, 3, 'twee domeinen wisten samen drie posities; het falende telde niet');
+  assert.deepEqual(kreeg, [T0, T0], 'elk domein kreeg de klok van de veger, ook na een falend domein');
+  assert.equal(saves, 1, 'wat gewist is, wordt opgeslagen');
+});
+
 test('radar: de wisregel zelf haalt alleen wat niet meer vers is weg', () => {
   const { maakOntmoeting } = require('../server/kern/ontmoeting');
   const db = { data: { ontmoetPosities: {
@@ -171,6 +191,8 @@ test('idempotent: een al geveegd dossier wordt niet elke ronde opnieuw "geveegd"
 
 test('een schone ronde bewaart niets en schrijft niets (geen save zonder reden)', () => {
   const { v, savesGedaan } = bouw();
-  assert.deepEqual(v.veeg(), { posities: 0, dossiers: 0, klokGestart: 0 });
+  /* sosPosities is erbij gekomen met NAVIGATIE.md N18/N19 (de wislijst van de
+     domeinen); een schone ronde telt ook daar nul. */
+  assert.deepEqual(v.veeg(), { posities: 0, dossiers: 0, klokGestart: 0, sosPosities: 0 });
   assert.equal(savesGedaan(), 0, 'geen wijziging, geen schrijfactie');
 });

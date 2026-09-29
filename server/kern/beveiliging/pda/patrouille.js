@@ -85,7 +85,7 @@ module.exports = (ctx) => {
   function rondePubliek(s, r) {
     const p = postVan(s, r.postId);
     return { id: r.id, postId: r.postId, post: p ? p.naam : 'Post', gestart: r.gestart, klaar: r.klaar || null,
-      checkpoints: r.checkpoints || [] };
+      checkpoints: (r.checkpoints || []).map(c => ({ naam: c.naam, at: c.at })) };
   }
   function rondeStart(supplierCode, gid, postId) {
     const s = findSupplier(supplierCode); if (!isBeveiliging(s)) return { status: 404, error: 'Team niet gevonden.' };
@@ -99,12 +99,17 @@ module.exports = (ctx) => {
     sseToSupplier(s.code, 'sync', { scope: 'beveiliging' });
     return { status: 200, ok: true, ronde: rondePubliek(s, r) };
   }
-  function rondeCheckpoint(supplierCode, gid, rondeId, naam, lat, lng) {
+  /* HET CONTROLEPUNT BEWIJST DE RONDE, NIET DE GPS (NAVIGATIE.md N19). Hier
+     werd bij elk controlepunt ook de positie van de bewaker opgeslagen, en zo
+     groeide per ronde een bewegingsgeschiedenis van een medewerker die niemand
+     nodig had: dat hij bij het Achterhek was, zegt het Achterhek. Er is geen
+     controle die de positie TIJDENS de scan nodig heeft (N11), dus hij komt
+     niet meer binnen -- de route geeft hem ook niet meer door. */
+  function rondeCheckpoint(supplierCode, gid, rondeId, naam) {
     const s = findSupplier(supplierCode); if (!isBeveiliging(s)) return { status: 404, error: 'Team niet gevonden.' };
     const r = rondes().find(x => x.id === rondeId && x.supplierCode === s.code && x.guardId === gid && !x.klaar);
     if (!r) return { status: 404, error: 'Lopende ronde niet gevonden.' };
-    r.checkpoints.push({ naam: schoon(naam, 60) || ('Checkpoint ' + (r.checkpoints.length + 1)), at: nu(),
-      lat: Number.isFinite(Number(lat)) ? Number(lat) : null, lng: Number.isFinite(Number(lng)) ? Number(lng) : null });
+    r.checkpoints.push({ naam: schoon(naam, 60) || ('Checkpoint ' + (r.checkpoints.length + 1)), at: nu() });
     save();
     sseToSupplier(s.code, 'sync', { scope: 'beveiliging' });
     return { status: 200, ok: true, ronde: rondePubliek(s, r) };
@@ -119,5 +124,14 @@ module.exports = (ctx) => {
     return { status: 200, ok: true, ronde: rondePubliek(s, r) };
   }
 
-  return { mijnDiensten, inklok, uitklok, rondePubliek, rondeStart, rondeCheckpoint, rondeKlaar };
+  /* Rondes van voor N19 dragen nog een positie per controlepunt. De bewaarveger
+     haalt die eraf; het controlepunt en zijn tijd blijven, want dat IS de ronde. */
+  function vergeetRondePosities() {
+    let n = 0;
+    for (const r of rondes()) for (const c of r.checkpoints || [])
+      if ('lat' in c || 'lng' in c) { delete c.lat; delete c.lng; n++; }
+    return n;
+  }
+
+  return { mijnDiensten, inklok, uitklok, rondePubliek, rondeStart, rondeCheckpoint, rondeKlaar, vergeetRondePosities };
 };

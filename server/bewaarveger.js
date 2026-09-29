@@ -30,7 +30,7 @@ const DAG = 86400000;
    register liegen zodra hier iets verandert (LAT-regel 4). */
 const STANDAARD = { locatieDagen: 7, idDagen: 365 };
 
-function maakBewaarveger({ db, save, accounts, identiteitsmap, lidmaatschapTot, log, nu, instel, accountWerk, radarVeeg }) {
+function maakBewaarveger({ db, save, accounts, identiteitsmap, lidmaatschapTot, log, nu, instel, accountWerk, radarVeeg, sosVeeg }) {
   const I = Object.assign({}, STANDAARD, instel || {});
   /* ACCOUNTMUTATIES LOPEN HIER BUITEN EEN HTTP-VERZOEK, en in productie mocht
      dat niet: de identiteitscache commit alleen als deelnemer aan een
@@ -62,7 +62,7 @@ function maakBewaarveger({ db, save, accounts, identiteitsmap, lidmaatschapTot, 
 
   function veeg() {
     const t = klok();
-    let posities = 0, dossiers = 0, klokGestart = 0;
+    let posities = 0, dossiers = 0, klokGestart = 0, sosPosities = 0;
 
     // 1. locatiesporen ouder dan de termijn
     const live = db.data.live || {};
@@ -78,6 +78,22 @@ function maakBewaarveger({ db, save, accounts, identiteitsmap, lidmaatschapTot, 
        van wat "vers" is -- blijft van de radar: de veger krijgt zijn wisfunctie
        mee (opzet/start.js) en leest het domein niet zelf. */
     if (typeof radarVeeg === 'function') posities += Number(radarVeeg()) || 0;
+
+    /* 1c. POSITIES DIE BIJ EEN MELDING OF VENSTER HOREN (NAVIGATIE.md N18, N19).
+       Een SOS houdt zijn plek zolang hij open is en 90 dagen erna; de laatste
+       plek van de veiligheidskring en de GPS van een patrouille bestaan buiten
+       hun venster niet. Elke regel blijft van zijn domein -- de veger krijgt een
+       lijst wisfuncties mee (opzet/start.js) en laadt zelf geen domein, net als
+       bij de radar. Een domein dat faalt houdt de andere niet tegen, en het
+       falen wordt gemeld en niet opgegeten. */
+    for (const f of Array.isArray(sosVeeg) ? sosVeeg : []) {
+      try { sosPosities += Number(f(t)) || 0; }
+      catch (e) {
+        if (log && log.schrijf) {
+          try { log.schrijf('warn', 'bewaarveger-sos', { fout: String((e && e.message) || e) }); } catch (x) { /* de logger zelf faalt: niets meer te melden */ }
+        }
+      }
+    }
 
     // 2. identiteitsbewijzen: een jaar na goedkeuring weg, afgewezen als vangnet
     for (const u of accounts.listByVerification('verified')) {
@@ -121,13 +137,13 @@ function maakBewaarveger({ db, save, accounts, identiteitsmap, lidmaatschapTot, 
       if (u.id_doc || md.selfie) { wisDossier(u, md); dossiers++; }
     }
 
-    if (posities || dossiers) {
+    if (posities || dossiers || sosPosities) {
       save();
       if (log && log.schrijf) {
-        try { log.schrijf('info', 'bewaarveger', { posities, dossiers }); } catch (e) {}
+        try { log.schrijf('info', 'bewaarveger', { posities, dossiers, sosPosities }); } catch (e) {}
       }
     }
-    return { posities, dossiers, klokGestart };
+    return { posities, dossiers, klokGestart, sosPosities };
   }
 
   function start() {

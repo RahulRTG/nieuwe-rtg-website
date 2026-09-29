@@ -1,29 +1,29 @@
 {
  "stempel": {
-  "op": "2026-09-29T16:14:06.112Z",
-  "commit": "a946bf15",
+  "op": "2026-09-29T16:43:24.720Z",
+  "commit": "95adad3c",
   "boomVuil": false,
-  "boomAnders": 2,
+  "boomAnders": 7,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5077,
-  "geclassificeerd": 5077,
+  "totaal": 5079,
+  "geclassificeerd": 5079,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3190,
    "NOT_APPLICABLE": 1213,
-   "PROTECTED": 508,
-   "INTENTIONALLY_NON_IDEMPOTENT": 166
+   "PROTECTED": 509,
+   "INTENTIONALLY_NON_IDEMPOTENT": 167
   },
-  "vastgesteldDoorMens": 1936,
+  "vastgesteldDoorMens": 1938,
   "afgeleidDoorScript": 3141,
   "toegangWaargenomen": {
    "AUTHENTICATED": 4178,
    "PUBLIC": 126,
-   "OBJECT_SCOPED": 749,
+   "OBJECT_SCOPED": 751,
    "(niet af te leiden -- vraagt een verklaring)": 8,
    "SERVICE_TO_SERVICE": 15,
    "SYSTEM_INTERNAL": 1
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 136,
    "kale ronde: onbeschermd": 123,
    "kale ronde: geen uitspraak": 4713,
-   "niet gemeten": 105
+   "niet gemeten": 107
   },
   "voorstellen": {},
   "metingVan": "2026-09-19T17:45:58.177Z"
@@ -20427,6 +20427,44 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.gezinssessie.intrekken",
+   "route": "POST /api/foundation/gezin/sessie/intrek",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: code",
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.gezinssessie.roteren",
+   "route": "POST /api/foundation/gezin/sessie/roteer",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: code",
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

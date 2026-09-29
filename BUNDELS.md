@@ -180,7 +180,7 @@ omlaag.
 
 ## `apps/foundation/gezin-rt.js`
 
-`public/apps/foundation/gezin-rt/` -- 3 delen, 192 regels in de delen
+`public/apps/foundation/gezin-rt/` -- 3 delen, 195 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -200,7 +200,7 @@ omlaag.
 
 ## `apps/foundation/sessie.js`
 
-`public/apps/foundation/sessie/` -- 4 delen, 395 regels in de delen
+`public/apps/foundation/sessie/` -- 4 delen, 404 regels in de delen
 
 | deel | onderwerp |
 |---|---|

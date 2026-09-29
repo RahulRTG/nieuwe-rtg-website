@@ -1,16 +1,16 @@
 {
  "stempel": {
-  "op": "2026-09-29T16:14:37.521Z",
-  "commit": "a946bf15",
+  "op": "2026-09-29T16:43:19.397Z",
+  "commit": "95adad3c",
   "boomVuil": false,
-  "boomAnders": 10,
+  "boomAnders": 5,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
-  "zonderBewakerslaag": 638,
-  "bewaakt": 548,
+  "zonderBewakerslaag": 640,
+  "bewaakt": 550,
   "openbaarMetReden": 51,
   "eigenControle": 19,
   "sleutelDoorgegeven": 12,
@@ -81,7 +81,7 @@
   },
   {
    "naam": "gezinVan",
-   "aantal": 14
+   "aantal": 16
   },
   {
    "naam": "lesVan",
@@ -1170,13 +1170,13 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/bericht",
-   "bestand": "server/foundation/gezin.js:126",
+   "bestand": "server/foundation/gezin.js:127",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/bericht/gelezen",
-   "bestand": "server/foundation/gezin.js:154",
+   "bestand": "server/foundation/gezin.js:155",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
@@ -1272,7 +1272,7 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/inloggen",
-   "bestand": "server/foundation/gezinstoegang.js:7",
+   "bestand": "server/foundation/gezinstoegang.js:10",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
@@ -1398,7 +1398,7 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/profiel/kies",
-   "bestand": "server/foundation/gezinstoegang.js:33",
+   "bestand": "server/foundation/gezinstoegang.js:36",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
@@ -1410,13 +1410,25 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/profiel/verwijder",
-   "bestand": "server/foundation/gezin.js:114",
+   "bestand": "server/foundation/gezin.js:115",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/profiel/wijzig",
    "bestand": "server/foundation/gezin.js:78",
+   "staat": "bewaakt",
+   "wacht": "gezinVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/sessie/intrek",
+   "bestand": "server/foundation/gezinssessie.js:38",
+   "staat": "bewaakt",
+   "wacht": "gezinVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/sessie/roteer",
+   "bestand": "server/foundation/gezinssessie.js:29",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
@@ -1446,31 +1458,31 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/uitnodiging/accepteer",
-   "bestand": "server/foundation/gezinsuitnodiging.js:127",
+   "bestand": "server/foundation/gezinsuitnodiging.js:134",
    "staat": "zonderWachtMetReden",
    "reden": "zelfde code, zelfde reden; accepteren verbruikt hem eenmalig"
   },
   {
    "sleutel": "POST /api/foundation/gezin/uitnodiging/bekijk",
-   "bestand": "server/foundation/gezinsuitnodiging.js:126",
+   "bestand": "server/foundation/gezinsuitnodiging.js:133",
    "staat": "zonderWachtMetReden",
    "reden": "de uitnodigingscode uit het lijf IS de geloofsbrief; een onbekende of verlopen code geeft 404 en verklapt niets"
   },
   {
    "sleutel": "POST /api/foundation/gezin/uitnodiging/intrek",
-   "bestand": "server/foundation/gezinsuitnodiging.js:125",
+   "bestand": "server/foundation/gezinsuitnodiging.js:132",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/uitnodiging/maak",
-   "bestand": "server/foundation/gezinsuitnodiging.js:123",
+   "bestand": "server/foundation/gezinsuitnodiging.js:130",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/uitnodigingen",
-   "bestand": "server/foundation/gezinsuitnodiging.js:124",
+   "bestand": "server/foundation/gezinsuitnodiging.js:131",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },

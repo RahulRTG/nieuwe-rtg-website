@@ -200,7 +200,15 @@ test('4. elke route hoort bij een functie of bij de bediening', () => {
      kern/platformregister/bediening-recht.js, en test/platformregister.test.js was
      groen -- 7 van 7 -- voordat dit getal werd verzet. `onverklaard <= 10` beweegt
      niet mee. */
-  assert.ok(zonder.length <= 148,
+  /* 148 -> 150: HET SSO-CLIENTGEHEIM (#403, B11). POST /api/techniek/sso/geheim en
+     /api/techniek/sso/geheim/overlap/sluit roteren en sluiten het clientgeheim van een
+     SSO-koppeling vanaf het techniekbord. Dat is bediening van het platform zelf en
+     hoort niet achter een functieschakelaar: een geheim dat je niet kunt roteren omdat
+     een knop uit staat, is een lek dat je niet kunt dichten. Beide vallen onder de
+     reden van /api/techniek in kern/bestuursroutes.js, en test/platformregister.test.js
+     en test/schakelkast-dekking.test.js waren groen voordat dit getal werd verzet.
+     `onverklaard <= 10` beweegt niet mee. */
+  assert.ok(zonder.length <= 150,
     zonder.length + ' routes hangen aan geen enkele functie. Dat is de bediening van ' +
     'het platform (boardroom, techniek, gezondheid, isolatie) en die hoort niet schakelbaar ' +
     'te zijn, maar bij deze aantallen is er iets anders aan de hand.');

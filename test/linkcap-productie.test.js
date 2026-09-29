@@ -15,7 +15,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startServer, stop, stopNet } = require('./helper');
+const { startServer, stop, stopNet, wachtOpWaarde } = require('./helper');
 
 const KYC_PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 const KEYS = { RTG_ENC_KEY: 'k'.repeat(64), RTG_VAULT_KEY: 'v'.repeat(64), RTG_SECRET_KEY: 's'.repeat(64) };
@@ -64,9 +64,11 @@ test('twee kassa\'s tegelijk op een code: precies een inning', async t => {
   // en de derde poging, na afloop, opent niets meer
   assert.equal((await api(base, '/api/supplier/link/cap/aanvaard', { capcode: cap.token, centen: 1 }, k1)).status, 404);
   // de kale code staat nergens in de opslag
-  await new Promise(r => setTimeout(r, 1500));
-  const opslag = fs.readdirSync(tmp).filter(f => /\.(json|db)(-wal)?$/.test(f))
+  /* Wacht op de TOESTAND (de rij met de hash staat in de opslag), niet op een tijd. */
+  const leesOpslag = () => fs.readdirSync(tmp).filter(f => /\.(json|db)(-wal)?$/.test(f))
     .map(f => fs.readFileSync(path.join(tmp, f)).toString('latin1')).join('\n');
+  const opslag = await wachtOpWaarde(() => { const o = leesOpslag(); return o.includes('linkCapToegang') && o.includes('code_hash') && o; },
+    { ms: 8000, wat: 'de linkCapToegang-rij met code_hash in de opslag' });
   assert.ok(opslag.includes('linkCapToegang') && opslag.includes('code_hash'), 'de proef leest de echte opslag');
   const code = Buffer.from(cap.token.split('.')[1], 'base64url').toString().split('|')[1];
   assert.match(code, /^[0-9A-F]{32}$/);

@@ -2,16 +2,16 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-29",
   "gemeten": {
-    "bestanden": 2571,
-    "vormen": 1506,
-    "velden": 2161,
-    "modules": 832,
-    "domeinen": 301,
-    "envelopDrempel": 19,
-    "envelop": 29,
-    "veldenDomeineigen": 1508,
-    "veldenGedeeldVanafVier": 224,
-    "gelijkendeVormparen": 24
+    "bestanden": 2564,
+    "vormen": 1496,
+    "velden": 2158,
+    "modules": 828,
+    "domeinen": 299,
+    "envelopDrempel": 18,
+    "envelop": 30,
+    "veldenDomeineigen": 1507,
+    "veldenGedeeldVanafVier": 219,
+    "gelijkendeVormparen": 23
   },
   "envelop": [
     "aantal",
@@ -25,6 +25,7 @@
     "door",
     "gemaakt",
     "id",
+    "key",
     "label",
     "naam",
     "notitie",
@@ -45,30 +46,6 @@
     "wat"
   ],
   "gedeeld": [
-    {
-      "veld": "naar",
-      "domeinen": 18,
-      "waar": [
-        "bedrijf",
-        "kern/ai",
-        "kern/bank",
-        "kern/command",
-        "kern/leerhuis",
-        "kern/lidboard"
-      ]
-    },
-    {
-      "veld": "key",
-      "domeinen": 18,
-      "waar": [
-        "kern/assets",
-        "kern/care",
-        "kern/ervaring",
-        "kern/gemeente",
-        "kern/instant-reality",
-        "kern/ledenbalie-inzage"
-      ]
-    },
     {
       "veld": "sinds",
       "domeinen": 17,
@@ -103,6 +80,18 @@
         "kern/comm",
         "kern/commercie",
         "kern/ervaring"
+      ]
+    },
+    {
+      "veld": "naar",
+      "domeinen": 17,
+      "waar": [
+        "bedrijf",
+        "kern/bank",
+        "kern/command",
+        "kern/leerhuis",
+        "kern/lidboard",
+        "kern/mailwachtrij"
       ]
     },
     {
@@ -142,18 +131,6 @@
       ]
     },
     {
-      "veld": "vervalt",
-      "domeinen": 14,
-      "waar": [
-        "kern/aanmeldingen",
-        "kern/ai",
-        "kern/command",
-        "kern/commerce",
-        "kern/koppel",
-        "kern/levensband"
-      ]
-    },
-    {
       "veld": "bedrag",
       "domeinen": 14,
       "waar": [
@@ -187,6 +164,18 @@
         "kern/labfonds",
         "kern/lidmaatschap",
         "kern/livinglab"
+      ]
+    },
+    {
+      "veld": "vervalt",
+      "domeinen": 13,
+      "waar": [
+        "kern/aanmeldingen",
+        "kern/command",
+        "kern/commerce",
+        "kern/koppel",
+        "kern/levensband",
+        "kern/levensgraaf"
       ]
     },
     {
@@ -524,6 +513,18 @@
         "kern/mall",
         "kern/trainingsschema"
       ]
+    },
+    {
+      "veld": "soortLabel",
+      "domeinen": 10,
+      "waar": [
+        "kern/bank",
+        "kern/boerderij",
+        "kern/concern",
+        "kern/gemeente",
+        "kern/mall",
+        "kern/overheid"
+      ]
     }
   ],
   "paren": [
@@ -743,21 +744,6 @@
         "now",
         "pad",
         "toegang"
-      ]
-    },
-    {
-      "gelijkenis": 0.75,
-      "a": "server/kern/ai/contextpakket.js",
-      "b": "server/kern/stuur/luspakket.js",
-      "domeinA": "kern/ai",
-      "domeinB": "kern/stuur",
-      "gedeeld": [
-        "berichten",
-        "graad",
-        "kort",
-        "magSamenvatten",
-        "magVervallen",
-        "prioriteit"
       ]
     },
     {

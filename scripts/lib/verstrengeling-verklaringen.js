@@ -22,6 +22,8 @@ module.exports = [
      registerblik kent de afdelingen niet, en leest alleen registers bij naam. */
   { van: 'domein:afdelingen', naar: 'domein:registerblik', soort: 'DOMEINRELATIE',
     reden: 'het boardroomadvies vraagt de registerblik wat de registers over productie, bewijs en routes zeggen; de registerblik leest alleen, en kent de afdelingen niet' },
+  { van: 'ingang:ik', naar: 'ingang:presentatie-beelden', soort: 'ORKESTRATIE',
+    reden: 'De ik-route registreert de persoonlijke presentatievoorkeuren als onderdeel van de eigen accountinstellingen; de beeldmodule bewaakt zelf lid- en gezinsprofielauthenticatie en eigendom van privébestanden.' },
   /* DE LEDENGIDS RAAKT DE AANWEZIGHEID AAN (besluit van de eigenaar, 25 september
      2026: retentie ook als aanwezigheid, een dag per lid). kern/gids.js dirTouch
      is het ene keelgat waar elk ledenverzoek langskomt; daar wordt ook de dag van

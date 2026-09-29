@@ -6,7 +6,8 @@
   var selected=data.stories[0],lastFocus=null,savedScroll=0,current=null,moved=null;
   function select(id,notify){
    var story=data.stories.find(function(s){return s.id===id;});if(!story)return;selected=story;
-   if(picture.src!==photo(story.photo).src)picture.src=photo(story.photo).src;
+   var source=photo(story.photo).src;
+   if(w.RTGPersonalImages)w.RTGPersonalImages.source(picture,source,copy(story.label));else if(picture.src!==source)picture.src=source;
    [title,body].forEach(function(el,i){var key=i?story.body:story.title;el.dataset.i18n='public.'+key;el.dataset.i18nSource=D.words[key][0];el.textContent=copy(key);});
    stories.querySelectorAll('[data-public-story]').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.publicStory===id));});
    stepper.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.publicStep===id));});
@@ -32,8 +33,8 @@
    detail.replaceChildren();
    if(content.parentNode){var marker=d.createComment('public-content:'+id);content.before(marker);moved={el:content,marker:marker};}
    detail.append(content);current=id;focusTitle.textContent=copy(titleKey);focusTitle.dataset.i18n='public.'+titleKey;focusTitle.dataset.i18nSource=(D.words[titleKey]||[titleKey])[0];
-   focus.hidden=false;home.hidden=true;favorites.hidden=true;library.hidden=true;root.classList.add('wd-expanded');saveHash();
-   if(w.RTGAdaptiveEdge)w.RTGAdaptiveEdge.setState('dock');focus.scrollIntoView({block:'start',behavior:'instant'});focusTitle.focus({preventScroll:true});o.detailChanged&&o.detailChanged(id);
+   focus.hidden=false;home.hidden=true;favorites.hidden=false;library.hidden=false;root.classList.add('wd-expanded');saveHash();
+   if(w.RTGAdaptiveEdge)w.RTGAdaptiveEdge.setState('dock');w.scrollTo({top:0,behavior:'instant'});focusTitle.focus({preventScroll:true});o.detailChanged&&o.detailChanged(id);
   }
   function menu(){w.RTGAdaptiveEdge.openPanel(menuPanel,{title:copy(company?'company':'app')});}
   function worlds(){w.RTGAdaptiveEdge.openPanel(worldPanel,{title:copy('worlds')});}

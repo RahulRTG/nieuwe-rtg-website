@@ -1,0 +1,33 @@
+/* Public company and app stories use the same warm, sharp composition. */
+body[data-public-platform][data-rtg-desktop][data-rtg-layout="standard"] .pp-shell{margin-top:40px!important}
+body[data-public-platform][data-rtg-desktop] .pp-header{background:transparent!important;backdrop-filter:none!important;border-bottom:1px solid var(--rtg-world-line);height:72px}
+body[data-public-platform][data-rtg-desktop] .pp-feature{display:flex;flex-direction:column;min-height:0;border:0;border-radius:0;background:none;overflow:visible}
+body[data-public-platform][data-rtg-desktop] .pp-feature::after{display:none}
+body[data-public-platform][data-rtg-desktop] .pp-feature-photo{position:static;inset:auto;order:2;width:100%;height:auto;aspect-ratio:2.26;object-fit:cover;z-index:auto}
+body[data-public-platform][data-rtg-desktop] .pp-feature-copy{display:contents}
+body[data-public-platform][data-rtg-desktop] .pp-feature-copy h2{order:1;font:600 clamp(28px,3vw,46px)/1.08 Inter,sans-serif!important;letter-spacing:-.05em;margin:8px 0 20px;max-width:none}
+body[data-public-platform][data-rtg-desktop] .pp-feature-copy>.pp-overline{order:0;margin:12px 0 0}
+body[data-public-platform][data-rtg-desktop] .pp-feature-copy>:is(p,.pp-itinerary){order:3}
+body[data-public-platform][data-rtg-desktop] .pp-feature-copy>.pp-button{order:4;align-self:start}
+body[data-public-platform][data-rtg-desktop] .pp-feature-copy>.pp-boundary{position:static;order:5;align-self:start;background:transparent;padding:8px 0;color:var(--wh-soft)}
+body[data-public-platform][data-rtg-desktop] .pp-stories{display:flex;gap:8px;padding:0 0 12px;border-bottom:1px solid var(--wd-line)}
+body[data-public-platform][data-rtg-desktop] .pp-story{min-width:64px;flex:1;min-height:44px;background:none;color:var(--wh-ink);border:0;border-radius:0;font:400 12px/1.4 Inter,sans-serif}
+body[data-public-platform][data-rtg-desktop] .pp-story>:is(img,.wd-icon){display:none!important}
+body[data-public-platform][data-rtg-desktop] .pp-story[aria-pressed="true"]{border-bottom:2px solid var(--wh-gold)}
+body[data-public-platform][data-rtg-desktop] .pp-person .wd-icon{background:none;border:0;padding:0;width:22px;height:22px;flex-basis:22px}
+body[data-public-platform][data-rtg-desktop] :is(.pp-widget,.pc-widget,.pp-side-widget){border:0;border-bottom:1px solid var(--wd-line);border-radius:0;background:transparent!important;box-shadow:none!important}
+body[data-public-platform][data-rtg-desktop] .pp-shell .pp-side-widget h2{font:500 22px/1.3 Inter,sans-serif!important}
+body[data-public-platform][data-rtg-desktop] .pp-filter{background:var(--rtg-world-card)!important;color:var(--wh-ink)!important}
+body[data-public-platform][data-rtg-desktop] .pp-shell :is(h2,h3){font-family:Inter,sans-serif!important}
+body[data-public-platform][data-rtg-desktop] .pp-tagline{display:none}
+body[data-public-platform][data-rtg-desktop] .pp-context{margin-inline-end:auto}
+@media(max-width:999px){body[data-public-platform][data-rtg-desktop][data-rtg-layout="standard"] .pp-shell{margin-top:72px!important}body[data-public-platform][data-rtg-desktop] .pp-mobile-intro{display:none}body[data-public-platform][data-rtg-desktop] .pp-feature-photo{aspect-ratio:1.82}body[data-public-platform][data-rtg-desktop] .pp-feature-copy h2{font-size:32px!important}body[data-public-platform][data-rtg-desktop] .pp-header{gap:4px;padding-inline:16px!important;height:64px}body[data-public-platform][data-rtg-desktop] .pp-context{font-size:13px}body[data-public-platform][data-rtg-desktop] .pp-language{display:none}body[data-public-platform][data-rtg-desktop] .pp-header .wp-edit-images{display:none}}
+
+body[data-public-platform] .pp-detail-content{overflow-wrap:anywhere}
+body[data-public-platform] .pp-detail-content :is(h1,h2,h3){font-family:Inter,sans-serif!important;line-height:1.15;letter-spacing:-.035em}
+body[data-public-platform] .pp-detail-content :is(.world-header,.site-header){display:none}
+
+.pp-feature>.wp-photo{order:2}.pp-feature>.wp-photo>.pp-feature-photo{height:100%!important}
+@media(max-width:999px){body[data-public-platform][data-rtg-desktop] .pp-shell{width:calc(100% - 32px)!important;margin-inline:auto!important}.pp-shell>*{min-width:0}}
+
+@media(max-width:599px){body[data-public-platform][data-rtg-desktop] .pp-stories{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;overflow:visible}body[data-public-platform][data-rtg-desktop] .pp-story{min-width:0;max-width:100%}}

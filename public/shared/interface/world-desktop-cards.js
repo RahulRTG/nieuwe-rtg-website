@@ -3,13 +3,13 @@
 (function (w, d) {
   'use strict';
   w.RTGDesktopCards = function (o) {
-    var U = w.RTGDesktopUI, index = 0, query = '', limit = 9, selected = o.defaults.slice(), changed = 0;
+    var U = w.RTGDesktopUI, index = 0, query = '', limit = 3, selected = o.defaults.slice(), changed = 0;
     var surfaces = [], favoriteSurfaces = [], onlyFavorites = false, views = Object.create(null);
     var priority = {
-      living: ['agenda', 'foodcourt', 'attenties', 'mijn-isolatie', 'geld', 'training', 'bestanden', 'notities', 'comm'],
-      travel: ['reizen', 'navigatie', 'agenda', 'reisboek', 'comm', 'bestanden', 'notities'],
-      work: ['kantoor', 'agenda', 'notities', 'bestanden', 'comm', 'personeel', 'werkruimte', 'leverancier'],
-      foundation: ['foundation-agenda', 'foundation-leren', 'foundation-schrijven', 'foundation-vrienden',
+      living: ['wereld', 'agenda', 'navigatie', 'foodcourt', 'attenties', 'mijn-isolatie', 'geld', 'training', 'bestanden', 'notities', 'comm'],
+      travel: ['reizen', 'reisboek', 'navigatie', 'agenda', 'comm', 'bestanden', 'notities'],
+      work: ['werkruimte', 'bestanden', 'agenda', 'kantoor', 'notities', 'comm', 'personeel', 'leverancier'],
+      foundation: ['foundation-leren', 'foundation-meedoen-ontdekken', 'foundation-hulpwijzer', 'foundation-agenda', 'foundation-schrijven', 'foundation-vrienden',
         'foundation-klusjes', 'foundation-gezondheid', 'foundation-geld', 'foundation-samen-thuis', 'foundation-meedoen-ontdekken']
     }[o.world] || [];
     o.apps.sort(function (a, b) { var ai = priority.indexOf(a.id), bi = priority.indexOf(b.id);
@@ -28,6 +28,8 @@
       b.setAttribute('aria-pressed', String(mode === 'grid')); b.onclick = function () {
         o.library.dataset.view = mode; filters.querySelectorAll('button').forEach(function (other) { other.setAttribute('aria-pressed', String(other === b)); });
       }; filters.appendChild(b); }); top.appendChild(filters);
+    var controls = U.el('details', 'wd-app-controls'), summary = U.el('summary', '', w.RTGWidgetCopy('all'));
+    controls.append(summary, label, filters); top.appendChild(controls);
     var results = U.el('div', 'wd-catalog'), empty = U.copy(U.el('p', 'wd-muted'), 'noResults');
     empty.setAttribute('role', 'status'); o.library.appendChild(results); o.library.appendChild(empty);
     var pages = U.el('div', 'wd-pages'), number = U.el('span');
@@ -47,8 +49,13 @@
       var title = U.el('span', 'wd-widget-title'); title.appendChild(U.icon(app.icon));
       title.appendChild(translated(app.name, app.id + '.name')); title.appendChild(U.el('span', 'wd-expand', '↗')); open.appendChild(title);
       box.appendChild(open);
+      if (!compact) {
+        var picture = U.el('div', 'wd-app-photo'), img = U.el('img');
+        img.src = '/images/' + ({agenda:'daily/agenda.webp',bestanden:'daily/bestanden.webp',notities:'daily/notities.webp',reisboek:'daily/notities.webp',wereld:'editorial/living-dining.webp',navigatie:'world-homes/living-coast.webp',werkruimte:'world-homes/work.webp'}[app.id] || 'world-homes/' + o.world + '.webp');
+        img.alt = ''; img.loading = 'lazy'; picture.appendChild(img); box.prepend(picture); box.classList.add('wd-app-shortcut');
+      }
       var body = U.el('div', 'wd-widget-content'); box.appendChild(body);
-      (compact ? favoriteSurfaces : surfaces).push(w.RTGWidgetLive(app, body, { compact: compact, state: views[app.id] || (views[app.id] = {}),
+      if (compact) favoriteSurfaces.push(w.RTGWidgetLive(app, body, { compact: compact, state: views[app.id] || (views[app.id] = {}),
         open: function (action) { o.open(app, open, action); },
         run: function (action, data) { return o.runtime.execute(action, data); } }));
       var pin = U.button(selected.includes(app.id) ? 'unpin' : 'pin', function () {
@@ -72,8 +79,8 @@
       favoriteSurfaces.forEach(function (s) { s.destroy(); }); favoriteSurfaces = [];
       o.favorites.textContent = ''; o.favorites.appendChild(U.copy(U.el('h2'), 'favorites'));
       selected.forEach(function (id) { var app = o.apps.find(function (a) { return a.id === id; }); if (app) o.favorites.appendChild(card(app, true)); });
-      o.favorites.appendChild(U.button('choose', function () { o.library.scrollIntoView({ block: 'start' }); input.focus(); }, 'wd-text-button'));
-      U.copy(notice, status); o.favorites.appendChild(notice); retry.hidden = !['saveError', 'readError'].includes(status); o.favorites.appendChild(retry);
+      o.favorites.appendChild(U.button('choose', function () { controls.open = true; o.library.scrollIntoView({ block: 'start' }); input.focus(); }, 'wd-text-button'));
+      U.copy(notice, status); notice.hidden = !['saveError', 'readError', 'pinLimit'].includes(status); o.favorites.appendChild(notice); retry.hidden = !['saveError', 'readError'].includes(status); o.favorites.appendChild(retry);
     }
     function draw() { drawFavorites(); drawLibrary(); }
     function save() {

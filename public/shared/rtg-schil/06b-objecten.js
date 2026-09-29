@@ -83,6 +83,7 @@
     s.el.setAttribute('data-kan-vangen', '');
     var tab = tabVanSurface(s);
     if (tab) tab.setAttribute('data-kan-vangen', '');
+    if (standaard()) schik();
   }
 
   function tabVanSurface(s) {
@@ -142,6 +143,7 @@
     if (schil.tabs) schil.tabs.querySelectorAll('[data-kan-vangen],[data-vangt]').forEach(function (tab) {
       tab.removeAttribute('data-kan-vangen'); tab.removeAttribute('data-vangt');
     });
+    if (standaard()) schik();
     var doel = sleepDoel, object = sleepObject;
     sleepDoel = null;
     if (!doel || !object) { sleepObject = null; return; }

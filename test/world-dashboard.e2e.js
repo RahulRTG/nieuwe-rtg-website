@@ -40,7 +40,7 @@ const WERELDEN = [
   },
   {
     naam: 'WorkOS', wereld: 'work', pad: '/apps/kantoor.html', hoofd: '#inhoud',
-    panelen: ['.wh-work-hero', '.wh-attention', '.wh-work-feature', '.wh-support'],
+    panelen: ['.wp-scene', '.wh-attention', '.wh-work-feature', '.wh-support'],
     maxCanvas: 1216, // De goedgekeurde editorial compositie is maximaal 76rem breed.
     context: ['wereldtabs', 'wereldapps'],
     oud: [
@@ -310,6 +310,7 @@ async function raakdoel(page, selector, label) {
 }
 
 async function bewijsHandeling(page, route, maat) {
+  if (await page.locator('.wp-domain:not([open])>summary').count()) await page.locator('.wp-domain>summary').click();
   const label = route.naam + ' @ ' + maat.naam;
   if (route.wereld === 'living') {
     const cta = '.dagkop .rtg-dashboard-hero-cta[href="/apps/life.html"]';
@@ -401,6 +402,8 @@ test('vier wereldhomes blijven native dashboards op zes schermbreedtes',
                 hoofd.getAttribute('data-rtg-dashboard-world') === cfg.wereld &&
                 document.querySelectorAll('.rtg-edge-2-context-slot').length === 1;
             }, route, { timeout: geduld(20000) });
+            await page.waitForSelector('body[data-rtg-desktop-state="ready"]');
+            if (await page.locator('.wp-domain:not([open])>summary').count()) await page.locator('.wp-domain>summary').click();
             const meting = await dashboardMeting(page, route);
             keurDashboard(meting, route, maat);
             const a11y = await page.evaluate(A11Y);

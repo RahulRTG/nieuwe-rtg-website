@@ -114,6 +114,9 @@ test('Saloon houdt Edge bereikbaar bij lezen, bewaren, teruggaan en bronuitval',
        zetten de pagina daarna terug waar ze was. */
     await page.evaluate(() => scrollTo(0, 400));
     await page.waitForFunction(() => scrollY > 0);
+    // De kop krijgt zijn grond via de scrollgebeurtenis, en die komt een frame later.
+    await page.waitForFunction(() => getComputedStyle(document.querySelector('.rtg-edge-top')).backgroundColor !== 'rgba(0, 0, 0, 0)',
+      null, { timeout: 5000 }).catch(() => {});
     assert.match(await page.locator('.rtg-edge-top').evaluate(n => getComputedStyle(n).backgroundColor), /^rgb\(/,
       'de bovenrand is dekkend wanneer de artikelkop eronder scrollt');
     await page.evaluate(() => scrollTo(0, 0));

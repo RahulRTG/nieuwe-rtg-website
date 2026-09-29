@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T20:56:41.300Z",
-    "commit": "be425cffc",
+    "op": "2026-09-29T21:41:54.654Z",
+    "commit": "2755ae662",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -9831,6 +9831,22 @@
       "operator": "liegpoort /api/",
       "gezakt": 9,
       "scherp": "gezakt"
+    },
+    "reisprogramma.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/reisprogramma-editor.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "reisprogramma.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/reisuitnodiging/programma.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "reisschermen.e2e.js": {
       "soort": "server",

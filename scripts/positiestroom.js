@@ -59,6 +59,28 @@ const DOEL = path.join(WORTEL, 'POSITIESTROOM.json');
    in, want wat niet blijft is geen stroom. */
 const KLASSEN = ['toegestaan', 'venster', 'noodzakelijk', 'teLang', 'onbegrensd', 'verboden', 'onbekend'];
 
+/* DE BESLUITEN VAN DE EIGENAAR. Een klasse hierboven is een voorstel; wat hier
+   staat is genomen, met een datum en een nummer dat letterlijk in NAVIGATIE.md
+   par. 15.0 moet voorkomen (test/positiestroom.test.js toets 9 zakt anders). Een
+   besluit noemt de klasse waar de stroom naartoe MOET. Of dat al zo is, wordt
+   niet opgegeven maar afgeleid: `uitgevoerd` is waar zodra de gemeten indeling
+   gelijk is aan de besloten klasse. Een besluit dat niemand bouwde blijft dus
+   zichtbaar als besluit, en niet als voltooid. */
+const N15 = { n: 'N15', datum: '2026-09-29', uitkomst: 'aanvaard zoals voorgesteld' };
+const BESLUITEN = {
+  'plaats-passages': { n: 'N12', datum: '2026-09-29', klasse: 'toegestaan',
+    uitkomst: 'alleen het doelhek wordt opgeslagen; een passage langs een ander hek wordt verwerkt en niet bewaard' },
+  'live-onderweg': { n: 'N14', datum: '2026-09-29', klasse: 'venster',
+    uitkomst: 'de positie wordt gewist zodra Onderweg stopt; de veger van zeven dagen blijft alleen als vangnet' },
+  'ontmoet-radar': { n: 'N14', datum: '2026-09-29', klasse: 'venster',
+    uitkomst: 'de positie wordt gewist zodra de radar stopt' },
+  ...Object.fromEntries(['charter-delen', 'date-positie', 'excursie-begeleider', 'excursie-leerling', 'huur-delen',
+    'koerier-bezorgdienst', 'ov-voertuig', 'plaats-waarnemingen', 'veilig-spoor']
+    .map(naam => [naam, Object.assign({ klasse: 'venster' }, N15)])),
+  ...Object.fromEntries(['favorieten', 'flits-melding', 'weefsel-zaak']
+    .map(naam => [naam, Object.assign({ klasse: 'noodzakelijk' }, N15)]))
+};
+
 /* ----------------------------------------------------------------------------
    DE STROMEN. Per stroom: waar hij woont (met een citaat dat letterlijk in de
    bron moet staan), in welke collectie hij landt, aan welke sleutel, van wie de
@@ -435,8 +457,10 @@ function meet() {
       vergeten: persoonlijk ? bronnen.vergeten.has(s.collectie) : null,
       gedetecteerd: s.bron.some(r => kand.includes(r.pad)),
       klasse: s.klasse,
-      status: 'voorstel',
-      besluit: null,
+      status: BESLUITEN[s.naam] ? 'besloten' : 'voorstel',
+      besluit: BESLUITEN[s.naam]
+        ? Object.assign({}, BESLUITEN[s.naam], { uitgevoerd: BESLUITEN[s.naam].klasse === s.klasse })
+        : null,
       tegenspraak: tegenspraak(s.klasse, termijn),
       reden: s.reden || null,
       waarom: s.waarom
@@ -470,6 +494,7 @@ function meet() {
       zonderTermijn: rijen.filter(r => r.termijn.soort === 'geen').length,
       nietVergeten: rijen.filter(r => r.vergeten === false).length,
       besloten: rijen.filter(r => r.besluit !== null).length,
+      besluitNietUitgevoerd: rijen.filter(r => r.besluit && !r.besluit.uitgevoerd).map(r => r.naam),
       klassen: telling
     },
     onverklaard,
@@ -489,7 +514,8 @@ if (require.main === module) {
   }
   console.log('\n  ' + g.stromen + ' stromen uit ' + g.kandidaten + ' kandidaatbestanden; ' + g.zonderTermijn +
     ' zonder termijn, ' + g.nietVergeten + ' op een ledensleutel die de vergeetroute niet wist.');
-  console.log('  voorstel: ' + KLASSEN.map(k => k + ' ' + g.klassen[k]).join(', ') + '. Besloten: ' + g.besloten + '.\n');
+  console.log('  voorstel: ' + KLASSEN.map(k => k + ' ' + g.klassen[k]).join(', ') + '. Besloten: ' + g.besloten +
+    (g.besluitNietUitgevoerd.length ? ', waarvan nog niet uitgevoerd: ' + g.besluitNietUitgevoerd.join(', ') : '') + '.\n');
   let fout = false;
   if (!uit.besturing.inOrde) {
     fout = true;
@@ -511,4 +537,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { meet, schrijftPositie, tegenspraak, termijnBronnen, KLASSEN, STROMEN, GEEN_STROOM };
+module.exports = { meet, schrijftPositie, tegenspraak, termijnBronnen, KLASSEN, STROMEN, GEEN_STROOM, BESLUITEN };

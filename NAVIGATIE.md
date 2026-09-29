@@ -1129,6 +1129,18 @@ andere tien als *minder GPS* worden gelezen:
 | **N10** | **de terughoudendheidstellers worden een permanente grondwetmeter** | geen eenmalige migratiecheck. *Groen betekent niet dat het privacybeleid zegt dat RTG geen bewegingsspoor maakt; groen betekent dat de code aantoonbaar geen verboden bewegingsspoor maakt.* De vijf tellers komen uit de nulmeting en niet uit dit document (par. 6.4) |
 | **N11** | **niet doorschieten: privacy is geen excuus voor een slechter product** | de vraag is niet *hoe weinig GPS kunnen we gebruiken* maar *hoeveel waarde halen we uit een positie op het moment dat de mens die nodig heeft, zonder er daarna meer over die mens aan over te houden dan noodzakelijk*. Tijdens een taak mag alles wat goede navigatie vraagt (par. 1.1). De server mag een positie kennen **voor een uitdrukkelijke functie, alleen wat die nodig heeft, alleen zo lang als nodig, alleen voor bevoegde ontvangers, en nooit stil hergebruikt voor een bewegingsprofiel** -- een ophaalpunt voor een taxi, een alarm, live delen met een vriend, een bezorging. Het technisch ambitieuze pad is intelligentie naar het TOESTEL verplaatsen, niet de server dom maken |
 
+Later die dag, na de eerste twee metingen (par. 6.5 en 6.6), vier besluiten
+erbij. Ze staan per stroom in `scripts/positiestroom.js` (`BESLUITEN`), en of een
+besluit is UITGEVOERD wordt daar afgeleid en niet opgegeven: pas als de gemeten
+indeling gelijk is aan de besloten klasse, staat hij op uitgevoerd.
+
+| # | besluit | wat het vastlegt |
+|---|---|---|
+| **N12** | **alleen het doelhek wordt bewaard** | een waarneming langs een ander hek wordt tijdens het venster verwerkt en niet opgeslagen; het venster zelf blijft als auditspoor. `plaats-passages` gaat naar `toegestaan`, en `test/plaats.test.js` 176-179 gaat hardop om |
+| **N13** | **aankomst bevestigt de klant of de zaak, en allebei mag** | nabijheid wordt een voorstel ("Bent u er?"); aankomst bestaat pas als het lid tikt of de zaak het zet (kassa, host, reservering). Wie van de twee het eerst bevestigt, is genoeg. De deur ter plaatse leest die bevestiging en niet de positie. Uitwerking van N3 |
+| **N14** | **wissen bij stoppen** | Onderweg en de ontmoetradar wissen de positie op het moment dat de taak stopt; de veger van zeven dagen blijft alleen als vangnet. Van `teLang` naar `venster` |
+| **N15** | **de vensters en de noodzakelijke stromen zijn aanvaard** | de negen `venster`- en drie `noodzakelijk`-voorstellen van par. 6.5 zijn besluiten zoals ze stonden. De negentien `onbegrensd`-stromen worden per stroom apart beslist (15.1) |
+
 Plus twee afbakeningen die bij de besluiten horen:
 
 - **Schakel 18 is voor V1 geen eis.** Na de betaling stuurt het domein de

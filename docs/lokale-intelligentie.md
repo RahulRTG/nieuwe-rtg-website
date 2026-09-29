@@ -146,6 +146,27 @@ Grenzen:
 - Zonder model dat gereedschap kan, valt de boardroom terug op de korte blik,
   en daarna op de regels.
 
+### De staving: staat het antwoord in wat is opgezocht?
+
+Een klein model kan een getal overschrijven, twee tellingen verwisselen of een
+route noemen die het nergens zag. `server/kern/registerblik/staving.js` legt het
+antwoord daarom naast de uitkomsten van de gereedschappen uit diezelfde beurt.
+
+- Het toetst alleen wat deterministisch terug te vinden is: getallen, API-routes
+  en registernamen. Dat zijn de ankers van een zin.
+- Een anker dat terugkomt, krijgt de graad van de uitkomst waarin het staat. Een
+  anker dat nergens staat, krijgt `onbekend`. Dat geldt ook voor een getal dat het
+  model zelf uitrekende: geen register draagt dat getal.
+- Het antwoord als geheel is nooit harder dan zijn zachtste anker. Een antwoord
+  zonder ankers is `onbekend` en wordt dus niet goedgekeurd.
+- Er zijn geen nieuwe woorden: alleen de vier graden van het huis
+  (`onbekend`, `vermoed`, `gemeten`, `bewezen`).
+- De toets beslist niets en houdt niets tegen. De boardroom zet onder het
+  antwoord wat niet is teruggevonden, en geeft de volledige staving mee.
+
+Wat hij niet ziet: of een zin zonder anker klopt, en of een gevonden getal in de
+juiste betekenis is gebruikt. Een `0` staat vrijwel altijd ergens.
+
 ## Externe uitwijk
 
 Externe aanbieders doen alleen mee als hun sleutel expliciet is ingesteld en

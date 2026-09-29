@@ -9,7 +9,9 @@
    Elke beurt gaat door de contextsamensteller (../stuur/luspakket.js), zodat
    een lange zoektocht nooit stil het begin -- de regels -- laat afkappen. Het
    antwoord komt terug met de registers die zijn geraadpleegd en hun leeftijd,
-   zodat het scherm kan laten zien waar een bewering vandaan komt.
+   zodat het scherm kan laten zien waar een bewering vandaan komt, en met de
+   staving (./staving.js): welke getallen, routes en registers uit het antwoord
+   ook echt in de opgezochte uitkomsten staan, en met welke graad.
 
    Loopt het stappenbudget op zonder antwoord, dan zegt de lus dat, met wat hij
    wel heeft bekeken -- geen verzonnen conclusie. */
@@ -18,6 +20,7 @@ const rahul = require('../rahul');
 const { REGISTERBLIK_TOOLS, kijk } = require('./gereedschap');
 const { lusPakket } = require('../stuur/luspakket');
 const { vensterVan } = require('../ai/contextpakket');
+const { staaf } = require('./staving');
 
 const STAPPEN = 5;
 const ANTWOORD = 900;
@@ -39,6 +42,7 @@ async function registerblikVraag({ anthropic, rol, vraag }) {
   const systeem = rahul.RAHUL_LEAD + (rol || '') + ' ' + REGELS;
   const messages = [{ role: 'user', content: String(vraag || '').slice(0, 600) }];
   const geraadpleegd = [];
+  const uitkomsten = [];
   for (let s = 0; s < STAPPEN; s++) {
     const pak = lusPakket({ systeem, messages, tools: REGISTERBLIK_TOOLS, venster: vensterVan(anthropic), antwoord: ANTWOORD });
     if (!pak.ok) return { tekst: null, geraadpleegd, stand: pak.code, reden: pak.uitleg };
@@ -47,12 +51,14 @@ async function registerblikVraag({ anthropic, rol, vraag }) {
     const wil = (resp.content || []).filter(c => c.type === 'tool_use');
     if (!wil.length || resp.stop_reason !== 'tool_use') {
       const tekst = (resp.content || []).filter(c => c.type === 'text').map(c => c.text).join('').trim();
-      return { tekst: tekst || null, geraadpleegd, stand: tekst ? 'beantwoord' : 'leeg' };
+      return { tekst: tekst || null, geraadpleegd, stand: tekst ? 'beantwoord' : 'leeg',
+        ...(tekst ? { staving: staaf(tekst, uitkomsten) } : {}) };
     }
     messages.push({ role: 'assistant', content: resp.content });
     messages.push({ role: 'user', content: wil.map((t) => {
       const uit = kijk(t.name, t.input);
       geraadpleegd.push({ gereedschap: t.name, invoer: t.input || {} });
+      uitkomsten.push({ gereedschap: t.name, invoer: t.input || {}, uit });
       return { type: 'tool_result', tool_use_id: t.id, content: JSON.stringify(uit).slice(0, 4000) };
     }) });
   }

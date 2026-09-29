@@ -1,9 +1,9 @@
 {
-  "catalogi": 1193,
-  "verschillendeNamen": 725,
+  "catalogi": 1196,
+  "verschillendeNamen": 727,
   "namenInMeerDomeinen": 131,
   "woordenMetMeerBetekenissen": 113,
-  "betekenissenTotaal": 419,
+  "betekenissenTotaal": 420,
   "ergsteWoord": "SOORTEN",
   "ergsteAantal": 49,
   "dubbelingen": 34,
@@ -379,7 +379,7 @@
     },
     {
       "naam": "NIVEAUS",
-      "betekenissenVanDitWoord": 8,
+      "betekenissenVanDitWoord": 9,
       "waar": [
         "server/kern/rampbeeld/index.js",
         "server/kern/spellen/sudoku.js"
@@ -2102,8 +2102,8 @@
     },
     {
       "naam": "NIVEAUS",
-      "domeinen": 9,
-      "betekenissen": 8,
+      "domeinen": 10,
+      "betekenissen": 9,
       "hoogsteOverlap": 0.17,
       "soort": "gemengd",
       "waar": [
@@ -2140,6 +2140,18 @@
             "entiteit",
             "vestiging",
             "afdeling"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/democratie/partijen.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "europees",
+            "tweede-kamer",
+            "provincie",
+            "waterschap"
           ]
         },
         {
@@ -2801,11 +2813,12 @@
           "bestanden": [
             "server/kern/wereld/saloon/voorkeur.js"
           ],
-          "leden": 3,
+          "leden": 6,
           "voorbeeld": [
             "overzicht",
-            "agenda",
-            "bewaard"
+            "wereld",
+            "mijn",
+            "actie"
           ]
         },
         {
@@ -3684,5 +3697,5 @@
       ]
     }
   ],
-  "bestanden": 3940
+  "bestanden": 3977
 }

@@ -2,14 +2,14 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-09-29",
   "gemeten": {
-    "bestanden": 2598,
-    "domeinenTotaal": 687,
-    "koopbareVormen": 615,
+    "bestanden": 2622,
+    "domeinenTotaal": 690,
+    "koopbareVormen": 614,
     "koopbareDomeinen": 123,
     "envelopDrempel": 8,
     "envelop": 43,
-    "veldenDomeineigen": 786,
-    "veldenNietEnvelop": 1056,
+    "veldenDomeineigen": 785,
+    "veldenNietEnvelop": 1055,
     "gelijkendeVormparen": 17,
     "werkwoordenVolledig": 2,
     "werkwoordenOveral": 0,
@@ -72,11 +72,11 @@
   "perWerkwoord": {
     "toon": 93,
     "prijs": 39,
-    "beschikbaarheid": 55,
+    "beschikbaarheid": 54,
     "reserveer": 31,
     "bevestig": 59,
     "lever": 24,
-    "annuleer": 36,
+    "annuleer": 37,
     "retour": 8
   },
   "overalAanwezig": [],
@@ -609,27 +609,6 @@
         "beschikbaarheid": "agenda",
         "reserveer": "onderhoudBij",
         "lever": "uitgifte"
-      },
-      "telt": 5
-    },
-    {
-      "domein": "kern/markt",
-      "heeft": {
-        "toon": true,
-        "prijs": true,
-        "beschikbaarheid": true,
-        "reserveer": true,
-        "bevestig": true,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "lijst",
-        "prijs": "prijsSuggestie",
-        "beschikbaarheid": "advertentieOpenbaar",
-        "reserveer": "blokkeer",
-        "bevestig": "plaats"
       },
       "telt": 5
     },
@@ -1191,25 +1170,6 @@
       "telt": 3
     },
     {
-      "domein": "kern/foodcourt",
-      "heeft": {
-        "toon": true,
-        "prijs": true,
-        "beschikbaarheid": true,
-        "reserveer": false,
-        "bevestig": false,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "kaart",
-        "prijs": "minimumMenuPrijs",
-        "beschikbaarheid": "capaciteit"
-      },
-      "telt": 3
-    },
-    {
       "domein": "kern/gemeente",
       "heeft": {
         "toon": true,
@@ -1465,6 +1425,24 @@
       "bewijs": {
         "toon": "publiek",
         "bevestig": "boek"
+      },
+      "telt": 2
+    },
+    {
+      "domein": "kern/foodcourt",
+      "heeft": {
+        "toon": true,
+        "prijs": true,
+        "beschikbaarheid": false,
+        "reserveer": false,
+        "bevestig": false,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "kaart",
+        "prijs": "minimumMenuPrijs"
       },
       "telt": 2
     },

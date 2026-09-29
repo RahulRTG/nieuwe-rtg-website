@@ -153,6 +153,16 @@
       "datum": "2026-09-29",
       "soort": "schuld",
       "sleutel": "zelfpoortendeToetsen",
+      "van": 42,
+      "vervalt": "2026-12-29",
+      "meter": "zelfpoortendeToetsen 42 -> 43; toetsenNietGemeten 642 -> 645",
+      "reden": "De lescredentials van RTFoundation-onderwijs zijn gemigreerd (B17, CODECREDENTIALS.json foundation.onderwijs_les_tokens) met drie nieuwe toetsbestanden. test/foundation-lescredential.pg.test.js laat twaalf leerlingen op twee echte PostgreSQL-instances om elf plekken racen en een rotatie op A tegen een toetreding met de oude code op B; zonder DATABASE_URL en REDIS_URL slaat hij over, dus de mutatiemotor meet hem niet. Met de hand: zonder advisory lock en FOR UPDATE in pg/collectietransactie.js zakte hij 3 van 3 keer. Hij staat in scripts/lib/pg-toetslijst.js en als uitzondering onder zelfpoortende-toets. De twee gewone toetsen (test/foundation-lescredential.test.js en test/foundation-lescredential-server.test.js) zijn met de hand gemuteerd en zakken, maar staan nog niet in MUTATIES.json: dat register wordt op een schone boom gemeten en niet in deze tak.",
+      "waarheen": "De twee gewone toetsen verdwijnen uit toetsenNietGemeten zodra MUTATIES.json op een schone boom opnieuw wordt gemeten; de pg-toets volgt de aflossing van de andere pg-toetsen (de standaardomgeving levert PostgreSQL)."
+    },
+    {
+      "datum": "2026-09-29",
+      "soort": "schuld",
+      "sleutel": "zelfpoortendeToetsen",
       "van": 43,
       "vervalt": "2026-12-29",
       "meter": "zelfpoortendeToetsen 43 -> 44",
@@ -3833,6 +3843,12 @@
       "pad": "test/linkcap-credential.pg.test.js",
       "vervalt": "2026-10-15",
       "reden": "de raceproef voor de RTG Link-drager (link.capability_aanvaarden, B15: twee claims op twee instances, intrekken tegen claimen, en alleen hashes in PostgreSQL) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl hij lokaal zonder die infrastructuur expliciet overslaat"
+    },
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/foundation-lescredential.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "de raceproef voor de lescode van RTFoundation-onderwijs (twaalf leerlingen op twee instances om elf plekken, en een rotatie op A tegen een toetreding met de oude code op B) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl hij lokaal zonder die infrastructuur expliciet overslaat"
     }
   ]
 }

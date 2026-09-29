@@ -2227,6 +2227,7 @@ toets omvalt.
 | `sprong.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE SPRONG: via Edge naar elke functie, vanaf elk scherm. Deze toets bewaakt de belofte die scripts/tikken.js meet. |
 | `sso-clientgeheim-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | SCHERM-TEST: de SSO-clientgeheimen op de techniekpagina (besluit B16). Het blok toont per koppeling de STAND en nooit het geheim: de vingerafdruk, verval, overlap, en of de inlog dicht staat met de reden. |
 | `staff-account-scherm.e2e.js` | 1 | -- | De leverancierdeur in een echte browser: productie-UI vraagt geen viercijferige staff-PIN en het hoofdformulier belt uitsluitend aan bij de persoonlijke RTG-accountingang. De server draait in Magnaat Test zodat een... |
+| `staving-scherm.e2e.js` | 1 | genoemd | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `stilleknoppen.e2e.js` | 1 | gezakt op `return-weg#1` | KNOPPEN DIE NIETS DEDEN EN NIETS ZEIDEN. Een kruipronde over alle 310 schermen onder public/apps (elke zichtbare knop aangetikt als lid, op telefoonformaat) vond een terugkerend patroon: een knop die bij een leeg... |
 | `storyline-worlds.e2e.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `taalkast.e2e.js` | 1 | gezakt op `liegpoort /api/` | WAT DE 114 TALEN KOSTTEN, EN WAAROM DAT NIET MEER ZO IS. De automatische vertaallaag bewaarde zijn vertalingen in een Map in de scope van de pagina. |

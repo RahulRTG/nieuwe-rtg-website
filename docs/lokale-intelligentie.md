@@ -177,7 +177,9 @@ zaak en het personeel. Daar geeft de lus zelf de graad van een uitkomst mee:
   noemde is geen bewijs, maar ook geen verzinsel van het model.
 
 Een graad in de uitkomst zelf kan de meegegeven graad alleen verlagen. De routes
-geven de staving mee als veld `staving`; een scherm toont hem nog niet.
+geven de staving mee als veld `staving`, en de Rahul-tab
+(`public/shared/rahul-tab.js`) zet onder het antwoord een regel met wat niet is
+teruggevonden. Kwam alles terug, dan staat er niets.
 
 ## Externe uitwijk
 

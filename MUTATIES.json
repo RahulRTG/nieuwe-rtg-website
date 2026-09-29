@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T22:24:36.425Z",
-    "commit": "09f0f1d71",
+    "op": "2026-09-29T22:24:38.117Z",
+    "commit": "c3969d3b5",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -9686,6 +9686,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 7,
       "scherp": "gezakt"
+    },
+    "registerblik.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/registerblik/gereedschap.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "registereigenaar.test.js": {
       "soort": "puur",

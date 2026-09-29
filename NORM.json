@@ -152,6 +152,16 @@
     {
       "datum": "2026-09-29",
       "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 642,
+      "vervalt": "2026-12-29",
+      "meter": "toetsenNietGemeten 642 -> 645",
+      "reden": "Drie nieuwe toetsen voor het SSO-clientgeheim per tenant (RELEASEKANDIDAAT.md B16, deur identity.sso_client_secret): test/sso-clientgeheim.test.js, test/sso-clientgeheim-routes.test.js en test/sso-clientgeheim-scherm.e2e.js. De mutatiemotor is er nog niet langs geweest (MUTATIES.json wordt op een schone boom gemeten, niet in deze werkboom). Met de hand nagetrokken: elke controle een keer weggehaald, en de zakkende toets staat in de commitboodschap.",
+      "waarheen": "De registerronde op een schone boom meet de drie toetsen in MUTATIES.json; daarna hoort deze meter terug naar 642."
+    },
+    {
+      "datum": "2026-09-29",
+      "soort": "schuld",
       "sleutel": "zelfpoortendeToetsen",
       "van": 43,
       "vervalt": "2026-12-29",

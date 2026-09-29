@@ -6,7 +6,7 @@
    afhankelijkheid die niet in server/kern/democratie/afhankelijkheden.js staat:
      - elke require() buiten die twee mappen;
      - elke naam die de fabriek van buitenaf krijgt;
-     - elke naam die de routes uit de kern-zak halen.
+     - elke naam die de routes aan hun expliciete grens ontvangen.
    Niet genoemd is geen afhankelijkheid, en dus een rode toets.
 
    HIJ LEEST ZONDER COMMENTAAR (scripts/lib/bron.js), want een require in een
@@ -65,14 +65,14 @@ test('2. elke naam die de fabriek krijgt, staat in de verklaring', () => {
   assert.deepEqual(fout, [], 'UNDECLARED_RTG_DEPENDENCY in de fabriek');
 });
 
-test('3. elke naam die de routes uit de kern-zak halen, staat in de verklaring', () => {
+test('3. elke naam die de routes aan hun grens ontvangen, staat in de verklaring', () => {
   const bron = lees(path.join(ROUTES, 'index.js'));
-  const m = /const \{([^}]*)\} = kern;/.exec(bron);
-  assert.ok(m, 'de kern-zak van de routes is niet gevonden -- dan meet deze toets niets');
+  const m = /module\.exports\s*=\s*\(([^)]*)\)\s*=>/.exec(bron);
+  assert.ok(m, 'de expliciete routegrens is niet gevonden -- dan meet deze toets niets');
   const fout = namen(m[1]).filter(n => !AFH.ROUTES[n]);
   assert.deepEqual(fout, [], 'UNDECLARED_RTG_DEPENDENCY in de routes');
-  assert.ok(!/\bkern\.\w+/.test(bron.replace(/const \{[^}]*\} = kern;/, '')),
-    'de routes lezen de kern-zak alleen via de verklaarde destructuring');
+  assert.ok(!/\bkern\b/.test(bron),
+    'de routes krijgen hun verklaarde afhankelijkheden expliciet en lezen geen kern-zak');
 });
 
 test('4. zelfijking: een verzonnen onverklaarde require wordt gevonden, een in commentaar niet', () => {

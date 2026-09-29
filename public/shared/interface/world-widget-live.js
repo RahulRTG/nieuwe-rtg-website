@@ -3,7 +3,7 @@
   'use strict';
   w.RTGWidgetLive = function (app, root, o) {
     var U = w.RTGDesktopUI, T = w.RTGWidgetCopy, offset = o.state.offset || 0, revision = 0;
-    var ui = w.RTGWidgetSurfaces(app, root, { compact: o.compact, open: o.open, days: function () { return offset; },
+    var ui = w.RTGWidgetSurfaces(app, root, { state:o.state, compact: o.compact, open: o.open, days: function () { return offset; },
       offset: function (delta) { offset = Math.max(0, Math.min(28, offset + delta)); o.state.offset = offset; load(false); }, run: o.run,
       changed: function (id) { d.dispatchEvent(new CustomEvent('rtg-widget-changed', { detail: { id: id } })); } });
     var supported = w.RTGWidgetData.supports(app.id);

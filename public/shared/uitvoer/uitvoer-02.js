@@ -1,10 +1,4 @@
-  /* De bediening. Die was er niet: neemMee() had als enige aanroeper de
-     letter "e" uit sneltoets.js, en een telefoon heeft geen toetsenbord.
-     Vandaar een knop in duimmaat en een venster met een eigen sluitknop,
-     want Esc bestaat daar net zo min. 44 staat in PIXELS en niet in rem:
-     een duim schaalt niet mee met de basismaat van een pagina. De dubbele
-     klasse moet, omdat "header button{border:0}" al in de <head> staat en
-     van een enkele klasse wint. */
+  // Visible export action and modal share the active host.
   var LIJN = '1px solid var(--line,var(--lijn,#2A2724))';
   /* --rtg-muted VOOR --muted: die eerste volgt het thema, de tweede is een
      vaste grijstoon. Op een goudgetinte grond haalde #8A8680 4,07:1 waar 4,5
@@ -27,7 +21,7 @@
     '.rtguitvoer-rij button{flex:1 1 6rem;}';
 
   var knop = null, laag = null, melding = null, tik = 0, pogingen = 0;
-  var gastKnop = null, gastLaag = null;
+  var gastKnop = null, gastLaag = null, gekozenKnop = null, gekozenLaag = null;
 
   function sluit() {
     laag.hidden = true;
@@ -68,7 +62,7 @@
   }
 
   function toon() {
-    paneel();
+    herzie(); paneel();
     var d = verzamel();
     melding.textContent = d ? d.rijen.length + ' regels, ' + d.kolommen.length +
       ' kolommen. Het bestand wordt hier gemaakt; er gaat niets naar een server.' : LEEG;
@@ -76,13 +70,7 @@
     laag.querySelector('button').focus();
   }
 
-  /* Binnen beeld, in de breedte. Een kop van een app is vaak een flexrij die
-     NIET afbreekt (display:flex zonder flex-wrap) en bovendien position:fixed:
-     staat die rij op telefoonmaat al vol, dan schuift onze knop er aan de
-     rechterkant uit, en juist doordat de rij vast staat valt er niet naartoe te
-     scrollen. Gemeten op 390 breed viel hij zo van het scherm bij navigatie en
-     ov. Vandaar deze toets na het plaatsen: een knop die je niet kunt zien is
-     geen knop. */
+  // Flex headers must keep the export button within the viewport.
   function inBeeld(k) {
     var r = k.getBoundingClientRect();
     var breed = window.innerWidth || document.documentElement.clientWidth;
@@ -114,18 +102,22 @@
     }
   }
 
-  /* De app verandert (gegevens komen later binnen, een scherm wordt
-     hertekend), dus de knop wordt telkens opnieuw gewogen. rtgdeel-vast
-     zegt tegen het deelmenu: geen inhoud -- zo telt de knop niet als deel
-     en verdwijnt hij niet bij een deelwissel.
-
-     Een knop die niet meer GETEKEND wordt telt hier als weg: op app.html
-     sluit de gastheer ([role=main] #gate) zodra de app opstart, en dan zou
-     de bediening stil verdwijnen. Na vijf verhuizingen houdt hij op, want
-     een pagina waar geen enkele plek zichtbaar is hoort geen eeuwige
-     verhuizing te betalen (LAT regel 5: dan is het stil, maar niet druk). */
+  // Reassess actual data and host visibility when the screen changes.
   function herzie() {
     if (!document.body) return;
+    // Standalone pages share one visible content frame. A former workspace
+    // drawer must not keep the real export control inside a permanently closed host.
+    var frame = document.body.hasAttribute('data-rtg-desktop') && document.querySelector('.wd-page');
+    if (frame) {
+      var output = frame.querySelector(':scope > .wd-output');
+      if (!output) { output = document.createElement('div'); output.className = 'wd-output'; frame.prepend(output); }
+      var bank = document.querySelector('.rtg-interface-second-screen:not(.rtg-ss-peek) .cmd-bank');
+      if (bank) { gekozenLaag = bank; gekozenKnop = bank.querySelector('.rtg-ss-header'); }
+      var openHost = gekozenLaag && gekozenLaag.isConnected && gekozenLaag.getClientRects().length &&
+        getComputedStyle(gekozenLaag).visibility !== 'hidden' && !gekozenLaag.closest('[hidden],[aria-hidden="true"]');
+      gastKnop = openHost ? gekozenKnop : output; gastLaag = openHost ? gekozenLaag : document.body;
+      if (laag && laag.parentNode !== gastLaag) gastLaag.appendChild(laag);
+    }
     /* hidden alleen is niet genoeg: sommige gastschermen laten #gate bestaan
        maar nemen hem via de indeling uit beeld. Alleen een werkelijk zichtbare
        poort onderdrukt de uitvoerknop. */
@@ -169,14 +161,14 @@
     zichtbaar: function () { return !!(laag && !laag.hidden); },
     /* Knop én dialoog horen bij dezelfde dominante laag. */
     mount: function (knopHost, laagHost) {
-      gastKnop = knopHost || null; gastLaag = laagHost || null;
+      gekozenKnop = gastKnop = knopHost || null; gekozenLaag = gastLaag = laagHost || null;
       if (laag && gastLaag && gastLaag.isConnected) gastLaag.appendChild(laag);
       herzie();
     },
     unmount: function () {
       if (laag && !laag.hidden) sluit();
       if (laag && laag.isConnected) document.body.appendChild(laag);
-      gastKnop = null; gastLaag = null; setTimeout(herzie, 0);
+      gekozenKnop = gastKnop = null; gekozenLaag = gastLaag = null; setTimeout(herzie, 0);
     }
   };
 

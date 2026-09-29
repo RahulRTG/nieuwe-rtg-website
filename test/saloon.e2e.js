@@ -23,6 +23,7 @@ test('Saloon: publiceren, reageren, bewaren, filters en mobiele bediening', { sk
     const fouten = []; letOpFouten(page, fouten);
     await page.addInitScript(token => { localStorage.setItem('rtg_member_token', token); localStorage.setItem('rtg_lang', 'nl'); }, reg.token);
     await page.goto(srv.base + '/apps/wereld.html');
+    await page.locator('.wp-story a').click();
     await page.locator('#saloon:not([hidden])').waitFor();
     await page.locator('[data-saloon-maken]').click();
     await page.locator('dialog textarea[name="tekst"]').fill('Samen de buurt ontdekken. #saloonproef');
@@ -41,7 +42,7 @@ test('Saloon: publiceren, reageren, bewaren, filters en mobiele bediening', { sk
     await page.locator('[data-vorm="bewaard"][aria-pressed="true"]').waitFor();
     await page.waitForFunction(() => document.querySelectorAll('[data-saloon-id]').length === 1);
     assert.equal(await page.locator('[data-saloon-id]').count(), 1);
-    await page.reload(); await kaart.waitFor();
+    await page.reload(); await page.locator('.wp-story a').click(); await kaart.waitFor();
     assert.equal(await page.locator('[data-vorm="bewaard"]').getAttribute('aria-pressed'), 'true');
     await page.locator('[data-keuzes]').click();
     await page.locator('#saloonFilters input[name="plaats"]').fill('Rotterdam');

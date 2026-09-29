@@ -55,7 +55,8 @@ test('Four editorial first visits: responsive, language, shared Edge and real fi
       assert.equal(await page.locator('.rtg-first-steps h1').count(), 1);
       assert.equal(await page.locator('.rtg-reality-graph,.tos-module-hero,.rtg-suite-hero').count(), 0);
       const header = await page.locator('.rtg-first-steps').boundingBox();
-      assert.ok(header.y < 100, app + ' begins directly below the shared world header');
+      const surface = await page.locator('.wd-page').boundingBox();
+      assert.ok(header.y >= surface.y && header.y <= surface.y + 100, app + ' begins directly inside the shared content surface');
       for (const width of [320, 390, 1440]) {
         await page.setViewportSize({ width, height: width === 1440 ? 1000 : 844 });
         assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), app + ': no overflow at ' + width);

@@ -57,11 +57,13 @@ test('Kantoor: wat in de specialist staat komt hier terug, en werken doe je daar
     const fouten = [];
     letOpFouten(page, fouten);
     await page.goto(base + '/apps/kantoor.html', { waitUntil: 'domcontentloaded' });
+    await page.locator('.wp-domain > summary').click();
     await page.evaluate((tok) => {
       localStorage.setItem('rtg_member_token', tok);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, reg.token);
     await page.goto(base + '/apps/kantoor.html', { waitUntil: 'domcontentloaded' });
+    await page.locator('.wp-domain > summary').click();
     await page.waitForSelector('#werkdag .reis', { timeout: 15000 });
 
     const beeld = await page.evaluate(() => {
@@ -98,7 +100,7 @@ test('Kantoor: wat in de specialist staat komt hier terug, en werken doe je daar
            headerstandaard in de kop van elke app en zegt niets over deze laag.
            Alles wat overblijft is wel een bediening die schrijft, en die hoort
            hier niet te bestaan. */
-        schrijfdingen: [...document.querySelectorAll('#inhoud button, #inhoud input, #inhoud textarea, #inhoud select')]
+        schrijfdingen: [...document.querySelectorAll('.wp-domain-content button, .wp-domain-content input, .wp-domain-content textarea, .wp-domain-content select')]
           .filter(e => !e.classList.contains('rtg-ref') && e.id !== 'osMenuBtn')
           .map(e => e.tagName + '.' + (e.className || '-'))
       };
@@ -161,6 +163,6 @@ test('Kantoor: wat in de specialist staat komt hier terug, en werken doe je daar
   } finally {
     if (browser) await browser.close().catch(() => {});
     child.kill();
-    fs.rmSync(TMP, { recursive: true, force: true });
+    fs.rmSync(TMP, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
   }
 });

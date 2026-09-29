@@ -9,7 +9,7 @@
   laadStijl('/shared/rahul-tab/helpers.js');
 
   /* Alleen echte app-bovenbalken zijn geldige gastheren voor deze globale tab. */
-  var selectors='.wk-tabs,.rv-tabs>div,.lo-tabs,.pn-tabs,.pn-top>div,.po-tabs,.ir-tabs,.ir-shell>main>header>div,.cmd-tabs,[data-tabs],[role="tablist"],main>header>div,.topbar,.appbar,body>header'.split(','),host=null;
+  var selectors='.wk-tabs,.rv-tabs>div,.lo-tabs,.pn-tabs,.pn-top>div,.po-tabs,.ir-tabs,.ir-shell>main>header>div,.cmd-tabs,[data-tabs],[role="tablist"],main>header>div,.topbar,.appbar,body>header,.wd-page>header'.split(','),host=null;
   for(var i=0;i<selectors.length&&!host;i++)host=document.querySelector(selectors[i]);
   if(!host||document.getElementById('wkRahulTab')||host.querySelector('.rtg-rahul-tab'))return;
 

@@ -1796,7 +1796,9 @@ const {
   bevMijnDiensten, bevInklok, bevUitklok, bevRondeStart, bevRondeCheckpoint, bevRondeKlaar,
   bevMeldIncident, bevBeslisIncident, bevSos, bevCommand,
   // de sleuf waar opzet/plaatsbronnen.js de plaatslaag in hangt (late binding)
-  bevKoppelPlaats
+  bevKoppelPlaats,
+  // hangt na kernlaag2 aan het verzuimregister (kern/beveiliging/rooster/vervallen.js)
+  bevDienstVervalt
 } = maakBeveiliging({ db, save, crypto, accounts, findSupplier, notify, notifySupplier, sseToSupplier, sseToOffice, logActivity, haversine, afwezigOp });
 
 /* De idempotentie-administratie van de betaal-naad (server/betaal.js) durable
@@ -2404,6 +2406,8 @@ const hulp = {
 require('./opzet/kernlaag1')(kern, hulp);
 require('./opzet/kernlaag1b')(kern, hulp);
 require('./opzet/kernlaag2')(kern, hulp);
+// een vastgestelde dienst die door afwezigheid vervalt, krijgt een bericht aan de zaak
+kern.payrollOS.verzuim.naMelding(bevDienstVervalt);
 require('./opzet/kernlaag2b')(kern, hulp);
 require('./opzet/kernlaag3')(kern, hulp);
 require('./opzet/kernlaag3c')(kern, hulp);  // de commerciele kern; NA pay, want de ronde boekt

@@ -70,6 +70,20 @@ function maakPayrollOS({ db, save, crypto, accounts, nu, inzagelog, notify, logA
      dat detail niet na -- hij wijst ernaar. */
   const { payrollHerkomst } = maakPayrollHerkomst({ aangifte, run, regelpakket: regels, dossier });
   const verzuim = maakVerzuim({ opslag, save, nu });
+  /* WIE WIL WETEN DAT ER EEN AFWEZIGHEID BIJKWAM, luistert hier (de
+     beveiligingsplanner: een vastgestelde dienst die vervalt, krijgt een
+     bericht). De melding gaat voor: een luisteraar die gooit breekt haar niet,
+     maar verdwijnt ook niet stil. */
+  const luisteraars = [];
+  const kaleMeld = verzuim.meld;
+  verzuim.meld = (code, staffId, melding, door) => {
+    const r = kaleMeld(code, staffId, melding, door);
+    if (r && r.ok) for (const f of luisteraars) {
+      try { f(code, staffId, r.melding); } catch (e) { console.error('[verzuim] luisteraar faalde:', e.message); }
+    }
+    return r;
+  };
+  verzuim.naMelding = (f) => { if (typeof f === 'function') luisteraars.push(f); };
   const identiteit = maakIdentiteit({ accounts, opslag, save, nu, inzagelog, notify, logActivity });
   /* De dekking eerst: de bijwerklaag leest er zijn bronnen uit, per land. Zo is
      een land erbij een adres neerzetten en geen uitrol. */

@@ -1,9 +1,9 @@
 {
   "uitleg": "Elke route (METHODE + patroon) die tijdens de volledige testsuite ECHT is aangeraakt, uit het routejournaal van server/routelog.js en niet uit de tekst van de toetsen. De eis is 100%: scripts/dekking.js zakt op elk gat en kent geen norm om die eis te verlagen. Het RTG Kantoor leest dit bestand (routes/office/dekking.js) en houdt het naast wat de server op dit moment registreert, zodat een route die er na de meting bij komt meteen als ongemeten opvalt. Bijwerken met: npm run dekking:vast",
   "gemeten": {
-    "op": "2026-09-29T15:54:38.240Z",
-    "commit": "ae955aca",
-    "routesToen": 5196
+    "op": "2026-09-29T16:16:22.792Z",
+    "commit": "2d5c85e6",
+    "routesToen": 5202
   },
   "aangeraakt": [
     "GET /",
@@ -815,8 +815,12 @@
     "POST /api/foundation/kosten",
     "GET /api/foundation/les/:code",
     "GET /api/foundation/les/:code/stream",
+    "POST /api/foundation/les/code/intrekken",
+    "POST /api/foundation/les/code/roteer",
     "POST /api/foundation/les/join",
+    "POST /api/foundation/les/leerling/intrekken",
     "POST /api/foundation/les/maak",
+    "POST /api/foundation/les/sluit",
     "POST /api/foundation/mail/inbox",
     "POST /api/foundation/mail/lees",
     "POST /api/foundation/mail/overzicht",
@@ -4835,6 +4839,8 @@
     "GET /api/techniek/sso",
     "POST /api/techniek/sso",
     "DELETE /api/techniek/sso/:org",
+    "POST /api/techniek/sso/geheim",
+    "POST /api/techniek/sso/geheim/overlap/sluit",
     "POST /api/techniek/sso/proef",
     "POST /api/techniek/sso/saml",
     "POST /api/techniek/sso/schakel",

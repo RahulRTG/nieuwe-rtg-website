@@ -3,25 +3,25 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-09-29T14:07:20.866Z",
-  "commit": "1acf8232",
+  "op": "2026-09-29T15:30:18.798Z",
+  "commit": "7404c832",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/afgeleid.js",
   "node": "v22.22.2"
  },
  "gemeten": {
-  "artefacten": 337,
+  "artefacten": 338,
   "bron": 23,
-  "afgeleid": 182,
+  "afgeleid": 183,
   "fragmenten": 26,
   "momentopname": 1,
   "onbeslist": 105,
   "afgeleidZonderEigenaar": 2,
-  "metEigenaar": 207,
-  "afgeleidEigenaarHard": 180,
-  "afgeleidGrendelt": 22,
-  "metStempel": 113,
+  "metEigenaar": 208,
+  "afgeleidEigenaarHard": 181,
+  "afgeleidGrendelt": 23,
+  "metStempel": 114,
   "stempelAnders": 0
  },
  "artefacten": [
@@ -3061,6 +3061,20 @@
    "stempelAnders": false,
    "versheidOpdracht": "npm run meetronde -- --alleen=poortwacht",
    "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "POSITIEPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/positieproef.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/positieproef.js"
+   ],
+   "stempelInstrument": "scripts/positieproef.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run positieproef:vast",
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {

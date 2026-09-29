@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T16:01:54.881Z",
-    "commit": "41c41073",
+    "op": "2026-09-29T16:06:16.725Z",
+    "commit": "8640de68",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -9328,6 +9328,28 @@
     "sprongindex.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
+    },
+    "sso-clientgeheim-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "sso-clientgeheim-scherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "sso-clientgeheim.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/accounts/index.js",
+      "operator": "return-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 3
     },
     "sso.test.js": {
       "soort": "puur",

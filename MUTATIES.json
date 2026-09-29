@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T15:17:43.785Z",
-    "commit": "265baf2ce",
+    "op": "2026-09-29T17:04:57.360Z",
+    "commit": "117be692e",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -3521,6 +3521,13 @@
       "operator": "!==->===#0",
       "gezakt": 14,
       "geprobeerd": 2
+    },
+    "festival-verzuim.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "festival-vooruit.test.js": {
       "soort": "puur",
@@ -8705,6 +8712,13 @@
       "gezakt": 1,
       "geprobeerd": 2
     },
+    "ov-verzuim.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "ov.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -12454,6 +12468,13 @@
       "operator": "===->!==#0",
       "gezakt": 3,
       "geprobeerd": 1
+    },
+    "taxi-verzuim.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "teacherflow.test.js": {
       "soort": "server",

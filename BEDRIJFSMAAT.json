@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T16:49:21.053Z",
-    "commit": "1dbf099c",
+    "op": "2026-09-29T16:59:37.345Z",
+    "commit": "05110e5f",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bedrijfsmaat.js",
@@ -166,27 +166,27 @@
     "maten": 67,
     "domeinen": 28,
     "perStatus": {
-      "bestaat": 46,
-      "half": 18,
+      "bestaat": 51,
+      "half": 13,
       "ontbreekt": 3,
       "onbekend": 0
     },
     "primairGat": {
       "BRON_ONTBREEKT": 3,
       "DEFINITIE_ONTBREEKT": 10,
-      "PROJECTIE_ONTBREEKT": 3,
-      "BEWIJS_ONTBREEKT": 5
+      "PROJECTIE_ONTBREEKT": 2,
+      "BEWIJS_ONTBREEKT": 1
     },
     "perGat": {
       "BRON_ONTBREEKT": 3,
       "DEFINITIE_ONTBREEKT": 13,
-      "PROJECTIE_ONTBREEKT": 13,
-      "BEWIJS_ONTBREEKT": 21
+      "PROJECTIE_ONTBREEKT": 12,
+      "BEWIJS_ONTBREEKT": 16
     },
     "ketens": 6,
     "ketensGegrond": 6,
     "bestaatGedeeltelijk": 18,
-    "rustOpGat": 2,
+    "rustOpGat": 0,
     "privacyGaten": 0,
     "verworpen": 0,
     "vormfouten": 0
@@ -236,8 +236,8 @@
     },
     "acquisitie": {
       "maten": 3,
-      "bestaat": 2,
-      "half": 1,
+      "bestaat": 3,
+      "half": 0,
       "ontbreekt": 0
     },
     "cac": {
@@ -320,8 +320,8 @@
     },
     "campagnes": {
       "maten": 2,
-      "bestaat": 1,
-      "half": 1,
+      "bestaat": 2,
+      "half": 0,
       "ontbreekt": 0
     },
     "infrastructuur": {
@@ -338,8 +338,8 @@
     },
     "risico": {
       "maten": 3,
-      "bestaat": 1,
-      "half": 1,
+      "bestaat": 2,
+      "half": 0,
       "ontbreekt": 1
     },
     "weerbaarheid": {
@@ -350,14 +350,14 @@
     },
     "commerciele-groei": {
       "maten": 2,
-      "bestaat": 0,
-      "half": 2,
+      "bestaat": 1,
+      "half": 1,
       "ontbreekt": 0
     },
     "geografische-groei": {
       "maten": 3,
-      "bestaat": 0,
-      "half": 3,
+      "bestaat": 1,
+      "half": 2,
       "ontbreekt": 0
     }
   },
@@ -544,20 +544,7 @@
       ]
     }
   ],
-  "rustOpGat": [
-    {
-      "id": "omzet.leden-maand",
-      "zwakkeSchakels": [
-        "groei.leden-per-pas"
-      ]
-    },
-    {
-      "id": "marge.per-lid",
-      "zwakkeSchakels": [
-        "groei.leden-per-pas"
-      ]
-    }
-  ],
+  "rustOpGat": [],
   "privacyGaten": [],
   "verworpen": [],
   "vormfouten": [],
@@ -645,7 +632,7 @@
       },
       {
         "id": "acquisitie.via-werkgever",
-        "status": "half",
+        "status": "bestaat",
         "domein": "acquisitie"
       },
       {
@@ -695,12 +682,12 @@
       },
       {
         "id": "campagnes.rtf-werving",
-        "status": "half",
+        "status": "bestaat",
         "domein": "campagnes"
       },
       {
         "id": "groei.leden-per-pas",
-        "status": "half",
+        "status": "bestaat",
         "domein": "commerciele-groei"
       },
       {
@@ -720,7 +707,7 @@
       },
       {
         "id": "geo.rtf-steden",
-        "status": "half",
+        "status": "bestaat",
         "domein": "geografische-groei"
       },
       {
@@ -880,7 +867,7 @@
       },
       {
         "id": "risico.betalingen-onbekend",
-        "status": "half",
+        "status": "bestaat",
         "domein": "risico"
       },
       {
@@ -908,7 +895,7 @@
       {
         "van": "groei.leden-per-pas",
         "naar": "omzet.leden-maand",
-        "gegrond": false
+        "gegrond": true
       },
       {
         "van": "kosten.per-drager",
@@ -1294,10 +1281,8 @@
         "reden": null
       },
       "keten": {
-        "gegrond": false,
-        "zwakkeSchakels": [
-          "groei.leden-per-pas"
-        ]
+        "gegrond": true,
+        "zwakkeSchakels": []
       },
       "gedeeltelijk": null
     },
@@ -1872,10 +1857,8 @@
         "reden": null
       },
       "keten": {
-        "gegrond": false,
-        "zwakkeSchakels": [
-          "groei.leden-per-pas"
-        ]
+        "gegrond": true,
+        "zwakkeSchakels": []
       },
       "gedeeltelijk": "Alleen de lopende maand: de bijdrage per pas is een stand van vandaag en wordt niet per maand bewaard. De Business Pass rekent alleen mee als elk lid een lopend contract heeft."
     },
@@ -2381,17 +2364,15 @@
       ],
       "berekening": "telling per zaakcode van de uitnodiging waarmee een lid binnenkwam",
       "eenheid": "leden per werkgever",
-      "graad": "onbekend",
+      "graad": "gemeten",
       "actualiteit": "live",
       "minimaleGroep": 10,
       "privacyklasse": "leden",
       "eigenaar": "kern/ledenregister",
       "eigenaarReden": null,
       "afhankelijk": [],
-      "status": "half",
-      "gaten": [
-        "BEWIJS_ONTBREEKT"
-      ],
+      "status": "bestaat",
+      "gaten": [],
       "elementen": {
         "bron": {
           "aanwezig": true,
@@ -2427,9 +2408,15 @@
           "reden": null
         },
         "bewijs": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Geen graad en geen peilmoment in het antwoord."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/ledenregister.js",
+              "citaat": "graad: 'gemeten', peilmoment: new Date().toISOString(), afgekapt",
+              "klopt": true
+            }
+          ],
+          "reden": null
         }
       },
       "groepsgrens": {
@@ -2445,7 +2432,7 @@
         "reden": null
       },
       "keten": {
-        "gegrond": false,
+        "gegrond": true,
         "zwakkeSchakels": []
       },
       "gedeeltelijk": null
@@ -3240,17 +3227,15 @@
       ],
       "berekening": "per campagne de opgehaalde bedragen en de verdeelsleutel",
       "eenheid": "euro per campagne",
-      "graad": "onbekend",
+      "graad": "vermoed",
       "actualiteit": "live",
       "minimaleGroep": null,
       "privacyklasse": "huis",
       "eigenaar": "kern/rtfos",
       "eigenaarReden": null,
       "afhankelijk": [],
-      "status": "half",
-      "gaten": [
-        "BEWIJS_ONTBREEKT"
-      ],
+      "status": "bestaat",
+      "gaten": [],
       "elementen": {
         "bron": {
           "aanwezig": true,
@@ -3279,6 +3264,11 @@
           "citaten": [
             {
               "bestand": "server/kern/rtfos/campagnes.js",
+              "citaat": "function lijst",
+              "klopt": true
+            },
+            {
+              "bestand": "server/kern/rtfos/campagnes.js",
               "citaat": "function ronde",
               "klopt": true
             }
@@ -3286,9 +3276,15 @@
           "reden": null
         },
         "bewijs": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Geen graad of peilmoment in het antwoord. Blijft binnen de wereld rtfoundation (C1)."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/rtfos/campagnes.js",
+              "citaat": "graad: 'vermoed', peilmoment: nu()",
+              "klopt": true
+            }
+          ],
+          "reden": null
         }
       },
       "groepsgrens": {
@@ -3298,7 +3294,7 @@
         "reden": null
       },
       "keten": {
-        "gegrond": false,
+        "gegrond": true,
         "zwakkeSchakels": []
       },
       "gedeeltelijk": null
@@ -3314,17 +3310,15 @@
       ],
       "berekening": "telling per pas uit het ledenregister",
       "eenheid": "leden per pas",
-      "graad": "onbekend",
+      "graad": "gemeten",
       "actualiteit": "live",
       "minimaleGroep": 10,
       "privacyklasse": "leden",
       "eigenaar": "kern/ledenregister",
       "eigenaarReden": null,
       "afhankelijk": [],
-      "status": "half",
-      "gaten": [
-        "BEWIJS_ONTBREEKT"
-      ],
+      "status": "bestaat",
+      "gaten": [],
       "elementen": {
         "bron": {
           "aanwezig": true,
@@ -3360,9 +3354,20 @@
           "reden": null
         },
         "bewijs": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Geen graad of peilmoment; het register telt tot 20000 rijen en zegt niet of het afkapte."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/ledenregister.js",
+              "citaat": "graad: 'gemeten', peilmoment: new Date().toISOString(), afgekapt",
+              "klopt": true
+            },
+            {
+              "bestand": "server/kern/ledenregister.js",
+              "citaat": "const afgekapt = rijen.length >= MAX",
+              "klopt": true
+            }
+          ],
+          "reden": null
         }
       },
       "groepsgrens": {
@@ -3378,7 +3383,7 @@
         "reden": null
       },
       "keten": {
-        "gegrond": false,
+        "gegrond": true,
         "zwakkeSchakels": []
       },
       "gedeeltelijk": null
@@ -3608,17 +3613,15 @@
       ],
       "berekening": "stedenboom met status per stad",
       "eenheid": "steden met status",
-      "graad": "onbekend",
+      "graad": "gemeten",
       "actualiteit": "live",
       "minimaleGroep": null,
       "privacyklasse": "huis",
       "eigenaar": "kern/rtfos",
       "eigenaarReden": null,
       "afhankelijk": [],
-      "status": "half",
-      "gaten": [
-        "BEWIJS_ONTBREEKT"
-      ],
+      "status": "bestaat",
+      "gaten": [],
       "elementen": {
         "bron": {
           "aanwezig": true,
@@ -3654,9 +3657,15 @@
           "reden": null
         },
         "bewijs": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Geen graad of peilmoment in het antwoord."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/rtfos/steden.js",
+              "citaat": "graad: 'gemeten', peilmoment: nu()",
+              "klopt": true
+            }
+          ],
+          "reden": null
         }
       },
       "groepsgrens": {
@@ -3666,7 +3675,7 @@
         "reden": null
       },
       "keten": {
-        "gegrond": false,
+        "gegrond": true,
         "zwakkeSchakels": []
       },
       "gedeeltelijk": null
@@ -6061,20 +6070,17 @@
       "bronnen": [
         "server/kern/betaalwaarheid/staten.js"
       ],
-      "berekening": "nog niet vastgesteld",
+      "berekening": "aantal en bedrag van gestarte betalingen zonder providerreferentie die niet definitief betaald zijn, met escalaties en controle nodig ernaast",
       "eenheid": "betalingen in een onbekende stand",
-      "graad": "onbekend",
+      "graad": "gemeten",
       "actualiteit": "live",
       "minimaleGroep": null,
       "privacyklasse": "huis",
       "eigenaar": "kern/betaalwaarheid",
       "eigenaarReden": null,
       "afhankelijk": [],
-      "status": "half",
-      "gaten": [
-        "PROJECTIE_ONTBREEKT",
-        "BEWIJS_ONTBREEKT"
-      ],
+      "status": "bestaat",
+      "gaten": [],
       "elementen": {
         "bron": {
           "aanwezig": true,
@@ -6091,22 +6097,39 @@
           "aanwezig": true,
           "citaten": [
             {
-              "bestand": "server/kern/betaalwaarheid/index.js",
-              "citaat": "De RTG Payment Truth",
+              "bestand": "server/kern/betaalwaarheid/hervat.js",
+              "citaat": "const onbekend = r =>",
               "klopt": true
             }
           ],
           "reden": null
         },
         "projectie": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "De waarheid staat per betaling; een telling van onbekende standen als bedrijfsmaat bestaat niet."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/betaalwaarheid/hervat.js",
+              "citaat": "function openstaand()",
+              "klopt": true
+            },
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand-risico.js",
+              "citaat": "maat('risico.betalingen-onbekend'",
+              "klopt": true
+            }
+          ],
+          "reden": null
         },
         "bewijs": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Volgt uit de projectie."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand-risico.js",
+              "citaat": "waarom: 'De betaalwaarheid is niet beschikbaar; er is niet gekeken.'",
+              "klopt": true
+            }
+          ],
+          "reden": null
         }
       },
       "groepsgrens": {
@@ -6116,7 +6139,7 @@
         "reden": null
       },
       "keten": {
-        "gegrond": false,
+        "gegrond": true,
         "zwakkeSchakels": []
       },
       "gedeeltelijk": null

@@ -7,8 +7,7 @@
    heen. De kantoorkant staat in ./kantoor.js, binnen dezelfde domeingrens. */
 'use strict';
 
-module.exports = (kern) => {
-  const { app, auth, officeAuth, boardroomWie, democratie } = kern;
+module.exports = (app, auth, officeAuth, boardroomWie, democratie) => {
   const stuur = (res, r) => (r && r.error)
     ? res.status(r.status || 400).json(r.actie ? { error: r.error, actie: r.actie } : { error: r.error })
     : res.json(r);

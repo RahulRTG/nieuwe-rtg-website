@@ -201,6 +201,7 @@ test('de buurt-app toont activiteiten en geen enkel gegeven over een mens',
   try {
     const d = await decor(srv.base);
     s = await schermMet(srv.base, pw, '/apps/foundation/os-publiek.html?stad=almere');
+    await s.page.locator('.wp-domain summary').click();
     await s.page.waitForSelector('#uit .buurtkaart', { timeout: 15000 });
     await s.page.waitForSelector('body[data-rtg-world-dashboard-ready="true"]',
       { timeout: 15000 });
@@ -231,6 +232,7 @@ test('de buurt-app toont activiteiten en geen enkel gegeven over een mens',
     const vanaf = s.verzoeken.length;
     await s.page.goto(srv.base + '/apps/foundation/os-publiek.html?stad=almere',
       { waitUntil: 'domcontentloaded' });
+    await s.page.locator('.wp-domain summary').click();
     await s.page.waitForSelector('#uit .buurtkaart', { timeout: 15000 });
     assert.equal(s.verzoeken.slice(vanaf).some(url => url.includes('/api/experience/')), false,
       'de publieke stadsroute vraagt geen persoonlijke Experience-projectie op');

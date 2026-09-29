@@ -41,7 +41,7 @@
     document.documentElement.classList.add('rtf-toegang-dicht');
     if (!document.getElementById('rtf-toegang-stijl')) {
       var stijl = document.createElement('style'); stijl.id = 'rtf-toegang-stijl';
-      stijl.textContent = 'html.rtf-toegang-dicht body>*:not(#rtf-toegang-slot){visibility:hidden!important}html.rtf-toegang-dicht #rtf-toegang-slot{visibility:visible!important}#rtf-toegang-slot [data-rtf-uitweg]{padding:.65rem .85rem;border:1px solid #4a463d;border-radius:0;color:#f6f1e7;text-decoration:none}';
+      stijl.textContent = 'html.rtf-toegang-dicht body>*:not(#rtf-toegang-slot):not(.wd-shell):not(.rtg-edge-chrome){visibility:hidden!important}html.rtf-toegang-dicht .wd-shell>.wd-home{visibility:hidden!important;pointer-events:none!important}html.rtf-toegang-dicht #rtf-toegang-slot{visibility:visible!important}#rtf-toegang-slot [data-rtf-uitweg]{padding:.65rem .85rem;border:1px solid #4a463d;border-radius:0;color:#f6f1e7;text-decoration:none}';
       (document.head || document.documentElement).appendChild(stijl);
     }
     if (!el) {

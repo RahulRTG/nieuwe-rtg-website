@@ -198,7 +198,7 @@ test('de marker volgt pas na volledige bereikbaarheid en verwijdering herstelt b
 
 test('CSS toont per state alleen de bedoelde bestaande randen', () => {
   assert.match(CSS, /data-rtg-edge-2-state="overview"\] \.rtg-edge-top[^}]*transform:none!important/);
-  assert.match(CSS, /data-rtg-edge-2-state="compact"\] \.rtg-edge-top[^}]*visibility:hidden/);
+  assert.match(CSS, /data-rtg-edge-2-state="compact"\]:not\(\[data-rtg-desktop\]\) \.rtg-edge-top[^}]*visibility:hidden/);
   assert.match(CSS, /data-rtg-edge-2-state="compact"\] \.rtg-edge-bottom[^}]*visibility:hidden/);
   assert.match(CSS, /data-rtg-edge-2-state="focus"\] \.rtg-edge-bottom[^}]*visibility:hidden/);
   assert.doesNotMatch(CSS, /data-rtg-edge-2-state="compact"\] \.rtg-edge-2-reveal/);

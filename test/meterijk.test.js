@@ -1706,6 +1706,27 @@ const IJKINGEN = {
       (j) => { j.gemeten.stromen = Math.max(0, (j.gemeten.stromen || 0) - 5); return j; },
       () => voor.positieStromenGezien - meet().positieStromenGezien)
   },
+  /* En de opslaghelft (POSITIEPROEF.json): elke tand de verkeerde kant op. */
+  positieNavBlijft: {
+    proef: (voor) => metVervangenJson('POSITIEPROEF.json',
+      (j) => { j.tellers.blijvendeNavPositie = (j.tellers.blijvendeNavPositie || 0) + 2; return j; },
+      () => meet().positieNavBlijft - voor.positieNavBlijft)
+  },
+  positieNaTaak: {
+    proef: (voor) => metVervangenJson('POSITIEPROEF.json',
+      (j) => { j.tellers.positieNaVenster = (j.tellers.positieNaVenster || 0) + 2; return j; },
+      () => meet().positieNaTaak - voor.positieNaTaak)
+  },
+  positiePassages: {
+    proef: (voor) => metVervangenJson('POSITIEPROEF.json',
+      (j) => { j.tellers.passageLog = (j.tellers.passageLog || 0) + 2; return j; },
+      () => meet().positiePassages - voor.positiePassages)
+  },
+  aankomstUitPositie: {
+    proef: (voor) => metVervangenJson('POSITIEPROEF.json',
+      (j) => { j.tellers.aankomstUitPositie = (j.tellers.aankomstUitPositie || 0) + 2; return j; },
+      () => meet().aankomstUitPositie - voor.aankomstUitPositie)
+  },
   /* DE TAND VAN 15 SEPTEMBER 2026: connectDomeinenGemeten telt de
      ontdekkingsdomeinen die scripts/connectlus.js werkelijk heeft gezien
      (CONNECT.md par. 1). Zelfde vorm en zelfde richting als zijn drie zusters

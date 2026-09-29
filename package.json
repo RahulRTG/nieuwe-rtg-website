@@ -465,7 +465,9 @@
     "bevoegdronde": "node scripts/bevoegdronde.js",
     "bevoegdronde:vast": "node scripts/bevoegdronde.js --vastleggen",
     "mandaatproef": "node scripts/mandaatproef.js",
-    "mandaatproef:vast": "node scripts/mandaatproef.js --vastleggen"
+    "mandaatproef:vast": "node scripts/mandaatproef.js --vastleggen",
+    "positieproef": "node scripts/positieproef.js",
+    "positieproef:vast": "node scripts/positieproef.js --vastleggen"
   },
   "devDependencies": {
     "playwright": "^1.63.0"

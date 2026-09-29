@@ -665,8 +665,51 @@ was:
   of dat een voertuig of een mens is kan geen meter zien. Bij een
   eenmanschauffeur is het een persoon die als plaats aan elk lid wordt getoond.
 
-Wat hierna komt is A0c -- de opslag lezen na een doorloop -- en daarna A1, in de
-volgorde die deze tabel aanwijst.
+Wat hierna komt is A0c -- de opslag lezen na een doorloop (par. 6.6) -- en
+daarna A1, in de volgorde die deze tabel aanwijst.
+
+### 6.6 A0c staat: de opslag gelezen na een doorloop (29 september 2026)
+
+`npm run positieproef` (`scripts/positieproef.js`, `POSITIEPROEF.json`,
+`test/positieproef.test.js`). Graad `gemeten`: een wegwerpserver met een eigen
+datamap, twaalf stappen waarin een lid een positie stuurt, en daarna de hele
+opslag (`store.db`) gelezen. Elke positie die de proef stuurt draagt een eigen
+staart in de vijfde decimaal, zodat een vondst precies terug te voeren is op de
+stap die haar veroorzaakte -- en een plek uit de zaaidata nooit meetelt.
+
+| teller | stand | wat er staat |
+|---|---|---|
+| `blijvendeNavPositie` | **0** | route en zoeken laten niets achter -- par. 6.2 zei dat bij lezing, nu is het gemeten |
+| `positieNaVenster` | **1** | na `/api/live/stop` staat de laatste positie in `live` (tot de veger hem na zeven dagen haalt) |
+| `passageLog` | **2** | langs een zaak die niet het doel was: een regel bij binnen en een bij buiten, in `plaatsLog` |
+| `aankomstUitPositie` | **1** | een positie binnen 150 m van de zaak zet `arrived`, zonder dat iemand iets bevestigde |
+| `onbegrensdeRitlijn` | **niet gemeten** | een rit vraagt een vervoerder, een chauffeur en een betaling; die wereld zet de proef nog niet op. `null` met die reden, nooit 0 |
+
+De verkeersmelding staat er ook (`flitsMeldingen`), en wordt apart gemeld en
+niet geteld: dat is een melding die iemand bewust doet, met een levensduur in
+de module. Of die levensduur in het bewaarbeleid hoort, is een besluit per
+stroom (15.1).
+
+**De ratel** staat in `NORM.json` met vier tanden die alleen omlaag mogen
+(`positieNavBlijft`, `positieNaTaak`, `positiePassages`, `aankomstUitPositie`),
+elk met een ijkproef in `test/meterijk.test.js`. Een stap die de proef niet kon
+lopen telt in de norm als niet gemeten, en de ritlijn staat daarom met opzet niet
+in die rij. A1 is de reparatie waarvoor deze vier de toets zijn die naar nul moet.
+
+**De besturingsproef bewees zich bij de eerste ronde.** Die eerste ronde meldde
+`positieNaVenster` 0, terwijl par. 6.2 zei dat Onderweg de positie na het stoppen
+laat staan. De code klopte met de paragraaf en de proef niet: de stap "op de
+stoep" overschreef de merktekens met de plek van de zaak, en die plek was geen
+merkteken. De besturing eist daarom niet meer "een vondst ergens" maar een vondst
+in `live`. Een meter die de ene positie niet terugvindt waarvan we zeker weten
+dat hij er staat, is blind, en dan zijn zijn nullen niets waard.
+
+**Wat de proef niet zegt.** Hij meet wat DEZE twaalf stappen achterlaten op een
+verse server. Termijnen die pas na dagen lopen (de veger, het bewaarbeleid) zijn
+nog niet verstreken, dus "staat er nog" betekent *na de taak* en niet *voor
+altijd*. Die helft zegt de bronmeter (6.5). De proef loopt niet door een rit, een
+bezorging of een SOS, en de 35 stromen van 6.5 zijn dus maar voor een klein deel
+langs de opslag gecontroleerd.
 
 ---
 
@@ -986,7 +1029,7 @@ architectuur en de meetuitslagen laten het zien, of ze laten het niet zien.
 |---|---|---|
 | **A0a** | **`plaatsvorm`**: wat verstaat RTG vandaag onder een plaats? Per bron: geometrie, etiketten, privacy, zichtbaarheid, toestand, bewijs en wie hem leest. Met de lezer van `scripts/objectmodel.js`. Niet om een schema af te dwingen maar om de inconsistenties zichtbaar te maken | meting, geen bouwwerk |
 | **A0b** | **`positiestroom`**: elke plek waar een positie binnenkomt, wordt verwerkt, aan een sleutel of codenaam wordt gekoppeld, wordt opgeslagen (hoe lang, waarvoor) en wordt gelezen -- met per stroom een van zeven klassen (par. 6.4) | **staat** (par. 6.5) |
-| **A0c** | de vijf tellers als toets die de OPSLAG leest na een doorloop -- die zakt vandaag, en dat is de bedoeling; daarna een ratel die alleen omlaag mag (N10) | toets |
+| **A0c** | de vijf tellers als toets die de OPSLAG leest na een doorloop, met een ratel die alleen omlaag mag (N10) | **staat** (par. 6.6): 0 / 1 / 2 / 1, de ritlijn niet gemeten |
 | **A1** | N2 en N3 uitvoeren, in de volgorde die A0b aanwijst: de passages uit `plaatsLog`, aankomst niet meer uit een opgeslagen positie, en per positieopslag doel, minimum, termijn en noodzaak | reparatie, met A0c als de toets die groen wordt |
 | **G** | de geografische grootheden uit elkaar (par. 7.4), zodat een API het moeilijk maakt ze te verwarren -- en pas dan de gebreken van par. 12 | op de oorzaak, niet per gebrek |
 | **A** | een zaak krijgt een geldige plaats: de adreszoeker geeft de coördinaat mee als VOORSTEL, de zaak bevestigt, en de poort van P-03 staat aan de bron | aansluiten |

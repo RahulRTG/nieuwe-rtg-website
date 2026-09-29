@@ -274,6 +274,10 @@ const EIGENAAR = {
       'blijft staan, aan welke sleutel en met welke termijn. Geschreven met --vastleggen, gelezen door ' +
       'test/positiestroom.test.js en scripts/norm.js (positieZonderTermijn en positieNietVergeten omlaag, ' +
       'positieStromenGezien omhoog).' },
+  'POSITIEPROEF.json': { schrijver: 'scripts/positieproef.js',
+    waarom: 'de opslag-helft van de grondwetmeter uit NAVIGATIE.md par. 6.6: een echte doorloop met ' +
+      'herkenbare coordinaten en daarna de hele opslag gelezen. Bewaakt door test/positieproef.test.js en ' +
+      'scripts/norm.js (positieNavBlijft, positieNaTaak, positiePassages en aankomstUitPositie omlaag).' },
   /* DE ONDERNEMERSLUS. Hij staat hier omdat toets 4 dat zo bedoelt: het aantal
      registers zonder eigenaar hoort te dalen doordat er eigenaren bijkomen, en
      niet te stijgen doordat er registers bijkomen. Een nieuw register zonder

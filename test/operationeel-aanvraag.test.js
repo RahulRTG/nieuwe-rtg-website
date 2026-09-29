@@ -64,6 +64,9 @@ test('aanvraag gaat via twee bevoegde werkplekken terug naar Saloon, ook zonder 
     a = (await api('/api/mall/aanvraag/heropen', { id: a.id, versie: a.versie })).aanvraag;
     assert.equal(a.status, 'open'); assert.equal(a.reacties[0].ingetrokken, true);
     assert.equal((await api('/api/mall/aanvraag/kies', kies)).http, 409);
+    a = (await api('/api/mall/aanvraag/wijzig', { ...invoer, id: a.id, versie: a.versie, wat: 'Behandeling op zondag' })).aanvraag;
+    assert.equal(a.wat, 'Behandeling op zondag');
+    assert.equal((await feed()).items[0].titel, a.wat);
     a = (await api('/api/mall/aanvraag/sluit', { id: a.id, versie: a.versie })).aanvraag;
     assert.equal(a.status, 'gesloten');
     assert.equal((await fetch(srv.base + '/api/push/key').then(r => r.json())).key, null);

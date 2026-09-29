@@ -57,7 +57,7 @@ module.exports = ({ kern, sociaal }) => ({
     }))) };
   },
   voortgang(sess) {
-    const d = kern.mall.mallAanvragen.mijn(sess.key);
+    const d = kern.mall.mallAanvragen.mijn(sess.key, sess.routeBeleid);
     if (d.error) throw new Error('Aanvragen niet beschikbaar');
     return { items: d.aanvragen.map(a => ({
       id: 'voortgang:' + a.id, bron: 'voortgang', type: 'request', prive: true,

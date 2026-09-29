@@ -3,20 +3,20 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-09-29T07:58:56.236Z",
-  "commit": "d055489cb",
-  "boomVuil": false,
-  "boomAnders": 4,
+  "op": "2026-09-29T20:50:01.606Z",
+  "commit": "9a4596f46",
+  "boomVuil": true,
+  "boomAnders": 3,
   "instrument": "scripts/afgeleid.js",
   "node": "v24.18.0"
  },
  "gemeten": {
-  "artefacten": 335,
+  "artefacten": 336,
   "bron": 22,
   "afgeleid": 181,
   "fragmenten": 26,
   "momentopname": 1,
-  "onbeslist": 105,
+  "onbeslist": 106,
   "afgeleidZonderEigenaar": 2,
   "metEigenaar": 206,
   "afgeleidEigenaarHard": 179,
@@ -1881,6 +1881,18 @@
    "stempelAnders": false,
    "versheidOpdracht": "npm run meetronde -- --alleen=ketenronde",
    "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "KETENS.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
    "botsingVerklaard": null
   },
   {

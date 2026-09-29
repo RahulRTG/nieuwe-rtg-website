@@ -2,14 +2,23 @@
 const test = require('node:test'), assert = require('node:assert/strict');
 const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
 const pw = require('playwright');
-const { startServer, stop, browserOpties, geenBrowser, letOpFouten, edgeActies } = require('./helper');
+const { startServer, stopHard, browserOpties, geenBrowser, letOpFouten, edgeActies } = require('./helper');
 const bewijs = require('./operationeel-journaal');
 
 test('lid en zaak sluiten de aanvraaglus via echte schermknoppen en één Edge', async () => {
   assert.equal(geenBrowser(pw), false, 'browserbewijs vereist een geïnstalleerde browser');
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-aanvraag-ui-')); let srv, browser;
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-aanvraag-ui-')); let srv, browser, pg, pgNaam;
+  const bron = process.env.DATABASE_URL || process.env.PG_URL;
+  const opslag = { RTG_STORE: 'sqlite', DATABASE_URL: '', PG_URL: '' };
   try {
-    srv = await startServer({ env: { RTG_DATA_DIR: tmp, SMTP_URL: '', RTG_BETALEN_UIT: '1', RTG_AI_UIT: '1', RTG_PUSH_UIT: '1' } });
+    if (bron) {
+      pg = new (require('../server/pgwire').Pool)({ connectionString: bron });
+      pgNaam = 'rtg_scherm_' + require('node:crypto').randomUUID().replace(/-/g, '');
+      await pg.query('CREATE DATABASE ' + pgNaam);
+      const url = new URL(bron); url.pathname = '/' + pgNaam;
+      Object.assign(opslag, { RTG_STORE: 'postgres', DATABASE_URL: url.toString() });
+    }
+    srv = await startServer({ env: { ...opslag, RTG_DATA_DIR: tmp, SMTP_URL: '', RTG_OWNER_EMAIL: 'beleid-eigenaar@example.test', RTG_BETALEN_UIT: '1', RTG_AI_UIT: '1', RTG_PUSH_UIT: '1' } });
     const api = async (pad, body, token) => {
       const r = await fetch(srv.base + pad, { method: 'POST', headers: { 'Content-Type': 'application/json',
         Authorization: 'Bearer ' + (token || '') }, body: JSON.stringify(body || {}) });
@@ -19,10 +28,16 @@ test('lid en zaak sluiten de aanvraaglus via echte schermknoppen en één Edge',
       phone: '0612345678', geboortedatum: '1990-01-01', tier: 'rtg' });
     const roster = await api('/api/supplier/roster', { code: 'SERENA' });
     const zaak = await api('/api/supplier/login', { code: 'SERENA', staffId: roster.staff.find(x => x.role === 'manager').id, pin: '1234' });
+    const eigenaar = await api('/api/techniek/inloggen', { login: 'beleid-eigenaar@example.test', wachtwoord: 'Imran' });
+    assert.ok(eigenaar.token);
     browser = await pw.chromium.launch(browserOpties(pw, { headless: true }));
     const klant = await browser.newPage({ viewport: { width: 390, height: 844 } });
     const werk = await browser.newPage({ viewport: { width: 390, height: 844 } });
     const fouten = []; letOpFouten(klant, fouten); letOpFouten(werk, fouten);
+    const leesfouten = [];
+    for (const p of [klant, werk]) p.on('response', r => {
+      if (r.status() === 500 && r.url().startsWith(srv.base + '/api/')) leesfouten.push(r.url());
+    });
     await klant.addInitScript(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'nl'); }, lid.token);
     await werk.addInitScript(t => { localStorage.setItem('rtg_sup_token', t); localStorage.setItem('rtg_lang', 'nl'); }, zaak.token);
     async function open(p, url) {
@@ -69,6 +84,28 @@ test('lid en zaak sluiten de aanvraaglus via echte schermknoppen en één Edge',
       await resultaat.scrollIntoViewIfNeeded();
       if (process.env.SALOON_DESIGN_OUTPUT) await klant.screenshot({ path: path.join(process.env.SALOON_DESIGN_OUTPUT, 'saloon-aanvraag-' + breedte + '.png') });
     }
+    async function schakel(aan) {
+      const v = await api('/api/techniek/functie', { id: 'dom-mall', aan }, eigenaar.token);
+      assert.ok(v.verzoekId);
+      await api('/api/techniek/functie/besluit', { verzoekId: v.verzoekId, akkoord: true }, eigenaar.token);
+    }
+    const bronVoor = (await api('/api/mall/aanvragen/mijn', {}, lid.token)).aanvragen[0];
+    const saloonVoor = await api('/api/wereld/feed', { ervaring: 'saloon', bronnen: ['voortgang'], vorm: 'mijn', lens: 'all' }, lid.token);
+    assert.deepEqual(saloonVoor.items[0].bronActies, bronVoor.acties);
+    assert.ok(bronVoor.acties.some(x => x.id === 'heropen'));
+    await schakel(false);
+    const dicht = await fetch(srv.base + '/api/mall/aanvraag/heropen', { method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lid.token },
+      body: JSON.stringify({ id, versie: bronVoor.versie }) });
+    assert.equal(dicht.status, 503, 'oude schermactie wordt aan de bron geweigerd');
+    const saloonDicht = await api('/api/wereld/feed', { ervaring: 'saloon', bronnen: ['voortgang'], vorm: 'mijn', lens: 'all' }, lid.token);
+    assert.deepEqual(saloonDicht.items[0].bronActies, []);
+    assert.equal(saloonDicht.items[0].bronversie, bronVoor.versie);
+    await klant.reload(); await resultaat.waitFor(); await resultaat.focus(); await edgeActies(klant);
+    assert.equal(await klant.getByRole('button', { name: 'Opnieuw openen in Mijn Mall', exact: true }).count(), 0);
+    await schakel(true);
+    await klant.reload(); await resultaat.waitFor();
+    bewijs('mall-policy', ['AUTHORITY'], { grens: 'Eén actuele policy bij uitvoering, Saloon-projectie en Edge: echte schakelaar uit/aan, oude actie geweigerd, resultaat blijft bestaan.' });
     await klant.setViewportSize({ width: 390, height: 844 });
     await resultaat.getByRole('button', { name: 'Open aanvraag', exact: true }).click();
     await klant.waitForURL('**/apps/mijnmall.html#aanvragen');
@@ -81,6 +118,12 @@ test('lid en zaak sluiten de aanvraaglus via echte schermknoppen en één Edge',
     await eigen.getByText('Ingetrokken', { exact: false }).waitFor();
     assert.equal(await eigen.getByRole('button', { name: 'Kiezen', exact: true }).count(), 0);
     assert.deepEqual(fouten, []);
+    assert.deepEqual(leesfouten, [], 'de schermlus heeft geen verborgen API-fouten');
     bewijs('mall-ui', ['ENTRY'], { grens: 'Twee echte schermen, bronknoppen, Edge en terugkeer in Saloon op 390 en 1440 pixels.' });
-  } finally { if (browser) await browser.close(); stop(srv?.child); fs.rmSync(tmp, { recursive: true, force: true }); }
+    if (bron) bewijs('mall-ui-postgres', ['ENTRY'], { grens: 'De volledige schermlus op een eigen lege PostgreSQL-database, inclusief Edge en Saloon.' });
+  } finally {
+    if (browser) await browser.close(); await stopHard(srv?.child);
+    if (pg) { if (pgNaam) await pg.query('DROP DATABASE IF EXISTS ' + pgNaam + ' WITH (FORCE)'); await pg.end(); }
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
 });

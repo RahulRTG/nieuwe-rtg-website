@@ -15,7 +15,13 @@
 module.exports = ({ db, save, crypto, schoon, reiswijzer, landVind, findSupplier, LANDEN }) => {
   const nu = () => new Date().toISOString();
   const d = () => db.data;
-  const huizen = () => { if (!d().thuisHuizen || typeof d().thuisHuizen !== 'object') d().thuisHuizen = {}; return d().thuisHuizen; };
+  const huizen = (schrijf = false) => {
+    if (!d().thuisHuizen || typeof d().thuisHuizen !== 'object') {
+      if (!schrijf) return {};
+      d().thuisHuizen = {};
+    }
+    return d().thuisHuizen;
+  };
   const boekingen = () => { if (!Array.isArray(d().thuisBoekingen)) d().thuisBoekingen = []; return d().thuisBoekingen; };
   const reviews = () => { if (!Array.isArray(d().thuisReviews)) d().thuisReviews = []; return d().thuisReviews; };
   const wensen = () => { if (!d().thuisWens || typeof d().thuisWens !== 'object') d().thuisWens = {}; return d().thuisWens; };

@@ -45,7 +45,8 @@ module.exports = ctx => {
       budget: Math.max(0, Math.round(Number(data.budget) || 0)) || null };
   }
   async function schrijfAanvraag(a, actor, actie, werk, tekst) {
-    const voor = structuredClone(a);
+    // PostgreSQL levert een copy-on-write proxy; de bron is uitsluitend JSON-data.
+    const voor = JSON.parse(JSON.stringify(a));
     const fout = await vastleggen(() => { werk(); levensloop.noteer(a, actor, actie, tekst); });
     if (fout) { for (const k of Object.keys(a)) delete a[k]; Object.assign(a, voor); return fout; }
     return { ok: true, aanvraag: publiek(a, actor) };
@@ -68,10 +69,10 @@ module.exports = ctx => {
     if (fout) { lijst.splice(lijst.indexOf(a), 1); return fout; }
     return { ok: true, aanvraag: publiek(a, { key }) };
   }
-  function mijn(key) { return { ok: true, aanvragen: kijk().filter(a => a.key === key).map(a => publiek(a, { key })) }; }
-  async function lidActie(key, id, actie, data = {}) {
+  function mijn(key, beleid) { return { ok: true, aanvragen: kijk().filter(a => a.key === key).map(a => publiek(a, { key, beleid })) }; }
+  async function lidActie(key, id, actie, data = {}, beleid) {
     const a = vind(key, id); if (!a) return { status: 404, error: 'Aanvraag niet gevonden.' };
-    const actor = { key };
+    const actor = { key, beleid };
     // Alleen een exacte herhaling van de laatste opdracht is zonder tweede gevolg.
     if (data.versie != null && a.laatste === opdracht(key, actie, data)) return { ok: true, aanvraag: publiek(a, actor) };
     const fout = levensloop.controle(a, actor, actie, data); if (fout) return fout;
@@ -96,18 +97,18 @@ module.exports = ctx => {
     if (actie === 'kies' && r.ok) r.opmerking = reactie.zaak + ' ziet uw keuze in de werklijst. Er is nog niets geboekt of betaald.';
     return r;
   }
-  function voorZaak(s) {
+  function voorZaak(s, beleid) {
     const lijst = kijk().filter(a => (open(a) && past(a, s)) || a.reacties.some(r => r.code === s.code));
     return { ok: true, verdieping: GENRE_VERDIEPING[s.type] || null, bereik: plek.bereikVan(s),
-      aanvragen: lijst.map(a => publiek(a, { code: s.code, past: past(a, s) })), aantal: lijst.length,
+      aanvragen: lijst.map(a => publiek(a, { code: s.code, past: past(a, s), beleid })), aantal: lijst.length,
       opmerking: 'Vragen binnen uw werkgebied en aanvragen waarop uw zaak heeft gereageerd.' };
   }
-  function zaakActie(s, id, actie, data = {}) {
+  function zaakActie(s, id, actie, data = {}, beleid) {
     const a = kijk().find(x => x.id === String(id || ''));
     if (!a) return { status: 404, error: 'Aanvraag niet gevonden.' };
     if (!(open(a) && past(a, s)) && !a.reacties.some(r => r.code === s.code))
       return { status: 403, error: 'Deze aanvraag valt buiten uw vak of werkgebied.' };
-    const actor = { code: s.code, past: past(a, s) };
+    const actor = { code: s.code, past: past(a, s), beleid };
     if (data.versie != null && a.laatste === opdracht(s.code, actie, data)) return { ok: true, aanvraag: publiek(a, actor) };
     const fout = levensloop.controle(a, actor, actie, data); if (fout) return fout;
     const tekst = schoon(data.tekst, 400), prijs = Math.max(0, Math.round(Number(data.prijs) || 0)) || null;
@@ -129,9 +130,9 @@ module.exports = ctx => {
     }, tekst);
   }
   const api = { plaats, mijn, voorZaak, lidActie, zaakActie,
-    sluit: (key, id, data) => lidActie(key, id, 'sluit', data),
-    kies: (key, id, code, data = {}) => lidActie(key, id, 'kies', { ...data, code }),
-    reageer: (s, id, data) => zaakActie(s, id, 'reageer', data),
+    sluit: (key, id, data, beleid) => lidActie(key, id, 'sluit', data, beleid),
+    kies: (key, id, code, data = {}, beleid) => lidActie(key, id, 'kies', { ...data, code }, beleid),
+    reageer: (s, id, data, beleid) => zaakActie(s, id, 'reageer', data, beleid),
     onbeantwoord: () => kijk().filter(a => open(a) && !a.reacties.some(r => !r.ingetrokken)),
     MAX_OPEN_PER_LID, DAGEN_GELDIG };
   ctx.aanvragen = api; return { mallAanvragen: api };

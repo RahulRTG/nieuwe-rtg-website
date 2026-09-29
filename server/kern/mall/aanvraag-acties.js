@@ -6,6 +6,10 @@ const DAGEN_GELDIG = 30;
 const versie = a => a.versie || 1;
 const verlopen = a => a.status === 'open' && Date.now() - Date.parse(a.at) > DAGEN_GELDIG * 86400000;
 const eigenaar = a => (a.reacties || []).find(r => r.gekozen);
+function padVoor(actor, id) {
+  return actor.code ? '/api/supplier/mall/aanvraag/' + (id === 'reageer' ? 'reageer' : 'behandel')
+    : '/api/mall/aanvraag/' + id;
+}
 function acties(a, actor) {
   const ids = [];
   if (actor.key && actor.key === a.key) {
@@ -28,7 +32,8 @@ function acties(a, actor) {
   const labels = { wijzig: 'Vraag wijzigen', kies: 'Reactie kiezen', sluit: 'Aanvraag intrekken',
     heropen: 'Opnieuw openen', reageer: 'Reageren', intrekken: 'Reactie intrekken',
     aanvaard: 'In behandeling nemen', teruggeven: 'Teruggeven aan het lid', afronden: 'Antwoord afronden' };
-  return ids.map(id => ({ id, label: labels[id], versie: versie(a) }));
+  return ids.filter(id => !actor.beleid || !actor.beleid(padVoor(actor, id)))
+    .map(id => ({ id, label: labels[id], versie: versie(a) }));
 }
 function controle(a, actor, actie, data = {}) {
   if (data.versie !== versie(a))

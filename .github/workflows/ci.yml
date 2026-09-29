@@ -672,10 +672,15 @@ jobs:
         if: needs.preflight.outputs.e2e != '0'
         run: node scripts/browserinstall.js --meting=browsermeting/incremental.json
       - name: Alleen REPROVE en UNKNOWN opnieuw bewijzen
-        run: npm run evidence:run -- --plan=.evidence/plan.json
+        # Dezelfde systeemgereedschappen als de volledige toetsen. evidence:run
+        # gaat niet door npm test en krijgt diens pretest-hook dus niet mee.
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libxml2-utils redis-server
+          npm run motor:build
+          npm run evidence:run -- --plan=.evidence/plan.json
         env:
           RTG_E2E_STRICT: '1'
-          REDIS_URL: redis://localhost:6379
 
   test-volledig:
     name: Volledige tests, checks en build

@@ -8,20 +8,23 @@ const PROEVEN = {
   'betaalstop-api': 'test/operationeel-aanvraag.test.js',
   'mall-failure': 'test/mall-aanvraag-levensloop.test.js',
   'mall-ui': 'test/operationeel-aanvraag.e2e.js',
+  'mall-ui-postgres': 'test/operationeel-aanvraag.e2e.js',
   'installatie-inventaris': null,
   'mall-authority': 'test/operationeel-herstel.test.js',
   'mall-crash': 'test/operationeel-herstel.test.js',
   'mall-route-failure': 'test/operationeel-herstel.test.js',
-  'mall-policy': null, 'mall-postgres': null
+  'mall-policy': 'test/operationeel-aanvraag.e2e.js',
+  'mall-productie': 'test/operationeel-productie.test.js',
+  'mall-postgres': 'test/operationeel-aanvraag.pg.test.js'
 };
 const aanvragen = Object.fromEntries(DIMENSIES.map(d => [d, ['mall-api']]));
-aanvragen.ENTRY.push('mall-ui');
-aanvragen.AUTHORITY.push('mall-authority', 'mall-policy');
+aanvragen.ENTRY.push('mall-ui', 'mall-ui-postgres');
+aanvragen.AUTHORITY.push('mall-authority', 'mall-policy', 'mall-productie');
 aanvragen.STATE.push('mall-crash', 'mall-postgres');
-aanvragen.REVOKE.push('mall-authority');
+aanvragen.REVOKE.push('mall-authority', 'mall-productie');
 aanvragen.FAILURE = ['mall-failure', 'mall-route-failure', 'mall-postgres'];
 aanvragen.RECOVERY = ['mall-failure', 'mall-route-failure', 'mall-postgres'];
-aanvragen.REPLAY.push('mall-crash');
+aanvragen.REPLAY.push('mall-crash', 'mall-postgres');
 const KETENS = [
   { id: 'mall-aanvraag', naam: 'Saloon → aanvraag → zaak → antwoord → Saloon → wijziging',
     functies: ['wereld', 'dom-mall'], vereist: aanvragen,

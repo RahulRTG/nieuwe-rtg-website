@@ -133,15 +133,15 @@ module.exports = (kern) => {
     if (geenGast(req, res)) return;
     lijstStuur(res, await mall.mallAanvragen.plaats(req.session.key, liveCodename(req.session), req.body || {}));
   });
-  app.post('/api/mall/aanvragen/mijn', auth, (req, res) => res.json(mall.mallAanvragen.mijn(req.session.key)));
+  app.post('/api/mall/aanvragen/mijn', auth, (req, res) => res.json(mall.mallAanvragen.mijn(req.session.key, req.routeBeleid)));
   app.post('/api/mall/aanvraag/wijzig', auth, async (req, res) => {
     if (geenGast(req, res)) return;
-    lijstStuur(res, await mall.mallAanvragen.lidActie(req.session.key, req.body.id, 'wijzig', req.body));
+    lijstStuur(res, await mall.mallAanvragen.lidActie(req.session.key, req.body.id, 'wijzig', req.body, req.routeBeleid));
   });
   app.post('/api/mall/aanvraag/heropen', auth, async (req, res) => {
     if (geenGast(req, res)) return;
-    lijstStuur(res, await mall.mallAanvragen.lidActie(req.session.key, req.body.id, 'heropen', req.body));
+    lijstStuur(res, await mall.mallAanvragen.lidActie(req.session.key, req.body.id, 'heropen', req.body, req.routeBeleid));
   });
-  app.post('/api/mall/aanvraag/sluit', auth, async (req, res) => lijstStuur(res, await mall.mallAanvragen.sluit(req.session.key, req.body.id, req.body)));
-  app.post('/api/mall/aanvraag/kies', auth, async (req, res) => lijstStuur(res, await mall.mallAanvragen.kies(req.session.key, req.body.id, req.body.code, req.body)));
+  app.post('/api/mall/aanvraag/sluit', auth, async (req, res) => lijstStuur(res, await mall.mallAanvragen.sluit(req.session.key, req.body.id, req.body, req.routeBeleid)));
+  app.post('/api/mall/aanvraag/kies', auth, async (req, res) => lijstStuur(res, await mall.mallAanvragen.kies(req.session.key, req.body.id, req.body.code, req.body, req.routeBeleid)));
 };

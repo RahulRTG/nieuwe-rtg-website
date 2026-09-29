@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2171 bestanden en 15148 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2173 bestanden en 15150 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2171 |
-| losse beweringen (`test(...)`) | 15148 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 204 |
+| toetsbestanden | 2173 |
+| losse beweringen (`test(...)`) | 15150 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 206 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1842 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 147 |
 | alleen in de kop *genoemd*, nog niet gemeten | 30 |
-| niets van beide | 152 |
+| niets van beide | 154 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1894 bestanden, 14663 beweringen.
+1896 bestanden, 14665 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1148,9 +1148,11 @@ toets omvalt.
 | `onvervreemdbaar.test.js` | 7 | gezakt op `===->!==#0` | DE UNIVERSELE BODEM -- de nulmeting, en vooral wat zij niet mag beweren. scripts/onvervreemdbaar.js vraagt voor SAMENLEVING.md SAM-01 of een werkwoord van de bodem (leren, ontwikkelen, orienteren, verbinden, rust,... |
 | `oog.test.js` | 4 | gezakt op `liegpoort /api/` | RTG Eye: de camerabril van de werkvloer. De visielaag draait op het toestel; de server bewaart compacte, gecodeerde regels: nulmetingen en schouwen per voertuig, aangeleerde spullen en het knoploze uitgifteregister... |
 | `openbare-bouwstand.test.js` | 12 | gezakt op `true->false#0` | De grendel op een OPENBARE installatie die in Magnaat Test draait. WAAR HIJ VANDAAN KOMT. |
+| `operationeel-aanvraag.pg.test.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `operationeel-aanvraag.test.js` | 1 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `operationeel-herstel.test.js` | 1 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `operationeel-meter.test.js` | 3 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `operationeel-productie.test.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `oplaadgat.test.js` | 4 | gezakt op `===->!==#0` | AFGESCHREVEN MOET BIJGESCHREVEN WORDEN. WAT ER MISGING. |
 | `opslag-voorcheck.test.js` | 9 | gezakt op `!==->===#0` | De goedkope voorcheck van de SQLite-opslag (server/db/sqlite.js). Verandering opsporen kostte een JSON.stringify van ELKE collectie bij ELKE save; op de echte store (164 collecties, 1,0 MB, waarvan `sessions` 780 KB)... |
 | `opslagblokkade.test.js` | 6 | gezakt op `true->false#0` | DE OPSLAGBLOKKADE: START DEZE PRODUCTIESTAND WEL OP EEN GROOTBOEK? WAAROM DEZE TOETS ER IS TAKEN 4.7 zegt dat de json- en geheugenstand geen transactiegrootboek hebben, en dat dat "klaar" is zodra die standen in... |

@@ -54,7 +54,7 @@ module.exports = (ctx, hulp) => {
   /* De systeemlijst, aangemaakt zodra hij nodig is. Vooraf aanmaken bij elke
      registratie zou iedereen een lijst geven die de meesten nooit gebruiken. */
   function bewaardLijst(key) {
-    const lijsten = bak(key);
+    const lijsten = bak(key, true);
     let l = lijsten.find(x => x.soort === BEWAARD);
     if (!l) {
       l = { id: crypto.randomBytes(4).toString('hex'), naam: 'Bewaard', soort: BEWAARD,

@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-29T16:47:24.780Z",
-  "commit": "0ca92585d",
-  "boomVuil": false,
-  "boomAnders": 5,
+  "op": "2026-09-29T19:11:57.746Z",
+  "commit": "aa1a876fe",
+  "boomVuil": true,
+  "boomAnders": 3,
   "instrument": "scripts/auditproef-route.js",
   "node": "v22.22.2",
   "begrenzing": "geen"

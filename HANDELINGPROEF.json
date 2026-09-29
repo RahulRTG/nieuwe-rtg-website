@@ -1,12 +1,12 @@
 {
  "stempel": {
-  "op": "2026-09-29T16:48:15.891Z",
-  "commit": "0ca92585d",
+  "op": "2026-09-29T19:06:53.676Z",
+  "commit": "aa1a876fe",
   "boomVuil": false,
-  "boomAnders": 6,
+  "boomAnders": 1,
   "instrument": "scripts/handelingproef-route.js",
   "node": "v22.22.2",
-  "begrenzing": 8000
+  "begrenzing": 20000
  },
  "uitleg": "Per schrijfroute: liet een geslaagde oproep een geketende regel na in het handelingsspoor? Een route die hier NIET in staat is niet beproefd, en dat is ongemeten en geen groen. \"ongemeten\" betekent hier: de oproep gaf geen 2xx, dus er is niets gebeurd en er hoort geen regel te zijn.",
  "gemeten": {
@@ -16,7 +16,7 @@
   "gezakt": 0,
   "ongemeten": 3265,
   "ketenOk": true,
-  "begrenzing": 8000
+  "begrenzing": 20000
  },
  "perRoute": [
   {

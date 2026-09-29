@@ -11,7 +11,7 @@
       var favorites = U.label(U.el('aside', 'wd-favorites'), 'favorites'), surface = U.el('section', 'wd-focus');
       var library = U.label(U.el('section', 'wd-library'), 'library'), announcement = U.el('p', 'wd-announcement');
       announcement.setAttribute('role', 'status'); announcement.hidden = true; surface.hidden = true;
-      home.before(root); home.classList.add('wd-home'); root.appendChild(people); root.appendChild(home);
+      home.before(root); home.classList.add('wd-home'); root.appendChild(people); w.RTGDesktopSurface.move(root, home);
       root.appendChild(favorites); root.appendChild(surface); root.appendChild(announcement); root.appendChild(library);
       w.RTGDesktopSurface.guard(root, home);
       w.RTGWorldPresentation.start({root:root,home:home,people:people,favorites:favorites});

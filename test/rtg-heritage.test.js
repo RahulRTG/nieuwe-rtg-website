@@ -43,7 +43,7 @@ test('vier vaste werelden delen één volledige token- en dieptegrammatica', () 
     assert.match(PALETTE, /--rtg-world-photo:none!important;/, wereld + ' mag geen foto wereldwijd herhalen');
   }
   for (const token of ['--rtg-depth-content:', '--rtg-depth-focus:', '--rtg-depth-system:',
-    '--rtg-radius-content:4px', '--rtg-radius-editorial:4px', '--rtg-radius-system:16px', '--rtg-target:48px']) {
+    '--rtg-radius-content:4px', '--rtg-radius-editorial:4px', '--rtg-radius-system:10px', '--rtg-target:48px']) {
     assert.ok(TOKENS.includes(token), token + ' ontbreekt');
   }
 });

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T15:04:16.165Z",
-    "commit": "b818798c0",
+    "op": "2026-09-29T15:37:42.920Z",
+    "commit": "83c480d38",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/doelgroepbereik.js",
@@ -1609,7 +1609,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/neiging.js",
-        "regel": 42,
+        "regel": 45,
         "samengesteld": false,
         "rauw": ", auth, lid, (req, res) =>"
       },
@@ -1634,7 +1634,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/neiging.js",
-        "regel": 42,
+        "regel": 45,
         "samengesteld": false,
         "rauw": ", auth, lid, (req, res) =>"
       },
@@ -1659,7 +1659,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/neiging.js",
-        "regel": 42,
+        "regel": 45,
         "samengesteld": false,
         "rauw": ", auth, lid, (req, res) =>"
       },
@@ -1674,11 +1674,33 @@
       "doelgroep": "gast",
       "verklaard": false,
       "routes": 7,
-      "beproefd": 7,
-      "onbepaaldeRoutes": 7,
-      "open": null,
-      "uitslag": "onbepaald",
-      "reden": "7 van de 7 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+      "openRoute": {
+        "methode": "POST",
+        "pad": "/api/neiging/antwoord",
+        "bewakers": [
+          "auth",
+          "lid"
+        ],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/neiging.js",
+        "regel": 45,
+        "samengesteld": false,
+        "rauw": ", auth, lid, (req, res) =>"
+      },
+      "openVorm": "account",
+      "beproefd": 1,
+      "onbepaaldeRoutes": 0,
+      "open": "POST /api/neiging/antwoord",
+      "uitslag": "bereikbaar-zonder-verklaring",
+      "triageBewijs": {
+        "zelfde": 3,
+        "geweigerd": 0,
+        "onbekend": 0,
+        "vergeleken": 3
+      },
+      "triage": "gelijk-aan-verklaard",
+      "triageReden": "een verklaarde doelgroep krijgt op POST /api/neiging/antwoord exact hetzelfde antwoord; het register loopt achter en het bord kan deze functie niet per doelgroep uitzetten"
     },
     {
       "functie": "neiging",
@@ -30012,7 +30034,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/stad.js",
-        "regel": 12,
+        "regel": 19,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => stuur(res, stad.stadBewonerBeeld(cn(req))));"
       },
@@ -30036,7 +30058,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/stad.js",
-        "regel": 12,
+        "regel": 19,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => stuur(res, stad.stadBewonerBeeld(cn(req))));"
       },
@@ -30060,7 +30082,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/stad.js",
-        "regel": 12,
+        "regel": 19,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => stuur(res, stad.stadBewonerBeeld(cn(req))));"
       },
@@ -30084,7 +30106,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/stad.js",
-        "regel": 12,
+        "regel": 19,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => stuur(res, stad.stadBewonerBeeld(cn(req))));"
       },
@@ -30115,7 +30137,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/stad.js",
-        "regel": 40,
+        "regel": 47,
         "samengesteld": false,
         "rauw": ", (req, res) => stuur(res, kern.weefsel.weefselBesluiten({"
       },
@@ -30137,7 +30159,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/stad.js",
-        "regel": 40,
+        "regel": 47,
         "samengesteld": false,
         "rauw": ", (req, res) => stuur(res, kern.weefsel.weefselBesluiten({"
       },
@@ -30159,7 +30181,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/stad.js",
-        "regel": 40,
+        "regel": 47,
         "samengesteld": false,
         "rauw": ", (req, res) => stuur(res, kern.weefsel.weefselBesluiten({"
       },
@@ -30181,7 +30203,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/stad.js",
-        "regel": 40,
+        "regel": 47,
         "samengesteld": false,
         "rauw": ", (req, res) => stuur(res, kern.weefsel.weefselBesluiten({"
       },
@@ -32822,9 +32844,9 @@
     "waar": 619,
     "correct-afgesloten": 195,
     "registerleugen": 18,
-    "bereikbaar-zonder-verklaring": 122,
+    "bereikbaar-zonder-verklaring": 123,
     "geen-deur": 145,
-    "onbepaald": 689,
+    "onbepaald": 688,
     "niet-beproefd": 4,
     "sessie-ontbreekt": 0
   },
@@ -33430,6 +33452,40 @@
       },
       "triage": "gelijk-aan-verklaard",
       "triageReden": "een verklaarde doelgroep krijgt op POST /api/ondertiteling/fragment exact hetzelfde antwoord; het register loopt achter en het bord kan deze functie niet per doelgroep uitzetten"
+    },
+    {
+      "functie": "neiging",
+      "naam": "RTG Neiging (Mijn neigingen)",
+      "doelgroep": "gast",
+      "verklaard": false,
+      "routes": 7,
+      "openRoute": {
+        "methode": "POST",
+        "pad": "/api/neiging/antwoord",
+        "bewakers": [
+          "auth",
+          "lid"
+        ],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/neiging.js",
+        "regel": 45,
+        "samengesteld": false,
+        "rauw": ", auth, lid, (req, res) =>"
+      },
+      "openVorm": "account",
+      "beproefd": 1,
+      "onbepaaldeRoutes": 0,
+      "open": "POST /api/neiging/antwoord",
+      "uitslag": "bereikbaar-zonder-verklaring",
+      "triageBewijs": {
+        "zelfde": 3,
+        "geweigerd": 0,
+        "onbekend": 0,
+        "vergeleken": 3
+      },
+      "triage": "gelijk-aan-verklaard",
+      "triageReden": "een verklaarde doelgroep krijgt op POST /api/neiging/antwoord exact hetzelfde antwoord; het register loopt achter en het bord kan deze functie niet per doelgroep uitzetten"
     },
     {
       "functie": "ontmoetingen",
@@ -36901,7 +36957,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/stad.js",
-        "regel": 12,
+        "regel": 19,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => stuur(res, stad.stadBewonerBeeld(cn(req))));"
       },

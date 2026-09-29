@@ -241,9 +241,13 @@ plaats van punten.
   2026): hij blijft in het rooster staan met "afwezig", de post telt weer als
   open en toont de knop om in te plannen. Dat wordt bij het lezen afgeleid en
   niet opgeslagen, dus er wordt niets geschrapt en bij herstel is de post
-  vanzelf weer gedekt. Herplannen doet een mens. Wat het NIET doet: de
-  festival-, OV-, taxi- en schoolplanners lezen verzuim nog niet, en er gaat
-  geen melding naar de leidinggevende -- hij ziet het in het rooster.
+  vanzelf weer gedekt. Herplannen doet een mens. De zaak krijgt er op dat
+  moment ook een BERICHT van (`kern/beveiliging/rooster/vervallen.js`, 29
+  september 2026), via een luisteraar op het verzuimregister
+  (`verzuim.naMelding` in `kern/payroll/index.js`): wie afwezig is en welke
+  posten weer open liggen, nooit waarom, een keer per verzuimregel, en een open
+  ziekmelding kijkt twee weken vooruit. `test/dienst-vervalt.test.js`. Wat het
+  NIET doet: de festival-, OV-, taxi- en schoolplanners lezen verzuim nog niet.
 - **Een MENS die toch een afwezige medewerker inplant, ziet het erbij** (28
   september 2026, op dezelfde regel). Een losse dienst bij de beveiliging gaat
   door en draagt `verzuimWaarschuwing` (aangepast werk is het besluit van een

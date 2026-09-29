@@ -14784,6 +14784,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "dienst-vervalt.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/payroll/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     }
   }
 }

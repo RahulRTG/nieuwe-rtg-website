@@ -1792,8 +1792,8 @@ const {
   bevAanvraag, bevAanvraagLijst, bevBeslisAanvraag,
   bevMijnDiensten, bevInklok, bevUitklok, bevRondeStart, bevRondeCheckpoint, bevRondeKlaar,
   bevMeldIncident, bevBeslisIncident, bevSos, bevCommand,
-  // de sleuf waar opzet/plaatsbronnen.js de plaatslaag in hangt (late binding)
-  bevKoppelPlaats
+  // late sleuven: plaats (opzet/plaatsbronnen.js), verzuim (kernlaag2)
+  bevKoppelPlaats, bevDienstVervalt
 } = maakBeveiliging({ db, save, crypto, accounts, findSupplier, notify, notifySupplier, sseToSupplier, sseToOffice, logActivity, haversine, afwezigOp });
 
 /* De idempotentie-administratie van de betaal-naad (server/betaal.js) durable
@@ -2396,11 +2396,11 @@ const hulp = {
   magAi: (req) => aiPoort.magAi(req)
 };
 
-/* De samenstelling van de kern staat in ./opzet/kernlaag1..7.js --
-   aaneengesloten stukken in precies deze volgorde. Zie de kop van kernlaag1.js. */
+/* De kern: ./opzet/kernlaag1..7.js, in deze volgorde (kop van kernlaag1.js). */
 require('./opzet/kernlaag1')(kern, hulp);
 require('./opzet/kernlaag1b')(kern, hulp);
 require('./opzet/kernlaag2')(kern, hulp);
+kern.payrollOS.verzuim.naMelding(bevDienstVervalt);
 require('./opzet/kernlaag2b')(kern, hulp);
 require('./opzet/kernlaag3')(kern, hulp);
 require('./opzet/kernlaag3c')(kern, hulp);  // de commerciele kern; NA pay, want de ronde boekt

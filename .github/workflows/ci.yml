@@ -671,11 +671,19 @@ jobs:
       - name: Playwright + Chromium uit de lockfile
         if: needs.preflight.outputs.e2e != '0'
         run: node scripts/browserinstall.js --meting=browsermeting/incremental.json
+      # Dezelfde omgeving als de toetsscherven, en niet meer: libxml2 omdat
+      # test/samlc14n.test.js zichzelf niet overslaat zonder xmllint, en GEEN
+      # REDIS_URL, omdat de scherven de unitsuite ook zonder draaien. Met
+      # REDIS_URL eist server/accounts/intreklijst.js een gekoppelde
+      # intrekkingsleiding (fail-closed), en die koppelt een unittoets nooit --
+      # dan zakken token- en pintoetsen die los groen zijn. De Redis-proeven
+      # lopen via scripts/pgtoetsen.js, met hun eigen omgeving.
+      - name: libxml2 voor de onafhankelijke protocolproeven
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq libxml2-utils
       - name: Alleen REPROVE en UNKNOWN opnieuw bewijzen
         run: npm run evidence:run -- --plan=.evidence/plan.json
         env:
           RTG_E2E_STRICT: '1'
-          REDIS_URL: redis://localhost:6379
 
   test-volledig:
     name: Volledige tests, checks en build

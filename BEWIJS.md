@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2168 bestanden en 15146 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2169 bestanden en 15148 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2168 |
-| losse beweringen (`test(...)`) | 15146 |
+| toetsbestanden | 2169 |
+| losse beweringen (`test(...)`) | 15148 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 199 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1840 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1841 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 147 |
 | alleen in de kop *genoemd*, nog niet gemeten | 30 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1890 bestanden, 14660 beweringen.
+1891 bestanden, 14662 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -366,6 +366,7 @@ toets omvalt.
 | `deltapoort.test.js` | 23 | gezakt op `===->!==#0` | DE IJKING VAN DE DELTAPOORT -- regel 2 van de lat, op de poort zelf. scripts/deltapoort.js houdt nieuw werk aan de norm. |
 | `democratie-aanval.test.js` | 3 | gezakt op `liegpoort /api/` | DEMOCRATIEOS FASE C -- de aanvalsfase (POLITIEK.md par. 18.2). |
 | `democratie-afhankelijk.test.js` | 6 | gezakt op `===->!==#0` | UNDECLARED_RTG_DEPENDENCY = 0 -- proef P3 wordt meetbaar (POLITIEK.md par. 1.1). |
+| `democratie-doe.test.js` | 10 | gezakt op `liegpoort /api/` | HET DOENETWERK -- een actie die bij de burger begint (POLITIEK.md par. 6, release-trein stap 4). |
 | `democratie-grondwet.test.js` | 4 | gezakt op `&&->||#0` | DEMOCRATIEOS FASE C4 -- de omwegen om de grondwet heen (POLITIEK.md par. 18.2). |
 | `democratie-verlies.test.js` | 2 | gezakt op `liegpoort /api/` | NIEMAND KWIJT, ONDER STORINGEN -- de verliesproef van fase B (POLITIEK.md par. 18.1). |
 | `democratie.test.js` | 12 | gezakt op `liegpoort /api/` | DEMOCRATIEOS FASE B -- de minimale burgerlus (POLITIEK.md par. 18.1). |
@@ -827,9 +828,9 @@ toets omvalt.
 | `ledenladder.test.js` | 3 | gezakt op `liegpoort /api/` | DE LEDENLADDER -- van RTG Pass naar Lifestyle, en wat daar dan achter zit. WAAROM DIT DE BELANGRIJKSTE OPENSTAANDE WAS Dit huis is een membership-platform. |
 | `ledenregister.test.js` | 7 | gezakt op `===->!==#0` | Ledenregister (kern/ledenregister.js): leden op codenaam, gesplitst per stad/land/alfabet/geslacht en pas, met de omzet per pas en de 30%- foundationsplit (20% lokaal, 10% RTF). Draai: npm test |
 | `leerfabric.test.js` | 15 | gezakt op `&&->||#0` | De Learning Fabric: de structuur waar elk vak op draait. Een leerdoel is hier niet langer een naam met een zin uitleg, maar een knoop in een graaf: hij weet wat eronder ligt (vereist), hij kan zichzelf op meer dan... |
-| `leerhuis-grenzen.test.js` | 26 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `leerhuis-grenzen.test.js` | 21 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `leerhuis-lus.test.js` | 6 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `leerhuis-routes.test.js` | 12 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `leerhuis-routes.test.js` | 9 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `leerhuis-rtfbron.test.js` | 6 | gezakt op `liegpoort /api/` | HET LEERHUIS VAN EEN RTF-STAD: de relatie komt uit de zetels en uit een koppeling die de vrijwilliger ZELF legt (ACADEMY.md besluit B2, stap B2b). Tegen een echte server, want de vraag loopt over twee domeinen: het... |
 | `leerstof.test.js` | 3 | gezakt op `liegpoort /api/` | RTG School golf 2: de leerstof-motor. Elke groep heeft echte leerdoelen met een les, de oefensessie is server-authoritatief (antwoorden staan nooit in de vraag), een behaald doel komt in het leerpaspoort, en er zijn... |
 | `leerstofbreed.test.js` | 3 | gezakt op `+->-#0` | RTG School, de brede leerlijn: van twee vakken naar een echt curriculum. Basisschool: rekenen, taal, aardrijkskunde, geschiedenis, natuur, verkeer en Engels. |
@@ -2044,13 +2045,12 @@ toets omvalt.
 | `klimaatfonds-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | HET KLIMAATFONDS (/apps/foundation/klimaatfonds.html) IN EEN ECHTE BROWSER. Het Klimaatfonds is een VENSTER op het Living Lab en geen tweede lab: de bewonersdeuren van kern/livinglab (thema aandragen, stemmen,... |
 | `kosten.e2e.js` | 2 | genoemd | HET KOSTENBORD IN EEN ECHTE BROWSER. test/kosten.test.js bewijst wat de SERVER doet. |
 | `kostenklant.e2e.js` | 2 | genoemd | DE KLANTKANT VAN DE KOSTPRIJSLAAG, IN EEN ECHTE BROWSER. test/kosten.e2e.js beproeft het BORD van de boardroom; dit is de andere kant: wat een LID (de stand Kosten in RTG Geld) en een ZAAK (/apps/zaakkosten.html) te... |
+| `kwesties-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | DEMOCRATIEOS V1 IN EEN ECHTE BROWSER: /apps/foundation/kwesties.html (de burger) en /apps/foundation/kwestiekantoor.html (het kantoor op naam). test/democratie.test.js en test/democratie-aanval.test.js bewijzen de... |
 | `kwijtschelding-scherm.e2e.js` | 1 | -- | Schermtoets: de kwijtschelding in het Belastingkantoor gaat door TWEE inspecteurs, en dat moet je op het scherm ook ZIEN. De regel zelf staat vast in test/belastingkantoor.test.js (de server weigert dezelfde ogen). |
 | `laatstedrie.e2e.js` | 1 | -- | De laatste drie schermen zonder eigen toets: RTG Camera, RTG Eye en het tweede scherm. WAAROM DEZE DRIE OVERBLEVEN, en waarom dat geen toeval is: twee ervan vragen de CAMERA (`getUserMedia`) en de derde is een tweede... |
 | `ledenschermen.e2e.js` | 3 | gezakt op `liegpoort /api/` | DE LEDENSCHERMEN: WAT HET HUIS OVER ZICHZELF ZEGT. Achttien schermen uit de lijst van TAKEN 4.9, en ze hebben iets gemeen dat de andere groepen niet hebben: ze staan het dichtst bij het lid, en juist daar doet dit... |
 | `leegtemeting.e2e.js` | 1 | genoemd | DE LEEGTE-METING, IN EEN ECHTE DOM. scripts/mobielkeuring.js beweert iets simpels: "dit scherm past, rendert, en toont een mens toch niets". |
-| `leerhuis-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | MIJN LEERHUIS IN EEN ECHTE BROWSER (ACADEMY.md, fase B-UI). test/leerhuis-routes.test.js bewijst de deur, niet het scherm. |
-| `leerhuis-trainer.e2e.js` | 1 | -- | LEERHUIS: DE TRAINER AAN HET WERK, IN EEN ECHTE BROWSER (ACADEMY.md, fase B-UI). test/leerhuis-grenzen.test.js toets 23 bewijst dat de trainercockpit de vaardigheden van het leerpad noemt en alleen OF er een... |
-| `leerhuis-werk.e2e.js` | 1 | gezakt op `liegpoort /api/` | LEERHUIS: AAN HET WERK, IN EEN ECHTE BROWSER (ACADEMY.md, fase B-UI). test/leerhuis-routes.test.js toets 11 bewijst dat het werk over de deur komt; deze toets bewijst dat het scherm er iets mee DOET, met de weigering... |
+| `leerhuis-scherm.e2e.js` | 1 | -- | MIJN LEERHUIS IN EEN ECHTE BROWSER (ACADEMY.md, fase B-UI). test/leerhuis-routes.test.js bewijst de deur, niet het scherm. |
 | `leerpaspoort-scherm.e2e.js` | 5 | gezakt op `liegpoort /api/` | HET LEERPASPOORT IN EEN ECHTE BROWSER: de leerlijn van een leerlingprofiel. test/rtfleerlingtoegang.test.js bewijst dat /api/rtf/leerling/* de ladder op leeftijd snijdt. |
 | `leven.e2e.js` | 1 | gezakt op `liegpoort /api/` | Schermtoets voor het werkblad RTG Leven. Leven opent andere apps in panelen; een avond samenstellen is van avond.html (SCHERMEIGENAAR.json), dus hier wordt bewaakt dat Leven die eigenaar opent en haar niet opnieuw bouwt. |
 | `levenspas.e2e.js` | 1 | genoemd | De levenspas aan de GEZINSKANT (/apps/foundation/mijnbanden.html), in een echte browser. Twee dingen bewaakt deze toets, en ze bestaan allebei alleen op dit niveau. |
@@ -2146,6 +2146,7 @@ toets omvalt.
 | `saloon-edge.e2e.js` | 1 | gezakt op `liegpoort /api/` | De goedgekeurde mobiele Saloon gebruikt één echte Edge, ook in de lezer. Publiceer bij de bron: geen onderschepte succesantwoorden of nepkaarten. |
 | `saloon-redactie.e2e.js` | 1 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `saloon.e2e.js` | 1 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `samendoen-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | HET DOENETWERK IN EEN ECHTE BROWSER: de kaart "Samen doen" op /apps/foundation/kwesties.html, en wat het kantoor ervan ziet. test/democratie-doe.test.js bewijst de regels op de routes. |
 | `scan-tafel.e2e.js` | 1 | -- | Scherm-test: de tafel-QR-stroom in de leden-app. We loggen als lid in (token in localStorage), openen de app, klikken op de scan-knop en voeren met de hand een tafel-QR-payload in (headless heeft geen camera). |
 | `scanner.e2e.js` | 2 | -- | Scherm-test voor RTG Scanner: foto's kiezen (de weg die ook zonder camera werkt), de paginastrook, en bewaren als PDF die als gewoon bestand in de Bestanden-kluis belandt (map Scans). De camera zelf valt buiten... |
 | `schuif.e2e.js` | 1 | -- | GEEN SCHERM SCHUIFT ZIJWAARTS. Waarom deze toets bestaat. |

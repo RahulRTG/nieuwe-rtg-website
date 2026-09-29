@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T15:18:00.632Z",
-    "commit": "9f718774",
+    "op": "2026-09-28T22:50:50.182Z",
+    "commit": "a5417a6a",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/edgedekking.js",
@@ -5242,6 +5242,153 @@
         "presence": "geen",
         "voortzetting": "geen",
         "hoofdactie": "geen",
+        "trust": "geen"
+      },
+      "acties": {
+        "RTGAdaptief": {
+          "totaal": 0,
+          "perStaat": {
+            "AFWEZIG": 0,
+            "GEBLOKKEERD": 0,
+            "BESCHIKBAAR": 0,
+            "LOPEND": 0
+          },
+          "zonderStaat": 0,
+          "gezagBekend": 0,
+          "geblokkeerdZonderWaarom": 0,
+          "gevolg": {
+            "bekend": 0,
+            "onvolledig": 0,
+            "onbekend": 0,
+            "zonder": 0
+          },
+          "herstelBekend": 0,
+          "metGewicht": 0,
+          "metGebreken": 0
+        },
+        "edge-compat": {
+          "totaal": 0,
+          "perStaat": {
+            "AFWEZIG": 0,
+            "GEBLOKKEERD": 0,
+            "BESCHIKBAAR": 0,
+            "LOPEND": 0
+          },
+          "zonderStaat": 0,
+          "gezagBekend": 0,
+          "geblokkeerdZonderWaarom": 0,
+          "gevolg": {
+            "bekend": 0,
+            "onvolledig": 0,
+            "onbekend": 0,
+            "zonder": 0
+          },
+          "herstelBekend": 0,
+          "metGewicht": 0,
+          "metGebreken": 0
+        }
+      },
+      "gebreken": [],
+      "stabiel": true
+    },
+    "/apps/foundation/kwestiekantoor.html": {
+      "status": "gemeten",
+      "http": 200,
+      "velden": {
+        "identiteit": "nee",
+        "wereld": "ja",
+        "context": "ja",
+        "object": "nee",
+        "activiteit": "nee",
+        "presence": "nee",
+        "voortzetting": "nee",
+        "hoofdactie": "nvt",
+        "trust": "nee"
+      },
+      "herkomst": {
+        "identiteit": "geen",
+        "wereld": "route",
+        "context": "edge-casco",
+        "object": "geen",
+        "activiteit": "geen",
+        "presence": "geen",
+        "voortzetting": "geen",
+        "hoofdactie": "geen",
+        "trust": "geen"
+      },
+      "acties": {
+        "RTGAdaptief": {
+          "totaal": 0,
+          "perStaat": {
+            "AFWEZIG": 0,
+            "GEBLOKKEERD": 0,
+            "BESCHIKBAAR": 0,
+            "LOPEND": 0
+          },
+          "zonderStaat": 0,
+          "gezagBekend": 0,
+          "geblokkeerdZonderWaarom": 0,
+          "gevolg": {
+            "bekend": 0,
+            "onvolledig": 0,
+            "onbekend": 0,
+            "zonder": 0
+          },
+          "herstelBekend": 0,
+          "metGewicht": 0,
+          "metGebreken": 0
+        },
+        "edge-compat": {
+          "totaal": 0,
+          "perStaat": {
+            "AFWEZIG": 0,
+            "GEBLOKKEERD": 0,
+            "BESCHIKBAAR": 0,
+            "LOPEND": 0
+          },
+          "zonderStaat": 0,
+          "gezagBekend": 0,
+          "geblokkeerdZonderWaarom": 0,
+          "gevolg": {
+            "bekend": 0,
+            "onvolledig": 0,
+            "onbekend": 0,
+            "zonder": 0
+          },
+          "herstelBekend": 0,
+          "metGewicht": 0,
+          "metGebreken": 0
+        }
+      },
+      "gebreken": [],
+      "stabiel": true,
+      "redenen": {
+        "hoofdactie": "Een kantoorscherm op naam: elke kwestie heeft zijn eigen handelingen, en zonder kantoorsessie is er niets te doen."
+      }
+    },
+    "/apps/foundation/kwesties.html": {
+      "status": "gemeten",
+      "http": 200,
+      "velden": {
+        "identiteit": "nee",
+        "wereld": "ja",
+        "context": "ja",
+        "object": "nee",
+        "activiteit": "nee",
+        "presence": "nee",
+        "voortzetting": "nee",
+        "hoofdactie": "ja",
+        "trust": "nee"
+      },
+      "herkomst": {
+        "identiteit": "geen",
+        "wereld": "route",
+        "context": "scherm",
+        "object": "geen",
+        "activiteit": "geen",
+        "presence": "geen",
+        "voortzetting": "geen",
+        "hoofdactie": "scherm:data-hoofdactie",
         "trust": "geen"
       },
       "acties": {
@@ -12170,81 +12317,6 @@
       },
       "gebreken": [],
       "stabiel": true
-    },
-    "/apps/leerhuis-werk.html": {
-      "status": "gemeten",
-      "http": 200,
-      "velden": {
-        "identiteit": "nee",
-        "wereld": "ja",
-        "context": "ja",
-        "object": "nee",
-        "activiteit": "nee",
-        "presence": "nee",
-        "voortzetting": "nee",
-        "hoofdactie": "nvt",
-        "trust": "nee"
-      },
-      "herkomst": {
-        "identiteit": "geen",
-        "wereld": "route",
-        "context": "edge-casco",
-        "object": "geen",
-        "activiteit": "geen",
-        "presence": "geen",
-        "voortzetting": "geen",
-        "hoofdactie": "geen",
-        "trust": "geen"
-      },
-      "acties": {
-        "RTGAdaptief": {
-          "totaal": 0,
-          "perStaat": {
-            "AFWEZIG": 0,
-            "GEBLOKKEERD": 0,
-            "BESCHIKBAAR": 0,
-            "LOPEND": 0
-          },
-          "zonderStaat": 0,
-          "gezagBekend": 0,
-          "geblokkeerdZonderWaarom": 0,
-          "gevolg": {
-            "bekend": 0,
-            "onvolledig": 0,
-            "onbekend": 0,
-            "zonder": 0
-          },
-          "herstelBekend": 0,
-          "metGewicht": 0,
-          "metGebreken": 0
-        },
-        "edge-compat": {
-          "totaal": 0,
-          "perStaat": {
-            "AFWEZIG": 0,
-            "GEBLOKKEERD": 0,
-            "BESCHIKBAAR": 0,
-            "LOPEND": 0
-          },
-          "zonderStaat": 0,
-          "gezagBekend": 0,
-          "geblokkeerdZonderWaarom": 0,
-          "gevolg": {
-            "bekend": 0,
-            "onvolledig": 0,
-            "onbekend": 0,
-            "zonder": 0
-          },
-          "herstelBekend": 0,
-          "metGewicht": 0,
-          "metGebreken": 0
-        }
-      },
-      "gebreken": [],
-      "stabiel": true,
-      "redenen": {
-        "hoofdactie": "een werkscherm met een handeling per kaart: elke leerling, beoordeling en elk concept heeft zijn eigen knop, er is geen handeling voor het hele scherm"
-      }
     },
     "/apps/leerhuis.html": {
       "status": "gemeten",
@@ -20953,10 +21025,10 @@
     }
   },
   "telling": {
-    "schermen": 312,
-    "metBlikveld": 282,
+    "schermen": 313,
+    "metBlikveld": 283,
     "perStatus": {
-      "gemeten": 282,
+      "gemeten": 283,
       "geen-blikveld": 1,
       "omgeleid": 29,
       "fout": 0
@@ -20971,13 +21043,13 @@
       "identiteit": {
         "ja": 0,
         "zelf": 0,
-        "nee": 282,
+        "nee": 283,
         "nvt": 0,
         "na-openen": 0,
         "zonderMeting": 30
       },
       "wereld": {
-        "ja": 281,
+        "ja": 282,
         "zelf": 0,
         "nee": 1,
         "nvt": 0,
@@ -20985,8 +21057,8 @@
         "zonderMeting": 30
       },
       "context": {
-        "ja": 282,
-        "zelf": 12,
+        "ja": 283,
+        "zelf": 13,
         "nee": 0,
         "nvt": 0,
         "na-openen": 0,
@@ -20995,7 +21067,7 @@
       "object": {
         "ja": 0,
         "zelf": 0,
-        "nee": 280,
+        "nee": 281,
         "nvt": 0,
         "na-openen": 2,
         "zonderMeting": 30
@@ -21003,7 +21075,7 @@
       "activiteit": {
         "ja": 0,
         "zelf": 0,
-        "nee": 282,
+        "nee": 283,
         "nvt": 0,
         "na-openen": 0,
         "zonderMeting": 30
@@ -21011,7 +21083,7 @@
       "presence": {
         "ja": 0,
         "zelf": 0,
-        "nee": 282,
+        "nee": 283,
         "nvt": 0,
         "na-openen": 0,
         "zonderMeting": 30
@@ -21019,14 +21091,14 @@
       "voortzetting": {
         "ja": 0,
         "zelf": 0,
-        "nee": 282,
+        "nee": 283,
         "nvt": 0,
         "na-openen": 0,
         "zonderMeting": 30
       },
       "hoofdactie": {
-        "ja": 59,
-        "zelf": 52,
+        "ja": 60,
+        "zelf": 53,
         "nee": 221,
         "nvt": 2,
         "na-openen": 0,
@@ -21035,7 +21107,7 @@
       "trust": {
         "ja": 0,
         "zelf": 0,
-        "nee": 282,
+        "nee": 283,
         "nvt": 0,
         "na-openen": 0,
         "zonderMeting": 30

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T20:15:49.095Z",
-    "commit": "db8153cc0",
+    "op": "2026-09-29T20:20:18.274Z",
+    "commit": "8478db46a",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bewijsmatrix.js",
@@ -98,11 +98,6 @@
       "ongemeten": 857,
       "gezakt": 0
     }
-  },
-  "verslechteringToegestaan": {
-    "reden": "Verse meetronde op 29 september 2026 (alle proefregisters op een schone boom, OUTPUTPROEF uit een volledige suite). Bewezen 26941 -> 28249. Wat achteruit ging is meting en geen regressie: twee IDEMPOTENCY-cellen (rtmail/imap/sleutel lid en zaak) staan op nvt door een besluit van de eigenaar in IDEMBESLUIT.json (code-maker); vijf routes (office/architect/bouwstaat, concept, kritiek, office/werkplaats/introk, supplier/rooster/beslis) gaven in de idemproef 404 bij de eerste oproep en zijn daardoor ongemeten; en AUTH kreeg twee ongemeten cellen bij, waarvan doos/buurmelding onbeslist is omdat een leeg verzoek 404 geeft. ACL en PRIVACY stegen van 3894 naar 4279 en INPUT van 3471 naar 3783 nadat de rol- en invoerproef een begrenzing kregen die de hele router dekt.",
-    "cellenVoor": 58003,
-    "cellenNa": 58003
   },
   "uitleg": "Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN."
 }

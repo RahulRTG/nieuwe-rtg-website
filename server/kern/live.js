@@ -115,4 +115,29 @@ function maakLive({ db, bus, nextSseId, PERSONAS, sseToSupplier, sseToOffice, fi
   return { sseToCustomer, liveCodename, connectedSupplierCodes, pushLive, liveStateFor, guestsFor };
 }
 
-module.exports = { maakLive };
+/* De bevestigde aankomst (NAVIGATIE.md N3 en N13) heeft alleen `db` nodig en
+   staat daarom los van maakLive: die wordt in server/opzet/diensten.js
+   opgebouwd, en elke naam die daar bijkomt moet door server/server.js, dat al
+   over de omvanggrens staat. server/opzet/kernlaag5.js zet hem in de kern. */
+function maakAankomst({ db }) {
+  /* AANKOMST WORDT BEVESTIGD, NIET GEMETEN (NAVIGATIE.md N3 en N13). Hier zette
+     /api/live/update `arrived` zodra een opgeslagen positie binnen 150 m van de
+     bestemming lag, en daarop ging een deur open. Nu is een aankomst een
+     bevestiging van het LID of van de ZAAK -- wie het eerst bevestigt is genoeg,
+     en er is geen positie voor nodig (een lid dat zijn locatie niet deelt, komt
+     evengoed aan). Deze functie zet alleen de stand; wie bevestigt, meldt het
+     zelf aan de ander, want de woorden verschillen per kant. */
+  function bevestigAankomst(key, door) {
+    const L = db.data.live[key];
+    if (!L || !L.active) return { status: 409, error: 'Er is geen lopende reis.' };
+    if (!L.destCode) return { status: 409, error: 'Deze reis heeft geen bestemming om bij aan te komen.' };
+    if (L.arrived) return { status: 200, al: true, L };
+    L.arrived = true;
+    L.aankomst = { door, at: new Date().toISOString() };
+    return { status: 200, al: false, L };
+  }
+
+  return { bevestigAankomst };
+}
+
+module.exports = { maakLive, maakAankomst };

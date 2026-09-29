@@ -13,10 +13,7 @@
 module.exports = function bouwKernAanTwee(kern, grens) {
   const { db, save, crypto, schoon, sseToCustomer, accounts, anthropic,
     beveilig, logboek, fs, path, DATA_DIR, rtf, gidsHaal, keyVanCodenaam, leeftijdVan, leeftijdInstr } = kern;
-  /* De collectietransactie uit de opslag zelf: `kern` draagt hem niet, dus wie
-     hem daaruit destructureerde kreeg undefined en viel stil terug op een
-     niet-atomair pad -- ook in productie (gemeten 29 september 2026;
-     test/aanbouw-collectie.test.js). Hij gaat ook niet in `kern`. */
+  // uit de opslag: `kern` draagt hem niet (test/aanbouw-collectie.test.js)
   const { bewerkCollectie } = require('../db');
   /* RTG iD (kern/rtgid.js): de DigiD-vervanger op de eigen identiteitskluis;
      koppelcode-inlog met bevestiging in de app, selectieve gegevensdeling,

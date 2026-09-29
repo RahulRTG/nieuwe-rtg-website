@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T16:11:43.008Z",
-    "commit": "b5721d54",
+    "op": "2026-09-29T16:44:27.363Z",
+    "commit": "6ae85c8f",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -24,6 +24,16 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "aanbouw-collectie.test.js": {
+      "soort": "puur",
+      "staat": "overleefd",
+      "modules": [
+        "server/db/index.js"
+      ],
+      "geprobeerd": 5,
+      "posities": 1000,
+      "dekking": "dun"
     },
     "aankomst-chauffeur-voorzijde.test.js": {
       "soort": "puur",
@@ -3830,6 +3840,21 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "gezinssessie.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
+    },
+    "gezinstoken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/foundation/gezinstoken.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "gezinsuitnodiging-verval.test.js": {
       "soort": "server",

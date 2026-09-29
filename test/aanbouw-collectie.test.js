@@ -12,6 +12,9 @@ const assert = require('node:assert/strict');
 const path = require('node:path');
 
 const KERN = path.join(__dirname, '..', 'server', 'kern');
+// het onderwerp: de twee aanbouwen (de opslag zelf is hier het ijkpunt, niet het onderwerp)
+const AANBOUW = [require('../server/opzet/aanbouw'), require('../server/opzet/aanbouw2')];
+const OPSLAG = path.join(__dirname, '..', 'server', 'db');
 // een los onderdeel dat alles slikt: de aanbouw monteert veel meer dan deze toets nodig heeft
 const stub = () => new Proxy(function () {}, {
   get: (t, k) => k === 'data' ? {} : k === Symbol.toPrimitive ? () => '' : stub(),
@@ -19,7 +22,7 @@ const stub = () => new Proxy(function () {}, {
 });
 
 test('elke collectiemodule uit de aanbouw krijgt de collectietransactie van de opslag', () => {
-  const echt = require('../server/db').bewerkCollectie;
+  const echt = require(OPSLAG).bewerkCollectie;
   assert.equal(typeof echt, 'function');
   const gezien = {};
   const vang = (mod, vorm) => {
@@ -34,8 +37,8 @@ test('elke collectiemodule uit de aanbouw krijgt de collectietransactie van de o
   try {
     const kern = {};
     const k = new Proxy(kern, { get: (t, p) => p in t ? t[p] : stub(), set: (t, p, v) => { t[p] = v; return true; } });
-    for (const f of ['aanbouw', 'aanbouw2']) {
-      try { require('../server/opzet/' + f)(k, () => stub()); } catch { /* de montage verderop is niet het onderwerp */ }
+    for (const bouw of AANBOUW) {
+      try { bouw(k, () => stub()); } catch { /* de montage verderop is niet het onderwerp */ }
     }
   } finally { herstel.forEach(h => h()); }
   for (const mod of ['samen', 'samenrtf', 'rtgai', 'rtgid', 'vracht'])

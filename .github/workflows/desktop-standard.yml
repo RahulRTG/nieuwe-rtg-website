@@ -34,7 +34,7 @@ jobs:
       - if: matrix.width == 1440
         run: node --test --test-concurrency=1 test/warm-presentation.e2e.js test/world-desktop-identity.e2e.js
       - if: matrix.width == 390
-        run: node --test test/mobile-content.e2e.js
+        run: node --test --test-concurrency=1 test/mobile-content.e2e.js test/pass-startup.e2e.js
         env:
           RTG_TEST_WEBKIT: '1'
       - name: Bewaar rapport en schermafbeeldingen

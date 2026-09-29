@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-29T07:58:55.571Z",
-    "commit": "d055489cb",
-    "boomVuil": false,
-    "boomAnders": 3,
+    "op": "2026-09-29T12:50:53.184Z",
+    "commit": "b8cf5eeb4",
+    "boomVuil": true,
+    "boomAnders": 9,
     "instrument": "scripts/edgekaart.js",
     "node": "v24.18.0"
   },
@@ -4077,6 +4077,6 @@
     "rollen": 213,
     "dubbeleEigenaars": 12,
     "dodeKanalen": 0,
-    "levendeKanalen": 14
+    "levendeKanalen": 15
   }
 }

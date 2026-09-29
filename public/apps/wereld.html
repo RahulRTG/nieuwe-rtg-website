@@ -368,7 +368,7 @@
       return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
     return d.getDate() + '/' + (d.getMonth() + 1);
   };
-  var BRONNAAM = { salon: 'De Salon', pulse: 'Pulse', zakelijk: 'Zakelijk',
+  var BRONNAAM = { voortgang: 'Mijn aanvragen', salon: 'De Salon', pulse: 'Pulse', zakelijk: 'Zakelijk',
     genootschap: 'Genootschap', verhalen: 'Verhaal', nieuws: 'Journalistiek', makers: 'Makers', plekken: 'Zaken en plekken', persoonlijk: 'Mijn reizen' };
 
   function tekenPassport(d) {
@@ -468,7 +468,7 @@
     }
   }
 
-  var TYPENAAM = { moment: 'Moment', story: 'Story', place: 'Plek', plan: 'Plan', event: 'Event',
+  var TYPENAAM = { request: 'Aanvraag', moment: 'Moment', story: 'Story', place: 'Plek', plan: 'Plan', event: 'Event',
     travel: 'Reis', food: 'Aan tafel', activity: 'Activiteit', question: 'Vraag', offer: 'Aanbod',
     article: 'Artikel', work: 'Werk', live: 'Live', business: 'Business', community: 'Community' };
   function tekenKaart(n, i) {

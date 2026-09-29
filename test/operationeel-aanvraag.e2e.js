@@ -69,6 +69,10 @@ test('lid en zaak sluiten de aanvraaglus via echte schermknoppen en één Edge',
       await resultaat.scrollIntoViewIfNeeded();
       if (process.env.SALOON_DESIGN_OUTPUT) await klant.screenshot({ path: path.join(process.env.SALOON_DESIGN_OUTPUT, 'saloon-aanvraag-' + breedte + '.png') });
     }
+    await klant.setViewportSize({ width: 390, height: 844 });
+    await resultaat.getByRole('button', { name: 'Open aanvraag', exact: true }).click();
+    await klant.waitForURL('**/apps/mijnmall.html#aanvragen');
+    await open(klant, '/apps/wereld.html');
     await resultaat.focus(); await edgeActies(klant);
     await klant.locator('.rtg-adaptive-controls').getByRole('button', { name: 'Opnieuw openen in Mijn Mall', exact: true }).click();
     await klant.waitForURL('**/apps/mijnmall.html#aanvragen');

@@ -1,15 +1,15 @@
 {
  "stempel": {
-  "op": "2026-09-29T16:51:53.267Z",
-  "commit": "0ca92585d",
+  "op": "2026-09-29T19:13:20.405Z",
+  "commit": "7fb56a703",
   "boomVuil": false,
-  "boomAnders": 7,
+  "boomAnders": 0,
   "instrument": "scripts/uitvoerproef-route.js",
   "node": "v22.22.2",
   "begrenzing": "geen"
  },
  "uitleg": "Per route: met de JUISTE rol en plausibele invoer, en of het 2xx-antwoord gegevens van een ANDER account bevatte (kanaries) of een geheim veld. Een route die hier NIET in staat is niet beproefd. Een route met uitvoer:\"poort\" gaf nooit een 2xx en is ONGEMETEN, geen groen. Zie scripts/lib/uitvoerproef.js voor de grens en waarom de lekmerkers niet blind over een 2xx mogen.",
- "kanariekenmerk": "682058",
+ "kanariekenmerk": "168224",
  "gemeten": {
   "routesMetRol": 4000,
   "gemeten": 1155,

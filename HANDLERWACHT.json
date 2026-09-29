@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-27T20:04:07.572Z",
-  "commit": "3ada60a3",
+  "op": "2026-09-29T15:49:05.754Z",
+  "commit": "4740256f",
   "boomVuil": false,
   "boomAnders": 10,
   "instrument": "scripts/handlerwacht.js",
@@ -1044,7 +1044,7 @@
   },
   {
    "sleutel": "POST /api/book",
-   "bestand": "server/routes/member/partnerkanaal.js:20",
+   "bestand": "server/routes/member/partnerkanaal.js:28",
    "staat": "sleutelDoorgegeven"
   },
   {
@@ -3154,7 +3154,7 @@
   },
   {
    "sleutel": "POST /api/partner",
-   "bestand": "server/routes/member/kopen/bezorg.js:12",
+   "bestand": "server/routes/member/kopen/bezorg.js:15",
    "staat": "openbaar",
    "reden": "het partnerkanaal is bedoeld voor niet-leden"
   },
@@ -3175,7 +3175,7 @@
   },
   {
    "sleutel": "POST /api/partnertrips",
-   "bestand": "server/routes/member/partnerkanaal.js:11",
+   "bestand": "server/routes/member/partnerkanaal.js:15",
    "staat": "sleutelDoorgegeven"
   },
   {
@@ -3924,7 +3924,7 @@
   },
   {
    "sleutel": "POST /api/staff",
-   "bestand": "server/routes/staff.js:38",
+   "bestand": "server/routes/staff.js:43",
    "staat": "eigenControle"
   },
   {

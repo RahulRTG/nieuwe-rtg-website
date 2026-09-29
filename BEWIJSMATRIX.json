@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T15:40:42.632Z",
-    "commit": "ccbd98075",
+    "op": "2026-09-29T16:10:23.215Z",
+    "commit": "bd14629c3",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bewijsmatrix.js",
@@ -16,9 +16,9 @@
   "telling": {
     "bewezen": 26941,
     "verklaard": 114,
-    "nvt": 611,
+    "nvt": 613,
     "ongemeten": 30335,
-    "gezakt": 2
+    "gezakt": 0
   },
   "perSchakel": {
     "AUTH": {
@@ -73,9 +73,9 @@
     "IDEMPOTENCY": {
       "bewezen": 1816,
       "verklaard": 0,
-      "nvt": 85,
+      "nvt": 87,
       "ongemeten": 3370,
-      "gezakt": 2
+      "gezakt": 0
     },
     "FAILURE": {
       "bewezen": 72,
@@ -98,11 +98,6 @@
       "ongemeten": 1244,
       "gezakt": 0
     }
-  },
-  "verslechteringToegestaan": {
-    "reden": "Noemer groeide van 5154 naar 5273 routes door de merge van main (nieuwe routes staan ongemeten tot hun instrumenten ze meten); bewezen steeg 26928 -> 26941. FAILURE bewezen 78 -> 72 omdat FAALPROEF.json bewust op de meting van 13 september (6dacd5e8) staat: de verse ronde liet schrijf-verloren op magnaat/scan niet meer aangrijpen en brak test/herrekenbaar.test.js (PROOF.md par. 2b). IDEMPOTENCY bewezen steeg door de verse IDEMPROEF met passkeymedewerker.",
-    "cellenVoor": 56694,
-    "cellenNa": 58003
   },
   "uitleg": "Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN."
 }

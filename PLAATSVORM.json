@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T16:01:02.875Z",
-    "commit": "6dbbd22a",
+    "op": "2026-09-29T17:14:13.470Z",
+    "commit": "9a7925608",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/plaatsvorm.js",
@@ -52,7 +52,7 @@
         "school"
       ],
       "vorm": {
-        "velden": 175,
+        "velden": 176,
         "inAlleDomeinen": [],
         "inMinstensHelft": 0,
         "inEenDomeinPct": 90.3
@@ -727,10 +727,10 @@
         "kern/stadsweefsel"
       ],
       "vorm": {
-        "velden": 39,
+        "velden": 40,
         "inAlleDomeinen": [],
         "inMinstensHelft": 0,
-        "inEenDomeinPct": 89.7
+        "inEenDomeinPct": 90
       },
       "woordenschat": {
         "varianten": [

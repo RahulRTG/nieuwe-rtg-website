@@ -59,6 +59,9 @@ test('3. het onderwerp bindt: ander gezin, ander profiel, andere rol, andere sco
   assert.equal(z.vind(g, t), null, 'op de beheerder geplakt opent hij niets');
   g.profielen.k.sessies = g.profielen.b.sessies; g.profielen.b.sessies = [];
   assert.equal(z.vind(g, t).id, 'k');
+  g.profielen.k2 = { id: 'k2', rol: 'kind', sessies: g.profielen.k.sessies }; g.profielen.k.sessies = [];
+  assert.equal(z.vind(g, t), null, 'op een ander kind met dezelfde rol geplakt opent hij ook niets');
+  g.profielen.k.sessies = g.profielen.k2.sessies; delete g.profielen.k2;
   g.profielen.k.rol = 'beheerder';
   assert.equal(z.vind(g, t), null, 'een kind dat beheerder wordt, houdt zijn oude sessie niet');
   g.profielen.k.rol = 'kind';
@@ -96,7 +99,11 @@ test('5. intrekken, roteren en de epoch', () => {
   assert.equal(z.vind(g, c).id, 'k');
   assert.equal(z.roteer(g, b), null, 'een geroteerde sessie roteert niet nog eens');
   const d = z.geef(g, g.profielen.k);
+  const oud = g.profielen.k.sessies.slice();
   z.sluit(g.profielen.k);
+  g.profielen.k.sessies = oud;   // een achterlopende kopie die de lijst nog had
+  assert.equal(z.vind(g, d), null, 'de epoch sluit, ook als een oude rij terugkomt');
+  g.profielen.k.sessies = [];
   assert.equal(g.profielen.k.sessieEpoch, 1);
   assert.equal(z.vind(g, c), null, 'sluiten neemt elke sessie mee');
   assert.equal(z.vind(g, d), null);
@@ -170,4 +177,7 @@ test('9. de claim van een uitnodiging: eenmalig, gebonden en hash-only', async (
   G().uitnodigingen.at(-1).verlooptAt = new Date(T0 - 1).toISOString();
   assert.equal((await C.claim({ code: 'ABC234', geheim: g2 })).status, 404, 'verlopen');
   assert.equal((await C.claim({ code: 'ANDER1', geheim: g2 })).status, 404, 'een ander gezin');
+  const g3 = crypto.randomBytes(24).toString('base64url');
+  G().uitnodigingen.push({ id: 'ui', naam: 'X', rol: 'ouder', status: 'ingetrokken', sleutelHash: C.hash(g3), verlooptAt: new Date(T0 + 3600000).toISOString() });
+  assert.equal((await C.claim({ code: 'ABC234', geheim: g3 })).status, 404, 'een ingetrokken uitnodiging opent niets, ook met een achtergebleven hash');
 });

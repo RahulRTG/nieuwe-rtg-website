@@ -10,6 +10,9 @@
       server, en het bewijs staat daarna in het werk van de assessor;
    2. hij vraagt de beoordeling aan, de kaart zegt dat hij loopt, en een tweede
       aanvraag weigert de server met de reden op het scherm;
+   0. vooraf richten de manager en de curriculumeigenaar het leerhuis in op
+      hetzelfde scherm: rol, startplan, en een curriculum dat de server niet
+      laat activeren zolang het concept-kennis zou leren;
    3. het herstelpad en de criteria van de assessor komen nooit op zijn scherm.
       Dat het leerpad weer openstaat ziet hij wel, want de stand van het
       leerpad was al van hem: hij begeleidt het herstel.
@@ -100,24 +103,56 @@ test('Leerhuis trainer: onder toezicht, bewijs, klaar voor beoordeling en de aan
       }
       await doe(Q, 'trainerKwalificeer', { persoon: T.p, trede: 'CERTIFIED_TRAINER', curricula: ['ops-basis'] });
 
+      browser = await pw.chromium.launch(browserOpties());
+      const opScherm = async (wie) => {
+        const ctx = await browser.newContext({ viewport: { width: 420, height: 900 } });
+        await ctx.addInitScript((t) => { try { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {} }, wie.tok);
+        const pg = await ctx.newPage();
+        letOpFouten(pg);
+        await pg.goto(base + '/apps/leerhuis-werk.html?org=' + ORG, { waitUntil: 'domcontentloaded' });
+        await pg.waitForFunction(() => !/wordt geladen/.test(document.getElementById('melding').textContent));
+        return pg;
+      };
+      /* "Bezig: ..." herhaalt de tekst van de uitslag voordat de server antwoordde; wie
+         daarop wacht, klikt in een kaart die de volgende laadronde weer vervangt. */
+      const wachtOp = (pg, re) => pg.waitForFunction((b) => { const t = document.getElementById('melding').textContent;
+        return !/^Bezig/.test(t) && new RegExp(b).test(t); }, re.source);
+
+      /* 0. De inrichting op het scherm: de manager wijst de rol toe en maakt het
+         startplan; de curriculumeigenaar krijgt de weigering van de server als
+         een curriculum concept-kennis zou leren. */
+      const q = await opScherm(Q);
+      const qk = q.locator('#manager .kaart', { hasText: N.code });
+      await qk.getByLabel('Rol voor ' + N.code).selectOption('ops');
+      await qk.getByRole('button', { name: 'Rol toewijzen' }).click();
+      await wachtOp(q, /Rol toegewezen: Operations Professional/);
+      await q.locator('#manager .kaart', { hasText: N.code }).getByRole('button', { name: 'Startplan maken voor Operations Professional' }).click();
+      await wachtOp(q, /Startplan gemaakt/);
+      await q.locator('#manager .kaart', { hasText: N.code }).getByText('Startplan ligt klaar voor Operations Professional').waitFor();
+      assert.equal(await q.locator('#manager .kaart', { hasText: N.code }).getByRole('button', { name: /Startplan maken/ }).count(), 0,
+        'een startplan dat er ligt, krijgt geen tweede knop');
+
+      await doe(C, 'kennisSchrijf', { id: 'escalatie', domein: 'betalingen', titel: 'Escaleren', tekst: 'Wanneer een tweede mens tekent.', bron: 'GELD.md' });
+      await doe(C, 'curriculumZet', { id: 'ops-extra', titel: 'Escaleren', vaardigheden: ['terugboeken'], kennis: ['escalatie'] });
+      const c = await opScherm(C);
+      const ck = () => c.locator('#curriculum .kaart', { hasText: 'Escaleren' });
+      await ck().getByText('Nog geen officiële kennis: escalatie').waitFor();
+      await ck().getByRole('button', { name: 'Ter review' }).click();
+      await wachtOp(c, /Ter review: Escaleren/);
+      await ck().getByRole('button', { name: 'Activeren' }).click();
+      await wachtOp(c, /Niet gelukt: .*concept/);
+      assert.match(await ck().textContent(), /ter review|review/i, 'de weigering liet de stand staan');
+
       /* N leert tot de simulatie; daarna neemt de trainer het over op het scherm. */
-      await doe(Q, 'rolToewijzen', { persoon: N.p, rol: 'ops' });
-      await doe(Q, 'startplanMaak', { persoon: N.p, rol: 'ops' });
       const pad = (await lees(T, 'trainerCockpit')).LEERLINGEN || [];
       if (!pad.some(x => x.persoon === N.p)) await doe(Q, 'trainerToewijzen', { persoon: N.p, curriculum: 'ops-basis', trainer: T.p });
       for (const naar of ['LEARNING', 'PRACTICING']) await doe(N, 'lerenStand', { persoon: N.p, curriculum: 'ops-basis', naar });
       await doe(N, 'simulatieAfronden', { scenario: 'storno', keuzes: ['controleer', 'reden', 'tweede-mens'] });
       await doe(N, 'lerenStand', { persoon: N.p, curriculum: 'ops-basis', naar: 'SIMULATING' });
 
-      browser = await pw.chromium.launch(browserOpties());
-      const ctx = await browser.newContext({ viewport: { width: 420, height: 900 } });
-      await ctx.addInitScript((t) => { try { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {} }, T.tok);
-      const page = await ctx.newPage();
-      letOpFouten(page);
-      await page.goto(base + '/apps/leerhuis-werk.html?org=' + ORG, { waitUntil: 'domcontentloaded' });
-      await page.waitForFunction(() => !/wordt geladen/.test(document.getElementById('melding').textContent));
+      const page = await opScherm(T);
       const kaart = () => page.locator('#trainer .kaart', { hasText: N.code });
-      const melding = (re) => page.waitForFunction((b) => new RegExp(b).test(document.getElementById('melding').textContent), re.source);
+      const melding = (re) => wachtOp(page, re);
 
       /* 1. Onder toezicht, bewijs, klaar voor beoordeling. */
       await kaart().getByRole('button', { name: 'Werkt nu onder mijn toezicht' }).click();

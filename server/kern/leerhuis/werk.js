@@ -19,7 +19,7 @@
 'use strict';
 
 const { heeftBestuur } = require('./oordeel');
-const { IMPACT } = require('./standen');
+const { IMPACT, MACHINES } = require('./standen');
 
 function assessorWerk(st, door) {
   if (!heeftBestuur(st, door, 'ASSESSOR')) return { ok: false, reden: 'u bent in deze organisatie geen assessor' };
@@ -54,4 +54,17 @@ function kennisWerk(st, door) {
     nietZichtbaar: 'wie een concept schreef staat er niet bij; alleen of u het zelf was, want dat keurt u niet zelf goed' };
 }
 
-module.exports = { assessorWerk, kennisWerk };
+/* De curricula en waar ze heen kunnen. `naar` komt uit de overgangstabel
+   (standen.js), zodat het scherm geen eigen kopie draagt; of een overgang MAG,
+   zegt curriculumStand (er gaat geen concept-kennis naar ACTIVE). */
+function curriculumWerk(st, door) {
+  if (!heeftBestuur(st, door, 'CURRICULUM_OWNER') && !heeftBestuur(st, door, 'QUALITY_AUTHORITY'))
+    return { ok: false, reden: 'u bent in deze organisatie geen curriculumeigenaar of kwaliteitsautoriteit' };
+  const naam = (v) => (st.vaardigheden[v] || {}).naam || v;
+  return { ok: true, CURRICULA: Object.values(st.curricula).map(c => ({ id: c.id, titel: c.titel, versie: c.versie, stand: c.stand,
+    vaardigheden: c.vaardigheden.map(naam), naar: MACHINES.curriculum.naar[c.stand] || [],
+    kennisZonderActief: c.kennis.filter(k => !(st.kennis[k] || {}).actief) })),
+  nietZichtbaar: 'wie een curriculum volgt en hoe ver hij is; dat ziet zijn trainer en zijn manager' };
+}
+
+module.exports = { assessorWerk, kennisWerk, curriculumWerk };

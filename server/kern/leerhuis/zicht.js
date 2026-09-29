@@ -103,7 +103,9 @@ function trainerCockpit(st, trainer) {
 
 function managerCockpit(st, manager, nu) {
   const team = Object.entries(st.relaties).filter(([, r]) => r.manager === manager && r.actief).map(([k]) => k);
-  return { TEAM: team.map(k => ({ persoon: k, rollen: (st.personen[k] || { rollen: [] }).rollen,
+  /* De rollen van de organisatie komen mee om toe te wijzen; `plan` zegt voor welke rol er een startplan ligt. */
+  return { ROLLEN: Object.values(st.rollen).map(r => ({ id: r.id, titel: r.titel })),
+    TEAM: team.map(k => ({ persoon: k, rollen: (st.personen[k] || { rollen: [] }).rollen, plan: (st.startplannen[k] || {}).rol || null,
     gereed: ((st.personen[k] || { rollen: [] }).rollen).map(r => { const x = rolKlaar(st, k, r, nu); return { rol: r, klaar: x.klaar, ontbreekt: x.ontbreekt, verloopt: x.verloopt }; }) })),
   nietZichtbaar: 'criteria, bewijs en uitslagen van beoordelingen; er is geen productiviteits-, loyaliteits- of persoonlijkheidsscore, en die komt er niet' };
 }

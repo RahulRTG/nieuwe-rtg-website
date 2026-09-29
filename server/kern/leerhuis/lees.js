@@ -22,6 +22,7 @@ module.exports = (stand, klok) => {
     managerCockpit: (org, p) => zicht.managerCockpit(stand(org), p, t()),
     assessorWerk: (org, p) => werk.assessorWerk(stand(org), p),
     kennisWerk: (org, p) => werk.kennisWerk(stand(org), p),
+    curriculumWerk: (org, p) => werk.curriculumWerk(stand(org), p),
     geschiktheid: (org, p, h) => geschiktheid(stand(org), p, h, t()),
     gereedheid: (org, eisen) => gereedheid.teamGereed(stand(org), eisen, t()),
     eenheid: (org) => gereedheid.eenheid(stand(org), t()),

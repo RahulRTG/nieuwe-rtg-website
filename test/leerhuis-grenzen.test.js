@@ -607,3 +607,31 @@ test('23. B-UI trainer: de cockpit noemt de vaardigheden van het leerpad en OF e
   assert.equal(v().loopt, false, 'na de uitslag loopt er niets meer');
   assert.ok(!/NOT_YET_PROVEN|nog een keer onder toezicht/.test(JSON.stringify(rij().vaardigheden)), 'de uitslag en het herstelpad staan niet in de trainercockpit');
 });
+
+test('24. B-UI inrichten: de manager ziet de rollen en welk startplan er ligt, de curriculumeigenaar ziet zijn curricula en waar ze heen kunnen', () => {
+  const w = basis();
+  const l = w.lh.lees;
+  const m0 = l.managerCockpit(ORG, P.M);
+  assert.ok(m0.ROLLEN.some(r => r.id === 'ops' && r.titel), 'de rollen van de organisatie staan klaar om toe te wijzen');
+  const lid = () => l.managerCockpit(ORG, P.M).TEAM.find(x => x.persoon === P.N);
+  assert.equal(lid().plan, null, 'nog geen startplan');
+  w.doe(ORG, 'rolToewijzen', { persoon: P.N, rol: 'ops' }, P.M);
+  assert.deepEqual(lid().rollen, ['ops']);
+  assert.equal(lid().plan, null, 'een rol is nog geen plan');
+  w.doe(ORG, 'startplanMaak', { persoon: P.N, rol: 'ops' }, P.M);
+  assert.equal(lid().plan, 'ops', 'het startplan hoort bij de rol');
+
+  assert.equal(l.curriculumWerk(ORG, P.N).ok, false, 'wie geen curriculumeigenaar is, ziet geen curricula om te beheren');
+  w.doe(ORG, 'kennisSchrijf', { id: 'nieuwe-kennis', domein: 'ops', titel: 'Nieuw', tekst: 'tekst', bron: 'werkinstructie' }, P.CO);
+  w.doe(ORG, 'curriculumZet', { id: 'ops-extra', titel: 'Extra', vaardigheden: ['terugboeken'], kennis: ['nieuwe-kennis'] }, P.CO);
+  const c = () => l.curriculumWerk(ORG, P.CO).CURRICULA.find(x => x.id === 'ops-extra');
+  assert.equal(c().stand, 'DRAFT');
+  assert.deepEqual(c().naar, ['REVIEW'], 'uit de overgangstabel, niet uit het scherm');
+  assert.deepEqual(c().kennisZonderActief, ['nieuwe-kennis'], 'wat nog geen officiele kennis is, staat erbij');
+  assert.deepEqual(c().vaardigheden, ['Een betaling terugboeken'], 'vaardigheden op naam');
+  w.doe(ORG, 'curriculumStand', { id: 'ops-extra', naar: 'REVIEW' }, P.CO);
+  assert.deepEqual(c().naar, ['DRAFT', 'PILOT', 'ACTIVE']);
+  assert.equal(w.probeer(ORG, 'curriculumStand', { id: 'ops-extra', naar: 'ACTIVE' }, P.CO).ok, false, 'de handeling weigert concept-kennis, ook als het scherm de knop toont');
+  assert.equal(l.curriculumWerk(ORG, P.Q).ok, true, 'de kwaliteitsautoriteit mag curricula van stand veranderen en ziet ze dus');
+  assert.ok(!JSON.stringify(l.curriculumWerk(ORG, P.CO)).includes(P.N), 'geen leerling in het curriculumwerk');
+});

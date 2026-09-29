@@ -1,11 +1,11 @@
 {
  "stempel": {
-  "op": "2026-09-29T07:57:47.546Z",
-  "commit": "a168d67e8",
+  "op": "2026-09-29T15:19:06.034Z",
+  "commit": "c9b845c0",
   "boomVuil": false,
-  "boomAnders": 3,
+  "boomAnders": 10,
   "instrument": "scripts/mutatiecontract.js",
-  "node": "v24.18.0"
+  "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",

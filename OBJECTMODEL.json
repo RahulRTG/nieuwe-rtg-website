@@ -2,15 +2,15 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-29",
   "gemeten": {
-    "bestanden": 2564,
-    "vormen": 1496,
-    "velden": 2158,
-    "modules": 828,
+    "bestanden": 2566,
+    "vormen": 1499,
+    "velden": 2161,
+    "modules": 829,
     "domeinen": 299,
     "envelopDrempel": 18,
-    "envelop": 30,
-    "veldenDomeineigen": 1507,
-    "veldenGedeeldVanafVier": 219,
+    "envelop": 31,
+    "veldenDomeineigen": 1509,
+    "veldenGedeeldVanafVier": 218,
     "gelijkendeVormparen": 23
   },
   "envelop": [
@@ -34,6 +34,7 @@
     "prijs",
     "reden",
     "ref",
+    "sinds",
     "soort",
     "stand",
     "status",
@@ -46,18 +47,6 @@
     "wat"
   ],
   "gedeeld": [
-    {
-      "veld": "sinds",
-      "domeinen": 17,
-      "waar": [
-        "bedrijf",
-        "kern/afdelingen",
-        "kern/clubs",
-        "kern/command",
-        "kern/commercie",
-        "kern/ledenbalie-inzage"
-      ]
-    },
     {
       "veld": "type",
       "domeinen": 17,
@@ -524,6 +513,18 @@
         "kern/gemeente",
         "kern/mall",
         "kern/overheid"
+      ]
+    },
+    {
+      "veld": "stad",
+      "domeinen": 10,
+      "waar": [
+        "kern/beschermzaak",
+        "kern/foundationregistratie-uitgifte",
+        "kern/ledenbalie-inzage",
+        "kern/livinglab",
+        "kern/mobiliteit",
+        "kern/rechterhand"
       ]
     }
   ],

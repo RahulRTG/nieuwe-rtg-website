@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-27T20:27:27.311Z",
-  "commit": "938044c3",
+  "op": "2026-09-29T15:44:08.201Z",
+  "commit": "7d2bc407c",
   "boomVuil": false,
-  "boomAnders": 3,
+  "boomAnders": 0,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.2"
  },
@@ -3900,13 +3900,13 @@
   },
   {
    "sleutel": "POST /api/stad/algoritmes",
-   "bestand": "server/routes/stad.js:31",
+   "bestand": "server/routes/stad.js:38",
    "staat": "openbaar",
    "reden": "het openbare algoritmeregister: beschrijft regels, geen personen"
   },
   {
    "sleutel": "POST /api/stad/besluiten",
-   "bestand": "server/routes/stad.js:40",
+   "bestand": "server/routes/stad.js:47",
    "staat": "openbaar",
    "reden": "het openbare besluitenregister: wat de stad besloot, met welke stemverhouding; fracties stemmen met zetels, geen personen"
   },

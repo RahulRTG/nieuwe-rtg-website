@@ -582,3 +582,28 @@ test('22. B-UI werkscherm: de assessor ziet wat op hem wacht en alleen zijn eige
   assert.ok(!JSON.stringify(ander).includes(P.KO), 'de schrijver staat er niet bij');
   assert.deepEqual(l.kennisWerk(ORG, P.KO2).impactKlassen, require('../server/kern/leerhuis/standen').IMPACT);
 });
+
+test('23. B-UI trainer: de cockpit noemt de vaardigheden van het leerpad en OF er een beoordeling loopt, niet de uitslag', () => {
+  const w = basis();
+  const l = w.lh.lees;
+  const stap = (naar, door) => w.doe(ORG, 'lerenStand', { persoon: P.N, curriculum: 'ops-basis', naar }, door);
+  w.doe(ORG, 'rolToewijzen', { persoon: P.N, rol: 'ops' }, P.M);
+  w.doe(ORG, 'startplanMaak', { persoon: P.N, rol: 'ops' }, P.M);
+  stap('LEARNING', P.N); stap('PRACTICING', P.N);
+  w.doe(ORG, 'simulatieAfronden', { scenario: 'storno', keuzes: W.STORNO }, P.N);
+  stap('SIMULATING', P.N); stap('SUPERVISED', P.T);
+  const rij = () => l.trainerCockpit(ORG, P.T).LEERLINGEN.find(x => x.persoon === P.N);
+  const v = () => rij().vaardigheden.find(x => x.id === 'terugboeken');
+  assert.ok(v(), 'de vaardigheid uit het leerpad staat bij de leerling, zodat de trainer er bewijs voor kan vastleggen');
+  assert.equal(v().loopt, false);
+  assert.deepEqual(l.trainerCockpit(ORG, P.T).bewijsSoorten, require('../server/kern/leerhuis/standen').LEERBEWIJS, 'geen eigen kopie op het scherm');
+  w.doe(ORG, 'bewijsVastleggen', { persoon: P.N, vaardigheid: 'terugboeken', soort: 'OBSERVATION_EVIDENCE', sterkte: 'OBSERVED', bron: 'toets' }, P.T);
+  stap('READY_FOR_ASSESSMENT', P.T);
+  const id = w.doe(ORG, 'beoordelingAanvragen', { persoon: P.N, vaardigheid: 'terugboeken' }, P.T).id;
+  assert.equal(v().loopt, true, 'een aangevraagde beoordeling loopt');
+  w.doe(ORG, 'beoordelingStart', { id }, P.A);
+  assert.equal(v().loopt, true, 'een begonnen beoordeling loopt ook');
+  w.doe(ORG, 'beoordelingAfronden', { id, uitkomst: 'NOT_YET_PROVEN', herstel: 'nog een keer onder toezicht' }, P.A);
+  assert.equal(v().loopt, false, 'na de uitslag loopt er niets meer');
+  assert.ok(!/NOT_YET_PROVEN|nog een keer onder toezicht/.test(JSON.stringify(rij().vaardigheden)), 'de uitslag en het herstelpad staan niet in de trainercockpit');
+});

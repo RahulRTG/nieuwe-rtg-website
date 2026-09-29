@@ -23,6 +23,7 @@ window.RTGLeerhuisKaarten = function (h) {
       } else if (x.volgende) {
         k.appendChild(maak('p', 'meta', 'Volgende stap: ' + x.volgende));
       }
+      if (h.bewijs) h.bewijs(k, x, t);
       return k;
     }), 'Er volgt nog niemand een leerpad bij u.');
   }

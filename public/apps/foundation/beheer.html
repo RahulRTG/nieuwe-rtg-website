@@ -164,7 +164,7 @@
 </div></dialog>
 
 <script src="sessie.js"></script>
-<!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
+<!-- uitvoer.js vóór het eigen script, dat RTGUitvoer.bron aanroept -->
 <script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
@@ -245,8 +245,8 @@ async function laadUitnodigingen(){
   }catch(e){host.innerHTML='<div class="fout">Uitnodigingen konden niet worden geladen.</div>';}
 }
 
-/* Meenemen (shared/uitvoer.js): het profielenregister van dit gezin, precies de
-   velden die in de lijst hierboven staan. Geen pincodes, alleen of er een is. */
+/* Meenemen (shared/uitvoer.js): de profielvelden van de lijst hierboven.
+   Geen pincodes, alleen of er een is. */
 if (window.RTGUitvoer) RTGUitvoer.bron(function(){
   if (!PROFIELEN.length) return null;
   return {
@@ -382,6 +382,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>
+<script src="beheer-sessies.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>
 <script src="/shared/randen.js" defer></script>

@@ -27,6 +27,9 @@
       verbind();
     },
     setLeden: function (arr) { S.leden = {}; (arr || []).forEach(function (l) { S.leden[l.id] = l; }); },
+    /* Een verse gezinssessie (de RTG-app haalt per keer een nieuwe van 12 uur via
+       /api/rtf/kanaal). Het kanaal verbindt opnieuw, behalve midden in een gesprek. */
+    setToken: function (t) { if (!t || t === S.token) return; S.token = t; if (!call) verbind(); },
     // chat
     stuur: function (naarId, tekst) { return post('/gezin/chat', { naar: naarId, tekst: tekst }); },
     thread: function (metId) { return fetch(S.base + '/gezin/' + S.code + '/chat/' + metId, { headers: { Authorization: 'Bearer ' + S.token } }).then(function (r) { return r.json(); }); },

@@ -23,7 +23,7 @@ require('./foundation/onderwijs')(ctx);
 const { G, nieuweGezinscode, ROLLEN, GROEPEN, GROEP_INFO, geboorteInfo, groepVanLeeftijd, actualiseerGroep,
   magSolliciteren, groepLeeftijd, isBeschermd, schoonGroep, isGast, KLEUREN, hashPin, checkPin, geldigePin,
   schoonAvatar, schoonKleur, nieuweCodenaam, ensureCodenaam, rtfHandle, socialProfielen, profielInfoVanHandle,
-  pubProfiel, pubGezin, gezinVan, profielVan, beheerderVan, berichtVoorMij } = require('./foundation/gezinshulp')(ctx);
+  pubProfiel, pubGezin, gezinVan, profielVan, beheerderVan, berichtVoorMij, gezinstoken } = require('./foundation/gezinshulp')(ctx);
 
 /* De gezinsroutes (gezin maken/inloggen, profielen, berichten) draaien als
    submodule op een gedeelde context, een keer opgebouwd bij het opstarten. */
@@ -31,9 +31,11 @@ const gctx = { router, F, G, save, nu, rid, schoon, crypto, eigenVeld, encS, dec
   nieuweGezinscode, ROLLEN, GROEPEN, GROEP_INFO, geboorteInfo, groepVanLeeftijd, actualiseerGroep,
   schoonGroep, isBeschermd, isGast, KLEUREN,
   hashPin, checkPin, geldigePin, schoonAvatar, schoonKleur, nieuweCodenaam, ensureCodenaam, rtfHandle,
-  socialProfielen, profielInfoVanHandle, pubProfiel, pubGezin, gezinVan, profielVan, beheerderVan, berichtVoorMij };
+  socialProfielen, profielInfoVanHandle, pubProfiel, pubGezin, gezinVan, profielVan, beheerderVan, berichtVoorMij,
+  gezinstoken, bewerkCollectie: ctx.bewerkCollectie };
 require('./foundation/gezin')(gctx);
 require('./foundation/gezinstoegang')(gctx);
+require('./foundation/gezinssessie')(gctx);
 
 /* Wat dit gezin kost, en wie het betaalt (foundation/kosten.js). Een eigen
    bestandje, want het antwoord draagt een belofte en geen bedrag: de
@@ -60,7 +62,7 @@ function familieVan(req, res) {
    context (voor de les-AI), de zorg-module locatiePubliek/oppasinfoPubliek
    (voor het gastoverzicht). */
 Object.assign(ctx, { G, gezinVan, profielVan, familieVan, sessieVan,
-  isGast, isBeschermd, ensureCodenaam, rtfHandle, checkPin });
+  isGast, isBeschermd, ensureCodenaam, rtfHandle, checkPin, gezinstoken });
 require('./foundation/vooruit')(ctx);
 const { leeftijdInstr } = require('./foundation/buddy')(ctx);
 require('./foundation/zorg')(ctx);

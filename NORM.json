@@ -3776,6 +3776,36 @@
       "meter": "toetsenNietGemeten 298 -> 313 (samenvoeging #426: de nieuwe toetsbestanden van elf open PR-takken naast elkaar)",
       "reden": "Geen nieuwe schuld van de samenvoeging zelf, op een na: test/presentatie-gezinsbeelden.test.js is in deze samenvoeging geschreven om de gezinsbeeldroutes van #413 een treffer op een echte server te geven. De rest komt uit de takken (#403 de codefamilie, #409 gastsplitsing, #420 routeversheid, #425 beslisgeheugen, #429 plaatsvorm en positiestroom, #428 pass-cache en world-palette, en andere), die elk hun eigen post op hun eigen basis hebben. De posten blijven apart staan zodat elk bestand zijn eigen reden houdt.",
       "waarheen": "npm run mutatie over de nieuwe toetsbestanden; de schermtoetsen via npm run mutatie:scherm."
+    },
+    {
+      "datum": "2026-09-29",
+      "soort": "schuld",
+      "sleutel": "zelfpoortendeToetsen",
+      "van": 45,
+      "vervalt": "2026-12-29",
+      "meter": "zelfpoortendeToetsen 45 -> 46; toetsenNietGemeten 645 -> 646",
+      "reden": "Het gezinsprofieltoken is gemigreerd (RELEASEKANDIDAAT.md B17, CODECREDENTIALS.json foundation.family_profile_token_buiten_harde_poort). test/gezinsuitnodiging.pg.test.js is nieuw: twee echte PostgreSQL-instances en twaalf tikken racen om dezelfde eenmalige gezinsuitnodiging, precies een profiel ontstaat en PostgreSQL draagt alleen de hash van de sessie. Zonder DATABASE_URL en REDIS_URL slaat hij over, dus hij telt als zelfpoortend (hij staat in scripts/lib/pg-toetslijst.js en als uitzondering onder zelfpoortende-toets). Om dezelfde reden telt hij bij toetsenNietGemeten: de mutatiemotor draait hem zonder diensten en ziet hem dus overslaan. test/gezinstoken.test.js en test/gezinssessie.test.js zijn na de merge wel gemeten (MUTATIES.json: beide gezakt).",
+      "waarheen": "lost af met de CI-dienstmatrix zonder skips."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 640,
+      "vervalt": "2026-12-27",
+      "meter": "toetsenNietGemeten 640 -> 641",
+      "reden": "test/codedeuren-claim.pg.test.js is nieuw en vraagt echte PostgreSQL en Redis; de mutatiemotor draait zonder, dus hij blijft ongemeten (zelfde vorm als de andere pg-proeven). De vijf andere nieuwe toetsen van deze deuren zijn wel door de motor gemeten (MUTATIES.json) en met de hand nagetrokken; zonder advisory lock plus FOR UPDATE zakte de pg-proef 3 van 3 keer.",
+      "waarheen": "Dezelfde aflossing als de andere pg-toetsen: de CI-dienstmatrix zonder skips."
+    },
+    {
+      "datum": "2026-09-27",
+      "soort": "structureel",
+      "sleutel": "toetsenNietGemeten",
+      "van": 637,
+      "vervalt": "2026-12-27",
+      "meter": "toetsenNietGemeten 637 -> 638",
+      "reden": "test/restdeuren.pg.test.js is nieuw (de vier restdeuren van B9). Zonder DATABASE_URL slaat hij zichzelf over, dus de mutatiemotor kan er niet langs; de vier gewone restdeurtoetsen zijn wel gemeten (MUTATIES.json, 0 overleefd). Met de hand nagetrokken tegen echte PostgreSQL: advisory lock plus FOR UPDATE uit pg/collectietransactie.js liet hem 3 van 3 keer zakken.",
+      "waarheen": "Een mutatieronde met DATABASE_URL, of de pg-scherf als meetomgeving."
     }
   ],
   "prestatie": {
@@ -4279,6 +4309,12 @@
       "pad": "test/foundation-lescredential.pg.test.js",
       "vervalt": "2026-10-15",
       "reden": "de raceproef voor de lescode van RTFoundation-onderwijs (twaalf leerlingen op twee instances om elf plekken, en een rotatie op A tegen een toetreding met de oude code op B) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl hij lokaal zonder die infrastructuur expliciet overslaat"
+    },
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/gezinsuitnodiging.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "de raceproef voor de gezinsuitnodiging (twee instances en twaalf tikken om dezelfde eenmalige uitnodiging, die een profiel met een gezinssessie oplevert) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl hij lokaal zonder die infrastructuur expliciet overslaat"
     }
   ]
 }

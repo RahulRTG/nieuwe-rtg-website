@@ -11,8 +11,10 @@
 'use strict';
 
 module.exports = function bouwKernAanTwee(kern, grens) {
-  const { db, save, bewerkCollectie, crypto, schoon, sseToCustomer, accounts, anthropic,
+  const { db, save, crypto, schoon, sseToCustomer, accounts, anthropic,
     beveilig, logboek, fs, path, DATA_DIR, rtf, gidsHaal, keyVanCodenaam, leeftijdVan, leeftijdInstr } = kern;
+  // uit de opslag: `kern` draagt hem niet (test/aanbouw-collectie.test.js)
+  const { bewerkCollectie } = require('../db');
   /* RTG iD (kern/rtgid.js): de DigiD-vervanger op de eigen identiteitskluis;
      koppelcode-inlog met bevestiging in de app, selectieve gegevensdeling,
      inzagelog met intrekken en herroepbare machtigingen. */

@@ -18,17 +18,14 @@
 'use strict';
 
 module.exports = function bouwKernAan(kern, grens) {
-  const { db, save, bewerkCollectie, STORE, crypto, schoon, sseToCustomer, accounts, anthropic, mail,
+  const { db, save, STORE, crypto, schoon, sseToCustomer, accounts, anthropic, mail,
     beveilig, fs, path, DATA_DIR, rtf, gidsHaal, keyVanCodenaam, leeftijdVan, leeftijdInstr } = kern;
-  /* De logger RECHTSTREEKS uit ./log, niet via kern.logboek. Bij het verhuizen
-     van dit blok uit server.js kwam `logboek` hier uit de kern -- en daar is
-     `logboek` de onderhoudslogboek-lezer van de Rechterhand
-     (kern/rechterhand/logboek.js), een functie zonder .log. `log` werd dus
-     stilletjes undefined: geen fout, geen melding, maar zelfzorg draaide zijn
-     wachtronde zonder foutenbron en gezondheidscheck ERR-01 stond daarmee
-     permanent op groen -- een storingsgolf van 25 uitzonderingen kantelde het
-     oordeel niet meer van 'ok' naar 'let op'. Rechtstreeks requiren kan niet
-     botsen; ./log is een singleton (dezelfde die server.js gebruikt). */
+  /* bewerkCollectie en de logger RECHTSTREEKS, niet uit `kern`: die draagt de
+     eerste niet en onder `logboek` iets anders dan de logger. Beide werden stil
+     undefined -- vijf collectiemodules vielen terug op een niet-atomair pad
+     (test/aanbouw-collectie.test.js), en zelfzorg liep zonder foutenbron, zodat
+     ERR-01 permanent groen stond. ../db en ../log zijn singletons. */
+  const { bewerkCollectie } = require('../db');
   const { log } = require('../log');
   /* De School-Bibliotheek (kern/schoolbieb.js): per leeftijdsgroep 10.000
      school-apps, van kleuter tot universiteit; plus Samen voor de gezinsapps

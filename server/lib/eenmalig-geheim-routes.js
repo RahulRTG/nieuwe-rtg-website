@@ -135,7 +135,12 @@ const ROUTES = new Set([
   /* De lescredentials van RTFoundation-onderwijs (B17, foundation/onderwijs/toegang.js):
      maken toont lescode en leraarssleutel, meedoen de leerlingsleutel, roteren een
      nieuwe lescode -- elk precies een keer; daarna bestaat alleen de hash. */
-  'POST /api/foundation/les/maak', 'POST /api/foundation/les/join', 'POST /api/foundation/les/code/roteer'
+  'POST /api/foundation/les/maak', 'POST /api/foundation/les/join', 'POST /api/foundation/les/code/roteer',
+  /* Het gezinsprofieltoken (B17, foundation/gezinstoken.js): elk van deze
+     antwoorden draagt een VERSE gezinssessie die daarna alleen als hash bestaat. */
+  'POST /api/foundation/gezin/maak', 'POST /api/foundation/gezin/inloggen',
+  'POST /api/foundation/gezin/profiel/kies', 'POST /api/foundation/gezin/uitnodiging/accepteer',
+  'POST /api/foundation/gezin/sessie/roteer', 'POST /api/rtf/kanaal'
 ]);
 
 const isEenmalig = (methode, pad) => ROUTES.has(

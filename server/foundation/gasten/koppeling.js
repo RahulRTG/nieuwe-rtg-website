@@ -5,7 +5,7 @@
    vanuit foundation/gasten.js op de gedeelde context. */
 module.exports = (ctx) => {
   const { router, G, eigenVeld, nu, save, rid, schoon, encS, decS,
-    familieVan, sessieVan, isGast, locatiePubliek, oppasinfoPubliek } = ctx;
+    familieVan, sessieVan, isGast, locatiePubliek, oppasinfoPubliek, gezinstoken } = ctx;
   const agendaPubliek = (g) => ctx.agendaPubliek(g);
   const TIERNAAM = { rtg: 'RTG Pass', lifestyle: 'Lifestyle Pass', business: 'Business Pass' };
   function gastProfielen(code) {
@@ -35,7 +35,7 @@ module.exports = (ctx) => {
   function unlinkGast({ userId, code, profielId }) {
     let n = 0;
     for (const g of Object.values(G())) for (const p of Object.values(g.profielen || {})) {
-      if (p.koppel && p.koppel.userId === userId && (!code || g.code === String(code).toUpperCase()) && (!profielId || p.id === profielId)) { delete p.koppel; n++; }
+      if (p.koppel && p.koppel.userId === userId && (!code || g.code === String(code).toUpperCase()) && (!profielId || p.id === profielId)) { delete p.koppel; gezinstoken.sluit(p); n++; }
     }
     if (n) save();
     return { ok: true, verwijderd: n };
@@ -61,15 +61,17 @@ module.exports = (ctx) => {
     }
     return uit;
   }
-  // het chat-/belkanaal van een gekoppeld gezin voor de RTG-app: het profieltoken
-  // (de gast is dit profiel) + de leden om mee te chatten en te bellen
+  // het chat-/belkanaal van een gekoppeld gezin voor de RTG-app: een VERSE
+  // gezinssessie van 12 uur (de gast is dit profiel; ./../gezinstoken.js), nooit
+  // een bewaarde oude, plus de leden om mee te chatten en te bellen
   function kanaalInfo(userId, code) {
     const g = G()[String(code || '').toUpperCase()];
     if (!g) return null;
     const p = Object.values(g.profielen).find(x => x.koppel && x.koppel.userId === userId);
     if (!p) return null;
+    const token = gezinstoken.geef(g, p, { geldigMs: gezinstoken.KANAAL_MS }); save();
     return {
-      code: g.code, gezinNaam: g.naam, profielId: p.id, token: p.token,
+      code: g.code, gezinNaam: g.naam, profielId: p.id, token,
       leden: Object.values(g.profielen).filter(x => x.id !== p.id).map(x => ({ id: x.id, naam: x.naam, avatar: x.avatar, kleur: x.kleur, rol: x.rol }))
     };
   }

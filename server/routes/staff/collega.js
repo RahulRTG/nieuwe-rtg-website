@@ -2,7 +2,7 @@
    oproepen (buzz/walkie) en de onderlinge collega-DM's. Krijgt de gedeelde
    context een keer bij het opstarten vanuit routes/staff.js. */
 module.exports = (actx) => {
-  const { DEMO, accounts, app, checkCred, commCollega, crypto, db, findStaffPartner, hasCred, klokVan, logActivity, managerOnly, notifySupplier, publicPartner, save, schoon, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth, trustVan } = actx;
+  const { DEMO, accounts, app, checkCred, commCollega, crypto, db, hasCred, klokVan, logActivity, managerOnly, notifySupplier, publicPartner, save, schoon, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth, trustVan } = actx;
   const { fluisterZeg, fluisterVergeet, fluisterFocus, fluisterProfiel } = actx.fluister;
 /* Het urenoverzicht voor de zaak: wie is er nu binnen, wie werkte wanneer en
    hoelang (vandaag en deze week). Elke medewerker klokt via de PDA; het

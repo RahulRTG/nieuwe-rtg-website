@@ -14,7 +14,11 @@ module.exports = {
      hebben: eigen code, lager servicetarief (arbeidsvoorwaarde). */
   partners: [
     { code: 'NOVA',  name: 'Nova van Dijk',          type: 'influencer', handle: '@novatravels · 380k volgers', share: 0.40 },
-    { code: 'ATLAS', name: 'Atlas Executive Travel', type: 'bedrijf',    handle: 'zakelijk reisbureau, Amsterdam', share: 0.35 }
+    /* ATLAS heeft een personeelskanaal: een eigen tarief, en (B14) GEEN gedeelde
+       code -- elke medewerker krijgt een eigen 128-bit code van het kantoor
+       (kern/partnerpersoneelscode.js). */
+    { code: 'ATLAS', name: 'Atlas Executive Travel', type: 'bedrijf',    handle: 'zakelijk reisbureau, Amsterdam', share: 0.35,
+      staff: { serviceRate: 0 } }
   ],
   partnerTrips: [
     {

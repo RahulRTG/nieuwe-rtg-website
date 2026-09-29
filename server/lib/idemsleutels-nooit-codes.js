@@ -42,6 +42,12 @@ module.exports = Object.freeze({
     'intrekken leest de actuele stand in de collectietransactie van kern/zaakdoos/sleutels.js; een tweede keer is een toestandscontrole, geen gecachet antwoord',
   'POST /api/supplier/doos/sleutel/weg':
     'zelfde reden als de kantoorkant: intrekken beslist op de actuele stand, en een gecachet antwoord mag geen intrekking overslaan',
+  'POST /api/office/partnerkanaal/personeelscode':
+    'uitgeven maakt elke keer een nieuwe medewerkerplek met een eigen 128-bit personeelscode (kern/partnerpersoneelscode.js); een herhaald antwoord zou een kale code heronthullen',
+  'POST /api/office/partnerkanaal/personeelscode/roteer':
+    'roteren geeft een nieuwe personeelscode en trekt de vorige van die plek in; een antwoordcache mag de nieuwe code nooit bewaren of herhalen',
+  'POST /api/office/partnerkanaal/personeelscode/intrek':
+    'intrekken leest de actuele stand in de collectietransactie van kern/partnerpersoneelscode.js; een tweede keer is een toestandscontrole, geen gecachet antwoord',
   'POST /api/order/afhaalcode/intrek':
     'intrekken leest de actuele stand in kern/afhaalcode.js; een tweede keer is een toestandscontrole, geen gecachet antwoord',
   'POST /api/ov/code':

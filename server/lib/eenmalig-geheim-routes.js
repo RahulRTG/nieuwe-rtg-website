@@ -117,7 +117,11 @@ const ROUTES = new Set([
   'POST /api/concern/uitnodigen', 'POST /api/concern/bulk/verstuur', 'POST /api/concern/uitnodiging/roteer',
   'POST /api/member/magnaat/teamkamer/maak', 'POST /api/member/magnaat/teamkamer/code',
   'POST /api/service/bevestiging/toon', 'POST /api/supplier/service/bevestiging/toon',
-  'POST /api/office/kantoor/uitnodiging'
+  'POST /api/office/kantoor/uitnodiging',
+  /* De personeelscode van het partnerkanaal (kern/partnerpersoneelscode.js, B14):
+     uitgeven en roteren dragen de kale 128-bit code, daarna alleen de hash. */
+  'POST /api/office/partnerkanaal/personeelscode',
+  'POST /api/office/partnerkanaal/personeelscode/roteer'
 ]);
 
 const isEenmalig = (methode, pad) => ROUTES.has(

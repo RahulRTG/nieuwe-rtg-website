@@ -96,6 +96,7 @@ const SLEUTELS = {
   'POST /api/office/werkos/bankpad/zet': { zelfdeVerzoek: true },
   'POST /api/office/doos/sleutels': { leest: true },
   'POST /api/supplier/doos/sleutels': { leest: true }, // de manager leest de dozen van zijn eigen zaak
+  'POST /api/office/partnerkanaal/personeelscodes': { leest: true }, // metadata van de personeelscodes, nooit een code (B14)
   /* Een vrije naam duiden: de tweede keer is het oude feit al vervallen en weigert de route. */
   'POST /api/concern/feit/duid': { zelfdeVerzoek: true }
 };

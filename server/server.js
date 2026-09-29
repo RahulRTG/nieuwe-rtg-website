@@ -1518,10 +1518,8 @@ function findPartner(code) {
   return db.data.partners.find(p => p.code === code) || null;
 }
 
-function findStaffPartner(staffCode) {
-  staffCode = String(staffCode || '').trim().toUpperCase();
-  return db.data.partners.find(p => p.staff && p.staff.code === staffCode) || null;
-}
+/* De personeelscode zoekt niet meer hier (raw, lineair): hij is een 128-bit
+   credential per medewerker in kern/partnerpersoneelscode.js (B14). */
 
 
 
@@ -2278,7 +2276,7 @@ const kern = {
   bufferEvent, bus, canEngage, cannedAnswer, cannedBoekhouder, cateringDishes, rondEuro, chatApplicant,
   chatKeyOf, chatStuur, checkCred, coachCache, coachRules, conciergeInbox, connectedSupplierCodes, convOf,
   crypto, cvReady, db, bijeen, deptsFor, dirTouch, eisAccount, engageError, ensureApplyChat, foutmelder,
-  ensureSupplierDefaults, etaMinutes, eventCovers, express, fallbackRunsheet, financeVoor, dagrapport, shiftSamenvatting, findPartner, findStaffPartner,
+  ensureSupplierDefaults, etaMinutes, eventCovers, express, fallbackRunsheet, financeVoor, dagrapport, shiftSamenvatting, findPartner,
   findSupplier, forgetSession, forgetSessionDuurzaam, fs, cadeaukaart, geborenVan, geenGast, idGeverifieerd, generateAiReply,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   eersteBijdrageFactuur, ledenInhoudVan, leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,

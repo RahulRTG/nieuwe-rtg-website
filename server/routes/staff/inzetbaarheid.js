@@ -8,7 +8,7 @@ module.exports = (actx) => {
      de regel eronder achter: de route viel om met "payrollOS is not defined",
      een 500 in plaats van de 503 die er twee regels lager netjes klaarstond.
      Geen enkele toets riep dit endpoint aan, dus niemand zag het. */
-  const { app, supplierAuth, db, save, schoon, findStaffPartner, payrollOS, sseToSupplier } = actx;
+  const { app, supplierAuth, db, save, schoon, payrollOS, sseToSupplier } = actx;
 app.post('/api/staff/inzetbaarheid', supplierAuth, (req, res) => {
   if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
   if (!payrollOS || !payrollOS.verzuim)

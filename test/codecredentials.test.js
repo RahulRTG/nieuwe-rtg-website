@@ -112,8 +112,51 @@ test('de echte credentials uit de classificatieronde blokkeren de release', () =
     }
 });
 
-  // partnerkanaal.personeels_en_partnercode (B14) en link.capability_aanvaarden (B15) zijn gemigreerd: zie de toetsen hieronder
-  const echte = ['travelos.ov_incheckcode',
+/* B14 (29 september 2026): het partnerkanaal is gesplitst. De personeelscode is
+   een gemigreerde credential per medewerker; de partnercode een openbare
+   attributie die niets opent. */
+test('het partnerkanaal is gesplitst: personeelscode gemigreerd, partnercode een openbare attributie', () => {
+  const register = poort.lees();
+  const uit = poort.controleer(register);
+  const d = register.deuren.find(x => x.id === 'partnerkanaal.personeels_en_partnercode');
+  assert.equal(d.status, 'migrated');
+  assert.equal(d.release_blocker, false);
+  assert.ok(!uit.blockers.some(x => x.id === d.id), 'blokkeert niet meer');
+  for (const c of poort.CONTROLES) assert.equal(d.controls[c], true, c);
+  assert.equal(d.controls.entropy_bits, 128);
+  assert.ok(d.bewijs.includes('test/partnerpersoneelscode.pg.test.js'), 'de atomaire claim over twee instances');
+  for (const route of poort.effectieveRoutes(d))
+    assert.ok(poort.REQUIRED_ROUTES.includes(route), route + ' hoort bewaakt te zijn');
+  const a = register.deuren.find(x => x.id === 'partnerkanaal.partnercode_attributie');
+  assert.equal(a.classificatie, 'public_identifier');
+  assert.equal(a.status, 'closed');
+  assert.ok(a.routes.includes('POST /api/partner'));
+  assert.ok(String(a.notitie).length >= 40);
+});
+
+/* B15 (29 september 2026): de RTG Link-drager is gemigreerd -- 128 bits, hash-only,
+   een eenmalige claim in een collectietransactie -- en daarom is ook zijn
+   productiegrendel weg. Beide helften horen samen: een gemigreerde deur die in
+   productie nog dicht staat liegt niet, maar een open deur die niet gemigreerd is wel. */
+test('de Link-drager is gemigreerd met alle controls, en de grendel is eraf', () => {
+  const register = poort.lees();
+  const uit = poort.controleer(register);
+  const d = register.deuren.find(x => x.id === 'link.capability_aanvaarden');
+  assert.equal(d.status, 'migrated');
+  assert.equal(d.release_blocker, false);
+  assert.ok(!uit.blockers.some(x => x.id === d.id), 'blokkeert niet meer');
+  assert.equal(d.controls.entropy_bits, 128);
+  for (const c of ['hash_only_at_rest', 'issuer_doel_scope', 'issued_at_expires_at', 'max_gebruik_gebruik',
+    'server_side_intrekken_roteren', 'constant_time_lookup', 'atomic_claim', 'raw_once'])
+    assert.equal(d.controls[c], true, c);
+  for (const t of ['test/linkcap-credential.test.js', 'test/linkcap-credential.pg.test.js', 'test/linkcap-productie.test.js'])
+    assert.ok(d.bewijs.includes(t), t);
+  assert.equal(d.huidige_risicos, undefined, 'een gemigreerde deur noemt geen open risico meer');
+  const grendel = require('../server/middleware/money-credential-productiepoort');
+  assert.equal([...grendel.EXACT.values()].includes(d.id), false, 'niet meer in de HTTP-grendel');
+  const kassacode = require('node:fs').readFileSync(require('node:path').join(__dirname, '..', 'server/kern/pay/kassacode.js'), 'utf8');
+  assert.doesNotMatch(kassacode, /blokkade\(/, 'en kern/pay/kassacode.js weigert niet meer zelf');
+  for (const route of poort.effectieveRoutes(d)) assert.ok(poort.REQUIRED_ROUTES.includes(route), route);
 });
 
 /* B10 (27 september 2026): de gedeelde kantoorcode is in productie gesloten. Dat

@@ -126,7 +126,11 @@ const ROUTES = new Set([
   'POST /api/link/cap/maak',
   /* Het SSO-clientgeheim (besluit B16): het VERZOEK draagt het geheim en het
      antwoord alleen de stand; geen cache mag een rotatie herhalen of onthouden. */
-  'POST /api/techniek/sso', 'POST /api/techniek/sso/geheim', 'POST /api/techniek/sso/geheim/overlap/sluit'
+  'POST /api/techniek/sso', 'POST /api/techniek/sso/geheim', 'POST /api/techniek/sso/geheim/overlap/sluit',
+  /* De lescredentials van RTFoundation-onderwijs (B17, foundation/onderwijs/toegang.js):
+     maken toont lescode en leraarssleutel, meedoen de leerlingsleutel, roteren een
+     nieuwe lescode -- elk precies een keer; daarna bestaat alleen de hash. */
+  'POST /api/foundation/les/maak', 'POST /api/foundation/les/join', 'POST /api/foundation/les/code/roteer'
 ]);
 
 const isEenmalig = (methode, pad) => ROUTES.has(

@@ -23,11 +23,10 @@
    rem, en die groeit van het KIJKEN. Dat is geen werk van de route. Een meter
    die de rem meetelt, verklaart elke bevraagde lezer tot schrijver.
 
-   De vierde is echt beschermd, en om een reden die je in de handler niet ziet
-   staan: /api/foundation/les/maak schrijft ELKE keer een verse les met een nieuwe
-   code, en wordt tegengehouden door de duplicaatregel `zelfdeVerzoek` in
-   ./idemsleutels-kaleronde.js (vak + docentnaam). De bescherming zit dus in de
-   laag ervoor en niet in de handler -- en zij is gemeten en niet aangenomen.
+   De vierde (/api/foundation/les/maak) stond hier als PROTECTED, beschermd door
+   de duplicaatregel `zelfdeVerzoek` -- die het antwoord HERHAALDE, lescode en
+   leraarssleutel incluis. Sinds de lescredentials hash-only zijn (29 september
+   2026, B17) mag dat niet meer; de route staat nu in ./mutatiecontracten-lesfamilie.js.
    ========================================================================== */
 'use strict';
 
@@ -63,27 +62,7 @@ const CONTRACTEN = Object.fromEntries([
     'filtert en sorteert de aankomsten van de zaak en geeft ze terug'),
   lezer('POST /api/supplier/pay/graaf', 'supplier.pay.graaf',
     'server/routes/pay-zaak.js',
-    'geeft pay.graafVanZaak() terug, en staat in ./idemsleutels-geld.js al als `leest` verklaard'),
-
-  ['POST /api/foundation/les/maak', {
-    mutatieId: 'foundation.les.maak', herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'PUBLIC',
-      waarom: 'een les wordt gemaakt door een begeleider die op dat moment nog niets heeft -- de code en ' +
-        'het docenttoken die hij terugkrijgt ZIJN de sleutel. Een inlog eisen zou betekenen dat een ' +
-        'gastdocent eerst een account moet hebben; de rem staat op de route en niet op een pas' },
-    stand: 'PROTECTED',
-    bewijs: {
-      gemeten: 'kale ronde ZONDER sleutel: de tweede oproep kwam terug met `herhaald: true` -- de ' +
-        'duplicaatregel ving haar, terwijl de aanroeper niets deed om dat te vragen',
-      op: '2026-08-30'
-    },
-    nagekeken: 'handler gelezen in server/foundation/onderwijs/les.js: hij maakt ELKE keer een verse les ' +
-      'met een nieuwe code en schrijft die weg -- de bescherming zit dus niet in de handler maar in de ' +
-      'duplicaatregel `zelfdeVerzoek` (vak + docentnaam) uit ./idemsleutels-kaleronde.js. Een tweede ' +
-      'druk op "maak les" levert dezelfde les en geen tweede lokaal',
-    afgetekend: AFGETEKEND
-  }]
+    'geeft pay.graafVanZaak() terug, en staat in ./idemsleutels-geld.js al als `leest` verklaard')
 ]);
 
 module.exports = CONTRACTEN;

@@ -231,8 +231,8 @@ const FAMILIES = [
         bevoegdGezin: true, privacyAkkoord: true
       }, null);
       const d = r && r.data;
-      if (!d || !d.code || !d.token) return null;
-      return { code: d.code, token: d.token };
+      if (!d || !d.lesId || !d.token) return null;
+      return { code: d.lesId, token: d.token };
     }
   },
   {
@@ -276,8 +276,8 @@ const FAMILIES = [
       '/api/foundation/agenda', '/api/foundation/opgave/', '/api/foundation/opgave',
       '/api/foundation/schrift/', '/api/foundation/ai'],
     velden: ['code', 'token'],
-    waarom: 'lesVan leest de lescode uit het lijf en docentCheck de docentsleutel via ' +
-      'tokenUit(req), die ook het lijfveld `token` accepteert (server/foundation/basis.js)',
+    waarom: 'lesVan leest het les-id uit het lijf en de lessleutel via ' +
+      'toegang.vanVerzoek(), die ook het lijfveld `token` leest (foundation/onderwijs/toegang.js)',
     /* Bewust zonder inlog -- een quizbord in de klas -- en dus geeft de deur
        code en sleutel gewoon terug. Wel met de uurgrens per IP die er sinds
        kort op zit (test/foundation-lesrem.test.js); een fixture die er een
@@ -291,8 +291,8 @@ const FAMILIES = [
     async bouw({ post }) {
       const r = await post('/api/foundation/les/maak', { vak: 'Proefles', naam: 'Proef Begeleider' }, null);
       const d = r && r.data;
-      if (!d || !d.code || !d.token) return null;
-      return { code: d.code, token: d.token };
+      if (!d || !d.lesId || !d.token) return null;
+      return { code: d.lesId, token: d.token };
     }
   },
   {

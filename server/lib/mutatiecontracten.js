@@ -92,6 +92,7 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-codefamilie').CONTRACTEN, // B9, B11, B12, B14
   require('./mutatiecontracten-restdeuren').CONTRACTEN,
   require('./mutatiecontracten-codedeuren').CONTRACTEN,
+  require('./mutatiecontracten-lesfamilie').CONTRACTEN,
   require('./mutatiecontracten-werksleutels').CONTRACTEN,
   require('./mutatiecontracten-machinesleutels').CONTRACTEN,
   require('./mutatiecontracten-ssogeheim').CONTRACTEN,
@@ -142,9 +143,7 @@ const CONTRACTEN = Object.assign({},
      een ander antwoord krijgt. Eigen bestand, zie de kop daar. */
   require('./mutatiecontracten-herstel').CONTRACTEN,
   /* De zevenenveertig die uit de afleidgang vielen toen die een grens erbij
-     kreeg, met de hand gelezen op 13 september 2026. Drie bestanden omdat ze
-     drie verschillende dingen bleken: lezers, lezers-met-een-seeder, en wat
-     geen lezer was. Zie de kop van het eerste. */
+     kreeg, met de hand gelezen op 13 september 2026 (zie de kop van de eerste). */
   require('./mutatiecontracten-afleidrest').CONTRACTEN,
   require('./mutatiecontracten-afleidrest-b').CONTRACTEN,
   require('./mutatiecontracten-afleidrest-c').CONTRACTEN,

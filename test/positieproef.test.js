@@ -54,7 +54,7 @@ test('4. een stap die niet liep is null met een reden, nooit 0', () => {
 test('5. een echte doorloop: de lezer ziet, en het register loopt niet achter', { timeout: 300000 }, async () => {
   const uit = await meet();
   assert.ok(!uit.fout, uit.fout);
-  assert.equal(uit.besturing.inOrde, true, 'de besturingsproef: de positie die Onderweg bewaart wordt teruggevonden');
+  assert.equal(uit.besturing.inOrde, true, 'de besturingsproef: de plek die een verkeersmelding met opzet bewaart (N15) wordt teruggevonden');
   for (const s of uit.stappen) assert.equal(s.status, 200, s.naam + ' liep niet (' + s.status + ')');
   const reg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'POSITIEPROEF.json'), 'utf8'));
   assert.deepEqual(reg.tellers, uit.tellers,

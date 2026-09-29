@@ -901,6 +901,11 @@ const EIGEN_MODULE = new Map([
      bericht mag komen en over intrekken -- dat woont in ./deelnemer.js en
      ./bericht.js. */
   ['comm-deelnemer.test.js', ['server/kern/comm/deelnemer.js', 'server/kern/comm/bericht.js']],
+  /* DE PLAATSLAAG. plaatsdoelhek.test.js laadt server/kern/plaats/index.js, en
+     dat is een samensteller zonder eigen gedrag. De regel die de toets bewaakt
+     (alleen het doelhek wordt bewaard, NAVIGATIE.md N12) woont in ./waarnemen.js,
+     de eis dat een nadering haar hek noemt in ./venster.js. */
+  ['plaatsdoelhek.test.js', ['server/kern/plaats/waarnemen.js', 'server/kern/plaats/venster.js']],
   /* DE GELDMOTOR. Deze twee toetsen laden server/kern/pay/motorklant.js, en dat
      is sinds de samenvoeging een schil van dertig regels: twee paden, twee
      namen, klaar. De motor vond daar terecht "geen bruikbare mutatie" -- niet

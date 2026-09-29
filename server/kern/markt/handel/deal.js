@@ -2,6 +2,7 @@
    elkaar, factuur, betalen) en het postvak. chatId en sein komen uit de
    chatlaag via de context. Krijgt de gedeelde context een keer bij het
    opstarten vanuit kern/markt/handel.js. */
+const S = require('./samenkomst');
 module.exports = (ctx) => {
   const { db, save, crypto, anthropic, schoon, notify, notifySupplier, haversine, betaal,
     CATEGORIEEN, STATEN, LEVERING, RESPECTLOOS, VERBODEN, SCAM_WOORDEN, CONTACT_BUITEN,
@@ -28,7 +29,7 @@ module.exports = (ctx) => {
     if (b <= 0) return { error: 'Vul een bedrag in om af te spreken.', status: 400 };
     const oud = chat.deal || {};
     chat.deal = { bedrag: b, status: 'afgesproken', door: rolIn(chat, partij),
-      koperGps: null, verkoperGps: null, samen: false, factuur: null, betaald: false, methode: null, at: nu() };
+      wacht: null, gedeeld: {}, samen: false, factuur: null, betaald: false, methode: null, at: nu() };
     if (oud.betaald) chat.deal = oud; // een afgeronde betaling niet overschrijven
     chat.berichten.push({ van: pk(partij), naam: rolIn(chat, partij) === 'verkoper' ? chat.verkoper.naam : chat.koper.naam, tekst: 'Prijs afgesproken: € ' + b + '. Betalen kan zodra jullie samen zijn.', at: nu(), systeem: true });
     save();
@@ -45,23 +46,20 @@ module.exports = (ctx) => {
     if (!isDeelnemer(chat, partij)) return { error: 'Dit gesprek is niet van jou.', status: 403 };
     if (!chat.deal || !chat.deal.bedrag) return { error: 'Spreek eerst een prijs af.', status: 400 };
     if (!Number.isFinite(Number(lat)) || !Number.isFinite(Number(lng))) return { error: 'We konden je locatie niet lezen. Zet locatie aan.', status: 400 };
-    const pos = { lat: Number(lat), lng: Number(lng), at: Date.now() };
-    if (pk(partij) === pk(chat.koper)) chat.deal.koperGps = pos; else chat.deal.verkoperGps = pos;
-    const kg = chat.deal.koperGps, vg = chat.deal.verkoperGps;
-    let afstand = null;
-    const versKg = kg && (Date.now() - kg.at) < SAMEN_VERS_MS;
-    const versVg = vg && (Date.now() - vg.at) < SAMEN_VERS_MS;
-    if (versKg && versVg) {
-      afstand = haversine ? haversine(kg, vg) : null;
-      if (afstand != null && afstand <= SAMEN_METER && !chat.deal.betaald) {
-        if (!chat.deal.samen) {
-          chat.deal.samen = true;
-          chat.deal.status = 'samen';
-          chat.deal.factuur = maakFactuur(chat);
-          const ander = pk(partij) === pk(chat.koper) ? chat.verkoper : chat.koper;
-          sein(ander, { icon: 'gps', title: 'Jullie zijn samen', body: 'De factuur staat klaar; de koper kan nu betalen.' });
-        }
-      }
+    /* Een wachtend punt en daarna de uitkomst, nooit twee punten op de chat
+       (NAVIGATIE.md N21, ./samenkomst.js). Al samen: een nieuw punt heeft geen doel. */
+    if (chat.deal.samen) return { ok: true, chat: chatPub(chat, partij), samen: true, afstand: chat.deal.afstand };
+    const nuMs = Date.now();
+    S.vervalAlle(store().chats, nuMs, SAMEN_VERS_MS);
+    const uit = S.samenMeld(chat.deal, rolIn(chat, partij), Number(lat), Number(lng),
+      { nuMs, versMs: SAMEN_VERS_MS, samenMeter: SAMEN_METER, haversine });
+    const afstand = uit.afstand;
+    if (uit.samen && !chat.deal.betaald && !chat.deal.samen) {
+      chat.deal.samen = true;
+      chat.deal.status = 'samen';
+      chat.deal.factuur = maakFactuur(chat);
+      const ander = pk(partij) === pk(chat.koper) ? chat.verkoper : chat.koper;
+      sein(ander, { icon: 'gps', title: 'Jullie zijn samen', body: 'De factuur staat klaar; de koper kan nu betalen.' });
     }
     chat.deal.afstand = afstand;
     save();
@@ -117,11 +115,11 @@ module.exports = (ctx) => {
     const d = chat.deal;
     if (!d) return null;
     const rol = rolIn(chat, kijker);
-    const ikGps = rol === 'koper' ? d.koperGps : d.verkoperGps;
-    const anderGps = rol === 'koper' ? d.verkoperGps : d.koperGps;
+    const nuMs = Date.now(), ander = rol === 'koper' ? 'verkoper' : 'koper';
     return {
       bedrag: d.bedrag, status: d.status, rol,
-      ikGedeeld: !!ikGps, anderGedeeld: !!anderGps, samen: !!d.samen,
+      ikGedeeld: S.gedeeldVers(d, rol, nuMs, SAMEN_VERS_MS),
+      anderGedeeld: S.gedeeldVers(d, ander, nuMs, SAMEN_VERS_MS), samen: !!d.samen,
       afstand: d.afstand != null ? d.afstand : null,
       factuur: d.factuur || null, betaald: !!d.betaald, methode: d.methode || null,
       magBetalen: rol === 'koper' && !!d.samen && !d.betaald

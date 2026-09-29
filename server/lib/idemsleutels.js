@@ -135,6 +135,7 @@ Object.assign(SLEUTELS,
   require('./idemsleutels-restbak'),
   /* De weerbaarheidsronde: de tweede handtekening en de schaduwteller. */
   require('./idemsleutels-weerbaarheid').SLEUTELS,
+  require('./idemsleutels-aankomst').SLEUTELS,
   /* RTG Move: drie lezende POST-routes. Waarom `leest` en niet
      `zelfdeVerzoek` staat in de kop van dat bestand -- een tweede weging
      hoort het antwoord van NU te krijgen. */

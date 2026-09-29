@@ -77,12 +77,13 @@ module.exports = (ctx) => {
      het stuk waar een lid op moet kunnen rekenen als het misgaat, en als enige
      opent het een kanaal naar het kantoorscherm. */
   const noodlaag = require('./sos')({ db, nu, save, id, lijsten, dateVoor, codenaamVan, notify, sseToCustomer, sseToOffice });
-  const { sos, sosAf, signaalNaarKantoor, signaalNaarLid } = noodlaag;
+  const { sos, sosAf, signaalNaarKantoor, signaalNaarLid, vergeetSosPosities } = noodlaag;
 
   function opschonen() {
     lijsten();
     let veranderd = false;
     for (const v of db.data.ontmoetVoorstellen) if (v.status === 'open' && verlopenVoorstel(v)) { v.status = 'verlopen'; veranderd = true; }
+    if (ctx.vergeetOudePosities && ctx.vergeetOudePosities()) veranderd = true;
     if (veranderd) save();
   }
   function publiekVoorstel(v, key) {
@@ -121,5 +122,5 @@ module.exports = (ctx) => {
     return { totaal: dates.length, alarmen, dates };
   }
 
-  return { maakDate, dateVoor, teken, dateHier, stop, sos, sosAf, signaalNaarKantoor, signaalNaarLid, opschonen, publiekVoorstel, publiekeDate, mijnState, kantoorState };
+  return { maakDate, dateVoor, teken, dateHier, stop, sos, sosAf, signaalNaarKantoor, signaalNaarLid, vergeetSosPosities, opschonen, publiekVoorstel, publiekeDate, mijnState, kantoorState };
 };

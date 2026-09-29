@@ -95,14 +95,25 @@ function maakOv({ db, save, crypto, bewerkCollectie, schoon, codenaamVan, havers
   const versVoertuig = v => Date.now() - new Date(v.at).getTime() < VOERTUIG_TTL_MS;
   const actieveRit = key => db.data.ovRitten.find(r => r.key === key && r.status === 'in') || null;
 
+  /* Halte in plaats van punt (NAVIGATIE.md N17): ./halte.js. De omzetting van
+     oude ritten krijgt de lijst en de lijn per rit, en slaat hier op. */
+  const { inPunten, halteBij, inPuntVan, puntenWeg: naarHalte } = require('./halte')({ haversine });
+  const puntenWeg = () => {
+    if (naarHalte(db.data.ovRitten, r => { const s = ovZaak(r.code); return s ? lijnVan(s, r.lijnId) : null; })) save();
+  };
+
   function ritStart(key, voertuig) {
     if (actieveRit(key)) return { status: 409, error: 'Al ingecheckt.' };
     const s = ovZaak(voertuig.code);
     const lijn = s ? lijnVan(s, voertuig.lijnId) : null;
     if (!lijn) return { status: 404, error: 'Lijn niet gevonden.' };
+    const at = nu();
+    // `at` bovenaan: daar leest de bewaarveger de datum (N17, een jaar)
     const rit = { id: id('rt'), key, code: voertuig.code, lijnId: lijn.id, soort: lijn.soort,
-      voertuigId: voertuig.id, status: 'in',
-      in: { lat: voertuig.lat, lng: voertuig.lng, at: nu() }, uit: null, prijs: null };
+      voertuigId: voertuig.id, status: 'in', at,
+      in: { ...halteBij(lijn, voertuig), at }, uit: null, prijs: null };
+    inPunten.set(rit.id, { lat: voertuig.lat, lng: voertuig.lng });
+    if (inPunten.size > RITTEN_MAX) inPunten.delete(inPunten.keys().next().value);
     db.data.ovRitten.push(rit);
     if (db.data.ovRitten.length > RITTEN_MAX) db.data.ovRitten = db.data.ovRitten.slice(-RITTEN_MAX);
     save();
@@ -111,17 +122,19 @@ function maakOv({ db, save, crypto, bewerkCollectie, schoon, codenaamVan, havers
   }
   function ritBeeld(r) {
     return { id: r.id, lijnId: r.lijnId, soort: r.soort, icoon: SOORTEN[r.soort] || '\u{1F68C}',
-      status: r.status, inAt: r.in.at, uitAt: r.uit ? r.uit.at : null, prijs: r.prijs, km: r.km || null };
+      status: r.status, inAt: r.in.at, uitAt: r.uit ? r.uit.at : null, prijs: r.prijs, km: r.km || null,
+      van: r.in.halte || null, naar: r.uit ? r.uit.halte || null : null };
   }
 
   // de gedeelde ctx voor de deelbestanden
   const ctx = {
     db, save, crypto, schoon, nu, id, codenaamVan, haversine, etaMinutes, pay, notify, codes, afwezigOp,
     ensureOv, ovZaak, lijnVan, ovPrijsVan, versVoertuig, actieveRit, ritStart, ritBeeld,
-    SOORTEN, VOERTUIG_TTL_MS, CODE_TTL_MS, GPS_CHECKIN_M, RITTEN_MAX
+    halteBij, inPuntVan, inPunten, SOORTEN, VOERTUIG_TTL_MS, CODE_TTL_MS, GPS_CHECKIN_M, RITTEN_MAX
   };
 
   ensureOv();
+  puntenWeg();   // na ensureOv: dan bestaat de demozaak en zijn haltelijst al
   return Object.assign({ ovPrijsVan, ovZaakVan: ovZaak, ovLijnVan: lijnVan },
     require('./reizen')(ctx), require('./dienst')(ctx), require('./regie')(ctx), require('./operatie')(ctx));
 }

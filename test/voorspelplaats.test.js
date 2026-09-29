@@ -99,7 +99,7 @@ test('2. niets gemeten laat de volgorde met rust', () => {
 
 test('3. wie in de buurt is, komt naar voren -- met de reden erbij', () => {
   const { v, plaats } = maak();
-  plaats.plaatsVensterOpen(IK, { doel: 'nadering', bron: 'toets' });
+  plaats.plaatsVensterOpen(IK, { doel: 'nadering', bron: 'toets', hek: 'leverancier:' + ZAAK_B });
   plaats.plaatsWaarneem(IK, { doel: 'nadering', hek: 'leverancier:' + ZAAK_B, wat: 'binnen' });
   const r = v.voorLid(IK, null);
   /* B is van zichzelf de ZWAKSTE verwachting (drie bezoeken tegen acht). Dat hij
@@ -118,7 +118,7 @@ test('3. wie in de buurt is, komt naar voren -- met de reden erbij', () => {
 
 test('4. aantoonbaar elders zakt onder wat niemand mat -- maar valt niet weg', () => {
   const { v, plaats } = maak();
-  plaats.plaatsVensterOpen(IK, { doel: 'nadering', bron: 'toets' });
+  plaats.plaatsVensterOpen(IK, { doel: 'nadering', bron: 'toets', hek: 'leverancier:' + ZAAK_A });
   plaats.plaatsWaarneem(IK, { doel: 'nadering', hek: 'leverancier:' + ZAAK_A, wat: 'buiten' });
   const r = v.voorLid(IK, null);
   assert.equal(r.verwachtingen.length, 2, 'er valt niets weg');

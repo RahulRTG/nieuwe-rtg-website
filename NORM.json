@@ -151,7 +151,14 @@
     "edgeVeldVoortzetting": 0,
     "edgeVeldHoofdactie": 59,
     "edgeVeldTrust": 0,
-    "edgeVeldContextZelf": 11
+    "edgeVeldContextZelf": 11,
+    "positieZonderTermijn": 20,
+    "positieNietVergeten": 20,
+    "positieStromenGezien": 35,
+    "positieNavBlijft": 0,
+    "positieNaTaak": 0,
+    "positiePassages": 0,
+    "aankomstUitPositie": 0
   },
   "notities": [
     {
@@ -3838,6 +3845,26 @@
       "meter": "toetsenNietGemeten 300 -> 302",
       "reden": "test/margeperlid.test.js (C15) en test/boardroombesluiten.e2e.js (de tab Besluiten) zijn nieuw. Met de hand nagetrokken, elf mutaties die alle elf zakten: de noemer alleen over leden met verbruik, kosten van een zaak meegeteld, geen secundaire onderdrukking, een lid zonder contract genegeerd, verbruik zonder tarief genegeerd, een oude maand gerekend, guest niet als gratis gelezen, een trede van de ladder bij RTG Pass geboekt; op het scherm de cadeaubon omzetten zonder passkey, de gekozen richting kwijt, en een uitgifte die niet mag verzwegen.",
       "waarheen": "Een volledige npm run mutatie op een schone boom neemt ze mee."
+    },
+    {
+      "datum": "2026-09-29",
+      "soort": "schuld",
+      "sleutel": "kernGedeeld",
+      "van": 250,
+      "vervalt": "2026-12-29",
+      "meter": "kernGedeeld 250 -> 251",
+      "reden": "`bevestigAankomst` (kern/live.js) is een nieuwe kernnaam, en hij wordt door TWEE domeinen aangeraakt: `member` (het lid bevestigt dat het er is, /api/live/aangekomen) en `supplier` (de zaak die de bestemming is bevestigt het, /api/supplier/guest/aangekomen). Dat is het besluit zelf: NAVIGATIE.md N13 zegt dat aankomst wordt bevestigd door de klant of de zaak, en wie het eerst bevestigt is genoeg. De regel -- een bevestiging zet de stand eenmaal, een tweede verandert niets -- hoort daarom op EEN plek te staan en door beide kanten te worden aangeroepen; twee kopieen zouden uiteenlopen zodra een van de twee kanten een voorwaarde krijgt. Beide staan als verklaring in GRENZEN.json, en de domeingrens hield hem tegen tot iemand hem opschreef.",
+      "waarheen": "Niets, tenzij aankomst weer een eenzijdig feit wordt -- en dat botst met N13. Dit getal hoort te dalen doordat OUDE koppelingen verdwijnen, niet door deze gedeelde regel weer in twee kopieen te splitsen."
+    },
+    {
+      "datum": "2026-09-29",
+      "soort": "schuld",
+      "sleutel": "kernBreedte",
+      "van": 1666,
+      "vervalt": "2026-12-29",
+      "meter": "kernBreedte 1666 -> 1667",
+      "reden": "`bevestigAankomst` (kern/live.js) is een nieuwe kernnaam, en hij wordt door TWEE domeinen aangeraakt: `member` (het lid bevestigt dat het er is, /api/live/aangekomen) en `supplier` (de zaak die de bestemming is bevestigt het, /api/supplier/guest/aangekomen). Dat is het besluit zelf: NAVIGATIE.md N13 zegt dat aankomst wordt bevestigd door de klant of de zaak, en wie het eerst bevestigt is genoeg. De regel -- een bevestiging zet de stand eenmaal, een tweede verandert niets -- hoort daarom op EEN plek te staan en door beide kanten te worden aangeroepen; twee kopieen zouden uiteenlopen zodra een van de twee kanten een voorwaarde krijgt. Beide staan als verklaring in GRENZEN.json, en de domeingrens hield hem tegen tot iemand hem opschreef.",
+      "waarheen": "Niets, tenzij aankomst weer een eenzijdig feit wordt -- en dat botst met N13. Dit getal hoort te dalen doordat OUDE koppelingen verdwijnen, niet door deze gedeelde regel weer in twee kopieen te splitsen."
     }
   ],
   "prestatie": {
@@ -3975,7 +4002,14 @@
     "edgeVeldHoofdactie": "2026-09-27",
     "edgeVeldTrust": "2026-09-23",
     "edgeVeldContextZelf": "2026-09-23",
-    "bewijsAlleenKeten": "2026-09-28"
+    "bewijsAlleenKeten": "2026-09-28",
+    "positieZonderTermijn": "2026-09-29",
+    "positieNietVergeten": "2026-09-29",
+    "positieStromenGezien": "2026-09-29",
+    "positieNavBlijft": "2026-09-29",
+    "positieNaTaak": "2026-09-29",
+    "positiePassages": "2026-09-29",
+    "aankomstUitPositie": "2026-09-29"
   },
   "uitzonderingen": [
     {

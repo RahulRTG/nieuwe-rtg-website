@@ -6,7 +6,7 @@
   "op": "2026-09-29T16:42:37.762Z",
   "commit": "f66e0bb84",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 1,
   "instrument": "scripts/afgeleid.js",
   "node": "v22.22.2"
  },

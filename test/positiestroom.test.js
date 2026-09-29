@@ -105,16 +105,28 @@ test('8. de termijn komt uit het bewaarbeleid en niet uit de lijst', () => {
 
 test('9. elke stroom draagt een geldige klasse, een reden en GEEN besluit dat niemand nam', () => {
   const uit = P.meet();
+  const doc = fs.readFileSync(path.join(__dirname, '..', 'NAVIGATIE.md'), 'utf8');
+  const par150 = doc.slice(doc.indexOf('### 15.0'), doc.indexOf('### 15.1'));
   for (const r of uit.rijen) {
     assert.ok(P.KLASSEN.includes(r.klasse), r.naam + ': onbekende klasse ' + r.klasse);
     assert.ok(r.waarom && r.waarom.length > 30, r.naam + ': de indeling hoort verklaard te zijn');
-    assert.equal(r.status, 'voorstel');
     /* Een besluit is van de eigenaar (MUTATIECONTRACT.md: een stand wordt nooit
-       afgeleid uit bewijs). Wie hier een besluit invult, hoort dat met de datum
-       en het besluit uit NAVIGATIE.md te doen, en deze toets bij te werken. */
-    assert.equal(r.besluit, null, r.naam + ': een besluit dat niet in NAVIGATIE.md staat');
+       afgeleid uit bewijs). Het komt alleen uit BESLUITEN, en elk nummer daar
+       hoort als besluit in NAVIGATIE.md par. 15.0 te staan. */
+    if (r.besluit === null) { assert.equal(r.status, 'voorstel'); }
+    else {
+      assert.equal(r.status, 'besloten');
+      assert.ok(P.KLASSEN.includes(r.besluit.klasse), r.naam + ': besluit naar een onbekende klasse');
+      assert.match(r.besluit.datum, /^\d{4}-\d{2}-\d{2}$/);
+      assert.ok(par150.includes('**' + r.besluit.n + '**'), r.naam + ': ' + r.besluit.n + ' staat niet in NAVIGATIE.md par. 15.0');
+      assert.equal(r.besluit.uitgevoerd, r.besluit.klasse === r.klasse,
+        r.naam + ': uitgevoerd wordt afgeleid, niet opgegeven');
+    }
     if (r.klasse === 'onbekend') assert.ok(r.reden && r.reden.length > 40, r.naam + ': onbekend draagt een reden');
   }
+  // een besluit over een stroom die niet bestaat, is een besluit dat nergens landt
+  const namen = new Set(P.STROMEN.map(x => x.naam));
+  for (const naam of Object.keys(P.BESLUITEN)) assert.ok(namen.has(naam), naam + ': geen stroom met die naam');
 });
 
 test('10. de meter telt geen gebruik als schuld (N11)', () => {
@@ -125,7 +137,13 @@ test('10. de meter telt geen gebruik als schuld (N11)', () => {
     assert.ok(g.reden.length > 10, pad + ': een reden');
   }
   const uit = P.meet();
-  assert.equal(uit.gemeten.klassen.toegestaan, 0, 'wat niet blijft, is geen stroom');
+  /* Wat niet blijft, is geen stroom -- met EEN uitzondering: een stroom die de
+     eigenaar heeft laten stoppen (N12) blijft als rij staan, zodat te zien is
+     dat het besluit is uitgevoerd. Zo'n rij is geen voorstel en geen schuld. */
+  for (const r of uit.rijen.filter(x => x.klasse === 'toegestaan')) {
+    assert.ok(r.besluit && r.besluit.klasse === 'toegestaan' && r.besluit.uitgevoerd,
+      r.naam + ': wat niet blijft, is geen stroom -- tenzij een besluit hem liet stoppen');
+  }
 });
 
 test('11. het register POSITIESTROOM.json loopt niet achter op een verse meting', () => {

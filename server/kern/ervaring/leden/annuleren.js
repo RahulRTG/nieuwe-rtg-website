@@ -65,6 +65,7 @@ module.exports = (ctx) => {
       if (o.paid) { o.refunded = true; o.refundedAt = nu(); }
       o.status = wasBetaald ? 'terugbetaald' : 'geweigerd';
       o.geannuleerdDoor = 'lid';
+      if (o.geo) o.geo = null;   // geannuleerd: het bezorgpunt gaat, het adres blijft (NAVIGATIE.md N20)
       save();
       if (wasBetaald || o.status !== 'wacht-op-betaling') {
         notifySupplier(o.supplierCode, { icon: 'betalen', title: 'Bestelling geannuleerd', body: o.customerCodename + ' annuleerde ' + o.ref + (wasBetaald ? ' (€ ' + o.total + ' retour)' : '') });

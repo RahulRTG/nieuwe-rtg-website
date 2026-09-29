@@ -73,12 +73,16 @@ test('RTG Veilig', { concurrency: false }, async (t) => {
     assert.equal(r.status, 400, 'een alarm zonder ontvangers is geen alarm');
   });
 
-  await t.test('3. de laatst bekende plek wordt onthouden', async () => {
+  /* HARDOP OMGEDRAAID (NAVIGATIE.md N19, 29 september 2026). Deze toets
+     bewees dat de server de laatste plek ook ZONDER venster onthield; het besluit
+     is dat die plek alleen bestaat zolang de kring een venster open heeft. Het
+     onthouden zelf staat nu in toets 4, binnen de wacht. */
+  await t.test('3. zonder open venster wordt de plek niet onthouden (N19)', async () => {
     const p = await api(B, '/api/veiligheid/plek', { lat: 52.3676, lon: 4.9041, accu: 12 }, ik.token);
     assert.equal(p.status, 200, JSON.stringify(p.body));
+    assert.equal(p.body.bewaard, false);
     const beeld = await api(B, '/api/veiligheid', {}, ik.token);
-    assert.ok(beeld.body.plek, 'de server houdt de laatste positie vast');
-    assert.ok(beeld.body.plek.ouderdomMin <= 1);
+    assert.equal(beeld.body.plek, null, 'buiten een venster houdt de server geen plek vast');
   });
 
   await t.test('4. de wacht loopt af ZONDER de telefoon, en waarschuwt de kring', async () => {
@@ -87,6 +91,12 @@ test('RTG Veilig', { concurrency: false }, async (t) => {
       { soort: 'thuis', minuten: 1, marge: 0, label: 'Naar huis' }, ik.token);
     assert.equal(s.status, 200, JSON.stringify(s.body));
     assert.equal(s.body.wacht.status, 'loopt');
+
+    // binnen de wacht (die een venster opent) meldt het toestel zich een keer
+    const p = await api(B, '/api/veiligheid/plek', { lat: 52.3676, lon: 4.9041, accu: 12 }, ik.token);
+    assert.equal(p.body.bewaard, true, 'binnen het venster wordt de plek onthouden');
+    const beeld = await api(B, '/api/veiligheid', {}, ik.token);
+    assert.ok(beeld.body.plek && beeld.body.plek.ouderdomMin <= 1, 'de server houdt de laatste positie vast');
 
     /* Vanaf hier doet het toestel van "ik" NIETS meer: geen check-in, geen
        positie, geen enkel verzoek. Precies de situatie van een lege batterij

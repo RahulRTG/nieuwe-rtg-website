@@ -90,8 +90,23 @@ function maakOntmoeting({ db, save, crypto, accounts, leeftijdVan, notify, sseTo
      Terwijl de functie aanstaat stuurt de app af en toe de positie mee. We
      bewaren alleen de laatste positie (kort houdbaar) en kijken of een verbonden
      vriend die ook aanstaat vlakbij is. Zo ja, dan ontstaat er een voorstel. */
+  /* WISSEN ALS DE RADAR STOPT (NAVIGATIE.md N14). Een positie telde na
+     POS_TTL_MS niet meer mee, maar dat werd alleen bij het LEZEN gewogen: wie de
+     functie aan liet en de app dichtdeed, liet zijn laatste plek onbeperkt
+     staan. Een positie die niet meer vers is, hoort bij geen lopende radar meer
+     en wordt gewist -- hier, bij het ophalen van de stand en door de bewaarveger. */
+  function vergeetOudePosities() {
+    const P = db.data.ontmoetPosities || {};
+    let weg = 0;
+    for (const k of Object.keys(P)) {
+      const at = Date.parse((P[k] || {}).at || '') || 0;
+      if (Date.now() - at > POS_TTL_MS) { delete P[k]; weg++; }
+    }
+    return weg;
+  }
   function pos(key, lat, lng) {
     lijsten();
+    vergeetOudePosities();
     if (!staatAan(key)) return { status: 409, error: 'Zet Ontmoetingen eerst aan.' };
     const m = mag(key); if (!m.ok) { zet(key, false); return { status: 403, error: m.reden }; }
     if (Number.isFinite(lat) && Number.isFinite(lng)) db.data.ontmoetPosities[key] = { lat, lng, at: nu() };
@@ -112,7 +127,7 @@ function maakOntmoeting({ db, save, crypto, accounts, leeftijdVan, notify, sseTo
   const ctx = { db, save, crypto, accounts, leeftijdVan, notify, sseToCustomer, sseToOffice,
     connectieTussen, verbActief, zijnVrienden, codenaamVan, haversine,
     RADIUS_M, POS_TTL_MS, VOORSTEL_TTL_MS, MIN_LEEFTIJD, ACTIVITEITEN, ACT_IDS,
-    lijsten, accountVanKey, memberState, geslachtVan, mag, staatAan, zet, pos, versePositie, id, nu, paar };
+    lijsten, accountVanKey, memberState, geslachtVan, mag, staatAan, zet, pos, versePositie, vergeetOudePosities, id, nu, paar };
   const deelRadar = require('./ontmoeting/radar')(ctx);
   Object.assign(ctx, deelRadar);
   const deelDate = require('./ontmoeting/date')(ctx);
@@ -124,7 +139,9 @@ function maakOntmoeting({ db, save, crypto, accounts, leeftijdVan, notify, sseTo
     ontmoetZet: zet, ontmoetPos: pos,
     ontmoetKies: kies, ontmoetTeken: teken, ontmoetHier: dateHier, ontmoetStop: stop,
     ontmoetSos: sos, ontmoetSosAf: sosAf, ontmoetSignaalKantoor: signaalNaarKantoor,
-    ontmoetSignaalLid: signaalNaarLid, ontmoetMijnState: mijnState, ontmoetKantoorState: kantoorState
+    ontmoetSignaalLid: signaalNaarLid, ontmoetMijnState: mijnState, ontmoetKantoorState: kantoorState,
+    ontmoetVergeetOudePosities: vergeetOudePosities,
+    ontmoetVergeetSosPosities: deelDate.vergeetSosPosities
   };
 }
 

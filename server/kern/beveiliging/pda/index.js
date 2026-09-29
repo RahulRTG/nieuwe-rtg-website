@@ -8,6 +8,7 @@
    ./patrouille, die rondePubliek meelevert zodat het commandocentrum de lopende
    rondes kan tonen. */
 const { coord } = require('../../util');
+const sosPositie = require('../../sospositie');
 module.exports = (ctx) => {
   const { db, save, findSupplier, notifySupplier, sseToSupplier, sseToOffice, logActivity,
     BEV_ERNST, id, nu, vandaag, schoon, isBeveiliging, defaults, functieAan,
@@ -49,6 +50,11 @@ module.exports = (ctx) => {
     const x = incidenten().find(i => i.id === incidentId && i.supplierCode === s.code);
     if (!x) return { status: 404, error: 'Incident niet gevonden.' };
     x.status = x.status === 'open' ? 'afgehandeld' : 'open';
+    /* HET SLUITMOMENT IS DE KLOK VAN DE POSITIE (NAVIGATIE.md N18): open houdt
+       hij zijn plek, 90 dagen na afhandelen gaat die eraf. Heropenen zet de klok
+       weer stil. Wie hier sluit is het team en niet de melder, dus er is geen
+       "binnen een minuut ingetrokken": dan geldt gewoon de termijn. */
+    if (x.status === 'afgehandeld') x.afgehandeldAt = nu(); else delete x.afgehandeldAt;
     save();
     sseToSupplier(s.code, 'sync', { scope: 'beveiliging' });
     return { status: 200, ok: true, status2: x.status };
@@ -73,6 +79,19 @@ module.exports = (ctx) => {
     sseToSupplier(s.code, 'sync', { scope: 'beveiliging' });
     sseToOffice('sync', { scope: 'beveiliging' });
     return { status: 200, ok: true, incident: incidentPubliek(x) };
+  }
+
+  /* VERGEET VERLOPEN INCIDENTPOSITIES (N18), aangeroepen door de bewaarveger.
+     Een incident dat voor deze regel al was afgehandeld heeft geen
+     afgehandeldAt; de klok start dan nu -- met terugwerkende kracht een datum
+     verzinnen zou een plek wissen op een moment dat niemand koos (zelfde vorm als
+     geverifieerdOp in bewaarveger.js). */
+  function vergeetPdaSos(t) {
+    const lijst = incidenten();
+    let klok = 0;
+    for (const x of lijst) if (x.status === 'afgehandeld' && !x.afgehandeldAt) { x.afgehandeldAt = nu(); klok++; }
+    if (klok) save();
+    return sosPositie.veeg(lijst, { velden: ['lat', 'lng'], dicht: x => x.status === 'afgehandeld' && x.afgehandeldAt, nu: t });
   }
 
   /* ---- het commandocentrum: alles in een oogopslag ---- */
@@ -103,6 +122,6 @@ module.exports = (ctx) => {
   }
 
   return Object.assign(
-    { meldIncident, beslisIncident, sos, command },
+    { meldIncident, beslisIncident, sos, command, vergeetPdaSos },
     patrouille);
 };

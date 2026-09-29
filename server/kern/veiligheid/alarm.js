@@ -16,6 +16,7 @@
         niemand het alarm nog. Vals alarm sloopt een veiligheidssysteem.
      2. daarna pas de kring.
    Het codewoord slaat trede 1 over: daar is de vertraging juist het gevaar. */
+const sosPositie = require('../sospositie');
 module.exports = ({ opslag, save, crypto, kring, plek, meldAan, mail, appUrl }) => {
   const nu = () => new Date().toISOString();
 
@@ -112,6 +113,12 @@ module.exports = ({ opslag, save, crypto, kring, plek, meldAan, mail, appUrl }) 
     if (!a) return { status: 404, error: 'Dit alarm kennen we niet.' };
     if (a.afgesloten) return { status: 200, ok: true };
     a.afgesloten = true; a.afgeslotenAt = nu(); a.hoe = String(hoe || '').slice(0, 120);
+    /* DE PLEK HOORT BIJ DE MELDING (NAVIGATIE.md N18). Een proefalarm, of een
+       alarm dat de melder binnen een minuut zelf afsluit, verliest hem nu; een
+       echt alarm houdt hem nog 90 dagen (vergeetAlarmPlekken hieronder). Afsluiten
+       doet hier altijd de melder zelf -- de route en de wacht sluiten alleen het
+       eigen alarm. */
+    if (directWeg(a)) sosPositie.wis(a, ['plek']);
     for (const doel of a.naar)
       meldAan(doel, {
         title: 'Alarm afgesloten', scope: 'veiligheid', soort: 'einde', alarmId: id,
@@ -120,6 +127,13 @@ module.exports = ({ opslag, save, crypto, kring, plek, meldAan, mail, appUrl }) 
     plek.vensterSluit(handle);
     save();
     return { status: 200, ok: true };
+  }
+
+  const directWeg = (a) => sosPositie.directWeg({ at: a.at, dicht: a.afgeslotenAt, proef: a.proef, doorMelder: true });
+
+  // Voor de bewaarveger: 90 dagen na afsluiten, of een proef die toch bleef staan.
+  function vergeetAlarmPlekken(t) {
+    return sosPositie.veeg(lijsten(), { velden: ['plek'], dicht: a => a.afgesloten && a.afgeslotenAt, direct: directWeg, nu: t });
   }
 
   function alarmenVan(handle, max) {
@@ -151,5 +165,5 @@ module.exports = ({ opslag, save, crypto, kring, plek, meldAan, mail, appUrl }) 
     catch (e) { return false; }   // bij twijfel niet in de weg staan
   }
 
-  return { alarmSlaan, alarmAfsluiten, alarmenVan, alarmenVoorMij, kaartLink, kringLeeg };
+  return { alarmSlaan, alarmAfsluiten, alarmenVan, alarmenVoorMij, kaartLink, kringLeeg, vergeetAlarmPlekken };
 };

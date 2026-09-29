@@ -124,6 +124,8 @@ module.exports = (kern) => {
     if (!reden) return res.status(400).json({ error: 'Noteer waarom deze rekening oninbaar is (weggelopen, klacht, vergissing).' });
     r.status = 'oninbaar'; r.oninbaar = { centen: openstaand(r), reden, at: nu(), door: req.actor.name };
     r.geslotenAt = nu();
+    // een bezorgrekening die zo stopt, wordt niet meer bezorgd: het punt gaat weg, het adres blijft (NAVIGATIE.md N20)
+    if (r.bezorg) { r.bezorg.lat = null; r.bezorg.lng = null; }
     save();
     logActivity(req.supplier.code, req.actor, 'boekte ' + (r.tafel || r.id) + ' als oninbaar: ' + reden);
     res.json({ ok: true, oninbaar: r.oninbaar,

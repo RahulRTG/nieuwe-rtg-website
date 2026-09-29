@@ -174,9 +174,16 @@ const TREDEN = [
         w.gelukt();
         const dest = start.data.live.dest || (start.data.live.partners || []).find(p => p.code === (w.zaakCode || 'KIKUNOI'));
         if (dest && dest.loc) {
+          /* Op de stoep staan is een VOORSTEL en geen aankomst (NAVIGATIE.md N3 en
+             N13): het scherm vraagt "Bent u er?", en de gast bevestigt zelf. Een
+             automatische aankomst uit een positie zou hier juist RAAK moeten zijn. */
           const upd = await w.vraag('POST', '/api/live/update', w.lid, { lat: dest.loc.lat, lng: dest.loc.lng });
-          if (upd.status === 200 && upd.data.live && upd.data.live.arrived) w.gelukt();
-          else w.raak('op de stoep staan leverde geen aankomst op', '/api/live/update gaf ' + upd.status);
+          const hier = upd.status === 200 && upd.data.live && upd.data.live.nabij && !upd.data.live.arrived
+            ? await w.vraag('POST', '/api/live/aangekomen', w.lid, {}) : null;
+          if (hier && hier.status === 200 && hier.data.live && hier.data.live.arrived) w.gelukt();
+          else if (upd.data && upd.data.live && upd.data.live.arrived) w.raak('een positie zette zelf een aankomst (N13)', '/api/live/update');
+          else w.raak('op de stoep staan en bevestigen leverde geen aankomst op',
+            '/api/live/update gaf ' + upd.status + (hier ? ', /api/live/aangekomen gaf ' + hier.status : ', en de gast werd niet gevraagd of hij er was'));
         } else w.nietGeprobeerd('de bestemming had geen locatie om naartoe te lopen');
       } else w.raak('onderweg gaan lukte niet', '/api/live/start gaf ' + start.status);
 

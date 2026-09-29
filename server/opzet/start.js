@@ -89,7 +89,15 @@ module.exports = function start(deps) {
   /* De bewaarveger en de regel eronder (tot wanneer iemand lid is) staan in
      ./bewaarveger.js. Die regel gaat over iemands gegevens en hoorde niet
      middenin een opstartblok te staan. */
-  require('./bewaarveger')({ db, save, accounts, log, UPLOAD_DIR });
+  require('./bewaarveger')({ db, save, accounts, log, UPLOAD_DIR,
+    // de ontmoetradar wist zijn eigen verlopen posities; de veger roept dat alleen aan (NAVIGATIE.md N14)
+    radarVeeg: () => (typeof kern.ontmoetVergeetOudePosities === 'function' ? kern.ontmoetVergeetOudePosities() : 0),
+    /* en de posities die bij een melding of venster horen: elk domein wist zijn
+       eigen (NAVIGATIE.md N18, N19). Een naam die ontbreekt veegt niets. */
+    sosVeeg: [(t, data) => require('../kern/voertuigsos').vergeetVoertuigSos(data.boekingen, t)].concat(
+      ['ontmoetVergeetSosPosities', 'veiligVergeetSosPosities', 'veiligVergeetVerlopenPlekken',
+        'bevVergeetSosPosities', 'bevVergeetRondePosities']
+        .map(n => (t) => (typeof kern[n] === 'function' ? kern[n](t) : 0))) });
 
   require('./startcontrole')({ PRODUCTION, DEMO, accounts, eigenaar });
 

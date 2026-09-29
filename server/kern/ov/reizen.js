@@ -6,7 +6,7 @@
 module.exports = (ctx) => {
   const { db, save, crypto, nu, codenaamVan, haversine, etaMinutes, pay, codes,
     ensureOv, ovZaak, lijnVan, ovPrijsVan, versVoertuig, actieveRit, ritStart, ritBeeld,
-    SOORTEN, CODE_TTL_MS, GPS_CHECKIN_M } = ctx;
+    halteBij, inPuntVan, inPunten, SOORTEN, CODE_TTL_MS, GPS_CHECKIN_M } = ctx;
 
   function kaart(key, hier) {
     ensureOv();
@@ -64,9 +64,11 @@ module.exports = (ctx) => {
     const s = ovZaak(rit.code);
     const lijn = s ? lijnVan(s, rit.lijnId) : null;
     const lat = Number(hier && hier.lat), lng = Number(hier && hier.lng);
+    // het instappunt leeft alleen tijdens de rit (NAVIGATIE.md N11/N17, kern/ov/index.js)
+    const vanPunt = inPuntVan(rit, lijn);
     const uitPunt = Number.isFinite(lat) ? { lat, lng } :
-      (db.data.ovVoertuigen.find(v => v.id === rit.voertuigId) || rit.in);
-    const km = Math.max(0, (haversine(rit.in, uitPunt) || 0) / 1000);
+      (db.data.ovVoertuigen.find(v => v.id === rit.voertuigId) || vanPunt);
+    const km = vanPunt && uitPunt ? Math.max(0, (haversine(vanPunt, uitPunt) || 0) / 1000) : 0;
     const prijs = ovPrijsVan(lijn, km);   // een formule, ook gebruikt door de kaartverkoop
     // betalen met autolaad: de wallet laadt zelf bij als het saldo tekortschiet
     const codenaam = codenaamVan(key);
@@ -79,7 +81,11 @@ module.exports = (ctx) => {
     const b = await pay.boekAsync({ van: rek, naar: 'partner:' + rit.code, centen: prijs, soort: 'ov',
       oms: 'OV · ' + (lijn ? lijn.naam : rit.lijnId) + ' · ' + (Math.round(km * 10) / 10) + ' km' });
     if (b.error) return { status: b.status || 400, error: b.error };
-    rit.status = 'uit'; rit.uit = { ...uitPunt, at: nu() }; rit.prijs = prijs; rit.km = Math.round(km * 10) / 10;
+    /* Na het rekenen blijft de uitstapHALTE en de afstand; de eigen GPS van het
+       lid wordt niet bewaard (NAVIGATIE.md N17). */
+    rit.status = 'uit'; rit.uit = { ...halteBij(lijn, uitPunt || {}), at: nu() };
+    rit.prijs = prijs; rit.km = Math.round(km * 10) / 10;
+    inPunten.delete(rit.id);
     save();
     return { status: 200, ok: true, prijs, km: rit.km, saldo: pay.saldoVan(rek), rit: ritBeeld(rit) };
   }

@@ -70,11 +70,17 @@ module.exports = (ctx) => {
     if (!adres) return { status: 400, error: 'Vul een bezorgadres in.' };
     const idVereist = waarde >= m.waardegrensId;
     if (idVereist && !accountVerified(key)) return { status: 403, error: 'Voor een bezorging boven € ' + m.waardegrensId + ' is een RTG-geverifieerd account nodig (ID aan de deur).' };
-    const lat = Number(opts && opts.lat), lng = Number(opts && opts.lng);
+    /* Geen punt is geen punt (NAVIGATIE.md N20, par. 12 gebrek 5). Hier stond
+       zonder coordinaat de winkel plus (0,01; 0,008) als bestemming, en daar
+       werd een route en een ETA naartoe gerekend: een verzonnen plek die als
+       echte afstand op het scherm kwam. Zonder punt blijft `loc` null, en
+       alles erna (route, ETA) zegt dan eerlijk dat het het niet weet. */
+    const lat = opts && opts.lat != null && opts.lat !== '' ? Number(opts.lat) : NaN;
+    const lng = opts && opts.lng != null && opts.lng !== '' ? Number(opts.lng) : NaN;
     const b = {
       ref: id('MODE'), supplierCode: s.code, supplierName: s.name, key, codenaam: codenaam || 'Lid',
       items, waarde, kosten, adres, idVereist,
-      loc: (Number.isFinite(lat) && Number.isFinite(lng)) ? { lat, lng } : (s.loc ? { lat: s.loc.lat + 0.01, lng: s.loc.lng + 0.008 } : null),
+      loc: (Number.isFinite(lat) && Number.isFinite(lng)) ? { lat, lng } : null,
       status: 'aangevraagd', koerier: null, foto: null, idOk: false,
       at: nu(), stappen: [{ status: 'aangevraagd', at: nu() }], gps: null
     };

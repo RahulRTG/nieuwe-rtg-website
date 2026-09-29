@@ -59,6 +59,55 @@ const DOEL = path.join(WORTEL, 'POSITIESTROOM.json');
    in, want wat niet blijft is geen stroom. */
 const KLASSEN = ['toegestaan', 'venster', 'noodzakelijk', 'teLang', 'onbegrensd', 'verboden', 'onbekend'];
 
+/* DE BESLUITEN VAN DE EIGENAAR. Een klasse hierboven is een voorstel; wat hier
+   staat is genomen, met een datum en een nummer dat letterlijk in NAVIGATIE.md
+   par. 15.0 moet voorkomen (test/positiestroom.test.js toets 9 zakt anders). Een
+   besluit noemt de klasse waar de stroom naartoe MOET. Of dat al zo is, wordt
+   niet opgegeven maar afgeleid: `uitgevoerd` is waar zodra de gemeten indeling
+   gelijk is aan de besloten klasse. Een besluit dat niemand bouwde blijft dus
+   zichtbaar als besluit, en niet als voltooid. */
+const N15 = { n: 'N15', datum: '2026-09-29', uitkomst: 'aanvaard zoals voorgesteld' };
+const BESLUITEN = {
+  'plaats-passages': { n: 'N12', datum: '2026-09-29', klasse: 'toegestaan',
+    uitkomst: 'alleen het doelhek wordt opgeslagen; een passage langs een ander hek wordt verwerkt en niet bewaard' },
+  'live-onderweg': { n: 'N14', datum: '2026-09-29', klasse: 'venster',
+    uitkomst: 'de positie wordt gewist zodra Onderweg stopt; de veger van zeven dagen blijft alleen als vangnet' },
+  'ontmoet-radar': { n: 'N14', datum: '2026-09-29', klasse: 'venster',
+    uitkomst: 'de positie wordt gewist zodra de radar stopt' },
+  ...Object.fromEntries(['charter-delen', 'date-positie', 'excursie-begeleider', 'excursie-leerling', 'huur-delen',
+    'koerier-bezorgdienst', 'ov-voertuig', 'plaats-waarnemingen', 'veilig-spoor']
+    .map(naam => [naam, Object.assign({ klasse: 'venster' }, N15)])),
+  ...Object.fromEntries(['favorieten', 'flits-melding', 'weefsel-zaak']
+    .map(naam => [naam, Object.assign({ klasse: 'noodzakelijk' }, N15)])),
+  /* De negentien onbegrensde stromen, per stroom besloten (29 september 2026). */
+  'ritlijn': { n: 'N16', datum: '2026-09-29', klasse: 'venster',
+    uitkomst: 'de punten van een rit worden gewist bij afronden; afstand, duur en begin- en eindplek zoals op de factuur blijven' },
+  'rit-vertrekpunt': { n: 'N16', datum: '2026-09-29', klasse: 'toegestaan',
+    uitkomst: 'tijdens de rit het exacte ophaalpunt; bij afronden vervangen door het adres of de plaatsnaam van de factuur' },
+  'ov-uitstap': { n: 'N17', datum: '2026-09-29', klasse: 'noodzakelijk',
+    uitkomst: 'na het rekenen van het tarief blijven de uitstaphalte en de afstand, een jaar; de GPS van het lid gaat weg' },
+  'ov-instap': { n: 'N17', datum: '2026-09-29', klasse: 'noodzakelijk',
+    uitkomst: 'de instaphalte vervangt de GPS; het reisoverzicht blijft een jaar en is eerder te wissen via de vergeetroute' },
+  ...Object.fromEntries(['huur-sos', 'charter-sos', 'date-sos', 'veilig-alarm', 'beveiliging-incident']
+    .map(naam => [naam, { n: 'N18', datum: '2026-09-29', klasse: 'noodzakelijk',
+      uitkomst: 'de positie hoort bij de melding: zolang die open is en 90 dagen erna; een proefalarm of een binnen een minuut ingetrokken SOS verdwijnt direct' }])),
+  'veilig-laatste-plek': { n: 'N19', datum: '2026-09-29', klasse: 'venster',
+    uitkomst: 'de laatste plek bestaat alleen zolang de kring een venster open heeft en verdwijnt bij sluiten' },
+  'patrouille': { n: 'N19', datum: '2026-09-29', klasse: 'toegestaan',
+    uitkomst: 'het controlepunt bewijst de ronde; de GPS-positie van de bewaker wordt niet bewaard' },
+  ...Object.fromEntries(['bezorgdienst-adres', 'horeca-bezorgadres', 'mode-adres', 'koerier-mode']
+    .map(naam => [naam, { n: 'N20', datum: '2026-09-29', klasse: 'venster',
+      uitkomst: 'het punt verdwijnt bij geleverd of geannuleerd; het adres zelf blijft bij de bestelling, en een verzonnen punt bestaat niet meer' }])),
+  'vonk-profiel': { n: 'N21', datum: '2026-09-29', klasse: 'noodzakelijk',
+    uitkomst: 'alleen een grove plek (een vak van 5 km), nooit het punt, en weg bij uitzetten of vergeten' },
+  'markt-overdracht': { n: 'N21', datum: '2026-09-29', klasse: 'toegestaan',
+    uitkomst: 'alleen samen ja/nee en de afstand blijven; de punten van koper en verkoper niet' },
+  'gemeente-melding': { n: 'N21', datum: '2026-09-29', klasse: 'toegestaan',
+    uitkomst: 'de plek blijft bij de melding, de codenaam van de melder gaat eraf na afhandeling' },
+  'reis-etappes': { n: 'N21', datum: '2026-09-29', klasse: 'toegestaan',
+    uitkomst: '"hier" wordt bij het plannen vervangen door de dichtstbijzijnde plaatsnaam; de GPS van het lid wordt niet bewaard' }
+};
+
 /* ----------------------------------------------------------------------------
    DE STROMEN. Per stroom: waar hij woont (met een citaat dat letterlijk in de
    bron moet staan), in welke collectie hij landt, aan welke sleutel, van wie de
@@ -70,25 +119,34 @@ const S = (pad, citaat) => ({ pad: 'server/' + pad, citaat });
 const STROMEN = [
   { naam: 'live-onderweg', wat: 'de positie van een lid dat Onderweg aanzet',
     bron: [S('routes/member/onderweg.js', 'L.lat = lat; L.lng = lng; L.updatedAt = new Date().toISOString(); gewijzigd = true;')],
-    collectie: 'live', sleutel: 'sessiesleutel', van: 'lid', klasse: 'teLang',
-    waarom: '/api/live/stop zet alleen active op false; de positie blijft tot de bewaarveger hem na zeven dagen ' +
-      'weghaalt. De taak is dan al voorbij (NAVIGATIE.md P-05, derde categorie).' },
+    collectie: 'live', sleutel: 'sessiesleutel', van: 'lid', klasse: 'venster',
+    termijn: { soort: 'venster', bewijs: S('routes/member/onderweg.js', 'if (L) { L.active = false; delete L.lat; delete L.lng; save(); pushLive(key); }') },
+    waarom: 'sinds N14 wist /api/live/stop de positie; de bewaarveger van zeven dagen is het vangnet voor wie ' +
+      'nooit op stop drukt. Tot 29 september zette stoppen alleen active op false (NAVIGATIE.md par. 6.2).' },
 
   { naam: 'rit-vertrekpunt', wat: 'de live-positie die bij een ritaanvraag in de vervoersopdracht wordt gekopieerd',
     bron: [S('routes/member/onderweg.js', 'const vanaf = (L && Number.isFinite(L.lat)) ? L : (zaak && zaak.loc) || null;')],
-    collectie: 'mobOpdrachten', sleutel: 'sessiesleutel', van: 'lid', klasse: 'onbegrensd',
-    waarom: 'de kopie ontsnapt aan de zevendagenveger van db.data.live en blijft op de opdracht staan zonder termijn' },
+    collectie: 'mobOpdrachten', sleutel: 'sessiesleutel', van: 'lid', klasse: 'toegestaan',
+    termijn: { soort: 'venster', bewijs: S('kern/mobiliteit/voortgang.js', 'if (VOORBIJ.has(status)) wisRitpunten(o, nu());') },
+    waarom: 'sinds N16 is het ophaalpunt exact zolang de rit loopt (de chauffeur moet je vinden) en houdt het bij ' +
+      'afronden alleen zijn label, zoals op de factuur (kern/mobiliteit/ritpunten.js). Tot 29 september ontsnapte de ' +
+      'kopie aan de zevendagenveger van db.data.live.' },
 
   { naam: 'ritlijn', wat: 'de posities van een lopende rit (chauffeur en dus reiziger)',
     bron: [S('kern/mobiliteit/voortgang.js', 'o.positie = { lat: punt.lat, lng: punt.lng, at: nu() };')],
-    collectie: 'mobOpdrachten', sleutel: 'sessiesleutel', van: 'medewerker', klasse: 'onbegrensd',
-    waarom: 'tot zestig gebeurtenissen met lat/lng blijven na de rit op de opdracht staan; een termijn ontbreekt ' +
-      '(B10 in NAVIGATIE.md: punten na de rit zijn onder PLAATS.md grens 1 een besluit, geen termijn)' },
+    collectie: 'mobOpdrachten', sleutel: 'sessiesleutel', van: 'medewerker', klasse: 'venster',
+    termijn: { soort: 'venster', bewijs: S('kern/mobiliteit/voortgang.js', 'if (VOORBIJ.has(status)) wisRitpunten(o, nu());') },
+    waarom: 'sinds N16 (beantwoordt B10) worden de locatiegebeurtenissen en o.positie gewist zodra de rit voorbij is; ' +
+      'afstand, duur en de plekken als tekst blijven voor de factuur, en na afronden neemt de opdracht geen positie ' +
+      'meer aan (409). Tot 29 september bleven tot zestig punten na de rit staan.' },
 
   { naam: 'reis-etappes', wat: 'vertrek- en aankomstpunten van een geboekte reis, soms de live-positie',
     bron: [S('kern/mobiliteit/reis.js', "van: { lat: e.van.lat, lng: e.van.lng, label: e.van.label || e.van.naam || 'Vertrek' },")],
-    collectie: 'mobReizen', sleutel: 'sessiesleutel', van: 'lid', klasse: 'onbegrensd',
-    waarom: 'begint het plan bij "hier", dan is dit de GPS van het lid, en de herkomst gaat verloren (bron wordt kaart)' },
+    collectie: 'mobReizen', sleutel: 'sessiesleutel', van: 'lid', klasse: 'toegestaan',
+    termijn: { soort: 'venster', bewijs: S('kern/mobiliteit/reis.js', 'reisZonderGps(r);') },
+    waarom: 'sinds N21 wordt "hier" vlak voor het opslaan vervangen door de dichtstbijzijnde plaatsnaam ' +
+      '(kern/mobiliteit/hiernaam.js); het plannen en de taxi-opdracht hebben het punt dan al gehad. Het citaat ' +
+      'hierboven is de opdracht voor de taxi, niet wat er van de reis blijft.' },
 
   { naam: 'favorieten', wat: 'plekken die een lid zelf bewaart, soms de huidige positie',
     bron: [S('kern/mobiliteit/plekken.js', 'Object.assign(f, { naam, lat: plek.lat, lng: plek.lng, bron: plek.bron });')],
@@ -98,14 +156,17 @@ const STROMEN = [
       'vergeetroute kent mobFavorieten niet (daar staat favorieten, een andere collectie)' },
 
   { naam: 'ov-instap', wat: 'het instappunt van een OV-rit',
-    bron: [S('kern/ov/index.js', 'in: { lat: voertuig.lat, lng: voertuig.lng, at: nu() }, uit: null, prijs: null };')],
-    collectie: 'ovRitten', sleutel: 'sessiesleutel', van: 'lid', klasse: 'onbegrensd',
-    waarom: 'alleen een plafond op aantal (4000), geen termijn; samen met het uitstappunt een reishistorie per lid' },
+    bron: [S('kern/ov/index.js', 'in: { ...halteBij(lijn, voertuig), at }, uit: null, prijs: null };')],
+    collectie: 'ovRitten', sleutel: 'sessiesleutel', van: 'lid', klasse: 'noodzakelijk',
+    waarom: 'sinds N17 blijft de instaphalte en niet het punt; het punt woont tijdens de rit alleen in het geheugen ' +
+      '(inPunten) voor het tarief. Het overzicht blijft een jaar (server/bewaarbeleid-vervoer.js) en de vergeetroute ' +
+      'haalt het eerder weg. Tot 29 september was er alleen een plafond op aantal.' },
 
   { naam: 'ov-uitstap', wat: 'de eigen GPS bij uitchecken, gebruikt voor het tarief',
-    bron: [S('kern/ov/reizen.js', "rit.status = 'uit'; rit.uit = { ...uitPunt, at: nu() }; rit.prijs = prijs; rit.km = Math.round(km * 10) / 10;")],
-    collectie: 'ovRitten', sleutel: 'sessiesleutel', van: 'lid', klasse: 'onbegrensd',
-    waarom: 'voor het tarief is een afstand nodig en geen punt; het punt blijft zonder termijn staan' },
+    bron: [S('kern/ov/reizen.js', "rit.status = 'uit'; rit.uit = { ...halteBij(lijn, uitPunt || {}), at: nu() };")],
+    collectie: 'ovRitten', sleutel: 'sessiesleutel', van: 'lid', klasse: 'noodzakelijk',
+    waarom: 'sinds N17 rekent het tarief de afstand uit de GPS en bewaart het de uitstaphalte, de afstand en de prijs, ' +
+      'een jaar; het punt gaat niet mee in de rit' },
 
   { naam: 'ov-voertuig', wat: 'de PDA-positie van een OV-chauffeur tijdens de dienst',
     bron: [S('kern/ov/dienst.js', 'if (Number.isFinite(lat) && Number.isFinite(lng)) { v.lat = lat; v.lng = lng; }')],
@@ -114,22 +175,27 @@ const STROMEN = [
     waarom: 'overschreven en niet opgestapeld, en weg zodra de dienst stopt' },
 
   { naam: 'patrouille', wat: 'de positie van een bewaker bij elk controlepunt',
-    bron: [S('kern/beveiliging/pda/patrouille.js', 'lat: Number.isFinite(Number(lat)) ? Number(lat) : null, lng: Number.isFinite(Number(lng)) ? Number(lng) : null });')],
-    collectie: 'bevRondes', sleutel: 'staffId', van: 'medewerker', klasse: 'onbegrensd',
-    waarom: 'een bewegingsgeschiedenis van een medewerker met alleen een plafond op aantal; hetzelfde bestand haalde ' +
-      'de coordinaat bij het inklokken juist weg als "geen plaats zonder doel"' },
+    bron: [S('kern/beveiliging/pda/patrouille.js', "r.checkpoints.push({ naam: schoon(naam, 60) || ('Checkpoint ' + (r.checkpoints.length + 1)), at: nu() });")],
+    collectie: 'bevRondes', sleutel: 'staffId', van: 'medewerker', klasse: 'toegestaan',
+    termijn: { soort: 'module', bewijs: S('kern/beveiliging/pda/patrouille.js', "if ('lat' in c || 'lng' in c) { delete c.lat; delete c.lng; n++; }") },
+    waarom: 'sinds N19 bewijst het controlepunt de ronde en neemt de route geen GPS meer aan; oude rondes verliezen hun ' +
+      'punten bij de volgende veegronde. Tot 29 september legde elk controlepunt de positie van de bewaker vast.' },
 
   { naam: 'beveiliging-incident', wat: 'de plek van een incident en van een SOS van een bewaker',
     bron: [S('kern/beveiliging/pda/index.js', 'lat: Number.isFinite(coord(data.lat, 90)) ? coord(data.lat, 90) : null, lng: Number.isFinite(coord(data.lng, 180)) ? coord(data.lng, 180) : null,'),
       S('kern/beveiliging/pda/index.js', 'lat: Number.isFinite(Number(lat)) ? Number(lat) : null, lng: Number.isFinite(Number(lng)) ? Number(lng) : null,')],
-    collectie: 'bevIncidenten', sleutel: 'staffId', van: 'medewerker', klasse: 'onbegrensd',
-    waarom: 'een incidentdossier heeft een reden om te bestaan, maar geen termijn; de SOS-positie blijft na afsluiten staan' },
+    collectie: 'bevIncidenten', sleutel: 'staffId', van: 'medewerker', klasse: 'noodzakelijk',
+    termijn: { soort: 'module', bewijs: S('kern/beveiliging/pda/index.js', "return sosPositie.veeg(lijst, { velden: ['lat', 'lng'], dicht: x => x.status === 'afgehandeld' && x.afgehandeldAt, nu: t });") },
+    waarom: 'sinds N18 hoort de positie bij de melding: zolang die open is en 90 dagen na afhandeling ' +
+      '(kern/sospositie.js, via de bewaarveger)' },
 
   { naam: 'veilig-laatste-plek', wat: 'de laatst bekende positie voor de veiligheidskring',
     bron: [S('kern/veiligheid/plek.js', 'lat: Math.round(lat * 1e5) / 1e5,')],
-    collectie: 'veilig', sleutel: 'handle', van: 'lid', klasse: 'onbegrensd',
-    waarom: 'PLAATS.md grens 1 laat na een venster hoogstens de laatste plek toe -- maar hier wordt hij ook zonder ' +
-      'open venster bewaard, en nooit weggehaald; de veiligheidslaag zegt zelf dat het bewaarbeleid haar niet kent' },
+    collectie: 'veilig', sleutel: 'handle', van: 'lid', klasse: 'venster',
+    termijn: { soort: 'venster', bewijs: S('kern/veiligheid/plek.js', 'function vergeetHandle(V, handle) { delete V.vensters[handle]; delete V.plek[handle]; }') },
+    waarom: 'sinds N19 bestaat de laatste plek alleen in een open venster: zonder venster wordt niets bewaard, bij ' +
+      'sluiten gaat hij weg, en een verlopen venster wordt door de veger opgeruimd. Tot 29 september werd hij ook ' +
+      'zonder venster bewaard en nooit weggehaald.' },
 
   { naam: 'veilig-spoor', wat: 'het korte spoor (max. twaalf punten) tijdens een open veiligheidsvenster',
     bron: [S('kern/veiligheid/plek.js', 'venster.spoor = (venster.spoor || []).concat([punt]).slice(-SPOOR_MAX);')],
@@ -139,15 +205,18 @@ const STROMEN = [
 
   { naam: 'veilig-alarm', wat: 'de laatste positie die bij elk alarm wordt meegeschreven',
     bron: [S('kern/veiligheid/alarm.js', 'afgesloten: false, plek: plek.laatstePlek(handle) || null')],
-    collectie: 'veilig', sleutel: 'handle', van: 'lid', klasse: 'onbegrensd',
-    waarom: 'blijft na afsluiten staan, ook bij een proefalarm; alleen een plafond van tweehonderd alarmen' },
+    collectie: 'veilig', sleutel: 'handle', van: 'lid', klasse: 'noodzakelijk',
+    termijn: { soort: 'module', bewijs: S('kern/veiligheid/alarm.js', "if (directWeg(a)) sosPositie.wis(a, ['plek']);") },
+    waarom: 'sinds N18 hoort de plek bij het alarm: 90 dagen na afsluiten, en een proefalarm of een binnen een minuut ' +
+      'ingetrokken alarm verliest hem direct. De kopie in het bericht aan de kring (meldAan) valt hierbuiten.' },
 
   { naam: 'ontmoet-radar', wat: 'de laatste positie voor de radar van Salon-ontmoetingen',
     bron: [S('kern/ontmoeting.js', 'if (Number.isFinite(lat) && Number.isFinite(lng)) db.data.ontmoetPosities[key] = { lat, lng, at: nu() };')],
-    collectie: 'ontmoetPosities', sleutel: 'sessiesleutel', van: 'lid', klasse: 'teLang',
-    termijn: { soort: 'module', bewijs: S('kern/ontmoeting.js', 'delete db.data.ontmoetPosities[key];') },
-    waarom: 'zes minuten telt hij als vers, maar dat wordt alleen bij het LEZEN gewogen; hij blijft staan tot het lid ' +
-      'de functie uitzet of vergeten wordt' },
+    collectie: 'ontmoetPosities', sleutel: 'sessiesleutel', van: 'lid', klasse: 'venster',
+    termijn: { soort: 'venster', bewijs: S('kern/ontmoeting.js', 'if (Date.now() - at > POS_TTL_MS) { delete P[k]; weg++; }') },
+    waarom: 'sinds N14 wordt een positie die niet meer vers is gewist -- bij elke nieuwe positie, bij elke stand en ' +
+      'door de bewaarveger. Tot 29 september werd de versheid alleen bij het LEZEN gewogen en bleef de plek staan ' +
+      'tot het lid de functie uitzette.' },
 
   { naam: 'date-positie', wat: 'de live-positie van beide deelnemers tijdens een date',
     bron: [S('kern/ontmoeting/date.js', 'if (Number.isFinite(lat) && Number.isFinite(lng)) d.posities[key] = { lat, lng, at: nu() };')],
@@ -157,25 +226,30 @@ const STROMEN = [
 
   { naam: 'date-sos', wat: 'de positie bij een noodknop tijdens een date',
     bron: [S('kern/ontmoeting/sos.js', 'if (Number.isFinite(lat) && Number.isFinite(lng)) { s.lat = lat; s.lng = lng; d.posities[key] = { lat, lng, at: nu() }; }')],
-    collectie: 'ontmoetDates', sleutel: 'sessiesleutel', van: 'lid', klasse: 'onbegrensd',
-    waarom: 'blijft in het SOS-record staan nadat de SOS is afgehandeld en de date is gestopt' },
+    collectie: 'ontmoetDates', sleutel: 'sessiesleutel', van: 'lid', klasse: 'noodzakelijk',
+    termijn: { soort: 'module', bewijs: S('kern/ontmoeting/sos.js', "n += sosPositie.veeg(d.sos, { velden: ['lat', 'lng'], dicht: s => s.ok && s.ok.at, nu: t });") },
+    waarom: 'sinds N18: 90 dagen na afhandeling van de SOS (kern/sospositie.js), en de live-posities van de date ' +
+      'gaan weg zodra de laatste SOS dicht is' },
 
   { naam: 'vonk-profiel', wat: 'de positie in een datingprofiel, voor afstand bij het matchen',
-    bron: [S('kern/vonk/index.js', 'if (isFinite(data.lat) && isFinite(data.lng)) { p.lat = coord(data.lat, 90); p.lng = coord(data.lng, 180); }')],
-    collectie: 'vonk', sleutel: 'sessiesleutel', van: 'lid', klasse: 'onbegrensd',
-    waarom: 'een precieze coordinaat zonder termijn en buiten de vergeetroute, terwijl matchen op afstand ook met een ' +
-      'grovere plek kan' },
+    bron: [S('kern/vonk/index.js', 'V.vakBijOpslaan(p, coord(data.lat, 90), coord(data.lng, 180));')],
+    collectie: 'vonk', sleutel: 'sessiesleutel', van: 'lid', klasse: 'noodzakelijk',
+    termijn: { soort: 'lid', bewijs: S('kern/vonk/vak.js', 'if (!p.actief) delete p.vak;') },
+    waarom: 'sinds N21 blijft alleen een vak van 5 km en nooit het punt; oude profielen worden bij het opstarten ' +
+      'omgezet, het vak gaat weg bij uitzetten en de vergeetroute wist het profiel' },
 
   { naam: 'markt-overdracht', wat: 'de GPS van koper en verkoper bij de overdracht',
-    bron: [S('kern/markt/handel/deal.js', 'const pos = { lat: Number(lat), lng: Number(lng), at: Date.now() };')],
-    collectie: 'markt', sleutel: 'partij', van: 'lid', klasse: 'onbegrensd',
-    waarom: 'bewijst dat beide partijen samen waren; daarvoor volstaat de uitkomst (samen ja/nee en de afstand), de ' +
-      'punten blijven onbeperkt op de chat' },
+    bron: [S('kern/markt/handel/samenkomst.js', 'deal.wacht = { rol, lat, lng, at: nuMs };')],
+    collectie: 'markt', sleutel: 'partij', van: 'lid', klasse: 'toegestaan',
+    termijn: { soort: 'venster', bewijs: S('kern/markt/handel/samenkomst.js', 'if (deal.wacht && !(nuMs - deal.wacht.at < versMs)) { delete deal.wacht; weg = true; }') },
+    waarom: 'sinds N21 blijft alleen samen ja/nee en de afstand; hooguit een punt wacht op de ander, zolang het vers ' +
+      'is. Er is geen veger voor de markt: een verlopen wachtend punt valt weg bij de volgende melding.' },
 
   { naam: 'koerier-mode', wat: 'de laatste positie van een koerier van een modebezorging',
     bron: [S('kern/modebezorg/koerier.js', 'b.gps = { lat, lng, at: nu() };')],
-    collectie: 'modeBezorg', sleutel: 'staffId', van: 'medewerker', klasse: 'onbegrensd',
-    waarom: 'het commentaar zegt "vluchtig", maar de positie blijft na de levering op het record staan' },
+    collectie: 'modeBezorg', sleutel: 'staffId', van: 'medewerker', klasse: 'venster',
+    termijn: { soort: 'venster', bewijs: S('kern/modebezorg/koerier.js', 'function wisPunt(b) { b.loc = null; b.gps = null; }') },
+    waarom: 'sinds N20 weg bij afleveren en bij retour; daarna neemt de bezorging geen positie meer aan' },
 
   { naam: 'koerier-bezorgdienst', wat: 'de positie van een bezorger van de bezorgdienst',
     bron: [S('routes/supplier/bezorg.js', "B[s.code + ':' + (req.actor.staffId || 'beheer')] = { lat, lng, at: new Date().toISOString(), staffId: req.actor.staffId || null, name: req.actor.name };")],
@@ -216,13 +290,17 @@ const STROMEN = [
 
   { naam: 'huur-sos', wat: 'de positie bij een SOS van een huurder',
     bron: [S('routes/member/voertuigen/huur.js', 'if (Number.isFinite(lat) && Number.isFinite(lng)) { sos.lat = lat; sos.lng = lng; }')],
-    collectie: 'boekingen', sleutel: 'boeking', van: 'lid', klasse: 'onbegrensd',
-    waarom: 'blijft zonder termijn op de boeking staan' },
+    collectie: 'boekingen', sleutel: 'boeking', van: 'lid', klasse: 'noodzakelijk',
+    termijn: { soort: 'module', bewijs: S('kern/voertuigsos.js', "n += veeg(b.sos, { velden: ['lat', 'lng'], dicht: s => s.ok && s.ok.at, nu });") },
+    waarom: 'sinds N18: de positie hoort bij de SOS, zolang die open is en 90 dagen erna (kern/sospositie.js via de ' +
+      'bewaarveger). Het lid kan een SOS niet intrekken; de zaak of het kantoor sluit hem.' },
 
   { naam: 'charter-sos', wat: 'de positie bij een SOS op zee',
     bron: [S('routes/member/voertuigen/charter.js', 'if (Number.isFinite(lat) && Number.isFinite(lng)) { sos.lat = lat; sos.lng = lng; }')],
-    collectie: 'boekingen', sleutel: 'boeking', van: 'lid', klasse: 'onbegrensd',
-    waarom: 'blijft zonder termijn op de boeking staan' },
+    collectie: 'boekingen', sleutel: 'boeking', van: 'lid', klasse: 'noodzakelijk',
+    termijn: { soort: 'module', bewijs: S('kern/voertuigsos.js', "n += veeg(b.sos, { velden: ['lat', 'lng'], dicht: s => s.ok && s.ok.at, nu });") },
+    waarom: 'sinds N18: de positie hoort bij de SOS, zolang die open is en 90 dagen erna (kern/sospositie.js via de ' +
+      'bewaarveger). Het lid kan een SOS niet intrekken; de zaak of het kantoor sluit hem.' },
 
   { naam: 'flits-melding', wat: 'een verkeersmelding: de plek waar het lid was, met zijn codenaam',
     bron: [S('kern/flits.js', 'const m = { id: id(), soort, lat, lng, door: codenaam, bevestigingen: 0, weg: 0, at: nu(), laatstBevestigd: null };')],
@@ -233,9 +311,11 @@ const STROMEN = [
 
   { naam: 'plaats-passages', wat: 'elke overgang langs een hek tijdens een naderingsvenster, onder een codenaam',
     bron: [S('kern/plaats/waarnemen.js', "schrijfLog(codenaam, 'waargenomen', { doel, hek, richting: wat });")],
-    collectie: 'plaatsLog', sleutel: 'codenaam', van: 'lid', klasse: 'verboden',
-    waarom: 'geen coordinaat, wel een reeks zaken met tijden onder een codenaam -- een mens-plaatsgraaf; botst met ' +
-      'P-05 en N1 ongeacht de termijn (NAVIGATIE.md par. 6.2, besluit B8)' },
+    collectie: 'plaatsLog', sleutel: 'codenaam', van: 'lid', klasse: 'toegestaan',
+    termijn: { soort: 'venster', bewijs: S('kern/plaats/waarnemen.js', 'if (venster.hek && hek !== venster.hek) {') },
+    waarom: 'sinds N12 noemt een naderingsvenster zijn hek, en een overgang langs een ander hek wordt verwerkt en niet ' +
+      'bewaard -- hij verlaat het verzoek niet. De regel die blijft gaat over het doel van het bezoek zelf. Tot 29 ' +
+      'september legde elke passage een regel onder de codenaam vast, 90 dagen (NAVIGATIE.md par. 6.2).' },
 
   { naam: 'plaats-waarnemingen', wat: 'binnen/buiten per hek binnen een venster',
     bron: [S('kern/plaats/waarnemen.js', 'const waarneming = { id: id(), codenaam, doel, venster: venster.id, hek, wat, at: nu() };')],
@@ -244,9 +324,10 @@ const STROMEN = [
 
   { naam: 'gemeente-melding', wat: 'de plek van een melding openbare ruimte, vaak de GPS van de melder',
     bron: [S('kern/gemeente/meldingen.js', 'lat: coord(data.lat, 90) || null, lng: coord(data.lng, 180) || null,')],
-    collectie: 'gemeenteMeldingen', sleutel: 'codenaam', van: 'lid', klasse: 'onbegrensd',
-    waarom: 'de plek hoort bij het probleem, maar staat met de codenaam van de melder zonder termijn (alleen een ' +
-      'plafond); de kopie in weefselZaken heeft wel een termijn' },
+    collectie: 'gemeenteMeldingen', sleutel: 'codenaam', van: 'lid', klasse: 'toegestaan',
+    termijn: { soort: 'module', bewijs: S('kern/gemeente/meldingen.js', 'delete m.melderKey; delete m.melder;') },
+    waarom: 'sinds N21 is de plek na afhandeling de plek van het probleem en niet meer van een mens: de codenaam en ' +
+      'de sleutel van de melder gaan eraf, nadat hij de uitkomst als bericht kreeg' },
 
   { naam: 'weefsel-zaak', wat: 'de plek van een zaak openbare ruimte, met de melder erbij',
     bron: [S('kern/stadsweefsel/zaken.js', 'lat: plek.lat, lng: plek.lng, gebied: plek.gebied, zone: plek.zone,')],
@@ -256,19 +337,25 @@ const STROMEN = [
   { naam: 'horeca-bezorgadres', wat: 'het bezorgadres (vaak het woonadres) als punt op de rekening van een gast',
     bron: [S('kern/gast/buitenshuis.js', 'lat: lat == null ? null : Number(lat), lng: lng == null ? null : Number(lng),'),
       S('routes/gast/bezorgen.js', 'buitenshuis.zetBezorging(rek, { adres: b.adres, postcode: b.postcode, lat: b.lat, lng: b.lng,')],
-    collectie: 'horeca', sleutel: 'codenaam', van: 'lid', klasse: 'onbegrensd',
-    waarom: 'codenaam plus bezorgadres zonder termijn is precies wat scripts/afleidbaar.js als besluit aanwees' },
+    collectie: 'horeca', sleutel: 'codenaam', van: 'lid', klasse: 'venster',
+    termijn: { soort: 'venster', bewijs: S('routes/supplier/eten.js', "if (rek.bezorg) { rek.bezorg.stand = 'geleverd'; rek.bezorg.lat = null; rek.bezorg.lng = null; }") },
+    waarom: 'sinds N20 verdwijnt het punt bij geleverd en bij annuleren (ook routes/supplier/horeca/betalen.js); het ' +
+      'adres als tekst blijft bij de rekening' },
 
   { naam: 'bezorgdienst-adres', wat: 'het bezorgadres als punt op een bestelling',
     bron: [S('routes/member/kopen/bezorg.js', 'if (Number.isFinite(lat) && Number.isFinite(lng)) geo = { lat, lng };')],
-    collectie: 'orders', sleutel: 'sessiesleutel', van: 'lid', klasse: 'onbegrensd',
-    waarom: 'nodig voor de levering, niet daarna; geen termijn' },
+    collectie: 'orders', sleutel: 'sessiesleutel', van: 'lid', klasse: 'venster',
+    termijn: { soort: 'venster', bewijs: S('routes/supplier/orders/afhandeling.js', 'if (CODE_DICHT.includes(status) && o.geo) o.geo = null;') },
+    waarom: 'sinds N20 weg bij afronden en annuleren, aan elke kant die een bestelling sluit (ook ' +
+      'routes/supplier/bezorg.js en de annulering door het lid); het adres blijft' },
 
   { naam: 'mode-adres', wat: 'de bestemming van een modebezorging, of een verzonnen punt als er geen is',
-    bron: [S('kern/modebezorg/winkel.js', 'loc: (Number.isFinite(lat) && Number.isFinite(lng)) ? { lat, lng } : (s.loc ? { lat: s.loc.lat + 0.01, lng: s.loc.lng + 0.008 } : null),'),
+    bron: [S('kern/modebezorg/winkel.js', 'loc: (Number.isFinite(lat) && Number.isFinite(lng)) ? { lat, lng } : null,'),
       S('routes/member/handel/winkel.js', '{ adres: req.body.adres, lat: req.body.lat, lng: req.body.lng });')],
-    collectie: 'modeBezorg', sleutel: 'sessiesleutel', van: 'lid', klasse: 'onbegrensd',
-    waarom: 'geen termijn, alleen een plafond; en zonder punt wordt er een verzonnen (NAVIGATIE.md par. 12, gebrek 5)' }
+    collectie: 'modeBezorg', sleutel: 'sessiesleutel', van: 'lid', klasse: 'venster',
+    termijn: { soort: 'venster', bewijs: S('kern/modebezorg/koerier.js', 'function wisPunt(b) { b.loc = null; b.gps = null; }') },
+    waarom: 'sinds N20 weg bij afleveren en retour, en zonder punt bestaat er geen verzonnen bestemming meer ' +
+      '(NAVIGATIE.md par. 12, gebrek 5)' }
 ];
 
 /* ----------------------------------------------------------------------------
@@ -298,6 +385,7 @@ const GEEN_STROOM = {
   'server/kern/stadsweefsel/ondernemers.js': G('plaats', 'de plek van een leeg pand'),
   'server/kern/stadsweefsel/voorzieningregister.js': G('plaats', 'het pand van een voorziening'),
   'server/kern/vervoer.js': G('doorgerekend', 'de live-positie voor een ophaaltijd; alleen de minuten blijven'),
+  'server/kern/vonk/vak.js': G('doorgerekend', 'het midden van twee vakken om een plek te kiezen; bewaard wordt alleen de vaknaam (vonk-profiel)'),
   'server/kern/vonk/match.js': G('doorgerekend', 'het midden van twee profielen; alleen de afstand blijft'),
   'server/kern/werk.js': G('plaats', 'de plek van een werkgever bij een vacature'),
   'server/kern/werkvenster.js': G('plaats', 'de zone van een werkplek; de positie bij het inloggen wordt alleen vergeleken'),
@@ -352,7 +440,12 @@ function lees(rel) {
 
 function termijnBronnen() {
   const beleid = {};
-  for (const rel of ['server/bewaarbeleid.js', 'server/bewaarbeleid-operationeel.js', 'server/bewaarbeleid-eigenregie.js']) {
+  /* Elk deel van het bewaarbeleid, en geen lijst met de hand: een nieuw deel
+     (bewaarbeleid-vervoer.js kwam er met N17 bij) valt anders stil buiten de
+     meting, en dan heet een stroom met een termijn `geen`. */
+  const delen = fs.readdirSync(path.join(WORTEL, 'server'))
+    .filter(n => /^bewaarbeleid(-[\w]+)?\.js$/.test(n)).sort().map(n => 'server/' + n);
+  for (const rel of delen) {
     const b = zonderCommentaar(lees(rel));
     const re = /tak:\s*'([\w.]+)'[^}]*?dagen:\s*([^,}]+)/g;
     let m;
@@ -368,7 +461,9 @@ function termijnBronnen() {
     const b = zonderCommentaar(fs.readFileSync(path.join(vergetenMap, n), 'utf8'));
     const lijst = /EIGEN_TAKKEN\s*=\s*\[([\s\S]*?)\]/.exec(b);
     if (lijst) for (const m of lijst[1].matchAll(/'(\w+)'/g)) vergeten.add(m[1]);
-    for (const m of b.matchAll(/delete\s+db\.data\.(\w+)\s*\[\s*key\s*\]/g)) vergeten.add(m[1]);
+    for (const m of b.matchAll(/delete\s+db\.data\.(\w+)(?:\.\w+)*\s*\[\s*key\s*\]/g)) vergeten.add(m[1]);
+    /* een lijst die op de sleutel wordt gefilterd, of een collectie een laag dieper (db.data.vonk.profielen) */
+    for (const m of b.matchAll(/db\.data\.(\w+)\s*=\s*db\.data\.\1\.filter\([^;]*\bkey\b/g)) vergeten.add(m[1]);
   }
   return { beleid, veger, vergeten };
 }
@@ -435,8 +530,10 @@ function meet() {
       vergeten: persoonlijk ? bronnen.vergeten.has(s.collectie) : null,
       gedetecteerd: s.bron.some(r => kand.includes(r.pad)),
       klasse: s.klasse,
-      status: 'voorstel',
-      besluit: null,
+      status: BESLUITEN[s.naam] ? 'besloten' : 'voorstel',
+      besluit: BESLUITEN[s.naam]
+        ? Object.assign({}, BESLUITEN[s.naam], { uitgevoerd: BESLUITEN[s.naam].klasse === s.klasse })
+        : null,
       tegenspraak: tegenspraak(s.klasse, termijn),
       reden: s.reden || null,
       waarom: s.waarom
@@ -470,6 +567,7 @@ function meet() {
       zonderTermijn: rijen.filter(r => r.termijn.soort === 'geen').length,
       nietVergeten: rijen.filter(r => r.vergeten === false).length,
       besloten: rijen.filter(r => r.besluit !== null).length,
+      besluitNietUitgevoerd: rijen.filter(r => r.besluit && !r.besluit.uitgevoerd).map(r => r.naam),
       klassen: telling
     },
     onverklaard,
@@ -489,7 +587,8 @@ if (require.main === module) {
   }
   console.log('\n  ' + g.stromen + ' stromen uit ' + g.kandidaten + ' kandidaatbestanden; ' + g.zonderTermijn +
     ' zonder termijn, ' + g.nietVergeten + ' op een ledensleutel die de vergeetroute niet wist.');
-  console.log('  voorstel: ' + KLASSEN.map(k => k + ' ' + g.klassen[k]).join(', ') + '. Besloten: ' + g.besloten + '.\n');
+  console.log('  voorstel: ' + KLASSEN.map(k => k + ' ' + g.klassen[k]).join(', ') + '. Besloten: ' + g.besloten +
+    (g.besluitNietUitgevoerd.length ? ', waarvan nog niet uitgevoerd: ' + g.besluitNietUitgevoerd.join(', ') : '') + '.\n');
   let fout = false;
   if (!uit.besturing.inOrde) {
     fout = true;
@@ -511,4 +610,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { meet, schrijftPositie, tegenspraak, termijnBronnen, KLASSEN, STROMEN, GEEN_STROOM };
+module.exports = { meet, schrijftPositie, tegenspraak, termijnBronnen, KLASSEN, STROMEN, GEEN_STROOM, BESLUITEN };

@@ -711,6 +711,73 @@ altijd*. Die helft zegt de bronmeter (6.5). De proef loopt niet door een rit, ee
 bezorging of een SOS, en de 35 stromen van 6.5 zijn dus maar voor een klein deel
 langs de opslag gecontroleerd.
 
+### 6.7 A1, eerste ronde: N12, N13 en N14 uitgevoerd (29 september 2026)
+
+Drie besluiten van 15.0 zijn gebouwd, elk met een toets die op een mutatie zakt:
+
+| besluit | wat er veranderde | toets |
+|---|---|---|
+| **N12** | een naderingsvenster noemt zijn hek (`eenHek` in `kern/plaats/hekken.js`); een overgang langs een ander hek krijgt 200 met `opgeslagen: false` en komt niet in de waarnemingen en niet in het actielog | `test/plaatsdoelhek.test.js`, en `test/plaatsnadering.e2e.js` in een echte browser |
+| **N13** | binnen 150 m is `nabij` een voorstel; aankomst bevestigt het lid (`/api/live/aangekomen`) of de zaak die de bestemming is (`/api/supplier/guest/aangekomen`), en de deur leest die bevestiging. Een tweede bevestiging verandert niets | `test/onderweg-positie.test.js` 5-7, en `test/grand-integratie.pg.test.js` subtoets 9 hardop omgedraaid |
+| **N14** | `/api/live/stop` wist de positie; de ontmoetradar wist een positie die niet meer vers is bij elke positie, bij elke stand en via de bewaarveger | `test/onderweg-positie.test.js` 4, `test/bewaarveger.test.js` |
+
+De positieproef ging daardoor van **0 / 1 / 2 / 1** naar **0 / 0 / 0 / 0**, en de
+tanden in `NORM.json` zijn meegezakt: ze mogen alleen dalen, dus een nul die
+weer een een wordt, laat de norm zakken. De besturingsproef kreeg daarbij een
+ander anker, en dat is de les van deze ronde: het oude anker was de positie die
+Onderweg na het stoppen liet staan, en die bestaat niet meer. **Een anker dat de
+reparatie wegneemt, is geen anker**: de proef hangt nu aan de verkeersmelding,
+die de plek MET OPZET bewaart (N15). Zou de lezer blind worden, dan zakt hij nog
+steeds.
+
+Wat de voorspeller hierdoor niet meer kan: nabijheid meewegen bij een zaak waar
+een lid vaak komt maar die niet het doel van dit bezoek is. Dat was precies de
+passagelog aan het werk, en N12 schrapt het met opzet.
+
+### 6.8 A1, tweede ronde: N16 tot en met N21 uitgevoerd (29 september 2026)
+
+De negentien stromen die `onbegrensd` stonden, zijn per stroom besloten (15.0) en
+gebouwd. Per besluit de regel die de positie nu weghaalt; elke toets is door de
+mutatiemotor gehaald (`MUTATIES.json`: alle zes zakken).
+
+| besluit | wat er veranderde | toets |
+|---|---|---|
+| **N16** | bij `voltooid`, `no-show`, `afgerekend` en `geannuleerd` wist `kern/mobiliteit/ritpunten.js` de locatiegebeurtenissen, `o.positie` en de coordinaten van begin, eind en stops; het label van de factuur blijft, en een afgeronde opdracht neemt geen positie meer aan (409) | `test/ritpunten.test.js` |
+| **N17** | het OV bewaart in- en uitstaphalte, afstand en prijs (`kern/ov/halte.js`); het instappunt woont tijdens de rit alleen in het geheugen. Het overzicht blijft een jaar (`server/bewaarbeleid-vervoer.js`) en de vergeetroute wist het eerder | `test/ovhalte.test.js` |
+| **N18** | een SOS-positie hoort bij de melding: open, en 90 dagen na afsluiten (`kern/sospositie.js`, via de bewaarveger); een proefalarm of een alarm dat binnen een minuut is ingetrokken verliest zijn plek direct. Huur, charter, date, veiligheidskring en bewaker | `test/sospositie.test.js` |
+| **N19** | de laatste plek van de kring bestaat alleen in een open venster; een patrouillering bewaart het controlepunt en geen GPS, en oude rondes verliezen hun punten | `test/kringronde.test.js`, `test/veiligheid.test.js` 3 hardop omgedraaid |
+| **N20** | een bezorgpunt verdwijnt bij geleverd of geannuleerd, aan elke kant die een bestelling sluit; het adres als tekst blijft, en een modebezorging zonder punt krijgt geen verzonnen bestemming meer | `test/bezorgpunt.test.js` |
+| **N21** | Vonk bewaart een vak van 5 km (`kern/vonk/vak.js`); de markt bewaart samen ja/nee en de afstand, met hooguit een wachtend punt; een gemeentemelding verliest de codenaam van de melder na afhandeling; "hier" in een reis wordt de dichtstbijzijnde plaatsnaam | `test/n21stromen.test.js` |
+
+De grondwetmeter volgt het besluit en niet de lijst: `uitgevoerd` is waar als de
+gemeten indeling gelijk is aan de besloten klasse, en dat is nu voor alle 34
+besloten stromen zo. **Zonder termijn: 20 -> 1** (de live locatie van een
+vervoerder, die `onbekend` blijft: of dat een voertuig of een mens is, is nog
+niet besloten, par. 6.5), **niet vergeten: 20 -> 17**.
+
+Twee blinde vlekken zaten in de METER en niet in de code, en allebei maakten ze
+een uitgevoerd besluit onzichtbaar. Het bewaarbeleid werd uit een vaste lijst
+delen gelezen, dus `bewaarbeleid-vervoer.js` viel erbuiten en de OV-ritten
+heetten termijnloos; de meter leest nu elk deel. En de vergeetroute werd alleen
+herkend als `delete db.data.X[key]`, dus een lijst die op de sleutel wordt
+gefilterd (`ovRitten`) of een collectie een laag dieper (`vonk.profielen`) telde
+als niet vergeten.
+
+Wat er nog staat, met de reden:
+
+- **Zeventien stromen op een ledensleutel die de vergeetroute niet wist.** Voor de
+  meeste is dat een vensterstroom die zelf al weggaat, maar "gaat vanzelf weg" is
+  niet "is weg als het lid vergeten wil worden"; dat is een eigen ronde.
+- **Het alarmbericht aan de kring** (`meldAan`) draagt de plek nog in de tekst.
+  Het alarm zelf verliest hem na 90 dagen, het bericht niet.
+- **De markt heeft geen veger**: een verlopen wachtend punt valt weg bij de
+  volgende melding in de markt, niet op een klok.
+- **Een punt dat het lid zelf op de kaart koos** (`bron: 'kaart'`) blijft in een
+  geplande reis staan. Dat is een bestemming en geen eigen positie, en N21 ging
+  over "hier".
+- **De positie van een bezorger** (`bezorgers`) is een vensterstroom en viel
+  buiten N20, dat over het punt van de klant ging.
+
 ---
 
 ## 7. De reistijddienst
@@ -1129,6 +1196,24 @@ andere tien als *minder GPS* worden gelezen:
 | **N10** | **de terughoudendheidstellers worden een permanente grondwetmeter** | geen eenmalige migratiecheck. *Groen betekent niet dat het privacybeleid zegt dat RTG geen bewegingsspoor maakt; groen betekent dat de code aantoonbaar geen verboden bewegingsspoor maakt.* De vijf tellers komen uit de nulmeting en niet uit dit document (par. 6.4) |
 | **N11** | **niet doorschieten: privacy is geen excuus voor een slechter product** | de vraag is niet *hoe weinig GPS kunnen we gebruiken* maar *hoeveel waarde halen we uit een positie op het moment dat de mens die nodig heeft, zonder er daarna meer over die mens aan over te houden dan noodzakelijk*. Tijdens een taak mag alles wat goede navigatie vraagt (par. 1.1). De server mag een positie kennen **voor een uitdrukkelijke functie, alleen wat die nodig heeft, alleen zo lang als nodig, alleen voor bevoegde ontvangers, en nooit stil hergebruikt voor een bewegingsprofiel** -- een ophaalpunt voor een taxi, een alarm, live delen met een vriend, een bezorging. Het technisch ambitieuze pad is intelligentie naar het TOESTEL verplaatsen, niet de server dom maken |
 
+Later die dag, na de eerste twee metingen (par. 6.5 en 6.6), vier besluiten
+erbij. Ze staan per stroom in `scripts/positiestroom.js` (`BESLUITEN`), en of een
+besluit is UITGEVOERD wordt daar afgeleid en niet opgegeven: pas als de gemeten
+indeling gelijk is aan de besloten klasse, staat hij op uitgevoerd.
+
+| # | besluit | wat het vastlegt |
+|---|---|---|
+| **N12** | **alleen het doelhek wordt bewaard** | een waarneming langs een ander hek wordt tijdens het venster verwerkt en niet opgeslagen; het venster zelf blijft als auditspoor. `plaats-passages` gaat naar `toegestaan`, en `test/plaatsnadering.e2e.js` (die de opgeslagen passage als bewijs gebruikte dat de motor draaide) gaat hardop om |
+| **N13** | **aankomst bevestigt de klant of de zaak, en allebei mag** | nabijheid wordt een voorstel ("Bent u er?"); aankomst bestaat pas als het lid tikt of de zaak het zet (kassa, host, reservering). Wie van de twee het eerst bevestigt, is genoeg. De deur ter plaatse leest die bevestiging en niet de positie. Uitwerking van N3 |
+| **N14** | **wissen bij stoppen** | Onderweg en de ontmoetradar wissen de positie op het moment dat de taak stopt; de veger van zeven dagen blijft alleen als vangnet. Van `teLang` naar `venster` |
+| **N15** | **de vensters en de noodzakelijke stromen zijn aanvaard** | de negen `venster`- en drie `noodzakelijk`-voorstellen van par. 6.5 zijn besluiten zoals ze stonden. De negentien `onbegrensd`-stromen worden per stroom apart beslist (N16-N21) |
+| **N16** | **de rit: punten weg bij afronden** (dit beantwoordt B10) | de ritlijn wordt gewist bij afronden; afstand, duur en begin- en eindplek zoals op de factuur blijven. Het ophaalpunt is tijdens de rit exact en wordt bij afronden het adres of de plaatsnaam van de factuur |
+| **N17** | **het OV: halte in plaats van punt, een jaar** | het tarief heeft een afstand nodig en geen punt; na het rekenen blijven in- en uitstaphalte en afstand een jaar, eerder te wissen via de vergeetroute |
+| **N18** | **een SOS hoort bij de melding** | de positie blijft zolang de melding open is en 90 dagen erna (klacht, verzekeraar, politie); een proefalarm of een binnen een minuut ingetrokken SOS verdwijnt direct. Geldt voor huur, charter, date, het alarm van de kring en een incident van een bewaker |
+| **N19** | **de kring alleen in een venster, de ronde zonder GPS** | de laatste plek van de veiligheidskring bestaat alleen zolang de kring een venster open heeft; bij een patrouille bewijst het controlepunt de ronde en wordt de positie van de bewaker niet bewaard |
+| **N20** | **een bezorgpunt verdwijnt bij levering** | coordinaat en laatste koerierpositie verdwijnen bij geleverd of geannuleerd; het adres blijft bij de bestelling. Een verzonnen punt (par. 12, gebrek 5) bestaat niet meer: geen punt is geen punt |
+| **N21** | **vier stromen zonder punt** | Vonk alleen een vak van 5 km; de marktoverdracht alleen samen ja/nee en de afstand; een gemeentemelding houdt haar plek maar verliest de codenaam van de melder na afhandeling; een reis die "hier" begint, bewaart de dichtstbijzijnde plaatsnaam |
+
 Plus twee afbakeningen die bij de besluiten horen:
 
 - **Schakel 18 is voor V1 geen eis.** Na de betaling stuurt het domein de
@@ -1208,6 +1293,7 @@ opties, wat ze betekenen en wat ze kosten; de aanbeveling staat vooraan.
 - *Salon-berichten per plek* -- botst met P-05 en `PLAATS.md` par. 6.
 
 **B8. Passages in het actielog van de plaatslaag** (par. 6.2).
+**Beslist: N12, en uitgevoerd (par. 6.7).** De opties hieronder blijven staan als verantwoording.
 - *Een naderingsvenster krijgt alleen het hek van zijn bezoek (aanbevolen).* Dan
   bestaat er geen passage om te loggen; de bron van het venster noemt de zaak al.
   Kost: de hek-motor krijgt een filter per venster, en de huidige proef van de
@@ -1218,6 +1304,7 @@ opties, wat ze betekenen en wat ze kosten; de aanbeveling staat vooraan.
 - *Zo laten en de termijn verkorten.* Kost: de graaf bestaat korter, maar bestaat.
 
 **B9. Automatische aankomst uit een opgeslagen positie** (`/api/live/update`).
+**Beslist: N13, en uitgevoerd (par. 6.7).** De opties hieronder blijven staan als verantwoording.
 - *De NADERING wordt een hek-overgang op het toestel en de server hoort alleen
   `binnen`; de AANKOMST komt van het domein of de mens (aanbevolen, en de vorm
   die N3 vraagt).* Dat is de vorm die de plaatslaag al heeft; `db.data.live`
@@ -1228,6 +1315,7 @@ opties, wat ze betekenen en wat ze kosten; de aanbeveling staat vooraan.
   `serverCoordinaatBuitenVenster` op, niet `aankomstUitGps` -- en botst dus met N3.
 
 **B10. De punten van een rit ná de rit** (N2, par. 15.0).
+**Beslist: N16, uitgevoerd (par. 6.8)** -- wissen bij afronden, de samenvatting blijft. De opties hieronder blijven staan als verantwoording.
 - *Eerst per reden meten of er één is die punten nodig heeft (aanbevolen).* Voor
   de werkelijk gereden afstand volstaat een GETAL dat aan het eind van de rit
   wordt uitgerekend; voor fraude en de meeste geschillen volstaan begin, eind en

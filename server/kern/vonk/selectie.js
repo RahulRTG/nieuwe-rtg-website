@@ -9,6 +9,7 @@
    Afgesplitst van ./index.js, dat de poort en het profiel houdt. Krijgt de
    gedeelde ctx, net als ./match. */
 const W = require('./wensen');
+const { plekVan } = require('./vak');
 
 module.exports = (ctx) => {
   const { d, mag, likeVan, matchTussen, haversine, publiek, DAG_MAX, rooster, tafelkaart, geblokkeerd } = ctx;
@@ -30,7 +31,9 @@ module.exports = (ctx) => {
      geen plaats opgaf, valt niet weg en wordt ook niet vooruit geschoven. In
      tafelInHetMidden (./match) is null wel het verschil, want dáár WON een
      onbekende afstand van elke bekende. Dat was de echte fout. */
-  function km(a, b) {
+  function km(pa, pb) {
+    const a = plekVan(pa), b = plekVan(pb);   // tussen de middens van de vakken (N21)
+    if (!a || !b) return null;                // isFinite(null) is true: eerst op leeg toetsen
     if (![a && a.lat, a && a.lng, b && b.lat, b && b.lng].every(v => isFinite(v))) return null;
     const m = haversine({ lat: a.lat, lng: a.lng }, { lat: b.lat, lng: b.lng });
     return m == null ? null : m / 1000;

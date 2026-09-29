@@ -116,9 +116,8 @@ function maakBeveiliging({ db, save, crypto, accounts, findSupplier, notify, not
   }
 
   /* De budget/rooster/aanvraag-laag en de PDA-laag draaien als submodules op
-     een gedeelde context (een keer opgebouwd bij het opstarten). Het rooster-
-     deel gaat eerst de context in, omdat de PDA-laag (het commandocentrum,
-     mijnDiensten) die functies gebruikt. */
+     een gedeelde context, een keer opgebouwd. Het roosterdeel gaat eerst de
+     context in: de PDA-laag (commandocentrum, mijnDiensten) gebruikt het. */
   /* LATE BINDING VOOR DE PLAATSLAAG. Deze module wordt in server.js gebouwd, ver
      voordat kern/plaats bestaat (kernlaag6). De patrouillelaag wil bij het
      inklokken weten of de bewaker binnen zijn post stond; die vraag kan hier dus
@@ -149,7 +148,8 @@ function maakBeveiliging({ db, save, crypto, accounts, findSupplier, notify, not
     bevMijnDiensten: mijnDiensten, bevInklok: inklok, bevUitklok: uitklok,
     bevRondeStart: rondeStart, bevRondeCheckpoint: rondeCheckpoint, bevRondeKlaar: rondeKlaar,
     bevMeldIncident: meldIncident, bevBeslisIncident: beslisIncident, bevSos: sos,
-    bevCommand: command,
+    bevCommand: command, bevVergeetSosPosities: deelPda.vergeetPdaSos,
+    bevVergeetRondePosities: deelPda.vergeetRondePosities,
     /* De sleuf vullen. Wordt door opzet/plaatsbronnen.js aangeroepen zodra de
        plaatslaag staat; daarvoor doet de patrouillelaag geen uitspraak. */
     bevKoppelPlaats: (plaats, codenaamVanGuard) => { laat.plaats = plaats; laat.codenaamVanGuard = codenaamVanGuard; }

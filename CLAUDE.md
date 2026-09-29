@@ -140,7 +140,9 @@ de nulmeting in par. 6.2: bij lezing staat geen van de vijf
 terughoudendheidstellers op nul, en de scherpste vondst zit in de plaatslaag
 zelf — tijdens een naderingsvenster komt elke passage langs een zaak onder een
 codenaam 90 dagen in `plaatsLog`. De eerste stap is daarom geen functie maar
-twee metingen (`plaatsvorm` en `positiestroom`), en de tellers worden een
+twee metingen (`plaatsvorm` en `positiestroom`; de tweede staat sinds 29 september,
+`npm run positiestroom`: 35 stromen, 20 zonder termijn, 20 buiten de
+vergeetroute, elke klasse een voorstel met `besluit: null`), en de tellers worden een
 permanente meter: groen betekent dat de code aantoonbaar geen verboden
 bewegingsspoor maakt, niet dat het beleid dat zegt. Aankomst wordt nooit uit een
 opgeslagen positie bewezen. Dat is geen pleidooi voor minder GPS (N11): tijdens

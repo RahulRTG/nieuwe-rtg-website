@@ -32,8 +32,9 @@ Daarnaast raakt dit document `REIZEN.md` (het werkwoord *vóór zijn*),
 5.1 (geen `humans`-tabel).
 
 **Hoe dit document tot stand kwam.** Alles hieronder is op 29 september 2026
-gelezen in de code, met bestand en regel erbij. Er is **niets gedraaid**: geen
-proef, geen server, geen meting. Waar dit document een gebrek noemt, is dat een
+gelezen in de code, met bestand en regel erbij. Er is één meting gedraaid, de
+bron-helft van de grondwetmeter (`npm run positiestroom`, par. 6.5); er is geen
+proef en geen server gedraaid. Waar dit document een gebrek noemt, is dat een
 lezing van de bron (graad `vermoed` tot een toets het vastzet), en het is met
 opzet niet gerepareerd -- dit is een ontwerpronde.
 
@@ -605,13 +606,67 @@ betekent dat de code aantoonbaar geen verboden bewegingsspoor maakt.**
    *vluchtig* heet en toch met de volgende `save()` naar schijf gaat (de positie
    van een bezorger, par. 6.2).
 
-De ratel mag alleen **omlaag** op `verboden`, `onbegrensd` en `teLang`, en
-**nooit omlaag** op het aantal gelezen stromen -- een schuld die daalt doordat de
-meter blind wordt, is de gevaarlijkste vorm van vooruitgang (`MENSNETWERK.md`,
-de drie ratels van `stilspoor`). En de meter hoort in de keuring waar hij over
-gaat: een register dat door een toets wordt bewaakt, is niet gedekt door een
-groene keuring tenzij die toets onderdeel is van die keuring (`npm run
-registerklopt`).
+De ratel mag alleen **omlaag** op de schulden en **nooit omlaag** op het aantal
+gelezen stromen -- een schuld die daalt doordat de meter blind wordt, is de
+gevaarlijkste vorm van vooruitgang (`MENSNETWERK.md`, de drie ratels van
+`stilspoor`). En de meter hoort in de keuring waar hij over gaat: een register
+dat door een toets wordt bewaakt, is niet gedekt door een groene keuring tenzij
+die toets onderdeel is van die keuring (`npm run registerklopt`).
+
+### 6.5 A0b staat: de eerste meting (29 september 2026)
+
+`npm run positiestroom` (`scripts/positiestroom.js`, `POSITIESTROOM.json`,
+`test/positiestroom.test.js`). Graad `vermoed`, want de detector is lexicaal.
+
+| | |
+|---|---|
+| kandidaatbestanden (de noemer) | **54**, alle 54 verklaard: een stroom of een reden |
+| stromen waar de positie van een mens blijft | **35** |
+| zonder enige termijn | **20** |
+| op een ledensleutel of codenaam die de vergeetroute niet wist | **20** |
+| door de detector gemist, met de hand gevonden | **7** |
+| voorstel per klasse | 9 `venster`, 3 `noodzakelijk`, 2 `teLang`, 19 `onbegrensd`, 1 `verboden`, 1 `onbekend` |
+| besloten door de eigenaar | **0** |
+
+**De ratel hangt aan wat GEMETEN is en niet aan de indeling.** Het voorstel van
+6.4 was een ratel op `verboden`, `onbegrensd` en `teLang` -- maar dat zijn
+voorstellen, en een voorstel kan naar beneden worden gepraat door het een ander
+etiket te geven. De tanden in `NORM.json` staan daarom op de twee getallen die
+uit de code komen: `positieZonderTermijn` (20) en `positieNietVergeten` (20),
+allebei alleen omlaag, en `positieStromenGezien` (35) alleen omhoog. Elk heeft
+een ijkproef in `test/meterijk.test.js`. De indeling kan de meting wel
+tegenspreken, en dan zakt de meter: wie `onbegrensd` voorstelt terwijl het
+bewaarbeleid een termijn noemt, of `venster` zonder dat iets de positie
+weghaalt, krijgt een TEGENSPRAAK (vandaag 0).
+
+**Twee mutaties op de echte code zijn gevangen**: de termijn van `plaatsLog` uit
+het bewaarbeleid halen laat toets 8 en 11 zakken, en een citaatregel in
+`kern/ov/reizen.js` veranderen laat de besturingsproef zakken.
+
+**Wat de meting toevoegde aan par. 6.2**, en wat met lezen alleen niet te zien
+was:
+
+- **De zeven gemiste stromen zijn de leerzaamste.** De positie wordt daar in losse
+  toewijzingen opgebouwd (`L.lat = lat`), en juist daar zitten het delen bij huur
+  en charter, beide SOS-regels op een boeking, het alarm van de veiligheidskring
+  en de passagelog. Een zuiver statische meter over "objecten met lat en lng" had
+  precies de gevoeligste helft gemist.
+- **Er zijn stromen die er GOED uitzien**, en die horen in dezelfde tabel: de
+  positie van een kind tijdens een schoolexcursie verdwijnt bij het stoppen en
+  meteen bij het intrekken van de toestemming, delen bij huur en charter
+  verdwijnt bij uitzetten, en de bezorger verdwijnt als hij terug is. Negen van de
+  35 zijn een echt venster.
+- **Nieuwe onbegrensde stromen** die par. 6.2 niet noemde: de GPS van koper en
+  verkoper bij een marktoverdracht (voor een bewijs dat *samen ja/nee* is), de
+  positie in een datingprofiel, de SOS tijdens een date en op een boeking, en de
+  bezorgadressen van drie bezorgketens naast een codenaam.
+- **`zaak-live-locatie` staat op `onbekend`**, en dat is het eerlijke antwoord:
+  de "live locatie" van een vervoerder overschrijft de vaste plek van de zaak, en
+  of dat een voertuig of een mens is kan geen meter zien. Bij een
+  eenmanschauffeur is het een persoon die als plaats aan elk lid wordt getoond.
+
+Wat hierna komt is A0c -- de opslag lezen na een doorloop -- en daarna A1, in de
+volgorde die deze tabel aanwijst.
 
 ---
 
@@ -697,7 +752,7 @@ minuten kan elk van deze vijf zijn:
 De reparatie hoort op de oorzaak (`LAT.md` regel 1): een API die een waarde met
 haar soort teruggeeft in plaats van een kaal getal, zodat een prijsformule een
 `afstandRecht` kan WEIGEREN in plaats van hem stil te vermenigvuldigen. Pas daarna
-de tien gebreken -- want wie ze een voor een repareert, laat de deur open voor
+de gebreken -- want wie ze een voor een repareert, laat de deur open voor
 het elfde.
 
 Let op één naam: `gemetenReistijd` mag nooit uit een bewegingsspoor komen (N1,
@@ -869,6 +924,17 @@ achterlaat. Elk hoort een eigen reparatie met een toets die eerst zakt.
 10. **`scripts/navigatie-index.js:198`** telt `!g.bron` terwijl het veld
     `downloadAdres` heet, dus "zonder downloadadres" is altijd gelijk aan het
     totaal.
+11. **Onderweg verzint een positie van een mens.** Start een lid Onderweg zonder
+    positie, dan zet `server/routes/member/onderweg.js:21` er zelf een neer: de
+    bestemming plus (0,012; -0,014), ruim een kilometer ernaast. Die punt wordt
+    daarna als live-positie van de gast aan de zaak getoond (`guestLoc` in
+    `server/kern/leverancier/state.js`). Dit is gevonden bij de meting van par.
+    6.5 en is ernstiger dan de verzonnen bestemming van gebrek 5: daar gaat het om
+    een pakket, hier om waar een mens zou zijn.
+12. **Een noodoproep van personeel toont nooit het label van de plek.**
+    `server/routes/supplier/tafels-team.js:88` schrijft
+    `alarm.label || lat.toFixed ? ... : ''`, en door de voorrang van `||` boven
+    `?:` is dat altijd waar; het kantoor krijgt dus steeds de ruwe coordinaten.
 
 Gebrek 6 en 7 hebben dezelfde oorzaak: `haversine(a, b)` neemt twee punten, en
 een aanroep met vier getallen geeft stil `null` in plaats van een fout. Een
@@ -915,10 +981,10 @@ architectuur en de meetuitslagen laten het zien, of ze laten het niet zien.
 | stap | wat | vorm |
 |---|---|---|
 | **A0a** | **`plaatsvorm`**: wat verstaat RTG vandaag onder een plaats? Per bron: geometrie, etiketten, privacy, zichtbaarheid, toestand, bewijs en wie hem leest. Met de lezer van `scripts/objectmodel.js`. Niet om een schema af te dwingen maar om de inconsistenties zichtbaar te maken | meting, geen bouwwerk |
-| **A0b** | **`positiestroom`**: elke plek waar een positie binnenkomt, wordt verwerkt, aan een sleutel of codenaam wordt gekoppeld, wordt opgeslagen (hoe lang, waarvoor) en wordt gelezen -- met per stroom een van zeven klassen (par. 6.4) | meting, geen bouwwerk |
+| **A0b** | **`positiestroom`**: elke plek waar een positie binnenkomt, wordt verwerkt, aan een sleutel of codenaam wordt gekoppeld, wordt opgeslagen (hoe lang, waarvoor) en wordt gelezen -- met per stroom een van zeven klassen (par. 6.4) | **staat** (par. 6.5) |
 | **A0c** | de vijf tellers als toets die de OPSLAG leest na een doorloop -- die zakt vandaag, en dat is de bedoeling; daarna een ratel die alleen omlaag mag (N10) | toets |
 | **A1** | N2 en N3 uitvoeren, in de volgorde die A0b aanwijst: de passages uit `plaatsLog`, aankomst niet meer uit een opgeslagen positie, en per positieopslag doel, minimum, termijn en noodzaak | reparatie, met A0c als de toets die groen wordt |
-| **G** | de geografische grootheden uit elkaar (par. 7.4), zodat een API het moeilijk maakt ze te verwarren -- en pas dan de tien gebreken van par. 12 | op de oorzaak, niet per gebrek |
+| **G** | de geografische grootheden uit elkaar (par. 7.4), zodat een API het moeilijk maakt ze te verwarren -- en pas dan de gebreken van par. 12 | op de oorzaak, niet per gebrek |
 | **A** | een zaak krijgt een geldige plaats: de adreszoeker geeft de coördinaat mee als VOORSTEL, de zaak bevestigt, en de poort van P-03 staat aan de bron | aansluiten |
 | **R** | de reistijddienst met de drie klassen van par. 7.2 | één plek, ingespoten |
 | **D** | ingang en parkeren als plaatsfeiten die de zaak zelf levert | besluit, dan aansluiten |
@@ -1089,10 +1155,10 @@ niets waard.
 - **Het vergelijkt niet met andere kaartdiensten.** De these heeft die
   vergelijking niet nodig, en een bewering over de techniek of het verdienmodel
   van een ander is hier niet te bewijzen.
-- **Het heeft niets gedraaid.** Elke stand is een lezing van de bron op 29
-  september 2026. De eerste proef maakt daar metingen van, en dan mogen deze
+- **Het heeft bijna niets gedraaid.** Elke stand is een lezing van de bron op 29
+  september 2026, behalve de positiestroommeting van par. 6.5. De eerste proef maakt daar metingen van, en dan mogen deze
   tabellen verschuiven -- ook de kant op die dit document niet verwacht.
-- **Het heeft niets gerepareerd.** De tien gebreken van par. 12 en de
+- **Het heeft niets gerepareerd.** De twaalf gebreken van par. 12 en de
   terughoudendheidsschuld van par. 6.2 staan open.
 - **Het zegt niet dat de rest van het huis fout zit.** Een positie in een
   vervoersopdracht of een alarm heeft vaak een echte reden. Par. 6.2 zegt alleen

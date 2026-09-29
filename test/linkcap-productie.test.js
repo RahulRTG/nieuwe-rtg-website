@@ -49,6 +49,14 @@ test('twee kassa\'s tegelijk op een code: precies een inning', async t => {
   const voor = await saldo();
   const cap = await json(await api(base, '/api/link/cap/maak', { handeling: 'geld.kassa', maxCenten: 5000 }, lid));
   assert.match(cap.token, /^RTG1\./);
+  /* De kale code bestaat alleen in DIT antwoord: een herhaling met dezelfde
+     sleutel krijgt geen kopie uit een antwoordcache (eenmalig-geheim-route). */
+  const sleutel = { 'Idempotency-Key': 'capmaak-' + Date.now() };
+  const [h1, h2] = [await json(await api(base, '/api/link/cap/maak', { handeling: 'geld.kassa', maxCenten: 5000, idem: 'x1' }, lid, sleutel)),
+    await json(await api(base, '/api/link/cap/maak', { handeling: 'geld.kassa', maxCenten: 5000, idem: 'x1' }, lid, sleutel))];
+  assert.ok(h1.token && h2.token && h1.token !== h2.token, 'geen herhaald geheim: ' + JSON.stringify([h1.error, h2.error]));
+  const nieuw = await json(await api(base, '/api/link/cap/maak', { handeling: 'geld.kassa', maxCenten: 5000 }, lid));
+  cap.token = nieuw.token;
   const uit = await Promise.all([k1, k2].map(k =>
     api(base, '/api/supplier/link/cap/aanvaard', { capcode: cap.token, centen: 1200 }, k)));
   assert.deepEqual(uit.map(r => r.status).sort(), [200, 404]);

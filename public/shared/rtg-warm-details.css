@@ -54,8 +54,8 @@ body[data-rtg-desktop] .wd-page>#shell{width:100%!important;max-width:100%!impor
 }
 
 body[data-rtg-desktop] .wd-page>#rtgCommand .cmd-rail{position:fixed;inset-inline:16px;bottom:calc(88px + env(safe-area-inset-bottom,0px));z-index:10001;background:var(--rtg-world-card);color:var(--rtg-world-muted);max-width:600px;margin-inline:auto}
-body[data-rtg-desktop] .wd-page:has(#kaart) .intelligence-dock{top:auto;bottom:calc(80px + var(--edge-bottom,0px));max-height:calc(100% - 280px);overflow-y:auto}
-@media(max-width:999px){body[data-rtg-desktop] .wd-page:has(#kaart) .intelligence-dock{left:12px;right:80px;width:auto;max-height:calc(100% - 180px);overflow-y:auto}}
+body[data-rtg-desktop] .wd-page:has(#kaart) .intelligence-dock{top:auto;bottom:16px;max-height:120px;overflow-y:auto}
+@media(max-width:999px){body[data-rtg-desktop] .wd-page:has(#kaart) .intelligence-dock{left:12px;right:80px;width:auto;max-height:120px;overflow-y:auto}}
 
 body[data-rtg-desktop] .wp-story>a{display:flex;align-items:center;min-height:44px}
 
@@ -67,3 +67,5 @@ body[data-rtg-desktop] .wp-story>a{display:flex;align-items:center;min-height:44
 body[data-rtg-desktop][data-rtg-layout="standard"]>.wd-skip{display:block!important}
 
 body[data-rtg-desktop] .wd-page>header a{display:inline-flex;align-items:center;min-width:44px;min-height:44px}
+
+body[data-rtg-desktop] .wd-page:has(#kaart) .lagen{bottom:148px;max-width:calc(100% - 32px);flex-wrap:wrap;flex-direction:row}

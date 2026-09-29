@@ -85,7 +85,7 @@ test('de echte credentials uit de classificatieronde blokkeren de release', () =
   const echte = ['travelos.ov_incheckcode',
     'mode.bezorgcode', 'festivalos.toegangspas',
     'rtfos.activiteit_incheckcode',
-    'foundation.onderwijs_les_tokens', 'foundation.family_profile_token_buiten_harde_poort'];
+    'foundation.family_profile_token_buiten_harde_poort'];
   // gemigreerd op 27 september 2026 (B9, de vier restdeuren): zie de toets hieronder
   const restdeuren = new Set(['travelos.ov_incheckcode', 'mode.bezorgcode', 'festivalos.toegangspas',
     'rtfos.activiteit_incheckcode']);
@@ -103,7 +103,7 @@ test('de echte credentials uit de classificatieronde blokkeren de release', () =
      dicht, ook met een geslaagd extern dossier. De deuren blijven remaining omdat
      de credential zelf niet gemigreerd is. */
   const vrijgave = require('../server/middleware/foundation-productiepoort');
-  for (const id of ['foundation.family_profile_token_buiten_harde_poort', 'foundation.onderwijs_les_tokens'])
+  for (const id of ['foundation.family_profile_token_buiten_harde_poort'])
     for (const route of poort.effectieveRoutes(register.deuren.find(x => x.id === id))) {
       const [methode, pad] = route.split(' ');
       assert.equal(vrijgave.isNogGeslotenCredentialroute(methode, pad, {}) ||
@@ -156,6 +156,28 @@ test('de Link-drager is gemigreerd met alle controls, en de grendel is eraf', ()
   const kassacode = require('node:fs').readFileSync(require('node:path').join(__dirname, '..', 'server/kern/pay/kassacode.js'), 'utf8');
   assert.doesNotMatch(kassacode, /blokkade\(/, 'en kern/pay/kassacode.js weigert niet meer zelf');
   for (const route of poort.effectieveRoutes(d)) assert.ok(poort.REQUIRED_ROUTES.includes(route), route);
+});
+
+/* B17 (29 september 2026): de lescredentials van onderwijs zijn gemigreerd. De deur
+   draagt alle controls, blokkeert niet meer, zijn nieuwe beheerroutes staan in de
+   inventaris, en de lesfamilie is uit NOG_GESLOTEN gehaald. */
+test('de lescredentials van onderwijs zijn gemigreerd en staan niet meer blijvend dicht', () => {
+  const register = poort.lees();
+  const uit = poort.controleer(register);
+  const d = register.deuren.find(x => x.id === 'foundation.onderwijs_les_tokens');
+  assert.equal(d.status, 'migrated');
+  assert.equal(d.release_blocker, false);
+  assert.equal(d.controls.entropy_bits, 128);
+  for (const c of poort.CONTROLES) assert.equal(d.controls[c], true, c);
+  assert.ok(!uit.blockers.some(x => x.id === d.id), 'blokkeert niet meer');
+  assert.ok(!uit.fouten.some(f => f.startsWith(d.id)), 'geen fout op de deur');
+  assert.ok(d.bewijs.includes('test/foundation-lescredential.pg.test.js'), 'de claim is over twee instances beproefd');
+  const vrijgave = require('../server/middleware/foundation-productiepoort');
+  for (const route of poort.effectieveRoutes(d)) {
+    assert.ok(poort.REQUIRED_ROUTES.includes(route), route + ' hoort bewaakt te zijn');
+    const [methode, pad] = route.split(' ');
+    assert.equal(vrijgave.isNogGeslotenCredentialroute(methode, pad, {}), false, route + ' staat nog in NOG_GESLOTEN');
+  }
 });
 
 /* B10 (27 september 2026): de gedeelde kantoorcode is in productie gesloten. Dat

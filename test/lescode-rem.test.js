@@ -62,11 +62,11 @@ test('DE TEGENPROEF EERST: een juiste code komt gewoon binnen', async () => {
   /* Zonder deze zou een `lesVan()` die ALTIJD weigert de raadtoets hieronder ook
      halen -- en dan is een kapotte les een geslaagde beveiliging. */
   const d = await json(await api('/les/maak', { vak: 'Rekenen', naam: 'Meester' }));
-  assert.ok(d.code && d.code.length >= 8,
-    'een nieuwe lescode is minstens acht tekens (nu ' + (d.code || '').length + ')');
-  const goed = await api('/les/join', { code: d.code, naam: 'Sam' });
+  /* 128 bits sinds 29 september 2026 (B17, foundation/onderwijs/toegang.js). */
+  assert.match(d.lescode || '', /^LES\.[0-9A-F]{32}$/, 'een nieuwe lescode is 128 bits');
+  const goed = await api('/les/join', { lescode: d.lescode, naam: 'Sam' });
   assert.equal(goed.status, 200, 'de juiste code komt binnen');
-  const daarna = await api('/les/join', { code: d.code, naam: 'Noor' });
+  const daarna = await api('/les/join', { lescode: d.lescode, naam: 'Noor' });
   assert.equal(daarna.status, 200, 'en een tweede leerling ook -- goedePoging() wist de teller');
 });
 
@@ -81,12 +81,12 @@ test('een lescode raden loopt tegen de rem', async () => {
      deze toets vallen op deze assertie. */
   let zagRem = false, missers = 0;
   for (let i = 0; i < 30 && !zagRem; i++) {
-    const r = await api('/les/join', { code: 'ZZZZZZZZ', naam: 'Raadt' });
+    const r = await api('/les/join', { lescode: 'ZZZZZZZZ', naam: 'Raadt' });
     if (r.status === 429) zagRem = true;
     else { assert.equal(r.status, 404, 'een onbekende lescode hoort 404 te geven tot de rem aanslaat'); missers++; }
   }
   assert.ok(zagRem, 'na ' + missers + ' foute lescodes hoort de rem te hebben aangeslagen (429); ' +
-    'zonder rem is een code van 39,6 bits alsnog te bestoken');
+    'een rem hoort ook bij 128 bits: hij kost niets en remt elke gok');
 
   /* EN DE PRIJS, hier expliciet vastgelegd in plaats van als verrassing. Een
      adres dat de grens raakt staat buiten -- OOK met een goede code. Dat is de
@@ -94,7 +94,7 @@ test('een lescode raden loopt tegen de rem', async () => {
      levert dan gewoon een 200 op. Wie deze bewering ooit omdraait, verandert de
      beveiliging en niet de vriendelijkheid; zie de uitleg bij `lesVan()`. */
   const d = await json(await api('/les/maak', { vak: 'Taal', naam: 'Juf' }));
-  const metGoedeCode = await api('/les/join', { code: d.code, naam: 'Kim' });
+  const metGoedeCode = await api('/les/join', { lescode: d.lescode, naam: 'Kim' });
   assert.equal(metGoedeCode.status, 429,
     'zolang de rem staat, komt ook een JUISTE code er niet langs -- anders remt hij niets');
 });

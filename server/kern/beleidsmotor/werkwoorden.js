@@ -35,8 +35,8 @@ const WERKWOORDEN = Object.freeze({
       /* de cadeaubon: een bon die ook bij zaken te besteden is, is e-geld (C14) */
       '/api/office/cadeaubon'] },
   export: { trede: 'uitvoeren', uitleg: 'gegevens in bulk naar buiten', voorvoegsels: ['/api/office/aidata/'] },
-  partners: { trede: 'uitvoeren', uitleg: 'partners, instellingen, foundationregistraties en hun papieren toelaten',
-    voorvoegsels: ['/api/office/partner/', '/api/office/papieren', '/api/office/instelling/', '/api/office/foundation/'] },
+  partners: { trede: 'uitvoeren', uitleg: 'partners, instellingen, foundationregistraties en hun papieren toelaten, en de personeelscodes van het partnerkanaal (B14)',
+    voorvoegsels: ['/api/office/partner/', '/api/office/partnerkanaal/', '/api/office/papieren', '/api/office/instelling/', '/api/office/foundation/'] },
   magnaat: { trede: 'uitvoeren', uitleg: 'de Magnaat-wereld en wat die leert',
     voorvoegsels: ['/api/office/magnaat/', '/api/office/boardroom/magnaat/'] },
   techniek: { trede: 'uitvoeren', uitleg: 'integraties, noodstop, lastafworp, quarantaine van capabilities en de sleutels van de zaakdozen',

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-29T12:53:18.864Z",
-    "commit": "c0b0a51b",
-    "boomVuil": false,
-    "boomAnders": 6,
+    "op": "2026-09-29T22:21:23.052Z",
+    "commit": "1f584f53b",
+    "boomVuil": true,
+    "boomAnders": 12,
     "instrument": "scripts/namensvorm.js",
     "node": "v22.22.2"
   },
@@ -91,12 +91,12 @@
         "ai-mandaat",
         "rtgid-claims"
       ],
-      "velden": 73,
+      "velden": 74,
       "inAlleMechanismen": 0,
       "inMinstensDeHelft": 0,
       "helftDrempel": 5,
-      "veldenMechanismeEigen": 69,
-      "eigenPct": 94.5,
+      "veldenMechanismeEigen": 70,
+      "eigenPct": 94.6,
       "perMechanisme": [
         {
           "mechanisme": "app-machtiging",
@@ -116,7 +116,7 @@
         },
         {
           "mechanisme": "ledenbalie-inzage",
-          "velden": 5
+          "velden": 6
         },
         {
           "mechanisme": "levensband",
@@ -591,7 +591,7 @@
         }
       ]
     },
-    "envelopVelden": 30
+    "envelopVelden": 29
   },
   "woordenschat": [
     {

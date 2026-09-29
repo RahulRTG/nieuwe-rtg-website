@@ -1,28 +1,28 @@
 {
  "stempel": {
-  "op": "2026-09-29T12:53:17.228Z",
-  "commit": "c0b0a51b",
+  "op": "2026-09-29T23:13:16.518Z",
+  "commit": "1f7d35626",
   "boomVuil": false,
-  "boomAnders": 4,
+  "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5167,
-  "geclassificeerd": 5142,
+  "totaal": 5169,
+  "geclassificeerd": 5144,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3168,
    "NOT_APPLICABLE": 1245,
    "LEGACY_PENDING_CLASSIFICATION": 25,
-   "PROTECTED": 570,
+   "PROTECTED": 572,
    "INTENTIONALLY_NON_IDEMPOTENT": 159
   },
-  "vastgesteldDoorMens": 2026,
+  "vastgesteldDoorMens": 2028,
   "afgeleidDoorScript": 3116,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4264,
+   "AUTHENTICATED": 4266,
    "PUBLIC": 126,
    "OBJECT_SCOPED": 754,
    "(niet af te leiden -- vraagt een verklaring)": 7,
@@ -33,7 +33,7 @@
    "kale ronde: beschermd": 134,
    "kale ronde: onbeschermd": 125,
    "kale ronde: geen uitspraak": 4761,
-   "niet gemeten": 147
+   "niet gemeten": 149
   },
   "voorstellen": {
    "NOT_APPLICABLE": 1
@@ -367,6 +367,12 @@
   },
   {
    "route": "POST /api/sociaal/object/pagina",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/supplier/guest/aangekomen",
    "bedoeld": "OBJECT_SCOPED",
    "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
@@ -37738,6 +37744,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "live.aankomst.lid",
+   "route": "POST /api/live/aangekomen",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -108507,6 +108534,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "live.aankomst.zaak",
+   "route": "POST /api/supplier/guest/aangekomen",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

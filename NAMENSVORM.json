@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T16:34:35.677Z",
-    "commit": "51166d2d9",
+    "op": "2026-09-29T23:18:40.520Z",
+    "commit": "a4ae5e47b",
     "boomVuil": false,
     "boomAnders": 5,
     "instrument": "scripts/namensvorm.js",
@@ -596,7 +596,7 @@
   "woordenschat": [
     {
       "woord": "doel",
-      "bestanden": 289,
+      "bestanden": 292,
       "domeinen": 151,
       "samengesteld": 190,
       "samengesteldDomeinen": 88,
@@ -621,8 +621,8 @@
       "woord": "contract",
       "bestanden": 58,
       "domeinen": 21,
-      "samengesteld": 92,
-      "samengesteldDomeinen": 33,
+      "samengesteld": 95,
+      "samengesteldDomeinen": 34,
       "stand": "bezet",
       "waar": [
         "bedrijf",
@@ -642,7 +642,7 @@
     },
     {
       "woord": "claim",
-      "bestanden": 46,
+      "bestanden": 47,
       "domeinen": 29,
       "samengesteld": 44,
       "samengesteldDomeinen": 25,
@@ -665,17 +665,17 @@
     },
     {
       "woord": "risico",
-      "bestanden": 52,
-      "domeinen": 21,
+      "bestanden": 53,
+      "domeinen": 22,
       "samengesteld": 28,
       "samengesteldDomeinen": 15,
       "stand": "bezet",
       "waar": [
         "kern/appstore",
         "kern/assets",
+        "kern/bedrijfsmaat",
         "kern/command",
-        "kern/handelingsklasse",
-        "kern/horeca"
+        "kern/handelingsklasse"
       ],
       "vormen": [
         "RISICOLIJST",
@@ -803,7 +803,7 @@
     },
     {
       "woord": "deal",
-      "bestanden": 18,
+      "bestanden": 19,
       "domeinen": 12,
       "samengesteld": 22,
       "samengesteldDomeinen": 6,

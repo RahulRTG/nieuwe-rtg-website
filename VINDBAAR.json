@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-29T19:29:45.860Z",
-    "commit": "4f9b603eb",
+    "op": "2026-09-29T23:18:48.743Z",
+    "commit": "a4ae5e47b",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 8,
     "instrument": "scripts/vindbaar.js",
     "node": "v22.22.2"
   },
@@ -11,9 +11,9 @@
   "vloer": 0.6,
   "drempel": 3,
   "bestemmingen": 100,
-  "woorden": 1251,
-  "gevonden": 791,
-  "dekking": 0.6323,
+  "woorden": 1252,
+  "gevonden": 792,
+  "dekking": 0.6326,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -74,8 +74,8 @@
     {
       "naam": "Daten",
       "url": "/apps/vonk.html",
-      "woorden": 44,
-      "gevonden": 16,
+      "woorden": 43,
+      "gevonden": 15,
       "mist": [
         "bevestig",
         "aandeel",
@@ -171,8 +171,8 @@
     {
       "naam": "RTG Media",
       "url": "/apps/media.html",
-      "woorden": 54,
-      "gevonden": 35,
+      "woorden": 53,
+      "gevonden": 34,
       "mist": [
         "professionele",
         "grading",
@@ -920,8 +920,8 @@
     {
       "naam": "Food Court",
       "url": "/apps/foodcourt.html",
-      "woorden": 7,
-      "gevonden": 6,
+      "woorden": 11,
+      "gevonden": 10,
       "mist": [
         "gevonden"
       ]
@@ -1067,8 +1067,8 @@
     {
       "naam": "Camera",
       "url": "/apps/camera.html",
-      "woorden": 16,
-      "gevonden": 16,
+      "woorden": 15,
+      "gevonden": 15,
       "mist": []
     },
     {

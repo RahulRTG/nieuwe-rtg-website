@@ -200,7 +200,7 @@ geldt:
    `alleRoutes` (<!--getal:routebron.routerRoutes-->5186<!--/getal-->, bestaan) en `perRoute` (met bestand), en
    <!--getal:routebron.zonderBestand-->4<!--/getal--> routes zitten wél in de eerste en niet in de tweede.
 
-Nul dode paden is hier geen lege controle: <!--getal:schermroutes.paden-->954<!--/getal--> exacte paden zijn tegen
+Nul dode paden is hier geen lege controle: <!--getal:schermroutes.paden-->955<!--/getal--> exacte paden zijn tegen
 <!--getal:routebron.routerRoutes-->5186<!--/getal--> echte routes gehouden.
 
 ### 0.4 De aanroepgraaf en de brug route → symbool (3 september 2026)

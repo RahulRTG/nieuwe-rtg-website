@@ -135,7 +135,8 @@ const BRON = {
   appwerkt: lees('APPWERKT.json'),
   execmap: lees('EXECUTION_MAP.json'),
   idor: lees('IDOR.json'),
-  handeling: lees('HANDELINGPROEF.json')
+  handeling: lees('HANDELINGPROEF.json'),
+  idembesluit: lees('IDEMBESLUIT.json')
 };
 const ontbreekt = Object.keys(BRON).filter(k => !BRON[k]);
 if (ontbreekt.length) {
@@ -217,6 +218,21 @@ uitRijen(BRON.rol.perRoute, 'bevoegd', 'acl', new Set(['dicht']), new Set(['open
 uitRijen(BRON.audit.perRoute, 'auditbaar', 'audit', new Set(['bewezen']), new Set(['afwezig', 'gebroken']));
 // --- herstelbaar: IDEMPROEF (tweede identieke aanroep) ---
 uitRijen(BRON.idem.perRoute, 'herstelbaar', 'idempotentie', new Set(['beschermd']), new Set(['onbeschermd']));
+/* EEN BESLUIT MAAKT ROOD NIET GROEN, maar ook niet rood. IDEMBESLUIT.json zegt
+   per route waarom een tweede oproep met opzet iets NIEUWS doet (een code-maker
+   geeft een verse sleutel, een teller telt). De bewijsmatrix zet zo'n cel op
+   nvt met het besluit erbij; hier zakte de hele capability erop -- op 29
+   september 2026 blokkeerden rtmail/imap/sleutel, bedrijf/mijn en
+   bedrijf/lid/aanmeld zo drie capabilities terwijl de eigenaar juist had
+   besloten dat ze zo horen. De stand wordt ONBEKEND (een besluit is geen
+   bewijs), de meting blijft als waarde staan, en `tebeslissen` blijft ROOD. */
+for (const r of routes.values()) {
+  const u = r.uitslag.herstelbaar;
+  const besluit = u && u.stand === 'ROOD' && BRON.idembesluit && (BRON.idembesluit.routes || {})[r.pad];
+  if (!besluit || !besluit.klasse || besluit.klasse === 'tebeslissen') continue;
+  r.uitslag.herstelbaar = { stand: 'ONBEKEND', waarde: u.waarde, besluit: besluit.klasse,
+    reden: 'gemeten ' + u.waarde + ', maar besloten als ' + besluit.klasse + ' in IDEMBESLUIT.json -- een besluit is geen bewijs' };
+}
 // --- persistent: IDEMPROEF opslag-beeld (graad `vermoed`, zie LAGEN) ---
 for (const rij of Object.values(BRON.idem.perRoute || {})) {
   if (!rij || !rij.pad || !rij.methode) continue;

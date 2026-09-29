@@ -1,9 +1,9 @@
 {
   "uitleg": "Elke route (METHODE + patroon) die tijdens de volledige testsuite ECHT is aangeraakt, uit het routejournaal van server/routelog.js en niet uit de tekst van de toetsen. De eis is 100%: scripts/dekking.js zakt op elk gat en kent geen norm om die eis te verlagen. Het RTG Kantoor leest dit bestand (routes/office/dekking.js) en houdt het naast wat de server op dit moment registreert, zodat een route die er na de meting bij komt meteen als ongemeten opvalt. Bijwerken met: npm run dekking:vast",
   "gemeten": {
-    "op": "2026-09-28T18:59:14.312Z",
-    "commit": "d1f3cc44c",
-    "routesToen": 5287
+    "op": "2026-09-29T11:10:16.257Z",
+    "commit": "31d428fa",
+    "routesToen": 5289
   },
   "aangeraakt": [
     "GET /",
@@ -2276,6 +2276,7 @@
     "POST /api/office/beleidsmotor",
     "POST /api/office/beleidsmotor/afdwingen",
     "POST /api/office/beleidsmotor/afdwingen/zet",
+    "POST /api/office/beleidsmotor/huis/zet",
     "POST /api/office/beleidsmotor/review",
     "POST /api/office/beleidsmotor/simulatie",
     "POST /api/office/beleidsmotor/waarom",
@@ -3842,6 +3843,7 @@
     "POST /api/staff/mob/mijn",
     "POST /api/staff/mob/positie",
     "POST /api/staff/mob/status",
+    "POST /api/staff/ochtend",
     "POST /api/staff/oog",
     "POST /api/staff/oog/leer",
     "POST /api/staff/oog/nulmeting",

@@ -361,6 +361,8 @@
     "ketenvorm:vast": "node scripts/ketenvorm.js --vastleggen",
     "aicontext": "node scripts/aicontext.js",
     "aicontext:vast": "node scripts/aicontext.js --vastleggen",
+    "gastsplitsing": "node scripts/gastsplitsing.js",
+    "gastsplitsing:vast": "node scripts/gastsplitsing.js --vastleggen",
     "stilspoor": "node scripts/stilspoor.js",
     "stilspoor:vast": "node scripts/stilspoor.js --vastleggen",
     "stempelveiligheid": "node scripts/stempelveiligheid.js",

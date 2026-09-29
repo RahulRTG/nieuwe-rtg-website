@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T16:50:42.495Z",
-    "commit": "286a048b2",
+    "op": "2026-09-29T18:10:26.965Z",
+    "commit": "4ba511e4d",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/positieproef.js",

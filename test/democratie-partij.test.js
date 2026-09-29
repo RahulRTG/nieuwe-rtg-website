@@ -276,8 +276,21 @@ test('9. twee keer hetzelfde verzoek: wat idempotent is en wat een toestandscont
   const aan = { id: vid, veld: 'regel', waarde: 'Geen', bron: 'Gemeentewet art. 1' };
   await api('/api/democratie/partij/voorstel/aanname', aan, null, sleutel(s));
   assert.equal((await api('/api/democratie/partij/voorstel/aanname', aan, null, sleutel(s))).body.herhaling, true, 'dezelfde aanname nog eens verandert niets');
+  /* Twee partijen achter hetzelfde adres, vlak na elkaar met hetzelfde lijf:
+     de partijdeur heeft geen sessie, dus een duplicaatlaag zou ze alleen op
+     het lijf en het ip-adres kunnen onderscheiden. Elke partij hoort haar
+     eigen antwoord te krijgen. */
+  const ander = (await api('/api/office/democratie/partij/registreer', inschrijving('Partij Buurman'), kantoor)).body.sleutel;
+  for (const pad of ['/api/democratie/partij/wie', '/api/democratie/partij/voorstel/mijn']) {
+    const [a, b] = [await api(pad, {}, null, sleutel(s)), await api(pad, {}, null, sleutel(ander))];
+    assert.notDeepEqual(a.body, b.body, pad + ': de tweede partij kreeg het antwoord van de eerste');
+  }
+  const aanAnder = await api('/api/democratie/partij/voorstel/aanname', aan, null, sleutel(ander));
+  assert.equal(aanAnder.status, 404, 'hetzelfde lijf van een andere partij raakt het voorstel niet en krijgt geen afgespeeld succes');
   const pid = reg.body.partij.id;
   await api('/api/office/democratie/partij/uitschrijf', { id: pid, reden: 'Op verzoek van de partij zelf, per brief.' }, kantoor);
-  assert.equal((await api('/api/office/democratie/partij/uitschrijf', { id: pid, reden: 'Op verzoek van de partij zelf, per brief.' }, kantoor)).body.herhaling, true);
+  const nogEens = await api('/api/office/democratie/partij/uitschrijf', { id: pid, reden: 'Op verzoek van de partij zelf, per brief.' }, kantoor);
+  assert.equal(nogEens.status, 200, 'nog eens uitschrijven is geen fout');
+  assert.equal(nogEens.body.partij.stand, 'uitgeschreven');
   assert.equal((await api('/api/office/democratie/partij/sleutel', { id: pid }, kantoor)).status, 409, 'geen sleutel voor een uitgeschreven partij');
 });

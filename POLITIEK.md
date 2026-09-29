@@ -386,6 +386,15 @@ Vijf grenzen, alle vijf in de code en elk met een toets die op een mutatie zakt
    hashketen; een nieuwe waarde of toelichting is een nieuwe regel. Uitschrijven
    wist niets: het voorstel blijft staan met de stand van de partij erbij.
 
+**De partijdeur heeft geen duplicaatlaag, en dat is gemeten.** De laag die een
+dubbeltik opvangt (`server/lib/idem-sleutelbepaling.js`) kent een afzender aan
+Authorization of de cookie, en zonder die twee aan het ip-adres. De partijsleutel
+reist in een eigen kop, dus met de aanname als `zelfdeVerzoek` kreeg een
+herhaling het EERSTE antwoord terug -- en twee partijen achter hetzelfde adres
+hadden elkaars antwoord kunnen krijgen. De schrijvende partijroutes herkennen
+een herhaling daarom zelf (`idemsleutels-nooit-democratie.js`), en toets 9 zakt
+zodra iemand er een duplicaatlaag omheen zet.
+
 Wat er met opzet NIET is: de andere acht soorten uit par. 7.1 (standpunt,
 amendement, onderbouwing, dekking, stemming, wijziging en uitvoering; de
 toezegging is stap 6),

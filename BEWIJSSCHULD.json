@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-28T16:04:26.967Z",
-  "commit": "53df75abe",
+  "op": "2026-09-29T16:14:16.936Z",
+  "commit": "c5710a94c",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/bewijsschuld.js",
@@ -11,14 +11,14 @@
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 18,
-  "meetwerk": 2389,
+  "meetwerk": 2398,
   "instrument": 323,
   "grens": 676
  },
  "aflossing": {
   "doel": 0,
   "wat": "de achterstand (meetwerk + instrument) gaat naar nul. `grens` telt niet mee en sluit nooit -- dat is de rand van de methode en geen werk.",
-  "staat": 2712,
+  "staat": 2721,
   "regels": [
    "de achterstand mag nooit groeien zonder een reden IN dit register (--groei=...)",
    "een post mag niet van soort veranderen om onder de poort uit te komen: naar `grens` verplaatsen laat de achterstand dalen zonder dat er iets gemeten is",
@@ -28,7 +28,7 @@
  },
  "gemeten": {
   "postenTotaal": 18,
-  "achterstand": 2712,
+  "achterstand": 2721,
   "randVanDeMethode": 676,
   "auth-onbeslist": 1,
   "capability-in-handler": 558,
@@ -46,7 +46,7 @@
   "gevolg-onbekend": 96,
   "droogloop-onbeoordeeld": 2,
   "herstel-onbevestigd": 49,
-  "idem-ongeclassificeerd": 1606,
+  "idem-ongeclassificeerd": 1615,
   "wegwerpserver-kopieen": 3
  },
  "posten": [
@@ -182,7 +182,7 @@
    "id": "idem-ongeclassificeerd",
    "soort": "meetwerk",
    "wat": "muterende routes zonder uitspraak over herhalen: wat gebeurt er bij een tweede keer",
-   "aantal": 1606,
+   "aantal": 1615,
    "waarom": "autonomie zonder herhaalsemantiek is niet te doen: een keten die halverwege afbreekt moet weten of opnieuw beginnen veilig is. Het doel is niet dat alles idempotent IS -- het is dat van elke route vastligt wat een tweede keer betekent.",
    "sluit": "per route beslissen en vastleggen. Het instrument staat (scripts/idemproef-route.js plus IDEMBESLUIT.json met zijn klassen); dit is meetwerk en handwerk."
   },
@@ -198,51 +198,47 @@
  "historie": {
   "auth-onbeslist": [
    {
-    "op": "2026-09-25",
-    "aantal": 1
-   },
-   {
     "op": "2026-09-27",
     "aantal": 1
    },
    {
     "op": "2026-09-28",
+    "aantal": 1
+   },
+   {
+    "op": "2026-09-29",
     "aantal": 1
    }
   ],
   "capability-in-handler": [
    {
-    "op": "2026-09-25",
-    "aantal": 558
-   },
-   {
     "op": "2026-09-27",
     "aantal": 558
    },
    {
     "op": "2026-09-28",
+    "aantal": 558
+   },
+   {
+    "op": "2026-09-29",
     "aantal": 558
    }
   ],
   "objectpoort": [
    {
-    "op": "2026-09-25",
-    "aantal": 52
-   },
-   {
     "op": "2026-09-27",
     "aantal": 52
    },
    {
     "op": "2026-09-28",
     "aantal": 52
+   },
+   {
+    "op": "2026-09-29",
+    "aantal": 52
    }
   ],
   "output-deuren": [
-   {
-    "op": "2026-09-25",
-    "aantal": 18
-   },
    {
     "op": "2026-09-27",
     "aantal": 18
@@ -250,13 +246,13 @@
    {
     "op": "2026-09-28",
     "aantal": 20
+   },
+   {
+    "op": "2026-09-29",
+    "aantal": 20
    }
   ],
   "lichaamssleutel": [
-   {
-    "op": "2026-09-25",
-    "aantal": 94
-   },
    {
     "op": "2026-09-27",
     "aantal": 94
@@ -264,13 +260,13 @@
    {
     "op": "2026-09-28",
     "aantal": 94
+   },
+   {
+    "op": "2026-09-29",
+    "aantal": 94
    }
   ],
   "output-niet-toerekenbaar": [
-   {
-    "op": "2026-09-25",
-    "aantal": 285
-   },
    {
     "op": "2026-09-27",
     "aantal": 285
@@ -278,173 +274,177 @@
    {
     "op": "2026-09-28",
     "aantal": 579
+   },
+   {
+    "op": "2026-09-29",
+    "aantal": 579
    }
   ],
   "output-blind": [
-   {
-    "op": "2026-09-25",
-    "aantal": 0
-   },
    {
     "op": "2026-09-27",
     "aantal": 0
    },
    {
     "op": "2026-09-28",
+    "aantal": 0
+   },
+   {
+    "op": "2026-09-29",
     "aantal": 0
    }
   ],
   "output-onwaarneembaar": [
    {
-    "op": "2026-09-25",
-    "aantal": 4
-   },
-   {
     "op": "2026-09-27",
     "aantal": 4
    },
    {
     "op": "2026-09-28",
+    "aantal": 4
+   },
+   {
+    "op": "2026-09-29",
     "aantal": 4
    }
   ],
   "audit-wisselend": [
    {
-    "op": "2026-09-25",
-    "aantal": null
-   },
-   {
     "op": "2026-09-27",
     "aantal": null
    },
    {
     "op": "2026-09-28",
+    "aantal": null
+   },
+   {
+    "op": "2026-09-29",
     "aantal": null
    }
   ],
   "audit-verklaard": [
    {
-    "op": "2026-09-25",
-    "aantal": null
-   },
-   {
     "op": "2026-09-27",
     "aantal": null
    },
    {
     "op": "2026-09-28",
+    "aantal": null
+   },
+   {
+    "op": "2026-09-29",
     "aantal": null
    }
   ],
   "rollback-gezakt": [
    {
-    "op": "2026-09-25",
-    "aantal": 0
-   },
-   {
     "op": "2026-09-27",
     "aantal": 0
    },
    {
     "op": "2026-09-28",
+    "aantal": 0
+   },
+   {
+    "op": "2026-09-29",
     "aantal": 0
    }
   ],
   "object-vooraf": [
    {
-    "op": "2026-09-25",
-    "aantal": 323
-   },
-   {
     "op": "2026-09-27",
     "aantal": 323
    },
    {
     "op": "2026-09-28",
+    "aantal": 323
+   },
+   {
+    "op": "2026-09-29",
     "aantal": 323
    }
   ],
   "proefruis": [
    {
-    "op": "2026-09-25",
-    "aantal": 1
-   },
-   {
     "op": "2026-09-27",
     "aantal": 1
    },
    {
     "op": "2026-09-28",
+    "aantal": 1
+   },
+   {
+    "op": "2026-09-29",
     "aantal": 1
    }
   ],
   "gevolg-onbekend": [
    {
-    "op": "2026-09-25",
-    "aantal": 95
-   },
-   {
     "op": "2026-09-27",
     "aantal": 96
    },
    {
     "op": "2026-09-28",
+    "aantal": 96
+   },
+   {
+    "op": "2026-09-29",
     "aantal": 96
    }
   ],
   "droogloop-onbeoordeeld": [
    {
-    "op": "2026-09-25",
-    "aantal": 2
-   },
-   {
     "op": "2026-09-27",
     "aantal": 2
    },
    {
     "op": "2026-09-28",
+    "aantal": 2
+   },
+   {
+    "op": "2026-09-29",
     "aantal": 2
    }
   ],
   "herstel-onbevestigd": [
    {
-    "op": "2026-09-25",
-    "aantal": 49
-   },
-   {
     "op": "2026-09-27",
     "aantal": 49
    },
    {
     "op": "2026-09-28",
+    "aantal": 49
+   },
+   {
+    "op": "2026-09-29",
     "aantal": 49
    }
   ],
   "idem-ongeclassificeerd": [
    {
-    "op": "2026-09-25",
-    "aantal": 1607
-   },
-   {
     "op": "2026-09-27",
     "aantal": 1606
    },
    {
     "op": "2026-09-28",
     "aantal": 1606
+   },
+   {
+    "op": "2026-09-29",
+    "aantal": 1615
    }
   ],
   "wegwerpserver-kopieen": [
    {
-    "op": "2026-09-25",
-    "aantal": 3
-   },
-   {
     "op": "2026-09-27",
     "aantal": 3
    },
    {
     "op": "2026-09-28",
+    "aantal": 3
+   },
+   {
+    "op": "2026-09-29",
     "aantal": 3
    }
   ]
@@ -473,6 +473,12 @@
    "aantal": 1,
    "meetdagen": 3,
    "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: de ruis meten: tien rondes op dezelfde commit, en per as de spreiding vastleggen. Dan weet de ratel wat een echte verslechtering is en wat niet."
+  },
+  {
+   "id": "gevolg-onbekend",
+   "aantal": 96,
+   "meetdagen": 3,
+   "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: de idempotentieproef over deze paden halen, of ze in de droogloop opnemen. Het gereedschap staat er (scripts/droogloop.js meet per stap welke collectie werkelijk bewoog); wat rest is meten."
   },
   {
    "id": "droogloop-onbeoordeeld",
@@ -601,6 +607,12 @@
    "van": 2418,
    "naar": 2712,
    "reden": "noemergroei, geen achteruitgang: de verse suite (74e97d99) zag 5151 routes tegen 4747 op 3 september; de 4151 bewezen OUTPUT-cellen bleven exact gelijk, en de 404 nieuwe routes landden als 294 onbeslist (output-niet-toerekenbaar 285 -> 579) en 110 ongemeten. Gemeten met scripts/routenoemer.js: +416 routes sinds df1a581a, 0 verdwenen. Output-deuren 18 -> 20 zijn twee deuren die de verse ronde voor het eerst zag."
+  },
+  {
+   "op": "2026-09-29",
+   "van": 2712,
+   "naar": 2723,
+   "reden": "De verse IDEMPROEF (5148 routes aangeroepen, tegen 5020) bracht 119 routes van de merge met main in beeld; idem-ongeclassificeerd groeit 1606 -> 1617 omdat die nieuwe routes nog geen besluit dragen. Geen bewezen cel ging verloren."
   }
  ]
 }

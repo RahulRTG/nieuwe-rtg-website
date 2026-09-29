@@ -321,6 +321,32 @@ test('een gezakte faalproef is een bevinding en telt niet als bewijs', () => {
   assert.equal(c.bron, 'faalproef');
 });
 
+/* HET BESLUIT UIT HERREKENBAAR.json. /api/office/magnaat/scan schrijft alleen een
+   tijdstempel weg en zakte op schrijf-verloren; zonder dit werd hij in
+   VERTROUWEN.json geschorst en door de schorspoort met een 503 dichtgezet. */
+const metFaalBesluit = (klasse) => bouw({ tabel: TABEL, bewakers: BEWAKERS, journaal: null,
+  poort: null, rol: null, keten: null, invoer: null, idem: null,
+  faal: new Map([['POST /api/proef/schrijf', { methode: 'POST', pad: '/api/proef/schrijf', failure: 'gezakt',
+    reden: 'schrijf-verloren: 200 terwijl de toestand niet veranderde',
+    besluit: { klasse, grond: 'alleen een tijdstempel die de volgende ronde opnieuw zet' } }]]) })
+  .rijen.find(r => r.pad === '/api/proef/schrijf').cellen.FAILURE;
+
+test('een gezakte faalproef met een herstellend besluit is nvt, met de meting erbij', () => {
+  for (const klasse of ['cache', 'herrekenbaar-uit-bron']) {
+    const c = metFaalBesluit(klasse);
+    assert.equal(c.staat, 'nvt', klasse + ' hoort de belofte niet-van-toepassing te maken');
+    assert.equal(c.besluit, klasse);
+    assert.match(c.reden, /schrijf-verloren/, 'de gemeten reden blijft in de cel staan');
+    assert.match(c.waarom, /tijdstempel/);
+  }
+});
+
+test('duurzaam-vereist is geen vrijstelling: de cel blijft gezakt', () => {
+  const c = metFaalBesluit('duurzaam-vereist');
+  assert.equal(c.staat, 'gezakt');
+  assert.equal(c.bron, 'faalproef');
+});
+
 test('ongemeten van de faalproef draagt de reden -- niet gegrepen is niet ongezien', () => {
   /* Het verschil tussen "het verraad greep niet aan" en "niemand heeft gekeken"
      hoort in de cel te staan. Zonder reden lezen ze identiek. */

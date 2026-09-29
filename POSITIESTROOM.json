@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T14:06:54.162Z",
-    "commit": "413d7d3f",
+    "op": "2026-09-29T16:26:45.747Z",
+    "commit": "db6d4974c",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/positiestroom.js",
@@ -23,7 +23,12 @@
     "tegenspraak": 0,
     "zonderTermijn": 20,
     "nietVergeten": 20,
-    "besloten": 0,
+    "besloten": 15,
+    "besluitNietUitgevoerd": [
+      "live-onderweg",
+      "ontmoet-radar",
+      "plaats-passages"
+    ],
     "klassen": {
       "toegestaan": 0,
       "venster": 9,
@@ -52,8 +57,14 @@
       "vergeten": true,
       "gedetecteerd": true,
       "klasse": "teLang",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "n": "N14",
+        "datum": "2026-09-29",
+        "klasse": "venster",
+        "uitkomst": "de positie wordt gewist zodra Onderweg stopt; de veger van zeven dagen blijft alleen als vangnet",
+        "uitgevoerd": false
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "/api/live/stop zet alleen active op false; de positie blijft tot de bewaarveger hem na zeven dagen weghaalt. De taak is dan al voorbij (NAVIGATIE.md P-05, derde categorie)."
@@ -137,8 +148,14 @@
       "vergeten": false,
       "gedetecteerd": true,
       "klasse": "noodzakelijk",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "klasse": "noodzakelijk",
+        "n": "N15",
+        "datum": "2026-09-29",
+        "uitkomst": "aanvaard zoals voorgesteld",
+        "uitgevoerd": true
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "het lid kiest en verwijdert ze zelf (max. tien); dat is zijn eigen inhoud en geen spoor -- maar de vergeetroute kent mobFavorieten niet (daar staat favorieten, een andere collectie)"
@@ -201,8 +218,14 @@
       "vergeten": null,
       "gedetecteerd": true,
       "klasse": "venster",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "klasse": "venster",
+        "n": "N15",
+        "datum": "2026-09-29",
+        "uitkomst": "aanvaard zoals voorgesteld",
+        "uitgevoerd": true
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "overschreven en niet opgestapeld, en weg zodra de dienst stopt"
@@ -286,8 +309,14 @@
       "vergeten": false,
       "gedetecteerd": true,
       "klasse": "venster",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "klasse": "venster",
+        "n": "N15",
+        "datum": "2026-09-29",
+        "uitkomst": "aanvaard zoals voorgesteld",
+        "uitgevoerd": true
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "weg bij het sluiten van het venster; een VERLOPEN venster wordt alleen niet vanzelf gesloten"
@@ -329,8 +358,14 @@
       "vergeten": true,
       "gedetecteerd": true,
       "klasse": "teLang",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "n": "N14",
+        "datum": "2026-09-29",
+        "klasse": "venster",
+        "uitkomst": "de positie wordt gewist zodra de radar stopt",
+        "uitgevoerd": false
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "zes minuten telt hij als vers, maar dat wordt alleen bij het LEZEN gewogen; hij blijft staan tot het lid de functie uitzet of vergeten wordt"
@@ -351,8 +386,14 @@
       "vergeten": false,
       "gedetecteerd": true,
       "klasse": "venster",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "klasse": "venster",
+        "n": "N15",
+        "datum": "2026-09-29",
+        "uitkomst": "aanvaard zoals voorgesteld",
+        "uitgevoerd": true
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "weg bij het stoppen van de date, tenzij er een SOS openstaat"
@@ -457,8 +498,14 @@
       "vergeten": null,
       "gedetecteerd": true,
       "klasse": "venster",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "klasse": "venster",
+        "n": "N15",
+        "datum": "2026-09-29",
+        "uitkomst": "aanvaard zoals voorgesteld",
+        "uitgevoerd": true
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "weg als de bezorger terug is; hij heet vluchtig maar gaat met de volgende save() wel naar schijf"
@@ -500,8 +547,14 @@
       "vergeten": null,
       "gedetecteerd": true,
       "klasse": "venster",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "klasse": "venster",
+        "n": "N15",
+        "datum": "2026-09-29",
+        "uitkomst": "aanvaard zoals voorgesteld",
+        "uitgevoerd": true
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "weg bij het stoppen van de excursie en direct weg bij het intrekken van de toestemming"
@@ -522,8 +575,14 @@
       "vergeten": null,
       "gedetecteerd": true,
       "klasse": "venster",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "klasse": "venster",
+        "n": "N15",
+        "datum": "2026-09-29",
+        "uitkomst": "aanvaard zoals voorgesteld",
+        "uitgevoerd": true
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "weg bij het stoppen van de excursie"
@@ -544,8 +603,14 @@
       "vergeten": null,
       "gedetecteerd": false,
       "klasse": "venster",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "klasse": "venster",
+        "n": "N15",
+        "datum": "2026-09-29",
+        "uitkomst": "aanvaard zoals voorgesteld",
+        "uitgevoerd": true
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "weg bij uitzetten en bij het inleveren van het voertuig"
@@ -566,8 +631,14 @@
       "vergeten": null,
       "gedetecteerd": false,
       "klasse": "venster",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "klasse": "venster",
+        "n": "N15",
+        "datum": "2026-09-29",
+        "uitkomst": "aanvaard zoals voorgesteld",
+        "uitgevoerd": true
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "weg bij uitzetten en bij afronden; een geweigerde charter laat de rij wel staan"
@@ -630,8 +701,14 @@
       "vergeten": false,
       "gedetecteerd": true,
       "klasse": "noodzakelijk",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "klasse": "noodzakelijk",
+        "n": "N15",
+        "datum": "2026-09-29",
+        "uitkomst": "aanvaard zoals voorgesteld",
+        "uitgevoerd": true
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "een bewust gedane melding met een levensduur van 45 minuten tot een dag; de codenaam en de sleutels van wie bevestigt reizen mee, en de vergeetroute kent de collectie niet"
@@ -654,8 +731,14 @@
       "vergeten": false,
       "gedetecteerd": false,
       "klasse": "verboden",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "n": "N12",
+        "datum": "2026-09-29",
+        "klasse": "toegestaan",
+        "uitkomst": "alleen het doelhek wordt opgeslagen; een passage langs een ander hek wordt verwerkt en niet bewaard",
+        "uitgevoerd": false
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "geen coordinaat, wel een reeks zaken met tijden onder een codenaam -- een mens-plaatsgraaf; botst met P-05 en N1 ongeacht de termijn (NAVIGATIE.md par. 6.2, besluit B8)"
@@ -678,8 +761,14 @@
       "vergeten": false,
       "gedetecteerd": false,
       "klasse": "venster",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "klasse": "venster",
+        "n": "N15",
+        "datum": "2026-09-29",
+        "uitkomst": "aanvaard zoals voorgesteld",
+        "uitgevoerd": true
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "weg met het venster en hooguit twee dagen in het bewaarbeleid"
@@ -723,8 +812,14 @@
       "vergeten": false,
       "gedetecteerd": true,
       "klasse": "noodzakelijk",
-      "status": "voorstel",
-      "besluit": null,
+      "status": "besloten",
+      "besluit": {
+        "klasse": "noodzakelijk",
+        "n": "N15",
+        "datum": "2026-09-29",
+        "uitkomst": "aanvaard zoals voorgesteld",
+        "uitgevoerd": true
+      },
       "tegenspraak": null,
       "reden": null,
       "waarom": "een zaakdossier met een termijn in het bewaarbeleid; of drie jaar de melder moet dragen, is een aparte vraag"

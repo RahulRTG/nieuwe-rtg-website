@@ -144,4 +144,4 @@ function maakOntmoeting({ db, save, crypto, accounts, leeftijdVan, notify, sseTo
   };
 }
 
-module.exports = { maakOntmoeting, POS_TTL_MS };
+module.exports = { maakOntmoeting };

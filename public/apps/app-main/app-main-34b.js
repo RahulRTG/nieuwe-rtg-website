@@ -1,3 +1,4 @@
+/* het Onderweg-paneel: kaart, partners, handelingen en de bevestigde aankomst */
   function renderLivePanel(){
     const L = liveData; if (!L) return;
     const dest = L.dest;

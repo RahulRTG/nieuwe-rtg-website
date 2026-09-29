@@ -29,9 +29,8 @@ const DAG = 86400000;
    deze getallen te komen en niet uit een tweede versie ervan, want dan gaat het
    register liegen zodra hier iets verandert (LAT-regel 4). */
 const STANDAARD = { locatieDagen: 7, idDagen: 365 };
-const { POS_TTL_MS } = require('./kern/ontmoeting');
 
-function maakBewaarveger({ db, save, accounts, identiteitsmap, lidmaatschapTot, log, nu, instel, accountWerk }) {
+function maakBewaarveger({ db, save, accounts, identiteitsmap, lidmaatschapTot, log, nu, instel, accountWerk, radarVeeg }) {
   const I = Object.assign({}, STANDAARD, instel || {});
   /* ACCOUNTMUTATIES LOPEN HIER BUITEN EEN HTTP-VERZOEK, en in productie mocht
      dat niet: de identiteitscache commit alleen als deelnemer aan een
@@ -75,13 +74,10 @@ function maakBewaarveger({ db, save, accounts, identiteitsmap, lidmaatschapTot, 
 
     /* 1b. RADARPOSITIES DIE NIET MEER VERS ZIJN (NAVIGATIE.md N14). De radar
        wist ze zelf bij elke positie en bij elke stand; dit is het vangnet voor
-       wie de functie aanliet en daarna niets meer deed. De grens is die van de
-       radar zelf en geen tweede getal. */
-    const radar = db.data.ontmoetPosities || {};
-    for (const key of Object.keys(radar)) {
-      const at = Date.parse((radar[key] || {}).at || '') || 0;
-      if (t - at > POS_TTL_MS) { delete radar[key]; posities++; }
-    }
+       wie de functie aanliet en daarna niets meer deed. De regel -- en de grens
+       van wat "vers" is -- blijft van de radar: de veger krijgt zijn wisfunctie
+       mee (opzet/start.js) en leest het domein niet zelf. */
+    if (typeof radarVeeg === 'function') posities += Number(radarVeeg()) || 0;
 
     // 2. identiteitsbewijzen: een jaar na goedkeuring weg, afgewezen als vangnet
     for (const u of accounts.listByVerification('verified')) {

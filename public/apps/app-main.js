@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '99403b62';
+var RTG_BOUW = '9ff3863c';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -6332,6 +6332,7 @@ var RTG_BOUW = '99403b62';
     return pts.map(p => ({ x: ((p.lng - minLng)/dLng)*100, y: (1 - (p.lat - minLat)/dLat)*100 }));
   }
 
+/* het Onderweg-paneel: kaart, partners, handelingen en de bevestigde aankomst */
   function renderLivePanel(){
     const L = liveData; if (!L) return;
     const dest = L.dest;

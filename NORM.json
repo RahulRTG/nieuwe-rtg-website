@@ -28,8 +28,8 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4626,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1666,
-    "kernGedeeld": 250,
+    "kernBreedte": 1667,
+    "kernGedeeld": 251,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
@@ -3552,6 +3552,26 @@
       "meter": "toetsenNietGemeten 654 -> 721",
       "reden": "DE TWEEDE BIJTREKRONDE VAN DE SAMENVOEGING DRAAGT DE GROEI VAN DE TAKKEN, EN GEEN GROEI VAN ZICHZELF. Na de eerste ronde zijn de nieuwe commits van alle open takken en #414 bijgetrokken (#413 is op besluit van de eigenaar weer uit deze tak gehaald, want hij was in zijn eigen CI nooit groen). Elke tak schreef voor zijn eigen verhoging hier al een notitie; de vereniging telt die op. De nieuwe stand is de GEMETEN stand op de samengevoegde boom, er is geen lucht bijgeteld, en vanaf hier geldt weer: alleen omlaag. De mutatiemotor is niet langs de nieuwe toetsbestanden van de takken geweest.",
       "waarheen": "Een volledige npm run mutatie op een schone boom neemt ze mee; die draait aan het eind van deze samenvoeging."
+    },
+    {
+      "datum": "2026-09-29",
+      "soort": "schuld",
+      "sleutel": "kernGedeeld",
+      "van": 250,
+      "vervalt": "2026-12-29",
+      "meter": "kernGedeeld 250 -> 251",
+      "reden": "`bevestigAankomst` (kern/live.js) is een nieuwe kernnaam, en hij wordt door TWEE domeinen aangeraakt: `member` (het lid bevestigt dat het er is, /api/live/aangekomen) en `supplier` (de zaak die de bestemming is bevestigt het, /api/supplier/guest/aangekomen). Dat is het besluit zelf: NAVIGATIE.md N13 zegt dat aankomst wordt bevestigd door de klant of de zaak, en wie het eerst bevestigt is genoeg. De regel -- een bevestiging zet de stand eenmaal, een tweede verandert niets -- hoort daarom op EEN plek te staan en door beide kanten te worden aangeroepen; twee kopieen zouden uiteenlopen zodra een van de twee kanten een voorwaarde krijgt. Beide staan als verklaring in GRENZEN.json, en de domeingrens hield hem tegen tot iemand hem opschreef.",
+      "waarheen": "Niets, tenzij aankomst weer een eenzijdig feit wordt -- en dat botst met N13. Dit getal hoort te dalen doordat OUDE koppelingen verdwijnen, niet door deze gedeelde regel weer in twee kopieen te splitsen."
+    },
+    {
+      "datum": "2026-09-29",
+      "soort": "schuld",
+      "sleutel": "kernBreedte",
+      "van": 1666,
+      "vervalt": "2026-12-29",
+      "meter": "kernBreedte 1666 -> 1667",
+      "reden": "`bevestigAankomst` (kern/live.js) is een nieuwe kernnaam, en hij wordt door TWEE domeinen aangeraakt: `member` (het lid bevestigt dat het er is, /api/live/aangekomen) en `supplier` (de zaak die de bestemming is bevestigt het, /api/supplier/guest/aangekomen). Dat is het besluit zelf: NAVIGATIE.md N13 zegt dat aankomst wordt bevestigd door de klant of de zaak, en wie het eerst bevestigt is genoeg. De regel -- een bevestiging zet de stand eenmaal, een tweede verandert niets -- hoort daarom op EEN plek te staan en door beide kanten te worden aangeroepen; twee kopieen zouden uiteenlopen zodra een van de twee kanten een voorwaarde krijgt. Beide staan als verklaring in GRENZEN.json, en de domeingrens hield hem tegen tot iemand hem opschreef.",
+      "waarheen": "Niets, tenzij aankomst weer een eenzijdig feit wordt -- en dat botst met N13. Dit getal hoort te dalen doordat OUDE koppelingen verdwijnen, niet door deze gedeelde regel weer in twee kopieen te splitsen."
     }
   ],
   "prestatie": {

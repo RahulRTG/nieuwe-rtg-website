@@ -56,7 +56,7 @@ for(const width of [390,1440])test(width+'px: context, verloren antwoord, bronco
   assert.equal(await app.evaluate(()=>JSON.parse(sessionStorage.getItem('rtg.intent.v1')).rows.filter(r=>r.status==='ACTIVE').length),0);
   await api('/api/supplier/reservering/beslis',{id:reservations[0].id,action:'bevestig'},supplier);
   await app.locator('#rAgenda').click();
-  await app.waitForURL('**/apps/agenda.html?datum='+date,{waitUntil:'load'});
+  await app.waitForURL('**/apps/agenda.html?datum='+date,{waitUntil:'domcontentloaded'});
   await app.waitForFunction(()=>document.body.innerText.includes('Tafel bij')&&document.body.innerText.includes('bevestigd'));
   await page.waitForFunction(()=>/Agenda/.test(document.querySelector('.wd-focus-head h2').textContent));
   assert.match(await page.locator('.wd-focus-head h2').textContent(),/Agenda/);

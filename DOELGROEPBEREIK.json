@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T15:39:17.965Z",
-    "commit": "f907b38bb",
+    "op": "2026-09-29T17:28:06.836Z",
+    "commit": "e9063f12d",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/doelgroepbereik.js",
@@ -10120,6 +10120,151 @@
       "onbepaaldeRoutes": 6,
       "open": "POST /api/carriere/regel/toon",
       "uitslag": "geen-deur"
+    },
+    {
+      "functie": "rust",
+      "naam": "Rust (Thuisrust)",
+      "doelgroep": "rtg",
+      "verklaard": true,
+      "routes": 3,
+      "openRoute": {
+        "methode": "POST",
+        "pad": "/api/veiligheid/rust",
+        "bewakers": [
+          "auth"
+        ],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/veiligheid/rust.js",
+        "regel": 14,
+        "samengesteld": false,
+        "rauw": ", auth, (req, res) => {"
+      },
+      "beproefd": 1,
+      "onbepaaldeRoutes": 0,
+      "open": "POST /api/veiligheid/rust",
+      "uitslag": "waar"
+    },
+    {
+      "functie": "rust",
+      "naam": "Rust (Thuisrust)",
+      "doelgroep": "lifestyle",
+      "verklaard": true,
+      "routes": 3,
+      "openRoute": {
+        "methode": "POST",
+        "pad": "/api/veiligheid/rust",
+        "bewakers": [
+          "auth"
+        ],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/veiligheid/rust.js",
+        "regel": 14,
+        "samengesteld": false,
+        "rauw": ", auth, (req, res) => {"
+      },
+      "beproefd": 1,
+      "onbepaaldeRoutes": 0,
+      "open": "POST /api/veiligheid/rust",
+      "uitslag": "waar"
+    },
+    {
+      "functie": "rust",
+      "naam": "Rust (Thuisrust)",
+      "doelgroep": "business",
+      "verklaard": true,
+      "routes": 3,
+      "openRoute": {
+        "methode": "POST",
+        "pad": "/api/veiligheid/rust",
+        "bewakers": [
+          "auth"
+        ],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/veiligheid/rust.js",
+        "regel": 14,
+        "samengesteld": false,
+        "rauw": ", auth, (req, res) => {"
+      },
+      "beproefd": 1,
+      "onbepaaldeRoutes": 0,
+      "open": "POST /api/veiligheid/rust",
+      "uitslag": "waar"
+    },
+    {
+      "functie": "rust",
+      "naam": "Rust (Thuisrust)",
+      "doelgroep": "gast",
+      "verklaard": true,
+      "routes": 3,
+      "openRoute": {
+        "methode": "POST",
+        "pad": "/api/veiligheid/rust",
+        "bewakers": [
+          "auth"
+        ],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/veiligheid/rust.js",
+        "regel": 14,
+        "samengesteld": false,
+        "rauw": ", auth, (req, res) => {"
+      },
+      "openVorm": "bezoeker",
+      "beproefd": 1,
+      "onbepaaldeRoutes": 0,
+      "open": "POST /api/veiligheid/rust",
+      "uitslag": "waar"
+    },
+    {
+      "functie": "rust",
+      "naam": "Rust (Thuisrust)",
+      "doelgroep": "leverancier",
+      "verklaard": false,
+      "routes": 3,
+      "beproefd": 3,
+      "onbepaaldeRoutes": 3,
+      "open": null,
+      "uitslag": "onbepaald",
+      "reden": "3 van de 3 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+    },
+    {
+      "functie": "rust",
+      "naam": "Rust (Thuisrust)",
+      "doelgroep": "personeel",
+      "verklaard": false,
+      "routes": 3,
+      "beproefd": 3,
+      "onbepaaldeRoutes": 3,
+      "open": null,
+      "uitslag": "onbepaald",
+      "reden": "3 van de 3 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+    },
+    {
+      "functie": "rust",
+      "naam": "Rust (Thuisrust)",
+      "doelgroep": "foundation",
+      "verklaard": false,
+      "routes": 3,
+      "beproefd": 3,
+      "onbepaaldeRoutes": 0,
+      "open": null,
+      "uitslag": "onbepaald",
+      "reden": "deze doelgroep dekt gezinnen, leerlingen EN scholen; de meter draagt alleen een gezinssessie"
+    },
+    {
+      "functie": "rust",
+      "naam": "Rust (Thuisrust)",
+      "doelgroep": "intern",
+      "verklaard": false,
+      "routes": 3,
+      "beproefd": 3,
+      "onbepaaldeRoutes": 3,
+      "open": null,
+      "uitslag": "onbepaald",
+      "reden": "3 van de 3 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
     },
     {
       "functie": "connect",
@@ -32832,13 +32977,13 @@
     }
   ],
   "telling": {
-    "cellen": 1792,
-    "waar": 620,
+    "cellen": 1800,
+    "waar": 624,
     "correct-afgesloten": 195,
     "registerleugen": 18,
     "bereikbaar-zonder-verklaring": 122,
     "geen-deur": 145,
-    "onbepaald": 688,
+    "onbepaald": 692,
     "niet-beproefd": 4,
     "sessie-ontbreekt": 0
   },

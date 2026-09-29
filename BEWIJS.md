@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2174 bestanden en 15163 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2176 bestanden en 15172 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2174 |
-| losse beweringen (`test(...)`) | 15163 |
+| toetsbestanden | 2176 |
+| losse beweringen (`test(...)`) | 15172 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 199 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1844 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 147 |
-| alleen in de kop *genoemd*, nog niet gemeten | 30 |
-| niets van beide | 153 |
+| alleen in de kop *genoemd*, nog niet gemeten | 31 |
+| niets van beide | 154 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1894 bestanden, 14672 beweringen.
+1895 bestanden, 14680 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -454,10 +454,11 @@ toets omvalt.
 | `excursie.test.js` | 2 | gezakt op `liegpoort /api/` | DE EXCURSIE -- waar kinderen zijn, en wie dat mag weten. WAAROM DIT DE ZWAARSTE VAN DE SCHOOL IS Van alle 199 school- en RTF-routes zonder toets is dit de enige waar het over de LOCATIE VAN EEN KIND gaat. |
 | `executionmap.test.js` | 12 | al rood | DE CAPABILITY-COMPILER (scripts/executionmap.js, EXECUTIE.md blok 1). EXECUTION_MAP.json is een PROJECTIE en geen bron. |
 | `experience-dinner.test.js` | 5 | gezakt op `===->!==#0` | Werkelijke HTTP-keten, zonder betaal-, AI- of pushprovider. De agenda leest de reserveringsbron; bevestigd blijft een besluit van de juiste zaak. |
-| `experience-intent.test.js` | 6 | gezakt op `true->false#0` | Tijdelijke bedoeling blijft gescheiden per sessie en doel. Intrekken, afronden en verlopen verwijderen de inhoud, zonder stil te herleven. |
+| `experience-intent.test.js` | 8 | gezakt op `true->false#0` | Tijdelijke bedoeling blijft gescheiden per sessie en doel. Intrekken, afronden en verlopen verwijderen de inhoud, zonder stil te herleven. |
 | `experience-platform.e2e.test.js` | 3 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `experience-platform.test.js` | 12 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `experience-rtg.test.js` | 4 | gezakt op `true->false#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `experience-travel.test.js` | 4 | -- | Travel-bewijs leest de echte aanvraag, het adviseursbesluit en de projectie. Een ledenlogin geeft nooit de bevoegdheid van een reisadviseur mee. |
 | `extern-afrekenen.test.js` | 4 | gezakt op `liegpoort /api/` | EXTERN AFREKENEN TERWIJL RTG-BETALEN UIT STAAT. Besluit van de eigenaar (27 september 2026, RELEASEKANDIDAAT.md B2b): zonder kaartrail rekent een zaak af zoals elke zaak dat doet -- contant, met de pin van haar eigen... |
 | `extern-bewijs.test.js` | 7 | gezakt op `===->!==#0` | DE BEWIJSVERSLAGEN VOOR HET EXTERNE DOSSIER (scripts/extern-bewijs.js). Wat hier beproefd wordt is het OORDEEL van elk verslag, niet de host: een verslag mag alleen PASS zeggen als het de proef werkelijk zag slagen,... |
 | `faalproefklasse.test.js` | 5 | gezakt op `!==->===#0` | KLAARZETTEN IS GEEN SCHRIJVEN -- de klassering van de faalproef. WAAROM DEZE TOETS BESTAAT. |
@@ -875,7 +876,7 @@ toets omvalt.
 | `live-kandidaat.test.js` | 6 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `livegang-pakket.test.js` | 5 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `livegang.test.js` | 3 | gezakt op `liegpoort /api/` | De livegang: in productie start het platform schoon en op slot. - geen demozaken in de catalogus, geen demopersoneel, geen voorbeeldposts - de demo-inlog is dicht (leden en zaken) - de rate-limiter staat aan |
-| `living-experience.test.js` | 5 | gezakt op `===->!==#0` | De ervaringscompiler wijst kapotte bestemming, toestand, wereld en overdracht af. Ontbrekend, veranderd of overgeslagen bewijs kan nooit groen worden. |
+| `living-experience.test.js` | 7 | gezakt op `===->!==#0` | De ervaringscompiler wijst kapotte bestemming, toestand, wereld en overdracht af. Ontbrekend, veranderd of overgeslagen bewijs kan nooit groen worden. |
 | `livinglab-capsule.test.js` | 6 | gezakt op `liegpoort /api/` | DE REPRODUCTIECAPSULE EN DE GESCHIEDENIS VAN EEN CONCLUSIE. Wat deze toets vastlegt: 1. |
 | `livinglab-instrument.test.js` | 10 | gezakt op `liegpoort /api/` | MEETINSTRUMENTEN -- wat een deelnemer met zijn labpas invult. Wat deze toets vastlegt: 1. |
 | `livinglab-ledger.test.js` | 9 | gezakt op `liegpoort /api/` | HET ONDERZOEKSGROOTBOEK -- wat een studie kostte, en waarom de stichting die rekening mocht betalen. Wat deze toets vastlegt: 1. |
@@ -1934,7 +1935,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-280 bestanden, 491 beweringen.
+281 bestanden, 492 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2003,6 +2004,7 @@ toets omvalt.
 | `experience-dinner.e2e.js` | 1 | gezakt op `true->false#0` | Browserbewijs van de pilot, met echte server en echte domeinmutaties. Een verloren HTTP-antwoord wordt gesimuleerd nadat de server heeft verwerkt. |
 | `experience-rtg.e2e.js` | 3 | gezakt op `true->false#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `experience-surface.e2e.js` | 1 | -- | De browser-golden-path van het Experience Platform: een echte Economic Proof verschijnt alleen bij de juiste principal; een afspraak gaat via preview + menselijke bevestiging naar de autoritatieve agenda en komt... |
+| `experience-travel.e2e.js` | 1 | genoemd | De zichtbare Travel-reis: voorbereiding, antwoordverlies, broncontrole, menselijke bevestiging en terugvinden in het reisoverzicht. |
 | `first-steps.e2e.js` | 1 | gezakt op `liegpoort /api/` | The approved first-visit designs against a real, empty RTG server. Photos and category buttons must never masquerade as account data or bookable stock. |
 | `foundationmailscherm.e2e.js` | 2 | -- | DE TWEE FOUNDATIONSCHERMEN DIE GEEN ENKELE TOETS AFLEGDE. De toegankelijkheidskeuring telt per scherm of een toets hem WERKELIJK aflegt -- niet of een veegtoets hem aantikt of een cache hem ophaalt. |
 | `galerij.e2e.js` | 1 | -- | Scherm-test voor RTG Galerij: de tijdlijn met beelden uit twee bronnen (De Salon en RTG Bestanden), de kijker met favoriet, en een album bouwen. Draait alleen waar een browser beschikbaar is. |

@@ -1,7 +1,7 @@
 # RTG Living Experience System
 
 De eerste verticale versie verbindt de bestaande vier wereldmanifesten, echte
-app-ingangen, routebronnen en een restaurantreis met toetsbaar bewijs. Er is geen
+app-ingangen, routebronnen en een restaurant- en reisaanvraag met toetsbaar bewijs. Er is geen
 nieuwe autorisatiemotor, gebruikersscore of autonome productiewijziging.
 
 ## Gebruiken
@@ -27,6 +27,11 @@ capability, resultaat, bevoegdheid, toestanden, herstel, overdracht, eigenaar,
 inspanningsdoel en benoemde proeven. Wereldidentiteit komt uit het bestaande
 manifest; routebronnen worden met de gedeelde routelezer gevonden. Het contract
 bewijst structurele aanwezigheid. Gedrag komt alleen uit uitgevoerde tests.
+
+`experience/travel.json` voegt Travel → reisbureau → adviseursbesluit in Work →
+reisoverzicht toe. `proofRefs` koppelt gedeelde contract- en intentproeven zonder
+ze opnieuw te draaien. Een onbekende verwijzing blokkeert de compiler. Het
+observatorium toont de bewijsstatus per reis en filtert op reis én bewijsstatus.
 
 Het observatorium inventariseert alle actuele niet-doorverwijzende app-HTML's.
 Een gevonden scherm krijgt `NOT_MODELED`; een scherm met DNA `CONTRACT_ONLY`.
@@ -74,6 +79,32 @@ volgende toegang verwijderd en bij herladen niet hersteld. SessionStorage is
 gebonden aan de browsertab en verdwijnt bij het sluiten van de tabsessie; dit is
 geen gegarandeerde achtergrond-wistaak op een slapend toestel. Er wordt nog geen
 context tussen accounts, apparaten of willekeurige andere capabilities gedeeld.
+
+## De Travel-reis
+
+Datum en aantal reizigers blijven staan bij het bekijken van een andere reis.
+Na expliciete toestemming kunnen alleen deze twee velden maximaal twee uur in
+hetzelfde tabblad worden hervat. Restaurant- en reiscontext kunnen elkaar niet
+lezen, wijzigen of afronden. Vrije reiswensen worden niet tijdelijk opgeslagen.
+
+De gebruiker controleert de aanvraag en de ontvanger vóór de verzendknop.
+Tijdens verzending blijft die knop geblokkeerd. De interface leest eerst de
+bestaande aanvragen, zodat een oude aanvraag niet als nieuw ontvangstbewijs
+wordt gepresenteerd. Na antwoordverlies zoekt zij naar precies één nieuwe
+aanvraag met dezelfde reis, datum, reizigers en wensen. Geen match, meerdere
+matches of een onbereikbare bron blijven onzeker; er wordt niet automatisch
+opnieuw verstuurd. Deze controle is geen cryptografische koppeling tussen een
+browserpoging en een domeinobject. Bij gelijktijdig identieke aanvragen in een
+ander tabblad kan alleen het reisbureau definitief bevestigen welke poging is
+ontvangen. Een herladen tabblad toont de aanvragen opnieuw via de bron; de
+tijdelijke verzendstatus zelf wordt niet opgeslagen.
+
+Een ontvangen aanvraag verschijnt meteen onder Mijn aanvragen. De reisadviseur
+beslist via de bestaande kantoorbevoegdheid. Reisoverzicht en programma blijven
+de domeinbron volgen. De HTTP-proef controleert ook afwijzen met een reden,
+afzeggen, intrekken, dubbel versturen en eigenaargrenzen. De browserproef loopt
+via de zichtbare Travel-appbibliotheek, met werkelijk antwoordverlies en een
+mislukte broncontrole. Betalen valt buiten deze reis.
 
 ## Bewuste grenzen
 

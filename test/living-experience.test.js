@@ -6,6 +6,7 @@ const {compile}=require('../scripts/lib/experience/compiler');
 const {state,outcome}=require('../scripts/lib/experience/evidence');
 const {render}=require('../scripts/lib/experience/observatory');
 const root=path.join(__dirname,'..'),constitution=require('../experience/constitution.json'),dinner=require('../experience/dinner.json');
+const travel=require('../experience/travel.json');
 function contract(change){const j=structuredClone(dinner);if(change)change(j);return compile(root,constitution,[j]);}
 test('de echte reis verbindt bronnen, schermen, wereld, bevoegdheid en bewijs zonder alle schermen bewezen te noemen',()=>{
   const r=contract();assert.deepEqual(r.errors,[]);assert.ok(r.nodes.filter(n=>n.route).length>250);
@@ -47,4 +48,19 @@ test('observatorium ontsnapt contractinhoud en presenteert menselijke beoordelin
   const html=render({graph,proofs:[],status:'INCOMPLETE',at:'now',commit:'x'});
   assert.ok(!html.includes('<img src=x'));assert.ok(html.includes('&lt;img'));
   assert.ok(html.includes('Menselijke beoordeling: <strong>NOT_TESTED'));
+});
+test('twee reizen verbinden de gedeelde proeven zonder dubbele uitvoer of stil ontbrekende verwijzingen',()=>{
+ const graph=compile(root,constitution,[dinner,travel]);assert.deepEqual(graph.errors,[]);
+ assert.ok(graph.edges.some(e=>e.from==='intent:travel'&&e.to==='proof:dinner:intent'));
+ assert.equal(graph.nodes.filter(n=>n.type==='proof'&&n.test==='test/experience-intent.test.js').length,1);
+ const broken=structuredClone(travel);broken.proofRefs=['missing'];
+ assert.ok(compile(root,constitution,[dinner,broken]).errors.some(e=>e.code==='SHARED_PROOF_MISSING'));
+});
+test('een gedeelde rode intentproef houdt beide reizen onvolledig in het observatorium',()=>{
+ const graph=compile(root,constitution,[dinner,travel]);
+ const proofs=[...dinner.proofs,...travel.proofs].map(p=>({...p,state:p.id==='intent'?'FAILED':'PROVEN'}));
+ const html=render({graph,proofs,status:'INCOMPLETE',at:'now',commit:'x'});
+ assert.match(html,/data-status="FAILED" data-journeys="dinner travel"/);
+ for(const id of ['dinner','travel'])assert.match(html,new RegExp('<article id="journey-'+id+'">[^]*?<strong>INCOMPLETE</strong>'));
+ assert.ok(!html.includes('<strong>PROVEN_IN_SCOPE</strong>'));
 });

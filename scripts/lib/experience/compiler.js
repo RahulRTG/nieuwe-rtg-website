@@ -74,6 +74,15 @@ function compile(root, constitution, journeys) {
       edges.push({from:'intent:'+j.id,to:'proof:'+j.id+':'+p.id});
     }
   }
+  // Gedeelde proeven worden eenmaal uitgevoerd; elke afhankelijke reis noemt
+  // ze expliciet. Een typefout mag geen stil ontbrekend bewijs worden.
+  for (const j of journeys || []) {
+    for (const id of j.proofRefs || []) {
+      const owner = journeys.find(other => (other.proofs || []).some(p => p.id === id));
+      if (!owner) problem('SHARED_PROOF_MISSING',j.id+':'+id);
+      else edges.push({from:'intent:'+j.id,to:'proof:'+owner.id+':'+id});
+    }
+  }
   return {valid:!errors.length,errors,nodes,edges,worlds:manifests.publiek(),journeys};
 }
 module.exports = {compile,inventory,files};

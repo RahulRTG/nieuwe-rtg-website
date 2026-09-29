@@ -40,6 +40,14 @@
   .leeg{color:var(--muted);font-size:.9rem;padding:2rem 0;text-align:center;}
   .blad{position:fixed;inset:0;z-index:20;background:var(--bg);overflow-y:auto;display:none;}
   .blad.open{display:block;}
+  body.rtg-stijl #blad .paneel{padding-bottom:calc(190px + env(safe-area-inset-bottom));}
+  .blad{scroll-padding-block:90px 160px;}
+  .blad :is(button,input,a){scroll-margin-block:90px 160px;}
+  [hidden]{display:none!important;}
+  .reis-context{margin:.9rem 0;line-height:1.6;}
+  .reis-context p,#rStatus,#rSummary{margin:.7rem 0;overflow-wrap:anywhere;}
+  .knop:disabled{opacity:.55;cursor:wait;}
+  .lijst{grid-template-columns:repeat(auto-fill,minmax(min(280px,100%),1fr));}
   .blad-kop{position:sticky;top:0;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 90%,transparent));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
   .paneel{max-width:560px;margin:0 auto;padding:1.1rem;}
   .veld{background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.9rem;padding:.55rem .7rem;width:100%;}
@@ -113,18 +121,30 @@
     <div id="bladRegels" style="font-size:.86rem;color:var(--muted);line-height:1.7;">Laden…</div>
     <div class="sec">Jouw aanvraag</div>
     <div class="rij">
-      <div><div class="lbl">Voorkeursdatum</div><input class="veld" id="rDatum" type="date"></div>
-      <div><div class="lbl">Reizigers</div><div class="step"><button type="button" id="rMin">−</button><span id="rAantal" style="min-width:2.5rem;text-align:center;font-size:1.05rem;">2</span><button type="button" id="rPlus">+</button></div></div>
+      <div><label class="lbl" for="rDatum">Voorkeursdatum</label><input class="veld" id="rDatum" type="date"></div>
+      <div><div class="lbl">Reizigers</div><div class="step"><button type="button" id="rMin" aria-label="Minder reizigers">−</button><span id="rAantal" style="min-width:2.5rem;text-align:center;font-size:1.05rem;">2</span><button type="button" id="rPlus" aria-label="Meer reizigers">+</button></div></div>
     </div>
-    <div class="h-mt80"><div class="lbl">Wensen (optioneel)</div><input class="veld" id="rNotitie" type="text" maxlength="300" placeholder="Bijzondere wensen voor je reisadviseur"></div>
+    <div class="h-mt80"><label class="lbl" for="rNotitie">Wensen (optioneel)</label><input class="veld" id="rNotitie" type="text" maxlength="300" placeholder="Bijzondere wensen voor je reisadviseur"></div>
+    <div class="reis-context">
+      <label><input type="checkbox" id="travelRemember"> Bewaar datum en reizigers voor deze reiswens</label>
+      <p id="travelContext" role="status">Alleen na uw keuze, in dit tabblad, maximaal twee uur.</p>
+      <button type="button" class="knop stil" id="travelForget">Nieuwe reiswens</button>
+    </div>
     <div id="rTotaal" style="margin-top:0.75rem;font-size:.86rem;color:var(--gold);font-variant-numeric:tabular-nums;"></div>
-    <button class="knop" id="rBoek">Reis aanvragen</button>
+    <button type="button" class="knop" id="rReview">Controleer uw aanvraag</button>
+    <p id="rSummary"></p>
+    <button type="button" class="knop" id="rBoek" hidden>Verstuur deze reisaanvraag</button>
+    <p id="rStatus" role="status" aria-live="polite"></p>
+    <button type="button" class="knop" id="rCheck" hidden>Controleer mijn aanvraag</button>
+    <a class="nazorg" id="rTrips" href="/apps/reizen.html#reizen" hidden>Bekijk uw reisoverzicht</a>
   </div>
 </section>
 
 <div class="melding" id="melding" role="status"></div>
 <!-- uitvoer.js zonder defer en voor het eigen script: dat meldt hieronder zijn eigen model aan -->
 <script src="/shared/uitvoer.js"></script>
+<script src="/shared/experience-intent.js"></script>
+<script src="/apps/reisbureau-experience.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -144,7 +164,7 @@ if (!TOKEN) {
   $('#main').innerHTML = RTGFirstSteps.welcome('reisbureau', true); RTGFirstSteps.sync();
 } else { laad(); }
 
-let ALLE = [], AANTAL = 2, HUIDIG = null;
+let ALLE = [], HUIDIG = null, travelFlow;
 /* Meenemen (shared/uitvoer.js): de reizen die klaarstaan gaan mee met de velden
    los -- reis, bestemming, periode en de nettoprijs per persoon -- en niet als
    de regel "Ibiza · 7 dagen · vanaf € 2200" die op de kaart staat. Wie zijn
@@ -229,11 +249,14 @@ function paneelHtml(a){
 }
 
 async function laadMijn(){
-  let d; try { d = await api('/api/reisbureau/mijn'); } catch(e){ return; }
+  let d; try { d = await api('/api/reisbureau/mijn'); } catch(e){
+    $('#mijnWrap').innerHTML = '<p role="status">Uw aanvragen konden niet worden opgehaald. '+esc(e.message)+'</p><button type="button" class="knop stil" id="mijnOpnieuw">Probeer opnieuw</button>';
+    $('#mijnOpnieuw').addEventListener('click',laadMijn); return;
+  }
   const rijen = (d.aanvragen||[]).slice(0, 8);
   if (!rijen.length){ $('#mijnWrap').innerHTML = ''; return; }
   $('#mijnWrap').innerHTML = '<h2 class="mijn-kop">Mijn aanvragen</h2>'+
-    rijen.map(a => '<div class="reis aanvraag">'+
+    rijen.map(a => '<div class="reis aanvraag" data-ref="'+esc(a.ref)+'">'+
       '<div class="aanvraag-rij">'+
         '<div><h3>'+esc(a.titel)+'</h3><span class="meta">'+esc(a.bestemming)+' · '+esc(a.personen)+' pers'+
         (a.vertrek ? ' · '+esc(a.vertrek) : '')+' · <span class="'+(STAND_KLAS[a.status]||'')+'">'+esc(STAND_WOORD[a.status]||a.status)+'</span></span></div>'+
@@ -278,6 +301,7 @@ async function laadMijn(){
    hierboven de opmaak al vervangen, dus deze elementen bestaan niet meer en
    liep het script hier stuk -- zonder dat iemand het zag. */
 if (TOKEN) {
+travelFlow = RTGTravelExperience({token:TOKEN,api,refresh:laadMijn});
 $('#main').addEventListener('click', e => {
   const preference = e.target.closest('[data-first-preference]');
   if (preference) {
@@ -302,17 +326,13 @@ $('#adviesGo').addEventListener('click', async () => {
   } catch(e){ $('#adviesUit').textContent = e.status === 404 ? 'Er is op dit moment geen passende reis beschikbaar. Uw reiswens is niet verstuurd en er is niets geboekt.' : e.message; }
 });
 function openReis(id){
-  HUIDIG = ALLE.find(r => r.id === id); if (!HUIDIG) return;
-  AANTAL = 2;
+  const next = ALLE.find(r => r.id === id); if (!next) return;
+  if (!travelFlow.open(next)) { $('#blad').classList.add('open'); return; }
+  HUIDIG = next;
   $('#bladNaam').textContent = HUIDIG.titel;
   $('#bladMeta').textContent = HUIDIG.bestemming;
   $('#bladTag').textContent = HUIDIG.omschrijving || '';
   $('#bladInbeg').innerHTML = (HUIDIG.inbegrepen||[]).map(x => '<li>'+esc(x)+'</li>').join('') || '<li>Op maat samengesteld</li>';
-  $('#rAantal').textContent = AANTAL;
-  $('#rNotitie').value = '';
-  const iso = new Date().toISOString().slice(0,10);
-  $('#rDatum').min = iso; $('#rDatum').value = '';
-  herbereken();
   laadRegels(HUIDIG.bestemming);
   $('#blad').classList.add('open');
 }
@@ -339,20 +359,7 @@ async function laadRegels(bestemming){
       '<div style="color:var(--soft);font-size:.76rem;margin-top:0.5rem;">'+esc(w.basis)+'</div>';
   } catch(e){ el.textContent = e.message; }
 }
-function herbereken(){ $('#rTotaal').textContent = HUIDIG ? ('Richtprijs: € ' + (HUIDIG.prijs * AANTAL) + ' voor ' + AANTAL + ' reiziger' + (AANTAL>1?'s':'')) : ''; }
-async function boek(){
-  if (!HUIDIG) return;
-  try {
-    const d = await api('/api/reisbureau/boek', { tripId: HUIDIG.id, personen: AANTAL, vertrek: $('#rDatum').value || undefined, notitie: $('#rNotitie').value });
-    $('#blad').classList.remove('open');
-    meld('Je reisaanvraag staat klaar. Een RTG-reisadviseur neemt contact met je op.' +
-      (d.reiswijzer ? ' Je hebt alle regels van ' + d.reiswijzer.naam + ' meegekregen' + (d.reiswijzer.visum.soort !== 'geen' ? ' -- let op: ' + d.reiswijzer.visum.label.toLowerCase() + '.' : '.') : ''));
-  } catch(e){ meld(e.message); }
-}
 $('#bladTerug').addEventListener('click', () => $('#blad').classList.remove('open'));
-$('#rMin').addEventListener('click', () => { AANTAL = Math.max(1, AANTAL-1); $('#rAantal').textContent = AANTAL; herbereken(); });
-$('#rPlus').addEventListener('click', () => { AANTAL = Math.min(20, AANTAL+1); $('#rAantal').textContent = AANTAL; herbereken(); });
-$('#rBoek').addEventListener('click', boek);
 }
 </script>
 <script src="/shared/metgezel.js" defer></script>

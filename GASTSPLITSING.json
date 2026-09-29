@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T15:15:29.019Z",
-    "commit": "33d8ba87e",
+    "op": "2026-09-29T15:37:10.873Z",
+    "commit": "fcb6d419c",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/gastsplitsing.js",
@@ -11,35 +11,18 @@
   "grens": "Lexicaal ingedeeld. Dit zegt NIET of een gratis account er werkelijk langs komt (dat meet npm run doelgroepbereik, met een echte gratis-accountsessie), en NIET of een deur voor een gratis account open hoort te staan -- dat is een productvraag (SAMENLEVING.md, de verklaring van de bodem). `leden` is geen fout: het woord is dubbelzinnig omdat een Community-lid ook lid heet. Een toets die het onderscheid via een andere poort maakt dan account of idGeverifieerd, telt hier als weigering.",
   "uitleg": "Per plek in server/ die op de gast toetst: maakt de code het onderscheid tussen bezoeker en gratis account, en wat zegt de weigering dat er nodig is. account-belofte = de tekst zegt dat een account of profiel volstaat, terwijl de code ook het gratis account weigert.",
   "gemeten": {
-    "bestanden": 124,
-    "plekken": 143,
+    "bestanden": 122,
+    "plekken": 140,
     "perSoort": {
       "vertakt": 23,
       "onderscheidt": 23,
       "pas-eis": 11,
       "leden": 82,
-      "account-belofte": 3,
       "zonder-tekst": 1
     },
-    "tegenspraak": 3
+    "tegenspraak": 0
   },
-  "tegenspraak": [
-    {
-      "plek": "server/routes/neiging.js:24",
-      "soort": "account-belofte",
-      "zegt": "Dit hoort bij een account; als gast is er niets om te bewaren."
-    },
-    {
-      "plek": "server/routes/stad.js:16",
-      "soort": "account-belofte",
-      "zegt": "Melden kan met een RTG-profiel; meekijken mag altijd."
-    },
-    {
-      "plek": "server/routes/stad.js:50",
-      "soort": "account-belofte",
-      "zegt": "Meepraten kan met een RTG-profiel; meelezen mag altijd."
-    }
-  ],
+  "tegenspraak": [],
   "plekken": [
     {
       "plek": "server/ai-budget-beleid.js:61",
@@ -627,11 +610,6 @@
       "zegt": "RTG Navigatie is voor leden."
     },
     {
-      "plek": "server/routes/neiging.js:24",
-      "soort": "account-belofte",
-      "zegt": "Dit hoort bij een account; als gast is er niets om te bewaren."
-    },
-    {
       "plek": "server/routes/notities.js:12",
       "soort": "onderscheidt",
       "zegt": null
@@ -680,16 +658,6 @@
       "plek": "server/routes/sportclub.js:57",
       "soort": "leden",
       "zegt": "Alleen voor leden."
-    },
-    {
-      "plek": "server/routes/stad.js:16",
-      "soort": "account-belofte",
-      "zegt": "Melden kan met een RTG-profiel; meekijken mag altijd."
-    },
-    {
-      "plek": "server/routes/stad.js:50",
-      "soort": "account-belofte",
-      "zegt": "Meepraten kan met een RTG-profiel; meelezen mag altijd."
     },
     {
       "plek": "server/routes/synergie.js:27",

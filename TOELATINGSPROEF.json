@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-28T12:03:10.481Z",
-    "commit": "ecef9a3fc",
+    "op": "2026-09-29T19:12:08.424Z",
+    "commit": "db2a65496",
     "boomVuil": false,
-    "boomAnders": 10,
+    "boomAnders": 5,
     "instrument": "scripts/toelatingsproef.js",
     "node": "v22.22.2"
   },
@@ -19,9 +19,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "id e0e098d0, in de wachtrij: true",
+      "ziet": "id 330eb831, in de wachtrij: true",
       "fout": null,
-      "ms": 21
+      "ms": 108
     },
     {
       "nr": 2,
@@ -45,7 +45,7 @@
       "status": 200,
       "ziet": "stand na indienen: ingediend",
       "fout": null,
-      "ms": 19
+      "ms": 13
     },
     {
       "nr": 4,
@@ -69,7 +69,7 @@
       "status": 200,
       "ziet": "status: geaccepteerd, besloten door: user-1",
       "fout": null,
-      "ms": 30
+      "ms": 66
     },
     {
       "nr": 6,
@@ -79,9 +79,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "antwoord: {\"ok\":true,\"maand\":1,\"zaak\":{\"code\":\"PROEFZAAK\",\"staffId\":184,\"pin\":\"1718\",\"toegang\":\"magnaat-test-pin\"}}",
+      "ziet": "antwoord: {\"ok\":true,\"maand\":1,\"zaak\":{\"code\":\"PROEFZAAK\",\"staffId\":184,\"pin\":\"1243\",\"toegang\":\"magnaat-test-pin\"}}",
       "fout": null,
-      "ms": 120
+      "ms": 147
     },
     {
       "nr": 7,
@@ -93,7 +93,7 @@
       "status": 200,
       "ziet": "op de herkeuringslijst: true (1 rijen)",
       "fout": null,
-      "ms": 36
+      "ms": 32
     }
   ],
   "storingen": [
@@ -141,14 +141,14 @@
     }
   ],
   "aanmelding": {
-    "id": "e0e098d0",
+    "id": "330eb831",
     "genre": "apotheek"
   },
   "wereld": {
     "keurder": "ingelogd met het eigenaarsaccount (demostand); de gedeelde kantoorcode heeft geen naam en kan daarom niet aftekenen of beslissen -- zie storing 1 en 7",
     "naamvorm": "de naam die in het dossier belandt is een SLEUTEL (user-1), geen mensennaam"
   },
-  "verlopenId": "71e4594b",
+  "verlopenId": "35d47998",
   "telling": {
     "schakels": 7,
     "gesloten": 7,

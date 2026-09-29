@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T16:10:23.215Z",
-    "commit": "bd14629c3",
+    "op": "2026-09-29T20:31:48.951Z",
+    "commit": "61eeda036",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bewijsmatrix.js",
@@ -14,88 +14,88 @@
   "schakels": 11,
   "cellen": 58003,
   "telling": {
-    "bewezen": 26941,
-    "verklaard": 114,
-    "nvt": 613,
-    "ongemeten": 30335,
+    "bewezen": 28249,
+    "verklaard": 0,
+    "nvt": 619,
+    "ongemeten": 29135,
     "gezakt": 0
   },
   "perSchakel": {
     "AUTH": {
-      "bewezen": 4814,
-      "verklaard": 114,
+      "bewezen": 4926,
+      "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 345,
+      "ongemeten": 347,
       "gezakt": 0
     },
     "ACL": {
-      "bewezen": 3894,
+      "bewezen": 4279,
       "verklaard": 0,
-      "nvt": 135,
-      "ongemeten": 1244,
+      "nvt": 137,
+      "ongemeten": 857,
       "gezakt": 0
     },
     "INPUT": {
-      "bewezen": 3466,
+      "bewezen": 3783,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1807,
+      "ongemeten": 1490,
       "gezakt": 0
     },
     "OUTPUT": {
-      "bewezen": 4151,
+      "bewezen": 4157,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1122,
+      "ongemeten": 1116,
       "gezakt": 0
     },
     "STATE": {
-      "bewezen": 408,
+      "bewezen": 412,
       "verklaard": 0,
       "nvt": 85,
-      "ongemeten": 4780,
+      "ongemeten": 4776,
       "gezakt": 0
     },
     "SIDE_EFFECT": {
-      "bewezen": 408,
+      "bewezen": 412,
       "verklaard": 0,
       "nvt": 85,
-      "ongemeten": 4780,
+      "ongemeten": 4776,
       "gezakt": 0
     },
     "AUDIT": {
-      "bewezen": 1109,
+      "bewezen": 1112,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 4164,
+      "ongemeten": 4161,
       "gezakt": 0
     },
     "IDEMPOTENCY": {
-      "bewezen": 1816,
+      "bewezen": 1812,
       "verklaard": 0,
-      "nvt": 87,
-      "ongemeten": 3370,
+      "nvt": 89,
+      "ongemeten": 3372,
       "gezakt": 0
     },
     "FAILURE": {
-      "bewezen": 72,
+      "bewezen": 80,
       "verklaard": 0,
-      "nvt": 1,
-      "ongemeten": 5200,
+      "nvt": 0,
+      "ongemeten": 5193,
       "gezakt": 0
     },
     "ROLLBACK": {
-      "bewezen": 2909,
+      "bewezen": 2997,
       "verklaard": 0,
-      "nvt": 85,
-      "ongemeten": 2279,
+      "nvt": 86,
+      "ongemeten": 2190,
       "gezakt": 0
     },
     "PRIVACY": {
-      "bewezen": 3894,
+      "bewezen": 4279,
       "verklaard": 0,
-      "nvt": 135,
-      "ongemeten": 1244,
+      "nvt": 137,
+      "ongemeten": 857,
       "gezakt": 0
     }
   },

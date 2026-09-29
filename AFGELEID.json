@@ -4181,11 +4181,11 @@
    "naam": "VERTROUWEN.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/vertrouwen.js",
-   "graad": "gemeten",
+   "graad": "stempel",
    "schrijvers": [
     "scripts/vertrouwen.js"
    ],
-   "stempelInstrument": null,
+   "stempelInstrument": "scripts/vertrouwen.js",
    "stempelAnders": false,
    "versheidOpdracht": null,
    "grendelt": true,

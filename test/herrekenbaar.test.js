@@ -69,9 +69,17 @@ test('2. elke grond is UITGESCHREVEN en geen etiket', () => {
 
 test('3. elk besluit gaat over een route die werkelijk gezakt is', () => {
   const gezakt = gezakteRoutes();
-  assert.ok(gezakt.length >= 1,
-    'de meting kent geen enkele gezakte route meer. Dan is dit register geheugen geworden: ' +
-    'haal de verklaringen weg die nergens meer over gaan, of dit bestand zelf.');
+  /* Kent de meting geen gezakte route meer, dan hoort het register LEEG te
+     zijn -- niet te zakken. Tot 29 september 2026 eiste deze toets minstens
+     een gezakte route; toen magnaat/scan in de verse faalproef bewezen bleek,
+     was de enige juiste opruiming (het besluit weg) daardoor zelf rood. Een
+     leeg register is opgeruimd geheugen, en een besluit over een route die
+     niet zakt blijft hieronder net zo hard fout. */
+  if (!gezakt.length) {
+    assert.deepEqual(Object.keys(REG.routes || {}), [],
+      'de meting kent geen enkele gezakte route meer. Dan is dit register geheugen geworden: ' +
+      'haal de verklaringen weg die nergens meer over gaan.');
+  }
   for (const route of Object.keys(REG.routes || {})) {
     assert.ok(gezakt.includes(route),
       'het register verklaart "' + route + '", maar die route staat niet als gezakt in FAALPROEF.json. ' +

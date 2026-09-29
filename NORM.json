@@ -3808,6 +3808,26 @@
       "meter": "toetsenNietGemeten 637 -> 638",
       "reden": "test/restdeuren.pg.test.js is nieuw (de vier restdeuren van B9). Zonder DATABASE_URL slaat hij zichzelf over, dus de mutatiemotor kan er niet langs; de vier gewone restdeurtoetsen zijn wel gemeten (MUTATIES.json, 0 overleefd). Met de hand nagetrokken tegen echte PostgreSQL: advisory lock plus FOR UPDATE uit pg/collectietransactie.js liet hem 3 van 3 keer zakken.",
       "waarheen": "Een mutatieronde met DATABASE_URL, of de pg-scherf als meetomgeving."
+    },
+    {
+      "datum": "2026-09-29",
+      "soort": "schuld",
+      "sleutel": "rollbackUitzonderingen",
+      "van": 1,
+      "vervalt": "2026-12-29",
+      "meter": "rollbackUitzonderingen 1 -> 2",
+      "reden": "EEN BESLUIT EN GEEN VERSOEPELING. De staatproef schorste /api/office/doos/sleutel: een weigering (400) liet iets staan in techniek. Nagetrokken met een vingerafdruk per rij: alleen de rij van het beveiligingsbord bewoog, bij elke oproep, en dat is de kritieke melding 'zwaar-zonder-passkey' die server/kern/zwaarbewijs.js met opzet schrijft zodra de zware poort via de terugval gaat -- ook als de handeling daarna nog weigert. Die melding stil laten is erger dan haar laten staan. ROLLBACKBESLUIT.json draagt het besluit met citaat; de gemeten reden blijft in de cel.",
+      "waarheen": "Zakt vanzelf terug als de zaakcontrole voor de zware poort komt of als de eigenaar een passkey heeft; dan hoort de regel uit ROLLBACKBESLUIT.json. Vervalt 2026-12-29."
+    },
+    {
+      "datum": "2026-09-29",
+      "soort": "schuld",
+      "sleutel": "bewijsAchterstand",
+      "van": 2721,
+      "vervalt": "2026-12-29",
+      "meter": "bewijsAchterstand 2721 -> 3178",
+      "reden": "DEZELFDE VORM ALS DE NOTITIE VAN 28 SEPTEMBER: EEN GROTERE NOEMER, GEEN ACHTERUITGANG. OUTPUTPROEF.json is hermeten uit een volledige suite met routejournaal. Die raakt 353 routes die de vorige ronde door geen enkele toets geraakt werden (OUTPUT ongemeten 421 -> 68) en 111 routes die sindsdien bijkwamen (5151 -> 5262). Ze landen in output-niet-toerekenbaar (579 -> 1037): een inhoudgevoelige toets raakt ze wel, maar raakt er ook andere. De bewezen OUTPUT-cellen stegen van 4151 naar 4157; de hele groei van 457 zit in die ene post plus een extra output-deur (20 -> 21).",
+      "waarheen": "de onbesliste routes toerekenbaar maken (een toets die alleen die route raakt, of een gerichte liegronde met node scripts/outputproef.js --meet=N). Vervalt 2026-12-29: staat hij dan nog op 3178 of hoger, dan is dit geen noemergroei meer maar achterstand die niemand aflost."
     }
   ],
   "prestatie": {

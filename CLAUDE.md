@@ -1481,7 +1481,7 @@ netwerk), **`onbekend` is geen `openbaar`** (en een gevolg erft de classificatie
 niet — dat zou raden zijn), en **de levering gaat voor** (een geweigerde actor
 houdt een melding nooit tegen, maar verdwijnt ook nooit stil). Wat er nog niet is,
 staat er met de meting erbij: van de <!--getal:idem.beoordeeld-->1739<!--/getal--> beproefde muterende routes zijn er
-<!--getal:idem.beschermd-->1733<!--/getal--> retry-veilig, en een schemaregister (`payment.authorized.v1` met een vorm
+<!--getal:idem.beschermd-->1734<!--/getal--> retry-veilig, en een schemaregister (`payment.authorized.v1` met een vorm
 erachter) bestaat niet — de envelop zegt met opzet nooit WAT. Zeven punten die een besluit van de eigenaar vragen staan in par. 4.
 **Het goedkoopste daarvan is genomen (27 augustus 2026):** het woord dat in twee
 lagenmodellen niet hetzelfde betekende, is hernoemd — laag 4 van `PLATFORM.md`

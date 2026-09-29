@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-29T16:14:16.936Z",
-  "commit": "c5710a94c",
+  "op": "2026-09-29T20:31:49.399Z",
+  "commit": "b019dc804",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/bewijsschuld.js",
@@ -11,14 +11,14 @@
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 18,
-  "meetwerk": 2398,
+  "meetwerk": 2855,
   "instrument": 323,
-  "grens": 676
+  "grens": 687
  },
  "aflossing": {
   "doel": 0,
   "wat": "de achterstand (meetwerk + instrument) gaat naar nul. `grens` telt niet mee en sluit nooit -- dat is de rand van de methode en geen werk.",
-  "staat": 2721,
+  "staat": 3178,
   "regels": [
    "de achterstand mag nooit groeien zonder een reden IN dit register (--groei=...)",
    "een post mag niet van soort veranderen om onder de poort uit te komen: naar `grens` verplaatsen laat de achterstand dalen zonder dat er iets gemeten is",
@@ -28,25 +28,25 @@
  },
  "gemeten": {
   "postenTotaal": 18,
-  "achterstand": 2721,
-  "randVanDeMethode": 676,
+  "achterstand": 3178,
+  "randVanDeMethode": 687,
   "auth-onbeslist": 1,
-  "capability-in-handler": 558,
+  "capability-in-handler": 560,
   "objectpoort": 52,
-  "output-deuren": 20,
-  "lichaamssleutel": 94,
-  "output-niet-toerekenbaar": 579,
+  "output-deuren": 21,
+  "lichaamssleutel": 102,
+  "output-niet-toerekenbaar": 1037,
   "output-blind": 0,
   "output-onwaarneembaar": 4,
   "audit-wisselend": null,
   "audit-verklaard": null,
-  "rollback-gezakt": 0,
+  "rollback-gezakt": 1,
   "object-vooraf": 323,
   "proefruis": 1,
   "gevolg-onbekend": 96,
   "droogloop-onbeoordeeld": 2,
   "herstel-onbevestigd": 49,
-  "idem-ongeclassificeerd": 1615,
+  "idem-ongeclassificeerd": 1613,
   "wegwerpserver-kopieen": 3
  },
  "posten": [
@@ -62,7 +62,7 @@
    "id": "capability-in-handler",
    "soort": "grens",
    "wat": "routes zonder bewakerslaag: de controle zit IN de handler (een capability-token)",
-   "aantal": 558,
+   "aantal": 560,
    "waarom": "de rolproef kruist ROLLEN. Deze routes kennen geen rol -- ze eisen een token dat je alleen hebt als je het hebt gekregen (de schoolborden van foundation, rtf/social). Rollen kruisen is hier niet moeilijk maar zinloos.",
    "sluit": "niets in deze proef. Een eigen proef op capability-tokens zou de goede vraag stellen; die bestaat niet en is een project, geen achterstand."
   },
@@ -78,7 +78,7 @@
    "id": "output-deuren",
    "soort": "grens",
    "wat": "deuren (login, register, webauthn) waarvan het antwoord niet met de liegpoort te meten is",
-   "aantal": 20,
+   "aantal": 21,
    "waarom": "RTG_LIEG_NIET spaart de deuren in elke lie-run; over een deur is dus per constructie nooit gelogen, en een oordeel van een instrument dat er niet kan komen is geen oordeel.",
    "sluit": "niets in deze proef; een inhoudseis op een deur hoort in een gewone toets op het echte antwoord (token-vorm, foutmelding), niet in een leugenmeting die de deur zou breken."
   },
@@ -86,7 +86,7 @@
    "id": "lichaamssleutel",
    "soort": "grens",
    "wat": "routes waarvan de sleutel een VELD IN HET VERZOEK is, geen token in de kop",
-   "aantal": 94,
+   "aantal": 102,
    "waarom": "gastAuth leest req.body.sleutel, gezinsPoort en rtfPoort lezen code+token uit het lichaam. Een member-, supplier- of officetoken is voor zo n deur niet fout maar IRRELEVANT: hij kijkt er niet naar. Alle drie krijgen dezelfde 401.",
    "sluit": "niets in deze proef; die 401 als bewijs tellen zou dezelfde fout zijn die de AUTH-as al 294 cellen kostte. Een proef op sessiesleutels is een andere vraag."
   },
@@ -94,7 +94,7 @@
    "id": "output-niet-toerekenbaar",
    "soort": "meetwerk",
    "wat": "routes waar inhoudgevoelige toetsen op zitten, maar die toetsen raken er meer",
-   "aantal": 579,
+   "aantal": 1037,
    "waarom": "een toets die op de lege inhoud zakt en tien routes raakt, kan op de inhoud van een van die tien zijn gezakt. Aan DEZE route valt dan niets toe te rekenen.",
    "sluit": "node scripts/outputproef.js --meet=<n>. Die liegt over EEN route en draait alleen de toetsen die hem raken; de uitslagen stapelen in OUTPUTPROEF.json. Een paar honderd per ronde, dus dit sluit met werk en niet met een doorbraak."
   },
@@ -134,7 +134,7 @@
    "id": "rollback-gezakt",
    "soort": "meetwerk",
    "wat": "routes die weigeren en toch de toestand veranderen",
-   "aantal": 0,
+   "aantal": 1,
    "waarom": "de meeste zijn /api/rtfos/* met securityLog en sessions -- vermoedelijk de auth-laag die een geweigerde poging vastlegt, en dus mogelijk ruis in de meting en geen lek. Maar EEN ervan verspringt per ronde van plek, en een bevinding die verhuist is zelf een bevinding over de meting.",
    "sluit": "per route nalopen wat er beweegt en waarom. Dit is de oudste post op deze lijst en de enige die naar een mogelijk defect wijst."
   },
@@ -182,7 +182,7 @@
    "id": "idem-ongeclassificeerd",
    "soort": "meetwerk",
    "wat": "muterende routes zonder uitspraak over herhalen: wat gebeurt er bij een tweede keer",
-   "aantal": 1615,
+   "aantal": 1613,
    "waarom": "autonomie zonder herhaalsemantiek is niet te doen: een keten die halverwege afbreekt moet weten of opnieuw beginnen veilig is. Het doel is niet dat alles idempotent IS -- het is dat van elke route vastligt wat een tweede keer betekent.",
    "sluit": "per route beslissen en vastleggen. Het instrument staat (scripts/idemproef-route.js plus IDEMBESLUIT.json met zijn klassen); dit is meetwerk en handwerk."
   },
@@ -221,7 +221,7 @@
    },
    {
     "op": "2026-09-29",
-    "aantal": 558
+    "aantal": 560
    }
   ],
   "objectpoort": [
@@ -249,7 +249,7 @@
    },
    {
     "op": "2026-09-29",
-    "aantal": 20
+    "aantal": 21
    }
   ],
   "lichaamssleutel": [
@@ -263,7 +263,7 @@
    },
    {
     "op": "2026-09-29",
-    "aantal": 94
+    "aantal": 102
    }
   ],
   "output-niet-toerekenbaar": [
@@ -277,7 +277,7 @@
    },
    {
     "op": "2026-09-29",
-    "aantal": 579
+    "aantal": 1037
    }
   ],
   "output-blind": [
@@ -347,7 +347,7 @@
    },
    {
     "op": "2026-09-29",
-    "aantal": 0
+    "aantal": 1
    }
   ],
   "object-vooraf": [
@@ -431,7 +431,7 @@
    },
    {
     "op": "2026-09-29",
-    "aantal": 1615
+    "aantal": 1613
    }
   ],
   "wegwerpserver-kopieen": [
@@ -613,6 +613,12 @@
    "van": 2712,
    "naar": 2723,
    "reden": "De verse IDEMPROEF (5148 routes aangeroepen, tegen 5020) bracht 119 routes van de merge met main in beeld; idem-ongeclassificeerd groeit 1606 -> 1617 omdat die nieuwe routes nog geen besluit dragen. Geen bewezen cel ging verloren."
+  },
+  {
+   "op": "2026-09-29",
+   "van": 2720,
+   "naar": 3178,
+   "reden": "OUTPUTPROEF.json is hermeten uit een volledige suite met routejournaal (29 september 2026). Die suite raakt 353 routes die de vorige ronde geen enkele toets raakte (ongemeten 421 -> 68) en 111 routes die sindsdien bijkwamen (5151 -> 5262). Ze landen in output-niet-toerekenbaar (579 -> 1037): een inhoudgevoelige toets raakt ze, maar raakt er ook andere, dus het is geen bewijs over deze route. Bewezen OUTPUT steeg van 4151 naar 4157. De groei is zichtbaar geworden meetwerk en geen achteruitgang."
   }
  ]
 }

@@ -1003,7 +1003,7 @@
   },
   {
    "sleutel": "POST /api/bedrijf/werkruimte",
-   "bestand": "server/bedrijf/werkruimte.js:93",
+   "bestand": "server/bedrijf/werkruimte.js:112",
    "staat": "bewaakt",
    "wacht": "beheerVan"
   },
@@ -1021,7 +1021,7 @@
   },
   {
    "sleutel": "POST /api/bedrijf/werkruimte/maak",
-   "bestand": "server/bedrijf/werkruimte.js:37",
+   "bestand": "server/bedrijf/werkruimte.js:50",
    "staat": "bewaakt",
    "wacht": "beheerVan"
   },

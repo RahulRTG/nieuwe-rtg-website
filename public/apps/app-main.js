@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'dafd8a8a';
+var RTG_BOUW = 'adb2c6c5';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -3897,6 +3897,7 @@ var RTG_BOUW = 'dafd8a8a';
     rtfbuurt:    { naam: 'RTFoundation in jouw buurt', url: '/apps/foundation/os-publiek.html' },
     klimaat:     { naam: 'Klimaatfonds', url: '/apps/foundation/klimaatfonds.html' },
     buurtruil:   { naam: 'Buurtruil', url: '/apps/foundation/buurtruil.html' },
+    kwesties:    { naam: T('app.kwesties', 'Wat speelt er'), url: '/apps/foundation/kwesties.html' },
     geven:       { naam: 'Geven', url: '/apps/foundation/geven.html' },
     rtfwinkel:   { naam: 'Winkel van de RTFoundation', url: '/apps/foundation/winkel.html' },
     spelen:      { naam: 'Spelen',       url: '/apps/spelen.html?pas=' + encodeURIComponent(pas) },
@@ -4362,7 +4363,7 @@ var RTG_BOUW = 'dafd8a8a';
        contextvraag van WERELDEN.md dat zegt -- wie iets wil ontdekken, leren of
        doorgeven denkt niet dat hij in zijn huishouden of op zijn werk zit. */
       'link:connect',
-      'link:rtfbord', 'link:rtfschrift', 'link:klimaat', 'link:buurtruil', 'link:geven',
+      'link:rtfbord', 'link:rtfschrift', 'link:klimaat', 'link:buurtruil', 'link:kwesties', 'link:geven',
       'link:vrienden'] }
   ];
   /* Afgesplitst van app-main-24a2.js toen dat over de 10 KB ging. De snede loopt

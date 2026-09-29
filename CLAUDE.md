@@ -126,6 +126,22 @@ standen extra, want met een gebouwd OSM-pakket onder de voeten stond er
 met de reden: de OSM-bouwer en het pakket op het TOESTEL (stap 2), plus waarom
 het OPHALEN van de index hier niet te bewijzen is (de proxy weigert de bron met
 een 403, dus het ontleden is beproefd en het ophalen niet — graad `vermoed`).
+**`NAVIGATIE.md` is de plaats-these** — een richtingsdocument boven PLAATS.md en
+KAARTEN.md: *een kaart vertelt waar iets is; RTG Plaats helpt een bedoeling op
+een plaats slagen, terwijl de positie van de mens zoveel mogelijk op diens
+toestel blijft.* Lees die vóór je aan navigatie, reistijd, aankomst of een
+plaatsgegeven van een zaak werkt. De omkering: een plaats wordt rijker uit haar
+operationele BRONNEN (kassa, reservering, partner-event), nooit uit het spoor van
+haar bezoekers (P-05). Zes grondwetsregels (P-01 t/m P-06), een restaurantketen
+als eerste proef met een storingsmatrix, en het **dubbelbewijs**: kunnen én
+aantoonbaar niet hoeven weten, en die twee worden nooit opgeteld. Het heet met
+opzet een these en geen categorie tot de poort van par. 13 groen staat. Let op
+de nulmeting in par. 6.2: bij lezing staat geen van de vijf
+terughoudendheidstellers op nul, en de scherpste vondst zit in de plaatslaag
+zelf — tijdens een naderingsvenster komt elke passage langs een zaak onder een
+codenaam 90 dagen in `plaatsLog`. Namen: `bereik` en `overdracht` zijn bezet (de
+ETA-dienst heet `reistijd`, de overgang `doorgave`), en "World" botst met
+WERELDEN.md.
 **`FOUNDATION.md` is het diepte-document van de RTFoundation als platform** —
 Personal & Civic Operating System, op drie niveaus tegelijk: individu,
 professional, organisatie. Het doet LEVEN.md niet over (dat blijft gelden en gaat

@@ -1,0 +1,86 @@
+{
+  "referenties": [
+    {
+      "bestand": "output/rtg-warm-persoonlijk/01-livingos-warm.png",
+      "sha256": "207972dacacbea0180db735f67f79c4f4d1a93c6d9324f38acf2461c709052d7"
+    },
+    {
+      "bestand": "output/rtg-warm-persoonlijk/02-workos-warm.png",
+      "sha256": "816ef9b2e0820e42f0507c6f07cd088db9aa34011a6741402a6b14333fe7bc8e"
+    },
+    {
+      "bestand": "output/rtg-warm-persoonlijk/03-travelos-warm.png",
+      "sha256": "80f1c54df59aa9e7a2e27e2c96b0ecac3aa3492276792703eb1ae35bbec59e3b"
+    },
+    {
+      "bestand": "output/rtg-warm-persoonlijk/04-foundationos-warm.png",
+      "sha256": "1802174fc0af2e59501051a2df5369a78e015382eb884e5e8f1abbaeb862492e"
+    },
+    {
+      "bestand": "output/rtg-warm-persoonlijk/05-eigen-fotos.png",
+      "sha256": "a532efe1b398735e71780c96f3ebf053e26c50fdcf932d991c9115f96cfbfa20"
+    },
+    {
+      "bestand": "output/rtg-mobiel-warm/01-livingos-mobiel.png",
+      "sha256": "4a595dd99a43ed87bde46c7c83e69db6deea3a2d263b2d6da39aea542cf13bf8"
+    },
+    {
+      "bestand": "output/rtg-mobiel-warm/02-workos-mobiel.png",
+      "sha256": "675f48f887ca038b8e722bae4d68987b33f3141494fae0ac8377799db4be0389"
+    },
+    {
+      "bestand": "output/rtg-mobiel-warm/03-travelos-mobiel.png",
+      "sha256": "032dc08484296ebcd15fe50e5e200c81d858519bd169f18c9d298c185695a93e"
+    },
+    {
+      "bestand": "output/rtg-mobiel-warm/04-foundationos-mobiel.png",
+      "sha256": "ad88b0ae5ea8fd44d3a51371b732594e30aa9a57af834b2e2491a9bc71fd1c16"
+    },
+    {
+      "bestand": "output/rtg-mobiel-warm/05-eigen-fotos-mobiel.png",
+      "sha256": "681fe583be1924b9fec8ccfc1c23f74ee522a3e1f43e3b791c4b0a0b2512f740"
+    }
+  ],
+  "productiebeelden": [
+    {
+      "bestand": "public/images/world-homes/foundation-sfeer.jpg",
+      "sha256": "114482c6db63a1fae4d8e26988f2d715d55637de97d409886bef2a8f8868e416",
+      "bron": "Goedgekeurde headerfoto van foundation, opnieuw gegenereerd zonder interface met de ingebouwde imagegen-tool. JPEG-encoding met sips op kwaliteit 85."
+    },
+    {
+      "bestand": "public/images/world-homes/foundation-warm.jpg",
+      "sha256": "16a8023d2e0fcb02a9cf2bc9783dbec7053c89d709eb98b967f82c71e4bbc70c",
+      "bron": "Goedgekeurde hoofdfoto van foundation, opnieuw gegenereerd zonder interface met de ingebouwde imagegen-tool. JPEG-encoding met sips op kwaliteit 85."
+    },
+    {
+      "bestand": "public/images/world-homes/living-sfeer.jpg",
+      "sha256": "c07bfeb9c74e2d8cfe860823c018b3384155492fae16cdc119de391f1a90b41d",
+      "bron": "Goedgekeurde headerfoto van living, opnieuw gegenereerd zonder interface met de ingebouwde imagegen-tool. JPEG-encoding met sips op kwaliteit 85."
+    },
+    {
+      "bestand": "public/images/world-homes/living-warm.jpg",
+      "sha256": "8a0cad091c200e43a02ac371d1be772b7d3acff3d1f64e19944a9e640a5fb8a8",
+      "bron": "Goedgekeurde hoofdfoto van living, opnieuw gegenereerd zonder interface met de ingebouwde imagegen-tool. JPEG-encoding met sips op kwaliteit 85."
+    },
+    {
+      "bestand": "public/images/world-homes/travel-sfeer.jpg",
+      "sha256": "9b1e5a3ac92c4a41f4e592633e9a0f5bbc226a5d78dd470cca8faf346d715103",
+      "bron": "Goedgekeurde headerfoto van travel, opnieuw gegenereerd zonder interface met de ingebouwde imagegen-tool. JPEG-encoding met sips op kwaliteit 85."
+    },
+    {
+      "bestand": "public/images/world-homes/travel-warm.jpg",
+      "sha256": "98195b34b0701d261306607157e313e13a4bf3eef8db7819986f54501efa4d5d",
+      "bron": "Goedgekeurde hoofdfoto van travel, opnieuw gegenereerd zonder interface met de ingebouwde imagegen-tool. JPEG-encoding met sips op kwaliteit 85."
+    },
+    {
+      "bestand": "public/images/world-homes/work-sfeer.jpg",
+      "sha256": "b4853e28d37b41da8e1117b33980b67fb1ba80f57a187d1ef4788de236ee6db1",
+      "bron": "Goedgekeurde headerfoto van work, opnieuw gegenereerd zonder interface met de ingebouwde imagegen-tool. JPEG-encoding met sips op kwaliteit 85."
+    },
+    {
+      "bestand": "public/images/world-homes/work-warm.jpg",
+      "sha256": "6e06b75611efaba013125e8e8eb0f1fb2d3c5b28faeea337efa9af3e643ac6f3",
+      "bron": "Goedgekeurde hoofdfoto van work, opnieuw gegenereerd zonder interface met de ingebouwde imagegen-tool. JPEG-encoding met sips op kwaliteit 85."
+    }
+  ]
+}

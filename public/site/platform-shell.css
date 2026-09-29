@@ -1,10 +1,11 @@
+@import url('../shared/rtg-public-warm.css');
 @import url('../shared/rtg-world-widgets.css');
 /* The world-home geometry is imported unchanged. This layer supplies public content. */
 body[data-public-platform]{--wh-ink:#f6efe3;--wh-soft:#d8cfc2;--wh-gold:#e2c389;--wh-bg:#100e0b;background:#100e0b!important;color:var(--wh-ink)!important;font-family:Inter,sans-serif;--wd-surface:#15130f;--wd-line:rgba(216,187,135,.3)}
-body[data-public-platform]>.experience-header,body[data-public-platform]>.experience-footer,body[data-public-platform]>.site-header,body[data-public-platform]>.site-footer,.pp-source{display:none!important}
+body[data-public-platform]:has(.pp-shell)>.experience-header,body[data-public-platform]:has(.pp-shell)>.experience-footer,body[data-public-platform]>.site-header,body[data-public-platform]>.site-footer,.pp-source{display:none!important}
 body[data-public-platform] :is(button,input,select){font-family:Inter,sans-serif}
 .pp-shell [hidden],.pp-detail [hidden]{display:none!important}
-.pp-header{position:relative!important;inset:auto!important;display:flex!important;align-items:center;gap:1rem;padding:.8rem max(1.5rem,calc((100vw - 1680px)/2))!important;min-height:4rem;background:linear-gradient(105deg,#21180f,#100e0b)!important;border-bottom:1px solid var(--wd-line);z-index:10}
+.pp-header{position:fixed!important;inset:0 0 auto!important;display:flex!important;align-items:center;gap:1rem;padding:0 40px!important;min-height:4rem;background:linear-gradient(105deg,#21180f,#100e0b)!important;border-bottom:1px solid var(--wd-line);z-index:10}
 .pp-brand{font:400 2.5rem/1 "Bodoni Moda",serif!important;letter-spacing:-.05em;color:var(--wh-gold)!important;text-decoration:none}
 .pp-context{display:flex;align-items:center;gap:.8rem;padding:.5rem 0;border:0;color:var(--wh-ink);background:transparent;font-size:1rem;min-height:44px;cursor:pointer}
 .pp-context .wd-icon{width:.8rem;transform:rotate(90deg)}
@@ -14,7 +15,7 @@ body[data-public-platform] :is(button,input,select){font-family:Inter,sans-serif
 .pp-language{border:0;font-size:.8rem}
 .pp-profile .wd-icon{width:1.4rem;height:1.4rem}
 .pp-header .wd-icon svg,.pp-shell .wd-icon svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
-body[data-public-platform] .wd-shell{margin-top:1rem}
+
 .pp-subtitle{grid-column:1;font-size:.82rem;color:var(--wh-soft)}
 .pp-shell h2,.pp-shell h3{font-family:"Bodoni Moda",Georgia,serif;font-weight:400;color:var(--wh-ink);letter-spacing:-.025em}
 .pp-shell p{line-height:1.6}
@@ -132,7 +133,7 @@ body[data-public-platform] .wd-shell{margin-top:1rem}
 @media(prefers-reduced-motion:reduce){body[data-public-platform] *{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 
 
-body[data-public-platform]>footer:not(.pp-footer){display:none}
+body[data-public-platform]:has(.pp-shell)>footer:not(.pp-footer){display:none}
 .pp-footer-links{display:flex;flex-wrap:wrap;gap:1rem}.pp-footer-links .pp-button{background:transparent;color:var(--wh-soft)!important;border:0;border-bottom:1px solid var(--wd-line);border-radius:0;padding:.3rem}
 .pp-company-article{max-width:70rem}.pp-company-article>p{max-width:68ch;font-size:1rem;margin:1.3rem 0}.pp-detail-photo{width:100%;max-height:400px;object-fit:cover;border-radius:var(--rtg-radius-editorial)}.pp-company-article .pp-lead{font:400 2rem/1.25 "Bodoni Moda",serif;color:var(--wh-ink)}
 .pp-company-article details{border-block-end:1px solid var(--wd-line);padding:1rem 0}.pp-company-article summary{cursor:pointer;padding:.5rem 0;color:var(--wh-gold);min-height:44px}.pp-company-article details p{font-size:.9rem;line-height:1.7}.pp-company-article>.pp-button{margin:1rem .8rem 0 0}
@@ -174,3 +175,5 @@ body[data-public-platform] .pp-detail-content .wd-focus-head h2:focus:not(:focus
 body[data-public-platform] .wd-greeting>.pp-language-notice:not([hidden]){display:block!important;grid-column:1/-1;grid-row:auto;margin:.8rem 0 0;font:400 .8rem/1.6 Inter,sans-serif;padding:.8rem 1rem;text-align:start}
 
 body[data-public-platform] .pp-filter{background:#17130f!important;color:var(--wh-ink)!important}
+
+.pp-section-index{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px;padding-top:24px;border-top:1px solid var(--wd-line)}

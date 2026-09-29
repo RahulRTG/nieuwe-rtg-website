@@ -13,7 +13,7 @@
   function link(label, href) { var a = d.createElement('a'); a.textContent = label; a.href = href; nav.appendChild(a); }
   ['living', 'travel', 'work', 'foundation'].forEach(function (key) {
     var names = { living: 'LivingOS', travel: 'TravelOS', work: 'WorkOS', foundation: 'FoundationOS, altijd 100% gratis' };
-    link(names[key], new URL('../werelden/' + key + 'os.html', d.baseURI).href);
+    link(names[key], new URL('site/werelden/' + key + 'os.html', w.RTGPublicPlatform ? w.RTGPublicPlatform.asset() : new URL('../..',d.baseURI)).href);
   });
   link('Ontdek het hele verhaal', home); link('Vergelijk alle passen', home + '#passen'); link('Bekijk alle vragen', home + '#vragen');
   var lang = d.createElement('button'); lang.type = 'button'; lang.textContent = 'Kies uw taal';

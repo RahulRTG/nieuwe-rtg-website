@@ -1,7 +1,7 @@
 (function (w, d) {
   'use strict';
   var words = {
-    people: ['Uw mensen', 'Your people'], library: ['Uw appbibliotheek', 'Your app library'],
+    people: ['Uw mensen', 'Your people'], library: ['Uw apps', 'Your apps'],
     favorites: ['Uw favoriete apps', 'Your favourite apps'], choose: ['Kies uw widgets', 'Choose your widgets'],
     search: ['Zoek een app in deze wereld', 'Find an app in this world'],
     open: ['Open uw gegevens', 'Open your information'], pin: ['Voeg toe aan uw widgets', 'Add to your widgets'],

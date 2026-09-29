@@ -1,29 +1,30 @@
 {
  "stempel": {
-  "op": "2026-09-28T14:44:19.595Z",
-  "commit": "0a47d598",
+  "op": "2026-09-29T07:57:47.546Z",
+  "commit": "a168d67e8",
   "boomVuil": false,
-  "boomAnders": 10,
+  "boomAnders": 3,
   "instrument": "scripts/mutatiecontract.js",
-  "node": "v22.22.2"
+  "node": "v24.18.0"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5148,
-  "geclassificeerd": 5148,
+  "totaal": 5158,
+  "geclassificeerd": 5133,
   "perStand": {
-   "BLOCKED_BY_TEST_FIXTURE": 3193,
-   "NOT_APPLICABLE": 1240,
-   "PROTECTED": 560,
-   "INTENTIONALLY_NON_IDEMPOTENT": 155
+   "BLOCKED_BY_TEST_FIXTURE": 3168,
+   "NOT_APPLICABLE": 1244,
+   "LEGACY_PENDING_CLASSIFICATION": 25,
+   "PROTECTED": 562,
+   "INTENTIONALLY_NON_IDEMPOTENT": 159
   },
-  "vastgesteldDoorMens": 2007,
-  "afgeleidDoorScript": 3141,
+  "vastgesteldDoorMens": 2017,
+  "afgeleidDoorScript": 3116,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4253,
+   "AUTHENTICATED": 4255,
    "PUBLIC": 126,
-   "OBJECT_SCOPED": 746,
+   "OBJECT_SCOPED": 754,
    "(niet af te leiden -- vraagt een verklaring)": 7,
    "SERVICE_TO_SERVICE": 15,
    "SYSTEM_INTERNAL": 1
@@ -32,9 +33,11 @@
    "kale ronde: beschermd": 134,
    "kale ronde: onbeschermd": 125,
    "kale ronde: geen uitspraak": 4761,
-   "niet gemeten": 128
+   "niet gemeten": 138
   },
-  "voorstellen": {},
+  "voorstellen": {
+   "NOT_APPLICABLE": 1
+  },
   "metingVan": "2026-09-27T12:22:52.912Z"
  },
  "tegenspraken": [
@@ -492,14 +495,12 @@
   {
    "mutatieId": "aanmelding.aanvraag",
    "route": "POST /api/aanmelding/aanvraag",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": null,
     "bewakers": []
    },
    "bewijs": {
@@ -509,10 +510,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
   },
   {
    "mutatieId": "aanmelding.beslis",
@@ -3755,14 +3756,12 @@
   {
    "mutatieId": "bank.akkoord",
    "route": "POST /api/bank/akkoord",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast",
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "auth"
     ]
@@ -3774,10 +3773,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "deze route draagt een duplicaatregel in lib/idemsleutels.js; dat zegt dat een herhaling WEL iets zou doen, en dus is NOT_APPLICABLE hier uitgesloten -- de meters zagen niets omdat de stand al op de doelwaarde stond"
   },
   {
    "mutatieId": "bank.bevries",
@@ -13467,14 +13466,12 @@
   {
    "mutatieId": "command.uitrol.pauze",
    "route": "POST /api/command/uitrol/pauze",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "officeAuth"
     ]
@@ -13486,10 +13483,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
   },
   {
    "mutatieId": "command.uitrol.zet",
@@ -19845,6 +19842,174 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "foundation.gezin.beelden.lezen",
+   "route": "POST /api/foundation/gezin/beelden",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "gezinBeeldAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.gezin.beelden.haal",
+   "route": "POST /api/foundation/gezin/beelden/haal",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "gezinBeeldAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.gezin.beelden.mijn",
+   "route": "POST /api/foundation/gezin/beelden/mijn",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "gezinBeeldAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.gezin.beelden.updeel",
+   "route": "POST /api/foundation/gezin/beelden/updeel",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "gezinBeeldAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.gezin.beelden.upklaar",
+   "route": "POST /api/foundation/gezin/beelden/upklaar",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "gezinBeeldAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.gezin.beelden.upload",
+   "route": "POST /api/foundation/gezin/beelden/upload",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "gezinBeeldAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.gezin.beelden.upstart",
+   "route": "POST /api/foundation/gezin/beelden/upstart",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "gezinBeeldAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.gezin.beelden.zet",
+   "route": "POST /api/foundation/gezin/beelden/zet",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "gezinBeeldAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "foundation.gezin.bel",
    "route": "POST /api/foundation/gezin/bel",
    "semantiek": {
@@ -25253,14 +25418,12 @@
   {
    "mutatieId": "foundation.school.overdracht.pakket",
    "route": "POST /api/foundation/school/overdracht/pakket",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: schoolCode",
-    "bedoeld": "OBJECT_SCOPED",
+    "bedoeld": null,
     "bewakers": []
    },
    "bewijs": {
@@ -25270,10 +25433,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
   },
   {
    "mutatieId": "foundation.school.pas.blokkeer",
@@ -31560,6 +31723,48 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "ik.beelden.lezen",
+   "route": "POST /api/ik/beelden",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "ik.beelden.zetten",
+   "route": "POST /api/ik/beelden/zet",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "ik.geloof",
    "route": "POST /api/ik/geloof",
    "semantiek": {
@@ -36283,14 +36488,12 @@
   {
    "mutatieId": "labfonds.beslis",
    "route": "POST /api/labfonds/beslis",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "auth"
     ]
@@ -36302,10 +36505,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "de eerste kale oproep deed geen werk (status 409)"
   },
   {
    "mutatieId": "labfonds.boardroom",
@@ -36337,14 +36540,12 @@
   {
    "mutatieId": "labfonds.doneer",
    "route": "POST /api/labfonds/doneer",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "auth"
     ]
@@ -36356,10 +36557,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
   },
   {
    "mutatieId": "labfonds.financiering",
@@ -36445,14 +36646,12 @@
   {
    "mutatieId": "labfonds.scheidsrechter",
    "route": "POST /api/labfonds/scheidsrechter",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "auth"
     ]
@@ -36464,10 +36663,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
   },
   {
    "mutatieId": "labfonds.stem",
@@ -36499,14 +36698,12 @@
   {
    "mutatieId": "labfonds.voorstel.maak",
    "route": "POST /api/labfonds/voorstel/maak",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "auth"
     ]
@@ -36518,10 +36715,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
   },
   {
    "mutatieId": "leerhuis.doe",
@@ -43070,14 +43267,12 @@
   {
    "mutatieId": "member.bureau.zaak.open",
    "route": "POST /api/member/bureau/zaak/open",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "auth"
     ]
@@ -43089,10 +43284,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
   },
   {
    "mutatieId": "member.bureau.zaken",
@@ -44990,14 +45185,12 @@
   {
    "mutatieId": "member.magnaat.economie.beslis",
    "route": "POST /api/member/magnaat/economie/beslis",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "auth"
     ]
@@ -45009,10 +45202,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
   },
   {
    "mutatieId": "member.magnaat.economie.schok",
@@ -56513,14 +56706,12 @@
   {
    "mutatieId": "office.aidata.export",
    "route": "POST /api/office/aidata/export",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "boardroomAuth"
     ]
@@ -56532,10 +56723,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
   },
   {
    "mutatieId": "office.anker",
@@ -56891,14 +57082,12 @@
   {
    "mutatieId": "office.asset.fees",
    "route": "POST /api/office/asset/fees",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "officeAuth"
     ]
@@ -56910,10 +57099,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "office.asset.overzicht",
@@ -57652,14 +57841,12 @@
   {
    "mutatieId": "office.balie.zoek",
    "route": "POST /api/office/balie/zoek",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "officeAuth",
      "balieAuth"
@@ -57672,10 +57859,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
   },
   {
    "mutatieId": "office.bank",
@@ -58707,14 +58894,12 @@
   {
    "mutatieId": "office.bank.rekening.open",
    "route": "POST /api/office/bank/rekening/open",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "kluisAuth"
     ]
@@ -58726,10 +58911,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
   },
   {
    "mutatieId": "bank.rood.aanvragen",
@@ -63133,14 +63318,12 @@
   {
    "mutatieId": "office.magnaat.scan",
    "route": "POST /api/office/magnaat/scan",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "boardroomAuth"
     ]
@@ -63152,10 +63335,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
   },
   {
    "mutatieId": "office.magnaat.status",
@@ -69603,14 +69786,12 @@
   {
    "mutatieId": "office.techniek.integraties.noodstop",
    "route": "POST /api/office/techniek/integraties/noodstop",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "boardroomAuth"
     ]
@@ -69622,10 +69803,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
   },
   {
    "mutatieId": "office.techniek.integraties.schakel",
@@ -75288,14 +75469,12 @@
   {
    "mutatieId": "ov.regie.zet",
    "route": "POST /api/ov/regie/zet",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "auth"
     ]
@@ -75307,10 +75486,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
   },
   {
    "mutatieId": "ov.uit",
@@ -85508,14 +85687,12 @@
   {
    "mutatieId": "rtf.onboarding.teken",
    "route": "POST /api/rtf/onboarding/teken",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: code",
-    "bedoeld": "OBJECT_SCOPED",
+    "bedoeld": null,
     "bewakers": []
    },
    "bewijs": {
@@ -85525,10 +85702,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
   },
   {
    "mutatieId": "rtf.ontkoppel",
@@ -115653,14 +115830,12 @@
   {
    "mutatieId": "supplier.mep.daily",
    "route": "POST /api/supplier/mep/daily",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "supplierAuth"
     ]
@@ -115672,10 +115847,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
   },
   {
    "mutatieId": "supplier.mep.daily.done",
@@ -117055,14 +117230,12 @@
   {
    "mutatieId": "supplier.onboarding.zet",
    "route": "POST /api/supplier/onboarding/zet",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "supplierAuth"
     ]
@@ -117074,10 +117247,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
   },
   {
    "mutatieId": "onderneming.zaakkant.lezen",
@@ -119047,14 +119220,12 @@
   {
    "mutatieId": "supplier.poort.online",
    "route": "POST /api/supplier/poort/online",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "supplierAuth"
     ]
@@ -119066,10 +119237,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
   },
   {
    "mutatieId": "supplier.poort.rondleiding",
@@ -120856,14 +121027,12 @@
   {
    "mutatieId": "supplier.rooster.voorstel",
    "route": "POST /api/supplier/rooster/voorstel",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "supplierAuth"
     ]
@@ -120875,10 +121044,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
   },
   {
    "mutatieId": "supplier.roster",
@@ -121436,14 +121605,12 @@
   {
    "mutatieId": "supplier.rtmail.export",
    "route": "POST /api/supplier/rtmail/export",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "supplierAuth"
     ]
@@ -121455,10 +121622,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
   },
   {
    "mutatieId": "supplier.rtmail.gesprekken",
@@ -126609,14 +126776,12 @@
   {
    "mutatieId": "supplier.werkbeleid.zet",
    "route": "POST /api/supplier/werkbeleid/zet",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "supplierAuth"
     ]
@@ -126628,10 +126793,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
   },
   {
    "mutatieId": "supplier.werkmail.adressen",
@@ -136611,14 +136776,12 @@
   {
    "mutatieId": "werkplek.taak",
    "route": "POST /api/werkplek/taak",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": "OBJECT_SCOPED",
+    "bedoeld": null,
     "bewakers": [
      "huisAuth"
     ]
@@ -136630,10 +136793,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
   },
   {
    "mutatieId": "werkplek.taak-zet",

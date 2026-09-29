@@ -269,7 +269,8 @@ test('de poort is één keer gemount na JSON en vóór idem, spoor en alle route
   const lijf = fs.readFileSync(path.join(root, 'server/opzet/lijfpoort.js'), 'utf8');
   const keten = fs.readFileSync(path.join(root, 'server/opzet/verzoekketen.js'), 'utf8');
   const wachters = fs.readFileSync(path.join(root, 'server/opzet/poortwachters.js'), 'utf8');
-  const dwars = fs.readFileSync(path.join(root, 'server/opzet/routes-dwars.js'), 'utf8');
+  const dwarsHoofd = fs.readFileSync(path.join(root, 'server/opzet/routes-dwars.js'), 'utf8');
+  const dwars = [dwarsHoofd, fs.readFileSync(path.join(root, 'server/opzet/routes-dwars-vervolg.js'), 'utf8')].join('\n');
   const aanbouw = fs.readFileSync(path.join(root, 'server/opzet/aanbouw.js'), 'utf8');
   const poort = lijf.indexOf("require('../middleware/foundation-productiepoort')()");
   assert.ok(poort > lijf.indexOf("express.json({ limit: '8mb' })"), 'poort moet een begrensde body kunnen lezen');
@@ -277,6 +278,7 @@ test('de poort is één keer gemount na JSON en vóór idem, spoor en alle route
   assert.ok(poort < lijf.indexOf("require('../lib/handelingsspoor')"), 'poort moet voor het handelingsspoor staan');
   assert.ok(keten.indexOf("require('./lijfpoort')") < keten.indexOf("require('./handeling').hervat()"));
   assert.ok(wachters.includes("app.use('/api/foundation', rtf.router)"), 'vroege Foundation-router ontbreekt');
+  assert.ok(dwarsHoofd.includes("require('./routes-dwars-vervolg')"), 'vervolg van de dwarse routerlijst ontbreekt');
   assert.ok(dwars.includes("require('../routes/rtfleerling')") && dwars.includes("require('../routes/livinglab')"),
     'latere leerling- of Living-Lab-router ontbreekt');
   assert.ok(aanbouw.includes("require('../routes/rtfschool')") && aanbouw.includes("require('../routes/rtfos')"),

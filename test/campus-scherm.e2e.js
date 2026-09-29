@@ -218,6 +218,7 @@ test('4. een tegel opent een ruimte binnen de Campus, en Campus sluit hem weer',
       }, null, { wat: 'de app in het kader geladen' });
       /* Wat ligt er op het midden van de knop? De knop zelf, of deze stap zakt
          (zie de kop: hier lag de kruimelbalk van het randensysteem). */
+      await page.locator('#terug').scrollIntoViewIfNeeded();
       const opDeKnop = await page.evaluate(() => {
         const k = document.querySelector('#terug');
         const b = k.getBoundingClientRect();

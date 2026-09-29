@@ -437,7 +437,8 @@ test('het zichtbare Edge-menu opent en houdt home en instellingen bereikbaar',
     await thuis.click();
     await page.waitForURL(/\/apps\/wereld\.html$/, { timeout: 8000 });
     assert.equal(new URL(page.url()).pathname, '/apps/wereld.html', 'Home opent de vernieuwde momentenfeed');
-    await page.waitForSelector('.living-intro');
+    await page.waitForSelector('.wp-scene');
+    await page.locator('.wp-story a').click();
     assert.equal(await page.locator('#feed').isVisible(), true, 'de momentenfeed is zichtbaar voor het ingelogde lid');
     await page.close();
   });

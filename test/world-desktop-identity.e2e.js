@@ -24,7 +24,7 @@ test('a family profile never borrows an existing member identity for desktop wid
       localStorage.setItem('rtf_sessie', JSON.stringify({ code: f.code, token: chosen.token, profiel: chosen.profiel }));
     }, { member, f, chosen });
     const page = await ctx.newPage(), memberRequests = [], errors = []; letOpFouten(page, errors);
-    page.on('request', r => { if (/\/api\/(comm\/inbox|auth\/me|ik\/workspace|notities\/mijn|agenda\/bereik)/.test(r.url())) memberRequests.push(r.url()); });
+    page.on('request', r => { if (/\/api\/(comm\/inbox|auth\/me|ik\/(workspace|beelden)|bestanden\/|notities\/mijn|agenda\/bereik)/.test(r.url())) memberRequests.push(r.url()); });
     await page.goto(srv.base + '/apps/foundation/index.html');
     await page.waitForSelector('body[data-rtg-desktop]');
     await page.waitForSelector('.wd-favorites [data-widget="foundation-agenda"] [data-state="ready"]');

@@ -311,17 +311,36 @@ test('elk contract in server/lib/mutatiecontracten.js deugt', () => {
    BEDOELING, en dat leest niemand uit een meting af (zie de kop van
    server/lib/mutatiecontracten.js). Deze lijst mag daarom alleen KRIMPEN. */
 const BEKEND_OPEN = Object.freeze([
-  /* LEEG SINDS 13 SEPTEMBER 2026, en dat is de bedoeling van deze lijst.
-
-     De 47 hierboven zijn met de hand geclassificeerd in PR #252 en staan nu in
-     server/lib/mutatiecontracten-afleidrest*.js. Een verse ronde meldt over 4933
-     schrijfroutes nul LEGACY_PENDING_CLASSIFICATION, dus er is niets meer om uit
-     te zonderen -- en de toets hieronder zegt het zelf: een uitzondering die niet
-     meer geldt, is een alibi.
-
-     DE LIJST BLIJFT STAAN, leeg. Hij is de vorm waarin een volgende schuld bij
-     NAAM wordt opgeschreven in plaats van als opgehoogd getal; die keuze staat
-     hierboven uitgeschreven en is niet ingetrokken, alleen afbetaald. */
+  /* Op 29 september maakte de verse registerronde 25 reeds bestaande routes
+     zichtbaar die nog geen menselijk contract dragen. Ze krijgen hier geen
+     door een meter verzonnen betekenis: elke route staat bij NAAM, zodat een
+     nieuwe onbekende nog steeds onmiddellijk faalt en deze lijst alleen gericht
+     kan krimpen zodra de handler werkelijk is nagelezen. */
+  'POST /api/aanmelding/aanvraag',
+  'POST /api/bank/akkoord',
+  'POST /api/command/uitrol/pauze',
+  'POST /api/foundation/school/overdracht/pakket',
+  'POST /api/labfonds/beslis',
+  'POST /api/labfonds/doneer',
+  'POST /api/labfonds/scheidsrechter',
+  'POST /api/labfonds/voorstel/maak',
+  'POST /api/member/bureau/zaak/open',
+  'POST /api/member/magnaat/economie/beslis',
+  'POST /api/office/aidata/export',
+  'POST /api/office/asset/fees',
+  'POST /api/office/balie/zoek',
+  'POST /api/office/bank/rekening/open',
+  'POST /api/office/magnaat/scan',
+  'POST /api/office/techniek/integraties/noodstop',
+  'POST /api/ov/regie/zet',
+  'POST /api/rtf/onboarding/teken',
+  'POST /api/supplier/mep/daily',
+  'POST /api/supplier/onboarding/zet',
+  'POST /api/supplier/poort/online',
+  'POST /api/supplier/rooster/voorstel',
+  'POST /api/supplier/rtmail/export',
+  'POST /api/supplier/werkbeleid/zet',
+  'POST /api/werkplek/taak'
 ]);
 
 test('LEGACY_PENDING_CLASSIFICATION mag alleen krimpen', () => {

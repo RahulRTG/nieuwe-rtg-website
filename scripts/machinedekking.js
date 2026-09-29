@@ -203,7 +203,7 @@ const ASSEN = {
   idempotentie: {
     wat: 'een tweede identieke aanroep doet niet nog eens hetzelfde',
     bron: 'server/lib/idem-poort.js', graad: 'vermoed',
-    tokens: ['idem-poort', 'metIdem', 'idemSleutel', 'idempotentie'],
+    tokens: ['idem-poort', 'metIdem', 'idemSleutel', 'idempotentie', 'Idempotency-Key'],
   },
   atomair: {
     wat: 'het effect landt in een schrijflaan die heel of niet doorgaat',

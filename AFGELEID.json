@@ -494,6 +494,20 @@
    "botsingVerklaard": null
   },
   {
+   "naam": "BODEMDRUK.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/bodemdruk.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/bodemdruk.js"
+   ],
+   "stempelInstrument": "scripts/bodemdruk.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run bodemdruk:vast",
+   "grendelt": true,
+   "botsingVerklaard": null
+  },
+  {
    "naam": "BUNDELS.md",
    "soort": "AFGELEID",
    "eigenaar": "scripts/deelindex.js",
@@ -1248,7 +1262,7 @@
    "naam": "GASTSPLITSING.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/gastsplitsing.js",
-   "graad": "stempel",
+   "graad": "verklaard",
    "schrijvers": [
     "scripts/gastsplitsing.js"
    ],

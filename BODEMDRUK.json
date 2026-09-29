@@ -1,0 +1,465 @@
+{
+  "stempel": {
+    "op": "2026-09-29T19:18:07.018Z",
+    "commit": "813b945fc",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/bodemdruk.js",
+    "node": "v22.22.2"
+  },
+  "graad": "vermoed",
+  "uitleg": "Per scherm dat een pad van de universele bodem aanroept (afgeleid uit de verklaring, het functieregister en SCHERMROUTES.json): staat er een uitnodiging om te betalen op? SAMENLEVING.md par. 6, eis 5.",
+  "grens": "Lexicaal en zonder commentaar gelezen, dus een ONDERGRENS: druk zonder deze woorden (een slotje, een kleur, een badge) ziet deze meter niet. Een deur die zegt dat iets bij een pas hoort is een weigering en geen druk; of die weigering op de bodem mag, meet npm run onvervreemdbaar. Gebruikstijd wordt niet gemeten (SAM-05).",
+  "gemeten": {
+    "schermen": 48,
+    "metDruk": 0,
+    "treffers": 0
+  },
+  "metDruk": [],
+  "nietGelezen": [],
+  "schermen": [
+    {
+      "bestand": "public/apps/app-main/app-main-09a2.js",
+      "werkwoorden": [
+        "verbinden"
+      ],
+      "functies": [
+        "member-connect"
+      ]
+    },
+    {
+      "bestand": "public/apps/belastingkantoor.html",
+      "werkwoorden": [
+        "hulp-vinden"
+      ],
+      "functies": [
+        "dom-overheid"
+      ]
+    },
+    {
+      "bestand": "public/apps/comm.html",
+      "werkwoorden": [
+        "verbinden"
+      ],
+      "functies": [
+        "member-connect"
+      ]
+    },
+    {
+      "bestand": "public/apps/connect.html",
+      "werkwoorden": [
+        "leren",
+        "orienteren"
+      ],
+      "functies": [
+        "connect"
+      ]
+    },
+    {
+      "bestand": "public/apps/doelen.html",
+      "werkwoorden": [
+        "ontwikkelen"
+      ],
+      "functies": [
+        "doelen"
+      ]
+    },
+    {
+      "bestand": "public/apps/foundation/gezondheid-welzijn.js",
+      "werkwoorden": [
+        "hulp-vinden"
+      ],
+      "functies": [
+        "dom-care"
+      ]
+    },
+    {
+      "bestand": "public/apps/foundation/hulpwijzer.html",
+      "werkwoorden": [
+        "orienteren"
+      ],
+      "functies": []
+    },
+    {
+      "bestand": "public/apps/foundation/leerpaspoort.html",
+      "werkwoorden": [
+        "leren"
+      ],
+      "functies": [
+        "dom-leerstof",
+        "dom-onderwijs",
+        "ov-bijles"
+      ]
+    },
+    {
+      "bestand": "public/apps/foundation/wegwijzer.html",
+      "werkwoorden": [
+        "hulp-vinden"
+      ],
+      "functies": [
+        "dom-beschermdeur"
+      ]
+    },
+    {
+      "bestand": "public/apps/foundation/zorg-hulp.js",
+      "werkwoorden": [
+        "hulp-vinden"
+      ],
+      "functies": [
+        "dom-care"
+      ]
+    },
+    {
+      "bestand": "public/apps/gedachten.html",
+      "werkwoorden": [
+        "rust"
+      ],
+      "functies": [
+        "gedachten"
+      ]
+    },
+    {
+      "bestand": "public/apps/geld/metierc.js",
+      "werkwoorden": [
+        "ontwikkelen",
+        "verbinden"
+      ],
+      "functies": [
+        "dom-metier",
+        "kern-berichten"
+      ]
+    },
+    {
+      "bestand": "public/apps/geld/wbwb.js",
+      "werkwoorden": [
+        "verbinden"
+      ],
+      "functies": [
+        "member-connect"
+      ]
+    },
+    {
+      "bestand": "public/apps/gemeente.html",
+      "werkwoorden": [
+        "hulp-vinden"
+      ],
+      "functies": [
+        "dom-gemeente"
+      ]
+    },
+    {
+      "bestand": "public/apps/gemeenteloket.html",
+      "werkwoorden": [
+        "hulp-vinden"
+      ],
+      "functies": [
+        "dom-gemeente"
+      ]
+    },
+    {
+      "bestand": "public/apps/gemeentepda.html",
+      "werkwoorden": [
+        "hulp-vinden"
+      ],
+      "functies": [
+        "dom-gemeente"
+      ]
+    },
+    {
+      "bestand": "public/apps/isolatie.js",
+      "werkwoorden": [
+        "verbinden"
+      ],
+      "functies": [
+        "salon"
+      ]
+    },
+    {
+      "bestand": "public/apps/life.html",
+      "werkwoorden": [
+        "hulp-vinden",
+        "ontwikkelen",
+        "rust"
+      ],
+      "functies": [
+        "gemoed",
+        "gewoonten",
+        "noodkaart"
+      ]
+    },
+    {
+      "bestand": "public/apps/loopbaan.html",
+      "werkwoorden": [
+        "ontwikkelen"
+      ],
+      "functies": [
+        "carriereledger"
+      ]
+    },
+    {
+      "bestand": "public/apps/loopbaanbewijs.html",
+      "werkwoorden": [
+        "ontwikkelen"
+      ],
+      "functies": [
+        "carriereledger"
+      ]
+    },
+    {
+      "bestand": "public/apps/media/lijst.js",
+      "werkwoorden": [
+        "verbinden"
+      ],
+      "functies": [
+        "member-connect"
+      ]
+    },
+    {
+      "bestand": "public/apps/muziek.html",
+      "werkwoorden": [
+        "verbinden"
+      ],
+      "functies": [
+        "dom-samen"
+      ]
+    },
+    {
+      "bestand": "public/apps/overheid.html",
+      "werkwoorden": [
+        "hulp-vinden"
+      ],
+      "functies": [
+        "dom-overheid"
+      ]
+    },
+    {
+      "bestand": "public/apps/overheidspda.html",
+      "werkwoorden": [
+        "hulp-vinden"
+      ],
+      "functies": [
+        "dom-overheid"
+      ]
+    },
+    {
+      "bestand": "public/apps/rechtbank.html",
+      "werkwoorden": [
+        "hulp-vinden"
+      ],
+      "functies": [
+        "dom-overheid"
+      ]
+    },
+    {
+      "bestand": "public/apps/residentie/residentie-03d.js",
+      "werkwoorden": [
+        "verbinden"
+      ],
+      "functies": [
+        "member-connect"
+      ]
+    },
+    {
+      "bestand": "public/apps/rijksloket.html",
+      "werkwoorden": [
+        "hulp-vinden"
+      ],
+      "functies": [
+        "dom-overheid"
+      ]
+    },
+    {
+      "bestand": "public/apps/rtg-vandaag.js",
+      "werkwoorden": [
+        "verbinden"
+      ],
+      "functies": [
+        "socialewereld"
+      ]
+    },
+    {
+      "bestand": "public/apps/rtgschool/bijles.js",
+      "werkwoorden": [
+        "leren"
+      ],
+      "functies": [
+        "ov-bijles"
+      ]
+    },
+    {
+      "bestand": "public/apps/rtgschool/examen.js",
+      "werkwoorden": [
+        "leren"
+      ],
+      "functies": [
+        "dom-leerstof",
+        "dom-onderwijs"
+      ]
+    },
+    {
+      "bestand": "public/apps/rtgschool/leer/leer-02.js",
+      "werkwoorden": [
+        "leren"
+      ],
+      "functies": [
+        "dom-leerstof",
+        "dom-onderwijs"
+      ]
+    },
+    {
+      "bestand": "public/apps/rtgschool/leer/leer-03.js",
+      "werkwoorden": [
+        "leren"
+      ],
+      "functies": [
+        "dom-leerstof"
+      ]
+    },
+    {
+      "bestand": "public/apps/rtgschool/leer/leer-04.js",
+      "werkwoorden": [
+        "leren"
+      ],
+      "functies": [
+        "dom-onderwijs"
+      ]
+    },
+    {
+      "bestand": "public/apps/salon.html",
+      "werkwoorden": [
+        "verbinden"
+      ],
+      "functies": [
+        "kern-berichten",
+        "salon"
+      ]
+    },
+    {
+      "bestand": "public/apps/salon/gebaren.js",
+      "werkwoorden": [
+        "verbinden"
+      ],
+      "functies": [
+        "salon"
+      ]
+    },
+    {
+      "bestand": "public/apps/saloon/acties.js",
+      "werkwoorden": [
+        "verbinden"
+      ],
+      "functies": [
+        "salon"
+      ]
+    },
+    {
+      "bestand": "public/apps/service-bel.js",
+      "werkwoorden": [
+        "hulp-vinden"
+      ],
+      "functies": [
+        "service"
+      ]
+    },
+    {
+      "bestand": "public/apps/sitemaker.html",
+      "werkwoorden": [
+        "verbinden"
+      ],
+      "functies": [
+        "salon"
+      ]
+    },
+    {
+      "bestand": "public/apps/sociaal.html",
+      "werkwoorden": [
+        "verbinden"
+      ],
+      "functies": [
+        "socialewereld"
+      ]
+    },
+    {
+      "bestand": "public/apps/spelen.html",
+      "werkwoorden": [
+        "verbinden"
+      ],
+      "functies": [
+        "member-connect"
+      ]
+    },
+    {
+      "bestand": "public/apps/veilig/rust.js",
+      "werkwoorden": [
+        "rust"
+      ],
+      "functies": [
+        "rust"
+      ]
+    },
+    {
+      "bestand": "public/shared/basis/basis-02.js",
+      "werkwoorden": [
+        "orienteren"
+      ],
+      "functies": [
+        "kern-gids"
+      ]
+    },
+    {
+      "bestand": "public/shared/basis/basis-02b.js",
+      "werkwoorden": [
+        "hulp-vinden"
+      ],
+      "functies": [
+        "service"
+      ]
+    },
+    {
+      "bestand": "public/shared/connection-communication.js",
+      "werkwoorden": [
+        "leren",
+        "orienteren"
+      ],
+      "functies": [
+        "connect"
+      ]
+    },
+    {
+      "bestand": "public/shared/deur.js",
+      "werkwoorden": [
+        "orienteren"
+      ],
+      "functies": [
+        "kern-gids"
+      ]
+    },
+    {
+      "bestand": "public/shared/handenvrij-chat.js",
+      "werkwoorden": [
+        "verbinden"
+      ],
+      "functies": [
+        "kern-berichten"
+      ]
+    },
+    {
+      "bestand": "public/shared/metgezel/metgezel-03.js",
+      "werkwoorden": [
+        "verbinden"
+      ],
+      "functies": [
+        "dom-samen"
+      ]
+    },
+    {
+      "bestand": "public/shared/social-intelligence-data.js",
+      "werkwoorden": [
+        "verbinden"
+      ],
+      "functies": [
+        "socialewereld"
+      ]
+    }
+  ]
+}

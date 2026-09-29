@@ -16,14 +16,11 @@ const d = (versie, regel, waarom) => Object.freeze({ versie, besloten: BESLOTEN,
 /* De besluiten C8 tot en met C11 (27 september 2026) over het boek van RTG. */
 const dC = (c, versie, regel, waarom) => Object.freeze({ versie, besloten: '27 september 2026, door de eigenaar (C' + c + ')',
   herkomst: 'mens', regel, waarom });
-/* De besluiten van 28 september 2026 (C12 en verder) en later: een datum per dag. */
-const dDag = (dag) => (c, versie, regel, waarom) => Object.freeze({ versie, besloten: dag + ' september 2026, door de eigenaar (C' + c + ')',
-  herkomst: 'mens', regel, waarom });
-const d28 = dDag(28), d29 = dDag(29);
+/* De besluiten van 28 september 2026 (C12) en later staan in ./definities-later.js. */
 const d27 = (versie, regel, waarom) => Object.freeze({ versie, besloten: '27 september 2026, door de eigenaar (C3)',
   herkomst: 'mens', regel, waarom });
 
-const DEFINITIES = Object.freeze({
+const DEFINITIES = Object.freeze(Object.assign({
   nieuwLid: d(1, 'Iemand wordt NIEUW LID op het moment van zijn eerste pas boven gast (rtg, lifestyle of business).',
     'Een gast is geen lid, en een account is geen lidmaatschap.'),
   cohort: d(1, 'Een COHORT is de ISO-week waarin iemand nieuw lid werd.',
@@ -75,16 +72,7 @@ const DEFINITIES = Object.freeze({
     'Netto zegt hoe lang het duurt; bruto zegt hoe lang het duurt als de omzet wegvalt.'),
   cac: dC(11, 1, 'De CAC per kanaal is de marketinguitgave van een maand voor dat kanaal gedeeld door de nieuwe leden die dat kanaal ' +
     'opgaven in dezelfde maand; onder tien leden geen getal.',
-    'Per kanaal, zodat te zien is welk kanaal werkt; \'via iemand die ik ken\' heeft geen uitgave.'),
-  campagne: d28(12, 1, 'Een campagne is een benoemde linkcode met een begin en een einde, onder precies een kanaal. Haar ' +
-    'uitgave is wat Financien per maand voor haar boekt, een deel van de kanaalpost; haar effect het aantal nieuwe leden ' +
-    'dat met haar code binnenkwam in dezelfde maand, onder tien leden geen getal.',
-    'Geen klikken en geen attributie: wie de link zag en later zelf zocht telt niet mee, dus het effect is een ondergrens.'),
-  margePerLid: d29(15, 1, 'De MARGE PER LID is per pas de afgesproken maandbijdrage van die pas (lijstprijs maal aantal, of de som van ' +
-    'de lopende contracten) min wat de leden van die pas het huis die maand kostten, gedeeld door ALLE leden van die pas -- ook wie ' +
-    'niets gebruikte. Onder tien leden geen getal; een contractuele pas met leden zonder contract krijgt er ook geen.',
-    'Per pas, omdat de pas met elke meting meereist en de kostenlaag geen identiteit hoeft op te zoeken; alle leden, omdat een ' +
-    'lid dat niets gebruikt ook bijdraagt.')
-});
+    'Per kanaal, zodat te zien is welk kanaal werkt; \'via iemand die ik ken\' heeft geen uitgave.')
+}, require('./definities-later')));
 
 module.exports = { DEFINITIES, BESLOTEN };

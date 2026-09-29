@@ -24,7 +24,7 @@ module.exports = [
     berekening: 'per pas: afgesproken maandbijdrage min de kosten van de leden van die pas, gedeeld door alle leden van die pas',
     actualiteit: 'live', privacy: 'leden', minGroep: 10, eigenaar: 'kern/bedrijfsmaat', graad: 'vermoed',
     afhankelijk: ['omzet.leden-maand', 'kosten.per-drager'],
-    bron: 'afgeleid', definitie: [c('server/kern/bedrijfsmaat/definities.js', 'margePerLid: d29(15')],
+    bron: 'afgeleid', definitie: [c('server/kern/bedrijfsmaat/definities-later.js', 'margePerLid: d29(15')],
     projectie: [c(MRG, 'function margePerPas()'), c('server/kern/ledenregister.js', 'function omzetPerPas')],
     bewijs: [c(MRG, "niet('Er zijn leden op deze pas zonder lopend contract"), c(MRG, "niet('Verbruik zonder tarief")],
     groepsgrens: [c(MRG, '{ grens, benoemd: true }')],

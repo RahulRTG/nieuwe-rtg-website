@@ -55,7 +55,7 @@ module.exports = [
     berekening: 'de uitgave per campagne uit het boek gedeeld door de nieuwe leden met haar code in dezelfde maand',
     actualiteit: 'periode', privacy: 'huis', minGroep: null, eigenaar: 'kern/rtgcampagne', graad: 'vermoed', afhankelijk: [],
     bron: [c('server/kern/rtgcampagne.js', 'function maak('), c('server/kern/rtgboek.js', 'function zetCampagne(')],
-    definitie: [c(DEF, 'campagne: d28(12, 1')],
+    definitie: [c('server/kern/bedrijfsmaat/definities-later.js', 'campagne: d28(12, 1')],
     projectie: [c(SRB, 'const perCampagne = ')], bewijs: [c('server/kern/rtgboek.js', "reden: p.centen == null ? 'De campagnes zijn geboekt")],
     groepsgrens: [c(SRB, "g.stand !== 'TOONBAAR' || !g.aantal) return Object.assign(basis")],
     gedeeltelijk: 'Alleen wie met de campagnelink binnenkwam: geen klikken, geen bereik en geen attributie, dus een ondergrens.',

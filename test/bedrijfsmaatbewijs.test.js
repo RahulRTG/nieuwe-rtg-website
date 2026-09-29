@@ -30,7 +30,8 @@ test('1. het register draagt graad en peilmoment, en zegt dat het niet afkapte',
   assert.equal(r.graad, 'gemeten');
   assert.ok(!Number.isNaN(Date.parse(r.peilmoment)), 'een peilmoment dat een datum is');
   assert.equal(r.afgekapt, false);
-  assert.deepEqual(r.dektNiet, []);
+  assert.equal(r.dektNiet.length, 1, 'alleen de zin over opgegeven land en stad (C16)');
+  assert.match(r.dektNiet[0], /opgegeven/);
 });
 
 test('2. een register dat zijn maximum las, zegt dat, en levert geen noemer voor de marge', () => {
@@ -38,7 +39,7 @@ test('2. een register dat zijn maximum las, zegt dat, en levert geen noemer voor
   const reg = register(rijen, 20001);
   const r = reg.register();
   assert.equal(r.afgekapt, true);
-  assert.match(r.dektNiet[0], /ondergrens/);
+  assert.match(r.dektNiet.join(' '), /ondergrens/);
   assert.equal(reg.omzetPerPas(), null, 'een noemer die niet alle leden telt, is geen noemer');
   /* precies het maximum en niet meer leden: dan is er niets afgekapt */
   assert.equal(register(rijen, 20000).register().afgekapt, false);

@@ -136,7 +136,8 @@ module.exports = ({ accounts, onboarding, geldPasprijzen, ledenAantal, db }) => 
     const totaal = typeof ledenAantal === 'function' ? ledenAantal() : null;
     const afgekapt = rijen.length >= MAX && (totaal == null || totaal > rijen.length);
     return { ok: true, graad: 'gemeten', peilmoment: new Date().toISOString(), afgekapt,
-      dektNiet: afgekapt ? ['Het register las ' + MAX + ' leden en er zijn er meer; de tellingen zijn een ondergrens.'] : [],
+      dektNiet: ['Land en stad zijn door het lid opgegeven en niet gecontroleerd (C16).']
+        .concat(afgekapt ? ['Het register las ' + MAX + ' leden en er zijn er meer; de tellingen zijn een ondergrens.'] : []),
       totaalGeteld: rijen.length,
       totaalLeden: totaal == null ? rijen.length : totaal,
       metCodenaam,

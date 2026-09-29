@@ -263,6 +263,25 @@ de telling al bestond: `openstaand()` in `kern/betaalwaarheid/hervat.js`, die de
 veegronde ook leest. Hij is aangesloten en niet opnieuw bedacht
 (`kern/bedrijfsmaat/stand-risico.js`).
 
+Daarna nog vier besluiten van dezelfde dag, als meerkeuze gesteld en alle vier
+gebouwd (`kern/bedrijfsmaat/stand-groei.js`, `definities-later.js`):
+
+- **C16, land en stad.** Het land komt uit het account, de stad uit de woonplaats
+  in de intake; allebei opgegeven en niet gecontroleerd (graad `vermoed`), en
+  kleine plaatsen gaan samen onder Overige.
+- **C17, zaken per genre.** Een zaak telt als zij toegelaten is (niet geschorst of
+  beeindigd) en in de maand minstens een verzoek door haar eigen deur deed -- de
+  kostenmeter telt dat al per drager. Aanmelden is geen gebruik.
+- **C18, contract verlengd.** Verlengd is een contract dat na zijn einddatum
+  doorloopt; de maat is het aandeel verlengd van de contracten die in de maand op
+  hun beslismoment kwamen (verlengd plus geeindigd), uit het verloop dat de
+  contractmotor al bijhoudt.
+- **C19, transactievolume.** Wat zaken via RTG Pay ontvingen, zonder btw: de
+  subtotalen van de facturen met betaalwijze `rtg`. Elke betaling via RTG Pay
+  schrijft zo'n factuur met het bedrag zonder btw en de btw apart, dus er hoeft
+  niets te worden geschat. Geld van de zaken, nooit omzet van RTG; een
+  terugbetaling staat niet als creditnota in het register en gaat er dus niet af.
+
 ---
 
 ## 3. De architectuur, onderdeel voor onderdeel

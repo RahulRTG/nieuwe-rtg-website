@@ -329,7 +329,7 @@ if (require.main !== module) { module.exports = {}; return; }
 
   const uit = await draaiStaatproef({ post, vingerafdruk, routes, tokenVoor: (r) => tokens[r],
     hernieuw: bos.hernieuw,
-    lijfVoor: (r) => pool.verrijk(plausibelLijf(r.pad), r.pad).lijf, verschilVan, ruis, maxRoutes: MAX });
+    lijfVoor: (r) => pool.verrijk(plausibelLijf(r.pad), r.pad).lijf, verschilVan, ruis, stilOoit, maxRoutes: MAX });
 
   if (uit.meterStuk) { console.error('\n  DE METER IS BLIND: ' + uit.meterStuk); klaar(); process.exit(2); }
 

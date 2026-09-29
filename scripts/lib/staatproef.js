@@ -351,7 +351,14 @@ async function draaiStaatproef({ post, vingerafdruk, routes, tokenVoor, lijfVoor
     }
 
     const d01 = zonderRuis(await verschilVan(f0, f1), ruis);
-    const d12 = zonderRuis(await verschilVan(f1, f2), ruis);
+    /* De voorwaardelijke klokruis (`stilOoit`) gaat er hier uit, en alleen
+       uit het tweede venster en alleen als de route hem bij de eerste oproep
+       niet raakte -- zie zonderTijdtik. Deze aanroep viel weg toen #95 dit
+       bestand herschreef; de functie kwam op 20 augustus terug, de aanroep
+       niet. De ronde drukte daarna "voorwaardelijk overgeslagen" af over
+       collecties die nergens werden overgeslagen, en op 29 september zakte
+       /api/supplier/mall/sync op `rtgai`, een collectie die in stilte beweegt. */
+    const d12 = zonderTijdtik(zonderRuis(await verschilVan(f1, f2), ruis), d01, stilOoit);
     /* DE STILLE CONTROLE, alleen als hij iets kan beslissen: bewoog er bij de
        aanroep EN bij de herhaling iets, dan kan dat een doorlopende
        omgevingsschrijver zijn (zie weegStaat). Een kort venster zonder enige

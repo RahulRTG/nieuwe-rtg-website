@@ -306,6 +306,22 @@ test('drie afdrukken rond twee oproepen, plus een STILLE als beide vensters bewo
   assert.equal(rij.idempotentie, 'GEZAKT');
 });
 
+test('de ronde PAST de voorwaardelijke klokruis toe, en niet alleen de functie ervoor', async () => {
+  /* zonderTijdtik bestond en had eigen toetsen, maar draaiStaatproef riep hem
+     niet aan: de ronde meldde `rtgai` als voorwaardelijk overgeslagen en liet
+     /api/supplier/mall/sync er toch op zakken (29 september 2026). */
+  let beurt = 0;
+  const uit = await draaiStaatproef({
+    post: async () => ({ status: 200 }),
+    vingerafdruk: async () => ({ nr: ++beurt }),
+    verschilVan: async (voor) => (voor.nr === 1 ? d('suppliers') : voor.nr === 2 ? d('rtgai') : niets),
+    stilOoit: new Set(['rtgai']),
+    routes: [{ methode: 'POST', pad: '/api/x', rol: 'supplier' }],
+    tokenVoor: () => 't', lijfVoor: () => ({})
+  });
+  assert.equal(uit.perRoute['POST /api/x'].idempotentie, 'bewezen');
+});
+
 test('de laatste afdruk van een route is de eerste van de volgende', async () => {
   /* Tussen F2 van route N en F0 van route N+1 gebeurt er niets, dus die twee
      zijn per definitie gelijk. Twee keer vragen is een derde van het werk

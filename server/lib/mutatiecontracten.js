@@ -94,6 +94,7 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-codedeuren').CONTRACTEN,
   require('./mutatiecontracten-werksleutels').CONTRACTEN,
   require('./mutatiecontracten-machinesleutels').CONTRACTEN,
+  require('./mutatiecontracten-ssogeheim').CONTRACTEN,
   require('./mutatiecontracten-muziekfeed').CONTRACTEN,
   require('./mutatiecontracten-hardening-checkpoint').CONTRACTEN,
   require('./mutatiecontracten-beschermzaak').CONTRACTEN,
@@ -135,8 +136,7 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-afstemming').CONTRACTEN,
   require('./mutatiecontracten-wonen').CONTRACTEN,
   require('./mutatiecontracten-project-room').CONTRACTEN,
-  /* De zware poort: drie ceremonieloketten, alle drie met opzet niet
-     herhaalbaar. Eigen bestand, zie de kop daar. */
+  // de zware poort: drie ceremonieloketten, met opzet niet herhaalbaar
   require('./mutatiecontracten-zwaar').CONTRACTEN,
   /* Het eigenaarsherstel: zeven routes, per stuk beantwoord of een herhaling
      een ander antwoord krijgt. Eigen bestand, zie de kop daar. */

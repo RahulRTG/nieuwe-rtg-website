@@ -45,6 +45,8 @@
       $('#bFoutenWis').hidden = !(d.eigenaar && fout.totaal);
       vervang($('#checks'), d.checks.map(checkRij));
       $('#zekeringBlok').hidden = !d.eigenaar;
+      // de SSO-clientgeheimen (alleen de stand): eenmalig, niet elke 12 seconden
+      if (d.eigenaar && !ssoGeladen){ ssoGeladen = true; ssoLaad(); }
       if (d.eigenaar) vervang($('#zekeringen'), d.zekeringen.map(zekerRij));
       $('#archiefBlok').hidden = !(d.eigenaar && d.archief);
       if (d.eigenaar && d.archief){

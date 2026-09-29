@@ -123,7 +123,10 @@ const ROUTES = new Set([
   'POST /api/office/partnerkanaal/personeelscode',
   'POST /api/office/partnerkanaal/personeelscode/roteer',
   // de RTG Link-drager (B15, kern/link/cap-bak.js): de 128-bit code staat alleen in dit antwoord
-  'POST /api/link/cap/maak'
+  'POST /api/link/cap/maak',
+  /* Het SSO-clientgeheim (besluit B16): het VERZOEK draagt het geheim en het
+     antwoord alleen de stand; geen cache mag een rotatie herhalen of onthouden. */
+  'POST /api/techniek/sso', 'POST /api/techniek/sso/geheim', 'POST /api/techniek/sso/geheim/overlap/sluit'
 ]);
 
 const isEenmalig = (methode, pad) => ROUTES.has(

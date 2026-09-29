@@ -80,11 +80,10 @@ test('geen_credential is alleen een gesloten, onderbouwd oordeel', () => {
 test('de echte credentials uit de classificatieronde blokkeren de release', () => {
   const register = poort.lees();
   const uit = poort.controleer(register);
-  // office.gedeelde_kantoorcode is in productie gesloten (B10): zie de toets hieronder
-  // partnerkanaal.personeels_en_partnercode (B14) en link.capability_aanvaarden (B15) zijn gemigreerd: zie de toetsen hieronder
+  // office.gedeelde_kantoorcode is in productie gesloten (B10), identity.sso_client_secret per tenant
+  // versleuteld (B16), en partnerkanaal (B14) en link.capability_aanvaarden (B15) gemigreerd: zie de toetsen hieronder
   const echte = ['travelos.ov_incheckcode',
     'mode.bezorgcode', 'festivalos.toegangspas',
-    'identity.sso_client_secret',
     'rtfos.activiteit_incheckcode',
     'foundation.onderwijs_les_tokens', 'foundation.family_profile_token_buiten_harde_poort'];
   // gemigreerd op 27 september 2026 (B9, de vier restdeuren): zie de toets hieronder
@@ -177,6 +176,29 @@ test('de gedeelde kantoorcode is in productie gesloten, met eerlijke controls en
   assert.ok(String(d.notitie).length >= 40);
   const pd = require('../server/kern/kantoor/productiedeur');
   assert.equal(pd.codeDicht({ NODE_ENV: 'production' }).code, pd.CODE_DICHT, 'de bron sluit hem echt');
+});
+
+/* B16 (29 september 2026): het SSO-clientgeheim moet omkeerbaar blijven voor de
+   tokenruil, dus hash_only en raw_once staan eerlijk op false; de deur is
+   gemigreerd naar versleuteling per tenant met verval, rotatie met overlap en
+   een inlog die dicht gaat zonder geldig geheim. */
+test('het SSO-clientgeheim is per tenant versleuteld, met eerlijke controls en een proef op een productieserver', () => {
+  const register = poort.lees();
+  const uit = poort.controleer(register);
+  const d = register.deuren.find(x => x.id === 'identity.sso_client_secret');
+  assert.equal(d.status, 'migrated');
+  assert.equal(d.release_blocker, false);
+  assert.ok(!uit.blockers.some(x => x.id === d.id), 'blokkeert niet meer');
+  assert.ok(d.bewijs.includes('test/sso-clientgeheim-routes.test.js'), 'bewezen op een echte (productie)server');
+  for (const c of ['omkeerbaar_versleuteld_per_tenant', 'nooit_terug_via_route', 'issued_at_expires_at',
+    'rotatie_met_begrensde_overlap', 'fail_closed_zonder_sleutel', 'fail_closed_inlog_bij_ongeldig_geheim',
+    'oude_opslag_herzegeld_bij_laden'])
+    assert.equal(d.controls[c], true, c);
+  for (const c of ['hash_only_at_rest', 'raw_once'])
+    assert.equal(d.controls[c], false, c + ': kan voor een omkeerbaar protocolgeheim niet, en dat staat er');
+  for (const route of d.routes) assert.ok(poort.REQUIRED_ROUTES.includes(route), route + ' hoort bewaakt te zijn');
+  const { ROUTES } = require('../server/lib/eenmalig-geheim-routes');
+  for (const route of d.routes) assert.ok(ROUTES.has(route), route + ' staat buiten elke antwoordcache');
 });
 
 test('de vier restdeuren zijn gemigreerd, en de korte bezorgcode alleen met haar grenzen', () => {

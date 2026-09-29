@@ -105,6 +105,12 @@ module.exports = ({ db, lidBoardLogWis }) => {
        er niet meer is. */
     if (typeof lidBoardLogWis === 'function') lidBoardLogWis(key);
 
+    /* DE OV-RITTEN: een lijst met `key` per rit en geen tak op de sleutel, dus
+       EIGEN_TAKKEN raakt ze niet. Het ritoverzicht (halte naar halte) blijft
+       normaal een jaar; op verzoek gaat het eerder weg (NAVIGATIE.md N17). Het
+       geld zelf blijft in payBoekingen, met zijn eigen bewaarplicht. */
+    if (Array.isArray(db.data.ovRitten)) db.data.ovRitten = db.data.ovRitten.filter(r => !r || r.key !== key);
+
     /* DE VAKBEWIJZEN, en die stonden hier niet -- met een reden die het waard is
        op te schrijven, want hij geldt voor alles wat er nog bij komt.
 

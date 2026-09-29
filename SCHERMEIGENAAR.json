@@ -22,6 +22,8 @@
   },
   "capabilities": {
     "agenda.afspraken": "apps/agenda.html",
+    "democratie.kwestie": "apps/foundation/kwesties.html",
+    "kantoor.democratie": "apps/foundation/kwestiekantoor.html",
     "kern.app": "apps/app.html",
     "appstore.cel": "apps/appcel.html",
     "appstore.dossier": "apps/appstore-dossier.html",
@@ -595,6 +597,16 @@
       "eigenaar": null,
       "reden": "Twee zelfstandige feeds met dezelfde workflow (plaatsen, reageren, volgen, bewaren) op twee opslagen: Pulse (9+ microblog) en De Salon (besloten beeldnetwerk).",
       "vervolg": "Besluit nodig: is een open 9+-microblog een ander product dan De Salon (dan blijven ze, met een gedeelde feedcomponent), of is Pulse een stand van De Salon?"
+    },
+    {
+      "schermen": [
+        "apps/salon.html",
+        "apps/wereld.html"
+      ],
+      "klasse": "gedeeltelijk",
+      "stand": "blijft",
+      "eigenaar": "apps/salon.html",
+      "reden": "De Saloon op \"Alles bij elkaar\" (public/apps/saloon/*.js) is een tweede PRESENTATIE van De Salon en geen tweede Salon: plaatsen, reageren en reacties lezen gaan langs de routes en de opslag van De Salon zelf (/api/salon/plaats, /reageer, /reacties), zoals saloon.js in zijn kop zegt: de Saloon bepaalt de presentatie, de bronapp voert de handeling uit. Het overlappende deel heeft dus al een eigenaar. Vastgelegd op 28 september 2026, toen een verse SCHERMROUTES.json dit paar liet zien dat het oude register nog niet kende."
     },
     {
       "schermen": [
@@ -1180,6 +1192,18 @@
       "rol": "eigenaar",
       "doelgroep": "rtf-kind",
       "doel": "Als tiener praten met een AI-buddy over dingen die spelen (school, groepsdruk, thuis, verliefdheid) en hulplijnen vinden bij nood."
+    },
+    "apps/foundation/kwestiekantoor.html": {
+      "capability": "kantoor.democratie",
+      "rol": "eigenaar",
+      "doelgroep": "kantoor",
+      "doel": "Kwesties op naam behandelen, een eindstand met reden vastleggen en de meter Niemand kwijt lezen."
+    },
+    "apps/foundation/kwesties.html": {
+      "capability": "democratie.kwestie",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een burger brengt een kwestie in en leest de uitkomst met de reden (DemocratieOS V1)."
     },
     "apps/foundation/leerpaspoort.html": {
       "capability": "leren.school",

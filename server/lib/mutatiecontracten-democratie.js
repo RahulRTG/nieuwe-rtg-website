@@ -49,6 +49,45 @@ const schrijft = (route, mutatieId, toegang, bewijs) => [route, {
   afgetekend: AFGETEKEND
 }];
 
+
+/* HET DOENETWERK (kern/democratie/doe.js, stap 4). Gemeten in
+   test/democratie-doe.test.js toets 10: elke route twee keer met hetzelfde lijf
+   tegen een echte server. Die meting vond twee fouten die er bij het lezen
+   goed uitzagen -- hetzelfde plan nog eens wiste de antwoorden van anderen, en
+   nog eens afgelasten schreef een nieuw tijdstip -- en beide zijn gerepareerd
+   voordat dit contract werd geschreven. */
+const DOE_OP = '2026-09-28';
+const DOE_GETEKEND = { door: 'Claude, op grond van test/democratie-doe.test.js toets 10; niet door een mens nagelezen', op: DOE_OP };
+const doeSchrijft = (route, mutatieId, bewijs) => [route, {
+  mutatieId, herkomst: 'mens', semantiek: { klasse: 'idempotent' }, toegang: LID, stand: 'PROTECTED',
+  bewijs: { gemeten: 'test/democratie-doe.test.js toets 10 (' + DOE_OP + '): ' + bewijs, op: DOE_OP },
+  afgetekend: DOE_GETEKEND
+}];
+const DOE = [
+  ['POST /api/member/democratie/actie/lijst', {
+    mutatieId: 'democratie.actie.lijst', herkomst: 'mens', semantiek: { klasse: 'idempotent' }, toegang: LID,
+    stand: 'NOT_APPLICABLE',
+    bewijs: { gemeten: 'test/democratie-doe.test.js toets 10 (' + DOE_OP + '): twee keer 200 met een byte voor byte gelijk antwoord.', op: DOE_OP },
+    nagekeken: 'de handler roept alleen kijk() aan, dat een ontbrekende collectie niet aanmaakt',
+    afgetekend: DOE_GETEKEND }],
+  doeSchrijft('POST /api/member/democratie/actie/start', 'democratie.actie.start',
+    'de tweede gaf 409 met de id van de actie die al loopt, en er bleef precies een actie. Een toestandscontrole: een kwestie heeft een lopende actie tegelijk.'),
+  doeSchrijft('POST /api/member/democratie/actie/aansluit', 'democratie.actie.aansluit',
+    'twee keer 200, de tweede met herhaling, en het aantal deelnemers telde niet dubbel.'),
+  doeSchrijft('POST /api/member/democratie/actie/plan', 'democratie.actie.plan',
+    'twee keer 200; hetzelfde plan nog eens liet de antwoorden staan. Een ANDER plan zet ze met opzet terug.'),
+  doeSchrijft('POST /api/member/democratie/actie/antwoord', 'democratie.actie.antwoord',
+    'twee keer 200 en een ja telde een keer.'),
+  doeSchrijft('POST /api/member/democratie/actie/afgelast', 'democratie.actie.afgelast',
+    'twee keer 200 en de afgelasting van de eerste bleef byte voor byte staan.'),
+  doeSchrijft('POST /api/member/democratie/actie/verlaat', 'democratie.actie.verlaat',
+    'de tweede gaf 403: wie al vertrok, doet niet meer mee. Een toestandscontrole.'),
+  doeSchrijft('POST /api/member/democratie/actie/resultaat', 'democratie.actie.resultaat',
+    'de tweede gaf 409 en het resultaat van de eerste bleef staan. Een toestandscontrole: een resultaat verandert niet achteraf.'),
+  doeSchrijft('POST /api/member/democratie/actie/stop', 'democratie.actie.stop',
+    'de tweede gaf 409 en er kwam geen tweede tijdlijnregel. Een toestandscontrole.')
+];
+
 const CONTRACTEN = Object.fromEntries([
   leest('POST /api/member/democratie/kwestie/mijn', 'democratie.mijn', LID,
     'De eigen kwesties, op de sleutel uit de sessie; een ander lid ziet ze niet.'),
@@ -75,7 +114,8 @@ const CONTRACTEN = Object.fromEntries([
     'toestandscontrole.'),
   schrijft('POST /api/member/democratie/kwestie/intrek', 'democratie.intrek', LID,
     'Na een eindstand gaf intrekken 409 en bleef de eindstand staan; in een lopende ronde sloot hij de ' +
-    'ronde een keer. Een toestandscontrole.')
+    'ronde een keer. Een toestandscontrole.'),
+  ...DOE
 ]);
 
 module.exports = { CONTRACTEN };

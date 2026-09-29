@@ -93,6 +93,10 @@ Kolommen: **code** / **extern** / **besluit** = JA/NEE; *bewijs* = wat
 | B11 | **Bon- en polsbandsaldo naar 128 bits** met een atomische claim; een gast boekt alleen af wat aan zijn eigen sessie hangt | deur `horeca.bon_en_polsbandsaldo`, patroon van de cadeaukaart |
 | B12 | **Zaakdoos-sleutel per zaak** (128 bits, hash-only, intrekken en roteren), met een kloon die alleen de eigen zaak bevat | deur `devices.zaakdoos_sleutel` |
 | B13 | **De kortingscode van RTG Eten is een promotiecode** en geen geheim: wel een vervaldatum, een maximum, een grens per lid en een rem tegen raden | deur `eten.kortingscode` |
+| B14 | **Partnerkanaal splitsen**: de partnercode wordt een openbare attributielink die niets opent; de personeelscode wordt een persoonlijke 128-bit code per medewerker (hash-only, intrekbaar), besluit van 29 september 2026 | deur `partnerkanaal.personeels_en_partnercode` |
+| B15 | **De RTG Link-drager voor `geld.kassa` migreert**: 128 bits, hash-only, minuten geldig, eenmalige atomaire claim, gebonden aan de zaak die hem maakte; daarna gaat de productiegrendel eraf | deur `link.capability_aanvaarden` |
+| B16 | **Het SSO-clientgeheim versleuteld per tenant**: nooit terug te lezen via een route, rotatie met overlap en een vervaldatum | deur `identity.sso_client_secret` |
+| B17 | **De Foundation-tokens migreren nu**, voor de release: de lescodes en leraar- en leerlingtokens van onderwijs, en het gezinsprofieltoken (128 bits, hash-only, verval, intrekken); tot dan blijven ze in productie op 503 | deuren `foundation.onderwijs_les_tokens` en `foundation.family_profile_token_buiten_harde_poort` |
 
 **Nieuw gemeten sinds de matrix:** de codecredentialpoort telt geen 9 maar
 **483** blokkades: de 9 open types, **399** routes die op een toegangscode

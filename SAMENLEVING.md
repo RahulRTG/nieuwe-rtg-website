@@ -83,7 +83,7 @@ doet. Hij mag er niets onder weghalen.
 | **ontwikkelen** | het leerdossier als ledger en niet als niveau, Métier, de aanvoer van werk en opleiding in `kern/knelpunt/aanvoer*.js` | staat in delen |
 | **oriënteren** | Ontdekken (`/apps/connect.html`), de hulpwijzer, de knelpuntmotor | staat |
 | **verbinden** | Buurtruil (`kern/rtfos/ruil.js`, op een gewone ledensessie en zonder geld), De Salon, de kring | staat; De Salon is ongemeten voor de gratis trede |
-| **rust** | `kern/veiligheid/rust.js` (vijf standen, de kring komt er altijd door, elke stand eindigt vanzelf) | staat als functie; als ontwerpgebied niet (par. 6) |
+| **rust** | `kern/veiligheid/rust.js` (vijf standen, de kring komt er altijd door, elke stand eindigt vanzelf), met een eigen functie `rust` voor elke doelgroep met account | staat; RTG Veilig staat sinds 29 september in LivingOS (par. 6) |
 | **hulp kunnen vinden** | de HDI-voordeur zonder account, BSN of adres; `kern/service/mens.js` (een mens bij een probleem is een ondergrens voor elk account) | staat |
 | **opnieuw kunnen beginnen** | niets dat het zo noemt | **een stap weg**: zie hieronder |
 
@@ -176,9 +176,15 @@ maximaliseren. Dat is geen restcategorie maar een ontwerpgebied met eigen regels
    Ochtendritme van de Foundation ("Helemaal klaar voor vandaag"). Daarna komt
    er niets meer, en zeker geen "misschien vind je dit ook leuk".
 2. **Stilte is standaard bereikbaar en eindigt vanzelf.** `kern/veiligheid/rust.js`
-   laat de wereld zwijgen terwijl de kring erdoor komt. Het gebrek: de functie
-   hangt onder Veiligheid en niet onder de bodem, en is dus te vinden voor wie
-   haar al zoekt.
+   laat de wereld zwijgen terwijl de kring erdoor komt. Het gebrek was dat de
+   functie onder Veiligheid hing en niet onder de bodem, en dus alleen te vinden
+   was voor wie haar al zocht: Thuisrust is een stand van RTG Veilig, en die app
+   stond onder Instellingen. **Besluit van 29 september 2026: heel RTG Veilig
+   staat nu in LivingOS**, en in het functieregister heeft rust een eigen functie
+   (`rust`, `/api/veiligheid/rust`) voor elke doelgroep met een account, los van
+   `dom-veiligheid`. `test/rust-eindigt.test.js` handhaaft de helft "eindigt
+   vanzelf": elke stand krijgt een einddatum binnen 24 uur, ook "tot ik thuis
+   ben", wat de aanroeper ook vraagt, en de kring komt er altijd door.
 3. **Rustige publieke ruimtes.** Waar mensen elkaar ontmoeten zonder dat er
    iets van ze gevraagd wordt: geen tellers, geen "wie is er online", geen feed
    die ververst.
@@ -187,7 +193,18 @@ maximaliseren. Dat is geen restcategorie maar een ontwerpgebied met eigen regels
    alleen een verbod.
 5. **Geen commerciële druk binnen de bodem.** Geen upgradeknop midden in een
    leerpad en geen "met RTG Pass kon u dit sneller". Wie meer wil, vindt de
-   ladder waar de ladder staat.
+   ladder waar de ladder staat. **Gemeten** met `npm run bodemdruk`
+   (`BODEMDRUK.json`, graad `vermoed`): de bodemschermen worden AFGELEID uit de
+   verklaring, het functieregister en `SCHERMROUTES.json` (46 op 29 september),
+   en op geen van hen staat een uitnodiging om te betalen. Die nul is een ratel
+   (`bodemDruk`, alleen omlaag), en hij is geen stilte: de meter vindt de
+   "Word lid" op `reisuitnodiging.html`, dat geen bodemscherm is. De eerste
+   proef vond negen treffers, en alle negen stonden in commentaar.
+
+Eis 1, 3 en 4 hebben vandaag geen handhaver. Klaar-zijn, rustige ruimtes en de
+afwezigheid van een aanbevelingslus zijn lexicaal te onbetrouwbaar om te tellen:
+een meter die daar een getal geeft, zou vooral ruis ratelen. Dat staat er liever
+dan een schijnbewaker.
 
 Rust meet je niet met gebruikstijd. Een rustfunctie die meer gebruikt wordt, is
 niet vanzelf beter. Wat er gemeten mag worden, is of hij er is en of hij vanzelf
@@ -266,11 +283,11 @@ Bij elke regel staat wie hem handhaaft, en waar dat nog niemand is.
 | **SAM-02** | **Geen maatschappelijke score.** Nergens wordt een positie, klasse of kwetsbaarheid van een mens berekend, opgeslagen of als sorteersleutel gebruikt, ook niet intern. | deels: `test/cijferopmens.test.js` en de CAR-05-familie; voor een positie-afleiding **niemand** |
 | **SAM-03** | **De pas zegt niets over de mens.** Uit een trede wordt nooit kwetsbaarheid, draagkracht of bescherming afgeleid, in geen van beide richtingen. | **niemand** |
 | **SAM-04** | **Identiteit begrenst handelingen, niet het mens-zijn.** De bodem vraagt geen bewezen identiteit, en een weigering op identiteit zegt hoe het wel kan. | **niemand** voor de bodem; `volwassen()` voor de handelingen erboven |
-| **SAM-05** | **Rust maximaliseert niets.** Geen onderdeel van de bodem wordt beoordeeld op gebruikstijd, terugkeer of conversie. | **niemand** |
+| **SAM-05** | **Rust maximaliseert niets.** Geen onderdeel van de bodem wordt beoordeeld op gebruikstijd, terugkeer of conversie. | deels: `test/rust-eindigt.test.js` (rust eindigt vanzelf) en `BODEMDRUK.json` (geen uitnodiging tot betalen op een bodemscherm); gebruikstijd en terugkeer **niemand** |
 | **SAM-06** | **De kringloop is geen trechter.** Er is geen per-persoon-meting van Foundation naar betalend, en geen herkomstlabel op een account. | **niemand** |
 | **SAM-07** | **Elke deelnamevorm die voor een functie bestaat, bestaat voor de bodem.** Wie via een gemachtigde of in begeleiding kan betalen, kan zo ook leren en hulp vinden. | **niemand** |
 
-Zes van de zeven hebben geen handhaver. Dat staat er liever dan een
+Vijf van de zeven hebben geen handhaver, en SAM-05 heeft er een voor twee van zijn helften. Dat staat er liever dan een
 schijnbewaker (vergelijk AI-CONTEXT-02 in MENSNETWERK.md). SAM-01 kreeg de
 eerste, omdat die meetbaar was zonder één productbesluit (par. 11).
 
@@ -477,7 +494,7 @@ omhoog.
 | 4b | De doelgroepmeter een gratis-accountsessie geven naast de bezoeker | **staat** (par. 11.3); de toegangsvraag bij `werving/verbind` wacht op een mens |
 | 4c | Gemeenteafspraak, aangifte en zorgintake voor een Community-lid | **staat**: open na paspoortcontrole (`server/kern/onvervreemdbaar.js`) |
 | 5 | `guest` splitsen in *bezoeker* en *lid op de bodem* | **staat** (par. 11.4): gemeten met `npm run gastsplitsing`, en de drie tegenspraken zijn op 29 september besloten en dicht; de 82 weigeringen "voor leden" zijn een formuleringsvraag |
-| 6 | Rust verhuizen van Veiligheid naar de bodem, plus de vijf eisen van par. 6 | een stap weg |
+| 6 | Rust verhuizen van Veiligheid naar de bodem, plus de vijf eisen van par. 6 | **staat** (par. 6): RTG Veilig in LivingOS, `rust` als eigen functie, eis 2 en 5 gehandhaafd; eis 1, 3 en 4 zonder handhaver, met de reden |
 | 7 | Eenvoudige taal als deelnamevorm | een stap weg |
 | 8 | De Foundation-rekening en de ANBI-vraag (GIFT.md) | **vraagt een besluit**; sluit de eerste pijl van de kringloop |
 | 9 | Een fysieke plek per gemeente, met een partner | vraagt een besluit en een derde partij |

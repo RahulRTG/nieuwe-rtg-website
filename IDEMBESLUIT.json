@@ -22,7 +22,7 @@
   "beschermd": 16,
   "berekening": 70,
   "instelling": 27,
-  "code-maker": 4,
+  "code-maker": 6,
   "teller": 1
  },
  "routes": {
@@ -587,6 +587,14 @@
   "/api/office/bank/incasso": {
    "klasse": "beschermd",
    "reden": "Gemeten op 27 september 2026 met de passkeymedewerker (scripts/lib/idempasskey.js): de server merkte de herhaling zelf. De economische sleutel van het voornemen (kern/commercie/voornemen.js) maakt van een tweede klik hetzelfde voornemen, en de ronde zelf draait pas na een tweede mens (kern/kantoor/geldketen.js). Een aanvraag voor dezelfde grens is dus geen tweede incassoronde."
+  },
+  "/api/bedrijf/lid/aanmeld": {
+   "klasse": "code-maker",
+   "reden": "Buiten productie geeft server/bedrijf/leden.js bij elke aanmelding een VERSE lid-sessie terug (sleutels.geefLid), die alleen als hash op het lid staat en nooit opnieuw wordt getoond; een tweede oproep die dezelfde sessie gaf, zou een token lekken. In productie ontdubbelt de route op het account (bestaand lid: hetzelfde antwoord, gesloten lid: 409). Besloten door de eigenaar op 29 september 2026, na de idemproef van 632583ce."
+  },
+  "/api/bedrijf/mijn": {
+   "klasse": "code-maker",
+   "reden": "Buiten productie geeft server/bedrijf/mijn.js per werkruimte een VERSE lid-sessie mee ('Een NIEUWE sessie per keer: de oude wordt nooit opnieuw getoond, want op de werkruimte staat alleen haar hash'). Dat de herhaling een ander antwoord geeft is de bedoeling. In productie maakt de route geen sessie en is hij een lezing. Besloten door de eigenaar op 29 september 2026, na de idemproef van 632583ce."
   }
  }
 }

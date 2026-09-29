@@ -55,7 +55,10 @@ for(const width of [390,1440])test(width+'px: context, verloren antwoord, bronco
   assert.equal(reservations.length,1);assert.equal(reservations[0].personen,3);
   assert.equal(await app.evaluate(()=>JSON.parse(sessionStorage.getItem('rtg.intent.v1')).rows.filter(r=>r.status==='ACTIVE').length),0);
   await api('/api/supplier/reservering/beslis',{id:reservations[0].id,action:'bevestig'},supplier);
-  await app.locator('#rAgenda').click();await app.waitForFunction(()=>document.body.textContent.includes('Tafel bij')&&document.body.textContent.includes('bevestigd'));
+  await app.locator('#rAgenda').click();
+  await app.waitForURL('**/apps/agenda.html?datum='+date,{waitUntil:'load'});
+  await app.waitForFunction(()=>document.body.innerText.includes('Tafel bij')&&document.body.innerText.includes('bevestigd'));
+  await page.waitForFunction(()=>/Agenda/.test(document.querySelector('.wd-focus-head h2').textContent));
   assert.match(await page.locator('.wd-focus-head h2').textContent(),/Agenda/);
   assert.ok(await app.locator('.litem .wat').first().evaluate(el=>el.getBoundingClientRect().width)>=120,'afspraaktitel houdt leesruimte');
   assert.ok(!(await app.evaluate(()=>document.documentElement.scrollWidth>innerWidth+2)),'geen horizontale overflow');

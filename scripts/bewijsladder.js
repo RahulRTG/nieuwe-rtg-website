@@ -85,7 +85,7 @@ const LADDER = [
       /wekkers\.js$/] },
   { id: 'reis', naam: 'Echte reizen per rol', wat: 'een keten van begin tot eind, met de actor die hem loopt',
     patronen: [/(tafel|rit|toelatings)proef\.js$/, /ketenronde\.js$/, /rolronde\.js$/, /zaakwig\.js$/,
-      /ladder\.js$/, /tikken\.js$/, /appwerkt\.js$/, /vindbaar\.js$/, /tredeproef\.js$/] },
+      /ladder\.js$/, /tikken\.js$/, /appwerkt\.js$/, /vindbaar\.js$/, /tredeproef\.js$/, /experience\.js$/] },
   { id: 'grens', naam: 'Tenant, veiligheid en tegenspel', wat: 'isolatie, aanval, gluren, verraad, sabotage, overleving',
     patronen: [/isolatieproef\.js$/, /isolatieschaduw\.js$/, /aanval\.js$/, /gluurronde\.js$/,
       /verraadronde\.js$/, /sabotage\.js$/, /overleving\.js$/, /^npm audit$/] },

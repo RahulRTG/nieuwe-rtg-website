@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T19:03:16.456Z",
-    "commit": "a84ab6582",
+    "op": "2026-09-29T20:40:55.095Z",
+    "commit": "ad269f86a",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -3369,6 +3369,22 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "experience-travel.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/reisbureau-experience.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "experience-travel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/reisbureau.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 2
+    },
     "extern-afrekenen.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -6488,7 +6504,7 @@
       "staat": "gezakt",
       "module": "scripts/lib/experience/compiler.js",
       "operator": "===->!==#0",
-      "gezakt": 1,
+      "gezakt": 3,
       "geprobeerd": 1
     },
     "livinglab-capsule.test.js": {

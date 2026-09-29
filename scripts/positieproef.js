@@ -33,9 +33,12 @@
    daarna verdwijnt, is geen schuld. Hier telt alleen wat BLIJFT.
 
    DE BESTURINGSPROEF. De proef weet van ten minste een stap dat hij een positie
-   achterlaat: Onderweg bewaart de laatste positie na het stoppen (par. 6.2). Vindt
-   hij daar niets, dan is de LEZER blind -- en dan meldt hij geen nullen maar
-   zakt hij. Een meter die niets kan vinden, vindt ook niets.
+   achterlaat, en MET OPZET: een verkeersmelding bewaart de plek van de melding
+   (`noodzakelijk`, besluit N15). Vindt hij die niet terug, dan is de LEZER blind
+   -- en dan meldt hij geen nullen maar zakt hij. Een meter die niets kan vinden,
+   vindt ook niets. Het anker was eerst de positie die Onderweg na het stoppen
+   liet staan; sinds N14 wist stoppen die, en een anker dat de reparatie
+   wegneemt is geen anker meer. Een bewuste bewaring kan niet wegrepareren.
 
         node scripts/positieproef.js                 (toont de uitslag)
         node scripts/positieproef.js --vastleggen    (schrijft POSITIEPROEF.json)
@@ -143,7 +146,7 @@ async function doorloop() {
     await stap('onderweg stop', '/api/live/stop', {}, lid);
 
     // 4. nadering: een venster, een passage langs een ander hek, en de eigen zaak
-    await stap('venster open', '/api/plaats/venster', { doel: 'nadering', bron: 'bezoek aan ' + ZAAK, minuten: 30 }, lid);
+    await stap('venster open', '/api/plaats/venster', { doel: 'nadering', bron: 'bezoek aan ' + ZAAK, hek: 'leverancier:' + ZAAK, minuten: 30 }, lid);
     const hekken = await post('/api/plaats/hekken', { doel: 'nadering' }, lid);
     const eigen = 'leverancier:' + ZAAK;
     const ander = ((hekken.data && hekken.data.hekken) || []).map(h => h.id).find(id => id && id !== eigen) || null;
@@ -214,9 +217,9 @@ async function meet() {
   const t = tel(uitslag);
   if (t.fout) return { fout: t.fout };
   const besturing = {
-    inOrde: t.vondsten.some(v => v.pad.startsWith('live.')),
-    wat: 'Onderweg bewaart de laatste positie na het stoppen (NAVIGATIE.md par. 6.2). Vindt de lezer geen enkel ' +
-      'merkteken terug, dan is hij blind en zegt een rij nullen niets.'
+    inOrde: t.vondsten.some(v => v.merk === 'melding'),
+    wat: 'Een verkeersmelding bewaart met opzet de plek van de melding (NAVIGATIE.md N15, noodzakelijk). Vindt de ' +
+      'lezer dat merkteken niet terug, dan is hij blind en zegt een rij nullen niets.'
   };
   return {
     graad: 'gemeten',

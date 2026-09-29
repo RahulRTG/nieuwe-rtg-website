@@ -233,10 +233,20 @@ test('plaats: langs een ANDERE zaak lopen geeft geen aankomstpuls',
       null, { timeout: 20000 });
     // De lokale motor verwerkt de GPS eerst; de waarneming moet daarna ook
     // door de server zijn verwerkt voordat we die opgeslagen stand beoordelen.
-    assert.equal((await waargenomen).status(), 200, 'de server heeft de waarneming ontvangen');
-    const stand = await api(base, '/api/plaats/stand', {}, reg.token);
-    assert.ok(stand.waarnemingen.some(w => w.hek === elders.id && w.wat === 'binnen'),
+    const antwoord = await waargenomen;
+    assert.equal(antwoord.status(), 200, 'de server heeft de waarneming ontvangen');
+    /* Het bewijs dat de motor draaide, komt van het TOESTEL: de lokale stand ziet
+       de andere zaak als binnen. Tot 29 september werd dat bewezen uit de
+       opgeslagen stand op de server -- maar een passage langs een andere zaak
+       wordt sinds NAVIGATIE.md N12 verwerkt en NIET bewaard. Dat is dus hardop
+       omgedraaid: de server zegt het, en in de opgeslagen stand staat hij niet. */
+    assert.ok(await page.evaluate((id) => window.RTGPlaats.stand().binnen.includes(id), elders.id),
       'het toestel heeft de andere zaak wel degelijk als binnen gezien');
+    assert.equal((await antwoord.json()).opgeslagen, false, 'de server verwerkte hem en bewaarde hem niet (N12)');
+    const stand = await api(base, '/api/plaats/stand', {}, reg.token);
+    assert.ok(!stand.waarnemingen.some(w => w.hek === elders.id),
+      'en in de opgeslagen stand staat geen passage langs de andere zaak');
+    assert.ok(!(stand.log || []).some(r => r.hek === elders.id), 'ook niet in het actielog');
 
     /* Hier wordt een NEGATIEF bewezen: de zaak van de pass hoort niets te
        hebben gehoord. Dat wordt niet waar door 1200 ms te wachten -- het wordt

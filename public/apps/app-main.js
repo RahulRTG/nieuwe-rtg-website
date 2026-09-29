@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '5bda648b';
+var RTG_BOUW = '99403b62';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -6387,7 +6387,11 @@ var RTG_BOUW = '5bda648b';
 
     const hasVeh = L.partners.some(p => p.type === 'taxi' || p.type === 'jet');
     const canDoor = L.arrived && dest && dest.hasDoors;
+    /* Aankomst bevestigt de mens (NAVIGATIE.md N13): in de buurt is een vraag,
+       en de knop staat er ook zonder gedeelde positie. */
+    const kanBevestigen = dest && !L.arrived;
     const acts = '<div class="live-acts">' +
+      (kanBevestigen ? '<button class="' + (L.nabij ? 'prim glowbtn' : 'sec') + '" id="liveHier">' + (L.nabij ? T('live.benuer','Bent u er? Bevestig uw aankomst') : T('live.ikbener','Ik ben er')) + '</button>' : '') +
       (canDoor ? '<button class="prim glowbtn" id="liveDoor">' + T('live.door','Open de deur') + '</button>' : '') +
       '<button class="sec" id="liveSim">' + T('live.simulate','Simuleer rit') + '</button>' +
       (hasVeh ? '' : '<button class="sec" id="liveTaxi">' + T('live.taxi','Vraag een taxi') + '</button>') +
@@ -6406,6 +6410,11 @@ var RTG_BOUW = '5bda648b';
       '</div>';
 
     $('#liveStop').addEventListener('click', stopLive);
+    const hier = $('#liveHier');
+    if (hier) hier.addEventListener('click', async () => {
+      try { const r = await API.call('/live/aangekomen', {}); liveData = r.live; renderLivePanel(); }
+      catch (e) { toast(e.message); }
+    });
     $('#liveSim').addEventListener('click', simulateRide);
 /* betalen met Face ID vanuit een rekeningregel */
     document.querySelectorAll('.js-rpay').forEach(b => b.addEventListener('click', () => {

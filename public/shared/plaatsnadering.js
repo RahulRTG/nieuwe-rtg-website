@@ -131,11 +131,11 @@
       var over = Math.round((Date.parse(p.vervaltAt) - Date.now()) / 60000);
       if (over > 0) minuten = over;
     }
+    var hekId = 'leverancier:' + p.zaak.code;
     var v = await api('/api/plaats/venster',
-      { doel: 'nadering', bron: 'bezoek aan ' + p.zaak.code, minuten: minuten }, lid());
+      { doel: 'nadering', bron: 'bezoek aan ' + p.zaak.code, hek: hekId, minuten: minuten }, lid());
     if (!v || v.status !== 200) return;
 
-    var hekId = 'leverancier:' + p.zaak.code;
     af = window.RTGPlaats.opWissel(function (w) {
       /* ALLEEN het hek van DEZE zaak, en alleen naar binnen. Elke andere
          overgang is niet van dit bezoek, en een puls sturen over een zaak waar

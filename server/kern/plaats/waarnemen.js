@@ -43,6 +43,16 @@ module.exports = ({ db, save, opslag, kentHek }) => {
     if (!kentHek(doel, hek, codenaam, key)) return { status: 400, error: 'Onbekend hek.' };
     const wat = body.wat === 'buiten' ? 'buiten' : body.wat === 'binnen' ? 'binnen' : null;
     if (!wat) return { status: 400, error: 'Een waarneming is binnen of buiten.' };
+    /* ALLEEN HET DOELHEK WORDT BEWAARD (NAVIGATIE.md N12). Een venster dat een
+       hek noemt, gaat over dat ene bezoek. Een overgang langs een ander hek is
+       geldig -- het toestel deed niets fout -- maar hij wordt niet opgeslagen,
+       niet in de waarnemingen en niet in het actielog: dat zou vastleggen langs
+       welke zaken je onderweg liep. Het antwoord zegt dat hardop in plaats van
+       te doen alsof hij bewaard is. */
+    if (venster.hek && hek !== venster.hek) {
+      return { status: 200, nieuw: false, opgeslagen: false,
+        reden: 'niet het hek van dit venster; verwerkt en niet bewaard (NAVIGATIE.md N12)' };
+    }
     /* Dezelfde overgang twee keer op rij is geen tweede feit. Een toestel dat op
        de rand van een hek staat, wisselt anders tientallen keren per minuut, en
        dan staat het actielog vol met ruis waar niemand doorheen komt. */

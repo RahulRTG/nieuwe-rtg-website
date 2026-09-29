@@ -137,7 +137,13 @@ test('10. de meter telt geen gebruik als schuld (N11)', () => {
     assert.ok(g.reden.length > 10, pad + ': een reden');
   }
   const uit = P.meet();
-  assert.equal(uit.gemeten.klassen.toegestaan, 0, 'wat niet blijft, is geen stroom');
+  /* Wat niet blijft, is geen stroom -- met EEN uitzondering: een stroom die de
+     eigenaar heeft laten stoppen (N12) blijft als rij staan, zodat te zien is
+     dat het besluit is uitgevoerd. Zo'n rij is geen voorstel en geen schuld. */
+  for (const r of uit.rijen.filter(x => x.klasse === 'toegestaan')) {
+    assert.ok(r.besluit && r.besluit.klasse === 'toegestaan' && r.besluit.uitgevoerd,
+      r.naam + ': wat niet blijft, is geen stroom -- tenzij een besluit hem liet stoppen');
+  }
 });
 
 test('11. het register POSITIESTROOM.json loopt niet achter op een verse meting', () => {

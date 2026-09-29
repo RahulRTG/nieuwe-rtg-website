@@ -95,7 +95,7 @@ module.exports = function maakDiensten(deps) {
      opgezet omdat de sociale kern hieronder al sseToCustomer nodig heeft. De
      functies dragen db, de bus, de SSE-routers, geo-helpers en i18n;
      sseToSupplier, sseToOffice en findSupplier zijn hoisted functies. */
-  const { sseToCustomer, liveCodename, connectedSupplierCodes, pushLive, liveStateFor, guestsFor } =
+  const { sseToCustomer, liveCodename, connectedSupplierCodes, pushLive, liveStateFor, guestsFor, bevestigAankomst } =
     maakLive({ db, bus, nextSseId, PERSONAS, sseToSupplier, sseToOffice, findSupplier, haversine, etaMinutes, i18n, ordersVanKlant });
   /* De ledengids (sleutel -> codenaam + pas) staat in server/kern/gids.js:
      dirTouch, ledental, opzoeken en zoeken op codenaam, met of zonder Postgres. */
@@ -150,7 +150,7 @@ module.exports = function maakDiensten(deps) {
   return {
     AUTHOR_TIER, SSE_BUFFER_TTL, aiPoort, antivirus, archief, atelierweb, auth, automatisering, 
     beveilig, broadcastSync, bufferEvent, bus, connectedSupplierCodes, dirTouch, 
-    ensureSupplierDefaults, etaMinutes, gidsHaal, gidsHaalWacht, gidsWeg, gidsZoekCodenaam, guestsFor,
+    ensureSupplierDefaults, etaMinutes, gidsHaal, gidsHaalWacht, gidsWeg, gidsZoekCodenaam, guestsFor, bevestigAankomst,
     haversine, initRealtime, keyVanCodenaam, ledenAantal, leverSse, liveCodename, liveStateFor, 
     mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, naamlaag, nextSseId, notify, ondernemerpoort, pushLive, resolveSession, sessieregister, toestellen, bezitsbewijs, tweefactor, commercieel, commercieelStand, commercieelZet, rtmail, rtmailTeam, 
     rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, mailAanname, 

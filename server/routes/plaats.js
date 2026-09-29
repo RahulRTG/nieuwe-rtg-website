@@ -39,7 +39,7 @@ module.exports = (kern) => {
   // toestemming openen: altijd met een reden en altijd met een einde
   app.post('/api/plaats/venster', auth, (req, res) => {
     if (geenGast(req, res)) return;
-    stuur(res, plaats.plaatsVensterOpen(wie(req), req.body || {}));
+    stuur(res, plaats.plaatsVensterOpen(wie(req), req.body || {}, sleutel(req)));
   });
 
   // en weer dicht -- sluiten wist ook de waarnemingen van dat venster

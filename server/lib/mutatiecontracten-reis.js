@@ -59,4 +59,6 @@ const CONTRACTEN = {
   }
 };
 
-module.exports = CONTRACTEN;
+/* De bevestigde aankomst (NAVIGATIE.md N13) hoort bij de reis en staat in een
+   eigen zijbestand, zodat het hoofdbestand onder de omvanggrens blijft. */
+module.exports = Object.assign({}, CONTRACTEN, require('./mutatiecontracten-aankomst').CONTRACTEN);

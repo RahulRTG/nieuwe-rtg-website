@@ -4,7 +4,7 @@
    komen via het kern-object binnen. */
 const wie = require('../../kern/comm/wie');
 module.exports = (kern) => {
-  const { app, db, talen, guestsFor, logActivity, notify, pushLive, save, sseToCustomer, sseToSupplier,
+  const { app, db, talen, guestsFor, bevestigAankomst, logActivity, notify, pushLive, save, sseToCustomer, sseToSupplier,
           supplierAuth, trChat, klantSalon, dpVerzoekMaak, dpVerzoekIntrek, dpOntvangsten,
           comm, commGast } = kern;
 
@@ -108,6 +108,28 @@ app.post('/api/supplier/guest/connect', supplierAuth, (req, res) => {
   save();
   logActivity(req.supplier.code, req.actor, 'verbond met gast ' + codename);
   notify(L.tier, { icon: 'rechterhand', title: req.supplier.name, body: 'Volgt uw aankomst om alles voor u klaar te zetten.', scope: 'live' });
+  pushLive(key);
+  res.json({ ok: true, guests: guestsFor(req.supplier.code) });
+});
+
+/* De zaak bevestigt dat een gast er is (NAVIGATIE.md N13): de host, de kassa of
+   de receptie ziet hem binnenkomen. Alleen de BESTEMMING kan dat -- een zaak die
+   alleen meekijkt (verbonden, of met een lopende bestelling) weet niet of iemand
+   ergens anders is aangekomen. */
+app.post('/api/supplier/guest/aangekomen', supplierAuth, (req, res) => {
+  const codename = String(req.body.codename || '').trim();
+  const key = Object.keys(db.data.live).find(k => {
+    const L = db.data.live[k];
+    return L.active && L.codename === codename && L.destCode === req.supplier.code;
+  });
+  if (!key) return res.status(404).json({ error: 'Deze gast is nu niet naar u onderweg.' });
+  const r = bevestigAankomst(key, 'zaak');
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  if (!r.al) {
+    save();
+    logActivity(req.supplier.code, req.actor, 'bevestigde de aankomst van ' + codename);
+    notify(r.L.tier, { icon: 'gps', title: 'Aangekomen', body: req.supplier.name + ' heeft uw aankomst bevestigd.', scope: 'live' });
+  }
   pushLive(key);
   res.json({ ok: true, guests: guestsFor(req.supplier.code) });
 });

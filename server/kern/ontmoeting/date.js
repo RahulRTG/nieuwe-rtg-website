@@ -83,6 +83,7 @@ module.exports = (ctx) => {
     lijsten();
     let veranderd = false;
     for (const v of db.data.ontmoetVoorstellen) if (v.status === 'open' && verlopenVoorstel(v)) { v.status = 'verlopen'; veranderd = true; }
+    if (ctx.vergeetOudePosities && ctx.vergeetOudePosities()) veranderd = true;
     if (veranderd) save();
   }
   function publiekVoorstel(v, key) {

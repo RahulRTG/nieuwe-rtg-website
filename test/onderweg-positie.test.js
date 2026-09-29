@@ -76,3 +76,80 @@ test('3. de eerste echte positie komt later binnen en vult de lege aan', async (
     'en verandert de laatst gedeelde positie niet');
   await api('live/stop', {}, lid);
 });
+
+test('4. stoppen wist de positie (NAVIGATIE.md N14)', async () => {
+  /* ZAKT OP: `delete L.lat; delete L.lng` uit /api/live/stop halen -- dan bleef
+     de laatste positie zeven dagen staan tot de bewaarveger kwam. */
+  await api('live/start', { destCode: 'PONTO', mode: 'walking', lat: 38.92, lng: 1.44 }, lid);
+  const stop = await api('live/stop', {}, lid);
+  assert.equal(stop.status, 200);
+  assert.equal(stop.body.live.active, false);
+  assert.equal(stop.body.live.me, null, 'de taak is voorbij, dus de positie ook');
+  const later = await api('live/state', {}, lid);
+  assert.equal(later.body.live.me, null, 'ook bij het teruglezen');
+});
+
+/* AANKOMST WORDT BEVESTIGD, NIET GEMETEN (NAVIGATIE.md N3 en N13). */
+const zaakToken = async (code) => {
+  const roster = await fetch(base + '/api/supplier/roster', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code }) }).then(r => r.json());
+  const man = roster.staff.find(x => x.role === 'manager');
+  const r = await fetch(base + '/api/supplier/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code, staffId: man.id, pin: '1234' }) }).then(r => r.json());
+  return r.token;
+};
+
+test('5. op de stoep staan is een VOORSTEL: nabij, geen aankomst, en de deur blijft dicht', async () => {
+  /* ZAKT OP: de oude automatische aankomst binnen 150 m in /api/live/update. */
+  const start = await api('live/start', { destCode: 'PONTO', mode: 'walking' }, lid);
+  const dest = start.body.live.partners.find(p => p.code === 'PONTO');
+  const upd = await api('live/update', { lat: dest.loc.lat, lng: dest.loc.lng }, lid);
+  assert.equal(upd.status, 200);
+  assert.equal(upd.body.live.arrived, false, 'een positie bewijst geen aankomst');
+  assert.equal(upd.body.live.nabij, true, 'maar het scherm mag vragen of je er bent');
+  const deur = await api('live/door', {}, lid);
+  assert.notEqual(deur.status, 200, 'en geen deur gaat open op een positie');
+  await api('live/stop', {}, lid);
+});
+
+test('6. het lid bevestigt zelf -- ook zonder gedeelde positie', async () => {
+  await api('live/start', { destCode: 'PONTO', mode: 'walking' }, lid);
+  const hier = await api('live/aangekomen', {}, lid);
+  assert.equal(hier.status, 200);
+  assert.equal(hier.body.live.arrived, true);
+  assert.equal(hier.body.live.aankomstDoor, 'lid');
+  assert.equal(hier.body.live.me, null, 'er was geen positie, en die is ook niet nodig');
+  /* EEN TWEEDE BEVESTIGING DOET NIETS (het contract PROTECTED): niet nog eens de
+     tijd, niet een andere bevestiger, en dus ook geen tweede bericht aan de zaak. */
+  const nogeens = await api('live/aangekomen', {}, lid);
+  assert.equal(nogeens.status, 200);
+  assert.equal(nogeens.body.live.aankomstAt, hier.body.live.aankomstAt, 'de aankomsttijd staat vast');
+  const ponto = await zaakToken('PONTO');
+  const g = (((await api('supplier/state', {}, ponto)).body.state || {}).guests || []).find(x => x.heading);
+  const zaak = await api('supplier/guest/aangekomen', { codename: g.codename }, ponto);
+  assert.equal(zaak.status, 200);
+  const na = await api('live/state', {}, lid);
+  assert.equal(na.body.live.aankomstDoor, 'lid', 'wie het eerst bevestigde, blijft de bevestiger');
+  assert.equal(na.body.live.aankomstAt, hier.body.live.aankomstAt);
+  await api('live/stop', {}, lid);
+});
+
+test('7. de bestemming bevestigt; een andere zaak kan dat niet', async () => {
+  await api('live/start', { destCode: 'PONTO', mode: 'walking' }, lid);
+  const state = await api('live/state', {}, lid);
+  assert.equal(state.body.live.arrived, false);
+  const ponto = await zaakToken('PONTO');
+  const stand = await api('supplier/state', {}, ponto);
+  const g = ((stand.body.state || {}).guests || []).find(x => x.heading) || null;
+  assert.ok(g && g.codename, 'de zaak ziet de gast die naar haar onderweg is');
+  const naam = g.codename;
+  const ander = await zaakToken('KIKUNOI');
+  const nee = await api('supplier/guest/aangekomen', { codename: naam }, ander);
+  assert.equal(nee.status, 404, 'een zaak die niet de bestemming is, bevestigt niets');
+  const ja = await api('supplier/guest/aangekomen', { codename: naam }, ponto);
+  assert.equal(ja.status, 200, JSON.stringify(ja.body).slice(0, 200));
+  const na = await api('live/state', {}, lid);
+  assert.equal(na.body.live.arrived, true);
+  assert.equal(na.body.live.aankomstDoor, 'zaak');
+  await api('live/stop', {}, lid);
+});

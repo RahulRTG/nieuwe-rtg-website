@@ -52,7 +52,7 @@ module.exports = function maakPlaats({ db, save, crypto, weefsel, navPoi }) {
      gedeeld -- drie kopieen van "een waarneming leeft zolang haar venster
      leeft" lopen uiteen. */
   const opslag = require('./opslag')({ db, save, crypto });
-  const vst = require('./venster')({ db, save, opslag, DOELEN: hek.DOELEN });
+  const vst = require('./venster')({ db, save, opslag, DOELEN: hek.DOELEN, DOEL: hek.DOEL, kentHek: hek.kentHek });
   const wrn = require('./waarnemen')({ db, save, opslag, kentHek: hek.kentHek });
 
   return {
@@ -70,7 +70,7 @@ module.exports = function maakPlaats({ db, save, crypto, weefsel, navPoi }) {
          lekt ze aan iedereen die de route aanroept. */
       plaatsBron: (naam, doel, fn) => hek.bronToevoegen(naam, doel, fn),
       // toestemming met een einde
-      plaatsVensterOpen: (codenaam, v) => vst.vensterOpen(codenaam, v),
+      plaatsVensterOpen: (codenaam, v, key) => vst.vensterOpen(codenaam, v, key),
       plaatsVensterSluit: (codenaam, doel) => vst.vensterSluit(codenaam, doel),
       // de uitkomst van de motor op het toestel
       plaatsWaarneem: (codenaam, w, key) => wrn.waarneem(codenaam, w, key),

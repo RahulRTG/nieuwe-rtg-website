@@ -92,9 +92,10 @@ const S = (pad, citaat) => ({ pad: 'server/' + pad, citaat });
 const STROMEN = [
   { naam: 'live-onderweg', wat: 'de positie van een lid dat Onderweg aanzet',
     bron: [S('routes/member/onderweg.js', 'L.lat = lat; L.lng = lng; L.updatedAt = new Date().toISOString(); gewijzigd = true;')],
-    collectie: 'live', sleutel: 'sessiesleutel', van: 'lid', klasse: 'teLang',
-    waarom: '/api/live/stop zet alleen active op false; de positie blijft tot de bewaarveger hem na zeven dagen ' +
-      'weghaalt. De taak is dan al voorbij (NAVIGATIE.md P-05, derde categorie).' },
+    collectie: 'live', sleutel: 'sessiesleutel', van: 'lid', klasse: 'venster',
+    termijn: { soort: 'venster', bewijs: S('routes/member/onderweg.js', 'if (L) { L.active = false; delete L.lat; delete L.lng; save(); pushLive(key); }') },
+    waarom: 'sinds N14 wist /api/live/stop de positie; de bewaarveger van zeven dagen is het vangnet voor wie ' +
+      'nooit op stop drukt. Tot 29 september zette stoppen alleen active op false (NAVIGATIE.md par. 6.2).' },
 
   { naam: 'rit-vertrekpunt', wat: 'de live-positie die bij een ritaanvraag in de vervoersopdracht wordt gekopieerd',
     bron: [S('routes/member/onderweg.js', 'const vanaf = (L && Number.isFinite(L.lat)) ? L : (zaak && zaak.loc) || null;')],
@@ -166,10 +167,11 @@ const STROMEN = [
 
   { naam: 'ontmoet-radar', wat: 'de laatste positie voor de radar van Salon-ontmoetingen',
     bron: [S('kern/ontmoeting.js', 'if (Number.isFinite(lat) && Number.isFinite(lng)) db.data.ontmoetPosities[key] = { lat, lng, at: nu() };')],
-    collectie: 'ontmoetPosities', sleutel: 'sessiesleutel', van: 'lid', klasse: 'teLang',
-    termijn: { soort: 'module', bewijs: S('kern/ontmoeting.js', 'delete db.data.ontmoetPosities[key];') },
-    waarom: 'zes minuten telt hij als vers, maar dat wordt alleen bij het LEZEN gewogen; hij blijft staan tot het lid ' +
-      'de functie uitzet of vergeten wordt' },
+    collectie: 'ontmoetPosities', sleutel: 'sessiesleutel', van: 'lid', klasse: 'venster',
+    termijn: { soort: 'venster', bewijs: S('kern/ontmoeting.js', 'if (Date.now() - at > POS_TTL_MS) { delete P[k]; weg++; }') },
+    waarom: 'sinds N14 wordt een positie die niet meer vers is gewist -- bij elke nieuwe positie, bij elke stand en ' +
+      'door de bewaarveger. Tot 29 september werd de versheid alleen bij het LEZEN gewogen en bleef de plek staan ' +
+      'tot het lid de functie uitzette.' },
 
   { naam: 'date-positie', wat: 'de live-positie van beide deelnemers tijdens een date',
     bron: [S('kern/ontmoeting/date.js', 'if (Number.isFinite(lat) && Number.isFinite(lng)) d.posities[key] = { lat, lng, at: nu() };')],
@@ -255,9 +257,11 @@ const STROMEN = [
 
   { naam: 'plaats-passages', wat: 'elke overgang langs een hek tijdens een naderingsvenster, onder een codenaam',
     bron: [S('kern/plaats/waarnemen.js', "schrijfLog(codenaam, 'waargenomen', { doel, hek, richting: wat });")],
-    collectie: 'plaatsLog', sleutel: 'codenaam', van: 'lid', klasse: 'verboden',
-    waarom: 'geen coordinaat, wel een reeks zaken met tijden onder een codenaam -- een mens-plaatsgraaf; botst met ' +
-      'P-05 en N1 ongeacht de termijn (NAVIGATIE.md par. 6.2, besluit B8)' },
+    collectie: 'plaatsLog', sleutel: 'codenaam', van: 'lid', klasse: 'toegestaan',
+    termijn: { soort: 'venster', bewijs: S('kern/plaats/waarnemen.js', 'if (venster.hek && hek !== venster.hek) {') },
+    waarom: 'sinds N12 noemt een naderingsvenster zijn hek, en een overgang langs een ander hek wordt verwerkt en niet ' +
+      'bewaard -- hij verlaat het verzoek niet. De regel die blijft gaat over het doel van het bezoek zelf. Tot 29 ' +
+      'september legde elke passage een regel onder de codenaam vast, 90 dagen (NAVIGATIE.md par. 6.2).' },
 
   { naam: 'plaats-waarnemingen', wat: 'binnen/buiten per hek binnen een venster',
     bron: [S('kern/plaats/waarnemen.js', 'const waarneming = { id: id(), codenaam, doel, venster: venster.id, hek, wat, at: nu() };')],

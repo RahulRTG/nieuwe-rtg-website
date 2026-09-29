@@ -52,6 +52,22 @@ test('locatie: op dag zes blijft alles staan (de termijn is 7 dagen, geen 5)', (
   assert.ok(db.data.live['user-1']);
 });
 
+test('radar: een positie die niet meer vers is gaat weg, een verse blijft (NAVIGATIE.md N14)', () => {
+  /* ZAKT OP: regel 1b uit server/bewaarveger.js halen -- dan blijft de laatste
+     plek staan van wie de ontmoetingsradar aanliet en de app dichtdeed. */
+  const { POS_TTL_MS } = require('../server/kern/ontmoeting');
+  const { db, v, tik } = bouw();
+  db.data.ontmoetPosities = {
+    oud: { lat: 52.1, lng: 4.3, at: new Date(T0).toISOString() },
+    vers: { lat: 52.2, lng: 4.4, at: new Date(T0 + POS_TTL_MS).toISOString() }
+  };
+  tik(POS_TTL_MS + 1000);
+  const r = v.veeg();
+  assert.equal(r.posities, 1);
+  assert.ok(!db.data.ontmoetPosities.oud, 'de oude radarpositie is weg');
+  assert.ok(db.data.ontmoetPosities.vers, 'een verse blijft: de radar loopt nog');
+});
+
 test('gratis app (nooit een termijn): de jaartermijn na de goedkeuring geldt, dan weg', () => {
   const { v, users, states, gewist, tik } = bouw();
   users.set(7, { id: 7, verified: 'verified', id_doc: '7-pas.bin' });

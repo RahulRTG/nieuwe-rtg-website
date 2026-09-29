@@ -711,6 +711,29 @@ altijd*. Die helft zegt de bronmeter (6.5). De proef loopt niet door een rit, ee
 bezorging of een SOS, en de 35 stromen van 6.5 zijn dus maar voor een klein deel
 langs de opslag gecontroleerd.
 
+### 6.7 A1, eerste ronde: N12, N13 en N14 uitgevoerd (29 september 2026)
+
+Drie besluiten van 15.0 zijn gebouwd, elk met een toets die op een mutatie zakt:
+
+| besluit | wat er veranderde | toets |
+|---|---|---|
+| **N12** | een naderingsvenster noemt zijn hek (`eenHek` in `kern/plaats/hekken.js`); een overgang langs een ander hek krijgt 200 met `opgeslagen: false` en komt niet in de waarnemingen en niet in het actielog | `test/plaatsdoelhek.test.js`, en `test/plaatsnadering.e2e.js` in een echte browser |
+| **N13** | binnen 150 m is `nabij` een voorstel; aankomst bevestigt het lid (`/api/live/aangekomen`) of de zaak die de bestemming is (`/api/supplier/guest/aangekomen`), en de deur leest die bevestiging. Een tweede bevestiging verandert niets | `test/onderweg-positie.test.js` 5-7, en `test/grand-integratie.pg.test.js` subtoets 9 hardop omgedraaid |
+| **N14** | `/api/live/stop` wist de positie; de ontmoetradar wist een positie die niet meer vers is bij elke positie, bij elke stand en via de bewaarveger | `test/onderweg-positie.test.js` 4, `test/bewaarveger.test.js` |
+
+De positieproef ging daardoor van **0 / 1 / 2 / 1** naar **0 / 0 / 0 / 0**, en de
+tanden in `NORM.json` zijn meegezakt: ze mogen alleen dalen, dus een nul die
+weer een een wordt, laat de norm zakken. De besturingsproef kreeg daarbij een
+ander anker, en dat is de les van deze ronde: het oude anker was de positie die
+Onderweg na het stoppen liet staan, en die bestaat niet meer. **Een anker dat de
+reparatie wegneemt, is geen anker**: de proef hangt nu aan de verkeersmelding,
+die de plek MET OPZET bewaart (N15). Zou de lezer blind worden, dan zakt hij nog
+steeds.
+
+Wat de voorspeller hierdoor niet meer kan: nabijheid meewegen bij een zaak waar
+een lid vaak komt maar die niet het doel van dit bezoek is. Dat was precies de
+passagelog aan het werk, en N12 schrapt het met opzet.
+
 ---
 
 ## 7. De reistijddienst
@@ -1136,7 +1159,7 @@ indeling gelijk is aan de besloten klasse, staat hij op uitgevoerd.
 
 | # | besluit | wat het vastlegt |
 |---|---|---|
-| **N12** | **alleen het doelhek wordt bewaard** | een waarneming langs een ander hek wordt tijdens het venster verwerkt en niet opgeslagen; het venster zelf blijft als auditspoor. `plaats-passages` gaat naar `toegestaan`, en `test/plaats.test.js` 176-179 gaat hardop om |
+| **N12** | **alleen het doelhek wordt bewaard** | een waarneming langs een ander hek wordt tijdens het venster verwerkt en niet opgeslagen; het venster zelf blijft als auditspoor. `plaats-passages` gaat naar `toegestaan`, en `test/plaatsnadering.e2e.js` (die de opgeslagen passage als bewijs gebruikte dat de motor draaide) gaat hardop om |
 | **N13** | **aankomst bevestigt de klant of de zaak, en allebei mag** | nabijheid wordt een voorstel ("Bent u er?"); aankomst bestaat pas als het lid tikt of de zaak het zet (kassa, host, reservering). Wie van de twee het eerst bevestigt, is genoeg. De deur ter plaatse leest die bevestiging en niet de positie. Uitwerking van N3 |
 | **N14** | **wissen bij stoppen** | Onderweg en de ontmoetradar wissen de positie op het moment dat de taak stopt; de veger van zeven dagen blijft alleen als vangnet. Van `teLang` naar `venster` |
 | **N15** | **de vensters en de noodzakelijke stromen zijn aanvaard** | de negen `venster`- en drie `noodzakelijk`-voorstellen van par. 6.5 zijn besluiten zoals ze stonden. De negentien `onbegrensd`-stromen worden per stroom apart beslist (15.1) |

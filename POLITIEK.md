@@ -140,7 +140,7 @@ uitvinden** (dezelfde conclusie als `HDI.md` par. 1).
 | Mogelijkheden | `server/kern/livinglab/werkplaats.js`, `server/kern/knelpunt/` (vondsten bij een randvoorwaarde, nooit bij een mens) | een stap weg |
 | Voorstel | de aannamelijst (par. 7.2) | te bouwen |
 | Besluit | `server/kern/stadsweefsel/besluitvorming.js`, `server/kern/rtfos/bestuur.js` | staat, per orgaan |
-| Actie | `server/kern/rtfos/vrijwilligers-inzet.js`, `server/kern/rtfos/projecten.js` | een stap weg (DoeNetwerk, par. 6) |
+| Actie | `server/kern/democratie/doe.js` (het DoeNetwerk, par. 6a); daarnaast `server/kern/rtfos/vrijwilligers-inzet.js` en `projecten.js` voor werk dat bij de stichting begint | staat (V1, 28 september 2026) |
 | Resultaat | `server/kern/stadsweefsel/rekenkamer.js` (*"geen cijfer en geen stoplicht"*) | staat als vorm |
 | Terugkoppeling | `server/kern/ontvanger.js` (pas bezorgd met een bewezen leespad) | staat |
 | Heropenen | — | te bouwen: een nieuwe behandelronde, de oude blijft staan |
@@ -231,6 +231,62 @@ blijven gelden:
 
 Sommige kwesties eindigen nooit bij een politicus. Daar is de eindstand
 `samen-opgelost` voor.
+
+### 6a. Wat stap 4 nu is (28 september 2026)
+
+Net genoeg om `samen-opgelost` echt te laten ontstaan, en niets meer:
+`server/kern/democratie/doe.js` (de actie) en `doe-bijeenkomst.js` (de
+samenkomst), negen ledenroutes onder `/api/member/democratie/actie/`, en de kaart
+*Samen doen* op het scherm *Wat speelt er*. De lus is
+**aansluiten → bijeenkomst → actie → resultaat → terugkoppeling**.
+
+Twee besluiten van de eigenaar, en beide houden de grondwet waar hij was:
+
+- **De eindstand blijft bij het kantoor, op naam.** Een actie legt haar
+  RESULTAAT vast op de tijdlijn van de kwestie; een medewerker die zelf niet
+  betrokken is, leest dat en sluit met `samen-opgelost`. W2 blijft dus staan
+  (wie inbrengt, volgt of meedoet, beslist niet), en de eindstandenlijst
+  verandert niet -- een eigen eindstand voor de actie was een DO-02-wijziging
+  geweest.
+- **Een eigen DoeNetwerk, met de regels van de bijeenkomst en niet met het
+  genootschap zelf.** Genootschap is een functie van de betaalde passen, en in
+  DemocratieOS geeft een pas nooit meer gewicht (DO-05). De regels zijn
+  overgenomen (geen wachtlijst, *misschien* blijft *misschien*, opnieuw plannen
+  zet de antwoorden terug, geen "X anderen komen"); de afhankelijkheid niet. Het
+  werkt dus voor elk account, ook het gratis.
+
+Vier grenzen, alle vier in de code en elk met een toets die zakt
+(`test/democratie-doe.test.js`, `test/samendoen-scherm.e2e.js`):
+
+1. **Een actie begint bij wie de kwestie heeft**, en alleen met een uitdrukkelijk
+   vinkje: *andere leden mogen het onderwerp zien, zonder mijn naam*. Zonder dat
+   vinkje weigert de server; de kwestie was tot dan alleen van hem en het kantoor.
+2. **Geen namen.** Een lid ziet hoeveel mensen meedoen en nooit wie; het kantoor
+   ook niet. Deelnemers staan op een nummer uit `koppeling.js`.
+3. **Niets gaat vanzelf naar een ander** (`LIFE.md`): geen uitnodiging en geen
+   herinnering. Wie meedoet, sluit zelf aan.
+4. **Wie aansluit, gaat de kwestie volgen**: hij krijgt de terugkoppeling als de
+   eindstand vastligt. Wie weer vertrekt, blijft volger -- volgers groeien alleen
+   aan.
+
+Wat er met opzet NIET is: rollen invullen (een rol is een woord in de actie,
+geen plek die iemand claimt), benodigdheden, toestemming van een derde en
+financiering. Die laatste vraagt `GELD.md` en staat op de V2-lijst.
+
+**Wat deze laag de machine kost, en dat staat hier en niet in een register.**
+De acht schrijvende actieroutes raken geen enkele as van `npm run
+machinedekking`, en de ratel `mutatiesZonderEnigeAs` ging daarmee van 2819 naar
+2827 (MACHINEDEKKING.json; de kwestieroutes van fase B brachten hem eerder van
+2791 naar 2819, toen zonder uitleg). Wat ze wel doen ziet die meter met opzet
+niet: ze schrijven langs de kern-tas naar een duurzame collectie en een regel in
+de hashketen van de kwestie. Er is geen woord in een commentaar gezet om hem te
+laten tellen. De weg omlaag: een volle `npm run idemproef` op een schone boom zet
+de vier herhaalbare routes (aansluit, plan, antwoord, afgelast) op `beschermd` en
+haalt er vier af; de andere vier weigeren een herhaling met een
+toestandscontrole en krijgen die as met opzet nooit. De rest daalt pas als de
+meter de kern-tas per functie leest. Deze uitleg staat hier omdat een notitie in
+NORM.json alleen een meter uit NORM kan innen, en MACHINEDEKKING.json bij elke
+vastlegging in zijn geheel wordt herschreven.
 
 ---
 
@@ -607,7 +663,7 @@ Let op de naam: **"Huis" is in dit repository het woord voor het hele systeem**
 | **B — Minimale burgerlus** | zie hieronder | volgende stap |
 | **C — Neutraliteit** | zie hieronder | na B |
 | **D — Menselijkheid** | B1 (lokaal), toegankelijkheid, meertaligheid, bijeenkomsten, offline inbreng | een stap weg |
-| **E — DoeNetwerk** | een actie die bij de burger begint | een stap weg |
+| **E — DoeNetwerk** | een actie die bij de burger begint | **V1 staat** (28 september 2026, par. 6a); rollen invullen, benodigdheden en financiering niet |
 | **F — Politiek protocol** | aansluiting voor partijen, register met twee categorieën, voorstellen, bronnen, stemmingen | **pas als B én C groen zijn** |
 | **G — Toezeggingen** | het register van par. 8, extern verankerd vanaf versie 1 | na F |
 | **H — Rahul** | de democratische assistent | pas nu, omdat zijn grenzen dan al bestaan |
@@ -700,7 +756,7 @@ De snelste route is de kortste bewijsroute naar een bruikbare V1. Een trein, in 
 1. **B sluiten**: `DEKKING.json` uit een volledige meting, bewijsstand, CI groen.
 2. **C, alleen de constitutionele kern**: de vier actoren, vergelijken van invoer, uitvoering en uitkomst, de owner-aanvalsmatrix en de privacy-tegenproef. Geen echte partij, geen scherm, geen AI. Groen = bevroren.
 3. **De menselijke V1**: een simpele voorkant -- *wat speelt er bij jou?*, inbrengen, voortgang, uitkomst met reden, terugkoppeling -- met B1 en toegankelijkheid. Geen honderd schermen.
-4. **DoeNetwerk**: net genoeg om `samen-opgelost` echt te laten ontstaan (aansluiten, bijeenkomst, actie, resultaat, terugkoppeling), op genootschap en bijeenkomst.
+4. **DoeNetwerk**: net genoeg om `samen-opgelost` echt te laten ontstaan (aansluiten, bijeenkomst, actie, resultaat, terugkoppeling), op de regels van genootschap en bijeenkomst. **Staat** (28 september 2026, par. 6a).
 5. **Political Connector V1**: echte `politiekePartij` -- register, voorstel koppelen, toelichting, bron -- alle partijen hetzelfde contract.
 6. **`politiekeToezegging` V1**: registreren, bron, wijzigingen die alleen aangroeien, uitvoering of stemming, externe verankering. Geen score.
 7. **Rahul als laatste**: B1, samenvatten, ontbrekende bron, ontbrekend tegenargument, dekking en uitvoerbaarheid -- alleen op de kwestieprojectie, lokaal waar de grondwet dat eist.

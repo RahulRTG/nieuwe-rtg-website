@@ -104,6 +104,12 @@ function maakKwestieSchrijver({ nu, journaal }) {
     noteer(k, { wat: 'volgers', ronde: huidige(k).nr, erbij: refs.length });
   }
 
+  /* Een actie van het DoeNetwerk (./doe.js) begon, stopte of had een resultaat.
+     De kwestie bezit de actie niet; ze krijgt alleen de regel dat het gebeurde. */
+  function actie(k, id, fase) {
+    noteer(k, { wat: 'actie', ronde: huidige(k).nr, actie: id, fase });
+  }
+
   /* De terugkoppeling aan een ontvanger een trede verder zetten. Nooit terug. */
   function trede(k, ref, naar) {
     const tredes = ['klaargezet', 'gewekt', 'gezien'];
@@ -119,7 +125,7 @@ function maakKwestieSchrijver({ nu, journaal }) {
     return bewogen;
   }
 
-  return { nieuw, behandel, sluit, toetsEindstand, heropen, volg, trede, huidige, loopt };
+  return { nieuw, behandel, sluit, toetsEindstand, heropen, volg, actie, trede, huidige, loopt };
 }
 
 module.exports = { maakKwestieSchrijver };

@@ -164,6 +164,9 @@ const EIGENAAR = {
      bijkomen, niet te stijgen doordat er registers bijkomen zonder eigenaar. De
      vloer oprekken zou die zin precies omdraaien. */
   'PLANVORM.json': { schrijver: 'scripts/planvorm.js' },
+  'PLAATSVORM.json': { schrijver: 'scripts/plaatsvorm.js',
+    waarom: 'A0a uit NAVIGATIE.md par. 14.1: wat RTG onder een plaats verstaat, per afgeleid domein, over vorm, ' +
+      'woordenschat en aspecten. Bewaakt door test/plaatsvorm.test.js en scripts/norm.js (plaatsDomeinenGemeten omhoog).' },
 
   /* De officevorm: is er een `RTGObject` onder document, taak, betaling en de
      andere subtypen die het voorstel voor RTG Office Next noemt (OFFICE.md par.

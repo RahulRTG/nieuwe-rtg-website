@@ -467,7 +467,9 @@
     "mandaatproef": "node scripts/mandaatproef.js",
     "mandaatproef:vast": "node scripts/mandaatproef.js --vastleggen",
     "positieproef": "node scripts/positieproef.js",
-    "positieproef:vast": "node scripts/positieproef.js --vastleggen"
+    "positieproef:vast": "node scripts/positieproef.js --vastleggen",
+    "plaatsvorm": "node scripts/plaatsvorm.js",
+    "plaatsvorm:vast": "node scripts/plaatsvorm.js --vastleggen"
   },
   "devDependencies": {
     "playwright": "^1.63.0"

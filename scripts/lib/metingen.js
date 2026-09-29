@@ -195,6 +195,7 @@ const REGISTER = {
      gedeeldheid door een regex in plaats van door een feit, en leest de nul als
      bevestiging terwijl hij een blinde vlek is. */
   'PLANVORM.json': { meter: ['planDomeinenGemeten'] },
+  'PLAATSVORM.json': { meter: ['plaatsDomeinenGemeten'] },
   /* OFFICEVORM.json meet of de elf objectdomeinen onder het voorgestelde
      `RTGObject` (OFFICE.md par. 0) een datavorm delen. Geratelde waarde: het
      BEREIK, om exact de reden van PLANVORM.json hierboven -- de uitkomst is een

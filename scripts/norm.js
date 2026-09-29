@@ -762,6 +762,11 @@ const METERS = [
      publieke domeinen dat de meter ziet niet stil dalen. */
   { sleutel: 'stageDomeinenGemeten', richting: 'omhoog', wat: 'publieke domeinen die de stagevormmeter werkelijk heeft gezien' },
   { sleutel: 'planDomeinenGemeten', richting: 'omhoog', wat: 'plandomeinen die de planvormmeter werkelijk heeft gezien' },
+  /* Het BEREIK van de plaatsvormmeter (NAVIGATIE.md par. 14.1), om dezelfde
+     reden omhoog: de uitslag is een nul, en een nul over MINDER domeinen is
+     geen betere nul. De domeinlijst is afgeleid, dus hij krimpt alleen als de
+     lezer minder plaatsvormen ziet -- en dat is precies wat deze tand vangt. */
+  { sleutel: 'plaatsDomeinenGemeten', richting: 'omhoog', wat: 'plaatsdomeinen die de plaatsvormmeter werkelijk heeft gezien' },
   /* OFFICEVORM.json (OFFICE.md par. 0): het bereik onder de nul waarop het
      besluit rust dat er geen `RTGObject` komt. */
   { sleutel: 'officeDomeinenGemeten', richting: 'omhoog', wat: 'objectdomeinen die de officevormmeter werkelijk heeft gezien' },
@@ -1736,6 +1741,7 @@ function meet(bronnen) {
     stempelSchrijversGezien: leesRegister('STEMPELVEILIGHEID.json', (j) => j.schrijvers),
     stageDomeinenGemeten: leesRegister('STAGEVORM.json', (j) => j.gemeten.vorm.domeinen),
     planDomeinenGemeten: leesRegister('PLANVORM.json', (j) => j.rondes.ruim.vorm.domeinen.length),
+    plaatsDomeinenGemeten: leesRegister('PLAATSVORM.json', (j) => j.rondes.ruim.domeinen.length),
     officeDomeinenGemeten: leesRegister('OFFICEVORM.json', (j) => j.rondes.ruim.vorm.domeinen.length),
     neigingVerwijzingRot: leesRegister('NEIGINGVORM.json', (j) => j.gemeten.voorstel.rot),
     neigingVoorkeurBlind: leesRegister('NEIGINGVORM.json', (j) => j.gemeten.voorkeur.metAffiniteit - j.gemeten.voorkeur.metAlledrie),

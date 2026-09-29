@@ -505,7 +505,7 @@ if (require.main === module) {
   if (fout) process.exit(1);
   if (process.argv.includes('--vastleggen')) {
     const poort = eisSchoneBoom('positiestroom');
-    if (poort && poort.fout) { console.error(poort.fout); process.exit(1); }
+    if (!poort.ok) { console.error(poort.reden); process.exit(1); }
     fs.writeFileSync(DOEL, JSON.stringify(Object.assign({ stempel: stempel() }, uit), null, 2) + '\n');
     console.log('Vastgelegd in POSITIESTROOM.json\n');
   }

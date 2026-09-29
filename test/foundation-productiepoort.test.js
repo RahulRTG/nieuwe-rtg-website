@@ -172,7 +172,6 @@ test('alleen een PASS-dossier van exact de releasecommit opent de routepoort', a
   t.after(() => goed.sluit());
   assert.equal((await vraag(goed, '/api/rtfos/casussen')).status, 200);
   for (const pad of ['/api/foundation/gezin/inloggen', '/api/foundation/school/school/activeren',
-    '/api/rtf/samen/mee', '/api/rtf/leerling/paspoort',
     '/api/lab2/mijn', '/api/lab2/bewoner/paspoort',
     '/api/les/mee', '/api/member/sport/tickets', '/api/sport/scan',
     '/api/foundation/registratie/status', '/api/rtf/social/stream']) {
@@ -193,7 +192,11 @@ test('alleen een PASS-dossier van exact de releasecommit opent de routepoort', a
      met een geslaagd dossier gaat hij open, net als elke andere beschermde familie. */
   assert.equal((await vraag(goed, '/api/foundation/les/join')).status, 200,
     'de gemigreerde lescredential gaat met juridische vrijgave open');
-  assert.equal(goed.geraakt.length, 4);
+  /* Het gezinsprofieltoken is gemigreerd (B17): Samen en het leerpaspoort dragen
+     het als sessie en gaan met het dossier gewoon open. */
+  for (const pad of ['/api/rtf/samen/mee', '/api/rtf/leerling/paspoort'])
+    assert.equal((await vraag(goed, pad)).status, 200, pad + ' draagt het gemigreerde gezinstoken');
+  assert.equal(goed.geraakt.length, 6);
 });
 
 test('iedere bekende onvolwassen Foundation-credential heeft een blijvende productiesluiting', () => {
@@ -237,9 +240,10 @@ test('iedere bekende onvolwassen Foundation-credential heeft een blijvende produ
     const spatie = route.indexOf(' '), methode = route.slice(0, spatie), pad = route.slice(spatie + 1);
     assert.equal(gesloten(methode, pad, { action:'goedkeuren' }), true, route);
   }
-  /* De Samen-deelcode is gemigreerd, maar Samen draagt het gezinsprofieltoken als
-     sessie (rtfschool.js samenSess -> rtf.verifieerProfiel) en blijft dus dicht. */
-  assert.equal(maakPoort.isNogGeslotenCredentialroute('POST', '/api/rtf/samen/mee'), true);
+  /* De Samen-deelcode is gemigreerd, en het gezinsprofieltoken dat Samen als
+     sessie draagt (rtfschool.js samenSess -> rtf.verifieerProfiel) sinds B17 ook:
+     Samen staat niet meer in NOG_GESLOTEN. */
+  assert.equal(maakPoort.isNogGeslotenCredentialroute('POST', '/api/rtf/samen/mee'), false);
   /* En de lescredential onder /api/foundation is gemigreerd (B17): niet meer blijvend dicht. */
   for (const pad of ['/api/foundation/les/join', '/api/foundation/bord/stroke', '/api/foundation/ai'])
     assert.equal(maakPoort.isNogGeslotenCredentialroute('POST', pad, {}), false, pad);

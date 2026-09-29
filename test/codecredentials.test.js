@@ -81,11 +81,11 @@ test('de echte credentials uit de classificatieronde blokkeren de release', () =
   const register = poort.lees();
   const uit = poort.controleer(register);
   // office.gedeelde_kantoorcode is in productie gesloten (B10), identity.sso_client_secret per tenant
-  // versleuteld (B16), en partnerkanaal (B14) en link.capability_aanvaarden (B15) gemigreerd: zie de toetsen hieronder
+  // versleuteld (B16), en partnerkanaal (B14), link.capability_aanvaarden (B15) en beide
+  // Foundation-tokens (B17) gemigreerd: zie de toetsen hieronder
   const echte = ['travelos.ov_incheckcode',
     'mode.bezorgcode', 'festivalos.toegangspas',
-    'rtfos.activiteit_incheckcode',
-    'foundation.family_profile_token_buiten_harde_poort'];
+    'rtfos.activiteit_incheckcode'];
   // gemigreerd op 27 september 2026 (B9, de vier restdeuren): zie de toets hieronder
   const restdeuren = new Set(['travelos.ov_incheckcode', 'mode.bezorgcode', 'festivalos.toegangspas',
     'rtfos.activiteit_incheckcode']);
@@ -98,17 +98,6 @@ test('de echte credentials uit de classificatieronde blokkeren de release', () =
     for (const route of poort.effectieveRoutes(d))
       assert.ok(poort.REQUIRED_ROUTES.includes(route), route + ' hoort bewaakt te zijn');
   }
-  /* Elke consumer en uitgever van het niet-gemigreerde gezinsprofieltoken en de
-     onderwijslesfamilie zit sinds 27 september 2026 in NOG_GESLOTEN: in productie
-     dicht, ook met een geslaagd extern dossier. De deuren blijven remaining omdat
-     de credential zelf niet gemigreerd is. */
-  const vrijgave = require('../server/middleware/foundation-productiepoort');
-  for (const id of ['foundation.family_profile_token_buiten_harde_poort'])
-    for (const route of poort.effectieveRoutes(register.deuren.find(x => x.id === id))) {
-      const [methode, pad] = route.split(' ');
-      assert.equal(vrijgave.isNogGeslotenCredentialroute(methode, pad, {}) ||
-        vrijgave.VEILIGE_UITGANGEN.includes(route), true, route + ' hoort in NOG_GESLOTEN');
-    }
 });
 
 /* B14 (29 september 2026): het partnerkanaal is gesplitst. De personeelscode is
@@ -178,6 +167,31 @@ test('de lescredentials van onderwijs zijn gemigreerd en staan niet meer blijven
     const [methode, pad] = route.split(' ');
     assert.equal(vrijgave.isNogGeslotenCredentialroute(methode, pad, {}), false, route + ' staat nog in NOG_GESLOTEN');
   }
+});
+
+/* B17 (29 september 2026): het gezinsprofieltoken is gemigreerd. Zijn consumers
+   staan niet meer in NOG_GESLOTEN; de gezinsdeur zelf (gezinscode plus PIN) blijft
+   dicht onder foundation.family_profile_access, en dat staat er eerlijk bij. */
+test('het gezinsprofieltoken is gemigreerd, en de gezinsdeur zelf niet', () => {
+  const register = poort.lees();
+  const uit = poort.controleer(register);
+  const d = register.deuren.find(x => x.id === 'foundation.family_profile_token_buiten_harde_poort');
+  assert.equal(d.status, 'migrated');
+  assert.equal(d.release_blocker, false);
+  assert.ok(!uit.blockers.some(x => x.id === d.id), 'blokkeert niet meer');
+  for (const b of ['test/gezinstoken.test.js', 'test/gezinssessie.test.js',
+    'test/foundation-gezinstoken-productie.test.js', 'test/gezinsuitnodiging.pg.test.js'])
+    assert.ok(d.bewijs.includes(b), b);
+  assert.equal(d.controls.gezinsdeur_zelf_gemigreerd, false, 'de gezinscode plus PIN is niet gemigreerd, en dat staat er');
+  assert.ok(String(d.notitie).length >= 200);
+  const vrijgave = require('../server/middleware/foundation-productiepoort');
+  for (const route of poort.effectieveRoutes(d)) {
+    const [methode, pad] = route.split(' ');
+    if (pad.startsWith('/api/foundation/gezin/')) continue;
+    assert.equal(vrijgave.isNogGeslotenCredentialroute(methode, pad, {}), false, route + ' hoort niet meer in NOG_GESLOTEN');
+  }
+  assert.equal(register.deuren.find(x => x.id === 'foundation.family_profile_access').status, 'closed');
+  assert.equal(vrijgave.isNogGeslotenCredentialroute('POST', '/api/foundation/gezin/inloggen', {}), true);
 });
 
 /* B10 (27 september 2026): de gedeelde kantoorcode is in productie gesloten. Dat

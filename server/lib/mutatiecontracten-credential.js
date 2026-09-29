@@ -144,5 +144,7 @@ Object.assign(CONTRACTEN, {
     'idempotent', PUBLIEK_WERVING, 'test/werving-link.test.js',
     'leest uitsluitend bedrijf, functie en naam en consumeert de uitnodiging niet')
 });
+// het gezinsprofieltoken (B17): eigen bestand, want mutatiecontracten.js zit aan zijn grens
+Object.assign(CONTRACTEN, require('./mutatiecontracten-gezinstoken').CONTRACTEN);
 
 module.exports = { CONTRACTEN };

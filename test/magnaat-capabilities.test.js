@@ -196,7 +196,10 @@ test('de Capability Graph maakt de gekozen motorstand zichtbaar', () => {
    vlek. Geen nieuwe vorm, geen tweede oorzaak: de andere 33 routes van deze tak
    schrijven hun volle adres wel op en worden alle 33 gewoon gezien.
    ========================================================================== */
-const GEMIST_MAX = 583;   // +2 imap/roteer, +4 foundation/les: bekende vorm
+/* EN VAN 583 NAAR 585 OP 29 SEPTEMBER 2026 (B17): POST /api/foundation/gezin/sessie/roteer
+   en /intrek, in server/foundation/gezinssessie.js als router.post('/gezin/sessie/...') op de
+   /api/foundation-router -- de foundation-familie hierboven, geen nieuwe vorm. */
+const GEMIST_MAX = 585;   // +2 imap/roteer, +4 foundation/les, +2 gezin/sessie: bekende vorm
 const SPOOK_MAX = 6;      // routes die de bronscanner noemt en de router niet
 
 test('de bronscanner loopt niet verder achter op de router dan is vastgelegd', () => {

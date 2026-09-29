@@ -24,6 +24,15 @@
     }
   } catch (e) {}
   function lees() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
+  /* Afmelden gebeurt OOK op de server: de gezinssessie is een 128-bit token dat
+     alleen als hash bestaat (server/foundation/gezinstoken.js), en wie hem hier
+     weggooit zonder hem in te trekken laat een geldige sessie achter. Stil en
+     zonder te wachten: een mislukte intrekking verloopt vanzelf. */
+  function afmelden(s) {
+    if (!s || !s.code || !s.token) return;
+    try { fetch('/api/foundation/gezin/sessie/intrek', { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: s.code, token: s.token }) }).catch(function () {}); } catch (e) {}
+  }
   function api(p, b) {
     return fetch('/api/foundation' + p, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b || {}) })
       .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) { if (!r.ok) { var e = new Error(d.error || 'Er ging iets mis.'); e.data = d; e.needCv = !!d.needCv; e.status = r.status; throw e; } return d; }); });
@@ -60,7 +69,7 @@
         (beheer ? '<a href="beheer.html" style="padding:.65rem .85rem;border:1px solid #4a463d;border-radius:0;color:#f6f1e7;text-decoration:none">Leeftijd instellen</a>' : '') + '</div>') + '</div>';
     var wissel = el.querySelector('[data-rtf-wissel]');
     if (wissel) wissel.onclick = function () {
-      var ss = lees(); if (ss) { delete ss.token; delete ss.profiel; localStorage.setItem(KEY, JSON.stringify(ss)); }
+      var ss = lees(); if (ss) { afmelden(ss); delete ss.token; delete ss.profiel; localStorage.setItem(KEY, JSON.stringify(ss)); }
     };
     try { if (!el.open) el.showModal(); } catch (e) {}
     return el;

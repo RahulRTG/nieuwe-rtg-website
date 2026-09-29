@@ -1,8 +1,11 @@
 /* Veilige gezinstoegang. De gezinscode is alleen het adres; in productie
-   moet de eigen PIN tegelijk kloppen voordat een naam of token terugkomt. */
+   moet de eigen PIN tegelijk kloppen voordat een naam of token terugkomt.
+   Elke geslaagde inlog geeft een NIEUWE sessie (./gezinstoken.js), nooit een
+   bewaarde oude: het kale token staat alleen in dit antwoord. */
 module.exports = (ctx) => {
   const { router, gezinVan, eigenVeld, checkPin, geldigePin, pubProfiel,
-    pubGezin, teVaak, misluktePoging, goedePoging, ipVan } = ctx;
+    pubGezin, teVaak, misluktePoging, goedePoging, ipVan, gezinstoken, save } = ctx;
+  const sessie = (g, p) => { const token = gezinstoken.geef(g, p); save(); return token; };
 
   router.post('/gezin/inloggen', async (req, res) => {
     const bucket = 'inlog:' + ipVan(req);
@@ -25,7 +28,7 @@ module.exports = (ctx) => {
     goedePoging(bucket);
     if (profielen.length === 1) {
       const p = profielen[0];
-      return res.json({ token:p.token, profiel:pubProfiel(p), gezin:pubGezin(g) });
+      return res.json({ token:sessie(g, p), profiel:pubProfiel(p), gezin:pubGezin(g) });
     }
     res.json({ gezin:pubGezin(g), keuzes:profielen.map(p => pubProfiel(p)) });
   });
@@ -45,6 +48,6 @@ module.exports = (ctx) => {
       }
       goedePoging(bucket);
     }
-    res.json({ token:p.token, profiel:pubProfiel(p), gezin:pubGezin(g) });
+    res.json({ token:sessie(g, p), profiel:pubProfiel(p), gezin:pubGezin(g) });
   });
 };

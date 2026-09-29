@@ -146,7 +146,7 @@ const CONTRACTEN = Object.assign({},
   /* Het kantoor aan het stuur, uitsluitend op tonen (besluit C2). Zie de kop. */
   require('./mutatiecontracten-kantoorstuur').CONTRACTEN,
   require('./mutatiecontracten-rtgboek').CONTRACTEN,
-  /* Van een betaalde pas naar gast (besluit C5). Zie de kop. */
+  /* Pas naar gast (C5), zie de kop. */
   require('./mutatiecontracten-naargast').CONTRACTEN,
   /* De zevenenveertig die uit de afleidgang vielen toen die een grens erbij
      kreeg, met de hand gelezen op 13 september 2026. Drie bestanden omdat ze

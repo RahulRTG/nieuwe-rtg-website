@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T16:44:27.363Z",
-    "commit": "6ae85c8f",
+    "op": "2026-09-29T16:48:04.947Z",
+    "commit": "fcb0cee1",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -29,9 +29,10 @@
       "soort": "puur",
       "staat": "overleefd",
       "modules": [
-        "server/db/index.js"
+        "server/opzet/aanbouw.js",
+        "server/opzet/aanbouw2.js"
       ],
-      "geprobeerd": 5,
+      "geprobeerd": 3,
       "posities": 1000,
       "dekking": "dun"
     },

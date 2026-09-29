@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-29T21:20:37.271Z",
-    "commit": "6deb7c164",
+    "op": "2026-09-29T21:32:51.753Z",
+    "commit": "2a3e1dc5d",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 0,
     "instrument": "scripts/stilspoor.js",
     "node": "v24.18.0"
   },
@@ -12,10 +12,10 @@
   "grens": "Deze meting toont NIET aan dat een gesmoorde schrijfactie fout is -- server/log.js en kern/envelop.js smoren met reden. Het is een triagelijst, geen oordeel. Zij toont ook niet aan dat dit alle gevallen zijn: de herkenning van een spoor- of opslagschrijver is lexicaal, dus dit is een ONDERGRENS op de schuld. En zij zegt niets over aanroepers die de uitslag van een schrijfactie negeren zonder try/catch -- dat is dezelfde faalvorm zonder dit kenmerk.",
   "graad": "vermoed",
   "gemeten": {
-    "bestanden": 3908,
+    "bestanden": 3910,
     "vangers": 1996,
     "leegVangers": 696,
-    "spoorAanroepen": 264,
+    "spoorAanroepen": 265,
     "opslagAanroepen": 3351,
     "spoorGesmoord": 17,
     "opslagGesmoord": 24,

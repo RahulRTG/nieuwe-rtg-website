@@ -28,6 +28,7 @@
     };
     function open() {
       var view = (w.location.hash || '#bestellingen').slice(1);
+      if (view === 'aanvragen') view = 'meer';
       if (!teksten[view]) view = 'bestellingen';
       d.querySelectorAll('.shop-panel').forEach(function (p) { p.hidden = p.dataset.shopView !== view; });
       navEl.querySelectorAll('[data-shop]').forEach(function (a) {

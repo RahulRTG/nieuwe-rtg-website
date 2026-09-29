@@ -74,6 +74,11 @@ app.post('/api/supplier/mall/sync', supplierAuth, (req, res) => {
 app.post('/api/supplier/mall/aanvragen', supplierAuth, (req, res) => {
   res.json(kern.mall.mallAanvragen.voorZaak(req.supplier));
 });
+app.post('/api/supplier/mall/aanvraag/behandel', supplierAuth, (req, res) => {
+  const r = kern.mall.mallAanvragen.zaakActie(req.supplier, req.body.id, req.body.actie, req.body);
+  if (r.error) return res.status(r.status || 400).json({ error: r.error });
+  res.json(r);
+});
 app.post('/api/supplier/mall/aanvraag/reageer', supplierAuth, (req, res) => {
   const r = kern.mall.mallAanvragen.reageer(req.supplier, req.body.id, req.body || {});
   if (r.error) return res.status(r.status || 400).json({ error: r.error });

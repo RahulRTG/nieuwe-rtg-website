@@ -134,6 +134,14 @@ module.exports = (kern) => {
     lijstStuur(res, mall.mallAanvragen.plaats(req.session.key, liveCodename(req.session), req.body || {}));
   });
   app.post('/api/mall/aanvragen/mijn', auth, (req, res) => res.json(mall.mallAanvragen.mijn(req.session.key)));
-  app.post('/api/mall/aanvraag/sluit', auth, (req, res) => lijstStuur(res, mall.mallAanvragen.sluit(req.session.key, req.body.id)));
-  app.post('/api/mall/aanvraag/kies', auth, (req, res) => lijstStuur(res, mall.mallAanvragen.kies(req.session.key, req.body.id, req.body.code)));
+  app.post('/api/mall/aanvraag/wijzig', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    lijstStuur(res, mall.mallAanvragen.lidActie(req.session.key, req.body.id, 'wijzig', req.body));
+  });
+  app.post('/api/mall/aanvraag/heropen', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    lijstStuur(res, mall.mallAanvragen.lidActie(req.session.key, req.body.id, 'heropen', req.body));
+  });
+  app.post('/api/mall/aanvraag/sluit', auth, (req, res) => lijstStuur(res, mall.mallAanvragen.sluit(req.session.key, req.body.id, req.body)));
+  app.post('/api/mall/aanvraag/kies', auth, (req, res) => lijstStuur(res, mall.mallAanvragen.kies(req.session.key, req.body.id, req.body.code, req.body)));
 };

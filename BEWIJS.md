@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2125 bestanden en 14880 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2128 bestanden en 14892 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2125 |
-| losse beweringen (`test(...)`) | 14880 |
+| toetsbestanden | 2128 |
+| losse beweringen (`test(...)`) | 14892 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 173 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1460 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1462 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 75 |
 | alleen in de kop *genoemd*, nog niet gemeten | 172 |
-| niets van beide | 418 |
+| niets van beide | 419 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1860 bestanden, 14415 beweringen.
+1863 bestanden, 14427 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -294,7 +294,7 @@ toets omvalt.
 | `clubdorp.test.js` | 4 | gezakt op `liegpoort /api/` | Het clubdorp: bars, clubs en beachclubs krijgen dezelfde afdelingen-motor als het hotel, maar met de eigen afdelingen van de nachtzaak: van de deur en de garderobe tot promo, inkoop en het kantoor. Draai los: node... |
 | `clubs.test.js` | 8 | gezakt op `liegpoort /api/` | RTG Clubs: de golf- en countryclub (Sa Roca) en de sport- en fitnessclub (Fortia). Bewaakt de tee sheet zonder dubbele flights, de lessen van de pro's, de maandbeker met vol-is-vol, de baanstatus, de ledenpas met... |
 | `codecredentials-kortecode.test.js` | 3 | gezakt op `return-weg#0` | Een van de TWEE wegen onder de 128 bit in CODECREDENTIALS.json: een verklaarde korte menscode (`beleid.korte_menscode`), voor een code die een mens voorleest. De andere is `korte_code` van de bezorgcode... |
-| `codecredentials.test.js` | 13 | gezakt op `return-weg#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `codecredentials.test.js` | 14 | gezakt op `return-weg#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `codedeuren-claim.pg.test.js` | 1 | -- | Echte productie-topologieproef voor vier codedeuren die op 27 september 2026 van `remaining` naar `migrated` gingen: workos.concern_uitnodiging, office.kantooruitnodiging, service.balie_bevestigingscode en... |
 | `codegrens.test.js` | 3 | geen bruikbare mutatie | CODE-AI-001 -- DE RUNTIME-AI KOMT NOOIT AAN DE BRON. Dit huis heeft vandaag twee gescheiden intelligenties, en die scheiding is waardevoller dan hij eruitziet: RUNTIME het stuur (kern/stuur/*) bestuurt RTG via... |
 | `codewereld.test.js` | 7 | geen module gevonden | DE CODEWERELD TELT INDEXEN NIET ALS GEDRAG. Twee keer op rij sprong hier een dekkingsgetal omhoog zonder dat er iets bij was gekomen: eerst bij SYMBOLEN.json (bronbereik 33% -> 100%) en daarna bij AANROEPGRAAF.json... |
@@ -1161,6 +1161,9 @@ toets omvalt.
 | `papieren.test.js` | 10 | gezakt op `liegpoort /api/` | DE PAPIEREN: Rahul vraagt het AVG-papierwerk uit in plaats van een [VUL IN]-lijst achter te laten die niemand invult. Waar deze tests op letten, in volgorde van belang: 1. |
 | `partner.test.js` | 8 | gezakt op `liegpoort /api/` | Integratietests voor de PARTNER-app-flows (de leverancier-kant): - personeelslogin met PIN + rate-limiting (bescherming tegen raden) - restaurant/keuken (KDS): een order van nieuw naar klaar zetten - taxi: een rit... |
 | `partnerpas.test.js` | 9 | gezakt op `liegpoort /api/` | De toegangseis voor nieuwe partners: een partnerplek vraag je aan ALS LID, met een ZAKELIJKE pas. Het kantoor geeft ook alleen een code uit bij een aanvraag met ledenbewijs. |
+| `partnerpersoneelscode-register.test.js` | 6 | gezakt op `===->!==#0` | De personeelscode van het partnerkanaal zonder server (B14, partnerkanaal.personeels_en_partnercode): 128 bits, hash-only, onderwerp en doel, verval, een maximum aantal boekingen dat atomair wordt verbruikt, roteren... |
+| `partnerpersoneelscode.pg.test.js` | 1 | -- | Echte productie-topologieproef voor partnerkanaal.personeels_en_partnercode (B14). Twee onafhankelijke kerninstances delen de autoritatieve `partnerPersoneelscodes` in PostgreSQL. |
+| `partnerpersoneelscode.test.js` | 4 | gezakt op `liegpoort /api/` | HET PARTNERKANAAL GESPLITST (besluit B14, partnerkanaal.personeels_en_partnercode), tegen een echte server. De partnercode is een openbare attributielink die niets opent; de personeelscode is een 128-bit credential... |
 | `partnertypes.test.js` | 3 | -- | De twee leesingangen van de partneraanmelding: /api/partner/types (de kaart van wat RTG per bedrijfstype en land vraagt) en /api/partner/applications/mijn (de eigen aanvragen met hun toelatingsstand). Wat hier op het... |
 | `pas-apps.test.js` | 3 | gezakt op `liegpoort /api/` | Integratietests voor de eigen app per pas: inloggegevens werken echt alleen in de app van de eigen pas (pasApp). De gratis laag heeft geen eigen app en speelt mee in de RTG-app; de brede leden-app (zonder pasApp)... |
 | `pas-escalatie.test.js` | 5 | gezakt op `liegpoort /api/` | Merkregel-poort: de Lifestyle- en Business Pass komen UITSLUITEND na een menselijk besluit. Zelf-registreren mag ze nooit geven -- eerder gaf het tier-veld bij /api/auth/register direct een Business Pass (gevonden... |

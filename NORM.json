@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1761,
-    "toetsenNietGemeten": 645,
+    "toetsenNietGemeten": 643,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -847,8 +847,8 @@
       "sleutel": "toetsenNietGemeten",
       "van": 645,
       "vervalt": "2026-12-15",
-      "meter": "toetsenNietGemeten 645 -> 672",
-      "reden": "De vier RTG-werelden voegen 27 gerichte scherm-, route- en integratietoetsen toe die de volledige lokale schermsuite en projectcheck halen, maar waar de mutatiemotor nog niet langs is geweest. Dit is instrumentdekking en geen groenverklaring over ongemeten mutaties.",
+      "meter": "toetsenNietGemeten 643 -> 672",
+      "reden": "De vier RTG-werelden voegen 27 gerichte scherm-, route- en integratietoetsen toe die de volledige lokale schermsuite en projectcheck halen, maar waar de mutatiemotor nog niet langs is geweest. Dit is instrumentdekking en geen groenverklaring over ongemeten mutaties. De twee gewone toetsen zijn daarna door de mutatiemotor gemeten (beide zakken), dus de norm ging weer naar 643: alleen de pg-proef blijft ongemeten.",
       "waarheen": "laat de mutatiemotor precies over de 27 nieuwe toetsbestanden lopen en leg MUTATIES.json opnieuw uit een schone commit vast"
     },
     {

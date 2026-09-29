@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-28T13:09:00.323Z",
-    "commit": "7e624c0d1",
+    "op": "2026-09-29T15:29:03.004Z",
+    "commit": "760f20c5",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 3,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -9286,6 +9286,14 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "positieproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/positieproef.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "postdatum.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -10736,6 +10744,13 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "saloon-edge.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "saloon-lus.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -10751,6 +10766,13 @@
       "gezakt": 2,
       "geprobeerd": 3
     },
+    "saloon-redactie.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "saloon-zicht.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -10758,6 +10780,13 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 3
+    },
+    "saloon.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "samen-credential.test.js": {
       "soort": "puur",
@@ -11155,6 +11184,14 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/scim/groepen.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "script-bronnen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/script-bronnen.js",
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
@@ -13619,6 +13656,13 @@
       "gezakt": 1,
       "geprobeerd": 12
     },
+    "warm-presentation.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
     "wauw.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -14514,42 +14558,6 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
-    },
-    "saloon-edge.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "gezakt"
-    },
-    "saloon-redactie.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "gezakt"
-    },
-    "saloon.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "gezakt"
-    },
-    "script-bronnen.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/script-bronnen.js",
-      "operator": "===->!==#0",
-      "gezakt": 1,
-      "geprobeerd": 1
-    },
-    "warm-presentation.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 3,
-      "scherp": "gezakt"
     }
   }
 }

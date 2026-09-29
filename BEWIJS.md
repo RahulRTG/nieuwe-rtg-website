@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2134 bestanden en 14914 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2137 bestanden en 14928 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2134 |
-| losse beweringen (`test(...)`) | 14914 |
+| toetsbestanden | 2137 |
+| losse beweringen (`test(...)`) | 14928 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 173 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1467 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1469 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 75 |
 | alleen in de kop *genoemd*, nog niet gemeten | 172 |
-| niets van beide | 420 |
+| niets van beide | 421 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1868 bestanden, 14448 beweringen.
+1871 bestanden, 14462 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -294,7 +294,7 @@ toets omvalt.
 | `clubdorp.test.js` | 4 | gezakt op `liegpoort /api/` | Het clubdorp: bars, clubs en beachclubs krijgen dezelfde afdelingen-motor als het hotel, maar met de eigen afdelingen van de nachtzaak: van de deur en de garderobe tot promo, inkoop en het kantoor. Draai los: node... |
 | `clubs.test.js` | 8 | gezakt op `liegpoort /api/` | RTG Clubs: de golf- en countryclub (Sa Roca) en de sport- en fitnessclub (Fortia). Bewaakt de tee sheet zonder dubbele flights, de lessen van de pro's, de maandbeker met vol-is-vol, de baanstatus, de ledenpas met... |
 | `codecredentials-kortecode.test.js` | 3 | gezakt op `return-weg#0` | Een van de TWEE wegen onder de 128 bit in CODECREDENTIALS.json: een verklaarde korte menscode (`beleid.korte_menscode`), voor een code die een mens voorleest. De andere is `korte_code` van de bezorgcode... |
-| `codecredentials.test.js` | 16 | gezakt op `return-weg#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `codecredentials.test.js` | 17 | gezakt op `return-weg#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `codedeuren-claim.pg.test.js` | 1 | -- | Echte productie-topologieproef voor vier codedeuren die op 27 september 2026 van `remaining` naar `migrated` gingen: workos.concern_uitnodiging, office.kantooruitnodiging, service.balie_bevestigingscode en... |
 | `codegrens.test.js` | 3 | geen bruikbare mutatie | CODE-AI-001 -- DE RUNTIME-AI KOMT NOOIT AAN DE BRON. Dit huis heeft vandaag twee gescheiden intelligenties, en die scheiding is waardevoller dan hij eruitziet: RUNTIME het stuur (kern/stuur/*) bestuurt RTG via... |
 | `codewereld.test.js` | 7 | geen module gevonden | DE CODEWERELD TELT INDEXEN NIET ALS GEDRAG. Twee keer op rij sprong hier een dekkingsgetal omhoog zonder dat er iets bij was gekomen: eerst bij SYMBOLEN.json (bronbereik 33% -> 100%) en daarna bij AANROEPGRAAF.json... |
@@ -489,10 +489,13 @@ toets omvalt.
 | `fonds.test.js` | 9 | gezakt op `liegpoort /api/` | Sociale afdracht: van elke bevestigde maandbetaling gaat 30% (ex btw) als twee formele claims naar 20% lokaal en 10% RTFoundation. We toetsen drie lagen: 1. |
 | `foodcourt.test.js` | 3 | gezakt op `liegpoort /api/` | De RTG Food Court (kern/foodcourt.js): alle restaurants op een rij, in de stijl van een reserveerplatform. Overzicht met keuken/prijs/ledenvoordeel, vrije tijdsloten per datum en gezelschap, en reserveren via... |
 | `foundation-geld-later.test.js` | 5 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `foundation-gezinstoken-productie.test.js` | 4 | gezakt op `liegpoort /api/` | De niet-gemigreerde gezins- en lesdragers zijn in productie DICHT, ook met een geslaagd extern Foundation-dossier; en de gedeelde Zaakdoos-sleutel opent in productie niets meer (B12): de kloon is dan 503 en de meting... |
+| `foundation-gezinstoken-productie.test.js` | 4 | gezakt op `liegpoort /api/` | De niet-gemigreerde gezinsdragers zijn in productie DICHT, ook met een geslaagd extern Foundation-dossier; de lesfamilie is sinds 29 september 2026 gemigreerd (B17) en gaat met dat dossier gewoon open; en de gedeelde... |
 | `foundation-gezondheid-welzijn.test.js` | 5 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `foundation-hulp-zorg.test.js` | 4 | -- | De Hulp & Zorg-voorzijde mag warm en persoonlijk ogen, maar nooit een zorgverlener, dossier of toestemming verzinnen. Deze toets bewaakt de drie getekende schermen en hun echte databronnen. |
 | `foundation-leren-groei.test.js` | 5 | -- | Leren & Groei toont de bestaande leerroute in de drie goedgekeurde schermen. De toets bewaakt dat vorm nooit wordt verward met bewijs. |
+| `foundation-lescredential-server.test.js` | 3 | gezakt op `liegpoort /api/` | De lescredentials van RTFoundation-onderwijs tegen een ECHTE server (B17): elke nieuwe route krijgt hier een treffer, met de montage, de deur en de generieke antwoordcaches ervoor. Zie... |
+| `foundation-lescredential.pg.test.js` | 1 | -- | Echte productie-topologieproef voor de lescredentials van RTFoundation- onderwijs (B17, CODECREDENTIALS.json foundation.onderwijs_les_tokens). Twee onafhankelijke instances delen dezelfde PostgreSQL. |
+| `foundation-lescredential.test.js` | 9 | gezakt op `!==->===#0` | De lescredentials van RTFoundation-onderwijs (B17, CODECREDENTIALS.json foundation.onderwijs_les_tokens) op moduleniveau: vorm, hash-only, verval, de claim met zijn plafond, intrekken en roteren, en dat een kind geen... |
 | `foundation-lesrem.test.js` | 3 | genoemd | DE LES-MAAKROUTE HEEFT DE REM DIE HAAR REDEN BELOOFDE. WAT ER MIS WAS. |
 | `foundation-markt.test.js` | 5 | gezakt op `liegpoort /api/` | DE MARKTPLAATS VAN DE FOUNDATION -- 4 endpoints. detail, verwijder, chat en blokkeer stonden als nooit aangeroepen in de waargenomen dekkingsmeting. |
 | `foundation-meedoen-ontdekken.test.js` | 5 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |

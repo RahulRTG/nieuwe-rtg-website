@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T16:06:16.725Z",
-    "commit": "8640de68",
+    "op": "2026-09-29T16:11:43.008Z",
+    "commit": "b5721d54",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -3301,6 +3301,21 @@
       "operator": "liegpoort /api/",
       "gezakt": 2,
       "scherp": "gezakt"
+    },
+    "foundation-lescredential-server.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "foundation-lescredential.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/foundation/onderwijs/toegang.js",
+      "operator": "!==->===#0",
+      "gezakt": 8,
+      "geprobeerd": 2
     },
     "foundation-markt.test.js": {
       "soort": "server",

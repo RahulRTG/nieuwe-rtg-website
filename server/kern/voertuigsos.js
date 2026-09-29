@@ -16,7 +16,7 @@
 const { veeg } = require('./sospositie');
 const SOORTEN = { huur: 1, charter: 1 };
 
-function vergeetSosPosities(boekingen, nu) {
+function vergeetVoertuigSos(boekingen, nu) {
   let n = 0;
   for (const b of boekingen || []) {
     if (!b || !SOORTEN[b.kind] || !Array.isArray(b.sos) || !b.sos.length) continue;
@@ -25,4 +25,4 @@ function vergeetSosPosities(boekingen, nu) {
   return n;
 }
 
-module.exports = { vergeetSosPosities };
+module.exports = { vergeetVoertuigSos };

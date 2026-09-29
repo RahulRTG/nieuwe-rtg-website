@@ -46,7 +46,7 @@ module.exports = ({ opslag, save }) => {
        kring niets, dus is er ook niets om te onthouden. De melding slaagt wel
        (200): het toestel doet niets fout, er valt alleen niets te bewaren. */
     const venster = vensterOpen_(handle);
-    if (!venster) { vergeet(V, handle); save(); return { status: 200, ok: true, at: punt.at, bewaard: false }; }
+    if (!venster) { vergeetHandle(V, handle); save(); return { status: 200, ok: true, at: punt.at, bewaard: false }; }
     V.plek[handle] = punt;
     venster.spoor = (venster.spoor || []).concat([punt]).slice(-SPOOR_MAX);
     save();
@@ -54,7 +54,7 @@ module.exports = ({ opslag, save }) => {
   }
 
   // Venster en plek gaan samen weg: de plek bestond alleen voor dit venster (N19).
-  function vergeet(V, handle) { delete V.vensters[handle]; delete V.plek[handle]; }
+  function vergeetHandle(V, handle) { delete V.vensters[handle]; delete V.plek[handle]; }
 
   function laatstePlek(handle) {
     const V = lijsten();
@@ -74,7 +74,7 @@ module.exports = ({ opslag, save }) => {
   function vensterSluit(handle) {
     const V = lijsten();
     // het spoor en de laatste plek gaan mee weg: ze bestonden alleen voor dit venster (N19)
-    vergeet(V, handle);
+    vergeetHandle(V, handle);
     save();
     return { status: 200, ok: true };
   }

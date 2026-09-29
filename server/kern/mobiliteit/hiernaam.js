@@ -22,7 +22,7 @@
 const BUURT_M = 5000;   // verder dan dit is een naam geen "bij" meer
 
 module.exports = ({ ovHaltes, opslag, haversine }) => {
-  function kandidaten() {
+  function plaatsKandidaten() {
     const uit = [];
     for (const h of (ovHaltes ? ovHaltes() : [])) uit.push({ naam: h.naam, lat: h.lat, lng: h.lng });
     for (const s of (opslag.vreemd.leveranciers() || [])) {
@@ -38,7 +38,7 @@ module.exports = ({ ovHaltes, opslag, haversine }) => {
   function hierAlsNaam(plek) {
     if (!plek || plek.bron !== 'live') return plek;
     let beste = null, af = Infinity;
-    for (const k of kandidaten()) {
+    for (const k of plaatsKandidaten()) {
       const m = haversine({ lat: plek.lat, lng: plek.lng }, { lat: k.lat, lng: k.lng });
       if (m != null && m < af) { af = m; beste = k; }
     }

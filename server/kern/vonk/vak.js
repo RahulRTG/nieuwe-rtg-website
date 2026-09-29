@@ -30,7 +30,7 @@ function dlngOp(midLat) {
 }
 
 /* Punt -> vaknaam, of null als het punt geen punt op aarde is. */
-function vakVan(lat, lng) {
+function vakVanPunt(lat, lng) {
   lat = Number(lat); lng = Number(lng);
   if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
   const rij = Math.floor(Math.min(lat, 89.99) / DLAT);
@@ -54,9 +54,41 @@ const plekVan = p => (p && p.vak ? middenVan(p.vak) : null);
 /* Een profiel van voor N21: het punt wordt een vak en het punt verdwijnt. */
 function vakMigreer(p) {
   if (!p || (!('lat' in p) && !('lng' in p))) return false;
-  if (!p.vak) p.vak = vakVan(p.lat, p.lng);
+  if (!p.vak) p.vak = vakVanPunt(p.lat, p.lng);
   delete p.lat; delete p.lng;
   return true;
 }
 
-module.exports = { vakVan, middenVan, plekVan, vakMigreer, KM };
+/* Alle profielen in een keer. `migreerEenmaal` doet dat een keer per
+   Vonk-opslag (per proces, en opnieuw als de opslag wordt vervangen). */
+function migreerAlle(profielen) {
+  let n = 0;
+  for (const p of Object.values(profielen || {})) if (vakMigreer(p)) n++;
+  return n;
+}
+const gemigreerd = new WeakSet();
+function migreerEenmaal(vonk, save) {
+  if (!vonk || gemigreerd.has(vonk)) return;
+  gemigreerd.add(vonk);
+  if (migreerAlle(vonk.profielen)) save();
+}
+
+/* Twee profielen als paar om een plek in het midden te zoeken: de middens van
+   hun vakken, met hun datewens erbij, en het midden daartussen -- of null. */
+function paar(pa, pb) {
+  const a = plekVan(pa), b = plekVan(pb);
+  if (!a || !b) return null;
+  return { a: { ...a, datewens: pa.datewens }, b: { ...b, datewens: pb.datewens },
+    mid: { lat: (a.lat + b.lat) / 2, lng: (a.lng + b.lng) / 2 } };
+}
+
+/* Bij het opslaan van een profiel: alleen het vak blijft, nooit het punt, en
+   wie Vonk uitzet laat geen plek achter -- aanzetten vraagt een nieuwe. */
+function vakBijOpslaan(p, lat, lng) {
+  const vak = vakVanPunt(lat, lng);
+  if (vak) p.vak = vak;
+  vakMigreer(p);
+  if (!p.actief) delete p.vak;
+}
+
+module.exports = { vakVanPunt, middenVan, plekVan, vakMigreer, migreerAlle, migreerEenmaal, vakBijOpslaan, paar, KM };

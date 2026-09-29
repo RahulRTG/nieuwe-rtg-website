@@ -115,7 +115,7 @@ module.exports = ({ opslag, save, crypto, kring, plek, meldAan, mail, appUrl }) 
     a.afgesloten = true; a.afgeslotenAt = nu(); a.hoe = String(hoe || '').slice(0, 120);
     /* DE PLEK HOORT BIJ DE MELDING (NAVIGATIE.md N18). Een proefalarm, of een
        alarm dat de melder binnen een minuut zelf afsluit, verliest hem nu; een
-       echt alarm houdt hem nog 90 dagen (vergeetSosPosities hieronder). Afsluiten
+       echt alarm houdt hem nog 90 dagen (vergeetAlarmPlekken hieronder). Afsluiten
        doet hier altijd de melder zelf -- de route en de wacht sluiten alleen het
        eigen alarm. */
     if (directWeg(a)) sosPositie.wis(a, ['plek']);
@@ -132,7 +132,7 @@ module.exports = ({ opslag, save, crypto, kring, plek, meldAan, mail, appUrl }) 
   const directWeg = (a) => sosPositie.directWeg({ at: a.at, dicht: a.afgeslotenAt, proef: a.proef, doorMelder: true });
 
   // Voor de bewaarveger: 90 dagen na afsluiten, of een proef die toch bleef staan.
-  function vergeetSosPosities(t) {
+  function vergeetAlarmPlekken(t) {
     return sosPositie.veeg(lijsten(), { velden: ['plek'], dicht: a => a.afgesloten && a.afgeslotenAt, direct: directWeg, nu: t });
   }
 
@@ -165,5 +165,5 @@ module.exports = ({ opslag, save, crypto, kring, plek, meldAan, mail, appUrl }) 
     catch (e) { return false; }   // bij twijfel niet in de weg staan
   }
 
-  return { alarmSlaan, alarmAfsluiten, alarmenVan, alarmenVoorMij, kaartLink, kringLeeg, vergeetSosPosities };
+  return { alarmSlaan, alarmAfsluiten, alarmenVan, alarmenVoorMij, kaartLink, kringLeeg, vergeetAlarmPlekken };
 };

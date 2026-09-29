@@ -17,18 +17,10 @@ function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan
   media, connectionMediaTicketSecret }) {
   const id = () => 'vonk' + crypto.randomBytes(5).toString('hex');
   const nu = () => new Date().toISOString();
-  let gemigreerd = false;
   function d() {
     if (!db.data.vonk || typeof db.data.vonk !== 'object')
       db.data.vonk = { profielen: {}, likes: [], matches: [], meldingen: [] };
-    /* Een profiel van voor N21 droeg nog een punt; het wordt een keer per proces
-       een vak (./vak.js), zodat het punt ook uit oude profielen verdwijnt. */
-    if (!gemigreerd) {
-      gemigreerd = true;
-      let n = 0;
-      for (const p of Object.values(db.data.vonk.profielen || {})) if (V.vakMigreer(p)) n++;
-      if (n) save();
-    }
+    V.migreerEenmaal(db.data.vonk, save);   // een punt van voor N21 wordt een vak
     return db.data.vonk;
   }
 
@@ -53,14 +45,9 @@ function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan
     if (Array.isArray(data.interesses)) p.interesses = data.interesses.map(x => schoon(x, 24)).filter(Boolean).slice(0, 8);
     p.interesses = p.interesses || [];
     p.stad = schoon(data.stad, 40) || p.stad || '';
-    /* Alleen het vak van 5 km blijft, nooit het punt (NAVIGATIE.md N21). */
-    const vak = V.vakVan(coord(data.lat, 90), coord(data.lng, 180));
-    if (vak) p.vak = vak;
-    V.vakMigreer(p);
     p.blokkade = p.blokkade || [];
     p.actief = data.actief === false ? false : true;
-    // wie Vonk uitzet, laat ook geen plek achter (N21); aanzetten vraagt een nieuwe
-    if (!p.actief) delete p.vak;
+    V.vakBijOpslaan(p, coord(data.lat, 90), coord(data.lng, 180));   // een vak van 5 km, nooit het punt (N21)
     p.leeftijd = poort.leeftijd;
     /* De voorkeurstaal (./wensen.js). Drie gescheiden dingen, en die scheiding
        is het punt: kenmerken zijn wie u bent, wensen zijn wat u van een ander
@@ -135,10 +122,9 @@ function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan
     /* De drie plekken rond het midden. De aardrijkskunde blijft hier -- halfweg
        rekent niet zelf aan afstanden maar krijgt ze aangeleverd. */
     optiesVoor: (pa, pb, planning) => {
-      const a = V.plekVan(pa), b = V.plekVan(pb);   // middens van de vakken (N21)
-      if (!a || !b) return null;
-      return H.drieOpties({ a: { ...a, datewens: pa.datewens }, b: { ...b, datewens: pb.datewens },
-        suppliers: db.data.suppliers, mid: { lat: (a.lat + b.lat) / 2, lng: (a.lng + b.lng) / 2 },
+      const P = V.paar(pa, pb);   // middens van de vakken (N21)
+      if (!P) return null;
+      return H.drieOpties({ ...P, suppliers: db.data.suppliers,
         afstandM: (p, l) => haversine({ lat: p.lat, lng: p.lng }, { lat: l.lat, lng: l.lng }),
         reisMin: m => etaMinutes(m, 'driving'), date: planning && planning.date,
         time: planning && planning.time, bookings: db.data.reserveringen || [] });

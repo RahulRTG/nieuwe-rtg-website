@@ -93,48 +93,12 @@ function maakOv({ db, save, crypto, schoon, codenaamVan, haversine, etaMinutes, 
   const versVoertuig = v => Date.now() - new Date(v.at).getTime() < VOERTUIG_TTL_MS;
   const actieveRit = key => db.data.ovRitten.find(r => r.key === key && r.status === 'in') || null;
 
-  /* HALTE IN PLAATS VAN PUNT (NAVIGATIE.md N17). Het tarief heeft een AFSTAND
-     nodig en geen punt; wat na de rit blijft is in- en uitstaphalte, afstand en
-     prijs -- een jaar (server/bewaarbeleid-vervoer.js). De halte komt uit de
-     eigen haltelijst van de lijn: een openbare plek en geen spoor van een mens.
-     Tijdens de rit mag alles wat het tarief vraagt (N11): het instappunt woont
-     dan in `inPunten`, alleen in het geheugen, en gaat bij het uitchecken weg.
-     Na een herstart is het er niet meer; dan rekent het tarief vanaf de
-     instaphalte -- een iets andere som, geen verzonnen punt. */
-  const inPunten = new Map();           // rit.id -> { lat, lng }, alleen tijdens de rit
-  function halteBij(lijn, punt) {
-    let beste = null, m = Infinity;
-    for (const h of (lijn && lijn.haltes) || []) {
-      const d = haversine(punt, h);
-      if (Number.isFinite(d) && d < m) { m = d; beste = h; }
-    }
-    return beste ? { halte: beste.naam, halteId: beste.id } : { halte: null, halteId: null };
-  }
-  function inPuntVan(rit, lijn) {
-    const p = inPunten.get(rit.id);
-    if (p) return p;
-    const h = ((lijn && lijn.haltes) || []).find(x => x.id === rit.in.halteId);
-    return h ? { lat: h.lat, lng: h.lng } : null;
-  }
-  /* Ritten van voor N17 droegen het instap- en uitstapPUNT. Die worden bij het
-     opstarten omgezet naar halte (een lopende rit houdt zijn punt in het
-     geheugen tot het uitchecken), zodat het besluit ook geldt voor wat er al
-     stond en niet alleen voor wat er bijkomt. */
-  function puntenWeg() {
-    let raak = false;
-    for (const r of db.data.ovRitten) {
-      const s = ovZaak(r.code), lijn = s ? lijnVan(s, r.lijnId) : null;
-      for (const kant of ['in', 'uit']) {
-        const p = r[kant];
-        if (!p || !Number.isFinite(p.lat)) continue;
-        if (kant === 'in' && r.status === 'in') inPunten.set(r.id, { lat: p.lat, lng: p.lng });
-        r[kant] = { ...halteBij(lijn, p), at: p.at };
-        raak = true;
-      }
-      if (!r.at && r.in) { r.at = r.in.at; raak = true; }
-    }
-    if (raak) save();
-  }
+  /* Halte in plaats van punt (NAVIGATIE.md N17): ./halte.js. De omzetting van
+     oude ritten krijgt de lijst en de lijn per rit, en slaat hier op. */
+  const { inPunten, halteBij, inPuntVan, puntenWeg: naarHalte } = require('./halte')({ haversine });
+  const puntenWeg = () => {
+    if (naarHalte(db.data.ovRitten, r => { const s = ovZaak(r.code); return s ? lijnVan(s, r.lijnId) : null; })) save();
+  };
 
   function ritStart(key, voertuig) {
     if (actieveRit(key)) return { status: 409, error: 'Al ingecheckt.' };

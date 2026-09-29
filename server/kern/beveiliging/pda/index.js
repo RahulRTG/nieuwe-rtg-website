@@ -86,7 +86,7 @@ module.exports = (ctx) => {
      afgehandeldAt; de klok start dan nu -- met terugwerkende kracht een datum
      verzinnen zou een plek wissen op een moment dat niemand koos (zelfde vorm als
      geverifieerdOp in bewaarveger.js). */
-  function vergeetSosPosities(t) {
+  function vergeetPdaSos(t) {
     const lijst = incidenten();
     let klok = 0;
     for (const x of lijst) if (x.status === 'afgehandeld' && !x.afgehandeldAt) { x.afgehandeldAt = nu(); klok++; }
@@ -122,6 +122,6 @@ module.exports = (ctx) => {
   }
 
   return Object.assign(
-    { meldIncident, beslisIncident, sos, command, vergeetSosPosities },
+    { meldIncident, beslisIncident, sos, command, vergeetPdaSos },
     patrouille);
 };

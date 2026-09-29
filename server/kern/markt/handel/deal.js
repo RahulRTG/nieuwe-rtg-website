@@ -46,13 +46,11 @@ module.exports = (ctx) => {
     if (!isDeelnemer(chat, partij)) return { error: 'Dit gesprek is niet van jou.', status: 403 };
     if (!chat.deal || !chat.deal.bedrag) return { error: 'Spreek eerst een prijs af.', status: 400 };
     if (!Number.isFinite(Number(lat)) || !Number.isFinite(Number(lng))) return { error: 'We konden je locatie niet lezen. Zet locatie aan.', status: 400 };
-    /* Alleen een wachtend punt en daarna de uitkomst; nooit twee punten op de
-       chat (NAVIGATIE.md N21, ./samenkomst.js). Oude wachtende punten van
-       andere gesprekken vervallen hier mee: er is geen veger voor de markt. */
-    // al samen: de uitkomst staat, en een nieuw punt heeft geen doel meer
+    /* Een wachtend punt en daarna de uitkomst, nooit twee punten op de chat
+       (NAVIGATIE.md N21, ./samenkomst.js). Al samen: een nieuw punt heeft geen doel. */
     if (chat.deal.samen) return { ok: true, chat: chatPub(chat, partij), samen: true, afstand: chat.deal.afstand };
     const nuMs = Date.now();
-    for (const c of Object.values(store().chats || {})) S.vervalWacht(c.deal, nuMs, SAMEN_VERS_MS);
+    S.vervalAlle(store().chats, nuMs, SAMEN_VERS_MS);
     const uit = S.samenMeld(chat.deal, rolIn(chat, partij), Number(lat), Number(lng),
       { nuMs, versMs: SAMEN_VERS_MS, samenMeter: SAMEN_METER, haversine });
     const afstand = uit.afstand;

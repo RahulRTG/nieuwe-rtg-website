@@ -94,7 +94,7 @@ module.exports = function start(deps) {
     radarVeeg: () => (typeof kern.ontmoetVergeetOudePosities === 'function' ? kern.ontmoetVergeetOudePosities() : 0),
     /* en de posities die bij een melding of venster horen: elk domein wist zijn
        eigen (NAVIGATIE.md N18, N19). Een naam die ontbreekt veegt niets. */
-    sosVeeg: [(t) => require('../kern/voertuigsos').vergeetSosPosities(db.data.boekingen, t)].concat(
+    sosVeeg: [(t, data) => require('../kern/voertuigsos').vergeetVoertuigSos(data.boekingen, t)].concat(
       ['ontmoetVergeetSosPosities', 'veiligVergeetSosPosities', 'veiligVergeetVerlopenPlekken',
         'bevVergeetSosPosities', 'bevVergeetRondePosities']
         .map(n => (t) => (typeof kern[n] === 'function' ? kern[n](t) : 0))) });

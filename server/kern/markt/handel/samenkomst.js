@@ -51,4 +51,10 @@ function gedeeldVers(deal, rol, nuMs, versMs) {
   return !!t && nuMs - t < versMs;
 }
 
-module.exports = { vervalWacht, samenMeld, gedeeldVers };
+/* Verlopen wachtende punten van ALLE gesprekken: er is geen veger voor de
+   markt, dus elke nieuwe melding ruimt ze mee op. */
+function vervalAlle(chats, nuMs, versMs) {
+  for (const c of Object.values(chats || {})) vervalWacht(c && c.deal, nuMs, versMs);
+}
+
+module.exports = { vervalWacht, vervalAlle, samenMeld, gedeeldVers };

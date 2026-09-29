@@ -87,7 +87,8 @@ function maakBewaarveger({ db, save, accounts, identiteitsmap, lidmaatschapTot, 
        bij de radar. Een domein dat faalt houdt de andere niet tegen, en het
        falen wordt gemeld en niet opgegeten. */
     for (const f of Array.isArray(sosVeeg) ? sosVeeg : []) {
-      try { sosPosities += Number(f(t)) || 0; }
+      // de veger is de deur naar de opslag: een domein krijgt de data mee en grijpt er niet zelf naar
+      try { sosPosities += Number(f(t, db.data)) || 0; }
       catch (e) {
         if (log && log.schrijf) {
           try { log.schrijf('warn', 'bewaarveger-sos', { fout: String((e && e.message) || e) }); } catch (x) { /* de logger zelf faalt: niets meer te melden */ }

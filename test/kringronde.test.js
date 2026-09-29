@@ -30,7 +30,7 @@ function bouwPlek() {
 }
 
 test('1. zonder open venster wordt de plek niet bewaard', () => {
-  /* ZAKT OP: de regel `if (!venster) { vergeet(...); ... }` in plekMelden
+  /* ZAKT OP: de regel `if (!venster) { vergeetHandle(...); ... }` in plekMelden
      weghalen -- dan onthoudt de server weer een plek terwijl er niets loopt. */
   const { plek, V } = bouwPlek();
   const r = plek.plekMelden('H', { lat: 52.3676, lon: 4.9041 });
@@ -41,7 +41,7 @@ test('1. zonder open venster wordt de plek niet bewaard', () => {
 });
 
 test('2. binnen een venster blijft de laatste plek, en bij sluiten gaat hij mee weg', () => {
-  /* ZAKT OP: `delete V.plek[handle]` uit vergeet() halen -- dan blijft de plek
+  /* ZAKT OP: `delete V.plek[handle]` uit vergeetHandle() halen -- dan blijft de plek
      na het sluiten van de wacht staan. */
   const { plek, V } = bouwPlek();
   plek.vensterOpen('H', 60, 'wacht');

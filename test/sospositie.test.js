@@ -50,7 +50,7 @@ test('2. huur en charter: de SOS op de boeking, dicht met ok.at van de zaak', ()
   /* ZAKT OP: `n += veeg(...)` in kern/voertuigsos.js weghalen -- dan blijft de
      plek van een afgehandelde SOS eeuwig op de boeking staan.
      ZAKT OP: SOORTEN tot `huur` versmallen -- dan blijft de charter staan. */
-  const { vergeetSosPosities } = require('../server/kern/voertuigsos');
+  const { vergeetVoertuigSos } = require('../server/kern/voertuigsos');
   const oud = { door: 'Balie', at: iso(T0 - 91 * DAG) };
   const boekingen = [
     { kind: 'huur', sos: [{ bericht: 'pech', at: iso(T0 - 92 * DAG), lat: 38.9, lng: 1.3, ok: oud },
@@ -59,7 +59,7 @@ test('2. huur en charter: de SOS op de boeking, dicht met ok.at van de zaak', ()
     { kind: 'charter', sos: [{ bericht: 'net af', at: iso(T0 - 2 * DAG), lat: 38.7, lng: 1.1, ok: { door: 'x', at: iso(T0 - DAG) } }] },
     { kind: 'tafel', sos: [{ lat: 1, lng: 2, ok: oud }] }
   ];
-  assert.equal(vergeetSosPosities(boekingen, T0), 2);
+  assert.equal(vergeetVoertuigSos(boekingen, T0), 2);
   assert.equal(boekingen[0].sos[0].lat, null, 'huur: 91 dagen na afhandelen weg');
   assert.equal(boekingen[0].sos[0].bericht, 'pech', 'de melding zelf blijft, alleen de plek gaat eraf');
   assert.equal(boekingen[0].sos[1].lat, 38.8, 'huur: een open SOS houdt zijn plek');
@@ -132,7 +132,7 @@ test('4. alarm van de kring: een proef verliest zijn plek bij afsluiten', () => 
 
 test('5. alarm van de kring: binnen een minuut zelf afgesloten is ingetrokken; daarna blijft de plek 90 dagen', () => {
   /* ZAKT OP: INTREK_MS op 0 -- dan houdt een meteen ingetrokken alarm zijn plek.
-     ZAKT OP: vergeetSosPosities in alarm.js laten teruggeven zonder te vegen. */
+     ZAKT OP: vergeetAlarmPlekken in alarm.js laten teruggeven zonder te vegen. */
   const b = bouwAlarm();
   const snel = slaMetPlek(b, {});
   assert.equal(b.alarm.alarmAfsluiten('H', snel.id).status, 200);
@@ -142,14 +142,14 @@ test('5. alarm van de kring: binnen een minuut zelf afgesloten is ingetrokken; d
   echt.at = iso(Date.now() - 5 * 60000);
   assert.equal(b.alarm.alarmAfsluiten('H', echt.id, 'het is goed').status, 200);
   assert.equal(echt.plek.lat, 52.37, 'een echt alarm houdt zijn plek na afsluiten');
-  assert.equal(b.alarm.vergeetSosPosities(Date.now() + 89 * DAG), 0);
+  assert.equal(b.alarm.vergeetAlarmPlekken(Date.now() + 89 * DAG), 0);
   assert.equal(echt.plek.lat, 52.37, 'dag 89: blijft');
-  assert.equal(b.alarm.vergeetSosPosities(Date.now() + 91 * DAG), 1);
+  assert.equal(b.alarm.vergeetAlarmPlekken(Date.now() + 91 * DAG), 1);
   assert.equal(echt.plek, null, 'dag 91: weg');
 });
 
 test('6. alarm van de kring: een alarm dat openstaat houdt zijn plek, en de veger vangt een proef die bleef staan', () => {
-  /* ZAKT OP: `direct: directWeg` uit vergeetSosPosities halen -- dan blijft een
+  /* ZAKT OP: `direct: directWeg` uit vergeetAlarmPlekken halen -- dan blijft een
      proef die buiten alarmAfsluiten dicht ging zijn plek 90 dagen houden.
      ZAKT OP: `a.afgesloten &&` uit de dicht-functie halen (dan telt een open
      alarm met een oude afgeslotenAt als dicht). */
@@ -158,7 +158,7 @@ test('6. alarm van de kring: een alarm dat openstaat houdt zijn plek, en de vege
   open.afgeslotenAt = iso(Date.now() - 200 * DAG);   // een oude sluittijd op een HEROPEND alarm telt niet
   const proef = slaMetPlek(b, { proef: true });
   proef.afgesloten = true; proef.afgeslotenAt = iso(Date.now());   // dicht zonder alarmAfsluiten
-  assert.equal(b.alarm.vergeetSosPosities(Date.now()), 1);
+  assert.equal(b.alarm.vergeetAlarmPlekken(Date.now()), 1);
   assert.equal(open.plek.lat, 52.37, 'open blijft staan');
   assert.equal(proef.plek, null, 'de proef is alsnog weg');
 });
@@ -181,7 +181,7 @@ test('7. bewaker: incident en SOS houden hun plek open, en 90 dagen na afhandele
      een afgehandeld incident geen klok en start de veger hem pas later.
      ZAKT OP: `else delete x.afgehandeldAt` weghalen -- dan telt een heropend
      incident als dicht en verliest het zijn plek terwijl het loopt.
-     ZAKT OP: de veeg in vergeetSosPosities (pda/index.js) weghalen. */
+     ZAKT OP: de veeg in vergeetPdaSos (pda/index.js) weghalen. */
   const { db, zaak, bev } = bouwBeveiliging();
   const sos = bev.bevSos('BEV', 7, 38.876, 1.383);
   const inc = bev.bevMeldIncident('BEV', 7, { tekst: 'Inbraakpoging', lat: 38.87, lng: 1.38 });
@@ -206,7 +206,7 @@ test('7. bewaker: incident en SOS houden hun plek open, en 90 dagen na afhandele
 });
 
 test('8. bewaker: een incident dat voor deze regel al afgehandeld was, krijgt een klok van NU en geen verzonnen verleden', () => {
-  /* ZAKT OP: de klok-backfill in vergeetSosPosities weghalen -- dan blijft een
+  /* ZAKT OP: de klok-backfill in vergeetPdaSos (pda/index.js) weghalen -- dan blijft een
      oud afgehandeld incident zonder afgehandeldAt zijn plek eeuwig houden. */
   const { db, bev } = bouwBeveiliging();
   db.data.bevIncidenten.push({ id: 'oud', supplierCode: 'BEV', status: 'afgehandeld', lat: 1, lng: 2, at: iso(T0 - 400 * DAG) });

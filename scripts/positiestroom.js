@@ -192,7 +192,7 @@ const STROMEN = [
   { naam: 'veilig-laatste-plek', wat: 'de laatst bekende positie voor de veiligheidskring',
     bron: [S('kern/veiligheid/plek.js', 'lat: Math.round(lat * 1e5) / 1e5,')],
     collectie: 'veilig', sleutel: 'handle', van: 'lid', klasse: 'venster',
-    termijn: { soort: 'venster', bewijs: S('kern/veiligheid/plek.js', 'function vergeet(V, handle) { delete V.vensters[handle]; delete V.plek[handle]; }') },
+    termijn: { soort: 'venster', bewijs: S('kern/veiligheid/plek.js', 'function vergeetHandle(V, handle) { delete V.vensters[handle]; delete V.plek[handle]; }') },
     waarom: 'sinds N19 bestaat de laatste plek alleen in een open venster: zonder venster wordt niets bewaard, bij ' +
       'sluiten gaat hij weg, en een verlopen venster wordt door de veger opgeruimd. Tot 29 september werd hij ook ' +
       'zonder venster bewaard en nooit weggehaald.' },
@@ -232,9 +232,9 @@ const STROMEN = [
       'gaan weg zodra de laatste SOS dicht is' },
 
   { naam: 'vonk-profiel', wat: 'de positie in een datingprofiel, voor afstand bij het matchen',
-    bron: [S('kern/vonk/index.js', 'const vak = V.vakVan(coord(data.lat, 90), coord(data.lng, 180));')],
+    bron: [S('kern/vonk/index.js', 'V.vakBijOpslaan(p, coord(data.lat, 90), coord(data.lng, 180));')],
     collectie: 'vonk', sleutel: 'sessiesleutel', van: 'lid', klasse: 'noodzakelijk',
-    termijn: { soort: 'lid', bewijs: S('kern/vonk/index.js', 'if (!p.actief) delete p.vak;') },
+    termijn: { soort: 'lid', bewijs: S('kern/vonk/vak.js', 'if (!p.actief) delete p.vak;') },
     waarom: 'sinds N21 blijft alleen een vak van 5 km en nooit het punt; oude profielen worden bij het opstarten ' +
       'omgezet, het vak gaat weg bij uitzetten en de vergeetroute wist het profiel' },
 
@@ -385,6 +385,7 @@ const GEEN_STROOM = {
   'server/kern/stadsweefsel/ondernemers.js': G('plaats', 'de plek van een leeg pand'),
   'server/kern/stadsweefsel/voorzieningregister.js': G('plaats', 'het pand van een voorziening'),
   'server/kern/vervoer.js': G('doorgerekend', 'de live-positie voor een ophaaltijd; alleen de minuten blijven'),
+  'server/kern/vonk/vak.js': G('doorgerekend', 'het midden van twee vakken om een plek te kiezen; bewaard wordt alleen de vaknaam (vonk-profiel)'),
   'server/kern/vonk/match.js': G('doorgerekend', 'het midden van twee profielen; alleen de afstand blijft'),
   'server/kern/werk.js': G('plaats', 'de plek van een werkgever bij een vacature'),
   'server/kern/werkvenster.js': G('plaats', 'de zone van een werkplek; de positie bij het inloggen wordt alleen vergeleken'),

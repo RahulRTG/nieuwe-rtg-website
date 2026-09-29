@@ -85,7 +85,7 @@ test('1c. vonk: uitzetten laat geen plek achter, en een oud profiel verliest zij
   const api = vonkMet(db);
   api.vonkProfielZet('user-1', { stad: 'Amsterdam', lat: 52.37, lng: 4.89 });
   const oud = db.data.vonk.profielen['user-9'];
-  /* ZAKT OP: de migratie in d() (server/kern/vonk/index.js, `V.vakMigreer(p)` over alle
+  /* ZAKT OP: de migratie in d() (`migreerEenmaal` in server/kern/vonk/vak.js, over alle
      profielen) weghalen -- dan houdt een profiel van voor N21 zijn punt. */
   assert.ok(!('lat' in oud) && !('lng' in oud), 'een profiel van voor N21 verliest zijn punt');
   assert.match(oud.vak, /^v5:/, 'en krijgt er een vak voor terug');

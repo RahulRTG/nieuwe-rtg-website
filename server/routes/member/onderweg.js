@@ -2,6 +2,7 @@
    bevestigde aankomst, stop, stand opvragen) en ritten aanvragen/betalen.
    Gemount vanuit routes/member.js. */
 const { coord, coordPaar } = require('../../kern/util');
+const { wie: envelopWie } = require('../../opzet/envelop');
 module.exports = (kern) => {
   const { app, auth, db, save, findSupplier, notifySupplier, pushLive,
     liveStateFor, liveCodename, haversine, vraagRitVoor, betaalRitVoor, bevestigAankomst } = kern;
@@ -65,7 +66,10 @@ module.exports = (kern) => {
   /* Het lid bevestigt zelf dat het er is (NAVIGATIE.md N13). Geen positie
      nodig: een bevestiging is het bewijs, niet de coordinaat. */
   app.post('/api/live/aangekomen', auth, (req, res) => {
-    const key = req.session.key;
+    /* Wie de aankomst bevestigt, komt uit de envelop van het verzoek -- de ene
+       plek die zegt wie er handelt (AUTHORITY.md: de actor van een spoor komt uit
+       de sessie en nooit uit het lijf). Voor een lid is dat de sessiesleutel. */
+    const key = envelopWie(req) || req.session.key;
     const r = bevestigAankomst(key, 'lid');
     if (r.error) return res.status(r.status).json({ error: r.error });
     if (!r.al) {

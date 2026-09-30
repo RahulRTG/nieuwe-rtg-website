@@ -74,7 +74,9 @@ module.exports = (kern) => {
     return db.data.wereld;
   }
   function mijnModus(req) {
-    const gekozen = W().modus[req.session.key];
+    // Lezen mag een lege installatie niet muteren: PostgreSQL weigert terecht
+    // een leesroute die stil een collectie aanmaakt zonder opslagcommit.
+    const gekozen = db.data.wereld?.modus?.[req.session.key];
     return rechten.modusOpen(req.session.tier, gekozen) ? gekozen : 'alles';
   }
 
@@ -132,7 +134,7 @@ module.exports = (kern) => {
         return res.status(403).json({ error: (gekozen && gekozen.reden) || 'Deze lens is niet beschikbaar.' });
     }
     if (req.body.ervaring === 'saloon') {
-      const d = await feed.saloon.lees(req.session, { ...req.body, modus, lens });
+      const d = await feed.saloon.lees({ ...req.session, routeBeleid: req.routeBeleid }, { ...req.body, modus, lens });
       return res.status(d.error ? 403 : 200).json(d);
     }
     const uit = feed({ tier, key: req.session.key, modus, lens,

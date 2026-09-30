@@ -151,4 +151,5 @@ test('PG-backend kill vóór commit: geen 200, geen halve staat, multi-instance 
       await begrens(a.sluit(), 'pool A sluiten', 2000).catch(() => {});
       await begrens(b.sluit(), 'pool B sluiten', 2000).catch(() => {});
     }
+    await t.test('Mall: commitfout, verloren antwoord, herstart en twee instances', require('./operationeel-postgres'));
   });

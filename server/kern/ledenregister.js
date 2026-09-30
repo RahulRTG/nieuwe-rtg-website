@@ -41,6 +41,7 @@ const PAS_NAAM = Object.fromEntries(ladder.treden().map(t => [t.id, t.naam]));
 const { pasVan } = require('./passen');
 const { groepeer, TE_KLEINE_GROEP, KLASSEN } = require('./bedrijfsmaat/poort');
 const LEDEN_GRENS = KLASSEN.leden.grens;
+const MAX = 20000; // zoveel rijen leest het register hooguit
 const GESLACHT_NAAM = { v: 'Vrouw', m: 'Man', x: 'X' };
 
 const { maandCentenVoor, contractueel } = require('./pasprijs');
@@ -73,7 +74,7 @@ module.exports = ({ accounts, onboarding, geldPasprijzen, ledenAantal, db }) => 
      alfabetische lijst; de facet-tellingen gaan altijd over alle leden. */
   function register(filter) {
     filter = filter || {};
-    const rijen = accounts.ledenRegisterRijen ? accounts.ledenRegisterRijen(20000) : [];
+    const rijen = accounts.ledenRegisterRijen ? accounts.ledenRegisterRijen(MAX) : [];
     const profielen = (onboarding && onboarding.store && onboarding.store().profielen) || {};
 
     const perPas = {}, perLand = {}, perStad = {}, perGeslacht = {};
@@ -129,9 +130,16 @@ module.exports = ({ accounts, onboarding, geldPasprijzen, ledenAantal, db }) => 
     const omzetOpen = omzet.map(o => dichtePas.has(o.pas)
       ? { pas: o.pas, pasNaam: o.pasNaam, opMaat: o.opMaat, aantal: null, maandOmzet: null, stand: TE_KLEINE_GROEP, grens: LEDEN_GRENS }
       : o);
-    return { ok: true,
+    /* BEWIJS BIJ DE TELLING (bedrijfsmaten groei.leden-per-pas en
+       acquisitie.via-werkgever): het register leest hooguit MAX rijen, en een
+       telling die afkapte zonder het te zeggen, lijkt compleet. */
+    const totaal = typeof ledenAantal === 'function' ? ledenAantal() : null;
+    const afgekapt = rijen.length >= MAX && (totaal == null || totaal > rijen.length);
+    return { ok: true, graad: 'gemeten', peilmoment: new Date().toISOString(), afgekapt,
+      dektNiet: ['Land en stad zijn door het lid opgegeven en niet gecontroleerd (C16).']
+        .concat(afgekapt ? ['Het register las ' + MAX + ' leden en er zijn er meer; de tellingen zijn een ondergrens.'] : []),
       totaalGeteld: rijen.length,
-      totaalLeden: typeof ledenAantal === 'function' ? ledenAantal() : rijen.length,
+      totaalLeden: totaal == null ? rijen.length : totaal,
       metCodenaam,
       perPas: perPasOpen,
       perGeslacht: groepstelling(sorteerTelling(perGeslacht), true),
@@ -146,5 +154,18 @@ module.exports = ({ accounts, onboarding, geldPasprijzen, ledenAantal, db }) => 
       lijst };
   }
 
-  return { ledenregister: { register, PAS_VOLGORDE, PAS_NAAM } };
+  /* Alleen de omzet per pas, zonder ledenlijst en zonder facetten: de bron van de
+     bedrijfsmaat marge.per-lid (besluit C15). Het aantal per pas gaat NIET langs
+     de groepspoort; dat doet de maat zelf, op de plek waar het getal ontstaat. */
+  function omzetPerPas() {
+    const passen = {}, rijen = accounts.ledenRegisterRijen ? accounts.ledenRegisterRijen(MAX) : [];
+    if (rijen.length >= MAX) return null; // afgekapt: een noemer die niet alle leden telt, is geen noemer
+    for (const r of rijen) {
+      const p = pasVan(r.tier);
+      passen[p] = (passen[p] || 0) + 1;
+    }
+    return omzetstaat(passen).omzet;
+  }
+
+  return { ledenregister: { register, omzetPerPas, PAS_VOLGORDE, PAS_NAAM } };
 };

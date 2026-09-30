@@ -762,6 +762,11 @@ const METERS = [
      publieke domeinen dat de meter ziet niet stil dalen. */
   { sleutel: 'stageDomeinenGemeten', richting: 'omhoog', wat: 'publieke domeinen die de stagevormmeter werkelijk heeft gezien' },
   { sleutel: 'planDomeinenGemeten', richting: 'omhoog', wat: 'plandomeinen die de planvormmeter werkelijk heeft gezien' },
+  /* Het BEREIK van de plaatsvormmeter (NAVIGATIE.md par. 14.1), om dezelfde
+     reden omhoog: de uitslag is een nul, en een nul over MINDER domeinen is
+     geen betere nul. De domeinlijst is afgeleid, dus hij krimpt alleen als de
+     lezer minder plaatsvormen ziet -- en dat is precies wat deze tand vangt. */
+  { sleutel: 'plaatsDomeinenGemeten', richting: 'omhoog', wat: 'plaatsdomeinen die de plaatsvormmeter werkelijk heeft gezien' },
   /* OFFICEVORM.json (OFFICE.md par. 0): het bereik onder de nul waarop het
      besluit rust dat er geen `RTGObject` komt. */
   { sleutel: 'officeDomeinenGemeten', richting: 'omhoog', wat: 'objectdomeinen die de officevormmeter werkelijk heeft gezien' },
@@ -803,6 +808,28 @@ const METERS = [
      stijgende tand op de VOLLEDIGE vorm kan dat niet: vier eigenschappen
      tegelijk faken is geen typefout. */
   { sleutel: 'spoorConvergent', richting: 'omhoog', wat: 'mechanismen die alle vier de spoor-eigenschappen van de referentie halen' },
+  /* HET BEWEGINGSSPOOR (POSITIESTROOM.json, NAVIGATIE.md par. 6.4, besluit N10).
+     Twee schulden en een bereik. `positieZonderTermijn` telt de stromen waar
+     een positie van een mens blijft staan zonder dat iets hem weghaalt, en
+     `positieNietVergeten` die op een ledensleutel of codenaam die de
+     vergeetroute niet wist -- allebei GEMETEN uit het bewaarbeleid, de veger en
+     de vergeetroute en niet uit de indeling, dus niet met een ander etiket naar
+     beneden te praten. Ze mogen alleen dalen. `positieStromenGezien` gaat
+     omhoog, om dezelfde reden als stilSpoorAanroepen: een schuld die daalt
+     doordat de meter minder stromen ziet, is de gevaarlijkste vorm van
+     vooruitgang. */
+  { sleutel: 'positieZonderTermijn', richting: 'omlaag', wat: 'stromen waar de positie van een mens zonder termijn blijft staan' },
+  { sleutel: 'positieNietVergeten', richting: 'omlaag', wat: 'positiestromen op een ledensleutel die de vergeetroute niet wist' },
+  { sleutel: 'positieStromenGezien', richting: 'omhoog', wat: 'positiestromen die de meter heeft verklaard (het bereik mag niet krimpen)' },
+  /* De OPSLAGhelft van dezelfde meter (POSITIEPROEF.json, NAVIGATIE.md par.
+     6.6): een echte doorloop met herkenbare coordinaten, en daarna de hele
+     opslag gelezen. Vier schulden die alleen mogen dalen. Een stap die de proef
+     niet kon lopen is null en telt als NIET GEMETEN, nooit als nul -- de
+     ritlijn staat daarom met opzet niet in deze rij. */
+  { sleutel: 'positieNavBlijft', richting: 'omlaag', wat: 'navigatieposities die het antwoord overleven (doorloop)' },
+  { sleutel: 'positieNaTaak', richting: 'omlaag', wat: 'posities die na het einde van hun taak in de opslag blijven staan (doorloop)' },
+  { sleutel: 'positiePassages', richting: 'omlaag', wat: 'passageregels langs een zaak die niet het doel van het venster was (doorloop)' },
+  { sleutel: 'aankomstUitPositie', richting: 'omlaag', wat: 'aankomsten die de server uit een positie afleidde in plaats van uit een bevestiging (doorloop)' },
   /* Het BEREIK van de connectlusmeter (CONNECT.md par. 1), en om precies
      dezelfde reden omhoog als de drie hierboven. De UITKOMST is daar een nul
      (0 van 8 werkwoorden in alle 23 ontdekkingsdomeinen, 2 domeinen die de lus
@@ -1731,6 +1758,7 @@ function meet(bronnen) {
     stempelSchrijversGezien: leesRegister('STEMPELVEILIGHEID.json', (j) => j.schrijvers),
     stageDomeinenGemeten: leesRegister('STAGEVORM.json', (j) => j.gemeten.vorm.domeinen),
     planDomeinenGemeten: leesRegister('PLANVORM.json', (j) => j.rondes.ruim.vorm.domeinen.length),
+    plaatsDomeinenGemeten: leesRegister('PLAATSVORM.json', (j) => j.rondes.ruim.domeinen.length),
     officeDomeinenGemeten: leesRegister('OFFICEVORM.json', (j) => j.rondes.ruim.vorm.domeinen.length),
     neigingVerwijzingRot: leesRegister('NEIGINGVORM.json', (j) => j.gemeten.voorstel.rot),
     neigingVoorkeurBlind: leesRegister('NEIGINGVORM.json', (j) => j.gemeten.voorkeur.metAffiniteit - j.gemeten.voorkeur.metAlledrie),
@@ -1741,6 +1769,13 @@ function meet(bronnen) {
        grammatica heeft nagelopen, en dat zijn ze alle zeven. */
     namensMechanismenGemeten: leesRegister('NAMENSVORM.json', (j) => j.gemeten.werkwoord.mechanismen),
     spoorConvergent: leesRegister('SPOORVORM.json', (j) => j.gemeten.volledigConvergent),
+    positieZonderTermijn: leesRegister('POSITIESTROOM.json', (j) => j.gemeten.zonderTermijn),
+    positieNietVergeten: leesRegister('POSITIESTROOM.json', (j) => j.gemeten.nietVergeten),
+    positieStromenGezien: leesRegister('POSITIESTROOM.json', (j) => j.gemeten.stromen),
+    positieNavBlijft: leesRegister('POSITIEPROEF.json', (j) => j.tellers.blijvendeNavPositie),
+    positieNaTaak: leesRegister('POSITIEPROEF.json', (j) => j.tellers.positieNaVenster),
+    positiePassages: leesRegister('POSITIEPROEF.json', (j) => j.tellers.passageLog),
+    aankomstUitPositie: leesRegister('POSITIEPROEF.json', (j) => j.tellers.aankomstUitPositie),
     wekZonderUitspraak: leesRegister('WEKDEKKING.json', (j) => j.gemeten.zonderUitspraak),
     momentOpenBekend: leesRegister('MOMENTPROEF.json', (j) => j.telling.openBekend),
     lussenGeenUitweg: leesRegister('LUSSEN.json', (j) => j.ratel.geenUitwegGevonden),

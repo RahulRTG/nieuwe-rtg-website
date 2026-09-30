@@ -309,8 +309,18 @@ valideren:
      dan telt alleen dat team mee.
    - Het RTG-beleid (tien RTG Days) geldt ALLEEN in deze zaak; elke andere
      zaak krijgt leeg beleid.
-   - Stap twee van het besluit volgt in een eigen PR: het kantoor logt in als
-     personeel van deze zaak in plaats van met de gedeelde code.
+   - **Stap twee staat** (28 september 2026, keuze van de eigenaar: "een zetel
+     in de RTG-zaak is de toegang"). Wie op zijn eigen account personeel is van
+     de RTG-zaak EN minstens een kamer heeft, heeft de kantoorsleutel aan zijn
+     sleutelbos en komt het kantoor binnen op naam
+     (`server/kern/vrijheid/rtgzetel.js`). De sleutel is AFGELEID en niet
+     opgeslagen, net als die van de eigenaar: uit de laatste kamer of uit dienst
+     is hij bij de volgende vraag weg, en een dienstverband zonder kamer is geen
+     sleutel. De uitnodiging van de eigenaar blijft voor wie buiten de zaak valt;
+     de gedeelde code blijft werken en wordt geteld. De beleidsmotor telt per
+     kamer DOOR WIE er zit (`eigen`, `vreemd`, `zonderToewijzing`, `onbekend`) en
+     niet WIE -- in de schaduw, zonder iemand tegen te houden
+     (`test/rtgzetel.test.js`, vijf mutaties die alle vijf zakken).
 7. **Half gedaan: de loonstrook** (27 september 2026). De motor had al een
    `rooster`-haak die niemand vulde; die is nu de brug naar het
    verzuimregister (`server/kern/vrijheid/verzuimbrug.js`), en dat register
@@ -328,17 +338,18 @@ valideren:
      nooit een melding uit een andere weg.
    - Het weekrooster, het AI-roostervoorstel en de autoplanner van de
      beveiliging lezen het verzuimregister (`kern/payroll/inplanbaar.js`), dus
-     een toegekende vrije dag staat daar vrij. De overige planners (festival,
-     OV, taxi, school) lezen het nog niet, en het vakantiesaldo komt nergens
-     vandaan.
+     een toegekende vrije dag staat daar vrij. Sinds 29 september lezen ook de
+     OV-dienst, het festivalrooster en de taxidispatch het (PLANNING.md par. 6);
+     een school houdt een eigen verlofregister en hangt er met opzet niet aan.
+     Het vakantiesaldo komt nergens vandaan.
 
    `test/vrijheid-verzuim.test.js` draait de echte motor, het echte register
    en de echte samenstelling van een loonrun.
 
 **P1**
 
-- De overige planners (festival, OV, taxi, school) lezen het verzuimregister
-  nog niet; het weekrooster en de twee autoplanners wel.
+- Alle planners van een zaak lezen het verzuimregister (weekrooster, de twee
+  autoplanners, OV, festival, taxi); de school heeft een eigen register.
 - Een vervanger krijgt zijn dienst in het rooster.
 - Dienst ruilen.
 - Overdracht breder dan de horecawijk.

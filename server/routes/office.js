@@ -2,12 +2,15 @@
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 module.exports = (kern) => {
   const { accounts, eigenaar, sessionFor } = kern;
+  // B10: in productie alleen op naam met een passkey, ook via een query-token
+  const productiedeur = require('../kern/kantoor/productiedeur');
 
   // backoffice-toegang via een query-token (stream/export/doc): een echte
   // office-sessie, OF de eigenaar met zijn eigen accountlogin.
   const officeQueryMag = (token) => {
     const sess = sessionFor(String(token || ''));
-    if (sess && sess.role === 'office') return true;
+    if (sess && sess.role === 'office') return productiedeur.sessieMag(sess).ok;
+    if (!productiedeur.eigenaarDirect().ok) return false;
     try { return eigenaar.isEigenaar(accounts, accounts.verifyToken(String(token || ''))); } catch (e) { return false; }
   };
 
@@ -18,13 +21,15 @@ module.exports = (kern) => {
      <img> kan geen header sturen, vandaar het token in de query. */
   const officeQueryOpNaam = (token) => {
     const sess = sessionFor(String(token || ''));
-    if (sess && sess.role === 'office') return !!sess.lidKey;
+    if (sess && sess.role === 'office') return !!sess.lidKey && productiedeur.sessieMag(sess).ok;
+    if (!productiedeur.eigenaarDirect().ok) return false;
     try { return eigenaar.isEigenaar(accounts, accounts.verifyToken(String(token || ''))); } catch (e) { return false; }
   };
   const octx = { kern, officeQueryMag, officeQueryOpNaam };
   require('./office/veiligheid')(octx);
   require('./office/partneraanvragen')(octx);
   require('./office/partners')(octx);
+  require('./office/partnerpersoneel')(octx);   // personeelscodes van het partnerkanaal, per medewerker (B14)
   require('./office/ondernemers')(octx);   // de ondernemerskant: regie, rechtsvormwacht, catalogus-wensen
   require('./office/instellingen')(octx);  // gemeente, luchthaven, OV en de andere interne genres aansluiten
   require('./office/toegang')(octx);

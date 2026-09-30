@@ -91,6 +91,215 @@ codewijziging vers bewijs, een modelwissel maakt alle gedragsbewijzen van een
 agent in een keer verschaald. En **niemand zet een staat met de hand op
 BEWEZEN** -- alleen een hermeting kan dat. Een staat is een uitkomst, geen knop.
 
+## 2a. Verval per cel: de afhankelijkheden (28 september 2026)
+
+`scripts/vertrouwen.js` rekende de ouderdom per REGISTER en zei zelf waarom:
+per-route-versheid wachtte op de slagveld-koppeling van par. 7. Die ligt er nu,
+in twee stappen en in deze volgorde.
+
+**Eerst de noemer** (`npm run routenoemer`). Er liepen zeven getallen rond die
+allemaal "het aantal routes" heetten, en vertrouwen per route rekenen boven
+zeven noemers is bouwen op zeven werkelijkheden. `scripts/routenoemer.js` zet
+per register de boom in een wegwerp-worktree op zijn eigen meetcommit, laat daar
+de router zijn routes opsommen, past de definitie van het register toe en
+vergelijkt. Elk verschil met HEAD is dan **leeftijd** (de route kwam er na de
+meting bij), **definitie** (het register telt met opzet iets anders) of
+**onverklaard**. Stand op 28 september: alle zeven reproduceren op hun eigen
+commit, onverklaard 0, en nul routes verdwenen sinds enige meting.
+
+| register | telling | definitie | meetcommit | nieuw sinds |
+|---|---|---|---|---|
+| router op HEAD / MUTATIEINVENTARIS | 5168 | alles wat de router kent | HEAD | 0 |
+| ROUTEBRON.json | 5102 | router | 6083f652 | +66 |
+| BEWIJSMATRIX.json | 4971 | router, alleen /api/ | b53eaa5e | +183 |
+| VERTROUWEN.json (oud) | 4738 | router, alleen /api/ | df1a581a | +416 |
+| IDEMPROEF / EXECUTION_MAP | 4972 | aangeroepen: POST /api/ zonder parameter of schakelkast | adc9db1b | +61 |
+| OUTPUTPROEF.json | 4747 | waargenomen in het routejournaal | df1a581a | +420 |
+
+Canoniek is een NOEMER PER BEGRIP en niet een getal: **bestaat** is de router op
+HEAD (5168), **onder bewijs** is de router op HEAD onder /api/ (5154), en
+**aanroepbaar** voor de idemproef is 5033. Het getal **5207** uit het voorstel
+staat in geen enkel register. OUTPUTPROEF telt twee routes die de router in
+gewone stand niet kent (`/api/test/bug` en `/api/test/crash`, alleen onder
+NODE_ENV=test); dat is definitie, net als in `kern/routedekking.js`.
+
+**Dan het verval** (`scripts/routeversheid.js`, aangesloten op `staatVan()`).
+Per route, per bewezen CEL: het register dat die cel bewees (de `bron` op de
+cel), de commit in diens stempel, en of er sindsdien iets is gewijzigd waar de
+route van afhangt. Er komt GEEN nieuwe stand bij: een aantoonbaar verouderde
+cel maakt de route `verschaald`. En drie dingen blijven strikt uit elkaar, ook
+als de stand er maar een kan tonen: **defect** (een cel gezakt: `geschorst`),
+**ontbrekend** (een cel nooit gemeten: `verzwakt`) en **verouderd** (een
+bewezen cel over een oudere commit: `verschaald`). Elke rij in VERTROUWEN.json
+draagt ze alle drie apart, en `soorten` telt ze apart -- nooit opgeteld. Een
+wijziging bewijst niet dat een route fout is; alleen dat het oude bewijs niet
+meer actueel genoeg is.
+
+De koppeling draagt een **graad**, en alleen `gemeten` laat vervallen:
+
+- **gemeten**: het bestand waarin de router de route afhandelt (ROUTEBRON.json),
+  en kern-namen die de route tijdens een verzoek aanraakte (CONTEXTPROEF.json).
+- **vermoed**: de statische sluiting daarachter -- requires, kern-kanten, namen
+  uit de kern-tas, de montagewortel naar zijn require. Een bestand LADEN is geen
+  bewijs dat de route die code RAAKT: `server/lib/keten.js` hangt statisch onder
+  ruim 4100 routes. Een wijziging daar staat bij de route (`vermoedVerouderd`),
+  met de keten, en laat niets vervallen. Niet gokken; de graad tonen.
+- **onbekend**: geen gemeten bestand, of een meetcommit die niet vast te
+  stellen is (ondiepe kloon). Dan geldt alleen de grove halfwaardetijd.
+
+Voor elke verouderde cel is de keten uit te leggen: welk bestand veranderde ->
+via welke gemeten koppeling -> welke route -> welk bewijs (cel, register,
+commit) -> wat opnieuw moet draaien (uit `scripts/versheid.js`, de ene lijst
+register -> opdracht).
+
+**De proef** (`npm run vervalproef`, in een wegwerp-worktree, ~5 minuten, 10 van
+10 stappen gehouden): route R (`POST /api/office/voogdij/besluit`) heeft een
+bewezen, actuele AUTH-cel. Een wijziging aan het handlerbestand van een ANDERE
+route laat R onaangetast, en laat die andere route wel verouderen -- anders
+bewijst het negatieve geval niets. Een wijziging aan R's handler laat zijn cel
+verouderen met de volledige keten. Dan draait de herdraai-opdracht UIT DIE KETEN
+(`npm run meetronde -- --alleen=poortwacht`, de echte poortwacht tegen een echte
+wegwerpserver), en daarna is de cel weer bewezen op de nieuwe commit. De
+routestand zelf beweegt daar niet van BEWEZEN, want geen enkele route heeft
+alle elf cellen bewezen; de cyclus op routeniveau staat als toets 3d met de
+echte `staatVan()`.
+
+**Wat nog niet staat** (de blinde vlekken, zie ook par. 2b):
+
+1. De gemeten koppeling reikt meestal niet verder dan het HANDLERBESTAND. Wat
+   een route daarachter aan code raakt, is voor de meeste routes alleen
+   `vermoed`. Een wijziging in `kern/pay/poort.js` laat de bewijzen van de
+   betaalroutes dus NIET vervallen; ze staat erbij. De stap die dat oplost is een
+   runtime-meting per verzoek op BESTANDSniveau (V8-dekking per toets of per
+   verzoek), in de vorm van CONTEXTPROEF maar dan met bestanden in plaats van
+   namen.
+2. CONTEXTPROEF.json draagt geen commit in zijn stempel, alleen een datum. Zijn
+   koppelingen tellen, maar welke code hij zag is niet na te lopen.
+3. Het verval kijkt naar bestanden en niet naar betekenis: een regel commentaar
+   laat bewijs vervallen. Grof, en de veilige kant; per symbool
+   (SYMBOLEN.json) is de fijnere stap.
+4. Cellen met `verklaard` (uit de bewakers van de router) en `leesroute`
+   vervallen nooit, want ze worden op HEAD afgeleid.
+
+## 2b. De hermeting van 28 september 2026
+
+De hele stapel bronregisters is opnieuw gemeten (`npm run meetronde`, 76
+minuten; een volle suite met routejournaal voor de outputproef, 63 minuten; de
+faalproef). Wat dat opleverde, in volgorde van gewicht:
+
+**Vijf routes zouden onterecht zijn dichtgezet.** De eerste verse
+staatproef zette `/api/onboarding/bedrijf`, `/api/onboarding/paspoort`,
+`/api/office/dienst/uit`, `/api/office/balie/zetel` en
+`/api/office/gateway/zendingen` op GEZAKT in IDEMPOTENCY, met als enige
+"dubbele" wijziging `beleidsmotor` en `kantoorMensdeur`. Dat zijn tellers die
+een kantoorverzoek in RAM tikken en vijf seconden later wegschrijven; de
+spoeling landde in de HERHALING van de volgende route. Vastleggen had ze met een
+503 dichtgezet. De staatproef kreeg een vierde ijking (naloop: een leesverzoek,
+dan langer wachten dan een spoeling), en de lange stilte begint nu na een
+verzoek (`rtgai` traint alleen na activiteit en zette zo `/api/pay/kascode`
+vals op GEZAKT). Daarna: 0 gezakt. Gemeten en niet bij naam -- een derde
+spoelende teller vindt de ijking ook.
+
+**De auditproef laadde al drie weken niet.** `scripts/auditproef-route.js`
+declareerde `stempel` twee keer (sinds 8c24cbf3), en de meetronde telde uitgang
+1 als "klaar" -- 1 betekent daar een bevinding, maar een crash van Node geeft
+ook 1. Elke ronde meldde "klaar (register onveranderd)". `scripts/lib/valom.js`
+herkent nu een ongevangen fout, en `test/meetronde.test.js` houdt vast dat elk
+instrument in de ronde laadt.
+
+**De enige volledige keten rust op een meting van voor de passkey-eis.** De
+verse idemproef kreeg op `/api/office/bank/incasso` een 403: de incassoronde
+vraagt inmiddels een passkey en de proefsleutels hebben er geen. Met die meting
+verloor de as `gevolg` van de gouden weg (MACHINE.md par. 5a) haar waarneming.
+IDEMPROEF.json staat daarom nog op zijn meting van adc9db1b -- deels
+samenvoegen zou een meting verzinnen -- en het verval per cel wijst het nu zelf
+aan: `POST /api/office/bank/incasso` -> IDEMPOTENCY uit IDEMPROEF.json (adc9db1b)
+-> `server/routes/kantoren/bank-incasso.js` veranderde sindsdien (gemeten) ->
+`npm run meetronde -- --alleen=idemproef`. **Daardoor weigert
+`vertrouwen.js --vastleggen` terecht**: een van de elf bronnen hoort niet bij
+deze code. VERTROUWEN.json staat nog op zijn meting van 3 september.
+
+**Ook de faalproef bleef op zijn oude meting.** De verse ronde zag
+`/api/office/magnaat/scan` niet meer zakken, maar niet omdat de route beter
+werd: onder `schrijf-verloren` staat "het verraad greep hier niet aan". De
+sabotage bereikte de schrijfweg niet, en waarom is niet vastgesteld. Een verse
+meting die een bekend, verklaard gebrek niet kan reproduceren, overschrijft de
+meting die het wel zag niet -- dezelfde regel als bij IDEMPROEF -- dus
+FAALPROEF.json staat op 14 september en HERREKENBAAR.json houdt zijn onderwerp.
+(`test/herrekenbaar.test.js` zag het meteen: een besluitregister zonder gezakte
+route is geheugen geworden.)
+
+**De verdeling**, oud (VERTROUWEN.json, df1a581a, 4738 routes) tegenover vers
+berekend (5154 routes):
+
+| stand | oud | vers |
+|---|---|---|
+| bewezen | 0 | 0 |
+| verschaald | 0 | 0 |
+| verzwakt | 4716 | 5142 |
+| geschorst | 0 | 0 |
+| ongemeten | 22 | 12 |
+
+Per soort, en nooit opgeteld: **defect 0** (geen enkele gezakte cel),
+**ontbrekend 5154** (elke route mist minstens een schakel -- daarom kan er geen
+enkele op bewezen staan, en daarom beweegt de stand niet naar verschaald: in de
+rangorde gaat ontbrekend voor verouderd), **verouderd 117** (allemaal
+IDEMPOTENCY uit IDEMPROEF.json), **alleen vermoed verouderd 1213**, **verval
+onbekend 61** (routes die jonger zijn dan ROUTEBRON.json en dus geen gemeten
+bestand hebben). Er staat met opzet geen samengesteld cijfer en geen
+"systeem bewezen" onder.
+
+**Wat hermeten verder liet zien.** De bewijsschuld groeit van 2418 naar 2712,
+volledig in `output-niet-toerekenbaar` (285 -> 579): de suite zag 404 routes
+meer, en de 4151 bewezen OUTPUT-cellen bleven exact gelijk. Vastgelegd met die
+reden en een notitie in NORM.json (vervalt 2026-12-28). En
+`test/grens-sweep.test.js` zakt op `/api/appstore/persoon/cijfers` en
+`/journaal` (de server valt om) -- ook op de merge-base met main, dus niet van
+deze tak.
+
+## 2c. De vastlegging van 29 september 2026
+
+VERTROUWEN.json is nu wel vastgelegd, op een verse meetronde, een volle suite
+met routejournaal, een verse faalproef en een staatproef op een schone boom.
+Oud (df1a581a, 4738 routes) tegenover vastgelegd (5273 routes): bewezen 0 -> 0,
+verschaald 0 -> 0, verzwakt 4716 -> 5258, geschorst 0 -> 0, ongemeten 22 -> 15.
+Elke verzwakte route mist minstens een schakel; FAILURE (5178), STATE en
+SIDE_EFFECT (elk 4767) en AUDIT (4146) ontbreken het vaakst.
+
+**Vijf routes waren geschorst, en geen ervan terecht op dezelfde manier.**
+`bedrijf/werkruimte/maak` was een echte regressie: een retry met dezelfde
+sleutel maakte een tweede werkruimte, en krijgt nu 409 zonder token.
+`rtmail/imap/sleutel` (lid en zaak) geeft met opzet elke keer een verse
+sleutel en staat als `code-maker` in IDEMBESLUIT.json. `office/doos/sleutel`
+laat na een weigering met opzet een melding op het beveiligingsbord staan
+(`veilige-kant` in ROLLBACKBESLUIT.json). En `rtfos/vrijwilliger/account-los`
+werd geschorst op een eenmalige inrichting naast een deurteller -- de
+staatproef past de eerste-aanrakingsregel nu per collectie toe.
+
+**Drie meetfouten, gevonden doordat een getal niet klopte.** De staatproef
+berekende de voorwaardelijke klokruis en paste hem niet toe (de aanroep viel
+weg bij #95). De meetronde gaf de rol- en invoerproef een begrenzing van 8000
+POGINGEN terwijl de router er 8832 vraagt, zodat de laatste 108 routes in het
+alfabet stil buiten de ronde vielen. En de outputproef schreef zijn register
+op een journaal van een handvol losse toetsen terug van 5151 naar 420 routes;
+een journaal dat minder dan de helft van de vorige ronde dekt, wordt nu
+geweigerd.
+
+**Wat de besluiten de machine kosten.** `mutatiesZonderEnigeAs` gaat van 2757
+naar 2758. De as `herhaling` komt uit EXECUTION_MAP.json en telt alleen
+`beschermd`; de vier `code-maker`-besluiten van deze ronde (`rtmail/imap/sleutel`
+twee keer, `bedrijf/lid/aanmeld`, `bedrijf/mijn`) halen die as daar met opzet
+weg, want een route die elke keer iets nieuws hoort te geven is niet beschermd
+tegen een herhaling. Andere routes kregen hem er in dezelfde ronde bij; per
+saldo is het een. De weg omlaag is niet de besluiten terugdraaien maar die
+routes een andere as geven (een spoor of een gevolgmeting). De uitleg staat hier
+en niet in NORM.json omdat MACHINEDEKKING.json bij elke vastlegging in zijn
+geheel wordt herschreven, zoals in POLITIEK.md voor de kwestieroutes.
+
+**Na de merge met main** (#415) zijn de proefregisters formeel weer verouderd:
+ze zijn op de code van voor die merge gemeten. VERTROUWEN.json blijft op de
+vastlegging hierboven staan tot een volgende meetronde.
+
 ## 3. Tegenspraak is een eigen uitslag
 
 Naast groen en rood bestaat er een derde uitslag: TEGENSPRAAK. Een toets zegt

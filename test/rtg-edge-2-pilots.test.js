@@ -157,7 +157,9 @@ test('een zichtbaar appvenster laat hetzelfde Edge-casco tijdelijk wijken', () =
 test('Clips draagt zijn hoofdhandeling over zonder een tweede duimbalk', () => {
   assert.match(LOADER, /pad === '\/apps\/clips\.html'\) neemHoofdactie\('Maak een clip', '#studioOpen'\)/);
   assert.match(LOADER, /data-rtg-edge-2-hoofdactie/);
-  assert.match(CSS, /\[data-rtg-edge-2-hoofdactie="edge"\]>\.rtg-duimbalk\{display:none!important\}/);
+  /* Sinds de desktopstandaard (#413) staat de duimbalk ook in het schermvlak
+     (.wd-page), dus de regel draagt de body-plek EN de vlak-plek. */
+  assert.match(CSS, /\[data-rtg-edge-2-hoofdactie="edge"\]>\.rtg-duimbalk,\s*[^{]*\[data-rtg-edge-2-hoofdactie="edge"\] \[data-rtg-screen-surface\]>\.rtg-duimbalk\{display:none!important\}/);
 });
 
 test('TravelOS biedt op mobiel en bureau zijn reisbladen aan de gedeelde Edge aan', () => {

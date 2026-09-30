@@ -55,7 +55,12 @@ const DOEL = {
   // de wacht en het alarm van RTG Veilig: waar kun je terecht
   veiligheid: { lagen: ['civic'], straalM: 250, zones: false },
   // klaarzetten voordat iemand er is (mall, hotel, residentie)
-  nadering: { lagen: ['leverancier', 'civic'], straalM: 900, zones: false },
+  /* `eenHek` (NAVIGATIE.md N12): een naderingsvenster hoort bij EEN bezoek en
+     noemt dus EEN hek. Het toestel krijgt wel alle hekken (anders weet het niet
+     waar het doel ligt ten opzichte van de rest), maar een overgang langs een
+     ander hek wordt verwerkt en niet bewaard -- anders legt RTG onder je
+     codenaam vast langs welke zaken je liep, en dat is een bewegingsspoor. */
+  nadering: { lagen: ['leverancier', 'civic'], straalM: 900, zones: false, eenHek: true },
   // melden en zien in de zone waar je bent (stadsweefsel)
   stad: { lagen: [], straalM: 0, zones: true }
 };

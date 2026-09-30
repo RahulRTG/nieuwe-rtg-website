@@ -41,6 +41,6 @@
 .office-opmerkinganker{color:#D8BF80!important;font-size:.67rem!important;margin-top:.3rem;}.office-opmerkingactie{display:flex;gap:.3rem;align-items:start;}
 .office-beheervelden{display:grid;grid-template-columns:1fr 1fr 1fr 1.5fr;gap:.55rem;}.office-beheervoet{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-top:.75rem;}
 .office-beheervoet p{color:var(--zacht);font-size:.68rem;max-width:38rem;line-height:1.45;}
-@media(max-width:820px){.office-signalen{grid-template-columns:repeat(2,1fr);}.office-presence{order:2;}.office-samenstand{grid-template-columns:1fr;}
+@container rtg-office (max-width:820px){.office-signalen{grid-template-columns:repeat(2,1fr);}.office-presence{order:2;}.office-samenstand{grid-template-columns:1fr;}
   .office-samenstand>div+div{border-left:0;border-top:1px solid var(--line);}.office-opmerkingmeta,.office-beheervelden{grid-template-columns:1fr;}
   .office-beheervoet{align-items:stretch;flex-direction:column;}.office-samen{width:calc(100vw - 1rem);}}

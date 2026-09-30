@@ -47,16 +47,16 @@ test('2. commentaar telt niet, tekst op het scherm wel', () => {
 });
 
 test('3. de meter is niet blind: een echte upgradetekst BUITEN de bodem wordt gevonden', () => {
-  /* De uitnodiging voor een reis vraagt om lid te worden ("Word lid van RTG").
-     Die tekst woont sinds #432 in het script naast het scherm, niet meer in de
-     HTML zelf. */
+  /* De tekst woont sinds de handmatige reisplanner (#432) in het script van het
+     scherm en niet meer in de HTML; de meter leest beide, want SCHERMROUTES.json
+     noemt ook de scripts. */
   const bestand = path.join(WORTEL, 'public', 'apps', 'reisuitnodiging-client.js');
   const tekst = zonderCommentaar(fs.readFileSync(bestand, 'utf8'), { soort: 'js', regelsHeel: true });
-  assert.ok(B.drukIn(tekst).length > 0, 'reisuitnodiging-client.js vraagt om lid te worden, en de meter zag het niet');
+  assert.ok(B.drukIn(tekst).length > 0, 'de reisuitnodiging vraagt om lid te worden, en de meter zag het niet');
   const s = B.meet();
-  for (const b of ['public/apps/reisuitnodiging.html', 'public/apps/reisuitnodiging-client.js']) {
-    assert.ok(!s.schermen.some(x => x.bestand === b), b + ' is geen bodemscherm; staat hij erin, dan is de afleiding te ruim');
-  }
+  for (const b of ['public/apps/reisuitnodiging.html', 'public/apps/reisuitnodiging-client.js'])
+    assert.ok(!s.schermen.some(x => x.bestand === b),
+      b + ' is geen bodemscherm; staat hij erin, dan is de afleiding te ruim');
 });
 
 test('4. de afleiding vindt de schermen die er zeker bij horen', () => {

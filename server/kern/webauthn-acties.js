@@ -52,6 +52,7 @@ const ZWARE_ACTIES = Object.freeze([
   'eigenaar-bewaarveeg',        // POST /api/techniek/bewaren/veeg  (alleen bevestig:'WIS')
   'eigenaar-noodrem-uit',       // POST /api/techniek/beveiliging/auto  (alleen bij UIT)
   'eigenaar-terugstorting',     // POST /api/office/bank/terugstorting
+  'eigenaar-cadeaubon',         // POST /api/office/cadeaubon/stand  (de e-geldpositie, C14)
   'eigenaar-herstel-in',        // POST /api/techniek/herstel/inrichten
   'eigenaar-herstel-af',        // POST /api/techniek/herstel/afbreken
   'eigenaar-kantooruitnodiging', // POST /api/office/kantoor/uitnodiging
@@ -62,6 +63,7 @@ const ZWARE_ACTIES = Object.freeze([
   'bank.bevestig',              // POST /api/office/bank/handtekening/bevestig  (tweede handtekening onder geld)
   'connection.table.manage',    // POST /api/office/rendezvous/tafel/*
   'connection.safety.report.read', // GET /api/vonk/meldingen en /api/member/rendezvous/meldingen
+  'kantoor-binnen',             // POST /api/account/start  (rol kantoor, in productie; kern/kantoor/productiedeur.js)
   'passkey-weg'                 // POST /api/webauthn/weg
 ]);
 

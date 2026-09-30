@@ -6,8 +6,8 @@
    half drie precies zoveel als het systeem hem vertelt.
 
    1. EEN POLSBAND IS GELD, DUS HIJ KAN NOOIT ONDER NUL. Opwaarderen en
-      afboeken lopen via dezelfde bonnenlaag als de cadeaubon (kern/horeca.js):
-      een band is een tegoed met een polsbandnummer erop. Bij vertrek kan het
+      afboeken lopen via dezelfde bonnenlaag als de cadeaubon (kern/horeca/
+      bon.js): een band is een tegoed met een polsbandnummer erop. Bij vertrek kan het
       restsaldo terug -- dat is geen gunst maar geld van de gast.
    2. EEN POLSBAND DRAAGT GEEN NAAM. Er staat een nummer op en een saldo. Wie
       hem verliest, verliest zijn tegoed en niet zijn identiteit; wij hoeven
@@ -21,84 +21,71 @@
       onderwerpgrens: hier het geld van de gast, daar de deur. */
 module.exports = (kern) => {
   const { app, save, schoon, supplierAuth, logActivity, horeca } = kern;
-  const { H, Hlees, nu, id, heleCenten, uitEuro, bonMaak, bonBoek } = horeca;
+  const { H, nu, heleCenten, uitEuro } = horeca;
 
   /* De doos van de club (banden, tafels, lijst, deur) komt uit
      kern/horeca/clublaag.js, zodat dit bestand en clubdeur.js er niet elk een
      eigen versie van aanmaken. */
   const { C } = kern.clublaag;
 
-  /* EEN BAND OPZOEKEN IS KIJKEN, EN KIJKEN SCHEPT NIET. C() zet de clubdoos van
-     een zaak neer zodra iemand ernaar vraagt -- ook als die vraag daarna wordt
-     geweigerd. Een club die nog nooit een band had en een onbekend bandnummer
-     laat scannen, kreeg zo een verse clubdoos bij een 404: de statuscode en de
-     opslag zeggen dan twee verschillende dingen over hetzelfde verzoek.
+  /* EEN BAND OPZOEKEN IS KIJKEN, EN KIJKEN SCHEPT NIET. Het saldo woont in
+     `horecaBonnen` (kern/horeca/bon.js); de band draagt alleen het NUMMER, dat
+     groot op de band staat en geen geheim is. Opzoeken leest die collectie en
+     zet niets neer -- een geraden nummer geeft een nette 404 en laat geen doos
+     achter. Neerzetten (C() voor de lijst op het clubscherm) gebeurt pas waar
+     er werkelijk een band bij komt. */
+  const bl = () => horeca.bonlaag;
+  const bandVan = (code, nummer) => nummer ? bl().kijk().find(b => b && b.zaak === code && b.band === nummer &&
+    !(b.toegang && b.toegang.ingetrokken_at)) || null : null;
+  const bedragVan = b => (b.bedrag != null ? uitEuro(b.bedrag) : heleCenten(b.centen));
 
-     Deze kijker leunt op Hlees (kern/horeca.js) en niet op C(). Bestaat de doos,
-     dan is dit de ECHTE band -- wat eraan verandert landt gewoon in de opslag.
-     Bestaat hij niet, dan is er geen band en loopt de zoektocht dood op een
-     nette 404. Neerzetten blijft C(), en dat gebeurt hieronder pas waar er
-     werkelijk een band bij komt. Hij staat hier en niet naast C() in de
-     clublaag omdat hij niets van de vorm van de clubdoos weet: hij zoekt een
-     band op, en dat is alles. */
-  const bandVan = (code, nummer) => ((Hlees(code).club || {}).banden || {})[nummer];
-
-  /* ---------- polsbanden ---------- */
-  app.post('/api/supplier/horeca/club/band', supplierAuth, (req, res) => {
+  /* ---------- polsbanden ----------
+     De EERSTE opwaardering maakt de band en toont zijn code een keer (druk hem
+     als QR op de band); daarna is opwaarderen alleen geld erbij, zonder code.
+     Kwijt of afgekeken: de manager roteert hem via /api/supplier/horeca/bon/roteer. */
+  app.post('/api/supplier/horeca/club/band', supplierAuth, async (req, res) => {
     const nummer = schoon(req.body.nummer, 40);
     if (!nummer) return res.status(400).json({ error: 'Welk bandnummer? (het nummer dat op de band staat, geen naam)' });
-    const bedrag = req.body.bedrag != null ? uitEuro(req.body.bedrag) : heleCenten(req.body.centen);
-    if (!bedrag) return res.status(400).json({ error: 'Voor hoeveel wordt de band opgewaardeerd?' });
-    let band = bandVan(req.supplier.code, nummer);
-    if (!band) {
-      const bon = bonMaak(req.supplier.code, { soort: 'tegoed', centen: bedrag, naam: 'Polsband ' + nummer });
-      band = C(req.supplier.code).banden[nummer] = { nummer, bonCode: bon.code, at: nu(), opgewaardeerd: bedrag };
-    } else {
-      const h = Hlees(req.supplier.code);
-      const bon = h.bonnen[band.bonCode];
-      if (!bon) return res.status(404).json({ error: 'Het tegoed van deze band is niet gevonden.' });
-      bon.saldo += bedrag;
-      bon.uitgegeven += bedrag;
-      bon.mutaties.unshift({ at: nu(), centen: bedrag });
-      band.opgewaardeerd = (band.opgewaardeerd || 0) + bedrag;
-    }
+    const bedrag = bedragVan(req.body);
+    await bl().zorg();
+    if (!bedrag && !bandVan(req.supplier.code, nummer)) return res.status(400).json({ error: 'Voor hoeveel wordt de band opgewaardeerd?' });
+    const r = await bl().band({ zaak: req.supplier.code, nummer, centen: bedrag, door: req.actor.name, idem: req.body.idem });
+    if (!r.ok) return res.status(r.status || 409).json({ error: r.error, code: r.code });
+    const c = C(req.supplier.code);
+    c.banden[nummer] = Object.assign({ nummer, at: nu() }, c.banden[nummer], { bonId: r.bon.id });
     save();
-    const saldo = Hlees(req.supplier.code).bonnen[band.bonCode].saldo;
     logActivity(req.supplier.code, req.actor, 'waardeerde band ' + nummer + ' op met ' + (bedrag / 100).toFixed(2));
-    /* De BONCODE gaat mee terug. Die is het bewijs-in-handen waarmee een gast
-       op zijn telefoon zijn saldo kan zien en kan afrekenen (routes/gast/club.js):
-       het bandnummer staat groot op de band en is te raden, de boncode niet.
-       Druk hem als QR op de band; toon hem verder nergens. */
-    res.json({ ok: true, band: { nummer, saldo, opgewaardeerd: band.opgewaardeerd, bonCode: band.bonCode },
-      pad: '/apps/gast.html?band=' + band.bonCode,
-      let: 'Op een band staat een nummer en een saldo, geen naam. De boncode is het bewijs-in-handen: zet hem als QR op de band.' });
+    const band = { nummer, saldo: r.bon.saldo, opgewaardeerd: r.bon.uitgegeven, bonId: r.bon.id, geldigTot: r.bon.geldigTot };
+    if (!r.nieuw) return res.json({ ok: true, herhaald: !!r.herhaald, band, let: 'Op een band staat een nummer en een saldo, geen naam.' });
+    res.json({ ok: true, eenmalig: true, band: Object.assign(band, { bonCode: r.code }),
+      pad: '/apps/gast.html#band=' + encodeURIComponent(r.code),
+      let: 'Op een band staat een nummer en een saldo, geen naam. De code wordt maar een keer getoond: zet hem als QR op de band.' });
   });
 
-  app.post('/api/supplier/horeca/club/band/betaal', supplierAuth, (req, res) => {
+  app.post('/api/supplier/horeca/club/band/betaal', supplierAuth, async (req, res) => {
+    await bl().zorg();
     const band = bandVan(req.supplier.code, schoon(req.body.nummer, 40));
     if (!band) return res.status(404).json({ error: 'Deze band kennen we niet.' });
-    const bedrag = req.body.bedrag != null ? uitEuro(req.body.bedrag) : heleCenten(req.body.centen);
-    const uit = bonBoek(req.supplier.code, band.bonCode, bedrag);
-    if (uit.error) return res.status(uit.status || 400).json({ error: uit.error });
-    res.json({ ok: true, geboekt: uit.geboekt, saldo: uit.saldo, tekort: uit.restVraag || 0,
+    const uit = await bl().boek({ zaak: req.supplier.code, vind: bl().opId(req.supplier.code, band.id),
+      centen: bedragVan(req.body), idem: req.body.idem, bron: 'bar' });
+    if (uit.error) return res.status(uit.status || 400).json({ error: uit.error, code: uit.code });
+    res.json({ ok: true, geboekt: uit.geboekt, saldo: uit.saldo, tekort: uit.restVraag || 0, herhaald: !!uit.herhaald,
       let: uit.restVraag ? 'Er is ' + (uit.restVraag / 100).toFixed(2) + ' te weinig saldo; laat de rest apart afrekenen.' : null });
   });
 
-  app.post('/api/supplier/horeca/club/band/terug', supplierAuth, (req, res) => {
+  app.post('/api/supplier/horeca/club/band/terug', supplierAuth, async (req, res) => {
     /* Terugbetalen voegt niets toe: het haalt het restsaldo van een BESTAANDE
-       band af. Er is hier dus geen enkele weg waarop een doos hoort te ontstaan. */
+       band af, in de transactie van de bon. */
+    await bl().zorg();
     const band = bandVan(req.supplier.code, schoon(req.body.nummer, 40));
     if (!band) return res.status(404).json({ error: 'Deze band kennen we niet.' });
-    const h = Hlees(req.supplier.code);
-    const bon = h.bonnen[band.bonCode];
-    if (!bon || !bon.saldo) return res.status(409).json({ error: 'Er staat niets meer op deze band.' });
-    const terug = bon.saldo;
-    bon.saldo = 0;
-    bon.mutaties.unshift({ at: nu(), centen: -terug, soort: 'uitbetaald' });
-    band.uitbetaald = (band.uitbetaald || 0) + terug;
+    const uit = await bl().leeg({ zaak: req.supplier.code, id: band.id });
+    if (uit.error) return res.status(uit.status || 409).json({ error: uit.error });
+    const c = C(req.supplier.code);
+    if (c.banden[band.band]) c.banden[band.band].uitbetaald = (c.banden[band.band].uitbetaald || 0) + uit.uitbetaald;
     save();
-    logActivity(req.supplier.code, req.actor, 'betaalde ' + (terug / 100).toFixed(2) + ' terug van band ' + band.nummer);
-    res.json({ ok: true, uitbetaald: terug, saldo: 0,
+    logActivity(req.supplier.code, req.actor, 'betaalde ' + (uit.uitbetaald / 100).toFixed(2) + ' terug van band ' + band.band);
+    res.json({ ok: true, uitbetaald: uit.uitbetaald, saldo: 0,
       let: 'Restsaldo hoort terug naar de gast; het is geen omzet van de club.' });
   });
 

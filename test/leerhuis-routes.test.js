@@ -19,6 +19,8 @@
      - besluit B1: de factuurcorrectie wordt meegelezen en niemand wordt
        tegengehouden (haal de meelezer uit opzet/kantoordeur.js)   -> toets 7
      - besluit B2: de bron-eis bij het openen weg                 -> toets 8
+     - de cockpits op codenaam (laat metNamen de naam weg)        -> toets 10
+     - het werkscherm: assessor- en kenniswerk alleen met de rol   -> toets 11
        (en de leesroute las eerst zijn eigen kopie van de relatie; toets 8
        vond dat wie uit dienst was, nog meelas)
 
@@ -211,4 +213,51 @@ test('9. B7: het startpakket laden kan alleen de curriculumeigenaar, en opnieuw 
   assert.equal(r.body.gezet.length, 8);
   const nog = await laad(N, 'pak-2');
   assert.equal(nog.body.gezet.length, 0, 'wat er al staat, wordt overgeslagen en niet overschreven');
+});
+
+test('10. fase B-UI: de cockpits noemen mensen op codenaam, en wie geen trainer is krijgt geen trainerbeeld', async () => {
+  /* N heeft sinds toets 3 een relatie met E als manager. */
+  const m = await lees(E, 'managerCockpit');
+  assert.equal(m.status, 200, JSON.stringify(m.body));
+  const lidN = (m.body.antwoord.TEAM || []).find(x => x.persoon === 'lid:' + nId);
+  assert.ok(lidN, 'N staat in het team van E');
+  assert.equal(lidN.naam, await codeVan(N), 'het team toont de codenaam, niet de sleutel en niet de echte naam');
+  assert.doesNotMatch(JSON.stringify(m.body), /Nieuwe Collega/, 'de echte naam komt nergens in het antwoord');
+  const t = await lees(E, 'trainerCockpit');
+  assert.equal(t.status, 200);
+  assert.equal(t.body.antwoord.ok, false, 'E is geen trainer, dus het scherm toont dat vak niet');
+});
+
+test('11. fase B-UI werkscherm: het werk van assessor en kenniseigenaar komt over de deur, alleen voor wie de rol heeft', async () => {
+  /* N is sinds toets 4 assessor en sinds toets 9 curriculumeigenaar die het startpakket laadde. */
+  const a = await lees(N, 'assessorWerk');
+  assert.equal(a.status, 200, JSON.stringify(a.body));
+  assert.equal(a.body.antwoord.ok, true);
+  assert.ok(Array.isArray(a.body.antwoord.OPEN) && Array.isArray(a.body.antwoord.LOPEND));
+  assert.equal((await lees(E, 'assessorWerk')).body.antwoord.ok, false, 'de eigenaar is geen assessor en ziet dus geen beoordelingen');
+  assert.equal((await lees(N, 'kennisWerk')).body.antwoord.ok, false, 'nog geen kenniseigenaar');
+  assert.equal((await doe(E, 'bestuurZet', { persoon: 'lid:' + nId, rol: 'KNOWLEDGE_OWNER' }, 'best-ko')).status, 200);
+  const k = await lees(N, 'kennisWerk');
+  const c = k.body.antwoord.CONCEPTEN.find(x => x.id === 'pakket-kennis-codenamen');
+  assert.ok(c, 'het concept uit het startpakket wacht op een kenniseigenaar');
+  assert.equal(c.bronNodig, true, 'een startpakketconcept vraagt de eigen bron');
+  assert.equal(c.eigen, true, 'N laadde het zelf, dus een ander activeert het');
+  assert.equal((await lees(X, 'kennisWerk')).body.antwoord.ok, false, 'een vrijwilliger zonder rol ziet geen concepten');
+});
+
+test('12. de eigenaar wijst een nieuwe collega aan op codenaam, met reden, en dat staat op de inzagekaart van die collega', async () => {
+  const Z = (await post('/api/auth/register', { name: 'Zonder Sleutel', email: 'lh-z@x.nl', phone: '0612348009',
+    password: 'geheim12345', geboortedatum: '1992-02-02', tier: 'rtg' })).body.token;
+  const code = await codeVan(Z);
+  assert.equal((await lees(Z, 'mijn')).status, 403, 'nog geen relatie');
+  const zet = (tok, invoer, sleutel) => doe(tok, 'relatieZet', Object.assign({ codenaam: code, soort: 'EMPLOYEE' }, invoer), sleutel);
+  assert.equal((await zet(X, { reden: 'nieuwe collega bij Operations' }, 'aanw-x')).status, 403, 'wie geen eigenaar is, kan geen codenaam nagaan');
+  assert.equal((await zet(E, { reden: '' }, 'aanw-leeg')).status, 400, 'zonder reden geen opzoeking');
+  assert.equal((await doe(E, 'relatieZet', { codenaam: 'Bestaat Niet 0000', soort: 'EMPLOYEE', reden: 'nieuwe collega' }, 'aanw-niet')).status, 404);
+  const r = await zet(E, { reden: 'nieuwe collega bij Operations' }, 'aanw-z');
+  assert.equal(r.status, 200, JSON.stringify(r.body));
+  assert.equal((await lees(Z, 'mijn')).status, 200, 'de relatie staat, op de sleutel die de server erbij zocht');
+  const kaart = (await post('/api/inzagekaart', {}, Z)).body;
+  assert.ok(JSON.stringify(kaart).includes('nieuwe collega bij Operations'), 'de collega ziet wie hem opzocht en waarom: ' + JSON.stringify(kaart).slice(0, 400));
+  assert.doesNotMatch(JSON.stringify(r.body), /Zonder Sleutel/, 'de echte naam komt nergens in het antwoord');
 });

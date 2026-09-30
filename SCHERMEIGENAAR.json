@@ -201,6 +201,7 @@
     "onderzoek.lab": "apps/livinglab.html",
     "loon.strook": "apps/loonstrook.html",
     "leerhuis.mijn": "apps/leerhuis.html",
+    "leerhuis.werk": "apps/leerhuis-werk.html",
     "loopbaan.ledger": "apps/loopbaan.html",
     "loopbaan.bewijs": "apps/loopbaanbewijs.html",
     "luchthaven.operatie": "apps/luchthaven.html",
@@ -1868,6 +1869,12 @@
       "rol": "eigenaar",
       "doelgroep": "lid",
       "doel": "Een werknemer bekijkt zijn loonstroken en ziet wie er in zijn loongegevens heeft gekeken."
+    },
+    "apps/leerhuis-werk.html": {
+      "capability": "leerhuis.werk",
+      "rol": "eigenaar",
+      "doelgroep": "lid",
+      "doel": "Een trainer, assessor of kenniseigenaar doet in het leerhuis van een organisatie het werk dat bij zijn rol hoort."
     },
     "apps/leerhuis.html": {
       "capability": "leerhuis.mijn",

@@ -43,11 +43,13 @@ module.exports = (kern) => {
   });
 
   /* ---------- betalen ---------- */
-  app.post('/api/gast/betaal', gastAuth, (req, res) => {
+  /* Een bon of polsband gaat hier NIET mee als code: betalen boekt alleen af
+     wat eerder met /api/gast/band aan deze sessie is gekoppeld. */
+  app.post('/api/gast/betaal', gastAuth, async (req, res) => {
     const { zaakcode, rekening, deelnemer } = req.gast;
     const b = req.body || {};
-    stuur(res, afrekenlaag.betaal(zaakcode, rekening, deelnemer, {
-      wijze: b.wijze, centen: b.centen, bonCode: b.bonCode, kamer: b.kamer,
+    stuur(res, await afrekenlaag.betaal(zaakcode, rekening, deelnemer, {
+      wijze: b.wijze, centen: b.centen, kamer: b.kamer,
       idem: b.idem, apparaat: b.apparaat, folioBoek }));
   });
 

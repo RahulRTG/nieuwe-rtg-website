@@ -568,7 +568,10 @@ const REGISTERS = [
      de CODE -- een nieuw objectdomein of een hernoemde map verandert hem. */
   ['OFFICEVORM.json', 'npm run officevorm:vast', 'of de objectdomeinen onder het voorgestelde RTGObject een datavorm DELEN -- het besluit tegen een universeel objectmodel voor RTG Office rust erop, en de uitslag is een nul'],
   ['PLANVORM.json', 'npm run planvorm:vast', 'of de plandomeinen een datavorm en een planlus DELEN -- het besluit over een universele planningsgrond rust erop, en de uitslag is twee nullen'],
+  ['PLAATSVORM.json', 'npm run plaatsvorm:vast', 'of de plaatsdomeinen een datavorm DELEN -- het besluit tegen een Place-objecttype rust erop, en de uitslag is een nul onder twee drempels'],
   ['SPOORVORM.json', 'npm run spoorvorm:vast', 'hoever de zes andere mechanismen van de spoorvorm van kern/vertegenwoordiging/handelen.js staan -- een matrix vol streepjes ziet er vers en verouderd hetzelfde uit, en juist die matrix hoort te veranderen'],
+  ['POSITIESTROOM.json', 'npm run positiestroom:vast', 'waar de positie van een mens blijft staan en met welke termijn -- een termijn die in het bewaarbeleid verdwijnt of een stroom die verhuist, hoort hier te verschijnen en niet stil te blijven staan'],
+  ['POSITIEPROEF.json', 'npm run positieproef:vast', 'wat een doorloop met posities in de opslag achterlaat -- een positie die na haar taak blijft staan, of een passage langs een zaak die niet het doel was, hoort hier te verschijnen'],
   /* Ook een nul, en om dezelfde reden hier: `zonderUitspraak: 0` betekent dat
      elk publiek domein een besluit draagt. Verouderd betekent diezelfde nul
      alleen nog dat er destijds geen domein ontbrak. */

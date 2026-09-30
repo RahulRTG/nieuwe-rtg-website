@@ -1611,6 +1611,13 @@ const IJKINGEN = {
       (j) => { j.rondes.ruim.vorm.domeinen = (j.rondes.ruim.vorm.domeinen || []).slice(0, -3); return j; },
       () => voor.planDomeinenGemeten - norm.meet().planDomeinenGemeten)
   },
+  /* DE TAND VAN 29 SEPTEMBER 2026: plaatsDomeinenGemeten, de zuster van de tand
+     hierboven voor de plaatsvorm (NAVIGATIE.md par. 14.1). */
+  plaatsDomeinenGemeten: {
+    proef: (voor) => metVervangenJson('PLAATSVORM.json',
+      (j) => { j.rondes.ruim.domeinen = (j.rondes.ruim.domeinen || []).slice(0, -3); return j; },
+      () => voor.plaatsDomeinenGemeten - norm.meet().plaatsDomeinenGemeten)
+  },
   /* DE TAND VAN 23 SEPTEMBER 2026: officeDomeinenGemeten, de zuster van de tand
      hierboven en om dezelfde reden: OFFICEVORM.json draagt een nul (0 velden in
      alle objectdomeinen onder het voorgestelde RTGObject), en ziet de meter stil
@@ -1685,6 +1692,47 @@ const IJKINGEN = {
     proef: (voor) => metVervangenJson('SPOORVORM.json',
       (j) => { j.gemeten.volledigConvergent = (j.gemeten.volledigConvergent || 0) + 2; return j; },
       () => meet().spoorConvergent - voor.spoorConvergent)
+  },
+  /* DE TANDEN VAN 29 SEPTEMBER 2026: het bewegingsspoor (POSITIESTROOM.json,
+     NAVIGATIE.md par. 6.4). Twee schulden die alleen mogen dalen en een bereik
+     dat alleen mag stijgen. De ijking duwt elke tand de VERKEERDE kant op en
+     eist dat de meter het ziet: meer stromen zonder termijn, meer stromen die
+     de vergeetroute mist, en minder stromen gezien. */
+  positieZonderTermijn: {
+    proef: (voor) => metVervangenJson('POSITIESTROOM.json',
+      (j) => { j.gemeten.zonderTermijn = (j.gemeten.zonderTermijn || 0) + 3; return j; },
+      () => meet().positieZonderTermijn - voor.positieZonderTermijn)
+  },
+  positieNietVergeten: {
+    proef: (voor) => metVervangenJson('POSITIESTROOM.json',
+      (j) => { j.gemeten.nietVergeten = (j.gemeten.nietVergeten || 0) + 3; return j; },
+      () => meet().positieNietVergeten - voor.positieNietVergeten)
+  },
+  positieStromenGezien: {
+    proef: (voor) => metVervangenJson('POSITIESTROOM.json',
+      (j) => { j.gemeten.stromen = Math.max(0, (j.gemeten.stromen || 0) - 5); return j; },
+      () => voor.positieStromenGezien - meet().positieStromenGezien)
+  },
+  /* En de opslaghelft (POSITIEPROEF.json): elke tand de verkeerde kant op. */
+  positieNavBlijft: {
+    proef: (voor) => metVervangenJson('POSITIEPROEF.json',
+      (j) => { j.tellers.blijvendeNavPositie = (j.tellers.blijvendeNavPositie || 0) + 2; return j; },
+      () => meet().positieNavBlijft - voor.positieNavBlijft)
+  },
+  positieNaTaak: {
+    proef: (voor) => metVervangenJson('POSITIEPROEF.json',
+      (j) => { j.tellers.positieNaVenster = (j.tellers.positieNaVenster || 0) + 2; return j; },
+      () => meet().positieNaTaak - voor.positieNaTaak)
+  },
+  positiePassages: {
+    proef: (voor) => metVervangenJson('POSITIEPROEF.json',
+      (j) => { j.tellers.passageLog = (j.tellers.passageLog || 0) + 2; return j; },
+      () => meet().positiePassages - voor.positiePassages)
+  },
+  aankomstUitPositie: {
+    proef: (voor) => metVervangenJson('POSITIEPROEF.json',
+      (j) => { j.tellers.aankomstUitPositie = (j.tellers.aankomstUitPositie || 0) + 2; return j; },
+      () => meet().aankomstUitPositie - voor.aankomstUitPositie)
   },
   /* DE TAND VAN 15 SEPTEMBER 2026: connectDomeinenGemeten telt de
      ontdekkingsdomeinen die scripts/connectlus.js werkelijk heeft gezien

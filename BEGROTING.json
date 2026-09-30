@@ -45,6 +45,10 @@
       "waarom": "Het vergeetpad (server/kern/vergeten/) herschrijft deze collectie: een handeling haalt alles van EEN lid weg, en dat is per ontwerp onbegrensd. Een lid met achthonderd rijen hoort die achthonderd te kunnen laten wissen; een grens hierop breekt het recht om vergeten te worden. Blijft uitgezonderd tot dat pad buiten een verzoek draait.",
       "gezienBij": "/api/privacy/delete"
     },
+    "ovRitten": {
+      "handhaaf": false,
+      "waarom": "Het vergeetpad (server/kern/vergeten/eigen.js) herschrijft deze collectie sinds NAVIGATIE.md N17: een handeling haalt alle OV-ritten van EEN lid weg, en dat is per ontwerp onbegrensd. Een grens hierop breekt het recht om vergeten te worden. Met de hand toegevoegd bij N17 en nog niet door de krimpronde gezien (geen gezien-getal); blijft uitgezonderd tot dat pad buiten een verzoek draait."
+    },
     "flitsMeldingen": {
       "grens": 100,
       "gezien": 1,

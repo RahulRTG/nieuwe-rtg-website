@@ -45,44 +45,48 @@ test.after(() => {
 
 async function les() {
   const d = await json(await api('/les/maak', { vak: 'Rekenen', naam: 'Juf' }));
-  const s = await json(await api('/les/join', { code: d.code, naam: 'Sara' }));
-  return { code: d.code, tToken: d.token, sToken: s.token, studentId: s.studentId };
+  const s = await json(await api('/les/join', { lescode: d.lescode, naam: 'Sara' }));
+  return { code: d.lesId, tToken: d.token, sToken: s.token, studentId: s.studentId };
 }
+const metSleutel = (pad, token) => fetch(BASE + '/api/foundation' + pad, { headers: { Authorization: 'Bearer ' + token } });
 
-test('les maken en meedoen geeft een code en tokens', async () => {
+test('les maken en meedoen geeft een lescode en eigen sleutels (128 bit, B17)', async () => {
   const d = await json(await api('/les/maak', { vak: 'Taal', naam: 'Meester' }));
-  /* ACHT EN NIET ZES, sinds 2 september 2026. De lescode IS de geloofsbrief van
-     een les -- wie hem heeft ziet leerlingnamen, schriften en het bord -- en zes
-     tekens uit 31 is 29,7 bits. Acht maakt er 39,6 van, tienduizend keer zo veel
-     werk voor wie raadt. Zie de uitleg bij `nieuweCode()` in
-     server/foundation/onderwijs.js, en TAKEN.md 7.24.
-
-     De ondergrens staat er als BEWERING en niet als exact getal: wie de code
-     later langer maakt, hoeft deze toets niet aan te raken; wie hem KORTER
-     maakt, loopt er tegenaan. Dat is de richting die bewaakt hoort te worden. */
-  assert.ok(d.code.length >= 8, 'een lescode is minstens acht tekens (nu ' + d.code.length + ')');
-  assert.ok(d.token);
-  const s = await api('/les/join', { code: d.code, naam: 'Kim' });
+  /* SINDS 29 SEPTEMBER 2026 128 BITS (CODECREDENTIALS.json,
+     foundation.onderwijs_les_tokens): de lescode, de leraarssleutel en elke
+     leerlingsleutel zijn 32 hexadecimale tekens achter een voorvoegsel uit
+     kern/bearercode.js. Het les-id is niet geheim en opent niets. */
+  assert.match(d.lescode, /^LES\.[0-9A-F]{32}$/);
+  assert.match(d.token, /^LESLR\.[0-9A-F]{32}$/);
+  assert.ok(d.lesId && !d.lescode.includes(d.lesId));
+  const s = await api('/les/join', { lescode: d.lescode, naam: 'Kim' });
   assert.equal(s.status, 200);
-  assert.ok((await json(s)).token);
-  // meedoen met een onbekende code kan niet
-  assert.equal((await api('/les/join', { code: 'XXXXXX', naam: 'Kim' })).status, 404);
+  assert.match((await json(s)).token, /^LESLL\.[0-9A-F]{32}$/);
+  // meedoen met een onbekende code kan niet, en het les-id is geen lescode
+  assert.equal((await api('/les/join', { lescode: 'XXXXXX', naam: 'Kim' })).status, 404);
+  assert.equal((await api('/les/join', { lescode: d.lesId, naam: 'Kim' })).status, 404);
+  // dezelfde naam nog eens geeft NIET de sleutel van Kim terug
+  const dubbel = await api('/les/join', { lescode: d.lescode, naam: 'kim' });
+  assert.equal(dubbel.status, 409);
+  assert.equal((await json(dubbel)).token, undefined);
 });
 
-test('het bord: docent tekent, iedereen ziet het; een leerling mag niet op het bord', async () => {
+test('het bord: docent tekent, de klas ziet het; een leerling mag niet op het bord', async () => {
   const L = await les();
   const stroke = { tool: 'pen', kleur: '#ffffff', dikte: 4, points: [[10, 10], [20, 20], [30, 15]] };
   const r = await api('/bord/stroke', { code: L.code, token: L.tToken, stroke });
   assert.equal(r.status, 200);
-  const bord = await json(await fetch(BASE + '/api/foundation/bord/' + L.code));
+  const bord = await json(await metSleutel('/bord/' + L.code, L.sToken));
   assert.equal(bord.strokes.length, 1);
   assert.deepEqual(bord.strokes[0].points[0], [10, 10]);
+  // zonder sleutel ziet niemand het bord: het les-id is geen geloofsbrief
+  assert.equal((await fetch(BASE + '/api/foundation/bord/' + L.code)).status, 403);
   // een leerling kan niet op het bord tekenen
   assert.equal((await api('/bord/stroke', { code: L.code, token: L.sToken, stroke })).status, 403);
   // wissen mag alleen de docent
   assert.equal((await api('/bord/wis', { code: L.code, token: L.sToken })).status, 403);
   assert.equal((await api('/bord/wis', { code: L.code, token: L.tToken })).status, 200);
-  assert.equal((await json(await fetch(BASE + '/api/foundation/bord/' + L.code))).strokes.length, 0);
+  assert.equal((await json(await metSleutel('/bord/' + L.code, L.tToken))).strokes.length, 0);
 });
 
 test('opgave klaarzetten, inleveren, en de docent leest het schrift mee', async () => {
@@ -106,7 +110,7 @@ test('opgave klaarzetten, inleveren, en de docent leest het schrift mee', async 
 
 test('XSS-preventie: HTML in een naam wordt ontdaan van < en >', async () => {
   const d = await json(await api('/les/maak', { vak: '<img src=x onerror=1>Wiskunde', naam: 'x' }));
-  const info = await json(await fetch(BASE + '/api/foundation/les/' + d.code));
+  const info = await json(await metSleutel('/les/' + d.lesId, d.token));
   assert.ok(!/[<>]/.test(info.les.vak), 'vak zonder < of >, kreeg: ' + info.les.vak);
 });
 

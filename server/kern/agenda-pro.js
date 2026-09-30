@@ -36,11 +36,11 @@ function keerN(basis, soort, n) {
 }
 
 function maakAgendaPro({ db, save, bijeen, inBundel, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer, boekingenVanKlant, reserveringenVanKlant }) {
-  // schrijft in dezelfde agenda, dus dezelfde belofte: zie lib/duurzaam.js
+  // zelfde agenda, zelfde belofte: zie lib/duurzaam.js
   const vastleggen = require('../lib/duurzaam')({ bijeen, save, inBundel, bron: 'agenda-pro' });
   const nu = () => new Date().toISOString();
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
-  const { agendaWortel: store, agendaItems } = require('./agenda-opslag')({ db });
+  const { agendaWortel: store, agendaItems, agendaLees } = require('./agenda-opslag')({ db });
   const ruw = k => agendaItems(k);
   const lidVan = ownerKey => String(ownerKey).startsWith('lid:') ? ownerKey.slice(4) : null;
   const naam = ownerKey => { const k = lidVan(ownerKey); return k ? (codenaamVan(k) || 'een lid') : 'de zaak'; };
@@ -59,7 +59,7 @@ function maakAgendaPro({ db, save, bijeen, inBundel, crypto, schoon, keyVanCoden
   function bereik(ownerKey, van, tot) {
     if (!isDatum(van) || !isDatum(tot) || tot < van) return { error: 'Kies een geldig datumvenster.' };
     const uit = [];
-    for (const i of ruw(ownerKey)) {
+    for (const i of agendaLees(ownerKey)) {
       const basis = publiek(i);
       if (!i.herhaal || i.herhaal === 'geen') {
         if (i.datum >= van && i.datum <= tot) uit.push({ ...basis, datum: i.datum });

@@ -788,6 +788,11 @@ async function tabActiviteiten() {
       .then(res => { melding(res.bericht, true); tekenTab(); })
       .catch(e => melding(e.message, false));
   }));
+  // de kale code staat alleen in dit antwoord; de vorige opent daarna niets meer
+  $('#tabIn').querySelectorAll('[data-nieuwecode]').forEach(b => b.addEventListener('click', () =>
+    api('activiteit/incheckcode', { id: b.dataset.nieuwecode, inschrijvingId: b.dataset.inschrijving })
+      .then(res => melding(res.inschrijving.codenaam + ': nieuwe incheckcode ' + res.inschrijving.checkinCode, true))
+      .catch(e => melding(e.message, false))));
   $('#tabIn').querySelectorAll('[data-afmeld]').forEach(b => b.addEventListener('click', () =>
     api('activiteit/afmelden', { id: b.dataset.afmeld, inschrijvingId: b.dataset.inschrijving })
       .then(res => { melding(res.bericht, true); tekenTab(); })
@@ -813,11 +818,12 @@ function activiteitRij(a, vrijOpties) {
       '<label class="uitleg"><input type="checkbox" class="aOuder"> toestemming ouders</label>' +
       '<label class="uitleg"><input type="checkbox" class="aFoto"> toestemming foto</label>' +
       '<button class="knop stil" data-inschrijf="' + esc(a.id) + '">Inschrijven</button>' +
-      '<input class="veld aIncheck" placeholder="incheckcode" maxlength="20" aria-label="Incheckcode">' +
+      '<input class="veld aIncheck" placeholder="incheckcode" maxlength="80" aria-label="Incheckcode">' +
       '<button class="knop stil" data-incheck="' + esc(a.id) + '">Inchecken</button></div>' +
     (a.inschrijvingen || []).map(i => '<div class="sub">' + esc(i.codenaam) + ' &middot; ' + esc(i.status) +
       (i.minderjarig ? (i.oudertoestemming ? ' &middot; oudertoestemming' : ' &middot; GEEN oudertoestemming') : '') +
       (i.fototoestemming ? '' : ' &middot; geen foto') +
+      ' <button class="knop stil" data-nieuwecode="' + esc(a.id) + '" data-inschrijving="' + esc(i.id) + '">nieuwe incheckcode</button>' +
       ' <button class="knop stil" data-afmeld="' + esc(a.id) + '" data-inschrijving="' + esc(i.id) + '">afmelden</button></div>').join('') +
     '</div>';
 }

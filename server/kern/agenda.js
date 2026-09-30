@@ -19,7 +19,7 @@ function maakAgenda({ db, save, bijeen, inBundel, crypto, anthropic, schoon }) {
   const nu = () => new Date().toISOString();
   const vandaagStr = () => new Date().toISOString().slice(0, 10);
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
-  const { agendaWortel: store, agendaItems } = require('./agenda-opslag')({ db });
+  const { agendaWortel: store, agendaItems, agendaLees } = require('./agenda-opslag')({ db });
 
   function ruw(ownerKey) { return agendaItems(ownerKey); }
 
@@ -32,14 +32,14 @@ function maakAgenda({ db, save, bijeen, inBundel, crypto, anthropic, schoon }) {
      staat. */
   function itemPubliek(i) { return { id: i.id, titel: i.titel, datum: i.datum, tijd: i.tijd || null, notitie: i.notitie || null, gedaan: !!i.gedaan, bron: i.bron || null }; }
   function lijst(ownerKey) {
-    return ruw(ownerKey).slice().sort((a, b) =>
+    return agendaLees(ownerKey).slice().sort((a, b) =>
       (a.gedaan - b.gedaan) || String(a.datum).localeCompare(String(b.datum)) || String(a.tijd || '').localeCompare(String(b.tijd || ''))
     ).map(itemPubliek);
   }
   // Voor de badge: hoeveel niet-afgeronde items er vandaag of later staan.
   function telling(ownerKey) {
     const t = vandaagStr();
-    return ruw(ownerKey).filter(i => !i.gedaan && String(i.datum) >= t).length;
+    return agendaLees(ownerKey).filter(i => !i.gedaan && String(i.datum) >= t).length;
   }
 
   function geldigeDatum(d) { return /^\d{4}-\d{2}-\d{2}$/.test(String(d || '')); }

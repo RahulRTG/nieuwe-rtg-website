@@ -19,14 +19,18 @@
 
 /* Modules buiten server/kern/democratie/ en server/routes/democratie/. */
 const MODULES = {
-  '../eigencollectie': { wat: 'bezit van de drie eigen collecties, met een schrijver per collectie',
-    vervangbaar: 'ja: een opslag met drie benoemde verzamelingen' },
+  '../eigencollectie': { wat: 'bezit van de zes eigen collecties, met een schrijver per collectie',
+    vervangbaar: 'ja: een opslag met zes benoemde verzamelingen' },
   '../../lib/duurzaam': { wat: 'pas bevestigen als het vastligt; anders 503',
     vervangbaar: 'ja: elke opslag met een bevestigde commit' },
   '../../lib/keten': { wat: 'hashketen onder de tijdlijn en het journaal',
     vervangbaar: 'ja: zelfstandige functies zonder staat, alleen node:crypto' },
   '../../lib/klok': { wat: 'de tijd, verschuifbaar in toetsen', vervangbaar: 'ja: Date.now()' },
-  '../util': { wat: 'invoer inkorten en ontdoen van < en >', vervangbaar: 'ja: een regel code' }
+  '../util': { wat: 'invoer inkorten en ontdoen van < en >', vervangbaar: 'ja: een regel code' },
+  '../bearercode': { wat: 'de partijsleutel: 128 bits, alleen de hash op schijf, zoeken in constante tijd, vervaltijd en intrekken',
+    vervangbaar: 'ja: een zelfstandige module zonder opslag, alleen node:crypto' },
+  '../../rem': { wat: 'een rem per bron voor de deur van een partij, tegen wie sleutels probeert',
+    vervangbaar: 'ja: elke teller per bron en tijdvenster' }
 };
 
 /* Namen die de fabriek van buitenaf krijgt (kern/democratie/index.js). */
@@ -35,7 +39,8 @@ const GEINJECTEERD = {
   save: { wat: 'wegschrijven', vervangbaar: 'ja' },
   bijeen: { wat: 'een bundel die in een keer wordt vastgelegd', vervangbaar: 'ja' },
   inBundel: { wat: 'weten of we al in een bundel zitten', vervangbaar: 'ja' },
-  crypto: { wat: 'willekeurige nummers voor kwesties en inbrengers', vervangbaar: 'ja: node:crypto' },
+  crypto: { wat: 'willekeurige nummers voor kwesties, inbrengers, partijen en voorstellen, en de hash van een partijsleutel',
+    vervangbaar: 'ja: node:crypto' },
   meldLid: { wat: 'een WEK in de berichten van het lid; nooit het bewijs van terugkoppeling',
     vervangbaar: 'ja: elke berichtendienst, of geen -- het leespad is de eigen lijst' },
   codenaamVan: { wat: 'de codenaam van wie een besluit nam, voor DO-09 (macht is zichtbaar)',

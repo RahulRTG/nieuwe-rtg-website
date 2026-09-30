@@ -3,25 +3,25 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-09-29T07:58:56.236Z",
-  "commit": "d055489cb",
+  "op": "2026-09-30T05:50:52.644Z",
+  "commit": "1a8f7df1",
   "boomVuil": false,
-  "boomAnders": 4,
+  "boomAnders": 0,
   "instrument": "scripts/afgeleid.js",
-  "node": "v24.18.0"
+  "node": "v22.22.2"
  },
  "gemeten": {
-  "artefacten": 335,
+  "artefacten": 337,
   "bron": 22,
-  "afgeleid": 181,
-  "fragmenten": 26,
+  "afgeleid": 182,
+  "fragmenten": 27,
   "momentopname": 1,
   "onbeslist": 105,
   "afgeleidZonderEigenaar": 2,
-  "metEigenaar": 206,
-  "afgeleidEigenaarHard": 179,
+  "metEigenaar": 208,
+  "afgeleidEigenaarHard": 180,
   "afgeleidGrendelt": 21,
-  "metStempel": 112,
+  "metStempel": 113,
   "stempelAnders": 0
  },
  "artefacten": [
@@ -2922,6 +2922,20 @@
    "botsingVerklaard": false
   },
   {
+   "naam": "OVERGANGSVORM.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/overgangsvorm.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/overgangsvorm.js"
+   ],
+   "stempelInstrument": "scripts/overgangsvorm.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run overgangsvorm:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
    "naam": "OVERLEVING.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/overleving.js",
@@ -4050,6 +4064,18 @@
    "stempelInstrument": "scripts/verband.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run verband",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "VERDER.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
    "grendelt": false,
    "botsingVerklaard": null
   },

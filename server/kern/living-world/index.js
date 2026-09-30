@@ -32,7 +32,7 @@ module.exports = function makeLivingWorld({db,save,bewerkCollectie,sources,now})
     return {ok:true,objectRef:M.ref(type,result.id),result:{id:result.id,type,revision:result.revision,
       status:result.status,url:M.href(type,result.id)}};
   }
-  function prepare(key,action,data) {
+  function prepareWorldAction(key,action,data) {
     try {
       if (!key || typeof data !== 'object' || !data || Array.isArray(data)) M.fail('Ongeldige invoer.');
       const parameters = M.clone(data);
@@ -80,6 +80,6 @@ module.exports = function makeLivingWorld({db,save,bewerkCollectie,sources,now})
     } catch(e) { return error(e); }
   }
   const projection = require('./projection')({read,time,sources});
-  return {prepare,execute,view:projection.view,saloon:projection.saloon,mediaLinks:projection.mediaLinks,
+  return {prepare:prepareWorldAction,execute,view:projection.view,saloon:projection.saloon,mediaLinks:projection.mediaLinks,
     portfolio:require('./portfolio')(read,time)};
 };

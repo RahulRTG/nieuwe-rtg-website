@@ -3,11 +3,13 @@ const test=require('node:test'),assert=require('node:assert/strict');
 const url=process.env.RTG_LIVING_WORLD_TEST_PG_URL || process.env.DATABASE_URL || process.env.PG_URL;
 test('Living World: twee PostgreSQL-instances delen ontvangstbewijzen, revisies en herstel',{
   timeout:30000
-},async()=>{
+},async t=>{
   assert.ok(url,'Deze proef vereist een lege testdatabase via npm run test:pg of RTG_LIVING_WORLD_TEST_PG_URL.');
+  const isolated=await require('./lib/living-world-pg-database')(url);
+  t.after(isolated.close);
   const {maakPg}=require('../server/pg'),{merge3}=require('../server/db/merge'),kluis=require('../server/kluis');
   const make=require('../server/kern/living-world');
-  const a=maakPg({url,merge3,kluis}),b=maakPg({url,merge3,kluis});
+  const a=maakPg({url:isolated.url,merge3,kluis}),b=maakPg({url:isolated.url,merge3,kluis});
   try{
     await a.schema();
     assert.equal(Number((await a.pool.query('SELECT count(*) AS n FROM kv')).rows[0].n),0,'deze proef vereist een lege testdatabase');

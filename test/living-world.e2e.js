@@ -1,13 +1,9 @@
 'use strict';
-const test=require('node:test'),assert=require('node:assert/strict'),crypto=require('node:crypto'),fs=require('node:fs'),path=require('node:path');
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const h=require('./helper');let srv,browser;const pw=h.laadPlaywright();
 async function post(route,body,token){
  const r=await fetch(srv.base+route,{method:'POST',headers:{'content-type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:JSON.stringify(body||{})});
  const out=await r.json();assert.equal(r.status,200,JSON.stringify(out));return out;
-}
-async function action(token,name,parameters){
- const p=await post('/api/experience/intent/preview',{world:'travel',intent:'living-world.'+name,parameters},token);
- return post('/api/experience/intent/execute',{previewId:p.preview.id,idempotencyKey:'browser-'+crypto.randomUUID(),confirmed:true},token);
 }
 test.before(async()=>{
  assert.ok(pw,'Een echte browser is vereist.');
@@ -50,7 +46,9 @@ for(const width of [390,1440])test(width+'px: Living World maakt, bevestigt, her
  assert.equal((await post('/api/living-world/view',{},owner)).plans.some(p=>p.id===plan.id),false);
  await traveler.locator('[data-lw-action="plan.update"]').click();
  const scheduled=Date.now()+10000;
- await traveler.locator('#lwField-date').fill(new Date(scheduled).toISOString().slice(0,19));
+ // Native datetime-local normaliseert hele minuten zonder het secondenveld.
+ const localDate=new Date(scheduled).toISOString().slice(0,19).replace(/:00$/,'');
+ await traveler.locator('#lwField-date').fill(localDate);
  await traveler.locator('#lwField-notes').fill('Graag een rustige route.');await confirm(traveler);
  await traveler.waitForSelector('[data-lw-action="plan.request"]');await traveler.locator('[data-lw-action="plan.request"]').click();await confirm(traveler);
  await page.goto(srv.base+'/apps/living-world.html?plan='+plan.id);await page.waitForSelector('[data-lw-action="plan.decide"]');

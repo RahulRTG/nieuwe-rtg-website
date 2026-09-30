@@ -18,10 +18,10 @@ module.exports = ({read,time,sources}) => {
         supersedes:c.supersedes,supersededBy:c.supersededBy || null,
         review:c.review ? {by:sources.name(c.review.by),at:c.review.at,reason:c.review.reason} : null,
         adoptedVersion:c.adoptedVersion || null,blueprintId:c.blueprintId};
-      if (c.owner === key) out.impact = impact(c);
+      if (c.owner === key) out.impact = contributionImpact(c);
       return out;
     }
-    function impact(c) {
+    function contributionImpact(c) {
       const plans = Object.values(s.plans).filter(p => p.owner !== c.owner && p.consentImpact &&
         p.knowledge.some(r => r.id === c.id) && !['cancelled','declined'].includes(p.status));
       const completed = plans.filter(p => p.status === 'completed' && p.acknowledgedAt && !p.participation.revokedAt);

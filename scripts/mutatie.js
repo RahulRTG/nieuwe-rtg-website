@@ -1,12 +1,7 @@
 #!/usr/bin/env node
 /* =====================================================================   DE MUTATIEMOTOR -- kan deze toets eigenlijk zakken?
 
-   WAAROM. LAT.md regel 9: een toets die niet kan zakken is erger dan geen toets,
-   want hij geeft dekking zonder dekking te leveren. BEWIJS.md legde bloot hoe
-   groot dat gat hier is: van de 612 toetsbestanden noemen er 586 geen enkele
-   mutatie. "Noemt geen mutatie" is niet hetzelfde als "kan niet zakken" -- maar
-   het betekent wel dat niemand het weet, en dat is precies het probleem dat deze
-   motor oplost. Hij MEET het, per bestand.
+   LAT.md regel 9: meet per toetsbestand of het op een aangebrachte fout zakt.
 
    TWEE SOORTEN TOETS, TWEE SOORTEN MUTATIE, en dat onderscheid is de hele opzet.
 
@@ -515,6 +510,10 @@ function draaiToets(bestand, env, wacht, forceer) {
    De tien andere staan nog open; dat is een geteld gat in TAKEN.md en geen
    vergeten hoekje. */
 const EIGEN_MODULE = new Map([
+  ['living-world.test.js', ['server/kern/living-world/actions.js']],
+  ['living-world-sources.test.js', ['server/kern/living-world/actions.js']],
+  ['living-world-sqlite.test.js', ['server/kern/living-world/index.js']],
+  ['living-world.pg.test.js', ['server/kern/living-world/index.js']],
   // This worker test executes the real source in a VM, not through require.
   ['pass-cache.test.js', ['public/shared/sw-pass-assets.js']],
   ['operationeel-meter.test.js', ['scripts/lib/operationeel/beoordeel.js']],

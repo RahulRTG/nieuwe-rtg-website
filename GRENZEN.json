@@ -355,7 +355,7 @@
       "zwaar"
     ],
     "living-world": [
-      "livingWorld"
+      "experience"
     ],
     "experience": [
       "experience"
@@ -818,7 +818,7 @@
       "markt"
     ],
     "mediaos": [
-      "livingWorld",
+      "experience",
       "aanwezigBeeld",
       "aanwezigMet",
       "aanwezigMijn",

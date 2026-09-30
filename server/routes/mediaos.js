@@ -33,7 +33,7 @@ module.exports = (kern) => {
     if (geenGast(req, res)) return;
     const id = String((req.body || {}).id || '');
     const stuk = await mediaStuk(sess(req), id);
-    if (stuk && !stuk.error) stuk.experiences = kern.livingWorld.mediaLinks(req.session.key, id)
+    if (stuk && !stuk.error) stuk.experiences = kern.experience.mediaExperiences(req.session.key, id)
       .map(b => ({ id: b.id, title: b.title, url: b.url }));
     stuur(res, stuk);
   });

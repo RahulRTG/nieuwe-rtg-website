@@ -3,11 +3,6 @@
 const G = (wat, doe, tip) => ({ wat, doe, tip });
 
 module.exports = Object.assign({
-  '/apps/living-world.html': G('Living World: van een gedeelde plek naar uw eigen ervaring en kennis voor de volgende persoon.',
-    ['Ontdek een blueprint en maak een privéplan met Take me there',
-      'Leg het plan voor aan de organisator en vind de behandeling hier terug',
-      'Bevestig uw deelname en laat vrijwillig een beoordeelde bijdrage achter'],
-    'Een blueprint is een opzet. De organisator beoordeelt iedere uitvoering; boekingen en kwalificaties blijven bij hun eigen bron.'),
   '/apps/festival.html': G('Het festival draaien: de poort, het beeld en het terrein.',
     ['Poort: kies waar u staat; het veld houdt zelf de focus, zodat een handscanner gewoon werkt',
       'Beeld: alleen wat aandacht vraagt, met de tijd die er nog is -- en welke plekken NIET gemeten worden',

@@ -9,6 +9,11 @@
 const G = (wat, doe, tip) => ({ wat, doe, tip });
 
 module.exports = {
+  '/apps/living-world.html': G('Living World: van een gedeelde plek naar uw eigen ervaring en kennis voor de volgende persoon.',
+    ['Ontdek een blueprint en maak een privéplan met Take me there',
+      'Leg het plan voor aan de organisator en vind de behandeling hier terug',
+      'Bevestig uw deelname en laat vrijwillig een beoordeelde bijdrage achter'],
+    'Een blueprint is een opzet. De organisator beoordeelt iedere uitvoering; boekingen en kwalificaties blijven bij hun eigen bron.'),
   '/apps/foundation/zorg.html': G('Hulp & Zorg in FoundationOS: echte zorgmomenten, een rustige hulpwijzer en uw begeleider op een plek.',
     ['Bekijk wat er voor u of uw gezin aankomt', 'Vind zonder nieuw dossier een passende eerste stap bij uw vraag',
      'Controleer welke medische intake u tijdelijk met een aanbieder deelt'],

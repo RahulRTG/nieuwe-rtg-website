@@ -16,14 +16,14 @@ het?**
 
 | | |
 |---|---|
-| Functieschakelaars (aan/uit per functie) | **224** in 17 categorieën |
+| Functieschakelaars (aan/uit per functie) | **225** in 17 categorieën |
 | Apps in de leden-catalogus | **89** in 8 categorieën |
 | Bedrijfsgenres | **79** in 28 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
-| Kernmodules (`server/kern/**`) | **2479** |
+| Kernmodules (`server/kern/**`) | **2482** |
 | App-pagina's (`public/apps/**.html`) | **313** |
-| Testbestanden | **2181** |
+| Testbestanden | **2183** |
 
 ## De vier werelden
 
@@ -54,9 +54,9 @@ ook blokkeert.
 
 ---
 
-# 1. De 224 functieschakelaars
+# 1. De 225 functieschakelaars
 
-### Leden (RTG-app) — 26
+### Leden (RTG-app) — 27
 
 - **Leden-app (algemeen)** (`member`) — Alle ledenfuncties in de RTG-app. Zet je dit uit, dan valt de hele ledenkant stil (behalve wat hieronder apart aan staat).  
   _voor: rtg, lifestyle, business, gast_
@@ -86,6 +86,8 @@ ook blokkeert.
   _voor: lifestyle, business_
 - **Kwesties inbrengen (DemocratieOS)** (`democratie`) — Een burger brengt een kwestie in en volgt wat ermee gebeurt. Alleen voor iedereen tegelijk aan of uit: nooit per persoon, plaats, pas of canary.  
   _voor: rtg, lifestyle, business, gast_
+- **Partijen plaatsen voorstellen (DemocratieOS)** (`democratie-partijen`) — Een partij uit het register plaatst met haar eigen sleutel voorstellen bij openbare kwesties. Alleen voor alle partijen tegelijk aan of uit: nooit per partij.  
+  _voor: intern_
 - **De app-staat** (`kern-state`) — De ene aanroep waarmee de app zijn hele beeld ophaalt. Uit betekent een lege app voor iedereen.  
   _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
 - **De live-verbinding** (`kern-live`) — De open lijn (SSE) waarover meldingen en verversingen binnenkomen, plus de verbindingsgegevens voor bellen.  

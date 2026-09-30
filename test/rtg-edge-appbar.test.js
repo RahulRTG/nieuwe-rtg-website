@@ -14,6 +14,7 @@ const SMART = lees('public/shared/rtg-edge-smart-menu.js');
 const COMMAND = lees('public/shared/rtg-edge-command.js');
 const CSS = lees('public/shared/rtg-edge-2.css');
 const SIMPLE = lees('public/shared/rtg-simple.css');
+const ACCESS = lees('public/apps/access/portal.css');
 
 test('Edge heeft één centraal slot voor functies van het huidige scherm', () => {
   assert.equal((LIBRARY.match(/class="rtg-edge-appslot"/g) || []).length, 1);
@@ -69,6 +70,8 @@ test('zelfstandige apps houden de normale vijf Edge-ankers', () => {
   assert.match(SIMPLE, /grid-template-columns:minmax\(44px,.85fr\) minmax\(44px,.85fr\) 64px minmax\(72px,1.4fr\) minmax\(44px,.85fr\)/);
   assert.match(SIMPLE, /not\(\[data-rtg-edge-appbar="true"\]\)/,
     'de nieuwe actions-stand valt onder de normale Edge en niet onder de oude vervangingsstand');
+  assert.doesNotMatch(ACCESS, /:has\(#(?:gate|onbGate)[^)]*\)\s+\.rtg-adaptive-(?:edge|bar|item)/,
+    'ook de inloglaag mag de normale Edge niet verkleinen of van palet laten wisselen');
 });
 
 test('ervaringsschermen openen weer met de herkenbare Edge', () => {

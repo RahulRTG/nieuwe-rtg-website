@@ -1,28 +1,28 @@
 {
  "stempel": {
-  "op": "2026-09-29T23:18:27.961Z",
-  "commit": "a4ae5e47b",
+  "op": "2026-09-30T09:33:38.509Z",
+  "commit": "9c3333724",
   "boomVuil": false,
-  "boomAnders": 2,
+  "boomAnders": 1,
   "instrument": "scripts/mutatiecontract.js",
-  "node": "v22.22.2"
+  "node": "v24.18.0"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5217,
-  "geclassificeerd": 5192,
+  "totaal": 5218,
+  "geclassificeerd": 5193,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3168,
-   "NOT_APPLICABLE": 1255,
+   "NOT_APPLICABLE": 1256,
    "LEGACY_PENDING_CLASSIFICATION": 25,
    "PROTECTED": 597,
    "INTENTIONALLY_NON_IDEMPOTENT": 172
   },
-  "vastgesteldDoorMens": 2076,
+  "vastgesteldDoorMens": 2077,
   "afgeleidDoorScript": 3116,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4302,
+   "AUTHENTICATED": 4303,
    "PUBLIC": 132,
    "OBJECT_SCOPED": 759,
    "(niet af te leiden -- vraagt een verklaring)": 8,
@@ -33,7 +33,7 @@
    "kale ronde: beschermd": 138,
    "kale ronde: onbeschermd": 128,
    "kale ronde: geen uitspraak": 4882,
-   "niet gemeten": 69
+   "niet gemeten": 70
   },
   "voorstellen": {
    "NOT_APPLICABLE": 1
@@ -38476,6 +38476,28 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "living-world.view",
+   "route": "POST /api/living-world/view",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth",
+     "lid"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

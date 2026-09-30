@@ -43,5 +43,6 @@ test('de scanner accepteert alleen valide fabrieksroutes als dekkingsbewijs', ()
   assert.equal(graph.automatischeWerkprocessen.length, graph.workflows.length);
   assert.equal(graph.dekkingsmatrix.percentage, 100);
   assert.equal(graph.dekkingsmatrix.metGaten, 0);
+  assert.equal(graph.workflows.find(w=>w.familie==='/api/living-world/view').kantoor.id,'klantenservice');
   assert.equal(graph.dekkingsmatrix.dimensies.find(d => d.id === 'werkroute').percentage, 100);
 });

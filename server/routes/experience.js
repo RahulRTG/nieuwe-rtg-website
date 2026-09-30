@@ -22,6 +22,9 @@ module.exports = (app, auth, experience) => {
     stuur(res, experience.projection({ key: req.session.key, world: req.body.world,
       contextId: req.body.contextId, economicPrincipalRef: principalVoorSession(req.session) })));
 
+  app.post('/api/living-world/view', auth, lid, (req, res) =>
+    stuur(res, experience.livingWorldView(req.session.key, req.body || {})));
+
   app.post('/api/experience/resume', auth, lid, (req, res) =>
     stuur(res, experience.resumeZet(req.session.key, req.body || {})));
 

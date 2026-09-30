@@ -47,6 +47,7 @@ module.exports = (kern, hulp) => {
        sociale laag -- er komt hier geen tweede vriendenlijst naast. */
     zijnVrienden: kern.zijnVrienden, sseToCustomer,
     bronnen: {
+      experiences: (key, id) => kern.experience.mediaExperiences(key, id),
       // de vier wereldbeelden, elk zoals het domein hem zelf al toont
       tracks: (sess) => kern.muziekZaal(sess, {}),
       videos: (key) => kern.theaterZaal(key),

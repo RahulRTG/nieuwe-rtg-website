@@ -633,12 +633,28 @@ jobs:
         run: node --test --test-timeout=300000 test/isolatiepoort.test.js
 
       - name: PostgreSQL-integratietests (elk in een eigen database)
-        run: node scripts/pgtoetsen.js
+        run: |
+          export RTG_TOETSBRON="$(node -p 'require("./scripts/lib/meetbron").bron()')"
+          node scripts/pgtoetsen.js
         env:
           REDIS_URL: redis://localhost:6379
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/rtgtest
           RTG_VAULT_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
           RTG_SECRET_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+          NODE_OPTIONS: --require "${{ github.workspace }}/test/toetsnaam.js"
+          RTG_TOETSDUUR: ${{ github.workspace }}/.toetsduur
+          RTG_TOETSMODUS: normaal
+      # Deze bestanden draaien uitsluitend hier. Hun echte procesmetingen
+      # moeten daarom mee naar de volledige ronde van veranderbereik.
+      - name: De duurmeting van PostgreSQL bewaren
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: toetsduur-postgresql
+          path: .toetsduur
+          retention-days: 5
+          if-no-files-found: error
+          include-hidden-files: true
 
   # De incrementele weg draait alleen het opnieuw vereiste en lokale UNKNOWN
   # bewijs. Unit en browser staan op twee schone runners: vroeger stonden ze

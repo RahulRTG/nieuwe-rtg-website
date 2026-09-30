@@ -6,7 +6,14 @@
 const { diepBevries } = require('./contract');
 const { kopie } = require('./canon');
 
+const livingWorld = Object.fromEntries(Object.keys(require('../living-world/actions').definitions).map(action => {
+  const id = 'living-world.' + action;
+  return [id, { id, version: 1, runtime: 'living-world', worlds: ['living', 'travel', 'work'],
+    required: [], optional: [], confirmation: 'REQUIRED', authority: ['living-world.act'],
+    evidence: 'REQUIRED', consequence: 'DOMAIN_TRUTH' }];
+}));
 const DEFINITIES = diepBevries({
+  ...livingWorld,
   'attention.acknowledge': {
     id: 'attention.acknowledge', version: 1, runtime: 'experience.attention',
     worlds: ['living', 'travel', 'work', 'foundation'],

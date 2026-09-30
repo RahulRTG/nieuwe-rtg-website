@@ -33,6 +33,7 @@
 
     travel: wereld({ naam: 'TRAVEL OS', kort: 'TRAVEL', kaart: 'TravelOS', huis: '/apps/reizen.html', home: '/apps/reizen.html', workspace: '/apps/werkruimte.html?gebied=reizen', actie: 'Open reisdetail' }, [
       ['Plannen', [
+        ['living-world', 'Living World', 'map', '/apps/living-world.html'],
         ['vandaag', 'Vandaag', 'home', '/apps/reizen.html#vandaag'], ['reisveilig', 'Reizen & Veilig', 'shield', '/apps/reizen-veilig.html'],
         ['vluchten', 'Vluchten', 'plane', '/apps/vluchten.html'], ['hotels', 'Verblijven', 'bed', '/apps/hotels.html'],
         ['reisbureau', 'Reisbureau', 'brief', '/apps/reisbureau.html']

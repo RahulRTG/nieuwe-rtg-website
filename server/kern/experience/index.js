@@ -67,6 +67,8 @@ function maakExperience({ kern, db, save, crypto, bijeen, inBundel, nu }) {
   return { experience: {
     contract: () => kopie(WORLD_CONTRACT), manifests: manifesten.publiek,
     bootstrap, projection, resumeZet,
+    livingWorldView: (key, options) => kern.livingWorld.view(key, options),
+    mediaExperiences: (key, id) => kern.livingWorld.mediaLinks(key, id),
     preview: (key, body, economicPrincipalRef) => broker.preview(key, body, economicPrincipalRef),
     execute: (key, body) => broker.execute(key, body),
     evidence: (key, limit) => ({ ok: true, evidence: opslag.bewijsVoor(key, limit),

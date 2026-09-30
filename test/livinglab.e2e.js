@@ -138,7 +138,10 @@ test('Living Lab: de onderzoekscyclus op het scherm, en de bewoner zonder accoun
 
     /* Ook dit scherm is een menu met één deel tegelijk (shared/deelmenu.js),
        dus openen wat je nodig hebt -- net als een bewoner zou doen. */
-    const bewDeel = async (n) => { await bew.evaluate(x => window.RTGDeel && RTGDeel.open(x), n); };
+    const bewDeel = async (n) => {
+      await bew.evaluate(x => window.RTGDeel && RTGDeel.open(x), n);
+      await wachtOpRust(bew, '#main', { rondes: 3 });
+    };
 
     await bewDeel('vragen-uit-de-buurt');
     assert.ok((await bew.locator('#bLab option').count()) > 0, 'de bewoner ziet welke labs er zijn');

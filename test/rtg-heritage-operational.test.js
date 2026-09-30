@@ -35,13 +35,14 @@ test('alle echte appschermen lopen door dezelfde gedeelde schermlaag', () => {
     assert.match(html, /<link\b[^>]*href=["']\/shared\/rtg-heritage\.css["'][^>]*>/i,
       route + ' mist de gedeelde schermstijl');
   }
-  assert.equal(echt, 296);
+  assert.equal(echt, 297); // inclusief Living World
 });
 
 test('representatieve operationele schermen houden een vaste wereld en echte bediening', () => {
   const schermen = [
     ['/apps/agenda.html', 'living', ['<input', 'role="dialog"']],
     ['/apps/routedossier.html', 'travel', ['<main']],
+    ['/apps/living-world.html', 'travel', ['<main', 'id="lwDialog"']],
     ['/apps/bestanden.html', 'work', ['<select', 'role="dialog"']],
     ['/apps/foundation/agenda.html', 'foundation', ['<input', 'role="dialog"']],
     ['/apps/mijn-gegevens.html', 'living', ['<main', "maak('article'"]]

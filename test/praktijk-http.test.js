@@ -6,7 +6,12 @@ let server,base,w,beheer,ander,lidId,lidToken;
 const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'rtg-praktijk-http-'));
 const api=async(p,b={})=>{const r=await fetch(base+p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});return {status:r.status,body:await r.json()};};
 const werk=(p,b={})=>api('/api/bedrijf'+p,{werkruimte:w,beheerToken:beheer,...b});
-const doe=(p,b={})=>werk('/praktijk/'+p,{idem:crypto.randomUUID(),...b});
+const PRAKTIJK = {
+  beeld: '/api/bedrijf/praktijk/beeld', inrichten: '/api/bedrijf/praktijk/inrichten',
+  aanbod: '/api/bedrijf/praktijk/aanbod', vraag: '/api/bedrijf/praktijk/vraag',
+  stap: '/api/bedrijf/praktijk/stap', delen: '/api/bedrijf/praktijk/delen'
+};
+const doe=(p,b={})=>api(PRAKTIJK[p],{werkruimte:w,beheerToken:beheer,idem:crypto.randomUUID(),...b});
 test.before(async()=>{
   server=await startServer({env:{RTG_DATA_DIR:tmp,SMTP_URL:'',PAYMENT_ENABLED:'false'}});base=server.base;
   let r=await api('/api/bedrijf/werkruimte/maak',{naam:'Bakker en buurthulp',idem:crypto.randomUUID()});
@@ -67,4 +72,24 @@ test('bevestigd werk blijft na een harde herstart terugkomen',async()=>{
   const r=await doe('beeld');assert.equal(r.status,200,JSON.stringify(r));
   const x=r.body.werk.find(x=>x.id===id);assert.equal(x.stand,'afgerond');assert.equal(x.administratie.verwijzing,'Kassabon 2026-005');
   assert.equal((await api('/api/werk-gast/beeld',{sleutel})).status,404,'intrekking overleeft herstart');
+});
+
+test('de echte pijplijn telt EUR en converteert een JPY-voorstel niet stilzwijgend',async()=>{
+  const euro = await api('/api/bedrijf/pijplijn', {werkruimte:w,beheerToken:beheer});
+  assert.equal(euro.status,200);assert.equal(euro.body.valuta,'EUR');
+  assert.equal(euro.body.gewonnen.bedragCenten,4200);assert.equal(euro.body.andereValuta,0);
+  const ruimte = (await api('/api/bedrijf/werkruimte/maak',{naam:'Werkplek Japan',idem:crypto.randomUUID()})).body;
+  const context = {werkruimte:ruimte.werkruimte,beheerToken:ruimte.beheerToken};
+  const jdoe=(p,b={})=>api(PRAKTIJK[p],{...context,idem:crypto.randomUUID(),...b});
+  assert.equal((await jdoe('inrichten',{profiel:'zelfstandig',land:'JP',valuta:'JPY',tijdzone:'Asia/Tokyo',versie:0})).status,200);
+  const aanbod=(await jdoe('aanbod',{naam:'Workshop',soort:'dienst',prijswijze:'vast',bedragMinor:1234})).body;
+  const vraag=(await jdoe('vraag',{aanbodId:aanbod.aanbodId,klant:'Klant Japan',vraag:'Workshop organiseren'})).body;
+  assert.ok(vraag.projectId);
+  const voorstel=await jdoe('stap',{projectId:vraag.projectId,versie:1,stap:'voorstel',toelichting:'1234 JPY afgesproken',bedragMinor:1234});
+  assert.equal(voorstel.status,200,JSON.stringify(voorstel));
+  const yen=await api('/api/bedrijf/pijplijn',context);
+  assert.equal(yen.status,200);assert.equal(yen.body.andereValuta,1);
+  assert.equal(yen.body.open.aantal,0);assert.equal(yen.body.open.bedragCenten,0);
+  assert.equal(yen.body.open.gewogenCenten,0,'JPY blijft buiten de EUR-rekensom');
+  assert.equal((await api('/api/bedrijf/pijplijn',{werkruimte:ruimte.werkruimte,beheerToken:beheer})).status,403);
 });

@@ -115,6 +115,9 @@ module.exports = (ctx) => {
 
     if (soort === 'warroom') {
       stap(c, 'in uitvoering', 'Wij hebben een incidentteam aangewezen; een van onze mensen neemt contact met u op.', 'systeem');
+    } else if (b.werkwijze === 'voorstel') { // akkoord op een voorstel: ./lus.js
+      c.werkwijze = 'voorstel';
+      stap(c, 'in voorbereiding', 'Wij gaan aan de slag; u beslist pas over een voorstel buiten uw mandaat.', 'systeem');
     } else if (oordeel.magZelf) {
       stap(c, 'in uitvoering', oordeel.reden, 'systeem');
     } else {
@@ -183,5 +186,5 @@ module.exports = (ctx) => {
 
   return { caseOpen, caseBeslis, caseIntrek, cases,
     bureauDesk: bureau.bureauDesk, bureauVoortgang: bureau.bureauVoortgang,
-    CASE_STATUSSEN: STATUSSEN, CASE_SOORTEN: SOORTEN, caseLijst: lees, caseOpenTest: openCase };
+    CASE_STATUSSEN: STATUSSEN, CASE_SOORTEN: SOORTEN, caseLijst: lees, caseOpenTest: openCase, caseStap: stap };
 };

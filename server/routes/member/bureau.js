@@ -125,7 +125,15 @@ module.exports = (kern) => {
 
   // zaken (cases)
   app.post('/api/member/bureau/zaken', auth, doe((k) => B.cases(k)));
-  app.post('/api/member/bureau/zaak/open', auth, doe((k, b) => B.caseOpen(k, b)));
+  // de werkwijze van de concierge-lus opent alleen via /lus/intake, met zijn velden erbij
+  app.post('/api/member/bureau/zaak/open', auth, doe((k, b) => B.caseOpen(k, Object.assign({}, b, { werkwijze: undefined }))));
   app.post('/api/member/bureau/zaak/beslis', auth, doe((k, b) => B.caseBeslis(k, String(b.id || ''), b.akkoord === true)));
   app.post('/api/member/bureau/zaak/intrek', auth, doe((k, b) => B.caseIntrek(k, String(b.id || ''))));
+
+  // de concierge-lus (CONCIERGE.md): een zin wordt een case, en het lid beslist over een voorstel
+  app.post('/api/member/bureau/lus/intake', auth, doe((k, b) => B.lusIntake(k, b)));
+  app.post('/api/member/bureau/lus/zaak', auth, doe((k, b) => B.lusLid(k, String(b.id || ''))));
+  app.post('/api/member/bureau/lus/toelichting', auth, doe((k, b) => B.lusToelichting(k, String(b.id || ''), b.tekst)));
+  app.post('/api/member/bureau/lus/verrassing', auth, doe((k, b) => B.lusVerrassing(k, String(b.id || ''), b.aan === true)));
+  app.post('/api/member/bureau/lus/beslis', auth, doe((k, b) => B.lusBeslis(k, String(b.id || ''), b.akkoord === true)));
 };

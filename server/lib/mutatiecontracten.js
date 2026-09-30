@@ -116,6 +116,9 @@ const CONTRACTEN = Object.assign({},
      toezegging zijn. Eigen bestand omdat ze een afweging delen -- zie de kop. */
   require('./mutatiecontracten-reisnazorg').CONTRACTEN,
   require('./mutatiecontracten-reisherkomst').CONTRACTEN,
+  /* De concierge-lus (CONCIERGE.md): zestien routes, gemeten met een dubbeltik
+     per route in test/conciergelus-dubbel.test.js -- zie de kop. */
+  require('./mutatiecontracten-conciergelus').CONTRACTEN,
   /* Een lid en zijn eigen lidmaatschap: twee lezers en een opzegging. Eigen
      bestand omdat het indelen er een defect uit haalde -- zie de kop. */
   require('./mutatiecontracten-lidabonnement').CONTRACTEN,

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-28T13:09:00.323Z",
-    "commit": "7e624c0d1",
+    "op": "2026-09-30T05:13:51.514Z",
+    "commit": "f5475e66",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -2614,6 +2614,13 @@
       "operator": "&&->||#0",
       "gezakt": 1,
       "geprobeerd": 3
+    },
+    "democratie-partij.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
     },
     "democratie-verlies.test.js": {
       "soort": "server",

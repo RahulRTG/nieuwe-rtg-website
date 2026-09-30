@@ -466,7 +466,11 @@
     "bevoegdronde": "node scripts/bevoegdronde.js",
     "bevoegdronde:vast": "node scripts/bevoegdronde.js --vastleggen",
     "mandaatproef": "node scripts/mandaatproef.js",
-    "mandaatproef:vast": "node scripts/mandaatproef.js --vastleggen"
+    "mandaatproef:vast": "node scripts/mandaatproef.js --vastleggen",
+    "experience:check": "node scripts/experience.js --check",
+    "experience:prove": "node scripts/experience.js --prove",
+    "experience:report": "node scripts/experience.js --report",
+    "experience:gate": "node scripts/experience.js --gate"
   },
   "devDependencies": {
     "playwright": "^1.63.0"

@@ -515,6 +515,8 @@ function draaiToets(bestand, env, wacht, forceer) {
    De tien andere staan nog open; dat is een geteld gat in TAKEN.md en geen
    vergeten hoekje. */
 const EIGEN_MODULE = new Map([
+  // This worker test executes the real source in a VM, not through require.
+  ['pass-cache.test.js', ['public/shared/sw-pass-assets.js']],
   /* DE SLEUTELWEDLOOP. De toets leest ook scripts/lib/bron.js (om commentaar
      te strippen), en de motor koos die als module -- een mutatie daar zegt niets
      over de sleutels. De module die hij beproeft is de helper; met de hand
@@ -756,6 +758,16 @@ const EIGEN_MODULE = new Map([
      kopwereld vast op living -> het label klopt niet) en door de motor
      bevestigd. */
   ['werktafel-lussen.e2e.js', ['public/shared/command/bladstand.js']],
+  // De kleurproef bezoekt echte apps; muteer hun wereldtoewijzing, niet hun API-antwoorden.
+  ['living-experience.test.js', ['scripts/lib/experience/compiler.js']],
+  ['experience-intent.test.js', ['public/shared/experience-intent.js']],
+  ['experience-dinner.test.js', ['server/kern/reservering/capaciteit.js']],
+  ['experience-dinner.e2e.js', ['public/apps/foodcourt-intent.js']],
+  ['reisprogramma.test.js', ['server/kern/reisuitnodiging/programma.js']],
+  ['reisprogramma.e2e.js', ['public/apps/reisprogramma-editor.js']],
+  ['experience-travel.test.js', ['server/kern/reisbureau.js']],
+  ['experience-travel.e2e.js', ['public/apps/reisbureau-experience.js']],
+  ['world-palette.e2e.js', ['public/shared/rtg-world-identity.js']],
   /* KNOPPEN DIE NIET KUNNEN, ZEGGEN WAAROM. Zes plekken in een toets. De
      gedeelde kantoor-inlog lag voor de hand, maar daar overleefde de toets de
      vier mutaties: de eerste plek per operator zit in dat bestand in code die

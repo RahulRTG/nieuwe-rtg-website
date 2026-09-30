@@ -1291,6 +1291,20 @@ zelf af, en wat niet gemeten is wordt niet als getal getoond. Daar staat ook wat
 er al staat en dus NIET opnieuw gebouwd moet worden — de rekening is al één
 waarheid over alle kanalen, en het ontbrekende scharnier is de **stoel**.
 
+**`CONCIERGE.md` is de lus rond een wens** -- gast, case-eigenaar,
+collega-conciërge, partner, zijn beslisser en uitvoerders rond één case, waarbij
+de gast het één keer vertelt en ieder alleen zijn stukje ziet. Lees die vóór je
+iets aan De Rechterhand, het Privékantoor of een conciërgewachtrij verandert.
+De meting die hem stuurt: er zijn vijf conciërge-ingangen (`kern/lifestyle`,
+`kern/bureau/cases*`, `rendezvous-concierge`, de hoteldorpafdeling en
+`mall/concierge`), en het meeste van de lus staat al. Mandaat, tijdlijn die bij
+vertraging meeschuift en verstoringen met gevolgen bestaan. Wat ontbreekt: een
+houdbaar aanbod van een partner, doorzetten naar zijn beslisser, een
+deelnemersweergave per rol, en een netwerk van collega's. Dat laatste vraagt
+eerst een besluit. De scherpste nieuwe grens is CON-08: **een verrassing is een
+privacystand en geen notitie**. Eén melding naar de partner en de case is
+mislukt.
+
 **`BESTUUR.md` is het besturingsvlak** — de achterkant van RTG niet als
 backoffice maar als één laag waarin een mens ziet wat er draait, of het gezond
 is, en **hoe hard dat bewijs is**. Lees die vóór je aan een bestuursscherm, een

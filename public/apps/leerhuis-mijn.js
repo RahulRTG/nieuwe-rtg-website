@@ -97,5 +97,23 @@ window.RTGLeerhuisMijn = function (h) {
         'Werk vastgelegd: ' + x.handeling + '. Het telt als werkbewijs, niet als nieuwe beoordeling.');
     })]));
   }
-  return { pad: pad, oefenen: oefenen, uitslag: uitslag, evc: evc, werk: werk };
+  /* Een voorstel over de kennis: iedereen met een lopende relatie mag er een doen,
+     zonder rol. Het kennisitem is een keuze, geen eis. */
+  function voorstel(keuze) {
+    var f = maak('div', 'kaart');
+    f.appendChild(maak('h3', null, 'Een voorstel doen'));
+    f.appendChild(maak('p', 'meta', 'Klopt iets niet in wat hier geleerd wordt, of kan het beter? Een kenniseigenaar behandelt uw voorstel; u ziet hier hoe ver het is.'));
+    var k = maak('select', 'veld'); k.setAttribute('aria-label', 'Over welk kennisitem');
+    k.appendChild(maak('option', null, 'Geen bepaald kennisitem')).value = '';
+    keuze.forEach(function (x) { k.appendChild(maak('option', null, x.titel)).value = x.id; });
+    var p = veld('Wat gaat er mis'), v = veld('Wat u voorstelt'), r = veld('Waarom dat beter is');
+    [k, p, v, r].forEach(function (x) { f.appendChild(x); });
+    f.appendChild(rij([knop('Voorstel indienen', false, function () {
+      var invoer = { probleem: p.value.trim(), voorstel: v.value.trim(), reden: r.value.trim() };
+      if (k.value) invoer.kennis = k.value;
+      doe('voorstel:' + (k.value || '-') + ':' + p.value.trim().slice(0, 40), 'voorstelIndienen', invoer, 'Voorstel ingediend; een kenniseigenaar behandelt het.');
+    })]));
+    return f;
+  }
+  return { pad: pad, oefenen: oefenen, uitslag: uitslag, evc: evc, werk: werk, voorstel: voorstel };
 };

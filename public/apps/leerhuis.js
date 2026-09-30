@@ -106,6 +106,12 @@
         [x.vastgelegd ? x.vastgelegd + ' keer vastgelegd, laatst op ' + String(x.laatste || '').slice(0, 10) + '.' : 'Nog geen werk vastgelegd.']);
       M.werk(k, x); return k;
     }), 'Er is hier nog geen goedgekeurd beleid voor werk.');
+    /* Een eigen tabel: REJECTED is bij een EVC 'niet erkend', bij een voorstel 'afgewezen'. */
+    var VS = { SUBMITTED: 'ingediend', TRIAGED: 'opgepakt', REVIEW: 'in review', EXPERIMENT: 'wordt geprobeerd', APPROVED: 'goedgekeurd',
+      REJECTED: 'afgewezen', IMPLEMENTED: 'uitgevoerd', MEASURED: 'gemeten' };
+    zet('voorstellen', (m.VOORSTELLEN || []).map(function (x) {
+      return kaart('Voorstel: ' + (x.kennisTitel || 'algemeen'), VS[x.stand] || x.stand, [x.probleem, x.notitie ? 'Toelichting: ' + x.notitie : null]);
+    }).concat(m.VOORSTEL_KEUZE ? [M.voorstel(m.VOORSTEL_KEUZE)] : []), 'Een voorstel vraagt een lopende relatie met deze organisatie.');
     var v = m.VAARDIGHEDEN || {};
     var kan = (v.vaardigheden || []).map(function (x) {
       return kaart(x.naam || x.vaardigheid, x.versheid, [x.niveau ? 'Niveau: ' + x.niveau.toLowerCase() : null,
@@ -154,7 +160,7 @@
       meld('Leerhuis ' + org + '.');
       cockpits(org);
     }).catch(function (e) {
-      ['vandaag', 'pad', 'oefenen', 'uitslagen', 'evc', 'werk', 'kan'].forEach(function (id) { zet(id, [], 'Niet te tonen: ' + e.message); });
+      ['vandaag', 'pad', 'oefenen', 'uitslagen', 'evc', 'werk', 'voorstellen', 'kan'].forEach(function (id) { zet(id, [], 'Niet te tonen: ' + e.message); });
       $('trainerBlok').hidden = true; $('teamBlok').hidden = true;
       meld(e.message);
     });

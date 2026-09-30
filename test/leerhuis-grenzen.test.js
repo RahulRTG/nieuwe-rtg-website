@@ -849,3 +849,25 @@ test('30. B-UI werk: de leerling ziet per goedgekeurd beleid of hij geschikt is 
   assert.equal(x().vastgelegd, 1);
   assert.deepEqual(l.mijn(ORG, 'lid:99').WERK, [], 'zonder relatie geen werk');
 });
+
+test('31. B-UI voorstellen: de leerling dient in en volgt, de kenniseigenaar behandelt zonder te zien wie indiende', () => {
+  const w = basis();
+  const l = w.lh.lees;
+  assert.ok(l.mijn(ORG, P.N).VOORSTEL_KEUZE.some(k => k.id === 'terugboeken'), 'officiele kennis om een voorstel over te doen');
+  assert.equal(l.mijn(ORG, 'lid:99').VOORSTEL_KEUZE, null, 'zonder relatie geen voorstel');
+  const id = w.doe(ORG, 'voorstelIndienen', { kennis: 'terugboeken', probleem: 'de grens is te laag', voorstel: 'grens naar 100', reden: 'te veel tweede handtekeningen' }, P.N).id;
+  const eigen = () => l.mijn(ORG, P.N).VOORSTELLEN.find(v => v.id === id);
+  assert.deepEqual([eigen().stand, eigen().notitie], ['SUBMITTED', null]);
+  const ko = () => l.kennisWerk(ORG, P.KO).VOORSTELLEN.find(v => v.id === id);
+  assert.deepEqual([ko().eigen, ko().naar, ko().versieGeschreven], [false, ['TRIAGED'], false]);
+  assert.ok(!('indiener' in ko()) && !JSON.stringify(ko()).includes(P.N), 'wie indiende staat er niet bij');
+  w.doe(ORG, 'voorstelStand', { id, naar: 'TRIAGED' }, P.KO);
+  w.doe(ORG, 'voorstelStand', { id, naar: 'REVIEW' }, P.KO);
+  w.doe(ORG, 'voorstelStand', { id, naar: 'APPROVED', notitie: 'we passen de grens aan' }, P.KO);
+  assert.deepEqual([eigen().stand, eigen().notitie], ['APPROVED', 'we passen de grens aan'], 'de indiener ziet de toelichting');
+  w.doe(ORG, 'kennisSchrijf', { id: 'terugboeken', titel: 'Terugboeken', tekst: 'grens 100', bron: 'besluit', voorstel: id }, P.KO);
+  assert.deepEqual([ko().versieGeschreven, ko().conceptLoopt], [true, true]);
+  nee(w.probeer(ORG, 'voorstelStand', { id, naar: 'IMPLEMENTED' }, P.KO), 409);
+  const eigenVoorstel = w.doe(ORG, 'voorstelIndienen', { probleem: 'a', voorstel: 'b', reden: 'c' }, P.KO).id;
+  assert.equal(l.kennisWerk(ORG, P.KO).VOORSTELLEN.find(v => v.id === eigenVoorstel).eigen, true, 'wie indiende, ziet dat hij het zelf was');
+});

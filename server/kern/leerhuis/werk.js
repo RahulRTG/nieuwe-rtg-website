@@ -52,9 +52,21 @@ function kennisWerk(st, door) {
         eigen: v.auteur === door, herkomst: v.herkomst || null,
         bronNodig: v.herkomst === 'startpakket', impactNodig: !!k.actief, actieveVersie: k.actief });
     }
+  /* Voorstellen uit de praktijk die nog lopen. Wie indiende staat er niet bij,
+     alleen of u het zelf was (dan beslist een ander). `naar` komt uit de
+     overgangstabel; of een overgang MAG, zegt voorstelStand. */
+  const titel = (id) => { const k = st.kennis[id]; if (!k) return null;
+    return (k.versies[k.actief || Math.max(...Object.keys(k.versies).map(Number))] || {}).titel || id; };
+  const voorstellen = Object.values(st.voorstellen).filter(v => !['REJECTED', 'MEASURED'].includes(v.stand)).map(v => {
+    const k = v.kennis && st.kennis[v.kennis];
+    return { id: v.id, kennis: v.kennis, kennisTitel: titel(v.kennis), probleem: v.probleem, huidigeRegel: v.huidigeRegel || null,
+      voorstel: v.voorstel, reden: v.reden, stand: v.stand, sinds: v.at, eigen: v.indiener === door, naar: MACHINES.voorstel.naar[v.stand] || [],
+      versieGeschreven: !!(k && Object.values(k.versies).some(x => x.voorstel === v.id)),
+      conceptLoopt: !!(k && Object.values(k.versies).some(x => x.stand === 'DRAFT' || x.stand === 'REVIEW')) };
+  });
   /* De impactklassen komen mee, zodat het scherm geen eigen kopie van de lijst draagt. */
-  return { ok: true, CONCEPTEN: uit, impactKlassen: IMPACT,
-    nietZichtbaar: 'wie een concept schreef staat er niet bij; alleen of u het zelf was, want dat keurt u niet zelf goed' };
+  return { ok: true, CONCEPTEN: uit, VOORSTELLEN: voorstellen, impactKlassen: IMPACT,
+    nietZichtbaar: 'wie een concept schreef of een voorstel indiende staat er niet bij; alleen of u het zelf was, want dat keurt u niet zelf goed' };
 }
 
 /* De curricula en waar ze heen kunnen. `naar` komt uit de overgangstabel

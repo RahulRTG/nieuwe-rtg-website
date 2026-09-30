@@ -86,5 +86,16 @@ window.RTGLeerhuisMijn = function (h) {
     })]));
     return f;
   }
-  return { pad: pad, oefenen: oefenen, uitslag: uitslag, evc: evc };
+  /* Werk onder goedgekeurd beleid. Geschikt of niet zegt de server; staat er een
+     eis open, dan staat hij er in woorden en is er geen knop. */
+  function werk(k, x) {
+    if (!x.geschikt) { (x.ontbreekt || []).forEach(function (w) { k.appendChild(maak('p', 'meta', 'Nog niet: ' + w + '.')); }); return; }
+    var u = veld('Wat u deed en wat eruit kwam: ' + x.handeling);
+    k.appendChild(u);
+    k.appendChild(rij([knop('Werk vastleggen: ' + x.handeling, true, function () {
+      doe('werk:' + x.handeling + ':' + (x.vastgelegd || 0), 'werkVastleggen', { handeling: x.handeling, uitkomst: u.value.trim() },
+        'Werk vastgelegd: ' + x.handeling + '. Het telt als werkbewijs, niet als nieuwe beoordeling.');
+    })]));
+  }
+  return { pad: pad, oefenen: oefenen, uitslag: uitslag, evc: evc, werk: werk };
 };

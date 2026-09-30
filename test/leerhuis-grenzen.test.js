@@ -832,3 +832,20 @@ test('29. B-UI leerling: uitslagen met bezwaar, EVC indienen en het EVC-werk van
   assert.equal(l.mijn(ORG, P.N).EVC[0].stand, 'PARTIAL');
   assert.ok(!l.assessorWerk(ORG, P.A).EVC.some(x => x.id === e.id), 'afgerond staat niet meer in het werk');
 });
+
+test('30. B-UI werk: de leerling ziet per goedgekeurd beleid of hij geschikt is en legt werk vast', () => {
+  const w = basis();
+  const l = w.lh.lees;
+  assert.deepEqual(l.mijn(ORG, P.N).WERK, [], 'zonder goedgekeurd beleid geen werk');
+  w.doe(ORG, 'beleidZet', { id: 'tb', handeling: 'betaling.terugboeken', rol: 'ops', vaardigheden: ['terugboeken'], certificaat: true }, P.E);
+  assert.deepEqual(l.mijn(ORG, P.N).WERK, [], 'een voorstel telt niet');
+  w.doe(ORG, 'beleidGoedkeuren', { id: 'tb' }, P.Q);
+  const x = () => l.mijn(ORG, P.N).WERK.find(y => y.handeling === 'betaling.terugboeken');
+  assert.equal(x().geschikt, false);
+  assert.ok(x().ontbreekt.some(r => /niet bewezen/.test(r)), 'wat ontbreekt staat er in woorden');
+  W.leidOp(w, ORG, P.N, P);
+  assert.deepEqual([x().geschikt, x().ontbreekt, x().vastgelegd], [true, [], 0]);
+  w.doe(ORG, 'werkVastleggen', { handeling: 'betaling.terugboeken', uitkomst: 'storno van 40 euro teruggeboekt' }, P.N);
+  assert.equal(x().vastgelegd, 1);
+  assert.deepEqual(l.mijn(ORG, 'lid:99').WERK, [], 'zonder relatie geen werk');
+});

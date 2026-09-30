@@ -101,6 +101,11 @@
     }), 'Er is nog geen beoordeling over u afgerond.');
     zet('evc', (m.EVC || []).map(function (x) { return kaart('EVC: ' + x.vaardigheidNaam, x.stand, [x.extern]); })
       .concat((m.EVC_KEUZE || []).length ? [M.evc(m.EVC_KEUZE)] : []), 'EVC vraagt een lopende relatie met deze organisatie.');
+    zet('werk', (m.WERK || []).map(function (x) {
+      var k = kaart(x.handeling, x.geschikt ? 'geschikt' : 'nog niet geschikt',
+        [x.vastgelegd ? x.vastgelegd + ' keer vastgelegd, laatst op ' + String(x.laatste || '').slice(0, 10) + '.' : 'Nog geen werk vastgelegd.']);
+      M.werk(k, x); return k;
+    }), 'Er is hier nog geen goedgekeurd beleid voor werk.');
     var v = m.VAARDIGHEDEN || {};
     var kan = (v.vaardigheden || []).map(function (x) {
       return kaart(x.naam || x.vaardigheid, x.versheid, [x.niveau ? 'Niveau: ' + x.niveau.toLowerCase() : null,
@@ -149,7 +154,7 @@
       meld('Leerhuis ' + org + '.');
       cockpits(org);
     }).catch(function (e) {
-      ['vandaag', 'pad', 'oefenen', 'uitslagen', 'evc', 'kan'].forEach(function (id) { zet(id, [], 'Niet te tonen: ' + e.message); });
+      ['vandaag', 'pad', 'oefenen', 'uitslagen', 'evc', 'werk', 'kan'].forEach(function (id) { zet(id, [], 'Niet te tonen: ' + e.message); });
       $('trainerBlok').hidden = true; $('teamBlok').hidden = true;
       meld(e.message);
     });

@@ -371,6 +371,24 @@ test('Leerhuis trainer: onder toezicht, bewijs, klaar voor beoordeling en de aan
       await n2.reload({ waitUntil: 'domcontentloaded' });
       await n2.locator('#evc .kaart', { hasText: 'EVC: Train-the-Trainer' }).getByText('deels erkend').waitFor();
       assert.ok(!(await lees(N, 'mijn')).VAARDIGHEDEN.vaardigheden.some(v => v.vaardigheid === 'didactiek'), 'EVC maakt niemand bewezen');
+
+      /* 6. Werk onder het goedgekeurde beleid: eerst staat er wat ontbreekt en geen
+         knop; na een nieuwe beoordeling legt N zijn werk op het scherm vast. */
+      const wkaart = n2.locator('#werk .kaart', { hasText: 'betaling.terugboeken' });
+      await wkaart.getByText('Nog niet: terugboeken is niet bewezen.').waitFor();
+      assert.equal(await wkaart.getByRole('button').count(), 0, 'niet geschikt: geen knop');
+      await doe(N, 'simulatieAfronden', { scenario: 'storno', keuzes: ['controleer', 'reden', 'tweede-mens'] });
+      await doe(A, 'bewijsVastleggen', { persoon: N.p, vaardigheid: 'terugboeken', soort: 'OBSERVATION_EVIDENCE', sterkte: 'OBSERVED', bron: 'tweede storno' });
+      const nb = (await doe(N, 'beoordelingAanvragen', { persoon: N.p, vaardigheid: 'terugboeken' })).id;
+      await doe(A, 'beoordelingStart', { id: nb });
+      const nbew = (await lees(A, 'assessorWerk')).LOPEND.find(b => b.id === nb).bewijs.map(b => b.id);
+      await doe(A, 'beoordelingAfronden', { id: nb, uitkomst: 'PROVEN', bewijs: nbew, criteria: 'tweede storno correct' });
+      await n2.reload({ waitUntil: 'domcontentloaded' });
+      await wkaart.getByText('Nog geen werk vastgelegd.').waitFor();
+      await wkaart.getByLabel('Wat u deed en wat eruit kwam: betaling.terugboeken').fill('storno van 40 euro teruggeboekt');
+      await wkaart.getByRole('button', { name: 'Werk vastleggen: betaling.terugboeken' }).click();
+      await wachtOp(n2, /Werk vastgelegd: betaling.terugboeken/);
+      await wkaart.getByText(/^1 keer vastgelegd/).waitFor();
     } finally {
       if (browser) await browser.close().catch(() => {});
       await stop(child);

@@ -74,7 +74,7 @@ function mijn(st, persoon, nu) {
     VAARDIGHEDEN: vakstaat(st, persoon, nu),
     GROEI: opvolgers.map(r => ({ rol: r, ...loopbaan(st, persoon, r, nu) })),
     COACH: { wat: 'vragen over officiele kennis', grond: 'alleen ACTIVE kennis; zonder bron is het antwoord ONBEKEND' },
-    ...eigenOordelen(st, persoon)
+    ...eigenOordelen(st, persoon, nu)
   };
 }
 

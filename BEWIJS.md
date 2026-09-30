@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2268 bestanden en 15618 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2268 bestanden en 15619 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2268 |
-| losse beweringen (`test(...)`) | 15618 |
+| losse beweringen (`test(...)`) | 15619 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 213 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1897 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1975 bestanden, 15112 beweringen.
+1975 bestanden, 15113 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -866,7 +866,7 @@ toets omvalt.
 | `ledenladder.test.js` | 3 | gezakt op `liegpoort /api/` | DE LEDENLADDER -- van RTG Pass naar Lifestyle, en wat daar dan achter zit. WAAROM DIT DE BELANGRIJKSTE OPENSTAANDE WAS Dit huis is een membership-platform. |
 | `ledenregister.test.js` | 7 | gezakt op `===->!==#0` | Ledenregister (kern/ledenregister.js): leden op codenaam, gesplitst per stad/land/alfabet/geslacht en pas, met de omzet per pas en de 30%- foundationsplit (20% lokaal, 10% RTF). Draai: npm test |
 | `leerfabric.test.js` | 15 | gezakt op `&&->||#0` | De Learning Fabric: de structuur waar elk vak op draait. Een leerdoel is hier niet langer een naam met een zin uitleg, maar een knoop in een graaf: hij weet wat eronder ligt (vereist), hij kan zichzelf op meer dan... |
-| `leerhuis-grenzen.test.js` | 31 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `leerhuis-grenzen.test.js` | 32 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `leerhuis-lus.test.js` | 6 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `leerhuis-routes.test.js` | 12 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `leerhuis-rtfbron.test.js` | 6 | gezakt op `liegpoort /api/` | HET LEERHUIS VAN EEN RTF-STAD: de relatie komt uit de zetels en uit een koppeling die de vrijwilliger ZELF legt (ACADEMY.md besluit B2, stap B2b). Tegen een echte server, want de vraag loopt over twee domeinen: het... |

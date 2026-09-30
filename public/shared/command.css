@@ -20,7 +20,7 @@
    uitspraak is ingetrokken; wat hier nu buiten een mediaquery staat, geldt
    overal. */
 
-body.rtg-command{display:block;background:var(--onyx-glans,#0C0C0B);overflow:hidden;}
+body.rtg-command{display:block;background:var(--onyx-glans,#0C0C0B);overflow:hidden!important;}
 
 /* ---- DE SCHIL IS GEEN SCHERM MEER, MAAR NOG WEL DE LA ----------------------
 

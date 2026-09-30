@@ -1,6 +1,7 @@
 /* LivingOS Geld 2026: een rustige voorzijde boven de bestaande geldstanden. */
 .rtg-geld-nieuw{--gx-bg:#0d0a08;--gx-card:#17110d;--gx-card2:#20150f;--gx-ink:#f3e9da;--gx-soft:#b9aa98;--gx-gold:#d4a451;--gx-line:rgba(212,164,81,.3);--gx-wine:#7b1733;background:radial-gradient(circle at 82% 4%,rgba(136,73,30,.13),transparent 28rem),var(--gx-bg);color:var(--gx-ink)}
 .rtg-geld-nieuw #inhoud{max-width:760px;margin:0 auto;padding-bottom:8rem}
+html.rtg-command-blad .rtg-geld-nieuw #inhoud{padding-bottom:max(2rem,env(safe-area-inset-bottom))}
 .rtg-geld-nieuw .merkkop{padding:1rem 0 .75rem;border-bottom:1px solid var(--gx-line)}
 .rtg-geld-nieuw .merkkop h1{margin:0;color:var(--gx-gold);font-size:clamp(2rem,8vw,3.4rem)}
 .rtg-geld-nieuw .merkkop p{margin:.25rem 0 0;color:var(--gx-soft);font-size:.66rem;letter-spacing:.25em;text-transform:uppercase}

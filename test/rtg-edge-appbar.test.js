@@ -13,6 +13,8 @@ const APPBAR = lees('public/shared/rtg-edge-appbar.js');
 const SMART = lees('public/shared/rtg-edge-smart-menu.js');
 const COMMAND = lees('public/shared/rtg-edge-command.js');
 const CSS = lees('public/shared/rtg-edge-2.css');
+const SIMPLE = lees('public/shared/rtg-simple.css');
+const ACCESS = lees('public/apps/access/portal.css');
 
 test('Edge heeft één centraal slot voor functies van het huidige scherm', () => {
   assert.equal((LIBRARY.match(/class="rtg-edge-appslot"/g) || []).length, 1);
@@ -60,11 +62,16 @@ test('vaste appbediening verhuist intact en wordt niet gekloond', () => {
     'bestaande gespecialiseerde Edge-bruggen blijven één eigenaar houden');
 });
 
-test('de wereldkleurige onderrand houdt vaste rollen en geeft het midden aan de app', () => {
-  assert.match(CSS, /data-rtg-edge-appbar="true"\] \.rtg-edge-bottom\{grid-template-columns:var\(--edge-side\) 44px minmax\(0,1fr\) 44px/);
-  assert.match(CSS, /data-rtg-edge-appbar="true"\] \.rtg-edge-history[\s\S]*\.rtg-edge-layout[\s\S]*\.rtg-edge-action\{display:none!important\}/);
-  assert.match(CSS, /\.rtg-edge-appslot>\.rtg-edge-owned-bar/);
-  assert.match(CSS, /data-rtg-edge-appbar="true"\] \.rtg-edge-ai\{grid-column:4/);
+test('zelfstandige apps houden de normale vijf Edge-ankers', () => {
+  assert.match(APPBAR, /setAttribute\('data-rtg-edge-appbar', 'actions'\)/);
+  assert.doesNotMatch(APPBAR, /setAttribute\('data-rtg-edge-appbar', 'true'\)/);
+  assert.match(CSS, /\.rtg-edge-appslot\{display:none/,
+    'de oorspronkelijke appbalk blijft alleen als verborgen handelingsbron bestaan');
+  assert.match(SIMPLE, /grid-template-columns:minmax\(44px,.85fr\) minmax\(44px,.85fr\) 64px minmax\(72px,1.4fr\) minmax\(44px,.85fr\)/);
+  assert.match(SIMPLE, /not\(\[data-rtg-edge-appbar="true"\]\)/,
+    'de nieuwe actions-stand valt onder de normale Edge en niet onder de oude vervangingsstand');
+  assert.doesNotMatch(ACCESS, /:has\(#(?:gate|onbGate)[^)]*\)\s+\.rtg-adaptive-(?:edge|bar|item)/,
+    'ook de inloglaag mag de normale Edge niet verkleinen of van palet laten wisselen');
 });
 
 test('ervaringsschermen openen weer met de herkenbare Edge', () => {

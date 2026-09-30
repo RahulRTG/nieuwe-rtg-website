@@ -35,7 +35,10 @@ function assessorWerk(st, door) {
       bewijs: Object.values(st.bewijs).filter(x => x.persoon === b.persoon && x.vaardigheid === b.vaardigheid && !x.ongeldig)
         .map(x => ({ id: x.id, soort: x.soort, sterkte: x.sterkte, sinds: x.at, bron: x.bron || null }))
     })),
-    nietZichtbaar: 'beoordelingen die een andere assessor begon, beoordelingen over uzelf, en bewijs buiten de vaardigheid die u beoordeelt'
+    /* EVC: een extern stuk dat hoogstens DOCUMENTED bewijs wordt (acties-evc.js). */
+    EVC: Object.values(st.evc).filter(e => ['EVIDENCE', 'REVIEW'].includes(e.stand) && e.persoon !== door)
+      .map(e => ({ id: e.id, persoon: e.persoon, vaardigheidNaam: naam(e.vaardigheid), extern: e.extern, stand: e.stand, uitkomsten: MACHINES.evc.naar.REVIEW })),
+    nietZichtbaar: 'beoordelingen die een andere assessor begon, beoordelingen over uzelf, EVC-aanvragen over uzelf, en bewijs buiten de vaardigheid die u beoordeelt'
   };
 }
 
@@ -49,9 +52,21 @@ function kennisWerk(st, door) {
         eigen: v.auteur === door, herkomst: v.herkomst || null,
         bronNodig: v.herkomst === 'startpakket', impactNodig: !!k.actief, actieveVersie: k.actief });
     }
+  /* Voorstellen uit de praktijk die nog lopen. Wie indiende staat er niet bij,
+     alleen of u het zelf was (dan beslist een ander). `naar` komt uit de
+     overgangstabel; of een overgang MAG, zegt voorstelStand. */
+  const titel = (id) => { const k = st.kennis[id]; if (!k) return null;
+    return (k.versies[k.actief || Math.max(...Object.keys(k.versies).map(Number))] || {}).titel || id; };
+  const voorstellen = Object.values(st.voorstellen).filter(v => !['REJECTED', 'MEASURED'].includes(v.stand)).map(v => {
+    const k = v.kennis && st.kennis[v.kennis];
+    return { id: v.id, kennis: v.kennis, kennisTitel: titel(v.kennis), probleem: v.probleem, huidigeRegel: v.huidigeRegel || null,
+      voorstel: v.voorstel, reden: v.reden, stand: v.stand, sinds: v.at, eigen: v.indiener === door, naar: MACHINES.voorstel.naar[v.stand] || [],
+      versieGeschreven: !!(k && Object.values(k.versies).some(x => x.voorstel === v.id)),
+      conceptLoopt: !!(k && Object.values(k.versies).some(x => x.stand === 'DRAFT' || x.stand === 'REVIEW')) };
+  });
   /* De impactklassen komen mee, zodat het scherm geen eigen kopie van de lijst draagt. */
-  return { ok: true, CONCEPTEN: uit, impactKlassen: IMPACT,
-    nietZichtbaar: 'wie een concept schreef staat er niet bij; alleen of u het zelf was, want dat keurt u niet zelf goed' };
+  return { ok: true, CONCEPTEN: uit, VOORSTELLEN: voorstellen, impactKlassen: IMPACT,
+    nietZichtbaar: 'wie een concept schreef of een voorstel indiende staat er niet bij; alleen of u het zelf was, want dat keurt u niet zelf goed' };
 }
 
 /* De curricula en waar ze heen kunnen. `naar` komt uit de overgangstabel
@@ -76,7 +91,8 @@ function curriculumWerk(st, door) {
     VAARDIGHEDEN: Object.values(st.vaardigheden).map(v => ({ id: v.id, naam: v.naam })),
     KENNIS: Object.values(st.kennis).map(k => ({ id: k.id, titel: (k.versies[k.actief || Math.max(...Object.keys(k.versies).map(Number))] || {}).titel || k.id,
       actief: !!k.actief, concept: concept(k) })),
-    ROLLEN: Object.values(st.rollen).map(r => ({ id: r.id, titel: r.titel })) });
+    ROLLEN: Object.values(st.rollen).map(r => ({ id: r.id, titel: r.titel })),
+    SCENARIOS: Object.values(st.scenarios).map(s => ({ id: s.id, domein: s.domein, vaardigheden: s.vaardigheden.map(naam) })) });
 }
 
 /* Het beheer van de eigenaar: wie welke bestuursrol draagt (op codenaam, via
@@ -88,7 +104,11 @@ function eigenaarWerk(st, door) {
     BESTUUR: Object.entries(st.bestuur).filter(([, r]) => r.length).map(([persoon, rollen]) => ({ persoon, rollen })),
     /* De lopende relaties met hun rollen, om een rol in te trekken of iemand uit dienst te melden.
        `zelf`: dat doet een tweede eigenaar (acties-mens.js uitDienst). */
+    /* De organisatiegraaf: eenheden met hun bovenliggende eenheid, en per relatie de eenheid. */
+    EENHEDEN: Object.values(st.eenheden).map(x => ({ id: x.id, naam: x.naam, soort: x.soort, ouder: x.ouder,
+      ouderNaam: x.ouder ? (st.eenheden[x.ouder] || {}).naam || x.ouder : null })),
     RELATIES: Object.entries(st.relaties).filter(([, r]) => r.actief).map(([persoon, r]) => ({ persoon, soort: r.soort, zelf: persoon === door,
+      eenheid: r.eenheid ? (st.eenheden[r.eenheid] || {}).naam || r.eenheid : null,
       rollen: ((st.personen[persoon] || {}).rollen || []).map(id => ({ id, titel: (st.rollen[id] || {}).titel || id })) })),
     nietZichtbaar: 'echte namen en sleutels; een mens wijst u aan op zijn codenaam, en elke opzoeking staat op zijn inzagekaart' };
 }

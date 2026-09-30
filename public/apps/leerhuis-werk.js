@@ -22,7 +22,7 @@
     NOT_YET_PROVEN: 'nog niet bewezen', PROVEN: 'bewezen', ACTIVE: 'actief', PILOT: 'pilot', MONITORED: 'gevolgd',
     IMPROVEMENT: 'in verbetering', SUPERSEDED: 'vervangen', RETIRED: 'uit gebruik', SUSPENDED: 'geschorst', REVOKED: 'ingetrokken',
     EXPIRING: 'verloopt binnenkort', EXPIRED: 'verlopen', REVIEW_REQUEST: 'bezwaar ingediend', INDEPENDENT_REVIEW: 'in review',
-    INCONCLUSIVE: 'onbeslist', INVALIDATED: 'ongeldig', ASSIGNED: 'toegewezen', LEARNING: 'aan het leren', PRACTICING: 'aan het oefenen' };
+    INCONCLUSIVE: 'onbeslist', INVALIDATED: 'ongeldig', EVIDENCE: 'stuk ingediend', ASSIGNED: 'toegewezen', LEARNING: 'aan het leren', PRACTICING: 'aan het oefenen' };
   var stand = function (s) { return STAND[s] || String(s || '').toLowerCase(); };
   var ORG = '';
 
@@ -65,6 +65,7 @@
   /* De kaarten per rol staan in leerhuis-werk-kaarten.js; dit bestand is de deur. */
   var bewijs = window.RTGLeerhuisBewijs ? window.RTGLeerhuisBewijs({ maak: maak, knop: knop, doe: doe }) : null;
   var S = window.RTGLeerhuisSchrijven ? window.RTGLeerhuisSchrijven({ $: $, maak: maak, knop: knop, doe: doe }) : null;
+  var V = window.RTGLeerhuisVoorstellen({ maak: maak, knop: knop, kaart: kaart, zet: zet, doe: doe, dag: dag });
   var Q = window.RTGLeerhuisKwaliteit({ maak: maak, knop: knop, kaart: kaart, zet: zet, doe: doe, wie: wie, dag: dag });
   var A = window.RTGLeerhuisAutoriteit({ maak: maak, knop: knop, kaart: kaart, zet: zet, doe: doe, wie: wie, dag: dag });
   var I = window.RTGLeerhuisInrichten({ $: $, maak: maak, knop: knop, kaart: kaart, zet: zet, doe: doe, wie: wie });
@@ -80,7 +81,7 @@
       var team = !!(m && m.TEAM && m.TEAM.length);
       $('trainerBlok').hidden = !(t && t.ok); if (t && t.ok) K.trainer(t);
       $('assessorBlok').hidden = !(a && a.ok); if (a && a.ok) K.assessor(a);
-      $('kennisBlok').hidden = !(w && w.ok); if (w && w.ok) K.kennis(w);
+      $('kennisBlok').hidden = !(w && w.ok); if (w && w.ok) { K.kennis(w); V(w); }
       $('managerBlok').hidden = !team; if (team) I.manager(m);
       $('curriculumBlok').hidden = !(c && c.ok); if (c && c.ok) { I.curriculum(c); if (S) S(c); }
       $('eigenaarBlok').hidden = !(e && e.ok); if (e && e.ok) I.eigenaar(e);

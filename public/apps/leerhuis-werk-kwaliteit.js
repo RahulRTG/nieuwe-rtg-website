@@ -19,6 +19,23 @@ window.RTGLeerhuisKwaliteit = function (h) {
   function veld(label, groot) { var v = maak(groot ? 'textarea' : 'input', 'veld'); v.setAttribute('aria-label', label); v.placeholder = label; return v; }
   function code(t) { return String(t || '').toLowerCase().trim().replace(/[^a-z0-9.]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60); }
 
+  /* Bewijs onder het oordeel: intrekken vraagt een reden (bewijsIntrekken), en
+     ingetrokken bewijs blijft staan met die reden -- historie wordt niet herschreven. */
+  function bewijsRij(x) {
+    var soort = String(x.soort || '').toLowerCase().replace(/_/g, ' ');
+    var d = maak('div', 'bewijs');
+    d.appendChild(maak('p', 'meta', 'Bewijs: ' + soort + ', ' + String(x.sterkte || '').toLowerCase().replace(/_/g, ' ')
+      + (x.bron ? ' (' + x.bron + ')' : '') + ', ' + dag(x.sinds) + '.'
+      + (x.ingetrokken ? ' Ingetrokken: ' + x.ingetrokken + '.' : '')));
+    if (x.ingetrokken) return d;
+    var reden = veld('Reden om bewijs ' + soort + ' in te trekken');
+    d.appendChild(reden);
+    d.appendChild(rij([knop('Bewijs ' + soort + ' intrekken', false, function () {
+      doe('bi:' + x.id, 'bewijsIntrekken', { id: x.id, reden: reden.value.trim() }, 'Bewijs ingetrokken: ' + soort + '.');
+    })]));
+    return d;
+  }
+
   function bezwaren(k) {
     return (k.BEZWAREN || []).map(function (z) {
       var c = kaart('Bezwaar: ' + z.vaardigheidNaam + ' van ' + wie(z), z.stand, ['Reden van de leerling: ' + (z.reden || 'geen'), 'Ingediend op ' + dag(z.sinds) + '.']);
@@ -26,6 +43,7 @@ window.RTGLeerhuisKwaliteit = function (h) {
       if (z.anderReviewer) { c.appendChild(maak('p', 'meta', 'Een andere kwaliteitsautoriteit behandelt dit bezwaar.')); return c; }
       if (z.oordeel) c.appendChild(maak('p', 'meta', 'Het oordeel: ' + String(z.oordeel.stand || '').toLowerCase().replace(/_/g, ' ')
         + (z.oordeel.criteria ? '. Criteria: ' + z.oordeel.criteria : '') + (z.oordeel.herstel ? '. Herstelpad: ' + z.oordeel.herstel : '') + '.'));
+      if (z.oordeel) (z.oordeel.bewijs || []).forEach(function (x) { c.appendChild(bewijsRij(x)); });
       var notitie = null;
       if (z.stand === 'INDEPENDENT_REVIEW') { notitie = veld('Uw bevinding', true); c.appendChild(notitie); }
       c.appendChild(rij((z.naar || []).map(function (n) {

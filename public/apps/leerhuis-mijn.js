@@ -56,5 +56,64 @@ window.RTGLeerhuisMijn = function (h) {
         });
       })]));
   }
-  return { pad: pad, oefenen: oefenen };
+  /* Een bezwaar over de eigen uitslag, en EVC: een extern stuk dat hoogstens
+     vastgelegd bewijs wordt. Of het mag, zegt de handeling (acties-evc.js). */
+  function veld(label) { var v = maak('textarea', 'veld'); v.setAttribute('aria-label', label); v.placeholder = label; return v; }
+  function uitslag(k, x) {
+    if (x.herstel) k.appendChild(maak('p', 'meta', 'Herstelpad: ' + x.herstel));
+    if (x.bezwaar) {
+      k.appendChild(maak('p', 'meta', 'Uw bezwaar: ' + h.stand(x.bezwaar.stand)
+        + (x.bezwaar.uitkomst ? '. Bevinding: ' + x.bezwaar.uitkomst : '') + '.'));
+      if (['REVIEW_REQUEST', 'INDEPENDENT_REVIEW'].indexOf(x.bezwaar.stand) >= 0) return;
+    }
+    var reden = veld('Waarom u bezwaar maakt');
+    var d = maak('details'); d.appendChild(maak('summary', null, 'Bezwaar maken')); d.appendChild(reden);
+    d.appendChild(rij([knop('Bezwaar indienen', false, function () {
+      doe('bezwaar:' + x.id, 'bezwaarIndienen', { beoordeling: x.id, reden: reden.value.trim() }, 'Bezwaar ingediend over ' + x.vaardigheidNaam + '. Een onafhankelijke kwaliteitsautoriteit behandelt het.');
+    })]));
+    k.appendChild(d);
+  }
+  function evc(keuze) {
+    var f = maak('div', 'kaart');
+    f.appendChild(maak('h3', null, 'Eerder verworven: een stuk van elders laten meetellen'));
+    f.appendChild(maak('p', 'meta', 'Een diploma of certificaat van elders telt hier hoogstens als vastgelegd bewijs. Bewezen wordt u alleen door een beoordeling in dit leerhuis.'));
+    var v = maak('select', 'veld'); v.setAttribute('aria-label', 'Vaardigheid');
+    keuze.forEach(function (x) { var o = maak('option', null, x.naam); o.value = x.id; v.appendChild(o); });
+    var ext = veld('Wat, van wie en wanneer');
+    f.appendChild(v); f.appendChild(ext);
+    f.appendChild(rij([knop('EVC indienen', false, function () {
+      doe('evc:' + v.value, 'evcIndienen', { vaardigheid: v.value, extern: ext.value.trim() }, 'EVC ingediend; een assessor bekijkt het stuk.');
+    })]));
+    return f;
+  }
+  /* Werk onder goedgekeurd beleid. Geschikt of niet zegt de server; staat er een
+     eis open, dan staat hij er in woorden en is er geen knop. */
+  function werk(k, x) {
+    if (!x.geschikt) { (x.ontbreekt || []).forEach(function (w) { k.appendChild(maak('p', 'meta', 'Nog niet: ' + w + '.')); }); return; }
+    var u = veld('Wat u deed en wat eruit kwam: ' + x.handeling);
+    k.appendChild(u);
+    k.appendChild(rij([knop('Werk vastleggen: ' + x.handeling, true, function () {
+      doe('werk:' + x.handeling + ':' + (x.vastgelegd || 0), 'werkVastleggen', { handeling: x.handeling, uitkomst: u.value.trim() },
+        'Werk vastgelegd: ' + x.handeling + '. Het telt als werkbewijs, niet als nieuwe beoordeling.');
+    })]));
+  }
+  /* Een voorstel over de kennis: iedereen met een lopende relatie mag er een doen,
+     zonder rol. Het kennisitem is een keuze, geen eis. */
+  function voorstel(keuze) {
+    var f = maak('div', 'kaart');
+    f.appendChild(maak('h3', null, 'Een voorstel doen'));
+    f.appendChild(maak('p', 'meta', 'Klopt iets niet in wat hier geleerd wordt, of kan het beter? Een kenniseigenaar behandelt uw voorstel; u ziet hier hoe ver het is.'));
+    var k = maak('select', 'veld'); k.setAttribute('aria-label', 'Over welk kennisitem');
+    k.appendChild(maak('option', null, 'Geen bepaald kennisitem')).value = '';
+    keuze.forEach(function (x) { k.appendChild(maak('option', null, x.titel)).value = x.id; });
+    var p = veld('Wat gaat er mis'), v = veld('Wat u voorstelt'), r = veld('Waarom dat beter is');
+    [k, p, v, r].forEach(function (x) { f.appendChild(x); });
+    f.appendChild(rij([knop('Voorstel indienen', false, function () {
+      var invoer = { probleem: p.value.trim(), voorstel: v.value.trim(), reden: r.value.trim() };
+      if (k.value) invoer.kennis = k.value;
+      doe('voorstel:' + (k.value || '-') + ':' + p.value.trim().slice(0, 40), 'voorstelIndienen', invoer, 'Voorstel ingediend; een kenniseigenaar behandelt het.');
+    })]));
+    return f;
+  }
+  return { pad: pad, oefenen: oefenen, uitslag: uitslag, evc: evc, werk: werk, voorstel: voorstel };
 };

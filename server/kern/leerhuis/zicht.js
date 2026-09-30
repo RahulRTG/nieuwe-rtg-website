@@ -18,6 +18,7 @@
 'use strict';
 
 const { verversen, certStand, versheid, trainerGeldig } = require('./oordeel');
+const { eigenOordelen } = require('./zicht-eigen');
 const { rolKlaar, loopbaan } = require('./gereedheid');
 const { LEERBEWIJS } = require('./standen');
 
@@ -72,7 +73,8 @@ function mijn(st, persoon, nu) {
         begin: s.begin || null, stappen: [...new Set(s.vereist.concat(s.verboden))].sort() })),
     VAARDIGHEDEN: vakstaat(st, persoon, nu),
     GROEI: opvolgers.map(r => ({ rol: r, ...loopbaan(st, persoon, r, nu) })),
-    COACH: { wat: 'vragen over officiele kennis', grond: 'alleen ACTIVE kennis; zonder bron is het antwoord ONBEKEND' }
+    COACH: { wat: 'vragen over officiele kennis', grond: 'alleen ACTIVE kennis; zonder bron is het antwoord ONBEKEND' },
+    ...eigenOordelen(st, persoon, nu)
   };
 }
 

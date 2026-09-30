@@ -81,6 +81,34 @@ window.RTGLeerhuisInrichten = function (h) {
     return s;
   }
 
+  function eenheidKeuze(label, leeg, lijst) {
+    var s = maak('select', 'veld'); s.setAttribute('aria-label', label);
+    s.appendChild(maak('option', null, leeg)).value = '';
+    lijst.forEach(function (x) { s.appendChild(maak('option', null, x.naam)).value = x.id; });
+    return s;
+  }
+  /* De organisatiegraaf. De code van een eenheid volgt uit haar naam; een naam die
+     al bestaat, zet die eenheid opnieuw (bijvoorbeeld onder een andere). Een kring
+     weigert de server. */
+  function eenheden(e) {
+    var k = maak('div', 'kaart');
+    k.appendChild(maak('h3', null, 'Eenheden'));
+    (e.EENHEDEN || []).forEach(function (x) {
+      k.appendChild(maak('p', 'meta', x.naam + (x.soort ? ' (' + x.soort + ')' : '') + (x.ouderNaam ? ', onder ' + x.ouderNaam : '') + '.'));
+    });
+    if (!(e.EENHEDEN || []).length) k.appendChild(maak('p', 'meta', 'Nog geen eenheden. Zonder eenheden is het leerhuis een geheel.'));
+    var n = veld('Naam van de eenheid'), s = veld('Soort (afdeling, vestiging, team)'), o = eenheidKeuze('Onder welke eenheid', 'Bovenaan', e.EENHEDEN || []);
+    [n, s, o].forEach(function (x) { k.appendChild(x); });
+    var r = maak('div', 'rij');
+    r.appendChild(knop('Eenheid vastleggen', false, function () {
+      var id = String(n.value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);
+      doe('eenheid:' + id + ':' + o.value, 'eenheidZet', { id: id, naam: n.value.trim(), soort: s.value.trim(), ouder: o.value || null },
+        'Eenheid vastgelegd: ' + n.value.trim() + '.');
+    }));
+    k.appendChild(r);
+    return k;
+  }
+
   function eigenaar(e) {
     var bestuur = (e.BESTUUR || []).map(function (x) {
       return kaart(wie(x), null, [x.rollen.map(function (r) { return leesbaar(ROL, r); }).join(', ')]);
@@ -88,11 +116,13 @@ window.RTGLeerhuisInrichten = function (h) {
     var rel = maak('div', 'kaart');
     rel.appendChild(maak('h3', null, 'Relatie vastleggen'));
     var rc = veld('Codenaam'), rs = kies('Soort relatie', e.relatieSoorten || [], RELATIE), rm = veld('Codenaam van de manager (mag leeg)'), rr = veld('Reden van de opzoeking');
-    [rc, rs, rm, rr].forEach(function (x) { rel.appendChild(x); });
+    var re = eenheidKeuze('Eenheid', 'Geen eenheid', e.EENHEDEN || []);
+    [rc, rs, re, rm, rr].forEach(function (x) { rel.appendChild(x); });
     var r1 = maak('div', 'rij');
     r1.appendChild(knop('Relatie vastleggen', false, function () {
       var invoer = { codenaam: rc.value.trim(), soort: rs.value, reden: rr.value.trim() };
       if (rm.value.trim()) invoer.managerCodenaam = rm.value.trim();
+      if (re.value) invoer.eenheid = re.value;
       doe('relatie:' + invoer.codenaam + ':' + invoer.soort, 'relatieZet', invoer, 'Relatie vastgelegd voor ' + invoer.codenaam + '.');
     }));
     rel.appendChild(r1);
@@ -107,7 +137,7 @@ window.RTGLeerhuisInrichten = function (h) {
     }));
     bs.appendChild(r2);
     var relaties = (e.RELATIES || []).map(function (x) {
-      var k = kaart(wie(x), null, [leesbaar(RELATIE, x.soort) + '.', x.rollen.length ? 'Rol: ' + x.rollen.map(function (r) { return r.titel; }).join(', ') : 'Nog geen rol.']);
+      var k = kaart(wie(x), null, [leesbaar(RELATIE, x.soort) + (x.eenheid ? ', ' + x.eenheid : '') + '.', x.rollen.length ? 'Rol: ' + x.rollen.map(function (r) { return r.titel; }).join(', ') : 'Nog geen rol.']);
       if (x.zelf) { k.appendChild(maak('p', 'meta', 'Uzelf uit dienst melden doet een tweede eigenaar.')); return k; }
       var reden = veld('Reden (bij intrekken verplicht)');
       if (x.rollen.length) k.appendChild(reden);
@@ -131,7 +161,7 @@ window.RTGLeerhuisInrichten = function (h) {
       k.appendChild(u);
       return k;
     });
-    zet('eigenaar', [rel, bs].concat(bestuur, relaties), '');
+    zet('eigenaar', [eenheden(e), rel, bs].concat(bestuur, relaties), '');
   }
 
   return { manager: manager, curriculum: curriculum, eigenaar: eigenaar };

@@ -24,7 +24,9 @@
     ASSIGNED: 'toegewezen', LEARNING: 'aan het leren', PRACTICING: 'aan het oefenen', SIMULATING: 'in simulatie',
     SUPERVISED: 'onder begeleiding', READY_FOR_ASSESSMENT: 'klaar voor beoordeling', ASSESSING: 'wordt beoordeeld',
     PROVEN: 'bewezen', NOT_YET_PROVEN: 'nog niet bewezen', CERTIFIED: 'gecertificeerd',
-    AUTHORITY_ELIGIBLE: 'komt in aanmerking', PRACTICING_IN_ROLE: 'in de rol',
+    AUTHORITY_ELIGIBLE: 'komt in aanmerking', PRACTICING_IN_ROLE: 'in de rol', INCONCLUSIVE: 'onbeslist',
+    REVIEW_REQUEST: 'ingediend', INDEPENDENT_REVIEW: 'in review', UPHELD: 'oordeel blijft staan', CHANGED: 'oordeel aangepast', REASSESSMENT: 'opnieuw beoordelen',
+    EVIDENCE: 'bij de assessor', REVIEW: 'in beoordeling', ACCEPTED: 'erkend', PARTIAL: 'deels erkend', REJECTED: 'niet erkend',
     CURRENT: 'vers', AGING: 'wordt oud', STALE: 'verouderd',
     ACTIVE: 'geldig', EXPIRED: 'verlopen', REFRESH_REQUIRED: 'verversen nodig', SUSPENDED: 'opgeschort', REVOKED: 'ingetrokken'
   };
@@ -62,7 +64,7 @@
   }
   /* De deur (sleutel, navragen, eerst laden dan melden) is gedeeld met het werkscherm. */
   var D = window.RTGLeerhuisDeur({ meld: meld, laad: function () { return laad(ORG); }, org: function () { return ORG; }, voorvoegsel: 'leerhuismijn' });
-  var M = window.RTGLeerhuisMijn({ maak: maak, knop: knop, doe: D.doe, ik: function () { return IK; } });
+  var M = window.RTGLeerhuisMijn({ maak: maak, knop: knop, doe: D.doe, stand: stand, ik: function () { return IK; } });
 
   function lees(org, vraag) {
     return fetch('/api/leerhuis/lees', {
@@ -93,6 +95,23 @@
       M.oefenen(k, x);
       return k;
     }), 'Er zijn nu geen oefeningen die bij uw leerpaden horen.');
+    zet('uitslagen', (m.UITSLAGEN || []).map(function (x) {
+      var k = kaart(x.vaardigheidNaam, x.stand, ['Beoordeeld op ' + String(x.sinds || '').slice(0, 10) + '.']);
+      M.uitslag(k, x); return k;
+    }), 'Er is nog geen beoordeling over u afgerond.');
+    zet('evc', (m.EVC || []).map(function (x) { return kaart('EVC: ' + x.vaardigheidNaam, x.stand, [x.extern]); })
+      .concat((m.EVC_KEUZE || []).length ? [M.evc(m.EVC_KEUZE)] : []), 'EVC vraagt een lopende relatie met deze organisatie.');
+    zet('werk', (m.WERK || []).map(function (x) {
+      var k = kaart(x.handeling, x.geschikt ? 'geschikt' : 'nog niet geschikt',
+        [x.vastgelegd ? x.vastgelegd + ' keer vastgelegd, laatst op ' + String(x.laatste || '').slice(0, 10) + '.' : 'Nog geen werk vastgelegd.']);
+      M.werk(k, x); return k;
+    }), 'Er is hier nog geen goedgekeurd beleid voor werk.');
+    /* Een eigen tabel: REJECTED is bij een EVC 'niet erkend', bij een voorstel 'afgewezen'. */
+    var VS = { SUBMITTED: 'ingediend', TRIAGED: 'opgepakt', REVIEW: 'in review', EXPERIMENT: 'wordt geprobeerd', APPROVED: 'goedgekeurd',
+      REJECTED: 'afgewezen', IMPLEMENTED: 'uitgevoerd', MEASURED: 'gemeten' };
+    zet('voorstellen', (m.VOORSTELLEN || []).map(function (x) {
+      return kaart('Voorstel: ' + (x.kennisTitel || 'algemeen'), VS[x.stand] || x.stand, [x.probleem, x.notitie ? 'Toelichting: ' + x.notitie : null]);
+    }).concat(m.VOORSTEL_KEUZE ? [M.voorstel(m.VOORSTEL_KEUZE)] : []), 'Een voorstel vraagt een lopende relatie met deze organisatie.');
     var v = m.VAARDIGHEDEN || {};
     var kan = (v.vaardigheden || []).map(function (x) {
       return kaart(x.naam || x.vaardigheid, x.versheid, [x.niveau ? 'Niveau: ' + x.niveau.toLowerCase() : null,
@@ -141,7 +160,7 @@
       meld('Leerhuis ' + org + '.');
       cockpits(org);
     }).catch(function (e) {
-      ['vandaag', 'pad', 'oefenen', 'kan'].forEach(function (id) { zet(id, [], 'Niet te tonen: ' + e.message); });
+      ['vandaag', 'pad', 'oefenen', 'uitslagen', 'evc', 'werk', 'voorstellen', 'kan'].forEach(function (id) { zet(id, [], 'Niet te tonen: ' + e.message); });
       $('trainerBlok').hidden = true; $('teamBlok').hidden = true;
       meld(e.message);
     });

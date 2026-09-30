@@ -59,13 +59,18 @@ module.exports = {
     if (i.actief !== false && st.org.bron && typeof st.bronToets === 'function' && st.bronToets(p) !== true)
       weiger(p + ' staat niet in de bron van dit leerhuis (' + st.org.bron.soort + ' ' + st.org.bron.id + ')', 409,
         'leg de relatie vast waar hij woont: een dienstverband, een plek bij de zaak of een zetel');
+    if (i.eenheid && !st.eenheden[i.eenheid]) weiger('eenheid ' + i.eenheid + ' bestaat niet in deze organisatie', 404);
     return [{ soort: 'relatie', data: { persoon: p, soort: i.soort, actief: i.actief !== false, eenheid: i.eenheid || null, manager: i.manager || null } }];
   },
 
   eenheidZet(st, i, door) {
     eisBestuur(st, door, ['ACADEMY_OWNER'], 'de organisatiegraaf wijzigen');
     eisId(i.id, 'eenheid');
+    if (!String(i.naam || '').trim()) weiger('een eenheid heeft een naam', 400);
     if (i.ouder && !st.eenheden[i.ouder]) weiger('ouder-eenheid ' + i.ouder + ' bestaat niet', 404);
+    /* Een bestaande eenheid onder een van haar eigen onderdelen hangen maakt een kring. */
+    for (let o = i.ouder; o; o = (st.eenheden[o] || {}).ouder)
+      if (o === i.id) weiger('een eenheid kan niet onder zichzelf of een van haar onderdelen hangen', 409);
     return [{ soort: 'eenheid', data: { id: i.id, soort: tekst(i.soort, 30), naam: tekst(i.naam, 120), ouder: i.ouder || null } }];
   },
 

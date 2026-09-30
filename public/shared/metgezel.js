@@ -50,7 +50,6 @@
   })();
 
   var esc = function (t) { return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); };
-
 /* De bedieningsknoppen; de gedeelde scope begint in metgezel-00.js. */
   /* DE BALK VAN RAHUL: een vorm, op elk scherm.
 

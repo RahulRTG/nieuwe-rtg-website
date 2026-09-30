@@ -59,9 +59,9 @@ gedrag zonder commentaar mee te lezen):
 | bewijs | kan de uitkomst herkomst, graad of peilmoment tonen? | `BEWIJS_ONTBREEKT` |
 
 De stand: <!--getal:bedrijfsmaat.maten-->67<!--/getal--> maten over de 28 domeinen van de eigenaar.
-<!--getal:bedrijfsmaat.bestaat-->44<!--/getal--> bestaan, <!--getal:bedrijfsmaat.half-->20<!--/getal--> half en <!--getal:bedrijfsmaat.ontbreekt-->3<!--/getal--> ontbreken.
-Van de bestaande zien er <!--getal:bedrijfsmaat.gedeeltelijk-->16<!--/getal--> een deel van de werkelijkheid niet
-(`gedeeltelijk`, met de reden). <!--getal:bedrijfsmaat.ketensGegrond-->4<!--/getal--> van de zes ketens is gegrond, en er staan
+<!--getal:bedrijfsmaat.bestaat-->56<!--/getal--> bestaan, <!--getal:bedrijfsmaat.half-->8<!--/getal--> half en <!--getal:bedrijfsmaat.ontbreekt-->3<!--/getal--> ontbreken.
+Van de bestaande zien er <!--getal:bedrijfsmaat.gedeeltelijk-->18<!--/getal--> een deel van de werkelijkheid niet
+(`gedeeltelijk`, met de reden). <!--getal:bedrijfsmaat.ketensGegrond-->6<!--/getal--> van de zes ketens is gegrond, en er staan
 <!--getal:bedrijfsmaat.privacyGaten-->0<!--/getal--> projecties over mensen zonder afgedwongen groepsgrens.
 
 De eerste meting (commit `2820af35`) stond op 61 maten, 22 bestaand en 9
@@ -197,6 +197,91 @@ erbij. Nog niet gebouwd, behalve waar het staat.
 - **C11, CAC per kanaal**, met dezelfde kanalen als de herkomstvraag en langs de
   groepspoort; 'via iemand die ik ken' heeft geen uitgave.
 
+### 2.6 De besluiten van 28 september 2026
+
+Drie keuzes van de eigenaar, weer als meerkeuze gesteld, en alle drie gebouwd.
+
+- **C12, een campagne is een code onder een kanaal.** Een benoemde linkcode (`?c=`)
+  met een begin en een einde, onder precies een aanmeldkanaal
+  (`kern/rtgcampagne.js`). Een geregistreerde code telt voortaan onder HAAR kanaal,
+  een onbekende blijft onder `campagne` vallen. Financien boekt per campagne wat
+  die kostte, als deel van de kanaalpost in het boek van RTG: kosten de campagnes
+  samen meer dan het kanaal, dan is dat een tegenspraak en rekent de maat voor dat
+  kanaal geen getal per campagne. Het effect is het aantal nieuwe leden met de code,
+  langs de groepspoort; geen klikken en geen attributiemodel, dus een ondergrens.
+- **C13, het beslisgeheugen: besluit plus uitkomst** (`kern/beslisgeheugen.js`).
+  Per besluit wie, wanneer, de bedrijfsmaten waarop het iets verwacht met hun stand,
+  waarde en graad VAN DAT MOMENT, en de verwachte richting; na een termijn van 30
+  tot 366 dagen per maat wat hij werkelijk deed. Nooit een cijfer voor het hele
+  besluit, geen oordeel waar toen of nu geen getal stond, intrekken met een reden
+  (het besluit blijft staan), zeven jaar bewaard. De machine stelt er niets uit
+  voor. Het is met opzet NIET het besluitgeheugen van het Werk OS
+  (`server/bedrijf/geheugen.js`): dat hoort bij de werkruimte van een zaak, en de
+  bedrijfsmaten van RTG staan achter de boardroom. De drie regels van dat geheugen
+  zijn wel overgenomen.
+- **C14, de cadeaubon van RTG, ook te besteden bij zaken.** Dat is elektronisch
+  geld, en het staat daarom als POSITIE en niet als instelling: een schakelaar in de
+  boardroom (`kern/cadeaubon.js`, met een verse passkey zoals de terugstortstand),
+  standaard dicht, en het vermogen `RTG_CADEAUBON` in
+  `kern/bevoegdheid/lijst-afhankelijk.js` met twee gezichten. Dicht: de handeling
+  bestaat niet. Open: een rail over de EIGEN rails met de eis
+  `elektronischgeldinstelling` en met opzet geen partnerrail. RTG heeft die
+  vergunning niet, dus ook open weigert de uitgifte nog -- met de reden. De
+  verplichting van verkochte bonnen komt uit het register van de bon en wordt door
+  de bankpositie gelezen. Verkopen, inwisselen en afrekenen met een zaak zijn NIET
+  gebouwd: een uitgifte die in geen enkele stand mag draaien, is een half aangezette
+  geldlaag.
+
+Het beslisgeheugen en de cadeaubon hebben sinds 29 september een scherm: de tab
+**Besluiten** in de boardroom (`public/apps/boardroom-besluiten.js`). Een besluit
+vastleggen en intrekken gaat op naam, de cadeaubon omzetten vraagt de passkey, en
+het scherm zegt bij open meteen dat de uitgifte nog steeds niet mag.
+
+### 2.7 Het besluit van 29 september 2026
+
+- **C15, de marge per lid: per pas, over alle leden.** Per pas de afgesproken
+  maandbijdrage (lijstprijs maal aantal, of de som van de lopende contracten) min
+  wat de leden van die pas het huis die maand kostten, gedeeld door ALLE leden van
+  die pas -- ook wie niets gebruikte, want die draagt bij en kost niets
+  (`kern/bedrijfsmaat/stand-marge.js`). Per pas en niet per cohort, omdat de pas met
+  elke meting meereist en de kostenlaag dan geen identiteit hoeft op te zoeken.
+  Onder tien leden geen getal, met secundaire onderdrukking. Geen getal ook voor een
+  eerdere maand (de bijdrage per pas is een stand van vandaag), bij verbruik zonder
+  tarief, en voor een contractuele pas waar een lid geen lopend contract heeft. De
+  graad is `vermoed`: stroom en serverhuur zijn met een sleutel verdeeld. Daarmee is
+  de kostenketen gegrond, en zijn het alle zes.
+
+Dezelfde dag, zonder nieuw besluit, vijf maten van half naar bestaand. Vier misten
+alleen hun bewijs: het ledenregister (`groei.leden-per-pas`,
+`acquisitie.via-werkgever`) draagt nu een graad, een peilmoment en of het afkapte
+-- het leest hooguit 20000 rijen, en een telling die afkapte zonder het te zeggen
+lijkt compleet (de marge per lid krijgt dan geen noemer); de RTF-campagnes
+(`campagnes.rtf-werving`) zijn `vermoed`, want een ronde is een bedrag dat het
+bestuur boekte en geen regel van de bank; de stedenboom (`geo.rtf-steden`) is
+`gemeten`. De vijfde, `risico.betalingen-onbekend`, miste zijn projectie terwijl
+de telling al bestond: `openstaand()` in `kern/betaalwaarheid/hervat.js`, die de
+veegronde ook leest. Hij is aangesloten en niet opnieuw bedacht
+(`kern/bedrijfsmaat/stand-risico.js`).
+
+Daarna nog vier besluiten van dezelfde dag, als meerkeuze gesteld en alle vier
+gebouwd (`kern/bedrijfsmaat/stand-groei.js`, `definities-later.js`):
+
+- **C16, land en stad.** Het land komt uit het account, de stad uit de woonplaats
+  in de intake; allebei opgegeven en niet gecontroleerd (graad `vermoed`), en
+  kleine plaatsen gaan samen onder Overige.
+- **C17, zaken per genre.** Een zaak telt als zij toegelaten is (niet geschorst of
+  beeindigd) en in de maand minstens een verzoek door haar eigen deur deed -- de
+  kostenmeter telt dat al per drager. Aanmelden is geen gebruik.
+- **C18, contract verlengd.** Verlengd is een contract dat na zijn einddatum
+  doorloopt; de maat is het aandeel verlengd van de contracten die in de maand op
+  hun beslismoment kwamen (verlengd plus geeindigd), uit het verloop dat de
+  contractmotor al bijhoudt.
+- **C19, transactievolume.** Wat zaken via RTG Pay ontvingen, zonder btw: de
+  subtotalen van de facturen met betaalwijze `rtg`. Elke betaling via RTG Pay
+  schrijft zo'n factuur met het bedrag zonder btw en de btw apart, dus er hoeft
+  niets te worden geschat. Geld van de zaken, nooit omzet van RTG; een
+  terugbetaling staat niet als creditnota in het register en gaat er dus niet af.
+
 ---
 
 ## 3. De architectuur, onderdeel voor onderdeel
@@ -219,8 +304,8 @@ erbij. Nog niet gebouwd, behalve waar het staat.
 | tonen | **staat voor het kantoor** | C2: drie paden |
 | klaarzetten, uitvoeren | **jaren weg** | 7 van de 118 AI-schrijfparen dragen een gemeten gevolg, een beproefde terugweg en een beschermde herhaling (`INTELLIGENTIE.md` par. 6) |
 | Boardroom | **staat** | vraagt een identiteit; de enige plek waar een besluit vandaag een naam heeft |
-| Decision Memory | **stap weg** | de vorm is er (`commercie/voornemen.js`, versies op de definities); het geheugen zelf niet |
-| Nameting | **stap weg** | volgt uit het beslisgeheugen |
+| Decision Memory | **staat** (28 september, C13) | `kern/beslisgeheugen.js`: gronden van toen, verwachting per maat, intrekken met reden; de machine stelt er niets uit voor |
+| Nameting | **staat, per maat** | de uitkomst wordt bij het lezen uitgerekend uit de maand van de toets; een menselijk oordeel over het besluit (klopte, klopte niet) is er nog niet |
 | Leren | **besluit genomen** | een leerregel promoveert pas na aftekening door een mens (`CODE.md` besluit 4) |
 
 **De terugweg blijft het plafond.** Zolang het getal van 7 op 118 laag is, wordt
@@ -240,9 +325,9 @@ breekt, is waar het verhaal ophoudt:
 | service | **gegrond** | fout -> klokken -> opgelost zonder herhaling |
 | afdracht | **gegrond** (27 september) | de maandbijdrage zegt nu zelf dat hij afgesproken is, gemeten, wanneer gepeild en wat hij niet dekt |
 | funnel | **gegrond** (27 september) | nieuw lid, cohort, activatie, klantwaarde in LivingOS en aanwezigheid; de andere drie werelden hebben hun eigen klantwaardemaat ernaast |
-| kosten | breekt bij `marge.per-lid` | kosten per drager bestaan, opbrengst per drager niet |
+| kosten | **gegrond** (29 september) | van kosten per drager via de maandafsluiting en de vooruitblik naar de marge per lid, per pas (C15); `vermoed`, want stroom en serverhuur zijn verdeeld |
 | geld | **gegrond** (27 september) | van ontvangen omzet via bruto- en operationele marge en het banksaldo naar de runway; alles na de brutomarge draagt de graad `vermoed`, want het rust op overgetikte bedragen |
-| werving | breekt bij `campagnes.rtg-marketing` | de uitgave per kanaal staat in het boek van RTG (C8, C11), maar wat een campagne is naast een kanaal en hoe haar effect gemeten wordt, is niet besloten |
+| werving | **gegrond** (28 september) | campagne (C12) -> kanaal -> kosten per nieuw lid, per kanaal en per campagne; een ondergrens, want wie de link zag en later zelf zocht telt niet mee |
 
 ---
 
@@ -314,8 +399,11 @@ doorgestreept met de datum; de besluiten staan in par. 2.5.
    zelf, gevuld door Financiën in zijn eigen kamer, en
    `kern/bedrijfsmaat/stand-rtgboek.js` rekent er de operationele marge, de
    liquiditeit (met het ledentegoed uit `kern/pay` ernaast) en de runway bruto en
-   netto uit. Een half ingevuld boek levert geen enkel getal. Nog te doen: de bon
-   zelf als eigen bouwstuk met de e-geldvraag.
+   netto uit. Een half ingevuld boek levert geen enkel getal. ~~De bon~~ is besloten
+   (28 september, C14): ook te besteden bij zaken, dus e-geld, en daarom een
+   schakelaar die de positie is (standaard dicht) plus de vergunningseis; de
+   verplichting leest de bankpositie uit het register van de bon. Verkopen en
+   inwisselen wachten op een e-geldvergunning of vrijstelling.
 7. ~~**Een weg van een betaalde pas naar gast**~~ -- staat (27 september, C5):
    `kern/aanmeldingen/naargast.js`. Het lid kiest nu of aan het eind van zijn
    periode (zijn eigen opdracht, geen schakelaar), het kantoor op naam met een
@@ -331,11 +419,18 @@ doorgestreept met de datum; de besluiten staan in par. 2.5.
    server zodat er geen tweede lijst ontstaat. Het account draagt alleen DAT de
    vraag nog open is, nooit wat er gekozen werd. ~~CAC~~ staat ook (C11): de
    marketinguitgave per kanaal uit het boek van RTG, gedeeld door de nieuwe leden
-   die dat kanaal opgaven, en onder de groepsgrens geen getal.
+   die dat kanaal opgaven, en onder de groepsgrens geen getal. ~~Campagnes~~ staan
+   ook (28 september, C12): een code onder een kanaal, met de uitgave per campagne
+   in het boek en de kosten per nieuw lid per campagne.
 9. ~~**De streefstand**~~ -- staat (27 september, C7), in de code het **streefbeeld**
    (`kern/streefbeeld.js`; `streefstand` was al een veld van elk gevolgcontract).
    Het voorstel komt uit de laatste drie afgesloten maanden, de eigenaar tekent een
    vingerafdruk van precies dat voorstel, en autonoom mag alleen als geen enkele
    dimensie buiten de tolerantie of onbekend is. Er handelt nog niets autonoom.
-10. **Het beslisgeheugen** -- nadat 1 tot en met 9 er zijn, want een geheugen
-    over besluiten zonder gegronde ketens onthoudt vooral gissingen.
+10. ~~**Het beslisgeheugen**~~ -- staat (28 september, C13): besluit, gronden van
+    toen, verwachting per maat en de uitkomst na de termijn, zonder totaal en zonder
+    voorstel. Sinds 29 september met een scherm (de tab Besluiten in de
+    boardroom), en alle zes ketens zijn gegrond: de kostenketen sloot met de marge
+    per lid (C15). Die maat rekent alleen over de lopende maand, dus een besluit
+    dat hem als verwachting draagt, krijgt bij het toetsen geen oordeel maar de
+    reden -- zo hoort het, want de bijdrage per pas van toen is niet bewaard.

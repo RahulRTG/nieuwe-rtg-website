@@ -57,7 +57,15 @@ module.exports = (ctx) => {
       const cacheBasis = laatsteJson.has(sleutel)
         ? JSON.parse(laatsteJson.get(sleutel)) : (Array.isArray(liveVoor) ? [] : {});
       publicatieBasisJson = JSON.stringify(liveVoor);
-      waarde = JSON.parse(JSON.stringify(merge3(cacheBasis, liveVoor, dbBasis)));
+      /* Een collectie die deze instance NOOIT zag (geen cache en geen live
+         waarde) heeft geen lokale wijziging: dan telt voor de samenvoeging de
+         database als live. Als `{}` las merge3 dat als "alles verwijderd", en
+         wiste de eerste transactie van instance B wat instance A net in een
+         NIEUWE collectie had gezet (gevonden door test/eten-kortingscode.pg.test.js).
+         De publicatiebasis blijft `{}`: lokaal stond er niets, dus de commit
+         moet daarna in zijn geheel in db.data landen. */
+      const liveMerge = dataNu[sleutel] == null && !laatsteJson.has(sleutel) ? dbBasis : liveVoor;
+      waarde = JSON.parse(JSON.stringify(merge3(cacheBasis, liveMerge, dbBasis)));
       resultaat = werk(waarde);
       if (resultaat && typeof resultaat.then === 'function')
         throw new Error('De bewerker van een collectietransactie mag niet asynchroon zijn.');

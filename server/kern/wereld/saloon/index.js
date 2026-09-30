@@ -32,7 +32,7 @@ module.exports = ({ kern, sociaal, lezers, voorkeurOpslag }) => {
           const i = { ...a, bronGroep: b.id, url: naar,
             herkomst: { naam: a.uitgever || b.naam, ref: a.id, gewijzigd: a.gewijzigd || a.at || null,
               zicht: a.prive ? 'Alleen voor u' : 'Volgens de bron' },
-            waarom: a.prive ? 'Uw eigen stand in ' + b.naam + '.' : 'U heeft ' + b.naam.toLowerCase() + ' aangezet.',
+            waarom: 'U heeft ' + b.naam.toLowerCase() + ' aangezet.',
             bewaard: o.bewaard.includes(a.id) };
           // Veranderingen in inhoud, datum of bestemming tellen; likes niet.
           i.versie = hash([i.titel, i.tekst, i.beeld, i.begint, i.eindigt, i.plaats, i.url, i.herkomst, i.bronversie]);
@@ -42,6 +42,9 @@ module.exports = ({ kern, sociaal, lezers, voorkeurOpslag }) => {
     }));
     const uniek = [...new Map(alles.map(i => [i.id, i])).values()];
     let passend = uniek.filter(i => {
+      if (o.vorm === 'wereld' && i.prive) return false;
+      if (o.vorm === 'mijn' && !i.prive) return false;
+      if (o.vorm === 'actie' && !i.aandacht) return false;
       if (o.vorm === 'bewaard' && !i.bewaard) return false;
       if (o.vorm === 'agenda' && !i.begint) return false;
       if (o.plaats && !klein(i.plaats).includes(klein(o.plaats))) return false;

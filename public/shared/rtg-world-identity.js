@@ -43,7 +43,7 @@
       appcel appstore-kantoor appstore-uitgever architect-pda belastingkantoor bewijsmap boardroom \
       concern doos handel hardware-pda horeca-bar horeca-beheer horeca-bezorg horeca-club horeca-events \
       horeca-expeditie horeca-haccp horeca-hotel horeca-pda horeca-vloer horeca kantoorpda kassa \
-      klankwerk-kantoor kosten leerhuis leverancier-aanvragen leverancier-commerce leverancier-rtmail \
+      klankwerk-kantoor kosten leerhuis leerhuis-werk leverancier-aanvragen leverancier-commerce leverancier-rtmail \
       leverancier-service leverancier loonstrook loopbaan loopbaanbewijs magnaat-kantoor magnaat-partnerstudio meldkamer merken \
       pakketten partner-network partner-worden payroll platformregister redactie-pda redactie \
       redactiekantoor rtgkantoor sportclub stadsdoos studio-pda techniek websitestudio werkplek \

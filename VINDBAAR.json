@@ -1,19 +1,19 @@
 {
   "stempel": {
-    "op": "2026-09-29T21:10:07.989Z",
-    "commit": "f3a7a08e6",
+    "op": "2026-09-29T23:18:48.743Z",
+    "commit": "a4ae5e47b",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 8,
     "instrument": "scripts/vindbaar.js",
-    "node": "v24.18.0"
+    "node": "v22.22.2"
   },
   "uitleg": "Per bestemming in de sprong: welk aandeel van de ONDERSCHEIDENDE woorden van dat scherm (woorden uit zijn koppen die op hooguit 3 bestemmingen voorkomen) er ook naartoe leidt in de zoekfilter van shared/sprong.js. Meet woorden, geen mensen: of iemand op het idee komt dat woord te typen, weet deze meter niet.",
   "vloer": 0.6,
   "drempel": 3,
-  "bestemmingen": 99,
-  "woorden": 1248,
-  "gevonden": 788,
-  "dekking": 0.6314,
+  "bestemmingen": 100,
+  "woorden": 1252,
+  "gevonden": 792,
+  "dekking": 0.6326,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -1237,6 +1237,13 @@
       "url": "/apps/foundation/vrienden.html",
       "woorden": 14,
       "gevonden": 14,
+      "mist": []
+    },
+    {
+      "naam": "Wat speelt er",
+      "url": "/apps/foundation/kwesties.html",
+      "woorden": 4,
+      "gevonden": 4,
       "mist": []
     }
   ]

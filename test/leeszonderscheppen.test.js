@@ -469,20 +469,20 @@ test('lesmaker: een les openen die niet bestaat, schept geen lessenkaart', async
 });
 
 /* ------------------------------------------------------------ mall/aanvragen */
-test('mall: een aanvraag sluiten die niet bestaat, schept geen lijst', () => {
+test('mall: een aanvraag sluiten die niet bestaat, schept geen lijst', async () => {
   const db = { data: {} };
   const { mallAanvragen } = require('../server/kern/mall/aanvragen')({
-    db, save: () => {}, crypto: require('node:crypto'),
+    db, bijeen: async werk => werk(), save: () => {}, crypto: require('node:crypto'),
     plek: { plekVan: ({ stad }) => ({ stad }), bereikVan: () => ({}), bedient: () => true },
   });
 
-  assert.equal(mallAanvragen.sluit('k', 'bestaat-niet').status, 404);
-  assert.equal(mallAanvragen.kies('k', 'x', 'Y').status, 404);
-  assert.equal(mallAanvragen.plaats('k', 'Lid', { wat: 'ab' }).status, 400);
+  assert.equal((await mallAanvragen.sluit('k', 'bestaat-niet')).status, 404);
+  assert.equal((await mallAanvragen.kies('k', 'x', 'Y')).status, 404);
+  assert.equal((await mallAanvragen.plaats('k', 'Lid', { wat: 'ab' })).status, 400);
   geenMeubilair(db, 'mallAanvragen', 'drie weigeringen in de Mall');
 
   /* TEGENPROEF: een geldige aanvraag legt de lijst wel aan. */
-  const ok = mallAanvragen.plaats('k', 'Lid', {
+  const ok = await mallAanvragen.plaats('k', 'Lid', {
     wat: 'Massage aan huis', verdieping: 'beauty', plek: 'Amsterdam' });
   assert.ok(ok.ok, 'de aanvraag staat: ' + (ok.error || ''));
   assert.equal(db.data.mallAanvragen.length, 1);

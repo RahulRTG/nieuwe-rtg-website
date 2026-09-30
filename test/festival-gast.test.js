@@ -63,7 +63,9 @@ test('1. een gast ziet alleen passen op zijn eigen codenaam', () => {
   /* De pascode IS het toegangsbewijs: wie hem heeft, staat binnen. Hij hoort
      dus bij precies een mens terug te komen. */
   assert.equal(w.k.gastPassen(w.fid, w.eid, 'AMBER').passen.length, 1);
-  assert.notEqual(mijn.passen[0].code, w.k.gastPassen(w.fid, w.eid, 'AMBER').passen[0].code);
+  assert.notEqual(mijn.passen[0].id, w.k.gastPassen(w.fid, w.eid, 'AMBER').passen[0].id);
+  // en de lijst draagt geen code: die staat alleen in het antwoord op tonen
+  assert.ok(!/"code|code_hash/.test(JSON.stringify(mijn)), 'de passenlijst draagt geen pascode of hash');
   assert.equal(w.k.gastPassen(w.fid, w.eid, 'IEMAND ANDERS').passen.length, 0);
 });
 

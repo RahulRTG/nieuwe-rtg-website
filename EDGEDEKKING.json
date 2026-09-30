@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-28T22:50:50.182Z",
-    "commit": "a5417a6a",
+    "op": "2026-09-29T16:42:30.870Z",
+    "commit": "51166d2d9",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 9,
     "instrument": "scripts/edgedekking.js",
     "node": "v22.22.2"
   },
@@ -12318,6 +12318,81 @@
       "gebreken": [],
       "stabiel": true
     },
+    "/apps/leerhuis-werk.html": {
+      "status": "gemeten",
+      "http": 200,
+      "velden": {
+        "identiteit": "nee",
+        "wereld": "ja",
+        "context": "ja",
+        "object": "nee",
+        "activiteit": "nee",
+        "presence": "nee",
+        "voortzetting": "nee",
+        "hoofdactie": "nvt",
+        "trust": "nee"
+      },
+      "herkomst": {
+        "identiteit": "geen",
+        "wereld": "route",
+        "context": "edge-casco",
+        "object": "geen",
+        "activiteit": "geen",
+        "presence": "geen",
+        "voortzetting": "geen",
+        "hoofdactie": "geen",
+        "trust": "geen"
+      },
+      "acties": {
+        "RTGAdaptief": {
+          "totaal": 0,
+          "perStaat": {
+            "AFWEZIG": 0,
+            "GEBLOKKEERD": 0,
+            "BESCHIKBAAR": 0,
+            "LOPEND": 0
+          },
+          "zonderStaat": 0,
+          "gezagBekend": 0,
+          "geblokkeerdZonderWaarom": 0,
+          "gevolg": {
+            "bekend": 0,
+            "onvolledig": 0,
+            "onbekend": 0,
+            "zonder": 0
+          },
+          "herstelBekend": 0,
+          "metGewicht": 0,
+          "metGebreken": 0
+        },
+        "edge-compat": {
+          "totaal": 0,
+          "perStaat": {
+            "AFWEZIG": 0,
+            "GEBLOKKEERD": 0,
+            "BESCHIKBAAR": 0,
+            "LOPEND": 0
+          },
+          "zonderStaat": 0,
+          "gezagBekend": 0,
+          "geblokkeerdZonderWaarom": 0,
+          "gevolg": {
+            "bekend": 0,
+            "onvolledig": 0,
+            "onbekend": 0,
+            "zonder": 0
+          },
+          "herstelBekend": 0,
+          "metGewicht": 0,
+          "metGebreken": 0
+        }
+      },
+      "gebreken": [],
+      "stabiel": true,
+      "redenen": {
+        "hoofdactie": "een werkscherm met een handeling per kaart: elke leerling, beoordeling, elk concept, curriculum en certificaat heeft zijn eigen knop, er is geen handeling voor het hele scherm"
+      }
+    },
     "/apps/leerhuis.html": {
       "status": "gemeten",
       "http": 200,
@@ -21025,10 +21100,10 @@
     }
   },
   "telling": {
-    "schermen": 313,
-    "metBlikveld": 283,
+    "schermen": 314,
+    "metBlikveld": 284,
     "perStatus": {
-      "gemeten": 283,
+      "gemeten": 284,
       "geen-blikveld": 1,
       "omgeleid": 29,
       "fout": 0
@@ -21043,13 +21118,13 @@
       "identiteit": {
         "ja": 0,
         "zelf": 0,
-        "nee": 283,
+        "nee": 284,
         "nvt": 0,
         "na-openen": 0,
         "zonderMeting": 30
       },
       "wereld": {
-        "ja": 282,
+        "ja": 283,
         "zelf": 0,
         "nee": 1,
         "nvt": 0,
@@ -21057,7 +21132,7 @@
         "zonderMeting": 30
       },
       "context": {
-        "ja": 283,
+        "ja": 284,
         "zelf": 13,
         "nee": 0,
         "nvt": 0,
@@ -21067,7 +21142,7 @@
       "object": {
         "ja": 0,
         "zelf": 0,
-        "nee": 281,
+        "nee": 282,
         "nvt": 0,
         "na-openen": 2,
         "zonderMeting": 30
@@ -21075,7 +21150,7 @@
       "activiteit": {
         "ja": 0,
         "zelf": 0,
-        "nee": 283,
+        "nee": 284,
         "nvt": 0,
         "na-openen": 0,
         "zonderMeting": 30
@@ -21083,7 +21158,7 @@
       "presence": {
         "ja": 0,
         "zelf": 0,
-        "nee": 283,
+        "nee": 284,
         "nvt": 0,
         "na-openen": 0,
         "zonderMeting": 30
@@ -21091,7 +21166,7 @@
       "voortzetting": {
         "ja": 0,
         "zelf": 0,
-        "nee": 283,
+        "nee": 284,
         "nvt": 0,
         "na-openen": 0,
         "zonderMeting": 30
@@ -21100,14 +21175,14 @@
         "ja": 60,
         "zelf": 53,
         "nee": 221,
-        "nvt": 2,
+        "nvt": 3,
         "na-openen": 0,
         "zonderMeting": 30
       },
       "trust": {
         "ja": 0,
         "zelf": 0,
-        "nee": 283,
+        "nee": 284,
         "nvt": 0,
         "na-openen": 0,
         "zonderMeting": 30

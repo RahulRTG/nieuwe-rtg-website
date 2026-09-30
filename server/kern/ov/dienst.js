@@ -4,8 +4,10 @@
    lijnen en haltes op de kaart (routetekenaar) en heeft een live vloot-/omzetoverzicht.
    Krijgt de gedeelde ctx van kern/ov/index.js. */
 const { coord } = require('../util');
+const { maakInplanbaar } = require('../payroll/inplanbaar');
 module.exports = (ctx) => {
-  const { db, save, schoon, id, nu, ensureOv, lijnVan, versVoertuig, ritStart, codes, SOORTEN } = ctx;
+  const { db, save, schoon, id, nu, ensureOv, lijnVan, versVoertuig, actieveRit, ritStart, codes, SOORTEN } = ctx;
+  const inplanbaar = maakInplanbaar(ctx.afwezigOp);
 
   /* ---- de PDA-kant: dienst, live positie en de code-check-in ---- */
   function dienst(s, actor, data) {
@@ -20,7 +22,13 @@ module.exports = (ctx) => {
       naam: schoon(data.voertuigNaam, 40) || (lijn.naam + ' ' + (actor && actor.name || '')),
       lat: start.lat, lng: start.lng, at: nu(), door: actor && actor.name || 'PDA' });
     save();
-    return { status: 200, ok: true, aan: true, voertuigId: vid, lijn: { id: lijn.id, naam: lijn.naam, soort: lijn.soort } };
+    /* Staat deze medewerker vandaag als afwezig in het verzuimregister, dan
+       loopt de dienst gewoon: hij start hem zelf, en wie er is, weet dat beter
+       dan een register. Wel zegt de PDA het erbij (DAT, nooit waarom), zodat
+       een vergeten ziekmelding niet stil blijft staan. */
+    const ip = actor && actor.staffId != null ? inplanbaar(s.code, actor.staffId, nu().slice(0, 10)) : { plan: true };
+    return { status: 200, ok: true, aan: true, voertuigId: vid, lijn: { id: lijn.id, naam: lijn.naam, soort: lijn.soort },
+      ...(ip.plan ? {} : { afwezigWaarschuwing: 'Je staat vandaag als afwezig gemeld. De dienst loopt; ben je er weer, laat je afmelding dan intrekken.' }) };
   }
   function pos(s, actor, data) {
     const vid = 'v-' + s.code + '-' + (actor && actor.staffId || 'pda');
@@ -31,14 +39,16 @@ module.exports = (ctx) => {
     v.at = nu(); save();
     return { status: 200, ok: true };
   }
-  // snelle optie 1: het personeel tikt de oplichtende code van het lid in
-  function codeIn(s, actor, codeTekst) {
+  /* snelle optie 1: het personeel scant de oplichtende code van het lid. De
+     rit start ALLEEN na een geslaagde claim bij deze vervoerder. */
+  async function codeIn(s, actor, codeTekst) {
     const vid = 'v-' + s.code + '-' + (actor && actor.staffId || 'pda');
     const v = db.data.ovVoertuigen.find(x => x.id === vid);
     if (!v) return { status: 409, error: 'Start eerst een dienst.' };
-    const c = codes.get(String(codeTekst || '').trim().toUpperCase());
-    if (!c || c.tot < Date.now()) return { status: 404, error: 'Onbekende of verlopen code.' };
-    codes.delete(String(codeTekst || '').trim().toUpperCase());
+    if (!lijnVan(s, v.lijnId)) return { status: 404, error: 'Lijn niet gevonden.' };
+    const c = await codes.claim({ code: codeTekst, zaak: s.code,
+      controleer: key => actieveRit(key) ? { status: 409, error: 'Deze reiziger is al ingecheckt.' } : null });
+    if (c.error) return c;
     return ritStart(c.key, v);
   }
   function stand(s, actor) {

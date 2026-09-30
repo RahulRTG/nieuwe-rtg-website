@@ -65,7 +65,16 @@ async function nieuwLid(naam, mailLokaal, n) {
   return { token: r.token, email, naam, codenaam: st.codename, id: st.id };
 }
 
+/* De lijst wordt uitgerekend VOORDAT de server er is. Hij zoekt synchroon door
+   ruim twintig megabyte toetsbron, en dat duurt op een trage machine langer dan
+   de keep-alive van de server (75 s, server/opzet/luister.js). Gebeurde het
+   tussen het registreren en de sweep, dan sloot de server de stille verbindingen
+   terwijl deze lus de gebeurtenissen blokkeerde, en gingen de eerste verzoeken
+   van de sweep over een verbinding die al dicht was: "other side closed" op twee
+   routes die zelf niets fout deden. */
+let ongedekt = null;
 test.before(async () => {
+  ongedekt = ongedekteRoutes();
   /* RTG_ROUTELOG uit voor DEZE server, ook als de suite met het routejournaal
      draait. De sweep raakt met opzet elk endpoint een keer; telde hij mee, dan
      sprong de gemeten dekking naar honderd procent terwijl er niets diepgaands
@@ -161,7 +170,7 @@ async function sweep(routes, token) {
 
 let uitslag = null;
 async function eenmaligSweepen() {
-  if (!uitslag) uitslag = await sweep(ongedekteRoutes(), B.token);
+  if (!uitslag) uitslag = await sweep(ongedekt, B.token);
   return uitslag;
 }
 

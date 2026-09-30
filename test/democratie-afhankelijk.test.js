@@ -81,12 +81,33 @@ test('4. zelfijking: een verzonnen onverklaarde require wordt gevonden, een in c
   assert.deepEqual(onverklaard("const k = require('../../lib/keten');"), []);
 });
 
-test('5. fase B kent geen partij (DO-03 in zijn kleinste vorm)', () => {
+/* De burgerkern kent geen partij. Sinds stap 5 (de Political Connector) woont
+   de partij in eigen bestanden; de lus van de burger -- kwestie, lid,
+   koppeling, doe, beeld, eindstanden, meter, wek -- noemt haar niet, zodat
+   proef P1 (de partij verdwijnt en de burgerlus draait door) ook in de bron
+   waar blijft. */
+const BURGERKERN = ['kwestie.js', 'lid.js', 'koppeling.js', 'doe.js', 'doe-bijeenkomst.js', 'beeld.js', 'eindstanden.js', 'meter.js', 'wek.js'];
+/* FOUNDATION_PARTY_NEUTRALITY in zijn scherpste vorm: geen vergelijking van een
+   partij, haar nummer of haar categorie met een vaste waarde. Een partij is
+   gegevens in een register en nooit een tak in de code (par. 7.1). */
+const TAK = /\b(partij|categorie|aanduiding|p\.id|partij\.id|v\.partij)\w*\s*[!=]==?\s*['"`]|['"`]\s*[!=]==?\s*(partij|categorie|aanduiding)\b/i;
+
+test('5. de burgerkern kent geen partij, en nergens wordt op een partij vertakt (DO-03)', () => {
+  for (const f of BURGERKERN) assert.ok(fs.existsSync(path.join(KERN, f)), f + ' bestaat niet meer -- dan meet deze toets niets');
   const fout = [];
-  for (const f of bestanden(KERN).concat(bestanden(ROUTES))) {
+  for (const f of BURGERKERN.map(b => path.join(KERN, b))) {
     if (/partij/i.test(lees(f))) fout.push(path.relative(WORTEL, f));
   }
-  assert.deepEqual(fout, [], 'fase B is de burgerkern: een partij komt pas in fase F, na de neutraliteitsproeven van fase C');
+  assert.deepEqual(fout, [], 'de burgerkern noemt een partij: zet het in partijen.js of voorstellen.js');
+  const tak = [];
+  for (const f of bestanden(KERN).concat(bestanden(ROUTES))) {
+    lees(f).split('\n').forEach((r, i) => { if (TAK.test(r)) tak.push(path.relative(WORTEL, f) + ':' + (i + 1)); });
+  }
+  assert.deepEqual(tak, [], 'een tak op een bepaalde partij of categorie: DO-03 verbiedt dat');
+  /* zelfijking */
+  assert.ok(TAK.test("if (partij.id === 'PP-ABC123') extra();"));
+  assert.ok(TAK.test("if (p.categorie !== 'deelnemer') return;"));
+  assert.ok(!TAK.test("if (!CATEGORIEEN.includes(b.categorie)) return;"));
 });
 
 test('6. elke verklaring zegt wat hij doet en hoe vervangbaar hij is', () => {

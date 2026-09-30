@@ -36,6 +36,19 @@ const PUBLIEK = new Map([
      titel te kunnen nakijken zonder eerst lid van RTG te worden. Wat hem
      begrenst: de code verloopt, het lid kan hem stoppen, hij toont EEN feit en
      nooit het ledger, en de deurrem van 300/minuut hangt ervoor. */
+  /* DE DEUR VAN EEN PARTIJ (server/routes/democratie/partij.js, POLITIEK.md
+     par. 7.1). Open om de reden van de proef P3: een partij hangt niet aan een
+     RTG-account, want dan kan DemocratieOS niet zonder RTG verder. Wat de deur
+     WEL heeft is een sleutel: 128 bits uit kern/bearercode, uitgegeven door een
+     kantoormens op naam, alleen als hash op schijf, een jaar geldig, te vervangen of
+     in te trekken. Zonder geldige sleutel 401, en een rem per bron van
+     120/minuut tegen wie sleutels probeert. Elke partij krijgt dezelfde deur. */
+  ['/api/democratie/partij/wie', 'de partijsleutel IS de geloofsbrief (alleen als hash bewaard, verloopt, intrekbaar door het kantoor); toont alleen de eigen registerregel'],
+  ['/api/democratie/partij/kwesties', 'de partijsleutel IS de geloofsbrief; toont alleen kwesties die hun inbrenger zelf openbaar maakte, zonder datum of nummer'],
+  ['/api/democratie/partij/voorstel/plaats', 'de partijsleutel IS de geloofsbrief; plaatst op naam van die ene partij, met dezelfde limiet voor elke partij'],
+  ['/api/democratie/partij/voorstel/toelicht', 'de partijsleutel IS de geloofsbrief; raakt alleen een voorstel van die partij'],
+  ['/api/democratie/partij/voorstel/aanname', 'de partijsleutel IS de geloofsbrief; raakt alleen een voorstel van die partij, en een veld gaat alleen met bron van onbekend af'],
+  ['/api/democratie/partij/voorstel/mijn', 'de partijsleutel IS de geloofsbrief; toont alleen de voorstellen van die partij'],
   ['/api/carriere/regel/toon', 'een deelbewijs wordt getoond aan iemand zonder RTG-account; de deelcode is de sleutel, verloopt en is te stoppen'],
   ['/api/muziek/luister/:ticket', 'de tijdelijke luisterkaart IS de geloofsbrief: 192 willekeurige bits, vijftien minuten geldig en alleen uitgegeven aan een ingelogd lid voor een gepubliceerd nummer'],
   ['/api/vonk/profile-photo/delivery/:ticket', 'het kortlevende versleutelde ticket IS de beperkte geloofsbrief; levering hercontroleert versie, publicatie, disclosure, match en blokkade en geeft nooit een opslagadres prijs'],
@@ -402,10 +415,7 @@ const ALLEEN_ANONIEM = new Map([
   ['/api/account/start', 'accountherkenning aan de poort; de `auth` ervoor stelt niets als eis'],
 
   ['/api/foundation/school/school/maak', 'een school meldt zich aan voor er een login bestaat; hij start op "wacht" tot RTG goedkeurt, met een rem per afzender'],
-  /* De reden die hier stond wees naar de uurgrens in server/routes/lesmaker.js
-     -- en dat is een ANDERE route (/api/les/maak). Deze route maakte onbeperkt
-     lessen aan. De rem staat nu op de route zelf; zie
-     test/foundation-lesrem.test.js. */
+  /* /les/maak: de rem staat op de route zelf (test/foundation-lesrem.test.js). */
   /* Wachtwoordloos herinloggen van schoolpersoneel: wie de link aanvraagt HEEFT
      per definitie geen sessie. Wat hem eerlijk houdt staat in
      server/school/personeel-inlog.js en is precies wat /api/auth/reset ook
@@ -413,13 +423,11 @@ const ALLEEN_ANONIEM = new Map([
      houdt, EN een minimale antwoordtijd, zodat het bestaan van een
      schoolaccount ook niet uit de duur volgt. Het bewijs zit in de mailbox.
 
-     WAAROM HIER EN NIET BIJ PUBLIEK, waar de andere deuren staan. Keuringsregel
-     28 leest alleen `app.post('/api/...')` met een letterlijk pad; deze route
-     hangt aan een router die onder /api/foundation is gemonteerd. Op de
-     PUBLIEK-lijst kon regel 28 hem dus nooit terugvinden en meldde hij hem als
-     een pad dat niet bestaat -- terwijl hij bestaat en gewoon opengaat. */
+     WAAROM HIER EN NIET BIJ PUBLIEK: keuringsregel 28 leest alleen
+     `app.post('/api/...')`; deze route hangt aan de router onder /api/foundation. */
   ['/api/foundation/school/personeel/inloglink', 'de wachtwoordloze herinlog van schoolpersoneel: wie hem aanvraagt heeft nog geen sessie; rem per ip, gelijk antwoord en gelijke antwoordtijd voor bekend en onbekend'],
-  ['/api/foundation/les/maak', 'bewust zonder inlog: een quizbord in de klas. Met een eigen uurgrens per IP op de route zelf -- zie server/foundation/onderwijs/les.js']
+  ['/api/foundation/les/maak', 'bewust zonder inlog: een quizbord in de klas. Met een eigen uurgrens per IP op de route zelf -- zie server/foundation/onderwijs/les.js'],
+  ['/api/foundation/les/join', 'meedoen zonder account: de 128-bit lescode IS de geloofsbrief en wordt atomair geclaimd (B17); rem per ip, plafond 60 per les']
 ]);
 
 /* De som, voor de poortwacht. Een pad dat in beide lijsten zou staan is een

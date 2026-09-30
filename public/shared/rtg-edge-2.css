@@ -98,7 +98,7 @@ body[data-rtg-edge-appbar="true"] .rtg-edge-ai{grid-column:4;min-width:44px!impo
 .rtg-edge-appslot>.speler.rtg-edge-owned-bar button{min-width:44px!important;width:44px!important;height:44px!important;color:var(--edge-copy)!important}
 .rtg-edge-appslot>.speler.rtg-edge-owned-bar :is(.titel,.sub){color:var(--edge-copy)!important}
 .rtg-edge-appslot>.speler.rtg-edge-owned-bar button.afspeel{background:var(--edge-accent)!important;color:#17120d!important}
-body[data-rtg-edge-appbar="true"]:is(.rtg-music-experience,.rtg-media-experience)>.rahul{display:none!important}
+body[data-rtg-edge-appbar]:is(.rtg-music-experience,.rtg-media-experience)>.rahul{display:none!important}
 
 /* Het slimme menu heeft twee zichtbare gezichten in dezelfde laag. Op een
    telefoon groeit die laag rechtstreeks uit de witte onderrand; desktop houdt
@@ -259,11 +259,16 @@ body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="rtgdeel-balk"] .
 body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="duimbalk"] .rtg-duimbalk:not([data-rtg-edge-2-contextual]),
 body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="world-shell"] .ws-balk:not([data-rtg-edge-2-contextual]),
 body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="travel-header"]>.reisapp>.prestatiekop:not([data-rtg-edge-2-contextual]),
-body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="native-header"]>header:not(.rtg-edge-top):not([data-rtg-edge-2-contextual]){display:none!important}
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="native-header"]>header:not(.rtg-edge-top):not([data-rtg-edge-2-contextual]),
+/* De desktopstandaard verhuist de kinderen van body naar een schermvlak
+   (world-desktop-surface.js); de eigen kop van het scherm is daar dezelfde kop. */
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="native-header"] [data-rtg-screen-surface]>header:not(.rtg-edge-top):not([data-rtg-edge-2-contextual]){display:none!important}
 /* Zodra de onderrand een bestaande duimhandeling aantoonbaar heeft
    overgenomen, blijft de oorspronkelijke vaste strook als veilige fallback in
    de DOM maar is hij niet ook nog eens zichtbaar. */
-body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-hoofdactie="edge"]>.rtg-duimbalk{display:none!important}
+/* In de desktopstandaard staat de strook in het schermvlak (world-desktop-surface.js). */
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-hoofdactie="edge"]>.rtg-duimbalk,
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-hoofdactie="edge"] [data-rtg-screen-surface]>.rtg-duimbalk{display:none!important}
 body[data-rtg-edge-2-rendered="true"]>.ios-thuis,
 body[data-rtg-edge-2-rendered="true"] #osMenuBtn,
 body[data-rtg-edge-2-rendered="true"] .amn-zweef{display:none!important}

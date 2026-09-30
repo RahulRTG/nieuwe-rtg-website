@@ -3,7 +3,7 @@
    de dienstkant (dienst starten, live GPS, code-check-in) achter de
    PDA-inlog; het zaakoverzicht voor de vervoerder zelf. */
 module.exports = (kern) => {
-  const { app, auth, supplierAuth, managerOnly, ovKaart, ovCodeMaak, ovHierIn, ovCheckUit, ovMijn,
+  const { app, auth, supplierAuth, managerOnly, ovKaart, ovCodeMaak, ovCodeIntrek, ovHierIn, ovCheckUit, ovMijn,
     ovDienst, ovPos, ovCodeIn, ovStand, ovOverzicht, ovLijnenBeheer, ovLijnZet, ovRegie, ovRegieZet,
     ovOperatieOverzicht, ovOperatieConcept, ovOperatieBevestig, ovOperatieAnnuleer, ovOperatieSegment } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
@@ -21,10 +21,14 @@ module.exports = (kern) => {
     if (geenGast(req, res)) return;
     stuur(res, ovKaart(req.session.key, { lat: req.body.lat, lng: req.body.lng }));
   });
-  // snelle optie 1: de oplichtende code
-  app.post('/api/ov/code', auth, (req, res) => {
+  // snelle optie 1: de oplichtende code, bij de gekozen vervoerder (roteert)
+  app.post('/api/ov/code', auth, async (req, res) => {
     if (geenGast(req, res)) return;
-    stuur(res, ovCodeMaak(req.session.key));
+    stuur(res, await ovCodeMaak(req.session.key, (req.body || {}).zaak));
+  });
+  app.post('/api/ov/code/intrek', auth, async (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, await ovCodeIntrek(req.session.key));
   });
   // snelle optie 2: een tik op GPS (aantoonbaar bij het voertuig)
   app.post('/api/ov/hier', auth, (req, res) => {
@@ -62,9 +66,9 @@ module.exports = (kern) => {
     if (ovZaakOnly(req, res)) return;
     stuur(res, ovPos(req.supplier, req.actor, req.body || {}));
   });
-  app.post('/api/staff/ov/checkin', supplierAuth, (req, res) => {
+  app.post('/api/staff/ov/checkin', supplierAuth, async (req, res) => {
     if (ovZaakOnly(req, res)) return;
-    stuur(res, ovCodeIn(req.supplier, req.actor, req.body.code));
+    stuur(res, await ovCodeIn(req.supplier, req.actor, req.body.code));
   });
   app.post('/api/staff/ov/stand', supplierAuth, (req, res) => {
     if (ovZaakOnly(req, res)) return;

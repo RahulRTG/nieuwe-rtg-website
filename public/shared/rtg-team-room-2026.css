@@ -13,7 +13,7 @@
   --trm-amber:#daa545;
 }
 body.trm-voorzijde-actief{display:block;overflow-x:hidden;background:var(--trm-diep);padding:0!important}
-body.trm-voorzijde-actief>#shell{display:none!important}
+body.trm-voorzijde-actief #shell{display:none!important}
 body.trm-voorzijde-actief>.wos-dock{display:none!important}
 /* Navigation stays interactive in the standard Edge; .trm-nav is its source. */
 .trm-voorzijde[hidden]{display:none!important}

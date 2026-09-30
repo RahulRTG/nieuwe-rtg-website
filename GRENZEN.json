@@ -149,16 +149,24 @@
       "werkplekken"
     ],
     "bedrijfsmaat": [
+      "AANMELDKANALEN",
       "RTGBOEK_DELEN",
       "aanmeldkanaalStand",
       "bankpositie",
       "bankpositieZet",
       "bedrijfsmaat",
+      "beslisgeheugen",
+      "beslisgeheugenLeg",
+      "beslisgeheugenTrekIn",
       "boardroomAuth",
       "boardroomWie",
+      "naamAuth",
       "officeAuth",
       "rtgBoek",
+      "rtgBoekCampagne",
       "rtgBoekZet",
+      "rtgCampagneMaak",
+      "rtgCampagnes",
       "streefbeeld"
     ],
     "bestanden": [
@@ -286,6 +294,7 @@
       "uitnodigingBulkVerstuur",
       "uitnodigingIntrek",
       "uitnodigingNieuw",
+      "uitnodigingRoteer",
       "uitnodigingVanEntiteit",
       "uitnodigingVind",
       "vestigingAlleVanEntiteit",
@@ -400,6 +409,7 @@
       "bezorglaag",
       "buitenshuis",
       "centen",
+      "etenKorting",
       "findSupplier",
       "folioBoek",
       "folioVan",
@@ -411,6 +421,7 @@
       "haversine",
       "heleCenten",
       "horeca",
+      "horecaBonlaag",
       "horecaFolioBoek",
       "horecaFolioVan",
       "logActivity",
@@ -590,9 +601,6 @@
       "werkplek"
     ],
     "kantoren": [
-      "doosSleutels",
-      "entiteitRekeningStand",
-      "entiteitRekeningZet",
       "afdelingen",
       "aidataExport",
       "aidataOverzicht",
@@ -623,10 +631,15 @@
       "boardroomLijst",
       "boardroomUser",
       "boardroomWie",
+      "cadeaubonBeeld",
+      "cadeaubonStandZet",
       "capGezondheid",
       "commercieRechten",
       "commercieRonde",
       "commercieVerrekening",
+      "doosSleutels",
+      "entiteitRekeningStand",
+      "entiteitRekeningZet",
       "findSupplier",
       "fonds",
       "geldAiInkoopZet",
@@ -645,11 +658,11 @@
       "kantoorIntrekking",
       "kantoorUitnodiging",
       "kluisAuth",
-      "naamAuth",
       "magnaatLeren",
       "mail",
       "mall",
       "naam",
+      "naamAuth",
       "pay",
       "payrollOS",
       "rampbeeld",
@@ -902,6 +915,7 @@
       "betaalRitVoor",
       "betaalSplits",
       "betaalWaarheid",
+      "bevestigAankomst",
       "bezitWeg",
       "bezitZet",
       "bezittingen",
@@ -972,7 +986,6 @@
       "factuur",
       "favorietenVan",
       "findPartner",
-      "findStaffPartner",
       "findSupplier",
       "fluister",
       "fluisterFocus",
@@ -1065,6 +1078,7 @@
       "maisonTaakWeg",
       "mall",
       "mbAanvraag",
+      "mbCode",
       "mbMijn",
       "mecBetaald",
       "mecGift",
@@ -1173,7 +1187,6 @@
       "plaatsReview",
       "postdatum",
       "prikbord",
-      "publicPartner",
       "publicSupplier",
       "publicTrip",
       "pulseBewaar",
@@ -1315,7 +1328,8 @@
       "zorgVan",
       "zorgVoor",
       "zorgZet",
-      "zzpwacht"
+      "zzpwacht",
+      "partnerPersoneelscode"
     ],
     "memo": [],
     "meting": [],
@@ -1451,6 +1465,7 @@
       "navStatus"
     ],
     "neiging": [
+      "idGeverifieerd",
       "neiging"
     ],
     "noodkaart": [
@@ -1540,7 +1555,9 @@
       "veiligGelijk",
       "vertegenwoordiging",
       "wieKijkt",
-      "zaakAbonnement"
+      "zaakAbonnement",
+      "findPartner",
+      "partnerPersoneelscode"
     ],
     "onboarding": [
       "eigenaar",
@@ -1553,6 +1570,7 @@
     "ov": [
       "ovCheckUit",
       "ovCodeIn",
+      "ovCodeIntrek",
       "ovCodeMaak",
       "ovDienst",
       "ovHierIn",
@@ -2015,6 +2033,7 @@
       "logInlog"
     ],
     "stad": [
+      "idGeverifieerd",
       "stad",
       "weefsel"
     ],
@@ -2023,7 +2042,6 @@
       "WERKBELEID_PAUZE_MINUTEN",
       "checkCred",
       "commCollega",
-      "findStaffPartner",
       "fluister",
       "fluisterFocus",
       "fluisterProfiel",
@@ -2032,6 +2050,7 @@
       "hasCred",
       "klokVan",
       "notifySupplier",
+      "ochtendkaart",
       "oogLeer",
       "oogNulmetingVan",
       "oogNulmetingZet",
@@ -2046,7 +2065,8 @@
       "publicPartner",
       "stuurLus",
       "trustVan",
-      "werkbeleidPauzeStand"
+      "werkbeleidPauzeStand",
+      "partnerPersoneelscode"
     ],
     "stuur": [
       "isolatie",
@@ -2131,6 +2151,7 @@
       "bevZetDienst",
       "bevZetFunctie",
       "bevZetPost",
+      "bevestigAankomst",
       "bewerkCollectie",
       "boekhoudkennis",
       "boekingMetRef",
@@ -2181,6 +2202,7 @@
       "dubbeltikMs",
       "ensureApplyChat",
       "etaMinutes",
+      "etenKorting",
       "eventCovers",
       "factor",
       "facturatie",
@@ -2222,6 +2244,7 @@
       "herkomst",
       "herstelGeldig",
       "horeca",
+      "horecaBonlaag",
       "horecaBord",
       "horecaCorrectie",
       "horecaFolioBoek",
@@ -2303,6 +2326,7 @@
       "pay",
       "payrollOS",
       "pc",
+      "personeelsUitnodiging",
       "persoonsPoort",
       "persoonseis",
       "petcare",
@@ -2746,6 +2770,7 @@
       "loginFails",
       "noteFailedTry",
       "notifySupplier",
+      "personeelsUitnodiging",
       "verbindCode",
       "verbindLid",
       "zoekInvite"

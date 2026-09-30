@@ -14,35 +14,34 @@
    personeelsbestand die nog nooit ja heeft gezegd -- en die telt dan mee in het
    organigram, de functiescheiding en de readiness.
 
-   EN ZIJ DRAAGT GEEN TECHNIEK IN DE TEKST. Geen zaakcode, geen rolsleutel. Wie
-   techniek in een uitnodiging zet, leert mensen die techniek uit te wisselen. */
+   EN ZIJ DRAAGT GEEN TECHNIEK IN DE TEKST. Geen zaakcode, geen rolsleutel.
+
+   DE CODE IS EEN CREDENTIAL (workos.concern_uitnodiging, RELEASEKANDIDAAT.md
+   B9): CU.<32 hex> (128 bit, ../bearercode.js), alleen als hash op de
+   uitnodiging, kaal alleen in het antwoord op uitnodigen, bulk versturen of
+   roteren, constant-time gezocht. Accepteren, intrekken en roteren lopen in
+   EEN collectietransactie op `concern` (./opslag.js onder()), zodat de claim en
+   het dienstverband samen landen en twee instances hem niet allebei claimen.
+   Een uitnodiging van voor de migratie (acht hextekens, kaal bewaard) opent
+   niets meer; de werkgever roteert hem en behoudt zo de uitnodiging zelf. */
 'use strict';
 
-/* De kanalen. Ze verschillen alleen in HOE de code bij iemand komt; de
-   uitnodiging zelf is er niet anders van. Zou elk kanaal zijn eigen soort
-   uitnodiging krijgen, dan had je zes stromen die uiteenlopen. */
-/* HERNOEMD VAN `KANALEN`. Vier domeinen droegen dat woord met vier
-   betekenissen en een onderlinge overlap van 0,10 -- SEMANTIEK.json had het in
-   de top staan als botsing. Het woord `kanaal` is nu van de VERKOOPWEG
-   (kern/horeca.js: tafel, bar, terras, afhaal, bezorging), omdat dat de enige
-   betekenis is waar een nieuwe laag hem voor nodig heeft; zie COMMERCE.md
-   par. 3. Dit is langs welke weg iemand wordt uitgenodigd (chat, e-mail, qr, code).
-
-   Er is niets aan de WAARDEN veranderd, alleen aan de naam ervan. */
+/* Langs welke weg iemand wordt uitgenodigd; de uitnodiging zelf verschilt
+   niet per weg. HERNOEMD VAN `KANALEN` (SEMANTIEK.json: vier betekenissen);
+   `kanaal` is van de verkoopweg, zie COMMERCE.md par. 3. */
 const UITNODIGINGSWEGEN = ['chat', 'email', 'telefoon', 'qr', 'code', 'bulk', 'directory'];
 
 module.exports = (ctx) => {
   const { db, save, crypto, schoon, entiteitVind, entiteitBeeld, vestigingVind,
-    employmentNieuw, employmentVanPersoon, tijdVandaag, opslag } = ctx;
+    employmentNieuw, employmentVanPersoon, tijdVandaag, opslag, bewerkCollectie } = ctx;
 
   const nu = () => new Date().toISOString();
   const DAGEN_GELDIG = 30;
+  const T = require('./uitnodiging-toegang')({ crypto, opslag, bewerkCollectie, nu });
+  const { vindCode, transactie, geefCode, schoonOud } = T;
 
   const bak = () => opslag.tak('uitnodigingen');
-
   const vind = (id) => bak()[String(id || '')] || null;
-  const vindCode = (code) => Object.values(bak())
-    .find(u => u.code === String(code || '').toUpperCase().replace(/[^A-Z0-9]/g, '')) || null;
 
   const verlopen = (u) => u.geldigTot && u.geldigTot < tijdVandaag();
 
@@ -70,12 +69,7 @@ module.exports = (ctx) => {
     tot.setUTCDate(tot.getUTCDate() + DAGEN_GELDIG);
 
     const u = {
-      id: 'uit_' + crypto.randomBytes(6).toString('hex'),
-      /* De code is kort genoeg om voor te lezen en lang genoeg om niet te raden:
-         acht tekens uit 32 mogelijkheden. Hij is EENMALIG -- accepteren maakt
-         hem ongeldig, zodat een doorgestuurde uitnodiging geen tweede mens
-         binnenlaat. */
-      code: crypto.randomBytes(5).toString('hex').toUpperCase().slice(0, 8),
+      id: 'uit_' + crypto.randomBytes(8).toString('hex'),
       entiteit: ent.id, vestiging: vest ? vest.id : null,
       afdeling: schoon(b.afdeling, 60) || null,
       rol, soort: b.soort === 'mandaat' ? 'mandaat' : 'employment',
@@ -86,9 +80,11 @@ module.exports = (ctx) => {
       geldigTot: tot.toISOString().slice(0, 10),
       gemaakt: nu()
     };
+    const code = geefCode(u, door);
+    schoonOud();
     bak()[u.id] = u;
     save();
-    return { ok: true, uitnodiging: beeld(u), tonen: tekst(u) };
+    return { ok: true, uitnodiging: beeld(u), code, tonen: tekst(u) };
   }
 
   /* De tekst die de uitgenodigde ziet. Geen entiteit-id, geen zaakcode, geen
@@ -115,12 +111,17 @@ module.exports = (ctx) => {
      bij ondernemingAanvraag(). */
   function uitnodigingAccepteer(code, persoon) {
     if (!persoon) return { status: 401, error: 'Log in of maak een gratis werkidentiteit aan.' };
+    return transactie(() => accepteerBinnen(code, persoon));
+  }
+  function accepteerBinnen(code, persoon) {
     const u = vindCode(code);
-    if (!u) return { status: 404, error: 'Deze uitnodiging kennen we niet.' };
-    if (u.stand === 'geaccepteerd') return { status: 409, error: 'Deze uitnodiging is al gebruikt.' };
-    if (u.stand === 'ingetrokken') return { status: 409, error: 'Deze uitnodiging is ingetrokken.' };
-    if (verlopen(u)) {
-      u.stand = 'verlopen'; save();
+    const reden = T.reden(u);
+    if (reden === 'onbekend') return { status: 404, error: 'Deze uitnodiging kennen we niet.' };
+    if (u.stand === 'geaccepteerd' || reden === 'opgebruikt') return { status: 409, error: 'Deze uitnodiging is al gebruikt.' };
+    if (u.stand === 'ingetrokken' || reden === 'ingetrokken') return { status: 409, error: 'Deze uitnodiging is ingetrokken.' };
+    if (reden && reden !== 'verlopen') return { status: 404, error: 'Deze uitnodiging kennen we niet.' };
+    if (verlopen(u) || reden === 'verlopen') {
+      u.stand = 'verlopen';
       return { status: 409, error: 'Deze uitnodiging is verlopen.',
         uitleg: 'Vraag de werkgever om een nieuwe; dat kost hem één tik.' };
     }
@@ -129,11 +130,11 @@ module.exports = (ctx) => {
       afdeling: u.afdeling, rol: u.rol, soort: u.soort, van: u.van });
     if (!r.ok) return r;
 
+    T.gebruik(u.toegang);
     u.stand = 'geaccepteerd';
     u.persoon = persoon;
     u.employment = r.employment.id;
     u.geaccepteerd = nu();
-    save();
 
     const ent = entiteitVind(u.entiteit);
     const v = u.vestiging ? vestigingVind(u.vestiging) : null;
@@ -143,19 +144,34 @@ module.exports = (ctx) => {
         regel: 'Uw werkplek is klaar.' } };
   }
 
-  function uitnodigingIntrek(u) {
-    if (u.stand === 'geaccepteerd') {
-      return { status: 409, error: 'Deze uitnodiging is al geaccepteerd.',
-        uitleg: 'Beëindig het dienstverband; een geaccepteerde uitnodiging terugdraaien zou het werk dat er al op staat laten zweven.' };
-    }
-    u.stand = 'ingetrokken';
-    save();
-    return { ok: true, uitnodiging: beeld(u) };
+  /* Intrekken en roteren op de verse stand in de transactie: een accepteren
+     dat net daarvoor landde, wint, en dan zegt dit dat eerlijk. */
+  const alGeaccepteerd = { status: 409, error: 'Deze uitnodiging is al geaccepteerd.',
+    uitleg: 'Beëindig het dienstverband; een geaccepteerde uitnodiging terugdraaien zou het werk dat er al op staat laten zweven.' };
+  function uitnodigingIntrek(ui, door) {
+    return transactie(() => {
+      const u = vind(ui && ui.id);
+      if (!u) return { status: 404, error: 'Deze uitnodiging bestaat niet.' };
+      if (u.stand === 'geaccepteerd') return alGeaccepteerd;
+      u.stand = 'ingetrokken';
+      if (u.toegang) T.intrekken(u.toegang, door || 'werkgever', 'ingetrokken door de werkgever');
+      return { ok: true, uitnodiging: beeld(u) };
+    });
+  }
+  function uitnodigingRoteer(ui, door) {
+    return transactie(() => {
+      const u = vind(ui && ui.id);
+      if (!u) return { status: 404, error: 'Deze uitnodiging bestaat niet.' };
+      if (u.stand === 'geaccepteerd') return alGeaccepteerd;
+      if (u.stand !== 'open' || verlopen(u)) return { status: 409, error: 'Deze uitnodiging is niet meer open; maak een nieuwe.' };
+      const code = geefCode(u, door);
+      return { ok: true, uitnodiging: beeld(u), code };
+    });
   }
 
   /* ---- lezen ---- */
   function beeld(u) {
-    return { id: u.id, code: u.stand === 'open' ? u.code : null,
+    return { id: u.id, toegang: T.publiek(u.toegang) || null,
       entiteit: u.entiteit, vestiging: u.vestiging, afdeling: u.afdeling,
       rol: u.rol, soort: u.soort, contact: u.contact, kanaal: u.kanaal,
       van: u.van, geldigTot: u.geldigTot,
@@ -171,7 +187,7 @@ module.exports = (ctx) => {
 
   return Object.assign({ UITNODIGING_UITNODIGINGSWEGEN: UITNODIGINGSWEGEN, uitnodigingVind: vind,
     uitnodigingVindCode: vindCode, uitnodigingNieuw, uitnodigingAccepteer,
-    uitnodigingIntrek, uitnodigingTekst: tekst, uitnodigingBeeld: beeld,
+    uitnodigingIntrek, uitnodigingRoteer, uitnodigingTekst: tekst, uitnodigingBeeld: beeld,
     uitnodigingVanEntiteit: vanEntiteit, uitnodigingOpenstaand: openstaand },
     require('./uitnodiging-bulk')(Object.assign({}, ctx, { uitnodigingNieuw })));
 };

@@ -1513,10 +1513,8 @@ function findPartner(code) {
   return db.data.partners.find(p => p.code === code) || null;
 }
 
-function findStaffPartner(staffCode) {
-  staffCode = String(staffCode || '').trim().toUpperCase();
-  return db.data.partners.find(p => p.staff && p.staff.code === staffCode) || null;
-}
+/* De personeelscode zoekt niet meer hier (raw, lineair): hij is een 128-bit
+   credential per medewerker in kern/partnerpersoneelscode.js (B14). */
 
 
 
@@ -1730,15 +1728,12 @@ const { agentKoppel, agentPubliek, agentVoorstel, agentBeslis, roosterVoorstel, 
   accounts, weekdagFactor, SHIFT_NAMES, save, logActivity, afwezigOp
 });
 
-/* Mode-bezorging (kern/modebezorg.js): een modewinkel zet in een tik een slimme,
-   veilige bezorgdienst op. Veilig voor beide kanten (bezorgcode, foto-bewijs,
-   geverifieerde koerier, live volgen, ID bij dure stukken, retour aan de deur)
-   en efficient (de koerier krijgt de kortste route). */
+// Mode-bezorging (kern/modebezorg.js): bezorgcode, foto, ID bij dure stukken, retour.
 const {
-  MODEBEZORG_KETEN, mbSetup, mbInstel, mbMagLeveren, mbAanvraag, mbWinkelOverzicht,
+  MODEBEZORG_KETEN, mbSetup, mbInstel, mbMagLeveren, mbAanvraag, mbCode, mbWinkelOverzicht,
   mbRoute, mbNeem, mbGps, mbOverhandig, mbRetour, mbMijn
 } = maakModebezorg({
-  db, save, crypto, findSupplier, accounts, notify, notifySupplier, sseToCustomer,
+  db, save, crypto, bewerkCollectie, dataDir: DATA_DIR, findSupplier, accounts, notify, notifySupplier, sseToCustomer,
   sseToSupplier, sseToOffice, haversine, etaMinutes, leesUploadDataUrl
 });
 
@@ -1790,8 +1785,8 @@ const {
   bevAanvraag, bevAanvraagLijst, bevBeslisAanvraag,
   bevMijnDiensten, bevInklok, bevUitklok, bevRondeStart, bevRondeCheckpoint, bevRondeKlaar,
   bevMeldIncident, bevBeslisIncident, bevSos, bevCommand,
-  // de sleuf waar opzet/plaatsbronnen.js de plaatslaag in hangt (late binding)
-  bevKoppelPlaats
+  // late sleuven: plaats (opzet/plaatsbronnen.js), verzuim (kernlaag2)
+  bevKoppelPlaats, bevDienstVervalt
 } = maakBeveiliging({ db, save, crypto, accounts, findSupplier, notify, notifySupplier, sseToSupplier, sseToOffice, logActivity, haversine, afwezigOp });
 
 /* De idempotentie-administratie van de betaal-naad (server/betaal.js) durable
@@ -2279,7 +2274,7 @@ const kern = {
   bufferEvent, bus, canEngage, cannedAnswer, cannedBoekhouder, cateringDishes, rondEuro, chatApplicant,
   chatKeyOf, chatStuur, checkCred, coachCache, coachRules, conciergeInbox, connectedSupplierCodes, convOf,
   crypto, cvReady, db, bijeen, deptsFor, dirTouch, eisAccount, engageError, ensureApplyChat, foutmelder,
-  ensureSupplierDefaults, etaMinutes, eventCovers, express, fallbackRunsheet, financeVoor, dagrapport, shiftSamenvatting, findPartner, findStaffPartner,
+  ensureSupplierDefaults, etaMinutes, eventCovers, express, fallbackRunsheet, financeVoor, dagrapport, shiftSamenvatting, findPartner,
   findSupplier, forgetSession, forgetSessionDuurzaam, fs, cadeaukaart, geborenVan, geenGast, idGeverifieerd, generateAiReply,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   eersteBijdrageFactuur, ledenInhoudVan, leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
@@ -2323,7 +2318,7 @@ const kern = {
     ghBijbestelVoorstel },
   agentKoppel, agentPubliek, agentVoorstel, agentBeslis, roosterVoorstel, roosterBeslis,
   // de mode-bezorging (kern/modebezorg.js)
-  mbSetup, mbInstel, mbMagLeveren, mbAanvraag, mbWinkelOverzicht, mbRoute, mbNeem, mbGps, mbOverhandig, mbRetour, mbMijn,
+  mbSetup, mbInstel, mbMagLeveren, mbAanvraag, mbCode, mbWinkelOverzicht, mbRoute, mbNeem, mbGps, mbOverhandig, mbRetour, mbMijn,
   // de eigen mini-boardroom per zaak (kern/zaak.js)
   ZAAK_CAPS, zaakFunctieAan, zaakFunctieLijst, zaakZet, zaakHr, zaakMarketing, zaakBoard,
   lidboard,
@@ -2394,11 +2389,11 @@ const hulp = {
   magAi: (req) => aiPoort.magAi(req)
 };
 
-/* De samenstelling van de kern staat in ./opzet/kernlaag1..7.js --
-   aaneengesloten stukken in precies deze volgorde. Zie de kop van kernlaag1.js. */
+/* De kern: ./opzet/kernlaag1..7.js, in deze volgorde (kop van kernlaag1.js). */
 require('./opzet/kernlaag1')(kern, hulp);
 require('./opzet/kernlaag1b')(kern, hulp);
 require('./opzet/kernlaag2')(kern, hulp);
+kern.payrollOS.verzuim.naMelding(bevDienstVervalt);
 require('./opzet/kernlaag2b')(kern, hulp);
 require('./opzet/kernlaag3')(kern, hulp);
 require('./opzet/kernlaag3c')(kern, hulp);  // de commerciele kern; NA pay, want de ronde boekt

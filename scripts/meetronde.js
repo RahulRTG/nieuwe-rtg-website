@@ -54,21 +54,30 @@ const ALLEEN = (argv.find(a => a.startsWith('--alleen=')) || '').slice(9);
 
 /* Elke stap: wat hij vult, hoe hij draait, en hoe lang hij ongeveer duurt.
    `snel` markeert de stappen die ook in de korte ronde meedoen. */
+/* DE BEGRENZING. Bij de rol- en invoerproef telt --max POGINGEN (twee per
+   route), niet routes. Op 8000 sneed hij op 29 september 2026 stil af: 4416
+   routes met een rol vragen 8832 pogingen, en de laatste 108 leveranciersroutes
+   in het alfabet vielen buiten de ronde -- ROLPROEF.json zag er normaal uit en
+   de bewijsmatrix meldde 108 ACL-cellen minder. Een ruimere grens kost niets:
+   elke proef stopt als alle routes gedaan zijn. Staat hij weer krap, dan zegt
+   `begrenzing` gelijk aan `pogingen` in het register dat de ronde is afgekapt. */
+const BEGRENZING = 20000;
+
 const STAPPEN = [
   { id: 'poortwacht', register: 'POORTWACHT.json', snel: true, duur: '~3 min',
     wat: 'welke routes zonder token opengaan' },
   { id: 'rolproef', register: 'ROLPROEF.json', duur: '~6 min',
     wat: 'of een verkeerde rol binnenkomt',
-    cmd: ['scripts/rolproef-route.js', '--max=8000'] },
+    cmd: ['scripts/rolproef-route.js', '--max=' + BEGRENZING] },
   { id: 'invoerproef', register: 'INVOERPROEF.json', duur: '~6 min',
     wat: 'of rommel netjes wordt geweigerd',
-    cmd: ['scripts/invoerproef-route.js', '--max=8000'] },
+    cmd: ['scripts/invoerproef-route.js', '--max=' + BEGRENZING] },
   { id: 'idemproef', register: 'IDEMPROEF.json', duur: '~8 min',
     wat: 'of een herhaalde oproep niets dubbel doet',
-    cmd: ['scripts/idemproef-route.js', '--max=8000'] },
+    cmd: ['scripts/idemproef-route.js', '--max=' + BEGRENZING] },
   { id: 'staatproef', register: 'STAATPROEF.json', duur: '~8 min',
     wat: 'of de toestand na afloop klopt',
-    cmd: ['scripts/staatproef-route.js', '--max=8000'] },
+    cmd: ['scripts/staatproef-route.js', '--max=' + BEGRENZING] },
   /* DE TWEE BEWIJSPROEVEN STONDEN HIER NIET IN, en dat had twee gevolgen die
      allebei zijn opgetreden.
 
@@ -86,10 +95,10 @@ const STAPPEN = [
      vóór de bewijsmatrix komt. */
   { id: 'auditproef', register: 'AUDITPROEF.json', duur: '~5 min',
     wat: 'of een geslaagde schrijfactie een regel in het API-spoor nalaat',
-    cmd: ['scripts/auditproef-route.js', '--max=8000'] },
+    cmd: ['scripts/auditproef-route.js', '--max=' + BEGRENZING] },
   { id: 'handelingproef', register: 'HANDELINGPROEF.json', duur: '~5 min',
     wat: 'of een geslaagde schrijfactie een geketende regel nalaat',
-    cmd: ['scripts/handelingproef-route.js', '--max=8000'] },
+    cmd: ['scripts/handelingproef-route.js', '--max=' + BEGRENZING] },
   { id: 'ketenronde', register: 'KETENS.json', duur: '~4 min',
     wat: 'of een keten netjes faalt onder sabotage',
     cmd: ['scripts/ketenronde.js'] },
@@ -108,7 +117,7 @@ const STAPPEN = [
     cmd: ['scripts/auditproef-route.js'] },
   { id: 'handelingproef', register: 'HANDELINGPROEF.json', duur: '~4 min',
     wat: 'of dat spoor geketend is',
-    cmd: ['scripts/handelingproef-route.js', '--max=8000'] },
+    cmd: ['scripts/handelingproef-route.js', '--max=' + BEGRENZING] },
   { id: 'uitvoerproef', register: 'UITVOERPROEF.json', duur: '~5 min',
     wat: 'of een antwoord gegevens van een ander bevat',
     cmd: ['scripts/uitvoerproef-route.js'] },
@@ -152,6 +161,8 @@ const vingerafdruk = (naam) => {
     .update(fs.readFileSync(path.join(WORTEL, naam))).digest('hex').slice(0, 12); }
   catch (e) { return null; }
 };
+
+const { valOm } = require('./lib/valom');
 
 function draai(cmd, extraEnv) {
   const r = spawnSync(process.execPath, cmd, {
@@ -207,7 +218,7 @@ async function poortwachtRonde() {
    Die wacht ontbrak hier omdat dit bestand zelf geen register schrijft en dus
    buiten het bereik van scripts/meetkeuring.js viel. Hij schrijft ze alleen
    allemaal via zijn kinderen -- wat erger is en niet minder erg. */
-module.exports = { STAPPEN };
+module.exports = { STAPPEN, valOm };
 if (require.main !== module) return;
 
 (async () => {
@@ -227,7 +238,18 @@ if (require.main !== module) return;
     let r;
     try {
       r = s.id === 'poortwacht' ? await poortwachtRonde()
-        : (() => { const d = draai(s.cmd); return { ok: d.code === 0 || d.code === 1, melding: laatsteRegel(d.uit) }; })();
+        : (() => {
+          const d = draai(s.cmd);
+          /* UITGANG 1 IS EEN BEVINDING -- MAAR OOK EEN CRASH. Node eindigt een
+             ongevangen fout met dezelfde 1, en dan las een instrument dat niet
+             eens laadde als "klaar (register onveranderd)". Dat is gebeurd: de
+             auditproef gaf een SyntaxError (dubbele declaratie) en AUDITPROEF.json
+             stond drie weken stil terwijl elke ronde "klaar" meldde. Een fout met
+             een stapelspoor op stderr is geen bevinding. */
+          const crash = valOm(d.fout);
+          return { ok: !crash && (d.code === 0 || d.code === 1),
+            melding: crash ? 'het instrument viel om: ' + String(d.fout).split('\n').find((l) => /Error: /.test(l)) : laatsteRegel(d.uit) };
+        })();
     } catch (e) { r = { ok: false, melding: String(e.message) }; }
     const na = vingerafdruk(s.register);
     const veranderd = voor !== na;

@@ -1,8 +1,7 @@
 
 (function (w, d) {
   'use strict';
-  // iOS moves overflow actions out of its visible header. Its menu is replaced
-  // by Edge, so these original controls must remain reachable here as well.
+  // Edge vervangt lokale balken; hun echte bediening blijft hier bereikbaar.
   var ROOTS = '.wd-output,.connection-edge,.cmd-balk,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-tabs,body>nav.balk,.wd-page>nav.balk,.rtg-edge-owned-bar,.rtgsprong-greep,.rtm-nav,.ios-nav-acties,.ios-nav-extra';
 
   function label(el) { return (el.getAttribute('aria-label') || el.title || el.textContent || '').replace(/\s+/g, ' ').trim(); }
@@ -81,7 +80,12 @@
         b.textContent = item.naam; container.appendChild(b);
       });
     }
-    sourceButtons(d, false, items).forEach(function (source) {
+    var sources = sourceButtons(d, false, items), frame = d.querySelector('#rtgCommand .cmd-pane.actief iframe');
+    try {
+      if (frame && frame.contentDocument && frame.contentDocument.body)
+        sources = sources.concat(sourceButtons(frame.contentDocument, true, items));
+    } catch (e) {}
+    sources.forEach(function (source) {
       var el = source.el, b = d.createElement('button'); b.type = 'button';
       var action = el.getAttribute('data-rtg-action-key');
       b.className = 'rtg-adaptive-sheet-action'; b.textContent = label(el);

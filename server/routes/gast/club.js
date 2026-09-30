@@ -9,8 +9,8 @@
    WAT ER WEL BIJ MOEST: HET BEWIJS DAT DE BAND VAN JOU IS. Aan de bar geef je
    hem af; dat is het bewijs. Vanaf een telefoon bestaat dat niet, en een
    bandNUMMER is geen geheim -- het staat groot op de band en is te raden. De
-   boncode is dat wel: acht willekeurige tekens die de zaak nergens toont. Die
-   staat dus als QR op de band, en wie hem scant heeft hem in handen gehad.
+   boncode is dat wel: 128 bits die de zaak een keer ziet. Die staat als QR op
+   de band, en wie hem scant KOPPELT hem aan zijn eigen tafelsessie.
 
    Dat is dezelfde redenering als bij de tafel en de kamer, voor de vierde keer:
    niet "wie ben je" maar "wat heb je in handen". Alleen is het bewijs hier geen
@@ -21,30 +21,40 @@ module.exports = (kern) => {
   const { app, schoon, horeca, gastAuth } = kern;
   const { Hlees, heleCenten } = horeca;
 
-  /* KIJKEN IS Hlees EN NIET H. Beide routes hieronder LEZEN alleen -- ze zetten
-     niets op de rekening en niets op de band. H() zou de horecadoos van de zaak
+  /* KIJKEN IS Hlees EN NIET H. Geen van beide routes hieronder zet iets op de
+     rekening; het koppelen schrijft alleen in de bon zelf. H() zou de horecadoos van de zaak
      neerzetten zodra iemand ernaar vraagt, ook bij de 404 op een geraden
      boncode, en dan laat een geweigerd verzoek iets achter dat er niet was.
      Bestaat de doos wel -- en dat is hier altijd zo, want gastAuth komt niet
      langs zonder open rekening -- dan geeft Hlees hem ECHT terug. Zie
      kern/horeca.js bij Hlees. */
 
-  /* ---------- mijn polsband ----------
-     Op saldo vragen kan alleen met de boncode, dus met de band in je hand. Het
-     antwoord noemt bewust het NUMMER niet terug: wie de code heeft weet welke
-     band het is, en wie hem raadt hoort er geen nummer bij te krijgen dat hij
-     kan gebruiken om aan de bar te doen alsof. */
-  app.post('/api/gast/band', gastAuth, (req, res) => {
-    const { zaakcode } = req.gast;
-    const code = schoon((req.body || {}).bonCode, 40);
-    if (!code) return res.status(400).json({ error: 'Scan de code op je polsband.', code: 'band-leeg' });
+  /* ---------- mijn bon of polsband: KOPPELEN ----------
+     Met de code in de hand (de QR op de band, de code op de bon) bindt de gast
+     de bon aan ZIJN tafelsessie; alleen dan kan /api/gast/betaal hem afboeken,
+     en zolang deze rekening open is kan geen andere telefoon hem koppelen
+     (kern/horeca/bon-beheer.js). Het antwoord noemt het NUMMER van de band niet
+     terug, en ook de code niet. Een rem op raden (per adres) staat ervoor, al
+     is 128 bits niet te raden: een oude bon van 32 bits wel. */
+  app.post('/api/gast/band', gastAuth, async (req, res) => {
+    const { zaakcode, rekening, deelnemer } = req.gast;
+    const code = schoon((req.body || {}).bonCode, 80);
+    if (!code) return res.status(400).json({ error: 'Scan de code op je polsband of bon.', code: 'band-leeg' });
+    const emmer = 'gastbon:' + req.ip;
+    if (kern.tooManyTries && kern.tooManyTries(res, emmer)) return;
     const h = Hlees(zaakcode);
-    const bon = Object.prototype.hasOwnProperty.call(h.bonnen, code) ? h.bonnen[code] : null;
-    if (!bon || bon.soort !== 'tegoed') return res.status(404).json({
-      error: 'Deze code hoort niet bij een polsband van deze zaak.', code: 'band-onbekend' });
-    res.json({ ok: true, saldo: bon.saldo, uitgegeven: bon.uitgegeven,
-      naam: bon.naam || null, geldigTot: bon.geldigTot || null,
-      let: 'Wat er op je band staat kan niet onder nul, en wat je overhoudt krijg je terug aan de kassa.' });
+    const r = await horeca.bonlaag.koppel({ zaak: zaakcode, code, rekeningId: rekening.id,
+      deelnemer: deelnemer ? deelnemer.hash : null,
+      leeft: b => { const x = (h.rekeningen || {})[b.rekeningId]; return !!(x && x.status === 'open'); } });
+    if (!r.ok) {
+      if (r.status === 404 && kern.noteFailedTry) kern.noteFailedTry(emmer, req.ip);
+      return res.status(r.status || 409).json({ error: r.status === 404
+        ? 'Deze code hoort niet bij een bon of polsband van deze zaak.' : r.error,
+        code: r.status === 404 ? 'band-onbekend' : r.code });
+    }
+    res.json({ ok: true, gekoppeld: true, saldo: r.bon.saldo, uitgegeven: r.bon.uitgegeven,
+      soort: r.bon.band ? 'polsband' : r.bon.soort, naam: r.bon.band ? null : r.bon.naam, geldigTot: r.bon.geldigTot,
+      let: 'Gekoppeld aan deze tafel. Wat erop staat kan niet onder nul, en wat je overhoudt krijg je terug aan de kassa.' });
   });
 
   /* ---------- minimum spend van mijn tafel ----------

@@ -42,17 +42,17 @@ module.exports = (kern) => {
   });
 
   // Veilig afronden: bezorgcode + foto-bewijs (+ ID bij dure stukken).
-  app.post('/api/supplier/mode/bezorg/overhandig', supplierAuth, express.json({ limit: '1.5mb' }), (req, res) => {
-    const r = mbOverhandig(req.supplier.code, String(req.body.ref || ''), {
+  app.post('/api/supplier/mode/bezorg/overhandig', supplierAuth, express.json({ limit: '1.5mb' }), async (req, res) => {
+    const r = await mbOverhandig(req.supplier.code, String(req.body.ref || ''), {
       bezorgcode: req.body.bezorgcode, foto: req.body.foto, idOk: req.body.idOk === true
     }, req.actor);
-    if (r.error) return res.status(r.status).json({ error: r.error });
+    if (r.error) return res.status(r.status).json({ error: r.error, resterend: r.resterend });
     res.json({ ok: true, status: r.status2 });
   });
 
   // Retour aan de deur (past niet / klant weigert).
-  app.post('/api/supplier/mode/bezorg/retour', supplierAuth, (req, res) => {
-    const r = mbRetour(req.supplier.code, String(req.body.ref || ''), req.body.reden, req.actor);
+  app.post('/api/supplier/mode/bezorg/retour', supplierAuth, async (req, res) => {
+    const r = await mbRetour(req.supplier.code, String(req.body.ref || ''), req.body.reden, req.actor);
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json({ ok: true });
   });

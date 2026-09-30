@@ -29,8 +29,8 @@ function opKleur(hex) {
     huidig: lees,
     actief: function () { var s = lees(); return !!(s && s.code && s.token); },
     zet: schrijf,
-    wisProfiel: function () { var s = lees(); if (s) { delete s.token; delete s.profiel; schrijf(s); } },
-    uitloggen: function () { schrijf(null); },
+    wisProfiel: function () { var s = lees(); if (s) { afmelden(s); delete s.token; delete s.profiel; schrijf(s); } },
+    uitloggen: function () { afmelden(lees()); schrijf(null); },
     naam: function () { var s = lees(); return (s && s.profiel && s.profiel.naam) || ''; },
     /* De deur van de RTFoundation.
 

@@ -9,11 +9,11 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**60 bundels, 483 delen, 0 zonder onderwerp.**
+**60 bundels, 485 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 99 delen, 9784 regels in de delen
+`public/apps/app-main/` -- 100 delen, 9824 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -83,6 +83,7 @@ omlaag.
 | `app-main-32.js` | het live-paneel: van modus wisselen |
 | `app-main-33.js` | een asset herroepen binnen de bedenktijd |
 | `app-main-34.js` | mijn zorgprofiel |
+| `app-main-34b.js` | het Onderweg-paneel: kaart, partners, handelingen en de bevestigde aankomst |
 | `app-main-35.js` | betalen met Face ID vanuit een rekeningregel |
 | `app-main-36.js` | een verblijf tonen: foto's en kamers |
 | `app-main-37.js` | de deur van kamer of entree openen, en een kamer boeken |
@@ -181,7 +182,7 @@ omlaag.
 
 ## `apps/foundation/gezin-rt.js`
 
-`public/apps/foundation/gezin-rt/` -- 3 delen, 192 regels in de delen
+`public/apps/foundation/gezin-rt/` -- 3 delen, 195 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -201,7 +202,7 @@ omlaag.
 
 ## `apps/foundation/sessie.js`
 
-`public/apps/foundation/sessie/` -- 4 delen, 395 regels in de delen
+`public/apps/foundation/sessie/` -- 4 delen, 404 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -212,7 +213,7 @@ omlaag.
 
 ## `apps/leverancier.js`
 
-`public/apps/leverancier/` -- 115 delen, 9827 regels in de delen
+`public/apps/leverancier/` -- 115 delen, 9834 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -379,7 +380,7 @@ omlaag.
 
 ## `apps/personeel.js`
 
-`public/apps/personeel/` -- 32 delen, 3232 regels in de delen
+`public/apps/personeel/` -- 32 delen, 3246 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -516,7 +517,7 @@ omlaag.
 
 ## `apps/techniek.js`
 
-`public/apps/techniek/` -- 9 delen, 882 regels in de delen
+`public/apps/techniek/` -- 10 delen, 944 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -528,6 +529,7 @@ omlaag.
 | `techniek-03.js` | een functie globaal aan- of uitzetten |
 | `techniek-03a.js` | het doelgroepfilter met chips, en het zoeken erin |
 | `techniek-03c.js` | de automatische noodrem aan- of uitzetten |
+| `techniek-03d-sso.js` | SSO-CLIENTGEHEIMEN (besluit B16) |
 | `techniek-04.js` | De laatste stand van het statusbord, zodat "meenemen" uit het EIGEN model leest en niet uit de kaartjes op het scherm |
 
 ## `apps/werkplek-bureaus.js`
@@ -554,7 +556,7 @@ omlaag.
 
 ## `shared/basis.js`
 
-`public/shared/basis/` -- 10 delen, 911 regels in de delen
+`public/shared/basis/` -- 10 delen, 915 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -713,7 +715,7 @@ omlaag.
 
 ## `shared/ios.js`
 
-`public/shared/ios/` -- 5 delen, 777 regels in de delen
+`public/shared/ios/` -- 5 delen, 784 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -764,7 +766,7 @@ omlaag.
 
 ## `shared/metgezel.js`
 
-`public/shared/metgezel/` -- 9 delen, 802 regels in de delen
+`public/shared/metgezel/` -- 9 delen, 801 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -873,7 +875,7 @@ omlaag.
 
 ## `shared/uitvoer.js`
 
-`public/shared/uitvoer/` -- 2 delen, 285 regels in de delen
+`public/shared/uitvoer/` -- 2 delen, 291 regels in de delen
 
 | deel | onderwerp |
 |---|---|

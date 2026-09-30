@@ -11,6 +11,7 @@
 module.exports = (ctx) => {
   const { anthropic, AFDELINGEN, kamer, taken, voorstellen } = ctx;
   const rahul = require('../rahul');
+  const { registerblikVraag, voetnoot } = require('../registerblik/lus');
 
   // De voorstellen uit de dagronde die op deze kamer slaan (of op de boardroom,
   // die overkoepelend is) -- zo krijgt Rahul dezelfde signalen als de eigenaar.
@@ -81,6 +82,19 @@ module.exports = (ctx) => {
     const v = String(vraag || '').replace(/[<>]/g, '').trim().slice(0, 300);
 
     if (anthropic) {
+      /* Eerst de registerblik (../registerblik/lus.js): Rahul zoekt in RTG's eigen
+         registers op wat hij niet weet. Lukt dat niet (geen gereedschap bij dit
+         model, geen antwoord), dan de korte blik hieronder -- en daarna de regels. */
+      try {
+        const blik = await registerblikVraag({ anthropic, vraag: v || 'Waar zou de boardroom vandaag als eerste naar kijken?',
+          rol: 'je denkt mee met de RTG-boardroom. Je BESLIST NOOIT en schakelt niets: je adviseert, de boardroom beslist zelf. ' +
+            'Antwoord kort, in gewone taal, in hooguit vijf punten.' });
+        if (blik && blik.tekst) {
+          const noot = voetnoot(blik.staving);
+          return { ok: true, antwoord: blik.tekst + (noot ? '\n\n' + noot : ''), punten: regels,
+            geraadpleegd: blik.geraadpleegd, staving: blik.staving };
+        }
+      } catch (e) { console.error('[boardroom] registerblik', e && e.message); }
       try {
         const beeld = 'Aantal kamers: ' + Object.keys(AFDELINGEN).length +
           '. Signalen uit de dagronde (per kamer): ' + (sig.length ? sig.join(' | ') : 'geen') +

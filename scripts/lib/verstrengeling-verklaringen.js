@@ -6,6 +6,12 @@
 module.exports = [
   { van: 'domein:experience', naar: 'domein:living-world', soort: 'ORKESTRATIE',
     reden: 'De Experience Broker registreert de actiewoordenlijst en voert bevestigde intents uit via de Living World-adapter. Het brondomein blijft eigenaar van bevoegdheid, revisie, levensloop en duurzame ontvangstbewijzen; de Broker kopieert geen domeinwaarheid.' },
+  /* DE BOARDROOM ZOEKT HET OP. kern/afdelingen/kameradvies.js laat de
+     boardroom-Rahul RTG's eigen registers lezen via kern/registerblik/ in plaats
+     van het uit zijn hoofd te moeten weten. De rand loopt een kant op: de
+     registerblik kent de afdelingen niet, en leest alleen registers bij naam. */
+  { van: 'domein:afdelingen', naar: 'domein:registerblik', soort: 'DOMEINRELATIE',
+    reden: 'het boardroomadvies vraagt de registerblik wat de registers over productie, bewijs en routes zeggen; de registerblik leest alleen, en kent de afdelingen niet' },
   { van: 'ingang:ik', naar: 'ingang:presentatie-beelden', soort: 'ORKESTRATIE',
     reden: 'De ik-route registreert de persoonlijke presentatievoorkeuren als onderdeel van de eigen accountinstellingen; de beeldmodule bewaakt zelf lid- en gezinsprofielauthenticatie en eigendom van privébestanden.' },
   /* DE LEDENGIDS RAAKT DE AANWEZIGHEID AAN (besluit van de eigenaar, 25 september

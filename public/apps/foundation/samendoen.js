@@ -74,7 +74,9 @@
       (a.stand === 'open' ? '<div class="rij ruimte">' +
         (!a.ikDoeMee ? '<button class="kknop vol" type="button" data-aansluit="' + esc(a.id) + '">Doe mee</button>' : '') +
         (a.ikDoeMee && !a.ikStartte ? '<button class="kknop" type="button" data-verlaat="' + esc(a.id) + '">Toch niet</button>' : '') +
-        '</div>' : '') + beheer(a) + '</div>';
+        '</div>' : '') + beheer(a) +
+      (k.id ? '<div class="rij ruimte"><button class="kknop" type="button" data-voorstellen="' + esc(k.id) + '">Voorstellen van partijen</button></div>' +
+        '<div data-voorstellen-bij="' + esc(k.id) + '"></div>' : '') + '</div>';
   }
 
   async function teken() {
@@ -88,6 +90,20 @@
   async function doe(pad, body, klaar) {
     try { await api(pad, body); zeg(klaar, true); await teken(); S.teken(); }
     catch (e) { zeg(e.message); }
+  }
+  /* De voorstellen van partijen bij de kwestie van een actie: een actie maakt het
+     onderwerp openbaar, dus elk lid mag ze lezen. Zelfde weergave als overal. */
+  async function voorstellen(kid) {
+    const plek = document.querySelector('[data-voorstellen-bij="' + kid + '"]');
+    try {
+      const r = await fetch('/api/member/democratie/kwestie/voorstellen', { method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + S.token() }, body: JSON.stringify({ id: kid }) });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok || d.error) throw new Error(d.error || 'Er ging iets mis.');
+      plek.innerHTML = window.VoorstelBeeld.html(d, esc) || '<p class="ronde">Er staat nog geen partij in het register.</p>';
+      const open = plek.querySelector('details');
+      if (open) open.open = true;
+    } catch (e) { plek.innerHTML = '<p class="ronde">' + esc(e.message) + '</p>'; }
   }
   const veld = (sel) => { const el = document.querySelector(sel); return el ? el.value.trim() : ''; };
 
@@ -110,6 +126,7 @@
       waar: veld('[data-plan-waar="' + d.plan + '"]'), plaatsen: veld('[data-plan-plaatsen="' + d.plan + '"]') }, 'De bijeenkomst staat in de lijst.');
     else if (d.afgelast) doe('afgelast', { id: d.afgelast }, 'De bijeenkomst is afgelast.');
     else if (d.resultaat) doe('resultaat', { id: d.resultaat, tekst: veld('#res-' + d.resultaat) }, 'Het resultaat staat bij je kwestie. Het kantoor legt de uitkomst vast.');
+    else if (d.voorstellen) voorstellen(d.voorstellen);
     else if (d.stop) doe('stop', { id: d.stop, reden: veld('[data-stop-reden="' + d.stop + '"]') }, 'De actie is gestopt. Je kwestie loopt gewoon door.');
   });
 

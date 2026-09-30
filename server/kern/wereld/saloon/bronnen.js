@@ -59,6 +59,21 @@ module.exports = ({ kern, sociaal }) => ({
       uitgever: a.naam
     }))) };
   },
+  voortgang(sess) {
+    const d = kern.mall.mallAanvragen.mijn(sess.key, sess.routeBeleid);
+    if (d.error) throw new Error('Aanvragen niet beschikbaar');
+    return { items: d.aanvragen.map(a => ({
+      id: 'voortgang:' + a.id, bron: 'voortgang', type: 'request', prive: true,
+      titel: a.wat, tekst: a.resultaat ? a.resultaat.tekst : a.statusLabel,
+      auteur: a.eigenaar || 'Uw aanvraag', plaats: a.plek, at: a.bij, gewijzigd: a.bij,
+      bronversie: a.versie, bronActies: a.acties,
+      aandacht: a.acties.some(x => x.id === 'kies'),
+      url: '/apps/mijnmall.html#aanvragen', actie: 'Open aanvraag', uitgever: 'Mijn Mall',
+      provenance: { source: 'mallAanvragen', source_version: a.versie,
+        observed_at: new Date().toISOString(), valid_from: a.bij, valid_until: null,
+        visibility: 'owner', consent_basis: 'user_enabled_source' }
+    })) };
+  },
   persoonlijk(sess) {
     const d = kern.reiswereld.komend(sess.key);
     return { meldingen: (d.stil || []).map(() => 'Een reisbron is niet bereikbaar.'),

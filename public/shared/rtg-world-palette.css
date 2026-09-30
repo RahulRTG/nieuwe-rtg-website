@@ -162,7 +162,7 @@ body[data-rtg-skin="heritage"][data-rtg-layout="standard"] #bladDienst .rv-ey{co
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"] .rv-specialisten{background:var(--rtg-world-card)!important;color:var(--rtg-world-ink)!important;border-color:var(--rtg-world-line)!important}
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"] .rv-specialisten :is(summary,a,a:hover){color:var(--rtg-world-ink)!important}
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world="living"] .lv-app :is(.rv-ey,.lv-kop button,.lv-opdrachten button,.lv-filters button,.lv-hero span,.lv-grid span,.lv-tijdlijn em){color:var(--rtg-world-muted)!important}
-body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world="living"] .lv-app :is(.lv-hero,.lv-grid button){background:var(--rtg-world-card)!important;color:var(--rtg-world-ink)!important}
+body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world="living"] .lv-app :is(.lv-hero,.lv-grid button){background:var(--rtg-world-card)!important;color:var(--rtg-world-ink)!important;--rv-tekst:var(--rtg-world-ink);--rv-soft:var(--rtg-world-muted)}
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world="living"] .lv-app :is(.lv-hero em,.lv-tijdlijn header span,.lv-tijdlijn time,.lv-live button){color:var(--rtg-world-metal)!important}
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world="work"] .rail .nav button span:first-child{color:var(--rtg-world-muted)!important}
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world="work"] #readinessRing>div{background:var(--rtg-world-card)}
@@ -193,3 +193,7 @@ body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-workos-premium] 
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-world-home="foundation"] :is(.onthaal-beeld,.band){
  background:var(--rtg-world-card)!important;color:var(--rtg-world-ink)!important;
 }
+/* The world switcher paints on its own ground (--rtg-bg of the page); under the
+   palette its ink follows the world, so its ground has to follow too. */
+body[data-rtg-skin="heritage"][data-rtg-layout="standard"] .os-switcher{background:var(--rtg-world-card)!important;color:var(--rtg-world-ink)!important;border-color:var(--rtg-world-line)!important;--world-ink:var(--rtg-world-ink);--world-soft:var(--rtg-world-muted)}
+body[data-rtg-skin="heritage"][data-rtg-layout="standard"] .os-switcher__links a span{color:var(--rtg-world-metal)!important}

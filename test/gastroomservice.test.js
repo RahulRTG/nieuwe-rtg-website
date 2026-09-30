@@ -171,7 +171,8 @@ test('met de band afrekenen loopt langs hetzelfde tegoed dat de zaak ziet', asyn
   const band = await post('/api/supplier/horeca/club/band', { nummer: '078', bedrag: 50 }, ZAAK);
   const bonCode = band.body.band.bonCode;
 
-  const betaal = await post('/api/gast/betaal', { sleutel: aan.sleutel, wijze: 'tegoed', bonCode });
+  assert.equal((await post('/api/gast/band', { sleutel: aan.sleutel, bonCode })).status, 200, 'eerst koppelen');
+  const betaal = await post('/api/gast/betaal', { sleutel: aan.sleutel, wijze: 'tegoed' });
   assert.equal(betaal.status, 200, JSON.stringify(betaal.body).slice(0, 200));
   assert.equal(betaal.body.gesloten, true);
   assert.equal(betaal.body.bonSaldo, 1000, 'van 50,00 blijft na 40,00 nog 10,00 op de band staan');

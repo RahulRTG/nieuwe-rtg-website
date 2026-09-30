@@ -149,7 +149,18 @@ function weegStaat({ a, b, d01, d12, dStil }) {
          hier de fout van de ruisvloer herhalen. */
       const stil = new Set((dStil && dStil.collecties) || []);
       const alles = [...new Set(uit.collecties.concat((d12 && d12.collecties) || []))];
-      const nietStil = alles.filter(c => !stil.has(c));
+      /* DE EERSTE-AANRAKINGSREGEL PER COLLECTIE. Dezelfde regel als hierboven,
+         maar niet over het hele verschil: een collectie die bij de eerste
+         oproep bewoog en bij de identieke, even hard geweigerde herhaling NIET,
+         is inrichting -- ook als er bij die herhaling toevallig een ander
+         spoor bewoog. Zonder dit bleef /api/rtfos/vrijwilliger/account-los op
+         GEZAKT staan (29 september 2026): `rtfos` ontstond bij de eerste 404
+         uit het niets en bleef daarna stil, maar een deurteller die vijf
+         seconden later spoelde viel in het tweede venster, en dan telde de
+         inrichting mee als gevolg. */
+      const tweede = new Set((d12 && d12.collecties) || []);
+      const eenmalig = uit.collecties.filter(c => !tweede.has(c) && !stil.has(c));
+      const nietStil = alles.filter(c => !stil.has(c) && !eenmalig.includes(c));
       /* De boekhouding van de aanroep telt hier net zo min mee als bij de
          idempotentie hieronder: dat een GEWEIGERD verzoek een kostenregel of
          een auditregel achterlaat, is precies wat er hoort te gebeuren -- er is
@@ -167,13 +178,15 @@ function weegStaat({ a, b, d01, d12, dStil }) {
         if (stil.size) delen.push('bewoog ook in het stille venster zonder aanroep (' +
           alles.filter(c => stil.has(c)).join(', ') + '): omgevingsruis');
         if (boek.length) delen.push('is boekhouding van de aanroep (' + boek.join(', ') + ')');
+        if (eenmalig.length) delen.push('was eenmalige inrichting die bij de herhaling stil bleef (' + eenmalig.join(', ') + ')');
         uit.reden = 'geweigerd (status ' + a.status + '); er bleef niets van de OPDRACHT staan -- ' +
           'alles wat bewoog ' + delen.join(', en ');
       } else {
         uit.rollback = 'GEZAKT';
         uit.reden = 'geweigerd (status ' + a.status + ') en de toestand veranderde toch, ook bij de ' +
           'herhaling: ' + (dStil ? rest.join(', ') +
-            (stil.size ? ' (omgevingsruis ' + [...stil].join(', ') + ' weggelaten na stille controle)' : '') + boekStaart
+            (stil.size ? ' (omgevingsruis ' + [...stil].join(', ') + ' weggelaten na stille controle)' : '') +
+            (eenmalig.length ? ' (eenmalige inrichting ' + eenmalig.join(', ') + ' weggelaten)' : '') + boekStaart
             : uit.collecties.join(', '));
       }
     } else {
@@ -338,7 +351,14 @@ async function draaiStaatproef({ post, vingerafdruk, routes, tokenVoor, lijfVoor
     }
 
     const d01 = zonderRuis(await verschilVan(f0, f1), ruis);
-    const d12 = zonderRuis(await verschilVan(f1, f2), ruis);
+    /* De voorwaardelijke klokruis (`stilOoit`) gaat er hier uit, en alleen
+       uit het tweede venster en alleen als de route hem bij de eerste oproep
+       niet raakte -- zie zonderTijdtik. Deze aanroep viel weg toen #95 dit
+       bestand herschreef; de functie kwam op 20 augustus terug, de aanroep
+       niet. De ronde drukte daarna "voorwaardelijk overgeslagen" af over
+       collecties die nergens werden overgeslagen, en op 29 september zakte
+       /api/supplier/mall/sync op `rtgai`, een collectie die in stilte beweegt. */
+    const d12 = zonderTijdtik(zonderRuis(await verschilVan(f1, f2), ruis), d01, stilOoit);
     /* DE STILLE CONTROLE, alleen als hij iets kan beslissen: bewoog er bij de
        aanroep EN bij de herhaling iets, dan kan dat een doorlopende
        omgevingsschrijver zijn (zie weegStaat). Een kort venster zonder enige

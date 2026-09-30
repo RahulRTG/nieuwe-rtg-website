@@ -35,9 +35,9 @@ let BASE, srv;
 
    Deze proef stuurde zesentwintig WOORDELIJK GELIJKE verzoeken, en zag geen
    enkele rem. De rem was niet stuk: de idem-poort beantwoordde ze. De route
-   staat in server/lib/idemsleutels-kaleronde.js als `zelfdeVerzoek` (vak +
-   docentnaam), dus een tweede identiek verzoek binnen het dubbeltikvenster
-   krijgt het EERSTE antwoord terug -- 200, dezelfde lescode, geen tweede les,
+   stond in server/lib/idemsleutels-kaleronde.js als `zelfdeVerzoek` (vak +
+   docentnaam; weg sinds B17), dus een tweede identiek verzoek binnen het dubbeltikvenster
+   kreeg het EERSTE antwoord terug -- 200, dezelfde lescode, geen tweede les,
    en de handler wordt niet eens aangeroepen. Van de zesentwintig oproepen kwam
    er precies EEN bij de rem uit.
 
@@ -67,28 +67,31 @@ test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: tru
 test('een docent maakt gewoon een les aan', async () => {
   const r = await maak();
   assert.equal(r.status, 200);
-  assert.ok(r.data && r.data.code, 'een les hoort een lescode terug te geven');
+  assert.ok(r.data && r.data.lescode, 'een les hoort een lescode terug te geven');
   assert.ok(r.data.token, 'en een leraarsleutel');
 });
 
 /* DE ANDERE HELFT: en hij staat VOOR de vloed-toets, want die laat de rem dicht
-   achter (zelfde adres, zelfde teller). Een toets die na een gesloten rem draait
-   meet niet wat hij denkt te meten.
+   achter (zelfde adres, zelfde teller).
 
-   DE ANDERE HELFT: de dubbeltik hoort NIET bij de rem te komen.
-
-   Zonder deze toets kon de vorige worden gerepareerd door de idem-regel eruit te
-   halen, en dan zou de vloed-toets groen staan terwijl een ongeduldige docent
-   met een dubbele klik twee lessen krijgt. */
-test('een woordelijk gelijke dubbeltik levert dezelfde les, niet een tweede', async () => {
+   SINDS 29 SEPTEMBER 2026 (B17) HERHAALT NIEMAND HET ANTWOORD NOG. De lescode en
+   de leraarssleutel zijn hash-only en staan precies een keer in een antwoord
+   (lib/eenmalig-geheim-routes.js); de duplicaatregel `zelfdeVerzoek` die hier
+   het eerste antwoord teruggaf, zou ze heronthullen en is weg. De dubbeltik
+   wordt nu door de kern gevangen op de `idem` die het scherm meestuurt
+   (public/apps/foundation/leren-groei.js): een tweede keer is 409, zonder codes
+   en zonder tweede les. */
+test('een dubbeltik met dezelfde idem maakt geen tweede les en toont de codes niet opnieuw', async () => {
   const zelfde = () => fetch(BASE + '/api/foundation/les/maak', { method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ vak: 'Zelfde vak', naam: 'Zelfde meester' }) }).then(r => r.json());
+    body: JSON.stringify({ vak: 'Zelfde vak', naam: 'Zelfde meester', idem: 'dubbeltik-1' }) })
+    .then(async r => ({ status: r.status, data: await r.json() }));
   const een = await zelfde();
   const twee = await zelfde();
-  assert.ok(een && een.code, 'de eerste oproep hoort een lescode te geven');
-  assert.equal(twee.code, een.code,
-    'een tweede identiek verzoek hoort dezelfde les terug te geven en geen nieuwe aan te maken');
+  assert.ok(een.data && een.data.lescode, 'de eerste oproep hoort een lescode te geven');
+  assert.equal(twee.status, 409, 'een tweede oproep met dezelfde idem maakt geen tweede les');
+  assert.equal(twee.data.lescode, undefined, 'en toont de lescode niet opnieuw');
+  assert.equal(twee.data.token, undefined, 'en de leraarssleutel ook niet');
 });
 
 test('een vloed stuit op de rem, en die zegt waarom', async () => {

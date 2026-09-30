@@ -43,14 +43,15 @@
    }
   }
   function widget(card,favorite){
-   var box=node('article',null,'wd-widget pp-widget pc-widget');box.dataset.publicWidget=card.id;box.dataset.widget=card.id;box.dataset.world=card.world;if(favorite)box.dataset.favorite='true';
-   var open=button(null,function(){v.o.open(card.target);},'wd-widget-open'),title=node('span',null,'wd-widget-title'),expand=node('span',null,'wd-expand');expand.textContent='↗';expand.setAttribute('aria-hidden','true');title.append(icon(card.icon),node('span',card.title),expand);open.append(title);open.setAttribute('aria-label',P.copy(card.title)+' · '+P.copy('open'));box.append(open);
-   var root=node('div',null,'wd-widget-content');surface(card,root);var more=button(card.action,function(){v.o.open(card.target);},'wd-text-button pc-open');more.append(icon('next'));root.append(more);box.append(root);
-   var pin=button(null,function(){pinned=pinned.includes(card.id)?pinned.filter(function(x){return x!==card.id;}):pinned.concat(card.id);favoritesPaint();refreshPins();if(!pin.isConnected){var next=d.querySelector('.wd-catalog [data-company-pin="'+card.id+'"]');if(next)next.focus({preventScroll:true});}},'wd-widget-pin');pin.dataset.companyPin=card.id;box.append(pin);setPin(pin);return box;
+   var box=node('article',null,'wd-widget pp-widget pc-widget pc-editorial-card');box.dataset.publicWidget=card.id;box.dataset.widget=card.id;box.dataset.world=card.world;if(favorite)box.dataset.favorite='true';
+   var open=button(null,function(){v.o.open(card.target);},'wd-widget-open pc-editorial-open');
+   var index=node('span',null,'pc-card-index'),heading=node('span',card.title,'pc-card-title'),description=node('span',card.body,'pc-card-description'),footer=node('span',null,'pc-card-footer'),action=node('span',card.action);
+   index.textContent=String(v.data.cards.indexOf(card)+1).padStart(2,'0');index.translate=false;
+   footer.append(action,icon('next'));open.append(index,heading,description,footer);open.setAttribute('aria-label',P.copy(card.title)+' · '+P.copy('open'));box.append(open);return box;
   }
   function setPin(pin){var yes=pinned.includes(pin.dataset.companyPin);pin.setAttribute('aria-pressed',String(yes));pin.setAttribute('aria-label',P.copy(yes?'companyUnpin':'companyPin'));}
   function refreshPins(){d.querySelectorAll('[data-company-pin]').forEach(setPin);var search=d.querySelector('#platform-search');if(search)search.dispatchEvent(new Event('input'));}
-  function favoritesPaint(){v.favorites.replaceChildren(node('h2','companyFavorites'));pinned.forEach(function(id){var card=v.data.cards.find(function(c){return c.id===id;});v.favorites.append(widget(card,true));});if(!pinned.length)v.favorites.append(node('p','companyEmpty','wd-muted'));v.favorites.append(node('p','companySession','pc-caption'));}
+  function favoritesPaint(){v.favorites.replaceChildren();}
   w.addEventListener('rtglang',refreshPins);return{widget:widget,favoritesPaint:favoritesPaint};
  };
 })(window,document);

@@ -225,10 +225,7 @@ module.exports = ({
      GEMETEN op een koude start met een verse datamap, drie rondes elk:
        met de scan in de fabriek   5,85 s
        met de scan overgeslagen    4,97 s
-     Dat is 0,88 s per start. De toetsen starten er per ronde bijna
-     negenhonderd, dus het is ruim een kwartier rekentijd per keten -- besteed
-     aan een graaf die in verreweg de meeste van die processen nooit wordt
-     opgevraagd.
+     Dat is 0,88 s per start, bij bijna negenhonderd toetsstarts per ronde.
 
      Wat hieronder staat verandert de UITKOMST niet: dezelfde scan, dezelfde
      waarde, alleen bij de eerste vraag in plaats van bij het opstarten. Wie
@@ -1024,6 +1021,8 @@ module.exports = ({
     teamkamerMijn: (key, id) => trainingslobbies.mijn(key, id),
     teamkamerMaak: (key, invoer) => trainingslobbies.maak(key, invoer),
     teamkamerDeelnemen: (key, code) => trainingslobbies.deelnemen(key, code),
+    teamkamerCode: (key, id) => trainingslobbies.roteerCode(key, id),
+    teamkamerCodeIntrek: (key, id) => trainingslobbies.intrekCode(key, id),
     teamkamerRol: (key, id, rolId, revisie) => trainingslobbies.kiesRol(key, id, rolId, revisie),
     teamkamerStart: (key, id, revisie, commandoId) => trainingslobbies.start(key, id, revisie, commandoId),
     teamkamerActie: (key, id, invoer) => trainingslobbies.actie(key, id, invoer),

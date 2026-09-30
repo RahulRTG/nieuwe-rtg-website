@@ -13,7 +13,7 @@
     favorites.appendChild(U.el('h2','','Op dit scherm'));
     favorites.appendChild(U.el('p','wd-muted','Alleen de gekoppelde spelstand wordt getoond. Persoonlijke contacten en gegevens staan op uw eigen toestel.'));
     library.appendChild(U.el('p','wd-muted','Uw telefoon blijft de bediening van het spel.'));
-    home.before(root);home.classList.add('wd-home');root.append(greeting,people,home,favorites,library);
+    home.before(root);home.classList.add('wd-home');root.append(greeting,people);w.RTGDesktopSurface.move(root,home);root.append(favorites,library);
     var chrome=U.el('div','rtg-edge-chrome'), top=U.el('header','rtg-edge-top'), brand=U.el('span','rtg-edge-mark','RTG');
     brand.appendChild(U.el('span','wd-world-label','Speelscherm'));top.appendChild(brand);chrome.appendChild(top);d.body.appendChild(chrome);
     var panel=U.el('section');panel.hidden=true;panel.appendChild(U.el('p','','Gebruik uw eigen toestel om een spel te starten en met dit scherm te koppelen.'));

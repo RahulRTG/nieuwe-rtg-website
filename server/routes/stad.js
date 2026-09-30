@@ -2,9 +2,16 @@
    Kijken mag met elke ingelogde sessie, ook de gratis laag: de stad is van
    iedereen. Melden vraagt een RTG-profiel (codenaam), zodat de melder zijn
    eigen melding kan volgen en de veldploeg een aanspreekpunt heeft -- op
-   pseudoniem, zoals alles in het huis. */
+   pseudoniem, zoals alles in het huis.
+
+   EEN PROFIEL, GEEN PAS (SAMENLEVING.md par. 11.4, besluit van 29 september
+   2026). Melden en meepraten weigerden elke gast, ook een gratis account,
+   terwijl de weigering zei dat een profiel volstond. Ze lopen nu langs de
+   paspoortdeur van de bodem: een gratis account waarvan RTG het paspoort zag
+   mag, een bezoeker zonder account niet, en een betaalde pas merkt niets. */
 module.exports = (kern) => {
-  const { app, auth, liveCodename, stad } = kern;
+  const { app, auth, liveCodename, stad, idGeverifieerd } = kern;
+  const paspoortdeur = require('../kern/onvervreemdbaar').maakPaspoortdeur({ idGeverifieerd });
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const cn = req => liveCodename(req.session);
 
@@ -13,7 +20,7 @@ module.exports = (kern) => {
 
   // iets melden dat stuk of vol is; het staat direct op de veldwerk-lijst
   app.post('/api/stad/melding', auth, (req, res) => {
-    if (req.session.tier === 'guest') return res.status(403).json({ error: 'Melden kan met een RTG-profiel; meekijken mag altijd.' });
+    if (!paspoortdeur(req, res)) return;
     stuur(res, stad.stadBewonerMeld({ codenaam: cn(req), zone: req.body.zone, soort: req.body.soort, tekst: req.body.tekst }));
   });
 
@@ -47,7 +54,7 @@ module.exports = (kern) => {
   app.post('/api/stad/raadplegingen', auth, (req, res) => stuur(res, kern.weefsel.weefselRaadplegingen({
     codenaam: cn(req), alleenOpen: req.body.alleenOpen === true })));
   app.post('/api/stad/raadpleging/reageer', auth, (req, res) => {
-    if (req.session.tier === 'guest') return res.status(403).json({ error: 'Meepraten kan met een RTG-profiel; meelezen mag altijd.' });
+    if (!paspoortdeur(req, res)) return;
     stuur(res, kern.weefsel.weefselReageer({ raadplegingId: req.body.id, codenaam: cn(req),
       keuze: req.body.keuze, tekst: req.body.tekst, zone: req.body.zone }));
   });

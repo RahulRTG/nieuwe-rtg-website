@@ -109,6 +109,26 @@ test('5b. afgeronde ritten gaan langs de poort, en de brutomarge is een getal of
   else { assert.equal(m.stand, 'NIET_UIT_TE_REKENEN'); assert.equal(m.waarde, null); assert.ok(m.waarom.length > 10); }
 });
 
+test('5d. de marge per lid (C15) komt per pas uit een echte server, of zegt waarom niet', async () => {
+  const m = maatVan((await stand()).body, 'marge.per-lid');
+  assert.ok(m, 'de maat staat in de stand');
+  assert.equal(m.graad, 'vermoed');
+  if (m.stand === 'NIET_UIT_TE_REKENEN') { assert.ok(m.waarom.length > 10); return; }
+  assert.equal(m.stand, 'PER_PAS');
+  assert.ok(m.perPas.some(r => r.pas === 'rtg'), 'de passen komen uit het ledenregister');
+  for (const r of m.perPas) {
+    if (r.stand === 'TOONBAAR') assert.ok(Number.isInteger(r.waarde) && r.n >= 10, r.pas);
+    else assert.equal(r.waarde, null, r.pas + ' toont een waarde zonder getal');
+  }
+});
+
+test('5e. de betalingen met een onbekende afloop komen uit de betaalwaarheid van de server', async () => {
+  const m = maatVan((await stand()).body, 'risico.betalingen-onbekend');
+  assert.ok(m, 'de maat staat in de stand');
+  assert.equal(m.stand, 'TOONBAAR', 'de betaalwaarheid is aangesloten: ' + JSON.stringify(m));
+  assert.ok(Number.isInteger(m.waarde) && Number.isInteger(m.controleNodig));
+});
+
 test('5c. klantwaarde per wereld: vier maten naast elkaar, elk langs zijn poort, en geen totaal', async () => {
   const b = (await stand()).body;
   for (const w of ['living', 'travel', 'work', 'foundation']) {

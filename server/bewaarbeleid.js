@@ -80,7 +80,9 @@ const BELEID = [
      zolang het iets doet, en die lijst groeit met elk domein dat erbij komt.
      Precies die groei duwde dit bestand over de leesgrens toen de plaatslaag
      erbij kwam, en dat gebeurt bij het volgende domein weer. */
-  ...require('./bewaarbeleid-operationeel')
+  ...require('./bewaarbeleid-operationeel'),
+  // en de verplaatsingen van een lid, per stroom beslist (NAVIGATIE.md par. 15.0)
+  ...require('./bewaarbeleid-vervoer')
 
 ];
 

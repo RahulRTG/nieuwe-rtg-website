@@ -88,7 +88,7 @@ module.exports = (kern) => {
   app.post('/api/link/cap/aanvaard', auth, async (req, res) => {
     if (geenGast(req, res)) return;
     const r = await linkCapAanvaard(alsLid(req), req.body && req.body.capcode, req.session);
-    if (r.error) return res.status(r.status || 400).json({ error: r.error, kyc: r.kyc || undefined });
+    if (r.error) return res.status(r.status || 400).json({ error: r.error, code: r.code || undefined, kyc: r.kyc || undefined });
     res.json({ ok: true, kaart: r.kaart, uitkomst: r.uitkomst });
   });
 
@@ -96,9 +96,9 @@ module.exports = (kern) => {
      staat (capcode), of met het id waaronder hij in je koppelingen staat. Twee
      ingangen, want je hebt hem niet altijd bij de hand; een besluit, want de
      eigenaarscontrole staat in kern/link/cap-beheer.js. */
-  app.post('/api/link/cap/trek', auth, (req, res) => {
+  app.post('/api/link/cap/trek', auth, async (req, res) => {
     if (geenGast(req, res)) return;
-    const r = linkCapTrek(alsLid(req), req.body && req.body.capcode, req.body && req.body.id);
+    const r = await linkCapTrek(alsLid(req), req.body && req.body.capcode, req.body && req.body.id);
     if (r.error) return res.status(r.status || 400).json({ error: r.error });
     res.json({ ok: true });
   });
@@ -119,7 +119,7 @@ module.exports = (kern) => {
   app.post('/api/supplier/link/cap/aanvaard', supplierAuth, async (req, res) => {
     const zaak = { soort: 'supplier', code: req.supplier.code };
     const r = await linkCapAanvaard(zaak, req.body && req.body.capcode, null, req.body || {});
-    if (r.error) return res.status(r.status || 400).json({ error: r.error });
+    if (r.error) return res.status(r.status || 400).json({ error: r.error, code: r.code || undefined });
     res.json({ ok: true, kaart: r.kaart, uitkomst: r.uitkomst });
   });
 };

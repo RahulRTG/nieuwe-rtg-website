@@ -121,7 +121,27 @@ LID_UITBETALING: { soort: 'afhankelijk', naam: 'Walletsaldo terugstorten naar he
     gesloten: { soort: 'stand',
       reden: 'RTG keert geen geld uit aan een mens buiten een levering om. Rugdekking loopt vandaag ' +
         'als KOOP: de mens levert iets, factureert als ondernemer, en wordt als leverancier betaald.' },
-    open: { soort: 'rail', eigenNodig: 'betaalinstelling', partnerRail: 'sepa' } }
+    open: { soort: 'rail', eigenNodig: 'betaalinstelling', partnerRail: 'sepa' } },
+
+  /* DE CADEAUBON VAN RTG (kern/cadeaubon.js, besluit C14). Een bon die RTG zelf
+     verkoopt en die ook bij de zaken op het platform te besteden is: waarde die
+     bij DERDEN inwisselbaar is tegen de nominale waarde, en dus elektronisch geld.
+     Een bon die alleen bij RTG te besteden is zou een beperkt netwerk zijn; de
+     eigenaar koos uitdrukkelijk voor meer, en deze regel is wat dat kost.
+
+       gesloten -> deze handeling BESTAAT NIET. RTG geeft geen waarde uit die bij
+                   zaken te besteden is.
+       open     -> een RAIL over de EIGEN rails met de eis elektronischgeldinstelling,
+                   en met opzet GEEN partnerrail: een partner die e-geld voor ons
+                   uitgeeft is een eigen besluit (TOKEN.md par. 7) en niet een
+                   bijvangst van deze knop. Zonder vergunning weigert hij dus nog
+                   steeds, en het antwoord zegt welke. */
+  RTG_CADEAUBON: { soort: 'afhankelijk', naam: 'Een RTG-cadeaubon uitgeven die ook bij zaken te besteden is',
+    hangtAf: 'cadeaubon', zonderStand: 'gesloten',   // bij twijfel geeft RTG geen e-geld uit
+    gesloten: { soort: 'stand',
+      reden: 'RTG verkoopt geen cadeaubon die ook bij zaken te besteden is: dat is elektronisch geld, en die ' +
+        'positie neemt RTG vandaag niet in.' },
+    open: { soort: 'rail', eigenNodig: 'elektronischgeldinstelling', partnerRail: null } }
 };
 
 module.exports = { AFHANKELIJK };

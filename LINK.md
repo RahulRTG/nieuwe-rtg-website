@@ -163,6 +163,14 @@ bestaande vorm van: de code draagt de pin niet, leeft 60 seconden, is eenmalig,
 en de verwijzing staat in het geheugen omdat hij een herstart niet hoort te
 overleven.
 
+**De capability-drager staat sinds 29 september 2026 NIET meer in het geheugen**
+(besluit B15, deur `link.capability_aanvaarden`): een Map per proces maakte een
+claim of intrekking onzichtbaar voor de andere instances. Hij is nu een 128-bit
+code in dezelfde ondertekende envelop, in de opslag alleen als hash, met de
+opdracht versleuteld onder de code zelf en een eenmalige claim in een
+collectietransactie (`kern/link/cap-bak.js`). De toets van hierboven blijft
+gelden: minuten geldig, en tien minuten na het verval is de rij weg.
+
 ### 3.5 Een capability draagt nooit een echte naam
 
 Privacy by design uit `CLAUDE.md`: operationele data draait op codenamen. Een

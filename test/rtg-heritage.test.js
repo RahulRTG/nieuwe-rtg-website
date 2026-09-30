@@ -52,6 +52,7 @@ test('LivingOS blijft champagne; routes hebben geen eigen donker thema meer', ()
   assert.doesNotMatch(TOKENS, /data-rtg-eigenvlak/);
   assert.doesNotMatch(SIMPLE, /--rtg-world-bg:/);
   const living = PALETTE.match(/data-rtg-world="living"[^}]+/)[0];
+  /* het warme palet van de desktopstandaard (#413) */
   assert.match(living, /--rtg-world-bg:#faf8f3!important/);
   assert.match(living, /--rtg-world-ink:#181918!important/);
   assert.match(living, /--rtg-world-schema:light!important/);

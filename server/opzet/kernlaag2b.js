@@ -72,4 +72,6 @@ if (kern.webplatform && kern.webplatform.koppelWinkel) {
   kern.reserveringUitzondering = { tegenvoorstel: uitz.tegenvoorstel, antwoord: uitz.tegenvoorstelAntwoord,
     doorzetten: uitz.doorzetten, magBeslissen: uitz.magBeslissen };
 }
+// de werkdag (ochtendkaart) leest de verzuimlaag, die er nu is
+require('./kernlaag2c')(kern, hulp);
 };

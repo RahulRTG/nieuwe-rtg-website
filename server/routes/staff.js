@@ -1,11 +1,11 @@
 /* Domein "staff" (aparte module op de gedeelde kern). Alleen de routes;
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 module.exports = (kern) => {
-  const { DEMO, accounts, app, checkCred, commCollega, crypto, db, findStaffPartner, hasCred, klokVan, logActivity, managerOnly, notifySupplier, publicPartner, save, schoon, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth, trustVan, stuurLus, werkbeleidPauzeStand, WERKBELEID_PAUZE_MINUTEN, oogVoertuigen, oogNulmetingZet, oogNulmetingVan, oogSchouwLog, oogSchouwen, oogLeer, oogSpullen, oogUitgifteLog, oogOverzicht, plaats, codenaamVan,
+  const { DEMO, accounts, app, checkCred, commCollega, crypto, db, hasCred, klokVan, logActivity, managerOnly, notifySupplier, publicPartner, save, schoon, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth, trustVan, stuurLus, werkbeleidPauzeStand, WERKBELEID_PAUZE_MINUTEN, oogVoertuigen, oogNulmetingZet, oogNulmetingVan, oogSchouwLog, oogSchouwen, oogLeer, oogSpullen, oogUitgifteLog, oogOverzicht, plaats, codenaamVan,
     // payrollOS gaat door naar staff/dienst.js: een ziekmelding raakt ook de
     // loondoorbetaling. Hij mag ontbreken (een kaal testproces mount de
     // loonlaag niet), dus de aanroepen daar controleren dat.
-    payrollOS } = kern;
+    payrollOS, ochtendkaart } = kern;
   /* De fluisterlaag als EEN naam, en die geven we ook als een naam door. Zou
      staff.js hier de vier losse namen uitpakken en die in actx zetten, dan staan
      ze weer los in de subcontext -- en dan zegt geen enkel bestand meer dat dit
@@ -15,7 +15,7 @@ module.exports = (kern) => {
 
   /* De collega-, dienst- en ooglaag draaien als submodules op een gedeelde
      context, een keer opgebouwd bij het opstarten. */
-  const actx = { DEMO, accounts, app, checkCred, commCollega, crypto, db, findStaffPartner, hasCred, klokVan, logActivity, managerOnly, notifySupplier, publicPartner, save, schoon, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth, trustVan,
+  const actx = { DEMO, accounts, app, checkCred, commCollega, crypto, db, hasCred, klokVan, logActivity, managerOnly, notifySupplier, publicPartner, save, schoon, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth, trustVan,
     fluister, stuurLus,
     werkbeleidPauzeStand, WERKBELEID_PAUZE_MINUTEN,
     oogVoertuigen, oogNulmetingZet, oogNulmetingVan, oogSchouwLog, oogSchouwen, oogLeer, oogSpullen, oogUitgifteLog, oogOverzicht,
@@ -29,24 +29,33 @@ module.exports = (kern) => {
        ./staff/dienst.js vraagt hem of het toestel van deze mens binnen het hek
        van de zaak stond. Hij mag ontbreken -- dan is "niet gemeten" het
        antwoord, en dat is iets anders dan "niet bevestigd". */
-    plaats, codenaamVan };
+    plaats, codenaamVan,
+    // de ochtendkaart (kern/ochtendkaart.js): een lezing, via ./staff/ochtend.js
+    ochtendkaart };
   require('./staff/collega')(actx);
   require('./staff/dienst')(actx);
   require('./staff/inzetbaarheid')(actx);
   require('./staff/oog')(actx);
+  require('./staff/ochtend')(actx);
 
+/* De personeelsdeur van het partnerkanaal (B14). De code is een 128-bit
+   credential per medewerker (kern/partnerpersoneelscode.js): hij opent het
+   bedrijfsbeeld van zijn partner zolang hij geldig is, wordt hier NIET verbruikt
+   (dat doet pas een boeking) en gaat nooit terug in het antwoord. Een onbekende,
+   verlopen, ingetrokken of opgebruikte code krijgt hetzelfde antwoord. */
 app.post('/api/staff', (req, res) => {
-  let partner;
+  res.set('Cache-Control', 'no-store');
+  let partner, personeel = null;
   if (hasCred(req.body)) {
     if (!DEMO) return res.status(403).json({ error: 'Demo-inlog is uitgeschakeld. Gebruik uw personeelscode.' });
     if (!checkCred(req.body.username, req.body.password))
       return res.status(401).json({ error: 'Onjuiste gebruikersnaam of wachtwoord.' });
     partner = db.data.partners.find(p => p.staff) || null;
   } else {
-    partner = findStaffPartner(req.body.staffCode);
+    const v = kern.partnerPersoneelscode.welke(req.body && req.body.staffCode);
+    if (v) { partner = v.partner; personeel = { expires_at: v.expires_at, resterend: v.resterend }; }
   }
   if (!partner) return res.status(404).json({ error: 'Deze personeelscode kennen we niet.' });
-  // De personeelscode gaat mee terug zodat de inlog verder werkt zoals de code-invoer.
-  res.json({ ok: true, partner: publicPartner(partner), staffCode: partner.staff ? partner.staff.code : null });
+  res.json({ ok: true, partner: publicPartner(partner), personeel });
 });
 };

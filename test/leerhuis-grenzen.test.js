@@ -542,3 +542,260 @@ test('21. B7: een startpakket zet concepten klaar, benoemt niemand en wordt niet
   W.richtIn(vreemd, 'PRJ', 'PROJECT', { eigenaar: P.E, relaties: { [P.CO]: { soort: 'EMPLOYEE' } }, bestuur: { [P.CO]: ['CURRICULUM_OWNER'] } });
   nee(vreemd.lh.startpakketLaden('PRJ', P.CO), 400);
 });
+
+test('22. B-UI werkscherm: de assessor ziet wat op hem wacht en alleen zijn eigen bewijs, de kenniseigenaar ziet wat hij niet zelf goedkeurt', () => {
+  const w = basis();
+  const l = w.lh.lees;
+  const stap = (naar, door) => w.doe(ORG, 'lerenStand', { persoon: P.N, curriculum: 'ops-basis', naar }, door);
+  w.doe(ORG, 'rolToewijzen', { persoon: P.N, rol: 'ops' }, P.M);
+  w.doe(ORG, 'startplanMaak', { persoon: P.N, rol: 'ops' }, P.M);
+  stap('LEARNING', P.N); stap('PRACTICING', P.N);
+  w.doe(ORG, 'simulatieAfronden', { scenario: 'storno', keuzes: W.STORNO }, P.N);
+  stap('SIMULATING', P.N); stap('SUPERVISED', P.T);
+  w.doe(ORG, 'bewijsVastleggen', { persoon: P.N, vaardigheid: 'terugboeken', soort: 'OBSERVATION_EVIDENCE', sterkte: 'OBSERVED', bron: 'toets' }, P.T);
+  stap('READY_FOR_ASSESSMENT', P.T);
+  const id = w.doe(ORG, 'beoordelingAanvragen', { persoon: P.N, vaardigheid: 'terugboeken' }, P.T).id;
+
+  assert.equal(l.assessorWerk(ORG, P.N).ok, false, 'wie geen assessor is, krijgt geen beoordelingen te zien');
+  const voor = l.assessorWerk(ORG, P.A);
+  assert.deepEqual(voor.OPEN.map(b => b.id), [id], 'de aangevraagde beoordeling wacht op een assessor');
+  assert.deepEqual(voor.LOPEND, []);
+  assert.ok(!JSON.stringify(voor.OPEN).includes('OBSERVATION_EVIDENCE'), 'voor hij begint, ziet de assessor geen bewijs');
+  w.doe(ORG, 'beoordelingStart', { id }, P.A);
+  const na = l.assessorWerk(ORG, P.A);
+  assert.deepEqual(na.OPEN, [], 'wat hij begon, wacht niet meer');
+  assert.equal(na.LOPEND[0].id, id);
+  assert.ok(na.LOPEND[0].bewijs.length >= 1 && na.LOPEND[0].bewijs.every(b => b.id), 'hij ziet het bewijs voor deze vaardigheid, met een id om te noemen');
+  /* `naam` is van namen.js (de codenaam); een eigen `naam` zou daar stil worden overschreven. */
+  const { metNamen } = require('../server/kern/leerhuis/namen');
+  assert.ok(!('naam' in na.LOPEND[0]) && !('naam' in voor.OPEN[0]), 'een rij met een mens draagt zelf geen veld naam');
+  const benoemd = metNamen(na, () => 'Rode Vos');
+  assert.equal(benoemd.LOPEND[0].naam, 'Rode Vos');
+  assert.equal(benoemd.LOPEND[0].vaardigheidNaam, 'Een betaling terugboeken', 'de naam van de vaardigheid blijft staan naast de codenaam');
+  w.doe(ORG, 'bestuurZet', { persoon: P.KO2, rol: 'ASSESSOR' }, P.E);
+  const tweede = l.assessorWerk(ORG, P.KO2);
+  assert.equal(tweede.ok, true);
+  assert.deepEqual(tweede.LOPEND, [], 'een tweede assessor ziet de beoordeling van de eerste niet als de zijne');
+  assert.deepEqual(tweede.OPEN, [], 'en ook niet als werk dat nog wacht');
+
+  assert.equal(l.kennisWerk(ORG, P.N).ok, false, 'wie geen kenniseigenaar is, krijgt geen concepten te zien');
+  w.doe(ORG, 'kennisSchrijf', { id: 'nieuw-item', domein: 'ops', titel: 'Nieuw', tekst: 'tekst', bron: 'werkinstructie' }, P.KO);
+  const zelf = l.kennisWerk(ORG, P.KO).CONCEPTEN.find(c => c.id === 'nieuw-item');
+  const ander = l.kennisWerk(ORG, P.KO2).CONCEPTEN.find(c => c.id === 'nieuw-item');
+  assert.equal(zelf.eigen, true, 'wie schreef, ziet dat hij het niet zelf goedkeurt');
+  assert.equal(ander.eigen, false);
+  assert.equal(ander.impactNodig, false, 'een eerste versie vraagt geen impactklasse');
+  assert.ok(!JSON.stringify(ander).includes(P.KO), 'de schrijver staat er niet bij');
+  assert.deepEqual(l.kennisWerk(ORG, P.KO2).impactKlassen, require('../server/kern/leerhuis/standen').IMPACT);
+});
+
+test('23. B-UI trainer: de cockpit noemt de vaardigheden van het leerpad en OF er een beoordeling loopt, niet de uitslag', () => {
+  const w = basis();
+  const l = w.lh.lees;
+  const stap = (naar, door) => w.doe(ORG, 'lerenStand', { persoon: P.N, curriculum: 'ops-basis', naar }, door);
+  w.doe(ORG, 'rolToewijzen', { persoon: P.N, rol: 'ops' }, P.M);
+  w.doe(ORG, 'startplanMaak', { persoon: P.N, rol: 'ops' }, P.M);
+  stap('LEARNING', P.N); stap('PRACTICING', P.N);
+  w.doe(ORG, 'simulatieAfronden', { scenario: 'storno', keuzes: W.STORNO }, P.N);
+  stap('SIMULATING', P.N); stap('SUPERVISED', P.T);
+  const rij = () => l.trainerCockpit(ORG, P.T).LEERLINGEN.find(x => x.persoon === P.N);
+  const v = () => rij().vaardigheden.find(x => x.id === 'terugboeken');
+  assert.ok(v(), 'de vaardigheid uit het leerpad staat bij de leerling, zodat de trainer er bewijs voor kan vastleggen');
+  assert.equal(v().loopt, false);
+  assert.deepEqual(l.trainerCockpit(ORG, P.T).bewijsSoorten, require('../server/kern/leerhuis/standen').LEERBEWIJS, 'geen eigen kopie op het scherm');
+  w.doe(ORG, 'bewijsVastleggen', { persoon: P.N, vaardigheid: 'terugboeken', soort: 'OBSERVATION_EVIDENCE', sterkte: 'OBSERVED', bron: 'toets' }, P.T);
+  stap('READY_FOR_ASSESSMENT', P.T);
+  const id = w.doe(ORG, 'beoordelingAanvragen', { persoon: P.N, vaardigheid: 'terugboeken' }, P.T).id;
+  assert.equal(v().loopt, true, 'een aangevraagde beoordeling loopt');
+  w.doe(ORG, 'beoordelingStart', { id }, P.A);
+  assert.equal(v().loopt, true, 'een begonnen beoordeling loopt ook');
+  w.doe(ORG, 'beoordelingAfronden', { id, uitkomst: 'NOT_YET_PROVEN', herstel: 'nog een keer onder toezicht' }, P.A);
+  assert.equal(v().loopt, false, 'na de uitslag loopt er niets meer');
+  assert.ok(!/NOT_YET_PROVEN|nog een keer onder toezicht/.test(JSON.stringify(rij().vaardigheden)), 'de uitslag en het herstelpad staan niet in de trainercockpit');
+});
+
+test('24. B-UI inrichten: de manager ziet de rollen en welk startplan er ligt, de curriculumeigenaar ziet zijn curricula en waar ze heen kunnen', () => {
+  const w = basis();
+  const l = w.lh.lees;
+  const m0 = l.managerCockpit(ORG, P.M);
+  assert.ok(m0.ROLLEN.some(r => r.id === 'ops' && r.titel), 'de rollen van de organisatie staan klaar om toe te wijzen');
+  const lid = () => l.managerCockpit(ORG, P.M).TEAM.find(x => x.persoon === P.N);
+  assert.equal(lid().plan, null, 'nog geen startplan');
+  w.doe(ORG, 'rolToewijzen', { persoon: P.N, rol: 'ops' }, P.M);
+  assert.deepEqual(lid().rollen, ['ops']);
+  assert.equal(lid().plan, null, 'een rol is nog geen plan');
+  w.doe(ORG, 'startplanMaak', { persoon: P.N, rol: 'ops' }, P.M);
+  assert.equal(lid().plan, 'ops', 'het startplan hoort bij de rol');
+
+  assert.equal(l.curriculumWerk(ORG, P.N).ok, false, 'wie geen curriculumeigenaar is, ziet geen curricula om te beheren');
+  w.doe(ORG, 'kennisSchrijf', { id: 'nieuwe-kennis', domein: 'ops', titel: 'Nieuw', tekst: 'tekst', bron: 'werkinstructie' }, P.CO);
+  w.doe(ORG, 'curriculumZet', { id: 'ops-extra', titel: 'Extra', vaardigheden: ['terugboeken'], kennis: ['nieuwe-kennis'] }, P.CO);
+  const c = () => l.curriculumWerk(ORG, P.CO).CURRICULA.find(x => x.id === 'ops-extra');
+  assert.equal(c().stand, 'DRAFT');
+  assert.deepEqual(c().naar, ['REVIEW'], 'uit de overgangstabel, niet uit het scherm');
+  assert.deepEqual(c().kennisZonderActief, ['nieuwe-kennis'], 'wat nog geen officiele kennis is, staat erbij');
+  assert.deepEqual(c().vaardigheden, ['Een betaling terugboeken'], 'vaardigheden op naam');
+  w.doe(ORG, 'curriculumStand', { id: 'ops-extra', naar: 'REVIEW' }, P.CO);
+  assert.deepEqual(c().naar, ['DRAFT', 'PILOT', 'ACTIVE']);
+  assert.equal(w.probeer(ORG, 'curriculumStand', { id: 'ops-extra', naar: 'ACTIVE' }, P.CO).ok, false, 'de handeling weigert concept-kennis, ook als het scherm de knop toont');
+  assert.equal(l.curriculumWerk(ORG, P.Q).ok, true, 'de kwaliteitsautoriteit mag curricula van stand veranderen en ziet ze dus');
+  assert.equal(l.curriculumWerk(ORG, P.Q).magSchrijven, false, 'maar schrijft niets: dat is de curriculumeigenaar');
+  assert.ok(!('KENNIS' in l.curriculumWerk(ORG, P.Q)), 'en krijgt dus ook de schrijflijsten niet');
+  const cw = l.curriculumWerk(ORG, P.CO);
+  assert.equal(cw.magSchrijven, true);
+  assert.deepEqual(cw.KEUZES.niveaus, require('../server/kern/leerhuis/standen').VAARDIGHEIDSNIVEAUS, 'geen eigen kopie op het scherm');
+  const nk = cw.KENNIS.find(k => k.id === 'nieuwe-kennis');
+  assert.equal(nk.actief, false);
+  assert.deepEqual(nk.concept, { versie: 1, stand: 'DRAFT', eigen: true }, 'de schrijver ziet zijn eigen concept, dat hij zelf ter review mag zetten');
+  assert.equal(cw.KENNIS.find(k => k.id === 'terugboeken').actief, true);
+  assert.ok(!JSON.stringify(l.curriculumWerk(ORG, P.CO)).includes(P.N), 'geen leerling in het curriculumwerk');
+});
+
+test('25. aanwijzen op codenaam: alleen de eigenaar, met reden, en niets gebruikt zonder vaststaand spoor', async () => {
+  const { maakAanwijzen } = require('../server/kern/leerhuis/aanwijzen');
+  const w = basis();
+  const st = w.lh.stand(ORG);
+  let gezocht = 0; let spoor = []; let spoorOk = true;
+  const a = maakAanwijzen({
+    keyVanCodenaam: async (c) => { gezocht++; return c === 'Blauwe Reiger' ? { key: 'user-77' } : null; },
+    idVanKey: (k) => { const m = /^user-(\d+)$/.exec(String(k)); return m ? Number(m[1]) : null; },
+    noteerVast: async (r) => { spoor.push(r); return spoorOk ? { ok: true } : { ok: false, status: 503 }; }
+  });
+  const zet = { codenaam: 'Blauwe Reiger', soort: 'EMPLOYEE', reden: 'nieuwe collega bij Operations' };
+
+  const door = await a(st, 'relatieZet', { persoon: 'lid:5', soort: 'EMPLOYEE' }, P.KO);
+  assert.equal(door.ok, true, 'zonder codenaam gaat de invoer ongewijzigd door');
+  assert.equal(gezocht + spoor.length, 0);
+
+  const vreemd = await a(st, 'relatieZet', zet, P.KO);
+  assert.equal(vreemd.status, 403, 'wie geen eigenaar is, kan geen codenaam nagaan');
+  assert.equal(gezocht + spoor.length, 0, 'en er is dus ook niet gezocht');
+  const zonder = await a(st, 'relatieZet', Object.assign({}, zet, { reden: '' }), P.E);
+  assert.equal(zonder.status, 400, 'zonder reden geen opzoeking');
+  assert.equal(gezocht, 0);
+
+  spoorOk = false;
+  const geenSpoor = await a(st, 'relatieZet', zet, P.E);
+  assert.equal(geenSpoor.ok, false, 'staat het spoor niet vast, dan gaat er niets door');
+  assert.ok(!geenSpoor.invoer, 'en de sleutel komt niet bij de handeling');
+  spoorOk = true; spoor = [];
+
+  const goed = await a(st, 'relatieZet', Object.assign({}, zet, { managerCodenaam: 'Blauwe Reiger' }), P.E);
+  assert.equal(goed.ok, true);
+  assert.equal(goed.invoer.persoon, 'lid:77');
+  assert.equal(goed.invoer.manager, 'lid:77');
+  assert.ok(!('codenaam' in goed.invoer) && !('reden' in goed.invoer), 'de handeling krijgt een sleutel en geen codenaam of reden');
+  assert.equal(spoor.length, 2, 'elke opzoeking een eigen regel');
+  assert.equal(spoor[0].waarom, 'nieuwe collega bij Operations');
+  assert.equal(spoor[0].over.codenaam, 'Blauwe Reiger');
+  assert.equal(spoor[0].over.id, 77, 'met het id van het lid, zodat hij op zijn eigen inzagekaart staat');
+
+  const onbekend = await a(st, 'bestuurZet', { codenaam: 'Niemand Hier', rol: 'ASSESSOR', reden: 'nieuwe assessor' }, P.E);
+  assert.equal(onbekend.status, 404);
+  assert.equal(spoor.length, 2, 'een codenaam die niet bestaat, raakt geen lid en schrijft geen regel');
+  const l = w.lh.lees;
+  assert.equal(l.eigenaarWerk(ORG, P.CO).ok, false, 'alleen de eigenaar ziet het beheer');
+  const e = l.eigenaarWerk(ORG, P.E);
+  assert.ok(e.BESTUUR.some(x => x.persoon === P.KO && x.rollen.includes('KNOWLEDGE_OWNER')), 'wie welke bestuursrol draagt');
+  assert.deepEqual(e.relatieSoorten, require('../server/kern/leerhuis/standen').RELATIESOORTEN, 'geen eigen kopie op het scherm');
+  w.doe(ORG, 'rolToewijzen', { persoon: P.N, rol: 'ops' }, P.M);
+  nee(w.probeer(ORG, 'rolIntrekken', { persoon: P.N, rol: 'ops', reden: '' }, P.E), 400);
+  nee(w.probeer(ORG, 'rolIntrekken', { persoon: P.N, rol: 'ops-trainer', reden: 'andere functie' }, P.E), 409);
+  assert.equal(w.doe(ORG, 'rolIntrekken', { persoon: P.N, rol: 'ops', reden: 'andere functie' }, P.E).ok, true);
+  const rel = e.RELATIES.find(x => x.persoon === P.N);
+  assert.ok(rel && Array.isArray(rel.rollen), 'de lopende relaties met hun rollen, om in te trekken of uit dienst te melden');
+  assert.equal(e.RELATIES.find(x => x.persoon === P.E).zelf, true, 'zichzelf uit dienst melden doet een tweede eigenaar');
+  const ander = await a(st, 'rolToewijzen', { codenaam: 'Blauwe Reiger', rol: 'ops', reden: 'nieuwe rol' }, P.E);
+  assert.deepEqual(ander.invoer, { codenaam: 'Blauwe Reiger', rol: 'ops', reden: 'nieuwe rol' }, 'alleen relatie en bestuursrol lopen via de codenaam');
+});
+
+test('26. B-UI autoriteiten: wat bewezen is en nog geen certificaat draagt, en wie een leerpad of trainerschap kan krijgen', () => {
+  const w = basis();
+  const l = w.lh.lees;
+  assert.equal(l.certificaatWerk(ORG, P.N).ok, false, 'wie geen autoriteit is, ziet niets klaarliggen');
+  assert.equal(l.trainerWerk(ORG, P.N).ok, false);
+  W.bewijs(w, ORG, P.N, 'terugboeken', P.A, 'storno', W.STORNO);
+  const b = W.beoordeel(w, ORG, P.N, 'terugboeken', P.A);
+  const klaar = () => l.certificaatWerk(ORG, P.Q).KLAAR.filter(x => x.persoon === P.N);
+  assert.deepEqual(klaar().map(x => x.beoordeling), [b], 'een bewezen beoordeling zonder certificaat ligt klaar');
+  assert.ok(!('naam' in klaar()[0]) && klaar()[0].vaardigheidNaam === 'Een betaling terugboeken', 'naam is van namen.js, de vaardigheid heet vaardigheidNaam');
+  assert.ok(!JSON.stringify(klaar()).includes('criteria') && !JSON.stringify(klaar()).includes('bewijs'), 'zonder bewijs of criteria erachter');
+  w.doe(ORG, 'certificaatUitgeven', { persoon: P.N, vaardigheden: ['terugboeken'], beoordelingen: [b], geldigDagen: 365 }, P.Q);
+  assert.deepEqual(klaar(), [], 'met certificaat ligt hij niet meer klaar');
+  const cert = l.certificaatWerk(ORG, P.Q).CERTIFICATEN.find(c => c.persoon === P.N);
+  assert.equal(cert.stand, 'ACTIVE');
+  assert.deepEqual(cert.vaardigheden, ['Een betaling terugboeken']);
+
+  const t = l.trainerWerk(ORG, P.Q);
+  assert.equal(t.magKwalificeren, true);
+  assert.ok(t.TRAINERS.some(x => x.persoon === P.T && x.curricula.includes('ops-basis')), 'de gekwalificeerde trainer staat erbij');
+  assert.ok(t.KANDIDATEN.some(x => x.persoon === P.T && x.curricula.includes('ops-basis')),
+    'wie een geldig Train-the-Trainer-certificaat heeft is kandidaat, met de curricula waarvan hij de vaardigheden zelf bewees');
+  assert.ok(!t.KANDIDATEN.some(x => x.persoon === P.N), 'zonder trainerschapscertificaat geen kandidaat');
+  const eig = l.trainerWerk(ORG, P.E);
+  assert.equal(eig.ok, true, 'de eigenaar mag een trainer toewijzen');
+  assert.equal(eig.magKwalificeren, false, 'maar niet kwalificeren');
+  assert.deepEqual(eig.KANDIDATEN, []);
+  w.doe(ORG, 'rolToewijzen', { persoon: P.N, rol: 'ops' }, P.M);
+  w.doe(ORG, 'startplanMaak', { persoon: P.N, rol: 'ops' }, P.M);
+  assert.ok(!l.trainerWerk(ORG, P.Q).ZONDER_TRAINER.some(x => x.persoon === P.N), 'een leerpad met trainer wacht niet');
+
+  /* Een leerpad waarvoor nog niemand trainer is: het wacht, zonder kandidaat. */
+  w.doe(ORG, 'vaardigheidZet', { id: 'escaleren', naam: 'Escaleren', niveau: 'PRACTITIONER', kennis: ['terugboeken'] }, P.CO);
+  w.doe(ORG, 'curriculumZet', { id: 'ops-extra', titel: 'Escaleren', vaardigheden: ['escaleren'], kennis: ['terugboeken'] }, P.CO);
+  w.doe(ORG, 'curriculumStand', { id: 'ops-extra', naar: 'REVIEW' }, P.CO);
+  w.doe(ORG, 'curriculumStand', { id: 'ops-extra', naar: 'ACTIVE' }, P.CO);
+  w.doe(ORG, 'rolZet', { id: 'ops2', titel: 'Escalatie', soort: 'OPERATIONS', vaardigheden: ['escaleren'] }, P.CO);
+  w.doe(ORG, 'rolToewijzen', { persoon: P.N, rol: 'ops2' }, P.M);
+  w.doe(ORG, 'startplanMaak', { persoon: P.N, rol: 'ops2' }, P.M);
+  const wacht = l.trainerWerk(ORG, P.Q).ZONDER_TRAINER.find(x => x.persoon === P.N && x.curriculum === 'ops-extra');
+  assert.ok(wacht, 'het leerpad zonder trainer staat klaar voor de trainerautoriteit');
+  assert.deepEqual(wacht.kandidaten, [], 'wie de vaardigheid niet zelf bewees, is geen kandidaat');
+  assert.ok(!l.trainerWerk(ORG, P.Q).KANDIDATEN.find(x => x.persoon === P.T).curricula.includes('ops-extra'),
+    'en kan er ook niet voor gekwalificeerd worden');
+});
+
+test('27. B-UI de leerling: zijn eigen sleutel, de vaardigheden per leerpad, en scenariostappen zonder de antwoorden', () => {
+  const w = basis();
+  const l = w.lh.lees;
+  w.doe(ORG, 'rolToewijzen', { persoon: P.N, rol: 'ops' }, P.M);
+  w.doe(ORG, 'startplanMaak', { persoon: P.N, rol: 'ops' }, P.M);
+  const m = () => l.mijn(ORG, P.N);
+  assert.equal(m().IK, P.N, 'de leerling zet zijn eigen stappen met zijn eigen sleutel');
+  const pad = m().PAD.find(x => x.curriculum === 'ops-basis');
+  assert.deepEqual(pad.vaardigheden, [{ id: 'terugboeken', naam: 'Een betaling terugboeken', loopt: false }]);
+  const oef = m().OEFENEN.find(x => x.scenario === 'storno');
+  assert.deepEqual(oef.stappen, ['controleer', 'direct-uitbetalen', 'reden', 'tweede-mens'], 'vereist en verboden door elkaar, op alfabet');
+  assert.ok(!('vereist' in oef) && !('verboden' in oef) && !('volgorde' in oef), 'welke stap goed is, zegt de motor pas na het spelen');
+});
+
+test('28. B-UI kwaliteit: bezwaren met het oordeel pas na het oppakken, ongeldig verklaren zonder eigen oordelen, en beleid', () => {
+  const w = basis();
+  const l = w.lh.lees;
+  assert.equal(l.kwaliteitWerk(ORG, P.N).ok, false, 'wie geen kwaliteitsautoriteit of eigenaar is, ziet niets');
+  const { beoordeling } = W.leidOp(w, ORG, P.N, P);
+  w.doe(ORG, 'bezwaarIndienen', { beoordeling, reden: 'de assessor keek niet naar mijn tweede poging' }, P.N);
+  const z = () => l.kwaliteitWerk(ORG, P.Q).BEZWAREN.find(x => x.persoon === P.N);
+  assert.equal(z().stand, 'REVIEW_REQUEST');
+  assert.equal(z().reden, 'de assessor keek niet naar mijn tweede poging');
+  assert.equal(z().oordeel, null, 'voor de review is opgepakt, geen criteria of uitslag');
+  assert.deepEqual(z().naar, ['INDEPENDENT_REVIEW'], 'uit de overgangstabel');
+  w.doe(ORG, 'bezwaarStand', { id: z().id, naar: 'INDEPENDENT_REVIEW' }, P.Q);
+  assert.ok(z().oordeel && z().oordeel.stand === 'PROVEN' && z().oordeel.criteria, 'wie de review oppakte, ziet het oordeel');
+  w.doe(ORG, 'bestuurZet', { persoon: P.KO2, rol: 'QUALITY_AUTHORITY' }, P.E);
+  const ander = l.kwaliteitWerk(ORG, P.KO2).BEZWAREN.find(x => x.persoon === P.N);
+  assert.equal(ander.anderReviewer, true);
+  assert.equal(ander.oordeel, null, 'een tweede kwaliteitsautoriteit ziet het oordeel niet');
+
+  assert.ok(l.kwaliteitWerk(ORG, P.Q).ONGELDIG.some(b => b.id === beoordeling), 'een afgeronde beoordeling kan ongeldig worden verklaard');
+  w.doe(ORG, 'bestuurZet', { persoon: P.A, rol: 'QUALITY_AUTHORITY' }, P.E);
+  assert.ok(!l.kwaliteitWerk(ORG, P.A).ONGELDIG.some(b => b.id === beoordeling), 'maar niet door wie hem zelf gaf');
+
+  const e = l.kwaliteitWerk(ORG, P.E);
+  assert.equal(e.magKwaliteit, false, 'de eigenaar ziet het beleid en geen bezwaren');
+  assert.deepEqual(e.BEZWAREN, []);
+  w.doe(ORG, 'beleidZet', { id: 'tb', handeling: 'betaling.terugboeken', rol: 'ops', vaardigheden: ['terugboeken'], certificaat: true }, P.E);
+  const b = l.kwaliteitWerk(ORG, P.E).BELEID.find(x => x.id === 'tb');
+  assert.deepEqual([b.eigen, b.goedgekeurd, b.rol], [true, false, 'Operations Professional'], 'wie voorstelde, keurt niet zelf goed');
+  assert.equal(l.kwaliteitWerk(ORG, P.Q).BELEID.find(x => x.id === 'tb').eigen, false);
+});

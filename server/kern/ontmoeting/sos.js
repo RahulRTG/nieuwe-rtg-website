@@ -10,6 +10,7 @@
    staan.
 
    Afgesplitst uit date.js toen die de 10 KB passeerde. */
+const sosPositie = require('../sospositie');
 module.exports = (sctx) => {
   const { db, nu, save, id, lijsten, dateVoor, codenaamVan, notify, sseToCustomer, sseToOffice } = sctx;
 
@@ -42,6 +43,10 @@ module.exports = (sctx) => {
     if (!s) return { status: 404, error: 'SOS niet gevonden.' };
     s.ok = { door: String(door || 'RTG-kantoor').slice(0, 60), at: nu() };
     if (!d.sos.some(x => !x.ok) && d.status === 'noodgeval') d.status = 'actief';
+    /* Was de afspraak al afgelopen terwijl deze SOS openstond, dan hield stop()
+       de live-posities vast voor de meldkamer. Nu er niets meer openstaat, gaan
+       ze weg -- de plek van de SOS zelf blijft bij de melding (N18). */
+    if (DICHT[d.status] && !d.sos.some(x => !x.ok)) d.posities = {};
     save();
     for (const k of [d.a, d.b]) sseToCustomer(k, 'sync', { scope: 'ontmoeting' });
     sseToOffice('sync', { scope: 'ontmoeting' });
@@ -82,7 +87,21 @@ module.exports = (sctx) => {
     return { status: 200, ok: true };
   }
 
-  /* ---- overzichten ---- */
+  /* VERGEET VERLOPEN SOS-POSITIES (NAVIGATIE.md N18), voor de bewaarveger. De
+     plek van een SOS blijft zolang hij open is en 90 dagen na het afhandelen
+     door het kantoor; het lid kan een SOS niet zelf intrekken, dus hier geldt
+     alleen de termijn. Als vangnet gaan ook de live-posities weg van een
+     afspraak die voorbij is en geen open SOS meer heeft. */
+  const DICHT = { afgerond: 1, geannuleerd: 1 };
+  function vergeetSosPosities(t) {
+    let n = 0;
+    for (const d of db.data.ontmoetDates || []) {
+      if (!Array.isArray(d.sos)) continue;
+      n += sosPositie.veeg(d.sos, { velden: ['lat', 'lng'], dicht: s => s.ok && s.ok.at, nu: t });
+      if (DICHT[d.status] && !d.sos.some(x => !x.ok) && d.posities && Object.keys(d.posities).length) { d.posities = {}; n++; }
+    }
+    return n;
+  }
 
-  return { sos, sosAf, signaalNaarKantoor, signaalNaarLid };
+  return { sos, sosAf, signaalNaarKantoor, signaalNaarLid, vergeetSosPosities };
 };

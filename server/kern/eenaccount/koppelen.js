@@ -129,7 +129,7 @@ module.exports = (kctx) => {
         logInlog('koppel', false, 'kantoor (tweede factor)', req);
         return { status: 401, error: 'Tweede factor vereist: voer de authenticator-code in.' };
       }
-      const v = kantoorUitnodiging.verzilver(key, body.uitnodiging);
+      const v = await kantoorUitnodiging.verzilver(key, body.uitnodiging);
       if (!v.ok) return v;
       pinSlot.goed(doel);
       kantoorUitnodiging.telWeg('uitnodiging');

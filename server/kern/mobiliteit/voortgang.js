@@ -18,6 +18,7 @@
    Een tweede plek waar geld beweegt is precies wat LAT.md regel 4 verbiedt. */
 
 const { magNaar, MELDING, GEBEURTENIS, EIND, KETEN, UITZONDERINGEN, VOLGENDE } = require('./keten');
+const { VOORBIJ, wisRitpunten } = require('./ritpunten');
 
 const GEBEURTENIS_MAX = 60;        // per opdracht; genoeg voor een lange rit met stops
 
@@ -60,6 +61,10 @@ module.exports = (ctx) => {
     if (status === 'vervangend-voertuig') { o.voertuig = null; o.chauffeur = null; }
     if (status === 'incident') o.incident = { reden: schoon(extra.reden, 200) || 'gemeld door ' + (door || 'systeem'), at: nu() };
     if (status === 'afgerekend') o.afgerekend = { bedrag: Number.isFinite(extra.bedrag) ? extra.bedrag : o.prijs, at: nu() };
+    /* De rit is voorbij: de ritlijn en het exacte ophaalpunt gaan weg, afstand,
+       duur en de plekken als tekst blijven (NAVIGATIE.md N16). Hier, op de
+       enige weg naar een andere status, zodat geen ingang eromheen kan. */
+    if (VOORBIJ.has(status)) wisRitpunten(o, nu());
 
     schrijf(o, GEBEURTENIS[status], door, extra.reden ? { reden: schoon(extra.reden, 200) } : null);
     save();
@@ -80,7 +85,9 @@ module.exports = (ctx) => {
   function opdrachtPositie(ref, punt, door) {
     const o = opdrachtMet(ref);
     if (!o) return { status: 404, error: 'Opdracht niet gevonden.' };
-    if (EIND.has(o.status)) return { status: 409, error: 'De rit is al ' + o.status + '.' };
+    /* VOORBIJ en niet alleen EIND: na `voltooid` is de ritlijn gewist (N16), en
+       een prik die daarna nog binnenkomt zou hem stil opnieuw beginnen. */
+    if (EIND.has(o.status) || VOORBIJ.has(o.status)) return { status: 409, error: 'De rit is al ' + o.status + '.' };
     if (!Number.isFinite(punt.lat) || !Number.isFinite(punt.lng)) return { status: 400, error: 'Geen geldige positie.' };
     o.positie = { lat: punt.lat, lng: punt.lng, at: nu() };
     schrijf(o, 'trip.location_updated', door, { lat: punt.lat, lng: punt.lng });

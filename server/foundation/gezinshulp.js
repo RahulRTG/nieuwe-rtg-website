@@ -150,10 +150,16 @@ function gezinVan(req, res) {
   if (!g) { res.status(404).json({ error: 'Dit gezin kennen we niet. Klopt de gezinscode?' }); return null; }
   return g;
 }
+/* Het gezinsprofieltoken woont in ./gezinstoken.js: hash-only, met vervaltijd,
+   epoch en constant-time zoeken. Dit is de ENE vergelijking; een oud kaal
+   token opent niets, en de eerste aanroep haalt die van schijf. */
+const gezinstoken = require('./gezinstoken').maak({ crypto, nu });
+let oudGeruimd = false;
 function profielVan(g, token) {
-  const p = Object.values(g.profielen || {}).find(x => x.token === token);
+  if (!oudGeruimd && Object.keys(G()).length) { oudGeruimd = true; if (gezinstoken.ruimOud(G())) save(); }
+  const p = gezinstoken.vind(g, token);
   if (p) actualiseerGroep(p);
-  return p;
+  return p || undefined;
 }
 function beheerderVan(g, req, res) {
   const t = ctx.tokenUit(req);
@@ -166,5 +172,5 @@ function berichtVoorMij(b, pid) { return b.naar === 'allen' || b.naar === pid ||
   return { G, nieuweGezinscode, ROLLEN, GROEPEN, GROEP_INFO, geboorteInfo, groepVanLeeftijd, actualiseerGroep,
     magSolliciteren, groepLeeftijd, isBeschermd, schoonGroep, isGast, KLEUREN, hashPin, checkPin, geldigePin,
     schoonAvatar, schoonKleur, nieuweCodenaam, ensureCodenaam, rtfHandle, socialProfielen, profielInfoVanHandle,
-    pubProfiel, pubGezin, gezinVan, profielVan, beheerderVan, berichtVoorMij };
+    pubProfiel, pubGezin, gezinVan, profielVan, beheerderVan, berichtVoorMij, gezinstoken };
 };

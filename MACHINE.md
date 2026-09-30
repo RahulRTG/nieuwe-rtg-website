@@ -60,7 +60,7 @@ van stil meegeteld.
 
 ## 1. Wat er gemeten is
 
-<!--getal:machine.muterend-->3968<!--/getal--> muterende routes. Per as het
+<!--getal:machine.muterend-->3946<!--/getal--> muterende routes. Per as het
 aantal routes dat hem raakt (`handler` / `bestand`):
 
 | as | handler | bestand | motor |
@@ -79,7 +79,7 @@ aantal routes dat hem raakt (`handler` / `bestand`):
 | assurance (passkey, stap-op) | 2 | 49 | `kern/identiteit/vertrouwen.js` |
 | frictie | 2 | 98 | `kern/frictie/motor.js` |
 | simulatie | 10 | 103 | `kern/command/simulatie.js` |
-| envelop (oorzaak, correlatie) | 2 | <!--getal:machine.envelop-->201<!--/getal--> | `kern/envelop.js` |
+| envelop (oorzaak, correlatie) | 2 | <!--getal:machine.envelop-->180<!--/getal--> | `kern/envelop.js` |
 | idempotentie | 13 | 114 | `lib/idem-poort.js` |
 | aiVindbaar | 173 | 173 | `kern/stuur/beleid.js` |
 | mensAanDeDeur | 234 | <!--getal:machine.mensAanDeDeur-->290<!--/getal--> | `kern/kantoor/kluispoort.js` |
@@ -101,8 +101,8 @@ de teller zakt naar 0 met de naam van die as erbij; dat is nagetrokken door
 
 **De drie getallen die de richting bepalen:**
 
-1. <!--getal:machine.zonderAs-->2773<!--/getal--> van de
-   <!--getal:machine.muterend-->3968<!--/getal--> muterende routes raken **geen
+1. <!--getal:machine.zonderAs-->2827<!--/getal--> van de
+   <!--getal:machine.muterend-->3946<!--/getal--> muterende routes raken **geen
    enkele** as — zelfs niet op de ruime bestandsas.
 
    **Let op de noemer: die is op 14 september 2026 verschoven, en een ronde van
@@ -209,7 +209,7 @@ vrij, **Situation** let op); die worden hier niet herhaald. Dit zijn de zeven di
 uit de uitvoeringskant komen. `SEMANTIEK.json` meet dat dit huis
 <!--getal:semantiek.namen-->131<!--/getal--> namen in meer dan één domein heeft,
 waarvan <!--getal:semantiek.betekenissen-->113<!--/getal--> met meer dan één
-betekenis (samen <!--getal:semantiek.betekenissenTotaal-->419<!--/getal-->
+betekenis (samen <!--getal:semantiek.betekenissenTotaal-->420<!--/getal-->
 betekenissen).
 
 1. **`envelop`** — bezet en gesloten (zie par. 2).
@@ -318,7 +318,7 @@ betekenissen).
   zonder terugweg is een tweede poging bovenop een half effect.
 - **Runtime evidence scores.** `VERTROUWEN.json` staat op
   <!--getal:vertrouwen.bewezen-->0<!--/getal--> bewezen en
-  <!--getal:vertrouwen.routes-->4716<!--/getal--> verzwakt. Een
+  <!--getal:vertrouwen.routes-->5258<!--/getal--> verzwakt. Een
   promotiesysteem boven nul bewijs promoveert niets; eerst één keten écht
   bewijzen, dan het systeem eromheen.
 - **Routes als bijproduct.** Kan pas als de capability-laag is **afgeleid**;

@@ -46,7 +46,7 @@ module.exports = (ctx) => {
       visual: Math.round(getal(data.visual, 0, 7, 0)),
       live: data.live !== false
     });
-    huizen()[h.id] = h;
+    huizen(true)[h.id] = h;
     save();
     return { ok: true, huis: metStats(h) };
   }

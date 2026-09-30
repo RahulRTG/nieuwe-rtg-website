@@ -255,3 +255,29 @@ test('14. "deur van een andere rol" wordt nooit zonder bewijs gezegd', () => {
       c.functie + ': de roldeur is die van de verklaarde doelgroep zelf; dan komt zij er juist wél langs');
   }
 });
+
+test('15. `gast` is twee mensen, en de meter draagt ze allebei', () => {
+  /* SAMENLEVING.md par. 11.2: `tier === 'guest'` is een bezoeker zonder
+     account EN een RTG Community-lid met account. Tot 28 september 2026 droeg
+     deze meter alleen de demo-inlog -- de bezoeker, die `geenGast()` met opzet
+     weigert -- en zei hij dus over gratis LEDEN niets. De bodemmeter
+     (scripts/onvervreemdbaar.js) maakte met diezelfde sessie eerst vijf keer
+     "achter betaling" van "zonder account".
+
+     DE MUTATIES: haal de vorm `account` uit lib/doelgroepsessies.js, of laat
+     klopVormen alleen de eerste vorm proberen -> deze toets zakt, want geen
+     cel komt er dan nog via het account langs. */
+  const { DOELGROEPEN } = require('../scripts/lib/doelgroepsessies');
+  assert.deepEqual(Object.keys(DOELGROEPEN.gast.vormen || {}), ['bezoeker', 'account'],
+    'gast draagt niet meer beide vormen, in deze volgorde (de eerste is wat draag() geeft)');
+  assert.match(sessieBron, /gecontroleerdGratis\(basis\)/,
+    'het gratis account komt niet langs de gedeelde registratie met paspoortcontrole');
+  const j = lees('DOELGROEPBEREIK.json');
+  assert.match(j.sessies.gast || '', /account/, 'het register zegt niet dat het gratis account is gemeten');
+  const viaAccount = j.cellen.filter((c) => c.doelgroep === 'gast' && c.openVorm === 'account');
+  assert.ok(viaAccount.length > 0,
+    'geen enkele gast-cel kwam via het gratis account binnen; dan meet de meter weer alleen de bezoeker');
+  /* En een doelgroep met een vorm krijgt geen openVorm: die zou suggereren dat
+     er gekozen is waar niets te kiezen viel. */
+  assert.ok(j.cellen.filter((c) => c.doelgroep !== 'gast').every((c) => c.openVorm === undefined));
+});

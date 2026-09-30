@@ -11,7 +11,12 @@ test('codecredentialregister is compleet en intern geldig', () => {
   assert.deepEqual(uit.fouten, []);
   assert.ok(uit.telling.migrated >= 7);
   assert.ok(uit.telling.closed >= 3);
-  assert.ok(uit.telling.remaining > 0, 'onvolwassen deuren worden niet weggepoetst');
+  /* Sinds 29 september 2026 (B14-B17) is er geen deur meer `remaining`. Wat niet
+     gemigreerd is staat er nog, als `closed` met zijn eigen productiesluiting:
+     een onvolwassen deur wordt dicht gezet en niet weggepoetst. */
+  assert.ok(uit.telling.closed > 0, 'onvolwassen deuren worden niet weggepoetst');
+  assert.equal(uit.telling.migrated + uit.telling.closed + uit.telling.remaining,
+    register.deuren.length, 'elke deur heeft een stand');
   const census = poort.bronCensus(undefined, register);
   assert.equal(census.aanroepen, census.letterlijk + census.doorRouter +
     census.verklaardDynamisch.length + census.onleesbaar.length,
@@ -80,14 +85,16 @@ test('geen_credential is alleen een gesloten, onderbouwd oordeel', () => {
 test('de echte credentials uit de classificatieronde blokkeren de release', () => {
   const register = poort.lees();
   const uit = poort.controleer(register);
-  const echte = ['office.gedeelde_kantoorcode', 'partnerkanaal.personeels_en_partnercode',
-    'horeca.bon_en_polsbandsaldo', 'link.capability_aanvaarden', 'travelos.ov_incheckcode',
-    'mode.bezorgcode', 'workos.concern_uitnodiging', 'festivalos.toegangspas',
-    'magnaat.teamkamer_toegangscode', 'identity.sso_client_secret',
-    'rtfos.activiteit_incheckcode', 'office.kantooruitnodiging', 'service.balie_bevestigingscode',
-    'foundation.onderwijs_les_tokens', 'foundation.family_profile_token_buiten_harde_poort',
-    'eten.kortingscode'];
-  for (const id of echte) {
+  // office.gedeelde_kantoorcode is in productie gesloten (B10), identity.sso_client_secret per tenant
+  // versleuteld (B16), en partnerkanaal (B14), link.capability_aanvaarden (B15) en beide
+  // Foundation-tokens (B17) gemigreerd: zie de toetsen hieronder
+  const echte = ['travelos.ov_incheckcode',
+    'mode.bezorgcode', 'festivalos.toegangspas',
+    'rtfos.activiteit_incheckcode'];
+  // gemigreerd op 27 september 2026 (B9, de vier restdeuren): zie de toets hieronder
+  const restdeuren = new Set(['travelos.ov_incheckcode', 'mode.bezorgcode', 'festivalos.toegangspas',
+    'rtfos.activiteit_incheckcode']);
+  for (const id of echte.filter(x => !restdeuren.has(x))) {
     const d = register.deuren.find(x => x.id === id);
     assert.ok(d, id + ' hoort geregistreerd te zijn');
     assert.equal(d.status, 'remaining', id + ' is niet gemigreerd');
@@ -96,17 +103,164 @@ test('de echte credentials uit de classificatieronde blokkeren de release', () =
     for (const route of poort.effectieveRoutes(d))
       assert.ok(poort.REQUIRED_ROUTES.includes(route), route + ' hoort bewaakt te zijn');
   }
-  /* Elke consumer en uitgever van het niet-gemigreerde gezinsprofieltoken en de
-     onderwijslesfamilie zit sinds 27 september 2026 in NOG_GESLOTEN: in productie
-     dicht, ook met een geslaagd extern dossier. De deuren blijven remaining omdat
-     de credential zelf niet gemigreerd is. */
+});
+
+/* B14 (29 september 2026): het partnerkanaal is gesplitst. De personeelscode is
+   een gemigreerde credential per medewerker; de partnercode een openbare
+   attributie die niets opent. */
+test('het partnerkanaal is gesplitst: personeelscode gemigreerd, partnercode een openbare attributie', () => {
+  const register = poort.lees();
+  const uit = poort.controleer(register);
+  const d = register.deuren.find(x => x.id === 'partnerkanaal.personeels_en_partnercode');
+  assert.equal(d.status, 'migrated');
+  assert.equal(d.release_blocker, false);
+  assert.ok(!uit.blockers.some(x => x.id === d.id), 'blokkeert niet meer');
+  for (const c of poort.CONTROLES) assert.equal(d.controls[c], true, c);
+  assert.equal(d.controls.entropy_bits, 128);
+  assert.ok(d.bewijs.includes('test/partnerpersoneelscode.pg.test.js'), 'de atomaire claim over twee instances');
+  for (const route of poort.effectieveRoutes(d))
+    assert.ok(poort.REQUIRED_ROUTES.includes(route), route + ' hoort bewaakt te zijn');
+  const a = register.deuren.find(x => x.id === 'partnerkanaal.partnercode_attributie');
+  assert.equal(a.classificatie, 'public_identifier');
+  assert.equal(a.status, 'closed');
+  assert.ok(a.routes.includes('POST /api/partner'));
+  assert.ok(String(a.notitie).length >= 40);
+});
+
+/* B15 (29 september 2026): de RTG Link-drager is gemigreerd -- 128 bits, hash-only,
+   een eenmalige claim in een collectietransactie -- en daarom is ook zijn
+   productiegrendel weg. Beide helften horen samen: een gemigreerde deur die in
+   productie nog dicht staat liegt niet, maar een open deur die niet gemigreerd is wel. */
+test('de Link-drager is gemigreerd met alle controls, en de grendel is eraf', () => {
+  const register = poort.lees();
+  const uit = poort.controleer(register);
+  const d = register.deuren.find(x => x.id === 'link.capability_aanvaarden');
+  assert.equal(d.status, 'migrated');
+  assert.equal(d.release_blocker, false);
+  assert.ok(!uit.blockers.some(x => x.id === d.id), 'blokkeert niet meer');
+  assert.equal(d.controls.entropy_bits, 128);
+  for (const c of ['hash_only_at_rest', 'issuer_doel_scope', 'issued_at_expires_at', 'max_gebruik_gebruik',
+    'server_side_intrekken_roteren', 'constant_time_lookup', 'atomic_claim', 'raw_once'])
+    assert.equal(d.controls[c], true, c);
+  for (const t of ['test/linkcap-credential.test.js', 'test/linkcap-credential.pg.test.js', 'test/linkcap-productie.test.js'])
+    assert.ok(d.bewijs.includes(t), t);
+  assert.equal(d.huidige_risicos, undefined, 'een gemigreerde deur noemt geen open risico meer');
+  const grendel = require('../server/middleware/money-credential-productiepoort');
+  assert.equal([...grendel.EXACT.values()].includes(d.id), false, 'niet meer in de HTTP-grendel');
+  const kassacode = require('node:fs').readFileSync(require('node:path').join(__dirname, '..', 'server/kern/pay/kassacode.js'), 'utf8');
+  assert.doesNotMatch(kassacode, /blokkade\(/, 'en kern/pay/kassacode.js weigert niet meer zelf');
+  for (const route of poort.effectieveRoutes(d)) assert.ok(poort.REQUIRED_ROUTES.includes(route), route);
+});
+
+/* B17 (29 september 2026): de lescredentials van onderwijs zijn gemigreerd. De deur
+   draagt alle controls, blokkeert niet meer, zijn nieuwe beheerroutes staan in de
+   inventaris, en de lesfamilie is uit NOG_GESLOTEN gehaald. */
+test('de lescredentials van onderwijs zijn gemigreerd en staan niet meer blijvend dicht', () => {
+  const register = poort.lees();
+  const uit = poort.controleer(register);
+  const d = register.deuren.find(x => x.id === 'foundation.onderwijs_les_tokens');
+  assert.equal(d.status, 'migrated');
+  assert.equal(d.release_blocker, false);
+  assert.equal(d.controls.entropy_bits, 128);
+  for (const c of poort.CONTROLES) assert.equal(d.controls[c], true, c);
+  assert.ok(!uit.blockers.some(x => x.id === d.id), 'blokkeert niet meer');
+  assert.ok(!uit.fouten.some(f => f.startsWith(d.id)), 'geen fout op de deur');
+  assert.ok(d.bewijs.includes('test/foundation-lescredential.pg.test.js'), 'de claim is over twee instances beproefd');
   const vrijgave = require('../server/middleware/foundation-productiepoort');
-  for (const id of ['foundation.family_profile_token_buiten_harde_poort', 'foundation.onderwijs_les_tokens'])
-    for (const route of poort.effectieveRoutes(register.deuren.find(x => x.id === id))) {
-      const [methode, pad] = route.split(' ');
-      assert.equal(vrijgave.isNogGeslotenCredentialroute(methode, pad, {}) ||
-        vrijgave.VEILIGE_UITGANGEN.includes(route), true, route + ' hoort in NOG_GESLOTEN');
-    }
+  for (const route of poort.effectieveRoutes(d)) {
+    assert.ok(poort.REQUIRED_ROUTES.includes(route), route + ' hoort bewaakt te zijn');
+    const [methode, pad] = route.split(' ');
+    assert.equal(vrijgave.isNogGeslotenCredentialroute(methode, pad, {}), false, route + ' staat nog in NOG_GESLOTEN');
+  }
+});
+
+/* B17 (29 september 2026): het gezinsprofieltoken is gemigreerd. Zijn consumers
+   staan niet meer in NOG_GESLOTEN; de gezinsdeur zelf (gezinscode plus PIN) blijft
+   dicht onder foundation.family_profile_access, en dat staat er eerlijk bij. */
+test('het gezinsprofieltoken is gemigreerd, en de gezinsdeur zelf niet', () => {
+  const register = poort.lees();
+  const uit = poort.controleer(register);
+  const d = register.deuren.find(x => x.id === 'foundation.family_profile_token_buiten_harde_poort');
+  assert.equal(d.status, 'migrated');
+  assert.equal(d.release_blocker, false);
+  assert.ok(!uit.blockers.some(x => x.id === d.id), 'blokkeert niet meer');
+  for (const b of ['test/gezinstoken.test.js', 'test/gezinssessie.test.js',
+    'test/foundation-gezinstoken-productie.test.js', 'test/gezinsuitnodiging.pg.test.js'])
+    assert.ok(d.bewijs.includes(b), b);
+  assert.equal(d.controls.gezinsdeur_zelf_gemigreerd, false, 'de gezinscode plus PIN is niet gemigreerd, en dat staat er');
+  assert.ok(String(d.notitie).length >= 200);
+  const vrijgave = require('../server/middleware/foundation-productiepoort');
+  for (const route of poort.effectieveRoutes(d)) {
+    const [methode, pad] = route.split(' ');
+    if (pad.startsWith('/api/foundation/gezin/')) continue;
+    assert.equal(vrijgave.isNogGeslotenCredentialroute(methode, pad, {}), false, route + ' hoort niet meer in NOG_GESLOTEN');
+  }
+  assert.equal(register.deuren.find(x => x.id === 'foundation.family_profile_access').status, 'closed');
+  assert.equal(vrijgave.isNogGeslotenCredentialroute('POST', '/api/foundation/gezin/inloggen', {}), true);
+});
+
+/* B10 (27 september 2026): de gedeelde kantoorcode is in productie gesloten. Dat
+   is geen migratie van de code -- die blijft buiten productie gedeeld en niet
+   hash-only, en dat staat er eerlijk bij -- maar de deur opent in productie niets. */
+test('de gedeelde kantoorcode is in productie gesloten, met eerlijke controls en een proef op een productieserver', () => {
+  const register = poort.lees();
+  const uit = poort.controleer(register);
+  const d = register.deuren.find(x => x.id === 'office.gedeelde_kantoorcode');
+  assert.equal(d.status, 'closed');
+  assert.equal(d.release_blocker, false);
+  assert.ok(!uit.blockers.some(x => x.id === d.id), 'blokkeert niet meer');
+  assert.ok(d.bewijs.includes('test/kantoordeur-productie.test.js'), 'bewezen op een echte productieserver');
+  for (const c of ['productie_code_opent_niets', 'productie_passkey_per_kantoorsessie', 'fail_closed_zonder_passkeyconfig'])
+    assert.equal(d.controls[c], true, c);
+  for (const c of ['code_zelf_hash_only', 'code_zelf_persoonsgebonden'])
+    assert.equal(d.controls[c], false, c + ': de code zelf is niet gemigreerd, en dat staat er');
+  assert.ok(String(d.notitie).length >= 40);
+  const pd = require('../server/kern/kantoor/productiedeur');
+  assert.equal(pd.codeDicht({ NODE_ENV: 'production' }).code, pd.CODE_DICHT, 'de bron sluit hem echt');
+});
+
+/* B16 (29 september 2026): het SSO-clientgeheim moet omkeerbaar blijven voor de
+   tokenruil, dus hash_only en raw_once staan eerlijk op false; de deur is
+   gemigreerd naar versleuteling per tenant met verval, rotatie met overlap en
+   een inlog die dicht gaat zonder geldig geheim. */
+test('het SSO-clientgeheim is per tenant versleuteld, met eerlijke controls en een proef op een productieserver', () => {
+  const register = poort.lees();
+  const uit = poort.controleer(register);
+  const d = register.deuren.find(x => x.id === 'identity.sso_client_secret');
+  assert.equal(d.status, 'migrated');
+  assert.equal(d.release_blocker, false);
+  assert.ok(!uit.blockers.some(x => x.id === d.id), 'blokkeert niet meer');
+  assert.ok(d.bewijs.includes('test/sso-clientgeheim-routes.test.js'), 'bewezen op een echte (productie)server');
+  for (const c of ['omkeerbaar_versleuteld_per_tenant', 'nooit_terug_via_route', 'issued_at_expires_at',
+    'rotatie_met_begrensde_overlap', 'fail_closed_zonder_sleutel', 'fail_closed_inlog_bij_ongeldig_geheim',
+    'oude_opslag_herzegeld_bij_laden'])
+    assert.equal(d.controls[c], true, c);
+  for (const c of ['hash_only_at_rest', 'raw_once'])
+    assert.equal(d.controls[c], false, c + ': kan voor een omkeerbaar protocolgeheim niet, en dat staat er');
+  for (const route of d.routes) assert.ok(poort.REQUIRED_ROUTES.includes(route), route + ' hoort bewaakt te zijn');
+  const { ROUTES } = require('../server/lib/eenmalig-geheim-routes');
+  for (const route of d.routes) assert.ok(ROUTES.has(route), route + ' staat buiten elke antwoordcache');
+});
+
+test('de vier restdeuren zijn gemigreerd, en de korte bezorgcode alleen met haar grenzen', () => {
+  const uit = poort.controleer(poort.lees());
+  for (const id of ['travelos.ov_incheckcode', 'mode.bezorgcode', 'festivalos.toegangspas', 'rtfos.activiteit_incheckcode']) {
+    const d = poort.lees().deuren.find(x => x.id === id);
+    assert.equal(d.status, 'migrated', id);
+    assert.ok(!uit.blockers.some(x => x.id === id), id + ' blokkeert niet meer');
+    for (const route of d.routes) assert.ok(poort.REQUIRED_ROUTES.includes(route), route + ' hoort bewaakt te zijn');
+  }
+  assert.equal(poort.lees().deuren.find(x => x.id === 'mode.bezorgcode').controls.entropy_bits, false,
+    'vier cijfers halen de 128 bits niet, en dat staat er eerlijk');
+  /* Haal een compenserende grens weg, of maak er geld van, en de uitzondering
+     vervalt: dan is het weer een gemigreerde credential zonder 128 bits. */
+  for (const wijzig of [d => { d.korte_code.rem_met_vergrendeling = false; }, d => { delete d.korte_code; },
+    d => { d.korte_code.max_fout = 50; }, d => { d.korte_code.reden = 'kort'; },
+    d => { d.classificatie = 'money_credential'; }, d => { d.controls.entropy_bits = 13; }]) {
+    const register = JSON.parse(JSON.stringify(poort.lees()));
+    wijzig(register.deuren.find(x => x.id === 'mode.bezorgcode'));
+    assert.ok(poort.controleer(register).fouten.some(f => f.startsWith('mode.bezorgcode: gemigreerde credential mist minimaal 128-bit')));
+  }
 });
 
 test('een routermount kan niet alleen met zijn interne schijnpad groen worden', () => {
@@ -121,8 +275,14 @@ test('een routermount kan niet alleen met zijn interne schijnpad groen worden', 
 
 test('iedere resterende deur blokkeert de release', () => {
   const uit = poort.controleer(poort.lees());
-  assert.ok(uit.blockers.length > 0);
   assert.ok(uit.blockers.every(x => x.routes.length && x.eigenaar));
+  /* Er staat vandaag geen deur meer op `remaining` (B14-B17). Dat mag de regel
+     niet leeg maken: een deur die terugvalt naar `remaining` blokkeert weer. */
+  const terug = JSON.parse(JSON.stringify(poort.lees()));
+  const d = terug.deuren.find(x => x.id === 'foundation.family_profile_token_buiten_harde_poort');
+  d.status = 'remaining'; d.release_blocker = true;
+  d.huidige_risicos = d.huidige_risicos && d.huidige_risicos.length ? d.huidige_risicos : ['terug naar remaining'];
+  assert.ok(poort.controleer(terug).blockers.some(x => x.id === d.id), 'een teruggevallen deur blokkeert de release');
   for (const id of ['pay.tegoedbon', 'pay.kascode_en_vooraf', 'pay.tikcode', 'pay.giftcard_value_code',
     'travelos.activity_ticket_entry', 'travelos.mobility_transport_ticket']) {
     assert.ok(!uit.blockers.some(x => x.id === id), id + ' is gemigreerd (27 september 2026)');
@@ -134,6 +294,13 @@ test('iedere resterende deur blokkeert de release', () => {
   assert.ok(!uit.blockers.some(x => x.id === 'pay.giftcard_value_code'),
     'de cadeaukaart is gemigreerd (27 september 2026) en blokkeert niet meer');
   assert.equal(poort.lees().deuren.find(x => x.id === 'pay.giftcard_value_code').status, 'migrated');
+  /* Besluiten B11 en B13 (27 september 2026): de horecabon is gemigreerd, de
+     kortingscode van RTG Eten is een promotiecode -- geen geheim, wel begrensd. */
+  assert.ok(!uit.blockers.some(x => x.id === 'horeca.bon_en_polsbandsaldo'));
+  assert.equal(poort.lees().deuren.find(x => x.id === 'horeca.bon_en_polsbandsaldo').status, 'migrated');
+  const promo = poort.lees().deuren.find(x => x.id === 'eten.kortingscode');
+  assert.ok(!uit.blockers.some(x => x.id === 'eten.kortingscode'));
+  assert.deepEqual([promo.status, promo.classificatie, promo.release_blocker], ['closed', 'public_identifier', false]);
   assert.ok(!uit.blockers.some(x => x.id === 'travelos.airport_boarding_pass'));
   assert.equal(poort.lees().deuren.find(x =>
     x.id === 'travelos.airport_boarding_pass').status, 'migrated');

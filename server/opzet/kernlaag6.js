@@ -26,8 +26,10 @@ module.exports = (kern, hulp) => {
 /* RTG OV (kern/ov.js): al het vervoer in een app. Lijnen met haltes, live
    voertuigen via de PDA, twee snelle check-ins (oplichtende code of GPS) en
    uitchecken met eerlijke km-prijs via RTG Pay. Na pay en sociaal gemount. */
+// afwezigheid uit het verzuimregister, voor de OV-dienst en de taxidispatch
+const afwezigOp = require('../kern/payroll/afwezig-laat')(() => kern);
 Object.assign(kern, require('../kern/ov').maakOv({
-  db, save, crypto, schoon, codenaamVan: kern.codenaamVan, haversine, etaMinutes, pay: kern.pay, notify
+  db, save, crypto, bewerkCollectie: hulp.bewerkCollectie, schoon, codenaamVan: kern.codenaamVan, haversine, etaMinutes, pay: kern.pay, notify, afwezigOp
 }));
 /* Het Mobility OS (kern/mobiliteit/): de vervoerskern onder alles wat rijdt,
    vaart of vliegt. Een moduleregister met afhankelijkheden (welk vervoer
@@ -42,7 +44,7 @@ Object.assign(kern, require('../kern/mobiliteit').maakMobiliteit({
   // OV-prijsformule als het uitchecken; geen tweede som, geen tweede grootboek
   pay: kern.pay, ovPrijsVan: kern.ovPrijsVan,
   // voor de dienstverbandcontrole bij zakelijke ritten; de kaartcode claimt atomair
-  accounts, bewerkCollectie: hulp.bewerkCollectie
+  accounts, bewerkCollectie: hulp.bewerkCollectie, afwezigOp
 }));
 /* DE APPBRUG: een app-rit wordt ook een vervoersOPDRACHT en komt zo op het
    dispatchbord. HIER en niet in kern/lidacties, dat vóór mobiliteit staat en

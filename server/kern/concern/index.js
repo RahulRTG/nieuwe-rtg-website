@@ -45,7 +45,10 @@ module.exports = (ctx) => {
   Object.assign(k, require('./graaf')(k));
   Object.assign(k, require('./employment')(k));
   Object.assign(k, require('./scope')(k));
-  Object.assign(k, require('./uitnodiging')(k));
+  /* De collectietransactie gaat ALLEEN naar de uitnodiging, en niet in `k`:
+     `k` wordt aan het eind op de kern gezet, en dan reikte elk ander domein er
+     ongevraagd naar (de domeingrens ving dat bij werving). */
+  Object.assign(k, require('./uitnodiging')(Object.assign({}, k, { bewerkCollectie: ctx.bewerkCollectie })));
   Object.assign(k, require('./aanname')(k));
   Object.assign(k, require('./readiness')(k));
   Object.assign(k, require('./verandering')(k));

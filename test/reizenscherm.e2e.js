@@ -82,6 +82,14 @@ test('het reisscherm groepeert per reis, en de kop zegt hetzelfde als de regels 
       const el = document.querySelector('#komend');
       return el && !/Laden/.test(el.textContent) && el.querySelector('.regkop');
     }, null, { timeout: 20000 });
+    /* Sinds de warme desktopstandaard (#413) staat de eigen inhoud van het
+       wereldhuis -- ook #komend -- onder een INGEKLAPT <details class="wp-domain">
+       "Uw volledige overzicht". Dat is een bewuste keuze van dat ontwerp; innerText
+       van een ingeklapt blok is leeg, dus opent de toets het overzicht zoals een lid
+       dat doet (op de summary). Wat hij van de koppen eist, blijft gelijk. */
+    await page.waitForFunction(() => !!document.body.dataset.rtgDesktopState, null, { timeout: 20000 });
+    const dicht = page.locator('details.wp-domain:not([open]) > summary');
+    if (await dicht.count()) await dicht.click();
 
     /* De koppen MET hun regels, uit de opmaak zelf: alles tussen deze kop en de
        volgende. Zo wordt gemeten wat er werkelijk onder een kop hangt, in

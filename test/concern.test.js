@@ -37,12 +37,13 @@ const crypto = require('node:crypto');
    findSupplier. Dat is met opzet -- een module die een hele server nodig heeft
    om getoetst te worden, is een module die te veel weet. */
 function bouw(zaken, vandaag) {
-  const db = { data: {} };
+  const db = { data: {}, writable: true };
   db.capsVan = (s) => (s && s.caps) || [];
   const suppliers = {};
   for (const s of (zaken || [])) suppliers[s.code] = s;
   return require('../server/kern/concern')({
     db, save: () => {}, crypto,
+    bewerkCollectie: require('../server/db/collectie-bewerken')({ store: 'json', db, save: () => {} }),
     schoon: (v, n) => String(v == null ? '' : v).trim().slice(0, n),
     findSupplier: (c) => suppliers[String(c || '').toUpperCase()] || null,
     vandaag: () => vandaag || '2027-06-14'
@@ -235,7 +236,7 @@ test('een kwalificatie is een filter voor de rol, geen rol', () => {
   assert.equal(K.scopeMag('lid_r', 'mens', doel).ok, true, 'de rol zelf hoort ongemoeid te blijven');
 });
 
-test('een uitnodiging maakt pas een dienstverband als iemand accepteert', () => {
+test('een uitnodiging maakt pas een dienstverband als iemand accepteert', async () => {
   const K = bouw();
   const e = maakEnt(K, 'Hotel Noordzee BV');
   const v = K.vestigingNieuw(e, { naam: 'Amsterdam', plaats: 'Amsterdam' }).vestiging;
@@ -250,12 +251,12 @@ test('een uitnodiging maakt pas een dienstverband als iemand accepteert', () => 
   assert.equal(JSON.stringify(t).includes(e.id), false, 'er hoort geen id in de uitnodigingstekst te staan');
   assert.match(t.voet, /gratis/i, 'een werknemer hoort te lezen dat werken hier geen pas kost');
 
-  const acc = K.uitnodigingAccepteer(u.uitnodiging.code, 'lid_n');
+  const acc = await K.uitnodigingAccepteer(u.code, 'lid_n');
   assert.equal(acc.ok, true);
   assert.equal(K.employmentVanEntiteit(e.id, false).length, 1);
 
   // eenmalig: een doorgestuurde uitnodiging laat geen tweede mens binnen
-  assert.equal(K.uitnodigingAccepteer(u.uitnodiging.code, 'lid_o').ok, undefined);
+  assert.equal((await K.uitnodigingAccepteer(u.code, 'lid_o')).ok, undefined);
   assert.equal(K.employmentVanEntiteit(e.id, false).length, 1);
 });
 
@@ -367,12 +368,12 @@ test('een momentopname zet de structuur terug en zegt eerlijk wat hij niet terug
     'een herstelknop waarvan de reikwijdte onduidelijk is, is gevaarlijker dan geen herstelknop');
 });
 
-test('de twee eindervaringen zijn één zin, geen stappenteller', () => {
+test('de twee eindervaringen zijn één zin, geen stappenteller', async () => {
   const K = bouw();
   const e = maakEnt(K, 'Hotel BV');
   const v = K.vestigingNieuw(e, { naam: 'Amsterdam' }).vestiging;
   const u = K.uitnodigingNieuw('lid_a', { entiteit: e.id, vestiging: v.id, rol: 'receptie' });
-  K.uitnodigingAccepteer(u.uitnodiging.code, 'lid_w');
+  await K.uitnodigingAccepteer(u.code, 'lid_w');
 
   const o = K.concernOverzicht('lid_a');
   assert.equal(o.kop, 'Uw concern is opgebouwd.');

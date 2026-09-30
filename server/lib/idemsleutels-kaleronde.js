@@ -37,7 +37,6 @@ const SLEUTELS = {
   'POST /api/foundation/gezin/droom/maak': { zelfdeVerzoek: true },    // de tekst van de droom
   'POST /api/foundation/gezin/gezondheid/medicijn': { zelfdeVerzoek: true },  // naam van het medicijn
   'POST /api/foundation/gezin/klus': { zelfdeVerzoek: true },          // titel + sterren + voor wie
-  'POST /api/foundation/les/maak': { zelfdeVerzoek: true },            // vak + docentnaam
   'POST /api/foundation/school/bezoeker/aanmeld': { zelfdeVerzoek: true },    // naam + organisatie
   'POST /api/foundation/school/leerling/aanmeld': { zelfdeVerzoek: true },    // naam + opleiding
   'POST /api/foundation/school/subsidie/zet': { zelfdeVerzoek: true },        // naam + verstrekker

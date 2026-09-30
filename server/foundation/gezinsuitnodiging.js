@@ -1,12 +1,15 @@
 /* Persoonlijke gezinsuitnodigingen. Een gezinscode is een adres, geen bewijs
    dat iemand familie is. Daarom koppelen volwassenen en gasten met een
    eenmalige CSPRNG-sleutel: de beheerder nodigt uit, de ontvanger accepteert.
-   Alleen de hash ligt in de database; de sleutel verloopt na 48 uur. */
+   Alleen de hash ligt in de database; de sleutel verloopt na 48 uur. Het
+   INWISSELEN is een atomaire claim (./gezinsclaim.js): een uitnodiging levert
+   precies een profiel op, ook bij twee tikken of twee instances tegelijk. */
 module.exports = (ctx) => {
   const { router, G, save, nu, rid, schoon, crypto, gezinVan, beheerderVan,
     profielVan, tokenUit, hashPin, checkPin, geldigePin, schoonAvatar,
     schoonKleur, ensureCodenaam, pubProfiel, pubGezin, teVaak,
-    misluktePoging, goedePoging, ipVan } = ctx;
+    misluktePoging, goedePoging, ipVan, gezinstoken, bewerkCollectie } = ctx;
+  const claimer = require('./gezinsclaim').maak({ bewerkCollectie, crypto, tokens: gezinstoken, nu, rid, ensureCodenaam });
   const ROLLEN = ['ouder', 'gezinslid', 'gast'];
   const DUUR = 48 * 60 * 60 * 1000;
   const hash = waarde => crypto.createHash('sha256').update(String(waarde || '')).digest('hex');
@@ -40,16 +43,12 @@ module.exports = (ctx) => {
     for (const p of Object.values(g.profielen || {})) if (p.pin && await checkPin(p.pin, pin)) return true;
     return false;
   }
-  function nieuwProfiel(g, u, extra) {
-    const p = { id:rid(4), naam:u.naam, rol:u.rol, avatar:schoonAvatar(extra.avatar),
-      kleur:schoonKleur(extra.kleur), groep:'volw', token:rid(24), at:nu(),
-      uitnodigingId:u.id, relatie:u.relatie || '' };
-    ensureCodenaam(p); g.profielen[p.id] = p; return p;
+  /* De claim zelf; een mislukking van de opslag is een storing en geen 'ongeldig'. */
+  async function claim(sleutel, opties) {
+    try { return await claimer.claim(Object.assign({ code:sleutel.code, geheim:sleutel.geheim }, opties)); }
+    catch (e) { return { status:503 }; }
   }
-  function rondAf(g, u, p, wijze) {
-    u.status = 'geaccepteerd'; u.geaccepteerdAt = nu(); u.profielId = p.id;
-    u.wijze = wijze; delete u.sleutelHash; save();
-  }
+  const nieuw = uit => { const g = G()[uit.code]; return { g, p:g && g.profielen[uit.profielId] }; };
 
   function maak(req, res) {
     const g = gezinVan(req, res); if (!g) return;
@@ -105,19 +104,27 @@ module.exports = (ctx) => {
       return res.status(400).json({ error:'Accepteer de gezinskoppeling en de privacy-uitleg.' });
     if (!geldigePin(req.body.pin)) return res.status(400).json({ error:'Kies uw eigen pincode van 4 tot 6 cijfers.' });
     if (await pinBestaat(r.g, req.body.pin)) return res.status(409).json({ error:'Kies een andere pincode dan de andere gezinsleden.' });
-    const p = nieuwProfiel(r.g, r.u, req.body); p.pin = await hashPin(req.body.pin);
-    rondAf(r.g, r.u, p, 'foundation'); goedePoging(bucket);
+    const pin = await hashPin(req.body.pin);
+    const uit = await claim(leesSleutel(req.body.uitnodiging), { metSessie:true,
+      profiel:{ avatar:schoonAvatar(req.body.avatar), kleur:schoonKleur(req.body.kleur), pin } });
+    if (uit.status === 503) return res.status(503).json({ error:'De uitnodiging kon nu niet worden verwerkt. Probeer het zo opnieuw.' });
+    if (!uit.ok) { misluktePoging(bucket, 6, 15); return res.status(404).json({ error:'Deze uitnodiging bestaat niet, is gebruikt of is verlopen.' }); }
+    goedePoging(bucket);
+    const { g, p } = nieuw(uit);
     try { ctx.welkomRtf(ensureCodenaam(p)); } catch (e) {}
-    res.json({ ok:true, code:r.g.code, token:p.token, profiel:pubProfiel(p), gezin:pubGezin(r.g) });
+    res.json({ ok:true, code:uit.code, token:uit.token, profiel:pubProfiel(p), gezin:pubGezin(g) });
   }
-  function accepteerGast({ uitnodiging, userId, tier, codenaam }) {
-    const r = zoek(uitnodiging);
-    if (!r || verlopen(r.u)) return { error:'Deze uitnodiging bestaat niet, is gebruikt of is verlopen.', status:404 };
-    if (r.u.rol !== 'gast') return { error:'Open deze uitnodiging in FOUNDATION en kies daar uw eigen pincode.', status:409 };
-    const p = nieuwProfiel(r.g, r.u, {});
-    p.koppel = { userId, tier, tierNaam:({ rtg:'RTG Pass', lifestyle:'Lifestyle Pass', business:'Business Pass' }[tier] || 'RTG Pass'), codenaam:codenaam || 'lid', at:nu() };
-    rondAf(r.g, r.u, p, 'rtg-account');
-    return { ok:true, gezinNaam:r.g.naam, profielNaam:p.naam, tierNaam:p.koppel.tierNaam };
+  async function accepteerGast({ uitnodiging, userId, tier, codenaam }) {
+    const s = leesSleutel(uitnodiging);
+    if (!s) return { error:'Deze uitnodiging bestaat niet, is gebruikt of is verlopen.', status:404 };
+    const tierNaam = { rtg:'RTG Pass', lifestyle:'Lifestyle Pass', business:'Business Pass' }[tier] || 'RTG Pass';
+    const uit = await claim(s, { alleenGast:true, profiel:{ avatar:schoonAvatar(''), kleur:schoonKleur(''),
+      koppel:{ userId, tier, tierNaam, codenaam:codenaam || 'lid', at:nu() } } });
+    if (uit.status === 503) return { error:'De uitnodiging kon nu niet worden verwerkt. Probeer het zo opnieuw.', status:503 };
+    if (uit.status === 409) return { error:'Open deze uitnodiging in FOUNDATION en kies daar uw eigen pincode.', status:409 };
+    if (!uit.ok) return { error:'Deze uitnodiging bestaat niet, is gebruikt of is verlopen.', status:404 };
+    const { g, p } = nieuw(uit);
+    return { ok:true, gezinNaam:g.naam, profielNaam:p.naam, tierNaam };
   }
 
   router.post('/gezin/uitnodiging/maak', maak);

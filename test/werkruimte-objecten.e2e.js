@@ -41,6 +41,30 @@ test('Werkruimte: een object slepen is een voorstel, en pas een mens voert het u
     browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 1600, height: 1000 } });
     const page = await ctx.newPage();
+    /* Elke surface laadt EEN keer. Het gedeelde kader van #413 verhuist de
+       pagina naar zijn middenkolom; een gewone verhuizing laadt een <iframe>
+       opnieuw (de surface verliest zijn stand, en een frame waar net iets naar
+       gestuurd werd bestaat niet meer). Geteld vanaf het eerste begin. */
+    await page.addInitScript(() => {
+      window.__rtgFrameLoads = {};
+      document.addEventListener('load', (e) => {
+        const t = e.target;
+        if (t && t.tagName === 'IFRAME') { const k = new URL(t.src, location.href).pathname; window.__rtgFrameLoads[k] = (window.__rtgFrameLoads[k] || 0) + 1; }
+      }, true);
+    });
+    /* Het kader pas laten komen als de surfaces al geladen zijn, zoals op een
+       drukke telefoon. Zonder dit hangt het van de klok af of de verhuizing voor
+       of na het eerste laden valt, en ziet de telling hierboven de fout maar
+       soms (met een vaste wachttijd van 2,5 s bleef de mutatie een keer groen). */
+    await page.route('**/shared/interface/world-desktop-surface.js', async (r) => {
+      for (let i = 0; i < 150; i++) {
+        const klaar = await page.evaluate(() => !!(window.__rtgFrameLoads && window.__rtgFrameLoads['/apps/agenda.html'] &&
+          window.__rtgFrameLoads['/apps/reizen.html'])).catch(() => false);
+        if (klaar) break;
+        await new Promise((k) => setTimeout(k, 100));
+      }
+      await r.continue();
+    });
     await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
@@ -61,6 +85,12 @@ test('Werkruimte: een object slepen is een voorstel, en pas een mens voert het u
     // de surfaces moeten geladen zijn voordat ze op berichten kunnen antwoorden
     // de surfaces moeten geladen zijn voordat ze op berichten kunnen antwoorden
     await wachtOpRust(page, null, { rondes: 3 });
+    await page.waitForSelector('body[data-rtg-desktop-state="ready"]', { timeout: 15000 });
+    await wachtOpRust(page, null, { rondes: 2 });
+    const laden = await page.evaluate(() => window.__rtgFrameLoads);
+    for (const pad of ['/apps/agenda.html', '/apps/reizen.html']) {
+      assert.equal(laden[pad], 1, 'de surface ' + pad + ' laadde meer dan eens: ' + JSON.stringify(laden));
+    }
 
     /* Het object komt uit Reizen. We bootsen het OPPAKKEN na op de manier
        waarop de app het stuurt -- via postMessage uit het reizen-frame -- want

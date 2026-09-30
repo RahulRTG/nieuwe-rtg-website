@@ -3,9 +3,8 @@
    undo). Krijgt de gedeelde context een keer bij het opstarten vanuit
    foundation/onderwijs.js. */
 module.exports = (octx) => {
-  const { router, F, save, nu, rid, schoon, crypto, anthropic, LETTERS, SYSTEM, DEMO, TIPS,
-    teVaak, misluktePoging, ipVan,
-    nieuweCode, sse, stuur, online, presentie, lesVan, docentCheck, leerlingVan, lesPubliek } = octx;
+  const { router, F, save, nu, rid, schoon, teVaak, misluktePoging, goedePoging, ipVan,
+    toegang, ruimOudeLessen, rolVanVerzoek, sse, stuur, presentie, lesVan, docentCheck, lesPubliek } = octx;
 
   /* ---------- les maken / meedoen ---------- */
   /* EEN REM OP HET MAKEN, en niet alleen op het raden. `lesVan()` begrenst wie
@@ -27,24 +26,49 @@ module.exports = (octx) => {
      probleem: er komt een les bij. Vandaar `misluktePoging` zonder een misser --
      de functie heet naar zijn eerste gebruik en telt gewoon een tik. Zie
      `/gezin/maak` in ../gezin.js, waar precies hetzelfde staat met acht. */
-  router.post('/les/maak', (req, res) => {
+  /* DE CODES STAAN KAAL ALLEEN IN DIT ANTWOORD (lib/eenmalig-geheim-routes.js):
+     `lescode` voor de klas en `token` voor de begeleider. Een herhaling met
+     dezelfde `idem` maakt geen tweede les en toont niets opnieuw (409). */
+  router.post('/les/maak', async (req, res) => {
     const bak = 'lesmaak:' + ipVan(req);
     if (teVaak(res, bak)) return;
     misluktePoging(bak, 20, 60);
-    const code = nieuweCode();
-    const les = { code, vak: schoon(req.body.vak, 40) || 'Les', docentNaam: schoon(req.body.naam, 40) || 'Begeleider',
-      teacherToken: rid(24), bord: { strokes: [] }, leerlingen: {}, opgaven: [], agenda: [], at: nu() };
-    F().lessen[code] = les; save();
-    res.json({ code, token: les.teacherToken, les: lesPubliek(les) });
+    const uit = await toegang.nieuweLes({ idem: typeof req.body.idem === 'string' ? req.body.idem : null });
+    if (!uit.ok) return res.status(uit.status).json({ error: uit.error, herhaald: uit.herhaald || undefined });
+    if (ruimOudeLessen()) save();
+    const les = { id: uit.lesId, v: 2, vak: schoon(req.body.vak, 40) || 'Les', docentNaam: schoon(req.body.naam, 40) || 'Begeleider',
+      bord: { strokes: [] }, leerlingen: {}, opgaven: [], agenda: [], at: nu() };
+    F().lessen[les.id] = les; save();
+    res.set('Cache-Control', 'no-store');
+    res.json({ lesId: les.id, lescode: uit.lescode, token: uit.token, verloopt: uit.expires_at, les: lesPubliek(les) });
   });
-  router.post('/les/join', (req, res) => {
-    const les = lesVan(req, res); if (!les) return;
+  /* MEEDOEN IS DE CLAIM: de lescode telt een toetreding in de collectie-
+     transactie en levert een eigen leerlingsleutel. De naam is alleen voor de
+     begeleider; de sleutel draagt hem niet. Een naam die al meedoet krijgt 409 en
+     nooit de sleutel van die ander -- zo kon je vroeger iemands schrift openen. */
+  router.post('/les/join', async (req, res) => {
+    const bak = 'lescode:' + ipVan(req);
+    if (teVaak(res, bak)) return;
     const naam = schoon(req.body.naam, 40);
     if (!naam) return res.status(400).json({ error: 'Vul je naam in.' });
-    let l = Object.values(les.leerlingen).find(x => x.naam.toLowerCase() === naam.toLowerCase());
-    if (!l) { const sid = rid(4); l = { studentId: sid, naam, token: rid(24), schrift: { pages: [] }, at: nu() }; les.leerlingen[sid] = l; save(); }
-    res.json({ token: l.token, studentId: l.studentId, naam: l.naam, les: lesPubliek(les), bord: les.bord.strokes, schrift: l.schrift });
-    presentie(les.code);
+    const bezet = lesId => {
+      const les = F().lessen[lesId];
+      if (!les) return 'Deze les is afgelopen.';
+      return Object.values(les.leerlingen).some(x => !x.ingetrokken_at && x.naam.toLowerCase() === naam.toLowerCase())
+        ? 'Er doet al iemand mee met deze naam. Kies een andere naam, of vraag je begeleider om je oude toegang in te trekken.' : null;
+    };
+    const uit = await toegang.claim(req.body.lescode, bezet);
+    if (!uit.ok) {
+      if (uit.status === 404) misluktePoging(bak, 20, 10);
+      return res.status(uit.status).json({ error: uit.error });
+    }
+    goedePoging(bak);
+    const les = F().lessen[uit.lesId];
+    const l = { studentId: uit.studentId, naam, schrift: { pages: [] }, at: nu() };
+    les.leerlingen[l.studentId] = l; ruimOudeLessen(); save();
+    res.set('Cache-Control', 'no-store');
+    res.json({ token: uit.token, studentId: l.studentId, naam: l.naam, lesId: les.id, les: lesPubliek(les), bord: les.bord.strokes, schrift: l.schrift });
+    presentie(les.id);
   });
   /* VIA lesVan() EN NIET RECHTSTREEKS, hoe verleidelijk kort dat ook staat: de
      rem op het raden van een lescode woont daar, en dit is juist de LEESkant
@@ -62,22 +86,18 @@ module.exports = (octx) => {
      stroom bij een 404 -- en het scheelt een tweede 404-vorm in dit bestand. */
   router.get('/les/:code/stream', (req, res) => {
     const les = lesVan(req, res); if (!les) return;
+    const w = rolVanVerzoek(req);
     const role = req.query.role === 'docent' ? 'docent' : 'leerling';
-    if (role === 'docent' && req.query.token !== les.teacherToken) return res.status(403).end();
-    let studentId = null;
-    if (role === 'leerling') {
-      const l = Object.values(les.leerlingen).find(x => x.token === req.query.token);
-      if (!l) return res.status(403).end();
-      studentId = l.studentId;
-    }
+    if ((role === 'docent') !== (w.rol === 'leraar')) return res.status(403).end();
+    const studentId = w.rol === 'leerling' ? w.studentId : null;
     res.set({ 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', Connection: 'keep-alive', 'X-Accel-Buffering': 'no' });
     res.write('retry: 3000\n\n');
     const client = { res, role, studentId };
-    let set = sse.get(les.code); if (!set) { set = new Set(); sse.set(les.code, set); }
+    let set = sse.get(les.id); if (!set) { set = new Set(); sse.set(les.id, set); }
     set.add(client);
-    presentie(les.code);
+    presentie(les.id);
     const hart = setInterval(() => { try { res.write(': ping\n\n'); } catch (e) {} }, 25000);
-    req.on('close', () => { clearInterval(hart); set.delete(client); presentie(les.code); });
+    req.on('close', () => { clearInterval(hart); set.delete(client); presentie(les.id); });
   });
 
   /* ---------- het bord ---------- */
@@ -94,16 +114,16 @@ module.exports = (octx) => {
     les.bord.strokes.push(stroke);
     if (les.bord.strokes.length > 8000) les.bord.strokes.splice(0, les.bord.strokes.length - 8000);
     save();
-    stuur(les.code, 'stroke', stroke, c => c.role === 'leerling');
+    stuur(les.id, 'stroke', stroke, c => c.role === 'leerling');
     res.json({ ok: true, id: stroke.id });
   });
   router.post('/bord/wis', (req, res) => {
     const les = lesVan(req, res); if (!les) return; if (!docentCheck(les, req, res)) return;
-    les.bord.strokes = []; save(); stuur(les.code, 'wis', {}, c => c.role === 'leerling'); res.json({ ok: true });
+    les.bord.strokes = []; save(); stuur(les.id, 'wis', {}, c => c.role === 'leerling'); res.json({ ok: true });
   });
   router.post('/bord/undo', (req, res) => {
     const les = lesVan(req, res); if (!les) return; if (!docentCheck(les, req, res)) return;
-    les.bord.strokes.pop(); save(); stuur(les.code, 'bord', { strokes: les.bord.strokes }, c => c.role === 'leerling'); res.json({ ok: true });
+    les.bord.strokes.pop(); save(); stuur(les.id, 'bord', { strokes: les.bord.strokes }, c => c.role === 'leerling'); res.json({ ok: true });
   });
   router.get('/bord/:code', (req, res) => {
     const les = lesVan(req, res); if (!les) return;

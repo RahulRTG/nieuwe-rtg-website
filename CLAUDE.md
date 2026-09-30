@@ -126,6 +126,33 @@ standen extra, want met een gebouwd OSM-pakket onder de voeten stond er
 met de reden: de OSM-bouwer en het pakket op het TOESTEL (stap 2), plus waarom
 het OPHALEN van de index hier niet te bewijzen is (de proxy weigert de bron met
 een 403, dus het ontleden is beproefd en het ophalen niet — graad `vermoed`).
+**`NAVIGATIE.md` is de plaats-these** — een richtingsdocument boven PLAATS.md en
+KAARTEN.md: *een kaart vertelt waar iets is; RTG Plaats helpt een bedoeling op
+een plaats slagen, terwijl de positie van de mens zoveel mogelijk op diens
+toestel blijft.* Lees die vóór je aan navigatie, reistijd, aankomst of een
+plaatsgegeven van een zaak werkt. De omkering: een plaats wordt rijker uit haar
+operationele BRONNEN (kassa, reservering, partner-event), nooit uit het
+bewegingsspoor van haar bezoekers (P-05, sinds 29 september 2026 hard, par. 15.0). Zes grondwetsregels (P-01 t/m P-06), een restaurantketen
+als eerste proef met een storingsmatrix, en het **dubbelbewijs**: kunnen én
+aantoonbaar niet hoeven weten, en die twee worden nooit opgeteld. Het heet met
+opzet een these en geen categorie tot de poort van par. 13 groen staat. Let op
+de nulmeting in par. 6.2: bij lezing staat geen van de vijf
+terughoudendheidstellers op nul, en de scherpste vondst zit in de plaatslaag
+zelf — tijdens een naderingsvenster komt elke passage langs een zaak onder een
+codenaam 90 dagen in `plaatsLog`. De eerste stap is daarom geen functie maar
+twee metingen (`plaatsvorm` en `positiestroom`; de tweede staat sinds 29 september,
+`npm run positiestroom`: 35 stromen, 20 zonder termijn, 20 buiten de
+vergeetroute; vijftien besluiten genomen en uitgevoerd (N12-N15), de negentien
+onbegrensde worden per stroom beslist), en de tellers worden een
+permanente meter: groen betekent dat de code aantoonbaar geen verboden
+bewegingsspoor maakt, niet dat het beleid dat zegt. Aankomst wordt nooit uit een
+opgeslagen positie bewezen. Dat is geen pleidooi voor minder GPS (N11): tijdens
+een taak mag alles wat goede navigatie vraagt, en de grens gaat over wat er na
+de taak van de mens overblijft -- huidige positie en een begrensd venster wel,
+een bewegingsgeschiedenis niet. Namen: in dit huis is een `spoor` het AUDITspoor
+(`stilspoor`, `spoorvorm`), dus posities heten een bewegingsspoor; `bereik` en
+`overdracht` zijn bezet (de ETA-dienst heet `reistijd`, de overgang `doorgave`),
+en "World" botst met WERELDEN.md.
 **`FOUNDATION.md` is het diepte-document van de RTFoundation als platform** —
 Personal & Civic Operating System, op drie niveaus tegelijk: individu,
 professional, organisatie. Het doet LEVEN.md niet over (dat blijft gelden en gaat
@@ -232,8 +259,10 @@ besluit 4c open voor een gratis account NA een paspoortcontrole
 betaalde pas niets nieuws oplegt); de meter meet daarom een GECONTROLEERD gratis
 account. Let op de meetfout die eraan voorafging:
 `tier === 'guest'` is TWEE mensen -- een bezoeker zonder account (die `geenGast()`
-weigert) en een Community-lid met account -- en de demo-inlog `gast` van de
-doelgroepmeter is alleen de eerste. Wie "gratis" meet, registreert een account.
+weigert) en een Community-lid met account -- en de demo-inlog `gast` is alleen
+de eerste. Wie "gratis" meet, registreert een account: daarvoor is er
+`scripts/lib/gratisaccount.js`, en de doelgroepmeter draagt `gast` sindsdien in
+twee vormen (bezoeker en gratis account, SAMENLEVING.md par. 11.3).
 
 **`CONNECT.md` is het diepte-document van Foundation Connect** -- het
 ontdeknetwerk van FoundationOS, op het scherm **Ontdekken**. In een zin: *je komt
@@ -927,8 +956,10 @@ staat, een stap weg is, een besluit vraagt of jaren weg is. Wat bovenaan par. 7
 stond is sinds 27 september gedaan: **de twee autoplanners en het weekrooster
 lezen verzuim** (`kern/payroll/inplanbaar.js`) en plannen automatisch alleen wie
 er volledig is -- deels inzetbaar plant een mens in, en het teamrooster zegt DAT
-iemand afwezig is en nooit waarom. De festival-, OV-, taxi- en schoolplanners
-lezen het nog niet.
+iemand afwezig is en nooit waarom. Sinds 29 september lezen ook OV, festival en
+taxi het; bij de laatste twee hing een dienst en een voertuig eerst aan een vrije
+naam, en die kregen daarom een koppeling aan een teamlid. De school heeft een
+eigen verlofregister en hangt er met opzet niet aan.
 
 **`VRIJHEID.md` is de mens die in dat rooster staat** -- RTG Vrijheid: tijd,
 rust, vrijheid en eerlijkheid voor wie bij RTG of een zaak werkt, in
@@ -1236,9 +1267,20 @@ een ZAAK heeft het meeste al (Team Room, `/api/staff/*`: klok, verlof,
 ziekmelden zonder reden-veld, Fluister voor de vloer met een geheugen dat de
 werkgever nooit ziet), terwijl RTG's eigen kantoor er niets van heeft -- dus er
 komt geen tweede personeelsportaal maar **RTG wordt de eerste klant van zijn
-eigen WorkOS** (besluit B1). "Staff Concierge", "Passport" en "Mijn RTG" zijn
+eigen WorkOS** (besluit B1, genomen op 27 september 2026: ja, helemaal). De eerste stap
+staat in de schaduw: de eigenaar wijst in de boardroom aan welke entiteit RTG
+IS (`kern/kantoor/huis.js`), en de toegangsreview rekent per kantoorhouder uit
+of er een dienstverband loopt -- uitgerekend en niet opgeslagen, want een
+dienstverband eindigt op een datum. Afdwingen is een volgend besluit. "Staff Concierge", "Passport" en "Mijn RTG" zijn
 bezet; de concierge bestaat al en heet Fluister, het paspoort is een lezing van
-`kern/carriereledger/`. En geen score op een mens, geen "waarschijnlijk" zonder
+`kern/carriereledger/`. De drie andere besluiten zijn op 28 september genomen: een
+vrije verjaardag is een RECHT voor iedereen (standaard uit, zelf aanzetten),
+het loopbaanbewijs heet op het scherm **Mijn loopbaan**, en Fluister biedt
+**alleen op vraag** aan -- de ochtendkaart toont dus wat er staat en stelt niets
+voor. Die kaart staat (`kern/ochtendkaart.js`, `/api/staff/ochtend`, bovenaan
+Vandaag in de personeelsapp): "Alles staat voor je klaar" alleen als elke regel
+GEMETEN is, een afwezige collega is een aantal en nooit een naam, en een
+levering heeft geen tijd omdat een order er geen draagt. De kaart en de planners lezen dezelfde regel (`kern/payroll/inplanbaar.js`); een mens die toch een afwezige inplant wordt niet tegengehouden maar ziet het erbij (`verzuimWaarschuwing`, `verzuimBijVaststellen`). En geen score op een mens, geen "waarschijnlijk" zonder
 meting, en alles wat een tweede persoon bereikt (een ruil, ook voor een
 verjaardag) bevestigt een mens.
 **`MUTATIECONTRACT.md` is de laag ernaast** — niet wie iets mag (dat is
@@ -1431,8 +1473,8 @@ in de ontwikkelaarsroute** (de beproevingsomgeving voor software is een eigen
 ding, met `scripts/aanval.js` en `scripts/chaos.js` als eerste bouwstenen), de
 App Store-keuring keek niet naar toegankelijkheid (inmiddels wél, en als POORT:
 zie par. 9.2), en er is geen kostenvlak. En
-par. 10 draait één aanname om die vaak fout gaat: van <!--getal:idem.routesMetRol-->4258<!--/getal--> routes met een rol
-zijn er <!--getal:idem.beoordeeld-->1730<!--/getal--> beproefd op herhaalbaarheid en <!--getal:idem.ongemeten-->3290<!--/getal--> ongemeten (`IDEMPROEF.json`,
+par. 10 draait één aanname om die vaak fout gaat: van <!--getal:idem.routesMetRol-->4376<!--/getal--> routes met een rol
+zijn er <!--getal:idem.beoordeeld-->1739<!--/getal--> beproefd op herhaalbaarheid en <!--getal:idem.ongemeten-->3409<!--/getal--> ongemeten (`IDEMPROEF.json`,
 levend getal — `npm run getallen` houdt het bij),
 maar het doel is **niet alles idempotent — het is alles geclassificeerd**, met
 `UNKNOWN` verboden voor nieuwe publiek aanroepbare ontwikkelaarsopdrachten.
@@ -1460,8 +1502,8 @@ weigert wat op een contactgegeven lijkt, want met `REDIS_URL` gaat hij over een
 netwerk), **`onbekend` is geen `openbaar`** (en een gevolg erft de classificatie
 niet — dat zou raden zijn), en **de levering gaat voor** (een geweigerde actor
 houdt een melding nooit tegen, maar verdwijnt ook nooit stil). Wat er nog niet is,
-staat er met de meting erbij: van de <!--getal:idem.beoordeeld-->1730<!--/getal--> beproefde muterende routes zijn er
-<!--getal:idem.beschermd-->1729<!--/getal--> retry-veilig, en een schemaregister (`payment.authorized.v1` met een vorm
+staat er met de meting erbij: van de <!--getal:idem.beoordeeld-->1739<!--/getal--> beproefde muterende routes zijn er
+<!--getal:idem.beschermd-->1734<!--/getal--> retry-veilig, en een schemaregister (`payment.authorized.v1` met een vorm
 erachter) bestaat niet — de envelop zegt met opzet nooit WAT. Zeven punten die een besluit van de eigenaar vragen staan in par. 4.
 **Het goedkoopste daarvan is genomen (27 augustus 2026):** het woord dat in twee
 lagenmodellen niet hetzelfde betekende, is hernoemd — laag 4 van `PLATFORM.md`
@@ -1546,7 +1588,7 @@ mórgen nog klopt. Lees die vóór je een begrip introduceert, een register aanl
 of een scorecard bouwt. De opzet vraagt een semantisch register naar aanleiding
 van de twee `VERMOGENS`; de vraag ervóór is gemeten (`scripts/semantiek.js`,
 `SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->131<!--/getal--> namen die in meer dan
-één domein staan, dragen er **<!--getal:semantiek.betekenissen-->113<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->419<!--/getal-->
+één domein staan, dragen er **<!--getal:semantiek.betekenissen-->113<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->420<!--/getal-->
 betekenissen, met `SOORTEN` op **39**. Daarnaast **29** betekenissen die op meer
 dan één plek wonen én **106** paren die dezelfde waarheid onder een ándere naam
 dragen — die tweede ronde bestaat omdat de eerste ze miste, en de duurste
@@ -1994,7 +2036,7 @@ afkapgrens van vijftien sneed midden in een GELIJKE score, dus /api/bank/pas/bet
 viel op alfabet af terwijl /api/bank/advies bleef. Een gelijke score afkappen is
 willekeur, en willekeur verbergt een vermogen zonder dat iemand het merkt.
 **En meetgetallen in de documenten verouderen niet meer**: `npm run getallen`
-schrijft ze tussen merktekens uit de registers (`<!--getal:idem.ongemeten-->3290<!--/getal--> randen,
+schrijft ze tussen merktekens uit de registers (`<!--getal:idem.ongemeten-->3409<!--/getal--> randen,
 <!--getal:verstrengeling.onverklaard-->0<!--/getal--> onverklaard — en dát getal moet naar nul, niet het
 aantal randen), de activering per functie, de deltapoort die er niets bij laat
 komen, de tredeproef over alle zeven treden van LAUNCH.md (0 lekken), en de
@@ -2428,8 +2470,8 @@ gemeten leespaden en geen bevestigroute. De fundering is gemeten en niet
 verklaard: `npm run bedrijfsmaat` (`BEDRIJFSMAAT.json`, catalogus in
 `server/kern/bedrijfsmaat/`) houdt per maat vier elementen tegen de code --
 bron, definitie, projectie, bewijs -- met vier gatsoorten en een
-afhankelijkheidsgraaf; <!--getal:bedrijfsmaat.bestaat-->44<!--/getal--> van <!--getal:bedrijfsmaat.maten-->67<!--/getal--> maten bestaan en
-<!--getal:bedrijfsmaat.ketensGegrond-->4<!--/getal--> van zes ketens is gegrond. Drie dingen die niet mogen sneuvelen: **lenzen,
+afhankelijkheidsgraaf; <!--getal:bedrijfsmaat.bestaat-->56<!--/getal--> van <!--getal:bedrijfsmaat.maten-->67<!--/getal--> maten bestaan en
+<!--getal:bedrijfsmaat.ketensGegrond-->6<!--/getal--> van zes ketens is gegrond. Drie dingen die niet mogen sneuvelen: **lenzen,
 geen breinen** (geen eigen opslag per lens), **de groepspoort staat aan de bron
 van een maat** (`bedrijfsmaat/poort.js`: onder de grens geen waarde, geen nul en
 geen aantal, ook op het kantoorscherm; werklijsten per persoon blijven voor een
@@ -2451,13 +2493,13 @@ het meten: de sluiting van het stuur is klein en precies één module leest van
 schijf -- `VERTROUWEN.json`, een REGISTER. Een register lezen mag, een `.js`
 lezen niet; dát onderscheid is de invariant. De vraag of de 77 registers samen
 één Codewereld vormen is eerst GEMETEN (`npm run codewereld`, `CODEWERELD.json`)
-in plaats van aangenomen -- zelfde reden als bij `Asset`: <!--getal:codewereld.ruggengraat-->6108<!--/getal--> van
-<!--getal:codewereld.paden-->6553<!--/getal--> paden staan in meer dan één register, dus er IS een ruggengraat, maar hij
+in plaats van aangenomen -- zelfde reden als bij `Asset`: <!--getal:codewereld.ruggengraat-->6119<!--/getal--> van
+<!--getal:codewereld.paden-->6564<!--/getal--> paden staan in meer dan één register, dus er IS een ruggengraat, maar hij
 loopt over de as ROUTE. De as SYMBOOL is **nul** -- geen register kent een
 functienaam met een plaats, dus het objectvoorbeeld `pay.boeken` met een
 `symbol`-veld belooft iets wat geen enkele meter vult. Die as is
-inmiddels GEBOUWD (`npm run symbolen`, `SYMBOLEN.json`): <!--getal:symbolen.totaal-->24598<!--/getal--> benoemde symbolen
-met een regelnummer en <!--getal:symbolen.kanten-->6474<!--/getal--> require-kanten heen en terug, met de eigen parser
+inmiddels GEBOUWD (`npm run symbolen`, `SYMBOLEN.json`): <!--getal:symbolen.totaal-->23473<!--/getal--> benoemde symbolen
+met een regelnummer en <!--getal:symbolen.kanten-->6083<!--/getal--> require-kanten heen en terug, met de eigen parser
 en <!--getal:symbolen.parsefout-->0<!--/getal--> parsefouten. De <!--getal:symbolen.nietGelezen-->309<!--/getal--> niet-gelezen bestanden staan er MET reden in
 (bundeldelen die pas samengevoegd een programma vormen) -- weglaten zou ze
 onzichtbaar maken. Wat hij met opzet niet doet: aanroepers raden (een naam in
@@ -2477,11 +2519,11 @@ grens vandaag niet -- en dat ene getal verbergt nog iets, want `server/` haalt
 vrijwel niets (6,6%) tot `SCHERMROUTES.json` erbij kwam, dat per bestand in
 public/ leest welke API-paden het noemt en daarmee de keten scherm -> route legt.
 De aanroepgraaf ligt er sinds dezelfde dag naast (`AANROEPGRAAF.json`,
-<!--getal:graaf.kanten-->28800<!--/getal--> kanten): wie roept wie aan, en welk symbool handelt welke route af
-(<!--getal:graaf.routesMetSymbool-->3242<!--/getal--> routes). Daarmee loopt de impactketen scherm -> route -> bestand ->
+<!--getal:graaf.kanten-->27314<!--/getal--> kanten): wie roept wie aan, en welk symbool handelt welke route af
+(<!--getal:graaf.routesMetSymbool-->3159<!--/getal--> routes). Daarmee loopt de impactketen scherm -> route -> bestand ->
 functie uit registers alleen. Let daar op twee dingen. Ten eerste is
-<!--getal:graaf.opgelostPct-->26.3<!--/getal-->% opgelost geen tekort maar een indeling: het meeste dat overblijft is
-`res.json()` of `String()`, en <!--getal:graaf.contextobject-->16712<!--/getal--> aanroepen lopen via het CONTEXTOBJECT dat
+<!--getal:graaf.opgelostPct-->25.9<!--/getal-->% opgelost geen tekort maar een indeling: het meeste dat overblijft is
+`res.json()` of `String()`, en <!--getal:graaf.contextobject-->16017<!--/getal--> aanroepen lopen via het CONTEXTOBJECT dat
 in server/opzet/ wordt samengesteld. Dat leek statisch onherleidbaar tot
 `CONTEXTPROEF.json` het NAMAT (`npm run contextproef`, een runtime-meting in de
 domeingrens-Proxy): van de <!--getal:context.aanHetWerk-->3214<!--/getal--> routes die werk deden reiken er maar
@@ -2491,12 +2533,12 @@ keerde de voorspelling om, en dat is precies waarom hij er is. `KERNHERKOMST.jso
 (`npm run kernherkomst`) volgt die aanwijzing en beantwoordt wie welke naam in de
 zak legt: <!--getal:kern.namen-->1246<!--/getal--> namen over <!--getal:kern.vulplekken-->300<!--/getal--> vulplekken, met <!--getal:kern.onopgelost-->29<!--/getal--> plekken die
 niet te volgen zijn (elk met een reden, geen daarvan geraden). Dat leverde
-<!--getal:graaf.viaKern-->6095<!--/getal--> nieuwe kanten en bracht de graaf van 18,1% naar <!--getal:graaf.opgelostPct-->26.3<!--/getal-->%; de restbak
-van de graaf ging in dezelfde ronde van 3071 naar <!--getal:graaf.overig-->423<!--/getal--> aanroepen (0,27%), en
+<!--getal:graaf.viaKern-->5942<!--/getal--> nieuwe kanten en bracht de graaf van 18,1% naar <!--getal:graaf.opgelostPct-->25.9<!--/getal-->%; de restbak
+van de graaf ging in dezelfde ronde van 3071 naar <!--getal:graaf.overig-->416<!--/getal--> aanroepen (0,27%), en
 daar zat geen raadsel in maar vijf BEKENDE vormen die de meter niet herkende --
 een restbak vol bekende vormen laat je denken dat je code ondoorgrondelijk is
 terwijl je meter te weinig weet. Twee
-dingen daar niet wegpoetsen: <!--getal:graaf.viaKernZonderSymbool-->4223<!--/getal--> van die kanten wijzen alleen het BESTAND
+dingen daar niet wegpoetsen: <!--getal:graaf.viaKernZonderSymbool-->4127<!--/getal--> van die kanten wijzen alleen het BESTAND
 aan en niet de functie (een fabriek mag `{ walletVoeg: voeg }` teruggeven, en dan
 is de zaknaam niet de symboolnaam), en een parameter die `save` heet wordt NIET
 op zijn naam als kernnaam herkend maar op zijn functie -- alleen de fabrieken die
@@ -2509,7 +2551,7 @@ voor de schermen pas op gang met `SCHERMGEDRAG.json`, dat per scherm SAMENSTELT
 wat de routes eronder al gemeten hadden (schrijft het, welke rol, wat is het
 bewijs waard). Twee dingen daar niet wegpoetsen: het is AFGELEID gedrag, dus
 `schrijft: nee` betekent "verandert niets aan de SERVERKANT" en niet "verandert
-niets"; en de <!--getal:schermgedrag.zonderGrond-->149<!--/getal--> schermen waarover het niets kan zeggen staan er MET reden
+niets"; en de <!--getal:schermgedrag.zonderGrond-->148<!--/getal--> schermen waarover het niets kan zeggen staan er MET reden
 in maar tellen niet als dekking (`zonderUitspraak`) -- anders stijgt een
 dekkingsgetal doordat er een meter bij komt die zwijgt. Die meter begon
 op 118 "dode paden" en eindigde op <!--getal:schermroutes.dood-->0<!--/getal-->; de aanroepgraaf begon op 587 onbekende
@@ -2592,8 +2634,8 @@ zeventiende motor bouwt. De kern in één zin: **dit huis heeft geen tekort aan
 motoren, het heeft een tekort aan handelingen die erlangs gaan** -- en dat is
 gemeten in plaats van beweerd. `npm run machinedekking` (`MACHINEDEKKING.json`)
 legt zestien motoren naast elkaar op DEZELFDE route, iets wat geen enkele
-bestaande meter deed: van de <!--getal:machine.muterend-->3968<!--/getal-->
-muterende routes raken er <!--getal:machine.zonderAs-->2773<!--/getal--> geen
+bestaande meter deed: van de <!--getal:machine.muterend-->3946<!--/getal-->
+muterende routes raken er <!--getal:machine.zonderAs-->2827<!--/getal--> geen
 enkele as, <!--getal:machine.motorenZonderRoute-->1<!--/getal--> motoren bereiken
 geen enkele route (bewijstoken, veiligheidskern, gevolgmeting), en de hoogst
 geïntegreerde handeling buiten de hubs raakt DRIE assen -- er is dus geen enkele

@@ -9,11 +9,11 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**60 bundels, 483 delen, 0 zonder onderwerp.**
+**60 bundels, 484 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 99 delen, 9784 regels in de delen
+`public/apps/app-main/` -- 100 delen, 9811 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -83,6 +83,7 @@ omlaag.
 | `app-main-32.js` | het live-paneel: van modus wisselen |
 | `app-main-33.js` | een asset herroepen binnen de bedenktijd |
 | `app-main-34.js` | mijn zorgprofiel |
+| `app-main-34b.js` | het Onderweg-paneel: kaart, partners, handelingen en de bevestigde aankomst |
 | `app-main-35.js` | betalen met Face ID vanuit een rekeningregel |
 | `app-main-36.js` | een verblijf tonen: foto's en kamers |
 | `app-main-37.js` | de deur van kamer of entree openen, en een kamer boeken |
@@ -212,7 +213,7 @@ omlaag.
 
 ## `apps/leverancier.js`
 
-`public/apps/leverancier/` -- 115 delen, 9827 regels in de delen
+`public/apps/leverancier/` -- 115 delen, 9834 regels in de delen
 
 | deel | onderwerp |
 |---|---|

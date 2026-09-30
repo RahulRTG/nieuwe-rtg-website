@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-30T05:44:44.959Z",
-    "commit": "35c04ce7",
+    "op": "2026-09-30T06:58:34.697Z",
+    "commit": "e7da7900",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 0,
     "instrument": "scripts/overgangsvorm.js",
     "node": "v22.22.2"
   },
@@ -1475,7 +1475,7 @@
     "zonderVorm": [
       "bevoegd"
     ],
-    "velden": 90,
+    "velden": 92,
     "inAlleOvergangen": [],
     "inEenOvergangPct": 47.8,
     "gedeeldeDragers": [
@@ -2368,7 +2368,7 @@
         "actor": {
           "stand": "draagt",
           "bestand": "server/kern/rtfos/activiteiten-deur.js",
-          "citaat": "wie(req)",
+          "citaat": "wieIn(req, staat)",
           "reden": "De actor is de medewerker uit de sessie, en niet de bezoeker: inschrijven is een kantoorhandeling."
         },
         "bevoegdheid": {

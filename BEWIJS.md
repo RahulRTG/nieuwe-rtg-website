@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2268 bestanden en 15615 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2270 bestanden en 15636 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2268 |
-| losse beweringen (`test(...)`) | 15615 |
+| toetsbestanden | 2270 |
+| losse beweringen (`test(...)`) | 15636 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 213 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1896 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1898 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 148 |
 | alleen in de kop *genoemd*, nog niet gemeten | 36 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1975 bestanden, 15109 beweringen.
+1977 bestanden, 15130 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1214,6 +1214,8 @@ toets omvalt.
 | `ov-verzuim.test.js` | 1 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `ov.test.js` | 8 | gezakt op `liegpoort /api/` | RTG OV: al het vervoer in een app. Lijnen met haltes, live voertuigen via de PDA, twee snelle check-ins (oplichtende code of GPS-een-tik) en uitchecken met eerlijke km-prijs via RTG Pay. |
 | `overdracht.test.js` | 11 | gezakt op `liegpoort /api/` | De Integration Fabric: wat gaat er mee bij een overstap, en in welke vorm. De beloftes die hier hard worden gemaakt: - er gaat geen dossier mee maar een pakket per doel, en het pakket zegt ALTIJD wat er niet in zit... |
+| `overgangsrekening.test.js` | 11 | gezakt op `===->!==#0` | DE REKENING ACHTER DE OVERGANGSVORM: kan hij uitslaan? VERDER.md par. |
+| `overgangsvorm.test.js` | 10 | gezakt op `===->!==#0` | DE OVERGANGSVORM-METER: kan hij nog vinden wat hij beweert niet te vinden? VERDER.md par. |
 | `overheid.test.js` | 23 | gezakt op `liegpoort /api/` | De Overheid (kern/overheid.js): de landelijke laag naast de gemeente. Zes pijlers voor inwoners, ondernemers en rijksambtenaren. |
 | `overleving.test.js` | 8 | gezakt op `===->!==#0` | DE OVERLEVINGSMETER, GETOETST -- want een meter die je niet hebt zien uitslaan, meet niets (LAT.md regel 2). Deze toets bewaakt vier eigenschappen die alle vier een keer fout zijn gegaan in de eerste ronde van... |
 | `overname.test.js` | 8 | gezakt op `===->!==#0` | De overnamemodus (kern/command/overname.js): de administratie van een overgenomen bedrijf inlezen. WAT DEZE TOETS VOORAL BEWAAKT zijn de drie manieren waarop een migratie stil misgaat: 1. |

@@ -403,6 +403,8 @@
     "planvorm:vast": "node scripts/planvorm.js --vastleggen",
     "officevorm": "node scripts/officevorm.js",
     "officevorm:vast": "node scripts/officevorm.js --vastleggen",
+    "overgangsvorm": "node scripts/overgangsvorm.js",
+    "overgangsvorm:vast": "node scripts/overgangsvorm.js --vastleggen",
     "aanvoervorm": "node scripts/aanvoervorm.js",
     "aanvoervorm:vast": "node scripts/aanvoervorm.js --vastleggen",
     "kantoormacht": "node scripts/kantoormacht.js",

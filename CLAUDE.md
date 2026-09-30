@@ -302,6 +302,39 @@ drukken. De zes vragen per bewijsstuk (`stelt`, `nietZegt`, `doorWie`, `graad`,
 `werkwoord`, `herkomst`) gebruiken met opzet de woorden van
 `kern/carriereledger/regels.js` en geen tweede vocabulaire.
 
+**`VERDER.md` is de lus van FoundationOS** -- werk, leren en de buurt als
+projecties op één lus (wereld -> mogelijkheid -> overgang -> ... -> overdragen
+-> lokaal aanpassen -> terugvloeien), met als belofte *wie na jou komt, begint
+verder*. Lees die vóór je iets bouwt dat een mens van de ene toestand naar de
+andere brengt of dat kennis tussen mensen en plekken laat reizen. De dragende
+vraag, is er één `Overgang` onder dat alles, is eerst **gemeten** en niet
+aangenomen (`npm run overgangsvorm`, `OVERGANGSVORM.json`), en de eigenaar vroeg de
+meter het idee kapot te proberen te krijgen. Uitslag over
+<!--getal:overgangsvorm.metDrager-->14<!--/getal--> overgangen met een drager en
+veertien dimensies: **geen universele overgang**. Er zijn
+<!--getal:overgangsvorm.dilemmas-->7<!--/getal--> dimensies die ergens een poort zijn en
+elders afwezig, en geen van de voorgestelde families is dilemmavrij, ook de
+groepen niet die de data zelf vormt. Wat overal staat is
+<!--getal:overgangsvorm.kern-->4<!--/getal--> dimensies (naar, actor, actie,
+blokkade): *iemand doet iets, er is een nieuwe stand, en een weigering zegt
+waarom*. Er komt dus geen `Overgang`-object maar een verklaring van werkwoorden,
+en de domeinpoorten (bewijs, kennis, bevestiging, privacy) blijven waar ze staan.
+Drie dingen daar niet wegpoetsen. **Elke stand draagt een citaat dat letterlijk
+in de CODE moet staan**: commentaar telt niet (dat is een belofte), een weigerzin
+wel, en een rot citaat telt als afwezig zodat het de kern nooit kan verhogen.
+**De mutatieproef is gedraaid en niet uitgerekend**: een universele motor die
+alleen de kern kent, laat een blauwdruk zonder gemeten indicator, een
+huiswerkklas zonder VOG en een koppeling zonder recht door waar de echte drager
+weigert. En **`gestopt` is nooit een blauwdrukbron** (dat staat en is gedraaid),
+maar een gestopte buurtpoging laat vandaag ook geen les achter: een mislukking is
+eerst een WAARNEMING en pas na gronding kennis. De twintig wetten en acht
+ontwerpbesluiten staan er met per regel wie hem handhaaft. B7 (vergeten tegenover
+aangenomen collectieve kennis) is een eigenaarbesluit. Par. 7 zet acht
+bevindingen op een rij die niet zijn gerepareerd. De scherpste daarvan: de
+gemeente ziet het exacte aantal hulpvragen van een buurt zodra die als enige
+onder de drempel van vijf valt, want "overige buurten (1)" is één buurt, en de
+gemeente weet welke. Celveilig is niet queryveilig.
+
 **`POLITIEK.md` is het masterplan voor DemocratieOS en de partij** -- twee
 projecten die bewust uit elkaar worden gehouden: DemocratieOS (werknaam) is
 partijneutrale burgerinfrastructuur in FoundationOS voor burgers, organisaties,

@@ -1622,6 +1622,36 @@ const IJKINGEN = {
       (j) => { j.rondes.ruim.vorm.domeinen = (j.rondes.ruim.vorm.domeinen || []).slice(0, -3); return j; },
       () => voor.officeDomeinenGemeten - norm.meet().officeDomeinenGemeten)
   },
+  /* DE DRIE TANDEN VAN 30 SEPTEMBER 2026, bij OVERGANGSVORM.json (VERDER.md
+     par. 2). Op de uitkomst GEEN rust het besluit dat er in FoundationOS geen
+     universele `Overgang` komt, en elk van de drie is een manier waarop die
+     uitkomst stil iets anders kan gaan betekenen.
+
+     overgangenGemeten is het BEREIK, en de mutatie zit op de LIJST die norm.js
+     leest (de lengte van `overgangen`), niet op een telveld ernaast -- een
+     mutatie langs de leesweg heen is het verkeerde experiment (BEWIJSMACHINE.md
+     par. 6a).
+
+     overgangCitaatRot staat op nul, dus de ijking gaat OMHOOG: norm.js telt de
+     rot van de dimensies EN van de wetten op, en de proef zet er in allebei iets
+     bij. Zou hij er maar een lezen, dan beweegt het getal met twee in plaats van
+     drie en zakt de ijking niet -- maar hij beweegt dan wel, en dat is hier de
+     eis. overgangWoordenOnverklaard idem, op het telveld dat norm.js leest. */
+  overgangenGemeten: {
+    proef: (voor) => metVervangenJson('OVERGANGSVORM.json',
+      (j) => { j.overgangen = (j.overgangen || []).slice(0, -3); return j; },
+      () => voor.overgangenGemeten - norm.meet().overgangenGemeten)
+  },
+  overgangCitaatRot: {
+    proef: (voor) => metVervangenJson('OVERGANGSVORM.json',
+      (j) => { j.citaten.rot = (j.citaten.rot || 0) + 2; j.wetten.rot = (j.wetten.rot || 0) + 1; return j; },
+      () => norm.meet().overgangCitaatRot - voor.overgangCitaatRot)
+  },
+  overgangWoordenOnverklaard: {
+    proef: (voor) => metVervangenJson('OVERGANGSVORM.json',
+      (j) => { j.woorden.onverklaard = (j.woorden.onverklaard || 0) + 2; return j; },
+      () => norm.meet().overgangWoordenOnverklaard - voor.overgangWoordenOnverklaard)
+  },
   /* DE TWEE TANDEN VAN 15 SEPTEMBER 2026, bij NEIGINGVORM.json (NEIGING.md par.
      0). Ze staan allebei op een NUL of op een getal waar een besluit op rust, en
      dat is precies waarom ze een ijking nodig hebben: bij zo'n meter is "hij is

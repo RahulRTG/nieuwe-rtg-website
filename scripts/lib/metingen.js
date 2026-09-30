@@ -201,6 +201,12 @@ const REGISTER = {
      nul, en een nul over minder domeinen leest als bevestiging terwijl hij een
      blinde vlek is. */
   'OFFICEVORM.json': { meter: ['officeDomeinenGemeten'] },
+  /* OVERGANGSVORM.json meet of er een universele overgang onder werk, leren,
+     bevoegdheid, de buurt, kennis en blauwdrukken ligt (VERDER.md par. 2). Het
+     BEREIK om de reden van de vormmeters hierboven, en daarnaast de rot van de
+     citaten en de onverklaarde onenigheid: de indeling is een oordeel, en die
+     twee zijn de enige plekken waar dat oordeel stil kan verouderen. */
+  'OVERGANGSVORM.json': { meter: ['overgangenGemeten', 'overgangCitaatRot', 'overgangWoordenOnverklaard'] },
   /* NEIGINGVORM.json meet of er een persoonlijke laag bij mag en in welke vorm
      (NEIGING.md par. 0). Twee geratelde waarden, en met opzet geen derde over de
      NAAMmeting: die telt sinds server/kern/neiging/ bestaat zijn eigen bestanden

@@ -42,12 +42,11 @@ const bevoegd = require('../kern/bevoegdheid').maakBevoegdheid({
      bevoegdheidsvraag te laten doorwerken -- anders is hij een manier om
      eromheen te komen. */
   terugstorting: bankregie.bankTerugstorting,
-  /* EN DE TWEEDE SCHAKELAAR, op naam. RUGDEKKING_BEURS hangt aan
-     `rugdekkingBeurs` en niet aan de terugstortstand -- die twee heten allebei
-     `gesloten` en `open`, dus zonder deze kaart zou de beurs stilletjes de
-     bankknop lezen. Ontbreekt hij, dan valt het vermogen terug op `gesloten`:
-     bij twijfel gaat er geen geld naar een mens. */
-  standen: { rugdekkingBeurs: () => kern.rugdekking.beursStand() }
+  /* DE ANDERE SCHAKELAARS, op naam (de beurs, en de cadeaubon van C14). Elk
+     vermogen hangt aan zijn eigen `hangtAf`: ze heten allemaal `gesloten` en
+     `open`, dus zonder deze kaart zou er een stilletjes de bankknop lezen.
+     Ontbreekt er een, dan geldt `gesloten`: bij twijfel beweegt er geen geld. */
+  standen: { rugdekkingBeurs: () => kern.rugdekking.beursStand(), cadeaubon: () => kern.cadeaubonStand() }
 });
 kern.bevoegd = bevoegd;
 /* DE TERUGSTORTING AANSLUITEN OP DE BEVOEGDHEID. Sinds leden hun saldo kunnen
@@ -188,13 +187,13 @@ kern.onboarding.zetHaken({ salon: kern.salon, ondernemingNieuw: kern.onderneming
    direct achter de onderneming, want die tabel is van hem. */
 Object.assign(kern, require('../kern/onderneming/rechtsvormwacht')({ db, save }));
 
-/* RTG CONCERN (kern/concern): het dak boven de onderneming. Zie CONCERN.md.
+/* RTG CONCERN (kern/concern): het dak boven de onderneming (CONCERN.md)
    Hangt DIRECT ACHTER de onderneming en die volgorde is niet vrij:
    entiteitOnderneming() wijst een bestaande onderneming aan. Andersom leest de
    onderneming niets van het concern -- de oude weg blijft dus werken zonder dat
    er ooit een entiteit bestaat. */
-Object.assign(kern, require('../kern/concern')({ db, save, crypto, schoon, findSupplier,
-  // Discovery leest de bestaande onderneming van deze aanvrager; zie ./voorstel.js
+Object.assign(kern, require('../kern/concern')({ db, save, crypto, schoon, findSupplier, bewerkCollectie,
+  // Discovery leest de onderneming van de aanvrager (./voorstel.js)
   ondernemingVind: kern.ondernemingVind }));
 kern.rechtsvormwacht.herstelOverlay();
 const rvTimer = setInterval(() => { kern.rechtsvormwacht.check().catch(() => {}); },

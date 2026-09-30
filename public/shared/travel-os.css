@@ -36,6 +36,14 @@
    TravelOS-rail wordt daar niet gebouwd; nul hier voorkomt dat zijn lege 104px
    op bureau of 78px op telefoon wel gereserveerd blijft. */
 html.tos-ingebed{--tos-top:0px;--tos-rail:0px;--tos-bottom:0px}
+/* In de desktopstandaard staat een kaart in een eigen schermvlak
+   (world-desktop-surface.js, `data-rtg-canvas-surface`) onder de Edge en naast
+   de rail van het wereldkader. Dat vlak is het bevattende blok: net als bij een
+   ingebed blad reserveert de kaart daarbinnen geen eigen kop- of railruimte
+   meer, anders staat hij 88px omlaag en 104px opzij in zijn eigen vlak.
+   Op de telefoon is het vlak geen bevattend blok (rtg-world-desktop.css zet
+   daar contain:none), dus daar blijven de gewone maten gelden. */
+@media(min-width:1000px){body[data-rtg-desktop] .wd-page[data-rtg-canvas-surface]{--tos-top:0px;--tos-rail:0px;--tos-bottom:0px}}
 html.tos-ingebed .tos-nav,html.tos-ingebed .tos-topbar{display:none!important}
 
 body.travel-os{

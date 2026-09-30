@@ -51,7 +51,12 @@ module.exports = (ctx, eigen) => {
     if (!w.key) return { status: 401, error: 'Log in om de campagnes te zien.' };
     return { ok: true, statussen: STATUS, landelijk: !!w.landelijk,
       campagnes: C().map(c => Object.assign(beeld(c), {
-        rondesDetail: w.landelijk ? (c.rondes || []).slice(-20).reverse() : undefined })) };
+        rondesDetail: w.landelijk ? (c.rondes || []).slice(-20).reverse() : undefined })),
+      /* bewijs bij de bedragen (bedrijfsmaat campagnes.rtf-werving): vermoed, want
+         een ronde is een bedrag dat het bestuur boekte, niet een regel van de bank */
+      graad: 'vermoed', peilmoment: nu(),
+      dektNiet: ['Opgehaald is wat het landelijke bestuur als ronde boekte; het is niet tegen een bankafschrift gelegd.',
+        'Giften die buiten een campagne binnenkwamen, staan hier niet.'] };
   }
 
   function maak(req, b) {

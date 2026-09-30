@@ -41,6 +41,12 @@
       reageer.onclick = function () { w.RTGSaloonActies.reacties(i, host); };
       k.querySelector('.acties').appendChild(reageer);
     }
+    if (i.bronActies && w.RTGAanvraagEdge) {
+      k.tabIndex = 0;
+      w.RTGAanvraagEdge(k, { id: i.id, wat: i.titel, acties: i.bronActies.map(function (x) {
+        return { id: x.id, label: x.label + ' in Mijn Mall' };
+      }) }, function () { location.href = i.url; });
+    }
     var d = document.createElement('details'); d.className = 'saloon-herkomst';
     var bron = i.herkomst || {};
     d.innerHTML = '<summary>Bron en samenhang' + (i.prive ? ' · privé' : '') + '</summary><p>'

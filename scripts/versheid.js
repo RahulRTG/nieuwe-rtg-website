@@ -130,6 +130,8 @@ const REGISTERS = [
      bot zonder dat iemand het merkt. */
   ['AICONTEXT.json', 'npm run aicontext:vast', 'welke velden van een lid in de system prompt van Rahul terechtkomen'],
   ['STILSPOOR.json', 'npm run stilspoor:vast', 'schrijfacties waarvan het falen stil wordt weggevangen (LAT.md regel 21)'],
+  ['GASTSPLITSING.json', 'npm run gastsplitsing:vast', 'toetsen op de gast: bezoeker en gratis account, en wat de weigering belooft (SAMENLEVING.md stap 5)'],
+  ['BODEMDRUK.json', 'npm run bodemdruk:vast', 'bodemschermen met een uitnodiging om te betalen (SAMENLEVING.md par. 6, eis 5)'],
   ['STEMPELVEILIGHEID.json', 'npm run stempelveiligheid:vast', 'welke generatoren repo-waarheid kunnen wegschrijven die niemand vroeg'],
   ['STILLEZING.json', 'npm run stillezing:vast', 'lezers die een onleesbaar bewijs als een afwezig bewijs behandelen (BEWIJSMACHINE.md par. 6b)'],
   ['AFGELEID.json', 'npm run afgeleid:vast', 'welk artefact bron is en welk afgeleid, en wie het opnieuw mag afleiden'],
@@ -570,7 +572,10 @@ const REGISTERS = [
      verliest, verschuift de dilemma's zonder dat iemand de meter draait. */
   ['OVERGANGSVORM.json', 'npm run overgangsvorm:vast', 'of er EEN overgang is onder werk, leren, bevoegdheid, buurt, kennis en blauwdrukken -- het besluit tegen een universele Overgang in FoundationOS rust erop, en de uitslag is GEEN'],
   ['PLANVORM.json', 'npm run planvorm:vast', 'of de plandomeinen een datavorm en een planlus DELEN -- het besluit over een universele planningsgrond rust erop, en de uitslag is twee nullen'],
+  ['PLAATSVORM.json', 'npm run plaatsvorm:vast', 'of de plaatsdomeinen een datavorm DELEN -- het besluit tegen een Place-objecttype rust erop, en de uitslag is een nul onder twee drempels'],
   ['SPOORVORM.json', 'npm run spoorvorm:vast', 'hoever de zes andere mechanismen van de spoorvorm van kern/vertegenwoordiging/handelen.js staan -- een matrix vol streepjes ziet er vers en verouderd hetzelfde uit, en juist die matrix hoort te veranderen'],
+  ['POSITIESTROOM.json', 'npm run positiestroom:vast', 'waar de positie van een mens blijft staan en met welke termijn -- een termijn die in het bewaarbeleid verdwijnt of een stroom die verhuist, hoort hier te verschijnen en niet stil te blijven staan'],
+  ['POSITIEPROEF.json', 'npm run positieproef:vast', 'wat een doorloop met posities in de opslag achterlaat -- een positie die na haar taak blijft staan, of een passage langs een zaak die niet het doel was, hoort hier te verschijnen'],
   /* Ook een nul, en om dezelfde reden hier: `zonderUitspraak: 0` betekent dat
      elk publiek domein een besluit draagt. Verouderd betekent diezelfde nul
      alleen nog dat er destijds geen domein ontbrak. */

@@ -49,7 +49,16 @@ async function palette(scope, world, card) {
     assert.equal(actual.cardInk,colors[world][2],world+' '+card+' text');
   }
   // Let initial data requests finish before navigating or closing this frame.
-  await scope.waitForLoadState('networkidle');
+  // Not `networkidle`: a signed-in screen keeps its live stream (/api/stream)
+  // open, so the network never goes idle. Wait for a complete document whose
+  // request count (live streams excluded) has been stable for 300 ms instead.
+  await scope.waitForFunction(() => {
+    if (document.readyState !== 'complete') return false;
+    const n = performance.getEntriesByType('resource').filter(e => !/\/api\/stream/.test(e.name)).length;
+    const v = window.__rtgPaletRust;
+    if (!v || v.n !== n) { window.__rtgPaletRust = { n, sinds: performance.now() }; return false; }
+    return performance.now() - v.sinds >= 300;
+  }, null, { timeout: 15000 });
 }
 async function ready(page) { await page.waitForSelector('body[data-rtg-desktop-state="ready"]'); }
 async function activeFrame(page, selector) {

@@ -293,7 +293,7 @@ body.rtg-stijl .fp-poort .knop{flex:0 0 auto;min-height:64px;min-width:44px;
             <div class="fp-lijst"><div class="fp-regel"><span id="kassaOpenZin"></span></div></div>
             <div class="fp-form">
               <button class="knop" type="button" id="kassaContant">Contant afrekenen</button>
-              <input class="veld" id="kassaPayCode" maxlength="48" placeholder="Betaalcode" autocomplete="off">
+              <input class="veld" id="kassaPayCode" maxlength="60" placeholder="Betaalcode" autocomplete="off">
               <button class="knop" type="button" id="kassaPay">RTG Pay</button>
               <button class="knop" type="button" id="kassaLos">Laat los</button>
             </div>
@@ -361,7 +361,8 @@ body.rtg-stijl .fp-poort .knop{flex:0 0 auto;min-height:64px;min-width:44px;
             <div class="fp-form">
               <select class="veld" id="dnDag" aria-label="Op welke dag"></select>
               <select class="veld" id="dnPlek" aria-label="Op welke plek"></select>
-              <input class="veld" id="dnWie" maxlength="60" placeholder="Wie" aria-label="Wie draait de dienst">
+              <select class="veld" id="dnTeam" aria-label="Wie uit het team"></select>
+              <input class="veld" id="dnWie" maxlength="60" placeholder="Of een naam van buiten het team" aria-label="Wie draait de dienst, als het geen teamlid is">
               <input class="veld" id="dnVan" maxlength="5" placeholder="Van uu:mm" aria-label="Begintijd">
               <input class="veld" id="dnTot" maxlength="5" placeholder="Tot uu:mm" aria-label="Eindtijd">
               <input class="veld" id="dnRol" maxlength="40" placeholder="Rol" aria-label="Rol">

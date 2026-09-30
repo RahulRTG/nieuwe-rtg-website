@@ -13,6 +13,11 @@
      - een betaalde pas merkt niets: geen nieuwe eis voor wie al binnenkwam
      - wat NIET onder het besluit valt (een aanslag betalen) blijft dicht
 
+   Het tweede besluit (29 september 2026, SAMENLEVING.md par. 11.4) zette er
+   drie deuren bij die een account BELOOFDEN en een pas VROEGEN: melden bij de
+   stad, meepraten in een raadpleging en de intake van RTG Neiging. Zelfde deur,
+   dus dezelfde vijf toetsen.
+
    Draai los: node --test test/paspoortdeur.test.js */
 'use strict';
 const test = require('node:test');
@@ -30,7 +35,8 @@ function api(base, pad, body, token) {
     .then(async (r) => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
 
-const DEUREN = ['/api/gemeente/afspraak', '/api/overheid/aangifte', '/api/care/intake/deel'];
+const DEUREN = ['/api/gemeente/afspraak', '/api/overheid/aangifte', '/api/care/intake/deel',
+  '/api/stad/melding', '/api/stad/raadpleging/reageer', '/api/neiging/intake'];
 const DICHT = new Set([401, 403]);
 
 let srv, base, seq = 0;

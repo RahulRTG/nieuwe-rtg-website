@@ -60,4 +60,6 @@ Object.assign(kern, require('../kern/commerce').maakCommerce({
 if (kern.webplatform && kern.webplatform.koppelWinkel) {
   kern.webplatform.koppelWinkel((code) => kern.commerce.etalage(code));
 }
+// de werkdag (ochtendkaart) leest de verzuimlaag, die er nu is
+require('./kernlaag2c')(kern, hulp);
 };

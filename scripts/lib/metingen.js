@@ -37,6 +37,7 @@ const GEEN_METING = new Set([
   'package.json', 'package-lock.json',
   'NORM.json',              // de ratel zelf; die wordt door normverval.js bewaakt
   'LANDEN.json',            // landpakketten: welke munt, welke voertaal -- gegevens
+  'KENNISINDEX.json',       // de documenten opgeknipt voor de registerblik -- tekst, geen getal
   /* TOETSDUUR.json draagt hoe lang elk toetsbestand duurde. Dat is een
      PLANNINGSgetal en geen kwaliteitsgetal: een toets die langzamer wordt is
      niet slechter, en een die sneller wordt niet beter. Het bestand voedt de
@@ -131,6 +132,11 @@ const REGISTER = {
   'AICONTEXT.json': { meter: ['aiContextLek', 'aiContextVeldenGezien'] },
   /* Het stilspoorregister draagt twee schulden en een bereikmeter. */
   'STILSPOOR.json': { meter: ['stilSpoor', 'stilleOpslag', 'stilSpoorAanroepen'] },
+  /* De gast als twee mensen (SAMENLEVING.md stap 5): de tegenspraak omlaag, het
+     onderscheid omhoog. */
+  'GASTSPLITSING.json': { meter: ['gastTegenspraak', 'gastOnderscheidt'] },
+  /* Geen commerciele druk binnen de bodem (SAMENLEVING.md par. 6, eis 5). */
+  'BODEMDRUK.json': { meter: ['bodemDruk', 'bodemSchermen'] },
   /* MAGNAATGRONDWET.json (npm run magnaat:grondwet -- --vastleggen) is de
      bevroren nulstand van de Magnaat-grondwet (MAGNAAT.md). De ratel woont in
      de toets en is vierledig: niet meer schendingen, niet minder PASS of
@@ -195,6 +201,7 @@ const REGISTER = {
      gedeeldheid door een regex in plaats van door een feit, en leest de nul als
      bevestiging terwijl hij een blinde vlek is. */
   'PLANVORM.json': { meter: ['planDomeinenGemeten'] },
+  'PLAATSVORM.json': { meter: ['plaatsDomeinenGemeten'] },
   /* OFFICEVORM.json meet of de elf objectdomeinen onder het voorgestelde
      `RTGObject` (OFFICE.md par. 0) een datavorm delen. Geratelde waarde: het
      BEREIK, om exact de reden van PLANVORM.json hierboven -- de uitkomst is een
@@ -233,6 +240,8 @@ const REGISTER = {
      door een feit. */
   'NAMENSVORM.json': { meter: ['namensMechanismenGemeten'] },
   'SPOORVORM.json': { meter: ['spoorConvergent'] },
+  'POSITIESTROOM.json': { meter: ['positieZonderTermijn', 'positieNietVergeten', 'positieStromenGezien'] },
+  'POSITIEPROEF.json': { meter: ['positieNavBlijft', 'positieNaTaak', 'positiePassages', 'aankomstUitPositie'] },
   /* Geen richting maar een ANKER: test/bedrijfsmaat.test.js eist nul verworpen
      citaten en nul vormfouten, en dat het register gelijk is aan een verse meting.
      Een maat die stil verdwijnt of een citaat dat niet meer klopt, laat hem zakken. */

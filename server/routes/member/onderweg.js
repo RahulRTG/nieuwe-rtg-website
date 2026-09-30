@@ -1,10 +1,10 @@
-/* Member-submodule: onderweg. De live reis (start, positie-updates met
-   automatische aankomst, stop, stand opvragen) en ritten aanvragen/betalen.
+/* Member-submodule: onderweg. De live reis (start, positie-updates, een
+   bevestigde aankomst, stop, stand opvragen) en ritten aanvragen/betalen.
    Gemount vanuit routes/member.js. */
 const { coord, coordPaar } = require('../../kern/util');
 module.exports = (kern) => {
-  const { app, auth, db, save, findSupplier, notifySupplier, notify, pushLive,
-    liveStateFor, liveCodename, haversine, vraagRitVoor, betaalRitVoor, ledenInhoudVan } = kern;
+  const { app, auth, db, save, findSupplier, notifySupplier, pushLive,
+    liveStateFor, liveCodename, haversine, vraagRitVoor, betaalRitVoor, bevestigAankomst } = kern;
 
   app.post('/api/live/start', auth, (req, res) => {
     if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
@@ -12,13 +12,13 @@ module.exports = (kern) => {
     const destCode = req.body.destCode ? String(req.body.destCode).trim().toUpperCase() : null;
     const dest = destCode ? findSupplier(destCode) : null;
     const mode = ['walking', 'driving', 'flying'].includes(req.body.mode) ? req.body.mode : 'driving';
-    // Startpositie: meegegeven, anders het hotel op de bestemming, anders vlakbij de bestemming.
-    let start = coordPaar(req.body.lat, req.body.lng);
-    // het hotel op de bestemming van de EIGEN reis (stond op db.data.trip: de
-    // demo-bestemming, en dat viel om zodra een lid geen demo-reis meer erft)
-    const eigenReis = (ledenInhoudVan ? (ledenInhoudVan(key) || {}) : {}).trip || null;
-    if (!start && eigenReis) { const hotel = db.data.suppliers.find(s => s.type === 'hotel' && s.city === eigenReis.dest); if (hotel && hotel.loc) start = { lat: hotel.loc.lat, lng: hotel.loc.lng }; }
-    if (!start && dest && dest.loc) start = { lat: dest.loc.lat + 0.012, lng: dest.loc.lng - 0.014 };
+    /* Startpositie: alleen wat het lid zelf meestuurt. Hier stond een terugval
+       op het hotel van de eigen reis en daarna op de bestemming plus een vaste
+       verschuiving -- een VERZONNEN positie van een mens, die daarna als zijn
+       live-positie werd gebruikt voor afstand, aankomsttijd en de zaak
+       (NAVIGATIE.md par. 12, gebrek 11). Geen positie is geen positie; de
+       eerste echte komt binnen via /api/live/update. */
+    const start = coordPaar(req.body.lat, req.body.lng);
     db.data.live[key] = {
       key, tier: req.session.tier, codename: liveCodename(req.session),
       active: true, mode, destCode,
@@ -40,16 +40,17 @@ module.exports = (kern) => {
     if (Number.isFinite(lat) && Number.isFinite(lng)) {
       L.lat = lat; L.lng = lng; L.updatedAt = new Date().toISOString(); gewijzigd = true;
     }
-    // automatische aankomst binnen ~150 m van de bestemming
+    /* NABIJ IS EEN VOORSTEL (NAVIGATIE.md N13). Binnen ~150 m van de bestemming
+       vraagt het scherm "Bent u er?"; de aankomst zelf bevestigt het lid of de
+       zaak (/api/live/aangekomen en /api/supplier/guest/aangekomen). Hier ging
+       eerst een automatische aankomst af, met een melding aan de zaak en een
+       deur die daarop openging -- bewezen uit een opgeslagen positie (N3). */
     const dest = L.destCode ? findSupplier(L.destCode) : null;
     let aangekomen = false;
-    if (dest && dest.loc && !L.arrived) {
+    if (dest && dest.loc && !L.arrived && Number.isFinite(L.lat)) {
       const d = haversine({ lat: L.lat, lng: L.lng }, dest.loc);
-      if (d != null && d < 150) {
-        L.arrived = true; aangekomen = true;
-        notifySupplier(dest.code, { icon: 'ster', title: 'Gast gearriveerd', body: L.codename + ' is bij u aangekomen.' });
-        notify(L.tier, { icon: 'gps', title: 'Aangekomen', body: 'U bent bij ' + dest.name + '.', scope: 'live' });
-      }
+      const nabij = d != null && d < 150;
+      if (nabij !== !!L.nabij) { L.nabij = nabij; aangekomen = true; }
     }
     /* Iedere gewijzigde positie neemt deel aan de requestcommit. De JSON-motor
        bundelt zulke save()-signalen nog steeds in zijn write-behind, terwijl
@@ -61,10 +62,29 @@ module.exports = (kern) => {
     res.json({ ok: true, live: liveStateFor(key, req.body.lang) });
   });
 
+  /* Het lid bevestigt zelf dat het er is (NAVIGATIE.md N13). Geen positie
+     nodig: een bevestiging is het bewijs, niet de coordinaat. */
+  app.post('/api/live/aangekomen', auth, (req, res) => {
+    const key = req.session.key;
+    const r = bevestigAankomst(key, 'lid');
+    if (r.error) return res.status(r.status).json({ error: r.error });
+    if (!r.al) {
+      save();
+      const dest = findSupplier(r.L.destCode);
+      if (dest) notifySupplier(dest.code, { icon: 'ster', title: 'Gast gearriveerd', body: r.L.codename + ' meldt dat hij bij u is.' });
+    }
+    pushLive(key);
+    res.json({ ok: true, live: liveStateFor(key, req.body.lang) });
+  });
+
   app.post('/api/live/stop', auth, (req, res) => {
     const key = req.session.key;
     const L = db.data.live[key];
-    if (L) { L.active = false; save(); pushLive(key); }
+    /* WISSEN BIJ STOPPEN (NAVIGATIE.md N14). Stoppen zette alleen `active` op
+       false, en de positie bleef dan zeven dagen staan tot de bewaarveger kwam.
+       De taak is voorbij, dus de positie ook; de veger blijft als vangnet voor
+       wie nooit op stop drukt. Bestemming en modus blijven: die zijn geen positie. */
+    if (L) { L.active = false; delete L.lat; delete L.lng; save(); pushLive(key); }
     res.json({ ok: true, live: liveStateFor(key, req.body.lang) });
   });
 

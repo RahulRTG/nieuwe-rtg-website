@@ -7,12 +7,15 @@ const { servicekostenVoor } = require('../../../kern/servicekosten');
 const bezorgvolg = require('../../../kern/bezorgvolg');
 module.exports = (kern) => {
   const { PERSONAS, app, auth, crypto, db, findPartner, findSupplier, magBezorgen, pickupCode,
-          publicPartner, save, schoon, salonZichtbaar, zorgMee, orderMetRef, ordersVoegToe,
+          save, schoon, salonZichtbaar, zorgMee, orderMetRef, ordersVoegToe,
           gegevensStop } = kern;
+/* De partnercode is een OPENBARE ATTRIBUTIELINK (B14): hij zegt wie iemand
+   stuurde en opent niets -- geen tarief, geen bedrijfsgegevens, en ook niet of
+   de partner een personeelskanaal heeft. Alleen de naam, voor "via ...". */
 app.post('/api/partner', (req, res) => {
   const partner = findPartner(req.body.code);
   if (!partner) return res.status(404).json({ error: 'Deze partnercode kennen we niet.' });
-  res.json({ partner: publicPartner(partner) });
+  res.json({ partner: { code: partner.code, name: partner.name } });
 });
 
 /* ================== bestellen: de ophaal/bezorgdienst ==================

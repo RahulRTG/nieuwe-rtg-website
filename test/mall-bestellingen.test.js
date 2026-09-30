@@ -36,7 +36,7 @@ function api(base, pad, body, token) {
 function bouw(data, kapot) {
   const db = { data: Object.assign({ orders: [], boekingen: [], reserveringen: [], reisAanvragen: [], thuisBoekingen: [] }, data) };
   if (kapot) Object.defineProperty(db.data, kapot, { get() { throw new Error('bron ' + kapot + ' ligt eruit'); } });
-  const ctx = { db, save() {}, crypto: require('crypto') };
+  const ctx = { db, bijeen: async werk => werk(), save() {}, crypto: require('crypto') };
   return require('../server/kern/mall/bestellingen')(ctx).mallBestellingen;
 }
 

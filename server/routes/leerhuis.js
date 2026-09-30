@@ -4,31 +4,26 @@
    DE ACTOR KOMT UIT DE SESSIE, NOOIT UIT HET LIJF (AUTHORITY.md grens 1): de
    kern krijgt `lid:<account-id>` uit `req.session.key`.
 
-   BESLUITEN (ACADEMY.md par. 5). B5: leren op elke leeftijd, een certificaat
-   alleen voor wie `volwassen()` haalt, fail closed buiten `lid:`; wie jonger
-   is ziet geen niveau. B4: certificaat en beoordeling antwoorden pas na een
-   bevestigde commit; een 503 daar is "onbekend" (eerst `uitkomst`, dan opnieuw
-   met dezelfde sleutel). B2: de relatie komt uit de bron van het leerhuis.
-   B7: een startpakket zet concepten klaar via dezelfde handelingen.
+   BESLUITEN (ACADEMY.md par. 5): B5 certificaat alleen bij `volwassen()`; B4
+   een 503 is "onbekend" (eerst `uitkomst`); B2 relatie uit de bron; B7
+   startpakket; een mens op codenaam aanwijzen met reden en spoor.
 
-   STANDAARD UIT (functie `leerhuis`), en elke handeling draagt een SLEUTEL:
-   zonder sleutel is een herhaling een tweede handeling. */
+   STANDAARD UIT (functie `leerhuis`), en elke handeling draagt een SLEUTEL. */
 'use strict';
 
 const { maakLeerhuis } = require('../kern/leerhuis');
 const { relatieActief } = require('../kern/leerhuis/oordeel');
 const { idVanKey } = require('../lib/lidsleutel');
 const { maakVolwassen } = require('../kern/volwassen');
-/* Zelfde weg als routes/supplier/kassa.js: de bundel komt uit de opslag zelf,
-   niet van de kern, zodat de kern er niet breder van wordt. */
+const { maakNaamVan, metNamen } = require('../kern/leerhuis/namen');
+/* De bundel komt uit de opslag zelf (zoals supplier/kassa.js), niet van de kern. */
 const { bijeen, inBundel } = require('../db');
 
 /* Wat een LID mag vragen, en wat alleen het bestuur van de organisatie mag
-   lezen. Een lid leest zijn eigen stand; het organisatiebrede beeld
-   (gereedheid, eenheid, wie geraakt, reconstructie) is voor wie de Academy
-   bestuurt. Een lezer zonder relatie met de organisatie leest niets: ook dat
-   is isolatie (grondwet 16). */
-const EIGEN_VRAGEN = ['mijn', 'vakstaat', 'trainerCockpit', 'managerCockpit', 'waaromLeren', 'waaromVerversen',
+   lezen. Een lezer zonder relatie met de organisatie leest niets: ook dat is
+   isolatie (grondwet 16). */
+const WERK = ['trainerCockpit', 'managerCockpit', 'assessorWerk', 'kennisWerk', 'curriculumWerk', 'eigenaarWerk', 'certificaatWerk', 'trainerWerk', 'kwaliteitWerk'];
+const EIGEN_VRAGEN = ['mijn', 'vakstaat', ...WERK, 'waaromLeren', 'waaromVerversen',
   'waaromNietGereed', 'geschiktheid', 'loopbaan', 'waaromTrainer', 'grond', 'uitkomst'];
 const BESTUURSVRAGEN = ['gereedheid', 'eenheid', 'wieGeraakt', 'reconstrueer', 'certStand', 'schaduw', 'startpakket'];
 const LEESROLLEN = ['ACADEMY_OWNER', 'QUALITY_AUTHORITY', 'KNOWLEDGE_OWNER', 'ASSESSMENT_AUTHORITY'];
@@ -41,21 +36,22 @@ module.exports = (kern) => {
   const rtfInStad = (key, stad) => !!(kern.rtfos && kern.rtfos.vrijwilligerportaal.account.inStad(key, stad));
   const bronToets = require('../kern/leerhuis/bron').maakBronToets({ accounts, employmentVanPersoon, entiteitVind, rtfInStad });
   const leerhuis = maakLeerhuis({ db, save, bijeen, inBundel, bronToets });
-  /* Alleen om de schaduwtellers van besluit B1 te LEZEN; de meelezer zelf hangt
-     in opzet/kantoordeur.js. */
+  /* Alleen de schaduwtellers van B1 LEZEN; de meelezer hangt in opzet/kantoordeur.js. */
   const schaduw = require('../kern/leerhuis/schaduw').maakLeerhuisSchaduw({ db, save });
-  /* Dezelfde fabriek als kern.volwassen (opzet/kernlaag1.js): dezelfde regel,
-     en de kern wordt er niet breder van (de ratel kernBreedte). */
+  /* Dezelfde fabriek als kern.volwassen: de kern wordt niet breder (kernBreedte). */
   const volwassen = maakVolwassen({ accounts });
+  /* Een cockpit toont mensen op codenaam. */
+  const naamVan = maakNaamVan((k) => kern.codenaamVan(k));
+  /* Op codenaam aanwijzen: kern/leerhuis/aanwijzen.js. */
+  const aanwijzen = require('../kern/leerhuis/aanwijzen').maakAanwijzen({ idVanKey,
+    keyVanCodenaam: (c) => kern.keyVanCodenaam(c), noteerVast: (r) => require('../inzagelog').noteerVast(r) });
 
   function actor(req, res) {
     const id = idVanKey(req.session && req.session.key);
     if (id == null) { res.status(403).json({ error: 'Het leerhuis hoort bij een eigen RTG-account.' }); return null; }
     return 'lid:' + id;
   }
-  /* Is deze persoon aantoonbaar 18+? Alleen een lid met een account kan dat
-     laten vaststellen; elke andere sleutel is "niet vast te stellen" en telt
-     dus als nee. */
+  /* Aantoonbaar 18+? Alleen een lid met een account; anders telt het als nee. */
   const volwassenLid = (persoon) => {
     const m = /^lid:(\d+)$/.exec(String(persoon || ''));
     return !!(m && volwassen('user-' + m[1]));
@@ -71,7 +67,9 @@ module.exports = (kern) => {
     const sleutel = String(b.sleutel || req.get('idempotency-key') || '').slice(0, 80);
     if (!sleutel) return res.status(400).json({ error: 'Elke handeling draagt een sleutel; zonder sleutel is een herhaling een tweede handeling.' });
     if (b.actie === 'startpakketLaden') return stuur(res, leerhuis.startpakketLaden(String(b.org || ''), door));
-    const invoer = b.invoer || {};
+    const a = await aanwijzen(leerhuis.stand(String(b.org || '')), String(b.actie || ''), b.invoer || {}, door);
+    if (!a.ok) return stuur(res, a);
+    const invoer = a.invoer;
     if (b.actie === 'certificaatUitgeven' && !volwassenLid(invoer.persoon))
       return res.status(403).json({ error: 'Een certificaat krijgt alleen wie aantoonbaar 18 of ouder is.',
         hoe: 'leren, oefenen en bewijs gaan gewoon door; zie ACADEMY.md besluit B5' });
@@ -85,21 +83,17 @@ module.exports = (kern) => {
     const vraag = String(b.vraag || '');
     const st = leerhuis.stand(org);
     if (!st.org) return res.status(404).json({ error: 'Deze organisatie heeft geen leerhuis.' });
-    /* De ene regel uit de kern en geen eigen kopie: een kopie las alleen het
-       spoor en sloeg de bron over (routetoets 8 vond het: wie uit dienst was,
-       las nog mee). */
+    /* De regel uit de kern, geen kopie (routetoets 8). */
     if (!relatieActief(st, door)) return res.status(403).json({ error: 'U heeft geen lopende relatie met deze organisatie.' });
     const l = leerhuis.lees;
     if (EIGEN_VRAGEN.includes(vraag)) {
-      /* Altijd over DE LEZER zelf: een ander vakstaat of geschiktheid opvragen
-         kan hier niet, ook niet met een veld in het lijf. */
-      /* Wie jonger is of zijn leeftijd niet kan laten vaststellen, ziet zijn
-         vaardigheden zonder niveaulabel (het leerdossier, besluit B5). */
+      /* Altijd over DE LEZER zelf; wie niet aantoonbaar 18+ is, ziet geen niveaulabel (B5). */
       const zonderNiveau = (v) => (volwassenLid(door) || !v) ? v
         : Object.assign({}, v, { vaardigheden: (v.vaardigheden || []).map(x => Object.assign({}, x, { niveau: null })) });
       const a = { mijn: () => { const m = l.mijn(org, door); return Object.assign({}, m, { VAARDIGHEDEN: zonderNiveau(m.VAARDIGHEDEN) }); },
         vakstaat: () => zonderNiveau(l.vakstaat(org, door)),
-        trainerCockpit: () => l.trainerCockpit(org, door), managerCockpit: () => l.managerCockpit(org, door),
+        /* Het werk per rol, met mensen op codenaam (namen.js). */
+        ...Object.fromEntries(WERK.map(w => [w, () => metNamen(l[w](org, door), naamVan)])),
         waaromLeren: () => l.waaromLeren(org, door, String(b.curriculum || '')), waaromVerversen: () => l.waaromVerversen(org, door),
         waaromNietGereed: () => l.waaromNietGereed(org, door, String(b.rol || '')),
         geschiktheid: () => l.geschiktheid(org, door, String(b.handeling || '')), loopbaan: () => l.loopbaan(org, door, String(b.rol || '')),

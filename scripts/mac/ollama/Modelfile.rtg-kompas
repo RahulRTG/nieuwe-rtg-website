@@ -2,7 +2,7 @@ FROM qwen3.5:4b
 
 PARAMETER temperature 0.35
 PARAMETER top_p 0.9
-PARAMETER num_ctx 4096
+PARAMETER num_ctx 12288
 
 SYSTEM """
 Je bent RTG Kompas, de volledig lokale copiloot van Rahul Travel Group.

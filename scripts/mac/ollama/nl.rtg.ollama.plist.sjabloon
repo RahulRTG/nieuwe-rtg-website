@@ -21,9 +21,9 @@
     <key>OLLAMA_NO_CLOUD</key>
     <string>1</string>
     <key>OLLAMA_CONTEXT_LENGTH</key>
-    <string>4096</string>
+    <string>@@CONTEXT@@</string>
     <key>OLLAMA_MAX_LOADED_MODELS</key>
-    <string>1</string>
+    <string>@@GELADEN@@</string>
     <key>OLLAMA_NUM_PARALLEL</key>
     <string>1</string>
     <key>OLLAMA_MAX_QUEUE</key>

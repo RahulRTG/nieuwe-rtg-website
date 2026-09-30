@@ -17,7 +17,10 @@
 'use strict';
 
 module.exports = (kern, deur) => {
-  const { app, festival, logActivity, managerOnly, supplierAuth } = kern;
+  const { app, festival, logActivity, managerOnly, supplierAuth, accounts } = kern;
+  /* Het team van DEZE zaak, uit de sessie: een dienst kan alleen aan een eigen
+     teamlid hangen, en het lichaam kan geen ander team noemen. */
+  const team = (req) => accounts.listStaff(req.supplier.code).map(m => ({ id: m.id, name: m.name }));
   const { mijn, editieVan, geenFestival, stuur } = deur;
 
   const nu = () => {
@@ -29,7 +32,7 @@ module.exports = (kern, deur) => {
     if (!managerOnly(req, res)) return;
     const f = mijn(req);
     if (!f) return stuur(res, geenFestival);
-    const r = festival.dienstZet(f.id, editieVan(req), req.body || {});
+    const r = festival.dienstZet(f.id, editieVan(req), req.body || {}, { code: req.supplier.code, team: team(req) });
     if (r.ok) logActivity(req.supplier.code, req.actor, 'zette een dienst voor ' + r.dienst.wie);
     stuur(res, r);
   });
@@ -45,7 +48,9 @@ module.exports = (kern, deur) => {
   app.post('/api/festival/diensten', supplierAuth, (req, res) => {
     const f = mijn(req);
     if (!f) return stuur(res, geenFestival);
-    stuur(res, festival.dienstenVan(f.id, editieVan(req), (req.body || {}).dag));
+    const r = festival.dienstenVan(f.id, editieVan(req), (req.body || {}).dag, req.supplier.code);
+    // wie het rooster maakt, kiest uit het team; een medewerker ziet alleen het rooster
+    stuur(res, r.ok && req.actor && req.actor.manager ? { ...r, team: team(req) } : r);
   });
 
   /* DE ENE VRAAG VAN DE MEDEWERKER. De lopende dag komt van de server (een

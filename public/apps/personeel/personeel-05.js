@@ -44,7 +44,7 @@
     const kaart = $('#gateStep').querySelector('.card');
     if (!kaart || $('#kaUitn')) return;
     kaart.insertAdjacentHTML('beforeend', '<div class="k h-mt70">'+T('pd.ka.uitn','Uitnodiging van de eigenaar')+'</div>'+
-      '<div class="pinrow h-mt40"><input id="kaUitn" aria-label="'+T('pd.ka.uitn','Uitnodiging van de eigenaar')+'" autocomplete="off" autocapitalize="characters" maxlength="10" placeholder="ABCD234567">'+
+      '<div class="pinrow h-mt40"><input id="kaUitn" aria-label="'+T('pd.ka.uitn','Uitnodiging van de eigenaar')+'" autocomplete="off" autocapitalize="characters" maxlength="40" placeholder="KU.">'+
       '<button id="kaUitnGo" class="abtn">'+T('pd.ka.uitnGo','Koppel aan mijn account')+'</button></div>');
     const ga = async () => {
       $('#kaFout').textContent = '';

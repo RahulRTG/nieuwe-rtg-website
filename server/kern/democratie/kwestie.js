@@ -110,6 +110,12 @@ function maakKwestieSchrijver({ nu, journaal }) {
     noteer(k, { wat: 'actie', ronde: huidige(k).nr, actie: id, fase });
   }
 
+  /* Er werd een voorstel aan deze kwestie gekoppeld (./voorstellen.js). Net als
+     bij een actie: de kwestie bezit het voorstel niet, ze krijgt de regel. */
+  function voorstel(k, id) {
+    noteer(k, { wat: 'voorstel', ronde: huidige(k).nr, voorstel: id });
+  }
+
   /* De terugkoppeling aan een ontvanger een trede verder zetten. Nooit terug. */
   function trede(k, ref, naar) {
     const tredes = ['klaargezet', 'gewekt', 'gezien'];
@@ -125,7 +131,7 @@ function maakKwestieSchrijver({ nu, journaal }) {
     return bewogen;
   }
 
-  return { nieuw, behandel, sluit, toetsEindstand, heropen, volg, actie, trede, huidige, loopt };
+  return { nieuw, behandel, sluit, toetsEindstand, heropen, volg, actie, voorstel, trede, huidige, loopt };
 }
 
 module.exports = { maakKwestieSchrijver };

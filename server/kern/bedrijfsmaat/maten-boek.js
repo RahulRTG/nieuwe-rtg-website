@@ -1,6 +1,6 @@
 /* Bedrijfsmaten, deel HET BOEK VAN RTG: wat RTG als organisatie uitgeeft en
-   verschuldigd is (besluiten C8 tot en met C11, 27 september 2026). De bron is
-   kern/rtgboek.js, gevuld door het Financien-kantoor op naam; alle vier dragen
+   verschuldigd is (besluiten C8 tot en met C12, 27 en 28 september 2026). De bron is
+   kern/rtgboek.js, gevuld door het Financien-kantoor op naam; alle vijf dragen
    daarom de graad vermoed. Vorm en regels staan in ./index.js; dit bestand is
    alleen gegevens. */
 'use strict';
@@ -48,5 +48,16 @@ module.exports = [
     projectie: [c(SRB, 'const perKanaal = ')], bewijs: [c(SRB, "stand: 'TE_KLEINE_GROEP'")],
     groepsgrens: [c(SRB, "g.stand !== 'TOONBAAR'")],
     gedeeltelijk: 'Alleen leden die een kanaal opgaven; wie de vraag oversloeg en zonder campagnelink kwam, telt nergens.',
+    waarom: {} },
+
+  { id: 'campagnes.rtg-marketing', domein: 'campagnes', wereld: 'rtg-intern', eenheid: 'eurocent per nieuw lid, per campagne',
+    betekenis: 'De campagnes van RTG zelf: wat ze kostten en hoeveel nieuwe leden er met hun code binnenkwamen.',
+    berekening: 'de uitgave per campagne uit het boek gedeeld door de nieuwe leden met haar code in dezelfde maand',
+    actualiteit: 'periode', privacy: 'huis', minGroep: null, eigenaar: 'kern/rtgcampagne', graad: 'vermoed', afhankelijk: [],
+    bron: [c('server/kern/rtgcampagne.js', 'function maak('), c('server/kern/rtgboek.js', 'function zetCampagne(')],
+    definitie: [c('server/kern/bedrijfsmaat/definities-later.js', 'campagne: d28(12, 1')],
+    projectie: [c(SRB, 'const perCampagne = ')], bewijs: [c('server/kern/rtgboek.js', "reden: p.centen == null ? 'De campagnes zijn geboekt")],
+    groepsgrens: [c(SRB, "g.stand !== 'TOONBAAR' || !g.aantal) return Object.assign(basis")],
+    gedeeltelijk: 'Alleen wie met de campagnelink binnenkwam: geen klikken, geen bereik en geen attributie, dus een ondergrens.',
     waarom: {} }
 ];

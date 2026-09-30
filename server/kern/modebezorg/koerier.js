@@ -4,7 +4,7 @@
    winkellaag heeft gemount. */
 module.exports = (ctx) => {
   const { db, save, crypto, findSupplier, accounts, notify, notifySupplier, sseToCustomer, sseToSupplier, sseToOffice, haversine, etaMinutes, leesUploadDataUrl,
-    KETEN, KLAAR, id, nu, pin, schoon, getal, lijst } = ctx;
+    KETEN, KLAAR, id, nu, bezorgcode, schoon, getal, lijst } = ctx;
   const { instel, winkelBeeld, klantBeeld } = ctx;
   function route(code, koerierPos) {
     const open = lijst().filter(b => b.supplierCode === code && !KLAAR[b.status]);
@@ -14,6 +14,10 @@ module.exports = (ctx) => {
     return metAfstand.map(x => Object.assign(winkelBeeld(x.b), { afstandM: x.d, etaMin: x.d != null ? etaMinutes(x.d, 'driving') : null }));
   }
   function bezorging(code, ref) { return lijst().find(b => b.ref === ref && b.supplierCode === code); }
+  /* Een bezorgpunt verdwijnt bij het einde van de levering (NAVIGATIE.md N20):
+     de bestemming en de laatste positie van de koerier waren er voor de rit.
+     Het adres als tekst blijft bij de bezorging, voor de bon en een geschil. */
+  function wisPunt(b) { b.loc = null; b.gps = null; }
   function neem(code, ref, actor) {
     const b = bezorging(code, ref);
     if (!b) return { status: 404, error: 'Bezorging niet gevonden.' };
@@ -31,23 +35,30 @@ module.exports = (ctx) => {
     const b = bezorging(code, ref);
     if (!b) return { status: 404, error: 'Bezorging niet gevonden.' };
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) return { status: 400, error: 'Geen positie.' };
+    // na de levering bestaat er geen rit meer om te volgen; anders zet een
+    // achterblijvende app de laatste positie terug die net gewist is (N20)
+    if (KLAAR[b.status]) return { status: 409, error: 'Deze bezorging is al afgerond.' };
     b.gps = { lat, lng, at: nu() };   // vluchtig genoeg; we bewaren de laatste
     const eta = b.loc ? etaMinutes(haversine({ lat, lng }, b.loc), 'driving') : null;
     sseToCustomer(b.key, 'modebezorg', { ref: b.ref, kind: 'gps', lat, lng, etaMin: eta });
     return { status: 200, ok: true, etaMin: eta };
   }
-  // Overdracht: bezorgcode moet kloppen; foto als bewijs; bij dure stukken ID ok.
-  function overhandig(code, ref, opts, actor) {
+  /* Overdracht: bij dure stukken eerst ID (dat kost geen poging), dan de
+     bezorgcode -- geclaimd in de collectietransactie van ./bezorgcode.js, die
+     ook de foute pogingen telt. De bezorging krijgt daarna de projectie. */
+  async function overhandig(code, ref, opts, actor) {
     const b = bezorging(code, ref);
     if (!b) return { status: 404, error: 'Bezorging niet gevonden.' };
     if (KLAAR[b.status]) return { status: 409, error: 'Deze bezorging is al afgerond.' };
-    if (String((opts && opts.bezorgcode) || '') !== b.bezorgcode) return { status: 403, error: 'De bezorgcode klopt niet. Vraag de klant om de code uit de app.' };
     if (b.idVereist && !(opts && opts.idOk === true)) return { status: 403, error: 'Dit is een dure levering: bevestig eerst de identiteit aan de deur.' };
+    const c = await bezorgcode.claim({ ref, supplierCode: code, code: opts && opts.bezorgcode, actor });
+    if (c.error) return c;
     const foto = opts && opts.foto;
     if (foto && typeof foto === 'string' && /^data:image\//.test(foto) && foto.length < 900 * 1024) b.foto = foto;
     b.idOk = !!(opts && opts.idOk);
     b.status = 'afgeleverd';
     b.afgeleverdAt = nu();
+    wisPunt(b);
     b.stappen.push({ status: 'afgeleverd', at: b.afgeleverdAt, door: (actor && actor.name) || null });
     save();
     notify(b.key, { icon: 'pas', title: b.supplierName, body: 'Veilig afgeleverd. Bedankt voor uw aankoop.', scope: 'orders' });
@@ -56,13 +67,16 @@ module.exports = (ctx) => {
     return { status: 200, ok: true, status2: b.status };
   }
   // Retour aan de deur (past niet / klant weigert): de koerier neemt het mee terug.
-  function retour(code, ref, reden, actor) {
+  async function retour(code, ref, reden, actor) {
     const b = bezorging(code, ref);
     if (!b) return { status: 404, error: 'Bezorging niet gevonden.' };
     if (KLAAR[b.status]) return { status: 409, error: 'Deze bezorging is al afgerond.' };
     const s = findSupplier(code);
     if (s && !instel(s).retourAanDeur) return { status: 409, error: 'Retour aan de deur staat uit voor deze winkel.' };
+    const dicht = await bezorgcode.sluit({ ref, supplierCode: code, door: (actor && actor.name) || 'koerier', waarom: 'retour aan de deur' });
+    if (dicht.error) return dicht;
     b.status = 'retour'; b.retourReden = schoon(reden, 160) || 'Retour aan de deur';
+    wisPunt(b);
     b.stappen.push({ status: 'retour', at: nu(), door: (actor && actor.name) || null });
     save();
     notify(b.key, { icon: 'betalen', title: b.supplierName, body: 'Uw bezorging is retour genomen. Het bedrag wordt teruggestort.', scope: 'orders' });

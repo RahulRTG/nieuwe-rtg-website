@@ -135,6 +135,7 @@ Object.assign(SLEUTELS,
   require('./idemsleutels-restbak'),
   /* De weerbaarheidsronde: de tweede handtekening en de schaduwteller. */
   require('./idemsleutels-weerbaarheid').SLEUTELS,
+  require('./idemsleutels-aankomst').SLEUTELS,
   /* RTG Move: drie lezende POST-routes. Waarom `leest` en niet
      `zelfdeVerzoek` staat in de kop van dat bestand -- een tweede weging
      hoort het antwoord van NU te krijgen. */
@@ -158,6 +159,7 @@ Object.assign(SLEUTELS,
   /* Reisbetalingen verklaren hun eigen replay-antwoorden in het deelbestand. */
   require('./idemsleutels-reisherkomst').SLEUTELS,
   require('./idemsleutels-bundel').SLEUTELS,
+  require('./idemsleutels-personeel').SLEUTELS,
   require('./idemsleutels-magnaatleven').SLEUTELS,
   require('./idemsleutels-democratie').SLEUTELS,
   require('./idemsleutels-connection-final').SLEUTELS,

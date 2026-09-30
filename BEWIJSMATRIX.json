@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-06T15:04:45.816Z",
-    "commit": "b53eaa5e",
+    "op": "2026-09-29T20:31:48.951Z",
+    "commit": "61eeda036",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bewijsmatrix.js",
@@ -9,93 +9,93 @@
   },
   "herkomst": "routekaart (draaiende server)",
   "gedegradeerd": false,
-  "journaalGelezen": null,
-  "routes": 4971,
+  "journaalGelezen": ".routejournaal",
+  "routes": 5273,
   "schakels": 11,
-  "cellen": 54681,
+  "cellen": 58003,
   "telling": {
-    "bewezen": 26449,
-    "verklaard": 117,
-    "nvt": 578,
-    "ongemeten": 27512,
-    "gezakt": 25
+    "bewezen": 28249,
+    "verklaard": 0,
+    "nvt": 619,
+    "ongemeten": 29135,
+    "gezakt": 0
   },
   "perSchakel": {
     "AUTH": {
-      "bewezen": 4516,
-      "verklaard": 117,
+      "bewezen": 4926,
+      "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 338,
+      "ongemeten": 347,
       "gezakt": 0
     },
     "ACL": {
-      "bewezen": 3902,
+      "bewezen": 4279,
       "verklaard": 0,
-      "nvt": 133,
-      "ongemeten": 936,
+      "nvt": 137,
+      "ongemeten": 857,
       "gezakt": 0
     },
     "INPUT": {
-      "bewezen": 3444,
+      "bewezen": 3783,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1527,
+      "ongemeten": 1490,
       "gezakt": 0
     },
     "OUTPUT": {
-      "bewezen": 4151,
+      "bewezen": 4157,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 820,
+      "ongemeten": 1116,
       "gezakt": 0
     },
     "STATE": {
-      "bewezen": 438,
+      "bewezen": 412,
       "verklaard": 0,
-      "nvt": 78,
-      "ongemeten": 4455,
+      "nvt": 85,
+      "ongemeten": 4776,
       "gezakt": 0
     },
     "SIDE_EFFECT": {
-      "bewezen": 438,
+      "bewezen": 412,
       "verklaard": 0,
-      "nvt": 78,
-      "ongemeten": 4455,
+      "nvt": 85,
+      "ongemeten": 4776,
       "gezakt": 0
     },
     "AUDIT": {
-      "bewezen": 1059,
+      "bewezen": 1112,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 3912,
+      "ongemeten": 4161,
       "gezakt": 0
     },
     "IDEMPOTENCY": {
-      "bewezen": 1662,
+      "bewezen": 1812,
       "verklaard": 0,
-      "nvt": 78,
-      "ongemeten": 3231,
+      "nvt": 89,
+      "ongemeten": 3372,
       "gezakt": 0
     },
     "FAILURE": {
-      "bewezen": 115,
+      "bewezen": 80,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 4832,
-      "gezakt": 24
+      "ongemeten": 5193,
+      "gezakt": 0
     },
     "ROLLBACK": {
-      "bewezen": 2822,
+      "bewezen": 2997,
       "verklaard": 0,
-      "nvt": 78,
-      "ongemeten": 2070,
-      "gezakt": 1
+      "nvt": 86,
+      "ongemeten": 2190,
+      "gezakt": 0
     },
     "PRIVACY": {
-      "bewezen": 3902,
+      "bewezen": 4279,
       "verklaard": 0,
-      "nvt": 133,
-      "ongemeten": 936,
+      "nvt": 137,
+      "ongemeten": 857,
       "gezakt": 0
     }
   },

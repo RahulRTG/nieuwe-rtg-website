@@ -2,7 +2,7 @@
   "uitleg": "Kan er een canonieke Codewereld bestaan? Gemeten over de registers in de wortel: op welke as staan ze, hoeveel sleutels delen ze, en spreken ze elkaar tegen. Deze meter voegt niets samen en kiest bij tegenspraak geen winnaar.",
   "stempel": {
     "op": "2026-09-29",
-    "commit": "2ae19049"
+    "commit": "eaacb8c3"
   },
   "registers": {
     "geteld": 190,
@@ -13,33 +13,33 @@
   },
   "assen": {
     "route": {
-      "sleutels": 6553,
+      "sleutels": 6564,
       "registers": 82
     },
     "bestand": {
-      "sleutels": 5806,
+      "sleutels": 5813,
       "registers": 154
     },
     "symbool": {
-      "sleutels": 24453,
+      "sleutels": 24495,
       "registers": 1,
       "reden": null,
       "gereedschapAanwezig": true,
       "gereedschap": "scripts/ast/ (eigen parser, met lijn- en positie-informatie)",
       "proef": {
         "gedraaid": true,
-        "bestanden": 3906,
-        "geparsed": 3906,
+        "bestanden": 3911,
+        "geparsed": 3911,
         "gefaald": 0,
         "gefaaldLijst": [],
-        "symbolen": 17177,
+        "symbolen": 17210,
         "seconden": 3.9
       }
     }
   },
   "ruggengraat": {
-    "paden": 6553,
-    "inMeerDanEenRegister": 6108,
+    "paden": 6564,
+    "inMeerDanEenRegister": 6119,
     "pct": 93.2,
     "verdeling": [
       {
@@ -160,19 +160,19 @@
       },
       {
         "registers": 6,
-        "paden": 71
+        "paden": 72
       },
       {
         "registers": 5,
-        "paden": 62
+        "paden": 75
       },
       {
         "registers": 4,
-        "paden": 69
+        "paden": 62
       },
       {
         "registers": 3,
-        "paden": 341
+        "paden": 345
       },
       {
         "registers": 2,
@@ -186,7 +186,7 @@
   },
   "brug": {
     "uitleg": "paren route -> bestand die BINNEN EEN RIJ van een register staan; alleen daar beweert een register dat die twee bij elkaar horen",
-    "paden": 5601,
+    "paden": 5612,
     "registersDieSpreken": [
       "AANROEPGRAAF.json",
       "DOELGROEPBEREIK.json",
@@ -196,7 +196,7 @@
       "ROUTEBRON.json",
       "SCHRIJFANALYSE.json"
     ],
-    "verschilToetsbaar": 5372,
+    "verschilToetsbaar": 5383,
     "verschilDekkingPct": 95.9,
     "verschillen": 35,
     "soortBeslistIn": "ROUTEBRON.json -- daar wordt een verschil ingedeeld als `verouderd` of `tegenspraak`; deze meter telt alleen DAT ze verschillen",
@@ -670,12 +670,12 @@
   },
   "bronbereik": {
     "uitleg": "twee getallen, met opzet. `genoemd` = door enig register (de symboolindex noemt alles, dus dit meet STRUCTUUR: welke functies, wat uitgevoerd, wie hangt ervan af). `gedrag` = door minstens een register buiten die index (schrijft het, is het bewezen, is het herhaalbaar). Alleen het tweede is de bovengrens voor een vraag over gedrag.",
-    "bestanden": 5102,
-    "genoemd": 5102,
+    "bestanden": 5109,
+    "genoemd": 5109,
     "pct": 100,
-    "gedrag": 2868,
+    "gedrag": 2871,
     "gedragPct": 56.2,
-    "relatie": 5102,
+    "relatie": 5109,
     "indexregisters": [
       {
         "register": "AANROEPGRAAF.json",
@@ -701,25 +701,25 @@
     "zwijgendeRegisters": [
       {
         "register": "SCHERMGEDRAG.json",
-        "bestanden": 149
+        "bestanden": 148
       }
     ],
     "indexgrens": "een register telt als index als hij zichzelf zo verklaart (soort: index) of minstens 95% van een boom noemt. Een index zegt WAAR iets woont en WAT met wat samenhangt; hij zegt niet of het schrijft, klopt of bewezen is -- daarom telt hij niet mee voor de gedragsteller.",
     "perBoom": [
       {
         "boom": "server",
-        "bestanden": 3906,
-        "genoemd": 3906,
+        "bestanden": 3911,
+        "genoemd": 3911,
         "pct": 100,
-        "gedrag": 2363,
+        "gedrag": 2365,
         "gedragPct": 60.5
       },
       {
         "boom": "public",
-        "bestanden": 1196,
-        "genoemd": 1196,
+        "bestanden": 1198,
+        "genoemd": 1198,
         "pct": 100,
-        "gedrag": 505,
+        "gedrag": 506,
         "gedragPct": 42.2
       }
     ],
@@ -754,7 +754,7 @@
     "perRegister": [
       {
         "register": "ROUTEBRON.json",
-        "paden": 5295
+        "paden": 5306
       },
       {
         "register": "DEKKING.json",
@@ -762,7 +762,7 @@
       },
       {
         "register": "MUTATIECONTRACT.json",
-        "paden": 5163
+        "paden": 5174
       },
       {
         "register": "POORTWACHT.json",
@@ -814,7 +814,7 @@
       },
       {
         "register": "MACHINEDEKKING.json",
-        "paden": 3935
+        "paden": 3955
       },
       {
         "register": "HANDELINGPROEF.json",
@@ -834,7 +834,7 @@
       },
       {
         "register": "AANROEPGRAAF.json",
-        "paden": 3233
+        "paden": 3244
       },
       {
         "register": "MUTATIECONTRACT-AFGELEID.json",
@@ -846,11 +846,11 @@
       },
       {
         "register": "SCHERMFUNCTIE.json",
-        "paden": 1459
+        "paden": 1460
       },
       {
         "register": "SCHERMROUTES.json",
-        "paden": 1097
+        "paden": 1098
       },
       {
         "register": "MUTATIECONTRACT-VOORSTEL.json",
@@ -914,18 +914,18 @@
     {
       "register": "AANROEPGRAAF.json",
       "as": "bestand",
-      "paden": 3233,
-      "bestanden": 3417,
+      "paden": 3244,
+      "bestanden": 3422,
       "symbolen": 0,
-      "paren": 3242
+      "paren": 3253
     },
     {
       "register": "ROUTEBRON.json",
       "as": "route",
-      "paden": 5295,
-      "bestanden": 705,
+      "paden": 5306,
+      "bestanden": 706,
       "symbolen": 0,
-      "paren": 5292
+      "paren": 5303
     },
     {
       "register": "DEKKING.json",
@@ -938,7 +938,7 @@
     {
       "register": "MUTATIECONTRACT.json",
       "as": "route",
-      "paden": 5163,
+      "paden": 5174,
       "bestanden": 1,
       "symbolen": 0,
       "paren": 0
@@ -947,8 +947,8 @@
       "register": "SYMBOLEN.json",
       "as": "symbool",
       "paden": 0,
-      "bestanden": 5108,
-      "symbolen": 24453,
+      "bestanden": 5115,
+      "symbolen": 24495,
       "paren": 0
     },
     {
@@ -1018,10 +1018,10 @@
     {
       "register": "MACHINEDEKKING.json",
       "as": "route",
-      "paden": 3935,
-      "bestanden": 689,
+      "paden": 3955,
+      "bestanden": 692,
       "symbolen": 0,
-      "paren": 3938
+      "paren": 3958
     },
     {
       "register": "ONBEWEZEN.json",
@@ -1098,7 +1098,7 @@
     {
       "register": "SCHERMFUNCTIE.json",
       "as": "route",
-      "paden": 1459,
+      "paden": 1460,
       "bestanden": 587,
       "symbolen": 0,
       "paren": 0
@@ -1122,7 +1122,7 @@
     {
       "register": "SCHERMROUTES.json",
       "as": "route",
-      "paden": 1097,
+      "paden": 1098,
       "bestanden": 426,
       "symbolen": 0,
       "paren": 0
@@ -1235,7 +1235,7 @@
       "register": "SEMANTIEK.json",
       "as": "bestand",
       "paden": 0,
-      "bestanden": 252,
+      "bestanden": 253,
       "symbolen": 0,
       "paren": 0
     },

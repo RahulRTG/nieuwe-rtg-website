@@ -66,6 +66,10 @@ module.exports = ({ db, lidBoardLogWis }) => {
     // meldingen weg (bij demo-profielen is dit de gedeelde demo-bel)
     if (db.data.notifications[key]) db.data.notifications[key] = [];
     for (const tak of EIGEN_TAKKEN) { if (db.data[tak]) delete db.data[tak][key]; }
+    /* HET VONK-PROFIEL, met zijn vak van 5 km (NAVIGATIE.md N21). Geen tak op de
+       sleutel maar een laag dieper (db.data.vonk.profielen), dus de lijst
+       hierboven raakte hem niet en bleef de plek van een vergeten lid staan. */
+    if (db.data.vonk && db.data.vonk.profielen) delete db.data.vonk.profielen[key];
     /* DE IDEMPOTENTIESLEUTELS VAN BETALEN. betaalIdem is geen tak op de sleutel
        van het lid maar een ring van antwoorden op een idem-sleutel, en in zo'n
        bewaard antwoord staat de codenaam. Een `delete tak[key]` raakt hem dus
@@ -104,6 +108,12 @@ module.exports = ({ db, lidBoardLogWis }) => {
        staan na "verwijder mijn gegevens", dan houden we een spoor van iemand die
        er niet meer is. */
     if (typeof lidBoardLogWis === 'function') lidBoardLogWis(key);
+
+    /* DE OV-RITTEN: een lijst met `key` per rit en geen tak op de sleutel, dus
+       EIGEN_TAKKEN raakt ze niet. Het ritoverzicht (halte naar halte) blijft
+       normaal een jaar; op verzoek gaat het eerder weg (NAVIGATIE.md N17). Het
+       geld zelf blijft in payBoekingen, met zijn eigen bewaarplicht. */
+    if (Array.isArray(db.data.ovRitten)) db.data.ovRitten = db.data.ovRitten.filter(r => !r || r.key !== key);
 
     /* DE VAKBEWIJZEN, en die stonden hier niet -- met een reden die het waard is
        op te schrijven, want hij geldt voor alles wat er nog bij komt.

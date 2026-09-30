@@ -12,7 +12,7 @@
     "bronBlindeBestanden": 3,
     "browserpoortToetsen": 402,
     "carriereDomeinenGemeten": 15,
-    "dbDeuren": 535,
+    "dbDeuren": 536,
     "dbDeurenSchrijvend": 275,
     "dekkingPct": 83,
     "dekkingWaargenomenPct": 100,
@@ -28,8 +28,8 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4626,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1680,
-    "kernGedeeld": 253,
+    "kernBreedte": 1682,
+    "kernGedeeld": 254,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
@@ -3952,6 +3952,43 @@
       "meter": "kernBreedte 1679 -> 1680 (samenvoeging #426 ronde 3)",
       "reden": "Dezelfde kant als bij kernGedeeld: OV leest verzuim (#422) naast de incheckcodes van deze tak.",
       "waarheen": "De notities van #422 zelf."
+    },
+    {
+      "datum": "2026-09-30",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1680,
+      "meter": "kernBreedte 1680 -> 1682",
+      "reden": "De concierge-lus (CONCIERGE.md) krijgt twee kernnamen en niet zes. `bureauZaak` is met opzet een EIGEN naam naast `bureau` en `bureauBalie`: de zaak die een onderdeel levert mag alleen zijn eigen onderdelen zien, en onder `bureau` zou het domein supplier bij de dossierfuncties van het lid kunnen. `reserveringUitzondering` draagt de vier functies van het tegenvoorstel en het doorzetten onder EEN naam in plaats van vier (de eerste versie had er vier, en de meter wees het aan).",
+      "waarheen": "GRENZEN.json (supplier: bureauZaak en reserveringUitzondering; member: reserveringUitzondering), server/kern/bureau/uitgang.js en server/kern/ervaring/tafels.js"
+    },
+    {
+      "datum": "2026-09-30",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 253,
+      "meter": "kernGedeeld 253 -> 254",
+      "reden": "`reserveringUitzondering` wordt door twee domeinen aangeraakt, en dat hoort zo: de zaak doet een tegenvoorstel (supplier), de gast antwoordt erop (member). Twee kopieen van de regel dat een verlopen tegenvoorstel niet wordt aangenomen zouden uit elkaar lopen; een gedeelde naam met een module erachter niet.",
+      "waarheen": "server/kern/ervaring/tafeluitzondering.js en test/tafeluitzondering.test.js"
+    },
+    {
+      "datum": "2026-09-30",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 338,
+      "vervalt": "2026-12-30",
+      "meter": "toetsenNietGemeten 338 -> 343",
+      "reden": "Vijf toetsbestanden zijn nieuw: test/conciergelus.test.js, -regels, -kern, -dubbel en test/tafeluitzondering.test.js. Met de hand nagetrokken met vijf mutaties op de dragende regels (een verlopen aanbod toch vastzetten, een verrassing naar een gedeeld kanaal laten gaan, een veld aan de deelnemersweergave toevoegen, afsluiten met een onbevestigd onderdeel, versturen zonder alles gezien te hebben); alle vijf laten een toets zakken. De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt ze mee."
+    },
+    {
+      "datum": "2026-09-30",
+      "soort": "structureel",
+      "sleutel": "dbDeuren",
+      "van": 535,
+      "meter": "dbDeuren 535 -> 536",
+      "reden": "server/opzet/kernlaag2b.js leest db.data.reserveringen voor de tafeluitzondering (tegenvoorstel en doorzetten, CONCIERGE.md par. 2.7-2.9). De eerste versie bouwde hem in kern/ervaring/tafels.js, dat al een deur is, maar server.js pakt de namen van de ervaring-laag een voor een uit en staat boven de omvanggrens, dus daar kan geen naam bij. Het is dezelfde collectie die tafels.js en tafelplanning.js al lezen, via een thunk; de module zelf raakt de opslag niet aan.",
+      "waarheen": "Zodra server.js de ervaring-laag in zijn geheel aan de kern hangt in plaats van naam voor naam, kan de bouw terug naar tafels.js en zakt de teller weer."
     }
   ],
   "prestatie": {

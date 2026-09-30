@@ -26,7 +26,7 @@
 'use strict';
 
 module.exports = (kern, hulp) => {
-  const { DATA_DIR, anthropic, crypto, db, liveCodename, notify, rtmail, save } = hulp;
+  const { DATA_DIR, anthropic, crypto, db, liveCodename, notify, notifySupplier, rtmail, save } = hulp;
 
 /* Het Privékantoor: de ENE app die de veertien premium-apps aan elkaar knoopt.
    Life Graph, Control Tower, delegatie en zaken. Staat NA de twee hierboven
@@ -44,7 +44,7 @@ Object.assign(kern, require('../kern/levensgraaf')({ db,
 // bezitZet komt uit de lifestyle-mount hierboven: een geregelde inkoopzaak
 // schrijft zichzelf in het register. Vandaar NA die twee.
 
-Object.assign(kern, require('../kern/bureau')({ db, save, crypto, anthropic, liveCodename, notify,
+Object.assign(kern, require('../kern/bureau')({ db, save, crypto, anthropic, liveCodename, notify, notifySupplier,
   bezitZet: kern.bezitZet, levensgraaf: kern.levensgraaf }));
 /* Postdatums (kern/postdatum.js): de datums die in de EIGEN post staan, als
    voorstel. Staat hier omdat hij de tower voedt langs de agenda -- niet als

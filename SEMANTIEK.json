@@ -1,9 +1,9 @@
 {
-  "catalogi": 1196,
-  "verschillendeNamen": 727,
+  "catalogi": 1199,
+  "verschillendeNamen": 729,
   "namenInMeerDomeinen": 131,
   "woordenMetMeerBetekenissen": 113,
-  "betekenissenTotaal": 420,
+  "betekenissenTotaal": 421,
   "ergsteWoord": "SOORTEN",
   "ergsteAantal": 49,
   "dubbelingen": 34,
@@ -543,7 +543,7 @@
       ]
     }
   ],
-  "dubbelingenZonderNaam": 262,
+  "dubbelingenZonderNaam": 271,
   "dubbelingZonderNaamLijst": [
     {
       "overlap": 1,
@@ -2218,11 +2218,23 @@
     },
     {
       "naam": "BRONNEN",
-      "domeinen": 8,
-      "betekenissen": 8,
+      "domeinen": 9,
+      "betekenissen": 9,
       "hoogsteOverlap": 0.05,
       "soort": "botsing",
       "waar": [
+        {
+          "bestanden": [
+            "server/kern/bureau/lus.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "normaal",
+            "beslisser",
+            "alternatief",
+            "tijd"
+          ]
+        },
         {
           "bestanden": [
             "server/kern/command/tijdlijn.js"
@@ -2352,7 +2364,7 @@
         },
         {
           "bestanden": [
-            "server/kern/lifestyle/index.js"
+            "server/kern/lifestyle/verzoek.js"
           ],
           "leden": 7,
           "voorbeeld": [

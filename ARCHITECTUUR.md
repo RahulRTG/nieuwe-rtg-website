@@ -107,14 +107,14 @@ luister
 Acht domeinen, uit `server/opzet/routes.js`. Met `RTG_DOMAINS=member,social` draait
 een proces alleen die domeinen; een gateway (`server/poort.js`) stuurt de
 padvoorvoegsels dan naar het juiste proces. **Die belofte is nog niet waargemaakt:**
-zie §5 -- er zijn nog 253 kern-namen die meer dan één domein aanraakt.
+zie §5 -- er zijn nog 254 kern-namen die meer dan één domein aanraakt.
 
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
 | `auth` | 21 | 6 | 8 | 54 |
-| `member` | 730 | 74 | 17 | 454 |
-| `supplier` | 636 | 132 | 6 | 342 |
-| `office` | 88 | 22 | 3 | 97 |
+| `member` | 736 | 75 | 17 | 455 |
+| `supplier` | 639 | 133 | 6 | 344 |
+| `office` | 98 | 22 | 3 | 98 |
 | `staff` | 27 | 9 | 1 | 43 |
 | `social` | 76 | 10 | 31 | 71 |
 | `techniek` | 79 | 20 | 1 | 64 |
@@ -137,9 +137,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1680 |
-| daarvan door **meer dan één** domein (de echte koppeling) | 253 |
-| daarvan door precies één domein | 1427 |
+| kern-namen die routes aanraken | 1682 |
+| daarvan door **meer dan één** domein (de echte koppeling) | 254 |
+| daarvan door precies één domein | 1428 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -151,7 +151,7 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(213) auth(130) supplierAuth(66) officeAuth(48) db(40) liveCodename(35) status(32)
+app(213) auth(130) supplierAuth(66) officeAuth(48) db(40) liveCodename(36) status(32)
 accounts(30) schoon(23) boardroomWie(20) codenaamVan(20) managerOnly(19) save(19)
 rtf(18) tooManyTries(14) geenGast(14) express(14) findSupplier(13) boardroomAuth(13)
 crypto(12) keyVanCodenaam(12) appUrl(11) pay(11) anthropic(11) noteFailedTry(10)
@@ -174,7 +174,7 @@ sseToCustomer(5)
 | 39 | `server/routes/member/voertuigen/ontmoeten.js` |
 | 39 | `server/routes/staff.js` |
 | 35 | `server/routes/auth.js` |
-| 34 | `server/routes/auth/herstel.js` |
+| 35 | `server/routes/member/handel/uitjes.js` |
 
 ## 6. Waar de waarheid staat
 

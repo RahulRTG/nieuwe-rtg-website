@@ -128,4 +128,5 @@ module.exports = (kern) => {
   app.post('/api/member/bureau/zaak/open', auth, doe((k, b) => B.caseOpen(k, b)));
   app.post('/api/member/bureau/zaak/beslis', auth, doe((k, b) => B.caseBeslis(k, String(b.id || ''), b.akkoord === true)));
   app.post('/api/member/bureau/zaak/intrek', auth, doe((k, b) => B.caseIntrek(k, String(b.id || ''))));
+  require('./bureau-lus')(kern, doe);
 };

@@ -859,6 +859,7 @@
       "noteFailedTry"
     ],
     "member": [
+      "reserveringUitzondering",
       "AUTHOR_TIER",
       "DOOR_RELOCK_MS",
       "LANDEN",
@@ -2158,6 +2159,7 @@
       "bonMaak",
       "broadcastSync",
       "btwAangifte",
+      "bureauZaak",
       "cadeaukaart",
       "cannedBoekhouder",
       "careAfronden",
@@ -2344,6 +2346,7 @@
       "reserveerSlot",
       "reserveringKomst",
       "reserveringTafel",
+      "reserveringUitzondering",
       "retailAnnuleer",
       "retailBon",
       "retailState",

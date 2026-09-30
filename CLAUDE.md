@@ -1333,6 +1333,25 @@ zelf af, en wat niet gemeten is wordt niet als getal getoond. Daar staat ook wat
 er al staat en dus NIET opnieuw gebouwd moet worden — de rekening is al één
 waarheid over alle kanalen, en het ontbrekende scharnier is de **stoel**.
 
+**`CONCIERGE.md` is de lus rond een wens** -- gast, case-eigenaar,
+collega-conciërge, partner, zijn beslisser en uitvoerders rond één case, waarbij
+de gast het één keer vertelt en ieder alleen zijn stukje ziet. Lees die vóór je
+iets aan De Rechterhand, het Privékantoor of een conciërgewachtrij verandert.
+De meting die hem stuurt: er zijn vijf conciërge-ingangen (`kern/lifestyle`,
+`kern/bureau/cases*`, `rendezvous-concierge`, de hoteldorpafdeling en
+`mall/concierge`), en het meeste van de lus staat al. Mandaat, tijdlijn die bij
+vertraging meeschuift en verstoringen met gevolgen bestaan. Wat ontbreekt: een
+houdbaar aanbod van een partner, doorzetten naar zijn beslisser, een
+deelnemersweergave per rol, en een netwerk van collega's. Dat laatste vraagt
+eerst een besluit. De scherpste nieuwe grens is CON-08: **een verrassing is een
+privacystand en geen notitie**. Eén melding naar de partner en de case is
+mislukt. **Stap 0 tot en met 8 staan in de server** (par. 0a, 30 september 2026):
+`kern/bureau/lus*.js` als tweede werkwijze (`voorstel`) op dezelfde cases, het
+oude verzoek van De Rechterhand als schil erover (`kern/lifestyle/verzoek.js`),
+en een tegenvoorstel met vasthoudtermijn plus doorzetten naar een manager op de
+tafelreservering (`kern/ervaring/tafeluitzondering.js`). Er zijn nog **geen
+schermen** voor, dus voor een mens bestaat de functie nog niet.
+
 **`BESTUUR.md` is het besturingsvlak** — de achterkant van RTG niet als
 backoffice maar als één laag waarin een mens ziet wat er draait, of het gezond
 is, en **hoe hard dat bewijs is**. Lees die vóór je aan een bestuursscherm, een
@@ -1569,7 +1588,7 @@ mórgen nog klopt. Lees die vóór je een begrip introduceert, een register aanl
 of een scorecard bouwt. De opzet vraagt een semantisch register naar aanleiding
 van de twee `VERMOGENS`; de vraag ervóór is gemeten (`scripts/semantiek.js`,
 `SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->131<!--/getal--> namen die in meer dan
-één domein staan, dragen er **<!--getal:semantiek.betekenissen-->113<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->420<!--/getal-->
+één domein staan, dragen er **<!--getal:semantiek.betekenissen-->113<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->421<!--/getal-->
 betekenissen, met `SOORTEN` op **39**. Daarnaast **29** betekenissen die op meer
 dan één plek wonen én **106** paren die dezelfde waarheid onder een ándere naam
 dragen — die tweede ronde bestaat omdat de eerste ze miste, en de duurste
@@ -2615,8 +2634,8 @@ zeventiende motor bouwt. De kern in één zin: **dit huis heeft geen tekort aan
 motoren, het heeft een tekort aan handelingen die erlangs gaan** -- en dat is
 gemeten in plaats van beweerd. `npm run machinedekking` (`MACHINEDEKKING.json`)
 legt zestien motoren naast elkaar op DEZELFDE route, iets wat geen enkele
-bestaande meter deed: van de <!--getal:machine.muterend-->3946<!--/getal-->
-muterende routes raken er <!--getal:machine.zonderAs-->2827<!--/getal--> geen
+bestaande meter deed: van de <!--getal:machine.muterend-->4008<!--/getal-->
+muterende routes raken er <!--getal:machine.zonderAs-->2780<!--/getal--> geen
 enkele as, <!--getal:machine.motorenZonderRoute-->1<!--/getal--> motoren bereiken
 geen enkele route (bewijstoken, veiligheidskern, gevolgmeting), en de hoogst
 geïntegreerde handeling buiten de hubs raakt DRIE assen -- er is dus geen enkele
@@ -2626,7 +2645,7 @@ dingen missen), en de meter heeft zichzelf twee keer betrapt op dezelfde fout va
 twee kanten: een hub in de kern-tas zette 4162 routes op "idempotent", en
 `/api/notifications` scoorde tien assen omdat die route zelf in `server/server.js`
 woont (143 requires). Vandaar de hubgrens en de
-<!--getal:machine.hubRoutes-->13<!--/getal--> routes waarvoor de bestandsas met
+<!--getal:machine.hubRoutes-->14<!--/getal--> routes waarvoor de bestandsas met
 naam en toenaam onbruikbaar is verklaard. **De eerste keten is rond** (par. 5a):
 `/api/office/bank/incasso` -> `handtekening/bevestig` -> `incasso/dossier`, vijftien
 verplichte assen voor haar klasse en alle vijftien gelopen, met

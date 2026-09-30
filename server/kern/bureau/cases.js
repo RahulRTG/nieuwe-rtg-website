@@ -73,7 +73,7 @@ module.exports = (ctx) => {
      en dat gebeurt precies één keer -- bij het aanmaken, met de stand van dat
      moment. Wie later zijn delegatie verruimt, verruimt niet met terugwerkende
      kracht wat er al ter goedkeuring ligt. */
-  function caseOpen(key, b) {
+  function caseOpen(key, b, o) {
     const titel = schoon(b.titel, 120);
     if (!titel) return { status: 400, error: 'Waarmee kunnen wij u van dienst zijn?' };
     const soort = SOORTEN.includes(b.soort) ? b.soort : 'regulier';
@@ -115,6 +115,9 @@ module.exports = (ctx) => {
 
     if (soort === 'warroom') {
       stap(c, 'in uitvoering', 'Wij hebben een incidentteam aangewezen; een van onze mensen neemt contact met u op.', 'systeem');
+    } else if (o && o.werkwijze === 'voorstel') { // nooit uit het lijf: ./lus.js
+      c.werkwijze = 'voorstel';
+      stap(c, 'in voorbereiding', 'Wij gaan aan de slag; u beslist pas over een voorstel buiten uw mandaat.', 'systeem');
     } else if (oordeel.magZelf) {
       stap(c, 'in uitvoering', oordeel.reden, 'systeem');
     } else {
@@ -183,5 +186,5 @@ module.exports = (ctx) => {
 
   return { caseOpen, caseBeslis, caseIntrek, cases,
     bureauDesk: bureau.bureauDesk, bureauVoortgang: bureau.bureauVoortgang,
-    CASE_STATUSSEN: STATUSSEN, CASE_SOORTEN: SOORTEN, caseLijst: lees, caseOpenTest: openCase };
+    CASE_STATUSSEN: STATUSSEN, CASE_SOORTEN: SOORTEN, caseLijst: lees, caseOpenTest: openCase, caseStap: stap };
 };

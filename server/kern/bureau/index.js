@@ -35,7 +35,7 @@
    de suite (routes/member/bureau.js). */
 'use strict';
 
-module.exports = ({ db, save, crypto, anthropic, liveCodename, notify, bezitZet, levensgraaf }) => {
+module.exports = ({ db, save, crypto, anthropic, liveCodename, notify, notifySupplier, bezitZet, levensgraaf }) => {
   const nu = () => new Date().toISOString();
   const rid = () => crypto.randomBytes(4).toString('hex');
   const schoon = (t, n) => String(t == null ? '' : t).replace(/[<>]/g, '').trim().slice(0, n || 200);
@@ -58,6 +58,13 @@ module.exports = ({ db, save, crypto, anthropic, liveCodename, notify, bezitZet,
     inAanbouw: kamersMod.inAanbouw });
   const casesMod = require('./cases')({ db, save, nu, rid, schoon, liveCodename, notify,
     beoordeel: delegatieMod.beoordeel, deelopdrachten: orkMod.deelopdrachten, bezitZet });
+  /* De concierge-lus (CONCIERGE.md) op dezelfde zaken: geen tweede wachtrij,
+     een tweede werkwijze. ./lus-regels.js rekent, ./lus.js en ./lus-wens.js
+     werken met de wens en het voorstel, ./lus-uitvoering.js met wat vaststaat. */
+  const lusMod = require('./lus')({ save, schoon, rid, nu, caseOpen: casesMod.caseOpen,
+    caseLijst: casesMod.caseLijst, stap: casesMod.caseStap, beoordeel: delegatieMod.beoordeel, notify });
+  const lusUitMod = require('./lus-uitvoering')({ db, save, schoon, rid, nu, stap: casesMod.caseStap,
+    vind: lusMod.vind, notifySupplier });
   const nuMod = require('./nu')({ tower: termijnenMod.tower, cases: casesMod.cases,
     samenvatting: graafMod.samenvatting, graaf: graafMod.graaf });
   const twinMod = require('./twin')({ db, save, nu, rid, schoon, isDatum: d => /^\d{4}-\d{2}-\d{2}$/.test(String(d || '')) });
@@ -124,7 +131,7 @@ module.exports = ({ db, save, crypto, anthropic, liveCodename, notify, bezitZet,
   return require('./uitgang')({
     overzicht: bureauOverzicht, ai: bureauAI,
     nu: nuMod, termijnen: termijnenMod, graaf: graafMod, delegatie: delegatieMod,
-    kamers: kamersMod, ork: orkMod, brief: briefMod, twin: twinMod, cases: casesMod,
+    kamers: kamersMod, ork: orkMod, brief: briefMod, twin: twinMod, cases: casesMod, lus: lusMod, lusUit: lusUitMod,
     bv: bvMod, rp: rpMod, dr: drMod, col: colMod, rel: relMod, rd: rdMod
   });
 };

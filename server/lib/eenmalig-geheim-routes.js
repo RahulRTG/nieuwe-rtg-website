@@ -7,6 +7,14 @@
 'use strict';
 
 const ROUTES = new Set([
+  // De domeinbon controleert eerst de actuele rol; een antwoordcache mag die niet overslaan.
+  'POST /api/bedrijf/praktijk/delen',
+  'POST /api/bedrijf/praktijk/inrichten',
+  'POST /api/bedrijf/praktijk/aanbod',
+  'POST /api/bedrijf/praktijk/vraag',
+  'POST /api/bedrijf/praktijk/stap',
+  'POST /api/werk-gast/beeld',
+  'POST /api/werk-gast/besluit',
   /* Account- en personeelsroutes geven een sessie/PIN eenmalig terug. Een
      generieke retrycache zou die na intrekking vóór de echte deur herhalen. */
   'POST /api/auth/register',

@@ -2,15 +2,15 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-30",
   "gemeten": {
-    "bestanden": 2632,
-    "vormen": 1531,
-    "velden": 2195,
-    "modules": 846,
+    "bestanden": 2655,
+    "vormen": 1549,
+    "velden": 2209,
+    "modules": 854,
     "domeinen": 306,
     "envelopDrempel": 19,
     "envelop": 28,
-    "veldenDomeineigen": 1528,
-    "veldenGedeeldVanafVier": 229,
+    "veldenDomeineigen": 1540,
+    "veldenGedeeldVanafVier": 230,
     "gelijkendeVormparen": 24
   },
   "envelop": [
@@ -249,6 +249,18 @@
       ]
     },
     {
+      "veld": "ingetrokken",
+      "domeinen": 13,
+      "waar": [
+        "bedrijf",
+        "kern/beschermzaak",
+        "kern/carriereledger",
+        "kern/command",
+        "kern/festival",
+        "kern/leerhuis"
+      ]
+    },
+    {
       "veld": "aan",
       "domeinen": 12,
       "waar": [
@@ -318,18 +330,6 @@
         "kern/meet",
         "kern/metier",
         "kern/muziek"
-      ]
-    },
-    {
-      "veld": "ingetrokken",
-      "domeinen": 12,
-      "waar": [
-        "bedrijf",
-        "kern/beschermzaak",
-        "kern/carriereledger",
-        "kern/command",
-        "kern/festival",
-        "kern/mobiliteit"
       ]
     },
     {
@@ -465,6 +465,18 @@
       ]
     },
     {
+      "veld": "duurMin",
+      "domeinen": 11,
+      "waar": [
+        "kern/avond",
+        "kern/bureau",
+        "kern/care",
+        "kern/gemeente",
+        "kern/leverancier",
+        "kern/mall"
+      ]
+    },
+    {
       "veld": "actief",
       "domeinen": 11,
       "waar": [
@@ -510,18 +522,6 @@
         "kern/livinglab",
         "kern/magnaat-controle",
         "kern/magnaat-trainingslobby-acties"
-      ]
-    },
-    {
-      "veld": "klaar",
-      "domeinen": 10,
-      "waar": [
-        "kern/afdelingen",
-        "kern/beveiliging",
-        "kern/borden",
-        "kern/eten",
-        "kern/magnaat-partnerstudio-basis",
-        "kern/muziek"
       ]
     }
   ],

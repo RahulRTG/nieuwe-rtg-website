@@ -107,7 +107,7 @@ test('6. de besluiten C1 en verder reizen mee, op volgorde, met hun herkomst en 
   assert.ok(ids.length >= 12, 'C1 tot en met C12 zijn genomen; er verdwijnt er geen');
   for (const b of vast.besluiten) {
     assert.equal(b.herkomst, 'mens');
-    assert.match(b.besloten, /2[5789] september 2026/);
+    assert.match(b.besloten, /(2[5789]|30) september 2026/);
     assert.ok(['gebouwd', 'te bouwen'].includes(b.stand), b.id + ' zegt niet of hij al een handhaver heeft');
     if (b.stand === 'te bouwen') assert.match(b.handhaving, /^Nog geen/, b.id + ' belooft een handhaver die er niet is');
     if (b.stand === 'gebouwd') assert.match(b.handhaving, /test\/[a-z-]+\.test\.js|test\/stuur-kantoor/, b.id + ' noemt geen toets die hem vasthoudt');

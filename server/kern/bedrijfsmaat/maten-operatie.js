@@ -15,14 +15,14 @@ module.exports = [
     betekenis: 'Hoeveel werk er bij de serviceteams ligt.', berekening: 'nog niet vastgesteld',
     actualiteit: 'live', privacy: 'personeel', minGroep: 10, eigenaar: null, graad: 'onbekend', afhankelijk: ['support.klokken'],
     bron: [c('server/kern/service/teams.js', 'const TEAMS = {')], definitie: null, projectie: null, bewijs: null, groepsgrens: null,
-    waarom: { definitie: 'Niet besloten; en per team met een of twee mensen is werklast een getal over een mens (KANTOORMACHT.md).',
+    waarom: { definitie: 'Besluit C23: blijft open; per team met een of twee mensen is werklast een getal over een mens (KANTOORMACHT.md).',
       projectie: 'Niet gebouwd.', bewijs: 'Volgt uit de projectie.', groepsgrens: 'Volgt uit de projectie.', eigenaar: 'Niemand.' } },
 
   { id: 'personeel.rtg-op-naam', domein: 'personeel', wereld: 'rtg-intern', eenheid: 'medewerkers',
     betekenis: 'Hoeveel mensen er op naam voor het kantoor van RTG werken.', berekening: 'nog niet vastgesteld',
     actualiteit: 'live', privacy: 'personeel', minGroep: 10, eigenaar: null, graad: 'onbekend', afhankelijk: [],
     bron: [c('server/kern/kantoor/uitnodiging.js', 'function verzilver')], definitie: null, projectie: null, bewijs: null, groepsgrens: null,
-    waarom: { definitie: 'Een kantoorrol op een account is geen dienstverband; het dienstverband bij RTG zelf staat niet in kern/concern/employment.js.',
+    waarom: { definitie: 'Besluit C23: blijft open tot een groter team. Een kantoorrol op een account is geen dienstverband; het dienstverband bij RTG zelf staat niet in kern/concern/employment.js.',
       projectie: 'Niet gebouwd; de mensdeur telt verzoeken met en zonder naam, geen mensen.', bewijs: 'Volgt uit de projectie.',
       groepsgrens: 'Met drie mensen op kantoor valt elk getal onder de grens; dat is juist.', eigenaar: 'Niemand.' } },
 
@@ -31,7 +31,7 @@ module.exports = [
     actualiteit: 'onbekend', privacy: 'personeel', minGroep: 10, eigenaar: null, graad: 'onbekend', afhankelijk: ['personeel.rtg-op-naam'],
     bron: null, definitie: null, projectie: null, bewijs: null, groepsgrens: null,
     waarom: { bron: 'De urenklok (kern/personeel.js) staat per zaakcode en is voor partnerpersoneel; het eigen kantoor van RTG klokt nergens.',
-      definitie: 'Volgt pas als er een bron is.', projectie: 'Idem.', bewijs: 'Idem.', groepsgrens: 'Idem.', eigenaar: 'Niemand.' } },
+      definitie: 'Besluit C23: blijft open; volgt pas als er een bron is.', projectie: 'Idem.', bewijs: 'Idem.', groepsgrens: 'Idem.', eigenaar: 'Niemand.' } },
 
   { id: 'leveranciers.providers', domein: 'leveranciers', wereld: 'rtg-intern', eenheid: 'euro per leverancier per maand',
     betekenis: 'Wat RTG aan zijn eigen leveranciers (hosting, modellen, berichten) betaalt, uit hun facturen.',
@@ -40,10 +40,11 @@ module.exports = [
     bron: [c(KOS + 'providerfactuur.js', 'function factuurZet')], definitie: [c(KOS + 'providerfactuur.js', 'function bronVan')],
     projectie: [c('server/routes/kosten-kantoor.js', '/api/office/kosten/leveranciersfacturen')], bewijs: [c(KOS + 'herkomst.js', 'function herkomst')], groepsgrens: null, waarom: {} },
 
-  { id: 'leveranciers.partners-toelating', domein: 'leveranciers', wereld: 'commercieel', eenheid: 'aanvragen per stand',
-    betekenis: 'Zaken die zich aanmelden en waar ze staan in de toelating.', berekening: 'nog niet vastgesteld',
-    actualiteit: 'live', privacy: 'zaken', minGroep: 5, eigenaar: null, graad: 'onbekend', afhankelijk: [],
-    bron: [c('server/kern/aanmeldingen/bewijs.js', 'function bewijsIndien')], definitie: null, projectie: null, bewijs: null, groepsgrens: null,
-    waarom: { definitie: 'De keten is beproefd (npm run toelatingsproef), maar een doorlooptijd of wachtrij als bedrijfsmaat is niet besloten.',
-      projectie: 'Niet gebouwd.', bewijs: 'Volgt uit de projectie.', groepsgrens: 'Volgt uit de projectie.', eigenaar: 'Niemand.' } }
+  { id: 'leveranciers.partners-toelating', domein: 'leveranciers', wereld: 'commercieel', eenheid: 'aanvragen per stand, en dagen',
+    betekenis: 'Zaken die zich aanmelden en waar ze staan in de toelating, en hoe lang een besluit duurt.',
+    berekening: 'aanmeldingen met een bedrijf per stand; mediane dagen van aanvraag tot besluit over de besluiten van de maand',
+    actualiteit: 'live', privacy: 'zaken', minGroep: 5, eigenaar: 'kern/bedrijfsmaat', graad: 'gemeten', afhankelijk: [],
+    bron: [c('server/kern/aanmeldingen/bewijs.js', 'function bewijsIndien')], definitie: [c('server/kern/bedrijfsmaat/definities-later.js', 'toelating: d30(20')],
+    projectie: [c('server/kern/bedrijfsmaat/stand-toelating.js', 'function toelating()')], bewijs: [c('server/kern/bedrijfsmaat/stand-toelating.js', "niet('Het aanmeldregister is niet beschikbaar.')")],
+    groepsgrens: [c('server/kern/bedrijfsmaat/stand-toelating.js', 'groepeer(rijen, { grens: KLASSEN.zaken.grens, benoemd: true })')], waarom: {} }
 ];

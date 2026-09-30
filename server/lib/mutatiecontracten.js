@@ -41,8 +41,8 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-storingen').CONTRACTEN,
   /* Opgesplitst omdat scripts/check.js een bestandsgrens kent en die terecht
      aansloeg: een lijst die naar duizenden regels groeit, hoort niet in een
-     bestand dat ook nog de vorm en de regels uitlegt. Dezelfde vorm als
-     ./idemsleutels.js, die om precies dezelfde reden vier zijbestanden heeft. */
+     bestand dat ook nog de vorm en de regels uitlegt. Zelfde vorm als
+     ./idemsleutels.js. */
   require('./mutatiecontracten-beschermd').CONTRACTEN,
   require('./mutatiecontracten-leest').CONTRACTEN,
   require('./mutatiecontracten-connection').CONTRACTEN,
@@ -117,6 +117,7 @@ const CONTRACTEN = Object.assign({},
      toezegging zijn. Eigen bestand omdat ze een afweging delen -- zie de kop. */
   require('./mutatiecontracten-reisnazorg').CONTRACTEN,
   require('./mutatiecontracten-reisherkomst').CONTRACTEN,
+  require('./mutatiecontracten-conciergelus').CONTRACTEN,
   /* Een lid en zijn eigen lidmaatschap: twee lezers en een opzegging. Eigen
      bestand omdat het indelen er een defect uit haalde -- zie de kop. */
   require('./mutatiecontracten-lidabonnement').CONTRACTEN,
@@ -124,6 +125,8 @@ const CONTRACTEN = Object.assign({},
   /* RTG Move: drie routes die alle drie lezen, met de BOUW als grond in plaats
      van een meting. Eigen bestand om dat verschil te bewaren -- zie de kop. */
   require('./mutatiecontracten-move').CONTRACTEN,
+  require('./mutatiecontracten-network').CONTRACTEN,
+  require('./mutatiecontracten-praktijk').CONTRACTEN,
   /* De kaartkeuze van een lid. Eigen bestand omdat de grond de BOUW is (de
      keuze is een verzameling) en niet een kale meetronde. */
   require('./mutatiecontracten-kaarten').CONTRACTEN,

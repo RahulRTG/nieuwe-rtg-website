@@ -17,6 +17,10 @@ const STATUSSEN = [
   { s: 'in voorbereiding', label: 'In voorbereiding' },
   { s: 'wacht op uw akkoord', label: 'Wacht op uw akkoord' },
   { s: 'in uitvoering', label: 'In uitvoering' },
+  /* Een onderdeel viel om en het doel staat nog. Geen nieuwe zaak: de gast
+     hoeft zijn verhaal niet opnieuw te doen (CONCIERGE.md par. 2.13). Alleen
+     ./lus.js zet deze stand, want hij hoort bij een kapot onderdeel. */
+  { s: 'in herstel', label: 'Wij passen het aan' },
   { s: 'geregeld', label: 'Geregeld', eind: true },
   { s: 'afgewezen', label: 'Niet gelukt', eind: true },
   { s: 'ingetrokken', label: 'Ingetrokken', eind: true }

@@ -968,6 +968,42 @@ function wachtOpNetstilte(page, opties) {
   });
 }
 
+/* WACHT TOT DE PAGINA WEER BEELDEN MAAKT. Netstilte zegt dat er niets meer
+   onderweg is; dit zegt dat de hoofdthread weer vrij is -- en dat tweede is wat
+   Playwright nodig heeft om te scrollen en te klikken. Een scherm met
+   data-rtg-world laadt na DOMContentLoaded nog ruim dertig bureaubladscripts en
+   hangt main daarna in een raster; onder CPU-druk hield dat de hoofdthread
+   seconden bezet (achtvoudig vertraagd gemeten: 15 s opmaak en tekenwerk, plus
+   twee observers die bij elke DOM-wijziging getComputedStyle vragen). De klik
+   op #bStuur in livinglab.e2e.js bleef daardoor tot 20 s hangen op "scrolling
+   into view", zonder dat er een verzoek vertrok.
+
+   Een toestand en geen duur: hij is klaar zodra `frames` beelden op rij elk
+   binnen `gatMs` na het vorige kwamen. Een rustige pagina haalt dat in een
+   fractie van een seconde; een pagina die blijft zwoegen, wordt na de kap luid
+   gemeld in plaats van stil doorgelaten. Een CSS-animatie op transform of
+   opacity (de ganglijn) draait op de compositor en houdt hem niet tegen. */
+async function wachtOpVloeiend(page, opties) {
+  const frames = (opties && opties.frames) || 10;
+  const gatMs = (opties && opties.gatMs) || 100;
+  const ms = (opties && opties.ms) || 2 * WACHT_MS;
+  const gelukt = await page.evaluate(([n, gat, kap]) => new Promise((klaar) => {
+    const begin = performance.now();
+    let vorige = begin, opRij = 0;
+    (function beeld(nu) {
+      opRij = nu - vorige <= gat ? opRij + 1 : 0;
+      vorige = nu;
+      if (opRij >= n) return klaar(true);
+      if (nu - begin > kap) return klaar(false);
+      requestAnimationFrame(beeld);
+    })(begin);
+  }), [frames, gatMs, ms]).catch(() => false);
+  if (!gelukt) {
+    throw new Error('de pagina maakte binnen ' + ms + 'ms geen ' + frames + ' beelden op rij binnen ' + gatMs +
+      'ms van elkaar: de hoofdthread bleef bezet. ' + (await korteStand(page)));
+  }
+}
+
 /* Klik, en wacht op het ANTWOORD VAN DE SERVER in plaats van op een geschatte
    duur. Voor de gevallen waarin niet vooraf te zeggen is wat er op het scherm
    komt (een lijst die vult, een melding die ook leeg kan blijven): de handeling
@@ -977,19 +1013,37 @@ function wachtOpNetstilte(page, opties) {
    dat wacht hij op het eerstvolgende POST-antwoord van de eigen API -- ruim
    genoeg voor een scherm dat er maar een afvuurt, en te ruim voor een scherm
    dat er drie doet; noem in dat geval het pad. */
+/* TWEE BUDGETTEN, EN DE MELDING ZEGT WELKE OP WAS. Hier liep EEN teller van
+   15 s over klikken EN antwoorden samen: de wacht op het antwoord begon, en
+   daarna ging Playwright de knop nog klikbaar maken (zichtbaar, stil, in beeld
+   gescrold). Op een drukke machine duurt dat laatste seconden -- onder
+   achtvoudige CPU-vertraging werd "scrolling into view" 6 tot 7 s gemeten op
+   /apps/labpas.html, dat na het laden ruim dertig bureaubladscripts draait --
+   en dan was het budget op voordat er iets verstuurd was. De melding zei
+   "wachtte op een antwoord dat niet kwam", terwijl er nooit een klik was
+   gegeven (livinglab.e2e.js op PR #433: geen verzoek, geen klikgebeurtenis in
+   de pagina). Nu krijgt het klikken zijn eigen grens, en telt de wacht op het
+   antwoord pas vanaf het moment dat de klik gegeven is. Er wordt nog steeds
+   VOOR de klik geluisterd, anders mist een snel antwoord de wacht. */
 async function klikEnWacht(page, selector, urlDeel, opties) {
   const ms = (opties && opties.ms) || WACHT_MS;
   const deel = urlDeel || '/api/';
+  const antwoord = page.waitForResponse((r) => r.url().includes(deel) && r.request().method() !== 'GET', { timeout: 2 * ms });
+  antwoord.catch(() => {});
   try {
-    const [antwoord] = await Promise.all([
-      page.waitForResponse((r) => r.url().includes(deel) && r.request().method() !== 'GET', { timeout: ms }),
-      page.click(selector)
-    ]);
-    return antwoord;
+    await page.click(selector, { timeout: ms });
+  } catch (e) {
+    throw new Error('kon niet klikken op ' + selector + ' binnen ' + ms + 'ms (' +
+      String(e && e.message || e).split('\n')[0] + '). ' + (await korteStand(page)));
+  }
+  let klok;
+  const grens = new Promise((_, weg) => { klok = setTimeout(() => weg(new Error('grens')), ms); });
+  try {
+    return await Promise.race([antwoord, grens]);
   } catch (e) {
     throw new Error('klikte op ' + selector + ' en wachtte ' + ms + 'ms op een antwoord van ' + deel +
       ', dat niet kwam. ' + (await korteStand(page)));
-  }
+  } finally { clearTimeout(klok); }
 }
 
 async function tekstVan(page, selector) {
@@ -1586,7 +1640,7 @@ module.exports = { edgeActies, edgeBediening, edgeCatalogus, edgeWerkbladen, ban
   installeerNepMicrofoon, kantoorAlsPersoon, kantoorKoppelBody, keurLidGoed, laadPlaywright, laadScherm, metGedeeldeBrowser, letOpFouten,
   nepMediaArgs, opstartGeduld, startServer, stop, stopHard, stopNet, veegDoor, volgVerzoeken, vrijePoort, vrijePoortReeks, efemeerBereik,
   wachtOpRust, wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering,
-  wachtOpNetstilte, wachtOpBestand, klikEnWacht, tekstVan, postJson,
+  wachtOpNetstilte, wachtOpVloeiend, wachtOpBestand, klikEnWacht, tekstVan, postJson,
   // testhaken om de strenge poort zelf te kunnen verifieren
   verwachtServerfout,
   _poort: { luisterOpFouten, serverUitzonderingen, verwachteFouten, isFataal: (r) => FATAAL.test(r) } };

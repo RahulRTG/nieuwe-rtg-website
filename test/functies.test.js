@@ -39,6 +39,14 @@ test('functies: een uitgezette functie blokkeert zijn pad', () => {
   assert.equal(functies.padGeblokkeerd('/api/foundation/mijn', staat), null);
 });
 
+test('functies: een gesloten werkplek sluit ook de gedeelde gastvoorstellen', () => {
+  for (const pad of ['/api/werk-gast/beeld', '/api/werk-gast/besluit']) {
+    assert.equal(functies.functieVoorPad(pad).id, 'bedrijf');
+    assert.equal(functies.padGeblokkeerd(pad, { bedrijf: { aan: false } }).id, 'bedrijf');
+    assert.equal(functies.padGeblokkeerd(pad, { bedrijf: { aan: true } }), null);
+  }
+});
+
 test('functies: langste prefix wint, brede functie uit, deelfunctie aan', () => {
   const staat = { supplier: { aan: false }, 'supplier-pos': { aan: true } };
   // de kassa (specifieker) blijft aan

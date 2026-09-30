@@ -38,6 +38,14 @@ function tenantOpen(t) {
   return !stand || stand === 'actief' || stand === 'opzegging';
 }
 
+/* De gastdeur gebruikt dezelfde actuele tenantgrens als een medewerker.
+   De aanroeper moet vóór deze synchrone lezing de requestbaseline verversen. */
+function gastWerkruimte(db, code) {
+  const data = db && db.data;
+  const ruimtes = (data && data.werkruimtes) || {};
+  return heeft(ruimtes, code) && tenantOpen(tenantVoor(data, code)) ? ruimtes[code] : null;
+}
+
 module.exports = function maakProductieIdentiteit({ app, auth, db, bewerkCollectie, productie } = {}) {
   const isProductie = productie == null
     ? String(process.env.NODE_ENV || '') === 'production' : productie === true;
@@ -141,3 +149,4 @@ module.exports.CODE_TOEGANG = CODE_TOEGANG;
 module.exports.codeVan = codeVan;
 module.exports.tenantVoor = tenantVoor;
 module.exports.tenantOpen = tenantOpen;
+module.exports.gastWerkruimte = gastWerkruimte;

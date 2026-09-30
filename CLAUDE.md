@@ -331,6 +331,39 @@ drukken. De zes vragen per bewijsstuk (`stelt`, `nietZegt`, `doorWie`, `graad`,
 `werkwoord`, `herkomst`) gebruiken met opzet de woorden van
 `kern/carriereledger/regels.js` en geen tweede vocabulaire.
 
+**`VERDER.md` is de lus van FoundationOS** -- werk, leren en de buurt als
+projecties op één lus (wereld -> mogelijkheid -> overgang -> ... -> overdragen
+-> lokaal aanpassen -> terugvloeien), met als belofte *wie na jou komt, begint
+verder*. Lees die vóór je iets bouwt dat een mens van de ene toestand naar de
+andere brengt of dat kennis tussen mensen en plekken laat reizen. De dragende
+vraag, is er één `Overgang` onder dat alles, is eerst **gemeten** en niet
+aangenomen (`npm run overgangsvorm`, `OVERGANGSVORM.json`), en de eigenaar vroeg de
+meter het idee kapot te proberen te krijgen. Uitslag over
+<!--getal:overgangsvorm.metDrager-->14<!--/getal--> overgangen met een drager en
+veertien dimensies: **geen universele overgang**. Er zijn
+<!--getal:overgangsvorm.dilemmas-->7<!--/getal--> dimensies die ergens een poort zijn en
+elders afwezig, en geen van de voorgestelde families is dilemmavrij, ook de
+groepen niet die de data zelf vormt. Wat overal staat is
+<!--getal:overgangsvorm.kern-->4<!--/getal--> dimensies (naar, actor, actie,
+blokkade): *iemand doet iets, er is een nieuwe stand, en een weigering zegt
+waarom*. Er komt dus geen `Overgang`-object maar een verklaring van werkwoorden,
+en de domeinpoorten (bewijs, kennis, bevestiging, privacy) blijven waar ze staan.
+Drie dingen daar niet wegpoetsen. **Elke stand draagt een citaat dat letterlijk
+in de CODE moet staan**: commentaar telt niet (dat is een belofte), een weigerzin
+wel, en een rot citaat telt als afwezig zodat het de kern nooit kan verhogen.
+**De mutatieproef is gedraaid en niet uitgerekend**: een universele motor die
+alleen de kern kent, laat een blauwdruk zonder gemeten indicator, een
+huiswerkklas zonder VOG en een koppeling zonder recht door waar de echte drager
+weigert. En **`gestopt` is nooit een blauwdrukbron** (dat staat en is gedraaid),
+maar een gestopte buurtpoging laat vandaag ook geen les achter: een mislukking is
+eerst een WAARNEMING en pas na gronding kennis. De twintig wetten en acht
+ontwerpbesluiten staan er met per regel wie hem handhaaft. B7 (vergeten tegenover
+aangenomen collectieve kennis) is een eigenaarbesluit. Par. 7 zet acht
+bevindingen op een rij die niet zijn gerepareerd. De scherpste daarvan: de
+gemeente ziet het exacte aantal hulpvragen van een buurt zodra die als enige
+onder de drempel van vijf valt, want "overige buurten (1)" is één buurt, en de
+gemeente weet welke. Celveilig is niet queryveilig.
+
 **`POLITIEK.md` is het masterplan voor DemocratieOS en de partij** -- twee
 projecten die bewust uit elkaar worden gehouden: DemocratieOS (werknaam) is
 partijneutrale burgerinfrastructuur in FoundationOS voor burgers, organisaties,
@@ -1333,6 +1366,25 @@ zelf af, en wat niet gemeten is wordt niet als getal getoond. Daar staat ook wat
 er al staat en dus NIET opnieuw gebouwd moet worden — de rekening is al één
 waarheid over alle kanalen, en het ontbrekende scharnier is de **stoel**.
 
+**`CONCIERGE.md` is de lus rond een wens** -- gast, case-eigenaar,
+collega-conciërge, partner, zijn beslisser en uitvoerders rond één case, waarbij
+de gast het één keer vertelt en ieder alleen zijn stukje ziet. Lees die vóór je
+iets aan De Rechterhand, het Privékantoor of een conciërgewachtrij verandert.
+De meting die hem stuurt: er zijn vijf conciërge-ingangen (`kern/lifestyle`,
+`kern/bureau/cases*`, `rendezvous-concierge`, de hoteldorpafdeling en
+`mall/concierge`), en het meeste van de lus staat al. Mandaat, tijdlijn die bij
+vertraging meeschuift en verstoringen met gevolgen bestaan. Wat ontbreekt: een
+houdbaar aanbod van een partner, doorzetten naar zijn beslisser, een
+deelnemersweergave per rol, en een netwerk van collega's. Dat laatste vraagt
+eerst een besluit. De scherpste nieuwe grens is CON-08: **een verrassing is een
+privacystand en geen notitie**. Eén melding naar de partner en de case is
+mislukt. **Stap 0 tot en met 8 staan in de server** (par. 0a, 30 september 2026):
+`kern/bureau/lus*.js` als tweede werkwijze (`voorstel`) op dezelfde cases, het
+oude verzoek van De Rechterhand als schil erover (`kern/lifestyle/verzoek.js`),
+en een tegenvoorstel met vasthoudtermijn plus doorzetten naar een manager op de
+tafelreservering (`kern/ervaring/tafeluitzondering.js`). Er zijn nog **geen
+schermen** voor, dus voor een mens bestaat de functie nog niet.
+
 **`BESTUUR.md` is het besturingsvlak** — de achterkant van RTG niet als
 backoffice maar als één laag waarin een mens ziet wat er draait, of het gezond
 is, en **hoe hard dat bewijs is**. Lees die vóór je aan een bestuursscherm, een
@@ -1569,7 +1621,7 @@ mórgen nog klopt. Lees die vóór je een begrip introduceert, een register aanl
 of een scorecard bouwt. De opzet vraagt een semantisch register naar aanleiding
 van de twee `VERMOGENS`; de vraag ervóór is gemeten (`scripts/semantiek.js`,
 `SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->131<!--/getal--> namen die in meer dan
-één domein staan, dragen er **<!--getal:semantiek.betekenissen-->113<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->420<!--/getal-->
+één domein staan, dragen er **<!--getal:semantiek.betekenissen-->113<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->422<!--/getal-->
 betekenissen, met `SOORTEN` op **39**. Daarnaast **29** betekenissen die op meer
 dan één plek wonen én **106** paren die dezelfde waarheid onder een ándere naam
 dragen — die tweede ronde bestaat omdat de eerste ze miste, en de duurste
@@ -2451,7 +2503,7 @@ gemeten leespaden en geen bevestigroute. De fundering is gemeten en niet
 verklaard: `npm run bedrijfsmaat` (`BEDRIJFSMAAT.json`, catalogus in
 `server/kern/bedrijfsmaat/`) houdt per maat vier elementen tegen de code --
 bron, definitie, projectie, bewijs -- met vier gatsoorten en een
-afhankelijkheidsgraaf; <!--getal:bedrijfsmaat.bestaat-->56<!--/getal--> van <!--getal:bedrijfsmaat.maten-->67<!--/getal--> maten bestaan en
+afhankelijkheidsgraaf; <!--getal:bedrijfsmaat.bestaat-->59<!--/getal--> van <!--getal:bedrijfsmaat.maten-->67<!--/getal--> maten bestaan en
 <!--getal:bedrijfsmaat.ketensGegrond-->6<!--/getal--> van zes ketens is gegrond. Drie dingen die niet mogen sneuvelen: **lenzen,
 geen breinen** (geen eigen opslag per lens), **de groepspoort staat aan de bron
 van een maat** (`bedrijfsmaat/poort.js`: onder de grens geen waarde, geen nul en
@@ -2615,8 +2667,8 @@ zeventiende motor bouwt. De kern in één zin: **dit huis heeft geen tekort aan
 motoren, het heeft een tekort aan handelingen die erlangs gaan** -- en dat is
 gemeten in plaats van beweerd. `npm run machinedekking` (`MACHINEDEKKING.json`)
 legt zestien motoren naast elkaar op DEZELFDE route, iets wat geen enkele
-bestaande meter deed: van de <!--getal:machine.muterend-->3946<!--/getal-->
-muterende routes raken er <!--getal:machine.zonderAs-->2827<!--/getal--> geen
+bestaande meter deed: van de <!--getal:machine.muterend-->4008<!--/getal-->
+muterende routes raken er <!--getal:machine.zonderAs-->2780<!--/getal--> geen
 enkele as, <!--getal:machine.motorenZonderRoute-->1<!--/getal--> motoren bereiken
 geen enkele route (bewijstoken, veiligheidskern, gevolgmeting), en de hoogst
 geïntegreerde handeling buiten de hubs raakt DRIE assen -- er is dus geen enkele
@@ -2626,7 +2678,7 @@ dingen missen), en de meter heeft zichzelf twee keer betrapt op dezelfde fout va
 twee kanten: een hub in de kern-tas zette 4162 routes op "idempotent", en
 `/api/notifications` scoorde tien assen omdat die route zelf in `server/server.js`
 woont (143 requires). Vandaar de hubgrens en de
-<!--getal:machine.hubRoutes-->13<!--/getal--> routes waarvoor de bestandsas met
+<!--getal:machine.hubRoutes-->14<!--/getal--> routes waarvoor de bestandsas met
 naam en toenaam onbruikbaar is verklaard. **De eerste keten is rond** (par. 5a):
 `/api/office/bank/incasso` -> `handtekening/bevestig` -> `incasso/dossier`, vijftien
 verplichte assen voor haar klasse en alle vijftien gelopen, met

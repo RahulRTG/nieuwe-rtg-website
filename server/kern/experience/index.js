@@ -12,13 +12,15 @@ function maakExperience({ kern, db, save, crypto, bijeen, inBundel, nu }) {
   const contexten = require('./contexts')({ kern, crypto });
   const attention = require('./attention')({ crypto, opslag });
   const projecties = require('./projections')({ kern, crypto, contexten, attention, manifesten });
+  const network = require('./network')({ kern, db, crypto, contexten, manifesten,
+    projecteer: projecties.projecteer });
   const commit = async fn => {
     if (typeof inBundel === 'function' && inBundel()) return fn();
     if (typeof bijeen === 'function') return bijeen(fn, { duurzaam: true });
     return fn();
   };
   const broker = require('./broker')({ crypto, opslag, projecteer: projecties.projecteer,
-    contexten, kern, commit });
+    contexten, kern, commit, network });
 
   function resumeVoor(key, world, context) {
     const opgeslagen = opslag.resumeLees(key);
@@ -42,7 +44,7 @@ function maakExperience({ kern, db, save, crypto, bijeen, inBundel, nu }) {
       worldContract: kopie(WORLD_CONTRACT), manifests: manifesten.publiek(),
       currentWorld: w, contexts: contexten.voor(key, w).map(kopie),
       currentContext: projection.context, projection,
-      resume: resumeVoor(key, w, projection.context), intents: broker.registry()
+      resume: resumeVoor(key, w, projection.context), intents: broker.registry(), network: network.contract()
     };
   }
   function projection(args) { return projecties.projecteer(args); }
@@ -67,6 +69,7 @@ function maakExperience({ kern, db, save, crypto, bijeen, inBundel, nu }) {
   return { experience: {
     contract: () => kopie(WORLD_CONTRACT), manifests: manifesten.publiek,
     bootstrap, projection, resumeZet,
+    network: network.read,
     livingWorldView: (key, options) => kern.livingWorld.view(key, options),
     mediaExperiences: (key, id) => kern.livingWorld.mediaLinks(key, id),
     preview: (key, body, economicPrincipalRef) => broker.preview(key, body, economicPrincipalRef),

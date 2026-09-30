@@ -160,6 +160,22 @@ const GETALLEN = {
     wat: 'velden die in ALLE objectdomeinen staan' },
   'officevorm.domeineigenPct': { bron: 'OFFICEVORM.json', veld: 'rondes.ruim.vorm.inEenDomeinPct',
     wat: 'percentage velden dat in precies EEN objectdomein staat (ruime lijst)' },
+  /* De overgangsvorm (VERDER.md par. 2). Zelfde reden als de vormmeters
+     hierboven: op GEEN rust het besluit dat er geen universele `Overgang` komt,
+     en een uitkomst die niet kan bewegen in het proza, beweegt ook niet als de
+     code dat wel doet. */
+  'overgangsvorm.overgangen': { bron: 'OVERGANGSVORM.json', veld: 'noemer.overgangen',
+    wat: 'overgangen die de overgangsvormmeter kent' },
+  'overgangsvorm.metDrager': { bron: 'OVERGANGSVORM.json', veld: 'noemer.metDrager',
+    wat: 'overgangen met een drager in de code' },
+  'overgangsvorm.kern': { bron: 'OVERGANGSVORM.json', veld: 'kern.length',
+    wat: 'dimensies die in ALLE overgangen met een drager staan' },
+  'overgangsvorm.dilemmas': { bron: 'OVERGANGSVORM.json', veld: 'dilemmas.length',
+    wat: 'dimensies die ergens een poort zijn en elders afwezig' },
+  'overgangsvorm.onenig': { bron: 'OVERGANGSVORM.json', veld: 'woorden.onenig',
+    wat: 'onenigheden tussen de indeling en de woordenas' },
+  'overgangsvorm.inEenPct': { bron: 'OVERGANGSVORM.json', veld: 'vorm.inEenOvergangPct',
+    wat: 'percentage velden dat in precies EEN overgang staat' },
   'kantoor.routes': { bron: 'KANTOORMACHT.json', veld: 'gemeten.routes',
     wat: 'kantoorroutes achter /api/office en /api/boardroom' },
   'kantoor.deurEistMens': { bron: 'KANTOORMACHT.json', veld: 'gemeten.deurEistMens',
@@ -647,7 +663,7 @@ const GETALLEN = {
 const DOCUMENTEN = ['CLAUDE.md', 'CREATE.md', 'EXECUTIE.md', 'OS.md', 'BEWIJSMACHINE.md', 'MODULAIR.md', 'HDI.md',
   'ISOLATIE.md', 'MAATSTAF.md', 'CODE.md', 'KANTOOR.md', 'WEERBAARHEID.md',
   'TRAVELCOMMERCE.md', 'MENS.md', 'MACHINE.md', 'REPRESENTATIE.md', 'FRANCHISE.md', 'SOEVEREIN.md', 'ONDERNEMEN.md',
-  'KEURING.md', 'VERANDERING.md', 'PLANNING.md', 'OFFICE.md', 'EDGE.md', 'AUTONOMIE.md'];
+  'KEURING.md', 'VERANDERING.md', 'PLANNING.md', 'OFFICE.md', 'EDGE.md', 'AUTONOMIE.md', 'VERDER.md'];
 
 const MERK = /<!--getal:([a-zA-Z0-9._-]+)-->([\s\S]*?)<!--\/getal-->/g;
 

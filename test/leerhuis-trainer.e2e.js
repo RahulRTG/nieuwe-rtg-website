@@ -206,6 +206,20 @@ test('Leerhuis trainer: onder toezicht, bewijs, klaar voor beoordeling en de aan
       const nieuw = (await lees(C, 'curriculumWerk')).VAARDIGHEDEN.find(v => v.id === 'terugboeking-controleren');
       assert.ok(nieuw, 'de vaardigheid staat er, met de code uit haar naam');
 
+      /* Een scenario zonder vereiste stap meet niets en weigert de server; met stappen staat het er. */
+      await form('Nieuw scenario').locator('summary').click();
+      await form('Nieuw scenario').getByLabel('Naam van het scenario').fill('Storno aan de balie');
+      await form('Nieuw scenario').getByLabel('Beginsituatie').fill('Een klant vraagt zijn geld terug.');
+      await form('Nieuw scenario').getByText('Terugboeking controleren', { exact: true }).click();
+      await form('Nieuw scenario').getByRole('button', { name: 'Scenario vastleggen' }).click();
+      await wachtOp(c, /Niet gelukt: een scenario zonder vereiste stap meet niets/);
+      await form('Nieuw scenario').getByLabel('Vereiste stappen, een per regel').fill('controleer\nreden\n');
+      await form('Nieuw scenario').getByLabel('Verboden stappen, een per regel').fill('direct-uitbetalen');
+      await form('Nieuw scenario').getByText('De vereiste stappen in deze volgorde').click();
+      await form('Nieuw scenario').getByRole('button', { name: 'Scenario vastleggen' }).click();
+      await wachtOp(c, /Scenario vastgelegd: Storno aan de balie \(code storno-aan-de-balie\)/);
+      await form('Nieuw scenario').getByText(/Er is al: storno-aan-de-balie \(Terugboeking controleren\)/).waitFor({ state: 'attached' });
+
       /* N leert tot de simulatie; daarna neemt de trainer het over op het scherm. */
       const pad = (await lees(T, 'trainerCockpit')).LEERLINGEN || [];
       if (!pad.some(x => x.persoon === N.p)) await doe(Q, 'trainerToewijzen', { persoon: N.p, curriculum: 'ops-basis', trainer: T.p });
@@ -284,7 +298,17 @@ test('Leerhuis trainer: onder toezicht, bewijs, klaar voor beoordeling en de aan
          (herstelpad) staat pas op de kaart als Q de review op zich neemt. Een
          ongeldigverklaring zonder reden weigert de server, en een beleid dat Q
          voorstelt, keurt de eigenaar goed -- Q zelf krijgt een zin en geen knop. */
-      await doe(N, 'bezwaarIndienen', { beoordeling: open[0].id, reden: 'de storno was klein, het herstelpad past niet' });
+      const n2 = await opScherm(N, '/apps/leerhuis.html');
+      const ukaart = n2.locator('#uitslagen .kaart', { hasText: 'Een betaling terugboeken' });
+      await ukaart.getByText(/Herstelpad: nog een keer onder toezicht/).waitFor();
+      await ukaart.locator('summary', { hasText: 'Bezwaar maken' }).click();
+      await ukaart.getByRole('button', { name: 'Bezwaar indienen' }).click();
+      await wachtOp(n2, /Niet gelukt: een bezwaar zonder reden/);
+      await ukaart.getByLabel('Waarom u bezwaar maakt').fill('de storno was klein, het herstelpad past niet');
+      await ukaart.getByRole('button', { name: 'Bezwaar indienen' }).click();
+      await wachtOp(n2, /Bezwaar ingediend over Een betaling terugboeken/);
+      await ukaart.getByText('Uw bezwaar: ingediend.').waitFor();
+      assert.equal(await ukaart.locator('summary', { hasText: 'Bezwaar maken' }).count(), 0, 'geen tweede bezwaar zolang het eerste loopt');
       const q2 = await opScherm(Q);
       const zkaart = q2.locator('#kwaliteit .kaart', { hasText: 'Bezwaar: Een betaling terugboeken van ' + N.code });
       await zkaart.getByText('de storno was klein').waitFor();
@@ -292,6 +316,15 @@ test('Leerhuis trainer: onder toezicht, bewijs, klaar voor beoordeling en de aan
       await zkaart.getByRole('button', { name: 'Review oppakken' }).click();
       await wachtOp(q2, /Review oppakken: Een betaling terugboeken/);
       await zkaart.getByText(/Herstelpad: nog een keer onder toezicht bij een grote storno/).waitFor();
+      /* Wie de review oppakte, ziet het bewijs eronder en kan een stuk intrekken -- met reden. */
+      const intrek = zkaart.getByRole('button', { name: /^Bewijs .* intrekken$/ }).first();
+      const soort = (await intrek.textContent()).replace(/^Bewijs | intrekken$/g, '');
+      await intrek.click();
+      await wachtOp(q2, /Niet gelukt: intrekken zonder reden bestaat niet/);
+      await zkaart.getByLabel('Reden om bewijs ' + soort + ' in te trekken').fill('dubbel vastgelegd');
+      await zkaart.getByRole('button', { name: 'Bewijs ' + soort + ' intrekken' }).click();
+      await wachtOp(q2, new RegExp('Bewijs ingetrokken: ' + soort));
+      await zkaart.getByText(/Ingetrokken: dubbel vastgelegd\./).waitFor();
       await zkaart.getByLabel('Uw bevinding').fill('herstelpad past bij het bewijs');
       await zkaart.getByRole('button', { name: 'Het oordeel blijft staan' }).click();
       await wachtOp(q2, /Het oordeel blijft staan: Een betaling terugboeken/);
@@ -318,6 +351,44 @@ test('Leerhuis trainer: onder toezicht, bewijs, klaar voor beoordeling en de aan
       await e2.locator('#kwaliteit .kaart', { hasText: 'Beleid voor betaling.terugboeken' }).getByRole('button', { name: 'Beleid goedkeuren' }).click();
       await wachtOp(e2, /Beleid goedgekeurd: betaling.terugboeken/);
       assert.ok((await lees(E, 'kwaliteitWerk')).BELEID.find(b => b.handeling === 'betaling.terugboeken').goedgekeurd);
+
+      /* 5. De leerling ziet de bevinding, en dient een EVC in dat de assessor behandelt. */
+      await n2.reload({ waitUntil: 'domcontentloaded' });
+      await ukaart.getByText('Uw bezwaar: oordeel blijft staan. Bevinding: herstelpad past bij het bewijs.').waitFor();
+      const evform = n2.locator('#evc .kaart', { hasText: 'Eerder verworven' });
+      await evform.getByLabel('Vaardigheid').selectOption({ label: 'Train-the-Trainer' });
+      await evform.getByRole('button', { name: 'EVC indienen' }).click();
+      await wachtOp(n2, /Niet gelukt: noem het externe stuk/);
+      await evform.getByLabel('Wat, van wie en wanneer').fill('didactiekcursus, ROC Amsterdam, 2023');
+      await evform.getByRole('button', { name: 'EVC indienen' }).click();
+      await wachtOp(n2, /EVC ingediend/);
+      await n2.locator('#evc .kaart', { hasText: 'EVC: Train-the-Trainer' }).getByText('bij de assessor').waitFor();
+      const a2 = await opScherm(A);
+      const ekaart = a2.locator('#assessor .kaart', { hasText: 'EVC: Train-the-Trainer van ' + N.code });
+      await ekaart.getByText('Stuk: didactiekcursus, ROC Amsterdam, 2023').waitFor();
+      await ekaart.getByRole('button', { name: 'Deels erkennen' }).click();
+      await wachtOp(a2, /EVC Train-the-Trainer: deels erkennen/);
+      await n2.reload({ waitUntil: 'domcontentloaded' });
+      await n2.locator('#evc .kaart', { hasText: 'EVC: Train-the-Trainer' }).getByText('deels erkend').waitFor();
+      assert.ok(!(await lees(N, 'mijn')).VAARDIGHEDEN.vaardigheden.some(v => v.vaardigheid === 'didactiek'), 'EVC maakt niemand bewezen');
+
+      /* 6. Werk onder het goedgekeurde beleid: eerst staat er wat ontbreekt en geen
+         knop; na een nieuwe beoordeling legt N zijn werk op het scherm vast. */
+      const wkaart = n2.locator('#werk .kaart', { hasText: 'betaling.terugboeken' });
+      await wkaart.getByText('Nog niet: terugboeken is niet bewezen.').waitFor();
+      assert.equal(await wkaart.getByRole('button').count(), 0, 'niet geschikt: geen knop');
+      await doe(N, 'simulatieAfronden', { scenario: 'storno', keuzes: ['controleer', 'reden', 'tweede-mens'] });
+      await doe(A, 'bewijsVastleggen', { persoon: N.p, vaardigheid: 'terugboeken', soort: 'OBSERVATION_EVIDENCE', sterkte: 'OBSERVED', bron: 'tweede storno' });
+      const nb = (await doe(N, 'beoordelingAanvragen', { persoon: N.p, vaardigheid: 'terugboeken' })).id;
+      await doe(A, 'beoordelingStart', { id: nb });
+      const nbew = (await lees(A, 'assessorWerk')).LOPEND.find(b => b.id === nb).bewijs.map(b => b.id);
+      await doe(A, 'beoordelingAfronden', { id: nb, uitkomst: 'PROVEN', bewijs: nbew, criteria: 'tweede storno correct' });
+      await n2.reload({ waitUntil: 'domcontentloaded' });
+      await wkaart.getByText('Nog geen werk vastgelegd.').waitFor();
+      await wkaart.getByLabel('Wat u deed en wat eruit kwam: betaling.terugboeken').fill('storno van 40 euro teruggeboekt');
+      await wkaart.getByRole('button', { name: 'Werk vastleggen: betaling.terugboeken' }).click();
+      await wachtOp(n2, /Werk vastgelegd: betaling.terugboeken/);
+      await wkaart.getByText(/^1 keer vastgelegd/).waitFor();
     } finally {
       if (browser) await browser.close().catch(() => {});
       await stop(child);

@@ -130,15 +130,16 @@
       "zzpwacht"
     ],
     "bedrijf": [
-      "entiteitBetaal",
-      "entiteitRekening",
       "agenda",
       "assetBeeld",
       "assetMet",
       "bedrijf",
       "bestanden",
+      "bijeen",
       "concernMagTekenen",
       "eigenaar",
+      "entiteitBetaal",
+      "entiteitRekening",
       "entiteitVind",
       "findSupplier",
       "rtmailTeam",
@@ -859,6 +860,7 @@
       "noteFailedTry"
     ],
     "member": [
+      "reserveringUitzondering",
       "AUTHOR_TIER",
       "DOOR_RELOCK_MS",
       "LANDEN",
@@ -2158,6 +2160,7 @@
       "bonMaak",
       "broadcastSync",
       "btwAangifte",
+      "bureauZaak",
       "cadeaukaart",
       "cannedBoekhouder",
       "careAfronden",
@@ -2344,6 +2347,7 @@
       "reserveerSlot",
       "reserveringKomst",
       "reserveringTafel",
+      "reserveringUitzondering",
       "retailAnnuleer",
       "retailBon",
       "retailState",

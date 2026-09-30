@@ -1,17 +1,17 @@
 {
  "stempel": {
-  "op": "2026-09-29T23:18:38.296Z",
-  "commit": "a4ae5e47b",
+  "op": "2026-09-30T20:13:02.559Z",
+  "commit": "ec186c7b2",
   "boomVuil": false,
-  "boomAnders": 4,
+  "boomAnders": 6,
   "instrument": "scripts/handlerwacht.js",
-  "node": "v22.22.2"
+  "node": "v26.10.0"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
-  "zonderBewakerslaag": 640,
-  "bewaakt": 550,
-  "openbaarMetReden": 51,
+  "zonderBewakerslaag": 648,
+  "bewaakt": 556,
+  "openbaarMetReden": 53,
   "eigenControle": 19,
   "sleutelDoorgegeven": 12,
   "zonderWachtMetReden": 8,
@@ -53,7 +53,7 @@
   },
   {
    "naam": "poort",
-   "aantal": 86
+   "aantal": 87
   },
   {
    "naam": "familieVan",
@@ -114,6 +114,10 @@
   {
    "naam": "rtf.verifieerProfiel",
    "aantal": 6
+  },
+  {
+   "naam": "praktijkMutatie -> poort",
+   "aantal": 5
   },
   {
    "naam": "sessie",
@@ -727,13 +731,49 @@
   },
   {
    "sleutel": "POST /api/bedrijf/pijplijn",
-   "bestand": "server/bedrijf/klant.js:147",
+   "bestand": "server/bedrijf/klant-pijplijn.js:6",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
   {
+   "sleutel": "POST /api/bedrijf/praktijk/aanbod",
+   "bestand": "server/bedrijf/praktijk.js:75",
+   "staat": "bewaakt",
+   "wacht": "praktijkMutatie -> poort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/praktijk/beeld",
+   "bestand": "server/bedrijf/praktijk.js:61",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/praktijk/delen",
+   "bestand": "server/bedrijf/praktijk.js:78",
+   "staat": "bewaakt",
+   "wacht": "praktijkMutatie -> poort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/praktijk/inrichten",
+   "bestand": "server/bedrijf/praktijk.js:74",
+   "staat": "bewaakt",
+   "wacht": "praktijkMutatie -> poort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/praktijk/stap",
+   "bestand": "server/bedrijf/praktijk.js:77",
+   "staat": "bewaakt",
+   "wacht": "praktijkMutatie -> poort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/praktijk/vraag",
+   "bestand": "server/bedrijf/praktijk.js:76",
+   "staat": "bewaakt",
+   "wacht": "praktijkMutatie -> poort"
+  },
+  {
    "sleutel": "POST /api/bedrijf/project",
-   "bestand": "server/bedrijf/project.js:150",
+   "bestand": "server/bedrijf/project.js:151",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
@@ -745,13 +785,13 @@
   },
   {
    "sleutel": "POST /api/bedrijf/project/mijlpaal",
-   "bestand": "server/bedrijf/project.js:122",
+   "bestand": "server/bedrijf/project.js:123",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/project/risico",
-   "bestand": "server/bedrijf/project.js:135",
+   "bestand": "server/bedrijf/project.js:136",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
@@ -877,7 +917,7 @@
   },
   {
    "sleutel": "POST /api/bedrijf/taak/uren",
-   "bestand": "server/bedrijf/taak.js:97",
+   "bestand": "server/bedrijf/taak.js:102",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
@@ -889,7 +929,7 @@
   },
   {
    "sleutel": "POST /api/bedrijf/taken",
-   "bestand": "server/bedrijf/taak.js:112",
+   "bestand": "server/bedrijf/taak.js:117",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
@@ -4095,6 +4135,18 @@
    "bestand": "server/routes/auth/webauthn.js:64",
    "staat": "openbaar",
    "reden": "de uitdaging moet er zijn VOOR je hem kunt beantwoorden; het bewijs volgt bij /login"
+  },
+  {
+   "sleutel": "POST /api/werk-gast/beeld",
+   "bestand": "server/bedrijf/praktijk-gast.js:11",
+   "staat": "openbaar",
+   "reden": "Een gast heeft geen RTG-account: een tijdelijk 256-bit geheim toont precies één afspraak; opslag bewaart alleen de hash en iedere lezing controleert intrekking en tenantstatus."
+  },
+  {
+   "sleutel": "POST /api/werk-gast/besluit",
+   "bestand": "server/bedrijf/praktijk-gast.js:16",
+   "staat": "openbaar",
+   "reden": "Dezelfde beperkte gastlink, met versiecontrole: uitsluitend eenmalig akkoord of afwijzen van het gedeelde voorstel, geen account of andere rechten."
   },
   {
    "sleutel": "POST /api/werkmail/bezorg",

@@ -2004,7 +2004,9 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
      wordt toegekend. Vandaar de tweede tak in de uitdrukking hieronder en niet
      de kale naam. Dit is SEMANTIEK.json in het klein -- een naam met twee
      betekenissen, in de veiligheidslaag. */
-  const POORT_BINNEN = /\b(profiel|schoolProfiel|rtfSociaal|eisAccount|resolveSession|verifyToken|sessionFor|magInzien|isEigenaar|boardroomWie|magBoardroom|doosSleutelOk|magMeten|metPartner|samenSess|kantoorSess|werkPoort|beheerVan|lidVan|viaBeheerOfDirectie|gezinVan|sessieVan|familieVan|gezinSessie|schoolVan|personeelVan|klasVan|docentCheck|lesVan|beheerderVan|magKlus|marktVolwassen|sessie)\s*\(|\bpoort\s*\(\s*req/;
+  // praktijkMutatie bewaakt via werkPoort binnen de duurzame commit; actuele
+  // rechten en herhaling worden via echte HTTP bewezen in praktijk-http.test.js.
+  const POORT_BINNEN = /\b(profiel|schoolProfiel|rtfSociaal|eisAccount|resolveSession|verifyToken|sessionFor|magInzien|isEigenaar|boardroomWie|magBoardroom|doosSleutelOk|magMeten|metPartner|samenSess|kantoorSess|werkPoort|praktijkMutatie|beheerVan|lidVan|viaBeheerOfDirectie|gezinVan|sessieVan|familieVan|gezinSessie|schoolVan|personeelVan|klasVan|docentCheck|lesVan|beheerderVan|magKlus|marktVolwassen|sessie)\s*\(|\bpoort\s*\(\s*req/;
 
   /* PUBLIEK MET REDEN woont in ./lib/publiek.js, en daar alleen: keuringsregel
      28, scripts/handlerwacht.js en het mutatiecontractregister stellen dezelfde
@@ -3410,6 +3412,8 @@ console.log('\n46) de SLO-tabel in SLO.md is een afdruk van SLO.json');
 console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestiging moet');
 {
   const TOEGESTAAN = new Map([
+    ['server/bedrijf/praktijk.js', 'Werk van een organisatie en de herhaalsleutel worden samen duurzaam bevestigd; verlies na een geslaagde reactie zou dubbel werk veroorzaken.'],
+    ['server/bedrijf/praktijk-gast.js', 'Gastakkoord op een voorstel wordt pas bevestigd na duurzame opslag van dezelfde versie en beslissing.'],
     ['server/db/duurzaam.js', 'hier WOONT de primitive sinds db/index.js is opgeknipt'],
     ['server/db/bijeen.js', 'de bundel met de duurzaam-vlag is de enige indirecte weg erheen'],
     ['server/db/index.js', 'draagt de vlag van de aanroeper door naar de bundel; kiest zelf niets'],

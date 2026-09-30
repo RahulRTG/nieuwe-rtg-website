@@ -24,6 +24,7 @@
   }
   function actieNaam(intent) {
     return ({ 'schedule.item.create': 'Afspraak gepland',
+      'network.plan.save': 'Selectie bewaard',
       'attention.acknowledge': 'Aandacht bevestigd' })[intent] || 'Actie uitgevoerd';
   }
   function moment(iso) {
@@ -127,6 +128,10 @@
     root.appendChild(section);
   }
 
-  function render(root, ctx) { planner(root, ctx); proofs(root, ctx); actionProofs(root, ctx); }
+  function render(root, ctx) {
+    planner(root, ctx);
+    if (w.RTGExperienceNetwork) w.RTGExperienceNetwork.render(root, ctx);
+    proofs(root, ctx); actionProofs(root, ctx);
+  }
   w.RTGExperienceActions = { render: render };
 })(window, document);

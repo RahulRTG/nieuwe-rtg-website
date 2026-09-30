@@ -46,10 +46,12 @@ module.exports = [
     bron: [PAS], definitie: [c(DEF, 'afwaardering: d(1')], projectie: [c(PRJ, 'function churnEnAfwaardering')], bewijs: BEWIJS,
     groepsgrens: [c(STAND, 'teller: ce.afwaardering')], waarom: {} },
 
-  { id: 'churn.contract-geeindigd', domein: 'churn', wereld: 'consument', eenheid: 'contracten per maand',
-    betekenis: 'Contractuele lidmaatschappen die GEEINDIGD bereiken; volgens de definitie van churn tellen ze mee.',
-    berekening: 'nog niet vastgesteld', actualiteit: 'live', privacy: 'leden', minGroep: 10, eigenaar: null, graad: 'onbekend', afhankelijk: [],
-    bron: [c(CTR, 'function beeindig')], definitie: [c(DEF, 'churn: d(1')], projectie: null, bewijs: null, groepsgrens: null,
-    waarom: { projectie: 'De projectie telt alleen de pasgeschiedenis. Een contract hangt aan een aanmelding en niet aan een codenaam, dus de koppeling contract -> lid moet eerst gelegd worden.',
-      bewijs: 'Volgt uit de projectie.', groepsgrens: 'Volgt uit de projectie.', eigenaar: 'Niemand.' } }
+  { id: 'churn.contract-geeindigd', domein: 'churn', wereld: 'consument', eenheid: 'aandeel lopende contracten per maand',
+    betekenis: 'Contractuele lidmaatschappen die GEEINDIGD bereiken, als aandeel van wat aan het begin van de maand liep.',
+    berekening: 'lopend aan het begin van de maand en geeindigd in de maand, gedeeld door lopend aan het begin', actualiteit: 'live',
+    privacy: 'leden', minGroep: 10, eigenaar: 'kern/bedrijfsmaat', graad: 'gemeten', afhankelijk: [],
+    bron: [c(CTR, 'function beeindig')], definitie: [c('server/kern/bedrijfsmaat/definities-later.js', 'contractGeeindigd: d30(21')],
+    projectie: [c('server/kern/bedrijfsmaat/stand-toelating.js', 'function contractGeeindigd()')],
+    bewijs: [c('server/kern/bedrijfsmaat/stand-toelating.js', "niet('Aan het begin van deze maand liep er geen enkel contract.')")],
+    groepsgrens: [c('server/kern/bedrijfsmaat/stand-toelating.js', 'toon(LEDEN, { waarde: geeindigd / liepen, n: liepen })')], waarom: {} }
 ];

@@ -101,6 +101,7 @@ module.exports = (sctx) => {
     const p = eigenVeld(P(g.w), String(req.body.projectId || ''));
     if (!p) return res.status(404).json({ error: 'Dat project kennen we niet.' });
 
+    if (p.praktijkRef && req.body.status != null) return res.status(409).json({ error: 'Rond dit werk af via Dagelijks werk, met uitvoeringsbewijs.' });
     const velden = {};
     if (req.body.budget != null) velden.budgetCenten = naarCenten(req.body.budget);
     if (req.body.eigenaar != null) velden.eigenaar = schoon(req.body.eigenaar, 60);

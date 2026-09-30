@@ -50,7 +50,7 @@ module.exports = (sctx) => {
       const verloren = kansen.filter(k => k.fase === 'verloren');
       uit.verkoop = { klanten: Object.values(w.klanten || {}).length,
         openKansen: kansen.length - gewonnen.length - verloren.length,
-        gewonnen: gewonnen.length, gewonnenCenten: gewonnen.reduce((t, k) => t + k.bedragCenten, 0),
+        gewonnen: gewonnen.length, valuta: 'EUR', andereValuta: kansen.filter(k => k.valuta && k.valuta !== 'EUR').length, gewonnenCenten: gewonnen.filter(k => !k.valuta || k.valuta === 'EUR').reduce((t, k) => t + k.bedragCenten, 0),
         verloren: verloren.length,
         scoringPct: (gewonnen.length + verloren.length)
           ? Math.round(gewonnen.length / (gewonnen.length + verloren.length) * 1000) / 10 : null,

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T19:32:09.030Z",
-    "commit": "b1762bacc",
+    "op": "2026-09-30T06:53:25.947Z",
+    "commit": "c3f686637",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bedrijfsmaat.js",
@@ -200,32 +200,72 @@
       "kort": "Geld van de zaken, naast de andere geldmaten te leggen.",
       "handhaving": "kern/bedrijfsmaat/stand-groei.js (subtotalen van facturen met betaalwijze rtg); test/bedrijfsmaatgroei.test.js.",
       "stand": "gebouwd"
+    },
+    {
+      "id": "C20",
+      "naam": "Toelating van zaken: aantal per stand en doorlooptijd",
+      "besloten": "30 september 2026, door de eigenaar",
+      "herkomst": "mens",
+      "regel": "Per stand het aantal aanmeldingen met een bedrijf, plus de mediane doorlooptijd van aanvraag tot besluit over de besluiten van de maand; onder vijf zaken geen getal.",
+      "kort": "Of het kantoor de rij bijhoudt.",
+      "handhaving": "kern/bedrijfsmaat/stand-toelating.js (aanmeldingen met een bedrijf per stand, mediane doorlooptijd); test/bedrijfsmaattoelating.test.js.",
+      "stand": "gebouwd"
+    },
+    {
+      "id": "C21",
+      "naam": "Churn via contracten, geteld op contract",
+      "besloten": "30 september 2026, door de eigenaar",
+      "herkomst": "mens",
+      "regel": "Het aandeel van de contracten die aan het begin van de maand liepen en in de maand geeindigd zijn; zonder koppeling naar een lid, onder tien geen getal.",
+      "kort": "Nu meten, zonder eerst het contractregister aan codenamen te hangen.",
+      "handhaving": "kern/bedrijfsmaat/stand-toelating.js (lopend aan het begin van de maand, geeindigd in de maand); test/bedrijfsmaattoelating.test.js.",
+      "stand": "gebouwd"
+    },
+    {
+      "id": "C22",
+      "naam": "De btw van RTG zelf als voorbereiding",
+      "besloten": "30 september 2026, door de eigenaar",
+      "herkomst": "mens",
+      "regel": "Per kwartaal uit de lidmaatschapstermijnen die in het kwartaal vervielen, tegen het standaardtarief, met klasse advies; een mens dient in en RTG nooit zelf.",
+      "kort": "Wie aangifte doet begint niet bij nul, en nergens staat zekerheid die er niet is.",
+      "handhaving": "kern/bedrijfsmaat/stand-toelating.js en btw.rtg in kern/fiscaal/zekerheid.js (klasse advies); test/bedrijfsmaattoelating.test.js.",
+      "stand": "gebouwd"
+    },
+    {
+      "id": "C23",
+      "naam": "Het eigen kantoor blijft ongeteld",
+      "besloten": "30 september 2026, door de eigenaar",
+      "herkomst": "mens",
+      "regel": "Medewerkers op naam, werkdruk en open zaken per team blijven open met de reden: met een klein kantoor is elk getal een getal over een mens. Ze gaan pas open met een groter team en een dienstverband bij RTG zelf.",
+      "kort": "De meeteenheid is nooit de mens.",
+      "handhaving": "Geen projectie: de drie maten staan open met besluit C23 als reden in kern/bedrijfsmaat/maten-operatie.js; test/bedrijfsmaattoelating.test.js.",
+      "stand": "gebouwd"
     }
   ],
   "telling": {
     "maten": 67,
     "domeinen": 28,
     "perStatus": {
-      "bestaat": 56,
-      "half": 8,
+      "bestaat": 59,
+      "half": 5,
       "ontbreekt": 3,
       "onbekend": 0
     },
     "primairGat": {
       "BRON_ONTBREEKT": 3,
-      "DEFINITIE_ONTBREEKT": 5,
-      "PROJECTIE_ONTBREEKT": 2,
+      "DEFINITIE_ONTBREEKT": 4,
+      "PROJECTIE_ONTBREEKT": 0,
       "BEWIJS_ONTBREEKT": 1
     },
     "perGat": {
       "BRON_ONTBREEKT": 3,
-      "DEFINITIE_ONTBREEKT": 8,
-      "PROJECTIE_ONTBREEKT": 10,
-      "BEWIJS_ONTBREEKT": 11
+      "DEFINITIE_ONTBREEKT": 7,
+      "PROJECTIE_ONTBREEKT": 7,
+      "BEWIJS_ONTBREEKT": 8
     },
     "ketens": 6,
     "ketensGegrond": 6,
-    "bestaatGedeeltelijk": 18,
+    "bestaatGedeeltelijk": 19,
     "rustOpGat": 0,
     "privacyGaten": 0,
     "verworpen": 0,
@@ -306,8 +346,8 @@
     },
     "churn": {
       "maten": 3,
-      "bestaat": 2,
-      "half": 1,
+      "bestaat": 3,
+      "half": 0,
       "ontbreekt": 0
     },
     "uitkomst": {
@@ -354,8 +394,8 @@
     },
     "leveranciers": {
       "maten": 2,
-      "bestaat": 1,
-      "half": 1,
+      "bestaat": 2,
+      "half": 0,
       "ontbreekt": 0
     },
     "campagnes": {
@@ -372,8 +412,8 @@
     },
     "fiscaliteit": {
       "maten": 2,
-      "bestaat": 1,
-      "half": 1,
+      "bestaat": 2,
+      "half": 0,
       "ontbreekt": 0
     },
     "risico": {
@@ -622,7 +662,7 @@
       },
       {
         "id": "fiscaal.btw-rtg",
-        "status": "half",
+        "status": "bestaat",
         "domein": "fiscaliteit"
       },
       {
@@ -717,7 +757,7 @@
       },
       {
         "id": "churn.contract-geeindigd",
-        "status": "half",
+        "status": "bestaat",
         "domein": "churn"
       },
       {
@@ -877,7 +917,7 @@
       },
       {
         "id": "leveranciers.partners-toelating",
-        "status": "half",
+        "status": "bestaat",
         "domein": "leveranciers"
       },
       {
@@ -1591,34 +1631,31 @@
       "id": "fiscaal.btw-rtg",
       "versie": 1,
       "domein": "fiscaliteit",
-      "betekenis": "De btw die RTG zelf verschuldigd is over zijn eigen facturen.",
+      "betekenis": "De btw die RTG zelf verschuldigd is over zijn lidmaatschapstermijnen, als voorbereiding voor een mens.",
       "wereld": "rtg-intern",
       "bronnen": [
-        "server/kern/kosten/factuurregel.js"
+        "server/kern/aanmeldingen.js"
       ],
-      "berekening": "nog niet vastgesteld",
-      "eenheid": "euro per aangifteperiode",
-      "graad": "onbekend",
+      "berekening": "termijnen die in het kwartaal vervielen, zonder btw, maal het standaardtarief; klasse advies",
+      "eenheid": "eurocent btw per kwartaal",
+      "graad": "vermoed",
       "actualiteit": "periode",
       "minimaleGroep": null,
       "privacyklasse": "huis",
-      "eigenaar": null,
-      "eigenaarReden": "Niemand.",
+      "eigenaar": "kern/bedrijfsmaat",
+      "eigenaarReden": null,
       "afhankelijk": [
         "omzet.leden-ontvangen"
       ],
-      "status": "half",
-      "gaten": [
-        "PROJECTIE_ONTBREEKT",
-        "BEWIJS_ONTBREEKT"
-      ],
+      "status": "bestaat",
+      "gaten": [],
       "elementen": {
         "bron": {
           "aanwezig": true,
           "citaten": [
             {
-              "bestand": "server/kern/kosten/factuurregel.js",
-              "citaat": "md.invoices.push",
+              "bestand": "server/kern/aanmeldingen.js",
+              "citaat": "function termijnVoldaan",
               "klopt": true
             }
           ],
@@ -1628,22 +1665,39 @@
           "aanwezig": true,
           "citaten": [
             {
-              "bestand": "server/kern/fiscaal/tarief.js",
-              "citaat": "WELK BTW-TARIEF HOORT BIJ DEZE VERKOOP",
+              "bestand": "server/kern/bedrijfsmaat/definities-later.js",
+              "citaat": "btwRtg: d30(22",
               "klopt": true
             }
           ],
           "reden": null
         },
         "projectie": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "De aangiftemotor (kern/fiscaal/btwaangifte.js) rekent voor een ZAAK; RTG is geen zaak in zijn eigen systeem, dus zijn eigen aangifte wordt nergens samengesteld."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand-toelating.js",
+              "citaat": "function btwRtg()",
+              "klopt": true
+            }
+          ],
+          "reden": null
         },
         "bewijs": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Volgt uit de projectie; de zekerheidsklassen en de herkomstketen staan klaar."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand-toelating.js",
+              "citaat": "zekerheid: zekerheid('btw.rtg')",
+              "klopt": true
+            },
+            {
+              "bestand": "server/kern/fiscaal/zekerheid.js",
+              "citaat": "'btw.rtg': { klasse: 'advies'",
+              "klopt": true
+            }
+          ],
+          "reden": null
         }
       },
       "groepsgrens": {
@@ -1653,10 +1707,10 @@
         "reden": null
       },
       "keten": {
-        "gegrond": false,
+        "gegrond": true,
         "zwakkeSchakels": []
       },
-      "gedeeltelijk": null
+      "gedeeltelijk": "De verbruiksfacturen per lid staan versleuteld in de kluis en worden niet gelezen; dit is een ondergrens."
     },
     {
       "id": "fiscaal.btw-zaken",
@@ -3220,25 +3274,22 @@
       "id": "churn.contract-geeindigd",
       "versie": 1,
       "domein": "churn",
-      "betekenis": "Contractuele lidmaatschappen die GEEINDIGD bereiken; volgens de definitie van churn tellen ze mee.",
+      "betekenis": "Contractuele lidmaatschappen die GEEINDIGD bereiken, als aandeel van wat aan het begin van de maand liep.",
       "wereld": "consument",
       "bronnen": [
         "server/kern/commercie/contract.js"
       ],
-      "berekening": "nog niet vastgesteld",
-      "eenheid": "contracten per maand",
-      "graad": "onbekend",
+      "berekening": "lopend aan het begin van de maand en geeindigd in de maand, gedeeld door lopend aan het begin",
+      "eenheid": "aandeel lopende contracten per maand",
+      "graad": "gemeten",
       "actualiteit": "live",
       "minimaleGroep": 10,
       "privacyklasse": "leden",
-      "eigenaar": null,
-      "eigenaarReden": "Niemand.",
+      "eigenaar": "kern/bedrijfsmaat",
+      "eigenaarReden": null,
       "afhankelijk": [],
-      "status": "half",
-      "gaten": [
-        "PROJECTIE_ONTBREEKT",
-        "BEWIJS_ONTBREEKT"
-      ],
+      "status": "bestaat",
+      "gaten": [],
       "elementen": {
         "bron": {
           "aanwezig": true,
@@ -3255,32 +3306,50 @@
           "aanwezig": true,
           "citaten": [
             {
-              "bestand": "server/kern/bedrijfsmaat/definities.js",
-              "citaat": "churn: d(1",
+              "bestand": "server/kern/bedrijfsmaat/definities-later.js",
+              "citaat": "contractGeeindigd: d30(21",
               "klopt": true
             }
           ],
           "reden": null
         },
         "projectie": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "De projectie telt alleen de pasgeschiedenis. Een contract hangt aan een aanmelding en niet aan een codenaam, dus de koppeling contract -> lid moet eerst gelegd worden."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand-toelating.js",
+              "citaat": "function contractGeeindigd()",
+              "klopt": true
+            }
+          ],
+          "reden": null
         },
         "bewijs": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Volgt uit de projectie."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand-toelating.js",
+              "citaat": "niet('Aan het begin van deze maand liep er geen enkel contract.')",
+              "klopt": true
+            }
+          ],
+          "reden": null
         }
       },
       "groepsgrens": {
         "vereist": true,
-        "afgedwongen": false,
-        "citaten": [],
-        "reden": "Volgt uit de projectie."
+        "afgedwongen": true,
+        "citaten": [
+          {
+            "bestand": "server/kern/bedrijfsmaat/stand-toelating.js",
+            "citaat": "toon(LEDEN, { waarde: geeindigd / liepen, n: liepen })",
+            "klopt": true
+          }
+        ],
+        "reden": null
       },
       "keten": {
-        "gegrond": false,
+        "gegrond": true,
         "zwakkeSchakels": []
       },
       "gedeeltelijk": null
@@ -5517,7 +5586,7 @@
         "definitie": {
           "aanwezig": false,
           "citaten": [],
-          "reden": "Niet besloten; en per team met een of twee mensen is werklast een getal over een mens (KANTOORMACHT.md)."
+          "reden": "Besluit C23: blijft open; per team met een of twee mensen is werklast een getal over een mens (KANTOORMACHT.md)."
         },
         "projectie": {
           "aanwezig": false,
@@ -5581,7 +5650,7 @@
         "definitie": {
           "aanwezig": false,
           "citaten": [],
-          "reden": "Een kantoorrol op een account is geen dienstverband; het dienstverband bij RTG zelf staat niet in kern/concern/employment.js."
+          "reden": "Besluit C23: blijft open tot een groter team. Een kantoorrol op een account is geen dienstverband; het dienstverband bij RTG zelf staat niet in kern/concern/employment.js."
         },
         "projectie": {
           "aanwezig": false,
@@ -5640,7 +5709,7 @@
         "definitie": {
           "aanwezig": false,
           "citaten": [],
-          "reden": "Volgt pas als er een bron is."
+          "reden": "Besluit C23: blijft open; volgt pas als er een bron is."
         },
         "projectie": {
           "aanwezig": false,
@@ -5749,26 +5818,22 @@
       "id": "leveranciers.partners-toelating",
       "versie": 1,
       "domein": "leveranciers",
-      "betekenis": "Zaken die zich aanmelden en waar ze staan in de toelating.",
+      "betekenis": "Zaken die zich aanmelden en waar ze staan in de toelating, en hoe lang een besluit duurt.",
       "wereld": "commercieel",
       "bronnen": [
         "server/kern/aanmeldingen/bewijs.js"
       ],
-      "berekening": "nog niet vastgesteld",
-      "eenheid": "aanvragen per stand",
-      "graad": "onbekend",
+      "berekening": "aanmeldingen met een bedrijf per stand; mediane dagen van aanvraag tot besluit over de besluiten van de maand",
+      "eenheid": "aanvragen per stand, en dagen",
+      "graad": "gemeten",
       "actualiteit": "live",
       "minimaleGroep": 5,
       "privacyklasse": "zaken",
-      "eigenaar": null,
-      "eigenaarReden": "Niemand.",
+      "eigenaar": "kern/bedrijfsmaat",
+      "eigenaarReden": null,
       "afhankelijk": [],
-      "status": "half",
-      "gaten": [
-        "DEFINITIE_ONTBREEKT",
-        "PROJECTIE_ONTBREEKT",
-        "BEWIJS_ONTBREEKT"
-      ],
+      "status": "bestaat",
+      "gaten": [],
       "elementen": {
         "bron": {
           "aanwezig": true,
@@ -5782,29 +5847,53 @@
           "reden": null
         },
         "definitie": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "De keten is beproefd (npm run toelatingsproef), maar een doorlooptijd of wachtrij als bedrijfsmaat is niet besloten."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/definities-later.js",
+              "citaat": "toelating: d30(20",
+              "klopt": true
+            }
+          ],
+          "reden": null
         },
         "projectie": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Niet gebouwd."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand-toelating.js",
+              "citaat": "function toelating()",
+              "klopt": true
+            }
+          ],
+          "reden": null
         },
         "bewijs": {
-          "aanwezig": false,
-          "citaten": [],
-          "reden": "Volgt uit de projectie."
+          "aanwezig": true,
+          "citaten": [
+            {
+              "bestand": "server/kern/bedrijfsmaat/stand-toelating.js",
+              "citaat": "niet('Het aanmeldregister is niet beschikbaar.')",
+              "klopt": true
+            }
+          ],
+          "reden": null
         }
       },
       "groepsgrens": {
         "vereist": true,
-        "afgedwongen": false,
-        "citaten": [],
-        "reden": "Volgt uit de projectie."
+        "afgedwongen": true,
+        "citaten": [
+          {
+            "bestand": "server/kern/bedrijfsmaat/stand-toelating.js",
+            "citaat": "groepeer(rijen, { grens: KLASSEN.zaken.grens, benoemd: true })",
+            "klopt": true
+          }
+        ],
+        "reden": null
       },
       "keten": {
-        "gegrond": false,
+        "gegrond": true,
         "zwakkeSchakels": []
       },
       "gedeeltelijk": null

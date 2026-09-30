@@ -121,6 +121,7 @@ module.exports = (sctx) => {
     const g = werkPoort(req, res, 'klant'); if (!g) return;
     const ka = eigenVeld(KA(g.w), String(req.body.kansId || ''));
     if (!ka) return res.status(404).json({ error: 'Die kans kennen we niet.' });
+    if (ka.praktijk) return res.status(409).json({ error: 'Deze vraag volgt de dagelijkse werkstroom. Verander het voorstel of akkoord daar.' });
     const f = faseVan(String(req.body.fase || ''));
     if (!f) return res.status(400).json({ error: 'Kies een fase: ' + FASEN.map(x => x.id).join(', ') + '.' });
     if (ka.fase === 'gewonnen' || ka.fase === 'verloren')
@@ -143,41 +144,7 @@ module.exports = (sctx) => {
     res.json({ ok: true, kans: ka });
   });
 
-  /* De pijplijn: gewogen, met de rekensom erbij en zonder het woord prognose. */
-  app.post('/api/bedrijf/pijplijn', (req, res) => {
-    const g = werkPoort(req, res, 'klant'); if (!g) return;
-    const alle = Object.values(KA(g.w));
-    const open = alle.filter(k => k.fase !== 'gewonnen' && k.fase !== 'verloren');
-    const perFase = {};
-    let gewogen = 0;
-    for (const k of open) {
-      const f = faseVan(k.fase);
-      const deel = Math.round(k.bedragCenten * f.kans / 100);
-      gewogen += deel;
-      perFase[k.fase] = perFase[k.fase] || { aantal: 0, bedragCenten: 0, kansPct: f.kans, gewogenCenten: 0 };
-      perFase[k.fase].aantal++;
-      perFase[k.fase].bedragCenten += k.bedragCenten;
-      perFase[k.fase].gewogenCenten += deel;
-    }
-    const gewonnen = alle.filter(k => k.fase === 'gewonnen');
-    const verloren = alle.filter(k => k.fase === 'verloren');
-    const redenen = {};
-    for (const k of verloren) { const r = k.reden || 'zonder reden'; redenen[r] = (redenen[r] || 0) + 1; }
-    res.json({ ok: true, fasen: FASEN,
-      open: { aantal: open.length, bedragCenten: open.reduce((t, k) => t + k.bedragCenten, 0), gewogenCenten: gewogen },
-      perFase,
-      gewonnen: { aantal: gewonnen.length, bedragCenten: gewonnen.reduce((t, k) => t + k.bedragCenten, 0) },
-      verloren: { aantal: verloren.length, redenen },
-      scoringPct: (gewonnen.length + verloren.length)
-        ? Math.round(gewonnen.length / (gewonnen.length + verloren.length) * 1000) / 10 : null,
-      let: 'Gewogen is bedrag maal de kans van de fase. Dat is een rekensom en geen prognose: een voorspelling hoort pas te bestaan als er genoeg afgesloten kwartalen zijn om hem aan te toetsen.' });
-  });
-
-  sctx.startBron('klanten', 'klant', (g) => {
-    const mijn = Object.values(KA(g.w)).filter(k => k.eigenaar === g.l.naam && k.fase !== 'gewonnen' && k.fase !== 'verloren');
-    return { openKansen: mijn.length,
-      kansen: mijn.slice(0, 8).map(k => ({ id: k.id, titel: k.titel, klant: k.klant, fase: k.fase })) };
-  });
+  require('./klant-pijplijn')(sctx, { KA, FASEN, faseVan });
 
   return { FASEN, PRODUCTEN, KLANTEN: K, KANSEN: KA };
 };

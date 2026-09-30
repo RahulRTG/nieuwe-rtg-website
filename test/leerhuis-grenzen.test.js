@@ -782,6 +782,10 @@ test('28. B-UI kwaliteit: bezwaren met het oordeel pas na het oppakken, ongeldig
   assert.deepEqual(z().naar, ['INDEPENDENT_REVIEW'], 'uit de overgangstabel');
   w.doe(ORG, 'bezwaarStand', { id: z().id, naar: 'INDEPENDENT_REVIEW' }, P.Q);
   assert.ok(z().oordeel && z().oordeel.stand === 'PROVEN' && z().oordeel.criteria, 'wie de review oppakte, ziet het oordeel');
+  const stuk = z().oordeel.bewijs[0];
+  assert.ok(stuk && stuk.ingetrokken === null, 'met het bewijs eronder, voor deze vaardigheid');
+  w.doe(ORG, 'bewijsIntrekken', { id: stuk.id, reden: 'dubbel vastgelegd' }, P.Q);
+  assert.equal(z().oordeel.bewijs.find(x => x.id === stuk.id).ingetrokken, 'dubbel vastgelegd', 'ingetrokken blijft staan, met de reden');
   w.doe(ORG, 'bestuurZet', { persoon: P.KO2, rol: 'QUALITY_AUTHORITY' }, P.E);
   const ander = l.kwaliteitWerk(ORG, P.KO2).BEZWAREN.find(x => x.persoon === P.N);
   assert.equal(ander.anderReviewer, true);
@@ -798,4 +802,89 @@ test('28. B-UI kwaliteit: bezwaren met het oordeel pas na het oppakken, ongeldig
   const b = l.kwaliteitWerk(ORG, P.E).BELEID.find(x => x.id === 'tb');
   assert.deepEqual([b.eigen, b.goedgekeurd, b.rol], [true, false, 'Operations Professional'], 'wie voorstelde, keurt niet zelf goed');
   assert.equal(l.kwaliteitWerk(ORG, P.Q).BELEID.find(x => x.id === 'tb').eigen, false);
+});
+
+test('29. B-UI leerling: uitslagen met bezwaar, EVC indienen en het EVC-werk van de assessor', () => {
+  const w = basis();
+  const l = w.lh.lees;
+  const { beoordeling } = W.leidOp(w, ORG, P.N, P);
+  const u = () => l.mijn(ORG, P.N).UITSLAGEN.find(x => x.id === beoordeling);
+  assert.deepEqual([u().stand, u().bezwaar], ['PROVEN', null], 'de eigen uitslag, nog zonder bezwaar');
+  nee(w.probeer(ORG, 'bezwaarIndienen', { beoordeling, reden: ' ' }, P.N), 400);
+  nee(w.probeer(ORG, 'bezwaarIndienen', { beoordeling, reden: 'niet van mij' }, P.T), 403);
+  w.doe(ORG, 'bezwaarIndienen', { beoordeling, reden: 'de tweede poging telde niet mee' }, P.N);
+  assert.deepEqual(u().bezwaar, { stand: 'REVIEW_REQUEST', uitkomst: null });
+  nee(w.probeer(ORG, 'bezwaarIndienen', { beoordeling, reden: 'nog een keer' }, P.N), 409);
+  const id = l.kwaliteitWerk(ORG, P.Q).BEZWAREN.find(x => x.persoon === P.N).id;
+  w.doe(ORG, 'bezwaarStand', { id, naar: 'INDEPENDENT_REVIEW', notitie: 'nog bezig' }, P.Q);
+  assert.equal(u().bezwaar.uitkomst, null, 'een tussennotitie is geen uitkomst');
+  w.doe(ORG, 'bezwaarStand', { id, naar: 'UPHELD', notitie: 'het bewijs dekt het oordeel' }, P.Q);
+  assert.deepEqual(u().bezwaar, { stand: 'UPHELD', uitkomst: 'het bewijs dekt het oordeel' });
+
+  assert.ok(l.mijn(ORG, P.N).EVC_KEUZE.length > 0, 'met een lopende relatie kiest de leerling een vaardigheid');
+  assert.deepEqual(l.mijn(ORG, 'lid:99').EVC_KEUZE, [], 'zonder relatie geen EVC-keuze');
+  w.doe(ORG, 'evcIndienen', { vaardigheid: 'terugboeken', extern: 'diploma betalingsverkeer, ROC, 2024' }, P.N);
+  nee(w.probeer(ORG, 'evcIndienen', { vaardigheid: 'terugboeken', extern: 'nog een' }, P.N), 409);
+  assert.equal(l.mijn(ORG, P.N).EVC[0].stand, 'EVIDENCE');
+  const e = l.assessorWerk(ORG, P.A).EVC.find(x => x.persoon === P.N);
+  assert.deepEqual([e.stand, e.uitkomsten], ['EVIDENCE', ['ACCEPTED', 'PARTIAL', 'REJECTED']], 'de uitkomsten uit de overgangstabel');
+  w.doe(ORG, 'evcBeoordeel', { id: e.id, uitkomst: 'PARTIAL' }, P.A);
+  assert.equal(l.mijn(ORG, P.N).EVC[0].stand, 'PARTIAL');
+  assert.ok(!l.assessorWerk(ORG, P.A).EVC.some(x => x.id === e.id), 'afgerond staat niet meer in het werk');
+});
+
+test('30. B-UI werk: de leerling ziet per goedgekeurd beleid of hij geschikt is en legt werk vast', () => {
+  const w = basis();
+  const l = w.lh.lees;
+  assert.deepEqual(l.mijn(ORG, P.N).WERK, [], 'zonder goedgekeurd beleid geen werk');
+  w.doe(ORG, 'beleidZet', { id: 'tb', handeling: 'betaling.terugboeken', rol: 'ops', vaardigheden: ['terugboeken'], certificaat: true }, P.E);
+  assert.deepEqual(l.mijn(ORG, P.N).WERK, [], 'een voorstel telt niet');
+  w.doe(ORG, 'beleidGoedkeuren', { id: 'tb' }, P.Q);
+  const x = () => l.mijn(ORG, P.N).WERK.find(y => y.handeling === 'betaling.terugboeken');
+  assert.equal(x().geschikt, false);
+  assert.ok(x().ontbreekt.some(r => /niet bewezen/.test(r)), 'wat ontbreekt staat er in woorden');
+  W.leidOp(w, ORG, P.N, P);
+  assert.deepEqual([x().geschikt, x().ontbreekt, x().vastgelegd], [true, [], 0]);
+  w.doe(ORG, 'werkVastleggen', { handeling: 'betaling.terugboeken', uitkomst: 'storno van 40 euro teruggeboekt' }, P.N);
+  assert.equal(x().vastgelegd, 1);
+  assert.deepEqual(l.mijn(ORG, 'lid:99').WERK, [], 'zonder relatie geen werk');
+});
+
+test('31. B-UI voorstellen: de leerling dient in en volgt, de kenniseigenaar behandelt zonder te zien wie indiende', () => {
+  const w = basis();
+  const l = w.lh.lees;
+  assert.ok(l.mijn(ORG, P.N).VOORSTEL_KEUZE.some(k => k.id === 'terugboeken'), 'officiele kennis om een voorstel over te doen');
+  assert.equal(l.mijn(ORG, 'lid:99').VOORSTEL_KEUZE, null, 'zonder relatie geen voorstel');
+  const id = w.doe(ORG, 'voorstelIndienen', { kennis: 'terugboeken', probleem: 'de grens is te laag', voorstel: 'grens naar 100', reden: 'te veel tweede handtekeningen' }, P.N).id;
+  const eigen = () => l.mijn(ORG, P.N).VOORSTELLEN.find(v => v.id === id);
+  assert.deepEqual([eigen().stand, eigen().notitie], ['SUBMITTED', null]);
+  const ko = () => l.kennisWerk(ORG, P.KO).VOORSTELLEN.find(v => v.id === id);
+  assert.deepEqual([ko().eigen, ko().naar, ko().versieGeschreven], [false, ['TRIAGED'], false]);
+  assert.ok(!('indiener' in ko()) && !JSON.stringify(ko()).includes(P.N), 'wie indiende staat er niet bij');
+  w.doe(ORG, 'voorstelStand', { id, naar: 'TRIAGED' }, P.KO);
+  w.doe(ORG, 'voorstelStand', { id, naar: 'REVIEW' }, P.KO);
+  w.doe(ORG, 'voorstelStand', { id, naar: 'APPROVED', notitie: 'we passen de grens aan' }, P.KO);
+  assert.deepEqual([eigen().stand, eigen().notitie], ['APPROVED', 'we passen de grens aan'], 'de indiener ziet de toelichting');
+  w.doe(ORG, 'kennisSchrijf', { id: 'terugboeken', titel: 'Terugboeken', tekst: 'grens 100', bron: 'besluit', voorstel: id }, P.KO);
+  assert.deepEqual([ko().versieGeschreven, ko().conceptLoopt], [true, true]);
+  nee(w.probeer(ORG, 'voorstelStand', { id, naar: 'IMPLEMENTED' }, P.KO), 409);
+  const eigenVoorstel = w.doe(ORG, 'voorstelIndienen', { probleem: 'a', voorstel: 'b', reden: 'c' }, P.KO).id;
+  assert.equal(l.kennisWerk(ORG, P.KO).VOORSTELLEN.find(v => v.id === eigenVoorstel).eigen, true, 'wie indiende, ziet dat hij het zelf was');
+});
+
+test('32. B-UI eenheden: een graaf zonder kring, en een relatie alleen in een eenheid die bestaat', () => {
+  const w = basis();
+  const l = w.lh.lees;
+  nee(w.probeer(ORG, 'eenheidZet', { id: 'ops', naam: ' ' }, P.E), 400);
+  nee(w.probeer(ORG, 'eenheidZet', { id: 'ops', naam: 'Operations', ouder: 'nergens' }, P.E), 404);
+  nee(w.probeer(ORG, 'eenheidZet', { id: 'ops', naam: 'Operations' }, P.CO), 403);
+  w.doe(ORG, 'eenheidZet', { id: 'ops', naam: 'Operations', soort: 'afdeling' }, P.E);
+  w.doe(ORG, 'eenheidZet', { id: 'ops-noord', naam: 'Operations Noord', soort: 'team', ouder: 'ops' }, P.E);
+  nee(w.probeer(ORG, 'eenheidZet', { id: 'ops', naam: 'Operations', ouder: 'ops-noord' }, P.E), 409);
+  nee(w.probeer(ORG, 'eenheidZet', { id: 'ops', naam: 'Operations', ouder: 'ops' }, P.E), 409);
+  nee(w.probeer(ORG, 'relatieZet', { persoon: P.N, soort: 'EMPLOYEE', eenheid: 'nergens' }, P.E), 404);
+  w.doe(ORG, 'relatieZet', { persoon: P.N, soort: 'EMPLOYEE', eenheid: 'ops-noord' }, P.E);
+  const e = l.eigenaarWerk(ORG, P.E);
+  assert.deepEqual(e.EENHEDEN.find(x => x.id === 'ops-noord'), { id: 'ops-noord', naam: 'Operations Noord', soort: 'team', ouder: 'ops', ouderNaam: 'Operations' });
+  assert.equal(e.RELATIES.find(x => x.persoon === P.N).eenheid, 'Operations Noord');
 });

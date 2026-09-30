@@ -46,8 +46,10 @@
        de inlogkaart weer open in plaats van dat het scherm leeg blijft. */
     api: function (pad, body) {
       var lijf = Object.assign({}, body || {}, sessie || {});
+      var headers = { 'Content-Type': 'application/json' };
+      try { var bearer = localStorage.getItem('rtg_member_token'); if (bearer) headers.Authorization = 'Bearer ' + bearer; } catch (_) {}
       return fetch('/api/bedrijf' + pad, { method: 'POST',
-        headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lijf) })
+        headers: headers, body: JSON.stringify(lijf) })
         .then(function (r) {
           return r.json().catch(function () { return {}; }).then(function (b) {
             /* TWEE SOORTEN 403, EN ZE HOREN NIET HETZELFDE TE BETEKENEN.

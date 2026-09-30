@@ -77,6 +77,11 @@ module.exports = (sctx) => {
     const g = werkPoort(req, res, 'project'); if (!g) return;
     const t = eigenVeld(T(g.w), String(req.body.taakId || ''));
     if (!t) return res.status(404).json({ error: 'Die taak kennen we niet.' });
+    if (t.externeAfspraak) return res.status(409).json({ error: 'Werk deze externe afspraak bij via Dagelijks werk, met een bewijsreferentie.' });
+    if (t.geannuleerd) return res.status(409).json({ error: 'Deze taak hoort bij geannuleerd werk.' });
+    const eigenaar = eigenVeld(P(g.w), t.projectId);
+    if (eigenaar && eigenaar.praktijkRef && (g.w.kansen || {})[eigenaar.praktijkRef]?.praktijk?.taakId === t.id)
+      return res.status(409).json({ error: 'Leg de uitvoering van deze taak vast via Dagelijks werk.' });
     const kolom = String(req.body.kolom || '');
     if (!KOLOMMEN.includes(kolom)) return res.status(400).json({ error: 'Kies een kolom: ' + KOLOMMEN.join(', ') + '.' });
     if (kolom === 'klaar') {
@@ -111,7 +116,7 @@ module.exports = (sctx) => {
 
   app.post('/api/bedrijf/taken', (req, res) => {
     const g = werkPoort(req, res, 'project'); if (!g) return;
-    const rijen = Object.values(T(g.w))
+    const rijen = Object.values(T(g.w)).filter(t => !t.geannuleerd)
       .filter(t => !req.body.projectId || t.projectId === String(req.body.projectId))
       .filter(t => !req.body.wie || t.wie === String(req.body.wie))
       .filter(t => !req.body.kolom || t.kolom === String(req.body.kolom))
@@ -123,7 +128,7 @@ module.exports = (sctx) => {
 
   // de twee blokken voor het startscherm; alleen voor wie het recht heeft
   sctx.startBron('taken', 'project', (g) => {
-    const mijn = Object.values(T(g.w)).filter(t => t.wie === g.l.naam && t.kolom !== 'klaar');
+    const mijn = Object.values(T(g.w)).filter(t => !t.geannuleerd && t.wie === g.l.naam && t.kolom !== 'klaar');
     return { aantal: mijn.length, teLaat: mijn.filter(t => t.deadline && t.deadline < dag()).length,
       taken: mijn.slice(0, 10).map(t => ({ id: t.id, titel: t.titel, deadline: t.deadline, prioriteit: t.prioriteit })) };
   });

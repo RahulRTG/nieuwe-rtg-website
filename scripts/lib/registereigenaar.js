@@ -93,6 +93,10 @@ const EIGENAAR = {
     waarom: 'Handmatig onderhouden architectuur- en bereikbeschrijving; de drie taalrapporten dragen het afzonderlijke uitvoerbare bewijs.' },
   'VRIJHEID.md': { soort: 'BRON',
     waarom: 'Handmatig geschreven richtingsdocument (RTG Vrijheid: tijd, rust, vrijheid en eerlijkheid); de machineleesbare lusstand staat in server/kern/vrijheid/lus.js en wordt door test/vrijheid-lus.test.js tegen de boom gehouden, er is geen generator die het schrijft.' },
+  'CONCIERGE.md': { soort: 'BRON',
+    waarom: 'Handmatig geschreven richtingsdocument (de conciërgelus rond één wens); de tellingen erin zijn met de hand gedaan en dragen de graad vermoed, er is geen generator die het schrijft.' },
+  'WORLDNETWORK.md': { soort: 'BRON',
+    waarom: 'Handmatig beschreven contract, architectuur en grenzen van World Network; de uitvoerbare netwerk- en praktijkproeven leveren afzonderlijk bewijs, geen generator schrijft dit document.' },
   'TOESTEL.md': { soort: 'BRON',
     waarom: 'Handmatig geschreven richtingsdocument (AI op het toestel van het lid); de gerepareerde herkomst staat in test/ai-herkomst.test.js, er is geen generator die het schrijft.' },
   'RELEASEKANDIDAAT.md': { soort: 'BRON',
@@ -188,6 +192,10 @@ const EIGENAAR = {
      0)? Zelfde vorm als de planvorm hierboven: een schrijver, een ratel op het
      BEREIK, een ijking en een regel in de versheidslijst. */
   'OFFICEVORM.json': { schrijver: 'scripts/officevorm.js' },
+
+  /* De overgangsvorm: is er EEN overgang onder FoundationOS? Zelfde vorm als de
+     officevorm hierboven, met drie ratels in plaats van een. */
+  'OVERGANGSVORM.json': { schrijver: 'scripts/overgangsvorm.js' },
 
   /* De spiegel van STILSPOOR: lezers die een onleesbaar bewijs als een afwezig
      bewijs behandelen. Vier tanden in scripts/lib/metingen.js, en de detectie

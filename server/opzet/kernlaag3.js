@@ -151,7 +151,7 @@ Object.assign(kern, require('../kern/gastzorg')({ db, save, crypto, schoon, noti
 // Toren 3, RTG Shared Assets: 300 tickets per object, Access en Asset
 Object.assign(kern, require('./assetsduurzaam')(hulp, kern));
 // De Rechterhand: de premium Lifestyle Pass-suite (concierge, bezittingen, gezondheid)
-Object.assign(kern, require('../kern/lifestyle')({ db, save, crypto, anthropic, liveCodename, notify }));
+Object.assign(kern, require('../kern/lifestyle')({ db, save, crypto, anthropic, liveCodename, notify, kern }));
 // De extra premium ROS-apps van de Lifestyle Pass: Reisboek, Cellier, Table, Maison
 Object.assign(kern, require('../kern/rechterhand')({ db, save, crypto, liveCodename, anthropic, DATA_DIR }));
 };

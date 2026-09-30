@@ -71,7 +71,20 @@ window.RTGLeerhuisKaarten = function (h) {
       k.appendChild(rij);
       return k;
     });
-    zet('assessor', lopend.concat(open), 'Er wacht geen beoordeling op u.');
+    /* EVC: een stuk van elders wordt hoogstens vastgelegd bewijs, nooit bewezen. */
+    var EVC = { ACCEPTED: 'Erkennen', PARTIAL: 'Deels erkennen', REJECTED: 'Niet erkennen' };
+    var evc = (a.EVC || []).map(function (e) {
+      var k = kaart('EVC: ' + e.vaardigheidNaam + ' van ' + wie(e), e.stand, ['Stuk: ' + e.extern, 'Erkend of deels erkend wordt vastgelegd bewijs, geen bewezen vaardigheid.']);
+      var rij = maak('div', 'rij');
+      (e.uitkomsten || []).forEach(function (u) {
+        rij.appendChild(knop(EVC[u] || u, u === 'REJECTED', function () {
+          doe('evc:' + e.id, 'evcBeoordeel', { id: e.id, uitkomst: u }, 'EVC ' + e.vaardigheidNaam + ': ' + (EVC[u] || u).toLowerCase() + '.');
+        }));
+      });
+      k.appendChild(rij);
+      return k;
+    });
+    zet('assessor', lopend.concat(open, evc), 'Er wacht geen beoordeling op u.');
     $('assessorNiet').textContent = a.nietZichtbaar ? 'Niet zichtbaar: ' + a.nietZichtbaar + '.' : '';
   }
 

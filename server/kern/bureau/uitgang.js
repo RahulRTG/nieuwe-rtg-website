@@ -61,9 +61,21 @@ module.exports = (m) => ({
     // het reisdek
     reisdek: m.rd.reisdek, rdVerstoring: m.rd.rdVerstoring, rdGevolg: m.rd.rdGevolg,
     rdVerstoringWeg: m.rd.rdVerstoringWeg, rdBon: m.rd.rdBon,
-    rdVergeten: m.rd.rdVergeten, rdPunten: m.rd.rdPunten
+    rdVergeten: m.rd.rdVergeten, rdPunten: m.rd.rdPunten,
+    // de concierge-lus, de kant van het lid
+    lusIntake: m.lus.lusIntake, lusToelichting: m.lus.lusToelichting, lusVerrassing: m.lus.lusVerrassing,
+    lusBeslis: m.lus.lusBeslis, lusLid: m.lus.lusLid
   },
   bureauBalie: {
-    desk: m.cases.bureauDesk, voortgang: m.cases.bureauVoortgang
-  }
+    desk: m.cases.bureauDesk, voortgang: m.cases.bureauVoortgang,
+    // de concierge-lus, de kant van het kantoor
+    lusNeem: m.lus.lusNeem, lusWeigering: m.lus.lusWeigering, lusAanbod: m.lus.lusAanbod,
+    lusKies: m.lus.lusKies, lusOnderdeel: m.lusUit.lusOnderdeel, lusBevestig: m.lusUit.lusBevestig,
+    lusVertraging: m.lusUit.lusVertraging, lusVerstuur: m.lusUit.lusVerstuur,
+    lusKapot: m.lusUit.lusKapot, lusKantoor: m.lusUit.lusKantoor
+  },
+  /* De zaak die een onderdeel levert ziet ALLEEN zijn eigen onderdelen, via een
+     positieve lijst velden (lus-regels.js deelnemerBeeld). Een eigen naam, zodat
+     de leveranciersroute nooit bij de balie of het dossier van een lid kan. */
+  bureauZaak: { opdrachten: m.lusUit.lusVoorZaak }
 });

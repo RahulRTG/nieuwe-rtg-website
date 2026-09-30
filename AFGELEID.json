@@ -3,25 +3,25 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-09-29T23:26:17.293Z",
-  "commit": "ae43c2392",
+  "op": "2026-09-30T20:13:04.979Z",
+  "commit": "ec186c7b2",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 10,
   "instrument": "scripts/afgeleid.js",
-  "node": "v22.22.2"
+  "node": "v26.10.0"
  },
  "gemeten": {
-  "artefacten": 343,
-  "bron": 24,
-  "afgeleid": 187,
-  "fragmenten": 26,
+  "artefacten": 347,
+  "bron": 26,
+  "afgeleid": 188,
+  "fragmenten": 27,
   "momentopname": 1,
   "onbeslist": 105,
   "afgeleidZonderEigenaar": 1,
-  "metEigenaar": 213,
-  "afgeleidEigenaarHard": 186,
+  "metEigenaar": 215,
+  "afgeleidEigenaarHard": 187,
   "afgeleidGrendelt": 26,
-  "metStempel": 119,
+  "metStempel": 120,
   "stempelAnders": 0
  },
  "artefacten": [
@@ -664,6 +664,18 @@
   {
    "naam": "CONCERN.md",
    "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "CONCIERGE.md",
+   "soort": "BRON",
    "eigenaar": null,
    "graad": null,
    "schrijvers": [],
@@ -2988,6 +3000,20 @@
    "botsingVerklaard": true
   },
   {
+   "naam": "OVERGANGSVORM.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/overgangsvorm.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/overgangsvorm.js"
+   ],
+   "stempelInstrument": "scripts/overgangsvorm.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run overgangsvorm:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
    "naam": "OVERLEVING.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/overleving.js",
@@ -4162,6 +4188,18 @@
    "botsingVerklaard": null
   },
   {
+   "naam": "VERDER.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
    "naam": "VERRAAD.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/verraadronde.js",
@@ -4475,6 +4513,18 @@
   },
   {
    "naam": "WORLD-HOMES.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "WORLDNETWORK.md",
    "soort": "BRON",
    "eigenaar": null,
    "graad": null,

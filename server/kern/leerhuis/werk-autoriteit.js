@@ -75,7 +75,12 @@ function kwaliteitWerk(st, door) {
     return { id: z.id, persoon: b.persoon, vaardigheidNaam: naamVan(st, b.vaardigheid), stand: z.stand, reden: z.reden, sinds: z.at,
       eigenOordeel: b.assessor === door, anderReviewer: z.stand === 'INDEPENDENT_REVIEW' && z.reviewer !== door,
       naar: MACHINES.bezwaar.naar[z.stand] || [],
-      oordeel: reviewer ? { stand: b.stand, criteria: b.criteria || null, herstel: b.herstel || null } : null };
+      oordeel: reviewer ? { stand: b.stand, criteria: b.criteria || null, herstel: b.herstel || null,
+        /* Het bewijs onder dit oordeel, zodat de reviewer een stuk kan intrekken
+           (bewijsIntrekken); ingetrokken bewijs blijft staan, met zijn reden. */
+        bewijs: Object.values(st.bewijs).filter(x => x.persoon === b.persoon && x.vaardigheid === b.vaardigheid)
+          .map(x => ({ id: x.id, soort: x.soort, sterkte: x.sterkte, sinds: x.at, bron: x.bron || null,
+            ingetrokken: x.ongeldig ? x.ongeldig.reden : null })) } : null };
   }) : [];
   const ongeldig = kwaliteit ? Object.values(st.beoordelingen).filter(b => ['PROVEN', 'NOT_YET_PROVEN', 'INCONCLUSIVE'].includes(b.stand) && b.assessor !== door)
     .map(b => ({ id: b.id, persoon: b.persoon, vaardigheidNaam: naamVan(st, b.vaardigheid), stand: b.stand, sinds: b.at })) : [];
@@ -83,7 +88,7 @@ function kwaliteitWerk(st, door) {
     BELEID: Object.values(st.beleid).map(b => ({ id: b.id, handeling: b.handeling, rol: b.rol ? ((st.rollen[b.rol] || {}).titel || b.rol) : null,
       vaardigheden: b.vaardigheden.map(v => naamVan(st, v)), certificaat: b.certificaat, goedgekeurd: !!b.goedgekeurd, eigen: b.voorgesteldDoor === door })),
     KEUZES: { vaardigheden: Object.values(st.vaardigheden).map(v => ({ id: v.id, naam: v.naam })), rollen: Object.values(st.rollen).map(r => ({ id: r.id, titel: r.titel })) },
-    nietZichtbaar: 'de beoordeling achter een bezwaar, tot u de review op u neemt; en oordelen die u zelf gaf' };
+    nietZichtbaar: 'de beoordeling en het bewijs achter een bezwaar, tot u de review op u neemt; en oordelen die u zelf gaf' };
 }
 
 module.exports = { certificaatWerk, trainerWerk, kwaliteitWerk };

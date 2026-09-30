@@ -5,14 +5,35 @@
 module.exports = (kern) => {
   const { app, beslisReservering, logActivity, supplierAuth, tafelplanning, reserveringTafel,
           reserveringKomst, walkIn } = kern;
+  const U = kern.reserveringUitzondering;
 
 
 
 app.post('/api/supplier/reservering/beslis', supplierAuth, (req, res) => {
   const action = req.body.action === 'bevestig' ? 'bevestig' : 'weiger';
+  // na doorzetten beslist alleen een manager (kern/ervaring/tafeluitzondering.js)
+  const mag = U.magBeslissen(req.supplier, req.actor, String(req.body.id || ''));
+  if (!mag.ok) return res.status(403).json({ error: mag.reden });
   const r = beslisReservering(req.supplier, String(req.body.id || ''), action);
   if (r.error) return res.status(r.status).json({ error: r.error });
   logActivity(req.supplier.code, req.actor, (action === 'bevestig' ? 'bevestigde' : 'weigerde') + ' de reservering van ' + r.reservering.customerCodename + ' (' + r.reservering.datum + ' ' + r.reservering.tijd + ')');
+  res.json(r);
+});
+
+/* Tussen ja en nee (CONCIERGE.md par. 2.7-2.9): een andere tijd aanbieden die
+   een termijn lang wordt vastgehouden, en een aanvraag doorzetten naar wie mag
+   beslissen. Wie het deed staat in het activiteitenlog; de gast ziet alleen de
+   nieuwe tijd en de termijn. */
+app.post('/api/supplier/reservering/tegenvoorstel', supplierAuth, (req, res) => {
+  const r = U.tegenvoorstel(req.supplier, req.actor, String(req.body.id || ''), req.body || {});
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  logActivity(req.supplier.code, req.actor, 'bood ' + r.reservering.customerCodename + ' ' + r.reservering.tijd + ' aan in plaats van ' + r.reservering.gevraagdeTijd);
+  res.json(r);
+});
+app.post('/api/supplier/reservering/doorzetten', supplierAuth, (req, res) => {
+  const r = U.doorzetten(req.supplier, req.actor, String(req.body.id || ''), req.body || {});
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  logActivity(req.supplier.code, req.actor, 'zette de reservering van ' + r.reservering.customerCodename + ' door naar een manager');
   res.json(r);
 });
 

@@ -12,7 +12,7 @@
     "bronBlindeBestanden": 3,
     "browserpoortToetsen": 402,
     "carriereDomeinenGemeten": 15,
-    "dbDeuren": 535,
+    "dbDeuren": 536,
     "dbDeurenSchrijvend": 275,
     "dekkingPct": 83,
     "dekkingWaargenomenPct": 100,
@@ -28,8 +28,8 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4626,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1680,
-    "kernGedeeld": 253,
+    "kernBreedte": 1682,
+    "kernGedeeld": 254,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1888,
-    "toetsenNietGemeten": 338,
+    "toetsenNietGemeten": 339,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -139,6 +139,9 @@
     "planDomeinenGemeten": 7,
     "plaatsDomeinenGemeten": 30,
     "officeDomeinenGemeten": 11,
+    "overgangenGemeten": 14,
+    "overgangCitaatRot": 0,
+    "overgangWoordenOnverklaard": 0,
     "edgeGeblokkeerdZonderWaarom": 0,
     "edgeDubbeleEigenaars": 12,
     "rtgDodeKanalen": 0,
@@ -161,6 +164,65 @@
     "aankomstUitPositie": 0
   },
   "notities": [
+    {
+      "datum": "2026-09-28",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1666,
+      "meter": "kernBreedte 1666 -> 1675",
+      "reden": "De besluiten C12 tot en met C14 (28 september 2026). Het domein bedrijfsmaat leest nu het campagneregister (rtgCampagnes, rtgCampagneMaak), de campagnepost van het boek (rtgBoekCampagne), de kanalen (AANMELDKANALEN) en het beslisgeheugen (beslisgeheugen, beslisgeheugenLeg, beslisgeheugenTrekIn); het domein kantoren leest de cadeaubon (cadeaubonBeeld, cadeaubonStandZet) naast de terugstortstand. Elk is een eigen kernmodule die zijn opslag bezit, en een route die hem zelf zou requiren maakt een tweede instantie met een eigen greep op de database.",
+      "waarheen": "GRENZEN.json (bedrijfsmaat en kantoren dragen de namen) en test/rtgcampagne.test.js, test/beslisgeheugen.test.js en test/cadeaubon.test.js tegen een echte server"
+    },
+    {
+      "datum": "2026-09-30",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 338,
+      "vervalt": "2026-12-29",
+      "meter": "toetsenNietGemeten 338 -> 339",
+      "reden": "Na de samenvoeging met main (#426) staat de norm op de stand van main; daarbovenop komt test/bedrijfsmaattoelating.test.js (C20-C23) van deze tak, met de hand nagetrokken met twaalf mutaties die alle twaalf zakten (zie de regel 302 -> 303).",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
+    {
+      "datum": "2026-09-30",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 303,
+      "vervalt": "2026-12-29",
+      "meter": "toetsenNietGemeten 303 -> 305",
+      "reden": "Binnengekomen met de samenvoeging van main (#430, #432): test/mobile-content.e2e.js en test/pass-startup.e2e.js staan ook op main niet in MUTATIES.json. Geen toets van deze tak; de mutatiemotor kent geen filter per bestand, en de hele achterstand draaien kost uren.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt ze mee, of een meting op main zelf."
+    },
+    {
+      "datum": "2026-09-30",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 302,
+      "vervalt": "2026-12-29",
+      "meter": "toetsenNietGemeten 302 -> 303",
+      "reden": "test/bedrijfsmaattoelating.test.js (C20-C23) is nieuw. Met de hand nagetrokken, twaalf mutaties die alle twaalf zakten: klaargezet als geaccepteerd geteld, aanmeldingen zonder bedrijf meegeteld, besluiten buiten de maand in de doorlooptijd, de eerste in plaats van de mediaan, een verschoven begin van de maand, een niet-lopend contract in de noemer, de ledengrens vervangen door die van zaken, een maand in plaats van het kwartaal, een vast tarief, de klasse bepaald in plaats van advies, een nul waar de bron ontbrak, en een groepsgrens van een.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
+    {
+      "datum": "2026-09-29",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 300,
+      "vervalt": "2026-12-29",
+      "meter": "toetsenNietGemeten 300 -> 302",
+      "reden": "test/margeperlid.test.js (C15) en test/boardroombesluiten.e2e.js (de tab Besluiten) zijn nieuw. Met de hand nagetrokken, elf mutaties die alle elf zakten: de noemer alleen over leden met verbruik, kosten van een zaak meegeteld, geen secundaire onderdrukking, een lid zonder contract genegeerd, verbruik zonder tarief genegeerd, een oude maand gerekend, guest niet als gratis gelezen, een trede van de ladder bij RTG Pass geboekt; op het scherm de cadeaubon omzetten zonder passkey, de gekozen richting kwijt, en een uitgifte die niet mag verzwegen.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt ze mee."
+    },
+    {
+      "datum": "2026-09-28",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 297,
+      "vervalt": "2026-12-28",
+      "meter": "toetsenNietGemeten 297 -> 300",
+      "reden": "test/rtgcampagne.test.js, test/beslisgeheugen.test.js en test/cadeaubon.test.js zijn nieuw (C12-C14). Met de hand nagetrokken, vijftien mutaties die alle vijftien zakten: een campagnecode die niet onder haar kanaal telt, geen tegenspraak als de campagnes meer kosten dan het kanaal, een getal per campagne ondanks die tegenspraak, vriend als campagne, schrijven zonder naam; gronden als verwijzing in plaats van een momentopname, een oordeel over een getal onder een dichte stand, een uitkomst voor de termijn, twee keer intrekken; de cadeaubon standaard open, een partnerrail op het open gezicht, de schakelaar standaard open, een bankpositie die de bon niet leest, en omzetten zonder naam.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt ze mee."
+    },
     {
       "datum": "2026-09-27",
       "soort": "structureel",
@@ -3893,6 +3955,43 @@
       "meter": "kernBreedte 1679 -> 1680 (samenvoeging #426 ronde 3)",
       "reden": "Dezelfde kant als bij kernGedeeld: OV leest verzuim (#422) naast de incheckcodes van deze tak.",
       "waarheen": "De notities van #422 zelf."
+    },
+    {
+      "datum": "2026-09-30",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1680,
+      "meter": "kernBreedte 1680 -> 1682",
+      "reden": "De concierge-lus (CONCIERGE.md) krijgt twee kernnamen en niet zes. `bureauZaak` is met opzet een EIGEN naam naast `bureau` en `bureauBalie`: de zaak die een onderdeel levert mag alleen zijn eigen onderdelen zien, en onder `bureau` zou het domein supplier bij de dossierfuncties van het lid kunnen. `reserveringUitzondering` draagt de vier functies van het tegenvoorstel en het doorzetten onder EEN naam in plaats van vier (de eerste versie had er vier, en de meter wees het aan).",
+      "waarheen": "GRENZEN.json (supplier: bureauZaak en reserveringUitzondering; member: reserveringUitzondering), server/kern/bureau/uitgang.js en server/kern/ervaring/tafels.js"
+    },
+    {
+      "datum": "2026-09-30",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 253,
+      "meter": "kernGedeeld 253 -> 254",
+      "reden": "`reserveringUitzondering` wordt door twee domeinen aangeraakt, en dat hoort zo: de zaak doet een tegenvoorstel (supplier), de gast antwoordt erop (member). Twee kopieen van de regel dat een verlopen tegenvoorstel niet wordt aangenomen zouden uit elkaar lopen; een gedeelde naam met een module erachter niet.",
+      "waarheen": "server/kern/ervaring/tafeluitzondering.js en test/tafeluitzondering.test.js"
+    },
+    {
+      "datum": "2026-09-30",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 338,
+      "vervalt": "2026-12-30",
+      "meter": "toetsenNietGemeten 338 -> 343",
+      "reden": "Vijf toetsbestanden zijn nieuw: test/conciergelus.test.js, -regels, -kern, -dubbel en test/tafeluitzondering.test.js. Met de hand nagetrokken met vijf mutaties op de dragende regels (een verlopen aanbod toch vastzetten, een verrassing naar een gedeeld kanaal laten gaan, een veld aan de deelnemersweergave toevoegen, afsluiten met een onbevestigd onderdeel, versturen zonder alles gezien te hebben); alle vijf laten een toets zakken. De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt ze mee."
+    },
+    {
+      "datum": "2026-09-30",
+      "soort": "structureel",
+      "sleutel": "dbDeuren",
+      "van": 535,
+      "meter": "dbDeuren 535 -> 536",
+      "reden": "server/opzet/kernlaag2b.js leest db.data.reserveringen voor de tafeluitzondering (tegenvoorstel en doorzetten, CONCIERGE.md par. 2.7-2.9). De eerste versie bouwde hem in kern/ervaring/tafels.js, dat al een deur is, maar server.js pakt de namen van de ervaring-laag een voor een uit en staat boven de omvanggrens, dus daar kan geen naam bij. Het is dezelfde collectie die tafels.js en tafelplanning.js al lezen, via een thunk; de module zelf raakt de opslag niet aan.",
+      "waarheen": "Zodra server.js de ervaring-laag in zijn geheel aan de kern hangt in plaats van naam voor naam, kan de bouw terug naar tafels.js en zakt de teller weer."
     }
   ],
   "prestatie": {
@@ -4017,6 +4116,9 @@
     "planDomeinenGemeten": "2026-09-16",
     "plaatsDomeinenGemeten": "2026-09-29",
     "officeDomeinenGemeten": "2026-09-23",
+    "overgangenGemeten": "2026-09-30",
+    "overgangCitaatRot": "2026-09-30",
+    "overgangWoordenOnverklaard": "2026-09-30",
     "edgeGeblokkeerdZonderWaarom": "2026-09-23",
     "edgeDubbeleEigenaars": "2026-09-23",
     "rtgDodeKanalen": "2026-09-23",

@@ -46,3 +46,12 @@
 }
 @media(max-width:600px){.xp-item{grid-template-columns:1fr}.xp-action{justify-self:start}.xp-dialog{margin:auto 0 0;width:100%;max-width:none;max-height:82vh}.xp-plan-row{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.xp-dialog::backdrop{backdrop-filter:none}}
+.xp-network fieldset{min-width:0;margin:0;padding:0;border:0}
+.xp-network legend{padding:0;margin:0 0 12px;font-size:.85rem;font-weight:600}
+.xp-network-needs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.xp-network .xp-network-needs label,.xp-network-card label{display:flex;align-items:center;gap:9px;min-height:44px;font-size:.8rem;letter-spacing:0;text-transform:none}
+.xp-network input[type=checkbox],.xp-network input[type=radio]{width:20px;height:20px;min-width:20px;margin:0;padding:0;accent-color:var(--rtg-gold,#ad8b56)}
+.xp-network-results{display:grid;gap:24px}
+.xp-network-card{display:grid;gap:9px;padding:16px 0;border-top:1px solid var(--rtg-line,rgba(145,125,93,.25))}
+.xp-network-card p{margin:0;font-size:.8rem;color:var(--rtg-muted,#817b70)}
+.xp-network-card small{font-size:.8rem}.xp-network-card .xp-action{justify-self:start}

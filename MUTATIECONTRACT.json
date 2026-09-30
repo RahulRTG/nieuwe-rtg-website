@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-30T08:30:37.005Z",
-  "commit": "cc8548828",
+  "op": "2026-09-30T09:33:38.509Z",
+  "commit": "9c3333724",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 1,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v24.18.0"
  },
@@ -38491,7 +38491,8 @@
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "auth"
+     "auth",
+     "lid"
     ]
    },
    "bewijs": null,

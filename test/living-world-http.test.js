@@ -52,7 +52,11 @@ test('HTTP: gesloten menselijke lus met betalingen, AI en push uit',async()=>{
     parameters:{id:p.id,revision:p.revision,decision:'accepted',reason:'Ik doe alsof'}},tokenC);
   assert.equal(wrong.status,403);
   p=(await action(tokenA,'plan.decide',{id:p.id,revision:p.revision,decision:'accepted',reason:'Ik begeleid deze wandeling.'})).result;
-  await new Promise(resolve=>setTimeout(resolve,1600));
+  await h.wachtOpWaarde(async()=>{
+    const ready=await request('/api/experience/intent/preview',{world:'travel',intent:'living-world.plan.start',
+      parameters:{id:p.id,revision:p.revision}},tokenA);
+    return ready.status===200;
+  },{ms:5000,wat:'de organisator mag de geplande activiteit starten'});
   p=(await action(tokenA,'plan.start',{id:p.id,revision:p.revision})).result;
   p=(await action(tokenA,'plan.complete',{id:p.id,revision:p.revision,statement:'De wandeling samen afgerond.'})).result;
   assert.equal((await view(tokenB)).plans[0].acknowledgedAt,null);

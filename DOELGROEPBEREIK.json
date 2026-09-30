@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-30T03:38:25.759Z",
-    "commit": "a29c1342b",
+    "op": "2026-09-29T19:17:27.397Z",
+    "commit": "8b187aa7b",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/doelgroepbereik.js",
@@ -25102,7 +25102,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/server.js",
-        "regel": 1417,
+        "regel": 1422,
         "samengesteld": false,
         "rauw": ", (req, res) => {"
       },
@@ -26546,7 +26546,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/server.js",
-        "regel": 1499,
+        "regel": 1504,
         "samengesteld": false,
         "rauw": ", uiVertaalPerIp, uiVertaalGlobaal,"
       },
@@ -26571,7 +26571,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/server.js",
-        "regel": 1499,
+        "regel": 1504,
         "samengesteld": false,
         "rauw": ", uiVertaalPerIp, uiVertaalGlobaal,"
       },
@@ -26596,7 +26596,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/server.js",
-        "regel": 1499,
+        "regel": 1504,
         "samengesteld": false,
         "rauw": ", uiVertaalPerIp, uiVertaalGlobaal,"
       },
@@ -26621,7 +26621,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/server.js",
-        "regel": 1499,
+        "regel": 1504,
         "samengesteld": false,
         "rauw": ", uiVertaalPerIp, uiVertaalGlobaal,"
       },

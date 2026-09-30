@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-30T04:53:51.426Z",
-    "commit": "987b1fd1f",
+    "op": "2026-09-29T19:18:07.018Z",
+    "commit": "813b945fc",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bodemdruk.js",

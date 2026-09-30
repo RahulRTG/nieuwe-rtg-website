@@ -85,7 +85,7 @@ async function main() {
       Object.keys(waarden).forEach((sleutel) => localStorage.setItem(sleutel, waarden[sleutel]));
     }, opslag);
     const page = await context.newPage();
-    const wachten = { organisatie: '#inhoud:not([hidden])', partner: '#app.active', gebruiker: 'body' };
+    const wachten = { organisatie: '#inhoud:not([hidden])', partner: '#app.active', gebruiker: '#app.active' };
     const screens = [];
     for (const scherm of PLATFORM) {
       await page.goto(server.basis + scherm.route, { waitUntil: 'domcontentloaded', timeout: 45000 });

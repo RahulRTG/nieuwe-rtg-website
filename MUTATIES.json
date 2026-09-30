@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-30T05:13:51.514Z",
-    "commit": "f5475e66",
+    "op": "2026-09-30T05:15:41.293Z",
+    "commit": "135f9b78",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -8856,6 +8856,13 @@
       "scherp": "gezakt"
     },
     "papieren.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "partijvoorstel-scherm.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",

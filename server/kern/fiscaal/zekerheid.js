@@ -28,15 +28,13 @@
    Kloppen de gegevens niet, dan is het antwoord fout -- en juist daarvoor is de
    bewijsketen er (./herkomst.js), die laat zien waar het vandaan komt.
 
-   EN WAT `voorbehouden` NIET IS: een tijdelijke stand. Het is geen functie die
-   nog gebouwd moet worden maar een grens. Verschuift die grens ooit, dan is dat
-   een besluit van een mens en niet van een release. */
+   EN `voorbehouden` IS GEEN tijdelijke stand maar een grens. Verschuift die ooit,
+   dan is dat een besluit van een mens en niet van een release. */
 'use strict';
 
-/* De klassen, met hun Engelse naam erbij. Die naam is hoe ze zijn benoemd toen
-   dit werd afgesproken; de sleutels zijn Nederlands omdat de rest van dit huis
-   dat ook is, en twee talen door elkaar in een enum is hoe je later de
-   verkeerde te pakken hebt. */
+/* De klassen met hun Engelse naam, zoals ze zijn afgesproken; de sleutels zijn
+   Nederlands, want twee talen door elkaar in een enum is hoe je later de
+   verkeerde pakt. */
 const KLASSEN = {
   bepaald: { term: 'DETERMINISTIC', kop: 'Vastgesteld',
     uitleg: 'Wet en gegevens leiden eenduidig tot deze uitkomst.' },
@@ -74,6 +72,8 @@ const REGISTER = {
   'btw.indienen': { klasse: 'bepaald',
     waarom: 'Vastleggen dat er is ingediend, met het kenmerk dat de Belastingdienst teruggaf.',
     mits: 'Dit legt vast en verzendt niet; de verzending loopt buiten RTG om.' },
+  'btw.rtg': { klasse: 'advies',
+    waarom: 'Uit de lidmaatschapstermijnen; de verbruiksfacturen in de kluis en het RTF-deel zijn niet beoordeeld.' },
   'btw.verzenden': { klasse: 'voorbehouden',
     waarom: 'De ondernemer is de belastingplichtige; RTG dient nooit namens hem in en verzendt niets.' },
   /* De loonkant apart, want daar is de rolverdeling anders: RTG voert die

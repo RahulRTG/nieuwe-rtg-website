@@ -5,7 +5,7 @@
 
 const dDag = (dag) => (c, versie, regel, waarom) => Object.freeze({ versie, besloten: dag + ' september 2026, door de eigenaar (C' + c + ')',
   herkomst: 'mens', regel, waarom });
-const d28 = dDag(28), d29 = dDag(29);
+const d28 = dDag(28), d29 = dDag(29), d30 = dDag(30);
 
 module.exports = {
   campagne: d28(12, 1, 'Een campagne is een benoemde linkcode met een begin en een einde, onder precies een kanaal. Haar ' +
@@ -28,5 +28,13 @@ module.exports = {
     'Meetbaar uit de contractmotor, zonder iets extra van het lid te vragen.'),
   transactievolume: d29(19, 1, 'Het TRANSACTIEVOLUME is wat zaken in de maand via RTG Pay ontvingen, zonder btw: de subtotalen van de ' +
     'facturen met betaalwijze RTG, in de wereld commercieel en nooit als omzet van RTG; onder vijf zaken geen getal.',
-    'Zonder btw, zodat het naast de andere geldmaten kan staan.')
+    'Zonder btw, zodat het naast de andere geldmaten kan staan.'),
+  toelating: d30(20, 1, 'De TOELATING van zaken is het aantal aanmeldingen met een bedrijf per stand (in behandeling, geaccepteerd, ' +
+    'klaargezet, afgewezen) plus de mediane doorlooptijd in dagen van aanvraag tot besluit over de besluiten van de maand; onder ' +
+    'vijf zaken geen getal.', 'Of het kantoor bijhoudt: de omvang van de rij en hoe lang een zaak wacht.'),
+  contractGeeindigd: d30(21, 1, 'CONTRACT GEEINDIGD is het aandeel van de contracten die aan het begin van de maand liepen en in de maand ' +
+    'GEEINDIGD bereikten; geteld per contract en niet per lid, onder tien geen getal.',
+    'Meetbaar uit de contractmotor zonder een contract eerst aan een codenaam te koppelen.'),
+  btwRtg: d30(22, 1, 'De BTW VAN RTG is een voorbereiding per kwartaal: de lidmaatschapstermijnen die in het kwartaal vervielen, zonder btw, ' +
+    'maal het standaardtarief; klasse advies, en RTG dient nooit zelf in.', 'Een mens die aangifte doet, begint niet bij nul.')
 };

@@ -180,6 +180,7 @@ toets omvalt.
 | `bedrijfsmaat.test.js` | 9 | gezakt op `===->!==#0` | HET BEDRIJFSMAATREGISTER EN ZIJN MEETER (server/kern/bedrijfsmaat/, scripts/bedrijfsmaat.js, BEDRIJFSMAAT.json). Wat hier vastligt: 1. |
 | `bedrijfsmaatbewijs.test.js` | 4 | -- | BEWIJS BIJ VIER BEDRIJFSMATEN -- groei.leden-per-pas, acquisitie.via-werkgever, campagnes.rtf-werving en geo.rtf-steden (AUTONOMIE.md par. 1: een maat bestaat pas als zijn antwoord zegt hoe hard het is en wanneer het... |
 | `bedrijfsmaatgroei.test.js` | 5 | -- | DRIE MATEN UIT DE BESLUITEN VAN 29 SEPTEMBER 2026 -- server/kern/bedrijfsmaat/ stand-groei.js: zaken per genre (C17), contract verlengd (C18) en transactievolume (C19). Zes beweringen, en alle zes kunnen ze zakken: 1. |
+| `bedrijfsmaattoelating.test.js` | 7 | -- | DRIE MATEN UIT DE BESLUITEN VAN 30 SEPTEMBER 2026 -- server/kern/bedrijfsmaat/ stand-toelating.js: toelating van zaken (C20), contract geeindigd (C21) en de btw van RTG zelf (C22). Zes beweringen, en alle zes kunnen... |
 | `bedrijfuitgave-mix.test.js` | 3 | gezakt op `liegpoort /api/` | RTG Werk OS: de uitgave met de STRENGSTE VAN TWEE TEKENGRENZEN en de BETAALWIJZE die de werkruimte kiest (AUTHORITY.md par. 5e, vervolg). |
 | `bedrijfuitgave.test.js` | 5 | gezakt op `liegpoort /api/` | RTG Werk OS: de UITGAVE, de tekengrens en functiescheiding (AUTHORITY.md fase 5, par. 5j). |
 | `bedrijfwerk.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Werk OS, deel 2: projecten en de kennisbank. De beweringen die ertoe doen, en het zijn er zes: - VOORTGANG WORDT GETELD, NOOIT INGEVULD. |

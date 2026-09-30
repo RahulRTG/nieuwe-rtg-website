@@ -97,6 +97,11 @@ test('uitvoerder versmalt alleen REPROVE en schaalt UNKNOWN op naar full', () =>
   ]) }, 'e2e').unit, [], 'de browserhelft start geen unitwerk');
 });
 
+test('de GitHub-samenvatting ontsnapt backslashes vóór tabelstrepen', () => {
+  assert.equal(uitvoerder.markdownCel('reden \\| tweede\nregel'),
+    'reden ' + '\\'.repeat(3) + '| tweede regel');
+});
+
 test('bewijsbasis kiest alleen een groene push-run van exact dezelfde commit', () => {
   const runs = [
     { id: 1, head_sha: 'abc', status: 'completed', conclusion: 'failure', event: 'push' },

@@ -66,6 +66,10 @@ function tijdlijn(plan, resultaat) {
   ];
 }
 
+function markdownCel(waarde) {
+  return String(waarde).replace(/\\/g, '\\\\').replace(/\|/g, '\\|').replace(/\r?\n/g, ' ');
+}
+
 function schrijfSamenvatting(plan, resultaat) {
   const pad = process.env.GITHUB_STEP_SUMMARY;
   if (!pad) return;
@@ -78,7 +82,7 @@ function schrijfSamenvatting(plan, resultaat) {
     '| Modus | `' + plan.mode + '` |',
     '| Risicobaan | `' + (plan.baan || 'onbekend') + '` |',
     '| Besluit | `' + besluit.code + '` |',
-    '| Reden | ' + besluit.reden.replace(/\|/g, '\\|') + ' |',
+    '| Reden | ' + markdownCel(besluit.reden) + ' |',
     '| Hergebruikt | ' + plan.telling.REUSED + ' |',
     '| Opnieuw bewijzen | ' + plan.telling.REPROVE + ' |',
     '| Onbekend | ' + plan.telling.UNKNOWN + ' |',
@@ -132,4 +136,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { leesPlan, selectie, voerUit, tijdlijn, schrijfSamenvatting };
+module.exports = { leesPlan, selectie, voerUit, tijdlijn, markdownCel, schrijfSamenvatting };

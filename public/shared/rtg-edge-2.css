@@ -259,11 +259,16 @@ body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="rtgdeel-balk"] .
 body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="duimbalk"] .rtg-duimbalk:not([data-rtg-edge-2-contextual]),
 body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="world-shell"] .ws-balk:not([data-rtg-edge-2-contextual]),
 body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="travel-header"]>.reisapp>.prestatiekop:not([data-rtg-edge-2-contextual]),
-body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="native-header"]>header:not(.rtg-edge-top):not([data-rtg-edge-2-contextual]){display:none!important}
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="native-header"]>header:not(.rtg-edge-top):not([data-rtg-edge-2-contextual]),
+/* De desktopstandaard verhuist de kinderen van body naar een schermvlak
+   (world-desktop-surface.js); de eigen kop van het scherm is daar dezelfde kop. */
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="native-header"] [data-rtg-screen-surface]>header:not(.rtg-edge-top):not([data-rtg-edge-2-contextual]){display:none!important}
 /* Zodra de onderrand een bestaande duimhandeling aantoonbaar heeft
    overgenomen, blijft de oorspronkelijke vaste strook als veilige fallback in
    de DOM maar is hij niet ook nog eens zichtbaar. */
-body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-hoofdactie="edge"]>.rtg-duimbalk{display:none!important}
+/* In de desktopstandaard staat de strook in het schermvlak (world-desktop-surface.js). */
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-hoofdactie="edge"]>.rtg-duimbalk,
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-hoofdactie="edge"] [data-rtg-screen-surface]>.rtg-duimbalk{display:none!important}
 body[data-rtg-edge-2-rendered="true"]>.ios-thuis,
 body[data-rtg-edge-2-rendered="true"] #osMenuBtn,
 body[data-rtg-edge-2-rendered="true"] .amn-zweef{display:none!important}

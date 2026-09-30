@@ -686,6 +686,8 @@ jobs:
         working-directory: motor
         run: cargo build --release --locked
       - name: Alleen REPROVE en UNKNOWN opnieuw bewijzen
+        # De systeemgereedschappen en de Rust-motor staan in de twee stappen
+        # hierboven; `preevidence:run` bouwt de motor nog eens als vangnet.
         run: npm run evidence:run -- --plan=.evidence/plan.json
         env:
           RTG_E2E_STRICT: '1'

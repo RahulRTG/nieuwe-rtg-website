@@ -75,7 +75,13 @@ test('Living Lab: de onderzoekscyclus op het scherm, en de bewoner zonder accoun
     await page.evaluate(() => window.RTGDeel && RTGDeel.open('nieuw-onderzoek'));
 
     // de twaalf projectsoorten komen van de server en worden niet in het scherm
-    // nagebouwd; staan ze er niet, dan is de kader-route stuk
+    // nagebouwd; staan ze er niet, dan is de kader-route stuk. Ze komen dus met
+    // een antwoord binnen, en de labs pas NA het kader (livinglab-kern.js): daarop
+    // wachten, en niet tellen voordat het er is -- met de extra scripts van de
+    // desktopschil kwam de telling soms te vroeg.
+    await wachtTot(page, () => document.querySelectorAll('#nSoort option').length > 0 &&
+      document.querySelectorAll('#labKies option').length > 0,
+      null, { wat: 'de projectsoorten uit het kader en de labs daarna' });
     assert.equal(await page.locator('#nSoort option').count(), 12, 'twaalf projectsoorten uit het kader');
     assert.ok((await page.locator('#labKies option').count()) > 0, 'het lab staat in de keuzelijst');
 

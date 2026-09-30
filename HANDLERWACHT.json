@@ -1,25 +1,25 @@
 {
  "stempel": {
-  "op": "2026-09-30T02:18:51.175Z",
-  "commit": "082b6631d",
+  "op": "2026-09-29T23:18:38.296Z",
+  "commit": "a4ae5e47b",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 4,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
-  "zonderBewakerslaag": 634,
-  "bewaakt": 545,
+  "zonderBewakerslaag": 640,
+  "bewaakt": 550,
   "openbaarMetReden": 51,
   "eigenControle": 19,
-  "sleutelDoorgegeven": 11,
+  "sleutelDoorgegeven": 12,
   "zonderWachtMetReden": 8,
   "laat": 0,
   "onbewaakt": 0,
   "nietGelezen": 0,
   "gezagsfuncties": 26,
-  "publiekeLijstenVerschillen": 18
+  "publiekeLijstenVerschillen": 19
  },
  "tweePubliekeLijsten": {
   "alleenInPoortwacht": [
@@ -40,7 +40,8 @@
    "/api/account/start",
    "/api/foundation/school/school/maak",
    "/api/foundation/school/personeel/inloglink",
-   "/api/foundation/les/maak"
+   "/api/foundation/les/maak",
+   "/api/foundation/les/join"
   ],
   "alleenInDeKeuring": []
  },
@@ -80,7 +81,11 @@
   },
   {
    "naam": "gezinVan",
-   "aantal": 14
+   "aantal": 16
+  },
+  {
+   "naam": "lesVan",
+   "aantal": 13
   },
   {
    "naam": "personeelVan",
@@ -93,10 +98,6 @@
   {
    "naam": "schoolVan",
    "aantal": 11
-  },
-  {
-   "naam": "lesVan",
-   "aantal": 10
   },
   {
    "naam": "viaBeheerOfDirectie",
@@ -1044,7 +1045,7 @@
   },
   {
    "sleutel": "POST /api/book",
-   "bestand": "server/routes/member/partnerkanaal.js:20",
+   "bestand": "server/routes/member/partnerkanaal.js:28",
    "staat": "sleutelDoorgegeven"
   },
   {
@@ -1103,37 +1104,37 @@
   },
   {
    "sleutel": "POST /api/foundation/agenda",
-   "bestand": "server/foundation/onderwijs/schrift.js:64",
+   "bestand": "server/foundation/onderwijs/schrift.js:63",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
   {
    "sleutel": "POST /api/foundation/agenda/verwijder",
-   "bestand": "server/foundation/onderwijs/schrift.js:72",
+   "bestand": "server/foundation/onderwijs/schrift.js:71",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
   {
    "sleutel": "POST /api/foundation/ai",
-   "bestand": "server/foundation/onderwijs/schrift.js:82",
+   "bestand": "server/foundation/onderwijs/schrift.js:81",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
   {
    "sleutel": "POST /api/foundation/bord/stroke",
-   "bestand": "server/foundation/onderwijs/les.js:84",
-   "staat": "bewaakt",
-   "wacht": "lesVan"
-  },
-  {
-   "sleutel": "POST /api/foundation/bord/undo",
    "bestand": "server/foundation/onderwijs/les.js:104",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
   {
+   "sleutel": "POST /api/foundation/bord/undo",
+   "bestand": "server/foundation/onderwijs/les.js:124",
+   "staat": "bewaakt",
+   "wacht": "lesVan"
+  },
+  {
    "sleutel": "POST /api/foundation/bord/wis",
-   "bestand": "server/foundation/onderwijs/les.js:100",
+   "bestand": "server/foundation/onderwijs/les.js:120",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
@@ -1169,13 +1170,13 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/bericht",
-   "bestand": "server/foundation/gezin.js:126",
+   "bestand": "server/foundation/gezin.js:127",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/bericht/gelezen",
-   "bestand": "server/foundation/gezin.js:154",
+   "bestand": "server/foundation/gezin.js:155",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
@@ -1271,7 +1272,7 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/inloggen",
-   "bestand": "server/foundation/gezinstoegang.js:7",
+   "bestand": "server/foundation/gezinstoegang.js:10",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
@@ -1397,7 +1398,7 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/profiel/kies",
-   "bestand": "server/foundation/gezinstoegang.js:33",
+   "bestand": "server/foundation/gezinstoegang.js:36",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
@@ -1409,13 +1410,25 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/profiel/verwijder",
-   "bestand": "server/foundation/gezin.js:114",
+   "bestand": "server/foundation/gezin.js:115",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/profiel/wijzig",
    "bestand": "server/foundation/gezin.js:78",
+   "staat": "bewaakt",
+   "wacht": "gezinVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/sessie/intrek",
+   "bestand": "server/foundation/gezinssessie.js:38",
+   "staat": "bewaakt",
+   "wacht": "gezinVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/sessie/roteer",
+   "bestand": "server/foundation/gezinssessie.js:29",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
@@ -1445,31 +1458,31 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/uitnodiging/accepteer",
-   "bestand": "server/foundation/gezinsuitnodiging.js:127",
+   "bestand": "server/foundation/gezinsuitnodiging.js:134",
    "staat": "zonderWachtMetReden",
    "reden": "zelfde code, zelfde reden; accepteren verbruikt hem eenmalig"
   },
   {
    "sleutel": "POST /api/foundation/gezin/uitnodiging/bekijk",
-   "bestand": "server/foundation/gezinsuitnodiging.js:126",
+   "bestand": "server/foundation/gezinsuitnodiging.js:133",
    "staat": "zonderWachtMetReden",
    "reden": "de uitnodigingscode uit het lijf IS de geloofsbrief; een onbekende of verlopen code geeft 404 en verklapt niets"
   },
   {
    "sleutel": "POST /api/foundation/gezin/uitnodiging/intrek",
-   "bestand": "server/foundation/gezinsuitnodiging.js:125",
+   "bestand": "server/foundation/gezinsuitnodiging.js:132",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/uitnodiging/maak",
-   "bestand": "server/foundation/gezinsuitnodiging.js:123",
+   "bestand": "server/foundation/gezinsuitnodiging.js:130",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/uitnodigingen",
-   "bestand": "server/foundation/gezinsuitnodiging.js:124",
+   "bestand": "server/foundation/gezinsuitnodiging.js:131",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
@@ -1546,16 +1559,39 @@
    "wacht": "gezinVan"
   },
   {
+   "sleutel": "POST /api/foundation/les/code/intrekken",
+   "bestand": "server/foundation/onderwijs/lesbeheer.js:34",
+   "staat": "bewaakt",
+   "wacht": "lesVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/les/code/roteer",
+   "bestand": "server/foundation/onderwijs/lesbeheer.js:29",
+   "staat": "bewaakt",
+   "wacht": "lesVan"
+  },
+  {
    "sleutel": "POST /api/foundation/les/join",
-   "bestand": "server/foundation/onderwijs/les.js:40",
+   "bestand": "server/foundation/onderwijs/les.js:49",
+   "staat": "sleutelDoorgegeven"
+  },
+  {
+   "sleutel": "POST /api/foundation/les/leerling/intrekken",
+   "bestand": "server/foundation/onderwijs/lesbeheer.js:39",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
   {
    "sleutel": "POST /api/foundation/les/maak",
-   "bestand": "server/foundation/onderwijs/les.js:30",
+   "bestand": "server/foundation/onderwijs/les.js:32",
    "staat": "zonderWachtMetReden",
    "reden": "een les openen is als een kamer openen: wie hem maakt krijgt de docenttoken terug, en zonder lescode komt er niemand binnen"
+  },
+  {
+   "sleutel": "POST /api/foundation/les/sluit",
+   "bestand": "server/foundation/onderwijs/lesbeheer.js:49",
+   "staat": "bewaakt",
+   "wacht": "lesVan"
   },
   {
    "sleutel": "POST /api/foundation/mail/inbox",
@@ -1685,19 +1721,19 @@
   },
   {
    "sleutel": "POST /api/foundation/opgave",
-   "bestand": "server/foundation/onderwijs/schrift.js:39",
+   "bestand": "server/foundation/onderwijs/schrift.js:38",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
   {
    "sleutel": "POST /api/foundation/opgave/inleveren",
-   "bestand": "server/foundation/onderwijs/schrift.js:48",
+   "bestand": "server/foundation/onderwijs/schrift.js:47",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
   {
    "sleutel": "POST /api/foundation/reis/aanvraag",
-   "bestand": "server/foundation/onderwijs/schrift.js:122",
+   "bestand": "server/foundation/onderwijs/schrift.js:119",
    "staat": "zonderWachtMetReden",
    "reden": "een open aanvraagformulier voor gezinnen zonder foundation-account -- dat is het punt ervan. Sinds deze meting met een rem per IP-adres, want de lijst kapt op duizend en een vloed duwde echte aanvragen eruit"
   },
@@ -2983,7 +3019,7 @@
   },
   {
    "sleutel": "POST /api/foundation/schrift/opslaan",
-   "bestand": "server/foundation/onderwijs/schrift.js:10",
+   "bestand": "server/foundation/onderwijs/schrift.js:9",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
@@ -3149,12 +3185,12 @@
   },
   {
    "sleutel": "POST /api/office/login",
-   "bestand": "server/routes/office/toegang.js:8",
+   "bestand": "server/routes/office/toegang.js:9",
    "staat": "eigenControle"
   },
   {
    "sleutel": "POST /api/partner",
-   "bestand": "server/routes/member/kopen/bezorg.js:12",
+   "bestand": "server/routes/member/kopen/bezorg.js:15",
    "staat": "openbaar",
    "reden": "het partnerkanaal is bedoeld voor niet-leden"
   },
@@ -3175,7 +3211,7 @@
   },
   {
    "sleutel": "POST /api/partnertrips",
-   "bestand": "server/routes/member/partnerkanaal.js:11",
+   "bestand": "server/routes/member/partnerkanaal.js:15",
    "staat": "sleutelDoorgegeven"
   },
   {
@@ -3900,13 +3936,13 @@
   },
   {
    "sleutel": "POST /api/stad/algoritmes",
-   "bestand": "server/routes/stad.js:31",
+   "bestand": "server/routes/stad.js:38",
    "staat": "openbaar",
    "reden": "het openbare algoritmeregister: beschrijft regels, geen personen"
   },
   {
    "sleutel": "POST /api/stad/besluiten",
-   "bestand": "server/routes/stad.js:40",
+   "bestand": "server/routes/stad.js:47",
    "staat": "openbaar",
    "reden": "het openbare besluitenregister: wat de stad besloot, met welke stemverhouding; fracties stemmen met zetels, geen personen"
   },
@@ -3924,7 +3960,7 @@
   },
   {
    "sleutel": "POST /api/staff",
-   "bestand": "server/routes/staff.js:38",
+   "bestand": "server/routes/staff.js:46",
    "staat": "eigenControle"
   },
   {

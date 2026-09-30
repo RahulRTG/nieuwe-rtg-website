@@ -1,5 +1,6 @@
 /* DE BESLUITEN ONDER DE BEDRIJFSMAATLAAG: twee constitutionele (C1, C2) en negen
-   over wat er gemeten wordt en hoe (C3 tot en met C11).
+   over wat er gemeten wordt en hoe (C3 tot en met C11). Wat daarna kwam (C12 en
+   verder) staat in ./besluiten-later.js, in dezelfde vorm.
 
    Genomen door de eigenaar op 25 september 2026, vóór de meter werd gebouwd --
    in die volgorde, omdat een meter die RTG en de RTFoundation samen waarneemt
@@ -99,7 +100,8 @@ const BESLUITEN = Object.freeze([
       'De marketinguitgave per kanaal gedeeld door de nieuwe leden via dat kanaal in dezelfde maand, langs de groepspoort.',
       'Welk kanaal werkt, en niet een gemiddelde over alles.']
   ].map(([id, naam, regel, kort]) => Object.freeze({ id, naam, besloten: '27 september 2026, door de eigenaar',
-    herkomst: 'mens', regel, kort, handhaving: HANDHAVING[id], stand: 'gebouwd' }))
+    herkomst: 'mens', regel, kort, handhaving: HANDHAVING[id], stand: 'gebouwd' })),
+  ...require('./besluiten-later')
 ]);
 
 module.exports = { BESLUITEN };

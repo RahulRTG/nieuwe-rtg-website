@@ -9,7 +9,7 @@
    staat wat er gebeurt als je er WEL bent (de klok, de pauze, en sinds
    PLAATS.md fase 2 de aanwezigheid bij het hek van de zaak). */
 module.exports = (actx) => {
-  const { DEMO, accounts, app, checkCred, crypto, db, findStaffPartner, hasCred, klokVan, logActivity, managerOnly, notifySupplier, publicPartner, save, schoon, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth, trustVan, stuurLus, werkbeleidPauzeStand, WERKBELEID_PAUZE_MINUTEN,
+  const { DEMO, accounts, app, checkCred, crypto, db, hasCred, klokVan, logActivity, managerOnly, notifySupplier, publicPartner, save, schoon, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth, trustVan, stuurLus, werkbeleidPauzeStand, WERKBELEID_PAUZE_MINUTEN,
     /* payrollOS: een ziekmelding heeft twee kanten. De bezetting van vandaag
        (deze laag) en de loondoorbetaling (kern/payroll/verzuim). Die tweede
        stond gebouwd en werd door niets aangeroepen: de loonrun wist niet dat

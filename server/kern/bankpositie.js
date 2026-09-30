@@ -15,7 +15,8 @@
       die maand, maar `vorige` blijft zichtbaar: er kan al iets op gebaseerd zijn.
    3. NIET ALLES OP DE BANK IS VRIJ GELD. RTG gaat eigen cadeaubonnen verkopen (C4);
       het geld van een verkochte bon staat op de bank maar is nog niet verdiend.
-      Die verplichting heeft hier een eigen plek. Zolang RTG geen bonnen verkoopt,
+      Die verplichting komt uit het register van de bon zelf (kern/cadeaubon.js,
+      C14) en wordt hier gelezen, niet overgetikt. Zolang RTG geen bonnen verkoopt,
       staat ze op nul MET die reden -- zodat een lezer ziet dat de plek er is en
       waarom hij leeg is, en niet denkt dat hij vergeten is. Bonnen die ZAKEN
       verkopen zijn van die zaak (kern/fiscaal) en tellen hier nooit mee: de
@@ -28,8 +29,14 @@
 const NAAM = 'rtgBankpositie';
 const MAX_CENTEN = 100000000000;   // een miljard euro: een grens op het doel, niet op RTG
 const BONNEN_REDEN = 'RTG verkoopt nog geen eigen cadeaubonnen (besluit C4): er staat geen verplichting uit.';
+/* Zonder register (een losse toets, of de bon nog niet gemonteerd) geldt de oude
+   reden; met register zegt de bon zelf wat hij verschuldigd is en waarom. */
+const bonnenVan = (fn) => {
+  try { const v = typeof fn === 'function' ? fn() : null; if (v && Number.isInteger(v.centen)) return { centen: v.centen, graad: v.graad || 'gemeten', reden: v.reden || null }; } catch (e) { /* valt terug */ }
+  return { centen: 0, graad: 'gemeten', reden: BONNEN_REDEN };
+};
 
-module.exports = ({ db, save, nu }) => {
+module.exports = ({ db, save, nu, bonnen: bonnenBron }) => {
   const eigen = require('./eigencollectie')({ db, domein: 'kern/bankpositie', bezit: { [NAAM]: 'kaart' } });
   const klok = typeof nu === 'function' ? nu : () => new Date().toISOString();
   const maandVan = (m) => (/^\d{4}-\d{2}$/.test(String(m || '')) ? String(m) : null);
@@ -65,7 +72,7 @@ module.exports = ({ db, save, nu }) => {
     const maanden = Object.keys(kaart).sort();
     const m = maandVan(maand) || maanden[maanden.length - 1] || null;
     const r = m ? kaart[m] : null;
-    const bonnen = { centen: 0, graad: 'gemeten', reden: BONNEN_REDEN };
+    const bonnen = bonnenVan(bonnenBron);
     if (!r) return { maand: m, saldo: null, graad: 'onbekend', bonnenVerplichting: bonnen, vrij: null,
       reden: 'Er is voor deze maand geen saldo ingevoerd; er staat geen getal waar er geen is.' };
     return { maand: m, saldo: { centen: r.centen, peildatum: r.peildatum, bron: r.bron, gezetOp: r.gezetOp,

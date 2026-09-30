@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-29T20:20:26.604Z",
-  "commit": "70efd8f4d",
+  "op": "2026-09-29T18:44:20.926Z",
+  "commit": "53c3bfca5",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/ondernemerbewijs.js",
@@ -17,16 +17,16 @@
    "commit": "df1a581a"
   },
   "audit": {
-   "op": "2026-09-29T20:19:49.002Z",
-   "commit": "01e346d18"
+   "op": "2026-09-28T14:34:02.799Z",
+   "commit": "360a82486"
   },
   "rol": {
-   "op": "2026-09-29T18:09:52.704Z",
-   "commit": "76dbed774"
+   "op": "2026-09-28T10:48:45.550Z",
+   "commit": "ecef9a3fc"
   },
   "idem": {
-   "op": "2026-09-29T18:39:11.935Z",
-   "commit": "387b942c5"
+   "op": "2026-09-29T15:38:38.454Z",
+   "commit": "632583cec"
   },
   "herstel": {
    "op": null,
@@ -47,13 +47,8 @@
    "commit": "4dcdcfa3"
   },
   "handeling": {
-   "op": "2026-09-29T19:06:53.676Z",
-   "commit": "aa1a876fe"
-  },
-  "idembesluit": {
-   "op": null,
-   "commit": null,
-   "let": "dit register draagt geen stempel"
+   "op": "2026-09-28T12:02:16.263Z",
+   "commit": "ecef9a3fc"
   }
  },
  "lagen": [
@@ -263,9 +258,9 @@
     "onbekend": 206
    },
    "routes": {
-    "groen": 221,
+    "groen": 223,
     "rood": 0,
-    "onbekend": 3446
+    "onbekend": 3444
    },
    "reden": "IDEMPROEF.json neemt per route een voor/na-beeld van de opslag en ziet dus of de schrijfactie de collectie werkelijk RAAKTE. Dat is de halve vraag: het bewijst dat het resultaat in de opslag landde, niet dat het een herstart overleeft. Daarom graad `vermoed` en niet `gemeten`."
   },
@@ -275,14 +270,14 @@
    "korrel": "route",
    "graad": "gemeten",
    "capabilities": {
-    "groen": 161,
+    "groen": 121,
     "rood": 0,
-    "onbekend": 46
+    "onbekend": 86
    },
    "routes": {
-    "groen": 3103,
+    "groen": 2812,
     "rood": 0,
-    "onbekend": 564
+    "onbekend": 855
    },
    "reden": null
   },
@@ -297,9 +292,9 @@
     "onbekend": 196
    },
    "routes": {
-    "groen": 1176,
+    "groen": 1175,
     "rood": 0,
-    "onbekend": 2491
+    "onbekend": 2492
    },
    "reden": null
   },
@@ -314,9 +309,9 @@
     "onbekend": 204
    },
    "routes": {
-    "groen": 466,
+    "groen": 464,
     "rood": 0,
-    "onbekend": 3201
+    "onbekend": 3203
    },
    "reden": "LET OP WAT DIT WEL EN NIET ZEGT. HANDELINGPROEF.json meet of een geslaagde oproep een GEKETENDE regel naliet in het handelingsspoor -- een regel die via correlatie en oorzaak (kern/envelop.js) terug te volgen is naar wat hem veroorzaakte. Dat is het SUBSTRAAT van uitlegbaarheid en niet de uitleg zelf: dat een gevolg naar zijn oorzaak wijst, betekent niet dat een ondernemer het in woorden te horen krijgt. Daarom graad `vermoed`. Het verschil met `auditbaar` is echt en niet cosmetisch: AUDITPROEF vraagt OF er een spoor is, deze of dat spoor een KETEN vormt. Niet samenvoegen. En niet verwarren met WAAROM.json -- dat zegt per route waarom hij niet te BEWIJZEN valt, wat provability is en geen uitlegbaarheid."
   },
@@ -348,9 +343,9 @@
     "onbekend": 199
    },
    "routes": {
-    "groen": 828,
+    "groen": 824,
     "rood": 0,
-    "onbekend": 2839
+    "onbekend": 2843
    },
    "reden": null
   },
@@ -402,10 +397,10 @@
   "lijst": [
    {
     "laag": "bevoegd",
-    "totaalInBron": 772,
-    "binnenOndernemer": 441,
+    "totaalInBron": 762,
+    "binnenOndernemer": 439,
     "perReden": {
-     "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)": 238,
+     "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)": 236,
      "objectpoort: huisAuth -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord": 62,
      "lichaamssleutel: gezinsPoort -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets": 59,
      "objectpoort: huisPoort -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord": 44,
@@ -484,7 +479,7 @@
      "gesloten": 11,
      "storingen": 8,
      "gehouden": 8,
-     "stempel": "2026-09-29"
+     "stempel": "2026-09-28"
     }
    },
    {
@@ -552,7 +547,7 @@
      "gesloten": 8,
      "storingen": 11,
      "gehouden": 11,
-     "stempel": "2026-09-29"
+     "stempel": "2026-09-28"
     }
    },
    {
@@ -566,7 +561,7 @@
      "gesloten": 7,
      "storingen": 7,
      "gehouden": 7,
-     "stempel": "2026-09-29"
+     "stempel": "2026-09-28"
     }
    },
    {
@@ -696,21 +691,21 @@
     },
     "persistent": {
      "stand": "ONBEKEND",
-     "groen": 58,
+     "groen": 57,
      "rood": 0,
-     "onbekend": 822,
+     "onbekend": 823,
      "totaal": 880,
      "graad": "vermoed",
-     "reden": "822 van 880 routes niet gemeten"
+     "reden": "823 van 880 routes niet gemeten"
     },
     "bevoegd": {
      "stand": "ONBEKEND",
-     "groen": 871,
+     "groen": 858,
      "rood": 0,
-     "onbekend": 9,
+     "onbekend": 22,
      "totaal": 880,
      "graad": "gemeten",
-     "reden": "9 van 880 routes niet gemeten"
+     "reden": "22 van 880 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -723,12 +718,12 @@
     },
     "uitlegbaar": {
      "stand": "ONBEKEND",
-     "groen": 236,
+     "groen": 235,
      "rood": 0,
-     "onbekend": 644,
+     "onbekend": 645,
      "totaal": 880,
      "graad": "vermoed",
-     "reden": "644 van 880 routes niet gemeten"
+     "reden": "645 van 880 routes niet gemeten"
     },
     "omkeerbaar": {
      "stand": "ONBEKEND",
@@ -741,12 +736,12 @@
     },
     "auditbaar": {
      "stand": "ONBEKEND",
-     "groen": 236,
+     "groen": 235,
      "rood": 0,
-     "onbekend": 644,
+     "onbekend": 645,
      "totaal": 880,
      "graad": "gemeten",
-     "reden": "644 van 880 routes niet gemeten"
+     "reden": "645 van 880 routes niet gemeten"
     },
     "autonoomVeilig": {
      "stand": "ONBEKEND",
@@ -821,13 +816,13 @@
      "reden": "196 van 211 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 211,
+     "stand": "ONBEKEND",
+     "groen": 210,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 1,
      "totaal": 211,
      "graad": "gemeten",
-     "reden": null
+     "reden": "1 van 211 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -948,12 +943,12 @@
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
-     "groen": 31,
+     "groen": 30,
      "rood": 0,
-     "onbekend": 87,
+     "onbekend": 88,
      "totaal": 118,
      "graad": "gemeten",
-     "reden": "87 van 118 routes niet gemeten"
+     "reden": "88 van 118 routes niet gemeten"
     },
     "uitlegbaar": {
      "stand": "ONBEKEND",
@@ -1404,13 +1399,13 @@
      "reden": "89 van 97 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 97,
+     "stand": "ONBEKEND",
+     "groen": 87,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 10,
      "totaal": 97,
      "graad": "gemeten",
-     "reden": null
+     "reden": "10 van 97 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -1641,12 +1636,12 @@
     },
     "bevoegd": {
      "stand": "ONBEKEND",
-     "groen": 3,
+     "groen": 0,
      "rood": 0,
-     "onbekend": 79,
+     "onbekend": 82,
      "totaal": 82,
      "graad": "gemeten",
-     "reden": "79 van 82 routes niet gemeten"
+     "reden": "82 van 82 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -1748,12 +1743,12 @@
     },
     "persistent": {
      "stand": "ONBEKEND",
-     "groen": 5,
+     "groen": 6,
      "rood": 0,
-     "onbekend": 64,
+     "onbekend": 63,
      "totaal": 69,
      "graad": "vermoed",
-     "reden": "64 van 69 routes niet gemeten"
+     "reden": "63 van 69 routes niet gemeten"
     },
     "bevoegd": {
      "stand": "GROEN",
@@ -1877,13 +1872,13 @@
      "reden": "59 van 59 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 59,
+     "stand": "ONBEKEND",
+     "groen": 58,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 1,
      "totaal": 59,
      "graad": "gemeten",
-     "reden": null
+     "reden": "1 van 59 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -2811,13 +2806,13 @@
      "reden": "28 van 28 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 28,
+     "stand": "ONBEKEND",
+     "groen": 0,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 28,
      "totaal": 28,
      "graad": "gemeten",
-     "reden": null
+     "reden": "28 van 28 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -2926,12 +2921,12 @@
     },
     "bevoegd": {
      "stand": "ONBEKEND",
-     "groen": 27,
+     "groen": 22,
      "rood": 0,
-     "onbekend": 1,
+     "onbekend": 6,
      "totaal": 28,
      "graad": "gemeten",
-     "reden": "1 van 28 routes niet gemeten"
+     "reden": "6 van 28 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -3767,13 +3762,13 @@
      "reden": "22 van 22 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 22,
+     "stand": "ONBEKEND",
+     "groen": 0,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 22,
      "totaal": 22,
      "graad": "gemeten",
-     "reden": null
+     "reden": "22 van 22 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -3786,12 +3781,12 @@
     },
     "uitlegbaar": {
      "stand": "ONBEKEND",
-     "groen": 1,
+     "groen": 0,
      "rood": 0,
-     "onbekend": 21,
+     "onbekend": 22,
      "totaal": 22,
      "graad": "vermoed",
-     "reden": "21 van 22 routes niet gemeten"
+     "reden": "22 van 22 routes niet gemeten"
     },
     "omkeerbaar": {
      "stand": "ONBEKEND",
@@ -3804,12 +3799,12 @@
     },
     "auditbaar": {
      "stand": "ONBEKEND",
-     "groen": 1,
+     "groen": 0,
      "rood": 0,
-     "onbekend": 21,
+     "onbekend": 22,
      "totaal": 22,
      "graad": "gemeten",
-     "reden": "21 van 22 routes niet gemeten"
+     "reden": "22 van 22 routes niet gemeten"
     },
     "autonoomVeilig": {
      "stand": "ONBEKEND",
@@ -3990,21 +3985,21 @@
     },
     "persistent": {
      "stand": "ONBEKEND",
+     "groen": 1,
+     "rood": 0,
+     "onbekend": 21,
+     "totaal": 22,
+     "graad": "vermoed",
+     "reden": "21 van 22 routes niet gemeten"
+    },
+    "bevoegd": {
+     "stand": "ONBEKEND",
      "groen": 0,
      "rood": 0,
      "onbekend": 22,
      "totaal": 22,
-     "graad": "vermoed",
-     "reden": "22 van 22 routes niet gemeten"
-    },
-    "bevoegd": {
-     "stand": "GROEN",
-     "groen": 22,
-     "rood": 0,
-     "onbekend": 0,
-     "totaal": 22,
      "graad": "gemeten",
-     "reden": null
+     "reden": "22 van 22 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -4702,12 +4697,12 @@
     },
     "bevoegd": {
      "stand": "ONBEKEND",
-     "groen": 19,
+     "groen": 0,
      "rood": 0,
-     "onbekend": 1,
+     "onbekend": 20,
      "totaal": 20,
      "graad": "gemeten",
-     "reden": "1 van 20 routes niet gemeten"
+     "reden": "20 van 20 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -4926,12 +4921,12 @@
     },
     "persistent": {
      "stand": "ONBEKEND",
-     "groen": 1,
+     "groen": 2,
      "rood": 0,
-     "onbekend": 18,
+     "onbekend": 17,
      "totaal": 19,
      "graad": "vermoed",
-     "reden": "18 van 19 routes niet gemeten"
+     "reden": "17 van 19 routes niet gemeten"
     },
     "bevoegd": {
      "stand": "GROEN",
@@ -5526,13 +5521,13 @@
      "reden": "17 van 17 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 17,
+     "stand": "ONBEKEND",
+     "groen": 0,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 17,
      "totaal": 17,
      "graad": "gemeten",
-     "reden": null
+     "reden": "17 van 17 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -6114,13 +6109,13 @@
      "reden": "14 van 15 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 15,
+     "stand": "ONBEKEND",
+     "groen": 0,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 15,
      "totaal": 15,
      "graad": "gemeten",
-     "reden": null
+     "reden": "15 van 15 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -6226,12 +6221,12 @@
     },
     "persistent": {
      "stand": "ONBEKEND",
-     "groen": 1,
+     "groen": 0,
      "rood": 0,
-     "onbekend": 13,
+     "onbekend": 14,
      "totaal": 14,
      "graad": "vermoed",
-     "reden": "13 van 14 routes niet gemeten"
+     "reden": "14 van 14 routes niet gemeten"
     },
     "bevoegd": {
      "stand": "ONBEKEND",
@@ -6470,12 +6465,12 @@
     },
     "bevoegd": {
      "stand": "ONBEKEND",
-     "groen": 1,
+     "groen": 0,
      "rood": 0,
-     "onbekend": 13,
+     "onbekend": 14,
      "totaal": 14,
      "graad": "gemeten",
-     "reden": "13 van 14 routes niet gemeten"
+     "reden": "14 van 14 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -6594,12 +6589,12 @@
     },
     "bevoegd": {
      "stand": "ONBEKEND",
-     "groen": 5,
+     "groen": 4,
      "rood": 0,
-     "onbekend": 9,
+     "onbekend": 10,
      "totaal": 14,
      "graad": "gemeten",
-     "reden": "9 van 14 routes niet gemeten"
+     "reden": "10 van 14 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -6709,13 +6704,13 @@
      "reden": "14 van 14 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 14,
+     "stand": "ONBEKEND",
+     "groen": 0,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 14,
      "totaal": 14,
      "graad": "gemeten",
-     "reden": null
+     "reden": "14 van 14 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -7185,13 +7180,13 @@
      "reden": "13 van 13 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 13,
+     "stand": "ONBEKEND",
+     "groen": 11,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 2,
      "totaal": 13,
      "graad": "gemeten",
-     "reden": null
+     "reden": "2 van 13 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -7300,13 +7295,13 @@
      "reden": "13 van 13 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 13,
+     "stand": "ONBEKEND",
+     "groen": 0,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 13,
      "totaal": 13,
      "graad": "gemeten",
-     "reden": null
+     "reden": "13 van 13 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -7776,13 +7771,13 @@
      "reden": "7 van 12 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 12,
+     "stand": "ONBEKEND",
+     "groen": 10,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 2,
      "totaal": 12,
      "graad": "gemeten",
-     "reden": null
+     "reden": "2 van 12 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -7813,12 +7808,12 @@
     },
     "auditbaar": {
      "stand": "ONBEKEND",
-     "groen": 6,
+     "groen": 4,
      "rood": 0,
-     "onbekend": 6,
+     "onbekend": 8,
      "totaal": 12,
      "graad": "gemeten",
-     "reden": "6 van 12 routes niet gemeten"
+     "reden": "8 van 12 routes niet gemeten"
     },
     "autonoomVeilig": {
      "stand": "ONBEKEND",
@@ -8592,13 +8587,13 @@
      "reden": "11 van 11 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 11,
+     "stand": "ONBEKEND",
+     "groen": 0,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 11,
      "totaal": 11,
      "graad": "gemeten",
-     "reden": null
+     "reden": "11 van 11 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -9180,13 +9175,13 @@
      "reden": "10 van 10 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 10,
+     "stand": "ONBEKEND",
+     "groen": 0,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 10,
      "totaal": 10,
      "graad": "gemeten",
-     "reden": null
+     "reden": "10 van 10 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -9645,13 +9640,13 @@
      "reden": "9 van 9 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 9,
+     "stand": "ONBEKEND",
+     "groen": 8,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 1,
      "totaal": 9,
      "graad": "gemeten",
-     "reden": null
+     "reden": "1 van 9 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -10220,12 +10215,12 @@
     },
     "persistent": {
      "stand": "ONBEKEND",
-     "groen": 1,
+     "groen": 2,
      "rood": 0,
-     "onbekend": 8,
+     "onbekend": 7,
      "totaal": 9,
      "graad": "vermoed",
-     "reden": "8 van 9 routes niet gemeten"
+     "reden": "7 van 9 routes niet gemeten"
     },
     "bevoegd": {
      "stand": "GROEN",
@@ -10347,13 +10342,13 @@
      "reden": "8 van 8 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 8,
+     "stand": "ONBEKEND",
+     "groen": 6,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 2,
      "totaal": 8,
      "graad": "gemeten",
-     "reden": null
+     "reden": "2 van 8 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -10466,13 +10461,13 @@
      "reden": "7 van 8 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 8,
+     "stand": "ONBEKEND",
+     "groen": 2,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 6,
      "totaal": 8,
      "graad": "gemeten",
-     "reden": null
+     "reden": "6 van 8 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -10586,13 +10581,13 @@
      "reden": "8 van 8 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 8,
+     "stand": "ONBEKEND",
+     "groen": 4,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 4,
      "totaal": 8,
      "graad": "gemeten",
-     "reden": null
+     "reden": "4 van 8 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -11292,12 +11287,12 @@
     },
     "bevoegd": {
      "stand": "ONBEKEND",
-     "groen": 4,
+     "groen": 3,
      "rood": 0,
-     "onbekend": 4,
+     "onbekend": 5,
      "totaal": 8,
      "graad": "gemeten",
-     "reden": "4 van 8 routes niet gemeten"
+     "reden": "5 van 8 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -11407,13 +11402,13 @@
      "reden": "8 van 8 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 8,
+     "stand": "ONBEKEND",
+     "groen": 0,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 8,
      "totaal": 8,
      "graad": "gemeten",
-     "reden": null
+     "reden": "8 van 8 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -12301,7 +12296,8 @@
    "doelgroepen": [
     "rtg",
     "lifestyle",
-    "business"
+    "business",
+    "gast"
    ],
    "paden": [
     "/api/neiging"
@@ -12937,13 +12933,13 @@
      "reden": "6 van 6 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 6,
+     "stand": "ONBEKEND",
+     "groen": 3,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 3,
      "totaal": 6,
      "graad": "gemeten",
-     "reden": null
+     "reden": "3 van 6 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -13287,13 +13283,13 @@
      "reden": "5 van 6 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 6,
+     "stand": "ONBEKEND",
+     "groen": 0,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 6,
      "totaal": 6,
      "graad": "gemeten",
-     "reden": null
+     "reden": "6 van 6 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -14240,13 +14236,13 @@
      "reden": "6 van 6 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 6,
+     "stand": "ONBEKEND",
+     "groen": 5,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 1,
      "totaal": 6,
      "graad": "gemeten",
-     "reden": null
+     "reden": "1 van 6 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -14356,13 +14352,13 @@
      "reden": "6 van 6 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 6,
+     "stand": "ONBEKEND",
+     "groen": 0,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 6,
      "totaal": 6,
      "graad": "gemeten",
-     "reden": null
+     "reden": "6 van 6 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -15058,13 +15054,13 @@
      "reden": "5 van 5 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 5,
+     "stand": "ONBEKEND",
+     "groen": 4,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 1,
      "totaal": 5,
      "graad": "gemeten",
-     "reden": null
+     "reden": "1 van 5 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -15175,13 +15171,13 @@
      "reden": "5 van 5 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 5,
+     "stand": "ONBEKEND",
+     "groen": 0,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 5,
      "totaal": 5,
      "graad": "gemeten",
-     "reden": null
+     "reden": "5 van 5 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -15536,12 +15532,12 @@
     },
     "bevoegd": {
      "stand": "ONBEKEND",
-     "groen": 2,
+     "groen": 0,
      "rood": 0,
-     "onbekend": 3,
+     "onbekend": 5,
      "totaal": 5,
      "graad": "gemeten",
-     "reden": "3 van 5 routes niet gemeten"
+     "reden": "5 van 5 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "GROEN",
@@ -16351,13 +16347,13 @@
      "reden": "5 van 5 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 5,
+     "stand": "ONBEKEND",
+     "groen": 0,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 5,
      "totaal": 5,
      "graad": "gemeten",
-     "reden": null
+     "reden": "5 van 5 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -16934,13 +16930,13 @@
      "reden": "4 van 4 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 4,
+     "stand": "ONBEKEND",
+     "groen": 3,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 1,
      "totaal": 4,
      "graad": "gemeten",
-     "reden": null
+     "reden": "1 van 4 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -18215,13 +18211,13 @@
      "reden": "4 van 4 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 4,
+     "stand": "ONBEKEND",
+     "groen": 0,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 4,
      "totaal": 4,
      "graad": "gemeten",
-     "reden": null
+     "reden": "4 van 4 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -18331,13 +18327,13 @@
      "reden": "4 van 4 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 4,
+     "stand": "ONBEKEND",
+     "groen": 0,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 4,
      "totaal": 4,
      "graad": "gemeten",
-     "reden": null
+     "reden": "4 van 4 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -18448,13 +18444,13 @@
      "reden": "3 van 3 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 3,
+     "stand": "ONBEKEND",
+     "groen": 2,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 1,
      "totaal": 3,
      "graad": "gemeten",
-     "reden": null
+     "reden": "1 van 3 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -19146,13 +19142,13 @@
      "reden": "3 van 3 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 3,
+     "stand": "ONBEKEND",
+     "groen": 2,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 1,
      "totaal": 3,
      "graad": "gemeten",
-     "reden": null
+     "reden": "1 van 3 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -19967,13 +19963,13 @@
      "reden": "3 van 3 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 3,
+     "stand": "ONBEKEND",
+     "groen": 0,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 3,
      "totaal": 3,
      "graad": "gemeten",
-     "reden": null
+     "reden": "3 van 3 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -20664,13 +20660,13 @@
      "reden": "3 van 3 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 3,
+     "stand": "ONBEKEND",
+     "groen": 0,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 3,
      "totaal": 3,
      "graad": "gemeten",
-     "reden": null
+     "reden": "3 van 3 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -20780,13 +20776,13 @@
      "reden": "3 van 3 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 3,
+     "stand": "ONBEKEND",
+     "groen": 0,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 3,
      "totaal": 3,
      "graad": "gemeten",
-     "reden": null
+     "reden": "3 van 3 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -22649,13 +22645,13 @@
      "reden": "1 van 2 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 2,
+     "stand": "ONBEKEND",
+     "groen": 1,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 1,
      "totaal": 2,
      "graad": "gemeten",
-     "reden": null
+     "reden": "1 van 2 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -23000,13 +22996,13 @@
      "reden": "2 van 2 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 2,
+     "stand": "ONBEKEND",
+     "groen": 0,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 2,
      "totaal": 2,
      "graad": "gemeten",
-     "reden": null
+     "reden": "2 van 2 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "GROEN",
@@ -23233,13 +23229,13 @@
      "reden": "2 van 2 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 2,
+     "stand": "ONBEKEND",
+     "groen": 0,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 2,
      "totaal": 2,
      "graad": "gemeten",
-     "reden": null
+     "reden": "2 van 2 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "GROEN",
@@ -23349,13 +23345,13 @@
      "reden": "2 van 2 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 2,
+     "stand": "ONBEKEND",
+     "groen": 0,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 2,
      "totaal": 2,
      "graad": "gemeten",
-     "reden": null
+     "reden": "2 van 2 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -23467,12 +23463,12 @@
     },
     "bevoegd": {
      "stand": "ONBEKEND",
-     "groen": 1,
+     "groen": 0,
      "rood": 0,
-     "onbekend": 1,
+     "onbekend": 2,
      "totaal": 2,
      "graad": "gemeten",
-     "reden": "1 van 2 routes niet gemeten"
+     "reden": "2 van 2 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "ONBEKEND",
@@ -24637,13 +24633,13 @@
      "reden": "1 van 1 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 1,
+     "stand": "ONBEKEND",
+     "groen": 0,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 1,
      "totaal": 1,
      "graad": "gemeten",
-     "reden": null
+     "reden": "1 van 1 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "GROEN",
@@ -24868,13 +24864,13 @@
      "reden": "1 van 1 routes niet gemeten"
     },
     "bevoegd": {
-     "stand": "GROEN",
-     "groen": 1,
+     "stand": "ONBEKEND",
+     "groen": 0,
      "rood": 0,
-     "onbekend": 0,
+     "onbekend": 1,
      "totaal": 1,
      "graad": "gemeten",
-     "reden": null
+     "reden": "1 van 1 routes niet gemeten"
     },
     "herstelbaar": {
      "stand": "GROEN",

@@ -187,6 +187,11 @@ const INRICHTING = [
   /^cargo\s+build\b/,
   /^sudo\b/, /^apt-get\b/,
   /^docker\s+(?:login|build|push|pull|tag|save|inspect|rm|run|compose|info)\b/,
+  /* De Rust-binaries BOUWEN is inrichting, net als `docker build`: het zet de
+     machine klaar voor de toetsen die ze gebruiken (samlc14n, sentinel,
+     magnaat-capabilities). `cargo test` staat er met opzet NIET bij -- dat
+     toetst, en is dus een poort die een sport op de ladder hoort te krijgen. */
+  /^cargo\s+build\b/,
   /^gh\s/,
   /^git\s+(?:config|add|commit|push|fetch|checkout|switch|remote|tag|rev-parse)\b/,
   /^(?:set|export|exit|echo|printf|cat|mkdir|mv|cp|rm|ls|find|touch|tee|shopt|sleep|test|true|false|source|\.|:)\b/,

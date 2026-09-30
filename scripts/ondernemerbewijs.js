@@ -218,6 +218,23 @@ uitRijen(BRON.rol.perRoute, 'bevoegd', 'acl', new Set(['dicht']), new Set(['open
 uitRijen(BRON.audit.perRoute, 'auditbaar', 'audit', new Set(['bewezen']), new Set(['afwezig', 'gebroken']));
 // --- herstelbaar: IDEMPROEF (tweede identieke aanroep) ---
 uitRijen(BRON.idem.perRoute, 'herstelbaar', 'idempotentie', new Set(['beschermd']), new Set(['onbeschermd']));
+/* EEN EENMALIG GEHEIM IS MET OPZET NIET IDEMPOTENT (server/lib/eenmalig-geheim-routes.js):
+   een herhaling krijgt een conflict of een NIEUW geheim, nooit het oude uit een
+   cache. Dat de proef dan "deed het opnieuw" meet is juist, maar het is geen schade
+   door een dubbele actie -- het is het contract. Zo'n route wordt hier ONBEKEND met
+   die reden, en niet ROOD (dat zou een verklaard besluit als storing tellen) en ook
+   niet GROEN (niemand heeft bewezen dat de rotatie niets beschadigt). */
+const { ROUTES: EENMALIG } = require(path.join(WORTEL, 'server/lib/eenmalig-geheim-routes'));
+for (const [sleutel, r] of routes) {
+  const u = r.uitslag.herstelbaar;
+  /* Een route die IDEMBESLUIT.json op `tebeslissen` zet, is een open vraag en
+     blijft ROOD -- ook als hij op de lijst eenmalige geheimen staat (#420). */
+  const open = BRON.idembesluit && (BRON.idembesluit.routes || {})[r.pad];
+  if (open && open.klasse === 'tebeslissen') continue;
+  if (u && u.stand === 'ROOD' && EENMALIG.has(sleutel))
+    r.uitslag.herstelbaar = { stand: 'ONBEKEND', waarde: u.waarde,
+      reden: 'met opzet niet idempotent: een eenmalig geheim (lib/eenmalig-geheim-routes.js); de proef mat ' + u.waarde };
+}
 /* EEN BESLUIT MAAKT ROOD NIET GROEN, maar ook niet rood. IDEMBESLUIT.json zegt
    per route waarom een tweede oproep met opzet iets NIEUWS doet (een code-maker
    geeft een verse sleutel, een teller telt). De bewijsmatrix zet zo'n cel op

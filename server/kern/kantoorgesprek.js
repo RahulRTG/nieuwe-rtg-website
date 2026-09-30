@@ -28,6 +28,7 @@
    moet maskeren. Een chatvenster toont normaal wat je typt, en een kantoorcode
    hoort niet leesbaar in beeld te staan. */
 
+const productiedeur = require('./kantoor/productiedeur');
 const TTL_MS = 5 * 60 * 1000;      // een deur hoort niet lang open te staan
 const MAX_GESPREKKEN = 200;
 const MAX_BEURTEN = 12;
@@ -50,7 +51,11 @@ function maakKantoorgesprek({ OFFICE_CODE, veiligGelijk, totpOk, crypto, remembe
     return !!(f && f.until > nu());
   };
 
+  /* B10: in productie opent de kantoorcode niets meer, ook niet via dit gesprek
+     (./kantoor/productiedeur.js). Geweigerd voor er iets vergeleken wordt. */
   function kantoorStart(ip) {
+    const dicht = productiedeur.codeDicht();
+    if (dicht) return dicht;
     if (opSlot(ip)) return { status: 429, error: 'Te veel pogingen. Probeer het over een paar minuten opnieuw.' };
     opruimen();
     const id = 'kg' + crypto.randomBytes(9).toString('hex');
@@ -60,6 +65,8 @@ function maakKantoorgesprek({ OFFICE_CODE, veiligGelijk, totpOk, crypto, remembe
   }
 
   function kantoorZeg(id, ruw, ip, req) {
+    const dicht = productiedeur.codeDicht();
+    if (dicht) { gesprekken.delete(String(id || '')); return dicht; }
     if (opSlot(ip)) return { status: 429, error: 'Te veel pogingen. Probeer het over een paar minuten opnieuw.' };
     const g = gesprekken.get(String(id || ''));
     if (!g) return { status: 404, error: 'Dit gesprek ken ik niet meer. Begin gerust opnieuw.' };

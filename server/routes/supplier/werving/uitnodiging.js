@@ -59,6 +59,9 @@ module.exports = ({ kern }) => {
     };
     if (typeof bewerkCollectie === 'function')
       return bewerkCollectie('staffInvites', doe);
+    // de claim is alleen atomair in een collectietransactie: in productie nooit zonder
+    if (process.env.NODE_ENV === 'production')
+      throw new Error('staffInvites vereist bewerkCollectie (opzet/kernlaag6b.js)');
     db.data.staffInvites = db.data.staffInvites && typeof db.data.staffInvites === 'object'
       ? db.data.staffInvites : {};
     const voor = JSON.stringify(db.data.staffInvites);

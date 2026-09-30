@@ -1,6 +1,6 @@
 /* ============================================================================
-   DE VORM VAN EEN BEVESTIGING -- de stand, wat er naar buiten gaat, en de
-   vergelijking van de code.
+   DE VORM VAN EEN BEVESTIGING -- de stand en wat er naar buiten gaat. De code
+   wordt sinds 27 september 2026 als hash vergeleken in ./bevestiging-code.js.
 
    Apart van ./bevestiging.js omdat dat bestand er over de omvangsgrens van
    keuringsregel 13 mee ging, met de naad op dezelfde plek als bij de machtiging:
@@ -33,18 +33,9 @@ function kortB(b, { voorLid = false, minuten } = {}) {
   const basis = { id: b.id, zaak: b.zaak, mens: b.mens, machine: isAi(b.mens), doel: b.doel,
     reden: b.reden, capabilities: b.capabilities.slice(), stand: stand(b), at: b.at, tot: b.tot,
     machtiging: b.machtiging, via: b.via };
-  if (voorLid) return Object.assign(basis, { code: levend(b) ? b.code : null, minuten });
+  // de code staat hier nooit: het lid vraagt hem op met toon() en ziet hem precies een keer
+  if (voorLid) return Object.assign(basis, { minuten });
   return basis;
 }
 
-/* Vergelijken zonder vroegtijdig af te breken: een code van zes cijfers is klein
-   genoeg om te raden als je mag meten hoe ver je kwam. */
-function gelijk(a, b) {
-  const x = String(a), y = String(b);
-  if (x.length !== y.length) return false;
-  let v = 0;
-  for (let i = 0; i < x.length; i++) v |= x.charCodeAt(i) ^ y.charCodeAt(i);
-  return v === 0;
-}
-
-module.exports = { stand, levend, kortB, gelijk };
+module.exports = { stand, levend, kortB };

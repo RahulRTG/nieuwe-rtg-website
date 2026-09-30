@@ -1,0 +1,728 @@
+{
+  "stempel": {
+    "op": "2026-09-30T00:33:05.084Z",
+    "commit": "18c166870",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/gastsplitsing.js",
+    "node": "v22.22.2"
+  },
+  "graad": "vermoed",
+  "grens": "Lexicaal ingedeeld. Dit zegt NIET of een gratis account er werkelijk langs komt (dat meet npm run doelgroepbereik, met een echte gratis-accountsessie), en NIET of een deur voor een gratis account open hoort te staan -- dat is een productvraag (SAMENLEVING.md, de verklaring van de bodem). `leden` is geen fout: het woord is dubbelzinnig omdat een Community-lid ook lid heet. Een toets die het onderscheid via een andere poort maakt dan account of idGeverifieerd, telt hier als weigering.",
+  "uitleg": "Per plek in server/ die op de gast toetst: maakt de code het onderscheid tussen bezoeker en gratis account, en wat zegt de weigering dat er nodig is. account-belofte = de tekst zegt dat een account of profiel volstaat, terwijl de code ook het gratis account weigert.",
+  "gemeten": {
+    "bestanden": 123,
+    "plekken": 140,
+    "perSoort": {
+      "vertakt": 23,
+      "onderscheidt": 23,
+      "pas-eis": 11,
+      "leden": 82,
+      "zonder-tekst": 1
+    },
+    "tegenspraak": 0
+  },
+  "tegenspraak": [],
+  "plekken": [
+    {
+      "plek": "server/ai-budget-beleid.js:61",
+      "soort": "vertakt",
+      "zegt": null
+    },
+    {
+      "plek": "server/functies/doelgroep.js:21",
+      "soort": "vertakt",
+      "zegt": null
+    },
+    {
+      "plek": "server/kern/aanmeldingen/naargast.js:54",
+      "soort": "onderscheidt",
+      "zegt": null
+    },
+    {
+      "plek": "server/kern/aipoort.js:49",
+      "soort": "onderscheidt",
+      "zegt": null
+    },
+    {
+      "plek": "server/kern/care/leden.js:59",
+      "soort": "pas-eis",
+      "zegt": "Boeken kan alleen met een lidmaatschap."
+    },
+    {
+      "plek": "server/kern/care/zaak.js:93",
+      "soort": "pas-eis",
+      "zegt": "Boeken kan alleen met een lidmaatschap."
+    },
+    {
+      "plek": "server/kern/drm.js:43",
+      "soort": "leden",
+      "zegt": "Beschermde inhoud is alleen voor leden."
+    },
+    {
+      "plek": "server/kern/economie/principal.js:19",
+      "soort": "onderscheidt",
+      "zegt": null
+    },
+    {
+      "plek": "server/kern/fluister/betalen.js:14",
+      "soort": "pas-eis",
+      "zegt": "Bestellen via mij kan alleen met een lidmaatschap; als gast kan het via de Bestellen-tab."
+    },
+    {
+      "plek": "server/kern/fluister/bevestig.js:98",
+      "soort": "pas-eis",
+      "zegt": "Reserveren kan alleen met een lidmaatschap."
+    },
+    {
+      "plek": "server/kern/gids.js:16",
+      "soort": "onderscheidt",
+      "zegt": null
+    },
+    {
+      "plek": "server/kern/lid.js:77",
+      "soort": "vertakt",
+      "zegt": null
+    },
+    {
+      "plek": "server/kern/lid.js:115",
+      "soort": "vertakt",
+      "zegt": null
+    },
+    {
+      "plek": "server/kern/lid/contact.js:34",
+      "soort": "vertakt",
+      "zegt": null
+    },
+    {
+      "plek": "server/kern/lidacties.js:28",
+      "soort": "vertakt",
+      "zegt": null
+    },
+    {
+      "plek": "server/kern/lidacties/bestellen.js:99",
+      "soort": "vertakt",
+      "zegt": null
+    },
+    {
+      "plek": "server/kern/lidacties/ritten.js:15",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/kern/mobiliteit/index.js:155",
+      "soort": "leden",
+      "zegt": "RTG Vervoer is voor leden."
+    },
+    {
+      "plek": "server/kern/onvervreemdbaar.js:37",
+      "soort": "vertakt",
+      "zegt": null
+    },
+    {
+      "plek": "server/kern/passen.js:66",
+      "soort": "vertakt",
+      "zegt": null
+    },
+    {
+      "plek": "server/kern/salon/zichtbaarheid.js:30",
+      "soort": "vertakt",
+      "zegt": null
+    },
+    {
+      "plek": "server/kern/servicekosten.js:34",
+      "soort": "vertakt",
+      "zegt": null
+    },
+    {
+      "plek": "server/kern/verzorging/beautyleden.js:75",
+      "soort": "pas-eis",
+      "zegt": "Boeken kan alleen met een lidmaatschap."
+    },
+    {
+      "plek": "server/kern/verzorging/opvangleden.js:97",
+      "soort": "pas-eis",
+      "zegt": "Een aanvraag klaarzetten kan met een lidmaatschap."
+    },
+    {
+      "plek": "server/opzet/diensten2.js:263",
+      "soort": "onderscheidt",
+      "zegt": null
+    },
+    {
+      "plek": "server/opzet/kernlaag4.js:16",
+      "soort": "onderscheidt",
+      "zegt": null
+    },
+    {
+      "plek": "server/routes/account.js:18",
+      "soort": "onderscheidt",
+      "zegt": null
+    },
+    {
+      "plek": "server/routes/algpin.js:13",
+      "soort": "onderscheidt",
+      "zegt": null
+    },
+    {
+      "plek": "server/routes/appstore/kopen.js:56",
+      "soort": "onderscheidt",
+      "zegt": null
+    },
+    {
+      "plek": "server/routes/appstore/lid.js:15",
+      "soort": "pas-eis",
+      "zegt": "Apps van derden op je startscherm zetten is voor betalende leden. Bladeren mag je gewoon."
+    },
+    {
+      "plek": "server/routes/auth.js:39",
+      "soort": "vertakt",
+      "zegt": null
+    },
+    {
+      "plek": "server/routes/auth/inlog-pas.js:32",
+      "soort": "vertakt",
+      "zegt": null
+    },
+    {
+      "plek": "server/routes/auth/inlog-pas.js:39",
+      "soort": "vertakt",
+      "zegt": null
+    },
+    {
+      "plek": "server/routes/bank.js:10",
+      "soort": "leden",
+      "zegt": "RTG Bank is voor leden."
+    },
+    {
+      "plek": "server/routes/bankhart.js:9",
+      "soort": "leden",
+      "zegt": "RTG Bank is voor leden."
+    },
+    {
+      "plek": "server/routes/bestanden.js:7",
+      "soort": "onderscheidt",
+      "zegt": null
+    },
+    {
+      "plek": "server/routes/clips.js:11",
+      "soort": "leden",
+      "zegt": "RTG Clips is voor leden."
+    },
+    {
+      "plek": "server/routes/experience.js:7",
+      "soort": "leden",
+      "zegt": "Het persoonlijke Experience Platform is voor ingelogde leden."
+    },
+    {
+      "plek": "server/routes/flits.js:8",
+      "soort": "leden",
+      "zegt": "RTG Flits is voor leden."
+    },
+    {
+      "plek": "server/routes/galerij.js:6",
+      "soort": "onderscheidt",
+      "zegt": null
+    },
+    {
+      "plek": "server/routes/gast/betalen-buiten.js:14",
+      "soort": "vertakt",
+      "zegt": null
+    },
+    {
+      "plek": "server/routes/gast/eten.js:81",
+      "soort": "leden",
+      "zegt": "Beoordelen is voor leden."
+    },
+    {
+      "plek": "server/routes/geld.js:30",
+      "soort": "leden",
+      "zegt": "RTG Geld is voor leden."
+    },
+    {
+      "plek": "server/routes/geldrahul.js:102",
+      "soort": "leden",
+      "zegt": "RTG Geld is voor leden."
+    },
+    {
+      "plek": "server/routes/inzagekaart.js:8",
+      "soort": "leden",
+      "zegt": "Een inzagekaart hoort bij een ledendossier; gasten hebben er geen."
+    },
+    {
+      "plek": "server/routes/kantoorpakket-samen.js:25",
+      "soort": "leden",
+      "zegt": "RTG Office is voor leden."
+    },
+    {
+      "plek": "server/routes/kantoorpakket.js:69",
+      "soort": "leden",
+      "zegt": "RTG Office is voor leden."
+    },
+    {
+      "plek": "server/routes/klok.js:6",
+      "soort": "onderscheidt",
+      "zegt": null
+    },
+    {
+      "plek": "server/routes/labfonds.js:38",
+      "soort": "onderscheidt",
+      "zegt": null
+    },
+    {
+      "plek": "server/routes/leven.js:28",
+      "soort": "leden",
+      "zegt": "Dit levensbeeld is voor leden."
+    },
+    {
+      "plek": "server/routes/levenband.js:128",
+      "soort": "leden",
+      "zegt": "Een band leggen is voor leden."
+    },
+    {
+      "plek": "server/routes/levenmentor.js:83",
+      "soort": "leden",
+      "zegt": "Dit levensbeeld is voor leden."
+    },
+    {
+      "plek": "server/routes/luchthaven.js:81",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/mediaos.js:18",
+      "soort": "leden",
+      "zegt": "De Media OS is voor leden."
+    },
+    {
+      "plek": "server/routes/meet.js:8",
+      "soort": "onderscheidt",
+      "zegt": null
+    },
+    {
+      "plek": "server/routes/member/assistent.js:14",
+      "soort": "leden",
+      "zegt": "De persoonlijke AI is exclusief voor leden."
+    },
+    {
+      "plek": "server/routes/member/betalen-munt.js:16",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/betalen-munt.js:39",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/betalen.js:24",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/betalen.js:91",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/betalen.js:102",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/boeken.js:18",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/boeken.js:85",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/cadeaukaart.js:39",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/cadeaukaart.js:81",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/gegevenskaart.js:16",
+      "soort": "leden",
+      "zegt": "Een gegevenskaart hoort bij een ledendossier; gasten hebben er geen."
+    },
+    {
+      "plek": "server/routes/member/gemeente.js:12",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/handel.js:10",
+      "soort": "vertakt",
+      "zegt": null
+    },
+    {
+      "plek": "server/routes/member/handel/uitjes.js:12",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/handel/uitjes.js:43",
+      "soort": "onderscheidt",
+      "zegt": null
+    },
+    {
+      "plek": "server/routes/member/handel/uitjes.js:70",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/handel/uitjes.js:79",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/handel/uitjes.js:91",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/handel/uitjes.js:105",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/herstelkanaal.js:38",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/kopen.js:18",
+      "soort": "leden",
+      "zegt": "Rechtstreeks betalen is voor leden."
+    },
+    {
+      "plek": "server/routes/member/kopen.js:27",
+      "soort": "vertakt",
+      "zegt": null
+    },
+    {
+      "plek": "server/routes/member/kopen.js:31",
+      "soort": "leden",
+      "zegt": "Betalen is voor leden."
+    },
+    {
+      "plek": "server/routes/member/mall-vindlaag.js:15",
+      "soort": "pas-eis",
+      "zegt": "Hiervoor heeft u een pas nodig."
+    },
+    {
+      "plek": "server/routes/member/onderweg.js:10",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/overheid.js:15",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/persoonlijk-care.js:53",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/persoonlijk-care.js:69",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/persoonlijk-spar.js:15",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/persoonlijk.js:14",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/persoonlijk.js:20",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/privacy.js:15",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/privacy.js:81",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/privacy.js:99",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/residentie.js:12",
+      "soort": "leden",
+      "zegt": "De Residence is er voor leden."
+    },
+    {
+      "plek": "server/routes/member/salon-claims.js:15",
+      "soort": "vertakt",
+      "zegt": null
+    },
+    {
+      "plek": "server/routes/member/salon.js:12",
+      "soort": "vertakt",
+      "zegt": null
+    },
+    {
+      "plek": "server/routes/member/salon.js:22",
+      "soort": "pas-eis",
+      "zegt": "Zonder pas bekijk je de Salon, maar liken en reageren bij leden is voor leden. Solliciteren en betalen bij partners kan wel."
+    },
+    {
+      "plek": "server/routes/member/salon.js:103",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/salon.js:155",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/sessies.js:54",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/terplaatse.js:28",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/terplaatse.js:52",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/terplaatse.js:86",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/toestellen.js:22",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/tweefactor.js:22",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/vakpro.js:12",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/vakpro.js:28",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/vakpro.js:39",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/voertuigen.js:17",
+      "soort": "vertakt",
+      "zegt": null
+    },
+    {
+      "plek": "server/routes/member/winkel-bieb.js:13",
+      "soort": "pas-eis",
+      "zegt": "Installeren uit de App-Bibliotheek is voor betalende leden. Word lid en alles is inbegrepen; het Reis-gedeelte en de RTF-bieb zijn ook voor jou al open."
+    },
+    {
+      "plek": "server/routes/member/winkel.js:31",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/winkel.js:56",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/winkel.js:109",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/winkel.js:116",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/member/winkel.js:133",
+      "soort": "onderscheidt",
+      "zegt": null
+    },
+    {
+      "plek": "server/routes/mobiliteit.js:33",
+      "soort": "leden",
+      "zegt": "RTG Vervoer is voor leden."
+    },
+    {
+      "plek": "server/routes/mobiliteit/vervoerbewijs.js:31",
+      "soort": "leden",
+      "zegt": "RTG Vervoer is voor leden."
+    },
+    {
+      "plek": "server/routes/move.js:17",
+      "soort": "leden",
+      "zegt": "RTG Move is voor leden."
+    },
+    {
+      "plek": "server/routes/muziek-samen.js:18",
+      "soort": "leden",
+      "zegt": "RTG Klankwerk is voor leden."
+    },
+    {
+      "plek": "server/routes/muziek.js:12",
+      "soort": "leden",
+      "zegt": "RTG Studio is voor leden."
+    },
+    {
+      "plek": "server/routes/navigatie.js:13",
+      "soort": "leden",
+      "zegt": "RTG Navigatie is voor leden."
+    },
+    {
+      "plek": "server/routes/notities.js:12",
+      "soort": "onderscheidt",
+      "zegt": null
+    },
+    {
+      "plek": "server/routes/ov.js:11",
+      "soort": "leden",
+      "zegt": "RTG OV is voor leden."
+    },
+    {
+      "plek": "server/routes/pay.js:27",
+      "soort": "leden",
+      "zegt": "RTG Pay is voor leden."
+    },
+    {
+      "plek": "server/routes/pay.js:34",
+      "soort": "onderscheidt",
+      "zegt": null
+    },
+    {
+      "plek": "server/routes/plaats.js:23",
+      "soort": "leden",
+      "zegt": "De plaatslaag is voor leden."
+    },
+    {
+      "plek": "server/routes/podium.js:18",
+      "soort": "leden",
+      "zegt": "Het Podium is voor leden."
+    },
+    {
+      "plek": "server/routes/rtmail-lid.js:98",
+      "soort": "leden",
+      "zegt": "Projecten zijn beschikbaar voor leden."
+    },
+    {
+      "plek": "server/routes/samen.js:9",
+      "soort": "vertakt",
+      "zegt": null
+    },
+    {
+      "plek": "server/routes/sleutelwoorden.js:12",
+      "soort": "onderscheidt",
+      "zegt": null
+    },
+    {
+      "plek": "server/routes/sportclub.js:57",
+      "soort": "leden",
+      "zegt": "Alleen voor leden."
+    },
+    {
+      "plek": "server/routes/synergie.js:27",
+      "soort": "leden",
+      "zegt": "Pakketten boeken is voor leden."
+    },
+    {
+      "plek": "server/routes/theater.js:17",
+      "soort": "leden",
+      "zegt": "Het Theater is voor leden."
+    },
+    {
+      "plek": "server/routes/theater.js:94",
+      "soort": "zonder-tekst",
+      "zegt": null
+    },
+    {
+      "plek": "server/routes/thuis.js:8",
+      "soort": "leden",
+      "zegt": "RTG Thuis boeken en hosten is voor leden."
+    },
+    {
+      "plek": "server/routes/thuis.js:12",
+      "soort": "vertakt",
+      "zegt": null
+    },
+    {
+      "plek": "server/routes/vakbewijs.js:35",
+      "soort": "onderscheidt",
+      "zegt": null
+    },
+    {
+      "plek": "server/routes/vertegenwoordiging.js:26",
+      "soort": "onderscheidt",
+      "zegt": null
+    },
+    {
+      "plek": "server/routes/wbw.js:8",
+      "soort": "leden",
+      "zegt": "Wie betaalt wat is voor leden."
+    },
+    {
+      "plek": "server/routes/webmaker.js:12",
+      "soort": "pas-eis",
+      "zegt": "Een eigen website maken is voor leden. Word lid om te beginnen."
+    },
+    {
+      "plek": "server/routes/zorgwallet.js:29",
+      "soort": "leden",
+      "zegt": "De RTG Wallet is voor leden."
+    },
+    {
+      "plek": "server/server.js:550",
+      "soort": "onderscheidt",
+      "zegt": null
+    },
+    {
+      "plek": "server/server.js:1289",
+      "soort": "onderscheidt",
+      "zegt": null
+    },
+    {
+      "plek": "server/server.js:1315",
+      "soort": "vertakt",
+      "zegt": null
+    }
+  ]
+}

@@ -141,7 +141,7 @@ test('een uitnodiging laat iemand binnen zonder betaalde pas, en maar één keer
     /* De werker heeft een gewoon gratis account -- geen Business Pass, geen
        Lifestyle Pass. Dat is de grens uit CONCERN.md: een werknemer koopt nooit
        een pas om te mogen werken. */
-    const acc = await post(base, '/api/concern/uitnodiging/accepteer', { code: u.uitnodiging.code }, werker);
+    const acc = await post(base, '/api/concern/uitnodiging/accepteer', { code: u.code }, werker);
     assert.equal(acc.status, 200, 'accepteren faalde: ' + JSON.stringify(acc.body));
     assert.match(acc.body.welkom.kop, /Hotel Noordzee BV/);
 
@@ -151,7 +151,7 @@ test('een uitnodiging laat iemand binnen zonder betaalde pas, en maar één keer
 
     // tweede keer: dicht
     const derde = await lid(base, 23);
-    const nog = await post(base, '/api/concern/uitnodiging/accepteer', { code: u.uitnodiging.code }, derde);
+    const nog = await post(base, '/api/concern/uitnodiging/accepteer', { code: u.code }, derde);
     assert.equal(nog.status, 409, 'een gebruikte uitnodiging hoort dicht te zijn');
 
     // en de baas ziet er precies één medewerker

@@ -11,6 +11,8 @@ const gereedheid = require('./gereedheid');
 const { geschiktheid } = require('./brug');
 const { certStand } = require('./oordeel');
 const { stappen } = require('./startpakket');
+const werk = require('./werk');
+const autoriteit = require('./werk-autoriteit');
 
 module.exports = (stand, klok) => {
   const t = () => klok();
@@ -19,6 +21,13 @@ module.exports = (stand, klok) => {
     vakstaat: (org, p) => zicht.vakstaat(stand(org), p, t()),
     trainerCockpit: (org, p) => zicht.trainerCockpit(stand(org), p),
     managerCockpit: (org, p) => zicht.managerCockpit(stand(org), p, t()),
+    assessorWerk: (org, p) => werk.assessorWerk(stand(org), p),
+    kennisWerk: (org, p) => werk.kennisWerk(stand(org), p),
+    curriculumWerk: (org, p) => werk.curriculumWerk(stand(org), p),
+    eigenaarWerk: (org, p) => werk.eigenaarWerk(stand(org), p),
+    certificaatWerk: (org, p) => autoriteit.certificaatWerk(stand(org), p, t()),
+    trainerWerk: (org, p) => autoriteit.trainerWerk(stand(org), p, t()),
+    kwaliteitWerk: (org, p) => autoriteit.kwaliteitWerk(stand(org), p),
     geschiktheid: (org, p, h) => geschiktheid(stand(org), p, h, t()),
     gereedheid: (org, eisen) => gereedheid.teamGereed(stand(org), eisen, t()),
     eenheid: (org) => gereedheid.eenheid(stand(org), t()),

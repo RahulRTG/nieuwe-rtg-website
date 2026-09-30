@@ -40,6 +40,11 @@ const REGELS = [
      ronde en met hetzelfde doel gebouwd (SERVICE.md par. 13d). */
   [/\/api\/service\b|\/service\/(?:zaak|bevestig|machtiging|gesprek|kanalen)|service-bel|leverancier-service|\/service\.html/, 'klantenservice', 'Klantenservice'],
   [/\/api\/ondertiteling\b/, 'klantenservice', 'Klantenservice'],
+  /* De deur van een partij in DemocratieOS (POLITIEK.md par. 7.3). Bij dezelfde
+     kamer als de kwesties van de burger (/api/member/democratie, via de brede
+     ledenregel): een vraag over die deur is een vraag van een klant van
+     DemocratieOS, en geen onderzoekswerk. */
+  [/\/api\/democratie\/partij\b/, 'klantenservice', 'Klantenservice'],
   [/office\/redactie|\/redactie|\/krant|\/nieuws/, 'redactie', 'RTG Redactie'],
   [/office\/atelier(?:web)?|\/atelier/, 'atelier', 'RTG Atelier'],
   [/office\/studio|\/studio/, 'studio', 'RTG Ontwerpstudio'],

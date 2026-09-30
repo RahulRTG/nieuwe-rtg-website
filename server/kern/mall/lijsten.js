@@ -55,16 +55,16 @@ module.exports = (ctx) => {
   const isDatum = (d) => /^\d{4}-\d{2}-\d{2}$/.test(String(d || ''));
 
   const eigen = require('../eigencollectie')({ db, domein: 'kern/mall/lijsten', bezit: { mallLijsten: 'kaart' } });
-  function bak(key) {
-    const t = eigen.bak('mallLijsten');
-    if (!Array.isArray(t[key])) t[key] = [];
+  function bak(key, schrijf = false) {
+    const t = schrijf ? eigen.bak('mallLijsten') : eigen.kijk('mallLijsten');
+    if (!Array.isArray(t[key])) { if (!schrijf) return []; t[key] = []; }
     return t[key];
   }
   const vind = (key, id) => bak(key).find(l => l.id === String(id || ''));
 
   function maak(key, data) {
     data = data || {};
-    const lijsten = bak(key);
+    const lijsten = bak(key, true);
     if (lijsten.length >= MAX_LIJSTEN) return { status: 409, error: 'U heeft het maximum van ' + MAX_LIJSTEN + ' lijsten bereikt.' };
     const naam = schoon(data.naam, 60);
     if (!naam) return { status: 400, error: 'Geef de lijst een naam.' };

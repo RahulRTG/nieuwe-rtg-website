@@ -1,23 +1,23 @@
 {
  "stempel": {
-  "op": "2026-09-30T18:47:41.755Z",
-  "commit": "c979c3584",
+  "op": "2026-09-30T20:13:02.559Z",
+  "commit": "ec186c7b2",
   "boomVuil": false,
-  "boomAnders": 8,
+  "boomAnders": 6,
   "instrument": "scripts/handlerwacht.js",
   "node": "v26.10.0"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
   "zonderBewakerslaag": 648,
-  "bewaakt": 551,
+  "bewaakt": 556,
   "openbaarMetReden": 53,
   "eigenControle": 19,
   "sleutelDoorgegeven": 12,
   "zonderWachtMetReden": 8,
   "laat": 0,
-  "onbewaakt": 4,
-  "nietGelezen": 1,
+  "onbewaakt": 0,
+  "nietGelezen": 0,
   "gezagsfuncties": 26,
   "publiekeLijstenVerschillen": 19
  },
@@ -114,6 +114,10 @@
   {
    "naam": "rtf.verifieerProfiel",
    "aantal": 6
+  },
+  {
+   "naam": "praktijkMutatie -> poort",
+   "aantal": 5
   },
   {
    "naam": "sessie",
@@ -734,7 +738,8 @@
   {
    "sleutel": "POST /api/bedrijf/praktijk/aanbod",
    "bestand": "server/bedrijf/praktijk.js:75",
-   "staat": "onbewaakt"
+   "staat": "bewaakt",
+   "wacht": "praktijkMutatie -> poort"
   },
   {
    "sleutel": "POST /api/bedrijf/praktijk/beeld",
@@ -745,23 +750,26 @@
   {
    "sleutel": "POST /api/bedrijf/praktijk/delen",
    "bestand": "server/bedrijf/praktijk.js:78",
-   "staat": "onbewaakt"
+   "staat": "bewaakt",
+   "wacht": "praktijkMutatie -> poort"
   },
   {
    "sleutel": "POST /api/bedrijf/praktijk/inrichten",
-   "staat": "nietGelezen",
    "bestand": "server/bedrijf/praktijk.js:74",
-   "reden": "op deze regel staat geen leesbare handler (lus of hulpje)"
+   "staat": "bewaakt",
+   "wacht": "praktijkMutatie -> poort"
   },
   {
    "sleutel": "POST /api/bedrijf/praktijk/stap",
    "bestand": "server/bedrijf/praktijk.js:77",
-   "staat": "onbewaakt"
+   "staat": "bewaakt",
+   "wacht": "praktijkMutatie -> poort"
   },
   {
    "sleutel": "POST /api/bedrijf/praktijk/vraag",
    "bestand": "server/bedrijf/praktijk.js:76",
-   "staat": "onbewaakt"
+   "staat": "bewaakt",
+   "wacht": "praktijkMutatie -> poort"
   },
   {
    "sleutel": "POST /api/bedrijf/project",

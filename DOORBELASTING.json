@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-29T23:18:48.068Z",
-    "commit": "a4ae5e47b",
+    "op": "2026-09-30T20:13:02.873Z",
+    "commit": "ec186c7b2",
     "boomVuil": false,
     "boomAnders": 7,
     "instrument": "scripts/doorbelasting.js",
-    "node": "v22.22.2"
+    "node": "v26.10.0"
   },
   "graad": "gemeten",
   "wat": "of de doorbelasting van RTG aantoonbaar te classificeren is: per vorm en per euro",
@@ -21,7 +21,7 @@
   ],
   "regel": "onbekend is een uitkomst en nooit een aanname: een bedrag zonder aantoonbare herkomst wordt niet naar rtgEigen of derdePartij geduwd, want beide fouten zijn onzichtbaar en komen allebei iemand goed uit",
   "vorm": {
-    "vormenTotaal": 1522,
+    "vormenTotaal": 1549,
     "geldvormen": 219,
     "volgbaar": 37,
     "perHerkomstveld": {
@@ -595,49 +595,10 @@
     "grens": "Dit is de NORM en geen waarneming: deze wereld is verzonnen en deterministisch. Hij bewijst dat de machine niet gaat raden, en zegt NIETS over wat RTG werkelijk verdient. Dat staat in B2, en die twee worden nooit opgeteld. Dat geldt ook voor de dekkingsgetallen hierboven: een zaadwereld bewijst dat de rekenmachine werkt, productie vertelt hoeveel van de werkelijkheid zij begrijpt."
   },
   "euros": {
-    "noemerCenten": 40026,
-    "rijen": 4,
-    "perKlasse": {
-      "rtgEigen": {
-        "rijen": 0,
-        "centen": 0
-      },
-      "derdePartij": {
-        "rijen": 0,
-        "centen": 0
-      },
-      "belasting": {
-        "rijen": 0,
-        "centen": 0
-      },
-      "fee": {
-        "rijen": 0,
-        "centen": 0
-      },
-      "kortingRefund": {
-        "rijen": 0,
-        "centen": 0
-      },
-      "onbekend": {
-        "rijen": 4,
-        "centen": 40026
-      }
-    },
-    "redenen": [
-      {
-        "reden": "onbekend: wel een bedrag (totaal), geen herkomstveld -- niet te volgen",
-        "rijen": 2
-      },
-      {
-        "reden": "onbekend: herkomstveld provider bestaat maar is leeg",
-        "rijen": 1
-      },
-      {
-        "reden": "onbekend: wel een bedrag (maxCenten), geen herkomstveld -- niet te volgen",
-        "rijen": 1
-      }
-    ],
-    "waaromGeen": null
+    "noemerCenten": 0,
+    "rijen": 0,
+    "perKlasse": null,
+    "waaromGeen": "er is geen server/data/store.db -- deze meter verzint geen bedragen"
   },
   "euroDekkingProductie": {
     "status": "GEEN_NOEMER",
@@ -645,15 +606,16 @@
     "verklaardEuro": null,
     "totaalEuro": null,
     "verklaardCenten": 0,
-    "noemerCenten": 40026,
+    "noemerCenten": 0,
     "kanoniekeRijen": 0,
-    "bedragrijen": 4,
+    "bedragrijen": 0,
     "ontbreekt": {},
     "beletsels": [
+      "er is geen server/data/store.db -- deze meter verzint geen bedragen",
       "de bedragen in de opslag dragen geen valuta, dus deze noemer is niet aantoonbaar in euro; kern/waarde/dekking.js weigert om die reden ook een totaal over meerdere munten",
       "niemand heeft verklaard of deze opslag productie of een ontwikkelomgeving is (RTG_ECONOMIE_WERELD is niet gezet). Een dekkingscijfer zonder die verklaring leest als productie, en zaaddata is uiterlijk niet van echte handel te onderscheiden."
     ],
-    "reden": "de bedragen in de opslag dragen geen valuta, dus deze noemer is niet aantoonbaar in euro; kern/waarde/dekking.js weigert om die reden ook een totaal over meerdere munten",
+    "reden": "er is geen server/data/store.db -- deze meter verzint geen bedragen",
     "grens": "De noemer is ELK bedrag dat deze meter in de opslag vindt, niet alleen de rijen die de economische keten dragen -- anders meldt zes goede rijen naast tienduizend losse bedragen 100%. De teller is de STRENGE: bedrag, herkomst, eigenaar, tegenpartij, bron en classificatie moeten er alle zes staan. Dit getal wordt nooit vergeleken met de vormdekking uit A (die telt vormen) en nooit met de dekking uit B1 (die rekent over een fixture)."
   }
 }

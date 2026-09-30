@@ -1,19 +1,19 @@
 {
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
-  "vastgelegd": "2026-09-29",
+  "vastgelegd": "2026-09-30",
   "gemeten": {
-    "bestanden": 2570,
-    "domeinenTotaal": 681,
-    "koopbareVormen": 612,
+    "bestanden": 2577,
+    "domeinenTotaal": 683,
+    "koopbareVormen": 611,
     "koopbareDomeinen": 123,
     "envelopDrempel": 8,
     "envelop": 42,
-    "veldenDomeineigen": 786,
-    "veldenNietEnvelop": 1054,
+    "veldenDomeineigen": 784,
+    "veldenNietEnvelop": 1052,
     "gelijkendeVormparen": 17,
     "werkwoordenVolledig": 2,
     "werkwoordenOveral": 0,
-    "werkwoordCombinaties": 45,
+    "werkwoordCombinaties": 44,
     "wagenVormen": 33,
     "wagenVormenUniek": 30,
     "wagenDomeinen": 22,
@@ -75,7 +75,7 @@
     "reserveer": 28,
     "bevestig": 59,
     "lever": 24,
-    "annuleer": 34,
+    "annuleer": 35,
     "retour": 8
   },
   "overalAanwezig": [],
@@ -375,6 +375,28 @@
       "telt": 6
     },
     {
+      "domein": "kern/markt",
+      "heeft": {
+        "toon": true,
+        "prijs": true,
+        "beschikbaarheid": true,
+        "reserveer": true,
+        "bevestig": true,
+        "lever": false,
+        "annuleer": true,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "lijst",
+        "prijs": "prijsSuggestie",
+        "beschikbaarheid": "advertentieOpenbaar",
+        "reserveer": "blokkeer",
+        "bevestig": "plaats",
+        "annuleer": "vervalAlle"
+      },
+      "telt": 6
+    },
+    {
       "domein": "kern/retail",
       "heeft": {
         "toon": true,
@@ -585,27 +607,6 @@
         "beschikbaarheid": "agenda",
         "reserveer": "onderhoudBij",
         "lever": "uitgifte"
-      },
-      "telt": 5
-    },
-    {
-      "domein": "kern/markt",
-      "heeft": {
-        "toon": true,
-        "prijs": true,
-        "beschikbaarheid": true,
-        "reserveer": true,
-        "bevestig": true,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "lijst",
-        "prijs": "prijsSuggestie",
-        "beschikbaarheid": "advertentieOpenbaar",
-        "reserveer": "blokkeer",
-        "bevestig": "plaats"
       },
       "telt": 5
     },

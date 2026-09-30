@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-30T01:58:58.312Z",
-    "commit": "5b8d2fceb",
+    "op": "2026-09-30T03:39:10.175Z",
+    "commit": "a6f95d5c5",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/gastsplitsing.js",
@@ -715,12 +715,12 @@
       "zegt": null
     },
     {
-      "plek": "server/server.js:1294",
+      "plek": "server/server.js:1289",
       "soort": "onderscheidt",
       "zegt": null
     },
     {
-      "plek": "server/server.js:1320",
+      "plek": "server/server.js:1315",
       "soort": "vertakt",
       "zegt": null
     }

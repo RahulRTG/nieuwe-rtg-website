@@ -2,6 +2,30 @@
 const test=require('node:test'),assert=require('node:assert/strict');
 const {fixture}=require('./lib/living-world-fixture');
 
+test('Saloon toont overdracht en beoordeling bij Actie aan de bevoegde ontvanger',async()=>{
+  const f=fixture(),{placeId,blueprintId}=await f.setup(),id=await f.preparePlan(blueprintId);
+  const source=require('../server/kern/living-world/saloon')(key=>f.world.view(key));
+  const saloon=require('../server/kern/wereld/saloon')({kern:{},
+    voorkeurOpslag:{haal:()=>null,schrijf:()=>{}},lezers:{livingworld:sess=>source(sess.key)}});
+  const read=(key,vorm)=>saloon.lees({key,tier:'rtg'},{bronnen:['livingworld'],vorm});
+  assert.equal((await read('A','mijn')).items.length,0,'privéplan nog niet overgedragen');
+  let p=f.row('B','plan',id);
+  await f.command('B','plan.request',{id,revision:p.revision});
+  assert.deepEqual((await read('A','actie')).items.map(i=>i.id),['livingworld:'+id]);
+  assert.equal((await read('B','actie')).items.length,0,'de organisator moet nu handelen');
+  assert.equal((await read('C','mijn')).items.length,0);
+  assert.ok((await read('A','wereld')).items.every(i=>!i.prive));
+  p=f.row('A','plan',id);
+  await f.command('A','plan.issue',{id,revision:p.revision,reason:'Afspraak bespreken'});
+  assert.equal((await read('A','actie')).items[0].id,'livingworld:'+id,'menselijke eigenaar blijft vindbaar');
+  const c=await f.command('B','contribution.create',{placeId,kind:'knowledge',title:'Actuele tip',text:'Een waarneming',observedAt:f.time()});
+  assert.ok((await read('A','actie')).items.some(i=>i.id==='livingworld:'+c.id));
+  assert.equal((await read('B','actie')).items.length,0,'eigen bijdrage geeft geen zelfreview');
+  await f.command('A','contribution.review',{id:c.id,revision:1,decision:'accepted',reason:'Gecontroleerd'});
+  assert.ok(!(await read('A','actie')).items.some(i=>i.id==='livingworld:'+c.id));
+  assert.ok((await read('C','wereld')).items.some(i=>i.id==='livingworld:'+c.id));
+});
+
 test('plekbeheerder mag eigen bijdragen niet via zelfreview publiceren',async()=>{
   const f=fixture(),{placeId}=await f.setup();
   const c=await f.command('A','contribution.create',{placeId,kind:'knowledge',title:'Eigen tip',text:'Zelf geschreven',observedAt:f.time()});

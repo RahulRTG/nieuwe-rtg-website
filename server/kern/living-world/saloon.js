@@ -14,12 +14,15 @@ module.exports=build=>viewerKey=>{
     tekst:p.sourceWithdrawn?'De bron is ingetrokken. Neem contact op met de organisator.':
       p.sourceChanged||p.knowledgeChanged?'De gebruikte ervaring of kennis is gewijzigd. Controleer uw plan.':status[p.status],
     auteur:p.mine?'Mijn ervaring':'Aanvraag van '+p.participant,at:p.updatedAt,bronversie:p.revision,
-    begint:p.date,prive:true,url:p.url,actie:p.mine?'Vervolg mijn ervaring':'Behandel aanvraag'
+    begint:p.date,prive:true,url:p.url,actie:p.mine?'Vervolg mijn ervaring':'Behandel aanvraag',
+    aandacht:!!(p.sourceWithdrawn||p.sourceChanged||p.knowledgeChanged||p.actions.some(a=>
+      ['plan.decide','plan.resolve','plan.acknowledge'].includes(a.id)))
   });
   for(const c of v.contributions)if(c.current || c.mine || c.actions.some(a=>a.id==='contribution.review'))items.push({
     id:'livingworld:'+c.id,bron:'livingworld',type:'work',titel:c.title,tekst:c.text,
     auteur:c.author,at:c.updatedAt,bronversie:c.revision,url:c.url,
-    prive:!c.current,actie:c.status==='pending'&&!c.mine?'Beoordeel bijdrage':'Open bijdrage'
+    prive:!c.current,actie:c.status==='pending'&&!c.mine?'Beoordeel bijdrage':'Open bijdrage',
+    aandacht:c.actions.some(a=>a.id==='contribution.review')
   });
   return {items};
 };

@@ -19,6 +19,24 @@ test('volledige release houdt gewone stores gescheiden en verliest geen PG-besta
 test('zonder database behoudt de gewone CI-indeling haar volledige inventaris',()=>{
  const p=plan(bestanden,{},false);assert.equal(p.apart,false);assert.deepEqual(p.bestanden,bestanden);
 });
+test('CI-scherven dragen alle PG-bestanden aantoonbaar over aan de verplichte databasejob',()=>{
+ const cp=require('node:child_process'),path=require('node:path'),fs=require('node:fs');
+ const env={...process.env,RTG_AFBOUW_SLOT_ACTIEF:'1'};delete env.DATABASE_URL;delete env.PG_URL;
+ const pg=TOETSEN.map(n=>n.slice(5)).sort(),lokaal=[];
+ for(let nr=1;nr<=4;nr++){
+  const child=cp.spawnSync(process.execPath,[path.join(__dirname,'../scripts/test-runner.js'),'--toon','--deel='+nr+'/4'],{encoding:'utf8',env});
+  assert.equal(child.status,0,child.stderr);const p=JSON.parse(child.stdout);
+  assert.deepEqual(p.postgresUitgesteld.sort(),pg);assert.deepEqual(p.postgres,[]);
+  lokaal.push(...p.parallel,...p.geisoleerd);
+ }
+ const alles=fs.readdirSync(__dirname).filter(n=>n.endsWith('.test.js')).sort();
+ assert.equal(new Set(lokaal).size,lokaal.length,'geen bestand dubbel verdeeld');
+ assert.deepEqual([...lokaal,...pg].sort(),alles,'geen test verdwijnt tussen beide runners');
+ assert.ok(!lokaal.includes('living-world.pg.test.js'));
+ const workflow=fs.readFileSync(path.join(__dirname,'../.github/workflows/ci.yml'),'utf8');
+ assert.match(workflow,/run: node scripts\/pgtoetsen\.js\s+env:\s+REDIS_URL:[^\n]+\s+DATABASE_URL:/);
+ assert.match(workflow,/needs: \[preflight, toetsscherf, ijkingen, keuringen, zware\]/);
+});
 test('de echte suiteplanner geeft elk databasebestand uitsluitend aan de geïsoleerde runner',()=>{
  const cp=require('node:child_process'),path=require('node:path'),fs=require('node:fs');
  const child=cp.spawnSync(process.execPath,[path.join(__dirname,'../scripts/test-runner.js'),'--toon'],

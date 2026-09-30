@@ -6,9 +6,7 @@
    Daarnaast startte Node op grote machines zoveel servers tegelijk dat lokale
    healthchecks hun timeout haalden voordat de code aan de beurt kwam.
 
-   Daarom: gewone bestanden begrensd parallel, bronmuterende ijkingen en de
-   twee zwaarste hele-serverproeven daarna een voor een. Geen globbing, shell
-   of npm-pakket nodig.
+   Gewone bestanden begrensd parallel; bronmuterende ijkingen daarna apart.
 
    DRIE VLAGGEN VOOR DE CI:
 
@@ -22,11 +20,8 @@
                      rekent daarna over ALLE delen samen (scripts/dekkingsvloer.js);
                      de vlaggen --test-coverage-* konden dat niet, want die
                      rekenen per proces.
-     --zonder-ijkingen  laat de zes bronmuterende ijkingen weg (scripts/lib/
-                     ijkingen.js). De CI geeft die elk een eigen job: meterijk
-                     alleen duurde 18 van de 19 minuten van het langste deel, en
-                     achter een deel aansluiten is voor een ijking geen eis --
-                     apart draaien is dat wel.
+     --zonder-ijkingen  laat de bronmuterende ijkingen uit scripts/lib/ijkingen.js
+                     aan hun eigen CI-jobs. PG-bestanden gaan naar de PG-job.
 
    Zonder die vlaggen gedraagt dit script zich precies als vroeger: dan draaien
    de ijkingen gewoon mee, een voor een, na de rest. */
@@ -148,7 +143,8 @@ const BRON = require('./lib/meetbron').bron();
 const env = { ...process.env, RTG_ROUTELOG: journaal, RTG_AFBOUW_SLOT_ACTIEF: '1',
   NODE_OPTIONS: nodeOpties, RTG_TOETSDUUR: duurpad, RTG_TOETSBRON: BRON };
 const pgSuite = require('./lib/suite-pg');
-const opslagPlan = pgSuite.plan(bestanden, env, !selectie.length && !deel && !zonderIjkingen && !zonderZware);
+const opslagPlan = pgSuite.plan(bestanden, env, !selectie.length && !deel && !zonderIjkingen && !zonderZware,
+  !selectie.length && !!(deel || zonderIjkingen || zonderZware));
 const lokaleBestanden = opslagPlan.bestanden;
 let pgBron = null;
 
@@ -268,7 +264,8 @@ const geïsoleerd = verdeel(lokaleBestanden.filter(n => isGeisoleerd(n) &&
    er straks apart draait, krijgt hetzelfde antwoord. */
 if (argv.includes('--toon')) {
   console.log(JSON.stringify({ parallel: gewoon, geisoleerd: geïsoleerd, concurrency,
-    dekking: dekkingMap || dekkingVloer, journaal, postgres:opslagPlan.pg }, null, 2));
+    dekking: dekkingMap || dekkingVloer, journaal, postgres:opslagPlan.pg,
+    postgresUitgesteld:opslagPlan.uitgesteld || [] }, null, 2));
   geefAfbouwSlotVrij();
   process.exit(0);
 }
@@ -277,6 +274,7 @@ console.log('[tests] ' + gewoon.length + ' bestanden, maximaal ' + concurrency +
   (dekkingMap ? ' (dekking naar ' + dekkingMap + ')'
     : (dekkingVloer.length ? ' (met dekkingsvloer ' + dekkingVloer.join('/') + ')' : '')));
 if (deel) console.log('[tests] deel ' + deel.nr + ' van ' + deel.totaal);
+if (opslagPlan.uitgesteld?.length) console.log('[tests] ' + opslagPlan.uitgesteld.length + ' PG-bestanden draaien uitsluitend in de verplichte PostgreSQL-job');
 if (zonderIjkingen && !selectie.length) console.log('[tests] zonder de losse ijkingen; die draaien in de CI elk in een eigen job');
 if (zonderZware && !selectie.length) console.log('[tests] zonder de zware toetsen; die draaien in de CI elk in een eigen job, zonder dekking');
 let code = draai(gewoon, concurrency, true);

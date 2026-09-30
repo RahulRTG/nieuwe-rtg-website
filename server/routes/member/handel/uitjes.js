@@ -8,6 +8,7 @@ module.exports = (hctx) => {
           favorietenVan, agendaVoor, maakSplits, mijnSplitsen, betaalSplits, zetOpWachtlijst,
           mijnWachtlijst, rsvpAnnuleer, puntenVan, verzilverPunten, zorgMee, idGeverifieerd,
           gegevensStop } = kern;
+  const { reserveringTegenvoorstelAntwoord } = kern;
 app.post('/api/verblijf', auth, (req, res) => {
   if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
   // een verblijf staat op uw naam bij een derde: de receptie moet u kunnen bereiken
@@ -54,6 +55,12 @@ app.post('/api/reserveer', auth, (req, res) => {
 app.post('/api/reserveringen/mijn', auth, (req, res) => res.json({ reserveringen: mijnReserveringen(req.session.key) }));
 app.post('/api/reservering/annuleer', auth, (req, res) => {
   const r = annuleerReservering(req.session.key, String(req.body.id || ''));
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json(r);
+});
+// de gast antwoordt op een tegenvoorstel van de zaak (kern/ervaring/tafeluitzondering.js)
+app.post('/api/reservering/tegenvoorstel', auth, (req, res) => {
+  const r = reserveringTegenvoorstelAntwoord(req.session.key, String(req.body.id || ''), req.body.akkoord === true);
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json(r);
 });

@@ -90,6 +90,12 @@ module.exports = (ctx) => {
      ervaring/tafelplanning.js. */
   const { tafelplanning, reserveringTafel, reserveringKomst, walkIn } = require('./tafelplanning')(ctx, { rijpMaak });
 
+  /* Tussen ja en nee: een tegenvoorstel met een termijn, en doorzetten naar wie
+     mag beslissen (./tafeluitzondering.js, CONCIERGE.md par. 2.7-2.9). */
+  const uitz = require('./tafeluitzondering')(ctx);
+
   return { reserveerTafel, mijnReserveringen, annuleerReservering, beslisReservering,
-    tafelplanning, reserveringTafel, reserveringKomst, walkIn };
+    tafelplanning, reserveringTafel, reserveringKomst, walkIn,
+    reserveringTegenvoorstel: uitz.tegenvoorstel, reserveringTegenvoorstelAntwoord: uitz.tegenvoorstelAntwoord,
+    reserveringDoorzetten: uitz.doorzetten, reserveringMagBeslissen: uitz.magBeslissen };
 };

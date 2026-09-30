@@ -2,8 +2,10 @@
    MUTATIECONTRACT -- de concierge-lus (kern/bureau/lus*.js, CONCIERGE.md).
 
    Deel van server/lib/mutatiecontracten.js; zie de kop daar voor de vorm.
-   Zestien routes: vijf aan de kant van het lid, tien aan de kant van het
-   kantoor en een voor de zaak die een onderdeel levert.
+   Negentien routes: zestien van de lus zelf (vijf aan de kant van het lid,
+   tien aan de kant van het kantoor en een voor de zaak die een onderdeel
+   levert), plus drie op de tafelreservering: tegenvoorstel, doorzetten en het
+   antwoord van de gast (onderaan, gemeten in test/tafeluitzondering.test.js).
 
    ================== HOE HET GEMETEN IS ==================
 
@@ -111,6 +113,26 @@ const CONTRACTEN = Object.assign({},
   LEEST('POST /api/supplier/concierge/opdrachten', 'bureau.lus.zaak', { klasse: 'AUTHENTICATED',
     uitleg: 'de zaakcode komt uit de sessie (supplierAuth), nooit uit het lijf' },
   'lusVoorZaak() over levens.alleLezend() en lus-regels.deelnemerBeeld, een positieve lijst velden')
+);
+
+/* Tussen ja en nee bij een tafelaanvraag (kern/ervaring/tafeluitzondering.js):
+   gemeten in test/tafeluitzondering.test.js. */
+const TAFEL = 'test/tafeluitzondering.test.js';
+const zaakDeur = { klasse: 'OBJECT_SCOPED', objectVeld: 'id',
+  uitleg: 'een reservering van DEZE zaak (de code komt uit de sessie); een andere geeft 404' };
+const beschermdTafel = (route, mutatieId, toegang, hoe) => ({
+  [route]: { mutatieId, semantiek: { klasse: 'idempotent' }, toegang, stand: 'PROTECTED', herkomst: 'mens',
+    afgetekend: Object.assign({}, AFGETEKEND, { door: AFGETEKEND.door.replace('test/conciergelus-dubbel.test.js', TAFEL) }),
+    bewijs: { gemeten: TAFEL + ': ' + hoe, op: OP } }
+});
+Object.assign(CONTRACTEN,
+  beschermdTafel('POST /api/supplier/reservering/tegenvoorstel', 'reservering.tegenvoorstel', zaakDeur,
+    'de tweede aanroep krijgt 409: de reservering staat op tegenvoorstel en niet meer op aangevraagd; de tijd beweegt niet.'),
+  beschermdTafel('POST /api/supplier/reservering/doorzetten', 'reservering.doorzetten', zaakDeur,
+    'de tweede aanroep geeft de reservering terug met exact hetzelfde doorgezet-blok (moment en reden van de eerste).'),
+  beschermdTafel('POST /api/reservering/tegenvoorstel', 'reservering.tegenvoorstel.antwoord',
+    { klasse: 'OBJECT_SCOPED', objectVeld: 'id', uitleg: 'een reservering van dit lid' },
+    'de tweede aanroep krijgt 409: er ligt geen tegenvoorstel meer; de stand blijft bevestigd.')
 );
 
 module.exports = { CONTRACTEN };

@@ -166,10 +166,12 @@ test('9. met een eerdere editie staat erbij hoeveel edities dat zijn', () => {
   const dag2 = w.k.dagZet(w.fid, eid2, { datum: '2028-07-01', open: '12:00', sluit: '02:00' }).dag;
   const terrein2 = w.k.plekZet(w.fid, eid2, { naam: 'Terrein', soort: 'terrein', capaciteit: 9000 }).plek;
   const poort2 = w.k.plekZet(w.fid, eid2, { naam: 'Poort', soort: 'ingang', ouder: terrein2.id }).plek;
+  const uitgegeven = [];
   for (let i = 0; i < 4; i++) {
-    w.k.pasUitgeven(w.fid, eid2, { drager: 'G' + i, rechten: [{ soort: 'festival.entree', dagen: [dag2.id] }] });
+    uitgegeven.push(w.k.pasUitgeven(w.fid, eid2, { drager: 'G' + i, rechten: [{ soort: 'festival.entree', dagen: [dag2.id] }] }).pas);
   }
-  const een = Object.values(w.k.editieVind(w.fid, eid2).passen)[0];
+  // de kale code staat alleen in het uitgifteantwoord, niet op de opgeslagen pas
+  const een = uitgegeven[0];
   w.k.scan(w.fid, eid2, { code: een.code, plek: poort2.id, poort: 'P', datum: '2028-07-01',
     tijd: '13:00', door: 'Toni' });
   w.k.dagSluiten(w.fid, eid2, { dag: dag2.id, door: 'Marta' });

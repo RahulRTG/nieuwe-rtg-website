@@ -5,8 +5,9 @@
    privechauffeur.
 
    Inchecken, bewust met twee snelle opties:
-   1. De oplichtende code: het lid toont een korte code, het personeel tikt
-      hem in: klaar. (Zelfde vertrouwde mechaniek als de entree- en kassacode.)
+   1. De oplichtende code: het lid kiest de vervoerder en toont een QR, het
+      personeel van DIE vervoerder scant hem (./incheckcode.js: 128 bits,
+      hash-only, eenmalig, atomair geclaimd).
    2. Een tik op GPS: het lid staat aantoonbaar bij het voertuig (binnen 150
       meter van de live positie) en checkt in zonder iets te laten zien.
    Uitchecken is een tik: de prijs is eerlijk basis + kilometers (hemelsbreed
@@ -23,10 +24,11 @@ const CODE_TTL_MS = 5 * 60 * 1000;    // de oplichtende code
 const GPS_CHECKIN_M = 150;            // zo dichtbij is 'bij het voertuig'
 const RITTEN_MAX = 4000;
 
-function maakOv({ db, save, crypto, schoon, codenaamVan, haversine, etaMinutes, pay, notify }) {
+function maakOv({ db, save, crypto, bewerkCollectie, schoon, codenaamVan, haversine, etaMinutes, pay, notify, afwezigOp }) {
   const id = p => (p || 'ov') + crypto.randomBytes(4).toString('hex');
   const nu = () => new Date().toISOString();
-  const codes = new Map();              // code -> { key, tot }
+  // de incheckcode: persistent en hash-only, nooit alleen in procesgeheugen
+  const codes = require('./incheckcode')({ crypto, bewerkCollectie, CODE_TTL_MS });
 
   /* ---- de demo-zaak: Ibiza Transit met vier lijnsoorten ---- */
   function ensureOv() {
@@ -126,7 +128,7 @@ function maakOv({ db, save, crypto, schoon, codenaamVan, haversine, etaMinutes, 
 
   // de gedeelde ctx voor de deelbestanden
   const ctx = {
-    db, save, crypto, schoon, nu, id, codenaamVan, haversine, etaMinutes, pay, notify, codes,
+    db, save, crypto, schoon, nu, id, codenaamVan, haversine, etaMinutes, pay, notify, codes, afwezigOp,
     ensureOv, ovZaak, lijnVan, ovPrijsVan, versVoertuig, actieveRit, ritStart, ritBeeld,
     halteBij, inPuntVan, inPunten, SOORTEN, VOERTUIG_TTL_MS, CODE_TTL_MS, GPS_CHECKIN_M, RITTEN_MAX
   };

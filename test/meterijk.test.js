@@ -1818,6 +1818,29 @@ const IJKINGEN = {
       (j) => { j.gemeten.spoorAanroepen = Math.max(0, (j.gemeten.spoorAanroepen || 0) - 40); return j; },
       () => voor.stilSpoorAanroepen - meet().stilSpoorAanroepen)
   },
+  /* De twee tanden van GASTSPLITSING.json: de tegenspraak omhoog, het
+     onderscheid omlaag -- elk met een eigen getal. */
+  gastTegenspraak: {
+    proef: (voor) => metVervangenJson('GASTSPLITSING.json',
+      (j) => { j.gemeten.tegenspraak = (j.gemeten.tegenspraak || 0) + 3; return j; },
+      () => meet().gastTegenspraak - voor.gastTegenspraak)
+  },
+  gastOnderscheidt: {
+    proef: (voor) => metVervangenJson('GASTSPLITSING.json',
+      (j) => { j.gemeten.perSoort.onderscheidt = Math.max(0, (j.gemeten.perSoort.onderscheidt || 0) - 5); return j; },
+      () => voor.gastOnderscheidt - meet().gastOnderscheidt)
+  },
+  /* De twee tanden van BODEMDRUK.json: de druk omhoog, het bereik omlaag. */
+  bodemDruk: {
+    proef: (voor) => metVervangenJson('BODEMDRUK.json',
+      (j) => { j.gemeten.metDruk = (j.gemeten.metDruk || 0) + 2; return j; },
+      () => meet().bodemDruk - voor.bodemDruk)
+  },
+  bodemSchermen: {
+    proef: (voor) => metVervangenJson('BODEMDRUK.json',
+      (j) => { j.gemeten.schermen = Math.max(0, (j.gemeten.schermen || 0) - 9); return j; },
+      () => voor.bodemSchermen - meet().bodemSchermen)
+  },
   /* DE DRIE TANDEN VAN STEMPELVEILIGHEID.json (15 september 2026). Dezelfde vorm
      als STILSPOOR.json hierboven -- twee schulden omhoog, het bereik omlaag --
      en elk met een EIGEN getal, want drie meters die naar hetzelfde register

@@ -45,6 +45,8 @@
       if (target && details.contains(target)) details.open = true;
       if (key && Array.from(native.querySelectorAll('[data-blad]')).some(function (el) { return el.dataset.blad === key; })) details.open = true;
       if (native.querySelector('.living-load-error,#stadmelding')) details.open = true;
+      // Een gekozen persoonlijke werklijst blijft zichtbaar in de warme schil.
+      if (world === 'living' && ['mijn', 'actie'].includes(d.body.dataset.saloonView)) details.open = true;
     }
     revealTarget(); w.addEventListener('hashchange', revealTarget);
     var feedWatch = new MutationObserver(revealTarget); feedWatch.observe(native, { childList: true, subtree: true });

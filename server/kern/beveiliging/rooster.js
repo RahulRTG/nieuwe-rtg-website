@@ -8,5 +8,5 @@ module.exports = (ctx) => {
   const deelPlanning = require('./rooster/planning')(ctx);
   Object.assign(ctx, deelPlanning);
   const deelAanvragen = require('./rooster/aanvragen')(ctx);
-  return { ...deelPlanning, ...deelAanvragen };
+  return { ...deelPlanning, ...deelAanvragen, ...require('./rooster/vervallen')(ctx) };
 };

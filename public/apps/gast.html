@@ -186,7 +186,7 @@
            een keer betaald (TAKEN 4.26). -->
       <div id="codeVak">
         <label class="lbl" for="bonCode">Code van je bon of polsband</label>
-        <input id="bonCode" maxlength="40" placeholder="Scan of typ de code" autocomplete="off">
+        <input id="bonCode" maxlength="80" placeholder="Scan of typ de code" autocomplete="off">
         <div class="rij mt5"><button id="bSaldo">Saldo bekijken</button></div>
         <p class="sub mt35" id="saldoUit"></p>
       </div>
@@ -622,6 +622,8 @@
     $('#saldoUit').textContent = '';
   }
   $('#rail').addEventListener('change', railGewisseld);
+  // de QR op een polsband opent dit scherm met de code in het fragment (niet in de query: die gaat naar de server)
+  try { var bandCode = new URLSearchParams(location.hash.slice(1)).get('band'); if (bandCode) $('#bonCode').value = bandCode; } catch (e) {}
 
   $('#bSaldo').addEventListener('click', function () {
     var code = $('#bonCode').value.trim();
@@ -635,13 +637,21 @@
   $('#bBetaal').addEventListener('click', function () {
     var w = $('#rail').value;
     var code = $('#bonCode').value.trim();
-    if (w !== 'kamer' && !code) return meld('Vul de code van je bon of polsband in.');
     /* De sleutel hoort bij DEZE betaling en niet bij deze klik: twee keer tikken
        of een hapering in het netwerk mag geen tweede afschrijving worden. */
     var idem = RTGId('gastbetaal');
     $('#bBetaal').disabled = true;
-    api('betaal', { sleutel: SLEUTEL, wijze: w, bonCode: code || undefined, idem: idem })
+    /* Een bon of polsband wordt eerst aan deze tafel GEKOPPELD (met de code in
+       de hand); betalen noemt daarna geen code meer. Zonder code boekt de
+       server af wat al gekoppeld is, of zegt dat er niets gekoppeld is. */
+    var koppel = (w !== 'kamer' && code) ? api('band', { sleutel: SLEUTEL, bonCode: code })
+      : Promise.resolve({});
+    koppel.then(function (k) {
+      if (k._fout) { $('#bBetaal').disabled = false; meld(k._fout); return { _fout: '' }; }
+      return api('betaal', { sleutel: SLEUTEL, wijze: w, idem: idem });
+    })
       .then(function (j) {
+        if (j._fout === '') return;
         $('#bBetaal').disabled = false;
         if (j._fout) return meld(j._fout);
         if (j.bonSaldo != null) $('#saldoUit').textContent = 'Er staat nog ' + euro(j.bonSaldo) + ' op je bon.';

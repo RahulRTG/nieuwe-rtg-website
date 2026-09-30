@@ -28,7 +28,17 @@ const SLEUTELS = {
   'POST /api/member/democratie/actie/aansluit': { zelfdeVerzoek: true },
   'POST /api/member/democratie/actie/plan': { zelfdeVerzoek: true },
   'POST /api/member/democratie/actie/antwoord': { zelfdeVerzoek: true },
-  'POST /api/member/democratie/actie/afgelast': { zelfdeVerzoek: true }
+  'POST /api/member/democratie/actie/afgelast': { zelfdeVerzoek: true },
+  /* De Political Connector (kern/democratie/connector.js, stap 5): lezen, en
+     nog eens uitschrijven dat niets nieuws doet (test/democratie-partij.test.js
+     toets 9). De schrijvende routes van de PARTIJDEUR staan hier met opzet niet:
+     zie ./idemsleutels-nooit-democratie.js. */
+  'POST /api/member/democratie/kwestie/voorstellen': { leest: true },
+  'POST /api/office/democratie/partij/lijst': { leest: true },
+  'POST /api/democratie/partij/wie': { leest: true },
+  'POST /api/democratie/partij/kwesties': { leest: true },
+  'POST /api/democratie/partij/voorstel/mijn': { leest: true },
+  'POST /api/office/democratie/partij/uitschrijf': { zelfdeVerzoek: true }
 };
 
 module.exports = { SLEUTELS };

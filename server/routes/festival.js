@@ -132,16 +132,20 @@ module.exports = (kern) => {
     if (!managerOnly(req, res)) return;
     const f = mijn(req);
     if (!f) return stuur(res, geenFestival);
-    const r = festival.pasUitgeven(f.id, editieVan(req), req.body || {});
+    const b = req.body || {};
+    const r = festival.pasUitgeven(f.id, editieVan(req), Object.assign({}, b, { dubbeltik: true,
+      idem: String(req.get('Idempotency-Key') || b.idem || '').slice(0, 200) || undefined }));
     if (r.ok) logActivity(req.supplier.code, req.actor, 'gaf een ' + r.pas.soort + '-pas uit op ' + r.pas.drager);
     stuur(res, r);
   });
 
-  app.post('/api/festival/pas/intrek', supplierAuth, (req, res) => {
+  // intrekken op pas-id of op de code die de manager voor zich ziet (collectietransactie)
+  app.post('/api/festival/pas/intrek', supplierAuth, async (req, res) => {
     if (!managerOnly(req, res)) return;
     const f = mijn(req);
     if (!f) return stuur(res, geenFestival);
-    const r = festival.pasIntrekken(f.id, editieVan(req), (req.body || {}).code, (req.body || {}).reden);
+    const b = req.body || {};
+    const r = await festival.pasIntrekken(f.id, editieVan(req), b.id || b.code, b.reden);
     if (r.ok) logActivity(req.supplier.code, req.actor, 'trok een pas in');
     stuur(res, r);
   });

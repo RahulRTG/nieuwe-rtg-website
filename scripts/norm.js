@@ -882,6 +882,19 @@ const METERS = [
   { sleutel: 'stilSpoor', richting: 'omlaag', wat: 'spoor-schrijvers waarvan het falen stil wordt weggevangen (STILSPOOR.json)' },
   { sleutel: 'stilleOpslag', richting: 'omlaag', wat: 'opslag-schrijvers waarvan het falen stil wordt weggevangen (STILSPOOR.json)' },
   { sleutel: 'stilSpoorAanroepen', richting: 'omhoog', wat: 'spoor-schrijvers die de stilspoormeter werkelijk heeft gevonden' },
+  /* DE GAST IS TWEE MENSEN (GASTSPLITSING.json, npm run gastsplitsing), stap 5
+     van SAMENLEVING.md par. 12. De schuld omlaag: een weigering die zegt dat een
+     account of profiel volstaat, op een plek die ook het gratis account
+     weigert. Het bereik omhoog: plekken die bezoeker en gratis account al uit
+     elkaar houden. Wie een deur dichtzet voor beide, verhoogt geen van twee --
+     een weigering "voor leden" is een formuleringsvraag en geen tegenspraak. */
+  { sleutel: 'gastTegenspraak', richting: 'omlaag', wat: 'weigeringen die een account beloven terwijl de code ook het gratis account weigert (GASTSPLITSING.json)' },
+  { sleutel: 'gastOnderscheidt', richting: 'omhoog', wat: 'toetsen op de gast die bezoeker en gratis account uit elkaar houden (GASTSPLITSING.json)' },
+  /* GEEN COMMERCIELE DRUK BINNEN DE BODEM (BODEMDRUK.json, npm run bodemdruk),
+     eis 5 van SAMENLEVING.md par. 6. De schuld omlaag, het bereik omhoog: een
+     schuld die daalt doordat de meter minder schermen ziet, is geen vooruitgang. */
+  { sleutel: 'bodemDruk', richting: 'omlaag', wat: 'bodemschermen met een uitnodiging om te betalen (BODEMDRUK.json)' },
+  { sleutel: 'bodemSchermen', richting: 'omhoog', wat: 'schermen die de bodemdrukmeter als bodemscherm heeft gezien (BODEMDRUK.json)' },
   /* DE STEMPELVEILIGHEID (STEMPELVEILIGHEID.json, npm run stempelveiligheid).
      Twee schulden omlaag, het bereik omhoog -- zie de kop bij het register in
      ./lib/metingen.js. Ze dalen door een grendel of een vlag toe te voegen, en
@@ -1736,6 +1749,10 @@ function meet(bronnen) {
     afgeleidMetEigenaar: leesRegister('AFGELEID.json', (j) => j.gemeten.metEigenaar),
     stilleOpslag: leesRegister('STILSPOOR.json', (j) => j.gemeten.opslagGesmoord),
     stilSpoorAanroepen: leesRegister('STILSPOOR.json', (j) => j.gemeten.spoorAanroepen),
+    gastTegenspraak: leesRegister('GASTSPLITSING.json', (j) => j.gemeten.tegenspraak),
+    gastOnderscheidt: leesRegister('GASTSPLITSING.json', (j) => j.gemeten.perSoort.onderscheidt || 0),
+    bodemDruk: leesRegister('BODEMDRUK.json', (j) => j.gemeten.metDruk),
+    bodemSchermen: leesRegister('BODEMDRUK.json', (j) => j.gemeten.schermen),
     stempelOngevraagd: leesRegister('STEMPELVEILIGHEID.json', (j) => j.klassen.KAN_COMMITBEWIJS_ONGELDIG_MAKEN),
     stempelInPoort: leesRegister('STEMPELVEILIGHEID.json', (j) => j.inEenPoort.length),
     stempelSchrijversGezien: leesRegister('STEMPELVEILIGHEID.json', (j) => j.schrijvers),

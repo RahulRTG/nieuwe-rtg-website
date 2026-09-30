@@ -150,7 +150,7 @@ en nooit aan een boolean, en de terugstortstand bepaalt wat `WALLET_SALDO` is.
 **TC-3. Een assistent die iets voorstelt is iets anders dan een assistent die
 iets doet.** `VERTROUWEN.json` staat op <!--getal:vertrouwen.bewezen-->0<!--/getal-->
 bewezen, <!--getal:vertrouwen.geschorst-->0<!--/getal--> geschorst en
-<!--getal:vertrouwen.routes-->4716<!--/getal--> verzwakt: de bewijspoort houdt
+<!--getal:vertrouwen.routes-->5258<!--/getal--> verzwakt: de bewijspoort houdt
 vandaag niets tegen. Een nieuwe handhavingsregel loopt daarom eerst mee zonder te
 blokkeren (`commercie/schaduw.js`) -- je kunt niet afdwingen wat nooit in de
 schaduw heeft gelopen.

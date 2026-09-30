@@ -31,14 +31,14 @@ const { maakLid } = require('./lid');
 const { maakKoppeling } = require('./koppeling');
 const { maakWek } = require('./wek');
 const { maakDoe } = require('./doe');
-const { meet } = require('./meter');
+const { maakConnector } = require('./connector'); // partijen en voorstellen, naast de burgerlus
+const { meet, metVerklaring } = require('./meter');
 const { EINDSTANDEN } = require('./eindstanden');
-const AFHANKELIJK = require('./afhankelijkheden');
-const { BEWIJSSTAND } = require('./bewijsstand');
 
 function maakDemocratie({ db, save, bijeen, inBundel, crypto, meldLid, codenaamVan }) {
   const eigen = require('../eigencollectie')({ db, domein: 'kern/democratie',
-    bezit: { democratieKwesties: 'kaart', democratieJournaal: 'lijst', democratieInbrengers: 'kaart', democratieActies: 'kaart' } });
+    bezit: { democratieKwesties: 'kaart', democratieJournaal: 'lijst', democratieInbrengers: 'kaart', democratieActies: 'kaart',
+      democratiePartijen: 'kaart', democratieVoorstellen: 'kaart' } });
   const vastleggen = require('../../lib/duurzaam')({ bijeen, save, inBundel, bron: 'democratie' });
   const kaart = () => eigen.bak('democratieKwesties');
   const kijk = () => eigen.kijk('democratieKwesties') || {};
@@ -73,7 +73,8 @@ function maakDemocratie({ db, save, bijeen, inBundel, crypto, meldLid, codenaamV
 
   const doe = maakDoe({ kaart: () => eigen.bak('democratieActies'), kijk: () => eigen.kijk('democratieActies') || {},
     zoek, schrijver, koppeling, vastleggen, ontvangersVan, crypto, nu: () => new Date(nu()).toISOString() });
-  const metActies = (v) => Object.assign(v, { acties: doe.opKwestie(v.id) });
+  const { bijKwestie, ...connector } = maakConnector({ eigen, vastleggen, crypto, nu, zoek, schrijver, wie, zonderNaam, betrokken });
+  const metActies = (v) => Object.assign(v, { acties: doe.opKwestie(v.id), voorstellen: bijKwestie(v.id) });
 
   function lijst() {
     const alle = Object.values(kijk()).sort((a, b) => String(a.at).localeCompare(String(b.at)));
@@ -138,10 +139,7 @@ function maakDemocratie({ db, save, bijeen, inBundel, crypto, meldLid, codenaamV
 
   /* De meter zegt er ook bij waar deze laag van RTG afhangt (proef P3): een
      verhuizing begint met weten wat er mee moet. */
-  const meter = () => Object.assign(meet({ kwesties: kijk(), journaal: eigen.kijk('democratieJournaal'), koppeling }),
-    { afhankelijkVanRtg: { modules: Object.keys(AFHANKELIJK.MODULES), geinjecteerd: Object.keys(AFHANKELIJK.GEINJECTEERD),
-      routes: Object.keys(AFHANKELIJK.ROUTES) },
-      bewijsstand: BEWIJSSTAND.map(b => ({ code: b.code, stand: b.stand, wat: b.wat, sluit: b.sluit || null })) });
+  const meter = () => metVerklaring(meet({ kwesties: kijk(), journaal: eigen.kijk('democratieJournaal'), koppeling }));
 
   /* Voor het recht op vergetelheid (kern/vergeten.js): synchroon, binnen de
      vastlegging van wie roept. De kwesties blijven; de weg naar de mens niet. */
@@ -152,7 +150,7 @@ function maakDemocratie({ db, save, bijeen, inBundel, crypto, meldLid, codenaamV
   const mijn = (sleutel) => { const r = lid.mijn(sleutel); r.kwesties.forEach(metActies); return r; };
   const { opKwestie, ...doeLid } = doe;
 
-  return { ...lid, mijn, doe: doeLid, lijst, behandel, sluit, heropen, herbezorg, meter, vergeet };
+  return { ...lid, ...connector, mijn, doe: doeLid, lijst, behandel, sluit, heropen, herbezorg, meter, vergeet };
 }
 
 module.exports = { maakDemocratie };

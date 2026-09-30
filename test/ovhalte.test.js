@@ -34,7 +34,9 @@ function wereld(ritten) {
           { id: 'h-tal', naam: 'Talamanca', lat: 38.915, lng: 1.455 }] }] }],
     ovVoertuigen: [], ovRitten: ritten || [] } };
   const pay = { saldoVan: () => 1e6, laadOp: async () => ({ ok: true }), boekAsync: async () => ({ ok: true }) };
-  const ov = maakOv({ db, save: () => {}, crypto, schoon: (s) => String(s || ''), codenaamVan: k => 'cn-' + k,
+  // de incheckcode leeft sinds #403 in een collectietransactie; hier een in het geheugen
+  const bewerkCollectie = async (naam, werk) => werk(db.data[naam] || (db.data[naam] = {}));
+  const ov = maakOv({ db, save: () => {}, crypto, bewerkCollectie, schoon: (s) => String(s || ''), codenaamVan: k => 'cn-' + k,
     haversine, etaMinutes, pay, notify: () => {} });
   return { db, ov };
 }

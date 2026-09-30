@@ -100,7 +100,7 @@ module.exports = (kern) => {
         const antwoord = { pakte: true, plafond: plafondTrede, spoor: lus.spoor,
           antwoord: lus.tekst, gedaan: lus.acties.some(a => a.status < 400), stuur: lus.acties,
           goedkeuringen: lus.acties.filter(a => a.goedkeuring).map(a => a.goedkeuring),
-          goedkeuringWereld: 'member',
+          goedkeuringWereld: 'member', staving: lus.staving,
           aiBeschikbaar: true, modus: stand.modus, verwerking: stand.verwerking, kompas: stand.kompas,
           uitgevoerd: require('../../ai-stand').uitgevoerd() };
         antwoord.liveTwin = maakLiveTwin({ vraag: req.body.q, context: req.body.context, wereld: 'member',

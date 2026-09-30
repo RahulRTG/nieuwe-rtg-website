@@ -14,10 +14,20 @@
       return !el.matches(overlays) && !el.className.toString().startsWith('rtg-edge-') && !el.className.toString().startsWith('rtg-adaptive-');
     });
     d.body.insertBefore(surface, nodes[0] || null);
-    nodes.forEach(function (el) { surface.appendChild(el); });
+    nodes.forEach(function (el) { move(surface, el); });
     var canvas = w.RTGHeritageRegistry && w.RTGHeritageRegistry.canvas[w.location.pathname];
     if (canvas && nodes.some(function (el) { return el.matches(canvas); })) surface.dataset.rtgCanvasSurface = 'true';
     return surface;
+  }
+  /* Verhuizen zonder herladen. Een gewone appendChild haalt een element los en
+     zet het terug, en een <iframe> laadt dan opnieuw: de surfaces van de
+     werkruimte laadden daardoor twee keer en verloren hun stand. moveBefore()
+     verhuist atomisch; waar hij ontbreekt blijft het de gewone verhuizing. */
+  function move(parent, node, before) {
+    if (parent.moveBefore && node.isConnected && parent.isConnected) {
+      try { parent.moveBefore(node, before || null); return node; } catch (e) {}
+    }
+    return parent.insertBefore(node, before || null);
   }
   function guard(root, home) {
     var locked = false, oldHidden = false;
@@ -64,5 +74,5 @@
     watch.observe(d.body, { childList:true });
     sync(); w.addEventListener('pagehide', function () { watch.disconnect(); });
   }
-  w.RTGDesktopSurface = { prepare: prepare, guard: guard };
+  w.RTGDesktopSurface = { prepare: prepare, guard: guard, move: move };
 })(window, document);

@@ -29,15 +29,12 @@
        bewijs:    { gemeten: '...', op: '...' }
      }
 
-   HIJ IS MET OPZET BIJNA LEEG. Er staan 4653 schrijfroutes tegenover, en dat
-   verschil is de eerlijke stand van zaken: dit huis weet van bijna geen enkele
-   route formeel wat een tweede aanroep hoort te doen. Elke regel die hier
-   bijkomt, is er een die iemand heeft nagekeken -- niet een die een script heeft
-   geraden. Het register vult zich dus langzaam, en dat is de bedoeling.
+   Domeinmodules hieronder dragen de afzonderlijke contracten en hun bewijs.
    ========================================================================== */
 'use strict';
 
 const CONTRACTEN = Object.assign({},
+  require('./mutatiecontracten-mall-aanvraag').CONTRACTEN,
   require('./mutatiecontracten-beelden').CONTRACTEN,
   require('./mutatiecontracten-document').CONTRACTEN,
   require('./mutatiecontracten-storingen').CONTRACTEN,
@@ -95,16 +92,19 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-vracht').CONTRACTEN,
   require('./mutatiecontracten-rtgid').CONTRACTEN,
   require('./mutatiecontracten-salon').CONTRACTEN,
-  require('./mutatiecontracten-codes').CONTRACTEN,
+  require('./mutatiecontracten-codefamilie').CONTRACTEN, // B9, B11, B12, B14
+  require('./mutatiecontracten-restdeuren').CONTRACTEN,
+  require('./mutatiecontracten-codedeuren').CONTRACTEN,
+  require('./mutatiecontracten-lesfamilie').CONTRACTEN,
+  require('./mutatiecontracten-werksleutels').CONTRACTEN,
+  require('./mutatiecontracten-machinesleutels').CONTRACTEN,
+  require('./mutatiecontracten-ssogeheim').CONTRACTEN,
   require('./mutatiecontracten-muziekfeed').CONTRACTEN,
   require('./mutatiecontracten-hardening-checkpoint').CONTRACTEN,
   require('./mutatiecontracten-beschermzaak').CONTRACTEN,
   require('./mutatiecontracten-neiging').CONTRACTEN,
   require('./mutatiecontracten-knelpunt').CONTRACTEN,
-  require('./mutatiecontracten-connect').CONTRACTEN,
-  require('./mutatiecontracten-connect2').CONTRACTEN,
-  require('./mutatiecontracten-connect3').CONTRACTEN,
-  require('./mutatiecontracten-connect4').CONTRACTEN,
+  require('./mutatiecontracten-connectdelen').CONTRACTEN,
   /* De naleesronde van 13 september 2026 -- zie de kop van het eerste bestand. */
   require('./mutatiecontracten-naleesronde').CONTRACTEN,
   require('./mutatiecontracten-naleesronde-b').CONTRACTEN,
@@ -137,20 +137,16 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-afstemming').CONTRACTEN,
   require('./mutatiecontracten-wonen').CONTRACTEN,
   require('./mutatiecontracten-project-room').CONTRACTEN,
-  /* De zware poort: drie ceremonieloketten, alle drie met opzet niet
-     herhaalbaar. Eigen bestand, zie de kop daar. */
+  // de zware poort: drie ceremonieloketten, met opzet niet herhaalbaar
   require('./mutatiecontracten-zwaar').CONTRACTEN,
   /* Het eigenaarsherstel: zeven routes, per stuk beantwoord of een herhaling
      een ander antwoord krijgt. Eigen bestand, zie de kop daar. */
   require('./mutatiecontracten-herstel').CONTRACTEN,
-  /* Het kantoor aan het stuur, uitsluitend op tonen (besluit C2). Zie de kop. */
   require('./mutatiecontracten-kantoorstuur').CONTRACTEN,
-  /* Van een betaalde pas naar gast (besluit C5). Zie de kop. */
+  require('./mutatiecontracten-rtgboek').CONTRACTEN,
   require('./mutatiecontracten-naargast').CONTRACTEN,
   /* De zevenenveertig die uit de afleidgang vielen toen die een grens erbij
-     kreeg, met de hand gelezen op 13 september 2026. Drie bestanden omdat ze
-     drie verschillende dingen bleken: lezers, lezers-met-een-seeder, en wat
-     geen lezer was. Zie de kop van het eerste. */
+     kreeg, met de hand gelezen op 13 september 2026 (zie de kop van de eerste). */
   require('./mutatiecontracten-afleidrest').CONTRACTEN,
   require('./mutatiecontracten-afleidrest-b').CONTRACTEN,
   require('./mutatiecontracten-afleidrest-c').CONTRACTEN,

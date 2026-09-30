@@ -37,6 +37,7 @@ const GEEN_METING = new Set([
   'package.json', 'package-lock.json',
   'NORM.json',              // de ratel zelf; die wordt door normverval.js bewaakt
   'LANDEN.json',            // landpakketten: welke munt, welke voertaal -- gegevens
+  'KENNISINDEX.json',       // de documenten opgeknipt voor de registerblik -- tekst, geen getal
   /* TOETSDUUR.json draagt hoe lang elk toetsbestand duurde. Dat is een
      PLANNINGSgetal en geen kwaliteitsgetal: een toets die langzamer wordt is
      niet slechter, en een die sneller wordt niet beter. Het bestand voedt de
@@ -131,6 +132,11 @@ const REGISTER = {
   'AICONTEXT.json': { meter: ['aiContextLek', 'aiContextVeldenGezien'] },
   /* Het stilspoorregister draagt twee schulden en een bereikmeter. */
   'STILSPOOR.json': { meter: ['stilSpoor', 'stilleOpslag', 'stilSpoorAanroepen'] },
+  /* De gast als twee mensen (SAMENLEVING.md stap 5): de tegenspraak omlaag, het
+     onderscheid omhoog. */
+  'GASTSPLITSING.json': { meter: ['gastTegenspraak', 'gastOnderscheidt'] },
+  /* Geen commerciele druk binnen de bodem (SAMENLEVING.md par. 6, eis 5). */
+  'BODEMDRUK.json': { meter: ['bodemDruk', 'bodemSchermen'] },
   /* MAGNAATGRONDWET.json (npm run magnaat:grondwet -- --vastleggen) is de
      bevroren nulstand van de Magnaat-grondwet (MAGNAAT.md). De ratel woont in
      de toets en is vierledig: niet meer schendingen, niet minder PASS of

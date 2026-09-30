@@ -34,21 +34,9 @@ const PAS_SOORTEN = ['gast', 'crew', 'artiest', 'leverancier', 'pers'];
 module.exports = (ctx) => {
   const { save, crypto, schoon, editieVind, dagVind, offset, plekVind } = ctx;
 
-  /* TIEN TEKENS, EN DAT IS EEN VEILIGHEIDSKEUZE. Een pas is een toonder-
-     credential: wie de code heeft, komt binnen. De zes tekens van
-     util.entreeCode() (32^6, een miljard) zijn genoeg voor een museumticket
-     maar niet voor een terrein waar een geldige code een weekend lang geld
-     waard is. Tien tekens maakt raden zinloos (32^10) en houdt hem voorleesbaar,
-     want het alfabet mist al de 0/O en 1/I. */
-  const LEESBAAR = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  function nieuweCode(e) {
-    for (let poging = 0; poging < 8; poging++) {
-      let c = '';
-      for (let i = 0; i < 10; i++) c += LEESBAAR[crypto.randomInt(LEESBAAR.length)];
-      if (!Object.values(e.passen || {}).some(p => p.code === c)) return c;
-    }
-    return null;
-  }
+  /* De CODE van een pas woont in ./pas-toegang.js: 128 bits, hash-only,
+     eenmalig getoond, en geclaimd in een collectietransactie. */
+  const pt = require('./pas-toegang')(ctx);
 
   /* ---------- een recht nakijken ----------
      Geeft een schoongemaakt recht terug, of { error }. */
@@ -113,31 +101,58 @@ module.exports = (ctx) => {
     } else {
       return { status: 400, error: 'Geef een product of losse rechten mee.' };
     }
-    const code = nieuweCode(e);
-    if (!code) return { status: 500, error: 'Kon geen vrije pascode maken.' };
-    const pas = { id: 'pas' + crypto.randomBytes(5).toString('hex'), code, drager, soort,
-      product: d.productId ? String(d.productId) : null, rechten, ingetrokken: false,
-      scans: [], at: new Date().toISOString() };
+    /* De handmatige uitgifte staat buiten elke antwoordcache (de code staat
+       erin). Een herhaling met dezelfde sleutel, of dezelfde pas binnen vijf
+       seconden (dubbeltik), maakt dus geen tweede pas: 409 zonder code. */
+    const tik = d.dubbeltik ? pt.afdruk(JSON.stringify([eid, drager, soort, rechten, d.productId || null, d.idem || ''])) : null;
+    const eerder = tik && Object.values(e.passen || {}).find(p => p.uitgifte && p.uitgifte.tik === tik &&
+      (d.idem || Date.now() - Date.parse(p.at) < 5000));
+    if (eerder) return { status: 409, herhaald: true, pas: pt.beeld(eerder),
+      error: 'Deze pas is al uitgegeven en de code wordt niet opnieuw getoond. Trek hem in en geef een nieuwe uit als hij niet is aangekomen.' };
+    const pas = { id: 'pas' + crypto.randomBytes(5).toString('hex'), drager, soort, uitgifte: tik ? { tik } : undefined,
+      product: d.productId ? String(d.productId) : (d.product ? schoon(d.product, 60) : null),
+      rechten, ingetrokken: false, toegang: null, scans: [], at: new Date().toISOString() };
+    const code = pt.geef(e, pas, d.issuer === 'verkoop' ? 'rtg.festival.verkoop' : 'rtg.festival.organisator');
     e.passen[pas.id] = pas;
     save();
-    return { ok: true, pas };
+    // de kale code staat alleen in dit antwoord; op de pas staat de hash
+    return { ok: true, eenmalig: true, pas: Object.assign(pt.beeld(pas), { code }) };
   }
 
-  const pasOpCode = (e, code) => Object.values(e.passen || {})
-    .find(p => p.code === String(code || '').trim().toUpperCase()) || null;
+  const pasOpCode = pt.opCode;
 
-  function pasIntrekken(fid, eid, code, reden) {
-    const e = editieVind(fid, eid);
-    if (!e) return { status: 404, error: 'Deze editie bestaat niet.' };
-    const p = pasOpCode(e, code);
-    if (!p) return { status: 404, error: 'Deze code hoort niet bij deze editie.' };
-    p.ingetrokken = true;
-    p.redenIntrekking = schoon(reden, 120) || null;
-    save();
-    return { ok: true, pas: p };
+  /* Intrekken op pas-id (de organisator heeft de code niet meer) of op de
+     code die hij voor zich ziet; in de collectietransactie, dus nooit half
+     tegen een scan in. */
+  function pasIntrekken(fid, eid, idOfCode, reden) {
+    return pt.transactie(bron => {
+      const e = pt.editieIn(bron, fid, eid);
+      if (!e) return { status: 404, error: 'Deze editie bestaat niet.' };
+      const x = String(idOfCode || '').trim();
+      const p = (e.passen || {})[x] || pasOpCode(e, x);
+      if (!p) return { status: 404, error: 'Deze pas hoort niet bij deze editie.' };
+      p.ingetrokken = true;
+      p.redenIntrekking = schoon(reden, 120) || null;
+      pt.trekIn(p, 'organisator', p.redenIntrekking || 'ingetrokken');
+      return { ok: true, pas: pt.beeld(p) };
+    });
   }
 
-  return { pasUitgeven, pasIntrekken, pasOpCode, keurRecht, PAS_SOORTEN };
+  /* De drager toont zijn eigen pas: dat IS roteren. `wie` komt uit de sessie. */
+  function pasToon(fid, eid, wie, id) {
+    const drager = schoon(wie, 60);
+    return pt.transactie(bron => {
+      const e = pt.editieIn(bron, fid, eid);
+      const p = e && (e.passen || {})[String(id || '')];
+      if (!p || !drager || p.drager !== drager) return { status: 404, error: 'Deze pas kennen wij niet.' };
+      if (p.ingetrokken) return { status: 409, error: 'Deze pas is ingetrokken.' };
+      const code = pt.geef(e, p, 'rtg.lid.festivalpas');
+      return { ok: true, eenmalig: true, code, pas: pt.beeld(p) };
+    });
+  }
+
+  return { pasUitgeven, pasIntrekken, pasToon, pasOpCode, pasReden: pt.reden, pasTelBinnen: pt.telBinnen,
+    pasBeeld: pt.beeld, pasTransactie: pt.transactie, pasEditieIn: pt.editieIn, keurRecht, PAS_SOORTEN };
 };
 
 module.exports.PAS_SOORTEN = PAS_SOORTEN;

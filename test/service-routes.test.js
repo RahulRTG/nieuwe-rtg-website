@@ -168,7 +168,11 @@ test('het lid: de keuzes noemen zijn mens, en weigeren maakt de terugvalcode waa
     const wacht = await o.p('/api/service/bevestigingen', {}, o.lid);
     assert.equal(wacht.body.verzoeken.length, 1, 'er stond niets klaar in de app');
     const verzoek = wacht.body.verzoeken[0];
-    assert.match(String(verzoek.code), /^\d{6}$/);
+    assert.equal(verzoek.code, undefined, 'de lijst in de app draagt geen code: die vraagt het lid apart op');
+    const getoond = await o.p('/api/service/bevestiging/toon', { id: verzoek.id }, o.lid);
+    assert.equal(getoond.status, 200, JSON.stringify(getoond.body).slice(0, 200));
+    assert.match(String(getoond.body.code), /^\d{6}$/);
+    verzoek.code = getoond.body.code;
 
     /* Een ander lid kan het verzoek niet weigeren: het staat op naam. */
     const ander = await lidMet(o.p, 'Ander Lid', 'anderlid@x.nl', '0612340018');
@@ -187,7 +191,7 @@ test('het lid: de keuzes noemen zijn mens, en weigeren maakt de terugvalcode waa
     assert.match(String(alsnog.body.error), /geweigerd/);
     const leeg = await o.p('/api/service/bevestigingen', {}, o.lid);
     assert.equal(leeg.body.verzoeken.length, 0, 'een geweigerd verzoek bleef in de app staan');
-    const dood = await o.p('/api/office/service/bevestiging/code', { code: verzoek.code }, o.balie);
+    const dood = await o.p('/api/office/service/bevestiging/code', { id: z.id, code: verzoek.code }, o.balie);
     assert.equal(dood.status, 404, 'de code van een geweigerd verzoek opende iets: ' + JSON.stringify(dood.body).slice(0, 160));
     const niets = await o.p('/api/office/service/machtigingen', {}, o.balie);
     assert.equal(niets.body.tel.totaal, 0, 'er ontstond een machtiging zonder dat het lid iets bevestigde');
@@ -198,14 +202,16 @@ test('het lid: de keuzes noemen zijn mens, en weigeren maakt de terugvalcode waa
       { id: z.id, capabilities: ['organisatie.stand'], reden: REDEN }, o.balie);
     assert.equal(v2.status, 200, JSON.stringify(v2.body).slice(0, 200));
     assert.notEqual(v2.body.bevestiging.id, verzoek.id, 'het geweigerde verzoek werd hergebruikt');
-    const code2 = (await o.p('/api/service/bevestigingen', {}, o.lid)).body.verzoeken[0].code;
-    const kort = await o.p('/api/office/service/bevestiging/code', { code: 'abc' }, o.balie);
+    const code2 = (await o.p('/api/service/bevestiging/toon', { id: v2.body.bevestiging.id }, o.lid)).body.code;
+    const kort = await o.p('/api/office/service/bevestiging/code', { id: z.id, code: 'abc' }, o.balie);
     assert.equal(kort.status, 400, 'iets anders dan zes cijfers werd als code aangenomen');
-    const open = await o.p('/api/office/service/bevestiging/code', { code: code2 }, o.balie);
+    const zonderZaak = await o.p('/api/office/service/bevestiging/code', { code: code2 }, o.balie);
+    assert.equal(zonderZaak.status, 400, 'de code werkte zonder dat de medewerker de zaak noemde');
+    const open = await o.p('/api/office/service/bevestiging/code', { id: z.id, code: code2 }, o.balie);
     assert.equal(open.status, 200, JSON.stringify(open.body).slice(0, 200));
     assert.deepEqual(open.body.machtiging.capabilities, ['organisatie.stand']);
     assert.equal(open.body.bevestiging.via, 'code');
-    const nogEens = await o.p('/api/office/service/bevestiging/code', { code: code2 }, o.balie);
+    const nogEens = await o.p('/api/office/service/bevestiging/code', { id: z.id, code: code2 }, o.balie);
     assert.equal(nogEens.status, 404, 'de code werkte een tweede keer');
 
     /* En intrekken: de machtiging bestaat nog (voor het journaal), maar geldt

@@ -130,6 +130,8 @@ const REGISTERS = [
      bot zonder dat iemand het merkt. */
   ['AICONTEXT.json', 'npm run aicontext:vast', 'welke velden van een lid in de system prompt van Rahul terechtkomen'],
   ['STILSPOOR.json', 'npm run stilspoor:vast', 'schrijfacties waarvan het falen stil wordt weggevangen (LAT.md regel 21)'],
+  ['GASTSPLITSING.json', 'npm run gastsplitsing:vast', 'toetsen op de gast: bezoeker en gratis account, en wat de weigering belooft (SAMENLEVING.md stap 5)'],
+  ['BODEMDRUK.json', 'npm run bodemdruk:vast', 'bodemschermen met een uitnodiging om te betalen (SAMENLEVING.md par. 6, eis 5)'],
   ['STEMPELVEILIGHEID.json', 'npm run stempelveiligheid:vast', 'welke generatoren repo-waarheid kunnen wegschrijven die niemand vroeg'],
   ['STILLEZING.json', 'npm run stillezing:vast', 'lezers die een onleesbaar bewijs als een afwezig bewijs behandelen (BEWIJSMACHINE.md par. 6b)'],
   ['AFGELEID.json', 'npm run afgeleid:vast', 'welk artefact bron is en welk afgeleid, en wie het opnieuw mag afleiden'],

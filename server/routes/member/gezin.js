@@ -22,10 +22,10 @@ module.exports = (kern) => {
     res.json({ ok: true, gezinNaam: r.gezinNaam, profielNaam: r.profielNaam, tierNaam: r.tierNaam });
   });
 
-  app.post('/api/rtf/uitnodiging/accepteer', auth, (req, res) => {
+  app.post('/api/rtf/uitnodiging/accepteer', auth, async (req, res) => {
     if (!eisAccount(req, res)) return;
     const u = req.session.account;
-    const r = rtf.accepteerGast({ uitnodiging:req.body.uitnodiging, userId:u.id,
+    const r = await rtf.accepteerGast({ uitnodiging:req.body.uitnodiging, userId:u.id,
       tier:u.tier, codenaam:u.codename });
     if (r.error) return res.status(r.status || 400).json({ error:r.error });
     res.json(r);

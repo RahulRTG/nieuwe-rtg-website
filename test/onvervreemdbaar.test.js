@@ -26,6 +26,7 @@ const { WERKWOORDEN, VERKLARING, AFGETEKEND } = require('../scripts/lib/onvervre
 const { klasseRoute, klasseFunctie, klasseWerkwoord } = require('../scripts/onvervreemdbaar');
 const { FUNCTIES } = require('../server/functies/register');
 const bron = fs.readFileSync(path.join(WORTEL, 'scripts', 'onvervreemdbaar.js'), 'utf8');
+const accountBron = fs.readFileSync(path.join(WORTEL, 'scripts', 'lib', 'gratisaccount.js'), 'utf8');
 const meting = JSON.parse(fs.readFileSync(path.join(WORTEL, 'ONVERVREEMDBAAR.json'), 'utf8'));
 
 test('1. de verklaring kent precies de zeven werkwoorden van SAMENLEVING.md par. 2', () => {
@@ -88,8 +89,10 @@ test('4. de classificatie per route, functie en werkwoord', () => {
 });
 
 test('5. "gratis" is een geregistreerd account en niet de demo-gast zonder account', () => {
-  assert.match(bron, /\/api\/auth\/register/);
-  assert.match(bron, /tier: 'guest'/);
+  assert.match(bron, /require\('\.\/lib\/gratisaccount'\)/, 'het gratis account komt niet meer uit de gedeelde registratie');
+  assert.match(accountBron, /\/api\/auth\/register/);
+  assert.match(accountBron, /tier: 'guest'/);
+  assert.match(accountBron, /gebruiker\.tier === 'guest'/, 'een registratie die geen gast-account opleverde, telt als gratis account');
   assert.match(bron, /const gratisKop = \{ Authorization: 'Bearer ' \+ gratisAccount\.token \}/);
   assert.match(bron, /keurLidGoed\(srv\.basis, gratisAccount\.token/, 'het oordeel hoort op een GECONTROLEERD gratis account te staan');
   assert.match(bron, /klop\(srv\.basis, r, gratisKop\)/,

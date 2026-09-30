@@ -33,7 +33,7 @@ module.exports = [
      VOOR de brede regel voor /api/office hieronder, anders valt de helft bij
      Intern & IT. Het scherm Mijn leerhuis hoort in dezelfde kamer. Een eigen
      kamer "Academy" is er niet; die is een besluit. */
-  [/(?:^|\s)\/(?:api\/(?:office\/)?leerhuis|apps\/leerhuis\.html)(?:\/|\s|$)/, 'hr', 'HR'],
+  [/(?:^|\s)\/(?:api\/(?:office\/)?leerhuis|apps\/leerhuis(?:-werk)?\.html)(?:\/|\s|$)/, 'hr', 'HR'],
   /* DE TENANT CONTROL PLANE, van main overgenomen op 25 augustus 2026. Deze twee
      regels stonden alleen in main's kopie van deze tabel; bij de samenvoeging is
      onze kopie gehouden (identieke inhoud, betere vorm) en vielen ze weg. Zeven
@@ -59,6 +59,10 @@ module.exports = [
   [/office\/(?:aidata)|\/belastingkantoor|\/loonstrook/, 'financien', 'Financiën'],
   /* het boek van RTG zelf (kern/rtgboek.js, besluit C8): Financien vult het in zijn eigen kamer */
   [/office\/rtgboek(?:\/|$)/, 'financien', 'Financiën'],
+  // de campagnes van RTG (kern/rtgcampagne.js, besluit C12): hetzelfde kantoor
+  [/office\/rtgcampagne(?:\/|$)/, 'financien', 'Financiën'],
+  // de cadeaubon van RTG (kern/cadeaubon.js, besluit C14): de e-geldpositie hoort bij de bank
+  [/office\/cadeaubon(?:\/|$)/, 'bank', 'RTG Rekening'],
   [/office\/wereld|\/wereld\b/, 'controleregister', 'RTG Controleregister'],
   /* VOOGDIJ EN RUGDEKKING STAAN HIER EN NIET IN ./tabel-lid.js, en dat is de
      regel "smal gaat voor breed" -- alleen op deze plek werkt hij ook.

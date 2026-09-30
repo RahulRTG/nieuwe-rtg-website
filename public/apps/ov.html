@@ -77,6 +77,8 @@
   .codeScherm{position:fixed;inset:0;background:#0C0C0B;display:none;flex-direction:column;align-items:center;
     justify-content:center;gap:1.2rem;z-index:50;}
   .codeScherm.zien{display:flex;}
+  .codeScherm .codeQr{width:min(70vw,300px);height:auto;border-radius:0;background:#fff;padding:0.6rem;}
+  .codeScherm .codeTekst{font-family:'Bodoni Moda',serif;letter-spacing:0.1em;word-break:break-all;max-width:90vw;text-align:center;}
   .codeScherm .code{font-family:'Bodoni Moda',serif;font-size:3.4rem;letter-spacing:0.35em;padding-left:0.35em;
     color:#0C0C0B;background:var(--gold);border-radius:0;padding:1rem 1.4rem;
     box-shadow:0 0 60px rgba(201,162,75,0.65), 0 0 140px rgba(201,162,75,0.35);}
@@ -261,7 +263,7 @@
       <div class="snel">
         <button id="knopCode" type="button">
           <span class="i" id="icoonCode" aria-hidden="true"></span>Oplichtende code
-          <span class="sub">Tonen; het personeel tikt hem in</span>
+          <span class="sub">Tonen; het personeel scant hem</span>
         </button>
         <button id="knopGps" type="button">
           <span class="i" id="icoonGps" aria-hidden="true"></span>E&eacute;n tik
@@ -326,8 +328,9 @@
 </main>
 
 <div class="codeScherm" id="codeScherm" role="dialog" aria-label="Uw incheckcode">
-  <p class="stil">Toon dit scherm; het personeel tikt de code in.</p>
-  <div class="code" id="codeTekst" aria-live="polite"></div>
+  <p class="stil" id="codeZaak">Toon dit scherm; het personeel scant de code.</p>
+  <img id="codeQr" alt="QR-code om in te checken" class="codeQr" hidden>
+  <p class="stil codeTekst" id="codeTekst" aria-live="polite"></p>
   <p class="stil" id="codeTijd"></p>
   <button class="knop" id="codeDicht" type="button">Sluiten</button>
 </div>
@@ -804,10 +807,18 @@
 
   /* ---- snelle optie 1: de oplichtende code ---- */
   let codeTimer;
+  /* De code geldt alleen bij de vervoerder van de dichtstbijzijnde lijn; die
+     staat erbij, zodat het lid ziet bij wie hij incheckt. */
   $('#knopCode').addEventListener('click', async () => {
-    const r = await api('code');
+    const lijn = nabij[0];
+    if (!lijn) return zeg('Er rijdt hier geen lijn; inchecken met een code kan niet.');
+    const r = await api('code', { zaak: lijn.code });
     if (r.body.error) return zeg(r.body.error);
+    $('#codeZaak').textContent = 'Geldig bij ' + lijn.zaak + '. Het personeel scant de code.';
     $('#codeTekst').textContent = r.body.code;
+    const qr = $('#codeQr');
+    qr.hidden = true;
+    try { if (window.RTGQRteken) { qr.src = RTGQRteken.dataURL(r.body.code, { schaal: 6, quiet: 3 }); qr.hidden = false; } } catch (e) {}
     $('#codeScherm').classList.add('zien');
     let over = r.body.geldigS;
     clearInterval(codeTimer);
@@ -819,7 +830,8 @@
       if (over % 3 === 0) api('mijn').then(m => { if (m.body.rit) { clearInterval(codeTimer); $('#codeScherm').classList.remove('zien'); zeg('Ingecheckt. Goede reis.'); verversOv(); } });
     }, 1000);
   });
-  $('#codeDicht').addEventListener('click', () => { clearInterval(codeTimer); $('#codeScherm').classList.remove('zien'); });
+  // sluiten trekt de code op de server in: een foto van het scherm opent daarna niets
+  $('#codeDicht').addEventListener('click', () => { clearInterval(codeTimer); $('#codeScherm').classList.remove('zien'); api('code/intrek'); });
 
   /* ---- snelle optie 2: een tik op GPS ---- */
   $('#knopGps').addEventListener('click', async () => {

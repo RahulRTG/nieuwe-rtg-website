@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'b5910e8c';
+var RTG_BOUW = 'f0f5b40c';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -4212,6 +4212,12 @@ var RTG_BOUW = 'b5910e8c';
     { sleutel: 'map-rtg', naam: 'LivingOS', wereld: '/apps/rtg.html', glyf: 'rtg', items: [
       'link:vooruitzicht', 'link:vandaag', 'link:leven', 'link:sociaal',
       'link:geldcommand', 'link:mediaos',
+    /* RTG VEILIG STOND ONDER INSTELLINGEN, en daarmee ook de rust (Thuisrust is
+       een stand van deze app). SAMENLEVING.md par. 6 noemde precies dat het
+       gebrek: rust was alleen te vinden voor wie haar al zocht. Besluit van 29
+       september 2026: de hele app hierheen, want stilte, een codewoord en een
+       thuiswacht gaan over iemands dag en niet over het systeem. */
+      'link:veilig',
     /* HET GEZIN KOMT UIT FOUNDATIONOS HIERHEEN, en dat is het eigendomsprincipe
        van WERELDEN.md in de praktijk: de bouwer van een capability bepaalt niet
        in welke wereld hij hoort, de gebruikerscontext doet dat. RTF Mini, Kids,
@@ -4267,7 +4273,7 @@ var RTG_BOUW = 'b5910e8c';
        in de voet. Vandaar `paneel`: geen vijfde wereldtegel, geen tweede
        instellingenscherm. wereldBij() in 29c filtert deze map er vanzelf uit. */
     { sleutel: 'map-instellingen', naam: 'Instellingen', paneel: '#osCcBtn', items: [
-      'link:ik', 'link:verificatie', 'link:veilig', 'link:passkeys', 'link:bescherming',
+      'link:ik', 'link:verificatie', 'link:passkeys', 'link:bescherming',
       'link:sessies', 'link:relaties', 'link:gegevens', 'link:neigingen', 'link:post', 'link:juridisch'] },
     /* WORKOS IS EEN CONTEXT EN GEEN PRODUCT MET EEN PRIJS. De naam ging van
        "RTG Kantoor" naar WorkOS omdat er twee verschillende toegangsmodellen in
@@ -6736,7 +6742,7 @@ var RTG_BOUW = 'b5910e8c';
     // lopende bezorgingen van deze winkel
     const bez = (menuState.modeBezorg || []).filter(b => b.supplierName === r.supplier.name && !['afgeleverd','retour','geannuleerd'].includes(b.status));
     if (bez.length) html += bez.map(b => '<div style="background:var(--card);border:1px solid var(--gold);border-radius:0;padding:0.7rem 0.9rem;margin-bottom:0.7rem;"><div style="font-size:0.7rem;color:var(--rtg-leesgoud,var(--gold));letter-spacing:0.08em;text-transform:uppercase;">' + T('mb.onderweg','Bezorging') + ' · ' + esc(b.status) + '</div>' +
-      '<div style="font-size:0.85rem;margin-top:0.3rem;">' + T('mb.code','Bezorgcode') + ': <b style="letter-spacing:0.2em;font-size:1.05rem;">' + esc(b.bezorgcode) + '</b></div>' +
+      '<button data-mbcode="' + esc(b.ref) + '" style="margin-top:0.4rem;background:none;border:1px solid var(--gold);color:inherit;border-radius:0;padding:0.35rem 0.7rem;font-family:inherit;cursor:pointer;">' + T('mb.toon','Nieuwe bezorgcode') + '</button>' +
       '<div style="font-size:0.68rem;color:var(--soft);margin-top:0.2rem;">' + (b.koerier ? T('mb.koerieris','Koerier') + ': ' + esc(b.koerier) + (b.etaMin != null ? ' · ETA ' + b.etaMin + ' min' : '') : T('mb.geefcode','Geef deze code alleen aan de RTG-koerier aan de deur.')) + '</div></div>').join('');
     const styling = (mijn.styling || []).filter(v => v.supplierName === r.supplier.name);
     if (styling.length) html += styling.map(v => '<div style="background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.7rem 0.9rem;margin-bottom:0.7rem;"><div style="font-size:0.7rem;color:var(--rtg-leesgoud,var(--gold));letter-spacing:0.08em;text-transform:uppercase;">' + esc(v.titel) + '</div>' +
@@ -6781,11 +6787,18 @@ var RTG_BOUW = 'b5910e8c';
       if (!adres || !adres.trim()) return;
       try {
         const r = await API.call('/mode/bezorg/aanvraag', { supplierCode: code, adres: adres.trim(), items });
-        toast('' + T('mb.aangevraagd','Bezorging aangevraagd. Bezorgcode:') + ' ' + r.bezorging.bezorgcode);
+        // de bezorgcode komt uit een eigen uitgifte (eenmalig getoond), niet uit de aanvraag
+        const c = await API.call('/mode/bezorg/code', { ref: r.bezorging.ref });
+        toast('' + T('mb.aangevraagd','Bezorging aangevraagd. Bezorgcode:') + ' ' + c.bezorgcode);
         try { menuState.modeBezorg = (await API.call('/mode/bezorg/mijn', {})).bezorgingen || []; } catch(e){}
         renderMenuSheet();
       } catch(e){ toast(e.message); }
     });
+    // de bezorgcode staat alleen in dit antwoord; een nieuwe maakt de vorige ongeldig
+    document.querySelectorAll('[data-mbcode]').forEach(b => b.addEventListener('click', async () => {
+      try { const r = await API.call('/mode/bezorg/code', { ref: b.dataset.mbcode }); b.textContent = T('mb.code','Bezorgcode') + ': ' + r.bezorgcode; }
+      catch(e){ toast(e.message); }
+    }));
     document.querySelectorAll('[data-rfav]').forEach(b => b.addEventListener('click', async () => {
       try {
         const d = await API.call('/retail/wishlist', { code, artikelId: b.dataset.rfav });
@@ -7471,7 +7484,7 @@ var RTG_BOUW = 'b5910e8c';
     box.style.display='';
     let kan; try{ kan=await API.call('/rtf/kanaal',{ code:g[0].code }); }catch(e){ box.innerHTML='<div class="meta">Chat is nu niet beschikbaar.</div>'; return; }
     if (!grtInit && window.GezinRT){ GezinRT.init({ base:'/api/foundation', code:kan.code, token:kan.token, mijnId:kan.profielId, mijnNaam:'ik', leden:kan.leden, onChat:onGrtChat }); grtInit=true; }
-    else if (window.GezinRT){ GezinRT.setLeden(kan.leden); }
+    else if (window.GezinRT){ GezinRT.setLeden(kan.leden); if (GezinRT.setToken) GezinRT.setToken(kan.token); }
     let chats=[]; try{ chats=(await GezinRT.chats()).chats||[]; }catch(e){}
     const byId={}; chats.forEach(c=> byId[c.id]=c);
 /* het gezinsblok: chatten en bellen met het gezin */

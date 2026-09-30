@@ -67,7 +67,8 @@ module.exports = (ctx) => {
     for (const v of voorstel.slice(0, 5000)) {
       const r = uitnodigingNieuw(door, { entiteit: entiteitId, vestiging: v.vestiging,
         afdeling: v.afdeling, rol: v.rol, contact: v.contact, kanaal: 'bulk', van: v.van });
-      if (r.ok) uit.push(r.uitnodiging); else mislukt.push({ contact: v.contact, error: r.error });
+      // de kale code staat alleen in DIT antwoord; het overzicht draagt hem nooit
+      if (r.ok) uit.push(Object.assign({}, r.uitnodiging, { code: r.code })); else mislukt.push({ contact: v.contact, error: r.error });
     }
     return { ok: true, verstuurd: uit.length, mislukt, uitnodigingen: uit };
   }

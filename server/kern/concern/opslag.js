@@ -75,6 +75,7 @@ module.exports = function maakOpslag({ db }) {
   /* De wortel zelf, aangemaakt als hij er niet is. Alleen ./verandering.js
      heeft hem nodig; alle andere lagen gaan door tak(). */
   function wortel() {
+    if (actief) return actief;
     const huidig = db.data[WORTEL];
     if (!huidig || typeof huidig !== 'object' || Array.isArray(huidig)) db.data[WORTEL] = {};
     return db.data[WORTEL];
@@ -98,7 +99,18 @@ module.exports = function maakOpslag({ db }) {
     return w[naam];
   }
 
-  return { tak, wortel, REGISTER, NIET_GEBOUWD };
+  /* EEN COLLECTIETRANSACTIE. `onder(w, werk)` laat elke tak tijdens het
+     synchrone `werk` naar de werkkopie `w` van de transactie wijzen, zodat een
+     claim en zijn gevolg (een dienstverband) in EEN commit landen. */
+  let actief = null;
+  function onder(w, werk) {
+    if (!w || typeof w !== 'object' || Array.isArray(w)) throw new Error('concern/opslag: de werkkopie is geen kaart');
+    const vorig = actief;
+    actief = w;
+    try { return werk(); } finally { actief = vorig; }
+  }
+
+  return { tak, wortel, onder, REGISTER, NIET_GEBOUWD };
 };
 
 module.exports.REGISTER = REGISTER;

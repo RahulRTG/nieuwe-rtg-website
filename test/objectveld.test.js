@@ -54,7 +54,15 @@ const { CONTRACTEN } = require(path.join(WORTEL, 'server/lib/mutatiecontracten')
    Het veld was overigens niet nieuw: handlerpoorten/buiten-routes-b.js:53
    beschrijft deze deur al als "gezinVan(code) plus beheerderVan()". Wat ontbrak
    was dat het REGISTER het zei -- en dat is precies wat toets 3 bedoelt met
-   "wie er een oplost, haalt hem eraf". */
+   "wie er een oplost, haalt hem eraf".
+
+   GEGROEID OP 29 SEPTEMBER 2026 (samenvoeging #426): /api/foundation/les/join.
+   #403 maakte de lescode een credential; meedoen is sindsdien een CLAIM op de
+   `lescode` in het lijf, en dat is het veld dat de les aanwijst. De route kreeg
+   met opzet nog geen menselijk contract (server/lib/mutatiecontracten-lesfamilie.js
+   zegt waarom: hij staat als afgeleid contract in MUTATIECONTRACT-AFGELEID.json,
+   en een route mag niet in beide lijsten staan). Zodra dat contract er is, met
+   `objectVeld: 'lescode'`, valt hij hier vanzelf af (toets 3). */
 const NOG_ZONDER = [
   'POST /api/aanmeld/zeg',
   'POST /api/auth/reset',
@@ -62,6 +70,7 @@ const NOG_ZONDER = [
   'POST /api/foundation/gezin/uitnodiging/bekijk',
   'POST /api/foundation/gezin/uitnodiging/intrek',
   'POST /api/foundation/gezin/uitnodiging/maak',
+  'POST /api/foundation/les/join',
   'POST /api/foundation/mail/lees',
   'POST /api/foundation/mail/stuur',
   'POST /api/foundation/school/personeel/inlog/accepteer',

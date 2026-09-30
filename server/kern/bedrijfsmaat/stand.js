@@ -6,8 +6,8 @@
    kantoorstuur: onder de groepsgrens staat er geen getal meer in, ook niet het
    aantal.
 
-   EEN UITKOMST ZEGT WAT ZE NIET DEKT: elke maat draagt `dektNiet`. Een getal dat
-   compleet LIJKT terwijl het dat niet is, is erger dan geen getal.
+   EEN UITKOMST ZEGT WAT ZE NIET DEKT (`dektNiet`): een getal dat compleet LIJKT
+   terwijl het dat niet is, is erger dan geen getal.
 
    DE OPSLAG KOMT ALS LEZERS BINNEN, zodat dit bestand geen eigen deur is. */
 'use strict';
@@ -15,13 +15,14 @@
 const P = require('./projecties');
 const K = require('./klantwaarde');
 const RB = require('./stand-rtgboek');
+const LATER = require('./stand-later');
 const { toon } = require('./poort');
 const { DEFINITIES } = require('./definities');
 
 const GEPEILD = 'gemeten';
 const VANAF = 'Leden van voor de ingebruikname van kern/pasgeschiedenis.js hebben geen overgang en tellen niet mee.';
 
-module.exports = ({ lees, pasgeschiedenis, aanwezigheid, kosten, bank, boek, kanalen, ledentegoed, nu }) => {
+module.exports = ({ lees, pasgeschiedenis, aanwezigheid, kosten, bank, boek, kanalen, ledentegoed, later, nu }) => {
   const klok = typeof nu === 'function' ? nu : Date.now;
   const lijst = (x) => (Array.isArray(x) ? x : []);
 
@@ -69,12 +70,11 @@ module.exports = ({ lees, pasgeschiedenis, aanwezigheid, kosten, bank, boek, kan
     const ce = P.churnEnAfwaardering(overgangen, m);
     const om = P.omzet(termijnen(), m);
     const rit = P.rittenAfgerond(lijst(lees.ritten()), m);
-    // de kostenlaag komt later (kernlaag4) en als lezer; faalt hij, dan geen nul maar onbekend
+    // de kostenlaag komt later, als lezer; faalt hij, dan onbekend en geen nul
     const kl = (f, x) => { try { const k = typeof kosten === 'function' ? kosten() : null; return k && k[f] ? k[f](x) : null; } catch (e) { return null; } };
     const cijfers = (x) => { const o = P.omzet(termijnen(), x); return { ontvangen: o.ontvangenCenten, bruto: P.brutomarge(o.ontvangenCenten, kl('afstemming', x)) }; };
     const bm = cijfers(m).bruto;
-    /* Klantwaarde per wereld (besluit C3): vier maten naast elkaar, elk langs zijn
-       eigen groepspoort, en geen totaal (./klantwaarde.js). */
+    // klantwaarde per wereld (C3): vier maten, elk met poort, geen totaal
     const lees0 = (f) => (typeof f === 'function' ? lijst(f()) : []);
     const kw = { living: K.klantwaardeLiving(lees.ritten(), lees.bestellingen(), m), travel: K.klantwaardeTravel(lees0(lees.reizen), m),
       work: K.klantwaardeWork(lees0(lees.loonruns), m), foundation: K.klantwaardeFoundation(lees0(lees.casussen), m) };
@@ -126,6 +126,7 @@ module.exports = ({ lees, pasgeschiedenis, aanwezigheid, kosten, bank, boek, kan
           ['Alleen de loonruns van de nieuwe payrollmotor (payrollRunsV2); de groep is het aantal zaken.']),
         kwMaat('uitkomst.klantwaarde-foundation', DEFINITIES.klantwaardeFoundation, { privacy: 'gezinnen', minGroep: 10 }, kw.foundation,
           ['Casussen van voor 27 september 2026 hebben geen dag van afronden en tellen niet mee.']),
+        ...LATER({ m, peilmoment, maat, kosten, later }),
         // het boek van RTG (C8-C11): operationele marge, liquiditeit, runway, CAC
         ...(typeof boek === 'function' ? RB({ m, peilmoment, maat, boek, bank, cijfers, notas: (x) => kl('posten', x),
           kanalen: typeof kanalen === 'function' ? kanalen : () => ({}), ledentegoed: typeof ledentegoed === 'function' ? ledentegoed : () => null }) : [])

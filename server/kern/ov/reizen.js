@@ -36,13 +36,15 @@ module.exports = (ctx) => {
     const rit = actieveRit(key);
     return { status: 200, lijnen: uit, rit: rit ? ritBeeld(rit) : null };
   }
-  function codeMaak(key) {
+  // de code geldt alleen bij de vervoerder die het lid kiest (./incheckcode.js)
+  function codeMaak(key, zaak) {
+    ensureOv();
     if (actieveRit(key)) return { status: 409, error: 'U bent al ingecheckt; check eerst uit.' };
-    const code = crypto.randomBytes(3).toString('hex').toUpperCase();
-    codes.set(code, { key, tot: Date.now() + CODE_TTL_MS });
-    if (codes.size > 5000) for (const [k, v] of codes) if (v.tot < Date.now()) codes.delete(k);
-    return { status: 200, code, geldigS: CODE_TTL_MS / 1000 };
+    const s = ovZaak(String(zaak || ''));
+    if (!s) return { status: 400, error: 'Kies de vervoerder waar u instapt.' };
+    return codes.uitgeven({ key, zaak: s.code });
   }
+  const codeIntrek = key => codes.intrekken({ key });
   // snelle optie 2: aantoonbaar bij het voertuig, dus een tik is genoeg
   function hierIn(key, hier) {
     ensureOv();
@@ -93,5 +95,5 @@ module.exports = (ctx) => {
     return { status: 200, rit: actieveRit(key) ? ritBeeld(actieveRit(key)) : null, ritten: rijen.map(ritBeeld) };
   }
 
-  return { ovKaart: kaart, ovCodeMaak: codeMaak, ovHierIn: hierIn, ovCheckUit: checkUit, ovMijn: mijn };
+  return { ovKaart: kaart, ovCodeMaak: codeMaak, ovCodeIntrek: codeIntrek, ovHierIn: hierIn, ovCheckUit: checkUit, ovMijn: mijn };
 };

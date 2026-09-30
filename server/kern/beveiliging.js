@@ -143,6 +143,7 @@ function maakBeveiliging({ db, save, crypto, accounts, findSupplier, notify, not
     bevPosten: (s) => defaults(s).posten, bevZetPost: zetPost, bevVerwijderPost: verwijderPost,
     bevBudget: budget, bevZetBudget: zetBudget,
     bevRooster: rooster, bevZetDienst: zetDienst, bevSchrapDienst: schrapDienst, bevPlanAuto: planAuto,
+    bevDienstVervalt: deelRooster.dienstVervalt,
     bevAanvraag: aanvraag, bevAanvraagLijst: aanvraagLijst, bevBeslisAanvraag: beslisAanvraag,
     bevMijnDiensten: mijnDiensten, bevInklok: inklok, bevUitklok: uitklok,
     bevRondeStart: rondeStart, bevRondeCheckpoint: rondeCheckpoint, bevRondeKlaar: rondeKlaar,

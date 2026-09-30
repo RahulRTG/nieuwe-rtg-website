@@ -61,6 +61,16 @@ test('Het Huis: het reisdossier staat op blad 02, met elke stand als woord',
     // en de bron zegt eerlijk wat er niet in staat
     assert.match(tekst, /inreisvereisten/i);
 
+    /* Sinds de warme desktopstandaard (#413) staat de eigen inhoud van het
+       wereldhuis -- ook dit dossier -- onder een INGEKLAPT <details
+       class="wp-domain"> "Uw volledige overzicht". Dat is een bewuste keuze van
+       dat ontwerp, dus opent de toets het overzicht zoals een lid dat doet (op
+       de summary) voordat hij knoppen aanklikt; wat hij van het dossier eist,
+       blijft gelijk. Zonder die laag doet dit niets. */
+    await page.waitForFunction(() => !!document.body.dataset.rtgDesktopState, null, { timeout: 20000 });
+    const dicht = page.locator('details.wp-domain:not([open]) > summary');
+    if (await dicht.count()) await dicht.click();
+
     // het dossier is mee te nemen: de knop staat er en werkt zonder fout
     await page.waitForSelector('#dosMap', { timeout: 8000 });
     await page.click('#dosMap');

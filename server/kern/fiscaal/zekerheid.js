@@ -74,6 +74,8 @@ const REGISTER = {
   'btw.indienen': { klasse: 'bepaald',
     waarom: 'Vastleggen dat er is ingediend, met het kenmerk dat de Belastingdienst teruggaf.',
     mits: 'Dit legt vast en verzendt niet; de verzending loopt buiten RTG om.' },
+  'btw.rtg': { klasse: 'advies',
+    waarom: 'De btw van RTG zelf, voorbereid uit de lidmaatschapstermijnen van het kwartaal tegen het standaardtarief. De verbruiksfacturen in de kluis zitten er niet in, en of het deel voor de RTFoundation een vergoeding is, is niet beoordeeld.' },
   'btw.verzenden': { klasse: 'voorbehouden',
     waarom: 'De ondernemer is de belastingplichtige; RTG dient nooit namens hem in en verzendt niets.' },
   /* De loonkant apart, want daar is de rolverdeling anders: RTG voert die

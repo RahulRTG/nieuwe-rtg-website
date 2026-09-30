@@ -18,7 +18,11 @@ const HANDHAVING = {
   C16: 'kern/ledenregister.js (land en stad langs de groepspoort, met de zin dat ze opgegeven zijn); test/bedrijfsmaatbewijs.test.js.',
   C17: 'kern/bedrijfsmaat/stand-groei.js (toegelaten en een verzoek door de eigen deur in de maand); test/bedrijfsmaatgroei.test.js.',
   C18: 'kern/bedrijfsmaat/stand-groei.js (het verloop van de contracten: verlengd tegen verlengd plus geeindigd); test/bedrijfsmaatgroei.test.js.',
-  C19: 'kern/bedrijfsmaat/stand-groei.js (subtotalen van facturen met betaalwijze rtg); test/bedrijfsmaatgroei.test.js.'
+  C19: 'kern/bedrijfsmaat/stand-groei.js (subtotalen van facturen met betaalwijze rtg); test/bedrijfsmaatgroei.test.js.',
+  C20: 'kern/bedrijfsmaat/stand-toelating.js (aanmeldingen met een bedrijf per stand, mediane doorlooptijd); test/bedrijfsmaattoelating.test.js.',
+  C21: 'kern/bedrijfsmaat/stand-toelating.js (lopend aan het begin van de maand, geeindigd in de maand); test/bedrijfsmaattoelating.test.js.',
+  C22: 'kern/bedrijfsmaat/stand-toelating.js en btw.rtg in kern/fiscaal/zekerheid.js (klasse advies); test/bedrijfsmaattoelating.test.js.',
+  C23: 'Geen projectie: de drie maten staan open met besluit C23 als reden in kern/bedrijfsmaat/maten-operatie.js; test/bedrijfsmaattoelating.test.js.'
 };
 
 const dag = (besloten, rijen) => rijen.map(([id, naam, regel, kort]) => Object.freeze({ id, naam,
@@ -64,5 +68,23 @@ module.exports = Object.freeze([
       'Wat zaken in de maand via RTG Pay ontvingen, zonder btw, in de wereld commercieel en nooit als omzet van RTG; onder ' +
       'vijf zaken geen getal.',
       'Geld van de zaken, naast de andere geldmaten te leggen.']
+  ]),
+  ...dag('30 september 2026', [
+    ['C20', 'Toelating van zaken: aantal per stand en doorlooptijd',
+      'Per stand het aantal aanmeldingen met een bedrijf, plus de mediane doorlooptijd van aanvraag tot besluit over de ' +
+      'besluiten van de maand; onder vijf zaken geen getal.',
+      'Of het kantoor de rij bijhoudt.'],
+    ['C21', 'Churn via contracten, geteld op contract',
+      'Het aandeel van de contracten die aan het begin van de maand liepen en in de maand geeindigd zijn; zonder koppeling ' +
+      'naar een lid, onder tien geen getal.',
+      'Nu meten, zonder eerst het contractregister aan codenamen te hangen.'],
+    ['C22', 'De btw van RTG zelf als voorbereiding',
+      'Per kwartaal uit de lidmaatschapstermijnen die in het kwartaal vervielen, tegen het standaardtarief, met klasse ' +
+      'advies; een mens dient in en RTG nooit zelf.',
+      'Wie aangifte doet begint niet bij nul, en nergens staat zekerheid die er niet is.'],
+    ['C23', 'Het eigen kantoor blijft ongeteld',
+      'Medewerkers op naam, werkdruk en open zaken per team blijven open met de reden: met een klein kantoor is elk getal ' +
+      'een getal over een mens. Ze gaan pas open met een groter team en een dienstverband bij RTG zelf.',
+      'De meeteenheid is nooit de mens.']
   ])
 ]);

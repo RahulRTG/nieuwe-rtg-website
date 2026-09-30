@@ -72,7 +72,7 @@ Per stap van de systeemlus, waar hij vandaag woont:
 | signaleren | `kern/envelop.js` (elk bericht draagt `correlatie` + `oorzaak`) | **staat** |
 | begrijpen | `weerklank` — de naam is gereserveerd in KANTOOR.md par. 6, het bestand bestaat nog niet | **een stap weg** |
 | voorbereiden | `kern/commercie/voornemen.js` (een plan dat niet meer kan veranderen) | **staat**, niet op personeel |
-| aanbieden | Fluister voor de vloer (par. 5) | **staat** als gesprek, niet als aanbod |
+| aanbieden | Fluister voor de vloer (par. 6) | **staat** als gesprek, niet als aanbod |
 | mens beslist | `kern/kantoor/tweedehandtekening.js`, de boardroom | **staat** voor geld |
 | uitvoeren | de eigen route van het domein, nooit een zijweg | **staat** |
 | bewijzen | `kern/carriereledger/` voor de mens, het inzagejournaal voor het huis | **staat** |
@@ -120,14 +120,14 @@ Een eigen "RTG-personeelsportaal" naast de Team Room zou de fout zijn die
 kantoorkamers blijven waar de MACHT woont; het WERKLEVEN van een RTG-medewerker
 woont waar dat van iedere andere werknemer woont.
 
-Stand: **vraagt een besluit** (par. 12, B1).
+Stand: **besloten** (B1, 27 september 2026: ja, helemaal) -- de eerste stap staat, zie par. 12.
 
 ## 3. Namen die al bezet zijn — lees dit vóór je begint
 
 | Voorgesteld | Stand | Uitweg |
 |---|---|---|
 | **Staff Concierge** | **bezet** — `concierge` staat in 80 bestanden: de menselijke concierge van de Lifestyle Pass (SERVICE.md), `kern/mall/concierge.js`, De Rechterhand | niet nodig: **Fluister voor de vloer IS de staff concierge** en staat al (par. 5) |
-| **RTG Passport** | **bezet** — `paspoort` staat in 209 bestanden en is het identiteitsdocument (de 18+-poort, `volwassen()`) | het ding bestaat al als `kern/carriereledger/`; de SCHERMnaam is open (B3) |
+| **RTG Passport** | **bezet** — `paspoort` staat in 209 bestanden en is het identiteitsdocument (de 18+-poort, `volwassen()`) | het ding bestaat al als `kern/carriereledger/`; de SCHERMnaam is **Mijn loopbaan** (B3, besloten) |
 | **Mijn RTG** | **bezet** — `MIJNRTG.md` is de persoonlijke vertrouwenslaag (identiteit, data, rechten, apparaten, bewijs) | niet gebruiken als kop van het loopbaanbewijs |
 | **erkenning** | 40 bestanden, meerdere betekenissen | eerst meten vóór het een veldnaam wordt; in dit document is het een soort regel in het ledger |
 | **stilte** | 94 bestanden | "gezonde stilte" is een begrip uit KANTOOR.md par. 7, geen nieuwe module |
@@ -151,17 +151,33 @@ Lunch: 73 aangemeld
 
 Niet *Dashboard → HR → Mijn rooster → Taken.* Eén kaart, één knop.
 
+**De kaart staat** (28 september 2026): `kern/ochtendkaart.js`, route
+`/api/staff/ochtend`, bovenaan het scherm Vandaag van de personeelsapp. Hij
+bezit niets en schrijft niets, en hij STELT NIETS VOOR (B4). De knop is de
+bestaande inklokknop; wie vrij of afwezig is krijgt er geen. De kop noemt de
+OORZAAK en niet elke regel die eraan lijdt: *"Het rooster van vandaag is nog niet
+vastgesteld: dit is het standaardpatroon."* is één ding en geen twee. Het bouwen
+vond ook iets dat eerder niemand zag: het rooster dat de Team Room toont
+(`scheduleFor`) las verzuim NIET, dus een zieke collega stond daar vandaag
+gewoon op zijn dienst. Een parallelle ronde repareerde dat op dezelfde dag
+(`kern/payroll/inplanbaar.js`, samengekomen in main): het rooster zet wie
+afwezig is op vrij met alleen DAT hij afwezig is -- het hele team ziet dat
+rooster, dus geen soort; die ziet de leidinggevende in
+`/api/supplier/verzuim/planning`. De kaart leest dezelfde regel en telt zo'n
+collega als AFWEZIG en niet als vrij, anders zou hij verdwijnen in plaats van
+ontbreken.
+
 Per regel: waar hij vandaan komt, wat hij mag zeggen, en wat hij NOOIT mag
 zeggen.
 
 | Regel | Bron | Stand | Grens |
 |---|---|---|---|
 | **Goedemorgen, Amir** | het eigen account: zelf-inzage is vrij | **staat** | de echte naam wordt op het toestel getoond en gaat nooit mee naar een model (`dienst-fluister.js` noemt de medewerker al niet bij naam) |
-| **Alles staat voor je klaar** | de optelsom van de regels eronder | **een stap weg** | mag er alleen staan als ELKE regel eronder gemeten is; anders: *"Eén ding kon ik niet nakijken: …"* — `niet vast te stellen` is een eersteklas uitslag (BESTUUR.md) |
+| **Alles staat voor je klaar** | de optelsom van de regels eronder | **staat** (28 sep 2026) | mag er alleen staan als ELKE regel eronder gemeten is; anders: *"Eén ding kon ik niet nakijken: …"* — `niet vast te stellen` is een eersteklas uitslag (BESTUUR.md) |
 | **Kantine · 08:00–16:30** | het rooster van de zaak | **staat** voor zaken | — |
-| **Team compleet** | rooster × verzuim | **een stap weg** | PLANNING.md par. 7: *géén roostermotor leest verzuim*. `voorPlanning()` levert het al; het rooster moet het lezen. Tot dan zegt de regel wie er ingeroosterd is, niet dat het team compleet is |
-| **Eerste levering 08:20** | de inkoop van de zaak (`/api/supplier/inkoop`) | **een stap weg** | alleen een BEVESTIGDE levering; een verwachte levering heet zo |
-| **Lunch: 73 aangemeld** | aanmeldingen of reserveringen | **een stap weg** | een GETELD getal mag. Een VOORSPELD getal pas als de trefzekerheid over drie afgesloten perioden is gemeten, en dan met bandbreedte (INT-04, `kern/kosten/vooruitblik.js`). "73 personen" zonder die meting is een verzonnen zekerheid |
+| **Team compleet** | rooster × verzuim | **staat** (28 sep 2026) | "compleet" alleen als de verzuimlaag antwoordde; anders zegt de kop dat het niet na te kijken was. Een afwezige collega is een AANTAL op jouw kaart, nooit een naam of een reden. Een rooster uit het standaardpatroon maakt het een vermoeden |
+| **Eerste levering 08:20** | de groothandelsorders van de zaak | **staat, zonder tijd** (28 sep 2026) | alleen BEVESTIGDE leveringen (`bevestigd`, `onderweg`), en de kaart zegt hoeveel en NIET hoe laat: een order draagt geen aflevertijd, dus "08:20" zou verzonnen zijn. Een aflevertijd is een stap weg in de groothandelslaag |
+| **Lunch: 73 aangemeld** | reserveringen, geteld | **staat** (28 sep 2026) voor het tellen | een GETELD getal mag. Een VOORSPELD getal pas als de trefzekerheid over drie afgesloten perioden is gemeten, en dan met bandbreedte (INT-04, `kern/kosten/vooruitblik.js`). "73 personen" zonder die meting is een verzonnen zekerheid |
 | **Begin mijn dag** | inklokken (`/api/staff/clock`) | **staat** | — |
 
 Wat er daarnaast vóór 08:00 moet zijn gebeurd, en waarom je het NIET ziet:
@@ -175,8 +191,9 @@ Wat er daarnaast vóór 08:00 moet zijn gebeurd, en waarom je het NIET ziet:
 - **Zijn pauze past bij de bezetting.** De pauzeregel staat
   (`werkbeleidPauzeStand`); de pauze PLANNEN op de bezetting niet. **Een stap
   weg.**
-- **Als een collega ziek is, is de impact al doorgerekend.** Hetzelfde gat als
-  "team compleet". En de doorrekening gaat over de BEZETTING en nooit over de
+- **Als een collega ziek is, is de impact al doorgerekend.** De planners slaan
+  hem sinds 27 september 2026 over en zeggen welke plek daardoor open bleef; de
+  doorrekening naar de kaart is nog een stap weg. En de doorrekening gaat over de BEZETTING en nooit over de
   zieke: wie ziek is, verschijnt als "afwezig" en niets meer.
 
 ## 5. Het uur van de eigenaar: status ≠ aandacht
@@ -274,7 +291,8 @@ er een eerlijke verdelingsmachine achter zit. Drie grenzen:
   zich voelt.
 
 Stand: **een stap weg** — de verdeling staat voor beveiliging en moet worden
-losgemaakt van dat ene domein. Of Fluister ongevraagd mag aanbieden is **B4**.
+losgemaakt van dat ene domein. Fluister biedt **alleen op vraag** aan (B4,
+besloten): wie niets vraagt, krijgt niets.
 
 ## 7. Regelen vóórdat iemand erom vraagt
 
@@ -302,8 +320,9 @@ Donderdag ben je jarig. Je bent vrij. 🎂
 
 Mooi, en het botst op drie plekken — alle drie op te lossen:
 
-1. **Een verjaardag vrij is een arbeidsvoorwaarde, geen functie.** Dat besluit
-   de werkgever (B2), niet de software.
+1. **Een verjaardag vrij is een arbeidsvoorwaarde, geen functie.** De werkgever
+   heeft besloten (B2): bij RTG is hij een RECHT, voor iedereen van kantine tot
+   eigenaar. De software legt het recht niet op; zij zet het klaar.
 2. **De geboortedatum staat er voor iets anders.** De payroll kent hem voor het
    jeugdloon. Hem gebruiken voor iets anders is een nieuw doel, en dus een keuze
    van de medewerker: niet iedereen wil dat zijn verjaardag in het werk
@@ -359,7 +378,7 @@ met de vaardigheden uit Métier (`kern/metier/`, de bron volgens ARBEID.md par.
   kwaliteit mag, lock-in door gijzeling zakt.*
 
 Stand: het ledger **staat**; deze kaart is **een stap weg**; de schermnaam is
-**B3**.
+**Mijn loopbaan** (B3, besloten).
 
 ## 9. Een waardige uitgang
 
@@ -441,38 +460,61 @@ Waar een functie botst met een grens, vervalt de functie.
 
 | Blok | Wat | Stand |
 |---|---|---|
-| **0** | RTG wordt werkgever in zijn eigen Concern, en RTG's eigen werk (ook de kantine) draait op de WorkOS-personeelslaag | **vraagt een besluit** (B1) |
+| **0** | RTG wordt werkgever in zijn eigen Concern, en RTG's eigen werk (ook de kantine) draait op de WorkOS-personeelslaag | **half**: besloten (B1), de huisentiteit en het werkverband in de toegangsreview staan in de schaduw; de entiteit zelf richt de eigenaar in |
 | **1** | dienstverband ↔ kantoorrol; einde dienstverband roept `intrekking.js` aan | een stap weg |
 | **2** | toegang per kamer op het dienstverband — de kantine krijgt alleen de kantine | een stap weg |
-| **3** | de ochtendkaart (par. 4) op gegevens die al bestaan; het rooster leest verzuim | een stap weg |
+| **3** | de ochtendkaart (par. 4) op gegevens die al bestaan; het rooster leest verzuim | **staat**: het rooster leest verzuim (27 sep 2026), waarschuwt een mens die met de hand plant, en de kaart staat (28 sep); het Team Room-rooster leest verzuim nog niet |
 | **4** | de aandachtskaart van de eigenaar (par. 5): besluitenwachtrij plus stilte met bewijsgraad | een stap weg |
 | **5** | het loopbaanbewijs als lezing van het ledger (par. 8) | een stap weg |
 | **6** | de waardige uitgang (par. 9), behalve de overdracht | een stap weg |
-| **7** | Fluister biedt aan (par. 6), met de verdeling los van beveiliging | vraagt een besluit (B4) |
+| **7** | Fluister biedt aan (par. 6), met de verdeling los van beveiliging | een stap weg; alleen op vraag (B4) |
 | **8** | overdracht via de verantwoordelijkheidsgraaf | vraagt een besluit (KANTOOR.md par. 5) |
-| **9** | vooraf regelen: apparatuur en verjaardag (par. 7) | jaren weg / B2 |
+| **9** | vooraf regelen: apparatuur en verjaardag (par. 7) | apparatuur jaren weg; verjaardag staat (B2, `VRIJHEID.md`) |
 
 Blok 0 gaat voor alles, en is goedkoper dan het lijkt: het meeste van deze
 ervaring hoeft niet gebouwd te worden, alleen te worden OPENGEZET voor RTG zelf.
 
 **De besluiten van de eigenaar:**
 
-- **B1 — Wordt RTG de eerste klant van zijn eigen WorkOS?**
-  - *Ja, helemaal* (aanbevolen): RTG's werkleven op de Team Room, de kamers
-    alleen voor de macht. Kost: RTG moet als entiteit en als zaak bestaan.
-  - *Alleen de kantine eerst*: de kantine wordt een zaak op WorkOS
-    (`personeelskantine` bestaat al als kassamodus); de rest volgt.
-  - *Nee*: een eigen kantoorvariant. Kost: twee personeelservaringen die uit
-    elkaar lopen.
-- **B2 — Is een verjaardag vrij een arbeidsvoorwaarde bij RTG?** Ja (en dan per
-  medewerker zelf aan te zetten) of nee (dan alleen een felicitatie, ook zelf aan
-  te zetten).
-- **B3 — Hoe heet het loopbaanbewijs op het scherm?** "Paspoort" en "Mijn RTG"
-  zijn bezet. Voorstellen: *Mijn loopbaan* (aanbevolen, zegt wat het is) of *Mijn
-  werk bij RTG* (tijdgebonden, maar het gaat mee als je vertrekt).
-- **B4 — Mag Fluister ongevraagd iets aanbieden?** Aanbevolen: ja, maximaal één
-  kaart per dienst, altijd weg te tikken, en uit te zetten door de medewerker
-  zelf. Alternatief: alleen op vraag.
+- **B1 — Wordt RTG de eerste klant van zijn eigen WorkOS? BESLOTEN (27 september
+  2026): ja, helemaal.** RTG's werkleven woont op de WorkOS-personeelslaag; de
+  kantoorkamers blijven voor de macht. De eerste stap staat, en hij houdt nog
+  niemand tegen (`kern/kantoor/huis.js`, `test/kantoorhuis.test.js`):
+  - **de huisentiteit**: de eigenaar wijst in de boardroom aan welke entiteit in
+    RTG Concern RTG IS (`/api/office/beleidsmotor/huis/zet`, alleen de eigenaar
+    zelf). Tot dan is het antwoord `onbekend` en nooit "niemand in dienst".
+  - **het werkverband in de toegangsreview**: per kantoorhouder `loopt`, `geen`
+    of `onbekend`, UITGEREKEND uit de dienstverbanden en niet opgeslagen -- een
+    dienstverband eindigt op een datum, dus een opgeslagen "in dienst" zou de
+    dag erna liegen. Een mandaat telt niet als dienstverband en staat er apart
+    bij. De review blijft schaduw: de deuren besluiten precies hetzelfde.
+
+  Wat nog volgt, in deze volgorde:
+  1. de eigenaar richt RTG in als entiteit (en zaak) in RTG Concern en wijst hem
+     aan -- dat is een handeling van een mens, geen code;
+  2. de medewerkers krijgen een dienstverband bij die entiteit; de review laat
+     zien wie er nog `geen` heeft;
+  3. pas als `geen` op nul staat of elk geval een reden heeft, **vraagt het een
+     besluit** om de kantoordeur het werkverband te laten EISEN (KANTOORMACHT.md:
+     schaduw, dan waarschuwen, dan afdwingen); de intrekking van lopende sessies
+     staat al klaar (`kern/kantoor/intrekking.js`);
+  4. RTG's eigen werk (ook de kantine) op de Team Room.
+- **B2 — Is een verjaardag vrij een arbeidsvoorwaarde bij RTG? BESLOTEN (28
+  september 2026): ja, als RECHT** -- voor iedereen, van kantine tot eigenaar,
+  want status is geen aandacht. Twee dingen blijven gelden: het staat standaard
+  UIT en de medewerker zet het zelf aan (de geboortedatum staat er voor het
+  jeugdloon, en een nieuw doel is zijn keuze), en een ruil van zijn dienst
+  bereikt een tweede mens, dus die collega bevestigt zelf. Gebouwd in een
+  parallelle ronde als verjaardagvrijheid in RTG Vrijheid (`VRIJHEID.md`,
+  `server/kern/vrijheid/`): de medewerker geeft zelf alleen `MM-DD` op, en de
+  geboortedatum uit het lidprofiel gaat niet naar de werkgever (MN-02).
+- **B3 — Hoe heet het loopbaanbewijs op het scherm? BESLOTEN (28 september
+  2026): Mijn loopbaan.** Het blijft een lezing van `kern/carriereledger/`
+  zonder score; "Paspoort" en "Mijn RTG" blijven voor hun eigen betekenis.
+- **B4 — Mag Fluister ongevraagd iets aanbieden? BESLOTEN (28 september 2026):
+  nee, alleen op vraag.** Fluister zegt niets uit zichzelf; de ochtendkaart is
+  daarom geen aanbod maar een weergave van wat er al staat (rooster, verzuim,
+  verlof), en een voorstel verschijnt pas als de medewerker erom vraagt.
 
 ## 13. Wat dit document niet zegt
 

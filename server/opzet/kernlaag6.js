@@ -29,7 +29,7 @@ module.exports = (kern, hulp) => {
 // afwezigheid uit het verzuimregister, voor de OV-dienst en de taxidispatch
 const afwezigOp = require('../kern/payroll/afwezig-laat')(() => kern);
 Object.assign(kern, require('../kern/ov').maakOv({
-  db, save, crypto, schoon, codenaamVan: kern.codenaamVan, haversine, etaMinutes, pay: kern.pay, notify, afwezigOp
+  db, save, crypto, bewerkCollectie: hulp.bewerkCollectie, schoon, codenaamVan: kern.codenaamVan, haversine, etaMinutes, pay: kern.pay, notify, afwezigOp
 }));
 /* Het Mobility OS (kern/mobiliteit/): de vervoerskern onder alles wat rijdt,
    vaart of vliegt. Een moduleregister met afhankelijkheden (welk vervoer

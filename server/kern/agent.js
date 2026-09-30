@@ -6,11 +6,9 @@
    bestelling echt bij de gekoppelde groothandel geplaatst. */
 
 const { dagContext } = require('./context');
-const { maakInplanbaar, NIET_GELEZEN } = require('./payroll/inplanbaar');
-/* Een vastgesteld weekrooster schrijft zeven dagen maal het hele personeel in
-   EEN veld op de zaak (s.roosterVast). Nul rijen verschil, dus onzichtbaar voor
-   de rij-telling van server/opzet/handeling.js -- daarom meldt hij zijn omvang
-   zelf. */
+const { maakInplanbaar, naKijken, NIET_GELEZEN } = require('./payroll/inplanbaar');
+/* Het vastgestelde rooster is EEN veld (s.roosterVast), onzichtbaar voor de
+   rij-telling van opzet/handeling.js; daarom meldt hij zijn omvang zelf. */
 const handeling = require('../opzet/handeling');
 
 function maakAgent({ db, crypto, findSupplier, notifySupplier, ghBijbestelVoorstel, ghPlaatsBestelling, accounts, weekdagFactor, SHIFT_NAMES, save, logActivity, afwezigOp }) {
@@ -163,7 +161,7 @@ function maakAgent({ db, crypto, findSupplier, notifySupplier, ghBijbestelVoorst
     save();
     handeling.raakt('roosterdiensten', a.rooster.days.reduce((n, d) => n + d.staff.length, 0));
     logActivity(s.code, wie || 'manager', 'stelde het AI-weekrooster vast');
-    return { status: 200, ok: true, rooster: a.rooster };
+    return { status: 200, ok: true, rooster: a.rooster, verzuimBijVaststellen: naKijken(inplanbaar, s.code, a.rooster.days, SHIFT_NAMES[2]) };
   }
 
   return { agentKoppel, agentPubliek, agentVoorstel, agentBeslis, roosterVoorstel, roosterBeslis };

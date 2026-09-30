@@ -102,10 +102,10 @@ module.exports = (ctx) => {
 
   // alle rijen over de bewaarde weken heen, opgeteld
   function opgeteld() {
-    const v = bak();
+    const weken = eigen.kijk('mallVraag').weken || {};
     const per = new Map();
-    for (const week of Object.keys(v.weken)) {
-      for (const r of Object.values(v.weken[week])) {
+    for (const week of Object.keys(weken)) {
+      for (const r of Object.values(weken[week])) {
         const s = (r.plek || '') + '|' + r.woord;
         const b = per.get(s) || { woord: r.woord, plek: r.plek, verdieping: r.verdieping, n: 0, gevonden: 0, leeg: 0 };
         b.n += r.n; b.gevonden += r.gevonden; b.leeg += r.leeg;

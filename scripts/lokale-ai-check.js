@@ -49,6 +49,50 @@ function proeven(client) {
   return uit;
 }
 
+/* HET VENSTER, GEMETEN IN PLAATS VAN AANGENOMEN. Een server die te weinig
+   venster heeft, antwoordt gewoon -- hij kapt alleen stil het begin af. Deze
+   proef stuurt een lange tekst met een codewoord VOORAAN en vraagt het terug,
+   en legt de telling van de server naast de schatting van RTG. Twee uitkomsten
+   die elkaar controleren: telt de server duidelijk minder dan er ging, of komt
+   het codewoord niet terug, dan is er afgekapt. Zonder verklaard venster
+   (LOCAL_AI_CONTEXT) is er niets om tegen te meten, en dat staat er dan. */
+async function vensterProef(client) {
+  const v = client.venster;
+  if (v.herkomst !== 'verklaard')
+    return { ok: null, stand: 'niet vast te stellen', reden: 'LOCAL_AI_CONTEXT ontbreekt; RTG neemt ' + v.tokens + ' aan en dwingt niets af.' };
+  const { schatTokens } = require('../server/kern/ai/contextpakket');
+  const code = 'KOMPAS-' + Math.floor(Math.random() * 9e5 + 1e5);
+  const zin = 'Dit is opvultekst voor de vensterproef van RTG en hij betekent verder niets. ';
+  const vraag = '\nWat was het codewoord aan het begin? Antwoord alleen met het codewoord.';
+  const kop = 'Het codewoord is ' + code + '. Onthoud het.\n';
+  const doel = Math.floor((v.tokens - 64) * 0.8);
+  let opvul = '';
+  while (schatTokens(kop + opvul + zin + vraag) < doel) opvul += zin;
+  const tekst = kop + opvul + vraag;
+  const begin = Date.now();
+  try {
+    /* max_tokens klein en boven 200 niet: dan gaat hij naar het KORTE model,
+       en dat is het model met het kleinste venster als ze verschillen. */
+    const r = await client.messages.create({ max_tokens: 48, messages: [{ role: 'user', content: tekst }] });
+    const antwoord = (r.content || []).map(x => x.text || '').join('').trim();
+    const u = r.usage || {};
+    const geteld = (Number(u.input_tokens) || 0) + (Number(u.cache_read_input_tokens) || 0);
+    const geschat = schatTokens(tekst);
+    const terug = antwoord.includes(code);
+    const verhouding = geteld ? Math.round(geschat / geteld * 100) / 100 : null;
+    /* De schatting van RTG is bewust te hoog (tekens/3); telt de server meer
+       dan RTG schat, dan past er minder dan RTG denkt en kan dat afkappen. */
+    const onderschat = geteld > geschat;
+    return { ok: terug && !onderschat, stand: terug ? (onderschat ? 'schatting te krap' : 'past') : 'afgekapt vermoed',
+      verklaard: v.tokens, geschat, geteld: geteld || null, schattingPerGeteld: verhouding, codewoordTerug: terug,
+      latencyMs: Date.now() - begin,
+      uitleg: terug ? (onderschat ? 'De server telt meer tokens dan RTG schat: verlaag TEKENS_PER_TOKEN in server/kern/ai/contextpakket.js.' : null)
+        : 'Het codewoord aan het begin kwam niet terug: de server kapt vermoedelijk af. Zet OLLAMA_CONTEXT_LENGTH en num_ctx gelijk aan LOCAL_AI_CONTEXT.' };
+  } catch (e) {
+    return { ok: false, stand: 'storing', verklaard: v.tokens, fout: e.message };
+  }
+}
+
 async function hoofd() {
   let client;
   try {
@@ -86,8 +130,11 @@ async function hoofd() {
     }
   }
 
+  const venster = await vensterProef(client);
+  if (venster.ok === false) alles = false;
+
   const verslag = { ok: alles, provider: client.naam, lokaal: true, verwerking: client.verwerking,
-    modellen: client.modellen, mogelijkheden: client.mogelijkheden, proeven: uitslag };
+    modellen: client.modellen, mogelijkheden: client.mogelijkheden, proeven: uitslag, venster };
   if (alles) console.log(JSON.stringify(verslag, null, 2));
   else { console.error(JSON.stringify(verslag, null, 2)); process.exitCode = 1; }
 }

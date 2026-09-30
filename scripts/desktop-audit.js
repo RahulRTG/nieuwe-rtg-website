@@ -38,6 +38,7 @@ async function main() {
           const started = Date.now();
           const response = await page.goto(srv.base + route, { waitUntil: 'domcontentloaded', timeout: 25000 });
           row.http = response.status();
+          await page.waitForLoadState('load', { timeout: 12000 });
           await page.waitForSelector('body[data-rtg-desktop-state="ready"],body[data-public-platform]', { timeout: 12000 });
           row.contentReadyMs = Date.now() - started;
           if (route === '/apps/reisuitnodiging.html') {
@@ -50,6 +51,20 @@ async function main() {
           // desktop stylesheet to finish applying before measuring its grid.
           await page.waitForFunction(() => getComputedStyle(document.body).paddingTop === (/^(compact|focus)$/.test(document.body.getAttribute('data-rtg-edge-2-state') || '') ? '0px' : '64px'), null, { timeout: 6000 });
           await page.evaluate(() => document.fonts.ready);
+          // Een doorverwijzing of later geladen stylesheet kan alle losse
+          // gereed-signalen tussendoor vervangen. Meet één stabiel document;
+          // de geometrie-eisen hieronder blijven onverminderd van kracht.
+          await page.waitForFunction(() => {
+            const b = document.body, shell = document.querySelector('.wd-shell');
+            if (!b || !shell || document.readyState !== 'complete') return false;
+            const r = shell.getBoundingClientRect();
+            const beeld = JSON.stringify([location.href, b.dataset.rtgDesktopState,
+              b.getAttribute('data-rtg-edge-2-state'), document.querySelectorAll('.rtg-adaptive-bar').length,
+              getComputedStyle(b).paddingTop, r.x, r.y, r.width, r.height]);
+            const vorige = window.__rtgAuditStabiel;
+            if (!vorige || vorige.beeld !== beeld) { window.__rtgAuditStabiel = { beeld, sinds: performance.now() }; return false; }
+            return performance.now() - vorige.sinds >= 300;
+          }, null, { timeout: 12000 });
           row.state = await page.evaluate(() => {
             const b = document.body, css = getComputedStyle(b);
             const rect = s => { const e = document.querySelector(s); if (!e) return null; const r = e.getBoundingClientRect(); return { x:r.x,y:r.y,w:r.width,h:r.height,right:r.right,bottom:r.bottom,scroll: getComputedStyle(e).overflowY }; };

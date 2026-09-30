@@ -8,43 +8,36 @@
    keer te gebruiken, en hij is in te trekken zolang hij niet gebruikt is.
 
    DE INHOUD ZIT ER NIET IN, en dat is de belangrijkste keuze in dit bestand.
-   De code draagt een verse, willekeurige VERWIJZING; wat de handeling is, staat
-   hier in het geheugen. Wie de QR fotografeert, houdt een string over die naar
-   niets meer wijst -- en, minstens zo belangrijk, kan er niet aan aflezen dat
+   De code draagt een verse, willekeurige VERWIJZING van 128 bits; wat de
+   handeling is, staat in ./cap-bak.js -- als hash plus een opdracht die met de
+   code zelf is versleuteld. Wie de QR fotografeert, kan er niet aan aflezen dat
    iemand geld vraagt en hoeveel. Een zelfdragende code (alles in het token,
-   alleen ondertekend) zou dat wel doen: de romp van een RTG-code is gewoon
-   base64. Zelfde keuze en dezelfde reden als bij de levende contactcode
-   (kern/sociaal/pin-live.js).
+   alleen ondertekend) zou dat wel doen: de romp van een RTG-code is base64.
 
-   IN HET GEHEUGEN, EN DAT HOORT ZO. Ze leven hooguit vijf minuten, ze horen een
-   herstart niet te overleven en er hoort niets van in een back-up te komen. Een
-   openstaande vraag die een nacht in de database blijft liggen, is precies het
-   blijvende ding dat LINK.md par. 3.4 verbiedt.
+   NIET MEER IN HET GEHEUGEN (besluit B15, 29 september 2026). De kluis was een
+   Map in het procesgeheugen met een verwijzing van 72 bits als sleutel: niet
+   hash-only, en een claim of intrekking op de ene instance bestond niet voor de
+   andere. Nu staat hij in een collectietransactie (./cap-bak.js), met dezelfde
+   korte geldigheid en een bezem die hem minuten na het verval weghaalt.
 
-   DRIE BESTANDEN, DRIE ONDERWERPEN, dezelfde knip als bij de contactpin. Hier
-   woont het BEZIT: de kluis met openstaande codes, het uitgeven, het opzoeken en
-   de kaart. Het AANVAARDEN staat in ./cap-in.js -- daar staat alles wat een
+   VIER BESTANDEN, VIER ONDERWERPEN. Hier woont het uitgeven en de kaart; de
+   kluis zelf (hash, verval, claim, intrekken) staat in ./cap-bak.js. Het AANVAARDEN staat in ./cap-in.js -- daar staat alles wat een
    aanvaller raakt, en daar wordt de handeling van het domein uitgevoerd. Het
    BEHEER (wat staat er van mij open, en hoe haal ik het weg) staat in
    ./cap-beheer.js: dat is de kant van de uitgever, met een eigen naam per code
    en zonder token. */
 'use strict';
 
-const rem = require('./rem');
-
 const MAX_OPEN = 20000;
 const UUR = 60 * 60 * 1000;
 
 module.exports = (opties) => {
-const { crypto, dyncodeGeef, codenaamVan, bonSchrijf, handelingen, rate, nu } = opties;
-
-const open = new Map();               // verwijzing -> gebonden opdracht
+const { db, crypto, bewerkCollectie, dyncodeGeef, codenaamVan, bonSchrijf, handelingen, rate, nu } = opties;
+const bak = require('./cap-bak')({ db, crypto, bewerkCollectie, nu });
 
 /* HET ENE ANTWOORD voor alles wat niets oplevert: vreemd, gemanipuleerd,
    verlopen, opgebruikt, ingetrokken, of het ding eronder is weg. Hij staat hier
-   en gaat mee naar de deur; hij stond even alleen dáár, en toen greep capTrek
-   naar een naam die hij niet had -- niet gevonden door een toets (dat pad raakte
-   er geen), maar door regel 50 van de keuring. */
+   en gaat mee naar de deur en het beheer. */
 const WEG = 'Deze code is verlopen, al gebruikt, of hoort bij niets.';
 
 /* WIE IEMAND IS, in een laag die niet alleen leden bedient. Een lid heeft een
@@ -52,116 +45,78 @@ const WEG = 'Deze code is verlopen, al gebruikt, of hoort bij niets.';
    "is dit je eigen code?" en "onder wiens naam komt de bon?" per rol anders
    worden uitgerekend, en dan klopt er op een dag een van de twee niet. */
 const idVan = (x) => (x && x.key) ? x.key : ((x && x.code) ? x.soort + ':' + x.code : null);
-const klok = typeof nu === 'function' ? nu : () => Date.now();
 const dyn = () => (typeof dyncodeGeef === 'function' ? dyncodeGeef() : null);
 
-/* De bezem, niet de bewaker: hij houdt het geheugen klein en draait alleen waar
-   de Map groeit. Of een code nog geldt, wordt op EEN plek besloten (losOp
-   hieronder). Dezelfde rolverdeling als in pin-live.js, en om dezelfde reden:
-   twee mechanismen voor een besluit is geen van beide verantwoordelijk. */
-function opruimen() {
-  const t = klok();
-  for (const [v, x] of open) if (x.vervalt < t) open.delete(v);
-}
-
-/* Van token naar de gebonden opdracht erachter. Geeft null bij elke reden --
-   vreemd, gemanipuleerd, verlopen, opgebruikt, ingetrokken -- want het verschil
-   hoort niets te verklappen. `mis` zegt of dit als misser telt: een geldige
-   handtekening bewijst dat de code van ons kwam, dus een verlopen code is geen
-   raadster maar iemand met een oud scherm. */
-function losOp(token) {
+/* Van token naar de verwijzing erin: alleen de ondertekening en de vorm. Een
+   geldige handtekening bewijst dat de code van ons kwam, dus een verlopen of
+   oude code (72 bits, van voor B15) is geen raadster maar iemand met een oud
+   scherm -- `mis` telt alleen de vreemde of vervalste. */
+function lees(token) {
   const d = dyn();
   if (!d) return { fout: 'geen-codelaag' };
   const r = d.lees(token);
   if (!r.ok || r.soort !== 'cap') return { fout: 'weg', mis: r.reden !== 'verlopen' };
-  const x = open.get(r.code);
-  if (!x || x.vervalt < klok()) { open.delete(r.code); return { fout: 'weg' }; }
-  return { verwijzing: r.code, cap: x };
+  if (!bak.vormKlopt(r.code)) return { fout: 'weg' };
+  return { code: r.code };
 }
 
 /* Het bedoelingsscherm: wie, wat, waarom, welke gegevens, hoe lang. De naam komt
-   uit de codenaam van de uitgever en nooit uit de kluis (LINK.md par. 3.5) -- de
-   capability draagt zelf geen naam, ook niet in het geheugen. */
-function kaartVan(cap) {
-  const def = handelingen.haal(cap.handeling);
-  const b = def.beschrijf(cap.opdracht) || {};
-  return { handeling: cap.handeling, wat: b.wat || def.wat, waarom: b.waarom || null,
-    /* `velden` is waar het domein zijn eigen detail kwijt kan (een bedrag, een
-       reisnummer) -- al opgemaakt, want deze laag weet niet wat een euro is. */
+   uit de codenaam van de uitgever en nooit uit de kluis (LINK.md par. 3.5); de
+   beschrijving is bij het uitgeven door het DOMEIN gemaakt en draagt geen
+   geheim. */
+function kaartVan(rij) {
+  const def = handelingen.haal(rij.handeling) || {};
+  const b = rij.beschrijving || {};
+  return { handeling: rij.handeling, wat: b.wat || def.wat, waarom: b.waarom || null,
     velden: Array.isArray(b.velden) ? b.velden : [],
     gegevens: Array.isArray(b.gegevens) ? b.gegevens : [],
-    van: cap.uitgeverKey ? codenaamVan(cap.uitgeverKey) : null,
-    eenmalig: def.eenmalig, tot: new Date(cap.vervalt).toISOString() };
+    van: rij.uitgeverKey ? codenaamVan(rij.uitgeverKey) : null,
+    eenmalig: !!def.eenmalig, tot: new Date(rij.vervalt).toISOString() };
 }
 
 /* Een capability uitgeven. De invoer gaat eerst door het DOMEIN (def.lees), want
    die weet wat een geldig bedrag of een geldige bron is; deze laag kent alleen
    de vorm eromheen. */
-function capMaak(uitgever, invoer) {
+async function capMaak(uitgever, invoer) {
   const d = dyn();
   if (!d) return { status: 503, error: 'De codelaag draait hier niet.' };
   const def = handelingen.haal(invoer && invoer.handeling);
   if (!def) return { status: 404, error: 'Deze handeling kennen we niet.' };
   if (!def.uitgever.includes(uitgever.soort)) return { status: 403, error: 'Deze code mag u niet maken.' };
   if (!uitgever.key) return { status: 403, error: 'Hier heb je een eigen ledenaccount voor nodig.' };
-  /* De rem hangt aan de UITGEVER en niet aan de deur, en dat is hier de juiste
-     kant: er valt niets te raden aan het maken van je eigen code. Wat je wel wil
-     tegenhouden is een lid dat er duizend per minuut de wereld in pompt. */
+  /* De rem hangt aan de UITGEVER: er valt niets te raden aan het maken van je
+     eigen code, maar een lid dat er duizend per minuut uitpompt houd je tegen. */
   if (typeof rate === 'function' && !rate(uitgever.key, 'capmaak', 60, UUR))
     return { status: 429, error: 'Te veel codes achter elkaar. Probeer het later opnieuw.' };
-  /* Ruimte maken VOOR het lezen, want lezen kan iets kosten. De kassacode maakt
-     in zijn `lees` een echte code aan bij RTG Pay; zouden we daarna pas op de
-     drukte stuiten, dan hebben we een code de wereld in geholpen waar geen enkel
-     token bij hoort -- en die verdringt bij dat lid de code die hij wel had. */
-  opruimen();
-  if (open.size > MAX_OPEN) return { status: 503, error: 'Even te druk. Probeer het zo opnieuw.' };
-  const gelezen = def.lees(invoer, uitgever);
-  /* Een handeling mag asynchroon lezen (de kascode maakt een code in een
-     collectietransactie); de rest van deze functie blijft dan hetzelfde. */
-  if (gelezen && typeof gelezen.then === 'function') return gelezen.then(o => capMaakVerder(def, uitgever, o));
-  return capMaakVerder(def, uitgever, gelezen);
-}
-function capMaakVerder(def, uitgever, opdracht) {
-  const d = dyn();
+  /* De drukte VOOR het lezen, want lezen kan iets kosten: de kassacode maakt in
+     zijn `lees` een echte code aan bij RTG Pay. */
+  if (bak.aantalOpen() > MAX_OPEN) return { status: 503, error: 'Even te druk. Probeer het zo opnieuw.' };
+  const opdracht = await def.lees(invoer, uitgever);
   if (!opdracht || opdracht.error) return opdracht || { status: 400, error: 'Deze opdracht kan niet.' };
-  const verwijzing = crypto.randomBytes(9).toString('base64url');
-  /* TWEE NAMEN VOOR EEN CODE, EN DAT IS GEEN VERDUBBELING. De VERWIJZING zit in
-     het ondertekende token en verzilvert; het ID staat in de lijst "mijn
-     koppelingen" en beheert (intrekken). Zou het dezelfde string zijn, dan draagt
-     een beheerscherm -- en elk logboek en elke schermafdruk daarvan -- het deel
-     waarmee je hem kunt gebruiken. Nu kan een gelekt id hooguit iets DICHTdoen
-     van iemand die het al mocht, en dat is de goede kant om fout te gaan. */
-  const id = crypto.randomBytes(6).toString('base64url');
-  const cap = { handeling: def.id, id, uitgeverId: idVan(uitgever), uitgeverKey: uitgever.key || null,
-    uitgeverSoort: uitgever.soort, opdracht, vervalt: klok() + def.ttlMs };
-  open.set(verwijzing, cap);
-  const c = d.maak({ soort: 'cap', code: verwijzing, ttlMs: def.ttlMs });
-  /* Wat alleen de UITGEVER te zien krijgt, en de scanner nooit. De kassacode
-     heeft dat nodig: het lid moet zijn code ook kunnen voorlezen aan een kassa
-     zonder camera, maar diezelfde code op de kaart zetten zou hem aan iedereen
-     geven die scant. */
+  const beschrijving = def.beschrijf(opdracht) || {};
+  const g = await bak.uitgeven({ handeling: def.id, ttlMs: def.ttlMs, eenmalig: def.eenmalig,
+    uitgever: { id: idVan(uitgever), key: uitgever.key || null, soort: uitgever.soort }, opdracht, beschrijving });
+  /* TWEE NAMEN VOOR EEN CODE, EN DAT IS GEEN VERDUBBELING. De 128-bit code zit
+     in het ondertekende token en verzilvert; het ID staat in "mijn koppelingen"
+     en kan hooguit iets DICHTdoen van wie het al mocht. De kale code bestaat
+     alleen in DIT antwoord. */
+  const c = d.maak({ soort: 'cap', code: g.code, ttlMs: Math.max(1000, g.vervalt - Date.now()) });
+  /* Wat alleen de UITGEVER te zien krijgt, en de scanner nooit (de kassacode die
+     het lid aan een kassa zonder camera voorleest). */
   const eigen = typeof def.voorUitgever === 'function' ? def.voorUitgever(opdracht) : null;
-  return { status: 200, token: c.token, exp: c.exp, ttlMs: c.ttlMs, kaart: kaartVan(cap), eigen };
+  const kaart = kaartVan({ handeling: def.id, beschrijving,
+    uitgeverKey: uitgever.key || null, vervalt: g.vervalt });
+  return { status: 200, token: c.token, exp: c.exp, ttlMs: c.ttlMs, kaart, eigen };
 }
 
-/* Kijken wat er in staat -- en niets doen. De code gaat hier bewust NIET op:
-   een blik op de verkeerde code mag die van iemand anders niet verbranden. */
-/* De deur krijgt het gereedschap mee dat hij nodig heeft en raakt de kluis
-   verder niet aan: opzoeken, de kaart maken, weten wie iemand is. */
-/* `verbruik` en niet de Map zelf: de deur mag een code OPGEBRUIKEN, niet in de
-   kluis rondlopen. Dat de deur de Map wel kreeg (en er per ongeluk buiten zijn
-   bereik naar greep) is precies wat er bij de knip misging -- het opgaan van een
-   eenmalige code deed niets meer, en test/linkcap.test.js zag het meteen. */
-const verbruik = (verwijzing) => open.delete(verwijzing);
-const { capKijk, capAanvaard } = require('./cap-in')({ losOp, kaartVan, idVan, verbruik, handelingen, bonSchrijf, WEG });
-/* Het beheer krijgt de kluis zelf, want "wat staat er van mij open" is een vraag
-   over de hele kluis en niet over een code. Hij mag lezen en weghalen, meer niet. */
-const { capOpenVan, capTrek } = require('./cap-beheer')({ open, losOp, kaartVan, idVan, opruimen, klok, WEG });
+/* De deur krijgt het gereedschap mee dat hij nodig heeft en raakt de bak verder
+   niet aan: lezen, de kaart maken, weten wie iemand is, en de vier overgangen
+   van de claim. */
+const { capKijk, capAanvaard } = require('./cap-in')({ lees, bak, kaartVan, idVan, handelingen, bonSchrijf, WEG });
+const { capOpenVan, capTrek } = require('./cap-beheer')({ lees, bak, kaartVan, idVan, WEG });
 
 /* `idVan` gaat mee naar buiten omdat de DEUR dezelfde vraag heeft: onder welke
-   naam staan de bonnen van wie er aanklopt. Die stond daar los uitgerekend, en
-   twee plekken die een identiteit uitrekenen zijn twee namen zodra er een rol
-   bijkomt -- dan schrijft de een `supplier:LUCHT` waar de ander leest. */
-return { capMaak, capKijk, capAanvaard, capTrek, capOpenVan, capOpen: open,
+   naam staan de bonnen van wie er aanklopt. */
+return { capMaak, capKijk, capAanvaard, capTrek, capOpenVan, capBak: bak,
   capHandelingen: handelingen.alle, idVan };
 };

@@ -103,6 +103,17 @@ body.nav-route .intelligence-dock{opacity:0;transform:translateX(18px);pointer-e
 .manual-results button{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid rgba(255,255,255,.08);background:transparent;color:#fff;padding:.65rem .2rem;cursor:pointer;}
 .manual-results strong,.manual-results span{display:block;}.manual-results strong{font-size:.74rem}.manual-results span{color:var(--soft);font-size:.6rem;margin-top:.15rem}
 
+/* Desktopstandaard: de kaart staat in een schermvlak van ruim 600 hoog in het
+   midden van het venster, in plaats van over het hele venster. Rechtsonder in
+   dat vlak lagen de kaartlagen onder het statuspaneel (dat op 12.5rem begon)
+   en onder de locatievraag die onderin het VENSTER staat -- niet meer aan te
+   tikken. In het vlak begint de kop op nul, dus de lagen gaan rechtsboven
+   onder de zoekbalk en het paneel eronder, met zijn onderkant vrij van de
+   Edge. Buiten de desktopstandaard verandert er niets. */
+@media(min-width:1000px){
+  body[data-rtg-desktop] .wd-page[data-rtg-canvas-surface] .lagen{top:8.5rem;bottom:auto}
+  body[data-rtg-desktop] .wd-page[data-rtg-canvas-surface] .intelligence-dock{top:calc(env(safe-area-inset-top,0px) + 12.75rem);max-height:calc(100% - 12.75rem - 1.5rem - var(--edge-bottom,0px));overflow:auto}
+}
 @media(max-width:760px){
   .kop{padding-left:1rem;padding-right:1rem}.kop .brand-mark{font-size:1.2rem}.kop .badge:not(.live-badge){display:none}
   .zoekwrap{left:1rem;width:calc(100vw - 2rem)}

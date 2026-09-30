@@ -127,13 +127,21 @@ module.exports = (ctx) => {
        worden, is een besluit en geen reparatie. */
     const rust = rustBotsing(s, gid, datum, sh.id);
     if (rust && door === 'autoplan') return { status: 409, error: rust };
+    /* Verzuim, in dezelfde vorm: de automaat plant nooit wie afwezig is, een
+       MENS mag het (aangepast werk, een misverstand) maar ziet het erbij. Een
+       reden staat er nooit in (kern/payroll/inplanbaar.js). */
+    const vz = inplanbaar(s.code, gid, datum);
+    const afwezig = !vz.plan ? guardNaam(s, gid) + ' staat op ' + datum + ' als ' + vz.wat +
+      (vz.inzetbaarheid ? ' (inzetbaar: ' + vz.inzetbaarheid + ')' : '') + ' in de verzuimlaag.' : null;
+    if (afwezig && door === 'autoplan') return { status: 409, error: afwezig };
     const dienst = { id: id('d'), supplierCode: s.code, datum, shiftId: sh.id, postId: p.id,
       guardId: gid, guardNaam: guardNaam(s, gid), status: 'gepland', door, at: nu() };
     diensten().unshift(dienst);
     db.data.bevDiensten = diensten().slice(0, 100000);
     save();
     sseToSupplier(s.code, 'sync', { scope: 'beveiliging' });
-    return { status: 200, ok: true, dienst: dienstPubliek(s, dienst), ...(rust ? { rustWaarschuwing: rust } : {}) };
+    return { status: 200, ok: true, dienst: dienstPubliek(s, dienst), ...(rust ? { rustWaarschuwing: rust } : {}),
+      ...(afwezig ? { verzuimWaarschuwing: afwezig } : {}), verzuimNagekeken: !vz.onbekend };
   }
   function schrapDienst(s, dienstId) {
     const d = diensten().find(x => x.id === dienstId && x.supplierCode === s.code);

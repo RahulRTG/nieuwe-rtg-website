@@ -8443,8 +8443,9 @@
       (guests.length ? guests.map(g =>
         '<div class="guest-row"><span class="cn">'+g.codename+'</span>'+
         (g.arrived?'<span class="ge here">✓ '+T('sup.arrived','gearriveerd')+'</span>'
-          : g.etaMin!=null?'<span class="ge"><b>'+g.etaMin+'</b> '+T('sup.minaway','min')+'</span>'
-          : '<span class="ge">'+T('sup.enrouteshort','onderweg')+'</span>')+'</div>'
+          : (g.etaMin!=null?'<span class="ge"><b>'+g.etaMin+'</b> '+T('sup.minaway','min')+'</span>'
+            : '<span class="ge">'+(g.nabij?T('sup.nabij','in de buurt'):T('sup.enrouteshort','onderweg'))+'</span>')+
+            (g.heading?'<button class="obtn" data-aangekomen="'+g.codename.replace(/"/g,'&quot;')+'">'+T('sup.bevestig','Is er')+'</button>':''))+'</div>'
       ).join('') : '<div class="softline">'+T('gst.none','Nog geen verbonden gasten.')+'</div>')+'</div>';
 
     html += '<div class="card"><div class="tt-h">'+T('gst.nearby','Nu onderweg (nog niet verbonden)')+'</div>'+
@@ -8457,6 +8458,12 @@
 
     el.innerHTML = html;
     bindGastLoc(el);
+    /* De zaak bevestigt de aankomst (NAVIGATIE.md N13): alleen voor een gast die
+       naar DEZE zaak onderweg is; de server weigert de rest. */
+    el.querySelectorAll('[data-aangekomen]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/guest/aangekomen', { codename: b.dataset.aangekomen }); toast(T('gst.bevestigd','Aankomst bevestigd.')); await refresh(); openTab('gasten'); }
+      catch(e){ toast(e.message); }
+    }));
     el.querySelectorAll('[data-connect]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/guest/connect', { codename: b.dataset.connect }); toast(T('gst.done','Verbonden. De gast is op de hoogte.')); await refresh(); openTab('gasten'); }
       catch(e){ toast(e.message); }

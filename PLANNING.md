@@ -246,35 +246,16 @@ plaats van punten.
   september 2026), via een luisteraar op het verzuimregister
   (`verzuim.naMelding` in `kern/payroll/index.js`): wie afwezig is en welke
   posten weer open liggen, nooit waarom, een keer per verzuimregel, en een open
-  ziekmelding kijkt twee weken vooruit. `test/dienst-vervalt.test.js`.
-  Sinds 29 september 2026 lezen ook de andere planners verzuim, elk op de
-  vorm van hun eigen domein en overal met dezelfde regel: wat een MACHINE
-  kiest slaat een afwezige over, wat een MENS doet gaat door met een
-  waarschuwing, en er staat DAT iemand afwezig is en nooit waarom.
-  - **OV** (`kern/ov/dienst.js`): de chauffeur start zijn dienst zelf; staat hij
-    als afwezig, dan loopt de dienst en zegt de PDA het erbij
-    (`test/ov-verzuim.test.js`).
-  - **Festival** (`kern/festival/dienst.js`): een dienst droeg alleen een vrije
-    naam, dus er was niets om te lezen. Een manager kiest nu een teamlid van zijn
-    EIGEN zaak (de naam komt uit het team, een staffId van een andere zaak is
-    404); een vrije naam van buiten het team blijft kunnen en hangt aan niemand.
-    Inplannen op een afwezige gaat door met een waarschuwing, en het rooster
-    toont "afwezig", afgeleid bij het lezen (`test/festival-verzuim.test.js`).
-  - **Taxi** (`kern/mobiliteit/bestuurder.js`): ook hier was de bestuurder een
-    vrije naam. Een voertuig kan nu aan een teamlid hangen
-    (`bestuurderStaffId`); staat dat teamlid afwezig, dan slaat de MATCHER het
-    voertuig over met de reden erbij, terwijl het voertuig zelf inzetbaar blijft
-    -- met opzet geen reden in `assetInzetbaar`, want dan kon de chauffeur die
-    zelf een rit aanneemt dat niet meer en weigerde de chauffeursapp hem.
-    Toewijzen met de hand gaat door met een waarschuwing
-    (`test/taxi-verzuim.test.js`).
-  - **School** hangt er met opzet NIET aan: het personeel van een school is geen
-    teamlid van een zaak maar een dossier in `server/school/`, met een eigen
-    verlof- en ziekteregister (`school/hr-verlof.js`). De vervanging leest dat al
-    en stelt geen afwezige leraar voor. Twee registers voor dezelfde afwezigheid
-    zou de fout zijn; wat openstaat is dat een school een ZIEKE vervanger met een
-    409 weigert waar de andere planners waarschuwen -- een verschil in regel dat
-    een besluit is en geen bouwtaak.
+  ziekmelding kijkt twee weken vooruit. `test/dienst-vervalt.test.js`. Wat het
+  NIET doet: de festival-, OV-, taxi- en schoolplanners lezen verzuim nog niet.
+- **Een MENS die toch een afwezige medewerker inplant, ziet het erbij** (28
+  september 2026, op dezelfde regel). Een losse dienst bij de beveiliging gaat
+  door en draagt `verzuimWaarschuwing` (aangepast werk is het besluit van een
+  mens); de automaat wordt ook langs `zetDienst` tegengehouden, in de vorm van
+  de rustregel. Het vaststellen van het weekrooster kijkt opnieuw na
+  (`naKijken()` in `kern/payroll/inplanbaar.js`, `verzuimBijVaststellen`),
+  want tussen voorstel en akkoord kan iemand afwezig worden.
+  `test/verzuimrooster.test.js`.
 
 ### Een stap weg
 
@@ -314,7 +295,7 @@ Niet op aantrekkelijkheid maar op wat de volgende stap mogelijk maakt.
 
 | # | Stap | Waarom nu |
 |---|---|---|
-| 1 | ~~Verlof en ziekte in de twee autoplanners~~ | staat (par. 6), ook voor een al vastgestelde dienst van de beveiliging; de overige planners volgen |
+| ~~1~~ | ~~Verlof en ziekte in de twee autoplanners~~ | **staat** (par. 6), ook voor een al vastgestelde dienst van de beveiliging, en met een waarschuwing voor een mens die met de hand plant (28 september); de overige planners volgen |
 | 2 | Transitietijd als primitief | staat op nul, en is het enige dat alle domeinen delen |
 | 3 | De ATW-rekenlaag uit taxi trekken | hij is al data-met-bron en al instelbaar per regime |
 | 4 | Het werkdruksignaal op rooster en klok | raakt geen gezondheidsgegeven, en is de helft die wél mag |

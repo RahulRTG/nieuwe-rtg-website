@@ -28,7 +28,6 @@ const os = require('os');
 const path = require('path');
 const { spawn } = require('child_process');
 const { draaiAuditproef } = require('./lib/auditproef');
-const { stempel } = require('./lib/stempel');
 const { plausibelLijf } = require('./lib/rolproef');
 const { alleRoutes, isSchakel } = require('./lib/routes');
 const { haalSleutels, meldSleutels, BASISROLLEN } = require('./lib/proefsleutels');

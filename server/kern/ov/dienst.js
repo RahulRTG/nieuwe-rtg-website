@@ -6,7 +6,7 @@
 const { coord } = require('../util');
 const { maakInplanbaar } = require('../payroll/inplanbaar');
 module.exports = (ctx) => {
-  const { db, save, schoon, id, nu, ensureOv, lijnVan, versVoertuig, ritStart, codes, SOORTEN } = ctx;
+  const { db, save, schoon, id, nu, ensureOv, lijnVan, versVoertuig, actieveRit, ritStart, codes, SOORTEN } = ctx;
   const inplanbaar = maakInplanbaar(ctx.afwezigOp);
 
   /* ---- de PDA-kant: dienst, live positie en de code-check-in ---- */
@@ -39,14 +39,16 @@ module.exports = (ctx) => {
     v.at = nu(); save();
     return { status: 200, ok: true };
   }
-  // snelle optie 1: het personeel tikt de oplichtende code van het lid in
-  function codeIn(s, actor, codeTekst) {
+  /* snelle optie 1: het personeel scant de oplichtende code van het lid. De
+     rit start ALLEEN na een geslaagde claim bij deze vervoerder. */
+  async function codeIn(s, actor, codeTekst) {
     const vid = 'v-' + s.code + '-' + (actor && actor.staffId || 'pda');
     const v = db.data.ovVoertuigen.find(x => x.id === vid);
     if (!v) return { status: 409, error: 'Start eerst een dienst.' };
-    const c = codes.get(String(codeTekst || '').trim().toUpperCase());
-    if (!c || c.tot < Date.now()) return { status: 404, error: 'Onbekende of verlopen code.' };
-    codes.delete(String(codeTekst || '').trim().toUpperCase());
+    if (!lijnVan(s, v.lijnId)) return { status: 404, error: 'Lijn niet gevonden.' };
+    const c = await codes.claim({ code: codeTekst, zaak: s.code,
+      controleer: key => actieveRit(key) ? { status: 409, error: 'Deze reiziger is al ingecheckt.' } : null });
+    if (c.error) return c;
     return ritStart(c.key, v);
   }
   function stand(s, actor) {

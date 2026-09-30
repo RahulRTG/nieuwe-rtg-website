@@ -296,16 +296,23 @@ test('GRAND: twee instances op gedeelde Postgres + Redis, volledige gelijktijdig
       }
     });
 
-    await t.test('9. reis: live onderweg met automatische aankomst', async () => {
+    await t.test('9. reis: live onderweg met een bevestigde aankomst', async () => {
       const start = await api(A.base, '/api/live/start', { destCode: supB.code }, koper.token);
       assert.equal(start.status, 200, 'onderweg gestart naar de bestemming');
       assert.equal(start.body.live.active, true);
-      // precies op de bestemming: binnen ~150 m -> automatische aankomst
+      /* Precies op de bestemming is een VOORSTEL en geen aankomst (NAVIGATIE.md
+         N3 en N13). Tot 29 september stond hier "het lid is automatisch
+         gearriveerd": een aankomst bewezen uit een opgeslagen positie. Die
+         bewering is met opzet omgedraaid en niet stil aangepast. */
       const dest = (start.body.live.dest || start.body.live.partners.find(p => p.code === supB.code));
       assert.ok(dest && dest.loc, 'de bestemming heeft een locatie');
       const upd = await api(A.base, '/api/live/update', { lat: dest.loc.lat, lng: dest.loc.lng }, koper.token);
       assert.equal(upd.status, 200);
-      assert.equal(upd.body.live.arrived, true, 'het lid is automatisch gearriveerd');
+      assert.equal(upd.body.live.arrived, false, 'een positie bewijst geen aankomst');
+      assert.equal(upd.body.live.nabij, true, 'het scherm mag vragen of het lid er is');
+      const hier = await api(A.base, '/api/live/aangekomen', {}, koper.token);
+      assert.equal(hier.status, 200);
+      assert.equal(hier.body.live.arrived, true, 'het lid bevestigde zelf');
     });
 
     await t.test('10. videobel-signalering: twee verbonden leden, een ring komt live aan', async () => {

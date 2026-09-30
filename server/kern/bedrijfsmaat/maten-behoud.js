@@ -27,11 +27,10 @@ module.exports = [
     groepsgrens: [c(STAND, 'retentieWaarde: verhouding(LEDEN')], waarom: {} },
 
   { id: 'retentie.contract-verlengd', domein: 'retentie', wereld: 'consument', eenheid: 'contracten per periode',
-    betekenis: 'Hoeveel contractuele lidmaatschappen bij hun verlengmoment werden verlengd.', berekening: 'nog niet vastgesteld',
-    actualiteit: 'live', privacy: 'leden', minGroep: 10, eigenaar: null, graad: 'onbekend', afhankelijk: [],
-    bron: [c(CTR, 'function verleng')], definitie: null, projectie: null, bewijs: null, groepsgrens: null,
-    waarom: { definitie: 'Niet besloten; en de meeste betalende leden hebben een pas zonder contract (AFSPRAAK.md), dus deze maat ziet alleen de contractuele treden.',
-      projectie: 'Niet gebouwd.', bewijs: 'Volgt uit de projectie.', groepsgrens: 'Volgt uit de projectie.', eigenaar: 'Niemand.' } },
+    betekenis: 'Hoeveel contractuele lidmaatschappen bij hun verlengmoment werden verlengd.', berekening: 'verlengd gedeeld door verlengd plus geeindigd, per maand, uit het verloop van de contracten',
+    actualiteit: 'live', privacy: 'leden', minGroep: 10, eigenaar: 'kern/bedrijfsmaat', graad: 'gemeten', afhankelijk: [],
+    bron: [c(CTR, 'function verleng')], definitie: [c('server/kern/bedrijfsmaat/definities-later.js', 'contractVerlengd: d29(18')], projectie: [c('server/kern/bedrijfsmaat/stand-groei.js', 'function contractVerlengd()')], bewijs: [c('server/kern/bedrijfsmaat/stand-groei.js', "niet('In deze maand kwam geen enkel contract op zijn beslismoment.')")], groepsgrens: [c('server/kern/bedrijfsmaat/stand-groei.js', 'toon(LEDEN, { waarde: verlengd / noemer, n: noemer })')],
+    waarom: {} },
 
   { id: 'churn.pas-naar-gast', domein: 'churn', wereld: 'consument', eenheid: 'aandeel betalende leden per maand',
     betekenis: 'Leden wier pas in een maand naar gast gaat, gedeeld door de betalende leden aan het begin van die maand.',

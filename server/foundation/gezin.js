@@ -3,7 +3,7 @@ module.exports = (gctx) => {
     nieuweGezinscode, ROLLEN, GROEPEN, GROEP_INFO, geboorteInfo, groepVanLeeftijd, actualiseerGroep,
     schoonGroep, isBeschermd, isGast, KLEUREN,
     hashPin, checkPin, geldigePin, schoonAvatar, schoonKleur, nieuweCodenaam, ensureCodenaam, rtfHandle,
-    socialProfielen, profielInfoVanHandle, pubProfiel, pubGezin, gezinVan, profielVan, beheerderVan, berichtVoorMij, tokenUit } = gctx;
+    socialProfielen, profielInfoVanHandle, pubProfiel, pubGezin, gezinVan, profielVan, beheerderVan, berichtVoorMij, tokenUit, gezinstoken } = gctx;
   const bezorgAanGasten = (g, b) => gctx.bezorgAanGasten(g, b);
 router.post('/gezin/maak', async (req, res) => {
   const bucket = 'maak:' + ipVan(req);
@@ -19,7 +19,7 @@ router.post('/gezin/maak', async (req, res) => {
   const code = nieuweGezinscode();
   const pid = rid(4);
   const profiel = { id: pid, naam: beheerder, rol: 'beheerder', avatar: schoonAvatar(req.body.avatar) || 'pas',
-    kleur: schoonKleur(req.body.kleur), pin: await hashPin(req.body.pin), groep: schoonGroep(req.body.groep) || 'volw', token: rid(24), at: nu() };
+    kleur: schoonKleur(req.body.kleur), pin: await hashPin(req.body.pin), groep: schoonGroep(req.body.groep) || 'volw', at: nu() };
   if (req.body.geboortedatum) {
     const geboorte = geboorteInfo(req.body.geboortedatum);
     if (!geboorte) return res.status(400).json({ error: 'Vul een geldige geboortedatum in.' });
@@ -28,9 +28,9 @@ router.post('/gezin/maak', async (req, res) => {
   ensureCodenaam(profiel);
   const g = { id: rid(4), code, naam, at: nu(), profielen: { [pid]: profiel }, berichten: [],
     registratie: { door:pid, bevoegdVerklaard:req.body.bevoegdGezin === true, privacyAkkoord:req.body.privacyAkkoord === true, at:nu() } };
-  G()[code] = g; save();
+  G()[code] = g; const token = gezinstoken.geef(g, profiel); save();
   try { gctx.welkomRtf(profiel.codenaam); } catch (e) {}
-  res.json({ code, token: profiel.token, profiel: pubProfiel(profiel, true), gezin: pubGezin(g) });
+  res.json({ code, token, profiel: pubProfiel(profiel, true), gezin: pubGezin(g) });
 });
 
 router.get('/gezin/:code/mij', (req, res) => {
@@ -58,7 +58,7 @@ router.post('/gezin/profiel/maak', async (req, res) => {
     return res.status(400).json({ error:'Vul voor een kind de geboortedatum in, zodat de leeftijdspas automatisch klopt.' });
   if (process.env.NODE_ENV !== 'test' && !geldigePin(req.body.pin))
     return res.status(400).json({ error:'Geef ieder nieuw kind een eigen pincode van 4 tot 6 cijfers.' });
-  const p = { id: rid(4), naam, rol, avatar: schoonAvatar(req.body.avatar), kleur: schoonKleur(req.body.kleur), token: rid(24), at: nu() };
+  const p = { id: rid(4), naam, rol, avatar: schoonAvatar(req.body.avatar), kleur: schoonKleur(req.body.kleur), at: nu() };
   const geboorte = req.body.geboortedatum ? geboorteInfo(req.body.geboortedatum) : null;
   if (req.body.geboortedatum && !geboorte) return res.status(400).json({ error: 'Vul een geldige geboortedatum in.' });
   if (geboorte) { p.geboren = geboorte.datum; p.groep = groepVanLeeftijd(geboorte.leeftijd); }
@@ -96,6 +96,7 @@ router.post('/gezin/profiel/wijzig', async (req, res) => {
   if (ROLLEN.includes(req.body.rol)) {
     if (p.rol === 'beheerder' && req.body.rol !== 'beheerder' && Object.values(g.profielen).filter(x => x.rol === 'beheerder').length <= 1)
       return res.status(400).json({ error: 'Er moet altijd minstens een beheerder blijven.' });
+    if (p.rol !== req.body.rol) gezinstoken.sluit(p);
     p.rol = req.body.rol;
   }
   if (req.body.pin === '') {
@@ -105,7 +106,7 @@ router.post('/gezin/profiel/wijzig', async (req, res) => {
     if (!geldigePin(req.body.pin)) return res.status(400).json({ error: 'Een pincode heeft 4 tot 6 cijfers.' });
     for (const bestaand of Object.values(g.profielen || {})) if (bestaand.id !== p.id && bestaand.pin && await checkPin(bestaand.pin, req.body.pin))
       return res.status(409).json({ error:'Kies voor ieder gezinslid een andere pincode.' });
-    p.pin = await hashPin(req.body.pin);
+    p.pin = await hashPin(req.body.pin); gezinstoken.sluit(p);
   }
   save();
   res.json({ profiel: pubProfiel(p, true) });

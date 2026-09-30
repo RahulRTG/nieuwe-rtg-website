@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '51b5dba8';
+var RTG_BOUW = 'f0f5b40c';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -4212,6 +4212,12 @@ var RTG_BOUW = '51b5dba8';
     { sleutel: 'map-rtg', naam: 'LivingOS', wereld: '/apps/rtg.html', glyf: 'rtg', items: [
       'link:vooruitzicht', 'link:vandaag', 'link:leven', 'link:sociaal',
       'link:geldcommand', 'link:mediaos',
+    /* RTG VEILIG STOND ONDER INSTELLINGEN, en daarmee ook de rust (Thuisrust is
+       een stand van deze app). SAMENLEVING.md par. 6 noemde precies dat het
+       gebrek: rust was alleen te vinden voor wie haar al zocht. Besluit van 29
+       september 2026: de hele app hierheen, want stilte, een codewoord en een
+       thuiswacht gaan over iemands dag en niet over het systeem. */
+      'link:veilig',
     /* HET GEZIN KOMT UIT FOUNDATIONOS HIERHEEN, en dat is het eigendomsprincipe
        van WERELDEN.md in de praktijk: de bouwer van een capability bepaalt niet
        in welke wereld hij hoort, de gebruikerscontext doet dat. RTF Mini, Kids,
@@ -4267,7 +4273,7 @@ var RTG_BOUW = '51b5dba8';
        in de voet. Vandaar `paneel`: geen vijfde wereldtegel, geen tweede
        instellingenscherm. wereldBij() in 29c filtert deze map er vanzelf uit. */
     { sleutel: 'map-instellingen', naam: 'Instellingen', paneel: '#osCcBtn', items: [
-      'link:ik', 'link:verificatie', 'link:veilig', 'link:passkeys', 'link:bescherming',
+      'link:ik', 'link:verificatie', 'link:passkeys', 'link:bescherming',
       'link:sessies', 'link:relaties', 'link:gegevens', 'link:neigingen', 'link:post', 'link:juridisch'] },
     /* WORKOS IS EEN CONTEXT EN GEEN PRODUCT MET EEN PRIJS. De naam ging van
        "RTG Kantoor" naar WorkOS omdat er twee verschillende toegangsmodellen in
@@ -6308,9 +6314,21 @@ var RTG_BOUW = '51b5dba8';
     }));
   }
 
+  /* De positie komt van het toestel en nergens anders vandaan: de server vult
+     hem niet meer zelf in (NAVIGATIE.md par. 12, gebrek 11). Weigert het lid of
+     is er geen locatie, dan start Onderweg gewoon zonder -- het paneel zegt dat
+     hardop en de knop "Deel mijn locatie" blijft vooraan staan. */
+  function huidigePositie(){
+    return new Promise(res => {
+      if (!navigator.geolocation) return res(null);
+      navigator.geolocation.getCurrentPosition(p => res({ lat: p.coords.latitude, lng: p.coords.longitude }),
+        () => res(null), { maximumAge: 15000, timeout: 4000 });
+    });
+  }
   async function startLive(){
     const destCode = $('#liveDest').value;
-    try { liveData = (await API.call('/live/start', { destCode, mode: liveMode })).live; toast(T('live.started','U bent onderweg. Uw partners zijn op de hoogte.')); renderLivePanel(); }
+    const hier = await huidigePositie();
+    try { liveData = (await API.call('/live/start', Object.assign({ destCode, mode: liveMode }, hier || {}))).live; toast(T('live.started','U bent onderweg. Uw partners zijn op de hoogte.')); renderLivePanel(); }
     catch (e){ toast(e.message); }
   }
 
@@ -6325,6 +6343,7 @@ var RTG_BOUW = '51b5dba8';
     return pts.map(p => ({ x: ((p.lng - minLng)/dLng)*100, y: (1 - (p.lat - minLat)/dLat)*100 }));
   }
 
+/* het Onderweg-paneel: kaart, partners, handelingen en de bevestigde aankomst */
   function renderLivePanel(){
     const L = liveData; if (!L) return;
     const dest = L.dest;
@@ -6332,6 +6351,7 @@ var RTG_BOUW = '51b5dba8';
     if (L.arrived && dest){ head = T('live.arrivedh','U bent <em>gearriveerd</em>'); sub = dest.name; }
     else if (dest){ head = T('live.headingto','Onderweg naar') + ' <em>' + dest.name + '</em>'; sub = dest.etaMin != null ? T('live.aankomst','aankomst over ~') + dest.etaMin + ' ' + T('live.min','min') : ''; }
     else { head = T('live.moving','U bent <em>onderweg</em>'); }
+    if (L.positie && !L.arrived) sub = (sub ? sub + ' · ' : '') + T('live.geenpositie','uw positie is niet gedeeld');
 
     const pts = [];
     if (L.me) pts.push({ lat: L.me.lat, lng: L.me.lng, me: true });
@@ -6339,7 +6359,7 @@ var RTG_BOUW = '51b5dba8';
     const proj = projectPoints(pts);
     const markers = proj.map((pt,i) => {
       const s = pts[i];
-      return '<div class="mk' + (s.me?' me':'') + '" style="left:' + pt.x.toFixed(1) + '%;top:' + pt.y.toFixed(1) + '%;">' +
+      return '<div class="mk' + (s.me?' me':'') + '" data-x="' + pt.x.toFixed(1) + '" data-y="' + pt.y.toFixed(1) + '">' +
         (s.me ? '<div class="pin"></div>' : '<div>' +RTGGlyf.tekst(s.icon)+ '</div>') +
         '<div class="lbl">' + (s.me ? T('live.you','U') : s.name) + '</div></div>';
     }).join('');
@@ -6350,7 +6370,7 @@ var RTG_BOUW = '51b5dba8';
       if (p.ride && isVeh){
         eta = p.taxiEtaMin != null && p.ride.status !== 'gearriveerd'
           ? '<div class="eta"><div class="n">' + p.taxiEtaMin + '</div><div class="u">' + T('live.mintoyou','min naar u') + '</div></div>'
-          : '<div class="eta"><div class="n" style="font-size:0.9rem;">' + tRide(p.ride.status) + '</div></div>';
+          : '<div class="eta"><div class="n n-klein">' + tRide(p.ride.status) + '</div></div>';
       } else if (p.isDest && L.arrived){
         eta = '<div class="eta arr"><div class="n">✓ ' + T('live.here','ter plaatse') + '</div></div>';
       } else {
@@ -6365,7 +6385,7 @@ var RTG_BOUW = '51b5dba8';
         if (extra.length) line2 += '<br>' + extra.join(' · ');
         // betaling achteraf: de zaak liet de rit direct rijden; afrekenen kan nu
         if (!p.ride.paid && p.ride.quote && p.ride.status !== 'wacht-op-betaling')
-          line2 += '<br><button class="js-rpay" data-rref="' + p.ride.ref + '" data-rq="' + p.ride.quote + '" style="margin-top:0.35rem;background:none;border:1px solid var(--gold);color:var(--rtg-leesgoud,var(--gold));border-radius:0;padding:0.3rem 0.8rem;font-size:0.7rem;font-weight:600;font-family:inherit;cursor:pointer;">' + T('live.betaalrit','Betaal de rit') + ' · ' + eur(p.ride.quote) + '</button>';
+          line2 += '<br><button class="js-rpay live-rpay" data-rref="' + p.ride.ref + '" data-rq="' + p.ride.quote + '">' + T('live.betaalrit','Betaal de rit') + ' · ' + eur(p.ride.quote) + '</button>';
       }
       else if (p.order) line2 += ' · ' + p.order.items + ' ' + T('app.items','item(s)') + ', ' + tStatus(p.order.status);
       return '<div class="live-partner"><span class="pic">' +RTGGlyf.tekst(p.icon)+ '</span><div class="pt"><b>' + p.name + '</b><span>' + line2 + '</span></div>' + eta + '</div>';
@@ -6379,7 +6399,11 @@ var RTG_BOUW = '51b5dba8';
 
     const hasVeh = L.partners.some(p => p.type === 'taxi' || p.type === 'jet');
     const canDoor = L.arrived && dest && dest.hasDoors;
+    /* Aankomst bevestigt de mens (NAVIGATIE.md N13): in de buurt is een vraag,
+       en de knop staat er ook zonder gedeelde positie. */
+    const kanBevestigen = dest && !L.arrived;
     const acts = '<div class="live-acts">' +
+      (kanBevestigen ? '<button class="' + (L.nabij ? 'prim glowbtn' : 'sec') + '" id="liveHier">' + (L.nabij ? T('live.benuer','Bent u er? Bevestig uw aankomst') : T('live.ikbener','Ik ben er')) + '</button>' : '') +
       (canDoor ? '<button class="prim glowbtn" id="liveDoor">' + T('live.door','Open de deur') + '</button>' : '') +
       '<button class="sec" id="liveSim">' + T('live.simulate','Simuleer rit') + '</button>' +
       (hasVeh ? '' : '<button class="sec" id="liveTaxi">' + T('live.taxi','Vraag een taxi') + '</button>') +
@@ -6397,7 +6421,15 @@ var RTG_BOUW = '51b5dba8';
         acts +
       '</div>';
 
+    /* De markers krijgen hun plek hier en niet als style-attribuut: een
+       stijlattribuut houdt style-src-attr open in de CSP (deltapoort). */
+    $('#livePanel').querySelectorAll('.mk[data-x]').forEach(m => { m.style.left = m.dataset.x + '%'; m.style.top = m.dataset.y + '%'; });
     $('#liveStop').addEventListener('click', stopLive);
+    const hier = $('#liveHier');
+    if (hier) hier.addEventListener('click', async () => {
+      try { const r = await API.call('/live/aangekomen', {}); liveData = r.live; renderLivePanel(); }
+      catch (e) { toast(e.message); }
+    });
     $('#liveSim').addEventListener('click', simulateRide);
 /* betalen met Face ID vanuit een rekeningregel */
     document.querySelectorAll('.js-rpay').forEach(b => b.addEventListener('click', () => {
@@ -6471,7 +6503,8 @@ var RTG_BOUW = '51b5dba8';
   function stopSim(){ if (simTimer){ clearInterval(simTimer); simTimer = null; } }
   function simulateRide(){
     const L = liveData;
-    if (!L || !L.me || !L.dest || !L.dest.loc){ toast(T('live.nosim','Kies eerst een bestemming.')); return; }
+    if (!L || !L.dest || !L.dest.loc){ toast(T('live.nosim','Kies eerst een bestemming.')); return; }
+    if (!L.me){ toast(T('live.nosimpos','Deel eerst uw locatie; een simulatie begint bij waar u echt bent.')); return; }
     stopSim();
     const start = { lat: L.me.lat, lng: L.me.lng };
     const end = { lat: L.dest.loc.lat, lng: L.dest.loc.lng };
@@ -6709,7 +6742,7 @@ var RTG_BOUW = '51b5dba8';
     // lopende bezorgingen van deze winkel
     const bez = (menuState.modeBezorg || []).filter(b => b.supplierName === r.supplier.name && !['afgeleverd','retour','geannuleerd'].includes(b.status));
     if (bez.length) html += bez.map(b => '<div style="background:var(--card);border:1px solid var(--gold);border-radius:0;padding:0.7rem 0.9rem;margin-bottom:0.7rem;"><div style="font-size:0.7rem;color:var(--rtg-leesgoud,var(--gold));letter-spacing:0.08em;text-transform:uppercase;">' + T('mb.onderweg','Bezorging') + ' · ' + esc(b.status) + '</div>' +
-      '<div style="font-size:0.85rem;margin-top:0.3rem;">' + T('mb.code','Bezorgcode') + ': <b style="letter-spacing:0.2em;font-size:1.05rem;">' + esc(b.bezorgcode) + '</b></div>' +
+      '<button data-mbcode="' + esc(b.ref) + '" style="margin-top:0.4rem;background:none;border:1px solid var(--gold);color:inherit;border-radius:0;padding:0.35rem 0.7rem;font-family:inherit;cursor:pointer;">' + T('mb.toon','Nieuwe bezorgcode') + '</button>' +
       '<div style="font-size:0.68rem;color:var(--soft);margin-top:0.2rem;">' + (b.koerier ? T('mb.koerieris','Koerier') + ': ' + esc(b.koerier) + (b.etaMin != null ? ' · ETA ' + b.etaMin + ' min' : '') : T('mb.geefcode','Geef deze code alleen aan de RTG-koerier aan de deur.')) + '</div></div>').join('');
     const styling = (mijn.styling || []).filter(v => v.supplierName === r.supplier.name);
     if (styling.length) html += styling.map(v => '<div style="background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.7rem 0.9rem;margin-bottom:0.7rem;"><div style="font-size:0.7rem;color:var(--rtg-leesgoud,var(--gold));letter-spacing:0.08em;text-transform:uppercase;">' + esc(v.titel) + '</div>' +
@@ -6754,11 +6787,18 @@ var RTG_BOUW = '51b5dba8';
       if (!adres || !adres.trim()) return;
       try {
         const r = await API.call('/mode/bezorg/aanvraag', { supplierCode: code, adres: adres.trim(), items });
-        toast('' + T('mb.aangevraagd','Bezorging aangevraagd. Bezorgcode:') + ' ' + r.bezorging.bezorgcode);
+        // de bezorgcode komt uit een eigen uitgifte (eenmalig getoond), niet uit de aanvraag
+        const c = await API.call('/mode/bezorg/code', { ref: r.bezorging.ref });
+        toast('' + T('mb.aangevraagd','Bezorging aangevraagd. Bezorgcode:') + ' ' + c.bezorgcode);
         try { menuState.modeBezorg = (await API.call('/mode/bezorg/mijn', {})).bezorgingen || []; } catch(e){}
         renderMenuSheet();
       } catch(e){ toast(e.message); }
     });
+    // de bezorgcode staat alleen in dit antwoord; een nieuwe maakt de vorige ongeldig
+    document.querySelectorAll('[data-mbcode]').forEach(b => b.addEventListener('click', async () => {
+      try { const r = await API.call('/mode/bezorg/code', { ref: b.dataset.mbcode }); b.textContent = T('mb.code','Bezorgcode') + ': ' + r.bezorgcode; }
+      catch(e){ toast(e.message); }
+    }));
     document.querySelectorAll('[data-rfav]').forEach(b => b.addEventListener('click', async () => {
       try {
         const d = await API.call('/retail/wishlist', { code, artikelId: b.dataset.rfav });
@@ -7444,7 +7484,7 @@ var RTG_BOUW = '51b5dba8';
     box.style.display='';
     let kan; try{ kan=await API.call('/rtf/kanaal',{ code:g[0].code }); }catch(e){ box.innerHTML='<div class="meta">Chat is nu niet beschikbaar.</div>'; return; }
     if (!grtInit && window.GezinRT){ GezinRT.init({ base:'/api/foundation', code:kan.code, token:kan.token, mijnId:kan.profielId, mijnNaam:'ik', leden:kan.leden, onChat:onGrtChat }); grtInit=true; }
-    else if (window.GezinRT){ GezinRT.setLeden(kan.leden); }
+    else if (window.GezinRT){ GezinRT.setLeden(kan.leden); if (GezinRT.setToken) GezinRT.setToken(kan.token); }
     let chats=[]; try{ chats=(await GezinRT.chats()).chats||[]; }catch(e){}
     const byId={}; chats.forEach(c=> byId[c.id]=c);
 /* het gezinsblok: chatten en bellen met het gezin */

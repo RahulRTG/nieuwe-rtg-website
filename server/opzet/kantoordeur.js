@@ -27,7 +27,19 @@ module.exports = function kantoordeur(app, kern, deps) {
     .maakLeerhuisSchaduw({ db: deps.db, save: deps.save, sessionFor: deps.sessionFor }).meelezer);
   /* Fase 8: de toegangsreview leest de drie zetelbronnen. De balie en de
      codenamen bestaan pas bij een verzoek, vandaar de functies. */
+  /* B1 (PERSONEEL.md): welke entiteit is RTG, en werkt deze houder daar? */
+  const huis = require('../kern/kantoor/huis').maakHuis({ db: deps.db, save: deps.save });
+  beleidsmotor.huis = huis;
+  /* Aanwijzen doet alleen de eigenaar zelf, en de sleutel komt uit de sessie. */
+  beleidsmotor.huisZet = (req, entiteitId) => {
+    const wie = rauw.boardroomWie(req);
+    if (!wie || !rauw.boardroomBaas(wie)) return { status: 403, error: 'Alleen de eigenaar wijst aan welke entiteit RTG is.' };
+    return huis.wijsAan(entiteitId, wie, (id) => !!(kern().entiteitVind && kern().entiteitVind(id)));
+  };
   beleidsmotor.review = require('../kern/beleidsmotor/review').maakReview({ kantoorHouders: () => kern().kantoorHouders(),
+    werkverband: (k) => huis.werkverband(k, { codenaamVan: (x) => kern().codenaamVan(x),
+      employmentVanPersoon: (p, oud) => kern().employmentVanPersoon(p, oud) }),
+    huis: () => huis.aanwijzing(),
     boardroomLijst: rauw.boardroomLijst, magBoardroom: rauw.magBoardroom, boardroomBaas: rauw.boardroomBaas,
     magBalie: (k) => kern().magBalie(k), balieZetels: () => kern().balieZetels(),
     codenaamVan: (k) => kern().codenaamVan(k), laatstGebruikt: beleidsmotor.laatstGebruikt });

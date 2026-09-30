@@ -3,7 +3,7 @@
  "uitleg": "Wat een scherm in public/ via de API kan veroorzaken: schrijft het, welke rol vraagt het, wat is het bewijs waard, en wat doet een tweede aanroep. Samengesteld uit bestaande metingen -- hier wordt niets nieuws gemeten en niets geraden.",
  "stempel": {
   "op": "2026-09-29",
-  "commit": "2ae19049"
+  "commit": "4984ab46"
  },
  "grond": [
   "SCHERMROUTES.json",
@@ -16,8 +16,8 @@
  "samenstelregel": "schrijven: de ZWAARSTE uitkomst wint (een van de tien routes schrijft = dit scherm kan iets veranderen). Bewijs: het ZWAKSTE telt, want een keten is zo sterk als zijn zwakste schakel. Onbekend is in beide gevallen niet de gunstige uitkomst.",
  "gemeten": {
   "schermen": 422,
-  "metGrond": 273,
-  "zonderGrond": 149,
+  "metGrond": 274,
+  "zonderGrond": 148,
   "schrijftJa": 65,
   "schrijftNee": 1,
   "schrijftOnbekend": 160,
@@ -31,7 +31,7 @@
   "bewijsVerzwakt": 213,
   "bewijsNietVastTeStellen": 175,
   "onbekendeBewijswaarden": [],
-  "zonderRol": 48
+  "zonderRol": 49
  },
  "zonderUitspraak": [
   "public/apps/app-main/app-main-43.js",
@@ -83,7 +83,6 @@
   "public/apps/foundation/registreren.js",
   "public/apps/foundation/samen-thuis.js",
   "public/apps/foundation/samen/samen-01.js",
-  "public/apps/foundation/samendoen.js",
   "public/apps/foundation/schoolbieb.html",
   "public/apps/foundation/schrijven.html",
   "public/apps/foundation/sessie/sessie-01.js",
@@ -3197,6 +3196,17 @@
    "reden": null
   },
   {
+   "bestand": "public/apps/foundation/samendoen.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 1,
+   "routesGeraakt": 1,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
+  },
+  {
    "bestand": "public/apps/foundation/school.html",
    "padenGenoemd": 1,
    "voorvoegsels": 1,
@@ -4799,17 +4809,6 @@
   },
   {
    "bestand": "public/apps/foundation/samen-thuis.js",
-   "padenGenoemd": 0,
-   "voorvoegsels": 1,
-   "routesGeraakt": 0,
-   "schrijft": "niet vast te stellen",
-   "bewijs": "niet vast te stellen",
-   "rollen": [],
-   "herhaling": [],
-   "reden": "dit scherm bouwt zijn paden op (sjabloon of optelling); daar hoort geen route bij die statisch te vinden is"
-  },
-  {
-   "bestand": "public/apps/foundation/samendoen.js",
    "padenGenoemd": 0,
    "voorvoegsels": 1,
    "routesGeraakt": 0,

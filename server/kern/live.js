@@ -78,7 +78,16 @@ function maakLive({ db, bus, nextSseId, PERSONAS, sseToSupplier, sseToOffice, fi
       };
     }).filter(Boolean);
     const destCode = L && L.destCode ? L.destCode : null;
-    return { active, mode, me, arrived: !!(L && L.arrived), destCode, dest: destCode ? (partners.find(p => p.code === destCode) || null) : null, partners };
+    /* Een lege positie draagt haar reden (NAVIGATIE.md par. 12, gebrek 11). De
+       server vult hem niet zelf in: geen hotel, geen punt naast de bestemming.
+       Het scherm kan dan vragen in plaats van een verzonnen stip te tonen. */
+    const positie = active && !me ? 'Uw positie is niet gedeeld; RTG vult hem niet zelf in.' : null;
+    /* `nabij` is een VOORSTEL en geen aankomst (NAVIGATIE.md N13): het scherm
+       vraagt "Bent u er?", en pas een bevestiging maakt er een aankomst van. */
+    const nabij = !!(L && L.active && L.nabij && !L.arrived);
+    const aankomstDoor = L && L.arrived && L.aankomst ? L.aankomst.door : null;
+    const aankomstAt = L && L.arrived && L.aankomst ? L.aankomst.at : null;
+    return { active, mode, me, positie, nabij, arrived: !!(L && L.arrived), aankomstDoor, aankomstAt, destCode, dest: destCode ? (partners.find(p => p.code === destCode) || null) : null, partners };
   }
 
   // Reizende leden die op dit moment met deze partner te maken hebben (voor de leverancier-app).
@@ -96,7 +105,7 @@ function maakLive({ db, bus, nextSseId, PERSONAS, sseToSupplier, sseToOffice, fi
       out.push({
         codename: L.codename, distance: dist, etaMin: etaMinutes(dist, L.mode),
         loc: me, mode: L.mode,
-        heading: L.destCode === code, arrived: !!L.arrived,
+        heading: L.destCode === code, arrived: !!L.arrived, nabij: !!(L.nabij && !L.arrived),
         orderRef: order ? order.ref : null, rideRef: ride ? ride.ref : null
       });
     }
@@ -106,4 +115,29 @@ function maakLive({ db, bus, nextSseId, PERSONAS, sseToSupplier, sseToOffice, fi
   return { sseToCustomer, liveCodename, connectedSupplierCodes, pushLive, liveStateFor, guestsFor };
 }
 
-module.exports = { maakLive };
+/* De bevestigde aankomst (NAVIGATIE.md N3 en N13) heeft alleen `db` nodig en
+   staat daarom los van maakLive: die wordt in server/opzet/diensten.js
+   opgebouwd, en elke naam die daar bijkomt moet door server/server.js, dat al
+   over de omvanggrens staat. server/opzet/kernlaag5.js zet hem in de kern. */
+function maakAankomst({ db }) {
+  /* AANKOMST WORDT BEVESTIGD, NIET GEMETEN (NAVIGATIE.md N3 en N13). Hier zette
+     /api/live/update `arrived` zodra een opgeslagen positie binnen 150 m van de
+     bestemming lag, en daarop ging een deur open. Nu is een aankomst een
+     bevestiging van het LID of van de ZAAK -- wie het eerst bevestigt is genoeg,
+     en er is geen positie voor nodig (een lid dat zijn locatie niet deelt, komt
+     evengoed aan). Deze functie zet alleen de stand; wie bevestigt, meldt het
+     zelf aan de ander, want de woorden verschillen per kant. */
+  function bevestigAankomst(key, door) {
+    const L = db.data.live[key];
+    if (!L || !L.active) return { status: 409, error: 'Er is geen lopende reis.' };
+    if (!L.destCode) return { status: 409, error: 'Deze reis heeft geen bestemming om bij aan te komen.' };
+    if (L.arrived) return { status: 200, al: true, L };
+    L.arrived = true;
+    L.aankomst = { door, at: new Date().toISOString() };
+    return { status: 200, al: false, L };
+  }
+
+  return { bevestigAankomst };
+}
+
+module.exports = { maakLive, maakAankomst };

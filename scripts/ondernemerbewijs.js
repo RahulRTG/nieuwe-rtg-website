@@ -135,7 +135,8 @@ const BRON = {
   appwerkt: lees('APPWERKT.json'),
   execmap: lees('EXECUTION_MAP.json'),
   idor: lees('IDOR.json'),
-  handeling: lees('HANDELINGPROEF.json')
+  handeling: lees('HANDELINGPROEF.json'),
+  idembesluit: lees('IDEMBESLUIT.json')
 };
 const ontbreekt = Object.keys(BRON).filter(k => !BRON[k]);
 if (ontbreekt.length) {
@@ -217,6 +218,38 @@ uitRijen(BRON.rol.perRoute, 'bevoegd', 'acl', new Set(['dicht']), new Set(['open
 uitRijen(BRON.audit.perRoute, 'auditbaar', 'audit', new Set(['bewezen']), new Set(['afwezig', 'gebroken']));
 // --- herstelbaar: IDEMPROEF (tweede identieke aanroep) ---
 uitRijen(BRON.idem.perRoute, 'herstelbaar', 'idempotentie', new Set(['beschermd']), new Set(['onbeschermd']));
+/* EEN EENMALIG GEHEIM IS MET OPZET NIET IDEMPOTENT (server/lib/eenmalig-geheim-routes.js):
+   een herhaling krijgt een conflict of een NIEUW geheim, nooit het oude uit een
+   cache. Dat de proef dan "deed het opnieuw" meet is juist, maar het is geen schade
+   door een dubbele actie -- het is het contract. Zo'n route wordt hier ONBEKEND met
+   die reden, en niet ROOD (dat zou een verklaard besluit als storing tellen) en ook
+   niet GROEN (niemand heeft bewezen dat de rotatie niets beschadigt). */
+const { ROUTES: EENMALIG } = require(path.join(WORTEL, 'server/lib/eenmalig-geheim-routes'));
+for (const [sleutel, r] of routes) {
+  const u = r.uitslag.herstelbaar;
+  /* Een route die IDEMBESLUIT.json op `tebeslissen` zet, is een open vraag en
+     blijft ROOD -- ook als hij op de lijst eenmalige geheimen staat (#420). */
+  const open = BRON.idembesluit && (BRON.idembesluit.routes || {})[r.pad];
+  if (open && open.klasse === 'tebeslissen') continue;
+  if (u && u.stand === 'ROOD' && EENMALIG.has(sleutel))
+    r.uitslag.herstelbaar = { stand: 'ONBEKEND', waarde: u.waarde,
+      reden: 'met opzet niet idempotent: een eenmalig geheim (lib/eenmalig-geheim-routes.js); de proef mat ' + u.waarde };
+}
+/* EEN BESLUIT MAAKT ROOD NIET GROEN, maar ook niet rood. IDEMBESLUIT.json zegt
+   per route waarom een tweede oproep met opzet iets NIEUWS doet (een code-maker
+   geeft een verse sleutel, een teller telt). De bewijsmatrix zet zo'n cel op
+   nvt met het besluit erbij; hier zakte de hele capability erop -- op 29
+   september 2026 blokkeerden rtmail/imap/sleutel, bedrijf/mijn en
+   bedrijf/lid/aanmeld zo drie capabilities terwijl de eigenaar juist had
+   besloten dat ze zo horen. De stand wordt ONBEKEND (een besluit is geen
+   bewijs), de meting blijft als waarde staan, en `tebeslissen` blijft ROOD. */
+for (const r of routes.values()) {
+  const u = r.uitslag.herstelbaar;
+  const besluit = u && u.stand === 'ROOD' && BRON.idembesluit && (BRON.idembesluit.routes || {})[r.pad];
+  if (!besluit || !besluit.klasse || besluit.klasse === 'tebeslissen') continue;
+  r.uitslag.herstelbaar = { stand: 'ONBEKEND', waarde: u.waarde, besluit: besluit.klasse,
+    reden: 'gemeten ' + u.waarde + ', maar besloten als ' + besluit.klasse + ' in IDEMBESLUIT.json -- een besluit is geen bewijs' };
+}
 // --- persistent: IDEMPROEF opslag-beeld (graad `vermoed`, zie LAGEN) ---
 for (const rij of Object.values(BRON.idem.perRoute || {})) {
   if (!rij || !rij.pad || !rij.methode) continue;

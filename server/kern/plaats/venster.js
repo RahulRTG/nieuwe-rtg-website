@@ -11,14 +11,14 @@
 
 const VENSTER_MAX_MIN = 12 * 60;      // een venster van meer dan een dienst is geen venster
 
-module.exports = ({ db, save, opslag, DOELEN }) => {
+module.exports = ({ db, save, opslag, DOELEN, DOEL, kentHek }) => {
   const { nu, id, vensters, ruim, schrijfLog, open } = opslag;
 
   /* Een venster openen. `bron` zegt WAAROM het openging -- een lopende dienst,
      een rit, een alarm, of een uitdrukkelijke tik van het lid -- en staat in het
      actielog. Zonder bron is een venster niet te verantwoorden, en een
      toestemming die niemand kan navertellen is geen toestemming. */
-  function vensterOpen(codenaam, v) {
+  function vensterOpen(codenaam, v, key) {
     ruim();
     if (!codenaam) return { status: 401, error: 'Geen lid.' };
     const doel = String((v && v.doel) || '');
@@ -26,6 +26,14 @@ module.exports = ({ db, save, opslag, DOELEN }) => {
     const bron = String((v && v.bron) || '').slice(0, 60);
     if (!bron) return { status: 400, error: 'Een venster zonder reden gaat niet open.' };
     const minuten = Math.min(VENSTER_MAX_MIN, Math.max(1, Number(v && v.minuten) || 60));
+    /* EEN DOEL MET EEN HEK (NAVIGATIE.md N12). Bij een nadering is het doel
+       van het venster een plek, en die plek hoort in het venster te staan: de
+       server bewaart alleen wat over dat hek gaat. Zonder hek zou elke
+       overgang onderweg weer bewaard moeten worden, en dat is de passagelog. */
+    const eenHek = !!(DOEL && DOEL[doel] && DOEL[doel].eenHek);
+    const hek = eenHek ? String((v && v.hek) || '') : null;
+    if (eenHek && !hek) return { status: 400, error: 'Een nadering noemt het hek waar het bezoek heen gaat.' };
+    if (eenHek && kentHek && !kentHek(doel, hek, codenaam, key)) return { status: 400, error: 'Onbekend hek.' };
     /* Eén venster per doel. Twee open vensters voor hetzelfde doel betekent twee
        einddatums, en dan is de vroegste een leugen. Bestaat er al een, dan
        verlengen we die in plaats van er een tweede naast te zetten. */
@@ -33,10 +41,11 @@ module.exports = ({ db, save, opslag, DOELEN }) => {
     const sluit = new Date(Date.now() + minuten * 60000).toISOString();
     if (bestaand) {
       bestaand.sluit = sluit; bestaand.bron = bron;
+      if (eenHek) bestaand.hek = hek;
       schrijfLog(codenaam, 'venster-verlengd', { doel, bron, sluit }); save();
       return { status: 200, venster: bestaand, verlengd: true };
     }
-    const venster = { id: id(), codenaam, doel, bron, geopend: nu(), sluit };
+    const venster = Object.assign({ id: id(), codenaam, doel, bron, geopend: nu(), sluit }, eenHek ? { hek } : {});
     vensters().unshift(venster);
     schrijfLog(codenaam, 'venster-geopend', { doel, bron, sluit });
     save();

@@ -6,13 +6,6 @@
     "herrekenbaar-uit-bron": "Het gevolg is opnieuw af te leiden uit een bron die zelf duurzaam is vastgelegd. Het verlies valt de veilige kant op.",
     "duurzaam-vereist": "Het gevolg is niet te herrekenen en hoort dus wel aan een duurzame commit. Een route die hier staat en toch zakt, is werk en geen verklaring."
   },
-  "routes": {
-    "POST /api/office/magnaat/scan": {
-      "klasse": "cache",
-      "grond": "Het enige dat deze route wegschrijft is `s.laatsteScan`, een tijdstempel die de dagelijkse herhaling afremt. De zestien voorstellen die hij teruggeeft staan in de ZAAISET; de scan maakt ze niet. Gemeten op een draaiende server: twee scans achter elkaar geven allebei nieuw=0, en na een herstart staan de voorstellen er nog voordat er opnieuw is gescand. Raakt de tijdstempel weg, dan slaat de volgende scan de daggrens niet over en draait hij gewoon -- dat kost rekenwerk en verliest niets. Ook een scan die wel iets vindt is herstelbaar: de voorstellen worden ontdubbeld op kans.sleutel, dus wat verloren ging komt de volgende ronde terug.",
-      "waaromNietDuurzaam": "Hem aan saveDuurzaam() hangen zou de schaarste van dat primitief opgeven voor een tijdstempel in de simulatiewereld -- precies waar db/duurzaam.js in zijn eigen kop voor waarschuwt: zodra iemand hem leest als 'de veilige save', staat hij binnen een half jaar onder een profielwijziging en een like.",
-      "besloten": "2026-09-13",
-      "meting": "FAALPROEF.json blijft deze route als gezakt melden; zie MENSNETWERK.md par. 0.6b."
-    }
-  }
+  "routes": {},
+  "geschiedenis": "POST /api/office/magnaat/scan stond hier van 13 tot 29 september 2026 als `cache`. De verse faalproef van 29 september meet hem als bewezen (schrijf-faalt: een expliciete 503 in plaats van een bevestiging), dus het besluit ging over niets meer en is weggehaald -- zie test/herrekenbaar.test.js toets 3."
 }

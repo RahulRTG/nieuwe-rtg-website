@@ -5,8 +5,9 @@
    privechauffeur.
 
    Inchecken, bewust met twee snelle opties:
-   1. De oplichtende code: het lid toont een korte code, het personeel tikt
-      hem in: klaar. (Zelfde vertrouwde mechaniek als de entree- en kassacode.)
+   1. De oplichtende code: het lid kiest de vervoerder en toont een QR, het
+      personeel van DIE vervoerder scant hem (./incheckcode.js: 128 bits,
+      hash-only, eenmalig, atomair geclaimd).
    2. Een tik op GPS: het lid staat aantoonbaar bij het voertuig (binnen 150
       meter van de live positie) en checkt in zonder iets te laten zien.
    Uitchecken is een tik: de prijs is eerlijk basis + kilometers (hemelsbreed
@@ -23,10 +24,11 @@ const CODE_TTL_MS = 5 * 60 * 1000;    // de oplichtende code
 const GPS_CHECKIN_M = 150;            // zo dichtbij is 'bij het voertuig'
 const RITTEN_MAX = 4000;
 
-function maakOv({ db, save, crypto, schoon, codenaamVan, haversine, etaMinutes, pay, notify, afwezigOp }) {
+function maakOv({ db, save, crypto, bewerkCollectie, schoon, codenaamVan, haversine, etaMinutes, pay, notify, afwezigOp }) {
   const id = p => (p || 'ov') + crypto.randomBytes(4).toString('hex');
   const nu = () => new Date().toISOString();
-  const codes = new Map();              // code -> { key, tot }
+  // de incheckcode: persistent en hash-only, nooit alleen in procesgeheugen
+  const codes = require('./incheckcode')({ crypto, bewerkCollectie, CODE_TTL_MS });
 
   /* ---- de demo-zaak: Ibiza Transit met vier lijnsoorten ---- */
   function ensureOv() {
@@ -93,14 +95,25 @@ function maakOv({ db, save, crypto, schoon, codenaamVan, haversine, etaMinutes, 
   const versVoertuig = v => Date.now() - new Date(v.at).getTime() < VOERTUIG_TTL_MS;
   const actieveRit = key => db.data.ovRitten.find(r => r.key === key && r.status === 'in') || null;
 
+  /* Halte in plaats van punt (NAVIGATIE.md N17): ./halte.js. De omzetting van
+     oude ritten krijgt de lijst en de lijn per rit, en slaat hier op. */
+  const { inPunten, halteBij, inPuntVan, puntenWeg: naarHalte } = require('./halte')({ haversine });
+  const puntenWeg = () => {
+    if (naarHalte(db.data.ovRitten, r => { const s = ovZaak(r.code); return s ? lijnVan(s, r.lijnId) : null; })) save();
+  };
+
   function ritStart(key, voertuig) {
     if (actieveRit(key)) return { status: 409, error: 'Al ingecheckt.' };
     const s = ovZaak(voertuig.code);
     const lijn = s ? lijnVan(s, voertuig.lijnId) : null;
     if (!lijn) return { status: 404, error: 'Lijn niet gevonden.' };
+    const at = nu();
+    // `at` bovenaan: daar leest de bewaarveger de datum (N17, een jaar)
     const rit = { id: id('rt'), key, code: voertuig.code, lijnId: lijn.id, soort: lijn.soort,
-      voertuigId: voertuig.id, status: 'in',
-      in: { lat: voertuig.lat, lng: voertuig.lng, at: nu() }, uit: null, prijs: null };
+      voertuigId: voertuig.id, status: 'in', at,
+      in: { ...halteBij(lijn, voertuig), at }, uit: null, prijs: null };
+    inPunten.set(rit.id, { lat: voertuig.lat, lng: voertuig.lng });
+    if (inPunten.size > RITTEN_MAX) inPunten.delete(inPunten.keys().next().value);
     db.data.ovRitten.push(rit);
     if (db.data.ovRitten.length > RITTEN_MAX) db.data.ovRitten = db.data.ovRitten.slice(-RITTEN_MAX);
     save();
@@ -109,17 +122,19 @@ function maakOv({ db, save, crypto, schoon, codenaamVan, haversine, etaMinutes, 
   }
   function ritBeeld(r) {
     return { id: r.id, lijnId: r.lijnId, soort: r.soort, icoon: SOORTEN[r.soort] || '\u{1F68C}',
-      status: r.status, inAt: r.in.at, uitAt: r.uit ? r.uit.at : null, prijs: r.prijs, km: r.km || null };
+      status: r.status, inAt: r.in.at, uitAt: r.uit ? r.uit.at : null, prijs: r.prijs, km: r.km || null,
+      van: r.in.halte || null, naar: r.uit ? r.uit.halte || null : null };
   }
 
   // de gedeelde ctx voor de deelbestanden
   const ctx = {
     db, save, crypto, schoon, nu, id, codenaamVan, haversine, etaMinutes, pay, notify, codes, afwezigOp,
     ensureOv, ovZaak, lijnVan, ovPrijsVan, versVoertuig, actieveRit, ritStart, ritBeeld,
-    SOORTEN, VOERTUIG_TTL_MS, CODE_TTL_MS, GPS_CHECKIN_M, RITTEN_MAX
+    halteBij, inPuntVan, inPunten, SOORTEN, VOERTUIG_TTL_MS, CODE_TTL_MS, GPS_CHECKIN_M, RITTEN_MAX
   };
 
   ensureOv();
+  puntenWeg();   // na ensureOv: dan bestaat de demozaak en zijn haltelijst al
   return Object.assign({ ovPrijsVan, ovZaakVan: ovZaak, ovLijnVan: lijnVan },
     require('./reizen')(ctx), require('./dienst')(ctx), require('./regie')(ctx), require('./operatie')(ctx));
 }

@@ -107,7 +107,9 @@ function maakVraag(basis) {
       const req = http.request({ hostname: u.hostname, port: u.port, path: pad, method: methode, headers, agent,
         timeout: (opt && opt.timeout) || 8000 }, res => {
         let body = '';
-        res.on('data', c => { if (body.length < 4096) body += c; });
+        // De kantoorlogin draagt ook de werkvoorraad. 4 KiB knipte geldig
+        // JSON halverwege af zodra het antwoord over meer chunks kwam.
+        res.on('data', c => { if (body.length < 1024 * 1024) body += c; });
         res.on('end', () => {
           let json = null; try { json = JSON.parse(body); } catch (e) {}
           resolve({ status: res.statusCode, data: json });

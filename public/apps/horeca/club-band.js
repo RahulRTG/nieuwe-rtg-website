@@ -21,8 +21,11 @@
   var esc = K.esc;
 
   function toonBand(d) {
+    /* De code staat er alleen bij de EERSTE opwaardering: de server toont hem
+       een keer (druk hem als QR op de band). Daarna heet de band zijn nummer. */
     $('cBandUit').textContent = 'Band ' + d.band.nummer + ': ' + K.euro(d.band.saldo) +
-      ' saldo (in totaal ' + K.euro(d.band.opgewaardeerd) + ' opgewaardeerd).';
+      ' saldo (in totaal ' + K.euro(d.band.opgewaardeerd) + ' opgewaardeerd).' +
+      (d.band.bonCode ? ' Code voor de QR, wordt maar een keer getoond: ' + d.band.bonCode : '');
   }
 
   function tafels() {
@@ -42,7 +45,9 @@
   if (!K.poort()) return;
 
   $('cBandOp').addEventListener('click', function () {
-    K.api('/club/band', { nummer: $('cNummer').value.trim(), bedrag: Number($('cBedrag').value) || 0 })
+    // een sleutel per tik: een dubbeltik waardeert niet twee keer op
+    K.api('/club/band', { nummer: $('cNummer').value.trim(), bedrag: Number($('cBedrag').value) || 0,
+      idem: RTGId('band') })
       .then(function (r) {
         if (r.body.error) return K.meld(r.body.error);
         toonBand(r.body);

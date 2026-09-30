@@ -4,7 +4,7 @@
 
 module.exports = H => {
   const { tekst, fout, vind, revisie, commando, legCommandoVast, muteer,
-    publiek, rolVan, nu, id } = H;
+    publiek, rolVan, nu, id, sluitToegang } = H;
 
   function kiesRol(key, kamerId, rolId, verwacht) {
     const v = vind(key, kamerId); if (v.fout) return v.fout;
@@ -46,6 +46,7 @@ module.exports = H => {
     v.kamer.taken = bouwTaken(v.kamer);
     v.kamer.taakIndex = 0;
     v.kamer.status = 'bezig';
+    sluitToegang(v.kamer, v.d.key);
     muteer(v.kamer, v.d, 'training-gestart', v.kamer.deelnemers.length + ' deelnemers · ' + v.kamer.werkproces.naam);
     return { ok: true, kamer: publiek(v.kamer, key) };
   }

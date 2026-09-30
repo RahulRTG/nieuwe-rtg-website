@@ -104,10 +104,11 @@
         <div class="veilig">Stoppen blijft altijd direct beschikbaar.</div></div>
       <h2>Actie nodig</h2>
       <div class="kaart codeIn actieNodig">
-        <p class="stil">Het lid toont een oplichtende code; tik hem in en de reiziger is binnen.</p>
+        <p class="stil">Het lid toont een oplichtende code; scan hem en de reiziger is binnen.</p>
+        <div class="rij"><button class="knop vol" id="incheckScan" type="button">Scan de incheckcode</button></div>
         <form class="rij" id="codeForm">
           <label for="codeVeld" class="i-1v4gr3">Incheckcode</label>
-          <input id="codeVeld" maxlength="6" autocomplete="off" placeholder="XXXXXX">
+          <input id="codeVeld" maxlength="80" autocomplete="off" placeholder="OVI.">
           <button class="knop vol" type="submit">Check in</button>
         </form>
         <p class="stil h-mt50">Reizigers met de GPS-tik checken zichzelf in; die ziet u vanzelf in
@@ -237,14 +238,19 @@
     $('#dienstBadge').textContent = 'Geen dienst';
     zeg('Dienst gestopt.');
   });
-  $('#codeForm').addEventListener('submit', async e => {
-    e.preventDefault();
-    const r = await api('checkin', { code: $('#codeVeld').value });
+  async function incheck(code) {
+    const r = await api('checkin', { code });
     if (r.body.error) return zeg(r.body.error);
     $('#codeVeld').value = '';
     zeg('Reiziger ingecheckt.');
     const s = await api('stand');
     if (s.status === 200) { $('#tAanBoord').textContent = s.body.aanBoord; $('#tVandaag').textContent = s.body.vandaag; }
+  }
+  $('#codeForm').addEventListener('submit', e => { e.preventDefault(); incheck($('#codeVeld').value.trim()); });
+  $('#incheckScan').addEventListener('click', () => {
+    if (!window.RTGScanknop) return zeg('Scannen kan hier niet; tik de code in.');
+    RTGScanknop.open({ titel: 'Incheckcode scannen', hint: 'Laat de reiziger de oplichtende QR tonen.',
+      onCode: c => incheck(String((c && c.tekst) || c || '').trim()) });
   });
 
   start();

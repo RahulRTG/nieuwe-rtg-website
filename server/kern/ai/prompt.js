@@ -57,7 +57,7 @@ module.exports = (ctx) => {
     } catch (e) { return null; }
   }
 
-  function aiSystemPrompt(tier, lang, key) {
+  function aiSystemPrompt(tier, lang, key, alsDelen) {
     const persona = PERSONAS[tier];
     /* Een echt account leest zichzelf; een demo-sessie houdt de persona. */
     const eigen = eigenProfiel(key) || {};
@@ -82,7 +82,7 @@ module.exports = (ctx) => {
     const taalRegel = (!lang || lang === 'nl')
       ? 'Antwoord in het Nederlands, beknopt (maximaal ~120 woorden), zonder opsmuk.'
       : 'The member reads and writes in ' + naamEn(lang) + '. Answer ONLY in ' + naamEn(lang) + ', concise (max ~120 words), no frills. Keep the same courteous, formal register.';
-    return [
+    const delen = [
       // Het vaste karakterportret van Rahul (identiteit, karakter, herkomst en
       // vorming) - statische tekst uit ./karakter, in elke prompt gelijk.
       ...RAHUL_KARAKTER,
@@ -138,7 +138,9 @@ module.exports = (ctx) => {
         ? `Openstaande betalingen: ${openInvoices.map(i => `${i.desc} (€ ${i.netto + i.bijdrage})`).join('; ')}. Wijs daar alleen op als het relevant is.`
         : 'Er staan geen betalingen open.',
       'Verzin geen boekingen of prijzen die hierboven niet staan. Als je iets niet weet of niet kunt regelen, zeg dat eerlijk en bied aan het uit te zoeken.'
-    ].join('\n');
+    ];
+    // los voor ./chatpakket.js, dat de delen een soort geeft
+    return alsDelen ? delen : delen.join('\n');
   }
 
   return { aiSystemPrompt, cannedAnswer };

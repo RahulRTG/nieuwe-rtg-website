@@ -4,17 +4,15 @@
    en hoe komt er een bij (altijd door de bestaande werk-inlog te bewijzen).
    Dit bestand doet het andere: met zo'n sleutel daadwerkelijk naar binnen.
 
-   Afgesplitst toen het bestand over de 10 kB ging, en de naad zat er al: dit is
-   verreweg het zwaarste deel, want er hangt van alles aan een sessie die er aan
-   een sleutel niet hangt -- het werkvenster van de werkgever, de algemene pin,
-   twee soorten logs, en de vraag of iemand nog in dienst is.
+   Afgesplitst toen het bestand over de 10 kB ging: aan een sessie hangt wat er
+   aan een sleutel niet hangt -- het werkvenster, de algemene pin, twee soorten
+   logs, of iemand nog in dienst is, en (B10) de passkey aan de kantoordeur.
 
    HET ENE ACCOUNT IS GEEN ACHTERDEUR, en dat wordt HIER waargemaakt. accStart()
    munt precies dezelfde sessie als de losse inlog: dezelfde rememberSession met
-   dezelfde velden, dezelfde logregel, hetzelfde werkvenster. Zou hier ook maar
-   een controle worden overgeslagen omdat "hij al is ingelogd", dan is het ene
-   account een tweede toegangspad met soepeler regels -- en dan is het geen
-   sleutelbos meer maar een omweg. */
+   dezelfde velden, dezelfde logregel, hetzelfde werkvenster. Een controle die
+   hier wordt overgeslagen omdat "hij al is ingelogd", maakt van de sleutelbos
+   een omweg met soepeler regels. */
 'use strict';
 const klok = require('../../lib/klok');
 const werkSleutels = require('../../bedrijf/sleutels').maak();
@@ -22,7 +20,8 @@ const werkSleutels = require('../../bedrijf/sleutels').maak();
 module.exports = (ctx) => {
   const { db, save, crypto, accounts, findSupplier, rememberSession, logInlog,
     logActivity, supplierState, officeState, magWerken, pinInfo, pinCheck,
-    lijst, zelfde, eigenaarKantoor, kantoorVanZetel, afgeleid, nu, persoonsPoort, sessieregister } = ctx;
+    lijst, zelfde, eigenaarKantoor, kantoorVanZetel, afgeleid, nu, persoonsPoort, sessieregister, zwaarVan } = ctx;
+  const productiedeur = require('../kantoor/productiedeur');
 
   /* Het lidnummer uit de lidsleutel. De sleutel is 'user-<id>' -- dezelfde vorm
      die kernlaag1, kernlaag7 en kern/wauw.js al lezen. Geen tweede opzoeking in
@@ -90,10 +89,12 @@ module.exports = (ctx) => {
         code: wl.w.code, naam: wl.w.naam, functie: wl.l.functie || null };
     }
     if (r.rol === 'kantoor') {
+      // B10: in productie alleen met een verse passkey (../kantoor/productiedeur.js)
+      const pd = await productiedeur.startBewijs({ zwaarVan, accounts, key, req });
+      if (!pd.ok) return pd;
       const token = crypto.randomBytes(24).toString('hex');
-      // lidKey reist mee: zo weet de boardroom-poort WIE er door de
-      // kantoordeur kwam (de eigenaar of iemand met gegeven toegang)
-      const oSess = { role: 'office', lidKey: key };
+      // lidKey: WIE er door de kantoordeur kwam (boardroom-poort)
+      const oSess = { role: 'office', lidKey: key, ...(pd.bewijs ? { kantoorBewijs: pd.bewijs } : {}) };
       rememberSession(token, oSess);
       legContext(oSess, key, 'kantoor', 'rtg-kantoor');
       logInlog('office', true, r.viaRtgZaak ? 'backoffice via zetel in de RTG-zaak' : 'backoffice via RTG-account', req);

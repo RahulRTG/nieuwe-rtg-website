@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-30T09:13:53.862Z",
-    "commit": "7cabf01a6",
+    "op": "2026-09-30T20:10:49.339Z",
+    "commit": "fb3c60829",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
-    "node": "v24.18.0"
+    "node": "v26.10.0"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -1065,6 +1065,13 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "bedrijfsmaattoelating.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "bedrijfuitgave-mix.test.js": {
       "soort": "server",
@@ -2314,6 +2321,36 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "conciergelus-dubbel.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "conciergelus-kern.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/bureau/lus.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "conciergelus-regels.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/bureau/lus-regels.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "conciergelus.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
     "connect-gezinsdeur.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2668,6 +2705,13 @@
       "operator": "&&->||#0",
       "gezakt": 1,
       "geprobeerd": 3
+    },
+    "democratie-partij.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
     },
     "democratie-verlies.test.js": {
       "soort": "server",
@@ -3397,6 +3441,25 @@
       "soort": "puur",
       "staat": "al rood",
       "gezakteZonderMutatie": 2
+    },
+    "experience-network-http.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "experience-network-scale.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
+    },
+    "experience-network.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/experience/network-compose.js",
+      "operator": "===->!==#0",
+      "gezakt": 8,
+      "geprobeerd": 1
     },
     "experience-platform.e2e.test.js": {
       "soort": "server",
@@ -6328,6 +6391,13 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "leerhuis-trainer.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "leerhuis-werk.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -9001,6 +9071,22 @@
       "gezakt": 2,
       "scherp": "gezakt"
     },
+    "overgangsrekening.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/overgangsrekening.js",
+      "operator": "===->!==#0",
+      "gezakt": 6,
+      "geprobeerd": 1
+    },
+    "overgangsvorm.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/overgangsvorm.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 1
+    },
     "overheid.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -9090,6 +9176,13 @@
       "scherp": "gezakt"
     },
     "papieren.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "partijvoorstel-scherm.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
@@ -9681,6 +9774,21 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 3
+    },
+    "praktijk-http.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "praktijk.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/bedrijf/praktijk-vorm.js",
+      "operator": "===->!==#0",
+      "gezakt": 10,
+      "geprobeerd": 1
     },
     "premium.e2e.js": {
       "soort": "server",
@@ -12862,6 +12970,13 @@
       "gezakt": 2,
       "scherp": "gezakt"
     },
+    "tafeluitzondering.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "takenlijst.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -15041,43 +15156,6 @@
       "module": "scripts/bundel.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
-    },
-    "leerhuis-trainer.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "gezakt"
-    },
-    "democratie-partij.test.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 2,
-      "scherp": "gezakt"
-    },
-    "partijvoorstel-scherm.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "gezakt"
-    },
-    "overgangsrekening.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/overgangsrekening.js",
-      "operator": "===->!==#0",
-      "gezakt": 6,
-      "geprobeerd": 1
-    },
-    "overgangsvorm.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/overgangsvorm.js",
-      "operator": "===->!==#0",
-      "gezakt": 5,
       "geprobeerd": 1
     }
   }

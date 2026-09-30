@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 5296 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 5315 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 5296 |
-| servermodules (`server/**/*.js`) | 3910 |
-| routebestanden (`server/routes/**`) | 628 |
-| kernmodules (`server/kern/**`) | 2479 |
+| API-endpoints | 5315 |
+| servermodules (`server/**/*.js`) | 3919 |
+| routebestanden (`server/routes/**`) | 629 |
+| kernmodules (`server/kern/**`) | 2486 |
 | schermen (`public/**/*.html`) | 323 |
 | gedeelde browsermodules (`public/shared/*.js`) | 420 |
-| toetsbestanden (`test/*.test.js`) | 1897 |
+| toetsbestanden (`test/*.test.js`) | 1902 |
 | schermtoetsen (`test/*.e2e.js`) | 284 |
 
 ## 2. De weg van een verzoek
@@ -112,9 +112,9 @@ zie §5 -- er zijn nog 250 kern-namen die meer dan één domein aanraakt.
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
 | `auth` | 21 | 6 | 8 | 54 |
-| `member` | 726 | 74 | 17 | 453 |
-| `supplier` | 632 | 130 | 6 | 341 |
-| `office` | 83 | 21 | 3 | 94 |
+| `member` | 732 | 74 | 17 | 454 |
+| `supplier` | 635 | 131 | 6 | 345 |
+| `office` | 93 | 21 | 3 | 95 |
 | `staff` | 26 | 8 | 1 | 42 |
 | `social` | 76 | 10 | 31 | 71 |
 | `techniek` | 77 | 19 | 1 | 64 |
@@ -137,9 +137,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1666 |
+| kern-namen die routes aanraken | 1671 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 250 |
-| daarvan door precies één domein | 1416 |
+| daarvan door precies één domein | 1421 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -151,7 +151,7 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(213) auth(130) supplierAuth(66) officeAuth(48) db(40) liveCodename(35) status(31)
+app(213) auth(130) supplierAuth(66) officeAuth(48) db(40) liveCodename(36) status(31)
 accounts(29) schoon(23) boardroomWie(20) managerOnly(19) codenaamVan(19) save(19)
 rtf(18) tooManyTries(14) geenGast(14) express(14) findSupplier(13) boardroomAuth(13)
 crypto(12) appUrl(11) keyVanCodenaam(11) pay(11) anthropic(11) noteFailedTry(10)
@@ -174,7 +174,7 @@ sseToCustomer(5)
 | 39 | `server/routes/member/voertuigen/ontmoeten.js` |
 | 38 | `server/routes/staff.js` |
 | 35 | `server/routes/auth.js` |
-| 34 | `server/routes/auth/herstel.js` |
+| 35 | `server/routes/member/handel/uitjes.js` |
 
 ## 6. Waar de waarheid staat
 

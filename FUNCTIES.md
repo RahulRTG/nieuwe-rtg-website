@@ -21,7 +21,7 @@ het?**
 | Bedrijfsgenres | **79** in 28 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
-| Kernmodules (`server/kern/**`) | **2531** |
+| Kernmodules (`server/kern/**`) | **2532** |
 | App-pagina's (`public/apps/**.html`) | **314** |
 | Testbestanden | **2268** |
 

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-28T13:09:00.323Z",
-    "commit": "7e624c0d1",
+    "op": "2026-09-30T05:44:49.188Z",
+    "commit": "35c04ce7",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 2,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -8774,6 +8774,22 @@
       "operator": "liegpoort /api/",
       "gezakt": 2,
       "scherp": "gezakt"
+    },
+    "overgangsrekening.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/overgangsrekening.js",
+      "operator": "===->!==#0",
+      "gezakt": 6,
+      "geprobeerd": 1
+    },
+    "overgangsvorm.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/overgangsvorm.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 1
     },
     "overheid.test.js": {
       "soort": "server",

@@ -28,8 +28,8 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4626,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1666,
-    "kernGedeeld": 250,
+    "kernBreedte": 1668,
+    "kernGedeeld": 251,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1888,
-    "toetsenNietGemeten": 297,
+    "toetsenNietGemeten": 302,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -3544,6 +3544,34 @@
       "meter": "toetsenNietGemeten 654 -> 721",
       "reden": "DE TWEEDE BIJTREKRONDE VAN DE SAMENVOEGING DRAAGT DE GROEI VAN DE TAKKEN, EN GEEN GROEI VAN ZICHZELF. Na de eerste ronde zijn de nieuwe commits van alle open takken en #414 bijgetrokken (#413 is op besluit van de eigenaar weer uit deze tak gehaald, want hij was in zijn eigen CI nooit groen). Elke tak schreef voor zijn eigen verhoging hier al een notitie; de vereniging telt die op. De nieuwe stand is de GEMETEN stand op de samengevoegde boom, er is geen lucht bijgeteld, en vanaf hier geldt weer: alleen omlaag. De mutatiemotor is niet langs de nieuwe toetsbestanden van de takken geweest.",
       "waarheen": "Een volledige npm run mutatie op een schone boom neemt ze mee; die draait aan het eind van deze samenvoeging."
+    },
+    {
+      "datum": "2026-09-30",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1666,
+      "meter": "kernBreedte 1666 -> 1668",
+      "reden": "De concierge-lus (CONCIERGE.md) krijgt twee kernnamen en niet zes. `bureauZaak` is met opzet een EIGEN naam naast `bureau` en `bureauBalie`: de zaak die een onderdeel levert mag alleen zijn eigen onderdelen zien, en onder `bureau` zou het domein supplier bij de dossierfuncties van het lid kunnen. `reserveringUitzondering` draagt de vier functies van het tegenvoorstel en het doorzetten onder EEN naam in plaats van vier (de eerste versie had er vier, en de meter wees het aan).",
+      "waarheen": "GRENZEN.json (supplier: bureauZaak en reserveringUitzondering; member: reserveringUitzondering), server/kern/bureau/uitgang.js en server/kern/ervaring/tafels.js"
+    },
+    {
+      "datum": "2026-09-30",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 250,
+      "meter": "kernGedeeld 250 -> 251",
+      "reden": "`reserveringUitzondering` wordt door twee domeinen aangeraakt, en dat hoort zo: de zaak doet een tegenvoorstel (supplier), de gast antwoordt erop (member). Twee kopieen van de regel dat een verlopen tegenvoorstel niet wordt aangenomen zouden uit elkaar lopen; een gedeelde naam met een module erachter niet.",
+      "waarheen": "server/kern/ervaring/tafeluitzondering.js en test/tafeluitzondering.test.js"
+    },
+    {
+      "datum": "2026-09-30",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 297,
+      "vervalt": "2026-12-30",
+      "meter": "toetsenNietGemeten 297 -> 302",
+      "reden": "Vijf toetsbestanden zijn nieuw: test/conciergelus.test.js, -regels, -kern, -dubbel en test/tafeluitzondering.test.js. Met de hand nagetrokken met vijf mutaties op de dragende regels (een verlopen aanbod toch vastzetten, een verrassing naar een gedeeld kanaal laten gaan, een veld aan de deelnemersweergave toevoegen, afsluiten met een onbevestigd onderdeel, versturen zonder alles gezien te hebben); alle vijf laten een toets zakken. De mutatiemotor is er nog niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt ze mee."
     }
   ],
   "prestatie": {

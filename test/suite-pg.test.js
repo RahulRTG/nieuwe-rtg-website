@@ -34,7 +34,11 @@ test('CI-scherven dragen alle PG-bestanden aantoonbaar over aan de verplichte da
  assert.deepEqual([...lokaal,...pg].sort(),alles,'geen test verdwijnt tussen beide runners');
  assert.ok(!lokaal.includes('living-world.pg.test.js'));
  const workflow=fs.readFileSync(path.join(__dirname,'../.github/workflows/ci.yml'),'utf8');
- assert.match(workflow,/run: node scripts\/pgtoetsen\.js\s+env:\s+REDIS_URL:[^\n]+\s+DATABASE_URL:/);
+ assert.match(workflow,/node scripts\/pgtoetsen\.js\s+env:\s+REDIS_URL:[^\n]+\s+DATABASE_URL:/);
+ const pgStap=workflow.split('- name: PostgreSQL-integratietests')[1].split('  incremental:')[0];
+ assert.match(pgStap,/NODE_OPTIONS: --require "\$\{\{ github.workspace \}\}\/test\/toetsnaam\.js"/);
+ assert.match(pgStap,/RTG_TOETSDUUR: \$\{\{ github.workspace \}\}\/\.toetsduur/);
+ assert.match(pgStap,/name: toetsduur-postgresql\s+path: \.toetsduur[\s\S]*if-no-files-found: error[\s\S]*include-hidden-files: true/);
  assert.match(workflow,/needs: \[preflight, toetsscherf, ijkingen, keuringen, zware\]/);
 });
 test('de echte suiteplanner geeft elk databasebestand uitsluitend aan de geïsoleerde runner',()=>{

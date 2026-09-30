@@ -1,0 +1,4 @@
+#passStartup{position:relative;z-index:250;pointer-events:auto;box-sizing:border-box;max-width:640px;margin:24px auto;padding:28px;background:var(--rtg-world-card,#faf7f0);color:var(--rtg-world-ink,#302820);border:1px solid var(--rtg-world-line,#d9d0c2);font:400 16px/1.6 Inter,system-ui,sans-serif}
+#passStartup[hidden]{display:none!important}
+#passStartup h2{font:500 26px/1.25 Inter,system-ui,sans-serif;margin:0 0 12px}
+#passStartup button{min-height:44px;padding:10px 18px;border:1px solid currentColor;background:transparent;color:inherit;font:inherit;cursor:pointer}

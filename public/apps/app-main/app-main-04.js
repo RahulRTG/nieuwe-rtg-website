@@ -24,7 +24,11 @@
       checkOnboarding(); laadAgendaLid();
     } catch(e){
       API.token = null;
-      try { localStorage.removeItem('rtg_member_token'); } catch(e2){}
+      // A lost connection is not a revoked session. Keep the stored token for
+      // an explicit retry, while the existing gate keeps the workspace closed.
+      if (e && (e.status === 401 || e.status === 403)) {
+        try { localStorage.removeItem('rtg_member_token'); } catch(e2){}
+      } else window.dispatchEvent(new Event('rtg-pass-unavailable'));
     }
   }
 

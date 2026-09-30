@@ -85,7 +85,7 @@ test('een verlopen tegenvoorstel wordt niet aangenomen en telt niet meer mee in 
     const db = { data: { reserveringen: [] } };
     const zaak = { code: 'Z', name: 'Zaak', tables: [{ seats: 2 }] };
     const stil = () => {};
-    const u = require('../server/kern/ervaring/tafeluitzondering')({ db, save: stil, notify: stil, notifySupplier: stil,
+    const u = require('../server/kern/ervaring/tafeluitzondering')({ reserveringen: () => db.data.reserveringen, save: stil, notify: stil, notifySupplier: stil,
       sseToCustomer: stil, sseToSupplier: stil, nu: () => new Date(Date.now()).toISOString() });
     const cap = require('../server/kern/reservering/capaciteit');
     db.data.reserveringen.push({ id: 'r1', supplierCode: 'Z', customerKey: 'k', datum: '2026-10-02', tijd: '20:00', personen: 2, status: 'aangevraagd' });

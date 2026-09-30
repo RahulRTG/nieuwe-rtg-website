@@ -154,7 +154,7 @@ function afsluitbaar(c) {
 }
 
 
-function uitkomst(c) {
+function afsluitUitkomst(c) {
   const o = actief(c);
   const nagekomen = o.filter(x => x.stand === 'bevestigd' || x.stand === 'geleverd').length;
   // een herstelmoment is een onderdeel dat omviel, niet een regel in de tijdlijn
@@ -173,5 +173,5 @@ function uitkomst(c) {
   };
 }
 
-module.exports = { aanbodStand, AANBOD_LABEL, deelnemerBeeld, magBereiken, gastBericht, tijdlijn, gevolgen, uitkomst,
+module.exports = { aanbodStand, AANBOD_LABEL, deelnemerBeeld, magBereiken, gastBericht, tijdlijn, gevolgen, afsluitUitkomst,
   actief, afsluitbaar };

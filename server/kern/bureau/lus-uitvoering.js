@@ -130,7 +130,7 @@ module.exports = (ctx) => {
   }
 
   // de uitkomst telt de ACTIEVE onderdelen als beloften; een vervangen kapot onderdeel is een herstelmoment
-  const lusUitkomst = c => R.uitkomst(c);
+  const lusUitkomst = c => R.afsluitUitkomst(c);
 
   function lusKantoor(key, id) {
     const { c, fout } = vind(key, id);

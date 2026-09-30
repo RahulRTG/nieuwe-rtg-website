@@ -20,7 +20,7 @@ const WEEKDAGEN = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vri
 
 const iso = d => d.toISOString().slice(0, 10);
 
-function datumUit(zin, vandaag) {
+function datumUitZin(zin, vandaag) {
   const t = zin.toLowerCase();
   const d0 = new Date(vandaag + 'T12:00:00Z');
   const plus = n => { const d = new Date(d0); d.setUTCDate(d.getUTCDate() + n); return iso(d); };
@@ -42,7 +42,7 @@ function datumUit(zin, vandaag) {
   return '';
 }
 
-function tijdUit(zin) {
+function tijdUitZin(zin) {
   const m = /\b(?:om|rond|vanaf)\s+(\d{1,2})(?:[:.](\d{2}))?\s*(?:uur)?\b/i.exec(zin);
   if (!m) return '';
   const u = Number(m[1]);
@@ -99,8 +99,8 @@ function intake(zinIn, vandaag) {
     wat: zin,
     domein,
     gelegenheid,
-    van: datumUit(zin, vandaag),
-    tijd: tijdUit(zin),
+    van: datumUitZin(zin, vandaag),
+    tijd: tijdUitZin(zin),
     plaats: plaatsUit(zin),
     personen: personenUit(zin),
     verrassing: VERRASSING.test(zin),

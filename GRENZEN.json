@@ -846,6 +846,7 @@
       "noteFailedTry"
     ],
     "member": [
+      "reserveringUitzondering",
       "AUTHOR_TIER",
       "DOOR_RELOCK_MS",
       "LANDEN",
@@ -1200,7 +1201,6 @@
       "reizen",
       "rekeningVoor",
       "reserveerTafel",
-      "reserveringTegenvoorstelAntwoord",
       "residentie",
       "resolveSession",
       "retailCatalogus",
@@ -2320,11 +2320,9 @@
       "releaseDrop",
       "rememberSession",
       "reserveerSlot",
-      "reserveringDoorzetten",
       "reserveringKomst",
-      "reserveringMagBeslissen",
       "reserveringTafel",
-      "reserveringTegenvoorstel",
+      "reserveringUitzondering",
       "retailAnnuleer",
       "retailBon",
       "retailState",

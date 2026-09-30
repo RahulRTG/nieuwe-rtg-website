@@ -31,8 +31,9 @@ module.exports = (ctx) => {
     for (const k of ['van', 'plaats', 'tijd', 'gelegenheid']) if (b[k]) v[k] = schoon(b[k], 60);
     if (Number.isFinite(Number(b.personen)) && Number(b.personen) > 0) v.personen = Math.min(99, Math.round(Number(b.personen)));
     if (b.verrassing === true || b.verrassing === false) v.verrassing = b.verrassing;
+    // de werkwijze gaat als los argument mee en nooit via het lijf: een lid kan hem niet zelf zetten
     const o = caseOpen(key, { titel: v.titel, wat: v.wat, domein: v.domein, van: v.van,
-      bedragCenten: b.grensCenten, werkwijze: 'voorstel' });
+      bedragCenten: b.grensCenten }, { werkwijze: 'voorstel' });
     if (o.error) return o;
     const c = o.zaak;
     Object.assign(c, {

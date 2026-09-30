@@ -1666,7 +1666,7 @@ const {
 const {
   reserveerTafel, mijnReserveringen, annuleerReservering, beslisReservering,
   tafelplanning, reserveringTafel, reserveringKomst, walkIn,
-  reserveringTegenvoorstel, reserveringTegenvoorstelAntwoord, reserveringDoorzetten, reserveringMagBeslissen,
+  reserveringUitzondering,
   annuleerItem, plaatsReview, reviewsVoor, ratingVan, reviewReageer, toggleFavoriet,
   favorietenVan, isFavoriet, fooiUit, agendaVoor, maakSplits, mijnSplitsen,
   betaalSplits, zetOpWachtlijst, mijnWachtlijst, meldWachtlijst, rsvpAnnuleer,
@@ -2299,8 +2299,7 @@ const kern = {
   stemmingVoor: stemming.stemmingVoor,
   webpush, weekdagFactor, werkgeverSollicitatie,
   // de ervaring-laag (kern/ervaring.js)
-  MELDING_SCOPES, reserveerTafel, mijnReserveringen, annuleerReservering, beslisReservering,
-  reserveringTegenvoorstel, reserveringTegenvoorstelAntwoord, reserveringDoorzetten, reserveringMagBeslissen,
+  MELDING_SCOPES, reserveerTafel, mijnReserveringen, annuleerReservering, beslisReservering, reserveringUitzondering,
   tafelplanning, reserveringTafel, reserveringKomst, walkIn,
   annuleerItem, plaatsReview, reviewsVoor, ratingVan, reviewReageer, toggleFavoriet, favorietenVan, isFavoriet,
   fooiUit, agendaVoor, maakSplits, mijnSplitsen, betaalSplits, zetOpWachtlijst, mijnWachtlijst,

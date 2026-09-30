@@ -12,10 +12,10 @@ function wereld({ magZelf = false } = {}) {
   const lijst = [];
   let n = 0;
   const stap = (c, status, notitie, door) => { c.status = status; c.tijdlijn.push({ status, notitie, door }); };
-  const caseOpen = (key, b) => {
+  const caseOpen = (key, b, o) => {
     const c = { id: 'c' + (++n), titel: b.titel, domein: b.domein, soort: 'regulier', status: 'genoteerd',
       tijdlijn: [], beslissing: { nodig: false } };
-    if (b.werkwijze === 'voorstel') { c.werkwijze = 'voorstel'; stap(c, 'in voorbereiding', '', 'systeem'); }
+    if (o && o.werkwijze === 'voorstel') { c.werkwijze = 'voorstel'; stap(c, 'in voorbereiding', '', 'systeem'); }
     lijst.push(c);
     return { status: 200, zaak: c };
   };

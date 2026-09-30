@@ -53,7 +53,7 @@ module.exports = (ctx) => {
       if (status === 'geregeld') {
         const g = R.afsluitbaar(c);
         if (!g.ok) return { status: 409, error: g.reden };
-        c.uitkomst = Object.assign({ op: new Date().toISOString(), wens: String(notitie || '').replace(/[<>]/g, '').slice(0, 300) }, R.uitkomst(c));
+        c.uitkomst = Object.assign({ op: new Date().toISOString(), wens: String(notitie || '').replace(/[<>]/g, '').slice(0, 300) }, R.afsluitUitkomst(c));
       }
     }
     stap(c, status, notitie, 'kantoor');

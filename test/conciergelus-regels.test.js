@@ -91,7 +91,7 @@ test('afsluiten weigert zolang er iets niet bevestigd is of een voorstel opensta
 });
 
 test('de uitkomst telt beloften, herstel en opnieuw vertellen, en noemt wat hij niet meet', () => {
-  const u = R.uitkomst({ werkwijze: 'voorstel',
+  const u = R.afsluitUitkomst({ werkwijze: 'voorstel',
     onderdelen: [{ id: 'x', stand: 'kapot', vervangenDoor: 'y' }, { id: 'y', stand: 'bevestigd' }],
     tijdlijn: [{ door: 'lid', soort: 'toelichting', tijdensHerstel: true }] });
   assert.deepEqual(u.beloften, { totaal: 1, nagekomen: 1, open: 0 });

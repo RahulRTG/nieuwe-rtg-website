@@ -92,10 +92,11 @@ module.exports = (ctx) => {
 
   /* Tussen ja en nee: een tegenvoorstel met een termijn, en doorzetten naar wie
      mag beslissen (./tafeluitzondering.js, CONCIERGE.md par. 2.7-2.9). */
-  const uitz = require('./tafeluitzondering')(ctx);
+  const uitz = require('./tafeluitzondering')(Object.assign({}, ctx, { reserveringen: () => db.data.reserveringen || [] }));
 
   return { reserveerTafel, mijnReserveringen, annuleerReservering, beslisReservering,
     tafelplanning, reserveringTafel, reserveringKomst, walkIn,
-    reserveringTegenvoorstel: uitz.tegenvoorstel, reserveringTegenvoorstelAntwoord: uitz.tegenvoorstelAntwoord,
-    reserveringDoorzetten: uitz.doorzetten, reserveringMagBeslissen: uitz.magBeslissen };
+    // EEN kernnaam voor de vier: elke naam die een route kan aanraken is breedte
+    reserveringUitzondering: { tegenvoorstel: uitz.tegenvoorstel, antwoord: uitz.tegenvoorstelAntwoord,
+      doorzetten: uitz.doorzetten, magBeslissen: uitz.magBeslissen } };
 };

@@ -466,5 +466,12 @@ module.exports = [
   { van: 'domein:vonk', naar: 'domein:connection-product-state', soort: 'BELEID',
     reden: 'Vonk laat availableCapabilities en Edge-projecties door de centrale state-resolver bepalen, zodat stale clients en zelfverzonnen acties nooit productbeleid kunnen omzeilen' },
   { van: 'domein:vonk', naar: 'domein:connection-state-vonk', soort: 'EIGEN_DATA',
-    reden: 'connection-state-vonk is de uitgeknipte Vonk-state-machine: hetzelfde productonderwerp in een kleiner bestand, met server-authoritative transitions en revisioncontrole' }
+    reden: 'connection-state-vonk is de uitgeknipte Vonk-state-machine: hetzelfde productonderwerp in een kleiner bestand, met server-authoritative transitions en revisioncontrole' },
+  /* DE CONCIERGE-LUS REKENT MET DE KLOK VAN DE AVOND (30 september 2026).
+     kern/bureau/lus-regels.js zet de onderdelen van een case op de klok, met de
+     knip op 04:00 zodat een avond over middernacht niet achterstevoren loopt.
+     Die klok bestond al in kern/avond/klok.js; een tweede zou op een dag
+     middernacht anders lezen. De lus leest alleen `min` en `klok`, geen stand. */
+  { van: 'domein:bureau', naar: 'domein:avond', soort: 'GEDEELDE_PRIMITIEF',
+    reden: 'kern/bureau/lus-regels.js gebruikt min() en klok() uit kern/avond/klok.js voor de tijdlijn van een case; een tweede klok zou middernacht anders lezen (CONCIERGE.md par. 2.11)' }
 ];

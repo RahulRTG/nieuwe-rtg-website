@@ -26,8 +26,9 @@
 const capaciteit = require('../reservering/capaciteit');
 
 module.exports = (ctx) => {
-  const { db, save, notify, notifySupplier, sseToCustomer, sseToSupplier, nu } = ctx;
-  const vind = (code, rid) => (db.data.reserveringen || []).find(x => x.id === rid && x.supplierCode === code);
+  // de lijst komt van ./tafels.js: deze module raakt de opslag niet zelf aan
+  const { reserveringen, save, notify, notifySupplier, sseToCustomer, sseToSupplier, nu } = ctx;
+  const vind = (code, rid) => reserveringen().find(x => x.id === rid && x.supplierCode === code);
   const verlopen = r => r.status === 'tegenvoorstel' && !(Date.parse(r.tegenvoorstel && r.tegenvoorstel.geldigTot) > Date.now());
 
   function tegenvoorstel(supplier, actor, rid, b) {
@@ -40,7 +41,7 @@ module.exports = (ctx) => {
     const min = Math.max(5, Math.min(24 * 60, Math.round(Number(b.geldigMin) || 15)));
     const oud = r.tijd;
     r.tijd = tijd; // tijdelijk, voor de capaciteitsvraag
-    const past = capaciteit.past(supplier, (db.data.reserveringen || []).filter(x => x !== r), r.datum, tijd, r.personen);
+    const past = capaciteit.past(supplier, reserveringen().filter(x => x !== r), r.datum, tijd, r.personen);
     r.tijd = oud;
     if (!past) return { status: 409, error: 'Ook om ' + tijd + ' is het vol.' };
     r.gevraagdeTijd = oud;
@@ -56,7 +57,7 @@ module.exports = (ctx) => {
   }
 
   function tegenvoorstelAntwoord(key, rid, akkoord) {
-    const r = (db.data.reserveringen || []).find(x => x.id === rid && x.customerKey === key);
+    const r = reserveringen().find(x => x.id === rid && x.customerKey === key);
     if (!r) return { status: 404, error: 'Reservering niet gevonden.' };
     if (r.status !== 'tegenvoorstel') return { status: 409, error: 'Er ligt geen tegenvoorstel voor deze reservering.' };
     if (!akkoord) {

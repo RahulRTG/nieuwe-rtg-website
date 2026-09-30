@@ -73,14 +73,14 @@ test('de hele lus: van een zin tot een gesloten case met uitkomst', async () => 
   const rij = desk.d.zaken.find(z => z.id === id);
   assert.ok(rij && rij.lus, 'de case staat op het bureau als lus-case');
   const key = rij.key;
-  const k = (pad, b) => roep('/office/bureau/lus' + pad, Object.assign({ key, id }, b || {}), kant);
+  const k = (pad, b) => roep(pad, Object.assign({ key, id }, b || {}), kant);
 
   // het bureau kan hem niet om de lus heen op "geregeld" zetten
   assert.equal((await roep('/office/bureau/voortgang', { key, id, status: 'in uitvoering' }, kant)).status, 409);
   assert.equal((await roep('/office/bureau/voortgang', { key, id, status: 'geregeld' }, kant)).status, 409);
 
   // wie het oppakt: met de gedeelde kantoorcode is er geen naam, dus ziet het lid een rol (CON-11)
-  const neem = await k('/neem');
+  const neem = await k('/office/bureau/lus/neem');
   assert.equal(neem.status, 200);
   assert.equal(neem.d.eigenaar.naam, null);
   assert.equal((await roep('/member/bureau/lus/zaak', { id }, lid)).d.eigenaar.rol, 'Lead Rechterhand');
@@ -88,13 +88,13 @@ test('de hele lus: van een zin tot een gesloten case met uitkomst', async () => 
   assert.equal((await roep('/member/bureau/lus/verrassing', { id, aan: true }, lid)).status, 200);
 
   // de gewone route weigert: de case wordt bijzonder, met de reden in de tijdlijn
-  const w = await k('/weigering', { reden: 'Het restaurant is vol.' });
+  const w = await k('/office/bureau/lus/weigering', { reden: 'Het restaurant is vol.' });
   assert.equal(w.d.soort, 'bijzonder');
 
   // de boot: binnen de tijd, maar het mandaat staat standaard op voorbereiden -> het lid beslist
-  const boot = await k('/aanbod', { wat: 'Privéboot', zaak: 'ESVEDRA', van: '19:00', duurMin: 90, bedragCenten: 45000, geldigMin: 60 });
+  const boot = await k('/office/bureau/lus/aanbod', { wat: 'Privéboot', zaak: 'ESVEDRA', van: '19:00', duurMin: 90, bedragCenten: 45000, geldigMin: 60 });
   assert.equal(boot.d.aanbod.stand, 'vastgehouden');
-  const kb = await k('/kies', { aanbod: boot.d.aanbod.id });
+  const kb = await k('/office/bureau/lus/kies', { aanbod: boot.d.aanbod.id });
   assert.equal(kb.d.wachtOpLid, true, 'standaard mag het kantoor niets zelf vastzetten');
   const zie = await roep('/member/bureau/lus/zaak', { id }, lid);
   assert.equal(zie.d.voorstel.wat, 'Privéboot');
@@ -104,19 +104,19 @@ test('de hele lus: van een zin tot een gesloten case met uitkomst', async () => 
   assert.equal((await roep('/member/bureau/delegatie/zet', { domein: 'gelegenheden', niveau: 3, grensCenten: 150000 }, lid)).status, 200);
 
   // een aanbod dat al verlopen is, wordt niet gekozen
-  const oud = await k('/aanbod', { wat: 'Tafel om 20:00', zaak: 'RIJK', van: '20:00', duurMin: 120, bedragCenten: 30000, geldigMin: -5 });
+  const oud = await k('/office/bureau/lus/aanbod', { wat: 'Tafel om 20:00', zaak: 'RIJK', van: '20:00', duurMin: 120, bedragCenten: 30000, geldigMin: -5 });
   assert.equal(oud.d.aanbod.stand, 'zonder-termijn', 'een negatieve termijn is geen termijn');
 
   // de manager biedt 21:15 aan; dat is 75 minuten van 20:00 en valt buiten de 60 minuten speelruimte
-  const laat = await k('/aanbod', { wat: 'Diner 21:15 (manager)', bron: 'beslisser', zaak: 'KIKUNOI', van: '21:15', duurMin: 105, bedragCenten: 32000, geldigMin: 12 });
-  const kl = await k('/kies', { aanbod: laat.d.aanbod.id });
+  const laat = await k('/office/bureau/lus/aanbod', { wat: 'Diner 21:15 (manager)', bron: 'beslisser', zaak: 'KIKUNOI', van: '21:15', duurMin: 105, bedragCenten: 32000, geldigMin: 12 });
+  const kl = await k('/office/bureau/lus/kies', { aanbod: laat.d.aanbod.id });
   assert.equal(kl.d.wachtOpLid, true, 'buiten de speelruimte in tijd beslist het lid');
   assert.ok(kl.d.reden.includes('60 minuten'));
   assert.equal((await roep('/member/bureau/lus/beslis', { id, akkoord: true }, lid)).d.vastgezet, true);
 
   // een chauffeur binnen grens en tijd: het kantoor zet hem zelf vast
-  const rit = await k('/aanbod', { wat: 'Chauffeur', zaak: 'TRANSIT', van: '20:40', duurMin: 20, bedragCenten: 9000, geldigMin: 30 });
-  const kr = await k('/kies', { aanbod: rit.d.aanbod.id });
+  const rit = await k('/office/bureau/lus/aanbod', { wat: 'Chauffeur', zaak: 'TRANSIT', van: '20:40', duurMin: 20, bedragCenten: 9000, geldigMin: 30 });
+  const kr = await k('/office/bureau/lus/kies', { aanbod: rit.d.aanbod.id });
   assert.equal(kr.d.vastgezet, true, 'binnen mandaat vraagt het kantoor niets');
 
   // de zaak ziet alleen zijn eigen onderdeel en niets over de gast
@@ -132,27 +132,27 @@ test('de hele lus: van een zin tot een gesloten case met uitkomst', async () => 
   assert.equal((await roep('/supplier/concierge/opdrachten', {}, null)).status, 401);
 
   // de boot loopt 25 minuten uit: berichten klaar, niets verstuurd
-  const kz = await k('');
+  const kz = await k('/office/bureau/lus');
   const bootOnd = kz.d.zaak.onderdelen.find(o => o.wat === 'Privéboot');
-  const v = await k('/vertraging', { onderdeel: bootOnd.id, minuten: 25 });
+  const v = await k('/office/bureau/lus/vertraging', { onderdeel: bootOnd.id, minuten: 25 });
   const ids = v.d.klaar.berichten.map(m => m.id);
   assert.ok(ids.length >= 2, 'boot en chauffeur schuiven');
-  assert.equal((await k('/verstuur', { klaar: v.d.klaar.id, gezien: ids.slice(1) })).status, 409, 'niet alles gezien, niets verstuurd');
-  const vs = await k('/verstuur', { klaar: v.d.klaar.id, gezien: ids });
+  assert.equal((await k('/office/bureau/lus/verstuur', { klaar: v.d.klaar.id, gezien: ids.slice(1) })).status, 409, 'niet alles gezien, niets verstuurd');
+  const vs = await k('/office/bureau/lus/verstuur', { klaar: v.d.klaar.id, gezien: ids });
   assert.equal(vs.status, 200);
   assert.ok(vs.d.uitslag.every(u => u.bezorgd), JSON.stringify(vs.d.uitslag));
 
   // het restaurant valt om: herstel in DEZELFDE case
-  const na = await k('');
+  const na = await k('/office/bureau/lus');
   const diner = na.d.zaak.onderdelen.find(o => o.wat === 'Diner 21:15 (manager)');
-  assert.equal((await k('/kapot', { onderdeel: diner.id, reden: 'keukenprobleem' })).status, 200);
-  assert.equal((await k('')).d.zaak.status, 'in herstel');
+  assert.equal((await k('/office/bureau/lus/kapot', { onderdeel: diner.id, reden: 'keukenprobleem' })).status, 200);
+  assert.equal((await k('/office/bureau/lus')).d.zaak.status, 'in herstel');
   assert.equal((await roep('/member/bureau/lus/toelichting', { id, tekst: 'Liefst in de buurt.' }, lid)).status, 200);
   assert.equal((await roep('/office/bureau/voortgang', { key, id, status: 'geregeld' }, kant)).status, 409, 'met een omgevallen diner is niets geregeld');
-  const alt = await k('/aanbod', { wat: 'Diner elders', bron: 'alternatief', zaak: 'RIJK', van: '21:30', duurMin: 90, bedragCenten: 28000, geldigMin: 20, vervangt: diner.id });
-  const ka = await k('/kies', { aanbod: alt.d.aanbod.id });
+  const alt = await k('/office/bureau/lus/aanbod', { wat: 'Diner elders', bron: 'alternatief', zaak: 'RIJK', van: '21:30', duurMin: 90, bedragCenten: 28000, geldigMin: 20, vervangt: diner.id });
+  const ka = await k('/office/bureau/lus/kies', { aanbod: alt.d.aanbod.id });
   assert.equal(ka.d.wachtOpLid, true, '21:30 ligt 90 minuten van de gevraagde 20:00: ook in herstel beslist het lid');
-  assert.equal((await k('')).d.zaak.status, 'wacht op uw akkoord');
+  assert.equal((await k('/office/bureau/lus')).d.zaak.status, 'wacht op uw akkoord');
   assert.equal((await roep('/member/bureau/lus/beslis', { id, akkoord: true }, lid)).d.vastgezet, true);
 
   const lidZiet = await roep('/member/bureau/lus/zaak', { id }, lid);
@@ -160,9 +160,9 @@ test('de hele lus: van een zin tot een gesloten case met uitkomst', async () => 
   assert.equal(lidZiet.d.bericht.tekst, 'Wij hebben het programma iets aangepast. Alles is geregeld.');
 
   // een los onderdeel dat het kantoor buiten een aanbod om regelt, moet eerst bevestigd zijn
-  const bl = await k('/onderdeel', { wat: 'Bloemen op de kamer', van: '17:45', duurMin: 5 });
+  const bl = await k('/office/bureau/lus/onderdeel', { wat: 'Bloemen op de kamer', van: '17:45', duurMin: 5 });
   assert.equal((await roep('/office/bureau/voortgang', { key, id, status: 'geregeld' }, kant)).status, 409, 'bloemen staan nog op gepland');
-  assert.equal((await k('/bevestig', { onderdeel: bl.d.onderdeel.id })).status, 200);
+  assert.equal((await k('/office/bureau/lus/bevestig', { onderdeel: bl.d.onderdeel.id })).status, 200);
 
   // sluiten, met de uitkomst erbij
   assert.equal((await roep('/office/bureau/voortgang', { key, id, status: 'geregeld', notitie: 'Een avond op het water en een diner.' }, kant)).status, 200);

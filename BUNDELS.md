@@ -13,7 +13,7 @@ omlaag.
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 99 delen, 9784 regels in de delen
+`public/apps/app-main/` -- 99 delen, 9790 regels in de delen
 
 | deel | onderwerp |
 |---|---|

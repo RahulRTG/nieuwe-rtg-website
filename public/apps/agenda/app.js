@@ -32,6 +32,10 @@
     }
   });
   window.RTGRouteMemory.start();
+  var gekozenDatum = new URLSearchParams(window.location.search).get('datum');
+  if (/^\d{4}-\d{2}-\d{2}$/.test(gekozenDatum || '') && Number.isFinite(Date.parse(gekozenDatum))) {
+    stand.anker = gekozenDatum; stand.weergave = 'dag';
+  }
   var paneel = window.RTGAgendaPaneel.maak(api, meld, laad);
 
   /* het datumvenster hoort bij de weergave: de maand laadt zijn hele

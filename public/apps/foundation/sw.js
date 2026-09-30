@@ -2,7 +2,7 @@
    offline openen. Pagina's en scripts zijn network-first (een update komt direct
    door), de cache is het vangnet zonder verbinding. API-verkeer en de live-stream
    gaan altijd naar het netwerk. */
-const CACHE = 'rtf-premium-foundation-meedoen-ontdekken-8da413e1';
+const CACHE = 'rtf-premium-foundation-meedoen-ontdekken-6be9930d';
 const SHELL = [
   '/apps/foundation/', '/apps/foundation/index.html', '/apps/foundation/campus.html',
   '/apps/foundation/samen-thuis.html', '/apps/foundation/samen-thuis.js', '/apps/foundation/samen-thuis-weergave.js',
@@ -73,6 +73,9 @@ const SHELL = [
   '/shared/rtg-heritage-components.js', '/shared/rtg-intelligence.css', '/shared/rtg-intelligence-shell.css',
   '/shared/rtg-operation.js', '/shared/rtg-side-sheet.js',
   '/shared/rtg-heritage.css', '/shared/rtg-heritage-materials.css',
+  '/shared/rtg-warm-details.css', '/shared/rtg-personal-images.css',
+  '/shared/rtg-world-widgets.css', '/shared/rtg-world-desktop.css',
+  '/shared/rtg-desktop-components.css', '/shared/rtg-world-palette.css',
   '/shared/rtg-heritage-adapters.css', '/shared/rtg-heritage-experiences.css', '/shared/rtg-heritage-components.css',
   '/shared/rtg-simple.css', '/shared/rtg-world-screen.css',
   '/shared/rtg-heritage-motion.css', '/shared/rtg-heritage-motion.js',

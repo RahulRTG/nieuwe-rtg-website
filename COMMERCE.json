@@ -1,9 +1,9 @@
 {
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
-  "vastgelegd": "2026-09-30",
+  "vastgelegd": "2026-09-29",
   "gemeten": {
-    "bestanden": 2571,
-    "domeinenTotaal": 680,
+    "bestanden": 2570,
+    "domeinenTotaal": 681,
     "koopbareVormen": 612,
     "koopbareDomeinen": 123,
     "envelopDrempel": 8,
@@ -71,7 +71,7 @@
   "perWerkwoord": {
     "toon": 93,
     "prijs": 39,
-    "beschikbaarheid": 54,
+    "beschikbaarheid": 53,
     "reserveer": 28,
     "bevestig": 59,
     "lever": 24,
@@ -1145,25 +1145,6 @@
       "telt": 3
     },
     {
-      "domein": "kern/foodcourt",
-      "heeft": {
-        "toon": true,
-        "prijs": true,
-        "beschikbaarheid": true,
-        "reserveer": false,
-        "bevestig": false,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "kaart",
-        "prijs": "minimumMenuPrijs",
-        "beschikbaarheid": "capaciteit"
-      },
-      "telt": 3
-    },
-    {
       "domein": "kern/gemeente",
       "heeft": {
         "toon": true,
@@ -1438,6 +1419,24 @@
       "bewijs": {
         "toon": "publiek",
         "bevestig": "boek"
+      },
+      "telt": 2
+    },
+    {
+      "domein": "kern/foodcourt",
+      "heeft": {
+        "toon": true,
+        "prijs": true,
+        "beschikbaarheid": false,
+        "reserveer": false,
+        "bevestig": false,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "kaart",
+        "prijs": "minimumMenuPrijs"
       },
       "telt": 2
     },

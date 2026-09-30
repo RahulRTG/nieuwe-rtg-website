@@ -27,186 +27,25 @@
 <link href="/shared/rtg-ui.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/travel-os.css" rel="stylesheet">
+<link rel="stylesheet" href="/apps/reisprogramma.css">
+<script src="/apps/reisprogramma-weergave.js"></script>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<!-- DE ENIGE PAGINA VAN DIT HUIS DIE OPENT VOOR IEMAND ZONDER ACCOUNT, en dat
-     is precies de bedoeling: het reisbureau zet een reis klaar en stuurt een
-     link, of een lid nodigt zijn reisgenoot uit. Wie hier komt, ziet genoeg om
-     te herkennen dat het over hem gaat en verder niets -- geen titels, geen
-     boekingsnummers, geen datums per onderdeel. Wie de link doorstuurt of
-     kwijtraakt, lekt daarmee niets (zie kern/reisuitnodiging.js).
-
-     Er staat hier ook geen marketing. Dit is een functioneel scherm met een
-     geldige sleutel, geen landingspagina (CLAUDE.md). -->
-<body class="rtg-stijl" data-rtg-modus="world" data-travelos-profile="invite" data-rtg-toegang="registratie" data-rtg-world="travel" data-rtg-skin="heritage" data-rtg-layout="standard">
+<!-- Een expliciet gedeeld reisprogramma is zonder account volledig leesbaar.
+     Bestaande accountuitnodigingen houden hun beperkte voorvertoning.
+     Beide controleren doel, scope, intrekking en verval bij de bron. -->
+<body data-public-platform="travel-guest" class="rtg-stijl" data-rtg-modus="world" data-travelos-profile="invite" data-rtg-toegang="registratie" data-rtg-world="travel" data-rtg-skin="heritage" data-rtg-layout="standard">
 <main class="rtg-wrap" style="max-width:34rem;margin:0 auto;padding:2.5rem 1.2rem 4rem;">
   <h1 class="rtg-ceremonie" style="font-size:1.9rem;margin-bottom:.4rem;">RTG</h1>
   <div id="vak"><p class="rtg-sub">Even kijken...</p></div>
 </main>
-<script>
-(function () {
-  const $ = (s) => document.querySelector(s);
-  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) =>
-    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const code = String(window.__RTG_REISUITNODIGING_CODE || '');
-  try { delete window.__RTG_REISUITNODIGING_CODE; } catch (e) { window.__RTG_REISUITNODIGING_CODE = null; }
-  const token = () => { try { return localStorage.getItem('rtg_member_token') || ''; } catch (e) { return ''; } };
-  const api = (pad, body, tok) => fetch('/api/' + pad, {
-    method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' },
-      tok ? { Authorization: 'Bearer ' + tok } : {}),
-    body: JSON.stringify(body || {})
-  }).then(async (r) => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+<script src="/apps/reisuitnodiging-client.js"></script>
 
-  const dagen = (v) => v.van === v.tot ? v.van : v.van + ' t/m ' + v.tot;
-  const soortenZin = (s) => Object.entries(s || {}).map(([k, n]) => n + ' ' + k + (n === 1 ? '' : 'en')).join(', ');
 
-  /* ZONDER CODE is dit de beheerkant: een ingelogd lid ziet hier zijn eigen
-     verstuurde uitnodigingen en kan ze intrekken. Zonder sessie én zonder code
-     valt er niets te tonen -- dan is de link gewoon niet compleet. */
-  if (!code) { token() ? mijnUitnodigingen() : ($('#vak').innerHTML =
-    '<p class="rtg-sub">Deze link is niet compleet. Vraag om een nieuwe.</p>'); return; }
 
-  api('reis/uitnodiging/open', { code }).then((d) => teken(d.uitnodiging)).catch((e) => {
-    $('#vak').innerHTML = '<p class="rtg-sub">' + esc(e.message) + '</p>';
-  });
 
-  async function mijnUitnodigingen(verseLink) {
-    let d;
-    try { d = await api('reis/uitnodiging/mijn', {}, token()); }
-    catch (e) { $('#vak').innerHTML = '<p class="rtg-sub">' + esc(e.message) + '</p>'; return; }
-    const rij = d.uitnodigingen || [];
-    $('#vak').innerHTML = '<h2 style="font-family:\'Bodoni Moda\',serif;font-weight:500;font-size:1.4rem;margin:.6rem 0 .3rem;">Uw uitnodigingen</h2>' +
-      '<p class="rtg-sub" style="margin-bottom:.8rem;">Een uitnodigingslink wordt alleen bij uitgifte getoond. ' +
-        'Niet ontvangen? Roteer haar; de oude link wordt dan direct onbruikbaar.</p>' +
-      '<div id="eenmaligeLink" aria-live="polite"></div>' +
-      (rij.length ? rij.map((u) =>
-        '<div class="rtg-rij"><span class="rtg-tekst"><span class="rtg-naam">' + esc(u.bestemming || 'reis') +
-          ' &middot; ' + esc(dagen(u.venster)) + '</span>' +
-          '<span class="rtg-sub">' + (u.opgeeist ? 'overgenomen' : u.ingetrokken ? 'ingetrokken' :
-            'geldig tot ' + esc(u.toegang && u.toegang.expires_at)) + '</span></span>' +
-          (u.opgeeist || u.ingetrokken ? '' :
-            '<button class="rtg-knop" type="button" data-roteer="' + esc(u.id) + '">Roteer link</button>' +
-            '<button class="rtg-knop" type="button" data-weg="' + esc(u.id) + '">Trek in</button>') +
-        '</div>').join('')
-      : '<p class="rtg-sub">U heeft nog geen uitnodigingen verstuurd. Dat doet u bij een reis in <a href="/apps/reizen.html">RTG Reizen</a>.</p>');
-    if (verseLink) toonEenmaligeLink(verseLink);
-    $('#vak').querySelectorAll('[data-roteer]').forEach((b) => b.addEventListener('click', async () => {
-      b.disabled = true;
-      try {
-        const r = await api('reis/uitnodiging/roteer', {
-          id: b.dataset.roteer, idem: RTGIdem('reis-roteer')
-        }, token());
-        await mijnUitnodigingen(r.link);
-      } catch (e) { b.disabled = false; b.textContent = e.message; }
-    }));
-    $('#vak').querySelectorAll('[data-weg]').forEach((b) => b.addEventListener('click', async () => {
-      b.disabled = true;
-      try { await api('reis/uitnodiging/weg', { id: b.dataset.weg }, token()); mijnUitnodigingen(); }
-      catch (e) { b.disabled = false; b.textContent = e.message; }
-    }));
-  }
-
-  function toonEenmaligeLink(link) {
-    const vak = $('#eenmaligeLink');
-    if (!vak || !link) return;
-    vak.innerHTML = '<div class="rtg-groep" style="margin:.7rem 0;">' +
-      '<strong>Nieuwe link: nu eenmalig kopiëren</strong>' +
-      '<input class="rtg-veld" id="verseLink" readonly autocomplete="off" spellcheck="false" style="margin:.55rem 0;">' +
-      '<button class="rtg-knop" id="kopieerVerseLink" type="button">Kopieer link</button></div>';
-    const invoer = $('#verseLink');
-    invoer.value = new URL(link, location.origin).href;
-    $('#kopieerVerseLink').addEventListener('click', async (e) => {
-      try { await navigator.clipboard.writeText(invoer.value); e.currentTarget.textContent = 'Gekopieerd'; }
-      catch (fout) { invoer.focus(); invoer.select(); }
-    });
-  }
-
-  function teken(u) {
-    const kop = '<h2 style="font-family:\'Bodoni Moda\',serif;font-weight:500;font-size:1.5rem;margin:.6rem 0 .2rem;">' +
-      (u.bestemming ? esc(u.bestemming) : 'Uw reis') + '</h2>' +
-      '<p class="rtg-sub">' + esc(dagen(u.venster)) + ' &middot; ' + esc(soortenZin(u.soorten)) + '</p>' +
-      '<p class="rtg-sub" style="margin-top:.4rem;">Klaargezet door ' + esc(u.van) + '.</p>';
-
-    if (!u.open) {
-      $('#vak').innerHTML = kop + '<p class="rtg-sub" style="margin-top:1rem;">' + esc(u.reden || 'Deze uitnodiging kan niet meer gebruikt worden.') + '</p>';
-      return;
-    }
-    /* WAT ER TE ZIEN IS VOORDAT IEMAND HEM OVERNEEMT, staat hierboven: waar,
-       wanneer, hoeveel. De onderdelen zelf komen pas in zijn eigen dossier. */
-    const uitleg = u.idNodig
-      ? 'U reist met iemand mee. Omdat u daarmee in de reisgegevens van een ander komt, controleren wij eerst uw identiteit -- dat gebeurt in uw account.'
-      : 'Neem hem over en hij staat in uw eigen RTG-reisoverzicht: alle onderdelen op een tijdlijn, met wat er nog niet rond is.';
-    $('#vak').innerHTML = kop +
-      '<p class="rtg-intro" style="margin-top:1rem;">' + esc(uitleg) + '</p>' +
-      '<div id="doe"></div>';
-    token() ? tekenOvernemen() : tekenAanmelden();
-  }
-
-  function tekenOvernemen() {
-    $('#doe').innerHTML = '<div class="rtg-acties" style="margin-top:1rem;">' +
-      '<button class="rtg-knop vol" id="neem" type="button">Neem deze reis over</button></div>' +
-      '<p class="rtg-sub" id="uit" aria-live="polite"></p>';
-    $('#neem').addEventListener('click', async () => {
-      $('#neem').disabled = true;
-      try {
-        const d = await api('reis/uitnodiging/eisop', { code }, token());
-        $('#doe').innerHTML = '<p class="rtg-intro">Overgenomen: ' + d.overgenomen +
-          ' onderdeel' + (d.overgenomen === 1 ? '' : 'en') + ' staan nu in uw reisoverzicht.</p>' +
-          '<div class="rtg-acties"><a class="rtg-knop vol" href="/apps/reizen.html">Naar mijn reizen</a></div>';
-      } catch (e) { $('#uit').textContent = e.message; $('#neem').disabled = false; }
-    });
-  }
-
-  /* AANMELDEN. Dit is de gewone registratie van RTG en geen achterdeur: er gaat
-     geen pas in mee. Wie een Lifestyle- of Business Pass wil, komt langs een
-     mens -- een link kan dat niet regelen (CLAUDE.md). */
-  function tekenAanmelden() {
-    $('#doe').innerHTML =
-      '<div class="rtg-groep" style="margin-top:1rem;">' +
-        '<h2>Word lid van RTG</h2>' +
-        '<p class="rtg-uitleg">Uw reis komt daarna in uw eigen overzicht te staan. U kiest zelf wat u verder met RTG doet.</p>' +
-        veld('rNaam', 'Uw naam', 'text', 'Voor- en achternaam') +
-        veld('rMail', 'E-mailadres', 'email', 'u@voorbeeld.nl') +
-        veld('rTel', 'Telefoon', 'tel', '06 12 34 56 78') +
-        veld('rGeb', 'Geboortedatum', 'date', '') +
-        veld('rWw', 'Wachtwoord', 'password', 'minstens 6 tekens') +
-        '<div class="rtg-acties" style="margin-top:.9rem;">' +
-          '<button class="rtg-knop vol" id="rGo" type="button">Word lid en neem de reis over</button>' +
-        '</div>' +
-        '<p class="rtg-sub" id="rUit" aria-live="polite"></p>' +
-        '<p class="rtg-sub" style="margin-top:.8rem;">Heeft u al een RTG-account? ' +
-          '<a href="/apps/app.html">Log eerst in</a> en open deze link daarna opnieuw.</p>' +
-      '</div>';
-    $('#rGo').addEventListener('click', aanmelden);
-  }
-  function veld(id, label, soort, plaats) {
-    return '<label class="rtg-label" for="' + id + '">' + esc(label) + '</label>' +
-      '<input class="rtg-veld" id="' + id + '" type="' + soort + '" placeholder="' + esc(plaats) + '" style="margin-bottom:.6rem;">';
-  }
-
-  async function aanmelden() {
-    const knop = $('#rGo');
-    knop.disabled = true;
-    $('#rUit').textContent = '';
-    try {
-      const d = await api('auth/register', {
-        name: $('#rNaam').value, email: $('#rMail').value, phone: $('#rTel').value,
-        password: $('#rWw').value, geboortedatum: $('#rGeb').value
-      });
-      if (!d.token) throw new Error('Aanmelden lukte, maar er kwam geen sessie terug. Log in via de app.');
-      try { localStorage.setItem('rtg_member_token', d.token); } catch (e) {}
-      const over = await api('reis/uitnodiging/eisop', { code }, d.token);
-      $('#doe').innerHTML = '<p class="rtg-intro">Welkom bij RTG. Uw reis staat klaar: ' + over.overgenomen +
-        ' onderdeel' + (over.overgenomen === 1 ? '' : 'en') + '.</p>' +
-        '<div class="rtg-acties"><a class="rtg-knop vol" href="/apps/reizen.html">Naar mijn reizen</a></div>';
-    } catch (e) { $('#rUit').textContent = e.message; knop.disabled = false; }
-  }
-})();
-</script>
-<script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
-<script src="/shared/travel-os-config.js" defer></script>
-<script src="/shared/travel-os.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
 </body>
 </html>

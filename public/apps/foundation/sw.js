@@ -2,8 +2,40 @@
    offline openen. Pagina's en scripts zijn network-first (een update komt direct
    door), de cache is het vangnet zonder verbinding. API-verkeer en de live-stream
    gaan altijd naar het netwerk. */
-const CACHE = 'rtf-premium-foundation-meedoen-ontdekken-cd91d438';
+const CACHE = 'rtf-premium-foundation-meedoen-ontdekken-b6c76040';
 const SHELL = [
+  /* The mandatory desktop standard is available offline too. */
+  '/shared/interface/module-sdk.js',
+  '/shared/interface/workspace-world-catalog.js',
+  '/shared/interface/workspace-registries.js',
+  '/shared/interface/workspace-session.js',
+  '/shared/interface/workspace-policy.js',
+  '/shared/interface/workspace-context.js',
+  '/shared/interface/workspace-navigation.js',
+  '/shared/interface/workspace-state.js',
+  '/shared/interface/workspace-orchestrator.js',
+  '/shared/interface/workspace-blueprints.js',
+  '/shared/interface/workspace-broker.js',
+  '/shared/interface/workspace-module-host.js',
+  '/shared/interface/workspace-runtime.js',
+  '/shared/interface/world-desktop-copy.js',
+  '/shared/interface/world-desktop-people.js',
+  '/shared/interface/world-desktop-frame.js',
+  '/shared/interface/world-widget-copy.js',
+  '/shared/interface/world-widget-data.js',
+  '/shared/interface/world-widget-surfaces.js',
+  '/shared/interface/world-widget-live.js',
+  '/shared/interface/world-desktop-cards.js',
+  '/shared/interface/world-desktop-surface.js',
+  '/shared/interface/world-desktop-projection.js',
+  '/shared/interface/world-desktop-home.js',
+  '/shared/interface/world-widget-catalog.json',
+  '/shared/rtg-world-desktop.js',
+  '/shared/rtg-world-desktop.css',
+  '/shared/rtg-world-widgets.css',
+  '/shared/rtg-desktop-components.css',
+  '/shared/rtg-world-palette.css',
+
   '/apps/foundation/', '/apps/foundation/index.html', '/apps/foundation/campus.html',
   '/apps/foundation/samen-thuis.html', '/apps/foundation/samen-thuis.js', '/apps/foundation/samen-thuis-weergave.js',
   '/apps/foundation/geld-later.html', '/apps/foundation/geld-later.js', '/apps/foundation/geld-later-weergave.js',
@@ -26,38 +58,21 @@ const SHELL = [
   '/apps/foundation/mediawijs.html',
   // de levenspas aan de gezinskant, met de gedeelde schil eronder
   '/apps/foundation/mijnbanden.html', '/shared/levenspas.js', '/shared/levenspas.css',
-  /* mail.html en registreren.html kwamen met de samenvoeging van 22 augustus
-     2026 op de hub te staan maar niet hier. Een tegel die de service worker niet
-     kent, geeft offline een wit scherm -- en dat is erger dan geen tegel, want
-     de gebruiker denkt dat de app stuk is. test/foundationschil.test.js meet dit. */
+
   '/apps/foundation/mail.html', '/apps/foundation/registreren.html',
   '/apps/foundation/contact.html', '/apps/foundation/gezin-rt.js', '/apps/foundation/werk.html', '/apps/foundation/werk-premium.css', '/apps/foundation/vrienden.html', '/apps/foundation/markt.html',
-  /* club en klas kwamen op de hub te staan toen elk scherm een klikroute
-     kreeg; zonder deze twee regels geeft de app ze offline als wit scherm.
-     test/foundationschil.js ving dat meteen -- de eerste keer dat die toets
-     iets ving, want hij draaide voorheen nooit (geen browser). */
+
   '/apps/foundation/club.html', '/apps/foundation/klas.html',
   '/apps/foundation/beheer.html', '/apps/foundation/privacy.html',
   '/apps/foundation/onveilig.html', '/apps/foundation/wegwijzer.html', '/apps/foundation/sessie.js',
   '/apps/foundation/voorzijde.js', '/apps/foundation/voorzijde-weergave.js',
   '/apps/foundation/zorg.html', '/apps/foundation/zorg-hulp.js', '/apps/foundation/zorg-hulp-weergave.js',
-  /* Deze tien stonden WEL op de hub en NIET in de schil: spelen, de biebs, de
-     schoolkant en het magazine. Precies de tegels waarmee een kind zich
-     bezighoudt als er niets anders is -- en dus juist de tegels die je nodig
-     hebt in een auto, een wachtkamer of een buurthuis met slecht bereik. Wie
-     hier een pagina bijzet op de hub, zet hem ook hier neer; de gaten waren
-     niet te zien omdat niets ze telde. */
+
   '/apps/foundation/speeltuin.html', '/apps/foundation/speelhal.html', '/apps/foundation/arena.html',
   '/apps/foundation/societeit.html', '/apps/foundation/bieb.html', '/apps/foundation/geloofbieb.html',
   '/apps/foundation/schoolbieb.html', '/apps/foundation/beroepen.html', '/apps/foundation/school.html',
   '/apps/foundation/magazine.html',
-  /* De ZES rolschermen van het Foundation OS (het commentaar zei drie; er
-     stonden er al zes). Ze staan in dezelfde schil omdat ze
-     in dezelfde scope liggen: een tweede service worker op /apps/foundation/
-     zou deze eerste vervangen, en dan is de gezinsapp zijn cache kwijt. Ze
-     draaien op een POST-API en die gaat nooit uit de cache -- wat hier offline
-     komt is de pagina zelf, zodat de vrijwilliger in een buurthuis met slecht
-     bereik niet naar een wit scherm kijkt. */
+
   '/apps/foundation/os-vrijwilliger.html', '/apps/foundation/os-deelnemer.html', '/apps/foundation/os-publiek.html',
   '/apps/foundation/os-bestuur.html',
   '/apps/foundation/os-veld.html', '/apps/foundation/os-donateur.html',

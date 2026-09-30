@@ -2,7 +2,9 @@
    diensten met de open plekken, en diensten zetten/schrappen. Krijgt de
    gedeelde context een keer bij het opstarten vanuit
    kern/beveiliging/rooster.js. */
+const { maakInplanbaar } = require('../../payroll/inplanbaar');
 module.exports = (ctx) => {
+  const inplanbaar = maakInplanbaar(ctx.afwezigOp);
   const { db, save, accounts, findSupplier, notify, notifySupplier, sseToSupplier, sseToOffice, logActivity, haversine,
     BEV_FUNCTIES, BEV_SHIFTS, BEV_ERNST, AANVR_KLAAR,
     id, nu, vandaag, schoon, getal, shiftVan, isBeveiliging, defaults, functieAan,
@@ -84,8 +86,15 @@ module.exports = (ctx) => {
       const posten = b.posten.filter(p => p.actief !== false).map(p => {
         const shifts = (p.shifts && p.shifts.length ? p.shifts : BEV_SHIFTS.map(x => x.id)).map(sid => {
           const bezet = opDag.filter(d => d.postId === p.id && d.shiftId === sid);
+          /* Een vastgestelde dienst van wie zich daarna ziek of vrij meldde, VULT
+             de post niet meer: hij blijft zichtbaar met `afwezig`, en de plek telt
+             weer als open. Afgeleid bij het lezen en niet opgeslagen, dus bij
+             herstel staat hij vanzelf weer. Herplannen doet een mens. */
+          const rijen = bezet.map(d => { const ip = inplanbaar(s.code, d.guardId, datum);
+            return ip.plan ? dienstPubliek(s, d) : Object.assign(dienstPubliek(s, d), { afwezig: ip.zin }); });
+          const aanwezig = rijen.filter(r => !r.afwezig).length;
           return { shiftId: sid, shift: (shiftVan(sid) || {}).naam || sid, minMan: p.minMan || 1,
-            bezet: bezet.map(d => dienstPubliek(s, d)), open: Math.max(0, (p.minMan || 1) - bezet.length) };
+            bezet: rijen, afwezig: rijen.length - aanwezig, open: Math.max(0, (p.minMan || 1) - aanwezig) };
         });
         return { postId: p.id, post: p.naam, klant: p.klant, shifts, open: shifts.reduce((t, x) => t + x.open, 0) };
       });
@@ -118,13 +127,21 @@ module.exports = (ctx) => {
        worden, is een besluit en geen reparatie. */
     const rust = rustBotsing(s, gid, datum, sh.id);
     if (rust && door === 'autoplan') return { status: 409, error: rust };
+    /* Verzuim, in dezelfde vorm: de automaat plant nooit wie afwezig is, een
+       MENS mag het (aangepast werk, een misverstand) maar ziet het erbij. Een
+       reden staat er nooit in (kern/payroll/inplanbaar.js). */
+    const vz = inplanbaar(s.code, gid, datum);
+    const afwezig = !vz.plan ? guardNaam(s, gid) + ' staat op ' + datum + ' als ' + vz.wat +
+      (vz.inzetbaarheid ? ' (inzetbaar: ' + vz.inzetbaarheid + ')' : '') + ' in de verzuimlaag.' : null;
+    if (afwezig && door === 'autoplan') return { status: 409, error: afwezig };
     const dienst = { id: id('d'), supplierCode: s.code, datum, shiftId: sh.id, postId: p.id,
       guardId: gid, guardNaam: guardNaam(s, gid), status: 'gepland', door, at: nu() };
     diensten().unshift(dienst);
     db.data.bevDiensten = diensten().slice(0, 100000);
     save();
     sseToSupplier(s.code, 'sync', { scope: 'beveiliging' });
-    return { status: 200, ok: true, dienst: dienstPubliek(s, dienst), ...(rust ? { rustWaarschuwing: rust } : {}) };
+    return { status: 200, ok: true, dienst: dienstPubliek(s, dienst), ...(rust ? { rustWaarschuwing: rust } : {}),
+      ...(afwezig ? { verzuimWaarschuwing: afwezig } : {}), verzuimNagekeken: !vz.onbekend };
   }
   function schrapDienst(s, dienstId) {
     const d = diensten().find(x => x.id === dienstId && x.supplierCode === s.code);

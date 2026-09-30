@@ -1,6 +1,15 @@
-/* DEMOCRATIEOS bij ./idemsleutels-nooit-routes.js -- zeven routes die het ZELF
-   al weten. Elk weigert een herhaling met 409 en zegt waarom, en precies die
-   reden mag een duplicaatlaag niet opslikken (MUTATIECONTRACT.md par. 5o). */
+/* DEMOCRATIEOS bij ./idemsleutels-nooit-routes.js -- twaalf routes die het ZELF
+   al weten. De meeste weigeren een herhaling met 409 en zeggen waarom, en
+   precies die reden mag een duplicaatlaag niet opslikken (MUTATIECONTRACT.md
+   par. 5o). Vier van de Political Connector doen iets anders en ook dat met
+   opzet: een tweede voorstel, toelichting of sleutel IS een tweede gebeurtenis,
+   en een duplicaatlaag zou er een verbergen. De partijdeur heeft bovendien geen
+   sessie, dus een duplicaatlaag zou hem op het lijf alleen herkennen -- en dan
+   krijgt de ene partij het afgespeelde antwoord van de andere. Dat is gemeten
+   en niet bedacht: met de aanname als `zelfdeVerzoek` kreeg een herhaling het
+   eerste antwoord terug in plaats van de eigen `herhaling` van de route, want
+   ./idem-sleutelbepaling.js kent een afzender alleen aan Authorization of de
+   cookie, en zonder die twee aan het ip-adres. */
 'use strict';
 
 module.exports = Object.freeze({
@@ -19,5 +28,19 @@ module.exports = Object.freeze({
   'POST /api/member/democratie/actie/resultaat':
     'weigert met 409 als de actie al klaar is: een resultaat verandert niet achteraf',
   'POST /api/member/democratie/actie/stop':
-    'weigert met 409 als de actie al gestopt is; er komt geen tweede tijdlijnregel'
+    'weigert met 409 als de actie al gestopt is; er komt geen tweede tijdlijnregel',
+  'POST /api/office/democratie/partij/registreer':
+    'weigert met 409 als dezelfde aanduiding al op dat niveau staat; een afgespeeld succes zou een tweede ' +
+    'sleutel tonen die niet bestaat',
+  'POST /api/office/democratie/partij/sleutel':
+    'geeft elke keer een NIEUWE sleutel en maakt de vorige ongeldig: een afgespeeld antwoord zou een sleutel ' +
+    'tonen die al niet meer werkt',
+  'POST /api/democratie/partij/voorstel/plaats':
+    'een tweede voorstel met dezelfde tekst is een tweede voorstel en telt mee voor de daglimiet; wie dubbel ' +
+    'plaatst hoort dat te zien en niet een afgespeeld eerste antwoord',
+  'POST /api/democratie/partij/voorstel/aanname':
+    'herkent een herhaling zelf (dezelfde waarde met dezelfde bron geeft herhaling en geen nieuwe ketenregel); ' +
+    'de partijdeur heeft geen sessie, dus een duplicaatlaag zou partijen achter hetzelfde adres door elkaar halen',
+  'POST /api/democratie/partij/voorstel/toelicht':
+    'een tweede toelichting is een nieuwe regel op de keten (DO-10); een afgespeeld succes zou er een verbergen'
 });

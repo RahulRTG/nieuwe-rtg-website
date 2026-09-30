@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-27T17:50:07.522Z",
-    "commit": "72c154f0",
+    "op": "2026-09-29T19:17:14.814Z",
+    "commit": "a9a30b4f4",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/onvervreemdbaar.js",
@@ -1462,8 +1462,8 @@
     {
       "werkwoord": "rust",
       "waarom": "niet storen, de kring komt erdoor",
-      "functie": "dom-veiligheid",
-      "naam": "Veiligheidsdiensten",
+      "functie": "rust",
+      "naam": "Rust (Thuisrust)",
       "paden": [
         "/api/veiligheid/rust"
       ],

@@ -517,6 +517,7 @@ function draaiToets(bestand, env, wacht, forceer) {
 const EIGEN_MODULE = new Map([
   // This worker test executes the real source in a VM, not through require.
   ['pass-cache.test.js', ['public/shared/sw-pass-assets.js']],
+  ['operationeel-meter.test.js', ['scripts/lib/operationeel/beoordeel.js']],
   /* DE SLEUTELWEDLOOP. De toets leest ook scripts/lib/bron.js (om commentaar
      te strippen), en de motor koos die als module -- een mutatie daar zegt niets
      over de sleutels. De module die hij beproeft is de helper; met de hand
@@ -900,6 +901,11 @@ const EIGEN_MODULE = new Map([
      bericht mag komen en over intrekken -- dat woont in ./deelnemer.js en
      ./bericht.js. */
   ['comm-deelnemer.test.js', ['server/kern/comm/deelnemer.js', 'server/kern/comm/bericht.js']],
+  /* DE PLAATSLAAG. plaatsdoelhek.test.js laadt server/kern/plaats/index.js, en
+     dat is een samensteller zonder eigen gedrag. De regel die de toets bewaakt
+     (alleen het doelhek wordt bewaard, NAVIGATIE.md N12) woont in ./waarnemen.js,
+     de eis dat een nadering haar hek noemt in ./venster.js. */
+  ['plaatsdoelhek.test.js', ['server/kern/plaats/waarnemen.js', 'server/kern/plaats/venster.js']],
   /* DE GELDMOTOR. Deze twee toetsen laden server/kern/pay/motorklant.js, en dat
      is sinds de samenvoeging een schil van dertig regels: twee paden, twee
      namen, klaar. De motor vond daar terecht "geen bruikbare mutatie" -- niet
@@ -1107,6 +1113,12 @@ const EIGEN_MODULE = new Map([
    Elke reden noemt hoeveel mutaties er zijn geprobeerd, want een reden zonder
    poging is een vermoeden. */
 const GEEN_BRONMUTATIE = new Map([
+  /* De crashherkenning van de meetronde (scripts/lib/valom.js) is een regex en
+     een `||`; geen van de vier operatoren komt erin voor (0 pogingen, 28
+     september 2026). Met de hand gemeten: `fout || ''` -> `fout && ''` laat
+     toets 1 zakken, en de oorspronkelijke kapotte auditproef (dubbele
+     declaratie van `stempel`) laat toets 2 zakken. Beide daarna teruggezet. */
+  ['meetronde.test.js', 'regex plus ||, geen operator van de motor (0 pogingen); handmutatie || -> && laat toets 1 zakken, en de kapotte auditproef laat toets 2 zakken'],
   /* Deze broncontracten lezen HTML/tekst via fs. TALEN is alleen hun noemer;
      diens migratieversie muteren raakt de tekstbewering niet. Op 20-09-2026
      afzonderlijk gemeten: AI in de paginatitel respectievelijk een ontbrekende

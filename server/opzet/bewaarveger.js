@@ -16,12 +16,12 @@
 'use strict';
 
 module.exports = function sluitBewaarvegerAan(deps) {
-  const { db, save, accounts, log, UPLOAD_DIR } = deps;
+  const { db, save, accounts, log, UPLOAD_DIR, radarVeeg, sosVeeg } = deps;
   /* De bewaarveger: de wisregels die de eigenaar in het papierwerkregister
      heeft gekozen (locatiesporen 7 dagen, ID-bewijs 1 jaar na goedkeuring,
      afgewezen bewijs als vangnet). Draait elk uur en een keer bij de start. */
   const bewaarveger = require('../bewaarveger').maakBewaarveger({
-    db, save, accounts, log,
+    db, save, accounts, log, radarVeeg, sosVeeg,
     identiteitsmap: require('../identiteitsmap').maakIdentiteitsmap(UPLOAD_DIR),
     /* TOT WANNEER IS DIT LIDMAATSCHAP BETAALD? Elke maandtermijn draagt zijn
        eigen vervaldatum (het begin van de maand die hij dekt), dus de dekking

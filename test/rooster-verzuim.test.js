@@ -93,3 +93,30 @@ test('op een echte server: wie zich ziek meldt, staat vrij in het weekrooster en
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) { /* opruimen mag falen */ }
   }
 });
+
+test('een al vastgestelde dienst van wie zich daarna ziek meldt, vult de post niet meer; bij herstel wel', () => {
+  let ziek = false;
+  const ctx = {
+    db: { data: { bevDiensten: [] } }, save() {}, sseToSupplier() {},
+    afwezigOp: (code, id) => (ziek && id === 1 ? { wat: 'afwezig', inzetbaarheid: 'niets' } : null),
+    BEV_SHIFTS: BEVEILIGING_SHIFTS, shiftVan: sid => BEVEILIGING_SHIFTS.find(x => x.id === sid) || null,
+    functieAan: () => true, vandaag: () => '2026-09-24', nu: () => 't',
+    getal: (v, min, max, std) => { const n = Number(v); return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : std; },
+    defaults: () => ({ posten: [{ id: 'P', naam: 'Post', klant: 'K', shifts: ['dag'], minMan: 1 }] }),
+    id: (() => { let n = 0; return p => p + (++n); })(),
+    guards: () => [{ id: 1 }, { id: 2 }], guardNaam: (s, g) => 'Bewaker ' + g,
+    postVan: () => ({ id: 'P', naam: 'Post', klant: 'K' }), diensten: () => ctx.db.data.bevDiensten
+  };
+  Object.assign(ctx, require('../server/kern/beveiliging/rooster/planning')(ctx));
+  assert.ok(ctx.zetDienst({ code: 'Z' }, { postId: 'P', shiftId: 'dag', datum: '2026-09-24', guardId: 1 }).ok);
+  const shift = () => ctx.rooster({ code: 'Z' }, '2026-09-24', 1).dagen[0].posten[0].shifts[0];
+  assert.equal(shift().open, 0, 'vastgesteld en gedekt');
+  ziek = true;
+  const na = shift();
+  assert.equal(na.open, 1, 'de post meldt zich weer als open');
+  assert.equal(na.afwezig, 1);
+  assert.equal(na.bezet[0].afwezig, 'afwezig.', 'de dienst blijft zichtbaar, met DAT hij afwezig is en niet waarom');
+  assert.equal(ctx.db.data.bevDiensten[0].status, 'gepland', 'er is niets geschrapt: herplannen doet een mens');
+  ziek = false;
+  assert.equal(shift().open, 0, 'hersteld: vanzelf weer gedekt');
+});

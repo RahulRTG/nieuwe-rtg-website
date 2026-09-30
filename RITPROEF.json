@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-24T16:37:16.698Z",
-    "commit": "56ea75ba",
+    "op": "2026-09-29T19:12:03.161Z",
+    "commit": "db2a65496",
     "boomVuil": false,
-    "boomAnders": 2,
+    "boomAnders": 4,
     "instrument": "scripts/ritproef.js",
     "node": "v22.22.2"
   },
@@ -18,9 +18,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "rit RTG-R-AA1611 -> opdracht RTG-M-64CD1A, op het bord: true, klant heet \"Amberen Vos\"",
+      "ziet": "rit RTG-R-452604 -> opdracht RTG-M-56F504, op het bord: true, klant heet \"Amberen Vos\"",
       "fout": null,
-      "ms": 19
+      "ms": 23
     },
     {
       "nr": 2,
@@ -32,7 +32,7 @@
       "status": 200,
       "ziet": "betaald: true, stand nu \"aangevraagd\"",
       "fout": null,
-      "ms": 18
+      "ms": 20
     },
     {
       "nr": 3,
@@ -44,7 +44,7 @@
       "status": 200,
       "ziet": "het lid leest chauffeur \"Chauffeur Proef\" bij stand \"geaccepteerd\"",
       "fout": null,
-      "ms": 37
+      "ms": 43
     },
     {
       "nr": 4,
@@ -56,7 +56,7 @@
       "status": 200,
       "ziet": "het lid leest stand \"onderweg\"",
       "fout": null,
-      "ms": 16
+      "ms": 20
     },
     {
       "nr": 5,
@@ -68,7 +68,7 @@
       "status": 200,
       "ziet": "het lid leest stand \"aangekomen\"",
       "fout": null,
-      "ms": 16
+      "ms": 19
     },
     {
       "nr": 6,
@@ -80,7 +80,7 @@
       "status": 200,
       "ziet": "het lid leest stand \"aan-boord\"",
       "fout": null,
-      "ms": 16
+      "ms": 18
     },
     {
       "nr": 7,
@@ -92,7 +92,7 @@
       "status": 200,
       "ziet": "stand \"afgerond\", nog in het live-beeld: false",
       "fout": null,
-      "ms": 18
+      "ms": 21
     },
     {
       "nr": 8,
@@ -104,7 +104,7 @@
       "status": 200,
       "ziet": "staat in de historie met stand \"afgerond\"",
       "fout": null,
-      "ms": 7
+      "ms": 6
     }
   ],
   "storingen": [
@@ -148,7 +148,7 @@
       "naam": "een bestemming die alleen een tekst is",
       "belofte": "wordt nooit een plek op de kaart: de opdracht draagt een bestemming die onbekend heet en geen afstand",
       "stand": "gehouden",
-      "wat": "opdracht RTG-M-000663, bestemming: {\"label\":\"Bestemming nog niet bekend\",\"bron\":\"onbekend\",\"onbekend\":true}, km: 0"
+      "wat": "opdracht RTG-M-E84D66, bestemming: {\"label\":\"Bestemming nog niet bekend\",\"bron\":\"onbekend\",\"onbekend\":true}, km: 0"
     },
     {
       "naam": "een rit die op \"aan-boord\" gaat",
@@ -160,7 +160,7 @@
       "naam": "een rit zonder bestemming, bij een vervoerder die die soort aanneemt",
       "belofte": "gaat gewoon door en krijgt een opdracht met een bestemming die nog niet bekend is",
       "stand": "gehouden",
-      "wat": "status 200, opdracht: RTG-M-21AF2E"
+      "wat": "status 200, opdracht: RTG-M-17DA84"
     },
     {
       "naam": "een vervoerder die alleen ritten mét bestemming aanneemt",
@@ -175,7 +175,7 @@
       "wat": "toewijzen: 200, chauffeur: Losse Chauffeur, op zijn bord: true"
     }
   ],
-  "rit": "RTG-R-AA1611",
+  "rit": "RTG-R-452604",
   "wereld": {
     "chauffeur": "via /api/supplier/staff/add, want de seed geeft ISLATR geen personeel"
   },

@@ -8,7 +8,8 @@
    en terug naar 293 met 17 doorwijzers sinds /apps/vandaag.html in RTG Life
    opging (SCHERMEIGENAAR.json), en 292 met 18 sinds /apps/toestemming.html een
    weergave van Wie heeft toegang tot mij werd, en 293 sinds /apps/leerhuis.html, en 295 sinds DemocratieOS V1
-   (/apps/foundation/kwesties.html en kwestiekantoor.html), en 296 sinds /apps/leerhuis-werk.html --
+   (/apps/foundation/kwesties.html en kwestiekantoor.html), en 296 sinds
+   /apps/leerhuis-werk.html --
    het getal is een grendel tegen
    een scherm dat er stil bij komt, en hoort dus mee te bewegen met een scherm
    dat er BEWUST bij komt), ieder exact eenmaal. */

@@ -123,6 +123,30 @@
     if (v.uitDienst) ken.appendChild(rij('uit dienst', 'ja', 'nee'));
   }
 
+  /* De bestuurder: een teamlid of een vrije naam. Afwezig zegt DAT, nooit
+     waarom -- de server geeft alleen die vlag (kern/mobiliteit/bestuurder.js). */
+  let team = null;
+  function toonBestuurder(v) {
+    const doel = $('#vBestuurder'); leeg(doel);
+    doel.appendChild(rij('bestuurder', (v.bestuurder || 'geen') + (v.bestuurderAfwezig ? ' · afwezig' : ''),
+      v.bestuurderAfwezig ? 'nee' : ''));
+    $('#vBestuurderKies').hidden = !team;
+    if (!team) return;
+    const sel = $('#vTeam'); leeg(sel);
+    const geen = document.createElement('option'); geen.value = ''; geen.textContent = 'geen teamlid';
+    sel.appendChild(geen);
+    for (const m of team) {
+      const o = document.createElement('option'); o.value = String(m.id); o.textContent = m.name;
+      if (m.id === v.bestuurderStaffId) o.selected = true;
+      sel.appendChild(o);
+    }
+    $('#vTeamZet').onclick = async () => {
+      const r = await api('voertuig', { id: v.id, bestuurderStaffId: sel.value || null });
+      if (r.status !== 200) { zeg((r.body && r.body.error) || 'Niet bewaard.'); return; }
+      zeg('Bestuurder bewaard.'); laad();
+    };
+  }
+
   function toonVloot(assets) {
     const doel = $('#vloot'); leeg(doel);
     for (const a of assets) {
@@ -131,7 +155,7 @@
       b.textContent = (a.naam || a.id) + ' · ' + (a.inzetbaar ? 'inzetbaar' : 'niet inzetbaar');
       b.addEventListener('click', () => {
         history.replaceState(null, '', '?voertuig=' + encodeURIComponent(a.id));
-        toonDit(a); toonPapieren(a);
+        toonDit(a); toonPapieren(a); toonBestuurder(a);
       });
       doel.appendChild(b);
     }
@@ -153,6 +177,7 @@
       return;
     }
     const assets = (r.body && r.body.assets) || [];
+    team = (r.body && r.body.team) || null;
     toonVloot(assets);
     if (!gevraagd) {
       $('#geen').hidden = false;
@@ -169,7 +194,7 @@
       $('#geenTekst').textContent = 'Voertuig "' + gevraagd + '" staat niet in deze vloot. Dat betekent of dat het niet (meer) bestaat, of dat het bij een andere vervoerder hoort; welke van de twee zegt dit scherm bewust niet.';
       return;
     }
-    toonDit(v); toonPapieren(v);
+    toonDit(v); toonPapieren(v); toonBestuurder(v);
   }
 
   $('#ververs').addEventListener('click', () => { laad().then(() => zeg('Bijgewerkt.')); });

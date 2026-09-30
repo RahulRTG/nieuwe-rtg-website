@@ -1,0 +1,1026 @@
+{
+  "stempel": {
+    "op": "2026-09-29T18:27:18.986Z",
+    "commit": "747aa293d",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/positiestroom.js",
+    "node": "v22.22.2"
+  },
+  "graad": "vermoed",
+  "hoe": "lexicaal: de noemer is elk bestand in server/ dat een object met lat en lng/lon bouwt (geen vaste getallen) en iets opslaat; de indeling is per stroom verklaard met een citaat dat letterlijk in de bron moet staan; de termijn komt uit het bewaarbeleid, de bewaarveger en de vergeetroute.",
+  "grens": "Dit is de BRON-helft van de grondwetmeter (NAVIGATIE.md par. 6.4). Wat er na een doorloop werkelijk in de opslag staat, meet hij niet -- dat is A0c. Hij telt geen gebruik tijdens een taak als schuld (N11). De klassen zijn VOORSTELLEN en geen besluiten. En de detector ziet geen positie die in losse toewijzingen wordt opgebouwd; die stromen staan er alleen omdat ze met de hand zijn gevonden (nietGedetecteerd).",
+  "besturing": {
+    "citaatFouten": [],
+    "inOrde": true,
+    "wat": "Elk citaat moet letterlijk in zijn bestand staan. Staat er een niet, dan is een stroom verhuisd of verdwenen, en telt deze meter iets wat hij niet meer ziet."
+  },
+  "gemeten": {
+    "kandidaten": 53,
+    "onverklaard": 0,
+    "stromen": 35,
+    "nietGedetecteerd": 9,
+    "tegenspraak": 0,
+    "zonderTermijn": 1,
+    "nietVergeten": 17,
+    "besloten": 34,
+    "besluitNietUitgevoerd": [],
+    "klassen": {
+      "toegestaan": 6,
+      "venster": 17,
+      "noodzakelijk": 11,
+      "teLang": 0,
+      "onbegrensd": 0,
+      "verboden": 0,
+      "onbekend": 1
+    }
+  },
+  "onverklaard": [],
+  "rijen": [
+    {
+      "naam": "live-onderweg",
+      "wat": "de positie van een lid dat Onderweg aanzet",
+      "bestanden": [
+        "server/routes/member/onderweg.js"
+      ],
+      "collectie": "live",
+      "sleutel": "sessiesleutel",
+      "van": "lid",
+      "termijn": {
+        "soort": "veger",
+        "bestand": "server/bewaarveger.js"
+      },
+      "vergeten": true,
+      "gedetecteerd": true,
+      "klasse": "venster",
+      "status": "besloten",
+      "besluit": {
+        "n": "N14",
+        "datum": "2026-09-29",
+        "klasse": "venster",
+        "uitkomst": "de positie wordt gewist zodra Onderweg stopt; de veger van zeven dagen blijft alleen als vangnet",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "sinds N14 wist /api/live/stop de positie; de bewaarveger van zeven dagen is het vangnet voor wie nooit op stop drukt. Tot 29 september zette stoppen alleen active op false (NAVIGATIE.md par. 6.2)."
+    },
+    {
+      "naam": "rit-vertrekpunt",
+      "wat": "de live-positie die bij een ritaanvraag in de vervoersopdracht wordt gekopieerd",
+      "bestanden": [
+        "server/routes/member/onderweg.js"
+      ],
+      "collectie": "mobOpdrachten",
+      "sleutel": "sessiesleutel",
+      "van": "lid",
+      "termijn": {
+        "soort": "venster",
+        "bestand": "server/kern/mobiliteit/voortgang.js"
+      },
+      "vergeten": false,
+      "gedetecteerd": true,
+      "klasse": "toegestaan",
+      "status": "besloten",
+      "besluit": {
+        "n": "N16",
+        "datum": "2026-09-29",
+        "klasse": "toegestaan",
+        "uitkomst": "tijdens de rit het exacte ophaalpunt; bij afronden vervangen door het adres of de plaatsnaam van de factuur",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "sinds N16 is het ophaalpunt exact zolang de rit loopt (de chauffeur moet je vinden) en houdt het bij afronden alleen zijn label, zoals op de factuur (kern/mobiliteit/ritpunten.js). Tot 29 september ontsnapte de kopie aan de zevendagenveger van db.data.live."
+    },
+    {
+      "naam": "ritlijn",
+      "wat": "de posities van een lopende rit (chauffeur en dus reiziger)",
+      "bestanden": [
+        "server/kern/mobiliteit/voortgang.js"
+      ],
+      "collectie": "mobOpdrachten",
+      "sleutel": "sessiesleutel",
+      "van": "medewerker",
+      "termijn": {
+        "soort": "venster",
+        "bestand": "server/kern/mobiliteit/voortgang.js"
+      },
+      "vergeten": false,
+      "gedetecteerd": true,
+      "klasse": "venster",
+      "status": "besloten",
+      "besluit": {
+        "n": "N16",
+        "datum": "2026-09-29",
+        "klasse": "venster",
+        "uitkomst": "de punten van een rit worden gewist bij afronden; afstand, duur en begin- en eindplek zoals op de factuur blijven",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "sinds N16 (beantwoordt B10) worden de locatiegebeurtenissen en o.positie gewist zodra de rit voorbij is; afstand, duur en de plekken als tekst blijven voor de factuur, en na afronden neemt de opdracht geen positie meer aan (409). Tot 29 september bleven tot zestig punten na de rit staan."
+    },
+    {
+      "naam": "reis-etappes",
+      "wat": "vertrek- en aankomstpunten van een geboekte reis, soms de live-positie",
+      "bestanden": [
+        "server/kern/mobiliteit/reis.js"
+      ],
+      "collectie": "mobReizen",
+      "sleutel": "sessiesleutel",
+      "van": "lid",
+      "termijn": {
+        "soort": "venster",
+        "bestand": "server/kern/mobiliteit/reis.js"
+      },
+      "vergeten": false,
+      "gedetecteerd": true,
+      "klasse": "toegestaan",
+      "status": "besloten",
+      "besluit": {
+        "n": "N21",
+        "datum": "2026-09-29",
+        "klasse": "toegestaan",
+        "uitkomst": "\"hier\" wordt bij het plannen vervangen door de dichtstbijzijnde plaatsnaam; de GPS van het lid wordt niet bewaard",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "sinds N21 wordt \"hier\" vlak voor het opslaan vervangen door de dichtstbijzijnde plaatsnaam (kern/mobiliteit/hiernaam.js); het plannen en de taxi-opdracht hebben het punt dan al gehad. Het citaat hierboven is de opdracht voor de taxi, niet wat er van de reis blijft."
+    },
+    {
+      "naam": "favorieten",
+      "wat": "plekken die een lid zelf bewaart, soms de huidige positie",
+      "bestanden": [
+        "server/kern/mobiliteit/plekken.js"
+      ],
+      "collectie": "mobFavorieten",
+      "sleutel": "sessiesleutel",
+      "van": "lid",
+      "termijn": {
+        "soort": "lid",
+        "bestand": "server/kern/mobiliteit/plekken.js"
+      },
+      "vergeten": false,
+      "gedetecteerd": true,
+      "klasse": "noodzakelijk",
+      "status": "besloten",
+      "besluit": {
+        "klasse": "noodzakelijk",
+        "n": "N15",
+        "datum": "2026-09-29",
+        "uitkomst": "aanvaard zoals voorgesteld",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "het lid kiest en verwijdert ze zelf (max. tien); dat is zijn eigen inhoud en geen spoor -- maar de vergeetroute kent mobFavorieten niet (daar staat favorieten, een andere collectie)"
+    },
+    {
+      "naam": "ov-instap",
+      "wat": "het instappunt van een OV-rit",
+      "bestanden": [
+        "server/kern/ov/index.js"
+      ],
+      "collectie": "ovRitten",
+      "sleutel": "sessiesleutel",
+      "van": "lid",
+      "termijn": {
+        "soort": "beleid",
+        "dagen": 365,
+        "tekst": "365",
+        "bestand": "server/bewaarbeleid-vervoer.js"
+      },
+      "vergeten": true,
+      "gedetecteerd": true,
+      "klasse": "noodzakelijk",
+      "status": "besloten",
+      "besluit": {
+        "n": "N17",
+        "datum": "2026-09-29",
+        "klasse": "noodzakelijk",
+        "uitkomst": "de instaphalte vervangt de GPS; het reisoverzicht blijft een jaar en is eerder te wissen via de vergeetroute",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "sinds N17 blijft de instaphalte en niet het punt; het punt woont tijdens de rit alleen in het geheugen (inPunten) voor het tarief. Het overzicht blijft een jaar (server/bewaarbeleid-vervoer.js) en de vergeetroute haalt het eerder weg. Tot 29 september was er alleen een plafond op aantal."
+    },
+    {
+      "naam": "ov-uitstap",
+      "wat": "de eigen GPS bij uitchecken, gebruikt voor het tarief",
+      "bestanden": [
+        "server/kern/ov/reizen.js"
+      ],
+      "collectie": "ovRitten",
+      "sleutel": "sessiesleutel",
+      "van": "lid",
+      "termijn": {
+        "soort": "beleid",
+        "dagen": 365,
+        "tekst": "365",
+        "bestand": "server/bewaarbeleid-vervoer.js"
+      },
+      "vergeten": true,
+      "gedetecteerd": true,
+      "klasse": "noodzakelijk",
+      "status": "besloten",
+      "besluit": {
+        "n": "N17",
+        "datum": "2026-09-29",
+        "klasse": "noodzakelijk",
+        "uitkomst": "na het rekenen van het tarief blijven de uitstaphalte en de afstand, een jaar; de GPS van het lid gaat weg",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "sinds N17 rekent het tarief de afstand uit de GPS en bewaart het de uitstaphalte, de afstand en de prijs, een jaar; het punt gaat niet mee in de rit"
+    },
+    {
+      "naam": "ov-voertuig",
+      "wat": "de PDA-positie van een OV-chauffeur tijdens de dienst",
+      "bestanden": [
+        "server/kern/ov/dienst.js"
+      ],
+      "collectie": "ovVoertuigen",
+      "sleutel": "staffId",
+      "van": "medewerker",
+      "termijn": {
+        "soort": "venster",
+        "bestand": "server/kern/ov/dienst.js"
+      },
+      "vergeten": null,
+      "gedetecteerd": true,
+      "klasse": "venster",
+      "status": "besloten",
+      "besluit": {
+        "klasse": "venster",
+        "n": "N15",
+        "datum": "2026-09-29",
+        "uitkomst": "aanvaard zoals voorgesteld",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "overschreven en niet opgestapeld, en weg zodra de dienst stopt"
+    },
+    {
+      "naam": "patrouille",
+      "wat": "de positie van een bewaker bij elk controlepunt",
+      "bestanden": [
+        "server/kern/beveiliging/pda/patrouille.js"
+      ],
+      "collectie": "bevRondes",
+      "sleutel": "staffId",
+      "van": "medewerker",
+      "termijn": {
+        "soort": "module",
+        "bestand": "server/kern/beveiliging/pda/patrouille.js"
+      },
+      "vergeten": null,
+      "gedetecteerd": false,
+      "klasse": "toegestaan",
+      "status": "besloten",
+      "besluit": {
+        "n": "N19",
+        "datum": "2026-09-29",
+        "klasse": "toegestaan",
+        "uitkomst": "het controlepunt bewijst de ronde; de GPS-positie van de bewaker wordt niet bewaard",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "sinds N19 bewijst het controlepunt de ronde en neemt de route geen GPS meer aan; oude rondes verliezen hun punten bij de volgende veegronde. Tot 29 september legde elk controlepunt de positie van de bewaker vast."
+    },
+    {
+      "naam": "beveiliging-incident",
+      "wat": "de plek van een incident en van een SOS van een bewaker",
+      "bestanden": [
+        "server/kern/beveiliging/pda/index.js"
+      ],
+      "collectie": "bevIncidenten",
+      "sleutel": "staffId",
+      "van": "medewerker",
+      "termijn": {
+        "soort": "module",
+        "bestand": "server/kern/beveiliging/pda/index.js"
+      },
+      "vergeten": null,
+      "gedetecteerd": true,
+      "klasse": "noodzakelijk",
+      "status": "besloten",
+      "besluit": {
+        "n": "N18",
+        "datum": "2026-09-29",
+        "klasse": "noodzakelijk",
+        "uitkomst": "de positie hoort bij de melding: zolang die open is en 90 dagen erna; een proefalarm of een binnen een minuut ingetrokken SOS verdwijnt direct",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "sinds N18 hoort de positie bij de melding: zolang die open is en 90 dagen na afhandeling (kern/sospositie.js, via de bewaarveger)"
+    },
+    {
+      "naam": "veilig-laatste-plek",
+      "wat": "de laatst bekende positie voor de veiligheidskring",
+      "bestanden": [
+        "server/kern/veiligheid/plek.js"
+      ],
+      "collectie": "veilig",
+      "sleutel": "handle",
+      "van": "lid",
+      "termijn": {
+        "soort": "venster",
+        "bestand": "server/kern/veiligheid/plek.js"
+      },
+      "vergeten": false,
+      "gedetecteerd": true,
+      "klasse": "venster",
+      "status": "besloten",
+      "besluit": {
+        "n": "N19",
+        "datum": "2026-09-29",
+        "klasse": "venster",
+        "uitkomst": "de laatste plek bestaat alleen zolang de kring een venster open heeft en verdwijnt bij sluiten",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "sinds N19 bestaat de laatste plek alleen in een open venster: zonder venster wordt niets bewaard, bij sluiten gaat hij weg, en een verlopen venster wordt door de veger opgeruimd. Tot 29 september werd hij ook zonder venster bewaard en nooit weggehaald."
+    },
+    {
+      "naam": "veilig-spoor",
+      "wat": "het korte spoor (max. twaalf punten) tijdens een open veiligheidsvenster",
+      "bestanden": [
+        "server/kern/veiligheid/plek.js"
+      ],
+      "collectie": "veilig",
+      "sleutel": "handle",
+      "van": "lid",
+      "termijn": {
+        "soort": "venster",
+        "bestand": "server/kern/veiligheid/plek.js"
+      },
+      "vergeten": false,
+      "gedetecteerd": true,
+      "klasse": "venster",
+      "status": "besloten",
+      "besluit": {
+        "klasse": "venster",
+        "n": "N15",
+        "datum": "2026-09-29",
+        "uitkomst": "aanvaard zoals voorgesteld",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "weg bij het sluiten van het venster; een VERLOPEN venster wordt alleen niet vanzelf gesloten"
+    },
+    {
+      "naam": "veilig-alarm",
+      "wat": "de laatste positie die bij elk alarm wordt meegeschreven",
+      "bestanden": [
+        "server/kern/veiligheid/alarm.js"
+      ],
+      "collectie": "veilig",
+      "sleutel": "handle",
+      "van": "lid",
+      "termijn": {
+        "soort": "module",
+        "bestand": "server/kern/veiligheid/alarm.js"
+      },
+      "vergeten": false,
+      "gedetecteerd": false,
+      "klasse": "noodzakelijk",
+      "status": "besloten",
+      "besluit": {
+        "n": "N18",
+        "datum": "2026-09-29",
+        "klasse": "noodzakelijk",
+        "uitkomst": "de positie hoort bij de melding: zolang die open is en 90 dagen erna; een proefalarm of een binnen een minuut ingetrokken SOS verdwijnt direct",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "sinds N18 hoort de plek bij het alarm: 90 dagen na afsluiten, en een proefalarm of een binnen een minuut ingetrokken alarm verliest hem direct. De kopie in het bericht aan de kring (meldAan) valt hierbuiten."
+    },
+    {
+      "naam": "ontmoet-radar",
+      "wat": "de laatste positie voor de radar van Salon-ontmoetingen",
+      "bestanden": [
+        "server/kern/ontmoeting.js"
+      ],
+      "collectie": "ontmoetPosities",
+      "sleutel": "sessiesleutel",
+      "van": "lid",
+      "termijn": {
+        "soort": "venster",
+        "bestand": "server/kern/ontmoeting.js"
+      },
+      "vergeten": true,
+      "gedetecteerd": true,
+      "klasse": "venster",
+      "status": "besloten",
+      "besluit": {
+        "n": "N14",
+        "datum": "2026-09-29",
+        "klasse": "venster",
+        "uitkomst": "de positie wordt gewist zodra de radar stopt",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "sinds N14 wordt een positie die niet meer vers is gewist -- bij elke nieuwe positie, bij elke stand en door de bewaarveger. Tot 29 september werd de versheid alleen bij het LEZEN gewogen en bleef de plek staan tot het lid de functie uitzette."
+    },
+    {
+      "naam": "date-positie",
+      "wat": "de live-positie van beide deelnemers tijdens een date",
+      "bestanden": [
+        "server/kern/ontmoeting/date.js"
+      ],
+      "collectie": "ontmoetDates",
+      "sleutel": "sessiesleutel",
+      "van": "lid",
+      "termijn": {
+        "soort": "venster",
+        "bestand": "server/kern/ontmoeting/date.js"
+      },
+      "vergeten": false,
+      "gedetecteerd": true,
+      "klasse": "venster",
+      "status": "besloten",
+      "besluit": {
+        "klasse": "venster",
+        "n": "N15",
+        "datum": "2026-09-29",
+        "uitkomst": "aanvaard zoals voorgesteld",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "weg bij het stoppen van de date, tenzij er een SOS openstaat"
+    },
+    {
+      "naam": "date-sos",
+      "wat": "de positie bij een noodknop tijdens een date",
+      "bestanden": [
+        "server/kern/ontmoeting/sos.js"
+      ],
+      "collectie": "ontmoetDates",
+      "sleutel": "sessiesleutel",
+      "van": "lid",
+      "termijn": {
+        "soort": "module",
+        "bestand": "server/kern/ontmoeting/sos.js"
+      },
+      "vergeten": false,
+      "gedetecteerd": true,
+      "klasse": "noodzakelijk",
+      "status": "besloten",
+      "besluit": {
+        "n": "N18",
+        "datum": "2026-09-29",
+        "klasse": "noodzakelijk",
+        "uitkomst": "de positie hoort bij de melding: zolang die open is en 90 dagen erna; een proefalarm of een binnen een minuut ingetrokken SOS verdwijnt direct",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "sinds N18: 90 dagen na afhandeling van de SOS (kern/sospositie.js), en de live-posities van de date gaan weg zodra de laatste SOS dicht is"
+    },
+    {
+      "naam": "vonk-profiel",
+      "wat": "de positie in een datingprofiel, voor afstand bij het matchen",
+      "bestanden": [
+        "server/kern/vonk/index.js"
+      ],
+      "collectie": "vonk",
+      "sleutel": "sessiesleutel",
+      "van": "lid",
+      "termijn": {
+        "soort": "lid",
+        "bestand": "server/kern/vonk/vak.js"
+      },
+      "vergeten": true,
+      "gedetecteerd": true,
+      "klasse": "noodzakelijk",
+      "status": "besloten",
+      "besluit": {
+        "n": "N21",
+        "datum": "2026-09-29",
+        "klasse": "noodzakelijk",
+        "uitkomst": "alleen een grove plek (een vak van 5 km), nooit het punt, en weg bij uitzetten of vergeten",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "sinds N21 blijft alleen een vak van 5 km en nooit het punt; oude profielen worden bij het opstarten omgezet, het vak gaat weg bij uitzetten en de vergeetroute wist het profiel"
+    },
+    {
+      "naam": "markt-overdracht",
+      "wat": "de GPS van koper en verkoper bij de overdracht",
+      "bestanden": [
+        "server/kern/markt/handel/samenkomst.js"
+      ],
+      "collectie": "markt",
+      "sleutel": "partij",
+      "van": "lid",
+      "termijn": {
+        "soort": "venster",
+        "bestand": "server/kern/markt/handel/samenkomst.js"
+      },
+      "vergeten": null,
+      "gedetecteerd": false,
+      "klasse": "toegestaan",
+      "status": "besloten",
+      "besluit": {
+        "n": "N21",
+        "datum": "2026-09-29",
+        "klasse": "toegestaan",
+        "uitkomst": "alleen samen ja/nee en de afstand blijven; de punten van koper en verkoper niet",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "sinds N21 blijft alleen samen ja/nee en de afstand; hooguit een punt wacht op de ander, zolang het vers is. Er is geen veger voor de markt: een verlopen wachtend punt valt weg bij de volgende melding."
+    },
+    {
+      "naam": "koerier-mode",
+      "wat": "de laatste positie van een koerier van een modebezorging",
+      "bestanden": [
+        "server/kern/modebezorg/koerier.js"
+      ],
+      "collectie": "modeBezorg",
+      "sleutel": "staffId",
+      "van": "medewerker",
+      "termijn": {
+        "soort": "venster",
+        "bestand": "server/kern/modebezorg/koerier.js"
+      },
+      "vergeten": null,
+      "gedetecteerd": true,
+      "klasse": "venster",
+      "status": "besloten",
+      "besluit": {
+        "n": "N20",
+        "datum": "2026-09-29",
+        "klasse": "venster",
+        "uitkomst": "het punt verdwijnt bij geleverd of geannuleerd; het adres zelf blijft bij de bestelling, en een verzonnen punt bestaat niet meer",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "sinds N20 weg bij afleveren en bij retour; daarna neemt de bezorging geen positie meer aan"
+    },
+    {
+      "naam": "koerier-bezorgdienst",
+      "wat": "de positie van een bezorger van de bezorgdienst",
+      "bestanden": [
+        "server/routes/supplier/bezorg.js"
+      ],
+      "collectie": "bezorgers",
+      "sleutel": "staffId",
+      "van": "medewerker",
+      "termijn": {
+        "soort": "venster",
+        "bestand": "server/routes/supplier/bezorg-keten.js"
+      },
+      "vergeten": null,
+      "gedetecteerd": true,
+      "klasse": "venster",
+      "status": "besloten",
+      "besluit": {
+        "klasse": "venster",
+        "n": "N15",
+        "datum": "2026-09-29",
+        "uitkomst": "aanvaard zoals voorgesteld",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "weg als de bezorger terug is; hij heet vluchtig maar gaat met de volgende save() wel naar schijf"
+    },
+    {
+      "naam": "zaak-live-locatie",
+      "wat": "de \"live locatie\" van een vervoerder, die de vaste plek van de zaak overschrijft",
+      "bestanden": [
+        "server/routes/supplier/vervoer.js"
+      ],
+      "collectie": "suppliers",
+      "sleutel": "zaakcode",
+      "van": "onbekend",
+      "termijn": {
+        "soort": "geen"
+      },
+      "vergeten": null,
+      "gedetecteerd": true,
+      "klasse": "onbekend",
+      "status": "voorstel",
+      "besluit": null,
+      "tegenspraak": null,
+      "reden": "of dit een voertuig of een mens is, kan deze meter niet vaststellen: bij een eenmanschauffeur is het een persoon, en die positie wordt als PLAATS aan elk lid getoond (P-01: een mens is geen plaats)",
+      "waarom": "zie de reden; het is een besluit welke van de twee het is"
+    },
+    {
+      "naam": "excursie-leerling",
+      "wat": "de positie van een leerling tijdens een schoolexcursie, met toestemming van een ouder",
+      "bestanden": [
+        "server/school/excursie.js"
+      ],
+      "collectie": "foundation",
+      "sleutel": "leerling",
+      "van": "kind",
+      "termijn": {
+        "soort": "venster",
+        "bestand": "server/school/excursie.js"
+      },
+      "vergeten": null,
+      "gedetecteerd": true,
+      "klasse": "venster",
+      "status": "besloten",
+      "besluit": {
+        "klasse": "venster",
+        "n": "N15",
+        "datum": "2026-09-29",
+        "uitkomst": "aanvaard zoals voorgesteld",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "weg bij het stoppen van de excursie en direct weg bij het intrekken van de toestemming"
+    },
+    {
+      "naam": "excursie-begeleider",
+      "wat": "de positie van een begeleider tijdens een schoolexcursie",
+      "bestanden": [
+        "server/school/excursie.js"
+      ],
+      "collectie": "foundation",
+      "sleutel": "naam",
+      "van": "medewerker",
+      "termijn": {
+        "soort": "venster",
+        "bestand": "server/school/excursie.js"
+      },
+      "vergeten": null,
+      "gedetecteerd": true,
+      "klasse": "venster",
+      "status": "besloten",
+      "besluit": {
+        "klasse": "venster",
+        "n": "N15",
+        "datum": "2026-09-29",
+        "uitkomst": "aanvaard zoals voorgesteld",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "weg bij het stoppen van de excursie"
+    },
+    {
+      "naam": "huur-delen",
+      "wat": "de positie die een huurder vrijwillig deelt",
+      "bestanden": [
+        "server/routes/member/voertuigen/huur.js"
+      ],
+      "collectie": "huurLocaties",
+      "sleutel": "boeking",
+      "van": "lid",
+      "termijn": {
+        "soort": "venster",
+        "bestand": "server/routes/member/voertuigen/huur.js"
+      },
+      "vergeten": null,
+      "gedetecteerd": false,
+      "klasse": "venster",
+      "status": "besloten",
+      "besluit": {
+        "klasse": "venster",
+        "n": "N15",
+        "datum": "2026-09-29",
+        "uitkomst": "aanvaard zoals voorgesteld",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "weg bij uitzetten en bij het inleveren van het voertuig"
+    },
+    {
+      "naam": "charter-delen",
+      "wat": "de positie die een chartergast vrijwillig deelt",
+      "bestanden": [
+        "server/routes/member/voertuigen/charter.js"
+      ],
+      "collectie": "charterLocaties",
+      "sleutel": "boeking",
+      "van": "lid",
+      "termijn": {
+        "soort": "venster",
+        "bestand": "server/routes/member/voertuigen/charter.js"
+      },
+      "vergeten": null,
+      "gedetecteerd": false,
+      "klasse": "venster",
+      "status": "besloten",
+      "besluit": {
+        "klasse": "venster",
+        "n": "N15",
+        "datum": "2026-09-29",
+        "uitkomst": "aanvaard zoals voorgesteld",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "weg bij uitzetten en bij afronden; een geweigerde charter laat de rij wel staan"
+    },
+    {
+      "naam": "huur-sos",
+      "wat": "de positie bij een SOS van een huurder",
+      "bestanden": [
+        "server/routes/member/voertuigen/huur.js"
+      ],
+      "collectie": "boekingen",
+      "sleutel": "boeking",
+      "van": "lid",
+      "termijn": {
+        "soort": "module",
+        "bestand": "server/kern/voertuigsos.js"
+      },
+      "vergeten": null,
+      "gedetecteerd": false,
+      "klasse": "noodzakelijk",
+      "status": "besloten",
+      "besluit": {
+        "n": "N18",
+        "datum": "2026-09-29",
+        "klasse": "noodzakelijk",
+        "uitkomst": "de positie hoort bij de melding: zolang die open is en 90 dagen erna; een proefalarm of een binnen een minuut ingetrokken SOS verdwijnt direct",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "sinds N18: de positie hoort bij de SOS, zolang die open is en 90 dagen erna (kern/sospositie.js via de bewaarveger). Het lid kan een SOS niet intrekken; de zaak of het kantoor sluit hem."
+    },
+    {
+      "naam": "charter-sos",
+      "wat": "de positie bij een SOS op zee",
+      "bestanden": [
+        "server/routes/member/voertuigen/charter.js"
+      ],
+      "collectie": "boekingen",
+      "sleutel": "boeking",
+      "van": "lid",
+      "termijn": {
+        "soort": "module",
+        "bestand": "server/kern/voertuigsos.js"
+      },
+      "vergeten": null,
+      "gedetecteerd": false,
+      "klasse": "noodzakelijk",
+      "status": "besloten",
+      "besluit": {
+        "n": "N18",
+        "datum": "2026-09-29",
+        "klasse": "noodzakelijk",
+        "uitkomst": "de positie hoort bij de melding: zolang die open is en 90 dagen erna; een proefalarm of een binnen een minuut ingetrokken SOS verdwijnt direct",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "sinds N18: de positie hoort bij de SOS, zolang die open is en 90 dagen erna (kern/sospositie.js via de bewaarveger). Het lid kan een SOS niet intrekken; de zaak of het kantoor sluit hem."
+    },
+    {
+      "naam": "flits-melding",
+      "wat": "een verkeersmelding: de plek waar het lid was, met zijn codenaam",
+      "bestanden": [
+        "server/kern/flits.js"
+      ],
+      "collectie": "flitsMeldingen",
+      "sleutel": "codenaam",
+      "van": "lid",
+      "termijn": {
+        "soort": "module",
+        "bestand": "server/kern/flits.js"
+      },
+      "vergeten": false,
+      "gedetecteerd": true,
+      "klasse": "noodzakelijk",
+      "status": "besloten",
+      "besluit": {
+        "klasse": "noodzakelijk",
+        "n": "N15",
+        "datum": "2026-09-29",
+        "uitkomst": "aanvaard zoals voorgesteld",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "een bewust gedane melding met een levensduur van 45 minuten tot een dag; de codenaam en de sleutels van wie bevestigt reizen mee, en de vergeetroute kent de collectie niet"
+    },
+    {
+      "naam": "plaats-passages",
+      "wat": "elke overgang langs een hek tijdens een naderingsvenster, onder een codenaam",
+      "bestanden": [
+        "server/kern/plaats/waarnemen.js"
+      ],
+      "collectie": "plaatsLog",
+      "sleutel": "codenaam",
+      "van": "lid",
+      "termijn": {
+        "soort": "beleid",
+        "dagen": 90,
+        "tekst": "90",
+        "bestand": "server/bewaarbeleid-operationeel.js"
+      },
+      "vergeten": false,
+      "gedetecteerd": false,
+      "klasse": "toegestaan",
+      "status": "besloten",
+      "besluit": {
+        "n": "N12",
+        "datum": "2026-09-29",
+        "klasse": "toegestaan",
+        "uitkomst": "alleen het doelhek wordt opgeslagen; een passage langs een ander hek wordt verwerkt en niet bewaard",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "sinds N12 noemt een naderingsvenster zijn hek, en een overgang langs een ander hek wordt verwerkt en niet bewaard -- hij verlaat het verzoek niet. De regel die blijft gaat over het doel van het bezoek zelf. Tot 29 september legde elke passage een regel onder de codenaam vast, 90 dagen (NAVIGATIE.md par. 6.2)."
+    },
+    {
+      "naam": "plaats-waarnemingen",
+      "wat": "binnen/buiten per hek binnen een venster",
+      "bestanden": [
+        "server/kern/plaats/waarnemen.js"
+      ],
+      "collectie": "plaatsWaarnemingen",
+      "sleutel": "codenaam",
+      "van": "lid",
+      "termijn": {
+        "soort": "beleid",
+        "dagen": 2,
+        "tekst": "2",
+        "bestand": "server/bewaarbeleid-operationeel.js"
+      },
+      "vergeten": false,
+      "gedetecteerd": false,
+      "klasse": "venster",
+      "status": "besloten",
+      "besluit": {
+        "klasse": "venster",
+        "n": "N15",
+        "datum": "2026-09-29",
+        "uitkomst": "aanvaard zoals voorgesteld",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "weg met het venster en hooguit twee dagen in het bewaarbeleid"
+    },
+    {
+      "naam": "gemeente-melding",
+      "wat": "de plek van een melding openbare ruimte, vaak de GPS van de melder",
+      "bestanden": [
+        "server/kern/gemeente/meldingen.js"
+      ],
+      "collectie": "gemeenteMeldingen",
+      "sleutel": "codenaam",
+      "van": "lid",
+      "termijn": {
+        "soort": "module",
+        "bestand": "server/kern/gemeente/meldingen.js"
+      },
+      "vergeten": false,
+      "gedetecteerd": true,
+      "klasse": "toegestaan",
+      "status": "besloten",
+      "besluit": {
+        "n": "N21",
+        "datum": "2026-09-29",
+        "klasse": "toegestaan",
+        "uitkomst": "de plek blijft bij de melding, de codenaam van de melder gaat eraf na afhandeling",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "sinds N21 is de plek na afhandeling de plek van het probleem en niet meer van een mens: de codenaam en de sleutel van de melder gaan eraf, nadat hij de uitkomst als bericht kreeg"
+    },
+    {
+      "naam": "weefsel-zaak",
+      "wat": "de plek van een zaak openbare ruimte, met de melder erbij",
+      "bestanden": [
+        "server/kern/stadsweefsel/zaken.js"
+      ],
+      "collectie": "weefselZaken",
+      "sleutel": "codenaam",
+      "van": "lid",
+      "termijn": {
+        "soort": "beleid",
+        "dagen": null,
+        "tekst": "3 * JAAR / DAG",
+        "bestand": "server/bewaarbeleid-operationeel.js"
+      },
+      "vergeten": false,
+      "gedetecteerd": true,
+      "klasse": "noodzakelijk",
+      "status": "besloten",
+      "besluit": {
+        "klasse": "noodzakelijk",
+        "n": "N15",
+        "datum": "2026-09-29",
+        "uitkomst": "aanvaard zoals voorgesteld",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "een zaakdossier met een termijn in het bewaarbeleid; of drie jaar de melder moet dragen, is een aparte vraag"
+    },
+    {
+      "naam": "horeca-bezorgadres",
+      "wat": "het bezorgadres (vaak het woonadres) als punt op de rekening van een gast",
+      "bestanden": [
+        "server/kern/gast/buitenshuis.js",
+        "server/routes/gast/bezorgen.js"
+      ],
+      "collectie": "horeca",
+      "sleutel": "codenaam",
+      "van": "lid",
+      "termijn": {
+        "soort": "venster",
+        "bestand": "server/routes/supplier/eten.js"
+      },
+      "vergeten": false,
+      "gedetecteerd": true,
+      "klasse": "venster",
+      "status": "besloten",
+      "besluit": {
+        "n": "N20",
+        "datum": "2026-09-29",
+        "klasse": "venster",
+        "uitkomst": "het punt verdwijnt bij geleverd of geannuleerd; het adres zelf blijft bij de bestelling, en een verzonnen punt bestaat niet meer",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "sinds N20 verdwijnt het punt bij geleverd en bij annuleren (ook routes/supplier/horeca/betalen.js); het adres als tekst blijft bij de rekening"
+    },
+    {
+      "naam": "bezorgdienst-adres",
+      "wat": "het bezorgadres als punt op een bestelling",
+      "bestanden": [
+        "server/routes/member/kopen/bezorg.js"
+      ],
+      "collectie": "orders",
+      "sleutel": "sessiesleutel",
+      "van": "lid",
+      "termijn": {
+        "soort": "venster",
+        "bestand": "server/routes/supplier/orders/afhandeling.js"
+      },
+      "vergeten": false,
+      "gedetecteerd": true,
+      "klasse": "venster",
+      "status": "besloten",
+      "besluit": {
+        "n": "N20",
+        "datum": "2026-09-29",
+        "klasse": "venster",
+        "uitkomst": "het punt verdwijnt bij geleverd of geannuleerd; het adres zelf blijft bij de bestelling, en een verzonnen punt bestaat niet meer",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "sinds N20 weg bij afronden en annuleren, aan elke kant die een bestelling sluit (ook routes/supplier/bezorg.js en de annulering door het lid); het adres blijft"
+    },
+    {
+      "naam": "mode-adres",
+      "wat": "de bestemming van een modebezorging, of een verzonnen punt als er geen is",
+      "bestanden": [
+        "server/kern/modebezorg/winkel.js",
+        "server/routes/member/handel/winkel.js"
+      ],
+      "collectie": "modeBezorg",
+      "sleutel": "sessiesleutel",
+      "van": "lid",
+      "termijn": {
+        "soort": "venster",
+        "bestand": "server/kern/modebezorg/koerier.js"
+      },
+      "vergeten": false,
+      "gedetecteerd": true,
+      "klasse": "venster",
+      "status": "besloten",
+      "besluit": {
+        "n": "N20",
+        "datum": "2026-09-29",
+        "klasse": "venster",
+        "uitkomst": "het punt verdwijnt bij geleverd of geannuleerd; het adres zelf blijft bij de bestelling, en een verzonnen punt bestaat niet meer",
+        "uitgevoerd": true
+      },
+      "tegenspraak": null,
+      "reden": null,
+      "waarom": "sinds N20 weg bij afleveren en retour, en zonder punt bestaat er geen verzonnen bestemming meer (NAVIGATIE.md par. 12, gebrek 5)"
+    }
+  ]
+}

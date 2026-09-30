@@ -14,8 +14,40 @@
    installeerde in de periode dat de `cache: 'no-cache'` hieronder was
    gesneuveld (zie de toelichting daar). Een naam die uit de INHOUD komt kan
    niet vergeten worden. */
-const CACHE = 'rtg-app-6a8a8126';
-const SHELL = ['/apps/app.html', '/shared/id.js',
+const CACHE = 'rtg-app-2aaf9d70';
+const SHELL = [
+  /* The mandatory desktop standard is available offline too. */
+  '/shared/interface/module-sdk.js',
+  '/shared/interface/workspace-world-catalog.js',
+  '/shared/interface/workspace-registries.js',
+  '/shared/interface/workspace-session.js',
+  '/shared/interface/workspace-policy.js',
+  '/shared/interface/workspace-context.js',
+  '/shared/interface/workspace-navigation.js',
+  '/shared/interface/workspace-state.js',
+  '/shared/interface/workspace-orchestrator.js',
+  '/shared/interface/workspace-blueprints.js',
+  '/shared/interface/workspace-broker.js',
+  '/shared/interface/workspace-module-host.js',
+  '/shared/interface/workspace-runtime.js',
+  '/shared/interface/world-desktop-copy.js',
+  '/shared/interface/world-desktop-people.js',
+  '/shared/interface/world-desktop-frame.js',
+  '/shared/interface/world-widget-copy.js',
+  '/shared/interface/world-widget-data.js',
+  '/shared/interface/world-widget-surfaces.js',
+  '/shared/interface/world-widget-live.js',
+  '/shared/interface/world-desktop-cards.js',
+  '/shared/interface/world-desktop-surface.js',
+  '/shared/interface/world-desktop-projection.js',
+  '/shared/interface/world-desktop-home.js',
+  '/shared/interface/world-widget-catalog.json',
+  '/shared/rtg-world-desktop.js',
+  '/shared/rtg-world-desktop.css',
+  '/shared/rtg-world-widgets.css',
+  '/shared/rtg-desktop-components.css',
+  '/shared/rtg-world-palette.css',
+'/apps/app.html', '/shared/id.js',
   '/shared/sw-pass-assets.js', '/shared/pass-cache.js', '/shared/pass-recovery.js', '/shared/pass-recovery.css',
   /* Heritage is één systeemlaag. Een offline start mag niet alleen de HTML
      bewaren en daarna identiteit, materiaal, beweging of lettertypen missen. */
@@ -31,8 +63,6 @@ const SHELL = ['/apps/app.html', '/shared/id.js',
   '/shared/rtg-operation.js', '/shared/rtg-side-sheet.js',
   '/shared/rtg-heritage.css', '/shared/rtg-heritage-materials.css',
   '/shared/rtg-warm-details.css', '/shared/rtg-personal-images.css',
-  '/shared/rtg-world-widgets.css', '/shared/rtg-world-desktop.css',
-  '/shared/rtg-desktop-components.css', '/shared/rtg-world-palette.css',
   '/shared/rtg-heritage-adapters.css', '/shared/rtg-heritage-experiences.css', '/shared/rtg-heritage-components.css',
   '/shared/rtg-simple.css', '/shared/rtg-world-screen.css',
   '/shared/rtg-heritage-motion.css', '/shared/rtg-heritage-motion.js',
@@ -58,16 +88,7 @@ const SHELL = ['/apps/app.html', '/shared/id.js',
   '/apps/app-main.js', '/apps/spelen.html', '/shared/verbinding.js',
   '/shared/interface/second-screen.css', '/shared/interface/second-screen-personal.css', '/shared/interface/workspace-empty.js', '/shared/interface/second-screen-modules.js',
   '/shared/interface/modules/context.js', '/shared/interface/second-screen.js', '/shared/interface/second-screen-personal.js', '/manifest.webmanifest', '/icon.svg',
-  /* DE TAAL HOORT BIJ DE SCHIL. Zonder i18n.js opent een offline start altijd
-     in het Nederlands, ook voor wie zijn taal allang gekozen had -- de laag die
-     de tekst omzet was er domweg niet. En zonder de schilbestanden heeft die
-     laag offline niets om uit te putten: het net is dan onbereikbaar en de kast
-     vult zich pas door eerder bezoek.
 
-     De lijst hieronder is de tien doeltalen uit server/taalschil.js. Hij staat
-     hier letterlijk omdat een service worker niets kan requiren; dat een tweede
-     lijst uit elkaar loopt met de eerste, wordt bewaakt door
-     test/taalschil.test.js -- die vergelijkt deze regels met schilPaden(). */
   '/shared/i18n.js',
   '/shared/taalschil/zh.json', '/shared/taalschil/hi.json', '/shared/taalschil/es.json',
   '/shared/taalschil/ar.json', '/shared/taalschil/bn.json', '/shared/taalschil/pt.json',
@@ -102,17 +123,7 @@ self.addEventListener('fetch', e => {
             caches.open(CACHE).then(c => c.put(e.request, copy));
             return res;
           }))
-      /* "Network-first" is hier niet vanzelf waar. fetch(e.request) mag gewoon
-         uit de BROWSERCACHE komen, en een script dat daar nog uren als vers in
-         ligt wordt dan zonder navragen geserveerd -- terwijl de pagina er wel
-         vers doorheen komt. Die mix is het ergste geval: nieuwe html naast een
-         oud script bouwt het beginscherm niet meer op, en dat is een zwart
-         scherm zonder foutmelding. Precies wat er gemeld werd.
 
-         Met cache:'no-cache' vraagt hij altijd na; is er niets veranderd dan is
-         dat een 304 van een paar bytes. Deze regel is bij de samenvoeging van
-         zes takken gesneuveld en hier teruggezet; test/randen.test.js bewaakt
-         hem, en die toets ving het. */
       : fetch(new Request(e.request, { cache: 'no-cache' })).then(res => {
           // alleen goede antwoorden bewaren: een 503 van een failover die hier
           // belandt, wordt anders voor altijd het "vangnet" van deze URL

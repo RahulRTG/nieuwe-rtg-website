@@ -5,7 +5,11 @@ module.exports = (octx) => {
   const { OFFICE_CODE, app, archief, crypto, db, loginFails, noteFailedTry, officeAuth, kluisAuth, officeState,
           rememberSession, sessionFor, sseClients, tooManyTries, totpOk, veiligGelijk, logInlog, securityLogKeten,
           handelingsspoor } = kern;
+  const productiedeur = require('../../kern/kantoor/productiedeur');
 app.post('/api/office/login', (req, res) => {
+  // B10: in productie dicht, voor de vergelijking (kern/kantoor/productiedeur.js)
+  const dicht = productiedeur.codeDicht();
+  if (dicht) { const { status, ...lijf } = dicht; return res.status(status).json(lijf); }
   const bucket = 'office:' + req.ip;
   if (tooManyTries(res, bucket)) return;
   // tijd-veilig vergeleken: de reactietijd verraadt niets over de code

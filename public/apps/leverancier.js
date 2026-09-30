@@ -6535,7 +6535,7 @@
         '<div style="border-bottom:1px solid var(--line);padding:0.5rem 0;">'+
           '<div style="display:flex;justify-content:space-between;"><b>'+esc(p.post)+'</b>'+(p.open?'<span style="color:var(--rood);font-size:0.72rem;">'+p.open+' '+T('bev.open','open')+'</span>':'<span style="color:#7EE0A3;font-size:0.72rem;">'+T('bev.gedekt','gedekt')+'</span>')+'</div>'+
           p.shifts.map(sl => '<div class="sub h-mt20">'+esc(sl.shift)+': '+
-            (sl.bezet.length? sl.bezet.map(d=>'<span class="bev-chip'+(d.status==='ingeklokt'?' on':'')+'">'+esc(d.guardNaam||'?')+(d.status==='ingeklokt'?' ●':'')+' <a data-schrap="'+d.id+'">✕</a></span>').join(' ') : '')+
+            (sl.bezet.length? sl.bezet.map(d=>'<span class="bev-chip'+(d.afwezig?' uit':d.status==='ingeklokt'?' on':'')+'"'+(d.afwezig?' title="'+esc(d.afwezig)+'"':'')+'>'+esc(d.guardNaam||'?')+(d.afwezig?' · '+T('bev.afwezig','afwezig'):d.status==='ingeklokt'?' ●':'')+' <a data-schrap="'+d.id+'">✕</a></span>').join(' ') : '')+
             (sl.open? ' <button class="bev-plan" data-post="'+p.postId+'" data-shift="'+sl.shiftId+'">+ '+T('bev.plan','plan')+'</button>':'')+
           '</div>').join('')+
         '</div>'
@@ -8443,8 +8443,9 @@
       (guests.length ? guests.map(g =>
         '<div class="guest-row"><span class="cn">'+g.codename+'</span>'+
         (g.arrived?'<span class="ge here">✓ '+T('sup.arrived','gearriveerd')+'</span>'
-          : g.etaMin!=null?'<span class="ge"><b>'+g.etaMin+'</b> '+T('sup.minaway','min')+'</span>'
-          : '<span class="ge">'+T('sup.enrouteshort','onderweg')+'</span>')+'</div>'
+          : (g.etaMin!=null?'<span class="ge"><b>'+g.etaMin+'</b> '+T('sup.minaway','min')+'</span>'
+            : '<span class="ge">'+(g.nabij?T('sup.nabij','in de buurt'):T('sup.enrouteshort','onderweg'))+'</span>')+
+            (g.heading?'<button class="obtn" data-aangekomen="'+g.codename.replace(/"/g,'&quot;')+'">'+T('sup.bevestig','Is er')+'</button>':''))+'</div>'
       ).join('') : '<div class="softline">'+T('gst.none','Nog geen verbonden gasten.')+'</div>')+'</div>';
 
     html += '<div class="card"><div class="tt-h">'+T('gst.nearby','Nu onderweg (nog niet verbonden)')+'</div>'+
@@ -8457,6 +8458,12 @@
 
     el.innerHTML = html;
     bindGastLoc(el);
+    /* De zaak bevestigt de aankomst (NAVIGATIE.md N13): alleen voor een gast die
+       naar DEZE zaak onderweg is; de server weigert de rest. */
+    el.querySelectorAll('[data-aangekomen]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/guest/aangekomen', { codename: b.dataset.aangekomen }); toast(T('gst.bevestigd','Aankomst bevestigd.')); await refresh(); openTab('gasten'); }
+      catch(e){ toast(e.message); }
+    }));
     el.querySelectorAll('[data-connect]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/guest/connect', { codename: b.dataset.connect }); toast(T('gst.done','Verbonden. De gast is op de hoogte.')); await refresh(); openTab('gasten'); }
       catch(e){ toast(e.message); }

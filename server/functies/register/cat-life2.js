@@ -9,9 +9,17 @@
    ========================================================================== */
 'use strict';
 
-const { LEDEN, LEDEN_RTF } = require('./doelgroepen');
+const { LEDEN, LEDEN_RTF, LEDEN_GAST } = require('./doelgroepen');
 
 module.exports = [
+  /* RUST HOORT BIJ DE BODEM (SAMENLEVING.md par. 2 en 6). De routes wonen in
+     routes/veiligheid/rust.js en vielen onder `dom-veiligheid`, dat alleen de
+     betalende passen verklaart -- terwijl de deur elk account doorlaat. Een eigen
+     functie voor elke doelgroep met een account: de langste prefix wint
+     (functies/toegangpad.js), dus de rest van /api/veiligheid blijft waar hij was. */
+  { id: 'rust', categorie: 'Eigen apps', naam: 'Rust (Thuisrust)', standaard: true, doelgroepen: LEDEN_GAST,
+    uitleg: 'Stilte die vanzelf eindigt, terwijl je kring erdoor komt. Hoe lang iemand hem gebruikt, meet RTG niet.',
+    paden: ['/api/veiligheid/rust'] },
   /* Foundation Connect (kern/connect/): de ontdeklus. LEDEN_RTF om dezelfde
      reden als `knelpunt` hierboven -- er is EEN motor met twee deuren, zodat een
      gezinsprofiel nooit een ander antwoord kan krijgen dan een lid.

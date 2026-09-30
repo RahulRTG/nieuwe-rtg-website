@@ -36,7 +36,10 @@ function api(pad, body) {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {})
   }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
-const get = pad => fetch(BASE + '/api/foundation' + pad).then(r => r.json());
+/* Lezen vraagt sinds de lescredential (#403) ook de sleutel van de les: de rem
+   op het raden van een lescode woont in lesVan(), ook aan de leeskant. */
+const get = (pad, token) => fetch(BASE + '/api/foundation' + pad,
+  { headers: token ? { Authorization: 'Bearer ' + token } : {} }).then(r => r.json());
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' }, wachtPad: '/api/foundation/health' }));
@@ -48,50 +51,50 @@ test.after(() => {
 
 test('1. het digibord draait terug wie de les geeft, niet wie hem volgt', async () => {
   const les = (await api('/les/maak', { vak: 'Rekenen', naam: 'Juf Nora' })).body;
-  assert.ok(les.code && les.token, 'de les staat klaar');
-  const leerling = (await api('/les/join', { code: les.code, naam: 'Sem' })).body;
+  assert.ok(les.lesId && les.token, 'de les staat klaar');
+  const leerling = (await api('/les/join', { lescode: les.lescode, naam: 'Sem' })).body;
   assert.ok(leerling.token, 'de leerling doet mee: ' + JSON.stringify(leerling).slice(0, 140));
 
-  const streek = n => ({ code: les.code, token: les.token,
+  const streek = n => ({ code: les.lesId, token: les.token,
     stroke: { tool: 'pen', kleur: '#ffffff', dikte: 4, points: [[n, n], [n + 10, n + 10]] } });
   for (const n of [10, 30, 50]) assert.equal((await api('/bord/stroke', streek(n))).status, 200);
-  assert.equal((await get('/bord/' + les.code)).strokes.length, 3);
+  assert.equal((await get('/bord/' + les.lesId, les.token)).strokes.length, 3);
 
   /* De leerling heeft een geldig token voor deze les. Het verschil tussen
      meedoen en lesgeven moet in de route staan: een leerling die het bord kan
      terugdraaien wist het werk van de klas, en niemand ziet wie het deed. */
-  const poging = await api('/bord/undo', { code: les.code, token: leerling.token });
+  const poging = await api('/bord/undo', { code: les.lesId, token: leerling.token });
   assert.equal(poging.status, 403, 'een leerling draait het bord niet terug');
-  assert.equal((await get('/bord/' + les.code)).strokes.length, 3, 'en er is niets weg');
+  assert.equal((await get('/bord/' + les.lesId, les.token)).strokes.length, 3, 'en er is niets weg');
 
-  assert.equal((await api('/bord/undo', { code: les.code, token: les.token })).status, 200);
-  assert.equal((await get('/bord/' + les.code)).strokes.length, 2, 'de begeleider haalt zijn laatste streek weg');
+  assert.equal((await api('/bord/undo', { code: les.lesId, token: les.token })).status, 200);
+  assert.equal((await get('/bord/' + les.lesId, les.token)).strokes.length, 2, 'de begeleider haalt zijn laatste streek weg');
 
   // tot de bodem, en daarna is undo gewoon een lege handeling
-  for (let i = 0; i < 5; i++) assert.equal((await api('/bord/undo', { code: les.code, token: les.token })).status, 200);
-  assert.equal((await get('/bord/' + les.code)).strokes.length, 0, 'een leeg bord blijft leeg');
+  for (let i = 0; i < 5; i++) assert.equal((await api('/bord/undo', { code: les.lesId, token: les.token })).status, 200);
+  assert.equal((await get('/bord/' + les.lesId, les.token)).strokes.length, 0, 'een leeg bord blijft leeg');
 
   assert.equal((await api('/bord/undo', { code: 'ZZZZZZ', token: les.token })).status, 404);
 });
 
 test('2. de lesagenda is ook van de begeleider', async () => {
   const les = (await api('/les/maak', { vak: 'Aardrijkskunde', naam: 'Meester Bram' })).body;
-  const leerling = (await api('/les/join', { code: les.code, naam: 'Fay' })).body;
+  const leerling = (await api('/les/join', { lescode: les.lescode, naam: 'Fay' })).body;
 
-  assert.equal((await api('/agenda', { code: les.code, token: les.token, tekst: '' })).status, 400,
+  assert.equal((await api('/agenda', { code: les.lesId, token: les.token, tekst: '' })).status, 400,
     'een leeg agendapunt is geen agendapunt');
-  assert.equal((await api('/agenda', { code: les.code, token: leerling.token, tekst: 'Geen huiswerk' })).status, 403,
+  assert.equal((await api('/agenda', { code: les.lesId, token: leerling.token, tekst: 'Geen huiswerk' })).status, 403,
     'een leerling zet niets in de agenda van de klas');
 
-  const mk = await api('/agenda', { code: les.code, token: les.token,
+  const mk = await api('/agenda', { code: les.lesId, token: les.token,
     tekst: 'Toets hoofdstuk 3', datum: '2027-09-14' });
   assert.equal(mk.status, 200);
   assert.equal(mk.body.agenda.length, 1);
   const itemId = mk.body.agenda[0].id;
 
-  assert.equal((await api('/agenda/verwijder', { code: les.code, token: leerling.token, itemId })).status, 403,
+  assert.equal((await api('/agenda/verwijder', { code: les.lesId, token: leerling.token, itemId })).status, 403,
     'en haalt er ook niets uit');
-  const weg = await api('/agenda/verwijder', { code: les.code, token: les.token, itemId });
+  const weg = await api('/agenda/verwijder', { code: les.lesId, token: les.token, itemId });
   assert.equal(weg.status, 200);
   assert.equal(weg.body.agenda.length, 0, 'de begeleider haalt het punt weg');
 });

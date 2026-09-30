@@ -7,7 +7,7 @@ const { idVanKey } = require('../../lib/lidsleutel');
 
 module.exports = (ctx) => {
   const { db, save, crypto, findSupplier, accounts, notify, notifySupplier, sseToCustomer, sseToSupplier, sseToOffice, haversine, etaMinutes, leesUploadDataUrl,
-    KETEN, KLAAR, id, nu, pin, schoon, getal, lijst } = ctx;
+    KETEN, KLAAR, id, nu, bezorgcode, houderVan, schoon, getal, lijst } = ctx;
   function isRetail(s) { return s && s.type === 'retail'; }
   function instel(s) {
     if (!s.modebezorg || typeof s.modebezorg !== 'object') s.modebezorg = {};
@@ -43,7 +43,18 @@ module.exports = (ctx) => {
   }
 
   /* ---- de klant vraagt een bezorging aan ---- */
+  /* Oude bezorgingen droegen hun vier cijfers kaal; die worden weggehaald en
+     niet gehonoreerd. Het lid vraagt voor een lopende bezorging een nieuwe. */
+  let legacyKlaar = false;
+  function ruimOudeBezorgcodes() {
+    if (legacyKlaar) return;
+    let n = 0;
+    for (const b of lijst()) if (b && Object.prototype.hasOwnProperty.call(b, 'bezorgcode')) { delete b.bezorgcode; n++; }
+    if (n) save();
+    legacyKlaar = true;
+  }
   function aanvraag(key, codenaam, supplierCode, itemsIn, opts) {
+    ruimOudeBezorgcodes();
     const s = findSupplier(supplierCode);
     if (!isRetail(s)) return { status: 404, error: 'Winkel niet gevonden.' };
     if (!magLeveren(s)) return { status: 409, error: s.name + ' bezorgt op dit moment niet.' };
@@ -59,12 +70,18 @@ module.exports = (ctx) => {
     if (!adres) return { status: 400, error: 'Vul een bezorgadres in.' };
     const idVereist = waarde >= m.waardegrensId;
     if (idVereist && !accountVerified(key)) return { status: 403, error: 'Voor een bezorging boven € ' + m.waardegrensId + ' is een RTG-geverifieerd account nodig (ID aan de deur).' };
-    const lat = Number(opts && opts.lat), lng = Number(opts && opts.lng);
+    /* Geen punt is geen punt (NAVIGATIE.md N20, par. 12 gebrek 5). Hier stond
+       zonder coordinaat de winkel plus (0,01; 0,008) als bestemming, en daar
+       werd een route en een ETA naartoe gerekend: een verzonnen plek die als
+       echte afstand op het scherm kwam. Zonder punt blijft `loc` null, en
+       alles erna (route, ETA) zegt dan eerlijk dat het het niet weet. */
+    const lat = opts && opts.lat != null && opts.lat !== '' ? Number(opts.lat) : NaN;
+    const lng = opts && opts.lng != null && opts.lng !== '' ? Number(opts.lng) : NaN;
     const b = {
       ref: id('MODE'), supplierCode: s.code, supplierName: s.name, key, codenaam: codenaam || 'Lid',
       items, waarde, kosten, adres, idVereist,
-      loc: (Number.isFinite(lat) && Number.isFinite(lng)) ? { lat, lng } : (s.loc ? { lat: s.loc.lat + 0.01, lng: s.loc.lng + 0.008 } : null),
-      bezorgcode: pin(), status: 'aangevraagd', koerier: null, foto: null, idOk: false,
+      loc: (Number.isFinite(lat) && Number.isFinite(lng)) ? { lat, lng } : null,
+      status: 'aangevraagd', koerier: null, foto: null, idOk: false,
       at: nu(), stappen: [{ status: 'aangevraagd', at: nu() }], gps: null
     };
     lijst().unshift(b);
@@ -73,7 +90,18 @@ module.exports = (ctx) => {
     notifySupplier(s.code, { icon: '\u{1F45C}', title: 'Nieuwe bezorging', body: b.codenaam + ' · ' + items.length + ' stuk(s) · € ' + waarde + (idVereist ? ' · ID vereist' : '') });
     sseToSupplier(s.code, 'sync', { scope: 'modebezorg' });
     sseToOffice('sync', { scope: 'modebezorg' });
+    /* Geen code in dit antwoord: de aanvraag blijft zo een gewone, herhaalbare
+       schrijfroute. Het lid haalt zijn code met /api/mode/bezorg/code. */
     return { status: 200, ok: true, bezorging: klantBeeld(b) };
+  }
+  // Een nieuwe bezorgcode voor een eigen, lopende bezorging (de vorige vervalt).
+  async function codeNieuw(key, ref) {
+    ruimOudeBezorgcodes();
+    const b = lijst().find(x => x.ref === String(ref || '') && x.key === key);
+    if (!b) return { status: 404, error: 'Bezorging niet gevonden.' };
+    if (KLAAR[b.status]) return { status: 409, error: 'Deze bezorging is al afgerond.' };
+    const c = await bezorgcode.uitgeven({ ref: b.ref, supplierCode: b.supplierCode, houder: houderVan(key) });
+    return c.error ? c : { status: 200, ok: true, ref: b.ref, bezorgcode: c.code, toegang: c.toegang };
   }
 
   /* ---- de winkel/koerier ---- */
@@ -98,12 +126,13 @@ module.exports = (ctx) => {
     const eta = (b.gps && b.loc) ? etaMinutes(haversine(b.gps, b.loc), 'driving') : null;
     return {
       ref: b.ref, supplierName: b.supplierName, items: b.items, waarde: b.waarde, kosten: b.kosten,
-      status: b.status, bezorgcode: b.bezorgcode, idVereist: b.idVereist,
+      status: b.status, idVereist: b.idVereist,
       koerier: b.koerier ? b.koerier.naam : null, gps: b.gps || null, etaMin: eta, at: b.at
     };
   }
   function mijnBezorgingen(key) {
+    ruimOudeBezorgcodes();
     return lijst().filter(b => b.key === key).slice(0, 30).map(klantBeeld);
   }
-  return { isRetail, instel, setup, magLeveren, accountVerified, aanvraag, winkelOverzicht, winkelBeeld, klantBeeld, mijnBezorgingen };
+  return { isRetail, instel, setup, magLeveren, accountVerified, aanvraag, codeNieuw, winkelOverzicht, winkelBeeld, klantBeeld, mijnBezorgingen };
 };

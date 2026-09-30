@@ -2,7 +2,7 @@
    Gemount vanuit routes/member/handel.js op de gedeelde kern. */
 module.exports = (hctx) => {
   const { kern, openLijn } = hctx;
-  const { app, auth, db, express, findSupplier, liveCodename, notifySupplier, save, schoon, sseToSupplier, mbAanvraag, mbMijn, gegevensStop } = kern;
+  const { app, auth, db, express, findSupplier, liveCodename, notifySupplier, save, schoon, sseToSupplier, mbAanvraag, mbCode, mbMijn, gegevensStop } = kern;
   const { ghMarkt, ghPlaatsBestelling, ghMijnBestellingen, ghAnnuleer } = kern.groothandel;
 /* ================== veilig laten bezorgen door een modewinkel ==================
    Een lid laat gekochte/apart-gelegde mode-artikelen thuisbezorgen. Veilig: een
@@ -19,6 +19,13 @@ app.post('/api/mode/bezorg/aanvraag', auth, express.json({ limit: '1mb' }), (req
 });
 app.post('/api/mode/bezorg/mijn', auth, (req, res) => {
   res.json({ bezorgingen: mbMijn(req.session.key) });
+});
+// een nieuwe bezorgcode (de vorige vervalt): de kale code staat alleen in dit antwoord
+app.post('/api/mode/bezorg/code', auth, async (req, res) => {
+  const r = await mbCode(req.session.key, String((req.body || {}).ref || ''));
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.set('Cache-Control', 'no-store');
+  res.json(r);
 });
 
 /* ================== boodschappen bij de groothandel/supermarkt ==================

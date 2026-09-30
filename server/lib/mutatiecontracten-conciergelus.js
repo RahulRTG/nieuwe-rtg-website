@@ -23,6 +23,11 @@
        verstuur 409). Dat is een toestandscontrole en geen idempotentie
        (MUTATIECONTRACT.md par. 5), maar de stand na twee aanroepen is die na een,
        en dat is wat PROTECTED hier belooft.
+   Daarvoor staat de dubbeltikpoort (./idemsleutels-conciergelus.js): binnen
+   het venster krijgt een woordelijk gelijke herhaling het eerste antwoord terug
+   (200, `herhaald`). Kies en verstuur kunnen dus langs beide deuren; beslis en
+   de verrassing zijn met opzet niet bij de poort verklaard, en waarom staat
+   daar.
 
    Een route is met opzet een tweede handeling: een tweede toelichting is een
    tweede bericht van het lid, en die telt als zodanig (de toets bewijst +2).
@@ -98,7 +103,7 @@ const CONTRACTEN = Object.assign({},
   BESCHERMD('POST /api/office/bureau/lus/aanbod', 'bureau.lus.aanbod', kantoor,
     'Een vastgehouden aanbod met hetzelfde wat, dezelfde tijd en dezelfde zaak wordt teruggegeven in plaats van verdubbeld.'),
   BESCHERMD('POST /api/office/bureau/lus/kies', 'bureau.lus.kies', kantoor,
-    'De tweede krijgt 409: er ligt al een voorstel bij het lid, of het aanbod is gekozen.'),
+    'Binnen het venster het eerste antwoord (herhaald), daarna 409: er ligt al een voorstel bij het lid, of het aanbod is gekozen.'),
   BESCHERMD('POST /api/office/bureau/lus/onderdeel', 'bureau.lus.onderdeel', kantoor,
     'Een actief onderdeel met hetzelfde wat, dezelfde tijd en dezelfde zaak wordt teruggegeven.'),
   BESCHERMD('POST /api/office/bureau/lus/bevestig', 'bureau.lus.bevestig', kantoor,
@@ -106,7 +111,7 @@ const CONTRACTEN = Object.assign({},
   BESCHERMD('POST /api/office/bureau/lus/vertraging', 'bureau.lus.vertraging', kantoor,
     'Dezelfde vertraging met berichten die al klaarstaan geeft dezelfde klaargezette set terug.'),
   BESCHERMD('POST /api/office/bureau/lus/verstuur', 'bureau.lus.verstuur', kantoor,
-    'De tweede krijgt 409: de klaargezette berichten zijn al weg; er gaat geen tweede bericht naar een zaak.'),
+    'Binnen het venster het eerste antwoord (herhaald), daarna 409: de klaargezette berichten zijn al weg; er gaat geen tweede bericht naar een zaak.'),
   BESCHERMD('POST /api/office/bureau/lus/kapot', 'bureau.lus.kapot', kantoor,
     'Al omgevallen: geen tweede regel.'),
 
@@ -127,12 +132,12 @@ const beschermdTafel = (route, mutatieId, toegang, hoe) => ({
 });
 Object.assign(CONTRACTEN,
   beschermdTafel('POST /api/supplier/reservering/tegenvoorstel', 'reservering.tegenvoorstel', zaakDeur,
-    'de tweede aanroep krijgt 409: de reservering staat op tegenvoorstel en niet meer op aangevraagd; de tijd beweegt niet.'),
+    'een gelijke tweede aanroep krijgt binnen het venster het eerste antwoord (herhaald), een andere 409: de reservering staat op tegenvoorstel en niet meer op aangevraagd; de tijd beweegt niet.'),
   beschermdTafel('POST /api/supplier/reservering/doorzetten', 'reservering.doorzetten', zaakDeur,
     'de tweede aanroep geeft de reservering terug met exact hetzelfde doorgezet-blok (moment en reden van de eerste).'),
   beschermdTafel('POST /api/reservering/tegenvoorstel', 'reservering.tegenvoorstel.antwoord',
     { klasse: 'OBJECT_SCOPED', objectVeld: 'id', uitleg: 'een reservering van dit lid' },
-    'de tweede aanroep krijgt 409: er ligt geen tegenvoorstel meer; de stand blijft bevestigd.')
+    'binnen het venster het eerste antwoord (herhaald), daarna 409: er ligt geen tegenvoorstel meer; de stand blijft bevestigd.')
 );
 
 module.exports = { CONTRACTEN };

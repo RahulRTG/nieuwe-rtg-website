@@ -117,7 +117,7 @@ test('de hele lus: van een zin tot een gesloten case met uitkomst', async () => 
   // een chauffeur binnen grens en tijd: het kantoor zet hem zelf vast
   const rit = await k('/office/bureau/lus/aanbod', { wat: 'Chauffeur', zaak: 'TRANSIT', van: '20:40', duurMin: 20, bedragCenten: 9000, geldigMin: 30 });
   const kr = await k('/office/bureau/lus/kies', { aanbod: rit.d.aanbod.id });
-  assert.equal(kr.d.vastgezet, true, 'binnen mandaat vraagt het kantoor niets');
+  assert.equal(kr.d.vastgezet, true, 'binnen mandaat vraagt het kantoor niets: ' + JSON.stringify(kr.d).slice(0, 300));
 
   // de zaak ziet alleen zijn eigen onderdeel en niets over de gast
   const kiku = await zaakTok('KIKUNOI');

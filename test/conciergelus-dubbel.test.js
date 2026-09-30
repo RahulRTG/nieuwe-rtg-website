@@ -59,6 +59,13 @@ test('elke schrijfroute van de lus laat na twee gelijke aanroepen de stand van e
     assert.equal(na2, na1, naam + ': de tweede aanroep veranderde de stand');
     return { a, b };
   };
+  /* Twee deuren, een invariant (server/lib/idemsleutels-conciergelus.js): binnen
+     het venster geeft de poort het eerste antwoord terug met `herhaald`,
+     daarbuiten weigert de handler op de toestand. Welke deur het werd hangt af
+     van de klok; wat telt is dat het een van de twee is en dat tweeKeer de
+     stand ongewijzigd vond. */
+  const eenVanTwee = (r, code, naam) => assert.ok((r.status === 200 && r.d.herhaald === true) || r.status === code,
+    naam + ': ' + r.status + ' ' + JSON.stringify(r.d));
   const k = (pad, b) => () => roep(pad, Object.assign({ key, id }, b), kant);
 
   await tweeKeer('verrassing', () => roep('/member/bureau/lus/verrassing', { id, aan: true }, lid));
@@ -66,15 +73,15 @@ test('elke schrijfroute van de lus laat na twee gelijke aanroepen de stand van e
   await tweeKeer('weigering', k('/office/bureau/lus/weigering', { reden: 'Het restaurant is vol.' }));
   const { a: ab } = await tweeKeer('aanbod', k('/office/bureau/lus/aanbod', { wat: 'Tafel', zaak: 'KIKUNOI', van: '20:15', duurMin: 90, geldigMin: 30 }));
   const { b: kb } = await tweeKeer('kies', k('/office/bureau/lus/kies', { aanbod: ab.d.aanbod.id }));
-  assert.equal(kb.status, 409, 'kies: de tweede keuze stuit op het open voorstel');
+  eenVanTwee(kb, 409, 'kies: de tweede keuze stuit op het open voorstel');
   const { b: bb } = await tweeKeer('beslis', () => roep('/member/bureau/lus/beslis', { id, akkoord: true }, lid));
-  assert.equal(bb.status, 400, 'beslis: er ligt geen tweede voorstel');
+  assert.equal(bb.status, 400, 'beslis: er ligt geen tweede voorstel (geen dedup: het lijf noemt het voorstel niet)');
   const { a: on } = await tweeKeer('onderdeel', k('/office/bureau/lus/onderdeel', { wat: 'Chauffeur', zaak: 'TRANSIT', van: '19:30', duurMin: 20 }));
   await tweeKeer('bevestig', k('/office/bureau/lus/bevestig', { onderdeel: on.d.onderdeel.id }));
   const { a: vt } = await tweeKeer('vertraging', k('/office/bureau/lus/vertraging', { onderdeel: on.d.onderdeel.id, minuten: 15 }));
   const gezien = vt.d.klaar.berichten.map(m => m.id);
   const { b: vs } = await tweeKeer('verstuur', k('/office/bureau/lus/verstuur', { klaar: vt.d.klaar.id, gezien }));
-  assert.equal(vs.status, 409, 'verstuur: de berichten zijn al weg');
+  eenVanTwee(vs, 409, 'verstuur: de berichten zijn al weg');
   const tafel = JSON.parse(JSON.stringify((await roep('/office/bureau/lus', { key, id }, kant)).d.zaak.onderdelen)).find(o => o.wat === 'Tafel');
   await tweeKeer('kapot', k('/office/bureau/lus/kapot', { onderdeel: tafel.id, reden: 'keukenprobleem' }));
 

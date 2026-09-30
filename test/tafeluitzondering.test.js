@@ -57,7 +57,9 @@ test('een zaak biedt een andere tijd aan, zet een aanvraag door, en alleen een m
   assert.equal(mijn.tegenvoorstel.door, 'medewerker', 'wie het deed staat bij de zaak, niet als label naar de gast');
   const ja = await roep('/reservering/tegenvoorstel', { id: rid, akkoord: true }, lid);
   assert.equal(ja.d.reservering.status, 'bevestigd');
-  assert.equal((await roep('/reservering/tegenvoorstel', { id: rid, akkoord: true }, lid)).status, 409, 'er ligt geen tweede tegenvoorstel');
+  // binnen het venster geeft de poort het eerste antwoord terug, daarna weigert de handler
+  const nog = await roep('/reservering/tegenvoorstel', { id: rid, akkoord: true }, lid);
+  assert.ok((nog.status === 200 && nog.d.herhaald === true) || nog.status === 409, 'er ligt geen tweede tegenvoorstel: ' + nog.status);
 
   // 2. doorzetten: vanaf dan beslist alleen een manager
   const b = await roep('/reserveer', { supplierCode: 'KIKUNOI', datum: morgen(), tijd: '19:00', personen: 2 }, lid);

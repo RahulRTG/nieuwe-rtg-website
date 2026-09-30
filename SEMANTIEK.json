@@ -1,9 +1,9 @@
 {
-  "catalogi": 1188,
-  "verschillendeNamen": 721,
+  "catalogi": 1191,
+  "verschillendeNamen": 723,
   "namenInMeerDomeinen": 131,
   "woordenMetMeerBetekenissen": 113,
-  "betekenissenTotaal": 418,
+  "betekenissenTotaal": 419,
   "ergsteWoord": "SOORTEN",
   "ergsteAantal": 49,
   "dubbelingen": 34,
@@ -543,7 +543,7 @@
       ]
     }
   ],
-  "dubbelingenZonderNaam": 262,
+  "dubbelingenZonderNaam": 271,
   "dubbelingZonderNaamLijst": [
     {
       "overlap": 1,
@@ -2101,6 +2101,121 @@
       ]
     },
     {
+      "naam": "BRONNEN",
+      "domeinen": 9,
+      "betekenissen": 9,
+      "hoogsteOverlap": 0.05,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/bureau/lus.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "normaal",
+            "beslisser",
+            "alternatief",
+            "tijd"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/command/tijdlijn.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "journaal",
+            "schakelaar",
+            "noodstand"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/dagcoach.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "agenda",
+            "boeking",
+            "medicijnen",
+            "zorg"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/onderneming/voorraad.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "keuken",
+            "retail",
+            "boerderij",
+            "groothandel"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/payroll/componenten.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "klok",
+            "contract",
+            "rooster",
+            "handmatig"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rtgonderzoeker.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "verkeer",
+            "partners",
+            "vracht",
+            "werkvloer"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/uitgifte.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "zaak",
+            "office",
+            "rijk"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/webplatform.js"
+          ],
+          "leden": 13,
+          "voorbeeld": [
+            "menu",
+            "diensten",
+            "kamers",
+            "agenda"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/wereld/feed.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "alles",
+            "lifestyle",
+            "business",
+            "genootschap"
+          ]
+        }
+      ]
+    },
+    {
       "naam": "NIVEAUS",
       "domeinen": 9,
       "betekenissen": 8,
@@ -2205,109 +2320,6 @@
       ]
     },
     {
-      "naam": "BRONNEN",
-      "domeinen": 8,
-      "betekenissen": 8,
-      "hoogsteOverlap": 0.05,
-      "soort": "botsing",
-      "waar": [
-        {
-          "bestanden": [
-            "server/kern/command/tijdlijn.js"
-          ],
-          "leden": 3,
-          "voorbeeld": [
-            "journaal",
-            "schakelaar",
-            "noodstand"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/dagcoach.js"
-          ],
-          "leden": 8,
-          "voorbeeld": [
-            "agenda",
-            "boeking",
-            "medicijnen",
-            "zorg"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/onderneming/voorraad.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "keuken",
-            "retail",
-            "boerderij",
-            "groothandel"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/payroll/componenten.js"
-          ],
-          "leden": 6,
-          "voorbeeld": [
-            "klok",
-            "contract",
-            "rooster",
-            "handmatig"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/rtgonderzoeker.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "verkeer",
-            "partners",
-            "vracht",
-            "werkvloer"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/uitgifte.js"
-          ],
-          "leden": 3,
-          "voorbeeld": [
-            "zaak",
-            "office",
-            "rijk"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/webplatform.js"
-          ],
-          "leden": 13,
-          "voorbeeld": [
-            "menu",
-            "diensten",
-            "kamers",
-            "agenda"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/wereld/feed.js"
-          ],
-          "leden": 5,
-          "voorbeeld": [
-            "alles",
-            "lifestyle",
-            "business",
-            "genootschap"
-          ]
-        }
-      ]
-    },
-    {
       "naam": "CATEGORIEEN",
       "domeinen": 8,
       "betekenissen": 8,
@@ -2340,7 +2352,7 @@
         },
         {
           "bestanden": [
-            "server/kern/lifestyle/index.js"
+            "server/kern/lifestyle/verzoek.js"
           ],
           "leden": 7,
           "voorbeeld": [
@@ -3673,5 +3685,5 @@
       ]
     }
   ],
-  "bestanden": 3883
+  "bestanden": 3897
 }

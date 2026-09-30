@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1888,
-    "toetsenNietGemeten": 338,
+    "toetsenNietGemeten": 339,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -169,6 +169,16 @@
       "meter": "kernBreedte 1666 -> 1675",
       "reden": "De besluiten C12 tot en met C14 (28 september 2026). Het domein bedrijfsmaat leest nu het campagneregister (rtgCampagnes, rtgCampagneMaak), de campagnepost van het boek (rtgBoekCampagne), de kanalen (AANMELDKANALEN) en het beslisgeheugen (beslisgeheugen, beslisgeheugenLeg, beslisgeheugenTrekIn); het domein kantoren leest de cadeaubon (cadeaubonBeeld, cadeaubonStandZet) naast de terugstortstand. Elk is een eigen kernmodule die zijn opslag bezit, en een route die hem zelf zou requiren maakt een tweede instantie met een eigen greep op de database.",
       "waarheen": "GRENZEN.json (bedrijfsmaat en kantoren dragen de namen) en test/rtgcampagne.test.js, test/beslisgeheugen.test.js en test/cadeaubon.test.js tegen een echte server"
+    },
+    {
+      "datum": "2026-09-30",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 338,
+      "vervalt": "2026-12-29",
+      "meter": "toetsenNietGemeten 338 -> 339",
+      "reden": "Na de samenvoeging met main (#426) staat de norm op de stand van main; daarbovenop komt test/bedrijfsmaattoelating.test.js (C20-C23) van deze tak, met de hand nagetrokken met twaalf mutaties die alle twaalf zakten (zie de regel 302 -> 303).",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
     },
     {
       "datum": "2026-09-30",

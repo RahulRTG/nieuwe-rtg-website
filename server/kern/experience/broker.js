@@ -10,10 +10,11 @@ const { veiligGelijk } = require('../util');
 
 function fout(error, status, code, extra) { return { error, status, code, ...(extra || {}) }; }
 
-module.exports = function maakBroker({ crypto, opslag, projecteer, contexten, kern, commit }) {
+module.exports = function maakBroker({ crypto, opslag, projecteer, contexten, kern, commit, network }) {
   const handlers = {
     'attention.acknowledge': require('./action-attention')({ projecteer, opslag }),
-    'schedule.item.create': require('./action-schedule')({ kern })
+    'schedule.item.create': require('./action-schedule')({ kern }),
+    'network.plan.save': require('./action-network')({ kern, network })
   };
 
   function contextVoor(key, world, contextId) {
@@ -108,7 +109,21 @@ module.exports = function maakBroker({ crypto, opslag, projecteer, contexten, ke
     const geenGezag = bevoegd(context, definition); if (geenGezag) return geenGezag;
 
     return commit(async () => {
-      const uitgevoerd = await handler.execute({ key, context, preview: p,
+      // Een tweede tab kan dezelfde preview gelijktijdig aanbieden. Buiten de
+      // transactie lezen is geen grendel: herlees onder dezelfde schrijverslot.
+      const replay = opslag.idemLees(key, idemKey);
+      if (replay) return veiligGelijk(replay.fingerprint, p.fingerprint)
+        ? { ...replay.result, replay: true }
+        : fout('Deze sleutel hoort bij een andere actie.', 409, 'IDEMPOTENCY_CONFLICT');
+      const current = opslag.previewLees(key, p.id);
+      if (!current || current.executedAt)
+        return fout('Deze preview is al uitgevoerd.', 409, 'PREVIEW_USED');
+      if (Date.parse(current.expiresAt) <= Date.parse(opslag.tijd()))
+        return fout('Deze preview is verlopen.', 409, 'PREVIEW_EXPIRED');
+      const activeContext = contextVoor(key, p.world, p.contextId);
+      if (activeContext.error) return activeContext;
+      const denied = bevoegd(activeContext, definition); if (denied) return denied;
+      const uitgevoerd = await handler.execute({ key, context: activeContext, preview: current,
         economicPrincipalRef: p.economicPrincipalRef });
       if (!uitgevoerd || uitgevoerd.error)
         return uitgevoerd || fout('De runtime kon de actie niet uitvoeren.', 500, 'EXECUTION_FAILED');

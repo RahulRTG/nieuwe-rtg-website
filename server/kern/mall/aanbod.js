@@ -40,12 +40,17 @@ module.exports = (ctx) => {
      type is een fout in de bron en wordt geweigerd -- niet stil overgeslagen:
      de weigeringen komen als `geweigerd` mee terug (LAT-regel 5). */
   const geweigerd = [];
+  let bezoeker = null;
 
   /* Het cijfer van een zaak en haar bezorgschakelaar, uit de modules die er al
      over gaan. Beide zijn per zoekopdracht duizenden keren nodig, vandaar de
      cache -- die leeft alleen binnen een aanroep van alles(). */
   const cacheWaardering = new Map(), cacheBezorg = new Map();
-  const zaakMet = (code) => (db.data.suppliers || []).find(s => s.code === code) || null;
+  // Eén index per lezing; geen N leveranciers opnieuw doorlopen per aanbod.
+  // Niet tussen verzoeken bewaren: verbergen en intrekken moeten direct werken.
+  const zakenIndex = new Map();
+  let zichtbare = [];
+  const zaakMet = (code) => zakenIndex.get(code) || null;
   function waarderingVan(code) {
     if (!code) return null;
     if (!cacheWaardering.has(code)) {
@@ -79,7 +84,7 @@ module.exports = (ctx) => {
       return null;
     }
     const genre = tekst(o.genre, 40) || null;
-    return {
+    const resultaat = {
       id, bron: tekst(o.bron, 30), type, typeLabel: TYPEN[type].label,
       titel, uitleg: o.uitleg ? tekst(o.uitleg, 220) : null,
       aanbieder: {
@@ -130,6 +135,8 @@ module.exports = (ctx) => {
       genre, genreLabel: o.genreLabel || null,
       kenmerken: (o.kenmerken || []).filter(Boolean).map(k => tekst(k, 40)).slice(0, 6)
     };
+    if (bezoeker) { bezoeker(resultaat); return null; }
+    return resultaat;
   }
   const prijs = (bedrag, eenheid, vanaf) => ({ bedrag: getal(bedrag), eenheid: eenheid || 'per stuk', valuta: 'EUR', vanaf: !!vanaf });
 
@@ -145,10 +152,10 @@ module.exports = (ctx) => {
   }
 
   const zaakPlek = (s) => plekVan({ stad: s.city, land: s.country, punt: s.loc, label: (s.loc || {}).label });
-  const zichtbareZaken = () => (db.data.suppliers || []).filter(s => s && !verborgen(s));
+  const zichtbareZaken = () => zichtbare;
   const genreLabel = (g) => ((db.data.supplierTypes || {})[g] || {}).label || g;
 
-  const hulp = { aanbod, prijs, getal, tekst, status: verificatieStand, zaakPlek, zichtbareZaken, genreLabel, bereikVan, plekVan, RTG_BEREIK };
+  const hulp = { aanbod, prijs, getal, tekst, status: verificatieStand, zaakMet, zaakPlek, zichtbareZaken, genreLabel, bereikVan, plekVan, RTG_BEREIK };
   const zaken = require('./aanbodzaken')(ctx, hulp);
   const breed = require('./aanbodrtg')(ctx, hulp);
 
@@ -164,17 +171,30 @@ module.exports = (ctx) => {
 
   /* Een bron die omvalt mag de Mall niet meenemen, maar ook niet stil
      verdwijnen: de fout komt als `stuk` mee terug en de Mall toont hem. */
-  function alles() {
+  function lees(bezoek) {
     geweigerd.length = 0;
     cacheWaardering.clear(); cacheBezorg.clear(); cacheVest.clear();
-    const out = [], stuk = [];
-    for (const [naam, fn] of BRONNEN) {
-      try { out.push(...fn()); }
-      catch (e) { stuk.push({ bron: naam, fout: String((e && e.message) || e).slice(0, 200) }); }
+    zakenIndex.clear(); zichtbare = [];
+    for (const s of (db.data.suppliers || [])) {
+      if (!s) continue;
+      if (!zakenIndex.has(s.code)) zakenIndex.set(s.code, s);
+      if (!verborgen(s)) zichtbare.push(s);
+    }
+    const out = [], stuk = []; bezoeker = bezoek || null;
+    try {
+      for (const [naam, fn] of BRONNEN) {
+        try { for (const a of fn()) out.push(a); }
+        catch (e) { stuk.push({ bron: naam, fout: String((e && e.message) || e).slice(0, 200) }); }
+      }
+    } finally {
+      bezoeker = null; zakenIndex.clear(); zichtbare = [];
+      cacheWaardering.clear(); cacheBezorg.clear(); cacheVest.clear();
     }
     return { aanbod: out, stuk, geweigerd: geweigerd.slice(0, 50) };
   }
 
+  const alles = () => lees(null);
   ctx.aanbodAlles = alles;
-  return { aanbodAlles: alles, MALL_BRONNEN: BRONNEN.map(b => b[0]) };
+  ctx.aanbodBezoek = bezoek => lees(bezoek);
+  return { aanbodAlles: alles, aanbodBezoek: ctx.aanbodBezoek, MALL_BRONNEN: BRONNEN.map(b => b[0]) };
 };

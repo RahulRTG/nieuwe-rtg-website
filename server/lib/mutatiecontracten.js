@@ -123,6 +123,7 @@ const CONTRACTEN = Object.assign({},
   /* RTG Move: drie routes die alle drie lezen, met de BOUW als grond in plaats
      van een meting. Eigen bestand om dat verschil te bewaren -- zie de kop. */
   require('./mutatiecontracten-move').CONTRACTEN,
+  require('./mutatiecontracten-network').CONTRACTEN,
   /* De kaartkeuze van een lid. Eigen bestand omdat de grond de BOUW is (de
      keuze is een verzameling) en niet een kale meetronde. */
   require('./mutatiecontracten-kaarten').CONTRACTEN,

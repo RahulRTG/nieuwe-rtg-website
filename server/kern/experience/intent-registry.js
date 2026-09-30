@@ -7,6 +7,12 @@ const { diepBevries } = require('./contract');
 const { kopie } = require('./canon');
 
 const DEFINITIES = diepBevries({
+  'network.plan.save': {
+    id: 'network.plan.save', version: 1, runtime: 'mall.lists',
+    worlds: ['living', 'travel', 'work', 'foundation'],
+    required: ['title', 'choices'], optional: [], confirmation: 'REQUIRED',
+    authority: ['network.plan.save'], evidence: 'REQUIRED', consequence: 'DOMAIN_TRUTH'
+  },
   'attention.acknowledge': {
     id: 'attention.acknowledge', version: 1, runtime: 'experience.attention',
     worlds: ['living', 'travel', 'work', 'foundation'],

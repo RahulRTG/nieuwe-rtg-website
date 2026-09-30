@@ -93,10 +93,10 @@ module.exports = (ctx) => {
   function openNu(s, wanneer) {
     const ex = extern.openVan(s, wanneer);
     if (ex) return ex;
-    const t = nuBij(s, wanneer);
     const u = vakUrenVan(s);
     if (u) {
       if (!neemtAan(s, 'reserveren')) return { open: false, tekst: 'Neemt nu geen afspraken aan', bron: 'schakelaar' };
+      const t = nuBij(s, wanneer);
       if (!u.dagen[t.dag] || (u.geblokkeerd || []).includes(t.datum))
         return { open: false, tekst: 'Vandaag gesloten', bron: 'agenda' };
       const van = naarMin(u.van), tot = naarMin(u.tot);
@@ -108,6 +108,7 @@ module.exports = (ctx) => {
     const fc = foodcourt();
     if (fc && fc.isEetgelegenheid(s)) {
       if (!neemtAan(s, 'reserveren')) return { open: false, tekst: 'Neemt nu geen reserveringen aan', bron: 'schakelaar' };
+      const t = nuBij(s, wanneer);
       const dienst = [['lunch', LUNCH], ['diner', DINER]]
         .find(([, l]) => t.minuten >= naarMin(l[0]) && t.minuten <= naarMin(l[l.length - 1]));
       if (dienst) return { open: true, tekst: 'Nu open (' + dienst[0] + ')', bron: 'foodcourt' };

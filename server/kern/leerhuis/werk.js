@@ -104,7 +104,11 @@ function eigenaarWerk(st, door) {
     BESTUUR: Object.entries(st.bestuur).filter(([, r]) => r.length).map(([persoon, rollen]) => ({ persoon, rollen })),
     /* De lopende relaties met hun rollen, om een rol in te trekken of iemand uit dienst te melden.
        `zelf`: dat doet een tweede eigenaar (acties-mens.js uitDienst). */
+    /* De organisatiegraaf: eenheden met hun bovenliggende eenheid, en per relatie de eenheid. */
+    EENHEDEN: Object.values(st.eenheden).map(x => ({ id: x.id, naam: x.naam, soort: x.soort, ouder: x.ouder,
+      ouderNaam: x.ouder ? (st.eenheden[x.ouder] || {}).naam || x.ouder : null })),
     RELATIES: Object.entries(st.relaties).filter(([, r]) => r.actief).map(([persoon, r]) => ({ persoon, soort: r.soort, zelf: persoon === door,
+      eenheid: r.eenheid ? (st.eenheden[r.eenheid] || {}).naam || r.eenheid : null,
       rollen: ((st.personen[persoon] || {}).rollen || []).map(id => ({ id, titel: (st.rollen[id] || {}).titel || id })) })),
     nietZichtbaar: 'echte namen en sleutels; een mens wijst u aan op zijn codenaam, en elke opzoeking staat op zijn inzagekaart' };
 }

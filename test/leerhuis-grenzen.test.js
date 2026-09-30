@@ -871,3 +871,20 @@ test('31. B-UI voorstellen: de leerling dient in en volgt, de kenniseigenaar beh
   const eigenVoorstel = w.doe(ORG, 'voorstelIndienen', { probleem: 'a', voorstel: 'b', reden: 'c' }, P.KO).id;
   assert.equal(l.kennisWerk(ORG, P.KO).VOORSTELLEN.find(v => v.id === eigenVoorstel).eigen, true, 'wie indiende, ziet dat hij het zelf was');
 });
+
+test('32. B-UI eenheden: een graaf zonder kring, en een relatie alleen in een eenheid die bestaat', () => {
+  const w = basis();
+  const l = w.lh.lees;
+  nee(w.probeer(ORG, 'eenheidZet', { id: 'ops', naam: ' ' }, P.E), 400);
+  nee(w.probeer(ORG, 'eenheidZet', { id: 'ops', naam: 'Operations', ouder: 'nergens' }, P.E), 404);
+  nee(w.probeer(ORG, 'eenheidZet', { id: 'ops', naam: 'Operations' }, P.CO), 403);
+  w.doe(ORG, 'eenheidZet', { id: 'ops', naam: 'Operations', soort: 'afdeling' }, P.E);
+  w.doe(ORG, 'eenheidZet', { id: 'ops-noord', naam: 'Operations Noord', soort: 'team', ouder: 'ops' }, P.E);
+  nee(w.probeer(ORG, 'eenheidZet', { id: 'ops', naam: 'Operations', ouder: 'ops-noord' }, P.E), 409);
+  nee(w.probeer(ORG, 'eenheidZet', { id: 'ops', naam: 'Operations', ouder: 'ops' }, P.E), 409);
+  nee(w.probeer(ORG, 'relatieZet', { persoon: P.N, soort: 'EMPLOYEE', eenheid: 'nergens' }, P.E), 404);
+  w.doe(ORG, 'relatieZet', { persoon: P.N, soort: 'EMPLOYEE', eenheid: 'ops-noord' }, P.E);
+  const e = l.eigenaarWerk(ORG, P.E);
+  assert.deepEqual(e.EENHEDEN.find(x => x.id === 'ops-noord'), { id: 'ops-noord', naam: 'Operations Noord', soort: 'team', ouder: 'ops', ouderNaam: 'Operations' });
+  assert.equal(e.RELATIES.find(x => x.persoon === P.N).eenheid, 'Operations Noord');
+});

@@ -160,6 +160,22 @@ test('Leerhuis aan het werk: geen rol geen werk, en een startpakketconcept wordt
       const V = await lid('Werk Nieuw', 'lhw-v@x.nl', '0612349805');
       const vCode = (await post('/api/state', {}, V)).body.state.user.codename;
       const e = await opScherm(E);
+      /* De organisatiegraaf: twee eenheden, en een kring weigert de server met de reden op het scherm. */
+      const een = () => e.locator('#eigenaar .kaart', { hasText: 'Eenheden' });
+      await een().getByText('Nog geen eenheden').waitFor();
+      await een().getByLabel('Naam van de eenheid').fill('Operations');
+      await een().getByLabel('Soort (afdeling, vestiging, team)').fill('afdeling');
+      await een().getByRole('button', { name: 'Eenheid vastleggen' }).click();
+      await e.waitForFunction(() => /^Eenheid vastgelegd: Operations\./.test(document.getElementById('melding').textContent));
+      await een().getByLabel('Naam van de eenheid').fill('Operations Noord');
+      await een().getByLabel('Onder welke eenheid').selectOption({ label: 'Operations' });
+      await een().getByRole('button', { name: 'Eenheid vastleggen' }).click();
+      await e.waitForFunction(() => /^Eenheid vastgelegd: Operations Noord/.test(document.getElementById('melding').textContent));
+      await een().getByText('Operations Noord, onder Operations.').waitFor();
+      await een().getByLabel('Naam van de eenheid').fill('Operations');
+      await een().getByLabel('Onder welke eenheid').selectOption({ label: 'Operations Noord' });
+      await een().getByRole('button', { name: 'Eenheid vastleggen' }).click();
+      await e.waitForFunction(() => /Niet gelukt: een eenheid kan niet onder zichzelf/.test(document.getElementById('melding').textContent));
       const rel = e.locator('#eigenaar .kaart', { hasText: 'Relatie vastleggen' });
       const bst = e.locator('#eigenaar .kaart', { hasText: 'Bestuursrol toekennen' });
       await rel.getByLabel('Codenaam', { exact: true }).fill('Bestaat Niet 0000');
@@ -171,8 +187,10 @@ test('Leerhuis aan het werk: geen rol geen werk, en een startpakketconcept wordt
       await rel.getByRole('button', { name: 'Relatie vastleggen' }).click();
       await e.waitForFunction(() => /Niet gelukt: .*reden/.test(document.getElementById('melding').textContent));
       await rel.getByLabel('Reden van de opzoeking').fill('nieuwe collega bij Werk');
+      await rel.getByLabel('Eenheid', { exact: true }).selectOption({ label: 'Operations Noord' });
       await rel.getByRole('button', { name: 'Relatie vastleggen' }).click();
       await e.waitForFunction(() => /^Relatie vastgelegd/.test(document.getElementById('melding').textContent));
+      await e.locator('#eigenaar .kaart', { hasText: vCode }).getByText(', Operations Noord.').waitFor();
       await bst.getByLabel('Codenaam', { exact: true }).fill(vCode);
       await bst.getByLabel('Bestuursrol').selectOption('KNOWLEDGE_OWNER');
       await bst.getByLabel('Reden van de opzoeking').fill('tweede kenniseigenaar voor Werk');

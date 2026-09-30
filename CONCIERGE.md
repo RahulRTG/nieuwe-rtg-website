@@ -115,7 +115,7 @@ toelichting van het lid is met opzet een tweede handeling.
   niet uitgevoerd.
 - **Een grens per handeling** ("extra boven € 250") bestaat nog niet; er is één
   grens per domein plus de speelruimte in tijd.
-- **Geen `scripts/conciergeproef.js`.** De schakels en storingen van par. 6
+- **Geen conciergeproef** (een ketenproef naar het voorbeeld van `scripts/tafelproef.js`). De schakels en storingen van par. 6
   zitten in de toetsen, niet in een ketenproef die `KETENVORM.json` meeneemt.
 - **Geen as van de machine.** Zestien nieuwe schrijfroutes raken geen enkele
   as van `npm run machinedekking`, en `mutatiesZonderEnigeAs` ging daardoor van

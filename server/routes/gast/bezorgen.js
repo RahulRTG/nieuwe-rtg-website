@@ -33,13 +33,17 @@ module.exports = (kern) => {
   const betaalBuiten = require('./betalen-buiten')({ kern, zaakVan, handleVan,
     horeca, orderlaag, naad });
 
-  const checkoutVan = require('./checkout-buiten')({ kern, horeca, bezorglaag, beleid, schoon });
+  const korting = kern.etenKorting; // kern/eten/kortingscode.js, een instantie (opzet/kernlaag5f.js)
+  const checkoutVan = require('./checkout-buiten')({ kern, horeca, bezorglaag, beleid, schoon, korting });
 
   const publiekCheckout = (uit) => {
     const schoonUit = Object.assign({}, uit);
-    delete schoonUit._check;
+    delete schoonUit._check; delete schoonUit._korting;
     return schoonUit;
   };
+
+  // de promotiecode: rem op raden en de atomaire claim (./korting-buiten.js)
+  const { lidVan, geremd, telMislukt, claimVoor } = require('./korting-buiten')({ kern, korting });
 
   /* ---------- kan het hier bezorgd worden ----------
      Bewust ook te stellen VOORDAT er iets in het mandje zit: wie eerst een
@@ -64,24 +68,28 @@ module.exports = (kern) => {
     const s = zaakVan(req, res); if (!s) return;
     const b = req.body || {};
     const kanaal = b.kanaal === 'afhaal' ? 'afhaal' : 'bezorging';
-    const uit = checkoutVan(s, b, kanaal);
+    if (geremd(req, res)) return;
+    const uit = checkoutVan(s, b, kanaal, lidVan(req));
     if (uit.error) return stuur(res, uit);
+    telMislukt(req, uit);
     res.json(betaalBuiten.verrijkCheckout(req, publiekCheckout(uit)));
   });
 
   require('./profiel-buiten')({ kern, zaakVan, horeca, bezorglaag, beleid, schoon });
 
   /* ---------- bestellen ---------- */
-  function bestelBuiten(req, res, kanaal) {
+  async function bestelBuiten(req, res, kanaal) {
     const s = zaakVan(req, res); if (!s) return;
     const b = req.body || {};
     const handle = handleVan(req);
+    if (geremd(req, res)) return;
 
     /* Eerst het HELE mandje en de zone, dan pas een rekening openen. Dezelfde
        functie voedt de controlesheet in de app, maar de server voert hem hier
        opnieuw uit: een oude of aangepaste browser kan de grens niet omzeilen. */
-    const voorbeeld = checkoutVan(s, b, kanaal);
+    const voorbeeld = checkoutVan(s, b, kanaal, lidVan(req));
     if (voorbeeld.error) return stuur(res, voorbeeld);
+    telMislukt(req, voorbeeld);
     /* Een vol slot houdt de oude, herstelbare API-belofte: de regels worden
        aangenomen en het antwoord noemt een alternatief. De nieuwe checkout
        voorkomt dat normale schermgebruikers zover komen, maar een oudere app
@@ -97,13 +105,15 @@ module.exports = (kern) => {
     const betalingLoopt = betaalBuiten.bewaakRekening(rek);
     if (betalingLoopt) return res.status(betalingLoopt.status).json(betalingLoopt);
 
+    // de promotiecode telt atomair VOOR de bestelling; mislukt die, dan komt hij terug
+    const claim = await claimVoor(req, res, s, voorbeeld, rek, handle); if (!claim) return;
     const kaart = kern.gastKaartVanZaak(s.code);
     const uit = orderlaag.bestel(s.code, rek, lop.deelnemer, {
       items: b.items, allergie: schoon(b.allergie, 120) || null,
       idem: b.idem, apparaat: schoon(b.apparaat, 40) || null,
       kaartVan: id => buitenshuis.bestelProduct(kaart.find(x => x.id === id))
     });
-    if (uit.error) return stuur(res, uit);
+    if (uit.error) { await claim.geefTerug(); return stuur(res, uit); }
     if (uit.herhaald) return res.json(uit);
 
     /* Nu pas het tijdslot. Lukt dat niet, dan staat de bestelling er wel maar
@@ -165,13 +175,13 @@ module.exports = (kern) => {
      de handhaver niet kan zien. Bezorging vraagt telefoon EN adres, want er
      komt iemand langs; afhalen alleen een nummer, want de tas ligt klaar op een
      code en een adres zou meer zijn dan nodig. */
-  app.post('/api/gast/bezorg/bestel', auth, (req, res) => {
+  app.post('/api/gast/bezorg/bestel', auth, async (req, res) => {
     if (kern.gegevensStop(req, res, 'bezorging')) return;
-    bestelBuiten(req, res, 'bezorging');
+    await bestelBuiten(req, res, 'bezorging');
   });
-  app.post('/api/gast/afhaal/bestel', auth, (req, res) => {
+  app.post('/api/gast/afhaal/bestel', auth, async (req, res) => {
     if (kern.gegevensStop(req, res, 'bestelling')) return;
-    bestelBuiten(req, res, 'afhaal');
+    await bestelBuiten(req, res, 'afhaal');
   });
 
   require('./mijn-buiten')({ kern, zaakVan, handleVan, horeca, orderlaag,

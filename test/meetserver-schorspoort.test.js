@@ -76,6 +76,6 @@ test('een meetserver bereikt een GESCHORSTE route, zodat hermeting mogelijk blij
     assert.equal(r.status, 200,
       'een instrument moet een geschorste route kunnen uitvoeren, anders kan hij nooit meer worden vrijgemeten');
     const d = await r.json();
-    assert.ok(d.code, 'en de oproep deed echt werk (er kwam een lescode uit)');
+    assert.ok(d.lescode, 'en de oproep deed echt werk (er kwam een lescode uit)');
   } finally { srv.klaar(); }
 });

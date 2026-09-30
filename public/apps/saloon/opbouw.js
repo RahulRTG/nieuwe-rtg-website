@@ -15,9 +15,9 @@
       + '<form id="saloonFilters"><label>Plaats<input name="plaats" type="search" maxlength="60" placeholder="Welke plaats wilt u volgen?"></label>'
       + '<p class="saloon-uitleg">Dichtbij zoekt op de plaats die u hier kiest.</p>'
       + '<fieldset><legend>Wat komt samen in uw Saloon?</legend><div id="saloonBronnen"></div></fieldset>'
-      + '<p class="saloon-uitleg">Mijn reizen is alleen voor u. U bepaalt uw bronnen en kunt deze keuzes altijd wijzigen.</p>'
+      + '<p class="saloon-uitleg">Mijn reizen en Mijn aanvragen zijn alleen voor u. U bepaalt uw bronnen en kunt deze keuzes altijd wijzigen.</p>'
       + '<button type="submit">Keuzes toepassen</button></form>'
-      + '<div class="saloon-extra"><button type="button" data-vorm="agenda">Agenda</button></div></details>'
+      + '<div class="saloon-extra"><button type="button" data-vorm="wereld">Wereld</button><button type="button" data-vorm="mijn">Mijn leven</button><button type="button" data-vorm="actie">Actie</button><button type="button" data-vorm="agenda">Agenda</button></div></details>'
       + '<div class="saloon-resultaat"><p id="saloonStatus" role="status" aria-live="polite"></p><button type="button" data-ververs aria-label="Vernieuwen">↻</button></div><div id="saloonBronstatus"></div>';
   };
   w.RTGSaloonEdge = function (acties) {

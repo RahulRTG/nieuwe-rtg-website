@@ -258,7 +258,6 @@ test('elke routehandler die een id uit het verzoek pakt, noemt ook de sessie', (
      onder een document komt. Zonder deze naam meldde de scan
      POST /api/office/uitgifte/teken als "geen poortwachter", terwijl daar juist
      de strengere van de twee kantoorsloten op zit. */
-  /* gezinBeeldAuth verifies the selected profile token and scopes private files by req.beeldKey; the browser test rejects other profiles. */
   const POORT = /,\s*(auth|supplierAuth|officeAuth|techAuth|boardroomAuth|huisAuth|baasAuth|eigenaarAlleen|scimAuth|gezinsPoort|gezinBeeldAuth|kluisAuth|naamAuth)\s*[,)]|\.\.\.lid\b/;
   /* Niet elke poort staat in de registratie. Een flink deel van het huis
      controleert in de handler zelf -- rtfSociaal(req, res), profiel(req, res),
@@ -289,6 +288,10 @@ test('elke routehandler die een id uit het verzoek pakt, noemt ook de sessie', (
      test verderop dat de handler req.scimOrg echt gebruikt, en is een SCIM-route
      die de organisatie vergeet net zo goed een fout als een member-route die de
      sessie vergeet. */
+  /* gezinBeeldAuth (routes/presentatie-gezinsbeelden.js, #413) is dezelfde soort
+     poort als gezinsPoort: rtf.verifieerProfiel(code, token) en anders 401. Een
+     gezin is een van duizenden, dus hij staat ook in VEELPARTIJ en de handler
+     moet req.beeldKey gebruiken, de sleutel die de poort uit DEZE request zette. */
   const VEELPARTIJ = /,\s*(auth|supplierAuth|huisAuth|scimAuth|gezinsPoort|gezinBeeldAuth)\s*[,)]/;
   /* req.<iets> dat een poortwachter zelf heeft gezet telt ook: huisAuth zet
      req.werkplekCode, de zaak-poort zet req.actor. En een helper mag naast de

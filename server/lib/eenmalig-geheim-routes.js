@@ -81,6 +81,17 @@ const ROUTES = new Set([
   'POST /api/supplier/ticket/toon',
   'POST /api/supplier/ticket/deurverkoop',
   'POST /api/mob/kaart/toon',
+  /* De vier restdeuren van B9: OV-incheckcode, bezorgcode, festivalpas en de
+     incheckcode van een Foundation-activiteit. Elk antwoord hier draagt de kale
+     code precies een keer (kern/ov/incheckcode.js, kern/modebezorg/bezorgcode.js,
+     kern/festival/pas-toegang.js, kern/rtfos/activiteiten-deur.js). */
+  'POST /api/ov/code',
+  'POST /api/mode/bezorg/code',
+  'POST /api/festival/pas',
+  'POST /api/festival/verkoop/rond',
+  'POST /api/festival/gast/pas/toon',
+  'POST /api/rtfos/activiteit/inschrijven',
+  'POST /api/rtfos/activiteit/incheckcode',
   /* kascode en tikcode (kern/pay/kasbak.js): uitgeven is roteren, en een retry
      met dezelfde sleutel krijgt 409 zonder code in plaats van een kopie. */
   'POST /api/pay/kascode',
@@ -99,7 +110,37 @@ const ROUTES = new Set([
   /* De sleutel per Zaakdoos (kern/zaakdoos/sleutels.js): uitgeven is roteren, en
      het antwoord draagt de kale sleutel die daarna alleen als hash bestaat. */
   'POST /api/office/doos/sleutel',
-  'POST /api/supplier/doos/sleutel'
+  'POST /api/supplier/doos/sleutel',
+  /* De horecabon en de polsband (kern/horeca/bon.js): de code staat alleen in
+     het antwoord op maken, de eerste band-opwaardering en een rotatie; een
+     herhaling krijgt de bon zonder code. */
+  'POST /api/supplier/horeca/bon/maak',
+  'POST /api/supplier/horeca/bon/roteer',
+  'POST /api/supplier/horeca/club/band',
+  /* De vier codedeuren van 27 september 2026 (lib/idemsleutels-nooit-codedeuren.js):
+     elk van deze antwoorden draagt een kale code die alleen als hash blijft. */
+  'POST /api/concern/uitnodigen', 'POST /api/concern/bulk/verstuur', 'POST /api/concern/uitnodiging/roteer',
+  'POST /api/member/magnaat/teamkamer/maak', 'POST /api/member/magnaat/teamkamer/code',
+  'POST /api/service/bevestiging/toon', 'POST /api/supplier/service/bevestiging/toon',
+  'POST /api/office/kantoor/uitnodiging',
+  /* De personeelscode van het partnerkanaal (kern/partnerpersoneelscode.js, B14):
+     uitgeven en roteren dragen de kale 128-bit code, daarna alleen de hash. */
+  'POST /api/office/partnerkanaal/personeelscode',
+  'POST /api/office/partnerkanaal/personeelscode/roteer',
+  // de RTG Link-drager (B15, kern/link/cap-bak.js): de 128-bit code staat alleen in dit antwoord
+  'POST /api/link/cap/maak',
+  /* Het SSO-clientgeheim (besluit B16): het VERZOEK draagt het geheim en het
+     antwoord alleen de stand; geen cache mag een rotatie herhalen of onthouden. */
+  'POST /api/techniek/sso', 'POST /api/techniek/sso/geheim', 'POST /api/techniek/sso/geheim/overlap/sluit',
+  /* De lescredentials van RTFoundation-onderwijs (B17, foundation/onderwijs/toegang.js):
+     maken toont lescode en leraarssleutel, meedoen de leerlingsleutel, roteren een
+     nieuwe lescode -- elk precies een keer; daarna bestaat alleen de hash. */
+  'POST /api/foundation/les/maak', 'POST /api/foundation/les/join', 'POST /api/foundation/les/code/roteer',
+  /* Het gezinsprofieltoken (B17, foundation/gezinstoken.js): elk van deze
+     antwoorden draagt een VERSE gezinssessie die daarna alleen als hash bestaat. */
+  'POST /api/foundation/gezin/maak', 'POST /api/foundation/gezin/inloggen',
+  'POST /api/foundation/gezin/profiel/kies', 'POST /api/foundation/gezin/uitnodiging/accepteer',
+  'POST /api/foundation/gezin/sessie/roteer', 'POST /api/rtf/kanaal'
 ]);
 
 const isEenmalig = (methode, pad) => ROUTES.has(

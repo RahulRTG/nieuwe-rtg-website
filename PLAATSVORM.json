@@ -1,0 +1,980 @@
+{
+  "stempel": {
+    "op": "2026-09-29T17:14:13.470Z",
+    "commit": "9a7925608",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/plaatsvorm.js",
+    "node": "v22.22.2"
+  },
+  "uitleg": "Wat verstaat RTG onder een plaats? Elke objectvorm die een plaats draagt, per domein, over drie assen: de vorm (gedeelde velden), de woordenschat (hoeveel manieren om een punt te schrijven) en de aspecten (etiket, zichtbaarheid, toestand, bewijs, termijn naast de plek). Gemeten met de lezer van scripts/objectmodel.js.",
+  "graad": "vermoed",
+  "grens": "De lezer ziet alleen objectliteralen met een id en zonder geneste accolades: een plaats als { id, loc: { lat, lng } } is onzichtbaar, en een plaats die in een ROUTE wordt opgebouwd ook. De aspect-as is lexicaal op veldnamen en dus een ondergrens. De drie assen worden nooit opgeteld.",
+  "nietGemeten": {
+    "lezers": "wie een plaats LEEST is een eigenschap van de aanroepers en niet van de vorm; een vormmeter die het invult, raadt. De keten scherm -> route -> bestand staat in SCHERMROUTES.json en AANROEPGRAAF.json."
+  },
+  "conclusie": "GEEN GEDEELDE VORM: geen veld (buiten de envelop) staat in alle plaatsdomeinen, onder geen van beide drempels. Een `Place`-OBJECTTYPE is daarmee niet gerechtvaardigd. Wat overleeft is een PROJECTIE met etiketten (kern/levensgraaf/graaf.js): elk domein houdt zijn plaats, en een plaatslaag verwijst ernaar met een herkomst.",
+  "geenGedeeldeVorm": true,
+  "eensgezind": true,
+  "rondes": {
+    "ruim": {
+      "vormen": 57,
+      "domeinen": [
+        "kern/afdelingen",
+        "kern/agenda-pro",
+        "kern/beveiliging",
+        "kern/command",
+        "kern/commerce",
+        "kern/concern",
+        "kern/connection-profile-media",
+        "kern/defensie",
+        "kern/ervaring",
+        "kern/festival",
+        "kern/flits",
+        "kern/gemeente",
+        "kern/hulpdienst",
+        "kern/labfonds",
+        "kern/mall",
+        "kern/mobiliteit",
+        "kern/munten",
+        "kern/navigatie",
+        "kern/ontmoeting",
+        "kern/ov",
+        "kern/overheid",
+        "kern/pay",
+        "kern/rtfos",
+        "kern/stadsweefsel",
+        "kern/veiligheid",
+        "kern/vonk",
+        "kern/webdomein",
+        "kern/webmaker",
+        "kern/woningonderhoud",
+        "school"
+      ],
+      "vorm": {
+        "velden": 176,
+        "inAlleDomeinen": [],
+        "inMinstensHelft": 0,
+        "inEenDomeinPct": 90.3
+      },
+      "woordenschat": {
+        "varianten": [
+          {
+            "variant": "lat+lng",
+            "vormen": 18,
+            "domeinen": [
+              "kern/beveiliging",
+              "kern/flits",
+              "kern/gemeente",
+              "kern/mobiliteit",
+              "kern/navigatie",
+              "kern/ontmoeting",
+              "kern/ov",
+              "kern/stadsweefsel"
+            ]
+          },
+          {
+            "variant": "loc",
+            "vormen": 1,
+            "domeinen": [
+              "kern/command"
+            ]
+          },
+          {
+            "variant": "locatie",
+            "vormen": 14,
+            "domeinen": [
+              "kern/defensie",
+              "kern/gemeente",
+              "kern/labfonds",
+              "kern/overheid",
+              "kern/rtfos"
+            ]
+          },
+          {
+            "variant": "positie",
+            "vormen": 3,
+            "domeinen": [
+              "kern/connection-profile-media",
+              "kern/ervaring",
+              "kern/pay"
+            ]
+          },
+          {
+            "variant": "plek",
+            "vormen": 17,
+            "domeinen": [
+              "kern/afdelingen",
+              "kern/agenda-pro",
+              "kern/commerce",
+              "kern/festival",
+              "kern/hulpdienst",
+              "kern/mall",
+              "kern/rtfos",
+              "kern/veiligheid",
+              "kern/vonk",
+              "kern/woningonderhoud",
+              "school"
+            ]
+          },
+          {
+            "variant": "adres",
+            "vormen": 5,
+            "domeinen": [
+              "kern/concern",
+              "kern/munten",
+              "kern/webdomein",
+              "kern/webmaker"
+            ]
+          }
+        ],
+        "aantal": 5,
+        "domeinenMetMeerdereSchrijfwijzen": [
+          "kern/gemeente",
+          "kern/rtfos"
+        ]
+      },
+      "aspecten": [
+        {
+          "aspect": "etiket",
+          "vormen": 21,
+          "domeinen": 14
+        },
+        {
+          "aspect": "zichtbaarheid",
+          "vormen": 0,
+          "domeinen": 0
+        },
+        {
+          "aspect": "toestand",
+          "vormen": 3,
+          "domeinen": 3
+        },
+        {
+          "aspect": "bewijs",
+          "vormen": 15,
+          "domeinen": 10
+        },
+        {
+          "aspect": "termijn",
+          "vormen": 7,
+          "domeinen": 3
+        }
+      ],
+      "kaal": {
+        "vormen": 24,
+        "pct": 42.1,
+        "voorbeelden": [
+          "server/kern/agenda-pro.js",
+          "server/kern/connection-profile-media.js",
+          "server/kern/defensie/beheer.js",
+          "server/kern/ervaring/leden/wachtlijst.js",
+          "server/kern/gemeente/meldingen.js",
+          "server/kern/gemeente/vergunningen.js",
+          "server/kern/hulpdienst/meldkamer.js",
+          "server/kern/labfonds/onderzoek.js"
+        ]
+      },
+      "rijen": [
+        {
+          "module": "server/kern/afdelingen/bewaking/wereld.js",
+          "domein": "kern/afdelingen",
+          "punt": [
+            "plek"
+          ],
+          "aspecten": [
+            "etiket"
+          ]
+        },
+        {
+          "module": "server/kern/afdelingen/bewaking/wereld.js",
+          "domein": "kern/afdelingen",
+          "punt": [
+            "plek"
+          ],
+          "aspecten": [
+            "etiket"
+          ]
+        },
+        {
+          "module": "server/kern/agenda-pro.js",
+          "domein": "kern/agenda-pro",
+          "punt": [
+            "plek"
+          ],
+          "aspecten": []
+        },
+        {
+          "module": "server/kern/beveiliging/pda/index.js",
+          "domein": "kern/beveiliging",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": [
+            "etiket"
+          ]
+        },
+        {
+          "module": "server/kern/beveiliging/pda/index.js",
+          "domein": "kern/beveiliging",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": [
+            "etiket"
+          ]
+        },
+        {
+          "module": "server/kern/beveiliging/pda/index.js",
+          "domein": "kern/beveiliging",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": [
+            "etiket"
+          ]
+        },
+        {
+          "module": "server/kern/command/mdm.js",
+          "domein": "kern/command",
+          "punt": [
+            "loc"
+          ],
+          "aspecten": [
+            "etiket"
+          ]
+        },
+        {
+          "module": "server/kern/commerce/koopbaar.js",
+          "domein": "kern/commerce",
+          "punt": [
+            "plek"
+          ],
+          "aspecten": [
+            "etiket",
+            "toestand",
+            "bewijs"
+          ]
+        },
+        {
+          "module": "server/kern/concern/vestiging.js",
+          "domein": "kern/concern",
+          "punt": [
+            "adres"
+          ],
+          "aspecten": [
+            "toestand"
+          ]
+        },
+        {
+          "module": "server/kern/connection-profile-media.js",
+          "domein": "kern/connection-profile-media",
+          "punt": [
+            "positie"
+          ],
+          "aspecten": []
+        },
+        {
+          "module": "server/kern/defensie/beheer.js",
+          "domein": "kern/defensie",
+          "punt": [
+            "locatie"
+          ],
+          "aspecten": []
+        },
+        {
+          "module": "server/kern/ervaring/leden/wachtlijst.js",
+          "domein": "kern/ervaring",
+          "punt": [
+            "positie"
+          ],
+          "aspecten": []
+        },
+        {
+          "module": "server/kern/festival/toegang.js",
+          "domein": "kern/festival",
+          "punt": [
+            "plek"
+          ],
+          "aspecten": [
+            "bewijs"
+          ]
+        },
+        {
+          "module": "server/kern/flits.js",
+          "domein": "kern/flits",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": [
+            "etiket",
+            "bewijs"
+          ]
+        },
+        {
+          "module": "server/kern/gemeente/meldingen.js",
+          "domein": "kern/gemeente",
+          "punt": [
+            "lat+lng",
+            "locatie"
+          ],
+          "aspecten": []
+        },
+        {
+          "module": "server/kern/gemeente/vergunningen.js",
+          "domein": "kern/gemeente",
+          "punt": [
+            "locatie"
+          ],
+          "aspecten": []
+        },
+        {
+          "module": "server/kern/hulpdienst/meldkamer.js",
+          "domein": "kern/hulpdienst",
+          "punt": [
+            "plek"
+          ],
+          "aspecten": []
+        },
+        {
+          "module": "server/kern/labfonds/onderzoek.js",
+          "domein": "kern/labfonds",
+          "punt": [
+            "locatie"
+          ],
+          "aspecten": []
+        },
+        {
+          "module": "server/kern/mall/bewaard.js",
+          "domein": "kern/mall",
+          "punt": [
+            "plek"
+          ],
+          "aspecten": [
+            "etiket",
+            "termijn"
+          ]
+        },
+        {
+          "module": "server/kern/mall/collecties.js",
+          "domein": "kern/mall",
+          "punt": [
+            "plek"
+          ],
+          "aspecten": [
+            "etiket",
+            "bewijs",
+            "termijn"
+          ]
+        },
+        {
+          "module": "server/kern/mall/lijsten.js",
+          "domein": "kern/mall",
+          "punt": [
+            "plek"
+          ],
+          "aspecten": [
+            "termijn"
+          ]
+        },
+        {
+          "module": "server/kern/mall/lijsten.js",
+          "domein": "kern/mall",
+          "punt": [
+            "plek"
+          ],
+          "aspecten": [
+            "etiket",
+            "termijn"
+          ]
+        },
+        {
+          "module": "server/kern/mobiliteit/plekken.js",
+          "domein": "kern/mobiliteit",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": [
+            "etiket"
+          ]
+        },
+        {
+          "module": "server/kern/mobiliteit/reisplan-etappe.js",
+          "domein": "kern/mobiliteit",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": []
+        },
+        {
+          "module": "server/kern/munten.js",
+          "domein": "kern/munten",
+          "punt": [
+            "adres"
+          ],
+          "aspecten": [
+            "termijn"
+          ]
+        },
+        {
+          "module": "server/kern/munten.js",
+          "domein": "kern/munten",
+          "punt": [
+            "adres"
+          ],
+          "aspecten": [
+            "termijn"
+          ]
+        },
+        {
+          "module": "server/kern/navigatie/gebiednet.js",
+          "domein": "kern/navigatie",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": []
+        },
+        {
+          "module": "server/kern/navigatie/partner-events.js",
+          "domein": "kern/navigatie",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": [
+            "etiket",
+            "bewijs",
+            "termijn"
+          ]
+        },
+        {
+          "module": "server/kern/ontmoeting/date.js",
+          "domein": "kern/ontmoeting",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": [
+            "bewijs"
+          ]
+        },
+        {
+          "module": "server/kern/ov/dienst.js",
+          "domein": "kern/ov",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": [
+            "etiket",
+            "bewijs"
+          ]
+        },
+        {
+          "module": "server/kern/ov/dienst.js",
+          "domein": "kern/ov",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": []
+        },
+        {
+          "module": "server/kern/ov/dienst.js",
+          "domein": "kern/ov",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": [
+            "etiket",
+            "bewijs"
+          ]
+        },
+        {
+          "module": "server/kern/ov/index.js",
+          "domein": "kern/ov",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": []
+        },
+        {
+          "module": "server/kern/ov/reizen.js",
+          "domein": "kern/ov",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": []
+        },
+        {
+          "module": "server/kern/overheid/pda/index.js",
+          "domein": "kern/overheid",
+          "punt": [
+            "locatie"
+          ],
+          "aspecten": []
+        },
+        {
+          "module": "server/kern/overheid/pda/index.js",
+          "domein": "kern/overheid",
+          "punt": [
+            "locatie"
+          ],
+          "aspecten": []
+        },
+        {
+          "module": "server/kern/overheid/pda/vloer.js",
+          "domein": "kern/overheid",
+          "punt": [
+            "locatie"
+          ],
+          "aspecten": [
+            "bewijs"
+          ]
+        },
+        {
+          "module": "server/kern/overheid/pda/vloer.js",
+          "domein": "kern/overheid",
+          "punt": [
+            "locatie"
+          ],
+          "aspecten": [
+            "bewijs"
+          ]
+        },
+        {
+          "module": "server/kern/overheid/pda/vloer.js",
+          "domein": "kern/overheid",
+          "punt": [
+            "locatie"
+          ],
+          "aspecten": [
+            "etiket",
+            "toestand",
+            "bewijs"
+          ]
+        },
+        {
+          "module": "server/kern/overheid/pda/vloer.js",
+          "domein": "kern/overheid",
+          "punt": [
+            "locatie"
+          ],
+          "aspecten": [
+            "bewijs"
+          ]
+        },
+        {
+          "module": "server/kern/overheid/regio.js",
+          "domein": "kern/overheid",
+          "punt": [
+            "locatie"
+          ],
+          "aspecten": []
+        },
+        {
+          "module": "server/kern/pay/budget.js",
+          "domein": "kern/pay",
+          "punt": [
+            "positie"
+          ],
+          "aspecten": []
+        },
+        {
+          "module": "server/kern/rtfos/activiteiten.js",
+          "domein": "kern/rtfos",
+          "punt": [
+            "locatie"
+          ],
+          "aspecten": [
+            "bewijs"
+          ]
+        },
+        {
+          "module": "server/kern/rtfos/projecten-werk.js",
+          "domein": "kern/rtfos",
+          "punt": [
+            "plek"
+          ],
+          "aspecten": []
+        },
+        {
+          "module": "server/kern/rtfos/voorraad.js",
+          "domein": "kern/rtfos",
+          "punt": [
+            "locatie"
+          ],
+          "aspecten": [
+            "etiket"
+          ]
+        },
+        {
+          "module": "server/kern/rtfos/voorraad.js",
+          "domein": "kern/rtfos",
+          "punt": [
+            "locatie"
+          ],
+          "aspecten": [
+            "bewijs"
+          ]
+        },
+        {
+          "module": "server/kern/stadsweefsel/bord.js",
+          "domein": "kern/stadsweefsel",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": [
+            "etiket"
+          ]
+        },
+        {
+          "module": "server/kern/stadsweefsel/bord.js",
+          "domein": "kern/stadsweefsel",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": [
+            "etiket"
+          ]
+        },
+        {
+          "module": "server/kern/stadsweefsel/zaken.js",
+          "domein": "kern/stadsweefsel",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": []
+        },
+        {
+          "module": "server/kern/veiligheid/alarm.js",
+          "domein": "kern/veiligheid",
+          "punt": [
+            "plek"
+          ],
+          "aspecten": [
+            "etiket"
+          ]
+        },
+        {
+          "module": "server/kern/vonk/halfweg.js",
+          "domein": "kern/vonk",
+          "punt": [
+            "plek"
+          ],
+          "aspecten": [
+            "etiket"
+          ]
+        },
+        {
+          "module": "server/kern/webdomein.js",
+          "domein": "kern/webdomein",
+          "punt": [
+            "adres"
+          ],
+          "aspecten": []
+        },
+        {
+          "module": "server/kern/webmaker.js",
+          "domein": "kern/webmaker",
+          "punt": [
+            "adres"
+          ],
+          "aspecten": []
+        },
+        {
+          "module": "server/kern/woningonderhoud.js",
+          "domein": "kern/woningonderhoud",
+          "punt": [
+            "plek"
+          ],
+          "aspecten": []
+        },
+        {
+          "module": "server/school/ouderportaal-mijn.js",
+          "domein": "school",
+          "punt": [
+            "plek"
+          ],
+          "aspecten": []
+        },
+        {
+          "module": "server/school/ouderportaal.js",
+          "domein": "school",
+          "punt": [
+            "plek"
+          ],
+          "aspecten": []
+        },
+        {
+          "module": "server/school/veiligheid-incident.js",
+          "domein": "school",
+          "punt": [
+            "plek"
+          ],
+          "aspecten": [
+            "bewijs"
+          ]
+        }
+      ]
+    },
+    "smal": {
+      "vormen": 18,
+      "domeinen": [
+        "kern/beveiliging",
+        "kern/flits",
+        "kern/gemeente",
+        "kern/mobiliteit",
+        "kern/navigatie",
+        "kern/ontmoeting",
+        "kern/ov",
+        "kern/stadsweefsel"
+      ],
+      "vorm": {
+        "velden": 40,
+        "inAlleDomeinen": [],
+        "inMinstensHelft": 0,
+        "inEenDomeinPct": 90
+      },
+      "woordenschat": {
+        "varianten": [
+          {
+            "variant": "lat+lng",
+            "vormen": 18,
+            "domeinen": [
+              "kern/beveiliging",
+              "kern/flits",
+              "kern/gemeente",
+              "kern/mobiliteit",
+              "kern/navigatie",
+              "kern/ontmoeting",
+              "kern/ov",
+              "kern/stadsweefsel"
+            ]
+          },
+          {
+            "variant": "locatie",
+            "vormen": 1,
+            "domeinen": [
+              "kern/gemeente"
+            ]
+          }
+        ],
+        "aantal": 2,
+        "domeinenMetMeerdereSchrijfwijzen": [
+          "kern/gemeente"
+        ]
+      },
+      "aspecten": [
+        {
+          "aspect": "etiket",
+          "vormen": 10,
+          "domeinen": 6
+        },
+        {
+          "aspect": "zichtbaarheid",
+          "vormen": 0,
+          "domeinen": 0
+        },
+        {
+          "aspect": "toestand",
+          "vormen": 0,
+          "domeinen": 0
+        },
+        {
+          "aspect": "bewijs",
+          "vormen": 5,
+          "domeinen": 4
+        },
+        {
+          "aspect": "termijn",
+          "vormen": 1,
+          "domeinen": 1
+        }
+      ],
+      "kaal": {
+        "vormen": 7,
+        "pct": 38.9,
+        "voorbeelden": [
+          "server/kern/gemeente/meldingen.js",
+          "server/kern/mobiliteit/reisplan-etappe.js",
+          "server/kern/navigatie/gebiednet.js",
+          "server/kern/ov/dienst.js",
+          "server/kern/ov/index.js",
+          "server/kern/ov/reizen.js",
+          "server/kern/stadsweefsel/zaken.js"
+        ]
+      },
+      "rijen": [
+        {
+          "module": "server/kern/beveiliging/pda/index.js",
+          "domein": "kern/beveiliging",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": [
+            "etiket"
+          ]
+        },
+        {
+          "module": "server/kern/beveiliging/pda/index.js",
+          "domein": "kern/beveiliging",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": [
+            "etiket"
+          ]
+        },
+        {
+          "module": "server/kern/beveiliging/pda/index.js",
+          "domein": "kern/beveiliging",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": [
+            "etiket"
+          ]
+        },
+        {
+          "module": "server/kern/flits.js",
+          "domein": "kern/flits",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": [
+            "etiket",
+            "bewijs"
+          ]
+        },
+        {
+          "module": "server/kern/gemeente/meldingen.js",
+          "domein": "kern/gemeente",
+          "punt": [
+            "lat+lng",
+            "locatie"
+          ],
+          "aspecten": []
+        },
+        {
+          "module": "server/kern/mobiliteit/plekken.js",
+          "domein": "kern/mobiliteit",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": [
+            "etiket"
+          ]
+        },
+        {
+          "module": "server/kern/mobiliteit/reisplan-etappe.js",
+          "domein": "kern/mobiliteit",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": []
+        },
+        {
+          "module": "server/kern/navigatie/gebiednet.js",
+          "domein": "kern/navigatie",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": []
+        },
+        {
+          "module": "server/kern/navigatie/partner-events.js",
+          "domein": "kern/navigatie",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": [
+            "etiket",
+            "bewijs",
+            "termijn"
+          ]
+        },
+        {
+          "module": "server/kern/ontmoeting/date.js",
+          "domein": "kern/ontmoeting",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": [
+            "bewijs"
+          ]
+        },
+        {
+          "module": "server/kern/ov/dienst.js",
+          "domein": "kern/ov",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": [
+            "etiket",
+            "bewijs"
+          ]
+        },
+        {
+          "module": "server/kern/ov/dienst.js",
+          "domein": "kern/ov",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": []
+        },
+        {
+          "module": "server/kern/ov/dienst.js",
+          "domein": "kern/ov",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": [
+            "etiket",
+            "bewijs"
+          ]
+        },
+        {
+          "module": "server/kern/ov/index.js",
+          "domein": "kern/ov",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": []
+        },
+        {
+          "module": "server/kern/ov/reizen.js",
+          "domein": "kern/ov",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": []
+        },
+        {
+          "module": "server/kern/stadsweefsel/bord.js",
+          "domein": "kern/stadsweefsel",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": [
+            "etiket"
+          ]
+        },
+        {
+          "module": "server/kern/stadsweefsel/bord.js",
+          "domein": "kern/stadsweefsel",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": [
+            "etiket"
+          ]
+        },
+        {
+          "module": "server/kern/stadsweefsel/zaken.js",
+          "domein": "kern/stadsweefsel",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": []
+        }
+      ]
+    }
+  }
+}

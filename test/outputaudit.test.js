@@ -437,3 +437,15 @@ test('4. een ontbrekend journaal geeft een REDEN en geen nullen', () => {
     }
   }
 });
+
+test('een DUN journaal schrijft het register niet stil terug', () => {
+  /* 29 september 2026: de meetronde draaide de outputproef op een journaal van
+     een handvol losse toetsen en schreef 5000+ routes terug naar 420. teDun
+     weigert minder dan de helft van de vorige ronde, en laat een gewone
+     schommeling of een groei door. */
+  const { teDun } = require('../scripts/outputproef');
+  assert.match(teDun({ routes: 420 }, { routes: 5151 }) || '', /420 routes, de vorige ronde 5151/);
+  assert.equal(teDun({ routes: 5000 }, { routes: 5151 }), null, 'een kleine schommeling is geen dun journaal');
+  assert.equal(teDun({ routes: 5300 }, { routes: 5151 }), null, 'groei is nooit dun');
+  assert.equal(teDun({ routes: 10 }, null), null, 'zonder vorige ronde valt er niets te vergelijken');
+});

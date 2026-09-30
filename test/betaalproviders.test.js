@@ -68,13 +68,15 @@ test('de centrale stop dekt betaalroutes maar laat gewone app- en rapportagerout
        Gevonden door scripts/zaakwig.js op trede 3: de vloer zonder betaalrail
        gaf hier 200 en de bon stond daarna op betaald. Het precedent stond al in
        de lijst -- giftcard/redeem, om precies dezelfde reden. */
-    '/api/supplier/pos/redeem'
+    '/api/supplier/pos/redeem', '/api/supplier/horeca/event/aanbetaling',
+    '/api/supplier/horeca/bon/maak'
   ];
   for (const pad of dicht) assert.equal(isBetaalactie('POST', pad), true, pad);
   const open = [
     ['GET', '/api/pay/saldo'], ['POST', '/api/facturen/overzicht'],
     ['POST', '/api/office/payroll/overzicht'], ['POST', '/api/office/payroll/loonrun'],
     ['POST', '/api/booking'], ['POST', '/api/order'],
+    ['POST', '/api/supplier/horeca/event/offerte'], ['POST', '/api/supplier/horeca/offline/sync'],
     ['POST', '/api/bank/afschrift'], ['POST', '/api/supplier/pos/checkout']
   ];
   for (const [methode, pad] of open) assert.equal(isBetaalactie(methode, pad), false, pad);

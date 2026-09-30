@@ -1,17 +1,13 @@
 /* De kantoor-inlog als gesprek met Rahul, in plaats van een codeveld.
 
-   Waarom dit een eigen module is en geen veld op drie schermen: een inlog die op
-   drie plekken los is nagebouwd, raakt op twee van die plekken achter. Precies
-   dat was hier gebeurd -- toen de backoffice een tweede factor kreeg, kreeg
-   alleen de werk-app een veld ervoor, en de andere drie schermen liepen vast op
-   een vraag die ze niet konden stellen. Eén module, één gesprek, overal gelijk.
+   Een eigen module en geen veld op drie schermen: een inlog die op drie plekken
+   los is nagebouwd, raakt op twee ervan achter (dat gebeurde bij de tweede
+   factor). Eén module, één gesprek, overal gelijk.
 
    Twee dingen die anders zijn dan bij een gewone chat, en allebei met opzet:
 
-   - VRAAGT RAHUL OM EEN CODE, DAN WORDT DE INVOER GEMASKEERD. De server zet
-     `verborgen` op de vraag; dit scherm maakt er dan een wachtwoordveld van. Een
-     chatvenster toont normaal wat je typt, en een kantoorcode hoort niet leesbaar
-     in beeld te staan waar iemand overheen kan kijken.
+   - VRAAGT RAHUL OM EEN CODE, DAN WORDT DE INVOER GEMASKEERD (`verborgen`
+     van de server): een kantoorcode hoort niet leesbaar in beeld te staan.
 
    - WAT JE TYPT BLIJFT NERGENS STAAN. Het gaat naar de server en verdwijnt uit
      het veld; er komt geen bellenrij met je code erin, en de browser krijgt
@@ -22,13 +18,9 @@
      eigenaar is die AFGELEID en koppelt hij niets), dan probeert dit gesprek
      eerst /api/account/start en vraagt het pas iets als dat niet gaat.
 
-     Dat was een gat en geen gemak: officeAuth liet de eigenaar met zijn eigen
-     lid-token allang door (server/kern/kantoor/index.js) terwijl vier schermen
-     hem om een kantoorcode vroegen en vier andere doodliepen op "Geen
-     backoffice-sessie". Een inlogvraag die niet nodig is, leert mensen hun
-     code intypen waar dat niet hoeft. De algemene pin blijft gelden: zegt de
-     server pinNodig, dan vraagt Rahul die hier, gemaskeerd, in hetzelfde
-     gesprek. Het ene account is geen achterdeur (kern/eenaccount/starten.js).
+     Een inlogvraag die niet nodig is, leert mensen hun code intypen waar dat
+     niet hoeft. De algemene pin en (in productie) de passkey blijven gelden;
+     het ene account is geen achterdeur (kern/eenaccount/starten.js).
 
    Gebruik:  RTGKantoorGesprek.toon(element, function (token, state) { ... })  */
 (function (w) {
@@ -55,12 +47,9 @@
     '.kg-rij button:disabled{opacity:.45;cursor:default;}' +
     '.kg-fout{font-size:.86rem;line-height:1.5;color:var(--burgundy-on-dark,#C23A5E);margin:.8rem 0 0;min-height:1.2rem;}';
 
-  /* EEN STILLE SLEUTEL PROBEER JE EEN KEER PER PAGINA. De deur kan twee keer
-     opengaan: als er geen sleutel is, en nog eens als een verzoek alsnog 401
-     geeft. Zou de sleutelbos dan opnieuw stil munten, dan draaien scherm en
-     deur rond -- de lus die backoffice.js eerder in vier seconden tweeenveertig
-     keer liet herladen. Een sleutel die niet hielp, helpt de tweede keer ook
-     niet; dan is de code aan de beurt, met de reden erbij. */
+  /* EEN STILLE SLEUTEL PROBEER JE EEN KEER PER PAGINA: anders draaien scherm en
+     deur rond (backoffice.js herlaadde eens 42 keer in vier seconden). Een
+     sleutel die niet hielp, helpt de tweede keer ook niet. */
   var sleutelGebruikt = false;
 
   var stijlGezet = false;
@@ -76,6 +65,14 @@
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(lijf || {})
     }).then(function (r) { return r.json().catch(function () { return {}; }); });
+  }
+
+  // /shared/passkey.js pas laden als de kantoordeur erom vraagt (productie, B10)
+  function passkey() {
+    return w.RTGPasskey ? Promise.resolve(w.RTGPasskey) : new Promise(function (ok) {
+      var t = document.createElement('script'); t.src = '/shared/passkey.js';
+      t.onload = t.onerror = function () { ok(w.RTGPasskey); }; document.head.appendChild(t);
+    });
   }
 
   // het lid-token van dit toestel; null als er niemand als lid is ingelogd
@@ -121,11 +118,8 @@
       veld.focus();
     }
 
-    /* WAT "VERDER" NU DOET. Het gesprek heeft twee standen -- de code van het
-       kantoor, en de algemene pin bij het ene account -- en die verschillen
-       alleen in waar het antwoord heen gaat. Een vlag zou hier twee keer
-       moeten worden uitgelezen; een verwijzing naar de ontvanger maar een keer
-       worden gezet. */
+    /* WAT "VERDER" NU DOET: de code van het kantoor of de algemene pin bij het
+       ene account; ze verschillen alleen in waar het antwoord heen gaat. */
     var ontvanger = zegCode;
 
     function stuur() {
@@ -157,11 +151,8 @@
       }).catch(function () { zegt.textContent = 'Het kantoor is even niet bereikbaar.'; });
     }
 
-    /* DE SLEUTELBOS EERST: /api/account/start munt dezelfde sessie als de code
-       zou doen (kern/eenaccount/starten.js), met dezelfde logregel. Lukt dat
-       niet, dan valt het gesprek terug op de code -- en NIET stil: de reden van
-       de server komt in het foutvak. Een terugval zonder reden laat iemand een
-       code intypen zonder te weten waarom zijn eigen account niet volstond. */
+    /* DE SLEUTELBOS EERST (/api/account/start). Lukt dat niet, dan valt het
+       gesprek terug op de code -- en NIET stil: de reden komt in het foutvak. */
     function viaAccount() {
       var lt = lidToken();
       if (!lt) return codeGesprek();
@@ -177,8 +168,11 @@
         start(null);
       }).catch(function () { codeGesprek(); });
 
-      function start(pin) {
-        accountPost('start', pin ? { rol: 'kantoor', pin: pin } : { rol: 'kantoor' }, lt).then(function (s) {
+      function start(pin, bewijs) {
+        var lijf = { rol: 'kantoor' };
+        if (pin) lijf.pin = pin;
+        if (bewijs) { lijf.ceremonie = bewijs.ceremonie; lijf.antwoord = bewijs.antwoord; }
+        accountPost('start', lijf, lt).then(function (s) {
           if (s.token) {
             sleutelGebruikt = true;
             zegt.textContent = 'Welkom terug. U bent binnen met uw eigen RTG-account.';
@@ -187,6 +181,13 @@
           /* `pinNodig` is de vraag EN de afwijzing (eenaccount/starten.js);
              alleen de afwijzing draagt een reden. Zie test/kantoordeur.e2e.js. */
           if (s.pinNodig) return vraagPin(pin ? (s.error || 'Die pincode klopt niet.') : '');
+          /* B10: in productie opent het kantoor met een passkey (kern/kantoor/productiedeur.js) */
+          if (s.bevestigingNodig && s.bevestiging && !bewijs) {
+            zegt.textContent = 'Bevestig met uw passkey, dan zet ik het kantoor open.';
+            return passkey().then(function (P) {
+              return P ? P.bevestig(function () { return s.bevestiging; }) : { fout: 'De passkey kon hier niet starten.' };
+            }).then(function (b) { if (b.fout) fout.textContent = b.fout; else start(pin, b); });
+          }
           // geen sleutel (meer), of iets anders mis: de code, met de reden erbij
           codeGesprek();
           fout.textContent = s.error || '';

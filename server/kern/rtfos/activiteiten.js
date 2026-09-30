@@ -111,7 +111,7 @@ module.exports = (ctx, eigen) => {
 
   return { lijst, maak, zet: beheer.zet, open: beheer.open, status: beheer.status,
     begeleiders: beheer.begeleiders,
-    inschrijven: deur.inschrijven, afmelden: deur.afmelden, inchecken: deur.inchecken,
+    inschrijven: deur.inschrijven, afmelden: deur.afmelden, inchecken: deur.inchecken, nieuweCode: deur.nieuweCode,
     vind, beeld, SOORTEN, JEUGD, STATUS };
 };
 module.exports.SOORTEN = SOORTEN;

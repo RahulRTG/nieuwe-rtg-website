@@ -8,8 +8,9 @@
 
    Twee dingen bewust NIET:
    - geen spoor. We bewaren de laatste positie, plus een kort spoor van
-     maximaal 12 punten binnen een LOPEND live-venster, en dat spoor gaat weg
-     zodra het venster sluit. Een permanent locatiearchief van een lid is een
+     maximaal 12 punten binnen een LOPEND live-venster, en allebei gaan ze weg
+     zodra het venster sluit of afloopt (NAVIGATIE.md N19: ook de laatste plek
+     bestaat alleen binnen een venster; daarbuiten wordt hij niet bewaard). Een permanent locatiearchief van een lid is een
      schat voor wie inbreekt, en dit is een veiligheidsapp, geen volgsysteem.
    - geen delen zonder venster. Buiten een alarm of een lopende wacht ziet
      niemand iets, ook je kring niet. Toestemming heeft hier altijd een
@@ -39,18 +40,25 @@ module.exports = ({ opslag, save }) => {
       accu: getal(body.accu),                     // batterijstand, als de browser hem geeft
       at: nu()
     };
+    /* ZONDER OPEN VENSTER GEEN PLEK (N19). Tot 29 september 2026 werd de
+       laatste plek altijd bewaard en nooit weggehaald: een blijvende "waar was
+       dit lid het laatst" zonder dat er iets liep. Buiten een venster ziet de
+       kring niets, dus is er ook niets om te onthouden. De melding slaagt wel
+       (200): het toestel doet niets fout, er valt alleen niets te bewaren. */
+    const venster = vensterOpen_(handle);
+    if (!venster) { vergeetHandle(V, handle); save(); return { status: 200, ok: true, at: punt.at, bewaard: false }; }
     V.plek[handle] = punt;
-    const venster = V.vensters[handle];
-    if (venster && venster.tot > Date.now()) {
-      venster.spoor = (venster.spoor || []).concat([punt]).slice(-SPOOR_MAX);
-    }
+    venster.spoor = (venster.spoor || []).concat([punt]).slice(-SPOOR_MAX);
     save();
-    return { status: 200, ok: true, at: punt.at };
+    return { status: 200, ok: true, at: punt.at, bewaard: true };
   }
+
+  // Venster en plek gaan samen weg: de plek bestond alleen voor dit venster (N19).
+  function vergeetHandle(V, handle) { delete V.vensters[handle]; delete V.plek[handle]; }
 
   function laatstePlek(handle) {
     const V = lijsten();
-    return V.plek[handle] || null;
+    return vensterOpen_(handle) ? (V.plek[handle] || null) : null;
   }
 
   /* Een live-venster openen: vanaf nu tot een vast moment mag de kring
@@ -65,8 +73,8 @@ module.exports = ({ opslag, save }) => {
 
   function vensterSluit(handle) {
     const V = lijsten();
-    // het spoor gaat mee weg: het bestond alleen voor dit venster
-    delete V.vensters[handle];
+    // het spoor en de laatste plek gaan mee weg: ze bestonden alleen voor dit venster (N19)
+    vergeetHandle(V, handle);
     save();
     return { status: 200, ok: true };
   }
@@ -75,6 +83,16 @@ module.exports = ({ opslag, save }) => {
     const V = lijsten();
     const v = V.vensters[handle];
     return v && v.tot > Date.now() ? v : null;
+  }
+
+  /* Een venster loopt af zonder dat iemand sluit. De bewaarveger ruimt het
+     dan op, met de plek erbij -- en ook een plek zonder venster, van voor N19. */
+  function vergeetVerlopen() {
+    const V = lijsten();
+    let n = 0;
+    for (const h of Object.keys(V.plek)) if (!vensterOpen_(h)) { delete V.plek[h]; n++; }
+    for (const h of Object.keys(V.vensters)) if (!vensterOpen_(h)) delete V.vensters[h];
+    return n;
   }
 
   /* Wat een kringlid te zien krijgt. `magPlek` komt uit de kring: staat de
@@ -95,5 +113,5 @@ module.exports = ({ opslag, save }) => {
     };
   }
 
-  return { plekMelden, laatstePlek, vensterOpen, vensterSluit, vensterActief: vensterOpen_, plekVoorContact };
+  return { plekMelden, laatstePlek, vensterOpen, vensterSluit, vensterActief: vensterOpen_, plekVoorContact, vergeetVerlopen };
 };

@@ -30,7 +30,7 @@ const WORTEL = path.join(__dirname, '..');
    toets 9 hieronder houdt de twee lijsten sindsdien aan elkaar. */
 const BRONNEN = ['VERTROUWEN.json', 'AUDITPROEF.json', 'ROLPROEF.json', 'IDEMPROEF.json',
                  'HERSTELPROEF.json', 'APPWERKT.json', 'EXECUTION_MAP.json', 'IDOR.json',
-                 'HANDELINGPROEF.json',
+                 'HANDELINGPROEF.json', 'IDEMBESLUIT.json',
                  'TAFELPROEF.json', 'RITPROEF.json', 'TOELATINGSPROEF.json', 'ZAAKLIVEPROEF.json'];
 
 /* Een wegwerpmap met kopieen van de registers. De mutatie gebeurt daar, nooit
@@ -74,6 +74,28 @@ test('1. een gezakte rechtenmeting maakt haar capability GEBLOKKEERD', () => {
   assert.equal(pos.lagen.bevoegd.stand, 'ROOD');
   assert.match(pos.lagen.bevoegd.reden, /zakt op \d+ route/);
   assert.equal(uit.telling.geblokkeerd, 1);
+});
+
+test('1b. een BESLOTEN niet-idempotente route blokkeert niet, een onbesliste wel', () => {
+  /* bedrijf/mijn staat als code-maker in IDEMBESLUIT.json: een tweede oproep
+     geeft met opzet een verse sessie. Dat is geen bewijs (dus niet GROEN) maar
+     ook geen defect. Zet je hetzelfde besluit op tebeslissen, dan is het weer
+     een open vraag en blokkeert hij wel. */
+  const bedrijf = (uit) => cap(uit, 'bedrijf');
+  /* De meting zelf wordt vastgezet, zodat deze toets niet afhangt van wat de
+     laatste idemproef toevallig over deze route zei. */
+  const meting = (map) => pas(map, 'IDEMPROEF.json', a => {
+    for (const r of Object.values(a.perRoute))
+      if (r.pad === '/api/bedrijf/mijn') r.idempotentie = 'onbeschermd';
+  });
+  const besloten = wereld(meting);
+  assert.notEqual(bedrijf(besloten).stand, 'GEBLOKKEERD', JSON.stringify(bedrijf(besloten).lagen.herstelbaar));
+  const open = wereld(map => meting(map) || pas(map, 'IDEMBESLUIT.json', a => {
+    a.routes['/api/bedrijf/mijn'].klasse = 'tebeslissen';
+    a.routes['/api/bedrijf/lid/aanmeld'].klasse = 'tebeslissen';
+  }));
+  assert.equal(bedrijf(open).stand, 'GEBLOKKEERD');
+  assert.equal(bedrijf(open).lagen.herstelbaar.stand, 'ROOD');
 });
 
 test('2. een geschorst bewijs blokkeert via de laag autonoomVeilig', () => {

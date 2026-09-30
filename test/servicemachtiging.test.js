@@ -22,11 +22,12 @@ const crypto = require('crypto');
 const { startServer, stop, kantoorAlsPersoon } = require('./helper');
 
 function laag() {
-  const db = { data: {} };
+  const db = { data: {}, writable: true };
   const save = () => {};
+  const bewerkCollectie = require('../server/db/collectie-bewerken')({ store: 'json', db, save });
   const zaken = require('../server/kern/service/zaak')({ db, save, crypto });
   const machtigingen = require('../server/kern/service/machtiging')({ db, save, crypto, zaken });
-  const bevestiging = require('../server/kern/service/bevestiging')({ db, save, crypto, zaken, machtigingen });
+  const bevestiging = require('../server/kern/service/bevestiging')({ db, save, crypto, zaken, machtigingen, bewerkCollectie });
   return { db, zaken, machtigingen, bevestiging };
 }
 const REDEN = 'de operationele werkruimte reageert sinds gisteren niet';
@@ -80,45 +81,47 @@ test('een bevoegdheid zonder lezer krijgt geen machtiging of zware ceremonie', (
     'een niet-actieve capability bleef als uitvoerbare zware grens staan');
 });
 
-test('een bevestiging levert precies de machtiging op die het lid heeft gelezen', () => {
+test('een bevestiging levert precies de machtiging op die het lid heeft gelezen', async () => {
   const l = laag();
   const z = l.zaken.open({ melder: 'user-7', onderwerp: 'zaak', titel: 'Werkruimte reageert niet' }).zaak;
   l.bevestiging.vraag({ zaakId: z.id, mens: 'nadia', doel: 'organisatiestand bekijken',
     capabilities: ['organisatie.stand'], reden: REDEN });
   const inApp = l.bevestiging.voorLid('user-7')[0];
   assert.ok(inApp.reden, 'het lid ziet niet waarvoor er wordt gevraagd');
-  const r = l.bevestiging.bevestig(inApp.id, { melder: 'user-7' });
+  const r = await l.bevestiging.bevestig(inApp.id, { melder: 'user-7' });
   assert.deepEqual(r.machtiging.capabilities, inApp.capabilities,
     'er ging iets anders open dan wat het lid bevestigde');
 });
 
-test('de code staat in de app van het lid en niet op het scherm van de medewerker', () => {
+test('de code staat in de app van het lid en niet op het scherm van de medewerker', async () => {
   const l = laag();
   const z = l.zaken.open({ melder: 'user-7', onderwerp: 'zaak', titel: 'Werkruimte reageert niet' }).zaak;
   const v = l.bevestiging.vraag({ zaakId: z.id, mens: 'nadia', capabilities: ['organisatie.stand'], reden: REDEN });
   assert.equal(v.bevestiging.code, undefined,
     'de medewerker kon de code van zijn eigen scherm aflezen; dan bevestigt de terugval niets');
-  assert.match(String(l.bevestiging.voorLid('user-7')[0].code), /^\d{6}$/);
+  assert.equal(l.bevestiging.voorLid('user-7')[0].code, undefined, 'de lijst in de app draagt geen code');
+  assert.match(String((await l.bevestiging.toon(v.bevestiging.id, { melder: 'user-7' })).code), /^\d{6}$/);
 });
 
-test('de terugvalcode werkt een keer, en alleen voor wie erom vroeg', () => {
-  const l = laag();
-  const z = l.zaken.open({ melder: 'user-7', onderwerp: 'zaak', titel: 'Werkruimte reageert niet' }).zaak;
-  l.bevestiging.vraag({ zaakId: z.id, mens: 'nadia', capabilities: ['organisatie.stand'], reden: REDEN });
-  const code = l.bevestiging.voorLid('user-7')[0].code;
-  assert.ok(l.bevestiging.metCode(code, { mens: 'joris' }).error,
-    'een andere medewerker kon de code van een collega gebruiken');
-  assert.equal(l.bevestiging.metCode(code, { mens: 'nadia' }).ok, true);
-  assert.ok(l.bevestiging.metCode(code, { mens: 'nadia' }).error, 'de code werkte een tweede keer');
-});
-
-test('een bevestiging staat op naam: een ander lid kan hem niet indrukken', () => {
+test('de terugvalcode werkt een keer, en alleen voor wie erom vroeg', async () => {
   const l = laag();
   const z = l.zaken.open({ melder: 'user-7', onderwerp: 'zaak', titel: 'Werkruimte reageert niet' }).zaak;
   const v = l.bevestiging.vraag({ zaakId: z.id, mens: 'nadia', capabilities: ['organisatie.stand'], reden: REDEN });
-  assert.ok(l.bevestiging.bevestig(v.bevestiging.id, { melder: 'user-9' }).error);
-  assert.ok(l.bevestiging.weiger(v.bevestiging.id, { melder: 'user-9' }).error);
-  assert.equal(l.bevestiging.weiger(v.bevestiging.id, { melder: 'user-7' }).ok, true,
+  const code = (await l.bevestiging.toon(v.bevestiging.id, { melder: 'user-7' })).code;
+  assert.ok((await l.bevestiging.metCode(code, { mens: 'joris', zaak: z.id })).error,
+    'een andere medewerker kon de code van een collega gebruiken');
+  assert.equal((await l.bevestiging.metCode(code, { mens: 'nadia', zaak: z.id })).ok, true);
+  assert.ok((await l.bevestiging.metCode(code, { mens: 'nadia', zaak: z.id })).error, 'de code werkte een tweede keer');
+});
+
+test('een bevestiging staat op naam: een ander lid kan hem niet indrukken', async () => {
+  const l = laag();
+  const z = l.zaken.open({ melder: 'user-7', onderwerp: 'zaak', titel: 'Werkruimte reageert niet' }).zaak;
+  const v = l.bevestiging.vraag({ zaakId: z.id, mens: 'nadia', capabilities: ['organisatie.stand'], reden: REDEN });
+  assert.ok((await l.bevestiging.bevestig(v.bevestiging.id, { melder: 'user-9' })).error);
+  assert.ok((await l.bevestiging.weiger(v.bevestiging.id, { melder: 'user-9' })).error);
+  assert.ok((await l.bevestiging.toon(v.bevestiging.id, { melder: 'user-9' })).error, 'een ander lid kreeg de code');
+  assert.equal((await l.bevestiging.weiger(v.bevestiging.id, { melder: 'user-7' })).ok, true,
     'weigeren hoort net zo makkelijk te zijn als bevestigen');
 });
 

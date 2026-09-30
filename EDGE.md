@@ -41,8 +41,8 @@ staan; ontbreekt er een, dan zakt het script, want een verklaring die niet meer
 op de code past is een verouderde kaart en geen kaart. `--controle` hercompileert
 en vergelijkt met het ingecheckte register.
 
-Uitslag: <!--getal:edgekaart.bestanden-->75<!--/getal--> bestanden met
-<!--getal:edgekaart.rollen-->213<!--/getal--> verklaarde rollen, allemaal met een
+Uitslag: <!--getal:edgekaart.bestanden-->77<!--/getal--> bestanden met
+<!--getal:edgekaart.rollen-->216<!--/getal--> verklaarde rollen, allemaal met een
 citaat dat letterlijk staat;
 <!--getal:edgekaart.dubbeleEigenaars-->12<!--/getal--> verantwoordelijkheden met
 meer dan één schrijver of beslisser (par. 1), en
@@ -65,16 +65,16 @@ ledensessie, gelezen uit `RTGEdgeBlikveld.lees()` — nooit geraden uit de bron.
 Per veld een telling, en met opzet **geen samengesteld percentage**: een
 gemiddelde over tien velden verbergt welk veld bewoog (`BEWIJSMACHINE.md`).
 
-Uitslag over <!--getal:edgedekking.schermen-->313<!--/getal--> schermen, waarvan er
-<!--getal:edgedekking.metBlikveld-->283<!--/getal--> een blikveld laden (de rest is
+Uitslag over <!--getal:edgedekking.schermen-->314<!--/getal--> schermen, waarvan er
+<!--getal:edgedekking.metBlikveld-->284<!--/getal--> een blikveld laden (de rest is
 een doorverwijzing, een scherm zonder Edge, of een scherm dat een lid niet
 opent — elk met de reden in het register):
 
 | Veld | Schermen met een waarde | waarvan het scherm hem zelf levert |
 |---|---|---|
 | identiteit | <!--getal:edgedekking.identiteit-->0<!--/getal--> | <!--getal:edgedekking.identiteitZelf-->0<!--/getal--> |
-| wereld | <!--getal:edgedekking.wereld-->282<!--/getal--> | <!--getal:edgedekking.wereldZelf-->0<!--/getal--> |
-| context | <!--getal:edgedekking.context-->283<!--/getal--> | <!--getal:edgedekking.contextZelf-->13<!--/getal--> |
+| wereld | <!--getal:edgedekking.wereld-->283<!--/getal--> | <!--getal:edgedekking.wereldZelf-->0<!--/getal--> |
+| context | <!--getal:edgedekking.context-->284<!--/getal--> | <!--getal:edgedekking.contextZelf-->13<!--/getal--> |
 | object | <!--getal:edgedekking.object-->0<!--/getal--> | <!--getal:edgedekking.objectZelf-->0<!--/getal--> |
 | activiteit | <!--getal:edgedekking.activiteit-->0<!--/getal--> | <!--getal:edgedekking.activiteitZelf-->0<!--/getal--> |
 | presence | <!--getal:edgedekking.presence-->0<!--/getal--> | <!--getal:edgedekking.presenceZelf-->0<!--/getal--> |

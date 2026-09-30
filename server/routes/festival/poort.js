@@ -57,11 +57,11 @@ module.exports = (kern, deur) => {
      Geen managerOnly: dit is het werk van de mens bij het hek. Wel supplierAuth,
      dus het personeelslid is ingelogd op deze zaak en zijn naam gaat mee de scan
      in -- wie wie binnenliet is achteraf een vraag die gesteld wordt. */
-  app.post('/api/festival/scan', supplierAuth, (req, res) => {
+  app.post('/api/festival/scan', supplierAuth, async (req, res) => {
     const f = mijn(req);
     if (!f) return stuur(res, geenFestival);
     const b = req.body || {};
-    const r = festival.scan(f.id, editieVan(req), {
+    const r = await festival.scan(f.id, editieVan(req), {
       code: b.code, plek: b.plek, poort: b.poort, richting: b.richting,
       bewijs: Array.isArray(b.bewijs) ? b.bewijs : [],
       door: req.actor && req.actor.name,
@@ -75,12 +75,12 @@ module.exports = (kern, deur) => {
      zonder verbinding stond. Ze worden als `offline` bewaard, de vroegste wint,
      en de rest komt terug als dubbel. Er wordt niets teruggedraaid: die mensen
      staan al binnen (kern/festival/toegang.js). */
-  app.post('/api/festival/scan/bundel', supplierAuth, (req, res) => {
+  app.post('/api/festival/scan/bundel', supplierAuth, async (req, res) => {
     const f = mijn(req);
     if (!f) return stuur(res, geenFestival);
     const rijen = Array.isArray((req.body || {}).scans) ? (req.body || {}).scans : [];
     const doorNaam = req.actor && req.actor.name;
-    stuur(res, festival.scanBundel(f.id, editieVan(req), rijen.map(r => ({ ...r, door: doorNaam }))));
+    stuur(res, await festival.scanBundel(f.id, editieVan(req), rijen.map(r => ({ ...r, door: doorNaam }))));
   });
 
   /* ---- de cockpit ----

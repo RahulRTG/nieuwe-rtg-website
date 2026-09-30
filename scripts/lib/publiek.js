@@ -415,10 +415,7 @@ const ALLEEN_ANONIEM = new Map([
   ['/api/account/start', 'accountherkenning aan de poort; de `auth` ervoor stelt niets als eis'],
 
   ['/api/foundation/school/school/maak', 'een school meldt zich aan voor er een login bestaat; hij start op "wacht" tot RTG goedkeurt, met een rem per afzender'],
-  /* De reden die hier stond wees naar de uurgrens in server/routes/lesmaker.js
-     -- en dat is een ANDERE route (/api/les/maak). Deze route maakte onbeperkt
-     lessen aan. De rem staat nu op de route zelf; zie
-     test/foundation-lesrem.test.js. */
+  /* /les/maak: de rem staat op de route zelf (test/foundation-lesrem.test.js). */
   /* Wachtwoordloos herinloggen van schoolpersoneel: wie de link aanvraagt HEEFT
      per definitie geen sessie. Wat hem eerlijk houdt staat in
      server/school/personeel-inlog.js en is precies wat /api/auth/reset ook
@@ -426,13 +423,11 @@ const ALLEEN_ANONIEM = new Map([
      houdt, EN een minimale antwoordtijd, zodat het bestaan van een
      schoolaccount ook niet uit de duur volgt. Het bewijs zit in de mailbox.
 
-     WAAROM HIER EN NIET BIJ PUBLIEK, waar de andere deuren staan. Keuringsregel
-     28 leest alleen `app.post('/api/...')` met een letterlijk pad; deze route
-     hangt aan een router die onder /api/foundation is gemonteerd. Op de
-     PUBLIEK-lijst kon regel 28 hem dus nooit terugvinden en meldde hij hem als
-     een pad dat niet bestaat -- terwijl hij bestaat en gewoon opengaat. */
+     WAAROM HIER EN NIET BIJ PUBLIEK: keuringsregel 28 leest alleen
+     `app.post('/api/...')`; deze route hangt aan de router onder /api/foundation. */
   ['/api/foundation/school/personeel/inloglink', 'de wachtwoordloze herinlog van schoolpersoneel: wie hem aanvraagt heeft nog geen sessie; rem per ip, gelijk antwoord en gelijke antwoordtijd voor bekend en onbekend'],
-  ['/api/foundation/les/maak', 'bewust zonder inlog: een quizbord in de klas. Met een eigen uurgrens per IP op de route zelf -- zie server/foundation/onderwijs/les.js']
+  ['/api/foundation/les/maak', 'bewust zonder inlog: een quizbord in de klas. Met een eigen uurgrens per IP op de route zelf -- zie server/foundation/onderwijs/les.js'],
+  ['/api/foundation/les/join', 'meedoen zonder account: de 128-bit lescode IS de geloofsbrief en wordt atomair geclaimd (B17); rem per ip, plafond 60 per les']
 ]);
 
 /* De som, voor de poortwacht. Een pad dat in beide lijsten zou staan is een

@@ -17,15 +17,15 @@ Drie soorten onderdeel, en ze gedragen zich verschillend:
 
 | wereld | huis | onderdelen |
 |---|---|---|
-| **LivingOS** | `/apps/rtg.html` | 58 |
+| **LivingOS** | `/apps/rtg.html` | 59 |
 | **WorkOS** | `/apps/kantoor.html` | 17 |
 | **TravelOS** | `/apps/reizen.html` | 15 |
 | **FoundationOS** | `/apps/foundation/os-publiek.html` | 12 |
-| | **samen** | **102** |
+| | **samen** | **103** |
 
 ## LivingOS
 
-Huis: `/apps/rtg.html` — 58 onderdelen.
+Huis: `/apps/rtg.html` — 59 onderdelen.
 
 | onderdeel | soort | komt uit op |
 |---|---|---|
@@ -35,6 +35,7 @@ Huis: `/apps/rtg.html` — 58 onderdelen.
 | Sociaal | `link:sociaal` | `/apps/sociaal.html` |
 | Geld | `link:geldcommand` | `/apps/geld.html` |
 | RTG Media | `link:mediaos` | `/apps/media.html` |
+| RTG Veilig | `link:veilig` | `/apps/veilig.html` |
 | RTFoundation | `os:rtf` | kiezer in de app |
 | Betalen | `tab:betalen` | `/apps/app.html (stand betalen)` |
 | Wallet | `link:wallet` | `/apps/geld.html#wallet` |

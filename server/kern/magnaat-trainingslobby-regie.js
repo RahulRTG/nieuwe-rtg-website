@@ -4,7 +4,7 @@
 
 module.exports = H => {
   const { sseToCustomer, staat, tekst, publiek, metActueleStaat,
-    maakBinnen, deelnemenBinnen, mijnBinnen, acties } = H;
+    maakBinnen, deelnemenBinnen, mijnBinnen, codeBinnen, acties } = H;
   function seinNaCommit(kamerId) {
     if (typeof sseToCustomer !== 'function') return;
     const kamer = staat().kamers[tekst(kamerId, 100)];
@@ -25,6 +25,8 @@ module.exports = H => {
   const onderSlot = werk => bevestigNaCommit(metActueleStaat(werk));
   const maak = (key, invoer) => onderSlot(() => maakBinnen(key, invoer));
   const deelnemen = (key, code) => onderSlot(() => deelnemenBinnen(key, code));
+  const roteerCode = (key, kamerId) => onderSlot(() => codeBinnen(key, kamerId, false));
+  const intrekCode = (key, kamerId) => onderSlot(() => codeBinnen(key, kamerId, true));
   const kiesRol = (...args) => onderSlot(() => acties.kiesRol(...args));
   const start = (...args) => onderSlot(() => acties.start(...args));
   const actie = (...args) => onderSlot(() => acties.actie(...args));
@@ -35,5 +37,5 @@ module.exports = H => {
   const mijn = (key, kamerId) => kamerId
     ? metActueleStaat(() => mijnBinnen(key, kamerId))
     : mijnBinnen(key, null);
-  return { maak, deelnemen, kiesRol, start, actie, bedien, mijn };
+  return { maak, deelnemen, roteerCode, intrekCode, kiesRol, start, actie, bedien, mijn };
 };

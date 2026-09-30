@@ -5,7 +5,7 @@
    leraar-kind. De spraak loopt peer-to-peer (WebRTC); de server geeft
    alleen de belsignalen door, via een SSE-kanaal per klas. */
 module.exports = (sctx) => {
-  const { router, G, eigenVeld, K, S, schoon, gezinSessie } = sctx;
+  const { router, G, eigenVeld, K, S, schoon, gezinSessie, profielVan } = sctx;
 
   const klanten = new Map(); // klasCode -> Set van { res, wie: 'leraar' | 'gezin:CODE' }
   function stuur(kc, data, wie) {
@@ -31,7 +31,7 @@ module.exports = (sctx) => {
   }
   function ouderQ(q, k) {
     const g = eigenVeld(G(), String(q.code || '').toUpperCase());
-    const p = g && Object.values(g.profielen || {}).find(x => x.token === String(q.token || ''));
+    const p = g && profielVan(g, String(q.token || '')); // de ene gezinstokenvergelijking (foundation/gezinstoken.js)
     if (!p || !(p.rol === 'beheerder' || p.rol === 'ouder')) return null;
     if (!(k.leerlingen || []).some(l => l.gezinCode === g.code)) return null;
     return { wie: 'gezin:' + g.code, naam: p.naam };

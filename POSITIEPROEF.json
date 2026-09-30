@@ -1,0 +1,101 @@
+{
+  "stempel": {
+    "op": "2026-09-29T18:10:26.965Z",
+    "commit": "4ba511e4d",
+    "boomVuil": false,
+    "boomAnders": 1,
+    "instrument": "scripts/positieproef.js",
+    "node": "v22.22.2"
+  },
+  "graad": "gemeten",
+  "hoe": "een wegwerpserver met eigen datamap, een doorloop met herkenbare coordinaten per stap, en daarna de hele opslag (store.db) gelezen op die coordinaten.",
+  "grens": "Een doorloop meet wat DEZE stappen achterlaten, niet wat het huis in het algemeen bewaart; de bronmeter (POSITIESTROOM.json) ziet de rest. De ritlijn is niet gelopen. En de proef meet een verse server: termijnen die pas na dagen lopen (de bewaarveger, het bewaarbeleid) zijn hier nog niet verstreken, dus \"staat er nog\" betekent \"staat er na de taak\", niet \"staat er voor altijd\".",
+  "besturing": {
+    "inOrde": true,
+    "wat": "Een verkeersmelding bewaart met opzet de plek van de melding (NAVIGATIE.md N15, noodzakelijk). Vindt de lezer dat merkteken niet terug, dan is hij blind en zegt een rij nullen niets."
+  },
+  "stappen": [
+    {
+      "naam": "route",
+      "pad": "/api/nav/route",
+      "status": 200
+    },
+    {
+      "naam": "bestemmingen zoeken",
+      "pad": "/api/nav/bestemmingen",
+      "status": 200
+    },
+    {
+      "naam": "verkeersmelding",
+      "pad": "/api/nav/meld",
+      "status": 200
+    },
+    {
+      "naam": "onderweg start",
+      "pad": "/api/live/start",
+      "status": 200
+    },
+    {
+      "naam": "onderweg positie",
+      "pad": "/api/live/update",
+      "status": 200
+    },
+    {
+      "naam": "onderweg op de stoep",
+      "pad": "/api/live/update",
+      "status": 200
+    },
+    {
+      "naam": "onderweg stop",
+      "pad": "/api/live/stop",
+      "status": 200
+    },
+    {
+      "naam": "venster open",
+      "pad": "/api/plaats/venster",
+      "status": 200
+    },
+    {
+      "naam": "langs een andere zaak",
+      "pad": "/api/plaats/waarneem",
+      "status": 200
+    },
+    {
+      "naam": "weer weg",
+      "pad": "/api/plaats/waarneem",
+      "status": 200
+    },
+    {
+      "naam": "bij de eigen zaak",
+      "pad": "/api/plaats/waarneem",
+      "status": 200
+    },
+    {
+      "naam": "venster dicht",
+      "pad": "/api/plaats/venster/sluit",
+      "status": 200
+    }
+  ],
+  "tellers": {
+    "blijvendeNavPositie": 0,
+    "positieNaVenster": 0,
+    "passageLog": 0,
+    "aankomstUitPositie": 0,
+    "onbegrensdeRitlijn": null
+  },
+  "redenen": {
+    "passageLog": null,
+    "aankomstUitPositie": null,
+    "onbegrensdeRitlijn": "niet gelopen: een rit vraagt een vervoerder, een chauffeur en een betaling, en die wereld zet deze proef (nog) niet op -- geen meting is geen nul"
+  },
+  "vondsten": [
+    {
+      "merk": "melding",
+      "pad": "flitsMeldingen[0]"
+    }
+  ],
+  "meldingBewaard": [
+    "flitsMeldingen[0]"
+  ],
+  "onleesbaar": []
+}

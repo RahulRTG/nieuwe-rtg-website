@@ -7,6 +7,7 @@ module.exports = (kern) => {
   const horeca = require('../../kern/horeca')(kern);
   const beeld = require('../../kern/eten/orderbeeld');
   const partnerwerk = require('../../kern/eten/partnerwerk')(kern, horeca);
+  const korting = kern.etenKorting; // kern/eten/kortingscode.js, een instantie (opzet/kernlaag5f.js)
 
   const doos = code => horeca.H(code);
   /* De leesbroer van doos(). H() zet de horecadoos van een zaak neer zodra
@@ -49,11 +50,11 @@ module.exports = (kern) => {
     s.kortingscodes = Array.isArray(s.kortingscodes) ? s.kortingscodes : [];
     const code = String(schoon(b.code, 30) || '').toUpperCase().replace(/[^A-Z0-9-]/g, '');
     if (b.actie === 'bewaar-korting') {
-      if (code.length < 3) return res.status(400).json({ error:'Een kortingscode heeft minimaal drie letters of cijfers.' });
-      const procent = Math.max(0, Math.min(100, Number(b.procent) || 0));
-      const centen = Math.max(0, Math.min(100000, parseInt(b.centen, 10) || 0));
-      if (!procent && !centen) return res.status(400).json({ error:'Geef een percentage of vast kortingsbedrag.' });
-      const regel = { code, procent:procent || 0, centen:procent ? 0 : centen, actief:b.actief !== false };
+      /* Een promotiecode (deur eten.kortingscode): altijd met vervaldatum,
+         maximum en grens per lid -- zonder opgave de standaard, nooit zonder. */
+      const n = korting.normaliseer(Object.assign({}, b, { code }));
+      if (n.error) return res.status(n.status).json({ error:n.error });
+      const regel = n.regel;
       const i = s.kortingscodes.findIndex(k => String(k.code).toUpperCase() === code);
       if (i >= 0) s.kortingscodes[i] = regel; else s.kortingscodes.push(regel);
       s.kortingscodes = s.kortingscodes.slice(-30);
@@ -61,7 +62,7 @@ module.exports = (kern) => {
       s.kortingscodes = s.kortingscodes.filter(k => String(k.code).toUpperCase() !== code);
     } else return res.status(400).json({ error:'Onbekende instelling.' });
     save(); logActivity(s.code, req.actor, 'werkte een kortingscode van RTG Eten bij');
-    res.json({ ok:true, kortingscodes:s.kortingscodes });
+    res.json({ ok:true, kortingscodes:s.kortingscodes.map(k => Object.assign({}, k, { gebruik:korting.stand(s.code, k.code).gebruik })) });
   });
 
   function rekeningVan(req, res) {
@@ -132,7 +133,10 @@ module.exports = (kern) => {
     if (naar === 'geleverd') {
       rek.fulfillment.status = rek.kanaal === 'afhaal' ? 'opgehaald' : 'geleverd';
       rek.fulfillment.geleverdAt = horeca.nu();
-      if (rek.bezorg) rek.bezorg.stand = 'geleverd';
+      /* Het bezorgpunt verdwijnt bij levering (NAVIGATIE.md N20): de coordinaat
+         was er voor de rit, en na de rit is hij een stukje bewegingsspoor van
+         de gast. Het adres als tekst blijft bij de bestelling. */
+      if (rek.bezorg) { rek.bezorg.stand = 'geleverd'; rek.bezorg.lat = null; rek.bezorg.lng = null; }
     }
     audit(rek, req, 'status', null, naar); save();
     logActivity(req.supplier.code, req.actor, 'zette RTG Eten-order ' + rek.id + ' op ' + naar);

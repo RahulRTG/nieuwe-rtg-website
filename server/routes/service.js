@@ -23,8 +23,8 @@ module.exports = (kern) => {
   const { app, auth, serviceZaken, serviceLoop, serviceBevestiging, serviceKeuzes, serviceMens,
     servicePersoonlijk, serviceGesprek } = kern;
 
-  const veilig = (res, werk) => {
-    try { const r = werk(); res.status(r && r.status ? r.status : 200).json(r); }
+  const veilig = async (res, werk) => {
+    try { const r = await werk(); res.status(r && r.status ? r.status : 200).json(r); }
     catch (e) { console.error('[service]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   };
   const lijf = (req) => req.body || {};
@@ -95,9 +95,9 @@ module.exports = (kern) => {
 
   /* ------------------------------------------------------- bevestigingen -- */
   /* Wat er in de app klaarstaat om te bevestigen: welke medewerker, voor welke
-     zaak, waarvoor, en wat hij daarmee opent. Met de terugvalcode erbij -- die
-     hoort HIER en niet op het scherm van de medewerker, anders kan hij hem
-     aflezen zonder ooit iemand te spreken. */
+     zaak, waarvoor, en wat hij daarmee opent. De terugvalcode vraagt het lid
+     apart op (/bevestiging/toon): hij bestaat pas dan, wordt een keer getoond
+     en hoort nooit op het scherm van de medewerker. */
   app.post('/api/service/bevestigingen', auth, (req, res) => veilig(res, () =>
     ({ ok: true, verzoeken: serviceBevestiging.voorLid(melder(req)),
       let: 'Een verzoek geldt ' + serviceBevestiging.MINUTEN + ' minuten en werkt een keer. ' +
@@ -108,6 +108,9 @@ module.exports = (kern) => {
 
   app.post('/api/service/weiger', auth, (req, res) => veilig(res, () =>
     serviceBevestiging.weiger(kort(lijf(req).id, 40), { melder: melder(req) })));
+
+  app.post('/api/service/bevestiging/toon', auth, (req, res) => veilig(res, () =>
+    serviceBevestiging.toon(kort(lijf(req).id, 40), { melder: melder(req) })));
 
   /* ------------------------------------------------- de persoonlijke stand -- */
   /* "Werkt RTG voor mij?" -- en het antwoord is bewust kleiner dan die vraag.

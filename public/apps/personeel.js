@@ -719,7 +719,7 @@
     const kaart = $('#gateStep').querySelector('.card');
     if (!kaart || $('#kaUitn')) return;
     kaart.insertAdjacentHTML('beforeend', '<div class="k h-mt70">'+T('pd.ka.uitn','Uitnodiging van de eigenaar')+'</div>'+
-      '<div class="pinrow h-mt40"><input id="kaUitn" aria-label="'+T('pd.ka.uitn','Uitnodiging van de eigenaar')+'" autocomplete="off" autocapitalize="characters" maxlength="10" placeholder="ABCD234567">'+
+      '<div class="pinrow h-mt40"><input id="kaUitn" aria-label="'+T('pd.ka.uitn','Uitnodiging van de eigenaar')+'" autocomplete="off" autocapitalize="characters" maxlength="40" placeholder="KU.">'+
       '<button id="kaUitnGo" class="abtn">'+T('pd.ka.uitnGo','Koppel aan mijn account')+'</button></div>');
     const ga = async () => {
       $('#kaFout').textContent = '';
@@ -913,8 +913,10 @@
   let horecaOverdrachten = []; // pas van eigenaar na akkoord van de opvolger
   let wisselOpties = []; // verbonden zaken waar dit personeelslid ook op het rooster staat
   let mijnPosities = []; // eigen werkplekken (RTG-account) om tussen te wisselen na 1x aanmelden
+  let ochtend = null;     // de ochtendkaart (PERSONEEL.md par. 4): een lezing, stelt niets voor
   async function laadZaken(){
     try { zaken = await API.call('/staff/mine', {}); } catch(e){ zaken = null; }
+    try { ochtend = (await API.call('/staff/ochtend', {})).kaart || null; } catch(e){ ochtend = null; }
     try { wisselOpties = (await API.call('/supplier/wissel/opties', {})).opties || []; } catch(e){ wisselOpties = []; }
     try { mijnPosities = (await API.call('/supplier/mijn/opties', {})).posities || []; } catch(e){ mijnPosities = []; }
     try { pdContracten = (await API.call('/supplier/contracten', {})).contracten || []; } catch(e){ pdContracten = []; }
@@ -980,11 +982,23 @@
     const tasks = taskList();
     $('#todaySub').textContent = new Date().toLocaleDateString(lang()==='en'?'en-GB':'nl-NL', { weekday:'long', day:'numeric', month:'long' });
     const klok = zaken && zaken.klok;
+    /* De ochtendkaart: dezelfde kaart voor iedereen, van kantine tot eigenaar.
+       Zonder kaart (oudere server, storing) blijft de gewone dienstkop staan. */
+    const kaart = ochtend;
+    const uur = new Date().getHours();
+    const groet = uur < 12 ? T('pd.o.morgen','Goedemorgen') : uur < 18 ? T('pd.o.middag','Goedemiddag') : T('pd.o.avond','Goedenavond');
+    const graad = r => r.graad === 'gemeten' ? r.bron : r.graad === 'vermoed' ? T('pd.o.vermoed','vermoed')+' · '+r.bron : T('pd.o.onbekend','niet vast te stellen');
+    const kop = kaart
+      ? '<div class="k">'+esc(groet+(kaart.naam ? ', '+kaart.naam : ''))+'</div><div class="shift-big">'+esc(kaart.kop)+'</div>'+
+        kaart.regels.map(r => '<div class="task"><div class="t"><b>'+esc(r.tekst)+'</b><span>'+esc(graad(r))+'</span></div></div>').join('')
+      : '<div class="k">'+T('pd.myshift','Uw dienst vandaag')+'</div><div class="shift-big">'+(shift||T('pd.noshift','Geen dienst'))+'</div>';
+    const klokTekst = klok && klok.open ? T('pd.k.uit','Klok uit')
+      : '▶ '+(kaart && kaart.knop ? kaart.knop.tekst : T('pd.k.in','Klok in'));
     $('#todayWrap').innerHTML =
-      '<div class="card"><div class="k">'+T('pd.myshift','Uw dienst vandaag')+'</div><div class="shift-big">'+(shift||T('pd.noshift','Geen dienst'))+'</div>'+
+      '<div class="card">'+kop+
       (klok ? '<div style="display:flex;align-items:center;justify-content:space-between;gap:0.8rem;margin-top:0.75rem;padding-top:0.7rem;border-top:1px solid var(--line);">'+
         '<span style="font-size:0.76rem;color:var(--soft);">'+T('pd.k.vandaag','Vandaag')+' <b style="color:var(--txt);">'+klok.vandaagUren+' u</b> · '+T('pd.k.week','deze week')+' <b style="color:var(--txt);">'+klok.weekUren+' u</b></span>'+
-        '<button class="abtn'+(klok.open?'':' ghost')+'" id="klokBtn">'+(klok.open?''+T('pd.k.uit','Klok uit'):'▶ '+T('pd.k.in','Klok in'))+'</button></div>' : '')+
+        '<button class="abtn'+(klok.open?'':' ghost')+'" id="klokBtn">'+esc(klokTekst)+'</button></div>' : '')+
       pauzeBlok()+
       '</div>'+
       '<div class="card"><div class="k">'+T('pd.tasksnow','Nu aandacht nodig')+' ('+tasks.length+')</div>'+

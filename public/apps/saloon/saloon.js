@@ -94,7 +94,8 @@
       zichtbaar: function (actief) { aan = actief; vlak.hidden = !aan; if (!aan) lezer.sluit(); edge(aan, leest); },
       ontvang: function (d, vraag, aanvullen) {
         if (!d.voorkeuren) return;
-        o = d.voorkeuren; teken();
+        if (!aanvullen && w.RTGAanvraagEdgeWis) w.RTGAanvraagEdgeWis();
+        o = d.voorkeuren; document.body.dataset.saloonView = o.vorm; teken();
         var scope = JSON.stringify([vraag.modus, vraag.lens, o.bronnen, o.zoek, o.plaats, o.vorm]);
         var nieuw = 0, veranderd = 0;
         if (!aanvullen && vorigeVraag === scope) d.items.forEach(function (i) {

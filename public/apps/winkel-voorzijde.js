@@ -5,7 +5,7 @@
   'use strict';
   function nav(huidig) {
     var el = d.createElement('nav');
-    el.className = 'shop-nav'; el.setAttribute('aria-label', 'Winkel');
+    el.className = 'shop-nav rtg-edge-owned-bar'; el.setAttribute('aria-label', 'Winkel');
     el.innerHTML =
       '<a href="/apps/mall.html" data-shop="ontdekken">Ontdekken</a>' +
       '<a href="/apps/mijnmall.html#bewaard" data-shop="bewaard">Bewaard</a>' +
@@ -28,6 +28,7 @@
     };
     function open() {
       var view = (w.location.hash || '#bestellingen').slice(1);
+      if (view === 'aanvragen') view = 'meer';
       if (!teksten[view]) view = 'bestellingen';
       d.querySelectorAll('.shop-panel').forEach(function (p) { p.hidden = p.dataset.shopView !== view; });
       navEl.querySelectorAll('[data-shop]').forEach(function (a) {

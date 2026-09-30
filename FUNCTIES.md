@@ -16,14 +16,14 @@ het?**
 
 | | |
 |---|---|
-| Functieschakelaars (aan/uit per functie) | **225** in 17 categorieën |
+| Functieschakelaars (aan/uit per functie) | **226** in 17 categorieën |
 | Apps in de leden-catalogus | **89** in 8 categorieën |
 | Bedrijfsgenres | **79** in 28 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
-| Kernmodules (`server/kern/**`) | **2482** |
-| App-pagina's (`public/apps/**.html`) | **313** |
-| Testbestanden | **2183** |
+| Kernmodules (`server/kern/**`) | **2531** |
+| App-pagina's (`public/apps/**.html`) | **314** |
+| Testbestanden | **2268** |
 
 ## De vier werelden
 
@@ -54,7 +54,7 @@ ook blokkeert.
 
 ---
 
-# 1. De 225 functieschakelaars
+# 1. De 226 functieschakelaars
 
 ### Leden (RTG-app) — 27
 
@@ -81,7 +81,7 @@ ook blokkeert.
 - **Automatisch ondertitelen in een gesprek** (`ondertiteling`) — Een deelnemer laat zijn eigen stem omzetten naar tekst met een LOKAAL model; de regel komt in de meeleesbaan van het gesprek. Uit zetten laat die baan staan -- meetypen blijft werken -- maar wie doof is is dan weer afhankelijk van de anderen.  
   _voor: rtg, lifestyle, business_
 - **RTG Neiging (Mijn neigingen)** (`neiging`) — De intake die zichzelf afkapt, en de kaart met wat RTG van je denkt te weten. Zet je dit uit, dan wordt er niets meer bijgehouden en is de kaart dicht; wat er staat blijft tot je het zelf weghaalt of de bewaartermijn verloopt.  
-  _voor: rtg, lifestyle, business_
+  _voor: rtg, lifestyle, business, gast_
 - **Het Privékantoor (Lifestyle)** (`privekantoor`) — De ene app van de Lifestyle Pass: de levensgraaf over de premium-apps heen, de Control Tower met alle termijnen, het mandaat (wat mag het kantoor zelf) en zaken met een team en een tijdlijn. Uit zetten laat de onderliggende apps staan; alleen de samenhang verdwijnt.  
   _voor: lifestyle, business_
 - **Kwesties inbrengen (DemocratieOS)** (`democratie`) — Een burger brengt een kwestie in en volgt wat ermee gebeurt. Alleen voor iedereen tegelijk aan of uit: nooit per persoon, plaats, pas of canary.  
@@ -147,7 +147,7 @@ ook blokkeert.
 - **RTG Commerce (mand & retour)** (`commerce`) — De verkooplaag boven de domeinen: wat er te koop staat en wat NIET met de reden erbij, een mand over verkopers heen met een afrekening per verkoper, de overdracht naar de deur die bevestigt, en de weg terug. RTG bevestigt hier zelf niets.  
   _voor: rtg, lifestyle, business_
 
-### Eigen apps — 43
+### Eigen apps — 44
 
 - **Spelen (spellen met vrienden)** (`spellen`) — Alle spellen: schaken, dammen, rummi, Magnaat, sudoku en de partyspellen.  
   _voor: rtg, lifestyle, business, foundation_
@@ -231,6 +231,8 @@ ook blokkeert.
   _voor: rtg, lifestyle, business_
 - **Mijn loopbaan (het carriere ledger)** (`carriereledger`) — De loopbaan van een mens als chronologische reeks: wat er gebeurde, wanneer, en wie dat heeft bevestigd. Per regel staat erbij wat die bevestiging WEL en NIET zegt -- RTG stelt niets vast over de prestatie zelf. Een regel is apart te delen met een code die verloopt, zodat een sponsor of een bond een titel kan nakijken zonder het hele dossier te zien. Er staat nergens een cijfer op de mens.  
   _voor: rtg, lifestyle, business_
+- **Rust (Thuisrust)** (`rust`) — Stilte die vanzelf eindigt, terwijl je kring erdoor komt. Hoe lang iemand hem gebruikt, meet RTG niet.  
+  _voor: rtg, lifestyle, business, gast_
 - **Ontdekken (leren, doen, doorgeven)** (`connect`) — Een ontdeklijst die wordt samengesteld uit lagen die RTG al heeft: leerstof en wat er in de buurt gebeurt. Bezit zelf geen inhoud. Er wordt niets gerangschikt en er staat geen cijfer op iets of iemand; elke plek zegt welke motor hem koos en waarom. Wat u hebt gezien, begrepen, geoefend, gemaakt of doorgegeven blijft als lijst staan -- nooit als niveau, en nooit vergeleken met iemand anders. Uitzetten haalt uw leerdossier niet weg; het sluit alleen de ingang.  
   _voor: rtg, lifestyle, business, foundation_
 - **RTG Academy (leren, bewijzen, certificeren)** (`leerhuis`) — Het leerhuis: van rol en officiele kennis via oefenen, simulatie, werk onder toezicht en een onafhankelijke beoordeling naar een certificaat, en terug via verbetervoorstellen uit de praktijk. Staat uit tot de besluiten in ACADEMY.md par. 5 zijn uitgevoerd. Een certificaat verleent geen bevoegdheid; het maakt iemand hoogstens geschikt volgens een beleid dat twee mensen hebben vastgesteld.  

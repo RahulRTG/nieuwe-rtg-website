@@ -54,7 +54,7 @@ const GENRE_VERDIEPING = {
   jet: 'reizen', helikopter: 'reizen', activiteit: 'reizen',
   bar: 'uitgaan', club: 'uitgaan', beachclub: 'uitgaan', events: 'uitgaan', theater: 'uitgaan',
   taxi: 'mobiliteit', verhuur: 'mobiliteit', tweewielers: 'mobiliteit', charter: 'mobiliteit',
-  wellness: 'beauty', beauty: 'beauty', kapper: 'beauty',
+  wellness: 'beauty', beauty: 'beauty', beautysalon: 'beauty', beautymedical: 'beauty', kapper: 'beauty',
   zzp: 'diensten', bouw: 'diensten', juridisch: 'diensten', financieel: 'diensten',
   sportclub: 'sport', sport: 'sport',
   zorg: 'zorg', huisarts: 'zorg', tandarts: 'zorg', apotheek: 'zorg',

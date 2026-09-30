@@ -54,8 +54,7 @@ const ROUTES = [
     naam: 'LivingOS Agenda', pad: '/apps/agenda.html', wereld: 'living',
     context: ['native-header', 'duimbalk'],
     oud: [
-      'body > header:not(.rtg-edge-top)', '[data-rtg-screen-surface] > header:not(.rtg-edge-top)',
-      'body > .rtg-duimbalk', 'body > .rtgdeel-balk',
+      'body > header:not(.rtg-edge-top)', 'body > .rtg-duimbalk', 'body > .rtgdeel-balk',
       'body > .ios-thuis', '#osMenuBtn'
     ]
   },
@@ -63,8 +62,7 @@ const ROUTES = [
     naam: 'TravelOS Reisboek', pad: '/apps/reisboek.html', wereld: 'travel',
     context: ['native-header'],
     oud: [
-      'body > header:not(.rtg-edge-top)', '[data-rtg-screen-surface] > header:not(.rtg-edge-top)',
-      '.tos-topbar', '.tos-nav',
+      'body > header:not(.rtg-edge-top)', '.tos-topbar', '.tos-nav',
       'body > .rtgdeel-balk', 'body > .ios-thuis', '#osMenuBtn'
     ]
   },
@@ -155,7 +153,6 @@ function schermToestand(route) {
     contextOpenAttr: document.body.hasAttribute('data-rtg-edge-2-context-open'),
     contextTokens, contextBuitenSlot, oudZichtbaar,
     contextHandelingen: slot ? slot.querySelectorAll('a[href],button,input,select,textarea,[tabindex]:not([tabindex="-1"])').length : 0,
-    kaderOnder: (() => { const k = document.querySelector('.wd-shell'); return k ? parseFloat(getComputedStyle(k).marginBottom) || 0 : null; })(),
     padding: {
       top: parseFloat(cs.paddingTop) || 0, right: parseFloat(cs.paddingRight) || 0,
       bottom: parseFloat(cs.paddingBottom) || 0, left: parseFloat(cs.paddingLeft) || 0
@@ -248,20 +245,6 @@ function assertInsets(overzicht, compact, focus, mobiel, label) {
   }
 }
 
-/* In het wereldkader reserveert niet de body maar het kader zelf de randen: de
-   body houdt de hoogte van de bovenrand vast (in elke stand dezelfde, anders
-   springt de inhoud bij elke wissel), en .wd-shell houdt onderaan ruimte vrij
-   voor de zwevende Edge. Mobiel is er geen zijrand om vrij te houden. */
-function assertKaderInsets(overzicht, compact, focus, label) {
-  assert.ok(overzicht.padding.top >= 40, label + ': het kader reserveert de bovenrand niet');
-  assert.equal(compact.padding.top, overzicht.padding.top, label + ': het kader springt bij compact');
-  assert.equal(focus.padding.top, overzicht.padding.top, label + ': het kader springt bij focus');
-  for (const [naam, m] of [['overzicht', overzicht], ['compact', compact], ['focus', focus]]) {
-    assert.ok(m.kaderOnder >= 40, label + ' · ' + naam + ': het kader houdt onderaan geen ruimte vrij voor de Edge (' + m.kaderOnder + ')');
-    assert.ok(m.padding.left <= 4, label + ' · ' + naam + ': het kader reserveert nog ruimte voor een verborgen zijrand');
-  }
-}
-
 async function controleerContextlade(page, label, route) {
   await require('./helper').edgeActies(page);
   await page.waitForFunction(() => document.body.hasAttribute('data-rtg-edge-2-context-open') &&
@@ -319,19 +302,6 @@ async function controleerRoute(page, route, scherm) {
   const desktopHome = scherm.naam === 'desktop' &&
     await page.locator('body').getAttribute('data-rtg-desktop') !== null;
   const verwachtOverzicht = { ...scherm.overzicht, ...(desktopHome ? { side: false } : {}) };
-  /* HET WERELDKADER (#413, shared/rtg-world-desktop.*) staat sinds de warme
-     presentatie op ELK scherm, op bureau en telefoon. Zijn bovenrand hoort bij
-     het kader en niet bij de Edge-stand: rtg-edge-2.css verbergt hem in compact
-     en focus alleen buiten `data-rtg-desktop`, en de desktopaudit
-     (scripts/desktop-audit.js, 'nonstandard-top-inset') eist dat het kader op
-     elk scherm op dezelfde hoogte begint -- ook op schermen die in compact
-     openen (camera, office, app.html). Dat is een ontwerpkeuze van het kader,
-     geen lek: in dat kader blijft de bovenrand dus zichtbaar in compact en
-     focus, en geeft compact geen bovenruimte terug. Wat compact en focus hier
-     WEL moeten doen, blijft even streng: zijrand weg, onderrand blijft, de
-     herstelgreep verschijnt, oude chrome keert niet terug. */
-  const kader = await page.locator('body').getAttribute('data-rtg-desktop') !== null;
-  const bovenInRust = kader;
   await zetStand(page, 'overview', { ...verwachtOverzicht, reveal: false });
   const overzicht = await page.evaluate(schermToestand, route);
   assertEenRand(overzicht, label + ' · overzicht');
@@ -344,25 +314,24 @@ async function controleerRoute(page, route, scherm) {
   assertContext(overzicht, route, label);
   if (scherm.naam === 'desktop') await controleerContextlade(page, label, route);
 
-  await zetStand(page, 'compact', { top: bovenInRust, side: false, bottom: true, reveal: false });
+  await zetStand(page, 'compact', { top: false, side: false, bottom: true, reveal: false });
   const compact = await page.evaluate(schermToestand, route);
   assertEenRand(compact, label + ' · compact');
-  assertStand(compact, { top: bovenInRust, side: false, bottom: true, reveal: false }, label + ' · compact');
+  assertStand(compact, { top: false, side: false, bottom: true, reveal: false }, label + ' · compact');
   assert.equal(compact.randHerstelZichtbaar, 1,
     label + ': alleen de bovenrandgreep hoort naast de vaste adaptieve Edge raakbaar te zijn');
   assert.deepEqual(compact.oudZichtbaar, [], label + ' · compact: oude chrome keert terug');
 
   await page.click('.rtg-edge-2-edge-reveal--top');
   await wachtOpStand(page, 'overview', { ...verwachtOverzicht, reveal: false });
-  await zetStand(page, 'compact', { top: bovenInRust, side: false, bottom: true, reveal: false });
+  await zetStand(page, 'compact', { top: false, side: false, bottom: true, reveal: false });
 
-  await zetStand(page, 'focus', { top: bovenInRust, side: false, bottom: true, reveal: true });
+  await zetStand(page, 'focus', { top: false, side: false, bottom: true, reveal: true });
   const focus = await page.evaluate(schermToestand, route);
   assertEenRand(focus, label + ' · focus');
-  assertStand(focus, { top: bovenInRust, side: false, bottom: true, reveal: true }, label + ' · focus');
+  assertStand(focus, { top: false, side: false, bottom: true, reveal: true }, label + ' · focus');
   assert.deepEqual(focus.oudZichtbaar, [], label + ' · focus: oude chrome keert terug');
-  if (kader) assertKaderInsets(overzicht, compact, focus, label);
-  else assertInsets(overzicht, compact, focus, scherm.naam === 'mobiel' || desktopHome, label);
+  assertInsets(overzicht, compact, focus, scherm.naam === 'mobiel' || desktopHome, label);
 
   /* Beide beloofde uitwegen uit focus zijn echte invoerwegen. Na elke weg is
      dezelfde Edge hersteld; er wordt dus geen tweede casco opgebouwd. */
@@ -372,7 +341,7 @@ async function controleerRoute(page, route, scherm) {
   assertEenRand(hersteld, label + ' · herstelklik');
   assertStand(hersteld, { ...verwachtOverzicht, reveal: false }, label + ' · herstelklik');
 
-  await zetStand(page, 'focus', { top: bovenInRust, side: false, bottom: true, reveal: true });
+  await zetStand(page, 'focus', { top: false, side: false, bottom: true, reveal: true });
   await page.keyboard.press('Escape');
   await wachtOpStand(page, 'overview', { ...verwachtOverzicht, reveal: false });
   hersteld = await page.evaluate(schermToestand, route);

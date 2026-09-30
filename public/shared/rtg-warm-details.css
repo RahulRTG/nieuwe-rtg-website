@@ -25,6 +25,8 @@ body[data-rtg-desktop][data-rtg-edge-2-hoofdactie="edge"] .wd-page>.rtg-duimbalk
 body[data-rtg-desktop] .wd-page #editor.aan{height:680px!important;min-height:680px}
 body[data-rtg-desktop] .wd-page .first-message:not([hidden]){position:relative!important;inset:auto!important}
 @container(max-width:700px){.wd-page .bestel-layout{grid-template-columns:minmax(0,1fr)!important}.wd-page .bestel-layout .zij{position:relative;top:auto}}
+body[data-rtg-desktop]:is([data-rtg-edge-2-state="compact"],[data-rtg-edge-2-state="focus"]) .rtg-edge-top{opacity:0!important;pointer-events:none!important}
+body[data-rtg-layout="standard"][data-rtg-skin="heritage"][data-rtg-world][data-rtg-desktop]:is([data-rtg-edge-2-state="compact"],[data-rtg-edge-2-state="focus"]){padding-top:0!important}
 
 body[data-rtg-desktop] .wd-page>#shell{width:100%!important;max-width:100%!important}
 

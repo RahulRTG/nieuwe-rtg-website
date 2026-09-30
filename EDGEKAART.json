@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-29T15:00:35.534Z",
-    "commit": "1c747985f",
-    "boomVuil": false,
-    "boomAnders": 1,
+    "op": "2026-09-30T03:40:58.892Z",
+    "commit": "5a6125c06",
+    "boomVuil": true,
+    "boomAnders": 4,
     "instrument": "scripts/edgekaart.js",
     "node": "v24.18.0"
   },
@@ -2645,7 +2645,7 @@
           "rol": "schrijft",
           "etiket": "onderbalk:s",
           "wat": "de Edge bezit een appbalk",
-          "citaat": "rt.body.setAttribute('data-rtg-edge-appbar', 'true');"
+          "citaat": "rt.body.setAttribute('data-rtg-edge-appbar', 'actions');"
         }
       ],
       "verantwoordelijkheden": [

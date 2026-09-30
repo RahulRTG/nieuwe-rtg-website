@@ -1,5 +1,5 @@
-/* Eén onderrand: bestaande appknoppen verhuizen intact naar de witte Edge.
-   Er worden geen knoppen gekloond; de app houdt haar eigen gedrag en staat. */
+/* Eén onderrand: bestaande appknoppen blijven intact als verborgen bron voor
+   Acties. De normale Edge wijkt nooit voor een schermspecifieke tweede balk. */
 (function (w, d) {
   'use strict';
 
@@ -40,7 +40,10 @@
     rt.balken.push({ el: el, ouder: el.parentNode, volgende: el.nextSibling });
     el.classList.add('rtg-edge-owned-bar');
     rt.slot.appendChild(el);
-    rt.body.setAttribute('data-rtg-edge-appbar', 'true');
+    /* `actions` is bewust niet de oude stand `true`: die oude stand verving
+       Home, Werelden en Acties door de appbalk. Nu houdt ieder zelfstandig
+       scherm de normale Edge en oogst Adaptive Edge deze echte bronknoppen. */
+    rt.body.setAttribute('data-rtg-edge-appbar', 'actions');
   }
 
   function scan(rt) {

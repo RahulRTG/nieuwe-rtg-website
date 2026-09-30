@@ -41,6 +41,10 @@
     'html.rtg-command-mobiel body[data-rtg-world="travel"] .hoofdtabs,' +
     'html.rtg-command-mobiel .tos-nav' +
     '{display:none!important}' +
+    /* Een werkblad tekent nooit een tweede Edge in zijn eigen scrollbaan.
+       De ouder oogst de knoppen uit deze balk en biedt ze in zijn ene Edge
+       aan; de functies verdwijnen dus niet wanneer de lokale kopie verdwijnt. */
+    'html.rtg-command-blad [data-rtg-edge-bar]{display:none!important}' +
     'html.rtg-command-blad body[data-rtg-world="travel"] .hoofdtabs{display:none!important}' +
     'html.rtg-command-blad:has(body[data-rtg-world="travel"]){--nav:0px!important}' +
     'html.rtg-command-blad:has(body.travel-os){--tos-bottom:0px!important;--tos-rail:0px!important}';

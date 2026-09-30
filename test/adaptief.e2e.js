@@ -294,3 +294,87 @@ test('de contextuele schilbalk', { skip: geenBrowser(pw), concurrency: false }, 
     });
   });
 });
+
+test('een appblad heeft één scrollbaan en één Edge', { skip: geenBrowser(pw) }, async () => {
+  /* Geld droeg in Command zijn eigen vaste standenbalk mee, terwijl de schil
+     daaronder al de universele Edge tekende. De lokale balk blijft in de DOM
+     als bron voor zijn echte handlers, maar is in het blad weg en wordt door
+     de ene Edge bediend. Standalone verandert hierdoor niet. */
+  await metLid(390, 844, async (page) => {
+    await page.evaluate(() => window.RTGCommand.open('/apps/geld.html', 'Geld'));
+    await page.waitForFunction(() => {
+      const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
+      const doc = f && f.contentDocument;
+      return doc && doc.documentElement &&
+        doc.documentElement.classList.contains('rtg-command-blad') && doc.querySelector('#standen');
+    }, null, { timeout: 20000 });
+
+    const voor = await page.evaluate(() => {
+      const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
+      const doc = f.contentDocument, balk = doc.querySelector('#standen');
+      return {
+        lokaleBalk: f.contentWindow.getComputedStyle(balk).display,
+        inhoudRuimte: f.contentWindow.getComputedStyle(doc.querySelector('#inhoud')).paddingBottom
+      };
+    });
+    assert.equal(voor.lokaleBalk, 'none', 'de ingebedde app tekent nog een tweede Edge');
+    assert.ok(parseFloat(voor.inhoudRuimte) < 80,
+      'het werkblad reserveert nog de lege hoogte van zijn verborgen balk: ' + voor.inhoudRuimte);
+
+    await page.evaluate(() => {
+      window.scrollTo(0, 0);
+      document.querySelector('#rtgCommand .cmd-pane.actief iframe').contentWindow.scrollTo(0, 0);
+    });
+    await page.mouse.move(195, 420);
+    await page.mouse.wheel(0, 500);
+    await page.waitForFunction(() => {
+      const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
+      return f && f.contentWindow.scrollY > 0;
+    }, null, { timeout: 5000 });
+    const banen = await page.evaluate(() => ({
+      ouder: window.scrollY,
+      blad: document.querySelector('#rtgCommand .cmd-pane.actief iframe').contentWindow.scrollY
+    }));
+    assert.equal(banen.ouder, 0, 'de appschil scrolt naast het actieve werkblad');
+    assert.ok(banen.blad > 0, 'de inhoud van het actieve werkblad scrolt niet');
+
+    await require('./helper').edgeActies(page);
+    const acties = await page.locator('.rtg-adaptive-controls .rtg-adaptive-sheet-action')
+      .evaluateAll((els) => els.map((el) => el.textContent.trim()));
+    for (const naam of ['Overzicht', 'Betalen', 'Vooruit', 'Meer'])
+      assert.ok(acties.includes(naam), naam + ' ontbreekt in de ene Edge: ' + acties.join(' | '));
+
+    await page.locator('.rtg-adaptive-controls .rtg-adaptive-sheet-action', { hasText: 'Betalen' }).click();
+    await page.waitForFunction(() => {
+      const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
+      return f && f.contentWindow.location.hash === '#betalen';
+    }, null, { timeout: 5000 });
+  });
+});
+
+test('een zelfstandige app gebruikt dezelfde normale Edge', { skip: geenBrowser(pw) }, async () => {
+  await metLid(390, 844, async (page, base) => {
+    await page.goto(base + '/apps/geld.html', { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('body[data-rtg-edge-appbar="actions"][data-rtg-adaptive-ready="true"]',
+      { timeout: 20000 });
+
+    assert.equal(await page.locator('#standen').isVisible(), false,
+      'de zelfstandige app toont nog een eigen balk naast de Edge');
+    assert.equal(await page.locator('.rtg-edge-appslot:visible').count(), 0,
+      'de oude appslot vervangt nog steeds de normale Edge');
+    assert.equal(await page.locator('.rtg-adaptive-bar:visible').count(), 1,
+      'de zelfstandige app heeft niet precies één normale Edge');
+    for (const actie of ['home', 'worlds', 'ai', 'context', 'menu']) {
+      assert.equal(await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="' + actie + '"]:visible').count(), 1,
+        actie + ' ontbreekt in de normale Edge');
+    }
+
+    await require('./helper').edgeActies(page);
+    const acties = await page.locator('.rtg-adaptive-controls .rtg-adaptive-sheet-action')
+      .evaluateAll((els) => els.map((el) => el.textContent.trim()));
+    for (const naam of ['Overzicht', 'Betalen', 'Vooruit', 'Meer'])
+      assert.ok(acties.includes(naam), naam + ' ontbreekt achter Acties: ' + acties.join(' | '));
+    await page.locator('.rtg-adaptive-controls .rtg-adaptive-sheet-action', { hasText: 'Betalen' }).click();
+    await page.waitForFunction(() => location.hash === '#betalen', null, { timeout: 5000 });
+  });
+});

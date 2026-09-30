@@ -764,7 +764,7 @@ omlaag.
 
 ## `shared/metgezel.js`
 
-`public/shared/metgezel/` -- 9 delen, 802 regels in de delen
+`public/shared/metgezel/` -- 9 delen, 801 regels in de delen
 
 | deel | onderwerp |
 |---|---|

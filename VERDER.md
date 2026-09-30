@@ -400,7 +400,7 @@ graad erbij.
 | V2 | `sluitbaar` in de klassen van RTG Service heeft **geen enkele lezer**. Het commentaar ernaast verwijst naar een `sluit()` in `zaak.js` die niet bestaat, dus een klacht die "niet sluitbaar" is, kan gewoon op klaar. | `service/klassen.js` | **gemeten**: nul lezers |
 | V3 | Het besluit "gestopt" in het Living Lab neemt de naam van de beslisser uit het **verzoek** (`b.door`) en niet uit de sessie, terwijl de sessie wel wordt meegegeven. AUTHORITY.md: de actor van een auditregel komt uit de sessie. | `livinglab/cyclus.js` `besluitZet` | **gemeten** |
 | V4 | Niets toetst dat wie een vakbewijs aftekent niet de betrokkene zelf is. | `vakbewijs-aftekenen.js` | **vermoed**: vraagt een kantoormens met een eigen vakbewijs |
-| V5 | Inschrijven en inchecken bij een activiteit laten geen auditregel na; alleen afmelden doet dat. | `rtfos/activiteiten-deur.js` | **gemeten** |
+| V5 | Inschrijven en inchecken bij een activiteit laten geen auditregel na; alleen afmelden en een nieuwe incheckcode doen dat. | `rtfos/activiteiten-deur.js` | **gemeten** |
 | V6 | Het leerhuis (bewezen competentie) en persoonseis/vakbewijs (afgetekende bevoegdheid) zijn niet verbonden. ACADEMY.md par. 5 laat dat open. | `leerhuis/brug.js`, `persoonseis.js` | **gemeten** |
 | V7 | Een verbetering stroomt nooit terug naar de blauwdruk waar een project uit kwam. `uitBlauwdruk` wordt nergens gelezen. | `rtfos/netwerk.js` | **gemeten** |
 | V8 | Een gestopt RTF-project laat geen les achter. | `rtfos/projecten-besluit.js` | **gemeten** |

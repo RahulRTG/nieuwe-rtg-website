@@ -273,7 +273,7 @@ const OVERGANGEN = [
       naar: d(K + 'rtfos/activiteiten-deur.js', 'function inschrijven('),
       voorwaarden: d(K + 'rtfos/activiteiten-deur.js', 'wachtlijst',
         'Vol is geen weigering: wie te laat is, komt op de wachtlijst.'),
-      actor: d(K + 'rtfos/activiteiten-deur.js', 'wie(req)',
+      actor: d(K + 'rtfos/activiteiten-deur.js', 'wieIn(req, staat)',
         'De actor is de medewerker uit de sessie, en niet de bezoeker: inschrijven is een kantoorhandeling.'),
       bevoegdheid: p(K + 'rtfos/activiteiten-deur.js', "'project.beheren'"),
       actie: d(K + 'rtfos/activiteiten-deur.js', 'function inchecken('),

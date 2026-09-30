@@ -15063,6 +15063,22 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "overgangsrekening.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/overgangsrekening.js",
+      "operator": "===->!==#0",
+      "gezakt": 6,
+      "geprobeerd": 1
+    },
+    "overgangsvorm.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/overgangsvorm.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 1
     }
   }
 }

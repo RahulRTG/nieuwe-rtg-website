@@ -1,0 +1,3166 @@
+{
+  "stempel": {
+    "op": "2026-09-30T06:58:34.697Z",
+    "commit": "e7da7900",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/overgangsvorm.js",
+    "node": "v22.22.2"
+  },
+  "uitleg": "Is er EEN overgang onder werk, leren, bevoegdheid, buurtinitiatieven, kennis en blauwdrukken? Zestien overgangen tegen veertien dimensies, met een citaat per cel dat letterlijk in de code moet staan, plus proeven op de echte modules. De vraag staat in VERDER.md par. 2; de eigenaar vroeg deze meter het idee kapot te proberen te krijgen.",
+  "grens": "DE INDELING IS EEN OORDEEL: het citaat bewijst dat de code er staat, niet dat hij deze dimensie IS. Daarom staat de lexicale as ernaast en wordt elke onenigheid gemeld in plaats van beslecht. De vormas leest alleen expliciete velden (de blinde vlek van scripts/objectmodel.js) en een drager die in twee overgangen staat, deelt zijn velden met zichzelf. De proeven draaien de echte modules met een verzonnen context: ze bewijzen dat een poort dichtgaat en een besturing opengaat, niet dat de route eromheen hetzelfde doet. Een overgang zonder drager telt niet mee in de noemer.",
+  "uitkomst": "GEEN",
+  "conclusie": "GEEN UNIVERSELE OVERGANG GEVONDEN. 7 van de 14 dimensies zijn ergens een poort en elders afwezig (van, voorwaarden, bevoegdheid, bewijs, kennis, privacyklasse, menselijke_bevestiging). Een gemeenschappelijke vorm moet ze weglaten -- dan slaagt een overgang ten onrechte, en dat is op de echte code gedraaid -- of overal verplichten, en dan verzinnen overgangen een bewijs, een bevoegdheid of een les die ze niet kennen. De voorgestelde families onderscheiden zich wel van elkaar (3 van 3), en 0 ervan is dilemmavrij; van de 3 groepen die de data zelf vormt zijn dat er 0. Wat overal staat is naar, actor, actie, blokkade: iemand doet iets, er is een nieuwe stand, en een weigering zegt waarom. Dat is een VERKLARING VAN WERKWOORDEN en geen objecttype; de poorten blijven bij de domeinen die ze vandaag al hebben.",
+  "dimensies": {
+    "van": "de begintoestand wordt getoetst (je kunt deze overgang alleen maken VANUIT iets)",
+    "naar": "de eindtoestand wordt vastgelegd",
+    "voorwaarden": "een voorwaarde aan de omstandigheden of de invoer, anders dan bewijs of bevoegdheid",
+    "actor": "wie de overgang maakt, en of dat uit de sessie komt",
+    "bevoegdheid": "een rol, recht of relatie die de handelende mens moet hebben",
+    "actie": "de handeling die de overgang uitvoert",
+    "bewijs": "iets wat in de echte wereld aantoonbaar is gebeurd of vastgesteld",
+    "uitkomst": "een vastgelegd resultaat naast de nieuwe stand (een besluit, een record, een dossierregel)",
+    "blokkade": "een weigering die zegt wat er ontbreekt en wat de volgende stap is",
+    "terugweg": "een handeling die de overgang ongedaan maakt of compenseert",
+    "kennis": "de overgang vraagt of levert een les, aanpak of kennisitem",
+    "overdracht": "de overgang geeft iets door aan een andere partij, plek of mens",
+    "privacyklasse": "een expliciete privacyregel: codenaam, abstractie, minderjarigen, wat niet mee mag",
+    "menselijke_bevestiging": "een tweede mens (of de betrokkene zelf) moet bevestigen"
+  },
+  "noemer": {
+    "overgangen": 16,
+    "metDrager": 14,
+    "zonderDrager": 2
+  },
+  "kern": [
+    "naar",
+    "actor",
+    "actie",
+    "blokkade"
+  ],
+  "bijnaKern": [
+    {
+      "dimensie": "van",
+      "aanwezig": 12,
+      "zonder": [
+        "melden",
+        "kennisvoorstel"
+      ]
+    },
+    {
+      "dimensie": "voorwaarden",
+      "aanwezig": 13,
+      "zonder": [
+        "gestopt"
+      ]
+    },
+    {
+      "dimensie": "bevoegdheid",
+      "aanwezig": 13,
+      "zonder": [
+        "melden"
+      ]
+    },
+    {
+      "dimensie": "uitkomst",
+      "aanwezig": 13,
+      "zonder": [
+        "deelnemen"
+      ]
+    }
+  ],
+  "dilemmas": [
+    {
+      "dimensie": "van",
+      "poortIn": [
+        "werk",
+        "leren",
+        "bevoegd",
+        "buurtidee",
+        "blauwdruk",
+        "deelnemen",
+        "mentor",
+        "oplossen",
+        "kennis-actief",
+        "fork",
+        "gestopt",
+        "les"
+      ],
+      "afwezigIn": [
+        "melden",
+        "kennisvoorstel"
+      ]
+    },
+    {
+      "dimensie": "voorwaarden",
+      "poortIn": [
+        "werk",
+        "leren",
+        "bevoegd",
+        "buurtidee",
+        "blauwdruk",
+        "mentor",
+        "melden",
+        "oplossen",
+        "kennisvoorstel",
+        "kennis-actief",
+        "fork",
+        "les"
+      ],
+      "afwezigIn": [
+        "gestopt"
+      ]
+    },
+    {
+      "dimensie": "bevoegdheid",
+      "poortIn": [
+        "werk",
+        "leren",
+        "bevoegd",
+        "buurtidee",
+        "blauwdruk",
+        "deelnemen",
+        "mentor",
+        "oplossen",
+        "kennisvoorstel",
+        "kennis-actief",
+        "fork",
+        "gestopt",
+        "les"
+      ],
+      "afwezigIn": [
+        "melden"
+      ]
+    },
+    {
+      "dimensie": "bewijs",
+      "poortIn": [
+        "leren",
+        "bevoegd",
+        "blauwdruk",
+        "deelnemen",
+        "mentor",
+        "kennis-actief"
+      ],
+      "afwezigIn": [
+        "werk",
+        "buurtidee",
+        "melden",
+        "oplossen",
+        "fork",
+        "gestopt",
+        "les"
+      ]
+    },
+    {
+      "dimensie": "kennis",
+      "poortIn": [
+        "blauwdruk",
+        "kennisvoorstel",
+        "kennis-actief",
+        "les"
+      ],
+      "afwezigIn": [
+        "werk",
+        "leren",
+        "bevoegd",
+        "buurtidee",
+        "deelnemen",
+        "mentor",
+        "melden",
+        "oplossen",
+        "gestopt"
+      ]
+    },
+    {
+      "dimensie": "privacyklasse",
+      "poortIn": [
+        "deelnemen"
+      ],
+      "afwezigIn": [
+        "werk",
+        "buurtidee",
+        "mentor",
+        "kennisvoorstel",
+        "kennis-actief",
+        "gestopt",
+        "les"
+      ]
+    },
+    {
+      "dimensie": "menselijke_bevestiging",
+      "poortIn": [
+        "werk",
+        "leren",
+        "buurtidee",
+        "deelnemen",
+        "mentor",
+        "kennis-actief"
+      ],
+      "afwezigIn": [
+        "blauwdruk",
+        "melden",
+        "oplossen",
+        "kennisvoorstel",
+        "fork",
+        "gestopt",
+        "les"
+      ]
+    }
+  ],
+  "mutatieproef": [
+    {
+      "dimensie": "van",
+      "inVorm": false,
+      "zonderDimensieSlaagtTenOnrechte": [
+        "werk",
+        "leren",
+        "bevoegd",
+        "buurtidee",
+        "blauwdruk",
+        "deelnemen",
+        "mentor",
+        "oplossen",
+        "kennis-actief",
+        "fork",
+        "gestopt",
+        "les"
+      ],
+      "metDimensieVerzonnen": []
+    },
+    {
+      "dimensie": "naar",
+      "inVorm": true,
+      "zonderDimensieSlaagtTenOnrechte": [],
+      "metDimensieVerzonnen": []
+    },
+    {
+      "dimensie": "voorwaarden",
+      "inVorm": false,
+      "zonderDimensieSlaagtTenOnrechte": [
+        "werk",
+        "leren",
+        "bevoegd",
+        "buurtidee",
+        "blauwdruk",
+        "mentor",
+        "melden",
+        "oplossen",
+        "kennisvoorstel",
+        "kennis-actief",
+        "fork",
+        "les"
+      ],
+      "metDimensieVerzonnen": []
+    },
+    {
+      "dimensie": "actor",
+      "inVorm": true,
+      "zonderDimensieSlaagtTenOnrechte": [
+        "werk",
+        "leren",
+        "bevoegd",
+        "buurtidee",
+        "melden",
+        "oplossen",
+        "kennisvoorstel",
+        "kennis-actief",
+        "gestopt"
+      ],
+      "metDimensieVerzonnen": []
+    },
+    {
+      "dimensie": "bevoegdheid",
+      "inVorm": false,
+      "zonderDimensieSlaagtTenOnrechte": [
+        "werk",
+        "leren",
+        "bevoegd",
+        "buurtidee",
+        "blauwdruk",
+        "deelnemen",
+        "mentor",
+        "oplossen",
+        "kennisvoorstel",
+        "kennis-actief",
+        "fork",
+        "gestopt",
+        "les"
+      ],
+      "metDimensieVerzonnen": []
+    },
+    {
+      "dimensie": "actie",
+      "inVorm": true,
+      "zonderDimensieSlaagtTenOnrechte": [],
+      "metDimensieVerzonnen": []
+    },
+    {
+      "dimensie": "bewijs",
+      "inVorm": false,
+      "zonderDimensieSlaagtTenOnrechte": [
+        "leren",
+        "bevoegd",
+        "blauwdruk",
+        "deelnemen",
+        "mentor",
+        "kennis-actief"
+      ],
+      "metDimensieVerzonnen": []
+    },
+    {
+      "dimensie": "uitkomst",
+      "inVorm": false,
+      "zonderDimensieSlaagtTenOnrechte": [],
+      "metDimensieVerzonnen": []
+    },
+    {
+      "dimensie": "blokkade",
+      "inVorm": true,
+      "zonderDimensieSlaagtTenOnrechte": [],
+      "metDimensieVerzonnen": []
+    },
+    {
+      "dimensie": "terugweg",
+      "inVorm": false,
+      "zonderDimensieSlaagtTenOnrechte": [],
+      "metDimensieVerzonnen": []
+    },
+    {
+      "dimensie": "kennis",
+      "inVorm": false,
+      "zonderDimensieSlaagtTenOnrechte": [
+        "blauwdruk",
+        "kennisvoorstel",
+        "kennis-actief",
+        "les"
+      ],
+      "metDimensieVerzonnen": []
+    },
+    {
+      "dimensie": "overdracht",
+      "inVorm": false,
+      "zonderDimensieSlaagtTenOnrechte": [],
+      "metDimensieVerzonnen": []
+    },
+    {
+      "dimensie": "privacyklasse",
+      "inVorm": false,
+      "zonderDimensieSlaagtTenOnrechte": [
+        "deelnemen"
+      ],
+      "metDimensieVerzonnen": []
+    },
+    {
+      "dimensie": "menselijke_bevestiging",
+      "inVorm": false,
+      "zonderDimensieSlaagtTenOnrechte": [
+        "werk",
+        "leren",
+        "buurtidee",
+        "deelnemen",
+        "mentor",
+        "kennis-actief"
+      ],
+      "metDimensieVerzonnen": []
+    }
+  ],
+  "families": {
+    "hypothese": [
+      {
+        "familie": "toestand",
+        "leden": [
+          "werk",
+          "leren",
+          "bevoegd",
+          "buurtidee",
+          "deelnemen",
+          "mentor",
+          "melden",
+          "oplossen",
+          "gestopt"
+        ],
+        "zonderDrager": [],
+        "kern": [
+          "naar",
+          "actor",
+          "actie",
+          "blokkade"
+        ],
+        "dilemmas": [
+          "van",
+          "voorwaarden",
+          "bevoegdheid",
+          "bewijs",
+          "privacyklasse",
+          "menselijke_bevestiging"
+        ],
+        "gelijkenisBinnen": 0.717,
+        "gelijkenisBuiten": 0.659,
+        "onderscheidt": true,
+        "dilemmavrij": false,
+        "houdtStand": false
+      },
+      {
+        "familie": "overdracht",
+        "leden": [
+          "blauwdruk",
+          "fork"
+        ],
+        "zonderDrager": [
+          "upstream"
+        ],
+        "kern": [
+          "van",
+          "naar",
+          "voorwaarden",
+          "actor",
+          "bevoegdheid",
+          "actie",
+          "uitkomst",
+          "blokkade",
+          "kennis",
+          "overdracht",
+          "privacyklasse"
+        ],
+        "dilemmas": [
+          "bewijs"
+        ],
+        "gelijkenisBinnen": 0.917,
+        "gelijkenisBuiten": 0.695,
+        "onderscheidt": true,
+        "dilemmavrij": false,
+        "houdtStand": false
+      },
+      {
+        "familie": "kennis",
+        "leden": [
+          "kennisvoorstel",
+          "kennis-actief",
+          "les"
+        ],
+        "zonderDrager": [
+          "les-voorstel"
+        ],
+        "kern": [
+          "naar",
+          "voorwaarden",
+          "actor",
+          "bevoegdheid",
+          "actie",
+          "uitkomst",
+          "blokkade",
+          "kennis"
+        ],
+        "dilemmas": [
+          "van",
+          "bewijs",
+          "menselijke_bevestiging"
+        ],
+        "gelijkenisBinnen": 0.73,
+        "gelijkenisBuiten": 0.675,
+        "onderscheidt": true,
+        "dilemmavrij": false,
+        "houdtStand": false
+      }
+    ],
+    "afgeleid": {
+      "drempel": 0.6,
+      "groepen": [
+        {
+          "leden": [
+            "bevoegd",
+            "buurtidee",
+            "deelnemen",
+            "kennis-actief",
+            "leren",
+            "mentor",
+            "werk"
+          ],
+          "kern": [
+            "van",
+            "naar",
+            "voorwaarden",
+            "actor",
+            "bevoegdheid",
+            "actie",
+            "blokkade",
+            "terugweg",
+            "menselijke_bevestiging"
+          ],
+          "dilemmas": [
+            "bewijs",
+            "kennis",
+            "privacyklasse"
+          ]
+        },
+        {
+          "leden": [
+            "blauwdruk",
+            "fork",
+            "kennisvoorstel",
+            "melden",
+            "oplossen"
+          ],
+          "kern": [
+            "naar",
+            "voorwaarden",
+            "actor",
+            "actie",
+            "uitkomst",
+            "blokkade",
+            "overdracht"
+          ],
+          "dilemmas": [
+            "van",
+            "bevoegdheid",
+            "bewijs",
+            "kennis"
+          ]
+        },
+        {
+          "leden": [
+            "gestopt",
+            "les"
+          ],
+          "kern": [
+            "van",
+            "naar",
+            "actor",
+            "bevoegdheid",
+            "actie",
+            "uitkomst",
+            "blokkade"
+          ],
+          "dilemmas": [
+            "voorwaarden",
+            "kennis"
+          ]
+        }
+      ]
+    },
+    "samenvallen": [
+      {
+        "familie": "toestand",
+        "afgeleideGroepen": 3,
+        "zuiver": false
+      },
+      {
+        "familie": "overdracht",
+        "afgeleideGroepen": 1,
+        "zuiver": false
+      },
+      {
+        "familie": "kennis",
+        "afgeleideGroepen": 3,
+        "zuiver": false
+      }
+    ],
+    "paren": [
+      {
+        "paar": [
+          "leren",
+          "bevoegd"
+        ],
+        "gelijkenis": 1
+      },
+      {
+        "paar": [
+          "mentor",
+          "kennis-actief"
+        ],
+        "gelijkenis": 0.923
+      },
+      {
+        "paar": [
+          "werk",
+          "mentor"
+        ],
+        "gelijkenis": 0.917
+      },
+      {
+        "paar": [
+          "leren",
+          "deelnemen"
+        ],
+        "gelijkenis": 0.917
+      },
+      {
+        "paar": [
+          "bevoegd",
+          "deelnemen"
+        ],
+        "gelijkenis": 0.917
+      },
+      {
+        "paar": [
+          "blauwdruk",
+          "fork"
+        ],
+        "gelijkenis": 0.917
+      },
+      {
+        "paar": [
+          "werk",
+          "buurtidee"
+        ],
+        "gelijkenis": 0.909
+      },
+      {
+        "paar": [
+          "werk",
+          "kennis-actief"
+        ],
+        "gelijkenis": 0.846
+      },
+      {
+        "paar": [
+          "leren",
+          "mentor"
+        ],
+        "gelijkenis": 0.846
+      },
+      {
+        "paar": [
+          "bevoegd",
+          "mentor"
+        ],
+        "gelijkenis": 0.846
+      },
+      {
+        "paar": [
+          "werk",
+          "oplossen"
+        ],
+        "gelijkenis": 0.833
+      },
+      {
+        "paar": [
+          "leren",
+          "buurtidee"
+        ],
+        "gelijkenis": 0.833
+      },
+      {
+        "paar": [
+          "bevoegd",
+          "buurtidee"
+        ],
+        "gelijkenis": 0.833
+      },
+      {
+        "paar": [
+          "buurtidee",
+          "mentor"
+        ],
+        "gelijkenis": 0.833
+      },
+      {
+        "paar": [
+          "blauwdruk",
+          "kennisvoorstel"
+        ],
+        "gelijkenis": 0.833
+      },
+      {
+        "paar": [
+          "oplossen",
+          "fork"
+        ],
+        "gelijkenis": 0.833
+      },
+      {
+        "paar": [
+          "fork",
+          "les"
+        ],
+        "gelijkenis": 0.818
+      },
+      {
+        "paar": [
+          "leren",
+          "kennis-actief"
+        ],
+        "gelijkenis": 0.786
+      },
+      {
+        "paar": [
+          "bevoegd",
+          "kennis-actief"
+        ],
+        "gelijkenis": 0.786
+      },
+      {
+        "paar": [
+          "blauwdruk",
+          "kennis-actief"
+        ],
+        "gelijkenis": 0.786
+      },
+      {
+        "paar": [
+          "gestopt",
+          "les"
+        ],
+        "gelijkenis": 0.778
+      },
+      {
+        "paar": [
+          "werk",
+          "leren"
+        ],
+        "gelijkenis": 0.769
+      },
+      {
+        "paar": [
+          "werk",
+          "bevoegd"
+        ],
+        "gelijkenis": 0.769
+      },
+      {
+        "paar": [
+          "leren",
+          "oplossen"
+        ],
+        "gelijkenis": 0.769
+      },
+      {
+        "paar": [
+          "bevoegd",
+          "oplossen"
+        ],
+        "gelijkenis": 0.769
+      },
+      {
+        "paar": [
+          "buurtidee",
+          "kennis-actief"
+        ],
+        "gelijkenis": 0.769
+      },
+      {
+        "paar": [
+          "blauwdruk",
+          "oplossen"
+        ],
+        "gelijkenis": 0.769
+      },
+      {
+        "paar": [
+          "deelnemen",
+          "mentor"
+        ],
+        "gelijkenis": 0.769
+      },
+      {
+        "paar": [
+          "mentor",
+          "oplossen"
+        ],
+        "gelijkenis": 0.769
+      },
+      {
+        "paar": [
+          "kennisvoorstel",
+          "kennis-actief"
+        ],
+        "gelijkenis": 0.769
+      },
+      {
+        "paar": [
+          "buurtidee",
+          "deelnemen"
+        ],
+        "gelijkenis": 0.75
+      },
+      {
+        "paar": [
+          "buurtidee",
+          "oplossen"
+        ],
+        "gelijkenis": 0.75
+      },
+      {
+        "paar": [
+          "blauwdruk",
+          "les"
+        ],
+        "gelijkenis": 0.75
+      },
+      {
+        "paar": [
+          "kennisvoorstel",
+          "fork"
+        ],
+        "gelijkenis": 0.75
+      },
+      {
+        "paar": [
+          "buurtidee",
+          "les"
+        ],
+        "gelijkenis": 0.727
+      },
+      {
+        "paar": [
+          "melden",
+          "oplossen"
+        ],
+        "gelijkenis": 0.727
+      },
+      {
+        "paar": [
+          "melden",
+          "fork"
+        ],
+        "gelijkenis": 0.727
+      },
+      {
+        "paar": [
+          "kennisvoorstel",
+          "les"
+        ],
+        "gelijkenis": 0.727
+      },
+      {
+        "paar": [
+          "leren",
+          "blauwdruk"
+        ],
+        "gelijkenis": 0.714
+      },
+      {
+        "paar": [
+          "bevoegd",
+          "blauwdruk"
+        ],
+        "gelijkenis": 0.714
+      },
+      {
+        "paar": [
+          "blauwdruk",
+          "mentor"
+        ],
+        "gelijkenis": 0.714
+      },
+      {
+        "paar": [
+          "deelnemen",
+          "kennis-actief"
+        ],
+        "gelijkenis": 0.714
+      },
+      {
+        "paar": [
+          "oplossen",
+          "kennis-actief"
+        ],
+        "gelijkenis": 0.714
+      },
+      {
+        "paar": [
+          "kennis-actief",
+          "fork"
+        ],
+        "gelijkenis": 0.714
+      },
+      {
+        "paar": [
+          "buurtidee",
+          "gestopt"
+        ],
+        "gelijkenis": 0.7
+      },
+      {
+        "paar": [
+          "werk",
+          "deelnemen"
+        ],
+        "gelijkenis": 0.692
+      },
+      {
+        "paar": [
+          "werk",
+          "fork"
+        ],
+        "gelijkenis": 0.692
+      },
+      {
+        "paar": [
+          "deelnemen",
+          "oplossen"
+        ],
+        "gelijkenis": 0.692
+      },
+      {
+        "paar": [
+          "mentor",
+          "kennisvoorstel"
+        ],
+        "gelijkenis": 0.692
+      },
+      {
+        "paar": [
+          "kennis-actief",
+          "les"
+        ],
+        "gelijkenis": 0.692
+      },
+      {
+        "paar": [
+          "werk",
+          "les"
+        ],
+        "gelijkenis": 0.667
+      },
+      {
+        "paar": [
+          "blauwdruk",
+          "melden"
+        ],
+        "gelijkenis": 0.667
+      },
+      {
+        "paar": [
+          "oplossen",
+          "les"
+        ],
+        "gelijkenis": 0.667
+      },
+      {
+        "paar": [
+          "werk",
+          "blauwdruk"
+        ],
+        "gelijkenis": 0.643
+      },
+      {
+        "paar": [
+          "leren",
+          "fork"
+        ],
+        "gelijkenis": 0.643
+      },
+      {
+        "paar": [
+          "bevoegd",
+          "fork"
+        ],
+        "gelijkenis": 0.643
+      },
+      {
+        "paar": [
+          "blauwdruk",
+          "deelnemen"
+        ],
+        "gelijkenis": 0.643
+      },
+      {
+        "paar": [
+          "mentor",
+          "fork"
+        ],
+        "gelijkenis": 0.643
+      },
+      {
+        "paar": [
+          "werk",
+          "gestopt"
+        ],
+        "gelijkenis": 0.636
+      },
+      {
+        "paar": [
+          "melden",
+          "kennisvoorstel"
+        ],
+        "gelijkenis": 0.636
+      },
+      {
+        "paar": [
+          "oplossen",
+          "gestopt"
+        ],
+        "gelijkenis": 0.636
+      },
+      {
+        "paar": [
+          "fork",
+          "gestopt"
+        ],
+        "gelijkenis": 0.636
+      },
+      {
+        "paar": [
+          "werk",
+          "kennisvoorstel"
+        ],
+        "gelijkenis": 0.615
+      },
+      {
+        "paar": [
+          "leren",
+          "les"
+        ],
+        "gelijkenis": 0.615
+      },
+      {
+        "paar": [
+          "bevoegd",
+          "les"
+        ],
+        "gelijkenis": 0.615
+      },
+      {
+        "paar": [
+          "buurtidee",
+          "fork"
+        ],
+        "gelijkenis": 0.615
+      },
+      {
+        "paar": [
+          "mentor",
+          "les"
+        ],
+        "gelijkenis": 0.615
+      },
+      {
+        "paar": [
+          "oplossen",
+          "kennisvoorstel"
+        ],
+        "gelijkenis": 0.615
+      },
+      {
+        "paar": [
+          "werk",
+          "melden"
+        ],
+        "gelijkenis": 0.583
+      },
+      {
+        "paar": [
+          "leren",
+          "gestopt"
+        ],
+        "gelijkenis": 0.583
+      },
+      {
+        "paar": [
+          "bevoegd",
+          "gestopt"
+        ],
+        "gelijkenis": 0.583
+      },
+      {
+        "paar": [
+          "blauwdruk",
+          "gestopt"
+        ],
+        "gelijkenis": 0.583
+      },
+      {
+        "paar": [
+          "mentor",
+          "gestopt"
+        ],
+        "gelijkenis": 0.583
+      },
+      {
+        "paar": [
+          "leren",
+          "kennisvoorstel"
+        ],
+        "gelijkenis": 0.571
+      },
+      {
+        "paar": [
+          "bevoegd",
+          "kennisvoorstel"
+        ],
+        "gelijkenis": 0.571
+      },
+      {
+        "paar": [
+          "buurtidee",
+          "blauwdruk"
+        ],
+        "gelijkenis": 0.571
+      },
+      {
+        "paar": [
+          "deelnemen",
+          "fork"
+        ],
+        "gelijkenis": 0.571
+      },
+      {
+        "paar": [
+          "melden",
+          "les"
+        ],
+        "gelijkenis": 0.545
+      },
+      {
+        "paar": [
+          "kennisvoorstel",
+          "gestopt"
+        ],
+        "gelijkenis": 0.545
+      },
+      {
+        "paar": [
+          "leren",
+          "melden"
+        ],
+        "gelijkenis": 0.538
+      },
+      {
+        "paar": [
+          "bevoegd",
+          "melden"
+        ],
+        "gelijkenis": 0.538
+      },
+      {
+        "paar": [
+          "buurtidee",
+          "kennisvoorstel"
+        ],
+        "gelijkenis": 0.538
+      },
+      {
+        "paar": [
+          "deelnemen",
+          "les"
+        ],
+        "gelijkenis": 0.538
+      },
+      {
+        "paar": [
+          "mentor",
+          "melden"
+        ],
+        "gelijkenis": 0.538
+      },
+      {
+        "paar": [
+          "kennis-actief",
+          "gestopt"
+        ],
+        "gelijkenis": 0.538
+      },
+      {
+        "paar": [
+          "buurtidee",
+          "melden"
+        ],
+        "gelijkenis": 0.5
+      },
+      {
+        "paar": [
+          "deelnemen",
+          "kennisvoorstel"
+        ],
+        "gelijkenis": 0.5
+      },
+      {
+        "paar": [
+          "deelnemen",
+          "gestopt"
+        ],
+        "gelijkenis": 0.5
+      },
+      {
+        "paar": [
+          "melden",
+          "kennis-actief"
+        ],
+        "gelijkenis": 0.5
+      },
+      {
+        "paar": [
+          "melden",
+          "gestopt"
+        ],
+        "gelijkenis": 0.5
+      },
+      {
+        "paar": [
+          "deelnemen",
+          "melden"
+        ],
+        "gelijkenis": 0.462
+      }
+    ]
+  },
+  "citaten": {
+    "rot": 0,
+    "rotLijst": []
+  },
+  "woorden": {
+    "onenig": 31,
+    "onverklaard": 0,
+    "verouderd": [],
+    "lijst": [
+      {
+        "overgang": "werk",
+        "dimensie": "kennis",
+        "verklaard": "afwezig",
+        "woorden": "raak",
+        "nagekeken": "`reden` en `voorstel` zijn hier de uitslag van de brug ({ gemaakt: false, reden }) en de inhaallijst, geen les.",
+        "lezing": "de woorden vinden iets waar de indeling niets ziet -- nakijken of de indeling iets mist"
+      },
+      {
+        "overgang": "werk",
+        "dimensie": "overdracht",
+        "verklaard": "draagt",
+        "woorden": "mis",
+        "nagekeken": "De uitnodiging gaat naar de persoon; de woordenlijst kent `accepteer` alleen als bevestiging.",
+        "lezing": "de indeling ziet iets dat de woorden niet vinden -- meestal een weigerzin (die staat in een tekenreeks)"
+      },
+      {
+        "overgang": "leren",
+        "dimensie": "kennis",
+        "verklaard": "afwezig",
+        "woorden": "raak",
+        "nagekeken": "`reden` bij een ongeldig oordeel en `kennis` als verwijzing naar een kennisitem; de beoordeling zelf legt geen les vast.",
+        "lezing": "de woorden vinden iets waar de indeling niets ziet -- nakijken of de indeling iets mist"
+      },
+      {
+        "overgang": "leren",
+        "dimensie": "privacyklasse",
+        "verklaard": "draagt",
+        "woorden": "mis",
+        "nagekeken": "De leeftijdspoort staat in de ROUTE (maakVolwassen), en het woord `volwassen` zit daar in een aanroep die de wringer als naam telt.",
+        "lezing": "de indeling ziet iets dat de woorden niet vinden -- meestal een weigerzin (die staat in een tekenreeks)"
+      },
+      {
+        "overgang": "bevoegd",
+        "dimensie": "kennis",
+        "verklaard": "afwezig",
+        "woorden": "raak",
+        "nagekeken": "`reden` is de weigerreden en de intrekreden, geen les.",
+        "lezing": "de woorden vinden iets waar de indeling niets ziet -- nakijken of de indeling iets mist"
+      },
+      {
+        "overgang": "bevoegd",
+        "dimensie": "menselijke_bevestiging",
+        "verklaard": "draagt",
+        "woorden": "mis",
+        "nagekeken": "Aftekenen is een bevestiging door een mens; het woord in de code is `afgetekend`, niet `bevestig`.",
+        "lezing": "de indeling ziet iets dat de woorden niet vinden -- meestal een weigerzin (die staat in een tekenreeks)"
+      },
+      {
+        "overgang": "buurtidee",
+        "dimensie": "bewijs",
+        "verklaard": "afwezig",
+        "woorden": "raak",
+        "nagekeken": "Een project draagt een bewijsmap en indicatoren, maar goedgekeurd -> actief vraagt er niet naar.",
+        "lezing": "de woorden vinden iets waar de indeling niets ziet -- nakijken of de indeling iets mist"
+      },
+      {
+        "overgang": "buurtidee",
+        "dimensie": "terugweg",
+        "verklaard": "draagt",
+        "woorden": "mis",
+        "nagekeken": "De herbeoordeling is een tekenreeks in een auditregel; de woordenas leest geen tekenreeksen.",
+        "lezing": "de indeling ziet iets dat de woorden niet vinden -- meestal een weigerzin (die staat in een tekenreeks)"
+      },
+      {
+        "overgang": "buurtidee",
+        "dimensie": "overdracht",
+        "verklaard": "afwezig",
+        "woorden": "raak",
+        "nagekeken": "`uitleen` in basis.js gaat over vrijwilligers tussen steden, niet over het project.",
+        "lezing": "de woorden vinden iets waar de indeling niets ziet -- nakijken of de indeling iets mist"
+      },
+      {
+        "overgang": "buurtidee",
+        "dimensie": "menselijke_bevestiging",
+        "verklaard": "poort",
+        "woorden": "mis",
+        "nagekeken": "De vier-ogenregel staat in een weigerzin (een tekenreeks); de woordenas leest geen tekenreeksen.",
+        "lezing": "de indeling ziet iets dat de woorden niet vinden -- meestal een weigerzin (die staat in een tekenreeks)"
+      },
+      {
+        "overgang": "blauwdruk",
+        "dimensie": "privacyklasse",
+        "verklaard": "draagt",
+        "woorden": "mis",
+        "nagekeken": "De abstractie is een veldselectie ({ naam, doel }), geen woord.",
+        "lezing": "de indeling ziet iets dat de woorden niet vinden -- meestal een weigerzin (die staat in een tekenreeks)"
+      },
+      {
+        "overgang": "deelnemen",
+        "dimensie": "kennis",
+        "verklaard": "afwezig",
+        "woorden": "raak",
+        "nagekeken": "`reden` is de verplichte reden bij het loskoppelen van een account.",
+        "lezing": "de woorden vinden iets waar de indeling niets ziet -- nakijken of de indeling iets mist"
+      },
+      {
+        "overgang": "mentor",
+        "dimensie": "kennis",
+        "verklaard": "afwezig",
+        "woorden": "raak",
+        "nagekeken": "Het woord staat er, maar in een andere handeling dan deze overgang. standen.js beschrijft ook de kennis- en voorstelmachine.",
+        "lezing": "de woorden vinden iets waar de indeling niets ziet -- nakijken of de indeling iets mist"
+      },
+      {
+        "overgang": "melden",
+        "dimensie": "bevoegdheid",
+        "verklaard": "afwezig",
+        "woorden": "raak",
+        "nagekeken": "`auth` is de inlog (actor), geen recht: melden mag iedereen met een account.",
+        "lezing": "de woorden vinden iets waar de indeling niets ziet -- nakijken of de indeling iets mist"
+      },
+      {
+        "overgang": "melden",
+        "dimensie": "kennis",
+        "verklaard": "afwezig",
+        "woorden": "raak",
+        "nagekeken": "`reden` bij de weg naar een mens.",
+        "lezing": "de woorden vinden iets waar de indeling niets ziet -- nakijken of de indeling iets mist"
+      },
+      {
+        "overgang": "melden",
+        "dimensie": "privacyklasse",
+        "verklaard": "draagt",
+        "woorden": "mis",
+        "nagekeken": "De melder uit de sessie heet `melder`, en dat woord valt onder actor.",
+        "lezing": "de indeling ziet iets dat de woorden niet vinden -- meestal een weigerzin (die staat in een tekenreeks)"
+      },
+      {
+        "overgang": "melden",
+        "dimensie": "menselijke_bevestiging",
+        "verklaard": "afwezig",
+        "woorden": "raak",
+        "nagekeken": "Het woord staat er, maar in een andere handeling dan deze overgang. De bevestiging in RTG Service is die van een machtiging, niet van een melding.",
+        "lezing": "de woorden vinden iets waar de indeling niets ziet -- nakijken of de indeling iets mist"
+      },
+      {
+        "overgang": "oplossen",
+        "dimensie": "terugweg",
+        "verklaard": "draagt",
+        "woorden": "mis",
+        "nagekeken": "Terugzetten is dezelfde zetStand, geen apart woord.",
+        "lezing": "de indeling ziet iets dat de woorden niet vinden -- meestal een weigerzin (die staat in een tekenreeks)"
+      },
+      {
+        "overgang": "oplossen",
+        "dimensie": "kennis",
+        "verklaard": "afwezig",
+        "woorden": "raak",
+        "nagekeken": "`reden` bij een machtiging en bij de weg naar een mens.",
+        "lezing": "de woorden vinden iets waar de indeling niets ziet -- nakijken of de indeling iets mist"
+      },
+      {
+        "overgang": "oplossen",
+        "dimensie": "menselijke_bevestiging",
+        "verklaard": "afwezig",
+        "woorden": "raak",
+        "nagekeken": "Het woord staat er, maar in een andere handeling dan deze overgang. De bevestiging in de kantoorroutes is die van een machtiging, niet van het sluiten.",
+        "lezing": "de woorden vinden iets waar de indeling niets ziet -- nakijken of de indeling iets mist"
+      },
+      {
+        "overgang": "kennisvoorstel",
+        "dimensie": "terugweg",
+        "verklaard": "afwezig",
+        "woorden": "raak",
+        "nagekeken": "Het woord staat er, maar in een andere handeling dan deze overgang. DEPRECATED en REVOKED zijn standen van een kennisVERSIE, niet van een voorstel.",
+        "lezing": "de woorden vinden iets waar de indeling niets ziet -- nakijken of de indeling iets mist"
+      },
+      {
+        "overgang": "kennisvoorstel",
+        "dimensie": "menselijke_bevestiging",
+        "verklaard": "afwezig",
+        "woorden": "raak",
+        "nagekeken": "Het woord staat er, maar in een andere handeling dan deze overgang. `eisNiet` hoort bij voorstelStand (overgang kennis-actief), niet bij indienen.",
+        "lezing": "de woorden vinden iets waar de indeling niets ziet -- nakijken of de indeling iets mist"
+      },
+      {
+        "overgang": "fork",
+        "dimensie": "bewijs",
+        "verklaard": "afwezig",
+        "woorden": "raak",
+        "nagekeken": "Het woord staat er, maar in een andere handeling dan deze overgang. Het bewijs hoort bij deel(), de overgang ervoor.",
+        "lezing": "de woorden vinden iets waar de indeling niets ziet -- nakijken of de indeling iets mist"
+      },
+      {
+        "overgang": "fork",
+        "dimensie": "privacyklasse",
+        "verklaard": "draagt",
+        "woorden": "mis",
+        "nagekeken": "Het bedrag dat NIET meereist is `budgetCenten: 0`, geen woord.",
+        "lezing": "de indeling ziet iets dat de woorden niet vinden -- meestal een weigerzin (die staat in een tekenreeks)"
+      },
+      {
+        "overgang": "gestopt",
+        "dimensie": "voorwaarden",
+        "verklaard": "afwezig",
+        "woorden": "raak",
+        "nagekeken": "`actief` is de naam van een stand en `Geldig` een hulpfunctie; stoppen stelt geen voorwaarde.",
+        "lezing": "de woorden vinden iets waar de indeling niets ziet -- nakijken of de indeling iets mist"
+      },
+      {
+        "overgang": "gestopt",
+        "dimensie": "bewijs",
+        "verklaard": "afwezig",
+        "woorden": "raak",
+        "nagekeken": "Het woord staat er, maar in een andere handeling dan deze overgang. Bewijsmap en indicatoren bestaan, stoppen vraagt er niet naar.",
+        "lezing": "de woorden vinden iets waar de indeling niets ziet -- nakijken of de indeling iets mist"
+      },
+      {
+        "overgang": "gestopt",
+        "dimensie": "overdracht",
+        "verklaard": "afwezig",
+        "woorden": "raak",
+        "nagekeken": "`uitleen` gaat over vrijwilligers tussen steden.",
+        "lezing": "de woorden vinden iets waar de indeling niets ziet -- nakijken of de indeling iets mist"
+      },
+      {
+        "overgang": "les",
+        "dimensie": "voorwaarden",
+        "verklaard": "poort",
+        "woorden": "mis",
+        "nagekeken": "De keuzelijst staat in een tekenreeks; de woordenas leest geen tekenreeksen.",
+        "lezing": "de indeling ziet iets dat de woorden niet vinden -- meestal een weigerzin (die staat in een tekenreeks)"
+      },
+      {
+        "overgang": "les",
+        "dimensie": "bewijs",
+        "verklaard": "afwezig",
+        "woorden": "raak",
+        "nagekeken": "Het woord staat er, maar in een andere handeling dan deze overgang. Het bewijs hoort bij de stappen van het onderzoek voor het besluit.",
+        "lezing": "de woorden vinden iets waar de indeling niets ziet -- nakijken of de indeling iets mist"
+      },
+      {
+        "overgang": "les",
+        "dimensie": "privacyklasse",
+        "verklaard": "afwezig",
+        "woorden": "raak",
+        "nagekeken": "Het woord staat er, maar in een andere handeling dan deze overgang. De privacyregels in de route gaan over deelnemers aan een studie.",
+        "lezing": "de woorden vinden iets waar de indeling niets ziet -- nakijken of de indeling iets mist"
+      },
+      {
+        "overgang": "les",
+        "dimensie": "menselijke_bevestiging",
+        "verklaard": "afwezig",
+        "woorden": "raak",
+        "nagekeken": "Het woord staat er, maar in een andere handeling dan deze overgang. Toestemming in de route is die van een deelnemer aan een studie.",
+        "lezing": "de woorden vinden iets waar de indeling niets ziet -- nakijken of de indeling iets mist"
+      }
+    ],
+    "graad": "vermoed"
+  },
+  "vorm": {
+    "overgangenMetVorm": [
+      "werk",
+      "leren",
+      "buurtidee",
+      "blauwdruk",
+      "deelnemen",
+      "mentor",
+      "melden",
+      "oplossen",
+      "kennisvoorstel",
+      "kennis-actief",
+      "fork",
+      "gestopt",
+      "les"
+    ],
+    "zonderVorm": [
+      "bevoegd"
+    ],
+    "velden": 92,
+    "inAlleOvergangen": [],
+    "inEenOvergangPct": 47.8,
+    "gedeeldeDragers": [
+      {
+        "paar": [
+          "leren",
+          "mentor"
+        ],
+        "dragers": [
+          "server/kern/leerhuis/acties-mens.js"
+        ]
+      },
+      {
+        "paar": [
+          "leren",
+          "kennisvoorstel"
+        ],
+        "dragers": [
+          "server/kern/leerhuis/index.js"
+        ]
+      },
+      {
+        "paar": [
+          "leren",
+          "kennis-actief"
+        ],
+        "dragers": [
+          "server/kern/leerhuis/index.js"
+        ]
+      },
+      {
+        "paar": [
+          "buurtidee",
+          "gestopt"
+        ],
+        "dragers": [
+          "server/kern/rtfos/projecten.js",
+          "server/kern/rtfos/projecten-besluit.js",
+          "server/kern/rtfos/basis.js"
+        ]
+      },
+      {
+        "paar": [
+          "blauwdruk",
+          "fork"
+        ],
+        "dragers": [
+          "server/kern/rtfos/netwerk.js"
+        ]
+      },
+      {
+        "paar": [
+          "mentor",
+          "kennisvoorstel"
+        ],
+        "dragers": [
+          "server/kern/leerhuis/standen.js"
+        ]
+      },
+      {
+        "paar": [
+          "mentor",
+          "kennis-actief"
+        ],
+        "dragers": [
+          "server/kern/leerhuis/standen.js"
+        ]
+      },
+      {
+        "paar": [
+          "melden",
+          "oplossen"
+        ],
+        "dragers": [
+          "server/kern/service/loop.js"
+        ]
+      },
+      {
+        "paar": [
+          "kennisvoorstel",
+          "kennis-actief"
+        ],
+        "dragers": [
+          "server/kern/leerhuis/acties-kennis.js",
+          "server/kern/leerhuis/index.js",
+          "server/kern/leerhuis/standen.js"
+        ]
+      }
+    ]
+  },
+  "proeven": {
+    "gestoptGeenBlauwdrukbron": {
+      "wat": "Een gestopt project met een gemeten indicator probeert een blauwdruk te worden.",
+      "gestopt": "geweigerd: Een blauwdruk komt uit een project dat draait of gedraaid heeft; dit staat op \"gestopt\".",
+      "besturing": "geslaagd",
+      "houdt": true
+    },
+    "mutatieBewijs": {
+      "wat": "Haal `bewijs` uit de vorm. Twee echte dragers krijgen een verzoek zonder bewijs; een universele motor die alleen de kern (naar, actor, actie, blokkade) kent, krijgt hetzelfde verzoek.",
+      "blauwdrukZonderIndicator": {
+        "drager": "geweigerd: Er is nog geen indicator met een resultaat ingevuld. Zonder cijfers is dit een idee en geen blauwdruk.",
+        "universeleMotor": "geslaagd"
+      },
+      "koppelingZonderVog": {
+        "drager": "geweigerd: Voor \"Huiswerkklas\" (huiswerk) is een geldige VOG verplicht. Er staat geen VOG in het dossier van Proefvrijwilliger.",
+        "universeleMotor": "geslaagd"
+      },
+      "besturing": {
+        "blauwdrukMetIndicator": "geslaagd",
+        "koppelingMetVog": "geslaagd"
+      },
+      "tenOnrechte": 2,
+      "besturingHoudt": true
+    },
+    "mutatieBevoegdheid": {
+      "wat": "Haal `bevoegdheid` uit de vorm: dezelfde koppeling, maar de handelende mens heeft het recht niet.",
+      "drager": "geweigerd: geen bevoegdheid (proef)",
+      "universeleMotor": "geslaagd",
+      "tenOnrechte": 1
+    },
+    "buurtenQueryveilig": {
+      "wat": "De gemeente ziet hulpvragen per buurt; buurten onder 5 worden samengevoegd. Wat als er precies een onder de drempel valt?",
+      "eenKleineBuurt": [
+        {
+          "wijk": "Noord",
+          "aantal": 12
+        },
+        {
+          "wijk": "Centrum",
+          "aantal": 10
+        },
+        {
+          "wijk": "overige buurten (1)",
+          "aantal": 3,
+          "samengevoegd": true
+        }
+      ],
+      "tweeKleineBuurten": [
+        {
+          "wijk": "Centrum",
+          "aantal": 10
+        },
+        {
+          "wijk": "overige buurten (2)",
+          "aantal": 5,
+          "samengevoegd": true
+        }
+      ],
+      "lekt": true,
+      "besturing": true,
+      "lezing": "De gemeente kent haar eigen buurten. Staat er \"overige buurten (1)\", dan weet zij welke buurt ontbreekt -- en ziet zij haar exacte aantal, onder de drempel die het moest verbergen. Dat is celveilig en niet queryveilig."
+    }
+  },
+  "wetten": {
+    "stand": {
+      "deels": 9,
+      "document": 5,
+      "gehandhaafd": 5,
+      "eigenaarbesluit": 1
+    },
+    "besluiten": {
+      "te-bouwen": 3,
+      "deels": 2,
+      "document": 2,
+      "eigenaarbesluit": 1
+    },
+    "rot": 0,
+    "rotLijst": [],
+    "lijst": [
+      {
+        "nr": 1,
+        "wet": "De mens is geen route-object: een route ondersteunt een mens en definieert hem niet.",
+        "stand": "deels",
+        "bestand": "server/kern/knelpunt/aanvoer.js",
+        "citaat": "draagt een gegeven over de mens: ",
+        "reden": "De aanvoerlaag weigert een vondst die een gegeven over de mens draagt. Dat houdt de mens UIT de mogelijkheid; een route-object dat een mens beschrijft, houdt niemand tegen."
+      },
+      {
+        "nr": 2,
+        "wet": "Iedere route heeft alternatieven. Geen systeemgegenereerde lotsbestemming.",
+        "stand": "document",
+        "bestand": null,
+        "citaat": null,
+        "reden": "Nergens wordt geweigerd om EEN pad te tonen. FOUNDATION.md en HDI.md zeggen het, geen code dwingt het af."
+      },
+      {
+        "nr": 3,
+        "wet": "Een blokkade is informatie, geen oordeel.",
+        "stand": "document",
+        "bestand": null,
+        "citaat": null,
+        "reden": "Dit huis schrijft weigeringen met een reden (as A telt `blokkade` in bijna elke overgang), maar niets dwingt het af: een weigering zonder reden laat geen toets zakken."
+      },
+      {
+        "nr": 4,
+        "wet": "Een vondst is geen recht, bevoegdheid of geschiktheid.",
+        "stand": "deels",
+        "bestand": "server/kern/knelpunt/aanvoer.js",
+        "citaat": "draagt een gegeven over de mens: ",
+        "reden": "Omdat een vondst de mens niet kent, KAN hij geen geschiktheidsoordeel zijn. Of iemand mag solliciteren, beslist de sollicitatielaag; dat een vondst nooit als toegang wordt gelezen, dwingt niemand af."
+      },
+      {
+        "nr": 5,
+        "wet": "Een rol verleent geen competentie; competentie verleent geen authority.",
+        "stand": "gehandhaafd",
+        "bestand": "server/kern/leerhuis/brug.js",
+        "citaat": "Geschiktheid is geen bevoegdheid",
+        "reden": "De brug van het leerhuis geeft hoogstens AUTHORITY_ELIGIBLE met `verleent: false`. Let op: het leerhuis is NIET verbonden met persoonseis/vakbewijs, dus bewezen competentie en afgetekende bevoegdheid zijn twee werelden zonder brug."
+      },
+      {
+        "nr": 6,
+        "wet": "De echte wereld is leidend: digitaal voltooid zonder werkelijk bewijs telt niet waar bewijs vereist is.",
+        "stand": "gehandhaafd",
+        "bestand": "server/kern/rtfos/netwerk.js",
+        "citaat": "Zonder cijfers is dit een idee en geen blauwdruk.",
+        "reden": "Waar bewijs een poort is (blauwdruk, VOG, beoordeling, vakbewijs, kennisbron), dwingt de drager het af. Waar het afwezig is (een zaak sluiten, een project actief zetten), telt digitaal voltooid gewoon."
+      },
+      {
+        "nr": 7,
+        "wet": "Persoonlijke ervaring wordt nooit automatisch collectieve kennis.",
+        "stand": "deels",
+        "bestand": "server/kern/leerhuis/acties-kennis.js",
+        "citaat": "wie een kennisversie schrijft, keurt hem niet zelf goed",
+        "reden": "Binnen het leerhuis wordt een voorstel pas kennis na een tweede mens. Daarbuiten bestaat er geen collectieve kennis om automatisch in te lopen."
+      },
+      {
+        "nr": 8,
+        "wet": "Alleen vrijwillig vrijgegeven en veilig geabstraheerde kennis mag reizen.",
+        "stand": "deels",
+        "bestand": "server/kern/rtfos/netwerk.js",
+        "citaat": "({ naam: i.naam, doel: i.doel })",
+        "reden": "Het ABSTRAHEREN wordt afgedwongen. Het VRIJWILLIGE niet: een blauwdruk deelt wie `project.beheren` heeft, niet de mensen van wie de ervaring was."
+      },
+      {
+        "nr": 9,
+        "wet": "Mislukking mag kennis worden, maar niet automatisch een blauwdruk.",
+        "stand": "deels",
+        "bestand": "server/kern/rtfos/netwerk.js",
+        "citaat": "['actief', 'afgerond'].includes(p.status)",
+        "reden": "De tweede helft staat: een gestopt project wordt nooit een blauwdruk (proef `gestoptGeenBlauwdrukbron`). De eerste helft niet: een gestopt RTF-project laat geen les achter."
+      },
+      {
+        "nr": 10,
+        "wet": "Een fork erft methode, nooit deelnemers, toestemming, geld of authority.",
+        "stand": "gehandhaafd",
+        "bestand": "server/kern/rtfos/netwerk.js",
+        "citaat": "budgetCenten: 0",
+        "reden": "Overnemen begint op idee, met budget nul, zonder resultaten en met de eigen goedkeuringsketen."
+      },
+      {
+        "nr": 11,
+        "wet": "AI stelt voor; bevoegde mensen en organisaties beslissen waar dat vereist is.",
+        "stand": "deels",
+        "bestand": "server/kern/stuur/beleid.js",
+        "citaat": "voorstel: 'voorstel'",
+        "reden": "Het stuur kent `voorstel` als niveau waarop een mens bevestigt. Voor de Foundation-overgangen zelf is er geen AI-pad om te begrenzen."
+      },
+      {
+        "nr": 12,
+        "wet": "Foundation optimaliseert uitvoerbaarheid, niet gehoorzaamheid.",
+        "stand": "document",
+        "bestand": null,
+        "citaat": null,
+        "reden": "Een richtingsregel; er is niets om af te dwingen zolang er geen optimizer is."
+      },
+      {
+        "nr": 13,
+        "wet": "Aandacht is geen impact.",
+        "stand": "gehandhaafd",
+        "bestand": "server/kern/connect/portfolio.js",
+        "citaat": "a && a.portfolio",
+        "reden": "`bereikt` draagt `aanspraak: geen` en komt niet in het portfolio."
+      },
+      {
+        "nr": 14,
+        "wet": "Geen mens of buurt krijgt een waardescore.",
+        "stand": "deels",
+        "bestand": "scripts/lib/cijferopmens.js",
+        "citaat": "VERBODEN_ONDERWERP",
+        "reden": "CAR-05 heeft een toets voor een cijfer op een MENS. Een score op een BUURT staat daar niet in."
+      },
+      {
+        "nr": 15,
+        "wet": "Het systeem leert van overgangen, niet van surveillance.",
+        "stand": "gehandhaafd",
+        "bestand": "server/kern/connect/horizon.js",
+        "citaat": "const GEEN_SIGNAAL",
+        "reden": "Kijktijd, scrollsnelheid en tijdstip zijn als signaal geweigerd."
+      },
+      {
+        "nr": 16,
+        "wet": "Wie een probleem kan oplossen, krijgt minimaal noodzakelijke informatie.",
+        "stand": "deels",
+        "bestand": "server/kern/rtfos/gemeente.js",
+        "citaat": "const K = 5",
+        "reden": "Celveilig, niet queryveilig: als precies een buurt onder de drempel valt, staat haar exacte aantal onder \"overige buurten (1)\" (proef `buurtenQueryveilig`)."
+      },
+      {
+        "nr": 17,
+        "wet": "Iedere materiele aanbeveling heeft herkomst.",
+        "stand": "deels",
+        "bestand": "server/kern/knelpunt/aanvoer.js",
+        "citaat": "'herkomst'",
+        "reden": "Een vondst zonder herkomst wordt geweigerd. Een aanbeveling buiten de aanvoerlaag draagt er geen."
+      },
+      {
+        "nr": 18,
+        "wet": "Teruggeven blijft vrijwillig: je mag Foundation gebruiken zonder ooit bij te dragen.",
+        "stand": "document",
+        "bestand": null,
+        "citaat": null,
+        "reden": "Er is geen poort die bijdragen eist, maar ook niets dat een toekomstige eis tegenhoudt."
+      },
+      {
+        "nr": 19,
+        "wet": "Vergeten moet mogelijk blijven.",
+        "stand": "eigenaarbesluit",
+        "bestand": null,
+        "citaat": null,
+        "reden": "OWNER_DECISION_REQUIRED: wat er met AANGENOMEN collectieve kennis gebeurt als de maker wordt vergeten -- alleen de naam eraf, of de kennis ook. Zie besluit B7."
+      },
+      {
+        "nr": 20,
+        "wet": "Wie na jou komt, moet verder kunnen beginnen -- niet verplicht verder moeten gaan.",
+        "stand": "document",
+        "bestand": null,
+        "citaat": null,
+        "reden": "Een richtingsregel."
+      },
+      {
+        "nr": "B1",
+        "besluit": "Aggregatie is queryveilig, niet alleen celveilig: vaste views, minimumcel, complementaire onderdrukking, tijdvensters, geen vrije gemeentelijke OLAP over gevoelige dimensies.",
+        "stand": "te-bouwen",
+        "bestand": "server/kern/rtfos/gemeente.js",
+        "citaat": "const K = 5",
+        "reden": "Er is een minimumcel en een vaste view (het portaal roept alleen `cijfersVan` aan). Complementaire onderdrukking en tijdvensters ontbreken; zie proef `buurtenQueryveilig`."
+      },
+      {
+        "nr": "B2",
+        "besluit": "Foundation zet financiele handelingen klaar maar wordt geen betaalroute; de organisatie betaalt via haar eigen geld- en arbeidsketen.",
+        "stand": "deels",
+        "bestand": "server/kern/rtfos/gift-betalen.js",
+        "citaat": "partnerIn",
+        "reden": "Een gift komt binnen over RTG Pay als bij elke zaak. Er is geen pad waarlangs de Foundation een mens betaalt, en dat moet zo blijven."
+      },
+      {
+        "nr": "B3",
+        "besluit": "De vijf standen (werk, leren, vrijwillig, oefenen, helpen) krijgen toelatingsregels; misclassificatie eindigt fail-closed in WEIGER.",
+        "stand": "te-bouwen",
+        "bestand": null,
+        "citaat": null,
+        "reden": "Geen van de vijf bestaat als stand. Er is VRIJWILLIG (vrijwilligers.js) en WERK (employment.js), zonder regel ertussen."
+      },
+      {
+        "nr": "B4",
+        "besluit": "Vrijwillige menselijke ontwikkeling krijgt geen funnelmetriek.",
+        "stand": "document",
+        "bestand": null,
+        "citaat": null,
+        "reden": "Er is vandaag geen conversiecijfer op bezoeker -> deelnemer -> mentor, en niets dat er een tegenhoudt."
+      },
+      {
+        "nr": "B5",
+        "besluit": "VERDER is onherleidbaar: geen plaats, persoon of exacte tijd, vertraagd, alleen extern bewezen gebruikt/doorgegeven, geen oplopende teller.",
+        "stand": "te-bouwen",
+        "bestand": "server/kern/connect/tredenlijst.js",
+        "citaat": "eenmalig: true",
+        "reden": "De treden zijn eenmalig en `bereikt` telt niet. VERDER zelf bestaat niet."
+      },
+      {
+        "nr": "B6",
+        "besluit": "Intentie blijft prive: een organisatie ziet iemand pas na diens expliciete overdracht.",
+        "stand": "document",
+        "bestand": null,
+        "citaat": null,
+        "reden": "Overgang `deelnemen` laat het KANTOOR inschrijven; er is geen stap waarin de mens zijn eigen voornemen overdraagt."
+      },
+      {
+        "nr": "B7",
+        "besluit": "Vergeten tegenover aangenomen collectieve kennis.",
+        "stand": "eigenaarbesluit",
+        "bestand": null,
+        "citaat": null,
+        "reden": "OWNER_DECISION_REQUIRED."
+      },
+      {
+        "nr": "B8",
+        "besluit": "\"Waarom zie ik dit?\" toont zowel de gebruikte als de bewust niet gebruikte factoren.",
+        "stand": "deels",
+        "bestand": "server/kern/connect/horizon.js",
+        "citaat": "const GEEN_SIGNAAL",
+        "reden": "Connect houdt een lijst van wat bewust NIET wordt gebruikt, en de mixer zegt per motor waarom hij niet kijkt. Een scherm \"Waarom zie ik dit?\" dat beide toont, bestaat niet."
+      }
+    ]
+  },
+  "overgangen": [
+    {
+      "id": "werk",
+      "van": "werkzoekend",
+      "naar": "eerste werkdag",
+      "familie": "toestand",
+      "dragers": [
+        "server/kern/concern/aanname.js",
+        "server/kern/concern/employment.js",
+        "server/kern/concern/uitnodiging.js",
+        "server/routes/supplier/werving/sollicitaties.js"
+      ],
+      "notitie": null,
+      "dimensies": {
+        "van": {
+          "stand": "poort",
+          "bestand": "server/kern/concern/uitnodiging.js",
+          "citaat": "Deze uitnodiging is al gebruikt.",
+          "reden": null
+        },
+        "naar": {
+          "stand": "draagt",
+          "bestand": "server/routes/supplier/werving/sollicitaties.js",
+          "citaat": "'aangenomen'",
+          "reden": null
+        },
+        "voorwaarden": {
+          "stand": "poort",
+          "bestand": "server/kern/concern/aanname.js",
+          "citaat": "De vestiging van deze zaak is gesloten.",
+          "reden": null
+        },
+        "actor": {
+          "stand": "poort",
+          "bestand": "server/kern/concern/uitnodiging.js",
+          "citaat": "Log in of maak een gratis werkidentiteit aan.",
+          "reden": null
+        },
+        "bevoegdheid": {
+          "stand": "poort",
+          "bestand": "server/routes/supplier/werving/sollicitaties.js",
+          "citaat": "managerOnly",
+          "reden": null
+        },
+        "actie": {
+          "stand": "draagt",
+          "bestand": "server/kern/concern/aanname.js",
+          "citaat": "dienstverbandUitAanname",
+          "reden": null
+        },
+        "bewijs": {
+          "stand": "afwezig",
+          "reden": "Bij de aanname wordt niets bewezen. Het eerste echte werk wordt pas gepoort door persoonseis.js (magWerkenHier), en dat is overgang `bevoegd`."
+        },
+        "uitkomst": {
+          "stand": "draagt",
+          "bestand": "server/kern/concern/employment.js",
+          "citaat": "employmentNieuw",
+          "reden": null
+        },
+        "blokkade": {
+          "stand": "draagt",
+          "bestand": "server/kern/concern/aanname.js",
+          "citaat": "dus er is geen werkgever om een dienstverband bij te maken",
+          "reden": null
+        },
+        "terugweg": {
+          "stand": "draagt",
+          "bestand": "server/kern/concern/employment.js",
+          "citaat": "employmentBeeindig",
+          "reden": null
+        },
+        "kennis": {
+          "stand": "afwezig",
+          "reden": "Een aanname vraagt en levert geen les."
+        },
+        "overdracht": {
+          "stand": "draagt",
+          "bestand": "server/kern/concern/uitnodiging.js",
+          "citaat": "uitnodigingAccepteer",
+          "reden": null
+        },
+        "privacyklasse": {
+          "stand": "afwezig",
+          "reden": "De aanname zelf draagt geen privacyregel; de persoon komt uit een geverifieerd account, maar dat is de actor en geen klasse."
+        },
+        "menselijke_bevestiging": {
+          "stand": "poort",
+          "bestand": "server/kern/concern/aanname.js",
+          "citaat": "er wordt niets vastgelegd zonder uw keuze",
+          "reden": "Een dienstverband op iemands naam is een verklaring van een werkgever; de inhaalweg legt niets vast zonder keuze. De aanname zelf wacht daarnaast op de persoon die zijn uitnodiging aanneemt."
+        }
+      }
+    },
+    {
+      "id": "leren",
+      "van": "leerling",
+      "naar": "competent",
+      "familie": "toestand",
+      "dragers": [
+        "server/kern/leerhuis/acties-oordeel.js",
+        "server/kern/leerhuis/acties-mens.js",
+        "server/kern/leerhuis/index.js"
+      ],
+      "notitie": null,
+      "dimensies": {
+        "van": {
+          "stand": "poort",
+          "bestand": "server/kern/leerhuis/acties-oordeel.js",
+          "citaat": "er loopt al een beoordeling voor deze vaardigheid",
+          "reden": null
+        },
+        "naar": {
+          "stand": "draagt",
+          "bestand": "server/kern/leerhuis/acties-oordeel.js",
+          "citaat": "PROVEN",
+          "reden": null
+        },
+        "voorwaarden": {
+          "stand": "poort",
+          "bestand": "server/kern/leerhuis/acties-oordeel.js",
+          "citaat": "een PROVEN noemt de criteria waartegen is beoordeeld",
+          "reden": null
+        },
+        "actor": {
+          "stand": "poort",
+          "bestand": "server/kern/leerhuis/index.js",
+          "citaat": "de actor komt uit de sessie en is een geldige sleutel",
+          "reden": null
+        },
+        "bevoegdheid": {
+          "stand": "poort",
+          "bestand": "server/kern/leerhuis/acties-oordeel.js",
+          "citaat": "de assessor is niet (meer) bevoegd",
+          "reden": null
+        },
+        "actie": {
+          "stand": "draagt",
+          "bestand": "server/kern/leerhuis/acties-oordeel.js",
+          "citaat": "beoordelingAfronden",
+          "reden": null
+        },
+        "bewijs": {
+          "stand": "poort",
+          "bestand": "server/kern/leerhuis/acties-oordeel.js",
+          "citaat": "zonder bewijs is er niets te beoordelen",
+          "reden": null
+        },
+        "uitkomst": {
+          "stand": "draagt",
+          "bestand": "server/kern/leerhuis/acties-oordeel.js",
+          "citaat": "ASSESSMENT_EVIDENCE",
+          "reden": null
+        },
+        "blokkade": {
+          "stand": "draagt",
+          "bestand": "server/kern/leerhuis/acties-mens.js",
+          "citaat": "volgt uit een beoordeling of certificaat, niet uit een handeling",
+          "reden": null
+        },
+        "terugweg": {
+          "stand": "draagt",
+          "bestand": "server/kern/leerhuis/acties-oordeel.js",
+          "citaat": "beoordelingOngeldig",
+          "reden": null
+        },
+        "kennis": {
+          "stand": "afwezig",
+          "reden": "Een beoordeling legt geen les vast en schrijft geen kennis; kennis die verandert stuurt wel mensen terug naar leren (overgang `kennis-actief`), maar dat is de andere richting."
+        },
+        "overdracht": {
+          "stand": "afwezig",
+          "reden": "Competent worden geeft niets door aan een ander; het certificaat is een aparte handeling."
+        },
+        "privacyklasse": {
+          "stand": "draagt",
+          "bestand": "server/routes/leerhuis.js",
+          "citaat": "maakVolwassen",
+          "reden": "Wie jonger is dan 18 ziet geen niveau (de route, niet de kern)."
+        },
+        "menselijke_bevestiging": {
+          "stand": "poort",
+          "bestand": "server/kern/leerhuis/acties-oordeel.js",
+          "citaat": "niemand beoordeelt zichzelf",
+          "reden": null
+        }
+      }
+    },
+    {
+      "id": "bevoegd",
+      "van": "competent",
+      "naar": "bevoegd",
+      "familie": "toestand",
+      "dragers": [
+        "server/kern/persoonseis.js",
+        "server/kern/vakbewijs.js",
+        "server/kern/vakbewijs-aftekenen.js",
+        "server/routes/vakbewijs-kantoor.js"
+      ],
+      "notitie": null,
+      "dimensies": {
+        "van": {
+          "stand": "poort",
+          "bestand": "server/kern/vakbewijs-aftekenen.js",
+          "citaat": "Dit stuk is al afgetekend.",
+          "reden": null
+        },
+        "naar": {
+          "stand": "draagt",
+          "bestand": "server/kern/vakbewijs-aftekenen.js",
+          "citaat": "v.afgetekend = { door: naam",
+          "reden": null
+        },
+        "voorwaarden": {
+          "stand": "poort",
+          "bestand": "server/kern/persoonseis.js",
+          "citaat": "Het vastgelegde stuk is verlopen.",
+          "reden": null
+        },
+        "actor": {
+          "stand": "poort",
+          "bestand": "server/kern/vakbewijs-aftekenen.js",
+          "citaat": "Wie tekent af? Een aftekening zonder naam is geen aftekening.",
+          "reden": null
+        },
+        "bevoegdheid": {
+          "stand": "poort",
+          "bestand": "server/routes/vakbewijs-kantoor.js",
+          "citaat": "kluisAuth",
+          "reden": null
+        },
+        "actie": {
+          "stand": "draagt",
+          "bestand": "server/kern/vakbewijs-aftekenen.js",
+          "citaat": "vakbewijsTeken",
+          "reden": null
+        },
+        "bewijs": {
+          "stand": "poort",
+          "bestand": "server/kern/persoonseis.js",
+          "citaat": "Uw stuk is ingediend maar nog niet door RTG gezien.",
+          "reden": null
+        },
+        "uitkomst": {
+          "stand": "draagt",
+          "bestand": "server/kern/vakbewijs.js",
+          "citaat": "vakbewijsHeeft",
+          "reden": null
+        },
+        "blokkade": {
+          "stand": "draagt",
+          "bestand": "server/kern/persoonseis.js",
+          "citaat": "op uw eigen naam nodig",
+          "reden": null
+        },
+        "terugweg": {
+          "stand": "draagt",
+          "bestand": "server/kern/vakbewijs-aftekenen.js",
+          "citaat": "vakbewijsIntrek",
+          "reden": null
+        },
+        "kennis": {
+          "stand": "afwezig",
+          "reden": "Bevoegd worden vraagt of levert geen les."
+        },
+        "overdracht": {
+          "stand": "afwezig",
+          "reden": "De bevoegdheid blijft bij de mens; hij wordt nergens doorgegeven."
+        },
+        "privacyklasse": {
+          "stand": "draagt",
+          "bestand": "server/kern/vakbewijs.js",
+          "citaat": "nummerZet",
+          "reden": "Het documentnummer woont in de identiteitskluis en niet naast de codenaam."
+        },
+        "menselijke_bevestiging": {
+          "stand": "draagt",
+          "bestand": "server/kern/vakbewijs-aftekenen.js",
+          "citaat": "afgetekend",
+          "reden": "Een mens van RTG tekent af, maar niets toetst dat die mens niet de betrokkene zelf is: de sleutel van de aftekenaar wordt nergens naast die van het stuk gelegd. Daarom DRAAGT en geen POORT."
+        }
+      }
+    },
+    {
+      "id": "buurtidee",
+      "van": "buurtidee",
+      "naar": "eerste uitvoering",
+      "familie": "toestand",
+      "dragers": [
+        "server/kern/rtfos/projecten.js",
+        "server/kern/rtfos/projecten-besluit.js",
+        "server/kern/rtfos/basis.js"
+      ],
+      "notitie": null,
+      "dimensies": {
+        "van": {
+          "stand": "poort",
+          "bestand": "server/kern/rtfos/projecten-besluit.js",
+          "citaat": "kan een project naar",
+          "reden": null
+        },
+        "naar": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/projecten.js",
+          "citaat": "'actief'",
+          "reden": null
+        },
+        "voorwaarden": {
+          "stand": "poort",
+          "bestand": "server/kern/rtfos/projecten.js",
+          "citaat": "alleen een actieve partner draagt een project.",
+          "reden": null
+        },
+        "actor": {
+          "stand": "poort",
+          "bestand": "server/kern/rtfos/basis.js",
+          "citaat": "boardroomWie",
+          "reden": null
+        },
+        "bevoegdheid": {
+          "stand": "poort",
+          "bestand": "server/kern/rtfos/projecten-besluit.js",
+          "citaat": "Een project goed- of afkeuren doet het stadsbestuur",
+          "reden": null
+        },
+        "actie": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/projecten.js",
+          "citaat": "KETEN",
+          "reden": null
+        },
+        "bewijs": {
+          "stand": "afwezig",
+          "reden": "Van goedgekeurd naar actief vraagt geen enkel bewijs; wat er gebeurt, komt pas in de rapportage."
+        },
+        "uitkomst": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/projecten-besluit.js",
+          "citaat": "p.besluit",
+          "reden": null
+        },
+        "blokkade": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/projecten-besluit.js",
+          "citaat": "Laat een ander uit het bestuur kijken.",
+          "reden": null
+        },
+        "terugweg": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/projecten.js",
+          "citaat": "'project.herbeoordeling'",
+          "reden": "Alleen terug naar beoordeling bij een hoger budget; van actief is er geen weg terug behalve stoppen."
+        },
+        "kennis": {
+          "stand": "afwezig",
+          "reden": "Een idee aanmaken of goedkeuren vraagt geen les; de knelpunten komen pas per periode in de rapportage."
+        },
+        "overdracht": {
+          "stand": "afwezig",
+          "reden": "Het project blijft in de eigen stad."
+        },
+        "privacyklasse": {
+          "stand": "afwezig",
+          "reden": "Een project draagt geen privacyregel; het gaat over een aanpak en niet over mensen."
+        },
+        "menselijke_bevestiging": {
+          "stand": "poort",
+          "bestand": "server/kern/rtfos/projecten-besluit.js",
+          "citaat": "Wie een project indient, keurt het niet zelf goed.",
+          "reden": null
+        }
+      }
+    },
+    {
+      "id": "blauwdruk",
+      "van": "uitvoering",
+      "naar": "bewezen blauwdruk",
+      "familie": "overdracht",
+      "dragers": [
+        "server/kern/rtfos/netwerk.js"
+      ],
+      "notitie": null,
+      "dimensies": {
+        "van": {
+          "stand": "poort",
+          "bestand": "server/kern/rtfos/netwerk.js",
+          "citaat": "Een blauwdruk komt uit een project dat draait of gedraaid heeft",
+          "reden": null
+        },
+        "naar": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/netwerk.js",
+          "citaat": "B().push(rij)",
+          "reden": null
+        },
+        "voorwaarden": {
+          "stand": "poort",
+          "bestand": "server/kern/rtfos/netwerk.js",
+          "citaat": "Beschrijf de aanpak",
+          "reden": null
+        },
+        "actor": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/netwerk.js",
+          "citaat": "door: w.key",
+          "reden": null
+        },
+        "bevoegdheid": {
+          "stand": "poort",
+          "bestand": "server/kern/rtfos/netwerk.js",
+          "citaat": "'project.beheren'",
+          "reden": null
+        },
+        "actie": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/netwerk.js",
+          "citaat": "function deel(",
+          "reden": null
+        },
+        "bewijs": {
+          "stand": "poort",
+          "bestand": "server/kern/rtfos/netwerk.js",
+          "citaat": "Zonder cijfers is dit een idee en geen blauwdruk.",
+          "reden": null
+        },
+        "uitkomst": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/netwerk.js",
+          "citaat": "blauwdruk: beeld(rij)",
+          "reden": null
+        },
+        "blokkade": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/netwerk.js",
+          "citaat": "Een blauwdruk zonder dat stuk laat de volgende stad dezelfde fout maken.",
+          "reden": null
+        },
+        "terugweg": {
+          "stand": "afwezig",
+          "reden": "Een gedeelde blauwdruk is niet in te trekken of te bewerken."
+        },
+        "kennis": {
+          "stand": "poort",
+          "bestand": "server/kern/rtfos/netwerk.js",
+          "citaat": "Wat ging er mis of anders dan verwacht?",
+          "reden": null
+        },
+        "overdracht": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/netwerk.js",
+          "citaat": "function catalogus(",
+          "reden": null
+        },
+        "privacyklasse": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/netwerk.js",
+          "citaat": "({ naam: i.naam, doel: i.doel })",
+          "reden": "Alleen de naam en het doel van een indicator reizen mee; de resultaten, deelnemers en bedragen van die stad blijven daar."
+        },
+        "menselijke_bevestiging": {
+          "stand": "afwezig",
+          "reden": "Wie deelt, publiceert. Er kijkt geen tweede mens naar een blauwdruk voordat hij in de catalogus staat."
+        }
+      }
+    },
+    {
+      "id": "deelnemen",
+      "van": "bezoeker",
+      "naar": "vrijwillige deelnemer",
+      "familie": "toestand",
+      "dragers": [
+        "server/kern/rtfos/activiteiten-deur.js",
+        "server/kern/rtfos/vrijwilligeraccount.js"
+      ],
+      "notitie": null,
+      "dimensies": {
+        "van": {
+          "stand": "poort",
+          "bestand": "server/kern/rtfos/activiteiten-deur.js",
+          "citaat": "neemt geen inschrijvingen aan.",
+          "reden": null
+        },
+        "naar": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/activiteiten-deur.js",
+          "citaat": "function inschrijven(",
+          "reden": null
+        },
+        "voorwaarden": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/activiteiten-deur.js",
+          "citaat": "wachtlijst",
+          "reden": "Vol is geen weigering: wie te laat is, komt op de wachtlijst."
+        },
+        "actor": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/activiteiten-deur.js",
+          "citaat": "wieIn(req, staat)",
+          "reden": "De actor is de medewerker uit de sessie, en niet de bezoeker: inschrijven is een kantoorhandeling."
+        },
+        "bevoegdheid": {
+          "stand": "poort",
+          "bestand": "server/kern/rtfos/activiteiten-deur.js",
+          "citaat": "'project.beheren'",
+          "reden": null
+        },
+        "actie": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/activiteiten-deur.js",
+          "citaat": "function inchecken(",
+          "reden": null
+        },
+        "bewijs": {
+          "stand": "poort",
+          "bestand": "server/kern/rtfos/activiteiten-deur.js",
+          "citaat": "Deze incheckcode hoort niet bij deze activiteit.",
+          "reden": null
+        },
+        "uitkomst": {
+          "stand": "afwezig",
+          "reden": "Inschrijven en inchecken laten geen auditregel na; alleen afmelden doet dat."
+        },
+        "blokkade": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/activiteiten-deur.js",
+          "citaat": "heeft nog geen plek.",
+          "reden": null
+        },
+        "terugweg": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/activiteiten-deur.js",
+          "citaat": "function afmelden(",
+          "reden": null
+        },
+        "kennis": {
+          "stand": "afwezig",
+          "reden": "Meedoen vraagt of levert geen les."
+        },
+        "overdracht": {
+          "stand": "afwezig",
+          "reden": "Er gaat niets naar een ander."
+        },
+        "privacyklasse": {
+          "stand": "poort",
+          "bestand": "server/kern/rtfos/activiteiten-deur.js",
+          "citaat": "Onder welke codenaam schrijft deze deelnemer in?",
+          "reden": null
+        },
+        "menselijke_bevestiging": {
+          "stand": "poort",
+          "bestand": "server/kern/rtfos/activiteiten-deur.js",
+          "citaat": "Zonder die toestemming doet een minderjarige niet mee.",
+          "reden": "Toestemming van de ouders voor een minderjarige. Voor een volwassene bevestigt niemand iets: het kantoor schrijft hem in."
+        }
+      }
+    },
+    {
+      "id": "mentor",
+      "van": "deelnemer",
+      "naar": "mentor",
+      "familie": "toestand",
+      "dragers": [
+        "server/kern/rtfos/vrijwilligers-inzet.js",
+        "server/kern/leerhuis/acties-mens.js",
+        "server/kern/leerhuis/standen.js"
+      ],
+      "notitie": null,
+      "dimensies": {
+        "van": {
+          "stand": "poort",
+          "bestand": "server/kern/rtfos/vrijwilligers-inzet.js",
+          "citaat": "kan pas mee als de status",
+          "reden": null
+        },
+        "naar": {
+          "stand": "draagt",
+          "bestand": "server/kern/leerhuis/standen.js",
+          "citaat": "MENTOR",
+          "reden": null
+        },
+        "voorwaarden": {
+          "stand": "poort",
+          "bestand": "server/kern/rtfos/vrijwilligers-inzet.js",
+          "citaat": "heeft de gedragscode nog niet ondertekend.",
+          "reden": null
+        },
+        "actor": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/vrijwilligers-inzet.js",
+          "citaat": "wie(req)",
+          "reden": null
+        },
+        "bevoegdheid": {
+          "stand": "poort",
+          "bestand": "server/kern/rtfos/vrijwilligers-inzet.js",
+          "citaat": "'vrijwilliger.beheren'",
+          "reden": null
+        },
+        "actie": {
+          "stand": "draagt",
+          "bestand": "server/kern/leerhuis/acties-mens.js",
+          "citaat": "trainerKwalificeer",
+          "reden": null
+        },
+        "bewijs": {
+          "stand": "poort",
+          "bestand": "server/kern/rtfos/vrijwilligers-inzet.js",
+          "citaat": "is een geldige VOG verplicht.",
+          "reden": null
+        },
+        "uitkomst": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/vrijwilligers-inzet.js",
+          "citaat": "'vrijwilliger.koppel'",
+          "reden": null
+        },
+        "blokkade": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/vrijwilligers-inzet.js",
+          "citaat": "Vraag de eigen afdeling om een uitleen",
+          "reden": null
+        },
+        "terugweg": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/vrijwilligers-inzet.js",
+          "citaat": "'vrijwilliger.los'",
+          "reden": null
+        },
+        "kennis": {
+          "stand": "afwezig",
+          "reden": "Mentor worden vraagt geen les van de mentor; wel dat hij zelf heeft bewezen wat hij doorgeeft, en dat is bewijs."
+        },
+        "overdracht": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/vrijwilligers-inzet.js",
+          "citaat": "magInStad",
+          "reden": null
+        },
+        "privacyklasse": {
+          "stand": "afwezig",
+          "reden": "De koppeling draagt geen privacyregel in code; dat de VOG-inhoud niet wordt bewaard, staat in een commentaar."
+        },
+        "menselijke_bevestiging": {
+          "stand": "poort",
+          "bestand": "server/kern/leerhuis/acties-mens.js",
+          "citaat": "niemand kwalificeert zichzelf als trainer",
+          "reden": null
+        }
+      }
+    },
+    {
+      "id": "melden",
+      "van": "probleem",
+      "naar": "zaak",
+      "familie": "toestand",
+      "dragers": [
+        "server/kern/service/zaak.js",
+        "server/kern/stadsweefsel/zaken.js",
+        "server/kern/service/loop.js",
+        "server/routes/service.js"
+      ],
+      "notitie": null,
+      "dimensies": {
+        "van": {
+          "stand": "afwezig",
+          "reden": "Een zaak ontstaat uit niets: er is geen begintoestand die getoetst wordt. Twee meldingen over hetzelfde voegt het stadsweefsel samen, maar dat is ontdubbelen en geen begintoestand."
+        },
+        "naar": {
+          "stand": "draagt",
+          "bestand": "server/kern/service/zaak.js",
+          "citaat": "'geopend'",
+          "reden": null
+        },
+        "voorwaarden": {
+          "stand": "poort",
+          "bestand": "server/kern/stadsweefsel/zaken.js",
+          "citaat": "Waar is het? Geef een gebied of een positie binnen de stad.",
+          "reden": null
+        },
+        "actor": {
+          "stand": "poort",
+          "bestand": "server/kern/service/zaak.js",
+          "citaat": "Een zaak zonder melder kan niemand beantwoorden.",
+          "reden": null
+        },
+        "bevoegdheid": {
+          "stand": "afwezig",
+          "reden": "Iedereen met een account mag melden. Dat is met opzet: een melding vraagt geen recht."
+        },
+        "actie": {
+          "stand": "draagt",
+          "bestand": "server/kern/service/zaak.js",
+          "citaat": "function open(",
+          "reden": null
+        },
+        "bewijs": {
+          "stand": "afwezig",
+          "reden": "Een melding vraagt geen bewijs."
+        },
+        "uitkomst": {
+          "stand": "draagt",
+          "bestand": "server/kern/stadsweefsel/zaken.js",
+          "citaat": "werkVoorZaak",
+          "reden": null
+        },
+        "blokkade": {
+          "stand": "draagt",
+          "bestand": "server/kern/stadsweefsel/zaken.js",
+          "citaat": "de veldploeg is ermee bezig.",
+          "reden": null
+        },
+        "terugweg": {
+          "stand": "afwezig",
+          "reden": "Er is geen handeling waarmee de melder zijn eigen melding intrekt."
+        },
+        "kennis": {
+          "stand": "afwezig",
+          "reden": "Melden vraagt of levert geen les."
+        },
+        "overdracht": {
+          "stand": "draagt",
+          "bestand": "server/kern/service/loop.js",
+          "citaat": "mensVraag",
+          "reden": null
+        },
+        "privacyklasse": {
+          "stand": "draagt",
+          "bestand": "server/routes/service.js",
+          "citaat": "melder(req)",
+          "reden": "De melder is een sleutel of codenaam uit de sessie, nooit een naam."
+        },
+        "menselijke_bevestiging": {
+          "stand": "afwezig",
+          "reden": "Niemand bevestigt een melding; dat is de bedoeling."
+        }
+      }
+    },
+    {
+      "id": "oplossen",
+      "van": "zaak",
+      "naar": "opgelost",
+      "familie": "toestand",
+      "dragers": [
+        "server/kern/service/loop.js",
+        "server/kern/stadsweefsel/werkorders.js",
+        "server/kern/stadsweefsel/zaakbeeld.js",
+        "server/routes/service-kantoor.js"
+      ],
+      "notitie": null,
+      "dimensies": {
+        "van": {
+          "stand": "poort",
+          "bestand": "server/kern/stadsweefsel/werkorders.js",
+          "citaat": "Deze werkorder is al afgerond.",
+          "reden": "Alleen het stadsweefsel. RTG Service laat elke stand naar elke stand gaan."
+        },
+        "naar": {
+          "stand": "draagt",
+          "bestand": "server/kern/stadsweefsel/zaakbeeld.js",
+          "citaat": "zaakKlaar",
+          "reden": null
+        },
+        "voorwaarden": {
+          "stand": "poort",
+          "bestand": "server/kern/stadsweefsel/werkorders.js",
+          "citaat": "Klaarmelden gaat via de klaarmelding (met naam en kosten).",
+          "reden": null
+        },
+        "actor": {
+          "stand": "poort",
+          "bestand": "server/routes/service-kantoor.js",
+          "citaat": "RTG Service vraagt een zetel op naam.",
+          "reden": null
+        },
+        "bevoegdheid": {
+          "stand": "poort",
+          "bestand": "server/routes/service-kantoor.js",
+          "citaat": "balieAuth",
+          "reden": null
+        },
+        "actie": {
+          "stand": "draagt",
+          "bestand": "server/kern/service/loop.js",
+          "citaat": "zetStand",
+          "reden": null
+        },
+        "bewijs": {
+          "stand": "afwezig",
+          "reden": "Klaar vraagt geen bewijs dat het probleem weg is. `sluitbaar` in service/klassen.js heeft geen enkele lezer, en het commentaar ernaast verwijst naar een `sluit()` in zaak.js die niet bestaat."
+        },
+        "uitkomst": {
+          "stand": "draagt",
+          "bestand": "server/kern/stadsweefsel/zaakbeeld.js",
+          "citaat": "klaarDoor",
+          "reden": null
+        },
+        "blokkade": {
+          "stand": "draagt",
+          "bestand": "server/kern/service/loop.js",
+          "citaat": "Kies een stand",
+          "reden": null
+        },
+        "terugweg": {
+          "stand": "draagt",
+          "bestand": "server/kern/service/loop.js",
+          "citaat": "zetStand",
+          "reden": "In RTG Service kan een zaak terug naar elke stand; het stadsweefsel heeft geen heropenen."
+        },
+        "kennis": {
+          "stand": "afwezig",
+          "reden": "Een zaak sluiten vraagt geen les."
+        },
+        "overdracht": {
+          "stand": "draagt",
+          "bestand": "server/kern/stadsweefsel/zaakbeeld.js",
+          "citaat": "ctx.zaakSeintje(z)",
+          "reden": "De melder hoort dat zijn zaak klaar is."
+        },
+        "privacyklasse": {
+          "stand": "draagt",
+          "bestand": "server/kern/stadsweefsel/zaakbeeld.js",
+          "citaat": "tekst: mijn.tekst",
+          "reden": "De melder ziet de klaarmelding met alleen zijn EIGEN tekst, niet die van de buren die hetzelfde meldden. Eerst als afwezig ingedeeld; de woordenas vond hem."
+        },
+        "menselijke_bevestiging": {
+          "stand": "afwezig",
+          "reden": "De melder bevestigt niet dat het probleem weg is. SERVICE.md zegt dat een hersteld incident geen zaken sluit; voor een zaak zelf ligt die bevestiging nergens vast."
+        }
+      }
+    },
+    {
+      "id": "kennisvoorstel",
+      "van": "ervaring",
+      "naar": "kennisvoorstel",
+      "familie": "kennis",
+      "dragers": [
+        "server/kern/leerhuis/acties-kennis.js",
+        "server/kern/leerhuis/index.js",
+        "server/kern/leerhuis/standen.js"
+      ],
+      "notitie": null,
+      "dimensies": {
+        "van": {
+          "stand": "afwezig",
+          "reden": "Een ervaring is geen vastgelegde toestand; het voorstel begint uit het niets."
+        },
+        "naar": {
+          "stand": "draagt",
+          "bestand": "server/kern/leerhuis/standen.js",
+          "citaat": "begin: 'SUBMITTED'",
+          "reden": null
+        },
+        "voorwaarden": {
+          "stand": "poort",
+          "bestand": "server/kern/leerhuis/acties-kennis.js",
+          "citaat": "weiger('kennisitem '",
+          "reden": null
+        },
+        "actor": {
+          "stand": "poort",
+          "bestand": "server/kern/leerhuis/index.js",
+          "citaat": "de actor komt uit de sessie en is een geldige sleutel",
+          "reden": null
+        },
+        "bevoegdheid": {
+          "stand": "poort",
+          "bestand": "server/kern/leerhuis/acties-kennis.js",
+          "citaat": "alleen wie hier werkt of meedoet kan een voorstel indienen",
+          "reden": null
+        },
+        "actie": {
+          "stand": "draagt",
+          "bestand": "server/kern/leerhuis/acties-kennis.js",
+          "citaat": "voorstelIndienen",
+          "reden": null
+        },
+        "bewijs": {
+          "stand": "draagt",
+          "bestand": "server/kern/leerhuis/acties-kennis.js",
+          "citaat": "bewijs",
+          "reden": "Bewijs mag, en hoeft niet."
+        },
+        "uitkomst": {
+          "stand": "draagt",
+          "bestand": "server/kern/leerhuis/acties-kennis.js",
+          "citaat": "soort: 'voorstel'",
+          "reden": null
+        },
+        "blokkade": {
+          "stand": "draagt",
+          "bestand": "server/kern/leerhuis/acties-kennis.js",
+          "citaat": "een voorstel noemt ",
+          "reden": null
+        },
+        "terugweg": {
+          "stand": "afwezig",
+          "reden": "De indiener kan zijn voorstel niet intrekken; het kan alleen worden afgewezen."
+        },
+        "kennis": {
+          "stand": "poort",
+          "bestand": "server/kern/leerhuis/acties-kennis.js",
+          "citaat": "een voorstel noemt ",
+          "reden": null
+        },
+        "overdracht": {
+          "stand": "draagt",
+          "bestand": "server/kern/leerhuis/acties-kennis.js",
+          "citaat": "KNOWLEDGE_OWNER",
+          "reden": null
+        },
+        "privacyklasse": {
+          "stand": "afwezig",
+          "reden": "Het voorstel draagt geen privacyregel: wat de indiener opschrijft, gaat mee."
+        },
+        "menselijke_bevestiging": {
+          "stand": "afwezig",
+          "reden": "Indienen vraagt geen bevestiging; die komt bij de volgende overgang."
+        }
+      }
+    },
+    {
+      "id": "kennis-actief",
+      "van": "kennisvoorstel",
+      "naar": "actieve kennis",
+      "familie": "kennis",
+      "dragers": [
+        "server/kern/leerhuis/acties-kennis.js",
+        "server/kern/leerhuis/index.js",
+        "server/kern/leerhuis/standen.js"
+      ],
+      "notitie": null,
+      "dimensies": {
+        "van": {
+          "stand": "poort",
+          "bestand": "server/kern/leerhuis/acties-kennis.js",
+          "citaat": "is niet goedgekeurd",
+          "reden": null
+        },
+        "naar": {
+          "stand": "draagt",
+          "bestand": "server/kern/leerhuis/acties-kennis.js",
+          "citaat": "ACTIVE",
+          "reden": null
+        },
+        "voorwaarden": {
+          "stand": "poort",
+          "bestand": "server/kern/leerhuis/acties-kennis.js",
+          "citaat": "een opvolgende versie vraagt een impactklasse",
+          "reden": null
+        },
+        "actor": {
+          "stand": "poort",
+          "bestand": "server/kern/leerhuis/index.js",
+          "citaat": "de actor komt uit de sessie en is een geldige sleutel",
+          "reden": null
+        },
+        "bevoegdheid": {
+          "stand": "poort",
+          "bestand": "server/kern/leerhuis/acties-kennis.js",
+          "citaat": "goedkeuren of afwijzen vraagt KNOWLEDGE_OWNER",
+          "reden": null
+        },
+        "actie": {
+          "stand": "draagt",
+          "bestand": "server/kern/leerhuis/acties-kennis.js",
+          "citaat": "kennisStand",
+          "reden": null
+        },
+        "bewijs": {
+          "stand": "poort",
+          "bestand": "server/kern/leerhuis/acties-kennis.js",
+          "citaat": "kennis zonder bron is geen officiele kennis",
+          "reden": null
+        },
+        "uitkomst": {
+          "stand": "draagt",
+          "bestand": "server/kern/leerhuis/acties-kennis.js",
+          "citaat": "kennisSchrijf",
+          "reden": null
+        },
+        "blokkade": {
+          "stand": "draagt",
+          "bestand": "server/kern/leerhuis/acties-kennis.js",
+          "citaat": "er ligt al een concept van",
+          "reden": null
+        },
+        "terugweg": {
+          "stand": "draagt",
+          "bestand": "server/kern/leerhuis/standen.js",
+          "citaat": "ACTIVE: ['DEPRECATED', 'REVOKED']",
+          "reden": null
+        },
+        "kennis": {
+          "stand": "poort",
+          "bestand": "server/kern/leerhuis/acties-kennis.js",
+          "citaat": "wordt pas officiele kennis met de eigen bron van deze organisatie",
+          "reden": null
+        },
+        "overdracht": {
+          "stand": "draagt",
+          "bestand": "server/kern/leerhuis/acties-kennis.js",
+          "citaat": "geraakt(st, i.id, i.impactKlasse)",
+          "reden": "Wie door een nieuwe versie geraakt wordt, gaat terug naar leren."
+        },
+        "privacyklasse": {
+          "stand": "afwezig",
+          "reden": "Een kennisversie draagt geen privacyregel."
+        },
+        "menselijke_bevestiging": {
+          "stand": "poort",
+          "bestand": "server/kern/leerhuis/acties-kennis.js",
+          "citaat": "wie een kennisversie schrijft, keurt hem niet zelf goed",
+          "reden": null
+        }
+      }
+    },
+    {
+      "id": "fork",
+      "van": "blauwdruk",
+      "naar": "lokale fork",
+      "familie": "overdracht",
+      "dragers": [
+        "server/kern/rtfos/netwerk.js"
+      ],
+      "notitie": null,
+      "dimensies": {
+        "van": {
+          "stand": "poort",
+          "bestand": "server/kern/rtfos/netwerk.js",
+          "citaat": "Deze blauwdruk bestaat niet.",
+          "reden": null
+        },
+        "naar": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/netwerk.js",
+          "citaat": "status: 'idee'",
+          "reden": null
+        },
+        "voorwaarden": {
+          "stand": "poort",
+          "bestand": "server/kern/rtfos/netwerk.js",
+          "citaat": "Overnemen doet een ANDERE afdeling.",
+          "reden": null
+        },
+        "actor": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/netwerk.js",
+          "citaat": "leiderKey: w.key",
+          "reden": null
+        },
+        "bevoegdheid": {
+          "stand": "poort",
+          "bestand": "server/kern/rtfos/netwerk.js",
+          "citaat": "'project.beheren'",
+          "reden": null
+        },
+        "actie": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/netwerk.js",
+          "citaat": "function neemOver(",
+          "reden": null
+        },
+        "bewijs": {
+          "stand": "afwezig",
+          "reden": "Overnemen vraagt geen bewijs; dat zat bij het delen."
+        },
+        "uitkomst": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/netwerk.js",
+          "citaat": "uitBlauwdruk: bd.id",
+          "reden": null
+        },
+        "blokkade": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/netwerk.js",
+          "citaat": "een blauwdruk is geen besluit.",
+          "reden": null
+        },
+        "terugweg": {
+          "stand": "afwezig",
+          "reden": "Een overname is alleen ongedaan te maken door het nieuwe project te stoppen."
+        },
+        "kennis": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/netwerk.js",
+          "citaat": "doel: bd.aanpak.slice(0, 400)",
+          "reden": null
+        },
+        "overdracht": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/netwerk.js",
+          "citaat": "bd.overgenomen.push",
+          "reden": null
+        },
+        "privacyklasse": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/netwerk.js",
+          "citaat": "budgetCenten: 0",
+          "reden": "Het bedrag van de andere stad reist niet mee; de indicatoren beginnen op nul."
+        },
+        "menselijke_bevestiging": {
+          "stand": "afwezig",
+          "reden": "De overname zelf vraagt niemand; de eigen goedkeuring volgt daarna in overgang `buurtidee`."
+        }
+      }
+    },
+    {
+      "id": "gestopt",
+      "van": "poging",
+      "naar": "gestopt",
+      "familie": "toestand",
+      "dragers": [
+        "server/kern/rtfos/projecten-besluit.js",
+        "server/kern/rtfos/projecten.js",
+        "server/kern/rtfos/basis.js"
+      ],
+      "notitie": null,
+      "dimensies": {
+        "van": {
+          "stand": "poort",
+          "bestand": "server/kern/rtfos/projecten-besluit.js",
+          "citaat": "kan een project naar",
+          "reden": null
+        },
+        "naar": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/projecten.js",
+          "citaat": "'gestopt'",
+          "reden": null
+        },
+        "voorwaarden": {
+          "stand": "afwezig",
+          "reden": "Stoppen stelt geen voorwaarde."
+        },
+        "actor": {
+          "stand": "poort",
+          "bestand": "server/kern/rtfos/basis.js",
+          "citaat": "boardroomWie",
+          "reden": null
+        },
+        "bevoegdheid": {
+          "stand": "poort",
+          "bestand": "server/kern/rtfos/projecten-besluit.js",
+          "citaat": "'project.besluit'",
+          "reden": null
+        },
+        "actie": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/projecten.js",
+          "citaat": "KETEN",
+          "reden": null
+        },
+        "bewijs": {
+          "stand": "afwezig",
+          "reden": "Stoppen vraagt geen bewijs."
+        },
+        "uitkomst": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/projecten-besluit.js",
+          "citaat": "'project.status'",
+          "reden": null
+        },
+        "blokkade": {
+          "stand": "draagt",
+          "bestand": "server/kern/rtfos/projecten.js",
+          "citaat": "Een afgerond of gestopt project wijzigt niet meer.",
+          "reden": null
+        },
+        "terugweg": {
+          "stand": "afwezig",
+          "reden": "Gestopt is een eindstation; de keten heeft er geen uitgang."
+        },
+        "kennis": {
+          "stand": "afwezig",
+          "reden": "Stoppen vraagt geen reden en geen les. Daardoor verdwijnt wat een gestopte poging leerde; de blauwdruk weigert gestopte projecten (terecht), en er is geen andere plek."
+        },
+        "overdracht": {
+          "stand": "afwezig",
+          "reden": "Er gaat niets naar een ander."
+        },
+        "privacyklasse": {
+          "stand": "afwezig",
+          "reden": "Geen privacyregel."
+        },
+        "menselijke_bevestiging": {
+          "stand": "afwezig",
+          "reden": "Stoppen vraagt geen tweede mens."
+        }
+      }
+    },
+    {
+      "id": "les",
+      "van": "gestopt",
+      "naar": "les",
+      "familie": "kennis",
+      "dragers": [
+        "server/kern/livinglab/cyclus.js",
+        "server/routes/livinglab/index.js"
+      ],
+      "notitie": "Alleen het Living Lab draagt deze overgang, voor ONDERZOEK en niet voor buurtprojecten. Voor een RTF-project is er geen drager (zie `gestopt`).",
+      "dimensies": {
+        "van": {
+          "stand": "poort",
+          "bestand": "server/kern/livinglab/cyclus.js",
+          "citaat": "Een besluit hoort bij de stap besluit",
+          "reden": null
+        },
+        "naar": {
+          "stand": "draagt",
+          "bestand": "server/kern/livinglab/cyclus.js",
+          "citaat": "s.dossier.besluitenlog.unshift",
+          "reden": null
+        },
+        "voorwaarden": {
+          "stand": "poort",
+          "bestand": "server/kern/livinglab/cyclus.js",
+          "citaat": "Kies doorzetten, opschalen of gestopt.",
+          "reden": null
+        },
+        "actor": {
+          "stand": "draagt",
+          "bestand": "server/kern/livinglab/cyclus.js",
+          "citaat": "const door = schoon(b.door, 80)",
+          "reden": "Hij weigert zonder naam, maar die naam komt uit het VERZOEK en niet uit de sessie. De poort toetst dus een getypte naam en geen actor; AUTHORITY.md zegt dat de actor van een auditregel uit de sessie komt. Daarom DRAAGT en geen POORT."
+        },
+        "bevoegdheid": {
+          "stand": "poort",
+          "bestand": "server/routes/livinglab/index.js",
+          "citaat": "officeAuth",
+          "reden": null
+        },
+        "actie": {
+          "stand": "draagt",
+          "bestand": "server/kern/livinglab/cyclus.js",
+          "citaat": "function besluitZet(",
+          "reden": null
+        },
+        "bewijs": {
+          "stand": "afwezig",
+          "reden": "Het besluit zelf vraagt geen bewijs; het onderzoek ervoor wel."
+        },
+        "uitkomst": {
+          "stand": "draagt",
+          "bestand": "server/kern/livinglab/cyclus.js",
+          "citaat": "s.besluit = { soort, door, reden, at: nu() }",
+          "reden": null
+        },
+        "blokkade": {
+          "stand": "draagt",
+          "bestand": "server/kern/livinglab/cyclus.js",
+          "citaat": "is dat de waardevolle regel.",
+          "reden": null
+        },
+        "terugweg": {
+          "stand": "afwezig",
+          "reden": "Een besluit is niet terug te draaien."
+        },
+        "kennis": {
+          "stand": "poort",
+          "bestand": "server/kern/livinglab/cyclus.js",
+          "citaat": "Waarom dit besluit?",
+          "reden": null
+        },
+        "overdracht": {
+          "stand": "afwezig",
+          "reden": "De les blijft in het dossier van de studie."
+        },
+        "privacyklasse": {
+          "stand": "afwezig",
+          "reden": "Geen privacyregel."
+        },
+        "menselijke_bevestiging": {
+          "stand": "afwezig",
+          "reden": "Een mens neemt het besluit; niemand bevestigt het."
+        }
+      }
+    }
+  ],
+  "zonderDrager": [
+    {
+      "id": "upstream",
+      "van": "lokale fork",
+      "naar": "verbetering upstream",
+      "reden": "Niets stuurt een verbetering terug naar de blauwdruk waar een project uit kwam. `uitBlauwdruk` wordt nergens gelezen, en een blauwdruk heeft geen versie en geen bewerkfunctie. Wie een overgenomen project later zelf deelt, maakt een NIEUWE blauwdruk zonder band met de oude."
+    },
+    {
+      "id": "les-voorstel",
+      "van": "les",
+      "naar": "kennisvoorstel",
+      "reden": "Een les uit een gestopte poging wordt nergens een kennisvoorstel. Het besluitenlog van het Living Lab heeft geen lezer in het leerhuis, en `voorstelIndienen` kent geen herkomst uit een gestopte poging. Dat is precies de tussenstand die het voorstel mist: een waarneming is nog geen kennis."
+    }
+  ]
+}

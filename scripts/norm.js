@@ -770,6 +770,19 @@ const METERS = [
   /* OFFICEVORM.json (OFFICE.md par. 0): het bereik onder de nul waarop het
      besluit rust dat er geen `RTGObject` komt. */
   { sleutel: 'officeDomeinenGemeten', richting: 'omhoog', wat: 'objectdomeinen die de officevormmeter werkelijk heeft gezien' },
+  /* OVERGANGSVORM.json (VERDER.md par. 2). Drie ratels, en ze gaan niet
+     dezelfde kant op. Het BEREIK omhoog, om de reden van de vormmeters
+     hierboven: op de uitkomst GEEN rust het besluit dat er geen universele
+     `Overgang` komt, en een GEEN over minder overgangen leest als bevestiging
+     terwijl hij een blinde vlek is. De ROT omlaag en op nul: elke stand en
+     elke wet draagt een citaat dat letterlijk in de code moet staan, en een
+     citaat dat verdwijnt is een bewering die haar grond kwijt is. En de
+     ONVERKLAARDE onenigheid tussen de indeling en de woordenas omlaag: een
+     nieuwe onenigheid is precies het moment om te kijken of de indeling iets
+     mist -- zo is `oplossen.privacyklasse` gevonden. */
+  { sleutel: 'overgangenGemeten', richting: 'omhoog', wat: 'overgangen met een drager die de overgangsvormmeter werkelijk heeft ingedeeld' },
+  { sleutel: 'overgangCitaatRot', richting: 'omlaag', wat: 'standen en wetten in VERDER.md waarvan het citaat niet (meer) in de code staat' },
+  { sleutel: 'overgangWoordenOnverklaard', richting: 'omlaag', wat: 'onenigheden tussen de indeling en de woordenas zonder nagekeken reden' },
   /* NEIGINGVORM.json (NEIGING.md par. 0). Twee ratels en met opzet geen derde
      over de naamsmeting: die telt sinds de laag bestaat zijn eigen bestanden
      mee, dus een getal daarop zou alleen maar groeien met het werk.
@@ -1760,6 +1773,9 @@ function meet(bronnen) {
     planDomeinenGemeten: leesRegister('PLANVORM.json', (j) => j.rondes.ruim.vorm.domeinen.length),
     plaatsDomeinenGemeten: leesRegister('PLAATSVORM.json', (j) => j.rondes.ruim.domeinen.length),
     officeDomeinenGemeten: leesRegister('OFFICEVORM.json', (j) => j.rondes.ruim.vorm.domeinen.length),
+    overgangenGemeten: leesRegister('OVERGANGSVORM.json', (j) => j.overgangen.length),
+    overgangCitaatRot: leesRegister('OVERGANGSVORM.json', (j) => j.citaten.rot + j.wetten.rot),
+    overgangWoordenOnverklaard: leesRegister('OVERGANGSVORM.json', (j) => j.woorden.onverklaard),
     neigingVerwijzingRot: leesRegister('NEIGINGVORM.json', (j) => j.gemeten.voorstel.rot),
     neigingVoorkeurBlind: leesRegister('NEIGINGVORM.json', (j) => j.gemeten.voorkeur.metAffiniteit - j.gemeten.voorkeur.metAlledrie),
     connectDomeinenGemeten: leesRegister('CONNECTLUS.json', (j) => j.werkwoorden.domeinen),

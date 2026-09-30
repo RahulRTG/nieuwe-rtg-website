@@ -567,6 +567,10 @@ const REGISTERS = [
      waarop het besluit rust dat er geen `RTGObject` komt, en die veroudert met
      de CODE -- een nieuw objectdomein of een hernoemde map verandert hem. */
   ['OFFICEVORM.json', 'npm run officevorm:vast', 'of de objectdomeinen onder het voorgestelde RTGObject een datavorm DELEN -- het besluit tegen een universeel objectmodel voor RTG Office rust erop, en de uitslag is een nul'],
+  /* Zesde van deze soort (VERDER.md par. 2): GEEN universele overgang, en die
+     uitslag veroudert met de CODE -- een drager die een poort krijgt of
+     verliest, verschuift de dilemma's zonder dat iemand de meter draait. */
+  ['OVERGANGSVORM.json', 'npm run overgangsvorm:vast', 'of er EEN overgang is onder werk, leren, bevoegdheid, buurt, kennis en blauwdrukken -- het besluit tegen een universele Overgang in FoundationOS rust erop, en de uitslag is GEEN'],
   ['PLANVORM.json', 'npm run planvorm:vast', 'of de plandomeinen een datavorm en een planlus DELEN -- het besluit over een universele planningsgrond rust erop, en de uitslag is twee nullen'],
   ['PLAATSVORM.json', 'npm run plaatsvorm:vast', 'of de plaatsdomeinen een datavorm DELEN -- het besluit tegen een Place-objecttype rust erop, en de uitslag is een nul onder twee drempels'],
   ['SPOORVORM.json', 'npm run spoorvorm:vast', 'hoever de zes andere mechanismen van de spoorvorm van kern/vertegenwoordiging/handelen.js staan -- een matrix vol streepjes ziet er vers en verouderd hetzelfde uit, en juist die matrix hoort te veranderen'],

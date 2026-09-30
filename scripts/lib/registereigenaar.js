@@ -191,6 +191,10 @@ const EIGENAAR = {
      BEREIK, een ijking en een regel in de versheidslijst. */
   'OFFICEVORM.json': { schrijver: 'scripts/officevorm.js' },
 
+  /* De overgangsvorm: is er EEN overgang onder FoundationOS? Zelfde vorm als de
+     officevorm hierboven, met drie ratels in plaats van een. */
+  'OVERGANGSVORM.json': { schrijver: 'scripts/overgangsvorm.js' },
+
   /* De spiegel van STILSPOOR: lezers die een onleesbaar bewijs als een afwezig
      bewijs behandelen. Vier tanden in scripts/lib/metingen.js, en de detectie
      hieronder vindt hem niet (het doel staat in een `const DOEL` die via

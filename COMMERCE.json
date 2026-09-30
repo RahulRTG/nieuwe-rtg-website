@@ -1,15 +1,15 @@
 {
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
-  "vastgelegd": "2026-09-29",
+  "vastgelegd": "2026-09-30",
   "gemeten": {
-    "bestanden": 2570,
-    "domeinenTotaal": 681,
-    "koopbareVormen": 612,
-    "koopbareDomeinen": 123,
+    "bestanden": 2580,
+    "domeinenTotaal": 684,
+    "koopbareVormen": 613,
+    "koopbareDomeinen": 124,
     "envelopDrempel": 8,
-    "envelop": 42,
-    "veldenDomeineigen": 786,
-    "veldenNietEnvelop": 1054,
+    "envelop": 43,
+    "veldenDomeineigen": 790,
+    "veldenNietEnvelop": 1057,
     "gelijkendeVormparen": 17,
     "werkwoordenVolledig": 2,
     "werkwoordenOveral": 0,
@@ -17,9 +17,9 @@
     "wagenVormen": 33,
     "wagenVormenUniek": 30,
     "wagenDomeinen": 22,
-    "optellingen": 120,
-    "optelDomeinen": 60,
-    "optelCenten": 65,
+    "optellingen": 121,
+    "optelDomeinen": 61,
+    "optelCenten": 66,
     "optelEuro": 5,
     "optelGemengd": 0,
     "optelOnbekend": 50
@@ -57,6 +57,7 @@
     "stand",
     "status",
     "supplierCode",
+    "tarief",
     "titel",
     "totaal",
     "totaalCenten",
@@ -69,11 +70,11 @@
     "wat"
   ],
   "perWerkwoord": {
-    "toon": 93,
+    "toon": 94,
     "prijs": 39,
-    "beschikbaarheid": 53,
-    "reserveer": 28,
-    "bevestig": 59,
+    "beschikbaarheid": 54,
+    "reserveer": 29,
+    "bevestig": 60,
     "lever": 24,
     "annuleer": 34,
     "retour": 8
@@ -1069,6 +1070,25 @@
       "telt": 3
     },
     {
+      "domein": "kern/bedrijfsmaat",
+      "heeft": {
+        "toon": true,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": true,
+        "bevestig": true,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "bezoek",
+        "reserveer": "verhouding",
+        "bevestig": "rtgboekMaten"
+      },
+      "telt": 3
+    },
+    {
       "domein": "kern/betaalwaarheid",
       "heeft": {
         "toon": true,
@@ -1585,6 +1605,24 @@
       "telt": 2
     },
     {
+      "domein": "kern/rtgboek",
+      "heeft": {
+        "toon": false,
+        "prijs": false,
+        "beschikbaarheid": true,
+        "reserveer": false,
+        "bevestig": true,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "beschikbaarheid": "lopend",
+        "bevestig": "boek"
+      },
+      "telt": 2
+    },
+    {
       "domein": "kern/rugdekking",
       "heeft": {
         "toon": true,
@@ -1943,23 +1981,6 @@
       },
       "bewijs": {
         "toon": "overzicht"
-      },
-      "telt": 1
-    },
-    {
-      "domein": "kern/rtgboek",
-      "heeft": {
-        "toon": false,
-        "prijs": false,
-        "beschikbaarheid": false,
-        "reserveer": false,
-        "bevestig": true,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "bevestig": "boek"
       },
       "telt": 1
     },

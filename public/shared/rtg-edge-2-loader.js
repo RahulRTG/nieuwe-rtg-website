@@ -140,6 +140,17 @@
   });
   else if (pad === '/apps/agenda.html') hoofdactie('Nieuwe afspraak', function () { klik('#nieuwBtn'); });
   else if (pad === '/apps/reisboek.html') hoofdactie('Naar reisinhoud', function () { focus('#main'); });
+  else if (pad === '/apps/living-world.html') {
+    function livingWorldAction() {
+      var source = vind('[data-lw-primary]');
+      hoofdactie(source ? source.textContent : 'Ontdek uw wereld', function () {
+        var current = vind('[data-lw-primary]');
+        if (current) current.click(); else klik('[data-lw-tab="world"]');
+      });
+    }
+    livingWorldAction();
+    d.addEventListener('rtg:living-world-render', livingWorldAction);
+  }
   else if (pad === '/apps/werk.html') {
     hoofdactie('Nieuw project', function () {
       var inlog = vind('#inlogGa');

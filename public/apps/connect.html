@@ -266,6 +266,14 @@
         '</div>').join('')
       : '<p class="stil">Hier komen uw bewijsstukken. Iets maken telt, en iets waar een ander mens ' +
         'daadwerkelijk mee heeft gewerkt telt het zwaarst.</p>';
+    (p.worldContributions || []).forEach(b => {
+      const item = document.createElement('div'); item.className = 'bewijs';
+      const link = document.createElement('a'); link.href = b.url; link.textContent = b.title;
+      const title = document.createElement('h4'); title.appendChild(link); item.appendChild(title);
+      const claim = document.createElement('p'); claim.className = 'zegt'; claim.textContent = b.claim; item.appendChild(claim);
+      const limit = document.createElement('p'); limit.className = 'nietzegt'; limit.textContent = b.limit; item.appendChild(limit);
+      $('#portfolio').appendChild(item);
+    });
     $('#portfolioNoot').textContent = (p.nietGeteld || '') + ' ' + (p.uitgang || '');
   }
 

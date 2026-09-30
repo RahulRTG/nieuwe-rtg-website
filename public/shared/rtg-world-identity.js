@@ -33,7 +33,7 @@
       mijn-neigingen mijn-post mijn-relaties mijn-sessies notities oog passkeys rtgid salon scanner service-bel service \
       sociaal-prive tijdlijn training vertaler voeding zaal'),
     travel: routes('\
-      arrival boeken chauffeur flits hangar hotels move navigatie ov reisboek reisbureau reizen-veilig reizen \
+      arrival boeken chauffeur flits hangar hotels living-world move navigatie ov reisboek reisbureau reizen-veilig reizen \
       residentie rit routedossier stad vluchten \
       dispatch ghost luchthaven marechaussee ovcontrol ovdienst ovroutes reisuitnodiging routedekking \
       voertuig zakelijk'),

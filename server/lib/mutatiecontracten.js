@@ -29,15 +29,13 @@
        bewijs:    { gemeten: '...', op: '...' }
      }
 
-   HIJ IS MET OPZET BIJNA LEEG. Er staan 4653 schrijfroutes tegenover, en dat
-   verschil is de eerlijke stand van zaken: dit huis weet van bijna geen enkele
-   route formeel wat een tweede aanroep hoort te doen. Elke regel die hier
-   bijkomt, is er een die iemand heeft nagekeken -- niet een die een script heeft
-   geraden. Het register vult zich dus langzaam, en dat is de bedoeling.
+   Elk contract is een nagelezen uitspraak over toegang en herhaling, geen
+   automatisch groen vinkje. Niet-geclassificeerde routes blijven zichtbaar.
    ========================================================================== */
 'use strict';
 
 const CONTRACTEN = Object.assign({},
+  require('./mutatiecontracten-living-world').CONTRACTEN,
   require('./mutatiecontracten-beelden').CONTRACTEN,
   require('./mutatiecontracten-document').CONTRACTEN,
   require('./mutatiecontracten-storingen').CONTRACTEN,

@@ -49,12 +49,13 @@ module.exports = (ctx) => {
          De extra JSON-ronde voorkomt dat `werk` via een gedeelde objectref al
          vóór COMMIT aan db.data schrijft. */
       const dbBasis = JSON.parse(jsonVoor);
-      const cacheBasis = laatsteJson.has(sleutel)
-        ? JSON.parse(laatsteJson.get(sleutel)) : dbBasis;
       /* Houd live-voor apart van de verenigde werkkopie. De werkkopie kan
          verse DB-wijzigingen bevatten die live nog niet kende; publicatie mag
          die niet aanzien voor een wijziging die tijdens deze tx ontstond. */
-      const liveVoor = dataNu[sleutel] == null ? {} : dataNu[sleutel];
+      const liveVoor = dataNu[sleutel] == null ? (Array.isArray(dbBasis) ? [] : {}) : dataNu[sleutel];
+      // Een nooit ingelezen collectie is geen lokale verwijdering van de DB-rij.
+      const cacheBasis = laatsteJson.has(sleutel)
+        ? JSON.parse(laatsteJson.get(sleutel)) : (Array.isArray(liveVoor) ? [] : {});
       publicatieBasisJson = JSON.stringify(liveVoor);
       waarde = JSON.parse(JSON.stringify(merge3(cacheBasis, liveVoor, dbBasis)));
       resultaat = werk(waarde);

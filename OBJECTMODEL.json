@@ -1,17 +1,17 @@
 {
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
-  "vastgelegd": "2026-09-29",
+  "vastgelegd": "2026-09-30",
   "gemeten": {
-    "bestanden": 2570,
-    "vormen": 1499,
-    "velden": 2159,
-    "modules": 830,
-    "domeinen": 301,
+    "bestanden": 2580,
+    "vormen": 1508,
+    "velden": 2170,
+    "modules": 834,
+    "domeinen": 302,
     "envelopDrempel": 19,
     "envelop": 29,
-    "veldenDomeineigen": 1508,
-    "veldenGedeeldVanafVier": 221,
-    "gelijkendeVormparen": 23
+    "veldenDomeineigen": 1512,
+    "veldenGedeeldVanafVier": 222,
+    "gelijkendeVormparen": 24
   },
   "envelop": [
     "aantal",
@@ -46,6 +46,18 @@
   ],
   "gedeeld": [
     {
+      "veld": "type",
+      "domeinen": 18,
+      "waar": [
+        "bedrijf",
+        "kern/antivirus",
+        "kern/command",
+        "kern/commerce",
+        "kern/connection-communication",
+        "kern/connection-communication-call"
+      ]
+    },
+    {
       "veld": "key",
       "domeinen": 18,
       "waar": [
@@ -67,18 +79,6 @@
         "kern/command",
         "kern/commercie",
         "kern/ledenbalie-inzage"
-      ]
-    },
-    {
-      "veld": "type",
-      "domeinen": 17,
-      "waar": [
-        "bedrijf",
-        "kern/antivirus",
-        "kern/command",
-        "kern/commerce",
-        "kern/connection-communication",
-        "kern/connection-communication-call"
       ]
     },
     {
@@ -274,6 +274,18 @@
       ]
     },
     {
+      "veld": "actie",
+      "domeinen": 12,
+      "waar": [
+        "bedrijf",
+        "kern/bankregie",
+        "kern/command",
+        "kern/frictie",
+        "kern/geldbeleid",
+        "kern/kantoor"
+      ]
+    },
+    {
       "veld": "vanMij",
       "domeinen": 12,
       "waar": [
@@ -307,6 +319,18 @@
         "kern/geldgraaf",
         "kern/leerhuis",
         "kern/levenslijn"
+      ]
+    },
+    {
+      "veld": "actor",
+      "domeinen": 12,
+      "waar": [
+        "bedrijf",
+        "kern/command",
+        "kern/commercie",
+        "kern/envelop",
+        "kern/experience",
+        "kern/living-world"
       ]
     },
     {
@@ -394,6 +418,18 @@
       ]
     },
     {
+      "veld": "updatedAt",
+      "domeinen": 11,
+      "waar": [
+        "kern/architect",
+        "kern/atelier",
+        "kern/connection-communication-call",
+        "kern/economie",
+        "kern/hardwarelab",
+        "kern/hoteldorp"
+      ]
+    },
+    {
       "veld": "waarde",
       "domeinen": 11,
       "waar": [
@@ -418,18 +454,6 @@
       ]
     },
     {
-      "veld": "actie",
-      "domeinen": 11,
-      "waar": [
-        "bedrijf",
-        "kern/bankregie",
-        "kern/command",
-        "kern/frictie",
-        "kern/geldbeleid",
-        "kern/kantoor"
-      ]
-    },
-    {
       "veld": "voor",
       "domeinen": 11,
       "waar": [
@@ -451,18 +475,6 @@
         "kern/levensgraaf",
         "kern/onderneming",
         "kern/reisgezelschap"
-      ]
-    },
-    {
-      "veld": "actor",
-      "domeinen": 11,
-      "waar": [
-        "bedrijf",
-        "kern/command",
-        "kern/commercie",
-        "kern/envelop",
-        "kern/experience",
-        "kern/luchthaven"
       ]
     },
     {
@@ -499,18 +511,6 @@
         "kern/gebouw-demo",
         "kern/mobiliteit",
         "kern/rtfos"
-      ]
-    },
-    {
-      "veld": "updatedAt",
-      "domeinen": 10,
-      "waar": [
-        "kern/architect",
-        "kern/atelier",
-        "kern/connection-communication-call",
-        "kern/economie",
-        "kern/hardwarelab",
-        "kern/hoteldorp"
       ]
     },
     {
@@ -861,6 +861,21 @@
         "gratis",
         "nr",
         "prijsCenten"
+      ]
+    },
+    {
+      "gelijkenis": 0.6,
+      "a": "server/kern/living-world/saloon.js",
+      "b": "server/kern/wereld/saloon/bronnen.js",
+      "domeinA": "kern/living-world",
+      "domeinB": "kern/wereld",
+      "gedeeld": [
+        "actie",
+        "auteur",
+        "begint",
+        "prive",
+        "type",
+        "url"
       ]
     },
     {

@@ -77,6 +77,7 @@ module.exports = function hangDwarseRoutersOp(grens) {
   /* De gedeelde Experience Plane boven alle vier werelden: projections lezen,
      mutaties uitsluitend via zijn Action Broker. */
   const experienceGrens = grens('experience');
+  require('../routes/living-world')(grens('living-world'));
   require('../routes/experience')(experienceGrens.app, experienceGrens.auth,
     experienceGrens.experience);
   /* De economielaag eronder (kern/economie/, ECONOMIE.md): de vier werelden en

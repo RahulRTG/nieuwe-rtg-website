@@ -83,6 +83,7 @@ require('./mediaos')(kern, hulp);
 
 Object.assign(kern, require('../kern/connect').maakConnect({
   db, save, crypto,
+  worldContributions:key=>kern.livingWorld.portfolio(key),
   DOELEN: require('../kern/leerstof').DOELEN,
   rtfos: kern.rtfos,
   /* Het voorvoegsel gaat eraf: een ontdekking draagt `herkomst:id`

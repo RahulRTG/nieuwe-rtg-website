@@ -345,6 +345,9 @@
       "sessieSleutel",
       "zwaar"
     ],
+    "living-world": [
+      "livingWorld"
+    ],
     "experience": [
       "experience"
     ],
@@ -802,6 +805,7 @@
       "markt"
     ],
     "mediaos": [
+      "livingWorld",
       "aanwezigBeeld",
       "aanwezigMet",
       "aanwezigMijn",

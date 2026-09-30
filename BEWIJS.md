@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2181 bestanden en 15190 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2187 bestanden en 15208 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2181 |
-| losse beweringen (`test(...)`) | 15190 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 200 |
+| toetsbestanden | 2187 |
+| losse beweringen (`test(...)`) | 15208 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 206 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1851 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 147 |
 | alleen in de kop *genoemd*, nog niet gemeten | 30 |
-| niets van beide | 153 |
+| niets van beide | 159 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1897 bestanden, 14695 beweringen.
+1902 bestanden, 14712 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -878,6 +878,11 @@ toets omvalt.
 | `livegang-pakket.test.js` | 5 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `livegang.test.js` | 3 | gezakt op `liegpoort /api/` | De livegang: in productie start het platform schoon en op slot. - geen demozaken in de catalogus, geen demopersoneel, geen voorbeeldposts - de demo-inlog is dicht (leden en zaken) - de rate-limiter staat aan |
 | `living-experience.test.js` | 7 | gezakt op `===->!==#0` | De ervaringscompiler wijst kapotte bestemming, toestand, wereld en overdracht af. Ontbrekend, veranderd of overgeslagen bewijs kan nooit groen worden. |
+| `living-world-http.test.js` | 2 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `living-world-sources.test.js` | 4 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `living-world-sqlite.test.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `living-world.pg.test.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `living-world.test.js` | 9 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `livinglab-capsule.test.js` | 6 | gezakt op `liegpoort /api/` | DE REPRODUCTIECAPSULE EN DE GESCHIEDENIS VAN EEN CONCLUSIE. Wat deze toets vastlegt: 1. |
 | `livinglab-instrument.test.js` | 10 | gezakt op `liegpoort /api/` | MEETINSTRUMENTEN -- wat een deelnemer met zijn labpas invult. Wat deze toets vastlegt: 1. |
 | `livinglab-ledger.test.js` | 9 | gezakt op `liegpoort /api/` | HET ONDERZOEKSGROOTBOEK -- wat een studie kostte, en waarom de stichting die rekening mocht betalen. Wat deze toets vastlegt: 1. |
@@ -1937,7 +1942,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-284 bestanden, 495 beweringen.
+285 bestanden, 496 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2068,6 +2073,7 @@ toets omvalt.
 | `lifestyleschermen.e2e.js` | 2 | -- | DE TWAALF LIFESTYLE-SCHERMEN: LEGT EEN TOETS DE WEG ECHT AF? WAAROM JUIST DEZE TWAALF Bij het afsluiten van TAKEN 4.1 heb ik zelf de openstaande rest opgeschreven: "wat er nog steeds niet is: dezelfde weg door het... |
 | `linkgezin.e2e.js` | 2 | -- | RTG SCAN AAN DE GEZINSKANT (public/apps/foundation/vrienden.html) -- LINK.md stap 4. WAAROM DEZE TOETS BESTAAT. |
 | `linkscan.e2e.js` | 4 | -- | RTG SCAN in de leden-app (public/apps/app-main/app-main-56.js) -- LINK.md stap 4. WAT HIER ECHT GEBEURT, EN WAAROM DAT IN EEN BROWSER MOET. |
+| `living-world.e2e.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `livinglab.e2e.js` | 2 | -- | Scherm-test voor het RTF Living Lab: het kantoorscherm (/apps/livinglab.html) en het bewonersscherm (/apps/labpas.html). WAAROM DEZE TOETS ER IS. |
 | `loopbaan.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE TWEE LOOPBAANSCHERMEN IN EEN ECHTE BROWSER. test/carriereledger.test.js bewijst het besluit en test/carriereledger.e2e.test.js dat een verzoek over HTTP bij dat besluit aankomt. |
 | `magnaat-partnerstudio.e2e.js` | 1 | gezakt op `liegpoort /api/` | De Magnaat Partnerstudio in een echte browser. De kernproeven bewijzen de publicatie- en vier-ogenregels. |

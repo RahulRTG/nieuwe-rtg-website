@@ -16,9 +16,12 @@ module.exports = ({ db, verbinding, statements, uitStore, naarStore,
     const rij = lees.get(sleutel);
     jsonVoor = rij ? uitStore(rij.val) : JSON.stringify(db.data[sleutel] == null ? {} : db.data[sleutel]);
     const dbBasis = JSON.parse(jsonVoor);
+    // Een collectie die dit proces nooit las heeft nog geen lokale basis.
+    // De verse DB-rij als basis nemen ziet haar afwezigheid in RAM ten
+    // onrechte als verwijdering en wist de eerste commit van een ander proces.
+    const liveVoor = db.data[sleutel] == null ? (Array.isArray(dbBasis) ? [] : {}) : db.data[sleutel];
     const cacheBasis = laatsteJson.has(sleutel)
-      ? JSON.parse(laatsteJson.get(sleutel)) : dbBasis;
-    const liveVoor = db.data[sleutel] == null ? {} : db.data[sleutel];
+      ? JSON.parse(laatsteJson.get(sleutel)) : (Array.isArray(liveVoor) ? [] : {});
     publicatieBasisJson = JSON.stringify(liveVoor);
     waardeNa = JSON.parse(JSON.stringify(merge3(cacheBasis, liveVoor, dbBasis)));
     antwoord = werk(waardeNa);

@@ -31,7 +31,11 @@ module.exports = (kern) => {
   // één stuk, met alles wat er echt aan vastzit
   app.post('/api/mediaos/stuk', auth, async (req, res) => {
     if (geenGast(req, res)) return;
-    stuur(res, await mediaStuk(sess(req), String((req.body || {}).id || '')));
+    const id = String((req.body || {}).id || '');
+    const stuk = await mediaStuk(sess(req), id);
+    if (stuk && !stuk.error) stuk.experiences = kern.livingWorld.mediaLinks(req.session.key, id)
+      .map(b => ({ id: b.id, title: b.title, url: b.url }));
+    stuur(res, stuk);
   });
   // één maker: al zijn werk, over de vier vormen heen
   app.post('/api/mediaos/maker', auth, async (req, res) => {

@@ -1,21 +1,11 @@
-/* DE VERKLAARDE RANDEN -- wat een mens over een rand heeft vastgesteld.
-
-   scripts/verstrengeling.js kan drie soorten AFLEIDEN (laagrand, eigen data,
-   gemeten primitief) en de rest niet. Die rest heet ONBEKEND, en dat getal moet
-   naar nul -- niet door de meter slimmer te maken maar door hier een regel bij
-   te schrijven met een reden die klopt.
-
-   Een regel is: { van, naar, soort, reden }. Van en naar zijn knopen in de vorm
-   laag:domein, precies zoals ze in het rapport staan.
-
-   DE REDEN IS HET HELE PUNT. 'hoort zo' verklaart niets; het onderdrukt alleen
-   een melding. Wie een rand niet in een zin kan uitleggen, heeft hem niet
-   begrepen en laat hem beter op ONBEKEND staan -- daar is dat woord voor.
-
-   LEGACY is een eerlijke soort: bekend, fout, en niet vandaag op te lossen.
-   Een rand daarheen verplaatsen is een besluit dat je kunt terugvinden; hem
-   DOMEINRELATIE noemen om van het getal af te zijn, is de meter kapotmaken. */
+/* Verklaarde randen: { van, naar, soort, reden } tussen knopen laag:domein.
+   Automatisch afleidbare randen staan in scripts/verstrengeling.js. Hier staat
+   waarom de overige relaties bestaan. Een reden onderbouwt het ontwerp;
+   alleen een melding onderdrukken is onvoldoende. LEGACY betekent: bekend,
+   fout en nog niet opgelost. Noem zo'n relatie geen DOMEINRELATIE. */
 module.exports = [
+  { van: 'domein:experience', naar: 'domein:living-world', soort: 'ORKESTRATIE',
+    reden: 'De Experience Broker registreert de actiewoordenlijst en voert bevestigde intents uit via de Living World-adapter. Het brondomein blijft eigenaar van bevoegdheid, revisie, levensloop en duurzame ontvangstbewijzen; de Broker kopieert geen domeinwaarheid.' },
   { van: 'ingang:ik', naar: 'ingang:presentatie-beelden', soort: 'ORKESTRATIE',
     reden: 'De ik-route registreert de persoonlijke presentatievoorkeuren als onderdeel van de eigen accountinstellingen; de beeldmodule bewaakt zelf lid- en gezinsprofielauthenticatie en eigendom van privébestanden.' },
   /* DE LEDENGIDS RAAKT DE AANWEZIGHEID AAN (besluit van de eigenaar, 25 september

@@ -45,6 +45,7 @@ module.exports = [
   '/apps/life.html',
   '/apps/lifestyle.html',
   '/apps/living-os.html',
+  '/apps/living-world.html',
   '/apps/logboek.html',
   '/apps/maison.html',
   '/apps/mall.html',

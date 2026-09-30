@@ -4,6 +4,9 @@
 const enc = encodeURIComponent;
 const url = (pad, q) => pad + '?' + new URLSearchParams(q).toString();
 module.exports = ({ kern, sociaal }) => ({
+  livingworld(sess) {
+    return kern.livingWorld.saloon(sess.key);
+  },
   sociaal(sess, o) {
     const items = []; let d;
     do {

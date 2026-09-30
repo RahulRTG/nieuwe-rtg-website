@@ -140,7 +140,9 @@ function maakConnect(ctx) {
      telt die twee met opzet apart. */
   return { connect: {
     ontdek, open, werkBij,
-    portfolio: dossier.portfolio, dossier: dossier.lees, dossierNoteer: dossier.noteer,
+    portfolio: (key,options) => ({...dossier.portfolio(key,options),
+      worldContributions:ctx.worldContributions ? ctx.worldContributions(key) : []}),
+    dossier: dossier.lees, dossierNoteer: dossier.noteer,
     naklank: naklank.geef, naklankWeg: naklank.neemTerug, naklankTel: naklank.tel,
     horizon: horizon.lees, schuif: horizon.schuifNaar, signaal: horizon.signaal,
     kringZet: kring.zet, kringKeuzes: kring.keuzes, magZien: kring.magZien,

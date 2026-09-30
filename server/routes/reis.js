@@ -129,6 +129,7 @@ module.exports = (kern) => {
   };
   const uitnodigingIdem = req => String(((req.body || {}).idem || req.get('idempotency-key') || '')).slice(0, 200);
   app.post('/api/reis/uitnodiging/open', async (req, res) => {
+    res.set('Cache-Control','no-store');
     if (kern.tooManyTries && kern.tooManyTries(res, 'reisuitnodiging:' + req.ip)) return;
     await reisUitnodiging(res, () => kern.reisuitnodiging.open((req.body || {}).code));
   });

@@ -13,7 +13,7 @@ omlaag.
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 100 delen, 9807 regels in de delen
+`public/apps/app-main/` -- 99 delen, 9784 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -83,7 +83,6 @@ omlaag.
 | `app-main-32.js` | het live-paneel: van modus wisselen |
 | `app-main-33.js` | een asset herroepen binnen de bedenktijd |
 | `app-main-34.js` | mijn zorgprofiel |
-| `app-main-34b.js` | het Onderweg-paneel: kaart, partners, handelingen en de bevestigde aankomst |
 | `app-main-35.js` | betalen met Face ID vanuit een rekeningregel |
 | `app-main-36.js` | een verblijf tonen: foto's en kamers |
 | `app-main-37.js` | de deur van kamer of entree openen, en een kamer boeken |
@@ -213,7 +212,7 @@ omlaag.
 
 ## `apps/leverancier.js`
 
-`public/apps/leverancier/` -- 115 delen, 9834 regels in de delen
+`public/apps/leverancier/` -- 115 delen, 9827 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -555,7 +554,7 @@ omlaag.
 
 ## `shared/basis.js`
 
-`public/shared/basis/` -- 10 delen, 909 regels in de delen
+`public/shared/basis/` -- 10 delen, 911 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -765,11 +764,12 @@ omlaag.
 
 ## `shared/metgezel.js`
 
-`public/shared/metgezel/` -- 8 delen, 799 regels in de delen
+`public/shared/metgezel/` -- 9 delen, 802 regels in de delen
 
 | deel | onderwerp |
 |---|---|
-| `metgezel-01.js` | De metgezel: Rahul + Samen, op elke app-pagina |
+| `metgezel-00.js` | De metgezel: Rahul + Samen, op elke app-pagina |
+| `metgezel-01.js` | De bedieningsknoppen; de gedeelde scope begint in metgezel-00.js |
 | `metgezel-01b.js` | de stijl en de bouwstenen van de metgezel |
 | `metgezel-01b2.js` | Afgesplitst van metgezel-01b.js, dat over de 10 KB ging |
 | `metgezel-01c.js` | HET BLOK VAN RAHUL: het antwoord boven, de balk eronder, en de ruimte die de pagina ervoor vrijhoudt |

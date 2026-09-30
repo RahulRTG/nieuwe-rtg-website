@@ -469,7 +469,11 @@
     "positieproef": "node scripts/positieproef.js",
     "positieproef:vast": "node scripts/positieproef.js --vastleggen",
     "plaatsvorm": "node scripts/plaatsvorm.js",
-    "plaatsvorm:vast": "node scripts/plaatsvorm.js --vastleggen"
+    "plaatsvorm:vast": "node scripts/plaatsvorm.js --vastleggen",
+    "experience:check": "node scripts/experience.js --check",
+    "experience:prove": "node scripts/experience.js --prove",
+    "experience:report": "node scripts/experience.js --report",
+    "experience:gate": "node scripts/experience.js --gate"
   },
   "devDependencies": {
     "playwright": "^1.63.0"

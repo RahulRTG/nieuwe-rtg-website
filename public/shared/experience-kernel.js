@@ -12,7 +12,7 @@
     if (!token) return Promise.reject(new Error('Niet ingelogd'));
     return fetch('/api/experience/' + pad, { method: 'POST', headers: {
       'Content-Type': 'application/json', Authorization: 'Bearer ' + token
-    }, body: JSON.stringify(body || {}) }).then(function (r) {
+    }, body: JSON.stringify(body || {}), keepalive: pad === 'resume' }).then(function (r) {
       return r.json().catch(function () { return {}; }).then(function (j) {
         if (!r.ok) throw new Error(j.error || 'Er ging iets mis.'); return j;
       });

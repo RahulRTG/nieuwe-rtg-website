@@ -50,3 +50,10 @@ body.rtg-daily .schrijf textarea{min-height:78px;height:78px}
 body.rtg-daily .schrijf .voet{gap:8px;flex-wrap:wrap}
 body.rtg-daily .schrijf .voet .knop{font-size:12px;padding:8px 10px}
 body.rtg-daily .schrijf .voet #plaats{flex:0 0 auto;margin-inline-start:auto}
+
+/* In een smal werkblad hoort de bron onder de afspraak, zodat de titel
+   leesruimte houdt naast de tijd. */
+@media(max-width:620px){
+  body.rtg-daily .litem{display:grid;grid-template-columns:46px minmax(0,1fr);gap:6px 12px}
+  body.rtg-daily .litem .bron{grid-column:2}
+}

@@ -76,11 +76,6 @@ body[data-ios-home][data-rtg-skin="heritage"] #onbGate{
 @media(prefers-reduced-motion:reduce){#gate[data-rtg-access] *,#onbGate *{animation:none!important;transition:none!important}}
 /* The standard Edge owns navigation and its panels also work before sign-in. */
 body[data-ios-home][data-rtg-skin="heritage"]:has(#gate[data-rtg-access]:not([style*="display: none"])) :is(.rtg-edge-index,.rtg-edge-ai-panel,.rtg-edge-status-panel)[aria-hidden="false"]{display:block!important}
-body:has(#gate[data-rtg-access]:not([style*="display: none"])) .rtg-adaptive-edge,
-body:has(#onbGate:not([hidden])) .rtg-adaptive-edge{
-  --edge-bar-bg:#16080e;--edge-bar-copy:var(--rtg-world-ink);--edge-bar-dim:#d5c2c2;
-  --edge-bar-accent:#c63565;--edge-bar-line:#71505a;--edge-bar-accent-soft:#502035;
-}
 #onbGate .onb-heading{margin:16px 0;color:var(--rtg-world-ink);font:400 clamp(34px,9vw,48px)/1.08 "Bodoni Moda",Georgia,serif;letter-spacing:-.035em}
 #onbGate .onb-zin{font:400 16px/1.6 Inter,sans-serif;margin:16px 0;min-height:0}
 #onbGate .onb-links{display:flex;flex-wrap:wrap;gap:8px 20px;margin:0 0 16px;font:400 13px/1.6 Inter,sans-serif}
@@ -124,41 +119,6 @@ html body[data-ios-home][data-rtg-skin="heritage"] #gate[data-rtg-access]:not([s
  box-shadow:none!important;
 }
 body:has(#gate[data-rtg-access]:not([style*="display: none"])){overflow:hidden!important}
-html body:has(#gate[data-rtg-access]:not([style*="display: none"])) .rtg-adaptive-edge{
- display:block!important;
- position:fixed!important;
- z-index:10002!important;
- left:auto!important;
- right:max(18px,env(safe-area-inset-right,0px))!important;
- bottom:max(16px,env(safe-area-inset-bottom,0px))!important;
- width:58px!important;
- max-width:58px!important;
- height:58px!important;
- transform:none!important;
-}
-html body:has(#gate[data-rtg-access]:not([style*="display: none"])) .rtg-adaptive-bar{
- grid-template-columns:1fr!important;
- padding:4px!important;
- background:var(--rtg-world-card,rgba(20,7,12,.82))!important;
- box-shadow:0 12px 36px rgba(0,0,0,.28)!important;
-}
-html body:has(#gate[data-rtg-access]:not([style*="display: none"])) .rtg-adaptive-item:not([data-rtg-adaptive-action="menu"]){display:none!important}
-html body:has(#gate[data-rtg-access]:not([style*="display: none"])) .rtg-adaptive-item[data-rtg-adaptive-action="menu"]{
- display:flex!important;
- min-width:48px!important;
- min-height:48px!important;
- grid-column:1!important;
- padding:8px!important;
-}
-html body:has(#gate[data-rtg-access]:not([style*="display: none"])) .rtg-adaptive-item[data-rtg-adaptive-action="menu"] small{display:none!important}
-html body:has(#gate[data-rtg-access]:not([style*="display: none"])) .rtg-adaptive-edge:has(.rtg-adaptive-sheet:not([hidden])){
- left:50%!important;
- right:auto!important;
- width:min(720px,calc(100% - 20px))!important;
- max-width:calc(100% - 20px)!important;
- height:68px!important;
- transform:translateX(-50%)!important;
-}
 html body #gate[data-rtg-access] form#agForm{
  width:100%!important;
  margin:0!important;
@@ -212,6 +172,6 @@ html body #gate[data-rtg-access] form#agForm .access-field{color:#f4eddc!importa
  html body[data-ios-home][data-rtg-skin="heritage"] #rtgCommand #gate[data-rtg-access]:not([style*="display: none"]),
  html body[data-ios-home][data-rtg-skin="heritage"] #gate[data-rtg-access]:not([style*="display: none"]){
   display:block!important;
-  padding:calc(env(safe-area-inset-top,0px) + 28px) 24px calc(env(safe-area-inset-bottom,0px) + 36px)!important;
+  padding:calc(env(safe-area-inset-top,0px) + 28px) 24px calc(var(--rtg-adaptive-inset,100px) + env(safe-area-inset-bottom,0px) + 24px)!important;
  }
 }

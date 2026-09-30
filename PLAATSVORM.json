@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-29T17:14:13.470Z",
-    "commit": "9a7925608",
+    "op": "2026-09-30T16:30:17.757Z",
+    "commit": "1cefdea9f",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 1,
     "instrument": "scripts/plaatsvorm.js",
-    "node": "v22.22.2"
+    "node": "v24.18.0"
   },
   "uitleg": "Wat verstaat RTG onder een plaats? Elke objectvorm die een plaats draagt, per domein, over drie assen: de vorm (gedeelde velden), de woordenschat (hoeveel manieren om een punt te schrijven) en de aspecten (etiket, zichtbaarheid, toestand, bewijs, termijn naast de plek). Gemeten met de lezer van scripts/objectmodel.js.",
   "graad": "vermoed",
@@ -18,7 +18,7 @@
   "eensgezind": true,
   "rondes": {
     "ruim": {
-      "vormen": 57,
+      "vormen": 58,
       "domeinen": [
         "kern/afdelingen",
         "kern/agenda-pro",
@@ -102,7 +102,7 @@
           },
           {
             "variant": "plek",
-            "vormen": 17,
+            "vormen": 18,
             "domeinen": [
               "kern/afdelingen",
               "kern/agenda-pro",
@@ -137,7 +137,7 @@
       "aspecten": [
         {
           "aspect": "etiket",
-          "vormen": 21,
+          "vormen": 22,
           "domeinen": 14
         },
         {
@@ -157,13 +157,13 @@
         },
         {
           "aspect": "termijn",
-          "vormen": 7,
+          "vormen": 8,
           "domeinen": 3
         }
       ],
       "kaal": {
         "vormen": 24,
-        "pct": 42.1,
+        "pct": 41.4,
         "voorbeelden": [
           "server/kern/agenda-pro.js",
           "server/kern/connection-profile-media.js",
@@ -374,6 +374,17 @@
             "plek"
           ],
           "aspecten": [
+            "termijn"
+          ]
+        },
+        {
+          "module": "server/kern/mall/lijsten.js",
+          "domein": "kern/mall",
+          "punt": [
+            "plek"
+          ],
+          "aspecten": [
+            "etiket",
             "termijn"
           ]
         },

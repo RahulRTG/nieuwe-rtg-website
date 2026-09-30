@@ -14,8 +14,9 @@
    installeerde in de periode dat de `cache: 'no-cache'` hieronder was
    gesneuveld (zie de toelichting daar). Een naam die uit de INHOUD komt kan
    niet vergeten worden. */
-const CACHE = 'rtg-app-ceda5c55';
+const CACHE = 'rtg-app-a2ebb90d';
 const SHELL = ['/apps/app.html', '/shared/id.js',
+  '/shared/sw-pass-assets.js', '/shared/pass-cache.js', '/shared/pass-recovery.js', '/shared/pass-recovery.css',
   /* Heritage is één systeemlaag. Een offline start mag niet alleen de HTML
      bewaren en daarna identiteit, materiaal, beweging of lettertypen missen. */
   '/shared/basis.js', '/shared/rtg-world-identity.js',
@@ -29,6 +30,9 @@ const SHELL = ['/apps/app.html', '/shared/id.js',
   '/shared/rtg-heritage-components.js', '/shared/rtg-intelligence.css', '/shared/rtg-intelligence-shell.css',
   '/shared/rtg-operation.js', '/shared/rtg-side-sheet.js',
   '/shared/rtg-heritage.css', '/shared/rtg-heritage-materials.css',
+  '/shared/rtg-warm-details.css', '/shared/rtg-personal-images.css',
+  '/shared/rtg-world-widgets.css', '/shared/rtg-world-desktop.css',
+  '/shared/rtg-desktop-components.css', '/shared/rtg-world-palette.css',
   '/shared/rtg-heritage-adapters.css', '/shared/rtg-heritage-experiences.css', '/shared/rtg-heritage-components.css',
   '/shared/rtg-simple.css', '/shared/rtg-world-screen.css',
   '/shared/rtg-heritage-motion.css', '/shared/rtg-heritage-motion.js',
@@ -69,6 +73,9 @@ const SHELL = ['/apps/app.html', '/shared/id.js',
   '/shared/taalschil/ar.json', '/shared/taalschil/bn.json', '/shared/taalschil/pt.json',
   '/shared/taalschil/ru.json', '/shared/taalschil/ja.json', '/shared/taalschil/fr.json',
   '/shared/taalschil/en.json'];
+
+importScripts('/shared/sw-pass-assets.js');
+self.RTGPassAssets(CACHE);
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)));

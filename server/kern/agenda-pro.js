@@ -35,7 +35,7 @@ function keerN(basis, soort, n) {
   return new Date(Date.UTC(nj, nm, Math.min(dg, laatste))).toISOString().slice(0, 10);
 }
 
-function maakAgendaPro({ db, save, bijeen, inBundel, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer, boekingenVanKlant }) {
+function maakAgendaPro({ db, save, bijeen, inBundel, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer, boekingenVanKlant, reserveringenVanKlant }) {
   // schrijft in dezelfde agenda, dus dezelfde belofte: zie lib/duurzaam.js
   const vastleggen = require('../lib/duurzaam')({ bijeen, save, inBundel, bron: 'agenda-pro' });
   const nu = () => new Date().toISOString();
@@ -170,7 +170,7 @@ function maakAgendaPro({ db, save, bijeen, inBundel, crypto, schoon, keyVanCoden
     return mis || { ok: true };
   }
 
-  const helpers = { keerN, publiek, ruw, naam, lidVan, isDatum, scho, sseToCustomer, save, boekingenVanKlant };
+  const helpers = { keerN, publiek, ruw, naam, lidVan, isDatum, scho, sseToCustomer, save, boekingenVanKlant, reserveringenVanKlant };
   const { ics, ecosysteem, startHerinneringen } = require('./agenda-ics')({ db, store }, helpers);
   startHerinneringen();
 

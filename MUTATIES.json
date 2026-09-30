@@ -3329,6 +3329,30 @@
       "staat": "al rood",
       "gezakteZonderMutatie": 2
     },
+    "experience-dinner.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/foodcourt-intent.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "experience-dinner.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/reservering/capaciteit.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "experience-intent.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/experience-intent.js",
+      "operator": "true->false#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
     "experience-platform.e2e.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3359,6 +3383,22 @@
       "operator": "true->false#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "experience-travel.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/reisbureau-experience.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "experience-travel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/reisbureau.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 2
     },
     "extern-afrekenen.test.js": {
       "soort": "server",
@@ -6491,6 +6531,14 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "living-experience.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/experience/compiler.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "livinglab-capsule.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -8904,6 +8952,14 @@
       "gezakt": 3,
       "geprobeerd": 1
     },
+    "pass-cache.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/sw-pass-assets.js",
+      "operator": "false->true#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "passkeys-eerste.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
@@ -9808,6 +9864,22 @@
       "gezakt": 9,
       "scherp": "gezakt"
     },
+    "reisprogramma.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/reisprogramma-editor.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "reisprogramma.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/reisuitnodiging/programma.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "reisschermen.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -10503,7 +10575,7 @@
       "staat": "gezakt",
       "module": "public/shared/rtg-world-identity.js",
       "operator": "===->!==#0",
-      "gezakt": 3,
+      "gezakt": 8,
       "geprobeerd": 1
     },
     "rtg.test.js": {
@@ -14303,6 +14375,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "world-palette.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-world-identity.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "world-widget-catalog.test.js": {
       "soort": "puur",

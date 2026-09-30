@@ -316,7 +316,8 @@ test('7b. een transportretry op rotatie heronthult noch vervangt de nieuwe link'
 });
 
 test('8. het beheerscherm heronthult oude links niet en biedt server-side rotatie/intrekking', () => {
-  const html = fs.readFileSync(path.join(__dirname, '..', 'public', 'apps', 'reisuitnodiging.html'), 'utf8');
+  const html = fs.readFileSync(path.join(__dirname, '..', 'public', 'apps', 'reisuitnodiging.html'), 'utf8') +
+    fs.readFileSync(path.join(__dirname, '..', 'public', 'apps', 'reisuitnodiging-client.js'), 'utf8');
   assert.equal(/\bu\.link\b/.test(html), false, 'een latere lijst kan geen niet-bestaande of oude link kopiëren');
   assert.match(html, /data-roteer/);
   assert.match(html, /reis\/uitnodiging\/roteer/);

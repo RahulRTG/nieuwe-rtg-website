@@ -9,11 +9,11 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**60 bundels, 482 delen, 0 zonder onderwerp.**
+**60 bundels, 483 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 99 delen, 9786 regels in de delen
+`public/apps/app-main/` -- 99 delen, 9784 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -554,7 +554,7 @@ omlaag.
 
 ## `shared/basis.js`
 
-`public/shared/basis/` -- 10 delen, 909 regels in de delen
+`public/shared/basis/` -- 10 delen, 911 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -764,11 +764,12 @@ omlaag.
 
 ## `shared/metgezel.js`
 
-`public/shared/metgezel/` -- 8 delen, 799 regels in de delen
+`public/shared/metgezel/` -- 9 delen, 802 regels in de delen
 
 | deel | onderwerp |
 |---|---|
-| `metgezel-01.js` | De metgezel: Rahul + Samen, op elke app-pagina |
+| `metgezel-00.js` | De metgezel: Rahul + Samen, op elke app-pagina |
+| `metgezel-01.js` | De bedieningsknoppen; de gedeelde scope begint in metgezel-00.js |
 | `metgezel-01b.js` | de stijl en de bouwstenen van de metgezel |
 | `metgezel-01b2.js` | Afgesplitst van metgezel-01b.js, dat over de 10 KB ging |
 | `metgezel-01c.js` | HET BLOK VAN RAHUL: het antwoord boven, de balk eronder, en de ruimte die de pagina ervoor vrijhoudt |

@@ -1,0 +1,40 @@
+/* Warme Travel-kleuren, scherpe typografie en rustige leesruimte. */
+#reisPlanner{padding:clamp(16px,3vw,32px);margin-block:24px;border:1px solid var(--line,#715e51);border-radius:0;overflow-wrap:anywhere}
+#reisPlanner h3{font-size:clamp(24px,3vw,36px);font-family:'Bodoni Moda',serif;font-weight:500}
+#reisPlanner h4{margin-block:20px 12px}#reisPlanner p{line-height:1.65}
+#reisPlanner button,.rp-programma button{min-height:44px;padding:10px 16px;border:1px solid var(--line,#715e51);border-radius:0;background:var(--card,#302327);color:var(--txt,#f0e9dd);font:inherit;cursor:pointer}
+#reisPlanner button:disabled{opacity:.45;cursor:default}
+.rp-grid,.rp-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+#reisPlanner label{display:grid;gap:7px;font-size:14px;margin-block:12px}
+#reisPlanner input:not([type=checkbox]),#reisPlanner select,#reisPlanner textarea{width:100%;min-width:0;box-sizing:border-box;min-height:44px;padding:10px;border:1px solid var(--line,#715e51);background:var(--bg,#211b1b);color:var(--txt,#f0e9dd);font:inherit;border-radius:0}
+#reisPlanner textarea{min-height:100px;resize:vertical}#reisPlanner input[type=checkbox]{width:24px;height:24px}
+.rp-tools{display:flex;gap:10px;flex-wrap:wrap;margin-block:16px}
+#rp-onderdelen{list-style:none;padding:0}#rp-onderdelen li{padding:12px 0;border-bottom:1px solid var(--line,#715e51)}
+#rp-onderdelen li>button{width:100%;text-align:left}#rp-onderdelen small{display:block;margin:8px 0}
+#rp-onderdelen li>div{display:flex;flex-wrap:wrap;gap:6px}#rp-onderdelen li>div button{font-size:12px;padding:8px}
+.rp-publiceer,.rp-saved{border-top:1px solid var(--line,#715e51);padding-block:16px}.rp-saved{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.rp-saved span{flex:1 1 240px}
+#rp-bericht{position:relative;white-space:pre-wrap}#rp-preview{margin-block:24px}#rp-link{display:grid;gap:8px}#rp-link:empty{display:none}
+body.rtg-programma-gast{background:#211b1b!important;color:#f2ede4!important}body.rtg-programma-gast main.rtg-wrap{max-width:1080px!important;padding:28px clamp(18px,4vw,48px) 100px!important}
+.rp-programma{color:#f2ede4;background:#211b1b;line-height:1.6;overflow-wrap:anywhere;--line:#69534a;--card:#302327;--txt:#f2ede4;padding:clamp(16px,3vw,30px);border-radius:0}
+.rp-hero{padding:clamp(24px,5vw,64px) clamp(16px,4vw,48px);background:radial-gradient(ellipse at top right,#79543b66,transparent 70%),linear-gradient(145deg,#40302d,#271e22);border:1px solid #b398704f;border-radius:0;margin-bottom:24px}
+.rp-hero h1{font-family:'Bodoni Moda',serif;font-size:clamp(34px,5vw,64px);font-weight:500;line-height:1.12;margin:16px 0 22px;color:#fff6e8}.rp-eyebrow{letter-spacing:.14em;font-size:12px;color:#ddc5a0}.rp-intro{white-space:pre-wrap;max-width:65ch}
+.rp-sub{font-size:13px;color:#cec2b5}.rp-tijdlijn{list-style:none;padding:0;margin:28px 0;display:grid;gap:20px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.rp-step{border:1px solid #80695c70;background:#302327;padding:24px;break-inside:avoid;scroll-margin-top:20px;border-radius:0}.rp-step-head{display:flex;justify-content:space-between;gap:16px;align-items:center}.rp-number{font:32px 'Bodoni Moda',serif;color:#d8bc91}.rp-status{font-size:12px;letter-spacing:.06em;border:1px solid #aa8b6266;padding:4px 10px}.rp-step h2,.rp-contact h2{font-family:'Bodoni Moda',serif;font-size:27px;font-weight:500;line-height:1.25;color:#fff6e8}.rp-moment{font-size:14px;color:#e3c8a1}.rp-step dl{margin:18px 0 0}.rp-step dt{color:#c8b49a;font-size:12px;margin-top:16px}.rp-step dd{margin:3px 0;font-size:15px;white-space:pre-wrap}.rp-instructies{border-top:1px solid #80695c70;padding-top:16px;white-space:pre-wrap}.rp-contact{padding:24px;border:1px solid #80695c70;margin:20px 0}.rp-contact a{display:block;color:#f3d5a9;margin:8px 0}
+@media(max-width:700px){.rp-grid,.rp-columns,.rp-tijdlijn{grid-template-columns:1fr}.rp-programma{padding:12px}.rp-step{padding:20px}.rp-hero{padding:28px 20px}#reisPlanner{padding:14px}}
+@media print{body.rtg-programma-gast{background:white!important;color:black!important}body.rtg-programma-gast>*:not(main){display:none!important}.rp-programma,.rp-step,.rp-hero{background:white!important;color:black!important;border-color:#aaa}.rp-programma *{color:black!important}.rp-programma nav,.rp-print,#gast-ververs{display:none!important}.rp-tijdlijn{display:block}.rp-step{margin:16px 0}body.rtg-programma-gast main.rtg-wrap{padding:0!important}.rp-contact a:after{content:' (' attr(href) ')'}}
+
+.rp-legacy-1{padding:.15rem .5rem;}
+
+.rp-invite-1{margin-bottom:.8rem;}
+.rp-invite-2{margin:.7rem 0;}
+.rp-invite-3{margin:.55rem 0;}
+.rp-invite-4{margin-top:.4rem;}
+.rp-invite-5{margin-top:1rem;}
+.rp-invite-6{margin-top:.9rem;}
+.rp-invite-7{margin-top:.8rem;}
+.rp-invite-8{margin-bottom:.6rem;}
+.rp-invite-9{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.4rem;margin:.6rem 0 .3rem;}
+.rp-invite-10{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.5rem;margin:.6rem 0 .2rem;}
+
+.rp-programma :focus-visible,#reisPlanner :focus-visible{outline:2px solid #dfc198;outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.rp-programma *{scroll-behavior:auto!important}}

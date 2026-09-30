@@ -99,6 +99,7 @@ w.addEventListener('online',load);
 d.addEventListener('visibilitychange',function(){if(!d.hidden)load();});
 setInterval(function(){if(!d.hidden&&!busy)load();},60000);
 function syncEdge(){
+  if(w.RTGAdaptief)w.RTGAdaptief.context({bron:'living-world',titel:selection?'Living World · '+selection.type:tab==='plans'?'Mijn ervaringen':tab==='studio'?'Werkplaats':'Living World'});
   var edge=w.RTGEdge&&w.RTGEdge.active;if(!edge)return;
   var b=edge.root.querySelector('[data-rtg-edge-primary]'),primary=d.querySelector('[data-lw-primary]');
   if(!b)return;

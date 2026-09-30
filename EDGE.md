@@ -54,7 +54,7 @@ waren het er 17, en vijf daarvan waren precies de signalen die de Edge zou
 moeten krijgen (`rtg-adaptive-project`, `-presence`, `-identity`,
 `-continuation`, `-action`: de adaptieve Edge luisterde, en geen enkel scherm
 verstuurde ze). Ronde 1 heeft ze alle 17 gesloten (par. 11). Daarnaast staan er
-<!--getal:edgekaart.levendeKanalen-->15<!--/getal--> levende kanalen, met zender
+<!--getal:edgekaart.levendeKanalen-->16<!--/getal--> levende kanalen, met zender
 én luisteraar: dat getal houdt de nul eerlijk, want een wandeling die niets ziet
 geeft ook nul dood. Namen die in code worden samengesteld, staan apart onder
 `dynamisch` en worden niet geraden.
@@ -917,6 +917,14 @@ opnieuw na in plaats van op deze lijst te vertrouwen.
 ---
 
 ## 12. Wat dit document niet zegt
+
+De meting van 30 september 2026 volgt ook het bestaande gastbesluit op main
+(`b6da6e9e5`): `reisuitnodiging.html` is een zelfstandige leesweergave met
+`data-public-platform="travel-guest"` en `data-ios-uit`. Basis en Metgezel laden
+daar bewust geen ledenframe. De oude registratie van wereld en context in een
+Edge vervalt daarom; de geaccepteerde afwijking blijft zichtbaar in
+`EDGEDEKKING.json`. Het nieuwe Living World-scherm houdt het volledige contract,
+inclusief een door het scherm zelf gepubliceerde context en hoofdactie.
 
 - Het zegt niet dat de Edge af is. Ronde 0 bouwt geen nieuwe
   productintelligentie; hij maakt meetbaar wat er is.

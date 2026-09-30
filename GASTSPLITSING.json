@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-29T19:18:06.534Z",
-    "commit": "43a78f692",
+    "op": "2026-09-30T00:33:05.084Z",
+    "commit": "18c166870",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/gastsplitsing.js",
@@ -11,7 +11,7 @@
   "grens": "Lexicaal ingedeeld. Dit zegt NIET of een gratis account er werkelijk langs komt (dat meet npm run doelgroepbereik, met een echte gratis-accountsessie), en NIET of een deur voor een gratis account open hoort te staan -- dat is een productvraag (SAMENLEVING.md, de verklaring van de bodem). `leden` is geen fout: het woord is dubbelzinnig omdat een Community-lid ook lid heet. Een toets die het onderscheid via een andere poort maakt dan account of idGeverifieerd, telt hier als weigering.",
   "uitleg": "Per plek in server/ die op de gast toetst: maakt de code het onderscheid tussen bezoeker en gratis account, en wat zegt de weigering dat er nodig is. account-belofte = de tekst zegt dat een account of profiel volstaat, terwijl de code ook het gratis account weigert.",
   "gemeten": {
-    "bestanden": 122,
+    "bestanden": 123,
     "plekken": 140,
     "perSoort": {
       "vertakt": 23,
@@ -155,7 +155,7 @@
       "zegt": null
     },
     {
-      "plek": "server/routes/account.js:15",
+      "plek": "server/routes/account.js:18",
       "soort": "onderscheidt",
       "zegt": null
     },
@@ -715,12 +715,12 @@
       "zegt": null
     },
     {
-      "plek": "server/server.js:1294",
+      "plek": "server/server.js:1289",
       "soort": "onderscheidt",
       "zegt": null
     },
     {
-      "plek": "server/server.js:1320",
+      "plek": "server/server.js:1315",
       "soort": "vertakt",
       "zegt": null
     }

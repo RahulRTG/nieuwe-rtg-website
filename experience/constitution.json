@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "name": "RTG Living Experience System",
+  "rules": [
+    {"id":"destination","level":"hard","description":"Elke hoofdactie heeft een bestaande bestemming en een resultaatcontract."},
+    {"id":"honest-state","level":"hard","description":"Verzonden is niet bevestigd; onzekere uitkomsten worden bij de bron gecontroleerd."},
+    {"id":"authority","level":"hard","description":"De server controleert bevoegdheden bij iedere mutatie."},
+    {"id":"recovery","level":"hard","description":"Een fout heeft een herstelpad dat invoer behoudt."},
+    {"id":"continuity","level":"hard","description":"Overdracht benoemt wat meegaat en wat niet meegaat."},
+    {"id":"identity","level":"world","description":"De route-identiteit en het zichtbare wereldpalet hebben ieder hun eigen bron."},
+    {"id":"understanding","level":"human","description":"Begrijpelijkheid en vertrouwen vragen beoordeling door mensen."}
+  ],
+  "intent": {"maxAgeMs":7200000,"maxActive":8,"terminalStates":["FULFILLED","ABANDONED","EXPIRED","REVOKED"],"inferredFactsMayExecute":false},
+  "release": {"automaticProductionChanges":false,"missingEvidence":"NOT_TESTED","changedSources":"STALE","humanReviewRequired":true}
+}

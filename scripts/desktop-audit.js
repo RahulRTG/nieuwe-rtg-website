@@ -40,6 +40,9 @@ async function main() {
           row.http = response.status();
           await page.waitForSelector('body[data-rtg-desktop-state="ready"],body[data-public-platform]', { timeout: 12000 });
           row.contentReadyMs = Date.now() - started;
+          if (route === '/apps/reisuitnodiging.html') {
+            await require('./lib/desktop-guest')(page, row, errors);
+          } else {
           await page.waitForSelector('.rtg-adaptive-bar', { timeout: 12000 });
           row.edgeReadyMs = Date.now() - started;
           await page.waitForFunction(() => { const photos = [...document.querySelectorAll('.wp-atmosphere img,.wp-photo>img')]; return photos.length && photos.every(img => img.complete && img.naturalWidth > 0); }, null, { timeout: 12000 });
@@ -53,13 +56,19 @@ async function main() {
             return { url: location.pathname, world:b.dataset.rtgWorld, desktop:b.dataset.rtgDesktop, layout:b.dataset.rtgLayout, public:b.dataset.publicPlatform,
               background:css.backgroundColor, edgeState:b.getAttribute('data-rtg-edge-2-state'), padding:css.padding, pageScroll:scrollY, scheme:css.colorScheme, shells:document.querySelectorAll('.wd-shell').length,
               edges:document.querySelectorAll('.rtg-adaptive-bar').length,
+              paletteRegions:['.rtg-adaptive-bar','.wk-shell','.hq-shell','.pn-shell','.reisapp'].flatMap(selector => {
+                const el = document.querySelector(selector); if (!el || !el.getBoundingClientRect().height) return [];
+                return [{selector,background:getComputedStyle(el).backgroundColor}];
+              }),
               shell:rect('.wd-shell'), content:rect(b.dataset.rtgDesktopAccess === 'locked' ? '.wd-access' : document.querySelector('.wd-focus:not([hidden])') ? '.wd-focus:not([hidden])' : '.wd-home'), left:rect('.wd-people'), right:rect('.wd-favorites'), library:rect('.wd-library'),
               overflow:document.documentElement.scrollWidth > innerWidth + 1,
               offenders:Array.from(document.querySelectorAll('body *')).filter(e => { const r=e.getBoundingClientRect(); return r.width && (r.right > innerWidth+2 || r.x < -2) && getComputedStyle(e).position !== 'fixed'; }).slice(0,8).map(e => e.tagName+'#'+e.id+'.'+e.className)
             };
           });
           const s = row.state;
+          row.clippedContent = await page.evaluate(require('./lib/desktop-content'));
           row.failures = [];
+          if (row.clippedContent.length) row.failures.push('clipped-app-content');
           if (row.http !== 200 && route !== '/site/404.html') row.failures.push('http-'+row.http);
           const expectedTop = (mobile ? 136 : !s.public && s.world === 'living' ? 154 : 104) - (/^(compact|focus)$/.test(s.edgeState || '') ? 64 : 0);
           if (Math.abs(s.shell?.y+s.pageScroll-expectedTop) > 2) row.failures.push('nonstandard-top-inset');
@@ -75,6 +84,12 @@ async function main() {
           const palettes = {living:'rgb(250, 248, 243)',work:'rgb(20, 26, 24)',travel:'rgb(28, 24, 24)',foundation:'rgb(20, 32, 42)'};
           if(s.layout !== 'standard')row.failures.push('legacy-layout');
           if (s.background !== (s.public ? 'rgb(18, 18, 16)' : palettes[s.world])) row.failures.push('nonstandard-world-palette');
+          const cards = {living:'rgb(255, 253, 249)',work:'rgb(28, 37, 36)',travel:'rgb(45, 32, 37)',foundation:'rgb(27, 41, 58)'};
+          if (!s.public) for (const region of s.paletteRegions) {
+            const expected = region.selector === '.rtg-adaptive-bar' ? cards[s.world] : palettes[s.world];
+            if (region.background !== expected) row.failures.push('nonstandard-inner-palette:'+region.selector);
+          }
+          }
         } catch (e) { row.failures = [e.message.split('\n')[0]]; }
         row.errors = errors;
         if (shots.has(route) || row.failures.length) {

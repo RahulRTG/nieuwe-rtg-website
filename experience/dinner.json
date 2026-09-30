@@ -1,0 +1,26 @@
+{
+  "id":"dinner","version":1,"purpose":"restaurant_reservation",
+  "humanIntent":"Ik wil met mijn gezelschap een tafel vinden en weten of die bevestigd is.",
+  "audience":"member","emotionalMode":"explore",
+  "owner":"restaurant","domainObject":"reservering",
+  "requiredStates":["loading","empty","normal","unavailable","changed","offline","uncertain","error"],
+  "effortBudget":{"duplicateInput":0,"deadEnds":0,"unexplainedStatusChanges":0,"meaningfulActions":8},
+  "steps":[
+    {"id":"discover","screen":"/apps/app.html","world":"living","capability":"restaurant.discover","primaryAction":"open-restaurants","destination":"/apps/foodcourt.html","result":"De restaurantlijst opent zonder een reservering te plaatsen.","recovery":"/apps/app.html","authority":"member session","states":["loading","empty","normal","unavailable","changed","offline","uncertain","error"]},
+    {"id":"request","screen":"/apps/foodcourt.html","world":"living","capability":"reservation.request","primaryAction":"request-table","destination":"/api/reserveer","result":"Maximaal een actieve aanvraag per lid, restaurant, datum en tijd; aangevraagd is niet bevestigd.","recovery":"/apps/foodcourt.html","authority":"auth + gegevensStop + domain validation","states":["loading","empty","normal","unavailable","changed","offline","uncertain","error"]},
+    {"id":"confirm","screen":"/apps/leverancier.html","world":"work","capability":"reservation.decide","primaryAction":"confirm-table","destination":"/api/supplier/reservering/beslis","result":"Alleen de verantwoordelijke zaak bevestigt of weigert haar eigen aanvraag.","recovery":"/apps/leverancier.html","authority":"supplierAuth + supplierCode ownership","states":["loading","empty","normal","unavailable","changed","offline","uncertain","error"]},
+    {"id":"agenda","screen":"/apps/agenda.html","world":"living","capability":"reservation.read","primaryAction":"read-reservation","destination":"/api/agenda/bereik","result":"De agenda leest de actuele reservering; er ontstaat geen tweede afspraak of bevestiging.","recovery":"/apps/foodcourt.html","authority":"auth + member ownership","states":["loading","empty","normal","unavailable","changed","offline","uncertain","error"]}
+  ],
+  "handoffs":[
+    {"from":"discover","to":"request","carry":[],"exclude":["authority","credentials"],"returnTo":"/apps/app.html","revalidate":["session","availability"]},
+    {"from":"request","to":"confirm","carry":["reservation reference"],"exclude":["personal search","credentials"],"returnTo":"/apps/foodcourt.html","revalidate":["supplier ownership","reservation status"]},
+    {"from":"confirm","to":"agenda","carry":["source reservation"],"exclude":["supplier authority","credentials"],"returnTo":"/apps/foodcourt.html","revalidate":["member ownership","current status"]}
+  ],
+  "proofs":[
+    {"id":"contract","layer":"EXPERIENCE","test":"test/living-experience.test.js","scope":"Compiler, bewijsversheid, graaf en tegenvoorbeelden; geen oordeel over menselijk begrip."},
+    {"id":"intent","layer":"EXPERIENCE","test":"test/experience-intent.test.js","scope":"Tijdelijke bedoelingen: scheiding, verloop, intrekking en verwijderen van context."},
+    {"id":"dinner-domain","layer":"OPERATIONAL","test":"test/experience-dinner.test.js","scope":"Echte HTTP-keten: aanvraag, zaakbesluit, actuele agenda, capaciteit, dubbele aanvraag en eigenaargrenzen."},
+    {"id":"dinner-browser","layer":"RESILIENCE","test":"test/experience-dinner.e2e.js","scope":"Chromium: 390 en 1440 px; invoerbehoud, verloren antwoord, herstel en agenda. Geen fysieke iPhone-proef."}
+  ],
+  "humanReview":{"status":"NOT_TESTED","questions":["Begrijpt iemand het verschil tussen aangevraagd en bevestigd?","Is het duidelijk wie de gegevens ontvangt?","Is de weg terug herkenbaar?"]}
+}

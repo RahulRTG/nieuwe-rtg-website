@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 2183 |
 | losse beweringen (`test(...)`) | 15203 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 200 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1852 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1853 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 147 |
 | alleen in de kop *genoemd*, nog niet gemeten | 30 |
-| niets van beide | 154 |
+| niets van beide | 153 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -2109,7 +2109,7 @@ toets omvalt.
 | `onderneming-scherm.e2e.js` | 5 | -- | Schermtoets voor /apps/onderneming.html: de schil van het Ondernemers-OS. Waarom dit er als BROWSERtoets naast de API-toetsen staat: een scherm dat 200 geeft en netjes rendert kan nog steeds dood zijn (zie de kop van... |
 | `overheidschermen.e2e.js` | 2 | -- | DE OVERHEIDSSCHERMEN: DE BURGER EN DE AMBTENAAR. Acht schermen uit de lijst van TAKEN 4.9, en ze vallen in twee soorten die precies tegenover elkaar staan: DE BURGERKANT (gemeente, overheid) is voor het lid zelf. |
 | `paginas.e2e.js` | 1 | -- | DE PAGINASCAN -- elke pagina in public/ wordt echt geopend in een browser. WAAROM DIT ER IS De schermtests hiernaast (test/*.e2e.js) beproeven allemaal EEN scherm dat iemand belangrijk vond. |
-| `partijvoorstel-scherm.e2e.js` | 1 | -- | DE POLITICAL CONNECTOR IN EEN ECHTE BROWSER: het partijenregister op /apps/foundation/kwestiekantoor.html, en de voorstellen bij een kwestie op /apps/foundation/kwesties.html. test/democratie-partij.test.js bewijst... |
+| `partijvoorstel-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE POLITICAL CONNECTOR IN EEN ECHTE BROWSER: het partijenregister op /apps/foundation/kwestiekantoor.html, en de voorstellen bij een kwestie op /apps/foundation/kwesties.html. test/democratie-partij.test.js bewijst... |
 | `pass-startup.e2e.js` | 3 | -- | Real installation and interrupted startup, rather than a mocked PWA flag alone. API responses must never become part of the offline interface. |
 | `payrollkeur.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-toets op het AANMERKEN van een regelpakket (payroll.html, tab "Loonrun (OS)"). WAAROM DIT BESTAND ER IS, en het is een onaangename reden. |
 | `paytegoed.e2e.js` | 2 | genoemd | Schermtoets voor het tegoed op RTG Pay (public/apps/pay.html). Waarom dit náást test/paytegoed.test.js staat, dat de routes al afloopt: een scherm dat 200 geeft en netjes rendert kan nog steeds dood zijn. |

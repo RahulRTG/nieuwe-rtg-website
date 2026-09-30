@@ -21,6 +21,7 @@
     "alias": "een doorverwijzing"
   },
   "capabilities": {
+    "wereld.ervaringslus": "apps/living-world.html",
     "agenda.afspraken": "apps/agenda.html",
     "democratie.kwestie": "apps/foundation/kwesties.html",
     "kantoor.democratie": "apps/foundation/kwestiekantoor.html",
@@ -758,6 +759,10 @@
     }
   ],
   "schermen": {
+    "apps/living-world.html": {
+      "capability": "wereld.ervaringslus",
+      "rol": "eigenaar"
+    },
     "apps/agenda.html": {
       "capability": "agenda.afspraken",
       "rol": "eigenaar",

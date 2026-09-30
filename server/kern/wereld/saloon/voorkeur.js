@@ -5,6 +5,7 @@ const BRONNEN = Object.freeze([
   { id: 'nieuws', naam: 'Journalistiek' },
   { id: 'makers', naam: 'Makers en media' },
   { id: 'plekken', naam: 'Zaken en plekken' },
+  { id: 'livingworld', naam: 'Living World' },
   { id: 'persoonlijk', naam: 'Mijn reizen', prive: true },
   { id: 'voortgang', naam: 'Mijn aanvragen', prive: true }
 ]);

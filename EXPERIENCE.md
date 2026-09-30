@@ -60,11 +60,56 @@ geregistreerde intentie. Rahul heeft geen rechtstreekse runtime-ingang.
 |---|---|---|---|
 | `attention.acknowledge@1` | Experience Attention | experience state | verplicht |
 | `schedule.item.create@1` | Agenda | domain truth | verplicht |
+| `living-world.*@1` | Living World | domain truth | verplicht |
 
-Dit is bewust een kleine, volledig bewezen registry. Een capability is pas
+De concrete Living World-acties worden uit `server/kern/living-world/actions.js`
+geregistreerd: plekken, blueprints, persoonlijke plannen, organisatorbesluiten,
+deelnameverklaringen en bijdragen. Hun levensloop staat hieronder. Een capability is pas
 gemigreerd wanneer zij hetzelfde pad voor context, policy, idempotency,
 evidence, foutinjectie en herstel doorloopt. Een knop die rechtstreeks een
 endpoint aanroept telt niet als gemigreerd.
+
+## Living World: van ontdekking naar de volgende ervaring
+
+`/apps/living-world.html` verbindt Saloon en eigen gepubliceerde media met een
+gedeelde plek, een versieerbare Experience Blueprint en een persoonlijk plan.
+Take me there maakt een privéplan; Make it mine maakt een privévariant met
+afstamming. Geen van beide kopieert boekingen of mediarechten.
+
+Een deelnemer kiest een moment, voorbereiding en optioneel gebruikte bijdragen.
+Pas bij voorleggen ziet de organisator de aanvraag. Deze beslist, registreert
+het begin en verklaart de uitvoering. De deelnemer bevestigt die verklaring
+afzonderlijk. Dit is herleidbaar verklaringsbewijs, geen gemeten aanwezigheid
+of beroepskwalificatie. Hulp nodig legt het werk bij dezelfde menselijke
+eigenaar; herstel vereist opnieuw een besluit.
+
+Een bijdrage gaat eerst naar de plekbeheerder; zelfreview is uitgesloten.
+Geaccepteerde kennis verschijnt in World Memory en, zolang actueel, World Pulse.
+De blueprintmaker kan haar overnemen in een nieuwe versie. Bestaande plannen
+signaleren bronwijzigingen. Een volgende deelnemer kiest zelf welke kennis hij
+gebruikt. Met expliciete, intrekbare toestemming telt de maker gebruik,
+bevestigde deelname en teruggegeven bijdragen. Views worden niet gemeten.
+Connect leest beoordeelde bijdragen rechtstreeks uit dezelfde bron; intrekking,
+correctie, vervaldatum en ingetrokken deelname werken door.
+
+TravelOS-reizen, communities en community-events kunnen als eigen bronverwijzing
+aan het plan worden verbonden. Alleen referentie en versie worden bewaard;
+status en toegang worden opnieuw bij de bron gelezen. Privéboekingsdetails
+worden niet aan de organisator verstrekt. Academy, verblijf, aanbieders,
+uitrusting en media openen hun bestaande bronapp. De lus boekt daar niets
+automatisch en kent niemand automatisch een kwalificatie of mentorrol toe.
+
+Edge en de bronpagina gebruiken dezelfde actieprojectie; uitvoeren herhaalt de
+bevoegdheids-, revisie- en brontoets via de Broker. Ontvangstbewijs, domeinwijziging
+en domeinaudit worden in één collectietransactie vastgelegd. De proeven staan
+in `test/living-world*.js`; de keten is opgenomen in `experience/living-world.json`.
+De PostgreSQL-proef draait in een lege, geïsoleerde database via `npm run test:pg`.
+
+De huidige grens: geen automatische videoreconstructie, live locatietracking,
+geografische kaart, leveranciersboeking of credentialverificatie. Media koppelt
+de maker expliciet. De eerste uitvoering blijft mensenwerk. Offline toont de
+pagina een onzekere bronstand; nieuwe handelingen vragen een serverbevestiging.
+Productievrijgave en menselijk gebruiksonderzoek zijn afzonderlijke stappen.
 
 ## Economische golden path
 

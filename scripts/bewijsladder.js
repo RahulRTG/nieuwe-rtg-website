@@ -77,7 +77,7 @@ const LADDER = [
          vinden, impact classificeren, geselecteerd herbewijzen en fail-closed
          het eindoordeel vellen. Eén familiepatroon voorkomt een nieuwe restbak
          zodra hier nog een smalle evidence-poort bijkomt. */
-      /evidence(?:-base|-gate)?\.js$/] },
+      /evidence(?:-base|-gate|-control|-calibration)?\.js$/] },
   { id: 'eenheid', naam: 'Eenheid, contract en bevoegdheid', wat: 'de toetssuite zelf, plus de as-proeven per route',
     patronen: [/test-runner\.js$/, /pgtoetsen\.js$/, /isolatiepoort\.test\.js$/, /mutatiecontract\.js$/,
       /^test\/native-(artifact|process)\.test\.js$/,

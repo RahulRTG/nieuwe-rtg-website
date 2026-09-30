@@ -1,0 +1,390 @@
+{
+  "id": "living-world",
+  "version": 1,
+  "purpose": "experience_contribution_loop",
+  "humanIntent": "Ik wil iets beleven, mijn ervaring delen en de volgende persoon helpen.",
+  "audience": "member",
+  "emotionalMode": "explore",
+  "owner": "Living World: maker, organisator en plekbeheerder",
+  "domainObject": "Experience Blueprint, persoonlijk plan en beoordeelde bijdrage",
+  "requiredStates": [
+    "loading",
+    "empty",
+    "normal",
+    "unavailable",
+    "changed",
+    "offline",
+    "uncertain",
+    "error"
+  ],
+  "effortBudget": {
+    "duplicateInput": 0,
+    "deadEnds": 0,
+    "unexplainedStatusChanges": 0,
+    "meaningfulActions": 18
+  },
+  "proofRefs": [
+    "contract",
+    "intent"
+  ],
+  "steps": [
+    {
+      "id": "see",
+      "screen": "/apps/living-world.html",
+      "world": "travel",
+      "capability": "living-world.discover",
+      "primaryAction": "view",
+      "destination": "/api/living-world/view",
+      "result": "Gedeelde plekken, actuele beoordeelde kennis en blueprints openen met herkomst.",
+      "recovery": "/apps/living-world.html",
+      "authority": "member session + current visibility",
+      "states": [
+        "loading",
+        "empty",
+        "normal",
+        "unavailable",
+        "changed",
+        "offline",
+        "uncertain",
+        "error"
+      ]
+    },
+    {
+      "id": "plan",
+      "screen": "/apps/living-world.html",
+      "world": "travel",
+      "capability": "living-world.plan",
+      "primaryAction": "plan.create",
+      "destination": "/api/experience/intent/execute",
+      "result": "Een eigen privéplan verwijst naar de gekozen blueprintversie en vrijwillig gekozen kennis.",
+      "recovery": "/apps/living-world.html",
+      "authority": "participant ownership + current published source",
+      "states": [
+        "loading",
+        "empty",
+        "normal",
+        "unavailable",
+        "changed",
+        "offline",
+        "uncertain",
+        "error"
+      ]
+    },
+    {
+      "id": "handoff",
+      "screen": "/apps/living-world.html",
+      "world": "travel",
+      "capability": "living-world.handoff",
+      "primaryAction": "plan.request",
+      "destination": "/api/experience/intent/execute",
+      "result": "De aangewezen organisator ontvangt de expliciete aanvraag; privébronverbindingen blijven afgeschermd.",
+      "recovery": "/apps/living-world.html",
+      "authority": "participant ownership + current source + future date",
+      "states": [
+        "loading",
+        "empty",
+        "normal",
+        "unavailable",
+        "changed",
+        "offline",
+        "uncertain",
+        "error"
+      ]
+    },
+    {
+      "id": "decide",
+      "screen": "/apps/living-world.html",
+      "world": "travel",
+      "capability": "living-world.decide",
+      "primaryAction": "plan.decide",
+      "destination": "/api/experience/intent/execute",
+      "result": "De organisator accepteert of wijst af met reden en controleert vereisten voor deze uitvoering.",
+      "recovery": "/apps/living-world.html",
+      "authority": "assigned organizer + no self approval + revision",
+      "states": [
+        "loading",
+        "empty",
+        "normal",
+        "unavailable",
+        "changed",
+        "offline",
+        "uncertain",
+        "error"
+      ]
+    },
+    {
+      "id": "participate",
+      "screen": "/apps/living-world.html",
+      "world": "travel",
+      "capability": "living-world.participate",
+      "primaryAction": "plan.acknowledge",
+      "destination": "/api/experience/intent/execute",
+      "result": "Organisator legt start en uitvoering vast; deelnemer bevestigt afzonderlijk.",
+      "recovery": "/apps/living-world.html",
+      "authority": "organizer attestation + participant acknowledgment + source revalidation",
+      "states": [
+        "loading",
+        "empty",
+        "normal",
+        "unavailable",
+        "changed",
+        "offline",
+        "uncertain",
+        "error"
+      ]
+    },
+    {
+      "id": "contribute",
+      "screen": "/apps/living-world.html",
+      "world": "travel",
+      "capability": "living-world.contribute",
+      "primaryAction": "contribution.create",
+      "destination": "/api/experience/intent/execute",
+      "result": "Vrijwillige kennis gaat naar de plekbeheerder; onafhankelijk beoordeelde kennis verrijkt World Memory.",
+      "recovery": "/apps/living-world.html",
+      "authority": "participant ownership + place owner review + no self review",
+      "states": [
+        "loading",
+        "empty",
+        "normal",
+        "unavailable",
+        "changed",
+        "offline",
+        "uncertain",
+        "error"
+      ]
+    },
+    {
+      "id": "improve",
+      "screen": "/apps/living-world.html",
+      "world": "travel",
+      "capability": "living-world.improve",
+      "primaryAction": "contribution.adopt",
+      "destination": "/api/experience/intent/execute",
+      "result": "De maker neemt een verbetering over in een nieuwe blueprintversie, zichtbaar voor de volgende persoon.",
+      "recovery": "/apps/living-world.html",
+      "authority": "blueprint ownership + current reviewed contribution + revision",
+      "states": [
+        "loading",
+        "empty",
+        "normal",
+        "unavailable",
+        "changed",
+        "offline",
+        "uncertain",
+        "error"
+      ]
+    },
+    {
+      "id": "return",
+      "screen": "/apps/living-world.html",
+      "world": "travel",
+      "capability": "living-world.return",
+      "primaryAction": "view",
+      "destination": "/api/living-world/view",
+      "result": "Een volgende deelnemer gebruikt kennis; vrijwillige deelname en nieuwe bijdragen maken het gevolg herleidbaar.",
+      "recovery": "/apps/living-world.html",
+      "authority": "current source + explicit revocable impact consent",
+      "states": [
+        "loading",
+        "empty",
+        "normal",
+        "unavailable",
+        "changed",
+        "offline",
+        "uncertain",
+        "error"
+      ]
+    }
+  ],
+  "handoffs": [
+    {
+      "to": "plan",
+      "carry": [
+        "object reference",
+        "source version",
+        "explicit user choices"
+      ],
+      "exclude": [
+        "session credentials",
+        "private booking details",
+        "professional qualifications"
+      ],
+      "returnTo": "/apps/living-world.html",
+      "revalidate": [
+        "actor rights",
+        "current state",
+        "source revision",
+        "visibility"
+      ],
+      "from": "see"
+    },
+    {
+      "to": "handoff",
+      "carry": [
+        "object reference",
+        "source version",
+        "explicit user choices"
+      ],
+      "exclude": [
+        "session credentials",
+        "private booking details",
+        "professional qualifications"
+      ],
+      "returnTo": "/apps/living-world.html",
+      "revalidate": [
+        "actor rights",
+        "current state",
+        "source revision",
+        "visibility"
+      ],
+      "from": "plan"
+    },
+    {
+      "to": "decide",
+      "carry": [
+        "object reference",
+        "source version",
+        "explicit user choices"
+      ],
+      "exclude": [
+        "session credentials",
+        "private booking details",
+        "professional qualifications"
+      ],
+      "returnTo": "/apps/living-world.html",
+      "revalidate": [
+        "actor rights",
+        "current state",
+        "source revision",
+        "visibility"
+      ],
+      "from": "handoff"
+    },
+    {
+      "to": "participate",
+      "carry": [
+        "object reference",
+        "source version",
+        "explicit user choices"
+      ],
+      "exclude": [
+        "session credentials",
+        "private booking details",
+        "professional qualifications"
+      ],
+      "returnTo": "/apps/living-world.html",
+      "revalidate": [
+        "actor rights",
+        "current state",
+        "source revision",
+        "visibility"
+      ],
+      "from": "decide"
+    },
+    {
+      "to": "contribute",
+      "carry": [
+        "object reference",
+        "source version",
+        "explicit user choices"
+      ],
+      "exclude": [
+        "session credentials",
+        "private booking details",
+        "professional qualifications"
+      ],
+      "returnTo": "/apps/living-world.html",
+      "revalidate": [
+        "actor rights",
+        "current state",
+        "source revision",
+        "visibility"
+      ],
+      "from": "participate"
+    },
+    {
+      "to": "improve",
+      "carry": [
+        "object reference",
+        "source version",
+        "explicit user choices"
+      ],
+      "exclude": [
+        "session credentials",
+        "private booking details",
+        "professional qualifications"
+      ],
+      "returnTo": "/apps/living-world.html",
+      "revalidate": [
+        "actor rights",
+        "current state",
+        "source revision",
+        "visibility"
+      ],
+      "from": "contribute"
+    },
+    {
+      "to": "return",
+      "carry": [
+        "object reference",
+        "source version",
+        "explicit user choices"
+      ],
+      "exclude": [
+        "session credentials",
+        "private booking details",
+        "professional qualifications"
+      ],
+      "returnTo": "/apps/living-world.html",
+      "revalidate": [
+        "actor rights",
+        "current state",
+        "source revision",
+        "visibility"
+      ],
+      "from": "improve"
+    }
+  ],
+  "proofs": [
+    {
+      "id": "living-world-domain",
+      "layer": "OPERATIONAL",
+      "test": "test/living-world.test.js",
+      "scope": "Menselijke lus over drie leden, mediareferentie, fork, wijziging, intrekking, verval, handmatige overname en vrijwillige impact; geen externe boekingen."
+    },
+    {
+      "id": "living-world-http",
+      "layer": "OPERATIONAL",
+      "test": "test/living-world-http.test.js",
+      "scope": "Echte HTTP-sessies, Broker, gedeelde bron, privéplan, organisator, deelname, review, verbetering en volgende persoon met betalingen, AI en push uit."
+    },
+    {
+      "id": "living-world-sources",
+      "layer": "RESILIENCE",
+      "test": "test/living-world-sources.test.js",
+      "scope": "Bronverbindingen zonder kopie van boekingen, privérechten, correcties en ingetrokken deelname in Connect."
+    },
+    {
+      "id": "living-world-sqlite",
+      "layer": "RESILIENCE",
+      "test": "test/living-world-sqlite.test.js",
+      "scope": "Twee echte processen: ontvangstbewijs na herstart, gelijktijdigheid, revisieconflict en rollback vóór commit."
+    },
+    {
+      "id": "living-world-browser",
+      "layer": "EXPERIENCE",
+      "test": "test/living-world.e2e.js",
+      "scope": "Chromium op 390 en 1440 pixels: maken, Edge-actie, aanvraag, besluit, deelname, bijdrage, review, blueprintverbetering en Connect. Geen fysiek toestel of gebruiksonderzoek."
+    }
+  ],
+  "humanReview": {
+    "status": "NOT_TESTED",
+    "questions": [
+      "Begrijpt iemand dat Take me there nog geen boeking is?",
+      "Is duidelijk wie de aanvraag en bijdrage behandelt?",
+      "Begrijpt iemand dat deelnamebewijs uit verklaringen bestaat?",
+      "Kan iemand zonder hulp een ingetrokken of gewijzigde ervaring herstellen?"
+    ]
+  }
+}

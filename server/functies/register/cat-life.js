@@ -1,7 +1,5 @@
-/* Functiecatalogus, deel "RTG Life" (server/functies/register): de lagen die
-   over het leven van het lid zelf gaan. Afgesplitst van ./cat-apps.js toen die
-   in de waarschuwingsband onder de 10 kB kwam; zie docs/life.md voor de
-   samenhang tussen deze lagen.
+/* Functiecatalogus "RTG Life": de lagen over het leven van het lid.
+   Zie docs/life.md voor hun samenhang.
 
    Los schakelbaar en niet als een blok, want ze doen echt verschillende dingen:
    iemand die zijn medicatieschema wil en zijn stemming niet, hoort dat te kunnen
@@ -18,7 +16,7 @@ module.exports = [
   { id: 'experience-platform', categorie: 'Eigen apps', naam: 'RTG Experience Platform',
     standaard: true, doelgroepen: LEDEN,
     uitleg: 'De vier werelden, hun contextprojecties, resume state, attention en gebrokerde acties. Domeinen blijven eigenaar van hun brondata.',
-    paden: ['/api/experience'] },
+    apps: ['living-world'], paden: ['/api/experience', '/api/living-world'] },
   { id: 'life', categorie: 'Eigen apps', naam: 'RTG Life (het ene scherm)', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Het overzichtsscherm en de dagcoach: ze lezen de lagen hieronder en leggen ze naast elkaar. Ze meten zelf niets en bezitten niets, dus uitzetten haalt geen gegevens weg.',
     paden: ['/api/life', '/api/dag'] },

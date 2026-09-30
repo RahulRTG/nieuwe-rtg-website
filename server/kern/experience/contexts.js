@@ -15,7 +15,8 @@ module.exports = function maakContexten({ kern, crypto }) {
     return Object.freeze({
       id: id({ world, type, actor: principal(key), bindings: b }),
       world, type, label: String(label || world), bindings: kopie(b),
-      authorityScope: Object.freeze(['world.read', 'attention.acknowledge', 'schedule.item.create', 'network.plan.save'])
+      authorityScope: Object.freeze(['world.read', 'attention.acknowledge', 'schedule.item.create', 'network.plan.save']
+        .concat(['living','travel','work'].includes(world) ? ['living-world.act'] : []))
     });
   }
 

@@ -54,7 +54,7 @@ waren het er 17, en vijf daarvan waren precies de signalen die de Edge zou
 moeten krijgen (`rtg-adaptive-project`, `-presence`, `-identity`,
 `-continuation`, `-action`: de adaptieve Edge luisterde, en geen enkel scherm
 verstuurde ze). Ronde 1 heeft ze alle 17 gesloten (par. 11). Daarnaast staan er
-<!--getal:edgekaart.levendeKanalen-->15<!--/getal--> levende kanalen, met zender
+<!--getal:edgekaart.levendeKanalen-->16<!--/getal--> levende kanalen, met zender
 én luisteraar: dat getal houdt de nul eerlijk, want een wandeling die niets ziet
 geeft ook nul dood. Namen die in code worden samengesteld, staan apart onder
 `dynamisch` en worden niet geraden.
@@ -65,7 +65,7 @@ ledensessie, gelezen uit `RTGEdgeBlikveld.lees()` — nooit geraden uit de bron.
 Per veld een telling, en met opzet **geen samengesteld percentage**: een
 gemiddelde over tien velden verbergt welk veld bewoog (`BEWIJSMACHINE.md`).
 
-Uitslag over <!--getal:edgedekking.schermen-->314<!--/getal--> schermen, waarvan er
+Uitslag over <!--getal:edgedekking.schermen-->315<!--/getal--> schermen, waarvan er
 <!--getal:edgedekking.metBlikveld-->284<!--/getal--> een blikveld laden (de rest is
 een doorverwijzing, een scherm zonder Edge, of een scherm dat een lid niet
 opent — elk met de reden in het register):
@@ -74,12 +74,12 @@ opent — elk met de reden in het register):
 |---|---|---|
 | identiteit | <!--getal:edgedekking.identiteit-->0<!--/getal--> | <!--getal:edgedekking.identiteitZelf-->0<!--/getal--> |
 | wereld | <!--getal:edgedekking.wereld-->283<!--/getal--> | <!--getal:edgedekking.wereldZelf-->0<!--/getal--> |
-| context | <!--getal:edgedekking.context-->284<!--/getal--> | <!--getal:edgedekking.contextZelf-->13<!--/getal--> |
+| context | <!--getal:edgedekking.context-->284<!--/getal--> | <!--getal:edgedekking.contextZelf-->14<!--/getal--> |
 | object | <!--getal:edgedekking.object-->0<!--/getal--> | <!--getal:edgedekking.objectZelf-->0<!--/getal--> |
 | activiteit | <!--getal:edgedekking.activiteit-->0<!--/getal--> | <!--getal:edgedekking.activiteitZelf-->0<!--/getal--> |
 | presence | <!--getal:edgedekking.presence-->0<!--/getal--> | <!--getal:edgedekking.presenceZelf-->0<!--/getal--> |
 | voortzetting | <!--getal:edgedekking.voortzetting-->0<!--/getal--> | <!--getal:edgedekking.voortzettingZelf-->0<!--/getal--> |
-| hoofdactie | <!--getal:edgedekking.hoofdactie-->60<!--/getal--> | <!--getal:edgedekking.hoofdactieZelf-->53<!--/getal--> |
+| hoofdactie | <!--getal:edgedekking.hoofdactie-->61<!--/getal--> | <!--getal:edgedekking.hoofdactieZelf-->54<!--/getal--> |
 | trust | <!--getal:edgedekking.trust-->0<!--/getal--> | <!--getal:edgedekking.trustZelf-->0<!--/getal--> |
 
 Lees ook de ja's goed, want een `ja` zegt dat er een waarde is en niet wie hem
@@ -917,6 +917,14 @@ opnieuw na in plaats van op deze lijst te vertrouwen.
 ---
 
 ## 12. Wat dit document niet zegt
+
+De meting van 30 september 2026 volgt ook het bestaande gastbesluit op main
+(`b6da6e9e5`): `reisuitnodiging.html` is een zelfstandige leesweergave met
+`data-public-platform="travel-guest"` en `data-ios-uit`. Basis en Metgezel laden
+daar bewust geen ledenframe. De oude registratie van wereld en context in een
+Edge vervalt daarom; de geaccepteerde afwijking blijft zichtbaar in
+`EDGEDEKKING.json`. Het nieuwe Living World-scherm houdt het volledige contract,
+inclusief een door het scherm zelf gepubliceerde context en hoofdactie.
 
 - Het zegt niet dat de Edge af is. Ronde 0 bouwt geen nieuwe
   productintelligentie; hij maakt meetbaar wat er is.

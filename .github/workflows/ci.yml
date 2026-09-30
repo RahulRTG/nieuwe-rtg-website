@@ -21,6 +21,11 @@ on:
   push:
     branches: [ main, master ]
   pull_request:
+  # Dagelijks kalibreert de volledige werkelijkheid het selectieve model. Een
+  # rode of onafgemaakte ijking degradeert oudere bewijsboeken automatisch;
+  # de volgende PR schaalt dan op naar full.
+  schedule:
+    - cron: '23 2 * * *'
   # MET DE HAND TE STARTEN, en dat is geen luxe. Een tak zonder PR krijgt geen
   # keuring (zie hierboven), en een PR die op een ANDERE tak staat dan main --
   # zoals een vervolgtak op een tak die nog niet gemerged is -- kreeg op
@@ -67,7 +72,7 @@ permissions:
 # deze grens bleven oude revisies urenlang drie runners bezetten, terwijl hun
 # uitslag door de nieuwere commit al niet meer merge-bepalend kon zijn.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 # ============================================================================
@@ -124,6 +129,8 @@ jobs:
       unknown: ${{ steps.plan.outputs.unknown }}
       unit: ${{ steps.plan.outputs.unit }}
       e2e: ${{ steps.plan.outputs.e2e }}
+      risk: ${{ steps.plan.outputs.risk }}
+      reason: ${{ steps.plan.outputs.reason }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -139,12 +146,12 @@ jobs:
           npm run ci-keten
           node scripts/document-fitness.js
           npm run check
-      - name: Exacte groene main-basis zoeken
+      - name: Vertrouwde content-addressed main-basis zoeken
         id: basis
         run: node scripts/evidence-base.js
         env:
           GITHUB_TOKEN: ${{ github.token }}
-      - name: Bewijsboek van exact die main-run ophalen
+      - name: Bewijsboek van de gekozen groene main-run ophalen
         if: steps.basis.outputs.found == 'true'
         continue-on-error: true
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
@@ -159,11 +166,19 @@ jobs:
       - name: Eén snapshot, één Evidence DAG, één plan
         id: plan
         run: npm run evidence:plan -- --out=.evidence/plan.json
+        env:
+          RTG_FORCE_FULL: ${{ github.event_name == 'schedule' && '1' || '0' }}
+      - name: RTG Evidence Control Plane bouwen en zelf verifiëren
+        run: |
+          node scripts/evidence-control.js build --plan=.evidence/plan.json --out=.evidence/control.json
+          node scripts/evidence-control.js verify --plan=.evidence/plan.json --out=.evidence/control.json
       - name: Het plan voor de uitvoerder bewaren
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: evidence-plan
-          path: .evidence/plan.json
+          path: |
+            .evidence/plan.json
+            .evidence/control.json
           if-no-files-found: error
           retention-days: 5
 
@@ -618,21 +633,39 @@ jobs:
         run: node --test --test-timeout=300000 test/isolatiepoort.test.js
 
       - name: PostgreSQL-integratietests (elk in een eigen database)
-        run: node scripts/pgtoetsen.js
+        run: |
+          export RTG_TOETSBRON="$(node -p 'require("./scripts/lib/meetbron").bron()')"
+          node scripts/pgtoetsen.js
         env:
           REDIS_URL: redis://localhost:6379
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/rtgtest
           RTG_VAULT_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
           RTG_SECRET_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+          NODE_OPTIONS: --require "${{ github.workspace }}/test/toetsnaam.js"
+          RTG_TOETSDUUR: ${{ github.workspace }}/.toetsduur
+          RTG_TOETSMODUS: normaal
+      # Deze bestanden draaien uitsluitend hier. Hun echte procesmetingen
+      # moeten daarom mee naar de volledige ronde van veranderbereik.
+      - name: De duurmeting van PostgreSQL bewaren
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: toetsduur-postgresql
+          path: .toetsduur
+          retention-days: 5
+          if-no-files-found: error
+          include-hidden-files: true
 
   # De incrementele weg draait alleen het opnieuw vereiste en lokale UNKNOWN
-  # bewijs. Een impactgat maakt het plan `full`, dus deze job kan nooit zelf een
-  # onzeker plan smaller interpreteren.
-  incremental:
-    name: Incrementeel bewijs
+  # bewijs. Unit en browser staan op twee schone runners: vroeger stonden ze
+  # achter elkaar in één job, terwijl ze geen staat delen en de browserinstall
+  # alleen de tweede helft nodig heeft. Een impactgat maakt het plan `full`, dus
+  # geen van beide kan een onzeker plan smaller interpreteren.
+  incremental-unit:
+    name: Incrementeel bewijs - unit
     runs-on: ubuntu-latest
     needs: preflight
-    if: needs.preflight.outputs.mode == 'incremental'
+    if: needs.preflight.outputs.mode == 'incremental' && needs.preflight.outputs.unit != '0'
     timeout-minutes: 30
     services:
       postgres:
@@ -668,9 +701,6 @@ jobs:
         with:
           name: evidence-plan
           path: .evidence
-      - name: Playwright + Chromium uit de lockfile
-        if: needs.preflight.outputs.e2e != '0'
-        run: node scripts/browserinstall.js --meting=browsermeting/incremental.json
       # DEZELFDE OMGEVING ALS DE SCHERF. Deze job draait een deelverzameling van
       # dezelfde toetsbestanden als `toetsscherf`, dus hij hoort dezelfde
       # voorbereiding te krijgen -- anders zakt een toets hier op de machine en
@@ -685,13 +715,95 @@ jobs:
       - name: De Rust-motor en de Sentinel bouwen
         working-directory: motor
         run: cargo build --release --locked
-      - name: Alleen REPROVE en UNKNOWN opnieuw bewijzen
+      - name: Alleen unit-REPROVE en unit-UNKNOWN opnieuw bewijzen
         # De systeemgereedschappen en de Rust-motor staan in de twee stappen
         # hierboven; `preevidence:run` bouwt de motor nog eens als vangnet.
-        run: npm run evidence:run -- --plan=.evidence/plan.json
+        run: npm run evidence:run -- --plan=.evidence/plan.json --kind=unit
         env:
           RTG_E2E_STRICT: '1'
           RTG_SNELLE_TOETS: '1'
+
+  incremental-browser:
+    name: Incrementeel bewijs - browser
+    runs-on: ubuntu-latest
+    needs: preflight
+    if: needs.preflight.outputs.mode == 'incremental' && needs.preflight.outputs.e2e != '0'
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: rtgtest
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 10s
+          --health-timeout 5s --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping" --health-interval 10s
+          --health-timeout 5s --health-retries 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: npm ci
+      - name: Alleen een door main opgebouwde Chromium-cache herstellen
+        id: browser-cache
+        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+      - name: Het vastgezette bewijsplan ophalen
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: evidence-plan
+          path: .evidence
+      - name: Playwright + Chromium uit de lockfile
+        if: needs.preflight.outputs.e2e != '0'
+        run: node scripts/browserinstall.js --meting=browsermeting/incremental.json
+      # Ook deze helft draait bewijs uit dezelfde selectie als de volledige
+      # scherf. De voorbereiding blijft daarom gelijk, ook nu unit en browser
+      # op verschillende runners staan.
+      - name: libxml2 en Redis voor de onafhankelijke protocolproeven
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq libxml2-utils redis-server
+      - name: De Rust-motor en de Sentinel bouwen
+        working-directory: motor
+        run: cargo build --release --locked
+      - name: Alleen browser-REPROVE en browser-UNKNOWN opnieuw bewijzen
+        run: npm run evidence:run -- --plan=.evidence/plan.json --kind=e2e
+        env:
+          RTG_E2E_STRICT: '1'
+          RTG_SNELLE_TOETS: '1'
+      - name: Chromium-cache uitsluitend vanaf de vertrouwde hoofdlijn bewaren
+        if: success() && steps.browser-cache.outputs.cache-hit != 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+
+  incremental:
+    name: Incrementeel bewijs
+    runs-on: ubuntu-latest
+    if: always() && needs.preflight.outputs.mode == 'incremental'
+    needs: [preflight, incremental-unit, incremental-browser]
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Beide onafhankelijke bewijsdelen moeten groen zijn
+        run: node scripts/evidence-gate.js --mode=split --unit=${{ needs.incremental-unit.result }} --unit-count=${{ needs.preflight.outputs.unit }} --browser=${{ needs.incremental-browser.result }} --browser-count=${{ needs.preflight.outputs.e2e }}
 
   test-volledig:
     name: Volledige tests, checks en build
@@ -814,7 +926,7 @@ jobs:
     name: Tests, checks en build
     runs-on: ubuntu-latest
     if: always()
-    needs: [preflight, incremental, test-volledig]
+    needs: [preflight, incremental, test-volledig, norm, security, dependency-review, adversarial, container]
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -822,6 +934,8 @@ jobs:
           persist-credentials: false
       - name: De gekozen bewijsroute moet groen zijn
         run: node scripts/evidence-gate.js --mode=${{ needs.preflight.outputs.mode }} --incremental=${{ needs.incremental.result }} --full=${{ needs.test-volledig.result }}
+      - name: RTG Merge Gate wacht ook op de risicogebonden poorten
+        run: node scripts/evidence-gate.js --mode=merge --route=${{ needs.preflight.outputs.mode }} --risk=${{ needs.preflight.outputs.risk }} --event=${{ github.event_name }} --norm=${{ needs.norm.result }} --security=${{ needs.security.result }} --dependency=${{ needs.dependency-review.result }} --adversarial=${{ needs.adversarial.result }} --container=${{ needs.container.result }}
 
   norm:
     name: De norm, de instroom en de build
@@ -929,7 +1043,7 @@ jobs:
         with:
           fail-on-severity: high
 
-  ladder:
+  adversarial:
     # DE LADDER, de meest complete aanvalsproef van dit huis: dertien treden van
     # een kleuter die op alles ramt tot een aanvaller die weet wat hij doet,
     # tegen een ECHTE server, met 3878 pogingen.
@@ -946,82 +1060,13 @@ jobs:
     # minuten die de kritieke lijn niet verlengen. Hij zakt op een bevinding EN
     # op minder proberen dan de norm (ladderRaak en ladderNietGeprobeerd in
     # NORM.json) -- nul bevindingen is anders te halen door niets meer te doen.
-    name: De ladder (aanvalsproef tegen een echte server)
+    name: Adversarial bewijs (aanval, rollen en isolatie)
     runs-on: ubuntu-latest
     needs: preflight
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with:
-          persist-credentials: false
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
-      - run: npm ci
-      - name: Van kleuter tot aanvaller
-        run: node scripts/ladder.js
-      - name: De uitslag bewaren, ook als hij zakt
-        if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
-        with:
-          name: ladder-uitslag
-          path: LADDER.json
-          if-no-files-found: warn
-
-  rolronde:
-    # DE ROLSCHEIDING, gevraagd aan een echte server in plaats van aan de bron.
-    # test/auth-rol.test.js beloofde "ELK leden-endpoint" en herkende er 1374;
-    # een grendel die in de BODY van de handler staat viel buiten zijn
-    # uitdrukking. Deze ronde klopt met drie rollen (anoniem, lid, leverancier,
-    # kantoor) op elke route en vindt er 1444 -- zeventig meer, en die zeventig
-    # waren nog nooit op rolscheiding beproefd.
-    #
-    # Eigen baan om dezelfde reden als de ladder: minuten die de kritieke lijn
-    # niet verlengen. Hij zakt op een gat EN op minder beproeven dan de norm --
-    # nul gaten is anders te halen door minder te onderzoeken.
-    name: De rolronde (welke rol komt waar binnen)
-    runs-on: ubuntu-latest
-    needs: preflight
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with:
-          persist-credentials: false
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
-      - run: npm ci
-      - name: Elke rol op elke route
-        run: node scripts/rolronde.js
-      - name: De uitslag bewaren, ook als hij zakt
-        if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
-        with:
-          name: rolronde-uitslag
-          path: ROLRONDE.json
-          if-no-files-found: warn
-
-  gluurronde:
-    # DE HORIZONTALE SCHEIDING: mag lid A bij de spullen van lid B? De rolronde
-    # doet de verticale vraag (welke ROL komt waar binnen); deze doet de
-    # moeilijke: A heeft een geldig token, de deur gaat terecht open, en de
-    # scheiding moet per opvraging gebeuren.
-    #
-    # Twee echte leden leggen allebei een leven aan via elke aanmaakroute, en
-    # daarna krijgt A drie vragen: ziet hij iets van B zonder erom te vragen,
-    # krijgt hij iets als hij B's identificator instuurt, en staan B's spullen
-    # er daarna nog. Bijna 8000 vragen.
-    #
-    # DE ZELFPROEF STAAT ER APART BIJ, en met reden: de vernielingscontrole is
-    # de enige die een schrijflek kan zien, en drie pogingen om hem met een
-    # opzettelijk gat te beproeven sloegen af op de opslagvorm. Deze stap laat B
-    # zelf iets weggooien en eist dat de controle dat ziet. Een ronde waarvan de
-    # scherpste controle niets meet, is groen zonder betekenis.
-    name: De gluurronde (mag A bij de spullen van B)
-    runs-on: ubuntu-latest
-    needs: preflight
+    # Product- en light-wijzigingen hoeven deze brede probes niet op goed
+    # vertrouwen over te slaan: de Control Plane onderbouwt hun uitsluiting.
+    # Onbekende risicowaarden vallen door de negatieve vergelijking juist IN.
+    if: needs.preflight.outputs.mode == 'full' || (needs.preflight.outputs.risk != 'light' && needs.preflight.outputs.risk != 'product')
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -1032,19 +1077,49 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'npm'
       - run: npm ci
-      - name: Slaat de vernielingscontrole echt uit? (zelfproef)
+      - name: Van kleuter tot aanvaller
+        id: ladder
+        continue-on-error: true
+        run: node scripts/ladder.js
+      - name: De uitslag bewaren, ook als hij zakt
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: ladder-uitslag
+          path: LADDER.json
+          if-no-files-found: warn
+      - name: Elke rol op elke route
+        id: roles
+        continue-on-error: true
+        run: node scripts/rolronde.js
+      - name: De rolronde bewaren
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: rolronde-uitslag
+          path: ROLRONDE.json
+          if-no-files-found: warn
+      - name: Slaat de horizontale vernielingscontrole echt uit?
+        id: gluur_self
+        continue-on-error: true
         run: node scripts/gluurronde.js
         env:
           GLUUR_ZELFPROEF: '1'
       - name: A tegen B
+        id: gluur
+        continue-on-error: true
         run: node scripts/gluurronde.js
-      - name: De uitslag bewaren, ook als hij zakt
+      - name: De gluurronde bewaren
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: gluurronde-uitslag
           path: GLUURRONDE.json
           if-no-files-found: warn
+      - name: Alle vier adversarial onderdelen moeten groen zijn
+        if: always()
+        run: node scripts/evidence-gate.js --mode=adversarial --ladder=${{ steps.ladder.outcome }} --roles=${{ steps.roles.outcome }} --gluur-self=${{ steps.gluur_self.outcome }} --gluur=${{ steps.gluur.outcome }}
+
   # PR #58 wilde het runtime-image van node:22-slim naar node:26-slim tillen en
   # kreeg zes groene vinkjes, terwijl geen enkele job de container aanraakte:
   # release-image.yml bouwt pas bij een release, en de keuring hierboven draait
@@ -1056,6 +1131,7 @@ jobs:
     name: De container komt op
     runs-on: ubuntu-latest
     needs: preflight
+    if: needs.preflight.outputs.mode == 'full' || needs.preflight.outputs.risk != 'light'
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -1095,6 +1171,12 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'npm'
       - run: npm ci
+      - name: Alleen een door main opgebouwde Chromium-cache herstellen
+        id: browser-cache
+        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
       # DE BROWSER KOMT UIT DE LOCKFILE. Hier stond `npm i --no-save
       # playwright@^1.49.0` NA `npm ci` -- een tweede installatie buiten de
       # lockfile om, zonder integriteitscontrole, op een bereik dat niet meer
@@ -1102,9 +1184,16 @@ jobs:
       # node_modules en de lockfile het oneens zijn, en klokt de apt-fase en de
       # browserdownload APART -- want de uitschieters van 313s en 434s op
       # 31 augustus 2026 zaten in een van die twee en `--with-deps` liet niet
-      # zien in welke. Nog geen cache: eerst het getal, dan het besluit.
+      # zien in welke. De cache wordt alleen vanaf een vertrouwde hoofdlijn
+      # gevuld; een PR mag hem gebruiken maar nooit vergiftigen.
       - name: Playwright + Chromium (uit de lockfile, per fase geklokt)
         run: node scripts/browserinstall.js --meting=browsermeting/${{ github.job }}-${{ matrix.deel }}.json
+      - name: Eén vertrouwde scherf bewaart de Chromium-cache
+        if: success() && steps.browser-cache.outputs.cache-hit != 'true' && matrix.deel == 1 && (github.event_name == 'push' || github.event_name == 'schedule')
+        uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
       # De scan gaat over ALLE schermen, uitgelogd en ingelogd, en sinds de
       # raakvlakronde nog een derde keer op telefoonformaat. Dit deel meet zijn
       # kwart daarvan en oordeelt niet.
@@ -1173,6 +1262,11 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'npm'
       - run: npm ci
+      - name: Alleen een door main opgebouwde Chromium-cache herstellen
+        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
       # DE BROWSER KOMT UIT DE LOCKFILE. Hier stond `npm i --no-save
       # playwright@^1.49.0` NA `npm ci` -- een tweede installatie buiten de
       # lockfile om, zonder integriteitscontrole, op een bereik dat niet meer
@@ -1180,7 +1274,8 @@ jobs:
       # node_modules en de lockfile het oneens zijn, en klokt de apt-fase en de
       # browserdownload APART -- want de uitschieters van 313s en 434s op
       # 31 augustus 2026 zaten in een van die twee en `--with-deps` liet niet
-      # zien in welke. Nog geen cache: eerst het getal, dan het besluit.
+      # zien in welke. Schermjobs herstellen uitsluitend de cache die een
+      # vertrouwde hoofdlijn heeft gevuld en schrijven zelf niets terug.
       - name: Playwright + Chromium (uit de lockfile, per fase geklokt)
         run: node scripts/browserinstall.js --meting=browsermeting/${{ github.job }}-${{ matrix.deel }}.json
       # RTG_E2E_STRICT=1 zegt: deze omgeving BELOOFT schermtoetsen te draaien.
@@ -1487,8 +1582,8 @@ jobs:
   evidence-publish:
     name: Vertrouwd bewijsboek publiceren
     runs-on: ubuntu-latest
-    needs: [preflight, test-volledig, dekking, norm, security, ladder, rolronde, gluurronde, container, a11y-oordeel]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.preflight.outputs.mode == 'full'
+    needs: [preflight, test-volledig, dekking, norm, security, adversarial, container, a11y-oordeel]
+    if: (github.event_name == 'schedule' || (github.event_name == 'push' && github.ref == 'refs/heads/main')) && needs.preflight.outputs.mode == 'full'
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -1500,14 +1595,58 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'npm'
       - run: npm ci
+      - name: Het vastgezette Evidence Control Plane ophalen
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: evidence-plan
+          path: .evidence
       - name: Content-addressed bewijs met clean-room-herkomst vastleggen
         run: npm run evidence:record
         env:
           RTG_FULL_PROOF: '1'
+          RTG_CONTROL_FILE: .evidence/control.json
       - name: Bewijsboek voor PRs op deze exacte commit bewaren
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: evidence-book
           path: BEWIJSBOEK.json
+          if-no-files-found: error
+          retention-days: 30
+
+  # DE TERUGKOPPELLUS. De planner heeft vóór de ronde voorspeld welke bewijzen
+  # konden worden hergebruikt; de schedule dwong desondanks een volledige ronde
+  # af. Hier worden voorspelling en werkelijkheid aan hetzelfde Control Plane
+  # gebonden. Eén rode of onbekende uitvoeringsstand degradeert de onderliggende
+  # uitsluitingsclaims naar nul. evidence-base.js weigert daarna ouder bewijs,
+  # zodat een kalibratiefout de volgende PR automatisch naar `full` opschaalt.
+  calibration:
+    name: Evidence Control Plane - nachtelijke kalibratie
+    runs-on: ubuntu-latest
+    if: always() && github.event_name == 'schedule'
+    needs: [preflight, toetsscherf, ijkingen, zware, keuringen, test-volledig, test, norm, security, adversarial, container, a11y, a11y-oordeel, schermen, schermen-oordeel, dekking, evidence-publish]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - name: De voorspelling van vóór de uitvoering ophalen
+        continue-on-error: true
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: evidence-plan
+          path: .evidence
+      - name: Voorspelling en volledige werkelijkheid kalibreren
+        run: node scripts/evidence-calibration.js --control=.evidence/control.json --out=EVIDENCE-CALIBRATION.json
+        env:
+          RTG_CALIBRATION_RESULTS: '{"preflight":"${{ needs.preflight.result }}","unit":"${{ needs.toetsscherf.result }}","ijkingen":"${{ needs.ijkingen.result }}","zware":"${{ needs.zware.result }}","keuringen":"${{ needs.keuringen.result }}","volledig":"${{ needs.test-volledig.result }}","merge-gate":"${{ needs.test.result }}","norm":"${{ needs.norm.result }}","security":"${{ needs.security.result }}","adversarial":"${{ needs.adversarial.result }}","container":"${{ needs.container.result }}","a11y":"${{ needs.a11y.result }}","a11y-oordeel":"${{ needs.a11y-oordeel.result }}","schermen":"${{ needs.schermen.result }}","schermen-oordeel":"${{ needs.schermen-oordeel.result }}","dekking":"${{ needs.dekking.result }}","bewijsboek":"${{ needs.evidence-publish.result }}"}'
+      - name: Kalibratie en confidence-updates bewaren
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: evidence-calibration
+          path: EVIDENCE-CALIBRATION.json
           if-no-files-found: error
           retention-days: 30

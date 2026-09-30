@@ -8,7 +8,7 @@
     "public/apps/leverancier.html",
     "public/apps/app.html"
   ],
-  "sourceHash": "02055cf6b56b98680c515628877a045049ae95b22614495f23d6963719cd1039",
+  "sourceHash": "e9c70e32886ac40fd99f39a9c23c0b9fffbf2ac60f5113720c35b1cbc5a366d4",
   "platform": [
     {
       "id": "organisatie",
@@ -129,11 +129,11 @@
       "workspaceRoute": "/apps/werkruimte.html?gebied=reizen",
       "action": "Open reisdetail",
       "groupCount": 3,
-      "featureCount": 13,
+      "featureCount": 14,
       "groups": [
         {
           "name": "Plannen",
-          "count": 5
+          "count": 6
         },
         {
           "name": "Onderweg",

@@ -44,6 +44,10 @@
         var rij = M.el('div', 'rij');
         rij.style.display = 'flex'; rij.style.gap = '0.35rem'; rij.style.flexWrap = 'wrap'; rij.style.margin = '0.8rem 0';
         rij.appendChild(M.knop('▶ Speel', 'vol', function () { M.speel(s); }));
+        (d.experiences || []).forEach(function (x) {
+          var a = M.el('a', 'knop', 'Take me there · ' + x.title);
+          a.href = x.url; rij.appendChild(a);
+        });
         rij.appendChild(M.knop('Naar ' + s.maker.codenaam, '', function () { maker(s.maker.codenaam); }));
         /* In een lijst zetten en delen staan in ./lijst.js; hier alleen de
            twee knoppen, zodat het bij het stuk staat waar u naar kijkt. */

@@ -3425,6 +3425,20 @@
       "maturity": "L0"
     },
     {
+      "id": "living-world",
+      "url": "/apps/living-world.html",
+      "name": "RTG Living World · TravelOS",
+      "world": "travel",
+      "worlds": [
+        "travel"
+      ],
+      "type": "workspace",
+      "icon": "grid",
+      "sections": [],
+      "description": "",
+      "maturity": "L0"
+    },
+    {
       "id": "livinglab",
       "url": "/apps/livinglab.html",
       "name": "Living Lab",

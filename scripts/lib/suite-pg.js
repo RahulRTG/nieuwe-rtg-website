@@ -7,9 +7,14 @@ const cp = require('node:child_process');
 const crypto = require('node:crypto');
 const { TOETSEN, toetslijstSha256 } = require('./pg-toetslijst');
 
-function plan(bestanden, env, volledig) {
+function plan(bestanden, env, volledig, pgApart = false) {
   const pg = TOETSEN.map(n => path.basename(n));
   const actief = !!(env.DATABASE_URL || env.PG_URL);
+  // CI-scherven hebben geen database; de verplichte PG-job draait deze lijst
+  // wel, elk bestand in een eigen database. Een losse PG-selectie blijft falen
+  // zonder database, en een volledige release blijft echt PG-bewijs eisen.
+  if (!actief && pgApart) return { apart:false, bestanden:bestanden.filter(n=>!pg.includes(n)),
+    env:{...env}, pg:[], uitgesteld:pg.filter(n=>bestanden.includes(n)) };
   if (!actief) return { apart: false, bestanden, env: { ...env }, pg: [] };
   if (!volledig) throw Error('Een gedeelde DATABASE_URL mag niet naar losse tests of scherven. Gebruik scripts/pgtoetsen.js voor databaseproeven.');
   if (!pg.every(n => bestanden.includes(n))) throw Error('De volledige suite mist verplichte PostgreSQL-bestanden.');

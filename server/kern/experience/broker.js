@@ -16,6 +16,9 @@ module.exports = function maakBroker({ crypto, opslag, projecteer, contexten, ke
     'schedule.item.create': require('./action-schedule')({ kern }),
     'network.plan.save': require('./action-network')({ kern, network })
   };
+  for (const action of Object.keys(require('../living-world/actions').definitions)) {
+    handlers['living-world.' + action] = require('./action-living-world')({ kern, action });
+  }
 
   function contextVoor(key, world, contextId) {
     const context = contexten.kies(key, world, contextId);

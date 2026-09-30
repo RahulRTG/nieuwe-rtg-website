@@ -27,6 +27,8 @@ module.exports = (app, auth, experience) => {
     stuur(res, experience.network({ key: req.session.key, body: req.body || {},
       economicPrincipalRef: principalVoorSession(req.session) }));
   });
+  app.post('/api/living-world/view', auth, lid, (req, res) =>
+    stuur(res, experience.livingWorldView(req.session.key, req.body || {})));
 
   app.post('/api/experience/resume', auth, lid, (req, res) =>
     stuur(res, experience.resumeZet(req.session.key, req.body || {})));

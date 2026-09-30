@@ -74,7 +74,10 @@ const VENSTER_MS = 5000;
    zodat er maar EEN opzoekweg bestaat. */
 /* De eerste ronde staat in ./idemsleutels-basis.js -- zelfde register, eigen
    bestand, precies zoals de zeven rondes hieronder. */
-const SLEUTELS = {};
+const SLEUTELS = {
+  /* Een verse projectie: dezelfde leesvraag moet de huidige wereld teruggeven. */
+  'POST /api/living-world/view': { leest: true }
+};
 
 function sleutelVoor(methode, pad) {
   return SLEUTELS[String(methode || '').toUpperCase() + ' ' + String(pad || '')] || null;

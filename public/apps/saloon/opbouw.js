@@ -9,7 +9,7 @@
       + '<button type="submit" aria-label="Zoek in Saloon"><span aria-hidden="true">⌕</span></button>'
       + '<input id="saloonZoekveld" name="zoek" type="search" maxlength="100" placeholder="Wat wilt u ontdekken?">'
       + '<button type="button" data-keuzes aria-label="Uw bronnen en voorkeuren" aria-controls="saloonKeuzes" aria-expanded="false">☷</button></form>'
-      + '<nav class="saloon-vormen" aria-label="Weergave"><button type="button" data-vorm="overzicht">Voor u</button>'
+      + '<nav class="saloon-vormen" aria-label="Weergave"><a href="/apps/living-world.html">Living World</a><button type="button" data-vorm="overzicht">Voor u</button>'
       + '<button type="button" data-dichtbij aria-pressed="false">Dichtbij</button><button type="button" data-vorm="bewaard">Bewaard</button></nav>'
       + '<details class="saloon-keuzes" id="saloonKeuzes"><summary>Mijn bronnen en omgeving</summary>'
       + '<form id="saloonFilters"><label>Plaats<input name="plaats" type="search" maxlength="60" placeholder="Welke plaats wilt u volgen?"></label>'

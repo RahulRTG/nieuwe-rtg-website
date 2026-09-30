@@ -100,8 +100,11 @@ d.addEventListener('visibilitychange',function(){if(!d.hidden)load();});
 setInterval(function(){if(!d.hidden&&!busy)load();},60000);
 function syncEdge(){
   if(w.RTGAdaptief)w.RTGAdaptief.context({bron:'living-world',titel:selection?'Living World · '+selection.type:tab==='plans'?'Mijn ervaringen':tab==='studio'?'Werkplaats':'Living World'});
+  var primary=d.querySelector('[data-lw-primary]')||d.querySelector('[data-lw-tab="world"]');
+  d.querySelectorAll('#lwMain [data-hoofdactie]').forEach(function(b){b.removeAttribute('data-hoofdactie');});
+  if(primary)primary.setAttribute('data-hoofdactie','');
   var edge=w.RTGEdge&&w.RTGEdge.active;if(!edge)return;
-  var b=edge.root.querySelector('[data-rtg-edge-primary]'),primary=d.querySelector('[data-lw-primary]');
+  var b=edge.root.querySelector('[data-rtg-edge-primary]');
   if(!b)return;
   edge.onAction=function(){if(w.RTGAdaptiveEdge)w.RTGAdaptiveEdge.setState('dock');var current=d.querySelector('[data-lw-primary]');if(current)current.click();else setTab('world');};
   var label=primary?primary.textContent:'Ontdek uw wereld';edge.ctx.actie=label;b.textContent=label;b.hidden=false;

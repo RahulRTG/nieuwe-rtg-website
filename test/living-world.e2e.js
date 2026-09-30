@@ -60,6 +60,7 @@ for(const width of [390,1440])test(width+'px: Living World maakt, bevestigt, her
  await traveler.waitForSelector('.rtg-edge-chrome');
  assert.equal(await traveler.locator('.rtg-edge-chrome').count(),1);
  assert.equal(await traveler.evaluate(()=>window.RTGAdaptief.context().bron),'living-world');
+ assert.equal(await traveler.locator('#lwMain [data-hoofdactie]').count(),1);
  assert.equal(await traveler.locator('body').getAttribute('data-rtg-world'),'travel');
  assert.equal(await traveler.evaluate(()=>document.documentElement.scrollWidth>innerWidth+2),false);
  const out=path.join(__dirname,'../artifacts/living-world');fs.mkdirSync(out,{recursive:true});

@@ -142,9 +142,9 @@
   else if (pad === '/apps/reisboek.html') hoofdactie('Naar reisinhoud', function () { focus('#main'); });
   else if (pad === '/apps/living-world.html') {
     function livingWorldAction() {
-      var source = vind('[data-lw-primary]');
+      var source = vind('[data-lw-primary]') || vind('[data-hoofdactie]');
       hoofdactie(source ? source.textContent : 'Ontdek uw wereld', function () {
-        var current = vind('[data-lw-primary]');
+        var current = vind('[data-lw-primary]') || vind('[data-hoofdactie]');
         if (current) current.click(); else klik('[data-lw-tab="world"]');
       });
     }

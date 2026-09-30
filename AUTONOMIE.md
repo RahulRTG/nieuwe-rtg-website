@@ -59,8 +59,8 @@ gedrag zonder commentaar mee te lezen):
 | bewijs | kan de uitkomst herkomst, graad of peilmoment tonen? | `BEWIJS_ONTBREEKT` |
 
 De stand: <!--getal:bedrijfsmaat.maten-->67<!--/getal--> maten over de 28 domeinen van de eigenaar.
-<!--getal:bedrijfsmaat.bestaat-->56<!--/getal--> bestaan, <!--getal:bedrijfsmaat.half-->8<!--/getal--> half en <!--getal:bedrijfsmaat.ontbreekt-->3<!--/getal--> ontbreken.
-Van de bestaande zien er <!--getal:bedrijfsmaat.gedeeltelijk-->18<!--/getal--> een deel van de werkelijkheid niet
+<!--getal:bedrijfsmaat.bestaat-->59<!--/getal--> bestaan, <!--getal:bedrijfsmaat.half-->5<!--/getal--> half en <!--getal:bedrijfsmaat.ontbreekt-->3<!--/getal--> ontbreken.
+Van de bestaande zien er <!--getal:bedrijfsmaat.gedeeltelijk-->19<!--/getal--> een deel van de werkelijkheid niet
 (`gedeeltelijk`, met de reden). <!--getal:bedrijfsmaat.ketensGegrond-->6<!--/getal--> van de zes ketens is gegrond, en er staan
 <!--getal:bedrijfsmaat.privacyGaten-->0<!--/getal--> projecties over mensen zonder afgedwongen groepsgrens.
 
@@ -281,6 +281,35 @@ gebouwd (`kern/bedrijfsmaat/stand-groei.js`, `definities-later.js`):
   schrijft zo'n factuur met het bedrag zonder btw en de btw apart, dus er hoeft
   niets te worden geschat. Geld van de zaken, nooit omzet van RTG; een
   terugbetaling staat niet als creditnota in het register en gaat er dus niet af.
+
+### 2.8 De besluiten van 30 september 2026
+
+Vier besluiten over de maten die nog een keuze vroegen; de eerste drie staan in
+`server/kern/bedrijfsmaat/stand-toelating.js`, met hun definities in
+`definities-later.js`.
+
+- **C20, toelating van zaken.** Per stand (in behandeling, geaccepteerd,
+  klaargezet, afgewezen) het aantal aanmeldingen met een bedrijf, plus de mediane
+  doorlooptijd van aanvraag tot besluit over de besluiten van de maand. Onder vijf
+  zaken geen getal, ook niet voor de doorlooptijd. Een klaargezette zaak is een
+  eigen stand: geaccepteerd is nog geen zaak.
+- **C21, churn via contracten.** Het aandeel van de contracten die aan het begin
+  van de maand liepen en in de maand GEEINDIGD bereikten. Geteld per contract en
+  niet per lid: een contract hangt aan een aanmelding, en de koppeling naar een
+  codenaam is met opzet niet gelegd. Een contract dat in de maand begon en eindigde
+  telt niet, want het stond niet in de noemer.
+- **C22, de btw van RTG zelf.** Een voorbereiding per kwartaal: de
+  lidmaatschapstermijnen die in het kwartaal vervielen (factuurstelsel), zonder
+  btw, maal het standaardtarief. Klasse `advies` (`btw.rtg` in
+  `kern/fiscaal/zekerheid.js`), graad `vermoed`, en indienen blijft `voorbehouden`.
+  Twee dingen zitten er niet in en staan erbij: de verbruiksfacturen per lid (die
+  staan versleuteld in de kluis) en het oordeel of het deel voor de RTFoundation
+  onder de vergoeding valt.
+- **C23, het eigen kantoor blijft ongeteld.** Medewerkers op naam, werkdruk en open
+  zaken per team krijgen geen projectie: met een klein kantoor is elk getal een
+  getal over een mens. Ze gaan pas open met een groter team en een dienstverband
+  bij RTG zelf; `test/bedrijfsmaattoelating.test.js` houdt vast dat ze open staan
+  en de reden dragen.
 
 ---
 

@@ -3058,7 +3058,7 @@
           "bestanden": [
             "server/kern/fiscaal/zekerheid.js"
           ],
-          "leden": 19,
+          "leden": 20,
           "voorbeeld": [
             "btw.aangifte",
             "btw.regel",
@@ -3673,5 +3673,5 @@
       ]
     }
   ],
-  "bestanden": 3893
+  "bestanden": 3894
 }

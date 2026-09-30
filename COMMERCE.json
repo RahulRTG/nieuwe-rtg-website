@@ -1,15 +1,15 @@
 {
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
-  "vastgelegd": "2026-09-29",
+  "vastgelegd": "2026-09-30",
   "gemeten": {
-    "bestanden": 2575,
+    "bestanden": 2576,
     "domeinenTotaal": 683,
-    "koopbareVormen": 612,
-    "koopbareDomeinen": 123,
+    "koopbareVormen": 613,
+    "koopbareDomeinen": 124,
     "envelopDrempel": 8,
-    "envelop": 42,
-    "veldenDomeineigen": 786,
-    "veldenNietEnvelop": 1054,
+    "envelop": 43,
+    "veldenDomeineigen": 790,
+    "veldenNietEnvelop": 1057,
     "gelijkendeVormparen": 17,
     "werkwoordenVolledig": 2,
     "werkwoordenOveral": 0,
@@ -57,6 +57,7 @@
     "stand",
     "status",
     "supplierCode",
+    "tarief",
     "titel",
     "totaal",
     "totaalCenten",
@@ -69,11 +70,11 @@
     "wat"
   ],
   "perWerkwoord": {
-    "toon": 93,
+    "toon": 94,
     "prijs": 39,
     "beschikbaarheid": 55,
-    "reserveer": 28,
-    "bevestig": 59,
+    "reserveer": 29,
+    "bevestig": 60,
     "lever": 24,
     "annuleer": 34,
     "retour": 8
@@ -1065,6 +1066,25 @@
         "toon": "beeld",
         "beschikbaarheid": "bankOpdrachtenOpen",
         "bevestig": "akkoordStore"
+      },
+      "telt": 3
+    },
+    {
+      "domein": "kern/bedrijfsmaat",
+      "heeft": {
+        "toon": true,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": true,
+        "bevestig": true,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "bezoek",
+        "reserveer": "verhouding",
+        "bevestig": "rtgboekMaten"
       },
       "telt": 3
     },

@@ -1303,7 +1303,12 @@ houdbaar aanbod van een partner, doorzetten naar zijn beslisser, een
 deelnemersweergave per rol, en een netwerk van collega's. Dat laatste vraagt
 eerst een besluit. De scherpste nieuwe grens is CON-08: **een verrassing is een
 privacystand en geen notitie**. Eén melding naar de partner en de case is
-mislukt.
+mislukt. **Stap 0 tot en met 8 staan in de server** (par. 0a, 30 september 2026):
+`kern/bureau/lus*.js` als tweede werkwijze (`voorstel`) op dezelfde cases, het
+oude verzoek van De Rechterhand als schil erover (`kern/lifestyle/verzoek.js`),
+en een tegenvoorstel met vasthoudtermijn plus doorzetten naar een manager op de
+tafelreservering (`kern/ervaring/tafeluitzondering.js`). Er zijn nog **geen
+schermen** voor, dus voor een mens bestaat de functie nog niet.
 
 **`BESTUUR.md` is het besturingsvlak** — de achterkant van RTG niet als
 backoffice maar als één laag waarin een mens ziet wat er draait, of het gezond

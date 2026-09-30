@@ -1,6 +1,6 @@
 # RTG Concierge — de lus rond een wens
 
-Status: richtingsdocument, 30 september 2026. Net als `PLATFORM.md`,
+Status: richtingsdocument, 30 september 2026; stap 0 tot en met 8 staan sinds dezelfde dag in de server (par. 0a). Net als `PLATFORM.md`,
 `ECONOMIE.md` en `INTELLIGENTIE.md` staat er bij elk onderdeel een van vier
 standen: **staat**, **een stap weg**, **vraagt een besluit** of **jaren weg**.
 Zo ziet niemand de vier voor elkaar aan.
@@ -69,6 +69,54 @@ de eerste week geen nieuwe module oplevert, maar één conciërge in plaats van
 vijf.
 
 ---
+
+## 0a. Wat er sinds 30 september 2026 staat
+
+De lus is gebouwd op de cases van het Privékantoor, als een tweede
+**werkwijze** (`voorstel`) en niet als een tweede wachtrij. Met mijn
+aanbevelingen uit par. 5 als uitgangspunt, want de eigenaar vroeg de hele lus
+te bouwen voordat de besluiten B1–B5 waren genomen. Die besluiten staan dus nog
+open; wat hieronder staat, kiest steeds de optie die ik aanbeval.
+
+| stap (par. 6) | waar | toets |
+|---|---|---|
+| 0. één conciërge | `kern/lifestyle/verzoek.js`: het oude verzoek is een schil over een case in de lus | `test/lifestyle.test.js` (ongewijzigd groen), `test/conciergelus.test.js` stap 0 |
+| 1. CON-08 als toets | `lus-regels.js` `magBereiken`; de lus heeft geen weg naar agenda, ontvanger of gezin | `test/conciergelus-regels.test.js`, `-kern.test.js` |
+| 2. intake | `lus-intake.js`: velden uit een zin, zonder model; wat ontbreekt wordt een vraag | `test/conciergelus-regels.test.js` |
+| 3. overgang naar bijzonder | `lus.js` `lusWeigering`: de weigering staat in de tijdlijn, daarna pas de soort | `test/conciergelus.test.js` |
+| 4. ieder zijn stukje + tegenvoorstel | `lus-regels.js` `deelnemerBeeld` (positieve lijst), `/api/supplier/concierge/opdrachten`; `kern/ervaring/tafeluitzondering.js` | `test/conciergelus*.test.js`, `test/tafeluitzondering.test.js` |
+| 5. houdbaar aanbod | `lus-regels.js` `aanbodStand`: verval berekend; een tegenvoorstel houdt capaciteit vast tot zijn termijn | beide, met een verzette klok |
+| 6. doorzetten naar de beslisser | `tafeluitzondering.js` `doorzetten`: daarna beslist alleen `req.actor.manager` | `test/tafeluitzondering.test.js` |
+| 7. tijdlijn per deelnemer + gevolgen | `lus-uitvoering.js` `lusVertraging` / `lusVerstuur`: klaarzetten, en pas versturen als alles gezien is | `test/conciergelus.test.js`, `-kern.test.js` |
+| 8. herstel + afsluiten | `lusKapot` (stand `in herstel`, dezelfde case), `afsluitbaar` + `afsluitUitkomst` in het bureau | `test/conciergelus.test.js` |
+
+Het mandaat kreeg er één ding bij dat in par. 2.10 ontbrak: een **speelruimte in
+tijd** per case (`speelruimteMin`). Een voorstel dat verder van de gevraagde tijd
+ligt, gaat naar het lid, ook als het geld binnen de grens valt.
+
+Elke schrijfroute is met een dubbeltik gemeten (`test/conciergelus-dubbel.test.js`)
+en heeft een contract in `server/lib/mutatiecontracten-conciergelus.js`. Een
+toelichting van het lid is met opzet een tweede handeling.
+
+**Wat er NIET staat**, en dat is evenveel:
+
+- **Geen schermen.** Alles hierboven is server en toetsen. Het kantoor ziet de
+  cases uit de lus op het bestaande bureau (`lus: true`), maar er is nog geen
+  knop voor een aanbod, een vertraging of een herstel. Het lid ziet zijn case in
+  het Privékantoor, maar nog geen voorstel om op te drukken. Volgens
+  `BETROUWBAARHEID.md` bestaat de functie daarom voor een mens nog niet.
+- **De routekaart (2.5)** is niet gebouwd; het kantoor noemt een route nog zelf.
+- **Het collega-netwerk (2.6)** en **de kennis over routes (2.16)** wachten op
+  B3 en B5.
+- **De hotelconciërge als eigenaar (B1)** niet: de lus draait op het
+  levensdossier van een lid. De regels in `lus-regels.js` zijn wel puur, zodat
+  een tweede ingang dezelfde regels kan gebruiken.
+- **Rendez-vous** houdt zijn eigen conciërgewachtrij; B2 is voor die ingang nog
+  niet uitgevoerd.
+- **Een grens per handeling** ("extra boven € 250") bestaat nog niet; er is één
+  grens per domein plus de speelruimte in tijd.
+- **Geen `scripts/conciergeproef.js`.** De schakels en storingen van par. 6
+  zitten in de toetsen, niet in een ketenproef die `KETENVORM.json` meeneemt.
 
 ## 1. Twee case-eigenaren, één motor
 
@@ -501,17 +549,17 @@ waar hij vandaan komt en wie hem vandaag handhaaft.
 
 | # | grens | komt uit | handhaver vandaag |
 |---|---|---|---|
-| CON-01 | **De gast vertelt het één keer.** De case draagt de context, niet de gast. Herstel is een stand binnen de case en geen nieuwe case. | `SERVICE.md` par. 12 | niemand |
-| CON-02 | **Ieder ziet zijn stukje.** Een deelnemer krijgt een projectie van de case, nooit een kopie en nooit het dossier. | `service/zaak.js` `verwijzing()`, `graaf.js` `deel` | half (`verwijzing` wel, deelnemerweergave bestaat niet) |
+| CON-01 | **De gast vertelt het één keer.** De case draagt de context, niet de gast. Herstel is een stand binnen de case en geen nieuwe case. | `SERVICE.md` par. 12 | `lusKapot` + `test/conciergelus.test.js` (dezelfde case, `opnieuwVerteld` geteld) |
+| CON-02 | **Ieder ziet zijn stukje.** Een deelnemer krijgt een projectie van de case, nooit een kopie en nooit het dossier. | `service/zaak.js` `verwijzing()`, `graaf.js` `deel` | `deelnemerBeeld` + `test/conciergelus-regels.test.js` (exacte veldenlijst) |
 | CON-03 | **Alleen een mens zet "geregeld".** Geen route van de gast en geen AI kan het zetten. De AI verzint geen aanbod, beschikbaarheid of partner. | `bureau/cases.js`, `mall/concierge.js` | **ja**, in code |
-| CON-04 | **RTG brengt de beslisser, nooit de druk.** Er komt geen aansporing, geen VIP-label en geen aftelklok. Een nee blijft een nee. | `ONTMOETEN.md` par. 4, `HORECA.md` | niemand |
+| CON-04 | **RTG brengt de beslisser, nooit de druk.** Er komt geen aansporing, geen VIP-label en geen aftelklok. Een nee blijft een nee. | `ONTMOETEN.md` par. 4, `HORECA.md` | half: `doorzetten` draagt alleen een reden, en `test/tafeluitzondering.test.js` houdt een nee als nee; een verbod op labels heeft geen toets |
 | CON-05 | **Geen cijfer op een mens.** Er komt geen ranglijst van conciërges, geen gastwaarde en geen relatiesterkte. Routes dragen redenen in woorden. | CAR-05, INT-04, `CONNECT.md` | niemand |
-| CON-06 | **Wat een tweede persoon bereikt, bevestigt een mens.** Eén druk mag meerdere berichten versturen, maar alleen als ze allemaal in beeld stonden. | `LIFE.md` par. 4 | niemand |
+| CON-06 | **Wat een tweede persoon bereikt, bevestigt een mens.** Eén druk mag meerdere berichten versturen, maar alleen als ze allemaal in beeld stonden. | `LIFE.md` par. 4 | `lusVerstuur` (de lijst gezien = de lijst klaar) + toets met mutatie |
 | CON-07 | **Geld verlaat het huis nooit vanzelf.** Het mandaat stelt een grens. Daarboven beslist de gast. Onder de grens zet het systeem de betaling klaar en voert een mens hem uit. | `GELD.md`, `stuur/mandaat.js` | **ja** (`NOOIT_AUTONOOM`) |
-| CON-08 | **Een verrassing is een privacystand en geen notitie.** Zolang hij geldt, gaat er niets naar een gedeelde agenda, naar het gezin of naar de meldingen van de partner. | nieuw | niemand |
-| CON-09 | **Vastgehouden is niet geboekt.** Verval wordt berekend. Een verlopen aanbod ziet er nooit uit als een reservering. | `commerce/werkwoordlijst.js` | niemand |
+| CON-08 | **Een verrassing is een privacystand en geen notitie.** Zolang hij geldt, gaat er niets naar een gedeelde agenda, naar het gezin of naar de meldingen van de partner. | nieuw | `magBereiken` + een brontoets dat de lus geen weg naar agenda of gezin kent |
+| CON-09 | **Vastgehouden is niet geboekt.** Verval wordt berekend. Een verlopen aanbod ziet er nooit uit als een reservering. | `commerce/werkwoordlijst.js` | `aanbodStand`, `tegenvoorstelVerlopen` + toetsen met een verzette klok |
 | CON-10 | **Kennis gaat over zaken en routes, nooit over gasten.** | `HDI.md` par. 5.1 (geen `humans`-tabel) | niemand |
-| CON-11 | **Geen naam die er niet is.** Er staat een rol tot een echte medewerker de case oppakt. Echte merken en verenigingen noemen we geen partner zonder overeenkomst. | `cases-soorten.js`, `CLAUDE.md` | half |
+| CON-11 | **Geen naam die er niet is.** Er staat een rol tot een echte medewerker de case oppakt. Echte merken en verenigingen noemen we geen partner zonder overeenkomst. | `cases-soorten.js`, `CLAUDE.md` | half: `lusNeem` zet alleen een naam uit de sessie (met de gedeelde code: een rol), getoetst; de merkregel niet |
 
 CON-08 verdient een extra zin, want juist deze grens mist het voorstel. De
 verrassing voor een partner is het hart van het voorbeeld. Het huis heeft

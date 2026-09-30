@@ -71,21 +71,6 @@ CONTRACTEN['POST /api/office/bankpositie'] = {
     '(afwezig blijft afwezig) -- geen save(), geen toewijzing',
   afgetekend: AF
 };
-/* Het boek van RTG (kern/rtgboek.js, besluit C8): Financien leest en vult het op naam. */
-CONTRACTEN['POST /api/office/rtgboek'] = {
-  mutatieId: 'office.rtgboek', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
-  toegang: { klasse: 'AUTHENTICATED' }, stand: 'NOT_APPLICABLE',
-  bewijs: { gemeten: 'test/rtgboek.test.js toets 8: 401 zonder sessie, 200 met de gedeelde code en het bedrag op naam', op: '2026-09-27' },
-  nagekeken: 'met de hand, 2026-09-27: de handler roept alleen rtgBoek() aan, die via eigencollectie.kijk leest',
-  afgetekend: AF
-};
-CONTRACTEN['POST /api/office/rtgboek/zet'] = {
-  mutatieId: 'office.rtgboek.zet', herkomst: 'mens', semantiek: { klasse: 'idempotent' },
-  toegang: { klasse: 'AUTHENTICATED' }, stand: 'PROTECTED',
-  bewijs: { gemeten: 'test/rtgboek.test.js toets 2: dezelfde post, hetzelfde bedrag en dezelfde bron nog eens geeft ' +
-    'ongewijzigd: true, en de vorige stand blijft die van voor de eerste oproep; toets 8: de gedeelde code krijgt 403', op: '2026-09-27' },
-  afgetekend: AF
-};
 /* Het aanmeldkanaal (kern/aanmeldkanaal.js, besluit C6): een telling lezen. */
 CONTRACTEN['POST /api/office/aanmeldkanaal'] = {
   mutatieId: 'office.aanmeldkanaal', herkomst: 'mens', semantiek: { klasse: 'idempotent' },

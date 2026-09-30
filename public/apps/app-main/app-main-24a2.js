@@ -44,6 +44,12 @@
     { sleutel: 'map-rtg', naam: 'LivingOS', wereld: '/apps/rtg.html', glyf: 'rtg', items: [
       'link:vooruitzicht', 'link:vandaag', 'link:leven', 'link:sociaal',
       'link:geldcommand', 'link:mediaos',
+    /* RTG VEILIG STOND ONDER INSTELLINGEN, en daarmee ook de rust (Thuisrust is
+       een stand van deze app). SAMENLEVING.md par. 6 noemde precies dat het
+       gebrek: rust was alleen te vinden voor wie haar al zocht. Besluit van 29
+       september 2026: de hele app hierheen, want stilte, een codewoord en een
+       thuiswacht gaan over iemands dag en niet over het systeem. */
+      'link:veilig',
     /* HET GEZIN KOMT UIT FOUNDATIONOS HIERHEEN, en dat is het eigendomsprincipe
        van WERELDEN.md in de praktijk: de bouwer van een capability bepaalt niet
        in welke wereld hij hoort, de gebruikerscontext doet dat. RTF Mini, Kids,
@@ -99,7 +105,7 @@
        in de voet. Vandaar `paneel`: geen vijfde wereldtegel, geen tweede
        instellingenscherm. wereldBij() in 29c filtert deze map er vanzelf uit. */
     { sleutel: 'map-instellingen', naam: 'Instellingen', paneel: '#osCcBtn', items: [
-      'link:ik', 'link:verificatie', 'link:veilig', 'link:passkeys', 'link:bescherming',
+      'link:ik', 'link:verificatie', 'link:passkeys', 'link:bescherming',
       'link:sessies', 'link:relaties', 'link:gegevens', 'link:neigingen', 'link:post', 'link:juridisch'] },
     /* WORKOS IS EEN CONTEXT EN GEEN PRODUCT MET EEN PRIJS. De naam ging van
        "RTG Kantoor" naar WorkOS omdat er twee verschillende toegangsmodellen in

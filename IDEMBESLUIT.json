@@ -1,6 +1,9 @@
 {
  "uitleg": "Per route waarom een HERHAALDE oproep daar wel of niet iets nieuws mag doen. IDEMPROEF.json telt welke routes onbeschermd zijn; dit bestand zegt of dat besloten is of alleen maar zo gegroeid. Een route die daar onbeschermd uitkomt en hier ontbreekt, staat in IDEMPROEF.json onder \"zonderBesluit\" -- dat getal hoort niet te groeien. \"onbeschermd\" is geen defect-oordeel; zie de grens in scripts/lib/idemproef.js.",
  "vastlegging": {
+  "zetelGebruik": "De laatste gebruiksdatum per zetel (server/kern/beleidsmotor/slapend.js, besluit van de eigenaar van 23 september 2026: alleen een datum per houder en zetel, 90 dagen bewaard). Hij wordt NA het antwoord via een spoeltimer weggeschreven en beweegt doordat iemand door de DEUR ging, niet door wat de route deed -- ook bij een geweigerde of herhaalde oproep. Omdat de timer vijf seconden later spoelt, landt hij in een willekeurig meetvenster. Toegevoegd op 29 september 2026, nadat /api/rtfos/vrijwilliger/account-los hierop GESCHORST werd terwijl de route een 404 gaf en niets deed. Groeit onder alle kantoorfamilies.",
+  "kantoorMensdeur": "De schaduwteller van server/kern/kantoor/mensdeur.js: per kantoorroute twee getallen (met en zonder mens op naam), geen journaal. Zelfde spoelweg als zetelGebruik (./mensdeur-spoel.js), dus hij beweegt na het antwoord en door de deur, niet door het werk. Toegevoegd op 29 september 2026 om dezelfde reden.",
+  "beleidsmotor": "De eens/oneens-teller van de beleidsmotor in de schaduw (server/kern/beleidsmotor/index.js, AUTHORITY.md A1): per poort een telling van of de motor het eens was met de bestaande poort. Beweegt bij elke oproep door een kantoordeur, ook bij een weigering of herhaling, en zegt niets over wat de route deed. Toegevoegd op 29 september 2026 om dezelfde reden.",
   "kantoorAudit": "Het kantoorjournaal: wie deed wat aan het kantoor, en wanneer. Elke handeling van een medewerker schrijft er een regel bij -- ook de tweede keer dat iemand dezelfde schakelaar op AAN zet, en dat HOORT zo: de aantekening is er om de handeling terug te vinden, niet om de eindstand te bewaren. Groeit dus bij een herhaling mee zonder dat er iets tweede keer is gedaan. Gemeten onder office/bank, office/weefsel en office/zelfzorg.",
   "commandJournaal": "Het journaal van RTG Command: welke opdracht is er aan de cockpit gegeven. Zelfde vorm als kantoorAudit -- een agent twee keer stoppen levert twee regels en een gestopte agent. Gemeten onder command/agent, command/alarm, command/sonde en command/zaak.",
   "securityLog": "Het beveiligingsjournaal van RTFOS. Legt vast DAT er iets is aangeraakt, niet WAT eruit kwam; groeit bij elke aanraking, ook bij een herhaalde. Gemeten onder zes verschillende rtfos-families.",
@@ -22,7 +25,7 @@
   "beschermd": 16,
   "berekening": 70,
   "instelling": 27,
-  "code-maker": 4,
+  "code-maker": 8,
   "teller": 1
  },
  "routes": {
@@ -587,6 +590,22 @@
   "/api/office/bank/incasso": {
    "klasse": "beschermd",
    "reden": "Gemeten op 27 september 2026 met de passkeymedewerker (scripts/lib/idempasskey.js): de server merkte de herhaling zelf. De economische sleutel van het voornemen (kern/commercie/voornemen.js) maakt van een tweede klik hetzelfde voornemen, en de ronde zelf draait pas na een tweede mens (kern/kantoor/geldketen.js). Een aanvraag voor dezelfde grens is dus geen tweede incassoronde."
+  },
+  "/api/bedrijf/lid/aanmeld": {
+   "klasse": "code-maker",
+   "reden": "Buiten productie geeft server/bedrijf/leden.js bij elke aanmelding een VERSE lid-sessie terug (sleutels.geefLid), die alleen als hash op het lid staat en nooit opnieuw wordt getoond; een tweede oproep die dezelfde sessie gaf, zou een token lekken. In productie ontdubbelt de route op het account (bestaand lid: hetzelfde antwoord, gesloten lid: 409). Besloten door de eigenaar op 29 september 2026, na de idemproef van 632583ce."
+  },
+  "/api/bedrijf/mijn": {
+   "klasse": "code-maker",
+   "reden": "Buiten productie geeft server/bedrijf/mijn.js per werkruimte een VERSE lid-sessie mee ('Een NIEUWE sessie per keer: de oude wordt nooit opnieuw getoond, want op de werkruimte staat alleen haar hash'). Dat de herhaling een ander antwoord geeft is de bedoeling. In productie maakt de route geen sessie en is hij een lezing. Besloten door de eigenaar op 29 september 2026, na de idemproef van 632583ce."
+  },
+  "/api/member/rtmail/imap/sleutel": {
+   "klasse": "code-maker",
+   "reden": "Maakt elke keer een VERSE apparaatsleutel voor een externe mailclient, die maar een keer te zien is (server/routes/rtmail-schrijf.js). Het mutatiecontract zegt INTENTIONALLY_NON_IDEMPOTENT met als waarom 'maakt elke keer een VERSE imap-sleutel met een eigen naam; de tweede opslikken zou een sleutel laten verdwijnen die het lid net heeft gekregen' (server/lib/idemsleutels-kaleronde-b.js), en de route staat in server/lib/eenmalig-geheim-routes.js, dus geen generieke cache mag het antwoord herhalen. Besloten door de eigenaar op 29 september 2026, na de staatproef die hem op dat contract schorste."
+  },
+  "/api/supplier/rtmail/imap/sleutel": {
+   "klasse": "code-maker",
+   "reden": "Zelfde route aan de zaakkant als /api/member/rtmail/imap/sleutel: een verse apparaatsleutel per oproep, INTENTIONALLY_NON_IDEMPOTENT in het mutatiecontract en eenmalig-geheim in server/lib/eenmalig-geheim-routes.js. Besloten door de eigenaar op 29 september 2026."
   }
  }
 }

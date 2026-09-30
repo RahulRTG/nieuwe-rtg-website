@@ -30,6 +30,7 @@
   .rij{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.8rem;align-items:center;}
   .rij .veld{flex:1 1 12rem;}
   .knop{background:var(--gold);color:#000;border:none;font:inherit;font-weight:600;font-size:.84rem;padding:.55rem 1.1rem;cursor:pointer;min-height:2.75rem;min-width:2.75rem;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);text-decoration:none;display:inline-flex;align-items:center;}
   .veld{background:var(--bg);border:1px solid var(--line);color:var(--txt);font:inherit;font-size:.87rem;padding:.5rem .6rem;min-height:2.75rem;}
   label{font-size:.8rem;color:var(--muted);display:block;}
   .leeg{color:var(--soft);font-size:.9rem;padding:1rem .2rem;line-height:1.6;}
@@ -41,7 +42,7 @@
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl" data-rtg-world="work" data-rtg-skin="heritage"
-  data-rtg-edge-nvt-hoofdactie="een leesscherm: leren, bewijs en beoordeling lopen via uw trainer en de assessor, niet via een knop hier" data-rtg-layout="standard">
+  data-rtg-edge-nvt-hoofdactie="elke stap hoort bij een eigen leerpad of scenario; bewijs en oordeel lopen via uw trainer en de assessor, er is geen handeling voor het hele scherm" data-rtg-layout="standard">
 <header>
   <div class="ey">RTG Academy</div>
   <h1>Mijn leerhuis</h1>
@@ -64,12 +65,12 @@
   </section>
   <section>
     <h2>Mijn leerpaden</h2>
-    <p class="uitleg">Waar u staat in elk curriculum, en wat de volgende stap is.</p>
+    <p class="uitleg">Waar u staat in elk curriculum, en wat de volgende stap is. Beginnen, oefenen, scenario's spelen en een beoordeling aanvragen doet u zelf; onder toezicht werken en klaar voor beoordeling bevestigt uw trainer.</p>
     <div id="pad"><p class="leeg">Kies eerst een leerhuis.</p></div>
   </section>
   <section>
     <h2>Oefenen</h2>
-    <p class="uitleg">Oefeningen zonder gevolgen: er wordt niets verstuurd en niemand geraakt.</p>
+    <p class="uitleg">Oefeningen zonder gevolgen: er wordt niets verstuurd en niemand geraakt. Kies de stappen in uw volgorde; pas na het afronden hoort u wat klopte. Alleen een geslaagd scenario komt als bewijs in uw dossier.</p>
     <div id="oefenen"><p class="leeg">Kies eerst een leerhuis.</p></div>
   </section>
   <section>
@@ -77,8 +78,23 @@
     <p class="uitleg">Vaardigheden die een assessor op naam heeft vastgesteld, en uw certificaten. Er staat geen cijfer op u: alleen wat is bewezen, door wie, en of het nog vers is.</p>
     <div id="kan"><p class="leeg">Kies eerst een leerhuis.</p></div>
     <p class="let">Wat hier staat, geeft zelf geen bevoegdheid. Of u een handeling mag uitvoeren, beslist de organisatie op de plek waar die handeling woont.</p>
+    <p class="rij"><a class="knop stil" href="/apps/leerhuis-werk.html">Aan het werk: trainen, beoordelen, kennis, curricula en uw team</a></p>
+  </section>
+  <section id="trainerBlok" hidden>
+    <h2>Als trainer</h2>
+    <p class="uitleg">Wie u begeleidt, in de leerpaden die u geeft. Van beoordelingen ziet u niets: die zijn van de assessor.</p>
+    <div id="trainer"></div>
+    <p id="trainerNiet" class="let"></p>
+  </section>
+  <section id="teamBlok" hidden>
+    <h2>Mijn team</h2>
+    <p class="uitleg">Of uw mensen gereed zijn voor hun rol, en wat er nog ontbreekt. Geen cijfer en geen rangorde.</p>
+    <div id="team"></div>
+    <p id="teamNiet" class="let"></p>
   </section>
 </main>
+<script src="/apps/leerhuis-deur.js"></script>
+<script src="/apps/leerhuis-mijn.js"></script>
 <script src="/apps/leerhuis.js"></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>

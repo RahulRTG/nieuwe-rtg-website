@@ -304,7 +304,15 @@ test('premium: de knop blijft getekend als de app zijn gastheer sluit',
     // Session restoration first selects the account's pass. Do not inject
     // the export source into the document that is about to be replaced.
     await page.waitForURL(url => url.pathname === '/apps/app.html' && url.searchParams.get('pas') === 'rtg');
-    await page.locator('#app.active').waitFor();
+    /* Dit lid heeft de overeenkomst nog niet getekend, dus de intake (#onbGate)
+       staat open. Tot de desktopstandaard lag die als vaste laag OVER een
+       volledige #app; sinds #413 (apps/access/portal.css) is de intake het vlak
+       zelf en staat #app eronder met nul hoogte. De bewering hier gaat over de
+       gastheer: de app is actief en #gate is dicht. Of #app daarbij pixels
+       krijgt, is een vraag van de indeling en niet van deze proef -- vandaar
+       'attached' en niet 'visible'. De knop zelf moet hieronder nog steeds
+       getekend worden, met zijn volle duimmaat. */
+    await page.locator('#app.active').waitFor({ state: 'attached' });
     assert.equal(await page.locator('#gate').isVisible(), false, 'the authenticated app has closed the original host');
     await page.waitForFunction(() => !!window.RTGUitvoer, null, { timeout: 12000 });
     /* deze app meldt zijn bron pas aan als er gegevens zijn; we melden er

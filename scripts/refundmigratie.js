@@ -216,7 +216,7 @@ const LEZERS = {
 const GEEN_LEZER = {
   'server/kern/mall/bestellingen.js': 'de mall heeft een eigen bestelwereld met een eigen betaalstand; niet db.data.orders',
   'public/apps/app-main/app-main-48.js': 'leest `delen[].paid` van een GESPLITSTE rekening (/splitsen/mijn) -- een eigen betaalstand, geen bestelling',
-  'public/apps/app-main/app-main-34.js': 'leest `ride.paid`; ritten wissen hun betaalstand nog en gaan met hun eigen kaart om'
+  'public/apps/app-main/app-main-34b.js': 'leest `ride.paid`; ritten wissen hun betaalstand nog en gaan met hun eigen kaart om (het Onderweg-paneel verhuisde op 29 september uit app-main-34.js)'
 };
 
 /* STAM EN GEEN NAAM. De collectie van een bestand werd eerst gezocht op de naam

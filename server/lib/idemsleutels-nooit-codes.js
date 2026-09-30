@@ -42,6 +42,38 @@ module.exports = Object.freeze({
     'intrekken leest de actuele stand in de collectietransactie van kern/zaakdoos/sleutels.js; een tweede keer is een toestandscontrole, geen gecachet antwoord',
   'POST /api/supplier/doos/sleutel/weg':
     'zelfde reden als de kantoorkant: intrekken beslist op de actuele stand, en een gecachet antwoord mag geen intrekking overslaan',
+  'POST /api/office/partnerkanaal/personeelscode':
+    'uitgeven maakt elke keer een nieuwe medewerkerplek met een eigen 128-bit personeelscode (kern/partnerpersoneelscode.js); een herhaald antwoord zou een kale code heronthullen',
+  'POST /api/office/partnerkanaal/personeelscode/roteer':
+    'roteren geeft een nieuwe personeelscode en trekt de vorige van die plek in; een antwoordcache mag de nieuwe code nooit bewaren of herhalen',
+  'POST /api/office/partnerkanaal/personeelscode/intrek':
+    'intrekken leest de actuele stand in de collectietransactie van kern/partnerpersoneelscode.js; een tweede keer is een toestandscontrole, geen gecachet antwoord',
   'POST /api/order/afhaalcode/intrek':
-    'intrekken leest de actuele stand in kern/afhaalcode.js; een tweede keer is een toestandscontrole, geen gecachet antwoord'
+    'intrekken leest de actuele stand in kern/afhaalcode.js; een tweede keer is een toestandscontrole, geen gecachet antwoord',
+  'POST /api/ov/code':
+    'tonen is roteren: elk antwoord draagt een nieuwe OV-incheckcode en trekt de vorige in (kern/ov/incheckcode.js); een herhaald antwoord zou een ingetrokken code tonen',
+  'POST /api/ov/code/intrek':
+    'intrekken leest de actuele stand in kern/ov/incheckcode.js; een tweede keer is een toestandscontrole, geen gecachet antwoord',
+  'POST /api/mode/bezorg/code':
+    'een nieuwe bezorgcode trekt de vorige in en begint een nieuw pogingenbudget (kern/modebezorg/bezorgcode.js); het plafond van tien telt elke echte uitgifte, dus een cache mag hem niet overslaan of heronthullen',
+  'POST /api/festival/pas':
+    'de uitgifte toont de pascode eenmaal; dezelfde sleutel of een dubbeltik krijgt in kern/festival/rechten.js 409 zonder code, zodat er geen tweede pas ontstaat',
+  'POST /api/festival/pas/intrek':
+    'intrekken leest de actuele stand in de festivaltransactie; een tweede keer laat de ingetrokken pas ingetrokken, geen gecachet antwoord',
+  'POST /api/festival/gast/pas/toon':
+    'tonen is roteren: elk antwoord draagt een nieuwe pascode en trekt de vorige in (kern/festival/pas-toegang.js)',
+  'POST /api/festival/verkoop/rond':
+    'rondmaken geeft de pascode eenmaal; een herhaling vindt de verkoop op betaald en krijgt 409 zonder code, dus een cache zou alleen een code heronthullen',
+  'POST /api/rtfos/activiteit/inschrijven':
+    'het inschrijfantwoord toont de incheckcode eenmaal; dezelfde codenaam opnieuw inschrijven weigert de kern zelf (400), zonder code',
+  'POST /api/rtfos/activiteit/incheckcode':
+    'een nieuwe incheckcode trekt de vorige in (kern/rtfos/activiteiten-deur.js); een herhaald antwoord zou een ingetrokken code tonen',
+  'POST /api/supplier/horeca/bon/maak':
+    'uitgifte toont een 128-bit boncode eenmaal; een herhaling met dezelfde sleutel geeft in kern/horeca/bon.js dezelfde bon zonder code, en een antwoordcache zou de code heronthullen',
+  'POST /api/supplier/horeca/club/band':
+    'de eerste opwaardering maakt de band en toont zijn 128-bit code eenmaal; een herhaald antwoord zou die code heronthullen, en opwaarderen is een geldhandeling die de bontransactie zelf beoordeelt',
+  'POST /api/supplier/horeca/bon/roteer':
+    'roteren toont een nieuwe boncode eenmaal en trekt de vorige in; de kern weigert dezelfde sleutel daarna met 409 zonder code',
+  'POST /api/supplier/horeca/bon/intrek':
+    'intrekken leest de actuele stand in kern/horeca/bon-beheer.js; een tweede keer is een toestandscontrole, geen gecachet antwoord'
 });

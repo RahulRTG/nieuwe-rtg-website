@@ -25,7 +25,7 @@ const SCHAKELS = Object.freeze([
   { schakel: 'POLICY', stand: 'DEELS', waar: 'server/kern/vrijheid/rtgbeleid.js', bewijs: [T, 'het besluit van de eigenaar staat, en de rest blijft open'],
     ontbreekt: 'Besloten (27 september 2026): tien RTG Days, en een verjaardag op een vrije dag schuift naar de vorige werkdag. Nog open: nachtdienst, schrikkeldag en alle drempels. Niets ervan is juridisch en loonadministratief gevalideerd.' },
   { schakel: 'ROSTER', stand: 'DEELS', waar: 'server/kern/vrijheid/teambeeld.js', bewijs: [TB, 'het teambeeld komt uit de bronnen, en zegt wat ontbreekt'],
-    ontbreekt: 'Het rooster wordt GELEZEN uit kern/personeel.js, maar kijkt maar zeven dagen vooruit en een dag zonder vastgesteld rooster is een patroon. De haak `pas`/`heeft` schrijft sinds 27 september in het verzuimregister (verzuimbrug.js), en het weekrooster en de twee autoplanners lezen dat (kern/payroll/inplanbaar.js); de overige planners nog niet.' },
+    ontbreekt: 'Het rooster wordt GELEZEN uit kern/personeel.js, maar kijkt maar zeven dagen vooruit en een dag zonder vastgesteld rooster is een patroon. De haak `pas`/`heeft` schrijft sinds 27 september in het verzuimregister (verzuimbrug.js), en elke planner van een zaak leest dat (kern/payroll/inplanbaar.js: weekrooster, de twee autoplanners, OV, festival en taxi; de school heeft een eigen register).' },
   { schakel: 'WORK', stand: 'DEELS', waar: 'server/kern/vrijheid/werkstand.js', bewijs: [T, 'zelf afvinken is geen WORK_COMPLETE'],
     ontbreekt: 'Geen domein legt vandaag verantwoordelijkheden per dienst vast; zonder bron is de werkstand UNKNOWN en komt er geen automatisch aanbod.' },
   { schakel: 'COVERAGE', stand: 'STAAT', waar: 'server/kern/vrijheid/dekking.js', bewijs: [T, 'vier aanwezigen zijn te weinig zonder de specialist'] },
@@ -45,7 +45,7 @@ const SCHAKELS = Object.freeze([
 const OVERIG = Object.freeze([
   'De schermen staan (Mijn tijd in de personeelsapp, Tijd van het team in het Kantoor; test/vrijheid-scherm.e2e.js), maar de gouden lus -- vragen, dekking, besluit, vrij -- is in een browser nog nooit rond gelopen: zonder dienstverband eindigt elk verzoek op het scherm bij die reden.',
   'Drie routes zijn niet beproefd omdat de proefopstelling de wereld niet kan bouwen (intrekken, beoordelen, afdelingen zetten): BLOCKED_BY_TEST_FIXTURE in server/lib/mutatiecontracten-vrijheid.js.',
-  'Het kantoor logt nog in met de gedeelde OFFICE_CODE in plaats van als personeel van de RTG-zaak; dat is stap twee van het besluit van 27 september 2026.',
+  'Een zetel met een kamer in de RTG-zaak opent het kantoor op naam (rtgzetel.js), maar de gedeelde OFFICE_CODE werkt nog en de kamers worden alleen in de schaduw geteld: afdwingen per kamer is een apart besluit.',
   'Geen productiebewijs.'
 ]);
 

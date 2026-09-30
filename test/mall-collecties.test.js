@@ -36,7 +36,7 @@ const dag = (n) => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10
    toetsen zonder de Mall te slopen. */
 function bouwCollecties(rijen, levend) {
   const db = { data: { mallCollecties: rijen } };
-  const ctx = { db, save() {}, crypto: require('crypto'),
+  const ctx = { db, bijeen: async werk => werk(), save() {}, crypto: require('crypto'),
     aanbodAlles: () => ({ aanbod: levend }),
     plek: { slugVan: (t) => String(t || '').toLowerCase().replace(/[^a-z0-9]+/g, '-') } };
   return require('../server/kern/mall/collecties')(ctx).mallCollecties;

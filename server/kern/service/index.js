@@ -20,11 +20,11 @@
    er een bouwt, hoeft aan deze bedrading niets te veranderen. */
 'use strict';
 
-module.exports = function maakService({ db, save, crypto, inzagelog, notify, sseToCustomer, sseToOffice, accounts }) {
+module.exports = function maakService({ db, save, crypto, inzagelog, notify, sseToCustomer, sseToOffice, accounts, bewerkCollectie }) {
   const zaken = require('./zaak')({ db, save, crypto });
   const loop = require('./loop')({ zaken, save, notify });
   const machtigingen = require('./machtiging')({ db, save, crypto, zaken, inzagelog });
-  const bevestiging = require('./bevestiging')({ db, save, crypto, zaken, machtigingen });
+  const bevestiging = require('./bevestiging')({ db, save, crypto, zaken, machtigingen, bewerkCollectie });
   /* De patroonlaag kijkt vanaf de MELDERS en maakt geen incident: die woont in
      kern/command. Zij levert een vermoeden, een mens beslist. En de persoonlijke
      stand leest wat Service aan melders heeft GEMELD -- niet wat een meter zegt. */

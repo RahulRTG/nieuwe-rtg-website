@@ -54,6 +54,13 @@ const WORTEL = path.join(__dirname, '..', '..');
    er geen programma is en dat een mens of een keuring hem onderhoudt -- dan hoort
    er een LEZER bij te staan, want een register dat niemand leest is geen register. */
 const EIGENAAR = {
+  /* Uit ONVERKLAARDE_BOTSING gehaald op 28 september 2026, toen een verse
+     outputproef voor het eerst een instrument in zijn stempel droeg. De reden
+     staat in de kop van scripts/outputband.js zelf en is hier niet verzonnen. */
+  'OUTPUTPROEF.json': { schrijver: 'scripts/outputproef.js',
+    waarom: 'outputband.js is "GEEN TWEEDE METING": de selectie (kiesKandidaten) en de meting (meetEen) komen allebei uit outputproef.js; de band bepaalt alleen wie wat wanneer meet en houdt EEN schrijver op het register. De meetronde draait outputproef.js, en die zet zich in de stempel.' },
+  'KETENS.md': { soort: 'BRON',
+    waarom: 'Handmatig onderhouden norm en bereik van operationele ketens; scripts/operationeel.js verzamelt vers uitvoerbaar bewijs en bewaart onbekende grenzen.' },
   'DESKTOP-STANDAARD.md': { soort: 'BRON',
     waarom: 'Handmatig onderhouden contract voor de goedgekeurde desktop- en mobiele compositie; desktop-audit en de wereld- en fototoetsen leveren het uitvoerbare bewijs.' },
   'SALOON.md': { soort: 'BRON',
@@ -100,12 +107,20 @@ const EIGENAAR = {
     waarom: 'Handmatig geschreven richtings- en bouwdocument (RTG Academy, het leerhuis); de blokkades erin worden door test/leerhuis-lus.test.js tegen scripts/leerhuisproef.js gehouden, er is geen generator die het schrijft.' },
   'PERSONEEL.md': { soort: 'BRON',
     waarom: 'Handmatig geschreven richtingsdocument (de werkervaring van RTG, van eigenaar tot kantine); de bronverwijzingen erin zijn met de hand nagelopen, er is geen generator die het schrijft.' },
+  'DESKTOP-STANDAARD.md': { soort: 'BRON',
+    waarom: 'Handmatig geschreven ontwerpstandaard (de ene desktopindeling); scripts/desktop-audit.js meet de schermen ertegen, er is geen generator die het schrijft.' },
   'BEWIJSLUS.md': { soort: 'BRON',
     waarom: 'Handmatig geschreven richtingsdocument (de terugweg van productie naar bewijs); de namen en bronverwijzingen erin zijn met de hand gemeten, er is geen generator die het schrijft.' },
+  'NAVIGATIE.md': { soort: 'BRON',
+    waarom: 'Handmatig geschreven richtingsdocument (de plaats-these boven PLAATS.md en KAARTEN.md); de bronverwijzingen en de nulmeting van par. 6.2 zijn met de hand in de code gelezen, er is geen generator die het schrijft.' },
   /* De nulmeting van de universele bodem (SAMENLEVING.md par. 11). De meting is
      afgeleid; de indeling van functies in werkwoorden is een VERKLARING in
      scripts/lib/onvervreemdbaar-verklaring.js en nog door geen mens afgetekend. */
   'ONVERVREEMDBAAR.json': { schrijver: 'scripts/onvervreemdbaar.js' },
+  /* De gast als twee mensen (SAMENLEVING.md par. 11.4, stap 5). */
+  'GASTSPLITSING.json': { schrijver: 'scripts/gastsplitsing.js' },
+  /* Geen commerciele druk binnen de bodem (SAMENLEVING.md par. 6, eis 5). */
+  'BODEMDRUK.json': { schrijver: 'scripts/bodemdruk.js' },
   'SAMENLEVING.md': { soort: 'BRON',
     waarom: 'Handmatig geschreven grondwet (de universele bodem en SAM-01 t/m 07); de meetgetallen erin komen uit ONVERVREEMDBAAR.json en zijn met de hand overgenomen, er is geen generator die het schrijft.' },
   'LANGUAGE-AUDIT.md': { soort: 'BRON',
@@ -135,6 +150,8 @@ const EIGENAAR = {
      bijkomen zonder dat iemand zegt wie ze bezit. */
   'VERANDERBEREIK-KENNIS.json': { schrijver: 'scripts/veranderbereik.js' },
   'VERANDERBEREIK-RONDE.json': { schrijver: 'scripts/veranderbereik.js' },
+  'KENNISINDEX.json': { schrijver: 'scripts/kennisindex.js',
+    waarom: 'kennisindex.js knipt de documenten per kop op voor de registerblik; server/kern/registerblik/kennis.js leest het via bronnen.js, want de runtime-AI leest registers en nooit een .md (CODE-AI-001).' },
   /* DE EDGE (EDGE.md par. 9). Twee meters en elk zijn eigen bestand: de kaart
      leest de BRON (wie schrijft, beslist en leest), de dekking een echte
      BROWSER (welk veld heeft elk scherm, en waar komt het vandaan). Hun ratels
@@ -162,6 +179,9 @@ const EIGENAAR = {
      bijkomen, niet te stijgen doordat er registers bijkomen zonder eigenaar. De
      vloer oprekken zou die zin precies omdraaien. */
   'PLANVORM.json': { schrijver: 'scripts/planvorm.js' },
+  'PLAATSVORM.json': { schrijver: 'scripts/plaatsvorm.js',
+    waarom: 'A0a uit NAVIGATIE.md par. 14.1: wat RTG onder een plaats verstaat, per afgeleid domein, over vorm, ' +
+      'woordenschat en aspecten. Bewaakt door test/plaatsvorm.test.js en scripts/norm.js (plaatsDomeinenGemeten omhoog).' },
 
   /* De officevorm: is er een `RTGObject` onder document, taak, betaling en de
      andere subtypen die het voorstel voor RTG Office Next noemt (OFFICE.md par.
@@ -267,6 +287,15 @@ const EIGENAAR = {
       'mechanismen halen de vier spoor-eigenschappen die kern/vertegenwoordiging/handelen.js ' +
       'definieert? Geschreven met --vastleggen, gelezen door test/spoorvorm.test.js en ' +
       'scripts/norm.js (de ratel spoorConvergent, die alleen omhoog mag).' },
+  'POSITIESTROOM.json': { schrijver: 'scripts/positiestroom.js',
+    waarom: 'de bron-helft van de grondwetmeter uit NAVIGATIE.md par. 6.4: waar de positie van een mens ' +
+      'blijft staan, aan welke sleutel en met welke termijn. Geschreven met --vastleggen, gelezen door ' +
+      'test/positiestroom.test.js en scripts/norm.js (positieZonderTermijn en positieNietVergeten omlaag, ' +
+      'positieStromenGezien omhoog).' },
+  'POSITIEPROEF.json': { schrijver: 'scripts/positieproef.js',
+    waarom: 'de opslag-helft van de grondwetmeter uit NAVIGATIE.md par. 6.6: een echte doorloop met ' +
+      'herkenbare coordinaten en daarna de hele opslag gelezen. Bewaakt door test/positieproef.test.js en ' +
+      'scripts/norm.js (positieNavBlijft, positieNaTaak, positiePassages en aankomstUitPositie omlaag).' },
   /* DE ONDERNEMERSLUS. Hij staat hier omdat toets 4 dat zo bedoelt: het aantal
      registers zonder eigenaar hoort te dalen doordat er eigenaren bijkomen, en
      niet te stijgen doordat er registers bijkomen. Een nieuw register zonder
@@ -401,7 +430,6 @@ function wortelregisters() {
    en een reden verzinnen is precies wat regel 13 verbiedt. */
 const ONVERKLAARDE_BOTSING = {
   'ENVELOP.json': 'scripts/actorvormen.js en scripts/envelopvelden.js schrijven er allebei naar',
-  'OUTPUTPROEF.json': 'scripts/outputband.js en scripts/outputproef.js schrijven er allebei naar',
 };
 
 module.exports = { EIGENAAR, ONVERKLAARDE_BOTSING, detecteer, wortelregisters, WORTEL };

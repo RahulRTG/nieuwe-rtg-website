@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="nl" data-rtg-thema="bordeaux">
+<head>
+<script src="/shared/id.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Leerhuis: aan het werk</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-ontwerp.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --line:var(--rtg-line);
+    --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft); --gold:#A98F1C; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:5;background:var(--bg);padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
+  header h1{font-size:1.5rem;margin-top:.15rem;}
+  main{padding:1.1rem;max-width:680px;margin:0 auto;}
+  section{margin-bottom:2.2rem;}
+  section > h2{font-size:1.12rem;margin-bottom:.2rem;}
+  .uitleg{font-size:.85rem;color:var(--muted);line-height:1.6;margin-bottom:.9rem;}
+  .kaart{border:1px solid var(--line);padding:.95rem 1.05rem;margin-bottom:.7rem;background:var(--card);}
+  .kaart h3{font-size:1.05rem;}
+  .meta{font-size:.78rem;color:var(--muted);margin-top:.25rem;line-height:1.55;}
+  .stand{display:inline-block;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;padding:.12rem .5rem;border:1px solid var(--line);color:var(--muted);margin-left:.4rem;}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.8rem;align-items:center;}
+  .rij .veld{flex:1 1 12rem;}
+  .knop{background:var(--gold);color:#000;border:none;font:inherit;font-weight:600;font-size:.84rem;padding:.55rem 1.1rem;cursor:pointer;min-height:2.75rem;min-width:2.75rem;}
+  .veld{background:var(--bg);border:1px solid var(--line);color:var(--txt);font:inherit;font-size:.87rem;padding:.5rem .6rem;min-height:2.75rem;}
+  label{font-size:.8rem;color:var(--muted);display:block;}
+  .leeg{color:var(--soft);font-size:.9rem;padding:1rem .2rem;line-height:1.6;}
+  .let{border-left:2px solid var(--gold);padding:.5rem 0 .5rem .8rem;margin-top:.8rem;font-size:.82rem;color:var(--muted);line-height:1.6;}
+  .kaart .rij .knop{flex:0 0 auto;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);}
+  textarea.veld{width:100%;min-height:4.5rem;resize:vertical;}
+  details.bewijs{margin-top:.8rem;}
+  details.bewijs summary{cursor:pointer;font-size:.87rem;min-height:2.75rem;display:flex;align-items:center;}
+  details.bewijs .veld{display:block;width:100%;margin-top:.5rem;}
+  details.schrijf{margin-top:1rem;border-top:1px solid var(--line);padding-top:.6rem;}
+  details.schrijf summary{cursor:pointer;min-height:2.75rem;display:flex;align-items:center;font-size:.92rem;}
+  details.schrijf .veld{display:block;width:100%;margin-top:.5rem;}
+  fieldset.vinkjes{border:1px solid var(--line);margin:.6rem 0 0;padding:.4rem .7rem;}
+  fieldset.vinkjes legend{font-size:.82rem;padding:0 .3rem;}
+  .keuze{display:flex;gap:.5rem;align-items:center;font-size:.84rem;margin-top:.35rem;min-height:2.75rem;}
+  .keuze input{width:1.25rem;height:1.25rem;}
+  .tekst{font-size:.86rem;line-height:1.6;margin-top:.5rem;white-space:pre-wrap;}
+</style>
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/ios.css" rel="stylesheet">
+<script src="/shared/rtg-world-desktop.js" defer></script>
+<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl" data-rtg-world="work" data-rtg-skin="heritage"
+  data-rtg-edge-nvt-hoofdactie="een werkscherm met een handeling per kaart: elke leerling, beoordeling, elk concept, curriculum en certificaat heeft zijn eigen knop, er is geen handeling voor het hele scherm" data-rtg-layout="standard">
+<header>
+  <div class="ey">RTG Academy</div>
+  <h1>Leerhuis: aan het werk</h1>
+</header>
+<main id="inhoud">
+  <section>
+    <h2>Welk leerhuis</h2>
+    <p class="uitleg">Het werk van trainers, assessoren, kenniseigenaren, curriculumeigenaren, managers, autoriteiten en de eigenaar in het leerhuis van uw organisatie. U ziet alleen het deel dat bij uw rol hoort. Wat u zelf leert, staat in <a href="/apps/leerhuis.html">Mijn leerhuis</a>.</p>
+    <form id="kies" class="rij">
+      <label for="org">Code van de organisatie</label>
+      <input id="org" class="veld" name="org" autocomplete="off" maxlength="60" placeholder="bijvoorbeeld RTG-OPS">
+      <button class="knop" type="submit">Toon</button>
+    </form>
+    <p id="melding" class="let" role="status" aria-live="polite">Nog geen leerhuis gekozen.</p>
+  </section>
+  <section id="trainerBlok" hidden>
+    <h2>Als trainer</h2>
+    <p class="uitleg">U bevestigt dat een leerling onder uw toezicht werkt, en daarna dat hij klaar is voor een beoordeling. Beoordelen doet u hier niet: dat doet een assessor.</p>
+    <div id="trainer"></div>
+  </section>
+  <section id="assessorBlok" hidden>
+    <h2>Als assessor</h2>
+    <p class="uitleg">Beoordelingen die op een assessor wachten, en de beoordelingen die u zelf begon. Een oordeel noemt het bewijs en de criteria; een "nog niet" noemt wat er nodig is.</p>
+    <div id="assessor"></div>
+    <p id="assessorNiet" class="let"></p>
+  </section>
+  <section id="kennisBlok" hidden>
+    <h2>Kennisbeheer</h2>
+    <p class="uitleg">Concepten die op een kenniseigenaar wachten. Wat u zelf schreef, activeert een ander; een concept uit het startpakket wordt pas officiële kennis met de eigen bron van uw organisatie.</p>
+    <div id="kennis"></div>
+    <p id="kennisNiet" class="let"></p>
+  </section>
+  <section id="eigenaarBlok" hidden>
+    <h2>Het leerhuis beheren</h2>
+    <p class="uitleg">U legt een relatie vast of kent een bestuursrol toe aan een mens op zijn codenaam. Elke opzoeking vraagt een reden en staat op de inzagekaart van die persoon. Niemand benoemt zichzelf, ook u niet.</p>
+    <div id="eigenaar"></div>
+  </section>
+  <section id="managerBlok" hidden>
+    <h2>Uw team inrichten</h2>
+    <p class="uitleg">U wijst een rol toe aan de mensen in uw team en maakt hun startplan; het leren zelf volgt hun trainer. Een leerpad dat uit het startplan volgt, krijgt de trainer die het leerhuis ervoor heeft.</p>
+    <div id="manager"></div>
+  </section>
+  <section id="curriculumBlok" hidden>
+    <h2>Curricula</h2>
+    <p class="uitleg">Een curriculum gaat van concept via review naar actief. Het leert alleen officiële kennis: zolang een kennisitem nog een concept is, weigert het leerhuis het activeren. Als curriculumeigenaar schrijft u hier ook nieuwe kennis, vaardigheden, rollen en curricula; kennis wordt officieel als een andere kenniseigenaar hem activeert.</p>
+    <div id="curriculum"></div>
+    <div id="schrijven"></div>
+  </section>
+  <section id="certificaatBlok" hidden>
+    <h2>Certificaten</h2>
+    <p class="uitleg">Bewezen vaardigheden die nog geen certificaat dragen, en de certificaten van dit leerhuis. Wat u zelf beoordeelde bij een kritieke vaardigheid, of wat over uzelf gaat, geeft een ander uit. Schorsen en intrekken vragen een reden.</p>
+    <div id="certificaat"></div>
+  </section>
+  <section id="trainerautoriteitBlok" hidden>
+    <h2>Trainers</h2>
+    <p class="uitleg">Leerpaden zonder trainer, wie trainer kan worden en wie het al is. Trainer wordt alleen wie een geldig certificaat voor Train-the-Trainer heeft en de vaardigheden van het leerpad zelf bewees; niemand kwalificeert zichzelf.</p>
+    <div id="trainerautoriteit"></div>
+  </section>
+  <section id="kwaliteitBlok" hidden>
+    <h2>Kwaliteit</h2>
+    <p class="uitleg">Bezwaren tegen een beoordeling, beoordelingen die ongeldig moeten, en het beleid dat zegt wie geschikt is voor een handeling. Het oordeel achter een bezwaar ziet u pas als u de review op u neemt; wat u zelf beoordeelde of voorstelde, behandelt een ander.</p>
+    <div id="kwaliteit"></div>
+  </section>
+  <p id="geenRol" class="leeg" hidden>U heeft in dit leerhuis geen rol als trainer, assessor, kenniseigenaar, curriculumeigenaar, manager, eigenaar of autoriteit. Er ligt hier dus geen werk voor u.</p>
+</main>
+<script src="/apps/leerhuis-deur.js"></script>
+<script src="/apps/leerhuis-werk-bewijs.js"></script>
+<script src="/apps/leerhuis-werk-inrichten.js"></script>
+<script src="/apps/leerhuis-werk-schrijven.js"></script>
+<script src="/apps/leerhuis-werk-autoriteit.js"></script>
+<script src="/apps/leerhuis-werk-kwaliteit.js"></script>
+<script src="/apps/leerhuis-werk-kaarten.js"></script>
+<script src="/apps/leerhuis-werk.js"></script>
+<script src="/shared/schermbeeld.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

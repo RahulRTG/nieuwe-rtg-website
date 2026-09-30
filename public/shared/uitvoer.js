@@ -191,7 +191,13 @@
   function plaats(k) {
     if (gastKnop && gastKnop.isConnected) { gastKnop.appendChild(k); return; }
     var l = document.querySelectorAll('h1, h2'), kop = null, w = wortel();
-    for (var i = 0; i < l.length && !kop; i++) if (l[i].offsetParent !== null) kop = l[i];
+    /* De koppen van het wereldkader (shared/interface/world-desktop-home.js)
+       zijn niet van deze app. Zijn laadkop staat als eerste h1 in beeld en
+       wordt even later VERVANGEN door de begroeting -- buiten main, dus buiten
+       het zicht van de kijker hieronder. Landde de knop daar, dan ging hij mee
+       met de oude kop en kwam hij niet meer terug. */
+    var KADER = '.wd-greeting,.wd-people,.wd-favorites,.wd-library,.wd-focus,.wd-announcement';
+    for (var i = 0; i < l.length && !kop; i++) if (l[i].offsetParent !== null && !l[i].closest(KADER)) kop = l[i];
     var h = kop && kop.closest('header');
     // staat de gastheer zelf niet meer aan (app.html sluit zijn #gate), dan
     // is de zichtbare kop het enige anker dat nog iets oplevert

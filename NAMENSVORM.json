@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-29T12:53:18.864Z",
-    "commit": "c0b0a51b",
+    "op": "2026-09-29T23:18:40.520Z",
+    "commit": "a4ae5e47b",
     "boomVuil": false,
-    "boomAnders": 6,
+    "boomAnders": 5,
     "instrument": "scripts/namensvorm.js",
     "node": "v22.22.2"
   },
@@ -17,12 +17,12 @@
       "zonderVormen": [
         "ai-mandaat"
       ],
-      "velden": 49,
+      "velden": 50,
       "inAlleMechanismen": 0,
       "inMinstensDeHelft": 0,
       "helftDrempel": 3,
-      "veldenMechanismeEigen": 45,
-      "eigenPct": 91.8,
+      "veldenMechanismeEigen": 46,
+      "eigenPct": 92,
       "perMechanisme": [
         {
           "mechanisme": "app-machtiging",
@@ -34,7 +34,7 @@
         },
         {
           "mechanisme": "fiscaal-mandaat",
-          "velden": 7
+          "velden": 8
         },
         {
           "mechanisme": "sepa-machtiging",
@@ -91,12 +91,12 @@
         "ai-mandaat",
         "rtgid-claims"
       ],
-      "velden": 73,
+      "velden": 75,
       "inAlleMechanismen": 0,
       "inMinstensDeHelft": 0,
       "helftDrempel": 5,
-      "veldenMechanismeEigen": 69,
-      "eigenPct": 94.5,
+      "veldenMechanismeEigen": 71,
+      "eigenPct": 94.7,
       "perMechanisme": [
         {
           "mechanisme": "app-machtiging",
@@ -112,11 +112,11 @@
         },
         {
           "mechanisme": "fiscaal-mandaat",
-          "velden": 7
+          "velden": 8
         },
         {
           "mechanisme": "ledenbalie-inzage",
-          "velden": 5
+          "velden": 6
         },
         {
           "mechanisme": "levensband",
@@ -591,13 +591,13 @@
         }
       ]
     },
-    "envelopVelden": 30
+    "envelopVelden": 28
   },
   "woordenschat": [
     {
       "woord": "doel",
-      "bestanden": 277,
-      "domeinen": 146,
+      "bestanden": 292,
+      "domeinen": 151,
       "samengesteld": 190,
       "samengesteldDomeinen": 88,
       "stand": "bezet",
@@ -621,8 +621,8 @@
       "woord": "contract",
       "bestanden": 58,
       "domeinen": 21,
-      "samengesteld": 92,
-      "samengesteldDomeinen": 33,
+      "samengesteld": 95,
+      "samengesteldDomeinen": 34,
       "stand": "bezet",
       "waar": [
         "bedrijf",
@@ -642,10 +642,10 @@
     },
     {
       "woord": "claim",
-      "bestanden": 38,
-      "domeinen": 24,
-      "samengesteld": 42,
-      "samengesteldDomeinen": 24,
+      "bestanden": 47,
+      "domeinen": 29,
+      "samengesteld": 44,
+      "samengesteldDomeinen": 25,
       "stand": "bezet",
       "waar": [
         "kern/afhaalcode",
@@ -655,27 +655,27 @@
         "kern/assets"
       ],
       "vormen": [
+        "CLAIM_BEWAAR_MS",
         "CLAIM_STATUS",
         "CLAIM_TTL_MS",
         "MAX_CLAIMS",
         "alGeclaimd",
-        "beginClaim",
-        "beloningGeclaimd"
+        "beginClaim"
       ]
     },
     {
       "woord": "risico",
-      "bestanden": 52,
-      "domeinen": 21,
+      "bestanden": 53,
+      "domeinen": 22,
       "samengesteld": 28,
       "samengesteldDomeinen": 15,
       "stand": "bezet",
       "waar": [
         "kern/appstore",
         "kern/assets",
+        "kern/bedrijfsmaat",
         "kern/command",
-        "kern/handelingsklasse",
-        "kern/horeca"
+        "kern/handelingsklasse"
       ],
       "vormen": [
         "RISICOLIJST",
@@ -684,6 +684,29 @@
         "bvRisicoWeg",
         "eigenRisico",
         "genoteerdeRisicos"
+      ]
+    },
+    {
+      "woord": "machtiging",
+      "bestanden": 21,
+      "domeinen": 8,
+      "samengesteld": 40,
+      "samengesteldDomeinen": 12,
+      "stand": "bezet",
+      "waar": [
+        "kern/appstore",
+        "kern/isolatie",
+        "kern/magnaat-kantoorregels",
+        "kern/rtfos",
+        "kern/rtgid-regie"
+      ],
+      "vormen": [
+        "KLASSE_VAN_MACHTIGING",
+        "MACHTIGINGEN",
+        "MACHTIGING_NOOIT",
+        "RTG_MACHTIGING_NIET_GEVRAAGD",
+        "RTG_MACHTIGING_NIET_VERLEEND",
+        "RTG_MACHTIGING_VERSMALD"
       ]
     },
     {
@@ -707,29 +730,6 @@
         "dealkansen",
         "dealkansenVoor",
         "foutkans"
-      ]
-    },
-    {
-      "woord": "machtiging",
-      "bestanden": 20,
-      "domeinen": 8,
-      "samengesteld": 39,
-      "samengesteldDomeinen": 12,
-      "stand": "bezet",
-      "waar": [
-        "kern/appstore",
-        "kern/isolatie",
-        "kern/magnaat-kantoorregels",
-        "kern/rtfos",
-        "kern/rtgid-regie"
-      ],
-      "vormen": [
-        "KLASSE_VAN_MACHTIGING",
-        "MACHTIGINGEN",
-        "MACHTIGING_NOOIT",
-        "RTG_MACHTIGING_NIET_GEVRAAGD",
-        "RTG_MACHTIGING_NIET_VERLEEND",
-        "RTG_MACHTIGING_VERSMALD"
       ]
     },
     {
@@ -803,7 +803,7 @@
     },
     {
       "woord": "deal",
-      "bestanden": 18,
+      "bestanden": 19,
       "domeinen": 12,
       "samengesteld": 22,
       "samengesteldDomeinen": 6,
@@ -960,7 +960,7 @@
       "woord": "mandaat",
       "bestanden": 11,
       "domeinen": 5,
-      "samengesteld": 8,
+      "samengesteld": 9,
       "samengesteldDomeinen": 4,
       "stand": "bezet",
       "waar": [
@@ -973,10 +973,31 @@
       "vormen": [
         "MANDAATPOORT",
         "RTG_MANDAAT_AFDWINGEN",
+        "alleenMandaat",
         "maakMandaat",
         "mandaatBron",
-        "mandaatContext",
-        "mandaatGeldig"
+        "mandaatContext"
+      ]
+    },
+    {
+      "woord": "verplichting",
+      "bestanden": 5,
+      "domeinen": 3,
+      "samengesteld": 10,
+      "samengesteldDomeinen": 6,
+      "stand": "bezet",
+      "waar": [
+        "kern/cadeaubon",
+        "kern/magnaat-leven",
+        "kern/spellen"
+      ],
+      "vormen": [
+        "VERPLICHTINGEN",
+        "bonnenVerplichting",
+        "cadeaubonVerplichting",
+        "maakVerplichting",
+        "verplichtingBedrag",
+        "verplichtingOp"
       ]
     },
     {
@@ -1015,26 +1036,6 @@
         "intentsVoorPrincipal",
         "principalRef",
         "principalVoorSession"
-      ]
-    },
-    {
-      "woord": "verplichting",
-      "bestanden": 4,
-      "domeinen": 2,
-      "samengesteld": 9,
-      "samengesteldDomeinen": 5,
-      "stand": "bezet",
-      "waar": [
-        "kern/magnaat-leven",
-        "kern/spellen"
-      ],
-      "vormen": [
-        "VERPLICHTINGEN",
-        "bonnenVerplichting",
-        "maakVerplichting",
-        "verplichtingBedrag",
-        "verplichtingOp",
-        "verplichtingen"
       ]
     },
     {

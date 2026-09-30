@@ -117,4 +117,15 @@ function meet({ kwesties, journaal, koppeling }) {
   };
 }
 
-module.exports = { meet };
+/* De meting met wat erbij hoort: waar deze laag van RTG afhangt (proef P3) en
+   de bewijsstand van de grondwet. */
+function metVerklaring(meting) {
+  const AFHANKELIJK = require('./afhankelijkheden');
+  const { BEWIJSSTAND } = require('./bewijsstand');
+  return Object.assign(meting, {
+    afhankelijkVanRtg: { modules: Object.keys(AFHANKELIJK.MODULES), geinjecteerd: Object.keys(AFHANKELIJK.GEINJECTEERD),
+      routes: Object.keys(AFHANKELIJK.ROUTES) },
+    bewijsstand: BEWIJSSTAND.map(b => ({ code: b.code, stand: b.stand, wat: b.wat, sluit: b.sluit || null })) });
+}
+
+module.exports = { meet, metVerklaring };

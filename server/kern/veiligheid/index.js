@@ -89,6 +89,8 @@ module.exports = (state) => {
 
     alarmSlaan: alarm.alarmSlaan, alarmAfsluiten: alarm.alarmAfsluiten,
     alarmenVan: alarm.alarmenVan, alarmenVoorMij: alarm.alarmenVoorMij,
+    // de bewaarveger: alarmplekken na 90 dagen (N18), en plekken buiten een venster (N19)
+    veiligVergeetSosPosities: alarm.vergeetAlarmPlekken, veiligVergeetVerlopenPlekken: plek.vergeetVerlopen,
 
     wachtStart: wacht.wachtStart, wachtVerlengen: wacht.wachtVerlengen,
     wachtStop: wacht.wachtStop, wachtenVan: wacht.wachtenVan,

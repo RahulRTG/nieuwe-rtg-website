@@ -238,6 +238,46 @@ if (require.main !== module) { module.exports = {}; return; }
   }
   const tijdruis = ruisUit(stilGeteld, STIL_RONDES);
 
+  /* DE VIERDE IJKING: WAT NA EEN VERZOEK NOG NALOOPT (28 september 2026).
+
+     WAAROM HIJ ER IS. De eerste twee ijkingen meten wat er TIJDENS een verzoek
+     beweegt, de derde wat er in STILTE beweegt. Geen van drieen ziet een
+     schrijver die een verzoek telt en pas LATER wegschrijft -- en die staan hier
+     wel: de schaduwmeting van de kantoordeur (`kantoorMensdeur`,
+     kern/kantoor/mensdeur-spoel.js) en de beleidsmotor (`beleidsmotor`, A1) tikken
+     in RAM en spoelen vijf seconden later. Tijdens een verzoek beweegt er dus
+     niets, in stilte ook niet (er is niets te spoelen), en de spoeling landt in
+     het verschil van de HERHALING van de route die op dat moment gemeten wordt.
+     Zo stonden vijf routes op GEZAKT in IDEMPOTENCY met als enige bewogen
+     collecties die twee -- en de schorspoort had ze dichtgezet, waaronder
+     /api/onboarding/bedrijf en /api/onboarding/paspoort. De idemproef kent
+     `kantoorMensdeur` al als achtergrondspoeling (scripts/idemproef-route.js,
+     de stille ronde); deze proef niet, omdat haar stille rondes geen verzoek
+     vooraf doen.
+
+     WAT HIJ DOET. Een geslaagde LEESroute bij het lid en een bij het kantoor
+     (beide gemeten als "bevestigd zonder dat er iets in de opslag bewoog"), dan
+     een vingerafdruk, dan langer wachten dan een spoeling, dan nog een. Wat in
+     het wachtvenster van ELKE ronde beweegt, is naloop van de deur en niet het
+     werk van een route. Gemeten en niet bij naam: komt er een derde spoelende
+     teller bij, dan vindt deze ijking hem ook.
+
+     DE PRIJS, en die staat erbij zoals bij `kosten`: een route die ZELF in zo'n
+     collectie schrijft, wordt daarop niet meer gemeten. Voor deze twee kan dat
+     niet -- hun enige schrijver is de deur. */
+  const NALOOP_RONDES = 3;
+  const naloopGeteld = new Map();
+  for (let i = 0; i < NALOOP_RONDES; i++) {
+    await post('/api/notities/mijn', {}, tokens.member);
+    await post('/api/office/asset/overzicht', {}, tokens.office);
+    const v0 = await vingerafdruk();
+    await new Promise(r => setTimeout(r, STIL_MS));
+    const v1 = await vingerafdruk();
+    for (const c of (await verschilVan(v0, v1)).collecties || []) naloopGeteld.set(c, (naloopGeteld.get(c) || 0) + 1);
+  }
+  const naloopRuis = ruisUit(naloopGeteld, NALOOP_RONDES);
+  for (const c of tijdruis) naloopRuis.delete(c);   // de klok staat al apart
+
   /* EN EEN LANGE STILTE, voor de schakelaars die TRAGER lopen dan het venster
      hierboven. kern/command/alarm.js weegt eens per zestig seconden; die tik
      haalt drie rondes van elf seconden nooit alle drie, maar kan wel net tussen
@@ -253,6 +293,16 @@ if (require.main !== module) { module.exports = {}; return; }
      Vijfenzestig seconden: elk venster van meer dan zestig seconden bevat ten
      minste een tik van een minuutschakelaar. */
   const STIL_LANG_MS = Number(process.env.RTG_STAATPROEF_STIL_LANG_MS || 65000);
+  /* NA EEN VERZOEK, en niet in een leeg huis (28 september 2026). `rtgai`
+     traint elke zestig seconden, maar schrijft alleen als er sinds de vorige
+     tik iets is waargenomen. In een stilte zonder verzoek vooraf bewoog hij dus
+     nooit, en in de meetronde viel zijn tik tussen de twee oproepen van
+     /api/pay/kascode: "de herhaling bewoog de toestand opnieuw: rtgai", en de
+     route stond op GEZAKT. Dezelfde vorm als de naloop hierboven, op een
+     tragere klok. Wat hier gevonden wordt blijft VOORWAARDELIJK (zonderTijdtik):
+     alleen overgeslagen als de route het bij zijn eerste oproep niet raakte. */
+  await post('/api/notities/mijn', {}, tokens.member);
+  await post('/api/office/asset/overzicht', {}, tokens.office);
   const v0 = await vingerafdruk();
   await new Promise(r => setTimeout(r, STIL_LANG_MS));
   const v1 = await vingerafdruk();
@@ -261,7 +311,7 @@ if (require.main !== module) { module.exports = {}; return; }
   for (const c of aanvraagRuis) stilOoit.delete(c);   // die gaan er toch al globaal uit
 
   const somsStil = [...stilGeteld].filter(([c, n]) => n < STIL_RONDES && !aanvraagRuis.has(c)).map(([c]) => c);
-  const ruis = new Set([...aanvraagRuis, ...tijdruis]);
+  const ruis = new Set([...aanvraagRuis, ...tijdruis, ...naloopRuis]);
 
   console.log('\n=== DE TOESTAND PER ROUTE ===\n');
   console.log('  routes met een herkenbare rol        : ' + routes.length);
@@ -270,6 +320,8 @@ if (require.main !== module) { module.exports = {}; return; }
   console.log('  ruis bij een VERZOEK    (genegeerd)  : ' + (aanvraagRuis.size ? [...aanvraagRuis].join(', ') : 'geen'));
   console.log('  ruis van de KLOK        (genegeerd)  : ' + (tijdruis.size ? [...tijdruis].join(', ') : 'geen') +
     '   <- ' + STIL_RONDES + ' stille rondes van ' + STIL_MS + ' ms');
+  console.log('  NALOOP na een verzoek   (genegeerd)  : ' + (naloopRuis.size ? [...naloopRuis].join(', ') : 'geen') +
+    '   <- ' + NALOOP_RONDES + ' rondes: leesverzoek, dan ' + STIL_MS + ' ms wachten');
   console.log('  in stilte OOIT bewogen  (voorwaardelijk): ' + (stilOoit.size ? [...stilOoit].join(', ') : 'geen') +
     '\n' + ' '.repeat(41) + '<- alleen overgeslagen als de route ze bij de EERSTE oproep ook niet raakte');
   console.log('  in stilte SOMS bewogen  (in de korte ronde): ' + (somsStil.length ? somsStil.join(', ') : 'geen'));
@@ -277,7 +329,7 @@ if (require.main !== module) { module.exports = {}; return; }
 
   const uit = await draaiStaatproef({ post, vingerafdruk, routes, tokenVoor: (r) => tokens[r],
     hernieuw: bos.hernieuw,
-    lijfVoor: (r) => pool.verrijk(plausibelLijf(r.pad), r.pad).lijf, verschilVan, ruis, maxRoutes: MAX });
+    lijfVoor: (r) => pool.verrijk(plausibelLijf(r.pad), r.pad).lijf, verschilVan, ruis, stilOoit, maxRoutes: MAX });
 
   if (uit.meterStuk) { console.error('\n  DE METER IS BLIND: ' + uit.meterStuk); klaar(); process.exit(2); }
 
@@ -328,7 +380,7 @@ if (require.main !== module) { module.exports = {}; return; }
       idemBewezen: t.idemBewezen, idemGezakt: t.idemGezakt, ongemeten: t.ongemeten,
       tokensHernieuwd: uit.hernieuwd, blindeRondes: uit.meterStuk ? 1 : 0,
       collectiesInVingerafdruk: proef.aantalCollecties, ruisCollecties: ruis.size,
-      tijdruisCollecties: tijdruis.size, stilleRondes: STIL_RONDES, stilteMs: STIL_MS, begrenzing: MAX },
+      tijdruisCollecties: tijdruis.size, naloopruisCollecties: naloopRuis.size, stilleRondes: STIL_RONDES, stilteMs: STIL_MS, begrenzing: MAX },
     /* Drie lijsten in plaats van een. Wie later leest waarom een collectie niet
        meetelde, hoort te zien OF dat kwam doordat elk verzoek hem beweegt of
        doordat de klok dat doet -- en welke tragere schakelaars wel gezien maar

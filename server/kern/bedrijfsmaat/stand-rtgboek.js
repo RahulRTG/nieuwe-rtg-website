@@ -1,7 +1,7 @@
-/* DE VIER MATEN OP HET BOEK VAN RTG (besluiten C8 tot en met C11) -- een deel
+/* DE MATEN OP HET BOEK VAN RTG (besluiten C8 tot en met C12) -- een deel
    van ./stand.js, apart omdat dat bestand tegen de omvanggrens aan zit.
 
-   Operationele marge, liquiditeit, runway en CAC per kanaal. Allemaal met de graad
+   Operationele marge, liquiditeit, runway, CAC per kanaal en per campagne. Allemaal met de graad
    `vermoed`: ze rusten op bedragen die een mens overtikte (het boek, het
    banksaldo), en een conclusie is nooit harder dan haar zachtste premisse.
 
@@ -77,6 +77,23 @@ module.exports = function rtgboekMaten({ m, peilmoment, maat, boek, bank, cijfer
   });
   const cac = { stand: 'PER_KANAAL', waarde: null, perKanaal };
 
+  /* C12: per campagne de uitgave uit het boek en de nieuwe leden met haar code,
+     langs dezelfde groepspoort. Een kanaal waarvan de campagnes meer kosten dan
+     het kanaal zelf, krijgt per campagne geen getal: het boek klopt dan niet. */
+  const bc = b.campagnes || { rijen: [], tegenspraak: [] };
+  const metCode = new Map(((kanalen(m).campagnes) || []).map(k => [k.naam, k]));
+  const perCampagne = bc.rijen.map(r => {
+    const t = bc.tegenspraak.find(x => x.kanaal === r.kanaal);
+    const basis = { campagne: r.code, naam: r.naam, kanaal: r.kanaal, uitgaveCenten: r.centen };
+    if (t) return Object.assign(basis, { stand: 'NIET_UIT_TE_REKENEN', waarde: null, waarom: t.reden });
+    if (r.centen == null) return Object.assign(basis, { stand: 'NIET_UIT_TE_REKENEN', waarde: null, waarom: 'Geen uitgave ingevuld.' });
+    const g = metCode.get(r.code);
+    if (!g || g.stand !== 'TOONBAAR' || !g.aantal) return Object.assign(basis, { stand: 'TE_KLEINE_GROEP', waarde: null });
+    return Object.assign(basis, { stand: 'TOONBAAR', nieuweLeden: g.aantal, waarde: Math.round(r.centen / g.aantal), eenheid: 'eurocent per nieuw lid' });
+  });
+  const campagnes = perCampagne.length ? { stand: 'PER_CAMPAGNE', waarde: null, perCampagne, tegenspraak: bc.tegenspraak }
+    : niet('In deze maand liep geen campagne van RTG.', { perCampagne });
+
   const m4 = (id, def, uitkomst, dekt) => Object.assign(maat(id, def, uitkomst, dekt), { graad: 'vermoed' });
   return [
     m4('marge.operationeel-rtg', DEFINITIES.operationeleMarge, operationeel,
@@ -86,6 +103,8 @@ module.exports = function rtgboekMaten({ m, peilmoment, maat, boek, bank, cijfer
     m4('runway.rtg', DEFINITIES.runway, runway,
       [VERMOED, 'Het verbruik van drie maanden is geen voorspelling: een grote uitgave die nog komt, staat er niet in.']),
     m4('cac.per-kanaal', DEFINITIES.cac, cac,
-      [VERMOED, 'Alleen leden die de herkomstvraag beantwoordden of via een campagnelink kwamen; de rest heeft geen kanaal.'])
+      [VERMOED, 'Alleen leden die de herkomstvraag beantwoordden of via een campagnelink kwamen; de rest heeft geen kanaal.']),
+    m4('campagnes.rtg-marketing', DEFINITIES.campagne, campagnes,
+      [VERMOED, 'Alleen wie met de campagnelink binnenkwam; wie hem zag en later zelf zocht, telt niet mee.'])
   ];
 };

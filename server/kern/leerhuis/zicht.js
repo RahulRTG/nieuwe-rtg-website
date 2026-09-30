@@ -19,6 +19,7 @@
 
 const { verversen, certStand, versheid, trainerGeldig } = require('./oordeel');
 const { rolKlaar, loopbaan } = require('./gereedheid');
+const { LEERBEWIJS } = require('./standen');
 
 const VOLGENDE_STAP = {
   ASSIGNED: 'begin met lezen en kijken (UNDERSTAND, OBSERVE)', LEARNING: 'ga oefenen in de zandbak', PRACTICING: 'speel een scenario',
@@ -51,17 +52,24 @@ function vakstaat(st, persoon, nu) {
 
 function mijn(st, persoon, nu) {
   const p = st.personen[persoon] || { rollen: [], leren: {}, bewezen: {} };
+  const loopt = (v) => Object.values(st.beoordelingen).some(b => b.persoon === persoon && b.vaardigheid === v && ['REQUESTED', 'ASSESSING'].includes(b.stand));
   const pad = Object.entries(p.leren).map(([c, l]) => ({ curriculum: c, titel: (st.curricula[c] || {}).titel, stand: l.stand,
-    wat: 'leerpad ' + c + ' staat op ' + l.stand, waarom: l.reden, volgende: VOLGENDE_STAP[l.stand] || null, trainer: l.trainer }));
+    wat: 'leerpad ' + c + ' staat op ' + l.stand, waarom: l.reden, volgende: VOLGENDE_STAP[l.stand] || null, trainer: l.trainer,
+    vaardigheden: ((st.curricula[c] || {}).vaardigheden || []).map(v => ({ id: v, naam: (st.vaardigheden[v] || {}).naam || v, loopt: loopt(v) })) }));
   const ververs = verversen(st, persoon, nu).map(x => ({ wat: 'verversen: ' + x.vaardigheid, waarom: x.waarom,
     volgende: x.klasse === 'LEARNING_UPDATE' ? 'lees de nieuwe versie en leg dat vast' : 'opnieuw bewijzen' }));
   const lopend = new Set(Object.keys(p.leren).flatMap(c => (st.curricula[c] || { vaardigheden: [] }).vaardigheden));
   const opvolgers = p.rollen.flatMap(r => (st.rollen[r] || {}).opvolgers || []);
   return {
+    /* De eigen sleutel: de leerling zet er zijn eigen stappen mee (lerenStand noemt de persoon). */
+    IK: persoon,
     VANDAAG: ververs.concat(pad.filter(x => !['PRACTICING_IN_ROLE', 'AUTHORITY_ELIGIBLE'].includes(x.stand)).slice(0, 3)),
     PAD: pad,
     OEFENEN: Object.values(st.scenarios).filter(s => s.vaardigheden.some(v => lopend.has(v)))
-      .map(s => ({ scenario: s.id, domein: s.domein, moeilijkheid: s.moeilijkheid, wat: 'oefenen zonder gevolgen in productie' })),
+      /* De stappen staan er door elkaar en op alfabet: welke vereist en welke verboden
+         zijn, zegt de motor pas na het spelen (acties-simulatie.js). */
+      .map(s => ({ scenario: s.id, domein: s.domein, moeilijkheid: s.moeilijkheid, wat: 'oefenen zonder gevolgen in productie',
+        begin: s.begin || null, stappen: [...new Set(s.vereist.concat(s.verboden))].sort() })),
     VAARDIGHEDEN: vakstaat(st, persoon, nu),
     GROEI: opvolgers.map(r => ({ rol: r, ...loopbaan(st, persoon, r, nu) })),
     COACH: { wat: 'vragen over officiele kennis', grond: 'alleen ACTIVE kennis; zonder bron is het antwoord ONBEKEND' }
@@ -86,9 +94,14 @@ function trainerCockpit(st, trainer) {
   const t = st.trainers[trainer];
   if (!t) return { ok: false, reden: trainer + ' is geen trainer in deze organisatie' };
   const leerlingen = [];
+  /* Alleen OF er een beoordeling loopt, niet de uitslag of de criteria. */
+  const lopend = (k, v) => Object.values(st.beoordelingen).some(b => b.persoon === k && b.vaardigheid === v && ['REQUESTED', 'ASSESSING'].includes(b.stand));
   for (const [k, p] of Object.entries(st.personen))
-    for (const [c, l] of Object.entries(p.leren)) if (l.trainer === trainer) leerlingen.push({ persoon: k, curriculum: c, stand: l.stand, volgende: VOLGENDE_STAP[l.stand] || null });
-  return { ok: true, trede: t.trede,
+    for (const [c, l] of Object.entries(p.leren)) if (l.trainer === trainer) leerlingen.push({ persoon: k, curriculum: c, stand: l.stand, volgende: VOLGENDE_STAP[l.stand] || null,
+      vaardigheden: ((st.curricula[c] || {}).vaardigheden || []).map(v => ({ id: v, naam: (st.vaardigheden[v] || {}).naam || v, loopt: lopend(k, v) })) });
+  /* Soorten en sterktes komen mee, zodat het scherm geen eigen kopie draagt; of
+     een trainer ze MAG zetten, zegt bewijsVastleggen (acties-oordeel.js). */
+  return { ok: true, trede: t.trede, bewijsSoorten: LEERBEWIJS, sterktes: ['OBSERVED', 'DOCUMENTED'],
     VANDAAG: leerlingen.filter(x => ['SIMULATING', 'SUPERVISED'].includes(x.stand)),
     LEERLINGEN: leerlingen,
     SESSIES: t.curricula.map(c => ({ curriculum: c.id, geldig: trainerGeldig(st, trainer, c.id), gids: st.curricula[c.id] ? sessie(st, c.id) : null })),
@@ -97,7 +110,9 @@ function trainerCockpit(st, trainer) {
 
 function managerCockpit(st, manager, nu) {
   const team = Object.entries(st.relaties).filter(([, r]) => r.manager === manager && r.actief).map(([k]) => k);
-  return { TEAM: team.map(k => ({ persoon: k, rollen: (st.personen[k] || { rollen: [] }).rollen,
+  /* De rollen van de organisatie komen mee om toe te wijzen; `plan` zegt voor welke rol er een startplan ligt. */
+  return { ROLLEN: Object.values(st.rollen).map(r => ({ id: r.id, titel: r.titel })),
+    TEAM: team.map(k => ({ persoon: k, rollen: (st.personen[k] || { rollen: [] }).rollen, plan: (st.startplannen[k] || {}).rol || null,
     gereed: ((st.personen[k] || { rollen: [] }).rollen).map(r => { const x = rolKlaar(st, k, r, nu); return { rol: r, klaar: x.klaar, ontbreekt: x.ontbreekt, verloopt: x.verloopt }; }) })),
   nietZichtbaar: 'criteria, bewijs en uitslagen van beoordelingen; er is geen productiviteits-, loyaliteits- of persoonlijkheidsscore, en die komt er niet' };
 }

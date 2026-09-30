@@ -41,6 +41,35 @@ const REGEL = (titel, ref) => '<a class="reis" href="/apps/office.html" data-sig
    van dezelfde fout als de scrollIntoView hieronder -- een proef die faalt om de
    verkeerde reden is net zo min een proef. */
 /* Centreer de regel boven de vaste Edge Bar, zodat de veeg de regel raakt. */
+/* HET WERKDAGVLAK IN BEELD. Een gebaar op een onzichtbaar vlak is geen gebaar:
+   het wereldhuis toont zijn inhoud pas na zijn eigen startlaag, en een pointer
+   die op verborgen inhoud landt bereikt niets. Wachten op de TOESTAND
+   (zichtbaar), niet op een klok.
+
+   Sinds de warme presentatie (#413, shared/interface/world-presentation.js)
+   staat de eigen inhoud van een wereldhuis -- ook #werkdag -- achter "Uw
+   volledige overzicht": een dichte <details> onder de scene. Dat is een
+   ontwerpkeuze en geen gebrek; een mens klapt het overzicht open voor hij er
+   iets op doet, en deze proef ook: met een klik op de samenvatting, niet door
+   het attribuut te zetten. Eerst wachten tot het wereldkader klaar is, want dat
+   verhuist #werkdag pas na de startlaag naar die <details>. */
+async function werkdagInBeeld(page) {
+  await page.waitForFunction(() => {
+    const el = document.querySelector('#werkdag');
+    const kader = document.body.dataset.rtgDesktopState;
+    return !!el && getComputedStyle(el).visibility !== 'hidden' && (kader === 'ready' || kader === 'error');
+  }, null, { timeout: 20000 });
+  const dicht = await page.evaluate(() => {
+    const d = document.querySelector('#werkdag').closest('details');
+    return !!(d && !d.open);
+  });
+  if (dicht) await page.locator('details:has(#werkdag) > summary').click();
+  await page.waitForFunction(() => {
+    const d = document.querySelector('#werkdag').closest('details');
+    return !d || d.open;
+  }, null, { timeout: 5000 });
+}
+
 async function maat(loc) {
   await loc.evaluate(el => el.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' }));
   return loc.boundingBox();
@@ -102,10 +131,7 @@ test('de twee laden onder een regel: openen, uitvoeren en de weg terug',
        zijn inhoud pas na zijn eigen startlaag, en een pointer die op verborgen
        inhoud landt bereikt niets. Wachten op de TOESTAND (zichtbaar), niet op
        een klok. */
-    await page.waitForFunction(() => {
-      const el = document.querySelector('#werkdag');
-      return !!el && getComputedStyle(el).visibility !== 'hidden';
-    }, null, { timeout: 20000 });
+    await werkdagInBeeld(page);
     await page.evaluate((h) => {
       document.querySelector('#werkdag').innerHTML = h;
       // het klembord is in een kale browser niet toegestaan; we luisteren mee
@@ -216,10 +242,7 @@ test('doorvegen kan terug, en wat niet terug kan gaat alleen op vasthouden',
        zijn inhoud pas na zijn eigen startlaag, en een pointer die op verborgen
        inhoud landt bereikt niets. Wachten op de TOESTAND (zichtbaar), niet op
        een klok. */
-    await page.waitForFunction(() => {
-      const el = document.querySelector('#werkdag');
-      return !!el && getComputedStyle(el).visibility !== 'hidden';
-    }, null, { timeout: 20000 });
+    await werkdagInBeeld(page);
     await page.evaluate(() => {
       document.querySelector('#werkdag').innerHTML =
         '<div class="proefrij" tabindex="0" style="height:70px"><span>Een regel om te proeven</span></div>';
@@ -380,10 +403,7 @@ async function openKantoor(page, base) {
   await page.goto(base + '/apps/kantoor.html', { waitUntil: 'domcontentloaded' });
     await page.locator('.wp-domain > summary').click();
   await page.waitForFunction(() => !!window.RTGGebaar, null, { timeout: 20000 });
-  await page.waitForFunction(() => {
-    const el = document.querySelector('#werkdag');
-    return !!el && getComputedStyle(el).visibility !== 'hidden';
-  }, null, { timeout: 20000 });
+  await werkdagInBeeld(page);
 }
 
 test('met een aanwijzer: kort vasthouden op een borg doet niets, lang voert uit, en lang drukken opent de actielade',
@@ -529,10 +549,7 @@ test('op een aanraakscherm ligt de lade in de regel en niet over de pagina',
        zijn inhoud pas na zijn eigen startlaag, en een pointer die op verborgen
        inhoud landt bereikt niets. Wachten op de TOESTAND (zichtbaar), niet op
        een klok. */
-    await page.waitForFunction(() => {
-      const el = document.querySelector('#werkdag');
-      return !!el && getComputedStyle(el).visibility !== 'hidden';
-    }, null, { timeout: 20000 });
+    await werkdagInBeeld(page);
     assert.equal(await page.evaluate(() => matchMedia('(hover:hover) and (pointer:fine)').matches), false,
       'deze proef hoort in de aanraakstand te draaien; anders meet hij hetzelfde als de twee hierboven');
 

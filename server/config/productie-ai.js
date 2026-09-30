@@ -16,6 +16,10 @@ function keurAi(env, fouten, waarschuwingen) {
       require('../local-ai')._intern.normaliseerUrl(env.LOCAL_AI_URL || env.LOCAL_AI_BASE_URL,
         env.LOCAL_AI_LAN_TOESTAAN === '1');
     } catch (e) { fouten.push(e.message); }
+    try {
+      if (require('../local-ai')._intern.leesVenster({ contextVenster: env.LOCAL_AI_CONTEXT }).herkomst === 'aangenomen')
+        waarschuwingen.push('LOCAL_AI_CONTEXT ontbreekt: RTG neemt het Ollama-standaardvenster van 4096 tokens aan en dwingt het niet af. Een te lang verzoek wordt dan door de modelserver stil afgekapt, vanaf de grondwet. Zet LOCAL_AI_CONTEXT gelijk aan OLLAMA_CONTEXT_LENGTH.');
+    } catch (e) { fouten.push(e.message); }
   }
   if (uit && provider)
     fouten.push('RTG_AI_UIT=1 botst met een ingestelde AI-sleutel of lokale modelserver. Verwijder de providerconfiguratie zodat uit ook werkelijk uit betekent.');

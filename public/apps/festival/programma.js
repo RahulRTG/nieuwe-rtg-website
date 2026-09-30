@@ -83,18 +83,26 @@
       .then(function (r) {
         var lijst = $('#dnLijst');
         lijst.textContent = '';
+        /* het team om uit te kiezen; een naam van buiten het team blijft kunnen */
+        if ((r.body || {}).team) vulKeuze($('#dnTeam'), r.body.team.map(function (m) {
+          return { value: String(m.id), tekst: m.name }; }), 'iemand van buiten het team');
         ((r.body || {}).diensten || []).forEach(function (d) {
-          regel(lijst, d.wie + ' · ' + (d.plekNaam || '?') + (d.rol ? ' · ' + d.rol : ''),
-            d.van + '-' + d.tot);
+          regel(lijst, d.wie + ' · ' + (d.plekNaam || '?') + (d.rol ? ' · ' + d.rol : '') +
+            (d.afwezig ? ' · afwezig' : ''), d.van + '-' + d.tot);
         });
       });
   }
 
   $('#dnZet').addEventListener('click', function () {
     doe('/api/festival/dienst', { dag: $('#dnDag').value, plek: $('#dnPlek').value,
+      staffId: $('#dnTeam').value || null,
       wie: $('#dnWie').value.trim(), van: $('#dnVan').value.trim(), tot: $('#dnTot').value.trim(),
       rol: $('#dnRol').value.trim() || null, briefing: $('#dnBrief').value.trim() || null },
-      function () { $('#dnWie').value = ''; herlaadDiensten(); });
+      function (b) {
+        $('#dnWie').value = ''; herlaadDiensten();
+        // de dienst staat erin, maar wie hem draait is afwezig gemeld: dat hoort de planner te weten
+        if (b.afwezigWaarschuwing) F.inr.meld(b.afwezigWaarschuwing);
+      });
   });
   $('#dnDag').addEventListener('change', herlaadDiensten);
 

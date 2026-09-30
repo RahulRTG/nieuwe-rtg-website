@@ -85,6 +85,8 @@ app.post('/api/supplier/order/status', supplierAuth, async (req, res) => {
   if (CODE_DICHT.includes(status) && !(await sluitCode(o, req, 'bestelling ' + status)))
     return res.status(503).json({ error: 'De afhaalcode kon niet worden ingetrokken; de status is niet veranderd.' });
   o.status = status;
+  // een eindstand laat geen bezorgpunt achter; het adres blijft (NAVIGATIE.md N20)
+  if (CODE_DICHT.includes(status) && o.geo) o.geo = null;
   save();
   broadcastSync([o.customerTier], 'orders');
   sseToOffice('sync', { scope: 'orders' });
@@ -127,6 +129,7 @@ app.post('/api/supplier/refund', supplierAuth, async (req, res) => {
   o.refundedAt = new Date().toISOString();
   o.terugbetaling = { bedrag: o.total, op: o.refundedAt, door: (req.actor && req.actor.id) || null };
   o.status = 'terugbetaald';
+  if (o.geo) o.geo = null;   // er wordt niets meer bezorgd, dus ook geen punt meer (NAVIGATIE.md N20)
   save();
   logActivity(req.supplier.code, req.actor, 'stortte € ' + o.total + ' terug (' + o.ref + ')');
   broadcastSync([o.customerTier], 'orders');

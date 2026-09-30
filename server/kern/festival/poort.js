@@ -29,10 +29,11 @@
 'use strict';
 
 module.exports = (ctx) => {
-  const { editieVind, dagOpMoment, offset, momentOffset, plekVind, plekPad, plekIn, pasOpCode } = ctx;
+  const { editieVind, dagOpMoment, offset, momentOffset, plekVind, plekPad, plekIn, pasOpCode, pasReden } = ctx;
 
-  function magHier(fid, eid, vraag) {
-    const e = editieVind(fid, eid);
+  // `eIn`: de editie uit een lopende collectietransactie (./toegang.js)
+  function magHier(fid, eid, vraag, eIn) {
+    const e = eIn || editieVind(fid, eid);
     if (!e) return { ok: false, status: 404, reden: 'Deze editie bestaat niet.' };
     const v = vraag || {};
     const pas = pasOpCode(e, v.code);
@@ -62,6 +63,9 @@ module.exports = (ctx) => {
       return { ok: false, pas, plek, dag, reden: 'Deze pas is ingetrokken'
         + (pas.redenIntrekking ? ' (' + pas.redenIntrekking + ')' : '') + '.' };
     }
+    // de code zelf: vervallen, vervangen of niet op deze pas -- zelfde uitgang
+    const codeReden = pasReden(pas);
+    if (codeReden) return { ok: false, pas, plek, dag, reden: 'Deze pascode is niet meer geldig (' + codeReden + ').' };
     const bewijs = Array.isArray(v.bewijs) ? v.bewijs.map(String) : [];
 
     /* DE BESLOTENHEIDSGRENS. Loop van deze plek omhoog en pak de EERSTE (dus

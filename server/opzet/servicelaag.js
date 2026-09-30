@@ -28,7 +28,7 @@ function hangOp(kern, hulp) {
   const accounts = hulp.accounts;
   const { db, save, crypto } = hulp;
   Object.assign(kern, require('../kern/service')({
-    db, save, crypto,
+    db, save, crypto, bewerkCollectie: hulp.bewerkCollectie,
     inzagelog: require('../inzagelog'),
     /* DE KLUIS GAAT MEE, EN MAAR VOOR EEN DING: de mailingang moet een adres
        kunnen terugvoeren op een codenaam (kern/service/post.js). Dat is het

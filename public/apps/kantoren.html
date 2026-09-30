@@ -55,6 +55,8 @@
   .rb-post .stil{font-size:.76rem;color:var(--soft);}
   .rb-bedrag{flex:0 1 8rem;min-width:6rem;}
   .rb-bron{flex:1 1 10rem;}
+  .rb-kop{margin:1.4rem 0 .2rem;font-size:.9rem;}
+  .rb-tegen{color:var(--burgundy);font-size:.8rem;margin:.3rem 0;}
   .knop.stil{background:var(--card2);color:var(--txt);border:1px solid var(--line);}
   .fout{color:var(--burgundy);font-size:.85rem;min-height:1.2rem;margin-top:.5rem;}
   /* kamergrid in de Werk-OS-taal: scherpe tegels, haarlijnen, korte beweging */
@@ -305,6 +307,9 @@
       <div class="stil">Wat RTG zelf uitgeeft en verschuldigd is, per maand. Elk bedrag met een bron en op uw naam; personeel als totaal, nooit per medewerker. Hier rusten de operationele marge, de liquiditeit, de runway en de kosten per nieuw lid op.</div>
       <label class="rb-maand">Maand <input type="month" class="veld" id="kRbMaand"></label>
       <div id="kRbDelen"></div>
+      <h5 class="rb-kop">Campagnes</h5>
+      <div class="stil">Een campagne is een linkcode (?c=) met een begin en een einde, onder precies een kanaal. Wat hij kostte is een deel van de kanaalpost hierboven.</div>
+      <div id="kRbCampagnes"></div>
     </div>
     <h3 class="sec">De werklijst van deze kamer</h3>
     <div class="kaart lijst">
@@ -1275,7 +1280,12 @@ async function openKamer(id){
   if (id === 'financien' || id === 'intern') laadBetaalKamer(id);
   // het boek van RTG zelf: Financien vult het op naam (besluit C8)
   $('#kRtgBoek').hidden = (id !== 'financien');
+  /* De twee scripts van dit paneel laden onderaan de pagina, na drie.js; op een
+     trage verbinding is de kamer al open voordat ze er zijn. Daarom blijft er een
+     briefje liggen, en een script dat te laat komt start zichzelf. */
+  window.RTGFinancien = id === 'financien' ? { api, meld } : null;
   if (id === 'financien' && window.RTGBoekKamer) RTGBoekKamer.laad(api, meld);
+  if (id === 'financien' && window.RTGCampagneKamer) RTGCampagneKamer.laad(api, meld);
   tekenTaken(d.taken);
   // Rahul denkt mee in deze kamer -- schoon starten bij elke kamer
   $('#kRahulUit').textContent = '';
@@ -4258,6 +4268,7 @@ else uitgelogd();
 <script src="/apps/kantoren-atelier3d.js"></script>
 <script src="/apps/kantoren-collectieboek.js"></script>
 <script src="/apps/kantoren-rtgboek.js"></script>
+<script src="/apps/kantoren-rtgcampagne.js"></script>
 <script src="/shared/glyf.js"></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>

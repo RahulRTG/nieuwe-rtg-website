@@ -77,3 +77,19 @@ test('een verrassing laat geen bericht naar een gedeeld kanaal door, ook niet bi
   assert.equal(w.verstuurd.length, 0, 'niets is de deur uit gegaan naar het gedeelde kanaal');
   assert.equal(c.onderdelen.find(o => o.id === 'g').van, '20:05', 'wie het bericht niet kreeg, houdt zijn oude tijd');
 }));
+
+test('stap 0: een oud verzoek dat al bestond, loopt op zijn eigen plek door tot het klaar is', () => {
+  const oud = { id: 'v1', titel: 'Jet naar Nice', status: 'aangevraagd', at: '2026-09-01', updates: [] };
+  const dossier = { k: { verzoeken: [oud], voorkeuren: {} } };
+  let bureauGeroepen = 0;
+  const vz = require('../server/kern/lifestyle/verzoek')({ save() {}, schoon: (t, m) => String(t == null ? '' : t).slice(0, m || 200),
+    rid: () => 'x', nu: () => '2026-09-30T00:00:00Z', notify: null, liveCodename: null,
+    L: key => dossier[key], mijn: { lees: key => dossier[key], alleLezend: () => dossier },
+    bureau: () => { bureauGeroepen++; return { cases: () => ({ zaken: [] }) }; },
+    balie: () => { throw new Error('een oud verzoek hoort de lus niet te raken'); } });
+  assert.equal(vz.conciergeVoortgang('k', 'v1', 'bevestigd', 'Geregeld').status, 200);
+  assert.equal(oud.status, 'bevestigd');
+  assert.equal(vz.conciergeVerzoeken('k').verzoeken[0].id, 'v1');
+  assert.equal(vz.conciergeDesk().verzoeken[0].id, 'v1');
+  assert.ok(bureauGeroepen >= 1, 'de lijst vraagt ook de lus, zodat nieuwe cases erbij staan');
+});

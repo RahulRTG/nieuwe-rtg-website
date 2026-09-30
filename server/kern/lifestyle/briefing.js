@@ -4,18 +4,20 @@
    maar NOOIT een boeking of toegang belooft die hij niet zeker kan waarmaken.
    Krijgt de gedeelde ctx van ./index.js. */
 module.exports = (ctx) => {
-  const { anthropic, liveCodename, schoon, vandaag, L, bezittingen, gezondheid } = ctx;
+  const { anthropic, liveCodename, schoon, vandaag, L, bezittingen, gezondheid, verzoekenAlle } = ctx;
 
   function overzicht(key) {
     const l = L(key);
-    const open = l.verzoeken.filter(v => v.status !== 'afgerond' && v.status !== 'ingetrokken');
+    // oude verzoeken en de cases uit de concierge-lus samen (./verzoek.js)
+    const verzoeken = verzoekenAlle(key);
+    const open = verzoeken.filter(v => v.status !== 'afgerond' && v.status !== 'ingetrokken');
     const gz = gezondheid(key);
     const bez = bezittingen(key);
     return {
       status: 200,
       naam: liveCodename ? liveCodename(key) : '',
       verzoekenOpen: open.length,
-      laatsteVerzoek: l.verzoeken[0] || null,
+      laatsteVerzoek: verzoeken[0] || null,
       volgendeAfspraak: gz.volgende,
       bezittingen: bez.bezittingen.length, bezittingenWaarde: bez.totaalWaarde,
       attenties: bez.attenties,

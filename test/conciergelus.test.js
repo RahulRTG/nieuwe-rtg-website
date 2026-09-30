@@ -185,3 +185,26 @@ test('de lus is dicht voor een RTG Pass en voor wie geen kantoor is', async () =
   assert.notEqual(o.d.zaak.status, 'in voorbereiding');
   assert.equal(o.d.zaak.werkwijze, undefined);
 });
+
+test('stap 0: een verzoek van De Rechterhand is een case in de lus, en afgerond kan pas na een bevestiging', async () => {
+  const lid = await lifestyleLid();
+  const kant = await officeTok();
+  const v = await roep('/member/lifestyle/concierge/vraag', { titel: 'Tafel voor vier, vrijdag', categorie: 'restaurant' }, lid);
+  assert.equal(v.status, 200);
+  assert.equal(v.d.verzoek.zaak, true);
+  // dezelfde case staat in het Privékantoor en op het bureau, niet in een tweede wachtrij
+  const zaak = (await roep('/member/bureau/zaken', {}, lid)).d.zaken.find(z => z.id === v.d.verzoek.id);
+  assert.ok(zaak, 'het verzoek is een case');
+  assert.equal(zaak.werkwijze, 'voorstel');
+  const rij = (await roep('/office/bureau', {}, kant)).d.zaken.find(z => z.id === v.d.verzoek.id);
+  assert.ok(rij && rij.lus);
+  const deskOud = (await roep('/office/concierge', {}, kant)).d.verzoeken.find(x => x.id === v.d.verzoek.id);
+  assert.ok(deskOud && deskOud.zaak, 'het oude bureau ziet dezelfde case');
+  // afronden zonder iets bevestigd: nee
+  const af = await roep('/office/concierge/voortgang', { key: rij.key, id: v.d.verzoek.id, status: 'afgerond' }, kant);
+  assert.equal(af.status, 409);
+  await roep('/office/concierge/voortgang', { key: rij.key, id: v.d.verzoek.id, status: 'bevestigd', notitie: 'Tafel om 20:00 op uw naam.' }, kant);
+  assert.equal((await roep('/office/concierge/voortgang', { key: rij.key, id: v.d.verzoek.id, status: 'afgerond' }, kant)).status, 200);
+  const mijn = (await roep('/member/lifestyle/concierge', {}, lid)).d.verzoeken.find(x => x.id === v.d.verzoek.id);
+  assert.equal(mijn.status, 'afgerond');
+});

@@ -2,14 +2,14 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-09-30",
   "gemeten": {
-    "bestanden": 2632,
+    "bestanden": 2646,
     "domeinenTotaal": 691,
-    "koopbareVormen": 614,
+    "koopbareVormen": 615,
     "koopbareDomeinen": 123,
     "envelopDrempel": 8,
     "envelop": 43,
-    "veldenDomeineigen": 785,
-    "veldenNietEnvelop": 1055,
+    "veldenDomeineigen": 786,
+    "veldenNietEnvelop": 1056,
     "gelijkendeVormparen": 17,
     "werkwoordenVolledig": 2,
     "werkwoordenOveral": 0,
@@ -689,7 +689,7 @@
       },
       "bewijs": {
         "toon": "beeld",
-        "prijs": "som",
+        "prijs": "prijs",
         "beschikbaarheid": "open",
         "annuleer": "intrek"
       },

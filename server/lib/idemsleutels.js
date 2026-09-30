@@ -89,6 +89,7 @@ function sleutelVoor(methode, pad) {
    zonder reden was daar dus gewoon toegestaan. Een controle die niet over alles
    loopt is geen controle. */
 Object.assign(SLEUTELS,
+  require('./idemsleutels-praktijk').SLEUTELS,
   require('./idemsleutels-beelden').SLEUTELS,
   require('./idemsleutels-document').SLEUTELS,
   require('./idemsleutels-basis').SLEUTELS,

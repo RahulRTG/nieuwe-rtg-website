@@ -130,15 +130,16 @@
       "zzpwacht"
     ],
     "bedrijf": [
-      "entiteitBetaal",
-      "entiteitRekening",
       "agenda",
       "assetBeeld",
       "assetMet",
       "bedrijf",
       "bestanden",
+      "bijeen",
       "concernMagTekenen",
       "eigenaar",
+      "entiteitBetaal",
+      "entiteitRekening",
       "entiteitVind",
       "findSupplier",
       "rtmailTeam",

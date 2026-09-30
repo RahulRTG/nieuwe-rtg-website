@@ -22,6 +22,11 @@ module.exports = (app, auth, experience) => {
     stuur(res, experience.projection({ key: req.session.key, world: req.body.world,
       contextId: req.body.contextId, economicPrincipalRef: principalVoorSession(req.session) })));
 
+  app.post('/api/experience/network', auth, lid, (req, res) => {
+    res.setHeader('Cache-Control', 'private, no-store');
+    stuur(res, experience.network({ key: req.session.key, body: req.body || {},
+      economicPrincipalRef: principalVoorSession(req.session) }));
+  });
   app.post('/api/living-world/view', auth, lid, (req, res) =>
     stuur(res, experience.livingWorldView(req.session.key, req.body || {})));
 

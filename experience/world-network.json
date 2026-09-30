@@ -1,0 +1,203 @@
+{
+  "id": "world-network",
+  "version": 1,
+  "purpose": "compose_visible_opportunities",
+  "humanIntent": "Ik wil mogelijkheden van verschillende aanbieders bij elkaar brengen en mijn keuze bewaren.",
+  "audience": "member",
+  "emotionalMode": "explore",
+  "owner": "Mall lists and source domains",
+  "domainObject": "mall list of source references",
+  "requiredStates": [
+    "loading",
+    "empty",
+    "normal",
+    "unavailable",
+    "changed",
+    "offline",
+    "uncertain",
+    "error"
+  ],
+  "effortBudget": {
+    "deadEnds": 0,
+    "unexplainedStatusChanges": 0,
+    "meaningfulActions": 16
+  },
+  "steps": [
+    {
+      "id": "compose",
+      "screen": "/apps/rtg.html",
+      "world": "living",
+      "capability": "network.compose",
+      "primaryAction": "compose",
+      "destination": "/api/experience/network",
+      "result": "Actuele, toegestane opties met ontbrekende onderdelen en onzekerheid.",
+      "recovery": "/apps/rtg.html",
+      "authority": "member session + own context + current source visibility",
+      "states": [
+        "loading",
+        "empty",
+        "normal",
+        "unavailable",
+        "changed",
+        "offline",
+        "uncertain",
+        "error"
+      ]
+    },
+    {
+      "id": "preview",
+      "screen": "/apps/rtg.html",
+      "world": "living",
+      "capability": "network.preview",
+      "primaryAction": "preview",
+      "destination": "/api/experience/intent/preview",
+      "result": "Expliciete bevestiging voor uitsluitend een eigen bewaarde lijst.",
+      "recovery": "/apps/rtg.html",
+      "authority": "member session + own context + current source visibility",
+      "states": [
+        "loading",
+        "empty",
+        "normal",
+        "unavailable",
+        "changed",
+        "offline",
+        "uncertain",
+        "error"
+      ]
+    },
+    {
+      "id": "save",
+      "screen": "/apps/rtg.html",
+      "world": "living",
+      "capability": "network.save",
+      "primaryAction": "confirm",
+      "destination": "/api/experience/intent/execute",
+      "result": "Een domeinlijst met bewijs, zonder boeking, betaling of bericht.",
+      "recovery": "/apps/rtg.html",
+      "authority": "member session + own context + current source visibility",
+      "states": [
+        "loading",
+        "empty",
+        "normal",
+        "unavailable",
+        "changed",
+        "offline",
+        "uncertain",
+        "error"
+      ]
+    },
+    {
+      "id": "read",
+      "screen": "/apps/rtg.html",
+      "world": "living",
+      "capability": "network.read",
+      "primaryAction": "read-list",
+      "destination": "/apps/mijnmall.html",
+      "result": "De bestaande eigen lijst herleest actueel aanbod.",
+      "recovery": "/apps/rtg.html",
+      "authority": "member session + own context + current source visibility",
+      "states": [
+        "loading",
+        "empty",
+        "normal",
+        "unavailable",
+        "changed",
+        "offline",
+        "uncertain",
+        "error"
+      ]
+    }
+  ],
+  "handoffs": [
+    {
+      "from": "compose",
+      "to": "preview",
+      "carry": [
+        "explicit selected source references"
+      ],
+      "exclude": [
+        "credentials",
+        "authority",
+        "private contacts"
+      ],
+      "returnTo": "/apps/rtg.html",
+      "revalidate": [
+        "session",
+        "context",
+        "source visibility",
+        "source revision"
+      ]
+    },
+    {
+      "from": "preview",
+      "to": "save",
+      "carry": [
+        "explicit selected source references"
+      ],
+      "exclude": [
+        "credentials",
+        "authority",
+        "private contacts"
+      ],
+      "returnTo": "/apps/rtg.html",
+      "revalidate": [
+        "session",
+        "context",
+        "source visibility",
+        "source revision"
+      ]
+    },
+    {
+      "from": "save",
+      "to": "read",
+      "carry": [
+        "explicit selected source references"
+      ],
+      "exclude": [
+        "credentials",
+        "authority",
+        "private contacts"
+      ],
+      "returnTo": "/apps/rtg.html",
+      "revalidate": [
+        "session",
+        "context",
+        "source visibility",
+        "source revision"
+      ]
+    }
+  ],
+  "proofs": [
+    {
+      "id": "network-domain",
+      "layer": "OPERATIONAL",
+      "test": "test/experience-network.test.js",
+      "scope": "Vier werelden, toetreding, privacy, bronwijziging, Unicode, beperkte samenstelling en gelijktijdig bewaren."
+    },
+    {
+      "id": "network-http",
+      "layer": "OPERATIONAL",
+      "test": "test/experience-network-http.test.js",
+      "scope": "Echte HTTP-ledenpoort, vier wereldprojecties, eigen domeinlijst en brokerbewijs."
+    },
+    {
+      "id": "network-scale",
+      "layer": "RESILIENCE",
+      "test": "test/experience-network-scale.test.js",
+      "scope": "100.000 synthetische retailbedrijven in één lokaal proces; geen productielastbewijs."
+    },
+    {
+      "id": "network-browser",
+      "layer": "EXPERIENCE",
+      "test": "test/experience-network.e2e.js",
+      "scope": "Chromium op 390 en 1440 px, zoeken, kiezen, bevestigen, bewaren en offline herstel zonder AI; geen fysieke iPhone-proef."
+    }
+  ],
+  "humanReview": {
+    "status": "NOT_TESTED",
+    "questions": [
+      "Is duidelijk dat bewaren nog geen boeking is?",
+      "Zijn ontbrekende onderdelen en onzekere beschikbaarheid begrijpelijk?"
+    ]
+  }
+}

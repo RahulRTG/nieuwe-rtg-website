@@ -37,6 +37,7 @@ const SOORTEN = ['lijst', 'reis'];
 const BEWAARD = 'bewaard';
 const MAX_LIJSTEN = 40;
 const MAX_REGELS = 200;
+const lijstregel = require('./lijstregel');
 
 /* Wat een reis compleet maakt. Bewust kort en bewust niet dwingend: dit is een
    geheugensteun, geen verkoopmachine. Er staat nadrukkelijk GEEN urgentie bij
@@ -117,16 +118,7 @@ module.exports = (ctx) => {
     const a = ctx.aanbodAlles().aanbod.find(x => x.id === gezocht);
     if (!a) return { status: 404, error: 'Dit aanbod bestaat niet (meer) in de Mall.' };
     if (l.regels.some(r => r.aanbodId === a.id)) return { status: 409, error: 'Dit staat al in ' + l.naam + '.' };
-    l.regels.unshift({
-      aanbodId: a.id, titel: a.titel, type: a.type, aanbieder: a.aanbieder.naam,
-      prijsBijBewaren: a.prijs ? a.prijs.bedrag : null,
-      /* De stand bij het bewaren, zodat ./volgen.js kan zeggen wat er sindsdien
-         veranderde. Regels van voor deze versie hebben dit veld niet; die
-         krijgen `null` en daarover doet volgen.js dan ook geen uitspraak in
-         plaats van "onveranderd" te raden. */
-      beschikbaarBijBewaren: a.beschikbaar ? (a.beschikbaar.uit ? 'uit' : 'in') : null,
-      plek: a.plek.stad || null, at: nu()
-    });
+    l.regels.unshift(lijstregel(a, nu()));
     save();
     return { ok: true, lijst: l.id, aantal: l.regels.length };
   }
@@ -151,9 +143,29 @@ module.exports = (ctx) => {
     };
   }
 
+  /* Eén domeinhandeling voor de hele selectie, aangeroepen binnen de duurzame
+     brokertransactie. Alle regels eerst controleren; nooit een halve lijst. */
+  function samenstellen(key, data) {
+    const naam = schoon(data && data.naam, 60), ids = data && data.ids;
+    if (!naam || !Array.isArray(ids) || !ids.length || ids.length > 8 || new Set(ids).size !== ids.length)
+      return { status: 400, error: 'Ongeldige selectie.' };
+    if (bak(key).length >= MAX_LIJSTEN) return { status: 409, error: 'U heeft het maximum aantal lijsten bereikt.' };
+    const gevraagd = new Set(ids), index = new Map(); let dubbel = false;
+    const bezoek = a => { if (gevraagd.has(a.id)) { if (index.has(a.id)) dubbel = true; index.set(a.id, a); } };
+    const aanbod = ctx.aanbodBezoek ? ctx.aanbodBezoek(bezoek) : ctx.aanbodAlles();
+    if (!ctx.aanbodBezoek) for (const a of aanbod.aanbod) bezoek(a);
+    if (dubbel || ids.some(id => !index.has(id) || (aanbod.stuk || []).some(s => s.bron === index.get(id).bron) ||
+        (index.get(id).beschikbaar && index.get(id).beschikbaar.uit)))
+      return { status: 409, error: 'Het aanbod is gewijzigd. Stel uw plan opnieuw samen.' };
+    const at = nu(), lijst = { id: crypto.randomBytes(12).toString('hex'), naam, soort: 'lijst',
+      plek: null, van: null, tot: null, at, regels: ids.map(id => lijstregel(index.get(id), at)) };
+    bak(key, true).unshift(lijst); save();
+    return { ok: true, lijst };
+  }
+
   // de leeskant (een lijst uitwerken tegen het levende aanbod) staat apart
   const { toon } = require('./lijsttonen')(ctx, { vind, REIS_ONDERDELEN });
-  const api = { mijn, maak, zet, weg, voegToe, haalWeg, toon, REIS_ONDERDELEN, MAX_LIJSTEN, BEWAARD };
+  const api = { mijn, maak, zet, weg, voegToe, haalWeg, toon, samenstellen, REIS_ONDERDELEN, MAX_LIJSTEN, BEWAARD };
   // "Bewaard" en het volgen van prijzen staan in ./bewaard.js
   Object.assign(api, require('./bewaard')(ctx, { bak, voegToe, haalWeg, toon, nu, BEWAARD }));
   ctx.lijsten = api;

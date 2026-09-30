@@ -16,7 +16,7 @@
 
      akkoord      -> de klant zei ja, maar er staat nog geen datum in de agenda
      ingepland    -> de datum staat er, de dag is nog niet geweest
-     uitgevoerd   -> de dag is geweest en er is nog niet gefactureerd
+     uitgevoerd   -> de boeking is expliciet afgerond en er is nog niet gefactureerd
      gefactureerd -> de factuur staat er en is nog niet afgetekend als betaald
 
    Alleen de laatste twee zijn "uw geld ligt ergens anders". De eerste twee zijn
@@ -45,7 +45,7 @@ const STADIA = {
   akkoord: { label: 'Akkoord, nog niet ingepland', geld: false,
     wat: 'De klant zei ja, maar er staat nog geen datum in de agenda.' },
   ingepland: { label: 'Ingepland', geld: false,
-    wat: 'De datum staat er en de dag is nog niet geweest.' },
+    wat: 'Er staat een datum; uitvoering is nog niet bevestigd.' },
   uitgevoerd: { label: 'Uitgevoerd, nog niet gefactureerd', geld: true,
     wat: 'Het werk is gedaan. Zolang er geen factuur ligt, kan er ook niets binnenkomen.' },
   gefactureerd: { label: 'Gefactureerd, nog niet betaald', geld: true,
@@ -65,8 +65,7 @@ module.exports = ({ db, boekingenVanZaak }) => {
     ? (db.data.suppliers || []).find(x => x.code === o.supplierCode) || null : null);
 
   /* Wanneer de klus in de agenda staat. `wanneer` mag een datum of een
-     datum+tijd zijn; alleen de datum telt hier, want een klus van vanochtend is
-     vandaag uitgevoerd. */
+     datum+tijd zijn; alleen de datum telt hier, een datum bewijst nooit dat werk is uitgevoerd. */
   const dagVan = (b) => {
     const w = String((b && b.wanneer) || '');
     return /^\d{4}-\d{2}-\d{2}/.test(w) ? w.slice(0, 10) : null;
@@ -75,8 +74,7 @@ module.exports = ({ db, boekingenVanZaak }) => {
   function stadiumVan(b, factuur, vandaag) {
     if (!b) return 'akkoord';
     const dag = dagVan(b);
-    if (!dag) return 'akkoord';
-    if (dag > vandaag) return 'ingepland';
+    if (b.status !== 'afgerond') return dag ? 'ingepland' : 'akkoord';
     if (!factuur) return 'uitgevoerd';
     /* Betaald staat op twee plekken en ze betekenen hetzelfde: de boeking kent
        `paid` (de oude weg, via de kassa) en de factuur `betaald` (de weg van de
@@ -108,7 +106,7 @@ module.exports = ({ db, boekingenVanZaak }) => {
       const f = b ? facturen.find(x => x.ref && x.ref === b.ref) || null : null;
       const st = stadiumVan(b, f, vandaag);
       const sinds = st === 'gefactureerd' ? (f && (f.datum || f.at))
-        : st === 'uitgevoerd' ? dagVan(b)
+        : st === 'uitgevoerd' ? b.finishedAt
           : st === 'ingepland' ? null : (of.antwoordAt || of.at);
       return {
         offerte: of.id, klant: of.customerCodename || null,

@@ -1,5 +1,10 @@
 # RTG Experience Platform
 
+Aanvulling 30 september 2026: [RTG World Network](WORLDNETWORK.md) verbindt het
+bestaande universele aanbod met intent, compositie, een afgeleide graaf en
+gecontroleerd bewaren via dezelfde broker. Aansluitdekking en grenzen staan
+machineleesbaar in `server/kern/experience/network-contract.js`.
+
 Status: werkende platformkern, vastgelegd op 29 augustus 2026. Dit document is
 het uitvoercontract naast de wereldindeling in `WERELDEN.md` en de economische
 grenzen in `CONTROLPLANE.md`.

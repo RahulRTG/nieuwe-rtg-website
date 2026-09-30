@@ -60,7 +60,7 @@ module.exports = (ctx, hulp) => {
     const { maakLogies } = require('../logies');
     const d = maakLogies({ db }).logies.overzicht();
     return (d.huizen || []).map(h => {
-      const s = (db.data.suppliers || []).find(x => x.code === h.code);
+      const s = hulp.zaakMet(h.code);
       return aanbod({
         id: 'verblijf:' + h.code, bron: 'logies', type: 'verblijf',
         titel: h.naam, uitleg: h.tagline,

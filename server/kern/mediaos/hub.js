@@ -103,6 +103,8 @@ function maakHub({ catalogus, bronnen, keyVanCodenaam, codenaamVan }) {
     }
     return {
       status: 200, stuk: dit,
+      experiences: bronnen.experiences ? bronnen.experiences(key, id)
+        .map(b => ({ id:b.id, title:b.title, url:b.url })) : [],
       gebruiktAls,
       gebruiktAlsUitleg: dit.vorm === 'track'
         ? (gebruiktAls.length ? 'Korte video’s waar dit stuk onder ligt.' : 'Nog geen korte video’s met dit stuk eronder.')

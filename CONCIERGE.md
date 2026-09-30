@@ -118,15 +118,15 @@ toelichting van het lid is met opzet een tweede handeling.
 - **Geen conciergeproef** (een ketenproef naar het voorbeeld van `scripts/tafelproef.js`). De schakels en storingen van par. 6
   zitten in de toetsen, niet in een ketenproef die `KETENVORM.json` meeneemt.
 - **Geen as van de machine.** Zestien nieuwe schrijfroutes raken geen enkele
-  as van `npm run machinedekking`, en `mutatiesZonderEnigeAs` ging daardoor van
-  2757 naar 2773. Dat is een teller die alleen hoort te dalen, en hij is hier
-  bewust vastgelegd in plaats van opgepoetst: de herhaling is wel beproefd
-  (`test/conciergelus-dubbel.test.js`), maar de meter leest de as `herhaling`
-  uit `IDEMPROEF.json`, en de idemproef kan deze routes niet aan het werk
-  krijgen zonder een case in `scripts/lib/idemwereld.js`. Een woord als
-  `idempotentie` in de code zetten zou de as laten branden zonder dat er iets
-  gemeten is. Wat hem omlaag brengt: die wereld bouwen, zodat de proef de
-  bescherming zelf ziet.
+  as van `npm run machinedekking` en tellen dus mee in `mutatiesZonderEnigeAs`
+  (op deze tak ging die teller eerst van 2757 naar 2773 en is dat zo
+  vastgelegd; na de samenvoeging met main staat hij op 2780, omdat main elders
+  daalde). De herhaling is wel beproefd (`test/conciergelus-dubbel.test.js`),
+  maar de meter leest de as `herhaling` uit `IDEMPROEF.json`, en de idemproef
+  kan deze routes niet aan het werk krijgen zonder een case in
+  `scripts/lib/idemwereld.js`. Een woord als `idempotentie` in de code zetten
+  zou de as laten branden zonder dat er iets gemeten is. Wat hem omlaag
+  brengt: die wereld bouwen, zodat de proef de bescherming zelf ziet.
 
 ## 1. Twee case-eigenaren, één motor
 

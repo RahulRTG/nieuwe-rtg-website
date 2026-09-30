@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2268 bestanden en 15615 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2268 bestanden en 15625 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2268 |
-| losse beweringen (`test(...)`) | 15615 |
+| losse beweringen (`test(...)`) | 15625 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 213 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1896 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1975 bestanden, 15109 beweringen.
+1975 bestanden, 15119 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -469,7 +469,7 @@ toets omvalt.
 | `eurodekking.test.js` | 6 | gezakt op `===->!==#0` | HOEVEEL VAN HET GELD BEGRIJPT DEZE MACHINE -- en de vier manieren waarop dat getal kan liegen. De dragende toetsen zijn 3, 4 en 5, en geen van drieen gaat over rekenen: 3. |
 | `eventkeuken.test.js` | 7 | gezakt op `liegpoort /api/` | DE EVENTKEUKEN -- 8 endpoints achter de leverancier-inlog. Deze acht wees de waargenomen dekkingsmeting aan als nooit aangeroepen: catering, allergy, allergy/alt, mep, checkin, runsheet, runsheet/done en runsheet/ai. |
 | `eventloop.test.js` | 4 | geen bronmutatie mogelijk | DE EVENT-LOOP-VERTRAGING, EN OF DE METER HEM ECHT ZIET. Node draait alles op een lus. |
-| `evidence-engine.test.js` | 7 | gezakt op `getal+1#4` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `evidence-engine.test.js` | 17 | gezakt op `getal+1#4` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `excursie.test.js` | 2 | gezakt op `liegpoort /api/` | DE EXCURSIE -- waar kinderen zijn, en wie dat mag weten. WAAROM DIT DE ZWAARSTE VAN DE SCHOOL IS Van alle 199 school- en RTF-routes zonder toets is dit de enige waar het over de LOCATIE VAN EEN KIND gaat. |
 | `executionmap.test.js` | 12 | al rood | DE CAPABILITY-COMPILER (scripts/executionmap.js, EXECUTIE.md blok 1). EXECUTION_MAP.json is een PROJECTIE en geen bron. |
 | `experience-dinner.test.js` | 5 | -- | Werkelijke HTTP-keten, zonder betaal-, AI- of pushprovider. De agenda leest de reserveringsbron; bevestigd blijft een besluit van de juiste zaak. |

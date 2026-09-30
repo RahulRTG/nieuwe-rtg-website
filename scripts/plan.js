@@ -28,6 +28,35 @@ function toetsbestanden() {
     .filter((n) => /\.(?:test|e2e)\.js$/.test(n)).map((n) => 'test/' + n).sort();
 }
 
+function risicobaan(klasse) {
+  if (klasse === 'besturing') return 'constitution';
+  if (['authorization', 'money', 'security'].includes(klasse)) return 'sensitive';
+  if (['implementation', 'contract', 'public API', 'schema'].includes(klasse)) return 'product';
+  return 'light';
+}
+
+function modusbesluit(impact, telling, boek, bewijsMachineGewijzigd) {
+  if (!impact.volledig) return { mode: 'full', code: 'impact-onvolledig',
+    reden: 'de impactgraaf kan niet alle gewijzigde paden begrenzen' };
+  if (telling.UNKNOWN === telling.REUSED + telling.REPROVE + telling.UNKNOWN && telling.UNKNOWN > 0) {
+    return { mode: 'full', code: 'alle-bewijzen-onbekend',
+      reden: 'geen enkel bewijs heeft begrensde invoer' };
+  }
+  if (!telling.REUSED) {
+    if (bewijsMachineGewijzigd) return { mode: 'full', code: 'bewijsmachine-gewijzigd',
+      reden: 'de code die bewijs selecteert of uitvoert is zelf gewijzigd' };
+    if (boek && boek.ongeldig) return { mode: 'full', code: 'bewijsboek-ongeldig', reden: boek.ongeldig };
+    if (!boek || !boek.bewijzen || Object.keys(boek.bewijzen).length === 0) {
+      return { mode: 'full', code: 'geen-vertrouwd-bewijsboek',
+        reden: 'geen vertrouwd content-addressed bewijsboek beschikbaar' };
+    }
+    return { mode: 'full', code: 'geen-geldig-hergebruik',
+      reden: 'geen bewijsrecord past nog bij deze invoer en omgeving' };
+  }
+  return { mode: 'incremental', code: 'bewijs-hergebruikt',
+    reden: telling.REUSED + ' bewijzen blijven inhoudelijk geldig' };
+}
+
 function plan(opties) {
   const o = opties || {};
   const nu = o.nu || Date.now();
@@ -82,14 +111,17 @@ function plan(opties) {
      zelf onvolledig is, zijn alle toetsen UNKNOWN en wordt dit vanzelf full.
      Zo dwingt één toets met een dynamische loader niet 1.926 onafhankelijke
      bewijzen opnieuw af. */
-  const mode = !impact.volledig || telling.UNKNOWN === toetsen.length || !telling.REUSED
-    ? 'full' : 'incremental';
+  const besluit = o.forceFull ? { mode: 'full', code: 'volledige-ijking-afgedwongen',
+    reden: 'deze ronde kalibreert het selectieve bewijs tegen de volledige werkelijkheid' }
+    : modusbesluit(impact, telling, boek, bewijsMachineGewijzigd);
+  const baan = risicobaan(oordeel.klasse);
   return { formaat: 'rtg-evidence-plan-v2', gemaakt: new Date(nu).toISOString(),
     basis: wijziging.basis, snapshot: { rootHash: snapshot.rootHash,
       bestanden: snapshot.aantalBestanden, duurMs: Math.round(snapshot.duurMs) },
     wijziging, gewijzigd, ondergrens, impact, oordeel, bewijsMachineGewijzigd, omgeving: volledigOmgeving,
-    boek: { versie: boek.versie || 1, ongeldig: boek.ongeldig || null },
-    telling, mode, toetsen };
+    boek: { versie: boek.versie || 1, ongeldig: boek.ongeldig || null,
+      bewijzen: Object.keys(boek.bewijzen || {}).length },
+    telling, mode: besluit.mode, besluit, baan, gedwongenVolledig: !!o.forceFull, toetsen };
 }
 
 function commit() {
@@ -105,8 +137,16 @@ function vastleggen(opties) {
   const snapshot = o.snapshot || snapshotModule.maak(MAPPEN);
   const volledigOmgeving = o.omgeving || bb.omgeving();
   const boek = bb.nieuwBoek();
+  let controlHash = null;
+  const controlPad = process.env.RTG_CONTROL_FILE;
+  if (controlPad) {
+    const control = JSON.parse(fs.readFileSync(path.resolve(WORTEL, controlPad), 'utf8'));
+    if (!control.controlHash) throw new Error('Evidence Control Plane mist controlHash');
+    controlHash = control.controlHash;
+  }
   const provenance = { vertrouwd: true, commit: commit(), run: process.env.GITHUB_RUN_ID || null,
-    bron: process.env.GITHUB_ACTIONS ? 'github-main-clean-room' : 'lokale-clean-room' };
+    bron: process.env.GITHUB_ACTIONS ? 'github-main-clean-room' : 'lokale-clean-room',
+    controlHash };
   let bij = 0, onbekend = 0;
   const lijst = toetsbestanden();
   const dag = evidenceDag.bouw(snapshot, lijst);
@@ -135,6 +175,8 @@ function serialiseer(p) {
     geraakt: p.impact.geraakt.size, impactTelling: p.impact.telling,
     omgeving: { hash: p.omgeving.hash, dekking: p.omgeving.dekking,
       ongemeten: p.omgeving.ongemeten }, boek: p.boek, mode: p.mode,
+    besluit: p.besluit, baan: p.baan, gedwongenVolledig: p.gedwongenVolledig,
+    impactClaims: [...p.impact.geraakt].map(([pad, staat]) => ({ pad, ...staat })),
     telling: p.telling,
     reused: p.toetsen.filter((t) => t.status === 'REUSED').map((t) => t.toets),
     reprove: p.toetsen.filter((t) => t.status === 'REPROVE').map((t) => t.toets),
@@ -149,6 +191,7 @@ function toon(p, alles) {
   console.log('  wijziging ' + p.gewijzigd.length + ' bestand(en), klasse ' + p.oordeel.klasse);
   console.log('  bewijs    ' + p.telling.REUSED + ' REUSED · ' + p.telling.REPROVE +
     ' REPROVE · ' + p.telling.UNKNOWN + ' UNKNOWN');
+  console.log('  route     ' + p.baan + ' · ' + p.besluit.code + ': ' + p.besluit.reden);
   for (const status of ['UNKNOWN', 'REPROVE', 'REUSED']) {
     const rij = p.toetsen.filter((t) => t.status === status);
     if (!rij.length) continue;
@@ -175,7 +218,8 @@ if (require.main === module) {
       const uit = vastleggen({ vertrouwd: args.includes('--trusted') });
       console.log('bewijsboek: ' + uit.vastgelegd + ' vertrouwde bewijzen, ' + uit.onbekend + ' onbegrensd; ' + uit.pad);
     } else {
-      const p = plan({ basis: waarde('--basis') });
+      const p = plan({ basis: waarde('--basis'),
+        forceFull: args.includes('--full') || process.env.RTG_FORCE_FULL === '1' });
       const out = waarde('--out');
       if (out) schrijfUitvoer(p, out);
       if (args.includes('--json')) console.log(JSON.stringify(serialiseer(p), null, 2));
@@ -187,4 +231,5 @@ if (require.main === module) {
   }
 }
 
-module.exports = { plan, vastleggen, serialiseer, schrijfUitvoer, toetsbestanden, MAPPEN };
+module.exports = { plan, vastleggen, serialiseer, schrijfUitvoer, toetsbestanden,
+  risicobaan, modusbesluit, MAPPEN };

@@ -126,7 +126,8 @@ function raak(ix, gewijzigd, opties) {
         : 'staat niet in de index -- buiten de gemeten mappen, of een soort die niet wordt gelezen' });
       continue;
     }
-    geraakt.set(g, { afstand: 0, via: 'zeker', reden: 'zelf gewijzigd' });
+    geraakt.set(g, { afstand: 0, via: 'zeker', reden: 'zelf gewijzigd',
+      van: null, kant: 'wijziging', vertrouwen: 1 });
     rij.push(g);
   }
 
@@ -147,11 +148,16 @@ function raak(ix, gewijzigd, opties) {
         if (bestaand.via === 'mogelijk' && via === 'zeker') {
           bestaand.via = 'zeker';
           bestaand.reden = 'ingeladen door ' + hier;
+          bestaand.van = hier;
+          bestaand.kant = 'opgelost';
+          bestaand.vertrouwen = 1;
         }
         continue;
       }
       geraakt.set(inlader, { afstand: staat.afstand + 1, via,
-        reden: (twijfel ? 'laadt mogelijk ' : 'laadt ') + hier + ' in' });
+        reden: (twijfel ? 'laadt mogelijk ' : 'laadt ') + hier + ' in',
+        van: hier, kant: twijfel ? 'benaderd' : 'opgelost',
+        vertrouwen: twijfel ? 0.5 : Math.min(1, staat.vertrouwen == null ? 1 : staat.vertrouwen) });
       rij.push(inlader);
     }
   }
@@ -162,7 +168,8 @@ function raak(ix, gewijzigd, opties) {
   for (const [pad, waarom] of onopgelosteRand(ix)) {
     if (geraakt.has(pad)) continue;
     geraakt.set(pad, { afstand: -1, via: 'onopgelost',
-      reden: 'kan niet bewijzen wat hij niet inlaadt: ' + waarom });
+      reden: 'kan niet bewijzen wat hij niet inlaadt: ' + waarom,
+      van: null, kant: 'onopgelost', vertrouwen: 0 });
   }
 
   /* Het zwaarste gebied dat vanuit deze wijziging bereikbaar is. */

@@ -8,6 +8,8 @@
      die met rust en voegen we alleen Samen toe
    - zonder inlog doet het script niets (geen knoppen, geen verkeer) */
 (function () {
+  // Een gastprogramma is een zelfstandige leesweergave zonder accountshell.
+  if (document.body && document.body.dataset.publicPlatform === 'travel-guest') return;
   if (window.__metgezel) return; window.__metgezel = true;
   /* De metgezel hoort bij de OMGEVING, niet bij een ingebed vlak. Draait deze
      pagina in een frame -- een surface in de RTG-werkruimte, of het comm-venster
@@ -48,7 +50,7 @@
   })();
 
   var esc = function (t) { return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); };
-
+/* De bedieningsknoppen; de gedeelde scope begint in metgezel-00.js. */
   /* DE BALK VAN RAHUL: een vorm, op elk scherm.
 
      Hiervoor waren er drie manieren om bij Rahul te komen en geen daarvan

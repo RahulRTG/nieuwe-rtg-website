@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '5a570edd';
+var RTG_BOUW = '51b5dba8';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -543,7 +543,11 @@ var RTG_BOUW = '5a570edd';
       checkOnboarding(); laadAgendaLid();
     } catch(e){
       API.token = null;
-      try { localStorage.removeItem('rtg_member_token'); } catch(e2){}
+      // A lost connection is not a revoked session. Keep the stored token for
+      // an explicit retry, while the existing gate keeps the workspace closed.
+      if (e && (e.status === 401 || e.status === 403)) {
+        try { localStorage.removeItem('rtg_member_token'); } catch(e2){}
+      } else window.dispatchEvent(new Event('rtg-pass-unavailable'));
     }
   }
 

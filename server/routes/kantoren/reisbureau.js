@@ -118,7 +118,10 @@ module.exports = ({ app, officeAuth, veilig, stuur, afdelingen, kern }) => {
     const wie = kern.boardroomWie(req) || 'backoffice (gedeelde code)';
     await uitnodigingVeilig(res, async () => {
       const idem = String(((req.body || {}).idem || req.get('idempotency-key') || '')).slice(0, 200);
-      const r = await Promise.resolve(kern.reisuitnodiging.zetKlaar(wie, (req.body || {}).onderdelen, idem));
+      const b=req.body||{};
+      const r = await Promise.resolve(b.programma
+        ? kern.reisuitnodiging.bewaarProgramma(wie,{...b,idem})
+        : kern.reisuitnodiging.zetKlaar(wie,b.onderdelen,idem));
       if (r.ok) afdelingen.audit(wie, 'Reisbureau: reis klaargezet voor een klant (' +
         (r.uitnodiging.bestemming || 'zonder bestemming') + ', ' + r.uitnodiging.aantal + ' onderdelen)');
       return r;

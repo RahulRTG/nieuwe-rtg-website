@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-29T07:58:55.571Z",
-    "commit": "d055489cb",
-    "boomVuil": false,
-    "boomAnders": 3,
+    "op": "2026-09-30T03:40:58.892Z",
+    "commit": "5a6125c06",
+    "boomVuil": true,
+    "boomAnders": 4,
     "instrument": "scripts/edgekaart.js",
     "node": "v24.18.0"
   },
@@ -1761,7 +1761,9 @@
         "luistert": [
           "rtglang"
         ],
-        "attributen": [],
+        "attributen": [
+          "data-rtg-frame-world"
+        ],
         "opslag": [],
         "fetch": []
       }
@@ -2643,7 +2645,7 @@
           "rol": "schrijft",
           "etiket": "onderbalk:s",
           "wat": "de Edge bezit een appbalk",
-          "citaat": "rt.body.setAttribute('data-rtg-edge-appbar', 'true');"
+          "citaat": "rt.body.setAttribute('data-rtg-edge-appbar', 'actions');"
         }
       ],
       "verantwoordelijkheden": [
@@ -3214,6 +3216,7 @@
         "zendt": [],
         "luistert": [],
         "attributen": [
+          "data-rtg-palette",
           "data-rtg-skin",
           "data-rtg-world"
         ],
@@ -4077,6 +4080,6 @@
     "rollen": 213,
     "dubbeleEigenaars": 12,
     "dodeKanalen": 0,
-    "levendeKanalen": 14
+    "levendeKanalen": 15
   }
 }

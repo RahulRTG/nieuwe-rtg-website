@@ -13,7 +13,7 @@
    keer dat hij valt; 'herinnerdOp' onthoudt per datum dat het seintje al
    geweest is. De timer is unref'd, zodat hij een test nooit wakker houdt. */
 
-module.exports = ({ db, store }, h) => {
+module.exports = ({ store }, h) => {
   const RR = { dag: 'DAILY', week: 'WEEKLY', maand: 'MONTHLY', jaar: 'YEARLY' };
   const escI = t => String(t || '').replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
 
@@ -68,6 +68,12 @@ module.exports = ({ db, store }, h) => {
       uit.push({ id: 'boeking:' + b.ref, bron: 'boeking', ref: b.ref, datum,
         tijd: w.length > 10 ? w.slice(11, 16) : null, status: b.status || null,
         titel: ((b.service && b.service.name) || 'Boeking') + (b.supplierName ? ' · ' + b.supplierName : '') });
+    }
+    for (const r of (h.reserveringenVanKlant ? h.reserveringenVanKlant(memberKey) : []) || []) {
+      if (r.customerKey !== memberKey || r.datum < van || r.datum > tot ||
+          !['aangevraagd','bevestigd'].includes(r.status)) continue;
+      uit.push({id:'reservering:'+r.id,bron:'boeking',ref:r.id,datum:r.datum,tijd:r.tijd,
+        status:r.status,titel:'Tafel bij '+r.supplierName+' ('+r.personen+'p) · '+r.status});
     }
     return uit;
   }

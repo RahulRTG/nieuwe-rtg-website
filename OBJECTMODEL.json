@@ -2,15 +2,15 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-29",
   "gemeten": {
-    "bestanden": 2569,
-    "vormen": 1497,
-    "velden": 2158,
-    "modules": 829,
-    "domeinen": 300,
-    "envelopDrempel": 18,
-    "envelop": 30,
-    "veldenDomeineigen": 1507,
-    "veldenGedeeldVanafVier": 220,
+    "bestanden": 2570,
+    "vormen": 1499,
+    "velden": 2159,
+    "modules": 830,
+    "domeinen": 301,
+    "envelopDrempel": 19,
+    "envelop": 29,
+    "veldenDomeineigen": 1508,
+    "veldenGedeeldVanafVier": 221,
     "gelijkendeVormparen": 23
   },
   "envelop": [
@@ -25,7 +25,6 @@
     "door",
     "gemaakt",
     "id",
-    "key",
     "label",
     "naam",
     "notitie",
@@ -46,6 +45,18 @@
     "wat"
   ],
   "gedeeld": [
+    {
+      "veld": "key",
+      "domeinen": 18,
+      "waar": [
+        "kern/assets",
+        "kern/care",
+        "kern/ervaring",
+        "kern/gemeente",
+        "kern/instant-reality",
+        "kern/ledenbalie-inzage"
+      ]
+    },
     {
       "veld": "sinds",
       "domeinen": 17,
@@ -251,6 +262,18 @@
       ]
     },
     {
+      "veld": "versie",
+      "domeinen": 12,
+      "waar": [
+        "bedrijf",
+        "kern/appstore",
+        "kern/beroepenbieb",
+        "kern/command",
+        "kern/envelop",
+        "kern/journalistiek-krant"
+      ]
+    },
+    {
       "veld": "vanMij",
       "domeinen": 12,
       "waar": [
@@ -323,6 +346,18 @@
       ]
     },
     {
+      "veld": "geldigTot",
+      "domeinen": 11,
+      "waar": [
+        "bedrijf",
+        "kern/aanmeldingen",
+        "kern/concern",
+        "kern/festival",
+        "kern/leerhuis",
+        "kern/mobiliteit"
+      ]
+    },
+    {
       "veld": "plek",
       "domeinen": 11,
       "waar": [
@@ -356,18 +391,6 @@
         "kern/magnaat-capabilities",
         "kern/magnaatwereld",
         "kern/mailsleutel"
-      ]
-    },
-    {
-      "veld": "versie",
-      "domeinen": 11,
-      "waar": [
-        "bedrijf",
-        "kern/appstore",
-        "kern/beroepenbieb",
-        "kern/command",
-        "kern/envelop",
-        "kern/journalistiek-krant"
       ]
     },
     {
@@ -455,18 +478,6 @@
       ]
     },
     {
-      "veld": "geldigTot",
-      "domeinen": 10,
-      "waar": [
-        "bedrijf",
-        "kern/aanmeldingen",
-        "kern/concern",
-        "kern/festival",
-        "kern/leerhuis",
-        "kern/mobiliteit"
-      ]
-    },
-    {
       "veld": "klaar",
       "domeinen": 10,
       "waar": [
@@ -512,18 +523,6 @@
         "kern/leverancier",
         "kern/mall",
         "kern/trainingsschema"
-      ]
-    },
-    {
-      "veld": "soortLabel",
-      "domeinen": 10,
-      "waar": [
-        "kern/bank",
-        "kern/boerderij",
-        "kern/concern",
-        "kern/gemeente",
-        "kern/mall",
-        "kern/overheid"
       ]
     }
   ],

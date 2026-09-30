@@ -95,10 +95,12 @@ for (const engine of engines) {
           await shot(page,engine+'-'+width+'-project-action');
         }
       }
-      await page.goto(srv.base+'/apps/werk.html');
+      await open(page,'/apps/werk.html');
       await page.waitForSelector('.wk-briefing');
+      await page.waitForFunction(() => document.documentElement.scrollHeight > innerHeight);
       await page.evaluate(() => scrollTo(0,document.documentElement.scrollHeight));
-      assert.ok(await page.evaluate(() => scrollY > 0), 'the common document must scroll on iPhone');
+      await page.waitForFunction(() => scrollY > 0);
+      assert.ok(await page.evaluate(() => scrollY > 0), 'the common document must scroll');
       assert.deepEqual(errors, [], 'no client errors while showing the content');
     } finally { await browser.close(); }
   });

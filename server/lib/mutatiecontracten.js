@@ -43,8 +43,8 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-storingen').CONTRACTEN,
   /* Opgesplitst omdat scripts/check.js een bestandsgrens kent en die terecht
      aansloeg: een lijst die naar duizenden regels groeit, hoort niet in een
-     bestand dat ook nog de vorm en de regels uitlegt. Dezelfde vorm als
-     ./idemsleutels.js, die om precies dezelfde reden vier zijbestanden heeft. */
+     bestand dat ook nog de vorm en de regels uitlegt. Zelfde vorm als
+     ./idemsleutels.js. */
   require('./mutatiecontracten-beschermd').CONTRACTEN,
   require('./mutatiecontracten-leest').CONTRACTEN,
   require('./mutatiecontracten-connection').CONTRACTEN,
@@ -116,8 +116,6 @@ const CONTRACTEN = Object.assign({},
      toezegging zijn. Eigen bestand omdat ze een afweging delen -- zie de kop. */
   require('./mutatiecontracten-reisnazorg').CONTRACTEN,
   require('./mutatiecontracten-reisherkomst').CONTRACTEN,
-  /* De concierge-lus (CONCIERGE.md): zestien routes, gemeten met een dubbeltik
-     per route in test/conciergelus-dubbel.test.js -- zie de kop. */
   require('./mutatiecontracten-conciergelus').CONTRACTEN,
   /* Een lid en zijn eigen lidmaatschap: twee lezers en een opzegging. Eigen
      bestand omdat het indelen er een defect uit haalde -- zie de kop. */

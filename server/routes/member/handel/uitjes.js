@@ -60,6 +60,7 @@ app.post('/api/reservering/annuleer', auth, (req, res) => {
 });
 // de gast antwoordt op een tegenvoorstel van de zaak (kern/ervaring/tafeluitzondering.js)
 app.post('/api/reservering/tegenvoorstel', auth, (req, res) => {
+  if (gegevensStop(req, res, 'reservering')) return;
   const r = reserveringTegenvoorstelAntwoord(req.session.key, String(req.body.id || ''), req.body.akkoord === true);
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json(r);

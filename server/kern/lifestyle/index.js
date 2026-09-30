@@ -14,7 +14,7 @@
      ./briefing  het overkoepelende Rechterhand-overzicht en de briefing
                  van Rahul in de u-vorm
    Gedeelde context (db, save, anthropic, liveCodename) vanuit server.js. */
-module.exports = ({ db, save, crypto, anthropic, liveCodename, notify, bureau, balie }) => {
+module.exports = ({ db, save, crypto, anthropic, liveCodename, notify, kern }) => {
   /* Het levensdossier is GEDEELD met rechterhand, bureau en levensgraaf, en
      elk domein schrijft alleen zijn eigen velden. Zie server/kern/levensdossier.js. */
   const mijn = require('../levensdossier')({ db }).voor('lifestyle');
@@ -42,11 +42,11 @@ module.exports = ({ db, save, crypto, anthropic, liveCodename, notify, bureau, b
 
   // de gedeelde ctx voor de deelbestanden
   /* Het concierge-verzoek is een schil over de concierge-lus in kern/bureau (zie
-     ./verzoek.js). `bureau` en `balie` komen laat binnen: het Privékantoor wordt
-     NA deze module gemonteerd, en wordt pas aangeroepen als alles staat. */
+     ./verzoek.js). Het Privékantoor wordt NA deze module gemonteerd, dus komt het
+     laat binnen: via `kern`, en alleen `kern.bureau` en `kern.bureauBalie` --
+     deze module leest verder niets uit de kern. */
   const verzoek = require('./verzoek')({ save, schoon, rid, nu, notify, liveCodename, L, mijn,
-    bureau: bureau || (() => { throw new Error('bureau niet gemonteerd'); }),
-    balie: balie || (() => { throw new Error('bureaubalie niet gemonteerd'); }) });
+    bureau: () => kern.bureau, balie: () => kern.bureauBalie });
   const ctx = { db, save, anthropic, liveCodename, nu, rid, schoon, vandaag, isDatum, L, verzoekenAlle: verzoek.verzoekenAlle };
   const dossier = require('./dossier')(ctx);
   ctx.bezittingen = dossier.bezittingen;

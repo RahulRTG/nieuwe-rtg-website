@@ -104,7 +104,7 @@ test('functionele Edge-labels zakken niet terug naar 6-9 pixels', () => {
 });
 
 test('Living-statuswoorden halen WCAG AA op alle centrale ivoorvlakken', () => {
-  const living = HERITAGE.match(/data-rtg-world="living"\]:not\(\[data-public-platform\]\)\{([\s\S]*?)\n\}/);
+  const living = HERITAGE.match(/data-rtg-palette="living"[^{}]*\{([\s\S]*?)\n\}/);
   assert.ok(living, 'Living-tokens ontbreken');
   const voorgronden = ['rtg-status-ok', 'rtg-status-warn', 'rtg-status-danger']
     .map(token => [token, variabele(living[1], token)]);

@@ -1,16 +1,16 @@
 {
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
-  "vastgelegd": "2026-09-30",
+  "vastgelegd": "2026-09-29",
   "gemeten": {
-    "bestanden": 2576,
-    "vormen": 1498,
-    "velden": 2158,
+    "bestanden": 2570,
+    "vormen": 1499,
+    "velden": 2159,
     "modules": 830,
     "domeinen": 301,
     "envelopDrempel": 19,
     "envelop": 29,
-    "veldenDomeineigen": 1507,
-    "veldenGedeeldVanafVier": 222,
+    "veldenDomeineigen": 1508,
+    "veldenGedeeldVanafVier": 221,
     "gelijkendeVormparen": 23
   },
   "envelop": [
@@ -142,18 +142,6 @@
       ]
     },
     {
-      "veld": "eenheid",
-      "domeinen": 14,
-      "waar": [
-        "kern/beslisgeheugen",
-        "kern/boerderij",
-        "kern/command",
-        "kern/commerce",
-        "kern/groothandel",
-        "kern/keuken"
-      ]
-    },
-    {
       "veld": "bedrag",
       "domeinen": 14,
       "waar": [
@@ -226,6 +214,18 @@
       ]
     },
     {
+      "veld": "eenheid",
+      "domeinen": 13,
+      "waar": [
+        "kern/boerderij",
+        "kern/command",
+        "kern/commerce",
+        "kern/groothandel",
+        "kern/keuken",
+        "kern/kosten"
+      ]
+    },
+    {
       "veld": "aan",
       "domeinen": 12,
       "waar": [
@@ -262,15 +262,15 @@
       ]
     },
     {
-      "veld": "waarde",
+      "veld": "versie",
       "domeinen": 12,
       "waar": [
-        "kern/assets",
-        "kern/beslisgeheugen",
-        "kern/bureau",
+        "bedrijf",
+        "kern/appstore",
+        "kern/beroepenbieb",
         "kern/command",
-        "kern/commercie",
-        "kern/levensgraaf"
+        "kern/envelop",
+        "kern/journalistiek-krant"
       ]
     },
     {
@@ -346,6 +346,18 @@
       ]
     },
     {
+      "veld": "geldigTot",
+      "domeinen": 11,
+      "waar": [
+        "bedrijf",
+        "kern/aanmeldingen",
+        "kern/concern",
+        "kern/festival",
+        "kern/leerhuis",
+        "kern/mobiliteit"
+      ]
+    },
+    {
       "veld": "plek",
       "domeinen": 11,
       "waar": [
@@ -382,15 +394,15 @@
       ]
     },
     {
-      "veld": "versie",
+      "veld": "waarde",
       "domeinen": 11,
       "waar": [
-        "bedrijf",
-        "kern/appstore",
-        "kern/beroepenbieb",
+        "kern/assets",
+        "kern/bureau",
         "kern/command",
-        "kern/envelop",
-        "kern/journalistiek-krant"
+        "kern/commercie",
+        "kern/levensgraaf",
+        "kern/onboarding"
       ]
     },
     {
@@ -463,18 +475,6 @@
         "kern/livinglab",
         "kern/magnaat-controle",
         "kern/magnaat-trainingslobby-acties"
-      ]
-    },
-    {
-      "veld": "geldigTot",
-      "domeinen": 10,
-      "waar": [
-        "bedrijf",
-        "kern/aanmeldingen",
-        "kern/concern",
-        "kern/festival",
-        "kern/leerhuis",
-        "kern/mobiliteit"
       ]
     },
     {

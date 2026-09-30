@@ -128,3 +128,10 @@ zzijk*
 
 # Generated browser coverage and screenshots for the desktop standard.
 artifacts/desktop-standard/
+artifacts/mobile-content/
+artifacts/world-palette/
+
+# Local Experience Observatory and measured test logs
+artifacts/experience/
+
+artifacts/reisprogramma/

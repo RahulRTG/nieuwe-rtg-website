@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 5304 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 5296 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,14 +18,14 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 5304 |
-| servermodules (`server/**/*.js`) | 3917 |
+| API-endpoints | 5296 |
+| servermodules (`server/**/*.js`) | 3910 |
 | routebestanden (`server/routes/**`) | 628 |
-| kernmodules (`server/kern/**`) | 2485 |
+| kernmodules (`server/kern/**`) | 2479 |
 | schermen (`public/**/*.html`) | 323 |
-| gedeelde browsermodules (`public/shared/*.js`) | 415 |
-| toetsbestanden (`test/*.test.js`) | 1898 |
-| schermtoetsen (`test/*.e2e.js`) | 279 |
+| gedeelde browsermodules (`public/shared/*.js`) | 420 |
+| toetsbestanden (`test/*.test.js`) | 1897 |
+| schermtoetsen (`test/*.e2e.js`) | 284 |
 
 ## 2. De weg van een verzoek
 
@@ -129,7 +129,7 @@ lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
 bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
 publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 3621 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 3613 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -137,9 +137,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1675 |
+| kern-namen die routes aanraken | 1666 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 250 |
-| daarvan door precies één domein | 1425 |
+| daarvan door precies één domein | 1416 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -156,7 +156,7 @@ accounts(29) schoon(23) boardroomWie(20) managerOnly(19) codenaamVan(19) save(19
 rtf(18) tooManyTries(14) geenGast(14) express(14) findSupplier(13) boardroomAuth(13)
 crypto(12) appUrl(11) keyVanCodenaam(11) pay(11) anthropic(11) noteFailedTry(10)
 payrollOS(10) rtmail(10) kern(9) gegevensStop(9) sseToOffice(9) loginFails(8) stuur(8)
-logActivity(8) mail(7) naamAuth(7) sseToSupplier(7) onboarding(6) notifySupplier(6)
+logActivity(8) mail(7) sseToSupplier(7) onboarding(6) naamAuth(6) notifySupplier(6)
 talen(6) tenant(5) logInlog(5) veilig(5) afdelingen(5) openVacatures(5) overheid(5)
 sseToCustomer(5)
 ```

@@ -159,6 +159,15 @@ test('offline cache verwart geen interfacevariant en wist geen buurapp', () => {
     'de RTG-worker mag uitsluitend zijn eigen oude caches verwijderen');
 });
 
+test('alle geïmporteerde stijlen van de gedeelde omlijsting zitten in de PWA-cache en bouwafdruk', () => {
+  const imports = [...lees('public/shared/rtg-heritage.css').matchAll(/@import url\(['"]\.\/([^'"]+)/g)];
+  assert.ok(imports.length > 0, 'de toets moet de echte stylesheet-imports meten');
+  for (const worker of ['public/sw.js','public/apps/foundation/sw.js']) {
+    const schil = new Set(schilVan(lees(worker)) || []);
+    for (const m of imports) assert.ok(schil.has('/shared/' + m[1]), worker + ': ' + m[1] + ' mist in de installatiecache');
+  }
+});
+
 test('iedere installeerbare RTG-pas heeft zijn exacte offline startdocument', () => {
   /* Een verse PWA kan voor het eerst zonder netwerk worden gestart. De drie
      pasmanifesten openen niet kale Home maar een eigen ?pas=-adres. Omdat de

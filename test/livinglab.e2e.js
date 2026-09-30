@@ -21,7 +21,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust, wachtTot, wachtOpTekst, klikEnWacht, wachtOpNetstilte } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust, wachtTot, wachtOpTekst, klikEnWacht, wachtOpNetstilte, wachtOpVloeiend } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -129,6 +129,11 @@ test('Living Lab: de onderzoekscyclus op het scherm, en de bewoner zonder accoun
     await volgVerzoeken(bew);
     await bew.goto(base + '/apps/labpas.html', { waitUntil: 'domcontentloaded' });
     await wachtTot(bew, () => !!window.RTGDeel, null, { wat: 'het deelmenu van het bewonersscherm' });
+    /* Dit scherm draagt data-rtg-world: na het laden bouwt het bureaublad er
+       nog een raster omheen, en onder CPU-druk hield dat de hoofdthread zo lang
+       bezet dat de klik op #bStuur niet eens gegeven werd (CI op PR #433). Een
+       mens klikt als het scherm stilstaat; de toets ook. */
+    await wachtOpVloeiend(bew);
 
     /* Ook dit scherm is een menu met één deel tegelijk (shared/deelmenu.js),
        dus openen wat je nodig hebt -- net als een bewoner zou doen. */

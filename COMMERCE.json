@@ -1,19 +1,19 @@
 {
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
-  "vastgelegd": "2026-09-29",
+  "vastgelegd": "2026-09-30",
   "gemeten": {
-    "bestanden": 2570,
+    "bestanden": 2577,
     "domeinenTotaal": 681,
-    "koopbareVormen": 612,
+    "koopbareVormen": 614,
     "koopbareDomeinen": 123,
     "envelopDrempel": 8,
-    "envelop": 42,
+    "envelop": 43,
     "veldenDomeineigen": 786,
     "veldenNietEnvelop": 1054,
     "gelijkendeVormparen": 17,
     "werkwoordenVolledig": 2,
     "werkwoordenOveral": 0,
-    "werkwoordCombinaties": 45,
+    "werkwoordCombinaties": 46,
     "wagenVormen": 33,
     "wagenVormenUniek": 30,
     "wagenDomeinen": 22,
@@ -34,6 +34,7 @@
     "centen",
     "codenaam",
     "datum",
+    "domein",
     "door",
     "id",
     "idem",
@@ -73,8 +74,8 @@
     "prijs": 39,
     "beschikbaarheid": 53,
     "reserveer": 28,
-    "bevestig": 59,
-    "lever": 24,
+    "bevestig": 60,
+    "lever": 25,
     "annuleer": 34,
     "retour": 8
   },
@@ -461,6 +462,27 @@
         "annuleer": "offerteIntrek"
       },
       "telt": 6
+    },
+    {
+      "domein": "kern/bureau",
+      "heeft": {
+        "toon": true,
+        "prijs": false,
+        "beschikbaarheid": true,
+        "reserveer": false,
+        "bevestig": true,
+        "lever": true,
+        "annuleer": true,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "bureauOverzicht",
+        "beschikbaarheid": "caseOpen",
+        "bevestig": "lusBevestig",
+        "lever": "lusVerstuur",
+        "annuleer": "caseIntrek"
+      },
+      "telt": 5
     },
     {
       "domein": "kern/ervaring",
@@ -1084,25 +1106,6 @@
         "toon": "publiek",
         "beschikbaarheid": "openstaand",
         "bevestig": "boek"
-      },
-      "telt": 3
-    },
-    {
-      "domein": "kern/bureau",
-      "heeft": {
-        "toon": true,
-        "prijs": false,
-        "beschikbaarheid": true,
-        "reserveer": false,
-        "bevestig": false,
-        "lever": false,
-        "annuleer": true,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "bureauOverzicht",
-        "beschikbaarheid": "caseOpen",
-        "annuleer": "caseIntrek"
       },
       "telt": 3
     },
@@ -2551,14 +2554,13 @@
       ]
     },
     {
-      "gelijkenis": 0.83,
+      "gelijkenis": 0.8,
       "a": "server/kern/command/register.js",
       "b": "server/kern/zaakcommand/register.js",
       "domeinA": "kern/command",
       "domeinB": "kern/zaakcommand",
       "gedeeld": [
         "collectie",
-        "domein",
         "meervoud",
         "sub",
         "zoek"

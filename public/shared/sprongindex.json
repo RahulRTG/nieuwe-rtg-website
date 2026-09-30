@@ -459,6 +459,23 @@
       ]
     },
     {
+      "naam": "RTG Veilig",
+      "wereld": "LivingOS",
+      "soort": "link",
+      "sleutel": "veilig",
+      "url": "/apps/veilig.html",
+      "woorden": [
+        "rust",
+        "omdat",
+        "juiste",
+        "mensen",
+        "weten",
+        "wanneer",
+        "nodig",
+        "zijn"
+      ]
+    },
+    {
       "naam": "Salon",
       "wereld": "LivingOS",
       "soort": "tab",
@@ -641,23 +658,6 @@
       "soort": "link",
       "sleutel": "post",
       "url": "/apps/mijn-post.html"
-    },
-    {
-      "naam": "RTG Veilig",
-      "wereld": "Instellingen",
-      "soort": "link",
-      "sleutel": "veilig",
-      "url": "/apps/veilig.html",
-      "woorden": [
-        "rust",
-        "omdat",
-        "juiste",
-        "mensen",
-        "weten",
-        "wanneer",
-        "nodig",
-        "zijn"
-      ]
     },
     {
       "naam": "Waar ben ik aanwezig",

@@ -27,7 +27,7 @@ uit dezelfde lijst (`BLOKKADES` in `scripts/leerhuisproef.js`).
 
 | blokkade | klasse | wat er ontbreekt | sluit met |
 |---|---|---|---|
-| `UI` | UX | Mijn leerhuis staat (`/apps/leerhuis.html`, alleen lezen, bereikbaar vanuit Mijn loopbaan); er is nog geen scherm voor trainer, manager en kennisbeheer | fase B-UI, de drie andere schermen (par. 6) |
+| `UI` | UX | Mijn leerhuis staat (`/apps/leerhuis.html`, alleen lezen, bereikbaar vanuit Mijn loopbaan), met het trainer- en teambeeld op codenaam (`kern/leerhuis/namen.js`). Het werkscherm staat ook (`/apps/leerhuis-werk.html`, leeskant in `kern/leerhuis/werk.js`): een trainer bevestigt toezicht en gereedheid, legt bewijs vast dat hij zag en vraagt een beoordeling aan (`leerhuis-werk-bewijs.js`; de vaardigheden en bewijssoorten komen uit de trainercockpit, en van een beoordeling ziet hij alleen OF hij loopt), een assessor begint en rondt een beoordeling af, een kenniseigenaar zet een concept ter review of activeert het, een manager wijst zijn team een rol toe en maakt het startplan, een curriculumeigenaar brengt een curriculum van concept naar actief (`leerhuis-werk-inrichten.js`, leeskant `curriculumWerk`; de overgangen komen uit de tabel in `standen.js`), de eigenaar legt relaties en bestuursrollen vast op codenaam met een reden (besluit B8, leeskant `eigenaarWerk`), en de curriculumeigenaar schrijft kennis (als concept, dat hij zelf ter review zet), vaardigheden, rollen en curricula (`leerhuis-werk-schrijven.js`; de keuzes komen uit `curriculumWerk`, de kwaliteitsautoriteit krijgt ze niet). de certificaatautoriteit geeft certificaten uit en schorst of trekt ze in, en de trainerautoriteit kwalificeert, bevestigt en wijst trainers toe (`leerhuis-werk-autoriteit.js`, leeskant `kern/leerhuis/werk-autoriteit.js`). De leerling zet op Mijn leerhuis zijn EIGEN stappen (`leerhuis-mijn.js`): beginnen, oefenen, een scenario spelen -- de stappen door elkaar en op alfabet, want welke vereist en welke verboden zijn zegt de motor pas na het spelen, en een mislukte poging laat geen bewijs achter -- en een beoordeling aanvragen. Beide schermen gaan door een deur (`leerhuis-deur.js`: sleutel, navragen bij onbekend, eerst laden en dan melden). De eigenaar trekt een rol in (met reden; `rolIntrekken` weigerde die eerst niet, en ook geen rol die iemand niet droeg) en meldt iemand uit dienst, pas na een vinkje dat zegt wat er vervalt. De kwaliteitsautoriteit behandelt een bezwaar, verklaart een beoordeling van een ander ongeldig (met reden) en stelt geschiktheidsbeleid voor dat een ander goedkeurt (`leerhuis-werk-kwaliteit.js`, leeskant `kwaliteitWerk`); het oordeel achter een bezwaar -- uitslag, criteria, herstelpad -- staat pas op de kaart als hij de review op zich nam, en de eigenaar ziet alleen het beleid. Daarmee hebben 27 van de 37 handelingen een scherm (geteld als: de naam van de handeling staat in een van de schermbestanden van het leerhuis; een eerdere telling van 21 was er een te veel) (`orgOpen` is met opzet van het kantoor). Nog zonder scherm: EVC, bezwaar indienen (de leerling), scenario's schrijven, bewijs intrekken, werk vastleggen, kennisvoorstellen en eenheden | fase B-UI: het bestuurswerk (par. 6) |
 | `DOMEINPOORT` | AUTHORITY | `POST /api/office/pay/factuurcorrectie` leest de geschiktheid mee, maar alleen in de schaduw (besluit B1): geschiktheid verandert nog nergens een recht | afdwingen als de schaduw rijp is en nul keer oneens staat; dat is een volgend besluit |
 | `IDENTITEIT` | TENANT_ISOLATION | een leerhuis met een bron (entiteit, zaak of RTF-stad) volgt die bron; maar RTG zelf heeft nog geen entiteit, dus juist het leerhuis van RTG Operations draait nog op een verklaring | RTG als entiteit in RTG Concern (de eigenaar) |
 
@@ -59,7 +59,7 @@ andere betekenis, dus niet aanraken en een eigen naam kiezen).
 | beoordeling | DEELS: `toetsbouw`, `toetsspiegel`, `schooladvies` (leerlingen) | NIEUW | |
 | certificering | ONTBREEKT (`onderwijs-ladder.js`: "wij claimen geen diploma's") | NIEUW | niet `vakbewijs`: dat is een EXTERN stuk dat RTG zag |
 | trainer / mentor / assessor | ONTBREEKT voor werk; `trainer` en `mentor` zijn bezet (sport, school) | NIEUW | eigen ladder in `standen.js` |
-| manager-, trainercockpit | ONTBREEKT | NIEUW (leeskant), scherm is fase B-UI | `leerhuis/zicht.js` |
+| manager-, trainercockpit | ONTBREEKT | NIEUW (leeskant); als leesdeel van Mijn leerhuis, op codenaam | `leerhuis/zicht.js`, `leerhuis/namen.js` |
 | workforce readiness | DEELS: `concern/readiness.js` meet een ENTITEIT | NIEUW voor mensen, dezelfde vorm | `leerhuis/gereedheid.js` |
 | impactanalyse | ONTBREEKT | NIEUW, als projectie | `leerhuis/graaf.js` |
 | audit / historie | BESTAAT | HERGEBRUIKEN | `lib/keten.js` |
@@ -169,6 +169,21 @@ vulling van het leerhuis werd een zevende besluit.
 | B5 | 18+? | **18+ voor een certificaat**: onder de 18 wel leren, oefenen, bewijs en beoordeling in de vorm van het leerdossier (niet vergelijkend, geen niveaulabel); geen certificaat en geen vakstaat als niveau | de ledendeur vraagt alleen een eigen account; `certificaatUitgeven` vraagt dat de ONTVANGER `volwassen()` haalt, en een sleutel buiten `lid:` telt als niet vast te stellen (fail closed). Wie jonger is, ziet zijn vaardigheden zonder niveaulabel (routetoets 5) | **staat** |
 | B6 | Wie opent een leerhuis? | **het kantoor op naam** (`kluisAuth`), voor elke soort organisatie | een Business-zaak vraagt RTG | **staat** |
 | B7 | Waarmee wordt het leerhuis gevuld? | **alles**: het RTG-eigen Operations-leerhuis (V1), een startpakket per soort organisatie (RTG, RTF-stad, Business, Supplier), en een demo-organisatie in de zaaiset | inhoud is officiele kennis en moet door een mens worden goedgekeurd: de bouwer zet CONCEPTEN klaar, een KNOWLEDGE_OWNER activeert. De mensen in de rollen (trainer, assessor, kenniseigenaar) wijst de eigenaar aan; die worden niet verzonnen. De demo in de zaaiset draagt zichtbaar dat hij demo is | **de startpakketten staan** (`kern/leerhuis/startpakket.js`, voor RTG, RTF, BUSINESS en SUPPLIER): acht concepten per pakket (drie kennisitems, twee vaardigheden, een rol, een curriculum, een oefening), geladen langs de gewone handelingen met een sleutel per stuk, alleen door een CURRICULUM_OWNER, en wat er al staat wordt overgeslagen. Een concept uit een pakket wordt pas officiele kennis als een KNOWLEDGE_OWNER die het niet zelf laadde, bij het activeren de EIGEN bron van de organisatie noemt (grenzen 21, routes 9). **Nog niet**: de mensen in het RTG-eigen leerhuis (wijst de eigenaar aan) en de demo in de zaaiset |
+
+**B8 (29 september 2026): een mens aanwijzen op codenaam.** Gevraagd als
+meerkeuze (codenaam, alleen wie al bekend is, uitnodiging, nog niet bouwen); de
+eigenaar koos het voorstel. De eigenaar van een leerhuis legt een relatie of een
+bestuursrol vast met `codenaam` (en voor de manager `managerCodenaam`) in plaats
+van een sleutel, plus een verplichte `reden`. `kern/leerhuis/aanwijzen.js` volgt
+de volgorde van `balieDossier` in `kern/ledenbalie-inzage.js`: alleen de
+EIGENAAR van dit leerhuis mag zoeken (anders is het een orakel voor wie een
+relatie heeft), zonder reden geen opzoeking, dan de gids (`keyVanCodenaam`),
+dan een regel via `noteerVast` MET het id van het lid -- zo staat hij op de
+inzagekaart van die persoon -- en pas als die regel vaststaat gaat de sleutel
+naar de handeling. Een codenaam die niet bestaat raakt geen lid en schrijft geen
+regel. Alleen `relatieZet` en `bestuurZet` lopen zo; de handeling beslist daarna
+alles, zoals bij een sleutel. Bewijs: grenzen 25 (drie mutaties gezakt), routes
+12, en het werkscherm in `test/leerhuis-werk.e2e.js` stap 4.
 
 ## 6. Bouwvolgorde
 

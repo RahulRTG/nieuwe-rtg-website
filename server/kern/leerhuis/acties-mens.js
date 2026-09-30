@@ -34,9 +34,14 @@ module.exports = {
     return [{ soort: 'rolToegewezen', data: { persoon: p, rol: i.rol } }];
   },
 
+  /* Net als bewijs of een certificaat intrekken: zonder reden bestaat het niet, en
+     een rol die iemand niet draagt valt niet in te trekken (dat was een lege regel
+     in het spoor die er uitzag als een besluit). */
   rolIntrekken(st, i, door) {
     eisBestuur(st, door, ['ACADEMY_OWNER'], 'een rol intrekken');
     const p = eisPersoon(i.persoon);
+    if (!(st.personen[p] && st.personen[p].rollen.includes(i.rol))) weiger(p + ' draagt rol ' + i.rol + ' niet', 409);
+    if (!String(i.reden || '').trim()) weiger('een rol intrekken zonder reden bestaat niet', 400);
     return [{ soort: 'rolIngetrokken', data: { persoon: p, rol: i.rol, reden: String(i.reden || '').slice(0, 300) } }];
   },
 

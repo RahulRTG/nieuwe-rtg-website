@@ -6,6 +6,8 @@
 module.exports = Object.freeze([
   'POST /api/foundation/gezin/profiel/verwijder',
   'POST /api/foundation/gezin/uitnodiging/intrek',
+  // gezinssessies afmelden of overal sluiten (foundation/gezinssessie.js)
+  'POST /api/foundation/gezin/sessie/intrek',
   'POST /api/foundation/gezin/locatie/stop',
   'POST /api/foundation/gezin/wissen',
   'POST /api/foundation/gezin/wissen/bevestig',
@@ -60,5 +62,9 @@ module.exports = Object.freeze([
   'POST /api/lab2/mens/weg',
   'POST /api/lab2/bewoner/klacht',
   'POST /api/lab2/publicatie/intrekken',
-  'POST /api/lab2/ethiek/stilleggen'
+  'POST /api/lab2/ethiek/stilleggen',
+  // een les beeindigen of een leerling/lescode intrekken (B17, foundation/onderwijs/lesbeheer.js)
+  'POST /api/foundation/les/code/intrekken',
+  'POST /api/foundation/les/leerling/intrekken',
+  'POST /api/foundation/les/sluit'
 ]);

@@ -253,9 +253,15 @@ test('4. na het afrekenen komt er geen prik meer bij, en de rit verhuist naar kl
   assert.equal(na.status, 409, 'een afgeronde rit neemt geen posities meer aan');
   assert.match(na.body.error, /al afgerekend/);
 
-  // en die weigering heeft ook echt niets verplaatst
+  /* en die weigering heeft ook echt niets teruggezet. Hier stond eerst dat de
+     laatst bekende plek die van TIJDENS de rit bleef (prikPositie). Dat was het
+     oude gedrag en is met opzet omgedraaid: sinds NAVIGATIE.md N16 wordt de
+     ritlijn bij afronden gewist (kern/mobiliteit/ritpunten.js), dus na
+     afrekenen is er geen laatste plek meer -- en de late prik mag er ook geen
+     nieuwe van maken. */
   const volg = await api('/api/mob/volg', { ref }, reiziger);
-  assert.deepEqual(volg.body.positie, prikPositie, 'de laatst bekende plek is die van tijdens de rit');
+  assert.equal(volg.body.positie, null, 'na afronden is de positie gewist (N16) en de late prik zette geen nieuwe');
+  assert.ok(prikPositie, 'tegenproef: tijdens de rit was er wel een positie');
 
   const bord = await api('/api/staff/mob/mijn', {}, taxiPda);
   assert.ok(bord.body.klaar.some(o => o.ref === ref), 'de rit staat bij het afgeronde werk');

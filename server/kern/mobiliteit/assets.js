@@ -21,6 +21,7 @@ const BIJNA_OP_DAGEN = 30;                  // zo lang van tevoren waarschuwen
 
 module.exports = (ctx) => {
   const { db, save, id, schoon, nu, modAan, opslag } = ctx;
+  const bst = require('./bestuurder')(ctx);
 
   function ensureAssets() {
     opslag.bak('mobAssets');
@@ -89,6 +90,8 @@ module.exports = (ctx) => {
     const cat = CATEGORIEEN[schoon(body.categorie, 20)];
     const bestaand = body.id ? assetMet(vervoerder, schoon(body.id, 40)) : null;
     if (body.id && !bestaand) return { status: 404, error: 'Voertuig niet gevonden.' };
+    const kies = bst.kies(vervoerder, body);
+    if (kies.error) return kies;
     if (!bestaand && !cat) return { status: 400, error: 'Kies een voertuigcategorie: ' + Object.keys(CATEGORIEEN).join(', ') };
     if (bestaand && body.weg) {
       opslag.zetBak('mobAssets', opslag.bak('mobAssets').filter(x => x.id !== bestaand.id));
@@ -106,7 +109,7 @@ module.exports = (ctx) => {
     if (Number.isFinite(body.energieNiveau)) a.energieNiveau = Math.max(0, Math.min(100, Math.round(body.energieNiveau)));
     if (body.onderhoud != null) a.onderhoud = schoon(body.onderhoud, 40);
     if (body.uitDienst != null) a.uitDienst = !!body.uitDienst;
-    if (body.bestuurder != null) a.bestuurder = schoon(body.bestuurder, 40) || null;
+    bst.zet(a, body, kies);
     if (Array.isArray(body.bemanning)) a.bemanning = body.bemanning.slice(0, 12).map(x => schoon(x, 40));
     if (Array.isArray(body.ritsoorten)) a.ritsoorten = body.ritsoorten.filter(r => RITSOORTEN.includes(r));
     if (Array.isArray(body.gebieden)) a.gebieden = body.gebieden.slice(0, 20).map(x => schoon(x, 40));
@@ -139,7 +142,7 @@ module.exports = (ctx) => {
       rolstoel: a.rolstoel != null ? !!a.rolstoel : !!cat.rolstoel,
       energie: a.energie || null, energieNiveau: Number.isFinite(a.energieNiveau) ? a.energieNiveau : null,
       onderhoud: a.onderhoud || 'in orde', uitDienst: !!a.uitDienst,
-      bestuurder: a.bestuurder || null, bemanning: a.bemanning || [], bemanningNodig: cat.bemanning || 0,
+      ...bst.beeld(a), bemanning: a.bemanning || [], bemanningNodig: cat.bemanning || 0,
       ritsoorten: a.ritsoorten || [], gebieden: a.gebieden || [], kenmerken: a.kenmerken || [],
       loc: a.loc || null, papieren: a.papieren || {}, verplichtePapieren: cat.papieren || [],
       inzetbaar: st.inzetbaar, redenen: st.redenen, bijnaOp: st.bijnaOp };
@@ -153,5 +156,6 @@ module.exports = (ctx) => {
       energie: ENERGIE, ritsoorten: RITSOORTEN };
   }
 
-  return { CATEGORIEEN, ensureAssets, assetsVan, assetMet, assetZet, assetLijst, assetBeeld, assetInzetbaar, assetGeschikt };
+  return { CATEGORIEEN, ensureAssets, assetsVan, assetMet, assetZet, assetLijst, assetBeeld, assetInzetbaar, assetGeschikt,
+    bestuurderAfwezig: bst.afwezig };
 };

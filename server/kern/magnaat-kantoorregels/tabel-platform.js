@@ -33,7 +33,7 @@ module.exports = [
      VOOR de brede regel voor /api/office hieronder, anders valt de helft bij
      Intern & IT. Het scherm Mijn leerhuis hoort in dezelfde kamer. Een eigen
      kamer "Academy" is er niet; die is een besluit. */
-  [/(?:^|\s)\/(?:api\/(?:office\/)?leerhuis|apps\/leerhuis\.html)(?:\/|\s|$)/, 'hr', 'HR'],
+  [/(?:^|\s)\/(?:api\/(?:office\/)?leerhuis|apps\/leerhuis(?:-werk)?\.html)(?:\/|\s|$)/, 'hr', 'HR'],
   /* DE TENANT CONTROL PLANE, van main overgenomen op 25 augustus 2026. Deze twee
      regels stonden alleen in main's kopie van deze tabel; bij de samenvoeging is
      onze kopie gehouden (identieke inhoud, betere vorm) en vielen ze weg. Zeven

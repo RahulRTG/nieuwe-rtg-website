@@ -28,7 +28,7 @@
 
 const { kan, DEUREN, FEITEN, UITKOMST, STAPOP_DEUREN } = require('./regels');
 const { maakFeiten } = require('./feiten');
-const { werkwoordVan, kamerVan, EXPORTEN } = require('./werkwoorden');
+const { werkwoordVan, kamerTelling, EXPORTEN } = require('./werkwoorden');
 
 const VELDEN = ['eens', 'oneens', 'onbekend', 'zonderPoort', 'eigenaarZonderStapop', 'gebruik'];
 const MAX_SLEUTELS = 2400;   // ~600 kantoorroutes maal hoogstens vier deuren
@@ -45,7 +45,7 @@ const VERKLAARD_OPEN = Object.freeze({
   'GET /api/office/doc': 'een paspoortscan in een <img>: het token komt als query binnen en moet op naam zijn (officeQueryOpNaam)'
 });
 
-function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eigenaar, boardroomWie, magBoardroom, boardroomBaas, balieBron, nu }) {
+function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eigenaar, boardroomWie, magBoardroom, boardroomBaas, balieBron, kamersVan, nu }) {
   const tijd = nu || Date.now;
   const eigen = require('../eigencollectie')({ db, domein: 'kern/beleidsmotor', bezit: { beleidsmotor: 'kaart', zetelGebruik: 'kaart', beleidsAfdwingen: 'kaart' } });
   const bak = () => eigen.bak('beleidsmotor');
@@ -83,14 +83,11 @@ function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eig
         if (door && feiten && feiten.eigenaarMens === true && STAPOP_DEUREN.includes(deur)) {
           spoeler.tikVeld('stapop ' + deur + ' ' + patroon(req), 'eigenaarZonderStapop');
         }
-        if (door && typeof boardroomWie === 'function') {
-          const key = boardroomWie(req);
-          if (key) slapend.noteer(key, ZETEL_VAN_DEUR[deur]);
-        }
+        const key = door && typeof boardroomWie === 'function' ? boardroomWie(req) : null;
+        if (key) slapend.noteer(key, ZETEL_VAN_DEUR[deur]);
         /* Fase 4: welk werkwoord en welke kamer, zonder wie (./werkwoorden.js). */
         if (door && deur === 'boardroom') spoeler.tikVeld('werkwoord ' + (werkwoordVan(req.routePatroon) || '(geen)'), 'gebruik');
-        const kamer = door && deur === 'kantoor' ? kamerVan(patroon(req), req.body) : null;
-        if (kamer) spoeler.tikVeld('kamer ' + kamer, 'gebruik');
+        if (door && deur === 'kantoor') for (const t of kamerTelling(patroon(req), req.body, kamersVan, key)) spoeler.tikVeld(t, 'gebruik');
       });
       /* Afgedwongen deur (./afdwingen.js): de motor weigert NAAST de poort, nooit in zijn plaats. */
       if (besluit && afdwingen.aan(deur) && besluit.uitkomst !== UITKOMST.TOESTAAN) return afdwingen.weiger(res, deur, besluit);

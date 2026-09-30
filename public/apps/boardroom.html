@@ -220,7 +220,7 @@ window.I18N = { en: {
   'rb.h':'RTG Account for businesses', 'rb.sub':'Two ways RTG opens on purpose: paying a Work OS expense from a member\'s own RTG account, and an account in the name of an entity from the company graph.',
   'rb.werk':'Work OS expense via a member account', 'rb.ent':'Accounts for entities', 'rb.open':'open', 'rb.dicht':'closed', 'rb.zetOpen':'Open', 'rb.zetDicht':'Close', 'rb.ok':'Switched.',
   'bm.h':'The office doors', 'bm.sub':'The policy engine runs alongside every office door. In the shadow it only counts; when enforced it refuses next to the gate, never instead of it.',
-  'bm.laden':'Loading doors…', 'bm.aan':'Enforce', 'bm.uit':'Back to the shadow', 'bm.schaduw':'shadow', 'bm.afdwingen':'enforced', 'bm.ok':'The door has been switched.',
+  'bm.laden':'Loading doors…', 'bm.aan':'Enforce', 'bm.uit':'Back to the shadow', 'bm.schaduw':'shadow', 'bm.afdwingen':'enforced', 'bm.ok':'The door has been switched.', 'bm.kamers':'Rooms: by who sits there', 'bm.keer':'times', 'bm.eigen':'own room', 'bm.vreemd':'other room', 'bm.zonder':'no assignment', 'bm.onbekend':'unknown',
   'ds.stand':'The shared key', 'ds.isdicht':'closed: only a box with its own key gets in', 'ds.isopen':'open (shadow): it still works',
   'ds.dicht':'Close the shared key', 'ds.open':'Open it again', 'ds.dichtOk':'The shared key is closed.', 'ds.openOk':'The shared key is open again.',
   'ds.eigen':'Boxes with their own key', 'ds.laatst':'last seen ', 'ds.keer':' times',
@@ -529,6 +529,16 @@ window.I18N = { en: {
         }
         rij(box, x.deur + ' · ' + (st === 'afdwingen' ? T('bm.afdwingen', 'afgedwongen') : T('bm.schaduw', 'schaduw')),
           x.eens + ' eens · ' + x.oneens + ' oneens · ' + x.waarom, k);
+      });
+      /* Stap twee (VRIJHEID.md par. 6a): per kamer DOOR WIE er zit, nooit wie.
+         Dit is het getal waarop een kamer ooit kan afdwingen. */
+      var gebruikt = (d.kamers || []).filter(function (x) { return x.gebruik > 0 && x.naarToewijzing; });
+      if (gebruikt.length) box.appendChild(el('h3', 'rtg-sub', T('bm.kamers', 'Kamers: door wie er zit')));
+      gebruikt.forEach(function (x) {
+        var t = x.naarToewijzing;
+        rij(box, x.kamer + ' · ' + x.gebruik + ' ' + T('bm.keer', 'keer'),
+          t.eigen + ' ' + T('bm.eigen', 'eigen kamer') + ' · ' + t.vreemd + ' ' + T('bm.vreemd', 'andere kamer') + ' · ' +
+          t.zonderToewijzing + ' ' + T('bm.zonder', 'zonder toewijzing') + (t.onbekend ? ' · ' + t.onbekend + ' ' + T('bm.onbekend', 'onbekend') : ''), null);
       });
     }).catch(function () { /* geen boardroom: de sectie blijft verborgen */ });
   }

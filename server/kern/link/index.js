@@ -30,7 +30,7 @@ const rem = require('./rem');
 const intenties = require('./intenties');
 
 module.exports = (opties) => {
-const { db, save, crypto, dyncodeGeef, pinNormaliseer, pinZoek, liveKijk,
+const { db, save, crypto, bewerkCollectie, dyncodeGeef, pinNormaliseer, pinZoek, liveKijk,
         rate, codenaamVan, bandStand, zaakVan, nu } = opties;
 const { duidt, TYPES } = require('./register')({ dyncodeGeef });
 const { bonSchrijf, bonnenVan, BON_MAX } = require('./bonnen')({ db, save, nu });
@@ -38,7 +38,7 @@ const { bonSchrijf, bonnenVan, BON_MAX } = require('./bonnen')({ db, save, nu })
    te wijzen. Het register van handelingen is leeg tot een domein er een aanmeldt
    (kern/pay/vraagcode.js is de eerste) -- deze laag kent er zelf geen. */
 const handelingen = require('./handelingen')();
-const cap = require('./cap')({ crypto, dyncodeGeef, codenaamVan, bonSchrijf, handelingen, rate, nu });
+const cap = require('./cap')({ db, crypto, bewerkCollectie, dyncodeGeef, codenaamVan, bonSchrijf, handelingen, rate, nu });
 
 /* "Mijn koppelingen": wat er van mij openstaat, wat er gebeurd is, en wat ik er
    nog aan kan doen. Hij leunt op de drie lagen hierboven en beslist zelf niets
@@ -123,7 +123,7 @@ return { linkLos: los, linkBon: bonSchrijf, linkBonnen: bonnenVan,
   /* Aanmelden doet het domein zelf, bij het opstarten (opzet/aanbouw2.js). */
   linkHandeling: handelingen.registreer, linkHandelingen: handelingen.alle,
   linkCapMaak: cap.capMaak, linkCapKijk: cap.capKijk,
-  linkCapAanvaard: cap.capAanvaard, linkCapTrek: cap.capTrek, linkCapOpen: cap.capOpen,
+  linkCapAanvaard: cap.capAanvaard, linkCapTrek: cap.capTrek,
   linkKoppelingen: koppelingen, linkWieId: cap.idVan,
   linkRemReset: rem.remReset, LINK_MIS_PER_MINUUT: rem.MIS_PER_MINUUT, LINK_BON_MAX: BON_MAX };
 };

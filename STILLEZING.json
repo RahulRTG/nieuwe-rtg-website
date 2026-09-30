@@ -3,16 +3,16 @@
  "uitleg": "Lezers van bewijs- en gezagsstate die een ONLEESBAAR bestand als een AFWEZIG bestand behandelen. Bewijs kent drie toestanden (bestaat+geldig, bestaat+ongeldig, bestaat niet) en een catch die op null valt, maakt van de tweede de derde -- en leeg betekent in dit huis bijna overal \"geen beperking\". De spiegel van STILSPOOR.json: die meet schrijvers wier falen wordt opgegeten, deze meet lezers die het onderscheid verliezen. Nooit optellen.",
  "grens": "Lexicaal, dus een ONDERGRENS: de werkelijke schuld is minstens dit. server/ en scripts/ worden nooit opgeteld -- daar staat een handeling tegenover een meting. `smeltSamen` mag alleen dalen, `bewijslezingen` alleen stijgen: een schuld die daalt doordat de meter blind wordt, is de gevaarlijkste vorm van vooruitgang.",
  "stempel": {
-  "op": "2026-09-30T04:42:02.034Z",
-  "commit": "165dd8c97",
+  "op": "2026-09-29T23:18:30.689Z",
+  "commit": "a4ae5e47b",
   "boomVuil": false,
-  "boomAnders": 7,
+  "boomAnders": 3,
   "instrument": "scripts/stillezing.js",
   "node": "v22.22.2"
  },
  "gemeten": {
   "server": {
-   "bewijslezingen": 83,
+   "bewijslezingen": 87,
    "metVanger": 9,
    "smeltSamen": 5,
    "zegtHet": 1,
@@ -21,10 +21,10 @@
    "anders": 1
   },
   "scripts": {
-   "bewijslezingen": 516,
-   "metVanger": 100,
+   "bewijslezingen": 539,
+   "metVanger": 101,
    "smeltSamen": 61,
-   "zegtHet": 11,
+   "zegtHet": 12,
    "onderscheidt": 6,
    "gooit": 2,
    "anders": 20
@@ -148,7 +148,7 @@
    },
    {
     "bestand": "scripts/bewijsladder.js",
-    "regel": 386,
+    "regel": 387,
     "leest": [
      "BEWIJSLADDER.json",
      "LADDER.json"
@@ -157,7 +157,7 @@
    },
    {
     "bestand": "scripts/bewijsmatrix.js",
-    "regel": 338,
+    "regel": 341,
     "leest": [
      "ROLPROEF.json"
     ],
@@ -165,7 +165,7 @@
    },
    {
     "bestand": "scripts/bewijsmatrix.js",
-    "regel": 352,
+    "regel": 355,
     "leest": [
      "HANDELINGPROEF.json"
     ],
@@ -173,7 +173,7 @@
    },
    {
     "bestand": "scripts/bewijsmatrix.js",
-    "regel": 425,
+    "regel": 428,
     "leest": [
      "POORTWACHT.json"
     ],
@@ -181,7 +181,7 @@
    },
    {
     "bestand": "scripts/bewijsmatrix.js",
-    "regel": 848,
+    "regel": 865,
     "leest": [
      "BEWIJSMATRIX.json"
     ],
@@ -197,7 +197,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 3060,
+    "regel": 3061,
     "leest": [
      "BELOFTE.json"
     ],
@@ -205,7 +205,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 3379,
+    "regel": 3380,
     "leest": [
      "SLO.json"
     ],
@@ -213,7 +213,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 4897,
+    "regel": 4899,
     "leest": [
      "MUTATIECONTRACT.json"
     ],
@@ -221,7 +221,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5386,
+    "regel": 5388,
     "leest": [
      "MUTATIECONTRACT.json"
     ],
@@ -229,7 +229,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5652,
+    "regel": 5654,
     "leest": [
      "TEKSTOPPERVLAK.json"
     ],
@@ -237,7 +237,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5828,
+    "regel": 5830,
     "leest": [
      "EERSTEMINUUT.json"
     ],
@@ -245,7 +245,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5840,
+    "regel": 5842,
     "leest": [
      "NORM.json"
     ],
@@ -253,7 +253,7 @@
    },
    {
     "bestand": "scripts/codecredentials.js",
-    "regel": 227,
+    "regel": 232,
     "leest": [
      "ROUTEBRON.json"
     ],
@@ -317,7 +317,7 @@
    },
    {
     "bestand": "scripts/edgekaart.js",
-    "regel": 757,
+    "regel": 764,
     "leest": [
      "EDGEKAART.json"
     ],
@@ -785,7 +785,7 @@
    },
    {
     "bestand": "scripts/rolronde.js",
-    "regel": 289,
+    "regel": 291,
     "leest": [
      "NORM.json"
     ],
@@ -894,6 +894,14 @@
      "MUTATIES.json"
     ],
     "soort": "smeltSamen"
+   },
+   {
+    "bestand": "scripts/vervalproef.js",
+    "regel": 130,
+    "leest": [
+     "POORTWACHT.json"
+    ],
+    "soort": "zegtHet"
    },
    {
     "bestand": "scripts/wachtwijze.js",

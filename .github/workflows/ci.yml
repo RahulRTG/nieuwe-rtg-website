@@ -671,19 +671,27 @@ jobs:
       - name: Playwright + Chromium uit de lockfile
         if: needs.preflight.outputs.e2e != '0'
         run: node scripts/browserinstall.js --meting=browsermeting/incremental.json
-      # DEZELFDE OMGEVING ALS DE SCHERVEN, want dezelfde toetsen draaien hier.
-      # Zonder libxml2 zakken de c14n-proeven op ENOENT, en de Rust-motor bouwt
-      # `preevidence:run` (net als pretest bij de scherven). REDIS_URL staat hier
-      # met opzet NIET: zonder DATABASE_URL laat de runner hem door naar de
-      # gewone toetsen, en dan weigert de tokencontrole elk token omdat de
-      # gedeelde intrekkingsleiding niet gekoppeld is -- de scherven zetten hem
-      # ook niet, de Redis-proeven starten hun eigen redis-server.
+      # DEZELFDE OMGEVING ALS DE SCHERF. Deze job draait een deelverzameling van
+      # dezelfde toetsbestanden als `toetsscherf`, dus hij hoort dezelfde
+      # voorbereiding te krijgen -- anders zakt een toets hier op de machine en
+      # niet op de code. Op 29 september 2026 zakten er zo elf tegelijk, de
+      # eerste keer dat de preflight deze weg koos na een merge: xmllint
+      # ontbrak (samlc14n), de Rust-binaries ontbraken (sentinel), en de hele
+      # ronde draaide met REDIS_URL terwijl de scherf dat niet doet
+      # (accounts, link, inhoudswacht, postgres-requestcommit). Een aanname
+      # over de omgeving is geen omgeving.
       - name: libxml2 en Redis voor de onafhankelijke protocolproeven
         run: sudo apt-get update -qq && sudo apt-get install -y -qq libxml2-utils redis-server
+      - name: De Rust-motor en de Sentinel bouwen
+        working-directory: motor
+        run: cargo build --release --locked
       - name: Alleen REPROVE en UNKNOWN opnieuw bewijzen
+        # De systeemgereedschappen en de Rust-motor staan in de twee stappen
+        # hierboven; `preevidence:run` bouwt de motor nog eens als vangnet.
         run: npm run evidence:run -- --plan=.evidence/plan.json
         env:
           RTG_E2E_STRICT: '1'
+          RTG_SNELLE_TOETS: '1'
 
   test-volledig:
     name: Volledige tests, checks en build

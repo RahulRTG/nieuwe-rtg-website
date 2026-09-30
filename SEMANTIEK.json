@@ -1,9 +1,9 @@
 {
-  "catalogi": 1189,
-  "verschillendeNamen": 722,
+  "catalogi": 1196,
+  "verschillendeNamen": 727,
   "namenInMeerDomeinen": 131,
   "woordenMetMeerBetekenissen": 113,
-  "betekenissenTotaal": 418,
+  "betekenissenTotaal": 420,
   "ergsteWoord": "SOORTEN",
   "ergsteAantal": 49,
   "dubbelingen": 34,
@@ -379,7 +379,7 @@
     },
     {
       "naam": "NIVEAUS",
-      "betekenissenVanDitWoord": 8,
+      "betekenissenVanDitWoord": 9,
       "waar": [
         "server/kern/rampbeeld/index.js",
         "server/kern/spellen/sudoku.js"
@@ -2102,8 +2102,8 @@
     },
     {
       "naam": "NIVEAUS",
-      "domeinen": 9,
-      "betekenissen": 8,
+      "domeinen": 10,
+      "betekenissen": 9,
       "hoogsteOverlap": 0.17,
       "soort": "gemengd",
       "waar": [
@@ -2140,6 +2140,18 @@
             "entiteit",
             "vestiging",
             "afdeling"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/democratie/partijen.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "europees",
+            "tweede-kamer",
+            "provincie",
+            "waterschap"
           ]
         },
         {
@@ -2801,11 +2813,12 @@
           "bestanden": [
             "server/kern/wereld/saloon/voorkeur.js"
           ],
-          "leden": 3,
+          "leden": 6,
           "voorbeeld": [
             "overzicht",
-            "agenda",
-            "bewaard"
+            "wereld",
+            "mijn",
+            "actie"
           ]
         },
         {
@@ -3058,7 +3071,7 @@
           "bestanden": [
             "server/kern/fiscaal/zekerheid.js"
           ],
-          "leden": 20,
+          "leden": 19,
           "voorbeeld": [
             "btw.aangifte",
             "btw.regel",
@@ -3156,6 +3169,73 @@
             "contrast",
             "beweging",
             "links"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "UITLEG",
+      "domeinen": 5,
+      "betekenissen": 5,
+      "hoogsteOverlap": 0,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/appstore/toegankelijk.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "in-orde",
+            "blokkeert",
+            "niet-vast-te-stellen"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/eten/kortingscode.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "onbekend",
+            "uit",
+            "onvolledig",
+            "verlopen"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/platformregister.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "gezakt",
+            "ongemeten",
+            "beproefd"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rtfos/deelnemerportaal.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "ontvangen",
+            "intake",
+            "toestemming",
+            "gekoppeld"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/routes/pay.js"
+          ],
+          "leden": 12,
+          "voorbeeld": [
+            "reden",
+            "opheffbaar",
+            "klasse",
+            "ruimte"
           ]
         }
       ]
@@ -3615,63 +3695,7 @@
           ]
         }
       ]
-    },
-    {
-      "naam": "HANDELINGEN",
-      "domeinen": 4,
-      "betekenissen": 4,
-      "hoogsteOverlap": 0,
-      "soort": "botsing",
-      "waar": [
-        {
-          "bestanden": [
-            "server/kern/horeca/rahul-register.js"
-          ],
-          "leden": 9,
-          "voorbeeld": [
-            "werklijst.samenvatten",
-            "gang.voorstellen",
-            "mise.adviseren",
-            "allergie.aanpassen"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/ogen.js"
-          ],
-          "leden": 5,
-          "voorbeeld": [
-            "naheffing.vaststellen",
-            "naheffing.bezwaar",
-            "naheffing.dwangbevel",
-            "kwijtschelding.besluit"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/persoonseis-lijst.js"
-          ],
-          "leden": 3,
-          "voorbeeld": [
-            "voorschrijven",
-            "verwijzen",
-            "uitreiken"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/stadsweefsel/ainiveau.js"
-          ],
-          "leden": 16,
-          "voorbeeld": [
-            "melding-samenvoegen",
-            "werkorder-uit-zaak",
-            "bericht-sturen",
-            "meting-vragen"
-          ]
-        }
-      ]
     }
   ],
-  "bestanden": 3898
+  "bestanden": 3977
 }

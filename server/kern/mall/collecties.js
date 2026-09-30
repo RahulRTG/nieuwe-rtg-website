@@ -54,8 +54,11 @@ module.exports = (ctx) => {
   const { db, save, crypto } = ctx;
   const vandaagVan = () => new Date().toISOString().slice(0, 10);
 
-  function bak() {
-    if (!Array.isArray(db.data.mallCollecties)) db.data.mallCollecties = [];
+  function bak(schrijf = false) {
+    if (!Array.isArray(db.data.mallCollecties)) {
+      if (!schrijf) return [];
+      db.data.mallCollecties = [];
+    }
     return db.data.mallCollecties;
   }
 
@@ -147,7 +150,7 @@ module.exports = (ctx) => {
 
   const api = { collecties, toon, vanZaak, SOORTEN, MAX_REGELS };
   // samenstellen en verwijderen staan in ./collecties-beheer.js
-  Object.assign(api, require('./collecties-beheer')(ctx, { bak, toon, SOORTEN, MAX_REGELS, MAX_PER_ZAAK, isDatum, schoonTekst }));
+  Object.assign(api, require('./collecties-beheer')(ctx, { bak: () => bak(true), toon, SOORTEN, MAX_REGELS, MAX_PER_ZAAK, isDatum, schoonTekst }));
   ctx.collecties = api;
   return { mallCollecties: api };
 };

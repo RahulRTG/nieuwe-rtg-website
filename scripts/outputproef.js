@@ -453,7 +453,31 @@ function gerichteRonde(aantal) {
   return gericht;
 }
 
-module.exports = { meet, oordeel, koppeling, gevoeligheid, infrastructuur, eerderGemeten, metGeheugen, onwaarneembareRoutes,
+/* EEN DUN JOURNAAL IS GEEN KLEINERE UITSLAG. Het journaal schrijft alleen wat
+   de toetsen die DEZE keer draaiden raakten. Op 29 september 2026 draaide de
+   meetronde deze proef op een .routejournaal van een handvol losse toetsen, en
+   schreef OUTPUTPROEF.json van ruim 5000 routes terug naar 420 -- het register
+   zag er daarna gewoon uit als een meting. Dat is dezelfde val als die in de kop
+   van scripts/meetronde.js voor de rolproef: een register dat stil krimpt.
+   Minder dan de helft van de vorige ronde wordt daarom geweigerd, tenzij
+   iemand met --kleiner zegt dat dat de bedoeling is. */
+function teDun(nieuw, oud) {
+  const n = Number(nieuw && nieuw.routes) || 0;
+  const o = Number(oud && oud.routes) || 0;
+  if (!o || n * 2 >= o) return null;
+  return 'het journaal raakt ' + n + ' routes, de vorige ronde ' + o + '. Dat is een journaal van een ' +
+    'deel van de suite en geen meting; draai de hele suite met RTG_ROUTELOG, of geef --kleiner mee ' +
+    'als deze krimp de bedoeling is.';
+}
+/* Geen register is geen vorige ronde; een KAPOT register is iets anders en mag
+   hier niet als "geen vorige ronde" doorgaan, want dan vergelijkt de grendel
+   met niets en laat hij elk dun journaal door. Dat gooit dus gewoon. */
+function vorigeRonde() {
+  if (!fs.existsSync(UITSLAG)) return null;
+  return JSON.parse(fs.readFileSync(UITSLAG, 'utf8'));
+}
+
+module.exports = { teDun, meet, oordeel, koppeling, gevoeligheid, infrastructuur, eerderGemeten, metGeheugen, onwaarneembareRoutes,
   gerichteRonde, kiesKandidaten, meetEen, basislijnVan };
 
 if (require.main !== module) return;
@@ -463,6 +487,8 @@ if (MEET) {
   const gericht = gerichteRonde(MEET);
   if (!gericht) { process.exitCode = 2; return; }
   const na = meet(gericht);
+  const dun = !argv.includes('--kleiner') && !na.fout && teDun(na, vorigeRonde());
+  if (dun) { console.error('\n  ' + dun + '\n'); process.exitCode = 2; return; }
   if (!na.fout) fs.writeFileSync(UITSLAG, JSON.stringify(metGeheugen(na, gericht), null, 1) + '\n');
   console.log('  weggeschreven in OUTPUTPROEF.json\n');
   process.exitCode = 0;
@@ -472,6 +498,8 @@ if (MEET) {
 const uit = meet();
 if (uit.fout) { console.error('\n  ' + uit.fout + '\n'); process.exitCode = 2; return; }
 if (argv.includes('--json')) { console.log(JSON.stringify(uit, null, 1)); process.exitCode = 0; return; }
+const dun = !argv.includes('--kleiner') && teDun(uit, vorigeRonde());
+if (dun) { console.error('\n  ' + dun + '\n'); process.exitCode = 2; return; }
 
 fs.writeFileSync(UITSLAG, JSON.stringify(metGeheugen(uit), null, 1) + '\n');
 console.log('\n=== DE OUTPUT-PROEF ===\n');

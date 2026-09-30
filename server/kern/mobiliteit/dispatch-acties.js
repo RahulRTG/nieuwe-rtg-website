@@ -64,7 +64,11 @@ module.exports = (ctx) => {
     save();
     logActivity(vervoerder, actor, 'wees ' + o.ref + ' toe aan ' + (a.naam || a.id));
     sseToOffice('sync', { scope: 'mobiliteit' });
-    return { ok: true, opdracht: opdrachtBeeld(opdrachtMet(o.ref), true), gekozen: uitleg, automatisch: !body.assetId };
+    /* Met de hand toegewezen aan een voertuig waarvan de bestuurder afwezig
+       staat: dat mag (een mens beslist), maar hij krijgt het te horen. */
+    const waarschuw = ctx.bestuurderAfwezig && ctx.bestuurderAfwezig(a)
+      ? { afwezigWaarschuwing: (a.bestuurder || 'De bestuurder') + ' staat vandaag als afwezig gemeld. De rit is toegewezen; wijs hem anders toe als dat nodig is.' } : {};
+    return { ok: true, opdracht: opdrachtBeeld(opdrachtMet(o.ref), true), gekozen: uitleg, automatisch: !body.assetId, ...waarschuw };
   }
 
   /* Overboeken naar een partnervervoerder. De opdracht blijft dezelfde

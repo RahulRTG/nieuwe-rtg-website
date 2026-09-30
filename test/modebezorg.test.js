@@ -42,7 +42,9 @@ test('2. een lid laat bezorgen en krijgt een bezorgcode; onder de drempel kost h
   const r = await api(base, '/api/mode/bezorg/aanvraag', { supplierCode: 'MAISON', adres: ADRES,
     items: [{ naam: 'Linnen jurk', maat: 'M', kleur: 'ecru', prijs: 80, aantal: 1 }] }, lid);
   assert.equal(r.status, 200);
-  assert.match(String(r.body.bezorging.bezorgcode), /^\d{4}$/, 'een 4-cijferige bezorgcode');
+  assert.equal(r.body.bezorging.bezorgcode, undefined, 'de aanvraag zelf draagt geen code');
+  const c = await api(base, '/api/mode/bezorg/code', { ref: r.body.bezorging.ref }, lid);
+  assert.match(String(c.body.bezorgcode), /^\d{4}$/, 'een 4-cijferige bezorgcode, eenmalig getoond');
   assert.equal(r.body.bezorging.kosten, 6.5, 'bezorgkosten onder de gratis-drempel');
   assert.equal(r.body.bezorging.status, 'aangevraagd');
 });
@@ -76,9 +78,15 @@ test('5. de koerier krijgt de kortste route en neemt een bezorging aan', async (
 test('6. veilig afronden: verkeerde bezorgcode faalt, juiste code levert af', async () => {
   const mijn = await api(base, '/api/mode/bezorg/mijn', {}, lid);
   const b = mijn.body.bezorgingen.find(x => x.status === 'onderweg') || mijn.body.bezorgingen[0];
-  const fout = await api(base, '/api/supplier/mode/bezorg/overhandig', { ref: b.ref, bezorgcode: '0000' }, winkel);
+  assert.equal(b.bezorgcode, undefined, 'het overzicht draagt de code niet: hij staat alleen in het antwoord op een uitgifte');
+  const c = await api(base, '/api/mode/bezorg/code', { ref: b.ref }, lid);
+  assert.equal(c.status, 200);
+  assert.match(c.body.bezorgcode, /^\d{4}$/);
+  const mis = String((Number(c.body.bezorgcode) + 1) % 10000).padStart(4, '0');
+  const fout = await api(base, '/api/supplier/mode/bezorg/overhandig', { ref: b.ref, bezorgcode: mis }, winkel);
   assert.equal(fout.status, 403, 'verkeerde bezorgcode wordt geweigerd');
-  const goed = await api(base, '/api/supplier/mode/bezorg/overhandig', { ref: b.ref, bezorgcode: b.bezorgcode, foto: PNG }, winkel);
+  assert.equal(fout.body.resterend, 4, 'en de fout telt');
+  const goed = await api(base, '/api/supplier/mode/bezorg/overhandig', { ref: b.ref, bezorgcode: c.body.bezorgcode, foto: PNG }, winkel);
   assert.equal(goed.status, 200);
   assert.equal(goed.body.status, 'afgeleverd');
 });

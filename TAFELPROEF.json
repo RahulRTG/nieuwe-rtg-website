@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-25T08:52:01.306Z",
-    "commit": "81cbca1c",
+    "op": "2026-09-29T20:19:55.319Z",
+    "commit": "b1c53b23c",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/tafelproef.js",
@@ -19,7 +19,7 @@
       "status": 200,
       "ziet": "de gast leest tafel PROEF-1 bij Sal de Mar",
       "fout": null,
-      "ms": 18
+      "ms": 23
     },
     {
       "nr": 2,
@@ -30,7 +30,7 @@
       "status": 200,
       "ziet": "1 stoel(en), stoel 1 zonder eigen sessie: true",
       "fout": null,
-      "ms": 10
+      "ms": 17
     },
     {
       "nr": 3,
@@ -39,9 +39,9 @@
       "wat": "schuift aan via de QR en komt op dezelfde rekening",
       "stand": "gesloten",
       "status": 200,
-      "ziet": "gast op rekening eb4b4d36da (zaak opende eb4b4d36da), 2 stoelen",
+      "ziet": "gast op rekening 762c5b60e4 (zaak opende 762c5b60e4), 2 stoelen",
       "fout": null,
-      "ms": 15
+      "ms": 20
     },
     {
       "nr": 4,
@@ -52,7 +52,7 @@
       "status": 200,
       "ziet": "2 regel(s) op de bon van de zaak",
       "fout": null,
-      "ms": 15
+      "ms": 17
     },
     {
       "nr": 5,
@@ -63,7 +63,7 @@
       "status": 200,
       "ziet": "keukenbord 0 -> 2 bon(nen)",
       "fout": null,
-      "ms": 15
+      "ms": 14
     },
     {
       "nr": 6,
@@ -74,7 +74,7 @@
       "status": 200,
       "ziet": "bon draagt gastNr 2 (Gast)",
       "fout": null,
-      "ms": 1
+      "ms": 0
     },
     {
       "nr": 7,
@@ -85,7 +85,7 @@
       "status": 200,
       "ziet": "1 van 2 uitgegeven",
       "fout": null,
-      "ms": 9
+      "ms": 15
     },
     {
       "nr": 8,
@@ -107,7 +107,7 @@
       "status": 200,
       "ziet": "de gast leest \"Verkeerd bereid: koud geserveerd\" bij Gazpacho de sandia",
       "fout": null,
-      "ms": 13
+      "ms": 12
     },
     {
       "nr": 10,
@@ -118,7 +118,7 @@
       "status": 200,
       "ziet": "bruto 3200 -> 1600 (correctie 1600), regel staat er nog: true",
       "fout": null,
-      "ms": 4
+      "ms": 5
     },
     {
       "nr": 11,
@@ -129,7 +129,7 @@
       "status": 200,
       "ziet": "zaak: openstaand 0, gesloten true | gast: 401 sessie-weg -- \"Deze tafelsessie is niet meer geldig. Scan de QR op tafel opnieuw.\"",
       "fout": null,
-      "ms": 11
+      "ms": 12
     }
   ],
   "storingen": [
@@ -179,10 +179,10 @@
       "naam": "een tweede rekening op dezelfde tafel",
       "belofte": "weigert en wijst naar de bestaande",
       "stand": "gehouden",
-      "wat": "status 409, wijst naar 6e3e96b3e5"
+      "wat": "status 409, wijst naar 37ae3ce47a"
     }
   ],
-  "rekening": "eb4b4d36da",
+  "rekening": "762c5b60e4",
   "telling": {
     "schakels": 11,
     "gesloten": 11,

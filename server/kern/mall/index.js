@@ -59,7 +59,7 @@ const GENRE_PAGINA = {
   taxi: '/apps/ov.html', verhuur: '/apps/mall.html', tweewielers: '/apps/mall.html'
 };
 
-function maakMall({ db, save, crypto, isRetail, anthropic, haalThuis, haalLandVind, haalVakwerk, haalFoodcourt, haalZaakFunctie, haalGroothandel }) {
+function maakMall({ db, save, bijeen, inBundel, crypto, isRetail, anthropic, haalThuis, haalLandVind, haalVakwerk, haalFoodcourt, haalZaakFunctie, haalGroothandel }) {
   const nu = () => new Date().toISOString();
   const va = (sku, kleuren, maten, v) => {
     const out = [];
@@ -75,7 +75,7 @@ function maakMall({ db, save, crypto, isRetail, anthropic, haalThuis, haalLandVi
 
   // de gedeelde ctx voor de deelbestanden
   const ctx = {
-    db, save, crypto, isRetail, anthropic, haalThuis, haalLandVind, haalVakwerk, haalFoodcourt, haalZaakFunctie, haalGroothandel,
+    db, save, bijeen, inBundel, crypto, isRetail, anthropic, haalThuis, haalLandVind, haalVakwerk, haalFoodcourt, haalZaakFunctie, haalGroothandel,
     nu, va, isBoer, farmTeKoop, verborgen, winkelCatalogus,
     ETAGES, ETAGE_IDS, GIDS_GENRES, GENRE_PAGINA
   };

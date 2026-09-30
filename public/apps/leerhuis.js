@@ -5,9 +5,10 @@
    Een scherm dat zelf gaat rekenen, zegt na de eerste kennisverandering iets
    anders dan het leerhuis, en dan gelooft een lid het scherm.
 
-   HIJ LEEST ALLEEN. Leren, bewijs en beoordeling lopen via de trainer en de
-   assessor; een knop hier die zegt "ik kan dit" zou precies de eigen verklaring
-   zijn die het leerhuis niet als bewijs telt.
+   HIJ ZET ALLEEN DE EIGEN STAPPEN (leerhuis-mijn.js): beginnen, oefenen, een
+   scenario spelen, een beoordeling aanvragen. Bewijs en oordeel lopen via de
+   trainer en de assessor; een knop hier die zegt "ik kan dit" zou precies de
+   eigen verklaring zijn die het leerhuis niet als bewijs telt.
 
    HIJ TOONT GEEN CIJFER OP EEN MENS. Wat bewezen is, door wie en of het vers
    is -- en niets dat optelt tot een score.
@@ -54,6 +55,14 @@
 
   var TOKEN = null;
   try { TOKEN = localStorage.getItem('rtg_member_token'); } catch (e) {}
+  var ORG = '', IK = '';
+  function knop(tekst, stil, fn) {
+    var b = maak('button', 'knop' + (stil ? ' stil' : ''), tekst);
+    b.type = 'button'; b.addEventListener('click', fn); return b;
+  }
+  /* De deur (sleutel, navragen, eerst laden dan melden) is gedeeld met het werkscherm. */
+  var D = window.RTGLeerhuisDeur({ meld: meld, laad: function () { return laad(ORG); }, org: function () { return ORG; }, voorvoegsel: 'leerhuismijn' });
+  var M = window.RTGLeerhuisMijn({ maak: maak, knop: knop, doe: D.doe, ik: function () { return IK; } });
 
   function lees(org, vraag) {
     return fetch('/api/leerhuis/lees', {
@@ -72,12 +81,17 @@
     zet('vandaag', (m.VANDAAG || []).map(function (x) {
       return kaart(x.titel || x.wat, x.stand, [x.waarom, x.volgende ? 'Volgende stap: ' + x.volgende : null]);
     }), 'Er staat vandaag niets voor u klaar.');
+    IK = m.IK || '';
     zet('pad', (m.PAD || []).map(function (x) {
-      return kaart(x.titel || x.curriculum, x.stand, [x.volgende ? 'Volgende stap: ' + x.volgende : null,
-        x.trainer ? 'Uw trainer: ' + x.trainer : 'Nog geen trainer toegewezen.']);
+      var k = kaart(x.titel || x.curriculum, x.stand, [x.volgende ? 'Volgende stap: ' + x.volgende : null,
+        x.trainer ? 'U heeft een trainer voor dit leerpad.' : 'Nog geen trainer toegewezen.']);
+      M.pad(k, x);
+      return k;
     }), 'U volgt hier nog geen curriculum.');
     zet('oefenen', (m.OEFENEN || []).map(function (x) {
-      return kaart(x.scenario, null, [x.domein ? 'Onderwerp: ' + x.domein : null, x.wat]);
+      var k = kaart(x.scenario, null, [x.domein ? 'Onderwerp: ' + x.domein : null, x.wat]);
+      M.oefenen(k, x);
+      return k;
     }), 'Er zijn nu geen oefeningen die bij uw leerpaden horen.');
     var v = m.VAARDIGHEDEN || {};
     var kan = (v.vaardigheden || []).map(function (x) {
@@ -90,15 +104,45 @@
     zet('kan', kan, 'Er is nog niets op uw naam vastgesteld.');
   }
 
+  /* De twee cockpits verschijnen alleen voor wie ze betreffen: een lid dat geen
+     trainer is en geen team heeft, ziet geen leeg vak met "u bent geen trainer". */
+  var wie = function (x) { return x.naam || 'een lid zonder codenaam'; };
+  function cockpits(org) {
+    lees(org, 'trainerCockpit').then(function (t) {
+      var aan = !!(t && t.ok);
+      $('trainerBlok').hidden = !aan;
+      if (!aan) return;
+      zet('trainer', (t.LEERLINGEN || []).map(function (x) {
+        return kaart(wie(x), x.stand, ['Leerpad ' + x.curriculum, x.volgende ? 'Volgende stap: ' + x.volgende : null]);
+      }), 'Er volgt nog niemand een leerpad bij u.');
+      $('trainerNiet').textContent = t.nietZichtbaar ? 'Niet zichtbaar: ' + t.nietZichtbaar + '.' : '';
+    }).catch(function () { $('trainerBlok').hidden = true; });
+    lees(org, 'managerCockpit').then(function (m) {
+      var team = (m && m.TEAM) || [];
+      $('teamBlok').hidden = !team.length;
+      if (!team.length) return;
+      zet('team', team.map(function (x) {
+        var regels = (x.gereed || []).map(function (g) {
+          return 'Rol ' + g.rol + ': ' + (g.klaar ? 'gereed' : 'nog niet gereed' + (g.ontbreekt && g.ontbreekt.length ? ', ontbreekt ' + g.ontbreekt.join(', ') : '')) + (g.verloopt && g.verloopt.length ? '; let op: ' + g.verloopt.join(', ') : '');
+        });
+        return kaart(wie(x), null, regels.length ? regels : ['Nog geen rol toegewezen.']);
+      }), '');
+      $('teamNiet').textContent = m.nietZichtbaar ? 'Niet zichtbaar: ' + m.nietZichtbaar + '.' : '';
+    }).catch(function () { $('teamBlok').hidden = true; });
+  }
+
   function laad(org) {
-    if (!org) return;
+    if (!org) return Promise.resolve();
+    ORG = org;
     try { localStorage.setItem(BEWAAR, org); } catch (e) {}
-    meld('Leerhuis ' + org + ' wordt geladen.');
-    lees(org, 'mijn').then(function (m) {
+    if (!/^Bezig/.test($('melding').textContent)) meld('Leerhuis ' + org + ' wordt geladen.');
+    return lees(org, 'mijn').then(function (m) {
       toon(m || {});
       meld('Leerhuis ' + org + '.');
+      cockpits(org);
     }).catch(function (e) {
       ['vandaag', 'pad', 'oefenen', 'kan'].forEach(function (id) { zet(id, [], 'Niet te tonen: ' + e.message); });
+      $('trainerBlok').hidden = true; $('teamBlok').hidden = true;
       meld(e.message);
     });
   }

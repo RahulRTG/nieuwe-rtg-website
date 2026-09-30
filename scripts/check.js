@@ -953,6 +953,7 @@ console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoor
        gestolen code dichtzetten mag geen drempel hebben. */
     ['/api/order/afhaalcode', 'de afhaal-QR van een bestelling die al langs de poort ging; de zaak krijgt hier niets nieuws'],
     ['/api/order/afhaalcode/intrek', 'een eigen afhaalcode intrekken; beveiliging hoort geen drempel te hebben'],
+    ['/api/mode/bezorg/code', 'een nieuwe bezorgcode voor een eigen bezorging die al langs de poort ging; de winkel krijgt niets nieuws'],
     ['/api/ticket/toon', 'de entreecode van een eigen ticket dat al langs de poort ging; de zaak krijgt niets nieuws'],
     ['/api/mob/kaart/toon', 'idem: de code van een eigen vervoerbewijs'],
     /* De winkel van de RTFoundation. Deze route KWAM eerst door de poort met
@@ -3424,6 +3425,7 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['server/kern/fonds.js', 'fondsallocatie: een bevestigde verdeling mag niet na een herstart verdwijnen'],
     ['server/kern/factuurcorrectie.js', 'geld terug naar een lid: de terugboeking en de correctieregel horen als een duurzame commit op schijf, net als de heenweg in kern/factuursaldo.js -- een lid dat "terugbetaald" leest terwijl de opslag het nog niet heeft, is precies de halve uitkomst waar de factuurproef voor is gebouwd'],
     ['server/kern/experience/index.js', 'menselijke bevestiging: acknowledgement en action evidence worden vóór succes duurzaam vastgelegd'],
+    ['server/kern/mall/aanvragen.js', 'aanvraag, keuze en antwoord zijn werk van een lid en zaak: geen bevestiging vóór opslag; rollback bij fout'],
     ['server/kern/notities.js', 'werk van een lid: een bevestigde notitie mag niet verdwijnen bij een opslagfout'],
     ['server/kern/vrijheid/huis.js', 'een besluit over iemands vrije tijd (verzoek, goedkeuring, verjaardag) heet pas gelukt als de opslag het bevestigt (VRIJHEID.md)'],
     ['server/kern/vertegenwoordiging/index.js', 'een machtiging is de bevoegdheid van een mens over het leven van een ander: aanvaarden, intrekken en de eigen grens mogen nooit bevestigd zijn zonder dat de opslag het heeft'],

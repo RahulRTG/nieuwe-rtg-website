@@ -92,8 +92,23 @@ module.exports = (ctx) => {
     const note = schoon(patch.update, 300);
     if (note) m.updates.unshift({ tekst: note, at: nu(), door: actor || 'gemeente' });
     m.updates = (m.updates || []).slice(0, 40);
+    /* AFGEHANDELD IS LOS VAN DE MELDER (NAVIGATIE.md N21). De plek blijft bij de
+       melding -- het is de plek van het PROBLEEM, en de gemeente heeft haar nodig
+       om te zien waar het weer misgaat. Maar een punt met de codenaam van wie
+       het meldde is ook: waar was dit lid, en wanneer. Na afhandeling heeft de
+       behandeling de melder niet meer nodig, dus gaan codenaam en sleutel eraf.
+       Hij krijgt de uitkomst eerst nog als bericht, want na deze regel staat de
+       melding niet meer in zijn eigen overzicht. */
+    if (['opgelost', 'afgewezen'].includes(m.status) && (m.melderKey || m.melder)) {
+      if (m.melderKey && notify) {
+        try { notify(m.melderKey, { icon: '\u{1F6A7}', title: 'Uw melding ' + m.ref + ': ' + m.status,
+          body: 'De gemeente heeft uw melding afgehandeld. Uw naam staat er niet meer bij.' }); }
+        catch (e) { console.error('[gemeente] melder berichten', e && e.message); }
+      }
+      delete m.melderKey; delete m.melder;
+      m.melderLos = nu();
+    }
     save();
-    if (m.melderKey && notify) { /* de melder ziet de status in de app; push blijft licht */ }
     const g = deGemeente(); if (g && sseToSupplier) sseToSupplier(g.code, 'sync', { scope: 'gemeente' });
     return { ok: true, melding: publiekeMelding(m) };
   }

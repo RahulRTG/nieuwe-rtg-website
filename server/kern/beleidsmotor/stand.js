@@ -67,7 +67,10 @@ module.exports = function stand({ beeld, dagen, sinds, oneens, verklaardOpen }) 
       uitleg: WERKWOORDEN[w].uitleg, gebruik: gebruik['werkwoord ' + w] || 0 })),
     zonderWerkwoord: gebruik['werkwoord (geen)'] || 0,
     kamers: Object.keys(KAMERSOORT).map(k => ({ kamer: k, soort: KAMERSOORT[k],
-      kanBevoegdheidDragen: KAMERSOORT[k] === 'bestuurlijk', gebruik: gebruik['kamer ' + k] || 0 })),
+      kanBevoegdheidDragen: KAMERSOORT[k] === 'bestuurlijk', gebruik: gebruik['kamer ' + k] || 0,
+      /* stap twee: door wie er zit, niet door wie (werkwoorden.js, kamerTelling) */
+      naarToewijzing: Object.fromEntries(['eigen', 'vreemd', 'zonderToewijzing', 'onbekend']
+        .map(s => [s, gebruik['kamer ' + k + ' ' + s] || 0])) })),
     /* FASE 6: lezen is niet exporteren. Hoe vaak een bestand het huis verliet. */
     exporten: Object.keys(EXPORTEN).map(r => Object.assign({ route: r }, EXPORTEN[r], { geleverd: gebruik['export ' + r] || 0 }))
   };

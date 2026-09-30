@@ -19,13 +19,15 @@ function leesPlan(pad) {
   return plan;
 }
 
-function selectie(plan) {
+function selectie(plan, soort) {
   const volledig = plan.mode === 'full';
   const gekozen = volledig ? plan.toetsen : plan.toetsen.filter((t) => t.status !== 'REUSED');
+  const unit = gekozen.filter((t) => t.toets.endsWith('.test.js')).map((t) => path.basename(t.toets));
+  const e2e = gekozen.filter((t) => t.toets.endsWith('.e2e.js')).map((t) => path.basename(t.toets));
   return {
     volledig,
-    unit: gekozen.filter((t) => t.toets.endsWith('.test.js')).map((t) => path.basename(t.toets)),
-    e2e: gekozen.filter((t) => t.toets.endsWith('.e2e.js')).map((t) => path.basename(t.toets)),
+    unit: soort === 'e2e' ? [] : unit,
+    e2e: soort === 'unit' ? [] : e2e,
     reused: plan.toetsen.filter((t) => t.status === 'REUSED').length
   };
 }
@@ -40,7 +42,7 @@ function draai(script, args, env) {
 
 function voerUit(plan, opties) {
   const o = opties || {};
-  const s = selectie(plan);
+  const s = selectie(plan, o.soort);
   if (o.droog) return { ...s, code: 0 };
   let code = 0;
   if (s.unit.length) {
@@ -64,6 +66,28 @@ function tijdlijn(plan, resultaat) {
   ];
 }
 
+function schrijfSamenvatting(plan, resultaat) {
+  const pad = process.env.GITHUB_STEP_SUMMARY;
+  if (!pad) return;
+  const besluit = plan.besluit || { code: plan.mode, reden: 'geen nadere reden vastgelegd' };
+  const regels = [
+    '## Bewijsroute',
+    '',
+    '| Veld | Uitkomst |',
+    '|---|---|',
+    '| Modus | `' + plan.mode + '` |',
+    '| Risicobaan | `' + (plan.baan || 'onbekend') + '` |',
+    '| Besluit | `' + besluit.code + '` |',
+    '| Reden | ' + besluit.reden.replace(/\|/g, '\\|') + ' |',
+    '| Hergebruikt | ' + plan.telling.REUSED + ' |',
+    '| Opnieuw bewijzen | ' + plan.telling.REPROVE + ' |',
+    '| Onbekend | ' + plan.telling.UNKNOWN + ' |',
+    '| Geselecteerd | ' + resultaat.unit.length + ' unit · ' + resultaat.e2e.length + ' browser |',
+    ''
+  ];
+  fs.appendFileSync(pad, regels.join('\n') + '\n');
+}
+
 if (require.main === module) {
   const args = process.argv.slice(2);
   const opdracht = args[0] || 'run';
@@ -77,9 +101,11 @@ if (require.main === module) {
         fs.appendFileSync(process.env.GITHUB_OUTPUT,
           'mode=' + serial.mode + '\nreused=' + serial.telling.REUSED +
           '\nreprove=' + serial.telling.REPROVE + '\nunknown=' + serial.telling.UNKNOWN +
-          '\nunit=' + gekozen.unit.length + '\ne2e=' + gekozen.e2e.length + '\n');
+          '\nunit=' + gekozen.unit.length + '\ne2e=' + gekozen.e2e.length +
+          '\nrisk=' + serial.baan + '\nreason=' + serial.besluit.code + '\n');
       }
       console.log(tijdlijn(serial, gekozen).join('\n'));
+      schrijfSamenvatting(serial, gekozen);
     } else if (opdracht === 'install') {
       const bron = (args.find((a) => a.startsWith('--from=')) || '').slice(7);
       if (!bron || !fs.existsSync(bron)) throw new Error('bewijsboek ontbreekt: ' + bron);
@@ -93,8 +119,10 @@ if (require.main === module) {
       console.log(JSON.stringify(r, null, 2));
     } else if (opdracht === 'run') {
       const pad = (args.find((a) => a.startsWith('--plan=')) || '--plan=.evidence/plan.json').slice(7);
+      const soort = (args.find((a) => a.startsWith('--kind=')) || '').slice(7) || null;
+      if (soort && !['unit', 'e2e'].includes(soort)) throw new Error('--kind verwacht unit of e2e');
       const plan = leesPlan(pad);
-      const resultaat = voerUit(plan, { droog: args.includes('--dry-run') });
+      const resultaat = voerUit(plan, { droog: args.includes('--dry-run'), soort });
       console.log(tijdlijn(plan, resultaat).join('\n'));
       process.exitCode = resultaat.code;
     } else throw new Error('onbekende opdracht: ' + opdracht + ' (plan, install, run of record)');
@@ -104,4 +132,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { leesPlan, selectie, voerUit, tijdlijn };
+module.exports = { leesPlan, selectie, voerUit, tijdlijn, schrijfSamenvatting };

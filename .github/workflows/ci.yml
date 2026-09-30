@@ -686,13 +686,9 @@ jobs:
         working-directory: motor
         run: cargo build --release --locked
       - name: Alleen REPROVE en UNKNOWN opnieuw bewijzen
-        # Dezelfde systeemgereedschappen als de volledige toetsen. evidence:run
-        # gaat niet door npm test en krijgt diens pretest-hook dus niet mee.
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq libxml2-utils redis-server
-          npm run motor:build
-          npm run evidence:run -- --plan=.evidence/plan.json
+        # De systeemgereedschappen en de Rust-motor staan in de twee stappen
+        # hierboven; `preevidence:run` bouwt de motor nog eens als vangnet.
+        run: npm run evidence:run -- --plan=.evidence/plan.json
         env:
           RTG_E2E_STRICT: '1'
           RTG_SNELLE_TOETS: '1'

@@ -189,7 +189,9 @@ test('mode: koerierpositie bestaat onderweg, verdwijnt bij afgeleverd en komt ni
   const lid = await maakLid('Mode koerier', false);
   const r = await post('/api/mode/bezorg/aanvraag', { supplierCode: 'MAISON', adres: 'Carrer de la Mar 10, Ibiza',
     lat: 38.91, lng: 1.43, items: [{ naam: 'Zijden blouse', prijs: 90, aantal: 1 }] }, lid);
-  const ref = r.body.bezorging.ref, code = r.body.bezorging.bezorgcode;
+  const ref = r.body.bezorging.ref;
+  // de aanvraag draagt geen code meer; het lid vraagt hem op (kern/modebezorg/bezorgcode.js)
+  const code = (await post('/api/mode/bezorg/code', { ref }, lid)).body.bezorgcode;
   await post('/api/supplier/mode/bezorg/neem', { ref }, MAISON);
   const gp = await post('/api/supplier/mode/bezorg/gps', { ref, lat: 38.905, lng: 1.44 }, MAISON);
   assert.equal(gp.status, 200);
@@ -212,7 +214,10 @@ function modeInProces() {
   const zaak = { code: 'MODE1', name: 'Mode', type: 'retail', loc: { lat: 52, lng: 4.9 },
     modebezorg: { aan: true, straalKm: 15, kosten: 6.5, gratisVanaf: 150, waardegrensId: 250, retourAanDeur: true } };
   const niets = () => {};
-  const mb = require('../server/kern/modebezorg').maakModebezorg({ db, save: niets, crypto,
+  // de bezorgcode leeft in een collectietransactie; hier een in het geheugen
+  const bewerkCollectie = async (naam, werk) => werk(db.data[naam] || (db.data[naam] = {}));
+  const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bezorgpunt-'));
+  const mb = require('../server/kern/modebezorg').maakModebezorg({ db, save: niets, crypto, bewerkCollectie, dataDir,
     findSupplier: c => (c === 'MODE1' ? zaak : null), accounts: { getUserById: () => null },
     notify: niets, notifySupplier: niets, sseToCustomer: niets, sseToSupplier: niets, sseToOffice: niets,
     haversine: (a, b) => Math.hypot(a.lat - b.lat, a.lng - b.lng) * 111000, etaMinutes: m => Math.ceil(m / 500),
@@ -220,7 +225,7 @@ function modeInProces() {
   return { db, mb };
 }
 
-test('mode in het proces: loc en gps weg bij afgeleverd en bij retour; adres blijft; geen punt is null', () => {
+test('mode in het proces: loc en gps weg bij afgeleverd en bij retour; adres blijft; geen punt is null', async () => {
   const { db, mb } = modeInProces();
   const items = [{ naam: 'Jas', prijs: 90, aantal: 1 }];
   const leeg = mb.mbAanvraag('k1', 'Lid', 'MODE1', items, { adres: 'Straat 1' });
@@ -238,8 +243,8 @@ test('mode in het proces: loc en gps weg bij afgeleverd en bij retour; adres bli
     assert.deepEqual(b.loc, { lat: 52.01, lng: 4.91 }, 'onderweg staat de bestemming er');
     assert.equal(b.gps.lat, 52.005, 'onderweg staat de koerierpositie er');
     const r = einde === 'afgeleverd'
-      ? mb.mbOverhandig('MODE1', b.ref, { bezorgcode: b.bezorgcode }, { name: 'Koerier' })
-      : mb.mbRetour('MODE1', b.ref, 'past niet', { name: 'Koerier' });
+      ? await mb.mbOverhandig('MODE1', b.ref, { bezorgcode: (await mb.mbCode('k1', b.ref)).bezorgcode }, { name: 'Koerier' })
+      : await mb.mbRetour('MODE1', b.ref, 'past niet', { name: 'Koerier' });
     assert.equal(r.status, 200);
     // ZAKT OP: zonder `wisPunt(b)` in overhandig() resp. retour()
     assert.equal(b.loc, null, einde + ': geen bestemming meer');

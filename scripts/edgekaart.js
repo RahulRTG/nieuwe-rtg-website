@@ -206,7 +206,7 @@ const KAART = [
   ['rtg-edge-appbar.js', 'edge-casco', 'onderbalk:sb', [
     ['beslist', 'onderbalk:b', 'welke paginabalk mee gaat', "return el.hasAttribute('data-rtg-edge-bar') || (el.parentElement === d.body"],
     ['rendert', 'onderbalk:s', 'verhuist de balk zelf', 'rt.slot.appendChild(el);'],
-    ['schrijft', 'onderbalk:s', 'de Edge bezit een appbalk', "rt.body.setAttribute('data-rtg-edge-appbar', 'true');"]]],
+    ['schrijft', 'onderbalk:s', 'de Edge bezit een appbalk', "rt.body.setAttribute('data-rtg-edge-appbar', 'actions');"]]],
   ['rtg-edge-command.js', 'edge-casco', 'onderbalk:sb', [
     ['beslist', 'onderbalk:b', 'neemt het menu tot 999 px', "var media = venster.matchMedia('(max-width:999px)')"],
     ['schrijft', 'onderbalk:s', 'claimt de menuknop', "menu.setAttribute('data-rtg-command-owner', 'true');"]]],

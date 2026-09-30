@@ -15,10 +15,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 2185 |
 | losse beweringen (`test(...)`) | 15227 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 200 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1853 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1854 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 148 |
-| alleen in de kop *genoemd*, nog niet gemeten | 31 |
+| alleen in de kop *genoemd*, nog niet gemeten | 30 |
 | niets van beide | 153 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -1874,7 +1874,7 @@ toets omvalt.
 | `werkregister.test.js` | 11 | gezakt op `liegpoort /api/` | HET WERKREGISTER: zoeken, dossier en samenhang over de tien modules heen. Deze laag bouwt geen tweede administratie -- hij zet de bestaande bakken van een werkruimte in een register (kern/werkcommand/register.js) en... |
 | `werkrol.test.js` | 3 | gezakt op `===->!==#0` | DE WERKROL: EEN INGANG IN EEN WERELD NAAR EEN KANTOORSCHERM IS NIET VOOR IEDEREEN. Op 24 september 2026 vond APPWERKT.json vier ingangen die de wereld aan elk lid toonde en die elk lid doorstuurden naar de... |
 | `werkruimte-kantoor.test.js` | 7 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `werkruimte-maak-idem.test.js` | 1 | genoemd | EEN RETRY MET DEZELFDE SLEUTEL MAAKT GEEN TWEEDE WERKRUIMTE. /api/bedrijf/werkruimte/maak staat in lib/eenmalig-geheim-routes.js: het antwoord draagt een beheer-token dat alleen als hash blijft, dus geen generieke... |
+| `werkruimte-maak-idem.test.js` | 1 | gezakt op `liegpoort /api/` | EEN RETRY MET DEZELFDE SLEUTEL MAAKT GEEN TWEEDE WERKRUIMTE. /api/bedrijf/werkruimte/maak staat in lib/eenmalig-geheim-routes.js: het antwoord draagt een beheer-token dat alleen als hash blijft, dus geen generieke... |
 | `werksleutels.test.js` | 9 | gezakt op `liegpoort /api/` | De sleutels van een werkruimte (workos.workspace_access_tokens), control voor control: 128 bits en eenmaal tonen, hash-only, issuer/doel/scope/onderwerp, vervaltijd, het plafond op sessies (een sessie telt geen... |
 | `werktafelgeheugen.test.js` | 7 | geen module gevonden | WAT DE WERKTAFEL ONTHOUDT, en waarom dat drie beloftes tegelijk is. WERELD.md beloofde tot 19 augustus 2026 dat inloggen, je laatste blad sluiten en op Home drukken alle drie op dezelfde lege werktafel uitkwamen. |
 | `werktoen.test.js` | 6 | gezakt op `liegpoort /api/` | DE TIJDMACHINE EN DE UITVALANALYSE: twee vragen die niet meer beweren dan ze meten. TOEN (bedrijf/toen.js) -- de organisatie op een datum. |

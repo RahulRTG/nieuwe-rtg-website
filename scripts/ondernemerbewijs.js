@@ -227,6 +227,10 @@ uitRijen(BRON.idem.perRoute, 'herstelbaar', 'idempotentie', new Set(['beschermd'
 const { ROUTES: EENMALIG } = require(path.join(WORTEL, 'server/lib/eenmalig-geheim-routes'));
 for (const [sleutel, r] of routes) {
   const u = r.uitslag.herstelbaar;
+  /* Een route die IDEMBESLUIT.json op `tebeslissen` zet, is een open vraag en
+     blijft ROOD -- ook als hij op de lijst eenmalige geheimen staat (#420). */
+  const open = BRON.idembesluit && (BRON.idembesluit.routes || {})[r.pad];
+  if (open && open.klasse === 'tebeslissen') continue;
   if (u && u.stand === 'ROOD' && EENMALIG.has(sleutel))
     r.uitslag.herstelbaar = { stand: 'ONBEKEND', waarde: u.waarde,
       reden: 'met opzet niet idempotent: een eenmalig geheim (lib/eenmalig-geheim-routes.js); de proef mat ' + u.waarde };

@@ -11,7 +11,7 @@
 'use strict';
 
 module.exports = (kern, hulp) => {
-  const { accounts, anthropic, crypto, db, findSupplier, notify, notifySupplier, save, sseToSupplier } = hulp;
+  const { accounts, anthropic, crypto, db, findSupplier, notify, notifySupplier, save, sseToCustomer, sseToSupplier } = hulp;
 
 /* DE INSTELLINGSWEG (kern/instelling.js): hoe een echte gemeente, luchthaven of
    vervoerder hier terechtkomt. Acht genres staan op 'intern' en worden dus
@@ -59,5 +59,17 @@ Object.assign(kern, require('../kern/commerce').maakCommerce({
 /* Een winkelblok van het webplatform gebruikt dezelfde levende etalage. */
 if (kern.webplatform && kern.webplatform.koppelWinkel) {
   kern.webplatform.koppelWinkel((code) => kern.commerce.etalage(code));
+}
+/* Tussen ja en nee bij een tafelaanvraag: een tegenvoorstel met een termijn,
+   en doorzetten naar wie mag beslissen (kern/ervaring/tafeluitzondering.js,
+   CONCIERGE.md par. 2.7-2.9). Hier en niet in de ervaring-laag, omdat server.js
+   die namen een voor een uitpakt. EEN kernnaam voor de vier: elke naam die een
+   route kan aanraken is breedte. */
+{
+  const uitz = require('../kern/ervaring/tafeluitzondering')({ save, notify, notifySupplier,
+    sseToCustomer, sseToSupplier, nu: () => new Date().toISOString(),
+    reserveringen: () => db.data.reserveringen || [] });
+  kern.reserveringUitzondering = { tegenvoorstel: uitz.tegenvoorstel, antwoord: uitz.tegenvoorstelAntwoord,
+    doorzetten: uitz.doorzetten, magBeslissen: uitz.magBeslissen };
 }
 };

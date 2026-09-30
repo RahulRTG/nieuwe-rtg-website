@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-28T16:04:17.962Z",
-    "commit": "8c67492f9",
+    "op": "2026-09-30T02:21:48.964Z",
+    "commit": "dd441f79f",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -14178,6 +14178,13 @@
     "werkruimte-kantoor.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
+    },
+    "werkruimte-maak-idem.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "werksleutels.test.js": {
       "soort": "server",

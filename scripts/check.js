@@ -1930,7 +1930,6 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     /* spread van [auth, geenGast], zoals `lid` hierboven; werd zichtbaar toen
        de kantoorpakket-paden voluit kwamen te staan (regel 45) */
     'ledenAuth', 'rtfPoort']);
-  POORT_MW.add('praktijkMutatiePoort'); // fabriek in bedrijf/praktijk.js: werkPoort + project/klant/werkruimte binnen de duurzame commit; praktijk-http.test.js bewijst actuele rollen
   POORT_MW.add('gezinBeeldAuth'); // verifieert gezinscode en profieltoken vóór eigen foto’s worden gelezen of geschreven
   POORT_MW.add('arrivalPassAuth'); // bezit van de tijdelijke, gehashte Arrival Pass
   /* `scimAuth` (routes/scim.js) -- de deur waar de IdP van een klant zelf
@@ -2005,7 +2004,9 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
      wordt toegekend. Vandaar de tweede tak in de uitdrukking hieronder en niet
      de kale naam. Dit is SEMANTIEK.json in het klein -- een naam met twee
      betekenissen, in de veiligheidslaag. */
-  const POORT_BINNEN = /\b(profiel|schoolProfiel|rtfSociaal|eisAccount|resolveSession|verifyToken|sessionFor|magInzien|isEigenaar|boardroomWie|magBoardroom|doosSleutelOk|magMeten|metPartner|samenSess|kantoorSess|werkPoort|beheerVan|lidVan|viaBeheerOfDirectie|gezinVan|sessieVan|familieVan|gezinSessie|schoolVan|personeelVan|klasVan|docentCheck|lesVan|beheerderVan|magKlus|marktVolwassen|sessie)\s*\(|\bpoort\s*\(\s*req/;
+  // praktijkMutatie bewaakt via werkPoort binnen de duurzame commit; actuele
+  // rechten en herhaling worden via echte HTTP bewezen in praktijk-http.test.js.
+  const POORT_BINNEN = /\b(profiel|schoolProfiel|rtfSociaal|eisAccount|resolveSession|verifyToken|sessionFor|magInzien|isEigenaar|boardroomWie|magBoardroom|doosSleutelOk|magMeten|metPartner|samenSess|kantoorSess|werkPoort|praktijkMutatie|beheerVan|lidVan|viaBeheerOfDirectie|gezinVan|sessieVan|familieVan|gezinSessie|schoolVan|personeelVan|klasVan|docentCheck|lesVan|beheerderVan|magKlus|marktVolwassen|sessie)\s*\(|\bpoort\s*\(\s*req/;
 
   /* PUBLIEK MET REDEN woont in ./lib/publiek.js, en daar alleen: keuringsregel
      28, scripts/handlerwacht.js en het mutatiecontractregister stellen dezelfde

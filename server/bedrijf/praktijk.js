@@ -61,7 +61,7 @@ module.exports = sctx => {
   app.post('/api/bedrijf/praktijk/beeld', (req, res) => {
     const g = poort(req, res); if (g) stuur(res, V.beeld(g.w, req.body || {}));
   });
-  const praktijkMutatiePoort = soort => async (req, res) => {
+  async function praktijkMutatie(req, res, soort) {
     let r;
     await kern.bijeen(() => {
       const g = poort(req, res, ['inrichten', 'aanbod', 'delen'].includes(soort) ? 'werkruimte' : 'project');
@@ -70,12 +70,12 @@ module.exports = sctx => {
       r = wijzig(g, soort, req.body || {}, () => functies[soort](g, req.body || {}));
     }, { duurzaam: true });
     if (r) stuur(res, r);
-  };
-  app.post('/api/bedrijf/praktijk/inrichten', praktijkMutatiePoort('inrichten'));
-  app.post('/api/bedrijf/praktijk/aanbod', praktijkMutatiePoort('aanbod'));
-  app.post('/api/bedrijf/praktijk/vraag', praktijkMutatiePoort('vraag'));
-  app.post('/api/bedrijf/praktijk/stap', praktijkMutatiePoort('stap'));
-  app.post('/api/bedrijf/praktijk/delen', praktijkMutatiePoort('delen'));
+  }
+  app.post('/api/bedrijf/praktijk/inrichten', (req, res) => praktijkMutatie(req, res, 'inrichten'));
+  app.post('/api/bedrijf/praktijk/aanbod', (req, res) => praktijkMutatie(req, res, 'aanbod'));
+  app.post('/api/bedrijf/praktijk/vraag', (req, res) => praktijkMutatie(req, res, 'vraag'));
+  app.post('/api/bedrijf/praktijk/stap', (req, res) => praktijkMutatie(req, res, 'stap'));
+  app.post('/api/bedrijf/praktijk/delen', (req, res) => praktijkMutatie(req, res, 'delen'));
   require('./praktijk-gast')(sctx, deel, stuur);
   return { praktijk: { beeld: V.beeld, ...functies, wijzig } };
 };

@@ -4,6 +4,7 @@
 'use strict';
 const { hash } = require('./canon');
 const { TYPEN } = require('../mall/aanbodvorm');
+const leveranciersVoorAanbod = require('../../db/leveranciers-projectie');
 const normal = v => String(v || '').normalize('NFKC').trim().toLowerCase();
 const text = (v, max = 140) => typeof v === 'string' ? v.trim().slice(0, max) : '';
 function plaats(p) {
@@ -19,7 +20,7 @@ function collect({ kern, db, crypto, each, ids }) {
     return { offers: [], missing: ['mall'], rejected: 0 };
   // Duplicaatcodes zijn ambigu; geen willekeurige winnaar als bron van gezag.
   const suppliers = new Map(), ambiguous = new Set();
-  for (const s of (db.data.suppliers || [])) {
+  for (const s of leveranciersVoorAanbod(db)) {
     if (!s) continue;
     if (suppliers.has(s.code)) ambiguous.add(s.code);
     suppliers.set(s.code, s);
@@ -31,8 +32,8 @@ function collect({ kern, db, crypto, each, ids }) {
     const p = a.aanbieder;
     if (p.soort === 'zaak') {
       const s = suppliers.get(p.code);
-      if (!s || ambiguous.has(p.code) || (s.mall && s.mall.verborgen) ||
-          ['geschorst', 'beeindigd'].includes(s.partnerStatus)) return;
+      if (!s || ambiguous.has(p.code) || s.verborgen ||
+          ['geschorst', 'beeindigd'].includes(s.status)) return;
     } else if (!['rtg', 'particulier'].includes(p.soort)) return;
     const destination = link(a.pagina);
     if (!text(a.id, 80) || !text(a.titel) || !Object.hasOwn(TYPEN, a.type) || !destination) {

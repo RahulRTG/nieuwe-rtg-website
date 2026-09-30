@@ -2,6 +2,19 @@ const test = require('node:test'), assert = require('node:assert/strict');
 const { fixture, supplier, request, choices } = require('./network-fixture');
 const { compose, validate } = require('../server/kern/experience/network-compose');
 
+test('de leveranciersprojectie draagt alleen verse beleidsvelden en behoudt ambigue codes', () => {
+  const lees = require('../server/db/leveranciers-projectie');
+  const db = { data: { suppliers: [{ code: 'A', password: 'GEHEIM', email: 'prive@example.test' },
+    { code: 'A', partnerStatus: 'geschorst' }] } };
+  const rows = lees(db);
+  assert.equal(rows.length, 2);
+  assert.deepEqual(Object.keys(rows[0]).sort(), ['code', 'status', 'verborgen']);
+  assert.equal(Object.isFrozen(rows[0]), true);
+  db.data.suppliers[0].mall = { verborgen: true };
+  assert.equal(lees(db)[0].verborgen, true);
+  assert.equal(rows[0].verborgen, false, 'geen gedeeld mutable zaakobject');
+});
+
 test('nieuwe aanbieders vergroten automatisch alle vier wereldprojecties; geen nieuwe opslag', () => {
   const h = fixture([]);
   for (const world of ['living', 'travel', 'work', 'foundation']) {

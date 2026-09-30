@@ -23,6 +23,8 @@ for (const [profiel,soort] of [['zelfstandig','dienst'],['winkel','product'],['d
     const q = doe('vraag',{aanbodId:a.aanbodId,klant:'Eerste klant',vraag:'Graag een afspraak',datum:'2026-12-10'});
     const id=q.projectId, bedrag = profiel==='stichting'?0:1500;
     assert.ok(w.projecten[id]); assert.equal(Object.keys(w.klanten).length,1); assert.equal(Object.keys(w.kansen).length,1);
+    assert.deepEqual(w.projecten[id].herkomst, { werkruimte: w.code, aanbodId: a.aanbodId, aanbodVersie: 1 });
+    assert.equal(Object.values(w.kansen)[0].herkomst.projectId, id, 'de prijs blijft aan het bronproject verbonden');
     assert.equal(w.projecten[id].praktijk,undefined,'geen klant/prijsgegevens op algemene projectprojectie');
     assert.equal(stap(id,{stap:'uitvoeren',toelichting:'Onterecht'}).status,409);
     assert.equal(stap(id,{stap:'voorstel',toelichting:'Afgesproken werk',bedragMinor:bedrag}).ok,true);
@@ -55,11 +57,20 @@ test('gast ziet alleen afspraak; wijziging, intrekking, verlopen tijd en tenant 
   const link=()=>doe('delen',{projectId:id,versie:V.details(w,V.project(w,id)).versie});
   let r=link(), sleutel=r.link.split('#gast=')[1], gast=delen.gast({sleutel});
   assert.ok(gast); assert.equal(JSON.stringify(w).includes(sleutel.split('.')[2]),false);
+  assert.equal(gast.d.hash.length,64); assert.equal(gast.d.gebruik,0);
+  const deur = gast.d;
+  for (const [veld, fout] of [['issuer','ander'],['doel','ander'],['uitgegeven',Date.now()+1000],
+    ['verloopt',null],['verloopt',deur.uitgegeven+8*864e5]]) {
+    const oud = deur[veld]; deur[veld] = fout;
+    assert.equal(delen.gast({sleutel}),null,'ongeldig credentialveld: '+veld);
+    deur[veld] = oud;
+  }
   assert.equal(JSON.stringify(delen.gastBeeld(gast)).includes('PRIVE KLANT'),false);
   assert.equal(delen.gast({sleutel:sleutel+'a'}),null);
   stap(id,{stap:'voorstel',toelichting:'Gewijzigde prijs',bedragMinor:17000}); assert.equal(delen.gast({sleutel}),null);
   r=link(); sleutel=r.link.split('#gast=')[1]; gast=delen.gast({sleutel});
   assert.equal(delen.besluit(gast,{keuze:'akkoord',versie:gast.x.versie}).ok,true);
+  assert.equal(gast.d.gebruik,1,'precies één geclaimd besluit');
   assert.equal(delen.besluit(gast,{keuze:'akkoord',versie:gast.x.versie}).status,409);
   doe('delen',{projectId:id,versie:gast.x.versie,intrekken:true}); assert.equal(delen.gast({sleutel}),null);
   r=link(); sleutel=r.link.split('#gast=')[1]; delen.gast({sleutel}).d.verloopt=Date.now()-1; assert.equal(delen.gast({sleutel}),null);

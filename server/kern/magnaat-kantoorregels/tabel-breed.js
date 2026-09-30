@@ -30,7 +30,7 @@ const BREED = [
   [/staff|personeel|vacature|sollicit|\/werving|\/cv\b|\/werkvloer|\/training|\/werk\.html/, 'hr', 'HR'],
   [/contract|juridisch|paspoort|machtig|privacy|avg|toestemming|inzagekaart|rechtsvorm|\/drm\b/, 'juridisch', 'Juridisch'],
   [/ingenieur|engineering/, 'ingenieurs', 'Ingenieurs'],
-  [/\/bedrijf|\/onderneming|\/concern|\/genootschap|\/zakelijk|\/metier/, 'support', 'Support team'],
+  [/\/bedrijf|\/werk-gast\b|\/onderneming|\/concern|\/genootschap|\/zakelijk|\/metier/, 'support', 'Support team'],
   // de gastenkant van het festival is een ledenoppervlak, dus Klantenservice --
   // en VOOR de regel hieronder, die elk pad met "gast" naar Support stuurt.
   [/\/festival\/gast|festival-gast/, 'klantenservice', 'Klantenservice'],

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2281 bestanden en 15675 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2289 bestanden en 15726 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2281 |
-| losse beweringen (`test(...)`) | 15675 |
+| toetsbestanden | 2289 |
+| losse beweringen (`test(...)`) | 15726 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 226 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1902 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1907 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 148 |
-| alleen in de kop *genoemd*, nog niet gemeten | 36 |
-| niets van beide | 187 |
+| alleen in de kop *genoemd*, nog niet gemeten | 38 |
+| niets van beide | 196 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1985 bestanden, 15166 beweringen.
+1993 bestanden, 15217 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|

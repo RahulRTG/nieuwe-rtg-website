@@ -20,6 +20,7 @@ module.exports = ({ rid, nu, dag, log }) => {
     const p = { id: rid(8), naam: V.tekst(b.vraag, 80), omschrijving: V.tekst(b.vraag, 500),
       werkvorm: 'algemeen', status: 'loopt', start: dag(), eind: null, budgetCenten: 0,
       uurtariefCenten: 0, eigenaar: actor.naam, mijlpalen: [], risicos: [], door: actor.naam, at: nu(),
+      herkomst: { werkruimte: w.code, aanbodId: a.id, aanbodVersie: a.versie },
       praktijk: { klantId: k.id, aanbodId: a.id, aanbodVersie: a.versie, stand: 'vraag', versie: 1,
         omschrijving: V.tekst(b.vraag, 500), datum: b.datum || null, locatie: a.locatie,
         prijswijze: a.prijswijze, bedragMinor: a.bedragMinor, valuta: w.praktijkProfiel.valuta,
@@ -27,7 +28,9 @@ module.exports = ({ rid, nu, dag, log }) => {
     const details = p.praktijk; delete p.praktijk;
     p.praktijkRef = rid(8);
     (w.kansen || (w.kansen = {}))[p.praktijkRef] = { id: p.praktijkRef, klantId: k.id, klant: k.naam,
-      titel: p.naam, eigenaar: actor.naam, fase: 'lead', bedragCenten: 0, valuta: w.praktijkProfiel.valuta, historie: [], at: nu(), praktijk: details };
+      titel: p.naam, eigenaar: actor.naam, fase: 'lead', bedragCenten: 0, valuta: w.praktijkProfiel.valuta,
+      herkomst: { werkruimte: w.code, projectId: p.id, aanbodId: a.id, aanbodVersie: a.versie },
+      historie: [], at: nu(), praktijk: details };
     (w.projecten || (w.projecten = {}))[p.id] = p;
     werkFeit(w, 'project', p.id, 'aangemaakt', { actor: actor.id || actor.naam, bron: 'werk/praktijk' },
       { naam: p.naam, werkvorm: p.werkvorm, status: p.status, budgetCenten: 0 });

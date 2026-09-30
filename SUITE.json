@@ -1,27 +1,27 @@
 {
  "stempel": {
-  "op": "2026-09-29T20:14:25.683Z",
-  "commit": "4f9b603ebec5f66d8d5ff0f59e4a7401927d9542",
+  "op": "2026-09-30T20:57:40.326Z",
+  "commit": "c47e0090134a039811671a2bb4d9397004c69f92",
   "boomVuil": false,
   "boomAnders": 1,
   "instrument": "scripts/test-runner.js",
-  "node": "v22.22.2"
+  "node": "v26.10.0"
  },
  "uitleg": "De laatste VOLLE testronde: wanneer, waartegen, en of hij groen was. scripts/versheid.js leest dit als elk ander register, zodat een suite die achterloopt net zo hard opvalt als een register dat achterloopt.",
  "grens": "zegt niets over WELKE toets zakte -- dat staat in de uitvoer van de ronde zelf. Hij zegt alleen dat er een volle ronde is geweest, wanneer, en met welke uitkomst.",
  "hoe": "npm test",
  "gemeten": {
   "volledig": true,
-  "bestanden": 1944,
-  "bestandenSha256": "9fd0da1de12b02c97e0c9ad226bbed691220eaddb217a30dfa62b64d24fc93e1",
+  "bestanden": 1993,
+  "bestandenSha256": "0bed38ca678ac39fa27a7cc07f92ad8f5fc80e57fcb82da1df0b1945797655d9",
   "afsluitcode": 1,
   "groen": false,
   "tapVolledig": true,
-  "tests": 15418,
-  "geslaagdeTests": 15376,
-  "mislukt": 3,
+  "tests": 15732,
+  "geslaagdeTests": 15680,
+  "mislukt": 9,
   "geannuleerd": 0,
-  "overgeslagen": 39,
+  "overgeslagen": 43,
   "todo": 0
  },
  "postgres": null

@@ -206,6 +206,20 @@ test('Leerhuis trainer: onder toezicht, bewijs, klaar voor beoordeling en de aan
       const nieuw = (await lees(C, 'curriculumWerk')).VAARDIGHEDEN.find(v => v.id === 'terugboeking-controleren');
       assert.ok(nieuw, 'de vaardigheid staat er, met de code uit haar naam');
 
+      /* Een scenario zonder vereiste stap meet niets en weigert de server; met stappen staat het er. */
+      await form('Nieuw scenario').locator('summary').click();
+      await form('Nieuw scenario').getByLabel('Naam van het scenario').fill('Storno aan de balie');
+      await form('Nieuw scenario').getByLabel('Beginsituatie').fill('Een klant vraagt zijn geld terug.');
+      await form('Nieuw scenario').getByText('Terugboeking controleren', { exact: true }).click();
+      await form('Nieuw scenario').getByRole('button', { name: 'Scenario vastleggen' }).click();
+      await wachtOp(c, /Niet gelukt: een scenario zonder vereiste stap meet niets/);
+      await form('Nieuw scenario').getByLabel('Vereiste stappen, een per regel').fill('controleer\nreden\n');
+      await form('Nieuw scenario').getByLabel('Verboden stappen, een per regel').fill('direct-uitbetalen');
+      await form('Nieuw scenario').getByText('De vereiste stappen in deze volgorde').click();
+      await form('Nieuw scenario').getByRole('button', { name: 'Scenario vastleggen' }).click();
+      await wachtOp(c, /Scenario vastgelegd: Storno aan de balie \(code storno-aan-de-balie\)/);
+      await form('Nieuw scenario').getByText(/Er is al: storno-aan-de-balie \(Terugboeking controleren\)/).waitFor({ state: 'attached' });
+
       /* N leert tot de simulatie; daarna neemt de trainer het over op het scherm. */
       const pad = (await lees(T, 'trainerCockpit')).LEERLINGEN || [];
       if (!pad.some(x => x.persoon === N.p)) await doe(Q, 'trainerToewijzen', { persoon: N.p, curriculum: 'ops-basis', trainer: T.p });
@@ -302,6 +316,15 @@ test('Leerhuis trainer: onder toezicht, bewijs, klaar voor beoordeling en de aan
       await zkaart.getByRole('button', { name: 'Review oppakken' }).click();
       await wachtOp(q2, /Review oppakken: Een betaling terugboeken/);
       await zkaart.getByText(/Herstelpad: nog een keer onder toezicht bij een grote storno/).waitFor();
+      /* Wie de review oppakte, ziet het bewijs eronder en kan een stuk intrekken -- met reden. */
+      const intrek = zkaart.getByRole('button', { name: /^Bewijs .* intrekken$/ }).first();
+      const soort = (await intrek.textContent()).replace(/^Bewijs | intrekken$/g, '');
+      await intrek.click();
+      await wachtOp(q2, /Niet gelukt: intrekken zonder reden bestaat niet/);
+      await zkaart.getByLabel('Reden om bewijs ' + soort + ' in te trekken').fill('dubbel vastgelegd');
+      await zkaart.getByRole('button', { name: 'Bewijs ' + soort + ' intrekken' }).click();
+      await wachtOp(q2, new RegExp('Bewijs ingetrokken: ' + soort));
+      await zkaart.getByText(/Ingetrokken: dubbel vastgelegd\./).waitFor();
       await zkaart.getByLabel('Uw bevinding').fill('herstelpad past bij het bewijs');
       await zkaart.getByRole('button', { name: 'Het oordeel blijft staan' }).click();
       await wachtOp(q2, /Het oordeel blijft staan: Een betaling terugboeken/);

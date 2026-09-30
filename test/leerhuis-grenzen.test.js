@@ -782,6 +782,10 @@ test('28. B-UI kwaliteit: bezwaren met het oordeel pas na het oppakken, ongeldig
   assert.deepEqual(z().naar, ['INDEPENDENT_REVIEW'], 'uit de overgangstabel');
   w.doe(ORG, 'bezwaarStand', { id: z().id, naar: 'INDEPENDENT_REVIEW' }, P.Q);
   assert.ok(z().oordeel && z().oordeel.stand === 'PROVEN' && z().oordeel.criteria, 'wie de review oppakte, ziet het oordeel');
+  const stuk = z().oordeel.bewijs[0];
+  assert.ok(stuk && stuk.ingetrokken === null, 'met het bewijs eronder, voor deze vaardigheid');
+  w.doe(ORG, 'bewijsIntrekken', { id: stuk.id, reden: 'dubbel vastgelegd' }, P.Q);
+  assert.equal(z().oordeel.bewijs.find(x => x.id === stuk.id).ingetrokken, 'dubbel vastgelegd', 'ingetrokken blijft staan, met de reden');
   w.doe(ORG, 'bestuurZet', { persoon: P.KO2, rol: 'QUALITY_AUTHORITY' }, P.E);
   const ander = l.kwaliteitWerk(ORG, P.KO2).BEZWAREN.find(x => x.persoon === P.N);
   assert.equal(ander.anderReviewer, true);

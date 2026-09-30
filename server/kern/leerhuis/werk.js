@@ -79,7 +79,8 @@ function curriculumWerk(st, door) {
     VAARDIGHEDEN: Object.values(st.vaardigheden).map(v => ({ id: v.id, naam: v.naam })),
     KENNIS: Object.values(st.kennis).map(k => ({ id: k.id, titel: (k.versies[k.actief || Math.max(...Object.keys(k.versies).map(Number))] || {}).titel || k.id,
       actief: !!k.actief, concept: concept(k) })),
-    ROLLEN: Object.values(st.rollen).map(r => ({ id: r.id, titel: r.titel })) });
+    ROLLEN: Object.values(st.rollen).map(r => ({ id: r.id, titel: r.titel })),
+    SCENARIOS: Object.values(st.scenarios).map(s => ({ id: s.id, domein: s.domein, vaardigheden: s.vaardigheden.map(naam) })) });
 }
 
 /* Het beheer van de eigenaar: wie welke bestuursrol draagt (op codenaam, via

@@ -1,9 +1,9 @@
-/* Leerhuis: aan het werk -- kennis, vaardigheden, rollen en curricula SCHRIJVEN,
+/* Leerhuis: aan het werk -- kennis, vaardigheden, rollen, curricula en scenario's SCHRIJVEN,
    voor de curriculumeigenaar (ACADEMY.md, fase B-UI).
 
    HIJ BESLIST NIETS. Wat er te kiezen valt (niveaus, soorten, fasen, sterktes)
    en wat er al is, komt uit curriculumWerk (kern/leerhuis/werk.js); of iets mag,
-   zeggen kennisSchrijf, vaardigheidZet, rolZet en curriculumZet. Een kritieke
+   zeggen kennisSchrijf, vaardigheidZet, rolZet, curriculumZet en scenarioZet. Een kritieke
    vaardigheid op te zwak bewijs of kennis zonder bron weigert de server, en die
    weigering staat in woorden op het scherm.
 
@@ -111,6 +111,28 @@ window.RTGLeerhuisSchrijven = function (h) {
         'Curriculum vastgelegd als concept: ' + t + ' (code ' + code(t) + ').');
     });
 
-    [fk, fv, fr, fc].forEach(function (x) { doos.appendChild(x); });
+    /* Een scenario: de motor oordeelt uit de vereiste en verboden stappen, dus een
+       scenario zonder vereiste stap weigert de server (het meet niets). */
+    var fs = formulier('Nieuw scenario');
+    (c.SCENARIOS || []).forEach(function (x) {
+      fs.appendChild(maak('p', 'meta', 'Er is al: ' + x.id + ' (' + (x.vaardigheden || []).join(', ') + ')'));
+    });
+    var sn = veld('Naam van het scenario'), sd = veld('Domein'), sb = veld('Beginsituatie', true),
+      sv = veld('Vereiste stappen, een per regel', true), sx = veld('Verboden stappen, een per regel', true),
+      sm = kies('Moeilijkheid', ['makkelijk', 'normaal', 'moeilijk']), sz = veld('Waarom dit veilig is om te oefenen');
+    sm.value = 'normaal';
+    var ol = maak('label', 'keuze'), so = document.createElement('input'); so.type = 'checkbox';
+    ol.appendChild(so); ol.appendChild(document.createTextNode('De vereiste stappen in deze volgorde'));
+    [sn, sd, sb, sv, ol, sx, sm, sz].forEach(function (x) { fs.appendChild(x); });
+    var sV = vinkjes(fs, 'Vaardigheden die het bewijst', vaardItems);
+    var regels = function (v) { return v.value.split('\n').map(function (x) { return x.trim(); }).filter(Boolean); };
+    voeg(fs, 'Scenario vastleggen', function () {
+      var n = sn.value.trim();
+      doe('sz:' + code(n), 'scenarioZet', { id: code(n), domein: sd.value.trim(), vaardigheden: sV(), moeilijkheid: sm.value,
+        begin: sb.value.trim(), vereist: regels(sv), verboden: regels(sx), volgorde: so.checked, veiligheid: sz.value.trim() },
+        'Scenario vastgelegd: ' + n + ' (code ' + code(n) + ').');
+    });
+
+    [fk, fv, fr, fc, fs].forEach(function (x) { doos.appendChild(x); });
   };
 };

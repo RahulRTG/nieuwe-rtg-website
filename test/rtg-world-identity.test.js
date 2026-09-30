@@ -127,6 +127,19 @@ test('de gedeelde werkruimte kent uitsluitend centraal toegewezen gebieden', () 
   assert.equal(identity.classify('/apps/kantoor.html?gebied=living'),'work','een willekeurige route kan niet van wereld wisselen');
 });
 
+test('het zichtbare palet volgt het voorste blad zonder de route-identiteit te wijzigen', () => {
+  const body = nepBody({'data-rtg-world':'living','data-rtg-blad-wereld':'travel'}), doc = {body};
+  assert.equal(identiteit.syncPalette(doc),'travel');
+  assert.equal(body.waarden['data-rtg-palette'],'travel');
+  body.setAttribute('data-rtg-frame-world','foundation');
+  assert.equal(identiteit.syncPalette(doc),'foundation','een desktopvenster ligt boven het Pass-blad');
+  body.setAttribute('data-rtg-frame-world','geen');
+  assert.equal(identiteit.syncPalette(doc),'travel','sluiten herstelt het onderliggende blad');
+  body.setAttribute('data-rtg-blad-wereld','geen');
+  assert.equal(identiteit.syncPalette(doc),'living','zonder blad herstelt de routekleur');
+  assert.equal(body.waarden['data-rtg-world'],'living','de vaste context blijft behouden');
+});
+
 /* HET MANIFEST IS OP DE GEDEELDE ROUTES EEN AFGELEIDE VAN MAPPEN.
 
    `MAPPEN` in de app-main-bundel is de enige lijst werelden (WERELD.md); daaruit

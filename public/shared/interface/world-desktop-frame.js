@@ -14,6 +14,11 @@
       x.frame.src = x.url; x.timer = setTimeout(function () { failed(x); }, 15000); }, 'wd-frame-retry');
     retry.hidden = true; o.surface.appendChild(retry);
     function refreshEdge() {
+      var id = w.RTGWorldIdentity, scope = active(), url = scope && scope.win.location.href;
+      var world = id && current && id.classify(url && url !== 'about:blank' ? url : current.url);
+      if (world && id.VALUES.includes(world)) d.body.setAttribute('data-rtg-frame-world', world);
+      else d.body.removeAttribute('data-rtg-frame-world');
+      if (id && id.syncPalette) id.syncPalette(d);
       if (w.RTGAdaptiveEdge && d.body.dataset.rtgAdaptiveState === 'expanded') w.RTGAdaptiveEdge.setState('expanded');
     }
     function active() {
@@ -44,6 +49,14 @@
       try {
         var doc = x.frame.contentDocument, win = x.frame.contentWindow;
         if (!doc || win.location.origin !== w.location.origin) throw new Error('unavailable');
+        // Een blad kan naar een andere app navigeren: titel en herstel volgen
+        // die werkelijke bestemming, zodat Agenda niet Food Court blijft heten.
+        var actual = win.location.pathname + win.location.search + win.location.hash;
+        if (o.paths.has(win.location.pathname) && actual !== x.url) {
+          x.url = actual; x.currentTitle = doc.title; x.frame.title = doc.title;
+          x.frame.dataset.desktopApp = actual;
+          if (current === x) { title.textContent = doc.title; direct.href = actual; }
+        }
         doc.body.classList.add('rtg-edge-embed');
         if (w.RTGAdaptiveEdgeClaim) w.RTGAdaptiveEdgeClaim.claim(doc, win);
         doc.addEventListener('input', function () { x.dirty = true; });
@@ -73,7 +86,7 @@
         frame.addEventListener('load', function () { ready(x); }); frame.addEventListener('error', function () { failed(x); });
         frame.src = url; o.surface.appendChild(frame); x.timer = setTimeout(function () { failed(x); }, 15000);
       }
-      current = x; title.textContent = name; direct.href = url; direct.hidden = true; retry.hidden = true;
+      current = x; title.textContent = x.currentTitle || name; direct.href = url; direct.hidden = true; retry.hidden = true;
       U.copy(notice, 'frameLoading'); notice.hidden = x.ready;
       entries.forEach(function (entry) { entry.frame.hidden = entry !== x; });
       o.home.hidden = true; o.favorites.hidden = false; o.surface.hidden = false; o.root.classList.add('wd-expanded');

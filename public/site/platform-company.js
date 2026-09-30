@@ -2,6 +2,12 @@
 (function(w,d){
  'use strict';
  var P=w.RTGPublicPlatform,D=w.RTGPublicContent,source=d.querySelector('main');if(!P||!source)return;
+ w.RTGCompanyThesis=function(){
+  var section=P.node('section',null,'pp-company-thesis'),copy=P.node('div',null,'pp-company-thesis-copy'),title=P.node('h1','companyThesisTitle'),actors=P.node('dl',null,'pp-company-actors');title.id='company-thesis-title';section.setAttribute('aria-labelledby',title.id);
+  copy.append(P.node('p','companyThesisOverline','pp-overline'),title,P.node('p','companyThesisBody','pp-company-thesis-body'));
+  [['companyActorOrganisation','companyActorOrganisationBody','WorkOS'],['companyActorPartner','companyActorPartnerBody','RTG Network'],['companyActorPerson','companyActorPersonBody','RTG OS']].forEach(function(item,i){var actor=P.node('div',null,'pp-company-actor'),system=P.node('span',null,'pp-company-actor-system');actor.dataset.actor=String(i+1).padStart(2,'0');system.textContent=item[2];system.translate=false;actor.append(P.node('dt',item[0]),P.node('dd',item[1]),system);actors.append(actor);});
+  section.append(copy,actors);return section;
+ };
  var languagePrefix=w.location.pathname.match(/^\/([a-z]{2})(?:\/|$)/);
  if(languagePrefix)w.RTGi18n.set(languagePrefix[1],true);
  var hash=new URLSearchParams(w.location.hash.replace(/^#rtg\?/,'')),shell;
@@ -50,6 +56,8 @@
   shell.show(id,card.title,article(card));
  }
  shell=P.init({kind:'company',source:source,open:open});
+ var companyRoot=d.querySelector('.pp-shell'),companyGreeting=companyRoot&&companyRoot.querySelector(':scope>.wd-greeting');
+ if(companyRoot&&companyGreeting)companyGreeting.after(w.RTGCompanyThesis());
  d.querySelectorAll('link[rel="stylesheet"]').forEach(function(link){if(/\/(?:site|styles)\.css(?:\?|$)/.test(link.href))link.disabled=true;});
  w.RTGPublicCompany={shell:shell,open:open};
  /* The legacy Edge is replaced only after the shared projection mounts. */

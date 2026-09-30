@@ -2600,6 +2600,13 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
+    "democratie-doe.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
     "democratie-grondwet.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -3322,6 +3329,30 @@
       "staat": "al rood",
       "gezakteZonderMutatie": 2
     },
+    "experience-dinner.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/foodcourt-intent.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "experience-dinner.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/reservering/capaciteit.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "experience-intent.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/experience-intent.js",
+      "operator": "true->false#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
     "experience-platform.e2e.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3352,6 +3383,22 @@
       "operator": "true->false#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "experience-travel.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/reisbureau-experience.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "experience-travel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/reisbureau.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 2
     },
     "extern-afrekenen.test.js": {
       "soort": "server",
@@ -5962,6 +6009,15 @@
       "gezakt": 6,
       "geprobeerd": 1
     },
+    "kwesties-scherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "gezakt": 1,
+      "lekt": true,
+      "reden": "de asserties deden hun werk, maar het proces sloot niet af: deze toets LEKT een handle. Uitslag gemeten met --test-force-exit; het lek is een eigen gebrek en hoort gerepareerd.",
+      "operator": "liegpoort /api/",
+      "scherp": "gezakt"
+    },
     "kycspoor.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -6473,6 +6529,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "living-experience.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/experience/compiler.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
     },
     "livinglab-capsule.test.js": {
       "soort": "server",
@@ -8894,6 +8958,14 @@
       "gezakt": 3,
       "geprobeerd": 1
     },
+    "pass-cache.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/sw-pass-assets.js",
+      "operator": "false->true#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "passkeys-eerste.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
@@ -9798,6 +9870,22 @@
       "gezakt": 9,
       "scherp": "gezakt"
     },
+    "reisprogramma.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/reisprogramma-editor.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "reisprogramma.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/reisuitnodiging/programma.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "reisschermen.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -10493,7 +10581,7 @@
       "staat": "gezakt",
       "module": "public/shared/rtg-world-identity.js",
       "operator": "===->!==#0",
-      "gezakt": 3,
+      "gezakt": 8,
       "geprobeerd": 1
     },
     "rtg.test.js": {
@@ -10844,6 +10932,15 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "samendoen-scherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "gezakt": 1,
+      "lekt": true,
+      "reden": "de asserties deden hun werk, maar het proces sloot niet af: deze toets LEKT een handle. Uitslag gemeten met --test-force-exit; het lek is een eigen gebrek en hoort gerepareerd.",
+      "operator": "liegpoort /api/",
       "scherp": "gezakt"
     },
     "samentekenen.test.js": {
@@ -14298,6 +14395,14 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "world-palette.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-world-identity.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "world-widget-catalog.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -14593,67 +14698,6 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
-    },
-    "saloon-edge.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "gezakt"
-    },
-    "saloon-redactie.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "gezakt"
-    },
-    "saloon.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "gezakt"
-    },
-    "script-bronnen.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/script-bronnen.js",
-      "operator": "===->!==#0",
-      "gezakt": 1,
-      "geprobeerd": 1
-    },
-    "warm-presentation.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 3,
-      "scherp": "gezakt"
-    },
-    "democratie-doe.test.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 2,
-      "scherp": "gezakt"
-    },
-    "kwesties-scherm.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "gezakt": 1,
-      "lekt": true,
-      "reden": "de asserties deden hun werk, maar het proces sloot niet af: deze toets LEKT een handle. Uitslag gemeten met --test-force-exit; het lek is een eigen gebrek en hoort gerepareerd.",
-      "operator": "liegpoort /api/",
-      "scherp": "gezakt"
-    },
-    "samendoen-scherm.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "gezakt": 1,
-      "lekt": true,
-      "reden": "de asserties deden hun werk, maar het proces sloot niet af: deze toets LEKT een handle. Uitslag gemeten met --test-force-exit; het lek is een eigen gebrek en hoort gerepareerd.",
-      "operator": "liegpoort /api/",
-      "scherp": "gezakt"
     }
   }
 }

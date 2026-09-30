@@ -20,6 +20,7 @@ module.exports = ({ transactie, vindCode, statusReden, publiek, bearer, invoer,
       /* Intrekking betekent ook intrekking van het beperkte voorbeeldbeeld.
          Anders blijft een verlopen of gelekte link bestemming/periode tonen. */
       if (reden) return fout(reden);
+      if(u.programma)return {ok:true,uitnodiging:{programma:u.programma,versie:u.versie,gewijzigd:u.gewijzigd,geldigTot:u.toegang.expires_at,open:true}};
       const telling = {};
       for (const o of (u.onderdelen || [])) telling[o.soort] = (telling[o.soort] || 0) + 1;
       return { ok: true, uitnodiging: { soort: u.soort, bestemming: u.bestemming, venster: u.venster,
@@ -34,6 +35,7 @@ module.exports = ({ transactie, vindCode, statusReden, publiek, bearer, invoer,
     return transactie(bron => {
       const u = vindCode(bron, code);
       if (!u) return fout('onbekend');
+      if(u.programma)return {status:403,error:'Deze gastlink geeft alleen leesrechten; er wordt geen account of boeking overgenomen.'};
       if (u.door === sess.key) return { status: 409, error: 'Dit is uw eigen uitnodiging; die is voor iemand anders bedoeld.' };
       if (u.soort === 'reisgenoot' && !(idGeverifieerd && idGeverifieerd(sess)))
         return { status: 403, error: 'Een medereiziger komt in de reisgegevens van iemand anders. Rond eerst de identiteitscontrole van uw account af.' };
@@ -97,6 +99,7 @@ module.exports = ({ transactie, vindCode, statusReden, publiek, bearer, invoer,
       const u = bron[String(id || '')];
       if (!u || u.door !== door) return { status: 404, error: 'Deze uitnodiging staat niet op uw naam.' };
       if (u.claim) return { status: 409, error: 'Een geclaimde uitnodiging kan niet worden geroteerd.' };
+      if(u.programma)return {status:409,error:'Open het programma en maak bewust een nieuwe gastlink met een einddatum.'};
       const hash = waarde => crypto.createHash('sha256').update(String(waarde || '')).digest('hex');
       const idemHash = idemWaarde
         ? hash('reisuitnodiging-roteer-idem|' + door + '|' + idemWaarde) : null;
@@ -129,7 +132,7 @@ module.exports = ({ transactie, vindCode, statusReden, publiek, bearer, invoer,
     return transactie(bron => ({ ok: true, uitnodigingen: Object.values(bron)
       .filter(u => u.door === door)
       .sort((a, b) => String(b.at).localeCompare(String(a.at))).slice(0, 100)
-      .map(u => publiek(u)) }));
+      .map(u => Object.assign(publiek(u),door==='kantoor'&&u.programma?{programma:u.programma}:{})) }));
   }
 
   return { open, eisOp, trekIn, roteer, lijst };

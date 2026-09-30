@@ -56,5 +56,35 @@ window.RTGLeerhuisMijn = function (h) {
         });
       })]));
   }
-  return { pad: pad, oefenen: oefenen };
+  /* Een bezwaar over de eigen uitslag, en EVC: een extern stuk dat hoogstens
+     vastgelegd bewijs wordt. Of het mag, zegt de handeling (acties-evc.js). */
+  function veld(label) { var v = maak('textarea', 'veld'); v.setAttribute('aria-label', label); v.placeholder = label; return v; }
+  function uitslag(k, x) {
+    if (x.herstel) k.appendChild(maak('p', 'meta', 'Herstelpad: ' + x.herstel));
+    if (x.bezwaar) {
+      k.appendChild(maak('p', 'meta', 'Uw bezwaar: ' + h.stand(x.bezwaar.stand)
+        + (x.bezwaar.uitkomst ? '. Bevinding: ' + x.bezwaar.uitkomst : '') + '.'));
+      if (['REVIEW_REQUEST', 'INDEPENDENT_REVIEW'].indexOf(x.bezwaar.stand) >= 0) return;
+    }
+    var reden = veld('Waarom u bezwaar maakt');
+    var d = maak('details'); d.appendChild(maak('summary', null, 'Bezwaar maken')); d.appendChild(reden);
+    d.appendChild(rij([knop('Bezwaar indienen', false, function () {
+      doe('bezwaar:' + x.id, 'bezwaarIndienen', { beoordeling: x.id, reden: reden.value.trim() }, 'Bezwaar ingediend over ' + x.vaardigheidNaam + '. Een onafhankelijke kwaliteitsautoriteit behandelt het.');
+    })]));
+    k.appendChild(d);
+  }
+  function evc(keuze) {
+    var f = maak('div', 'kaart');
+    f.appendChild(maak('h3', null, 'Eerder verworven: een stuk van elders laten meetellen'));
+    f.appendChild(maak('p', 'meta', 'Een diploma of certificaat van elders telt hier hoogstens als vastgelegd bewijs. Bewezen wordt u alleen door een beoordeling in dit leerhuis.'));
+    var v = maak('select', 'veld'); v.setAttribute('aria-label', 'Vaardigheid');
+    keuze.forEach(function (x) { var o = maak('option', null, x.naam); o.value = x.id; v.appendChild(o); });
+    var ext = veld('Wat, van wie en wanneer');
+    f.appendChild(v); f.appendChild(ext);
+    f.appendChild(rij([knop('EVC indienen', false, function () {
+      doe('evc:' + v.value, 'evcIndienen', { vaardigheid: v.value, extern: ext.value.trim() }, 'EVC ingediend; een assessor bekijkt het stuk.');
+    })]));
+    return f;
+  }
+  return { pad: pad, oefenen: oefenen, uitslag: uitslag, evc: evc };
 };

@@ -284,7 +284,17 @@ test('Leerhuis trainer: onder toezicht, bewijs, klaar voor beoordeling en de aan
          (herstelpad) staat pas op de kaart als Q de review op zich neemt. Een
          ongeldigverklaring zonder reden weigert de server, en een beleid dat Q
          voorstelt, keurt de eigenaar goed -- Q zelf krijgt een zin en geen knop. */
-      await doe(N, 'bezwaarIndienen', { beoordeling: open[0].id, reden: 'de storno was klein, het herstelpad past niet' });
+      const n2 = await opScherm(N, '/apps/leerhuis.html');
+      const ukaart = n2.locator('#uitslagen .kaart', { hasText: 'Een betaling terugboeken' });
+      await ukaart.getByText(/Herstelpad: nog een keer onder toezicht/).waitFor();
+      await ukaart.locator('summary', { hasText: 'Bezwaar maken' }).click();
+      await ukaart.getByRole('button', { name: 'Bezwaar indienen' }).click();
+      await wachtOp(n2, /Niet gelukt: een bezwaar zonder reden/);
+      await ukaart.getByLabel('Waarom u bezwaar maakt').fill('de storno was klein, het herstelpad past niet');
+      await ukaart.getByRole('button', { name: 'Bezwaar indienen' }).click();
+      await wachtOp(n2, /Bezwaar ingediend over Een betaling terugboeken/);
+      await ukaart.getByText('Uw bezwaar: ingediend.').waitFor();
+      assert.equal(await ukaart.locator('summary', { hasText: 'Bezwaar maken' }).count(), 0, 'geen tweede bezwaar zolang het eerste loopt');
       const q2 = await opScherm(Q);
       const zkaart = q2.locator('#kwaliteit .kaart', { hasText: 'Bezwaar: Een betaling terugboeken van ' + N.code });
       await zkaart.getByText('de storno was klein').waitFor();
@@ -318,6 +328,26 @@ test('Leerhuis trainer: onder toezicht, bewijs, klaar voor beoordeling en de aan
       await e2.locator('#kwaliteit .kaart', { hasText: 'Beleid voor betaling.terugboeken' }).getByRole('button', { name: 'Beleid goedkeuren' }).click();
       await wachtOp(e2, /Beleid goedgekeurd: betaling.terugboeken/);
       assert.ok((await lees(E, 'kwaliteitWerk')).BELEID.find(b => b.handeling === 'betaling.terugboeken').goedgekeurd);
+
+      /* 5. De leerling ziet de bevinding, en dient een EVC in dat de assessor behandelt. */
+      await n2.reload({ waitUntil: 'domcontentloaded' });
+      await ukaart.getByText('Uw bezwaar: oordeel blijft staan. Bevinding: herstelpad past bij het bewijs.').waitFor();
+      const evform = n2.locator('#evc .kaart', { hasText: 'Eerder verworven' });
+      await evform.getByLabel('Vaardigheid').selectOption({ label: 'Train-the-Trainer' });
+      await evform.getByRole('button', { name: 'EVC indienen' }).click();
+      await wachtOp(n2, /Niet gelukt: noem het externe stuk/);
+      await evform.getByLabel('Wat, van wie en wanneer').fill('didactiekcursus, ROC Amsterdam, 2023');
+      await evform.getByRole('button', { name: 'EVC indienen' }).click();
+      await wachtOp(n2, /EVC ingediend/);
+      await n2.locator('#evc .kaart', { hasText: 'EVC: Train-the-Trainer' }).getByText('bij de assessor').waitFor();
+      const a2 = await opScherm(A);
+      const ekaart = a2.locator('#assessor .kaart', { hasText: 'EVC: Train-the-Trainer van ' + N.code });
+      await ekaart.getByText('Stuk: didactiekcursus, ROC Amsterdam, 2023').waitFor();
+      await ekaart.getByRole('button', { name: 'Deels erkennen' }).click();
+      await wachtOp(a2, /EVC Train-the-Trainer: deels erkennen/);
+      await n2.reload({ waitUntil: 'domcontentloaded' });
+      await n2.locator('#evc .kaart', { hasText: 'EVC: Train-the-Trainer' }).getByText('deels erkend').waitFor();
+      assert.ok(!(await lees(N, 'mijn')).VAARDIGHEDEN.vaardigheden.some(v => v.vaardigheid === 'didactiek'), 'EVC maakt niemand bewezen');
     } finally {
       if (browser) await browser.close().catch(() => {});
       await stop(child);

@@ -799,3 +799,32 @@ test('28. B-UI kwaliteit: bezwaren met het oordeel pas na het oppakken, ongeldig
   assert.deepEqual([b.eigen, b.goedgekeurd, b.rol], [true, false, 'Operations Professional'], 'wie voorstelde, keurt niet zelf goed');
   assert.equal(l.kwaliteitWerk(ORG, P.Q).BELEID.find(x => x.id === 'tb').eigen, false);
 });
+
+test('29. B-UI leerling: uitslagen met bezwaar, EVC indienen en het EVC-werk van de assessor', () => {
+  const w = basis();
+  const l = w.lh.lees;
+  const { beoordeling } = W.leidOp(w, ORG, P.N, P);
+  const u = () => l.mijn(ORG, P.N).UITSLAGEN.find(x => x.id === beoordeling);
+  assert.deepEqual([u().stand, u().bezwaar], ['PROVEN', null], 'de eigen uitslag, nog zonder bezwaar');
+  nee(w.probeer(ORG, 'bezwaarIndienen', { beoordeling, reden: ' ' }, P.N), 400);
+  nee(w.probeer(ORG, 'bezwaarIndienen', { beoordeling, reden: 'niet van mij' }, P.T), 403);
+  w.doe(ORG, 'bezwaarIndienen', { beoordeling, reden: 'de tweede poging telde niet mee' }, P.N);
+  assert.deepEqual(u().bezwaar, { stand: 'REVIEW_REQUEST', uitkomst: null });
+  nee(w.probeer(ORG, 'bezwaarIndienen', { beoordeling, reden: 'nog een keer' }, P.N), 409);
+  const id = l.kwaliteitWerk(ORG, P.Q).BEZWAREN.find(x => x.persoon === P.N).id;
+  w.doe(ORG, 'bezwaarStand', { id, naar: 'INDEPENDENT_REVIEW', notitie: 'nog bezig' }, P.Q);
+  assert.equal(u().bezwaar.uitkomst, null, 'een tussennotitie is geen uitkomst');
+  w.doe(ORG, 'bezwaarStand', { id, naar: 'UPHELD', notitie: 'het bewijs dekt het oordeel' }, P.Q);
+  assert.deepEqual(u().bezwaar, { stand: 'UPHELD', uitkomst: 'het bewijs dekt het oordeel' });
+
+  assert.ok(l.mijn(ORG, P.N).EVC_KEUZE.length > 0, 'met een lopende relatie kiest de leerling een vaardigheid');
+  assert.deepEqual(l.mijn(ORG, 'lid:99').EVC_KEUZE, [], 'zonder relatie geen EVC-keuze');
+  w.doe(ORG, 'evcIndienen', { vaardigheid: 'terugboeken', extern: 'diploma betalingsverkeer, ROC, 2024' }, P.N);
+  nee(w.probeer(ORG, 'evcIndienen', { vaardigheid: 'terugboeken', extern: 'nog een' }, P.N), 409);
+  assert.equal(l.mijn(ORG, P.N).EVC[0].stand, 'EVIDENCE');
+  const e = l.assessorWerk(ORG, P.A).EVC.find(x => x.persoon === P.N);
+  assert.deepEqual([e.stand, e.uitkomsten], ['EVIDENCE', ['ACCEPTED', 'PARTIAL', 'REJECTED']], 'de uitkomsten uit de overgangstabel');
+  w.doe(ORG, 'evcBeoordeel', { id: e.id, uitkomst: 'PARTIAL' }, P.A);
+  assert.equal(l.mijn(ORG, P.N).EVC[0].stand, 'PARTIAL');
+  assert.ok(!l.assessorWerk(ORG, P.A).EVC.some(x => x.id === e.id), 'afgerond staat niet meer in het werk');
+});

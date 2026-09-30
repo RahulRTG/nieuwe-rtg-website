@@ -23,6 +23,8 @@ module.exports = {
     if (!relatieActief(st, door)) weiger('EVC vraagt een lopende relatie', 403);
     if (!st.vaardigheden[i.vaardigheid]) weiger('vaardigheid bestaat niet', 404);
     if (!i.extern) weiger('noem het externe stuk (wat, van wie, wanneer)', 400);
+    if (Object.values(st.evc).some(e => e.persoon === door && e.vaardigheid === i.vaardigheid && ['CLAIM', 'EVIDENCE', 'REVIEW'].includes(e.stand)))
+      weiger('er loopt al een EVC voor deze vaardigheid', 409);
     const id = eigenId(st.evc, i.id, ctx);
     return [{ soort: 'evc', data: { id, persoon: door, vaardigheid: i.vaardigheid, extern: tekst(i.extern, 400) } },
       { soort: 'evcStand', data: { id, naar: 'EVIDENCE' } }];
@@ -45,6 +47,10 @@ module.exports = {
     eisOrg(st);
     const b = st.beoordelingen[i.beoordeling]; if (!b) weiger('beoordeling bestaat niet', 404);
     if (b.persoon !== door) weiger('bezwaar maakt de beoordeelde zelf', 403);
+    if (!['PROVEN', 'NOT_YET_PROVEN', 'INCONCLUSIVE'].includes(b.stand)) weiger('bezwaar gaat over een afgeronde beoordeling', 409);
+    if (Object.values(st.bezwaren).some(z => z.beoordeling === b.id && ['REVIEW_REQUEST', 'INDEPENDENT_REVIEW'].includes(z.stand)))
+      weiger('er loopt al een bezwaar tegen deze beoordeling', 409);
+    if (!String(i.reden || '').trim()) weiger('een bezwaar zonder reden kan niemand behandelen', 400);
     return [{ soort: 'bezwaar', data: { id: ctx.id(), beoordeling: b.id, reden: tekst(i.reden, 800) } }];
   },
 

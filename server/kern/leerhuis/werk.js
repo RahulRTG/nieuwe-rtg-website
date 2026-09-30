@@ -35,7 +35,10 @@ function assessorWerk(st, door) {
       bewijs: Object.values(st.bewijs).filter(x => x.persoon === b.persoon && x.vaardigheid === b.vaardigheid && !x.ongeldig)
         .map(x => ({ id: x.id, soort: x.soort, sterkte: x.sterkte, sinds: x.at, bron: x.bron || null }))
     })),
-    nietZichtbaar: 'beoordelingen die een andere assessor begon, beoordelingen over uzelf, en bewijs buiten de vaardigheid die u beoordeelt'
+    /* EVC: een extern stuk dat hoogstens DOCUMENTED bewijs wordt (acties-evc.js). */
+    EVC: Object.values(st.evc).filter(e => ['EVIDENCE', 'REVIEW'].includes(e.stand) && e.persoon !== door)
+      .map(e => ({ id: e.id, persoon: e.persoon, vaardigheidNaam: naam(e.vaardigheid), extern: e.extern, stand: e.stand, uitkomsten: MACHINES.evc.naar.REVIEW })),
+    nietZichtbaar: 'beoordelingen die een andere assessor begon, beoordelingen over uzelf, EVC-aanvragen over uzelf, en bewijs buiten de vaardigheid die u beoordeelt'
   };
 }
 

@@ -22,7 +22,7 @@
     NOT_YET_PROVEN: 'nog niet bewezen', PROVEN: 'bewezen', ACTIVE: 'actief', PILOT: 'pilot', MONITORED: 'gevolgd',
     IMPROVEMENT: 'in verbetering', SUPERSEDED: 'vervangen', RETIRED: 'uit gebruik', SUSPENDED: 'geschorst', REVOKED: 'ingetrokken',
     EXPIRING: 'verloopt binnenkort', EXPIRED: 'verlopen', REVIEW_REQUEST: 'bezwaar ingediend', INDEPENDENT_REVIEW: 'in review',
-    INCONCLUSIVE: 'onbeslist', INVALIDATED: 'ongeldig', ASSIGNED: 'toegewezen', LEARNING: 'aan het leren', PRACTICING: 'aan het oefenen' };
+    INCONCLUSIVE: 'onbeslist', INVALIDATED: 'ongeldig', EVIDENCE: 'stuk ingediend', ASSIGNED: 'toegewezen', LEARNING: 'aan het leren', PRACTICING: 'aan het oefenen' };
   var stand = function (s) { return STAND[s] || String(s || '').toLowerCase(); };
   var ORG = '';
 

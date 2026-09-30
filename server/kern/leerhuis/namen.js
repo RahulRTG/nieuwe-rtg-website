@@ -32,7 +32,7 @@ function metNamen(antwoord, naamVan) {
   if (!antwoord || typeof antwoord !== 'object') return antwoord;
   const zet = (lijst) => Array.isArray(lijst) ? lijst.map(x => Object.assign({}, x, { naam: naamVan(x.persoon) })) : lijst;
   const uit = Object.assign({}, antwoord);
-  for (const veld of ['LEERLINGEN', 'VANDAAG', 'TEAM', 'OPEN', 'LOPEND', 'BESTUUR', 'RELATIES', 'KLAAR', 'CERTIFICATEN', 'TRAINERS', 'ZONDER_TRAINER', 'KANDIDATEN', 'BEZWAREN', 'ONGELDIG']) if (veld in uit) uit[veld] = zet(uit[veld]);
+  for (const veld of ['LEERLINGEN', 'VANDAAG', 'TEAM', 'OPEN', 'LOPEND', 'BESTUUR', 'RELATIES', 'KLAAR', 'CERTIFICATEN', 'TRAINERS', 'ZONDER_TRAINER', 'KANDIDATEN', 'BEZWAREN', 'ONGELDIG', 'EVC']) if (veld in uit) uit[veld] = zet(uit[veld]);
   return uit;
 }
 

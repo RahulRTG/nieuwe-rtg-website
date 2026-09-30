@@ -1,9 +1,9 @@
 {
   "uitleg": "Elke route (METHODE + patroon) die tijdens de volledige testsuite ECHT is aangeraakt, uit het routejournaal van server/routelog.js en niet uit de tekst van de toetsen. De eis is 100%: scripts/dekking.js zakt op elk gat en kent geen norm om die eis te verlagen. Het RTG Kantoor leest dit bestand (routes/office/dekking.js) en houdt het naast wat de server op dit moment registreert, zodat een route die er na de meting bij komt meteen als ongemeten opvalt. Bijwerken met: npm run dekking:vast",
   "gemeten": {
-    "op": "2026-09-30T00:39:07.363Z",
-    "commit": "0166adb62",
-    "routesToen": 5346
+    "op": "2026-09-30T15:44:01.323Z",
+    "commit": "1888cbffc",
+    "routesToen": 5355
   },
   "aangeraakt": [
     "GET /",
@@ -229,6 +229,12 @@
     "POST /api/bedrijf/post/context",
     "POST /api/bedrijf/post/herkomst",
     "POST /api/bedrijf/post/omzetten",
+    "POST /api/bedrijf/praktijk/aanbod",
+    "POST /api/bedrijf/praktijk/beeld",
+    "POST /api/bedrijf/praktijk/delen",
+    "POST /api/bedrijf/praktijk/inrichten",
+    "POST /api/bedrijf/praktijk/stap",
+    "POST /api/bedrijf/praktijk/vraag",
     "POST /api/bedrijf/project",
     "POST /api/bedrijf/project/maak",
     "POST /api/bedrijf/project/mijlpaal",
@@ -666,6 +672,7 @@
     "POST /api/experience/evidence",
     "POST /api/experience/intent/execute",
     "POST /api/experience/intent/preview",
+    "POST /api/experience/network",
     "POST /api/experience/projection",
     "POST /api/experience/resume",
     "POST /api/facturen/ai",
@@ -5219,6 +5226,8 @@
     "POST /api/wereld/rahul",
     "POST /api/wereld/state",
     "POST /api/wereld/zoek",
+    "POST /api/werk-gast/beeld",
+    "POST /api/werk-gast/besluit",
     "POST /api/werkmail/bezorg",
     "POST /api/werkplek/bureau/architect",
     "POST /api/werkplek/bureau/architect/bouwstaat",

@@ -93,7 +93,7 @@ const stadium = (k, id) => k.stadia.find(s => s.id === id);
 /* ---------------- de keten wordt gevolgd, niet nagebouwd ---------------- */
 
 test('de keten wordt gevolgd op de referenties en er wordt niets geschreven', () => {
-  const K = stubKern([klus({ boeking: { wanneer: dag(-3) }, factuur: {} })]);
+  const K = stubKern([klus({ boeking: { status: 'afgerond', finishedAt: isoTerug(3), wanneer: dag(-3) }, factuur: {} })]);
   /* De momentopname NA het aanmaken van de onderneming: dat aanmaken schrijft
      zelf in db.data.ondernemingen, en dat is niet wat deze toets meet. */
   const o = ond(K);
@@ -122,9 +122,9 @@ test('elk stadium wordt herkend aan wat er echt staat', () => {
   const K = stubKern([
     klus({ boeking: { wanneer: null } }),                                  // akkoord
     klus({ boeking: { wanneer: dag(3) } }),                                // ingepland
-    klus({ boeking: { wanneer: dag(-3) } }),                               // uitgevoerd
-    klus({ boeking: { wanneer: dag(-9) }, factuur: {} }),                  // gefactureerd
-    klus({ boeking: { wanneer: dag(-20) }, factuur: { betaald: true } })   // klaar
+    klus({ boeking: { status: 'afgerond', finishedAt: isoTerug(3), wanneer: dag(-3) } }),                               // uitgevoerd
+    klus({ boeking: { status: 'afgerond', finishedAt: isoTerug(9), wanneer: dag(-9) }, factuur: {} }),                  // gefactureerd
+    klus({ boeking: { status: 'afgerond', finishedAt: isoTerug(20), wanneer: dag(-20) }, factuur: { betaald: true } })   // klaar
   ]);
   const k = K.ondernemingKlussen(ond(K), NU);
   for (const id of ['akkoord', 'ingepland', 'uitgevoerd', 'gefactureerd', 'klaar']) {
@@ -133,18 +133,18 @@ test('elk stadium wordt herkend aan wat er echt staat', () => {
   assert.equal(k.rijen.length, 4, 'wat klaar is staat niet meer in de lijst');
 });
 
-test('de dag van vandaag telt als uitgevoerd en niet als ingepland', () => {
+test('een datum van vandaag bewijst geen uitvoering', () => {
   const K = stubKern([klus({ boeking: { wanneer: dag(0) + 'T09:00' } })]);
   const k = K.ondernemingKlussen(ond(K), NU);
-  assert.equal(stadium(k, 'uitgevoerd').aantal, 1,
-    'een klus van vanochtend is vandaag gedaan');
+  assert.equal(stadium(k, 'ingepland').aantal, 1,
+    'ook een klus van vanochtend kan nog open staan');
 });
 
 test('ingepland werk telt niet mee als openstaand geld', () => {
   const K = stubKern([
     klus({ boeking: { wanneer: dag(5) } }),                  // ingepland, 1000
-    klus({ boeking: { wanneer: dag(-2) } }),                 // uitgevoerd, 1000
-    klus({ boeking: { wanneer: dag(-9) }, factuur: {} })     // gefactureerd, 1000
+    klus({ boeking: { status: 'afgerond', finishedAt: isoTerug(2), wanneer: dag(-2) } }),                 // uitgevoerd, 1000
+    klus({ boeking: { status: 'afgerond', finishedAt: isoTerug(9), wanneer: dag(-9) }, factuur: {} })     // gefactureerd, 1000
   ]);
   const k = K.ondernemingKlussen(ond(K), NU);
   assert.equal(k.buiten.aantal, 2);
@@ -156,7 +156,7 @@ test('ingepland werk telt niet mee als openstaand geld', () => {
 /* ---------------- wat wij niet weten ---------------- */
 
 test('geen factuur betekent niet dat er niet is gefactureerd', () => {
-  const K = stubKern([klus({ boeking: { wanneer: dag(-3) } })]);
+  const K = stubKern([klus({ boeking: { status: 'afgerond', finishedAt: isoTerug(3), wanneer: dag(-3) } })]);
   const k = K.ondernemingKlussen(ond(K), NU);
   const r = k.rijen[0];
   assert.equal(r.stadium, 'uitgevoerd');
@@ -166,8 +166,8 @@ test('geen factuur betekent niet dat er niet is gefactureerd', () => {
 });
 
 test('de factuur wordt op referentie gevonden en niet op bedrag of klant', () => {
-  const a = klus({ boeking: { wanneer: dag(-8) }, factuur: {} });
-  const b = klus({ boeking: { wanneer: dag(-8) } });
+  const a = klus({ boeking: { status: 'afgerond', finishedAt: isoTerug(8), wanneer: dag(-8) }, factuur: {} });
+  const b = klus({ boeking: { status: 'afgerond', finishedAt: isoTerug(8), wanneer: dag(-8) } });
   /* Twee klussen van dezelfde klant voor hetzelfde bedrag; alleen de eerste
      heeft een factuur. Op bedrag matchen zou de tweede die van de eerste geven. */
   const K = stubKern([a, b]);
@@ -180,8 +180,8 @@ test('de factuur wordt op referentie gevonden en niet op bedrag of klant', () =>
 });
 
 test('betaald is betaald, langs welke van de twee wegen dan ook', () => {
-  const viaFactuur = klus({ boeking: { wanneer: dag(-9) }, factuur: { betaald: true } });
-  const viaKassa = klus({ boeking: { wanneer: dag(-9), paid: true }, factuur: { betaald: false } });
+  const viaFactuur = klus({ boeking: { status: 'afgerond', finishedAt: isoTerug(9), wanneer: dag(-9) }, factuur: { betaald: true } });
+  const viaKassa = klus({ boeking: { status: 'afgerond', finishedAt: isoTerug(9), wanneer: dag(-9), paid: true }, factuur: { betaald: false } });
   const K = stubKern([viaFactuur, viaKassa]);
   const k = K.ondernemingKlussen(ond(K), NU);
   assert.equal(stadium(k, 'klaar').aantal, 2,
@@ -193,14 +193,14 @@ test('betaald is betaald, langs welke van de twee wegen dan ook', () => {
 
 test('per stap een eigen drempel, want ze betekenen iets anders', () => {
   const K = stubKern([
-    klus({ boeking: { wanneer: dag(-3) } }),                                  // uitgevoerd, 3 dagen
-    klus({ boeking: { wanneer: dag(-10) } }),                                 // uitgevoerd, 10 dagen
-    klus({ boeking: { wanneer: dag(-60) }, factuur: { datum: dag(-40) } }),    // gefactureerd, 39 dagen
+    klus({ boeking: { status: 'afgerond', finishedAt: isoTerug(3), wanneer: dag(-3) } }),                                  // uitgevoerd, 3 dagen
+    klus({ boeking: { status: 'afgerond', finishedAt: isoTerug(10), wanneer: dag(-10) } }),                                 // uitgevoerd, 10 dagen
+    klus({ boeking: { status: 'afgerond', finishedAt: isoTerug(60), wanneer: dag(-60) }, factuur: { datum: dag(-40) } }),    // gefactureerd, 39 dagen
     /* Het geval dat de twee drempels ECHT scheidt: tien dagen is traag voor een
        onbetaalde uitvoering en juist niet voor een factuur. Zonder dit geval
        kwam een mutatie die overal dezelfde drempel zette er ongestraft
        doorheen -- de andere gevallen lagen aan beide kanten hetzelfde. */
-    klus({ boeking: { wanneer: dag(-30) }, factuur: { datum: dag(-10) } })     // gefactureerd, 9 dagen
+    klus({ boeking: { status: 'afgerond', finishedAt: isoTerug(30), wanneer: dag(-30) }, factuur: { datum: dag(-10) } })     // gefactureerd, 9 dagen
   ]);
   const k = K.ondernemingKlussen(ond(K), NU);
   assert.equal(KLU.TRAAG.uitgevoerd, 7);
@@ -226,8 +226,8 @@ test('ingepland werk kan nooit traag zijn', () => {
 
 test('niet gefactureerd werk gaat voor wat op betaling wacht', () => {
   const K = stubKern([
-    klus({ boeking: { wanneer: dag(-3) } }),
-    klus({ boeking: { wanneer: dag(-60) }, factuur: { datum: dag(-40) } })
+    klus({ boeking: { status: 'afgerond', finishedAt: isoTerug(3), wanneer: dag(-3) } }),
+    klus({ boeking: { status: 'afgerond', finishedAt: isoTerug(60), wanneer: dag(-60) }, factuur: { datum: dag(-40) } })
   ]);
   const v = KLU.klussenOpvolging(K.ondernemingKlussen(ond(K), NU));
   assert.deepEqual(v.map(x => x.id), ['niet-gefactureerd', 'lang-open']);
@@ -244,7 +244,7 @@ test('zonder iets te melden komt er geen regel', () => {
 /* ---------------- het dagbeeld ---------------- */
 
 test('het dagbeeld draagt de klusketen en zet hem voor de pijplijn', () => {
-  const K = stubKern([klus({ boeking: { wanneer: dag(-3) } })]);
+  const K = stubKern([klus({ boeking: { status: 'afgerond', finishedAt: isoTerug(3), wanneer: dag(-3) } })]);
   const d = K.ondernemingDagbeeld(ond(K), NU);
   assert.ok(d.klussen, 'de keten hangt in het dagbeeld');
   const ids = d.acties.map(a => a.id);
@@ -253,4 +253,11 @@ test('het dagbeeld draagt de klusketen en zet hem voor de pijplijn', () => {
   assert.ok(ki >= 0);
   if (pi >= 0) assert.ok(ki < pi,
     'uitgevoerd werk zonder factuur houdt u zelf tegen; een offerte moet nog een klant overtuigen');
+});
+
+test('een oude afspraak wordt zonder afmelding geen uitgevoerd werk', () => {
+  const K = stubKern([klus({ boeking: { wanneer: dag(-30), status: 'bevestigd' } })]);
+  const k = K.ondernemingKlussen(ond(K), NU);
+  assert.equal(stadium(k, 'ingepland').aantal, 1);
+  assert.equal(stadium(k, 'uitgevoerd').aantal, 0);
 });

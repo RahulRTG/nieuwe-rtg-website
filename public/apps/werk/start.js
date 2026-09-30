@@ -15,6 +15,7 @@
   function $(id) { return document.getElementById(id); }
 
   function start() {
+    if (window.RTGPraktijk) window.RTGPraktijk.laad();
     /* Het merk van de klant laadt naast het startscherm en niet erin: een
        werkruimte die zonder tenant draait, hoort gewoon te werken. */
     if (window.RTGWerkMerk) window.RTGWerkMerk.laad();

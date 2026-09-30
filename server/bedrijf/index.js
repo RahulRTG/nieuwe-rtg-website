@@ -111,6 +111,7 @@ module.exports = (kern) => {
      alle bakken hierboven en schrijft in geen enkele -- er staat niet eens een
      save() in. */
   require('./gevolg')(sctx);
+  Object.assign(sctx, require('./praktijk')(sctx));
   sctx.hangProductieIdentiteit = productieIdentiteit.hang;
   /* Bij de opslagstart (server.js): oude kale sleutels uit de werkruimtes.
      Productie houdt er geen enkele over; elders worden ze hash (legacy192). */

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2272 bestanden en 15632 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2275 bestanden en 15645 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2272 |
-| losse beweringen (`test(...)`) | 15632 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 217 |
+| toetsbestanden | 2275 |
+| losse beweringen (`test(...)`) | 15645 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 220 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1896 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 148 |
 | alleen in de kop *genoemd*, nog niet gemeten | 36 |
-| niets van beide | 192 |
+| niets van beide | 195 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1978 bestanden, 15125 beweringen.
+1980 bestanden, 15137 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1169,7 +1169,7 @@ toets omvalt.
 | `onderneming-debiteuren.test.js` | 12 | gezakt op `===->!==#0` | Ronde: de debiteuren -- wat er nog open staat, en hoe lang al. Vier beweringen: 1. |
 | `onderneming-eersteklant.test.js` | 16 | gezakt op `===->!==#0` | Ronde: de eerste klant, en de honderd daarna. Drie beweringen die hier het zwaarst wegen: 1. |
 | `onderneming-kas.test.js` | 15 | gezakt op `===->!==#0` | Ronde: de kasvooruitblik. Vier beweringen: 1. |
-| `onderneming-klussen.test.js` | 13 | gezakt op `===->!==#0` | Ronde: de klusketen -- van akkoord tot geld, en waar hij blijft steken. Vijf beweringen: 1. |
+| `onderneming-klussen.test.js` | 14 | gezakt op `===->!==#0` | Ronde: de klusketen -- van akkoord tot geld, en waar hij blijft steken. Vijf beweringen: 1. |
 | `onderneming-mallprofiel.test.js` | 10 | gezakt op `===->!==#0` | Ronde: het Mall-profiel -- hoe de pagina van een zaak is opgebouwd. Drie beweringen: 1. |
 | `onderneming-offertebouw.test.js` | 17 | gezakt op `===->!==#0` | Ronde: de offertebouwer -- een prijs die is opgebouwd in plaats van bedacht. Vijf beweringen: 1. |
 | `onderneming-ontwerper.test.js` | 11 | gezakt op `===->!==#0` | Ronde: de bedrijfsontwerper en de Mall-bouwer -- de AI die meedenkt en nergens over beslist. Zes beweringen: 1. |
@@ -1314,6 +1314,8 @@ toets omvalt.
 | `postgres-requestcommit.test.js` | 17 | gezakt op `&&->||#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `postgres-transport.test.js` | 8 | gezakt op `!==->===#0` | PostgreSQL-transport: de productiepoort en de echte pgwire-handshake moeten dezelfde grens trekken. Extern betekent verify-full + expliciete CA; plaintext bestaat alleen op loopback en de vaste Compose-servicenamen. |
 | `pragmavolgorde.test.js` | 2 | gezakt op `===->!==#0` | DE OMSCHAKELING NAAR WAL OP EEN BEZETTE DATABASE. `PRAGMA busy_timeout` zegt: kom je een bezet bestand tegen, wacht dan even in plaats van te weigeren. |
+| `praktijk-http.test.js` | 5 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `praktijk.test.js` | 6 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `presentatie-eigenaar.test.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `presentatie-gezinsbeelden.test.js` | 3 | -- | DE BEELDKEUZE VAN EEN GEZINSPROFIEL BLIJFT VAN DAT PROFIEL. routes/presentatie-gezinsbeelden.js (#413) laat een gekozen gezinsprofiel eigen foto's kiezen voor zijn schermen. |
 | `presentiemeting.test.js` | 4 | gezakt op `liegpoort /api/` | De presentiebelofte: een les staat binnen dertig seconden. Wat hier hard wordt gemaakt: - het scherm is UITZONDERINGSGESTUURD: iedereen staat op aanwezig en de leraar wijzigt alleen wie er niet is. |
@@ -2018,7 +2020,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-294 bestanden, 507 beweringen.
+295 bestanden, 508 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2206,6 +2208,7 @@ toets omvalt.
 | `plaatsnadering.e2e.js` | 2 | -- | DE AANKOMSTPULS ZONDER HANDWERK (PLAATS.md fase 4). Invisible Arrival had deze functie al, en goed: een tijdelijke pass met drie knoppen waarmee een gast vrijwillig deelt dat hij onderweg, in de buurt of gearriveerd... |
 | `poortgesprek.e2e.js` | 1 | -- | Scherm-test voor het gegevensgesprek: de client-kant van de gegevenspoort. De server houdt een handeling met een derde partij tegen met 428 en zegt wat er mist. |
 | `post-scherm.e2e.js` | 1 | -- | Schermtoets voor apps/mijn-post.html. Dit scherm belooft drie dingen die allebei op het scherm EN in de bron waar moeten zijn: 1. |
+| `praktijk.e2e.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `premium.e2e.js` | 7 | gezakt op `liegpoort /api/` | Scherm-test voor de premium-laag: meenemen (shared/uitvoer.js) en sneltoetsen (shared/sneltoets.js). Waarom deze twee. |
 | `prijsgarantie.e2e.js` | 1 | -- | DE MELDKNOP, end-to-end. test/prijsmelding.test.js toetst de kern; dit bestand toetst dat de knop er ECHT is -- dat het lid hem kan indienen en dat de zaak hem ziet. |
 | `rahul-escape.e2e.js` | 1 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |

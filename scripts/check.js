@@ -1930,6 +1930,7 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     /* spread van [auth, geenGast], zoals `lid` hierboven; werd zichtbaar toen
        de kantoorpakket-paden voluit kwamen te staan (regel 45) */
     'ledenAuth', 'rtfPoort']);
+  POORT_MW.add('praktijkMutatiePoort'); // fabriek in bedrijf/praktijk.js: werkPoort + project/klant/werkruimte binnen de duurzame commit; praktijk-http.test.js bewijst actuele rollen
   POORT_MW.add('gezinBeeldAuth'); // verifieert gezinscode en profieltoken vóór eigen foto’s worden gelezen of geschreven
   POORT_MW.add('arrivalPassAuth'); // bezit van de tijdelijke, gehashte Arrival Pass
   /* `scimAuth` (routes/scim.js) -- de deur waar de IdP van een klant zelf
@@ -3410,6 +3411,8 @@ console.log('\n46) de SLO-tabel in SLO.md is een afdruk van SLO.json');
 console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestiging moet');
 {
   const TOEGESTAAN = new Map([
+    ['server/bedrijf/praktijk.js', 'Werk van een organisatie en de herhaalsleutel worden samen duurzaam bevestigd; verlies na een geslaagde reactie zou dubbel werk veroorzaken.'],
+    ['server/bedrijf/praktijk-gast.js', 'Gastakkoord op een voorstel wordt pas bevestigd na duurzame opslag van dezelfde versie en beslissing.'],
     ['server/db/duurzaam.js', 'hier WOONT de primitive sinds db/index.js is opgeknipt'],
     ['server/db/bijeen.js', 'de bundel met de duurzaam-vlag is de enige indirecte weg erheen'],
     ['server/db/index.js', 'draagt de vlag van de aanroeper door naar de bundel; kiest zelf niets'],

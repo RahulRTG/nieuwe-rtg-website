@@ -18,6 +18,8 @@
 'use strict';
 
 const PUBLIEK = new Map([
+  ['/api/werk-gast/beeld', 'Een gast heeft geen RTG-account: een tijdelijk 256-bit geheim toont precies één afspraak; opslag bewaart alleen de hash en iedere lezing controleert intrekking en tenantstatus.'],
+  ['/api/werk-gast/besluit', 'Dezelfde beperkte gastlink, met versiecontrole: uitsluitend eenmalig akkoord of afwijzen van het gedeelde voorstel, geen account of andere rechten.'],
   // ---- de deuren zelf: hier kan per definitie nog geen sessie zijn ----
   ['/api/auth/register', 'registreren kan alleen zonder account'],
   ['/api/mail/ses', 'AWS SES bewijst bezit met een verse HMAC over envelop, controles en exacte berichtbytes; zonder 32+ teken geheim blijft de route dicht'],

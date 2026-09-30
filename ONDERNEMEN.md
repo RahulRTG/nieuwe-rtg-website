@@ -614,3 +614,68 @@ een vierde bij komt. Dat is een eigen meting en geen bijzin.
 `ONDERNEMERSLUS.json` (`npm run ondernemerslus`), die in par. 0 en 8 uit
 `ONDERNEMERBEWIJS.json` en `VERTROUWEN.json`. Wie ze citeert, leest eerst hun
 stempel.*
+
+## Dagelijks werk zonder bestaande software (30 september 2026)
+
+`/apps/werk.html` biedt binnen de bestaande WerkOS-werkruimte een eenvoudige
+werktafel. Een nieuwe organisatie kan daar zelf een werkruimte openen en haar
+werkprofiel, land, valuta en tijdzone kiezen. Producten, diensten, verhuur,
+activiteiten en kosteloze hulp kunnen naast elkaar bestaan, met een eigen
+locatie per onderdeel. Er zijn geen AI-, betaal- of integratiesleutels nodig.
+Dit is een interne werkplek; een aanbod invoeren verleent geen publieke
+partnerstatus en publiceert niets in de Mall.
+
+De werkstroom is vraag → voorstel → akkoord → planning → uitvoering →
+administratieve afronding. Klanten blijven in `werkruimtes.klanten`, de vraag en
+haar afspraak in `kansen`, het werk in `projecten` en de planning in `taken`.
+Het algemene project draagt uitsluitend een verwijzing naar de klantafspraak.
+Het aanbod in `praktijkAanbod` is de interne definitie van wat deze organisatie
+zelf wil registreren; een koppeling of publicatie naar een bestaand sectoraal
+catalogusregister is in deze ronde niet gemaakt. Bestaande sectorale offertes,
+boekingen, voorraad, facturen en betalingen houden hun eigen bron en werkproces.
+
+Handmatig extern geregeld werk hangt als taak aan hetzelfde project. De bron
+blijft zichtbaar als handmatig; bevestigd, uitgevoerd en geannuleerd vragen een
+bewijsreferentie. Er wordt geen externe API aangeroepen en niets geboekt of
+betaald bij een leverancier. Open onderdelen blokkeren de uitvoering. Een
+verstreken datum is geen uitvoeringsbewijs, ook niet meer in de bestaande
+ondernemersweergave van de Vakwerk-klusketen.
+
+Personeel gebruikt het bestaande WerkOS-rollenregister, inclusief begin- en
+einddatum. De werktafel vraagt zowel project- als klantrechten; inrichting,
+aanbod en delen vragen daarnaast werkruimtebeheer. Het teamscherm gebruikt de
+bestaande routes voor toelating en rollen. Een organisatiecode, klantrelatie,
+profielkeuze of netwerkverbinding geeft nooit bevoegdheid.
+
+Een klant zonder RTG-account kan een beperkt voorstel lezen en beantwoorden via
+een gastlink. Een link geldt maximaal zeven dagen, kan worden ingetrokken en
+wordt vervangen bij een nieuw voorstel. Alleen een hash van het 256-bit geheim
+wordt opgeslagen; het geheim reist in het URL-fragment en de POST-body, niet in
+querystrings. Bezit van de link is de bevoegdheid, geen geverifieerde identiteit:
+de vastlegging zegt `gastlink`, niet dat RTG weet welke persoon heeft getekend.
+Intrekking van de uitgevende medewerker of het afsluiten van de tenant sluit
+ook diens gastlinks. Een link mag geen personeelsgegevens, andere klanten,
+interne uitvoeringsnotities of administratieve bewijsreferenties tonen.
+
+Elke nieuwe schrijfactie controleert de actuele werkruimte, versie en een
+herhaalsleutel en wordt duurzaam bevestigd. Generieke antwoordcaches mogen deze
+controles niet overslaan. Het gastbesluit kan slechts eenmaal op de actuele
+voorstelversie plaatsvinden. Ontvangst van een voorstel en handmatig genoteerd
+telefonisch akkoord zijn zichtbaar verschillende bronnen.
+
+Valutabedragen volgen de decimaalprecisie van hun munt (bijvoorbeeld JPY 0,
+EUR 2, KWD 3). Andere valuta worden niet als euro opgeteld in het bestaande
+EUR-verkoopbeeld. De administratieve afsluiting bewaart een verwijzing naar de
+administratie, of bij bedrag nul de reden voor geen betaling. Zij genereert
+geen factuur, boekt geen omzet en verklaart geen betaling ontvangen.
+
+Collega's kunnen op het toegangsscherm met de werkruimtecode toegang aanvragen.
+De beheerder laat een persoon toe en kent bestaande rollen toe; een aanvraag
+geeft zelf geen toegang. De browserproef doorloopt ook deze toelating.
+
+Bewijs: `test/praktijk.test.js`, `test/praktijk-http.test.js`,
+`test/praktijk.e2e.js` en `test/onderneming-klussen.test.js`. De scenario's
+omvatten zelfstandige, winkel, dienstverlening, meerdere locaties en stichting;
+de browserketen loopt op 390 en 1440 pixels. Dit bewijst deze werkstroom, niet
+alle sectorale processen, fiscale regels, resourcecapaciteit, live externe
+boekingssystemen of de hele toekomstige RTG World-architectuur.

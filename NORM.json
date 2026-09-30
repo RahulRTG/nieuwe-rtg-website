@@ -12,7 +12,7 @@
     "bronBlindeBestanden": 3,
     "browserpoortToetsen": 402,
     "carriereDomeinenGemeten": 15,
-    "dbDeuren": 531,
+    "dbDeuren": 532,
     "dbDeurenSchrijvend": 275,
     "dekkingPct": 83,
     "dekkingWaargenomenPct": 100,
@@ -3572,6 +3572,15 @@
       "meter": "toetsenNietGemeten 297 -> 302",
       "reden": "Vijf toetsbestanden zijn nieuw: test/conciergelus.test.js, -regels, -kern, -dubbel en test/tafeluitzondering.test.js. Met de hand nagetrokken met vijf mutaties op de dragende regels (een verlopen aanbod toch vastzetten, een verrassing naar een gedeeld kanaal laten gaan, een veld aan de deelnemersweergave toevoegen, afsluiten met een onbevestigd onderdeel, versturen zonder alles gezien te hebben); alle vijf laten een toets zakken. De mutatiemotor is er nog niet langs geweest.",
       "waarheen": "Een volledige npm run mutatie op een schone boom neemt ze mee."
+    },
+    {
+      "datum": "2026-09-30",
+      "soort": "structureel",
+      "sleutel": "dbDeuren",
+      "van": 531,
+      "meter": "dbDeuren 531 -> 532",
+      "reden": "server/opzet/kernlaag2b.js leest db.data.reserveringen voor de tafeluitzondering (tegenvoorstel en doorzetten, CONCIERGE.md par. 2.7-2.9). De eerste versie bouwde hem in kern/ervaring/tafels.js, dat al een deur is, maar server.js pakt de namen van de ervaring-laag een voor een uit en staat boven de omvanggrens, dus daar kan geen naam bij. Het is dezelfde collectie die tafels.js en tafelplanning.js al lezen, via een thunk; de module zelf raakt de opslag niet aan.",
+      "waarheen": "Zodra server.js de ervaring-laag in zijn geheel aan de kern hangt in plaats van naam voor naam, kan de bouw terug naar tafels.js en zakt de teller weer."
     }
   ],
   "prestatie": {

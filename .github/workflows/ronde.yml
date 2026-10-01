@@ -73,11 +73,11 @@ defaults:
   run:
     shell: bash
 
-# Twee rondes tegelijk hebben geen zin: de tweede meet dezelfde bron op een
-# machine die al bezet is. Een lopende ronde afbreken doen we NIET -- een halve
-# beproeving is geen meting.
+# Iedere job gebruikt een eigen geïsoleerde runner. Onafhankelijke branches
+# en bewijssoorten mogen elkaar niet blokkeren of een pending run vervangen.
+# Dezelfde ref/scope blijft serieel; een lopende meting breken we niet af.
 concurrency:
-  group: ronde
+  group: ronde-${{ github.ref }}-${{ inputs.scope || 'full' }}
   cancel-in-progress: false
 
 jobs:
@@ -243,11 +243,17 @@ jobs:
       MEGA_SEED: '1234567'
       LEK_MS: '15000'
       LEK_RONDES: '2'
-      RTG_PERFORMANCE_COMMIT: ${{ github.sha }}
+      RTG_PERFORMANCE_COMMIT: ${{ inputs.candidate || github.sha }}
+      RTG_PERFORMANCE_WORKFLOW_COMMIT: ${{ github.sha }}
       RTG_CPU_PROFILE_DIR: ${{ inputs.profile && format('{0}/artifacts/performance-debt/profiles', github.workspace) || '' }}
     steps:
+      - name: Alleen exacte bronidentiteiten vóór checkout
+        run: |
+          [[ "$RTG_PERFORMANCE_COMMIT" =~ ^[0-9a-f]{40}$ ]] || exit 1
+          [[ "$RTG_PERFORMANCE_WORKFLOW_COMMIT" =~ ^[0-9a-f]{40}$ ]] || exit 1
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
+          ref: ${{ env.RTG_PERFORMANCE_COMMIT }}
           persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
@@ -256,6 +262,9 @@ jobs:
       - run: npm ci
       - name: Bewaar de vorige meting; accepteer alleen vers bewijs
         run: node scripts/performance-debt.js prepare
+      - name: Bewaar workflowherkomst afzonderlijk van de gemeten kandidaat
+        run: |
+          printf '{"candidateCommit":"%s","workflowCommit":"%s"}\n' "$RTG_PERFORMANCE_COMMIT" "$RTG_PERFORMANCE_WORKFLOW_COMMIT" > artifacts/performance-debt/WORKFLOW-IDENTITY.json
       - name: Bestaande storm, geld, misbruik en herstel
         run: node scripts/beproeving.js 2>&1 | tee artifacts/performance-debt/beproeving.log
       - name: Toets de oorspronkelijke doelen zonder de norm te verplaatsen
@@ -265,7 +274,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: performance-debt-${{ github.sha }}
+          name: performance-debt-${{ env.RTG_PERFORMANCE_COMMIT }}
           path: |
             artifacts/performance-debt/
             BEPROEVING.json

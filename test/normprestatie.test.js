@@ -165,4 +165,5 @@ test('9. prestatieschuld sluit alleen met schoon, vergelijkbaar en volledig kand
   }
   assert.equal(assess(commit, lat, null).status, 'BLOCKED', 'historisch bewijs vervangt geen verse meting');
   assert.equal(assess('558f4e603', lat, geldig()).status, 'BLOCKED', 'volledige kandidaatidentiteit is verplicht');
+  assert.equal(assess(commit, lat, geldig(), true).status, 'BLOCKED', 'een profielrun is diagnose en kan geen schuld sluiten');
 });

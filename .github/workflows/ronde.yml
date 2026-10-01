@@ -40,6 +40,10 @@ on:
         options:
           - full
           - performance
+      profile:
+        description: Alleen diagnose; CPU-profielen kunnen prestatieschuld niet sluiten
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -86,6 +90,7 @@ jobs:
       LEK_MS: '15000'
       LEK_RONDES: '2'
       RTG_PERFORMANCE_COMMIT: ${{ github.sha }}
+      RTG_CPU_PROFILE_DIR: ${{ inputs.profile && format('{0}/artifacts/performance-debt/profiles', github.workspace) || '' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:

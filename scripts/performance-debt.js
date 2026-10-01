@@ -12,8 +12,9 @@ const TARGETS = Object.freeze({ p99Ms: 144, eventLoopP99Ms: 64.8 });
 const hash = bytes => crypto.createHash('sha256').update(bytes).digest('hex');
 const finite = n => typeof n === 'number' && Number.isFinite(n);
 
-function assess(candidate, norm, measurement) {
+function assess(candidate, norm, measurement, profiling = false) {
   const proof = { commit: candidate, status: 'BLOCKED', blockers: [], targets: TARGETS };
+  if (profiling) proof.blockers.push('Profiler is active; diagnostic timings cannot close performance debt.');
   if (!/^[a-f0-9]{40}$/.test(candidate || '')) proof.blockers.push('No full candidate commit was supplied.');
   if (!measurement) {
     proof.blockers.push('The current storm produced no completed measurement; historical values cannot stand in for it.');
@@ -60,6 +61,7 @@ function prepare(root = process.cwd(), env = process.env) {
     platform: [os.platform(), os.release(), os.arch()].join('/'),
     cpu: execFileSync('lscpu', { encoding: 'utf8' }),
     workload: Object.fromEntries(['STORM_WERKERS', 'SOAK_MIN', 'MEGA_SEED', 'LEK_MS', 'LEK_RONDES'].map(key => [key, env[key]])),
+    profiling: Boolean(env.RTG_CPU_PROFILE_DIR),
     isolation: 'Fresh GitHub-hosted runner; temporary SQLite directory; no production or provider credentials.'
   };
   fs.writeFileSync(path.join(out, 'RUN-IDENTITY.json'), JSON.stringify(manifest, null, 2) + '\n');
@@ -72,7 +74,7 @@ function evaluate(root = process.cwd(), env = process.env) {
   const norm = JSON.parse(fs.readFileSync(path.join(root, 'NORM.json'), 'utf8'));
   const source = path.join(root, 'LAATSTE_METING.json');
   const bytes = fs.existsSync(source) ? fs.readFileSync(source) : null;
-  const proof = assess(env.RTG_PERFORMANCE_COMMIT, norm, bytes ? JSON.parse(bytes.toString()) : null);
+  const proof = assess(env.RTG_PERFORMANCE_COMMIT, norm, bytes ? JSON.parse(bytes.toString()) : null, Boolean(env.RTG_CPU_PROFILE_DIR));
   if (bytes) proof.measurementSha256 = hash(bytes);
   fs.writeFileSync(path.join(out, 'PERFORMANCE-DEBT-PROOF.json'), JSON.stringify(proof, null, 2) + '\n');
   return proof;

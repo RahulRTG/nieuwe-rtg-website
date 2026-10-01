@@ -2,7 +2,7 @@
 (function (w, d) {
   'use strict';
   // Edge vervangt lokale balken; hun echte bediening blijft hier bereikbaar.
-  var ROOTS = '.wd-output,.connection-edge,.cmd-balk,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-tabs,body>nav.balk,.wd-page>nav.balk,.rtg-edge-owned-bar,.rtgsprong-greep,.rtm-nav,.ios-nav-acties,.ios-nav-extra';
+  var ROOTS = '.wd-output,.connection-edge,.cmd-balk,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-tabs,body>nav.balk,.wd-page>nav.balk,.rtg-edge-owned-bar,[data-rtg-edge-controls],.rtgsprong-greep,.rtm-nav,.ios-nav-acties,.ios-nav-extra';
 
   function label(el) { return (el.getAttribute('aria-label') || el.title || el.textContent || '').replace(/\s+/g, ' ').trim(); }
   function available(el, root) {
@@ -72,8 +72,8 @@
         var b = buttons.knop(item); b.classList.add('rtg-adaptive-sheet-action');
         b.addEventListener('click', function (event) {
           var current = currentItems().find(function (x) { return x.id === item.id; });
-          if (!current) { event.stopImmediatePropagation(); refreshLater(); return; }
           event.stopImmediatePropagation();
+          if (!current) { refreshLater(); return; }
           if (current.aan === undefined) close();
           buttons.voer(current);
         }, true);
@@ -121,7 +121,7 @@
         if (!field || !input.value.trim()) return;
         var mouth = d.querySelector('#rtgCommand .cmd-mondknop');
         rt.questionOwner = mouth && mouth.closest('.cmd-balk');
-        if (mouth && !mouth.closest('.cmd-balk').classList.contains('vraagt')) mouth.click();
+        if (mouth && !rt.questionOwner.classList.contains('vraagt')) mouth.click();
         field.value = input.value; original.requestSubmit(); input.value = ''; close();
         var reply = d.querySelector('#rtgCommand .cmd-praat');
         if (reply && reply.children.length) reply.hidden = false;

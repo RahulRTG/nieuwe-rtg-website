@@ -1,4 +1,4 @@
-/* The four approved editorial homes. The shared Edge retains all chrome. */
+/* Four editorial homes. The shared Edge retains all chrome. */
 body.rtg-stijl[data-world-home]{--wh-ink:#f6efe3;--wh-soft:#d8cfc2;--wh-line:rgba(216,187,135,.32);--wh-gold:#e2c389;--wh-bg:#100e0b;background:var(--wh-bg)!important;color:var(--wh-ink)!important;height:auto!important;min-height:100dvh;overflow-x:clip!important;overflow-y:visible!important}
 body[data-world-home]::before,body[data-world-home]::after{pointer-events:none}
 body[data-world-home] #inhoud,body[data-world-home] #hoofd{width:100%;max-width:76rem!important;min-width:0;margin:0 auto!important;padding:0 clamp(1rem,3vw,2.5rem) calc(9rem + env(safe-area-inset-bottom,0px))!important;background:transparent!important;border:0!important;box-shadow:none!important}
@@ -79,10 +79,244 @@ body.rtg-social-experience[data-world-home="living"] :is(#feed .kaart,.living-we
 body[data-world-home="living"] .living-nearby>img{border-radius:var(--rtg-radius-editorial)}
 body.rtg-social-experience[data-world-home="living"][data-rtg-skin="heritage"] .rtg-edge-top{background:transparent!important;backdrop-filter:none;-webkit-backdrop-filter:none;border-bottom:0;box-shadow:none!important}
 body[data-world-home="living"] .rtg-edge-top::after{display:none}
-@media(max-width:767px){body[data-world-home="living"] .rtg-edge-mark{font-size:36px;font-weight:400;gap:8px;align-items:center}}
-body[data-world-home="living"] .rtg-edge-mark{color:var(--wh-gold)!important}
-body[data-world-home="living"] .rtg-edge-mark::after{font:400 23px/1 Inter,sans-serif;letter-spacing:-.025em;text-transform:none}
-body[data-world-home="living"] .rtg-edge-profile{border-color:var(--wh-gold)!important;font-size:0!important;color:var(--wh-gold)!important}
-body[data-world-home="living"] .rtg-edge-profile::after{content:"";display:block;width:20px;height:26px;background:radial-gradient(circle at 50% 6px,currentColor 4.5px,transparent 5px),radial-gradient(ellipse 10px 8px at 50% 23px,currentColor 98%,transparent 100%)}
-body[data-world-home="living"] .rtg-adaptive-bar{border-color:var(--wh-gold)}
-@media(max-width:359px){body[data-world-home="living"] .rtg-edge-mark{font-size:30px}body[data-world-home="living"] .rtg-edge-mark::after{font-size:20px}}
+body[data-world-home="living"] .rtg-adaptive-bar{border-color:color-mix(in srgb,var(--wh-gold) 28%,transparent)}
+
+/* Editorial reference, October 2026. These are the original source-owned
+   homes, not another mobile shell. Photography is atmosphere; names, trips,
+   dates, permissions and activities still come from their existing sources. */
+body.rtg-stijl[data-world-home][data-rtg-skin="heritage"] {
+  --wh-reading:#f7f0e3;
+  --wh-reading-soft:#e2d8c9;
+  --wh-hairline:rgba(223,189,136,.27);
+  --wh-paper:#f4eddf;
+  --wh-paper-ink:#243d32;
+  --wh-paper-muted:#586057;
+}
+body.rtg-stijl[data-world-home] :is(.wh-home,.wh-living-hero,.living-feed-heading,.living-example-copy,.onthaal-beeld) :is(h1,h2,h3) {
+  font-family:"Bodoni Moda",Georgia,serif!important;
+  font-weight:400!important;letter-spacing:-.045em!important;
+  text-transform:none!important;text-wrap:balance;
+}
+body.rtg-stijl[data-world-home] .wh-photo {
+  border:0;border-radius:0;background:var(--wh-bg);box-shadow:none;
+  color:var(--wh-reading);isolation:isolate;
+}
+body.rtg-stijl[data-world-home] .wh-photo :is(h1,h2,h3) {color:var(--wh-reading)!important}
+body.rtg-stijl[data-world-home] .wh-photo p {color:var(--wh-reading-soft)}
+body.rtg-stijl[data-world-home] .wh-photo::after {
+  background:linear-gradient(180deg,rgba(10,8,6,.15),transparent 34%,rgba(10,8,6,.3) 55%,var(--wh-bg) 100%);
+}
+body.rtg-stijl[data-world-home] .wh-photo-copy {padding:24px 22px 20px}
+body.rtg-stijl[data-world-home] .wh-photo-copy h1 {
+  font-size:clamp(38px,10.9vw,62px);line-height:1.01!important;margin:0 0 15px;max-width:11ch;
+}
+body.rtg-stijl[data-world-home] .wh-photo-copy h1::after {
+  content:"";display:block;width:36px;height:2px;background:#dfbd88;margin-top:18px;
+}
+body.rtg-stijl[data-world-home] .wh-photo-copy>p {font-size:15px;line-height:1.5;margin:0;max-width:29ch}
+body.rtg-stijl[data-world-home] .wh-hero-label {
+  position:absolute;top:20px;inset-inline:22px;z-index:1;margin:0!important;
+  color:var(--wh-reading)!important;font:500 10px/1.5 Inter,sans-serif;letter-spacing:.21em;text-transform:uppercase;
+}
+body.rtg-stijl[data-world-home] .wh-caption {
+  font-size:9px;background:rgba(12,10,8,.65);border:0;border-radius:var(--rtg-radius-content);
+  inset-inline-end:20px;inset-block-end:8px;padding:2px 5px;
+}
+body.rtg-stijl[data-world-home] .wh-home h2 {font-size:clamp(25px,6.8vw,34px);margin:0 0 13px}
+body.rtg-stijl[data-world-home] :is(.wh-service,.wh-support) {
+  background:transparent;border:0;border-block-start:1px solid var(--wh-hairline);
+  border-radius:0;padding:18px 0;margin:0;box-shadow:none;
+}
+body.rtg-stijl[data-world-home] .wh-service h3 {font-size:22px;line-height:1.2!important;margin:0 0 5px}
+body.rtg-stijl[data-world-home] .wh-service p {font-size:13px;line-height:1.5}
+body.rtg-stijl[data-world-home] .wh-service>span[aria-hidden] {font-size:25px;font-weight:300}
+body.rtg-stijl[data-world-home] .wh-link {font-size:14px;min-height:46px}
+body.rtg-stijl[data-world-home] .wh-details {margin-top:24px;border-color:var(--wh-hairline)}
+body.rtg-stijl[data-world-home] .wh-details>summary {font-size:14px;line-height:1.5}
+body.rtg-stijl[data-world-home] .wh-related {margin:0 22px 24px;font:400 13px/1.55 Inter,sans-serif}
+body.rtg-stijl[data-world-home] .wh-related a {display:inline-flex;gap:12px;align-items:center;min-height:44px;color:var(--wh-gold);text-decoration:none;border-bottom:1px solid var(--wh-hairline)}
+body.rtg-stijl[data-world-home] .wh-travel-hero {
+  min-height:0;display:flex;justify-content:flex-end;padding-top:300px;
+}
+body.rtg-stijl[data-world-home] .wh-travel-hero>img {object-position:65% center}
+body.rtg-stijl[data-world-home] .wh-travel-hero .wh-photo-copy {padding-bottom:4px}
+body.rtg-stijl[data-world-home] .wh-travel-bottom {padding:0 22px 28px;background:none}
+body.rtg-stijl[data-world-home] #worldTravelDetail strong {font-size:25px;line-height:1.25;color:var(--wh-reading);max-width:100%;overflow-wrap:anywhere}
+body.rtg-stijl[data-world-home] #worldTravelDetail span {font-size:13px;color:var(--wh-reading-soft)}
+body.rtg-stijl[data-world-home] #worldTravelMessage {font-size:13px;line-height:1.55;max-width:36ch;margin:9px 0 18px}
+body.rtg-stijl[data-world-home] #worldTravelAction {
+  display:flex;width:100%;box-sizing:border-box;min-height:49px;justify-content:space-between;
+  border:1px solid rgba(216,140,153,.52);border-radius:var(--rtg-radius-content);padding:10px 16px;
+  background:linear-gradient(135deg,#76273d,#57172c);color:#fff3e9;
+}
+body.rtg-stijl[data-world-home] .wh-travel-help {margin:20px 22px}
+body.rtg-stijl[data-world-home] .wh-stories {padding:16px 22px 24px;gap:17px;scrollbar-width:none}
+body.rtg-stijl[data-world-home] .wh-stories::-webkit-scrollbar {display:none}
+body.rtg-stijl[data-world-home] .wh-story {flex:1 0 62px;font-size:11px;max-width:90px}
+body.rtg-stijl[data-world-home] .wh-story img {border-width:1px;border-color:var(--wh-gold);padding:3px}
+body.rtg-stijl[data-world-home] :is(.wh-work-hero,.wh-foundation-hero,.wh-living-hero) {
+  display:flex;align-items:flex-end;min-height:470px;margin:0 0 20px;
+}
+body.rtg-stijl[data-world-home] .wh-work-hero>img {object-position:72% center}
+body.rtg-stijl[data-world-home] .wh-attention {padding:0 22px;margin-bottom:28px}
+body.rtg-stijl[data-world-home] #worldWorkState {padding:13px 0;border:0;border-block:1px solid var(--wh-hairline);border-radius:0;font-size:14px;line-height:1.6;background:none}
+body.rtg-stijl[data-world-home] #vandaag .cv-lijn,
+body.rtg-stijl[data-world-home] #werkdag {border:0;border-radius:0;background:none}
+body.rtg-stijl[data-world-home] #vandaag .cv-lijn {padding-block:16px;border-top:1px solid var(--wh-hairline)}
+body.rtg-stijl[data-world-home] #vandaag .cv-titel {font-size:15px}
+body.rtg-stijl[data-world-home] #werkdag .reis {border-inline:0!important;padding-inline:0}
+body.rtg-stijl[data-world-home] .wh-home>section:has(>#worldWorkProjects) {padding:0 22px}
+body.rtg-stijl[data-world-home] .wh-work-feature .wh-photo {min-height:310px;border-radius:var(--rtg-radius-editorial);border:1px solid var(--wh-hairline)}
+/* Model photographs can be pale directly beneath the project title. Keep a
+   dark reading layer with the copy itself, independent of image luminance. */
+body.rtg-stijl[data-world-home] .wh-work-feature .wh-photo-copy {
+  width:100%;box-sizing:border-box;padding-top:58px;
+  background:linear-gradient(180deg,transparent,rgba(9,17,15,.82) 30%,rgba(9,17,15,.96));
+}
+body.rtg-stijl[data-world-home] .wh-work-feature h3 {font-size:30px}
+body.rtg-stijl[data-world-home] .wh-home>.wh-support {margin-inline:22px}
+body.rtg-stijl[data-world-home] .wh-support h2 {font-size:26px}
+body.rtg-stijl[data-world-home] .wh-support p {font-size:14px;line-height:1.5}
+body.rtg-stijl[data-world-home] .wh-foundation-hero {min-height:480px;margin-bottom:0}
+body.rtg-stijl[data-world-home] .wh-foundation-hero>img {object-position:58% center}
+body.rtg-stijl[data-world-home] .wh-foundation-hero::after {background:linear-gradient(180deg,rgba(14,25,18,.2),transparent 30%,rgba(14,21,16,.17) 50%,var(--wh-bg) 100%)}
+body.rtg-stijl[data-world-home] .wh-foundation-label {position:absolute;inset:22px 22px auto;z-index:1}
+body.rtg-stijl[data-world-home] .wh-foundation-label .wh-eyebrow {font-size:10px;color:var(--wh-reading)!important;margin:0 0 7px}
+body.rtg-stijl[data-world-home] .wh-free {
+  position:static;inline-size:fit-content;max-width:100%;box-sizing:border-box;
+  border:1px solid rgba(223,189,136,.3);border-radius:var(--rtg-radius-content);
+  padding:5px 9px;margin:0;color:#fff5e8!important;background:rgba(12,33,24,.9);
+  font:400 13px/1.5 Inter,sans-serif!important;
+}
+body.rtg-stijl[data-world-home] .wh-discover {margin:0 22px}
+body.rtg-stijl[data-world-home] .wh-pair {display:grid;grid-template-columns:1fr;gap:7px;margin:0}
+body.rtg-stijl[data-world-home] .wh-paper-card {
+  min-height:82px;display:flex;align-items:center;gap:12px;padding:10px 13px;
+  border:1px solid rgba(232,218,192,.8);border-radius:var(--rtg-radius-content);background:var(--wh-paper);color:var(--wh-paper-ink);
+}
+body.rtg-stijl[data-world-home] .wh-paper-card::after {display:none}
+body.rtg-stijl[data-world-home] .wh-paper-card>div {padding:0;min-width:0}
+body.rtg-stijl[data-world-home] .wh-paper-card h3 {color:var(--wh-paper-ink)!important;font-size:23px;line-height:1.2!important;margin:0 0 4px;letter-spacing:-.025em!important}
+body.rtg-stijl[data-world-home] .wh-paper-card p {font-size:12px;line-height:1.4;color:var(--wh-paper-muted);margin:0}
+body.rtg-stijl[data-world-home] .wh-paper-card .wh-card-symbol {
+  display:grid;place-items:center;flex:0 0 48px;height:48px;border-radius:50%;background:#e4d7b8;color:#244e41;
+}
+body.rtg-stijl[data-world-home] .wh-card-symbol svg {width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+body.rtg-stijl[data-world-home] .wh-paper-card .wh-card-arrow {font-size:23px;color:var(--wh-paper-ink);margin-inline-start:auto;flex-shrink:0}
+body.rtg-stijl[data-world-home] .wh-home>.wh-support-compact {
+  display:flex;align-items:center;justify-content:space-between;padding:12px 16px;margin:8px 22px 24px;
+  border:1px solid #527061;border-radius:var(--rtg-radius-content);background:#244e41;color:#fff6e8;min-height:48px;box-sizing:border-box;font-size:14px;
+}
+body.rtg-stijl[data-world-home] #vWelkom>.hero {margin:26px 22px;padding:0!important}
+body.rtg-stijl[data-world-home] #vWelkom>.hero h2 {font:400 29px/1.15 "Bodoni Moda",Georgia,serif!important}
+body.rtg-stijl[data-world-home] #vWelkom>.hero>p {font-size:14px;line-height:1.6}
+body.rtg-stijl[data-world-home] #vVoorzijde .rtf-thuis-groet,
+body.rtg-stijl[data-world-home] #vVoorzijde .rtf-thuis-sectiekop,
+body.rtg-stijl[data-world-home] #vVoorzijde #rtfDagLijst {margin-inline:22px}
+body.rtg-stijl[data-world-home] .wh-foundation-public {min-height:490px;padding:320px 22px 24px;justify-content:flex-end;background:var(--wh-bg)!important}
+body.rtg-stijl[data-world-home] .wh-foundation-public::before {display:none}
+body.rtg-stijl[data-world-home] .wh-foundation-public>img {position:absolute;z-index:-2;object-position:50% center}
+body.rtg-stijl[data-world-home] .wh-foundation-public>.wh-free {position:absolute;inset-block-start:22px;inset-inline-start:22px}
+body.rtg-stijl[data-world-home] .wh-foundation-public #onthaalkop {font-size:42px;line-height:1.06;max-width:12ch;margin:7px 0 12px}
+body.rtg-stijl[data-world-home] .wh-foundation-public #wat {font-size:14px;line-height:1.5}
+body.rtg-stijl[data-world-home] .onthaal {border:0}
+body.rtg-stijl[data-world-home] .onthaal-kies {background:var(--wh-paper);color:var(--wh-paper-ink);border:0;border-radius:var(--rtg-radius-content);padding:20px;margin:0 22px 20px}
+body.rtg-stijl[data-world-home] .onthaal-kies :is(.buurtsec,.leeg) {color:var(--wh-paper-muted)}
+body.rtg-stijl[data-world-home] .wh-living-hero {align-items:flex-end;text-align:start}
+body.rtg-stijl[data-world-home] .wh-living-hero .status {background:rgba(18,13,8,.5);font-size:10px;border:1px solid var(--wh-hairline);padding:6px 8px;margin-block:10px;color:var(--wh-reading-soft)}
+body.rtg-stijl[data-world-home] .wh-living-hero:after {width:auto;height:auto;margin:0}
+body.rtg-stijl[data-world-home] .wh-living-hero .rtg-dashboard-hero-cta {display:flex;width:fit-content;min-height:44px;align-items:center;gap:18px;border-bottom:1px solid var(--wh-gold);font-size:14px;color:var(--wh-reading);text-decoration:none}
+body.rtg-stijl[data-world-home] .dagkolom>:not(.wh-living-hero) {margin-inline:22px}
+body.rtg-stijl[data-world-home] .dagfeed .dagkaart {border:0;border-block-start:1px solid var(--wh-hairline);border-radius:0;background:none;padding:16px 0;min-height:0}
+body.rtg-stijl[data-world-home] .dagtitel {margin-top:20px}
+body.rtg-stijl[data-world-home] .dagtitel b {font:400 26px/1.2 "Bodoni Moda",Georgia,serif}
+body.rtg-stijl[data-world-home] .dagkaart b {font-size:23px}
+@media(max-width:999px) {
+  /* Mobile is a composition in its own right: the hero owns the top edge,
+     and all following sections share one inset instead of nested gutters. */
+  body.rtg-stijl[data-world-home][data-rtg-shell="mobile"] {--edge-top:64px!important;padding-top:0!important;padding-bottom:0!important}
+  body.rtg-stijl[data-world-home="work"][data-rtg-shell="mobile"]::before {display:none}
+  body.rtg-stijl[data-world-home][data-rtg-shell="mobile"] :is(main#inhoud,main#hoofd,main#main,main.wd-home) {
+    width:100%;max-width:none!important;margin:0!important;
+    padding:0 0 calc(var(--rtg-adaptive-inset,96px) + 24px)!important;
+  }
+  body.rtg-stijl[data-world-home][data-rtg-shell="mobile"] :is(.wh-photo-copy,.wh-travel-bottom) {padding-inline:20px}
+  body.rtg-stijl[data-world-home] .wh-photo-copy h1 {font-size:clamp(37px,10.4vw,52px);letter-spacing:-.035em!important;line-height:1.04!important}
+  body.rtg-stijl[data-world-home] .wh-photo-copy h1::after {display:none}
+  body.rtg-stijl[data-world-home] .wh-photo-copy>p {font-size:14px;line-height:1.6;max-width:34ch}
+  body.rtg-stijl[data-world-home] .wh-hero-label {top:calc(var(--edge-top,64px) + 16px);inset-inline:20px;font-size:9px;letter-spacing:.24em}
+  body.rtg-stijl[data-world-home] .wh-home h2 {font-size:clamp(25px,6.9vw,32px);line-height:1.15;margin-bottom:14px}
+  body.rtg-stijl[data-world-home] .wh-caption {inset-inline-end:20px;bottom:7px;font-size:8px;background:transparent;opacity:.75}
+  body.rtg-stijl[data-world-home] main>.wh-details,
+  body.rtg-stijl[data-world-home] .wh-home+.wh-details {margin-inline:20px}
+  body.rtg-stijl[data-world-home] .wh-travel-layout {display:block}
+  body.rtg-stijl[data-world-home] .wh-travel-hero {padding-top:190px;min-height:450px;box-sizing:border-box;justify-content:flex-end}
+  body.rtg-stijl[data-world-home] .wh-travel-hero .wh-photo-copy {padding-block:24px 0}
+  body.rtg-stijl[data-world-home] .wh-travel-hero .wh-photo-copy h1 {max-width:12ch;margin-bottom:12px}
+  body.rtg-stijl[data-world-home] .wh-travel-bottom {padding-bottom:28px}
+  body.rtg-stijl[data-world-home] #worldTravelMessage {margin:0 0 16px;font-size:13px}
+  body.rtg-stijl[data-world-home] .wh-travel-help {margin:22px 16px 0}
+  body.rtg-stijl[data-world-home] .wh-travel-help>h2 {margin-inline:4px}
+  body.rtg-stijl[data-world-home] .wh-service {
+    display:flex;align-items:center;gap:12px;padding:14px;margin:8px 0;
+    min-height:86px;box-sizing:border-box;border:1px solid var(--wh-hairline);
+    border-radius:var(--rtg-radius-editorial);background:color-mix(in srgb,var(--wh-bg) 90%,#fff 10%)!important;
+  }
+  body.rtg-stijl[data-world-home] .wh-service>div {flex:1;min-width:0}
+  body.rtg-stijl[data-world-home] .wh-service h3 {font-size:21px;line-height:1.15!important}
+  body.rtg-stijl[data-world-home] .wh-service p {font-size:12px;line-height:1.45}
+  body.rtg-stijl[data-world-home] .wh-service .wh-service-icon {
+    display:grid;place-items:center;flex:0 0 42px;height:42px;margin:0;
+    border:1px solid var(--wh-hairline);border-radius:50%;color:var(--wh-gold);
+  }
+  body.rtg-stijl[data-world-home] .wh-service-icon svg {width:23px;height:23px}
+  body.rtg-stijl[data-world-home] .wh-service-thumb {width:74px;height:80px;flex:0 0 74px;object-fit:cover;border-radius:var(--rtg-radius-content)}
+  body.rtg-stijl[data-world-home] .wh-stories {padding:22px 20px 12px;gap:18px}
+  body.rtg-stijl[data-world-home] :is(.wh-work-hero,.wh-foundation-hero,.wh-living-hero) {min-height:clamp(390px,107vw,460px);margin-bottom:20px}
+  body.rtg-stijl[data-world-home] .wh-work-hero>img {object-position:70% center}
+  body.rtg-stijl[data-world-home] .wh-attention {margin:0 16px 24px;padding:0}
+  body.rtg-stijl[data-world-home] .wh-attention>h2 {margin-inline:4px}
+  body.rtg-stijl[data-world-home] .wh-work-status {padding:14px 16px;border:1px solid var(--wh-hairline);border-radius:var(--rtg-radius-editorial);background:rgba(255,248,225,.035)}
+  body.rtg-stijl[data-world-home] .wh-work-status:has(#worldWorkState[hidden]):has(#worldWorkLogin[hidden]) {display:none}
+  body.rtg-stijl[data-world-home] #worldWorkState {padding:0;border:0;border-radius:0;background:transparent;font-size:13px;line-height:1.6}
+  body.rtg-stijl[data-world-home] #worldWorkLogin {display:flex;justify-content:space-between;margin:4px 0 0;padding:8px 0 0;border:0;border-radius:0;font-size:13px}
+  body.rtg-stijl[data-world-home] .wh-home>section:has(>#worldWorkProjects) {padding:0 16px}
+  body.rtg-stijl[data-world-home] #worldWorkProjects {margin-inline:4px}
+  body.rtg-stijl[data-world-home] .wh-work-feature {margin:0 0 24px}
+  body.rtg-stijl[data-world-home] .wh-work-feature .wh-photo {min-height:260px}
+  body.rtg-stijl[data-world-home] .wh-work-feature .wh-photo-copy {padding:56px 18px 20px}
+  body.rtg-stijl[data-world-home] .wh-work-feature h3 {font-size:29px;max-width:16ch}
+  body.rtg-stijl[data-world-home] .wh-home>.wh-support {margin-inline:16px;padding:18px;border:1px solid var(--wh-hairline);border-radius:var(--rtg-radius-editorial)}
+  body.rtg-stijl[data-world-home] .wh-foundation-label {inset:calc(var(--edge-top,64px) + 16px) 20px auto}
+  body.rtg-stijl[data-world-home] .wh-foundation-hero {margin-bottom:0;min-height:440px}
+  body.rtg-stijl[data-world-home] .wh-foundation-hero .wh-photo-copy {padding-bottom:30px}
+  body.rtg-stijl[data-world-home] .wh-discover {margin:0 16px}
+  body.rtg-stijl[data-world-home] .wh-paper-card {padding:15px;gap:13px;min-height:94px;border-radius:var(--rtg-radius-editorial)}
+  body.rtg-stijl[data-world-home] .wh-paper-card h3 {font-size:24px}
+  body.rtg-stijl[data-world-home] .wh-pair {gap:10px}
+  body.rtg-stijl[data-world-home] .wh-home>.wh-support-compact {margin:10px 16px 24px;padding:14px 16px;min-height:50px}
+  body.rtg-stijl[data-world-home] #vWelkom>.hero {margin:24px 16px;text-align:start;padding:20px!important;border:1px solid var(--wh-hairline);border-radius:var(--rtg-radius-editorial);background:rgba(9,18,13,.35)}
+  body.rtg-stijl[data-world-home] #vWelkom>.hero h2 {font-size:27px!important}
+  body.rtg-stijl[data-world-home] #vWelkom>.hero>p {font-size:13px;text-align:start;max-width:40ch;margin-inline:0}
+  body.rtg-stijl[data-world-home] .foundation-entry-actions {display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:18px}
+  body.rtg-stijl[data-world-home] #vWelkom .foundation-entry-actions .knop {margin:0;padding:12px 10px;font:500 12px/1.4 Inter,sans-serif!important;min-height:48px;border:1px solid var(--wh-hairline)!important;border-radius:var(--rtg-radius-content)!important;background:rgba(255,248,225,.04)!important;color:var(--wh-reading)!important}
+  body.rtg-stijl[data-world-home] #vWelkom .foundation-entry-actions .knop.hoofd {background:#244e41!important;border-color:#527061!important}
+  body.rtg-stijl[data-world-home] .foundation-entry-actions>a {grid-column:1/-1}
+  body.rtg-stijl[data-world-home] .wh-related {margin-inline:20px}
+  body.rtg-stijl[data-world-home] .tweeluik,
+  body.rtg-stijl[data-world-home] #main>:is(.band,.buurtkaart) {margin-inline:20px}
+  body.rtg-stijl[data-world-home="living"][data-rtg-shell="mobile"] {padding-top:64px!important}
+  body.rtg-stijl[data-world-home="living"][data-rtg-shell="mobile"] :is(main#inhoud,main#hoofd,main#main,main.wd-home) {padding-inline:16px!important}
+}
+@media(min-width:1000px) {
+  body.rtg-stijl[data-world-home] .wh-photo-copy h1 {font-size:clamp(38px,4vw,60px)}
+  body.rtg-stijl[data-world-home] .wh-travel-layout {display:grid;grid-template-columns:minmax(0,1fr);gap:0}
+  body.rtg-stijl[data-world-home] .wh-work-hero,
+  body.rtg-stijl[data-world-home] .wh-foundation-hero {min-height:460px}
+}
+@media(max-width:359px) {
+  body.rtg-stijl[data-world-home] .wh-photo-copy h1 {font-size:36px}
+  body.rtg-stijl[data-world-home] .wh-paper-card {gap:9px;padding:10px}
+  body.rtg-stijl[data-world-home] .wh-paper-card .wh-card-symbol {flex-basis:40px;height:40px}
+  body.rtg-stijl[data-world-home] .wh-paper-card h3 {font-size:20px}
+}

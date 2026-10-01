@@ -1,0 +1,141 @@
+/* RTG editorial system · reference composition, 1 October 2026.
+   One presentation contract for every heritage entry, including embeds.
+   Domain handlers, authentic data, document contents and media keep ownership. */
+body[data-rtg-skin="heritage"]{
+  --rtg-editorial-version:20261001;
+  --rtg-display:"Bodoni Moda",Didot,Georgia,serif;
+  --rtg-interface:Inter,system-ui,-apple-system,sans-serif;
+  --rtg-paper:#f4eddf;--rtg-paper-ink:#28261f;--rtg-paper-muted:#625d52;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+}
+body[data-rtg-skin="heritage"][data-rtg-layout="standard"] :is(h1,h2):not(.rtg-edge-mark){
+  font-family:var(--rtg-display)!important;font-weight:400!important;
+  letter-spacing:-.035em!important;line-height:1.12;text-wrap:balance;
+}
+/* Data tools and document contents are not editorial headlines. */
+body[data-rtg-skin="heritage"] :is(table,form,[role="grid"],.cmd-werk) :is(h2,h3),
+body[data-rtg-skin="heritage"] :is(button,input,textarea,select,label,th,td){
+  font-family:var(--rtg-interface);font-variant-numeric:tabular-nums;
+}
+body[data-rtg-skin="heritage"][data-rtg-layout="standard"] :is(.kantoor-intro,.rtg-intro){
+  padding:clamp(22px,4vw,44px)!important;border:0!important;
+  border-bottom:1px solid var(--rtg-world-line)!important;
+  border-radius:0!important;background-color:transparent!important;box-shadow:none!important;
+}
+body[data-rtg-skin="heritage"][data-rtg-layout="standard"] :is(.kantoor-intro,.rtg-intro) h1{
+  font-size:clamp(32px,4vw,58px)!important;max-width:20ch;margin-block:0 14px;
+}
+body[data-rtg-skin="heritage"][data-rtg-layout="standard"] :is(.kantoor-intro,.rtg-intro) p{
+  max-width:60ch;font-size:15px;line-height:1.65;
+}
+body[data-rtg-skin="heritage"] :is(.rtg-leeg,.empty,.leeg){line-height:1.65;max-width:100%;overflow-wrap:anywhere}
+body[data-rtg-skin="heritage"][data-rtg-layout="standard"] :is(.kaart,.card,.paneel,.panel,.rtg-groep){
+  border-color:var(--rtg-world-line);border-radius:var(--rtg-radius-content);
+}
+/* Edit fields stay quiet, readable and touch-friendly. Checkbox/range/color,
+   native camera surfaces and rich document canvases are deliberately untouched. */
+body[data-rtg-skin="heritage"][data-rtg-layout="standard"] :is(
+  input[type="text"],input[type="email"],input[type="password"],input[type="search"],
+  input[type="tel"],input[type="number"],input[type="url"],select,textarea):not([data-rtg-own-surface]){
+  border:1px solid var(--rtg-world-line);border-radius:var(--rtg-radius-content);
+  background-color:color-mix(in srgb,var(--rtg-world-card) 82%,transparent);
+  color:var(--rtg-world-ink);min-height:44px;max-width:100%;
+  font:400 16px/1.5 var(--rtg-interface);padding:11px 14px;
+}
+body[data-rtg-skin="heritage"][data-rtg-layout="standard"] :is(.knop,.btn,.rtg-knop):not(.rond):not(.icon){
+  min-height:44px;border-radius:var(--rtg-radius-content);font-family:var(--rtg-interface);
+  font-size:14px;font-weight:500;letter-spacing:0;text-transform:none;
+}
+body[data-rtg-skin="heritage"] :is(dialog,[role="dialog"]){
+  border-radius:var(--rtg-radius-system);border-color:var(--rtg-world-line);
+}
+body[data-rtg-skin="heritage"] :is(button,a,input,select,textarea,summary):focus-visible{
+  outline:2px solid var(--rtg-world-metal);outline-offset:3px;
+}
+/* The global brand header is the single shell, with an understated glass edge. */
+body[data-rtg-skin="heritage"][data-rtg-layout="standard"] .rtg-edge-top{
+  background:color-mix(in srgb,var(--rtg-world-bg) 76%,transparent)!important;
+  border-bottom:1px solid color-mix(in srgb,var(--rtg-world-metal) 20%,transparent);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+}
+body[data-rtg-skin="heritage"] .rtg-edge-mark{color:var(--rtg-world-metal)!important}
+body[data-rtg-shell="mobile"] .rtg-edge-mark{
+  display:flex!important;align-items:center;gap:10px;font-size:30px!important;font-weight:400!important;
+}
+/* The existing source-owned world label replaces the old tiny pseudo-label.
+   Until desktop modules finish loading, the pseudo-label uses the same scale. */
+body[data-rtg-skin="heritage"][data-rtg-shell="mobile"] .rtg-edge-mark .wd-world-label{
+  display:inline!important;font:400 16px/1.25 var(--rtg-interface)!important;
+  letter-spacing:0;text-transform:none!important;color:var(--rtg-world-ink);
+  margin:0;padding:0;border:0;white-space:nowrap;
+}
+body[data-rtg-skin="heritage"][data-rtg-shell="mobile"] .rtg-edge-mark::after{
+  font:400 16px/1.25 var(--rtg-interface)!important;letter-spacing:0;text-transform:none;
+}
+body[data-rtg-skin="heritage"][data-rtg-shell="mobile"] .rtg-edge-mark:has(.wd-world-label)::after{content:none!important}
+/* One existing profile link, one neutral profile symbol; no invented person. */
+body[data-rtg-skin="heritage"][data-world-home] .rtg-edge-profile{
+  display:flex!important;align-items:center;justify-content:center;flex:0 0 44px;
+  width:44px!important;height:44px!important;min-width:44px!important;min-height:44px!important;
+  padding:0!important;border:1px solid var(--rtg-world-metal)!important;border-radius:50%;
+  font-size:0!important;color:var(--rtg-world-metal)!important;
+}
+body[data-rtg-skin="heritage"][data-world-home] .rtg-edge-profile::after{
+  content:"";display:block;width:20px;height:26px;
+  background:radial-gradient(circle at 50% 6px,currentColor 4.5px,transparent 5px),
+    radial-gradient(ellipse 10px 8px at 50% 23px,currentColor 98%,transparent 100%);
+}
+/* Desktop uses the same photo-led composition, with useful side space. */
+body[data-rtg-desktop] .wp-scene{isolation:isolate;overflow:hidden;border-radius:var(--rtg-radius-editorial);min-height:340px}
+body[data-rtg-desktop] .wp-scene .wp-photo{aspect-ratio:auto;height:clamp(340px,30vw,440px);min-height:340px;border-radius:var(--rtg-radius-editorial)}
+body[data-rtg-desktop] .wp-scene .wp-photo::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,transparent 20%,rgba(14,10,8,.3) 45%,rgba(14,10,8,.92));
+}
+body[data-rtg-desktop] .wp-scene .wp-heading{position:absolute;z-index:1;inset:auto 28px 84px;margin:0;pointer-events:none}
+body[data-rtg-desktop] .wp-scene .wp-heading h2{color:#fff5e8!important;max-width:14ch;text-shadow:0 2px 20px #0005}
+body[data-rtg-desktop] .wp-scene .wp-overline{color:#e8c995;font-weight:500;font-size:10px}
+body[data-rtg-desktop] .wp-scene>.wp-action{z-index:1;inset:auto auto 24px 28px;color:#f8e6c9!important;font-size:14px}
+body[data-rtg-desktop] .wp-scene>.wp-free{
+  position:absolute;z-index:1;inset:20px auto auto 24px;max-width:calc(100% - 190px);
+  padding:7px 10px;margin:0;box-sizing:border-box;border:1px solid rgba(223,189,136,.3);
+  border-radius:var(--rtg-radius-content);background:rgba(12,33,24,.92);color:#fff5e8!important;
+  font:400 13px/1.5 var(--rtg-interface);
+}
+body[data-rtg-desktop] .wd-shell .wd-widget{border-radius:var(--rtg-radius-content)!important;padding:12px;border:1px solid var(--wd-line);background:color-mix(in srgb,var(--rtg-world-card) 58%,transparent)!important}
+body[data-rtg-desktop] .wd-shell .wd-app-shortcut{border-radius:var(--rtg-radius-content);padding:10px}
+body[data-rtg-desktop] .wd-shell .wd-app-photo{border-radius:var(--rtg-radius-content)}
+body[data-rtg-desktop] .wd-shell .wd-widget-open{padding:0 32px 10px 0}
+body[data-rtg-desktop] .wd-shell .wd-widget-content{padding-bottom:0}
+body[data-rtg-desktop] .wd-library-heading h2{font-size:32px}
+body[data-rtg-skin="heritage"][data-rtg-layout="standard"] .wd-shell .wd-favorites>h2{
+  font:600 11px/1.6 var(--rtg-interface)!important;letter-spacing:.2em!important;
+  text-transform:uppercase;color:var(--rtg-world-ink);
+}
+body[data-rtg-desktop] .wd-date-tile b{font-family:var(--rtg-display)}
+@media(max-width:999px){
+  body[data-rtg-shell="mobile"]{padding-bottom:var(--rtg-adaptive-inset,100px)}
+  body[data-world-home][data-rtg-shell="mobile"] .rtg-edge-top{
+    height:64px!important;min-height:64px!important;padding:0 20px!important;box-sizing:border-box;
+    background:linear-gradient(180deg,rgba(10,9,8,.85),rgba(10,9,8,.22))!important;
+    border:0;box-shadow:none;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  }
+  body[data-world-home][data-rtg-shell="mobile"] .rtg-edge-top::after{display:none}
+  body[data-world-home][data-rtg-shell="mobile"] .rtg-edge-mark{font-size:34px!important;gap:10px}
+  body[data-world-home][data-rtg-shell="mobile"] .rtg-edge-mark .wd-world-label{font-size:15px!important}
+  body[data-world-home][data-rtg-shell="mobile"] .rtg-edge-profile{flex-basis:40px;width:40px!important;height:40px!important;min-width:40px!important;min-height:44px!important;border-color:color-mix(in srgb,var(--rtg-world-metal) 55%,transparent)!important}
+  body[data-rtg-skin="heritage"] :is(.kantoor-intro,.rtg-intro) h1{max-width:17ch}
+  body[data-rtg-shell="mobile"] .wd-access{margin:24px 18px!important;padding:24px!important;border-radius:var(--rtg-radius-editorial)}
+}
+@media(prefers-reduced-motion:reduce){
+  body[data-rtg-skin="heritage"]{scroll-behavior:auto}
+}
+@media(prefers-contrast:more){
+  body[data-rtg-skin="heritage"][data-rtg-layout="standard"] .rtg-edge-top{background:var(--rtg-world-bg)!important}
+}
+@media(forced-colors:active){
+  body[data-rtg-skin="heritage"] .wp-photo::after{display:none}
+}
+@media print{
+  body[data-rtg-skin="heritage"][data-rtg-layout="standard"]{background:#fff!important;color:#000!important}
+}

@@ -935,3 +935,31 @@ inclusief een door het scherm zelf gepubliceerde context en hoofdactie.
   ronde.
 - Het zegt niet wie iets mag. Dat is `CONTROLPLANE.md` en de server; de Edge
   toont het.
+
+## 13. Eén interactieoppervlak — mobiele vervolgstap
+
+De Edge bezit **interactiecontinuïteit**, nooit domeinwaarheid. Zijn bestaande
+blikveld, `RTGAdaptief`, grammatica, actiestaat en uitvoeringspad blijven de
+bronnen. Er komt geen parallel capabilityregister of client-side autorisatie bij.
+Domeinen bepalen betekenis en state; de server bepaalt bevoegdheid; bewijsbronnen
+bepalen zekerheid; de mens geeft toestemming. Een AI-voorstel wijzigt geen van
+die grenzen.
+
+De eerste zichtbare stap is één mobiele schil. `world-presentation.js` kiest
+uitsluitend de compositie bij de viewportgrens. Hij bewaart dezelfde DOM-nodes,
+formulieren en geopende apps. `rtg-adaptive-edge-input.js` gebruikt de bestaande
+gebaarherkomst en bewaakt actieve invoer en panelen. De vier bestaande
+balkstanden blijven bestaan; een automatische `peek` heeft de presentatie
+`reading`, met alle vijf knoppen bereikbaar. Dit veld is alleen vormgeving,
+geen nieuwe workflow-, trust- of domeintoestand.
+
+De wereldkleur komt uit `rtg-world-palette.css`. Rustige diepte, rondingen,
+compactie en een uitvouwend actieoppervlak dragen de continuïteit; verminderde
+beweging schakelt de animaties uit. Decoratieve stippen in de compacte balk,
+activiteitslabel en actiekop gebruiken de accentkleur, geen groen bewijsstempel.
+
+Live journeys, gesigneerde apparaatoverdracht, objectcompositie en doorlopende
+consent- of bewijskaarten zijn **richting**, niet door deze wijziging gebouwd
+of bewezen. Ze mogen alleen bestaande geautoriseerde capabilitycontracten en
+daadwerkelijke signalen presenteren. Onbekend of conflicterend bewijs mag nooit
+door presentatie veranderen in bevestigd, betaald, toegestaan of ingetrokken.

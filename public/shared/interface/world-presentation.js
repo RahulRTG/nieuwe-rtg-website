@@ -51,13 +51,37 @@
     revealTarget(); w.addEventListener('hashchange', revealTarget);
     var feedWatch = new MutationObserver(revealTarget); feedWatch.observe(native, { childList: true, subtree: true });
     w.addEventListener('pagehide', function () { feedWatch.disconnect(); });
+    // Reuse the actual screen, including listeners and unsaved state. A small
+    // viewport must not put a second home in front of the domain's own home.
+    return function (wide) {
+      var from = wide ? home : native, to = wide ? native : home;
+      Array.from(from.childNodes).forEach(function (node) {
+        if (node !== scene) w.RTGDesktopSurface.move(to, node);
+      });
+    };
+  }
+  function responsive(o, scene) {
+    // Public storytelling already is the content surface, not a domain wrapper.
+    if (d.body.dataset.publicPlatform) return;
+    var viewport = w.matchMedia('(min-width:1000px)');
+    function sync() {
+      if (viewport.matches) d.body.dataset.rtgDesktop = world;
+      else delete d.body.dataset.rtgDesktop;
+      d.body.dataset.rtgShell = viewport.matches ? 'desktop' : 'mobile';
+      if (scene) scene(viewport.matches);
+    }
+    sync(); viewport.addEventListener('change', sync);
+    w.addEventListener('pagehide', function (event) {
+      if (!event.persisted) viewport.removeEventListener('change', sync);
+    });
   }
   function start(o) {
     U = w.RTGDesktopUI; world = d.body.dataset.rtgWorld; P = w.RTGPersonalImages;
     if (!content[world]) return;
     var atmosphere = photo('/images/world-homes/' + world + '-sfeer.jpg', 'sfeer', 'Sfeerbeeld', 'wp-atmosphere'); d.body.appendChild(atmosphere);
     tabs(o.root, o.home, o.people, o.favorites);
-    if (d.body.dataset.worldHome && !d.body.dataset.publicPlatform) homeScene(o.home, o.root);
+    var scene = d.body.dataset.worldHome && !d.body.dataset.publicPlatform ? homeScene(o.home, o.root) : null;
+    responsive(o, scene);
     function toolbar() {
       var top = d.querySelector('.rtg-edge-top'); if (!P || !top || top.querySelector('.wp-edit-images')) return;
       var b = U.el('button', 'wp-edit-images'); b.append(U.icon('camera'), U.el('span', '', 'Beelden aanpassen')); b.type = 'button'; b.onclick = function () { w.RTGPersonalImageEditor.open(world + '/hoofd'); };

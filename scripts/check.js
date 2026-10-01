@@ -4735,7 +4735,7 @@ console.log('\n57) een browser start op EEN plek: test/helper.js');
   }
 }
 
-console.log('\n58) vaste hoekgrammatica: rechte inhoud, afgeronde systeemlagen en echte cirkels');
+console.log('\n58) vaste hoekgrammatica: centrale inhouds-, systeem- en capsulevormen en echte cirkels');
 {
   const RE = /border-radius\s*:\s*([^;}"'\n\\`]+)/g;
   const HERITAGE = new Map([
@@ -4787,6 +4787,24 @@ console.log('\n58) vaste hoekgrammatica: rechte inhoud, afgeronde systeemlagen e
       'var(--rtg-radius-system)'
     ])]
   ]);
+  // Approved editorial surfaces use named geometry, never arbitrary per-page
+  // radii. Keep the scope explicit so unrelated routes cannot bypass the rule.
+  const editorialSurfaces = [
+    'public/shared/rtg-adaptive-edge.css', 'public/shared/rtg-editorial-system.css',
+    'public/shared/rtg-communication-surface.css', 'public/shared/rtg-mail-2026.css',
+    'public/shared/rtg-world-home.css', 'public/apps/wereld-feed.css',
+    'public/apps/muziek-heritage.css'
+  ];
+  for (const file of editorialSurfaces) {
+    const permitted = HERITAGE.get(file) || new Set();
+    for (const name of ['content', 'editorial', 'system', 'capsule']) {
+      permitted.add('var(--rtg-radius-' + name + ')');
+      permitted.add('var(--rtg-radius-' + name + ')!important');
+    }
+    HERITAGE.set(file, permitted);
+  }
+  HERITAGE.get('public/shared/rtg-communication-surface.css').add('var(--rtg-radius-system)var(--rtg-radius-system)00!important');
+  HERITAGE.get('public/shared/rtg-mail-2026.css').add('0var(--rtg-radius-content)var(--rtg-radius-content)0');
   const mag = (v, rel) => {
     const k = String(v).trim().toLowerCase().replace(/\s+/g, '');
     if (k === '0' || k === '0!important' || k === '50%' || k === '50%!important') return true;
@@ -4814,7 +4832,7 @@ console.log('\n58) vaste hoekgrammatica: rechte inhoud, afgeronde systeemlagen e
   });
   if (kapot.length) {
     for (const k of kapot.slice(0, 12)) {
-      fout('ongeclassificeerde hoek: ' + k + ' -- route-inhoud blijft 0;' +
+      fout('ongeclassificeerde hoek: ' + k + ' -- onbenoemde vorm;'  +
         ' Heritage-inhoud en systeemlagen gebruiken uitsluitend de centrale contractwaarden');
     }
     if (kapot.length > 12) fout('... en nog ' + (kapot.length - 12) + ' plekken');

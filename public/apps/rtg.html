@@ -107,6 +107,9 @@
 <link rel="stylesheet" href="/shared/rtg-world-widgets.css">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<link href="/shared/rtg-world-home.css" rel="stylesheet">
+<script src="/shared/rtg-world-home-copy.js"></script>
+<script src="/shared/rtg-world-home.js"></script>
 </head>
 <body data-world-home="living" class="rtg-stijl" data-ios-home data-rtg-world="living" data-rtg-world-dashboard="living" data-rtg-vandaag-luxe data-rtg-edge-2-context="living-bank,living-top" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage" data-rtg-world-start="loading" aria-busy="true" data-rtg-layout="standard">
 <div class="rtg-world-start" role="status" aria-live="polite"><span class="rtg-world-start-brand" aria-hidden="true"><strong>Rahul Travel Group</strong><span>Experience the elite class</span></span><span class="rtg-world-start-status">LivingOS wordt klaargezet…</span></div>
@@ -143,11 +146,14 @@
   <section class="paneel actief" data-inhoud="vandaag">
     <div class="dag">
       <div class="dagkolom">
-        <header class="dagkop" data-rtg-transition="world">
-          <div class="ey">Vandaag &middot; uw leven</div>
-          <h1>Uw momenten, uw leven.</h1>
+        <header class="dagkop wh-photo wh-living-hero" data-rtg-transition="world">
+          <img src="/images/editorial/living-dining.webp" alt="" width="1448" height="1086" fetchpriority="high">
+          <div class="ey wh-hero-label">Vandaag &middot; uw leven</div>
+          <div class="wh-photo-copy"><h1 data-wh-copy="livingTitle">Het leven, met elkaar.</h1>
+          <p data-wh-copy="livingIntro">Uw momenten, mensen en plannen komen hier samen.</p>
           <div class="status"><i></i><span id="lifePasStatus">RTG Pass &middot; LIFE</span></div>
           <a class="rtg-dashboard-hero-cta" href="/apps/life.html">Open Vandaag <span aria-hidden="true">&rarr;</span></a>
+          </div><span class="wh-caption" data-wh-copy="atmosphere">Sfeerbeeld</span>
         </header>
 
         <div class="dagtitel"><b>Momenten van vandaag</b><a href="/apps/pulse.html">Bekijk alles &rsaquo;</a></div>

@@ -5,24 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Rekenmachine</title>
 <style>
-  /* De vormtaal van RTG, maar in de bundel en niet uit een RTG-stylesheet: een
-     cel heeft geen netwerk, dus alles wat deze app nodig heeft zit erin. Geen
-     ronde hoeken (CLAUDE.md), en een cirkel alleen waar het een vorm is. */
-  :root{ --bg:#0C0C0B; --card:#151413; --line:#2A2825; --txt:#F4F2EE;
-         --muted:#B4AFA7; --soft:#8A8680; --goud:#A98F1C; --bordeaux:#C23A5E; }
+  /* RTG editorial material lives inside this offline bundle. The enclosing
+     workspace already owns its title and Edge; no second shell is created. */
+  :root{color-scheme:dark;--rtg-package-design:editorial-v1;
+    --bg:#100d0b;--card:#211b17;--line:rgba(218,187,140,.22);--txt:#f6f0e6;
+    --muted:#cabfb2;--soft:#b6a99b;--goud:#dfbd83;--bordeaux:#6f2037;}
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  body{background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,'Segoe UI',sans-serif;
+  body{background:radial-gradient(ellipse at 50% 0,rgba(130,90,54,.14),transparent 55%),var(--bg);color:var(--txt);font-family:system-ui,-apple-system,'Segoe UI',sans-serif;
     -webkit-font-smoothing:antialiased;padding:1rem;max-width:640px;margin:0 auto;}
-  .veld{background:var(--card);border:1px solid var(--line);color:var(--txt);padding:.6rem .7rem;
+  .veld{background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--txt);padding:.7rem .8rem;
     font:inherit;font-size:.95rem;width:100%;min-height:2.75rem;}
-  #rkScherm{font-size:1.5rem;text-align:right;min-height:3.2rem;}
+  #rkScherm{font-size:2.4rem;line-height:1.2;letter-spacing:-.035em;text-align:right;min-height:4.5rem;
+    border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;font-variant-numeric:tabular-nums;}
   #rkUitkomst{text-align:right;color:var(--goud);font-size:.95rem;min-height:1.4rem;margin:.35rem 0 .6rem;}
   #rkToetsen{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem;}
   #rkToetsen button{background:var(--card);border:1px solid var(--line);color:var(--txt);
-    font:inherit;font-size:1.05rem;min-height:3.2rem;cursor:pointer;}
-  #rkToetsen button:active{background:#201E1C;}
+    border-radius:12px;font:inherit;font-size:1.05rem;min-height:3.2rem;cursor:pointer;
+    box-shadow:inset 0 1px rgba(255,255,255,.035);}
+  #rkToetsen button:active{background:#33251e;}
+  button:focus-visible,.veld:focus-visible{outline:2px solid var(--goud);outline-offset:3px;}
   #rkToetsen button.op{color:var(--muted);}
-  #rkToetsen button.gelijk{background:var(--txt);color:#000;font-weight:600;}
+  #rkToetsen button.gelijk{background:linear-gradient(150deg,#812940,var(--bordeaux));border-color:rgba(222,181,136,.3);color:var(--txt);font-weight:600;}
   .zaak{margin-top:1.2rem;display:grid;gap:.8rem;}
   .vak{border-top:1px solid var(--line);padding-top:.7rem;}
   .vak b{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);font-weight:600;}

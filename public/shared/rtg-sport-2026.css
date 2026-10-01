@@ -11,7 +11,7 @@ body.rtg-sport-flow{min-height:100vh;background:radial-gradient(circle at 16% 8%
 .sport-back{border:1px solid var(--sport-line);padding:.45rem .65rem;color:var(--sport-soft);font-size:.7rem;text-decoration:none}
 .rtg-sport-flow main{max-width:760px;padding:.1rem 1rem 2rem}
 .sport-intro{position:relative;margin:.3rem 0 1rem;padding:1.1rem 0 .65rem;border-bottom:1px solid var(--sport-line)}
-.sport-intro:after{content:"";position:absolute;right:-1rem;top:-1rem;width:48%;height:12rem;background:radial-gradient(ellipse at center,rgba(201,162,75,.11),transparent 68%);pointer-events:none}
+.sport-intro:after{content:"";position:absolute;inset-inline-end:0;top:-1rem;width:48%;height:12rem;background:radial-gradient(ellipse at center,rgba(201,162,75,.11),transparent 68%);pointer-events:none}
 .sport-ey{margin:0 0 .45rem;color:var(--sport-gold);font-size:.63rem;letter-spacing:.25em;text-transform:uppercase}
 .sport-intro h1{position:relative;z-index:1;max-width:620px;margin:0;color:var(--sport-ivory);font:400 clamp(2.45rem,8vw,4.5rem)/.96 "Bodoni Moda",Georgia,serif}
 .sport-intro>p:last-child{max-width:35rem;margin:.65rem 0 0;color:var(--sport-soft);font-size:.92rem;line-height:1.55}
@@ -20,6 +20,11 @@ body.rtg-sport-flow{min-height:100vh;background:radial-gradient(circle at 16% 8%
 .rtg-sport-flow .tabs>.tab{flex:1;min-width:max-content;margin:0!important;padding:.7rem .8rem!important;border:0!important;border-left:1px solid var(--sport-line)!important;color:var(--sport-soft)!important;font-size:.63rem!important;letter-spacing:.12em!important}
 .rtg-sport-flow .tabs>.tab:first-child{border-left:0!important}
 .rtg-sport-flow .tabs>.tab.aan{background:rgba(201,162,75,.12)!important;color:var(--sport-gold)!important;box-shadow:inset 0 -2px var(--sport-gold)}
+/* Every local sport view stays directly reachable on a narrow screen. */
+@media(max-width:760px){
+  body.rtg-stijl.rtg-sport-flow #tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));min-width:0;max-width:100%;overflow:visible}
+  body.rtg-stijl.rtg-sport-flow #tabs>.tab{min-width:0;max-width:100%;min-height:48px;padding:.5rem .25rem!important;white-space:normal;overflow-wrap:anywhere;letter-spacing:.04em!important;line-height:1.35;text-wrap:balance}
+}
 .rtg-sport-flow #inhoud{min-height:45vh}
 .sport-section{display:flex;align-items:end;justify-content:space-between;gap:1rem;margin:.9rem 0 .55rem}
 .sport-section h3,.sport-title{margin:0;color:var(--sport-ivory);font:400 1.55rem "Bodoni Moda",Georgia,serif}

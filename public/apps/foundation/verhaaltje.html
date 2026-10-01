@@ -69,8 +69,9 @@
 
 <script src="sessie.js"></script>
 <script>
+(function foundationPage() {
 const $ = s => document.querySelector(s);
-if (!window.Sessie || !Sessie.eisProfiel()) throw new Error('geen sessie');
+if (!window.Sessie || !Sessie.eisProfiel()) return;
 Sessie.balk($('#balk'), { terug: 'index.html' });
 
 const P = {
@@ -233,6 +234,7 @@ function naarKeuze() {
 
 tekenKeuze();
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
+}());
 </script>
 <script src="samen.js" defer></script>
 <script src="/shared/basis.js" defer></script>

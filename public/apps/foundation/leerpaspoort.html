@@ -51,13 +51,14 @@
 <script src="sessie.js"></script><script src="/shared/uitvoer.js"></script>
 <script>
 const $=s=>document.querySelector(s),esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const sess=Sessie.huidig(); if(!Sessie.eisProfiel()) throw new Error('geen sessie'); Sessie.balk($('#balk'),{terug:'campus.html',terugTekst:'← Campus'});
+const sess=Sessie.huidig(), profielToegestaan=Sessie.eisProfiel();
+if(profielToegestaan) Sessie.balk($('#balk'),{terug:'campus.html',terugTekst:'← Campus'});
 function meld(t){const m=$('#melding');m.textContent=t;m.style.opacity='1';clearTimeout(m._t);m._t=setTimeout(()=>m.style.opacity='0',3000)}
 const PAD={'/api/onderwijs/ladder':'/ladder','/api/onderwijs/mijn':'/paspoort','/api/onderwijs/inschrijf':'/inschrijf','/api/onderwijs/jaar-over':'/jaar-over','/api/onderwijs/advies':'/advies','/api/leerstof/vakken':'/vakken','/api/leerstof/les':'/les','/api/leerstof/oefen':'/oefen','/api/leerstof/antwoord':'/antwoord','/api/leerstof/dag':'/dag','/api/leerstof/herhalen':'/herhalen','/api/leerstof/herhaal':'/herhaal','/api/onderwijs/bewijs':'/bewijs','/api/leerstof/examen':'/examen','/api/leerstof/examen-antwoord':'/examen-antwoord','/api/bijles/gesprek':'/bijles/gesprek','/api/bijles/vraag':'/bijles/vraag'};
 const api=(pad,body)=>fetch('/api/rtf/leerling'+PAD[pad],{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({code:sess.code,token:sess.token},body||{}))}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Er ging iets mis.');return d});
 </script>
 <script src="/apps/rtgschool/leer.js"></script><script src="/apps/rtgschool/examen.js"></script><script src="/apps/rtgschool/bijles.js"></script>
-<script>if(window.RTGSchool)RTGSchool.start();</script>
+<script>if(profielToegestaan && window.RTGSchool)RTGSchool.start();</script>
 <script src="/shared/basis.js" defer></script><script src="/shared/metgezel.js" defer></script><script src="/shared/randen.js" defer></script><script src="/shared/ios.js" defer></script>
 <script src="premium.js" defer></script>
 </body></html>

@@ -2,7 +2,7 @@
    offline openen. Pagina's en scripts zijn network-first (een update komt direct
    door), de cache is het vangnet zonder verbinding. API-verkeer en de live-stream
    gaan altijd naar het netwerk. */
-const CACHE = 'rtf-premium-foundation-meedoen-ontdekken-18c40545';
+const CACHE = 'rtf-premium-foundation-meedoen-ontdekken-0f0c22a9';
 const SHELL = [
   /* The mandatory desktop standard is available offline too. */
   '/shared/interface/module-sdk.js',
@@ -116,7 +116,9 @@ const SHELL = [
 ];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).catch(() => {}));
+  // Cache.addAll is atomic and rejects repeated URLs. Keep the previous worker
+  // active when an actual required download fails; never activate an empty shell.
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll([...new Set(SHELL)])));
   self.skipWaiting();
 });
 self.addEventListener('activate', e => {

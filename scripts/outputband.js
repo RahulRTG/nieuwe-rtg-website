@@ -40,10 +40,26 @@ const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
 const op = require('./outputproef');
+const B = require('./lib/outputbinding');
 
 const WORTEL = path.join(__dirname, '..');
 const REGISTER = path.join(WORTEL, 'OUTPUTPROEF.json');
 const argv = process.argv.slice(2);
+const journal = path.resolve((argv.find(a => a.startsWith('--lees=')) || '').slice(7) || path.join(WORTEL, '.routejournaal'));
+let runBinding, evidenceDir;
+function prepare() {
+  if (['.env', 'server/.env'].some(file => fs.existsSync(path.join(WORTEL, file))))
+    throw Error('Use an isolated checkout without local environment secrets.');
+  if (['DATABASE_URL', 'PG_URL', 'RTG_DATA_DIR', 'RTG_LIEG'].some(key => process.env[key]))
+    throw Error('Output proof must run without inherited database, data-directory or mutation targets.');
+  runBinding = B.binding(journal);
+  evidenceDir = path.resolve((argv.find(a => a.startsWith('--bewijs-dir=')) || '').slice(13) || path.join(WORTEL, 'server/data/output-proof', runBinding.id));
+  fs.mkdirSync(evidenceDir, { recursive: true });
+  fs.writeFileSync(path.join(evidenceDir, 'BINDING.json'), JSON.stringify(runBinding, null, 2) + '\n');
+}
+function unchanged() {
+  if (B.binding(journal).id !== runBinding.id) throw Error('Candidate or journal changed during the proof.');
+}
 
 /* ---- DE WERKER: een route, een regel JSON ----
    `groen` in het derde veld zegt dat de basislijn van deze toets al bekend en
@@ -52,14 +68,16 @@ const argv = process.argv.slice(2);
    zodat de coordinator het kan onthouden. */
 const eenArg = (argv.find(a => a.startsWith('--een=')) || '').slice(6);
 if (eenArg) {
+  prepare();
   const delen = eenArg.split('|');
   const route = delen[0];
   const toets = delen[1];
-  const basisGroen = delen[2] === 'groen' ? new Set([toets]) : undefined;
+  const recorded = JSON.parse(fs.readFileSync(REGISTER, 'utf8')).basislijn?.[toets];
+  const basisGroen = delen[2] === 'groen' && B.currentBaseline(recorded, runBinding.id) ? new Set([toets]) : undefined;
   let uit;
-  try { uit = op.meetEen(route, toets, { basisGroen }); }
+  try { uit = op.meetEen(route, toets, { basisGroen, requireHit: true }); unchanged(); }
   catch (e) { uit = { staat: 'stoornis', fout: String((e && e.message) || e) }; }
-  process.stdout.write(JSON.stringify({ route, toets, staat: uit.staat, basis: uit.basis || null }) + '\n');
+  process.stdout.write(JSON.stringify({ route, toets, ...uit, binding: runBinding.id, evidenceCommit: runBinding.commit, op: new Date().toISOString() }) + '\n');
   process.exitCode = 0;
   return;
 }
@@ -90,8 +108,17 @@ function leesRegister() {
    rest intact; `basislijn` hangen we er als apart veld naast, zodat een herstart
    hem terugvindt. */
 function schrijf(gericht, basislijn) {
+  unchanged();
   const na = op.meet(gericht);
   if (na.fout) { console.error('  ' + na.fout); return na; }
+  const thin = op.teDun(na, leesRegister()); if (thin) throw Error(thin);
+  const previous = leesRegister();
+  na.basislijnHistorisch = { ...(previous.basislijnHistorisch || {}),
+    ...Object.fromEntries(Object.entries(previous.basislijn || {}).filter(([, value]) => !value || value.binding !== runBinding.id)) };
+  na.binding = runBinding;
+  na.claimValidity = { currentCandidate: Object.values(gericht).filter(v => v.binding === runBinding.id).length,
+    historicalUnrevalidated: Object.values(gericht).filter(v => v.binding !== runBinding.id).length,
+    note: 'Historical route outcomes retain their original provenance and are not proof for this candidate.' };
   fs.writeFileSync(REGISTER, JSON.stringify(Object.assign(na, { gericht, basislijn }), null, 1) + '\n');
   return na;
 }
@@ -103,7 +130,7 @@ function schrijf(gericht, basislijn) {
    echt naast elkaar en telt de machine zijn kernen mee. */
 function eenRegel(args) {
   return new Promise((resolve) => {
-    const kind = spawn('node', [__filename].concat(args),
+    const kind = spawn(process.execPath, [__filename].concat(args, ['--lees=' + journal, '--bewijs-dir=' + evidenceDir]),
       { cwd: WORTEL });
     let uit = '';
     const dood = setTimeout(() => { try { kind.kill('SIGKILL'); } catch (e) {} }, 300000);
@@ -119,8 +146,11 @@ function eenRegel(args) {
 }
 
 (async () => {
+  prepare();
   const reg = leesRegister();
-  const gericht = reg.gericht || {};
+  const gericht = Object.fromEntries(Object.entries(reg.gericht || {}).map(([route, value]) => [route, {
+    ...value, evidenceCommit: value.evidenceCommit || reg.stempel?.commit || null,
+    provenance: value.binding === runBinding.id ? 'CURRENT_CANDIDATE' : 'HISTORICAL_UNREVALIDATED' }]));
   let kandidaten;
   if (blindStand) {
     let kaart;
@@ -140,7 +170,7 @@ function eenRegel(args) {
   const rij = max ? kandidaten.slice(0, max) : kandidaten;
   /* De basislijn uit het register terug in een Map, zodat een herstart de al
      gemeten toetsen niet opnieuw controleert. */
-  const basislijn = new Map(Object.entries(reg.basislijn || {}));
+  const basislijn = new Map(Object.entries(reg.basislijn || {}).filter(([, value]) => value && value.binding === runBinding.id));
 
   console.log('\n=== DE LOPENDE BAND ===\n');
   console.log('  ' + rij.length + ' routes in de rij, ' + werkers + ' werkers naast elkaar');
@@ -162,41 +192,8 @@ function eenRegel(args) {
     sindsSchrijf = 0;
   }
 
-  /* ---- DE BAND COMMIT ZICHZELF ----
-
-     DEZE OMGEVING HERSTART DE CONTAINER BIJ ELKE SESSIE-RESUME, en dan kan een
-     lopende band sneuvelen. Alleen wat GECOMMIT is, is met zekerheid duurzaam;
-     de werkboom-schrijfbeurt is dat misschien niet. Vandaar dat de band zelf
-     periodiek OUTPUTPROEF.json vastlegt en pusht. Nooit iets anders dan dat ene
-     bestand (server/data en .env blijven met rust), en een mislukte push mag de
-     meting nooit stoppen -- vandaar de try/catch en geen throw. */
-  const { execFileSync } = require('child_process');
-  function commitDuurzaam(na) {
-    try {
-      execFileSync('git', ['add', 'OUTPUTPROEF.json'], { cwd: WORTEL });
-      const staat = na && na.gemeten ? na.gemeten : {};
-      const bericht = 'OUTPUT-band: ' + (staat.bewezen || 0) + ' bewezen, ' +
-        (staat.onbeslist || 0) + ' onbeslist (' + klaar + '/' + rij.length + ' gemeten)\n\n' +
-        'Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>\n' +
-        'Claude-Session: https://claude.ai/code/session_011wXxJn2qhUZPyF9dJtwgW1';
-      /* Niets te committen (geen wijziging sinds vorige keer) geeft exit 1; dat
-         is geen fout maar rust. */
-      const st = execFileSync('git', ['status', '--porcelain', 'OUTPUTPROEF.json'], { cwd: WORTEL, encoding: 'utf8' });
-      if (!st.trim()) return;
-      /* ONGESIGNEERD MET OPZET. Deze omgeving tekent commits via een
-         signeringsserver die geregeld 503 geeft, en de commits hier zijn toch
-         niet geverifieerd-getekend (git log %G? = N). Een mechanische
-         register-commit laten stranden op een flakey tekenserver is de meting
-         niet waard; -c commit.gpgsign=false slaat die server over. */
-      execFileSync('git', ['-c', 'commit.gpgsign=false', 'commit', '-q', '-m', bericht], { cwd: WORTEL });
-      for (let poging = 0; poging < 4; poging++) {
-        try { execFileSync('git', ['push', '-u', 'origin', 'claude/route-coverage-rtg-kantoor-tsv5ot'], { cwd: WORTEL }); break; }
-        catch (e) { if (poging === 3) break; require('child_process').execSync('sleep ' + (2 ** (poging + 1))); }
-      }
-    } catch (e) { process.stdout.write('  (commit overgeslagen: ' + String((e && e.message) || e).slice(0, 80) + ')\n'); }
-  }
-  let sindsCommit = 0;
-  const commitBundel = 150;
+  // Evidence tooling never stages, commits or pushes source or results.
+  // The caller reviews and records the generated register explicitly.
 
   async function werker(nr) {
     while (volgende < rij.length) {
@@ -214,18 +211,20 @@ function eenRegel(args) {
                        niet eens uitdelen, meteen stoornis
            onbekend -> de werker doet de controle en meldt wat hij zag */
       const basis = basislijn.get(d.toets);
-      if (basis === 'rood') { klaar++; stoornis++; continue; }
+      if (basis && basis.staat === 'rood') { klaar++; stoornis++; continue; }
 
-      const u = (await eenRegel(['--een=' + d.route + '|' + d.toets + '|' + (basis === 'groen' ? 'groen' : 'onbekend')])) ||
+      const u = (await eenRegel(['--een=' + d.route + '|' + d.toets + '|' + (B.currentBaseline(basis, runBinding.id) ? 'groen' : 'onbekend')])) ||
         { route: d.route, toets: d.toets, staat: 'stoornis', basis: null };
       klaar++; sindsSchrijf++;
 
       /* Wat de werker over de basislijn zag, onthouden -- ook 'rood', zodat de
          volgende route met deze toets niet nog een keer wordt geprobeerd. */
-      if (u.basis === 'groen' || u.basis === 'rood') basislijn.set(d.toets, u.basis);
+      if (u.basis === 'groen' || u.basis === 'rood') basislijn.set(d.toets,
+        { staat: u.basis, binding: runBinding.id, execution: u.evidence?.control || null });
+      fs.writeFileSync(path.join(evidenceDir, B.digest(d.route) + '.json'), JSON.stringify(u, null, 2) + '\n');
 
-      if (u.staat === 'merkt') { merkt++; gericht[d.route] = { toets: d.toets, merkt: true, op: new Date().toISOString() }; }
-      else if (u.staat === 'blind') { blind++; gericht[d.route] = { toets: d.toets, merkt: false, op: new Date().toISOString() }; }
+      if (u.staat === 'merkt') { merkt++; gericht[d.route] = { ...u, merkt: true, provenance: 'CURRENT_CANDIDATE' }; }
+      else if (u.staat === 'blind') { blind++; gericht[d.route] = { ...u, merkt: false, provenance: 'CURRENT_CANDIDATE' }; }
       else stoornis++;   // stoornis: niets vastleggen, komt vanzelf terug in een latere ronde
 
       const verstreken = (Date.now() - begin) / 1000;
@@ -235,15 +234,15 @@ function eenRegel(args) {
       process.stdout.write('  ' + String(klaar).padStart(5) + '/' + rij.length + '  w' + nr + '  ' +
         label + '  ' + d.route.slice(0, 52).padEnd(54) + '  ~' + rest + ' min\n');
       if (sindsSchrijf >= bundel) bewaar();
-      if (++sindsCommit >= commitBundel) { sindsCommit = 0; commitDuurzaam(schrijf(gericht, Object.fromEntries(basislijn))); }
+
     }
   }
 
   await Promise.all(Array.from({ length: werkers }, (_, n) => werker(n + 1)));
   const na = schrijf(gericht, Object.fromEntries(basislijn));
-  commitDuurzaam(na);
+
   console.log('\n  ' + merkt + ' merken, ' + blind + ' blind, ' + stoornis + ' stoornis.');
   if (na && na.gemeten) console.log('  register nu: ' + JSON.stringify(na.gemeten));
   console.log('  BAND KLAAR');
-  process.exitCode = 0;
+  process.exitCode = stoornis ? 1 : 0;
 })().catch(e => { console.error('de band viel om: ' + (e && e.stack || e)); process.exitCode = 2; });

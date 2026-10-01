@@ -14,7 +14,7 @@ async function open(route, width = 390) {
   const ctx = await browser.newContext({ viewport: { width, height: 844 }, serviceWorkers: 'block', reducedMotion: 'reduce', hasTouch: true });
   await ctx.addInitScript(() => { localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); });
   const page = await ctx.newPage();
-  await page.goto(srv.base + route, { waitUntil: 'load' });
+  await page.goto(srv.base + route, { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('body[data-rtg-desktop-state="ready"][data-rtg-adaptive-ready="true"]');
   return { page, ctx };
 }
@@ -150,7 +150,8 @@ test('Foundation keeps its original view actions inside one mobile Edge', { skip
       localStorage.setItem('rtf_sessie', JSON.stringify(s));
     }, { code: gezin.code, token: gezin.token, gezin: gezin.gezin, profiel: gezin.profiel });
     const page = await ctx.newPage();
-    await page.goto(srv.base + '/apps/foundation/meedoen-ontdekken.html', { waitUntil: 'load' });
+    await page.goto(srv.base + '/apps/foundation/meedoen-ontdekken.html', { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
     await page.waitForSelector('.mo-nav.rtg-edge-owned-bar', { state: 'attached' });
     assert.equal(await page.locator('.mo-nav').isVisible(), false);
     assert.equal(await page.locator('.mo-top').isVisible(), false);

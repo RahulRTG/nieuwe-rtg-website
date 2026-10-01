@@ -227,6 +227,9 @@ function oordeel(perRoute, perToets, gevoelig, blind, gemeten) {
           : { staat: 'blind', bron: 'outputproef (gericht)', toetsen: [direct.toets],
               reden: 'er is over DEZE route gelogen en ' + direct.toets + ' bleef groen; ' +
                 'geen enkele toets kijkt naar deze inhoud' };
+      if (direct.evidenceCommit || direct.binding) Object.assign(perRouteUit[route], {
+        evidenceCommit: direct.evidenceCommit || null, evidenceBinding: direct.binding || null,
+        provenance: direct.provenance || 'HISTORICAL_UNREVALIDATED' });
       telling[perRouteUit[route].staat]++;
       continue;
     }
@@ -273,7 +276,9 @@ function metGeheugen(uit, versGericht) {
   try { oud = JSON.parse(fs.readFileSync(UITSLAG, 'utf8')); } catch (e) {}
   return Object.assign(uit, {
     gericht: versGericht || oud.gericht || {},
-    basislijn: oud.basislijn || {}
+    basislijn: oud.basislijn || {},
+    ...(oud.binding ? { binding: oud.binding, claimValidity: oud.claimValidity } : {}),
+    ...(oud.basislijnHistorisch ? { basislijnHistorisch: oud.basislijnHistorisch } : {})
   });
 }
 
@@ -382,42 +387,35 @@ function kiesKandidaten(al) {
    vast. */
 function meetEen(route, toets, opties) {
   const { draaiToets, DEUREN } = require('./mutatie');
+  const B = require('./lib/outputbinding');
   const o = opties || {};
-  /* DE BASISLIJN, EEN KEER GEMETEN IN PLAATS VAN PER ROUTE. De controlerun
-     hieronder vraagt "is deze toets groen ZONDER leugen". Voor de honderden
-     routes die dezelfde toets delen (auth-rol.test.js raakt er 194) is dat
-     honderden keren dezelfde vraag. Wie een `basisGroen` meegeeft -- een Set of
-     Map van toetsen die in een eerste ronde groen bleken -- slaat de controlerun
-     over: staat de toets erin, dan is een zakking onder de leugen toe te
-     rekenen; staat hij er NIET in (hij was al rood), dan is het stoornis en valt
-     er niets aan de leugen toe te schrijven. Zo blijft het onderscheid uit de
-     controlerun overeind, maar zonder hem duizenden keren te herhalen. */
+  if (!/^[A-Za-z0-9_.-]+\.js$/.test(toets)) throw Error('Invalid test path.');
+  const match = /^(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS) (\/api\/\S+)$/.exec(route);
+  if (!match) throw Error('Invalid route identity.');
   const kentBasis = o.basisGroen !== undefined && o.basisGroen !== null;
-  const heeft = (t) => o.basisGroen instanceof Set ? o.basisGroen.has(t)
-    : o.basisGroen instanceof Map ? o.basisGroen.get(t) : !!(o.basisGroen && o.basisGroen[t]);
-  if (kentBasis && !heeft(toets)) return { staat: 'stoornis' };   // was al rood in de basislijn
-
-  const pad = route.slice(route.indexOf(' ') + 1);
-  const r = draaiToets(path.join(WORTEL, 'test', toets),
-    { RTG_LIEG: pad, RTG_LIEG_NIET: DEUREN }, 240000);
-  if ((r.gezakt || 0) === 0) return { staat: 'blind' };
-  if (kentBasis) return { staat: 'merkt' };   // basislijn zei groen, leugen maakt rood: toe te rekenen
-
-  /* DE CONTROLERUN (basislijn onbekend). Een toets die onder de leugen zakt, kan
-     ook zakken door iets anders -- een trage machine, een poortbotsing, een toets
-     die net vandaag stuk is. Dat als MERKT tellen maakt een valse bewezen-cel in
-     de matrix, precies het bewijs dat niemand ooit nakijkt (LAT.md regel 10).
-     Alleen als dezelfde toets ZONDER leugen groen is, bewijst de zakking iets
-     over de inhoud.
-
-     `basis` geeft door WAT de controlerun zag, zodat de aanroeper het per toets
-     kan onthouden: een tweede route met dezelfde toets hoeft de controle dan niet
-     over te doen. Zo is de basislijn niet langer een aparte fase die een
-     herstart wegvaagt, maar een gememoriseerd bijproduct dat in het (gecommitte)
-     register blijft staan. */
-  const controle = draaiToets(path.join(WORTEL, 'test', toets), {}, 240000);
-  const groen = (controle.gezakt || 0) === 0;
-  return { staat: groen ? 'merkt' : 'stoornis', basis: groen ? 'groen' : 'rood' };
+  const heeft = o.basisGroen instanceof Set ? o.basisGroen.has(toets) :
+    o.basisGroen instanceof Map ? o.basisGroen.get(toets) : !!(o.basisGroen && o.basisGroen[toets]);
+  if (kentBasis && !heeft) return { staat: 'stoornis', reden: 'No passing baseline.' };
+  const tmp = fs.mkdtempSync(path.join(require('os').tmpdir(), 'rtg-output-'));
+  try {
+    const hitPath = path.join(tmp, 'mutated-routes.log');
+    const mutation = draaiToets(path.join(WORTEL, 'test', toets),
+      { RTG_LIEG: match[2], RTG_LIEG_NIET: DEUREN, RTG_LIEG_EXACT: '1',
+        RTG_LIEG_METHODE: match[1], RTG_LIEG_JOURNAAL: hitPath }, 240000);
+    const hits = fs.existsSync(hitPath) ? fs.readFileSync(hitPath, 'utf8').trim().split('\n').filter(Boolean) : [];
+    const evidence = { mutation, changedResponses: hits.length, hitDigest: B.digest(hits.join('\n')) };
+    if (!B.complete(mutation)) return { staat: 'stoornis', reden: 'Incomplete mutation execution.', evidence };
+    // Legacy callers without a binding can exercise the pure algorithm in tests;
+    // the evidence-producing coordinator always requires a confirmed route hit.
+    if (o.requireHit && !hits.length) return { staat: 'stoornis', reden: 'Selected route was never mutated.', evidence };
+    if (B.green(mutation)) return { staat: 'blind', evidence };
+    if (kentBasis) return { staat: 'merkt', evidence };
+    const control = draaiToets(path.join(WORTEL, 'test', toets),
+      { RTG_LIEG: '', RTG_LIEG_EXACT: '', RTG_LIEG_METHODE: '', RTG_LIEG_JOURNAAL: '' }, 240000);
+    evidence.control = control;
+    return { staat: B.green(control) ? 'merkt' : 'stoornis',
+      basis: B.green(control) ? 'groen' : 'rood', evidence };
+  } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
 }
 
 /* Draait EEN toets zonder leugen en zegt of hij groen was. De basislijn van de
@@ -425,7 +423,7 @@ function meetEen(route, toets, opties) {
 function basislijnVan(toets) {
   const { draaiToets } = require('./mutatie');
   const r = draaiToets(path.join(WORTEL, 'test', toets), {}, 240000);
-  return { toets, groen: (r.gezakt || 0) === 0, gedraaid: r.gedraaid !== undefined ? r.gedraaid : null };
+  return { toets, groen: require('./lib/outputbinding').green(r), gedraaid: r.toetsen - r.overgeslagen, execution: r };
 }
 
 function gerichteRonde(aantal) {
@@ -437,7 +435,7 @@ function gerichteRonde(aantal) {
   let merkt = 0, blind = 0, stoornis = 0;
   for (let i = 0; i < doen.length; i++) {
     const d = doen[i];
-    const u = meetEen(d.route, d.toets);
+    const u = meetEen(d.route, d.toets, { requireHit: true });
     if (u.staat === 'merkt') merkt++;
     else if (u.staat === 'blind') blind++;
     else stoornis++;

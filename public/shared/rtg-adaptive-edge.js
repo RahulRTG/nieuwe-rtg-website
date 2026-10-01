@@ -111,15 +111,18 @@
   function build() {
     var host = d.createElement('section'); host.className = 'rtg-adaptive-edge'; host.setAttribute('aria-label', 'RTG Adaptive Edge');
     host.innerHTML = '<button class="rtg-adaptive-presence" type="button" hidden><i></i><span></span></button><div class="rtg-adaptive-identity" hidden></div>' +
-      '<section class="rtg-adaptive-sheet" hidden aria-hidden="true"><div class="rtg-adaptive-sheet-head"><div><span class="rtg-adaptive-sheet-mouth">' + lips() + '</span><h2></h2><p></p></div><button type="button" data-rtg-adaptive-close aria-label="Sluiten">×</button></div><div class="rtg-adaptive-guard"><i></i><span>Uw volgende handeling</span><b>Controle bij uitvoering</b></div><div class="rtg-adaptive-sheet-list"></div></section>' +
+      '<section class="rtg-adaptive-sheet" hidden aria-hidden="true"><div class="rtg-adaptive-sheet-head"><div><button type="button" class="rtg-adaptive-sheet-mouth" data-rtg-sheet-action="ai" aria-label="Praat met Rahul">' + lips() + '</button><h2></h2><p></p></div><button type="button" data-rtg-adaptive-close aria-label="Sluiten">×</button></div><div class="rtg-adaptive-guard"><i></i><span>Uw volgende handeling</span><b>Controle bij uitvoering</b></div><div class="rtg-adaptive-sheet-list"></div></section>' +
       '<nav class="rtg-adaptive-bar" aria-label="Home, Context, Acties, Connect en Rahul"></nav>';
-    rt.edge.root.appendChild(host); rt.host = host; rt.bar = host.querySelector('.rtg-adaptive-bar');
-    rt.sheet = host.querySelector('.rtg-adaptive-sheet'); rt.sheetTitle = host.querySelector('h2');
-    rt.sheetCopy = host.querySelector('.rtg-adaptive-sheet-head p'); rt.sheetList = host.querySelector('.rtg-adaptive-sheet-list');
-    rt.identity = host.querySelector('.rtg-adaptive-identity');
-    rt.presenceButton = host.querySelector('.rtg-adaptive-presence'); rt.presenceText = rt.presenceButton.querySelector('span');
-    host.querySelector('[data-rtg-adaptive-close]').addEventListener('click', function () { setState('dock'); });
-    rt.presenceButton.addEventListener('click', function () { execute('presence'); });
+    function find(selector) { return host.querySelector(selector); }
+    rt.edge.root.appendChild(host); rt.host = host; rt.bar = find('.rtg-adaptive-bar');
+    rt.sheet = find('.rtg-adaptive-sheet'); rt.sheetTitle = find('h2');
+    rt.sheetCopy = find('.rtg-adaptive-sheet-head p'); rt.sheetList = find('.rtg-adaptive-sheet-list');
+    rt.identity = find('.rtg-adaptive-identity');
+    rt.presenceButton = find('.rtg-adaptive-presence'); rt.presenceText = rt.presenceButton.querySelector('span');
+    find('[data-rtg-adaptive-close]').addEventListener('click', function () { setState('dock'); });
+    [['[data-rtg-sheet-action]', 'ai'], ['.rtg-adaptive-presence', 'presence']].forEach(function (item) {
+      find(item[0]).onclick = function () { execute(item[1]); };
+    });
     renderDeck(); rt.inputStop = Input.bind(rt, { state: setState, action: execute,
       deck: function (delta) { setDeck(K.nextDeck(rt.model.deck, delta)); },
       rahul: function () { rt.model.deck = 'rahul'; renderDeck(); setState('deck'); execute('ai'); },
@@ -134,8 +137,8 @@
     w.RTGAdaptiveEdgeControls.start(rt);
     w.dispatchEvent(new w.CustomEvent('rtg-adaptive-ready'));
     if (w.MutationObserver) rt.observer = new w.MutationObserver(function () {
-      var state = d.body.getAttribute('data-rtg-edge-2-state');
-      if (d.body.getAttribute('data-rtg-edge-venster-open') === 'true') return;
+      var state = d.body.dataset.rtgEdge2State;
+      if (d.body.dataset.rtgEdgeVensterOpen === 'true') return;
       if (state === 'focus') setState('dock', 'auto');
       else if (state === 'compact') setState('peek', 'auto');
       else if (state === 'overview' && rt.model.state === 'peek') setState('dock', 'auto');
@@ -146,12 +149,10 @@
   function destroy() {
     if (!rt) return;
     closePanel();
-    if (rt.surfaceStop) rt.surfaceStop();
+    ['surfaceStop', 'inputStop', 'controlsStop'].forEach(function (key) { if (rt[key]) rt[key](); });
     if (rt.observer) rt.observer.disconnect();
-    if (rt.inputStop) rt.inputStop();
-    if (rt.controlsStop) rt.controlsStop();
-    if (rt.host && rt.host.parentNode) rt.host.parentNode.removeChild(rt.host);
-    d.body.removeAttribute('data-rtg-adaptive-ready'); d.body.removeAttribute('data-rtg-adaptive-state'); rt = null;
+    if (rt.host) rt.host.remove();
+    delete d.body.dataset.rtgAdaptiveReady; delete d.body.dataset.rtgAdaptiveState; rt = null;
   }
   w.RTGAdaptiveEdge = Object.freeze({ start: start, setState: setState, setDeck: setDeck,
     openPanel: openPanel, mountSurface: function (node, options) { return w.RTGAdaptiveEdgeSurface && w.RTGAdaptiveEdgeSurface.mount(node, options); }, setPresence: setPresence,

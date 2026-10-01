@@ -9,7 +9,7 @@
     originals=[];if(wrapper)wrapper.remove();wrapper=null;
     delete d.body.dataset.rtgCommunication;
   }
-  function take(node){originals.push({node:node,parent:node.parentNode,next:node.nextSibling});wrapper.appendChild(node);}
+  function take(node,parent){originals.push({node:node,parent:node.parentNode,next:node.nextSibling});(parent||wrapper).appendChild(node);}
   function sync(){
     var edge=w.RTGAdaptiveEdge;if(!edge||!edge.mountSurface)return;
     var call=d.getElementById('callScreen'), thread=d.getElementById('draad');
@@ -20,6 +20,9 @@
     d.body.appendChild(wrapper);
     if(next==='chat'){
       take(d.getElementById('antwoordop'));take(d.getElementById('invoerrij'));
+      // Keep the original assist actions available to Edge while their old
+      // composer is hidden. The owned strip itself remains visually hidden.
+      take(d.querySelector('.invoer .hulprij'),d.body);
     }else{
       take(call.querySelector('.cs-top'));take(call.querySelector('.cs-foot'));
     }

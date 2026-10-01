@@ -32,6 +32,14 @@ on:
     # staat de wachtrij van GitHub vol en wachten runs onnodig lang.
     - cron: '17 3 * * 0'
   workflow_dispatch:
+    inputs:
+      scope:
+        description: Volledige ronde of alleen de bestaande prestatieschuld meten
+        type: choice
+        default: full
+        options:
+          - full
+          - performance
 
 permissions:
   contents: read
@@ -60,7 +68,113 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  performance-debt:
+    name: Prestatieschuld (geïsoleerde SQLite-storm)
+    if: github.event_name == 'workflow_dispatch' && inputs.scope == 'performance'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      DATABASE_URL: ''
+      PG_URL: ''
+      RTG_STORE: sqlite
+      SMTP_URL: ''
+      RTG_AI_UIT: '1'
+      ANTHROPIC_API_KEY: ''
+      STORM_WERKERS: '12'
+      SOAK_MIN: '3'
+      MEGA_SEED: '1234567'
+      LEK_MS: '15000'
+      LEK_RONDES: '2'
+      RTG_PERFORMANCE_COMMIT: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: npm ci
+      - name: Bewaar de vorige meting; accepteer alleen vers bewijs
+        run: |
+          mkdir -p artifacts/performance-debt
+          python3 - <<'PY'
+          import hashlib, json, os, pathlib, platform, shutil, subprocess
+          out = pathlib.Path('artifacts/performance-debt')
+          for name in ['BEPROEVING.json', 'LAATSTE_METING.json']:
+              source = pathlib.Path(name)
+              if source.exists():
+                  shutil.copy2(source, out / ('previous-' + name))
+                  source.unlink()
+          norm = pathlib.Path('NORM.json')
+          manifest = {
+              'commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),
+              'normSha256': hashlib.sha256(norm.read_bytes()).hexdigest(),
+              'platform': platform.platform(),
+              'cpu': subprocess.check_output(['lscpu'], text=True),
+              'workload': {key: os.environ[key] for key in ['STORM_WERKERS', 'SOAK_MIN', 'MEGA_SEED', 'LEK_MS', 'LEK_RONDES']},
+              'isolation': 'Fresh GitHub-hosted runner; temporary SQLite directory; no production or provider credentials.'
+          }
+          assert manifest['commit'] == os.environ['RTG_PERFORMANCE_COMMIT']
+          (out / 'RUN-IDENTITY.json').write_text(json.dumps(manifest, indent=2) + '\n')
+          PY
+      - name: Bestaande storm, geld, misbruik en herstel
+        run: node scripts/beproeving.js 2>&1 | tee artifacts/performance-debt/beproeving.log
+      - name: Toets de oorspronkelijke doelen zonder de norm te verplaatsen
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, math, os, pathlib, sys
+          out = pathlib.Path('artifacts/performance-debt')
+          out.mkdir(parents=True, exist_ok=True)
+          norm = json.loads(pathlib.Path('NORM.json').read_text())
+          source = pathlib.Path('LAATSTE_METING.json')
+          proof = {'commit': os.environ['RTG_PERFORMANCE_COMMIT'], 'status': 'BLOCKED', 'blockers': [], 'targets': {'p99Ms': 144, 'eventLoopP99Ms': 64.8}}
+          if not source.exists():
+              proof['blockers'].append('The current storm produced no completed measurement; historical values cannot stand in for it.')
+          else:
+              measurement = json.loads(source.read_text())
+              proof['measurement'] = measurement
+              proof['measurementSha256'] = hashlib.sha256(source.read_bytes()).hexdigest()
+              stamp = measurement.get('stempel', {})
+              short = stamp.get('commit', '')
+              if len(short) < 7 or not proof['commit'].startswith(short) or stamp.get('boomVuil') is not False:
+                  proof['blockers'].append('Measurement does not bind to the clean candidate commit.')
+              machine = measurement.get('machine', {})
+              shape = str(machine.get('kernen')) + 'k/' + str(machine.get('geheugenGB')) + 'g/' + str(machine.get('platform')) + '/' + str(measurement.get('modus'))
+              calibration, baseline = machine.get('kalibratieBasisMs'), norm.get('prestatieKalibratie')
+              comparable = shape == norm.get('prestatieBron') and isinstance(calibration, (int, float)) and calibration > 0 and isinstance(baseline, (int, float)) and baseline > 0 and max(calibration / baseline, baseline / calibration) <= 1.4
+              proof['hardwareComparison'] = {'current': shape, 'baseline': norm.get('prestatieBron'), 'calibrationMs': calibration, 'baselineCalibrationMs': baseline, 'comparable': comparable}
+              if not comparable:
+                  proof['blockers'].append('Hardware or calibration differs from the recorded baseline; debt cannot be declared repaid on this measurement.')
+              metrics = measurement.get('meters', {})
+              if measurement.get('oordeel') != 'PASS' or measurement.get('gezakteDrempels') != 0:
+                  proof['blockers'].append('Existing storm correctness/recovery assertions did not all pass.')
+              if metrics.get('stormDuurSec', 0) < 180 or metrics.get('endpointsOnbereikt') != 0:
+                  proof['blockers'].append('The required duration or discovered-endpoint coverage was not completed.')
+              for name, target in proof['targets'].items():
+                  value = metrics.get(name)
+                  if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0 or value > target:
+                      proof['blockers'].append(name + ': measured ' + str(value) + ', original target ' + str(target))
+          if not proof['blockers']:
+              proof['status'] = 'PASS'
+          (out / 'PERFORMANCE-DEBT-PROOF.json').write_text(json.dumps(proof, indent=2) + '\n')
+          print(json.dumps(proof, indent=2))
+          sys.exit(0 if proof['status'] == 'PASS' else 1)
+          PY
+      - name: Bewaar bewijs, ook wanneer een doel niet is gehaald
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: performance-debt-${{ github.sha }}
+          path: |
+            artifacts/performance-debt/
+            BEPROEVING.json
+            LAATSTE_METING.json
+          retention-days: 30
+
   beproeving:
+    if: github.event_name != 'workflow_dispatch' || inputs.scope != 'performance'
     name: De Beproeving (storm, geld, misbruik, herstel)
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -152,6 +266,7 @@ jobs:
           retention-days: 30
 
   tot-crash:
+    if: github.event_name != 'workflow_dispatch' || inputs.scope != 'performance'
     name: Tot crash (escalerende druk tot iets breekt)
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -190,6 +305,7 @@ jobs:
           retention-days: 30
 
   heapproef:
+    if: github.event_name != 'workflow_dispatch' || inputs.scope != 'performance'
     name: Heapproef (houdt de server geheugen vast?)
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -229,6 +345,7 @@ jobs:
           retention-days: 30
 
   dekking:
+    if: github.event_name != 'workflow_dispatch' || inputs.scope != 'performance'
     name: Waargenomen endpoint-dekking en de samenhang
     runs-on: ubuntu-latest
     # 90 was genoeg voor de suite plus de dekking; de meetronde komt er met

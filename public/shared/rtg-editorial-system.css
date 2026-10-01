@@ -59,6 +59,31 @@ body[data-rtg-skin="heritage"][data-rtg-layout="standard"] .rtg-edge-top{
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
 }
 body[data-rtg-skin="heritage"] .rtg-edge-mark{color:var(--rtg-world-metal)!important}
+/* A surface and its ink travel together. These existing light entry cards
+   keep their paper treatment inside the dark world; gold is not white ink. */
+body[data-rtg-skin="heritage"][data-rtg-layout="standard"] .inlog{
+  background:var(--rtg-world-card)!important;color:var(--rtg-world-ink)!important;
+}
+body[data-rtg-skin="heritage"][data-rtg-layout="standard"] .splitwerk .scherm{
+  --txt:#28261f;--soft:#625d52;--muted:#625d52;color:#28261f;
+}
+body[data-rtg-skin="heritage"][data-rtg-layout="standard"] .splitwerk :is(.sectionkop,.detail-leeg) p{color:#625d52}
+body[data-rtg-skin="heritage"][data-rtg-layout="standard"] .splitwerk .ingang:not(.actief){color:#28261f}
+body[data-rtg-skin="heritage"][data-rtg-layout="standard"] .splitwerk .ingang:not(.actief) span{color:#625d52}
+body[data-rtg-skin="heritage"][data-rtg-layout="standard"] .ios-onder{color:var(--rtg-world-muted)}
+body[data-rtg-skin="heritage"][data-rtg-layout="standard"].rtg-safe-experience #wacht .stil{color:var(--rtg-world-muted)}
+body[data-rtg-skin="heritage"][data-world-home] :is(.wh-paper-card,.onthaal-kies){
+  background:var(--wh-paper)!important;color:var(--wh-paper-ink)!important;
+}
+body[data-rtg-skin="heritage"][data-world-home] .onthaal-kies .buurtstad{
+  background:var(--rtg-world-card-strong)!important;color:var(--rtg-world-ink)!important;
+}
+body[data-rtg-skin="heritage"][data-world-home] .onthaal-kies :is(.buurtsec,.leeg){color:#625d52!important}
+/* The public Foundation story stays readable even against a bright photo.
+   The gradient belongs to the photo, never to the city data or its controls. */
+body[data-rtg-skin="heritage"][data-world-home="foundation"] .wh-foundation-public::after{
+  background:linear-gradient(180deg,rgba(10,27,21,.66),rgba(10,27,21,.72) 48%,rgba(10,27,21,.94));
+}
 body[data-rtg-shell="mobile"] .rtg-edge-mark{
   display:flex!important;align-items:center;gap:10px;font-size:30px!important;font-weight:400!important;
 }
@@ -123,9 +148,33 @@ body[data-rtg-desktop] .wd-date-tile b{font-family:var(--rtg-display)}
   body[data-world-home][data-rtg-shell="mobile"] .rtg-edge-top::after{display:none}
   body[data-world-home][data-rtg-shell="mobile"] .rtg-edge-mark{font-size:34px!important;gap:10px}
   body[data-world-home][data-rtg-shell="mobile"] .rtg-edge-mark .wd-world-label{font-size:15px!important}
-  body[data-world-home][data-rtg-shell="mobile"] .rtg-edge-profile{flex-basis:40px;width:40px!important;height:40px!important;min-width:40px!important;min-height:44px!important;border-color:color-mix(in srgb,var(--rtg-world-metal) 55%,transparent)!important}
+  body[data-world-home][data-rtg-shell="mobile"] .rtg-edge-profile{flex-basis:44px;width:44px!important;height:44px!important;min-width:44px!important;min-height:44px!important;border-color:color-mix(in srgb,var(--rtg-world-metal) 55%,transparent)!important}
   body[data-rtg-skin="heritage"] :is(.kantoor-intro,.rtg-intro) h1{max-width:17ch}
   body[data-rtg-shell="mobile"] .wd-access{margin:24px 18px!important;padding:24px!important;border-radius:var(--rtg-radius-editorial)}
+  /* The Foundation introduction is page content, not another rounded shell.
+     Its city picker takes only the space required by the real result. */
+  body[data-rtg-skin="heritage"][data-world-home="foundation"][data-rtg-shell="mobile"] .onthaal{
+    min-height:0!important;padding:0!important;border:0!important;border-radius:0!important;
+    background:transparent!important;box-shadow:none!important;outline:0!important;
+    grid-template-rows:auto auto;align-items:start;
+  }
+  body[data-rtg-skin="heritage"][data-world-home="foundation"][data-rtg-shell="mobile"] .wh-foundation-public{
+    min-height:390px!important;box-sizing:border-box;padding:118px 20px 30px!important;
+    border:0;border-radius:0;
+  }
+  body[data-rtg-skin="heritage"][data-world-home="foundation"][data-rtg-shell="mobile"] .wh-foundation-public>.wh-free{
+    inset-block-start:calc(var(--edge-top,64px) + 16px);inset-inline-start:20px;
+  }
+  body[data-rtg-skin="heritage"][data-world-home="foundation"][data-rtg-shell="mobile"] .onthaal-kies{
+    min-height:0!important;height:auto;align-self:start;margin:0 16px 8px;padding:20px!important;gap:10px;
+  }
+  body[data-rtg-skin="heritage"][data-world-home="foundation"][data-rtg-shell="mobile"] .onthaal-kies .steden{
+    flex:0 0 auto;min-height:0!important;
+  }
+  body[data-rtg-skin="heritage"][data-world-home="foundation"][data-rtg-shell="mobile"] .onthaal-kies .leeg{
+    min-height:0!important;margin:0;padding:0;
+  }
+  body[data-rtg-skin="heritage"][data-world-home="foundation"][data-rtg-shell="mobile"] .onthaal-kies .stippen:empty{display:none}
 }
 @media(prefers-reduced-motion:reduce){
   body[data-rtg-skin="heritage"]{scroll-behavior:auto}

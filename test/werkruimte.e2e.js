@@ -50,7 +50,7 @@ test('Werkruimte: een kamer bewaren, leeghalen en met een klik terughalen',
     });
     const randKlopt = (m) => {
       assert.ok(Math.abs(m.ruimte.x - m.kader.x) < 1, JSON.stringify(m));
-      assert.ok(Math.abs(m.ruimte.y - m.kader.y) < 1);
+      assert.ok(Math.abs(m.ruimte.y - m.kader.y) < 1, JSON.stringify(m));
       assert.ok(Math.abs(m.ruimte.width - m.kader.width) < 1);
       assert.ok(m.ruimte.height >= 400, 'de actieve app krijgt een bruikbare werkhoogte');
       assert.ok(m.rand.onder.y + m.rand.onder.height <= m.scherm.height, 'de bediening blijft in beeld');

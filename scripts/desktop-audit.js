@@ -24,8 +24,11 @@ async function main() {
   let browser;
   try {
     browser = await pw.chromium.launch(browserOpties(pw));
-    const ctx = await browser.newContext({ viewport: { width, height: 1000 }, serviceWorkers: 'block', reducedMotion: 'reduce' });
-    await ctx.addInitScript(() => { localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); });
+    // Playwright's worker-blocking injection reads navigator.serviceWorker in
+    // every frame. That property is forbidden in an opaque app-store sandbox.
+    // Use a fresh ordinary context; never inject RTG preferences into a cell.
+    const ctx = await browser.newContext({ viewport: { width, height: 1000 }, reducedMotion: 'reduce' });
+    await ctx.addInitScript(() => { if (window.top !== window) return; localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); });
     let next = 0;
     await Promise.all(Array.from({ length: 3 }, async () => {
       const page = await ctx.newPage();

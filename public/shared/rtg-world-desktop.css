@@ -62,6 +62,15 @@ body[data-rtg-desktop] :is(button,summary,a,input,select,textarea){scroll-margin
    ready on a wide viewport, but never a second mobile page or navigation row. */
 body[data-rtg-shell="mobile"] .wd-shell,
 body[data-rtg-shell="mobile"] .wd-page{display:contents;contain:none;isolation:auto}
+/* Een kaart of werkblad heeft één echt tekenvlak nodig. Display:contents zou
+   dat vlak nul pixels maken en fixed kinderen opnieuw aan de viewport hangen.
+   Dit is het inhoudskader binnen dezelfde Edge, geen extra navigatieschil. */
+body[data-rtg-shell="mobile"] .wd-page:is([data-rtg-canvas-surface],:has(>.rtg-werkruimte),:has(>#rtgCommand)){
+ display:block;position:fixed;inset:calc(var(--edge-top,44px) + var(--rtg-command-safe-top,env(safe-area-inset-top,0px))) 0 var(--rtg-adaptive-inset,96px);contain:layout;isolation:isolate;min-height:0;
+}
+body[data-rtg-shell="mobile"] .wd-page>:is([data-rtg-native-canvas],.rtg-werkruimte,#rtgCommand){
+ position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-height:0!important;margin:0!important;
+}
 body[data-rtg-shell="mobile"] .wd-shell>[hidden]{display:none!important}
 body[data-rtg-shell="mobile"] .wd-shell>:is(.wd-greeting,.wp-tabs,.wd-people,.wd-favorites,.wd-library,.wp-story,.wp-domain),
 body[data-rtg-shell="mobile"] :is(.wp-atmosphere,.wp-edit-images),
@@ -74,3 +83,7 @@ body[data-rtg-shell="mobile"] .wd-app-frame{height:calc(100% - 64px);min-height:
 body[data-rtg-shell="mobile"] .wd-world-label{display:none!important}
 body[data-rtg-shell="mobile"][data-rtg-desktop-access="locked"] .wd-access{margin:calc(var(--edge-top,64px) + 20px) 16px var(--rtg-adaptive-inset,96px);width:auto}
 body[data-rtg-shell="mobile"][data-ios-home] #gate[data-rtg-access]>.access-brand{display:none}
+/* App headings stay in the content flow; only the global Edge stays fixed. */
+body[data-rtg-shell="mobile"] .wd-page>header.ios-nav:not(.ritkop){position:relative!important;top:auto!important}
+body.rtg-edge-host[data-rtg-shell="mobile"][data-workos-premium].workos-has-bottom{display:block!important;height:auto;min-height:100dvh;overflow:visible;padding-top:calc(var(--edge-top) + env(safe-area-inset-top,0px))!important;padding-bottom:var(--rtg-adaptive-inset,96px)!important}
+body[data-rtg-shell="mobile"] :is(button,summary,a,input,select,textarea){scroll-margin-block:calc(var(--edge-top,48px) + env(safe-area-inset-top,0px) + 12px) var(--rtg-adaptive-inset,96px)}

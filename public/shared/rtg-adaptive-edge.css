@@ -107,7 +107,7 @@ body[data-rtg-adaptive-ready="true"] .ios-thuis{display:none!important}
 .rtg-adaptive-item:active{transform:scale(.94)}
 .rtg-adaptive-sheet{border-radius:var(--rtg-radius-system);transform-origin:50% 100%}
 .rtg-adaptive-sheet:not([hidden]){animation:rtg-edge-unfold .28s cubic-bezier(.2,.8,.2,1) both}
-@keyframes rtg-edge-unfold{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes rtg-edge-unfold{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){.rtg-adaptive-item,.rtg-adaptive-sheet{animation:none!important;transition:none!important}}
 @media(prefers-contrast:more){.rtg-adaptive-bar,.rtg-adaptive-sheet{background:var(--edge-bar-bg);border:2px solid var(--edge-bar-copy)}}
 @media(forced-colors:active){.rtg-adaptive-bar,.rtg-adaptive-sheet{background:Canvas;border:2px solid ButtonText;box-shadow:none}}
@@ -129,8 +129,9 @@ body[data-rtg-adaptive-ready="true"]{--rtg-adaptive-height:64px}
 .rtg-adaptive-sheet{bottom:0;padding:16px;max-height:calc(100dvh - var(--rtg-edge-keyboard,0px) - var(--rtg-safe-top) - var(--edge-top,48px) - 32px);border-radius:var(--rtg-radius-system)}
 .rtg-adaptive-sheet-head{grid-template-columns:minmax(0,1fr) 44px;align-items:start}
 .rtg-adaptive-sheet-head>[data-rtg-adaptive-close]{height:44px;width:44px;background:transparent!important}
-.rtg-adaptive-sheet-mouth{display:block;width:32px;height:20px;color:var(--edge-bar-accent)}
-.rtg-adaptive-sheet-mouth svg{width:100%;height:100%}
+.rtg-adaptive-sheet-mouth{display:grid;place-items:center;width:44px;height:44px;min-width:44px;min-height:44px;padding:0!important;border:0!important;background:transparent!important;color:var(--edge-bar-accent)}
+.rtg-adaptive-sheet-mouth svg{width:32px;height:20px}
+.rtg-adaptive-sheet-mouth:focus-visible{outline:2px solid var(--edge-bar-accent);outline-offset:-2px}
 .rtg-adaptive-sheet h2{font-size:25px}
 .rtg-adaptive-guard,.rtg-adaptive-sheet-head p:empty{display:none}
 .rtg-adaptive-sheet>.rtg-edge-index,.rtg-adaptive-sheet>.rtg-edge-ai-panel,.rtg-adaptive-sheet>.rtg-edge-status-panel{position:static!important;inset:auto!important;transform:none!important;height:auto!important;min-height:0!important;max-height:none!important;width:100%!important;border:0!important;background:transparent!important;box-shadow:none!important;backdrop-filter:none!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;padding:0!important}

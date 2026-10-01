@@ -461,7 +461,12 @@ function draaiToets(bestand, env, wacht, forceer) {
      leunt, meet de standaardinstelling (LAT regel 10). */
   const vlaggen = ['--test', '--test-reporter=tap'];
   if (forceer) vlaggen.push('--test-force-exit');
-  const r = spawnSync('node', vlaggen.concat([bestand]), {
+  const childEnv = Object.assign({}, process.env, env || {});
+  // This is an independent TAP runner, even when the instrument is tested by
+  // node:test. Inheriting its internal child marker suppresses the TAP output.
+  delete childEnv.NODE_TEST_CONTEXT;
+  const gestartOp = new Date().toISOString();
+  const r = spawnSync(process.execPath, vlaggen.concat([bestand]), {
     cwd: WORTEL, encoding: 'utf8', timeout: wacht || WACHT_NUL, maxBuffer: 64 * 1024 * 1024,
     /* SIGKILL EN NIET HET STANDAARD SIGTERM, en dat is geen ruwheid maar een
        lek dat ik heb zien ontstaan. Bij een time-out stuurt spawnSync SIGTERM,
@@ -472,7 +477,7 @@ function draaiToets(bestand, env, wacht, forceer) {
        Over een ronde van uren stapelen die zich op, houden ze poorten en geheugen
        vast, en vervuilen ze de metingen die erna komen. */
     killSignal: 'SIGKILL',
-    env: Object.assign({}, process.env, env || {})
+    env: childEnv
   });
   const uit = String(r.stdout || '');
   const gezakt = (uit.match(/^not ok /gm) || []).length;
@@ -486,7 +491,10 @@ function draaiToets(bestand, env, wacht, forceer) {
   const toetsen = geteld ? Number(geteld[1]) : 0;
   const overgeslagen = over ? Number(over[1]) : 0;
   return { gezakt, toetsen, overgeslagen, alGeslagen: toetsen > 0 && overgeslagen >= toetsen,
-    tijdout: r.error && r.error.code === 'ETIMEDOUT' };
+    tijdout: !!(r.error && r.error.code === 'ETIMEDOUT'), status: r.status, signal: r.signal,
+    error: r.error ? r.error.code || 'PROCESS_ERROR' : null, gestartOp, klaarOp: new Date().toISOString(),
+    stdoutSha256: require('crypto').createHash('sha256').update(uit).digest('hex'),
+    stderrSha256: require('crypto').createHash('sha256').update(String(r.stderr || '')).digest('hex') };
 }
 
 /* TOETSEN DIE DE SERVER STARTEN IN PLAATS VAN HEM TE REQUIREN, en waarom die een

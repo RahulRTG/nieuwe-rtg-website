@@ -52,7 +52,7 @@ test('Heritage context returns through real navigation without writes', async t 
       assert.deepEqual(writes,[]);
     });
     await t.test('Living restores its selected tab', async () => {
-      await visit('/apps/rtg.html'); await page.locator('.wp-domain > summary').click(); await page.click('[data-paneel="mensen"]');
+      await visit('/apps/rtg.html'); await page.click('[data-paneel="mensen"]');
       await returnTo('/apps/rtg.html');
       await page.waitForFunction(() => document.querySelector('[data-paneel="mensen"]').classList.contains('actief'));
     });
@@ -66,7 +66,6 @@ test('Heritage context returns through real navigation without writes', async t 
     });
     await t.test('Work restores audience and respects a direct address', async () => {
       await visit('/apps/kantoor.html');
-      await page.locator('.wp-domain > summary').click();
       await page.locator('#worldWorkDetails > summary').click();
       await page.click('[data-work-kies="ondernemers"]');
       await page.evaluate(() => history.replaceState(null,'',location.pathname));

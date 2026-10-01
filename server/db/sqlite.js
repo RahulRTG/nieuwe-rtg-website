@@ -12,6 +12,7 @@ const { DATA_DIR, STORE, besloten, beslotenMap } = require('./opslag');
 // De goedkope veranderingsdetectie op GROTE collecties; daar staat ook waarom
 // hij veilig is en waarom geld er nooit door gaat.
 const voorcheck = require('./voorcheck');
+const externeCollecties = require('./sqlite-poll');
 const db = state.db;
 
 let kvdb = null;
@@ -49,7 +50,7 @@ function loadSqlite() {
   for (const r of rows) { const j = uitStore(r.val); data[r.key] = JSON.parse(j); laatsteJson.set(r.key, j); toegepast.set(r.key, r.ver); }
   return data;
 }
-// De vier statements zijn per verbinding altijd dezelfde: één keer voorbereiden
+// De statements zijn per verbinding altijd dezelfde: één keer voorbereiden
 // in plaats van bij elke save opnieuw (SQLite hoeft dan niet te hercompileren).
 let stmt = null;
 function statements() {
@@ -58,6 +59,7 @@ function statements() {
     bump: kvdb.prepare("UPDATE meta SET v = v + 1 WHERE k = 'ver'"),
     huidig: kvdb.prepare("SELECT v FROM meta WHERE k = 'ver'"),
     lees: kvdb.prepare('SELECT val, ver FROM kv WHERE key = ?'),
+    versies: kvdb.prepare('SELECT key, ver FROM kv'),
     up: kvdb.prepare('INSERT INTO kv(key,val,ver) VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET val=excluded.val, ver=excluded.ver')
   };
   return stmt;
@@ -110,33 +112,32 @@ function saveSqlite(force) {
 function pollSqlite() {
   if (!kvdb) return;
   try {
-    // per collectie kijken of een ANDER proces een nieuwere versie schreef dan wij
-    // al toepasten (een globale hoogwatergrens zou een lager genummerde wijziging
-    // van een ander proces missen zodra wij zelf iets hoger schreven). We halen
-    // alleen rijen op boven onze laagst-toegepaste versie, zodat we niet elke
-    // keer alle collecties hoeven te deserialiseren.
-    let laagst = 0;
-    for (const v of toegepast.values()) if (v < laagst || laagst === 0) laagst = v;
-    const rows = kvdb.prepare('SELECT key, val, ver FROM kv WHERE ver > ?').all(laagst);
+    // Eerst alleen de versies: de laagst-toegepaste versie blijft bij een
+    // ongewijzigde collectie laag. Een query met val boven die grens kopieerde
+    // daarom iedere poll vrijwel de hele database naar JavaScript, ook als we
+    // al die waarden zelf hadden geschreven en direct weer weggooiden.
+    // De vergelijking blijft PER COLLECTIE: een eigen hogere schrijfversie
+    // mag een eerdere externe wijziging nooit verbergen.
+    const rows = externeCollecties(kvdb, statements(), toegepast);
     let sessieGewijzigd = false;
     for (const r of rows) {
-      if (r.ver <= (toegepast.get(r.key) || 0)) continue;
-      const baseJson = laatsteJson.get(r.key);
+      const sleutel = r.key;
+      const baseJson = laatsteJson.get(sleutel);
       const hunJson = uitStore(r.val);
-      const lokaalOpenstaand = baseJson !== undefined && JSON.stringify(db.data[r.key]) !== baseJson;
+      const lokaalOpenstaand = baseJson !== undefined && JSON.stringify(db.data[sleutel]) !== baseJson;
       if (lokaalOpenstaand) {
         // wij hebben nog niet-opgeslagen wijzigingen: samenvoegen en die niet
         // als "opgeslagen" markeren, zodat de eerstvolgende save ze wegschrijft.
-        db.data[r.key] = merge3(JSON.parse(baseJson), db.data[r.key], JSON.parse(hunJson));
+        db.data[sleutel] = merge3(JSON.parse(baseJson), db.data[sleutel], JSON.parse(hunJson));
       } else {
-        db.data[r.key] = JSON.parse(hunJson);
-        laatsteJson.set(r.key, hunJson);
+        db.data[sleutel] = JSON.parse(hunJson);
+        laatsteJson.set(sleutel, hunJson);
       }
-      toegepast.set(r.key, r.ver);
+      toegepast.set(sleutel, r.ver);
       // De inhoud komt van BUITEN: wat de voorcheck van deze collectie meende te
       // weten, geldt niet meer. Vergeten, zodat de volgende save hem exact nakijkt.
-      voorcheck.vergeet(r.key);
-      if (r.key === 'sessions') sessieGewijzigd = true;
+      voorcheck.vergeet(sleutel);
+      if (sleutel === 'sessions') sessieGewijzigd = true;
     }
     if (sessieGewijzigd) { const ext = state.getExternCb(); if (ext) ext(); }
   } catch (e) { console.warn('[db] sqlite-sync mislukt:', e.message); }

@@ -68,9 +68,9 @@ test('een contrastmelding noemt de wereld, de tokens en de ondergrond',
        belofte, geen oneindige wacht. */
     await page.addStyleTag({ url: srv.base + '/shared/rtg-heritage.css' });
 
-    /* De gemelde vorm nagebouwd: de Heritage-skin met LivingOS erop (de lichte
-       kamer), en daarin een kaart die donker is. De tekst pakt --rtg-world-muted
-       en staat daarmee op 2,09:1 -- precies het beeld uit de rode CI. */
+    /* Injecteer de historische verkeerde tekstinkt expliciet. De huidige Living-
+       kleuren hebben goed contrast en mogen geen defectfixture zijn. Zo blijft
+       de negatieve proef onafhankelijk van een toekomstige paletverbetering. */
     await page.evaluate(() => {
       document.body.setAttribute('data-rtg-skin', 'heritage');
       document.body.setAttribute('data-rtg-world', 'living');
@@ -78,9 +78,10 @@ test('een contrastmelding noemt de wereld, de tokens en de ondergrond',
       kaart.className = 'donkere-kaart';
       kaart.style.background = '#171310';
       kaart.style.padding = '20px';
+      kaart.style.cssText += ';position:fixed;top:150px;left:30px;z-index:9999';
       const regel = document.createElement('p');
       regel.id = 'meetregel';
-      regel.style.color = 'var(--rtg-world-muted)';
+      regel.style.color = '#5e5c57';
       regel.style.fontSize = '14px';
       regel.textContent = 'Een regel om aan te meten';
       kaart.appendChild(regel);
@@ -104,7 +105,7 @@ test('een contrastmelding noemt de wereld, de tokens en de ondergrond',
     /* En de token die de melding noemt is de ECHTE waarde van deze wereld, niet
        een naam die toevallig meeloopt: zonder deze rij zou `muted=` ook groen
        blijven met een lege of doorgegeven waarde. */
-    assert.match(waar, /muted=\s*#5e5c57/i, 'de gemelde tokenwaarde is niet die van LivingOS');
+    assert.match(waar, /muted=\s*#cbbdab/i, 'de gemelde tokenwaarde is niet die van LivingOS');
   } finally {
     if (browser) await browser.close().catch(() => {});
     await stop(srv);

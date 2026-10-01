@@ -117,6 +117,83 @@ test('custom Edge menus replace screen controls without reserving an empty actio
   } finally { await ctx.close(); }
 });
 
+test('all registered apps remain reachable through one mobile Edge, including retry after catalog failure', { skip }, async () => {
+  const { page, ctx } = await open('/apps/notities.html');
+  try {
+    const catalog = require('../public/shared/interface/world-widget-catalog.json');
+    const pattern = '**/shared/interface/world-widget-catalog.json';
+    await page.route(pattern, route => route.fulfill({status:503,contentType:'application/json',body:'{}'}));
+    await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]').click();
+    await page.locator('button[data-edge-face="all"]').click();
+    await page.locator('.rtg-edge-smart-doors a[href="/apps/app.html"]').click();
+    await page.getByText('De applijst kon niet worden geladen.',{exact:false}).waitFor();
+    assert.equal(await page.locator('[data-catalogus-ready="true"]').count(),0);
+    await page.locator('[data-edge-smart-search]').click();
+    await page.getByRole('button',{name:'Probeer opnieuw',exact:true}).waitFor();
+    assert.equal(await page.locator('[data-edge-catalog-status]').count(),1,'herhaald zoeken laat maar één actuele foutmelding staan');
+    await page.unroute(pattern);
+    await page.getByRole('button',{name:'Probeer opnieuw',exact:true}).click();
+    await page.locator('[data-catalogus-ready="true"]').waitFor();
+    assert.equal(await page.locator('[data-edge-catalog-status]').count(),0,'succes verwijdert de oude laadfout');
+    const hrefs = await page.locator('.rtg-edge-global-original .rtg-edge-group a').evaluateAll(links=>links.map(a=>a.getAttribute('href')));
+    assert.equal(new Set(hrefs).size,hrefs.length,'geen dubbele appbestemmingen');
+    for(const app of catalog.apps) assert.ok(hrefs.includes(app.url),app.name+' blijft bereikbaar');
+    assert.equal(await page.locator('.rtg-adaptive-sheet:visible').count(),1);
+    assert.equal(await page.locator('.rtg-adaptive-bar:visible').count(),0,'het menu gebruikt hetzelfde Edge-oppervlak');
+    await page.locator('.rtg-edge-find input').fill('Food Court');
+    await page.locator('.rtg-edge-global-original a[href="/apps/foodcourt.html"]').click();
+    await page.waitForURL('**/apps/foodcourt.html');
+    await page.locator('.rtg-adaptive-bar').waitFor();
+    assert.equal(await page.locator('.rtg-adaptive-bar').count(),1);
+  } finally { await ctx.close(); }
+});
+
+
+test('a catalog response belongs to its exact menu host, including in-flight context changes', { skip }, async () => {
+  const { page, ctx } = await open('/apps/notities.html');
+  const catalog = require('../public/shared/interface/world-widget-catalog.json');
+  const pattern = '**/shared/interface/world-widget-catalog.json';
+  const pending = [], requests = [];
+  const invalid = ['javascript:alert(1)','https://example.test/apps/test.html','/apps/../test.html',['/apps/unsafe.html']].map((url,i)=>({id:'invalid-'+i,world:'living',name:'Invalid '+i,url}));
+  try {
+    await page.route(pattern, async route => {
+      requests.push(route.request());
+      await new Promise(resolve => pending.push(resolve));
+      await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({apps:[...catalog.apps,...invalid,catalog.apps[0]]})});
+    });
+    await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]').click();
+    const zoeken = async () => {
+      await page.locator('button[data-edge-face="all"]').click();
+      const begun = page.waitForRequest(pattern);
+      await page.locator('[data-edge-smart-search]').click(); await begun;
+    };
+    await zoeken();
+    await page.evaluate(() => { window.__oldCatalogPromise = RTGEdgeSmartMenu.start().catalogus.promise; });
+    const oldHost = await page.locator('.rtg-edge-face-all').getAttribute('id');
+    await page.evaluate(() => RTGEdge.setContext({title:'Nieuwe context'}));
+    await page.locator('#'+oldHost).waitFor({state:'detached'});
+    await zoeken();
+    await page.evaluate(() => { window.__currentCatalogPromise = RTGEdgeSmartMenu.start().catalogus.promise; });
+    pending.shift()(); await page.evaluate(() => window.__oldCatalogPromise);
+    assert.equal(await page.locator('[data-catalogus-ready="true"]').count(),0,'een oude response mag de nieuwe host niet gereed verklaren');
+    assert.equal(await page.locator('[data-catalog-app]').count(),0,'een oude response mag geen apps in de nieuwe host publiceren');
+    pending.shift()(); await page.evaluate(() => window.__currentCatalogPromise);
+    await page.locator('[data-catalogus-ready="true"]').waitFor();
+    let hrefs = await page.locator('.rtg-edge-group a').evaluateAll(nodes => nodes.map(n=>n.getAttribute('href')));
+    for (const app of catalog.apps) assert.ok(hrefs.includes(app.url),app.name);
+    const readyHost = await page.locator('.rtg-edge-face-all').getAttribute('id');
+    await page.evaluate(() => RTGEdge.setContext({title:'Nog een context'}));
+    await page.locator('#'+readyHost).waitFor({state:'detached'});
+    await zoeken();
+    pending.shift()();
+    await page.locator('[data-catalogus-ready="true"]').waitFor();
+    hrefs = await page.locator('.rtg-edge-group a').evaluateAll(nodes => nodes.map(n=>n.getAttribute('href')));
+    for (const app of catalog.apps) assert.ok(hrefs.includes(app.url),'ook na een opgeloste vorige aanvraag: '+app.name);
+    assert.equal(await page.locator('[data-catalog-app^="invalid-"]').count(),0,'ongeldige URL-types en routes worden niet aangeboden');
+    assert.equal(requests.length,3,'elke nieuwe host laadt zijn eigen catalogus');
+    assert.equal(new Set(hrefs).size,hrefs.length,'de actuele host bevat geen duplicaten');
+  } finally { pending.splice(0).forEach(resolve=>resolve()); await ctx.close(); }
+});
 
 test('Sound lends its real playback controls to the single Edge', { skip }, async () => {
   const { page, ctx } = await open('/apps/muziek.html', 390);

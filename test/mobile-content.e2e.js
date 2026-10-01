@@ -87,8 +87,9 @@ for (const engine of engines) {
           await page.click('[data-wk="projecten"]');
           await page.click('[data-rtg-adaptive-close]');
           await painted(page,'[data-doe="0"]');
+          // .wd-home is display:contents on mobile; measure the real Work content stage.
           const fits = await page.locator('[data-doe="0"]').evaluate(el => {
-            const button = el.getBoundingClientRect(), home = el.closest('.wd-home').getBoundingClientRect();
+            const button = el.getBoundingClientRect(), home = el.closest('.wk-stage').getBoundingClientRect();
             return button.left >= home.left && button.right <= home.right;
           });
           assert.ok(fits, 'the project action must remain inside the content column');

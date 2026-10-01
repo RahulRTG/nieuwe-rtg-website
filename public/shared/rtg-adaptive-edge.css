@@ -182,7 +182,7 @@ body[data-rtg-adaptive-ready="true"] .rtg-adaptive-sheet[data-rtg-custom-panel="
 .rtg-adaptive-sheet .rtg-edge-sheet-head{padding:0}
 @media(max-width:999px){
  body[data-rtg-adaptive-ready="true"]{--rtg-adaptive-height:60px;--rtg-adaptive-gap:max(10px,calc(env(safe-area-inset-bottom,0px) + 4px))}
- .rtg-adaptive-edge{width:calc(100% - var(--rtg-safe-left) - var(--rtg-safe-right) - 32px)}
+ .rtg-adaptive-edge{left:calc(50% + (var(--rtg-safe-left) - var(--rtg-safe-right))/2);width:calc(100% - var(--rtg-safe-left) - var(--rtg-safe-right) - 32px)}
  .rtg-adaptive-item-copy{display:flex;gap:0}
  .rtg-adaptive-item small{font-size:10px;font-weight:500;line-height:12px;color:var(--edge-bar-dim)}
  .rtg-adaptive-item svg{width:21px;height:21px}

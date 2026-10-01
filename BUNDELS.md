@@ -810,12 +810,12 @@ omlaag.
 
 ## `shared/rtg-edge-smart-menu.js`
 
-`public/shared/rtg-edge-smart-menu/` -- 2 delen, 250 regels in de delen
+`public/shared/rtg-edge-smart-menu/` -- 2 delen, 295 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `rtg-edge-smart-menu-00.js` | Twee gezichten, één hamburger: lokale context en heel RTG blijven in het bestaande Edge-menu |
-| `rtg-edge-smart-menu-01.js` | De menupanelen, focus en koppeling aan de bestaande Edge-schil |
+| `rtg-edge-smart-menu-01.js` | Dezelfde appcatalogus als de widgets: mobiel mag geen apps verliezen |
 
 ## `shared/rtg-schil.js`
 

@@ -434,6 +434,10 @@ test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
     await page.waitForSelector('#askInput', { state: 'visible', timeout: 10000 });
     const payload = '<img src=x onerror="window.__xss=1">';
     await page.fill('#askInput', payload);
+    await page.evaluate(async () => { await Promise.all(document.getAnimations().filter(a => a.effect.getTiming().iterations !== Infinity).map(a => a.finished.catch(() => {}))); });
+    const content = await page.locator('#content').boundingBox();
+    const edge = await page.locator('.rtg-adaptive-bar').boundingBox();
+    assert.ok(content.y + content.height <= edge.y, 'the conversation scroll area ends above the Edge');
     await page.click('#askBtn');
     await page.waitForSelector('#chat .bubble.user', { timeout: 10000 });
     /* Hier werd gewacht om een EVENTUELE onerror de tijd te geven -- wachten op

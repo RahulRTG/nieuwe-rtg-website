@@ -93,6 +93,9 @@ body[data-rtg-skin="heritage"][data-rtg-layout="standard"].rtg-safe-experience :
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"].rtg-sport-flow :is(.tabs,.sport-match,.sport-table,.sport-stadium,.sport-moment,.sport-moment div),
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"].rtg-music-experience :is(.eigen-muziek,.samen,.speler),
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"].foundation-hulp :is(.fh-leeg,.fh-afspraak,.fh-snel>a,.fh-belofte--licht){background:var(--rtg-world-card)!important;color:var(--rtg-world-ink);border-color:var(--rtg-world-line)!important;box-shadow:none!important}
+/* De Vitaal-logkaart krijgt hier de wereldgrond; haar tekst volgt diezelfde
+   grond in plaats van de donkere inkt van het omringende lichte formulier. */
+body[data-rtg-skin="heritage"].rtg-safe-experience[data-veilig-stand=vitaal] #log .stil{color:var(--muted)}
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"]:is(.rtg-shop-flow,.rtg-night-flow,.rtg-safe-experience,.rtg-sport-flow,.rtg-music-experience) :is(input,select,textarea,.veld,.slot,.step button){background:var(--rtg-world-card)!important;color:var(--rtg-world-ink)!important;border-color:var(--rtg-world-line)!important}
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"] :is(.gknop.vol,.brknop.vol,button.hoofd,#nKnop,#koppelKnop,.gx-primary,.shop-primary,.night-primary,.home-button:not(.alt),.sport-action){background:var(--rtg-world-action)!important;color:var(--rtg-world-action-ink)!important;border-color:var(--rtg-world-action)!important}
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"] :is(.shop-hero,.night-hero,.home-hero,.veilig-rustig){--shop-ink:#f5f1e8;--shop-soft:#d5cbbd;--shop-gold:#dfc491;--night-ink:#f5f1e8;--night-soft:#d5cbbd;--night-gold:#dfc491;--home-cream:#f5f1e8;--home-muted:#d5cbbd;--home-gold:#dfc491;--safe-ink:#f5f1e8;--safe-soft:#d5cbbd;--safe-gold:#dfc491}

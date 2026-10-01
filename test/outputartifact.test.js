@@ -1,6 +1,6 @@
 'use strict';
 const test = require('node:test'), assert = require('node:assert/strict');
-const { verifyUpload } = require('../scripts/lib/outputartifact');
+const { verifyUpload, githubBytes } = require('../scripts/lib/outputartifact');
 const name = 'schermjournaal-deel-2', stepName = 'Schermjournaal van dit deel bewaren';
 const digest = '8fa04f7e70b0ef26d29e4e42f0f9b01e4354669f159d1802e99b72792e3ad548';
 function fixture() {
@@ -22,6 +22,29 @@ function fixture() {
   return { job, artifact, text };
 }
 const verify = f => verifyUpload(name, stepName, f.job, f.artifact, f.text);
+test('GitHub ANSI logs retain exact bytes while upload identity remains strict', () => {
+  const f = fixture();
+  const raw = Buffer.from(f.text.split('\n').map(line => '\x1b[32m' + line + '\x1b[0m').join('\n'));
+  const bytes = githubBytes('owner/repo', '/actions/jobs/42/logs', (command, args, options) => {
+    assert.equal(command, 'gh');
+    assert.deepEqual(args, ['api', 'repos/owner/repo/actions/jobs/42/logs', '--allow-escape-sequences']);
+    assert.equal(options.maxBuffer, 256 * 1024 * 1024);
+    return raw;
+  });
+  assert.strictEqual(bytes, raw, 'raw evidence bytes must not be rewritten before hashing');
+  f.text = bytes.toString('utf8');
+  assert.equal(verify(f).artifactId, f.artifact.id);
+  for (const change of [g => { g.artifact.id++; },
+    g => { g.artifact.digest = 'sha256:' + '0'.repeat(64); },
+    g => { g.job.steps[1].conclusion = 'failure'; },
+    g => { g.job.steps[1].started_at = '2026-10-01T11:41:15Z'; }]) {
+    const altered = structuredClone(f); change(altered);
+    assert.throws(() => verify(altered), 'ANSI handling must not relax provenance checks');
+  }
+  const failure = new Error('GitHub read failed');
+  assert.throws(() => githubBytes('owner/repo', '/actions/jobs/42/logs', () => { throw failure; }),
+    error => error === failure, 'transport failures must propagate');
+});
 test('v7 upload proof binds the exact journal ID and digest to the successful step', () => {
   const f = fixture(), proof = verify(f);
   assert.equal(proof.artifactId, f.artifact.id);

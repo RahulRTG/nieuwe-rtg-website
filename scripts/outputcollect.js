@@ -2,7 +2,7 @@
 // Read-only GitHub evidence collection. Never runs tests, commits, pushes or deploys.
 const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto');
 const { execFileSync } = require('node:child_process');
-const { verifyUpload } = require('./lib/outputartifact');
+const { verifyUpload, githubBytes } = require('./lib/outputartifact');
 const source = path.resolve(process.argv[2] || '');
 const repo = process.env.GITHUB_REPOSITORY;
 const sha = process.argv[3], runId = process.argv[4];
@@ -16,7 +16,7 @@ const json = (file, value) => {
   fs.writeFileSync(path.join(out, file), JSON.stringify(value, null, 2) + '\n', { flag: 'wx' });
 };
 const git = args => execFileSync('git', args, { cwd: source, encoding: 'utf8' }).trim();
-const api = endpoint => execFileSync('gh', ['api', 'repos/' + repo + endpoint], { maxBuffer: 256 * 1024 * 1024 });
+const api = endpoint => githubBytes(repo, endpoint);
 const read = endpoint => JSON.parse(api(endpoint).toString('utf8'));
 function pages(endpoint, key) {
   const result = [];

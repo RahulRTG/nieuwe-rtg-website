@@ -1,4 +1,9 @@
 'use strict';
+// Preserve the exact API bytes for hashing; log consumers strip ANSI before parsing.
+function githubBytes(repository, endpoint, execute = require('node:child_process').execFileSync) {
+  return execute('gh', ['api', 'repos/' + repository + endpoint, '--allow-escape-sequences'],
+    { maxBuffer: 256 * 1024 * 1024 });
+}
 // Bind a journal archive to the upload that actually ran in the selected job.
 // Format observed in the pinned actions/upload-artifact v7 job logs.
 function verifyUpload(name, stepName, job, artifact, text) {
@@ -38,4 +43,4 @@ function verifyUpload(name, stepName, job, artifact, text) {
     completedAt: step.completed_at, finalizedAt: finalizations[0][1], artifactId: artifact.id,
     artifactName: name, artifactDigest: artifact.digest };
 }
-module.exports = { verifyUpload };
+module.exports = { verifyUpload, githubBytes };

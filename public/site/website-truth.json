@@ -8,7 +8,7 @@
     "public/apps/leverancier.html",
     "public/apps/app.html"
   ],
-  "sourceHash": "9db8d3d230ddb5de6cda30c6414976d06395d20f1bb278bc7167cba978901c69",
+  "sourceHash": "d3a99e9f9d907b6c90fc524e39c9284cb2d44e929247df3c03c4af62226e4c27",
   "platform": [
     {
       "id": "organisatie",
@@ -24,7 +24,7 @@
         "Kies een module en zie de lijst plus wat aandacht vraagt; koppel eenmalig uw RTG-account voor agenda, postvak en kluis"
       ],
       "note": "Wat u niet mag zien, staat er niet als lege doos; en wat nergens wordt gemeten, staat er met de reden erbij.",
-      "sourceHash": "20a5e2e87fc710b8473445e97c7c04030e1e420831211081105f3125848a1a67"
+      "sourceHash": "e8745b7e7431c822d5bb493ef17fb1fb4cf6940dd8b20bc1ba28fe8dc4f3558e"
     },
     {
       "id": "partner",

@@ -719,8 +719,9 @@ gebruiken dezelfde economische betaling. Een onbekende uitkomst blijft zichtbaar
 zij geeft geen vrijbrief voor een tweede betaling. Alleen geverifieerde
 providerinformatie bepaalt de centrale status, ook bij latere webhooks.
 Betaling betekent geen uitgevoerde opdracht. Annuleren blijft geblokkeerd
-zolang de betaling financiële afstemming vraagt. Terugbetalen blijft een
-afzonderlijke bevoegde handeling in de bestaande betaaladministratie.
+zolang de betaling financiële afstemming vraagt. Deze werktafel heeft nog
+geen terugbetaalknop; terugbetalingen vereisen afzonderlijke bevoegde
+afstemming in de provideradministratie en verwerking van diens terugmelding.
 
 De oorspronkelijke klantlink blijft in de eigen browser; het capabilitygeheim
 gaat niet mee naar de provider of terugkeer-URL. Na betaling kan de klant in

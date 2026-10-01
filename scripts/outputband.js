@@ -83,7 +83,8 @@ function leesRegister() {
    rest intact; `basislijn` hangen we er als apart veld naast, zodat een herstart
    hem terugvindt. */
 function schrijf(gericht, basislijn) {
-  require('./lib/stempel').eisSchoneBoom('outputband');
+  const schoon = require('./lib/stempel').eisSchoneBoom('outputband');
+  if (!schoon.ok) throw new Error(schoon.reden);
   const na = op.meet(gericht);
   if (na.fout) { console.error('  ' + na.fout); return na; }
   fs.writeFileSync(REGISTER, JSON.stringify(Object.assign(na, { gericht, basislijn }), null, 1) + '\n');
@@ -113,7 +114,8 @@ function eenRegel(args) {
 }
 
 (async () => {
-  require('./lib/stempel').eisSchoneBoom('outputband');
+  const schoon = require('./lib/stempel').eisSchoneBoom('outputband');
+  if (!schoon.ok) throw new Error(schoon.reden);
   const reg = leesRegister();
   const gericht = reg.gericht || {};
   let kandidaten;

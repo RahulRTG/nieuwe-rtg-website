@@ -11,17 +11,17 @@
     if (!['bevestigd', 'ingepland'].includes(x.stand)) return '';
     const mag = ['werkruimte', 'project', 'klant', 'geld', 'geld.goedkeuren'].every(r => (rechten || []).includes(r));
     const taken = x.taken.filter(t => t.externeAfspraak?.herkomst === 'rtg-aanvraag');
-    return '<details><summary>Boeken bij een leverancier · ' + taken.length + '</summary>' +
+    return '<details data-pr-open="leveranciers"><summary>Boeken bij een leverancier · ' + taken.length + '</summary>' +
       '<p>De leverancier bevestigt uw opdracht via een eigen link. Alleen daarna staat de boeking op bevestigd. Deel uitsluitend gegevens die voor deze opdracht nodig zijn.</p>' +
       taken.map(t => {
         const a = t.externeAfspraak;
-        return '<details><summary>' + e(t.titel) + ' · ' + e(a.stand) + '</summary><p>' + e(t.wie) + ' · ' + e(t.deadline) + '</p><p>' + e(a.voorwaarden) + '</p>' +
+        return '<details data-pr-open="taak-' + e(t.id) + '"><summary>' + e(t.titel) + ' · ' + e(a.stand) + '</summary><p>' + e(t.wie) + ' · ' + e(t.deadline) + '</p><p>' + e(a.voorwaarden) + '</p>' +
           (a.antwoord ? '<p>Antwoord leverancier: ' + e(a.antwoord.referentie) + '</p>' : '') +
           (mag && ['aangevraagd', 'annulering-gevraagd'].includes(a.stand) ? form(x, 'link', 'Nieuwe leverancierslink maken', t.id) : '') +
           (mag && a.stand === 'aangevraagd' ? form(x, 'intrekken', 'Aanvraag intrekken', t.id) : '') +
           (mag && a.stand === 'bevestigd' ? form(x, 'annuleren', 'Annulering aanvragen', t.id, veld('toelichting', 'Reden voor annulering')) +
             form(x, 'uitgevoerd', 'Leverancierswerk aftekenen', t.id, veld('toelichting', 'Bewijs van uitvoering')) : '') + '</details>';
-      }).join('') + (mag ? '<details><summary>Nieuwe leveranciersopdracht</summary>' + form(x, 'aanvragen', 'Opdracht klaarzetten', '',
+      }).join('') + (mag ? '<details data-pr-open="nieuwe-leverancier"><summary>Nieuwe leveranciersopdracht</summary>' + form(x, 'aanvragen', 'Opdracht klaarzetten', '',
         veld('leverancier', 'Naam leverancier') + veld('onderdeel', 'Opdracht voor leverancier') + veld('datum', 'Datum van levering of uitvoering', 'date') +
         veld('locatie', 'Locatie voor leverancier') + veld('bedrag', 'Afgesproken inkoopbedrag in ' + x.valuta, 'number') +
         '<label>Afgesproken voorwaarden<textarea name="voorwaarden" maxlength="1000" required></textarea></label>') + '</details>' :

@@ -3,7 +3,7 @@
   const e = window.RTGWerk.esc;
   function formulier(x,rechten) {
     const b = x.betaling; if (!b) return '';
-    let s = '<details><summary>Klantbetaling</summary><p>'+e(b.uitleg)+'</p>';
+    let s = '<details data-pr-open="betalen"><summary>Klantbetaling</summary><p>'+e(b.uitleg)+'</p>';
     if (b.ontvanger) s += '<p>Geldontvanger: <b>'+e(b.ontvanger)+'</b></p>';
     if (b.stand) s += '<p>'+e(b.stand.label)+' · '+e(b.stand.id)+'</p><p>'+e(b.stand.volgende || '')+'</p>';
     else if (b.beschikbaar && ['bevestigd','ingepland','uitgevoerd'].includes(x.stand) &&

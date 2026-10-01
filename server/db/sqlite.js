@@ -12,6 +12,7 @@ const { DATA_DIR, STORE, besloten, beslotenMap } = require('./opslag');
 // De goedkope veranderingsdetectie op GROTE collecties; daar staat ook waarom
 // hij veilig is en waarom geld er nooit door gaat.
 const voorcheck = require('./voorcheck');
+const { serialiseer } = require('./logjson');
 const db = state.db;
 
 let kvdb = null;
@@ -58,6 +59,7 @@ function statements() {
     bump: kvdb.prepare("UPDATE meta SET v = v + 1 WHERE k = 'ver'"),
     huidig: kvdb.prepare("SELECT v FROM meta WHERE k = 'ver'"),
     lees: kvdb.prepare('SELECT val, ver FROM kv WHERE key = ?'),
+    versie: kvdb.prepare('SELECT ver FROM kv WHERE key = ?'),
     up: kvdb.prepare('INSERT INTO kv(key,val,ver) VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET val=excluded.val, ver=excluded.ver')
   };
   return stmt;
@@ -76,7 +78,7 @@ function saveSqlite(force, collecties) {
   const sleutels = force || collecties === undefined ? Object.keys(db.data) : [...new Set(collecties)];
   for (const k of sleutels) {
     if (voorcheck.magOverslaan(k, db.data[k], force, nu)) { uitgesteld = true; continue; }
-    const j = JSON.stringify(db.data[k]);
+    const j = serialiseer(k, db.data[k]);
     voorcheck.onthoud(k, j.length, db.data[k], nu);
     if (laatsteJson.get(k) !== j) gewijzigd.push([k, j]);
   }
@@ -85,16 +87,17 @@ function saveSqlite(force, collecties) {
      `undefined`, en de duurzame bundel las dat als verlies -- zie duurzaam.js.
      Alleen zonder uitgesteld werk is elke collectie ook echt nagekeken. */
   if (!gewijzigd.length) return { alGelijk: !uitgesteld };
-  const { bump, huidig, lees, up } = statements();
+  const { bump, huidig, lees, versie, up } = statements();
   const bevestigd = [];
   kvdb.exec('BEGIN IMMEDIATE'); // pak meteen de schrijflock, zodat de versie en de merge kloppen
   try {
     for (const [k, jOns] of gewijzigd) {
       let j = jOns;
-      const rij = lees.get(k);
+      const stand = versie.get(k);
       // Schreef een ander proces deze collectie ondertussen? Voeg per item samen
       // in plaats van hun wijzigingen te overschrijven.
-      if (rij && rij.ver > (toegepast.get(k) || 0)) {
+      if (stand && stand.ver > (toegepast.get(k) || 0)) {
+        const rij = lees.get(k);
         const base = laatsteJson.has(k) ? JSON.parse(laatsteJson.get(k)) : undefined;
         const samen = merge3(base, db.data[k], JSON.parse(uitStore(rij.val)));
         db.data[k] = samen;
@@ -130,10 +133,11 @@ function pollSqlite() {
     // keer alle collecties hoeven te deserialiseren.
     let laagst = 0;
     for (const v of toegepast.values()) if (v < laagst || laagst === 0) laagst = v;
-    const rows = kvdb.prepare('SELECT key, val, ver FROM kv WHERE ver > ?').all(laagst);
+    const rows = kvdb.prepare('SELECT key, ver FROM kv WHERE ver > ?').all(laagst);
     let sessieGewijzigd = false;
     for (const r of rows) {
       if (r.ver <= (toegepast.get(r.key) || 0)) continue;
+      Object.assign(r, statements().lees.get(r.key));
       const baseJson = laatsteJson.get(r.key);
       const hunJson = uitStore(r.val);
       const lokaalOpenstaand = baseJson !== undefined && JSON.stringify(db.data[r.key]) !== baseJson;

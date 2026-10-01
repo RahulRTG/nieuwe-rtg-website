@@ -1,3 +1,4 @@
+/* WerkOS: mobiele schil en contextbalk. */
   CSS += `  /* Op de telefoon blijft de driedelige WerkOS-schil volledig bruikbaar.
      De contextbalk krijgt een eigen rij, de rail blijft een compacte
      glyfenstrook en de dock houdt altijd Start en Command Center bereikbaar. */

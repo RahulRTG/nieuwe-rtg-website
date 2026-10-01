@@ -59,6 +59,7 @@
     .wos-navkop{margin-top:2rem;}
   }
 `;
+/* WerkOS: dock en desktopwerkvlak. */
   CSS += `  /* De onderbalk is een onyx commandobalk, geen los merkobject. */
   .wos-dock{
     position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + .8rem);
@@ -149,6 +150,7 @@
     body.wos .wos-top-huidig{min-width:130px;}
   }
 `;
+/* WerkOS: mobiele schil en contextbalk. */
   CSS += `  /* Op de telefoon blijft de driedelige WerkOS-schil volledig bruikbaar.
      De contextbalk krijgt een eigen rij, de rail blijft een compacte
      glyfenstrook en de dock houdt altijd Start en Command Center bereikbaar. */
@@ -175,6 +177,7 @@
   }
   @media (max-width:360px){.wos-dock button:nth-child(n+5):not(:last-child){display:none;}}
 `;
+/* WerkOS: beweging en vensters. */
   CSS += `  /* Beweging bevestigt alleen een wissel van werkvlak. */
   @media (prefers-reduced-motion:no-preference){
     body.wos-aan .view.active{animation:wosOpen var(--rtg-tijd-normaal,180ms) var(--rtg-veer,ease);}

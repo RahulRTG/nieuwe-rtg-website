@@ -1,3 +1,4 @@
+/* WerkOS: beweging en vensters. */
   CSS += `  /* Beweging bevestigt alleen een wissel van werkvlak. */
   @media (prefers-reduced-motion:no-preference){
     body.wos-aan .view.active{animation:wosOpen var(--rtg-tijd-normaal,180ms) var(--rtg-veer,ease);}

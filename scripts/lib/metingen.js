@@ -97,6 +97,7 @@ const GEEN_METING = new Set([
 ]);
 
 const REGISTER = {
+  'COMMERCE.json': { eigenRatel: 'scripts/registerratel.js' },
   /* Deze kwaliteitsvelden hebben een echte regressiepoort tegen het aftakpunt;
      test/registerratel.test.js draait de poort en saboteert iedere regel. */
   'AANROEPGRAAF.json': { eigenRatel: 'scripts/registerratel.js' },
@@ -129,7 +130,7 @@ const REGISTER = {
   'DEKKING.json': { meter: ['dekkingWaargenomenPct', 'endpointsNooitAangeraakt'] },
   'GEZAG.json': { eigenRatel: 'scripts/gezag.js' },
   'IDEMSCHULD.json': { eigenRatel: 'test/idemschuld.test.js' },
-  'RUST-MIGRATIES.json': { eigenRatel: 'test/rust-migraties.test.js' },
+  'RUST-MIGRATIES.json': { eigenRatel: 'scripts/rust-migraties.js' },
 
   /* CONNECTION_CONSTITUTION.json wordt uitsluitend geschreven nadat alle
      genoemde product-, privacy-, state- en routeproeven groen zijn. Het script

@@ -101,17 +101,23 @@ function maakHandelingsspoor({ db, save, nu, max }) {
   const grens = max || MAX;
   const eigen = require('../kern/eigencollectie')({ db, domein: 'lib/handelingsspoor', bezit: { handelingLog: 'lijst' } });
 
-  const rij = () => eigen.bak('handelingLog');
+  const { borg } = require('../db/logjson');
+  const bekend = new WeakSet();
+  const rij = () => {
+    const regels = eigen.bak('handelingLog');
+    if (!bekend.has(regels)) { for (const regel of regels) borg(regel); bekend.add(regels); }
+    return regels;
+  };
 
   function noteer({ wie, methode, pad, status, afdruk, grof }) {
-    return keten.noteerIn(rij(), {
+    return borg(keten.noteerIn(rij(), {
       at: grof ? burger.dag(tijd()) : new Date(tijd()).toISOString(),
       wie: String(wie || 'anoniem').slice(0, 60),
       methode: String(methode || '').slice(0, 10),
       pad: String(pad || '').slice(0, 200),
       status: Number(status) || 0,
       afdruk: String(afdruk || '')
-    }, grens);
+    }, grens));
   }
 
   /* De ketenstand: klopt dit spoor nog met zichzelf? Zelfde vorm als bij de

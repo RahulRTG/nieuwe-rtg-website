@@ -9,6 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const { bepaalBasis, versieBij } = require('./lib/basis');
 const REGELS = {
+  'COMMERCE.json': { 'gemeten.optelGemengd': 'omlaag', 'gemeten.optelOnbekend': 'omlaag' },
   'AANROEPGRAAF.json': { 'gemeten.nietGelezen': 'omlaag', 'gemeten.doelOnbekend': 'omlaag' },
   'AUDITPROEF.json': { 'gemeten.gezakt': 'omlaag', 'gemeten.blindeRondes': 'omlaag', 'gemeten.ketenHeel': 'waar' },
   'CONTEXTPROEF.json': { 'gemeten.routesZonderSpoorMaarWelAanHetWerk': 'omlaag', 'gemeten.volledigeRonde': 'waar' },

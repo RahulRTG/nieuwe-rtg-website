@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-01T11:01:40.544Z",
-    "commit": "efeb612ef",
+    "op": "2026-10-01T12:14:38.378Z",
+    "commit": "6f7014331",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 13,
     "instrument": "scripts/plaatsvorm.js",
     "node": "v24.18.0"
   },

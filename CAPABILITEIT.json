@@ -1,18 +1,12 @@
 {
-  "woordenlijsten": 23,
+  "woordenlijsten": 21,
   "leden": 248,
-  "ledenInEen": 222,
-  "ledenInMeer": 26,
-  "ledenInEenPct": 90,
-  "maxGelijkenis": 1,
-  "gelijkendeParen": 1,
-  "paren": [
-    {
-      "gelijkenis": 1,
-      "a": "server/bedrijf/praktijk-betalen.js :: RECHTEN",
-      "b": "server/bedrijf/praktijk-leverancier.js :: RECHTEN"
-    }
-  ],
+  "ledenInEen": 227,
+  "ledenInMeer": 21,
+  "ledenInEenPct": 92,
+  "maxGelijkenis": 0.22,
+  "gelijkendeParen": 0,
+  "paren": [],
   "gedeeldeLeden": [
     {
       "id": "tickets",
@@ -34,42 +28,6 @@
       ]
     },
     {
-      "id": "geld",
-      "lijsten": 3,
-      "waar": [
-        "server/bedrijf/praktijk-betalen.js :: RECHTEN",
-        "server/bedrijf/praktijk-leverancier.js :: RECHTEN",
-        "server/bedrijf/rollen-register.js :: RECHTEN"
-      ]
-    },
-    {
-      "id": "geld.goedkeuren",
-      "lijsten": 3,
-      "waar": [
-        "server/bedrijf/praktijk-betalen.js :: RECHTEN",
-        "server/bedrijf/praktijk-leverancier.js :: RECHTEN",
-        "server/bedrijf/rollen-register.js :: RECHTEN"
-      ]
-    },
-    {
-      "id": "klant",
-      "lijsten": 3,
-      "waar": [
-        "server/bedrijf/praktijk-betalen.js :: RECHTEN",
-        "server/bedrijf/praktijk-leverancier.js :: RECHTEN",
-        "server/bedrijf/rollen-register.js :: RECHTEN"
-      ]
-    },
-    {
-      "id": "project",
-      "lijsten": 3,
-      "waar": [
-        "server/bedrijf/praktijk-betalen.js :: RECHTEN",
-        "server/bedrijf/praktijk-leverancier.js :: RECHTEN",
-        "server/bedrijf/rollen-register.js :: RECHTEN"
-      ]
-    },
-    {
       "id": "retail",
       "lijsten": 3,
       "waar": [
@@ -85,15 +43,6 @@
         "server/kern/pda/modules.js :: PER_CAP",
         "server/seed/genres-lijst-a.js :: caps (genre-register)",
         "server/seed/genres-lijst-b.js :: caps (genre-register)"
-      ]
-    },
-    {
-      "id": "werkruimte",
-      "lijsten": 3,
-      "waar": [
-        "server/bedrijf/praktijk-betalen.js :: RECHTEN",
-        "server/bedrijf/praktijk-leverancier.js :: RECHTEN",
-        "server/bedrijf/rollen-register.js :: RECHTEN"
       ]
     },
     {
@@ -223,6 +172,14 @@
         "server/kern/lidboard/catalogus.js :: CAPS",
         "server/kern/zaak.js :: CAPS"
       ]
+    },
+    {
+      "id": "services",
+      "lijsten": 2,
+      "waar": [
+        "server/seed/genres-lijst-a.js :: caps (genre-register)",
+        "server/seed/genres-lijst-b.js :: caps (genre-register)"
+      ]
     }
   ],
   "contract": [
@@ -348,13 +305,13 @@
       "draagt": []
     },
     {
-      "lijst": "server/bedrijf/praktijk-betalen.js :: RECHTEN",
-      "leden": 5,
+      "lijst": "server/kern/magnaat-partnerstudio-bedrijf.js :: RECHTEN",
+      "leden": 4,
       "draagt": []
     },
     {
-      "lijst": "server/bedrijf/praktijk-leverancier.js :: RECHTEN",
-      "leden": 5,
+      "lijst": "server/kern/overheid/index.js :: RECHTSVORMEN",
+      "leden": 3,
       "draagt": []
     }
   ],
@@ -368,7 +325,7 @@
       "grens"
     ]
   },
-  "bestanden": 4025,
-  "bekeken": 4025,
-  "kandidaten": 1205
+  "bestanden": 4026,
+  "bekeken": 4026,
+  "kandidaten": 1203
 }

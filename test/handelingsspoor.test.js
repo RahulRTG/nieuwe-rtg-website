@@ -48,7 +48,8 @@ function doe(spoor, req, route) {
 }
 
 test('een geslaagde schrijfactie laat een geketende regel na', () => {
-  const o = maak();
+  const saves = [];
+  const o = maak({ save: sleutels => saves.push(sleutels) });
   doe(o.spoor, nepReq({ body: { naam: 'RTG' } }), (q, r) => r.status(200).json({ ok: true }));
 
   const rij = o.rij();
@@ -58,7 +59,7 @@ test('een geslaagde schrijfactie laat een geketende regel na', () => {
   assert.equal(rij[0].pad, '/api/concern/nieuw');
   assert.equal(rij[0].status, 200);
   assert.ok(rij[0].hash, 'geketend');
-  assert.equal(o.saves(), 1, 'en weggeschreven');
+  assert.deepStrictEqual(saves, [['handelingLog']], 'weggeschreven via alleen de eigen collectie');
 });
 
 /* ------------------------------------------------------------------------

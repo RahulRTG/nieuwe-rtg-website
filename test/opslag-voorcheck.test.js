@@ -56,6 +56,57 @@ function grootBlok(n, extra) {
   return uit;
 }
 
+test('gerichte spoorsave raakt geen andere collectie; gewone en geforceerde saves bewaren nog alles', () => {
+  const o = verseOpslag();
+  try {
+    o.db.data.apiSpoor = { aantal: 1 };
+    o.db.data.paySaldi = { lid: { centen: 100 } };
+    o.dbmod.save();
+    let gelezen = 0;
+    const waarde = { groot: 'ongewijzigde bedrijfsgegevens' };
+    Object.defineProperty(waarde, 'toJSON', { value() { gelezen++; return { groot: this.groot }; } });
+    o.db.data.onverwant = waarde;
+    o.db.data.apiSpoor.aantal = 2;
+    o.db.data.paySaldi.lid.centen = 200;
+    o.dbmod.save(['apiSpoor']);
+    assert.equal(gelezen, 0, 'geen serialisatie van ongerelateerde bedrijfsgegevens');
+    assert.deepEqual(o.opSchijf('apiSpoor'), { aantal: 2 }, 'spoor staat direct op schijf');
+    assert.equal(o.opSchijf('paySaldi').lid.centen, 100, 'geen onbedoelde gedeeltelijke bedrijfscommit');
+    o.dbmod.save();
+    assert.ok(gelezen > 0, 'de gewone save blijft alle collecties bekijken');
+    assert.equal(o.opSchijf('paySaldi').lid.centen, 200, 'geneste geldwijziging blijft behouden');
+    o.db.data.paySaldi.lid.centen = 300;
+    require('../server/db/sqlite').saveSqlite(true, ['apiSpoor']);
+    assert.equal(o.opSchijf('paySaldi').lid.centen, 300, 'geforceerde save spoelt ook buiten de scope');
+    for (const fout of [[], ['bestaatNiet'], ['apiSpoor', null], 'apiSpoor']) {
+      assert.throws(() => o.dbmod.save(fout), /bestaande collecties/);
+    }
+  } finally { o.op(); }
+});
+
+test('een mislukte SQLite-commit blijft opnieuw schrijfbaar, ook voor grote collecties', () => {
+  const o = verseOpslag({ RTG_SQLITE_GROOT_MS: 60000 });
+  const exec = DatabaseSync.prototype.exec;
+  try {
+    o.db.data.paySaldi = { lid: { centen: 100 } };
+    o.db.data.sessions = grootBlok(3000);
+    o.dbmod.save();
+    o.db.data.paySaldi.lid.centen = 500;
+    o.db.data.sessions.nieuw = { nr: -1, gezien: 7 };
+    let geweigerd = false;
+    DatabaseSync.prototype.exec = function(sql) {
+      if (sql === 'COMMIT' && !geweigerd) { geweigerd = true; throw new Error('proef: commit geweigerd'); }
+      return exec.call(this, sql);
+    };
+    assert.throws(() => o.dbmod.save(), /commit geweigerd/);
+    assert.equal(o.opSchijf('paySaldi').lid.centen, 100, 'mislukte transactie is teruggedraaid');
+    assert.equal(o.opSchijf('sessions').nieuw, undefined);
+    o.dbmod.save();
+    assert.equal(o.opSchijf('paySaldi').lid.centen, 500, 'herhaling schrijft het geld alsnog');
+    assert.deepEqual(o.opSchijf('sessions').nieuw, { nr: -1, gezien: 7 }, 'voorcheck verbergt de mislukte save niet');
+  } finally { DatabaseSync.prototype.exec = exec; o.op(); }
+});
+
 test('geld wordt altijd exact nagekeken, ook boven de grens', async () => {
   const o = verseOpslag({ RTG_SQLITE_GROOT_MS: 60000 }); // venster ruim: alleen de regel telt
   try {

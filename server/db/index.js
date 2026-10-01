@@ -54,7 +54,7 @@ const { load, startSqliteSync } = require('./starten')({ save });
 const { flushBijAfsluiten, opslagKlaar } = require('./afsluiten');
 const { planSnapshot } = snapshot;
 
-function save() {
+function save(collecties) {
   if (!db.writable) return;
   /* DE VERRAADSMOTOR, op het ene punt waar alle schrijfacties doorheen gaan.
 
@@ -101,7 +101,7 @@ function save() {
     postgres.planSave();
   } else if (STORE === 'sqlite') {
     // SQLite: kruisproces-sync via versienummers en de poll (geen Redis-mirror).
-    sqlite.saveSqlite();
+    sqlite.saveSqlite(false, collecties);
   } else if (STORE === 'geheugen') {
     // GEHEUGEN: versleutelde, incrementele brok-per-collectie-opslag (write-behind).
     geheugen.saveGeheugen();

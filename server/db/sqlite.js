@@ -168,20 +168,11 @@ function startSqliteSync() {
   if (pollTimer.unref) pollTimer.unref();
 }
 
-/* Backup checkpoint: verse transacties staan eerst in WAL. Een losse kopie van
-   store.db zonder checkpoint mist die transacties (soms zelfs alle data). */
-function checkpointSqlite() {
-  if (!kvdb) return false;
-  try { saveSqlite(true); } catch (e) {}
-  try { kvdb.exec('PRAGMA wal_checkpoint(TRUNCATE)'); return true; }
-  catch (e) { return false; }        // een ander proces leest nog; de -wal-kopie vangt dat op
-}
-
-function afrondSqlite() {
-  if (!kvdb) return;
-  try { saveSqlite(true); } catch (e) { console.warn('[db] laatste sqlite-save mislukt:', e.message); }
-  try { kvdb.exec('PRAGMA wal_checkpoint(TRUNCATE)'); } catch (e) { /* ander proces leest nog */ }
-}
+/* Alleen de duurzame schrijver heeft al geflusht. Backup en afsluiten houden
+   hun eigen volledige flush; de WAL-grens staat naast de transactielaag. */
+const { checkpointSqlite, vouwWalSqlite, afrondSqlite } = require('./sqlite-checkpoint')({
+  verbinding: () => kvdb, saveSqlite
+});
 
 /* DE PERSISTENTE VERSIE, gelezen uit de DATABASE en niet uit het geheugen.
 
@@ -203,5 +194,5 @@ const bewerkCollectieSqlite = require('./collectie-sqlite')({
 const economischeBoekingSqlite = require('./economische-boeking-sqlite')({ db,
   verbinding: () => { sqliteInit(); return kvdb; }, statements, merge3, uitStore, naarStore, laatsteJson, toegepast, voorcheck });
 
-module.exports = { loadSqlite, saveSqlite, auditMotor, bewerkCollectieSqlite, economischeBoekingSqlite, startSqliteSync, afrondSqlite, checkpointSqlite,
+module.exports = { loadSqlite, saveSqlite, auditMotor, bewerkCollectieSqlite, economischeBoekingSqlite, startSqliteSync, afrondSqlite, checkpointSqlite, vouwWalSqlite,
   persistentieStandSqlite };

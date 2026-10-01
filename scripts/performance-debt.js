@@ -10,6 +10,7 @@ const { execFileSync } = require('node:child_process');
 const OUT = path.join('artifacts', 'performance-debt');
 const TARGETS = Object.freeze({ p99Ms: 144, eventLoopP99Ms: 64.8 });
 const hash = bytes => crypto.createHash('sha256').update(bytes).digest('hex');
+const { PRESTATIEMETERS, oordeel } = require('./norm');
 const finite = n => typeof n === 'number' && Number.isFinite(n);
 
 function assess(candidate, norm, measurement, profiling = false) {
@@ -42,6 +43,13 @@ function assess(candidate, norm, measurement, profiling = false) {
     const value = metrics[name];
     if (!finite(value) || value < 0 || value > target) proof.blockers.push(name + ': measured ' + value + ', original target ' + target);
   }
+  // De twee af te lossen schulden vervangen de overige bestaande lat niet.
+  proof.normResults = PRESTATIEMETERS.map(m => {
+    const value = metrics[m.sleutel], limit = norm.prestatie?.[m.sleutel];
+    const pass = finite(value) && finite(limit) && oordeel(m, value, limit) !== 'slechter';
+    if (!pass) proof.blockers.push(m.sleutel + ': measured ' + value + ', existing norm ' + limit + ' (' + m.richting + ')');
+    return { metric: m.sleutel, direction: m.richting, value, limit, status: pass ? 'PASS' : 'BLOCKED' };
+  });
   if (!proof.blockers.length) proof.status = 'PASS';
   return proof;
 }

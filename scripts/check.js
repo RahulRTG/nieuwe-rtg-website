@@ -3420,6 +3420,7 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['scripts/check.js', 'deze regel zelf noemt zijn naam'],
     ['test/saveduurzaam.test.js', 'de toets die bewijst dat hij bevestigt'],
     ['test/sqlite-audit-rijen.test.js', 'bewijst dat auditrijen dezelfde duurzame bundel delen en niet tweemaal worden gecommit'],
+    ['test/sqlite-audit-selectief.test.js', 'bewijst dat selectieve sessieopslag, een andere domeinmutatie en audit samen in dezelfde duurzame bundel worden bevestigd'],
     ['test/notitiesduurzaam.test.js', 'de toets die bewijst dat het bord niet bevestigt zonder opslag'],
     ['scripts/duurzaamheidskosten.js', 'merkt per route of hij duurzaam is; meet de prijs, zet niets aan'],
     ['server/lib/verraad-catalogus.js', 'de catalogus benoemt de plek waar sterf-na-commit zit; geen aanroep. Stond op verraad.js tot de catalogus daar op 13 september uit is geknipt (keuringsregel 13); de lijst is daarmee VERPLAATST en niet gegroeid'],

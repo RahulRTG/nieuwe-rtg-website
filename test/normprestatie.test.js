@@ -134,12 +134,15 @@ test('8. de beproeving schrijft exact de sleutels die de ratel leest', () => {
 test('9. prestatieschuld sluit alleen met schoon, vergelijkbaar en volledig kandidaatbewijs', () => {
   const { assess } = require('../scripts/performance-debt');
   const commit = '558f4e60386f862a5c3a755c97faba821651768a';
-  const lat = { prestatieBron: '4k/17g/linux/sqlite', prestatieKalibratie: 13.3 };
+  const lat = { prestatieBron: '4k/17g/linux/sqlite', prestatieKalibratie: 13.3, prestatie: { p99Ms: 233, eventLoopP99Ms: 97.9, doorvoerPerSec: 336, herstelSeconden: 1, verhalenSlaagPctStorm: 100, geheugenHellingMBPerMin: 0 } };
   const geldig = () => ({ stempel: { commit: commit.slice(0, 9), boomVuil: false },
     modus: 'sqlite', machine: { kernen: 4, geheugenGB: 17, platform: 'linux', kalibratieBasisMs: 13.3 },
-    oordeel: 'PASS', gezakteDrempels: 0, meters: { stormDuurSec: 180, endpointsOnbereikt: 0, p99Ms: 144, eventLoopP99Ms: 64.8 } });
+    oordeel: 'PASS', gezakteDrempels: 0, meters: { ...lat.prestatie, stormDuurSec: 180, endpointsOnbereikt: 0, p99Ms: 144, eventLoopP99Ms: 64.8 } });
   const goed = assess(commit, lat, geldig());
   assert.equal(goed.status, 'PASS');
+  assert.equal(goed.normResults.length, norm.PRESTATIEMETERS.length);
+  assert.ok(goed.normResults.every(r => r.status === 'PASS'));
+  assert.equal(assess(commit, { ...lat, prestatie: {} }, geldig()).status, 'BLOCKED');
   assert.deepEqual(goed.targets, { p99Ms: 144, eventLoopP99Ms: 64.8 });
   assert.deepEqual(goed.blockers, []);
   const gevallen = [
@@ -147,6 +150,11 @@ test('9. prestatieschuld sluit alleen met schoon, vergelijkbaar en volledig kand
     ['vuile boom', m => { m.stempel.boomVuil = true; }],
     ['andere hardware', m => { m.machine.kernen = 8; }],
     ['andere kalibratie', m => { m.machine.kalibratieBasisMs = 2; }],
+    ['te lage doorvoer', m => { m.meters.doorvoerPerSec = 335; }],
+    ['lang herstel', m => { m.meters.herstelSeconden = 2; }],
+    ['verloren journey', m => { m.meters.verhalenSlaagPctStorm = 99; }],
+    ['groeiend geheugen', m => { m.meters.geheugenHellingMBPerMin = 1; }],
+    ['ontbrekende meter', m => { delete m.meters.doorvoerPerSec; }],
     ['trage p99', m => { m.meters.p99Ms = 145; }],
     ['trage eventloop', m => { m.meters.eventLoopP99Ms = 64.9; }],
     ['boolean is geen cijfer', m => { m.meters.p99Ms = true; }],

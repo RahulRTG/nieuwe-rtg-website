@@ -103,7 +103,7 @@ module.exports = ({ save }) => {
          `BEGIN IMMEDIATE ... COMMIT` maakt de save EEN transactie, dus de
          duurzaamheid valt op de commit en niet op de checkpoint. Deze regel was
          een tweede sterf-na-commit met een andere naam. */
-      sqlite.checkpointSqlite();
+      sqlite.vouwWalSqlite();
     } else if (STORE === 'json') {
       schrijfSnapshotNu();               // schrijft via schrijfDuurzaam(): fsync + rename
     } else {

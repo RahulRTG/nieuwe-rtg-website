@@ -120,3 +120,63 @@ test('een expliciet opgeslagen spoor overleeft een onderbroken schrijfproces', t
   assert.equal(herstart.status, 0, herstart.stderr);
   assert.deepEqual(JSON.parse(herstart.stdout), p.lees('apiSpoor'));
 });
+
+
+test('sessie en context bewaren alleen hun eigendom, ook bij wijziging en intrekking', async t => {
+  const p = proef(t), crypto = require('node:crypto');
+  const s = require('../server/kern/sessies').maakSessies({ db: p.db, save: p.save, crypto });
+  const c = require('../server/kern/identiteit/sessieregister').maakSessieregister(p);
+  let gelezen = 0;
+  Object.defineProperty(p.db.data.ander, 'toJSON', { value() { gelezen++; return { waarde: this.waarde }; } });
+  s.rememberSession('eigen-token', { tier: 'rtg', key: 'user-1' });
+  const hash = s.tokenHash('eigen-token'), sid = p.db.data.sessions[hash].sid;
+  c.open(sid, 'user-1', {});
+  assert.equal(p.lees('sessions')[hash].key, 'user-1');
+  assert.equal(p.lees('sessiecontext')[sid].lidKey, 'user-1');
+  assert.equal(gelezen, 0);
+  assert.equal(await s.forgetSessionDuurzaam(hash), true);
+  c.sluit(sid);
+  assert.deepEqual(p.lees('sessions'), {});
+  assert.deepEqual(p.lees('sessiecontext'), {});
+  assert.equal(gelezen, 0, 'geen vreemde domeinen gescand voor een sessiemutatie');
+  p.db.data = require('../server/db/sqlite').loadSqlite();
+  s.herbouwSessions();
+  assert.equal(s.sessionFor('eigen-token'), null, 'reload wekt de ingetrokken sessie niet tot leven');
+});
+
+test('een mislukte sessiecommit geeft geen bruikbaar token; retry bewaart sessie en context', t => {
+  const p = proef(t), crypto = require('node:crypto'), proto = DatabaseSync.prototype, exec = proto.exec;
+  const s = require('../server/kern/sessies').maakSessies({ db: p.db, save: p.save, crypto });
+  let fail = true;
+  t.mock.method(proto, 'exec', function(sql) {
+    if (sql === 'COMMIT' && fail) { fail = false; throw new Error('sessiecommit mislukt'); }
+    return exec.call(this, sql);
+  });
+  assert.throws(() => s.rememberSession('retry', { tier: 'rtg', key: 'user-2' }), /sessiecommit mislukt/);
+  assert.equal(s.sessionFor('retry'), null);
+  assert.equal(p.conn.prepare("SELECT COUNT(*) n FROM kv WHERE key='sessions'").get().n, 0);
+  s.rememberSession('retry', { tier: 'rtg', key: 'user-2' });
+  assert.equal(p.lees('sessions')[s.tokenHash('retry')].key, 'user-2');
+});
+
+test('selectieve sessies en context blijven samen met vreemd domein en audit in één bundel', async t => {
+  const p = proef(t), crypto = require('node:crypto');
+  const s = require('../server/kern/sessies').maakSessies({ db: p.db, save: p.save, crypto });
+  const c = require('../server/kern/identiteit/sessieregister').maakSessieregister(p);
+  const h = require('../server/lib/handelingsspoor')({ db: p.db, save: p.save });
+  await p.bijeen(() => {
+    s.rememberSession('bundel', { key: 'user-3', tier: 'rtg' });
+    c.open(p.db.data.sessions[s.tokenHash('bundel')].sid, 'user-3', {});
+    p.db.data.ander.waarde = 9;
+    p.save();
+    h.noteer({ wie: 'user-3', methode: 'POST', pad: '/api/sessie-proef', status: 200 });
+    assert.equal(p.conn.prepare("SELECT COUNT(*) n FROM kv WHERE key='sessions'").get().n, 0);
+    assert.equal(p.lees('ander').waarde, 1);
+    assert.equal(p.lees('handelingLog').length, 0);
+  }, { duurzaam: true });
+  assert.equal(p.lees('sessions')[s.tokenHash('bundel')].key, 'user-3');
+  assert.equal(Object.values(p.lees('sessiecontext'))[0].lidKey, 'user-3');
+  assert.equal(p.lees('ander').waarde, 9);
+  assert.equal(p.lees('handelingLog').length, 1);
+  assert.equal(h.ketenstand().ok, true);
+});

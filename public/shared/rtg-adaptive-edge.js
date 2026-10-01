@@ -74,11 +74,12 @@
   function setState(state, source) {
     if (!rt) return false;
     if (source === 'auto' && (rt.manual || Input.busy(rt))) return false;
-    if (state !== 'expanded') { closePanel(); Input.closeContext(rt); }
+    if (state !== 'expanded') closePanel();
     rt.model.state = K.normState(state); rt.host.dataset.rtgAdaptiveState = rt.model.state;
     rt.host.dataset.rtgAdaptiveMotion = source === 'auto' && rt.model.state === 'peek' ? 'reading' : 'available';
     d.body.dataset.rtgAdaptiveState = rt.model.state; rt.sheet.hidden = rt.model.state !== 'expanded';
     rt.sheet.setAttribute('aria-hidden', String(rt.model.state !== 'expanded'));
+    if (rt.sheet.hidden) Input.closeContext(rt);
     if (rt.model.state === 'expanded') renderSheet();
     if (source !== 'auto') rt.manual = rt.model.state === 'deck' || rt.model.state === 'expanded';
     return true;

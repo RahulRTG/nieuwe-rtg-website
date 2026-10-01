@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-01T11:05:17.613Z",
-    "commit": "4520ebf44",
+    "op": "2026-10-01T11:57:34.366Z",
+    "commit": "e9254cb18",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/mutatie.js",
@@ -9086,6 +9086,21 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "outputartifact.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "scripts/lib/outputartifact.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-09-06/kan-je-main-live-zetten/output/editorial-live-20261001/quality-mutation-proofs-e9254cb/outputartifact.test.js.evidence.json",
+        "sha256": "5c04b7b982f82ae4cca7f7c9e64deb3f8af6eebdd76de5ba9d2594d7e380992d",
+        "commit": "e9254cb184dd3b3ce4ef310d072bab9fb9c96210",
+        "sourceSha256": "05411957d3440d09a856a2dc9f3076533b173edbccf88e5145230f517d2d8647",
+        "testSha256": "28ede256591ea3cdf5ef2ed571f38e1e2fc5bdc7248882ff731526b9504f5a82"
+      }
+    },
     "outputaudit.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -12527,6 +12542,36 @@
       "soort": "puur",
       "staat": "geen module gevonden"
     },
+    "sqlite-audit-herstel.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/db/audit-sqlite.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-09-06/kan-je-main-live-zetten/output/editorial-live-20261001/quality-mutation-proofs-e9254cb/sqlite-audit-herstel.test.js.evidence.json",
+        "sha256": "ef3b18209a8fdc7625128a9ee3742ecb5b87fef9e41a01a2b8ef107d59d0258b",
+        "commit": "e9254cb184dd3b3ce4ef310d072bab9fb9c96210",
+        "sourceSha256": "084276ae99b17eb87d9639273b7cfd5271eca6953e17ebf475c0fb214934d58b",
+        "testSha256": "5adb4f92b6b4b33a0c3152ffcff6104b139b83c51d5d75b44550a2709b10a62d"
+      }
+    },
+    "sqlite-audit-rijen.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/db/audit-sqlite.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-09-06/kan-je-main-live-zetten/output/editorial-live-20261001/quality-mutation-proofs-e9254cb/sqlite-audit-rijen.test.js.evidence.json",
+        "sha256": "5b8553f1a7a663c0cded5707ebf59043242b69816033fd7dd700427f8b8c63af",
+        "commit": "e9254cb184dd3b3ce4ef310d072bab9fb9c96210",
+        "sourceSha256": "084276ae99b17eb87d9639273b7cfd5271eca6953e17ebf475c0fb214934d58b",
+        "testSha256": "226f495b9f280ca2d3327a4a6628d78e1af81ce261aebad64a79f31a5268e2c3"
+      }
+    },
     "sqlite-audit-selectief.test.js": {
       "soort": "gericht",
       "staat": "gezakt",
@@ -12535,11 +12580,26 @@
       "gezakt": 1,
       "geprobeerd": 1,
       "bewijs": {
-        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-09-06/kan-je-main-live-zetten/output/editorial-live-20261001/quality-mutation-proofs-4520ebf/sqlite-audit-selectief.test.js.evidence.json",
-        "sha256": "d3f5c01ee4a35c1fc4a3ec2e83811d3d90b7d6f8a71ebdf7894e3b49f994842c",
-        "commit": "4520ebf44571a9fae935272fdfa61e22f0530e1a",
-        "sourceSha256": "520b59076811b9d78a6558cd053b36d903bd32e4e40ca4c88a84990ab2dd7de7",
-        "testSha256": "25b1216004db89ea484180b5e830e4837cfbeb3679e8a42a850e88d9e13f25b4"
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-09-06/kan-je-main-live-zetten/output/editorial-live-20261001/quality-mutation-proofs-e9254cb/sqlite-audit-selectief.test.js.evidence.json",
+        "sha256": "9a25b024812e34dc086f56844eed935dbf97934ac23d7a07139df624521b0e0e",
+        "commit": "e9254cb184dd3b3ce4ef310d072bab9fb9c96210",
+        "sourceSha256": "b873cffaf781e32875756aca64b402f66a848a4ba5d52adf20f17159b5d0163d",
+        "testSha256": "e8ee042a57a0825752600f58f597384b6f5ac94841604f870dcd4843b67980b8"
+      }
+    },
+    "sqlite-audit-snapshot.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/db/audit-sqlite.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-09-06/kan-je-main-live-zetten/output/editorial-live-20261001/quality-mutation-proofs-e9254cb/sqlite-audit-snapshot.test.js.evidence.json",
+        "sha256": "128a5177f456ebf57f8af359455f7037f9b9d0e3bb57915bd932fc2001acb251",
+        "commit": "e9254cb184dd3b3ce4ef310d072bab9fb9c96210",
+        "sourceSha256": "084276ae99b17eb87d9639273b7cfd5271eca6953e17ebf475c0fb214934d58b",
+        "testSha256": "3b1f13998a6319183ef804ab43ff7062a3e6d4383463cf096e7f503d378542d7"
       }
     },
     "sqlite-poll-selectief.test.js": {

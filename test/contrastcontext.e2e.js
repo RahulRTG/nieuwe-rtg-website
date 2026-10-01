@@ -28,7 +28,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, wachtOpNetstilte } = require('./helper');
+const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, wachtOpNetstilte, letOpFouten } = require('./helper');
 const { BRON } = require('../scripts/a11ykeuring');
 
 const pw = laadPlaywright();
@@ -108,6 +108,59 @@ test('een contrastmelding noemt de wereld, de tokens en de ondergrond',
     assert.match(waar, /muted=\s*#cbbdab/i, 'de gemelde tokenwaarde is niet die van LivingOS');
   } finally {
     if (browser) await browser.close().catch(() => {});
+    await stop(srv);
+  }
+});
+
+/* De twee echte regressies deelden hun oorzaak: lokale donkere inkt bleef
+   staan nadat de kaart de donkere wereldgrond kreeg. Meet de echte ingelogde
+   routes, inclusief de Vitaal-omleiding, en niet een nagebouwde kleurfixture. */
+test('Bestellen en Vitaal houden leesbare inhoud in alle drie de thema’s',
+  { skip: geenBrowser(pw) }, async (t) => {
+  const srv = await startServer({ env: { SMTP_URL: '' } });
+  let browser;
+  try {
+    const reg = await fetch(srv.base + '/api/auth/register', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'Contrastproef', email: 'contrast' + Date.now() + '@x.nl',
+        phone: '0612345678', password: 'geheim12345', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })
+    }).then(r => r.json());
+    assert.ok(reg.token, 'een echte proefsessie is vereist');
+    browser = await pw.chromium.launch(browserOpties(pw));
+    for (const thema of ['champagne', 'bordeaux', 'royal']) {
+      const ctx = await browser.newContext({ serviceWorkers: 'block', reducedMotion: 'reduce',
+        viewport: { width: 1280, height: 900 } });
+      await ctx.addInitScript(({ token, thema }) => {
+        localStorage.setItem('rtg_member_token', token);
+        localStorage.setItem('rtg_cookieinfo_v1', '1');
+        localStorage.setItem('rtg_lang', 'nl');
+        localStorage.setItem('rtg_thema_v2', thema);
+      }, { token: reg.token, thema });
+      try {
+        for (const route of ['bestellen', 'vitaal']) await t.test(thema + ' / ' + route, async () => {
+          const page = await ctx.newPage(), fouten = [];
+          letOpFouten(page, fouten);
+          try {
+            await page.goto(srv.base + '/apps/' + route + '.html', { waitUntil: 'load' });
+            const sel = route === 'bestellen' ? '#ontdekGroepen button' : '#log .stil';
+            await page.waitForFunction(({ route, sel }) => {
+              const els = [...document.querySelectorAll(sel)];
+              return route === 'bestellen' ? els.length === 3 :
+                els.length === 1 && els[0].textContent === 'Nog niets. Zo hoort het.';
+            }, { route, sel });
+            if (route === 'vitaal') assert.equal(new URL(page.url()).hash, '#vitaal');
+            await page.locator(sel).first().scrollIntoViewIfNeeded();
+            await wachtOpNetstilte(page);
+            await page.evaluate(() => document.fonts.ready);
+            const keur = await page.evaluate(KEUR);
+            assert.deepEqual(keur.contrast, [], JSON.stringify(keur.contrast));
+            assert.deepEqual(fouten, [], 'geen paginafouten');
+          } finally { await page.close(); }
+        });
+      } finally { await ctx.close(); }
+    }
+  } finally {
+    if (browser) await browser.close();
     await stop(srv);
   }
 });

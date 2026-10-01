@@ -83,7 +83,10 @@ test('Heritage context returns through real navigation without writes', async t 
       await require('./helper').edgeActies(page);
       await page.click(key); await page.waitForSelector('#afScrim.open');
       await page.keyboard.press('Escape');
-      await page.waitForFunction(selector=>document.activeElement.matches(selector),key);
+      const returnKey = '.rtg-adaptive-bar [data-rtg-adaptive-action="context"]';
+      await page.waitForFunction(selector=>document.activeElement.matches(selector),returnKey);
+      assert.equal(await page.locator(returnKey).isVisible(),true,'focus returns to the visible action entrance');
+      assert.equal(await page.locator('.rtg-adaptive-sheet').isVisible(),false,'the previous sheet stays closed');
       assert.equal(await page.getAttribute('#afScrim','aria-modal'),'false');
       /* Maand is op telefoon bewust verborgen; Week is de zichtbare route
          naar dezelfde dagsheet die deze toets nodig heeft. */

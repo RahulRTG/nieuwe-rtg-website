@@ -276,6 +276,25 @@ test('de richting van een meter die in een EIGEN script woont wordt gevonden', (
    Deze twee proeven repareren dat bij de oorzaak in plaats van bij het getal. */
 const verval = require('../scripts/normverval.js');
 
+test('verlopen prestatieschuld leest de prestatiegroep en blijft rood tot werkelijk afbetaald', () => {
+  metRepo(h => {
+    const basis = commitGrond(h, { prestatie: { p99Ms: 144 } });
+    const notities = [{ datum: '2026-05-01', meter: 'p99Ms 144 -> 233',
+      soort: 'schuld', sleutel: 'p99Ms', van: 144, vervalt: '2026-05-31' }];
+    for (const [waarde, code] of [[233, 1], [144, 0], [100, 0]]) {
+      h.schrijfNorm(grond({ prestatie: { p99Ms: waarde }, notities }));
+      const r = h.draai('2026-06-01', '--basis', basis);
+      assert.equal(r.code, code, r.uit);
+      assert.doesNotMatch(r.uit, /meter staat niet meer/);
+      assert.match(r.uit, waarde > 144 ? /meter staat op 233/ : /is afbetaald/);
+    }
+    h.schrijfNorm(grond({ prestatie: {}, notities }));
+    const weg = h.draai('2026-06-01', '--basis', basis);
+    assert.equal(weg.code, 1, weg.uit);
+    assert.match(weg.uit, /meter staat niet meer/);
+  });
+});
+
 test('genoemdeMeters leest de metersleutels uit de vrije tekst van een notitie', () => {
   const bekend = new Set(['kernBreedte', 'kernGedeeld', 'dekkingPct']);
   assert.deepEqual(

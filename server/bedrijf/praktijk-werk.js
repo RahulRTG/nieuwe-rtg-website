@@ -1,7 +1,7 @@
 'use strict';
 const V = require('./praktijk-vorm');
 const { werkFeit, werkBeginstand, werkVeld } = require('./gebeurtenis');
-module.exports = ({ rid, nu, dag, log }) => {
+module.exports = ({ rid, nu, dag, log, kern }) => {
   const extern = require('./praktijk-extern')({ rid, nu, log });
   function vraag(w, actor, b) {
     const a = V.pak(w.praktijkAanbod, b.aanbodId);
@@ -86,6 +86,11 @@ module.exports = ({ rid, nu, dag, log }) => {
       x.administratie = { soort: b.administratie, verwijzing: reden, door: actor.id || actor.naam, at: nu() };
       x.stand = 'afgerond';
     } else if (b.stap === 'annuleren' && !['afgerond', 'geannuleerd', 'uitgevoerd'].includes(van)) {
+      if (x.betalingRef && !['GEWEIGERD','GEANNULEERD','TERUGBETAALD'].includes(kern?.betaalWaarheid?.van(x.betalingRef)?.status))
+        return V.fout('Stem de gestarte betaling eerst af. Een annulering is geen terugbetaling.',409);
+      if (Object.values(w.taken || {}).some(t => t.projectId === p.id && t.externeAfspraak?.herkomst === 'rtg-aanvraag' &&
+          !['geannuleerd', 'afgewezen', 'ingetrokken'].includes(t.externeAfspraak.stand)))
+        return V.fout('Trek open leveranciersaanvragen in en laat bevestigde boekingen eerst annuleren. Uitgevoerd werk vraagt afhandeling.',409);
       if (!reden) return V.fout('Noteer de reden van annulering.');
       x.stand = 'geannuleerd'; x.annulering = { reden, door: actor.id || actor.naam, at: nu() };
       for (const d of Object.values(w.praktijkDelen || {})) if (d.projectId === p.id) d.ingetrokken = true;

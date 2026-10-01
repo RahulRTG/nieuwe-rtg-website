@@ -85,7 +85,10 @@ test('de hele lus: van een zin tot een gesloten case met uitkomst', async () => 
   assert.equal(neem.d.eigenaar.naam, null);
   assert.equal((await roep('/member/bureau/lus/zaak', { id }, lid)).d.eigenaar.rol, 'Lead Rechterhand');
   // de verrassing is een stand die het lid zelf kan zetten
+  assert.equal((await roep('/member/bureau/lus/verrassing', { id, aan: false }, lid)).status, 200);
+  assert.equal((await k('/office/bureau/lus')).d.zaak.verrassing, false);
   assert.equal((await roep('/member/bureau/lus/verrassing', { id, aan: true }, lid)).status, 200);
+  assert.equal((await k('/office/bureau/lus')).d.zaak.verrassing, true);
 
   // de gewone route weigert: de case wordt bijzonder, met de reden in de tijdlijn
   const w = await k('/office/bureau/lus/weigering', { reden: 'Het restaurant is vol.' });

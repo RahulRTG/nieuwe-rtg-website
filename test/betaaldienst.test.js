@@ -43,6 +43,9 @@ test('0. het publieke partnertarief komt uit dezelfde bron als de afrekening', a
   assert.equal(b.betaaldienst.vastCenten, 10);
   assert.equal(b.betaaldienst.pct, 1);
   assert.equal(b.betaaldienst.overOmzet, false);
+  const post = await api(base, '/api/betaaldiensttarief', {});
+  assert.equal(post.status, 200);
+  assert.deepEqual(post.body.betaaldienst, b.betaaldienst, 'beide publieke leesingangen tonen dezelfde afrekening');
 });
 
 test('1. het standaardtarief: 10 centen + 1%, per transactie DIRECT verrekend met de zaak', async () => {

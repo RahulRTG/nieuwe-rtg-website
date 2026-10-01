@@ -14,6 +14,12 @@ const WEBM=Buffer.from([0x1a,0x45,0xdf,0xa3,0,0,0,0]);
 const TMP=fs.mkdtempSync(path.join(os.tmpdir(),'rtg-connection-final-'));
 let srv,base,office,A,B,seq=0;
 
+function bewaardeMeldingen(){
+  const bron="const {DatabaseSync}=require('node:sqlite');const k=require('./server/kluis');const d=new DatabaseSync(process.env.RTG_PROEF_STORE,{readOnly:true});try{console.log(JSON.stringify(JSON.parse(k.ontsleutel(d.prepare('SELECT val FROM kv WHERE key=?').get('connectionCommunication').val)).reports));}finally{d.close();}";
+  return JSON.parse(require('node:child_process').execFileSync(process.execPath,['-e',bron],{cwd:path.join(__dirname,'..'),
+    env:{...process.env,RTG_ENC_KEY:'connection-final-route-key-123456789',RTG_PROEF_STORE:path.join(TMP,'store.db')},encoding:'utf8'}));
+}
+
 async function api(route,body,token,headers){const r=await fetch(base+route,{method:'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{}),...(headers||{})},body:Buffer.isBuffer(body)?body:JSON.stringify(body||{})});return {status:r.status,body:await r.json().catch(()=>({}))};}
 async function lid(){const n=Date.now()+'-'+(++seq),reg=await api('/api/auth/register',{name:'Final '+seq,email:'final-'+n+'@test.invalid',phone:'064'+String(Date.now()).slice(-7)+seq,password:'geheim123',geboortedatum:'1990-05-05',tier:'rtg'});
   await elevateTier(base,reg.body.token,'lifestyle',office);let state=await api('/api/state',{},reg.body.token),codenaam=state.body.state.user.codename;
@@ -22,7 +28,7 @@ async function lid(){const n=Date.now()+'-'+(++seq),reg=await api('/api/auth/reg
   await api('/api/office/verify',{userId:row.id,decision:'approve',faceMatch:true,geslacht:'x'},office);
   state=await api('/api/state',{},reg.body.token);return {token:reg.body.token,codenaam:state.body.state.user.codename};}
 
-test.before(async()=>{srv=await startServer({env:{SMTP_URL:'',RTG_DATA_DIR:TMP,RTG_ENC_KEY:'connection-final-route-key-123456789'}});base=srv.base;office=await kantoorAlsPersoon(base,'RTG-OFFICE');A=await lid();B=await lid();});
+test.before(async()=>{srv=await startServer({env:{SMTP_URL:'',RTG_STORE:'sqlite',DATABASE_URL:'',PG_URL:'',RTG_DATA_DIR:TMP,RTG_ENC_KEY:'connection-final-route-key-123456789'}});base=srv.base;office=await kantoorAlsPersoon(base,'RTG-OFFICE');A=await lid();B=await lid();});
 test.after(()=>{stop(srv&&srv.child);try{fs.rmSync(TMP,{recursive:true,force:true});}catch(e){}});
 
 test('Vonk en Rendez-vous finale routes vormen een echte mobiele serviceketen',async()=>{
@@ -52,7 +58,9 @@ test('Vonk en Rendez-vous finale routes vormen een echte mobiele serviceketen',a
   assert.equal(rvStatus.body.messages[0].text,'Zullen we rustig kennismaken?');
   const rvText=rvStatus.body.messages[0];
   assert.equal((await api('/api/connection/rendezvous/message/report',{id:rvContext,messageId:rvText.id,reason:'Routeproef'},B.token)).status,200);
+  assert.ok(bewaardeMeldingen().some(r=>r.messageId===rvText.id&&r.product==='rendezvous'&&r.reason==='Routeproef'));
   assert.equal((await api('/api/connection/rendezvous/message/remove',{id:rvContext,messageId:rvText.id},A.token)).status,200);
+  assert.equal((await api('/api/connection/rendezvous/status',{id:rvContext},B.token)).body.messages.some(m=>m.id===rvText.id),false);
   const rvMedia=await api('/api/connection/rendezvous/message-media',WEBM,A.token,{'Content-Type':'audio/webm','X-RTG-Context':rvContext,'X-RTG-Media-Kind':'voice','X-RTG-Transcript':'Vrijdagavond past voor mij.','Idempotency-Key':'rv-voice-final-0001'});
   assert.equal(rvMedia.status,200,JSON.stringify(rvMedia.body));
   rvStatus=await api('/api/connection/rendezvous/status',{id:rvContext},B.token);
@@ -68,8 +76,15 @@ test('Vonk en Rendez-vous finale routes vormen een echte mobiele serviceketen',a
   assert.equal((await api('/api/connection/rendezvous/call/signal',{callId:rvCall.body.call.id,kind:'caption',payload:{text:'Tot vrijdag'}},A.token)).status,200);
   assert.equal((await api('/api/connection/rendezvous/call/poll',{callId:rvCall.body.call.id},B.token)).body.signals[0].payload.text,'Tot vrijdag');
   assert.equal((await api('/api/connection/rendezvous/call/end',{callId:rvCall.body.call.id},A.token)).status,200);
-  assert.equal((await api('/api/member/rendezvous/profile-photo/order',{ids:[upload.body.media.id]},B.token)).status,200);
+  assert.equal((await api('/api/connection/rendezvous/call/poll',{callId:rvCall.body.call.id},B.token)).body.call.state,'ENDED');
+  const ordered=await api('/api/member/rendezvous/profile-photo/order',{ids:[upload.body.media.id]},B.token);
+  assert.deepEqual(ordered.body.media.map(m=>m.id),[upload.body.media.id]);
+  const freshPhoto=ordered.body.media[0].src;
+  assert.equal((await fetch(base+freshPhoto,{headers:{Authorization:'Bearer '+B.token}})).status,200);
   assert.equal((await api('/api/member/rendezvous/profile-photo/remove',{id:upload.body.media.id},B.token)).status,200);
+  assert.equal((await api('/api/member/rendezvous/profiel',{},B.token)).body.profiel.media.length,0,'de foto is uit het eigen profiel verwijderd');
+  assert.equal((await fetch(base+freshPhoto,{headers:{Authorization:'Bearer '+B.token}})).status,404,'ook het actuele fototicket is ingetrokken');
+  assert.equal((await fetch(base+candidate.media[0].src,{headers:fotoHeaders})).status,404,'een verwijderde profielfoto wordt niet meer geleverd');
   const arranged=await api('/api/member/rendezvous/arrange',{id:candidate.id,setting:'diner'},A.token);
   assert.equal(arranged.status,200,JSON.stringify(arranged.body));
   const akkoordA=await api('/api/member/rendezvous/akkoord',{id:candidate.id,ja:true},A.token);
@@ -82,6 +97,8 @@ test('Vonk en Rendez-vous finale routes vormen een echte mobiele serviceketen',a
   for(const state of ['ACKNOWLEDGED','IN_PROGRESS'])
     assert.equal((await api('/api/office/rendezvous/arrangement/step',{id:arrangement.id,state},office)).status,200);
   assert.equal((await api('/api/office/rendezvous/arrangement/step',{id:arrangement.id,state:'CONFIRMED',confirmation:'Arrangement RV-2026'},office)).status,200);
+  const confirmed=(await api('/api/office/rendezvous/arrangements',{},office)).body.requests.find(r=>r.id===arrangement.id);
+  assert.equal(confirmed.state,'CONFIRMED');assert.equal(confirmed.confirmation,'Arrangement RV-2026');
 
   await api('/api/vonk/like',{codenaam:B.codenaam},A.token);const matched=await api('/api/vonk/like',{codenaam:A.codenaam},B.token);
   assert.equal(matched.body.match,true);const id=matched.body.id;
@@ -89,6 +106,7 @@ test('Vonk en Rendez-vous finale routes vormen een echte mobiele serviceketen',a
   let status=await api('/api/connection/vonk/status',{id},B.token);assert.equal(status.body.messages[0].text,'Zullen we koffie drinken?');
   const textMessage=status.body.messages[0];
   assert.equal((await api('/api/connection/vonk/message/report',{id,messageId:textMessage.id,reason:'Veiligheidstest'},B.token)).status,200);
+  assert.ok(bewaardeMeldingen().some(r=>r.messageId===textMessage.id&&r.product==='vonk'&&r.reason==='Veiligheidstest'));
   assert.equal((await api('/api/connection/vonk/message/remove',{id,messageId:textMessage.id},A.token)).status,200);
   status=await api('/api/connection/vonk/status',{id},B.token);assert.equal(status.body.messages.length,0);
   const media=await api('/api/connection/vonk/message-media',WEBM,A.token,{'Content-Type':'audio/webm','X-RTG-Context':id,'X-RTG-Media-Kind':'voice','X-RTG-Transcript':'Ik stel zaterdagmiddag voor.','Idempotency-Key':'vonk-voice-final-0001'});
@@ -103,9 +121,16 @@ test('Vonk en Rendez-vous finale routes vormen een echte mobiele serviceketen',a
   assert.equal((await api('/api/connection/vonk/call/answer',{callId:call.body.call.id,accept:true},B.token)).body.call.state,'ACTIVE');
   await api('/api/connection/vonk/call/signal',{callId:call.body.call.id,kind:'caption',payload:{text:'Goedenavond'}},A.token);
   const poll=await api('/api/connection/vonk/call/poll',{callId:call.body.call.id},B.token);assert.equal(poll.body.signals[0].payload.text,'Goedenavond');
-  await api('/api/connection/vonk/consent',{id,capability:'connection.voice',active:false},A.token);
-  assert.equal((await api('/api/connection/vonk/call/poll',{callId:call.body.call.id},B.token)).body.call.state,'CONSENT_REVOKED');
   assert.equal((await api('/api/connection/vonk/call/end',{callId:call.body.call.id},A.token)).status,200);
+  assert.equal((await api('/api/connection/vonk/call/poll',{callId:call.body.call.id},B.token)).body.call.state,'ENDED');
+  const nextCall=await api('/api/connection/vonk/call/start',{id,type:'voice'},A.token,{'Idempotency-Key':'vonk-call-final-0002'});
+  assert.equal(nextCall.status,200,JSON.stringify(nextCall.body));
+  assert.equal(nextCall.body.call.state,'RINGING');
+  assert.equal((await api('/api/connection/vonk/call/answer',{callId:nextCall.body.call.id,accept:true},B.token)).body.call.state,'ACTIVE');
+  await api('/api/connection/vonk/consent',{id,capability:'connection.voice',active:false},A.token);
+  assert.equal((await api('/api/connection/vonk/call/poll',{callId:nextCall.body.call.id},B.token)).body.call.state,'CONSENT_REVOKED');
+  await api('/api/connection/vonk/call/end',{callId:nextCall.body.call.id},A.token);
+  assert.equal((await api('/api/connection/vonk/call/poll',{callId:nextCall.body.call.id},B.token)).body.call.state,'CONSENT_REVOKED');
   assert.equal((await fetch(base+'/api/connection/vonk/message-media/delivery/ongeldig')).status,404);
 
   const request=await api('/api/member/rendezvous/concierge/request',{subject:'Diner',request:'Een rustige tafel in Amsterdam.',idempotencyKey:'rv-concierge-final-0001'},A.token);

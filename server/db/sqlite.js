@@ -12,6 +12,7 @@ const { DATA_DIR, STORE, besloten, beslotenMap } = require('./opslag');
 // De goedkope veranderingsdetectie op GROTE collecties; daar staat ook waarom
 // hij veilig is en waarom geld er nooit door gaat.
 const voorcheck = require('./voorcheck');
+const { serialiseer } = require('./logjson');
 const db = state.db;
 
 let kvdb = null;
@@ -58,18 +59,26 @@ function statements() {
     bump: kvdb.prepare("UPDATE meta SET v = v + 1 WHERE k = 'ver'"),
     huidig: kvdb.prepare("SELECT v FROM meta WHERE k = 'ver'"),
     lees: kvdb.prepare('SELECT val, ver FROM kv WHERE key = ?'),
+    versie: kvdb.prepare('SELECT ver FROM kv WHERE key = ?'),
     up: kvdb.prepare('INSERT INTO kv(key,val,ver) VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET val=excluded.val, ver=excluded.ver')
   };
   return stmt;
 }
-function saveSqlite(force) {
+function saveSqlite(force, collecties) {
+  if (collecties !== undefined && (!Array.isArray(collecties) || !collecties.length ||
+      collecties.some(k => typeof k !== 'string' || !Object.hasOwn(db.data, k)))) {
+    throw new TypeError('Een gerichte save vereist bestaande collecties');
+  }
   sqliteInit();
   const gewijzigd = [];
   const nu = Date.now();
   let uitgesteld = false;
-  for (const k of Object.keys(db.data)) {
+  // Een spoor schrijft alleen zijn eigen collectie. Gewone en duurzame saves
+  // blijven alle collecties controleren, ook na een gerichte schrijfactie.
+  const sleutels = force || collecties === undefined ? Object.keys(db.data) : [...new Set(collecties)];
+  for (const k of sleutels) {
     if (voorcheck.magOverslaan(k, db.data[k], force, nu)) { uitgesteld = true; continue; }
-    const j = JSON.stringify(db.data[k]);
+    const j = serialiseer(k, db.data[k]);
     voorcheck.onthoud(k, j.length, db.data[k], nu);
     if (laatsteJson.get(k) !== j) gewijzigd.push([k, j]);
   }
@@ -78,15 +87,17 @@ function saveSqlite(force) {
      `undefined`, en de duurzame bundel las dat als verlies -- zie duurzaam.js.
      Alleen zonder uitgesteld werk is elke collectie ook echt nagekeken. */
   if (!gewijzigd.length) return { alGelijk: !uitgesteld };
-  const { bump, huidig, lees, up } = statements();
+  const { bump, huidig, lees, versie, up } = statements();
+  const bevestigd = [];
   kvdb.exec('BEGIN IMMEDIATE'); // pak meteen de schrijflock, zodat de versie en de merge kloppen
   try {
     for (const [k, jOns] of gewijzigd) {
       let j = jOns;
-      const rij = lees.get(k);
+      const stand = versie.get(k);
       // Schreef een ander proces deze collectie ondertussen? Voeg per item samen
       // in plaats van hun wijzigingen te overschrijven.
-      if (rij && rij.ver > (toegepast.get(k) || 0)) {
+      if (stand && stand.ver > (toegepast.get(k) || 0)) {
+        const rij = lees.get(k);
         const base = laatsteJson.has(k) ? JSON.parse(laatsteJson.get(k)) : undefined;
         const samen = merge3(base, db.data[k], JSON.parse(uitStore(rij.val)));
         db.data[k] = samen;
@@ -98,11 +109,16 @@ function saveSqlite(force) {
       bump.run();
       const v = huidig.get().v;
       up.run(k, naarStore(j), v);
-      laatsteJson.set(k, j);
-      toegepast.set(k, v);
+      bevestigd.push([k, j, v]);
     }
     kvdb.exec('COMMIT');
-  } catch (e) { try { kvdb.exec('ROLLBACK'); } catch (x) {} throw e; }
+  } catch (e) {
+    try { kvdb.exec('ROLLBACK'); } catch (x) {}
+    for (const [k] of gewijzigd) voorcheck.vergeet(k);
+    throw e;
+  }
+  // Een mislukte COMMIT mag de volgende poging nooit als al opgeslagen zien.
+  for (const [k, j, v] of bevestigd) { laatsteJson.set(k, j); toegepast.set(k, v); }
   return { alGelijk: false };
 }
 // Haal de collecties op die een ANDER proces sinds onze laatste versie schreef,
@@ -117,10 +133,11 @@ function pollSqlite() {
     // keer alle collecties hoeven te deserialiseren.
     let laagst = 0;
     for (const v of toegepast.values()) if (v < laagst || laagst === 0) laagst = v;
-    const rows = kvdb.prepare('SELECT key, val, ver FROM kv WHERE ver > ?').all(laagst);
+    const rows = kvdb.prepare('SELECT key, ver FROM kv WHERE ver > ?').all(laagst);
     let sessieGewijzigd = false;
     for (const r of rows) {
       if (r.ver <= (toegepast.get(r.key) || 0)) continue;
+      Object.assign(r, statements().lees.get(r.key));
       const baseJson = laatsteJson.get(r.key);
       const hunJson = uitStore(r.val);
       const lokaalOpenstaand = baseJson !== undefined && JSON.stringify(db.data[r.key]) !== baseJson;
@@ -150,13 +167,8 @@ function startSqliteSync() {
   if (pollTimer.unref) pollTimer.unref();
 }
 
-/* De WAL leegdrukken in store.db zelf.
-
-   In WAL-modus staat verse data NIET in store.db maar in store.db-wal, en
-   pas een checkpoint schuift hem over. Wie store.db kopieert zonder eerst te
-   checkpointen, kopieert dus een bestand waar de recentste gegevens niet in
-   staan -- en bij een verse installatie is dat letterlijk een leeg bestand van
-   4 KB. Daarom roept de backup dit eerst aan. */
+/* De backup moet eerst de WAL naar store.db laten doorschrijven; anders mist
+   een kopie van alleen store.db de nieuwste gegevens. */
 function checkpointSqlite() {
   if (!kvdb) return false;
   try { saveSqlite(true); } catch (e) {}
@@ -170,14 +182,8 @@ function afrondSqlite() {
   try { kvdb.exec('PRAGMA wal_checkpoint(TRUNCATE)'); } catch (e) { /* ander proces leest nog */ }
 }
 
-/* DE PERSISTENTE VERSIE, gelezen uit de DATABASE en niet uit het geheugen.
-
-   Dit is het enige getal waarmee een aanroeper kan vaststellen dat zijn
-   schrijfactie werkelijk de schijf heeft gehaald. Het geheugen kan hem niet
-   bevestigen -- daar staat de wijziging sowieso -- en juist dat verschil is waar
-   een verloren schrijfactie zich verstopt. Geeft null als er geen SQLite-opslag
-   draait; de aanroeper hoort dat als "niet vast te stellen" te behandelen en
-   niet als "in orde". */
+/* Alleen de databaseversie bevestigt een schrijfactie: gewijzigd geheugen is
+   geen bewijs van opslag. null betekent niet vast te stellen, nooit in orde. */
 function persistentieStandSqlite() {
   try { sqliteInit(); const r = statements().huidig.get(); return r ? Number(r.v) : null; }
   catch (e) { return null; }

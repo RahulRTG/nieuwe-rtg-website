@@ -311,7 +311,7 @@ const VERHALEN = [
       const bestemming = start.data.live.dest
         || (start.data.live.partners || []).find(x => x.code === p.supCode);
       wb.eis('de bestemming', bestemming && bestemming.loc, 'de bestemming heeft geen locatie');
-      /* EERST NOG NIET. De aankomst hoort uit de AFSTAND te volgen en niet uit
+      /* EERST NOG NIET. Het aankomstvoorstel hoort uit de AFSTAND te volgen en niet uit
          het feit dat je een positie doorgeeft. Een halve graad noorderbreedte is
          ruim vijftig kilometer; wie daar staat is niet aangekomen. Zonder deze
          eerste stap zou een grens van honderd kilometer hier groen blijven, want
@@ -321,12 +321,17 @@ const VERHALEN = [
         { lat: bestemming.loc.lat + 0.5, lng: bestemming.loc.lng });
       wb.eis('nog onderweg', !(ver.data.live && ver.data.live.arrived),
         'vijftig kilometer verderop gold al als aangekomen');
+      wb.eis('nog onderweg', ver.data.live && ver.data.live.nabij === false,
+        'vijftig kilometer verderop gold al als nabij');
 
       // en dan precies op de stoep
-      const upd = await wb.stap('aankomen', 'POST', '/api/live/update', lid.token,
+      const upd = await wb.stap('nabij de bestemming', 'POST', '/api/live/update', lid.token,
         { lat: bestemming.loc.lat, lng: bestemming.loc.lng });
-      wb.eis('aankomen', upd.data.live && upd.data.live.arrived === true,
-        'op de bestemming staan leverde geen aankomst op');
+      wb.eis('nabij de bestemming', upd.data.live && upd.data.live.nabij === true && upd.data.live.arrived === false,
+        'de positie moet een voorstel geven, nooit stil een aankomst bevestigen (NAVIGATIE N13)');
+      const bevestigd = await wb.stap('aankomst bevestigen', 'POST', '/api/live/aangekomen', lid.token, {});
+      wb.eis('aankomst bevestigen', bevestigd.data.live && bevestigd.data.live.arrived === true && bevestigd.data.live.aankomstDoor === 'lid',
+        'de bevestigde aankomst ontbreekt of is niet aan het lid toegeschreven');
     }
   },
   {

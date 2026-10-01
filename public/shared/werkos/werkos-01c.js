@@ -1,4 +1,5 @@
-  /* Beweging bevestigt alleen een wissel van werkvlak. */
+/* WerkOS: beweging en vensters. */
+  CSS += `  /* Beweging bevestigt alleen een wissel van werkvlak. */
   @media (prefers-reduced-motion:no-preference){
     body.wos-aan .view.active{animation:wosOpen var(--rtg-tijd-normaal,180ms) var(--rtg-veer,ease);}
     @keyframes wosOpen{from{transform:translateY(4px);opacity:.72;}to{transform:none;opacity:1;}}

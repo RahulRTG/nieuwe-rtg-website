@@ -19,6 +19,27 @@ const { EventEmitter } = require('events');
 const maakSpoor = require('../server/lib/handelingsspoor');
 const keten = require('../server/lib/keten');
 
+test('auditregels blijven request-lokaal: lezen bevriest geen gedeelde PG-proxy', () => {
+  const context = require('../server/db/verzoekcontext');
+  const bron = { handelingLog: [] };
+  keten.noteerIn(bron.handelingLog, { wie: 'oud', pad: '/api/oud' }, 50000);
+  const origineel = JSON.stringify(bron);
+  const ctx = context.nieuw();
+  const db = { get data() { return context.dataVoor(bron); } };
+  const spoor = maakSpoor({ db, save() {} });
+  try {
+    context.voer(ctx, () => {
+      assert.equal(spoor.ketenstand().ok, true);
+      assert.equal(Object.isFrozen(bron.handelingLog[0]), false);
+      spoor.noteer({ wie: 'nieuw', methode: 'POST', pad: '/api/nieuw', status: 200 });
+      assert.equal(db.data.handelingLog.length, 2);
+      assert.equal(spoor.ketenstand().ok, true);
+      assert.equal(JSON.stringify(bron), origineel, 'nog niets gedeeld vóór commit');
+    });
+  } finally { context.sluit(ctx); }
+  assert.equal(JSON.stringify(bron), origineel, 'afgebroken verzoek bewaart niets');
+});
+
 function maak(opts) {
   const db = { data: {} };
   let saves = 0;
@@ -48,7 +69,8 @@ function doe(spoor, req, route) {
 }
 
 test('een geslaagde schrijfactie laat een geketende regel na', () => {
-  const o = maak();
+  const saves = [];
+  const o = maak({ save: sleutels => saves.push(sleutels) });
   doe(o.spoor, nepReq({ body: { naam: 'RTG' } }), (q, r) => r.status(200).json({ ok: true }));
 
   const rij = o.rij();
@@ -58,7 +80,7 @@ test('een geslaagde schrijfactie laat een geketende regel na', () => {
   assert.equal(rij[0].pad, '/api/concern/nieuw');
   assert.equal(rij[0].status, 200);
   assert.ok(rij[0].hash, 'geketend');
-  assert.equal(o.saves(), 1, 'en weggeschreven');
+  assert.deepStrictEqual(saves, [['handelingLog']], 'weggeschreven via alleen de eigen collectie');
 });
 
 /* ------------------------------------------------------------------------
@@ -124,7 +146,8 @@ test('sleutelen aan een regel breekt de keten aantoonbaar', () => {
   assert.equal(o.spoor.ketenstand().ok, true, 'ongemoeid is heel');
 
   // "dat pad heeft hij nooit aangeroepen"
-  o.rij()[1].pad = '/api/iets/anders';
+  assert.throws(() => { o.rij()[1].pad = '/api/iets/anders'; }, TypeError, 'bestaande auditregels zijn onveranderlijk');
+  o.rij()[1] = { ...o.rij()[1], pad: '/api/iets/anders' }; // vervangen bewijs blijft detecteerbaar
   const stand = o.spoor.ketenstand();
   assert.equal(stand.ok, false, 'een regel bijstellen HOORT op te vallen');
   assert.ok(stand.gebroken.length > 0);
@@ -154,7 +177,7 @@ test('de ketenstand gaat over het HELE spoor, niet over de selectie', () => {
   const o = maak();
   doe(o.spoor, nepReq({ sessie: { key: 'user-1' } }), (q, r) => r.status(200).json({ ok: true }));
   doe(o.spoor, nepReq({ sessie: { key: 'user-2' } }), (q, r) => r.status(200).json({ ok: true }));
-  o.rij()[0].pad = '/api/gesleuteld';        // een regel van user-2
+  o.rij()[0] = { ...o.rij()[0], pad: '/api/gesleuteld' }; // een vervangen regel van user-2
 
   const vanEen = o.spoor.lijst({ over: 'user-1' });
   assert.equal(vanEen.keten.ok, false,

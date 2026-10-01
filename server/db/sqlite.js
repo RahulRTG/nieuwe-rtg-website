@@ -1,9 +1,6 @@
-/* Opslag, deel "sqlite": de SQLite-kv-motor. Elke top-level collectie is een rij
-   (WAL, transactioneel), met een oplopend versienummer per collectie; een korte
-   achtergrondpoll haalt de collecties op die een ANDER proces heeft gewijzigd.
-   Zo kunnen echt losse schrijvende servers hetzelfde store.db delen zonder elkaar
-   te overschrijven (per collectie serialiseert SQLite de schrijvers), en zien ze
-   elkaars data live. De data in het geheugen (db.data) blijft gelijk. */
+/* SQLite/WAL: collecties hebben versies; de poll leest externe wijzigingen.
+   Schrijvers delen dezelfde transactionele store.db. De twee auditjournalen
+   hebben eigen rijen; db.data blijft de leesprojectie van dezelfde opslag. */
 const path = require('path');
 const kluis = require('../kluis');
 const state = require('./state');
@@ -14,6 +11,12 @@ const { DATA_DIR, STORE, besloten, beslotenMap } = require('./opslag');
 const voorcheck = require('./voorcheck');
 const externeCollecties = require('./sqlite-poll');
 const db = state.db;
+let auditMotorWaarde;
+function auditMotor() {
+  sqliteInit();
+  return auditMotorWaarde || (auditMotorWaarde = require('./audit-sqlite')({ db, kv: kvdb,
+    decode: uitStore, encode: naarStore, bump: () => statements().bump.run() }));
+}
 
 let kvdb = null;
 const toegepast = new Map();   // collectie -> versienummer dat dit proces al toegepast heeft
@@ -44,11 +47,14 @@ function sqliteInit() {
 }
 function loadSqlite() {
   sqliteInit();
-  const rows = kvdb.prepare('SELECT key, val, ver FROM kv').all();
-  if (!rows.length) return null;
+  const audits = auditMotor();
+  const { rows, audit } = externeCollecties.snapshot(kvdb, () => ({
+    rows: kvdb.prepare('SELECT key, val, ver FROM kv').all(), audit: audits.snapshots()
+  }));
+  if (!rows.length && !audit.length) return null;
   const data = {};
   for (const r of rows) { const j = uitStore(r.val); data[r.key] = JSON.parse(j); laatsteJson.set(r.key, j); toegepast.set(r.key, r.ver); }
-  return data;
+  return audits.laad(data, audit);
 }
 // De statements zijn per verbinding altijd dezelfde: één keer voorbereiden
 // in plaats van bij elke save opnieuw (SQLite hoeft dan niet te hercompileren).
@@ -64,12 +70,16 @@ function statements() {
   };
   return stmt;
 }
-function saveSqlite(force, sleutels) {
+function saveSqlite(force, sleutels, extraAudit = []) {
   sqliteInit();
+  const audits = auditMotor(), doos = audits.doos();
+  const auditOps = [...audits.vervangingen(db.data), ...(doos?.auditOps || []), ...extraAudit];
+  const auditSleutels = new Set(auditOps.map(op => op.naam));
   const gewijzigd = [];
   const nu = Date.now();
   let uitgesteld = false;
   for (const k of sleutels || Object.keys(db.data)) {
+    if (auditSleutels.has(k) || audits.bezit(db.data, k)) continue;
     if (voorcheck.magOverslaan(k, db.data[k], force, nu)) { uitgesteld = true; continue; }
     const j = JSON.stringify(db.data[k]);
     voorcheck.onthoud(k, j.length, db.data[k], nu);
@@ -79,9 +89,11 @@ function saveSqlite(force, sleutels) {
   /* Niets te schrijven is iets anders dan niet geschreven; beide gaven hier
      `undefined`, en de duurzame bundel las dat als verlies -- zie duurzaam.js.
      Alleen zonder uitgesteld werk is elke collectie ook echt nagekeken. */
-  if (!gewijzigd.length) return { alGelijk: !uitgesteld };
+  if (!gewijzigd.length && !auditOps.length) return { alGelijk: !uitgesteld };
   const { bump, huidig, lees, up } = statements();
   const vastgelegd = [];
+  const auditResultaten = [];
+  let auditSnapshots;
   kvdb.exec('BEGIN IMMEDIATE'); // pak meteen de schrijflock, zodat de versie en de merge kloppen
   try {
     for (const [k, jOns] of gewijzigd) {
@@ -103,6 +115,8 @@ function saveSqlite(force, sleutels) {
       up.run(k, naarStore(j), v);
       vastgelegd.push([k, j, v]);
     }
+    for (const op of auditOps) auditResultaten.push(audits.pasToe(op));
+    auditSnapshots = audits.publicaties(auditResultaten);
     kvdb.exec('COMMIT');
   } catch (e) {
     try { kvdb.exec('ROLLBACK'); } catch (x) {}
@@ -110,6 +124,7 @@ function saveSqlite(force, sleutels) {
     throw e;
   }
   for (const [k, j, v] of vastgelegd) { laatsteJson.set(k, j); toegepast.set(k, v); }
+  audits.naCommit(auditResultaten, doos, auditSnapshots);
   return { alGelijk: false };
 }
 // Haal de collecties op die een ANDER proces sinds onze laatste versie schreef,
@@ -117,28 +132,25 @@ function saveSqlite(force, sleutels) {
 function pollSqlite() {
   if (!kvdb) return;
   try {
-    // Eerst alleen de versies: de laagst-toegepaste versie blijft bij een
-    // ongewijzigde collectie laag. Een query met val boven die grens kopieerde
-    // daarom iedere poll vrijwel de hele database naar JavaScript, ook als we
-    // al die waarden zelf hadden geschreven en direct weer weggooiden.
-    // De vergelijking blijft PER COLLECTIE: een eigen hogere schrijfversie
-    // mag een eerdere externe wijziging nooit verbergen.
-    const rows = externeCollecties(kvdb, statements(), toegepast);
+    // Vergelijk versies per collectie: een eigen hogere versie mag een eerdere
+    // externe wijziging niet verbergen. Haal uitsluitend gewijzigde payloads.
+    const audits = auditMotor();
+    const { rows, audit } = externeCollecties(kvdb, statements(), toegepast, audits.snapshots);
+    const voorbereid = [];
     let sessieGewijzigd = false;
     for (const r of rows) {
       const sleutel = r.key;
       const baseJson = laatsteJson.get(sleutel);
       const hunJson = uitStore(r.val);
       const lokaalOpenstaand = baseJson !== undefined && JSON.stringify(db.data[sleutel]) !== baseJson;
-      if (lokaalOpenstaand) {
-        // wij hebben nog niet-opgeslagen wijzigingen: samenvoegen en die niet
-        // als "opgeslagen" markeren, zodat de eerstvolgende save ze wegschrijft.
-        db.data[sleutel] = merge3(JSON.parse(baseJson), db.data[sleutel], JSON.parse(hunJson));
-      } else {
-        db.data[sleutel] = JSON.parse(hunJson);
-        laatsteJson.set(sleutel, hunJson);
-      }
-      toegepast.set(sleutel, r.ver);
+      const waarde = lokaalOpenstaand ? merge3(JSON.parse(baseJson), db.data[sleutel], JSON.parse(hunJson)) : JSON.parse(hunJson);
+      voorbereid.push({ sleutel, waarde, hunJson, lokaalOpenstaand, ver: r.ver });
+    }
+    audits.publiceerSnapshots(audit);
+    for (const { sleutel, waarde, hunJson, lokaalOpenstaand, ver } of voorbereid) {
+      db.data[sleutel] = waarde;
+      if (!lokaalOpenstaand) laatsteJson.set(sleutel, hunJson);
+      toegepast.set(sleutel, ver);
       // De inhoud komt van BUITEN: wat de voorcheck van deze collectie meende te
       // weten, geldt niet meer. Vergeten, zodat de volgende save hem exact nakijkt.
       voorcheck.vergeet(sleutel);
@@ -156,13 +168,8 @@ function startSqliteSync() {
   if (pollTimer.unref) pollTimer.unref();
 }
 
-/* De WAL leegdrukken in store.db zelf.
-
-   In WAL-modus staat verse data NIET in store.db maar in store.db-wal, en
-   pas een checkpoint schuift hem over. Wie store.db kopieert zonder eerst te
-   checkpointen, kopieert dus een bestand waar de recentste gegevens niet in
-   staan -- en bij een verse installatie is dat letterlijk een leeg bestand van
-   4 KB. Daarom roept de backup dit eerst aan. */
+/* Backup checkpoint: verse transacties staan eerst in WAL. Een losse kopie van
+   store.db zonder checkpoint mist die transacties (soms zelfs alle data). */
 function checkpointSqlite() {
   if (!kvdb) return false;
   try { saveSqlite(true); } catch (e) {}
@@ -196,5 +203,5 @@ const bewerkCollectieSqlite = require('./collectie-sqlite')({
 const economischeBoekingSqlite = require('./economische-boeking-sqlite')({ db,
   verbinding: () => { sqliteInit(); return kvdb; }, statements, merge3, uitStore, naarStore, laatsteJson, toegepast, voorcheck });
 
-module.exports = { loadSqlite, saveSqlite, bewerkCollectieSqlite, economischeBoekingSqlite, startSqliteSync, afrondSqlite, checkpointSqlite,
+module.exports = { loadSqlite, saveSqlite, auditMotor, bewerkCollectieSqlite, economischeBoekingSqlite, startSqliteSync, afrondSqlite, checkpointSqlite,
   persistentieStandSqlite };

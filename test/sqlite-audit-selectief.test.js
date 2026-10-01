@@ -19,7 +19,13 @@ function proef(t) {
   opslag.db.data = { handelingLog: [], apiSpoor: {}, ander: { waarde: 1 } };
   opslag.save();
   const conn = new DatabaseSync(path.join(dir, 'store.db'));
-  const lees = key => JSON.parse(conn.prepare('SELECT val FROM kv WHERE key=?').get(key).val);
+  const lees = key => {
+    const meta = conn.prepare('SELECT * FROM audit_meta WHERE naam=?').get(key);
+    if (!meta) return JSON.parse(conn.prepare('SELECT val FROM kv WHERE key=?').get(key).val);
+    const lijst = conn.prepare('SELECT waarde FROM audit_rij WHERE naam=? ORDER BY nr').all(key).map(r => JSON.parse(r.waarde));
+    if (key === 'handelingLog') return lijst.reverse();
+    return { ...JSON.parse(meta.extra), commandJournaal: lijst, commandJournaalTotaal: meta.totaal };
+  };
   t.after(() => {
     conn.close();
     for (const [k, v] of Object.entries(oud)) { if (v === undefined) delete process.env[k]; else process.env[k] = v; }

@@ -99,19 +99,22 @@ function wieVan(req) {
 function maakHandelingsspoor({ db, save, nu, max }) {
   const tijd = nu || klok.nu;
   const grens = max || MAX;
+  const opslag = save.audit?.open('handelingLog');
   const eigen = require('../kern/eigencollectie')({ db, domein: 'lib/handelingsspoor', bezit: { handelingLog: 'lijst' } });
 
-  const rij = () => eigen.bak('handelingLog');
+  const rij = () => opslag ? opslag.view() : eigen.bak('handelingLog');
 
   function noteer({ wie, methode, pad, status, afdruk, grof }) {
-    return keten.noteerIn(rij(), {
+    const regel = {
       at: grof ? burger.dag(tijd()) : new Date(tijd()).toISOString(),
       wie: String(wie || 'anoniem').slice(0, 60),
       methode: String(methode || '').slice(0, 10),
       pad: String(pad || '').slice(0, 200),
       status: Number(status) || 0,
       afdruk: String(afdruk || '')
-    }, grens);
+    };
+    if (opslag) return opslag.append(vorige => keten.schakel(regel, vorige?.hash || null, (Number(vorige?.nr) || 0) + 1), r => Boolean(r?.hash));
+    return keten.noteerIn(rij(), regel, grens);
   }
 
   /* De ketenstand: klopt dit spoor nog met zichzelf? Zelfde vorm als bij de
@@ -167,7 +170,7 @@ function maakHandelingsspoor({ db, save, nu, max }) {
       const pseudoniem = burger.isBurgerpad(pad);
       noteer({ wie: pseudoniem ? burger.PSEUDONIEM : wieVan(req), methode: req.method,
         pad, status, afdruk: pseudoniem ? '' : afdrukVan(req.body), grof: pseudoniem });
-      if (save.sleutels) save.sleutels(['handelingLog']); else save();
+      if (!opslag) { if (save.sleutels) save.sleutels(['handelingLog']); else save(); }
     };
     if (!verzoekcontext.haakVoorCommit(schrijf)) {
       res.on('finish', () => { try { schrijf(); } catch (e) {} });

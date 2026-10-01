@@ -64,12 +64,12 @@ function statements() {
   };
   return stmt;
 }
-function saveSqlite(force) {
+function saveSqlite(force, sleutels) {
   sqliteInit();
   const gewijzigd = [];
   const nu = Date.now();
   let uitgesteld = false;
-  for (const k of Object.keys(db.data)) {
+  for (const k of sleutels || Object.keys(db.data)) {
     if (voorcheck.magOverslaan(k, db.data[k], force, nu)) { uitgesteld = true; continue; }
     const j = JSON.stringify(db.data[k]);
     voorcheck.onthoud(k, j.length, db.data[k], nu);
@@ -81,6 +81,7 @@ function saveSqlite(force) {
      Alleen zonder uitgesteld werk is elke collectie ook echt nagekeken. */
   if (!gewijzigd.length) return { alGelijk: !uitgesteld };
   const { bump, huidig, lees, up } = statements();
+  const vastgelegd = [];
   kvdb.exec('BEGIN IMMEDIATE'); // pak meteen de schrijflock, zodat de versie en de merge kloppen
   try {
     for (const [k, jOns] of gewijzigd) {
@@ -100,11 +101,15 @@ function saveSqlite(force) {
       bump.run();
       const v = huidig.get().v;
       up.run(k, naarStore(j), v);
-      laatsteJson.set(k, j);
-      toegepast.set(k, v);
+      vastgelegd.push([k, j, v]);
     }
     kvdb.exec('COMMIT');
-  } catch (e) { try { kvdb.exec('ROLLBACK'); } catch (x) {} throw e; }
+  } catch (e) {
+    try { kvdb.exec('ROLLBACK'); } catch (x) {}
+    for (const [k] of gewijzigd) voorcheck.vergeet(k);
+    throw e;
+  }
+  for (const [k, j, v] of vastgelegd) { laatsteJson.set(k, j); toegepast.set(k, v); }
   return { alGelijk: false };
 }
 // Haal de collecties op die een ANDER proces sinds onze laatste versie schreef,

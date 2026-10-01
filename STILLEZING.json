@@ -3,10 +3,10 @@
  "uitleg": "Lezers van bewijs- en gezagsstate die een ONLEESBAAR bestand als een AFWEZIG bestand behandelen. Bewijs kent drie toestanden (bestaat+geldig, bestaat+ongeldig, bestaat niet) en een catch die op null valt, maakt van de tweede de derde -- en leeg betekent in dit huis bijna overal \"geen beperking\". De spiegel van STILSPOOR.json: die meet schrijvers wier falen wordt opgegeten, deze meet lezers die het onderscheid verliezen. Nooit optellen.",
  "grens": "Lexicaal, dus een ONDERGRENS: de werkelijke schuld is minstens dit. server/ en scripts/ worden nooit opgeteld -- daar staat een handeling tegenover een meting. `smeltSamen` mag alleen dalen, `bewijslezingen` alleen stijgen: een schuld die daalt doordat de meter blind wordt, is de gevaarlijkste vorm van vooruitgang.",
  "stempel": {
-  "op": "2026-10-01T10:06:11.678Z",
-  "commit": "57a009315",
+  "op": "2026-10-01T11:15:41.326Z",
+  "commit": "22854075d",
   "boomVuil": false,
-  "boomAnders": 2,
+  "boomAnders": 1,
   "instrument": "scripts/stillezing.js",
   "node": "v24.18.0"
  },
@@ -21,10 +21,10 @@
    "anders": 1
   },
   "scripts": {
-   "bewijslezingen": 544,
-   "metVanger": 100,
+   "bewijslezingen": 549,
+   "metVanger": 101,
    "smeltSamen": 61,
-   "zegtHet": 12,
+   "zegtHet": 13,
    "onderscheidt": 6,
    "gooit": 2,
    "anders": 19
@@ -157,7 +157,7 @@
    },
    {
     "bestand": "scripts/bewijsmatrix.js",
-    "regel": 341,
+    "regel": 343,
     "leest": [
      "ROLPROEF.json"
     ],
@@ -165,7 +165,7 @@
    },
    {
     "bestand": "scripts/bewijsmatrix.js",
-    "regel": 355,
+    "regel": 357,
     "leest": [
      "HANDELINGPROEF.json"
     ],
@@ -173,7 +173,7 @@
    },
    {
     "bestand": "scripts/bewijsmatrix.js",
-    "regel": 428,
+    "regel": 430,
     "leest": [
      "POORTWACHT.json"
     ],
@@ -713,9 +713,17 @@
    },
    {
     "bestand": "scripts/outputband.js",
-    "regel": 158,
+    "regel": 147,
     "leest": [
      "INHOUDSKAART.json"
+    ],
+    "soort": "zegtHet"
+   },
+   {
+    "bestand": "scripts/outputcollect.js",
+    "regel": 117,
+    "leest": [
+     "routejournaal"
     ],
     "soort": "zegtHet"
    },
@@ -737,7 +745,7 @@
    },
    {
     "bestand": "scripts/outputproef.js",
-    "regel": 263,
+    "regel": 264,
     "leest": [
      "OUTPUTPROEF.json"
     ],
@@ -745,7 +753,7 @@
    },
    {
     "bestand": "scripts/outputproef.js",
-    "regel": 276,
+    "regel": 277,
     "leest": [
      "OUTPUTPROEF.json"
     ],

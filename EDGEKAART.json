@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-01T10:06:10.265Z",
-    "commit": "57a009315",
+    "op": "2026-10-01T11:15:47.930Z",
+    "commit": "22854075d",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 2,
     "instrument": "scripts/edgekaart.js",
     "node": "v24.18.0"
   },
@@ -2949,7 +2949,9 @@
         "globals": [
           "RTGEdgeSmartMenu"
         ],
-        "zendt": [],
+        "zendt": [
+          "input"
+        ],
         "luistert": [],
         "attributen": [],
         "opslag": [],

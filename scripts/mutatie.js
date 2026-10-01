@@ -452,7 +452,7 @@ function herstelBron(voor, paden, wortel = WORTEL) {
   }
 }
 
-function draaiToets(bestand, env, wacht, forceer) {
+function draaiToets(bestand, env, wacht, forceer, logPrefix) {
   /* DE REPORTER STAAT VASTGEPIND OP TAP, want deze functie leest de uitslag
      met /^# tests/ en /^not ok/. Tot Node 22 was TAP de standaard zonder TTY;
      op Node 24 is dat de spec-reporter geworden en las de motor ineens NIETS
@@ -480,6 +480,10 @@ function draaiToets(bestand, env, wacht, forceer) {
     env: childEnv
   });
   const uit = String(r.stdout || '');
+  if (logPrefix) {
+    fs.writeFileSync(logPrefix + '.tap', uit);
+    fs.writeFileSync(logPrefix + '.stderr', String(r.stderr || ''));
+  }
   const gezakt = (uit.match(/^not ok /gm) || []).length;
   const geteld = /^# tests (\d+)/m.exec(uit);
   /* OOK DE OVERGESLAGEN TOETSEN TELLEN, en dat is geen bijzaak. Een bestand dat
@@ -1653,10 +1657,106 @@ function proefServer(naam) {
     : { soort: 'server', staat: 'overleefd', operator: 'liegpoort /api/' };
 }
 
+/* GERICHTE BRONMUTATIES gebruiken dezelfde draaier, herstelwacht en schrijver.
+   De declaratie bevat alleen exacte bytes, hashes en de verwachte foutmelding;
+   geen meegeleverd commando of gefingeerde uitslag. Een nieuwe kandidaat moet
+   opnieuw worden gemeten. Voorbeeld: --gericht=/absolute/cases.json. */
+const sha256 = bytes => require('crypto').createHash('sha256').update(bytes).digest('hex');
+function gerichteBron(proef, wortel = WORTEL) {
+  wortel = fs.realpathSync(wortel);
+  if (!proef || typeof proef !== 'object' ||
+      !/^test\/[a-zA-Z0-9_.-]+\.(?:test|e2e)\.js$/.test(proef.test || '') ||
+      !/^(?:server|scripts|public)\/[a-zA-Z0-9_./-]+\.(?:js|html|css)$/.test(proef.module || '') ||
+      proef.module.split('/').includes('..')) throw Error('Ongeldig gericht bron- of toetspad.');
+  for (const [pad, verwacht] of [[proef.test, proef.testSha256], [proef.module, proef.sourceSha256]]) {
+    const absoluut = path.join(wortel, pad);
+    if (fs.realpathSync(absoluut) !== absoluut || !/^[a-f0-9]{64}$/.test(verwacht || '') ||
+        sha256(fs.readFileSync(absoluut)) !== verwacht) throw Error('Gerichte bronbinding klopt niet: ' + pad);
+  }
+  const bron = fs.readFileSync(path.join(wortel, proef.module), 'utf8');
+  if (typeof proef.find !== 'string' || !proef.find || typeof proef.replace !== 'string' ||
+      proef.find === proef.replace || bron.split(proef.find).length !== 2 ||
+      typeof proef.expectedFailure !== 'string' || !proef.expectedFailure.trim() ||
+      typeof proef.rationale !== 'string' || !proef.rationale.trim())
+    throw Error('Een gerichte mutant vereist één exacte vervanging, foutclaim en reden.');
+  return { bron, mutant: bron.replace(proef.find, () => proef.replace) };
+}
+function laadGericht(bestand) {
+  if (['.env', 'local.env', 'server/.env', 'deploy/live.env'].some(p => fs.existsSync(path.join(WORTEL, p))) ||
+      ['DATABASE_URL', 'PG_URL', 'REDIS_URL', 'RTG_DATA_DIR', 'RTG_LIEG', 'RTG_METEN_OP_VUILE_BOOM'].some(k => process.env[k]))
+    throw Error('Gerichte mutaties vereisen een geïsoleerde checkout zonder externe doelen.');
+  const schoon = require('./lib/stempel').eisSchoneBoom('gerichte mutatiemeting');
+  if (!schoon.ok) throw Error(schoon.reden);
+  const spec = JSON.parse(fs.readFileSync(bestand, 'utf8'));
+  const git = args => require('child_process').execFileSync('git', args, { cwd: WORTEL, encoding: 'utf8' }).trim();
+  if (spec.schema !== 'RTG_DIRECTED_MUTATIONS/v1' || !/^[a-f0-9]{40}$/.test(spec.commit || '') ||
+      spec.commit !== git(['rev-parse', 'HEAD']) || !Array.isArray(spec.cases) || !spec.cases.length)
+    throw Error('Gerichte mutaties vereisen de exacte huidige kandidaat en een niet-lege casuslijst.');
+  const seen = new Set();
+  for (const proef of spec.cases) {
+    gerichteBron(proef);
+    if (seen.has(proef.test)) throw Error('Dubbele gerichte toets: ' + proef.test);
+    seen.add(proef.test);
+  }
+  if (typeof spec.evidenceDirectory !== 'string' || !path.isAbsolute(spec.evidenceDirectory))
+    throw Error('Een absolute bewijsmap buiten de checkout is vereist.');
+  fs.mkdirSync(spec.evidenceDirectory, { recursive: true });
+  const bewijs = fs.realpathSync(spec.evidenceDirectory);
+  if (bewijs === WORTEL || bewijs.startsWith(WORTEL + path.sep)) throw Error('Bewijsmap moet buiten de checkout staan.');
+  const binding = { commit: spec.commit, tree: git(['rev-parse', 'HEAD^{tree}']), node: process.version,
+    runtimeSha256: sha256(fs.readFileSync(process.execPath)), instrumentSha256: sha256(fs.readFileSync(__filename)),
+    declarationSha256: sha256(fs.readFileSync(bestand)) };
+  return { ...spec, evidenceDirectory: bewijs, binding };
+}
+function gerichteAssertie(tap, verwacht) {
+  return String(tap).split(/(?=^not ok |^ok |^# tests |^1\.\.)/m)
+    .some(blok => blok.startsWith('not ok ') && /code: ['\"]ERR_ASSERTION['\"]/.test(blok) && blok.includes(verwacht));
+}
+function proefGericht(proef, spec) {
+  const { bron, mutant } = gerichteBron(proef), absoluut = path.join(WORTEL, proef.module);
+  const prefix = path.join(spec.evidenceDirectory, path.basename(proef.test));
+  const complete = r => !r.tijdout && !r.error && !r.signal && r.toetsen > 0 && r.overgeslagen === 0;
+  const groen = r => complete(r) && r.status === 0 && r.gezakt === 0;
+  const voorBaseline = bronStand(null);
+  const nul = draaiToets(path.join(WORTEL, proef.test), null, WACHT_NUL, false, prefix + '.baseline');
+  const baselineSchade = bijwerkingVan(voorBaseline, bronStand(null));
+  if (baselineSchade.length) { herstelBron(voorBaseline, baselineSchade); throw Error('Baseline wijzigt bron: ' + baselineSchade.join(', ')); }
+  const evidence = { ...spec.binding, test: proef.test, module: proef.module,
+    testSha256: proef.testSha256, sourceSha256: proef.sourceSha256,
+    mutantSha256: sha256(mutant), rationale: proef.rationale, find: proef.find, replace: proef.replace,
+    expectedFailure: proef.expectedFailure, baseline: nul, op: new Date().toISOString() };
+  let staat = 'al rood', mutantRun, herstel;
+  if (groen(nul)) {
+    const voor = bronStand(absoluut);
+    mutantRun = metMutatie(absoluut, mutant, () => draaiToets(path.join(WORTEL, proef.test), null,
+      WACHT_MUTATIE, false, prefix + '.mutant'));
+    const schade = bijwerkingVan(voor, bronStand(absoluut));
+    if (schade.length) { herstelBron(voor, schade); staat = 'bijwerking'; evidence.bijwerking = schade; }
+    else if (fs.readFileSync(absoluut, 'utf8') !== bron) throw Error('Mutatiebron niet hersteld: ' + proef.module);
+    else {
+      herstel = draaiToets(path.join(WORTEL, proef.test), null, WACHT_NUL, false, prefix + '.restored');
+      const herstelSchade = bijwerkingVan(voorBaseline, bronStand(null));
+      if (herstelSchade.length) { herstelBron(voorBaseline, herstelSchade); throw Error('Herproef wijzigt bron: ' + herstelSchade.join(', ')); }
+      const assertie = gerichteAssertie(fs.readFileSync(prefix + '.mutant.tap', 'utf8'), proef.expectedFailure);
+      staat = complete(mutantRun) && mutantRun.status === 1 && mutantRun.gezakt > 0 && assertie && groen(herstel)
+        ? 'gezakt' : groen(mutantRun) && groen(herstel) ? 'overleefd' : 'onvolledig gericht bewijs';
+    }
+  }
+  evidence.mutant = mutantRun || null; evidence.restored = herstel || null; evidence.staat = staat;
+  const bewijsbestand = prefix + '.evidence.json';
+  fs.writeFileSync(bewijsbestand, JSON.stringify(evidence, null, 2) + '\n');
+  return { soort: 'gericht', staat, module: proef.module, operator: 'expliciete bronmutatie',
+    gezakt: mutantRun ? mutantRun.gezakt : 0, geprobeerd: mutantRun ? 1 : 0,
+    bewijs: { bestand: bewijsbestand, sha256: sha256(fs.readFileSync(bewijsbestand)), commit: spec.commit,
+      sourceSha256: proef.sourceSha256, testSha256: proef.testSha256 } };
+}
+
 if (require.main === module) {
   const args = process.argv.slice(2);
   const losse = args.filter(a => !a.startsWith('--'));
   const alleen = args.includes('--puur') ? 'puur' : args.includes('--server') ? 'server' : null;
+  const gerichtArg = args.find(a => a.startsWith('--gericht='));
+  const gericht = gerichtArg ? laadGericht(gerichtArg.slice(10)) : null;
 
   /* HET AFBOUWSLOT, EN WAAROM HET HIER ONTBRAK.
 
@@ -1694,6 +1794,7 @@ if (require.main === module) {
 
   let namen = fs.readdirSync(TEST).filter(n => n.endsWith('.test.js')).sort();
   if (losse.length) namen = losse.map(a => path.basename(a));
+  if (gericht) namen = gericht.cases.map(p => path.basename(p.test));
 
   const puur = namen.filter(n => !isServerToets(n));
   const server = namen.filter(n => isServerToets(n));
@@ -1706,8 +1807,8 @@ if (require.main === module) {
   /* Een gerichte herproef mag geen half afgemaakte VOLLEDIGE ronde uit de
      voortgangscache mee vastleggen. Bij losse bestanden is MUTATIES.json daarom
      de basis; de uitkomst van die losse proef ververst daarna de cache vanzelf. */
-  const uitslag = Object.assign(laad(UITSLAG), losse.length ? {} : laad(VOORTGANG));
-  const opnieuw = args.includes('--opnieuw');
+  const uitslag = Object.assign(laad(UITSLAG), losse.length || gericht ? {} : laad(VOORTGANG));
+  const opnieuw = !!gericht || args.includes('--opnieuw');
   /* Na ELK bestand wegschrijven, en overslaan wat er al in staat. Het serverdeel
      duurt uren; een motor die alleen aan het eind wegschrijft verliest bij een
      ctrl-C alles, en dan draait niemand hem ooit af. */
@@ -1758,6 +1859,12 @@ if (require.main === module) {
         r.staat + (r.operator ? '  [' + r.operator + (r.module ? ' in ' + r.module : '') + ']' : ''));
     }
   };
+
+  if (gericht) {
+    doe(namen, n => proefGericht(gericht.cases.find(p => path.basename(p.test) === n), gericht));
+    vastleggen();
+    process.exit(namen.every(n => uitslag[n].staat === 'gezakt') ? 0 : 1);
+  }
 
   if (alleen !== 'server') {
     console.log('  --- A: pure toetsen, bronmutatie (eerste plek per operator) ---');
@@ -1840,7 +1947,7 @@ if (require.main === module) {
   console.log('\n  Uitslag in MUTATIES.json; npm run bewijs zet hem in BEWIJS.md.\n');
 }
 
-module.exports = { OPERATOREN, muteer, codemasker, modulesVan, UITSLAG, VOORTGANG, NIET_MUTEREN,
+module.exports = { gerichteAssertie, gerichteBron, laadGericht, proefGericht, OPERATOREN, muteer, codemasker, modulesVan, UITSLAG, VOORTGANG, NIET_MUTEREN,
   DUN_ONDER, dekkingVan, overleverTelling,
   SPOOR, ruimEerderOp, schrijfSpoor, metMutatie, DEUREN,
   /* draaiToets naar buiten, zodat scripts/outputproef.js hem kan gebruiken in

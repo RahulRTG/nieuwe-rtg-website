@@ -38,7 +38,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const { spawn } = require('child_process');
+const { runWorker } = require('./lib/outputworker');
 const op = require('./outputproef');
 const B = require('./lib/outputbinding');
 
@@ -129,20 +129,8 @@ function schrijf(gericht, basislijn) {
    dus trager dan de kale --meet-lus. Met spawn (async) lopen de drie kinderen
    echt naast elkaar en telt de machine zijn kernen mee. */
 function eenRegel(args) {
-  return new Promise((resolve) => {
-    const kind = spawn(process.execPath, [__filename].concat(args, ['--lees=' + journal, '--bewijs-dir=' + evidenceDir]),
-      { cwd: WORTEL });
-    let uit = '';
-    const dood = setTimeout(() => { try { kind.kill('SIGKILL'); } catch (e) {} }, 300000);
-    kind.stdout.on('data', (d) => { uit += d; });
-    kind.on('close', () => {
-      clearTimeout(dood);
-      const regel = uit.trim().split('\n').filter(Boolean).pop();
-      if (!regel) return resolve(null);
-      try { resolve(JSON.parse(regel)); } catch (e) { resolve(null); }
-    });
-    kind.on('error', () => { clearTimeout(dood); resolve(null); });
-  });
+  return runWorker([__filename].concat(args, ['--lees=' + journal, '--bewijs-dir=' + evidenceDir]),
+    { cwd: WORTEL });
 }
 
 (async () => {

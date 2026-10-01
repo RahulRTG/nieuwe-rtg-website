@@ -31,4 +31,25 @@ function green(run) { return complete(run) && run.status === 0 && run.gezakt ===
 function currentBaseline(entry, id) {
   return !!entry && entry.binding === id && entry.staat === 'groen' && green(entry.execution);
 }
-module.exports = { binding, digest, complete, green, currentBaseline };
+function outputCell(row, register, route) {
+  if (!row) return { staat: 'ongemeten' };
+  const direct = register?.gericht?.[route], candidate = register?.binding;
+  const evidenceCommit = direct?.evidenceCommit || row.evidenceCommit || register?.stempel?.commit || null;
+  const evidenceBinding = direct?.binding || row.evidenceBinding || null;
+  const cell = { staat: 'ongemeten', bron: 'outputproef', reden: row.reden,
+    evidenceCommit, evidenceBinding, provenance: 'HISTORICAL_UNREVALIDATED' };
+  if (row.staat !== 'bewezen') return cell;
+  const { id, ...identity } = candidate || {};
+  const mutation = direct?.evidence?.mutation;
+  const valid = candidate && /^[a-f0-9]{40}$/.test(candidate.commit || '') &&
+    id === digest(JSON.stringify(identity)) && evidenceCommit === candidate.commit &&
+    evidenceBinding === id && row.evidenceCommit === evidenceCommit && row.evidenceBinding === id &&
+    direct?.provenance === 'CURRENT_CANDIDATE' && direct.merkt === true &&
+    complete(mutation) && mutation.status === 1 && mutation.gezakt > 0 &&
+    direct.evidence.changedResponses > 0 && /^[a-f0-9]{64}$/.test(direct.evidence.hitDigest || '') &&
+    (green(direct.evidence.control) || currentBaseline(register.basislijn?.[direct.toets], id));
+  if (valid) return { ...cell, staat: 'bewezen', provenance: 'CANDIDATE_BOUND' };
+  return { ...cell, historicalState: row.staat,
+    reden: 'Historische of onbevestigde outputclaim; de nieuwe registerstempel bewijst geen actuele route-uitvoer. ' + (row.reden || '') };
+}
+module.exports = { binding, digest, complete, green, currentBaseline, outputCell };

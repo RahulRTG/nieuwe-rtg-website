@@ -34,10 +34,12 @@ function currentBaseline(entry, id) {
 function outputCell(row, register, route) {
   if (!row) return { staat: 'ongemeten' };
   const direct = register?.gericht?.[route], candidate = register?.binding;
-  const evidenceCommit = direct?.evidenceCommit || row.evidenceCommit || register?.stempel?.commit || null;
+  const evidenceCommit = direct?.evidenceCommit || row.evidenceCommit || null;
   const evidenceBinding = direct?.binding || row.evidenceBinding || null;
   const cell = { staat: 'ongemeten', bron: 'outputproef', reden: row.reden,
-    evidenceCommit, evidenceBinding, provenance: 'HISTORICAL_UNREVALIDATED' };
+    evidenceCommit, evidenceBinding,
+    evidenceRegisterCommit: direct?.registerCommit || row.evidenceRegisterCommit || register?.stempel?.commit || null,
+    provenance: 'HISTORICAL_UNREVALIDATED' };
   if (row.staat !== 'bewezen') return cell;
   const { id, ...identity } = candidate || {};
   const mutation = direct?.evidence?.mutation;

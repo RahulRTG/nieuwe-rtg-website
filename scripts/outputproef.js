@@ -227,8 +227,9 @@ function oordeel(perRoute, perToets, gevoelig, blind, gemeten) {
           : { staat: 'blind', bron: 'outputproef (gericht)', toetsen: [direct.toets],
               reden: 'er is over DEZE route gelogen en ' + direct.toets + ' bleef groen; ' +
                 'geen enkele toets kijkt naar deze inhoud' };
-      if (direct.evidenceCommit || direct.binding) Object.assign(perRouteUit[route], {
+      if (direct.evidenceCommit || direct.binding || direct.provenance || direct.registerCommit) Object.assign(perRouteUit[route], {
         evidenceCommit: direct.evidenceCommit || null, evidenceBinding: direct.binding || null,
+        evidenceRegisterCommit: direct.registerCommit || null,
         provenance: direct.provenance || 'HISTORICAL_UNREVALIDATED' });
       telling[perRouteUit[route].staat]++;
       continue;

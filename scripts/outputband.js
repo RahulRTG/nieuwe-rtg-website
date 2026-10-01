@@ -137,7 +137,8 @@ function eenRegel(args) {
   prepare();
   const reg = leesRegister();
   const gericht = Object.fromEntries(Object.entries(reg.gericht || {}).map(([route, value]) => [route, {
-    ...value, evidenceCommit: value.evidenceCommit || reg.stempel?.commit || null,
+    ...value, evidenceCommit: value.evidenceCommit || null,
+    registerCommit: value.registerCommit || reg.stempel?.commit || null,
     provenance: value.binding === runBinding.id ? 'CURRENT_CANDIDATE' : 'HISTORICAL_UNREVALIDATED' }]));
   let kandidaten;
   if (blindStand) {

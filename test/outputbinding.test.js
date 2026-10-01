@@ -43,6 +43,9 @@ test('a fresh register stamp cannot renew historical route proof or a forged PAS
   assert.equal(cell.staat, 'ongemeten');
   assert.equal(cell.historicalState, 'bewezen');
   assert.equal(cell.evidenceCommit, 'a'.repeat(40));
+  const legacy = B.outputCell({ staat: 'bewezen' }, { stempel: { commit: 'regenerated-later' } }, route);
+  assert.equal(legacy.evidenceCommit, null, 'a regeneration commit is not the historical execution commit');
+  assert.equal(legacy.evidenceRegisterCommit, 'regenerated-later');
   for (const change of [x => { delete x.direct.evidence; }, x => { x.direct.evidence.changedResponses = 0; },
     x => { x.direct.evidence.control = { ...pass, overgeslagen: 1 }; },
     x => { x.direct.binding = 'wrong'; }, x => { x.row.evidenceCommit = 'd'.repeat(40); },

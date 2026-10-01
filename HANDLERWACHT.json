@@ -1,17 +1,17 @@
 {
  "stempel": {
-  "op": "2026-09-30T20:13:02.559Z",
-  "commit": "ec186c7b2",
-  "boomVuil": false,
-  "boomAnders": 6,
+  "op": "2026-10-01T10:52:35.879Z",
+  "commit": "155820a40",
+  "boomVuil": true,
+  "boomAnders": 14,
   "instrument": "scripts/handlerwacht.js",
-  "node": "v26.10.0"
+  "node": "v24.18.0"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
-  "zonderBewakerslaag": 648,
-  "bewaakt": 556,
-  "openbaarMetReden": 53,
+  "zonderBewakerslaag": 654,
+  "bewaakt": 558,
+  "openbaarMetReden": 57,
   "eigenControle": 19,
   "sleutelDoorgegeven": 12,
   "zonderWachtMetReden": 8,
@@ -108,16 +108,16 @@
    "aantal": 8
   },
   {
+   "naam": "praktijkMutatie -> poort",
+   "aantal": 7
+  },
+  {
    "naam": "sessieVan",
    "aantal": 7
   },
   {
    "naam": "rtf.verifieerProfiel",
    "aantal": 6
-  },
-  {
-   "naam": "praktijkMutatie -> poort",
-   "aantal": 5
   },
   {
    "naam": "sessie",
@@ -737,37 +737,49 @@
   },
   {
    "sleutel": "POST /api/bedrijf/praktijk/aanbod",
-   "bestand": "server/bedrijf/praktijk.js:75",
+   "bestand": "server/bedrijf/praktijk.js:86",
    "staat": "bewaakt",
    "wacht": "praktijkMutatie -> poort"
   },
   {
    "sleutel": "POST /api/bedrijf/praktijk/beeld",
-   "bestand": "server/bedrijf/praktijk.js:61",
+   "bestand": "server/bedrijf/praktijk.js:65",
    "staat": "bewaakt",
    "wacht": "poort"
   },
   {
+   "sleutel": "POST /api/bedrijf/praktijk/betaalverzoek",
+   "bestand": "server/bedrijf/praktijk.js:91",
+   "staat": "bewaakt",
+   "wacht": "praktijkMutatie -> poort"
+  },
+  {
    "sleutel": "POST /api/bedrijf/praktijk/delen",
-   "bestand": "server/bedrijf/praktijk.js:78",
+   "bestand": "server/bedrijf/praktijk.js:89",
    "staat": "bewaakt",
    "wacht": "praktijkMutatie -> poort"
   },
   {
    "sleutel": "POST /api/bedrijf/praktijk/inrichten",
-   "bestand": "server/bedrijf/praktijk.js:74",
+   "bestand": "server/bedrijf/praktijk.js:85",
+   "staat": "bewaakt",
+   "wacht": "praktijkMutatie -> poort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/praktijk/leverancier",
+   "bestand": "server/bedrijf/praktijk.js:90",
    "staat": "bewaakt",
    "wacht": "praktijkMutatie -> poort"
   },
   {
    "sleutel": "POST /api/bedrijf/praktijk/stap",
-   "bestand": "server/bedrijf/praktijk.js:77",
+   "bestand": "server/bedrijf/praktijk.js:88",
    "staat": "bewaakt",
    "wacht": "praktijkMutatie -> poort"
   },
   {
    "sleutel": "POST /api/bedrijf/praktijk/vraag",
-   "bestand": "server/bedrijf/praktijk.js:76",
+   "bestand": "server/bedrijf/praktijk.js:87",
    "staat": "bewaakt",
    "wacht": "praktijkMutatie -> poort"
   },
@@ -4147,6 +4159,30 @@
    "bestand": "server/bedrijf/praktijk-gast.js:16",
    "staat": "openbaar",
    "reden": "Dezelfde beperkte gastlink, met versiecontrole: uitsluitend eenmalig akkoord of afwijzen van het gedeelde voorstel, geen account of andere rechten."
+  },
+  {
+   "sleutel": "POST /api/werk-gast/betaling/start",
+   "bestand": "server/bedrijf/praktijk-betalen-routes.js:9",
+   "staat": "openbaar",
+   "reden": "Actuele klantcapability plus financieel bevoegd vrijgegeven betaalverzoek; serverbedrag en ontvanger duurzaam vast vóór provideroproep, nooit zelf betaald verklaren."
+  },
+  {
+   "sleutel": "POST /api/werk-gast/betaling/status",
+   "bestand": "server/bedrijf/praktijk-betalen-routes.js:24",
+   "staat": "openbaar",
+   "reden": "Actuele klantcapability toont uitsluitend de centrale providerwaarheid van de eigen opdracht; geen betalingId uit de client."
+  },
+  {
+   "sleutel": "POST /api/werk-leverancier/beeld",
+   "bestand": "server/bedrijf/praktijk-leverancier-routes.js:10",
+   "staat": "openbaar",
+   "reden": "Tijdelijk hash-only capabilitygeheim voor één leveranciersopdracht; huidige uitgeversrechten en tenant worden iedere keer gecontroleerd."
+  },
+  {
+   "sleutel": "POST /api/werk-leverancier/besluit",
+   "bestand": "server/bedrijf/praktijk-leverancier-routes.js:14",
+   "staat": "openbaar",
+   "reden": "Eenmalig leveranciersantwoord op precies één versie, met actuele capabilitycontrole en duurzame opslag. Geen accounttoegang."
   },
   {
    "sleutel": "POST /api/werkmail/bezorg",

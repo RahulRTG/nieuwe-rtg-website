@@ -1,34 +1,34 @@
 {
  "stempel": {
-  "op": "2026-09-30T20:14:17.353Z",
-  "commit": "ec186c7b2",
-  "boomVuil": false,
+  "op": "2026-10-01T10:52:42.712Z",
+  "commit": "155820a40",
+  "boomVuil": true,
   "boomAnders": 14,
   "instrument": "scripts/mutatieboek.js",
-  "node": "v26.10.0"
+  "node": "v24.18.0"
  },
  "uitleg": "Elke route van de router valt in precies een bak, met de reden waarom hij niet verder komt in de keten. De optelling van de bakken is gelijk aan het totaal; dat is de toets, en niet een van de getallen. Zie de kop van scripts/mutatieboek.js. Dit boek beoordeelt geen enkele route.",
- "vastgelegd": "2026-09-30",
+ "vastgelegd": "2026-10-01",
  "gemeten": {
-  "routesTotaal": 5375,
-  "mutaties": 5276,
-  "mutatiesVerklaard": 695,
+  "routesTotaal": 5381,
+  "mutaties": 5282,
+  "mutatiesVerklaard": 701,
   "mutatiesOnverklaard": 4581,
-  "beproefbaar": 4452,
-  "beproefbaarVerklaard": 590,
+  "beproefbaar": 4456,
+  "beproefbaarVerklaard": 594,
   "bakken": 7,
-  "statusSom": 5276,
+  "statusSom": 5282,
   "statusSluit": true,
   "nogNietGeclassificeerd": 3862,
-  "metBesluitOverDuplicaat": 695,
+  "metBesluitOverDuplicaat": 701,
   "zonderBesluitOverDuplicaat": 4581,
   "metGemetenDuplicaatgedrag": 0,
-  "somVanDeBakken": 5375,
+  "somVanDeBakken": 5381,
   "sluit": true
  },
  "bewijsgraad": {
   "metingGebruikt": false,
-  "metingReden": "de meting is van commit 387b942c5 en HEAD staat op ec186c7b2; een meting van een andere stand is geen grond voor een status",
+  "metingReden": "de meting is van commit 387b942c5 en HEAD staat op 155820a40; een meting van een andere stand is geen grond voor een status",
   "metingGemetenOp": "2026-09-29T18:39:11.935Z",
   "perGraad": [
    {
@@ -51,7 +51,7 @@
    },
    {
     "id": "verklaard",
-    "aantal": 695,
+    "aantal": 701,
     "voorbeelden": [
      "POST /api/office/bank/terugstorting",
      "POST /api/techniek/fouten/wis",
@@ -109,7 +109,7 @@
   {
    "id": "geen-rol-met-token",
    "uitleg": "Er is geen proefsleutel voor de rol achter deze deur. Aanroepen zonder sleutel geeft 401, en dat bewijst niets. De onderverdeling staat in zonderRolPerReden -- daar zitten drie verschillende reparaties in.",
-   "aantal": 784,
+   "aantal": 786,
    "eind": true,
    "voorbeelden": [
     "POST /api/arrival/pass",
@@ -120,7 +120,7 @@
   {
    "id": "beproefbaar-verklaard",
    "uitleg": "Beproefbaar EN er staat een besluit over duplicaatgedrag in server/lib/idemsleutels.js.",
-   "aantal": 590,
+   "aantal": 594,
    "eind": true,
    "voorbeelden": [
     "POST /api/aanmelding/bewijs/herkeuring",
@@ -144,7 +144,7 @@
   {
    "id": "BESCHERMD",
    "uitleg": "Er staat verklaard hoe een herhaling wordt herkend. De idemproef kan hierop meten.",
-   "aantal": 310,
+   "aantal": 315,
    "moetNaarNul": false,
    "semantiek": true,
    "voorbeelden": [
@@ -168,7 +168,7 @@
   {
    "id": "NIET_VAN_TOEPASSING",
    "uitleg": "Een POST die niets verandert. Er valt niets te dedupliceren.",
-   "aantal": 233,
+   "aantal": 234,
    "moetNaarNul": false,
    "semantiek": true,
    "voorbeelden": [
@@ -217,7 +217,7 @@
  "zonderRolPerReden": [
   {
    "reden": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)",
-   "aantal": 572,
+   "aantal": 574,
    "voorbeelden": [
     "POST /api/auth/tweede",
     "POST /api/bedrijf/apparaat/innemen",
@@ -308,10 +308,10 @@
    "bron": "IDEMSCHULD.json",
    "veld": "schrijfroutes",
    "vastgelegd": 5247,
-   "nu": 5276,
+   "nu": 5282,
    "vastgelegdOp": "2026-09-29",
    "zelfdeVraag": "API-paden die niet GET zijn",
-   "verschil": 29,
+   "verschil": 35,
    "gelijk": false,
    "duiding": "de vastlegging is van 2026-09-29; sindsdien zijn er routes bijgekomen"
   },
@@ -320,9 +320,9 @@
    "veld": "routesGevonden",
    "vastgelegd": 5148,
    "vastgelegdOp": "2026-09-29",
-   "nu": 5236,
+   "nu": 5242,
    "zelfdeVraag": "mutaties zonder schakelpad en zonder :parameter",
-   "verschil": 88,
+   "verschil": 94,
    "gelijk": false,
    "duiding": "de vastlegging is van 2026-09-29; sindsdien zijn er routes bijgekomen"
   },
@@ -330,10 +330,10 @@
    "bron": "IDEMPROEF.json",
    "veld": "routesMetRol",
    "vastgelegd": 4376,
-   "nu": 4452,
+   "nu": 4456,
    "vastgelegdOp": "2026-09-29",
    "zelfdeVraag": "daarvan: de routes waarvoor een proefsleutel bestaat",
-   "verschil": 76,
+   "verschil": 80,
    "gelijk": false,
    "duiding": "de vastlegging is van 2026-09-29; sindsdien zijn er routes bijgekomen"
   }

@@ -102,6 +102,18 @@ module.exports = function maakBetaalWaarheid({ d, save, crypto, betaal, nu, log 
     return publiek(r);
   }
 
+  // Een aanroeper kan dit binnen zijn duurzame requestcommit vastleggen vóór
+  // netwerkverkeer. Herstel mag daarna dezelfde expliciet bevestigde opdracht
+  // hervatten, ook als het proces vóór het providerantwoord stopt.
+  function bereidVoor(id, opties = {}) {
+    const r = doos()[id];
+    if (!r) throw new Error('Betaling niet gevonden.');
+    if (r.providerId || r.start) return;
+    r.start = require('./hervat').startVan(opties);
+    gebeurtenis(r, 'PROVIDER_START', { bron: r.start.aanbieder || 'automatisch', hervat: false });
+    save();
+  }
+
   async function begin(id, opties) {
     const r = doos()[id];
     if (!r) throw new Error('Betaling niet gevonden.');
@@ -181,7 +193,7 @@ module.exports = function maakBetaalWaarheid({ d, save, crypto, betaal, nu, log 
     return Object.assign(a, { hervat: h });
   }
 
-  return { STATUS, maak, begin, publiek, van, vanActor, providerMelding,
+  return { STATUS, maak, bereidVoor, begin, publiek, van, vanActor, providerMelding,
     terugbetalen: terug.terugbetalen, providerTerugbetaling: terug.providerTerugbetaling,
     registreerAfhandeling, ronde, openstaand: veeg.openstaand, definitiefBetaald };
 };

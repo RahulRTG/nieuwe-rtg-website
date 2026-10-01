@@ -2,7 +2,7 @@
   'use strict';
   const e=window.RTGWerk.esc;
   window.RTGPraktijkExtern={formulier:x=>{
-    const taken=x.taken.filter(t=>t.externeAfspraak);
+    const taken=x.taken.filter(t=>t.externeAfspraak && t.externeAfspraak.herkomst !== 'rtg-aanvraag');
     return '<details><summary>Externe afspraken en onderdelen · '+taken.length+'</summary><p>Noteer wat u zelf buiten RTG heeft geregeld, zoals een levering, verhuur, vervoer of ingehuurde specialist.</p>'+taken.map(t=>'<p><b>'+e(t.titel)+'</b> · '+e(t.wie)+' · '+e(t.externeAfspraak.stand)+'<br>'+e(t.externeAfspraak.bron)+'</p>').join('')+
       '<form data-pr="stap" data-project="'+e(x.id)+'" data-stap="extern">'+
       '<label>Onderdeel kiezen<select aria-label="Onderdeel kiezen" name="taakId"><option value="">Nieuw onderdeel</option>'+taken.map(t=>'<option value="'+e(t.id)+'">'+e(t.titel)+'</option>').join('')+'</select></label>'+

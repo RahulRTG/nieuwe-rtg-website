@@ -6,7 +6,7 @@
 (function () {
   'use strict';
   var K = window.RTGWerk;
-  if (location.hash.startsWith('#gast=')) return;
+  if (/^#(?:(gast|leverancier)=|betaling-terug$)/.test(location.hash)) return;
   function $(id) { return document.getElementById(id); }
 
   function toon(welke) {

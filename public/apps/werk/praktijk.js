@@ -1,7 +1,7 @@
 (function () {
   'use strict';
   const K = window.RTGWerk, UI = window.RTGPraktijkUI;
-  if (location.hash.startsWith('#gast=')) return;
+  if (/^#(?:(gast|leverancier)=|betaling-terug$)/.test(location.hash)) return;
   const paneel = document.createElement('section'); paneel.className = 'praktijk'; paneel.id = 'praktijk';
   paneel.setAttribute('aria-label','Dagelijks werk');
   document.querySelector('#vStart').prepend(paneel);
@@ -39,14 +39,24 @@
     const b = Object.fromEntries(new FormData(f)), soort = f.dataset.pr;
     if ('bedrag' in b) { b.bedragMinor = Math.round(Number(b.bedrag)*10**(stand.profiel?.decimalen ?? 2)); delete b.bedrag; }
     if (soort === 'inrichten') { b.versie = stand.profiel?.versie || 0; b.land = b.land.toUpperCase(); b.valuta = b.valuta.toUpperCase(); }
+    if (['leverancier','betaalverzoek'].includes(soort)) { b.projectId = f.dataset.project; b.versie = stand.werk.find(x => x.id === b.projectId).versie; }
     if (soort === 'stap') { b.projectId = f.dataset.project; b.stap = f.dataset.stap; b.versie = stand.werk.find(x => x.id === b.projectId).versie; }
+    if (soort === 'betaalverzoek') b.aan = b.aan === 'true';
     const afdruk = JSON.stringify(b);
     if (f._afdruk !== afdruk) { f._idem = crypto.randomUUID(); f._afdruk = afdruk; }
     b.idem = f._idem;
     bezig = true; const knop = f.querySelector('button[type=submit]'); knop.disabled = true;
     let uit = f.querySelector('[role=status]'); if (!uit) { uit = document.createElement('p'); uit.setAttribute('role','status'); f.append(uit); }
     uit.textContent = 'Bewaren…';
-    try { await api(soort,b); concepten.delete(formulierSleutel(f)); bezig = false; await laad(); K.meld('Bewaard.'); }
+    try {
+      const r = await api(soort,b); concepten.delete(formulierSleutel(f)); bezig = false; await laad(); K.meld('Bewaard.');
+      if (r.link) {
+        const ontvangst=document.createElement('div'); ontvangst.setAttribute('role','status');
+        const a=document.createElement('a');a.className='pr-link';a.href=r.link;a.textContent=new URL(r.link,location.origin).href;
+        ontvangst.append(document.createTextNode(r.let+' Geldig tot '+new Date(r.verloopt).toLocaleString(document.documentElement.lang||navigator.language)+'. '),a);
+        paneel.prepend(ontvangst);ontvangst.scrollIntoView({block:'center'});
+      }
+    }
     catch (err) { uit.textContent = err.message; }
     finally { bezig = false; knop.disabled = false; }
   });

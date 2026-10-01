@@ -46,12 +46,18 @@ function aggregate(ctx, plan, shardsRoot, output) {
   if (S.hash(fs.readFileSync(path.join(ctx.candidate, 'OUTPUTPROEF.json'))) !== plan.historicalRegisterSha256)
     throw Error('Historical baseline changed.');
   const perRoute = {}, gericht = {}, totals = { bewezen: 0, blind: 0, ongemeten: 0, onbeslist: 0 };
-  for (const row of plan.excluded) perRoute[row.route] = { staat: 'ongemeten', reden: row.reason, toetsen: row.tests };
-  for (const route of plan.historicalUnseen) perRoute[route] = { staat: 'ongemeten',
-    reden: 'Not reached by the complete current journal; retained as a gap, not silently removed.',
-    historicalState: previous.perRoute[route]?.staat };
+  // Failure or changed attribution cannot repay the existing route-level debt.
+  // Preserve its state for bewijsschuld's real consumer; expose other gaps separately.
+  const gap = (route, details) => ({
+    staat: previous.perRoute[route]?.staat === 'onbeslist' ? 'onbeslist' : 'ongemeten',
+    historicalState: previous.perRoute[route]?.staat || null, ...details });
+  for (const row of plan.excluded) perRoute[row.route] = gap(row.route,
+    { measurementState: 'EXCLUDED', reden: row.reason, toetsen: row.tests });
+  for (const route of plan.historicalUnseen) perRoute[route] = gap(route,
+    { measurementState: 'NOT_REACHED', reden: 'Not reached by the complete current journal; no debt repaid.' });
   for (const result of results) {
-    const row = { staat: result.staat === 'merkt' ? 'bewezen' : result.staat === 'blind' ? 'blind' : 'ongemeten',
+    const row = { ...(result.staat === 'stoornis' ? gap(result.route, { measurementState: 'INTERRUPTED' }) :
+      { staat: result.staat === 'merkt' ? 'bewezen' : 'blind' }),
       bron: 'outputproef (gericht)', toetsen: [result.toets], evidenceCommit: plan.candidate.commit,
       evidenceBinding: plan.binding.id, reden: result.reden || 'Current candidate; preserved mutation/control TAP and changed-response journal.' };
     if (result.staat !== 'stoornis') gericht[result.route] = result;
@@ -76,6 +82,7 @@ function aggregate(ctx, plan, shardsRoot, output) {
     measured: results.length, merkt: totals.bewezen, blind: totals.blind,
     stoornis: results.filter(r => r.staat === 'stoornis').length, excluded: plan.excluded.length,
     historicalUnseen: plan.historicalUnseen.length, automaticRepositoryChanges: false,
+    unresolved: { retainedDebt: totals.onbeslist, otherUnmeasured: totals.ongemeten },
     releaseReadiness: 'NOT_EVALUATED', debtDecision: 'NOT_AUTOMATIC' };
   S.write(path.join(output, 'STATUS.json'), status);
   S.write(path.join(output, 'BUNDLE.json'), S.seal({ plan, shards: shardEvidence, status,

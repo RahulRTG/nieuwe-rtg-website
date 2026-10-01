@@ -2,8 +2,8 @@
 // Alleen een verwijzing naar de centrale betaalwaarheid. De ontvanger wordt
 // door de installatiebeheerder aan een werkruimte gebonden, nooit door de gast.
 const V = require('./praktijk-vorm');
-const RECHTEN = ['werkruimte', 'project', 'klant', 'geld', 'geld.goedkeuren'];
-module.exports = ({ kern = {}, db, save, log, rechtenVan }, env = process.env) => {
+const RECHTEN = require('./praktijk-geldrechten');
+module.exports = ({ kern = {}, W, save, log, rechtenVan }, env = process.env) => {
   const bw = kern.betaalWaarheid, betaal = kern.betaal;
   function ontvanger(w, x) {
     if (!bw || !betaal || env.RTG_BETALEN_UIT === '1') return null;
@@ -86,7 +86,7 @@ module.exports = ({ kern = {}, db, save, log, rechtenVan }, env = process.env) =
     save(); return { ok:true, id:r.id };
   }
   if (bw) bw.registreerAfhandeling('werk-opdracht', r => {
-    const w = V.pak(db.data.werkruimtes,r.context?.werkruimte), p = w && V.project(w,r.bronRef), x = w && V.details(w,p);
+    const w = V.pak(W(),r.context?.werkruimte), p = w && V.project(w,r.bronRef), x = w && V.details(w,p);
     if (!p || x.betalingRef !== r.id || x.bedragMinor !== r.centen || x.valuta.toLowerCase() !== r.valuta)
       throw new Error('De betaalopdracht vraagt afstemming met de werkruimte.');
     // Geen gekopieerde betaald-vlag, geen automatische uitvoering of leveranciersboeking.

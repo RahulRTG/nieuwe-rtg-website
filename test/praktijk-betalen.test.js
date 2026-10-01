@@ -14,7 +14,7 @@ function setup() {
     async haalBetaling(){return {id:'cs_fixture',aanbieder:'stripe',status:providerStatus,bedrag:x.bedragMinor,valuta:x.valuta};}};
   const env={RTG_WERK_BETAALONTVANGERS:JSON.stringify({WTEST:{soort:'platform',naam:'RTG Testrekening',aanbieder:'stripe',valutas:['EUR','JPY']}}),
     RTG_WERK_BETAAL_ORIGIN:'https://rtg.example'};
-  const ctx={db,save(){},log(){},rechtenVan:l=>l.rechten,kern:{betaal}};
+  const ctx={db,W:()=>data.werkruimtes,save(){},log(){},rechtenVan:l=>l.rechten,kern:{betaal}};
   function bouw(){ctx.kern.betaalWaarheid=maakWaarheid({d:()=>data,save(){},crypto,betaal});return maakBetalen(ctx,env);}
   let api=bouw();
   const aan=()=>api.instellen(g,{projectId:'p',versie:x.versie,aan:true});

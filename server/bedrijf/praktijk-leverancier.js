@@ -4,7 +4,7 @@
 // de opdrachtgever. Een prijswijziging vraagt een nieuwe opdracht.
 const V = require('./praktijk-vorm');
 const { gastWerkruimte } = require('./productie-identiteit');
-const RECHTEN = ['werkruimte', 'project', 'klant', 'geld', 'geld.goedkeuren'];
+const RECHTEN = require('./praktijk-geldrechten');
 module.exports = ({ db, crypto, rid, nu, log, rechtenVan }) => {
   const hash = s => crypto.createHash('sha256').update(s).digest('hex');
   const open = x => ['bevestigd', 'ingepland'].includes(x.stand);

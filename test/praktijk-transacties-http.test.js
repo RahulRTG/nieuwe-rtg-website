@@ -34,7 +34,7 @@ test('echte werk-, leveranciers- en betaalroutes: scope, duurzame herhaling, ann
     assert.equal((await api('/api/werk-gast/besluit',{sleutel,versie:await versie(),keuze:'akkoord'})).status,200);
     const aanvraag={projectId:p,versie:await versie(),actie:'aanvragen',leverancier:'Lokale leverancier',onderdeel:'Transfer',
       datum:'2026-12-01',locatie:'Afgesproken adres',bedragMinor:2000,voorwaarden:'Twee personen, geen extra kosten',idem:crypto.randomUUID()};
-    const a=await doe('leverancier',aanvraag);assert.equal(a.status,200,JSON.stringify(a));
+    const a=await api('/api/bedrijf/praktijk/leverancier',{...context,...aanvraag});assert.equal(a.status,200,JSON.stringify(a));
     assert.equal((await doe('leverancier',aanvraag)).status,409,'geen geheim uit herhaalcache');
     const ls=a.body.link.split('#leverancier=')[1];
     assert.equal((await api('/api/werk-gast/beeld',{sleutel:ls})).status,404,'leverancier is geen klant');

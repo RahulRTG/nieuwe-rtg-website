@@ -2,6 +2,7 @@
 // Read-only GitHub evidence collection. Never runs tests, commits, pushes or deploys.
 const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto');
 const { execFileSync } = require('node:child_process');
+const { verifyUpload } = require('./lib/outputartifact');
 const source = path.resolve(process.argv[2] || '');
 const repo = process.env.GITHUB_REPOSITORY;
 const sha = process.argv[3], runId = process.argv[4];
@@ -27,11 +28,14 @@ function pages(endpoint, key) {
 }
 const required = [
   ...[1, 2, 3, 4].map(n => ({ artifact: 'routejournaal-scherf-' + n,
-    job: 'Toetsscherf ' + n + ' van 4', step: 'Deze scherf, met dekking als lcov', member: 'routejournaal.log', nonempty: true })),
+    job: 'Toetsscherf ' + n + ' van 4', step: 'Deze scherf, met dekking als lcov',
+    upload: 'Het routejournaal van deze scherf bewaren', member: 'routejournaal.log', nonempty: true })),
   ...['boot-smoke', 'grens-sweep', 'keuring', 'klok', 'meterijk', 'zaakdoos'].map(n => ({ artifact: 'routejournaal-ijking-' + n,
-    job: 'De ijking - ' + n, step: 'De ijking draaien (een bestand, alleen op deze machine)', member: 'routejournaal.log' })),
+    job: 'De ijking - ' + n, step: 'De ijking draaien (een bestand, alleen op deze machine)',
+    upload: 'Het routejournaal van deze ijking bewaren', member: 'routejournaal.log' })),
   ...[1, 2, 3, 4].map(n => ({ artifact: 'schermjournaal-deel-' + n,
-    job: 'Schermtoetsen deel ' + n + ' van 4', step: 'Scherm-tests (PDA in de browser)', member: '.schermjournaal', nonempty: true }))
+    job: 'Schermtoetsen deel ' + n + ' van 4', step: 'Scherm-tests (PDA in de browser)',
+    upload: 'Schermjournaal van dit deel bewaren', member: '.schermjournaal', nonempty: true }))
 ];
 try {
   if (git(['rev-parse', 'HEAD']) !== sha || git(['status', '--porcelain', '--untracked-files=no']))
@@ -65,6 +69,7 @@ try {
     const log = fs.existsSync(logFile) ? fs.readFileSync(logFile) : api('/actions/jobs/' + r.job.id + '/logs');
     if (!fs.existsSync(logFile)) fs.writeFileSync(logFile, log);
     const text = log.toString('utf8').replace(/\x1b\[[0-9;]*m/g, '');
+    const upload = verifyUpload(r.artifact.name, r.upload, r.job, r.artifact, text);
     const lines = text.split('\n'), checkouts = [];
     for (let i = 0; i < lines.length - 1; i++) {
       if (!/git log -1 --format=['"]?%H/.test(lines[i])) continue;
@@ -96,7 +101,7 @@ try {
     records.push({ artifact: r.artifact.name, artifactId: r.artifact.id, artifactDigest: r.artifact.digest,
       journalFile, journalSha256: hash(bytes), attributedLines,
       jobId: r.job.id, jobName: r.job.name, jobConclusion: r.job.conclusion,
-      testStep: r.step, testConclusion: 'success', startedAt: r.job.started_at, completedAt: r.job.completed_at,
+      testStep: r.step, testConclusion: 'success', upload, startedAt: r.job.started_at, completedAt: r.job.completed_at,
       jobLogFile: path.basename(logFile), jobLogSha256: hash(log), checkoutCommit: checkout,
       checkoutTree: checkedOutTree, candidateTree, binding: checkout === sha ? 'EXACT_COMMIT' : 'IDENTICAL_FULL_GIT_TREE' });
     console.log('Verified ' + r.artifact.name + ': ' + attributedLines + ' attributed lines');

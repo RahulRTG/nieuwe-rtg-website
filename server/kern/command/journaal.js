@@ -160,41 +160,8 @@ function maakJournaal({ db, save, crypto, vak, opslag, auditOpslag }) {
     return { heel: true, regels: rij.length };
   }
 
-  function overObject(type, id) {
-    const t = String(type), i = String(id);
-    return lijst().filter(r => r.objectType === t && r.objectId === i);
-  }
-
-  function recent(n, filter) {
-    let rij = lijst().slice().reverse();
-    if (filter && filter.actor) rij = rij.filter(r => r.actor === filter.actor);
-    if (filter && filter.actie) rij = rij.filter(r => r.actie.includes(filter.actie));
-    if (filter && filter.niveau) rij = rij.filter(r => r.niveau === filter.niveau);
-    return rij.slice(0, n || 50);
-  }
-
-  /* FORENSIC REPLAY: reconstrueer wat er tussen twee momenten gebeurde, in
-     volgorde, met per stap de toestand ervoor en erna. Dat is precies wat je
-     na een incident wilt kunnen doen -- en het is alleen mogelijk omdat `voor`
-     en `na` bij het noteren zijn vastgelegd en niet achteraf herleid. */
-  function herbeleef(van, tot, opties) {
-    const v = String(van || ''), t = String(tot || '￿');
-    const alles = lijst().filter(r => r.at >= v && r.at <= t);
-    const gefilterd = opties && opties.objectType
-      ? alles.filter(r => r.objectType === opties.objectType && (!opties.objectId || r.objectId === String(opties.objectId)))
-      : alles;
-    return {
-      van: v, tot: t, stappen: gefilterd.length,
-      actoren: [...new Set(gefilterd.map(r => r.actor))],
-      automatisch: gefilterd.filter(r => r.niveau === NIVEAUS.auto).length,
-      mislukt: gefilterd.filter(r => r.uitslag !== 'gedaan').length,
-      lijn: gefilterd.map(r => ({ at: r.at, actor: r.actor, actie: r.actie, niveau: r.niveau,
-        object: r.objectType ? r.objectType + ' ' + r.objectId : null,
-        reden: r.reden, uitslag: r.uitslag, voor: r.voor, na: r.na, zegel: r.zegel }))
-    };
-  }
-
-  return { noteer, controleer, overObject, recent, herbeleef, wisActor,
+  const lezing = require('./journaal-lezing')(lijst, NIVEAUS);
+  return { noteer, controleer, ...lezing, wisActor,
     aantal: () => tellerLees(), venster: () => lijst().length, MAX };
 }
 

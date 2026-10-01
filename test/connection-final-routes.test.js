@@ -79,7 +79,11 @@ test('Vonk en Rendez-vous finale routes vormen een echte mobiele serviceketen',a
   assert.equal((await api('/api/connection/rendezvous/call/poll',{callId:rvCall.body.call.id},B.token)).body.call.state,'ENDED');
   const ordered=await api('/api/member/rendezvous/profile-photo/order',{ids:[upload.body.media.id]},B.token);
   assert.deepEqual(ordered.body.media.map(m=>m.id),[upload.body.media.id]);
+  const freshPhoto=ordered.body.media[0].src;
+  assert.equal((await fetch(base+freshPhoto,{headers:{Authorization:'Bearer '+B.token}})).status,200);
   assert.equal((await api('/api/member/rendezvous/profile-photo/remove',{id:upload.body.media.id},B.token)).status,200);
+  assert.equal((await api('/api/member/rendezvous/profiel',{},B.token)).body.profiel.media.length,0,'de foto is uit het eigen profiel verwijderd');
+  assert.equal((await fetch(base+freshPhoto,{headers:{Authorization:'Bearer '+B.token}})).status,404,'ook het actuele fototicket is ingetrokken');
   assert.equal((await fetch(base+candidate.media[0].src,{headers:fotoHeaders})).status,404,'een verwijderde profielfoto wordt niet meer geleverd');
   const arranged=await api('/api/member/rendezvous/arrange',{id:candidate.id,setting:'diner'},A.token);
   assert.equal(arranged.status,200,JSON.stringify(arranged.body));

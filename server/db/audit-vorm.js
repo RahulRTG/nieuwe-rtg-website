@@ -24,7 +24,11 @@ function alleenLezen(waarde) {
     if (!v || typeof v !== 'object') return v;
     if (bewaakt.has(v)) return v;
     if (gezien.has(v)) return gezien.get(v);
-    const p = new Proxy(v, { get: (o, k) => wikkel(Reflect.get(o, k)), set: dicht,
+    const p = new Proxy(v, { get: (o, k) => wikkel(Reflect.get(o, k)),
+      getOwnPropertyDescriptor(o, k) {
+        const d = Reflect.getOwnPropertyDescriptor(o, k);
+        return d && Object.hasOwn(d, 'value') ? { ...d, value: wikkel(d.value) } : d;
+      }, set: dicht,
       deleteProperty: dicht, defineProperty: dicht, setPrototypeOf: dicht, preventExtensions: dicht });
     gezien.set(v, p); bewaakt.add(p); return p;
   }

@@ -22,6 +22,7 @@ module.exports = ({ db, kv, decode, encode, bump }) => {
     wegBron: kv.prepare('DELETE FROM kv WHERE key=?')
   };
   const cache = new Map();
+  const projectie = require('./audit-projectie')();
   let context = () => null;
   function metaZet(m) { q.zetMeta.run(m.naam, m.versie, m.epoch, m.kop, m.totaal, m.extra); }
   function transaction(werk) {
@@ -57,13 +58,15 @@ module.exports = ({ db, kv, decode, encode, bump }) => {
     const oud = cache.get(naam);
     if (oud?.meta.versie === m.versie) return oud;
     const gelijkEpoch = oud?.meta.epoch === m.epoch;
-    const nieuw = q.vanaf.all(naam, gelijkEpoch ? oud.meta.kop : 0).map(r => ({ nr: r.nr, waarde: JSON.parse(decode(r.waarde)) }));
-    const rows = gelijkEpoch ? [...oud.rows, ...nieuw] : nieuw;
+    const nieuw = q.vanaf.all(naam, gelijkEpoch ? oud.meta.kop : 0).map(r => {
+      const tekst = decode(r.waarde);
+      JSON.parse(tekst); // Ongeldige opgeslagen JSON faalt binnen deze snapshot.
+      return { nr: r.nr, tekst };
+    });
     const spec = vorm.eis(naam), vanaf = q.staart.get(naam).nr;
-    const behouden = rows.filter(r => vanaf !== null && r.nr >= vanaf);
-    const lijst = behouden.map(r => r.waarde);
-    if (spec.omgekeerd) lijst.reverse();
-    return { meta: m, rows: behouden, waarde: vorm.alleenLezen(vorm.pak(naam, lijst, m.totaal, JSON.parse(decode(m.extra)))), root: null };
+    const beeld = projectie.volgende(gelijkEpoch ? oud.beeld : null, nieuw, vanaf);
+    const lijst = projectie.lijst(beeld, spec.omgekeerd);
+    return { meta: m, beeld, waarde: vorm.alleenLezen(vorm.pak(naam, lijst, m.totaal, JSON.parse(decode(m.extra)))), root: null };
   }
   function publiceer(naam, nieuw) {
     if (!nieuw) return;

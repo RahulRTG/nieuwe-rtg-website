@@ -141,7 +141,7 @@ test('Bestellen en Vitaal houden leesbare inhoud in alle drie de thema’s',
           const page = await ctx.newPage(), fouten = [];
           letOpFouten(page, fouten);
           try {
-            await page.goto(srv.base + '/apps/' + route + '.html', { waitUntil: 'load' });
+            await page.goto(srv.base + '/apps/' + route + '.html', { waitUntil: 'domcontentloaded' });
             const sel = route === 'bestellen' ? '#ontdekGroepen button' : '#log .stil';
             await page.waitForFunction(({ route, sel }) => {
               const els = [...document.querySelectorAll(sel)];

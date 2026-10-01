@@ -57,6 +57,50 @@ test('beide echte auditmiddlewares bewaren hun keten zonder vreemde collecties t
   assert.equal(p.lees('ander').waarde, 2);
 });
 
+test('systeempost bewaart alleen haar post, gewone post bewaart de bestaande lus-rem mee', t => {
+  const p = proef(t), crypto = require('node:crypto');
+  p.db.data.rtmail = { berichten: [] };
+  p.db.data.rtmailSchrijf = { vakken: { afwezig: { beantwoord: {} } } };
+  p.save();
+  let scans = 0;
+  Object.defineProperty(p.db.data.ander, 'toJSON', { value() { scans++; return { waarde: this.waarde }; } });
+  const mail = require('../server/kern/rtmail')({ db: p.db, save: p.save, crypto, integriteitSleutel: crypto.randomBytes(32) });
+  const bericht = mail.systeemStuur('lid', 'Welkom', 'Uw postvak');
+  assert.equal(scans, 0, 'een systeemseintje serialiseert geen vreemde collectie');
+  assert.equal(p.lees('rtmail').berichten[0].id, bericht.id);
+  assert.equal(mail.controleerIntegriteit(p.lees('rtmail').berichten[0]), 'ongeschonden');
+  p.db.data.rtmailSchrijf.vakken.afwezig.beantwoord.lid = 'vast';
+  const antwoord = mail.stuur({ van: 'afwezig', naar: 'lid', soort: 'afwezig', tekst: 'Later' });
+  assert.ok(scans > 0, 'gewone bezorging houdt de oorspronkelijke brede opslag');
+  assert.equal(p.lees('rtmail').berichten[0].id, antwoord.id);
+  assert.equal(p.lees('rtmailSchrijf').vakken.afwezig.beantwoord.lid, 'vast');
+});
+
+test('systeempost houdt foutinjectie en de volledige duurzame bundel', async t => {
+  const p = proef(t), crypto = require('node:crypto');
+  p.db.data.rtmail = { berichten: [] }; p.save();
+  const mail = require('../server/kern/rtmail')({ db: p.db, save: p.save, crypto });
+  let nagekomen = 0;
+  mail.zetNaBezorging(() => { nagekomen++; });
+  const fout = t.mock.method(require('../server/lib/verraadfase'), 'sla', name => name === 'schrijf-faalt');
+  assert.throws(() => mail.systeemStuur('lid', 'Fout', 'Niet bevestigd'), /schrijf-faalt/);
+  assert.equal(nagekomen, 0, 'geen naverwerking bij geweigerde opslag');
+  assert.deepEqual(p.lees('rtmail').berichten, []);
+  fout.mock.restore();
+  p.db.data.rtmail = p.lees('rtmail');
+  let id;
+  await p.bijeen(() => {
+    id = mail.systeemStuur('lid', 'Samen', 'Eén commit').id;
+    p.db.data.ander.waarde = 9;
+    p.save();
+    assert.deepEqual(p.lees('rtmail').berichten, [], 'geen vroegtijdige deelcommit');
+    assert.equal(p.lees('ander').waarde, 1);
+  }, { duurzaam: true });
+  assert.equal(p.lees('rtmail').berichten[0].id, id);
+  assert.equal(p.lees('ander').waarde, 9);
+  assert.equal(nagekomen, 1);
+});
+
 test('expliciete auditopslag stelt grote bestaande collecties niet uit', t => {
   const p = proef(t);
   p.db.data.apiSpoor = { tekst: 'a'.repeat(600000), nummer: 1 };

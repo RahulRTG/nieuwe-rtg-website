@@ -43,7 +43,7 @@ module.exports = ({ db, save, crypto, integriteitSleutel }) => {
   }
 
   // De geverifieerde serverroute zet `bron`; de client bepaalt dit vertrouwen niet.
-  function stuur({ van, naar, onderwerp, tekst, soort, bron, antwoordOp } = {}) {
+  function bezorg({ van, naar, onderwerp, tekst, soort, bron, antwoordOp } = {}, bewaar = save) {
     const naarA = normAdres(naar);
     if (!naarA) return { error: 'Geen geldig ontvang-adres.' };
     const vanA = normAdres(van) || SYSTEEM;
@@ -78,7 +78,7 @@ module.exports = ({ db, save, crypto, integriteitSleutel }) => {
     veiligheid.zegel(msg);
     s.berichten.unshift(msg);
     if (s.berichten.length > MAX) s.berichten.length = MAX;
-    save();
+    bewaar();
     /* NA DE BEZORGING. De regels van een postvak en het afwezigheidsbericht
        horen te draaien voor ELKE bezorging, niet alleen voor post die
        toevallig via de app binnenkomt -- een automatisering, de werkmail-poort
@@ -95,11 +95,15 @@ module.exports = ({ db, save, crypto, integriteitSleutel }) => {
 
   let naBezorging = null;
   const zetNaBezorging = (fn) => { naBezorging = typeof fn === 'function' ? fn : null; };
+  const stuur = input => bezorg(input);
 
   // De rail voor de automatiseringen: het platform stuurt vanuit "rtg@rtmail"
   // (bron 'systeem', altijd vertrouwd).
   function systeemStuur(naar, onderwerp, tekst, soort) {
-    return stuur({ van: SYSTEEM, naar, onderwerp, tekst, soort: soort || 'systeem', bron: 'systeem' });
+    // Een systeemseintje bezit alleen rtmail. Gewone bezorging behoudt save():
+    // een afwezigheidsantwoord legt ook de lus-rem in rtmailSchrijf vast.
+    const bewaar = () => typeof save.sleutels === 'function' ? save.sleutels(['rtmail']) : save();
+    return bezorg({ van: SYSTEEM, naar, onderwerp, tekst, soort: soort || 'systeem', bron: 'systeem' }, bewaar);
   }
 
   const pub = m => {

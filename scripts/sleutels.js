@@ -11,8 +11,11 @@
      npm run live:init -- --eigenaar=jij@domein.nl \
        --url=https://jouw-domein.nl --smtp-url=smtps://...
 
-   --docker maakt ook aparte PostgreSQL- en geldsnapshot-sleutelbestanden. Bestaande
-   geheimen worden nooit stil overschreven; --force is bewust en expliciet.
+   --docker maakt ook aparte PostgreSQL- en geldsnapshot-sleutelbestanden. De
+   publieke Docker-opstelling maakt daarnaast het besloten compliancebestand.
+   Bestaande geheimen of ingevulde papieren worden nooit stil overschreven;
+   --force is bewust en expliciet voor de sleutelset, niet voor menselijke
+   compliance-antwoorden.
    --stil drukt gegenereerde geheimen niet naar terminal/loggeschiedenis. */
 'use strict';
 
@@ -28,20 +31,6 @@ const optie = (naam) => {
   return a ? a.slice(voor.length) : '';
 };
 const hex = (n) => crypto.randomBytes(n).toString('hex');
-const CODEABC = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
-const code = (n) => Array.from({ length: n }, () => CODEABC[crypto.randomInt(CODEABC.length)]).join('');
-
-function base32(buf) {
-  const ABC = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-  let bits = 0, waarde = 0, uit = '';
-  for (const b of buf) {
-    waarde = (waarde << 8) | b; bits += 8;
-    while (bits >= 5) { uit += ABC[(waarde >>> (bits - 5)) & 31]; bits -= 5; }
-  }
-  if (bits > 0) uit += ABC[(waarde << (5 - bits)) & 31];
-  return uit;
-}
-
 const docker = heeft('--docker');
 const priveBeta = heeft('--prive-beta');
 const zonderAi = heeft('--zonder-ai');
@@ -55,7 +44,6 @@ const eigenaar = optie('--eigenaar') || 'VUL-IN@JOUW-DOMEIN.NL';
 const poort = optie('--poort') || '3000';
 const appUrl = optie('--url') || (priveBeta ? 'http://127.0.0.1:' + poort : 'https://VUL-IN.NL');
 const smtpUrl = optie('--smtp-url') || 'smtps://VUL-IN';
-const totp = base32(crypto.randomBytes(20));
 let tlsDomein = 'VUL-IN.NL';
 try { tlsDomein = new URL(appUrl).hostname || tlsDomein; } catch (e) {}
 
@@ -66,8 +54,6 @@ const regels = [
   ['RTG_SECRET_KEY', hex(32), 'sessietokens; gedeeld over alle instances'],
   ['RTG_CLUSTER_KEY', hex(24), 'beschermt de failover-endpoints'],
   ['RTG_MOTOR_TOKEN', hex(32), 'beschermt de interne Rust-geldmotor'],
-  ['OFFICE_CODE', code(12), 'inlogcode van de RTG-Backoffice'],
-  ['OFFICE_TOTP_SECRET', totp, 'tweede factor (2FA) van de backoffice; scan de otpauth-regel hieronder'],
   ['RTG_ISOLATIE_AFDWINGEN', '1', 'persoonlijke bescherm- en isolatiestanden blokkeren server-side; geen schaduwstand in productie'],
   ['DEMO_PASS', hex(12), 'vervangt het demo-wachtwoord (demo staat in productie sowieso uit)'],
   ['RTG_OWNER_EMAIL', eigenaar, 'HANDMATIG: het echte e-mailadres van de eigenaar (technische pagina)'],
@@ -125,8 +111,7 @@ for (const [naam, waarde, uitleg] of regels) {
 
 if (!stil) {
   console.log(blok.join('\n'));
-  console.log('\n# 2FA koppelen: voer dit adres (of het secret hierboven) in je authenticator-app in:');
-  console.log('# otpauth://totp/RTG%20Backoffice?secret=' + totp + '&issuer=RTG');
+  console.log('\n# Het productiekantoor gebruikt geen gedeelde code of losse TOTP. Iedere medewerker opent het op naam met een eigen passkey.');
 }
 
 function schrijfNieuw(doel, inhoud) {
@@ -147,6 +132,9 @@ if (schrijven) {
       : '';
     const motorSleutelDoel = docker
       ? path.resolve(optie('--motor-sleutel-doel') || path.join(path.dirname(doel), '.rtg-secrets', 'motor_state_key'))
+      : '';
+    const papierenDoel = docker && !priveBeta
+      ? path.resolve(optie('--papieren-doel') || path.join(path.dirname(doel), '.rtg-compliance', 'papieren.json'))
       : '';
     // Eerst ALLE doelen controleren; zo laat een tweede run nooit een half
     // vernieuwde sleutelset achter.
@@ -184,6 +172,15 @@ if (schrijven) {
       } else {
         schrijfNieuw(motorSleutelDoel, 'k-' + hex(8) + ':' + hex(32) + '\n');
         console.log('# Aparte geldsnapshot-sleutelring: ' + motorSleutelDoel + ' (rechten 600).');
+      }
+      if (papierenDoel && fs.existsSync(papierenDoel)) {
+        // Ook --force mag nooit de door mensen ingevulde juridische/contact-
+        // gegevens terugzetten naar leeg. Sleutels roteren en papier wissen
+        // zijn twee volstrekt verschillende operatorhandelingen.
+        console.log('# Bestaand compliancebestand blijft ongewijzigd: ' + papierenDoel);
+      } else if (papierenDoel) {
+        schrijfNieuw(papierenDoel, JSON.stringify({ antwoorden: {}, bijgewerkt: null }, null, 2) + '\n');
+        console.log('# Apart compliancebestand: ' + papierenDoel + ' (rechten 600).');
       }
     }
     const envTekst = blok.join('\n') + '\n' + (bewaardeGenesis

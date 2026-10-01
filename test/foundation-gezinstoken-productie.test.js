@@ -133,6 +133,7 @@ const SLEUTEL = 'd'.repeat(40);
 
 const PROD = { NODE_ENV: 'production', RTG_DEMO: '0', APP_URL: 'https://rtg.voorbeeld.test/',
   SMTP_URL: 'smtp://rtg:test@mail.voorbeeld.test:587', ERR_WEBHOOK_URL: 'https://alarm.voorbeeld.test/rtg',
+  TURN_URL: 'turns:turn.rtg.voorbeeld.test:5349', TURN_SECRET: 't'.repeat(48),
   RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl', OFFICE_CODE: 'GEHEIME-CODE-123',
   OFFICE_TOTP_SECRET: 'JBSWY3DPEHPK3PXP', RTG_ISOLATIE_AFDWINGEN: '1', RTG_BETALEN_UIT: '1',
   RTG_AI_UIT: '1', RTG_HERSTEL_SMS_UIT_BEWUST: '1', RTG_DOOS_SLEUTEL: SLEUTEL };

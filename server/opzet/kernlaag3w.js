@@ -6,6 +6,9 @@
 'use strict';
 
 module.exports = (kern, hulp) => {
+/* Het bewijsvlak is de control plane onder alle werelden. Het bezit geen
+   domeindata en staat hier alleen als gedeelde inspectie-/uitvoerprimitive. */
+kern.trustEvidence = require('../kern/bewijsvlak/runtime').current();
 /* RTG Reizen (kern/reiswereld.js): de samenhanglaag over de reiswereld -- laag 2
    uit PLATFORM.md. Hij bezit niets en schrijft nooit; hij haalt uw komende reis
    op uit de domeinen zelf (verblijf, reisbureau, luchthaven). Krijgt daarom de

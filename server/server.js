@@ -737,6 +737,12 @@ const { sseToSupplier, sseToOffice, notifySupplier, supplierIndex,
    plus de poortwachters resolveSession en auth -- staat in ./opzet/diensten.js.
    De in- en uitgangslijsten zijn uitgerekend met scripts/blokscan.js, niet met
    de hand bijgehouden. */
+/* Trust & Evidence Plane V2 start additief in schaduwstand. De opslag bevat
+   uitsluitend ketenbewijs en digests; domeinobjecten blijven bij hun eigenaar. */
+const trustPlane = require('./kern/bewijsvlak/runtime').configure({
+  db, save, mode: 'shadow', issuer: 'rtg:platform'
+});
+
 const {
   AUTHOR_TIER, SSE_BUFFER_TTL, aiPoort, antivirus, archief, atelierweb, auth, automatisering, 
   beveilig, broadcastSync, bufferEvent, bus, connectedSupplierCodes, dirTouch, 
@@ -1671,6 +1677,7 @@ const {
 } = maakErvaring({
   db, save, crypto, findSupplier, notify, notifySupplier, sseToCustomer,
   sseToSupplier, sseToOffice, zijnVrienden, ticketsVoorSlot, optieAan,
+  trustPlane,
   // de gedekte tafel (kern/tafeldek.js) wordt pas in kernlaag7 gebouwd; laat gebonden
   tafeldekVan: () => kern.tafeldek,
   /* RTG Pay wordt pas in kernlaag3 gebouwd -- ver na deze regel -- en de

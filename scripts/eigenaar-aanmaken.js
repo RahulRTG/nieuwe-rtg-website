@@ -134,14 +134,28 @@ function kluisStand() {
 }
 
 function argumenten(argv) {
-  const uit = { maak: false, hulp: false };
+  const uit = { maak: false, hulp: false, eisBestaand: false };
   for (const a of argv) {
     if (a === '--maak') { uit.maak = true; continue; }
+    if (a === '--eis-bestaand') { uit.eisBestaand = true; continue; }
     if (a === '--hulp' || a === '--help' || a === '-h') { uit.hulp = true; continue; }
     const m = /^--([a-z]+)=([\s\S]*)$/.exec(a);
     if (m) uit[m[1]] = m[2];
   }
   return uit;
+}
+
+async function vulOntbrekendIn(arg) {
+  if (!arg.maak || (arg.naam && arg.geboren) || !process.stdin.isTTY) return arg;
+  const readline = require('node:readline/promises');
+  const rl = readline.createInterface({ input:process.stdin, output:process.stdout });
+  try {
+    if (!arg.naam) arg.naam = String(await rl.question('Volledige naam: ')).trim();
+    if (!arg.geboren) arg.geboren = String(await rl.question('Geboortedatum (JJJJ-MM-DD): ')).trim();
+    if (arg.telefoon === undefined)
+      arg.telefoon = String(await rl.question('Telefoon (optioneel): ')).trim();
+  } finally { rl.close(); }
+  return arg;
 }
 
 /* Een wachtwoord dat niemand hoeft te onthouden en niemand hoeft te bedenken.
@@ -367,8 +381,8 @@ function diagnose(accounts, adres, bestaand) {
   zeg('');
 }
 
-async function hoofd() {
-  const arg = argumenten(process.argv.slice(2));
+async function hoofd(argv = process.argv.slice(2)) {
+  const arg = await vulOntbrekendIn(argumenten(argv));
   if (arg.hulp) return toonHulp();
 
   const accounts = openKluis();
@@ -406,7 +420,13 @@ async function hoofd() {
   regel('kantoorcode', process.env.OFFICE_CODE
     ? 'gezet' : 'NIET gezet -- willekeurig en na elke herstart anders');
 
-  if (!arg.maak) { diagnose(accounts, adres, bestaand); return; }
+  if (!arg.maak) {
+    diagnose(accounts, adres, bestaand);
+    if (arg.eisBestaand && (!bestaand || !eigenaar.isEigenaar(accounts, bestaand)))
+      return stop('het eigenaarsaccount is niet aantoonbaar uit de gedeelde productiestaat teruggelezen.',
+        ['Het bootstrapgeheim blijft staan. Herstel de PostgreSQL-/kluisketen en probeer opnieuw.']);
+    return;
+  }
 
   if (duurzaamheid.gesloten()) return stop('accountmutaties zijn gesloten in deze modus.', grendelUitleg());
   if (bestaand) {
@@ -512,9 +532,16 @@ async function hoofd() {
   zeg('');
 }
 
-hoofd()
-  .catch(e => { zeg(''); zeg('MISLUKT -- ' + (e && e.stack ? e.stack : e)); zeg(''); process.exitCode = 1; })
-  /* Afsluiten met de spiegel LEEG: zonder DATABASE_URL is dit een no-op, en met
-     een DATABASE_URL is het het verschil tussen een account dat in Postgres staat
-     en een account dat alleen in de lokale cache stond toen het proces stopte. */
-  .finally(async () => { if (kluis) { try { await kluis.flushBijAfsluiten(); } catch (e) {} } });
+async function voer(argv) {
+  try { await hoofd(argv); }
+  catch (e) { zeg(''); zeg('MISLUKT -- ' + (e && e.stack ? e.stack : e)); zeg(''); process.exitCode = 1; }
+  finally {
+    /* Afsluiten met de spiegel LEEG: zonder DATABASE_URL is dit een no-op, en
+       met een DATABASE_URL is dit het verschil tussen gedeelde waarheid en een
+       account dat alleen in de lokale cache stond toen het proces stopte. */
+    if (kluis) { try { await kluis.flushBijAfsluiten(); } catch (e) {} }
+  }
+}
+
+module.exports = { argumenten, vulOntbrekendIn, hoofd, voer };
+if (require.main === module) voer(process.argv.slice(2));

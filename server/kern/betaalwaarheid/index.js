@@ -7,6 +7,7 @@
 const { STATUS, providerStatus, mag, definitiefBetaald } = require('./staten');
 const beeld = require('./beeld');
 const { datum: klokDatum } = require('../../lib/klok');
+const trustMoney = require('../bewijsvlak/v3-money-hook');
 
 module.exports = function maakBetaalWaarheid({ d, save, crypto, betaal, nu, log }) {
   const nuIso = nu || (() => klokDatum().toISOString());
@@ -98,6 +99,7 @@ module.exports = function maakBetaalWaarheid({ d, save, crypto, betaal, nu, log 
     naar(r, providerStatus(r.provider, r.providerStatus, gebeurtenisType), {
       bron: r.provider, providerEventId: eventId || null, providerStatus: r.providerStatus });
     save();
+    if (definitiefBetaald(r.status)) trustMoney.confirmed(r, eventId);
     await afhandeling.handelAf(r);
     return publiek(r);
   }
@@ -131,6 +133,7 @@ module.exports = function maakBetaalWaarheid({ d, save, crypto, betaal, nu, log 
     try { return await werk; } catch (e) {
       if (!e || e.code !== 'BETAAL_AFHANDELING_MISLUKT') {
         gebeurtenis(r, 'PROVIDER_FOUT', { fout: String(e && e.message || e).slice(0, 180) }); save();
+        if (!e || e.nietVerstuurd !== true) trustMoney.unknown(r, e);
       }
       throw e;
     } finally { startend.delete(id); }

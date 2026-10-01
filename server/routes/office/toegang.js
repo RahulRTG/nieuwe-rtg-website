@@ -18,9 +18,9 @@ app.post('/api/office/login', (req, res) => {
     logInlog('office', false, null, req);
     return res.status(401).json({ error: 'Onjuiste backoffice-code.' });
   }
-  /* de tweede factor (TOTP, zoals bij de bank): staat OFFICE_TOTP_SECRET in
-     de omgeving, dan is de code alleen niet genoeg; er moet ook een geldige
-     zescijferige authenticator-code bij */
+  /* Alleen buiten productie: staat OFFICE_TOTP_SECRET in de afgeschermde
+     test/demo-omgeving, dan is de code alleen niet genoeg. In productie is
+     deze route hierboven al gesloten vóór code of TOTP wordt bekeken. */
   if (process.env.OFFICE_TOTP_SECRET && !totpOk(process.env.OFFICE_TOTP_SECRET, req.body.totp)) {
     noteFailedTry(bucket, req.ip);
     logInlog('office-2fa', false, null, req);

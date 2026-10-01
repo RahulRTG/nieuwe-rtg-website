@@ -9,7 +9,34 @@ const crypto = require('crypto');
 const { spawnSync } = require('node:child_process');
 const vrijgave = require('../server/config/foundation-vrijgave');
 const extern = require('../server/config/external-release');
+const trust = require('../server/config/release-trust');
+const { canon } = require('../server/kern/bewijsvlak/canon');
 const { COMMIT, groenDossier, maakGetekendeVrijgave } = require('./foundation-vrijgave-fixture');
+
+function wijzigMachineRapport(root, sleutels, controle, verander, opties = {}) {
+  const dossierPad = path.join(root, '.release', 'external-release.json');
+  const dossier = JSON.parse(fs.readFileSync(dossierPad));
+  const bewijsPad = path.join(root, '.release', 'external-evidence',
+    dossier.controles[controle].bewijs.bestand);
+  const rapport = JSON.parse(fs.readFileSync(bewijsPad));
+  verander(rapport);
+  const meting = rapport.gegevens && rapport.gegevens.externalMeasurement;
+  if (meting && rapport.gegevens.responseSha256) {
+    const ongetekend = { ...meting }; delete ongetekend.signature;
+    if (opties.hertekenRunner !== false)
+      meting.signature = crypto.sign(null,
+        require('../scripts/lib/extern-meter').signaturePayload(ongetekend),
+        sleutels.runner.privateKey).toString('base64');
+    rapport.gegevens.responseSha256 = extern.sha256(Buffer.from(canon(meting)));
+  }
+  const bewijsBytes = Buffer.from(JSON.stringify(rapport) + '\n');
+  fs.writeFileSync(bewijsPad, bewijsBytes);
+  dossier.controles[controle].bewijs.sha256 = extern.sha256(bewijsBytes);
+  const dossierBytes = Buffer.from(JSON.stringify(dossier, null, 2) + '\n');
+  fs.writeFileSync(dossierPad, dossierBytes);
+  fs.writeFileSync(path.join(root, '.release', 'external-release.sig'),
+    trust.sign('EVIDENCE', dossierBytes, sleutels.privateKey) + '\n');
+}
 
 test('alleen een ondertekend dossier met de werkelijk gemounte bewijsbytes geldt', t => {
   const maakRoot = naam => {
@@ -75,6 +102,69 @@ test('algemene release accepteert bewezen gesloten Foundation maar runtime-open 
     vereisteControles:extern.FOUNDATION_CONTROLES, eisFoundationOpen:true });
   assert.equal(openen.ok, false);
   assert.equal(openen.reden, 'foundationvoorwaarden-niet-pass');
+});
+
+test('een signer kan een rood, verkeerd of aan een ander verzoek gebonden machinerapport niet groen verklaren', t => {
+  const geval = (naam, controle, verander, reden) => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-machine-' + naam + '-'));
+    t.after(() => fs.rmSync(root, { recursive:true, force:true }));
+    const s = maakGetekendeVrijgave(root);
+    wijzigMachineRapport(root, s.sleutels, controle, verander);
+    assert.match(extern.controleerReleaseRoot(root, COMMIT).reden, reden);
+  };
+  geval('rood', 'connectionRealtime', r => { r.uitkomst = 'FAIL'; }, /machine-rapport-niet-pass/);
+  geval('control', 'connectionRealtime', r => { r.controle = 'tlsDdosRand'; }, /provenance-wijkt-af/);
+  geval('request', 'connectionRealtime', r => { r.requestSha256 = '0'.repeat(64); }, /verzoek-of-provenance/);
+
+  const runner = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-machine-runner-'));
+  t.after(() => fs.rmSync(runner, { recursive:true, force:true }));
+  const s = maakGetekendeVrijgave(runner);
+  wijzigMachineRapport(runner, s.sleutels, 'connectionRealtime', r => {
+    r.gegevens.externalMeasurement.observations = { veranderd:true };
+  }, { hertekenRunner:false });
+  assert.match(extern.controleerReleaseRoot(runner, COMMIT).reden, /runner-handtekening/,
+    'de evidence-signer kan een gewijzigde runnerwaarneming niet zelfstandig legitimeren');
+
+  const image = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-machine-image-'));
+  t.after(() => fs.rmSync(image, { recursive:true, force:true }));
+  const i = maakGetekendeVrijgave(image);
+  wijzigMachineRapport(image, i.sleutels, 'imageVulnerabilityScan', r => {
+    r.gegevens.imageDigest = 'sha256:' + 'f'.repeat(64);
+  });
+  assert.match(extern.controleerReleaseRoot(image, COMMIT).reden, /image-scan-digest/,
+    'de evidence-signer kan geen scan aan een andere dan de build-getekende digest hangen');
+});
+
+test('de vijf money-rapporten vormen één correlation/provider/ref/amount-keten of de vrijgave faalt', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-money-chain-'));
+  t.after(() => fs.rmSync(root, { recursive:true, force:true }));
+  const s = maakGetekendeVrijgave(root);
+  assert.equal(extern.controleerReleaseRoot(root, COMMIT).moneyMode, 'LIVE');
+  wijzigMachineRapport(root, s.sleutels, 'refundPayoutSettlement', r => {
+    r.gegevens.externalMeasurement.observations.paymentRefSha256 = 'f'.repeat(64);
+  });
+  assert.equal(extern.controleerReleaseRoot(root, COMMIT).reden, 'geldketen-referenties-wijken-af');
+
+  const manifestRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-money-manifest-'));
+  t.after(() => fs.rmSync(manifestRoot, { recursive:true, force:true }));
+  const m = maakGetekendeVrijgave(manifestRoot);
+  wijzigMachineRapport(manifestRoot, m.sleutels, 'webhookDelivery', r => {
+    r.gegevens.externalMeasurement.observations.providerItemManifestSha256 = 'f'.repeat(64);
+  });
+  assert.equal(extern.controleerReleaseRoot(manifestRoot, COMMIT).reden,
+    'geldketen-provideritemmanifest-wijkt-af',
+    'webhook en reconciliatie moeten exact hetzelfde provideritemmanifest bewijzen');
+});
+
+test('READY_ZONDER_RAIL heeft vijf expliciete machinebewijzen en kan niet met live PASS mengen', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-money-disabled-'));
+  t.after(() => fs.rmSync(root, { recursive:true, force:true }));
+  const s = maakGetekendeVrijgave(root, { moneyDisabled:true });
+  assert.equal(extern.controleerReleaseRoot(root, COMMIT).moneyMode, 'RAIL_DISABLED');
+  wijzigMachineRapport(root, s.sleutels, 'paymentProvider', r => {
+    r.uitkomst = 'PASS'; r.requestSha256 = '1'.repeat(64);
+  });
+  assert.equal(extern.controleerReleaseRoot(root, COMMIT).ok, false);
 });
 
 test('Foundationvoorwaarden blijven onderdeel van de ondertekende inhoud', t => {
@@ -145,7 +235,10 @@ test('de signer tekent alleen een compleet dossier op een schone exacte HEAD', t
   const sleutels = crypto.generateKeyPairSync('ed25519');
   fs.mkdirSync(path.join(root, 'deploy'), { recursive:true });
   fs.writeFileSync(path.join(root, '.gitignore'), '.release/\n');
-  require('./release-trust-fixture').trustFixture(root, { EVIDENCE:sleutels });
+  const trustKeys = require('./release-trust-fixture').trustFixture(root, { EVIDENCE:sleutels });
+  const runnerKeys = crypto.generateKeyPairSync('ed25519');
+  fs.writeFileSync(path.join(root, 'deploy', 'evidence-runner-v1.pub'),
+    runnerKeys.publicKey.export({ type:'spki', format:'pem' }));
   const git = (...args) => spawnSync('git', args, { cwd:root, encoding:'utf8' });
   assert.equal(git('init', '--quiet').status, 0);
   assert.equal(git('config', 'user.email', 'release@test.invalid').status, 0);
@@ -153,7 +246,8 @@ test('de signer tekent alleen een compleet dossier op een schone exacte HEAD', t
   assert.equal(git('add', '.gitignore', 'deploy').status, 0);
   assert.equal(git('commit', '--quiet', '-m', 'vertrouwensanker').status, 0);
   const commit = git('rev-parse', 'HEAD').stdout.trim();
-  maakGetekendeVrijgave(root, { commit, sleutels, runtimeBewijs:false });
+  maakGetekendeVrijgave(root, { commit, sleutels, buildKeys:trustKeys.BUILD,
+    runnerKeys, runtimeBewijs:false });
   fs.unlinkSync(path.join(root, '.release', 'external-release.sig'));
   const prive = sleutels.privateKey.export({ type:'pkcs8', format:'pem' }).toString('base64');
   const resultaat = require('../scripts/external-release-teken').teken(root,

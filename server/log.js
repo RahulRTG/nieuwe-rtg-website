@@ -15,6 +15,7 @@ const DIENST = process.env.RTG_SERVICE || 'rtg';
 let foutHaak = null; // (err, context) => void , bijv. Sentry.captureException
 function onError(fn) { foutHaak = typeof fn === 'function' ? fn : null; }
 const { geheimVrij, veiligeWaarde, veiligeFout } = require('./log-redactie');
+const { naAntwoord } = require('./lib/antwoord-einde');
 
 /* Eigen fout-aggregatie (in-memory), zodat de eigenaar op het techniekbord
    meteen ziet wat er stuk is -- zonder een externe dienst zoals Sentry.
@@ -138,7 +139,7 @@ function middleware() {
     req.id = id;
     res.set('X-Request-Id', id);
     const start = process.hrtime.bigint();
-    res.on('finish', () => {
+    naAntwoord(res, () => {
       const ms = Number(process.hrtime.bigint() - start) / 1e6;
       const stil = req.path === '/api/health' || req.path === '/api/ready';
       const niveau = res.statusCode >= 500 ? 'error' : res.statusCode >= 400 ? 'warn' : (stil ? 'debug' : 'info');

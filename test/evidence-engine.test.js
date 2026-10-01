@@ -97,6 +97,19 @@ test('uitvoerder versmalt alleen REPROVE en schaalt UNKNOWN op naar full', () =>
   ]) }, 'e2e').unit, [], 'de browserhelft start geen unitwerk');
 });
 
+test('de nachtelijke force-full vlag bereikt de planner echt', () => {
+  assert.deepEqual(uitvoerder.planOpties([], { RTG_FORCE_FULL: '1' }), { forceFull: true });
+  assert.deepEqual(uitvoerder.planOpties(['--full'], {}), { forceFull: true });
+  assert.deepEqual(uitvoerder.planOpties([], { RTG_FORCE_FULL: '0' }), { forceFull: false });
+  let ontvangen = null;
+  const plan = uitvoerder.maakPlan([], { RTG_FORCE_FULL: '1' }, (opties) => {
+    ontvangen = opties;
+    return { mode: 'full' };
+  });
+  assert.deepEqual(ontvangen, { forceFull: true });
+  assert.equal(plan.mode, 'full');
+});
+
 test('de GitHub-samenvatting ontsnapt backslashes vóór tabelstrepen', () => {
   assert.equal(uitvoerder.markdownCel('reden \\| tweede\nregel'),
     'reden ' + '\\'.repeat(3) + '| tweede regel');
@@ -247,10 +260,13 @@ test('warme browserfabriek ruimt contexten op zonder het gedeelde proces te slui
     launch: async () => { geisoleerd++; return browser; }
   } };
   const gedeeld = metGedeeldeBrowser(mod, 'ws://bewijs');
-  const client = await Reflect.get(gedeeld.chromium, 'launch')({ headless: true });
+  const client = await Reflect.get(gedeeld.chromium, 'launch')({
+    headless: true, args: ['--no-sandbox'], executablePath: '/warme-host/chromium'
+  });
   assert.equal(await client.newContext(), 'context');
   await client.close();
-  assert.equal(verbonden, 'ws://bewijs');
+  assert.equal(verbonden, 'ws://bewijs',
+    'de standaardopties van browserOpties mogen de warme browser niet omzeilen');
   assert.equal(browserDicht, 1, 'een testbestand moet zijn clientverbinding afsluiten');
   const apart = await Reflect.get(gedeeld.chromium, 'launch')({ args: ['--use-fake-device-for-media-stream'] });
   await apart.close();

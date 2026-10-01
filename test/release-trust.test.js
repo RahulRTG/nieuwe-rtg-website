@@ -67,7 +67,8 @@ test('each shared-key pair and each missing anchor is rejected before authority 
 
 test('evidence verifier rejects build/promotion signers even when they use the correct evidence domain', t => {
   const { root, keys } = fixture(t);
-  const { dossierBytes } = maakGetekendeVrijgave(root, { sleutels:keys.EVIDENCE, runtimeBewijs:false });
+  const { dossierBytes } = maakGetekendeVrijgave(root, { sleutels:keys.EVIDENCE,
+    buildKeys:keys.BUILD, runtimeBewijs:false });
   assert.equal(external.controleerReleaseRoot(root, COMMIT).ok, true);
   for (const wrong of ['BUILD', 'PROMOTION']) {
     fs.writeFileSync(path.join(root, '.release/external-release.sig'), trust.sign('EVIDENCE', dossierBytes, keys[wrong].privateKey));
@@ -79,7 +80,8 @@ test('evidence verifier rejects build/promotion signers even when they use the c
 
 test('old external format, unframed legacy signature and relabelled domain are rejected, with no fallback', t => {
   const { root, keys } = fixture(t);
-  const { dossier, dossierBytes } = maakGetekendeVrijgave(root, { sleutels:keys.EVIDENCE, runtimeBewijs:false });
+  const { dossier, dossierBytes } = maakGetekendeVrijgave(root, { sleutels:keys.EVIDENCE,
+    buildKeys:keys.BUILD, runtimeBewijs:false });
   const sig = path.join(root, '.release/external-release.sig');
   fs.writeFileSync(sig, crypto.sign(null, dossierBytes, keys.EVIDENCE.privateKey).toString('base64'));
   assert.equal(external.controleerReleaseRoot(root, COMMIT).reden, 'handtekening-klopt-niet');
@@ -93,7 +95,8 @@ test('old external format, unframed legacy signature and relabelled domain are r
 
 test('rotated/revoked evidence identity does not revive old attestations', t => {
   const { root, keys } = fixture(t);
-  maakGetekendeVrijgave(root, { sleutels:keys.EVIDENCE, runtimeBewijs:false });
+  maakGetekendeVrijgave(root, { sleutels:keys.EVIDENCE,
+    buildKeys:keys.BUILD, runtimeBewijs:false });
   const fresh = crypto.generateKeyPairSync('ed25519');
   fs.writeFileSync(path.join(root, trust.ROLES.EVIDENCE.publicFile), fresh.publicKey.export({ type:'spki', format:'pem' }));
   assert.equal(external.controleerReleaseRoot(root, COMMIT).reden, 'handtekening-klopt-niet');

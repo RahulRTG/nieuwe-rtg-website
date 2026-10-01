@@ -50,6 +50,7 @@
 'use strict';
 
 const klok = require('./lib/klok');
+const { naAntwoord } = require('./lib/antwoord-einde');
 
 const functies = require('./functies');
 
@@ -106,7 +107,7 @@ function volg(req, res, org) {
     gedaan = true;
     raak(f ? f.id : null, org, (res.statusCode || 0) >= 500);
   };
-  res.on('finish', klaar);
+  naAntwoord(res, klaar);
   res.on('close', klaar);
 }
 

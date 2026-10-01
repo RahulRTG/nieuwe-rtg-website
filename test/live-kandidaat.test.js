@@ -84,8 +84,25 @@ function opstelling() {
   schrijf(root, kandidaat.REL.pg, JSON.stringify({ formaat: 'rtg-pg-bewijs-v1',
     geslaagd:true, tapVolledig:true, tests:4, mislukt:0, geannuleerd:0,
     overgeslagen:0, todo:0, bron }) + '\n');
+  const ownerBinding = kandidaat.ownerKandidaatBinding(root, { commit,
+    imageVerwijzing:APP_REF, imageDigest:APP_DIGEST, imageId:APP_ID });
+  const ownerObserved = new Date().toISOString(), ownerNonce = 'o'.repeat(32);
+  const ownerBewijs = kandidaat.maakOwnerReadback(root, { commit, nonce:ownerNonce,
+    imageVerwijzing:APP_REF, imageDigest:APP_DIGEST, imageId:APP_ID,
+    readback:{ formaat:'rtg-owner-postgres-readback-v2', commit, imageId:APP_ID,
+      imageImmutable:ownerBinding.imageImmutable,
+      candidateEvidenceSha256:ownerBinding.kandidaatBewijsSha256, nonce:ownerNonce,
+      postgresReadback:true, directReadOnly:true, ownerAuthorized:true,
+      ownerRefSha256:'4'.repeat(64), ownerEmailSha256:'1'.repeat(64),
+      databaseTargetSha256:'5'.repeat(64), databaseIdentitySha256:'2'.repeat(64),
+      databaseSnapshotSha256:'3'.repeat(64), observedAt:ownerObserved } });
   schrijf(root, kandidaat.REL.golive, JSON.stringify({ formaat: 'rtg-golive-bewijs-v1',
     geslaagd: true, blokkers: 0, bron,
+    ownerReadback:{ formaat:'rtg-owner-readback-bewijs-v2', commit,
+      imageId:APP_ID, bewijsSha256:ownerBewijs.bewijsSha256, postgresReadback:true,
+      directReadOnly:true, ownerAuthorized:true, ownerEmailSha256:'1'.repeat(64),
+      databaseIdentitySha256:'2'.repeat(64), databaseSnapshotSha256:'3'.repeat(64),
+      observedAt:ownerObserved, validUntil:ownerBewijs.geldigTot },
     redis:{ ok:true, tweeInstanties:true, pubsub:true, atomischeRateLimit:true,
       toegestaan:1, geweigerd:1, teller:2, opgeruimd:true, doelSha256:'c'.repeat(64) },
     gedeeldeMedia:{ ok:true, tweeInstanties:true, verwijderd:true, bytes:96,
@@ -95,6 +112,17 @@ function opstelling() {
     imageId: APP_ID, imageVerwijzing:APP_REF, imageDigest:APP_DIGEST,
     inhoudSha256: manifest.inhoudSha256 });
   return { root, commit, APP_REF, BACKUP_REF };
+}
+
+function zetAlleenBootstrapOpen(root, extraHard) {
+  const pad = path.join(root, kandidaat.REL.golive);
+  const golive = JSON.parse(fs.readFileSync(pad, 'utf8'));
+  golive.geslaagd = false;
+  golive.blokkers = 1 + (extraHard ? 1 : 0);
+  golive.controles = [{ teken:'✗', hard:true,
+    tekst:kandidaat.BOOTSTRAP_BLOKKADE + ' Gebruik hem uitsluitend voor de eerste eigenaarsregistratie.' }];
+  if (extraHard) golive.controles.push({ teken:'✗', hard:true, tekst:extraHard });
+  fs.writeFileSync(pad, JSON.stringify(golive) + '\n');
 }
 
 test('één kandidaat bindt bron, draaiend image, container-PG en container-golive', () => {
@@ -131,6 +159,104 @@ test('een kandidaat zonder actieve Redis-, media- en alarmproef blijft geblokkee
       imageVerwijzing:APP_REF, imageDigest:APP_DIGEST, imageId:APP_ID,
       backupVerwijzing:BACKUP_REF, backupDigest:BACKUP_DIGEST, backupId:BACKUP_ID }),
     /Redis-, gedeelde-media- of alarmbezorgingproeven/);
+  } finally { fs.rmSync(root, { recursive:true, force:true }); }
+});
+
+test('alleen de eerste-eigenaarblokkade levert een begrensd bootstrapkandidaatbewijs op', () => {
+  const { root, commit, APP_REF, BACKUP_REF } = opstelling();
+  try {
+    zetAlleenBootstrapOpen(root);
+    const bewijs = kandidaat.maakBootstrap(root, { commit,
+      imageVerwijzing:APP_REF, imageDigest:APP_DIGEST, imageId:APP_ID,
+      backupVerwijzing:BACKUP_REF, backupDigest:BACKUP_DIGEST, backupId:BACKUP_ID });
+    assert.equal(bewijs.uitsluitendEersteEigenaar, true);
+    assert.equal(kandidaat.controleerBootstrap(root, commit).image.id, APP_ID);
+    assert.throws(() => kandidaat.maak(root, { commit,
+      imageVerwijzing:APP_REF, imageDigest:APP_DIGEST, imageId:APP_ID,
+      backupVerwijzing:BACKUP_REF, backupDigest:BACKUP_DIGEST, backupId:BACKUP_ID }),
+    /niet groen/, 'een bootstrapbewijs mag nooit een gewone live-kandidaat worden');
+  } finally { fs.rmSync(root, { recursive:true, force:true }); }
+});
+
+test('bootstrapvoorbereiding weigert iedere tweede go-liveblokkade', () => {
+  const { root, commit, APP_REF, BACKUP_REF } = opstelling();
+  try {
+    zetAlleenBootstrapOpen(root, 'De uitbetaalrail ontbreekt.');
+    assert.throws(() => kandidaat.maakBootstrap(root, { commit,
+      imageVerwijzing:APP_REF, imageDigest:APP_DIGEST, imageId:APP_ID,
+      backupVerwijzing:BACKUP_REF, backupDigest:BACKUP_DIGEST, backupId:BACKUP_ID }),
+    /enige go-liveblokkade/);
+  } finally { fs.rmSync(root, { recursive:true, force:true }); }
+});
+
+test('de bootstrapdeur sluit alleen na een commit/image/PG-readback-gebonden duurzaam bewijs', () => {
+  const { root, commit, APP_REF, BACKUP_REF } = opstelling();
+  try {
+    zetAlleenBootstrapOpen(root);
+    const bootstrap = kandidaat.maakBootstrap(root, { commit,
+      imageVerwijzing:APP_REF, imageDigest:APP_DIGEST, imageId:APP_ID,
+      backupVerwijzing:BACKUP_REF, backupDigest:BACKUP_DIGEST, backupId:BACKUP_ID });
+    const nonce = 'n'.repeat(32);
+    const gelezenOp = new Date().toISOString();
+    const readback = { formaat:'rtg-owner-postgres-readback-v2', commit, imageId:APP_ID,
+      imageImmutable:bootstrap.image.immutable,
+      candidateEvidenceSha256:bootstrap.bewijsSha256, nonce, postgresReadback:true,
+      directReadOnly:true,
+      ownerAuthorized:true, ownerRefSha256:'f'.repeat(64),
+      ownerEmailSha256:crypto.createHash('sha256').update('owner@example.test').digest('hex'),
+      databaseTargetSha256:'1'.repeat(64), databaseIdentitySha256:'2'.repeat(64),
+      databaseSnapshotSha256:'3'.repeat(64), observedAt:gelezenOp };
+    const bewijs = kandidaat.maakOwnerReadback(root, { commit, nonce, readback, bootstrap:true });
+    assert.equal(kandidaat.controleerOwnerReadback(root, { commit }).bewijsSha256, bewijs.bewijsSha256);
+
+    const envPad = path.join(root, '.env.productie');
+    fs.writeFileSync(envPad, 'RTG_OWNER_EMAIL=owner@example.test\nRTG_OWNER_BOOTSTRAP=eenmalig-geheim-123456789\n', { mode:0o600 });
+    const claim = require('../scripts/eigenaar-claim');
+    assert.throws(() => claim.sluitNaOfflineBewijs({ root, envPad,
+      proofPath:path.join(root, '.release', 'ontbreekt.json'), commit }), /readbackbewijs ontbreekt/);
+    assert.match(fs.readFileSync(envPad, 'utf8'), /RTG_OWNER_BOOTSTRAP=/,
+      'zonder bewijs blijft de eenmalige deur open');
+    fs.writeFileSync(envPad, 'RTG_OWNER_EMAIL=ander@example.test\nRTG_OWNER_BOOTSTRAP=eenmalig-geheim-123456789\n');
+    assert.throws(() => claim.sluitNaOfflineBewijs({ root, envPad,
+      proofPath:path.join(root, kandidaat.REL.ownerReadback), commit }), /hoort niet bij RTG_OWNER_EMAIL/);
+    fs.writeFileSync(envPad, 'RTG_OWNER_EMAIL=owner@example.test\nRTG_OWNER_BOOTSTRAP=eenmalig-geheim-123456789\n');
+    claim.sluitNaOfflineBewijs({ root, envPad,
+      proofPath:path.join(root, kandidaat.REL.ownerReadback), commit });
+    assert.doesNotMatch(fs.readFileSync(envPad, 'utf8'), /^RTG_OWNER_BOOTSTRAP=/m);
+
+    const pad = path.join(root, kandidaat.REL.ownerReadback);
+    const geknoeid = JSON.parse(fs.readFileSync(pad));
+    geknoeid.imageId = BACKUP_ID;
+    fs.writeFileSync(pad, JSON.stringify(geknoeid));
+    assert.throws(() => kandidaat.controleerOwnerReadback(root), /ongeldig/);
+  } finally { fs.rmSync(root, { recursive:true, force:true }); }
+});
+
+test('iedere normale release vraagt een nieuw current-DB-bewijs voor exact haar immutable image', () => {
+  const { root, commit, APP_REF, BACKUP_REF } = opstelling();
+  try {
+    const binding = kandidaat.ownerKandidaatBinding(root, { commit,
+      imageVerwijzing:APP_REF, imageDigest:APP_DIGEST, imageId:APP_ID });
+    const nonce = 'r'.repeat(32), observedAt = new Date().toISOString();
+    const readback = { formaat:'rtg-owner-postgres-readback-v2', commit, imageId:APP_ID,
+      imageImmutable:binding.imageImmutable,
+      candidateEvidenceSha256:binding.kandidaatBewijsSha256, nonce,
+      postgresReadback:true, directReadOnly:true, ownerAuthorized:true,
+      ownerRefSha256:'4'.repeat(64), ownerEmailSha256:'5'.repeat(64),
+      databaseTargetSha256:'6'.repeat(64), databaseIdentitySha256:'7'.repeat(64),
+      databaseSnapshotSha256:'8'.repeat(64), observedAt };
+    const bewijs = kandidaat.maakOwnerReadback(root, { commit, nonce, readback,
+      imageVerwijzing:APP_REF, imageDigest:APP_DIGEST, imageId:APP_ID });
+    assert.equal(bewijs.kandidaatSoort, 'release');
+    assert.equal(bewijs.database.readOnlyMeasurement, true);
+    assert.equal(kandidaat.controleerOwnerReadback(root, { commit, imageId:APP_ID,
+      imageImmutable:binding.imageImmutable, eisVers:true }).bewijsSha256, bewijs.bewijsSha256);
+    assert.throws(() => kandidaat.controleerOwnerReadback(root, { commit,
+      imageId:BACKUP_ID, eisVers:true }), /ongeldig/,
+    'bewijs van het vorige/andere image mag een nieuwe release niet dragen');
+    assert.throws(() => kandidaat.controleerOwnerReadback(root, { commit, imageId:APP_ID,
+      eisVers:true, nu:Date.parse(bewijs.geldigTot) + 1 }), /ongeldig/,
+    'historisch bewijs blijft geen waarheid na restore of drift');
   } finally { fs.rmSync(root, { recursive:true, force:true }); }
 });
 

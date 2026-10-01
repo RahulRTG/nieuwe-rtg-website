@@ -10,7 +10,8 @@ const { veiligGelijk } = require('../util');
 
 function fout(error, status, code, extra) { return { error, status, code, ...(extra || {}) }; }
 
-module.exports = function maakBroker({ crypto, opslag, projecteer, contexten, kern, commit, network }) {
+module.exports = function maakBroker({ crypto, opslag, projecteer, contexten, kern, commit, network, trustPlane }) {
+  const meting = require('./broker-meting')({ trustPlane, opslag });
   const handlers = {
     'attention.acknowledge': require('./action-attention')({ projecteer, opslag }),
     'schedule.item.create': require('./action-schedule')({ kern }),
@@ -39,7 +40,7 @@ module.exports = function maakBroker({ crypto, opslag, projecteer, contexten, ke
     return null;
   }
 
-  function preview(key, invoer, economicPrincipalRef) {
+  function previewIntern(key, invoer, economicPrincipalRef) {
     const b = invoer || {}, definition = registry.haal(b.intent, b.version);
     if (!definition) return fout('Onbekende of verouderde intentie.', 400, 'UNKNOWN_INTENT');
     const parameters = b.parameters || {};
@@ -80,10 +81,18 @@ module.exports = function maakBroker({ crypto, opslag, projecteer, contexten, ke
       consequence: kopie(voorbereid.consequence)
     };
     opslag.previewZet(key, p);
+    if (trustPlane && typeof trustPlane.observe === 'function') try {
+      trustPlane.observe({ capability: 'experience.propose', boundary: 'actor:' + opslag.actor(key),
+        subjectRef: p.objectRef || { domain: 'experience', type: 'preview', id: p.id },
+        predicate: 'experience.preview.allowed', value: { intent: p.intent, world: p.world },
+        evidence: { intent: p.intent, version: p.version, policyInputHash: p.fingerprint },
+        policy: { id: p.policyDecision.policyId, version: p.policyDecision.policyVersion,
+          decision: p.policyDecision.decision } });
+    } catch (e) { /* shadow evidence mag de bestaande preview niet breken */ }
     return { ok: true, preview: p };
   }
 
-  async function execute(key, invoer) {
+  async function executeIntern(key, invoer) {
     const b = invoer || {}, idemKey = String(b.idempotencyKey || '');
     if (!/^[a-zA-Z0-9._:-]{8,120}$/.test(idemKey))
       return fout('Een geldige idempotencyKey van minimaal acht tekens is verplicht.', 400, 'IDEMPOTENCY_REQUIRED');
@@ -140,8 +149,44 @@ module.exports = function maakBroker({ crypto, opslag, projecteer, contexten, ke
         policyDecision: p.policyDecision, confirmation: { confirmed: true, at },
         result: kopie(uitgevoerd.result || {})
       }, { ok: true, intent: p.intent, ...(uitgevoerd.result || {}), objectRef });
+      if (result && trustPlane && typeof trustPlane.observe === 'function') try {
+        trustPlane.observe({ capability: 'experience.propose', boundary: 'actor:' + opslag.actor(key),
+          subjectRef: objectRef || { domain: 'experience', type: 'preview', id: p.id },
+          predicate: 'experience.action.executed', value: { intent: p.intent },
+          evidence: { previewId: p.id, inputHash: p.fingerprint, idempotencyKeyHash:
+            crypto.createHash('sha256').update(idemKey).digest('hex') },
+          policy: { id: p.policyDecision.policyId, version: p.policyDecision.policyVersion,
+            decision: p.policyDecision.decision } });
+      } catch (e) { /* shadow evidence mag de domeincommit niet terugdraaien */ }
       return result || fout('De actie kon niet atomair worden afgerond.', 500, 'FINALIZATION_FAILED');
     });
+  }
+
+  function preview(key, invoer, economicPrincipalRef) {
+    const timer = meting.start(key);
+    try {
+      const result = previewIntern(key, invoer, economicPrincipalRef), ok = !!(result && result.ok);
+      meting.finish(timer, result, ok, ok ? 'PREVIEW_ALLOWED' : ((result && result.code) || 'PREVIEW_DENIED'),
+        ok ? 'experience-preview:' + result.preview.id : null);
+      return result;
+    } catch (e) {
+      meting.finish(timer, { status: 500, code: 'PREVIEW_EXCEPTION' }, false, 'PREVIEW_FAILED');
+      throw e;
+    }
+  }
+
+  async function execute(key, invoer) {
+    const timer = meting.start(key);
+    try {
+      const result = await executeIntern(key, invoer), ok = !!(result && result.ok);
+      const idemKey = invoer && invoer.idempotencyKey;
+      meting.finish(timer, result, ok, ok ? 'ACTION_EXECUTED' : ((result && result.code) || 'ACTION_DENIED'),
+        ok && idemKey ? 'experience-execute:' + idemKey : null);
+      return result;
+    } catch (e) {
+      meting.finish(timer, { status: 500, code: 'EXECUTION_EXCEPTION' }, false, 'ACTION_FAILED');
+      throw e;
+    }
   }
 
   return { preview, execute, registry: registry.publiek };

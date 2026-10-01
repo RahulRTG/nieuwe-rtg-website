@@ -127,3 +127,25 @@ test('DE TEGENPROEF: de zeef geeft niet overal nul terug', () => {
   assert.notEqual(blindIn(bron, kapot).kwijt, 0, 'op bekend-foute invoer hoort hij uit te slaan');
   assert.equal(blindIn('const a = 1;\n').kwijt, 0, 'en op gewone code niet');
 });
+
+test('bundeldelen die midden in een sjabloon zijn geknipt worden als een logisch programma gelezen', () => {
+  const fs = require('fs');
+  const os = require('os');
+  const path = require('path');
+  const { meetBlind } = require('../scripts/lib/bronblind.js');
+  const wortel = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bronblind-bundel-'));
+  try {
+    const delen = path.join(wortel, 'public', 'gedeeld');
+    fs.mkdirSync(delen, { recursive: true });
+    fs.writeFileSync(path.join(delen, '01.js'), "(function(){ const CSS = `\n");
+    fs.writeFileSync(path.join(delen, '02.js'), ".x{color:red}\n`; globalThis.waarde = CSS; })();\n");
+    /* De uitvoer is met opzet ongeldig en achtergelopen. De meter hoort de
+       canonieke delen te lezen, niet toevallig groen te worden op bouwuitvoer. */
+    fs.writeFileSync(path.join(wortel, 'public', 'gedeeld.js'), 'dit is achtergelopen bouwuitvoer @');
+
+    const r = meetBlind({ wortel, mappen: ['public'], bundels: { 'gedeeld.js': 'gedeeld' } });
+    assert.equal(r.bestanden, 1, 'twee delen plus bouwuitvoer vormen een logisch programma');
+    assert.equal(r.lexfout, 0, 'een knip midden in een sjabloon is geen syntaxfout van de bundel');
+    assert.equal(r.ongedekt, 0, 'de samengevoegde canonieke bron is volledig gedekt');
+  } finally { fs.rmSync(wortel, { recursive: true, force: true }); }
+});

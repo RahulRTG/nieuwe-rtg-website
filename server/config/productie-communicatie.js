@@ -47,6 +47,32 @@ function keurCommunicatie(env, fouten, waarschuwingen, priveBeta) {
   if (!priveBeta && env.RTG_HERSTEL_SMS_UIT_BEWUST !== '1') {
     fouten.push('Geen echte SMS-provider aangesloten: zet RTG_HERSTEL_SMS_UIT_BEWUST=1 om telefoonherstel bewust fail-closed uit te schakelen.');
   }
+
+  /* Voice en video staan in Connection OS als werkelijk geïmplementeerde
+     capabilities. Alleen STUN is daarvoor geen volledige productieketen:
+     symmetrische NAT, streng 4G en bedrijfsfirewalls vereisen een relais. Een
+     publieke release mag die acties dus niet projecteren terwijl TURN slechts
+     een waarschuwing is. Private/lokale beta blijft bruikbaar voor een directe
+     netwerkproef, maar publieke productie faalt hier dicht. */
+  if (!priveBeta) {
+    const turnUrls = String(env.TURN_URL || '').split(',').map(x => x.trim()).filter(Boolean);
+    if (!turnUrls.length) {
+      fouten.push('TURN_URL ontbreekt: live voice/video is dan niet betrouwbaar via 4G, symmetrische NAT en bedrijfsfirewalls.');
+    } else if (turnUrls.some(url => !/^turns?:[^\s]+$/i.test(url))) {
+      fouten.push('TURN_URL bevat een ongeldige relay-URL; gebruik uitsluitend turn: of turns: adressen.');
+    }
+    const gedeeldGeheim = String(env.TURN_SECRET || '');
+    const vasteGebruiker = String(env.TURN_USER || '');
+    const vastWachtwoord = String(env.TURN_PASS || '');
+    const tijdelijkeInlog = gedeeldGeheim.length >= 32;
+    const vasteInlog = vasteGebruiker.length > 0 && vastWachtwoord.length >= 32;
+    if (!tijdelijkeInlog && !vasteInlog) {
+      fouten.push('TURN-authenticatie ontbreekt of is te zwak: zet TURN_SECRET (32+ tekens) of TURN_USER plus TURN_PASS (32+ tekens).');
+    }
+    if (env.STUN_FALLBACK_GOOGLE === '1') {
+      fouten.push('STUN_FALLBACK_GOOGLE=1 is niet toegestaan in publieke productie: gebruik de eigen STUN/TURN-keten zonder stille externe metadata-uitgang.');
+    }
+  }
 }
 
 module.exports = { keurCommunicatie };

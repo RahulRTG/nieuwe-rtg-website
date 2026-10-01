@@ -66,6 +66,7 @@ const keten = require('./keten');
 const klok = require('./klok');
 const verzoekcontext = require('../db/verzoekcontext');
 const burger = require('./burgerpad');
+const { naAntwoord } = require('./antwoord-einde');
 
 const MAX = 50000;          // ruim genoeg voor een jaar bij dit verkeer, en begrensd
 const SCHRIJFT = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
@@ -170,7 +171,7 @@ function maakHandelingsspoor({ db, save, nu, max }) {
       save();
     };
     if (!verzoekcontext.haakVoorCommit(schrijf)) {
-      res.on('finish', () => { try { schrijf(); } catch (e) {} });
+      naAntwoord(res, () => { try { schrijf(); } catch (e) {} });
     }
     next();
   }

@@ -22,14 +22,23 @@ function inventaris(root) {
 /* Node's TAP-reporter sluit af met één canonieke samenvatting. Afwezig is
    onbekend, nooit stilzwijgend nul. */
 function tapSamenvatting(tekst) {
+  const bron = String(tekst || '');
   const waarden = {};
-  for (const m of String(tekst || '').matchAll(/^# (tests|pass|fail|cancelled|skipped|todo) (\d+)$/gm))
+  for (const m of bron.matchAll(/^# (tests|pass|fail|cancelled|skipped|todo) (\d+)$/gm))
     waarden[m[1]] = Number(m[2]);
+  /* Een fail-closed ronde weigert skips en todo's. Alleen hun aantal bewaren
+     maakte de weigering bij duizenden toetsen onnodig traag te onderzoeken.
+     Deze begrensde TAP-regels zijn diagnose, nooit vervangend bewijs. */
+  const regelsVoor = merkteken => [...bron.matchAll(new RegExp(
+    '^\\s*(?:ok|not ok)\\s+\\d+\\s+-\\s+([^\\r\\n]*?)\\s+#\\s+' + merkteken + '(?:\\s+([^\\r\\n]*))?$', 'gmi'))]
+    .map(m => ({ test: String(m[1] || '').trim().slice(0, 300),
+      reden: String(m[2] || '').trim().slice(0, 500) || null }));
   const volledig = ['tests', 'pass', 'fail', 'cancelled', 'skipped', 'todo']
     .every(k => Number.isSafeInteger(waarden[k]));
   return { volledig, tests: waarden.tests, geslaagdeTests: waarden.pass,
     mislukt: waarden.fail, geannuleerd: waarden.cancelled,
-    overgeslagen: waarden.skipped, todo: waarden.todo };
+    overgeslagen: waarden.skipped, todo: waarden.todo,
+    overgeslagenTests: regelsVoor('SKIP'), todoTests: regelsVoor('TODO') };
 }
 
 function zelfdeInventaris(a, b) {

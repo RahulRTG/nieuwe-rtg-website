@@ -26,6 +26,7 @@
 'use strict';
 const { lokaalAdres } = require('../lib/lokaaladres');
 const foutisolatie = require('../lib/foutisolatie');
+const { naAntwoord } = require('../lib/antwoord-einde');
 
 module.exports = function verzoekketen(deps) {
   const { app, express, log, logboek, db, save, betaal, betaalWaarheid, muntbetaal, opslagKlaar,
@@ -79,6 +80,10 @@ module.exports = function verzoekketen(deps) {
      staat vóór bodylezers en dus ook vóór de rauwe betaalwebhooks. */
   if (typeof postgresVerzoekMiddleware === 'function') app.use(postgresVerzoekMiddleware());
   app.use(logboek.middleware()); // correlatie-id + verzoeklog (methode, pad, status, duur)
+  /* De Trust & Evidence-correlatie loopt door ELK verzoek, ook wanneer de route
+     zelf nog geen claims schrijft. Het publieke request-id blijft een logref;
+     de interne chain-id is apart, ondoorzichtig en verleent nooit toegang. */
+  app.use(require('../kern/bewijsvlak/context').middleware());
   // wat verandert dit verzoek: rijen per collectie voor en na (blast radius).
   // NA het logboek want hij leunt op req.id; bewust niet in save(). Zie de kop
   // van ./handeling.js voor de afweging en de gemeten kosten.
@@ -119,7 +124,7 @@ module.exports = function verzoekketen(deps) {
      verkeer en doet verder niets; de kern wordt verderop aangesloten. */
   let rtgaiMeelezer = null;
   app.use((req, res, next) => {
-    res.on('finish', () => { try { if (rtgaiMeelezer) rtgaiMeelezer.lees(req.method, req.path, res.statusCode); } catch (e) {} });
+    naAntwoord(res, () => { try { if (rtgaiMeelezer) rtgaiMeelezer.lees(req.method, req.path, res.statusCode); } catch (e) {} });
     next();
   });
 

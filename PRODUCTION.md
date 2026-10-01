@@ -159,7 +159,6 @@ logboeken, energie-instellingen): `scripts/mac/LEESMIJ.md`. Weghalen kan met
 | `RTG_ENC_KEY` | Versleuteling-at-rest. 64 hex-tekens (`openssl rand -hex 32`). **Zonder dit weigert iedere productiestart; er is geen plaintext-override.** |
 | `RTG_VAULT_KEY` | De sleutel van de identiteitskluis (echte naam, e-mail, telefoon). 64 hex-tekens. **Zonder dit weigert de start.** Staat hij niet in de omgeving, dan maakt de server hem als bestand `vault.key` in de datamap — naast `rtg.db`. Wie die map steelt heeft dan de data én de sleutel, en zijn de codenamen weer namen. Hoort uit een secrets manager te komen |
 | `RTG_SECRET_KEY` | Ondertekent de sessietokens. 64 hex-tekens. **Zonder dit weigert de start**, om dezelfde reden: anders komt `secret.key` naast de database te liggen, en kan wie hem heeft zelf geldige sessies maken |
-| `OFFICE_CODE` | Gedeeld backofficegeheim van minimaal 12 willekeurige tekens. Verplicht naast TOTP; nooit per proces laten wisselen |
 | `DATABASE_URL` | PostgreSQL voor gedeelde, multi-instance data. De app kan lokaal op SQLite proefdraaien, maar **go-live weigert zonder PostgreSQL** |
 | `APP_URL` | Vast publiek HTTPS-adres voor herstel-, uitnodigings- en bevestigingslinks. **Zonder dit weigert productie; de Host-kop is nooit een veilige bron.** |
 | `REDIS_URL` | Gedeelde realtime-bus, intrekking en atomische RTG-PIN-antifraudegrenzen. **Go-live weigert zonder Redis** |
@@ -172,6 +171,13 @@ Aanbevolen: `ERR_WEBHOOK_URL` (externe alarmering) en SMTP (`SMTP_URL`). Voor
 echte betalingen: `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET` of een andere
 provider; anders `RTG_BETALEN_UIT=1`. Voor AI: `ANTHROPIC_API_KEY` of een andere
 provider; anders `RTG_AI_UIT=1`.
+
+Het productiekantoor gebruikt geen `OFFICE_CODE` en geen losse
+`OFFICE_TOTP_SECRET`. Iedere medewerker logt in met het eigen RTG-account,
+start de kantoorrol op naam en bevestigt die deur met een verse passkey. De
+gedeelde code/TOTP-deur wordt in productie geweigerd vóórdat een code wordt
+vergeleken. `OFFICE_CODE` en `OFFICE_TOTP_SECRET` blijven alleen beschikbaar
+buiten productie voor afgeschermde demo's en geautomatiseerde toetsen.
 
 Veilige tussenstand: er is nog geen externe herstel-SMS en geen geactiveerde
 uitgaande Stripe-rail. Productie start daarom alleen wanneer
@@ -581,7 +587,9 @@ dev-lekken, registratie/eigenaar/backoffice werken.
 **De enige productieroute:**
 
 1. Volg `LIVEGANG.md`: bereid host, geheimen, externe backup en echte providers
-   voor; rond code en gegenereerde registers af en commit een schone bron.
+   voor; vul het compliancebestand met `npm run papierwerk -- --live` en lees
+   het na invullen met `npm run papierwerk -- --live --lees` terug; rond code
+   en gegenereerde registers af en commit een schone bron.
 2. Laat `Release-imagekandidaat` op die exacte commit lopen. Download het
    artefact `herkomst` ongewijzigd naar `.release/` en vul de twee unieke
    kandidaat-tags in `deploy/live.env` in.
@@ -602,8 +610,25 @@ dev-lekken, registratie/eigenaar/backoffice werken.
    padbehoudende HTTP→HTTPS-redirect en bewaart
    `.release/publieke-tls-bewijs.json`; vervolgens lopen veiligheidsrand en SLO.
 
-- [ ] `npm run live:golive` geeft exitcode 0 in de productiecontainer
-- [ ] `RTG_OWNER_EMAIL` is het echte adres van de eigenaar, en er hoort al een RTG-account bij (verplicht; leeg of het voorbeeldadres blokkeert de start). `RTG_OWNER_BOOTSTRAP` is na die eerste registratie volledig uit de productieomgeving verwijderd. Overdragen kan later op de technische pagina onder "Eigenaarschap"
+- [ ] `npm run live:golive` geeft exitcode 0 in de productiecontainer. Op een
+      verse host mag de eerste ronde uitsluitend op `RTG_OWNER_BOOTSTRAP`
+      blokkeren; draai dan `npm run live:owner` en herhaal `live:golive`
+- [ ] `npm run papierwerk -- --live --lees` heeft alle 18 echte antwoorden in
+      exact `.rtg-compliance/papieren.json` vastgelegd; onbekende feiten zijn
+      niet ingevuld om de poort kunstmatig groen te maken
+- [ ] `RTG_OWNER_EMAIL` is het echte adres van de eigenaar, en er hoort al een
+      RTG-account bij. De eerste eigenaar is vóór de publieke wissel uit exact
+      het begrensd gekeurde kandidaatimage aangemaakt én door een tweede proces
+      uit PostgreSQL teruggelezen. `RTG_OWNER_BOOTSTRAP` is daarna volledig uit
+      de productieomgeving verwijderd. Overdragen kan later op de technische
+      pagina onder "Eigenaarschap"
+- [ ] Ook na de eerste installatie heeft deze release een vers
+      `rtg-owner-readback-bewijs-v2`: `live:golive` heeft de effectieve eigenaar
+      opnieuw met alleen `SELECT` uit de echte productie-PostgreSQL gelezen en
+      het bewijs aan current DB snapshot, nonce, commit en immutable image
+      gebonden. `ownerproof` heeft geen productie- of releasevolume;
+      `keurgolive` ontvangt alleen het gehashte bewijs. Na vier uur of na
+      restore/drift moet de ronde opnieuw
 - [ ] `.env` ingevuld; `NODE_ENV=production`; `RTG_ENC_KEY` gezet
 - [ ] Versleuteling in rust bewezen op de echte machine: `node --test test/rust.test.js` is groen. Die test zet gegevens via de gewone endpoints in een server en zoekt daarna de hele datamap byte voor byte af; hij vertrouwt niet op de belofte
 - [ ] De sleutels (`RTG_ENC_KEY`, `RTG_VAULT_KEY`, `RTG_SECRET_KEY`) staan als omgevingsvariabele, **niet** in de datamap. Zonder deze regel schrijft de server ze als bestand naast de data, en dan opent een gestolen schijf zichzelf
@@ -643,13 +668,23 @@ dev-lekken, registratie/eigenaar/backoffice werken.
 - [ ] Een rollback is op de echte host geoefend met een uitrolbon; volumes zijn daarbij niet teruggezet
 - [ ] Logs komen ergens terecht (Loki/CloudWatch/Datadog)
 - [ ] GitHub repository variables `RTG_LIVE_URL` én `RTG_LIVE_COMMIT` gezet; de publieke sonde prikt elke vijf minuten van buitenaf door DNS en TLS heen en bindt het bewijs aan de werkelijk uitgerolde commit
-- [ ] `OFFICE_TOTP_SECRET` gezet en de authenticator-app gekoppeld (2FA op de backoffice; **de keuring blokkeert de productiestart zolang hij ontbreekt**, en een geheim onder de 16 base32-tekens telt niet als tweede factor). Zonder deze factor staat de backoffice — auditlog, tijdlijn met codenamen, export — achter alleen de statische `OFFICE_CODE`, en de officedeur remt per IP, dus verspreid raden komt daar langs. Dit was een waarschuwing; `scripts/docker/controle.js` eiste het al hard voor livegang, en die twee zeggen nu hetzelfde
+- [ ] Iedere productiemedewerker met de kantoorrol heeft een eigen passkey en
+      de echte productieproef bevestigt: gedeelde code/TOTP wordt geweigerd,
+      een oude codesessie en een sessie op naam zonder passkey openen niets,
+      en alleen een verse passkeyceremonie opent de kantoorroute
 - [ ] Inlog-auditlog gecontroleerd na de eerste inlog (RTG HQ, kaart "Inlogactiviteit")
 - [ ] Rate-limiter bevestigd: in productie geeft de API boven 300 verzoeken/minuut/IP een 429 (test/livegang.test.js bewijst dit)
 - [ ] Schone start bevestigd: elke echte omgeving heeft `RTG_MAGNAAT_TEST` uit en bevat geen voorbeeldzaken, testpersoneel of voorbeeldposts; ook een database die eerder als testomgeving begon wordt bij de start opgeschoond (test/livegang.test.js)
 - [ ] Schild getest: de applicatie-WAF blokkeert sondes (wp-admin, .env, pad-klimmen) en de DDoS-rem zet een stormend IP 15 minuten op de banlijst; meldingen komen op het beveiligingsbord binnen (test/schild.test.js)
-- [ ] Rand-DDoS geregeld: DNS achter Cloudflare (of gelijkwaardig) met proxy aan, zodat volumetrische golven de server nooit bereiken; de app-WAF en -rem zijn de tweede linie
-- [ ] TURN draait: coturn met `use-auth-secret` en `static-auth-secret` gelijk aan `TURN_SECRET`; `/api/ice` geeft kortlevende inloggegevens terug en (video)bellen werkt vanaf 4G/strenge firewalls
+- [ ] Rand-DDoS geregeld via een aantoonbaar passende EU/self-hosted of bewust
+      geaccepteerde randdienst, zodat volumetrische golven de server niet
+      bereiken; Cloudflare is een mogelijke externe afhankelijkheid, nooit een
+      verplichte of impliciet soevereine keuze. De app-WAF en -rem zijn de
+      tweede linie
+- [ ] TURN draait: coturn met `use-auth-secret` en `static-auth-secret` gelijk
+      aan `TURN_SECRET`; `/api/ice` geeft kortlevende inloggegevens terug en
+      een echte tweennetwerkproef bewijst voice én video vanaf 4G en een streng
+      firewallnetwerk. Zonder deze keten blokkeert publieke productie
 
 ---
 
@@ -666,16 +701,19 @@ Dit is het deel dat je niet in dit repo kunt afvinken:
    schrijvers, globaal-unieke id's), met tests voor correctheid en multi-writer.
    Wat nog rest: load-tests op productievolume, afstemmen van pool/connlimits, en
    een read-replica-/backup-strategie voor Postgres zelf.
-4. **Kinderen en moderatie (het zwaarst).** De RTFoundation richt zich op
-   minderjarigen, met chat, snaps en (video)bellen. Dat vereist: echte moderatie
-   (mensen + tooling, niet alleen block/report), leeftijdsverificatie, een DPIA,
-   meldroutes en toezicht. Dit is een *voorwaarde om te mogen starten*, geen
-   latere feature.
+4. **Kinderen en moderatie (het zwaarst).** Foundation blijft in de beperkte
+   volwassen release gesloten. Openstelling voor minderjarigen vereist vooraf
+   echte moderatie (mensen + tooling, niet alleen block/report),
+   leeftijdsverificatie, een DPIA, meldroutes en toezicht. Dit is een
+   voorwaarde voor het openen van Foundation, niet voor een release waarin de
+   productpolicy Foundation aantoonbaar dicht houdt.
 5. **Juridisch.** Voorwaarden, verwerkersovereenkomsten, cookie-/privacybeleid
    en aansprakelijkheid moeten door een jurist zijn getoetst voor de doelgroepen
    en landen waarin je draait.
 6. **Breder testen.** De testsuite dekt de kritieke paden (veiligheid, realtime,
    betaal-naad, config, opslag). UI-flows en edge-cases verdienen meer dekking.
 
-Kort: **de code is klaar om te draaien; het product is klaar om te starten
-zodra de zes punten hierboven zijn geregeld.**
+Kort: **de bron kan pas releaseklaar worden genoemd wanneer de commitgebonden
+poorten groen zijn. Het product kan pas starten wanneer daarnaast alle gekozen
+host-, provider-, juridische en operationele voorwaarden aantoonbaar zijn
+gesloten. Ontbrekend bewijs blijft `UNKNOWN`.**

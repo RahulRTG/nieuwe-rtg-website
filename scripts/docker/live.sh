@@ -173,13 +173,59 @@ case "$opdracht" in
     compose ps
     ;;
   owner)
+    # Eerste eigenaar op een verse host: NIET eerst publiek uitrollen. Een
+    # eerdere live:golive-ronde moet hebben bewezen dat RTG_OWNER_BOOTSTRAP de
+    # enige blokkade is en welk immutable kandidaatimage die uitspraak deed.
+    # Dat image schrijft het account via een eenmalige, niet-gepubliceerde
+    # container naar de echte datalaag; een tweede schoon proces leest het uit
+    # PostgreSQL terug voordat de host het bootstrapgeheim atomisch verwijdert.
     cd "$ROOT"
-    RTG_LIVE_ENV_FILE="$LIVE_ENV" node scripts/eigenaar-claim.js
-    # Het claimscript verwijdert de bootstrapwaarde uit het host-secret. Een
-    # recreate is nodig omdat een bestaand containerproces secrets niet herlaadt.
-    compose up -d --no-build --force-recreate app
-    wacht_ready
-    echo "[live] eigenaar geclaimd en eenmalige bootstrapdeur gesloten"
+    shift
+    release_commit="$(git rev-parse --verify HEAD)"
+    bootstrap="$(node scripts/live-kandidaat.js --controle-bootstrap --commit="$release_commit")"
+    bootstrap_image="$(printf '%s\n' "$bootstrap" | sed -n '1p')"
+    bootstrap_id="$(printf '%s\n' "$bootstrap" | sed -n '2p')"
+    bootstrap_pin="$(printf '%s\n' "$bootstrap" | sed -n '5p')"
+    [ -n "$bootstrap_image" ] && [ -n "$bootstrap_id" ] && [ -n "$bootstrap_pin" ] || {
+      echo "[live] bootstrapkandidaatbewijs gaf geen image" >&2; exit 65;
+    }
+    [ "$(docker image inspect --format='{{.Id}}' "$bootstrap_image")" = "$bootstrap_id" ] || {
+      echo "[live] lokale bootstrap-image wijkt af van het gekeurde image" >&2; exit 65;
+    }
+    IMAGE="$bootstrap_image"
+    compose up -d --no-build --wait postgres
+    owner_nonce="$(node -e 'process.stdout.write(require("crypto").randomBytes(24).toString("base64url"))')"
+    owner_status=0
+    owner_uitvoer="$(compose run --rm --no-deps -e NODE_ENV=production \
+      -e RTG_RELEASE_COMMIT="$release_commit" -e RTG_OWNER_IMAGE_ID="$bootstrap_id" \
+      -e RTG_OWNER_IMAGE_IMMUTABLE="$bootstrap_image" \
+      -e RTG_OWNER_CANDIDATE_SHA256="$bootstrap_pin" -e RTG_OWNER_PROOF_NONCE="$owner_nonce" \
+      ownerproof 2>&1)" || owner_status=$?
+    if [ "$owner_status" -ne 0 ]; then
+      printf '%s\n' "$owner_uitvoer"
+      compose run --rm --no-deps -e NODE_ENV=bootstrap app \
+        node scripts/docker/start.js owner-init "$@"
+      owner_uitvoer="$(compose run --rm --no-deps -e NODE_ENV=production \
+        -e RTG_RELEASE_COMMIT="$release_commit" -e RTG_OWNER_IMAGE_ID="$bootstrap_id" \
+        -e RTG_OWNER_IMAGE_IMMUTABLE="$bootstrap_image" \
+        -e RTG_OWNER_CANDIDATE_SHA256="$bootstrap_pin" -e RTG_OWNER_PROOF_NONCE="$owner_nonce" \
+        ownerproof 2>&1)"
+    fi
+    printf '%s\n' "$owner_uitvoer" | sed '/^RTG_OWNER_READBACK_JSON=/d'
+    owner_json="$(printf '%s\n' "$owner_uitvoer" | sed -n 's/^RTG_OWNER_READBACK_JSON=//p')"
+    [ -n "$owner_json" ] && [ "$(printf '%s\n' "$owner_uitvoer" | grep -c '^RTG_OWNER_READBACK_JSON=')" -eq 1 ] || {
+      echo "[live] eigenaar werd niet met één machineleesbare PostgreSQL-readback teruggegeven" >&2; exit 70;
+    }
+    owner_tmp="$(mktemp "$ROOT/.release/.owner-readback.XXXXXX")"
+    printf '%s\n' "$owner_json" > "$owner_tmp"
+    node scripts/live-kandidaat.js --owner-readback-bewijs --commit="$release_commit" \
+      --bootstrap --nonce="$owner_nonce" --attestatie-bestand="$owner_tmp"
+    rm -f "$owner_tmp"
+    RTG_ENV_FILE="$PRODUCTIE_ENV" node scripts/eigenaar-claim.js --sluit-offline
+    rm -f "$ROOT/.release/live-bootstrap-kandidaat.json" \
+      "$ROOT/.release/golive-bewijs.json" "$ROOT/.release/live-kandidaat.json"
+    echo "[live] eigenaar in de productiedatalaag teruggelezen en bootstrapdeur gesloten"
+    echo "[live] draai nu live:golive opnieuw; pas daarna kan READY en live:deploy ontstaan"
     ;;
   golive)
     # Haal een NIET-PUBLIEKE CI-kandidaat op en keur precies dat image
@@ -193,6 +239,7 @@ case "$opdracht" in
     mkdir -p "$bewijs_map"
     rm -f "$bewijs_map/live-kandidaat.json" "$bewijs_map/live-kandidaat-image-bewijs.json" \
       "$bewijs_map/live-kandidaat-runtime-bewijs.json" "$bewijs_map/pg-bewijs.json" \
+      "$bewijs_map/owner-readback-bewijs.json" \
       "$bewijs_map/keur.env" "$bewijs_map/keur-motor-state.key"
     release_commit="$(node scripts/live-kandidaat-bron.js)"
     release="$(printf '%s' "$release_commit" | cut -c1-12)"
@@ -270,6 +317,57 @@ case "$opdracht" in
     mv "$bewijs_tmp" "$bewijs_map/live-kandidaat-image-bewijs.json"
     IMAGE="$kandidaat_registry"
     BACKUP_IMAGE="$backup_registry"
+    owner_image_immutable="$kandidaat@$kandidaat_digest"
+    export RTG_OWNER_IMAGE_ID="$kandidaat_id"
+    export RTG_OWNER_IMAGE_IMMUTABLE="$owner_image_immutable"
+
+    # Op de allereerste ronde bestaat de eigenaar nog niet. Dan laat de
+    # geïsoleerde keuring uitsluitend RTG_OWNER_BOOTSTRAP blokkeren en ontstaat
+    # daarna het begrensde bootstrapbewijs. Elke volgende ronde moet HIER een
+    # verse, read-only waarneming uit echte productie-PostgreSQL maken. De
+    # ownerproof-service heeft geen productievolume; keurgolive ziet vervolgens
+    # alleen het gesanitiseerde bewijsbestand en nooit het datanetwerk.
+    owner_bootstrap="$(awk -F= '$1 == "RTG_OWNER_BOOTSTRAP" { sub(/^[^=]*=/, ""); print; exit }' "$PRODUCTIE_ENV" 2>/dev/null || true)"
+    if [ -z "$owner_bootstrap" ]; then
+      owner_binding="$(node scripts/live-kandidaat.js --owner-kandidaatbinding \
+        --commit="$release_commit" --image-verwijzing="$kandidaat" \
+        --image-digest="$kandidaat_digest" --image-id="$kandidaat_id")"
+      owner_nonce="$(node -e 'process.stdout.write(require("crypto").randomBytes(24).toString("base64url"))')"
+      productie_pg="$(compose ps -q postgres 2>/dev/null || true)"
+      [ -n "$productie_pg" ] || {
+        echo "[live] productie-PostgreSQL draait niet; kandidaatraadpleging start of recreëert geen productiedienst" >&2
+        exit 69
+      }
+      [ "$(docker inspect --format='{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' "$productie_pg")" = "healthy" ] || {
+        echo "[live] productie-PostgreSQL is niet healthy; vers eigenaarsbewijs geweigerd" >&2
+        exit 69
+      }
+      owner_status=0
+      owner_uitvoer="$(compose run --rm --no-deps -e NODE_ENV=production \
+        -e RTG_RELEASE_COMMIT="$release_commit" -e RTG_OWNER_IMAGE_ID="$kandidaat_id" \
+        -e RTG_OWNER_IMAGE_IMMUTABLE="$owner_image_immutable" \
+        -e RTG_OWNER_CANDIDATE_SHA256="$owner_binding" \
+        -e RTG_OWNER_PROOF_NONCE="$owner_nonce" ownerproof 2>&1)" || owner_status=$?
+      printf '%s\n' "$owner_uitvoer" | sed '/^RTG_OWNER_READBACK_JSON=/d'
+      [ "$owner_status" -eq 0 ] || {
+        echo "[live] verse eigenaar kon niet read-only uit productie-PostgreSQL worden bewezen" >&2
+        exit "$owner_status"
+      }
+      owner_json="$(printf '%s\n' "$owner_uitvoer" | sed -n 's/^RTG_OWNER_READBACK_JSON=//p')"
+      [ -n "$owner_json" ] && [ "$(printf '%s\n' "$owner_uitvoer" | grep -c '^RTG_OWNER_READBACK_JSON=')" -eq 1 ] || {
+        echo "[live] verse eigenaar werd niet met één PostgreSQL-readback teruggegeven" >&2; exit 70;
+      }
+      owner_tmp="$(mktemp "$bewijs_map/.owner-readback.XXXXXX")"
+      printf '%s\n' "$owner_json" > "$owner_tmp"
+      if ! node scripts/live-kandidaat.js --owner-readback-bewijs \
+        --commit="$release_commit" --nonce="$owner_nonce" --attestatie-bestand="$owner_tmp" \
+        --image-verwijzing="$kandidaat" --image-digest="$kandidaat_digest" \
+        --image-id="$kandidaat_id"; then
+        rm -f "$owner_tmp"
+        exit 70
+      fi
+      rm -f "$owner_tmp"
+    fi
     # De kandidaat krijgt een eigen projectvolume. Alleen deze expliciete
     # golive-handeling initialiseert het; `up` en een restart doen dat nooit.
     keur_compose run --rm --no-deps --entrypoint /app/rtg-motor keurmotor init-state
@@ -327,7 +425,18 @@ case "$opdracht" in
     fi
     mv "$bewijs_tmp" "$bewijs_doel"
     echo "[live] go-live-bewijs host-side bewaard: .release/golive-bewijs.json"
-    [ "$status" -eq 0 ] || exit "$status"
+    if [ "$status" -ne 0 ]; then
+      # Is de eerste eigenaar werkelijk het ENIGE open punt, dan maken we een
+      # smal tussenbewijs. Het blijft een rode go-live en kan nooit door de
+      # productiepoort of live:deploy als READY worden gebruikt.
+      if node scripts/live-kandidaat.js --maak-bootstrap --commit="$release_commit" \
+        --image-verwijzing="$kandidaat" --image-digest="$kandidaat_digest" \
+        --image-id="$kandidaat_id" --backup-verwijzing="$kandidaat_backup" \
+        --backup-digest="$backup_digest" --backup-id="$kandidaat_backup_id"; then
+        echo "[live] uitsluitend de eerste eigenaar staat nog open; draai nu npm run live:owner"
+      fi
+      exit "$status"
+    fi
     keur_opruimen
     trap - EXIT HUP INT TERM
     release_commit_na="$(node scripts/live-kandidaat-bron.js)"

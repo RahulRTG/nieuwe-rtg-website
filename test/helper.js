@@ -1158,9 +1158,21 @@ function metGedeeldeBrowser(mod, endpoint) {
          BrowserServer voor de volgende test blijft leven. Dit oorspronkelijke
          close-gedrag is ook nodig om de event-loop van het toetsproces leeg te
          maken; alleen contexten sluiten laat de socket open en hangt de shard. */
-      return async (opties) => opties && Array.isArray(opties.args) && opties.args.length
-        ? mod.chromium.launch(opties)
-        : mod.chromium.connect(endpoint);
+      return async (opties) => {
+        const o = opties || {};
+        /* browserOpties() voegt voor iedere lokale launch --no-sandbox en
+           soms executablePath toe. Dat zijn eigenschappen van de al gestarte
+           warme host, geen reden om voor ieder van de honderden bestanden een
+           nieuw Chromiumproces te starten. Alleen aanvullende procesvlaggen
+           of onbekende launchopties vereisen isolatie. */
+        const bijzondereArgs = (Array.isArray(o.args) ? o.args : [])
+          .filter((arg) => arg !== '--no-sandbox');
+        const gedeeldToegestaan = new Set(['args', 'executablePath', 'headless']);
+        const bijzondereOptie = Object.keys(o).some((naam) => !gedeeldToegestaan.has(naam));
+        return bijzondereArgs.length || bijzondereOptie
+          ? mod.chromium.launch(o)
+          : mod.chromium.connect(endpoint);
+      };
     }
   }) };
 }
@@ -1243,7 +1255,8 @@ function browserPad(pw) {
 
 /* De opties waarmee een browsertoets hem start. `extra` is wat DEZE toets nodig
    heeft (nepmedia, autoplay); --no-sandbox staat er altijd bij want als root is
-   er geen andere manier. Geeft null als er geen browser is. */
+   er geen andere manier. De gedeelde-browserwikkel weet dat deze basisvlag al
+   op de warme host geldt. Geeft null als er geen browser is. */
 function browserOpties(pw, extra) {
   const pad = browserPad(pw);
   if (pad === false) return null;

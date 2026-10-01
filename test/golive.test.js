@@ -4,9 +4,6 @@
    geweigerd, en dat de go-live-keuring goed keurt en afkeurt.
    Draai los: node --test test/golive.test.js */
 const test = require('node:test');
-/* De veilige productie-opstelling zet OFFICE_TOTP_SECRET, dus de kantoordeur
-   vraagt nu ook de tweede factor. Zelfde idioom als bankbeveiliging.test.js. */
-const { totpCode } = require('../server/kern/totp');
 const assert = require('node:assert/strict');
 const { spawn, spawnSync } = require('node:child_process');
 const fs = require('fs');
@@ -24,7 +21,7 @@ fs.writeFileSync(SENTINEL_TOKEN, 'a'.repeat(64) + '\n', { mode: 0o600 });
 const PROD_ENV = {
   ...process.env, NODE_ENV: 'production', PORT: String(PORT), RTG_DATA_DIR: TMP,
   RTG_ENC_KEY: 'e'.repeat(64), RTG_VAULT_KEY: 'v'.repeat(64), RTG_SECRET_KEY: 's'.repeat(64),
-  RTG_CLUSTER_KEY: 'c'.repeat(32), OFFICE_CODE: 'KEURING-CODE-12', OFFICE_TOTP_SECRET: 'JBSWY3DPEHPK3PXP', DEMO_PASS: 'x'.repeat(16),
+  RTG_CLUSTER_KEY: 'c'.repeat(32), DEMO_PASS: 'x'.repeat(16),
   RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl', APP_URL: 'https://rtg.example.com',
   RTG_SENTINEL_TOKEN_FILE: SENTINEL_TOKEN,
   /* De eenmalige sleutel waarmee de eerste eigenaar zijn account claimt. Zonder
@@ -38,6 +35,7 @@ const PROD_ENV = {
      echte rail mag een betaling bevestigen. */
   RTG_BETALEN_UIT: '1', RTG_AI_UIT: '1', RTG_HERSTEL_SMS_UIT_BEWUST: '1',
   RTG_ISOLATIE_AFDWINGEN: '1',
+  TURN_URL: 'turns:turn.rtg.example:5349', TURN_SECRET: 't'.repeat(48),
   SMTP_URL: 'smtp://rtg:test@mail.voorbeeld.test:587',
   ERR_WEBHOOK_URL: 'https://alarm.voorbeeld.test/rtg',
   DATABASE_URL: '', REDIS_URL: '', SENTRY_DSN: '', STRIPE_SECRET_KEY: ''
@@ -153,8 +151,7 @@ test('de veilige productiestart komt op en gedraagt zich als productie', async (
   /* en de backoffice opent in productie niet meer met een gedeelde code, ook niet
      met code EN tweede factor (besluit B10): alleen op naam, met een passkey
      (kern/kantoor/productiedeur.js, test/kantoordeur-productie.test.js) */
-  for (const lijf of [{ code: 'RTG-OFFICE' }, { code: 'KEURING-CODE-12' },
-    { code: 'KEURING-CODE-12', totp: totpCode('JBSWY3DPEHPK3PXP') }]) {
+  for (const lijf of [{ code: 'RTG-OFFICE' }, { code: 'OUDE-KANTOORCODE', totp: '123456' }]) {
     const r = await post('/api/office/login', lijf);
     assert.equal(r.status, 403, 'de gedeelde kantoorcode opent in productie niets');
     assert.equal((await r.json()).code, 'KANTOORCODE_NIET_IN_PRODUCTIE');
@@ -199,7 +196,7 @@ test('de go-live-keuring keurt af zonder geheimen, en met alle geheimen blijft h
   assert.match(goed.stdout, /vragen staan nog open/, 'en wijst naar de vragen die Rahul nog moet stellen');
 });
 
-test('EN DE ANDERE KANT OP: alles ingevuld en de AVG-poort laat los', () => {
+test('EN DE ANDERE KANT OP: het expliciete kandidaatbestand is ingevuld en de AVG-poort laat los', () => {
   /* De toets hierboven bewijst dat het papierwerk BLOKKEERT. Dat is de helft die
      iemand vanzelf schrijft. De andere helft is de helft die stil kapot gaat:
      laat de keuring ook echt LOS als de achttien vragen beantwoord zijn?
@@ -210,23 +207,32 @@ test('EN DE ANDERE KANT OP: alles ingevuld en de AVG-poort laat los', () => {
      echte antwoorden gaat zitten. Precies de vorm van LAT.md regel 10: een poort
      die je nooit hebt zien OPENgaan, weet je niet of hij opengaat.
 
-     De antwoorden hier zijn onmiskenbaar nep en staan in een wegwerpmap
-     (RTG_DATA_DIR); er komt nooit een verzonnen KvK-nummer in de repository. */
+     De antwoorden hier zijn onmiskenbaar nep en staan in een wegwerpmap; er
+     komt nooit een verzonnen KvK-nummer in de repository. RTG_DATA_DIR wijst
+     bewust naar een ANDERE, lege map. Dit is dezelfde grens als de echte
+     kandidaatcontainer: alleen RTG_PAPIEREN_FILE levert compliance-inhoud. */
   const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-golive-papier-'));
   try {
+    const appdata = path.join(map, 'appdata');
+    const compliance = path.join(map, 'compliance');
+    const papierenBestand = path.join(compliance, 'papieren.json');
+    fs.mkdirSync(appdata);
+    fs.mkdirSync(compliance);
     const vul = spawnSync(process.execPath, ['-e', `
-      process.env.RTG_DATA_DIR = ${JSON.stringify(map)};
+      process.env.RTG_DATA_DIR = ${JSON.stringify(appdata)};
+      process.env.RTG_PAPIEREN_FILE = ${JSON.stringify(papierenBestand)};
       const p = require(${JSON.stringify(path.join(__dirname, '..', 'server', 'papieren'))});
       for (const v of p.openVragen()) p.antwoord(v.id, 'PROEFWAARDE -- niet echt (' + v.id + ')', { door: 'de toets' });
       console.log(JSON.stringify({ klaar: p.klaar(), open: p.openVragen().length }));
-    `], { env: { ...process.env, RTG_DATA_DIR: map }, timeout: 20000, encoding: 'utf8' });
+    `], { env: { ...process.env, RTG_DATA_DIR: appdata, RTG_PAPIEREN_FILE: papierenBestand }, timeout: 20000, encoding: 'utf8' });
     assert.equal(vul.status, 0, 'de achttien vragen laten zich beantwoorden: ' + (vul.stderr || '').slice(0, 300));
     const stand = JSON.parse(vul.stdout.trim().split('\n').pop());
     assert.equal(stand.open, 0, 'geen enkele vraag blijft achter');
     assert.equal(stand.klaar, true);
+    assert.equal(fs.readdirSync(appdata).length, 0, 'brede appdata bleef buiten de papierketen');
 
     const na = spawnSync(process.execPath, [path.join(__dirname, '..', 'scripts', 'golive.js')],
-      { env: { ...PROD_ENV, RTG_DATA_DIR: map }, timeout: 20000, encoding: 'utf8' });
+      { env: { ...PROD_ENV, RTG_DATA_DIR: appdata, RTG_PAPIEREN_FILE: papierenBestand }, timeout: 20000, encoding: 'utf8' });
     /* De drie AVG-blokkades horen weg te zijn. De keuring mag nog wel over
        andere dingen vallen (dat hangt van de omgeving af), maar NIET meer over
        deze drie -- en dat is wat hier wordt vastgehouden. */

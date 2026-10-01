@@ -119,6 +119,8 @@ test('partnerapp rendert de servergedreven Connection-keuzes',()=>{
 
 test('een ingetrokken partnerdeelname blokkeert een nieuwe betaling maar laat een bevestigde date staan',async()=>{
   const maakBetaling=require('../server/kern/vonk/payment');let boekingen=0;
+  const trustRuntime=require('../server/kern/bewijsvlak/runtime');
+  const voor=trustRuntime.current().metrics.aggregate('payment.authorize',30);
   const open={id:'m-open',a:'a',b:'b',betaald:{},status:'wacht-op-betaling',
     tafel:{supplierCode:'DATE3',datum:'2026-10-02',tijd:'20:00',soort:'diner'}};
   const confirmed={id:'m-confirmed',a:'a',b:'b',betaald:{a:'eerder'},status:'bevestigd',reserveringId:'r1',
@@ -130,4 +132,7 @@ test('een ingetrokken partnerdeelname blokkeert een nieuwe betaling maar laat ee
   assert.equal(geweigerd.code,'PARTNER_NOT_PARTICIPATING');assert.equal(boekingen,0);assert.equal(open.tafel,null);
   const bestaand=await betaal('a','m-confirmed');
   assert.equal(bestaand.status,200);assert.equal(confirmed.reserveringId,'r1');
+  const na=trustRuntime.current().metrics.aggregate('payment.authorize',30);
+  assert.equal(na.denied-voor.denied,1,'ingetrokken deelname blijft zichtbaar maar is geen storing');
+  assert.equal(na.succeeded-voor.succeeded,1,'een reeds bevestigde geldstatus telt technisch als succes');
 });

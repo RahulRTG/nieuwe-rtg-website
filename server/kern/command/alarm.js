@@ -104,6 +104,17 @@ function maakAlarm({ opslag, save, journaal, slo, sonde, canary, kwaliteit, norm
         : null;
     });
 
+    probeer('capability-gezakt', 'Een capability-SLO is niet gehaald', 'hoog', () => {
+      const g = (slo.stand().capabilities || []).filter(x => x.oordeel === 'niet gehaald');
+      return g.length ? g.map(x => x.capability).join(', ') + ' mist beschikbaarheid of latency' : null;
+    });
+
+    probeer('capability-verouderd', 'Capabilitybewijs is verouderd', 'midden', () => {
+      const g = (slo.stand().capabilities || []).filter(x =>
+        (x.reasons || []).includes('STALE_MEASUREMENTS') && x.availability && x.availability.eligible > 0);
+      return g.length ? g.map(x => x.capability).join(', ') + ' heeft geen verse meting' : null;
+    });
+
     return uit;
   }
 

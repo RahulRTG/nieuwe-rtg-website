@@ -1,6 +1,7 @@
 'use strict';
 
 const Consent = require('./connection-consent');
+const trustAuthority = require('./bewijsvlak/v3-authority-hook');
 const CALL_TYPES = Object.freeze({ voice: 'connection.voice', video: 'connection.video' });
 
 module.exports = function maakConnectionCommunication({ product, db, save, crypto, media, schoon,
@@ -70,8 +71,11 @@ module.exports = function maakConnectionCommunication({ product, db, save, crypt
     const r = root(), b = binding(actor, c.counterpart, c.scope, capability);
     if (active === false) Consent.revoke(r.consent, b, { at: now() });
     else Consent.grant(r.consent, b, { at: now() });
-    if (active === false) calls.close(c, capability === CALL_TYPES.video ? 'video' : 'voice', 'CONSENT_REVOKED');
+    const gesloten = active === false
+      ? calls.close(c, capability === CALL_TYPES.video ? 'video' : 'voice', 'CONSENT_REVOKED') : 0;
     save(); ping(c.counterpart, 'consent', c.scope);
+    if (active === false) trustAuthority.propagated(b, now(), { activeSessionsClosed: gesloten,
+      storageRevision: (Consent.record(r.consent, b) || {}).revision || null });
     return communicationStatus(actor, input);
   }
   function sendText(actor, input, value) {

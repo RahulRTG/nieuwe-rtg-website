@@ -5947,6 +5947,14 @@ try {
   fout(e.message);
 }
 
+console.log('\n74) Trust & Evidence Plane-manifest hoort bij de uitvoerbare kern');
+try {
+  cp.execFileSync(process.execPath, [path.join(ROOT, 'scripts/trust-evidence-plane.js'), '--check'], { stdio: 'pipe' });
+  ok('correlatieketen, capabilities, constitution en modulehashes horen bij deze bron');
+} catch (e) {
+  fout('TRUST_EVIDENCE_PLANE.json ontbreekt of is verouderd; draai npm run trust:manifest');
+}
+
 /* HET BEREIK VAN DEZE POORT, en waarom hij het ZELF zegt.
 
    Op 13 september 2026 heb ik twee keer op een dag "de gate is groen" gezegd op

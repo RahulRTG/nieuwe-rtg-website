@@ -32,3 +32,16 @@ test('TAP-samenvatting behandelt ontbrekend niet als nul skips', () => {
   assert.equal(uit.tests, 12);
   assert.equal(uit.overgeslagen, 1);
 });
+
+test('TAP-diagnose bewaart welke toetsen zijn overgeslagen of todo', () => {
+  const uit = tapSamenvatting([
+    'TAP version 13',
+    'ok 1 - echte browser # SKIP chromium ontbreekt',
+    'not ok 2 - providercontract # TODO wacht op sandbox',
+    '# tests 2', '# pass 0', '# fail 0', '# cancelled 0', '# skipped 1', '# todo 1'
+  ].join('\n'));
+  assert.deepEqual(uit.overgeslagenTests,
+    [{ test: 'echte browser', reden: 'chromium ontbreekt' }]);
+  assert.deepEqual(uit.todoTests,
+    [{ test: 'providercontract', reden: 'wacht op sandbox' }]);
+});

@@ -124,13 +124,12 @@ configuratie ALSOF het productie is, ook als `NODE_ENV` nog leeg staat
 (`scripts/golive.js` regel 10) -- de stand hieronder geldt dus ongeacht waar je
 hem draait.
 
-**Hier stond "deze acht", en dat klopte niet.** Nagemeten op 23 augustus 2026
-geeft `npm run golive` **dertien** blokkerende punten. Drie ervan stonden nergens
-in deze lijst en hebben daarom hieronder een nieuw nummer gekregen (1.9, 1.10,
-1.11). De andere twee staan in §2 als "sterk aangeraden" terwijl de keuring er
-wél op blokkeert: **2.2** (`OFFICE_TOTP_SECRET`) en **2.5** (een mailprovider).
-Die twee houden hun nummer waar het staat -- een nummer verhuist niet -- maar ze
-horen bij dit lijstje gelezen te worden, en §2 zegt dat er nu ook bij.
+**Deze genummerde inventaris is historisch en niet de actuele release-uitspraak.**
+Gebruik voor de huidige blokkades uitsluitend `npm run productie:status` en
+`npm run golive`. De oude regel 2.2 over `OFFICE_TOTP_SECRET` is vervallen:
+productie accepteert geen gedeelde kantoorcode/TOTP-deur meer, maar uitsluitend
+een medewerker op naam met een verse passkeyceremonie. Een mailprovider blijft
+wel een echte productievoorwaarde.
 
 **En 1.6, 1.7 en 1.8 zijn één klus, geen drie.** De 15 open plekken in
 `VERWERKINGSREGISTER.md` en de 4 in `DATALEK.md` zijn geen apart schrijfwerk: het
@@ -155,19 +154,16 @@ beantwoordt, ruimt alle drie de blokkades tegelijk op. Stand vandaag: 18 van de
 
 ## 2. Sterk aangeraden voor go-live
 
-Geen blokkade, wel een risico dat je bewust moet nemen -- **behalve 2.2 en 2.5,
-en dat is de reden dat deze kop hier stond te liegen.** Nagemeten op 23 augustus
-2026 geeft `npm run golive` op allebei een blokkerend kruis, niet een
-waarschuwing: zonder `OFFICE_TOTP_SECRET` staat de backoffice -- waar de
-pasbesluiten vallen -- achter alleen de statische `OFFICE_CODE`, en zonder
-mailprovider belanden herstel- en bevestigingsmail alleen in de lokale outbox.
-Ze houden hun nummer hier, want een nummer verhuist niet, maar ze horen bij §1
-gelezen te worden. De overige zeven zijn wél waarschuwingen.
+Geen blokkade, wel een risico dat je bewust moet nemen. Regel 2.2 blijft alleen
+als historische correctie staan: de productieconfiguratie kent dat geheim niet
+meer. Zonder mailprovider belanden herstel- en bevestigingsmail nog steeds
+alleen in de lokale outbox; de actuele keuring bepaalt of dat de gekozen
+releasestand blokkeert.
 
 | # | Wat | Waarom |
 |---|---|---|
 | 2.1 | `ERR_WEBHOOK_URL` zetten en beproeven | Nu is er geen EXTERNE alarmering: een storing zie je alleen als je zelf kijkt, en niet als de doos plat ligt |
-| ~~2.2~~ | ~~`OFFICE_TOTP_SECRET` zetten~~ **Deze regel klopte niet meer en stond hier te verouderen.** Het geheim is geen aanbeveling maar een BLOKKADE: `server/config/productie.js` weigert de productiestart zonder een base32-geheim van minstens 16 tekens, en `scripts/docker/controle.js` eist hem ook. Wat er nog wel te doen is, is het zetten -- maar dat merk je vanzelf, want de server start anders niet. Nagemeten op 18 augustus 2026 | Een aanbeveling die in werkelijkheid een blokkade is, leert de lezer dat deze lijst niet klopt |
+| ~~2.2~~ | ~~`OFFICE_TOTP_SECRET` zetten~~ **Vervallen.** Productie opent het kantoor uitsluitend op naam met een verse passkey. Code/TOTP bestaat alleen nog buiten productie voor toetsen en demo's | Eén productiedeur, één rechtenmodel; geen ongebruikt gedeeld geheim |
 | 2.3 | `DATABASE_URL` (PostgreSQL) | Op SQLite kan er maar een instance zijn; het transactiegrootboek draait alleen in de sqlite- en postgres-stand |
 | 2.4 | `REDIS_URL` | Realtime werkt nu alleen binnen een proces |
 | 2.5 | Mail aanzetten: `SMTP_URL` (smarthost) **of** `MAIL_DIRECT=1` (eigen bezorging, zie `npm run eigenpost`) | Herstel-links en bevestigingen worden nu niet echt verstuurd. De verzendlaag is er wel helemaal -- eigen SMTP-client, eigen MX-bezorging, eigen DKIM -- maar zonder een van beide standen gaat alles naar de outbox. Voor de directe stand moeten drie dingen BUITEN de code kloppen: open poort 25 uit, kloppende PTR, en de DNS-records uit `npm run eigenpost` |
@@ -450,4 +446,3 @@ topologievork) omdat dat besluit het ontwerp van 7.1 bepaalt.
 | 7.27 | **De schorspoort trok de deur dicht op grond van een register dat zijn eigen besluiten niet las.** Gevonden op 2 september 2026, en gesloten op dezelfde dag -- hier als KLAAR genoteerd omdat de keten zelf blijft bestaan en de volgende die hem raakt hoort te weten wat er is gebeurd. **De keten:** `VERTROUWEN.json` werd voor het eerst uit een schone boom herbouwd, zette 23 routes op `geschorst`, en `server/middleware/schorspoort.js` (PROOF.md fase 3) gaf daarop 503 -- op ECHT verkeer, niet alleen de AI-weg. Twee toetsen in `test/aidata.test.js` zakten; `npm test` stond rood en niemand wist het, want die ronde was door `| tail` gehaald en toonde de afsluitcode van `tail`. **Vier oorzaken, geen van alle een fout in de geschorste routes zelf:** (1) de staatproef telde de BOEKHOUDING van de aanroep als tweede uitvoering -- de kostenmeter schrijft per verzoek en dat hoort, dus negen routes vielen om op iets dat niet gebeurde; (2) `scripts/poortwacht.js` hield een EIGEN lijst publieke routes naast `scripts/lib/publiekeroutes.js` (64 tegenover 125) en meldde vier bewust publieke routes als open; (3) de bewijsmatrix las `IDEMBESLUIT.json` niet, dus een route waarvan het huis had BESLOTEN dat onbeschermd de bedoeling is, ging offline; (4) voor de ROLLBACK-as bestond zo'n besluitregister helemaal niet. Alle vier gerepareerd, `ROLLBACKBESLUIT.json` toegevoegd met een citaatgrendel. **Wat hiervan blijft staan als les:** een meetketen die eindigt in GEDRAG heeft geen ruimte voor een meetfout, en drie van de vier oorzaken waren twee plekken die dezelfde waarheid vasthielden |
 | ~~7.28~~ | ~~**Twee proefrondes struikelden al weken stil.**~~ **Opgelost op 2 september 2026.** `rolproef` en `handelingproef` zakten allebei op "geen token voor: member, supplier": `server/testomgeving.js` vraagt OF `RTG_MAGNAAT_TEST=1`, OF `NODE_ENV=test` SAMEN met `RTG_DEMO=1`, en die twee zetten alleen de laatste helft. Ze stopten daarop terecht -- een proef zonder rol hoort niet te doen alsof hij die rol beproefde -- maar hun registers verouderden stil; `ROLPROEF.json` stond op 20 augustus. **`RTG_MAGNAAT_TEST` en niet `NODE_ENV=test`**, want zestien plekken in `server/` versoepelen hun controle onder die tweede en dan meet een proefronde een LOSSER huis dan er draait. `handelingproef-route.js` startte bovendien zijn eigen server met een eigen `vrijePoort()`, `wacht()` en env-lijst -- drie tweede uitvoeringen van `scripts/lib/wegwerpserver.js`, en daardoor miste hij ook de `RTG_SCHORSPOORT_UIT` die daar net bij was gekomen |
 | ~~7.29~~ | ~~**Zeven routes lieten een spoor na op een verzoek dat ze weigerden.**~~ **Opgelost op 2 september 2026, en het waren zeven gezichten van EEN vorm:** de handler raakt de opslag aan voordat hij de invoer keurt -- een lui aangemaakte la, een pak-of-maak-getter, een toewijzing die eruitziet als een lezing. `/api/supplier/vacature`, `/api/sociaal/beleid/zet`, `/api/supplier/rtmail/afwezig`, `/api/supplier/horeca/arrival/promise`, `/api/mediaos/lijst` en `/api/mob/favoriet`; bij `sociaal/beleid/zet` zat er een tweede, duurdere fout onder -- de velden werden EEN VOOR EEN toegepast terwijl er verderop nog geweigerd kon worden, dus `{soort:'x', horizon:9999}` gaf een 400 met de soort al uitgezet. De zevende was geen weigering maar een crash: `kern/horeca/werklijst.js` liet de VRAAG terugvallen op 'alles' en de TOEWIJZING niet, dus `MODI['undefined'].soorten` gaf een 500 -- zonder modus. **Het gewone geval was het kapotte geval**, en met rommel ging het juist goed; daarom meldde de invoerproef hem als "500 op rommelinvoer" en bleef de echte faalweg -- een PDA die zijn servicelijst opent -- buiten beeld |
-

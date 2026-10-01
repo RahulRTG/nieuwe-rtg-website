@@ -40,12 +40,18 @@ test('verlopen of ontbrekende sessie kan geen aanvraag plaatsen',async()=>{
 });
 test('de laatste vrije plaatsen worden opnieuw geteld; een vol slot kan niet worden overboekt',()=>{
  const restaurant={code:'SMALL',name:'Klein',tables:[{seats:3}],settings:{}};
- const db={data:{reserveringen:[]}};let id=0;
+ const db={data:{reserveringen:[]}};let id=0;const metingen=[];
  const noop=()=>{};
  const core=require('../server/kern/ervaring/tafels')({db,save:noop,findSupplier:()=>restaurant,notify:noop,notifySupplier:noop,sseToCustomer:noop,sseToSupplier:noop,sseToOffice:noop,
-  id:()=>String(++id),nu:()=>new Date().toISOString(),vandaag:()=>new Date().toISOString().slice(0,10)});
+  id:()=>String(++id),nu:()=>new Date().toISOString(),vandaag:()=>new Date().toISOString().slice(0,10),
+  trustPlane:{timer:meta=>({finish:result=>metingen.push({...meta,...result})}),observe:noop}});
  const input={supplierCode:'SMALL',datum:date,tijd:'21:00',personen:2};
  assert.equal(core.reserveerTafel({key:'one'},'Een',input).ok,true);
  assert.equal(core.reserveerTafel({key:'two'},'Twee',input).status,409);
  assert.equal(db.data.reserveringen.length,1);
+ assert.deepEqual(metingen.map(x=>[x.capability,x.outcome,x.domainOutcome]),[
+  ['hospitality.availability.check','SUCCEEDED','AVAILABLE'],
+  ['reservation.request','SUCCEEDED','REQUESTED'],
+  ['hospitality.availability.check','SUCCEEDED','FULL']
+ ]);
 });

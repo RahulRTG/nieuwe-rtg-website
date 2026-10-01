@@ -6,6 +6,8 @@
    en eventueel tijdelijk. Ontbrekende of ongeldige toestemming is altijd dicht. */
 'use strict';
 
+const trustAuthority = require('./bewijsvlak/v3-authority-hook');
+
 const STATES = Object.freeze({
   ABSENT: 'ABSENT',
   ACTIVE: 'ACTIVE',
@@ -75,6 +77,7 @@ function consentGebeurtenis(ledger, input, state, opties) {
     revision: event.revision,
     events
   };
+  trustAuthority.record(b, state, at);
   return ledger[id];
 }
 

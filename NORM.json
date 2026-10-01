@@ -9,7 +9,7 @@
     "bewijsAchterstand": 3178,
     "bewijsAlleenKeten": 18,
     "bewijsCellenBewezen": 26449,
-    "bronBlindeBestanden": 3,
+    "bronBlindeBestanden": 0,
     "browserpoortToetsen": 402,
     "carriereDomeinenGemeten": 15,
     "dbDeuren": 536,
@@ -45,7 +45,7 @@
     "lussenZonderOverlapRem": 3,
     "meetleerBlind": 8,
     "metersOngeijkt": 0,
-    "metingenZonderRatel": 50,
+    "metingenZonderRatel": 49,
     "onbewaakt": 0,
     "ratelTanden": 152,
     "registersUitVuileBoom": 1,
@@ -1983,8 +1983,17 @@
       "soort": "schuld",
       "sleutel": "bewijsAchterstand",
       "van": 985,
+      "naar": 989,
       "vervalt": "2026-09-30",
-      "reden": "Vier posten erbij bij de samenvoeging van 24 takken, alle vier in object-vooraf: nieuwe routes die een bestaand object willen bedienen dat de proef niet zelf heeft aangemaakt. Geen enkele post wisselde van soort, dus dit is groei in omvang en niet in aard. De sluitweg per post staat in BEWIJSSCHULD.json."
+      "reden": "Vier posten erbij bij de samenvoeging van 24 takken, alle vier in object-vooraf: nieuwe routes die een bestaand object willen bedienen dat de proef niet zelf heeft aangemaakt. Geen enkele post wisselde van soort, dus dit is groei in omvang en niet in aard. De sluitweg per post staat in BEWIJSSCHULD.json.",
+      "aflossingsbewijs": {
+        "datum": "2026-08-31",
+        "van": 1997,
+        "naar": 1966,
+        "bewijs": "de structurele NORM-notities van 2026-08-31 sluiten op 1997 en hervatten op 1966",
+        "bronVan": "bewijsAchterstand 989 -> 1997",
+        "bronNaar": "bewijsAchterstand 1966 -> 2605"
+      }
     },
     {
       "datum": "2026-08-27",
@@ -2091,8 +2100,17 @@
       "soort": "schuld",
       "sleutel": "metingenZonderRatel",
       "van": 19,
+      "naar": 20,
       "vervalt": "2026-09-30",
-      "reden": "Samenvoeging van 24 takken (tak samenvoeging-negen-2026-08-18). Een meetbestand in de wortel dat aan geen enkele ratel hangt. Bewust genoteerd als schuld en niet stil verlaagd; de meter hoort terug naar 19."
+      "reden": "Samenvoeging van 24 takken (tak samenvoeging-negen-2026-08-18). Een meetbestand in de wortel dat aan geen enkele ratel hangt. Bewust genoteerd als schuld en niet stil verlaagd; de meter hoort terug naar 19.",
+      "aflossingsbewijs": {
+        "datum": "2026-10-01",
+        "van": 50,
+        "naar": 49,
+        "bewijs": "GRAAFAS.json en TRUST_EVIDENCE_PLANE.json zijn aan hun bestaande inhoudelijke ratels gekoppeld in scripts/lib/metingen.js",
+        "bronVan": "metingenZonderRatel 49 -> 50",
+        "bronNaar": "huidige meter"
+      }
     },
     {
       "datum": "2026-08-27",

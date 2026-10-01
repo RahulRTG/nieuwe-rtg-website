@@ -35,6 +35,7 @@
 'use strict';
 
 const { AsyncLocalStorage } = require('async_hooks');
+const { naAntwoord } = require('../lib/antwoord-einde');
 /* De rij-telling staat apart in ./handelingtelling.js, met de kop over WAT er
    gemeten wordt, wat die meting NIET ziet en wat hij kost erbij. */
 const { tel, verschil } = require('./handelingtelling');
@@ -128,7 +129,7 @@ function middleware(deps) {
     };
     try { if (req) req.handeling = h; } catch (e) { /* bevroren req: dan alleen in de context */ }
 
-    res.on('finish', () => {
+    naAntwoord(res, () => {
       let laatste = null;
       try { laatste = geefData(); } catch (e) { laatste = null; }
       sluit(h, laatste, klasse);

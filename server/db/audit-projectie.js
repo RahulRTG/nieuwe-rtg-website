@@ -16,9 +16,9 @@ module.exports = () => {
       // Een nog vastgehouden rij behoudt haar identiteit, ook na cacheverdringing.
       lijst = lijst.map((v, i) => {
         if (!v || typeof v !== 'object') return v;
-        const ref = pagina.refs[i], oud = ref.waarde?.deref();
+        const nr = pagina.nummers[i], oud = pagina.refs.get(nr)?.deref();
         if (oud) return oud;
-        ref.waarde = new WeakRef(v); return v;
+        pagina.refs.set(nr, new WeakRef(v)); return v;
       });
     }
     gelezen.set(pagina, lijst);
@@ -27,7 +27,7 @@ module.exports = () => {
   }
   function pagina(rijen, dicht) {
     const tekst = rijen.map(r => r.tekst);
-    return { nummers: rijen.map(r => r.nr), refs: rijen.map(r => r.ref || {}), ...(dicht
+    return { nummers: rijen.map(r => r.nr), refs: rijen.find(r => r.refs)?.refs || new Map(), ...(dicht
       ? { bytes: deflateRawSync('[' + tekst.join(',') + ']') } : { tekst }) };
   }
   function volgende(oud, nieuw, minimum) {
@@ -36,7 +36,7 @@ module.exports = () => {
     const paginas = (oud?.paginas || []).filter(p => p.nummers.at(-1) >= minimum);
     const staart = oud?.staart;
     const rijen = staart ? staart.nummers.flatMap((nr, i) => nr >= minimum
-      ? [{ nr, tekst: staart.tekst[i], ref: staart.refs[i] }] : []) : [];
+      ? [{ nr, tekst: staart.tekst[i], refs: staart.refs }] : []) : [];
     rijen.push(...nieuw);
     while (rijen.length >= OMVANG) paginas.push(pagina(rijen.splice(0, OMVANG), true));
     const over = rijen.length ? pagina(rijen, false) : null;

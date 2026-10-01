@@ -21,7 +21,15 @@ module.exports = function profileer() {
         const end = new Date().toISOString();
         const stem = process.pid + '-' + end.replace(/[:.]/g, '-');
         fs.writeFileSync(path.join(dir, stem + '.cpuprofile'), JSON.stringify(profile));
-        fs.writeFileSync(path.join(dir, stem + '.json'), JSON.stringify({ pid: process.pid, begin, end, diagnosticOnly: true }));
+        // Alleen namen en byteaantallen van de synthetische testdatabase;
+        // geen inhoud. Buiten het CPU-venster, zodat dit de hotspot niet wordt.
+        let collections;
+        try {
+          const data = require('../server/db/state').db.data || {};
+          collections = Object.entries(data).map(([name, value]) => ({ name, bytes: Buffer.byteLength(JSON.stringify(value) || '') }))
+            .sort((a, b) => b.bytes - a.bytes).slice(0, 20);
+        } catch (error) { collections = { error: error.message }; }
+        fs.writeFileSync(path.join(dir, stem + '.json'), JSON.stringify({ pid: process.pid, begin, end, diagnosticOnly: true, collections }));
         begin = end;
         await post('Profiler.start');
       } catch (error) { console.error('[cpu-profile]', error.message); }

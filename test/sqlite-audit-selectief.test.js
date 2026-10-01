@@ -101,6 +101,102 @@ test('systeempost houdt foutinjectie en de volledige duurzame bundel', async t =
   assert.equal(nagekomen, 1);
 });
 
+function activiteitPoort(p, publiceer) {
+  return require('../server/opzet/leverancierpoort')({ db: p.db, save: p.save,
+    crypto: require('node:crypto'), busGeef: () => ({ publish: publiceer }), kernGeef: () => ({}) });
+}
+
+test('zelfstandig activiteitspoor bewaart alleen zichzelf; gewone activiteit bewaart de domeinmutatie mee', t => {
+  const p = proef(t);
+  p.db.data.supplierActivity = { AAA: Array.from({ length: 80 }, (_, n) => ({ who: 'Oud', text: String(n) })) };
+  p.db.data.suppliers = [{ code: 'AAA', events: [] }]; p.save();
+  let scans = 0, signalen = 0;
+  Object.defineProperty(p.db.data.ander, 'toJSON', { value() { scans++; return { waarde: this.waarde }; } });
+  const poort = activiteitPoort(p, (kanaal, bericht) => {
+    signalen++;
+    assert.equal(kanaal, 'sse'); assert.equal(bericht.match, 'AAA');
+    assert.deepEqual(bericht.data, { scope: 'team' });
+    assert.equal(p.lees('supplierActivity').AAA[0].text, signalen === 1 ? 'logde in' : 'event gemaakt',
+      'SQLite heeft de activiteit vóór het live sein vastgelegd');
+  });
+  poort.logActivity.alleenActiviteit('AAA', { name: 'Sam' }, 'logde in');
+  assert.equal(scans, 0);
+  const regels = p.lees('supplierActivity').AAA;
+  assert.equal(regels.length, 80); assert.equal(regels[0].who, 'Sam');
+  assert.equal(regels[79].text, '78'); assert.ok(Number.isFinite(Date.parse(regels[0].at)));
+  p.db.data.suppliers[0].events.push({ id: 'nieuw' });
+  poort.logActivity('AAA', { name: 'Sam' }, 'event gemaakt');
+  assert.ok(scans > 0, 'het oorspronkelijke brede opslagcontract blijft bestaan');
+  assert.deepEqual(p.lees('suppliers')[0].events, [{ id: 'nieuw' }]);
+  assert.equal(signalen, 2);
+});
+
+test('activiteit krijgt geen live bevestiging na een echte SQLite-commitfout en blijft in de volledige bundel', async t => {
+  const p = proef(t), proto = DatabaseSync.prototype, exec = proto.exec;
+  p.db.data.supplierActivity = {}; p.save();
+  let signalen = 0, fail = true;
+  const poort = activiteitPoort(p, () => { signalen++; });
+  const fout = t.mock.method(proto, 'exec', function(sql) {
+    if (sql === 'COMMIT' && fail) { fail = false; throw new Error('activiteitcommit mislukt'); }
+    return exec.call(this, sql);
+  });
+  assert.throws(() => poort.logActivity.alleenActiviteit('AAA', null, 'niet bevestigd'), /activiteitcommit/);
+  assert.deepEqual(p.lees('supplierActivity'), {}); assert.equal(signalen, 0);
+  fout.mock.restore();
+  p.db.data = require('../server/db/sqlite').loadSqlite();
+  await p.bijeen(() => {
+    poort.logActivity.alleenActiviteit('AAA', null, 'samen bewaard');
+    p.db.data.ander.waarde = 11; p.save();
+    assert.deepEqual(p.lees('supplierActivity'), {}, 'geen vroege deelcommit');
+    assert.equal(p.lees('ander').waarde, 1);
+  }, { duurzaam: true });
+  assert.equal(p.lees('supplierActivity').AAA[0].text, 'samen bewaard');
+  assert.equal(p.lees('supplierActivity').AAA[0].who, 'Beheer');
+  assert.equal(p.lees('ander').waarde, 11);
+});
+
+test('demo-login bewaart zelfstandig; personeelslogin behoudt de werkvensterinitialisatie', async t => {
+  const p = proef(t), crypto = require('node:crypto');
+  p.db.data.supplierActivity = {}; p.db.data.securityLog = [];
+  p.db.data.suppliers = [{ code: 'AAA', type: 'hotel' }]; p.save();
+  const sessies = require('../server/kern/sessies').maakSessies({ db: p.db, save: p.save, crypto });
+  let scans = 0, signalen = 0, antwoord;
+  Object.defineProperty(p.db.data.ander, 'toJSON', { value() { scans++; return { waarde: this.waarde }; } });
+  const poort = activiteitPoort(p, () => {
+    signalen++;
+    assert.equal(Object.keys(p.lees('sessions')).length, signalen);
+    assert.equal(p.lees('securityLog')[0].ok, true);
+    assert.equal(p.lees('supplierActivity').AAA[0].text, (signalen === 1 ? 'Beheer' : 'Sam') + ' logde in');
+  });
+  const routes = new Map();
+  require('../server/routes/supplier/toegang')({
+    app: { post(pad, ...handlers) { routes.set(pad, handlers.at(-1)); } },
+    DEMO: true, DEMO_SUPPLIER: 'AAA', crypto,
+    accounts: { legacyStaffPinToegestaan: () => true,
+      verifyStaffPin: async () => ({ id: 77, supplier_code: 'AAA', name: 'Sam', role: 'staff' }) },
+    pinSlot: { personeel: () => 'AAA:77', dicht: () => false, goed() {} },
+    magWerken: require('../server/kern/werkvenster').maakWerkvenster(p).magWerken,
+    hasCred: () => true, checkCred: () => true, tooManyTries: () => false,
+    loginFails: new Map(), findSupplier: () => p.db.data.suppliers[0], persoonsPoort: () => ({ ok: true }),
+    logActivity: poort.logActivity, rememberSession: sessies.rememberSession,
+    logInlog(kanaal, ok) { p.db.data.securityLog.push({ kanaal, ok }); p.save.sleutels(['securityLog']); },
+    supplierState: s => ({ code: s.code })
+  });
+  const res = { status() { assert.fail('de toegestane proeflogin moet slagen'); }, json(x) { antwoord = x; } };
+  await routes.get('/api/supplier/login')({ body: { username: 'proef', password: 'proef' }, ip: '127.0.0.1' }, res);
+  assert.equal(scans, 0, 'de loginroute kiest geen brede activiteit-save');
+  assert.equal(signalen, 1); assert.equal(antwoord.state.code, 'AAA');
+  const bewaard = p.lees('sessions')[sessies.tokenHash(antwoord.token)];
+  assert.equal(bewaard.role, 'supplier'); assert.equal(bewaard.code, 'AAA');
+  assert.equal(p.lees('suppliers')[0].settings, undefined);
+  await routes.get('/api/supplier/login')({ body: { code: 'AAA', staffId: 77, pin: 'proef' } }, res);
+  assert.ok(scans > 0, 'personeelslogin behoudt de brede save');
+  assert.deepEqual(p.lees('suppliers')[0].settings.werkvenster,
+    { aan: false, dagen: {}, vrijgesteld: [], perStaff: {} }, 'impliciete defaults moeten op schijf staan');
+  assert.equal(p.lees('sessions')[sessies.tokenHash(antwoord.token)].staffId, 77);
+  assert.equal(signalen, 2);
+});
+
 test('expliciete auditopslag stelt grote bestaande collecties niet uit', t => {
   const p = proef(t);
   p.db.data.apiSpoor = { tekst: 'a'.repeat(600000), nummer: 1 };

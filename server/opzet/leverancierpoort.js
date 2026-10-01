@@ -166,13 +166,18 @@ module.exports = ({ db, save, crypto, rtgKlok, sessionFor, DEMO, accounts,
   }
 
   // Legt vast wie wat deed binnen het bedrijf; live zichtbaar in de team-tab.
-  function logActivity(code, actor, text) {
+  function noteerActiviteit(code, actor, text, bewaar) {
     const list = db.data.supplierActivity[code] = (db.data.supplierActivity[code] || []);
     list.unshift({ who: actor ? actor.name : 'Beheer', text, at: new Date().toISOString() });
     db.data.supplierActivity[code] = list.slice(0, 80);
-    save();
+    bewaar();
     sseToSupplier(code, 'sync', { scope: 'team' });
   }
+  const logActivity = (code, actor, text) => noteerActiviteit(code, actor, text, save);
+  // Alleen voor een caller die zijn andere mutaties al zelf heeft bewaard.
+  // Gewone activiteit bewaart ook de bestaande impliciete domeinmutaties mee.
+  logActivity.alleenActiviteit = (code, actor, text) => noteerActiviteit(code, actor, text,
+    () => typeof save.sleutels === 'function' ? save.sleutels(['supplierActivity']) : save());
 
   return { sseToSupplier, sseToOffice, notifySupplier, supplierIndex,
     findSupplier, supplierAuth, persoonsPoort, logActivity };

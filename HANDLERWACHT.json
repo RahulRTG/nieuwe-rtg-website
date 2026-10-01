@@ -1,11 +1,11 @@
 {
  "stempel": {
-  "op": "2026-09-30T20:13:02.559Z",
-  "commit": "ec186c7b2",
+  "op": "2026-10-01T14:37:11.509Z",
+  "commit": "b3af5abf0",
   "boomVuil": false,
-  "boomAnders": 6,
+  "boomAnders": 0,
   "instrument": "scripts/handlerwacht.js",
-  "node": "v26.10.0"
+  "node": "v24.18.0"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
@@ -1102,7 +1102,7 @@
   },
   {
    "sleutel": "POST /api/cluster/:actie",
-   "bestand": "server/server.js:932",
+   "bestand": "server/server.js:902",
    "staat": "openbaar",
    "reden": "de clustersleutel zit in een eigen kop; zonder sleutel bestaat de route niet"
   },
@@ -4021,7 +4021,7 @@
   },
   {
    "sleutel": "POST /api/supplier/roster",
-   "bestand": "server/routes/supplier/toegang.js:153",
+   "bestand": "server/routes/supplier/toegang-roster.js:25",
    "staat": "eigenControle"
   },
   {
@@ -4166,7 +4166,7 @@
   },
   {
    "sleutel": "POST /api/zegel/controleer",
-   "bestand": "server/server.js:1443",
+   "bestand": "server/server.js:1413",
    "staat": "openbaar",
    "reden": "controleert een handtekening; het bewijs zit in het verzoek"
   }

@@ -3,12 +3,12 @@
  "uitleg": "Lezers van bewijs- en gezagsstate die een ONLEESBAAR bestand als een AFWEZIG bestand behandelen. Bewijs kent drie toestanden (bestaat+geldig, bestaat+ongeldig, bestaat niet) en een catch die op null valt, maakt van de tweede de derde -- en leeg betekent in dit huis bijna overal \"geen beperking\". De spiegel van STILSPOOR.json: die meet schrijvers wier falen wordt opgegeten, deze meet lezers die het onderscheid verliezen. Nooit optellen.",
  "grens": "Lexicaal, dus een ONDERGRENS: de werkelijke schuld is minstens dit. server/ en scripts/ worden nooit opgeteld -- daar staat een handeling tegenover een meting. `smeltSamen` mag alleen dalen, `bewijslezingen` alleen stijgen: een schuld die daalt doordat de meter blind wordt, is de gevaarlijkste vorm van vooruitgang.",
  "stempel": {
-  "op": "2026-09-30T20:13:03.940Z",
-  "commit": "ec186c7b2",
+  "op": "2026-10-01T13:35:17.136Z",
+  "commit": "c9c478408",
   "boomVuil": false,
-  "boomAnders": 8,
+  "boomAnders": 1,
   "instrument": "scripts/stillezing.js",
-  "node": "v26.10.0"
+  "node": "v24.18.0"
  },
  "gemeten": {
   "server": {
@@ -21,13 +21,13 @@
    "anders": 1
   },
   "scripts": {
-   "bewijslezingen": 543,
+   "bewijslezingen": 550,
    "metVanger": 101,
    "smeltSamen": 61,
-   "zegtHet": 12,
+   "zegtHet": 13,
    "onderscheidt": 6,
    "gooit": 2,
-   "anders": 20
+   "anders": 19
   }
  },
  "plekken": {
@@ -157,7 +157,7 @@
    },
    {
     "bestand": "scripts/bewijsmatrix.js",
-    "regel": 341,
+    "regel": 343,
     "leest": [
      "ROLPROEF.json"
     ],
@@ -165,7 +165,7 @@
    },
    {
     "bestand": "scripts/bewijsmatrix.js",
-    "regel": 355,
+    "regel": 357,
     "leest": [
      "HANDELINGPROEF.json"
     ],
@@ -173,7 +173,7 @@
    },
    {
     "bestand": "scripts/bewijsmatrix.js",
-    "regel": 428,
+    "regel": 430,
     "leest": [
      "POORTWACHT.json"
     ],
@@ -189,7 +189,7 @@
    },
    {
     "bestand": "scripts/bewijsschuld.js",
-    "regel": 555,
+    "regel": 549,
     "leest": [
      "BEWIJSSCHULD.json"
     ],
@@ -213,7 +213,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 4903,
+    "regel": 4923,
     "leest": [
      "MUTATIECONTRACT.json"
     ],
@@ -221,7 +221,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5392,
+    "regel": 5412,
     "leest": [
      "MUTATIECONTRACT.json"
     ],
@@ -229,7 +229,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5658,
+    "regel": 5678,
     "leest": [
      "TEKSTOPPERVLAK.json"
     ],
@@ -237,7 +237,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5834,
+    "regel": 5854,
     "leest": [
      "EERSTEMINUUT.json"
     ],
@@ -245,7 +245,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5846,
+    "regel": 5866,
     "leest": [
      "NORM.json"
     ],
@@ -705,7 +705,7 @@
    },
    {
     "bestand": "scripts/outputband.js",
-    "regel": 85,
+    "regel": 103,
     "leest": [
      "OUTPUTPROEF.json"
     ],
@@ -713,19 +713,19 @@
    },
    {
     "bestand": "scripts/outputband.js",
-    "regel": 128,
+    "regel": 147,
     "leest": [
      "INHOUDSKAART.json"
     ],
     "soort": "zegtHet"
    },
    {
-    "bestand": "scripts/outputband.js",
-    "regel": 196,
+    "bestand": "scripts/outputcollect.js",
+    "regel": 122,
     "leest": [
-     "OUTPUTPROEF.json"
+     "routejournaal"
     ],
-    "soort": "anders"
+    "soort": "zegtHet"
    },
    {
     "bestand": "scripts/outputproef.js",
@@ -745,7 +745,7 @@
    },
    {
     "bestand": "scripts/outputproef.js",
-    "regel": 260,
+    "regel": 264,
     "leest": [
      "OUTPUTPROEF.json"
     ],
@@ -753,7 +753,7 @@
    },
    {
     "bestand": "scripts/outputproef.js",
-    "regel": 273,
+    "regel": 277,
     "leest": [
      "OUTPUTPROEF.json"
     ],

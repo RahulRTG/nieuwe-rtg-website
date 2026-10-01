@@ -40,7 +40,8 @@ const WERELDEN = [
   },
   {
     naam: 'WorkOS', wereld: 'work', pad: '/apps/kantoor.html', hoofd: '#inhoud',
-    panelen: ['.wp-scene', '.wh-attention', '.wh-work-feature', '.wh-support'],
+    // Desktop uses its overview scene; mobile keeps the original photographic hero.
+    panelen: ['.wp-scene,.wh-work-hero', '.wh-attention', '.wh-work-feature', '.wh-support'],
     maxCanvas: 1216, // De goedgekeurde editorial compositie is maximaal 76rem breed.
     context: ['wereldtabs', 'wereldapps'],
     oud: [
@@ -243,6 +244,9 @@ async function dashboardMeting(page, route) {
       contextBuiten, oudZichtbaar,
       canvas, werkruimte, rails, panelen: panelen.length, ontbrekend, paneelBuiten, kopAfgesneden, tekstBotsingen,
       viewport: html.clientWidth,
+      buiten: [...document.querySelectorAll('body *')].filter(layoutZichtbaar).filter(el=>{
+        const r=el.getBoundingClientRect();return r.right>html.clientWidth+1||r.left<-1;
+      }).slice(0,15).map(el=>beschrijf(el,el.className)),
       documentOverloop: Math.max(html.scrollWidth, body.scrollWidth) - html.clientWidth,
       canvasOverloop: hoofd.scrollWidth - hoofd.clientWidth
     };
@@ -283,7 +287,7 @@ function keurDashboard(m, route, maat) {
   assert.ok(m.canvas.left >= -1 && m.canvas.right <= m.viewport + 1,
     label + ': canvas valt buiten het kijkvlak: ' + JSON.stringify(m.canvas));
   assert.ok(m.documentOverloop <= 1,
-    label + ': document is ' + Math.ceil(m.documentOverloop) + 'px horizontaal te breed');
+    label + ': document is ' + Math.ceil(m.documentOverloop) + 'px horizontaal te breed: ' + m.buiten.join('; '));
   assert.ok(m.canvasOverloop <= 1,
     label + ': dashboard maskeert ' + Math.ceil(m.canvasOverloop) + 'px horizontale inhoud');
   assert.deepEqual(m.paneelBuiten, [],
@@ -310,7 +314,7 @@ async function raakdoel(page, selector, label) {
 }
 
 async function bewijsHandeling(page, route, maat) {
-  if (await page.locator('.wp-domain:not([open])>summary').count()) await page.locator('.wp-domain>summary').click();
+  if (await page.locator('.wp-domain:not([open])>summary:visible').count()) await page.locator('.wp-domain>summary:visible').click();
   const label = route.naam + ' @ ' + maat.naam;
   if (route.wereld === 'living') {
     const cta = '.dagkop .rtg-dashboard-hero-cta[href="/apps/life.html"]';
@@ -403,7 +407,7 @@ test('vier wereldhomes blijven native dashboards op zes schermbreedtes',
                 document.querySelectorAll('.rtg-edge-2-context-slot').length === 1;
             }, route, { timeout: geduld(20000) });
             await page.waitForSelector('body[data-rtg-desktop-state="ready"]');
-            if (await page.locator('.wp-domain:not([open])>summary').count()) await page.locator('.wp-domain>summary').click();
+            if (await page.locator('.wp-domain:not([open])>summary:visible').count()) await page.locator('.wp-domain>summary:visible').click();
             const meting = await dashboardMeting(page, route);
             keurDashboard(meting, route, maat);
             const a11y = await page.evaluate(A11Y);

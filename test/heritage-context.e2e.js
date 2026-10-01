@@ -52,7 +52,7 @@ test('Heritage context returns through real navigation without writes', async t 
       assert.deepEqual(writes,[]);
     });
     await t.test('Living restores its selected tab', async () => {
-      await visit('/apps/rtg.html'); await page.locator('.wp-domain > summary').click(); await page.click('[data-paneel="mensen"]');
+      await visit('/apps/rtg.html'); await page.click('[data-paneel="mensen"]');
       await returnTo('/apps/rtg.html');
       await page.waitForFunction(() => document.querySelector('[data-paneel="mensen"]').classList.contains('actief'));
     });
@@ -66,7 +66,6 @@ test('Heritage context returns through real navigation without writes', async t 
     });
     await t.test('Work restores audience and respects a direct address', async () => {
       await visit('/apps/kantoor.html');
-      await page.locator('.wp-domain > summary').click();
       await page.locator('#worldWorkDetails > summary').click();
       await page.click('[data-work-kies="ondernemers"]');
       await page.evaluate(() => history.replaceState(null,'',location.pathname));
@@ -84,7 +83,10 @@ test('Heritage context returns through real navigation without writes', async t 
       await require('./helper').edgeActies(page);
       await page.click(key); await page.waitForSelector('#afScrim.open');
       await page.keyboard.press('Escape');
-      await page.waitForFunction(selector=>document.activeElement.matches(selector),key);
+      const returnKey = '.rtg-adaptive-bar [data-rtg-adaptive-action="context"]';
+      await page.waitForFunction(selector=>document.activeElement.matches(selector),returnKey);
+      assert.equal(await page.locator(returnKey).isVisible(),true,'focus returns to the visible action entrance');
+      assert.equal(await page.locator('.rtg-adaptive-sheet').isVisible(),false,'the previous sheet stays closed');
       assert.equal(await page.getAttribute('#afScrim','aria-modal'),'false');
       /* Maand is op telefoon bewust verborgen; Week is de zichtbare route
          naar dezelfde dagsheet die deze toets nodig heeft. */

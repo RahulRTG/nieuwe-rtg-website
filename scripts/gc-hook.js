@@ -21,6 +21,7 @@
    Dit raakt de productieserver niet: het zit in de test-preload, niet in de
    servercode, en doet niets zonder RTG_GC_OUT + --expose-gc. */
 const fs = require('fs');
+if (process.env.RTG_CPU_PROFILE_DIR) require('./cpu-profile-hook')();
 
 /* De loop-meter. Een timer die elke TIK ms hoort te vuren; alles wat hij LATER
    vuurt dan dat is tijd waarin de loop bezet was. We houden de piek bij, niet

@@ -14,7 +14,7 @@
    installeerde in de periode dat de `cache: 'no-cache'` hieronder was
    gesneuveld (zie de toelichting daar). Een naam die uit de INHOUD komt kan
    niet vergeten worden. */
-const CACHE = 'rtg-app-752e58b5';
+const CACHE = 'rtg-app-92911df0';
 const SHELL = [
   /* The mandatory desktop standard is available offline too. */
   '/shared/interface/module-sdk.js',
@@ -46,7 +46,7 @@ const SHELL = [
   '/shared/rtg-world-desktop.css',
   '/shared/rtg-world-widgets.css',
   '/shared/rtg-desktop-components.css',
-  '/shared/rtg-world-palette.css',
+  '/shared/rtg-world-palette.css', '/shared/rtg-editorial-system.css',
 '/apps/app.html', '/shared/id.js',
   '/shared/sw-pass-assets.js', '/shared/pass-cache.js', '/shared/pass-recovery.js', '/shared/pass-recovery.css',
   /* Heritage is één systeemlaag. Een offline start mag niet alleen de HTML
@@ -72,7 +72,7 @@ const SHELL = [
   '/shared/rtg-edge-library.js', '/shared/rtg-edge-system.js', '/shared/rtg-edge-system.css',
   '/shared/rtg-edge-2-loader.js', '/shared/rtg-edge-2-context.js', '/shared/rtg-edge-command.js',
   '/shared/rtg-edge-2.js', '/shared/rtg-edge-2.css',
-  '/shared/experience-handoff.js', '/shared/rtg-adaptive-edge-loader.js', '/shared/rtg-adaptive-edge-core.js', '/shared/rtg-adaptive-edge-controls.js', '/shared/rtg-adaptive-edge-input.js', '/shared/adaptief/grammatica.js',
+  '/shared/experience-handoff.js', '/shared/rtg-adaptive-edge-loader.js', '/shared/rtg-adaptive-edge-core.js', '/shared/rtg-adaptive-edge-controls.js', '/shared/rtg-adaptive-edge-input.js', '/shared/rtg-adaptive-edge-surface.js', '/apps/muziek-edge.js', '/shared/rtg-edge-pages.js', '/shared/rtg-communication-surface.css', '/shared/rtg-communication-surface.js', '/shared/adaptief/grammatica.js',
   '/shared/rtg-adaptive-edge.js', '/shared/rtg-adaptive-edge-signals.js', '/shared/rtg-adaptive-edge.css',
   '/shared/edge/actiestaat.js', '/shared/edge/blikveld-hoofdactie.js', '/shared/edge/blikveld.js',
   '/images/worlds/heritage/living-heritage-v2.jpg',

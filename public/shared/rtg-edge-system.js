@@ -67,6 +67,7 @@
     if (!A) return;
     sluitLagen();
     var idx = A.root.querySelector('.rtg-edge-index'), menu = A.root.querySelector('.rtg-edge-menu');
+    if (w.RTGAdaptiveEdge) w.RTGAdaptiveEdge.openPanel(idx, { title:A.cfg.kaart || 'RTG', onClose:function () { idx.setAttribute('aria-hidden','true'); menu.setAttribute('aria-expanded','false'); } });
     idx.setAttribute('aria-hidden', 'false'); menu.setAttribute('aria-expanded', 'true');
     if (zoek) setTimeout(function () { if (w.RTGEdgeSmartMenu) w.RTGEdgeSmartMenu.openSearch(); var v = idx.querySelector('input'); if (v) v.focus(); }, 20);
   }
@@ -101,6 +102,7 @@
   }
   function sluitLagen() {
     if (!A) return;
+    if (w.RTGAdaptiveEdge && A.root.querySelector('.rtg-adaptive-sheet>.rtg-edge-index')) w.RTGAdaptiveEdge.setState('dock');
     L.release(A);
     A.root.querySelector('.rtg-edge-index').setAttribute('aria-hidden', 'true');
     A.root.querySelector('.rtg-edge-menu').setAttribute('aria-expanded', 'false');

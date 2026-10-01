@@ -27,8 +27,11 @@ const keten = require('../../lib/keten');
    Dit spoor bezit alleen securityLog. Een opslagfout gaat naar de aanroeper;
    een mislukte vastlegging wordt hier nooit stil als geslaagd behandeld. */
 function maakInlogspoor({ db, save, schoon }) {
+  const opslag = require('../eigencollectie')({ db, domein: 'inlogherkomst',
+    bezit: { securityLog: 'lijst' } });
   function logInlog(kanaal, ok, wie, req) {
-    const lijst = db.data.securityLog = db.data.securityLog || [];
+    opslag.kijk('securityLog'); // beschadigde bestaande auditdata nooit als leeg vervangen
+    const lijst = opslag.bak('securityLog');
     keten.noteerIn(lijst, {
       at: new Date().toISOString(), kanaal, ok: !!ok,
       wie: schoon(wie, 60) || null, ip: String((req && req.ip) || '')
@@ -36,7 +39,7 @@ function maakInlogspoor({ db, save, schoon }) {
     save.sleutels(['securityLog']);
   }
   function securityLogKeten() {
-    const lijst = (db.data && db.data.securityLog) || [];
+    const lijst = opslag.kijk('securityLog');
     return Object.assign({ top: keten.top(lijst) }, keten.verifieer(lijst));
   }
   return { logInlog, securityLogKeten };

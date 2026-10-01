@@ -70,8 +70,10 @@ function statements() {
   };
   return stmt;
 }
-function saveSqlite(force, sleutels, extraAudit = []) {
+function saveSqlite(force, sleutels, extraAudit = [], duurzaam = false) {
   sqliteInit();
+  if (duurzaam) return require('./sqlite-duurzaam')(kvdb,
+    () => saveSqlite(true, sleutels, extraAudit), vouwWalSqlite);
   const audits = auditMotor(), doos = audits.doos();
   const auditOps = [...audits.vervangingen(db.data), ...(doos?.auditOps || []), ...extraAudit];
   const auditSleutels = new Set(auditOps.map(op => op.naam));
@@ -125,7 +127,7 @@ function saveSqlite(force, sleutels, extraAudit = []) {
   }
   for (const [k, j, v] of vastgelegd) { laatsteJson.set(k, j); toegepast.set(k, v); }
   audits.naCommit(auditResultaten, doos, auditSnapshots);
-  return { alGelijk: false };
+  return { alGelijk: false, committed: true };
 }
 // Haal de collecties op die een ANDER proces sinds onze laatste versie schreef,
 // en zet ze in db.data. Zo blijven losse domeinprocessen bij elkaar in de pas.

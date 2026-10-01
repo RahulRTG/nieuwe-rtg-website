@@ -5,7 +5,11 @@
 module.exports = ({ verbinding, saveSqlite }) => {
   function vouwWalSqlite() {
     if (!verbinding()) return false;
-    try { verbinding().exec('PRAGMA wal_checkpoint(TRUNCATE)'); return true; }
+    try {
+      const r = verbinding().prepare('PRAGMA wal_checkpoint(TRUNCATE)').get();
+      return r?.busy === 0 && Number.isInteger(r.log) && Number.isInteger(r.checkpointed)
+        && r.log >= 0 && r.checkpointed === r.log;
+    }
     catch (e) { return false; } // andere lezer: de backup neemt de WAL mee
   }
 

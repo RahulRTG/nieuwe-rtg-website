@@ -148,3 +148,17 @@ test('inlogspoor bewaart alleen zijn eigen keten, weigert commitfouten en overle
   assert.equal(na.log[0].wie, null);
   assert.equal(na.keten.ok, true);
 });
+
+test('inlogspoor leest zonder scheppen en weigert beschadigde bestaande auditdata', () => {
+  const db = { data: {} }; let saves = 0;
+  const spoor = require('../server/kern/identiteit/inlogherkomst').maakInlogspoor({
+    db, save: { sleutels() { saves++; } }, schoon: v => v
+  });
+  spoor.securityLogKeten();
+  assert.equal(Object.hasOwn(db.data, 'securityLog'), false);
+  db.data.securityLog = { corrupt: true };
+  assert.throws(() => spoor.securityLogKeten(), /niet de verklaarde vorm/);
+  assert.throws(() => spoor.logInlog('account', false, null, {}), /niet de verklaarde vorm/);
+  assert.deepEqual(db.data.securityLog, { corrupt: true });
+  assert.equal(saves, 0);
+});

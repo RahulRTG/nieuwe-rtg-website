@@ -176,7 +176,8 @@ function main() {
       meldingen.push('schuld op ' + n.sleutel + ' loopt tot ' + n.vervalt + ' (terug naar ' + n.van + ')');
       continue;
     }
-    const nu = norm.meters ? norm.meters[n.sleutel] : undefined;
+    const groep = require('./norm.js').PRESTATIEMETERS.some(m => m.sleutel === n.sleutel) ? norm.prestatie : norm.meters;
+    const nu = groep ? groep[n.sleutel] : undefined;
     if (nu === undefined) {
       fouten.push({ wat: n.sleutel, bericht: 'de schuld is verlopen op ' + n.vervalt + ' en de meter staat niet meer in NORM.json' });
       continue;

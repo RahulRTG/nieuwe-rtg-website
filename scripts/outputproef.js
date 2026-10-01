@@ -400,6 +400,8 @@ function meetEen(route, toets, opties) {
   const pad = route.slice(route.indexOf(' ') + 1);
   const r = draaiToets(path.join(WORTEL, 'test', toets),
     { RTG_LIEG: pad, RTG_LIEG_NIET: DEUREN }, 240000);
+  if (r.tijdout || !r.toetsen || r.overgeslagen > 0 || r.exitCode === null) return { staat: 'stoornis' };
+  if ((r.gezakt || 0) === 0 && r.exitCode !== 0) return { staat: 'stoornis' };
   if ((r.gezakt || 0) === 0) return { staat: 'blind' };
   if (kentBasis) return { staat: 'merkt' };   // basislijn zei groen, leugen maakt rood: toe te rekenen
 
@@ -416,7 +418,7 @@ function meetEen(route, toets, opties) {
      herstart wegvaagt, maar een gememoriseerd bijproduct dat in het (gecommitte)
      register blijft staan. */
   const controle = draaiToets(path.join(WORTEL, 'test', toets), {}, 240000);
-  const groen = (controle.gezakt || 0) === 0;
+  const groen = controle.exitCode === 0 && controle.toetsen > 0 && controle.overgeslagen === 0 && !controle.tijdout && controle.gezakt === 0;
   return { staat: groen ? 'merkt' : 'stoornis', basis: groen ? 'groen' : 'rood' };
 }
 
@@ -425,7 +427,7 @@ function meetEen(route, toets, opties) {
 function basislijnVan(toets) {
   const { draaiToets } = require('./mutatie');
   const r = draaiToets(path.join(WORTEL, 'test', toets), {}, 240000);
-  return { toets, groen: (r.gezakt || 0) === 0, gedraaid: r.gedraaid !== undefined ? r.gedraaid : null };
+  return { toets, groen: r.exitCode === 0 && r.toetsen > 0 && r.overgeslagen === 0 && !r.tijdout && r.gezakt === 0, gedraaid: r.toetsen - r.overgeslagen };
 }
 
 function gerichteRonde(aantal) {

@@ -14,16 +14,9 @@
    scripts/outputproef.js -- deze band bepaalt alleen WIE WAT WANNEER doet, niet
    WAT een meting betekent (LAT.md regel 4).
 
-   DE BASISLIJN IS GEMEMORISEERD, NIET EEN FASE. Een eerdere versie mat eerst
-   alle 468 betrokken toetsen op hun basislijn (groen zonder leugen) en dan pas
-   de routes. Dat kostte ruim anderhalf uur vooraf -- en deze omgeving herstart
-   de container vaker dan dat: elke herstart wierp de hele basislijn weg, zodat
-   hij NOOIT afkwam. Nu betaalt de EERSTE route die een toets aanraakt zijn
-   controlerun; het resultaat (groen/rood) komt in het register te staan, en
-   elke volgende route met dezelfde toets leest het daar. Omdat het register
-   periodiek wordt gecommit, overleeft die basislijn een herstart. Geen fase die
-   als geheel verloren gaat -- alleen de laatste paar routes sinds de vorige
-   schrijfbeurt.
+   DE BASISLIJN WORDT BINNEN EEN RUN GEDEELD. Een herstart meet opnieuw:
+   een oude groene basislijn is geen bewijs over de huidige bron of omgeving.
+   Het register bewaart haar uitsluitend als verslag, nooit als vrijstelling.
 
    DE WERKER IS DIT BESTAND ZELF, met --een="METHODE /pad|toets|groen?". Hij
    meet precies een route en print een JSON-regel; hij raakt het register niet
@@ -90,6 +83,7 @@ function leesRegister() {
    rest intact; `basislijn` hangen we er als apart veld naast, zodat een herstart
    hem terugvindt. */
 function schrijf(gericht, basislijn) {
+  require('./lib/stempel').eisSchoneBoom('outputband');
   const na = op.meet(gericht);
   if (na.fout) { console.error('  ' + na.fout); return na; }
   fs.writeFileSync(REGISTER, JSON.stringify(Object.assign(na, { gericht, basislijn }), null, 1) + '\n');
@@ -119,6 +113,7 @@ function eenRegel(args) {
 }
 
 (async () => {
+  require('./lib/stempel').eisSchoneBoom('outputband');
   const reg = leesRegister();
   const gericht = reg.gericht || {};
   let kandidaten;
@@ -138,9 +133,9 @@ function eenRegel(args) {
     if (!kandidaten) { console.error('geen journaal of geen MUTATIES.json'); process.exitCode = 2; return; }
   }
   const rij = max ? kandidaten.slice(0, max) : kandidaten;
-  /* De basislijn uit het register terug in een Map, zodat een herstart de al
-     gemeten toetsen niet opnieuw controleert. */
-  const basislijn = new Map(Object.entries(reg.basislijn || {}));
+  /* Elke run krijgt een verse basislijn: een oude groene toets kan inmiddels
+     rood zijn. Alleen binnen deze run delen werkers hun controlerun. */
+  const basislijn = new Map();
 
   console.log('\n=== DE LOPENDE BAND ===\n');
   console.log('  ' + rij.length + ' routes in de rij, ' + werkers + ' werkers naast elkaar');
@@ -162,42 +157,8 @@ function eenRegel(args) {
     sindsSchrijf = 0;
   }
 
-  /* ---- DE BAND COMMIT ZICHZELF ----
-
-     DEZE OMGEVING HERSTART DE CONTAINER BIJ ELKE SESSIE-RESUME, en dan kan een
-     lopende band sneuvelen. Alleen wat GECOMMIT is, is met zekerheid duurzaam;
-     de werkboom-schrijfbeurt is dat misschien niet. Vandaar dat de band zelf
-     periodiek OUTPUTPROEF.json vastlegt en pusht. Nooit iets anders dan dat ene
-     bestand (server/data en .env blijven met rust), en een mislukte push mag de
-     meting nooit stoppen -- vandaar de try/catch en geen throw. */
-  const { execFileSync } = require('child_process');
-  function commitDuurzaam(na) {
-    try {
-      execFileSync('git', ['add', 'OUTPUTPROEF.json'], { cwd: WORTEL });
-      const staat = na && na.gemeten ? na.gemeten : {};
-      const bericht = 'OUTPUT-band: ' + (staat.bewezen || 0) + ' bewezen, ' +
-        (staat.onbeslist || 0) + ' onbeslist (' + klaar + '/' + rij.length + ' gemeten)\n\n' +
-        'Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>\n' +
-        'Claude-Session: https://claude.ai/code/session_011wXxJn2qhUZPyF9dJtwgW1';
-      /* Niets te committen (geen wijziging sinds vorige keer) geeft exit 1; dat
-         is geen fout maar rust. */
-      const st = execFileSync('git', ['status', '--porcelain', 'OUTPUTPROEF.json'], { cwd: WORTEL, encoding: 'utf8' });
-      if (!st.trim()) return;
-      /* ONGESIGNEERD MET OPZET. Deze omgeving tekent commits via een
-         signeringsserver die geregeld 503 geeft, en de commits hier zijn toch
-         niet geverifieerd-getekend (git log %G? = N). Een mechanische
-         register-commit laten stranden op een flakey tekenserver is de meting
-         niet waard; -c commit.gpgsign=false slaat die server over. */
-      execFileSync('git', ['-c', 'commit.gpgsign=false', 'commit', '-q', '-m', bericht], { cwd: WORTEL });
-      for (let poging = 0; poging < 4; poging++) {
-        try { execFileSync('git', ['push', '-u', 'origin', 'claude/route-coverage-rtg-kantoor-tsv5ot'], { cwd: WORTEL }); break; }
-        catch (e) { if (poging === 3) break; require('child_process').execSync('sleep ' + (2 ** (poging + 1))); }
-      }
-    } catch (e) { process.stdout.write('  (commit overgeslagen: ' + String((e && e.message) || e).slice(0, 80) + ')\n'); }
-  }
-  let sindsCommit = 0;
-  const commitBundel = 150;
-
+  /* Publiceren hoort bij de release, niet bij een meetwerker. Alleen het
+     rapport wordt hier geschreven; geen git-commit, branch of push. */
   async function werker(nr) {
     while (volgende < rij.length) {
       const i = volgende++;
@@ -235,13 +196,11 @@ function eenRegel(args) {
       process.stdout.write('  ' + String(klaar).padStart(5) + '/' + rij.length + '  w' + nr + '  ' +
         label + '  ' + d.route.slice(0, 52).padEnd(54) + '  ~' + rest + ' min\n');
       if (sindsSchrijf >= bundel) bewaar();
-      if (++sindsCommit >= commitBundel) { sindsCommit = 0; commitDuurzaam(schrijf(gericht, Object.fromEntries(basislijn))); }
     }
   }
 
   await Promise.all(Array.from({ length: werkers }, (_, n) => werker(n + 1)));
   const na = schrijf(gericht, Object.fromEntries(basislijn));
-  commitDuurzaam(na);
   console.log('\n  ' + merkt + ' merken, ' + blind + ' blind, ' + stoornis + ' stoornis.');
   if (na && na.gemeten) console.log('  register nu: ' + JSON.stringify(na.gemeten));
   console.log('  BAND KLAAR');

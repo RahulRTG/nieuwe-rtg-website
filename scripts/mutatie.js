@@ -461,6 +461,10 @@ function draaiToets(bestand, env, wacht, forceer) {
      leunt, meet de standaardinstelling (LAT regel 10). */
   const vlaggen = ['--test', '--test-reporter=tap'];
   if (forceer) vlaggen.push('--test-force-exit');
+  const omgeving = Object.assign({}, process.env, env || {});
+  // Een zelfstandige controlerun is geen kind van de aanroepende node:test-run.
+  // Anders slaat Node de tests over en ontbreekt de TAP-uitslag volledig.
+  delete omgeving.NODE_TEST_CONTEXT;
   const r = spawnSync('node', vlaggen.concat([bestand]), {
     cwd: WORTEL, encoding: 'utf8', timeout: wacht || WACHT_NUL, maxBuffer: 64 * 1024 * 1024,
     /* SIGKILL EN NIET HET STANDAARD SIGTERM, en dat is geen ruwheid maar een
@@ -472,7 +476,7 @@ function draaiToets(bestand, env, wacht, forceer) {
        Over een ronde van uren stapelen die zich op, houden ze poorten en geheugen
        vast, en vervuilen ze de metingen die erna komen. */
     killSignal: 'SIGKILL',
-    env: Object.assign({}, process.env, env || {})
+    env: omgeving
   });
   const uit = String(r.stdout || '');
   const gezakt = (uit.match(/^not ok /gm) || []).length;
@@ -483,9 +487,12 @@ function draaiToets(bestand, env, wacht, forceer) {
      deze telling heet dat "overleefd", en dan beschuldigt de motor een toets van
      iets wat hij niet heeft gedaan: hij heeft niets gedaan. */
   const over = /^# skipped (\d+)/m.exec(uit);
-  const toetsen = geteld ? Number(geteld[1]) : 0;
+  const subtests = [...uit.matchAll(/^# Subtest: (.+)$/gm)].map(m => m[1]);
+  const alleenBestand = subtests.length === 1 &&
+    [bestand, path.relative(WORTEL, bestand)].includes(subtests[0]);
+  const toetsen = geteld && !alleenBestand ? Number(geteld[1]) : 0;
   const overgeslagen = over ? Number(over[1]) : 0;
-  return { gezakt, toetsen, overgeslagen, alGeslagen: toetsen > 0 && overgeslagen >= toetsen,
+  return { gezakt, toetsen, overgeslagen, exitCode: r.status, alGeslagen: toetsen > 0 && overgeslagen >= toetsen,
     tijdout: r.error && r.error.code === 'ETIMEDOUT' };
 }
 

@@ -97,6 +97,40 @@ const GEEN_METING = new Set([
 ]);
 
 const REGISTER = {
+  /* Deze kwaliteitsvelden hebben een echte regressiepoort tegen het aftakpunt;
+     test/registerratel.test.js draait de poort en saboteert iedere regel. */
+  'AANROEPGRAAF.json': { eigenRatel: 'scripts/registerratel.js' },
+  'AUDITPROEF.json': { eigenRatel: 'scripts/registerratel.js' },
+  'CONTEXTPROEF.json': { eigenRatel: 'scripts/registerratel.js' },
+  'CONTROLS.json': { eigenRatel: 'scripts/registerratel.js' },
+  'DUURZAAMHEIDSKOSTEN.json': { eigenRatel: 'scripts/registerratel.js' },
+  'ENVELOP.json': { eigenRatel: 'scripts/registerratel.js' },
+  'GRAAFAS.json': { eigenRatel: 'scripts/registerratel.js' },
+  'HANDELINGPROEF.json': { eigenRatel: 'scripts/registerratel.js' },
+  'HANDLERWACHT.json': { eigenRatel: 'scripts/registerratel.js' },
+  'IDOR.json': { eigenRatel: 'scripts/registerratel.js' },
+  'INHOUDSKAART.json': { eigenRatel: 'scripts/registerratel.js' },
+  'KERNHERKOMST.json': { eigenRatel: 'scripts/registerratel.js' },
+  'KLOKWACHT.json': { eigenRatel: 'scripts/registerratel.js' },
+  'MAGNAATLAB.json': { eigenRatel: 'scripts/registerratel.js' },
+  'MUTATIEBOEK.json': { eigenRatel: 'scripts/registerratel.js' },
+  'MUTATIESEMANTIEK.json': { eigenRatel: 'scripts/registerratel.js' },
+  'ONBEWEZEN.json': { eigenRatel: 'scripts/registerratel.js' },
+  'ONDERZOEKSKETEN.json': { eigenRatel: 'scripts/registerratel.js' },
+  'OUTPUTPROEF.json': { eigenRatel: 'scripts/registerratel.js' },
+  'ROUTEBRON.json': { eigenRatel: 'scripts/registerratel.js' },
+  'SCHERMGEDRAG.json': { eigenRatel: 'scripts/registerratel.js' },
+  'SCHERMROUTES.json': { eigenRatel: 'scripts/registerratel.js' },
+  'SYMBOLEN.json': { eigenRatel: 'scripts/registerratel.js' },
+  'VERRAAD.json': { eigenRatel: 'scripts/registerratel.js' },
+  'WAAROM.json': { eigenRatel: 'scripts/registerratel.js' },
+  'BELOFTE.json': { eigenRatel: 'scripts/check.js' },
+  'BEWIJSSCHULD.json': { meter: ['bewijsAchterstand'] },
+  'DEKKING.json': { meter: ['dekkingWaargenomenPct', 'endpointsNooitAangeraakt'] },
+  'GEZAG.json': { eigenRatel: 'scripts/gezag.js' },
+  'IDEMSCHULD.json': { eigenRatel: 'test/idemschuld.test.js' },
+  'RUST-MIGRATIES.json': { eigenRatel: 'test/rust-migraties.test.js' },
+
   /* CONNECTION_CONSTITUTION.json wordt uitsluitend geschreven nadat alle
      genoemde product-, privacy-, state- en routeproeven groen zijn. Het script
      weigert bij een ontbrekend bewijs of exposed implemented:false capability

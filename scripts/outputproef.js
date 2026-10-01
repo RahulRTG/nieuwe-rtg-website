@@ -226,7 +226,7 @@ function oordeel(perRoute, perToets, gevoelig, blind, gemeten) {
                 'niets over de toets: ' + stil.get(route) })
           : { staat: 'blind', bron: 'outputproef (gericht)', toetsen: [direct.toets],
               reden: 'er is over DEZE route gelogen en ' + direct.toets + ' bleef groen; ' +
-                'geen enkele toets kijkt naar deze inhoud' };
+                'deze toets merkt de lege inhoud niet; andere toetsen zijn hiermee niet beoordeeld' };
       telling[perRouteUit[route].staat]++;
       continue;
     }

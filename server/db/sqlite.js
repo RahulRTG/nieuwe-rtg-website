@@ -163,13 +163,8 @@ function startSqliteSync() {
   if (pollTimer.unref) pollTimer.unref();
 }
 
-/* De WAL leegdrukken in store.db zelf.
-
-   In WAL-modus staat verse data NIET in store.db maar in store.db-wal, en
-   pas een checkpoint schuift hem over. Wie store.db kopieert zonder eerst te
-   checkpointen, kopieert dus een bestand waar de recentste gegevens niet in
-   staan -- en bij een verse installatie is dat letterlijk een leeg bestand van
-   4 KB. Daarom roept de backup dit eerst aan. */
+/* De backup moet eerst de WAL naar store.db laten doorschrijven; anders mist
+   een kopie van alleen store.db de nieuwste gegevens. */
 function checkpointSqlite() {
   if (!kvdb) return false;
   try { saveSqlite(true); } catch (e) {}
@@ -183,14 +178,8 @@ function afrondSqlite() {
   try { kvdb.exec('PRAGMA wal_checkpoint(TRUNCATE)'); } catch (e) { /* ander proces leest nog */ }
 }
 
-/* DE PERSISTENTE VERSIE, gelezen uit de DATABASE en niet uit het geheugen.
-
-   Dit is het enige getal waarmee een aanroeper kan vaststellen dat zijn
-   schrijfactie werkelijk de schijf heeft gehaald. Het geheugen kan hem niet
-   bevestigen -- daar staat de wijziging sowieso -- en juist dat verschil is waar
-   een verloren schrijfactie zich verstopt. Geeft null als er geen SQLite-opslag
-   draait; de aanroeper hoort dat als "niet vast te stellen" te behandelen en
-   niet als "in orde". */
+/* Alleen de databaseversie bevestigt een schrijfactie: gewijzigd geheugen is
+   geen bewijs van opslag. null betekent niet vast te stellen, nooit in orde. */
 function persistentieStandSqlite() {
   try { sqliteInit(); const r = statements().huidig.get(); return r ? Number(r.v) : null; }
   catch (e) { return null; }

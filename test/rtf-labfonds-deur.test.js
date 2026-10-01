@@ -192,8 +192,12 @@ test('5. de leesroutes veranderen niets, hoe vaak je ze ook aanroept', async () 
     const voor = await roep(w.base, '/api/rtf/labfonds/overzicht', w.gez);
     for (let i = 0; i < 3; i++) {
       await roep(w.base, '/api/rtf/labfonds/overzicht', w.gez);
-      await roep(w.base, '/api/rtf/labfonds/financiering', { ...w.gez, onderzoek: 'bestaat-niet' });
-      await roep(w.base, '/api/rtf/labfonds/scheidsrechter', { ...w.gez, id: 'bestaat-niet' });
+      const financiering = await roep(w.base, '/api/rtf/labfonds/financiering', { ...w.gez, onderzoek: 'bestaat-niet' });
+      assert.equal(financiering.status, 404, 'onbekend onderzoek mag niet als gevonden worden bevestigd');
+      assert.ok(financiering.d.error, 'de gebruiker krijgt de reden');
+      const scheids = await roep(w.base, '/api/rtf/labfonds/scheidsrechter', { ...w.gez, id: 'bestaat-niet' });
+      assert.equal(scheids.status, 404, 'over een niet-bestaand voorstel kan geen oordeel worden gegeven');
+      assert.ok(scheids.d.error);
     }
     const na = await roep(w.base, '/api/rtf/labfonds/overzicht', w.gez);
     const pot = (l) => ((l.d.locaties || []).find((x) => x.id === w.locId) || {}).pot;

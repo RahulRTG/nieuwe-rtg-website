@@ -43,6 +43,30 @@ const { spawn } = require('node:child_process');
 
 const MOTOR = path.join(__dirname, '..', 'scripts', 'mutatie.js');
 
+test('een time-out ruimt ook de kinderen van de testrunner op', { skip: process.platform === 'win32' }, async () => {
+  const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-mutatie-kind-'));
+  const pidBestand = path.join(map, 'kind.pid'), bestand = path.join(map, 'hang.test.js');
+  let pid;
+  try {
+    const kindBron = `require('fs').writeFileSync(${JSON.stringify(pidBestand)}, String(process.pid)); setInterval(() => {}, 1000);`;
+    fs.writeFileSync(bestand, `const test = require('node:test');
+      test('hangt na het starten van een kind', () => {
+        require('node:child_process').spawn(process.execPath, ['-e', ${JSON.stringify(kindBron)}], { stdio: 'ignore' });
+        return new Promise(() => {});
+      });`);
+    const r = require('../scripts/mutatie').draaiToets(bestand, {}, 2000);
+    assert.ok(r.tijdout, 'de grens is daadwerkelijk geraakt');
+    pid = Number(fs.readFileSync(pidBestand, 'utf8'));
+    const leeft = () => { try { process.kill(pid, 0); return true; } catch (e) { if (e.code === 'ESRCH') return false; throw e; } };
+    for (let i = 0; i < 50 && leeft(); i++) await new Promise(k => setTimeout(k, 20));
+    assert.equal(leeft(), false, 'de kleinkind-server mag niet achterblijven');
+  } finally {
+    if (!pid && fs.existsSync(pidBestand)) pid = Number(fs.readFileSync(pidBestand, 'utf8'));
+    if (pid) { try { process.kill(pid, 'SIGKILL'); } catch (e) {} }
+    fs.rmSync(map, { recursive: true, force: true });
+  }
+});
+
 function wachtOp(kind) {
   return new Promise((klaar) => kind.on('exit', (code, sein) => klaar({ code, sein })));
 }

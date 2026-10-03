@@ -479,6 +479,7 @@ function draaiToets(bestand, env, wacht, forceer) {
   delete omgeving.NODE_TEST_CONTEXT;
   const r = spawnSync('node', vlaggen.concat([bestand]), {
     cwd: WORTEL, encoding: 'utf8', timeout: wacht || WACHT_NUL, maxBuffer: 64 * 1024 * 1024,
+    detached: process.platform !== 'win32',
     /* SIGKILL EN NIET HET STANDAARD SIGTERM, en dat is geen ruwheid maar een
        lek dat ik heb zien ontstaan. Bij een time-out stuurt spawnSync SIGTERM,
        en juist de toetsen die hier vastlopen (test/redis.test.js) blijven hangen
@@ -490,6 +491,13 @@ function draaiToets(bestand, env, wacht, forceer) {
     killSignal: 'SIGKILL',
     env: omgeving
   });
+  // SIGKILL op alleen de runner laat node:test-workers en hun servers leven.
+  // Een eigen procesgroep begrenst de opruiming tot deze ene proef, ook na
+  // --test-force-exit of een geslaagde runner met een achtergelaten kind.
+  if (process.platform !== 'win32' && r.pid) {
+    try { process.kill(-r.pid, 'SIGKILL'); }
+    catch (e) { if (e.code !== 'ESRCH') throw e; }
+  }
   const uit = String(r.stdout || '');
   const gezakt = (uit.match(/^not ok /gm) || []).length;
   const geteld = /^# tests (\d+)/m.exec(uit);

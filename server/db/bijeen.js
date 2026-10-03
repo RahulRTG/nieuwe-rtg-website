@@ -129,25 +129,30 @@ module.exports = ({ save, saveDuurzaam }) => {
          deze context, en zijn latere save() moet ECHT flushen in plaats van een
          vlag zetten waar niemand meer naar kijkt. */
       doos.open = false;
-      if (doos.nodig) {
-        if (duurzaam) {
-          const uit = saveDuurzaam();
+      await bijeenContext.run(doos, async () => {
+        doos.committen = true;
+        try {
+          if (doos.nodig) {
+            if (duurzaam) {
+              const uit = saveDuurzaam();
           /* DE BUNDEL FAALT ALS HIJ NIET BEVESTIGD KON WORDEN, en alleen daar waar
              bevestigen mogelijk is. Zonder dit gooien meldt saveDuurzaam netjes
              dat het misging en gaat de route toch met 200 verder -- precies de
              valse bevestiging waar deze hele ronde over ging. En met een
              onvoorwaardelijk gooien zou een opslag die niet kan tellen elke
              transactie laten mislukken; dat brak eerder vier geldtoetsen. */
-          if (uit.bevestigbaar && !uit.duurzaam) {
-            throw new Error('[duurzaam] de commit is niet vastgelegd: ' + uit.reden);
-          }
-        } else save();
+              if (uit.bevestigbaar && !uit.duurzaam) {
+                throw new Error('[duurzaam] de commit is niet vastgelegd: ' + uit.reden);
+              }
+            } else save();
         /* Postgres is write-behind: zonder dit wachten zegt de route "gelukt"
            terwijl het geld nog in een 60ms-timer hangt -- de crashproef mat daar
            echt verlies in. Elders (sqlite synchroon; json/geheugen bewust
            write-behind en in productie geblokkeerd) is dit een no-op. */
-        await postgres.flushVoorrangDirect();
-      }
+            await postgres.flushVoorrangDirect();
+          }
+        } finally { doos.committen = false; }
+      });
     }
   }
 

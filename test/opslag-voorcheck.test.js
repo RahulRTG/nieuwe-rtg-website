@@ -56,35 +56,6 @@ function grootBlok(n, extra) {
   return uit;
 }
 
-test('audit-JSON hergebruikt alleen onveranderlijke vlakke regels en blijft bytegelijk', () => {
-  const { serialiseer, borg } = require('../server/db/logjson');
-  const r = borg({ at:'2026-10-01', wie:'lid', tekst:'quote " en \\ en\n', n:3, leeg:null });
-  const regels = [r];
-  const stringify = JSON.stringify;
-  let gelezen = 0;
-  JSON.stringify = function(v, ...rest) { if (v === r) gelezen++; return stringify(v, ...rest); };
-  try {
-    assert.equal(serialiseer('handelingLog',regels), stringify(regels));
-    assert.equal(gelezen,1);
-    regels.unshift(borg({ at:'2026-10-02', wie:'ander' }));
-    assert.equal(serialiseer('handelingLog',regels), stringify(regels));
-    assert.equal(gelezen,1,'de oude regel is niet opnieuw geserialiseerd');
-    regels[1] = { ...r, wie:'vervangen' };
-    assert.equal(serialiseer('handelingLog',regels), stringify(regels),'vervangen bewijs is niet verborgen');
-    const genest=Object.freeze({ data:{waarde:1} });
-    const gemengd=[genest,undefined,null,NaN];
-    assert.equal(serialiseer('handelingLog',gemengd), stringify(gemengd));
-    genest.data.waarde=2;
-    assert.equal(serialiseer('handelingLog',gemengd), stringify(gemengd),'ondiep bevroren is niet onveranderlijk');
-    let n=0; const getter=Object.freeze({get waarde(){return ++n;}});
-    assert.equal(serialiseer('handelingLog',[getter]),'[{"waarde":1}]');
-    assert.equal(serialiseer('handelingLog',[getter]),'[{"waarde":2}]');
-    gemengd.toJSON=()=>({aangepast:true});
-    assert.equal(serialiseer('handelingLog',gemengd),stringify(gemengd));
-    assert.equal(serialiseer('geld',regels),stringify(regels),'andere collecties blijven bij de gewone encoder');
-  } finally { JSON.stringify = stringify; }
-});
-
 test('gerichte spoorsave raakt geen andere collectie; gewone en geforceerde saves bewaren nog alles', () => {
   const o = verseOpslag();
   try {

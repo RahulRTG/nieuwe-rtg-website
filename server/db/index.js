@@ -37,14 +37,9 @@ const tx = require('./tx');
 const redis = require('./redis');
 const { STORE } = opslag;
 
-/* DE VIER DEELBESTANDEN. Dit bestand stond op 23911 byte, ruim twee keer de
-   grens uit keuringsregel 13, en is langs vier naden geknipt: ./starten.js (de
-   opslag opstarten), ./bijeen.js (een commit voor wat bij elkaar hoort),
-   ./duurzaam.js (wegschrijven dat een crash overleeft) en ./afsluiten.js (netjes
-   stoppen). Elk zegt in zijn eigen kop waarom hij daar staat; hier staat alleen
-   de volgorde, want die is gedrag: duurzaam heeft save nodig, bijeen heeft save
-   EN saveDuurzaam. Alle drie krijgen ze save MEE en maken hem niet na -- een
-   tweede schrijfweg is er een die het verraad niet kent. */
+/* Starten, bundelen, duurzaam schrijven en afsluiten hebben eigen modules.
+   De volgorde is gedrag: duurzaam krijgt save; bijeen krijgt beide. Geen
+   tweede schrijfweg die het gedeelde injectiepunt voor opslagfouten omzeilt. */
 const { saveDuurzaam, CONTROL_DUURZAAM, persistentieStand } = require('./duurzaam')({ save });
 const { bijeen, inBundel, bundelDoos } = require('./bijeen')({ save, saveDuurzaam });
 const economischeBoekingEenmaal = require('./economische-boeking')({
@@ -54,7 +49,15 @@ const { load, startSqliteSync } = require('./starten')({ save });
 const { flushBijAfsluiten, opslagKlaar } = require('./afsluiten');
 const { planSnapshot } = snapshot;
 
-function save(collecties) {
+function save(collecties) { return collecties === undefined ? bewaar() : save.sleutels(collecties); }
+// Expliciete schrijvers hoeven niet bij iedere auditregel de hele wereld te scannen.
+save.sleutels = keys => {
+  if (!Array.isArray(keys) || !keys.length || keys.some(k => typeof k !== 'string' || !Object.hasOwn(db.data, k)))
+    throw new Error('Selectieve opslag vereist bestaande collecties.');
+  return bewaar([...new Set(keys)]);
+};
+save.audit = require('./audit-poort')({ db, store: STORE, sqlite, bundelDoos, bewaar });
+function bewaar(sleutels, auditOp) {
   if (!db.writable) return;
   /* DE VERRAADSMOTOR, op het ene punt waar alle schrijfacties doorheen gaan.
 
@@ -86,7 +89,10 @@ function save(collecties) {
      de vraag is niet "hoeveel" maar "iets of niets", en die mag geen tak missen. */
   effectmeter.tel('opslag');
   const doos = bundelDoos();
-  if (doos && doos.open) { doos.nodig = true; return; } // binnen bijeen: aan het eind, in een commit
+  if (doos && doos.open) {
+    if (auditOp) sqlite.auditMotor().stage(doos, auditOp);
+    doos.nodig = true; return;
+  } // binnen bijeen: aan het eind, in een commit
   // verraadfase = de motor ACHTER de opstartpoort; zie ../lib/verraadfase.js
   if (verraadfase.sla('schrijf-faalt')) throw new Error('[verraad] de schrijfactie mislukte (schrijf-faalt)');
   if (verraadfase.sla('schrijf-verloren')) return;
@@ -101,7 +107,7 @@ function save(collecties) {
     postgres.planSave();
   } else if (STORE === 'sqlite') {
     // SQLite: kruisproces-sync via versienummers en de poll (geen Redis-mirror).
-    sqlite.saveSqlite(false, collecties);
+    sqlite.saveSqlite(false, sleutels, auditOp ? [auditOp] : []);
   } else if (STORE === 'geheugen') {
     // GEHEUGEN: versleutelde, incrementele brok-per-collectie-opslag (write-behind).
     geheugen.saveGeheugen();
@@ -132,14 +138,8 @@ module.exports = {
   ledenGidsActief: gidsen.ledenGidsActief, ledenGidsHaal: gidsen.ledenGidsHaal, ledenGidsAantal: gidsen.ledenGidsAantal,
   ledenGidsZet: gidsen.ledenGidsZet, ledenGidsExact: gidsen.ledenGidsExact, ledenGidsZoek: gidsen.ledenGidsZoek,
   ledenGidsHaalWacht: gidsen.ledenGidsHaalWacht,
-  /* ledenGidsWeg stond hier NIET, terwijl ledengids.js hem exporteert, gidsen.js
-     hem doorreikt en server.js hem uit deze module haalt. Hij was dus undefined,
-     en in kern/gids.js sloeg `if (ledenGidsWeg)` daar stilzwijgend op over --
-     inclusief de `return` erachter, zodat OOK het lokale pad werd overgeslagen.
-     Uitkomst: in Postgres-modus haalde het recht op vergetelheid (AVG art. 17)
-     het lid nergens uit de gids, terwijl het commentaar boven gidsWeg letterlijk
-     belooft dat het allebei de opslagvormen dekt. Een ontbrekende regel in een
-     exportlijst, en niets dat erover klaagde. */
+  // Ook de AVG-wissing doorgeven: zonder deze export sloeg gidsWeg beide
+  // opslagpaden over, hoewel de onderliggende ledengids hem wel aanbiedt.
   ledenGidsWeg: gidsen.ledenGidsWeg,
   orderMetRef: tx.orderMetRef, ordersVanKlant: tx.ordersVanKlant, ordersVanZaak: tx.ordersVanZaak, ordersVoegToe: tx.ordersVoegToe,
   boekingMetRef: tx.boekingMetRef, boekingenVanKlant: tx.boekingenVanKlant, boekingenVanZaak: tx.boekingenVanZaak, boekingenVoegToe: tx.boekingenVoegToe,

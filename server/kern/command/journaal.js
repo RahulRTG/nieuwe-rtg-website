@@ -32,8 +32,10 @@ const MAX = 5000;
    Dit is geen tweede journaal: het is dezelfde module, één keer per eigenaar.
    De waarheid "wat is er in zaak X gebeurd" staat daarmee op precies één
    plek -- wat LAT.md regel 4 vraagt. */
-function maakJournaal({ db, save, crypto, vak, opslag }) {
-  const V = typeof vak === 'function' ? vak : (() => opslag.vak());
+function maakJournaal({ db, save, crypto, vak, opslag, auditOpslag }) {
+  let werkVak = null;
+  const bron = typeof vak === 'function' ? vak : (() => opslag.vak());
+  const V = () => werkVak || (auditOpslag ? auditOpslag.view() : bron());
   function lijst() {
     const v = V();
     if (!Array.isArray(v.commandJournaal)) v.commandJournaal = [];
@@ -60,15 +62,15 @@ function maakJournaal({ db, save, crypto, vak, opslag }) {
     return uit;
   }
 
-  function noteer(regel) {
-    const rij = lijst();
-    const vorige = rij.length ? rij[rij.length - 1] : null;
+  function noteer(regel, vast) {
+    const rij = auditOpslag && !werkVak ? null : lijst();
+    const vorige = rij?.length ? rij[rij.length - 1] : null;
     const kern = {
-      id: crypto.randomUUID(),
+      id: vast?.id || crypto.randomUUID(),
       /* Een aanroeper mag een GROVERE tijd meegeven (lib/burgerpad.js); nooit
          een tijd die niet van nu is, want de keten gaat over volgorde. */
-      at: typeof regel.at === 'string' && regel.at.slice(0, 10) === new Date().toISOString().slice(0, 10)
-        ? regel.at : new Date().toISOString(),
+      at: vast?.at || (typeof regel.at === 'string' && regel.at.slice(0, 10) === new Date().toISOString().slice(0, 10)
+        ? regel.at : new Date().toISOString()),
       actor: String(regel.actor || 'onbekend'),
       actie: String(regel.actie || ''),
       objectType: regel.objectType ? String(regel.objectType) : null,
@@ -82,13 +84,16 @@ function maakJournaal({ db, save, crypto, vak, opslag }) {
       na: beknopt(regel.na),
       vorig: vorige ? vorige.zegel : null
     };
+    if (auditOpslag && !werkVak) return auditOpslag.append(top => {
+      const waarde = { ...kern, vorig: top?.zegel || null }; waarde.zegel = hash(waarde); return waarde;
+    });
     kern.zegel = hash(kern);
     rij.push(kern);
     V().commandJournaalTotaal = tellerLees() + 1;
     /* De staart afkappen mag, de teller niet: `aantal` blijft het echte
        totaal. Zo weet een scherm dat het naar een venster kijkt. */
     if (rij.length > MAX) rij.splice(0, rij.length - MAX);
-    if (save) save();
+    if (save && !werkVak) save();
     return kern;
   }
 
@@ -109,7 +114,14 @@ function maakJournaal({ db, save, crypto, vak, opslag }) {
 
      Wat blijft: WAT er is gebeurd en WANNEER. Wat weggaat: WIE, en dat is
      precies wat er gevraagd werd. */
-  function wisActor(actor, reden) {
+  function wisActor(actor, reden, vast) {
+    if (auditOpslag && !werkVak) {
+      const identiteit = { id: crypto.randomUUID(), at: new Date().toISOString() };
+      return auditOpslag.rewrite(waarde => {
+        werkVak = waarde;
+        try { return wisActor(actor, reden, identiteit); } finally { werkVak = null; }
+      });
+    }
     const wie = String(actor || '');
     if (!wie) return { geraakt: 0 };
     const rij = lijst();
@@ -128,7 +140,7 @@ function maakJournaal({ db, save, crypto, vak, opslag }) {
     }
     noteer({ actor: 'systeem', actie: 'wissing in het spoor', niveau: NIVEAUS.auto,
       reden: reden || 'recht op vergetelheid (AVG art. 17)',
-      uitslag: 'gedaan', voor: { kopVoorWissing: kopVoor }, na: { regelsGewist: geraakt } });
+      uitslag: 'gedaan', voor: { kopVoorWissing: kopVoor }, na: { regelsGewist: geraakt } }, vast);
     return { geraakt, kopVoor };
   }
 
@@ -148,41 +160,8 @@ function maakJournaal({ db, save, crypto, vak, opslag }) {
     return { heel: true, regels: rij.length };
   }
 
-  function overObject(type, id) {
-    const t = String(type), i = String(id);
-    return lijst().filter(r => r.objectType === t && r.objectId === i);
-  }
-
-  function recent(n, filter) {
-    let rij = lijst().slice().reverse();
-    if (filter && filter.actor) rij = rij.filter(r => r.actor === filter.actor);
-    if (filter && filter.actie) rij = rij.filter(r => r.actie.includes(filter.actie));
-    if (filter && filter.niveau) rij = rij.filter(r => r.niveau === filter.niveau);
-    return rij.slice(0, n || 50);
-  }
-
-  /* FORENSIC REPLAY: reconstrueer wat er tussen twee momenten gebeurde, in
-     volgorde, met per stap de toestand ervoor en erna. Dat is precies wat je
-     na een incident wilt kunnen doen -- en het is alleen mogelijk omdat `voor`
-     en `na` bij het noteren zijn vastgelegd en niet achteraf herleid. */
-  function herbeleef(van, tot, opties) {
-    const v = String(van || ''), t = String(tot || '￿');
-    const alles = lijst().filter(r => r.at >= v && r.at <= t);
-    const gefilterd = opties && opties.objectType
-      ? alles.filter(r => r.objectType === opties.objectType && (!opties.objectId || r.objectId === String(opties.objectId)))
-      : alles;
-    return {
-      van: v, tot: t, stappen: gefilterd.length,
-      actoren: [...new Set(gefilterd.map(r => r.actor))],
-      automatisch: gefilterd.filter(r => r.niveau === NIVEAUS.auto).length,
-      mislukt: gefilterd.filter(r => r.uitslag !== 'gedaan').length,
-      lijn: gefilterd.map(r => ({ at: r.at, actor: r.actor, actie: r.actie, niveau: r.niveau,
-        object: r.objectType ? r.objectType + ' ' + r.objectId : null,
-        reden: r.reden, uitslag: r.uitslag, voor: r.voor, na: r.na, zegel: r.zegel }))
-    };
-  }
-
-  return { noteer, controleer, overObject, recent, herbeleef, wisActor,
+  const lezing = require('./journaal-lezing')(lijst, NIVEAUS);
+  return { noteer, controleer, ...lezing, wisActor,
     aantal: () => tellerLees(), venster: () => lijst().length, MAX };
 }
 

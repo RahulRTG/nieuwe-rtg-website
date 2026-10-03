@@ -1,19 +1,21 @@
-/* Opslag, deel "sqlite": de SQLite-kv-motor. Elke top-level collectie is een rij
-   (WAL, transactioneel), met een oplopend versienummer per collectie; een korte
-   achtergrondpoll haalt de collecties op die een ANDER proces heeft gewijzigd.
-   Zo kunnen echt losse schrijvende servers hetzelfde store.db delen zonder elkaar
-   te overschrijven (per collectie serialiseert SQLite de schrijvers), en zien ze
-   elkaars data live. De data in het geheugen (db.data) blijft gelijk. */
+/* SQLite/WAL: collecties hebben versies; de poll leest externe wijzigingen.
+   Schrijvers delen dezelfde transactionele store.db. De twee auditjournalen
+   hebben eigen rijen; db.data blijft de leesprojectie van dezelfde opslag. */
 const path = require('path');
 const kluis = require('../kluis');
 const state = require('./state');
 const { merge3 } = require('./merge');
 const { DATA_DIR, STORE, besloten, beslotenMap } = require('./opslag');
-// De goedkope veranderingsdetectie op GROTE collecties; daar staat ook waarom
-// hij veilig is en waarom geld er nooit door gaat.
+// Grote collecties: begrensde voorcheck, nooit voor geld.
 const voorcheck = require('./voorcheck');
-const { serialiseer } = require('./logjson');
+const externeCollecties = require('./sqlite-poll');
 const db = state.db;
+let auditMotorWaarde;
+function auditMotor() {
+  sqliteInit();
+  return auditMotorWaarde || (auditMotorWaarde = require('./audit-sqlite')({ db, kv: kvdb,
+    decode: uitStore, encode: naarStore, bump: () => statements().bump.run() }));
+}
 
 let kvdb = null;
 const toegepast = new Map();   // collectie -> versienummer dat dit proces al toegepast heeft
@@ -44,13 +46,16 @@ function sqliteInit() {
 }
 function loadSqlite() {
   sqliteInit();
-  const rows = kvdb.prepare('SELECT key, val, ver FROM kv').all();
-  if (!rows.length) return null;
+  const audits = auditMotor();
+  const { rows, audit } = externeCollecties.snapshot(kvdb, () => ({
+    rows: kvdb.prepare('SELECT key, val, ver FROM kv').all(), audit: audits.snapshots()
+  }));
+  if (!rows.length && !audit.length) return null;
   const data = {};
   for (const r of rows) { const j = uitStore(r.val); data[r.key] = JSON.parse(j); laatsteJson.set(r.key, j); toegepast.set(r.key, r.ver); }
-  return data;
+  return audits.laad(data, audit);
 }
-// De vier statements zijn per verbinding altijd dezelfde: één keer voorbereiden
+// De statements zijn per verbinding altijd dezelfde: één keer voorbereiden
 // in plaats van bij elke save opnieuw (SQLite hoeft dan niet te hercompileren).
 let stmt = null;
 function statements() {
@@ -60,25 +65,26 @@ function statements() {
     huidig: kvdb.prepare("SELECT v FROM meta WHERE k = 'ver'"),
     lees: kvdb.prepare('SELECT val, ver FROM kv WHERE key = ?'),
     versie: kvdb.prepare('SELECT ver FROM kv WHERE key = ?'),
+    versies: kvdb.prepare('SELECT key, ver FROM kv'),
     up: kvdb.prepare('INSERT INTO kv(key,val,ver) VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET val=excluded.val, ver=excluded.ver')
   };
   return stmt;
 }
-function saveSqlite(force, collecties) {
-  if (collecties !== undefined && (!Array.isArray(collecties) || !collecties.length ||
-      collecties.some(k => typeof k !== 'string' || !Object.hasOwn(db.data, k)))) {
+function saveSqlite(force, sleutels, extraAudit = []) {
+  if (sleutels !== undefined && (!Array.isArray(sleutels) || (!sleutels.length && !extraAudit.length) ||
+      sleutels.some(k => typeof k !== 'string' || !Object.hasOwn(db.data, k))))
     throw new TypeError('Een gerichte save vereist bestaande collecties');
-  }
   sqliteInit();
+  const audits = auditMotor(), doos = audits.doos();
+  const auditOps = [...audits.vervangingen(db.data), ...(doos?.auditOps || []), ...extraAudit];
+  const auditSleutels = new Set(auditOps.map(op => op.naam));
   const gewijzigd = [];
   const nu = Date.now();
   let uitgesteld = false;
-  // Een spoor schrijft alleen zijn eigen collectie. Gewone en duurzame saves
-  // blijven alle collecties controleren, ook na een gerichte schrijfactie.
-  const sleutels = force || collecties === undefined ? Object.keys(db.data) : [...new Set(collecties)];
-  for (const k of sleutels) {
-    if (voorcheck.magOverslaan(k, db.data[k], force, nu)) { uitgesteld = true; continue; }
-    const j = serialiseer(k, db.data[k]);
+  for (const k of force || sleutels === undefined ? Object.keys(db.data) : [...new Set(sleutels)]) {
+    if (auditSleutels.has(k) || audits.bezit(db.data, k)) continue;
+    if (voorcheck.magOverslaan(k, db.data[k], force || sleutels !== undefined, nu)) { uitgesteld = true; continue; }
+    const j = JSON.stringify(db.data[k]);
     voorcheck.onthoud(k, j.length, db.data[k], nu);
     if (laatsteJson.get(k) !== j) gewijzigd.push([k, j]);
   }
@@ -86,9 +92,11 @@ function saveSqlite(force, collecties) {
   /* Niets te schrijven is iets anders dan niet geschreven; beide gaven hier
      `undefined`, en de duurzame bundel las dat als verlies -- zie duurzaam.js.
      Alleen zonder uitgesteld werk is elke collectie ook echt nagekeken. */
-  if (!gewijzigd.length) return { alGelijk: !uitgesteld };
+  if (!gewijzigd.length && !auditOps.length) return { alGelijk: !uitgesteld };
   const { bump, huidig, lees, versie, up } = statements();
-  const bevestigd = [];
+  const vastgelegd = [];
+  const auditResultaten = [];
+  let auditSnapshots;
   kvdb.exec('BEGIN IMMEDIATE'); // pak meteen de schrijflock, zodat de versie en de merge kloppen
   try {
     for (const [k, jOns] of gewijzigd) {
@@ -109,16 +117,18 @@ function saveSqlite(force, collecties) {
       bump.run();
       const v = huidig.get().v;
       up.run(k, naarStore(j), v);
-      bevestigd.push([k, j, v]);
+      vastgelegd.push([k, j, v]);
     }
+    for (const op of auditOps) auditResultaten.push(audits.pasToe(op));
+    auditSnapshots = audits.publicaties(auditResultaten);
     kvdb.exec('COMMIT');
   } catch (e) {
     try { kvdb.exec('ROLLBACK'); } catch (x) {}
     for (const [k] of gewijzigd) voorcheck.vergeet(k);
     throw e;
   }
-  // Een mislukte COMMIT mag de volgende poging nooit als al opgeslagen zien.
-  for (const [k, j, v] of bevestigd) { laatsteJson.set(k, j); toegepast.set(k, v); }
+  for (const [k, j, v] of vastgelegd) { laatsteJson.set(k, j); toegepast.set(k, v); }
+  audits.naCommit(auditResultaten, doos, auditSnapshots);
   return { alGelijk: false };
 }
 // Haal de collecties op die een ANDER proces sinds onze laatste versie schreef,
@@ -126,34 +136,29 @@ function saveSqlite(force, collecties) {
 function pollSqlite() {
   if (!kvdb) return;
   try {
-    // per collectie kijken of een ANDER proces een nieuwere versie schreef dan wij
-    // al toepasten (een globale hoogwatergrens zou een lager genummerde wijziging
-    // van een ander proces missen zodra wij zelf iets hoger schreven). We halen
-    // alleen rijen op boven onze laagst-toegepaste versie, zodat we niet elke
-    // keer alle collecties hoeven te deserialiseren.
-    let laagst = 0;
-    for (const v of toegepast.values()) if (v < laagst || laagst === 0) laagst = v;
-    const rows = kvdb.prepare('SELECT key, ver FROM kv WHERE ver > ?').all(laagst);
+    // Vergelijk versies per collectie: een eigen hogere versie mag een eerdere
+    // externe wijziging niet verbergen. Haal uitsluitend gewijzigde payloads.
+    const audits = auditMotor();
+    const { rows, audit } = externeCollecties(kvdb, statements(), toegepast, audits.snapshots);
+    const voorbereid = [];
     let sessieGewijzigd = false;
     for (const r of rows) {
-      if (r.ver <= (toegepast.get(r.key) || 0)) continue;
-      Object.assign(r, statements().lees.get(r.key));
-      const baseJson = laatsteJson.get(r.key);
+      const sleutel = r.key;
+      const baseJson = laatsteJson.get(sleutel);
       const hunJson = uitStore(r.val);
-      const lokaalOpenstaand = baseJson !== undefined && JSON.stringify(db.data[r.key]) !== baseJson;
-      if (lokaalOpenstaand) {
-        // wij hebben nog niet-opgeslagen wijzigingen: samenvoegen en die niet
-        // als "opgeslagen" markeren, zodat de eerstvolgende save ze wegschrijft.
-        db.data[r.key] = merge3(JSON.parse(baseJson), db.data[r.key], JSON.parse(hunJson));
-      } else {
-        db.data[r.key] = JSON.parse(hunJson);
-        laatsteJson.set(r.key, hunJson);
-      }
-      toegepast.set(r.key, r.ver);
+      const lokaalOpenstaand = baseJson !== undefined && JSON.stringify(db.data[sleutel]) !== baseJson;
+      const waarde = lokaalOpenstaand ? merge3(JSON.parse(baseJson), db.data[sleutel], JSON.parse(hunJson)) : JSON.parse(hunJson);
+      voorbereid.push({ sleutel, waarde, hunJson, lokaalOpenstaand, ver: r.ver });
+    }
+    audits.publiceerSnapshots(audit);
+    for (const { sleutel, waarde, hunJson, lokaalOpenstaand, ver } of voorbereid) {
+      db.data[sleutel] = waarde;
+      if (!lokaalOpenstaand) laatsteJson.set(sleutel, hunJson);
+      toegepast.set(sleutel, ver);
       // De inhoud komt van BUITEN: wat de voorcheck van deze collectie meende te
       // weten, geldt niet meer. Vergeten, zodat de volgende save hem exact nakijkt.
-      voorcheck.vergeet(r.key);
-      if (r.key === 'sessions') sessieGewijzigd = true;
+      voorcheck.vergeet(sleutel);
+      if (sleutel === 'sessions') sessieGewijzigd = true;
     }
     if (sessieGewijzigd) { const ext = state.getExternCb(); if (ext) ext(); }
   } catch (e) { console.warn('[db] sqlite-sync mislukt:', e.message); }
@@ -167,23 +172,20 @@ function startSqliteSync() {
   if (pollTimer.unref) pollTimer.unref();
 }
 
-/* De backup moet eerst de WAL naar store.db laten doorschrijven; anders mist
-   een kopie van alleen store.db de nieuwste gegevens. */
-function checkpointSqlite() {
-  if (!kvdb) return false;
-  try { saveSqlite(true); } catch (e) {}
-  try { kvdb.exec('PRAGMA wal_checkpoint(TRUNCATE)'); return true; }
-  catch (e) { return false; }        // een ander proces leest nog; de -wal-kopie vangt dat op
-}
+/* Alleen de duurzame schrijver heeft al geflusht. Backup en afsluiten houden
+   hun eigen volledige flush; de WAL-grens staat naast de transactielaag. */
+const { checkpointSqlite, vouwWalSqlite, afrondSqlite } = require('./sqlite-checkpoint')({
+  verbinding: () => kvdb, saveSqlite
+});
 
-function afrondSqlite() {
-  if (!kvdb) return;
-  try { saveSqlite(true); } catch (e) { console.warn('[db] laatste sqlite-save mislukt:', e.message); }
-  try { kvdb.exec('PRAGMA wal_checkpoint(TRUNCATE)'); } catch (e) { /* ander proces leest nog */ }
-}
+/* DE PERSISTENTE VERSIE, gelezen uit de DATABASE en niet uit het geheugen.
 
-/* Alleen de databaseversie bevestigt een schrijfactie: gewijzigd geheugen is
-   geen bewijs van opslag. null betekent niet vast te stellen, nooit in orde. */
+   Dit is het enige getal waarmee een aanroeper kan vaststellen dat zijn
+   schrijfactie werkelijk de schijf heeft gehaald. Het geheugen kan hem niet
+   bevestigen -- daar staat de wijziging sowieso -- en juist dat verschil is waar
+   een verloren schrijfactie zich verstopt. Geeft null als er geen SQLite-opslag
+   draait; de aanroeper hoort dat als "niet vast te stellen" te behandelen en
+   niet als "in orde". */
 function persistentieStandSqlite() {
   try { sqliteInit(); const r = statements().huidig.get(); return r ? Number(r.v) : null; }
   catch (e) { return null; }
@@ -196,5 +198,5 @@ const bewerkCollectieSqlite = require('./collectie-sqlite')({
 const economischeBoekingSqlite = require('./economische-boeking-sqlite')({ db,
   verbinding: () => { sqliteInit(); return kvdb; }, statements, merge3, uitStore, naarStore, laatsteJson, toegepast, voorcheck });
 
-module.exports = { loadSqlite, saveSqlite, bewerkCollectieSqlite, economischeBoekingSqlite, startSqliteSync, afrondSqlite, checkpointSqlite,
+module.exports = { loadSqlite, saveSqlite, auditMotor, bewerkCollectieSqlite, economischeBoekingSqlite, startSqliteSync, afrondSqlite, checkpointSqlite, vouwWalSqlite,
   persistentieStandSqlite };

@@ -681,7 +681,7 @@ function logInlog(kanaal, ok, wie, req) {
     at: new Date().toISOString(), kanaal, ok: !!ok,
     wie: schoon(wie, 60) || null, ip: String((req && req.ip) || '')
   }, 5000);
-  save();
+  save.sleutels(['securityLog']);
 }
 
 /* De ketenstand van het inlog-auditlog: hetzelfde getal dat inzagelog.ketenTop()

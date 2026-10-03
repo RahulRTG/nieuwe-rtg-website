@@ -32,6 +32,14 @@ on:
     # staat de wachtrij van GitHub vol en wachten runs onnodig lang.
     - cron: '17 3 * * 0'
   workflow_dispatch:
+    inputs:
+      scope:
+        description: Volledige ronde of dezelfde standaardbeproeving afzonderlijk
+        type: choice
+        default: full
+        options:
+          - full
+          - performance
 
 permissions:
   contents: read
@@ -52,11 +60,10 @@ defaults:
   run:
     shell: bash
 
-# Twee rondes tegelijk hebben geen zin: de tweede meet dezelfde bron op een
-# machine die al bezet is. Een lopende ronde afbreken doen we NIET -- een halve
-# beproeving is geen meting.
+# Jobs gebruiken geïsoleerde runners. Verschillende branches en proefsoorten
+# blokkeren elkaar niet; dezelfde bron en proef blijven serieel.
 concurrency:
-  group: ronde
+  group: ronde-${{ github.ref }}-${{ inputs.scope || 'full' }}
   cancel-in-progress: false
 
 jobs:
@@ -152,6 +159,7 @@ jobs:
           retention-days: 30
 
   tot-crash:
+    if: inputs.scope != 'performance'
     name: Tot crash (escalerende druk tot iets breekt)
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -190,6 +198,7 @@ jobs:
           retention-days: 30
 
   heapproef:
+    if: inputs.scope != 'performance'
     name: Heapproef (houdt de server geheugen vast?)
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -229,6 +238,7 @@ jobs:
           retention-days: 30
 
   dekking:
+    if: inputs.scope != 'performance'
     name: Waargenomen endpoint-dekking en de samenhang
     runs-on: ubuntu-latest
     # 90 was genoeg voor de suite plus de dekking; de meetronde komt er met

@@ -35,13 +35,14 @@
    van p50 -- en dat is hier de leesbaarheid niet waard.
    ========================================================================== */
 'use strict';
+const sleutelsVoorLezing = data => require('./begroting').sleutelsVoorLezing(data);
 
 /* Alleen top-level arrays tellen. Een object of een getal in db.data is geen
    collectie met rijen, en meetellen zou het getal betekenisloos maken. */
 function tel(data) {
   const uit = new Map();
   if (!data || typeof data !== 'object') return uit;
-  for (const sleutel of Object.keys(data)) {
+  for (const sleutel of sleutelsVoorLezing(data)) {
     const v = data[sleutel];
     if (Array.isArray(v)) uit.set(sleutel, v.length);
   }

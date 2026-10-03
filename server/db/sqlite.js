@@ -8,6 +8,7 @@ const { merge3 } = require('./merge');
 const { DATA_DIR, STORE, besloten, beslotenMap } = require('./opslag');
 // Grote collecties: begrensde voorcheck, nooit voor geld.
 const voorcheck = require('./voorcheck');
+const { sleutelsVoorLezing } = require('../opzet/begroting');
 const externeCollecties = require('./sqlite-poll');
 const db = state.db;
 let auditMotorWaarde;
@@ -81,7 +82,7 @@ function saveSqlite(force, sleutels, extraAudit = []) {
   const gewijzigd = [];
   const nu = Date.now();
   let uitgesteld = false;
-  for (const k of force || sleutels === undefined ? Object.keys(db.data) : [...new Set(sleutels)]) {
+  for (const k of force || sleutels === undefined ? sleutelsVoorLezing(db.data) : [...new Set(sleutels)]) {
     if (auditSleutels.has(k) || audits.bezit(db.data, k)) continue;
     if (voorcheck.magOverslaan(k, db.data[k], force || sleutels !== undefined, nu)) { uitgesteld = true; continue; }
     const j = JSON.stringify(db.data[k]);
@@ -131,8 +132,7 @@ function saveSqlite(force, sleutels, extraAudit = []) {
   audits.naCommit(auditResultaten, doos, auditSnapshots);
   return { alGelijk: false };
 }
-// Haal de collecties op die een ANDER proces sinds onze laatste versie schreef,
-// en zet ze in db.data. Zo blijven losse domeinprocessen bij elkaar in de pas.
+// Publiceer extern gewijzigde collecties vanuit één snapshot.
 function pollSqlite() {
   if (!kvdb) return;
   try {

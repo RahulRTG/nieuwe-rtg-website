@@ -53,7 +53,7 @@ window.SPart.taalcheck = function () {
     q('tcUit').innerHTML =
       '<div class="stil">Vraag ' + d.nr + ' van ' + d.totaal + ' &middot; ' +
       (d.ronde === 'nl' ? 'Nederlands' : 'eigen taal') + '</div>' +
-      '<div style="margin:.4rem 0;font-size:1.02rem;">' + esc(d.vraag) + '</div>' +
+      '<div class="sp-taal-vraag">' + esc(d.vraag) + '</div>' +
       '<div class="rij"><input class="veld" id="tcIn" placeholder="Antwoord van de leerling" aria-label="Antwoord">' +
       '<button class="knop" id="tcStuur" type="button">Volgende</button></div>';
     q('tcStuur').addEventListener('click', function () { antwoord(q('tcIn').value); });

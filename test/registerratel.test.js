@@ -3,7 +3,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { REGELS, vergelijk, controleer } = require('../scripts/registerratel');
 function zet(obj, pad, waarde) {
-  const delen = pad.split('.');
+  const delen = pad.startsWith('/') ? pad.slice(1).split('/').map(k => k.replace(/~1/g, '/').replace(/~0/g, '~')) : pad.split('.');
   const laatste = delen.pop();
   let plek = obj;
   for (const d of delen) plek = plek[d] ||= {};

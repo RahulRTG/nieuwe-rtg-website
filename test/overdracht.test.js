@@ -248,6 +248,7 @@ test('de kaart en het pakket staan achter de leerlingpoort', async () => {
   const kaart = await bh('/school/overdracht/kaart');
   assert.equal(kaart.status, 200, JSON.stringify(kaart.body).slice(0, 140));
   assert.equal(kaart.body.velden.filter(v => v.klasse === 'nooit').length >= 4, true);
+  assert.ok(kaart.body.standaarden.length > 0, 'de kaart toont echte overdrachtsstandaarden');
   assert.ok(kaart.body.standaarden.every(s => s.kanNiet.length));
   /* De herkomst reist mee tot op het scherm. Een lijst van vier standaarden
      zonder bron laat een school denken dat er vier koppelingen klaarliggen. */

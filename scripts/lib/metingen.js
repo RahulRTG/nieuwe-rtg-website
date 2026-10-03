@@ -97,6 +97,15 @@ const GEEN_METING = new Set([
 ]);
 
 const REGISTER = {
+  'KRIMP.json': { eigenRatel: 'scripts/registerratel.js' },
+  'BEGROTING.json': { eigenRatel: 'scripts/registerratel.js' },
+  'CODEWERELD.json': { eigenRatel: 'scripts/registerratel.js' },
+  'RAILVERGELIJK.json': { eigenRatel: 'scripts/registerratel.js' },
+  'SCHRIJFANALYSE.json': { eigenRatel: 'scripts/registerratel.js' },
+  'SEMANTIEK.json': { eigenRatel: 'scripts/registerratel.js' },
+  'SLO.json': { eigenRatel: 'scripts/registerratel.js' },
+  'SUITE.json': { eigenRatel: 'scripts/registerratel.js' },
+  'VERTROUWEN.json': { eigenRatel: 'scripts/registerratel.js' },
   'COMMERCE.json': { eigenRatel: 'scripts/registerratel.js' },
   /* Deze kwaliteitsvelden hebben een echte regressiepoort tegen het aftakpunt;
      test/registerratel.test.js draait de poort en saboteert iedere regel. */

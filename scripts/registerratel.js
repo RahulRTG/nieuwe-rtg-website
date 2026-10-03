@@ -9,6 +9,15 @@ const fs = require('fs');
 const path = require('path');
 const { bepaalBasis, versieBij } = require('./lib/basis');
 const REGELS = {
+  'KRIMP.json': { '/rondes/grens-0.5/suite/gezakt': 'omlaag', '/rondes/grens-0.5/suite/rood': 'omlaag', '/rondes/grens-0.5/suite/toetsen': 'omhoog' },
+  'BEGROTING.json': { 'standaard': 'omlaag' },
+  'CODEWERELD.json': { 'assen.symbool.proef.gefaald': 'omlaag', 'assen.symbool.proef.gedraaid': 'waar' },
+  'RAILVERGELIJK.json': { 'telling.overtreding': 'omlaag', 'telling.nietGemeten': 'omlaag' },
+  'SCHRIJFANALYSE.json': { 'gemeten.onbekend': 'omlaag' },
+  'SEMANTIEK.json': { 'dubbelingenZonderNaam': 'omlaag' },
+  'SLO.json': { 'minimumVerzoeken': 'omhoog', 'minimumDekking': 'omhoog' },
+  'SUITE.json': { 'gemeten.mislukt': 'omlaag', 'gemeten.geannuleerd': 'omlaag', 'gemeten.overgeslagen': 'omlaag', 'gemeten.tapVolledig': 'waar' },
+  'VERTROUWEN.json': { 'onreproduceerbaar': 'leeg' },
   'COMMERCE.json': { 'gemeten.optelGemengd': 'omlaag', 'gemeten.optelOnbekend': 'omlaag' },
   'AANROEPGRAAF.json': { 'gemeten.nietGelezen': 'omlaag', 'gemeten.doelOnbekend': 'omlaag' },
   'AUDITPROEF.json': { 'gemeten.gezakt': 'omlaag', 'gemeten.blindeRondes': 'omlaag', 'gemeten.ketenHeel': 'waar' },
@@ -36,7 +45,10 @@ const REGELS = {
   'VERRAAD.json': { 'gemeten.blindeInjecties': 'omlaag', 'gemeten.onherhaalbareRondes': 'omlaag', 'gemeten.toegediend': 'omhoog' },
   'WAAROM.json': { 'gemeten.onbekend': 'omlaag' }
 };
-const veld = (obj, sleutel) => sleutel.split('.').reduce((o, k) => o && Object.hasOwn(o, k) ? o[k] : undefined, obj);
+// JSON Pointer voor sleutels die zelf punten bevatten; bestaande paden blijven geldig.
+const veld = (obj, sleutel) => (sleutel.startsWith('/')
+  ? sleutel.slice(1).split('/').map(k => k.replace(/~1/g, '/').replace(/~0/g, '~'))
+  : sleutel.split('.')).reduce((o, k) => o && Object.hasOwn(o, k) ? o[k] : undefined, obj);
 function vergelijk(naam, nu, basis) {
   const fouten = [];
   for (const [sleutel, richting] of Object.entries(REGELS[naam] || {})) {

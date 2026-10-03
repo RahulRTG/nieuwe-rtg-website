@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-01T15:10:09.895Z",
-    "commit": "c64d473b2",
+    "op": "2026-10-03T20:06:37.758Z",
+    "commit": "823d57a0d",
     "boomVuil": false,
-    "boomAnders": 2,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v24.18.0"
   },
@@ -12445,6 +12445,38 @@
     "sprongindex.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
+    },
+    "sqlite-audit-herstel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/command/journaal.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 3
+    },
+    "sqlite-audit-rijen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/keten.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "sqlite-audit-selectief.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 8,
+      "geprobeerd": 1
+    },
+    "sqlite-audit-snapshot.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/sqlite.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
     },
     "sso-clientgeheim-routes.test.js": {
       "soort": "server",

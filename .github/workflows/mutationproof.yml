@@ -44,7 +44,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: '26.10.0'
+          node-version-file: candidate/.nvmrc
       - name: Volledige discovery en deterministische verdeling
         run: node tooling/scripts/mutationproof.js plan candidate "$CANDIDATE_SHA" mutation-plan
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -82,7 +82,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: '26.10.0'
+          node-version-file: candidate/.nvmrc
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: mutation-plan-${{ github.run_id }}-${{ github.run_attempt }}
@@ -98,7 +98,7 @@ jobs:
           cp tooling/scripts/mutationproof.Dockerfile image-context/Dockerfile
           cp candidate/package.json candidate/package-lock.json image-context/
           cp candidate/scripts/browserinstall.js image-context/browserinstall.js
-          docker build --tag rtg-mutationproof:local image-context
+          docker build --build-arg NODE_VERSION="$(node -p process.versions.node)" --tag rtg-mutationproof:local image-context
       - name: Echte baseline, bestaande mutatiemotor en herstel per geïsoleerde testcase
         run: node tooling/scripts/mutationproof.js shard candidate "$CANDIDATE_SHA" mutation-plan/PLAN.json "$SHARD_INDEX" mutation-shard
       - name: Ruwe logs en onvolledige uitkomsten blijven bewijsbaar
@@ -131,7 +131,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: '26.10.0'
+          node-version-file: candidate/.nvmrc
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: mutation-plan-${{ github.run_id }}-${{ github.run_attempt }}

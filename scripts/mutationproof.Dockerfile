@@ -1,6 +1,7 @@
 # Network is available only while preparing dependencies. Each actual test is
 # run in a fresh --network none container with its own loopback PG and Redis.
-FROM node:26.10.0-bookworm AS node
+ARG NODE_VERSION
+FROM node:${NODE_VERSION}-bookworm AS node
 FROM ubuntu:24.04
 COPY --from=node /usr/local/ /usr/local/
 RUN apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq \

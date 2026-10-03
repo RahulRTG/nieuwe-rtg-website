@@ -95,7 +95,7 @@ test('een bestemmingsmutatie breekt de route, zonder commentaar of gewone tekst 
   const na = muteer(bron, op('route-doel-weg'));
   const gezien = [];
   new Function('fetch', na)(pad => gezien.push(pad));
-  assert.deepEqual(gezien, ['/__rtg_mutatie__/api/werk']);
+  assert.deepEqual(gezien, ['/__rtg_mutatie__']);
   assert.ok(na.startsWith("/* '/api/voorbeeld' */ const tekst='apps 3';"));
   assert.equal(muteer("const tekst='gewone uitleg';", op('route-doel-weg')), null);
 });

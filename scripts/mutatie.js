@@ -124,7 +124,7 @@ const OPERATOREN = [
       return tokens.filter(t => t.type === 'string' && /^['"]\/(?:api|apps)\//.test(t.value))
         .map(t => ({ start: t.start, eind: t.end }));
     },
-    maak: tekst => tekst[0] + '/__rtg_mutatie__' + tekst.slice(1)
+    maak: tekst => tekst[0] + '/__rtg_mutatie__' + tekst.at(-1)
   },
   { naam: 'true->false', zoek: /\breturn true\b/, zet: 'return false' },
   { naam: 'false->true', zoek: /\breturn false\b/, zet: 'return true' },

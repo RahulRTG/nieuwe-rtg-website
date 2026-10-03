@@ -3,10 +3,10 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-10-01T12:14:38.928Z",
-  "commit": "6f7014331",
+  "op": "2026-10-01T15:14:25.984Z",
+  "commit": "8be959d5a",
   "boomVuil": false,
-  "boomAnders": 13,
+  "boomAnders": 15,
   "instrument": "scripts/afgeleid.js",
   "node": "v24.18.0"
  },
@@ -21,7 +21,7 @@
   "metEigenaar": 215,
   "afgeleidEigenaarHard": 187,
   "afgeleidGrendelt": 26,
-  "metStempel": 120,
+  "metStempel": 119,
   "stempelAnders": 0
  },
  "artefacten": [
@@ -2993,7 +2993,7 @@
     "scripts/outputband.js",
     "scripts/outputproef.js"
    ],
-   "stempelInstrument": "scripts/outputproef.js",
+   "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": "npm run meetronde -- --alleen=outputproef",
    "grendelt": false,

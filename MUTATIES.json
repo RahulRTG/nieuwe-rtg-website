@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-01T12:13:36.427Z",
-    "commit": "6f7014331",
+    "op": "2026-10-01T15:10:09.895Z",
+    "commit": "c64d473b2",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 2,
     "instrument": "scripts/mutatie.js",
     "node": "v24.18.0"
   },
@@ -4842,6 +4842,14 @@
       "gezakt": 2,
       "geprobeerd": 3
     },
+    "herhaalbesluit.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/herhaalbesluit.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "herhaalpakket.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -8420,7 +8428,7 @@
       "staat": "gezakt",
       "module": "scripts/normverval.js",
       "operator": "===->!==#0",
-      "gezakt": 7,
+      "gezakt": 8,
       "geprobeerd": 1
     },
     "notities.e2e.js": {
@@ -8984,9 +8992,9 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/db/sqlite.js",
-      "operator": "!==->===#0",
-      "gezakt": 6,
-      "geprobeerd": 4
+      "operator": "===->!==#0",
+      "gezakt": 10,
+      "geprobeerd": 3
     },
     "opslagblokkade.test.js": {
       "soort": "puur",
@@ -10177,6 +10185,14 @@
       "operator": "getal+1#1",
       "gezakt": 1,
       "geprobeerd": 8
+    },
+    "registerratel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/registerratel.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "reisaanbod.test.js": {
       "soort": "server",
@@ -13800,6 +13816,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "verhalen-aankomst.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/verhalen.js",
+      "operator": "&&->||#14",
+      "gezakt": 1,
+      "geprobeerd": 67
     },
     "verhuur.test.js": {
       "soort": "server",

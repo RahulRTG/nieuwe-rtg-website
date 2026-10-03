@@ -46,7 +46,21 @@ const STANDAARD = {
 function maakWachter({ db, save, sseToOffice, log, nu, instel }) {
   const I = Object.assign({}, STANDAARD, instel || {});
   const klok = nu || (() => Date.now());
-  const ramen = new Map();   // functie-id -> [{ t, fout }], begrensd per venster
+  const ramen = new Map();   // functie-id -> exact getelde tijdstippen in het venster
+
+  /* Alleen identieke tijdstippen delen een rij; iedere response blijft meetellen.
+     Geen seconde-emmers of steekproef: ook de rand van het venster blijft exact.
+     Een stille functie wordt in herstelronde opgeruimd, anders bleven haar
+     verlopen responses tot een volgend verzoek onbeperkt bereikbaar. */
+  function snoei(raam, t) {
+    let n = 0;
+    while (n < raam.rijen.length && raam.rijen[n].t < t - I.vensterMs) {
+      const rij = raam.rijen[n++];
+      raam.aantal -= rij.aantal;
+      raam.fouten -= rij.fouten;
+    }
+    if (n) raam.rijen.splice(0, n);
+  }
 
   const staat = () => {
     db.data.techniek = db.data.techniek || {};
@@ -63,17 +77,20 @@ function maakWachter({ db, save, sseToOffice, log, nu, instel }) {
     if (sseToOffice) { try { sseToOffice('sync', { scope: 'functies' }); } catch (e) {} }
   }
 
-  // Elke afgeronde API-respons komt hier langs (goedkoop: een prefix-match
-  // plus een array-push). Alleen een echte serverfout start een evaluatie.
+  // Elke afgeronde API-respons telt. Alleen een echte serverfout evalueert.
   function meet(pad, status) {
     if (status === 503) return;                      // regel 2
     const f = functieVoorPad(pad);
     if (!f) return;
     const t = klok();
     let raam = ramen.get(f.id);
-    if (!raam) ramen.set(f.id, raam = []);
-    raam.push({ t, fout: status >= 500 });
-    while (raam.length && raam[0].t < t - I.vensterMs) raam.shift();
+    if (!raam) ramen.set(f.id, raam = { rijen: [], aantal: 0, fouten: 0 });
+    let rij = raam.rijen[raam.rijen.length - 1];
+    if (!rij || rij.t !== t) raam.rijen.push(rij = { t, aantal: 0, fouten: 0 });
+    const fout = Number(status >= 500);
+    rij.aantal++; rij.fouten += fout;
+    raam.aantal++; raam.fouten += fout;
+    snoei(raam, t);
     if (status >= 500) evalueer(f.id, raam);
   }
 
@@ -82,9 +99,9 @@ function maakWachter({ db, save, sseToOffice, log, nu, instel }) {
     const cur = st[id] || {};
     if (cur.wachter === false) return;               // automaat uit voor deze functie
     if (cur.aan === false) return;                   // staat al dicht (hand of automaat)
-    const fouten = raam.filter(x => x.fout).length;
+    const fouten = raam.fouten;
     if (fouten < I.drempel) return;                  // regel 1a
-    if (fouten <= raam.length * I.aandeel) return;   // regel 1b
+    if (fouten <= raam.aantal * I.aandeel) return;   // regel 1b
     st[id] = cur;
     const ronde = ((cur.automaat && cur.automaat.ronde) || 0) + 1;
     cur.aan = false;
@@ -99,6 +116,11 @@ function maakWachter({ db, save, sseToOffice, log, nu, instel }) {
   /* De herstelronde (elke ~30s): proefopeningen en het vergeten van oude
      rondes. Raakt uitsluitend automaat-standen aan (regel 3). */
   function herstelronde() {
+    const t = klok();
+    for (const [id, raam] of ramen) {
+      snoei(raam, t);
+      if (!raam.aantal) ramen.delete(id);
+    }
     const st = staat();
     let geraakt = false;
     for (const id of Object.keys(st)) {

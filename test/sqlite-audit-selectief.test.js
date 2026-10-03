@@ -171,6 +171,97 @@ function activiteitPoort(p, publiceer) {
     crypto: require('node:crypto'), busGeef: () => ({ publish: publiceer }), kernGeef: () => ({}) });
 }
 
+/* De echte afhandelingshandlers en activiteitsschrijver, met een tweede SQLite-
+   verbinding als lezer. De meldingsgrens bootst een inmiddels bewaarde melding
+   na; daarna verschijnt een vreemde pending mutatie die NIET van het spoor is. */
+function orderAfhandeling(t) {
+  const p = proef(t), routes = new Map(), signalen = [];
+  p.db.data.orders = [{ ref: 'BON', supplierCode: 'AAA', customerTier: 'lid', status: 'nieuw', pickup: '42' }];
+  p.db.data.supplierActivity = {}; p.db.data.notifications = {}; p.save();
+  let scans = 0, antwoord;
+  Object.defineProperty(p.db.data.ander, 'toJSON', { value() { scans++; return { waarde: this.waarde }; } });
+  const sein = naam => {
+    assert.equal(p.lees('orders')[0].status, 'klaar', 'order staat op schijf vóór elk live sein');
+    signalen.push(naam);
+  };
+  const poort = activiteitPoort(p, (kanaal, bericht) => {
+    assert.equal(kanaal, 'sse'); assert.equal(bericht.match, 'AAA');
+    assert.equal(bericht.data.scope, 'team');
+    assert.equal(p.lees('supplierActivity').AAA.length, 1, 'activiteit staat op schijf vóór teamsync');
+    sein('team');
+  });
+  require('../server/routes/supplier/orders/afhandeling')({
+    app: { post(pad, ...handlers) { routes.set(pad, handlers.at(-1)); } },
+    supplierAuth() {}, orderMetRef: ref => p.db.data.orders.find(o => o.ref === ref),
+    save: p.save, logActivity: poort.logActivity,
+    sectiesForOrder: () => ['warm'], stationsForOrder: () => ['keuken'],
+    broadcastSync: () => sein('order'), sseToSupplier: () => sein('zaak'), sseToOffice: () => sein('kantoor'),
+    notify(tier, note) {
+      p.db.data.notifications[tier] = [note]; p.save(); sein('melding');
+      p.db.data.ander.waarde = 9; scans = 0;
+    }
+  });
+  const handeling = require('../server/lib/handelingsspoor')({ db: p.db, save: p.save });
+  const audit = require('../server/opzet/auditspoor').maakAuditspoor({ db: p.db, save: p.save });
+  const run = async (soort, body) => {
+    const req = { method: 'POST', path: '/api/supplier/order/' + soort, body: { ref: 'BON', ...body },
+      supplier: { code: 'AAA', name: 'Zaak' }, actor: { name: 'Sam' }, session: { key: 'actor' } };
+    const res = new EventEmitter(); res.statusCode = 200;
+    res.status = code => { res.statusCode = code; return res; };
+    res.json = value => { antwoord = value; res.emit('finish'); return res; };
+    handeling.middleware(req, res, () => {}); audit.middleware()(req, res, () => {});
+    await routes.get(req.path)(req, res);
+  };
+  return { ...p, run, signalen, handeling, audit, scans: () => scans, antwoord: () => antwoord };
+}
+
+const orderFasen = [
+  ['sectie', { sectie: 'warm', phase: 'klaar' }],
+  ['station', { station: 'keuken', phase: 'klaar' }],
+  ['status', { status: 'klaar' }]
+];
+for (const [soort, body] of orderFasen) {
+  test('orderafhandeling ' + soort + ': bewaart order, melding en audit zonder vreemde pending mutatie', async t => {
+    const p = orderAfhandeling(t);
+    await p.run(soort, body);
+    assert.equal(p.antwoord().ok, true);
+    assert.equal(p.lees('orders')[0].status, 'klaar');
+    assert.equal(p.lees('notifications').lid.length, 1);
+    assert.equal(p.lees('supplierActivity').AAA[0].who, 'Sam');
+    assert.match(p.lees('supplierActivity').AAA[0].text, /BON/);
+    assert.equal(p.signalen.at(-1), 'team');
+    assert.equal(p.lees('ander').waarde, 1, 'het activiteitspoor publiceert geen vreemde lopende mutatie');
+    assert.equal(p.db.data.ander.waarde, 9, 'de lopende mutatie wordt ook niet weggegooid');
+    assert.equal(p.scans(), 0, 'het spoor leest geen vreemde collectie');
+    assert.equal(p.lees('handelingLog').length, 1); assert.equal(p.handeling.ketenstand().ok, true);
+    assert.equal(p.lees('apiSpoor').commandJournaalTotaal, 1); assert.equal(p.audit.stand().keten.heel, true);
+  });
+  for (const [grens, commit] of [['order', 1], ['activiteit', 3]]) {
+    test('orderafhandeling ' + soort + ': ' + grens + '-commitfout bevestigt geen onbewaard resultaat', async t => {
+      const p = orderAfhandeling(t), exec = DatabaseSync.prototype.exec;
+      let commits = 0;
+      t.mock.method(DatabaseSync.prototype, 'exec', function(sql) {
+        if (sql === 'COMMIT' && ++commits === commit) throw new Error(grens + 'commit mislukt');
+        return exec.call(this, sql);
+      });
+      await assert.rejects(p.run(soort, body), new RegExp(grens + 'commit'));
+      assert.equal(p.antwoord(), undefined);
+      assert.deepEqual(p.lees('supplierActivity'), {});
+      assert.equal(p.signalen.includes('team'), false);
+      assert.equal(p.lees('ander').waarde, 1);
+      if (grens === 'order') {
+        assert.equal(p.lees('orders')[0].status, 'nieuw');
+        assert.deepEqual(p.lees('notifications'), {}); assert.deepEqual(p.signalen, []);
+      } else {
+        assert.equal(p.lees('orders')[0].status, 'klaar', 'eerdere echte ordercommit blijft geldig');
+        assert.equal(p.lees('notifications').lid.length, 1);
+      }
+      assert.equal(p.lees('handelingLog').length, 0);
+      assert.equal(p.lees('apiSpoor').commandJournaalTotaal || 0, 0);
+    });
+  }
+}
+
 test('zelfstandig activiteitspoor bewaart alleen zichzelf; gewone activiteit bewaart de domeinmutatie mee', t => {
   const p = proef(t);
   p.db.data.supplierActivity = { AAA: Array.from({ length: 80 }, (_, n) => ({ who: 'Oud', text: String(n) })) };

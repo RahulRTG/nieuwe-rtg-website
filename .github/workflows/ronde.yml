@@ -54,6 +54,10 @@ on:
         description: Alleen diagnose; CPU-profielen kunnen prestatieschuld niet sluiten
         type: boolean
         default: false
+      heap:
+        description: Alleen diagnose; twee begrensde profielen van levende allocaties
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -253,6 +257,7 @@ jobs:
       RTG_PERFORMANCE_COMMIT: ${{ inputs.candidate || github.sha }}
       RTG_PERFORMANCE_WORKFLOW_COMMIT: ${{ github.sha }}
       RTG_CPU_PROFILE_DIR: ${{ inputs.profile && format('{0}/artifacts/performance-debt/profiles', github.workspace) || '' }}
+      RTG_HEAP_PROFILE_DIR: ${{ inputs.heap && format('{0}/artifacts/performance-debt/heap', github.workspace) || '' }}
     steps:
       - name: Alleen exacte bronidentiteiten vóór checkout
         run: |

@@ -11,11 +11,12 @@ const OUT = path.join('artifacts', 'performance-debt');
 const TARGETS = Object.freeze({ p99Ms: 144, eventLoopP99Ms: 64.8 });
 const hash = bytes => crypto.createHash('sha256').update(bytes).digest('hex');
 const { PRESTATIEMETERS, oordeel } = require('./norm');
+const heap = require('./lib/heapdiagnose');
 const finite = n => typeof n === 'number' && Number.isFinite(n);
 
 function assess(candidate, norm, measurement, profiling = false) {
   const proof = { commit: candidate, status: 'BLOCKED', blockers: [], targets: TARGETS };
-  if (profiling) proof.blockers.push('Profiler is active; diagnostic timings cannot close performance debt.');
+  if (profiling || measurement?.diagnosticOnly) proof.blockers.push('Profiler is active; diagnostic timings cannot close performance debt.');
   if (!/^[a-f0-9]{40}$/.test(candidate || '')) proof.blockers.push('No full candidate commit was supplied.');
   if (!measurement) {
     proof.blockers.push('The current storm produced no completed measurement; historical values cannot stand in for it.');
@@ -57,6 +58,12 @@ function assess(candidate, norm, measurement, profiling = false) {
 function prepare(root = process.cwd(), env = process.env) {
   const commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim();
   if (!/^[a-f0-9]{40}$/.test(env.RTG_PERFORMANCE_COMMIT || '') || commit !== env.RTG_PERFORMANCE_COMMIT) throw new Error('Candidate commit mismatch.');
+  if (heap.active(env)) {
+    heap.identity(env);
+    heap.check(!env.RTG_CPU_PROFILE_DIR && env.LEK_RONDES === '2', 'heap-workload-mode');
+    heap.check(path.resolve(env.RTG_HEAP_PROFILE_DIR) === path.join(root, OUT, 'heap'), 'heap-output-directory');
+    heap.check(!fs.existsSync(env.RTG_HEAP_PROFILE_DIR), 'heap-stale-output');
+  }
   const out = path.join(root, OUT);
   fs.mkdirSync(out, { recursive: true });
   for (const name of ['BEPROEVING.json', 'LAATSTE_METING.json']) {
@@ -70,6 +77,13 @@ function prepare(root = process.cwd(), env = process.env) {
     cpu: execFileSync('lscpu', { encoding: 'utf8' }),
     workload: Object.fromEntries(['STORM_WERKERS', 'SOAK_MIN', 'MEGA_SEED', 'LEK_MS', 'LEK_RONDES'].map(key => [key, env[key]])),
     profiling: Boolean(env.RTG_CPU_PROFILE_DIR),
+    diagnosticOnly: Boolean(env.RTG_CPU_PROFILE_DIR || env.RTG_HEAP_PROFILE_DIR),
+    heapRequested: heap.active(env),
+    toolingCommit: env.RTG_PERFORMANCE_WORKFLOW_COMMIT,
+    candidateToolingSha256: Object.fromEntries(['scripts/beproeving.js', 'scripts/gc-hook.js', 'scripts/heap-profile-hook.js',
+      'scripts/lib/heapdiagnose.js', 'scripts/performance-debt.js', '.github/workflows/ronde.yml'].map(file => [file, hash(fs.readFileSync(path.join(root, file)))])),
+    runtimeTrees: Object.fromEntries(['server', 'public', 'package.json', 'package-lock.json'].map(file =>
+      [file, execFileSync('git', ['rev-parse', 'HEAD:' + file], { cwd: root, encoding: 'utf8' }).trim()])),
     isolation: 'Fresh GitHub-hosted runner; temporary SQLite directory; no production or provider credentials.'
   };
   fs.writeFileSync(path.join(out, 'RUN-IDENTITY.json'), JSON.stringify(manifest, null, 2) + '\n');
@@ -82,7 +96,17 @@ function evaluate(root = process.cwd(), env = process.env) {
   const norm = JSON.parse(fs.readFileSync(path.join(root, 'NORM.json'), 'utf8'));
   const source = path.join(root, 'LAATSTE_METING.json');
   const bytes = fs.existsSync(source) ? fs.readFileSync(source) : null;
-  const proof = assess(env.RTG_PERFORMANCE_COMMIT, norm, bytes ? JSON.parse(bytes.toString()) : null, Boolean(env.RTG_CPU_PROFILE_DIR));
+  const runFile = path.join(out, 'RUN-IDENTITY.json');
+  const run = fs.existsSync(runFile) ? JSON.parse(fs.readFileSync(runFile)) : {};
+  const diagnostic = Boolean(env.RTG_CPU_PROFILE_DIR || env.RTG_HEAP_PROFILE_DIR || run.diagnosticOnly);
+  const proof = assess(env.RTG_PERFORMANCE_COMMIT, norm, bytes ? JSON.parse(bytes.toString()) : null, diagnostic);
+  if (heap.active(env) || run.heapRequested) {
+    proof.diagnosticOnly = true;
+    proof.heapDiagnostic = heap.verify(path.join(out, 'heap'), {
+      candidate: env.RTG_PERFORMANCE_COMMIT, tooling: env.RTG_PERFORMANCE_WORKFLOW_COMMIT || run.toolingCommit });
+    if (proof.heapDiagnostic.status !== 'COMPLETE') proof.blockers.push('Heap diagnostic incomplete or invalid: ' + proof.heapDiagnostic.reason);
+    proof.status = 'BLOCKED';
+  }
   if (bytes) proof.measurementSha256 = hash(bytes);
   fs.writeFileSync(path.join(out, 'PERFORMANCE-DEBT-PROOF.json'), JSON.stringify(proof, null, 2) + '\n');
   return proof;

@@ -67,6 +67,7 @@ const { execFileSync } = require('child_process');
 const { start: wegwerp } = require('./lib/wegwerpserver');
 const fs = require('fs'), os = require('os'), path = require('path');
 const http = require('http');
+const heapDiagnose = require('./lib/heapdiagnose');
 /* De goede verhalen (scripts/verhalen.js). De gauntlet bewijst dat er niets
    BREEKT; die bewijst niets over of het huis nog WERKT -- een server die op
    alles "400 nee" antwoordt haalt een chaostest met vlag en wimpel. Daarom
@@ -241,15 +242,17 @@ function rssMB(pid) {
     return Number.isFinite(kb) && kb > 0 ? Math.round(kb / 1024) : null;
   } catch (e) { return null; }
 }
-async function heapNaGc(pid) {
+async function heapNaGc(pid, fase) {
   let laagst = Infinity;
   for (let i = 0; i < 4; i++) {
     let voor = 0; try { voor = fs.statSync(GC_OUT).mtimeMs; } catch (e) {}
+    const opdracht = i === 3 && fase ? heapDiagnose.vraag(pid, GC_OUT, fase) : null;
     try { process.kill(pid, 'SIGUSR2'); } catch (e) {}
     for (let w = 0; w < 40; w++) {
       await new Promise(r => setTimeout(r, 100));
       try { const st = fs.statSync(GC_OUT); if (st.mtimeMs > voor) { const j = JSON.parse(fs.readFileSync(GC_OUT, 'utf8')); const mb = Math.round(j.heapUsed / 1048576); if (mb < laagst) laagst = mb; break; } } catch (e) {}
     }
+    if (opdracht) await heapDiagnose.wacht(opdracht);
   }
   return laagst === Infinity ? null : laagst;
 }
@@ -983,8 +986,8 @@ if (require.main !== module) { module.exports = { alleRoutes }; return; }
      wijst de verkeerde kant op precies wanneer het spannend is (LAT-regel 10). */
   const echteServerfout = (s) => s >= 500 && s !== 503;
   async function leesWerker() { while (Date.now() < stormEind) { const r = leesPaden[rint(leesPaden.length)]; const tk = rkeuze(tokVoor[r.rol].length ? tokVoor[r.rol] : tokVoor.member); const st = await verzoek(r.m, r.p, tk, r.m === 'GET' ? null : {}); if (echteServerfout(st.status)) { buckets.s5xx++; vijfxx.set(r.p, (vijfxx.get(r.p) || 0) + 1); } else if (st.status === 503) buckets.r503++; await new Promise(res => setTimeout(res, 1 + rint(4))); } }
-  async function rustVloer() { await new Promise(r => setTimeout(r, 4000)); let l = Infinity; for (let i = 0; i < 3; i++) { const h = await heapNaGc(child.pid); if (h != null && h < l) l = h; await new Promise(r => setTimeout(r, 1200)); } return l === Infinity ? null : l; }
-  async function lekRonde(ms) { stormEind = Date.now() + ms; await Promise.all(Array.from({ length: WERKERS }, leesWerker)); return rustVloer(); }
+  async function rustVloer(fase) { await new Promise(r => setTimeout(r, 4000)); let l = Infinity; for (let i = 0; i < 3; i++) { const h = await heapNaGc(child.pid, i === 2 ? fase : null); if (h != null && h < l) l = h; await new Promise(r => setTimeout(r, 1200)); } return l === Infinity ? null : l; }
+  async function lekRonde(ms, fase) { stormEind = Date.now() + ms; await Promise.all(Array.from({ length: WERKERS }, leesWerker)); return rustVloer(fase); }
   const lekMin = LEK_MS / 60000;
   /* De helling van een reeks vloeren, als losse functie: hij wordt nu twee keer
      gebruikt -- een keer MET verkeer en een keer ZONDER. */
@@ -1017,8 +1020,8 @@ if (require.main !== module) { module.exports = { alleRoutes }; return; }
   for (let i = 0; i < LEK_RONDES; i++) stiltes.push(await stilteRonde(LEK_MS));
   const stilteHelling = helling(stiltes.slice(1));
 
-  const vloers = [await rustVloer()];
-  for (let i = 0; i < LEK_RONDES; i++) vloers.push(await lekRonde(LEK_MS));
+  const vloers = [await rustVloer('start')];
+  for (let i = 0; i < LEK_RONDES; i++) vloers.push(await lekRonde(LEK_MS, i === 0 ? 'sample' : i === 1 ? 'stop' : null));
   const lekHelling = helling(vloers.slice(1));
 
   // ---------- METING ----------
@@ -1314,11 +1317,12 @@ if (require.main !== module) { module.exports = { alleRoutes }; return; }
       return false;
     }
   };
+  cijfers.diagnosticOnly = Boolean(process.env.RTG_HEAP_PROFILE_DIR || process.env.RTG_CPU_PROFILE_DIR);
   if (schrijf('LAATSTE_METING.json', cijfers)) {
     console.log('\n  \x1b[2mactuele meting weggeschreven naar LAATSTE_METING.json (' + cijfers.oordeel
       + ') -- die blijft staan, ook rood\x1b[0m');
   }
-  if (cijfers.oordeel === 'PASS') {
+  if (cijfers.oordeel === 'PASS' && !cijfers.diagnosticOnly) {
     if (schrijf('BEPROEVING.json', cijfers)) {
       console.log('  \x1b[2mde ronde slaagde, dus de basislijn BEPROEVING.json is meegeschoven\x1b[0m');
     }

@@ -22,6 +22,7 @@
    servercode, en doet niets zonder RTG_GC_OUT + --expose-gc. */
 const fs = require('fs');
 if (process.env.RTG_CPU_PROFILE_DIR) require('./cpu-profile-hook')();
+const heapDiagnose = process.env.RTG_HEAP_PROFILE_DIR ? require('./heap-profile-hook')() : null;
 
 /* De loop-meter. Een timer die elke TIK ms hoort te vuren; alles wat hij LATER
    vuurt dan dat is tijd waarin de loop bezet was. We houden de piek bij, niet
@@ -77,5 +78,6 @@ process.on('SIGUSR2', () => {
     const lus = Math.max(0, Math.round(lusPiek));
     lusPiek = 0; vorig = process.hrtime.bigint(); // volgend venster begint schoon
     if (process.env.RTG_GC_OUT) fs.writeFileSync(process.env.RTG_GC_OUT, JSON.stringify({ heapUsed: m.heapUsed, rss: m.rss, lusMs: lus, t: Date.now() }));
+    if (heapDiagnose) void heapDiagnose();
   } catch (e) {}
 });

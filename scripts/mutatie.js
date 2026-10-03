@@ -517,6 +517,11 @@ function draaiToets(bestand, env, wacht, forceer) {
    De tien andere staan nog open; dat is een geteld gat in TAKEN.md en geen
    vergeten hoekje. */
 const EIGEN_MODULE = new Map([
+  // Deze browserproeven beoordelen de keuring, landing en CSP, niet API-inhoud.
+  ['a11y-hermeet.e2e.js', ['scripts/a11y-hermeet.js']],
+  ['appwerkt-bestemming.e2e.js', ['scripts/lib/bestemming.js']],
+  ['csp.e2e.js', ['server/middleware/voordeur.js']],
+  ['browserpoort.e2e.js', ['test/helper.js']],
   ['living-world.test.js', ['server/kern/living-world/actions.js']],
   ['living-world-sources.test.js', ['server/kern/living-world/actions.js']],
   ['living-world-sqlite.test.js', ['server/kern/living-world/index.js']],
@@ -1400,6 +1405,13 @@ function modulesVan(bestand) {
     if (!fs.existsSync(p)) { const idx = p.replace(/\.js$/, '/index.js'); if (fs.existsSync(idx)) p = idx; else continue; }
     const rel = path.relative(WORTEL, p).replace(/\\/g, '/');
     if (!uit.includes(rel)) uit.push(rel);
+  }
+  // VM- en bronproeven lezen hun onderwerp als bestand. Dat is slechts een
+  // kandidaat: alleen een groene nulproef gevolgd door een rode mutatie telt.
+  if (/\breadFileSync\s*\(/.test(bron)) {
+    for (const m of bron.matchAll(/['"](?:\.\.\/)?((?:public|server|scripts)\/[^'"\s]+\.js)['"]/g)) {
+      if (!m[1].split('/').includes('..') && fs.existsSync(path.join(WORTEL, m[1])) && !uit.includes(m[1])) uit.push(m[1]);
+    }
   }
   return uit;
 }

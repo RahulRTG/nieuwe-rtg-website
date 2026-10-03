@@ -23,6 +23,20 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
+test('de mutatiemotor vindt ook werkelijk gelezen browserbronnen', () => {
+  const { modulesVan } = require('../scripts/mutatie');
+  const map = fs.mkdtempSync(require('node:path').join(require('node:os').tmpdir(), 'rtg-modulezoek-'));
+  const bestand = require('node:path').join(map, 'bronzoek.test.js');
+  try {
+    fs.writeFileSync(bestand, `const bron = fs.readFileSync('../public/shared/command.js');
+      const nog = lees('public/shared/command.js');
+      const niet = lees('public/../../server/server.js');
+      const mist = lees('public/bestaat-niet.js');`);
+    assert.deepEqual(modulesVan(bestand), ['public/shared/command.js']);
+    fs.writeFileSync(bestand, `const beschrijving = 'public/shared/command.js';`);
+    assert.deepEqual(modulesVan(bestand), [], 'alleen een naam noemen is geen bron lezen');
+  } finally { fs.rmSync(map, { recursive: true, force: true }); }
+});
 const os = require('node:os');
 const path = require('node:path');
 const { spawn } = require('node:child_process');

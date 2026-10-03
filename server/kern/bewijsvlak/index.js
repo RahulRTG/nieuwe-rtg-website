@@ -14,6 +14,7 @@ module.exports = {
   sloProfiles: require('./slo-profiles'),
   contracts: require('./contracts'),
   v3Contract: require('./v3-contract'),
+  v3Authorities: require('./v3-authorities'),
   v3Profiles: require('./v3-profiles'),
   v3Resolver: require('./v3-resolver'),
   v3Plane: require('./v3-plane')

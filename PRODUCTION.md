@@ -590,9 +590,15 @@ dev-lekken, registratie/eigenaar/backoffice werken.
    voor; vul het compliancebestand met `npm run papierwerk -- --live` en lees
    het na invullen met `npm run papierwerk -- --live --lees` terug; rond code
    en gegenereerde registers af en commit een schone bron.
-2. Laat `Release-imagekandidaat` op die exacte commit lopen. Download het
-   artefact `herkomst` ongewijzigd naar `.release/` en vul de twee unieke
-   kandidaat-tags in `deploy/live.env` in.
+2. Laat op die exacte commit eerst de vier prereleasepoorten uit `LIVEGANG.md`
+   groen eindigen: handmatige volledige CI met `verwachte_commit`, de Node
+   26/4k/17g-Beproeving, Desktop 1440/390 en CodeQL met een nul-resultaten-SARIF-
+   verdict op exact dezelfde commit. Start pas daarna
+   `Release-imagekandidaat`. Die workflow weigert zelf iedere ontbrekende,
+   oudere, rode of anders gecommitte prerelease-uitspraak voordat hij bouwt of
+   publiceert, en bindt het resulterende dossier met BUILD aan de herkomst.
+   Download het artefact `herkomst` ongewijzigd naar `.release/` en vul de twee
+   unieke kandidaat-tags in `deploy/live.env` in.
 3. Verzamel de echte onafhankelijke bewijsbestanden, vul het commitgebonden
    externe dossier en laat de vaste releasebeoordelaar het ondertekenen.
 4. Draai `npm run live:check`, `npm run live:golive` en daarna
@@ -681,10 +687,14 @@ dev-lekken, registratie/eigenaar/backoffice werken.
       bereiken; Cloudflare is een mogelijke externe afhankelijkheid, nooit een
       verplichte of impliciet soevereine keuze. De app-WAF en -rem zijn de
       tweede linie
-- [ ] TURN draait: coturn met `use-auth-secret` en `static-auth-secret` gelijk
-      aan `TURN_SECRET`; `/api/ice` geeft kortlevende inloggegevens terug en
+- [ ] TURN draait: coturn met publiek vertrouwd TLS, uitsluitend een volledige
+      `turns:`-URL met expliciete poort, `use-auth-secret` en
+      `static-auth-secret` gelijk aan een sterk willekeurig `TURN_SECRET`;
+      `/api/ice` geeft kortlevende inloggegevens en geen lege URL-items terug en
       een echte tweennetwerkproef bewijst voice én video vanaf 4G en een streng
-      firewallnetwerk. Zonder deze keten blokkeert publieke productie
+      firewallnetwerk. Het getekende releasebewijs eist verschillende
+      netwerk-AS'en, relay-only en echte bytes in beide richtingen. Alleen een
+      bereikbare ICE-route is geen bewijs. Zonder deze keten blokkeert publieke productie
 
 ---
 

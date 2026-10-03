@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-30T20:37:01.609Z",
-    "commit": "c47e00901",
-    "boomVuil": false,
-    "boomAnders": 0,
+    "op": "2026-10-03T19:57:03.727Z",
+    "commit": "32b8eb037",
+    "boomVuil": true,
+    "boomAnders": 21,
     "instrument": "scripts/vindbaar.js",
-    "node": "v26.10.0"
+    "node": "v24.18.0"
   },
   "uitleg": "Per bestemming in de sprong: welk aandeel van de ONDERSCHEIDENDE woorden van dat scherm (woorden uit zijn koppen die op hooguit 3 bestemmingen voorkomen) er ook naartoe leidt in de zoekfilter van shared/sprong.js. Meet woorden, geen mensen: of iemand op het idee komt dat woord te typen, weet deze meter niet.",
   "vloer": 0.6,

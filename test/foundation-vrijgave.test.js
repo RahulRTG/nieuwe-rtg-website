@@ -125,6 +125,18 @@ test('een signer kan een rood, verkeerd of aan een ander verzoek gebonden machin
   assert.match(extern.controleerReleaseRoot(runner, COMMIT).reden, /runner-handtekening/,
     'de evidence-signer kan een gewijzigde runnerwaarneming niet zelfstandig legitimeren');
 
+  const onvoldoende = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-machine-turn-onvoldoende-'));
+  t.after(() => fs.rmSync(onvoldoende, { recursive:true, force:true }));
+  const u = maakGetekendeVrijgave(onvoldoende);
+  wijzigMachineRapport(onvoldoende, u.sleutels, 'connectionRealtime', r => {
+    const o = r.gegevens.externalMeasurement.observations;
+    o.distinctNetworkCount = 1;
+    o.networkASNsHashed = ['7'.repeat(64)];
+  });
+  assert.match(extern.controleerReleaseRoot(onvoldoende, COMMIT).reden,
+    /machine-realtime-bewijs-ongeldig/,
+    'ook correct getekend runnerbewijs opent release niet zonder twee onafhankelijke netwerken');
+
   const image = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-machine-image-'));
   t.after(() => fs.rmSync(image, { recursive:true, force:true }));
   const i = maakGetekendeVrijgave(image);

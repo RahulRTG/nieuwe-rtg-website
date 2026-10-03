@@ -7,7 +7,6 @@
 const { STATUS, providerStatus, mag, definitiefBetaald } = require('./staten');
 const beeld = require('./beeld');
 const { datum: klokDatum } = require('../../lib/klok');
-const trustMoney = require('../bewijsvlak/v3-money-hook');
 
 module.exports = function maakBetaalWaarheid({ d, save, crypto, betaal, nu, log }) {
   const nuIso = nu || (() => klokDatum().toISOString());
@@ -35,6 +34,7 @@ module.exports = function maakBetaalWaarheid({ d, save, crypto, betaal, nu, log 
   }
 
   const publiek = (r) => beeld.publiek(r, definitiefBetaald);
+  const bewijs = require('./bewijs')(betaal);
   const afhandeling = require('./afhandeling')({ d, doos, save, nuIso, gebeurtenis,
     STATUS, log, afhandelaars });
 
@@ -73,7 +73,7 @@ module.exports = function maakBetaalWaarheid({ d, save, crypto, betaal, nu, log 
     return true;
   }
 
-  async function pasProviderToe(r, p, eventId, gebeurtenisType) {
+  async function pasProviderToe(r, p, eventId, gebeurtenisType, providerProof) {
     if (!r) return null;
     if (p.id && r.providerId && p.id !== r.providerId && p.id !== r.providerPaymentId) return publiek(r);
     if (Number.isFinite(p.bedrag) && Math.round(p.bedrag) !== r.centen) {
@@ -99,7 +99,7 @@ module.exports = function maakBetaalWaarheid({ d, save, crypto, betaal, nu, log 
     naar(r, providerStatus(r.provider, r.providerStatus, gebeurtenisType), {
       bron: r.provider, providerEventId: eventId || null, providerStatus: r.providerStatus });
     save();
-    if (definitiefBetaald(r.status)) trustMoney.confirmed(r, eventId);
+    if (definitiefBetaald(r.status)) bewijs.confirmed(r, eventId, providerProof, p);
     await afhandeling.handelAf(r);
     return publiek(r);
   }
@@ -116,7 +116,7 @@ module.exports = function maakBetaalWaarheid({ d, save, crypto, betaal, nu, log 
       }
       if (r.providerId) {
         const vers = await betaal.haalBetaling(r.provider, r.providerId);
-        const stand = await pasProviderToe(r, vers, 'hervat:' + r.providerId, 'ophalen');
+        const stand = await pasProviderToe(r, vers, 'hervat:' + r.providerId, 'ophalen', bewijs.providerProof(vers));
         return { betaling: stand, actie: beeld.actieVan(vers) };
       }
       // startopties vast, eenmalig: een hervatting moet dezelfde aanbieder gebruiken (./hervat.js)
@@ -126,14 +126,14 @@ module.exports = function maakBetaalWaarheid({ d, save, crypto, betaal, nu, log 
       save(); /* waarheid bestaat VOOR de externe aanroep */
       const p = await betaal.maakBetaling(Object.assign({ bedrag: r.centen, valuta: r.valuta,
         referentie: r.id, idempotentieSleutel: 'waarheid:' + r.id }, st));
-      const stand = await pasProviderToe(r, p, 'start:' + p.id, 'start');
+      const stand = await pasProviderToe(r, p, 'start:' + p.id, 'start', bewijs.providerProof(p));
       return { betaling: stand, actie: beeld.actieVan(p) };
     })();
     startend.set(id, werk);
     try { return await werk; } catch (e) {
       if (!e || e.code !== 'BETAAL_AFHANDELING_MISLUKT') {
         gebeurtenis(r, 'PROVIDER_FOUT', { fout: String(e && e.message || e).slice(0, 180) }); save();
-        if (!e || e.nietVerstuurd !== true) trustMoney.unknown(r, e);
+        if (!e || e.nietVerstuurd !== true) bewijs.unknown(r, e);
       }
       throw e;
     } finally { startend.delete(id); }
@@ -162,7 +162,8 @@ module.exports = function maakBetaalWaarheid({ d, save, crypto, betaal, nu, log 
     if (r) {
       meldingen[eventId].betalingId = r.id;
       save(); /* koppeling staat vast vóór de mogelijk falende domeinafhandeling */
-      await pasProviderToe(r, invoer, eventId, invoer.gebeurtenis);
+      await pasProviderToe(r, invoer, eventId, invoer.gebeurtenis,
+        invoer.providerProof || bewijs.providerProof(invoer.providerSource));
     } else meldingen[eventId].betalingId = null;
     meldingen[eventId].verwerktAt = nuIso();
     save();

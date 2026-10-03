@@ -101,7 +101,7 @@ const winkel = new AsyncLocalStorage();
 function perVerzoek(fn) {
   const bestaand = winkel.getStore();
   if (bestaand) return fn(bestaand);
-  const teller = { opslag: 0, mail: 0, sms: 0 };
+  const teller = { opslag: 0, mail: 0, sms: 0, collecties: new Set(), collectieDekking: 'proxy-v1' };
   return winkel.run(teller, () => fn(teller));
 }
 
@@ -116,6 +116,15 @@ function tel(soort, hoeveel) {
 /* De teller van DIT verzoek, of null. Voor wie de stand niet als tekst wil maar als
    getallen -- ./effectbon.js leest hem zo, en bouwt er geen tweede naast. */
 function huidig() { return winkel.getStore() || null; }
+
+/* De opslagtracker meldt uitsluitend de top-level collectienaam. Geen rij,
+   sleutel of waarde komt hier binnen. Daardoor kan de effectbon exact zeggen
+   WELKE soort toestand bewoog zonder twee volledige wereldscans per verzoek. */
+function wijziging(feit) {
+  const t = winkel.getStore();
+  if (!t || !t.collecties || !feit || typeof feit.collectie !== 'string') return false;
+  t.collecties.add(feit.collectie); return true;
+}
 
 /* De stand van dit verzoek, als korte tekst voor de kop. Leeg blijft leeg: een
    kop met alleen nullen suggereert een meting waar er geen was. */
@@ -172,5 +181,10 @@ function begin(vlag) {
 
 begin(process.env.RTG_STAATLOG);
 
-module.exports = { haak, tel, stand, begin, perVerzoek, huidig, SOORTEN, NIET_GEMETEN,
+/* Eén waarnemingsweg voor iedere opslagmotor: de tracker zit om db.data en deze
+   teller zit om het verzoek. Registreren aan het eind voorkomt een modulekring
+   tijdens het opstarten van db/state. */
+try { require('./db/mutatietracker').voegWaarnemerToe(wijziging); } catch (e) {}
+
+module.exports = { haak, tel, stand, begin, perVerzoek, huidig, wijziging, SOORTEN, NIET_GEMETEN,
   get aan() { return aan; } };

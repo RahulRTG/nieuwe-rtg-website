@@ -109,6 +109,8 @@
     "trust:proof": "node --test test/trust-evidence-plane.test.js test/trust-evidence-plane-v3.test.js",
     "trust:manifest": "node scripts/trust-evidence-plane.js",
     "trust:manifest:check": "node scripts/trust-evidence-plane.js --check",
+    "trust:evidence:migrate-v2": "node scripts/trust-evidence-v2-migrate.js",
+    "trust:evidence:export": "node scripts/trust-evidence-export.js",
     "bewijsladder": "node scripts/bewijsladder.js",
     "bewijsladder:vast": "node scripts/bewijsladder.js --vastleggen",
     "bewijsladder:controle": "node scripts/bewijsladder.js --controle",

@@ -514,7 +514,7 @@ test('het eigenaarsadres is niet via de openbare registratie te claimen', async 
     RTG_ISOLATIE_AFDWINGEN: '1',
     RTG_OWNER_EMAIL: 'eigenaar-proef@voorbeeld.test',
     APP_URL: 'https://app.voorbeeld.test',
-    TURN_URL: 'turns:turn.rtg.voorbeeld.test:5349', TURN_SECRET: 't'.repeat(48),
+    TURN_URL: 'turns:turn.rahultravelgroup.com:5349', TURN_SECRET: 'T9!relay-A7#tijdelijk-B4$geheim-C8%2026',
     ERR_WEBHOOK_URL: 'https://alarm.voorbeeld.test/rtg',
     // deze proef gaat niet over betalen; de rail staat daarom hard dicht
     RTG_BETALEN_UIT: '1',

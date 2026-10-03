@@ -18,15 +18,16 @@ const MELDING_SCOPES = ['orders', 'events', 'salon', 'live', 'apply', 'wachtlijs
 
 const { orderMetRef, boekingMetRef, boekingenVanKlant } = require('../db'); // O(1)-index i.p.v. array-scans
 
-function maakErvaring({ db, save, crypto, findSupplier, notify, notifySupplier, sseToCustomer, sseToSupplier, sseToOffice, zijnVrienden, ticketsVoorSlot, optieAan, tafeldekVan, payVan, codenaamVan, trustPlane }) {
+function maakErvaring({ db, save, crypto, findSupplier, notify, notifySupplier, sseToCustomer, sseToSupplier, sseToOffice, zijnVrienden, ticketsVoorSlot, optieAan, tafeldekVan, payVan, codenaamVan, trustPlane, bewijsHospitalityBesluit }) {
   const id = () => crypto.randomBytes(4).toString('hex');
   const nu = () => new Date().toISOString();
   const vandaag = () => new Date().toISOString().slice(0, 10);
   const rond = n => Math.round(n * 100) / 100;
 
   /* ---- de twee delen: tafels (reserveren/planning) en ledenbeleving ---- */
-  const ctx = { db, save, findSupplier, notify, notifySupplier, sseToCustomer, sseToSupplier, sseToOffice,
-    zijnVrienden, ticketsVoorSlot, optieAan, tafeldekVan, payVan, codenaamVan, trustPlane, orderMetRef, boekingMetRef, boekingenVanKlant,
+  const ctx = { db, save, crypto, findSupplier, notify, notifySupplier, sseToCustomer, sseToSupplier, sseToOffice,
+    zijnVrienden, ticketsVoorSlot, optieAan, tafeldekVan, payVan, codenaamVan, trustPlane,
+    bewijsHospitalityBesluit, orderMetRef, boekingMetRef, boekingenVanKlant,
     id, nu, vandaag, rond, MELDING_SCOPES };
   return Object.assign({},
     require('./ervaring/tafels')(ctx),

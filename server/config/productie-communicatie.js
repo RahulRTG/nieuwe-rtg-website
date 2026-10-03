@@ -4,6 +4,7 @@
 'use strict';
 
 const OUD_MAILVELD = 'SMTP_' + 'HOST';
+const turn = require('./turn');
 
 function keurCommunicatie(env, fouten, waarschuwingen, priveBeta) {
   /* mail.js leest SMTP_URL (of de afzonderlijke MAIL_DIRECT-route), niet het
@@ -55,20 +56,20 @@ function keurCommunicatie(env, fouten, waarschuwingen, priveBeta) {
      een waarschuwing is. Private/lokale beta blijft bruikbaar voor een directe
      netwerkproef, maar publieke productie faalt hier dicht. */
   if (!priveBeta) {
-    const turnUrls = String(env.TURN_URL || '').split(',').map(x => x.trim()).filter(Boolean);
-    if (!turnUrls.length) {
+    const stun = turn.projecteerStun(env, { publiekeProductie:true });
+    if (!stun.urls || stun.fouten.length) {
+      fouten.push('STUN-configuratie is niet veilig voor publieke productie: gebruik een geldig stun:/stuns:-adres met expliciete poort op exact STUN_PUBLIC_HOST (of de APP_URL-host); geen lege items, externe host, testnaam of lokaal/privaat adres (' +
+        [...new Set(stun.fouten.map(x => x.reden))].join(', ') + ').');
+    }
+    const relay = turn.ontleedLijst(env.TURN_URL, { publiekeProductie:true });
+    if (!String(env.TURN_URL || '').trim()) {
       fouten.push('TURN_URL ontbreekt: live voice/video is dan niet betrouwbaar via 4G, symmetrische NAT en bedrijfsfirewalls.');
-    } else if (turnUrls.some(url => !/^turns?:[^\s]+$/i.test(url))) {
-      fouten.push('TURN_URL bevat een ongeldige relay-URL; gebruik uitsluitend turn: of turns: adressen.');
     }
-    const gedeeldGeheim = String(env.TURN_SECRET || '');
-    const vasteGebruiker = String(env.TURN_USER || '');
-    const vastWachtwoord = String(env.TURN_PASS || '');
-    const tijdelijkeInlog = gedeeldGeheim.length >= 32;
-    const vasteInlog = vasteGebruiker.length > 0 && vastWachtwoord.length >= 32;
-    if (!tijdelijkeInlog && !vasteInlog) {
-      fouten.push('TURN-authenticatie ontbreekt of is te zwak: zet TURN_SECRET (32+ tekens) of TURN_USER plus TURN_PASS (32+ tekens).');
-    }
+    if (String(env.TURN_URL || '').trim() && (!relay.urls.length || relay.fouten.length))
+      fouten.push('TURN_URL is niet veilig voor publieke productie: gebruik uitsluitend volledige turns:-adressen met een openbare host en expliciete geldige poort; geen lege items, plaintext turn:, testnamen of lokale/private adressen (' +
+        [...new Set(relay.fouten.map(x => x.reden))].join(', ') + ').');
+    if (!turn.credentials(env))
+      fouten.push('TURN-authenticatie ontbreekt of is te zwak: zet een willekeurig TURN_SECRET (32+ tekens) of geldige TURN_USER plus een willekeurige TURN_PASS (32+ tekens); herhaling en plaatshouders tellen niet.');
     if (env.STUN_FALLBACK_GOOGLE === '1') {
       fouten.push('STUN_FALLBACK_GOOGLE=1 is niet toegestaan in publieke productie: gebruik de eigen STUN/TURN-keten zonder stille externe metadata-uitgang.');
     }

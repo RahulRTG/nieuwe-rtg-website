@@ -53,7 +53,7 @@ test('config: veilige productie is foutloos', () => {
     RTF_IBAN: 'NL11FOUND0000000001', RTG_MEDIA_BACKEND: 's3',
     RTG_MEDIA_S3_BUCKET: 'rtg-productie-media',
     RTG_MEDIA_S3_KEY: 'AKIA0123456789PRODUCTIE', RTG_MEDIA_S3_SECRET: 'm'.repeat(40),
-    TURN_URL: 'turns:turn.rtg.example:5349', TURN_SECRET: 't'.repeat(48),
+    TURN_URL: 'turns:turn.rahultravelgroup.com:5349', TURN_SECRET: 'T9!relay-A7#tijdelijk-B4$geheim-C8%2026',
     RTG_HERSTEL_SMS_UIT_BEWUST: '1', STRIPE_UITGAAND_UIT_BEWUST: '1',
     RTG_ISOLATIE_AFDWINGEN: '1',
     RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl' });

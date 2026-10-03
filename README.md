@@ -6170,7 +6170,30 @@ completeness en finality. Een nieuwe correctie schrijft een oude claim nooit
 over: `REVERSED`, `DISPUTED` en `CANCELLED` zijn nieuwe feiten in dezelfde
 geschiedenis. De vier bronklassen blijven apart: technisch, domein, extern en
 operationeel. Een bron telt alleen binnen haar expliciete authority-scope en
-geldigheidsvenster.
+geldigheidsvenster. Sinds de authority-hardening is die scope alleen niet meer
+genoeg: iedere requirement verwijst naar een onveranderlijk, versiegebonden
+authority/source-contract. Dat contract bindt feitsoort, bron, authority,
+interne signer, provider, capability en domein. Vrije callerstrings kunnen geen
+V3-bewijs meer maken; alleen de beperkte money-, external-, authority- en
+decision-adapters kunnen de eenmalige interne attestatie afgeven. Een verkeerde
+authority, source, signer of provider wordt vóór opslag geweigerd.
+
+De primaire ledger bewaart geen domeinpayload. Hij houdt uitsluitend de
+contentdigest, een digest van de volledige metadata en veilige contractrefs;
+de subjectref en authorityref staan alleen als digest in de evidence-index. De
+`evidenceId` bindt content, subject, capability, authority én metadata, zodat
+gelijke payloads van twee subjects nooit over die grens dedupliceren. Een oude
+state die nog raw `content` bevat start bewust fail-closed met
+`LEGACY_RAW_EVIDENCE_REQUIRES_MIGRATION`: migratie/archivering is een expliciete
+operatorhandeling en herschrijft de auditgeschiedenis niet stil.
+
+Ook groei is fail-closed. De primaire keten accepteert standaard maximaal
+100.000 records en 50.000 evidence-descriptors; V3 begrenst evidence/claims op
+50.000, decisions/reconciliations op 25.000 en conflicts op 10.000. Een exacte
+replay blijft mogelijk, maar een nieuw record boven de grens krijgt
+`EVIDENCE_CAPACITY_REACHED`. Er wordt nooit automatisch oudste historie
+verwijderd. Voor productievolume moet een geverifieerde immutable archiefsink de
+state vóór die grens overnemen; de actuele bezetting staat in de snapshot.
 
 Ontbrekend, verlopen, onbevoegd of conflicterend bewijs staat als evidence debt
 in de V3-snapshot. `UNKNOWN` kan nooit een blinde geldretry of onomkeerbare actie

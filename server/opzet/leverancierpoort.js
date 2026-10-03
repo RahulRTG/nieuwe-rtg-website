@@ -41,7 +41,7 @@ const envelop = require('./envelop');
 const kostenhaak = require('../kern/kosten/haak');
 
 module.exports = ({ db, save, crypto, rtgKlok, sessionFor, DEMO, accounts,
-  grootSupplierSync, busGeef, kernGeef }) => {
+  grootSupplierSync, busGeef, kernGeef, markeerHospitalityRequest }) => {
   const routepoort = require('../kern/commercie/routepoort');
   const bus = { publish: (a, b) => busGeef().publish(a, b) };
   const kern = new Proxy({}, { get: (_, naam) => kernGeef()[naam] });
@@ -121,6 +121,12 @@ module.exports = ({ db, save, crypto, rtgKlok, sessionFor, DEMO, accounts,
        DICHTVALT, staat in kern/commercie/routepoort.js. */
     const abo = routepoort.voorZaak(kern.zaakAbonnement, req.supplier.code, req.path, kern.handhavingSchaduw);
     if (!abo.ok) return res.status(402).json({ error: abo.error, capability: abo.cap, nodig: abo.nodig || null });
+
+    /* Pas NA identiteit, persoonseis en abonnement is dit een bevoegde
+       provider-ingress. De opaque request-marker kan alleen door de latere
+       reserveringsbeslisroute worden verbruikt. */
+    if (typeof markeerHospitalityRequest === 'function')
+      markeerHospitalityRequest(req, req.supplier, req.actor);
 
     // Kostencontext op de ZAAKCODE en NA de abonnementspoort (KOSTEN.md par. 6).
     const drager = kostenhaak.drager('zaak', req.supplier.code);

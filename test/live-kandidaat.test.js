@@ -51,6 +51,7 @@ function opstelling() {
   schrijf(root, kandidaat.REL.ciSuite, '{"suite":"green"}\n');
   schrijf(root, kandidaat.REL.ciSchermen, '{"screens":"green"}\n');
   schrijf(root, kandidaat.REL.ciPg, '{"pg":"green"}\n');
+  schrijf(root, '.release/prerelease-workflows.json', '{"workflows":"green"}\n');
   const vorig = process.env.RTG_RELEASE_COMMIT;
   process.env.RTG_RELEASE_COMMIT = commit;
   const manifest = release.maakManifest(root);

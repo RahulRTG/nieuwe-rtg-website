@@ -70,22 +70,28 @@ async function betaalIntern(key, mid) {
     if(m.betaald[ander]&&!m.reserveringId&&!m.reservationInFlight){
       m.reservationInFlight=nu();save();let r;
       const bewijsRef='vonk:'+m.id+':reservation';
-      const commitment=trustExternal.reservation('commitment',{reservationRef:bewijsRef,
-        provider:m.tafel.supplierCode,at:nu(),value:{matchRef:m.id,supplierRef:m.tafel.supplierCode,
-          date:m.tafel.datum,time:m.tafel.tijd,people:2}});
+      const commitmentId=null;
+      m.reservationTrust={reservationRef:bewijsRef,commitmentEvidenceId:null};
       try{r=await Promise.resolve(reserveerTafel({key,tier:'rtg'},codenaamVan(m.a)+' & '+codenaamVan(m.b),{
         supplierCode:m.tafel.supplierCode,datum:m.tafel.datum,tijd:m.tafel.tijd,personen:2,
         notitie:'Vonk-date (aanbetaling voldaan)',idempotencyKey:'vonk:'+m.id+':reservation'}));}
       catch(e){r={error:'De reserveringsprovider reageerde niet.'};}
-      delete m.reservationInFlight;m.status=r&&r.ok?'bevestigd':'betaald';m.reserveringId=r&&r.ok?r.reservering.id:null;
-      if(r&&r.ok){const confirmed=trustExternal.reservation('confirmed',{reservationRef:bewijsRef,
-        provider:m.tafel.supplierCode,at:nu(),value:{providerReservationRef:r.reservering.id,status:r.reservering.status}});
-        if(commitment&&confirmed)trustExternal.assess(bewijsRef,[commitment.evidenceId,confirmed.evidenceId],nu());}
-      if(r&&r.ok)trustRuntime.observe({capability:'reservation.request',boundary:'connection:vonk',
-        subjectRef:{domain:'hospitality',type:'reservation',id:r.reservering.id},predicate:'vonk.date.reserved',
-        value:{status:r.reservering.status},evidence:{matchRef:m.id,reservationRef:r.reservering.id,supplierRef:m.tafel.supplierCode},
+      const heeftReservering=!!(r&&r.ok&&r.reservering&&r.reservering.id);
+      const aangevraagd=heeftReservering&&r.reservering.status==='aangevraagd';
+      delete m.reservationInFlight;m.status=aangevraagd?'reservering-aangevraagd':'reservering-onbekend';
+      m.reserveringId=heeftReservering?r.reservering.id:null;
+      const claim=commitmentId?trustExternal.assess(bewijsRef,[commitmentId],nu()):null;
+      m.reservationEvidence={state:aangevraagd?'PENDING':'UNKNOWN',
+        finality:claim&&claim.claimId?claim.finality:'UNKNOWN',
+        missing:claim&&claim.claimId?claim.completeness.missing.map(x=>x.requirementId):
+          ['domain-commitment','provider-confirmation','operational-outcome']};
+      if(aangevraagd)trustRuntime.observe({capability:'reservation.request',boundary:'connection:vonk',
+        subjectRef:{domain:'hospitality',type:'reservation',id:r.reservering.id},predicate:'vonk.date.reservation_requested',
+        value:{status:'PENDING'},evidence:{matchRef:m.id,reservationRef:r.reservering.id,
+          supplierRef:m.tafel.supplierCode,providerConfirmation:false},
         policy:{id:'vonk-policy',version:1,decision:'SHADOW'}});
-      if(r&&r.ok)for(const wie of [m.a,m.b])try{notify(wie,{icon:'bar',title:'De date staat',body:m.tafel.supplierName+', '+m.tafel.datum+' '+m.tafel.tijd+'. Veel plezier!'});}catch(e){}
+      if(aangevraagd)for(const wie of [m.a,m.b])try{notify(wie,{icon:'bar',title:'Tafel aangevraagd',
+        body:m.tafel.supplierName+' beslist nog over '+m.tafel.datum+' '+m.tafel.tijd+'.'});}catch(e){}
     }
     return {status:200,ok:true,status2:m.status};
   } catch(e) { return {status:502,error:'De betaling kon niet veilig worden afgerond.'}; }

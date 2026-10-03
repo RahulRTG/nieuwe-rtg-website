@@ -150,7 +150,8 @@ module.exports = function betaalBuiten(ctx) {
         const p = await betaal.haalBetaling(w.provider, w.providerId);
         await betaalWaarheid.providerMelding({ eventId: 'controle:' + p.id + ':' + p.status,
           gebeurtenis: 'status.controle', aanbieder: p.aanbieder, providerId: p.id,
-          status: p.status, referentie: p.referentie, bedrag: p.bedrag, valuta: p.valuta });
+          status: p.status, referentie: p.referentie, bedrag: p.bedrag, valuta: p.valuta,
+          providerSource: p });
       }
     } catch (e) { /* de duurzame laatste stand blijft zichtbaar; nooit gokken */ }
     const vers = betaalWaarheid.van(w.id);

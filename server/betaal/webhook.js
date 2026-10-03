@@ -11,7 +11,24 @@
    nooit zichzelf als betaald markeren. */
 'use strict';
 
-module.exports = function webhookLaag({ crypto, stripe, BETALEN_UIT, WEBHOOK_SECRET, env }) {
+module.exports = function webhookLaag({ crypto, stripe, BETALEN_UIT, WEBHOOK_SECRET, env,
+  markProviderEvidence }) {
+  function stripeAssertion(event) {
+    const p = event && event.data && event.data.object || {}, type = String(event && event.type || '');
+    if (type.startsWith('checkout.session.')) {
+      const betaald = p.payment_status === 'paid' || type === 'checkout.session.async_payment_succeeded';
+      return { id: p.id, betaalId: typeof p.payment_intent === 'string' ? p.payment_intent
+        : p.payment_intent && p.payment_intent.id,
+      status: betaald ? 'succeeded' : type === 'checkout.session.expired' ? 'canceled'
+        : type === 'checkout.session.async_payment_failed' ? 'requires_payment_method' : 'processing',
+      referentie: p.client_reference_id || p.metadata && p.metadata.referentie,
+      bedrag: Math.round(Number(p.amount_total) || 0), valuta: p.currency };
+    }
+    return { id: p.id, status: p.status,
+      referentie: p.metadata && p.metadata.referentie,
+      bedrag: Math.round(Number(p.amount_received != null ? p.amount_received : p.amount) || 0),
+      valuta: p.currency };
+  }
   /* Verifieer een inkomende provider-webhook en geef de gebeurtenis terug.
      - Stripe met secret: officiële handtekeningcontrole (gooit bij twijfel).
      - Demo met secret: HMAC-SHA256 over de ruwe body, constant-tijd vergeleken.
@@ -22,7 +39,10 @@ module.exports = function webhookLaag({ crypto, stripe, BETALEN_UIT, WEBHOOK_SEC
       throw new Error('Betaalwebhook geweigerd: betalen staat bewust uitgeschakeld.');
     const buf = Buffer.isBuffer(ruweBody) ? ruweBody : Buffer.from(String(ruweBody));
     if (stripe && WEBHOOK_SECRET) {
-      return stripe.webhooks.constructEvent(buf, handtekening, WEBHOOK_SECRET);
+      const event = stripe.webhooks.constructEvent(buf, handtekening, WEBHOOK_SECRET);
+      if (typeof markProviderEvidence === 'function') markProviderEvidence(event, 'stripe',
+        String(event && event.id || ''), 'stripe-webhook-signature', stripeAssertion(event));
+      return event;
     }
     /* ZONDER SECRET IN PRODUCTIE: WEIGEREN.
 

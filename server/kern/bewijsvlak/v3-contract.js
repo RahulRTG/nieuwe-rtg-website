@@ -1,6 +1,7 @@
 'use strict';
 
 const { hash, kopie, bevries } = require('./canon');
+const sourceRetention = require('./v3-source-retention');
 
 const PROTOCOL = Object.freeze(['INTENT', 'AUTHORITY', 'COMMITMENT', 'EXECUTION',
   'CONFIRMATION', 'SETTLEMENT', 'OUTCOME']);
@@ -27,6 +28,18 @@ function ref(v, naam) {
     type: tekst(r.type, naam + '.type', /^[a-z0-9._-]{1,80}$/i),
     id: tekst(r.id, naam + '.id', /^[a-z0-9:._-]{1,180}$/i) });
 }
+function digestOf(v, naam) {
+  if (v == null) return null;
+  return tekst(v, naam, /^[a-f0-9]{64}$/);
+}
+
+function sluit(body) {
+  const uit = kopie(body || {});
+  delete uit.recordDigest; delete uit.evidenceId;
+  uit.recordDigest = hash(uit);
+  uit.evidenceId = 'evidence_v3_' + uit.recordDigest.slice(0, 32);
+  return bevries(uit);
+}
 
 function evidence(input, nu) {
   const i = kopie(input || {}), at = typeof nu === 'function' ? nu() : new Date().toISOString();
@@ -41,7 +54,10 @@ function evidence(input, nu) {
     schemaVersion: 3, factType: tekst(i.factType, 'factType', /^[a-z0-9._-]{3,160}$/i),
     subjectRef: ref(i.subjectRef, 'subjectRef'), protocol, truthClass,
     source: { type: tekst(source.type, 'source.type', /^[a-z0-9._-]{2,80}$/i),
-      ref: tekst(source.ref, 'source.ref', /^[a-z0-9:._-]{2,180}$/i) },
+      ref: tekst(source.ref, 'source.ref', /^[a-z0-9:._-]{2,180}$/i),
+      eventRefDigest: digestOf(source.eventRefDigest, 'source.eventRefDigest'),
+      assertionDigest: digestOf(source.assertionDigest, 'source.assertionDigest'),
+      receiptDigest: digestOf(source.receiptDigest, 'source.receiptDigest') },
     authority: { id: tekst(authority.id, 'authority.id', /^[a-z0-9:._-]{2,180}$/i),
       scopes: lijst(authority.scopes), basis: tekst(authority.basis, 'authority.basis', /^[a-z0-9:._-]{2,180}$/i),
       validFrom: tijd(authority.validFrom || observedAt, 'authority.validFrom'),
@@ -62,9 +78,17 @@ function evidence(input, nu) {
     valueDigest: tekst(i.valueDigest || hash(i.value == null ? null : i.value), 'valueDigest', /^[a-f0-9]{64}$/),
     classification: String(i.classification || 'intern'), purpose: String(i.purpose || 'trust-evidence')
   };
-  body.recordDigest = hash(body);
-  body.evidenceId = 'evidence_v3_' + body.recordDigest.slice(0, 32);
-  return bevries(body);
+  body.sourceRetention = sourceRetention.normaliseer(i.sourceRetention, body.authority);
+  return sluit(body);
 }
 
-module.exports = { PROTOCOL, TRUTH, FINALITY, DECISIONS, evidence, ref, lijst, tijd };
+function bindAuthority(record, authorityContract) {
+  const body = kopie(record || {});
+  delete body.recordDigest; delete body.evidenceId;
+  if (!authorityContract || typeof authorityContract !== 'object')
+    throw new Error('bewijsvlak v3: authority/source-attestatie ontbreekt');
+  body.authorityContract = kopie(authorityContract);
+  return sluit(body);
+}
+
+module.exports = { PROTOCOL, TRUTH, FINALITY, DECISIONS, evidence, bindAuthority, ref, lijst, tijd };

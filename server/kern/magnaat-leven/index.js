@@ -84,7 +84,11 @@ function maakLeven({ db, save = () => {}, nu = () => Date.now() } = {}) {
      hoe het was. Wel geboekt: bevriezen, want het journaal gaat niet terug.
      En kloppen de invarianten na afloop niet, dan ook bevriezen. */
   function beschermd(st, doe) {
-    const voor = structuredClone(st), volgorde = st.boek.boekVolgorde;
+    /* De opslagstaat is contractueel JSON. SQLite bewaakt hem met een Proxy,
+       die structuredClone niet accepteert. Deze ronde maakt dezelfde losse
+       rollbackkopie langs de duurzame JSON-grens, zonder de Proxy of een ruwe
+       opslagreferentie naar het domein te lekken. */
+    const voor = JSON.parse(JSON.stringify(st)), volgorde = st.boek.boekVolgorde;
     try {
       const r = doe();
       const schending = r && r.nieuw ? [] : controleer(st, boek);

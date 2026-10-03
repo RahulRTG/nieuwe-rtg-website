@@ -5,6 +5,7 @@
 'use strict';
 
 const crypto = require('node:crypto');
+const { keurRealtimeWaarneming } = require('../../server/config/connection-realtime-evidence');
 
 const HASH = /^[a-f0-9]{64}$/;
 const hash = waarde => crypto.createHash('sha256').update(String(waarde)).digest('hex');
@@ -103,15 +104,7 @@ async function realtime(o) {
   if (!appUrl) return { stand:'OPEN', redenen:['APP_URL ontbreekt'] };
   const r = await o.meetExtern('connectionRealtime', { appUrl, forceRelay:true,
     requiredDistinctNetworks:2, bidirectionalPayloadBytes:65536 });
-  return uitslag(r, x => {
-    alleen(x, ['distinctNetworkCount','networkASNsHashed','turnCredentialsShortLived','relayCandidateA',
-      'relayCandidateB','selectedPairRelayOnly','connected','bytesAToB','bytesBToA','disconnectedCleanly']);
-    if (x.distinctNetworkCount < 2 || !Array.isArray(x.networkASNsHashed) || x.networkASNsHashed.length < 2 ||
-        !x.networkASNsHashed.every(v => HASH.test(String(v)))) throw new Error('de proef liep niet over twee bewezen verschillende netwerken');
-    for (const k of ['turnCredentialsShortLived','relayCandidateA','relayCandidateB','selectedPairRelayOnly','connected','disconnectedCleanly']) ja(x[k], k);
-    if (!geheel(x.bytesAToB, 65536, 100000000) || !geheel(x.bytesBToA, 65536, 100000000))
-      throw new Error('er zijn geen bidirectionele payloadbytes via TURN gemeten');
-  });
+  return uitslag(r, keurRealtimeWaarneming);
 }
 
 module.exports = { tlsRand, incident, emailHerstel, realtime, _alleen:alleen };

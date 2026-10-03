@@ -6,7 +6,8 @@ const capaciteit = require('../reservering/capaciteit');
 
 module.exports = (ctx) => {
   const { db, save, findSupplier, notify, notifySupplier, sseToCustomer, sseToSupplier, sseToOffice, zijnVrienden, ticketsVoorSlot, optieAan,
-    orderMetRef, boekingMetRef, boekingenVanKlant, id, nu, vandaag, rond, MELDING_SCOPES, trustPlane } = ctx;
+    orderMetRef, boekingMetRef, boekingenVanKlant, id, nu, vandaag, rond, MELDING_SCOPES, trustPlane,
+    bewijsHospitalityBesluit } = ctx;
 
   function observe(invoer) {
     if (!trustPlane || typeof trustPlane.observe !== 'function') return null;
@@ -20,6 +21,7 @@ module.exports = (ctx) => {
     if (!timer) return null;
     try { return timer.finish(uitkomst); } catch (e) { return null; }
   }
+  const beslisReservering = require('./reservering-besluit')({ ...ctx, observe, metricTimer, finish });
 
   /* Lazy sweep: reserveringen waarvan de 24u-bedenktijd voorbij is worden
      definitief zodra iemand ze opvraagt. Eén keer opslaan als er iets rijpte. */
@@ -112,34 +114,6 @@ module.exports = (ctx) => {
     sseToSupplier(r.supplierCode, 'sync', { scope: 'reserveringen' });
     return { ok: true, reservering: r, boeteCenten };
   }
-  // de zaak beslist (elke medewerker, op eigen naam)
-  function beslisReservering(supplier, rid, action) {
-    const r = (db.data.reserveringen || []).find(x => x.id === rid && x.supplierCode === supplier.code);
-    if (!r) return { status: 404, error: 'Reservering niet gevonden.' };
-    if (r.status !== 'aangevraagd') return { status: 409, error: 'Deze reservering is al ' + r.status + '.' };
-    const decisionTimer = metricTimer({ capability: 'reservation.request', boundary: 'supplier:' + supplier.code });
-    r.status = action === 'bevestig' ? 'bevestigd' : 'geweigerd';
-    try { save(); }
-    catch (e) {
-      finish(decisionTimer, { outcome: 'FAILED', domainOutcome: 'DECISION_NOT_PERSISTED',
-        errorClass: e.code || 'STORAGE_EXCEPTION' });
-      throw e;
-    }
-    finish(decisionTimer, { outcome: 'SUCCEEDED', domainOutcome: r.status === 'bevestigd' ? 'CONFIRMED' : 'REJECTED',
-      measurementKey: 'reservation-decision:' + r.id + ':' + r.status });
-    observe({ capability: 'reservation.request', boundary: 'supplier:' + supplier.code,
-      subjectRef: { domain: 'hospitality', type: 'reservation', id: r.id },
-      predicate: r.status === 'bevestigd' ? 'reservation.confirmed' : 'reservation.rejected',
-      value: { status: r.status }, evidence: { status: r.status, supplierRef: supplier.code },
-      policy: { id: 'hospitality-policy', version: 1, decision: 'SHADOW' } });
-    const tekst = r.status === 'bevestigd'
-      ? 'Uw tafel bij ' + supplier.name + ' op ' + r.datum + ' om ' + r.tijd + ' (' + r.personen + 'p) is bevestigd.'
-      : supplier.name + ' kan uw reservering voor ' + r.datum + ' ' + r.tijd + ' helaas niet plaatsen.';
-    notify(r.customerKey, { icon: 'table', title: supplier.name, body: tekst, scope: 'orders' });
-    sseToCustomer(r.customerKey, 'sync', { scope: 'reserveringen' });
-    return { ok: true, reservering: r };
-  }
-
   /* ---- 1b. de tafelplanning: van losse aanvragen naar een gedekte avond ----
      De toewijzing, de komst-meldingen en de walk-in draaien als submodule op
      dezelfde context (plus de gedeelde rijpMaak-sweep); zie

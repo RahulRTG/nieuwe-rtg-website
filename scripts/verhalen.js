@@ -322,11 +322,16 @@ const VERHALEN = [
       wb.eis('nog onderweg', !(ver.data.live && ver.data.live.arrived),
         'vijftig kilometer verderop gold al als aangekomen');
 
-      // en dan precies op de stoep
+      /* Precies op de stoep is alleen een nabijheidsvoorstel. Een positie mag
+         nooit zelfstandig een aankomst bewijzen of een deur openen (N3/N13);
+         het lid bevestigt daarom in een afzonderlijke handeling dat het er is. */
       const upd = await wb.stap('aankomen', 'POST', '/api/live/update', lid.token,
         { lat: bestemming.loc.lat, lng: bestemming.loc.lng });
-      wb.eis('aankomen', upd.data.live && upd.data.live.arrived === true,
-        'op de bestemming staan leverde geen aankomst op');
+      wb.eis('aankomen', upd.data.live && upd.data.live.nabij === true && upd.data.live.arrived === false,
+        'op de bestemming hoort alleen een nabijheidsvoorstel te ontstaan');
+      const hier = await wb.stap('aankomst bevestigen', 'POST', '/api/live/aangekomen', lid.token, {});
+      wb.eis('aankomst bevestigen', hier.data.live && hier.data.live.arrived === true &&
+        hier.data.live.aankomstDoor === 'lid', 'de bevestigde aankomst werd niet als handeling van het lid vastgelegd');
     }
   },
   {

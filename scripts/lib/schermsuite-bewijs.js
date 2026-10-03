@@ -35,10 +35,24 @@ function tapSamenvatting(tekst) {
       reden: String(m[2] || '').trim().slice(0, 500) || null }));
   const volledig = ['tests', 'pass', 'fail', 'cancelled', 'skipped', 'todo']
     .every(k => Number.isSafeInteger(waarden[k]));
+  /* Een urenlange browserronde die alleen `mislukt: 2` bewaart, laat de
+     operator de hele ronde opnieuw draaien om zelfs maar te weten welke twee.
+     Bewaar daarom uitsluitend de begrensde TAP-testnaam en de eerste begrensde
+     foutregel. Requestlogs en diagnostische objecten worden niet opgenomen. */
+  const misluktTests = [...bron.matchAll(/^\s*not ok\s+\d+\s+-\s+([^\r\n#]*)(?![^\r\n]*#\s+(?:SKIP|TODO))/gmi)]
+    .slice(0, 100)
+    .map(m => {
+      const vanaf = m.index + m[0].length;
+      const blok = bron.slice(vanaf, vanaf + 4000);
+      const fout = blok.match(/^\s*(?:error|name|message):\s*([^\r\n]{1,1000})$/mi) ||
+        blok.match(/^\s*([^#\r\n]*(?:AssertionError|Error):[^\r\n]{0,1000})$/mi);
+      return { test: String(m[1] || '').trim().slice(0, 300),
+        fout: fout ? String(fout[1] || '').trim().slice(0, 1000) : null };
+    });
   return { volledig, tests: waarden.tests, geslaagdeTests: waarden.pass,
     mislukt: waarden.fail, geannuleerd: waarden.cancelled,
     overgeslagen: waarden.skipped, todo: waarden.todo,
-    overgeslagenTests: regelsVoor('SKIP'), todoTests: regelsVoor('TODO') };
+    misluktTests, overgeslagenTests: regelsVoor('SKIP'), todoTests: regelsVoor('TODO') };
 }
 
 function zelfdeInventaris(a, b) {

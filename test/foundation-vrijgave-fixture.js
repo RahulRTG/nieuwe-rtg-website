@@ -60,11 +60,15 @@ function machineBewijs(naam, commit, status = 'PASS', sleutels = {}) {
         ledgerItems:3, matchedItems:3, unmatchedProvider:0, unmatchedLedger:0,
         amountDeltaMinor:0, unknownOutcomes:0, reconciled:true }
     };
+    const realtime = { distinctNetworkCount:2,
+      networkASNsHashed:['7'.repeat(64), '8'.repeat(64)], turnCredentialsShortLived:true,
+      relayCandidateA:true, relayCandidateB:true, selectedPairRelayOnly:true,
+      connected:true, bytesAToB:65536, bytesBToA:65536, disconnectedCleanly:true };
     const meting = { format:runnerTrust.MEASUREMENT_FORMAT, runnerTrustVersion:'v1', control:naam, commit,
       correlationId:extern.GELD_CONTROLES.includes(naam) ? 'money-proof-12345678' : 'proof-'+naam,
       requestSha256, measurementId:'meter-'+naam,
       startedAt:'2026-09-04T12:00:00.000Z', finishedAt:'2026-09-04T12:00:01.000Z',
-      observations:money[naam] || {} };
+      observations:money[naam] || (naam === 'connectionRealtime' ? realtime : {}) };
     meting.signature = crypto.sign(null, meter.signaturePayload(meting),
       sleutels.runner.privateKey).toString('base64');
     const runnerPem = sleutels.runner.publicKey.export({ type:'spki', format:'pem' });

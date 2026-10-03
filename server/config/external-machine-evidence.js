@@ -6,6 +6,7 @@
 const crypto = require('node:crypto');
 const trust = require('./release-trust');
 const runnerTrust = require('./evidence-runner-trust');
+const { keurRealtimeWaarneming } = require('./connection-realtime-evidence');
 const { canon } = require('../kern/bewijsvlak/canon');
 
 const GELD_CONTROLES = Object.freeze(['paymentProvider', 'payoutProvider', 'webhookDelivery',
@@ -86,6 +87,10 @@ function machineRapport(bytes, naam, commit, status, context = {}) {
         sha256(Buffer.from(canon(meting))) !== g.responseSha256)
       throw new Error('runner-rapport-verzoek-of-provenance-ongeldig:' + naam);
     verifieerRunnerMeting(g, meting, context.trustRoot);
+    if (naam === 'connectionRealtime') {
+      try { keurRealtimeWaarneming(meting.observations); }
+      catch (e) { throw new Error('machine-realtime-bewijs-ongeldig:' + String(e.message || e)); }
+    }
   } else if (rapport.requestSha256 !== null) {
     throw new Error('lokaal-machine-rapport-heeft-onverwacht-providerverzoek:' + naam);
   }

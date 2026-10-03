@@ -100,8 +100,21 @@ function uitVerschil(voor, na) {
 function maak({ envelop, voor, na, teller }) {
   const e = envelop || {};
   const ctx = e.context || {};
-  const { klassen, refs, zonderIndeling } = uitVerschil(voor, na);
   const t = teller || {};
+  /* Nieuwe runtime: de db-proxy heeft de bewogen collecties tijdens de mutatie
+     zelf al aangewezen. De oude voor/na-vorm blijft uitsluitend als expliciete
+     fallback voor losse toetsen en voor een niet-bewaakte datastore. */
+  const waargenomen = t.collecties && typeof t.collecties[Symbol.iterator] === 'function'
+    ? [...t.collecties].sort() : null;
+  const uit = waargenomen == null ? uitVerschil(voor, na) : (() => {
+    const klassen = new Set(), refs = []; let zonderIndeling = 0;
+    for (const naam of waargenomen) {
+      const rij = effectcollecties.effectVan(naam);
+      if (rij) { klassen.add(rij.effect); refs.push(naam); } else zonderIndeling++;
+    }
+    return { klassen: [...klassen].sort(), refs, zonderIndeling };
+  })();
+  const { klassen, refs, zonderIndeling } = uit;
 
   /* De twee choke points buiten de opslag. Zij dragen dezelfde klasse en dat is geen
      versimpeling: mail en sms bereiken allebei een tweede persoon buiten RTG, en dat IS
@@ -128,8 +141,9 @@ function maak({ envelop, voor, na, teller }) {
          -- en dat is iets anders dan "er gebeurde niets". */
       schreefOpslag: schreef,
       collectiesZonderIndeling: zonderIndeling,
-      diep: staatlog.diep === true,
-      blind: Object.freeze((staatlog.diep === true ? [] : BLIND_ONDIEP).concat(BLIND_ALTIJD))
+      diep: t.collectieDekking === 'proxy-v1' || staatlog.diep === true,
+      blind: Object.freeze((t.collectieDekking === 'proxy-v1' || staatlog.diep === true
+        ? [] : BLIND_ONDIEP).concat(BLIND_ALTIJD))
     })
   };
   if (Array.isArray(voorspeld)) bon.nameting = nameet(voorspeld, bon);
@@ -147,11 +161,10 @@ function haak(app) {
        effectmeter niet. Nesten is geen probleem: perVerzoek hergebruikt een bestaande
        teller in plaats van er een tweede bovenop te zetten. */
     effectmeter.perVerzoek((teller) => {
-      const voor = staatlog.stand();
       const echt = res.end;
       res.end = function (...args) {
         try {
-          const bon = bewaar(maak({ envelop: req && req.envelop, voor, na: staatlog.stand(), teller }));
+          const bon = bewaar(maak({ envelop: req && req.envelop, teller }));
           /* De kop draagt de KLASSEN en niet de bon: een bon in een header is een payload,
              en de klassen zijn wat een lezer buiten dit proces nodig heeft. Leeg blijft
              leeg -- `geen` zou een meting suggereren waar er geen was. */

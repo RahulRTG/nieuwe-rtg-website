@@ -50,8 +50,12 @@ test('alleen een verse geldige HMAC-carrier mag een serviceketen hervatten', () 
 
 test('ledger is content-addressed, append-only en gescheiden per trust boundary', () => {
   const regels = [], ledger = maakLedger({ regels, nu: () => '2026-09-30T00:00:00.000Z' });
-  const bewijs = ledger.bewijs({ available: true }, { kind: 'capacity' });
-  assert.equal(bewijs.evidenceId, 'evidence_' + bewijs.digest);
+  const bewijs = ledger.bewijs({ available: true }, { kind: 'capacity',
+    subjectRef: ref('window', 'A-20'), capabilityRef: { id: 'hospitality.availability.check', version: 1 },
+    authorityRef: { id: 'rtg:hospitality', version: 1 } });
+  assert.match(bewijs.evidenceId, /^evidence_[a-f0-9]{64}$/);
+  assert.notEqual(bewijs.evidenceId, 'evidence_' + bewijs.digest,
+    'de identifier bindt meer dan alleen de losse content');
   ledger.append({ boundary: 'supplier:A', claimId: 'claim_a', evidenceRefs: [bewijs] });
   ledger.append({ boundary: 'supplier:B', claimId: 'claim_b', evidenceRefs: [bewijs] });
   ledger.append({ boundary: 'supplier:A', claimId: 'claim_c', evidenceRefs: [bewijs] });
@@ -61,7 +65,7 @@ test('ledger is content-addressed, append-only en gescheiden per trust boundary'
   assert.equal(maakLedger({ regels: fout }).verify('supplier:A').ok, false);
 });
 
-test('claims dragen alleen digest en refs, nooit de aangeleverde waarde', () => {
+test('claims en ledger dragen alleen digests en veilige refs, nooit de aangeleverde waarde', () => {
   const state = {}, plane = maakPlane({ state, mode: 'shadow' });
   const r = plane.observe({ capability: 'hospitality.availability.check', boundary: 'supplier:A',
     subjectRef: ref('window', 'A-20'), predicate: 'hospitality.capacity.available',
@@ -72,8 +76,47 @@ test('claims dragen alleen digest en refs, nooit de aangeleverde waarde', () => 
   assert.equal(Object.hasOwn(r.claim, 'value'), false);
   assert.equal(plane.ledger.verify('supplier:A').ok, true);
   const herstart = maakPlane({ state, mode: 'shadow' });
-  assert.equal(herstart.ledger.haalBewijs(r.claim.evidenceRefs[0].evidenceId).content.available, true,
-    'content-addressed bewijs overleeft een nieuwe plane op dezelfde duurzame state');
+  const opgeslagen = herstart.ledger.haalBewijs(r.claim.evidenceRefs[0].evidenceId);
+  assert.equal(Object.hasOwn(opgeslagen, 'content'), false);
+  assert.equal(opgeslagen.contentDigest, r.claim.evidenceRefs[0].digest);
+  assert.equal(opgeslagen.metadata.capabilityRef.id, 'hospitality.availability.check');
+  assert.match(opgeslagen.metadata.subjectRefDigest, /^[a-f0-9]{64}$/);
+  assert.equal(JSON.stringify(state).includes('niet-in-claim'), false);
+  assert.equal(JSON.stringify(state).includes('A-20'), false,
+    'de ledger bewaart geen leesbare subjectref naast de domeinclaim');
+});
+
+test('dezelfde content voor twee subjects dedupliceert nooit over de subjectgrens', () => {
+  const blobs = {}, ledger = maakLedger({ blobs });
+  const metadata = { kind: 'capacity', capabilityRef: { id: 'hospitality.availability.check', version: 1 },
+    authorityRef: { id: 'rtg:hospitality', version: 1 }, privateNote: 'niet-bewaren' };
+  const a = ledger.bewijs({ available: true }, { ...metadata, subjectRef: ref('window', 'A') });
+  const b = ledger.bewijs({ available: true }, { ...metadata, subjectRef: ref('window', 'B') });
+  assert.notEqual(a.evidenceId, b.evidenceId);
+  assert.equal(Object.keys(blobs).length, 2);
+  assert.equal(JSON.stringify(blobs).includes('niet-bewaren'), false);
+  assert.equal(JSON.stringify(blobs).includes('"id":"A"'), false);
+});
+
+test('ledgercapaciteit sluit zonder historie te verwijderen en replay blijft mogelijk', () => {
+  const regels = [], blobs = {}, ledger = maakLedger({ regels, blobs,
+    limits: { records: 1, evidence: 1 }, nu: () => '2026-09-30T00:00:00.000Z' });
+  const metadata = { subjectRef: ref('window', 'A'), capabilityRef: { id: 'hospitality.availability.check', version: 1 } };
+  const eerste = ledger.bewijs({ available: true }, metadata);
+  assert.equal(ledger.bewijs({ available: true }, metadata).evidenceId, eerste.evidenceId, 'idempotente replay blijft veilig');
+  assert.throws(() => ledger.bewijs({ available: false }, metadata), e => e.code === 'EVIDENCE_CAPACITY_REACHED');
+  ledger.append({ boundary: 'supplier:A', evidenceRefs: [eerste] });
+  assert.throws(() => ledger.append({ boundary: 'supplier:A', evidenceRefs: [eerste] }),
+    e => e.code === 'EVIDENCE_CAPACITY_REACHED');
+  assert.equal(regels.length, 1); assert.equal(Object.keys(blobs).length, 1);
+  assert.equal(ledger.verify('supplier:A').ok, true, 'de bestaande hashketen is niet stil ingekort');
+});
+
+test('legacy raw evidence start fail-closed en wordt niet stil herschreven', () => {
+  const legacy = { evidence_oud: { evidenceId: 'evidence_oud', digest: 'a'.repeat(64),
+    metadata: { kind: 'capacity' }, content: { persoon: 'raw' } } };
+  assert.throws(() => maakLedger({ blobs: legacy }), e => e.code === 'LEGACY_RAW_EVIDENCE_REQUIRES_MIGRATION');
+  assert.equal(legacy.evidence_oud.content.persoon, 'raw');
 });
 
 test('capability resolution is fail-closed op implementatie, policy, compatibility en SLO', () => {

@@ -5,9 +5,16 @@ const { maakPlane } = require('./plane');
 let actief = maakPlane({ mode: 'shadow', state: {} });
 
 function configure(opties) {
-  const o = opties || {}, state = o.state || (o.db && o.db.data
-    ? (o.db.data.trustEvidence = o.db.data.trustEvidence || {}) : {});
-  actief = maakPlane({ ...o, state });
+  const o = opties || {}, fallback = o.state || {};
+  const stateFor = typeof o.stateFor === 'function' ? o.stateFor : o.db
+    ? () => {
+      const data = o.db.data;
+      if (!data || typeof data !== 'object') throw new Error('bewijsvlak runtime: database-state ontbreekt');
+      if (!data.trustEvidence || typeof data.trustEvidence !== 'object') data.trustEvidence = {};
+      return data.trustEvidence;
+    }
+    : () => fallback;
+  actief = maakPlane({ ...o, state: stateFor(), stateFor });
   return actief;
 }
 
@@ -37,18 +44,9 @@ function v3(handeling, invoer) {
       return { ok: false, shadow: true, code: 'V3_ACTION_UNKNOWN' };
     return plane[handeling](invoer);
   } catch (error) {
-    return { ok: false, shadow: true, code: 'V3_EVIDENCE_FAILED', error: error.message };
+    if (error && error.incidentId) throw error;
+    return { ok: false, shadow: true, code: error && error.code || 'V3_EVIDENCE_FAILED',
+      incidentId: error && error.incidentId || null, error: error.message };
   }
 }
-function pilot(naam, handeling, invoer) {
-  try {
-    const groep = actief.v3 && actief.v3.pilots;
-    if (!groep || typeof groep[handeling] !== 'function')
-      return { ok: false, shadow: true, code: 'V3_PILOT_UNKNOWN' };
-    return groep[handeling](invoer);
-  } catch (error) {
-    return { ok: false, shadow: true, code: 'V3_PILOT_FAILED', pilot: naam, error: error.message };
-  }
-}
-
-module.exports = { configure, current, observe, measure, timer, v3, pilot };
+module.exports = { configure, current, observe, measure, timer, v3 };

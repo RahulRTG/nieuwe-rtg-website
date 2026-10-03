@@ -6,6 +6,7 @@ const { alsAanbieder } = require('../kern/dienstidentiteit');
 
 module.exports = function hangKaartWebhooks({ app, express, db, save, log, betaal,
   betaalWaarheid, webhookRem, webhookPoort, settleFactuur, opdrachtenVan }) {
+  const payout = require('./kaartpayout')(opdrachtenVan, log);
 
   async function settleWachtend(p, hoe) {
     if (!p || !p.id) return;
@@ -33,17 +34,6 @@ module.exports = function hangKaartWebhooks({ app, express, db, save, log, betaa
     }
   }
 
-  async function payout(evt, object) {
-    const soort = evt && evt.type;
-    if (!['payout.paid', 'payout.failed', 'payout.canceled'].includes(soort)) return;
-    const rij = opdrachtenVan && opdrachtenVan();
-    if (!rij || !object || !object.id) return;
-    const r = await rij.bevestig({ settlementRef: object.id, gelukt: soort === 'payout.paid',
-      reden: object.failure_message || object.failure_code || soort });
-    if (r && r.error) log.info('payout-webhook zonder bijbehorende betaalopdracht', { id: object.id, type: soort });
-    else log.info('payout-webhook verwerkt', { id: object.id, type: soort, opdracht: r && r.id, status: r && r.status });
-  }
-
   app.post('/api/betaal/webhook', webhookRem, webhookPoort,
     express.raw({ type: '*/*', limit: '1mb' }), async (req, res) => {
       let evt;
@@ -62,7 +52,8 @@ module.exports = function hangKaartWebhooks({ app, express, db, save, log, betaa
           const bedrag = Math.round(Number(p.amount_received != null ? p.amount_received : p.amount) || 0);
           await betaalWaarheid.providerMelding({ eventId: evt.id, gebeurtenis: soort,
             aanbieder: 'stripe', providerId: p.id, status: p.status,
-            referentie: p.metadata && p.metadata.referentie, bedrag, valuta: p.currency });
+            referentie: p.metadata && p.metadata.referentie, bedrag, valuta: p.currency,
+            providerSource: evt });
           if (soort === 'payment_intent.succeeded')
             await settleWachtend({ id: p.id, bedrag }, 'Betaald per kaart');
         } else if (p && p.id && String(soort || '').startsWith('checkout.session.')) {
@@ -75,7 +66,7 @@ module.exports = function hangKaartWebhooks({ app, express, db, save, log, betaa
           await betaalWaarheid.providerMelding({ eventId: evt.id, gebeurtenis: soort,
             aanbieder: 'stripe', providerId: p.id, betaalId, status,
             referentie: p.client_reference_id || (p.metadata && p.metadata.referentie),
-            bedrag, valuta: p.currency });
+            bedrag, valuta: p.currency, providerSource: evt });
           if (betaald) await settleWachtend({ id: p.id, bedrag }, 'Betaald via Stripe Checkout');
         } else if (p && p.id && String(soort || '').startsWith('refund.') &&
           ['succeeded', 'failed', 'canceled'].includes(String(p.status || '').toLowerCase())) {
@@ -110,7 +101,8 @@ module.exports = function hangKaartWebhooks({ app, express, db, save, log, betaa
         await alsAanbieder('mollie', async () => { // het opgehaalde antwoord is het bewijs
           await betaalWaarheid.providerMelding({ eventId: 'mollie:' + p.id + ':' + p.status,
             gebeurtenis: 'payment.' + p.status, aanbieder: 'mollie', providerId: p.id,
-            status: p.status, referentie: p.referentie, bedrag: p.bedrag, valuta: p.valuta });
+            status: p.status, referentie: p.referentie, bedrag: p.bedrag, valuta: p.valuta,
+            providerSource: p });
           if (p.status === 'paid') await settleWachtend(p, 'Betaald via Mollie');
         });
         log.info('mollie-webhook verwerkt', { id: p.id, status: p.status });
@@ -153,7 +145,8 @@ module.exports = function hangKaartWebhooks({ app, express, db, save, log, betaa
               : soort === 'CAPTURE' || !betaal.adyenHandmatigeCapture ? 'captured' : 'authorised';
             await betaalWaarheid.providerMelding({ eventId, gebeurtenis: soort,
               aanbieder: 'adyen', providerId: linkId, betaalId: item.pspReference,
-              status, referentie: item.merchantReference, bedrag, valuta });
+              status, referentie: item.merchantReference, bedrag, valuta,
+              providerSource: item });
             if (status === 'captured') await settleWachtend({ id: linkId || item.pspReference, bedrag }, 'Betaald via Adyen');
           } else if (['REFUND', 'REFUND_FAILED'].includes(soort)) {
             await betaalWaarheid.providerTerugbetaling({ eventId, aanbieder: 'adyen',

@@ -110,13 +110,35 @@ ondertekende externe dossier staan.
 
 1. Rond de bronwijzigingen af, werk alle gegenereerde registers bij en commit.
    De releasebron moet volledig schoon zijn.
-2. Laat de GitHub-workflow `Release-imagekandidaat` op precies die commit lopen.
-   Die voert de volledige Node-, scherm-, PostgreSQL/Redis- en stagingronde uit,
-   bouwt twee unieke kandidaatimages en levert het artefact `herkomst` op.
-3. Plaats de bestanden uit dat artefact ongewijzigd in `.release/` en neem de
+2. Bewijs die commit eerst met vier onafhankelijke GitHub-ronden: een handmatige
+   volledige `CI` met `verwachte_commit`, `De ronde (wekelijks)` met omvang
+   `beproeving`, `Desktop- en mobielstandaard` en `CodeQL`. Een oudere groene
+   run, een andere commit, een verlopen artefact of een nieuwere rode run telt
+   niet. Voor de twee handmatige ronden is de canonieke aanroep:
+
+   ```bash
+   SHA="$(git rev-parse origin/main)"
+   gh workflow run ci.yml --ref main -f verwachte_commit="$SHA"
+   gh workflow run ronde.yml --ref main -f omvang=beproeving
+   ```
+
+   Controleer bij alle vier de uiteindelijke runs dat `headSha` exact `$SHA` is.
+   Een groene CodeQL-workflow alleen is niet genoeg: die ronde beoordeelt de
+   lokaal geproduceerde SARIF en publiceert uitsluitend bij nul resultaten een
+   commitgebonden `codeql-verdict`. De release-imagepoort eist het digest van
+   precies dat artifact; een latere, mutable Security-tab kan een oudere commit
+   daardoor niet stil groen maken.
+3. Laat daarna de GitHub-workflow `Release-imagekandidaat` op precies die commit
+   lopen. Vóór bouwen leest hij de vier uitspraken fail-closed uit GitHub Actions
+   en bevriest hij run-ID's en artifactdigests in
+   `.release/prerelease-workflows.json`. Daarna voert hij zelf opnieuw de
+   volledige Node-, scherm-, PostgreSQL/Redis- en stagingronde uit, bouwt twee
+   unieke kandidaatimages en bindt het prereleasedossier met BUILD aan beide
+   image-digests in het artefact `herkomst`.
+4. Plaats de bestanden uit dat artefact ongewijzigd in `.release/` en neem de
    twee unieke kandidaat-tags over in `deploy/live.env` als
    `RTG_CANDIDATE_IMAGE` en `RTG_CANDIDATE_BACKUP_IMAGE`.
-4. Plaats de echte onafhankelijke bewijsbestanden in
+5. Plaats de echte onafhankelijke bewijsbestanden in
    `.release/external-evidence/`. De host maakt de machineverslagen zelf met
    `npm run extern:bewijs -- <proef>`; zie **Externe bewijsproducenten**
    hieronder. Herstel blijft OPEN tot een mens met naam verklaart dat een lid
@@ -125,12 +147,12 @@ ondertekende externe dossier staan.
    daarna `.release/external-release.json` op basis
    van `deploy/external-release.example.json` en laat de aangewezen
    releasebeoordelaar het dossier ondertekenen met `npm run external:teken`.
-5. Keur de host en exact dezelfde CI-kandidaat. `live:golive` bouwt niets en
+6. Keur de host en exact dezelfde CI-kandidaat. `live:golive` bouwt niets en
    raakt de productievolumes niet; het gebruikt een eigen vluchtige
    PostgreSQL-, Redis-, queue- en motoromgeving.
-6. Laat de commitgebonden einduitspraak maken. Alleen nul blokkades mag READY
+7. Laat de commitgebonden einduitspraak maken. Alleen nul blokkades mag READY
    opleveren.
-7. Laat een andere, bevoegde release-authority de READY-uitspraak, kandidaat-
+8. Laat een andere, bevoegde release-authority de READY-uitspraak, kandidaat-
    digests en alle bewijsbytes ondertekenen. Daarna pas volgt de wissel.
 
 ```bash
@@ -209,7 +231,9 @@ De proeven en hun echte grens:
   Kies desgewenst met `RTG_IMAGE_SCANNER=trivy` of `grype`.
 - `realtime`: eist twee werkelijk verschillende netwerk-AS'en, relay-candidates
   aan beide kanten, een relay-only selected pair en minstens 64 KiB in beide
-  richtingen. Alleen `/api/ice` ophalen kan deze proef nooit laten slagen.
+  richtingen. De releasepoort herverifieert ook de inhoud van de ondertekende
+  runnerwaarneming; een dossier-signer kan een onvoldoende meting niet groen
+  verklaren. Alleen `/api/ice` ophalen kan deze proef nooit laten slagen.
 
 De vijf geldverslagen gebruiken bewust één al bestaande, idempotente liveketen.
 Zonder een eigenaarbesluit en hard maximumbedrag starten ze niets:
@@ -333,7 +357,9 @@ bewaarde kluissleutel bij de teruggezette data hoort.
   herstellinks anders alleen in een lokale outbox belanden.
 - Videobellen door strenge mobiele/bedrijfsfirewalls: de eigen STUN-server is
   inbegrepen; voor betrouwbare verbindingen is ook een eigen coturn/TURN nodig.
-  Zet daarna `TURN_URL` en `TURN_SECRET` in `.env.productie`.
+  Zet daarna een publieke `turns:`-URL met expliciete poort en een sterk
+  willekeurig `TURN_SECRET` in `.env.productie`; plaintext `turn:`, test- of
+  private hosts en placeholders worden door publieke productie geweigerd.
 - Bescherming tegen zeer grote netwerk-DDoS: de app heeft een WAF en IP-rem,
   maar een volumetrische aanval moet vóór de server worden geabsorbeerd. Voeg
   pas als het risicoprofiel dat vraagt een CDN/WAF-provider toe.

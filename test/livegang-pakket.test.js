@@ -164,7 +164,7 @@ test('live:init maakt stil een valide lokale-eerst en betalingen-uit configurati
     const papierenPad = path.join(tmp, 'compliance', 'papieren.json');
     const maak = spawnSync(process.execPath, [path.join(ROOT, 'scripts/sleutels.js'),
       '--docker', '--schrijf', '--zonder-ai', '--zonder-betalen', '--zonder-sms', '--native-tls', '--stil',
-      '--eigenaar=owner@example.test', '--url=https://app.example.test',
+      '--eigenaar=owner@example.test', '--url=https://app.rahultravelgroup.com',
       '--tls-email=tls@example.test', '--smtp-url=smtps://mail.example.test:465',
       '--doel=' + envPad, '--postgres-doel=' + pgPad,
       '--motor-sleutel-doel=' + motorSleutelPad,
@@ -185,8 +185,8 @@ test('live:init maakt stil een valide lokale-eerst en betalingen-uit configurati
       'RTG_MEDIA_S3_BUCKET=rtg-productie-media',
       'RTG_MEDIA_S3_KEY=fixture-access-key',
       'RTG_MEDIA_S3_SECRET=fixture-secret-key',
-      'TURN_URL=turns:turn.example.test:5349',
-      'TURN_SECRET=' + 't'.repeat(48),
+      'TURN_URL=turns:turn.rahultravelgroup.com:5349',
+      'TURN_SECRET=T9!relay-A7#tijdelijk-B4$geheim-C8%2026',
       ''
     ].join('\n'));
     const env = leesEnv(envPad);
@@ -194,7 +194,7 @@ test('live:init maakt stil een valide lokale-eerst en betalingen-uit configurati
       RTG_AI_UIT: '1', RTG_BETALEN_UIT: '1', RTG_HERSTEL_SMS_UIT_BEWUST: '1',
       RTG_ISOLATIE_AFDWINGEN: '1',
       RTG_TLS: '1', RTG_ACME: '1',
-      RTG_TLS_DOMAIN: 'app.example.test', RTG_PROXY_HOPS: '0'
+      RTG_TLS_DOMAIN: 'app.rahultravelgroup.com', RTG_PROXY_HOPS: '0'
     })) assert.equal(env[naam], waarde, naam);
     assert.equal(env.OFFICE_CODE, undefined,
       'live:init maakt geen gedeeld geheim voor een deur die productie weigert');

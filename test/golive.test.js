@@ -35,7 +35,9 @@ const PROD_ENV = {
      echte rail mag een betaling bevestigen. */
   RTG_BETALEN_UIT: '1', RTG_AI_UIT: '1', RTG_HERSTEL_SMS_UIT_BEWUST: '1',
   RTG_ISOLATIE_AFDWINGEN: '1',
-  TURN_URL: 'turns:turn.rtg.example:5349', TURN_SECRET: 't'.repeat(48),
+  STUN_PUBLIC_HOST: 'stun.rahultravelgroup.com',
+  STUN_URL: 'stun:stun.rahultravelgroup.com:3478',
+  TURN_URL: 'turns:turn.rahultravelgroup.com:5349', TURN_SECRET: 'T9!relay-A7#tijdelijk-B4$geheim-C8%2026',
   SMTP_URL: 'smtp://rtg:test@mail.voorbeeld.test:587',
   ERR_WEBHOOK_URL: 'https://alarm.voorbeeld.test/rtg',
   DATABASE_URL: '', REDIS_URL: '', SENTRY_DSN: '', STRIPE_SECRET_KEY: ''

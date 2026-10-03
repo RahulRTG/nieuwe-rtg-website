@@ -312,6 +312,12 @@ test('TURN-bewijs vereist twee netwerken, relay-only en echte bytes in beide ric
   const geenRelay = await bewijs.voer('realtime', null, basis({ env:{ APP_URL:'https://app.rtg.example' },
     meetExtern:async c => externeMeting(c,{ ...obs, selectedPairRelayOnly:false }) }));
   assert.equal(geenRelay.uitkomst, 'FAIL');
+  const zelfdeNetwerk = await bewijs.voer('realtime', null, basis({ env:{ APP_URL:'https://app.rtg.example' },
+    meetExtern:async c => externeMeting(c,{ ...obs, networkASNsHashed:['1'.repeat(64),'1'.repeat(64)] }) }));
+  assert.equal(zelfdeNetwerk.uitkomst, 'FAIL', 'twee meetpunten op hetzelfde netwerk zijn geen tweennetwerkbewijs');
+  const geenTerugweg = await bewijs.voer('realtime', null, basis({ env:{ APP_URL:'https://app.rtg.example' },
+    meetExtern:async c => externeMeting(c,{ ...obs, bytesBToA:65535 }) }));
+  assert.equal(geenTerugweg.uitkomst, 'FAIL');
 });
 
 test('imagescan bindt scanner, verse database en exacte image-digest aan de commit', () => {

@@ -98,6 +98,35 @@ test('de echte werkstromen voldoen aan alle vier de regels', () => {
   assert.deepEqual(controleer(map), []);
 });
 
+test('handmatige full-run en beschermd eindoordeel zijn fail-closed bedraad', () => {
+  const fs = require('node:fs');
+  const workflow = fs.readFileSync(path.join(__dirname, '..', '.github/workflows/ci.yml'), 'utf8');
+  const blok = naam => {
+    const m = workflow.match(new RegExp('^  ' + naam + ':\\n([\\s\\S]*?)(?=^  [a-zA-Z][\\w-]*:|$(?![\\s\\S]))', 'm'));
+    assert.ok(m, 'workflowjob bestaat: ' + naam);
+    return m[0];
+  };
+  assert.match(workflow, /workflow_dispatch:\n\s+inputs:\n\s+verwachte_commit:[\s\S]*?required: true/);
+  const preflight = blok('preflight');
+  assert.match(preflight, /ref:\s*\$\{\{ github\.sha \}\}/);
+  assert.match(preflight, /RTG_EXPECTED_COMMIT:\s*\$\{\{ inputs\.verwachte_commit \}\}/);
+  assert.ok(preflight.indexOf('evidence-control.js bind-source') < preflight.indexOf('evidence:plan'),
+    'de bronbinding hoort vóór het bewijsplan te staan');
+  assert.match(preflight, /RTG_FORCE_FULL:[^\n]*schedule[^\n]*workflow_dispatch[^\n]*'1'/,
+    'schedule en manual moeten beide aantoonbaar full afdwingen');
+
+  const oordeel = blok('test');
+  assert.match(oordeel, /needs:\s*\[[^\]]*keuringen[^\]]*\]/);
+  assert.match(oordeel, /needs:\s*\[[^\]]*schermen-oordeel[^\]]*\]/);
+  assert.match(oordeel, /--keuringen=\$\{\{ needs\.keuringen\.result \}\}/,
+    'alleen wachten is niet genoeg: het resultaat moet door de poort worden beoordeeld');
+  assert.match(oordeel, /--schermen=\$\{\{ needs\.schermen-oordeel\.result \}\}/,
+    'de volledige schermsuite moet door dezelfde beschermde poort worden beoordeeld');
+  const publiceren = blok('evidence-publish');
+  assert.match(publiceren, /workflow_dispatch[\s\S]*github\.ref == 'refs\/heads\/main'[\s\S]*mode == 'full'/,
+    'alleen een handmatige full-run op main mag een vertrouwd bewijsboek publiceren');
+});
+
 test('volledige bewijsconsumenten hangen niet transitief aan de overgeslagen incrementele route', () => {
   const fs = require('node:fs');
   const workflow = fs.readFileSync(path.join(__dirname, '..', '.github/workflows/ci.yml'), 'utf8');

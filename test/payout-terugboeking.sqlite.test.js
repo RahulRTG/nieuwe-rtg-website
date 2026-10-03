@@ -25,8 +25,17 @@ test('SQLite bewaart sleutel plus volledige projectie atomair en fail-closed bij
       const mist=await doe();
       sql.prepare('INSERT INTO economische_boekingen(sleutel,afdruk,antwoord) VALUES(?,?,?)').run(rij.sleutel,rij.afdruk,rij.antwoord);
       d.db.data.payBoekingen[0].ref='zelfde-id-andere-ref';d.save();
-      const drift=await doe();sql.close();
-      console.log(JSON.stringify({een,twee,mist,drift,werk,saldi:d.db.data.paySaldi}));
+      const drift=await doe();
+      sql.exec('BEGIN IMMEDIATE');
+      sql.prepare("UPDATE meta SET v=v+1 WHERE k='ver'").run();
+      const ver=Number(sql.prepare("SELECT v FROM meta WHERE k='ver'").get().v);
+      sql.prepare('UPDATE kv SET val=NULL,ver=?,deleted=1 WHERE key=?').run(ver,'paySaldi');
+      sql.exec('COMMIT');
+      let tombWerk=0;
+      const tomb=await d.economischeBoekingEenmaal({...i,
+        sleutel:'payout-terug:'+('c'.repeat(64)),afdruk:'d'.repeat(64)},()=>{tombWerk++;return {ok:true}});
+      sql.close();
+      console.log(JSON.stringify({een,twee,mist,drift,tomb,tombWerk,werk,saldi:d.db.data.paySaldi}));
     })().catch(e=>{console.error(e);process.exit(1)});`;
   try {
     const r = spawnSync(process.execPath, ['-e', code], { cwd: path.join(__dirname, '..'),
@@ -40,6 +49,8 @@ test('SQLite bewaart sleutel plus volledige projectie atomair en fail-closed bij
     assert.equal(uit.twee.herhaald, true);
     assert.equal(uit.mist.code, 'ECONOMISCHE_SLEUTEL_ONTBREEKT');
     assert.equal(uit.drift.code, 'ECONOMISCHE_PROJECTIE_ONTBREEKT');
+    assert.equal(uit.tomb.code, 'ECONOMISCHE_COLLECTIE_VERWIJDERD');
+    assert.equal(uit.tombWerk, 0, 'een economische bewerker draait niet boven een verwijderde projectie');
     assert.equal(uit.werk, 1);
     assert.deepEqual(uit.saldi, { extern: -110, lid: 110 });
   } finally { fs.rmSync(map, { recursive: true, force: true }); }

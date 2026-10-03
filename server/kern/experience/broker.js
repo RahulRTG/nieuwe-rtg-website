@@ -12,6 +12,8 @@ function fout(error, status, code, extra) { return { error, status, code, ...(ex
 
 module.exports = function maakBroker({ crypto, opslag, projecteer, contexten, kern, commit, network, trustPlane }) {
   const meting = require('./broker-meting')({ trustPlane, opslag });
+  const evidence = require('./broker-evidence')({ trustPlane, opslag, crypto });
+  const { contextVoor, bevoegd, velden } = require('./broker-grenzen')({ contexten });
   const handlers = {
     'attention.acknowledge': require('./action-attention')({ projecteer, opslag }),
     'schedule.item.create': require('./action-schedule')({ kern }),
@@ -19,25 +21,6 @@ module.exports = function maakBroker({ crypto, opslag, projecteer, contexten, ke
   };
   for (const action of Object.keys(require('../living-world/actions').definitions)) {
     handlers['living-world.' + action] = require('./action-living-world')({ kern, action });
-  }
-
-  function contextVoor(key, world, contextId) {
-    const context = contexten.kies(key, world, contextId);
-    if (!context || (contextId && context.id !== contextId))
-      return fout('Deze context hoort niet bij deze gebruiker en wereld.', 403, 'CONTEXT_NOT_ALLOWED');
-    return context;
-  }
-  function bevoegd(context, definition) {
-    const scope = new Set(context.authorityScope || []);
-    const mist = (definition.authority || []).filter(a => !scope.has(a));
-    return mist.length ? fout('Deze context geeft geen bevoegdheid voor de actie.', 403,
-      'AUTHORITY_DENIED', { requiredAuthority: mist }) : null;
-  }
-  function velden(definition, parameters) {
-    const p = parameters || {};
-    for (const naam of definition.required) if (p[naam] == null || p[naam] === '')
-      return fout('Verplicht veld ontbreekt: ' + naam + '.', 400, 'INVALID_INPUT');
-    return null;
   }
 
   function previewIntern(key, invoer, economicPrincipalRef) {
@@ -81,14 +64,7 @@ module.exports = function maakBroker({ crypto, opslag, projecteer, contexten, ke
       consequence: kopie(voorbereid.consequence)
     };
     opslag.previewZet(key, p);
-    if (trustPlane && typeof trustPlane.observe === 'function') try {
-      trustPlane.observe({ capability: 'experience.propose', boundary: 'actor:' + opslag.actor(key),
-        subjectRef: p.objectRef || { domain: 'experience', type: 'preview', id: p.id },
-        predicate: 'experience.preview.allowed', value: { intent: p.intent, world: p.world },
-        evidence: { intent: p.intent, version: p.version, policyInputHash: p.fingerprint },
-        policy: { id: p.policyDecision.policyId, version: p.policyDecision.policyVersion,
-          decision: p.policyDecision.decision } });
-    } catch (e) { /* shadow evidence mag de bestaande preview niet breken */ }
+    evidence.preview(key, p);
     return { ok: true, preview: p };
   }
 
@@ -149,15 +125,7 @@ module.exports = function maakBroker({ crypto, opslag, projecteer, contexten, ke
         policyDecision: p.policyDecision, confirmation: { confirmed: true, at },
         result: kopie(uitgevoerd.result || {})
       }, { ok: true, intent: p.intent, ...(uitgevoerd.result || {}), objectRef });
-      if (result && trustPlane && typeof trustPlane.observe === 'function') try {
-        trustPlane.observe({ capability: 'experience.propose', boundary: 'actor:' + opslag.actor(key),
-          subjectRef: objectRef || { domain: 'experience', type: 'preview', id: p.id },
-          predicate: 'experience.action.executed', value: { intent: p.intent },
-          evidence: { previewId: p.id, inputHash: p.fingerprint, idempotencyKeyHash:
-            crypto.createHash('sha256').update(idemKey).digest('hex') },
-          policy: { id: p.policyDecision.policyId, version: p.policyDecision.policyVersion,
-            decision: p.policyDecision.decision } });
-      } catch (e) { /* shadow evidence mag de domeincommit niet terugdraaien */ }
+      if (result) evidence.execute(key, p, objectRef, idemKey);
       return result || fout('De actie kon niet atomair worden afgerond.', 500, 'FINALIZATION_FAILED');
     });
   }

@@ -42,7 +42,9 @@ test.before(async () => {
     // sinds de sleutel-hardening (config fail-fast) eist een productiestart de
     // gedeelde kluis- en tokensleutel; zonder deze weigert de server te starten.
     RTG_VAULT_KEY: 'v'.repeat(64), RTG_SECRET_KEY: 's'.repeat(64),
-    TURN_URL: 'turns:turn.livegang.voorbeeld.test:5349', TURN_SECRET: 't'.repeat(48),
+    STUN_PUBLIC_HOST: 'stun.rahultravelgroup.com',
+    STUN_URL: 'stun:stun.rahultravelgroup.com:3478',
+    TURN_URL: 'turns:turn.rahultravelgroup.com:5349', TURN_SECRET: 'T9!relay-A7#tijdelijk-B4$geheim-C8%2026',
     RTG_ISOLATIE_AFDWINGEN: '1',
     /* Deze toets bewijst de schone productiestart, toegang en limiter, niet de
        providerketen. Geld staat daarom expliciet fail-closed uit. De aparte

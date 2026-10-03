@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-01T12:45:38.869Z",
-    "commit": "bb6d9cdd6",
+    "op": "2026-10-03T19:41:59.115Z",
+    "commit": "7e71dac65",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/mutatie.js",
@@ -12590,6 +12590,21 @@
         "testSha256": "5adb4f92b6b4b33a0c3152ffcff6104b139b83c51d5d75b44550a2709b10a62d"
       }
     },
+    "sqlite-audit-publicatie.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/db/audit-publicatie.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-09-06/kan-je-main-live-zetten/output/editorial-live-20261001/sqlite-mutation-proof-7e71-20261003/sqlite-audit-publicatie.test.js.evidence.json",
+        "sha256": "c9d449c326cf7108c82089348f7b26a0e0ee67c395f164456adb1b84ec6f517f",
+        "commit": "7e71dac6590996898d8d388f714bec737a5f7835",
+        "sourceSha256": "7d78a851b93fc7d828c6c9195485dba650ef6283bb6608585eea486ca9bd1ac5",
+        "testSha256": "ad3d245c2ed017e655056f30b796e4b18ac1ed3d4bac6c1112846fe650b4dc78"
+      }
+    },
     "sqlite-audit-rijen.test.js": {
       "soort": "gericht",
       "staat": "gezakt",
@@ -12633,6 +12648,21 @@
         "commit": "e9254cb184dd3b3ce4ef310d072bab9fb9c96210",
         "sourceSha256": "084276ae99b17eb87d9639273b7cfd5271eca6953e17ebf475c0fb214934d58b",
         "testSha256": "3b1f13998a6319183ef804ab43ff7062a3e6d4383463cf096e7f503d378542d7"
+      }
+    },
+    "sqlite-duurzaam-sync.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/db/sqlite-duurzaam.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 8,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-09-06/kan-je-main-live-zetten/output/editorial-live-20261001/sqlite-mutation-proof-7e71-20261003/sqlite-duurzaam-sync.test.js.evidence.json",
+        "sha256": "610ce4cf123bb0effd89a9ef51080ab8fdc248cffca66b9d847d2a7773b8a704",
+        "commit": "7e71dac6590996898d8d388f714bec737a5f7835",
+        "sourceSha256": "8f2c2d93b3268bf74c30fab88139ee6f13d444254a489da2a441c013fdfe4407",
+        "testSha256": "b334086d44d42bd3eed6ecc39c55f1b47d2d8dbdc033d197b64c205e962e8df5"
       }
     },
     "sqlite-poll-selectief.test.js": {

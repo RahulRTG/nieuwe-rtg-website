@@ -3,6 +3,7 @@
    zorgprofiel voor de chauffeur) en betaalRitVoor. Krijgt de gedeelde
    context een keer bij het opstarten vanuit kern/lidacties.js. */
 const subsidie = require('../commercie/subsidie');
+const ritreferentie = require('./ritreferentie');
 
 module.exports = (ctx) => {
   const { db, save, crypto, schoon, PERSONAS, findSupplier, ledenPrijs, optieAan,
@@ -59,8 +60,10 @@ function vraagRitVoor(session, body) {
   if (meters != null && meters > 200) km = Math.max(1, meters / 1000);
   const t = (s.settings && s.settings.tarief) || {};
   const quote = Math.round(Math.max(t.minimum || 0, (t.start || 0) + (t.perKm || 2.5) * km));
+  const ref = ritreferentie(db, crypto);
+  if (!ref) return { status: 503, error: 'Een unieke ritaanvraag maken lukt nu niet. Probeer het opnieuw.' };
   const ride = {
-    ref: 'RTG-R-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
+    ref,
     supplierCode: s.code, supplierName: s.name, type: s.type,
     customerTier: session.tier, customerKey: session.key, customerCodename: codename,
     from: schoon(body.from || 'Huidige locatie', 80),

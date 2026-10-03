@@ -10,6 +10,7 @@ const { DATA_DIR, STORE, besloten, beslotenMap } = require('./opslag');
 // hij veilig is en waarom geld er nooit door gaat.
 const voorcheck = require('./voorcheck');
 const externeCollecties = require('./sqlite-poll');
+const { collectieSleutels } = require('../opzet/begroting');
 const db = state.db;
 let auditMotorWaarde;
 function auditMotor() {
@@ -80,7 +81,7 @@ function saveSqlite(force, sleutels, extraAudit = [], duurzaam = false) {
   const gewijzigd = [];
   const nu = Date.now();
   let uitgesteld = false;
-  for (const k of sleutels || Object.keys(db.data)) {
+  for (const k of sleutels || collectieSleutels(db.data)) {
     if (auditSleutels.has(k) || audits.bezit(db.data, k)) continue;
     if (voorcheck.magOverslaan(k, db.data[k], force, nu)) { uitgesteld = true; continue; }
     const j = JSON.stringify(db.data[k]);

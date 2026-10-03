@@ -34,6 +34,71 @@ function proef(t) {
   return { ...opslag, conn, lees, dir };
 }
 
+test('volledige SQLite-scan leest actuele eigen collecties zonder de begrotingsproxy te enumereren', t => {
+  const p = proef(t), keys = Object.keys, data = p.db.data;
+  Object.setPrototypeOf(data, { geerfd: { geheim: true } });
+  Object.defineProperty(data, 'verborgen', { value: { geheim: true }, configurable: true });
+  data[Symbol('intern')] = { geheim: true };
+  let proxyScans = 0;
+  t.mock.method(Object, 'keys', value => {
+    if (value === data) proxyScans++;
+    return keys(value);
+  });
+  data.nieuw = { waarde: 1 }; p.save();
+  data.nieuw.waarde = 2;
+  data.later = [3]; p.save();
+  assert.deepEqual(p.lees('nieuw'), { waarde: 2 }, 'ook nested wijzigingen blijven authoritative');
+  assert.deepEqual(p.lees('later'), [3], 'geen gecachete sleutellijst die nieuwe collecties mist');
+  assert.equal(p.conn.prepare("SELECT count(*) n FROM kv WHERE key IN ('geerfd','verborgen')").get().n, 0);
+  assert.equal(proxyScans, 0, 'de bekende wikkel voegt geen descriptorval per collectie toe');
+});
+
+function toegangSchrijvers(p) {
+  const schaduw = require('../server/kern/commercie/schaduw').maakSchaduw(p);
+  const gids = require('../server/kern/gids')({ ...p, liveCodename: s => s.codename,
+    ledenGidsActief: () => false });
+  return { weeg: () => schaduw.weeg('toegang', 'controle', { wie: 'lid' }),
+    raak: cn => gids.dirTouch({ key: 'lid', tier: 'rtg', codename: cn }) };
+}
+
+test('toegangswaarneming en ledengids bewaren alleen hun eigen collectie', t => {
+  const p = proef(t); p.db.data.memberDir = {}; p.save();
+  const s = toegangSchrijvers(p);
+  let scans = 0;
+  Object.defineProperty(p.db.data.ander, 'toJSON', { value() { scans++; return { waarde: this.waarde }; } });
+  p.db.data.ander.waarde = 8;
+  assert.equal(s.weeg().door, true);
+  s.raak('Eerste naam'); s.raak('Nieuwe naam');
+  assert.equal(p.lees('schaduwregels').toegang.waarnemingen, 1);
+  assert.equal(p.lees('schaduwregels').toegang.zouTegenhouden, 1);
+  assert.deepEqual(p.lees('memberDir').lid, { codename: 'Nieuwe naam', tier: 'rtg' });
+  assert.equal(p.lees('ander').waarde, 1, 'toegangscontrole publiceert geen vreemde lopende mutatie');
+  assert.equal(scans, 0);
+  p.save(); assert.equal(p.lees('ander').waarde, 8, 'de brede expliciete save blijft volledig');
+});
+
+test('toegangsschrijvers behouden volledige bundel en falen vóór bevestiging bij opslagfout', async t => {
+  const p = proef(t); p.db.data.memberDir = {}; p.save();
+  const s = toegangSchrijvers(p), proto = DatabaseSync.prototype, exec = proto.exec;
+  let fail = true;
+  t.mock.method(proto, 'exec', function(sql) {
+    if (sql === 'COMMIT' && fail) { fail = false; throw new Error('toegangscommit mislukt'); }
+    return exec.call(this, sql);
+  });
+  assert.throws(() => s.raak('Bevestigd'), /toegangscommit/);
+  assert.deepEqual(p.lees('memberDir'), {});
+  assert.deepEqual(p.db.data.memberDir, {}, 'een retry met dezelfde naam moet nog schrijven');
+  await p.bijeen(() => {
+    s.raak('Bevestigd'); s.weeg();
+    p.db.data.ander.waarde = 9; p.save();
+    assert.deepEqual(p.lees('memberDir'), {});
+    assert.equal(p.lees('ander').waarde, 1);
+  }, { duurzaam: true });
+  assert.equal(p.lees('memberDir').lid.codename, 'Bevestigd');
+  assert.equal(p.lees('schaduwregels').toegang.waarnemingen, 1);
+  assert.equal(p.lees('ander').waarde, 9);
+});
+
 test('beide echte auditmiddlewares bewaren hun keten zonder vreemde collecties te lezen', t => {
   const p = proef(t);
   let gelezen = 0;

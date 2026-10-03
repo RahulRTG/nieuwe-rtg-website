@@ -29,9 +29,16 @@ module.exports = ({ db, save, liveCodename, ledenGidsActief, ledenGidsHaal, lede
     if (!db.data.memberDir) return;
     const cur = db.data.memberDir[sess.key];
     if (!cur || cur.codename !== cn || cur.tier !== sess.tier) {
-      if (!cur && ledenAantalCache != null) ledenAantalCache++; // nieuw lid: teller ophogen
       db.data.memberDir[sess.key] = { codename: cn, tier: sess.tier };
-      save();
+      try {
+        if (save.sleutels) save.sleutels(['memberDir']); else save();
+      } catch (e) {
+        // Een mislukte write mag dezelfde login niet als al opgeslagen lezen.
+        if (cur) db.data.memberDir[sess.key] = cur;
+        else delete db.data.memberDir[sess.key];
+        throw e;
+      }
+      if (!cur && ledenAantalCache != null) ledenAantalCache++;
     }
   }
 

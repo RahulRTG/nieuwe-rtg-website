@@ -90,6 +90,26 @@ const op = (naam) => {
   return gevonden;
 };
 
+test('een bestemmingsmutatie breekt de route, zonder commentaar of gewone tekst te veranderen', () => {
+  const bron = "/* '/api/voorbeeld' */ const tekst='apps 3'; fetch('/api/werk');";
+  const na = muteer(bron, op('route-doel-weg'));
+  const gezien = [];
+  new Function('fetch', na)(pad => gezien.push(pad));
+  assert.deepEqual(gezien, ['/__rtg_mutatie__/api/werk']);
+  assert.ok(na.startsWith("/* '/api/voorbeeld' */ const tekst='apps 3';"));
+  assert.equal(muteer("const tekst='gewone uitleg';", op('route-doel-weg')), null);
+});
+
+test('een browserexportmutatie ontneemt de API en houdt de JavaScript geldig', () => {
+  const bron = 'w.RTGProef = { start() { return 7; } };';
+  const voor = {}, na = {};
+  new Function('w', bron)(voor);
+  new Function('w', muteer(bron, op('browser-export-weg')))(na);
+  assert.equal(voor.RTGProef.start(), 7);
+  assert.equal(na.RTGProef, undefined);
+  assert.equal(muteer('// w.RTGProef = {};', op('browser-export-weg')), null);
+});
+
 test('getal+1 verhoogt het eerste getal in CODE met een', () => {
   assert.equal(muteer('const cap = 5;', op('getal+1'), 0), 'const cap = 6;');
   assert.equal(muteer('const a = 0; const b = 9;', op('getal+1'), 1), 'const a = 0; const b = 10;',

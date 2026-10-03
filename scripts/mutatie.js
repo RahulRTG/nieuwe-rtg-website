@@ -114,6 +114,18 @@ const NIET_MUTEREN = new Map([
    Elke operator werkt op de bron ZONDER commentaar en tekenreeksen mee te
    rekenen, want een verandering in een uitlegregel bewijst niets. */
 const OPERATOREN = [
+  // Bestemmingen en publieke browser-API's zijn ook gedrag. Een ontbrekende
+  // route of export is een echte regressie, ook als geen conditie verandert.
+  { naam: 'browser-export-weg', zoek: /\b((?:window|w)\.RTG\w+\s*=\s*)(?!=)/, zet: '$1undefined && ' },
+  {
+    naam: 'route-doel-weg',
+    vind: bron => {
+      let tokens; try { tokens = require('./ast/lexer').lex(bron); } catch (e) { return []; }
+      return tokens.filter(t => t.type === 'string' && /^['"]\/(?:api|apps)\//.test(t.value))
+        .map(t => ({ start: t.start, eind: t.end }));
+    },
+    maak: tekst => tekst[0] + '/__rtg_mutatie__' + tekst.slice(1)
+  },
   { naam: 'true->false', zoek: /\breturn true\b/, zet: 'return false' },
   { naam: 'false->true', zoek: /\breturn false\b/, zet: 'return true' },
   { naam: '===->!==', zoek: /===/, zet: '!==' },

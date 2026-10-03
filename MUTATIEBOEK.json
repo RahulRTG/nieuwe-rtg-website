@@ -1,14 +1,14 @@
 {
  "stempel": {
-  "op": "2026-10-01T15:14:24.828Z",
-  "commit": "8be959d5a",
-  "boomVuil": false,
-  "boomAnders": 15,
+  "op": "2026-10-03T20:57:53.802Z",
+  "commit": "c4f3118d2",
+  "boomVuil": true,
+  "boomAnders": 10,
   "instrument": "scripts/mutatieboek.js",
   "node": "v24.18.0"
  },
  "uitleg": "Elke route van de router valt in precies een bak, met de reden waarom hij niet verder komt in de keten. De optelling van de bakken is gelijk aan het totaal; dat is de toets, en niet een van de getallen. Zie de kop van scripts/mutatieboek.js. Dit boek beoordeelt geen enkele route.",
- "vastgelegd": "2026-10-01",
+ "vastgelegd": "2026-10-03",
  "gemeten": {
   "routesTotaal": 5381,
   "mutaties": 5282,
@@ -28,7 +28,7 @@
  },
  "bewijsgraad": {
   "metingGebruikt": false,
-  "metingReden": "de meting is van commit 387b942c5 en HEAD staat op 8be959d5a; een meting van een andere stand is geen grond voor een status",
+  "metingReden": "de meting is van commit 387b942c5 en HEAD staat op c4f3118d2; een meting van een andere stand is geen grond voor een status",
   "metingGemetenOp": "2026-09-29T18:39:11.935Z",
   "perGraad": [
    {

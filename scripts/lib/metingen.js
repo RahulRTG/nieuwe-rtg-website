@@ -124,6 +124,26 @@ const REGISTER = {
   'SCHERMGEDRAG.json': { eigenRatel: 'test/codewereld.test.js' },
   'SCHERMROUTES.json': { eigenRatel: 'test/codewereld.test.js' },
   'SEMANTIEK.json': { eigenRatel: 'test/semantiek.test.js' },
+  /* Bestaande tegenproeven: collectiegrenzen inclusief vergeetpad-uitzonderingen,
+     werkelijk bestaande beloftedekking en de vaste Rust-migratietrechter.
+     Dit claimt geen weigermodus in productie, volledige beloftecorrectheid of
+     voltooide Rust-migraties. De handhavers toetsen precies die grenzen. */
+  'BEGROTING.json': { eigenRatel: 'test/begrotingsgrenzen.test.js' },
+  'BELOFTE.json': { eigenRatel: 'test/belofte.test.js' },
+  'RUST-MIGRATIES.json': { eigenRatel: 'scripts/rust-migraties.js' },
+  /* Geen nieuw bewijs over oude rondes: deze ratels verhinderen tegenstrijdige
+     bewijsclaims in de opgeslagen uitkomst. SUITE mag eerlijk rood blijven;
+     onbekende herkomst, ontbrekende schakels en niet-gereden routes blijven
+     onbekend. Versheid en kandidaatbinding worden hiermee niet bewezen. SLO
+     bewaakt de bestaande afspraak dat de gepubliceerde doelen en sonde gelijk
+     zijn aan de machineconfiguratie. Elke regel heeft een negatieve proef. */
+  'SLO.json': { eigenRatel: 'scripts/registerratels.js' },
+  'SUITE.json': { eigenRatel: 'scripts/registerratels.js' },
+  'HANDELINGPROEF.json': { eigenRatel: 'scripts/registerratels.js' },
+  'KERNHERKOMST.json': { eigenRatel: 'scripts/registerratels.js' },
+  'SCHRIJFANALYSE.json': { eigenRatel: 'scripts/registerratels.js' },
+  'WAAROM.json': { eigenRatel: 'scripts/registerratels.js' },
+  'VERTROUWEN.json': { eigenRatel: 'scripts/registerratels.js' },
   'AUDITPROEF.json': { eigenRatel: 'scripts/registerratels.js' },
   'MUTATIEBOEK.json': { eigenRatel: 'scripts/registerratels.js' },
   'ONBEWEZEN.json': { eigenRatel: 'scripts/registerratels.js' },

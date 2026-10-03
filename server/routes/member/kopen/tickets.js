@@ -77,7 +77,7 @@ app.post('/api/transfer/aanvraag', auth, (req, res) => {
     return res.status(409).json({ error: 'Er staat al een transfer voor dit ticket.' });
   const prijs = s.transfer.prijs || 0;
   const codename = liveCodename(req.session);
-  const ref = require('../../../kern/lidacties/ritreferentie')(db, crypto);
+  const ref = require('../../../kern/lidacties/ritreferentie')(db.data.rides, crypto);
   if (!ref) return res.status(503).json({ error: 'Een unieke ritaanvraag maken lukt nu niet. Probeer het opnieuw.' });
   const ride = {
     ref,

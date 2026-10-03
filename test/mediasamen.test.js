@@ -169,6 +169,9 @@ test('4b. en dat geldt ook als het stuk gewoon BESTAAT -- maar niet voor hem', a
 });
 
 test('5. gaat de gastheer weg, dan gaat de kamer dicht', async () => {
+  const voor = await api('/api/mediaos/samen/mijn', {}, vriend.token);
+  assert.equal(voor.body.kamers.length, 1);
+  assert.equal(voor.body.kamers[0].id, kamerId, 'de deelnemer ziet deze kamer vóór de gastheer vertrekt');
   assert.equal((await api('/api/mediaos/samen/uit', { id: kamerId }, gastheer.token)).status, 200);
   const na = await api('/api/mediaos/samen/in', { id: kamerId }, vriend.token);
   assert.equal(na.status, 404, 'een kamer zonder gastheer blijft niet als lege wachtkamer staan');

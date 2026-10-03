@@ -34,13 +34,14 @@ on:
   workflow_dispatch:
     inputs:
       scope:
-        description: Volledige ronde, prestatieschuld of kandidaatgebonden outputproef
+        description: Volledige ronde, prestatieschuld of kandidaatgebonden output- of mutatieproef
         type: choice
         default: full
         options:
           - full
           - performance
           - outputproof
+          - mutationproof
       candidate:
         description: Volledige kandidaat-SHA; afzonderlijk van de workflow/runner-revisie
         type: string
@@ -81,6 +82,12 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  mutationproof:
+    if: github.event_name == 'workflow_dispatch' && inputs.scope == 'mutationproof'
+    uses: ./.github/workflows/mutationproof.yml
+    with:
+      candidate: ${{ inputs.candidate }}
+
   output-plan:
     name: Outputproef — bron en volledige journals verifiëren
     if: github.event_name == 'workflow_dispatch' && inputs.scope == 'outputproof'

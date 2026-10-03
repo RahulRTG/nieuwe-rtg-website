@@ -515,7 +515,6 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     'server/kern/fiscaal/index.js',
     'server/kern/vergeten.js',
     'server/opzet/diensten2.js',
-    'server/opzet/leverancierpoort.js',
     'public/apps/app-main/app-main-09a.js',
     'public/shared/teamcall/teamcall-01.js',
     /* server/db/postgres-verzoeken.js STOND HIER en is er weer af: de naad die
@@ -3422,6 +3421,7 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['test/saveduurzaam.test.js', 'de toets die bewijst dat hij bevestigt'],
     ['test/sqlite-duurzaam-sync.test.js', 'bewijst FULL vóór dezelfde atomaire commit, fouten zonder schijnsucces en duurzame herhaling zonder dubbel effect'],
     ['test/sqlite-audit-publicatie.test.js', 'bewijst dat onpubliceerbare auditresultaten vóór de duurzame commit worden geweigerd, zodat vastgelegd werk niet als mislukt terugkomt'],
+    ['test/ritreferentie.test.js', 'bewijst verse ritidentiteit, idempotente herhaling en actor-isolation via de echte duurzame SQLite-geldboeking'],
     ['test/sqlite-audit-rijen.test.js', 'bewijst dat auditrijen dezelfde duurzame bundel delen en niet tweemaal worden gecommit'],
     ['test/sqlite-audit-selectief.test.js', 'bewijst dat selectieve sessieopslag, een andere domeinmutatie en audit samen in dezelfde duurzame bundel worden bevestigd'],
     ['test/notitiesduurzaam.test.js', 'de toets die bewijst dat het bord niet bevestigt zonder opslag'],

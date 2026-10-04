@@ -80,7 +80,7 @@ test('de techniekpagina toont het SSO-clientgeheim alleen als stand, en roteert 
     await rij.locator('input[type="password"]').fill(TWEEDE);
     await rij.locator('input[type="number"]').fill('99');
     await rij.locator('button', { hasText: 'Roteren' }).click();
-    await page.waitForFunction(() => /overlap is 0 tot 30/.test(document.querySelector('#toast').textContent), null, { timeout: 15000 });
+    await page.waitForFunction(() => /overlap is 0 tot 7/.test(document.querySelector('#toast').textContent), null, { timeout: 15000 });
     assert.equal(await rij.locator('input[type="password"]').inputValue(), '', 'ook na een weigering is het veld leeg');
     await rij.locator('input[type="number"]').fill('7');
 

@@ -102,11 +102,11 @@ test('publieke website houdt tekst, inhoud en Edge binnen alle schermranden',
             'Edge houdt een tastbare zijmarge op ' + viewport.width);
           await bar.getByRole('button', { name: 'Werelden', exact: true }).click();
           const paneel = await page.locator('.rtg-adaptive-sheet').boundingBox();
-          const balk = await bar.boundingBox();
+          assert.equal(await bar.isVisible(),false,'the expanded surface replaces the compact bar');
           assert.ok(paneel.x >= vak.x - 1 && paneel.x + paneel.width <= vak.x + vak.width + 1,
             'wereldpaneel blijft binnen de Edge op ' + viewport.width);
-          assert.ok(paneel.y >= -1 && paneel.y + paneel.height <= balk.y + 17,
-            'wereldpaneel blijft tussen bovenrand en navigatie op ' + viewport.width);
+          assert.ok(paneel.y >= -1 && paneel.y + paneel.height <= viewport.height - 5,
+            'het ene wereldpaneel blijft binnen de schermranden op ' + viewport.width);
           await page.keyboard.press('Escape');
         }
       }

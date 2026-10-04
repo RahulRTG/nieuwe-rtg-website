@@ -86,7 +86,9 @@ function maakSchaduw({ db, save, nu }) {
         wat: w.wat == null ? null : String(w.wat).slice(0, 120) });
       if (r.voorbeelden.length > VOORBEELDEN) r.voorbeelden.length = VOORBEELDEN;
     }
-    save();
+    // Een toegangswaarneming commit geen werk uit andere domeinen. Binnen een
+    // open bundel bewaart deze bestaande poort nog steeds alles samen.
+    if (save.sleutels) save.sleutels(['schaduwregels']); else save();
 
     if (r.modus === MODUS.SCHADUW) return { door: true, modus: r.modus, gemeten: true, zouTegenhouden: !!bezwaar };
     return { door: !bezwaar, modus: r.modus, gemeten: true, bezwaar: bezwaar || null };

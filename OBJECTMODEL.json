@@ -2,16 +2,16 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-10-04",
   "gemeten": {
-    "bestanden": 2720,
-    "vormen": 1566,
-    "velden": 2246,
-    "modules": 864,
-    "domeinen": 307,
+    "bestanden": 2732,
+    "vormen": 1567,
+    "velden": 2249,
+    "modules": 866,
+    "domeinen": 308,
     "envelopDrempel": 19,
     "envelop": 29,
-    "veldenDomeineigen": 1571,
-    "veldenGedeeldVanafVier": 229,
-    "gelijkendeVormparen": 23
+    "veldenDomeineigen": 1570,
+    "veldenGedeeldVanafVier": 230,
+    "gelijkendeVormparen": 25
   },
   "envelop": [
     "aantal",
@@ -214,6 +214,18 @@
       ]
     },
     {
+      "veld": "aan",
+      "domeinen": 13,
+      "waar": [
+        "kern/afdelingen",
+        "kern/command",
+        "kern/geldbeleid",
+        "kern/klok",
+        "kern/lidboard",
+        "kern/pay"
+      ]
+    },
+    {
       "veld": "categorie",
       "domeinen": 13,
       "waar": [
@@ -250,15 +262,27 @@
       ]
     },
     {
-      "veld": "aan",
+      "veld": "land",
+      "domeinen": 13,
+      "waar": [
+        "bedrijf",
+        "kern/commercie",
+        "kern/concern",
+        "kern/labfonds",
+        "kern/ledenbalie-inzage",
+        "kern/livinglab"
+      ]
+    },
+    {
+      "veld": "besluit",
       "domeinen": 12,
       "waar": [
-        "kern/afdelingen",
-        "kern/command",
-        "kern/geldbeleid",
-        "kern/klok",
-        "kern/lidboard",
-        "kern/pay"
+        "kern/aanmeldingen",
+        "kern/appstore",
+        "kern/commercie",
+        "kern/gemeente",
+        "kern/labfonds",
+        "kern/ledenbalie-zaken"
       ]
     },
     {
@@ -346,18 +370,6 @@
       ]
     },
     {
-      "veld": "land",
-      "domeinen": 12,
-      "waar": [
-        "bedrijf",
-        "kern/commercie",
-        "kern/concern",
-        "kern/labfonds",
-        "kern/ledenbalie-inzage",
-        "kern/livinglab"
-      ]
-    },
-    {
       "veld": "rol",
       "domeinen": 12,
       "waar": [
@@ -382,15 +394,15 @@
       ]
     },
     {
-      "veld": "besluit",
-      "domeinen": 11,
+      "veld": "bewijs",
+      "domeinen": 12,
       "waar": [
-        "kern/aanmeldingen",
-        "kern/appstore",
-        "kern/commercie",
-        "kern/gemeente",
-        "kern/labfonds",
-        "kern/ledenbalie-zaken"
+        "kern/horeca",
+        "kern/invoer",
+        "kern/leerhuis",
+        "kern/livinglab",
+        "kern/magnaat-controle",
+        "kern/magnaat-trainingslobby-acties"
       ]
     },
     {
@@ -502,27 +514,15 @@
       ]
     },
     {
-      "veld": "bewijs",
+      "veld": "grond",
       "domeinen": 11,
       "waar": [
-        "kern/horeca",
-        "kern/invoer",
-        "kern/leerhuis",
-        "kern/livinglab",
-        "kern/magnaat-controle",
-        "kern/magnaat-trainingslobby-acties"
-      ]
-    },
-    {
-      "veld": "klaar",
-      "domeinen": 10,
-      "waar": [
-        "kern/afdelingen",
-        "kern/beveiliging",
-        "kern/borden",
-        "kern/eten",
-        "kern/magnaat-partnerstudio-basis",
-        "kern/muziek"
+        "kern/connect",
+        "kern/economie",
+        "kern/factuurcorrectie",
+        "kern/identiteit",
+        "kern/kosten",
+        "kern/neiging"
       ]
     }
   ],
@@ -631,6 +631,25 @@
         "vaardigheden",
         "voertuig",
         "vogGeldigTot"
+      ]
+    },
+    {
+      "gelijkenis": 0.91,
+      "a": "server/kern/reisbureau-betaling.js",
+      "b": "server/kern/reisbureau-teruggave.js",
+      "domeinA": "kern/reisbureau-betaling",
+      "domeinB": "kern/reisbureau-teruggave",
+      "gedeeld": [
+        "bedragCenten",
+        "bewijs",
+        "bronObject",
+        "economischeEigenaar",
+        "economischeHerkomst",
+        "grond",
+        "land",
+        "naarWie",
+        "relatie",
+        "valuta"
       ]
     },
     {
@@ -858,6 +877,21 @@
         "gratis",
         "nr",
         "prijsCenten"
+      ]
+    },
+    {
+      "gelijkenis": 0.6,
+      "a": "server/kern/reisbureau-betaling.js",
+      "b": "server/kern/reisbureau-teruggave.js",
+      "domeinA": "kern/reisbureau-betaling",
+      "domeinB": "kern/reisbureau-teruggave",
+      "gedeeld": [
+        "aan",
+        "economischeHerkomst",
+        "grond",
+        "hoe",
+        "uitgevoerd",
+        "valuta"
       ]
     },
     {

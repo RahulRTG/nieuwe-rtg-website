@@ -187,6 +187,10 @@ const LEZERS = {
     wat: 'verkochte kaartjes per tijdslot, voor de drukte-uitloop op een knooppunt',
     tedoen: '`b.paid` zonder `refunded` ernaast; gaan tickets om, dan blijft een teruggestort kaartje ' +
       'publiek op straat zetten dat er niet is' },
+  'server/routes/supplier/tickets-verkoop.js': { collectie: 'tickets', soort: 'grendel', stand: 'wacht',
+    wat: 'de deurverkoop: een herhaling met dezelfde sleutel neemt de vastgehouden plek (`!t.paid`)',
+    tedoen: 'leest `paid` alleen om een eigen, nog onbetaalde vasthouding terug te vinden; gaan tickets om, ' +
+      'dan mag een teruggestort kaartje (paid, refunded) daar nooit voor een open vasthouding doorgaan' },
   'server/routes/member/kopen/tickets.js': { collectie: ['tickets', 'rides'], soort: 'grendel', stand: 'wacht',
     wat: 'de eigen kaartjes van een lid, de betaalstand van de transferrit, en de grendel op een transfer zonder betaald ticket',
     tedoen: 'drie plekken: de lijst en de grendel sluiten `refunded` niet uit, en de transferrit toont ' +

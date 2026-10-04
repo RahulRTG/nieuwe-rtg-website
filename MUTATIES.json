@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-04T15:45:45.370Z",
-    "commit": "cefaafba6",
+    "op": "2026-10-04T16:01:52.749Z",
+    "commit": "63916f6cb",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -4231,8 +4231,11 @@
     },
     "foundation-lescredential.pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "gezakt",
+      "module": "server/pg/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "foundation-lescredential.test.js": {
       "soort": "puur",
@@ -5107,8 +5110,11 @@
     },
     "gezinsuitnodiging.pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "gezakt",
+      "module": "server/pg/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "gezinzorg.test.js": {
       "soort": "server",

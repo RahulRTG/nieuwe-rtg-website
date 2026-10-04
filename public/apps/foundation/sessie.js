@@ -28,10 +28,25 @@
      alleen als hash bestaat (server/foundation/gezinstoken.js), en wie hem hier
      weggooit zonder hem in te trekken laat een geldige sessie achter. Stil en
      zonder te wachten: een mislukte intrekking verloopt vanzelf. */
+  /* Afmelden sluit de sessie op de server. Een bewaarde WISSEL-sessie (zie
+     wissel() hieronder) gaat mee: die is ook een sessie van dit apparaat. */
   function afmelden(s) {
-    if (!s || !s.code || !s.token) return;
-    try { fetch('/api/foundation/gezin/sessie/intrek', { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code: s.code, token: s.token }) }).catch(function () {}); } catch (e) {}
+    if (!s || !s.code) return;
+    [s.token, s.wissel].forEach(function (t) {
+      if (!t) return;
+      try { fetch('/api/foundation/gezin/sessie/intrek', { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: s.code, token: t }) }).catch(function () {}); } catch (e) {}
+    });
+  }
+  /* Profiel WISSELEN (B18): de lopende sessie blijft als `wissel` bewaard tot het
+     volgende profiel met zijn eigen pincode binnen is; zo hoeft niemand de lange
+     gezinscode opnieuw over te typen. De nieuwe sessie eindigt waar deze eindigt
+     (de server verlengt bij wisselen niets), en daarna meldt index.html de
+     bewaarde af. */
+  function wissel(ss) {
+    if (!ss) return;
+    if (ss.token && !ss.wissel) ss.wissel = ss.token;
+    delete ss.token; delete ss.profiel;
   }
   function api(p, b) {
     return fetch('/api/foundation' + p, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b || {}) })
@@ -69,7 +84,7 @@
         (beheer ? '<a href="beheer.html" style="padding:.65rem .85rem;border:1px solid #4a463d;border-radius:0;color:#f6f1e7;text-decoration:none">Leeftijd instellen</a>' : '') + '</div>') + '</div>';
     var wissel = el.querySelector('[data-rtf-wissel]');
     if (wissel) wissel.onclick = function () {
-      var ss = lees(); if (ss) { afmelden(ss); delete ss.token; delete ss.profiel; localStorage.setItem(KEY, JSON.stringify(ss)); }
+      var ss = lees(); if (ss) { wissel(ss); localStorage.setItem(KEY, JSON.stringify(ss)); }
     };
     try { if (!el.open) el.showModal(); } catch (e) {}
     return el;
@@ -124,7 +139,9 @@ function opKleur(hex) {
     huidig: lees,
     actief: function () { var s = lees(); return !!(s && s.code && s.token); },
     zet: schrijf,
-    wisProfiel: function () { var s = lees(); if (s) { afmelden(s); delete s.token; delete s.profiel; schrijf(s); } },
+    wisProfiel: function () { var s = lees(); if (s) { wissel(s); schrijf(s); } },
+    /* na een geslaagde wissel: de bewaarde sessie afmelden en vergeten */
+    wisselKlaar: function () { var s = lees(); if (s && s.wissel) { afmelden({ code: s.code, token: s.wissel }); delete s.wissel; schrijf(s); } },
     uitloggen: function () { afmelden(lees()); schrijf(null); },
     naam: function () { var s = lees(); return (s && s.profiel && s.profiel.naam) || ''; },
     /* De deur van de RTFoundation.

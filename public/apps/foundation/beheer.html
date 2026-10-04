@@ -20,7 +20,7 @@
   .blok h2{font-family:var(--serif);font-weight:500;font-size:1.15rem;margin-bottom:.2rem;}
   .blok .h{color:var(--zacht);font-size:.85rem;margin-bottom:1rem;line-height:1.4;}
   .codepaneel{display:flex;align-items:center;gap:.8rem;justify-content:space-between;flex-wrap:wrap;background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;padding:.9rem 1.1rem;}
-  .codepaneel .code{font-size:1.5rem;font-weight:700;letter-spacing:.28em;color:var(--rtg-leesgoud,var(--goud));}
+  .codepaneel .code{font-size:1.05rem;font-weight:700;letter-spacing:.04em;word-break:break-all;color:var(--rtg-leesgoud,var(--goud));}
   .plist{display:flex;flex-direction:column;gap:.6rem;}
   .prow{display:flex;align-items:center;gap:.8rem;background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;padding:.6rem .8rem;}
   .prow .av{width:2.4rem;height:2.4rem;border-radius:0;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
@@ -36,6 +36,7 @@
   select.veld{appearance:none;}
   .rijknop{display:flex;gap:.6rem;flex-wrap:wrap;}
   .rijknop.los{margin-top:1rem;}
+  #uDeel[hidden]{display:none;}
   .h.los{margin-top:.7rem;}
   .fout{color:var(--rood-tekst);font-size:.85rem;min-height:1.1rem;}
   .ok{color:var(--groen);font-size:.85rem;min-height:1.1rem;}
@@ -64,8 +65,11 @@
 
   <div class="kaart blok">
     <h2>Jullie gezinscode</h2>
-    <div class="h">Dit is het adres van jullie gezin. Inloggen vraagt daarnaast altijd ieders eigen pincode; nieuwe volwassenen koppelen alleen via een persoonlijke uitnodiging.</div>
-    <div class="codepaneel"><span class="code" id="uCode">------</span><button class="knop grijs klein" id="uDeel">Kopieer</button></div>
+    <div class="h">Met de gezinscode en ieders eigen pincode komt een gezinslid binnen. Wij bewaren alleen een vingerafdruk van de code: hij staat hier één keer, direct na het maken. Kwijt? Maak een nieuwe; de oude werkt dan niet meer. Nieuwe volwassenen koppelen alleen via een persoonlijke uitnodiging.</div>
+    <div class="codepaneel"><span class="code" id="uCode">Verborgen</span><button class="knop grijs klein" id="uDeel" hidden>Kopieer</button></div>
+    <div class="h" id="uStand"></div>
+    <div class="rijknop los"><button class="knop grijs klein" id="uNieuw">Nieuwe gezinscode</button><button class="knop rood klein" id="uIntrek">Gezinscode intrekken</button></div>
+    <div class="fout" id="uFout"></div>
   </div>
 
   <div class="kaart blok">
@@ -188,11 +192,10 @@ $('#dRol').addEventListener('change', ()=>{ $('#rolhint').hidden = $('#dRol').va
 })();
 
 async function laad(){
-  const d = await fetch('/api/foundation/gezin/'+s.code+'/mij?token='+encodeURIComponent(s.token)).then(r=>r.json());
+  const d = await fetch('/api/foundation/gezin/'+s.code+'/mij',{headers:{Authorization:'Bearer '+s.token}}).then(r=>r.json());
   if (d.error || !d.profiel){ location.href='index.html'; return; }
   if (!d.profiel.beheerder){ document.querySelector('.wrap').innerHTML='<h1>Alleen de beheerder</h1><p class="zin">Alleen de beheerder van het gezin kan hier profielen en berichten beheren. <a href="index.html" style="color:var(--rtg-leesgoud,var(--goud))">Terug naar de app</a>.</p>'; return; }
   Sessie.balk($('#balk'), { terug:'index.html', terugTekst:'← Terug' });
-  $('#uCode').textContent = s.code;
   $('#zin').textContent = 'Beheer het gezin "' + d.gezin.naam + '". Voeg profielen toe en houd iedereen op de hoogte.';
   // profielen
   PROFIELEN = d.profielen;
@@ -339,7 +342,6 @@ async function verwijder(id){
 }
 document.querySelectorAll('[data-sluit]').forEach(b=> b.onclick=e=> e.target.closest('dialog').close());
 
-$('#uDeel').onclick=async()=>{ try{ await navigator.clipboard.writeText(s.code); $('#uDeel').textContent='Gekopieerd!'; setTimeout(()=>$('#uDeel').textContent='Kopieer',1500); }catch(e){ alert('Gezinscode: '+s.code); } };
 
 async function stuur(soort){
   $('#bOk').textContent=''; $('#bFout').textContent='';
@@ -383,6 +385,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>
 <script src="beheer-sessies.js" defer></script>
+<script src="beheer-gezinscode.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>
 <script src="/shared/randen.js" defer></script>

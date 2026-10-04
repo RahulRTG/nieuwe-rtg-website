@@ -36,15 +36,28 @@
     chats: function () { return fetch(S.base + '/gezin/' + S.code + '/chats', { headers: { Authorization: 'Bearer ' + S.token } }).then(function (r) { return r.json(); }); },
     // bellen
     bel: function (naarId, video) { beginGesprek(naarId, video); },
-    stop: function () { try { if (es) es.close(); } catch (e) {} eindeGesprek(false); }
+    stop: function () { clearTimeout(wacht); try { if (es) es.close(); } catch (e) {} es = null; eindeGesprek(false); }
   };
 
+  /* De sessie gaat niet in de URL (B18): eerst een eenmalig stroomticket van een
+     minuut met de sessie in de header. Verbindt de browser vanzelf opnieuw, dan
+     is dat ticket al op (401) en sluit EventSource; dan halen we een nieuw. */
+  var wacht = null;
   function verbind() {
     try { if (es) es.close(); } catch (e) {}
-    es = new EventSource(S.base + '/gezin/' + S.code + '/kanaal?token=' + encodeURIComponent(S.token));
-    es.addEventListener('chat', function (e) { try { var d = JSON.parse(e.data); if (onChat) onChat(d); } catch (x) {} });
-    es.addEventListener('bel', function (e) { try { opBelsignaal(JSON.parse(e.data)); } catch (x) {} });
-    es.onerror = function () { /* de browser verbindt vanzelf opnieuw (retry) */ };
+    es = null; clearTimeout(wacht);
+    var token = S.token;
+    fetch(S.base + '/gezin/stroom/ticket', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      body: JSON.stringify({ code: S.code, kanaal: 'gezin' }) })
+      .then(function (r) { return r.ok ? r.json() : (r.status === 403 ? 'weg' : null); })
+      .then(function (t) {
+        if (t === 'weg' || token !== S.token) return;
+        if (!t || !t.ticket) { wacht = setTimeout(verbind, 30000); return; }
+        es = new EventSource(S.base + '/gezin/' + S.code + '/kanaal?ticket=' + encodeURIComponent(t.ticket));
+        es.addEventListener('chat', function (e) { try { var d = JSON.parse(e.data); if (onChat) onChat(d); } catch (x) {} });
+        es.addEventListener('bel', function (e) { try { opBelsignaal(JSON.parse(e.data)); } catch (x) {} });
+        es.onerror = function () { if (es && es.readyState === 2) { es = null; wacht = setTimeout(verbind, 3000); } };
+      }, function () { wacht = setTimeout(verbind, 10000); });
   }
 
   /* ---------- WebRTC bellen ---------- */

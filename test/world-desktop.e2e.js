@@ -136,7 +136,7 @@ test('Foundation widgets read the chosen family profile without a paid member ac
   const family = await post('/api/foundation/gezin/maak', { gezinsnaam: 'Desktop gezin', naam: 'Ouder', pin: '1234', bevoegdGezin: true, privacyAkkoord: true }, null);
   await post('/api/foundation/gezin/agenda', { code: family.code, token: family.token, titel: 'Samen wandelen', datum: new Date().toLocaleDateString('sv-SE'), tijd: '16:00' }, null);
   const child = await post('/api/foundation/gezin/profiel/maak', { code: family.code, token: family.token, naam: 'Milan', rol: 'kind', geboortedatum: '2015-04-04', pin: '5678' }, null);
-  const chosen = await post('/api/foundation/gezin/profiel/kies', { code: family.code, profielId: child.profiel.id, pin: '5678' }, null);
+  const chosen = await post('/api/foundation/gezin/profiel/kies', { gezinscode: family.gezinscode, profielId: child.profiel.id, pin: '5678' }, null);
   family.token = chosen.token; family.profiel = chosen.profiel;
   const ctx = await context(null), page = await ctx.newPage();
   await ctx.addInitScript(f => localStorage.setItem('rtf_sessie', JSON.stringify({ code: f.code, token: f.token, profiel: f.profiel })), family);

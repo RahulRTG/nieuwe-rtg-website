@@ -17,13 +17,14 @@
      profiel (LEVEN.md par. 2), en een token is geen plek voor wie hij is;
    - een sessie is geen eenmalige code: max_gebruik 0 = NIET GETELD. Wat haar
      begrenst is de vervaltijd, het plafond per profiel, de epoch en intrekken;
-   - GELDIG_MS 30 dagen. De gezinsapp draait op een thuisapparaat en een kind
-     logt in met de gezinscode en een eigen pincode; een maand is lang genoeg om
-     dat niet elke dag te vragen en kort genoeg dat een vergeten apparaat (een
-     logeeradres, de telefoon van een oppas) vanzelf dichtgaat. Het oude token
-     verliep nooit, dus dit is voor iedereen smaller dan het was. KANAAL_MS 12
-     uur: de RTG-app van een gekoppelde oppas vraagt het kanaal opnieuw op met
-     zijn eigen ingelogde RTG-account, dus een werkdag is genoeg;
+   - GELDIG_MS 7 dagen (besluit B19, 4 oktober 2026; was 30). Wie binnen die
+     termijn met zijn passkey bevestigt, krijgt opnieuw 7 dagen
+     (./gezinsdeur.js, /gezin/sessie/verleng); zonder passkey is het daarna
+     opnieuw inloggen met gezinscode en pincode. Nooit langer dan 7 dagen per
+     stap: geef() kapt elke termijn af, en reden() telt ook vanaf issued_at,
+     zodat een sessie van voor B19 (30 dagen op schijf) na 7 dagen ophoudt.
+     KANAAL_MS 12 uur: de RTG-app van een gekoppelde oppas vraagt het kanaal
+     opnieuw op met zijn eigen ingelogde RTG-account, dus een werkdag is genoeg;
    - de EPOCH: een nieuwe pincode, een andere rol, ontkoppelen of een beheerder
      die "overal afmelden" kiest hoogt hem op (sluit()), en dan valt elke sessie
      van dat profiel tegelijk weg;
@@ -37,7 +38,7 @@
 
 const klok = require('../lib/klok');
 
-const GELDIG_MS = 30 * 86400000;
+const GELDIG_MS = 7 * 86400000;
 const KANAAL_MS = 12 * 3600000;
 const MAX_SESSIES = 8;
 const DOEL = 'gezinsprofiel-sessie';
@@ -68,6 +69,7 @@ function maak({ crypto, nu = () => klok.datum().toISOString() }) {
   function reden(g, p, t) {
     const r = bearer.reden(t, { doel: DOEL, scope: SCOPE, negeerGebruik: true });
     if (r) return r;
+    if (!(Date.parse(t.issued_at) + GELDIG_MS > Date.parse(nu()))) return 'verlopen';
     const o = t.onderwerp || {};
     if (o.gezin !== g.code || o.profiel !== p.id || o.rol !== rolVan(p) || o.epoch !== epoch(p)) return 'onderwerp';
     return null;
@@ -89,12 +91,18 @@ function maak({ crypto, nu = () => klok.datum().toISOString() }) {
 
   /* De houder roteert zijn EIGEN sessie: de gebruikte valt weg, een nieuwe komt
      een keer terug. Niemand roteert de sessie van een ander -- dan kreeg de
-     beheerder de sleutel van zijn kind in handen; hij kan hem wel intrekken. */
-  function roteer(g, raw) {
+     beheerder de sleutel van zijn kind in handen; hij kan hem wel intrekken.
+     ROTEREN VERLENGT NIET (B19): de nieuwe sessie houdt het einde van de oude,
+     anders was elke zevende dag roteren een eeuwige sessie zonder passkey.
+     Alleen `verleng` (na een passkeybevestiging, ./gezinsdeur.js) geeft weer
+     een volle termijn -- en een gast nooit: zijn kanaal blijft 12 uur. */
+  function roteer(g, raw, { verleng } = {}) {
     const h = zoek(g, raw);
-    if (!h) return null;
-    bearer.intrekken(h.t, 'houder', 'geroteerd');
-    return geef(g, h.p);
+    if (!h || (verleng && h.p.rol === 'gast')) return null;
+    const rest = Date.parse(h.t.expires_at) - Date.parse(nu());
+    if (!(rest > 0)) return null;
+    bearer.intrekken(h.t, 'houder', verleng ? 'verlengd' : 'geroteerd');
+    return geef(g, h.p, { geldigMs: verleng ? GELDIG_MS : rest });
   }
   function intrek(g, raw) {
     const h = zoek(g, raw);
@@ -126,7 +134,17 @@ function maak({ crypto, nu = () => klok.datum().toISOString() }) {
     const rij = (p && Array.isArray(p.sessies) ? p.sessies : []).filter(levend);
     return { apparaten: rij.length, laatstUitgegeven: rij.map(t => t.issued_at).sort().pop() || null };
   }
-  return { geef, zoek, vind, roteer, intrek, sluit, ruimOud, overzicht,
+  /* Leeft de sessie met deze hash nog op dit profiel? Voor een open live-stroom
+     (./gezinsstroom.js): die controleert bij elke hartslag, zodat afmelden,
+     intrekken en verlopen ook een lopende verbinding sluiten. */
+  function leeft(g, profielId, codeHash) {
+    const p = g && g.profielen && Object.prototype.hasOwnProperty.call(g.profielen, profielId) ? g.profielen[profielId] : null;
+    let hit = null;
+    for (const t of (p && Array.isArray(p.sessies) ? p.sessies : []))
+      if (bearer.zelfdeHash(t && t.code_hash, codeHash)) hit = t;
+    return !!(hit && !reden(g, p, hit));
+  }
+  return { geef, zoek, vind, roteer, intrek, sluit, ruimOud, overzicht, leeft,
     DOEL, SCOPE, GELDIG_MS, KANAAL_MS, MAX_SESSIES };
 }
 

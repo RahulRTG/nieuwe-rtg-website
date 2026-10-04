@@ -104,7 +104,7 @@ if (window.RTGUitvoer) RTGUitvoer.bron(function () {
 
 async function laadDoelen(){
   try{
-    const d = await fetch('/api/foundation/gezin/'+s.code+'/spaardoelen?token='+encodeURIComponent(s.token)).then(r=>r.json());
+    const d = await fetch('/api/foundation/gezin/'+s.code+'/spaardoelen',{headers:{Authorization:'Bearer '+s.token}}).then(r=>r.json());
     const box = $('#doelen');
     DOELEN = d.spaardoelen || [];
     if (!d.spaardoelen || !d.spaardoelen.length){ box.innerHTML = '<div class="leeg">Nog geen spaardoel. Begin er hieronder een; klein mag ook.</div>'; return; }

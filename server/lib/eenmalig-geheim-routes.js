@@ -148,7 +148,11 @@ const ROUTES = new Set([
      antwoorden draagt een VERSE gezinssessie die daarna alleen als hash bestaat. */
   'POST /api/foundation/gezin/maak', 'POST /api/foundation/gezin/inloggen',
   'POST /api/foundation/gezin/profiel/kies', 'POST /api/foundation/gezin/uitnodiging/accepteer',
-  'POST /api/foundation/gezin/sessie/roteer', 'POST /api/rtf/kanaal'
+  'POST /api/foundation/gezin/sessie/roteer', 'POST /api/rtf/kanaal',
+  /* De gezinsdeur (B18/B19, foundation/gezinsdeur.js): een nieuwe gezinscode, een
+     eenmalig stroomticket en een verlengde sessie staan elk alleen in dit antwoord. */
+  'POST /api/foundation/gezin/code/roteer', 'POST /api/foundation/gezin/stroom/ticket',
+  'POST /api/foundation/gezin/sessie/verleng'
 ]);
 
 const isEenmalig = (methode, pad) => ROUTES.has(

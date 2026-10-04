@@ -91,7 +91,7 @@ let data = null, gekozen = null;
 
 async function laad(){
   try{
-    data = await fetch('/api/foundation/gezin/'+s.code+'/gezondheid?token='+encodeURIComponent(s.token)).then(r=>r.json());
+    data = await fetch('/api/foundation/gezin/'+s.code+'/gezondheid',{headers:{Authorization:'Bearer '+s.token}}).then(r=>r.json());
     if (data.error) throw new Error(data.error);
     // allergiekaart
     $('#allergie').innerHTML = data.allergie

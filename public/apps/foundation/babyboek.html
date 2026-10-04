@@ -315,7 +315,7 @@ async function laad(){
 /* de jarigenstrook: het album leest de verjaardagen-app alleen mee */
 async function laadJarigen(){
   try {
-    const d = await fetch('/api/foundation/gezin/' + encodeURIComponent(s.code) + '/verjaardagen?token=' + encodeURIComponent(s.token)).then(r => r.json());
+    const d = await fetch('/api/foundation/gezin/' + encodeURIComponent(s.code) + '/verjaardagen',{headers:{Authorization:'Bearer '+s.token}}).then(r => r.json());
     const komend = (d.mensen || []).filter(m => m.dagenTot <= 30).slice(0, 3);
     $('#jarigen').innerHTML = komend.map(m =>
       '<div class="jarig"><span>' + (m.vandaag ? 'Vandaag jarig: <b>' + esc(m.naam) + '</b>'

@@ -65,6 +65,8 @@ const ZWARE_ACTIES = Object.freeze([
   'connection.table.manage',    // POST /api/office/rendezvous/tafel/*
   'connection.safety.report.read', // GET /api/vonk/meldingen en /api/member/rendezvous/meldingen
   'kantoor-binnen',             // POST /api/account/start  (rol kantoor, in productie; kern/kantoor/productiedeur.js)
+  'gezin-passkey-koppel',       // POST /api/rtf/gezin/passkey  (B19: eigen passkey aan het eigen gezinsprofiel)
+  'gezin-sessie-verleng',       // POST /api/foundation/gezin/sessie/verleng  (B19: zeven dagen erbij, foundation/gezinsdeur.js)
   'passkey-weg'                 // POST /api/webauthn/weg
 ]);
 

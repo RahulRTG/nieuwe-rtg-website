@@ -72,7 +72,7 @@ test('family photo uploads, gallery, cancel and profile switches use only the se
   async function family(route,body){return api('/api/foundation/gezin/'+route,body,null);}
   const made=await family('maak',{gezinsnaam:'Eigen beelden',naam:'Ouder',pin:'1234',bevoegdGezin:true,privacyAkkoord:true});assert.equal(made.status,200);const parent=made.body;
   const child=await family('profiel/maak',{code:parent.code,token:parent.token,naam:'Milan',rol:'kind',geboortedatum:'2015-04-04',pin:'5678'});assert.equal(child.status,200);
-  const selected=await family('profiel/kies',{code:parent.code,profielId:child.body.profiel.id,pin:'5678'});assert.equal(selected.status,200);
+  const selected=await family('profiel/kies',{gezinscode: parent.gezinscode,profielId:child.body.profiel.id,pin:'5678'});assert.equal(selected.status,200);
   const session={code:parent.code,token:selected.body.token,profiel:selected.body.profiel}, other={code:parent.code,token:parent.token};
   const ctx=await browser.newContext({viewport:{width:390,height:932},serviceWorkers:'block',reducedMotion:'reduce'});
   await ctx.addInitScript(({session,first})=>{localStorage.setItem('rtg_lang','nl');localStorage.setItem('rtg_cookieinfo_v1','1');localStorage.setItem('rtg_member_token',first);localStorage.setItem('rtf_sessie',JSON.stringify(session));},{session,first});

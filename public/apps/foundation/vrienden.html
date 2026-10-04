@@ -322,6 +322,7 @@
 <script src="/apps/util.js"></script>
 <script src="/shared/glyf.js" defer></script>
 <script src="sessie.js"></script>
+<script src="/shared/gezinsstroom.js"></script>
 <script src="/apps/translate.js"></script>
 <!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
 <script src="/shared/uitvoer.js"></script>
@@ -1057,12 +1058,13 @@ function opSociaal(d){
   else if(d.kind==='snap'){ meld('Nieuwe snap'); if(!document.querySelector('.ov.open')) laad(); }
   else if(!document.querySelector('.ov.open')) laad();
 }
+/* De sessie gaat niet in de URL (B18): /shared/gezinsstroom.js vraagt eerst een
+   eenmalig stroomticket en haalt bij elke herverbinding een nieuw. */
 function startStream(){
-  try{
-    const es=new EventSource('/api/rtf/social/stream?code='+encodeURIComponent(s.code)+'&token='+encodeURIComponent(s.token));
-    es.addEventListener('call', e=>{ try{ opBelsignaal(JSON.parse(e.data)); }catch(x){} });
-    es.addEventListener('social', e=>{ try{ opSociaal(JSON.parse(e.data)); }catch(x){} });
-  }catch(e){}
+  if(!window.RTGGezinsstroom) return;
+  RTGGezinsstroom.open({ code:s.code, token:s.token, kanaal:'sociaal',
+    url:(t,sinds)=>'/api/rtf/social/stream?code='+encodeURIComponent(s.code)+'&ticket='+t+(sinds?'&since='+sinds:''),
+    op:{ call:e=>{ try{ opBelsignaal(JSON.parse(e.data)); }catch(x){} }, social:e=>{ try{ opSociaal(JSON.parse(e.data)); }catch(x){} } } });
 }
 
 laad();

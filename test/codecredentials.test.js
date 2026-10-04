@@ -174,10 +174,11 @@ test('de lescredentials van onderwijs zijn gemigreerd en staan niet meer blijven
   }
 });
 
-/* B17 (29 september 2026): het gezinsprofieltoken is gemigreerd. Zijn consumers
-   staan niet meer in NOG_GESLOTEN; de gezinsdeur zelf (gezinscode plus PIN) blijft
-   dicht onder foundation.family_profile_access, en dat staat er eerlijk bij. */
-test('het gezinsprofieltoken is gemigreerd, en de gezinsdeur zelf niet', () => {
+/* B17 (29 september 2026): het gezinsprofieltoken is gemigreerd. B18 (4 oktober
+   2026): de gezinsdeur zelf ook -- de gezinscode is 128 bits en hash-only, en de
+   social-stream opent met een eenmalig stroomticket. Geen van beide staat nog in
+   NOG_GESLOTEN, en de controls zeggen het. */
+test('het gezinsprofieltoken en de gezinsdeur zelf zijn gemigreerd', () => {
   const register = poort.lees();
   const uit = poort.controleer(register);
   const d = register.deuren.find(x => x.id === 'foundation.family_profile_token_buiten_harde_poort');
@@ -187,16 +188,41 @@ test('het gezinsprofieltoken is gemigreerd, en de gezinsdeur zelf niet', () => {
   for (const b of ['test/gezinstoken.test.js', 'test/gezinssessie.test.js',
     'test/foundation-gezinstoken-productie.test.js', 'test/gezinsuitnodiging.pg.test.js'])
     assert.ok(d.bewijs.includes(b), b);
-  assert.equal(d.controls.gezinsdeur_zelf_gemigreerd, false, 'de gezinscode plus PIN is niet gemigreerd, en dat staat er');
+  assert.equal(d.controls.gezinsdeur_zelf_gemigreerd, true, 'de gezinsdeur is sinds B18 gemigreerd, en dat staat er');
   assert.ok(String(d.notitie).length >= 200);
   const vrijgave = require('../server/middleware/foundation-productiepoort');
   for (const route of poort.effectieveRoutes(d)) {
     const [methode, pad] = route.split(' ');
-    if (pad.startsWith('/api/foundation/gezin/')) continue;
     assert.equal(vrijgave.isNogGeslotenCredentialroute(methode, pad, {}), false, route + ' hoort niet meer in NOG_GESLOTEN');
   }
-  assert.equal(register.deuren.find(x => x.id === 'foundation.family_profile_access').status, 'closed');
-  assert.equal(vrijgave.isNogGeslotenCredentialroute('POST', '/api/foundation/gezin/inloggen', {}), true);
+  const deur = register.deuren.find(x => x.id === 'foundation.family_profile_access');
+  assert.equal(deur.status, 'migrated');
+  assert.equal(deur.release_blocker, false);
+  assert.ok(!uit.blockers.some(x => x.id === deur.id));
+  assert.equal(deur.controls.entropy_bits, 128);
+  for (const c of ['geen_sessie_in_url', 'oude_zes_tekencode_opent_niets', 'rem_per_ip_en_per_gezin',
+    'stroomticket_eenmalig_en_per_kanaal', 'sessie_zeven_dagen_verlengen_met_passkey'])
+    assert.equal(deur.controls[c], true, c);
+  for (const b of ['test/gezinsdeur.test.js', 'test/gezinscode.test.js', 'test/gezinsdeur.pg.test.js'])
+    assert.ok(deur.bewijs.includes(b), b);
+  assert.ok(Array.isArray(deur.restrisico) && deur.restrisico.length >= 3, 'wat niet af is, staat er');
+  for (const route of ['POST /api/foundation/gezin/maak', 'POST /api/foundation/gezin/inloggen',
+    'POST /api/foundation/gezin/profiel/kies', 'POST /api/foundation/gezin/code/roteer',
+    'POST /api/foundation/gezin/stroom/ticket', 'GET /api/foundation/gezin/:code/kanaal', 'GET /api/rtf/social/stream',
+    'POST /api/foundation/gezin/sessie/verleng', 'POST /api/rtf/gezin/passkey'])
+    assert.ok(poort.REQUIRED_ROUTES.includes(route) && poort.effectieveRoutes(deur).includes(route), route + ' hoort bewaakt te zijn');
+  for (const route of poort.effectieveRoutes(deur)) {
+    const [methode, pad] = route.split(' ');
+    assert.equal(vrijgave.isNogGeslotenCredentialroute(methode, pad, {}), false, route + ' staat nog in NOG_GESLOTEN');
+  }
+  const { ROUTES } = require('../server/lib/eenmalig-geheim-routes');
+  for (const route of ['POST /api/foundation/gezin/maak', 'POST /api/foundation/gezin/code/roteer',
+    'POST /api/foundation/gezin/stroom/ticket', 'POST /api/foundation/gezin/sessie/verleng'])
+    assert.ok(ROUTES.has(route), route + ' staat buiten elke antwoordcache');
+  /* Fail-closed: zet de deur terug op closed of haal een control weg, en de proef ziet het. */
+  const terug = JSON.parse(JSON.stringify(register));
+  terug.deuren.find(x => x.id === deur.id).controls.hash_only_at_rest = false;
+  assert.ok(poort.controleer(terug).fouten.some(f => f.includes('foundation.family_profile_access') && f.includes('hash_only_at_rest')));
 });
 
 /* B10 (27 september 2026): de gedeelde kantoorcode is in productie gesloten. Dat
@@ -311,7 +337,7 @@ test('iedere resterende deur blokkeert de release', () => {
   for (const id of ['rtfoundation.club_portaal', 'rtfoundation.stadsraad_partner',
     'rtfos.legacy_organisatieportalen', 'travelos.mobility_deelcode',
     'livinglab.labpas', 'livinglab.labpaspoort',
-    'foundation.les_leraar_en_deelnemer', 'foundation.family_profile_access',
+    'foundation.les_leraar_en_deelnemer',
     'foundation.school_access_credentials', 'foundation.sport_stadium_ticket']) {
     assert.ok(!uit.blockers.some(x => x.id === id), id + ' is in productie hard gesloten');
     assert.equal(poort.lees().deuren.find(x => x.id === id).status, 'closed');

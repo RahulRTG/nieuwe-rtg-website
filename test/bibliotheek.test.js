@@ -25,7 +25,7 @@ test.before(async () => {
   assert.ok(gast);
   gezin = (await api(base, '/api/foundation/gezin/maak', { gezinsnaam: 'Biebgezin', naam: 'Mam', pin: '1234' })).body;
   const kp = (await api(base, '/api/foundation/gezin/profiel/maak', { code: gezin.code, token: gezin.token, naam: 'Fee', rol: 'kind', groep: 'kind' })).body;
-  kind = (await api(base, '/api/foundation/gezin/profiel/kies', { code: gezin.code, profielId: kp.profiel.id })).body;
+  kind = (await api(base, '/api/foundation/gezin/profiel/kies', { gezinscode: gezin.gezinscode, profielId: kp.profiel.id })).body;
 });
 test.after(() => stop(srv && srv.child));
 

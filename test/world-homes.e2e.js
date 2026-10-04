@@ -140,7 +140,7 @@ test('a Foundation child keeps personal tabs and all apps in the standard Edge, 
   const family = await post('/api/foundation/gezin/maak', { gezinsnaam: 'Testgezin', naam: 'Ouder', pin: '1234', bevoegdGezin: true, privacyAkkoord: true });
   await post('/api/foundation/gezin/agenda', { code: family.code, token: family.token, titel: 'Samen wandelen', datum: new Date().toISOString().slice(0, 10), tijd: '16:00' });
   const child = await post('/api/foundation/gezin/profiel/maak', { code: family.code, token: family.token, naam: 'Milan', rol: 'kind', geboortedatum: '2015-04-04', pin: '5678', kleur: '#3A7BD5' });
-  const chosen = await post('/api/foundation/gezin/profiel/kies', { code: family.code, profielId: child.profiel.id, pin: '5678' });
+  const chosen = await post('/api/foundation/gezin/profiel/kies', { gezinscode: family.gezinscode, profielId: child.profiel.id, pin: '5678' });
   const ctx = await context(null, { code: family.code, token: chosen.token, profiel: chosen.profiel }), page = await ctx.newPage();
   try {
     await open(page, routes[2]);

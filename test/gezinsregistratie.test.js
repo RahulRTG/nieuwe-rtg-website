@@ -26,10 +26,10 @@ test.after(() => {
 });
 
 test('code plus eigen PIN opent direct één profiel en een foute PIN toont geen namen', async () => {
-  const fout = await f('/gezin/inloggen', { code:gezin.code, pin:'0000' });
+  const fout = await f('/gezin/inloggen', { gezinscode:gezin.gezinscode, pin:'0000' });
   assert.equal(fout.status, 403);
   assert.equal((await fout.text()).includes('Beheerder'), false);
-  const goed = await json(await f('/gezin/inloggen', { code:gezin.code, pin:'2468' }));
+  const goed = await json(await f('/gezin/inloggen', { gezinscode:gezin.gezinscode, pin:'2468' }));
   assert.equal(goed.profiel.naam, 'Beheerder');
   assert.ok(goed.token);
   assert.equal(goed.profielen, undefined);

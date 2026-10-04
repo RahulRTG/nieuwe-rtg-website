@@ -69,7 +69,7 @@ test.before(async () => {
 
   const g = (await fapi('/gezin/maak', { gezinsnaam: 'De Laatsten', naam: 'Ouder', pin: '2468' })).body;
   const kind = (await fapi('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Sem', rol: 'kind' })).body.profiel;
-  const kt = (await fapi('/gezin/profiel/kies', { code: g.code, profielId: kind.id })).body.token;
+  const kt = (await fapi('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: kind.id })).body.token;
   G = { code: g.code, token: g.token, kindId: kind.id, kt };
   assert.ok(zaak && lid && G.code, 'de zaak, het lid en het gezin staan klaar');
 });
@@ -107,11 +107,15 @@ test('2. de leskamer en het gezinskanaal doen hetzelfde bij de deur', async () =
   assert.equal(doc.status, 200, 'de begeleider komt binnen');
   assert.match(doc.type, /text\/event-stream/);
 
-  // het gezinskanaal: alleen met een geldig profieltoken van dat gezin
-  assert.equal((await stroom('/api/foundation/gezin/' + G.code + '/kanaal?token=verzonnen')).status, 403);
-  assert.equal((await stroom('/api/foundation/gezin/ZZZZ/kanaal?token=' + G.token)).status >= 400, true,
-    'een gezinscode die niet bestaat');
-  const kan = await stroom('/api/foundation/gezin/' + G.code + '/kanaal?token=' + G.token);
+  /* het gezinskanaal: alleen met een eenmalig stroomticket van een geldige
+     sessie van dat gezin (B18); de sessie zelf in de URL opent niets meer */
+  assert.equal((await stroom('/api/foundation/gezin/' + G.code + '/kanaal?ticket=verzonnen')).status, 401);
+  assert.equal((await stroom('/api/foundation/gezin/' + G.code + '/kanaal?token=' + G.token)).status, 401,
+    'de sessie in de URL');
+  const ticket = async () => (await fapi('/gezin/stroom/ticket', { code: G.code, token: G.token, kanaal: 'gezin' })).body.ticket;
+  assert.equal((await stroom('/api/foundation/gezin/ZZZZ/kanaal?ticket=' + await ticket())).status >= 400, true,
+    'een gezin dat niet bestaat');
+  const kan = await stroom('/api/foundation/gezin/' + G.code + '/kanaal?ticket=' + await ticket());
   assert.equal(kan.status, 200, 'het eigen gezin komt binnen');
   assert.match(kan.type, /text\/event-stream/);
 });
@@ -149,7 +153,7 @@ test('3. het schrift is van de leerling die erin schrijft', async () => {
 });
 
 test('4. de knoppen van een kind bedient een ouder, en alleen van eigen kind', async () => {
-  const profielen = (await fetch(base + '/api/foundation/gezin/' + G.code + '/mij?token=' + G.kt).then(r => r.json()));
+  const profielen = (await fetch(base + '/api/foundation/gezin/' + G.code + '/mij', { headers: { Authorization: 'Bearer ' + G.kt } }).then(r => r.json()));
   kindHandle = (profielen.profiel || profielen).handle || (profielen.profiel || profielen).codenaam;
 
   for (const pad of ['/api/rtf/social/kind/boardroom/zetveel', '/api/rtf/social/kind/boardroom/herstel']) {

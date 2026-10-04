@@ -101,6 +101,13 @@ const REQUIRED_ROUTES = [
   'POST /api/supplier/vracht/volgcode/intrek', 'POST /api/vracht/volg',
   'POST /api/werkvloer/koppel/code',
   'POST /api/foundation/gezin/inloggen', 'POST /api/foundation/gezin/profiel/kies',
+  // de gezinsdeur (B18/B19): uitgifte, rotatie, intrekken, stroomticket en verlengen
+  'POST /api/foundation/gezin/maak', 'POST /api/foundation/gezin/uitnodiging/accepteer',
+  'POST /api/foundation/gezin/code/roteer', 'POST /api/foundation/gezin/code/intrek',
+  'GET /api/foundation/gezin/:code/gezinscode', 'POST /api/foundation/gezin/stroom/ticket',
+  'GET /api/foundation/gezin/:code/kanaal', 'GET /api/rtf/social/stream',
+  'POST /api/foundation/gezin/sessie/verleng', 'POST /api/foundation/gezin/passkey/weg',
+  'POST /api/rtf/gezin/passkey',
   'POST /api/foundation/school/personeel/inlog/accepteer',
   'POST /api/foundation/school/koppel',
   'POST /api/supplier/bezichtiging/beslis', 'POST /api/vastgoed/keyless',

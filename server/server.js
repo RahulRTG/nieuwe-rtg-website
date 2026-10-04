@@ -788,11 +788,9 @@ const salonClaimcode = require('./kern/salon-claimcode')({
 const afhaalcode = require('./kern/afhaalcode')({ db, bewerkCollectie, crypto });
 const tickettoegang = require('./kern/tickettoegang')({ db, save, bewerkCollectie, crypto,
   oudeRijen: () => ({ boekingen: db.data.boekingen, posSales: db.data.posSales }) });
-/* PostgreSQL neemt pas asynchroon over (startPostgresMetSalon); de lokale
-   migraties draaien na Samen. */
+// PostgreSQL neemt asynchroon over; lokaal migreert na Samen.
 const startPostgresMetSalon = () => {
-  /* opslagstart roept deze ingang voor elke motor aan. Een lokale standby mag
-     daardoor niet via de inerte Postgres-tak ten onrechte "gemigreerd" worden. */
+  // per motor aangeroepen: een lokale standby migreert niet via de Postgres-tak
   if (STORE !== 'postgres') return Promise.resolve(false);
   salonMigratieKlaar = false;
   rtfSamenMigratieKlaar = false;
@@ -806,6 +804,7 @@ const startPostgresMetSalon = () => {
       throw new Error('TravelOS boarding-passmigratie ontbreekt bij de opslagstart.');
     await kern.lucht.migreerBoardingPasses();
     await kern.bedrijf.migreerSleutels(bewerkCollectie);
+    await kern.partnerOudeCodes.migreerOudeCodes();
   })).then(gestart => {
     salonMigratieKlaar = true;
     rtfSamenMigratieKlaar = true;
@@ -1513,12 +1512,7 @@ function findPartner(code) {
   return db.data.partners.find(p => p.code === code) || null;
 }
 
-/* De personeelscode zoekt niet meer hier (raw, lineair): hij is een 128-bit
-   credential per medewerker in kern/partnerpersoneelscode.js (B14). */
-
-
-
-
+// Personeelscode: kern/partnerpersoneelscode.js (B14; oude codes weg, B21).
 
 /* ================= LEVERANCIER-KANAAL =================
    Eén app voor alle leverancierstypes. Communiceert live (SSE) met de
@@ -2410,9 +2404,8 @@ require('./opzet/kernlaag6b')(kern, hulp);
 require('./opzet/kernlaag7')(kern, hulp);
 require('./opzet/kernlaag7b')(kern, hulp);   // de routers ophangen; zie de kop daar waarom dat NA alle Object.assign moet
 
-/* JSON/SQLite/geheugen zijn al geladen: verwijder oude kale codes (Salon,
-   Samen, boarding, WerkOS) vóór verkeer. Lokaal commit dat synchroon, anders
-   weigert de start. */
+/* JSON/SQLite/geheugen geladen: oude kale codes (Salon, Samen, boarding,
+   WerkOS, B21 partnerpersoneel) weg vóór verkeer; lokaal synchroon of niet starten. */
 /* Een losse server migreert vóór listen(); een trio-standby pas in
    /api/cluster/promote, na zijn verse load() (fail-closed, geen crashlus). */
 if (STORE !== 'postgres' && db.writable) migreerLokaleToegang();
@@ -2439,6 +2432,8 @@ function migreerLokaleToegang() {
     boardingPassMigratieKlaar = true;
     if (kern.bedrijf.migreerSleutels(bewerkCollectie) instanceof Promise)
       throw new Error('Lokale WerkOS-sleutelmigratie committe niet synchroon.');
+    if (kern.partnerOudeCodes.migreerOudeCodes() instanceof Promise)
+      throw new Error('Lokale B21-migratie (oude personeelscodes) committe niet synchroon.');
   }
 }
 

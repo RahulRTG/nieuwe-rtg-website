@@ -66,7 +66,7 @@
     const sd = await s.json().catch(() => ({}));
     if (!s.ok && sd.bevestigingNodig && sd.bevestiging && !bewijs) {
       await laad('RTGPasskey', 'passkey');
-      const b = window.RTGPasskey ? await RTGPasskey.bevestig(() => sd.bevestiging) : { fout: 'De passkey kon hier niet starten.' };
+      const b = window.RTGPasskey ? await RTGPasskey.bevestig(() => sd.bevestiging) : { fout: T('pd.passkeyStart', 'De passkey kon hier niet starten.') };
       if (b && !b.fout) return kantoorMetAccount(lt, pin, b);
       if ($('#kaFout')) $('#kaFout').textContent = (b && b.fout) || T('pd.mis', 'Er ging iets mis.');
       return;

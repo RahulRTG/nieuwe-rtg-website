@@ -29,7 +29,7 @@
     "inlineStijlAttributen": 4541,
     "kernBreedsteBestand": 71,
     "kernBreedte": 1682,
-    "kernGedeeld": 254,
+    "kernGedeeld": 255,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 51,
     "keuringDubbeling": 178,
@@ -4001,6 +4001,15 @@
       "meter": "bewijsAlleenKeten 18 -> 24 (gemeten op een schone boom; het ingecheckte register stond nog op 18 terwijl main vers al 21 meet). Op uitdrukkelijk besluit van de eigenaar van 2026-10-04.",
       "reden": "Zes mechanismen draaien alleen in de keten omdat ze per definitie een kandidaat-SHA, een CI-run of de veertien routejournalen van GitHub nodig hebben. Drie kwamen met #443 op main en werden nooit gemeten: scripts/evidence.js, evidence-control.js en evidence-calibration.js. Drie komen met #444: tooling/scripts/mutationproof.js (mutationproof.yml), scripts/outputcollect.js en scripts/outputproof.js (ronde.yml). Geen ervan vervangt een lokale proef; het zijn kandidaatgebonden omhulsels eromheen.",
       "waarheen": "De lokale tegenhangers dragen dezelfde vraag: scripts/mutatie.js voor de mutatieproef, scripts/outputproef.js voor de outputproef, en npm run evidence:plan voor het bewijsplan. Zodra scripts/ci-lokaal.js die opdrachten met een lokale kandidaat kan draaien, tellen ze als lokaal bereikbaar en zakt de teller weer."
+    },
+    {
+      "datum": "2026-10-04",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 254,
+      "meter": "kernGedeeld 254 -> 255",
+      "reden": "`betaalWaarheid` wordt nu ook door het supplier-domein aangeraakt: de horecateruggave betaalt een online betaling terug langs dezelfde betaalwaarheid waarlangs hij binnenkwam (besluit van de eigenaar, 4 oktober 2026: de zaak voert uit, per wijze). Een tweede terugbetaalweg naast de betaalwaarheid zou het bedrag langs een andere route laten lopen dan de betaling zelf.",
+      "waarheen": "server/kern/horeca/teruggave.js, GRENZEN.json (supplier) en test/horeca-teruggave-online.test.js"
     }
   ],
   "prestatie": {

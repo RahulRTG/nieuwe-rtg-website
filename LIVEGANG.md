@@ -80,9 +80,8 @@ npm run motor:init
 versleutelde geldvolume daarna exact eenmaal. Start/restart doet dit nooit
 automatisch en blijft bij een verdwenen of afwijkende volume fail-closed.
 Bewaar een versleutelde kopie van deze bestanden en het geldvolume buiten de
-server. Koppel `OFFICE_TOTP_SECRET` uit `.env.productie` aan de authenticator
-van de eigenaar en verwijder `RTG_OWNER_BOOTSTRAP` zodra het eigenaarsaccount
-is geclaimd.
+server. Verwijder `RTG_OWNER_BOOTSTRAP` zodra het eigenaarsaccount is geclaimd.
+`OFFICE_CODE`/`OFFICE_TOTP_SECRET`: geen eis meer (B10/B24, 4 okt 2026).
 
 ClamAV haalt zijn handtekeningen dagelijks op via een apart update-netwerk en
 publiceert poort 3310 niet op de host. Reserveer hiervoor circa 4 GB RAM; bij te

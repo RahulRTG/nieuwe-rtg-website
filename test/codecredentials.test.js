@@ -225,9 +225,9 @@ test('het gezinsprofieltoken en de gezinsdeur zelf zijn gemigreerd', () => {
   assert.ok(poort.controleer(terug).fouten.some(f => f.includes('foundation.family_profile_access') && f.includes('hash_only_at_rest')));
 });
 
-/* B10 (27 september 2026): de gedeelde kantoorcode is in productie gesloten. Dat
-   is geen migratie van de code -- die blijft buiten productie gedeeld en niet
-   hash-only, en dat staat er eerlijk bij -- maar de deur opent in productie niets. */
+/* B10 (27 september 2026): de gedeelde kantoorcode is in productie gesloten --
+   geen migratie (buiten productie gedeeld, niet hash-only), en sinds 4 oktober
+   2026 ook geen productie-eis meer. */
 test('de gedeelde kantoorcode is in productie gesloten, met eerlijke controls en een proef op een productieserver', () => {
   const register = poort.lees();
   const uit = poort.controleer(register);
@@ -236,7 +236,8 @@ test('de gedeelde kantoorcode is in productie gesloten, met eerlijke controls en
   assert.equal(d.release_blocker, false);
   assert.ok(!uit.blockers.some(x => x.id === d.id), 'blokkeert niet meer');
   assert.ok(d.bewijs.includes('test/kantoordeur-productie.test.js'), 'bewezen op een echte productieserver');
-  for (const c of ['productie_code_opent_niets', 'productie_passkey_per_kantoorsessie', 'fail_closed_zonder_passkeyconfig'])
+  for (const c of ['productie_code_opent_niets', 'productie_passkey_per_kantoorsessie', 'fail_closed_zonder_passkeyconfig',
+    'productie_start_zonder_code_en_totp'])
     assert.equal(d.controls[c], true, c);
   for (const c of ['code_zelf_hash_only', 'code_zelf_persoonsgebonden'])
     assert.equal(d.controls[c], false, c + ': de code zelf is niet gemigreerd, en dat staat er');

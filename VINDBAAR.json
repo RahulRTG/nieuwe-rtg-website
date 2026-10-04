@@ -1,19 +1,19 @@
 {
   "stempel": {
-    "op": "2026-09-30T20:37:01.609Z",
-    "commit": "c47e00901",
+    "op": "2026-10-01T13:35:24.249Z",
+    "commit": "c9c478408",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 3,
     "instrument": "scripts/vindbaar.js",
-    "node": "v26.10.0"
+    "node": "v24.18.0"
   },
   "uitleg": "Per bestemming in de sprong: welk aandeel van de ONDERSCHEIDENDE woorden van dat scherm (woorden uit zijn koppen die op hooguit 3 bestemmingen voorkomen) er ook naartoe leidt in de zoekfilter van shared/sprong.js. Meet woorden, geen mensen: of iemand op het idee komt dat woord te typen, weet deze meter niet.",
   "vloer": 0.6,
   "drempel": 3,
   "bestemmingen": 100,
-  "woorden": 1252,
-  "gevonden": 792,
-  "dekking": 0.6326,
+  "woorden": 1248,
+  "gevonden": 787,
+  "dekking": 0.6306,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -267,7 +267,7 @@
       "naam": "Wie ben ik",
       "url": "/apps/ik.html",
       "woorden": 24,
-      "gevonden": 11,
+      "gevonden": 10,
       "mist": [
         "regie",
         "werelden",
@@ -276,6 +276,7 @@
         "bediening",
         "informatie",
         "aanspreekvorm",
+        "doet",
         "welke",
         "geloof",
         "levensbeschouwing",
@@ -328,8 +329,8 @@
     {
       "naam": "Overzicht",
       "url": "/apps/rtg.html",
-      "woorden": 56,
-      "gevonden": 46,
+      "woorden": 55,
+      "gevonden": 45,
       "mist": [
         "documenten",
         "acties",
@@ -475,21 +476,6 @@
       ]
     },
     {
-      "naam": "RTG One",
-      "url": "/apps/rtgone.html",
-      "woorden": 28,
-      "gevonden": 21,
-      "mist": [
-        "geladen",
-        "persoonlijke",
-        "beloften",
-        "length",
-        "persoonlijk",
-        "actieve",
-        "werkstromen"
-      ]
-    },
-    {
       "naam": "Attenties",
       "url": "/apps/attenties.html",
       "woorden": 9,
@@ -546,10 +532,24 @@
       ]
     },
     {
+      "naam": "RTG One",
+      "url": "/apps/rtgone.html",
+      "woorden": 28,
+      "gevonden": 22,
+      "mist": [
+        "geladen",
+        "persoonlijke",
+        "beloften",
+        "length",
+        "actieve",
+        "werkstromen"
+      ]
+    },
+    {
       "naam": "RTMail",
       "url": "/apps/rtmail.html",
-      "woorden": 24,
-      "gevonden": 18,
+      "woorden": 21,
+      "gevonden": 15,
       "mist": [
         "daarna",
         "externe",
@@ -730,6 +730,18 @@
       ]
     },
     {
+      "naam": "Identiteit aantonen",
+      "url": "/apps/verificatie.html",
+      "woorden": 9,
+      "gevonden": 5,
+      "mist": [
+        "stappen",
+        "identiteitsbewijs",
+        "hiermee",
+        "doet"
+      ]
+    },
+    {
       "naam": "Berichten",
       "url": "/apps/comm.html",
       "woorden": 5,
@@ -782,17 +794,6 @@
         "gelegenheid",
         "gasten",
         "menu"
-      ]
-    },
-    {
-      "naam": "Identiteit aantonen",
-      "url": "/apps/verificatie.html",
-      "woorden": 9,
-      "gevonden": 6,
-      "mist": [
-        "stappen",
-        "identiteitsbewijs",
-        "hiermee"
       ]
     },
     {

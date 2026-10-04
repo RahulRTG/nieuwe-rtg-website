@@ -628,6 +628,7 @@ body.travel-os .ios-nav{
      Het gaat om drie eigenschappen en niet om een heel blok. */
   position:static!important;
   display:flex!important;
+  flex-wrap:wrap;
   align-items:center;
   justify-content:space-between;
   gap:.8rem;
@@ -649,6 +650,10 @@ body.travel-os .ios-nav .ios-terug,
 body.travel-os .ios-nav .terug{display:none}
 body.travel-os .ios-nav .ios-nav-rij{min-height:0;padding-block:0}
 body.travel-os .ios-nav .ios-nav-acties{display:flex;align-items:center;gap:.5rem}
+/* iOS moves a hero's introduction into this sibling, outside .ios-nav-rij.
+   Keep it on a complete second line: its intrinsic width must not push the
+   adjacent Rahul control beyond the viewport on Flights and Stays. */
+body.travel-os .ios-nav>.ios-nav-extra{order:2;flex:1 1 100%;min-width:0;max-width:100%;box-sizing:border-box}
 body.travel-os .ios-nav .rtg-rahul-tab{
   flex:none;
   display:flex;

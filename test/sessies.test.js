@@ -154,3 +154,33 @@ test('recordsessies vallen dicht zolang de geconfigureerde Redis-autoriteit onze
     if (oud === undefined) delete process.env.REDIS_URL; else process.env.REDIS_URL = oud;
   }
 });
+
+
+test('selectieve sessieopslag overleeft procesdood en een stale andere schrijver herleeft geen intrekking', async t => {
+  const p = require('./lib/audit-rijen-fixture')(t, { sessions: {}, sessiecontext: {} });
+  const s = require('../server/kern/sessies').maakSessies({ db: p.db, save: p.save, crypto });
+  s.rememberSession('ingetrokken', { tier: 'rtg', key: 'user-1' });
+  const hash = s.tokenHash('ingetrokken');
+  const uit = p.kind(`
+    const p=require('./server/db');p.db.data=require('./server/db/sqlite').loadSqlite();
+    const s=require('./server/kern/sessies').maakSessies({...p,crypto:require('crypto')});
+    s.herbouwSessions();
+    (async()=>{
+      await s.forgetSessionDuurzaam(s.tokenHash('ingetrokken'));
+      s.rememberSession('ander-proces',{tier:'rtg',key:'user-2'});
+      const c=require('./server/kern/identiteit/sessieregister').maakSessieregister(p);
+      c.open(p.db.data.sessions[s.tokenHash('ander-proces')].sid,'user-2',{});
+      process.kill(process.pid,'SIGKILL');
+    })();`);
+  assert.equal(uit.signal, 'SIGKILL', uit.stderr);
+  assert.ok(p.db.data.sessions[hash], 'dit proces heeft bewust nog de oude snapshot');
+  s.rememberSession('eigen-proces', { tier: 'rtg', key: 'user-3' });
+  assert.equal(p.lees('sessions')[hash], undefined, 'de merge bewaart de externe intrekking');
+  assert.equal(Object.keys(p.lees('sessions')).length, 2, 'beide nieuwe sessies zijn vastgelegd');
+  p.db.data = require('../server/db/sqlite').loadSqlite();
+  s.herbouwSessions();
+  assert.equal(s.sessionFor('ingetrokken'), null);
+  assert.equal(s.sessionFor('ander-proces').key, 'user-2');
+  assert.equal(s.sessionFor('eigen-proces').key, 'user-3');
+  assert.equal(Object.values(p.db.data.sessiecontext)[0].lidKey, 'user-2');
+});

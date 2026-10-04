@@ -58,7 +58,7 @@
     v.innerHTML = '<div class="kaart blok h-mt50">' +
       (r.les ? '<div class="mini h-zacht">' + esc(r.les) + '</div>' : '') +
       '<div class="mini">Vraag ' + r.nr + ' van ' + r.totaal + '</div>' +
-      '<div style="margin:.5rem 0;font-size:1.02rem;line-height:1.6;">' + esc(r.vraag) + '</div>' +
+      '<div class="school-opgave-vraag" >' + esc(r.vraag) + '</div>' +
       ((r.opties || []).length
         ? '<div class="h-stapel">' + r.opties.map(function (o) {
             return '<button class="knop mini h-links" data-optie="' + esc(o) + '">' + esc(o) + '</button>';
@@ -90,7 +90,7 @@
        Kwam hij er niet uit, dan staat er niets extra's -- liever niets dan een
        gok, want een verzonnen duiding stuurt een kind de verkeerde kant op. */
     var extra = (r.denkfout ? '<div class="h-mt35"><b>' + esc(r.denkfout.naam) + '.</b> ' + esc(r.denkfout.uitleg) + '</div>' : '') +
-      (r.anders ? '<div style="margin-top:.3rem;opacity:.9;"><i>Anders uitgelegd (' + esc(r.anders.soort) + '):</i> ' + esc(r.anders.tekst) + '</div>' : '');
+      (r.anders ? '<div class="school-opgave-alternatief" ><i>Anders uitgelegd (' + esc(r.anders.soort) + '):</i> ' + esc(r.anders.tekst) + '</div>' : '');
     if (!r.klaar) {
       vraag(r);
       var u = wortel.querySelector('#oefenUit');

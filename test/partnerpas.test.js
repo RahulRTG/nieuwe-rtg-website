@@ -345,3 +345,26 @@ test('partner schorsen trekt bestaande toegang onmiddellijk in', async () => {
   assert.equal((await api('/api/supplier/login', { code: partnerCode, staffId: manager.id, pin: partnerPin })).status, 403, 'nieuwe toegang blijft dicht');
   assert.equal((await api('/api/office/partner/status', { code: partnerCode, status: 'actief' }, eigenaarToken)).status, 200, 'boardroom kan een schorsing gecontroleerd opheffen');
 });
+
+
+test('partnerbesluit staat vast vóór een intrekkingsfout en geeft geen vals succes', async t => {
+  const routes = new Map(), partner = { code: 'PROEF', partnerStatus: 'actief', online: true };
+  partner.omvang = 'x'.repeat(600000); // boven de voorcheckgrens, zelfde aantal zaken
+  const p = require('./lib/audit-rijen-fixture')(t, { suppliers: [partner] });
+  let antwoord = false;
+  require('../server/routes/office/partners')({ kern: {
+    app: { post(p, ...handlers) { routes.set(p, handlers.at(-1)); } },
+    db: p.db, findSupplier: () => partner, schoon: v => String(v || ''),
+    boardroomWie: () => 'user-1', save: p.save,
+    sessions: new Map([['hash', { role: 'supplier', code: 'PROEF' }]]), sseClients: [],
+    forgetSessionDuurzaam: async () => { assert.equal(p.lees('suppliers')[0].partnerStatus, 'geschorst'); throw new Error('intrekking onderbroken'); }
+  } });
+  await assert.rejects(routes.get('/api/office/partner/status')(
+    { body: { code: 'PROEF', status: 'geschorst', reden: 'proef' } },
+    { json() { antwoord = true; } }), /intrekking onderbroken/);
+  assert.equal(antwoord, false);
+  const vast = p.lees('suppliers')[0];
+  assert.equal(vast.partnerStatus, 'geschorst');
+  assert.equal(vast.online, false);
+  assert.equal(vast.partnerStatusDoor, 'user-1');
+});

@@ -96,6 +96,7 @@ async function confirm(page){
  await page.waitForFunction(()=>!document.getElementById('lwPreview').hidden||document.getElementById('lwFormError').textContent);
  assert.equal(await page.locator('#lwFormError').textContent(),'');
  await page.locator('#lwSubmit').click();await page.waitForSelector('#lwDialog',{state:'hidden'});
+ assert.equal(await page.locator('.rtg-adaptive-sheet').isVisible(),false,'an executed action must not leave its old Edge sheet over the next step');
 }
 async function screenshot(page,file){
  await page.waitForFunction(()=>document.body.dataset.rtgDesktopState==='ready');

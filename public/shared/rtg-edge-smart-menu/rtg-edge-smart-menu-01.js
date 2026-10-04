@@ -1,3 +1,45 @@
+  /* Dezelfde appcatalogus als de widgets: mobiel mag geen apps verliezen. */
+  function volledigeCatalogus(rt) {
+    var host = rt.alles;
+    if (rt.catalogus && rt.catalogus.host === host) return rt.catalogus.promise;
+    var oud = host.querySelector('[data-edge-catalog-status]'); if (oud) oud.remove();
+    var lijst = host.querySelector('.rtg-edge-groups'), melding = d.createElement('p');
+    melding.setAttribute('data-edge-catalog-status', '');
+    melding.setAttribute('role', 'status'); melding.textContent = 'Apps worden geladen.'; lijst.before(melding);
+    var aanvraag = rt.catalogus = { host: host, promise: null };
+    function actueel() { return rt.catalogus === aanvraag && rt.alles === host && host.isConnected; }
+    aanvraag.promise = fetch('/shared/interface/world-widget-catalog.json').then(function (r) {
+      if (!r.ok) throw new Error('Catalogus niet beschikbaar'); return r.json();
+    }).then(function (data) {
+      if (!actueel()) return;
+      if (!Array.isArray(data.apps)) throw new Error('Catalogus ontbreekt');
+      var gezien = new Set(Array.from(lijst.querySelectorAll('a[href]')).map(function (a) { return a.getAttribute('href'); }));
+      var groepen = {}, namen = { living: 'LivingOS', travel: 'TravelOS', work: 'WorkOS', foundation: 'FoundationOS' };
+      data.apps.forEach(function (app) {
+        if (!app || !Object.prototype.hasOwnProperty.call(namen, app.world) || typeof app.name !== 'string' || typeof app.url !== 'string' || !/^\/apps\/(?:[\w-]+\/)*[\w-]+\.html(?:[?#][^\s]*)?$/.test(app.url) || gezien.has(app.url)) return;
+        gezien.add(app.url);
+        if (!groepen[app.world]) {
+          var groep = d.createElement('section'), kop = d.createElement('h3');
+          groep.className = 'rtg-edge-group'; kop.textContent = namen[app.world]; groep.appendChild(kop);
+          lijst.appendChild(groep); groepen[app.world] = groep;
+        }
+        var a = d.createElement('a'), nr = d.createElement('span'), naam = d.createElement('b'), pijl = d.createElement('em');
+        a.href = app.url; a.dataset.search = (namen[app.world] + ' ' + app.name).toLowerCase();
+        a.dataset.catalogApp = app.id; nr.textContent = String(gezien.size).padStart(2, '0');
+        naam.textContent = app.name; pijl.textContent = '→'; a.append(nr, naam, pijl); groepen[app.world].appendChild(a);
+      });
+      melding.remove();
+      var input = host.querySelector('.rtg-edge-find input');
+      input.placeholder = 'Zoek in ' + gezien.size + ' functies'; input.dispatchEvent(new Event('input', { bubbles: true }));
+      host.dataset.catalogusReady = 'true';
+    }).catch(function () {
+      if (!actueel()) return;
+      rt.catalogus = null; melding.textContent = 'De applijst kon niet worden geladen. ';
+      var opnieuw = d.createElement('button'); opnieuw.type = 'button'; opnieuw.textContent = 'Probeer opnieuw';
+      opnieuw.onclick = function () { melding.remove(); volledigeCatalogus(rt); }; melding.appendChild(opnieuw);
+    });
+    return aanvraag.promise;
+  }
   /* De menupanelen, focus en koppeling aan de bestaande Edge-schil. */
   function bouw(rt) {
     var index = rt.index, oorspronkelijk = index.querySelector('.rtg-edge-index-inner');
@@ -41,6 +83,7 @@
       rt.alles.querySelector('.rtg-edge-smart-doors').appendChild(werk);
     }
     schaal.querySelector('[data-edge-smart-search]').addEventListener('click', function () {
+      volledigeCatalogus(rt);
       rt.alles.setAttribute('data-catalogus-open', 'true');
       var invoer = rt.alles.querySelector('.rtg-edge-find input'); if (invoer) invoer.focus();
     });
@@ -51,6 +94,7 @@
       w.RTGi18n.openModal();
     });
     schaal.querySelector('.rtg-edge-smart-doors a').addEventListener('click', function (ev) {
+      volledigeCatalogus(rt);
       var groepen = rt.alles.querySelector('.rtg-edge-global-original');
       if (!groepen) return; ev.preventDefault(); rt.alles.setAttribute('data-catalogus-open', 'true'); groepen.scrollIntoView({ block: 'start' });
     });
@@ -95,6 +139,7 @@
     start: start,
     openSearch: function () {
       if (!actief || actief.index.getAttribute('aria-hidden') !== 'false') return;
+      volledigeCatalogus(actief);
       gezicht(actief, 'all', false);
       actief.alles.setAttribute('data-catalogus-open', 'true');
     },

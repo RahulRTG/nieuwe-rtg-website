@@ -15,7 +15,7 @@ module.exports = async function guest(page, row, errors) {
   const s=row.state;row.failures=[];
   if(row.http!==200)row.failures.push('http-'+row.http);
   if(s.public!=='travel-guest'||s.world!=='travel')row.failures.push('missing-guest-identity');
-  if(s.background!=='rgb(18, 18, 16)')row.failures.push('nonstandard-guest-palette');
+  if(s.background!=='rgb(25, 13, 18)')row.failures.push('nonstandard-guest-palette');
   if(s.shells||s.edges)row.failures.push('unexpected-member-navigation');
   if(s.overflow)row.failures.push('horizontal-overflow');
   if(!s.content||s.content.width<250||s.content.height<60||s.content.x<0)row.failures.push('missing-guest-content');

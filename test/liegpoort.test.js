@@ -98,3 +98,13 @@ test('sparen wint van liegen, ook als beide passen', () => {
   assert.equal(magLiegen('/api/auth/register', '/api/auth/', '/api/auth/'), false,
     'staat een pad in beide lijsten, dan wint sparen -- anders is de uitzondering geen uitzondering');
 });
+
+
+test('directed output evidence changes one HTTP method and exact path only', () => {
+  const { magGerichtLiegen: may } = require('../server/opzet/liegpoort');
+  assert.equal(may('POST', '/api/example', '/api/example', '', 'POST', true), true);
+  assert.equal(may('GET', '/api/example', '/api/example', '', 'POST', true), false);
+  assert.equal(may('POST', '/api/example/child', '/api/example', '', 'POST', true), false);
+  assert.equal(may('POST', '/api/example/ABC', '/api/example/:id', '', 'POST', true), true);
+  assert.equal(may('POST', '/api/example/ABC/child', '/api/example/:id', '', 'POST', true), false);
+});

@@ -68,9 +68,10 @@
 <!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
 <script src="/shared/uitvoer.js"></script>
 <script>
+(function foundationPage() {
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-if (!window.Sessie || !Sessie.eisProfiel()) throw new Error('geen sessie');
+if (!window.Sessie || !Sessie.eisProfiel()) return;
 Sessie.balk($('#balk'), { terug: 'index.html' });
 const sess = Sessie.huidig();
 // de bibliothecaris: kindveilig advies uit de echte catalogi
@@ -161,6 +162,7 @@ $('#bCat').addEventListener('change', () => { ST.categorie = $('#bCat').value; S
 let zt; $('#bZoek').addEventListener('input', () => { clearTimeout(zt); zt = setTimeout(() => { ST.zoek = $('#bZoek').value; ST.pagina = 1; ST.mijn = false; teken(); }, 300); });
 $('#bMijn').addEventListener('click', () => { ST.mijn = !ST.mijn; ST.pagina = 1; teken(); });
 start();
+}());
 </script>
 <script src="samen.js" defer></script>
 <script src="/shared/basis.js" defer></script>

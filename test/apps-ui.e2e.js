@@ -434,6 +434,10 @@ test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
     await page.waitForSelector('#askInput', { state: 'visible', timeout: 10000 });
     const payload = '<img src=x onerror="window.__xss=1">';
     await page.fill('#askInput', payload);
+    await page.evaluate(async () => { await Promise.all(document.getAnimations().filter(a => a.effect.getTiming().iterations !== Infinity).map(a => a.finished.catch(() => {}))); });
+    const content = await page.locator('#content').boundingBox();
+    const edge = await page.locator('.rtg-adaptive-bar').boundingBox();
+    assert.ok(content.y + content.height <= edge.y, 'the conversation scroll area ends above the Edge');
     await page.click('#askBtn');
     await page.waitForSelector('#chat .bubble.user', { timeout: 10000 });
     /* Hier werd gewacht om een EVENTUELE onerror de tijd te geven -- wachten op
@@ -526,7 +530,7 @@ test('Leden-app: Rahul begint zelf op het beginscherm en antwoordt daar ook',
        stil. De teller gaat bij elke afwijkende lezing terug naar nul, dus het is
        geen verkapte klok: duurt het langer, dan wacht hij langer. */
     await wachtTot(page, () => {
-      const e = document.querySelector('.rtg-adaptive-bar');
+      const e = document.querySelector('.rtg-adaptive-question input');
       if (!e) { window.__balkStil = 0; return false; }
       const top = Math.round(e.getBoundingClientRect().top);
       window.__balkStil = window.__balkVorige === top ? (window.__balkStil || 0) + 1 : 0;
@@ -534,12 +538,14 @@ test('Leden-app: Rahul begint zelf op het beginscherm en antwoordt daar ook',
       return window.__balkStil >= 3;
     }, null, { wat: 'een balk die stil ligt', polling: 100 });
     assert.equal(await page.evaluate(() => {
-      const e = document.querySelector('.rtg-adaptive-bar'), r = e.getBoundingClientRect();
+      const e = document.querySelector('.rtg-adaptive-question input'), r = e.getBoundingClientRect();
       const boven = document.elementFromPoint(Math.round(r.left + r.width / 2), Math.round(r.top + r.height / 2));
-      return !!(boven && boven.closest('.rtg-adaptive-bar'));
+      return !!(boven && boven.closest('.rtg-adaptive-question'));
     }), true, 'de vraagbalk van Rahul gaat open achter iets anders in plaats van erboven');
-    assert.equal(await page.evaluate(() => !!document.querySelector('.rtg-adaptive-lips')), true,
-      'de mond van Rahul staat niet in de balk');
+    assert.equal(await page.locator('.rtg-adaptive-sheet-mouth').isVisible(),true,
+      'de mond van Rahul blijft zichtbaar in het open vraagvlak');
+    assert.equal(await page.locator('.rtg-adaptive-bar').isVisible(),false,
+      'het vraagvlak vervangt de compacte balk: er is maar één schil');
 
     // en we zijn de werktafel niet kwijt: hij roepen is geen navigatie
     assert.match(new URL(page.url()).pathname, /\/apps\/app\.html$/,

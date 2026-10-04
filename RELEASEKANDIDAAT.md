@@ -97,6 +97,12 @@ Kolommen: **code** / **extern** / **besluit** = JA/NEE; *bewijs* = wat
 | B15 | **De RTG Link-drager voor `geld.kassa` migreert**: 128 bits, hash-only, minuten geldig, eenmalige atomaire claim, gebonden aan de zaak die hem maakte; daarna gaat de productiegrendel eraf | deur `link.capability_aanvaarden` |
 | B16 | **Het SSO-clientgeheim versleuteld per tenant**: nooit terug te lezen via een route, rotatie met overlap en een vervaldatum | deur `identity.sso_client_secret` |
 | B17 | **De Foundation-tokens migreren nu**, voor de release: de lescodes en leraar- en leerlingtokens van onderwijs, en het gezinsprofieltoken (128 bits, hash-only, verval, intrekken); tot dan blijven ze in productie op 503 | deuren `foundation.onderwijs_les_tokens` en `foundation.family_profile_token_buiten_harde_poort` |
+| B18 | **De gezinsdeur zelf migreert** (besluit van 4 oktober 2026): de gezinscode van circa 30 bits wordt een 128-bit code, alleen als hash bewaard, met een rem per code en per IP, en het token gaat niet meer in de URL van de social-stream. Daarna geeft productie weer gezinstokens uit | deur `foundation.family_profile_access` |
+| B19 | **Een gezinssessie is 7 dagen geldig**, en wie binnen die termijn met zijn passkey bevestigt krijgt opnieuw 7 dagen; zonder passkey is het daarna opnieuw inloggen met gezinscode en pincode. Het kanaal van een oppas blijft 12 uur | `server/foundation/gezinstoken.js` |
+| B20 | **Een leerling komt binnen via een deellink of QR van de leraar**; de lescode blijft 128 bits en wordt niet ingetikt. Geen derde korte-code-uitzondering | deur `foundation.onderwijs_les_tokens` |
+| B21 | **Oude personeelscodes van het partnerkanaal worden bij de uitrol gewist** uit de opslag; partners geven elke medewerker opnieuw een personeelscode | deur `partnerkanaal.personeels_en_partnercode` |
+| B22 | **Strengere termijnen voor het SSO-clientgeheim**: rotatieadvies 30 dagen, maximaal 90, overlap 3; roteren vraagt een verse passkey | deur `identity.sso_client_secret` |
+| B23 | **Het eerste kantooraccount op naam machtigt de eigenaar met zijn eigen passkey**; er is geen gedeelde of eenmalige startcode | deur `office.gedeelde_kantoorcode` |
 
 **Nieuw gemeten sinds de matrix:** de codecredentialpoort telt geen 9 maar
 **483** blokkades: de 9 open types, **399** routes die op een toegangscode

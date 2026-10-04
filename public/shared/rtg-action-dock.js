@@ -32,8 +32,12 @@
     var settings = d.createElement('details'), summary = d.createElement('summary'); summary.textContent = 'Vaste acties instellen'; settings.appendChild(summary);
     var cells = [], selects = [];
     function draw() {
-      state.entries().forEach(function (item, i) {
+      var entries = state.entries(), count = entries.filter(Boolean).length;
+      row.hidden = !settings.open && count === 0;
+      row.style.setProperty('--rtg-action-visible', String(settings.open ? 3 : Math.max(1, count)));
+      entries.forEach(function (item, i) {
         cells[i].textContent = '';
+        cells[i].hidden = !item && !settings.open;
         var el = d.createElement(item ? 'a' : 'span'); el.textContent = item ? item[1] : 'Vrije plek ' + (i + 1);
         if (item) {
           el.href = item[3];
@@ -48,6 +52,7 @@
         selects[i].value = item ? item[0] : '';
       });
     }
+    settings.addEventListener('toggle', draw);
     for (var i = 0; i < 3; i++) {
       var cell = d.createElement('div'); row.appendChild(cell); cells.push(cell);
       var label = d.createElement('label'), select = d.createElement('select'); label.textContent = 'Plek ' + (i + 1); label.appendChild(select);

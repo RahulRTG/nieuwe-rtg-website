@@ -24,7 +24,7 @@ test('de nieuwe taalkeuze volgt de RTG-stijl en blijft binnen elke schermrand',
           'taalkaart blijft horizontaal binnen ' + viewport.width + 'px');
         assert.ok(vak.y >= 0 && vak.y + vak.height <= viewport.height,
           'taalkaart blijft verticaal binnen ' + viewport.height + 'px');
-        assert.equal(parseFloat(await kaart.evaluate(el => getComputedStyle(el).borderRadius)), 10,
+        assert.equal(parseFloat(await kaart.evaluate(el => getComputedStyle(el).borderRadius)), 24,
           'taalkaart gebruikt de afgeronde RTG-systeemvorm');
         assert.equal(await page.locator('.rtg-lang-quick').count(), 4, 'vier directe taalkeuzes zijn zichtbaar');
         assert.equal(await page.locator('#rtg-lang-modal canvas').count(), 0, 'geen losse sterrenlaag achter de taalkeuze');

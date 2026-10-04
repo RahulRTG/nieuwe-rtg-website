@@ -38,7 +38,7 @@ test('het IDOR-register draagt geen ONVERKLAARDE doorbraak', () => {
   const path = require('path');
   let reg;
   try { reg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'IDOR.json'), 'utf8')); }
-  catch (e) { return; } // nog niet gedraaid: dan valt er niets te bewaken
+  catch (e) { assert.fail('IDOR.json ontbreekt of is onleesbaar; geen isolationbewijs: ' + e.message); }
   const open = Object.entries(reg.perRoute || {}).filter(([, v]) => v.staat === 'doorbraak');
   assert.deepEqual(open.map(([r]) => r), [],
     'er staan ONVERKLAARDE IDOR-doorbraken in IDOR.json: ' + open.map(([r]) => r).join(', ') +
@@ -55,7 +55,7 @@ test('het IDOR-register draagt geen onverklaarde WERKPLEK-doorbraak', () => {
   const path = require('path');
   let reg;
   try { reg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'IDOR.json'), 'utf8')); }
-  catch (e) { return; }
+  catch (e) { assert.fail('IDOR.json ontbreekt of is onleesbaar; geen isolationbewijs: ' + e.message); }
   const w = reg.werkplekPerRoute || {};
   const open = Object.entries(w).filter(([, v]) => v.staat === 'doorbraak');
   assert.deepEqual(open.map(([r]) => r), [],
@@ -85,7 +85,7 @@ test('de proef overleeft zijn eigen ronde: een 401 van een DODE sessie telt niet
   const path = require('path');
   let reg;
   try { reg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'IDOR.json'), 'utf8')); }
-  catch (e) { return; }
+  catch (e) { assert.fail('IDOR.json ontbreekt of is onleesbaar; geen isolationbewijs: ' + e.message); }
   assert.ok((reg.gemeten || {}).sessieHernieuwd >= 1,
     'de proef raakt /api/logout aan en hoort zijn sessie te herstellen; gemeten: ' +
     JSON.stringify((reg.gemeten || {}).sessieHernieuwd));

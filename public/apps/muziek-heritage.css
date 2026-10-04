@@ -4,7 +4,7 @@ body.rtg-music-experience.rtg-edge-host{padding-top:0!important}
 body.rtg-music-experience .rtg-edge-top{display:none!important}
 body.rtg-music-experience .os-switcher{display:none!important}
 body.rtg-music-experience [hidden]{display:none!important}
-body.rtg-music-experience .muziek-hero{min-height:min(87vh,52rem)!important;padding:10rem 1.3rem 3.7rem!important;background:#130d09!important}
+body.rtg-music-experience .muziek-hero{min-height:min(70svh,42rem)!important;padding:8rem 1.3rem 2.7rem!important;background:#130d09!important}
 body.rtg-music-experience .muziek-hero__beeld{opacity:1!important;filter:saturate(.83) contrast(1.03)!important;object-position:59% center!important}
 body.rtg-music-experience .muziek-hero::before{background:linear-gradient(180deg,rgba(6,3,2,.02) 20%,rgba(8,4,3,.22) 46%,rgba(10,6,4,.95) 92%,#0c0907),linear-gradient(90deg,rgba(7,4,3,.74),rgba(7,4,3,.08) 78%)!important}
 body.rtg-music-experience .muziek-hero::after{height:9rem!important;background:linear-gradient(transparent,#0c0907)!important}
@@ -12,12 +12,12 @@ body.rtg-music-experience .muziek-hero__inhoud{max-width:32rem!important}
 body.rtg-music-experience .muziek-hero .eyebrow{color:#ead39f!important;font-size:.58rem!important;letter-spacing:.34em!important;margin-bottom:.85rem!important}
 body.rtg-music-experience .muziek-hero h2{max-width:8.8ch;font-size:clamp(3.4rem,14vw,6.3rem)!important;line-height:.88!important;margin-bottom:1rem!important;text-wrap:balance}
 body.rtg-music-experience .muziek-hero p{max-width:25rem!important;color:#eee4d6!important;font-size:.94rem!important}
-body.rtg-music-experience .hero-speel{border:1px solid rgba(237,207,145,.58)!important;border-radius:0!important;background:rgba(17,10,7,.58)!important;box-shadow:none!important;backdrop-filter:blur(12px);color:var(--sound-ivory)!important}
+body.rtg-music-experience .hero-speel{border:1px solid rgba(237,207,145,.3)!important;border-radius:var(--rtg-radius-capsule)!important;background:linear-gradient(120deg,#80384a,#641f32)!important;box-shadow:none!important;color:var(--sound-ivory)!important;min-height:48px;font:500 14px/1.4 Inter,sans-serif!important}
 .hero-acties{display:flex;align-items:center;gap:.95rem;flex-wrap:wrap}.hero-studio{color:#f1d79e;text-decoration:none;border-bottom:1px solid rgba(237,207,145,.7);padding:.55rem 0;font-size:.76rem;font-weight:600}.hero-studio span{margin-left:.3rem}
-body.rtg-music-experience main{max-width:44rem!important;padding:0 1rem calc(var(--edge-bottom,64px) + env(safe-area-inset-bottom,0px) + 11.5rem)!important}
+body.rtg-music-experience main{max-width:44rem!important;padding:0 1rem calc(var(--edge-bottom,64px) + env(safe-area-inset-bottom,0px) + 24px)!important}
 .sound-sectiekop{display:flex;align-items:end;justify-content:space-between;gap:1rem;margin:1.1rem .2rem .8rem}.sound-sectiekop>div>span,.eigen-muziek__kop>div>span,.samen-kop>span:first-child{display:block;margin-bottom:.4rem;color:var(--sound-gold);font-size:.54rem;letter-spacing:.25em;text-transform:uppercase}.sound-sectiekop h2,.eigen-muziek__kop h2,.samen-kop b{margin:0!important;color:var(--sound-ivory)!important;font:400 2rem/1.02 'Bodoni Moda',Georgia,serif!important;letter-spacing:-.025em!important;text-transform:none!important}.sound-sectiekop>p{max-width:15rem;margin:0;color:#ad9f92;font-size:.68rem;line-height:1.45;text-align:right}.sound-sectiekop--klein h2{font-size:1.75rem!important}
-body.rtg-music-experience .stations{gap:.7rem!important;padding:.1rem .15rem .8rem!important;margin-right:-1rem!important}
-body.rtg-music-experience .station{flex-basis:10.6rem!important;aspect-ratio:.78!important;border:1px solid var(--sound-line)!important;border-radius:0!important;isolation:isolate;box-shadow:0 1rem 2.6rem rgba(0,0,0,.32)!important}
+body.rtg-music-experience .stations{gap:.7rem!important;padding:.1rem .15rem .8rem!important;margin-inline:0!important;max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory}
+body.rtg-music-experience .station{flex-basis:10.6rem!important;aspect-ratio:.78!important;border:1px solid var(--sound-line)!important;border-radius:var(--rtg-radius-content)!important;isolation:isolate;box-shadow:none!important;scroll-snap-align:start;overflow:hidden}
 body.rtg-music-experience .station::before{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(circle at 75% 18%,rgba(255,222,155,.3),transparent 28%),linear-gradient(145deg,transparent 35%,rgba(0,0,0,.48));mix-blend-mode:screen}
 body.rtg-music-experience .station .hoes{font-size:2.4rem!important;color:#f3d99e;opacity:.78;transform:translateY(-.55rem)}
 body.rtg-music-experience .station .naam{padding:3.1rem .8rem .85rem!important;font:400 1.05rem 'Bodoni Moda',serif!important;background:linear-gradient(transparent,rgba(7,4,3,.97))!important}body.rtg-music-experience .station .sub{margin-top:.2rem;font:400 .6rem Inter,system-ui!important;color:#f3eadf!important;letter-spacing:.03em}
@@ -31,3 +31,17 @@ body.rtg-music-experience .wachtrij{padding:.25rem .95rem!important;border-radiu
 body.rtg-music-experience .speler{left:.75rem!important;right:.75rem!important;bottom:calc(var(--edge-bottom,64px) + env(safe-area-inset-bottom,0px) + .8rem)!important;z-index:8600!important;border:1px solid rgba(238,212,155,.28)!important;border-radius:0!important;background:rgba(22,14,10,.91)!important;padding:.58rem .7rem .65rem!important;box-shadow:0 1.2rem 3.5rem rgba(0,0,0,.55)!important;backdrop-filter:blur(24px)!important;opacity:0!important;transform:translateY(1rem)!important;pointer-events:none!important;transition:opacity .25s ease,transform .25s ease!important}body.rtg-music-experience .speler[data-actief="true"]{opacity:1!important;transform:none!important;pointer-events:auto!important}.speler .balk{margin:.05rem .35rem .45rem!important}.speler .afspeel{background:var(--sound-gold)!important;color:#160d08!important;box-shadow:0 .35rem 1.1rem rgba(216,182,111,.2)!important}.speler .titel{color:var(--sound-ivory)!important}.speler .sub{color:#b5a89d!important}
 body.rtg-music-experience canvas.golf{bottom:calc(var(--edge-bottom,64px) + env(safe-area-inset-bottom,0px) + 5.8rem)!important}
 @media(max-width:520px){.sound-sectiekop{display:block}.sound-sectiekop>p{margin-top:.45rem;text-align:left}.eigen-muziek__kop{display:block!important}.muziek-toevoegen{width:auto!important;margin-top:.8rem}.eigen-muziek__kop h2{font-size:2.05rem!important}.samen{grid-template-columns:auto minmax(0,1fr)!important}.samen-start{display:grid!important}.samen-start form{min-width:0!important}.sound-profiel{width:2.45rem!important;height:2.45rem!important}.kop .badge{font-size:.5rem!important}}
+
+/* Sound morphs into the same Edge instead of stacking a second player. */
+body.rtg-music-experience[data-rtg-edge-surface="music"] .rtg-adaptive-surface>.speler{
+ position:relative!important;inset:auto!important;min-width:0;flex:1;margin:0!important;
+ padding:6px 8px!important;border:0!important;border-radius:0!important;
+ background:transparent!important;box-shadow:none!important;backdrop-filter:none!important;
+ transform:none!important;opacity:1!important;pointer-events:auto!important;
+}
+body.rtg-music-experience[data-rtg-edge-surface="music"] .speler .rij{gap:2px}
+body.rtg-music-experience[data-rtg-edge-surface="music"] .speler button{min-width:44px;width:44px;height:44px}
+body.rtg-music-experience[data-rtg-edge-surface="music"] .speler .afspeel{border-radius:50%;font-size:20px}
+body.rtg-music-experience[data-rtg-edge-surface="music"] .speler .balk{height:2px;margin:0 0 5px!important}
+body.rtg-music-experience[data-rtg-edge-surface="music"] .speler .sub{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px}
+body.rtg-music-experience[data-rtg-edge-surface="music"] canvas.golf{bottom:var(--rtg-adaptive-inset)!important;opacity:.18}

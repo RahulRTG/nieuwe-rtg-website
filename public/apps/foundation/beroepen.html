@@ -80,9 +80,10 @@
 <!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
 <script src="/shared/uitvoer.js"></script>
 <script>
+(function foundationPage() {
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-if (!window.Sessie || !Sessie.eisProfiel()) throw new Error('geen sessie');
+if (!window.Sessie || !Sessie.eisProfiel()) return;
 Sessie.balk($('#balk'), { terug: 'index.html' });
 const sess = Sessie.huidig();
 const api = (pad, body) => fetch('/api/rtf/beroepen' + pad, {
@@ -172,6 +173,7 @@ async function teken(){
   } catch(e){ grid.innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
 }
 start().catch(e => { $('#bbGrid').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; });
+}());
 </script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>

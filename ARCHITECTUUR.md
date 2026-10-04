@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 5375 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 5392 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,14 +18,14 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 5375 |
-| servermodules (`server/**/*.js`) | 4058 |
-| routebestanden (`server/routes/**`) | 638 |
-| kernmodules (`server/kern/**`) | 2559 |
+| API-endpoints | 5392 |
+| servermodules (`server/**/*.js`) | 4169 |
+| routebestanden (`server/routes/**`) | 642 |
+| kernmodules (`server/kern/**`) | 2629 |
 | schermen (`public/**/*.html`) | 325 |
-| gedeelde browsermodules (`public/shared/*.js`) | 424 |
-| toetsbestanden (`test/*.test.js`) | 2012 |
-| schermtoetsen (`test/*.e2e.js`) | 300 |
+| gedeelde browsermodules (`public/shared/*.js`) | 425 |
+| toetsbestanden (`test/*.test.js`) | 2052 |
+| schermtoetsen (`test/*.e2e.js`) | 304 |
 
 ## 2. De weg van een verzoek
 
@@ -58,6 +58,7 @@ mail
 log
 testomgeving
 betaal
+trust-bewijs
 muntbetaal
 talen
 foutmelder
@@ -107,13 +108,13 @@ luister
 Acht domeinen, uit `server/opzet/routes.js`. Met `RTG_DOMAINS=member,social` draait
 een proces alleen die domeinen; een gateway (`server/poort.js`) stuurt de
 padvoorvoegsels dan naar het juiste proces. **Die belofte is nog niet waargemaakt:**
-zie §5 -- er zijn nog 254 kern-namen die meer dan één domein aanraakt.
+zie §5 -- er zijn nog 255 kern-namen die meer dan één domein aanraakt.
 
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
 | `auth` | 21 | 6 | 8 | 54 |
-| `member` | 736 | 75 | 17 | 455 |
-| `supplier` | 639 | 134 | 6 | 344 |
+| `member` | 737 | 75 | 17 | 456 |
+| `supplier` | 640 | 136 | 6 | 345 |
 | `office` | 98 | 22 | 3 | 98 |
 | `staff` | 27 | 9 | 1 | 43 |
 | `social` | 76 | 10 | 31 | 71 |
@@ -129,7 +130,7 @@ lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
 bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
 publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 3657 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 3672 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -138,8 +139,8 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 | Meting | Nu |
 |---|---|
 | kern-namen die routes aanraken | 1682 |
-| daarvan door **meer dan één** domein (de echte koppeling) | 254 |
-| daarvan door precies één domein | 1428 |
+| daarvan door **meer dan één** domein (de echte koppeling) | 255 |
+| daarvan door precies één domein | 1427 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -157,8 +158,8 @@ rtf(18) tooManyTries(14) geenGast(14) express(14) findSupplier(13) boardroomAuth
 crypto(12) keyVanCodenaam(12) appUrl(11) pay(11) anthropic(11) noteFailedTry(10)
 payrollOS(10) rtmail(10) kern(9) gegevensStop(9) sseToOffice(9) loginFails(8) stuur(8)
 logActivity(8) mail(7) naamAuth(7) sseToSupplier(7) onboarding(6) notifySupplier(6)
-talen(6) kluisAuth(5) tenant(5) logInlog(5) veilig(5) afdelingen(5) openVacatures(5)
-overheid(5) sseToCustomer(5)
+talen(6) kluisAuth(5) tenant(5) logInlog(5) zwaarbewijs(5) veilig(5) afdelingen(5)
+openVacatures(5) overheid(5) sseToCustomer(5)
 ```
 
 **De breedste routebestanden** -- hier zou je beginnen:

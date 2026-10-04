@@ -70,7 +70,9 @@ function maakAuditspoor(deps) {
   /* Het eigen vak. Dezelfde sleutels als het command-journaal, maar in een
      eigen doos, zodat de twee ketens elkaar niet in de weg zitten. */
   const vak = () => eigen.bak('apiSpoor');
-  const journaal = maakJournaal({ db, save, crypto, vak });
+  const auditOpslag = save.audit?.open('apiSpoor');
+  const bewaarSpoor = () => save.sleutels ? save.sleutels(['apiSpoor']) : save();
+  const journaal = maakJournaal({ db, save: bewaarSpoor, crypto, vak, auditOpslag });
 
   /* De actor, in volgorde van zekerheid. req.session en req.supplier zijn door
      de auth van de route zelf gezet -- dat is het hardste wat er is. Pas als

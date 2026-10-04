@@ -124,6 +124,10 @@ app.post('/api/office/partner/status', boardroomAuth, async (req, res) => {
   s.partnerStatusDoor = boardroomWie(req);
   s.partnerStatusReden = reden || null;
   if (status !== 'actief') s.online = false;
+  // Het partnerbesluit moet vaststaan voordat asynchrone intrekking begint.
+  // Een sessie-eigenaar bewaart geen partnerdata; ook een fout halverwege
+  // de intrekkingen mag na herstart geen gesloten werkplek heropenen.
+  save.sleutels(['suppliers']);
 
   let ingetrokken = 0;
   if (status !== 'actief') {
@@ -141,7 +145,6 @@ app.post('/api/office/partner/status', boardroomAuth, async (req, res) => {
       sseClients.splice(i, 1);
     }
   }
-  save();
   logActivity(code, { name: 'Boardroom' }, status === 'actief'
     ? 'hief de partnerschorsing op'
     : 'zette de partnerwerkplek op ' + status + ': ' + reden);

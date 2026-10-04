@@ -7,8 +7,9 @@
   src:url('../fonts/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2') format('woff2')
 }
 
-/* Bediening en gegevens blijven Inter; alleen benoemde vertelmomenten Bodoni. */
-body[data-rtg-skin="heritage"] :where(h1,h2,h3,h4){font-family:var(--rtg-interface,Inter,system-ui,sans-serif)}
+/* Editorial titles use Bodoni; controls and dense data keep Inter. */
+body[data-rtg-skin="heritage"] :where(h1,h2){font-family:var(--rtg-display,"Bodoni Moda",Georgia,serif);font-weight:400;letter-spacing:-.035em;line-height:1.12;text-wrap:balance}
+body[data-rtg-skin="heritage"] :where(h3,h4){font-family:var(--rtg-interface,Inter,system-ui,sans-serif)}
 body[data-rtg-skin="heritage"] :where([data-rtg-type="display"],.rtg-ceremonie,.display,.serif){
   font-family:var(--rtg-display,"Bodoni Moda",Georgia,serif);
   font-weight:450;

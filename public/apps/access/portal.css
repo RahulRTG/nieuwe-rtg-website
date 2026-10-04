@@ -172,6 +172,8 @@ html body #gate[data-rtg-access] form#agForm .access-field{color:#f4eddc!importa
  html body[data-ios-home][data-rtg-skin="heritage"] #rtgCommand #gate[data-rtg-access]:not([style*="display: none"]),
  html body[data-ios-home][data-rtg-skin="heritage"] #gate[data-rtg-access]:not([style*="display: none"]){
   display:block!important;
-  padding:calc(env(safe-area-inset-top,0px) + 28px) 24px calc(var(--rtg-adaptive-inset,100px) + env(safe-area-inset-bottom,0px) + 24px)!important;
+  /* The shared brand header remains visible over this fixed viewport. Its
+     real height and the device safe area both precede the first heading. */
+  padding:calc(var(--edge-top,44px) + env(safe-area-inset-top,0px) + 24px) 24px calc(var(--rtg-adaptive-inset,100px) + env(safe-area-inset-bottom,0px) + 24px)!important;
  }
 }

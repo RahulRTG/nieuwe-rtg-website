@@ -19,6 +19,10 @@
 'use strict';
 
 const BEWAAKT = Symbol.for('rtg.db.mutatietracker.bewaakt');
+/* Een waarde die met dit merk antwoordt heeft al een eigen schrijfpoort (de
+   alleen-leesbare auditprojectie); haar opnieuw wikkelen zou haar identiteit
+   breken waarop de auditmotor bezit vaststelt. */
+const NIET_VOLGEN = Symbol.for('rtg.db.nietVolgen');
 const ontdoe = new WeakMap();
 const waarnemers = new Set();
 const vuil = new Map();
@@ -66,7 +70,7 @@ function bewaak(data) {
 
   function diep(waarde, naam) {
     waarde = ruw(waarde);
-    if (!volg(waarde)) return waarde;
+    if (!volg(waarde) || waarde[NIET_VOLGEN] === true) return waarde;
     let kaart = perCollectie.get(naam);
     if (!kaart) { kaart = new WeakMap(); perCollectie.set(naam, kaart); }
     if (kaart.has(waarde)) return kaart.get(waarde);
@@ -155,4 +159,4 @@ function vergeet(naam) { vuil.delete(String(naam)); }
 function isBewaakt(data) { try { return !!(data && data[BEWAAKT]); } catch (e) { return false; } }
 
 module.exports = { bewaak, snapshot, bevestig, vergeet, isBewaakt, voegWaarnemerToe,
-  serialiseerVoorOpslag, BEWAAKT, lengte };
+  serialiseerVoorOpslag, BEWAAKT, NIET_VOLGEN, lengte };

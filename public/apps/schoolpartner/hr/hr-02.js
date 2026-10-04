@@ -27,7 +27,7 @@
              (c.van ? ' · vanaf ' + esc(c.van) : '') : 'nog niet vastgelegd') + '</span></div>' +
         '<div class="rij h-mt40">' +
         '<input class="veld" id="hrCSoort" maxlength="40" placeholder="Soort (onbepaalde tijd)" aria-label="Soort contract">' +
-        '<input class="veld" id="hrCUren" type="number" min="0" max="60" placeholder="Uren" aria-label="Uren per week" style="flex:0 1 6rem;">' +
+        '<input class="veld schoolhr-contracturen" id="hrCUren" type="number" min="0" max="60" placeholder="Uren" aria-label="Uren per week" >' +
         '<input class="veld" id="hrCFunctie" maxlength="60" placeholder="Functie" aria-label="Functie">' +
         '<input class="veld h-kolom10" id="hrCVan" type="date" aria-label="Vanaf">' +
         '<button class="knop" id="hrCZet" type="button">Leg contract vast</button></div>' +

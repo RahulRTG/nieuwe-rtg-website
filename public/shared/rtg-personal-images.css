@@ -9,3 +9,10 @@
 body[data-image-editor="open"]{overflow:hidden!important}body[data-image-editor="open"] :is(.rtg-adaptive-edge,.rtg-adaptive-bar){visibility:hidden!important}
 @media(max-width:699px){.pi-editor{width:100%;height:100dvh;max-height:100dvh;border:0;border-radius:0;margin:0}.pi-head{padding:calc(16px + env(safe-area-inset-top,0px)) 20px 16px!important}.pi-head h2{font-size:22px!important}.pi-content{display:block;padding:20px}.pi-slots{margin-bottom:20px}.pi-tools{gap:6px}.pi-tools button{font-size:12px;padding:8px 10px}.pi-foot{padding:16px 20px calc(16px + env(safe-area-inset-bottom,0px));flex-wrap:wrap}.pi-foot>span{width:100%}.pi-foot button{flex:1}.pi-sliders{gap:10px}.pi-sliders label{min-width:100px}.pi-gallery{margin:20px 0}}
 .pi-change{display:inline-flex!important;gap:8px;align-items:center;justify-content:center}.pi-change .wd-icon{width:18px;height:18px;flex-basis:18px}.wp-edit-images{display:inline-flex;gap:8px;align-items:center;justify-content:center}
+/* Desktop photo tools appear at the image being edited. The toolbar and
+   keyboard focus remain reachable without camera badges on every thumbnail. */
+@media(hover:hover) and (pointer:fine){
+  body[data-rtg-desktop] .pi-change{opacity:0;pointer-events:none}
+  body[data-rtg-desktop] :is(.wp-photo,.wd-app-photo):is(:hover,:focus-within)>.pi-change,
+  body[data-rtg-desktop] .pi-change:focus-visible{opacity:1;pointer-events:auto}
+}

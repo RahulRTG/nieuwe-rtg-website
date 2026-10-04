@@ -288,7 +288,9 @@ function objectRegister(pad) {
   try { j = JSON.parse(fs.readFileSync(pad, 'utf8')); } catch (e) { return null; }
   if (!j || j.perRoute === undefined || j.perRoute === null) return null;
   if (Array.isArray(j.perRoute)) vormfout(pad, 'een object', 'een array');
-  return new Map(Object.entries(j.perRoute));
+  const kaart = new Map(Object.entries(j.perRoute));
+  kaart.evidenceRegister = { stempel: j.stempel, binding: j.binding, gericht: j.gericht, basislijn: j.basislijn };
+  return kaart;
 }
 
 function bewakersPerRoute() {
@@ -529,9 +531,7 @@ function bouw(invoer) {
            inhoudgevoelige toetsen op deze route zitten, maar dat ze er meer
            raken -- dan is niet te zeggen op WELKE inhoud ze zakken, en dat als
            dekking tellen is precies de fout die de AUTH-as 294 cellen kostte. */
-        cellen[s.id] = !o ? { staat: 'ongemeten' }
-          : o.staat === 'bewezen' ? { staat: 'bewezen', bron: 'outputproef', reden: o.reden }
-            : { staat: 'ongemeten', bron: 'outputproef', reden: o.reden };
+        cellen[s.id] = require('./lib/outputbinding').outputCell(o, output?.evidenceRegister, sleutel);
         continue;
       }
 

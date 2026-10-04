@@ -54,7 +54,7 @@ function opstelling(opties) {
     db, save: () => { saves++; }, crypto, accounts,
     rtgKlok: { datum: () => new Date('2026-08-19T12:00:00Z') },
     sessionFor: (t) => o.sessies && o.sessies[t],
-    grootSupplierSync: () => null,   // de grote kast is hier leeg; de kleine doet het werk
+    grootSupplierSync: o.grootSupplierSync || (() => null),
     DEMO: !!o.demo,
     busGeef: () => bus,
     kernGeef: () => kern
@@ -120,16 +120,93 @@ test('de bus wordt pas bij het SEINEN opgehaald, niet bij het bouwen', () => {
 });
 
 test('findSupplier bouwt zijn index opnieuw zodra er een zaak bij komt', () => {
-  /* De index bestaat omdat een lineaire scan per verzoek bij miljoenen zaken te
-     duur is. Hij hangt aan de LENGTE van de lijst; zonder herbouw vindt hij een
-     nieuwe partner nooit, en dat is precies het soort fout dat pas in productie
-     opvalt. */
+  // Groei is een wijziging van de lokale voorraad, niet de enige wijziging.
   const { poort, db } = opstelling();
   db.data.suppliers.push({ code: 'AAA', type: VRIJ });
   assert.equal(poort.findSupplier('AAA').code, 'AAA');
   assert.equal(poort.findSupplier('BBB'), null, 'onbekend is null en niet undefined');
   db.data.suppliers.push({ code: 'BBB', type: VRIJ });
   assert.equal(poort.findSupplier('BBB').code, 'BBB', 'de index hoort mee te groeien');
+});
+
+test('supplierindex: een even lange nieuwe voorraad trekt partnertoegang direct in', () => {
+  const o = opstelling({ sessies: { goed: { role: 'supplier', code: 'AAA' } } });
+  const oud = { code: 'AAA', type: VRIJ };
+  o.db.data.suppliers = [oud];
+  let door = 0;
+  o.poort.supplierAuth({ get: () => 'Bearer goed' }, antwoord(), () => { door++; });
+  assert.equal(door, 1, 'de warme index heeft eerst de actieve partner doorgelaten');
+  o.db.data = { ...o.db.data, suppliers: [{ ...oud, partnerStatus: 'geschorst' }] };
+  const res = antwoord();
+  o.poort.supplierAuth({ get: () => 'Bearer goed' }, res, () => { door++; });
+  assert.equal(door, 1, 'de oude actieve rij mag geen autoriteit meer geven');
+  assert.equal(res.uit.status, 401);
+  assert.match(res.uit.body.error, /gesloten/);
+  assert.equal(o.poort.findSupplier('AAA'), o.db.data.suppliers[0]);
+});
+
+test('supplierindex: vervanging van één rij met dezelfde code vervangt de oude identiteit', () => {
+  const { poort, db } = opstelling();
+  db.data.suppliers = [{ code: 'AAA', naam: 'oud' }];
+  const oud = poort.findSupplier('AAA');
+  db.data.suppliers[0] = { code: 'AAA', naam: 'nieuw' };
+  assert.notEqual(poort.findSupplier('AAA'), oud);
+  assert.equal(poort.findSupplier('AAA'), db.data.suppliers[0]);
+});
+
+test('supplierindex: even lange splice en herordening volgen de huidige rijen', () => {
+  const { poort, db } = opstelling();
+  const a = { code: 'AAA' }, b = { code: 'BBB' }, c = { code: 'CCC' };
+  db.data.suppliers = [a, b];
+  assert.equal(poort.findSupplier('AAA'), a);
+  db.data.suppliers.splice(0, 1, c);
+  assert.equal(poort.findSupplier('AAA'), null);
+  assert.equal(poort.findSupplier('CCC'), c);
+  db.data.suppliers.reverse();
+  assert.equal(poort.findSupplier('BBB'), b);
+  assert.equal(poort.findSupplier('CCC'), c);
+});
+
+test('supplierindex: codewijziging verwijdert de oude sleutel en gebruikt pas dan het grootboek', () => {
+  const gevraagd = [], groot = { code: 'AAA', naam: 'grootboek' };
+  const { poort, db } = opstelling({ grootSupplierSync: c => { gevraagd.push(c); return c === 'AAA' ? groot : null; } });
+  const lokaal = { code: 'AAA' };
+  db.data.suppliers = [lokaal];
+  assert.equal(poort.findSupplier(' aaa '), lokaal);
+  assert.deepEqual(gevraagd, [], 'lokaal gaat vóór het grootboek');
+  lokaal.code = 'CCC';
+  assert.equal(poort.findSupplier('ccc'), lokaal);
+  assert.equal(poort.findSupplier('aaa'), groot);
+  assert.equal(poort.findSupplier('onbekend'), null);
+  assert.deepEqual(gevraagd, ['AAA', 'ONBEKEND']);
+});
+
+test('supplierindex: de laatste dubbele code wint ook na omkeren en een codewijziging', () => {
+  const { poort, db } = opstelling();
+  const a = { code: 'AAA' }, b = { code: 'AAA' }, c = { code: 'CCC' };
+  db.data.suppliers = [a, b, c];
+  assert.equal(poort.findSupplier('AAA'), b);
+  db.data.suppliers.reverse();
+  assert.equal(poort.findSupplier('AAA'), a);
+  a.code = 'CCC';
+  assert.equal(poort.findSupplier('AAA'), b);
+  assert.equal(poort.findSupplier('CCC'), a);
+});
+
+test('supplierindex: veldmutatie en begrotingswikkel behouden verse toestand en de schrijfgrens', () => {
+  const { poort, db } = opstelling();
+  const begroting = require('../server/opzet/begroting');
+  const rij = { code: 'AAA', partnerStatus: 'actief' };
+  db.data.suppliers = [rij, { code: 'BBB' }];
+  db.data = begroting.bewaak(db.data, { modus: 'weigeren', grens: 0, log: () => {},
+    handeling: { huidige: () => ({ pad: '/proef', correlatie: 'index' }) } });
+  assert.equal(poort.findSupplier('AAA'), rij);
+  rij.partnerStatus = 'geschorst';
+  assert.equal(poort.findSupplier('AAA').partnerStatus, 'geschorst');
+  db.data.suppliers = [{ ...rij, partnerStatus: 'beeindigd' }, { code: 'BBB' }];
+  assert.equal(poort.findSupplier('AAA').partnerStatus, 'beeindigd');
+  assert.throws(() => { db.data.suppliers = []; }, begroting.BegrotingOverschreden);
+  assert.equal(poort.findSupplier('AAA'), db.data.suppliers[0]);
 });
 
 test('de poort laat niemand door zonder sessie, en een gesloten partner ook niet', () => {

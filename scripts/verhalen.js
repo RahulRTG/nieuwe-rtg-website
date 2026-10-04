@@ -311,27 +311,34 @@ const VERHALEN = [
       const bestemming = start.data.live.dest
         || (start.data.live.partners || []).find(x => x.code === p.supCode);
       wb.eis('de bestemming', bestemming && bestemming.loc, 'de bestemming heeft geen locatie');
-      /* EERST NOG NIET. De aankomst hoort uit de AFSTAND te volgen en niet uit
-         het feit dat je een positie doorgeeft. Een halve graad noorderbreedte is
+      /* EERST NOG NIET. Nabijheid mag uit de AFSTAND volgen, aankomst uitsluitend
+         uit bevestiging (NAVIGATIE.md N3/N13, besluit 29 september). Een halve graad noorderbreedte is
          ruim vijftig kilometer; wie daar staat is niet aangekomen. Zonder deze
          eerste stap zou een grens van honderd kilometer hier groen blijven, want
          de tweede stap (precies op de stoep, afstand nul) slaagt bij elke grens
          die groter is dan nul. */
       const ver = await wb.stap('nog onderweg', 'POST', '/api/live/update', lid.token,
         { lat: bestemming.loc.lat + 0.5, lng: bestemming.loc.lng });
-      wb.eis('nog onderweg', !(ver.data.live && ver.data.live.arrived),
-        'vijftig kilometer verderop gold al als aangekomen');
+      wb.eis('nog onderweg', ver.data.live && ver.data.live.arrived === false && ver.data.live.nabij === false,
+        'vijftig kilometer verderop gold al als nabij of aangekomen');
 
-      /* Precies op de stoep is alleen een nabijheidsvoorstel. Een positie mag
-         nooit zelfstandig een aankomst bewijzen of een deur openen (N3/N13);
-         het lid bevestigt daarom in een afzonderlijke handeling dat het er is. */
-      const upd = await wb.stap('aankomen', 'POST', '/api/live/update', lid.token,
+      // en dan precies op de stoep
+      const upd = await wb.stap('nabij de bestemming', 'POST', '/api/live/update', lid.token,
         { lat: bestemming.loc.lat, lng: bestemming.loc.lng });
-      wb.eis('aankomen', upd.data.live && upd.data.live.nabij === true && upd.data.live.arrived === false,
-        'op de bestemming hoort alleen een nabijheidsvoorstel te ontstaan');
+      wb.eis('nabij de bestemming', upd.data.live && upd.data.live.nabij === true && upd.data.live.arrived === false,
+        'de positie moet nabijheid voorstellen en mag geen aankomst bewijzen');
       const hier = await wb.stap('aankomst bevestigen', 'POST', '/api/live/aangekomen', lid.token, {});
-      wb.eis('aankomst bevestigen', hier.data.live && hier.data.live.arrived === true &&
-        hier.data.live.aankomstDoor === 'lid', 'de bevestigde aankomst werd niet als handeling van het lid vastgelegd');
+      const aankomst = hier.data.live;
+      wb.eis('aankomst bevestigen', aankomst && aankomst.arrived === true && aankomst.aankomstDoor === 'lid'
+        && Number.isFinite(Date.parse(aankomst.aankomstAt)), 'de bevestigde aankomst mist status, actor of tijd');
+      const terug = await wb.stap('aankomst teruglezen', 'POST', '/api/live/state', lid.token, {});
+      wb.eis('aankomst teruglezen', terug.data.live && terug.data.live.arrived === true
+        && terug.data.live.aankomstDoor === 'lid' && terug.data.live.aankomstAt === aankomst.aankomstAt,
+        'de bevestigde aankomst bleef niet behouden');
+      const opnieuw = await wb.stap('bevestiging herhalen', 'POST', '/api/live/aangekomen', lid.token, {});
+      wb.eis('bevestiging herhalen', opnieuw.data.live && opnieuw.data.live.arrived === true
+        && opnieuw.data.live.aankomstDoor === 'lid' && opnieuw.data.live.aankomstAt === aankomst.aankomstAt,
+        'herhaling veranderde de bevestigde aankomst');
     }
   },
   {

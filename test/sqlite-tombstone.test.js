@@ -8,9 +8,9 @@ test('SQLite-poll laat een vuile lokale kopie nooit over een nieuwere tombstone 
   const laatsteJson = new Map([['toestemming', JSON.stringify({ actief: true })]]);
   const vergeten = [];
   const poll = require('../server/db/sqlite-poll')({
-    verbinding: () => ({ prepare: () => ({
-      all: () => [{ key: 'toestemming', val: null, ver: 5, deleted: 1 }]
-    }) }),
+    // Eén snapshot uit SQLite: de externe rijen plus (hier geen) auditjournalen.
+    lees: () => ({ rows: [{ key: 'toestemming', val: null, ver: 5, deleted: 1 }], audit: [] }),
+    publiceerAudit: () => {},
     toegepast,
     laatsteJson,
     db,

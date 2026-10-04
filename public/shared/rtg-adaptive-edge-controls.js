@@ -2,7 +2,7 @@
 (function (w, d) {
   'use strict';
   // Edge vervangt lokale balken; hun echte bediening blijft hier bereikbaar.
-  var ROOTS = '.wd-output,.connection-edge,.cmd-balk,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-tabs,body>nav.balk,.wd-page>nav.balk,.rtg-edge-owned-bar,.rtgsprong-greep,.rtm-nav,.ios-nav-acties,.ios-nav-extra';
+  var ROOTS = '.wd-output,.connection-edge,.cmd-balk,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-tabs,body>nav.balk,.wd-page>nav.balk,.rtg-edge-owned-bar,[data-rtg-edge-controls],.rtgsprong-greep,.rtm-nav,.ios-nav-acties,.ios-nav-extra';
 
   function label(el) { return (el.getAttribute('aria-label') || el.title || el.textContent || '').replace(/\s+/g, ' ').trim(); }
   function available(el, root) {
@@ -72,8 +72,8 @@
         var b = buttons.knop(item); b.classList.add('rtg-adaptive-sheet-action');
         b.addEventListener('click', function (event) {
           var current = currentItems().find(function (x) { return x.id === item.id; });
-          if (!current) { event.stopImmediatePropagation(); refreshLater(); return; }
           event.stopImmediatePropagation();
+          if (!current) { refreshLater(); return; }
           if (current.aan === undefined) close();
           buttons.voer(current);
         }, true);
@@ -121,7 +121,7 @@
         if (!field || !input.value.trim()) return;
         var mouth = d.querySelector('#rtgCommand .cmd-mondknop');
         rt.questionOwner = mouth && mouth.closest('.cmd-balk');
-        if (mouth && !mouth.closest('.cmd-balk').classList.contains('vraagt')) mouth.click();
+        if (mouth && !rt.questionOwner.classList.contains('vraagt')) mouth.click();
         field.value = input.value; original.requestSubmit(); input.value = ''; close();
         var reply = d.querySelector('#rtgCommand .cmd-praat');
         if (reply && reply.children.length) reply.hidden = false;
@@ -129,10 +129,15 @@
     }
   }
   function start(rt) {
-    /* Standalone marketing omits claim.js; guard it so context actions still
-       start. Regression covered by experience-rtg.e2e.js. */
+    // Marketing may omit claim.js.
     if (w.RTGAdaptiveEdgeClaim) w.RTGAdaptiveEdgeClaim.claim(d, w);
     rt.renderControls = function () { render(rt); };
+    // Close presentation; preserve the original domain handler.
+    function primaryClick(event) {
+      var button = event.target.closest && event.target.closest('[data-rtg-edge-primary]');
+      if (button && !button.disabled && button.getAttribute('aria-disabled') !== 'true') close();
+    }
+    rt.sheet.addEventListener('click', primaryClick, true);
     var frame = 0;
     function refresh() {
       if (frame || rt.model.state !== 'expanded' || (rt.controls && rt.controls.contains(d.activeElement) && d.activeElement.tagName === 'INPUT')) return;
@@ -140,11 +145,7 @@
     }
     var observer = new w.MutationObserver(function (records) {
       w.RTGAdaptiveEdgeInput.reflect(rt);
-      /* Een scherm dat zijn balk later pas tekent, hoort er niet buiten te
-         vallen. claim() is stil als er niets te claimen valt en voegt een
-         klasse die er al staat niet opnieuw toe, dus dit wekt zichzelf niet.
-         Dezelfde afwezigheidswacht als in start(): niet elk bundel laadt de
-         module. */
+      // Claim late bars idempotently.
       if (w.RTGAdaptiveEdgeClaim) w.RTGAdaptiveEdgeClaim.claim(d, w);
       var commandBar = d.querySelector('#rtgCommand .cmd-balk');
       if (commandBar && commandBar.classList.contains('vraagt')) {
@@ -160,6 +161,7 @@
       attributeFilter: ['disabled', 'hidden', 'class', 'aria-disabled', 'aria-current', 'aria-pressed', 'aria-expanded'] });
     var unsubscribe = w.RTGAdaptief && w.RTGAdaptief.opContext(refresh);
     rt.controlsStop = function () {
+      rt.sheet.removeEventListener('click', primaryClick, true);
       observer.disconnect(); if (frame) w.cancelAnimationFrame(frame);
       if (typeof unsubscribe === 'function') unsubscribe();
       if (rt.primarySlot && rt.primaryParent) rt.primaryParent.appendChild(rt.primarySlot);

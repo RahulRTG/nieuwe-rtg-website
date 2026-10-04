@@ -48,7 +48,8 @@ body[data-rtg-world-dashboard-ready="true"] .wrooster-kaart,body[data-rtg-world-
 .rtg-edge-state[data-edge-health="waiting"] i{background:var(--edge-warn);box-shadow:none}
 
 .rtg-action-dock{margin:0 0 24px;padding-block:12px;border-block:1px solid var(--edge-line)}
-.rtg-action-dock-slots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+.rtg-action-dock-slots{display:grid;grid-template-columns:repeat(var(--rtg-action-visible,3),minmax(0,1fr));gap:4px}
+.rtg-action-dock-slots[hidden],.rtg-action-dock-slots>[hidden]{display:none!important}
 .rtg-action-dock-slots>div{min-width:0;min-height:64px}
 .rtg-edge-index .rtg-action-dock-slots a,.rtg-action-dock-slots span{display:flex;align-items:center;min-height:64px;padding:8px;font:500 .75rem/1.4 Inter,system-ui,sans-serif;overflow-wrap:anywhere;color:var(--edge-copy)}
 .rtg-action-dock summary{min-height:44px;display:flex;align-items:center;cursor:pointer;font-size:.875rem;color:var(--edge-dim)}

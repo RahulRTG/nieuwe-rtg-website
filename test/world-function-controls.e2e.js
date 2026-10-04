@@ -83,10 +83,18 @@ test('mobile messages send to the intended test recipient and retain the convers
     assert.equal(read.gesprek.berichten.filter(b => b.tekst === 'Bericht via de mobiele bediening.').length, 1);
     await page.reload(); await page.locator('#veld').waitFor();
     await page.locator('#bubbels .bub').filter({ hasText: 'Bericht via de mobiele bediening.' }).waitFor();
-    const control = page.locator('[data-ai="afspraken"]');
+    await page.locator('.rtg-adaptive-surface [aria-label="Bediening openen"]').click();
+    const control = page.locator('.rtg-adaptive-controls').getByRole('button',{name:'Wat is er afgesproken?',exact:true});
+    await control.waitFor({state:'visible'});
+    await control.scrollIntoViewIfNeeded();
     assert.equal(await control.evaluate(e => { const r = e.getBoundingClientRect();
       const top = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
-      return !!top && e.contains(top); }), true, 'the Edge must not cover conversation actions');
+      return !!top && e.contains(top); }), true, 'the single Edge keeps the original conversation action reachable');
+    page.once('dialog',dialog=>dialog.dismiss());
+    const requested = page.waitForRequest(r=>r.url().endsWith('/api/comm/ai'));
+    await control.click();
+    assert.deepEqual((await requested).postDataJSON(),{id:conversation,taak:'afspraken',wens:''},
+      'the visible action reaches the original handler for this conversation');
   } finally { await ctx.close(); }
 });
 

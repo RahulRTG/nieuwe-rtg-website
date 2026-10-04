@@ -115,3 +115,68 @@ test('7. twee verzoeken zien elkaars werkkopie niet', async () => {
     });
   });
 });
+
+test('collectiesleutels blijven vers, geordend en uitsluitend eigen enumerable strings', () => {
+  const budget = require('../server/opzet/begroting');
+  const { collectieSleutels, tel } = require('../server/opzet/handelingtelling');
+  const bron = Object.assign(Object.create({ geerfd: [9] }), { z: [1], a: [], 2: [2] });
+  bron[Symbol('verborgen')] = [3];
+  Object.defineProperty(bron, 'stil', { value: [4], enumerable: false, configurable: true });
+  const d = budget.bewaak(bron), controle = () => {
+    assert.deepEqual(collectieSleutels(d), Object.keys(d));
+    assert.deepEqual(tel(d), new Map(Object.keys(d).filter(k => Array.isArray(d[k])).map(k => [k, d[k].length])));
+  };
+  controle(); d.nieuw = [5, 6]; controle(); delete d.z; controle();
+  Object.defineProperty(d, 'stil', { enumerable: true }); controle();
+  delete d.a; d.a = [7]; controle();
+  assert.deepEqual(collectieSleutels(d), ['2', 'stil', 'nieuw', 'a']);
+  assert.deepEqual(collectieSleutels(budget.bewaak({ vervangen: [1] })), ['vervangen']);
+});
+
+test('sleutelmeting laat onbekende proxies en PG-werkkopieën volledig beslissen', async () => {
+  const { collectieSleutels, tel } = require('../server/opzet/handelingtelling');
+  let opsommingen = 0, lezingen = 0;
+  const vreemd = new Proxy({ a: [1], b: [2] }, {
+    ownKeys() { opsommingen++; return ['b', 'a']; },
+    get(o, k) { lezingen++; return Reflect.get(o, k); }
+  });
+  assert.deepEqual(collectieSleutels(vreemd), ['b', 'a']);
+  assert.equal(opsommingen, 1); assert.equal(lezingen, 0, 'geen uitleessymbool op vreemde objecten');
+  assert.deepEqual([...tel(vreemd)], [['b', 1], ['a', 1]]);
+  assert.equal(opsommingen, 2); assert.equal(lezingen, 2, 'waarden komen nog uit de echte proxy');
+  const rev = Proxy.revocable({}, {}); rev.revoke();
+  assert.throws(() => collectieSleutels(rev.proxy), TypeError);
+  const bron = { a: [1], b: [2] };
+  await inVerzoek(bron, (d) => {
+    d.c = [3, 4]; delete d.a;
+    assert.deepEqual(collectieSleutels(d), Object.keys(d));
+    assert.deepEqual([...tel(d)], [['b', 1], ['c', 2]]);
+    assert.deepEqual(Object.keys(bron), ['a', 'b'], 'geen gedeelde rootmutatie');
+  });
+});
+
+test('staatmeter behoudt beide standen en sleuteluitlezing kan krimpweigering niet omzeilen', () => {
+  const budget = require('../server/opzet/begroting'), staat = require('../server/staatlog');
+  const { collectieSleutels } = require('../server/opzet/handelingtelling');
+  const { db } = require('../server/db/state'), oud = db.data, vlag = staat.diep ? '2' : staat.aan ? '1' : '';
+  try {
+    db.data = { lijst: [1, 2], leeg: [], kaart: { een: 1 }, teller: 4 };
+    for (const diep of [false, true]) {
+      staat.begin(diep ? '2' : '1');
+      const verwacht = () => Object.keys(db.data).flatMap(k => {
+        const v = db.data[k]; if (!v || typeof v !== 'object') return [];
+        if (!diep) return Array.isArray(v) && v.length ? [k + '=' + v.length] : [];
+        const n = Array.isArray(v) ? v.length : Object.keys(v).length;
+        return n ? [k + '=' + n + ':' + staat.afdruk(v)] : [];
+      }).join(',');
+      assert.equal(staat.stand(), verwacht());
+      db.data.nieuw = [3]; delete db.data.leeg;
+      assert.equal(staat.stand(), verwacht());
+    }
+    const bron = { buitenCatalogus: [1, 2, 3] };
+    const d = budget.bewaak(bron, { modus: 'weigeren', grens: 1, log() {}, handeling: { huidige: () => ({ pad: '/proef' }) } });
+    assert.deepEqual(collectieSleutels(d), ['buitenCatalogus']);
+    assert.throws(() => { d.buitenCatalogus = []; }, budget.BegrotingOverschreden);
+    assert.deepEqual(bron.buitenCatalogus, [1, 2, 3]);
+  } finally { db.data = oud; staat.begin(vlag); }
+});

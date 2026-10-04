@@ -212,7 +212,10 @@ function meet() {
 
   for (const naam of artefacten()) {
     const verklaard = EIGENAAR[naam] || null;
-    const schrijvers = [...(gemeten.get(naam) || [])];
+    /* Een verklaarde HERSTELLER schrijft alleen de oorspronkelijke bytes terug en
+       is geen schrijver; staat hij er niet met naam en reden, dan telt hij mee. */
+    const herstellers = (verklaard && verklaard.herstellers) || {};
+    const schrijvers = [...(gemeten.get(naam) || [])].filter(s => !herstellers[s]);
     const uitVersheid = versheid.has(naam) ? scriptVanOpdracht(versheid.get(naam)) : null;
     const stempelbaas = uitStempel(naam);
 

@@ -149,3 +149,22 @@ test('bundeldelen die midden in een sjabloon zijn geknipt worden als een logisch
     assert.equal(r.ongedekt, 0, 'de samengevoegde canonieke bron is volledig gedekt');
   } finally { fs.rmSync(wortel, { recursive: true, force: true }); }
 });
+
+test('WerkOS-bundeldelen sluiten hun templates: elke bron blijft afzonderlijk meetbaar', () => {
+  const fs = require('fs');
+  const path = require('path');
+  const vm = require('vm');
+  const { bundel } = require('../scripts/bundel');
+  const map = path.join(__dirname, '../public/shared/werkos');
+  for (const bestand of fs.readdirSync(map).filter(x => x.endsWith('.js'))) {
+    assert.deepEqual(blindIn(fs.readFileSync(path.join(map, bestand), 'utf8')),
+      { lexfout: false, kwijt: 0, eerste: null }, bestand + ' moet zonder uitsluiting meetbaar blijven');
+  }
+  new vm.Script(bundel('shared/werkos.js').toString());
+  const gebroken = 'const CSS = `\n.a { color: red; }\n';
+  assert.equal(blindIn(gebroken).lexfout, true, 'een template over een bestandsnaad is nog steeds blind');
+  const delen = [gebroken + '` +\n', '`.b { color: blue; }\n`;'];
+  assert.ok(delen.every(x => !blindIn(x).lexfout));
+  assert.equal(vm.runInNewContext(delen.join('') + '\nCSS'), '\n.a { color: red; }\n.b { color: blue; }\n',
+    'de herstelde naad mag de CSS-inhoud niet veranderen');
+});

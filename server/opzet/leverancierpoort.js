@@ -2,38 +2,20 @@
    van de MENS achter de balie wordt gevraagd.
 
    Acht dingen die bij elkaar horen: de twee SSE-wegen (naar een zaak, naar het
-   kantoor), de melding aan een zaak, de index die een code in O(1) op een zaak
+   kantoor), de melding aan een zaak, de index die een code op een actuele zaak
    terugvoert, de opzoeking zelf, de poort waar ELKE supplier-route doorheen
    moet, de persoonseis die daaraan hangt, en het activiteitenjournaal.
 
-   WAAROM DIT EEN EIGEN BESTAND IS. server/server.js staat op 121 kilobyte. Hij
-   mag groot zijn -- hij is de ophanglijst van het hele huis en staat daarom in
-   de MAG-lijst van scripts/check.js -- maar met een belofte erbij: "wordt per
-   ronde verder verdund". Dit is die ronde.
+   supplierAuth is apart leesbaar omdat ELKE supplier-route hierlangs gaat.
+   De persoonseis geldt ook voor de manager (kinderopvang, beveiliging en
+   hulpdiensten). De index mag daarvoor nooit een vervangen partner vasthouden.
 
-   EN DEZE ACHT ZIJN NIET WILLEKEURIG. supplierAuth is een POORT, en een poort
-   die in een bestand van tweeduizend regels woont kun je niet in een keer
-   nakijken -- terwijl dat precies is wat je met een poort wilt doen. De
-   persoonseis eronder houdt hele beroepsgroepen tegen (kinderopvang,
-   beveiliging, hulpdiensten) en geldt uitdrukkelijk OOK voor de manager.
-
-   WAT ER BINNENKOMT, EN WAAROM DRIE ERVAN BIJZONDER ZIJN.
-
-   `bus` en `kern` komen als GETTER binnen. De dienstenlaag (./diensten.js)
-   levert de bus maar krijgt findSupplier en de twee SSE-wegen van hieruit mee,
-   dus die twee kunnen niet allebei eerst zijn; en `kern` wordt pas onderaan
-   server.js gebouwd. Alles hieronder draait pas bij een VERZOEK, en dan staan
-   ze er allang. Een vaste verwijzing zou hier voor altijd undefined zijn --
-   dezelfde late binding als commDm en dyncodeGeef in server.js. De Proxy op
-   kern is daarbij geen kunstje maar het bestaande idioom: ./domeingrens.js doet
-   hetzelfde, en om dezelfde reden ("een kopie bevriest dat"). Met die twee
-   schilletjes zijn de acht functies WOORD VOOR WOORD overgenomen.
-
-   `grootSupplierSync` gaat als parameter mee en stond in server.js als vrije
-   naam in het bereik -- precies het soort binding dat bij een verhuizing STIL
-   stukgaat, want findSupplier valt er alleen op terug als de zaak NIET in de
-   kleine kast staat. Hij is gevonden doordat deze poort een eigen toets kreeg,
-   niet door hem te lezen. Zie test/leverancierpoort.test.js.
+   `bus` en `kern` komen als GETTER binnen: diensten.js levert de bus maar
+   gebruikt findSupplier en de SSE-wegen van deze poort; kern wordt later
+   gebouwd. Beide worden daarom pas bij het verzoek opgehaald. Een kopie bij
+   opbouw bevriest undefined. `grootSupplierSync` blijft een expliciete binding:
+   die wordt alleen na een actuele lokale miss aangesproken. De eigen toetsen
+   in test/leverancierpoort.test.js bewaken deze grenzen.
    ========================================================================== */
 'use strict';
 
@@ -64,23 +46,10 @@ module.exports = ({ db, save, crypto, rtgKlok, sessionFor, DEMO, accounts,
     return n;
   }
 
-  /* Leverancier opzoeken op code. Met miljoenen zaken in de kast is een lineaire
-     scan (Array.find) per verzoek te duur: elke kassahandeling, elke bestelling
-     en elke inlog zoekt een zaak op. Daarom een index (code -> zaak) die zichzelf
-     herbouwt zodra het aantal zaken verandert (nieuwe partner erbij). Zo is elke
-     opzoeking O(1), ook bij miljoenen restaurants. */
-  let _supIndex = null, _supIndexLen = -1;
-  function supplierIndex() {
-    if (!_supIndex || _supIndexLen !== db.data.suppliers.length) {
-      _supIndex = new Map();
-      for (const s of db.data.suppliers) _supIndex.set(s.code, s);
-      _supIndexLen = db.data.suppliers.length;
-    }
-    return _supIndex;
-  }
+  const supplierIndex = require('./leverancierindex')(() => db.data.suppliers);
   function findSupplier(code) {
     const c = String(code || '').trim().toUpperCase();
-    // eerst de kleine, actieve kast in het geheugen (O(1)); anders het grootboek
+    // Eerst de actuele kleine kast in het geheugen; anders het grootboek
     // in Postgres (miljoenen bulk-zaken, op aanvraag ingeladen met cache).
     return supplierIndex().get(c) || grootSupplierSync(c) || null;
   }
@@ -172,13 +141,18 @@ module.exports = ({ db, save, crypto, rtgKlok, sessionFor, DEMO, accounts,
   }
 
   // Legt vast wie wat deed binnen het bedrijf; live zichtbaar in de team-tab.
-  function logActivity(code, actor, text) {
+  function noteerActiviteit(code, actor, text, bewaar) {
     const list = db.data.supplierActivity[code] = (db.data.supplierActivity[code] || []);
     list.unshift({ who: actor ? actor.name : 'Beheer', text, at: new Date().toISOString() });
     db.data.supplierActivity[code] = list.slice(0, 80);
-    save();
+    bewaar();
     sseToSupplier(code, 'sync', { scope: 'team' });
   }
+  const logActivity = (code, actor, text) => noteerActiviteit(code, actor, text, save);
+  // Alleen voor een caller die zijn andere mutaties al zelf heeft bewaard.
+  // Gewone activiteit bewaart ook de bestaande impliciete domeinmutaties mee.
+  logActivity.alleenActiviteit = (code, actor, text) => noteerActiviteit(code, actor, text,
+    () => typeof save.sleutels === 'function' ? save.sleutels(['supplierActivity']) : save());
 
   return { sseToSupplier, sseToOffice, notifySupplier, supplierIndex,
     findSupplier, supplierAuth, persoonsPoort, logActivity };

@@ -36,7 +36,7 @@ module.exports = ({ db, save, crypto, rtgKlok, sessionFor, DEMO, accounts,
     bus.publish('sse', { doel: 'office', event, data, envelop: { classificatie: 'intern' } });
   }
 
-  const notifySupplier = require('./leveranciersmeldingen')({ db, save, crypto, rtgKlok, sseToSupplier });
+  const notifySupplier = require('./leveranciersmeldingen')({ meldingen: () => db.data.supplierNotifications, save, crypto, rtgKlok, sseToSupplier });
 
   const supplierIndex = require('./leverancierindex')(() => db.data.suppliers);
   function findSupplier(code) {

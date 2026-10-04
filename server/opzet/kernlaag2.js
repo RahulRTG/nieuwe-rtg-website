@@ -142,7 +142,7 @@ Object.assign(kern, require('../kern/foodcourt').maakFoodcourt({ db, save, crypt
    bevestigt). De visumtaak-haak is laat gebonden (kern/visumtaak.js komt in
    kernlaag7) en optioneel. */
 Object.assign(kern, require('../kern/reisbureau').maakReisbureau({ db, save, crypto, anthropic, accounts,
-  visumtaakVan: () => kern.visumtaak, meldLidVan: () => kern.meldLid }));
+  visumtaakVan: () => kern.visumtaak, meldLidVan: () => kern.meldLid, reisbetalingVan: () => kern.reisbetaling }));
 /* De geldgebeurtenis van een reis. Waarom, staat in de kop daar. */
 Object.assign(kern, require('../kern/reisbureau-betaling').maakReisbetaling({
   db, save, crypto, payVan: () => kern.pay, reisbureauVan: () => kern.reisbureau }));

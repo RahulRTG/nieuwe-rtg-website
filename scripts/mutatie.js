@@ -558,7 +558,7 @@ const EIGEN_MODULE = new Map([
   // Deze browserproeven laden clientgedrag of toetsen een keuringsmodule;
   // een gewijzigde serverrespons raakt hun beweringen niet.
   ['deelmenuwacht.e2e.js', ['public/shared/deelmenu.js']],
-  ['deelmenuronde.e2e.js', ['public/shared/deelmenu.js']],
+  ['deelmenuronde.e2e.js', ['public/shared/deelmenu/deelmenu-01.js', 'public/shared/deelmenu/deelmenu-02.js', 'public/shared/deelmenu/deelmenu-03.js']],
   ['leegtemeting.e2e.js', ['scripts/mobielkeuring.js']],
   ['liegend-scherm.e2e.js', ['scripts/lib/schermleugen.js']],
   ['rtg-dev.e2e.js', ['scripts/rtg-dev.js']],

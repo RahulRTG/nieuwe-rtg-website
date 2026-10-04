@@ -31,7 +31,7 @@ const COL = 'giftcards';
 module.exports = ({ db, bewerkCollectie, crypto, nu }) => {
   if (typeof bewerkCollectie !== 'function') throw new Error('De cadeaukaart vereist een collectietransactie.');
   const t = require('./cadeaukaart-toegang')(nu ? { crypto, nu } : { crypto });
-  const { bearer, kaal, codeHash, afdruk, sleutel, nieuweToegang, naarBuiten, DOEL, SCOPE, GELDIG_MS, MAX_GEBRUIK } = t;
+  const { bearer, kaal, codeHash, afdruk, sleutel, nieuweToegang, roteerToegang, naarBuiten, DOEL, SCOPE, GELDIG_MS, MAX_GEBRUIK } = t;
   nu = t.nu;
   const transactie = werk => bewerkCollectie(COL, bron => {
     if (!Array.isArray(bron)) throw new Error('giftcards hoort een lijst te zijn');
@@ -114,13 +114,13 @@ module.exports = ({ db, bewerkCollectie, crypto, nu }) => {
         return { status: 409, error: 'Deze cadeaukaart is verlopen.' };
       if (!(g.saldo > 0)) return { status: 409, error: 'Op deze kaart staat niets meer.' };
       const oud = g.toegang;
-      bearer.intrekken(oud, door, 'geroteerd');
+      let n;
+      try { n = roteerToegang(oud, door); } catch (e) {
+        if (e.code === 'geldigheid-ongeldig') return { status: 409, error: 'Deze cadeaukaart is verlopen.' };
+        throw e;
+      }
       g.historie = (g.historie || []).concat([{ code_hash: oud.code_hash, ingetrokken_at: oud.ingetrokken_at,
         rotatie: oud.rotatie }]).slice(-12);
-      const n = nieuweToegang(oud.issuer, g, oud.expires_at);
-      n.toegang.rotatie = (Number(oud.rotatie) || 1) + 1;
-      n.toegang.gebruik = oud.gebruik;
-      n.toegang.max_gebruik = oud.max_gebruik;
       g.toegang = n.toegang;
       g.legacy24 = false;
       g.laatste_rotatie = { idem_hash: idemHash, at: nu() };

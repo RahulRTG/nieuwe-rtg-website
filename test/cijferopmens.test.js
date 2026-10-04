@@ -59,7 +59,7 @@ const { WOORDEN, VERBODEN_ONDERWERP, UITZONDERINGEN, keurUitzonderingen, grensSc
 const MAPPEN = [
   ...['vertegenwoordiging', 'rugdekking', 'carriereledger',
     'levensband', 'levensbeleid', 'levensdossier', 'levensgraaf', 'levenslijn', 'socialegraaf',
-    'rtfos', 'command']
+    'rtfos', 'command', 'mobiliteit']
     .map(n => path.join(__dirname, '..', 'server', 'kern', n)),
   path.join(__dirname, '..', 'server', 'school'),
 ];
@@ -93,7 +93,7 @@ test('2. elk verboden woord draagt een reden', () => {
   }
 });
 
-test('3. geen cijfer op een mens in de carrierekant, de Foundation, School, rtfos en command', () => {
+test('3. geen cijfer op een mens in de carrierekant, de Foundation, School, rtfos, command en de dispatch', () => {
   const { gevonden, ontbreekt, onbenut, bezwaren } =
     grensScan(MAPPEN, { uitzonderingen: UITZONDERINGEN, wortel: WORTEL });
   assert.deepStrictEqual(bezwaren, [],

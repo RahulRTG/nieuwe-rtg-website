@@ -42,7 +42,8 @@ app.post('/api/supplier/order/sectie', supplierAuth, (req, res) => {
   sseToOffice('sync', { scope: 'orders' });
   if (o.status === 'klaar' && !wasKlaar && o.customerTier)
     notify(o.customerTier, { icon: '\u2705', title: req.supplier.name, body: 'Uw bestelling is klaar (bon ' + o.pickup + '). Toon bij het ophalen uw afhaal-QR in de app.', scope: 'orders' });
-  logActivity(req.supplier.code, req.actor, sectie + ': ' + o.ref + ' ' + (phase === 'klaar' ? 'klaar' : 'in bereiding'));
+  // Order en eventuele melding zijn al bewaard; dit spoor bezit alleen zichzelf.
+  (logActivity.alleenActiviteit || logActivity)(req.supplier.code, req.actor, sectie + ': ' + o.ref + ' ' + (phase === 'klaar' ? 'klaar' : 'in bereiding'));
   res.json({ ok: true, order: o });
 });
 
@@ -68,7 +69,7 @@ app.post('/api/supplier/order/station', supplierAuth, (req, res) => {
   sseToOffice('sync', { scope: 'orders' });
   if (o.status === 'klaar' && !wasKlaar && o.customerTier)
     notify(o.customerTier, { icon: '\u2705', title: req.supplier.name, body: 'Uw bestelling is klaar (bon ' + o.pickup + '). Toon bij het ophalen uw afhaal-QR in de app.', scope: 'orders' });
-  logActivity(req.supplier.code, req.actor, (station === 'bar' ? 'bar' : 'keuken') + ': ' + o.ref + ' ' + (phase === 'klaar' ? 'klaar' : 'in bereiding'));
+  (logActivity.alleenActiviteit || logActivity)(req.supplier.code, req.actor, (station === 'bar' ? 'bar' : 'keuken') + ': ' + o.ref + ' ' + (phase === 'klaar' ? 'klaar' : 'in bereiding'));
   res.json({ ok: true, order: o });
 });
 
@@ -91,7 +92,7 @@ app.post('/api/supplier/order/status', supplierAuth, async (req, res) => {
   broadcastSync([o.customerTier], 'orders');
   sseToOffice('sync', { scope: 'orders' });
   if (o.customerTier) notify(o.customerTier, { icon: 'horeca', title: req.supplier.name, body: 'Uw bestelling is nu: ' + status + '.', scope: 'orders' });
-  logActivity(req.supplier.code, req.actor, 'zette ' + o.ref + ' op "' + status + '"');
+  (logActivity.alleenActiviteit || logActivity)(req.supplier.code, req.actor, 'zette ' + o.ref + ' op "' + status + '"');
   res.json({ ok: true, order: o });
 });
 

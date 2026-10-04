@@ -12,7 +12,7 @@
       var body = U.el('div'); body.appendChild(text('strong', '', title)); if (sub) body.appendChild(text('span', 'wd-muted', sub)); n.appendChild(body); root.appendChild(n); return n; }
     function photo(url) { if (o.compact) return; var f = U.el('figure', 'wd-widget-photo'), im = U.el('img'); im.src = url; im.alt = ''; im.loading = 'lazy';
       f.appendChild(im); f.appendChild(copy('figcaption', '', 'atmosphere')); root.appendChild(f); }
-    function empty(key) { root.appendChild(copy('p', 'wd-widget-empty', key || 'empty')); }
+    function empty(key) { root.dataset.contentState = 'empty'; root.appendChild(copy('p', 'wd-widget-empty', key || 'empty')); }
     function array(j, key) { if (!Array.isArray(j[key])) throw new Error('invalid-widget-data'); return j[key]; }
     function calendar(j) {
       var items = array(j, 'items').concat(j.ecosysteem || []).slice().sort(function (a, b) {
@@ -73,9 +73,9 @@
     }
     function documents(j) { var files = array(j, 'items').filter(function (x) { return !x.weg && !x.verwijderd; });
       files.slice(0, 3).forEach(function (x) { row(x.naam, x.gewijzigd ? date(x.gewijzigd) : '', 'doc'); });
-      if (!files.length) { root.appendChild(U.icon('doc')); empty('filesEmpty'); } root.appendChild(open('documents')); }
+      if (!files.length) empty('filesEmpty'); root.appendChild(open('documents')); }
     function render(j) {
-      root.textContent = '';
+      root.textContent = ''; root.dataset.contentState = 'data';
       if (app.id === 'agenda' || app.id === 'foundation-agenda') calendar(j);
       else if (app.id === 'notities') notes(j);
       else if (app.id === 'reizen' || app.id === 'reisboek') travel(j);
@@ -101,7 +101,7 @@
         var today = array(j, 'vandaagOpSchema'); today.slice(0, 3).forEach(function (x) { row(x.naam, x.duurMin ? x.duurMin + ' min' : '', 'heart'); });
         if (!today.length) empty('noHealth'); root.appendChild(open()); }
       else if (app.id === 'veilig') { if (!j.wachten || !Array.isArray(j.wachten.lopend)) throw new Error('invalid-safety');
-        root.appendChild(U.icon('shield')); j.wachten.lopend.slice(0, 3).forEach(function (x) { row(x.label || x.soort, '', 'shield'); });
+        j.wachten.lopend.slice(0, 3).forEach(function (x) { row(x.label || x.soort, '', 'shield'); });
         if (!j.wachten.lopend.length) empty('safeEmpty'); root.appendChild(open()); }
       else if (app.id === 'kantoor') { var rows = array(j, 'regels'); rows.slice(0, 3).forEach(function (x) { row(x.titel || x.naam, x.datum || '', 'doc'); });
         if (!rows.length) empty(); root.appendChild(open()); }

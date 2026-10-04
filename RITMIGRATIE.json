@@ -1,5 +1,5 @@
 {
-  "stempel": "2026-09-25",
+  "stempel": "2026-10-03",
   "uitleg": "Per lezer van db.data.rides: wat hij eruit haalt en of de opdrachtwereld dat kan leveren. Geschreven vóór de migratie, zodat die niet wordt geraden. Zie MAATSTAF.md par. 7.5.",
   "blokkade": {
     "stand": "opgeheven",
@@ -13,7 +13,7 @@
   },
   "telling": {
     "bestanden": 23,
-    "treffers": 38,
+    "treffers": 40,
     "schrijver": 2,
     "stand": 7,
     "historie": 10,
@@ -27,14 +27,14 @@
     "schrijver": [
       {
         "bestand": "server/kern/lidacties/ritten.js",
-        "treffers": 2,
-        "wat": "maakt de rit (unshift) en zoekt hem terug om te betalen",
-        "naOmzetting": "wordt de plek waar de projectie ontstaat: de opdracht eerst, de rit-rij als afgeleide"
+        "treffers": 3,
+        "wat": "maakt de rit (unshift), geeft bestaande referenties door aan de pure botsingscontrole en zoekt hem terug om te betalen",
+        "naOmzetting": "de opdracht eerst, de rit-rij als afgeleide; ook historische betaalde referenties blijven nodig om een dubbele object- en betaalidentiteit uit te sluiten"
       },
       {
         "bestand": "server/routes/member/kopen/tickets.js",
-        "treffers": 3,
-        "wat": "maakt een transferrit bij een ticket, en weigert een tweede op dezelfde ticketRef",
+        "treffers": 4,
+        "wat": "maakt een transferrit bij een ticket, sluit bestaande ritreferenties uit en weigert een tweede op dezelfde ticketRef",
         "naOmzetting": "idem; let op de ticketRef-controle, die kent de opdrachtwereld niet"
       }
     ],

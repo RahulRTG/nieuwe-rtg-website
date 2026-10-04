@@ -1,8 +1,12 @@
 # Eén standaard voor desktop en mobiel
 
-Alle zelfstandige RTG-appschermen, de publieke appwebsite, wereld- en paspagina’s, Explore en de bedrijfssite gebruiken dezelfde indeling. Vanaf 1000 px staan er een bovenrand, titelstrook, mensenkolom, centraal werkvlak, favorieten en een appbibliotheek. Op 1440 px zijn de buitenmarges 40 px, de zijkolommen 216 en 280 px en de tussenruimtes 24 px. De gedeelde Edge heeft vijf knoppen. Kleinere schermen volgen de goedgekeurde mobiele tekening: één kolom, tabbladen, foto, actie, agenda, verhaal en apps met dezelfde vaste Edge.
+Alle zelfstandige RTG-appschermen, de publieke appwebsite, wereld- en paspagina’s, Explore en de bedrijfssite delen vormgeving en Edge-bediening. Vanaf 1000 px staan er een bovenrand, titelstrook, mensenkolom, centraal werkvlak, favorieten en een appbibliotheek. Op 1440 px zijn de buitenmarges 24 px, de zijkolommen 216 en 280 px en de tussenruimtes 20 px. De gedeelde Edge heeft vijf knoppen.
 
-LivingOS en Saloon gebruiken champagne/licht. WorkOS gebruikt grafiet met gedempt groen, TravelOS gedempt bordeaux en FoundationOS nachtblauw met zacht goud. Openbare platformpagina’s gebruiken neutraal warm onyx met subtiel brons. Foto’s, documenten en tekenvlakken behouden hun eigen inhoudskleuren.
+Onder 1000 px krijgt een app één inhoudsoppervlak: de eigen pagina, met dezelfde Edge. De desktop-titel, tabrij, zijpanelen, sfeerlaag en appbibliotheek worden niet om de mobiele pagina heen gestapeld. De oorspronkelijke wereldinhoud is direct zichtbaar, niet verstopt achter een tweede gegenereerde homepage. Een geopende desktopapp blijft bij versmallen het actieve oppervlak; invoer en iframe blijven bestaan. Dit is een presentatiewissel, geen navigatie of herladen. Publieke verhalen behouden hun inhoudelijke secties; die zijn de pagina zelf.
+
+De Edge past zijn materiaal aan vanuit het bestaande wereldpalet. Tijdens menselijk scrollen wordt hij kleiner, met vijf aanraakvlakken van minstens 44 px. Omhoog scrollen of rust herstelt de ruime stand. Actieve invoer, een geopend paneel en handmatig gekozen bediening gaan voor automatische beweging. Verminderde beweging en verhoogd contrast worden gerespecteerd. De gedeelde RTG-vorm blijft herkenbaar; er wordt geen aparte mobiele balk gebouwd.
+
+LivingOS en Saloon gebruiken warm onyx met brons en champagnegoud. WorkOS gebruikt donker petrol, TravelOS diep bordeaux en FoundationOS bosgroen met ivoren inhoudsvlakken. Foundation blijft altijd 100% gratis. Openbare platformpagina’s gebruiken neutraal warm onyx met subtiel brons. Foto’s, documenten en tekenvlakken behouden hun eigen inhoudskleuren.
 
 `public/shared/rtg-world-palette.css` bezit de wereldkleuren. De gedeelde desktopbestanden bezitten de geometrie. `scripts/heritage-uitrol.js` bewaakt alle 293 zelfstandige appingangen; de 18 bestaande aliases verwijzen door en bevatten geen tweede scherm. Een ingesloten app deelt het buitenste kader. Het gedeelde speelscherm laadt geen persoonlijke widgets.
 
@@ -17,3 +21,5 @@ De definitieve warme tekeningen en productiebeelden zijn vastgelegd in `docs/ont
 De bedrijfssite staat buiten deze apprepository. `scripts/company-desktop-build.js --source <bestaande-inhoud> --config <geverifieerde-workerconfig> --output <bouwmap>` bouwt alle pagina’s met exact dezelfde gedeelde bestanden. `DESKTOP-PROVENANCE.json` bevat de pagina-inventaris en SHA-256 per asset. Oude navigatiescripts en zelfstandige stylesheets worden niet meegenomen. De bestaande Worker, taalroutes, headers en redirects blijven behouden.
 
 Lokale controles en een gemergede PR zijn geen bewijs dat beide live domeinen dezelfde versie serveren. Controleer na publicatie de bestanden, cacheversie en zichtbare pagina’s op de openbare domeinen.
+
+De gedeelde desktop begint 24 px onder de bovenrand. Lege werkvlakken krijgen geen minimale decoratieve hoogte. Bodoni draagt grote redactionele titels; Inter draagt bediening en gegevens. De mobiele Edge is 60 px hoog met raakvlakken van minimaal 44 px, subtiel glas en het lippenbeeldmerk. Een geopend paneel of geleende appbediening vervangt de navigatie binnen dezelfde Edge.

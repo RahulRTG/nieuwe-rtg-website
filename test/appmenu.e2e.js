@@ -185,11 +185,17 @@ async function werelden(page) {
 /* Open de zichtbare witte Edge-laag zoals een lid dat doet. De oude Command-
    bank blijft als bron voor werkbladen in de DOM, maar is op de persoonlijke
    startpagina bewust geen tweede navigatie meer. */
+async function sluitEdgeWerkvlak(page) {
+  const sluiten = page.locator('.rtg-adaptive-sheet:not([hidden]) [data-rtg-adaptive-close]');
+  if (await sluiten.isVisible()) await sluiten.click();
+}
+
 async function openEdge(page, gezicht) {
   await page.waitForFunction(() => document.body.getAttribute('data-rtg-edge-2-rendered') === 'true' &&
     document.querySelectorAll('.rtg-edge-chrome').length === 1, null, { timeout: 10000 });
   const greep = page.locator('.rtg-edge-2-reveal');
   if (await greep.isVisible()) await greep.click();
+  await sluitEdgeWerkvlak(page);
   const menu = page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]');
   await menu.waitFor({ state: 'visible', timeout: 5000 });
   if (await page.locator('.rtg-edge-menu').getAttribute('aria-expanded') !== 'true') await menu.click();
@@ -214,6 +220,7 @@ async function openLade(page) {
   await page.waitForFunction(() => !document.querySelector('.rtg-edge-menu') ||
     document.querySelector('.rtg-edge-menu[data-rtg-command-brug="true"]'), null,
   { timeout: 5000 }).catch(() => {});
+  await sluitEdgeWerkvlak(page);
   const edge = page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]');
   await edge.waitFor({ state: 'visible', timeout: 10000 });
   if (await edge.isVisible()) {
@@ -401,6 +408,7 @@ test('het zichtbare Edge-menu opent en houdt home en instellingen bereikbaar',
         return !!(menu && getComputedStyle(menu).visibility !== 'hidden' && menu.getBoundingClientRect().width > 0);
       }, null, { timeout: 5000 });
     }
+    await sluitEdgeWerkvlak(page);
     await page.click('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]');
     await page.waitForFunction(() => document.querySelector('.rtg-edge-index')
       .getAttribute('aria-hidden') === 'false', null, { timeout: 5000 });
@@ -433,12 +441,13 @@ test('het zichtbare Edge-menu opent en houdt home en instellingen bereikbaar',
     await page.keyboard.press('Escape');
     await page.waitForFunction(() => !document.querySelector('.bdn-scrim.open'), null, { timeout: 3000 });
 
+    await sluitEdgeWerkvlak(page);
     const thuis = page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="home"]');
     await thuis.click();
     await page.waitForURL(/\/apps\/wereld\.html$/, { timeout: 8000 });
     assert.equal(new URL(page.url()).pathname, '/apps/wereld.html', 'Home opent de vernieuwde momentenfeed');
-    await page.waitForSelector('.wp-scene');
-    await page.locator('.wp-story a').click();
+    // The editorial Living home now opens its actual moments feed directly.
+    await page.waitForSelector('#feed');
     assert.equal(await page.locator('#feed').isVisible(), true, 'de momentenfeed is zichtbaar voor het ingelogde lid');
     await page.close();
   });
@@ -758,26 +767,26 @@ test('TravelOS gebruikt mobiel één veilige onderbalk met alle vier reisbladen'
     await require('./helper').edgeActies(page);
 
     /* Chromium heeft geen iPhone-notch. De bronregel gebruikt daarom een
-       overschrijfbare variabele met env() als echte terugval; zo meet deze toets
+       overschrijfbare variabele op het inhoudskader met env() als echte terugval; zo meet deze toets
        dezelfde 47px die de bovenste uitsparing op het toestel opeist. */
     await page.evaluate(async () => {
-      document.getElementById('rtgCommand').style.setProperty('--rtg-command-safe-top', '47px');
+      document.querySelector('.wd-page:has(>#rtgCommand)').style.setProperty('--rtg-command-safe-top', '47px');
       await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
     });
     const maat = await page.evaluate(() => {
       const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
       const doc = f.contentDocument;
-      const balk = document.querySelector('.rtg-adaptive-bar');
+      const oppervlakken = [...document.querySelectorAll('.rtg-adaptive-bar,.rtg-adaptive-sheet,.rtg-adaptive-surface')];
       const eigen = doc.querySelector('.hoofdtabs');
       const werelden = doc.querySelector('.os-switcher');
       const zichtbaar = (el) => !!(el && getComputedStyle(el).display !== 'none' &&
         el.getBoundingClientRect().height > 0);
       return {
         frameTop: Math.round(f.getBoundingClientRect().top),
-        schilbalk: zichtbaar(balk),
+        schilbalk: oppervlakken.filter(zichtbaar).length === 1,
         eigenBalk: zichtbaar(eigen),
         wereldbalk: zichtbaar(werelden),
-        onderbalken: [balk, eigen].filter(zichtbaar).length,
+        onderbalken: [...oppervlakken, eigen].filter(zichtbaar).length,
         navRuimte: getComputedStyle(doc.documentElement).getPropertyValue('--nav').trim(),
         acties: [...document.querySelectorAll('.rtg-adaptive-controls .cmd-actie')].map(b => b.dataset.cap),
         heeftMeer: zichtbaar(document.querySelector('#rtgCommand .cmd-meer'))
@@ -854,8 +863,8 @@ test('TravelOS gebruikt mobiel één veilige onderbalk met alle vier reisbladen'
     }, null, { timeout: 10000 });
     await kies('reizen.taxi', 'Taxi', 'taxi');
 
-    /* Dezelfde pagina mag op bureau niet kaal worden: daar bestaat de mobiele
-       schilbalk niet en blijft de eigen TravelOS-navigatie dus eigenaar. */
+    /* Op bureau blijft dezelfde gedeelde Edge de eigenaar. Het werkvlak
+       wordt gesloten zodat de compacte navigatie weer zichtbaar is. */
     await page.keyboard.press('Escape');
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.waitForFunction(() => {
@@ -918,7 +927,7 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
       const doc = f.contentDocument;
       return {
         acties: window.RTGAdaptief.context().acties,
-        schil: zichtbaar(document.querySelector('.rtg-adaptive-bar')),
+        schil: [...document.querySelectorAll('.rtg-adaptive-bar,.rtg-adaptive-sheet,.rtg-adaptive-surface')].filter(zichtbaar).length === 1,
         bank: zichtbaar(doc.querySelector('#rvApp > .rv-bank')),
         rahul: zichtbaar(doc.querySelector('#rvApp > .rv-rahul')),
         rasterrijen: getComputedStyle(doc.querySelector('#rvApp')).gridTemplateRows.trim().split(/\s+/).length
@@ -947,7 +956,7 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
     assert.deepEqual(await page.evaluate(() => {
       const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe'), doc = f.contentDocument;
       const zichtbaar = (el) => !!(el && getComputedStyle(el).display !== 'none' && el.getBoundingClientRect().height > 0);
-      return { eigenaren: [document.querySelector('.rtg-adaptive-bar'), doc.querySelector('.tos-nav')].filter(zichtbaar).length,
+      return { eigenaren: [...document.querySelectorAll('.rtg-adaptive-bar,.rtg-adaptive-sheet,.rtg-adaptive-surface'), doc.querySelector('.tos-nav')].filter(zichtbaar).length,
         travel: zichtbaar(doc.querySelector('.tos-nav')),
         onderruimte: getComputedStyle(doc.documentElement).getPropertyValue('--tos-bottom').trim() };
     }), { eigenaren: 1, travel: false, onderruimte: '0px' },
@@ -976,7 +985,7 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
     const vervoer = await page.evaluate(() => {
       const zichtbaar = (el) => !!(el && getComputedStyle(el).display !== 'none' &&
         el.getBoundingClientRect().height > 0);
-      const buiten = document.querySelector('.rtg-adaptive-bar');
+      const buiten = [...document.querySelectorAll('.rtg-adaptive-bar,.rtg-adaptive-sheet,.rtg-adaptive-surface')];
       const frames = [...document.querySelectorAll('#rtgCommand > .cmd-werk > .cmd-panes > .cmd-pane > iframe')];
       const rv = frames.find(f => f.contentWindow.location.pathname === '/apps/reizen-veilig.html');
       const leaf = frames.find(f => f.contentWindow.location.pathname === '/apps/ov.html');
@@ -984,8 +993,8 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
       const lokaal = leaf.contentDocument.querySelector('.tos-nav');
       const stijl = getComputedStyle(leaf.contentDocument.documentElement);
       return {
-        eigenaren: [buiten, bank, lokaal].filter(zichtbaar).length,
-        schil: zichtbaar(buiten), bank: zichtbaar(bank), travel: zichtbaar(lokaal),
+        eigenaren: [...buiten, bank, lokaal].filter(zichtbaar).length,
+        schil: buiten.filter(zichtbaar).length === 1, bank: zichtbaar(bank), travel: zichtbaar(lokaal),
         marker: leaf.contentDocument.documentElement.classList.contains('tos-ingebed'),
         embed: leaf.contentWindow.location.search,
         rail: stijl.getPropertyValue('--tos-rail').trim(),
@@ -1072,7 +1081,7 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
       const rv = frames.find(f => f.contentWindow.location.pathname === '/apps/reizen-veilig.html');
       const leaf = frames.find(f => f.contentWindow.location.pathname === '/apps/navigatie.html');
       return { bank: zichtbaar(rv.contentDocument.querySelector('#rvApp > .rv-bank')),
-        schil: zichtbaar(document.querySelector('.rtg-adaptive-bar')),
+        schil: [...document.querySelectorAll('.rtg-adaptive-bar,.rtg-adaptive-sheet,.rtg-adaptive-surface')].filter(zichtbaar).length === 1,
         kindnav: zichtbaar(leaf && leaf.contentDocument.querySelector('.tos-nav')),
         directeBladen: frames.length };
     });

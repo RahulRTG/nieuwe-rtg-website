@@ -100,8 +100,11 @@ test('1. delen kan alleen met wie u verbonden bent', async () => {
 });
 
 test('2. de ander leest de lijst -- en lost hem op met ZIJN eigen sessie', async () => {
+  const eigenLijst = await api('/api/mediaos/lijst/maak', { naam: 'Eigen muziek van vriend' }, vriend.token);
+  assert.equal(eigenLijst.status, 200);
   const mijne = await api('/api/mediaos/lijsten', {}, vriend.token);
-  assert.deepEqual(mijne.body.lijsten, [], 'het is niet zijn lijst');
+  assert.deepEqual(mijne.body.lijsten.map(l => l.id), [eigenLijst.body.lijst.id],
+    'de eigen lijst is zichtbaar; de gedeelde lijst wordt geen eigendom');
   assert.equal((mijne.body.metMij || []).length, 1, 'maar hij staat wel onder "met mij gedeeld"');
   assert.equal(mijne.body.metMij[0].van, eigenaar.codenaam, 'met de naam van wie hem deelde');
 
@@ -135,6 +138,12 @@ test('3. gedeeld is LEZEN, niet meeschrijven', async () => {
 });
 
 test('4. delen terugdraaien sluit de deur echt', async () => {
+  const voorEigenaar = await api('/api/mediaos/lijst', { id: lijstId }, eigenaar.token);
+  assert.equal(voorEigenaar.body.lijst.gedeeldMet.length, 1);
+  assert.equal(voorEigenaar.body.lijst.gedeeldMet[0], vriend.codenaam);
+  const voorVriend = await api('/api/mediaos/lijsten', {}, vriend.token);
+  assert.equal(voorVriend.body.metMij.length, 1);
+  assert.equal(voorVriend.body.metMij[0].id, lijstId, 'de concrete toegang bestaat vóór intrekking');
   const uit = await api('/api/mediaos/lijst/deel', { id: lijstId, codenaam: vriend.codenaam, aan: false }, eigenaar.token);
   assert.equal(uit.status, 200);
   assert.deepEqual(uit.body.lijst.gedeeldMet, []);
@@ -143,4 +152,5 @@ test('4. delen terugdraaien sluit de deur echt', async () => {
   assert.equal(na.status, 404, 'daarna komt hij er niet meer in, ook niet met het id');
   const lijstjes = await api('/api/mediaos/lijsten', {}, vriend.token);
   assert.deepEqual(lijstjes.body.metMij, [], 'en de lijst staat niet meer bij hem');
+  assert.deepEqual(lijstjes.body.lijsten, voorVriend.body.lijsten, 'intrekking bewaart zijn eigen lijst');
 });

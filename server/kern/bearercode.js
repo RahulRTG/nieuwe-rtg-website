@@ -21,6 +21,11 @@ const klok = require('../lib/klok');
 const maakV2 = require('./bearercode-v2');
 
 const MAX_GELDIG_MS = 366 * 86400000;
+/* SCHADUW voor de stille duur: een v1-code zonder bruikbare geldigMs krijgt
+   nog steeds 30 dagen, maar dat wordt hier GETELD per namespace en doel (geen
+   onderwerp, geen code, geen mens). Pas als deze teller in productie op nul
+   staat, kan de stille duur een weigering worden zonder een domein te breken. */
+const STILLE_DUUR = new Map();
 
 module.exports = ({ crypto, namespace, nu = () => klok.datum().toISOString(), normaal: eigenNormaal, sluit, spoor }) => {
   if (!crypto || typeof crypto.randomBytes !== 'function' || typeof crypto.createHash !== 'function' ||
@@ -57,6 +62,11 @@ module.exports = ({ crypto, namespace, nu = () => klok.datum().toISOString(), no
   };
   const maakV1 = ({ prefix, issuer, doel, scope, onderwerp, geldigMs, maxGebruik = 1 }) => {
     const issuedAt = nu();
+    if (!Number(geldigMs)) {
+      const sleutel = ns + '|' + String(doel || '').trim().slice(0, 100);
+      STILLE_DUUR.set(sleutel, (STILLE_DUUR.get(sleutel) || 0) + 1);
+      if (spoor) spoor({ soort: 'stille-duur', namespace: ns, doel: String(doel || ''), at: issuedAt });
+    }
     const duur = Math.max(1000, Math.min(Number(geldigMs) || 30 * 86400000, MAX_GELDIG_MS));
     const kaleCode = codeNieuw(prefix);
     const toegang = {
@@ -125,3 +135,4 @@ module.exports = ({ crypto, namespace, nu = () => klok.datum().toISOString(), no
 };
 
 module.exports.MAX_GELDIG_MS = MAX_GELDIG_MS;
+module.exports.stilleDuur = () => Object.fromEntries(STILLE_DUUR);

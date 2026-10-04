@@ -162,3 +162,21 @@ test('12. de fabriek eist echte crypto en een namespace', () => {
   assert.throws(() => maakLaag({ crypto, namespace: '  ' }), /namespace/);
   assert.equal(typeof maakLaag({ crypto, namespace: 'x' }).maak, 'function', 'zonder klok valt hij terug op de systeemtijd');
 });
+
+test('13. de stille duur wordt geteld per namespace en doel, en alleen als hij geldt', () => {
+  const ns = 'stil-' + process.pid;
+  const l = laag(ns), sporen = [];
+  const metSpoor = maakLaag({ crypto, namespace: ns + '-s', nu: () => T0, spoor: s => sporen.push(s) });
+  const voor = maakLaag.stilleDuur();
+  assert.equal(voor[ns + '|deur'], undefined, 'een verse namespace begint zonder telling');
+  for (const leeg of [undefined, null, 0, NaN, 'abc']) l.maak({ ...basis, geldigMs: leeg });
+  l.maak({ ...basis, geldigMs: DAG });
+  l.maak({ ...basis, geldigMs: -DAG });
+  l.maak({ ...basis, geldigheid: { duurMs: DAG }, gebruik: { max: 1 }, afgeleid: 'geen' });
+  assert.equal(maakLaag.stilleDuur()[ns + '|deur'], 5, 'alleen de vijf lege duren vallen op 30 dagen');
+  metSpoor.maak({ ...basis, doel: 'poort' });
+  assert.deepEqual(sporen, [{ soort: 'stille-duur', namespace: ns + '-s', doel: 'poort', at: T0 }]);
+  assert.equal(maakLaag.stilleDuur()[ns + '-s|poort'], 1);
+  const sleutels = Object.keys(maakLaag.stilleDuur()).filter(k => k.startsWith(ns));
+  assert.ok(sleutels.every(k => !/ZAAK|PROEF|openen/.test(k)), 'de telling draagt geen uitgever of scope');
+});

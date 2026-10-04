@@ -28,12 +28,23 @@ function bereiken(bron) {
 }
 
 const OPERATOREN_HTML = [
+  { naam: 'html-bron-weg', htmlAttr: true, vind: () => [] },
   { naam: 'html-hoofdinhoud-weg', html: 'main', vind: () => [] },
   { naam: 'html-breedte-breken', html: 'body', vind: () => [] }
 ];
 
 function muteerHtml(bron, op, index, muteerJs) {
   const { scripts, tags } = bereiken(bron);
+  if (op.htmlAttr) {
+    const gevonden = [];
+    for (const t of tags) {
+      const rauw = bron.slice(t.start, t.eind);
+      const m = /\s(?:src|href)\s*=\s*(["'])(\/[^"']+)\1/i.exec(rauw);
+      if (m) gevonden.push({ start: t.start + m.index + m[0].indexOf(m[2]), eind: t.start + m.index + m[0].indexOf(m[2]) + m[2].length });
+    }
+    const p = gevonden[index || 0];
+    return p ? bron.slice(0, p.start) + '/__rtg_mutatie__' + bron.slice(p.eind) : null;
+  }
   if (op.html) {
     const p = tags.filter(t => t.naam === op.html)[index || 0];
     if (!p) return null;

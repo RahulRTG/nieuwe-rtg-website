@@ -34,3 +34,10 @@ test('layoutfouten behouden de pagina en muteren geen commentaar, attributen of 
   assert.equal(muteerHtml('<p>geen hoofdinhoud</p>', OPERATOREN_HTML[0], 0, muteer), null);
   assert.equal(muteer('const main = true;', OPERATOREN_HTML[0], 0), null);
 });
+
+test('een lokale script- of stijlkoppeling kan weg zonder tekst en externe bronnen te raken', () => {
+  const bron = '<!-- href="/niet" --><a href="https://voorbeeld.nl">Extern</a><link href="/shared/vorm.css"><script src="/apps/werk.js"></script>';
+  assert.equal(muteerHtml(bron, OPERATOREN_HTML[0], 0, muteer), bron.replace('/shared/vorm.css', '/__rtg_mutatie__'));
+  assert.equal(muteerHtml(bron, OPERATOREN_HTML[0], 1, muteer), bron.replace('/apps/werk.js', '/__rtg_mutatie__'));
+  assert.equal(muteerHtml('<p>href="/tekst"</p>', OPERATOREN_HTML[0], 0, muteer), null);
+});

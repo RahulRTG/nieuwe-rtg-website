@@ -568,6 +568,8 @@ const EIGEN_MODULE = new Map([
   ['media-studio-pro.e2e.js', ['public/apps/media/studio-pro-engine.js']],
   ['werkruimte.e2e.js', ['public/shared/rtg-schil.js']],
   ['foundation-premium-ui.test.js', ['public/apps/foundation/sw.js', 'public/apps/foundation/premium.js']],
+  ['team-room-voorzijde.test.js', ['public/apps/personeel.html']],
+  ['winkel-voorzijde.test.js', ['public/apps/mall.html']],
   ['werkos-schil.e2e.js', ['public/shared/werkos.js']],
   ['rtg-edge-2.e2e.js', ['public/shared/rtg-edge-2.js']],
   ['storyline-worlds.e2e.js', ['public/site/storyline-world.js']],

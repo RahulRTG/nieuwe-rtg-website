@@ -20,7 +20,11 @@
      nieuwe pincode) sluit de stroom bij de eerstvolgende hartslag.
    Wat in de URL overblijft is dus een ticket dat na een minuut, of na het
    eerste gebruik, niets meer opent. Verbindt de browser opnieuw met dezelfde
-   URL, dan krijgt hij 401 en vraagt de client een nieuw ticket. */
+   URL, dan krijgt hij 401 en vraagt de client een nieuw ticket.
+
+   De mechaniek (uitgifte, eenmalige claim, binding, plafond, hercontrole) is
+   sinds 4 oktober 2026 gedeeld met de lesstroom: kern/stroomticket.js. Hier
+   blijven het voorvoegsel, de minuut, de kanalen, de opslag en de 401. */
 'use strict';
 
 const klok = require('../lib/klok');
@@ -55,46 +59,34 @@ function maak({ db, bewerkCollectie, crypto, gezinstoken, G, rtfHandle, producti
     return Promise.resolve(ruim(bezit.bak(COLLECTIE)));
   }
 
+  /* De gedeelde mechaniek (kern/stroomticket.js): uitgifte, eenmalige claim,
+     binding, plafond per profiel (de oudste valt af) en de hercontrole. */
+  const stroom = require('../kern/stroomticket')({ bearer, nu, transactie,
+    lees: (kaart, code) => eigen(kaart, code),
+    schrijf: (kaart, code, rij) => { if (rij.length) kaart[code] = rij; else delete kaart[code]; },
+    prefix: 'GS', issuer: 'rtg.foundation', doel: DOEL, scope: SCOPE, geldigMs: GELDIG_MS,
+    maxOpen: MAX_OPEN, bijVol: 'oudste', groep: o => o.profiel });
+
   /* Een ticket voor de houder van deze sessie; de kale waarde komt EEN keer terug. */
   async function geef(g, raw, kanaal) {
     if (!KANALEN.includes(kanaal)) return null;
     const h = gezinstoken.zoek(g, raw);
     if (!h || (kanaal === 'sociaal' && h.p.rol === 'gast')) return null;
-    const m = bearer.maak({ prefix: 'GS', issuer: 'rtg.foundation', doel: DOEL, scope: SCOPE,
-      onderwerp: { gezin: String(g.code), profiel: String(h.p.id), kanaal, sessie: h.t.code_hash },
-      geldigMs: GELDIG_MS, maxGebruik: 1 });
-    await transactie(kaart => {
-      const rij = Array.isArray(eigen(kaart, g.code)) ? kaart[g.code] : [];
-      rij.push(m.toegang);
-      while (rij.filter(t => t.onderwerp.profiel === h.p.id).length > MAX_OPEN)
-        rij.splice(rij.findIndex(t => t.onderwerp.profiel === h.p.id), 1);
-      kaart[g.code] = rij;
-    });
+    const onderwerp = { gezin: String(g.code), profiel: String(h.p.id), kanaal, sessie: h.t.code_hash };
+    const m = await stroom.geef(g.code, () => ({ onderwerp }));
     return { ticket: m.code, geldigTot: m.toegang.expires_at };
   }
 
-  /* De EENMALIGE inwisseling, in een collectietransactie. Elk ticket van het gezin
-     wordt vergeleken (timingSafeEqual, geen vroege uitgang); het ticket verdwijnt
-     in dezelfde transactie, ook als het daarna om een andere reden niet opent.
+  /* De EENMALIGE inwisseling, in een collectietransactie: het ticket verdwijnt
+     ook als het daarna om een andere reden niet opent. Gebonden aan kanaal en
+     gezin; de hercontrole vraagt of de sessie die het vroeg nog leeft.
      Geeft { ok, profielId, sessie } of { status }. */
-  function claim(code, raw, kanaal) {
-    const kaal = String(raw == null ? '' : raw).trim().toUpperCase();
+  async function claim(code, raw, kanaal) {
     const adres = String(code || '').toUpperCase();
-    if (!VORM.test(kaal) || !KANALEN.includes(kanaal)) return Promise.resolve({ status: 401 });
-    const gezocht = bearer.hash(kaal);
-    return transactie(kaart => {
-      const rij = eigen(kaart, adres);
-      let hit = null;
-      for (const t of Array.isArray(rij) ? rij : []) if (bearer.zelfdeHash(t && t.code_hash, gezocht)) hit = t;
-      if (!hit) return { status: 401 };
-      const over = rij.filter(t => t !== hit);
-      if (over.length) kaart[adres] = over; else delete kaart[adres];
-      const o = hit.onderwerp || {};
-      const g = eigen(G(), adres);
-      if (bearer.reden(hit, { doel: DOEL, scope: SCOPE }) || o.kanaal !== kanaal || o.gezin !== adres ||
-          !g || !gezinstoken.leeft(g, o.profiel, o.sessie)) return { status: 401 };
-      return { ok: true, profielId: o.profiel, sessie: o.sessie };
-    });
+    if (!VORM.test(String(raw == null ? '' : raw).trim().toUpperCase()) || !KANALEN.includes(kanaal)) return { status: 401 };
+    const uit = await stroom.claim(adres, raw, { voor: () => ({ binding: { kanaal, gezin: adres } }),
+      hercontrole: o => { const g = eigen(G(), adres); return !!g && gezinstoken.leeft(g, o.profiel, o.sessie); } });
+    return uit.ok ? { ok: true, profielId: uit.onderwerp.profiel, sessie: uit.onderwerp.sessie } : { status: 401 };
   }
 
   /* Na de claim: het gezin en profiel uit de live stand, plus een functie die bij

@@ -18,9 +18,9 @@
      ingetrokken leerling of een gesloten les opent niets, ook niet met een
      ticket dat hij een seconde eerder kreeg.
 
-   Er is (nog) geen generiek stroomticket in dit huis; dit is een klein eigen
-   mechanisme voor de lesstroom. Komt er een gedeeld mechanisme (de
-   gezinsstroom heeft dezelfde vraag), dan kunnen de twee samen. */
+   De mechaniek is sinds 4 oktober 2026 gedeeld met de gezinsstroom
+   (kern/stroomticket.js); hier blijven het voorvoegsel, de dertig seconden,
+   het plafond per les, de opslag in de les en de antwoorden van de route. */
 'use strict';
 
 const GELDIG_MS = 30000;
@@ -31,8 +31,6 @@ const NEE = Object.freeze({ status: 403, error: 'Deze toegang tot de les is verl
 const ONBEKEND = Object.freeze({ status: 404, error: 'Deze les kennen we niet.' });
 
 module.exports = ({ bearer, transactie, dicht, kaal, nu, DOEL: SLEUTELDOEL, SCOPE: SLEUTELSCOPE }) => {
-  const levend = t => !!t && Date.parse(t.expires_at) > Date.parse(nu());
-
   /* Wie draagt deze sleutel binnen de les? Elke sleutel wordt vergeleken,
      zonder vroege uitgang (dezelfde vorm als vanSleutel in ./toegang.js). */
   function wie(les, sleutel) {
@@ -50,41 +48,45 @@ module.exports = ({ bearer, transactie, dicht, kaal, nu, DOEL: SLEUTELDOEL, SCOP
       !bearer.reden(t, { doel: SLEUTELDOEL[rol], scope: SLEUTELSCOPE[rol], negeerGebruik: true });
   }
 
+  /* De gedeelde mechaniek: de tickets staan als hash in de les zelf. */
+  const st = require('../../kern/stroomticket')({ bearer, nu, transactie,
+    lees: (lessen, lesId) => lessen[lesId].stroomtickets,
+    schrijf: (lessen, lesId, rij) => { lessen[lesId].stroomtickets = rij; },
+    prefix: 'LESST', issuer: 'rtfoundation-onderwijs', doel: DOEL, scope: SCOPE, geldigMs: GELDIG_MS,
+    maxOpen: MAX_OPEN, bijVol: 'weiger' });
+  const lesIn = (lessen, lesId) => { const les = lessen[lesId]; return les && les.leraar ? les : null; };
+
   /* Uitgifte: de sleutel wordt BINNEN de transactie opnieuw getoetst. */
-  function geef(lesId, sleutel) {
-    return transactie(lessen => {
-      const les = lessen[String(lesId || '')];
-      if (!les || !les.leraar) return ONBEKEND;
+  async function geef(lesId, sleutel) {
+    const id = String(lesId || '');
+    const uit = await st.geef(id, lessen => {
+      const les = lesIn(lessen, id);
+      if (!les) return { weiger: ONBEKEND };
       const w = kaal(sleutel) ? wie(les, sleutel) : null;
-      if (!w || !sleutelGeldig(les, w.rol, w.studentId)) return NEE;
-      les.stroomtickets = (les.stroomtickets || []).filter(levend);
-      if (les.stroomtickets.length >= MAX_OPEN)
-        return { status: 429, error: 'Er staan te veel verbindingen tegelijk open voor deze les; probeer het zo weer.' };
+      if (!w || !sleutelGeldig(les, w.rol, w.studentId)) return { weiger: NEE };
       const onderwerp = { soort: 'foundation-les', les: les.id, rol: w.rol };
       if (w.studentId) onderwerp.leerling = w.studentId;
-      const m = bearer.maak({ prefix: 'LESST', issuer: 'rtfoundation-onderwijs', doel: DOEL, scope: SCOPE,
-        onderwerp, geldigMs: GELDIG_MS, maxGebruik: 1 });
-      les.stroomtickets.push(m.toegang);
-      return { ok: true, ticket: m.code, rol: w.rol, verloopt: m.toegang.expires_at };
+      return { onderwerp };
     });
+    if (uit.weiger) return uit.weiger;
+    if (uit.vol) return { status: 429, error: 'Er staan te veel verbindingen tegelijk open voor deze les; probeer het zo weer.' };
+    return { ok: true, ticket: uit.code, rol: uit.toegang.onderwerp.rol, verloopt: uit.toegang.expires_at };
   }
 
   /* Openen: DE claim. Het gevonden ticket gaat altijd weg -- ook als het al
      verlopen is of de sleutel eronder niet meer geldt -- zodat geen tweede
      opening het nog kan gebruiken. Een ticket van een andere les staat niet in
-     deze les en wordt dus nooit gevonden. */
-  function claim(lesId, ticket) {
-    return transactie(lessen => {
-      const les = lessen[String(lesId || '')];
-      if (!les || !les.leraar) return ONBEKEND;
-      const lijst = Array.isArray(les.stroomtickets) ? les.stroomtickets : [];
-      const t = kaal(ticket) ? bearer.vind(lijst, ticket) : null;
-      les.stroomtickets = lijst.filter(x => x !== t && levend(x));
-      if (!t || bearer.reden(t, { doel: DOEL, scope: SCOPE })) return NEE;
-      const o = t.onderwerp || {};
-      if (o.les !== les.id || !sleutelGeldig(les, o.rol, o.leerling)) return NEE;
-      return { ok: true, lesId: les.id, rol: o.rol, studentId: o.rol === 'leerling' ? o.leerling : null };
-    });
+     deze les en wordt dus nooit gevonden; de binding op het les-id houdt dat
+     ook vast als hij er toch zou staan. */
+  async function claim(lesId, ticket) {
+    const id = String(lesId || '');
+    const uit = await st.claim(id, kaal(ticket), {
+      voor: lessen => { const les = lesIn(lessen, id); return les ? { binding: { les: les.id } } : { weiger: ONBEKEND }; },
+      hercontrole: (o, lessen) => sleutelGeldig(lessen[id], o.rol, o.leerling) });
+    if (uit.weiger) return uit.weiger;
+    if (!uit.ok) return NEE;
+    const o = uit.onderwerp;
+    return { ok: true, lesId: o.les, rol: o.rol, studentId: o.rol === 'leerling' ? o.leerling : null };
   }
 
   return { stroomticket: geef, claimStroom: claim };

@@ -35,6 +35,14 @@ module.exports = [
      5xx in de sloophamer). kern/eigentransactie.js legt de ene weg vast: via
      bewerkCollectie, als haak voor de commit, en een fout telt in plaats van het
      verzoek te laten vallen. Twee kopieen zouden twee faalgedragen worden. */
+  /* HET STROOMTICKET (besluit van de eigenaar, 4 oktober 2026). De gezinsstroom
+     (GS.) en de lesstroom (LESST.) hadden elk een eigen eenmalig ticket voor een
+     EventSource; kern/stroomticket.js is nu de ene mechaniek (uitgifte via
+     kern/bearercode.js, eenmalige claim in de collectietransactie, binding,
+     plafond, hercontrole). Opslag, voorvoegsel en antwoorden blijven bij het
+     domein. */
+  { van: 'domein:foundation', naar: 'domein:stroomticket', soort: 'GEDEELDE_PRIMITIEF',
+    reden: 'gezinsstroom en lesstroom openen hun live-stroom met hetzelfde eenmalige, kortlevende ticket uit kern/stroomticket.js; twee kopieen zouden twee definities van eenmalig worden' },
   { van: 'domein:pasgeschiedenis', naar: 'domein:eigentransactie', soort: 'GEDEELDE_PRIMITIEF',
     reden: 'de pasovergang schrijft via kern/eigentransactie.js in een eigen collectietransactie, zodat gelijktijdige registraties niet in de requestcommit botsen' },
   { van: 'domein:aanwezigheid', naar: 'domein:eigentransactie', soort: 'GEDEELDE_PRIMITIEF',

@@ -53,7 +53,8 @@ module.exports = (kern) => {
     zonderWerkruimte: ['/api/bedrijf/mijn', '/api/bedrijf/werkruimte/maak']
   });
 
-  const sctx = { app, db, save, crypto, schoon, kern, W, nu, rid, dag, ruimteVan, beheerVan, lidVan, eigenVeld, sleutels };
+  const sctx = { app, db, save, crypto, schoon, kern, W, nu, rid, dag, ruimteVan, beheerVan, lidVan, eigenVeld, sleutels,
+    workLoopSource:kern.workLoopSource,loopFabric:kern.loopFabric };
 
   // de deellagen; de volgorde is gedrag (rollen zet de poort die de rest
   // gebruikt, en start zet de blokkenregistratie waar de rest zich op meldt)
@@ -79,6 +80,7 @@ module.exports = (kern) => {
   Object.assign(sctx, require('./regels')(sctx));
   Object.assign(sctx, require('./regelpoort')(sctx));
   Object.assign(sctx, require('./besluit')(sctx));
+  Object.assign(sctx, require('./loop-change')(sctx));
   Object.assign(sctx, require('./uitgave')(sctx));
   Object.assign(sctx, require('./tekengrens')(sctx));
   Object.assign(sctx, require('./samentekenen')(sctx));

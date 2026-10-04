@@ -16,14 +16,14 @@ het?**
 
 | | |
 |---|---|
-| Functieschakelaars (aan/uit per functie) | **227** in 17 categorieën |
+| Functieschakelaars (aan/uit per functie) | **228** in 17 categorieën |
 | Apps in de leden-catalogus | **90** in 8 categorieën |
 | Bedrijfsgenres | **79** in 28 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
-| Kernmodules (`server/kern/**`) | **2569** |
+| Kernmodules (`server/kern/**`) | **2575** |
 | App-pagina's (`public/apps/**.html`) | **316** |
-| Testbestanden | **2295** |
+| Testbestanden | **2299** |
 
 ## De vier werelden
 
@@ -54,7 +54,7 @@ ook blokkeert.
 
 ---
 
-# 1. De 227 functieschakelaars
+# 1. De 228 functieschakelaars
 
 ### Leden (RTG-app) — 27
 
@@ -263,7 +263,7 @@ ook blokkeert.
 - **Regie: rechtzetten & regels** (`zaakregie-beheer`) — Administratieve drift rechtzetten, een ronde terugdraaien, de eigen grenzen zetten en het spoor van de zaak lezen.  
   _voor: leverancier_
 
-### RTG-Backoffice — 7
+### RTG-Backoffice — 8
 
 - **Backoffice (algemeen)** (`office`) — Het RTG-actiecentrum: orders, ritten, prestaties, verificaties en partneraanvragen.  
   _voor: intern_
@@ -271,6 +271,8 @@ ook blokkeert.
   _voor: intern_
 - **Werk OS (werkruimtes)** (`bedrijf`) — De werkplek van een organisatie: leden, rollen, startscherm, projecten, kennis, klanten, service, bouw, contracten, IT en besluiten. Uit = geen enkele werkruimte of gedeeld gastvoorstel werkt meer.  
   _voor: intern, business, leverancier, personeel_
+- **Loop Fabric: overdracht en recall** (`loop-fabric`) — Duurzame, beleidsgebonden overdracht van bronobservaties, wijzigingsbonnen en recall tussen RTG-domeinen. Uit = bronwaarheid blijft intact, maar nieuwe overdracht en recall pauzeren.  
+  _voor: rtg, lifestyle, business, intern, leverancier, personeel_
 - **RTG Command: zien** (`command-zien`) — De puls van alle domeinen, de zoekbalk over alles en het objectdossier met zijn tijdlijn.  
   _voor: intern_
 - **RTG Command: doen** (`command-doen`) — De operator, de runbooks en de uitzonderingenrij: herstellen en afhandelen.  

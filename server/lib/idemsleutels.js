@@ -168,6 +168,7 @@ Object.assign(SLEUTELS,
   require('./idemsleutels-democratie').SLEUTELS,
   require('./idemsleutels-connection-final').SLEUTELS,
   require('./idemsleutels-leerhuis').SLEUTELS,
+  require('./idemsleutels-loop-fabric').SLEUTELS,
   require('./idemsleutels-conciergelus').SLEUTELS);
 
 /* Drie keuringen bij het laden, en ze staan bij elkaar in ./idemsleutels-nooit.js:

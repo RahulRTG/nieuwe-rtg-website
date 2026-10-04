@@ -1,16 +1,16 @@
 {
  "stempel": {
-  "op": "2026-09-30T20:13:02.559Z",
-  "commit": "ec186c7b2",
-  "boomVuil": false,
-  "boomAnders": 6,
+  "op": "2026-10-04T14:14:08.220Z",
+  "commit": "0055a1b2d",
+  "boomVuil": true,
+  "boomAnders": 8,
   "instrument": "scripts/handlerwacht.js",
-  "node": "v26.10.0"
+  "node": "v24.18.0"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
-  "zonderBewakerslaag": 648,
-  "bewaakt": 556,
+  "zonderBewakerslaag": 649,
+  "bewaakt": 557,
   "openbaarMetReden": 53,
   "eigenControle": 19,
   "sleutelDoorgegeven": 12,
@@ -49,7 +49,7 @@
  "perWacht": [
   {
    "naam": "werkPoort",
-   "aantal": 100
+   "aantal": 101
   },
   {
    "naam": "poort",
@@ -401,7 +401,7 @@
   },
   {
    "sleutel": "POST /api/bedrijf/besluit/advies",
-   "bestand": "server/bedrijf/besluit.js:63",
+   "bestand": "server/bedrijf/besluit.js:75",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
@@ -419,7 +419,7 @@
   },
   {
    "sleutel": "POST /api/bedrijf/besluit/maak",
-   "bestand": "server/bedrijf/besluit.js:42",
+   "bestand": "server/bedrijf/besluit.js:43",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
@@ -437,19 +437,19 @@
   },
   {
    "sleutel": "POST /api/bedrijf/besluit/sluit",
-   "bestand": "server/bedrijf/besluit.js:110",
+   "bestand": "server/bedrijf/besluit.js:122",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/besluit/stem",
-   "bestand": "server/bedrijf/besluit.js:92",
+   "bestand": "server/bedrijf/besluit.js:104",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/besluit/stemronde",
-   "bestand": "server/bedrijf/besluit.js:77",
+   "bestand": "server/bedrijf/besluit.js:89",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
@@ -575,7 +575,7 @@
   },
   {
    "sleutel": "POST /api/bedrijf/journaal",
-   "bestand": "server/bedrijf/rollen.js:143",
+   "bestand": "server/bedrijf/rollen.js:136",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
@@ -701,7 +701,7 @@
   },
   {
    "sleutel": "POST /api/bedrijf/lid/rollen",
-   "bestand": "server/bedrijf/rollen.js:95",
+   "bestand": "server/bedrijf/rollen.js:88",
    "staat": "bewaakt",
    "wacht": "beheerVan"
   },
@@ -718,8 +718,14 @@
    "wacht": "beheerVan"
   },
   {
+   "sleutel": "POST /api/bedrijf/loop/procedure/change",
+   "bestand": "server/bedrijf/loop-change.js:6",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
    "sleutel": "POST /api/bedrijf/mijn-rechten",
-   "bestand": "server/bedrijf/rollen.js:132",
+   "bestand": "server/bedrijf/rollen.js:125",
    "staat": "bewaakt",
    "wacht": "lidVan"
   },
@@ -851,7 +857,7 @@
   },
   {
    "sleutel": "POST /api/bedrijf/rollen",
-   "bestand": "server/bedrijf/rollen.js:88",
+   "bestand": "server/bedrijf/rollen.js:81",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },

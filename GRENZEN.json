@@ -142,12 +142,14 @@
       "entiteitRekening",
       "entiteitVind",
       "findSupplier",
+      "loopFabric",
       "rtmailTeam",
       "rtmailVak",
       "tenant",
       "werkBankBewijs",
       "werkBankpadStand",
-      "werkplekken"
+      "werkplekken",
+      "workLoopSource"
     ],
     "bedrijfsmaat": [
       "AANMELDKANALEN",
@@ -189,6 +191,9 @@
     ],
     "library": [
       "library"
+    ],
+    "loop-fabric": [
+      "loopFabric"
     ],
     "borden": [],
     "carriereledger": [

@@ -17,6 +17,7 @@ module.exports = (kern, hulp) => {
     noteFailedTry, pinSlot, rememberSession, save, sessieregister, supplierState } = hulp;
 
 require('./library')(kern, hulp);
+require('./loop-fabric')(kern, hulp);
 
 /* Het werkvenster (kern/werkvenster.js): de werkgever bepaalt wanneer
    personeel op de werkpagina en de PDA mag; de server dwingt dat af bij elke

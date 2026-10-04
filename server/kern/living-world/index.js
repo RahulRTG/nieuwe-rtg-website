@@ -1,10 +1,17 @@
 'use strict';
-const M = require('./model'), actions = require('./actions');
+const M = require('./model'), actions = require('./actions'), envelope = require('../envelop');
 const klok = require('../../lib/klok');
 module.exports = function makeLivingWorld({db,save,bewerkCollectie,sources,now}) {
   const eigen = require('../eigencollectie')({db,domein:'kern/living-world',bezit:{livingWorld:'kaart'}});
   const time = now || (() => klok.datum().toISOString());
   const read = () => Object.assign(M.empty(),eigen.kijk('livingWorld'));
+  async function mutate(work) {
+    if (bewerkCollectie) return bewerkCollectie('livingWorld',work);
+    const before = eigen.kijk('livingWorld'), next = M.clone(before), out = work(next);
+    eigen.zetBak('livingWorld',next);
+    try { await save(); } catch(e) { eigen.zetBak('livingWorld',before); throw e; }
+    return out;
+  }
   function target(s, action, p) {
     if (action === 'place.create') return null;
     if (action === 'blueprint.create' || action === 'contribution.create') return M.get(s,'places',p.placeId);
@@ -60,9 +67,14 @@ module.exports = function makeLivingWorld({db,save,bewerkCollectie,sources,now})
         return {...M.clone(previous.out),replay:true};
       }
       const at = time(), out = apply(s,key,action,data,receipt,at);
-      const event = {id:'lwe_' + receiptKey.slice(0,24),actor:key,action,
-        objectRef:out.objectRef,revision:out.result.revision,at,
-        previousHash:s.history.length ? s.history.at(-1).hash : null};
+      const eventId = 'lwe_' + receiptKey.slice(0,24), priorEvent = s.history.at(-1);
+      const event = {id:eventId,sequence:s.history.length+1,actor:key,action,
+        objectRef:out.objectRef,revision:out.result.revision,at,operationId:receipt,
+        previousHash:priorEvent ? priorEvent.hash : null,
+        envelop:envelope.maak({id:eventId,at,kanaal:'living-world',actor:key,
+          correlatie:receipt,oorzaak:null,
+          classificatie:action.startsWith('contribution.') ? 'persoonsgegeven' : 'intern'})};
+      if (action.startsWith('contribution.')) event.protocol = loopSource.observationRecord(s.contributions[out.result.id]);
       event.hash = M.hash(event); s.history.push(event);
       out.result.receiptId = event.id;
       s.receipts[receiptKey] = {fingerprint,out:M.clone(out)};
@@ -79,7 +91,10 @@ module.exports = function makeLivingWorld({db,save,bewerkCollectie,sources,now})
       return out;
     } catch(e) { return error(e); }
   }
+  const loopSource = require('./loop-source')({read,mutate,time});
   const projection = require('./projection')({read,time,sources});
   return {prepare:prepareWorldAction,execute,view:projection.view,saloon:projection.saloon,mediaLinks:projection.mediaLinks,
-    portfolio:require('./portfolio')(read,time)};
+    portfolio:require('./portfolio')(read,time),deliver:loopSource.deliver,
+    protocolEvents:loopSource.protocolEvents,resolveObservation:loopSource.resolveObservation,
+    returnChangeReceipt:loopSource.returnChangeReceipt};
 };

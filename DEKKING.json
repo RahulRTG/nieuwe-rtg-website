@@ -1,12 +1,12 @@
 {
   "uitleg": "Elke route (METHODE + patroon) die tijdens de volledige testsuite ECHT is aangeraakt, uit het routejournaal van server/routelog.js en niet uit de tekst van de toetsen. De eis is 100%: scripts/dekking.js zakt op elk gat en kent geen norm om die eis te verlagen. Het RTG Kantoor leest dit bestand (routes/office/dekking.js) en houdt het naast wat de server op dit moment registreert, zodat een route die er na de meting bij komt meteen als ongemeten opvalt. Bijwerken met: npm run dekking:vast",
   "gemeten": {
-    "op": "2026-10-04T05:10:45.176Z",
-    "commit": "22eda5459",
-    "routesToen": 5414,
-    "scope": "Incrementele samenvoeging van bestaande Living World CI-/browserjournalen en de finale LibraryOS-kernel-, Studio-, Reader- en browserproeven; geen volledig opnieuw uitgevoerde RTG-suite.",
+    "op": "2026-10-05T02:39:02.865Z",
+    "commit": "5bfc7b1cd",
+    "routesToen": 5419,
+    "scope": "Incrementele samenvoeging van het bestaande bewijs voor 5414 routes en de echte HTTP-journalen voor de vijf nieuwe Loop Fabric-routes; alle vijf nieuwe routes zijn via de gemounte server aangeroepen.",
     "werkkopie": true,
-    "herkomst": "LIBRARYOS-STUDIO-READER-RESULTAAT.md"
+    "herkomst": "RTG-LOOP-FABRIC-VERTICAL-SLICE.md"
   },
   "aangeraakt": [
     "GET /",
@@ -225,6 +225,7 @@
     "POST /api/bedrijf/lid/rollen",
     "POST /api/bedrijf/lid/tekengrens",
     "POST /api/bedrijf/lid/uit-dienst",
+    "POST /api/bedrijf/loop/procedure/change",
     "POST /api/bedrijf/mijn",
     "POST /api/bedrijf/mijn-rechten",
     "POST /api/bedrijf/mijnwerk",
@@ -1545,6 +1546,10 @@
     "POST /api/locatie/stop",
     "POST /api/login",
     "POST /api/logout",
+    "POST /api/loop/observation/inbox",
+    "POST /api/loop/proof",
+    "POST /api/loop/recall/disposition",
+    "POST /api/loop/recall/present",
     "POST /api/lucht/ai",
     "POST /api/lucht/bagage",
     "POST /api/lucht/bagage/zet",

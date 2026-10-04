@@ -86,10 +86,18 @@ test('mobile messages send to the intended test recipient and retain the convers
     await page.locator('.rtg-adaptive-surface [aria-label="Bediening openen"]').click();
     const control = page.locator('.rtg-adaptive-controls').getByRole('button',{name:'Wat is er afgesproken?',exact:true});
     await control.waitFor({state:'visible'});
-    await control.scrollIntoViewIfNeeded();
-    assert.equal(await control.evaluate(e => { const r = e.getBoundingClientRect();
+    // Scrollen en de raaktoets in een stap, herhaald tot hij klopt: de balk mag zich
+    // tussendoor herbouwen, maar de echte knop moet dan nog steeds zijn eigen bovenste element zijn.
+    const reachable = await page.waitForFunction(() => {
+      const e = [...document.querySelectorAll('.rtg-adaptive-controls button')]
+        .find(b => b.textContent.trim() === 'Wat is er afgesproken?');
+      if (!e) return false;
+      e.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      const r = e.getBoundingClientRect();
       const top = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
-      return !!top && e.contains(top); }), true, 'the single Edge keeps the original conversation action reachable');
+      return !!top && e.contains(top);
+    }, null, { timeout: 5000 }).then(() => true, () => false);
+    assert.equal(reachable, true, 'the single Edge keeps the original conversation action reachable');
     page.once('dialog',dialog=>dialog.dismiss());
     const requested = page.waitForRequest(r=>r.url().endsWith('/api/comm/ai'));
     await control.click();

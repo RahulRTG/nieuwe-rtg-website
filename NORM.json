@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1888,
-    "toetsenNietGemeten": 320,
+    "toetsenNietGemeten": 319,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -164,16 +164,6 @@
     "aankomstUitPositie": 0
   },
   "notities": [
-    {
-      "datum": "2026-10-04",
-      "soort": "schuld",
-      "sleutel": "toetsenNietGemeten",
-      "van": 319,
-      "vervalt": "2027-01-04",
-      "meter": "toetsenNietGemeten 319 -> 320",
-      "reden": "test/stroomticket.test.js is nieuw: de unittoets op server/kern/stroomticket.js, de mechaniek die de gezinsstroom (GS.) en de lesstroom (LESST.) sinds het besluit van de eigenaar van 4 oktober 2026 delen. Met de hand nagetrokken met vijf mutaties op de gedeelde module (claim niet eenmalig, geen binding, geen hercontrole, geen plafond, geen verloop); alle vijf zakten op deze toets. Dit is instrumentdekking en geen oordeel over de toets.",
-      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
-    },
     {
       "datum": "2026-10-04",
       "soort": "schuld",

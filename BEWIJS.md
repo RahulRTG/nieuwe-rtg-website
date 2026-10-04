@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2303 bestanden en 15774 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2304 bestanden en 15784 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2303 |
-| losse beweringen (`test(...)`) | 15774 |
+| toetsbestanden | 2304 |
+| losse beweringen (`test(...)`) | 15784 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 226 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1950 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1951 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 149 |
 | alleen in de kop *genoemd*, nog niet gemeten | 33 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2004 bestanden, 15262 beweringen.
+2005 bestanden, 15272 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -798,7 +798,7 @@ toets omvalt.
 | `kantoorawait.test.js` | 5 | gezakt op `liegpoort /api/` | HET KANTOOR BEVESTIGT GEEN VERWIJDERING DIE DE OPSLAG NIET HEEFT. TWEE FOUTEN IN EEN KETEN, en ze hielden elkaar overeind. |
 | `kantoorbank.test.js` | 10 | gezakt op `return-weg#0` | KAN DEZE HANDELING NA COMMIT EEN KANTOORBANK WIJZIGEN? (server/kern/isolatie/kantoorbank.js) DE VRAAG DIE DEZE SUITE AFDWINGT is met opzet NIET "zit deze route in het bankdomein". |
 | `kantoordeur-passkey.test.js` | 3 | gezakt op `liegpoort /api/` | EEN KANTOORMEDEWERKER MET EEN PASSKEY KAN DE INCASSORONDE STARTEN, en dan is de geldketen rond. Gevonden bij het meten van "passkeys aan de kantoordeur" (25 september 2026): kern/zwaarbewijs.js eist voor... |
-| `kantoordeur-productie.test.js` | 1 | gezakt op `liegpoort /api/` | DE KANTOORDEUR OP EEN ECHTE PRODUCTIESERVER (besluit B10, deur office.gedeelde_kantoorcode). In productie opent de gedeelde kantoorcode het kantoor niet meer; het kantoor gaat alleen open op naam, met een passkey... |
+| `kantoordeur-productie.test.js` | 3 | gezakt op `liegpoort /api/` | DE KANTOORDEUR OP EEN ECHTE PRODUCTIESERVER (besluit B10, deur office.gedeelde_kantoorcode). In productie opent de gedeelde kantoorcode het kantoor niet meer; het kantoor gaat alleen open op naam, met een passkey... |
 | `kantoordienst.test.js` | 3 | gezakt op `liegpoort /api/` | HET RTG-KANTOOR OP EEN WERKDAG: AANMELDEN, INWERKEN, EN DE NOODKNOP. DRIE DINGEN DIE HIER SAMENKOMEN 1. |
 | `kantoorgesprek.test.js` | 2 | gezakt op `liegpoort /api/` | De backoffice binnenkomen door met Rahul te praten in plaats van een codeveld in te vullen -- zonder dat de deur daar zachter van wordt. Dat laatste is de kern van deze test. |
 | `kantoorhuis.test.js` | 2 | gezakt op `liegpoort /api/` | WELKE ENTITEIT IS RTG, EN WERKT DEZE KANTOORMENS DAAR? (besluit B1, PERSONEEL.md par. |
@@ -1724,6 +1724,7 @@ toets omvalt.
 | `streng-poorten.test.js` | 7 | gezakt op `liegpoort /api/` | De strenge poorten-veeg over de nieuwe genredomeinen: elke werkplek-API weigert anoniemen (401) en zaken zonder het juiste vermogen (403), de leden-lagen weigeren gasten (403), en rommel-invoer (HTML-injectie,... |
 | `strenge-poort.test.js` | 2 | gezakt op `regex-alternatief-weg#0` | De strenge poort bewaakt de hele suite: een geslaagde test mag de server nooit een uncaughtException of unhandledRejection laten loggen. Deze test bewaakt de BEWAKER zelf: dat de detectie klopt (crashes wel,... |
 | `stripe-eigen.test.js` | 4 | gezakt op `===->!==#0` | De eigen Stripe-client (server/stripe.js) i.p.v. het pakket 'stripe'. |
+| `stroomticket.test.js` | 8 | gezakt op `===->!==#0` | Het gedeelde stroomticket (server/kern/stroomticket.js), regel voor regel: 128 bits en alleen de hash, kort en eenmalig, binding aan het onderwerp, het plafond (weigeren of de oudste verdringen), de hercontrole bij... |
 | `studio.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Ontwerpstudio: het voertuig- en vaartuig-ontwerpbureau van de kantoren (automotive, jachten, luchtvaart, helikopters). Een AI tekent het concept uit (silhouet, aandrijving, materialen, gedempt palet, uitrusting,... |
 | `stun.test.js` | 4 | gezakt op `===->!==#0` | Test voor de eigen STUN-server (server/stun.js): een Binding Request krijgt een Binding Success Response met een correct ge-XOR'd MAPPED-ADDRESS terug, en rommel wordt genegeerd (geen crash). Zo bellen leden zonder... |
 | `stuur-aanval.test.js` | 6 | gezakt op `!==->===#0` | Aanvalstoetsen voor het AI-stuur. Deze gebruiken bewust een vijandig nagemaakt model dat bevestigingsvelden fabriceert en verborgen routes kiest. |

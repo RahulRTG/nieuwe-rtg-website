@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-04T07:15:40.423Z",
-    "commit": "6b20e024",
+    "op": "2026-10-04T13:52:48.895Z",
+    "commit": "0fb2dc64",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -12936,6 +12936,14 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/stripe.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "stroomticket.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/stroomticket.js",
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1

@@ -271,18 +271,19 @@ function leesEnvBestand(pad) {
        (CLAUDE.md, privacy by design). Een adres in een terminalbuffer of in een
        screenshot bij een hulpvraag is precies de terugweg van codenaam naar
        mens die dat ontwerp wil voorkomen. De keuring wil alleen weten OF de
-       eigenaar gezet is en of hij niet nog op het voorbeeld staat; daar is de
-       gemaskeerde vorm genoeg voor. */
+       eigenaar gezet is en niet op het voorbeeld staat. */
     goed('Eigenaar van de technische pagina: ' + maskerEmail(env.RTG_OWNER_EMAIL));
 
   // 6. de productiedeur van de backoffice. De gedeelde code/TOTP-combinatie
   //    bestaat hier niet: productiedeur.js accepteert alleen een medewerker op
   //    naam met een verse passkeyceremonie en valt nooit op de codedeur terug.
   goed('Backoffice opent in productie uitsluitend op naam, met een verse passkey; de gedeelde code/TOTP-deur is gesloten.');
+  //    Kantoorcode en -TOTP: in productie genegeerd (B10/B24, 4 okt 2026).
+  if (env.OFFICE_CODE || env.OFFICE_TOTP_SECRET) waarschuw('OFFICE_CODE/-TOTP_SECRET genegeerd (B10/B24).');
 
   // 7. Magnaat Test en de verouderde snelle testinlog mogen nooit op de echte
-  //    installatie werken. De configuratiekeuring blokkeert beide standen;
-  //    hier bevestigen we de bedoelde eindstand nogmaals zichtbaar.
+  //    installatie werken. De configuratiekeuring blokkeert beide; hier
+  //    staat de eindstand nog eens zichtbaar.
   if (process.env.RTG_MAGNAAT_TEST !== '1' && process.env.RTG_DEMO !== '1')
     goed('Magnaat Test en snelle testinlog staan uit; leden loggen in via hun account, personeel met pincode.');
 

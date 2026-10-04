@@ -154,16 +154,18 @@ beantwoordt, ruimt alle drie de blokkades tegelijk op. Stand vandaag: 18 van de
 
 ## 2. Sterk aangeraden voor go-live
 
-Geen blokkade, wel een risico dat je bewust moet nemen. Regel 2.2 blijft alleen
-als historische correctie staan: de productieconfiguratie kent dat geheim niet
-meer. Zonder mailprovider belanden herstel- en bevestigingsmail nog steeds
-alleen in de lokale outbox; de actuele keuring bepaalt of dat de gekozen
-releasestand blokkeert.
+Geen blokkade, wel een risico dat je bewust moet nemen -- **behalve 2.2 en 2.5,
+en dat is de reden dat deze kop hier stond te liegen.** Nagemeten op 23 augustus
+2026 geeft `npm run golive` op allebei een blokkerend kruis, niet een
+waarschuwing (2.2 is op 4 oktober 2026 vervallen, zie de rij), en zonder
+mailprovider belanden herstel- en bevestigingsmail alleen in de lokale outbox.
+Ze houden hun nummer hier, want een nummer verhuist niet, maar ze horen bij §1
+gelezen te worden. De overige zeven zijn wél waarschuwingen.
 
 | # | Wat | Waarom |
 |---|---|---|
 | 2.1 | `ERR_WEBHOOK_URL` zetten en beproeven | Nu is er geen EXTERNE alarmering: een storing zie je alleen als je zelf kijkt, en niet als de doos plat ligt |
-| ~~2.2~~ | ~~`OFFICE_TOTP_SECRET` zetten~~ **Vervallen.** Productie opent het kantoor uitsluitend op naam met een verse passkey. Code/TOTP bestaat alleen nog buiten productie voor toetsen en demo's | Eén productiedeur, één rechtenmodel; geen ongebruikt gedeeld geheim |
+| ~~2.2~~ | ~~`OFFICE_TOTP_SECRET` zetten~~ **Vervallen op 4 oktober 2026** (besluit van de eigenaar): `OFFICE_CODE` en `OFFICE_TOTP_SECRET` zijn geen productie-eis meer. In productie opent de gedeelde code niets (B10, `kern/kantoor/productiedeur.js`) en gebruikt het koppelen van een uitnodiging de TOTP niet (B24); de start blokkeert niet meer zonder, en gezet worden ze genegeerd met een regel in het opstartlog (`opzet/startcontrole.js`, `test/kantoordeur-productie.test.js`) | Een eis op een geheim dat niets opent, is een ritueel |
 | 2.3 | `DATABASE_URL` (PostgreSQL) | Op SQLite kan er maar een instance zijn; het transactiegrootboek draait alleen in de sqlite- en postgres-stand |
 | 2.4 | `REDIS_URL` | Realtime werkt nu alleen binnen een proces |
 | 2.5 | Mail aanzetten: `SMTP_URL` (smarthost) **of** `MAIL_DIRECT=1` (eigen bezorging, zie `npm run eigenpost`) | Herstel-links en bevestigingen worden nu niet echt verstuurd. De verzendlaag is er wel helemaal -- eigen SMTP-client, eigen MX-bezorging, eigen DKIM -- maar zonder een van beide standen gaat alles naar de outbox. Voor de directe stand moeten drie dingen BUITEN de code kloppen: open poort 25 uit, kloppende PTR, en de DNS-records uit `npm run eigenpost` |

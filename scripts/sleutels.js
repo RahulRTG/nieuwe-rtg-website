@@ -31,6 +31,10 @@ const optie = (naam) => {
   return a ? a.slice(voor.length) : '';
 };
 const hex = (n) => crypto.randomBytes(n).toString('hex');
+/* OFFICE_CODE en OFFICE_TOTP_SECRET maakt dit script niet meer (4 oktober
+   2026): in productie opent de kantoorcode niets (B10) en koppelen vraagt een
+   eigen passkey in plaats van de gedeelde TOTP (B24). */
+
 const docker = heeft('--docker');
 const priveBeta = heeft('--prive-beta');
 const zonderAi = heeft('--zonder-ai');

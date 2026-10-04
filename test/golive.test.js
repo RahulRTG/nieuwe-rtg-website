@@ -4,6 +4,9 @@
    geweigerd, en dat de go-live-keuring goed keurt en afkeurt.
    Draai los: node --test test/golive.test.js */
 const test = require('node:test');
+/* De opstelling zet OFFICE_CODE en -TOTP toch: in productie genegeerd (B10/B24,
+   4 okt 2026), en de code met tweede factor opent niets. */
+const { totpCode } = require('../server/kern/totp');
 const assert = require('node:assert/strict');
 const { spawn, spawnSync } = require('node:child_process');
 const fs = require('fs');

@@ -16,6 +16,12 @@ function keurIdentiteit(env, fouten) {
      demo's, maar zijn daarom geen productieconfiguratie. */
   if (env.RTG_ISOLATIE_AFDWINGEN !== '1')
     fouten.push('RTG_ISOLATIE_AFDWINGEN=1 ontbreekt: persoonlijke isolatie zou alleen meten en gewone HTTP-verzoeken niet blokkeren. Productie vereist actieve handhaving.');
+  /* OFFICE_CODE en OFFICE_TOTP_SECRET zijn sinds 4 oktober 2026 GEEN eis meer
+     (besluit van de eigenaar): in productie opent de gedeelde kantoorcode niets
+     (B10, kern/kantoor/productiedeur.js) en gebruikt het koppelen van een
+     uitnodiging de TOTP niet (B24, kern/eenaccount/koppelen.js). Een eis op een
+     geheim dat niets opent, is een ritueel. Staan ze toch gezet, dan negeert de
+     server ze en zegt hij dat in een regel (opzet/startcontrole.js). */
 }
 
 module.exports = { keurIdentiteit };

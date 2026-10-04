@@ -11,7 +11,11 @@
      2. in productie: de code (formulier en gesprek) wordt geweigerd;
      3. een oude codesessie en een sessie op naam zonder passkey openen niets;
      4. op naam zonder passkey op het account: geen kantoor, met de weg erheen;
-     5. op naam met een passkey: eerst de ceremonie, daarna binnen.
+     5. op naam met een passkey: eerst de ceremonie, daarna binnen;
+     6. OFFICE_CODE en OFFICE_TOTP_SECRET zijn geen productie-eis meer (besluit
+        van de eigenaar, 4 oktober 2026, B10/B24): de server start ZONDER beide,
+        en MET beide start hij ook, opent de code niets en staat er precies een
+        regel in het opstartlog dat ze genegeerd worden (opzet/startcontrole.js).
 
    Draai los: node --test test/kantoordeur-productie.test.js */
 'use strict';
@@ -22,6 +26,7 @@ const os = require('node:os');
 const path = require('node:path');
 const { startServer, stop, stopNet, kantoorKoppelBody } = require('./helper');
 const { maakAuthenticator } = require('./webauthn-authenticator');
+const { totpCode } = require('../server/kern/totp');
 
 const APP = 'https://rtg.voorbeeld.test';
 const CODE = 'GEHEIME-CODE-123';
@@ -127,4 +132,55 @@ test('echte productieserver: de kantoorcode opent niets, op naam met een passkey
   assert.ok(binnen.body.token, 'een kantoorsessie');
   const log = await api('/api/office/securitylog', {}, binnen.body.token);
   assert.equal(log.status, 200, 'de kantoorsessie met passkey opent een kantoorroute: ' + JSON.stringify(log.body).slice(0, 120));
+});
+
+/* ---- 6. geen productie-eis meer op de kantoorcode en haar TOTP ---- */
+const TOTP = 'JBSWY3DPEHPK3PXP';
+const REGEL = /\[start\] OFFICE_CODE en OFFICE_TOTP_SECRET staan gezet maar worden in productie genegeerd \(B10\/B24\)/g;
+
+const PROD = { NODE_ENV: 'production', RTG_DEMO: '0', APP_URL: 'https://rtg.voorbeeld.test/',
+  SMTP_URL: 'smtp://rtg:test@mail.voorbeeld.test:587', ERR_WEBHOOK_URL: 'https://alarm.voorbeeld.test/rtg',
+  ...KEYS, RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl', RTG_ISOLATIE_AFDWINGEN: '1',
+  RTG_BETALEN_UIT: '1', RTG_AI_UIT: '1', RTG_HERSTEL_SMS_UIT_BEWUST: '1' };
+
+/* Start in productie en lees het opstartlog mee. Een lege string overschrijft
+   wat er toevallig in de omgeving van de aanroeper staat: "niet gezet". */
+async function start(t, kantoor) {
+  const srv = await startServer({ stderr: 'pipe', env: { ...PROD, OFFICE_CODE: '', OFFICE_TOTP_SECRET: '', ...kantoor } });
+  t.after(() => stop(srv.child));
+  let log = '';
+  srv.child.stderr.setEncoding('utf8');
+  srv.child.stderr.on('data', d => { log += d; });
+  const post = (pad, body) => fetch(srv.base + pad, { method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Forwarded-Proto': 'https' }, body: JSON.stringify(body || {}) })
+    .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+  /* de startcontrole draait VOOR het luisteren (opzet/start.js), dus de regel
+     staat al in de pijp; geef hem alleen de tijd om aan te komen */
+  await new Promise(r => setTimeout(r, 200));
+  return { post, log: () => log };
+}
+
+async function codeOpentNiets(post, lijven) {
+  for (const lijf of lijven) {
+    const r = await post('/api/office/login', lijf);
+    assert.equal(r.status, 403, 'de kantoorcode opent in productie niets: ' + JSON.stringify(r.body).slice(0, 120));
+    assert.equal(r.body.code, 'KANTOORCODE_NIET_IN_PRODUCTIE');
+    assert.equal(r.body.token, undefined, 'geen sessie');
+  }
+  const g = await post('/api/kantoor/gesprek/start', {});
+  assert.equal(g.status, 403, 'ook het kantoorgesprek neemt geen code aan');
+  assert.equal(g.body.code, 'KANTOORCODE_NIET_IN_PRODUCTIE');
+}
+
+test('6a. productie start zonder OFFICE_CODE en OFFICE_TOTP_SECRET, en de code opent niets', async t => {
+  const { post, log } = await start(t, {});
+  await codeOpentNiets(post, [{ code: 'RTG-OFFICE' }, { code: CODE }]);
+  assert.equal((log().match(REGEL) || []).length, 0, 'niets gezet, dus ook niets te negeren:\n' + log().slice(0, 600));
+});
+
+test('6b. productie start MET beide gezet: genegeerd, met een regel in het opstartlog', async t => {
+  const { post, log } = await start(t, { OFFICE_CODE: CODE, OFFICE_TOTP_SECRET: TOTP });
+  await codeOpentNiets(post, [{ code: CODE }, { code: CODE, totp: totpCode(TOTP) }]);
+  assert.equal((log().match(REGEL) || []).length, 1,
+    'precies een regel dat ze genegeerd worden, niet stil en niet herhaald:\n' + log().slice(0, 600));
 });

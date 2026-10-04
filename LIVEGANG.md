@@ -93,8 +93,9 @@ versleutelde geldvolume daarna exact eenmaal. Start/restart doet dit nooit
 automatisch en blijft bij een verdwenen of afwijkende volume fail-closed.
 Bewaar een versleutelde kopie van deze bestanden en het geldvolume buiten de
 server. Het productiekantoor gebruikt geen gedeelde code of losse TOTP:
-medewerkers openen de kantoorrol op naam met hun eigen passkey. Verwijder
-`RTG_OWNER_BOOTSTRAP` zodra het eigenaarsaccount is geclaimd.
+medewerkers openen de kantoorrol op naam met hun eigen passkey, en
+`OFFICE_CODE`/`OFFICE_TOTP_SECRET` zijn geen eis meer (B10/B24, 4 okt 2026).
+Verwijder `RTG_OWNER_BOOTSTRAP` zodra het eigenaarsaccount is geclaimd.
 
 ClamAV haalt zijn handtekeningen dagelijks op via een apart update-netwerk en
 publiceert poort 3310 niet op de host. Reserveer hiervoor circa 4 GB RAM; bij te

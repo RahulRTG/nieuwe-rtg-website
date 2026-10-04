@@ -2137,15 +2137,13 @@ const { ritVerder, ritBezetting } = maakVervoer({
 /* ================= BACKOFFICE (RTG) =================
    De backoffice ziet alle binnenkomende dynamische prijzen, bestellingen en
    ritten live. Demo-toegang met een vaste code. */
-// In productie mag de demo-backofficecode ('RTG-OFFICE') nooit werken: zonder een
-// eigen OFFICE_CODE wordt hij onraadbaar willekeurig, zodat de deur dichtblijft
-// tot er een echte code is gezet. Buiten productie houden we de demo-code.
-/* Zonder eigen OFFICE_CODE wordt hij onraadbaar willekeurig -- ALTIJD, niet
-   alleen in productie. De terugval op 'RTG-OFFICE' hing aan dezelfde vergeten
-   vlag als hierboven, en die code staat letterlijk in deze repo: iedereen die
-   hem gelezen heeft kon de backoffice van deze server openen. De demo-code komt
-   alleen nog terug als de demo-modus uitdrukkelijk aanstaat. */
-const OFFICE_CODE = process.env.OFFICE_CODE || (DEMO ? 'RTG-OFFICE' : crypto.randomBytes(18).toString('hex'));
+/* Zonder eigen OFFICE_CODE wordt hij onraadbaar willekeurig -- ALTIJD. De
+   terugval op 'RTG-OFFICE' staat letterlijk in deze repo en komt alleen terug
+   als de demo-modus uitdrukkelijk aanstaat. In productie wordt een gezette
+   OFFICE_CODE NIET gelezen (B10, 4 oktober 2026): de code opent daar niets, en
+   opzet/startcontrole.js zegt in een regel dat hij genegeerd wordt. */
+const OFFICE_CODE = process.env.OFFICE_CODE && !PRODUCTION ? process.env.OFFICE_CODE
+  : (DEMO ? 'RTG-OFFICE' : crypto.randomBytes(18).toString('hex'));
 
 
 /* De backoffice-laag (officeAuth, officeState, pendingVerifications) staat in

@@ -17973,6 +17973,14 @@
         "instrument": "scripts/mutatie.js",
         "node": "v24.18.0"
       }
+    },
+    "stroomticket.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/stroomticket.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     }
   }
 }

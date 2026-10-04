@@ -92,21 +92,18 @@ test('config: herstel-SMS moet echt bestaan of bewust fail-closed staan', () => 
   assert.ok(!bewust.fouten.some(f => /SMS-provider/.test(f)), 'de bewuste fail-closed stand is toegestaan');
 });
 
-/* De productiedeur accepteert uitsluitend een kantoorsessie op naam die door
-   een verse passkeyceremonie is geopend. Een gedeelde code of losse TOTP is
-   daar geen factor meer en hoort dus ook geen schijnveilig productievereiste
-   te zijn. Buiten productie blijven beide variabelen beschikbaar voor de
-   bestaande toetsen en demo's. */
-test('config: productie vereist geen ongebruikte gedeelde kantoorcode of losse TOTP', () => {
+/* Kantoorcode en -TOTP zijn sinds 4 oktober 2026 geen productie-eis meer: in
+   productie opent de code niets (B10) en koppelen vraagt een eigen passkey
+   (B24). Ontbreken, te kort of gezet: geen fout en geen waarschuwing. */
+test('config: productie start zonder OFFICE_CODE en OFFICE_TOTP_SECRET (B10/B24)', () => {
   const basis = { NODE_ENV: 'production', RTG_ENC_KEY: 'a'.repeat(64), RTG_VAULT_KEY: 'v'.repeat(64),
     RTG_SECRET_KEY: 's'.repeat(64), RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl', SMTP_URL: 'smtp://x',
     RTG_HERSTEL_SMS_UIT_BEWUST: '1', STRIPE_DEMO_BEWUST: '1' };
-  const zonder = config.valideer(basis);
-  assert.ok(!zonder.fouten.concat(zonder.waarschuwingen).some(f => /OFFICE_(?:CODE|TOTP_SECRET)/.test(f)),
-    'ontbrekende gedeelde kantoorgeheimen mogen de passkey-only productiedeur niet blokkeren');
-  const oud = config.valideer({ ...basis, OFFICE_CODE: 'kort', OFFICE_TOTP_SECRET: 'x' });
-  assert.ok(!oud.fouten.concat(oud.waarschuwingen).some(f => /OFFICE_(?:CODE|TOTP_SECRET)/.test(f)),
-    'legacy demo/testwaarden mogen in productie geen tweede rechtenmodel suggereren');
+  for (const extra of [{}, { OFFICE_CODE: 'kort', OFFICE_TOTP_SECRET: 'JBSWY3DP' },
+    { OFFICE_CODE: 'KANTOORCODE12', OFFICE_TOTP_SECRET: 'JBSWY3DPEHPK3PXP' }]) {
+    const r = config.valideer({ ...basis, ...extra });
+    assert.ok(!r.fouten.concat(r.waarschuwingen).some(f => /OFFICE_/.test(f)), JSON.stringify(extra));
+  }
 });
 
 test('config: een ongebruikte SMTP_HOST doet zich niet voor als werkende mailroute', () => {

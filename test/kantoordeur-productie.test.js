@@ -24,7 +24,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startServer, stop, stopNet, kantoorKoppelBody } = require('./helper');
+const { startServer, stop, stopNet, kantoorKoppelBody, wachtOpWaarde } = require('./helper');
 const { maakAuthenticator } = require('./webauthn-authenticator');
 const { totpCode } = require('../server/kern/totp');
 
@@ -157,9 +157,11 @@ async function start(t, kantoor) {
   const post = (pad, body) => fetch(srv.base + pad, { method: 'POST',
     headers: { 'Content-Type': 'application/json', 'X-Forwarded-Proto': 'https' }, body: JSON.stringify(body || {}) })
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
-  /* de startcontrole draait VOOR het luisteren (opzet/start.js), dus de regel
-     staat al in de pijp; geef hem alleen de tijd om aan te komen */
-  await new Promise(r => setTimeout(r, 200));
+  /* de startcontrole schrijft de kantoorregel VOOR de waarschuwing over het
+     ontbrekende eigenaarsaccount, op dezelfde stderr; staat die tweede er, dan
+     is de eerste er ook -- of komt hij niet. Wachten op een toestand, geen slaapje. */
+  await wachtOpWaarde(() => /\[start\] LET OP: er is nog geen account op het eigenaarsadres/.test(log),
+    { wat: 'de startcontrole in het opstartlog' });
   return { post, log: () => log };
 }
 

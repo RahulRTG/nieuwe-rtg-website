@@ -1,17 +1,17 @@
 {
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
-  "vastgelegd": "2026-09-30",
+  "vastgelegd": "2026-10-03",
   "gemeten": {
-    "bestanden": 2655,
-    "vormen": 1549,
-    "velden": 2209,
-    "modules": 854,
-    "domeinen": 306,
+    "bestanden": 2664,
+    "vormen": 1553,
+    "velden": 2218,
+    "modules": 857,
+    "domeinen": 307,
     "envelopDrempel": 19,
-    "envelop": 28,
-    "veldenDomeineigen": 1540,
+    "envelop": 29,
+    "veldenDomeineigen": 1548,
     "veldenGedeeldVanafVier": 230,
-    "gelijkendeVormparen": 24
+    "gelijkendeVormparen": 23
   },
   "envelop": [
     "aantal",
@@ -39,6 +39,7 @@
     "tijd",
     "titel",
     "tot",
+    "type",
     "uitleg",
     "van",
     "wat"
@@ -66,18 +67,6 @@
         "kern/command",
         "kern/leerhuis",
         "kern/lidboard"
-      ]
-    },
-    {
-      "veld": "type",
-      "domeinen": 18,
-      "waar": [
-        "bedrijf",
-        "kern/antivirus",
-        "kern/command",
-        "kern/commerce",
-        "kern/connection-communication",
-        "kern/connection-communication-call"
       ]
     },
     {
@@ -523,6 +512,18 @@
         "kern/magnaat-controle",
         "kern/magnaat-trainingslobby-acties"
       ]
+    },
+    {
+      "veld": "klaar",
+      "domeinen": 10,
+      "waar": [
+        "kern/afdelingen",
+        "kern/beveiliging",
+        "kern/borden",
+        "kern/eten",
+        "kern/magnaat-partnerstudio-basis",
+        "kern/muziek"
+      ]
     }
   ],
   "paren": [
@@ -540,7 +541,6 @@
         "oorzaak",
         "past",
         "terugDraaibaar",
-        "type",
         "veld"
       ]
     },
@@ -574,34 +574,6 @@
     },
     {
       "gelijkenis": 1,
-      "a": "server/kern/magnaat-werkroutefabriek.js",
-      "b": "server/kern/magnaatwereld.js",
-      "domeinA": "kern/magnaat-werkroutefabriek",
-      "domeinB": "kern/magnaatwereld",
-      "gedeeld": [
-        "max",
-        "min",
-        "placeholder",
-        "type",
-        "verplicht"
-      ]
-    },
-    {
-      "gelijkenis": 1,
-      "a": "server/kern/webplatform-live.js",
-      "b": "server/kern/webplatform.js",
-      "domeinA": "kern/webplatform-live",
-      "domeinB": "kern/webplatform",
-      "gedeeld": [
-        "lk",
-        "lt",
-        "rk",
-        "rt",
-        "type"
-      ]
-    },
-    {
-      "gelijkenis": 1,
       "a": "server/kern/agent.js",
       "b": "server/kern/personeel.js",
       "domeinA": "kern/agent",
@@ -615,15 +587,28 @@
     },
     {
       "gelijkenis": 1,
-      "a": "server/kern/connection-communication-call.js",
-      "b": "server/kern/connection-communication.js",
-      "domeinA": "kern/connection-communication-call",
-      "domeinB": "kern/connection-communication",
+      "a": "server/kern/magnaat-werkroutefabriek.js",
+      "b": "server/kern/magnaatwereld.js",
+      "domeinA": "kern/magnaat-werkroutefabriek",
+      "domeinB": "kern/magnaatwereld",
       "gedeeld": [
-        "incoming",
-        "revision",
-        "state",
-        "type"
+        "max",
+        "min",
+        "placeholder",
+        "verplicht"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/webplatform-live.js",
+      "b": "server/kern/webplatform.js",
+      "domeinA": "kern/webplatform-live",
+      "domeinB": "kern/webplatform",
+      "gedeeld": [
+        "lk",
+        "lt",
+        "rk",
+        "rt"
       ]
     },
     {
@@ -650,24 +635,6 @@
     },
     {
       "gelijkenis": 0.9,
-      "a": "server/kern/command/runbookcatalogus.js",
-      "b": "server/kern/zaakcommand/runbooks.js",
-      "domeinA": "kern/command",
-      "domeinB": "kern/zaakcommand",
-      "gedeeld": [
-        "actie",
-        "certificaat",
-        "klantImpact",
-        "naar",
-        "oorzaak",
-        "past",
-        "terugDraaibaar",
-        "type",
-        "veld"
-      ]
-    },
-    {
-      "gelijkenis": 0.9,
       "a": "server/kern/spellen/projectie.js",
       "b": "server/kern/spelprojectie-toegang.js",
       "domeinA": "kern/spellen",
@@ -685,17 +652,20 @@
       ]
     },
     {
-      "gelijkenis": 0.83,
-      "a": "server/kern/magnaat-werkroutefabriek.js",
-      "b": "server/kern/magnaatwereld.js",
-      "domeinA": "kern/magnaat-werkroutefabriek",
-      "domeinB": "kern/magnaatwereld",
+      "gelijkenis": 0.89,
+      "a": "server/kern/command/runbookcatalogus.js",
+      "b": "server/kern/zaakcommand/runbooks.js",
+      "domeinA": "kern/command",
+      "domeinB": "kern/zaakcommand",
       "gedeeld": [
-        "max",
-        "min",
-        "placeholder",
-        "type",
-        "verplicht"
+        "actie",
+        "certificaat",
+        "klantImpact",
+        "naar",
+        "oorzaak",
+        "past",
+        "terugDraaibaar",
+        "veld"
       ]
     },
     {
@@ -713,6 +683,19 @@
         "publiekePrijs",
         "sku",
         "varianten"
+      ]
+    },
+    {
+      "gelijkenis": 0.8,
+      "a": "server/kern/magnaat-werkroutefabriek.js",
+      "b": "server/kern/magnaatwereld.js",
+      "domeinA": "kern/magnaat-werkroutefabriek",
+      "domeinB": "kern/magnaatwereld",
+      "gedeeld": [
+        "max",
+        "min",
+        "placeholder",
+        "verplicht"
       ]
     },
     {

@@ -34,6 +34,7 @@
 'use strict';
 
 const CONTRACTEN = Object.assign({},
+  require('./mutatiecontracten-library').CONTRACTEN,
   require('./mutatiecontracten-living-world').CONTRACTEN,
   require('./mutatiecontracten-mall-aanvraag').CONTRACTEN,
   require('./mutatiecontracten-beelden').CONTRACTEN,

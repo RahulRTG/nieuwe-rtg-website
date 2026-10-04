@@ -16,14 +16,14 @@ het?**
 
 | | |
 |---|---|
-| Functieschakelaars (aan/uit per functie) | **226** in 17 categorieën |
+| Functieschakelaars (aan/uit per functie) | **227** in 17 categorieën |
 | Apps in de leden-catalogus | **89** in 8 categorieën |
 | Bedrijfsgenres | **79** in 28 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
-| Kernmodules (`server/kern/**`) | **2557** |
+| Kernmodules (`server/kern/**`) | **2566** |
 | App-pagina's (`public/apps/**.html`) | **315** |
-| Testbestanden | **2289** |
+| Testbestanden | **2293** |
 
 ## De vier werelden
 
@@ -54,7 +54,7 @@ ook blokkeert.
 
 ---
 
-# 1. De 226 functieschakelaars
+# 1. De 227 functieschakelaars
 
 ### Leden (RTG-app) — 27
 
@@ -392,8 +392,10 @@ ook blokkeert.
 - **Sparren en parkeren** (`ov-spar`) — De sparlijst: iets parkeren om er later op terug te komen.  
   _voor: rtg, lifestyle, business_
 
-### Cultuur en gezelschap — 7
+### Cultuur en gezelschap — 8
 
+- **Foundation LibraryOS kernel** (`dom-library`) — Besloten werken, afspraken, rechten en editiegebonden vrijgave; geen publieke catalogus of verkoop.  
+  _voor: rtg, lifestyle, business_
 - **Het Genootschap** (`dom-genootschap`) — Het besloten genootschap: kringen, bijeenkomsten en beheer.  
   _voor: rtg, lifestyle, business_
 - **Sport** (`dom-sport`) — Sportprogramma's, teams en wedstrijden.  

@@ -16,6 +16,8 @@ module.exports = (kern, hulp) => {
   const { accounts, crypto, db, findSupplier, haversine, klokVan, logActivity, loginFails,
     noteFailedTry, pinSlot, rememberSession, save, sessieregister, supplierState } = hulp;
 
+require('./library')(kern, hulp);
+
 /* Het werkvenster (kern/werkvenster.js): de werkgever bepaalt wanneer
    personeel op de werkpagina en de PDA mag; de server dwingt dat af bij elke
    ingang naar een personeelssessie. Rahul adviseert los daarvan (agenda,

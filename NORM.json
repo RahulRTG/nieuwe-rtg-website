@@ -1335,9 +1335,9 @@
       "soort": "schuld",
       "sleutel": "p99Ms",
       "van": 144,
-      "vervalt": "2026-10-01",
+      "vervalt": "2026-12-15",
       "meter": "p99Ms 144 -> 233, doorvoerPerSec 395 -> 336, eventLoopP99Ms 64,8 -> 97,9 (op de LAATSTE run, niet op deze stand)",
-      "reden": "De tweede samenvoegronde (PR #83): 23 PR-takken bijeen. EERLIJK GEZEGD IS DIT GEEN METING VAN DEZE VERZAMELING. BEPROEVING.json draagt een run van 18 augustus, van voor de veertien nieuwe takken; hij is wel op dezelfde soort (sqlite) als de grondwaarde, dus de vergelijking klopt -- maar hij beschrijft de code van toen. De lat gaat mee met wat er gemeten IS in plaats van te blijven staan op een getal dat niemand heeft nagelopen; de eerstvolgende npm run beproeving over deze stand vervangt hem door een echte."
+      "reden": "De tweede samenvoegronde (PR #83): 23 PR-takken bijeen. EERLIJK GEZEGD IS DIT GEEN METING VAN DEZE VERZAMELING. BEPROEVING.json draagt een run van 18 augustus, van voor de veertien nieuwe takken; hij is wel op dezelfde soort (sqlite) als de grondwaarde, dus de vergelijking klopt -- maar hij beschrijft de code van toen. De lat gaat mee met wat er gemeten IS in plaats van te blijven staan op een getal dat niemand heeft nagelopen; de eerstvolgende npm run beproeving over deze stand vervangt hem door een echte. OPNIEUW BESLOTEN op 2026-10-04 door de eigenaar, met een nieuwe datum: niet afgelost en lokaal niet te bewijzen, want de lat geldt op de CI-runner (scripts/beproeving-ci-bewijs.js) en de laatste ronde daar gaf geen verbetering. Aflossen is profileren onder de storm (npm run beproeving) en de duurste paden per verzoek inkorten, in een eigen PR."
     },
     {
       "datum": "2026-08-19",
@@ -1983,8 +1983,8 @@
       "soort": "schuld",
       "sleutel": "bewijsAchterstand",
       "van": 985,
-      "vervalt": "2026-09-30",
-      "reden": "Vier posten erbij bij de samenvoeging van 24 takken, alle vier in object-vooraf: nieuwe routes die een bestaand object willen bedienen dat de proef niet zelf heeft aangemaakt. Geen enkele post wisselde van soort, dus dit is groei in omvang en niet in aard. De sluitweg per post staat in BEWIJSSCHULD.json."
+      "vervalt": "2026-12-15",
+      "reden": "Vier posten erbij bij de samenvoeging van 24 takken, alle vier in object-vooraf: nieuwe routes die een bestaand object willen bedienen dat de proef niet zelf heeft aangemaakt. Geen enkele post wisselde van soort, dus dit is groei in omvang en niet in aard. De sluitweg per post staat in BEWIJSSCHULD.json. OPNIEUW BESLOTEN op 2026-10-04 door de eigenaar, met een nieuwe datum: de schuld is van 3178 naar 1717 gezakt (gemeten, vastgelegd met norm.js --vastleggen) maar nog niet terug op 985. Wat ontbreekt staat per post in BEWIJSSCHULD.json; de grootste is output-niet-toerekenbaar (1037 routes, sluitweg node scripts/outputproef.js --meet=<n>), dan object-vooraf (323) en idem-ongeclassificeerd (152). Aflossen gebeurt in een eigen PR en niet in deze samenvoeging."
     },
     {
       "datum": "2026-08-27",
@@ -2100,8 +2100,8 @@
       "soort": "schuld",
       "sleutel": "p99Ms",
       "van": 144,
-      "vervalt": "2026-09-30",
-      "reden": "Samenvoeging van 24 takken (tak samenvoeging-negen-2026-08-18). Latentie p99 onder de storm; 24 gebundelde takken meer werk per verzoek. Bewust genoteerd als schuld en niet stil verlaagd; de meter hoort terug naar 144."
+      "vervalt": "2026-12-15",
+      "reden": "Samenvoeging van 24 takken (tak samenvoeging-negen-2026-08-18). Latentie p99 onder de storm; 24 gebundelde takken meer werk per verzoek. Bewust genoteerd als schuld en niet stil verlaagd; de meter hoort terug naar 144. OPNIEUW BESLOTEN op 2026-10-04 door de eigenaar, met een nieuwe datum: niet afgelost en lokaal niet te bewijzen, want de lat geldt op de CI-runner (scripts/beproeving-ci-bewijs.js) en de laatste ronde daar gaf geen verbetering. Aflossen is profileren onder de storm (npm run beproeving) en de duurste paden per verzoek inkorten, in een eigen PR."
     },
     {
       "datum": "2026-08-27",
@@ -2109,8 +2109,8 @@
       "soort": "schuld",
       "sleutel": "eventLoopP99Ms",
       "van": 64.8,
-      "vervalt": "2026-09-30",
-      "reden": "Samenvoeging van 24 takken (tak samenvoeging-negen-2026-08-18). Event-loopvertraging p99 onder de storm, zelfde oorzaak als p99Ms. Bewust genoteerd als schuld en niet stil verlaagd; de meter hoort terug naar 64.8."
+      "vervalt": "2026-12-15",
+      "reden": "Samenvoeging van 24 takken (tak samenvoeging-negen-2026-08-18). Event-loopvertraging p99 onder de storm, zelfde oorzaak als p99Ms. Bewust genoteerd als schuld en niet stil verlaagd; de meter hoort terug naar 64.8. OPNIEUW BESLOTEN op 2026-10-04 door de eigenaar, met een nieuwe datum: zelfde oorzaak en zelfde sluitweg als p99Ms; de laatste CI-ronde gaf 114,3 ms, dus de schuld groeit eerder dan dat hij krimpt en dat staat hier met opzet bij."
     },
     {
       "datum": "2026-08-27",

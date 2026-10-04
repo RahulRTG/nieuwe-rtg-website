@@ -125,7 +125,7 @@ test('de twee laden onder een regel: openen, uitvoeren en de weg terug',
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, reg.token);
     await page.goto(base + '/apps/kantoor.html', { waitUntil: 'domcontentloaded' });
-    await page.locator('.wp-domain > summary').click();
+    if(await page.locator('.wp-domain > summary:visible').count())await page.locator('.wp-domain > summary:visible').click();
     await page.waitForFunction(() => !!window.RTGGebaar, null, { timeout: 20000 });
     /* Een gebaar op een onzichtbaar vlak is geen gebaar: het wereldhuis toont
        zijn inhoud pas na zijn eigen startlaag, en een pointer die op verborgen
@@ -236,7 +236,7 @@ test('doorvegen kan terug, en wat niet terug kan gaat alleen op vasthouden',
     const paginaFouten = [];
     letOpFouten(page, paginaFouten);
     await page.goto(base + '/apps/kantoor.html', { waitUntil: 'domcontentloaded' });
-    await page.locator('.wp-domain > summary').click();
+    if(await page.locator('.wp-domain > summary:visible').count())await page.locator('.wp-domain > summary:visible').click();
     await page.waitForFunction(() => !!window.RTGGebaar, null, { timeout: 20000 });
     /* Een gebaar op een onzichtbaar vlak is geen gebaar: het wereldhuis toont
        zijn inhoud pas na zijn eigen startlaag, en een pointer die op verborgen
@@ -401,7 +401,7 @@ async function houdVinger(page, loc, ms) {
 
 async function openKantoor(page, base) {
   await page.goto(base + '/apps/kantoor.html', { waitUntil: 'domcontentloaded' });
-    await page.locator('.wp-domain > summary').click();
+    if(await page.locator('.wp-domain > summary:visible').count())await page.locator('.wp-domain > summary:visible').click();
   await page.waitForFunction(() => !!window.RTGGebaar, null, { timeout: 20000 });
   await werkdagInBeeld(page);
 }
@@ -543,7 +543,7 @@ test('op een aanraakscherm ligt de lade in de regel en niet over de pagina',
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, reg.token);
     await page.goto(base + '/apps/kantoor.html', { waitUntil: 'domcontentloaded' });
-    await page.locator('.wp-domain > summary').click();
+    if(await page.locator('.wp-domain > summary:visible').count())await page.locator('.wp-domain > summary:visible').click();
     await page.waitForFunction(() => !!window.RTGGebaar, null, { timeout: 20000 });
     /* Een gebaar op een onzichtbaar vlak is geen gebaar: het wereldhuis toont
        zijn inhoud pas na zijn eigen startlaag, en een pointer die op verborgen

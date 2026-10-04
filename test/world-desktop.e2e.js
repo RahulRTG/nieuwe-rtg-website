@@ -43,6 +43,21 @@ test('four desktop worlds use one composition and one Edge; the mobile home stay
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true, route);
       if (route !== '/') assert.match(await page.locator('.wd-people').innerText(), /Meld u aan/);
       if (route.includes('foundation')) assert.match(await page.locator('.wd-people').innerText(), /100% gratis/);
+      await page.waitForFunction(() => [...document.querySelectorAll('.wd-favorites .wd-widget-content')]
+        .every(el => el.dataset.state !== 'loading'));
+      const guestCards = await page.locator('.wd-favorites .wd-widget-content[data-state="guest"]').evaluateAll(nodes => nodes.map(el => ({
+        minHeight: getComputedStyle(el).minHeight, height: el.getBoundingClientRect().height,
+        repeatedIcon: el.querySelectorAll('.wd-icon').length, repeatedAction: el.querySelectorAll('button').length,
+        hasAppAction: !!el.closest('.wd-widget').querySelector('.wd-widget-open'),
+        timestamp: el.querySelectorAll('.wd-widget-updated').length
+      })));
+      for (const card of guestCards) {
+        assert.equal(card.minHeight, '0px');
+        assert.ok(card.height < 60, route + ': an unauthenticated status is a compact line, not an empty data panel');
+        assert.equal(card.repeatedIcon, 0); assert.equal(card.repeatedAction, 0);
+        assert.equal(card.hasAppAction, true, 'the original app action remains available');
+        assert.equal(card.timestamp, 0, 'an unauthenticated widget cannot claim data was retrieved');
+      }
       await page.locator('.wd-library').scrollIntoViewIfNeeded();
       const overlap = await page.evaluate(() => {
         const top = document.querySelector('.wd-library').getBoundingClientRect().top;
@@ -94,6 +109,13 @@ test('a widget expands into a real app, preserves input, and delegates controls 
     await page.waitForSelector('[data-desktop-source="nieuwLijst"]');
     await page.locator('[data-desktop-source="nieuwLijst"]').click();
     await frame.locator('#ntTitel').fill('Mijn concept blijft staan');
+    await page.setViewportSize({ width:390, height:844 });
+    await page.waitForSelector('body[data-rtg-shell="mobile"]');
+    await frame.locator('#ntTitel').waitFor({ state:'visible' });
+    assert.equal(await frame.locator('#ntTitel').inputValue(), 'Mijn concept blijft staan');
+    assert.equal(await page.locator('.wd-home').isVisible(), false, 'the open app is the only mobile surface');
+    await page.setViewportSize({ width:1440, height:1050 });
+    await page.waitForSelector('body[data-rtg-desktop]');
     await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="home"]').click();
     assert.equal(await page.locator('.wd-home').isVisible(), true);
     await page.evaluate(() => window.RTGi18n.set('en'));
@@ -112,6 +134,14 @@ test('unavailable and forbidden widget data are never rendered as an empty confi
       await open(page);
       await page.waitForSelector('.wd-favorites [data-widget="notities"] [data-state="' + (status === 403 ? 'locked' : 'error') + '"]');
       assert.equal(await page.locator('.wd-favorites [data-widget="notities"] input[type="checkbox"]').count(), 0);
+      const state = await page.locator('.wd-favorites [data-widget="notities"] .wd-widget-content').evaluate(el => ({
+        minHeight: getComputedStyle(el).minHeight, content: el.dataset.contentState,
+        timestamp: el.querySelectorAll('.wd-widget-updated').length,
+        retry: [...el.querySelectorAll('button')].some(b => b.dataset.i18n === 'widget.retry')
+      }));
+      assert.equal(state.minHeight, '0px'); assert.equal(state.content, undefined);
+      assert.equal(state.timestamp, 0, 'failed or forbidden reads cannot masquerade as retrieved records');
+      assert.equal(state.retry, status === 503, 'only a failed read offers the existing retry');
       await page.unroute('**/api/notities/mijn');
     }
   } finally { await ctx.close(); }
@@ -212,9 +242,9 @@ test('direct function screens keep their inputs when the common frame changes si
     await page.setViewportSize({ width: 1440, height: 1050 });
     assert.equal(await page.locator('#zoek').inputValue(), 'Desktop taken');
     assert.equal(await page.locator('.wd-shell').count(), 1);
-    const expected = 'rgb(250, 248, 243)';
+    const expected = 'rgb(16, 13, 10)';
     assert.equal(await page.locator('body').evaluate(e => getComputedStyle(e).backgroundColor), expected);
-    // Control experiment: the rendered check detects the retired dark Living theme.
+    // Control experiment: the rendered check detects a wrong pure-black theme.
     await page.addStyleTag({ content: 'body[data-rtg-layout][data-rtg-world][data-rtg-skin][data-rtg-desktop]{background:#000!important}' });
     assert.notEqual(await page.locator('body').evaluate(e => getComputedStyle(e).backgroundColor), expected);
   } finally { await ctx.close(); }
@@ -243,7 +273,7 @@ test('a missing catalogue reports failure inside the standard without restoring 
     assert.equal(await page.locator('.wd-home').isVisible(), true);
     assert.match(await page.locator('.wd-announcement').innerText(), /kon niet worden geladen/);
     const x = await page.locator('.wd-shell').evaluate(e => e.getBoundingClientRect().x);
-    assert.equal(x, 40);
+    assert.equal(x, 24);
   } finally { await ctx.close(); }
 });
 

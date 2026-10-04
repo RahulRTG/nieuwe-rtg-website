@@ -125,10 +125,10 @@
         '<div class="h-mt35">' + (d.bewijs || []).map(function (b) {
           return '&bull; ' + esc(BEWIJSNAAM[b.soort] || b.soort) +
             (b.detail ? ': ' + esc(b.detail) : '') +
-            (b.door ? ' <span class="h-zacht80">(' + esc(b.door) + ')</span>' : '') +
-            ' <span class="h-zacht70">' + esc(String(b.at).slice(0, 10)) + '</span>';
+            (b.door ? ' <span class="leer-bewijs-door" >(' + esc(b.door) + ')</span>' : '') +
+            ' <span class="leer-bewijs-datum" >' + esc(String(b.at).slice(0, 10)) + '</span>';
         }).join('<br>') + '</div>' +
-        '<div class="h-mt35 h-zacht">' + esc(d.uitleg) + '</div>';
+        '<div class="leer-doel-uitleg" >' + esc(d.uitleg) + '</div>';
     } catch (e) { vak.textContent = e.message; }
   }
 
@@ -155,8 +155,8 @@
             : '<button class="knop stil" data-naar="' + esc(v.id) + '" type="button">Open</button>') + '</div>';
       }).join('');
       document.getElementById('lesInhoud').innerHTML = '<b>' + esc(d.doel.naam) + '</b> (' + esc(d.doel.vak) + ')' +
-        '<p id="lesTekst" class="h-mt40 h-lh170">' + esc(d.doel.les) + '</p>' +
-        (uitleg ? '<div class="rij h-mt50"><span class="sec h-m0">Leg anders uit</span>' + uitleg + '</div>' : '') +
+        '<p id="lesTekst" class="leer-les-tekst" >' + esc(d.doel.les) + '</p>' +
+        (uitleg ? '<div class="rij h-mt50"><span class="sec leer-uitleg-kop" >Leg anders uit</span>' + uitleg + '</div>' : '') +
         (onder ? '<div class="sec h-mt80">Wat hier onder ligt</div>' + onder +
           ((d.ontbreekt || []).length
             ? '<p class="leeg">Hiervan staat nog open: ' + esc(d.ontbreekt.map(function (x) { return x.naam; }).join(', ')) +
@@ -218,11 +218,11 @@
             var knop = x.soort === 'herhalen' ? 'herhaal' : 'oefen';
             return '<div class="doel"><span>' + esc(x.naam) +
               ' <span class="h-meta">(' + esc(x.vak) + ')</span><br>' +
-              '<span class="h-meta76">' + esc(x.waarom) + '</span></span>' +
+              '<span class="leer-voorstel-reden" >' + esc(x.waarom) + '</span></span>' +
               '<span class="rij"><button class="knop h-chip" data-' + knop + '="' + esc(x.doel) + '">Doen</button></span></div>';
           }).join('')
         : '<div class="leeg">' + esc(d.let || '') + '</div>') +
-        '<p class="leeg h-kop50">' + esc(d.uitleg) + '</p>';
+        '<p class="leeg leer-dag-uitleg" >' + esc(d.uitleg) + '</p>';
       el.querySelectorAll('[data-oefen]').forEach(function (b) {
         b.addEventListener('click', function () { oefenStart(b.dataset.oefen); });
       });
@@ -293,7 +293,7 @@
          andere manier uitgelegd. Komt de server er niet uit, dan staat er
          niets extra's: een verzonnen duiding stuurt je de verkeerde kant op. */
       if (d.denkfout) regel += '<div class="h-mt40"><b>' + esc(d.denkfout.naam) + '.</b> ' + esc(d.denkfout.uitleg) + '</div>';
-      if (d.anders) regel += '<div class="h-mt35 h-zacht90"><i>Anders uitgelegd (' + esc(d.anders.soort) + '):</i> ' + esc(d.anders.tekst) + '</div>';
+      if (d.anders) regel += '<div class="leer-antwoord-alternatief" ><i>Anders uitgelegd (' + esc(d.anders.soort) + '):</i> ' + esc(d.anders.tekst) + '</div>';
       if (d.klaar) {
         document.getElementById('oefenOpties').innerHTML = '';
         document.getElementById('oefenIn').parentElement.hidden = true;

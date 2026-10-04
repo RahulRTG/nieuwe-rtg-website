@@ -105,8 +105,9 @@
 <!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
 <script src="/shared/uitvoer.js"></script>
 <script>
+(function foundationPage() {
 const $ = s => document.querySelector(s);
-if (!window.Sessie || !Sessie.eisProfiel()) throw new Error('geen sessie');
+if (!window.Sessie || !Sessie.eisProfiel()) return;
 Sessie.balk($('#balk'), { terug: 'index.html' });
 
 const DELEN = [
@@ -267,6 +268,7 @@ $('#minuten').addEventListener('input', tekenTijd);
 
 tekenDelen();
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
+}());
 </script>
 <script src="/shared/deelmenu.js" defer></script>
 <script src="samen.js" defer></script>

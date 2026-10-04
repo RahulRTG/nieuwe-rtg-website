@@ -36,9 +36,8 @@ test('LivingOS editorial home: responsive example, real destinations, language a
     letOpFouten(page, errors);
     page.on('request', r => { if (/\/api\/(like|salon\/(bewaar|reageer|plaats))$/.test(new URL(r.url()).pathname)) writes.push(r.url()); });
     await page.goto(srv.base + '/apps/wereld.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForSelector('.wp-scene');
-    await page.locator('.wp-story a').click();
     await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
+    await page.waitForSelector('.living-example-head');
     assert.match(await page.locator('.living-example-head').innerText(), /Voorbeeldmoment/);
     assert.equal(await page.locator('.living-welcome .tel,.living-welcome .auteur').count(), 0, 'example is never a fabricated post');
     assert.equal(await page.locator('.moment').count(), 4);
@@ -47,6 +46,7 @@ test('LivingOS editorial home: responsive example, real destinations, language a
     assert.equal(await page.locator('#livingNearby').getAttribute('href'), '/apps/foodcourt.html');
     for (const width of [320, 390, 1440]) {
       await page.setViewportSize({ width, height: 844 });
+      if (width >= 1000) await page.locator('.wp-domain > summary').click();
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true, 'no horizontal overflow at ' + width);
       assert.equal(await page.locator('.rtg-adaptive-bar').count(), 1);
       assert.equal(await page.locator('.social-nav').isVisible(), false);
@@ -202,7 +202,7 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
     }, a);
     await page.setViewportSize({ width: 320, height: 720 });
     await page.goto(base + '/apps/wereld.html', { waitUntil: 'domcontentloaded' });
-    await page.locator('.wp-story a').click();
+    // The phone opens the native feed directly; no hidden desktop wrapper.
     await page.waitForSelector('#werelden button', { timeout: 15000 });
     await page.waitForSelector('body[data-rtg-edge-2-rendered="true"]', { timeout: 15000 });
     assert.equal(await page.locator('.rtg-edge-chrome').count(), 1,

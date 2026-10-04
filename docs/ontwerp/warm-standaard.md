@@ -1,10 +1,10 @@
 # RTG — goedgekeurde warme standaard
 
-De definitieve desktop- en mobiele tekeningen van 27 september 2026 staan in `output/rtg-warm-persoonlijk` en `output/rtg-mobiel-warm` in de taakwerkruimte. `warm-referenties.json` legt de hashes vast. Eerdere ontwerpen zijn geen runtime-keuze.
+De actuele beeldrichting is de door de gebruiker gekozen RTG-editorialstijl van 1 oktober 2026. De referenties staan in `output/rtg-editorial-concepts-20261001/` in de taakwerkruimte. Werkelijke browserbeelden staan afzonderlijk onder `output/rtg-editorial-rollout-20261001/`; een tekening is geen bewijs van de implementatie.
 
-Alle app-ingangen en publieke pagina’s gebruiken dezelfde componenten en tokens. LivingOS en Saloon zijn licht champagne (#faf8f3); WorkOS grafietgroen (#141a18); TravelOS warm bordeauxzwart (#1c1818); FoundationOS nachtblauw (#14202a). Inter is de interfaceletter. Het RTG-beeldmerk blijft zijn eigen vorm houden.
+Alle app-ingangen en publieke pagina’s gebruiken dezelfde componenten en tokens. LivingOS en Saloon zijn warm onyx (#100d0a); WorkOS donker petrol (#101817); TravelOS bordeauxzwart (#190d12); FoundationOS bosgroen (#10231e) met ivoren inhoud. Inter is de interfaceletter, Bodoni de redactionele titelletter. Foundation blijft altijd 100% gratis. Het RTG-beeldmerk blijft zijn eigen vorm houden.
 
-Desktop: drie kolommen, bij 1440 px buitenmarges van 40 px, 216 px links, 280 px rechts en 24 px tussenruimte. Een ondiepe sfeerfoto bovenaan, open navigatie, echte persoonlijke gegevens, kop boven de hoofdfoto, verhaalregel, drie app-ingangen en één vaste Edge. Mobiel: één kolom met tabbladen, hoofdfoto, actie, compacte agenda, verhaal en apps. Scrollruimte houdt alle bediening boven de vaste Edge bereikbaar.
+Desktop: drie kolommen, bij 1440 px buitenmarges van 24 px, 216 px links, 280 px rechts en 20 px tussenruimte. Een volwaardige hoofdfoto, echte persoonlijke gegevens, redactionele titel, bruikbare app-ingangen en één Edge. Houd de tussenruimte compact en gebruik geen lege vaste minimumhoogtes. De mobiele correctie van 1 oktober vervangt de gestapelde desktopindeling: één oorspronkelijke apppagina zonder extra titel, tabrij of widgetkolommen. Dezelfde Edge beweegt mee in formaat en wereldkleur; scrollruimte houdt de bediening bereikbaar. Zie `DESKTOP-STANDAARD.md` voor de responsieve grens en het behoud van geopende apps.
 
 Bestaande functies, invoer, rechten en accountgrenzen blijven de functionele bron. Namen, afspraken en reizen uit de illustraties zijn geen gegevens van ingelogde gebruikers. Geen gefingeerde persoonlijke gegevens om een tekening te vullen.
 

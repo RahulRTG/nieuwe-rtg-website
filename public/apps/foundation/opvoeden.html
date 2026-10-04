@@ -66,8 +66,9 @@
      een gesprek zijn geen rijen), dus "Meenemen" blijft hier stil -->
 <script src="/shared/uitvoer.js"></script>
 <script>
+(function foundationPage() {
 const $ = s => document.querySelector(s);
-if (!window.Sessie || !Sessie.eisFamilie()) throw new Error('geen sessie');
+if (!window.Sessie || !Sessie.eisFamilie()) return;
 Sessie.balk($('#balk'), { terug:'index.html' });
 function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
 
@@ -110,6 +111,7 @@ Object.keys(ONDERWERPEN).forEach(k=>{
 
 Sessie.coach({ kind:'opvoeden', chat:$('#chat'), input:$('#vraag'), knop:$('#stuur'), wacht:'Nora denkt mee...' });
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+}());
 </script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>

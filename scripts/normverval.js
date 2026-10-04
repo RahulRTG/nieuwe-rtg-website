@@ -176,17 +176,12 @@ function main() {
       meldingen.push('schuld op ' + n.sleutel + ' loopt tot ' + n.vervalt + ' (terug naar ' + n.van + ')');
       continue;
     }
-    /* NORM.json heeft TWEE helften: `meters` (de keuring) en `prestatie` (De
-       Beproeving, p99Ms en verwanten). Een schuld kan op allebei staan -- stap 4
-       hieronder kijkt ook in allebei. Las deze stap alleen `meters`, dan heette
-       elke verlopen prestatieschuld "de meter staat niet meer in NORM.json"
-       terwijl hij er gewoon stond: een valse oorzaak, en wie die gelooft gaat in
-       de historie zoeken naar een verwijdering die nooit is gebeurd (4 oktober
-       2026, p99Ms en eventLoopP99Ms). */
-    const helft = [norm.meters, norm.prestatie].find(h => h && Object.prototype.hasOwnProperty.call(h, n.sleutel));
-    const nu = helft ? helft[n.sleutel] : undefined;
+    // Performance thresholds have their own section, also compared below.
+    // Expiry must inspect that recorded value, not report an existing meter as gone.
+    const nu = Object.hasOwn(norm.meters || {}, n.sleutel)
+      ? norm.meters[n.sleutel] : (norm.prestatie || {})[n.sleutel];
     if (nu === undefined) {
-      fouten.push({ wat: n.sleutel, bericht: 'de schuld is verlopen op ' + n.vervalt + ' en de meter staat niet meer in NORM.json (niet onder meters en niet onder prestatie)' });
+      fouten.push({ wat: n.sleutel, bericht: 'de schuld is verlopen op ' + n.vervalt + ' en de meter staat niet meer in NORM.json' });
       continue;
     }
     if (slechter(richting.get(n.sleutel), nu, n.van)) {

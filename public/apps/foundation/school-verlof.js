@@ -46,7 +46,7 @@
     }).join('');
 
     var uit = kaart('Verlof aanvragen', lijst +
-      (ouder ? '<div class="h-rij h-wrap h-mt50">' +
+      (ouder ? '<div class="school-verlof-acties" >' +
         '<select class="veld" id="vlKind" aria-label="Voor welk kind">' + kies + '</select>' +
         '<input class="veld h-kolom9" id="vlVan" type="date" aria-label="Van">' +
         '<input class="veld h-kolom9" id="vlTot" type="date" aria-label="Tot en met">' +

@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-10-04T13:52:57.960Z",
-    "commit": "0fb2dc64",
+    "op": "2026-10-01T13:35:23.926Z",
+    "commit": "c9c478408",
     "boomVuil": false,
     "boomAnders": 2,
     "instrument": "scripts/edgekaart.js",
-    "node": "v22.22.2"
+    "node": "v24.18.0"
   },
   "uitleg": "Gemaakt met scripts/edgekaart.js; de methode staat in de kop. Rollen en verantwoordelijkheden zijn VERKLAARD en elk citaat staat letterlijk in zijn bestand. Elk citaat hangt aan het etiket (naam:letter) waar het over gaat, of aan null als het over geen van de veertien gaat; elk etiket s of b heeft minstens een citaat. schrijver = houdt of zet de toestand zelf; beslisser = kiest de uitkomst; lezer = leest haar of voedt haar via de API van de eigenaar. `gemeten` komt uit de bron zonder commentaar en kent alleen letterlijke namen: attributen alleen op body/html of een alias daarvan, opslag `onbekend` als de opslag niet letterlijk local- of sessionStorage heet. dodeKanalen gaat over rtg-events in public/ (zonder public/dist, .min.js en bundels, wel hun delen) plus index.html; een naam in luisterZonderZender kan nog een zender hebben onder `dynamisch`. `afgeleid` is wat de lexicale lezer over dezelfde wandeling vindt en naast de kaart legt: wie registerAction aanroept op de Edge-kern, wie data-rtg-world en wie data-rtg-edge-2-state op body zet. Een ondergrens: een samengestelde naam ontsnapt. Een dubbele eigenaar is een vondst en geen oordeel.",
   "bestanden": [
@@ -2047,8 +2047,8 @@
         {
           "rol": "beslist",
           "etiket": "zichtbaarheidsstand:b",
-          "wat": "auto-peek bij scrollen",
-          "citaat": "if (moved < 8 || rt.manual || rt.model.state === 'expanded') return;"
+          "wat": "compacte leesstand bij menselijk scrollen, zonder invoer of panelen te verstoren",
+          "citaat": "if (Math.abs(delta) < 8 || rt.manual || rt.model.state === 'expanded' || busy(rt)) return;"
         },
         {
           "rol": "leest",
@@ -2235,6 +2235,7 @@
           "RTGAdaptiveEdge"
         ],
         "zendt": [
+          "rtg-adaptive-ready",
           "rtg-edge-home"
         ],
         "luistert": [],
@@ -2948,7 +2949,9 @@
         "globals": [
           "RTGEdgeSmartMenu"
         ],
-        "zendt": [],
+        "zendt": [
+          "input"
+        ],
         "luistert": [],
         "attributen": [],
         "opslag": [],
@@ -4124,11 +4127,6 @@
         "uitdrukking": "k.slice(2).toLowerCase()"
       },
       {
-        "pad": "public/shared/gezinsstroom.js",
-        "soort": "luistert",
-        "uitdrukking": "naam"
-      },
-      {
         "pad": "public/shared/rtg-edge-2-context.js",
         "soort": "luistert",
         "uitdrukking": "type"
@@ -4163,6 +4161,6 @@
     "rollen": 216,
     "dubbeleEigenaars": 12,
     "dodeKanalen": 0,
-    "levendeKanalen": 16
+    "levendeKanalen": 17
   }
 }

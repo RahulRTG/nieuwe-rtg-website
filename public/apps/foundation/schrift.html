@@ -125,6 +125,7 @@
 <script src="sessie.js"></script>
 <script src="/shared/rtg-school-session.js"></script>
 <script>
+(function foundationPage() {
 const $ = s => document.querySelector(s);
 const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const q = new URLSearchParams(location.search);
@@ -138,7 +139,7 @@ if(!CODE||!TOKEN){
     if(document.documentElement.classList.contains('rtf-toegang-dicht')) addEventListener('rtf-toegang',()=>RTGSchoolSession.deur({rol:'leerling'}),{once:true});
     else RTGSchoolSession.deur({rol:'leerling'});
   }
-  throw new Error(Sessie && Sessie.actief() ? 'geen schoolsessie' : 'geen sessie');
+  return;
 }
 RTGSchoolSession.bewaak(['rtf_leerling'],()=>{ CODE=''; TOKEN=''; RTGSchoolSession.deur({rol:'leerling'}); });
 
@@ -255,6 +256,7 @@ KlasLive.verbind(CODE,'leerling',TOKEN,{
 $('#liveDot').classList.add('aan'); $('#liveTxt').textContent='live';
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 window.addEventListener('beforeunload', ()=>{ try{ vangHuidigeTekening(); navigator.sendBeacon && navigator.sendBeacon('/api/foundation/schrift/opslaan', new Blob([JSON.stringify({code:CODE,token:TOKEN,pages})],{type:'application/json'})); }catch(e){} });
+}());
 </script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>

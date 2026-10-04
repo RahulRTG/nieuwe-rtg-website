@@ -205,9 +205,9 @@
   <div class="hero">
     <h2 data-wh-copy="family">Uw gezin krijgt hier een eigen plek.</h2>
     <p class="deck" data-wh-copy="familyIntro">Maak een gezinsomgeving aan of open de omgeving die u al heeft. FoundationOS is en blijft 100% gratis.</p>
-    <!-- De standaard Edge projecteert deze bestaande knoppen. De originele
-         handlers en gezinsrechten blijven eigenaar van de handeling. -->
-    <div class="knoprij rtg-duimbalk rtg-edge-owned-bar">
+    <!-- These primary actions remain in the page and are also forwarded by
+         the shared Edge. This static button group is not a second dock. -->
+    <div class="knoprij foundation-entry-actions" data-rtg-edge-controls>
       <button class="knop hoofd" id="bMaak" data-hoofdactie>Maak een gezin aan</button>
       <button class="knop grijs" id="bLogin">Inloggen bij je gezin</button>
       <a class="knop grijs kaal" href="registreren.html">School, vrijwilliger of stichting</a>

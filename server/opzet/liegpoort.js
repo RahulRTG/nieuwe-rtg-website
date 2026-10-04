@@ -98,7 +98,9 @@ module.exports = function liegpoort({ app, log }) {
      dichte deur zegt niets, en een toets die op een 401 rekent hoort die te
      krijgen. */
   app.use((req, res, next) => {
-    if (!magLiegen(req.path, process.env.RTG_LIEG, niet)) return next();
+    if (!magGerichtLiegen(req.method, req.path, process.env.RTG_LIEG, niet,
+      process.env.RTG_LIEG_METHODE, process.env.RTG_LIEG_EXACT === '1')) return next();
+    if (process.env.RTG_LIEG_JOURNAAL) require('fs').appendFileSync(process.env.RTG_LIEG_JOURNAAL, req.method + ' ' + req.path + '\n');
     geraakt.add(req.method + ' ' + req.path);
     res.status(200).json({ ok: true });
   });
@@ -109,3 +111,14 @@ module.exports = function liegpoort({ app, log }) {
 
 module.exports.magLiegen = magLiegen;
 module.exports.INFRA = INFRA;
+
+// A route-level proof may never attribute a neighbouring route or another HTTP
+// method to its selected capability. Broad mutation runs retain prefix mode.
+function magGerichtLiegen(method, pad, lieg, niet, gevraagd, exact) {
+  if (gevraagd && method !== gevraagd) return false;
+  if (!magLiegen(pad, lieg, niet)) return false;
+  if (!exact) return true;
+  const patroon = require('../lib/padvorm').segmentPatroon(lieg);
+  return patroon ? patroon.test(pad) : pad === lieg;
+}
+module.exports.magGerichtLiegen = magGerichtLiegen;

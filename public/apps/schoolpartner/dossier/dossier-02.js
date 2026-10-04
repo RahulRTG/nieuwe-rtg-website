@@ -30,7 +30,7 @@
             veld('doVr' + i, 'Relatie', x.relatie, 30) +
             veld('doVt' + i, 'Telefoon', x.telefoon, 24) +
             veld('doVe' + i, 'E-mail', x.email, 80) +
-            '<label class="stil h-rij-mid h-gap30">' +
+            '<label class="stil schooldossier-deelkeuze" >' +
             '<input type="checkbox" id="doVnood' + i + '"' + (x.noodnummer ? ' checked' : '') + '> noodnummer</label></div>';
         }).join('') +
         '<div class="rij h-mt50"><button class="knop p" id="doContact" type="button">Bewaar contactgegevens</button></div>' +

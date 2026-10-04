@@ -1,4 +1,5 @@
-  /* Op de telefoon blijft de driedelige WerkOS-schil volledig bruikbaar.
+/* WerkOS op mobiel: compacte rail, context en bereikbare bediening. */
+`  /* Op de telefoon blijft de driedelige WerkOS-schil volledig bruikbaar.
      De contextbalk krijgt een eigen rij, de rail blijft een compacte
      glyfenstrook en de dock houdt altijd Start en Command Center bereikbaar. */
 `  @media (max-width:620px){

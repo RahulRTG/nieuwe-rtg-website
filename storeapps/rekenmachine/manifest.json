@@ -1,7 +1,7 @@
 {
   "sleutel": "rtg-rekenmachine",
   "naam": "Rekenmachine",
-  "versie": "1.0.0",
+  "versie": "1.0.1",
   "uitleg": "Rekenen, btw twee kanten op en een rekening delen met fooi. Alles gebeurt op uw toestel; de app heeft geen netwerk.",
   "categorie": "geld",
   "taal": "nl",

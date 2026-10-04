@@ -108,7 +108,7 @@
     if (!vak) return;
     vak.innerHTML = '<div class="kaart blok h-mt50">' +
       '<div class="mini"><b>' + esc(r.naam || 'Toets') + '</b> · vraag ' + r.nr + ' van ' + r.totaal + '</div>' +
-      '<div class="h-my50 h-fs102 h-lh160">' + esc(r.vraag) + '</div>' +
+      '<div class="school-opgave-vraag" >' + esc(r.vraag) + '</div>' +
       ((r.opties || []).length
         ? '<div class="h-stapel">' + r.opties.map(function (o) {
             return '<button class="knop mini h-links" data-optie="' + esc(o) + '">' + esc(o) + '</button>';

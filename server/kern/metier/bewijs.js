@@ -124,7 +124,7 @@ module.exports = ({ db, save, accounts, codenaamVan, keyVanCodenaam, findSupplie
       : { ok: false, status: 503, error: 'Het inzagejournaal is niet aangesloten. Zonder spoor geen naam.' };
     if (!spoor || !spoor.ok) return { status: (spoor && spoor.status) || 503, error: (spoor && spoor.error) || 'Zonder spoor geen naam.' };
     logInzage(tref.key, c, true);
-    try { if (notify) notify(tref.key, 'Een werkgever bekeek je naam in Métier.'); } catch (e) {}
+    try { if (notify) notify(tref.key, { title: 'Métier', body: 'Een werkgever bekeek je naam in Métier.' }); } catch (e) {}
     return { status: 200, ok: true, codenaam: tref.codename || codenaamVan(tref.key), naam: accounts.realNameOf(u) };
   }
 

@@ -44,7 +44,7 @@
       container.setAttribute('role', 'group'); container.setAttribute('aria-label', 'Handelingen van dit scherm');
       rt.sheet.appendChild(container); rt.controls = container;
     }
-    var focused = container.contains(d.activeElement) ? d.activeElement.dataset.cap : '';
+    var focused = container.contains(d.activeElement) ? d.activeElement.dataset.cap : '', schuif = container.scrollLeft;
     container.textContent = '';
     if (w.RTGDesktopFrame && w.RTGDesktopFrame.controls(container, sourceButtons)) return;
     var A = w.RTGAdaptief;
@@ -59,12 +59,12 @@
       rt.sheet.appendChild(panel);
     }
     if (panel && rt.model.state === 'expanded') panel.hidden = false;
-    var travelQuestion = d.getElementById('rvRahul');
-    if (travelQuestion && !rt.travelQuestion) {
-      rt.travelQuestion = travelQuestion; rt.travelQuestionParent = travelQuestion.parentElement;
-      rt.sheet.prepend(travelQuestion);
+    var vraag = d.getElementById('rvRahul');
+    if (vraag && !rt.travelQuestion) {
+      rt.travelQuestion = vraag; rt.travelQuestionParent = vraag.parentElement;
+      rt.sheet.prepend(vraag);
     }
-    if (travelQuestion) travelQuestion.hidden = rt.model.deck !== 'rahul';
+    if (vraag) vraag.hidden = rt.model.deck !== 'rahul';
     var items = currentItems();
     if (items.length && w.RTGAdaptiefBalkKnoppen) {
       var buttons = w.RTGAdaptiefBalkKnoppen({ items: function () { return items; }, titel: function () { return A.context().titel; } });
@@ -106,6 +106,7 @@
     if (focused) container.querySelectorAll('[data-cap]').forEach(function (b) {
       if (b.dataset.cap === focused) b.focus({ preventScroll: true });
     });
+    container.scrollLeft = schuif;
     function refreshLater() { rt.win.requestAnimationFrame(function () { render(rt); }); }
     var command = d.querySelector('#rtgCommand .cmd-vraagvorm');
     if (command && rt.model.deck === 'rahul') {

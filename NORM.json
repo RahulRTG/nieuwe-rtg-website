@@ -71,7 +71,7 @@
     "wekkersZonderTrede": 0,
     "wettenOnbewezen": 5,
     "zaakwigGezakt": 0,
-    "zelfpoortendeToetsen": 47,
+    "zelfpoortendeToetsen": 48,
     "geldRoutesPubliek": 0,
     "geldRoutesZonderSemantiek": 1,
     "geldRoutesZonderIdemBewijs": 3,
@@ -164,6 +164,16 @@
     "aankomstUitPositie": 0
   },
   "notities": [
+    {
+      "datum": "2026-10-04",
+      "soort": "schuld",
+      "sleutel": "zelfpoortendeToetsen",
+      "van": 47,
+      "vervalt": "2027-01-04",
+      "meter": "zelfpoortendeToetsen 47 -> 48",
+      "reden": "test/foundation-lesstroom.pg.test.js is nieuw (het stroomticket van RTFoundation-onderwijs, besluit B25): acht gelijktijdige claims op een eenmalig ticket over twee instances (precies een opent de stroom) en een intrekking op A tegen een claim op B. Dat kan niet eerlijk zonder PostgreSQL en Redis en slaat lokaal zonder DATABASE_URL over. Lokaal tegen echte PostgreSQL en Redis groen; met de mutatie 'de claim laat het ticket staan' zakte hij. Hij staat in scripts/lib/pg-toetslijst.js (verplicht in CI) en als uitzondering onder zelfpoortende-toets.",
+      "waarheen": "De CI-dienstmatrix draait hem zonder skip; aflossen is de standaardomgeving met PostgreSQL en Redis."
+    },
     {
       "datum": "2026-10-04",
       "soort": "schuld",

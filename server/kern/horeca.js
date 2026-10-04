@@ -143,5 +143,7 @@ module.exports = (kern) => {
      naar -- en de domeingrens telt alleen wat er werkelijk wordt gelezen. */
   return { KANALEN, REGELSTANDEN, H, Hlees, nu, id, centen: heleCenten, heleCenten, uitEuro, regelSom, kortingCenten, teruggegeven, waarde,
     totaal, openstaand, controleerSom, happyKorting,
-    get bonlaag() { return kern.horecaBonlaag || null; } };
+    get bonlaag() { return kern.horecaBonlaag || null; },
+    // De smalle terugbetaalweg van de horecateruggave (opzet/kernlaag5f.js), op dezelfde manier.
+    get terugbetaling() { return kern.horecaTerugbetaling || null; } };
 };

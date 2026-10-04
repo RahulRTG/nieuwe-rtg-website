@@ -11,7 +11,7 @@ module.exports = (kern) => {
   const rekVan = kern.horecaRekVan;
   const publiek = kern.horecaPubliek;
   const teruggave = require('../../../kern/horeca/teruggave')({ horeca,
-    betaalWaarheid: kern.horecaTerugbetaling, bonlaag: horeca.bonlaag, nu: horeca.nu, id: horeca.id });
+    betaalWaarheid: horeca.terugbetaling, bonlaag: horeca.bonlaag, nu: horeca.nu, id: horeca.id });
 
   app.post('/api/supplier/horeca/teruggave', supplierAuth, async (req, res) => {
     if (!managerOnly(req, res)) return;

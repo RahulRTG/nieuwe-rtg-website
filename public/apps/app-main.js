@@ -4006,6 +4006,7 @@ var RTG_BOUW = 'f0f5b40c';
        hernoemde de tegels naar gewone woorden ("Video" in plaats van "Clips"),
        en een tak die daarvoor aftakte kent die keuze nog niet. */
     mediaos:     { naam: 'RTG Media',    url: '/apps/media.html' },
+    library:     { naam: T('app.library', 'LibraryOS'), url: '/apps/library.html' },
     office:      { naam: 'RTDocs',       url: '/apps/office.html' },
     /* werkrol: zie app-main-24a3.js. Alle drie praten alleen met /api/rtgone
        achter officeAuth: zonder kantoorsleutel is de ingang een omleiding. */
@@ -4373,6 +4374,7 @@ var RTG_BOUW = 'f0f5b40c';
        contextvraag van WERELDEN.md dat zegt -- wie iets wil ontdekken, leren of
        doorgeven denkt niet dat hij in zijn huishouden of op zijn werk zit. */
       'link:connect',
+      'link:library',
       'link:rtfbord', 'link:rtfschrift', 'link:klimaat', 'link:buurtruil', 'link:kwesties', 'link:geven',
       'link:vrienden'] }
   ];

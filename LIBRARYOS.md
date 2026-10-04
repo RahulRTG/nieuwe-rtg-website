@@ -4,6 +4,10 @@ Deze fase bouwt uitsluitend Work → Edition → Contribution/Agreement → Righ
 PublicationRelease. Uitgangspunt is main 155820a406379e0d0b363f00296695bce0c20120,
 opnieuw opgehaald vóór implementatie. Geen publieke distributie of productievrijgave.
 
+Dit document blijft het contract van kernel v1. De inmiddels daarop gebouwde
+private Studio-/Readerfase staat afzonderlijk in `LIBRARYOS-STUDIO-READER.md`;
+zij wijzigt de onderstaande Edition- en rechteninvarianten niet.
+
 ## Domeingrenzen en invarianten
 
 - Een Work is een intellectueel werk, geen bestand. `responsible` betekent
@@ -245,11 +249,10 @@ werk vereist later behoud van atomaire rechten/release en duurzame receipts.
 
 ## Niet gebouwd en volgende fase
 
-Geen marketplace, royalty-engine, reader-UI, discovery, Academy-integratie,
+Deze kernelfase bouwde geen marketplace, royalty-engine, reader-UI, discovery, Academy-integratie,
 AI-studio, EPUB/audio/printpipeline, lineagegraaf, archiefdienst of stewardship.
 Geen uitnodigingsmail, notificatie, externe publicatie of betaling verstuurd.
 
-De volgende functionele fase kan een beperkte Creation Studio en Reader rond
-deze contracten bouwen: kennis vastleggen → concept → editie → lezen →
-feedback/correctie → nieuwe editie. Publieke distributie blijft afhankelijk van
-de genoemde privacy-, bewaar-, toegankelijkheids- en moderatievoorwaarden.
+De beperkte Creation Studio en Reader zijn vervolgens rond deze contracten
+gebouwd; zie `LIBRARYOS-STUDIO-READER.md`. Publieke distributie blijft afhankelijk
+van de genoemde privacy-, bewaar-, toegankelijkheids- en moderatievoorwaarden.

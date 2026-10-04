@@ -2,18 +2,21 @@
 const M = require('./model'), P = require('./policy'), journal = require('./journal');
 const { requirements, publication } = require('./publication');
 const { intact } = require('./editions');
+const studio = require('./studio'), feedback = require('./feedback');
 const klok = require('../../lib/klok');
 const handlers = {
   'work.create': require('./works'), 'revision.add': require('./works'),
   'contribution.invite': require('./agreements'), 'contribution.accept': require('./agreements'),
   'agreement.propose': require('./agreements'), 'agreement.accept': require('./agreements'), 'agreement.conflict': require('./agreements'),
   'rights.grant': require('./rights').rights, 'rights.revoke': require('./rights').rights,
+  'structure.reorder': studio.command,
+  'feedback.create': feedback.command, 'feedback.decide': feedback.command, 'feedback.resolve': feedback.command,
   'edition.create': require('./editions'), 'edition.freeze': require('./editions'),
   'edition.withdraw': require('./editions'), 'edition.warn': require('./editions'),
   'publication.consent': publication, 'publication.revoke-consent': publication, 'publication.confirm': publication
 };
 module.exports = function makeLibrary({ db, bewerkCollectie, store, identities, now }) {
-  const own = require('../eigencollectie')({ db, domein: 'kern/library', bezit: { libraryKernel: 'kaart' } });
+  const own = require('../eigencollectie')({ db, domein: 'kern/library', bezit: { libraryKernel: 'kaart', libraryReader: 'kaart' } });
   const read = () => M.state(own.kijk('libraryKernel'));
   const time = now || (() => klok.datum().toISOString());
   const transaction = fn => {
@@ -70,9 +73,21 @@ module.exports = function makeLibrary({ db, bewerkCollectie, store, identities, 
   function query(actor, kind, input, authority) {
     try {
       M.fields(input, ['workId', 'editionId']);
-      const ctx = context(actor, read(), input.workId, authority); if (!ctx.w) M.fail('NOT_FOUND', 'Kies een werk.', 404);
+      const ctx = context(actor, read(), input.workId, authority);
+      if (kind === 'context') return { ok: true, actorRef: actor, policy: M.POLICY };
+      if (kind === 'work-list') {
+        const works = Object.values(ctx.s.works).filter(w => P.member({ ...ctx, w })).map(w => ({
+          id: w.id, title: w.title, description: w.description, type: w.type, originalLanguage: w.originalLanguage,
+          lifecycle: w.lifecycle, revision: w.revision, updatedAt: w.updatedAt,
+          editions: Object.values(w.editions).filter(e => e.status === 'released').length
+        })).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+        return { ok: true, works };
+      }
+      if (!ctx.w) M.fail('NOT_FOUND', 'Kies een werk.', 404);
       P.readable(ctx);
       if (kind === 'work') return { ok: true, work: M.clone(ctx.w) };
+      if (kind === 'workspace') return { ok: true, workspace: studio.workspace(ctx.w) };
+      if (kind === 'feedback') return { ok: true, feedback: feedback.list(ctx.w, input.editionId) };
       if (kind === 'proof') {
         const events = ctx.s.journal.filter(e => e.workId === ctx.w.id);
         Object.values(ctx.w.editions).filter(e => e.status !== 'draft').forEach(intact);
@@ -90,5 +105,6 @@ module.exports = function makeLibrary({ db, bewerkCollectie, store, identities, 
         available: e.status === 'released' && e.distribution.status === 'released' && rightsStatus === 'current' };
     } catch (e) { return error(e); }
   }
-  return { execute, query, deliver: journal.outbox({ read, transaction }) };
+  const reader = require('./reader')({ own, bewerkCollectie, store, identities, libraryRead: read, now: time });
+  return { execute, query, reader, deliver: journal.outbox({ read, transaction }) };
 };

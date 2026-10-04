@@ -64,6 +64,7 @@
        contextvraag van WERELDEN.md dat zegt -- wie iets wil ontdekken, leren of
        doorgeven denkt niet dat hij in zijn huishouden of op zijn werk zit. */
       'link:connect',
+      'link:library',
       'link:rtfbord', 'link:rtfschrift', 'link:klimaat', 'link:buurtruil', 'link:kwesties', 'link:geven',
       'link:vrienden'] }
   ];

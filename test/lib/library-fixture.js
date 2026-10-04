@@ -21,7 +21,9 @@ function fixture() {
   const library = make({ db, bewerkCollectie: transaction, store: 'sqlite', identities, now: () => now });
   const raw = (actor, action, input) => library.execute(actor, action, input, () => authority);
   const query = (actor, kind, input) => library.query(actor, kind, input, () => authority);
-  return { db, library, raw, query, organizations, identities, transaction,
+  const readerRaw = (actor, action, input) => library.reader.execute(actor, action, input, () => authority);
+  const readerQuery = (actor, kind, input) => library.reader.query(actor, kind, input, () => authority);
+  return { db, library, raw, query, readerRaw, readerQuery, organizations, identities, transaction,
     fail: x => { fail = x; }, authority: x => { authority = x; }, clock: x => { now = x; } };
 }
 const terms = (A, B) => ({ parties: [A, B], governance: 'Partijen behouden hun rechten; geen overdracht aan Foundation.',

@@ -9,7 +9,7 @@ module.exports = function works(ctx) {
       type: M.text(d.type, 80), originalLanguage: M.text(d.language, 40), responsible,
       governanceRef: M.text(d.governanceRef || '', 300, false), lifecycle: 'active', revision: 0,
       createdAt: at, updatedAt: at, createdBy: actor, updatedBy: actor,
-      nodes: {}, contributions: {}, agreements: {}, grants: {}, editions: {}, releases: {},
+      nodes: {}, structure: [], feedback: {}, contributions: {}, agreements: {}, grants: {}, editions: {}, releases: {},
       activeAgreementId: null };
     s.works[id] = row; ctx.w = row;
     return { id };
@@ -24,6 +24,7 @@ module.exports = function works(ctx) {
       title: M.text(d.title, 300), content: M.text(d.content, 50000),
       changeSummary: M.text(d.changeSummary, 1000), createdAt: at, createdBy: actor };
     revision.hash = M.hash(revision); node.revisions.push(revision); w.nodes[node.id] = node;
+    if (!w.structure.includes(node.id)) w.structure.push(node.id);
     return { id: revision.id, nodeId: node.id, hash: revision.hash };
   }
   M.fail('UNKNOWN_ACTION', 'Onbekende werkhandeling.');

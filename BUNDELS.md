@@ -9,11 +9,11 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**60 bundels, 485 delen, 0 zonder onderwerp.**
+**61 bundels, 487 delen, 2 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 100 delen, 9824 regels in de delen
+`public/apps/app-main/` -- 100 delen, 9826 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -332,6 +332,15 @@ omlaag.
 | `leverancier-84.js` | de meldingenlijst van de zaak |
 | `leverancier-84a.js` | HET ETEN-WERKBLAD AAN ZIJN KNOPPEN, en de rest van het werkblad zelf |
 | `leverancier-84b.js` | Een algemene reserveringsschakelaar geeft RTG geen toestemming voor een Connection-programma |
+
+## `apps/library/app.js`
+
+`public/apps/library/app/` -- 2 delen, 31 regels in de delen, waarvan 2 zonder onderwerp
+
+| deel | onderwerp |
+|---|---|
+| `app-01.js` | -- |
+| `app-02.js` | -- |
 
 ## `apps/meldkamer.js`
 

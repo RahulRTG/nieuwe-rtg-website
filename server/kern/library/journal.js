@@ -2,7 +2,9 @@
 const M = require('./model'), envelope = require('../envelop');
 const NAMES = { 'work.create': 'library.work.created', 'contribution.accept': 'library.contribution.accepted',
   'agreement.accept': 'library.agreement.accepted', 'edition.freeze': 'library.edition.frozen',
-  'publication.confirm': 'library.publication.released' };
+  'publication.confirm': 'library.publication.released', 'structure.reorder': 'library.structure.reordered',
+  'feedback.create': 'library.feedback.created', 'feedback.decide': 'library.feedback.decided',
+  'feedback.resolve': 'library.feedback.resolved' };
 function append(ctx, result, operationId) {
   const { s, w, actor, action, at, receiptKey } = ctx;
   const eventId = 'libevt_' + receiptKey.slice(0, 32);

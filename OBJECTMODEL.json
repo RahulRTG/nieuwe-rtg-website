@@ -1,15 +1,15 @@
 {
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
-  "vastgelegd": "2026-10-03",
+  "vastgelegd": "2026-10-04",
   "gemeten": {
-    "bestanden": 2664,
-    "vormen": 1553,
-    "velden": 2218,
-    "modules": 857,
+    "bestanden": 2667,
+    "vormen": 1559,
+    "velden": 2231,
+    "modules": 860,
     "domeinen": 307,
     "envelopDrempel": 19,
     "envelop": 29,
-    "veldenDomeineigen": 1548,
+    "veldenDomeineigen": 1561,
     "veldenGedeeldVanafVier": 230,
     "gelijkendeVormparen": 23
   },
@@ -286,6 +286,18 @@
       ]
     },
     {
+      "veld": "updatedAt",
+      "domeinen": 12,
+      "waar": [
+        "kern/architect",
+        "kern/atelier",
+        "kern/connection-communication-call",
+        "kern/economie",
+        "kern/hardwarelab",
+        "kern/hoteldorp"
+      ]
+    },
+    {
       "veld": "waarde",
       "domeinen": 12,
       "waar": [
@@ -442,18 +454,6 @@
       ]
     },
     {
-      "veld": "updatedAt",
-      "domeinen": 11,
-      "waar": [
-        "kern/architect",
-        "kern/atelier",
-        "kern/connection-communication-call",
-        "kern/economie",
-        "kern/hardwarelab",
-        "kern/hoteldorp"
-      ]
-    },
-    {
       "veld": "duurMin",
       "domeinen": 11,
       "waar": [
@@ -475,6 +475,18 @@
         "kern/concern",
         "kern/livinglab",
         "kern/machtiging"
+      ]
+    },
+    {
+      "veld": "kind",
+      "domeinen": 11,
+      "waar": [
+        "kern/boerderij",
+        "kern/connection-communication",
+        "kern/connection-communication-actions",
+        "kern/connection-communication-media",
+        "kern/economie",
+        "kern/experience"
       ]
     },
     {
@@ -511,18 +523,6 @@
         "kern/livinglab",
         "kern/magnaat-controle",
         "kern/magnaat-trainingslobby-acties"
-      ]
-    },
-    {
-      "veld": "klaar",
-      "domeinen": 10,
-      "waar": [
-        "kern/afdelingen",
-        "kern/beveiliging",
-        "kern/borden",
-        "kern/eten",
-        "kern/magnaat-partnerstudio-basis",
-        "kern/muziek"
       ]
     }
   ],

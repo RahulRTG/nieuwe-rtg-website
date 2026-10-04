@@ -27,6 +27,37 @@ test('echte server: achttien stappen, uitgeschakelde optionele diensten en alle 
   const raw = async (actor, action, input) => (await request(action.replace('.', '/'), input, actor)).body;
   const query = async (actor, kind, input) => (await request({ work: 'work/get', edition: 'edition/get', preview: 'publication/preview', proof: 'proof' }[kind], input, actor)).body;
   const d = driver(raw, query, actors[0], actors[1]); const s = await fullScenario(d);
+  assert.equal((await request('context', {}, d.A)).body.actorRef, d.A);
+  const list = await request('work/list', {}, d.A); assert.ok(list.body.works.some(w => w.id === s.workId));
+  const workspace = await request('studio/workspace', { workId: s.workId }, d.A);
+  assert.equal(workspace.body.workspace.nodes.length, 1);
+  await d.command(d.A, 'structure.reorder', { nodeIds: [s.nodeId] });
+  const readerOpen = await request('reader/open', { workId: s.workId, editionId: s.e2 }, d.B);
+  assert.match(readerOpen.body.edition.nodes[0].revision.content, /gecorrigeerde datum/);
+  assert.equal((await request('reader/search', { workId: s.workId, editionId: s.e2, query: 'datum' }, d.B)).body.matches.length, 1);
+  let rr = 0, rn = 0;
+  const readerWrite = async (path, data) => {
+    const out = await request(path, { operationId: 'http_reader_operation_' + String(++rn).padStart(4, '0'),
+      workId: s.workId, editionId: s.e2, expectedRevision: rr, data }, d.B);
+    assert.equal(out.status, 200, JSON.stringify(out.body)); rr = out.body.revision; return out.body.result;
+  };
+  await readerWrite('reader/progress', { nodeId: s.nodeId, fraction: 0.4 });
+  const bookmark = await readerWrite('reader/bookmark', { nodeId: s.nodeId, label: 'Voor gesprek' });
+  const highlight = await readerWrite('reader/highlight', { nodeId: s.nodeId, start: 3, end: 14 });
+  const note = await readerWrite('reader/note', { nodeId: s.nodeId, content: 'Bespreken met de auteur.' });
+  await readerWrite('reader/bookmark/remove', { bookmarkId: bookmark.id });
+  await readerWrite('reader/highlight/remove', { highlightId: highlight.id });
+  await readerWrite('reader/note/remove', { noteId: note.id });
+  const readerState = await request('reader/state', { workId: s.workId, editionId: s.e2 }, d.B);
+  assert.equal(readerState.body.state.progress.fraction, 0.4);
+  assert.equal((await request('reader/proof', { workId: s.workId, editionId: s.e2 }, d.B)).body.integrity, true);
+  const feedback = await d.command(d.B, 'feedback.create', { editionId: s.e2, nodeId: s.nodeId,
+    kind: 'clarity', message: 'Deze passage kan preciezer.', evidenceRefs: [] });
+  await d.command(d.A, 'feedback.decide', { feedbackId: feedback.result.id, decision: 'accepted', reason: 'Terecht.' });
+  const correction = await d.command(d.A, 'revision.add', { nodeId: s.nodeId, kind: 'chapter', title: 'De haven',
+    content: 'De herinnering met gecorrigeerde datum en preciezere uitleg.', changeSummary: 'Verduidelijkt na feedback.' });
+  await d.command(d.A, 'feedback.resolve', { feedbackId: feedback.result.id, revisionId: correction.result.id, summary: 'Passage verduidelijkt.' });
+  assert.equal((await request('feedback/list', { workId: s.workId, editionId: s.e2 }, d.B)).body.feedback[0].status, 'resolved');
   assert.equal((await request('work/get', { workId: s.workId }, actors[2])).status, 404);
   const forged = await request('rights/grant', await d.input('rights.grant', { grantor: actors[1], actor: actors[0] }), actors[2]);
   assert.equal(forged.status, 404);

@@ -12,7 +12,7 @@ module.exports = function editions(ctx) {
       const old = M.get(w.editions, d.predecessorId);
       if (old.status === 'draft') M.fail('INVALID_PREDECESSOR', 'De voorganger moet vastgelegd zijn.', 409);
     }
-    const content = Object.values(w.nodes).sort((a, b) => a.id.localeCompare(b.id))
+    const content = w.structure.map(nodeId => M.get(w.nodes, nodeId))
       .map(n => ({ nodeId: n.id, kind: n.kind, revision: M.clone(n.revisions.at(-1)) }));
     if (!content.length) M.fail('CONTENT_REQUIRED', 'Een editie heeft inhoud nodig.', 409);
     if (!/^(WORLD|[A-Z]{2})$/.test(d.territory || '')) M.fail('INVALID_SCOPE', 'Kies een publicatieterritorium.');

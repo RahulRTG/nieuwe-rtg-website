@@ -39,12 +39,20 @@ function version(w, expected) {
   if (!Number.isSafeInteger(expected) || expected !== w.revision)
     fail('STALE_REVISION', 'Open de actuele werkrevisie.', 409);
 }
-function empty() { return { schemaVersion: 1, works: {}, receipts: {}, journal: [], delivery: {} }; }
+function empty() { return { schemaVersion: 2, works: {}, receipts: {}, journal: [], delivery: {} }; }
 function state(raw) {
   if (Object.keys(raw).length === 0) return empty();
-  if (raw.schemaVersion !== 1 || !raw.works || !raw.receipts || !Array.isArray(raw.journal) || !raw.delivery)
+  if (![1, 2].includes(raw.schemaVersion) || !raw.works || !raw.receipts || !Array.isArray(raw.journal) || !raw.delivery)
     fail('SCHEMA_UNAVAILABLE', 'De Library-opslag heeft een onbekende versie.', 503);
-  return clone(raw);
+  const s = clone(raw);
+  if (s.schemaVersion === 1) {
+    for (const w of Object.values(s.works)) {
+      w.structure = Object.keys(w.nodes || {}).sort();
+      w.feedback = {};
+    }
+    s.schemaVersion = 2;
+  }
+  return s;
 }
 const POLICY = Object.freeze({ id: 'library.kernel', version: 1,
   rules: ['no-implicit-ip-transfer', 'credit-is-not-authority', 'edition-bound-consent', 'check-at-commit'] });

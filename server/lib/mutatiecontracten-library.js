@@ -1,11 +1,14 @@
 'use strict';
 // Library owns only its private kernel. These are source contracts, not a public release attestation.
 const CONTRACTEN = {};
-const reads = ['work/get', 'edition/get', 'publication/preview', 'proof'];
+const reads = ['context', 'work/list', 'work/get', 'edition/get', 'publication/preview', 'studio/workspace',
+  'feedback/list', 'reader/open', 'reader/state', 'reader/proof', 'reader/search', 'proof'];
 const writes = ['work/create', 'revision/add', 'contribution/invite', 'contribution/accept',
   'agreement/propose', 'agreement/accept', 'agreement/conflict', 'rights/grant', 'rights/revoke',
-  'edition/create', 'edition/freeze', 'edition/withdraw', 'edition/warn',
-  'publication/consent', 'publication/revoke-consent', 'publication/confirm'];
+  'structure/reorder', 'edition/create', 'edition/freeze', 'edition/withdraw', 'edition/warn',
+  'publication/consent', 'publication/revoke-consent', 'publication/confirm',
+  'feedback/create', 'feedback/decide', 'feedback/resolve', 'reader/progress', 'reader/bookmark',
+  'reader/bookmark/remove', 'reader/highlight', 'reader/highlight/remove', 'reader/note', 'reader/note/remove'];
 for (const path of [...reads, ...writes]) {
   const reading = reads.includes(path);
   CONTRACTEN['POST /api/library/' + path] = {

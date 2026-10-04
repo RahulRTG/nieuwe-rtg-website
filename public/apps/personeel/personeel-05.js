@@ -6,8 +6,7 @@
         const d = await r.json().catch(() => ({}));
         if (!r.ok) throw new Error(d.error || T('pd.ka.fout','Die code klopt niet.'));
         kaToken = d.token; try { localStorage.setItem('rtg_office_token', kaToken); } catch(e){}
-        // De gedeelde code koppelt geen kantoorrol meer aan een account (23 september
-        // 2026): dat gaat alleen met een uitnodiging van de eigenaar, op naam.
+        // een kantoorrol koppelen gaat alleen met een uitnodiging op naam (23-09-2026)
         enterKantoor();
       } catch(e){ $('#kaFout').textContent = e.message; }
     };
@@ -36,23 +35,23 @@
       } catch(e){}
     })();
   }
-  /* DE KANTOORUITNODIGING VERZILVEREN. Sinds 23 september 2026 hangt de
-     kantoorrol alleen nog aan een account via een uitnodiging van de eigenaar,
-     op naam en eenmalig. Wie ingelogd is en de rol nog niet heeft, tikt hier de
-     code in die hij van de eigenaar kreeg; de TOTP komt uit het veld erboven. */
+  /* DE KANTOORUITNODIGING VERZILVEREN (op naam, eenmalig). Het scherm volgt de
+     server: vraagt die een passkey (productie, B24), dan de ceremonie via
+     RTGZwaar; anders telt de TOTP uit het veld erboven. */
   function kantoorUitnodigingVeld(lt){
     const kaart = $('#gateStep').querySelector('.card');
     if (!kaart || $('#kaUitn')) return;
     kaart.insertAdjacentHTML('beforeend', '<div class="k h-mt70">'+T('pd.ka.uitn','Uitnodiging van de eigenaar')+'</div>'+
       '<div class="pinrow h-mt40"><input id="kaUitn" aria-label="'+T('pd.ka.uitn','Uitnodiging van de eigenaar')+'" autocomplete="off" autocapitalize="characters" maxlength="40" placeholder="KU.">'+
       '<button id="kaUitnGo" class="abtn">'+T('pd.ka.uitnGo','Koppel aan mijn account')+'</button></div>');
+    const laad = (g, f) => window[g] || new Promise(ok => { const t = document.createElement('script'); t.src = '/shared/'+f+'.js'; t.onload = t.onerror = ok; document.head.appendChild(t); });
     const ga = async () => {
       $('#kaFout').textContent = '';
-      const r = await fetch('/api/account/koppel', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lt },
-        body: JSON.stringify({ soort: 'kantoor', uitnodiging: $('#kaUitn').value.trim(), totp: $('#kaTotp').value.trim() }) });
-      const d = await r.json().catch(() => ({}));
-      if (!r.ok) { $('#kaFout').textContent = d.error || T('pd.mis', 'Er ging iets mis.'); return; }
-      kantoorMetAccount(lt);
+      try {
+        await laad('RTGPasskey', 'passkey'); await laad('RTGZwaar', 'zwaarbevestig');
+        await RTGZwaar.doe('/api/account/koppel', { soort: 'kantoor', uitnodiging: $('#kaUitn').value.trim(), totp: $('#kaTotp').value.trim() }, { token: lt });
+        kantoorMetAccount(lt);
+      } catch(e){ $('#kaFout').textContent = e.message || T('pd.mis', 'Er ging iets mis.'); }
     };
     $('#kaUitnGo').addEventListener('click', ga);
     $('#kaUitn').addEventListener('keydown', e => { if (e.key === 'Enter') ga(); });

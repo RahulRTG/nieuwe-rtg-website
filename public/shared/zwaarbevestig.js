@@ -30,7 +30,9 @@
   }
 
   /* opties: { token, optiesPad } -- het loket hoort bij de deur waar de
-     handeling doorheen gaat, en dat weet alleen de aanroeper. */
+     handeling doorheen gaat, en dat weet alleen de aanroeper. Een deur die de
+     ceremonie meteen meegeeft (`bevestiging` in de 401, zoals /api/account/start
+     en /api/account/koppel) heeft geen loket nodig: dan wordt die gebruikt. */
   function doe(pad, body, opties) {
     var o = opties || {};
     return stuur(pad, body, o.token).then(function (a) {
@@ -42,6 +44,7 @@
         throw new Error('Deze handeling vraagt uw passkey, en dit scherm kan die ceremonie niet starten.');
       }
       return global.RTGPasskey.bevestig(function () {
+        if (a.d.bevestiging && a.d.bevestiging.opties) return a.d.bevestiging;
         return stuur(o.optiesPad, { actie: a.d.actie }, o.token).then(function (x) { return x.d; });
       }).then(function (b) {
         if (!b || b.fout) throw new Error((b && b.fout) || 'De bevestiging is niet gelukt.');

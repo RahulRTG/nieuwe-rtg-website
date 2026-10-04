@@ -67,6 +67,7 @@ const ZWARE_ACTIES = Object.freeze([
   'kantoor-binnen',             // POST /api/account/start  (rol kantoor, in productie; kern/kantoor/productiedeur.js)
   'gezin-passkey-koppel',       // POST /api/rtf/gezin/passkey  (B19: eigen passkey aan het eigen gezinsprofiel)
   'gezin-sessie-verleng',       // POST /api/foundation/gezin/sessie/verleng  (B19: zeven dagen erbij, foundation/gezinsdeur.js)
+  'kantoor-koppel',             // POST /api/account/koppel  (kantooruitnodiging, in productie; B24)
   'passkey-weg'                 // POST /api/webauthn/weg
 ]);
 

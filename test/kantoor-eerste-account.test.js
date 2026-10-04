@@ -15,7 +15,6 @@ const os = require('node:os');
 const path = require('node:path');
 const { startServer, stop } = require('./helper');
 const { maakAuthenticator } = require('./webauthn-authenticator');
-const { totpCode } = require('../server/kern/totp');
 
 const APP = 'https://rtg.voorbeeld.test';
 const HOST = new URL(APP).hostname;
@@ -44,15 +43,16 @@ async function zetPasskey(api, lid, naam) {
   assert.equal(rr.status, 200, kort(rr.body));
   return sleutel;
 }
-async function kantoorOpen(api, lid, sleutel) {
-  const vraag = await api('/api/account/start', { rol: 'kantoor' }, lid);
+async function metPasskey(api, pad, body, lid, sleutel, n) {
+  const vraag = await api(pad, body, lid);
   assert.equal(vraag.status, 401, kort(vraag.body));
   const b = vraag.body.bevestiging;
-  const binnen = await api('/api/account/start', { rol: 'kantoor', ceremonie: b.ceremonie,
-    antwoord: sleutel.loginAntwoord(b.opties.challenge, APP, 1) }, lid);
-  assert.equal(binnen.status, 200, kort(binnen.body));
-  return binnen.body.token;
+  const r = await api(pad, { ...body, ceremonie: b.ceremonie,
+    antwoord: sleutel.loginAntwoord(b.opties.challenge, APP, n) }, lid);
+  assert.equal(r.status, 200, kort(r.body));
+  return r.body;
 }
+const kantoorOpen = (api, lid, s, n = 1) => metPasskey(api, '/api/account/start', { rol: 'kantoor' }, lid, s, n).then(b => b.token);
 
 test('verse productie: de eigenaar machtigt met zijn passkey het eerste kantooraccount op naam', async t => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kantoor-eerste-'));
@@ -120,11 +120,9 @@ test('verse productie: de eigenaar machtigt met zijn passkey het eerste kantoora
   assert.equal(uitn.status, 200, kort(uitn.body));
   assert.match(uitn.body.code, /^KU\.[0-9A-F]{32}$/i);
 
-  // 4. de medewerker verzilvert, en opent het kantoor op naam met zijn eigen passkey
-  const kop = await api('/api/account/koppel', { soort: 'kantoor', uitnodiging: uitn.body.code,
-    totp: totpCode(TOTP, Date.now(), 30) }, mwLid);
-  assert.equal(kop.status, 200, kort(kop.body));
-  const mwKantoor = await kantoorOpen(api, mwLid, mwSleutel);
+  // 4. de medewerker verzilvert met zijn eigen passkey (B24), en opent het kantoor op naam
+  await metPasskey(api, '/api/account/koppel', { soort: 'kantoor', uitnodiging: uitn.body.code }, mwLid, mwSleutel, 1);
+  const mwKantoor = await kantoorOpen(api, mwLid, mwSleutel, 2);
   const log = await api('/api/office/securitylog', {}, mwKantoor);
   assert.equal(log.status, 200, kort(log.body));
 

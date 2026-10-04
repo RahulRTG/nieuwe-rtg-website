@@ -121,7 +121,14 @@ for (const engine of engines) {
       await page.evaluate(() => document.querySelector('.tabbar button[data-tab="home"]').click());
       await page.evaluate(() => RTGCommand.open('/apps/werk.html','Werk OS'));
       await page.waitForSelector('.cmd-pane.actief iframe');
-      await page.reload({waitUntil:'domcontentloaded'});
+      /* WebKit meldt bij een herlaad terwijl de vertraagde route nog een verzoek
+         vasthoudt soms een eigen interne fout, zonder dat de app iets doet. Alleen
+         die engine-melding krijgt een tweede poging; elke andere fout blijft rood. */
+      try { await page.reload({waitUntil:'domcontentloaded'}); }
+      catch (e) {
+        if (engine !== 'webkit' || !/internal error/i.test(String(e && e.message))) throw e;
+        await page.reload({waitUntil:'domcontentloaded'});
+      }
       await page.waitForSelector('body[data-rtg-desktop-state="ready"]');
       const frame = page.frameLocator('.cmd-pane.actief iframe');
       await frame.locator('.wk-briefing h1').waitFor({state:'visible'});

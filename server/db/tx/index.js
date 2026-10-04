@@ -81,6 +81,7 @@ function txVoegToe(naam, t, opties) {
   const achteraan = !!(opties && opties.achteraan);
   if (achteraan) st.arr.push(t); else st.arr.unshift(t);
   st.len++;
+  t = achteraan ? st.arr[st.arr.length - 1] : st.arr[0]; // index de trackerproxy, niet het ruwe object
   const sl = txSleutelVan(naam, t);
   if (sl != null && (achteraan ? !st.byRef.has(sl) : true)) st.byRef.set(sl, t);
   const k = txKlantVan(naam, t); if (k != null) { let l = st.byKlant.get(k); if (!l) st.byKlant.set(k, l = []); if (achteraan) l.push(t); else l.unshift(t); }

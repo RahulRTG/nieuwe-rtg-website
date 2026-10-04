@@ -20,7 +20,7 @@ function maakExperience({ kern, db, save, crypto, bijeen, inBundel, nu }) {
     return fn();
   };
   const broker = require('./broker')({ crypto, opslag, projecteer: projecties.projecteer,
-    contexten, kern, commit, network });
+    contexten, kern, commit, network, trustPlane: require('../bewijsvlak/runtime').current() });
 
   function resumeVoor(key, world, context) {
     const opgeslagen = opslag.resumeLees(key);

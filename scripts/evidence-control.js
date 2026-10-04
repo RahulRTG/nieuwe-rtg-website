@@ -24,6 +24,25 @@ function commit() {
   catch (e) { return null; }
 }
 
+/* Een workflow_dispatch wijst in GitHub eerst naar een beweegbare ref. De
+   aanroeper noemt daarom de verwachte immutable commit; pas als die gelijk is
+   aan zowel het event als de werkelijk uitgecheckte HEAD mag de ronde meten. */
+function bindCommit(verwacht, eventCommit, headCommit) {
+  const waarden = { verwacht, event: eventCommit, head: headCommit };
+  for (const [naam, waarde] of Object.entries(waarden)) {
+    if (!/^[0-9a-f]{40}$/.test(String(waarde || ''))) {
+      throw new Error(naam + '-commit is geen volledige lowercase Git-SHA');
+    }
+  }
+  if (verwacht !== eventCommit) {
+    throw new Error('verwachte commit wijkt af van de workflow-eventcommit');
+  }
+  if (verwacht !== headCommit) {
+    throw new Error('verwachte commit wijkt af van de werkelijk uitgecheckte HEAD');
+  }
+  return { commit: verwacht, event: eventCommit, head: headCommit };
+}
+
 function score(via) {
   if (via === 'zeker') return 1;
   if (via === 'mogelijk') return 0.5;
@@ -102,23 +121,28 @@ if (require.main === module) {
   try {
     const args = process.argv.slice(2);
     const opdracht = args[0] || 'build';
-    const planPad = path.resolve(WORTEL, leesVlag(args, 'plan', '.evidence/plan.json'));
-    const out = path.resolve(WORTEL, leesVlag(args, 'out', '.evidence/control.json'));
-    const plan = JSON.parse(fs.readFileSync(planPad, 'utf8'));
-    if (opdracht === 'build') {
-      const control = bouwen(plan);
-      fs.mkdirSync(path.dirname(out), { recursive: true });
-      fs.writeFileSync(out, JSON.stringify(control, null, 2) + '\n');
-      console.log('Evidence Control Plane ' + control.controlHash.slice(0, 16) + ': ' +
-        control.uitvoering.vereist.length + ' uitvoeren, ' + control.uitsluitingen.length + ' onderbouwd hergebruiken');
-    } else if (opdracht === 'verify') {
-      const control = JSON.parse(fs.readFileSync(out, 'utf8'));
-      console.log(JSON.stringify(verifieren(control, plan)));
-    } else throw new Error('onbekende opdracht: ' + opdracht);
+    if (opdracht === 'bind-source') {
+      const binding = bindCommit(process.env.RTG_EXPECTED_COMMIT, process.env.GITHUB_SHA, commit());
+      console.log('Handmatige bewijsrun gebonden aan ' + binding.commit + '.');
+    } else {
+      const planPad = path.resolve(WORTEL, leesVlag(args, 'plan', '.evidence/plan.json'));
+      const out = path.resolve(WORTEL, leesVlag(args, 'out', '.evidence/control.json'));
+      const plan = JSON.parse(fs.readFileSync(planPad, 'utf8'));
+      if (opdracht === 'build') {
+        const control = bouwen(plan);
+        fs.mkdirSync(path.dirname(out), { recursive: true });
+        fs.writeFileSync(out, JSON.stringify(control, null, 2) + '\n');
+        console.log('Evidence Control Plane ' + control.controlHash.slice(0, 16) + ': ' +
+          control.uitvoering.vereist.length + ' uitvoeren, ' + control.uitsluitingen.length + ' onderbouwd hergebruiken');
+      } else if (opdracht === 'verify') {
+        const control = JSON.parse(fs.readFileSync(out, 'utf8'));
+        console.log(JSON.stringify(verifieren(control, plan)));
+      } else throw new Error('onbekende opdracht: ' + opdracht);
+    }
   } catch (e) {
     console.error('[evidence-control] ' + e.message);
     process.exitCode = 1;
   }
 }
 
-module.exports = { hash, score, bouwen, verifieren };
+module.exports = { hash, commit, bindCommit, score, bouwen, verifieren };

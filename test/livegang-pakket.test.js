@@ -32,10 +32,26 @@ test('live-compose ontsluit native HTTPS en schermt herstel af', () => {
   assert.match(live, /backup_public_cert/);
   assert.match(live, /backup_private_key:ro/);
   const keurgolive = basis.match(/^  keurgolive:\n[\s\S]*?(?=^  keurredis:\n)/m)[0];
+  const ownerproof = basis.match(/^  ownerproof:\n[\s\S]*?(?=^  # De echte productieconfiguratie)/m)[0];
+  assert.match(ownerproof, /scripts\/docker\/start\.js", "owner-proof/);
+  assert.match(ownerproof, /^      - data$/m,
+    'alleen de smalle meetcontainer mag de echte PostgreSQL bereiken');
+  assert.doesNotMatch(ownerproof, /^    volumes:|rtg-data|rtg-release|keurdata|edge/m,
+    'de eigenaarsmeting krijgt geen productievolume, releasevolume of ander netwerk');
   assert.match(keurgolive, /- keurdata/);
   assert.match(keurgolive, /- keuruitgangen/,
     'alleen de go-live-keurtaak krijgt egress voor echte media- en alarmproeven');
   assert.doesNotMatch(keurgolive, /^\s+ports:/m, 'de providerproef publiceert geen ingang');
+  const liveApp = live.match(/^  app:\n[\s\S]*?(?=^  keurgolive:\n)/m)[0];
+  const liveKeurgolive = live.match(/^  keurgolive:\n[\s\S]*?(?=^  backup:\n)/m)[0];
+  assert.match(liveApp, /RTG_PAPIEREN_FILE: \/run\/rtg-compliance\/papieren\.json/);
+  assert.match(liveApp, /RTG_PAPIEREN_HOST_DIR[^\n]*:\/run\/rtg-compliance:rw/,
+    'de productie-app moet het afzonderlijke compliancebestand kunnen bijwerken');
+  assert.match(liveKeurgolive, /RTG_PAPIEREN_FILE: \/run\/rtg-compliance\/papieren\.json/);
+  assert.match(liveKeurgolive, /RTG_PAPIEREN_HOST_DIR[^\n]*:\/run\/rtg-compliance:ro/,
+    'de kandidaat mag hetzelfde ingevulde papier uitsluitend lezen');
+  assert.doesNotMatch(liveKeurgolive, /rtg-data|\/app\/server\/data/,
+    'voor papiercontrole mag de kandidaat nooit brede productie-appdata mounten');
   const uitgangenNet = basis.match(/^  keuruitgangen:\n[\s\S]*?(?=^  # Alleen ClamAV)/m)[0];
   assert.doesNotMatch(uitgangenNet, /internal:\s*true/,
     'het afgescheiden providerproefnetwerk moet de echte HTTPS-diensten kunnen bereiken');
@@ -61,11 +77,20 @@ test('live-, motorinit-, herstel- en backupscript zijn geldige shell en herstel 
     'de off-site boom is write-once en krijgt geen retentie-wisser');
   const liveScript = lees('scripts/docker/live.sh');
   assert.match(liveScript, /keur_compose run --rm --no-deps[\s\S]*keurgolive node scripts\/golive\.js --bewijs-stdout/);
-  assert.match(liveScript, /node scripts\/eigenaar-claim\.js/);
+  assert.match(liveScript, /--controle-bootstrap/,
+    'de eerste eigenaar mag uitsluitend uit een exact gekeurd kandidaatimage ontstaan');
+  assert.match(liveScript, /owner-init[\s\S]*ownerproof[\s\S]*eigenaar-claim\.js --sluit-offline/,
+    'eerst schrijven, via een volume-loze SELECT-meting teruglezen, dan pas het eenmalige geheim sluiten');
+  assert.match(liveScript, /RTG_OWNER_READBACK_JSON=[\s\S]*--owner-readback-bewijs[\s\S]*eigenaar-claim\.js --sluit-offline/,
+    'de succesvolle procesexit alleen is onvoldoende: de host bewaart eerst het kandidaat-/DB-readbackbewijs');
+  assert.match(liveScript, /rm -f[\s\S]*owner-readback-bewijs\.json[\s\S]*owner-kandidaatbinding[\s\S]*ownerproof/,
+    'iedere latere go-live wist historisch bewijs en leest de eigenaar opnieuw uit productie');
   const golive = lees('scripts/golive.js');
   assert.match(golive, /process\.env\.RTG_ENV_FILE/);
   assert.match(golive, /RTG_POSTGRES_PASSWORD_FILE/);
   const eigenaarClaim = lees('scripts/eigenaar-claim.js');
+  assert.match(eigenaarClaim, /controleerOwnerReadbackBestand[\s\S]*schrijfZonderBootstrap/,
+    'direct --sluit-offline weigert zonder duurzaam readbackbewijs');
   assert.match(eigenaarClaim, /servername: domein/);
   assert.doesNotMatch(eigenaarClaim, /rejectUnauthorized\s*:\s*false/);
 });
@@ -101,19 +126,54 @@ test('eigenaarsclaim verwijdert de eenmalige deur zonder overige geheimen te wij
   assert.throws(() => zonderBootstrap(na), /ontbreekt/);
 });
 
+test('papierwerk --live schrijft en leest exact de gemounte compliance-opslag', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-live-papierwerk-'));
+  try {
+    const compliance = path.join(tmp, 'compliance');
+    const liveEnv = path.join(tmp, 'live.env');
+    fs.mkdirSync(compliance, { mode: 0o700 });
+    fs.writeFileSync(path.join(compliance, 'papieren.json'),
+      JSON.stringify({ antwoorden: {}, bijgewerkt: null }), { mode: 0o600 });
+    fs.writeFileSync(liveEnv, 'RTG_PAPIEREN_HOST_DIR=' + compliance + '\n', { mode: 0o600 });
+    const omgeving = { ...process.env, RTG_LIVE_ENV_FILE: liveEnv };
+    let r = spawnSync(process.execPath, [path.join(ROOT, 'scripts/papierwerk.js'), '--live'], {
+      encoding: 'utf8', env: omgeving
+    });
+    assert.equal(r.status, 0, r.stdout + r.stderr);
+    const invul = path.join(compliance, 'papierwerk-invullen.txt');
+    assert.ok(fs.existsSync(invul), 'het invulvel hoort naast het live compliancebestand');
+    fs.writeFileSync(invul, fs.readFileSync(invul, 'utf8')
+      .replace('\nAntwoord:', '\nAntwoord: Rahul Travel Group B.V.'));
+    r = spawnSync(process.execPath, [path.join(ROOT, 'scripts/papierwerk.js'), '--live', '--lees'], {
+      encoding: 'utf8', env: omgeving
+    });
+    assert.equal(r.status, 0, r.stdout + r.stderr);
+    const bewaard = JSON.parse(fs.readFileSync(path.join(compliance, 'papieren.json'), 'utf8'));
+    assert.equal(bewaard.antwoorden.verantwoordelijke.waarde, 'Rahul Travel Group B.V.');
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
 test('live:init maakt stil een valide lokale-eerst en betalingen-uit configuratie', () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-livepakket-'));
   try {
     const envPad = path.join(tmp, '.env.productie');
     const pgPad = path.join(tmp, 'postgres_password');
     const motorSleutelPad = path.join(tmp, 'motor_state_key');
+    const papierenPad = path.join(tmp, 'compliance', 'papieren.json');
     const maak = spawnSync(process.execPath, [path.join(ROOT, 'scripts/sleutels.js'),
       '--docker', '--schrijf', '--zonder-ai', '--zonder-betalen', '--zonder-sms', '--native-tls', '--stil',
-      '--eigenaar=owner@example.test', '--url=https://app.example.test',
+      '--eigenaar=owner@example.test', '--url=https://app.rahultravelgroup.com',
       '--tls-email=tls@example.test', '--smtp-url=smtps://mail.example.test:465',
       '--doel=' + envPad, '--postgres-doel=' + pgPad,
-      '--motor-sleutel-doel=' + motorSleutelPad], { encoding: 'utf8' });
+      '--motor-sleutel-doel=' + motorSleutelPad,
+      '--papieren-doel=' + papierenPad], { encoding: 'utf8' });
     assert.equal(maak.status, 0, maak.stderr);
+    assert.deepEqual(JSON.parse(fs.readFileSync(papierenPad, 'utf8')),
+      { antwoorden: {}, bijgewerkt: null }, 'live:init maakt een eerlijk leeg compliancebestand');
+    if (process.platform !== 'win32')
+      assert.equal(fs.statSync(papierenPad).mode & 0o077, 0, 'het compliancebestand is niet leesbaar voor anderen');
     bereidVoor({ envPad, sleutelPad: motorSleutelPad });
     /* De publieke hostcontrole bewijst configuratie, niet de externe diensten
        zelf. Geef de fixture daarom expliciete niet-geheime testdoelen; de
@@ -125,6 +185,8 @@ test('live:init maakt stil een valide lokale-eerst en betalingen-uit configurati
       'RTG_MEDIA_S3_BUCKET=rtg-productie-media',
       'RTG_MEDIA_S3_KEY=fixture-access-key',
       'RTG_MEDIA_S3_SECRET=fixture-secret-key',
+      'TURN_URL=turns:turn.rahultravelgroup.com:5349',
+      'TURN_SECRET=T9!relay-A7#tijdelijk-B4$geheim-C8%2026',
       ''
     ].join('\n'));
     const env = leesEnv(envPad);
@@ -132,9 +194,12 @@ test('live:init maakt stil een valide lokale-eerst en betalingen-uit configurati
       RTG_AI_UIT: '1', RTG_BETALEN_UIT: '1', RTG_HERSTEL_SMS_UIT_BEWUST: '1',
       RTG_ISOLATIE_AFDWINGEN: '1',
       RTG_TLS: '1', RTG_ACME: '1',
-      RTG_TLS_DOMAIN: 'app.example.test', RTG_PROXY_HOPS: '0'
+      RTG_TLS_DOMAIN: 'app.rahultravelgroup.com', RTG_PROXY_HOPS: '0'
     })) assert.equal(env[naam], waarde, naam);
-    assert.ok(env.OFFICE_TOTP_SECRET.length >= 16);
+    assert.equal(env.OFFICE_CODE, undefined,
+      'live:init maakt geen gedeeld geheim voor een deur die productie weigert');
+    assert.equal(env.OFFICE_TOTP_SECRET, undefined,
+      'de eigen passkey van de medewerker is de productiefactor, niet een losse TOTP');
     assert.doesNotMatch(maak.stdout, new RegExp(env.RTG_ENC_KEY));
 
     const backupDir = path.join(tmp, 'backup');
@@ -147,6 +212,7 @@ test('live:init maakt stil een valide lokale-eerst en betalingen-uit configurati
     const livePad = path.join(tmp, 'live.env');
     fs.writeFileSync(livePad, [
       'RTG_PUBLISH_HOST=0.0.0.0', 'RTG_PUBLISH_PORT=443', 'RTG_CONTAINER_PORT=443',
+      'RTG_PAPIEREN_HOST_DIR=' + path.dirname(papierenPad),
       'RTG_BACKUP_HOST_DIR=' + backupDir, 'RTG_BACKUP_OFFSITE_HOST_DIR=' + offsiteDir,
       'RTG_BACKUP_OFFSITE_IMMUTABLE=1', 'RTG_BACKUP_PUBLIC_CERT_FILE=' + publicCert,
       'RTG_IMAGE=rtg-app:live', ''
@@ -158,6 +224,24 @@ test('live:init maakt stil een valide lokale-eerst en betalingen-uit configurati
     });
     assert.equal(keur.status, 0, keur.stdout + keur.stderr);
     assert.match(keur.stdout, /versleutelde en off-site back-ups zijn afgedwongen/);
+
+    if (process.platform !== 'win32') {
+      const complianceLink = path.join(tmp, 'compliance-parent-link');
+      fs.symlinkSync(tmp, complianceLink, 'dir');
+      const gekoppeldeCompliance = path.join(complianceLink, 'compliance');
+      const linkLivePad = path.join(tmp, 'live-link.env');
+      fs.writeFileSync(linkLivePad, fs.readFileSync(livePad, 'utf8')
+        .replace('RTG_PAPIEREN_HOST_DIR=' + path.dirname(papierenPad),
+          'RTG_PAPIEREN_HOST_DIR=' + gekoppeldeCompliance), { mode: 0o600 });
+      const gekoppeld = spawnSync(process.execPath, [path.join(ROOT, 'scripts/docker/controle.js'), '--publiek'], {
+        encoding: 'utf8',
+        env: { ...process.env, RTG_ENV_FILE: envPad, RTG_POSTGRES_PASSWORD_FILE: pgPad,
+          RTG_MOTOR_STATE_KEY_SECRET_FILE: motorSleutelPad, RTG_LIVE_ENV_FILE: linkLivePad }
+      });
+      assert.equal(gekoppeld.status, 1, gekoppeld.stdout + gekoppeld.stderr);
+      assert.match(gekoppeld.stdout, /symbolische koppeling/,
+        'een symlink mag de smalle compliance-bind mount niet naar een ander hostpad verleggen');
+    }
 
     fs.appendFileSync(envPad, 'RTG_ACME_STAGING=1\n');
     const staging = spawnSync(process.execPath, [path.join(ROOT, 'scripts/docker/controle.js'), '--publiek'], {

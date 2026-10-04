@@ -52,6 +52,7 @@ const burger = require('../lib/burgerpad');
 const crypto = require('crypto');
 const { maakJournaal } = require('../kern/command/journaal');
 const verzoekcontext = require('../db/verzoekcontext');
+const { naAntwoord } = require('../lib/antwoord-einde');
 
 const SCHRIJFT = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
@@ -119,7 +120,7 @@ function maakAuditspoor(deps) {
       /* PostgreSQL neemt het spoor mee vóór dezelfde requestcommit. Buiten die
          stand blijft de bestaande finish-haak (en zijn best-effort gedrag). */
       if (!verzoekcontext.haakVoorCommit(noteer)) {
-        res.on('finish', () => { try { noteer(); } catch (e) {} });
+        naAntwoord(res, () => { try { noteer(); } catch (e) {} });
       }
       next();
     };

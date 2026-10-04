@@ -18,6 +18,7 @@
 const crypto = require('crypto');
 const sandbox = require('./betaal-sandbox');
 const magnaatTest = require('./testomgeving').actief(process.env);
+const providerBewijs = require('./betaal/providerbewijs')();
 
 const STRIPE_KEY = process.env.STRIPE_SECRET_KEY || '';
 const WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || '';
@@ -95,7 +96,8 @@ function koppelStore(store) {
 
 const ontvangst = require('./betaal/ontvangst')({ crypto, stripe, mollie, adyen,
   standaard: AANBIEDER, get: (k) => haalOp(k), set: (k, v) => bewaar(k, v),
-  env: process.env, uit: BETALEN_UIT, simulatie: BETALEN_UIT ? null : simulatie });
+  env: process.env, uit: BETALEN_UIT, simulatie: BETALEN_UIT ? null : simulatie,
+  markProviderEvidence: providerBewijs.mark });
 const {
   maakBetaling: maakProviderBetaling,
   haalBetaling, maakTerugbetaling, mogelijkheden, kiesAanbieder
@@ -164,7 +166,12 @@ async function maakUitbetaling(opdracht) {
    uitgeschreven: de client mag een betaling starten, nooit zichzelf betaald
    noemen. */
 const { verifieerWebhook, tekenDemo } = require('./betaal/webhook')({
-  crypto, stripe, BETALEN_UIT, WEBHOOK_SECRET, env: process.env });
+  crypto, stripe, BETALEN_UIT, WEBHOOK_SECRET, env: process.env,
+  markProviderEvidence: providerBewijs.mark });
+
+function verifieerAdyenMelding(item) {
+  return providerBewijs.verifyAdyen(item, adyen);
+}
 
 module.exports = { AANBIEDER, BETALEN_AAN: !BETALEN_UIT && AANBIEDER !== 'uit',
   maakBetaling, haalBetaling, maakTerugbetaling, maakUitbetaling,
@@ -175,4 +182,7 @@ module.exports = { AANBIEDER, BETALEN_AAN: !BETALEN_UIT && AANBIEDER !== 'uit',
   SIMULATIE_AAN, simulatieBelet: () => simulatie.belet(),
   adyenMerchantAccount: adyen && adyen.merchantAccount,
   adyenHandmatigeCapture: !!(adyen && adyen.handmatigeCapture),
-  verifieerAdyenMelding: (item) => !!(adyen && adyen.verifieerMelding(item)) };
+  verifieerAdyenMelding,
+  providerBewijsVan: providerBewijs.issue,
+  providerAssertionVan: providerBewijs.assertionVan,
+  verifieerProviderBewijs: providerBewijs.verify };

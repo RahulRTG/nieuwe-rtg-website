@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-04T04:41:52.144Z",
-    "commit": "eaf9b488",
+    "op": "2026-10-04T05:38:16.433Z",
+    "commit": "fdee9c00",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -17025,6 +17025,145 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "antwoord-einde.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/antwoord-einde.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "beproeving-ci-bewijs.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/beproeving-ci-bewijs.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 2
+    },
+    "betaal-providerbewijs.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/betaal/webhook.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 7
+    },
+    "codeql-verdict.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/codeql-verdict.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "eigenaar-postgres-bewijs.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/eigenaar-postgres-bewijs.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "experience-broker-evidence.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/experience/broker-evidence.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "hospitality-providerbewijs.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/reservering/providerbewijs.js",
+      "operator": "!==->===#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "magnaat-economie-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
+    "mutatietracker.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/mutatietracker.js",
+      "operator": "false->true#0",
+      "gezakt": 5,
+      "geprobeerd": 2
+    },
+    "release-workflow-bewijs.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/release-workflow-bewijs.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
+    "sqlite-tombstone-restart.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
+    },
+    "sqlite-tombstone.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/sqlite-poll.js",
+      "operator": "return-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 5
+    },
+    "trust-evidence-export.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/bewijsvlak/canon.js",
+      "operator": "return-weg#0",
+      "gezakt": 3,
+      "geprobeerd": 2
+    },
+    "trust-evidence-plane-v3.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/bewijsvlak/v3-contract.js",
+      "operator": "===->!==#0",
+      "gezakt": 17,
+      "geprobeerd": 1
+    },
+    "trust-evidence-plane.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/bewijsvlak/ledger.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
+    "trust-evidence-runtime-boundary.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/verzoekcontext.js",
+      "operator": "!==->===#0",
+      "gezakt": 3,
+      "geprobeerd": 4
+    },
+    "trust-evidence-source-retention.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/bewijsvlak/canon.js",
+      "operator": "!==->===#0",
+      "gezakt": 6,
+      "geprobeerd": 1
+    },
+    "trust-evidence-v2-migration.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/bewijsvlak/canon.js",
+      "operator": "return-weg#0",
+      "gezakt": 4,
+      "geprobeerd": 2
     }
   }
 }

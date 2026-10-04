@@ -42,6 +42,7 @@ const EMMERS = [0.0001, 0.00025, 0.0005, 0.001, 0.0025, 0.005, 0.01, 0.025, 0.05
 // De tijd via lib/klok.js: verzetbaar in een toets, en buiten de klokschuld.
 // Boven `staat`, want die vraagt hem meteen bij het laden.
 const rtgKlok = require('./lib/klok');
+const { naAntwoord } = require('./lib/antwoord-einde');
 
 const staat = {
   gestart: rtgKlok.nu(),
@@ -89,7 +90,7 @@ function middleware() {
       const sec = Number(process.hrtime.bigint() - begin) / 1e9;
       telVerzoek(req.method || 'GET', patroonVan(req), res.statusCode || 0, sec);
     };
-    res.on('finish', klaar);
+    naAntwoord(res, klaar);
     res.on('close', klaar);  // afgebroken verbinding telt ook mee
     next();
   };

@@ -23,11 +23,12 @@
    mensenwerk, en het document zegt dat zelf ook.
 
    Het ingevulde bestand bevat privénummers en bedrijfsgegevens. Het komt
-   daarom in server/data/ terecht: die map staat in .gitignore en hoort daar te
-   blijven.
+   daarom in een genegeerde gegevensmap terecht. Voor een live-installatie is
+   dat exact dezelfde afzonderlijke compliance-map die de app en keuring lezen.
 
    Schrijven:  node scripts/papierwerk.js
    Inlezen:    node scripts/papierwerk.js --lees
+   Live-host:  node scripts/papierwerk.js --live [--lees]
    Andere plek: beide met een pad erachter.
    ========================================================================== */
 'use strict';
@@ -35,9 +36,30 @@ const fs = require('fs');
 const path = require('path');
 
 const WORTEL = path.join(__dirname, '..');
+const CLI_ARGS = process.argv.slice(2);
+
+/* Selecteer de live-opslag VOOR server/papieren geladen wordt. Die module
+   kiest zijn opslagpad bij require-tijd. Zonder deze vroege binding kon een
+   beheerder keurig alle vragen invullen, terwijl de livekeuring een ander,
+   leeg bestand las. --live leest uitsluitend het lokale env-bestand; het
+   voert geen shelltekst uit. */
+function configureerLivePapieren(args = CLI_ARGS, env = process.env) {
+  if (!args.includes('--live')) return null;
+  const envPad = path.resolve(WORTEL, env.RTG_LIVE_ENV_FILE || 'deploy/live.env');
+  if (!fs.existsSync(envPad)) throw new Error('live-envbestand ontbreekt: ' + envPad);
+  const { leesEnv } = require(path.join(WORTEL, 'scripts', 'docker', 'start'));
+  const waarden = leesEnv(fs.readFileSync(envPad, 'utf8'));
+  const hostDir = env.RTG_PAPIEREN_HOST_DIR || waarden.RTG_PAPIEREN_HOST_DIR;
+  if (!hostDir) throw new Error('RTG_PAPIEREN_HOST_DIR ontbreekt in ' + envPad);
+  const absoluut = path.resolve(WORTEL, hostDir);
+  if (!env.RTG_PAPIEREN_FILE) env.RTG_PAPIEREN_FILE = path.join(absoluut, 'papieren.json');
+  return absoluut;
+}
+
+const LIVE_MAP = configureerLivePapieren();
 const papieren = require(path.join(WORTEL, 'server', 'papieren'));
 const DATADIR = process.env.RTG_DATA_DIR || path.join(WORTEL, 'server', 'data');
-const STANDAARD = path.join(DATADIR, 'papierwerk-invullen.txt');
+const STANDAARD = path.join(LIVE_MAP || DATADIR, 'papierwerk-invullen.txt');
 const K = { rood: '\x1b[31m', groen: '\x1b[32m', geel: '\x1b[33m', grijs: '\x1b[2m', reset: '\x1b[0m' };
 
 const MERK = '### ';
@@ -176,7 +198,7 @@ function lees(bron) {
 }
 
 function main() {
-  const args = process.argv.slice(2);
+  const args = CLI_ARGS;
   const wilLezen = args.includes('--lees');
   const pad = args.find(a => !a.startsWith('--')) || STANDAARD;
   if (wilLezen) return lees(pad);
@@ -185,11 +207,11 @@ function main() {
   const open = papieren.openVragen().length;
   console.log('\n\x1b[1mPAPIERWERK\x1b[0m ' + K.grijs + r.aantal + ' vragen geschreven' + K.reset + '\n');
   console.log('  ' + r.pad);
-  console.log('  ' + K.grijs + 'rechten 0600, in server/data/ -- die map staat in .gitignore en hoort daar te blijven' + K.reset);
+  console.log('  ' + K.grijs + 'rechten 0600, in een genegeerde gegevensmap; nooit committen' + K.reset);
   console.log('\n  ' + (open ? open + ' van de ' + r.aantal + ' vragen staan nog open.' : 'Alle vragen waren al beantwoord; ze staan ingevuld in het bestand.'));
   console.log('  ' + K.grijs + 'Vul in en lees terug met: node scripts/papierwerk.js --lees' + K.reset + '\n');
   return 0;
 }
 
 if (require.main === module) process.exit(main());
-module.exports = { schrijf, lees };
+module.exports = { schrijf, lees, configureerLivePapieren };

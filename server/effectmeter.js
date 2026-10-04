@@ -101,7 +101,7 @@ const winkel = new AsyncLocalStorage();
 function perVerzoek(fn) {
   const bestaand = winkel.getStore();
   if (bestaand) return fn(bestaand);
-  const teller = { opslag: 0, mail: 0, sms: 0 };
+  const teller = { opslag: 0, mail: 0, sms: 0, collecties: new Set(), collectieDekking: 'proxy-v1' };
   return winkel.run(teller, () => fn(teller));
 }
 
@@ -174,3 +174,7 @@ begin(process.env.RTG_STAATLOG);
 
 module.exports = { haak, tel, stand, begin, perVerzoek, huidig, SOORTEN, NIET_GEMETEN,
   get aan() { return aan; } };
+
+/* De collectiewaarneming (./effectmeter-collecties.js) hangt pas NA de exports
+   aan de opslagtracker: zij leest dit verzoek via huidig(). */
+module.exports.wijziging = require('./effectmeter-collecties').wijziging;

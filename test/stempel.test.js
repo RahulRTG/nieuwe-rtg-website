@@ -27,14 +27,35 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 const { execFileSync } = require('child_process');
-const { stempel, CODE, WORTEL } = require('../scripts/lib/stempel');
+const { stempel, CODE } = require('../scripts/lib/stempel');
 
-/* Draait git in de wortel en geeft de uitvoer, of '' als git niet kan. */
-function git(args) {
-  try { return execFileSync('git', args, { cwd: WORTEL, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim(); }
-  catch (e) { return ''; }
+function git(wortel, args) {
+  return execFileSync('git', args, { cwd: wortel, encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+}
+
+/* Iedere Git-bewering krijgt een eigen tijdelijke repository. De oude toets
+   eiste dat de HELE werkboom schoon was en kon daardoor juist tijdens bouwen
+   nooit haar onderwerp meten. Een test van vuile bomen hoort zijn eigen boom
+   te bezitten. */
+function metRepo(doe) {
+  const wortel = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-stempel-'));
+  try {
+    for (const map of ['server/kern', 'scripts', 'public', 'test'])
+      fs.mkdirSync(path.join(wortel, map), { recursive: true });
+    fs.writeFileSync(path.join(wortel, 'server/kern/basis.js'), 'module.exports = 1;\n');
+    fs.writeFileSync(path.join(wortel, 'package.json'), '{"name":"stempelproef"}\n');
+    git(wortel, ['init', '--quiet']);
+    git(wortel, ['add', '.']);
+    git(wortel, ['-c', 'user.name=RTG Test', '-c', 'user.email=test@rtg.invalid',
+      'commit', '--quiet', '-m', 'basis']);
+    return doe(wortel);
+  } finally {
+    fs.rmSync(wortel, { recursive: true, force: true });
+  }
 }
 
 /* Zet een bestand neer, meet, en ruim het HOE DAN OOK weer op.
@@ -44,8 +65,8 @@ function git(args) {
    en 6.7 in TAKEN.md, en het is deze sessie nog een keer echt gebeurd. Een
    ijkbestand dat blijft liggen, laat elke latere meting van die ronde
    meebewegen. */
-function metBestand(rel, inhoud, doe) {
-  const vol = path.join(WORTEL, rel);
+function metBestand(wortel, rel, inhoud, doe) {
+  const vol = path.join(wortel, rel);
   fs.writeFileSync(vol, inhoud);
   try { return doe(); } finally { try { fs.rmSync(vol, { force: true }); } catch (e) {} }
 }
@@ -53,8 +74,8 @@ function metBestand(rel, inhoud, doe) {
 test('een ongecommit CODEbestand maakt de meting onreproduceerbaar', () => {
   /* De richting die eronder ligt: als dit NIET meer uitslaat, dan stempelt een
      meting zich schoon terwijl de code waarop hij is gemeten nergens staat. */
-  const uit = metBestand('server/kern/zz-proef-stempel.js', 'module.exports = 1;\n',
-    () => stempel());
+  const uit = metRepo(wortel => metBestand(wortel, 'server/kern/zz-proef-stempel.js',
+    'module.exports = 1;\n', () => stempel({}, { wortel })));
   assert.equal(uit.boomVuil, true,
     'met een ongecommit bestand in server/ hoort boomVuil true te zijn -- die meting hoort ' +
     'bij code die nergens is vastgelegd');
@@ -68,16 +89,8 @@ test('een ongecommit REGISTER doet dat niet: een uitkomst is geen invoer', () =>
      De proef gebruikt een register dat ECHT bestaat en gewoon een andere inhoud
      krijgt, want dat is het geval dat in het echt optreedt -- een generator
      die zijn eigen register herschrijft. */
-  const schoon = git(['status', '--porcelain', '--'].concat(CODE)) === '';
-  if (!schoon) {
-    /* Draait deze toets in een boom met ongecommitte code, dan kan hij zijn
-       bewering niet doen. Dat MELDT hij en hij slaat zichzelf niet over met
-       groen: niet gemeten is geen bewijs (LAT.md regel 3). */
-    assert.fail('deze toets vraagt een boom zonder ongecommitte code; nu staat er wel wat. ' +
-      'Commit eerst, of draai hem los.');
-  }
-  const uit = metBestand('ZZPROEF-STEMPEL.json', '{ "uitleg": "tijdelijk register" }\n',
-    () => stempel());
+  const uit = metRepo(wortel => metBestand(wortel, 'ZZPROEF-STEMPEL.json',
+    '{ "uitleg": "tijdelijk register" }\n', () => stempel({}, { wortel })));
   assert.equal(uit.boomVuil, false,
     'een ongecommit REGISTER in de wortel hoort de meting NIET onreproduceerbaar te maken. ' +
     'Zou dat wel zo zijn, dan kan een meetronde nooit meer dan een schoon register opleveren.');
@@ -98,8 +111,12 @@ test('zonder git is de uitslag ONBEKEND en niet "schoon"', () => {
   /* De derde stand hoort te bestaan. Een stempel dat bij een mislukte
      git-aanroep `false` zou invullen, meldt een meting als reproduceerbaar
      terwijl niemand het heeft nagekeken. */
-  const uit = stempel();
-  assert.ok(uit.boomVuil === true || uit.boomVuil === false || uit.boomVuil === null,
-    'boomVuil kent drie standen: waar, onwaar, en niet vast te stellen');
+  const wortel = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-zonder-git-'));
+  let uit;
+  try { uit = stempel({}, { wortel }); }
+  finally { fs.rmSync(wortel, { recursive: true, force: true }); }
+  assert.equal(uit.commit, null);
+  assert.equal(uit.boomVuil, null,
+    'zonder Git is de vuilheid onbekend en nooit stilletjes schoon');
   assert.ok(uit.op && uit.node, 'en het stempel draagt altijd wanneer en waarop');
 });

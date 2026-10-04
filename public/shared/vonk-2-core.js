@@ -69,7 +69,13 @@
     var m = match && typeof match === 'object' ? match : {};
     var dag = tekst(datum) || new Date().toISOString().slice(0, 10);
     var afspraak = m.tafel && tekst(m.tafel.datum);
+    if (m.status === 'reservering-aangevraagd') return 'RESERVATION_PENDING';
+    if (m.status === 'reservering-onbekend') return 'RESERVATION_UNKNOWN';
+    if (m.status === 'reservering-geweigerd') return 'RESERVATION_REJECTED';
     if (m.status === 'bevestigd') {
+      var bewijs = m.reservering || {};
+      if (bewijs.state !== 'CONFIRMED' || lijst(bewijs.missing).indexOf('provider-confirmation') !== -1)
+        return 'RESERVATION_UNKNOWN';
       if (!afspraak || afspraak > dag) return 'DATE_CONFIRMED';
       if (afspraak === dag) return 'DATE_ACTIVE';
       return 'POST_DATE';

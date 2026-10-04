@@ -34,7 +34,8 @@ test('de Connection Edge rendert uitsluitend acties uit availableCapabilities', 
 
 test('zonder call-consent en met implemented:false route verschijnen geen ongeldige Edge-acties', () => {
   const actief = Vonk.match({ key:'a', now:'2026-09-22T12:00:00.000Z', match:{ id:'m1', a:'a', b:'b',
-    status:'bevestigd', tafel:{ datum:'2026-09-22' }, betaald:{}, halfweg:{ keuzes:{} } } });
+    status:'bevestigd', tafel:{ datum:'2026-09-22' }, betaald:{}, halfweg:{ keuzes:{} },
+    reservationEvidence:{ state:'CONFIRMED', finality:'SOURCE_ATTESTED', missing:['operational-outcome'] } } });
   const edge = model('vonk', actief, member);
   assert.deepEqual(edge.actions.map(x => x.id), ['date', 'safety']);
   assert.ok(!edge.actions.some(x => ['voice', 'route'].includes(x.id)));

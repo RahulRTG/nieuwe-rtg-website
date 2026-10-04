@@ -14,7 +14,7 @@ const { startServer } = require('./helper');
 
 let BASE, child;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-schild-'));
-const TURN_SECRET = 'orkaan-turn-geheim';
+const TURN_SECRET = 'Orkaan-A7!relay-B4#tijdelijk-C8$geheim-2026';
 
 const vraag = (pad, ip, extra) => fetch(BASE + pad, Object.assign({}, extra || {}, {
   headers: Object.assign({ 'X-Forwarded-For': ip }, (extra && extra.headers) || {})
@@ -31,7 +31,8 @@ const rauw = (pad, ip) => new Promise((resolve, reject) => {
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: {
     RTG_DATA_DIR: TMP, SMTP_URL: '', RTG_SCHILD_PLAFOND: '60',
-    TURN_URL: 'turn:turn.rtg.example:3478', TURN_SECRET
+    STUN_URL: ' ,stun:stun.rahultravelgroup.com:3478, ',
+    TURN_URL: ' ,turns:turn.rahultravelgroup.com:5349?transport=tcp,, ', TURN_SECRET
   } }));
 });
 test.after(() => {
@@ -67,8 +68,13 @@ test('DDoS-rem: boven het plafond gaat het IP op de banlijst; localhost nooit', 
 
 test('TURN: /api/ice geeft kortlevende inloggegevens met een kloppende HMAC', async () => {
   const d = await (await fetch(BASE + '/api/ice')).json();
-  const turn = d.iceServers.find(s => String(s.urls).includes('turn:'));
+  const turn = d.iceServers.find(s => String(s.urls).includes('turns:'));
   assert.ok(turn, 'de TURN-server staat in de lijst');
+  for (const server of d.iceServers) {
+    assert.ok(Array.isArray(server.urls));
+    assert.equal(server.urls.every(url => typeof url === 'string' && url.length > 0), true,
+      'de route projecteert geen lege ICE URL-items');
+  }
   assert.match(turn.username, /^\d+:rtg$/);
   const verloopt = Number(turn.username.split(':')[0]);
   assert.ok(verloopt * 1000 > Date.now() + 30 * 60000, 'minstens een half uur geldig');

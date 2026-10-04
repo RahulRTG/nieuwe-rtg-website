@@ -41,13 +41,29 @@ function verseOpslag(env) {
   const opSchijf = (naam) => {
     const d = new DatabaseSync(path.join(TMP, 'store.db'));
     try {
-      const rij = d.prepare('SELECT val FROM kv WHERE key = ?').get(naam);
-      return rij ? JSON.parse(kluis.ontsleutel(rij.val)) : null;
+      const rij = d.prepare('SELECT val, deleted FROM kv WHERE key = ?').get(naam);
+      return rij && !rij.deleted ? JSON.parse(kluis.ontsleutel(rij.val)) : null;
+    } finally { d.close(); }
+  };
+  const externeTombstone = (naam) => {
+    const d = new DatabaseSync(path.join(TMP, 'store.db'));
+    try {
+      d.exec('PRAGMA busy_timeout=5000');
+      d.exec('BEGIN IMMEDIATE');
+      d.prepare("UPDATE meta SET v = v + 1 WHERE k = 'ver'").run();
+      const v = Number(d.prepare("SELECT v FROM meta WHERE k = 'ver'").get().v);
+      d.prepare(`INSERT INTO kv(key,val,ver,deleted) VALUES(?,NULL,?,1)
+        ON CONFLICT(key) DO UPDATE SET val=NULL,ver=excluded.ver,deleted=1`).run(naam, v);
+      d.exec('COMMIT');
+      return v;
+    } catch (e) {
+      try { d.exec('ROLLBACK'); } catch (x) {}
+      throw e;
     } finally { d.close(); }
   };
   const walBytes = () => { const w = path.join(TMP, 'store.db-wal'); return fs.existsSync(w) ? fs.statSync(w).size : 0; };
   const op = () => { for (const [k, v] of Object.entries(oud)) { if (v === undefined) delete process.env[k]; else process.env[k] = v; } fs.rmSync(TMP, { recursive: true, force: true }); };
-  return { dbmod, db: dbmod.db, TMP, opSchijf, walBytes, op };
+  return { dbmod, db: dbmod.db, TMP, opSchijf, externeTombstone, walBytes, op };
 }
 // Een collectie die zeker boven RTG_SQLITE_GROOT_BYTES uitkomt.
 function grootBlok(n, extra) {
@@ -89,6 +105,58 @@ test('toevoegen en verwijderen landen meteen: het aantal items verandert', async
     delete o.db.data.sessions.nieuw;                  // uitloggen
     o.dbmod.save();
     assert.equal(o.opSchijf('sessions').nieuw, undefined, 'een uitgelogde sessie is direct weg van schijf');
+  } finally { o.op(); }
+});
+
+test('een verwijderde top-level collectie blijft weg na herstart', async () => {
+  const o = verseOpslag();
+  try {
+    o.db.data.tijdelijkeKloondata = { oud: true };
+    o.dbmod.save();
+    assert.ok(o.opSchijf('tijdelijkeKloondata'));
+    delete o.db.data.tijdelijkeKloondata;
+    o.dbmod.save();
+    assert.equal(o.opSchijf('tijdelijkeKloondata'), null,
+      'SQLite bewaart een tombstone in plaats van de oude collectie te laten herleven');
+    await o.dbmod.flushBijAfsluiten();
+    assert.equal(o.opSchijf('tijdelijkeKloondata'), null);
+    o.dbmod.bewerkCollectie('tijdelijkeKloondata', kaart => { kaart.nieuw = true; });
+    assert.deepEqual(o.opSchijf('tijdelijkeKloondata'), { nieuw: true },
+      'een domeintransactie kan een getombstonede collectie veilig herscheppen');
+  } finally { o.op(); }
+});
+
+test('een nieuwere externe tombstone wint van een vuile lokale werkkopie', () => {
+  const o = verseOpslag();
+  try {
+    o.db.data.intrekkingen = { geheim: 'oud', behouden: true };
+    o.dbmod.save();
+    o.db.data.intrekkingen.lokaleNaloop = 'mag niet herrijzen';
+    o.externeTombstone('intrekkingen');
+
+    o.dbmod.save();
+
+    assert.equal(o.opSchijf('intrekkingen'), null,
+      'een gewone save schrijft geen oudere lokale inhoud over de tombstone');
+    assert.equal(Object.prototype.hasOwnProperty.call(o.db.data, 'intrekkingen'), false,
+      'de levende werkkopie neemt de autoritatieve verwijdering over');
+  } finally { o.op(); }
+});
+
+test('expliciet herscheppen na een tombstone begint leeg en lekt geen oude inhoud', () => {
+  const o = verseOpslag();
+  try {
+    o.db.data.intrekkingen = { geheim: 'oud', behouden: true };
+    o.dbmod.save();
+    o.externeTombstone('intrekkingen');
+
+    o.dbmod.bewerkCollectie('intrekkingen', kaart => {
+      assert.deepEqual(kaart, {}, 'de domeintransactie ziet geen verwijderde oude inhoud');
+      kaart.nieuw = true;
+    });
+
+    assert.deepEqual(o.opSchijf('intrekkingen'), { nieuw: true });
+    assert.deepEqual(o.db.data.intrekkingen, { nieuw: true });
   } finally { o.op(); }
 });
 

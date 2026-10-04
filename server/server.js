@@ -74,6 +74,10 @@ const logboek = require('./log');
 const log = logboek.log;
 const testomgeving = require('./testomgeving');
 const betaal = require('./betaal');
+// Hospitality-issuer en Trust & Evidence Plane: ./opzet/vertrouwensvlak.js.
+const vertrouwensvlak = require('./opzet/vertrouwensvlak')({ save, betaal,
+  reserveringen: () => db.data.reserveringen || [],
+  trustEvidence: () => require('./kern/bewijsvlak/runtime').trustStaat(db.data) });
 const systeemKlok = require('./lib/klok');
 const { schoon, ledenPrijs, rondEuro, entreeCode, pickupCode, veiligGelijk } = require('./kern/util');
 const { totpOk } = require('./kern/totp');
@@ -700,13 +704,16 @@ const ankerpost = require('./lib/ankerpost').maakAnkerpost({ ankerdienst });
 const { sseToSupplier, sseToOffice, notifySupplier, supplierIndex,
   findSupplier, supplierAuth, persoonsPoort, logActivity } =
   require('./opzet/leverancierpoort')({ db, save, crypto, rtgKlok, sessionFor, DEMO, accounts,
-    grootSupplierSync, busGeef: () => bus, kernGeef: () => kern });
+    grootSupplierSync, busGeef: () => bus, kernGeef: () => kern,
+    markeerHospitalityRequest: vertrouwensvlak.markeerHospitalityRequest });
 
 /* De dienstenlaag -- live updates (SSE), meldingen en web-push, en de diensten
    die daarop leunen (archief, beveiliging, de Wacht, RTmail, naamlaag, antivirus)
    plus de poortwachters resolveSession en auth -- staat in ./opzet/diensten.js.
    De in- en uitgangslijsten zijn uitgerekend met scripts/blokscan.js, niet met
    de hand bijgehouden. */
+const trustPlane = vertrouwensvlak.trustPlane(); // schaduwstand, zie ./opzet/vertrouwensvlak.js
+
 const {
   AUTHOR_TIER, SSE_BUFFER_TTL, aiPoort, antivirus, archief, atelierweb, auth, automatisering, 
   beveilig, broadcastSync, bufferEvent, bus, connectedSupplierCodes, dirTouch, 
@@ -1641,6 +1648,8 @@ const {
 } = maakErvaring({
   db, save, crypto, findSupplier, notify, notifySupplier, sseToCustomer,
   sseToSupplier, sseToOffice, zijnVrienden, ticketsVoorSlot, optieAan,
+  trustPlane,
+  bewijsHospitalityBesluit: vertrouwensvlak.bewijsHospitalityBesluit,
   // de gedekte tafel (kern/tafeldek.js) wordt pas in kernlaag7 gebouwd; laat gebonden
   tafeldekVan: () => kern.tafeldek,
   /* RTG Pay wordt pas in kernlaag3 gebouwd -- ver na deze regel -- en de

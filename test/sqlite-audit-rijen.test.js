@@ -108,7 +108,7 @@ test('rijen en metadata gebruiken bestaande versleuteling; oude schrijvers worde
   for (const r of p.conn.prepare('SELECT waarde FROM audit_rij').all()) assert.match(r.waarde, /^RTGENC1:/);
   for (const r of p.conn.prepare('SELECT extra FROM audit_meta').all()) assert.match(r.extra, /^RTGENC1:/);
   assert.equal(p.lees('apiSpoor').geheim, 'metadata');
-  assert.throws(() => p.conn.prepare('INSERT INTO kv VALUES(?,?,?)').run('apiSpoor', '{}', 99), /stop oude schrijvers/);
+  assert.throws(() => p.conn.prepare('INSERT INTO kv(key,val,ver) VALUES(?,?,?)').run('apiSpoor', '{}', 99), /stop oude schrijvers/);
 });
 
 test('offline rollback materialiseert voor oude reader en herimport behoudt wijzigingen van de oude release', t => {

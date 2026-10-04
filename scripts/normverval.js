@@ -33,8 +33,10 @@
 
      SCHULD -- we konden het even niet. Dat mag, en dan hoort er een datum bij
      waarop het weer terug is. Na die datum zakt dit script tot de meter terug
-     is op de waarde van voor de verlaging, of tot er opnieuw en met een nieuwe
-     reden is besloten. Zo wordt een schuld geind in plaats van vergeten.
+     is op de waarde van voor de verlaging, of tot een latere verbetering de
+     omvang van precies die tranche aantoonbaar heeft afgelost. Nieuwe schuld
+     blijft een nieuwe notitie met een eigen reden en datum; zij kan de oude
+     niet verlengen. Zo wordt een schuld geind in plaats van vergeten.
 
    WAAROM DE REGEL EEN BEGINDATUM HEEFT. De 62 bestaande notities zijn het
    register van dit huis en niet mijn werk om achteraf in te delen; ze zijn
@@ -101,6 +103,81 @@ function richtingen() {
 
 const slechter = (richting, nu, toen) => richting === 'omlaag' ? nu > toen : nu < toen;
 
+/* De ratel heeft twee vakken met exact dezelfde betekenis: gewone meters en
+   prestatiemeters. De eerste vervalbewaker keek alleen in `meters`, waardoor
+   een verlopen p99-schuld niet als 233 ms maar als "meter verdwenen" werd
+   gemeld. Dat is niet alleen een slechte melding: hij kon daardoor ook nooit
+   vaststellen of de schuld werkelijk was afbetaald. Dubbel voorkomen is een
+   fout in plaats van een stil gekozen winnaar. */
+function meterstand(norm, sleutel) {
+  const gevonden = [];
+  if (norm && norm.meters && Object.prototype.hasOwnProperty.call(norm.meters, sleutel)) gevonden.push(norm.meters[sleutel]);
+  if (norm && norm.prestatie && Object.prototype.hasOwnProperty.call(norm.prestatie, sleutel)) gevonden.push(norm.prestatie[sleutel]);
+  if (gevonden.length > 1) throw new Error('meter ' + sleutel + ' staat zowel onder meters als prestatie');
+  return gevonden.length ? gevonden[0] : undefined;
+}
+
+const verslechtering = (richting, van, naar) => richting === 'omlaag' ? naar - van : van - naar;
+const verbetering = (richting, van, naar) => richting === 'omlaag' ? van - naar : naar - van;
+
+function overgang(notitie, sleutel) {
+  const veilig = String(sleutel).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const m = new RegExp('(?:^|[^a-zA-Z0-9])' + veilig + '\\s+(-?\\d+(?:[.,]\\d+)?)\\s*->\\s*(-?\\d+(?:[.,]\\d+)?)').exec(String(notitie && notitie.meter || ''));
+  if (!m) return null;
+  return { van: Number(m[1].replace(',', '.')), naar: Number(m[2].replace(',', '.')) };
+}
+
+/* SCHULD IS EEN TRANCHE, GEEN EEUWIG SLOT OP HET TOTAAL.
+
+   Een meter kan na een tijdelijke +4 eerst met 31 verbeteren en daarna door
+   een NIEUWE, afzonderlijk genoteerde noemerwijziging honderden punten hoger
+   staan. De oude implementatie vergeleek het huidige totaal dan eeuwig met de
+   historische `van`: alle latere notities werden betekenisloos en een echte
+   aflossing was niet meer uit te drukken.
+
+   `aflossingsbewijs` repareert dat zonder een datum te verlengen of een norm te
+   verruimen. Het is een klein bewijsrecord: de schuld noemt gestructureerd zijn
+   `naar`, en de aflossing noemt een latere gemeten verbetering plus de plek
+   waar die stand is terug te vinden. De bewaker rekent zelf na dat richting en
+   omvang voldoende zijn. Een tekst "afgelost" of een te kleine verbetering
+   opent dus niets. Nieuwe schulden blijven hun eigen vervaldatum houden. */
+function oordeelAflossing(n, richting, context = {}) {
+  if (n.aflossingsbewijs === undefined) return { aanwezig: false, geldig: false };
+  const a = n.aflossingsbewijs;
+  if (!a || typeof a !== 'object') return { aanwezig: true, geldig: false, reden: '`aflossingsbewijs` is geen bewijsobject' };
+  if (typeof n.naar !== 'number') return { aanwezig: true, geldig: false, reden: 'de schuld mist `naar`, dus haar omvang is niet na te rekenen' };
+  if (typeof a.van !== 'number' || typeof a.naar !== 'number') return { aanwezig: true, geldig: false, reden: 'de aflossing mist numerieke `van` en `naar`' };
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(a.datum || ''))) return { aanwezig: true, geldig: false, reden: 'de aflossing mist een datum' };
+  if (String(a.datum) < String(n.datum || '')) return { aanwezig: true, geldig: false, reden: 'de aflossing ligt voor het ontstaan van de schuld' };
+  if (!String(a.bewijs || '').trim()) return { aanwezig: true, geldig: false, reden: 'de aflossing noemt geen bewijs' };
+  if (!String(a.bronVan || '').trim() || !String(a.bronNaar || '').trim())
+    return { aanwezig: true, geldig: false, reden: 'de aflossing mist machineleesbare bronVan of bronNaar' };
+  const alle = (context.notities || []).filter(x => x && typeof x === 'object');
+  const zoek = tekst => alle.find(x => x.meter === tekst);
+  const vanNotitie = zoek(a.bronVan);
+  const vanOvergang = overgang(vanNotitie, n.sleutel);
+  if (!vanOvergang || vanOvergang.naar !== a.van)
+    return { aanwezig: true, geldig: false, reden: 'bronVan bewijst de opgegeven beginstand niet' };
+  if (String((vanNotitie && vanNotitie.datum) || '') > String(a.datum))
+    return { aanwezig: true, geldig: false, reden: 'bronVan ligt na de aflossingsdatum' };
+  if (a.bronNaar === 'huidige meter') {
+    if (context.nu !== a.naar) return { aanwezig: true, geldig: false, reden: 'de huidige meter bewijst de opgegeven eindstand niet' };
+  } else {
+    const naarNotitie = zoek(a.bronNaar);
+    const naarOvergang = overgang(naarNotitie, n.sleutel);
+    if (!naarOvergang || naarOvergang.van !== a.naar)
+      return { aanwezig: true, geldig: false, reden: 'bronNaar bewijst de opgegeven eindstand niet' };
+    if (String((naarNotitie && naarNotitie.datum) || '') > String(a.datum))
+      return { aanwezig: true, geldig: false, reden: 'bronNaar ligt na de aflossingsdatum' };
+  }
+  const schuld = verslechtering(richting, n.van, n.naar);
+  const betaald = verbetering(richting, a.van, a.naar);
+  if (!(schuld > 0)) return { aanwezig: true, geldig: false, reden: '`van` -> `naar` is geen verslechtering in de richting van deze meter' };
+  if (!(betaald >= schuld)) return { aanwezig: true, geldig: false,
+    reden: 'de aflossing verbetert ' + betaald + ', maar de schuld is ' + schuld };
+  return { aanwezig: true, geldig: true, schuld, betaald };
+}
+
 /* --------------------------------------------------------------- het inlezen */
 
 function leesNorm(tekst, waar) {
@@ -166,6 +243,11 @@ function main() {
       if (!/^\d{4}-\d{2}-\d{2}$/.test(String(n.vervalt || '')))
         fouten.push({ wat: naam, bericht: 'is een schuld zonder vervaldatum',
           hulp: 'een reden zonder einde is na een half jaar een tweede norm' });
+      const aflossing = richting.has(n.sleutel) ? oordeelAflossing(n, richting.get(n.sleutel),
+        { notities, nu: meterstand(norm, n.sleutel) }) : { aanwezig: false };
+      if (aflossing.aanwezig && !aflossing.geldig)
+        fouten.push({ wat: naam, bericht: 'beweert aflossing maar die is niet geldig: ' + aflossing.reden,
+          hulp: 'leg de gemeten verbetering vast; een verklaring zonder voldoende getal betaalt geen schuld' });
     }
   }
 
@@ -176,15 +258,18 @@ function main() {
       meldingen.push('schuld op ' + n.sleutel + ' loopt tot ' + n.vervalt + ' (terug naar ' + n.van + ')');
       continue;
     }
-    // Performance thresholds have their own section, also compared below.
-    // Expiry must inspect that recorded value, not report an existing meter as gone.
-    const nu = Object.hasOwn(norm.meters || {}, n.sleutel)
-      ? norm.meters[n.sleutel] : (norm.prestatie || {})[n.sleutel];
+    const nu = meterstand(norm, n.sleutel);
     if (nu === undefined) {
       fouten.push({ wat: n.sleutel, bericht: 'de schuld is verlopen op ' + n.vervalt + ' en de meter staat niet meer in NORM.json' });
       continue;
     }
     if (slechter(richting.get(n.sleutel), nu, n.van)) {
+      const aflossing = oordeelAflossing(n, richting.get(n.sleutel), { notities, nu });
+      if (aflossing.geldig) {
+        meldingen.push('schuld op ' + n.sleutel + ' is als tranche afbetaald (' + aflossing.betaald +
+          ' verbetering voor ' + aflossing.schuld + ' schuld; ' + n.aflossingsbewijs.bewijs + ')');
+        continue;
+      }
       fouten.push({ wat: n.sleutel, bericht: 'de schuld is verlopen op ' + n.vervalt + ': de meter staat op ' + nu + ' en hoort terug naar ' + n.van,
         hulp: 'herstel hem, of neem opnieuw een besluit met een nieuwe reden en een nieuwe datum -- stil laten staan is de erosie die deze regel tegenhoudt' });
     } else {
@@ -264,4 +349,4 @@ if (require.main === module) {
   try { process.exit(main()); }
   catch (e) { console.error('\n  ' + K.rood + String(e.message || e) + K.reset + '\n'); process.exit(2); }
 }
-module.exports = { richtingen, genoemdeMeters, slechter };
+module.exports = { richtingen, genoemdeMeters, slechter, meterstand, overgang, oordeelAflossing };

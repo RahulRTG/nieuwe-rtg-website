@@ -144,7 +144,7 @@ const SLEUTELS = {
      dedupliceren. */
   'POST /api/office/bank/incasso/dossier': { leest: true },
   /* De schaduwmeting van de kantoordeur (KANTOOR.md par. 3). Leest de stand op;
-     de TELLING gebeurt in officeAuth op res.on('finish') en niet in deze
+     de TELLING gebeurt in officeAuth via de finish-haak en niet in deze
      handler, dus twee keer opvragen verandert niets aan wat er geteld is. */
   'POST /api/office/mensdeur': { leest: true },
   'POST /api/ik/workspace': { leest: true },

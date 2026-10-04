@@ -134,7 +134,10 @@ async function beproefAlarm(env, opties) {
       timeout: opties.timeout || 5000, log: opties.log });
     if (!melder || melder.actief !== true || typeof melder.zelfproef !== 'function')
       return { ok: false, reden: 'de foutmelder heeft het ingestelde doel geweigerd' };
-    const r = await melder.zelfproef('golive');
+    /* Een bewijsproducent geeft hier zijn commitgebonden proef-ID mee. De
+       externe ontvanger kan dan aantonen dat precies DIT alarm aankwam, in
+       plaats van een willekeurig ouder zelfproefbericht. */
+    const r = await melder.zelfproef(String(opties.door || 'golive').slice(0, 240));
     if (!r || r.ok !== true || !Number.isInteger(r.status) || r.status < 200 || r.status >= 300)
       return { ok: false, status: r && r.status, reden: String(r && r.reden || 'geen 2xx-bevestiging').slice(0, 240) };
     return { ok: true, status: r.status, doelSha256: sha256(url) };

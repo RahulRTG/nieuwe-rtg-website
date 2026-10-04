@@ -32,7 +32,6 @@ test('config: onveilige productie geeft blokkerende fouten', () => {
 test('config: veilige productie is foutloos', () => {
   const r = config.valideer({ NODE_ENV: 'production', RTG_ENC_KEY: 'a'.repeat(64),
     APP_URL: 'https://x', DATABASE_URL: 'postgresql://postgres/rtg', RTG_VAULT_KEY: 'v'.repeat(64), RTG_SECRET_KEY: 's'.repeat(64),
-    OFFICE_CODE: 'KANTOORCODE12',
     /* STRIPE_WEBHOOK_SECRET hoort hier sinds de poortwacht-ronde bij: een
        betaalsleutel zonder webhook-secret is gevaarlijker dan geen van beide,
        want dan komt de "is er betaald"-melding onondertekend binnen en kan wie
@@ -54,8 +53,10 @@ test('config: veilige productie is foutloos', () => {
     RTF_IBAN: 'NL11FOUND0000000001', RTG_MEDIA_BACKEND: 's3',
     RTG_MEDIA_S3_BUCKET: 'rtg-productie-media',
     RTG_MEDIA_S3_KEY: 'AKIA0123456789PRODUCTIE', RTG_MEDIA_S3_SECRET: 'm'.repeat(40),
+    STUN_PUBLIC_HOST: 'stun.rahultravelgroup.com', STUN_URL: 'stun:stun.rahultravelgroup.com:3478',
+    TURN_URL: 'turns:turn.rahultravelgroup.com:5349', TURN_SECRET: 'T9!relay-A7#tijdelijk-B4$geheim-C8%2026',
     RTG_HERSTEL_SMS_UIT_BEWUST: '1', STRIPE_UITGAAND_UIT_BEWUST: '1',
-    OFFICE_TOTP_SECRET: 'JBSWY3DPEHPK3PXP', RTG_ISOLATIE_AFDWINGEN: '1',
+    RTG_ISOLATIE_AFDWINGEN: '1',
     RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl' });
   assert.equal(r.fouten.length, 0);
   assert.equal(r.waarschuwingen.length, 0, 'geen enkele waarschuwing: ' + JSON.stringify(r.waarschuwingen));
@@ -91,28 +92,21 @@ test('config: herstel-SMS moet echt bestaan of bewust fail-closed staan', () => 
   assert.ok(!bewust.fouten.some(f => /SMS-provider/.test(f)), 'de bewuste fail-closed stand is toegestaan');
 });
 
-/* De backoffice is de meest bevoorrechte deur van het huis: auditlog, tijdlijn
-   met codenamen, export. Zonder tweede factor staat die achter alleen de
-   statische OFFICE_CODE, en de officedeur telt mislukkingen per IP -- dus is
-   verspreid raden er ook niet door gestopt. Dit was een waarschuwing, en een
-   waarschuwing bij elke start leert iedereen wegkijken. */
-test('config: productie start niet zonder tweede factor op de backoffice', () => {
+/* De productiedeur accepteert uitsluitend een kantoorsessie op naam die door
+   een verse passkeyceremonie is geopend. Een gedeelde code of losse TOTP is
+   daar geen factor meer en hoort dus ook geen schijnveilig productievereiste
+   te zijn. Buiten productie blijven beide variabelen beschikbaar voor de
+   bestaande toetsen en demo's. */
+test('config: productie vereist geen ongebruikte gedeelde kantoorcode of losse TOTP', () => {
   const basis = { NODE_ENV: 'production', RTG_ENC_KEY: 'a'.repeat(64), RTG_VAULT_KEY: 'v'.repeat(64),
     RTG_SECRET_KEY: 's'.repeat(64), RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl', SMTP_URL: 'smtp://x',
     RTG_HERSTEL_SMS_UIT_BEWUST: '1', STRIPE_DEMO_BEWUST: '1' };
   const zonder = config.valideer(basis);
-  assert.ok(zonder.fouten.some(f => /OFFICE_TOTP_SECRET/.test(f)),
-    'zonder tweede factor hoort productie te weigeren, niet te waarschuwen');
-  assert.ok(!zonder.waarschuwingen.some(f => /OFFICE_TOTP_SECRET/.test(f)),
-    'en het hoort geen waarschuwing meer te zijn, anders staat dezelfde eis op twee sterktes');
-
-  /* Een geheim dat te kort is om een tweede factor te zijn is geen tweede
-     factor. Anders haalt "OFFICE_TOTP_SECRET=x" de eis met een letter. */
-  const kort = config.valideer({ ...basis, OFFICE_TOTP_SECRET: 'JBSWY3DP' });
-  assert.ok(kort.fouten.some(f => /OFFICE_TOTP_SECRET/.test(f)), 'acht tekens is geen tweede factor');
-
-  const goed = config.valideer({ ...basis, OFFICE_TOTP_SECRET: 'JBSWY3DPEHPK3PXP' });
-  assert.ok(!goed.fouten.some(f => /OFFICE_TOTP_SECRET/.test(f)), 'een bruikbaar base32-geheim is genoeg');
+  assert.ok(!zonder.fouten.concat(zonder.waarschuwingen).some(f => /OFFICE_(?:CODE|TOTP_SECRET)/.test(f)),
+    'ontbrekende gedeelde kantoorgeheimen mogen de passkey-only productiedeur niet blokkeren');
+  const oud = config.valideer({ ...basis, OFFICE_CODE: 'kort', OFFICE_TOTP_SECRET: 'x' });
+  assert.ok(!oud.fouten.concat(oud.waarschuwingen).some(f => /OFFICE_(?:CODE|TOTP_SECRET)/.test(f)),
+    'legacy demo/testwaarden mogen in productie geen tweede rechtenmodel suggereren');
 });
 
 test('config: een ongebruikte SMTP_HOST doet zich niet voor als werkende mailroute', () => {
@@ -162,12 +156,6 @@ test('config: het voorbeeld-eigenaarsadres blokkeert de productiestart', () => {
   assert.ok(standaard.fouten.some(f => /RTG_OWNER_EMAIL/.test(f)));
   const ongeldig = config.valideer({ NODE_ENV: 'production', RTG_ENC_KEY: 'a'.repeat(64), RTG_OWNER_EMAIL: 'geen-adres' });
   assert.ok(ongeldig.fouten.some(f => /RTG_OWNER_EMAIL.*geldig e-mailadres/.test(f)));
-  // en een te korte backoffice-code ook
-  const zwak = config.valideer({ NODE_ENV: 'production', RTG_ENC_KEY: 'a'.repeat(64), RTG_OWNER_EMAIL: 'e@x.nl', OFFICE_CODE: 'kort' });
-  assert.ok(zwak.fouten.some(f => /OFFICE_CODE/.test(f)));
-  const ontbreekt = config.valideer({ NODE_ENV: 'production', RTG_ENC_KEY: 'a'.repeat(64), RTG_OWNER_EMAIL: 'e@x.nl' });
-  assert.ok(ontbreekt.fouten.some(f => /OFFICE_CODE ontbreekt/.test(f)),
-    'een per-proces wisselende backofficecode is niet productiewaardig');
 });
 
 test('config: VUL-IN-plaatshouders blokkeren ook een directe productiestart', () => {

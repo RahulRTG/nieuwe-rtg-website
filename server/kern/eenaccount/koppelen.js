@@ -1,10 +1,12 @@
 /* Eenaccount (deelbestand): het KOPPELEN van een rol aan het ene account.
 
    Dit is de bewijs-helft: personeel bewijst de zaak-code + eigen PIN, de zaak
-   bewijst de bedrijfsinlog, het kantoor bewijst de backoffice-code (en de
-   tweede factor als die aanstaat). Pas als het bewijs er is, komt de rol aan
-   de sleutelbos. De andere helft -- met die sleutelbos een werk-sessie munten
-   -- staat in ../eenaccount.js.
+   bewijst de bedrijfsinlog en het kantoor een uitnodiging op naam. Buiten
+   productie mag de oude test/demo-opstelling daar nog een losse TOTP bij
+   vragen. Pas als het bewijs er is, komt de rol aan de sleutelbos. De andere
+   helft -- met die sleutelbos een werk-sessie munten -- staat in
+   ../eenaccount.js; in productie opent die kantoorrol uitsluitend na een verse
+   passkeyceremonie (kantoor/productiedeur.js).
 
    TWEE SLOTEN, EN ALLEEN SAMEN DEUGEN ZE.
 
@@ -24,6 +26,7 @@
    Afgesplitst uit eenaccount.js toen die de 10 KB passeerde. */
 
 const { idVanKey } = require('../../lib/lidsleutel');
+const productiedeur = require('../kantoor/productiedeur');
 
 const MAX_POGING = 5; // koppel-pogingen per account per minuut
 
@@ -123,7 +126,8 @@ module.exports = (kctx) => {
         logInlog('koppel', false, 'kantoor', req);
         return toegang;
       }
-      if (process.env.OFFICE_TOTP_SECRET && !totpOk(process.env.OFFICE_TOTP_SECRET, body.totp)) {
+      if (!productiedeur.isProductie() && process.env.OFFICE_TOTP_SECRET &&
+          !totpOk(process.env.OFFICE_TOTP_SECRET, body.totp)) {
         fout(key);
         pinSlot.fout(doel, 'de tweede factor van de backoffice via /api/account/koppel');
         logInlog('koppel', false, 'kantoor (tweede factor)', req);

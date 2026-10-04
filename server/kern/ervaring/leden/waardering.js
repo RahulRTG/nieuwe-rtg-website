@@ -2,7 +2,10 @@
    favorieten en de fooi-helper. Verbatim afgesplitst uit leden.js. */
 module.exports = (ctx) => {
   const { db, save, findSupplier, notify, notifySupplier, sseToSupplier,
-    orderMetRef, boekingMetRef, id, nu, rond } = ctx;
+    orderMetRef, boekingMetRef, id, nu, rond, trustPlane } = ctx;
+
+  // Schaduwhaken naar het bewijsvlak; zie ../bewijshaak.js.
+  const { observe, metricTimer, finish } = require('../bewijshaak')(trustPlane);
 
   /* ---- 3. reviews ----
      Een review kan pas na een geslaagde afronding, een per dienst. Het
@@ -29,6 +32,8 @@ module.exports = (ctx) => {
     if (!item) return { status: 404, error: 'Niet gevonden.' };
     if (!REVIEW_OK[soort].includes(item.status)) return { status: 409, error: 'Een review kan pas na afronding.' };
     if ((db.data.reviews || []).some(r => r.ref === ref && r.key === sess.key)) return { status: 409, error: 'U heeft deze dienst al beoordeeld.' };
+    const outcomeTimer = metricTimer({ capability: 'outcome.observe',
+      boundary: 'supplier:' + item.supplierCode });
     const rev = {
       id: id(), supplierCode: item.supplierCode, supplierName: item.supplierName,
       soort, ref, key: sess.key, codename, score,
@@ -38,7 +43,18 @@ module.exports = (ctx) => {
     db.data.reviews = db.data.reviews.slice(0, 20000);
     const st = db.data.reviewStats[item.supplierCode] = db.data.reviewStats[item.supplierCode] || { som: 0, aantal: 0 };
     st.som += score; st.aantal += 1;
-    save();
+    try { save(); }
+    catch (e) {
+      finish(outcomeTimer, { outcome: 'FAILED', domainOutcome: 'REVIEW_NOT_PERSISTED',
+        errorClass: e.code || 'STORAGE_EXCEPTION' });
+      throw e;
+    }
+    finish(outcomeTimer, { outcome: 'SUCCEEDED', domainOutcome: 'REVIEW_' + score,
+      measurementKey: 'review:' + soort + ':' + ref + ':' + sess.key });
+    observe({ capability: 'outcome.observe', boundary: 'supplier:' + item.supplierCode,
+      subjectRef: { domain: 'experience', type: soort, id: ref }, predicate: 'experience.outcome.reviewed',
+      value: { scoreBand: score }, evidence: { kind: soort, scoreBand: score, supplierRef: item.supplierCode },
+      policy: { id: 'experience-policy', version: 1, decision: 'SHADOW' } });
     notifySupplier(item.supplierCode, { icon: '⭐', title: 'Nieuwe review: ' + score + '/5', body: codename + (rev.tekst ? ': ' + rev.tekst.slice(0, 80) : '') });
     sseToSupplier(item.supplierCode, 'sync', { scope: 'reviews' });
     return { ok: true, review: { score: rev.score, tekst: rev.tekst } };

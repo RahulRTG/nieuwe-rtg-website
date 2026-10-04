@@ -3,6 +3,8 @@ const crypto = require('crypto');
 
 const TOETSEN = Object.freeze([
   'test/pg.test.js',
+  'test/trust-evidence-v2-migration.pg.test.js',
+  'test/trust-evidence-export.pg.test.js',
   'test/living-world.pg.test.js',
   'test/foundation-persoonscodes.pg.test.js',
   'test/spelprojectie.pg.test.js',

@@ -93,6 +93,7 @@ const { isEenmalig } = require('./eenmalig-geheim-routes');
    HIER staat is het http-deel: welke sleutel geldt, wie de afzender is, en wat
    er met een herhaling gebeurt. Zie de kop van ./idem-kast.js. */
 const { maakKast, afdrukVan, MAX, TTL_MS } = require('./idem-kast');
+const { naAntwoord } = require('./antwoord-einde');
 /* En de SLEUTELBEPALING staat sinds 3 september 2026 ook apart (TAKEN.md 5.57):
    "welke sleutel geldt en van wie" is een andere vraag dan "wat doet de poort
    met een herhaling", en dit bestand stond met allebei erin boven de maat. */
@@ -173,7 +174,7 @@ function maakIdemPoort(opties) {
        verbinding) mag de vlucht niet laten hangen; dan wacht een tweede
        verzoek eeuwig. */
     res.on('close', () => rond(null));
-    res.on('finish', () => rond(null));
+    naAntwoord(res, () => rond(null));
 
     next();
   }

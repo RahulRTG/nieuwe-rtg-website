@@ -11,6 +11,14 @@ services:
       PORT: 443
       RTG_BIND: 0.0.0.0
       STUN_PORT: ${STUN_PORT:-3478}
+      # Juridische/contactgegevens zijn een eigen productiedomein. Ze staan
+      # niet in het brede appvolume en worden via hetzelfde expliciete pad door
+      # de app en de go-livekeuring gelezen.
+      RTG_PAPIEREN_FILE: /run/rtg-compliance/papieren.json
+    volumes:
+      # Een map in plaats van een los bestandsmount: opslag.js schrijft
+      # stroomveilig via tijdelijk bestand + atomische rename.
+      - ${RTG_PAPIEREN_HOST_DIR:?Zet RTG_PAPIEREN_HOST_DIR in deploy/live.env op de aparte compliance-map}:/run/rtg-compliance:rw
     # De basis-compose publiceert alleen Sentinel op loopback. Deze bewuste
     # live-overlay ontsluit daarnaast native HTTPS en de ACME-responder.
     ports:
@@ -29,6 +37,15 @@ services:
       timeout: 5s
       retries: 8
       start_period: 45s
+
+  # De kandidaat beoordeelt dezelfde ingevulde papieren als productie, maar
+  # krijgt uitsluitend dit smalle domein en kan het niet wijzigen. Het brede
+  # rtg-data-volume blijft volledig buiten het kandidaatproject.
+  keurgolive:
+    environment:
+      RTG_PAPIEREN_FILE: /run/rtg-compliance/papieren.json
+    volumes:
+      - ${RTG_PAPIEREN_HOST_DIR:?Zet RTG_PAPIEREN_HOST_DIR in deploy/live.env op de aparte compliance-map}:/run/rtg-compliance:ro
 
   backup:
     # Zelfde numerieke gebruiker als `node` in het app-image. Daardoor blijven

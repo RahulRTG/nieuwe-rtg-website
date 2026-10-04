@@ -174,10 +174,14 @@ function maakSlo({ meting, sonde }) {
       onbeoordeeld: doelen.length - beoordeeld.length
     };
 
+    // Capability-SLO apart van HTTP; een gezakte capability sluit de uitrol (./slo-capabilities.js).
+    const { capabilities, tel: capabilityTel } = require('./slo-capabilities').capabilityStand(t, uitrol);
+
     return {
-      doelen, uitrol,
+      doelen, capabilities, uitrol,
       tel: { doelen: doelen.length, gehaald: beoordeeld.filter(d => d.oordeel === 'gehaald').length,
-        gezakt: gezakt.length, onvoldoende: doelen.length - beoordeeld.length },
+        gezakt: gezakt.length, onvoldoende: doelen.length - beoordeeld.length,
+        capabilities: capabilityTel },
       bron: {
         binnen: 'server/meting.js telt sinds de start van dit proces; bij een herstart begint dat opnieuw',
         buiten: sonde ? sonde.buitenkort() : null

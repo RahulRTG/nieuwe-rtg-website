@@ -1,32 +1,32 @@
-# Release candidate V1 — blocker-matrix en afhankelijkheden
+# Release candidate V1 — besluitlog en afhankelijkheden
 
-*Gemeten, niet aangenomen. Stand: main `c82e3f94` (27 september 2026).
-Bronnen: `npm run productie:status`, `npm run golive`, `npm run release:gate`,
-`npm run check`, `npm test` (op `115ceb85`, 14.591 toetsen), plus
-`scripts/lib/productie-oordeel.js`, `server/config/external-release.js`,
-`server/config/release-trust.js`, `deploy/TRUST.md`, `LIVEGANG.md`,
-`PRODUCTION.md` §6–7, `LAUNCH.md`, `TAKEN.md` §1–3.*
+> **Geen actuele statusbron.** Dit document bewaart de besluiten en historische
+> blockeranalyse achter de releasebouw. Aantallen, commits en metingen in de
+> matrix zijn momentopnamen en mogen nooit een release autoriseren. Alleen de
+> commitgebonden uitvoer van `npm run productie:status`, `npm run live:golive`,
+> `npm run release:gate:productie` en de ondertekende kandidaat-/bewijsbestanden
+> in `.release/` vormen de huidige waarheid. Ontbreekt dat bewijs, dan is de
+> status `UNKNOWN`, niet groen.
 
 Dit document bouwt niets. Het zegt per blokkade wat hem sluit, wie dat kan, en
 waar hij op wacht. Groep **A** is technisch en zelfstandig af te bouwen, **E** is
 een externe partij of een echte host, **B** is een besluit van de eigenaar.
 
-## 0. De meting in vier regels
+## 0. Hoe de actuele stand wordt bepaald
 
-- `productie:status` → **BLOCKED**, 10 blokkades (acht ontbrekende CI-/release-
-  bewijzen, het externe dossier, de getekende kandidaat).
-- `golive` → **26 blokkades**; twee daarvan zijn CODE (`PG_ACCOUNTS_ATOMAIR_ONTBREEKT`
-  en een hard `uitgaandGeconfigureerd: false`), de rest is configuratie,
-  providers en papierwerk.
-- `release:gate` → **zakt op eigen kracht** bij "Bron- en securityregels": de poort
-  pakt het afbouwslot en geeft het niet door aan zijn kinderen, dus
-  `scripts/kaart.js` in `check.js` weigert te meten. Dezelfde poort draait in
-  `release-image.yml` via `afbouw:software`; daar is hij nog nooit aangekomen
-  omdat de sleutelcontrole er eerder stopt.
-- `npm test` → 14.591 toetsen, **0 gezakt, 22 overgeslagen** — alle 22 vragen een
-  echte PostgreSQL/Redis. Met `DATABASE_URL` + `REDIS_URL` is dat een
-  omgevingskwestie en geen codefout; een overgeslagen toets telt voor de
-  release als gezakt (`productie-oordeel.js:18-33`).
+- De volledige releaseworkflow draait op één schone commit en Node 26.
+- Een skip telt niet als bewijs; PostgreSQL-, Redis-, browser- en stagingproeven
+  moeten in de daarvoor bestemde omgeving werkelijk lopen.
+- Host-, provider-, juridisch en menselijk bewijs blijft open totdat de echte
+  bron het ondertekend heeft; code vult die feiten nooit in.
+- Volledige `READY` vereist een werkende inkomende én uitgaande geldrail.
+  `READY_ZONDER_RAIL` is de afzonderlijke, fail-closed beperkte release en mag
+  niet als volledige betaalgereedheid worden gepresenteerd.
+
+De matrix hieronder verklaart waar de poorten vandaan kwamen. Regels die
+inmiddels als **gebouwd** zijn vastgelegd zijn regressiegeschiedenis, geen nog
+openstaand werk. Vraag voor de huidige lijst altijd de genoemde commando's en
+bewijsbestanden op.
 
 ## 1. De matrix
 

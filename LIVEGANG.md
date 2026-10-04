@@ -70,19 +70,31 @@ npm run live:init -- \
   --url=https://app.jouwdomein.nl \
   --tls-email=beheer@jouwdomein.nl \
   --smtp-url=smtps://gebruiker:wachtwoord@smtp.jouwdomein.nl:465
+npm run papierwerk -- --live
+# Vul .rtg-compliance/papierwerk-invullen.txt met echte, gecontroleerde feiten.
+npm run papierwerk -- --live --lees
 npm run motor:init
 ```
 
 `live:init` toont de sleutels niet in de terminal. Het schrijft
-`.env.productie`, `.rtg-secrets/postgres_password` en de afzonderlijke
-`.rtg-secrets/motor_state_key` met rechten 600; alle drie staan in `.gitignore`.
+`.env.productie`, `.rtg-secrets/postgres_password`, de afzonderlijke
+`.rtg-secrets/motor_state_key` en `.rtg-compliance/papieren.json` met rechten
+600; alle vier staan in `.gitignore`. De compliance-map wordt schrijfbaar in
+de productie-app gemount en alleen-lezen in de eenmalige go-livekandidaat. Zo
+kan die kandidaat de werkelijk ingevulde papieren beoordelen zonder toegang
+tot het brede productie-appvolume.
+Gebruik voor een live-host altijd `npm run papierwerk -- --live`: deze stand
+leidt het doel af uit `deploy/live.env` en schrijft/leest daardoor aantoonbaar
+hetzelfde `papieren.json` dat later read-only in de keuring hangt. De gewone
+stand blijft uitsluitend voor lokale ontwikkeling. Een leeg of geparkeerd
+antwoord blijft terecht een blokkade.
 `motor:init` legt de verwachte genesis eerst blijvend vast en initialiseert het
 versleutelde geldvolume daarna exact eenmaal. Start/restart doet dit nooit
 automatisch en blijft bij een verdwenen of afwijkende volume fail-closed.
 Bewaar een versleutelde kopie van deze bestanden en het geldvolume buiten de
-server. Koppel `OFFICE_TOTP_SECRET` uit `.env.productie` aan de authenticator
-van de eigenaar en verwijder `RTG_OWNER_BOOTSTRAP` zodra het eigenaarsaccount
-is geclaimd.
+server. Het productiekantoor gebruikt geen gedeelde code of losse TOTP:
+medewerkers openen de kantoorrol op naam met hun eigen passkey. Verwijder
+`RTG_OWNER_BOOTSTRAP` zodra het eigenaarsaccount is geclaimd.
 
 ClamAV haalt zijn handtekeningen dagelijks op via een apart update-netwerk en
 publiceert poort 3310 niet op de host. Reserveer hiervoor circa 4 GB RAM; bij te
@@ -98,31 +110,59 @@ ondertekende externe dossier staan.
 
 1. Rond de bronwijzigingen af, werk alle gegenereerde registers bij en commit.
    De releasebron moet volledig schoon zijn.
-2. Laat de GitHub-workflow `Release-imagekandidaat` op precies die commit lopen.
-   Die voert de volledige Node-, scherm-, PostgreSQL/Redis- en stagingronde uit,
-   bouwt twee unieke kandidaatimages en levert het artefact `herkomst` op.
-3. Plaats de bestanden uit dat artefact ongewijzigd in `.release/` en neem de
+2. Bewijs die commit eerst met vier onafhankelijke GitHub-ronden: een handmatige
+   volledige `CI` met `verwachte_commit`, `De ronde (wekelijks)` met omvang
+   `beproeving`, `Desktop- en mobielstandaard` en `CodeQL`. Een oudere groene
+   run, een andere commit, een verlopen artefact of een nieuwere rode run telt
+   niet. Voor de twee handmatige ronden is de canonieke aanroep:
+
+   ```bash
+   SHA="$(git rev-parse origin/main)"
+   gh workflow run ci.yml --ref main -f verwachte_commit="$SHA"
+   gh workflow run ronde.yml --ref main -f omvang=beproeving
+   ```
+
+   Controleer bij alle vier de uiteindelijke runs dat `headSha` exact `$SHA` is.
+   Een groene CodeQL-workflow alleen is niet genoeg: die ronde beoordeelt de
+   lokaal geproduceerde SARIF en publiceert uitsluitend bij nul resultaten een
+   commitgebonden `codeql-verdict`. De release-imagepoort eist het digest van
+   precies dat artifact; een latere, mutable Security-tab kan een oudere commit
+   daardoor niet stil groen maken.
+3. Laat daarna de GitHub-workflow `Release-imagekandidaat` op precies die commit
+   lopen. Vóór bouwen leest hij de vier uitspraken fail-closed uit GitHub Actions
+   en bevriest hij run-ID's en artifactdigests in
+   `.release/prerelease-workflows.json`. Daarna voert hij zelf opnieuw de
+   volledige Node-, scherm-, PostgreSQL/Redis- en stagingronde uit, bouwt twee
+   unieke kandidaatimages en bindt het prereleasedossier met BUILD aan beide
+   image-digests in het artefact `herkomst`.
+4. Plaats de bestanden uit dat artefact ongewijzigd in `.release/` en neem de
    twee unieke kandidaat-tags over in `deploy/live.env` als
    `RTG_CANDIDATE_IMAGE` en `RTG_CANDIDATE_BACKUP_IMAGE`.
-4. Plaats de echte onafhankelijke bewijsbestanden in
-   `.release/external-evidence/`. Vier ervan maakt de host zelf, als verslag van
-   een proef die hij echt uitvoert (`npm run extern:bewijs -- malware`,
-   `objectopslag`, `rollback` en `herstel <stempel>`; herstel blijft OPEN tot een
-   mens met naam verklaart dat een lid inlogt en zijn echte naam ziet). Vul
+5. Plaats de echte onafhankelijke bewijsbestanden in
+   `.release/external-evidence/`. De host maakt de machineverslagen zelf met
+   `npm run extern:bewijs -- <proef>`; zie **Externe bewijsproducenten**
+   hieronder. Herstel blijft OPEN tot een mens met naam verklaart dat een lid
+   inlogt en zijn echte naam ziet. Een externe/providerproef blijft OPEN zolang
+   de meetrunner, testaccount of expliciete geldautorisatie ontbreekt. Vul
    daarna `.release/external-release.json` op basis
    van `deploy/external-release.example.json` en laat de aangewezen
    releasebeoordelaar het dossier ondertekenen met `npm run external:teken`.
-5. Keur de host en exact dezelfde CI-kandidaat. `live:golive` bouwt niets en
+6. Keur de host en exact dezelfde CI-kandidaat. `live:golive` bouwt niets en
    raakt de productievolumes niet; het gebruikt een eigen vluchtige
    PostgreSQL-, Redis-, queue- en motoromgeving.
-6. Laat de commitgebonden einduitspraak maken. Alleen nul blokkades mag READY
+7. Laat de commitgebonden einduitspraak maken. Alleen nul blokkades mag READY
    opleveren.
-7. Laat een andere, bevoegde release-authority de READY-uitspraak, kandidaat-
+8. Laat een andere, bevoegde release-authority de READY-uitspraak, kandidaat-
    digests en alle bewijsbytes ondertekenen. Daarna pas volgt de wissel.
 
 ```bash
 npm run live:check
 npm run live:golive
+# Alleen op een verse host kan deze eerste ronde rood eindigen met exact één
+# blokkade: RTG_OWNER_BOOTSTRAP. In dat geval is een smal, niet-uitrolbaar
+# bootstrapkandidaatbewijs gemaakt:
+npm run live:owner
+npm run live:golive          # nu volledig groen, zonder bootstrapdeur
 npm run productie:status       # moet exact PRODUCTION_STATUS=READY melden
 npm run promotie:teken         # aparte Ed25519-promotiesleutel + besluitreferentie
 npm run promotie:controle
@@ -140,6 +180,93 @@ Private keys horen uitsluitend in de bijbehorende secret store, nooit in de
 appomgeving, Git, terminaluitvoer of bewijsbundles. De buildjob krijgt alleen
 de build-private-key. Zie [trust-bootstrap en migratie](deploy/TRUST.md).
 
+## Externe bewijsproducenten
+
+De bewijsproducent schrijft alleen PASS na een waarneming op de echte host of
+bij een echte externe dienst. Configuratie alleen is geen bewijs. Voor de
+onafhankelijke proeven gebruikt de releasehost een aparte meetrunner:
+
+```bash
+export RTG_EVIDENCE_RUNNER_URL=https://evidence-runner.example/probe
+export RTG_EVIDENCE_RUNNER_TOKEN='uit-de-release-secret-store-minstens-32-tekens'
+export RTG_EVIDENCE_RUNNER_TRUST_VERSION=v1
+
+npm run extern:bewijs -- rand
+npm run extern:bewijs -- incident
+npm run extern:bewijs -- mailherstel
+npm run extern:bewijs -- beeldscan
+npm run extern:bewijs -- realtime       # aanvullend TURN-bewijs, geen dossiercontrole
+```
+
+De runner moet Ed25519-ondertekende `rtg-external-measurement-v2`-JSON
+teruggeven met exact de aangevraagde `control`, releasecommit en unieke
+`correlationId`. `v1` wijst uitsluitend naar het gecommitte
+`deploy/evidence-runner-v1.pub`; een los sleutelpad uit de runtime wordt
+geweigerd. De oorspronkelijke runnerhandtekening wordt bij dossiercontrole
+opnieuw tegen dat anker geverifieerd, onafhankelijk van de evidence-signer.
+Het script weigert onbekende velden en bewaart uitsluitend
+begrensde metingen en gehashte identifiers. Daardoor kan een runner geen
+providerreferenties, adressen of geheimen in het vrijgavedossier smokkelen.
+Bootstrap, rotatie en het exacte signaturecontract staan in
+[deploy/EVIDENCE-RUNNER.md](deploy/EVIDENCE-RUNNER.md).
+
+De proeven en hun echte grens:
+
+- `rand`: publieke TLS/HSTS/redirect plus een begrensde randproef vanaf minstens
+  twee netwerken, providerbescherming en een niet rechtstreeks bereikbare
+  origin. Dit is geen ongeautoriseerde volumetrische aanval.
+- `incident`: verstuurt een uniek commitgebonden testalarm en eist externe
+  ontvangst, incidentopening, acknowledgement én resolutie met gemeten tijden.
+- `mailherstel`: start `/api/auth/forgot` voor het bestaande, uitsluitend voor
+  releasebewijs gebruikte `RTG_EVIDENCE_RECOVERY_EMAIL`; de runner controleert
+  inbox, herstellink, doelorigin, SPF, DKIM en DMARC. Het adres komt niet in het
+  verslag.
+- `beeldscan`: draait Trivy of Grype op exact `RTG_CANDIDATE_IMAGE` als
+  `...@sha256:<digest>`, leest de commit uit `/app/release-bewijs.json` in dat
+  image, verifieert dezelfde digest tegen de BUILD-getekende
+  `.release/herkomst.json` en eist een databank jonger dan 72 uur en nul
+  HIGH/CRITICAL-bevindingen. Het externe dossier herverifieert die
+  buildhandtekening; de evidence-signer kan geen scan aan een ander image
+  hangen.
+  Kies desgewenst met `RTG_IMAGE_SCANNER=trivy` of `grype`.
+- `realtime`: eist twee werkelijk verschillende netwerk-AS'en, relay-candidates
+  aan beide kanten, een relay-only selected pair en minstens 64 KiB in beide
+  richtingen. De releasepoort herverifieert ook de inhoud van de ondertekende
+  runnerwaarneming; een dossier-signer kan een onvoldoende meting niet groen
+  verklaren. Alleen `/api/ice` ophalen kan deze proef nooit laten slagen.
+
+De vijf geldverslagen gebruiken bewust één al bestaande, idempotente liveketen.
+Zonder een eigenaarbesluit en hard maximumbedrag starten ze niets:
+
+```bash
+export RTG_EVIDENCE_MONEY_CHAIN_ID='release-2026-10-money-001'
+export RTG_EVIDENCE_MONEY_AUTHORIZATION_REF='CAB-2048'
+export RTG_EVIDENCE_MONEY_MAX_MINOR=500
+export RTG_EVIDENCE_MONEY_CURRENCY=eur
+
+npm run extern:bewijs -- betaling
+npm run extern:bewijs -- uitbetaling
+npm run extern:bewijs -- webhook
+npm run extern:bewijs -- geldlus
+npm run extern:bewijs -- reconciliatie
+```
+
+De runner moet per stap zowel de RTG-operatie als de providerwaarheid meten.
+`webhookDelivery` en `reconciliation` moeten daarnaast onafhankelijk dezelfde
+`rtg-provider-items-v1`-manifestdigest en itemtelling rapporteren. Daardoor is
+bewezen dat de afgeleverde webhooks en de reconciliatie over exact dezelfde
+provideritems spreken; twee los groene tellingen zijn niet genoeg. De
+canonieke manifestvorm staat in [deploy/EVIDENCE-RUNNER.md](deploy/EVIDENCE-RUNNER.md).
+Webhookbewijs vereist een geldige providersignature en een replay met exact één
+bedrijfsmutatie; reconciliatie vereist nul onbekende uitkomsten, nul unmatched
+regels en een bedragverschil van nul. Een rail die RTG nog niet werkelijk kan
+uitvoeren blijft dus OPEN/FAIL, ook als de provider zelf die functie aanbiedt.
+
+De vier lokale producenten blijven beschikbaar als `malware`, `objectopslag`,
+`rollback` en `herstel <JJJJMMDDTuummssZ>`. De onafhankelijke pentest,
+juridische vrijgave, DPIA, Foundation-vrijgave en menselijke herstelcontrole
+blijven terecht menselijke/derdepartijbewijzen; dit script maakt die niet na.
+
 Beschermde Foundation- en minderjarigenfuncties staan in de eerste release
 standaard server-side dicht. Het externe dossier legt dat vast met
 `vrijgave: GESLOTEN`; leeftijdscontrole en moderatie blijven dan expliciet
@@ -153,19 +280,34 @@ beschikbaar:
 
 ```bash
 npm run live:init        # hierboven met de vereiste argumenten
-npm run live:owner       # na de eerste geslaagde wissel; claimt eigenaar lokaal
+npm run live:owner       # vóór de eerste wissel; alleen na het begrensde tussenbewijs
 npm run live:status
 ```
 
-De eerste uitrol is nog niet het moment om de lancering aan te kondigen.
-`live:owner` vraagt naam, geboortedatum en tweemaal het
-wachtwoord, claimt het ingestelde eigenaarsadres uitsluitend via de lokale
-HTTPS-poort, verwijdert `RTG_OWNER_BOOTSTRAP` atomisch en herstart de app. Geen
-van beide geheimen komt in shellgeschiedenis of logs. Bevestig daarna de mail,
-beantwoord op de technische pagina de papierwerkvragen en voer voor een volgende
-release opnieuw de volledige kandidaat- en bewijsronde uit. PostgreSQL heeft
-bewust geen hostpoort; de kandidaatkeuring gebruikt daarom een afzonderlijke
-interne database en nooit de actieve productiedatabase.
+Op een verse host eindigt de eerste `live:golive` bewust rood. Alleen wanneer
+`RTG_OWNER_BOOTSTRAP` de enige blokkade is, ontstaat een smal tussenbewijs dat
+nooit als READY of als uitrolbewijs geldt. `live:owner` gebruikt exact dat
+geverifieerde immutable image in een eenmalige container zonder gepubliceerde
+poort. Het vraagt naam en geboortedatum, maakt een sterk wachtwoord en toont dat
+één keer. Daarna leest een tweede schoon productieproces het account uit de
+gedeelde PostgreSQL-waarheid terug. Pas na dat positieve bewijs wordt
+`RTG_OWNER_BOOTSTRAP` atomisch verwijderd. Draai vervolgens `live:golive`
+opnieuw; alleen die tweede, volledig groene ronde kan naar READY en deploy.
+Daarmee bestaat er geen circulaire route meer waarin RTG eerst publiek zou
+moeten draaien om zijn eerste eigenaar veilig te kunnen maken. PostgreSQL houdt
+bewust geen hostpoort: beide eenmalige containers gebruiken uitsluitend het
+afgesloten Docker-datanetwerk.
+
+Dit eerste bewijs wordt daarna nooit als blijvende waarheid hergebruikt. Iedere
+volgende `live:golive` wist het vorige eigenaarsbewijs en start uit exact het
+nieuwe immutable kandidaatimage een aparte `ownerproof`-container. Die container
+krijgt geen appvolume, geen releasevolume en geen publieke poort; hij voert
+uitsluitend `SELECT`-metingen uit op de echte productie-PostgreSQL. De host bindt
+de gehashte owner-email en current-DB-snapshot via een eenmalige nonce aan
+commit, image-ID en registrydigest. Alleen dit gesanitiseerde bewijs gaat naar
+`keurgolive`; de productiedatabase en haar volume nooit. Het bewijs verloopt na
+vier uur. Een herstel, verdwenen eigenaar, onleesbare kluisbinding, oud image of
+uitgestelde promotie valt daardoor dicht en vraagt een nieuwe `live:golive`.
 
 De eerste ACME-uitgifte lukt pas als DNS al naar de server wijst en poort 80
 bereikbaar is. Een mislukte uitgifte houdt de app bewust op een self-signed
@@ -215,7 +357,9 @@ bewaarde kluissleutel bij de teruggezette data hoort.
   herstellinks anders alleen in een lokale outbox belanden.
 - Videobellen door strenge mobiele/bedrijfsfirewalls: de eigen STUN-server is
   inbegrepen; voor betrouwbare verbindingen is ook een eigen coturn/TURN nodig.
-  Zet daarna `TURN_URL` en `TURN_SECRET` in `.env.productie`.
+  Zet daarna een publieke `turns:`-URL met expliciete poort en een sterk
+  willekeurig `TURN_SECRET` in `.env.productie`; plaintext `turn:`, test- of
+  private hosts en placeholders worden door publieke productie geweigerd.
 - Bescherming tegen zeer grote netwerk-DDoS: de app heeft een WAF en IP-rem,
   maar een volumetrische aanval moet vóór de server worden geabsorbeerd. Voeg
   pas als het risicoprofiel dat vraagt een CDN/WAF-provider toe.

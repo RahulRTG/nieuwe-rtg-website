@@ -464,7 +464,7 @@ test('PG-control-bewijs verifieert oorspronkelijke suitebytes en telt uitsluiten
 test('contractversie 2 vraagt een v2-uitgifte in de eigen bron, en de twee proefdeuren hebben die', () => {
   const register = JSON.parse(JSON.stringify(poort.lees()));
   const v2 = register.deuren.filter(d => d.contractversie === 2).map(d => d.id).sort();
-  assert.deepEqual(v2, ['pay.giftcard_value_code', 'workos.workspace_access_tokens']);
+  assert.deepEqual(v2, ['pay.giftcard_value_code', 'pay.tegoedbon', 'workos.workspace_access_tokens']);
   const deur = register.deuren.find(d => d.id === 'travelos.reisuitnodiging');
   deur.contractversie = 2;
   let uit = poort.controleer(register);

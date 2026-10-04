@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-04T13:03:59.807Z",
-    "commit": "f3b95137",
+    "op": "2026-10-04T13:08:29.157Z",
+    "commit": "1407edcf",
     "boomVuil": false,
-    "boomAnders": 4,
+    "boomAnders": 1,
     "instrument": "scripts/doorbelasting.js",
     "node": "v22.22.0"
   },
@@ -23,16 +23,16 @@
   "vorm": {
     "vormenTotaal": 1551,
     "geldvormen": 221,
-    "volgbaar": 37,
+    "volgbaar": 39,
     "perHerkomstveld": {
-      "bron": 19,
+      "bron": 20,
       "provider": 1,
-      "herkomst": 3,
+      "herkomst": 4,
       "aanbieder": 7,
       "leverancier": 8,
       "economischeHerkomst": 4
     },
-    "nietVolgbaar": 184,
+    "nietVolgbaar": 182,
     "volgbareModules": [
       "server/kern/appbieb.js",
       "server/kern/betaalopdracht/index.js",
@@ -46,6 +46,8 @@
       "server/kern/groothandel/assortiment.js",
       "server/kern/horeca/bon-maak.js",
       "server/kern/horeca/foliolaag.js",
+      "server/kern/horeca/teruggave.js",
+      "server/kern/horeca/teruggave.js",
       "server/kern/kosten/providerfactuur.js",
       "server/kern/kosten/providerfactuur.js",
       "server/kern/magnaat-leven/contract.js",
@@ -199,7 +201,7 @@
       },
       "server/kern/horeca": {
         "geldvormen": 5,
-        "volgbaar": 2
+        "volgbaar": 4
       },
       "server/kern/koppel.js": {
         "geldvormen": 2,

@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-04T16:29:18.119Z",
-  "commit": "47f40800",
+  "op": "2026-10-04T17:12:17.478Z",
+  "commit": "e29429f4",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/bewijsschuld.js",
@@ -11,14 +11,14 @@
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 18,
-  "meetwerk": 1276,
+  "meetwerk": 1278,
   "instrument": 323,
   "grens": 687
  },
  "aflossing": {
   "doel": 0,
   "wat": "de achterstand (meetwerk + instrument) gaat naar nul. `grens` telt niet mee en sluit nooit -- dat is de rand van de methode en geen werk.",
-  "staat": 1599,
+  "staat": 1601,
   "regels": [
    "de achterstand mag nooit groeien zonder een reden IN dit register (--groei=...)",
    "een post mag niet van soort veranderen om onder de poort uit te komen: naar `grens` verplaatsen laat de achterstand dalen zonder dat er iets gemeten is",
@@ -28,7 +28,7 @@
  },
  "gemeten": {
   "postenTotaal": 18,
-  "achterstand": 1599,
+  "achterstand": 1601,
   "randVanDeMethode": 687,
   "auth-onbeslist": 1,
   "capability-in-handler": 560,
@@ -45,7 +45,7 @@
   "proefruis": 1,
   "gevolg-onbekend": 96,
   "droogloop-onbeoordeeld": 2,
-  "herstel-onbevestigd": 49,
+  "herstel-onbevestigd": 51,
   "idem-ongeclassificeerd": 34,
   "wegwerpserver-kopieen": 3
  },
@@ -174,7 +174,7 @@
    "id": "herstel-onbevestigd",
    "soort": "meetwerk",
    "wat": "vermoede tegenhangers (annuleren, terugdraaien) die nog niet zijn uitgevoerd",
-   "aantal": 49,
+   "aantal": 51,
    "waarom": "HERSTEL.json leidt tegenhangers af uit NAMEN, en de hoogste graad die dat kan opleveren is `vermoed`. Dat /api/x/annuleer bestaat naast /api/x/boek zegt niet dat de eerste de tweede werkelijk ongedaan maakt.",
    "sluit": "wat hier nog staat, vraagt een WERELD die de proef niet opzet: een zaak met de werkvorm journalistiek, een ingericht landpakket, een salon, een geplande reisoptie. Elk draagt in HERSTELPROEF.json wat er zou moeten bestaan (`wereldOntbreekt`). Sluiten betekent hier dus die wereld opzetten in scripts/lib/herstelwereld.js -- per stuk, en alleen langs de gewone routes. Wat de afleiding uberhaupt niet ziet blijft daarbuiten: een terugweg die anders heet, en een schakelaar met een vlag in het lichaam."
   },
@@ -417,7 +417,7 @@
    },
    {
     "op": "2026-10-04",
-    "aantal": 49
+    "aantal": 51
    }
   ],
   "idem-ongeclassificeerd": [
@@ -485,12 +485,6 @@
    "aantal": 2,
    "meetdagen": 3,
    "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: dezelfde weg als gevolg-onbekend: het pad in een proefronde krijgen. Deze post is daarvan de kleine, zichtbare kant -- hij staat er apart omdat een droogloop met vijf onbeoordeelde stappen er groen uitziet en niets bewijst."
-  },
-  {
-   "id": "herstel-onbevestigd",
-   "aantal": 49,
-   "meetdagen": 3,
-   "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: wat hier nog staat, vraagt een WERELD die de proef niet opzet: een zaak met de werkvorm journalistiek, een ingericht landpakket, een salon, een geplande reisoptie. Elk draagt in HERSTELPROEF.json wat er zou moeten bestaan (`wereldOntbreekt`). Sluiten betekent hier dus die wereld opzetten in scripts/lib/herstelwereld.js -- per stuk, en alleen langs de gewone routes. Wat de afleiding uberhaupt niet ziet blijft daarbuiten: een terugweg die anders heet, en een schakelaar met een vlag in het lichaam."
   },
   {
    "id": "wegwerpserver-kopieen",
@@ -619,6 +613,12 @@
    "van": 2720,
    "naar": 3178,
    "reden": "OUTPUTPROEF.json is hermeten uit een volledige suite met routejournaal (29 september 2026). Die suite raakt 353 routes die de vorige ronde geen enkele toets raakte (ongemeten 421 -> 68) en 111 routes die sindsdien bijkwamen (5151 -> 5262). Ze landen in output-niet-toerekenbaar (579 -> 1037): een inhoudgevoelige toets raakt ze, maar raakt er ook andere, dus het is geen bewijs over deze route. Bewezen OUTPUT steeg van 4151 naar 4157. De groei is zichtbaar geworden meetwerk en geen achteruitgang."
+  },
+  {
+   "op": "2026-10-04",
+   "van": 1599,
+   "naar": 1601,
+   "reden": "herstel-onbevestigd 49 -> 51: de verse idemproefronde van 4 oktober bereikte /api/member/democratie/actie/start en /stop voor het eerst (een paar, twee richtingen). Niet te beproeven met een demosessie; staat in herstelwereld ONBEREIKBAAR."
   }
  ]
 }

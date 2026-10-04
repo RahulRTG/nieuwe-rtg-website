@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-04T04:41:52.144Z",
-    "commit": "eaf9b488",
+    "op": "2026-10-04T18:12:48.585Z",
+    "commit": "2b8e5a89",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -2961,6 +2961,10 @@
       "operator": "liegpoort /api/",
       "gezakt": 2,
       "scherp": "gezakt"
+    },
+    "deurverkoop-race.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
     },
     "dienst-vervalt.test.js": {
       "soort": "puur",

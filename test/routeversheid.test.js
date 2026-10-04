@@ -110,6 +110,20 @@ test('2b. alleen BEWEZEN cellen kunnen vervallen; een leesroute-cel en een cel z
   assert.deepEqual([v.verouderd.length, v.onbekend.length], [0, 0]);
 });
 
+test('2c. route-evidence keeps its own commit when the enclosing register was regenerated', () => {
+  const cellen = { OUTPUT: { staat: 'bewezen', bron: 'poortwacht', evidenceCommit: 'old-route-proof',
+    evidenceBinding: 'bound-proof', provenance: 'CANDIDATE_BOUND' } };
+  const seen = [];
+  const result = rv.vervalVan({ cellen, afh, registerVan,
+    gewijzigdVoor: commit => { seen.push(commit); return { gewijzigd: new Set(['server/routes/a.js']) }; } });
+  assert.deepEqual(seen, ['old-route-proof']);
+  assert.equal(result.verouderd[0].commit, 'old-route-proof');
+  assert.equal(result.verouderd[0].evidenceBinding, 'bound-proof');
+  cellen.OUTPUT.provenance = 'HISTORICAL_UNREVALIDATED';
+  const historical = rv.vervalVan({ cellen, afh, registerVan, gewijzigdVoor: sinds() });
+  assert.equal(historical.onbekend.length, 1);
+});
+
 /* ---------------------------------------------------------------------------
    3 en 4. DE AANSLUITING OP STAATVAN: bestaande standen, drie soorten apart
    ------------------------------------------------------------------------- */

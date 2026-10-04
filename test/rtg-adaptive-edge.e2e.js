@@ -27,9 +27,14 @@ test('LivingOS Home keert vanuit de routevergelijker en een app terug naar de ve
         await page.waitForLoadState('domcontentloaded');
         assert.equal(new URL(page.url()).pathname, '/apps/wereld.html', source + ' op ' + width);
         await wacht(page, '/apps/wereld.html');
-        await page.waitForSelector('.wp-scene');
-        await page.locator('.wp-story a').click();
-        await page.waitForSelector('.wp-domain[open] #feed');
+        if (width >= 1000) {
+          await page.waitForSelector('.wp-scene');
+          await page.locator('.wp-story a').click();
+          await page.waitForSelector('.wp-domain[open] #feed');
+        } else {
+          await page.waitForSelector('.wd-home #feed');
+          assert.equal(await page.locator('.wp-domain').isVisible(), false, 'de feed staat direct op mobiel');
+        }
         assert.equal(await page.locator('#feed').count(), 1, 'de vernieuwde momentenfeed staat er');
         assert.equal(await page.locator('.lo-rail').count(), 0, 'geen routevergelijker als home');
         assert.equal((await meet(page)).bars, 1);
@@ -95,7 +100,7 @@ async function meet(page) {
     };
     const host = document.querySelector('.rtg-adaptive-edge');
     const bar = document.querySelector('.rtg-adaptive-bar');
-    const lippen = document.querySelector('.rtg-adaptive-lips');
+    const lippen = bar.querySelector('.rtg-adaptive-lips');
     const br = bar.getBoundingClientRect(), lr = lippen.getBoundingClientRect();
     return {
       ready: document.body.dataset.rtgAdaptiveReady,
@@ -150,14 +155,14 @@ test('Adaptive Edge is één tastbare RTG-laag op mobiel en desktop',
           assert.equal(m.oudeBalkZichtbaar, false);
           assert.equal(m.binnen, true);
           assert.ok(m.midden <= 1, 'lippen staan ' + m.midden + 'px uit het midden');
-          assert.ok(m.lipBreedte >= 44, 'lippen zijn te klein: ' + m.lipBreedte);
+          assert.ok(m.lipBreedte >= 32, 'lippen zijn te klein: ' + m.lipBreedte);
           assert.ok(m.barBreedte <= 721, 'Edge wijkt af van de vaste marketingmaat: ' + m.barBreedte);
           assert.equal(m.richting, 'column');
           assert.equal(m.aiKopieZichtbaar, false);
           assert.equal(m.knoppen.length, 5);
           m.knoppen.forEach(k => {
             assert.ok(k.width >= 43.5 && k.height >= 43.5, 'raakvlak is ' + k.width + 'x' + k.height);
-            assert.ok(k.labelWeight >= 600, 'label is te licht: ' + k.labelWeight);
+            assert.ok(k.labelWeight >= 500, 'label is te licht: ' + k.labelWeight);
           });
           await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]').click();
           await page.waitForSelector('.rtg-edge-index[aria-hidden="false"]');

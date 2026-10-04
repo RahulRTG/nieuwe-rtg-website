@@ -91,7 +91,7 @@ window.SPart.mijnhr = function () {
         return '<div class="h-my40"><b>' + esc(p.titel) + '</b>' +
           (p.alGeantwoord ? ' <span class="tag aan">beantwoord</span>'
             : p.stellingen.map(function (st, i) {
-                return '<div class="rij" style="margin:.25rem 0;"><span style="flex:1;min-width:12rem;">' + esc(st) + '</span>' +
+                return '<div class="rij schoolhr-stukrij" ><span class="schoolhr-stuknaam" >' + esc(st) + '</span>' +
                   '<select class="veld h-kolom7" data-peil="' + esc(p.id) + '" data-nr="' + i + '" aria-label="' + esc(st) + '">' +
                   [1, 2, 3, 4, 5].map(function (n) { return '<option value="' + n + '">' + n + '</option>'; }).join('') +
                   '</select></div>';

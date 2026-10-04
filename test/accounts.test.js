@@ -38,6 +38,34 @@ test('identiteitskluis: echte naam versleuteld, codenaam operationeel', async ()
   assert.equal(pub.enc_name, undefined);
 });
 
+test('codenaambotsing wordt vóór invoegen herkozen, ook hoofdletterongevoelig en via sync/seed', async t => {
+  const kluis = require('../server/accounts/kluis');
+  const namen = ['Botsing ABCD', 'botsing abcd', 'Vrij E001', 'VRIJ e001', 'Vrij E002', 'vrij e002', 'Vrij E003'];
+  const getrokken = [];
+  t.mock.method(kluis, 'makeCodename', () => { const naam = namen.shift(); assert.ok(naam, 'begrensde fixture uitgeput'); getrokken.push(naam); return naam; });
+  const data = n => ({ email: 'codenaam-' + n + '@voorbeeld.test', password: 'geheim123', tier: 'lifestyle', realName: 'Testlid' });
+  const a = await accounts.createUser(data(1));
+  const b = await accounts.createUser(data(2));
+  const c = accounts.createUserSync(data(3));
+  const d = accounts.createUserZaai(data(4));
+  assert.deepEqual([a, b, c, d].map(u => u.codename), ['Botsing ABCD', 'Vrij E001', 'Vrij E002', 'Vrij E003']);
+  assert.equal(new Set([a, b, c, d].map(u => u.codename.toLowerCase())).size, 4);
+  assert.equal(getrokken.length, 7, 'alle drie botsingen zijn echt aangeboden');
+  for (const u of [a, b, c, d]) assert.equal(accounts.getUserById(u.id).codename, u.codename, 'bevestigde naam staat in de database');
+});
+
+test('blijvende codenaambotsing faalt begrensd zonder tweede account of verkeerde bestaande identiteit', async t => {
+  const kluis = require('../server/accounts/kluis');
+  t.mock.method(kluis, 'makeCodename', () => 'Bezet CAFE');
+  const eerste = await accounts.createUser({ email: 'bezet-een@voorbeeld.test', password: 'geheim123', tier: 'rtg' });
+  const voor = accounts.count();
+  await assert.rejects(accounts.createUser({ email: 'bezet-twee@voorbeeld.test', password: 'geheim123', tier: 'rtg' }),
+    e => e.code === 'RTG_CODENAAM_BEZET' && e.status === 503);
+  assert.equal(accounts.count(), voor);
+  assert.equal(accounts.findByLogin('bezet-twee@voorbeeld.test'), null);
+  assert.equal(accounts.getUserById(eerste.id).codename, 'Bezet CAFE');
+});
+
 test('wachtwoord: scrypt-verificatie klopt en weigert fout wachtwoord', async () => {
   const u = await accounts.createUser({ email: 'pw@voorbeeld.test', password: 'JuistWachtwoord9', tier: 'rtg', realName: 'Piet' });
   const rij = accounts.getUserById(u.id);

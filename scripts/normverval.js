@@ -176,7 +176,10 @@ function main() {
       meldingen.push('schuld op ' + n.sleutel + ' loopt tot ' + n.vervalt + ' (terug naar ' + n.van + ')');
       continue;
     }
-    const nu = norm.meters ? norm.meters[n.sleutel] : undefined;
+    // Performance thresholds have their own section, also compared below.
+    // Expiry must inspect that recorded value, not report an existing meter as gone.
+    const nu = Object.hasOwn(norm.meters || {}, n.sleutel)
+      ? norm.meters[n.sleutel] : (norm.prestatie || {})[n.sleutel];
     if (nu === undefined) {
       fouten.push({ wat: n.sleutel, bericht: 'de schuld is verlopen op ' + n.vervalt + ' en de meter staat niet meer in NORM.json' });
       continue;

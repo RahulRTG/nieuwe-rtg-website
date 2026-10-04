@@ -75,7 +75,6 @@ test('een knop die niet kan, zegt waarom', { skip: geenBrowser(pw) }, async () =
 
     // FoundationOS-home zonder open afdeling: de kaart blijft staan en zegt het.
     await naar('/apps/foundation/os-publiek.html');
-    await page.locator('.wp-domain > summary').click();
     await page.locator('[data-heen="projecten"]').click();
     assert.match(await tekstVan('#doenReden'), /afdeling|stad/, 'de kaart zegt niet waarom hij nergens heen gaat');
 

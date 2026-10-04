@@ -126,8 +126,8 @@
     <div>
       <section class="rtm-scherm" data-rtm-paneel="aandacht">
         <div class="rtm-ey" id="rtmDag">Uw aandacht · laden</div>
-        <h1 class="rtm-titel">Uw inbox, teruggebracht tot wat ertoe doet.</h1>
-        <p class="rtm-inleiding">RTMail zet lezen, beoordelen en doorgeven in één rustige volgorde.</p>
+        <h1 class="rtm-titel">Uw post,<br>persoonlijk.</h1>
+        <p class="rtm-inleiding">Uw berichten en gesprekken staan hier bij elkaar.</p>
         <article class="rtm-focus" id="rtmFocus" aria-live="polite"><div class="rtm-leeg">Uw post wordt rustig geordend…</div></article>
         <div class="rtm-sectiekop"><h2>Daarna</h2><button type="button" data-rtm-diep="inbox">Open alle post</button></div>
         <div class="rtm-lijst" id="rtmDaarna"></div>
@@ -140,9 +140,9 @@
           <span class="rtm-terugtitel"><b>Gesprek</b><span id="rtmGesprekMeta">Vraag, mensen en bron bij elkaar</span></span>
           <span class="rtm-deelnemers" id="rtmGesprekMensen" aria-label="Deelnemers"></span>
         </div>
-        <article class="rtm-onderwerp"><small>RTMail · beschermd gesprek</small><h1 id="rtmGesprekOnderwerp">Kies een bericht</h1></article>
+        <div class="rtm-letter-surface"><article class="rtm-onderwerp"><small>RTMail · beschermd gesprek</small><h1 id="rtmGesprekOnderwerp">Kies een bericht</h1></article>
         <div class="rtm-draad" id="rtmDraad"><div class="rtm-leeg">Kies bij Mijn aandacht welk gesprek u wilt openen.</div></div>
-        <aside class="rtm-samenvatting" id="rtmGesprekHulp"><b>In één oogopslag</b><p>De samenvatting blijft herleidbaar tot de oorspronkelijke post.</p></aside>
+        </div><aside class="rtm-samenvatting" id="rtmGesprekHulp"><b>In één oogopslag</b><p>De samenvatting blijft herleidbaar tot de oorspronkelijke post.</p></aside>
         <div class="rtm-gesprekacties">
           <button class="rtm-secundair" type="button" data-rtm-diep="bericht">Open volledige post</button>
           <button class="rtm-primair" type="button" data-rtm-naar-werk>Maak er werk van &rsaquo;</button>
@@ -526,6 +526,7 @@ document.addEventListener('visibilitychange',()=>{ if(!document.hidden && !$('#t
 <script src="/apps/rtmail-voorzijde-werk.js"></script>
 <script src="/apps/rtmail-voorzijde-gesprek.js"></script>
 <script src="/apps/rtmail-voorzijde.js"></script>
+<script src="/apps/rtmail-compose.js"></script>
 <script src="/apps/rtmail/gebaren.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>

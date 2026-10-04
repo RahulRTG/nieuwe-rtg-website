@@ -76,7 +76,10 @@ test('de metgezel wijkt voor een venster en komt daarna terug',
     await page.waitForFunction(() => document.body.getAttribute('data-rtg-edge-2-rendered') === 'true',
       null, { timeout: 20000 });
     await page.waitForSelector('body[data-rtg-adaptive-ready="true"] .rtg-adaptive-bar');
-    await page.waitForFunction(() => { const r = document.querySelector('.rtg-adaptive-bar').getBoundingClientRect(); return r.height === 64 && r.top < innerHeight; });
+    await page.waitForFunction(() => { const r = document.querySelector('.rtg-adaptive-bar').getBoundingClientRect(); return r.height >= 44 && r.height <= 96 && r.top >= 0 && r.bottom <= innerHeight; });
+    // The compact Edge adapts its height; its touch target and viewport bounds stay mandatory.
+    const mouth = await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]').boundingBox();
+    assert.ok(mouth.width >= 44 && mouth.height >= 44, 'Rahul keeps a reachable touch target');
     assert.equal(await page.evaluate(rahulStaat), 'zichtbaar', 'in rust is de centrale Rahul-tab bereikbaar');
     assert.deepEqual(await page.evaluate(edgeStaat), { roots: 1, balk: 'zichtbaar', venster: false },
       'in rust staat exact het ene Edge-casco klaar');

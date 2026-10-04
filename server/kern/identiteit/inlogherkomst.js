@@ -16,6 +16,34 @@
    ========================================================================== */
 'use strict';
 const klok = require('../../lib/klok');
+const keten = require('../../lib/keten');
+
+/* Elke inlogpoging (gelukt of mislukt, op elk kanaal) komt in een afgeschermd
+   log: wie, waar vandaan, wanneer. Het kantoor leest dit spoor in RTG HQ.
+   De hashketen maakt wijzigen of wissen MIDDEN in het log zichtbaar; voor
+   afknippen van de nieuwste regels blijft het afzonderlijke anker nodig.
+   Hashloze regels van vóór de keten worden door verifieer apart geteld.
+
+   Dit spoor bezit alleen securityLog. Een opslagfout gaat naar de aanroeper;
+   een mislukte vastlegging wordt hier nooit stil als geslaagd behandeld. */
+function maakInlogspoor({ db, save, schoon }) {
+  const opslag = require('../eigencollectie')({ db, domein: 'inlogherkomst',
+    bezit: { securityLog: 'lijst' } });
+  function logInlog(kanaal, ok, wie, req) {
+    opslag.kijk('securityLog'); // beschadigde bestaande auditdata nooit als leeg vervangen
+    const lijst = opslag.bak('securityLog');
+    keten.noteerIn(lijst, {
+      at: new Date().toISOString(), kanaal, ok: !!ok,
+      wie: schoon(wie, 60) || null, ip: String((req && req.ip) || '')
+    }, 5000);
+    save.sleutels(['securityLog']);
+  }
+  function securityLogKeten() {
+    const lijst = opslag.kijk('securityLog');
+    return Object.assign({ top: keten.top(lijst) }, keten.verifieer(lijst));
+  }
+  return { logInlog, securityLogKeten };
+}
 
 /* Vastleggen op het moment van authenticatie. Faalt stil naar "niets
    vastgelegd" als er geen register of geen sid is: een sessie die geen
@@ -43,4 +71,4 @@ function legInlogVast({ sessieregister, accounts, token, lidKey, type, assurance
   return sid;
 }
 
-module.exports = { legInlogVast };
+module.exports = { legInlogVast, maakInlogspoor };

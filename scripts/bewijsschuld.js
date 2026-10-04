@@ -36,6 +36,7 @@
 const fs = require('fs');
 const path = require('path');
 const { stempel } = require('./lib/stempel');
+const { idemClassificatie } = require('./lib/bewijsschuld-idem');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'BEWIJSSCHULD.json');
@@ -337,26 +338,18 @@ const POSTEN = [
   { id: 'idem-ongeclassificeerd', soort: 'meetwerk',
     wat: 'muterende routes zonder uitspraak over herhalen: wat gebeurt er bij een tweede keer',
     uit: (r) => {
-      /* De routes MET een besluit staan in IDEMBESLUIT.json; hoeveel er in
-         totaal beproefd zijn, weet IDEMPROEF.json. Het verschil is de
-         achterstand. Beide moeten er zijn -- anders een vraagteken. */
-      const besluiten = (r.idembesluit || {}).routes;
-      const rijen = r.idemproef && Array.isArray(r.idemproef.perRoute) ? r.idemproef.perRoute : null;
-      if (!besluiten || !rijen) return null;
-      /* Alleen routes die WERK deden tellen mee. Een route waar de proef niet
-         binnenkwam (404, geen geldig lijf) heeft geen tweede keer om over te
-         beslissen; die als achterstand tellen maakt de post twee keer zo groot
-         als hij is, en dat is dezelfde fout als bij auth-onbeslist. Zij staan
-         al onder object-vooraf en proefruis. */
-      const werk = rijen.filter(x => !/geen werk/.test(x.reden || ''));
-      const beslist = new Set(Object.keys(besluiten));
-      return werk.filter(x => !beslist.has(x.pad)).length;
+      const uit = idemClassificatie(r.idemproef && r.idemproef.perRoute,
+        (r.idembesluit || {}).routes, r.mutatiecontracten);
+      return uit ? uit.open.length : null;
     },
     waarom: 'autonomie zonder herhaalsemantiek is niet te doen: een keten die halverwege ' +
       'afbreekt moet weten of opnieuw beginnen veilig is. Het doel is niet dat alles ' +
       'idempotent IS -- het is dat van elke route vastligt wat een tweede keer betekent.',
-    sluit: 'per route beslissen en vastleggen. Het instrument staat (scripts/idemproef-route.js ' +
-      'plus IDEMBESLUIT.json met zijn klassen); dit is meetwerk en handwerk.' },
+    sluit: 'per route beslissen en vastleggen in de canonieke server/lib/mutatiecontracten ' +
+      '(gevalideerd met dezelfde contractkeuring), of het oudere IDEMBESLUIT.json. ' +
+      'Een fixtureblokkade, tebeslissen of onbekende semantiek blijft open. Dit telt ' +
+      'uitsluitend het bestaan van een geldig besluit; runtimebewijs blijft afzonderlijk ' +
+      'in IDEMPROEF.json en de bewijsmatrix staan.' },
 
   { id: 'wegwerpserver-kopieen', soort: 'meetwerk',
     wat: 'scripts met een eigen kopie van "start een wegwerpserver"',
@@ -433,7 +426,8 @@ function meet() {
        iets anders dan niets te melden. */
     resolverbereik: lees('RESOLVERBEREIK.json'), idemproef: lees('IDEMPROEF.json'),
     droogloop: lees('DROOGLOOP.json'), herstel: lees('HERSTEL.json'),
-    idembesluit: lees('IDEMBESLUIT.json'), executionmap: lees('EXECUTION_MAP.json')
+    idembesluit: lees('IDEMBESLUIT.json'), executionmap: lees('EXECUTION_MAP.json'),
+    mutatiecontracten: require('../server/lib/mutatiecontracten').CONTRACTEN
   };
   const posten = POSTEN.map(p => {
     let aantal = null;

@@ -8,8 +8,9 @@
       changed: function (id) { d.dispatchEvent(new CustomEvent('rtg-widget-changed', { detail: { id: id } })); } });
     var supported = w.RTGWidgetData.supports(app.id);
     root.dataset.widgetLive = supported ? 'true' : 'false';
+    root.dataset.compact = o.compact ? 'true' : 'false';
     function load(fresh) {
-      var version = ++revision; root.textContent = ''; root.dataset.state = 'loading';
+      var version = ++revision; root.textContent = ''; root.dataset.state = 'loading'; delete root.dataset.contentState;
       root.appendChild(ui.copy('p', 'wd-widget-empty', 'loading'));
       o.run('desktop.widget.read', { id: app.id, offset: offset, fresh: fresh }).then(function (j) {
         if (version !== revision || !root.isConnected) return;
@@ -20,24 +21,29 @@
       }).catch(function (e) {
         if (version !== revision || !root.isConnected) return;
         var state = e.message === 'signed-out' || e.status === 401 ? 'guest' : e.status === 403 ? 'locked' : 'error';
-        root.dataset.state = state; root.textContent = '';
-        root.appendChild(U.icon(app.icon)); root.appendChild(ui.copy('p', 'wd-widget-empty', state));
+        root.dataset.state = state; delete root.dataset.contentState; root.textContent = '';
+        root.appendChild(ui.copy('p', 'wd-widget-empty', state === 'guest' && o.compact ? 'guestCompact' : state));
         if (state === 'error') root.appendChild(ui.button('retry', function () { load(true); }));
-        else root.appendChild(ui.open());
+        // Compact cards already open the real app through their header. The
+        // domain keeps its access flow; no second login action is invented here.
+        else if (!o.compact) root.appendChild(ui.open());
       });
     }
     function fallback() {
       root.classList.add('wd-capability-' + app.type);
+      root.dataset.state = 'capability';
       // A capability has its own identity. A world-wide stock photo neither
       // describes its records nor belongs to every app of the same type.
-      var emblem = U.el('div', 'wd-capability-emblem'); emblem.appendChild(U.icon(app.icon)); root.appendChild(emblem);
+      if (!o.compact) { var emblem = U.el('div', 'wd-capability-emblem'); emblem.appendChild(U.icon(app.icon)); root.appendChild(emblem); }
       if (app.id === 'navigatie') { root.appendChild(ui.copy('p', 'wd-widget-empty', 'noRoute')); root.appendChild(ui.open('route')); return; }
       app.sections.slice(0, 2).forEach(function (s, i) {
-        var title = ui.row(s, '', app.icon).querySelector('strong'); delete title.dataset.userContent;
+        var title;
+        if (o.compact) { title = U.el('p', 'wd-capability-subject', s); root.appendChild(title); }
+        else { title = ui.row(s, '', app.icon).querySelector('strong'); delete title.dataset.userContent; }
         title.dataset.i18n = 'desktopApp.' + app.id + '.section' + i; title.dataset.i18nSource = s;
       });
       if (!app.sections.length) root.appendChild(ui.copy('p', 'wd-widget-empty', 'empty'));
-      root.appendChild(ui.open('browse'));
+      if (!o.compact) root.appendChild(ui.open('browse'));
     }
     function refresh(e) { if (!root.isConnected) return; if (e.detail && e.detail.id === app.id) load(true); }
     if (supported) { load(false); d.addEventListener('rtg-widget-changed', refresh); } else fallback();

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-04T14:30:03.765Z",
-    "commit": "3d3c6053b",
+    "op": "2026-10-04T15:45:45.370Z",
+    "commit": "cefaafba6",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -4251,8 +4251,11 @@
     },
     "foundation-lesstroom.pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "gezakt",
+      "module": "server/pg/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "foundation-lesstroom.test.js": {
       "soort": "server",
@@ -5069,8 +5072,11 @@
     },
     "gezinsdeur.pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "gezakt",
+      "module": "server/pg/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "gezinsdeur.test.js": {
       "soort": "server",

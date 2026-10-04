@@ -29,7 +29,7 @@
     "inlineStijlAttributen": 4626,
     "kernBreedsteBestand": 71,
     "kernBreedte": 1682,
-    "kernGedeeld": 254,
+    "kernGedeeld": 255,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
@@ -3992,6 +3992,15 @@
       "meter": "dbDeuren 535 -> 536",
       "reden": "server/opzet/kernlaag2b.js leest db.data.reserveringen voor de tafeluitzondering (tegenvoorstel en doorzetten, CONCIERGE.md par. 2.7-2.9). De eerste versie bouwde hem in kern/ervaring/tafels.js, dat al een deur is, maar server.js pakt de namen van de ervaring-laag een voor een uit en staat boven de omvanggrens, dus daar kan geen naam bij. Het is dezelfde collectie die tafels.js en tafelplanning.js al lezen, via een thunk; de module zelf raakt de opslag niet aan.",
       "waarheen": "Zodra server.js de ervaring-laag in zijn geheel aan de kern hangt in plaats van naam voor naam, kan de bouw terug naar tafels.js en zakt de teller weer."
+    },
+    {
+      "datum": "2026-10-04",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 254,
+      "meter": "kernGedeeld 254 -> 255",
+      "reden": "Het supplier-domein leest nu de betaalwaarheid (GRENZEN.json, met de hand). Een horecacorrectie na een ONLINE betaling zet een teruggaverecht klaar, en dat geld kan alleen terug langs de provider waarlangs het binnenkwam -- de betaalwaarheid is daar de enige weg (kern/horeca/teruggave.js, besluit van de eigenaar 4 oktober 2026: de zaak voert uit, per wijze). Een haak via het gast-domein had de meter op 254 gehouden en de koppeling verstopt. Zonder de naam in GRENZEN.json kopieerde routes/supplier/horeca.js hem stil niet mee en mislukte elke online teruggave; test/horeca-teruggave-online.test.js houdt dat vast.",
+      "waarheen": "Dit is de koppeling van de functie zelf; hij gaat weg als de online teruggave ooit naar het domein van de betaalwaarheid verhuist."
     }
   ],
   "prestatie": {

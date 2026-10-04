@@ -103,7 +103,7 @@ module.exports = ({ db, bewerkCollectie, crypto, nu }) => {
      langs een zoeklus komen die alleen hashes kent. */
   const na = fn => async (...a) => { await migratie.zorg(); return fn(...a); };
 
-  return { COL, maak: na(maak), band: na(band), boek: na(boek), herstel: na(beheer.herstel), leeg: na(beheer.leeg),
+  return { COL, maak: na(maak), band: na(band), boek: na(boek), herstel: na(beheer.herstel), terug: na(beheer.terug), leeg: na(beheer.leeg),
     lees: na(beheer.lees), koppel: na(beheer.koppel), intrek: na(beheer.intrek), roteer: na(beheer.roteer),
     opCode: (zaak, code) => bron => zoekIn(bron, zaak, code),
     opId: (zaak, id) => bron => { const b = vanId(bron, zaak, id); return b ? { bon: b } : { status: 404, error: 'Deze bon kennen we niet.', code: 'bon-onbekend' }; },

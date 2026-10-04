@@ -94,8 +94,13 @@ module.exports = (kern) => {
     const korting = kortingCenten(rek);
     return { bruto, korting, netto: bruto - korting, fooi: heleCenten(rek.fooiCenten || 0),
       teBetalen: bruto - korting + heleCenten(rek.fooiCenten || 0),
-      betaald: (rek.betalingen || []).reduce((t, b) => t + heleCenten(b.centen), 0) };
+      betaald: (rek.betalingen || []).reduce((t, b) => t + heleCenten(b.centen), 0) - teruggegeven(rek) };
   }
+  /* Wat er van een betaling AL TERUG is (kern/horeca/teruggave.js). Alleen een
+     uitgevoerde terugbetaling telt: een die nog bij de provider ligt, is geld
+     dat de gast nog niet heeft. */
+  const teruggegeven = (rek) => (rek.terugbetalingen || [])
+    .filter(t => t.stand === 'uitgevoerd').reduce((n, t) => n + heleCenten(t.centen), 0);
   const openstaand = (rek) => { const t = totaal(rek); return t.teBetalen - t.betaald; };
 
   /* De somcontrole die splitsen en samenvoegen eerlijk houdt. Hij vergelijkt
@@ -136,7 +141,7 @@ module.exports = (kern) => {
      kern als `horecaBonlaag` (opzet/kernlaag5f.js). Een getter en geen waarde:
      wie de bonnen niet raakt (de avondplanner, een unittoets), reikt er ook niet
      naar -- en de domeingrens telt alleen wat er werkelijk wordt gelezen. */
-  return { KANALEN, REGELSTANDEN, H, Hlees, nu, id, centen: heleCenten, heleCenten, uitEuro, regelSom, kortingCenten, waarde,
+  return { KANALEN, REGELSTANDEN, H, Hlees, nu, id, centen: heleCenten, heleCenten, uitEuro, regelSom, kortingCenten, teruggegeven, waarde,
     totaal, openstaand, controleerSom, happyKorting,
     get bonlaag() { return kern.horecaBonlaag || null; } };
 };

@@ -1,28 +1,28 @@
 {
  "stempel": {
-  "op": "2026-09-30T20:12:59.038Z",
-  "commit": "ec186c7b2",
+  "op": "2026-10-04T12:21:55.534Z",
+  "commit": "f1133313",
   "boomVuil": false,
-  "boomAnders": 4,
+  "boomAnders": 1,
   "instrument": "scripts/mutatiecontract.js",
-  "node": "v26.10.0"
+  "node": "v22.22.0"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5246,
-  "geclassificeerd": 5221,
+  "totaal": 5247,
+  "geclassificeerd": 5222,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3168,
    "NOT_APPLICABLE": 1262,
    "LEGACY_PENDING_CLASSIFICATION": 25,
-   "PROTECTED": 618,
+   "PROTECTED": 619,
    "INTENTIONALLY_NON_IDEMPOTENT": 173
   },
-  "vastgesteldDoorMens": 2105,
+  "vastgesteldDoorMens": 2106,
   "afgeleidDoorScript": 3116,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4323,
+   "AUTHENTICATED": 4324,
    "PUBLIC": 134,
    "OBJECT_SCOPED": 760,
    "(niet af te leiden -- vraagt een verklaring)": 13,
@@ -33,7 +33,7 @@
    "kale ronde: beschermd": 138,
    "kale ronde: onbeschermd": 128,
    "kale ronde: geen uitspraak": 4882,
-   "niet gemeten": 98
+   "niet gemeten": 99
   },
   "voorstellen": {
    "NOT_APPLICABLE": 1
@@ -114082,6 +114082,27 @@
     "hindernis": null
    },
    "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "supplier.horeca.teruggave.uitvoeren",
+   "route": "POST /api/supplier/horeca/teruggave",
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "object: rekeningId",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null

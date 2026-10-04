@@ -2107,15 +2107,7 @@
       "van": 19,
       "naar": 20,
       "vervalt": "2026-09-30",
-      "reden": "Samenvoeging van 24 takken (tak samenvoeging-negen-2026-08-18). Een meetbestand in de wortel dat aan geen enkele ratel hangt. Bewust genoteerd als schuld en niet stil verlaagd; de meter hoort terug naar 19.",
-      "aflossingsbewijs": {
-        "datum": "2026-10-01",
-        "van": 50,
-        "naar": 49,
-        "bewijs": "GRAAFAS.json en TRUST_EVIDENCE_PLANE.json zijn aan hun bestaande inhoudelijke ratels gekoppeld in scripts/lib/metingen.js",
-        "bronVan": "metingenZonderRatel 49 -> 50",
-        "bronNaar": "huidige meter"
-      }
+      "reden": "Samenvoeging van 24 takken (tak samenvoeging-negen-2026-08-18). Een meetbestand in de wortel dat aan geen enkele ratel hangt. Bewust genoteerd als schuld en niet stil verlaagd; de meter hoort terug naar 19."
     },
     {
       "datum": "2026-08-27",

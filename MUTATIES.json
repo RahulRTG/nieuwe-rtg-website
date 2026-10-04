@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-04T16:01:52.749Z",
-    "commit": "63916f6cb",
+    "op": "2026-10-04T16:12:31.889Z",
+    "commit": "bacd8a816",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -9468,6 +9468,22 @@
       "gezakt": 2,
       "scherp": "gezakt"
     },
+    "mutatie-html.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/mutatie-html.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "herkomst": {
+        "op": "2026-10-04T11:04:50.235Z",
+        "commit": "5c26105f3",
+        "boomVuil": false,
+        "boomAnders": 1,
+        "instrument": "scripts/mutatie.js",
+        "node": "v24.18.0"
+      }
+    },
     "mutatie.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -15079,6 +15095,14 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "stroomticket.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/stroomticket.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "studio.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -17954,30 +17978,6 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "scripts/bundel.js",
-      "operator": "===->!==#0",
-      "gezakt": 1,
-      "geprobeerd": 1
-    },
-    "mutatie-html.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/mutatie-html.js",
-      "operator": "voorwaarde-omkeren#0",
-      "gezakt": 1,
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T11:04:50.235Z",
-        "commit": "5c26105f3",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
-    },
-    "stroomticket.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/stroomticket.js",
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1

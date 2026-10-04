@@ -46,10 +46,16 @@ for (const breedte of [390,1440]) test('dagelijks werk vanaf nul en gastakkoord 
     assert.equal(await gast.locator('#praktijkGast').getByText('Mijn buur',{exact:true}).count(),0);
     await page.reload({waitUntil:'domcontentloaded'});
     await paneel.locator('[data-pr-werk] > summary').click();
+    /* Een POST herlaadt het paneel en zet de details weer dicht. Wie de summary
+       aanklikt voordat dat gebeurd is, klapt het OUDE paneel dicht en ziet daarna
+       een gesloten nieuw paneel: wacht tot het oude element weg is, en open
+       alleen wat dicht is. */
+    const naHerladen=async doe=>{const oud=await paneel.locator('[data-pr-werk]').elementHandle();await doe();await page.waitForFunction(el=>!el.isConnected,oud);};
+    const openWerk=async()=>{const d=paneel.locator('[data-pr-werk]');if(!(await d.evaluate(n=>n.open)))await d.locator('> summary').click();await paneel.locator('[data-pr-werk][open]').waitFor();};
     await paneel.getByLabel('Uitvoerdatum',{exact:true}).fill('2026-12-01');
     await paneel.getByLabel('Wie voert het uit?').fill('Sam');
-    await paneel.getByRole('button',{name:'Werk plannen',exact:true}).click();
-    await paneel.locator('[data-pr-werk] > summary').click();
+    await naHerladen(()=>paneel.getByRole('button',{name:'Werk plannen',exact:true}).click());
+    await openWerk();
     await paneel.getByText('Externe afspraken en onderdelen · 0',{exact:true}).click();
     await paneel.getByLabel('Wat wordt geregeld?',{exact:true}).fill('Keukenruimte huren');
     await paneel.getByLabel('Uitvoerende partij',{exact:true}).fill('Buurthuis');
@@ -63,8 +69,8 @@ for (const breedte of [390,1440]) test('dagelijks werk vanaf nul en gastakkoord 
     assert.match(await paneel.textContent(),/Ontvangstbewijs BH-01/);
     await paneel.locator('[data-pr-werk] > summary').click();
     await paneel.getByLabel('Wat is daadwerkelijk uitgevoerd?').fill('Samen gekookt en opgeruimd');
-    await paneel.getByRole('button',{name:'Uitvoering vastleggen',exact:true}).click();
-    await paneel.locator('[data-pr-werk] > summary').click();
+    await naHerladen(()=>paneel.getByRole('button',{name:'Uitvoering vastleggen',exact:true}).click());
+    await openWerk();
     await paneel.getByLabel('Verwijzing naar uw administratie of uitleg').fill('Kosteloze vrijwilligersactiviteit');
     await paneel.getByRole('button',{name:'Administratief afronden',exact:true}).click();
     await paneel.getByText('Mijn buur · afgerond · 2026-12-01',{exact:true}).waitFor();

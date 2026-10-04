@@ -75,8 +75,9 @@ const log = logboek.log;
 const testomgeving = require('./testomgeving');
 const betaal = require('./betaal');
 // Hospitality-issuer en Trust & Evidence Plane: ./opzet/vertrouwensvlak.js.
-const vertrouwensvlak = require('./opzet/vertrouwensvlak')({ db, save, betaal,
-  reserveringen: () => db.data.reserveringen || [] });
+const vertrouwensvlak = require('./opzet/vertrouwensvlak')({ save, betaal,
+  reserveringen: () => db.data.reserveringen || [],
+  trustEvidence: () => require('./kern/bewijsvlak/runtime').trustStaat(db.data) });
 const systeemKlok = require('./lib/klok');
 const { schoon, ledenPrijs, rondEuro, entreeCode, pickupCode, veiligGelijk } = require('./kern/util');
 const { totpOk } = require('./kern/totp');

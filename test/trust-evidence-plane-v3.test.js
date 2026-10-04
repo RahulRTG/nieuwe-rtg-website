@@ -492,7 +492,7 @@ test('dynamische stateFor bindt Trust aan dezelfde PostgreSQL request-COW als bu
   const db = {};
   Object.defineProperty(db, 'data', { get() { return verzoekcontext.dataVoor(raw); } });
   const save = () => verzoekcontext.noteerSave();
-  configureRuntime({ db, save, mode: 'shadow', nu: () => at });
+  configureRuntime({ stateFor: () => runtime.trustStaat(db.data), save, mode: 'shadow', nu: () => at });
 
   const failed = verzoekcontext.nieuw({ method: 'POST' });
   verzoekcontext.voer(failed, () => {

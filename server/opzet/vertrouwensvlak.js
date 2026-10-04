@@ -11,7 +11,7 @@
    ketenbewijs en digests; domeinobjecten blijven bij hun eigenaar. Het wordt
    pas geconfigureerd als server.js `trustPlane()` aanroept, op dezelfde plek
    in de opstartvolgorde als voorheen. */
-module.exports = function maakVertrouwensvlak({ db, save, betaal, reserveringen }) {
+module.exports = function maakVertrouwensvlak({ save, betaal, reserveringen, trustEvidence }) {
   const hospitalityProviderBewijs = require('../kern/reservering/providerbewijs')();
   const hospitalityDomainBewijs = require('../kern/reservering/domeinbewijs')({
     vindReservering: id => reserveringen().find(r => r.id === id)
@@ -31,7 +31,7 @@ module.exports = function maakVertrouwensvlak({ db, save, betaal, reserveringen 
 
   function trustPlane() {
     return require('../kern/bewijsvlak/runtime').configure({
-      db, save, mode: 'shadow', issuer: 'rtg:platform',
+      stateFor: trustEvidence, save, mode: 'shadow', issuer: 'rtg:platform',
       verifyProviderProof: verifieerTrustProviderBewijs,
       verifyExternalOwnerProof: hospitalityDomainBewijs.verify
     });

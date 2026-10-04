@@ -17,7 +17,7 @@ function harnas(opties) {
   let raw = { trustEvidence: {} };
   const db = {};
   Object.defineProperty(db, 'data', { get() { return verzoekcontext.dataVoor(raw); } });
-  const plane = runtime.configure({ db, mode: 'shadow', nu: () => AT,
+  const plane = runtime.configure({ stateFor: () => runtime.trustStaat(db.data), mode: 'shadow', nu: () => AT,
     save() {
       if (o.saveFout) throw Object.assign(new Error('opslag stuk'), { code: 'TEST_SAVE_FAILED' });
       return verzoekcontext.noteerSave();

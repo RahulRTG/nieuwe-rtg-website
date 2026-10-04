@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-04T04:41:52.144Z",
-    "commit": "eaf9b488",
+    "op": "2026-10-04T18:35:53.002Z",
+    "commit": "c0526415",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -9322,6 +9322,14 @@
       "operator": "===->!==#0",
       "gezakt": 7,
       "geprobeerd": 1
+    },
+    "notify-vorm.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/opzet/meldingen.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 2
     },
     "notities.e2e.js": {
       "soort": "server",

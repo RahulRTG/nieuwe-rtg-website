@@ -77,8 +77,10 @@ app.post('/api/transfer/aanvraag', auth, (req, res) => {
     return res.status(409).json({ error: 'Er staat al een transfer voor dit ticket.' });
   const prijs = s.transfer.prijs || 0;
   const codename = liveCodename(req.session);
+  const ref = require('../../../kern/lidacties/ritreferentie')(db, crypto);
+  if (!ref) return res.status(503).json({ error: 'Een unieke ritaanvraag maken lukt nu niet. Probeer het opnieuw.' });
   const ride = {
-    ref: 'RTG-R-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
+    ref,
     supplierCode: s.code, supplierName: s.name, type: 'transfer',
     customerTier: req.session.tier, customerKey: req.session.key, customerCodename: codename,
     from: schoon(req.body.van || 'Huidige locatie', 80),

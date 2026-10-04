@@ -71,6 +71,9 @@ const DOEL = path.join(WORTEL, 'RITMIGRATIE.json');
    een reden, en scripts/ritmigratie.js controleert alleen dat de plek nog
    bestaat -- niet dat het oordeel klopt. */
 const LEZERS = {
+  'server/kern/lidacties/ritreferentie.js': { soort: 'historie',
+    wat: 'bestaande referenties, ook van betaalde ritten, uitsluiten bij de uitgifte van een nieuwe object- en betaalidentiteit',
+    naOmzetting: 'pas als de opdrachtwereld ook alle historische referenties bewaart; een gemiste betaalde rit kan anders opnieuw dezelfde identiteit krijgen' },
   'server/kern/lidacties/ritten.js': { soort: 'schrijver',
     wat: 'maakt de rit (unshift) en zoekt hem terug om te betalen',
     naOmzetting: 'wordt de plek waar de projectie ontstaat: de opdracht eerst, de rit-rij als afgeleide' },

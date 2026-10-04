@@ -3,7 +3,7 @@
   "gemeten": {
     "op": "2026-09-30T21:15:15.364Z",
     "commit": "b9d571ed7",
-    "routesToen": 5375
+    "routesToen": 5374
   },
   "aangeraakt": [
     "GET /",
@@ -471,7 +471,6 @@
     "POST /api/command/land",
     "POST /api/command/land/activeer",
     "POST /api/command/land/terug",
-    "POST /api/command/mandaat",
     "POST /api/command/mdm",
     "POST /api/command/mdm/gouden",
     "POST /api/command/mdm/samen",

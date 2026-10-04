@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2289 bestanden en 15729 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2303 bestanden en 15772 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2289 |
-| losse beweringen (`test(...)`) | 15729 |
+| toetsbestanden | 2303 |
+| losse beweringen (`test(...)`) | 15772 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 226 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1917 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1926 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 149 |
 | alleen in de kop *genoemd*, nog niet gemeten | 36 |
-| niets van beide | 187 |
+| niets van beide | 192 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1993 bestanden, 15220 beweringen.
+2004 bestanden, 15260 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -537,6 +537,8 @@ toets omvalt.
 | `foundation-lescredential.pg.test.js` | 1 | -- | Echte productie-topologieproef voor de lescredentials van RTFoundation- onderwijs (B17, CODECREDENTIALS.json foundation.onderwijs_les_tokens). Twee onafhankelijke instances delen dezelfde PostgreSQL. |
 | `foundation-lescredential.test.js` | 9 | gezakt op `!==->===#0` | De lescredentials van RTFoundation-onderwijs (B17, CODECREDENTIALS.json foundation.onderwijs_les_tokens) op moduleniveau: vorm, hash-only, verval, de claim met zijn plafond, intrekken en roteren, en dat een kind geen... |
 | `foundation-lesrem.test.js` | 3 | gezakt op `liegpoort /api/` | DE LES-MAAKROUTE HEEFT DE REM DIE HAAR REDEN BELOOFDE. WAT ER MIS WAS. |
+| `foundation-lesstroom.pg.test.js` | 1 | -- | Echte productie-topologieproef voor het stroomticket van RTFoundation- onderwijs (B25, CODECREDENTIALS.json foundation.onderwijs_les_tokens). Twee onafhankelijke instances delen dezelfde PostgreSQL. |
+| `foundation-lesstroom.test.js` | 5 | gezakt op `liegpoort /api/` | B25: de lessleutel verlaat de URL (RELEASEKANDIDAAT.md; deur foundation.onderwijs_les_tokens). Tegen een ECHTE server: - een ?token= wordt overal geweigerd, met een reden, voordat er iets wordt opgezocht -- ook met... |
 | `foundation-markt.test.js` | 5 | gezakt op `liegpoort /api/` | DE MARKTPLAATS VAN DE FOUNDATION -- 4 endpoints. detail, verwijder, chat en blokkeer stonden als nooit aangeroepen in de waargenomen dekkingsmeting. |
 | `foundation-meedoen-ontdekken.test.js` | 5 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `foundation-persoonscodes.pg.test.js` | 1 | slaat zichzelf over | Echte PostgreSQL-proef voor Foundation-persoonscodes. Twee onafhankelijke contexts delen alleen de database en raken tegelijk dezelfde `rtfos`-rij. |
@@ -633,10 +635,13 @@ toets omvalt.
 | `gezinhuishouden.test.js` | 3 | gezakt op `liegpoort /api/` | HET HUISHOUDEN: DE KEUKEN, HET SPAARPOT EN HET DROMENBORD. WAT DEZE DRIE BINDT: ze zijn allemaal GEDEELD. |
 | `gezinleven.test.js` | 4 | gezakt op `liegpoort /api/` | HET GEZINSLEVEN: DE OCHTEND EN HET FEEST. WAT DEZE TWEE MODULES GEMEEN HEBBEN Ze coderen allebei een OPVOEDKUNDIGE keuze, en in allebei is die keuze met een half regeltje om te draaien zonder dat er iets kapot lijkt... |
 | `gezinsagenda-motor.test.js` | 6 | gezakt op `===->!==#0` | De gezinsagenda is geen tweede agenda meer (SCHERMEIGENAAR.json, consolidatieronde van 23 september 2026): hij schrijft en leest via dezelfde motor als de ledenagenda, onder de sleutel gezin:<code>. Deze toets draait... |
+| `gezinscode.test.js` | 7 | gezakt op `true->false#0` | De gezinscode en het stroomticket (B18, CODECREDENTIALS.json foundation.family_profile_access), control voor control: 128 bits en eenmaal kaal, hash-only in een EIGEN collectie, issuer/doel/scope/onderwerp zonder... |
+| `gezinsdeur.pg.test.js` | 1 | -- | Echte productie-topologieproef voor de gezinsdeur (B18, foundation.family_profile_access): twee onafhankelijke instances delen dezelfde PostgreSQL. 1. |
+| `gezinsdeur.test.js` | 6 | gezakt op `liegpoort /api/` | De gezinsdeur op een ECHTE server (B18 en B19, CODECREDENTIALS.json foundation.family_profile_access): de 128-bit gezinscode die alleen in het antwoord op maken en roteren staat, het zes-tekenadres dat niets meer... |
 | `gezinskeuken.test.js` | 5 | gezakt op `liegpoort /api/` | Integratietests voor de Gezinskeuken (RTFoundation-gezin): het weekmenu (wat eten we, wie kookt), de "verras me"-ideeen, en de gedeelde boodschappenlijst waar iedereen op afvinkt. Gedeeld per gezin, dicht voor gasten... |
 | `gezinsregistratie.test.js` | 5 | gezakt op `liegpoort /api/` | De snelle gezinsdeur: code + eigen PIN zonder namenlek, kinderen onder de beheerder en volwassenen alleen via een persoonlijke eenmalige sleutel. |
 | `gezinssessie.test.js` | 4 | -- | Het gezinsprofieltoken op een ECHTE server (foundation.family_profile_token_ buiten_harde_poort, B17): elke uitgifte een nieuwe 128-bit sessie, roteren en afmelden door de houder, de beheerder die een profiel of het... |
-| `gezinstoken.test.js` | 9 | -- | Het gezinsprofieltoken (foundation.family_profile_token_buiten_harde_poort, B17), control voor control: 128 bits en eenmaal kaal, hash-only, issuer/doel/ scope/onderwerp zonder persoonsgegevens, vervaltijd, het... |
+| `gezinstoken.test.js` | 11 | -- | Het gezinsprofieltoken (foundation.family_profile_token_buiten_harde_poort, B17), control voor control: 128 bits en eenmaal kaal, hash-only, issuer/doel/ scope/onderwerp zonder persoonsgegevens, vervaltijd, het... |
 | `gezinsuitnodiging-verval.test.js` | 2 | gezakt op `liegpoort /api/` | VERVALT EEN GEZINSUITNODIGING ECHT? `server/foundation/gezinsuitnodiging.js` belooft het in zijn kop -- "de sleutel verloopt na 48 uur" -- en de code doet het ook: `DUUR`, `verloop()` en `verlopen()` staan er, en... |
 | `gezinsuitnodiging.pg.test.js` | 1 | -- | Echte productie-topologieproef voor de gezinsuitnodiging (B17, foundation.family_profile_token_buiten_harde_poort): twee onafhankelijke instances delen dezelfde PostgreSQL en wisselen TEGELIJK dezelfde eenmalige... |
 | `gezinzorg.test.js` | 4 | gezakt op `liegpoort /api/` | HET GEZIN: DE GEVOELIGE KANT. Dit zijn de scherpste routes van het hele huis, en ze hadden geen van drieen een eigen toets: 1. |
@@ -787,6 +792,8 @@ toets omvalt.
 | `journalistiek-versies.test.js` | 3 | gezakt op `getal+1#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `kaart.test.js` | 8 | gezakt op `===->!==` | De kaart-uitwijk (public/shared/kaart.js): de pure parseGeo() ontleedt de geo:-URI's die het huis gebruikt tot iets toonbaars. Getoetst op beide vormen (echte coördinaten en het adres-alleen 0,0?q=...), op de... |
 | `kaarttoegang.test.js` | 7 | gezakt op `liegpoort /api/` | De code van een OV-vervoerbewijs (travelos.mobility_transport_ticket), control voor control: 128 bits en kaal eenmaal, hash-only, issuer/doel/scope, verval met het kaartje, max_gebruik = ritten (en een rotatie speelt... |
+| `kantoor-eerste-account.test.js` | 1 | gezakt op `liegpoort /api/` | HET EERSTE KANTOORACCOUNT OP NAAM, OP EEN VERSE PRODUCTIESERVER (besluit B23, deur office.gedeelde_kantoorcode). In productie opent de gedeelde code niets (B10); de EIGENAAR machtigt het eerste kantooraccount met... |
+| `kantoor-koppel-passkey.test.js` | 2 | gezakt op `liegpoort /api/` | B24: EEN KANTOORUITNODIGING VERZILVEREN MET EEN EIGEN VERSE PASSKEY, OP EEN ECHTE PRODUCTIESERVER (deur office.gedeelde_kantoorcode). In productie vraagt /api/account/koppel geen gedeelde OFFICE_TOTP meer maar de... |
 | `kantoor-productiedeur.test.js` | 4 | gezakt op `===->!==#0` | De regels van server/kern/kantoor/productiedeur.js (besluit B10), los van een server. De e2e-proef staat in test/kantoordeur-productie.test.js; hier de randen die daar niet te bereiken zijn: de eigenaar met een kaal... |
 | `kantoorawait.test.js` | 5 | gezakt op `liegpoort /api/` | HET KANTOOR BEVESTIGT GEEN VERWIJDERING DIE DE OPSLAG NIET HEEFT. TWEE FOUTEN IN EEN KETEN, en ze hielden elkaar overeind. |
 | `kantoorbank.test.js` | 10 | gezakt op `return-weg#0` | KAN DEZE HANDELING NA COMMIT EEN KANTOORBANK WIJZIGEN? (server/kern/isolatie/kantoorbank.js) DE VRAAG DIE DEZE SUITE AFDWINGT is met opzet NIET "zit deze route in het bankdomein". |
@@ -887,6 +894,7 @@ toets omvalt.
 | `leren-leden.test.js` | 11 | gezakt op `liegpoort /api/` | DE LEERLAAG VANAF DE LEDEN-APP -- 28 endpoints, en een uitnodiging als spil. Deze achtentwintig wees de waargenomen dekkingsmeting aan als nooit aangeroepen. |
 | `leren.test.js` | 5 | gezakt op `liegpoort /api/` | Integratietests voor de leerlaag: overhoorlijsten (zelf en via de AI-demo), het overhoorduel via de vriendenlaag (zonder automatische vriendschap), samen-projecten met taken/notities/AI-plan, en schrijven met... |
 | `lescode-rem.test.js` | 5 | gezakt op `liegpoort /api/` | DE REM OP HET RADEN VAN EEN LESCODE. De lescode IS de geloofsbrief van een les: wie hem heeft ziet leerlingnamen, schriften en het bord (`/les/:code`, `/bord/:code`, `/schrift/:code`). |
+| `lesdeel.test.js` | 5 | gezakt op `!==->===#0` | DE LESCODE ALS DEELLINK EN QR (besluit B20, RELEASEKANDIDAAT.md), zonder browser. De browserweg zelf staat in test/lesdeellink.e2e.js. |
 | `letters.test.js` | 4 | geen module gevonden | DE LETTERS: wat public/fonts/fonts.css moet blijven waarmaken. Deze toets bestaat om EEN gemeten fout: Bodoni Moda tekent U+20AC als een kale C -- de twee dwarsbalkjes zitten niet in de glief. |
 | `levenbandroutes.test.js` | 11 | gezakt op `liegpoort /api/` | LEVEN.md fase 2 aan de BUITENKANT: de routes die de twee sessiewerelden aan elkaar knopen (server/routes/levenband.js). De kernregels zelf staan in test/levensband.test.js en worden hier niet overgedaan. |
 | `levensband.test.js` | 17 | gezakt op `===->!==#0` | LEVEN.md fase 2: rechten per relatie. Dit bestand handhaaft de twee besluiten van 11 augustus 2026, en het is daarmee het belangrijkste toetsbestand van deze fase. |
@@ -1244,6 +1252,7 @@ toets omvalt.
 | `papieren.test.js` | 10 | gezakt op `liegpoort /api/` | DE PAPIEREN: Rahul vraagt het AVG-papierwerk uit in plaats van een [VUL IN]-lijst achter te laten die niemand invult. Waar deze tests op letten, in volgorde van belang: 1. |
 | `partner.test.js` | 8 | gezakt op `liegpoort /api/` | Integratietests voor de PARTNER-app-flows (de leverancier-kant): - personeelslogin met PIN + rate-limiting (bescherming tegen raden) - restaurant/keuken (KDS): een order van nieuw naar klaar zetten - taxi: een rit... |
 | `partnerpas.test.js` | 9 | gezakt op `liegpoort /api/` | De toegangseis voor nieuwe partners: een partnerplek vraag je aan ALS LID, met een ZAKELIJKE pas. Het kantoor geeft ook alleen een code uit bij een aanvraag met ledenbewijs. |
+| `partnerpersoneelscode-migratie.test.js` | 4 | gezakt op `liegpoort /api/` | B21 (deur partnerkanaal.personeels_en_partnercode): de oude, zelfgekozen `partner.staff.code` wordt bij de opslagstart uit de opslag gewist, met een telling in het log en een stempel op de partner, nooit met de code... |
 | `partnerpersoneelscode-register.test.js` | 6 | gezakt op `===->!==#0` | De personeelscode van het partnerkanaal zonder server (B14, partnerkanaal.personeels_en_partnercode): 128 bits, hash-only, onderwerp en doel, verval, een maximum aantal boekingen dat atomair wordt verbruikt, roteren... |
 | `partnerpersoneelscode.pg.test.js` | 1 | -- | Echte productie-topologieproef voor partnerkanaal.personeels_en_partnercode (B14). Twee onafhankelijke kerninstances delen de autoritatieve `partnerPersoneelscodes` in PostgreSQL. |
 | `partnerpersoneelscode.test.js` | 4 | gezakt op `liegpoort /api/` | HET PARTNERKANAAL GESPLITST (besluit B14, partnerkanaal.personeels_en_partnercode), tegen een echte server. De partnercode is een openbare attributielink die niets opent; de personeelscode is een 128-bit credential... |
@@ -1676,10 +1685,12 @@ toets omvalt.
 | `spraaktekst.test.js` | 10 | geen module gevonden | SPRAAK NAAR TEKST -- lokaal, of helemaal niet. Dit is de helft die ontbrak onder de meeleesbaan. |
 | `spreidingsoordeel.test.js` | 8 | gezakt op `&&->||#4` | HET OORDEEL VAN DE SPREIDINGSPROEF (scripts/spreidingsproef.js). Het script meet doorvoer, percentielen en de rekentijd per proces. |
 | `sprongindex.test.js` | 5 | geen module gevonden | DE TWEE AFGELEIDE LIJSTEN LOPEN NIET ACHTER. shared/sprongindex.json (waar de sprong heen kan) en shared/handelingindex.json (wat je in een app kunt doen) worden allebei GEGENEREERD -- uit MAPPEN en uit de knoppen... |
-| `sso-clientgeheim-routes.test.js` | 1 | gezakt op `liegpoort /api/` | HET SSO-CLIENTGEHEIM OP EEN ECHTE SERVER (besluit B16). Deel 1, gewone server: de eigenaar zet en roteert het geheim; geen antwoord en geen bestand in de datamap draagt het kale geheim; de overlap loopt en is te... |
+| `sso-clientgeheim-b22.test.js` | 4 | gezakt op `liegpoort /api/` | B22 (besluit van de eigenaar, 4 oktober 2026; deur identity.sso_client_secret): strengere termijnen voor het SSO-clientgeheim, en zetten of roteren vraagt een VERSE passkey van wie het doet. 1. |
+| `sso-clientgeheim-routes.test.js` | 1 | gezakt op `liegpoort /api/` | HET SSO-CLIENTGEHEIM OP EEN ECHTE SERVER (B16; de passkey van B22 ook in ./sso-clientgeheim-b22.test.js). Deel 1, gewone server: de eigenaar zet en roteert (met passkey); geen antwoord of bestand draagt het kale... |
 | `sso-clientgeheim.test.js` | 8 | gezakt op `return-weg#0` | HET SSO-CLIENTGEHEIM, VERSLEUTELD PER TENANT (besluit B16, deur identity.sso_client_secret in CODECREDENTIALS.json). Wat hier vastligt, elk met een eigen toets: 1. |
 | `sso-werksync-failclosed.test.js` | 6 | gezakt op `===->!==#0` | SSO EN WERK OS -- authenticatie is pas zakelijke toegang na groepssync. De provider kan de persoon correct hebben aangemeld terwijl de tenantbrug faalt. |
 | `sso.test.js` | 28 | gezakt op `return-weg#0` | SSO: de laag waarmee een zakelijke klant met zijn eigen identiteitsprovider inlogt. Dit is auth, dus de tests gaan vooral over wat er NIET mag. |
+| `ssogeheim-ouderdom.test.js` | 2 | gezakt op `+->-#0` | B27 (deur identity.sso_client_secret): de uitrollijst van scripts/ssogeheim-ouderdom.js. Een seed met een OUD slot (gezet 120 dagen voor de uitrol, eigen verval ver weg), een VERS slot en een GEMIGREERD slot (geen... |
 | `ssrf.test.js` | 10 | gezakt op `true->false#0` | Tests voor de SSRF-afweer (server/kern/ssrf.js). Het scherpst getoetste geval is het web-push-endpoint: dat komt van de client en de server POST daar later naartoe. |
 | `staatlog.test.js` | 13 | gezakt op `true->false#0` | DE STAATMETER: heeft een verzoek de opslag veranderd? (TAKEN.md 4.30) De idempotentieproef keek alleen naar het ANTWOORD, en liep daarop vast: een route die bij elke oproep hetzelfde teruggeeft, verraadt van buitenaf... |
 | `staatproef.test.js` | 33 | gezakt op `>=->>#0` | HET OORDEEL VAN DE STAATPROEF, los van een server. De ronde start een echte server en muteert per route twee keer; daar komt niemand met een mutatie bij. |
@@ -2033,7 +2044,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-296 bestanden, 509 beweringen.
+299 bestanden, 512 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2145,6 +2156,7 @@ toets omvalt.
 | `kantoordeur.e2e.js` | 2 | -- | DE KANTOORDEUR EN HET ENE ACCOUNT. De server laat de eigenaar met zijn EIGEN lid-token door officeAuth (server/kern/kantoor/index.js: "de eigenaar komt ook met zijn eigen accountlogin binnen"), en kern/eenaccount.js... |
 | `kantoordeuren.e2e.js` | 1 | -- | DE KANTOOR-APPS: EEN DEUR OP DE APP ZELF, GEEN OMLEIDING. WAT ER MIS WAS (TAKEN 5.5) Acht kantoor-apps stuurden een uitgelogde bezoeker weg met een location.replace() naar personeel.html. |
 | `kantoorgesprek.e2e.js` | 1 | -- | Scherm-test voor de kantoor-inlog als gesprek. De server-kant staat in test/kantoorgesprek.test.js; dit gaat over wat een mens ziet. |
+| `kantoorkoppel-productie.e2e.js` | 1 | -- | B24 + B10 VIA HET SCHERM, OP EEN PRODUCTIESERVER, IN EEN ECHTE BROWSER. test/kantoor-koppel-passkey.test.js bewijst de server; deze toets bewijst dat het SCHERM die weg ook aflegt. |
 | `kantoorregisters.e2e.js` | 2 | genoemd | HET PLATFORMREGISTER EN HET ROUTEDOSSIER WORDEN ZELF AFGELEGD. WAAROM DEZE TOETS ER IS, EN HOE HIJ IS ONTSTAAN. |
 | `kassawachtrij.e2e.js` | 1 | -- | DE KASSA ZONDER LIJN, in een echte browser. HORECA.md eist dat elke locatie blijft werken zonder internet. |
 | `klankwerk.e2e.js` | 1 | -- | Scherm-test voor RTG Klankwerk. test/muziek.test.js bewijst de server-kant; deze bewijst dat het instrument werkt: een stuk openen, een stap aanzetten, een noot in de notenrol zetten, Rahul om een voorstel vragen en... |
@@ -2160,6 +2172,8 @@ toets omvalt.
 | `leerhuis-trainer.e2e.js` | 1 | gezakt op `liegpoort /api/` | LEERHUIS: DE TRAINER AAN HET WERK, IN EEN ECHTE BROWSER (ACADEMY.md, fase B-UI). test/leerhuis-grenzen.test.js toets 23 bewijst dat de trainercockpit de vaardigheden van het leerpad noemt en alleen OF er een... |
 | `leerhuis-werk.e2e.js` | 1 | gezakt op `liegpoort /api/` | LEERHUIS: AAN HET WERK, IN EEN ECHTE BROWSER (ACADEMY.md, fase B-UI). test/leerhuis-routes.test.js toets 11 bewijst dat het werk over de deur komt; deze toets bewijst dat het scherm er iets mee DOET, met de weigering... |
 | `leerpaspoort-scherm.e2e.js` | 5 | gezakt op `liegpoort /api/` | HET LEERPASPOORT IN EEN ECHTE BROWSER: de leerlijn van een leerlingprofiel. test/rtfleerlingtoegang.test.js bewijst dat /api/rtf/leerling/* de ladder op leeftijd snijdt. |
+| `lesdeellink.e2e.js` | 1 | -- | DE DEELLINK VAN DE LESCODE IN EEN ECHTE BROWSER (besluit B20, RELEASEKANDIDAAT.md). test/lesdeel.test.js legt de stukken los vast; hier de WEG, van bord tot schrift: 1. |
+| `lesstroom.e2e.js` | 1 | -- | DE LESSLEUTEL VERLAAT DE URL, IN EEN ECHTE BROWSER (besluit B25, RELEASEKANDIDAAT.md). test/foundation-lesstroom.test.js beproeft de server; hier de WEG, met de schermen zelf: 1. |
 | `leven.e2e.js` | 1 | gezakt op `liegpoort /api/` | Schermtoets voor het werkblad RTG Leven. Leven opent andere apps in panelen; een avond samenstellen is van avond.html (SCHERMEIGENAAR.json), dus hier wordt bewaakt dat Leven die eigenaar opent en haar niet opnieuw bouwt. |
 | `levenspas.e2e.js` | 1 | genoemd | De levenspas aan de GEZINSKANT (/apps/foundation/mijnbanden.html), in een echte browser. Twee dingen bewaakt deze toets, en ze bestaan allebei alleen op dit niveau. |
 | `liegend-scherm.e2e.js` | 1 | genoemd | DE SCHERMEN TERWIJL DE BACKEND LIEGT. WAAROM DIT BESTAND ER IS, en het is een gat dat te meten viel. |

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-04T07:09:04.277Z",
-    "commit": "33d2f312",
+    "op": "2026-10-04T07:10:10.490Z",
+    "commit": "73ca643d",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -6516,9 +6516,12 @@
       "scherp": "gezakt"
     },
     "lesdeel.test.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/foundation/lesdeel.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 2
     },
     "letters.test.js": {
       "soort": "puur",

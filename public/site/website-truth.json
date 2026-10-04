@@ -8,7 +8,7 @@
     "public/apps/leverancier.html",
     "public/apps/app.html"
   ],
-  "sourceHash": "7b453b441391156f0bdff87242683454b0beefc033cec2472f583097aaa04516",
+  "sourceHash": "872d2375add7497893c6d2c340cfede69031c4c80bd37e18e52584b183d80cc6",
   "platform": [
     {
       "id": "organisatie",
@@ -24,7 +24,7 @@
         "Kies een module en zie de lijst plus wat aandacht vraagt; koppel eenmalig uw RTG-account voor agenda, postvak en kluis"
       ],
       "note": "Wat u niet mag zien, staat er niet als lege doos; en wat nergens wordt gemeten, staat er met de reden erbij.",
-      "sourceHash": "bb576a41726a7970cb886819c434bbcb5eff25979a121e7a6d73116ea8de85b5"
+      "sourceHash": "32305f8a23e9d5802508d227b17248e7359f57a0f7b6dc31b14a3554b28baa93"
     },
     {
       "id": "partner",
@@ -55,7 +55,7 @@
         "Je ledenpas ligt in je wallet, de tegel rechts onder de klok"
       ],
       "note": "Je echte naam blijft in de kluis; partners zien alleen je codenaam. Dat is bewust ons ontwerp.",
-      "sourceHash": "3bf292870277d87a9d28d48e28d01eaad44f6c0824baa57ea2ba0d7cc45cfb30"
+      "sourceHash": "c45ff9ab12f1809a89ad1a29a110e4067b59aac2d267ff3291c71e2da3a44415"
     }
   ],
   "worlds": {

@@ -103,6 +103,10 @@ Kolommen: **code** / **extern** / **besluit** = JA/NEE; *bewijs* = wat
 | B21 | **Oude personeelscodes van het partnerkanaal worden bij de uitrol gewist** uit de opslag; partners geven elke medewerker opnieuw een personeelscode | deur `partnerkanaal.personeels_en_partnercode` |
 | B22 | **Strengere termijnen voor het SSO-clientgeheim**: rotatieadvies 30 dagen, maximaal 90, overlap 3; roteren vraagt een verse passkey | deur `identity.sso_client_secret` |
 | B23 | **Het eerste kantooraccount op naam machtigt de eigenaar met zijn eigen passkey**; er is geen gedeelde of eenmalige startcode | deur `office.gedeelde_kantoorcode` |
+| B24 | **Een nieuwe kantoormedewerker bevestigt het koppelen met een eigen verse passkey**; de gedeelde kantoor-TOTP vervalt in productie bij het verzilveren van een uitnodiging (besluit van 4 oktober 2026) | `kern/eenaccount/koppelen.js`, deur `office.gedeelde_kantoorcode` |
+| B25 | **De leerlingsleutel verlaat de URL**: bord-, schrift- en lesverzoeken dragen hem in een header of het lijf, de live-stroom krijgt een kortlevend eenmalig ticket | deur `foundation.onderwijs_les_tokens` |
+| B26 | **Een leerling zonder gezinsprofiel scant na het inloggen opnieuw**; de lescode uit de link blijft alleen in het geheugen en wordt nergens bewaard | `public/apps/foundation/leren.html` |
+| B27 | **De maximale overlap van een SSO-clientgeheim gaat naar 7 dagen**, en de uitrol levert vooraf een lijst organisaties waarvan het geheim ouder is dan 90 dagen, zodat die eerst roteren | deur `identity.sso_client_secret` |
 
 **Nieuw gemeten sinds de matrix:** de codecredentialpoort telt geen 9 maar
 **483** blokkades: de 9 open types, **399** routes die op een toegangscode

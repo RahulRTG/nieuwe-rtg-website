@@ -43,7 +43,7 @@ const { spawn } = require('node:child_process');
 
 const MOTOR = path.join(__dirname, '..', 'scripts', 'mutatie.js');
 
-test('een time-out ruimt ook de kinderen van de testrunner op', { skip: process.platform === 'win32' }, async () => {
+test('een time-out ruimt ook de kinderen van de testrunner op', async () => {
   const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-mutatie-kind-'));
   const pidBestand = path.join(map, 'kind.pid'), bestand = path.join(map, 'hang.test.js');
   let pid;

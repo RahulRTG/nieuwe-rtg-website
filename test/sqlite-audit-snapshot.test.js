@@ -94,3 +94,51 @@ test('begrotingsweigering van de auditpublicatie vindt vóór COMMIT plaats', t 
   actief = false; h.noteer({ pad: '/nieuw', status: 200 });
   assert.equal(p.lees('handelingLog').length, 50000); assert.equal(p.lees('handelingLog')[0].pad, '/nieuw');
 });
+
+test('gepagineerde audit houdt uitgedeelde snapshots intact na append, wissing en cacheverdringing', t => {
+  const legacy = Array.from({ length: 777 }, (_, i) => ({ pad: '/' + i, nested: { id: i } }));
+  const p = proef(t, { handelingLog: legacy }); const h = p.handeling();
+  const oud = p.db.data.handelingLog;
+  const eerste = oud[0];
+  assert.deepEqual(JSON.parse(JSON.stringify(oud)), legacy);
+  assert.equal(oud.indexOf(eerste), 0, 'een uitgedeelde rij behoudt identiteit na volledige scan');
+  assert.equal(Object.keys(oud).length, 777);
+  assert.deepEqual(oud.filter(r => r.nested.id % 127 === 0).map(r => r.nested.id), [0, 127, 254, 381, 508, 635, 762]);
+  const descriptor = Object.getOwnPropertyDescriptor(oud, '0');
+  assert.throws(() => { descriptor.value.nested.id = 999; }, /alleen leesbaar/);
+  assert.throws(() => { Object.getOwnPropertyDescriptor(oud[0], 'nested').value.id = 999; }, /alleen leesbaar/);
+  h.noteer({ pad: '/nieuw', status: 200 });
+  assert.equal(p.db.data.handelingLog.length, 778);
+  assert.equal(p.db.data.handelingLog[1], eerste, 'append deelt dezelfde nog levende rij');
+  assert.deepEqual(JSON.parse(JSON.stringify(oud)), legacy);
+  p.db.data.handelingLog = []; p.save();
+  assert.deepEqual(p.lees('handelingLog'), []);
+  assert.deepEqual(JSON.parse(JSON.stringify(oud)), legacy);
+  assert.equal(p.db.data.handelingLog.length, 0);
+});
+
+test('paginaopslag comprimeert werkelijk en decodeert slechts een begrensde leeswerkset', t => {
+  const zlib = require('node:zlib'), inflate = zlib.inflateRawSync;
+  let gelezen = 0;
+  t.mock.method(zlib, 'inflateRawSync', (...args) => { gelezen++; return inflate(...args); });
+  const pad = require.resolve('../server/db/audit-projectie'); delete require.cache[pad];
+  const projectie = require(pad)();
+  const nieuw = Array.from({ length: 1024 }, (_, i) => ({ nr: i + 1,
+    tekst: JSON.stringify({ nr: i + 1, pad: '/api/planning/state', methode: 'POST', status: 200, actor: 'synthetisch-' + i }) }));
+  const snapshot = projectie.volgende(null, nieuw, 1), lijst = projectie.lijst(snapshot, false);
+  assert.equal(Object.getOwnPropertyDescriptor(lijst, 'length').value, 1024);
+  assert.equal(Reflect.ownKeys(lijst).length, 1025);
+  const bytes = snapshot.paginas.reduce((n, p) => n + p.bytes.length + p.nummers.length * 8, 0);
+  assert.ok(bytes < Buffer.byteLength(JSON.stringify(nieuw)) / 2, 'ook gecomprimeerde bytes en nummerindex meetellen');
+  assert.equal(gelezen, 0, 'schrijven decodeert geen leespagina');
+  for (let i = 0; i < 5; i++) assert.equal(lijst[i * 128].nr, i * 128 + 1);
+  assert.equal(gelezen, 5);
+  assert.equal(lijst[0].nr, 1); assert.equal(gelezen, 6, 'vijfde pagina verdringt de eerste');
+  assert.equal(lijst[1].nr, 2); assert.equal(gelezen, 6, 'actieve pagina wordt hergebruikt');
+  const later = projectie.volgende(snapshot, [{ nr: 1025, tekst: '{"nr":1025}' }], 130);
+  assert.equal(projectie.lijst(later, false)[0].nr, 130);
+  assert.equal(projectie.lijst(later, true)[0].nr, 1025);
+  assert.equal(lijst[0].nr, 1, 'retentie verandert geen oude snapshot');
+  assert.equal(projectie.lijst(projectie.volgende(later, [], null), false).length, 0);
+  delete require.cache[pad];
+});

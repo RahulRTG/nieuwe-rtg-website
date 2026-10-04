@@ -22,6 +22,8 @@ module.exports = ({ db, kv, decode, encode, bump }) => {
     wegBron: kv.prepare('DELETE FROM kv WHERE key=?')
   };
   const cache = new Map();
+  const { publicaties, naCommit, resultaat: publiceerResultaat } = require('./audit-publicatie')({ db, cache, leesBinnen });
+  const projectie = require('./audit-projectie')();
   let context = () => null;
   function metaZet(m) { q.zetMeta.run(m.naam, m.versie, m.epoch, m.kop, m.totaal, m.extra); }
   function transaction(werk) {
@@ -57,13 +59,15 @@ module.exports = ({ db, kv, decode, encode, bump }) => {
     const oud = cache.get(naam);
     if (oud?.meta.versie === m.versie) return oud;
     const gelijkEpoch = oud?.meta.epoch === m.epoch;
-    const nieuw = q.vanaf.all(naam, gelijkEpoch ? oud.meta.kop : 0).map(r => ({ nr: r.nr, waarde: JSON.parse(decode(r.waarde)) }));
-    const rows = gelijkEpoch ? [...oud.rows, ...nieuw] : nieuw;
+    const nieuw = q.vanaf.all(naam, gelijkEpoch ? oud.meta.kop : 0).map(r => {
+      const tekst = decode(r.waarde);
+      JSON.parse(tekst); // Ongeldige opgeslagen JSON faalt binnen deze snapshot.
+      return { nr: r.nr, tekst };
+    });
     const spec = vorm.eis(naam), vanaf = q.staart.get(naam).nr;
-    const behouden = rows.filter(r => vanaf !== null && r.nr >= vanaf);
-    const lijst = behouden.map(r => r.waarde);
-    if (spec.omgekeerd) lijst.reverse();
-    return { meta: m, rows: behouden, waarde: vorm.alleenLezen(vorm.pak(naam, lijst, m.totaal, JSON.parse(decode(m.extra)))), root: null };
+    const beeld = projectie.volgende(gelijkEpoch ? oud.beeld : null, nieuw, vanaf);
+    const lijst = projectie.lijst(beeld, spec.omgekeerd);
+    return { meta: m, beeld, waarde: vorm.alleenLezen(vorm.pak(naam, lijst, m.totaal, JSON.parse(decode(m.extra)))), root: null };
   }
   function publiceer(naam, nieuw) {
     if (!nieuw) return;
@@ -143,23 +147,9 @@ module.exports = ({ db, kv, decode, encode, bump }) => {
       else { lijst.push(resultaat); if (lijst.length > spec.max) lijst.splice(0, lijst.length - spec.max); waarde.commandJournaalTotaal = vorm.totaal(op.naam, basis) + 1; }
     } else resultaat = op.werk(waarde);
     if (resultaat && typeof resultaat.then === 'function') throw new Error('Auditbewerker moet synchroon zijn.');
-    Object.assign(op.resultaat, resultaat);
+    publiceerResultaat(op.resultaat, resultaat);
     doos.auditOps.push(op); doos.auditViews.set(op.naam, vorm.alleenLezen(waarde));
     return op.resultaat;
-  }
-  function publicaties(results) {
-    return [...new Set(results.map(r => r.op.naam))].map(naam => {
-      const nieuw = leesBinnen(naam);
-      require('../opzet/begroting').toetsOpslag(db.data, naam, nieuw.waarde);
-      return [naam, nieuw];
-    });
-  }
-  function naCommit(results, doos, snapshots) {
-    for (const r of results) Object.assign(r.op.resultaat, r.resultaat);
-    if (doos?.auditOps) { doos.auditOps.length = 0; doos.auditViews.clear(); }
-    for (const [naam, nieuw] of snapshots) {
-      db.data[naam] = nieuw.waarde; nieuw.root = db.data; nieuw.pending = null; cache.set(naam, nieuw);
-    }
   }
   function snapshots() { return q.metas.all().map(({ naam }) => [naam, leesBinnen(naam)]); }
   function publiceerSnapshots(lijst) { for (const [naam, nieuw] of lijst) publiceer(naam, nieuw); }

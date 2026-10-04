@@ -88,22 +88,15 @@ module.exports = ({ save }) => {
 
     const voor = persistentieStand();
     let alGelijk = false;
+    let sqliteBevestigd = false;
     if (STORE === 'sqlite') {
-      /* force: sla de goedkope voorcheck over, die kan een gelijk gebleven
-         collectiegrootte overslaan. Daarna de WAL dichtvouwen, zodat de
-         wijziging niet alleen in het journaal staat. */
-      const uit = sqlite.saveSqlite(true);
+      // Volledige scan, dezelfde atomaire transactie, FULL-sync vóór bevestiging.
+      const uit = sqlite.saveSqlite(true, undefined, [], true);
       alGelijk = !!(uit && uit.alGelijk);
-      /* HIER STOND EEN `sterf-in-de-opslag`, EN HIJ IS ER WEER UIT GEHAALD.
-
-         De gedachte was dat een dood tussen de schrijfopdracht en de checkpoint
-         de grens `in-de-opslag` zou raken: in het journaal, nog niet ingevouwen.
-         scripts/crashgrenzen.js mat het na en gaf drie keer hetzelfde: de
-         betaling stond na de herstart gewoon vast. Reden staat in sqlite.js --
-         `BEGIN IMMEDIATE ... COMMIT` maakt de save EEN transactie, dus de
-         duurzaamheid valt op de commit en niet op de checkpoint. Deze regel was
-         een tweede sterf-na-commit met een andere naam. */
-      sqlite.vouwWalSqlite();
+      sqliteBevestigd = uit?.duurzaam === true;
+      /* Een procescrash na COMMIT was al door scripts/crashgrenzen.js bewezen.
+         Dat bewijst geen stroomuitval: die garantie komt nu van FULL op deze
+         eigen transactie, of de gecontroleerde checkpoint bij een netto-noop. */
     } else if (STORE === 'json') {
       schrijfSnapshotNu();               // schrijft via schrijfDuurzaam(): fsync + rename
     } else {
@@ -123,7 +116,8 @@ module.exports = ({ save }) => {
        en het weer losliet, kwam zo als 500 terug in plaats van als haar eigen
        402. Alleen de opslag zelf mag dit zeggen; afleiden uit een gelijke
        teller zou echt verlies meedekken. */
-    const bevestigd = bevestigbaar && (na > voor || alGelijk);
+    const bevestigd = bevestigbaar && (na > voor || alGelijk)
+      && (STORE !== 'sqlite' || sqliteBevestigd);
 
     /* STERF-NA-COMMIT. Het gemeenste moment dat er bestaat, en het is hier
        eenduidig aan te wijzen: de schrijfactie is duurzaam, de aanroeper heeft

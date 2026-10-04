@@ -36,9 +36,7 @@ function sqliteInit() {
   stmt = null; // verse verbinding: de voorbereide statements horen bij de oude
   besloten(bestand);
   require('../lib/sqlite-gelijktijdigheid')(kvdb);
-  // Houd het WAL-bestand begrensd: na een checkpoint wordt het teruggezet naar
-  // deze grens in plaats van op zijn hoogste stand te blijven staan. Zonder dit
-  // groeide store.db-wal tot een paar MB en werd elke start onnodig traag.
+  // Begrens het WAL-bestand na checkpoints.
   kvdb.exec('PRAGMA journal_size_limit=' + Number(process.env.RTG_SQLITE_WAL_MAX || 8 * 1024 * 1024));
   kvdb.exec('CREATE TABLE IF NOT EXISTS kv (key TEXT PRIMARY KEY, val TEXT, ver INTEGER NOT NULL DEFAULT 0)');
   kvdb.exec('CREATE INDEX IF NOT EXISTS idx_kv_ver ON kv(ver)');
@@ -71,11 +69,13 @@ function statements() {
   };
   return stmt;
 }
-function saveSqlite(force, sleutels, extraAudit = []) {
+function saveSqlite(force, sleutels, extraAudit = [], duurzaam = false) {
   if (sleutels !== undefined && (!Array.isArray(sleutels) || (!sleutels.length && !extraAudit.length) ||
       sleutels.some(k => typeof k !== 'string' || !Object.hasOwn(db.data, k))))
     throw new TypeError('Een gerichte save vereist bestaande collecties');
   sqliteInit();
+  if (duurzaam) return require('./sqlite-duurzaam')(kvdb,
+    () => saveSqlite(true, sleutels, extraAudit), vouwWalSqlite);
   const audits = auditMotor(), doos = audits.doos();
   const auditOps = [...audits.vervangingen(db.data), ...(doos?.auditOps || []), ...extraAudit];
   const auditSleutels = new Set(auditOps.map(op => op.naam));
@@ -130,7 +130,7 @@ function saveSqlite(force, sleutels, extraAudit = []) {
   }
   for (const [k, j, v] of vastgelegd) { laatsteJson.set(k, j); toegepast.set(k, v); }
   audits.naCommit(auditResultaten, doos, auditSnapshots);
-  return { alGelijk: false };
+  return { alGelijk: false, committed: true };
 }
 // Publiceer extern gewijzigde collecties vanuit één snapshot.
 function pollSqlite() {

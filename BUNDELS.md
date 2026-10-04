@@ -893,7 +893,7 @@ omlaag.
 
 ## `shared/werkos.js`
 
-`public/shared/werkos/` -- 7 delen, 686 regels in de delen
+`public/shared/werkos/` -- 7 delen, 689 regels in de delen
 
 | deel | onderwerp |
 |---|---|

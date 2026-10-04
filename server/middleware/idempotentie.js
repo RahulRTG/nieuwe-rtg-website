@@ -43,8 +43,17 @@
      een token in een kas ligt.
    - HET EERSTE ANTWOORD WINT, PLUS `herhaald: true`. De herhaling krijgt status
      en lijf van de eerste uitvoering terug, met de kop X-Idempotentie: herhaald,
-     en de handler draait niet. Ook een 4xx wordt herhaald: dezelfde vraag,
-     hetzelfde oordeel.
+     en de handler draait niet.
+   - ALLEEN EEN GESLAAGD ANTWOORD WORDT ONTHOUDEN (2xx zonder `ok: false`).
+     Hier stond "ook een 4xx wordt herhaald: dezelfde vraag, hetzelfde oordeel",
+     en dat sprak de twee lagen ervoor tegen (lib/idem-poort.js en
+     lib/dubbeltik.js, die net als de geldlaag lib/idem.js alleen een succes
+     bewaren). Het gevolg was een val: een 409 omdat de toestand nog niet
+     klopte, de toestand hersteld, dezelfde sleutel opnieuw -- en de oude 409
+     kwam 24 uur lang uit deze kas terwijl de route nu wel had gewerkt. Een
+     weigering die van de toestand afhangt, is een TOESTANDSCONTROLE en geen
+     idempotentie (MUTATIECONTRACT.md); die hoort de route opnieuw te doen.
+     Besluit van 4 oktober 2026.
 
      `herhaald` is de bestaande huistaal van de geldlaag. Het hoort in het lijf,
      niet alleen in een kop die clients niet lezen.
@@ -123,7 +132,9 @@ module.exports = () => {
       const bewaar = () => {
         try {
           const lijf = JSON.stringify(data);
-          if (res.statusCode < 500 && typeof lijf === 'string' && lijf.length <= MAX_LIJF) {
+          const geslaagd = res.statusCode >= 200 && res.statusCode < 300 &&
+            !(data && typeof data === 'object' && data.ok === false);
+          if (geslaagd && typeof lijf === 'string' && lijf.length <= MAX_LIJF) {
             ruim();
             kas.set(id, { status: res.statusCode, lijf, op: Date.now() });
           }

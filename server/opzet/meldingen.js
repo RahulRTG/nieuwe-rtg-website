@@ -35,6 +35,13 @@ function broadcastSync(tiers, scope) {
 
 // notificeer één tier: opslaan, naar open schermen sturen én web-push
 function notify(tier, note) {
+  return meld(tier, note, save);
+}
+/* Alleen voor callers die hun domeinmutatie al zelf hebben bewaard. De gewone
+   ingang behoudt de brede save, zodat bestaande impliciete writes niet vervallen. */
+notify.alleenMelding = (tier, note) => meld(tier, note,
+  () => save.sleutels ? save.sleutels(['notifications']) : save());
+function meld(tier, note, bewaar) {
   /* DE TWEEDE HELFT VAN DE CRASHGRENS `na-commit-voor-bericht`, en dat er twee
      helften zijn is zelf de vondst. ./meldaan.js draagt dezelfde injectie; de
      eerste ronde zette hem alleen daar, en op /api/supplier/facturen/maak sloeg
@@ -58,7 +65,7 @@ function notify(tier, note) {
   db.data.notifications[tier] = (db.data.notifications[tier] || []);
   db.data.notifications[tier].unshift(n);
   db.data.notifications[tier] = db.data.notifications[tier].slice(0, 40);
-  save();
+  bewaar();
   // een melding gaat over een lid en draagt zijn tekst mee
   bus.publish('sse', { doel: 'tier', match: [tier], event: 'notify', data: n,
     envelop: { classificatie: 'persoonsgegeven' } });

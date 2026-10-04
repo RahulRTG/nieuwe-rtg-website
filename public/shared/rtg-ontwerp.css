@@ -318,3 +318,7 @@
 }
 .rtg-koppel-knop:focus-visible{outline:2px solid var(--rtg-goud);outline-offset:2px;}
 .rtg-koppel-knop[disabled]{opacity:.5;cursor:progress;}
+
+
+/* Componentopmaak: behoudt de voormalige attributen en expliciete toestanden. */
+.rtg-bedoeling .knoppen .linkkaart-intentie-uitleg{font-weight:400;opacity:.8;}

@@ -29,6 +29,38 @@ const schuld = require('../scripts/bewijsschuld');
 
 const WORTEL = path.join(__dirname, '..');
 const VASTGELEGD = path.join(WORTEL, 'BEWIJSSCHULD.json');
+const { idemClassificatie } = require('../scripts/lib/bewijsschuld-idem');
+
+test('herhaalclassificatie leest het actuele contract zonder er runtimebewijs van te maken', () => {
+  const route = 'POST /api/voorbeeld', rij = { methode: 'POST', pad: '/api/voorbeeld', reden: 'herhaald: true' };
+  const contract = { mutatieId: 'voorbeeld', herkomst: 'mens',
+    semantiek: { klasse: 'idempotent' }, toegang: { klasse: 'AUTHENTICATED' },
+    stand: 'PROTECTED', bewijs: { gemeten: 'expliciete bestaande proef', op: '2026-09-01' },
+    afgetekend: { door: 'bestaand contract met benoemde herkomst', op: '2026-09-01' } };
+  const meet = c => idemClassificatie([rij], {}, { [route]: c });
+  assert.equal(meet(contract).contract, 1);
+  assert.equal(meet(contract).open.length, 0);
+  assert.equal(idemClassificatie([rij], {}, {}).open.length, 1, 'herhaald:true zonder contract sluit niets');
+  for (const c of [
+    { ...contract, stand: 'BLOCKED_BY_TEST_FIXTURE', watErMoetKomen: 'een echt object' },
+    { ...contract, stand: 'LEGACY_PENDING_CLASSIFICATION' },
+    { ...contract, stand: 'UNTESTABLE_WITH_JUSTIFIED_REASON', waarom: 'hardware ontbreekt' },
+    { ...contract, semantiek: { klasse: 'onbekend' } },
+    { ...contract, bewijs: {} },
+    { ...contract, herkomst: 'afgeleid' },
+    { ...contract, afgetekend: {} },
+    { ...contract, stand: 'NOT_APPLICABLE' },
+    { ...contract, stand: 'INTENTIONALLY_NON_IDEMPOTENT' }
+  ]) assert.equal(meet(c).open.length, 1, 'onvolledige of onbesliste claim blijft schuld');
+  assert.equal(idemClassificatie([{ ...rij, methode: 'DELETE' }], {}, { [route]: contract }).open.length, 1);
+  assert.equal(idemClassificatie([rij], { [rij.pad]: { klasse: 'tebeslissen' } }, {}).open.length, 1);
+  assert.equal(idemClassificatie([rij], { [rij.pad]: { klasse: 'creatie' } }, {}).legacy, 1);
+  assert.equal(idemClassificatie([rij], { [rij.pad]: { klasse: 'creatie' } },
+    { [route]: { ...contract, semantiek: { klasse: 'onbekend' } } }).open.length, 1,
+  'een oud besluit mag een actuele onbekende niet overschrijven');
+  assert.equal(idemClassificatie(null, {}, {}), null, 'geen meting is geen nul');
+  assert.equal(idemClassificatie([rij], {}, null), null, 'ontbrekende contractbron is geen nul');
+});
 
 test('1. elke post draagt een aantal dat uit een REGISTER komt', () => {
   const uit = schuld.meet();

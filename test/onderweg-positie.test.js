@@ -153,3 +153,25 @@ test('7. de bestemming bevestigt; een andere zaak kan dat niet', async () => {
   assert.equal(na.body.live.aankomstDoor, 'zaak');
   await api('live/stop', {}, lid);
 });
+
+test('8. de stormjourney bewijst nabijheid, menselijke bevestiging en blijvende aankomst', async () => {
+  const journey = require('../scripts/verhalen').VERHALEN.find(v => v.id === 'onderweg-en-aankomen');
+  const stappen = [];
+  const wb = {
+    async stap(naam, method, route, token, body) {
+      assert.equal(method, 'POST');
+      const r = await api(route.slice('/api/'.length), body, token);
+      assert.equal(r.status, 200, naam + ': ' + JSON.stringify(r.body));
+      stappen.push(route);
+      return { data: r.body };
+    },
+    eis(naam, waar, reden) { assert.ok(waar, naam + ': ' + reden); }
+  };
+  await journey.doe(wb, { ploeg: { gast: { token: lid } }, supCode: 'PONTO' });
+  assert.equal(stappen.filter(p => p === '/api/live/aangekomen').length, 2, 'bevestiging en retry zijn werkelijk uitgevoerd');
+  assert.ok(stappen.includes('/api/live/state'), 'de opgeslagen aankomst is teruggelezen');
+  const resultaat = await api('live/state', {}, lid);
+  assert.equal(resultaat.body.live.arrived, true);
+  assert.equal(resultaat.body.live.aankomstDoor, 'lid');
+  await api('live/stop', {}, lid);
+});

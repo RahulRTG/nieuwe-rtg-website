@@ -93,71 +93,66 @@ const GEEN_METING = new Set([
      beide lijsten, en telt dus mee in `metingenZonderRatel`. Dat hier rechtzetten
      zou die tand verschuiven, en dat is een apart besluit -- het staat genoteerd
      en niet stilletjes meegenomen. */
-  'HERREKENBAAR.json',
-  /* DE AUDIT VAN 4 OKTOBER 2026. Vijftig meetbestanden stonden in geen van
-     beide lijsten; per bestand is nagelezen wat hem vasthoudt. Deze negen
-     dragen geen getal dat beter of slechter kan worden. IDEMBESLUIT.json staat
-     hier nu ook, om de reden die hierboven al stond: het is een register van
-     besluiten zoals HERREKENBAAR.json. De meting ernaast telt wel -- haal je een
-     besluit weg, dan groeit de bewijsschuldpost idem-ongeclassificeerd. */
-  'IDEMBESLUIT.json',
-  'BEGROTING.json',              // grenzen per collectie: een voornemen, geen meting
-  'KRIMP.json',                  // welke collecties krimpen in de suite: invoer voor BEGROTING
-  'MUTATIECONTRACT-VOORSTEL.json', // een machinevoorstel; het besluit staat in server/lib/mutatiecontracten.js
-  'RUST-MIGRATIES.json',         // een migratieplan; scripts/rust-migraties.js keurt zijn vorm
-  'SLO.json',                    // de servicedoelen zelf
-  'SYMBOLEN.json',               // een index (soort: index); codewereld.test.js houdt hem buiten de gedragstelling
-  'WETBRONNEN.json',             // de wetsbronnen met hun vingerafdruk: een catalogus
-  'WETWACHT.json',               // een alarmrapport over externe wetteksten; wacht.yml zakt erop
-  /* DUURZAAMHEIDSKOSTEN.json draagt vertragingsfactoren van een duurzame
-     schrijfactie. Net als TOETSDUUR.json een PLANNINGSgetal: een schijf die
-     trager is, is geen slechtere code. */
-  'DUURZAAMHEIDSKOSTEN.json'
+  'HERREKENBAAR.json'
 ]);
 
 const REGISTER = {
-  /* DE AUDIT VAN 4 OKTOBER 2026 (zie ook GEEN_METING). Elke regel hieronder is
-     nagelezen tot op de bewering die zakt: welk getal, welke richting. Vier zijn
-     DOCUMENTtanden en geen kwaliteitsratel -- CAPABILITEIT, MAGNAATLAB,
-     OBJECTMODEL en MAKERS houden een bevinding vast (er IS geen gedeeld type) of
-     een bereik, zoals CARRIEREVORM hieronder. GRAAFAS is een exacte pin en zakt
-     dus ook bij verbetering; ook dat vangt een verslechtering. De drie via
-     scripts/bewijsmatrix.js draaien in de meetronde en niet in npm test, op
-     dezelfde grond als IDEMPROEF verderop. SUITE.json wordt pas bij een
-     vrijgave gekeurd en houdt dus een release tegen, geen commit. */
-  'AANROEPGRAAF.json': { eigenRatel: 'test/codewereld.test.js' },      // doelOnbekend === 0
-  'SCHERMROUTES.json': { eigenRatel: 'test/codewereld.test.js' },      // doodPad === 0
-  'AUDITPROEF.json': { eigenRatel: 'scripts/bewijsmatrix.js' },        // AUDIT-kolom; en bewijsschuld audit-wisselend
-  'HANDELINGPROEF.json': { eigenRatel: 'scripts/bewijsmatrix.js' },    // AUDIT-kolom, terugval
-  'OUTPUTPROEF.json': { eigenRatel: 'scripts/bewijsmatrix.js' },       // OUTPUT-kolom; en bewijsschuld onbeslist/blind
-  'WAAROM.json': { eigenRatel: 'scripts/bewijsschuld.js' },            // post object-vooraf; zakt in bewijsschuld.test.js
-  'BEWIJSSCHULD.json': { eigenRatel: 'test/bewijsschuld.test.js' },    // achterstand mag niet groeien
-  'BELOFTE.json': { eigenRatel: 'test/belofte.test.js' },              // gebroken === 0
-  'DEKKING.json': { eigenRatel: 'test/routedekking.test.js' },         // gaten === 0, pct === 100
-  'ENVELOP.json': { eigenRatel: 'scripts/envelopvelden.js' },          // veldenZonderHuis, actorVormen mogen niet groeien
-  'GEZAG.json': { eigenRatel: 'scripts/gezag.js' },                    // vocabulaires, losse niveaunamen
-  'IDEMSCHULD.json': { eigenRatel: 'test/idemschuld.test.js' },        // schuld mag niet groeien
-  'IDOR.json': { eigenRatel: 'test/idor.test.js' },                    // geen doorbraak, gescheiden >= 50
-  'KLOKWACHT.json': { eigenRatel: 'test/klokwacht.test.js' },          // totaal en per bestand niet hoger
-  'MUTATIESEMANTIEK.json': { eigenRatel: 'test/mutatiesemantiek.test.js' }, // onbekende klassen, tegenspraken === 0
-  'CAPABILITEIT.json': { eigenRatel: 'test/capabilities.test.js' },    // gelijkendeParen === 0 (documenttand)
-  'MAGNAATLAB.json': { eigenRatel: 'test/magnaatlab.test.js' },        // geen gedeelde vorm (documenttand)
-  'OBJECTMODEL.json': { eigenRatel: 'test/objectmodel.test.js' },      // domeineigen > 50% (documenttand, ruim)
-  'MAKERS.json': { eigenRatel: 'test/makers.test.js' },                // bereik >= 8
-  'GRAAFAS.json': { eigenRatel: 'test/graafas.test.js' },              // exacte pin
-  'SUITE.json': { eigenRatel: 'scripts/lib/productie-vrijgave.js' },   // groen, nul mislukt: release-poort
-  /* Tien die tot 4 oktober nergens aan hingen en toen een tand in NORM.json
-     kregen (zie scripts/norm.js bij controlsNietGroen). */
-  'CONTROLS.json': { meter: ['controlsNietGroen'] },
-  'HANDLERWACHT.json': { meter: ['handlerOnbewaakt'] },
-  'KERNHERKOMST.json': { meter: ['kernOnopgelost'] },
-  'ROUTEBRON.json': { meter: ['routebronTegenspraak'] },
-  'SEMANTIEK.json': { meter: ['semantiekBotsingen'] },
-  'SCHERMGEDRAG.json': { meter: ['schermZonderGrond'] },
-  'MUTATIEBOEK.json': { meter: ['mutatiesOnverklaard'] },
-  'ONBEWEZEN.json': { meter: ['mutatiesOnbewezen'] },
-  'SCHRIJFANALYSE.json': { meter: ['schrijfOnbekend'] },
-  'VERTROUWEN.json': { meter: ['vertrouwenOngemeten'] },
+  /* Bestaande handhavers waren wel actief in CI maar niet met hun register
+     verbonden. Deze koppelingen claimen alleen de genoemde ratel: bijvoorbeeld
+     afdrukconsistentie is geen bewijs dat een gehele capability correct werkt.
+     De integriteitsratels hieronder hebben per register negatieve controles in
+     test/registerratels.test.js; ontbrekende records of tellers worden geweigerd. */
+  'BEWIJSSCHULD.json': { meter: ['bewijsAchterstand'] },
+  'DEKKING.json': { meter: ['dekkingWaargenomenPct', 'endpointsNooitAangeraakt'] },
+  'AANROEPGRAAF.json': { eigenRatel: 'test/codewereld.test.js' },
+  'CAPABILITEIT.json': { eigenRatel: 'test/capabilities.test.js' },
+  'CODEWERELD.json': { eigenRatel: 'test/codewereld.test.js' },
+  'COMMERCE.json': { eigenRatel: 'scripts/check.js' },
+  'CONTROLS.json': { eigenRatel: 'test/controls.test.js' },
+  'ENVELOP.json': { eigenRatel: 'test/actorvormen.test.js' },
+  'GEZAG.json': { eigenRatel: 'test/gezag.test.js' },
+  'GRAAFAS.json': { eigenRatel: 'test/graafas.test.js' },
+  'HANDLERWACHT.json': { eigenRatel: 'test/handlerwacht.test.js' },
+  'IDEMSCHULD.json': { eigenRatel: 'test/idemschuld.test.js' },
+  'IDOR.json': { eigenRatel: 'test/idor.test.js' },
+  'INHOUDSKAART.json': { eigenRatel: 'test/inhoudswacht.test.js' },
+  'KLOKWACHT.json': { eigenRatel: 'test/klokwacht.test.js' },
+  'MAKERS.json': { eigenRatel: 'test/makers.test.js' },
+  'MAGNAATLAB.json': { eigenRatel: 'test/magnaatlab.test.js' },
+  'MUTATIESEMANTIEK.json': { eigenRatel: 'test/mutatiesemantiek.test.js' },
+  'OBJECTMODEL.json': { eigenRatel: 'test/objectmodel.test.js' },
+  'SCHERMGEDRAG.json': { eigenRatel: 'test/codewereld.test.js' },
+  'SCHERMROUTES.json': { eigenRatel: 'test/codewereld.test.js' },
+  'SEMANTIEK.json': { eigenRatel: 'test/semantiek.test.js' },
+  /* Bestaande tegenproeven: collectiegrenzen inclusief vergeetpad-uitzonderingen,
+     werkelijk bestaande beloftedekking en de vaste Rust-migratietrechter.
+     Dit claimt geen weigermodus in productie, volledige beloftecorrectheid of
+     voltooide Rust-migraties. De handhavers toetsen precies die grenzen. */
+  'BEGROTING.json': { eigenRatel: 'test/begrotingsgrenzen.test.js' },
+  'BELOFTE.json': { eigenRatel: 'test/belofte.test.js' },
+  'RUST-MIGRATIES.json': { eigenRatel: 'scripts/rust-migraties.js' },
+  /* Geen nieuw bewijs over oude rondes: deze ratels verhinderen tegenstrijdige
+     bewijsclaims in de opgeslagen uitkomst. SUITE mag eerlijk rood blijven;
+     onbekende herkomst, ontbrekende schakels en niet-gereden routes blijven
+     onbekend. Versheid en kandidaatbinding worden hiermee niet bewezen. SLO
+     bewaakt de bestaande afspraak dat de gepubliceerde doelen en sonde gelijk
+     zijn aan de machineconfiguratie. Elke regel heeft een negatieve proef. */
+  'SLO.json': { eigenRatel: 'scripts/registerratels.js' },
+  'SUITE.json': { eigenRatel: 'scripts/registerratels.js' },
+  'HANDELINGPROEF.json': { eigenRatel: 'scripts/registerratels.js' },
+  'KERNHERKOMST.json': { eigenRatel: 'scripts/registerratels.js' },
+  'SCHRIJFANALYSE.json': { eigenRatel: 'scripts/registerratels.js' },
+  'WAAROM.json': { eigenRatel: 'scripts/registerratels.js' },
+  'VERTROUWEN.json': { eigenRatel: 'scripts/registerratels.js' },
+  'AUDITPROEF.json': { eigenRatel: 'scripts/registerratels.js' },
+  'MUTATIEBOEK.json': { eigenRatel: 'scripts/registerratels.js' },
+  'ONBEWEZEN.json': { eigenRatel: 'scripts/registerratels.js' },
+  'ONDERZOEKSKETEN.json': { eigenRatel: 'scripts/registerratels.js' },
+  'RAILVERGELIJK.json': { eigenRatel: 'scripts/registerratels.js' },
+  'ROUTEBRON.json': { eigenRatel: 'scripts/registerratels.js' },
+  'SYMBOLEN.json': { eigenRatel: 'scripts/registerratels.js' },
+  'VERRAAD.json': { eigenRatel: 'scripts/registerratels.js' },
+  'WERELDSTIJL.json': { eigenRatel: 'scripts/registerratels.js' },
   /* CONNECTION_CONSTITUTION.json wordt uitsluitend geschreven nadat alle
      genoemde product-, privacy-, state- en routeproeven groen zijn. Het script
      weigert bij een ontbrekend bewijs of exposed implemented:false capability

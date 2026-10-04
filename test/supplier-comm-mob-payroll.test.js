@@ -178,6 +178,10 @@ test('1. een collega-gesprek: het werkt, en het blijft bij de twee die het voere
   const bijC = await api('/api/supplier/comm/gesprek', { id }, security.token);
   assert.equal(bijC.status, 400, 'een collega van dezelfde zaak las mee in een onderling gesprek');
   assert.match(bijC.body.error, /niet van jou/i);
+  const zoekB = await api('/api/supplier/comm/zoek', { vraag: 'vroege dienst' }, receptie.token);
+  assert.equal(zoekB.status, 200);
+  assert.equal(zoekB.body.treffers.length, 1);
+  assert.equal(zoekB.body.treffers[0].gesprekId, id, 'dezelfde zoekterm vindt het echte bericht voor een deelnemer');
   const zoekC = await api('/api/supplier/comm/zoek', { vraag: 'vroege dienst' }, security.token);
   assert.equal(zoekC.status, 200, zoekC.body.error || '');
   assert.deepEqual(zoekC.body.treffers, [], 'en hij kon er ook niet naar zoeken');
@@ -211,6 +215,11 @@ test('2. lezen, typen en zoeken hebben elk een gevolg aan de andere kant', async
     'wie typt, verschijnt bij de ander -- en niet bij zichzelf');
   const bijMij = await api('/api/supplier/comm/gesprek', { id }, baas.token);
   assert.deepEqual(bijMij.body.gesprek.typt, [], 'de typer ziet zichzelf niet typen');
+  assert.equal((await api('/api/supplier/comm/typt', { id }, receptie.token)).status, 200);
+  const antwoordTypt = await api('/api/supplier/comm/gesprek', { id }, baas.token);
+  assert.equal(antwoordTypt.body.gesprek.typt.length, 1);
+  assert.deepEqual(antwoordTypt.body.gesprek.typt, [receptie.naam],
+    'zijn eigen leesprojectie toont wel de ander, terwijl beide deelnemers typen');
 
   const lees = await api('/api/supplier/comm/lees', { id }, receptie.token);
   assert.equal(lees.status, 200, lees.body.error || '');

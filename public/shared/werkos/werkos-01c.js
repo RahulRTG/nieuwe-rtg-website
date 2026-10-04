@@ -1,5 +1,5 @@
-/* Beweging: alleen een wissel van werkvlak wordt bevestigd (vervolg van de schilstijl). */
-+ `  /* Beweging bevestigt alleen een wissel van werkvlak. */
+/* WerkOS-beweging, vaste rail en contextschil. */
+`  /* Beweging bevestigt alleen een wissel van werkvlak. */
   @media (prefers-reduced-motion:no-preference){
     body.wos-aan .view.active{animation:wosOpen var(--rtg-tijd-normaal,180ms) var(--rtg-veer,ease);}
     @keyframes wosOpen{from{transform:translateY(4px);opacity:.72;}to{transform:none;opacity:1;}}

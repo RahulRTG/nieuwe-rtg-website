@@ -59,6 +59,29 @@ function commitGrond(h, extra) {
   return h.git('rev-parse', 'HEAD').trim();
 }
 
+test('verlopen prestatieschuld leest de echte prestatiegrens en blijft blokkeren tot afbetaling', () => {
+  for (const [sleutel, van, verhoogd] of [['p99Ms', 144, 233], ['eventLoopP99Ms', 64.8, 97.9]]) {
+    metRepo(h => {
+      const basis = commitGrond(h, { prestatie: { [sleutel]: van } });
+      const notities = [{ datum: '2026-05-01', meter: sleutel, reden: 'tijdelijke gemeten achterstand',
+        soort: 'schuld', sleutel, van, vervalt: '2026-05-31' }];
+      h.schrijfNorm(grond({ prestatie: { [sleutel]: verhoogd }, notities }));
+      const open = h.draai('2026-06-01', '--basis', basis);
+      assert.equal(open.code, 1, open.uit);
+      assert.ok(open.uit.includes('de meter staat op ' + verhoogd + ' en hoort terug naar ' + van), open.uit);
+      assert.doesNotMatch(open.uit, /staat niet meer in NORM/);
+      h.schrijfNorm(grond({ prestatie: { [sleutel]: van }, notities }));
+      const betaald = h.draai('2026-06-01', '--basis', basis);
+      assert.equal(betaald.code, 0, betaald.uit);
+      assert.match(betaald.uit, /is afbetaald/);
+      h.schrijfNorm(grond({ prestatie: {}, notities }));
+      const ontbreekt = h.draai('2026-06-01', '--basis', basis);
+      assert.equal(ontbreekt.code, 1, ontbreekt.uit);
+      assert.match(ontbreekt.uit, /staat niet meer in NORM/);
+    });
+  }
+});
+
 /* ==================== 1. DE STILLE VERLAGING ==================== */
 
 test('een lat die met de hand wordt verlaagd ZONDER notitie laat hem zakken', () => {

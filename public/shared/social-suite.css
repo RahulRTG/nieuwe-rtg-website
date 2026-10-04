@@ -204,7 +204,7 @@ body.rtg-social-messages .draad{height:auto!important;background:var(--suite-pap
 body.rtg-social-messages .draad-kop{min-height:77px!important;padding:1rem 1.4rem!important;background:rgba(246,244,239,.91)!important;border-bottom:1px solid var(--suite-line)!important;}
 body.rtg-social-messages .kopknop{width:44px!important;height:44px!important;border-radius:0!important;}
 body.rtg-social-messages .bubbels{padding:clamp(1.25rem,3vw,2.5rem)!important;gap:.7rem!important;background:linear-gradient(180deg,#eeeae2,#f6f4ef)!important;}
-body.rtg-social-messages .bub{border-radius:0!important;padding:.72rem .9rem!important;box-shadow:none!important;}
+body.rtg-social-messages .bub{padding:.72rem .9rem!important;box-shadow:none!important;}
 body.rtg-social-messages .bub.van-mij{background:#ded5be!important;border-color:rgba(98,76,32,.2)!important;}
 body.rtg-social-messages .bub.van-ander{background:rgba(255,255,255,.65)!important;}
 body.rtg-social-messages .invoer{background:#f6f4ef!important;padding:.8rem 1.25rem 1rem!important;}
@@ -438,7 +438,7 @@ body.rtg-social-messages .kopknop:hover{background:#e8dfcf;color:#6e263d;}
 body.rtg-social-messages .bubbels{position:relative;z-index:1;background:linear-gradient(135deg,rgba(174,146,80,.045) 0 1px,transparent 1px 22px),linear-gradient(180deg,#e9e2d5,#f2ecdf)!important;}
 body.rtg-social-messages[data-pane="lijst"] .bubbels::before{content:"Private correspondence";align-self:center;width:min(540px,70%);margin:auto 0 0;padding:1.8rem 1rem 1rem;border-top:1px solid rgba(82,69,40,.2);color:rgba(63,54,36,.36);font:500 clamp(1.5rem,2.6vw,2.5rem)/1 "Bodoni Moda",Georgia,serif;letter-spacing:.1em;text-align:center;text-transform:uppercase;}
 body.rtg-social-messages[data-pane="lijst"] .bubbels::after{content:"Alleen zichtbaar binnen uw eigen kring";align-self:center;width:min(540px,70%);margin:0 0 auto;padding:0 1rem 1.8rem;border-bottom:1px solid rgba(82,69,40,.2);color:rgba(63,54,36,.44);font:600 .58rem/1.4 Inter,system-ui,sans-serif;letter-spacing:.15em;text-align:center;text-transform:uppercase;}
-body.rtg-social-messages .bub{border-radius:0!important;}
+/* Message bubble geometry belongs to rtg-communication-surface.css. */
 body.rtg-social-messages .invoer{position:relative;z-index:1;padding:1rem 1.25rem 1.05rem!important;border-top-color:rgba(45,39,28,.18)!important;background:#1c1d1a!important;color:#eee8dc;}
 body.rtg-social-messages .invoerrij textarea{border-color:rgba(255,255,255,.12)!important;background:rgba(0,0,0,.22)!important;color:#f3ede1!important;}
 body.rtg-social-messages .invoerrij textarea::placeholder{color:#949189;}

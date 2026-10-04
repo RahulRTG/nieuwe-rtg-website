@@ -139,7 +139,7 @@ window.RTGSchoolGeld = (function () {
       '<div class="kpis h-mb60">' +
       [['Gefactureerd', euro(t.gefactureerd)], ['Betaald', euro(t.betaald)],
        ['Terugbetaald', euro(t.terugbetaald)], ['Open', euro(t.open)]]
-        .map(function (x) { return '<div class="kpi"><b style="font-size:1.05rem;">' + x[1] + '</b><span>' + x[0] + '</span></div>'; }).join('') + '</div>' +
+        .map(function (x) { return '<div class="kpi"><b class="schoolgeld-samenvatting" >' + x[1] + '</b><span>' + x[0] + '</span></div>'; }).join('') + '</div>' +
       soorten + '<p class="stil">' + (rap.export || []).length + ' regels staan klaar voor de boekhouding, plat en compleet: soort, bedrag, betaald, open, datum.</p></div>';
   }
 

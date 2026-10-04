@@ -20,6 +20,13 @@
   .wd-data-row strong,.wd-data-row span.wd-muted{display:block}
   .wd-data-row strong{font-weight:500;font-size:.8rem}
   .wd-widget-empty{margin:.5rem 0;line-height:1.7;color:var(--wh-soft);min-height:3.5rem}
+  /* Space follows real content. Authentication, failed reads and empty records
+     do not reserve the height of a populated personal widget. */
+  .wd-widget-content[data-compact="true"]:is([data-state="loading"],[data-state="guest"],[data-state="locked"],[data-state="error"],[data-state="capability"],[data-content-state="empty"]){min-height:0}
+  .wd-widget-content[data-compact="true"] .wd-widget-empty{min-height:0;margin:.15rem 0 .45rem;line-height:1.5}
+  .wd-widget-content[data-compact="true"][data-state="guest"] .wd-widget-empty{font-size:.7rem;margin:0 0 .15rem}
+  .wd-widget-content[data-compact="true"]:is([data-state="error"],[data-state="locked"],[data-content-state="empty"]) .wd-primary{margin-top:.5rem}
+  .wd-capability-subject{margin:.1rem 0;color:var(--wh-soft);font-size:.74rem;line-height:1.5}
   .wd-widget-warning{padding:.5rem;border-inline-start:2px solid var(--wh-gold);font-size:.72rem;color:var(--wh-soft)}
   .wd-widget-updated{display:block;font:400 .58rem/1.6 Inter,sans-serif;color:var(--wh-soft);margin-top:.65rem}
   .wd-date-hero{display:flex;gap:.8rem;align-items:center;margin:.7rem 0}

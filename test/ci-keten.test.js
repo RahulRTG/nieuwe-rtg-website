@@ -98,6 +98,42 @@ test('de echte werkstromen voldoen aan alle vier de regels', () => {
   assert.deepEqual(controleer(map), []);
 });
 
+test('de ronde plant onafhankelijke refs en scopes zonder lopende metingen af te breken', () => {
+  const fs = require('node:fs');
+  const { ontleed } = require('../scripts/lib/werkstroom');
+  const workflow = ontleed(fs.readFileSync(path.join(__dirname, '..', '.github/workflows/ronde.yml'), 'utf8'));
+  assert.equal(workflow.concurrency.group, "ronde-${{ github.ref }}-${{ inputs.scope || 'full' }}");
+  assert.equal(workflow.concurrency['cancel-in-progress'], 'false');
+});
+
+test('prestaties meten de volledige gevalideerde kandidaat, met afzonderlijke workflowherkomst', () => {
+  const fs = require('node:fs');
+  const { spawnSync } = require('node:child_process');
+  const { ontleed } = require('../scripts/lib/werkstroom');
+  const workflow = ontleed(fs.readFileSync(path.join(__dirname, '..', '.github/workflows/ronde.yml'), 'utf8'));
+  const job = workflow.jobs['performance-debt'];
+  assert.equal(job.env.RTG_PERFORMANCE_COMMIT, '${{ inputs.candidate || github.sha }}');
+  assert.equal(job.env.RTG_PERFORMANCE_WORKFLOW_COMMIT, '${{ github.sha }}');
+  const checkout = job.steps.findIndex(step => step.uses?.startsWith('actions/checkout@'));
+  assert.equal(checkout, 1, 'candidate validation must run before any checkout');
+  assert.equal(job.steps[checkout].with.ref, '${{ env.RTG_PERFORMANCE_COMMIT }}');
+  const check = job.steps[0].run;
+  const full = 'b'.repeat(40);
+  const invoke = (candidate, runner = full) => spawnSync('bash', ['-e', '-c', check], {
+    env: { ...process.env, RTG_PERFORMANCE_COMMIT: candidate, RTG_PERFORMANCE_WORKFLOW_COMMIT: runner }
+  }).status;
+  assert.equal(invoke(full), 0);
+  for (const invalid of ['', 'main', full.slice(0, 12), full + '0', full + '\n', '$(exit 0)']) {
+    assert.notEqual(invoke(invalid), 0, 'reject invalid candidate ' + JSON.stringify(invalid));
+    assert.notEqual(invoke(full, invalid), 0, 'reject invalid workflow identity');
+  }
+  const provenance = job.steps.find(step => step.run?.includes('WORKFLOW-IDENTITY.json'));
+  assert.match(provenance.run, /"candidateCommit".*"workflowCommit"/);
+  assert.match(provenance.run, /"\$RTG_PERFORMANCE_COMMIT" "\$RTG_PERFORMANCE_WORKFLOW_COMMIT"/);
+  const upload = job.steps.find(step => step.uses?.startsWith('actions/upload-artifact@'));
+  assert.equal(upload.with.name, 'performance-debt-${{ env.RTG_PERFORMANCE_COMMIT }}');
+});
+
 test('volledige bewijsconsumenten hangen niet transitief aan de overgeslagen incrementele route', () => {
   const fs = require('node:fs');
   const workflow = fs.readFileSync(path.join(__dirname, '..', '.github/workflows/ci.yml'), 'utf8');

@@ -202,7 +202,7 @@ omlaag.
 
 ## `apps/foundation/sessie.js`
 
-`public/apps/foundation/sessie/` -- 4 delen, 404 regels in de delen
+`public/apps/foundation/sessie/` -- 4 delen, 405 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -213,7 +213,7 @@ omlaag.
 
 ## `apps/leverancier.js`
 
-`public/apps/leverancier/` -- 115 delen, 9834 regels in de delen
+`public/apps/leverancier/` -- 115 delen, 9836 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -810,12 +810,12 @@ omlaag.
 
 ## `shared/rtg-edge-smart-menu.js`
 
-`public/shared/rtg-edge-smart-menu/` -- 2 delen, 250 regels in de delen
+`public/shared/rtg-edge-smart-menu/` -- 2 delen, 295 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `rtg-edge-smart-menu-00.js` | Twee gezichten, één hamburger: lokale context en heel RTG blijven in het bestaande Edge-menu |
-| `rtg-edge-smart-menu-01.js` | De menupanelen, focus en koppeling aan de bestaande Edge-schil |
+| `rtg-edge-smart-menu-01.js` | Dezelfde appcatalogus als de widgets: mobiel mag geen apps verliezen |
 
 ## `shared/rtg-schil.js`
 
@@ -893,14 +893,14 @@ omlaag.
 
 ## `shared/werkos.js`
 
-`public/shared/werkos/` -- 7 delen, 686 regels in de delen
+`public/shared/werkos/` -- 7 delen, 692 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `werkos-01.js` | RTG Werk-OS |
-| `werkos-01b.js` | De onderbalk is een onyx commandobalk, geen los merkobject |
-| `werkos-01bb.js` | Op de telefoon blijft de driedelige WerkOS-schil volledig bruikbaar |
-| `werkos-01c.js` | Beweging bevestigt alleen een wissel van werkvlak |
+| `werkos-01b.js` | WerkOS-commandobalk, Command Center en tabletindeling |
+| `werkos-01bb.js` | WerkOS op mobiel: compacte rail, context en bereikbare bediening |
+| `werkos-01c.js` | WerkOS-beweging, vaste rail en contextschil |
 | `werkos-02.js` | Command Center |
 | `werkos-03.js` | bouwen en spiegelen |
 | `werkos-04.js` | DE BORDSCHIL: het vlak dat over de app komt met de werkvlakken erin |

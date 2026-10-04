@@ -112,8 +112,9 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-naleesronde-b').CONTRACTEN,
   require('./mutatiecontracten-naleesronde-c').CONTRACTEN,
   require('./mutatiecontracten-opvangwijzer').CONTRACTEN,
-  require('./mutatiecontracten-horeca-correctie').CONTRACTEN,
   require('./mutatiecontracten-inhaal').CONTRACTEN,
+  // horecacorrectie en de twee teruggaveloketten
+  require('./mutatiecontracten-teruggave').CONTRACTEN,
   /* De nazorg van een reisaanvraag: vier routes die samen de weg terug uit een
      toezegging zijn. Eigen bestand omdat ze een afweging delen -- zie de kop. */
   require('./mutatiecontracten-reisnazorg').CONTRACTEN,
@@ -139,15 +140,11 @@ const CONTRACTEN = Object.assign({},
      loket zijn. Eigen bestand omdat het interessante in het VERSCHIL tussen die
      twee helften zit -- zie de kop. */
   require('./mutatiecontracten-tweedehand').CONTRACTEN,
-  // het teruggaverecht van een reis uitvoeren (passkey, vier ogen vanaf duizend euro)
-  require('./mutatiecontracten-reisteruggave').CONTRACTEN,
   require('./mutatiecontracten-afstemming').CONTRACTEN,
   require('./mutatiecontracten-wonen').CONTRACTEN,
   require('./mutatiecontracten-project-room').CONTRACTEN,
   // de zware poort: drie ceremonieloketten, met opzet niet herhaalbaar
   require('./mutatiecontracten-zwaar').CONTRACTEN,
-  // de teruggave na een horecacorrectie, door de manager van de zaak, per wijze
-  require('./mutatiecontracten-horecateruggave').CONTRACTEN,
   /* Het eigenaarsherstel: zeven routes, per stuk beantwoord of een herhaling
      een ander antwoord krijgt. Eigen bestand, zie de kop daar. */
   require('./mutatiecontracten-herstel').CONTRACTEN,

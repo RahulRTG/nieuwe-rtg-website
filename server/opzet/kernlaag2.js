@@ -136,11 +136,8 @@ Object.assign(kern, require('../kern/pestgrens')({ db, save }));
    stijl van een reserveerplatform; kies datum en gezelschap en zie de vrije
    tijdsloten. Reserveren loopt via het bestaande /api/reserveer. */
 Object.assign(kern, require('../kern/foodcourt').maakFoodcourt({ db, save, crypto }));
-/* Het RTG-reisbureau (kern/reisbureau.js): een echt reisbureau in de leden-app;
-   leden bladeren door de samengestelde reizen en vragen er een aan tegen de
-   nettoprijs. De aanvraag landt bij een RTG-reisadviseur (aangevraagd, mens
-   bevestigt). De visumtaak-haak is laat gebonden (kern/visumtaak.js komt in
-   kernlaag7) en optioneel. */
+/* Het RTG-reisbureau (kern/reisbureau.js): de aanvraag landt bij een
+   RTG-reisadviseur, een mens bevestigt. De haken zijn laat gebonden. */
 Object.assign(kern, require('../kern/reisbureau').maakReisbureau({ db, save, crypto, anthropic, accounts,
   visumtaakVan: () => kern.visumtaak, meldLidVan: () => kern.meldLid, reisbetalingVan: () => kern.reisbetaling }));
 /* De geldgebeurtenis van een reis. Waarom, staat in de kop daar. */

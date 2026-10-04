@@ -16,7 +16,7 @@ const AFGETEKEND = {
 };
 const BEWIJS = {
   gemeten: 'test/reisteruggave.test.js tegen een echte server: de gedeelde code krijgt 403, uitvoeren ' +
-    'zonder passkey 403, met passkey boekt het een keer en een tweede besluit geeft 409; vanaf duizend ' +
+    'zonder passkey 401 (bevestigingNodig), met passkey boekt het een keer en een tweede besluit geeft 409; vanaf duizend ' +
     'euro wordt het een aanvraag die een tweede mens met zijn eigen passkey bevestigt.',
   op: '2026-10-04'
 };

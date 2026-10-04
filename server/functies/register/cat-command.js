@@ -65,7 +65,7 @@ module.exports = [
   { id: 'command-besturen', categorie: 'RTG-Backoffice', naam: 'RTG Command: besturen', standaard: true, doelgroepen: ['intern'],
     uitleg: 'Beleidsregels zetten, simuleren, agents begrenzen en zware rechten tijdelijk uitdelen.',
     paden: ['/api/command/beleid', '/api/command/simulatie', '/api/command/agent', '/api/command/agents',
-      '/api/command/recht', '/api/command/rechten', '/api/command/mandaat',
+      '/api/command/recht', '/api/command/rechten',
       '/api/command/canary',
       /* DE UITROLREGIE, en het API-SPOOR hierboven, kwamen met de andere tak mee
          en stonden daar in cat-partners.js. Bij de samenvoeging van 24 augustus is

@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-30T20:13:02.873Z",
-    "commit": "ec186c7b2",
+    "op": "2026-10-04T13:03:59.807Z",
+    "commit": "f3b95137",
     "boomVuil": false,
-    "boomAnders": 7,
+    "boomAnders": 4,
     "instrument": "scripts/doorbelasting.js",
-    "node": "v26.10.0"
+    "node": "v22.22.0"
   },
   "graad": "gemeten",
   "wat": "of de doorbelasting van RTG aantoonbaar te classificeren is: per vorm en per euro",
@@ -21,8 +21,8 @@
   ],
   "regel": "onbekend is een uitkomst en nooit een aanname: een bedrag zonder aantoonbare herkomst wordt niet naar rtgEigen of derdePartij geduwd, want beide fouten zijn onzichtbaar en komen allebei iemand goed uit",
   "vorm": {
-    "vormenTotaal": 1549,
-    "geldvormen": 219,
+    "vormenTotaal": 1551,
+    "geldvormen": 221,
     "volgbaar": 37,
     "perHerkomstveld": {
       "bron": 19,
@@ -32,7 +32,7 @@
       "leverancier": 8,
       "economischeHerkomst": 4
     },
-    "nietVolgbaar": 182,
+    "nietVolgbaar": 184,
     "volgbareModules": [
       "server/kern/appbieb.js",
       "server/kern/betaalopdracht/index.js",
@@ -198,7 +198,7 @@
         "volgbaar": 1
       },
       "server/kern/horeca": {
-        "geldvormen": 3,
+        "geldvormen": 5,
         "volgbaar": 2
       },
       "server/kern/koppel.js": {

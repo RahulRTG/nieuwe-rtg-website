@@ -90,27 +90,51 @@ app.post('/api/supplier/ticket/deurverkoop', supplierAuth, async (req, res) => {
   const personen = Math.min(20, Math.max(1, parseInt(req.body.personen, 10) || 1));
   const vip = req.body.vip === true;
   const datum = new Date().toISOString().slice(0, 10);
-  const al = ticketsVoorSlot(s.code, act.id, datum, tijd).reduce((n, t) => n + (t.personen || 1), 0);
-  if (al + personen > act.capaciteit) return res.status(409).json({ error: 'Vol: nog ' + Math.max(0, act.capaciteit - al) + ' plekken voor dit tijdslot.' });
   const total = Math.round((act.prijs || 0) * personen * 100) / 100;
   const method = req.body.method === 'rtgpay' ? 'rtgpay' : 'contant';
-  let betaler = null;
-  if (method === 'rtgpay' && total > 0) {
-    const p = await pay.kasInt({ supplierCode: s.code, code: req.body.payCode, centen: Math.round(total * 100), oms: s.name + ' - ' + act.name, idem: req.body.idem });
-    if (p.error) return res.status(p.status || 400).json({ error: p.error });
-    betaler = p.van;
+  const betaalt = method === 'rtgpay' && total > 0;
+  const idem = req.body.idem ? String(req.body.idem).slice(0, 120) : null;
+
+  /* EERST DE PLEK, DAN HET GELD. Tellen -> await kasInt -> toevoegen liet twee
+     kopers dezelfde plekken verkopen zodra de betaling op echte I/O wachtte.
+     Zoals kern/lidacties.js en kern/festival/verkoop.js: het kaartje staat er
+     synchroon als `wacht-op-betaling` (ticketsVoorSlot telt het 30 min mee).
+     Een retry met dezelfde idem-sleutel hergebruikt die vasthouding. */
+  const vastgehouden = betaalt && idem
+    ? ticketsVoorSlot(s.code, act.id, datum, tijd).find(t => t.deur && !t.paid && t.deurIdem === idem && t.personen === personen)
+    : null;
+  if (!vastgehouden) {
+    const al = ticketsVoorSlot(s.code, act.id, datum, tijd).reduce((n, t) => n + (t.personen || 1), 0);
+    if (al + personen > act.capaciteit) return res.status(409).json({ error: 'Vol: nog ' + Math.max(0, act.capaciteit - al) + ' plekken voor dit tijdslot.' });
   }
-  const ticket = {
+  const ticket = vastgehouden || {
     ref: 'D' + crypto.randomBytes(4).toString('hex'),
     kind: 'ticket',
     supplierCode: s.code, supplierName: s.name,
-    customerTier: null, customerKey: null, customerCodename: betaler || 'Deurverkoop',
+    customerTier: null, customerKey: null, customerCodename: 'Deurverkoop',
     service: { id: act.id, name: act.name, soort: 'ticket' },
     activiteitId: act.id, datum, tijd, personen, vip, deur: true,
     price: total, wanneer: datum + ' ' + tijd,
     betaalMoment: 'deur', status: 'bevestigd', paid: true, at: new Date().toISOString()
   };
-  kern.boekingenVoegToe(ticket);
+  let betaler = null;
+  if (betaalt) {
+    if (!vastgehouden) {
+      Object.assign(ticket, { status: 'wacht-op-betaling', paid: false, deurIdem: idem });
+      kern.boekingenVoegToe(ticket);
+      save();
+    }
+    const p = await pay.kasInt({ supplierCode: s.code, code: req.body.payCode, centen: Math.round(total * 100), oms: s.name + ' - ' + act.name, idem: req.body.idem });
+    if (p.error) {
+      // onbekende uitkomst: plek blijft vast (onbekend is geen mislukking)
+      if (p.code !== 'KASCLAIM_HERVATBAAR') { ticket.status = 'geweigerd'; save(); }
+      return res.status(p.status || 400).json(p.code ? { error: p.error, code: p.code } : { error: p.error });
+    }
+    betaler = p.van;
+    Object.assign(ticket, { status: 'bevestigd', paid: true, customerCodename: betaler || 'Deurverkoop' });
+  } else {
+    kern.boekingenVoegToe(ticket);
+  }
   const bonnen = db.data.posSales[s.code] = (db.data.posSales[s.code] || []);
   bonnen.unshift({
     id: crypto.randomBytes(4).toString('hex'), bon: ticket.ref, actor: req.actor.name,

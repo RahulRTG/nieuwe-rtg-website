@@ -74,10 +74,8 @@ const logboek = require('./log');
 const log = logboek.log;
 const testomgeving = require('./testomgeving');
 const betaal = require('./betaal');
-const hospitalityProviderBewijs = require('./kern/reservering/providerbewijs')();
-const hospitalityDomainBewijs = require('./kern/reservering/domeinbewijs')({
-  vindReservering: id => (db.data.reserveringen || []).find(r => r.id === id)
-});
+// Hospitality-issuer en Trust & Evidence Plane: ./opzet/vertrouwensvlak.js.
+const vertrouwensvlak = require('./opzet/vertrouwensvlak')({ db, save, betaal });
 const systeemKlok = require('./lib/klok');
 const { schoon, ledenPrijs, rondEuro, entreeCode, pickupCode, veiligGelijk } = require('./kern/util');
 const { totpOk } = require('./kern/totp');
@@ -705,31 +703,14 @@ const { sseToSupplier, sseToOffice, notifySupplier, supplierIndex,
   findSupplier, supplierAuth, persoonsPoort, logActivity } =
   require('./opzet/leverancierpoort')({ db, save, crypto, rtgKlok, sessionFor, DEMO, accounts,
     grootSupplierSync, busGeef: () => bus, kernGeef: () => kern,
-    markeerHospitalityRequest: hospitalityProviderBewijs.authenticeer });
+    markeerHospitalityRequest: vertrouwensvlak.markeerHospitalityRequest });
 
 /* De dienstenlaag -- live updates (SSE), meldingen en web-push, en de diensten
    die daarop leunen (archief, beveiliging, de Wacht, RTmail, naamlaag, antivirus)
    plus de poortwachters resolveSession en auth -- staat in ./opzet/diensten.js.
    De in- en uitgangslijsten zijn uitgerekend met scripts/blokscan.js, niet met
    de hand bijgehouden. */
-/* Trust & Evidence Plane V2 start additief in schaduwstand. De opslag bevat
-   uitsluitend ketenbewijs en digests; domeinobjecten blijven bij hun eigenaar. */
-function verifieerTrustProviderBewijs(token, expected) {
-  let eersteFout = null;
-  for (const verify of [betaal.verifieerProviderBewijs, hospitalityProviderBewijs.verify]) {
-    try { return verify(token, expected); }
-    catch (error) {
-      if (error && error.code === 'INGRESS_PROOF_REQUIRED') throw error;
-      if (!eersteFout) eersteFout = error;
-    }
-  }
-  throw eersteFout || Object.assign(new Error('Onbekend providerbewijs.'), { code: 'INGRESS_PROOF_INVALID' });
-}
-const trustPlane = require('./kern/bewijsvlak/runtime').configure({
-  db, save, mode: 'shadow', issuer: 'rtg:platform',
-  verifyProviderProof: verifieerTrustProviderBewijs,
-  verifyExternalOwnerProof: hospitalityDomainBewijs.verify
-});
+const trustPlane = vertrouwensvlak.trustPlane(); // schaduwstand, zie ./opzet/vertrouwensvlak.js
 
 const {
   AUTHOR_TIER, SSE_BUFFER_TTL, aiPoort, antivirus, archief, atelierweb, auth, automatisering, 
@@ -1666,36 +1647,7 @@ const {
   db, save, crypto, findSupplier, notify, notifySupplier, sseToCustomer,
   sseToSupplier, sseToOffice, zijnVrienden, ticketsVoorSlot, optieAan,
   trustPlane,
-  bewijsHospitalityBesluit: (req, reservationRef, reservation, commitmentEvidenceId) => {
-    const domain = hospitalityDomainBewijs.commitment(reservationRef, reservation);
-    const trustExternal = require('./kern/bewijsvlak/v3-external-hook');
-    const commitment = trustExternal.reservation('commitment', { reservationRef,
-      provider: domain.provider, ownerProof: domain.proof, ownerAssertion: domain.assertion,
-      ownerEventRef: domain.eventRef, at: reservation.at, value: domain.value });
-    if (!commitment || !commitment.evidenceId) {
-      const error = new Error('Hospitality-aanvraag kon niet als domeinbewijs worden vastgelegd.');
-      error.code = commitment && commitment.code || 'HOSPITALITY_COMMITMENT_EVIDENCE_FAILED';
-      throw error;
-    }
-    const receipt = hospitalityProviderBewijs.bevestiging(req, reservationRef, reservation);
-    const confirmed = trustExternal.reservation('confirmed', { reservationRef,
-      provider: receipt.provider, providerProof: receipt.proof, providerAssertion: receipt.assertion,
-      at: reservation.beslotenAt, value: { providerReservationRef: reservation.id,
-        status: 'confirmed', decisionRef: reservation.besluitAudit.decisionRef } });
-    if (!confirmed || !confirmed.evidenceId) {
-      const error = new Error('Hospitality-bevestiging kon niet als bewijs worden vastgelegd.');
-      error.code = confirmed && confirmed.code || 'HOSPITALITY_EVIDENCE_FAILED';
-      throw error;
-    }
-    const refs = [commitment.evidenceId, confirmed.evidenceId].filter(Boolean);
-    const claim = trustExternal.assess(reservationRef, refs, reservation.beslotenAt);
-    if (!claim || !claim.claimId) {
-      const error = new Error('Hospitality-bevestiging kon niet worden beoordeeld.');
-      error.code = claim && claim.code || 'HOSPITALITY_ASSESSMENT_FAILED';
-      throw error;
-    }
-    return Object.freeze({ confirmed, claim });
-  },
+  bewijsHospitalityBesluit: vertrouwensvlak.bewijsHospitalityBesluit,
   // de gedekte tafel (kern/tafeldek.js) wordt pas in kernlaag7 gebouwd; laat gebonden
   tafeldekVan: () => kern.tafeldek,
   /* RTG Pay wordt pas in kernlaag3 gebouwd -- ver na deze regel -- en de

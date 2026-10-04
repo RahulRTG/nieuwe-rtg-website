@@ -110,6 +110,24 @@ test('een browserexportmutatie ontneemt de API en houdt de JavaScript geldig', (
   assert.equal(muteer('// w.RTGProef = {};', op('browser-export-weg')), null);
 });
 
+test('een omgekeerde ontkenning neemt de andere tak zonder tekst of ongelijkheid te veranderen', () => {
+  const bron = 'if (!ok) return 1; return 2;';
+  const voor = new Function('ok', bron), na = new Function('ok', muteer(bron, op('voorwaarde-omkeren')));
+  assert.deepEqual([voor(true), voor(false)], [2, 1]);
+  assert.deepEqual([na(true), na(false)], [1, 2]);
+  assert.equal(muteer('if (x !== y) return 1;', op('voorwaarde-omkeren')), null);
+  assert.equal(muteer("const tekst='if (!ok)'; // if (!ok)", op('voorwaarde-omkeren')), null);
+});
+
+test('een relatieve API-actie verandert het aangeroepen doel, niet andere argumenten of uitleg', () => {
+  const bron = "/* api('uitleg') */ const tekst=\"api('tekst')\"; office.api('open', {id:7});";
+  let gezien;
+  new Function('office', muteer(bron, op('api-actie-weg')))({api: (...args) => { gezien = args; }});
+  assert.deepEqual(gezien, ['__rtg_mutatie__', {id:7}]);
+  assert.equal(muteer("const tekst=\"api('open')\";", op('api-actie-weg')), null);
+  assert.equal(muteer('api(doel)', op('api-actie-weg')), null);
+});
+
 test('getal+1 verhoogt het eerste getal in CODE met een', () => {
   assert.equal(muteer('const cap = 5;', op('getal+1'), 0), 'const cap = 6;');
   assert.equal(muteer('const a = 0; const b = 9;', op('getal+1'), 1), 'const a = 0; const b = 10;',

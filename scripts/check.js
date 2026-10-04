@@ -3417,6 +3417,7 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['server/bedrijf/praktijk-betalen-routes.js', 'Betaalopdracht, ontvanger en hervatopties moeten duurzaam staan vóór extern netwerkverkeer.'],
     ['server/bedrijf/praktijk-gast.js', 'Gastakkoord op een voorstel wordt pas bevestigd na duurzame opslag van dezelfde versie en beslissing.'],
     ['server/db/duurzaam.js', 'hier WOONT de primitive sinds db/index.js is opgeknipt'],
+    ['server/db/sqlite-duurzaam.js', 'bezit de SQLite FULL-sync transactie en controleert de duurzame bevestiging van de commit'],
     ['server/db/bijeen.js', 'de bundel met de duurzaam-vlag is de enige indirecte weg erheen'],
     ['server/db/index.js', 'draagt de vlag van de aanroeper door naar de bundel; kiest zelf niets'],
     ['scripts/check.js', 'deze regel zelf noemt zijn naam'],

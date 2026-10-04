@@ -117,6 +117,18 @@ const OPERATOREN = [
   // Bestemmingen en publieke browser-API's zijn ook gedrag. Een ontbrekende
   // route of export is een echte regressie, ook als geen conditie verandert.
   { naam: 'browser-export-weg', zoek: /\b((?:window|w)\.RTG\w+\s*=\s*)(?!=)/, zet: '$1undefined && ' },
+  { naam: 'voorwaarde-omkeren', zoek: /\bif\s*\(\s*!(?!=)/, zet: 'if (' },
+  // Een relatieve API-aanroep is net zo goed een bestemming als /api/....
+  // Alleen het eerste letterlijke argument verandert, niet de API zelf.
+  {
+    naam: 'api-actie-weg',
+    vind: bron => {
+      let tokens; try { tokens = require('./ast/lexer').lex(bron); } catch (e) { return []; }
+      return tokens.filter((t, i) => t.type === 'string' && tokens[i - 1]?.value === '(' && tokens[i - 2]?.value === 'api')
+        .map(t => ({ start: t.start, eind: t.end }));
+    },
+    maak: tekst => tekst[0] + '__rtg_mutatie__' + tekst.at(-1)
+  },
   {
     naam: 'route-doel-weg',
     vind: bron => {
@@ -542,6 +554,18 @@ const EIGEN_MODULE = new Map([
   ['appwerkt-bestemming.e2e.js', ['scripts/lib/bestemming.js']],
   ['csp.e2e.js', ['server/middleware/voordeur.js']],
   ['browserpoort.e2e.js', ['test/helper.js']],
+  // Deze browserproeven laden clientgedrag of toetsen een keuringsmodule;
+  // een gewijzigde serverrespons raakt hun beweringen niet.
+  ['deelmenuwacht.e2e.js', ['public/shared/deelmenu.js']],
+  ['deelmenuronde.e2e.js', ['public/shared/deelmenu.js']],
+  ['leegtemeting.e2e.js', ['scripts/mobielkeuring.js']],
+  ['liegend-scherm.e2e.js', ['scripts/lib/schermleugen.js']],
+  ['rtg-dev.e2e.js', ['scripts/rtg-dev.js']],
+  ['praktijk-betalen.e2e.js', ['public/apps/werk/praktijk-betalen.js']],
+  ['media.e2e.js', ['public/shared/media.js']],
+  ['media-studio-pro.e2e.js', ['public/apps/media/studio-pro-engine.js']],
+  ['werkruimte.e2e.js', ['public/shared/rtg-schil.js']],
+  ['foundation-premium-ui.test.js', ['public/apps/foundation/sw.js', 'public/apps/foundation/premium.js']],
   ['living-world.test.js', ['server/kern/living-world/actions.js']],
   ['living-world-sources.test.js', ['server/kern/living-world/actions.js']],
   ['living-world-sqlite.test.js', ['server/kern/living-world/index.js']],

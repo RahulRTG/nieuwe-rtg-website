@@ -49,10 +49,10 @@
         '<div class="h-mt35">' + (d.bewijs || []).map(function (b) {
           return '&bull; ' + esc(BEWIJSNAAM[b.soort] || b.soort) +
             (b.detail ? ': ' + esc(b.detail) : '') +
-            (b.door ? ' <span style="opacity:.8;">(' + esc(b.door) + ')</span>' : '') +
-            ' <span style="opacity:.7;">' + esc(String(b.at).slice(0, 10)) + '</span>';
+            (b.door ? ' <span class="h-zacht80">(' + esc(b.door) + ')</span>' : '') +
+            ' <span class="h-zacht70">' + esc(String(b.at).slice(0, 10)) + '</span>';
         }).join('<br>') + '</div>' +
-        '<div style="margin-top:.35rem;opacity:.85;">' + esc(d.uitleg) + '</div>';
+        '<div class="h-mt35 h-zacht">' + esc(d.uitleg) + '</div>';
     } catch (e) { vak.textContent = e.message; }
   }
 
@@ -79,8 +79,8 @@
             : '<button class="knop stil" data-naar="' + esc(v.id) + '" type="button">Open</button>') + '</div>';
       }).join('');
       document.getElementById('lesInhoud').innerHTML = '<b>' + esc(d.doel.naam) + '</b> (' + esc(d.doel.vak) + ')' +
-        '<p id="lesTekst" style="margin-top:.4rem;line-height:1.7;">' + esc(d.doel.les) + '</p>' +
-        (uitleg ? '<div class="rij h-mt50"><span class="sec" style="margin:0;">Leg anders uit</span>' + uitleg + '</div>' : '') +
+        '<p id="lesTekst" class="h-mt40 h-lh170">' + esc(d.doel.les) + '</p>' +
+        (uitleg ? '<div class="rij h-mt50"><span class="sec h-m0">Leg anders uit</span>' + uitleg + '</div>' : '') +
         (onder ? '<div class="sec h-mt80">Wat hier onder ligt</div>' + onder +
           ((d.ontbreekt || []).length
             ? '<p class="leeg">Hiervan staat nog open: ' + esc(d.ontbreekt.map(function (x) { return x.naam; }).join(', ')) +

@@ -153,3 +153,29 @@
    dus hij klopt ook op een pagina zonder themalaag. Gemeten 11,04:1 licht en
    16,16:1 donker. */
 .h-witlink { color: light-dark(#3A3733, #FFFFFF) !important; text-decoration: underline !important; }
+
+/* Vierde ronde, 4 oktober 2026: de laatste losse attributen uit de school-,
+   schoolpartner- en ledenschermen waarvan de uitzondering in NORM.json was
+   verlopen. Elke klasse zet exact wat het attribuut zette; een samengesteld
+   attribuut is een combinatie van deze klassen geworden, niet een eigen naam. */
+.h-mt65 { margin-top: .65rem !important; }
+.h-my25 { margin: .25rem 0 !important; }
+.h-m0 { margin: 0 !important; }
+.h-kop50 { margin: .5rem 0 0 !important; }
+.h-pl100 { padding-left: 1rem !important; }
+.h-zacht90 { opacity: .9 !important; }
+.h-zacht80 { opacity: .8 !important; }
+.h-zacht70 { opacity: .7 !important; }
+.h-fs80 { font-size: .8rem !important; }
+.h-fs102 { font-size: 1.02rem !important; }
+.h-fs105 { font-size: 1.05rem !important; }
+.h-fw400 { font-weight: 400 !important; }
+.h-lh160 { line-height: 1.6 !important; }
+.h-lh170 { line-height: 1.7 !important; }
+.h-meta76 { color: var(--soft) !important; font-size: .76rem !important; }
+.h-kolom6 { flex: 0 1 6rem !important; }
+.h-breed6 { max-width: 6rem !important; }
+.h-wijd11 { width: 11rem !important; }
+.h-rek12 { flex: 1 !important; min-width: 12rem !important; }
+.h-rek13 { flex: 1 !important; min-width: 13rem !important; }
+.h-gap30 { gap: .3rem !important; }

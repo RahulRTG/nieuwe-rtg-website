@@ -18,7 +18,7 @@
         (t.thema ? ' · ' + escHtml(t.thema) : '')+'</span>'+
         '<span class="sub">'+t.toegezegd+' van '+t.genodigden.length+' toegezegd, '+t.plaatsen+' plaatsen</span>'+
         '<span class="sub">'+t.genodigden.map(g => escHtml(g.codenaam)+' ('+g.status+')').join(', ')+'</span></div>'+
-        '<div class="rr"><input data-nodig="'+escHtml(t.id)+'" placeholder="Codenaam erbij" style="width:11rem;">'+
+        '<div class="rr"><input data-nodig="'+escHtml(t.id)+'" placeholder="Codenaam erbij" class="h-wijd11">'+
         '<button class="hbtn" data-nodigknop="'+escHtml(t.id)+'">Uitnodigen</button></div></div>').join('')
         : '<div class="row"><div class="rl"><span class="sub">Nog geen tafels samengesteld.</span></div></div>';
       el.querySelectorAll('[data-nodigknop]').forEach(b => b.addEventListener('click', async () => {

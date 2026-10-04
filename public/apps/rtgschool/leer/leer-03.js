@@ -32,11 +32,11 @@
             var knop = x.soort === 'herhalen' ? 'herhaal' : 'oefen';
             return '<div class="doel"><span>' + esc(x.naam) +
               ' <span class="h-meta">(' + esc(x.vak) + ')</span><br>' +
-              '<span style="color:var(--soft);font-size:.76rem;">' + esc(x.waarom) + '</span></span>' +
+              '<span class="h-meta76">' + esc(x.waarom) + '</span></span>' +
               '<span class="rij"><button class="knop h-chip" data-' + knop + '="' + esc(x.doel) + '">Doen</button></span></div>';
           }).join('')
         : '<div class="leeg">' + esc(d.let || '') + '</div>') +
-        '<p class="leeg" style="margin:.5rem 0 0;">' + esc(d.uitleg) + '</p>';
+        '<p class="leeg h-kop50">' + esc(d.uitleg) + '</p>';
       el.querySelectorAll('[data-oefen]').forEach(function (b) {
         b.addEventListener('click', function () { oefenStart(b.dataset.oefen); });
       });
@@ -107,7 +107,7 @@
          andere manier uitgelegd. Komt de server er niet uit, dan staat er
          niets extra's: een verzonnen duiding stuurt je de verkeerde kant op. */
       if (d.denkfout) regel += '<div class="h-mt40"><b>' + esc(d.denkfout.naam) + '.</b> ' + esc(d.denkfout.uitleg) + '</div>';
-      if (d.anders) regel += '<div style="margin-top:.35rem;opacity:.9;"><i>Anders uitgelegd (' + esc(d.anders.soort) + '):</i> ' + esc(d.anders.tekst) + '</div>';
+      if (d.anders) regel += '<div class="h-mt35 h-zacht90"><i>Anders uitgelegd (' + esc(d.anders.soort) + '):</i> ' + esc(d.anders.tekst) + '</div>';
       if (d.klaar) {
         document.getElementById('oefenOpties').innerHTML = '';
         document.getElementById('oefenIn').parentElement.hidden = true;

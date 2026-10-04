@@ -23,7 +23,7 @@ window.SPart.toetskeuring = function () {
     vak.innerHTML =
       '<div class="rij">' +
       '<input class="veld" id="kvDoelen" maxlength="300" placeholder="Leerdoelen, gescheiden door komma s" aria-label="Leerdoelen">' +
-      '<input class="veld" id="kvPer" type="number" min="1" max="20" value="3" aria-label="Vragen per leerdoel" style="max-width:6rem;">' +
+      '<input class="veld h-breed6" id="kvPer" type="number" min="1" max="20" value="3" aria-label="Vragen per leerdoel">' +
       '<button class="knop" id="kvKeur" type="button">Wat meet dit</button></div>' +
       '<div id="kvUit" class="stil h-mt50"></div>';
     q('kvKeur').addEventListener('click', function () {

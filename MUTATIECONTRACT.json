@@ -1,28 +1,28 @@
 {
  "stempel": {
-  "op": "2026-09-30T20:12:59.038Z",
-  "commit": "ec186c7b2",
+  "op": "2026-10-04T10:58:29.633Z",
+  "commit": "3b886e86",
   "boomVuil": false,
-  "boomAnders": 4,
+  "boomAnders": 3,
   "instrument": "scripts/mutatiecontract.js",
-  "node": "v26.10.0"
+  "node": "v22.22.0"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5246,
-  "geclassificeerd": 5221,
+  "totaal": 5245,
+  "geclassificeerd": 5220,
   "perStand": {
-   "BLOCKED_BY_TEST_FIXTURE": 3168,
+   "BLOCKED_BY_TEST_FIXTURE": 3167,
    "NOT_APPLICABLE": 1262,
    "LEGACY_PENDING_CLASSIFICATION": 25,
    "PROTECTED": 618,
    "INTENTIONALLY_NON_IDEMPOTENT": 173
   },
   "vastgesteldDoorMens": 2105,
-  "afgeleidDoorScript": 3116,
+  "afgeleidDoorScript": 3115,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4323,
+   "AUTHENTICATED": 4322,
    "PUBLIC": 134,
    "OBJECT_SCOPED": 760,
    "(niet af te leiden -- vraagt een verklaring)": 13,
@@ -32,7 +32,7 @@
   "bewijs": {
    "kale ronde: beschermd": 138,
    "kale ronde: onbeschermd": 128,
-   "kale ronde: geen uitspraak": 4882,
+   "kale ronde: geen uitspraak": 4881,
    "niet gemeten": 98
   },
   "voorstellen": {
@@ -12662,33 +12662,6 @@
     "zonderSleutel": "ongemeten",
     "grond": null,
     "hindernis": "Geen landpakket voor ."
-   },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "command.mandaat",
-   "route": "POST /api/command/mandaat",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
-   "duplicaatregel": null,
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "officeAuth"
-    ]
-   },
-   "bewijs": {
-    "op": "2026-09-29T18:39:11.935Z",
-    "metSleutel": "ongemeten",
-    "zonderSleutel": "ongemeten",
-    "grond": null,
-    "hindernis": "Een mandaat vraagt van wie, aan wie en waarvoor."
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",

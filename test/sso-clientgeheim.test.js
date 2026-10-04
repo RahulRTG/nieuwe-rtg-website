@@ -113,10 +113,10 @@ test('3. roteren met overlap: nieuw eerst, het oude een begrensde tijd, dan weg'
   const dicht = rotatie.sluitOverlap(org, w, NU + DAG);
   assert.deepEqual(cg.geldige(org, dicht, NU + DAG).geheimen, ['tweede']);
   assert.throws(() => rotatie.sluitOverlap(org, dicht, NU + DAG), e => e.status === 409);
-  assert.throws(() => rotatie.roteer(org, 'x', w, { overlapDagen: 31 }, NU), e => e.code === 'OVERLAP_ONGELDIG');
+  assert.throws(() => rotatie.roteer(org, 'x', w, { overlapDagen: 8 }, NU), e => e.code === 'OVERLAP_ONGELDIG');
   // de overlap duurt nooit langer dan het verval van het oude geheim
   const kort = rotatie.roteer(org, 'a', null, { dagen: 2 }, NU).waarde;
-  const verder = rotatie.roteer(org, 'b', kort, { overlapDagen: 30 }, NU).waarde;
+  const verder = rotatie.roteer(org, 'b', kort, { overlapDagen: 7 }, NU).waarde;
   assert.equal(cg.stand(org, verder, NU).overlap.tot, new Date(NU + 2 * DAG).toISOString());
 });
 

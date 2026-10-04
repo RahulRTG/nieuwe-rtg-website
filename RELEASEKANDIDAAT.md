@@ -106,7 +106,7 @@ Kolommen: **code** / **extern** / **besluit** = JA/NEE; *bewijs* = wat
 | B24 | **Een nieuwe kantoormedewerker bevestigt het koppelen met een eigen verse passkey**; de gedeelde kantoor-TOTP vervalt in productie bij het verzilveren van een uitnodiging (besluit van 4 oktober 2026) | `kern/eenaccount/koppelen.js`, deur `office.gedeelde_kantoorcode` |
 | B25 | **De leerlingsleutel verlaat de URL**: bord-, schrift- en lesverzoeken dragen hem in een header of het lijf, de live-stroom krijgt een kortlevend eenmalig ticket | deur `foundation.onderwijs_les_tokens` |
 | B26 | **Een leerling zonder gezinsprofiel scant na het inloggen opnieuw**; de lescode uit de link blijft alleen in het geheugen en wordt nergens bewaard | `public/apps/foundation/leren.html` |
-| B27 | **De maximale overlap van een SSO-clientgeheim gaat naar 7 dagen**, en de uitrol levert vooraf een lijst organisaties waarvan het geheim ouder is dan 90 dagen, zodat die eerst roteren | deur `identity.sso_client_secret` |
+| B27 | **De maximale overlap van een SSO-clientgeheim gaat naar 7 dagen**, en de uitrol levert vooraf een lijst organisaties waarvan het geheim ouder is dan 90 dagen, zodat die eerst roteren | **gebouwd**: `GRENS.maxOverlap` = 7 in `server/sso/clientgeheim.js`, meer geeft 400 `OVERLAP_ONGELDIG` met de reden (niet afgekapt); de lijst is `npm run ssogeheim:ouderdom -- --op <uitroldatum>` (alleen-lezen, toont nooit het geheim, exitcode 0). Toetsen: `test/sso-clientgeheim-b22.test.js`, `test/ssogeheim-ouderdom.test.js`. Deur `identity.sso_client_secret` |
 
 **Nieuw gemeten sinds de matrix:** de codecredentialpoort telt geen 9 maar
 **483** blokkades: de 9 open types, **399** routes die op een toegangscode

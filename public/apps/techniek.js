@@ -745,7 +745,7 @@
     ];
     var veld = el('input',{class:'veld',type:'password',autocomplete:'new-password','aria-label':'Nieuw clientgeheim voor '+k.org,
       placeholder:'Nieuw clientgeheim',style:{margin:'0',maxWidth:'16rem'}});
-    var overlap = el('input',{class:'veld',type:'number',inputmode:'numeric',min:'0',max:'30',value:'3',
+    var overlap = el('input',{class:'veld',type:'number',inputmode:'numeric',min:'0',max:'7',value:'3',
       'aria-label':'Dagen overlap',style:{margin:'0',width:'5rem'}});
     var acties = el('div',{style:{display:'flex',gap:'.5rem',flexWrap:'wrap',alignItems:'center',marginTop:'.5rem'}},
       veld, overlap, el('span',{class:'muted',style:{fontSize:'.72rem'}},'dagen overlap'),

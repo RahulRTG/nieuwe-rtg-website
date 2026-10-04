@@ -14,7 +14,7 @@
       wanneer gezet, wanneer het vervalt en de overlap. Alleen geldige() levert
       de tekst, en die heeft precies een lezer: de tokenruil.
    3. ROTATIE MET OVERLAP. Een nieuw geheim wordt het eerste slot; het vorige
-      blijft een begrensde tijd (standaard 3, hoogstens 30 dagen) geldig, zodat
+      blijft een begrensde tijd (standaard 3, hoogstens 7 dagen -- B27) geldig, zodat
       een klant zonder uitval kan wisselen. De ruil probeert het oude alleen
       als de provider het nieuwe weigert met invalid_client.
    4. EEN VERVALDATUM op elk slot (B22: standaard 30 dagen -- het
@@ -39,7 +39,7 @@ const gebonden = require('../accounts/gebonden');
 
 const MERK = 'RTGSSO2:';
 const DAG = 86400000;
-const GRENS = Object.freeze({ standaardDagen: 30, maxDagen: 90, standaardOverlap: 3, maxOverlap: 30,
+const GRENS = Object.freeze({ standaardDagen: 30, maxDagen: 90, standaardOverlap: 3, maxOverlap: 7,
   gemigreerdDagen: 90, maxLengte: 2048 });
 
 const REDEN = Object.freeze({

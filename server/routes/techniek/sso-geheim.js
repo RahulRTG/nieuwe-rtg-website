@@ -8,8 +8,9 @@
 
    Roteren met overlap: het nieuwe geheim wordt het eerste dat de tokenruil
    probeert, het vorige blijft `overlapDagen` bruikbaar (standaard 3, hoogstens
-   30) zodat de klant bij zijn provider zonder uitval kan wisselen. Is hij over,
-   dan sluit /overlap/sluit het vorige meteen af.
+   7 sinds B27; meer wordt geweigerd met de reden) zodat de klant bij zijn
+   provider zonder uitval kan wisselen. Is hij over, dan sluit /overlap/sluit
+   het vorige meteen af.
 
    ZETTEN EN ROTEREN VRAGEN EEN VERSE PASSKEY (B22): de zware poort
    (kern/zwaarbewijs.js, actie `eigenaar-ssogeheim`) ZONDER terugval. Een

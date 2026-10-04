@@ -65,6 +65,17 @@ test('2. een lopend geheim van voor B22 wordt afgekapt op 90 dagen na uitgifte, 
   assert.equal(cg.stand(org, rot, NU).overlap.tot, iso(NU + DAG));
 });
 
+test('4. B27: de overlap is hoogstens 7 dagen, en meer wordt geweigerd in plaats van afgekapt', () => {
+  assert.equal(cg.GRENS.maxOverlap, 7);
+  const org = 'b27';
+  const eerste = rotatie.roteer(org, 'een', null, {}, NU).waarde;
+  const zeven = rotatie.roteer(org, 'twee', eerste, { overlapDagen: 7 }, NU).waarde;
+  assert.equal(cg.stand(org, zeven, NU).overlap.tot, iso(NU + 7 * DAG), '7 mag, en loopt dan ook 7 dagen');
+  for (const d of [8, 30, '8'])
+    assert.throws(() => rotatie.roteer(org, 'drie', eerste, { overlapDagen: d }, NU),
+      e => e.code === 'OVERLAP_ONGELDIG' && e.status === 400 && /0 tot 7 dagen/.test(e.message), String(d));
+});
+
 test('3. echte server: zetten en roteren vragen een verse passkey, zonder terugval', { timeout: 180000 }, async () => {
   const { startServer, stop } = require('./helper');
   const { zwaarApi } = require('./zwaarpasskey');
@@ -109,6 +120,13 @@ test('3. echte server: zetten en roteren vragen een verse passkey, zonder terugv
     const teLang = await zw('/api/techniek/sso/geheim', { org: 'b22klant', clientSecret: 'derde', dagen: 91 }, eig);
     assert.equal(teLang.status, 400);
     assert.equal(teLang.body.code, 'VERVAL_ONGELDIG');
+    // B27: een overlap boven 7 dagen wordt geweigerd met de reden, en er verandert niets
+    const voor = await stand();
+    const teVeel = await zw('/api/techniek/sso/geheim', { org: 'b22klant', clientSecret: 'vierde', overlapDagen: 8 }, eig);
+    assert.equal(teVeel.status, 400, JSON.stringify(teVeel.body));
+    assert.equal(teVeel.body.code, 'OVERLAP_ONGELDIG');
+    assert.match(String(teVeel.body.error), /0 tot 7 dagen/, 'met de reden');
+    assert.deepEqual(await stand(), voor, 'een geweigerde overlap schrijft niets');
   } finally {
     stop(srv.child);
     try { fs.rmSync(map, { recursive: true, force: true }); } catch (e) {}

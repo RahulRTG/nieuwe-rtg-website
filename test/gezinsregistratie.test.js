@@ -13,7 +13,8 @@ const post = (pad, body, token) => fetch(base + pad, { method:'POST',
   headers:{ 'Content-Type':'application/json', ...(token ? { Authorization:'Bearer ' + token } : {}) },
   body:JSON.stringify(body || {}) });
 const json = r => r.json();
-const f = (pad, body) => post('/api/foundation' + pad, body);
+// Een volledig pad gaat ongewijzigd door, zodat de routedekking het ziet.
+const f = (pad, body) => post(pad.startsWith('/api/') ? pad : '/api/foundation' + pad, body);
 
 test.before(async () => {
   ({ child, base } = await startServer({ env:{ RTG_DATA_DIR:map, SMTP_URL:'' } }));
@@ -105,7 +106,7 @@ test('de beheerder trekt een openstaande uitnodiging in en de sleutel is daarna 
     'zonder beheerderstoken trekt niemand een uitnodiging in');
   assert.equal((await f('/gezin/uitnodiging/intrek', { code:gezin.code, token:gezin.token, id:'bestaatniet' })).status, 404);
 
-  const voor = await json(await f('/gezin/uitnodigingen', { code:gezin.code, token:gezin.token }));
+  const voor = await json(await f('/api/foundation/gezin/uitnodigingen', { code:gezin.code, token:gezin.token }));
   assert.equal(voor.uitnodigingen.find(u => u.id === gemaakt.id).status, 'open');
 
   const ingetrokken = await f('/gezin/uitnodiging/intrek', { code:gezin.code, token:gezin.token, id:gemaakt.id });
@@ -113,7 +114,7 @@ test('de beheerder trekt een openstaande uitnodiging in en de sleutel is daarna 
   assert.equal(ingetrokken.status, 200, antwoord);
   assert.deepEqual(JSON.parse(antwoord), { ok:true });
 
-  const na = await json(await f('/gezin/uitnodigingen', { code:gezin.code, token:gezin.token }));
+  const na = await json(await f('/api/foundation/gezin/uitnodigingen', { code:gezin.code, token:gezin.token }));
   assert.equal(na.uitnodigingen.find(u => u.id === gemaakt.id).status, 'ingetrokken');
 
   assert.equal((await f('/gezin/uitnodiging/bekijk', { uitnodiging:gemaakt.uitnodiging })).status, 404,

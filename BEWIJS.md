@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 2312 |
 | losse beweringen (`test(...)`) | 15913 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 248 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1934 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1940 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 148 |
-| alleen in de kop *genoemd*, nog niet gemeten | 39 |
-| niets van beide | 191 |
+| alleen in de kop *genoemd*, nog niet gemeten | 36 |
+| niets van beide | 188 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -1104,11 +1104,11 @@ toets omvalt.
 | `mutatiedekking.test.js` | 7 | muteert zelf | DUN EN BEPROEFD ZIJN NIET HETZELFDE SOORT OVERLEVER (TAKEN.md 4.53). WAAROM DEZE TOETS ER IS. |
 | `mutatiesemantiek.test.js` | 10 | gezakt op `===->!==#0` | DE MUTATIESEMANTIEK OVER DE ROUTES -- en of de meter werkelijk uitslaat. Het besluit staat in CREATE.md par. |
 | `mutatiewacht.test.js` | 9 | muteert zelf | DE OPRUIMWACHT VAN DE MUTATIEMOTOR: zet hij de bron ook terug bij een KILL? WAAR DIT UIT KOMT. |
-| `mutationproof-aggregate.test.js` | 2 | genoemd | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `mutationproof-aggregate.test.js` | 2 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `mutationproof-canary.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `mutationproof-capture.test.js` | 2 | genoemd | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `mutationproof-runtime.test.js` | 4 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `mutationproof.test.js` | 10 | genoemd | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `mutationproof-capture.test.js` | 2 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `mutationproof-runtime.test.js` | 4 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `mutationproof.test.js` | 10 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `muziek-bestanden.test.js` | 6 | gezakt op `liegpoort /api/` | Echte muziek in RTG Sound: rauwe upload, privé-opslag, eigen bibliotheek en afspelen met byte-ranges via een korte luisterkaart. |
 | `muziek-lied.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Klankwerk: van een lus een LIED maken. Wat hier getoetst wordt is de belofte "echte liedjes zonder er eerst voor te studeren": er komt een VORM uit (intro, couplet, refrein), een ZANGLIJN met lettergrepen... |
 | `muziek-uitgave.test.js` | 9 | gezakt op `liegpoort /api/` | RTG Klankwerk: zang, samen produceren en uitgeven. De zwaarste belofte die hier getoetst wordt: DE RTG-NAAM KOMT ER NOOIT VANZELF ONDER. |
@@ -1433,7 +1433,7 @@ toets omvalt.
 | `ritmigratie.test.js` | 7 | gezakt op `!==->===#0` | DE MIGRATIEKAART VAN db.data.rides (scripts/ritmigratie.js). De eigenaar heeft besloten dat de OPDRACHT de waarheid is; de brug staat (kern/mobiliteit/appbrug.js) en de migratie van de lezers volgt. |
 | `ritproef.test.js` | 9 | gezakt op `&&->||#0` | DE RITPROEF EN DE KETENVORM -- de tweede keten, en wat de twee delen. scripts/ritproef.js legt een ritketen af zoals scripts/tafelproef.js een tafelketen; scripts/ketenvorm.js telt achteraf wat ze werkelijk delen. |
 | `ritpunten.test.js` | 2 | gezakt op `liegpoort /api/` | DE PUNTEN VAN EEN RIT NA DE RIT (NAVIGATIE.md N16, kern/mobiliteit/ritpunten.js). Het besluit: de ritlijn (`trip.location_updated` met lat/lng, en `o.positie`) wordt gewist bij afronden of annuleren; afstand, duur en... |
-| `ritreferentie.test.js` | 6 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `ritreferentie.test.js` | 6 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rollbackbesluit.test.js` | 4 | gezakt op `&&->||#5` | HET BESLUITREGISTER VAN DE ROLLBACK-AS, EN DE GRENDEL EROP. ROLLBACKBESLUIT.json zegt per route waarom een GEWEIGERD verzoek daar toch iets in de opslag mag achterlaten. |
 | `rollenmatrix.test.js` | 9 | gezakt op `liegpoort /api/` | DE ROLLENMATRIX -- drieënveertig endpoints uit acht torens, een vraag. Deze endpoints wees de waargenomen dekkingsmeting als nooit aangeroepen aan. |
 | `rolproef.test.js` | 15 | gezakt op `===->!==#0` | DE ROL-SCHEIDING (scripts/lib/rolproef.js) -- de proef die vraagt of een INGELOGDE met de verkeerde rol binnenkomt, en of de weigering iets lekt. WAAROM DEZE TOETS ER IS. |
@@ -2215,7 +2215,7 @@ toets omvalt.
 | `mijn-relaties-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | HET RELATIESCHERM (/apps/mijn-relaties.html) IN EEN ECHTE BROWSER. test/appstore-lab-toestemming-routes.test.js bewijst de drie routes over HTTP: de relaties zijn die van de lezer, /gevolgen voert niets uit, /sluit... |
 | `mijn-sessies-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | HET SESSIESCHERM (/apps/mijn-sessies.html) IN EEN ECHTE BROWSER. test/mijnrtg-routes.test.js en test/mijnsessies.test.js bewijzen de routes over HTTP: intrekken werkt op de sid, en "sluit alle andere" doet de eigen... |
 | `mobile-content.e2e.js` | 2 | -- | Content must be painted and reachable inside the common frame. Checking only the outer .wd-home missed a 58px Work viewport inside a 400px box. |
-| `mobile-single-shell.e2e.js` | 8 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `mobile-single-shell.e2e.js` | 8 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `mobiliteitscherm.e2e.js` | 5 | -- | Scherm-toets op het Mobility OS: leggen de twee schermen de weg werkelijk af? WAAROM DEZE TOETS BESTAAT test/mobiliteit.test.js bewijst dat de API klopt. |
 | `move.e2e.js` | 2 | -- | RTG MOVE IN EEN ECHTE BROWSER -- de eigen weg van dit scherm. scripts/moveproef.js meet dezelfde keten als PROEF en schrijft MOVEPROEF.json; dat is een instrument en geen toets. |
 | `muziek-bestanden.e2e.js` | 1 | -- | Schermbewijs voor Mijn muziek: kiezen op het toestel, terugzien in RTG Sound en bedienen met precies dezelfde vaste speler als de live stations. |

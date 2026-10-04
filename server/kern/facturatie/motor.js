@@ -9,6 +9,9 @@ module.exports = (ctx) => {
   const { db, save, crypto, findSupplier, keyVanCodenaam, notify, notifySupplier, sseToCustomer, sseToSupplier, factuur, anthropic, schoon,
     SOORTEN, nu, scho, rond } = ctx;
   const publiek = (f) => ctx.publiek(f);
+  const factuurSave = () => typeof save.sleutels === 'function'
+    ? save.sleutels(['facturen', 'factuurTeller'])
+    : save();
   function store() {
     if (!Array.isArray(db.data.facturen)) db.data.facturen = [];
     if (typeof db.data.factuurTeller !== 'number') db.data.factuurTeller = 0;
@@ -100,7 +103,7 @@ module.exports = (ctx) => {
     f.vervaldatum = new Date(Date.parse(f.at) + f.betaaltermijn * 86400000).toISOString().slice(0, 10);
     s.facturen.unshift(f);
     s.facturen = s.facturen.slice(0, 100000);
-    save();
+    factuurSave();
     // beide partijen seinen: de verkoper en (indien lid) de koper
     if (f.verkoper.code && sseToSupplier) sseToSupplier(f.verkoper.code, 'sync', { scope: 'facturen' });
     if (f.koper.supplierCode && sseToSupplier) sseToSupplier(f.koper.supplierCode, 'sync', { scope: 'facturen' });
@@ -142,7 +145,7 @@ module.exports = (ctx) => {
     if (!!f.betaald === naar) return { status: 200, ok: true, betaald: naar, ongewijzigd: true };
     f.betaald = naar;
     f.betaaldAt = naar ? nu() : null;
-    save();
+    factuurSave();
     if (sseToSupplier && f.verkoper.code) sseToSupplier(f.verkoper.code, 'sync', { scope: 'facturen' });
     return { status: 200, ok: true, betaald: naar };
   }

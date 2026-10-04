@@ -33,6 +33,7 @@ module.exports = (ctxIn) => {
     betaaldienstKosten, betaalOpdrachten, waarde, accounts, payBoekingenVoegToe, betaalWaarheid } = ctxIn;
   if (typeof payBoekingenVoegToe !== 'function')
     throw new Error('pay: payBoekingenVoegToe ontbreekt. Zonder die weg landt geen enkele grootboekregel in het transactiegrootboek.');
+  const paySave = require('./opslag')({ db, save });
   /* DE TIJD VAN DE HELE PAYLAAG, uit de huisklok en niet uit het
      besturingssysteem. Elk deelbestand hieronder leest `nu` uit deze ctx, dus
      deze ene regel bepaalt of vervaldatums, aflopende reserveringen, de
@@ -56,13 +57,10 @@ module.exports = (ctxIn) => {
      (dubbeltik, haperend netwerk, retry) geeft exact hetzelfde antwoord en boekt
      nooit dubbel -- en dezelfde sleutel met een ANDER verzoek geeft een 409 in
      plaats van stil het oude antwoord. Zie ../../lib/idem.js. */
-  /* Met de save-bundel (db.bijeen) landen de boeking en de idem-sleutel als
-     EEN commit; de bundel is context-gebonden, dus ook met echte I/O in het
-     werk (motor, kaart-naad) raakt hij geen saves van andere verzoeken. */
   /* duurzaam: geld is de enige laag waar bevestigen vóór duurzaamheid een belofte
      is die de opslag nog niet heeft gedaan. Boeking en idem-sleutel zitten al in
      EEN bundel (zie lib/idem.js); deze vlag maakt die bundel ook duurzaam. */
-  const metIdem = require('../../lib/idem')({ d, save, naam: 'payIdem', bijeen, duurzaam: true });
+  const metIdem = require('../../lib/idem')({ d, save: paySave, naam: 'payIdem', bijeen, duurzaam: true });
 
   /* De waardepoort (./poort.js): de toets die VOOR elke boeking gaat -- de oude
      saldo-regel als bodem, daarbovenop klasse, beleid, reserveringen en plafond.
@@ -80,14 +78,14 @@ module.exports = (ctxIn) => {
      verandert, verandert wat er met GELD gebeurt; wie hier iets verandert,
      verandert welke ONDERDELEN aan elkaar hangen. */
   const { pasToe, boek, boekAsync } = require('./boeking')({
-    saldi, saldoVan, grootboek, payBoekingenVoegToe, save, id, schoon, nu, waardePoort,
+    saldi, saldoVan, grootboek, payBoekingenVoegToe, save: paySave, id, schoon, nu, waardePoort,
     betalingenUit, uitFout, geldModus, motorklant, schaduw, MIN_CENTEN, MAX_CENTEN });
 
   /* Het oplaaddeel (laadOp, bankdekking, zorgSaldo, herstart-reconcile) staat
      in ./opladen.js; het krijgt de guard (boekAsync) en de helpers mee en
      raakt de boekingsregels zelf niet aan. */
   const { laadOp, oplaadAfronden, koppelBank, koppelKosten, reconcileVanMotor, zorgSaldo, bestaatLid } = require('./opladen').maakOpladen({
-    betaal, metIdem, boekAsync, rekLid, saldoVan, nu, d, save,
+    betaal, metIdem, boekAsync, rekLid, saldoVan, nu, d, save: paySave,
     motorklant, geldModus, keyVanCodenaam, plafondFout, betaalWaarheid,
     OPLAAD_MIN, MAX_CENTEN, AUTOLAAD_STAP
   });
@@ -100,7 +98,7 @@ module.exports = (ctxIn) => {
     require('./kijken')({ saldi, grootboek, keyVanCodenaam, sseToCustomer, schaduw });
 
   const ctx = {
-    db, save, economischeBoekingEenmaal, bewerkCollectie, crypto, betaal, schoon, nu, d,
+    db, save: paySave, economischeBoekingEenmaal, bewerkCollectie, crypto, betaal, schoon, nu, d,
     saldi, grootboek, klompjes, saldiKijk, grootboekKijk, klompjesKijk,
     rekLid, rekPartner, saldoVan, id, metIdem, boek, boekAsync, geldModus, zorgSaldo, seintje, bestaatLid,
     betaaldienstKosten: betaaldienstKosten || (() => 0), waarde, accounts,

@@ -91,6 +91,11 @@ function bewaar(sleutels, auditOp) {
   const doos = bundelDoos();
   if (doos && doos.open) {
     if (auditOp) sqlite.auditMotor().stage(doos, auditOp);
+    if (sleutels === undefined) doos.volledig = true;
+    else {
+      if (!doos.sleutels) doos.sleutels = new Set();
+      for (const sleutel of sleutels) doos.sleutels.add(sleutel);
+    }
     doos.nodig = true; return;
   } // binnen bijeen: aan het eind, in een commit
   // verraadfase = de motor ACHTER de opstartpoort; zie ../lib/verraadfase.js

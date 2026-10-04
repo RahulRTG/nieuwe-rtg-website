@@ -42,7 +42,8 @@ module.exports = ({ db, save, crypto, rtgKlok, sessionFor, DEMO, accounts,
     db.data.supplierNotifications[code] = (db.data.supplierNotifications[code] || []);
     db.data.supplierNotifications[code].unshift(n);
     db.data.supplierNotifications[code] = db.data.supplierNotifications[code].slice(0, 40);
-    save();
+    if (typeof save.sleutels === 'function') save.sleutels(['supplierNotifications']);
+    else save();
     sseToSupplier(code, 'notify', n);
     return n;
   }

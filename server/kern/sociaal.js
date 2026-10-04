@@ -5,6 +5,16 @@
    nergens rechtstreeks met de buitenwereld. */
 module.exports = (core) => {
   const { db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsHaalWacht, gidsZoekCodenaam, media, commDm, dyncodeGeef } = core;
+  /* Dit domein schrijft uitsluitend zijn sociale voorraden. Een verbinding of
+     snap hoeft daarom geen facturen, reizen en bedrijfsdata te serialiseren. */
+  const sociaalSleutels = ['blocks', 'connections', 'reports', 'snaps', 'stories',
+    'contactPins', 'contactPinRetired', 'contactPinSecurity'];
+  const sociaalSave = () => {
+    const sleutels = sociaalSleutels.filter(k => Object.hasOwn(db.data, k));
+    return sleutels.length && typeof save.sleutels === 'function'
+      ? save.sleutels(sleutels)
+      : save();
+  };
 
 function dmSleutel(a, b) { return [a, b].sort().join('|'); }
 function connectieTussen(a, b) {
@@ -42,15 +52,15 @@ function blokkeer(mij, doel) {
   if (!db.data.blocks.some(x => x.door === mij && x.doel === doel)) db.data.blocks.push({ door: mij, doel, at: new Date().toISOString() });
   // bestaande vriendschap of openstaand verzoek meteen weg
   db.data.connections = db.data.connections.filter(c => !((c.a === mij && c.b === doel) || (c.a === doel && c.b === mij)));
-  save();
+  sociaalSave();
   return { status: 200, ok: true };
 }
-function deblokkeer(mij, doel) { db.data.blocks = db.data.blocks.filter(x => !(x.door === mij && x.doel === doel)); save(); return { status: 200, ok: true }; }
+function deblokkeer(mij, doel) { db.data.blocks = db.data.blocks.filter(x => !(x.door === mij && x.doel === doel)); sociaalSave(); return { status: 200, ok: true }; }
 function meldMisbruik(mij, doel, reden) {
   if (!doel) return { status: 400, error: 'Wie wil je melden?' };
   db.data.reports.push({ door: mij, doel, codenaamDoel: codenaamVan(doel), reden: String(reden || '').replace(/[<>]/g, '').slice(0, 300), at: new Date().toISOString() });
   db.data.reports = db.data.reports.slice(-5000);
-  save();
+  sociaalSave();
   return { status: 200, ok: true };
 }
 const sociaalTellers = new Map(); // actie:handle -> { n, reset }
@@ -67,7 +77,7 @@ function sociaalRate(mij, actie, max, perMs) {
 /* De vriendenlaag en de snaps/verhalen-laag draaien als submodules op een
    gedeelde context, een keer opgebouwd bij het opstarten; de vriendenlaag
    levert zijnVrienden aan de snapslaag via die context. */
-const ctx = { db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsZoekCodenaam, media, commDm, dyncodeGeef,
+const ctx = { db, save: sociaalSave, sseToCustomer, rtf, crypto, gidsHaal, gidsZoekCodenaam, media, commDm, dyncodeGeef,
   dmSleutel, connectieTussen, isRtf, codeExists, codeBestaat, codenaamVan, soortVan, isKindHandle,
   isBeschermdHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate };
 const deelVrienden = require('./sociaal/vrienden')(ctx);

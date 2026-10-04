@@ -68,7 +68,7 @@ module.exports = ({ save }) => {
      GELDLAT.md; wat er nog niet aan hangt -- agenda, bestanden, berichten -- staat
      daar ook, en de prestatiemeting van stap 6 is nog open.
      ========================================================================== */
-  function saveDuurzaam() {
+  function saveDuurzaam(sleutels) {
     if (!db.writable) return { duurzaam: false, stand: null, reden: 'de opslag staat niet open' };
 
     /* HET VERRAAD GELDT OOK HIER, en dat ontbrak in de eerste versie.
@@ -90,8 +90,11 @@ module.exports = ({ save }) => {
     let alGelijk = false;
     let sqliteBevestigd = false;
     if (STORE === 'sqlite') {
-      // Volledige scan, dezelfde atomaire transactie, FULL-sync vóór bevestiging.
-      const uit = sqlite.saveSqlite(true, undefined, [], true);
+      /* Een bundel die al exact weet welke collecties zij muteerde hoeft voor
+         duurzaamheid niet alsnog de hele wereld te serialiseren. `force`
+         houdt de opgegeven collecties exact; zonder lijst blijft dit bewust de
+         volledige afsluit-/herstelronde. */
+      const uit = sqlite.saveSqlite(true, sleutels, [], true);
       alGelijk = !!(uit && uit.alGelijk);
       sqliteBevestigd = uit?.duurzaam === true;
       /* Een procescrash na COMMIT was al door scripts/crashgrenzen.js bewezen.

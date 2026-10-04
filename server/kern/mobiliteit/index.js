@@ -50,15 +50,23 @@ function maakMobiliteit(state) {
   const nu = () => new Date().toISOString();
   const id = p => (p || 'mb') + crypto.randomBytes(4).toString('hex');
 
+  const opslag = require('./opslag')({ db });
+  const mobSave = () => {
+    const sleutels = opslag.bestaande();
+    return sleutels.length && typeof save.sleutels === 'function'
+      ? save.sleutels(sleutels)
+      : save();
+  };
+
   /* De gedeelde context. Hij wordt EEN keer bij het opstarten gevuld en aan
      alle deelmodules meegegeven; kruisverwijzingen lopen erover, zodat er geen
      module een andere rechtstreeks hoeft te requiren. De volgorde hieronder is
      gedrag: assets leunt op het register, de opdracht op plekken en het
      register, matching op assets, dispatch op alledrie. */
-  const ctx = { db, save, crypto, schoon, nu, id, codenaamVan, haversine, etaMinutes,
+  const ctx = { db, save: mobSave, crypto, schoon, nu, id, codenaamVan, haversine, etaMinutes,
     notify, findSupplier, logActivity, sseToOffice, sseToCustomer, pay, ovPrijsVan, accounts, afwezigOp };
 
-  ctx.opslag = require('./opslag')({ db: ctx.db });   // de enige db-aanraking; zie ./opslag.js
+  ctx.opslag = opslag;   // de enige db-aanraking; zie ./opslag.js
 
   Object.assign(ctx, require('./register')(ctx));
   Object.assign(ctx, require('./plekken')(ctx));

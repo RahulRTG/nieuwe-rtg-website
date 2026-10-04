@@ -82,7 +82,7 @@ function saveSqlite(force, sleutels, extraAudit = [], duurzaam = false) {
   const gewijzigd = [];
   const nu = Date.now();
   let uitgesteld = false;
-  for (const k of force || sleutels === undefined ? sleutelsVoorLezing(db.data) : [...new Set(sleutels)]) {
+  for (const k of sleutels === undefined ? sleutelsVoorLezing(db.data) : [...new Set(sleutels)]) {
     if (auditSleutels.has(k) || audits.bezit(db.data, k)) continue;
     if (voorcheck.magOverslaan(k, db.data[k], force || sleutels !== undefined, nu)) { uitgesteld = true; continue; }
     const j = JSON.stringify(db.data[k]);

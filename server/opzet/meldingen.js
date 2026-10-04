@@ -58,7 +58,8 @@ function notify(tier, note) {
   db.data.notifications[tier] = (db.data.notifications[tier] || []);
   db.data.notifications[tier].unshift(n);
   db.data.notifications[tier] = db.data.notifications[tier].slice(0, 40);
-  save();
+  if (typeof save.sleutels === 'function') save.sleutels(['notifications']);
+  else save();
   // een melding gaat over een lid en draagt zijn tekst mee
   bus.publish('sse', { doel: 'tier', match: [tier], event: 'notify', data: n,
     envelop: { classificatie: 'persoonsgegeven' } });
@@ -76,7 +77,8 @@ function sendPushToUser(userId, note) {
     webpush.sendNotification(sub, payload).catch(err => {
       if (err && (err.statusCode === 404 || err.statusCode === 410)) {
         db.data.pushSubsUser[userId] = (db.data.pushSubsUser[userId] || []).filter(s => s.endpoint !== sub.endpoint);
-        save();
+        if (typeof save.sleutels === 'function') save.sleutels(['pushSubsUser']);
+        else save();
       }
     });
   }
@@ -91,7 +93,8 @@ function sendPush(tier, note) {
       // verlopen/ongeldige subscription opruimen
       if (err && (err.statusCode === 404 || err.statusCode === 410)) {
         db.data.pushSubs[tier] = (db.data.pushSubs[tier] || []).filter(s => s.endpoint !== sub.endpoint);
-        save();
+        if (typeof save.sleutels === 'function') save.sleutels(['pushSubs']);
+        else save();
       }
     });
   }

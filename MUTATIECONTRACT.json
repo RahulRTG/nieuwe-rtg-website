@@ -1,39 +1,39 @@
 {
  "stempel": {
-  "op": "2026-10-03T20:57:49.766Z",
-  "commit": "c4f3118d2",
-  "boomVuil": true,
-  "boomAnders": 6,
+  "op": "2026-10-04T14:14:36.009Z",
+  "commit": "ca441ee5b",
+  "boomVuil": false,
+  "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
-  "node": "v24.18.0"
+  "node": "v26.10.0"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5252,
-  "geclassificeerd": 5227,
+  "totaal": 5262,
+  "geclassificeerd": 5237,
   "perStand": {
-   "BLOCKED_BY_TEST_FIXTURE": 3168,
-   "NOT_APPLICABLE": 1263,
+   "BLOCKED_BY_TEST_FIXTURE": 3167,
+   "NOT_APPLICABLE": 1264,
    "LEGACY_PENDING_CLASSIFICATION": 25,
-   "PROTECTED": 623,
-   "INTENTIONALLY_NON_IDEMPOTENT": 173
+   "PROTECTED": 626,
+   "INTENTIONALLY_NON_IDEMPOTENT": 180
   },
-  "vastgesteldDoorMens": 2111,
-  "afgeleidDoorScript": 3116,
+  "vastgesteldDoorMens": 2122,
+  "afgeleidDoorScript": 3115,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4323,
+   "AUTHENTICATED": 4327,
    "PUBLIC": 138,
-   "OBJECT_SCOPED": 760,
-   "(niet af te leiden -- vraagt een verklaring)": 15,
+   "OBJECT_SCOPED": 764,
+   "(niet af te leiden -- vraagt een verklaring)": 17,
    "SERVICE_TO_SERVICE": 15,
    "SYSTEM_INTERNAL": 1
   },
   "bewijs": {
    "kale ronde: beschermd": 138,
    "kale ronde: onbeschermd": 128,
-   "kale ronde: geen uitspraak": 4882,
-   "niet gemeten": 104
+   "kale ronde: geen uitspraak": 4881,
+   "niet gemeten": 115
   },
   "voorstellen": {
    "NOT_APPLICABLE": 1
@@ -1954,7 +1954,7 @@
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "officeAuth"
+     "kluisAuth"
     ]
    },
    "bewijs": {
@@ -12731,33 +12731,6 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "command.mandaat",
-   "route": "POST /api/command/mandaat",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
-   "duplicaatregel": null,
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "officeAuth"
-    ]
-   },
-   "bewijs": {
-    "op": "2026-09-29T18:39:11.935Z",
-    "metSleutel": "ongemeten",
-    "zonderSleutel": "ongemeten",
-    "grond": null,
-    "hindernis": "Een mandaat vraagt van wie, aan wie en waarvoor."
-   },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
    "mutatieId": "command.mdm",
    "route": "POST /api/command/mdm",
    "semantiek": {
@@ -20800,6 +20773,44 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "foundation.gezinscode.intrekken",
+   "route": "POST /api/foundation/gezin/code/intrek",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: code",
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.gezinscode.roteren",
+   "route": "POST /api/foundation/gezin/code/roteer",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: code",
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "foundation.gezin.droom.behaald",
    "route": "POST /api/foundation/gezin/droom/behaald",
    "semantiek": {
@@ -21157,8 +21168,8 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "OBJECT_SCOPED",
-    "uitHandler": "object: code",
+    "waargenomen": null,
+    "uitHandler": null,
     "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
@@ -21675,6 +21686,25 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "foundation.gezinspasskey.ontkoppelen",
+   "route": "POST /api/foundation/gezin/passkey/weg",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: code",
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "foundation.gezin.profiel.kies",
    "route": "POST /api/foundation/gezin/profiel/kies",
    "semantiek": {
@@ -21682,8 +21712,8 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "OBJECT_SCOPED",
-    "uitHandler": "object: code",
+    "waargenomen": null,
+    "uitHandler": null,
     "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
@@ -21813,6 +21843,25 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "foundation.gezinssessie.verlengen",
+   "route": "POST /api/foundation/gezin/sessie/verleng",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: code",
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "foundation.gezin.sollicitaties",
    "route": "POST /api/foundation/gezin/sollicitaties",
    "semantiek": {
@@ -21909,6 +21958,25 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.gezinsstroom.ticket",
+   "route": "POST /api/foundation/gezin/stroom/ticket",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: code",
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -22459,6 +22527,25 @@
    },
    "bewijs": null,
    "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.les.stroomticket",
+   "route": "POST /api/foundation/les/stroomticket",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: code",
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
@@ -69118,6 +69205,69 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "reisbureau.teruggave.besluiten",
+   "route": "POST /api/office/reisbureau/teruggave",
+   "semantiek": {
+    "klasse": "hooguitEens"
+   },
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "kluisAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "zwaar.opties.reisteruggave",
+   "route": "POST /api/office/reisbureau/teruggave/opties",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "kluisAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "reisbureau.teruggave.lezen",
+   "route": "POST /api/office/reisbureau/teruggaven",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "kluisAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "reisbureau.thuis.kantoor",
    "route": "POST /api/office/reisbureau/thuis",
    "semantiek": {
@@ -85585,6 +85735,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.gezinspasskey.koppelen",
+   "route": "POST /api/rtf/gezin/passkey",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "een eigen RTG-account",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -114144,6 +114315,27 @@
     "hindernis": null
    },
    "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "supplier.horeca.teruggave.uitvoeren",
+   "route": "POST /api/supplier/horeca/teruggave",
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "object: rekeningId",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null

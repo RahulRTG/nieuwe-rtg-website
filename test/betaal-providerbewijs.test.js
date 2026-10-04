@@ -78,10 +78,11 @@ test('alleen Payment Truth en de bootstrap mogen de proof-verifier aanroepen', (
     }
   }
   walk(root);
+  // De bootstrap van het bewijsvlak woont sinds de omvangsplitsing in opzet/vertrouwensvlak.js.
   assert.deepEqual(hits.sort(), [
     'server/betaal.js',
     'server/kern/betaalwaarheid/bewijs.js',
-    'server/server.js'
+    'server/opzet/vertrouwensvlak.js'
   ]);
 });
 

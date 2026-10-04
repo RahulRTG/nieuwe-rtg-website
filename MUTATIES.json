@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-04T18:12:48.585Z",
-    "commit": "2b8e5a89",
+    "op": "2026-10-04T18:18:01.434Z",
+    "commit": "fd29ec64",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -2964,7 +2964,11 @@
     },
     "deurverkoop-race.test.js": {
       "soort": "puur",
-      "staat": "geen module gevonden"
+      "staat": "gezakt",
+      "module": "server/routes/supplier/tickets-verkoop.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
     },
     "dienst-vervalt.test.js": {
       "soort": "puur",

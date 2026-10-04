@@ -174,7 +174,7 @@ const KAART = [
   ['rtg-adaptive-edge-input.js', 'adaptieve-balk', 'gebaar-drempel:l zichtbaarheidsstand:bl capability-register:l', [
     ['leest', 'gebaar-drempel:l', 'veeg opzij wisselt deck, drempel uit de tabel', 'if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > D.veeg)'],
     ['leest', 'gebaar-drempel:l', 'lang drukken uit de tabel', '}, D.lang);'],
-    ['beslist', 'zichtbaarheidsstand:b', 'auto-peek bij scrollen', "if (moved < 8 || rt.manual || rt.model.state === 'expanded') return;"],
+    ['beslist', 'zichtbaarheidsstand:b', 'compacte leesstand bij menselijk scrollen, zonder invoer of panelen te verstoren', "if (Math.abs(delta) < 8 || rt.manual || rt.model.state === 'expanded' || busy(rt)) return;"],
     ['leest', 'zichtbaarheidsstand:l', 'de gebaarversheid van Edge 2, alleen waar Edge 2 draait', 'if (gebaar && !e2.gestureFresh(gebaar)) return;'],
     ['beslist', 'zichtbaarheidsstand:b', 'omhoog naar RTGDiepte', 'if (-dy >= D.diep) depth.tweede(); else depth.eerste();']]],
   ['rtg-adaptive-edge-loader.js', 'laden', '', [

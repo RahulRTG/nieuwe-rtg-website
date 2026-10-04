@@ -36,11 +36,11 @@
   }
   function foundation(host) {
     host.innerHTML = '<div class="wh-foundation-hero wh-photo"><img src="/images/world-homes/foundation.webp" alt="" width="1408" height="1056" fetchpriority="high">'
-      + '<p class="wh-free">' + text('free') + '</p><div class="wh-photo-copy"><h1>' + text('grow') + '</h1><p>' + text('foundationIntro') + '</p></div><span class="wh-caption">' + text('atmosphere') + '</span></div>'
-      + '<section class="wh-discover"><h2>' + text('discover') + '</h2><p>' + text('choose') + '</p><div class="wh-pair">'
-      + '<a class="wh-card" href="/apps/foundation/leren.html"><img src="/images/editorial/foundation-discover-learning.webp" width="1448" height="1086" alt="" loading="lazy"><div><h3>' + text('learn') + '</h3><p>' + text('learnIntro') + '</p><span aria-hidden="true">↗</span></div></a>'
-      + '<a class="wh-card" href="/apps/foundation/meedoen-ontdekken.html"><img src="/images/editorial/foundation-discover-talent.webp" width="1448" height="1086" alt="" loading="lazy"><div><h3>' + text('talent') + '</h3><p>' + text('talentIntro') + '</p><span aria-hidden="true">↗</span></div></a></div></section>'
-      + '<a class="wh-support" href="/apps/foundation/hulpwijzer.html"><div><h2>' + text('support') + '</h2><p>' + text('supportIntro') + '</p><span class="wh-link">' + text('possibilities') + ' <span aria-hidden="true">↗</span></span></div></a>';
+      + '<div class="wh-foundation-label"><p class="wh-eyebrow">' + text('foundationEyebrow') + '</p><p class="wh-free">' + text('free') + '</p></div><div class="wh-photo-copy"><h1>' + text('grow') + '</h1><p>' + text('foundationIntro') + '</p></div><span class="wh-caption">' + text('atmosphere') + '</span></div>'
+      + '<section class="wh-discover" aria-label="FoundationOS"><div class="wh-pair">'
+      + '<a class="wh-card wh-paper-card" href="/apps/foundation/leren.html"><span class="wh-card-symbol" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v15M12 5C8 2 4 3 2 4v15c3-1 7-1 10 1 3-2 7-2 10-1V4c-2-1-6-2-10 1Z"/></svg></span><div><h3>' + text('learn') + '</h3><p>' + text('learnIntro') + '</p></div><span class="wh-card-arrow" aria-hidden="true">›</span></a>'
+      + '<a class="wh-card wh-paper-card" href="/apps/foundation/vrienden.html"><span class="wh-card-symbol" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="3"/><path d="M3 21v-4a6 6 0 0 1 12 0v4M16 4a3 3 0 0 1 0 6m2 3a5 5 0 0 1 4 5v3"/></svg></span><div><h3>' + text('circle') + '</h3><p>' + text('circleIntro') + '</p></div><span class="wh-card-arrow" aria-hidden="true">›</span></a></div></section>'
+      + '<a class="wh-support wh-support-compact" href="/apps/foundation/hulpwijzer.html"><span>' + text('possibilities') + '</span><span aria-hidden="true">›</span></a>';
   }
   function openFragment() {
     var el = d.getElementById(location.hash.slice(1));

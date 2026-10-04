@@ -50,7 +50,7 @@ test('Werkruimte: een kamer bewaren, leeghalen en met een klik terughalen',
     });
     const randKlopt = (m) => {
       assert.ok(Math.abs(m.ruimte.x - m.kader.x) < 1, JSON.stringify(m));
-      assert.ok(Math.abs(m.ruimte.y - m.kader.y) < 1);
+      assert.ok(Math.abs(m.ruimte.y - m.kader.y) < 1, JSON.stringify(m));
       assert.ok(Math.abs(m.ruimte.width - m.kader.width) < 1);
       assert.ok(m.ruimte.height >= 400, 'de actieve app krijgt een bruikbare werkhoogte');
       assert.ok(m.rand.onder.y + m.rand.onder.height <= m.scherm.height, 'de bediening blijft in beeld');
@@ -103,6 +103,11 @@ test('Werkruimte: een kamer bewaren, leeghalen en met een klik terughalen',
     /* EN NU TERUG. Dit is waar het om gaat: een klik en de hele kamer staat er,
        met dezelfde apps op dezelfde adressen. */
     await page.click('.rtg-adaptive-item[data-rtg-adaptive-action="menu"]:visible, .rtg-edge-menu:visible'); await require('./helper').edgeCatalogus(page);
+    await page.waitForSelector('[data-catalogus-ready="true"]', { state: 'attached' });
+    await page.fill('.rtg-edge-find input', 'Mijn Directie');
+    assert.equal(await page.locator('[data-edge-ruimte="Mijn Directie"]').isVisible(), true,
+      'een bewaarde kamer blijft vindbaar nadat de volledige catalogus is geladen');
+    await page.fill('.rtg-edge-find input', '');
     await page.click('[data-edge-ruimte="Mijn Directie"]');
     await page.waitForFunction(() => RTGSchil.surfaces.length === 3, { timeout: 8000 });
     const terug = await page.evaluate(() => RTGSchil.surfaces.map(s => ({ id: s.id, url: s.url })));

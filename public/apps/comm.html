@@ -201,6 +201,8 @@
 <script src="/shared/social-intelligence-data.js" defer></script>
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 <link href="/apps/comm-heritage.css" rel="stylesheet">
+<link href="/shared/rtg-communication-surface.css" rel="stylesheet">
+<script src="/shared/rtg-communication-surface.js" defer></script>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
@@ -263,7 +265,7 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13"/><path d="M12 6l6 6-6 6"/></svg>
         </button>
       </form>
-      <div class="hulprij">
+      <div class="hulprij rtg-edge-owned-bar">
         <button type="button" data-ai="samenvat">Vat samen</button>
         <button type="button" data-ai="concept">Stel een antwoord op</button>
         <button type="button" data-ai="afspraken">Wat is er afgesproken?</button>
@@ -476,6 +478,9 @@
         }));
       }
       el.appendChild(act);
+      /* The compact bubble reveals its existing controls on keyboard focus
+         as well as pointer interaction. The message handlers stay unchanged. */
+      el.tabIndex = 0;
     }
     return el;
   }
@@ -613,6 +618,8 @@
       items.push({ label: g.vast ? 'Niet meer bovenaan' : 'Bovenaan houden', doe: function () { zetVlag('vast'); } });
       items.push({ label: g.stil ? 'Meldingen weer aan' : 'Meldingen uit', doe: function () { zetVlag('stil'); } });
       items.push({ label: g.weg ? 'Terug in de lijst' : 'Uit de lijst halen', doe: function () { zetVlag('weg'); } });
+      items.push({ label: 'Stel een antwoord op', doe: function () { document.querySelector('[data-ai="concept"]').click(); } });
+      items.push({ label: 'Wat is er afgesproken?', doe: function () { document.querySelector('[data-ai="afspraken"]').click(); } });
       items.push({ label: 'Vat dit gesprek samen', doe: function () { document.querySelector('[data-ai="samenvat"]').click(); } });
     }
     RTGAppMenu.zet(items);

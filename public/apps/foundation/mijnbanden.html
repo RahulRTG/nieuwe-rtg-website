@@ -79,12 +79,13 @@
 <script src="sessie.js"></script>
 <script src="/shared/levenspas.js"></script>
 <script>
+(function foundationPage() {
 const $ = s => document.querySelector(s);
 /* eisFamilie en niet eisProfiel: een gastprofiel hoort hier niet te komen, en
    de server weigert hem ook (routes/levenband.js gezinsPoort). Twee sloten op
    dezelfde deur, want een scherm dat pas bij de server stukloopt, heeft de
    gebruiker al beloofd dat het wel zou werken. */
-if (!window.Sessie || !Sessie.eisFamilie()) throw new Error('geen sessie');
+if (!window.Sessie || !Sessie.eisFamilie()) return;
 Sessie.balk($('#balk'), { terug: 'index.html' });
 
 /* ELK PAD VOLUIT, dezelfde afspraak als aan de serverkant (scripts/check.js
@@ -135,6 +136,7 @@ Levenspas.start({
   }
 });
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+}());
 </script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>

@@ -21,10 +21,21 @@ for(const width of [390,1440])test(width+'px: context, verloren antwoord, bronco
   await ctx.addInitScript(token=>{localStorage.setItem('rtg_member_token',token);localStorage.setItem('rtg_lang','nl');localStorage.setItem('rtg_cookieinfo_v1','1');},token);
   const page=await ctx.newPage(),errors=[];page.setDefaultTimeout(12000);h.letOpFouten(page,errors);
   await page.goto(srv.base+'/apps/app.html');await page.waitForSelector('body[data-rtg-desktop-state="ready"]');
-  // De zichtbare Saloon-appkaart opent het echte desktopframe.
-  await page.locator('.wd-library [data-widget="foodcourt"] .wd-widget-open').click();
-  const el=await page.waitForSelector('.wd-app-frame:not([hidden])');const app=await el.contentFrame();
-  await app.waitForSelector('body.rtg-edge-embed');
+  // Mobiel opent de zichtbare Edge-catalogus de app; desktop vergroot de widget.
+  let app;
+  if(width===390){
+   await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]').click();
+   await page.locator('button[data-edge-face="all"]').click();
+   await page.locator('[data-edge-smart-search]').click();
+   await page.locator('.rtg-edge-find input').fill('Food Court');
+   await page.locator('.rtg-edge-global-original a[href="/apps/foodcourt.html"]').click();
+   await page.waitForURL('**/apps/foodcourt.html');app=page;
+   assert.equal(await page.locator('.rtg-adaptive-bar').count(),1);
+  }else{
+   await page.locator('.wd-library [data-widget="foodcourt"] .wd-widget-open').click();
+   const el=await page.waitForSelector('.wd-app-frame:not([hidden])');app=await el.contentFrame();
+   await app.waitForSelector('body.rtg-edge-embed');
+  }
   await app.waitForSelector('.resto[data-code="KIKUNOI"]');
   await app.locator('#intentRemember').check();
   fs.mkdirSync(path.join(__dirname,'../artifacts/experience'),{recursive:true});
@@ -58,8 +69,13 @@ for(const width of [390,1440])test(width+'px: context, verloren antwoord, bronco
   await app.locator('#rAgenda').click();
   await app.waitForURL('**/apps/agenda.html?datum='+date,{waitUntil:'domcontentloaded'});
   await app.waitForFunction(()=>document.body.innerText.includes('Tafel bij')&&document.body.innerText.includes('bevestigd'));
-  await page.waitForFunction(()=>/Agenda/.test(document.querySelector('.wd-focus-head h2').textContent));
-  assert.match(await page.locator('.wd-focus-head h2').textContent(),/Agenda/);
+  if(width===1440){
+   await page.waitForFunction(()=>/Agenda/.test(document.querySelector('.wd-focus-head h2').textContent));
+   assert.match(await page.locator('.wd-focus-head h2').textContent(),/Agenda/);
+  }else{
+   await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
+   assert.equal(await page.locator('.rtg-adaptive-bar').count(),1,'de agenda houdt dezelfde enkele Edge');
+  }
   assert.ok(await app.locator('.litem .wat').first().evaluate(el=>el.getBoundingClientRect().width)>=120,'afspraaktitel houdt leesruimte');
   assert.ok(!(await app.evaluate(()=>document.documentElement.scrollWidth>innerWidth+2)),'geen horizontale overflow');
   assert.deepEqual(errors,[]);

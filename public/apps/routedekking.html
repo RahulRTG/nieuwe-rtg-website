@@ -57,6 +57,9 @@
   .pager{display:flex;gap:.6rem;align-items:center;justify-content:center;
     margin-top:.7rem;font-size:.8rem;color:var(--rtg-soft);}
   .leeg{color:var(--rtg-soft);font-size:.85rem;padding:.8rem 0;}
+
+/* Componentopmaak: behoudt de voormalige attributen en expliciete toestanden. */
+#rail.routedekking-rail{padding-left:1rem;}
 </style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
@@ -83,7 +86,7 @@
 
   <h2>De stand</h2>
   <div class="vak">
-    <div class="rtg-rail" id="rail" data-sig="actief" style="padding-left:1rem;">
+    <div class="rtg-rail routedekking-rail" id="rail" data-sig="actief" >
       <span class="rtg-status" id="stand" data-sig="actief" data-teken="·">Laden…</span>
       <span class="uitleg" id="wanneer"></span>
     </div>

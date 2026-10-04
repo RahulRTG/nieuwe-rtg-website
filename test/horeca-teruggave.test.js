@@ -127,7 +127,7 @@ function nepWaarheid() {
   const doos = { W1: { terugbetaalOpdrachten: [] } };
   return { doos,
     van: id => doos[id],
-    terugbetalen: async (id, inv) => { await new Promise(k => setTimeout(k, 5));
+    terugbetalen: async (id, inv) => { await new Promise(k => setImmediate(k));
       doos[id].terugbetaalOpdrachten.push({ reden: inv.reden, centen: inv.centen, status: 'BIJ_PROVIDER' }); } };
 }
 

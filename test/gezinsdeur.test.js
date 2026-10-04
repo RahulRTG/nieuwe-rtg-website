@@ -166,7 +166,9 @@ test('5. het stroomticket: eenmalig, per kanaal, en nooit de sessie in de URL', 
   assert.equal((await stroom('/api/rtf/social/stream?code=' + g.code + '&ticket=' + t4.body.ticket)).status, 401,
     'een ticket van een afgemelde sessie opent niets');
   assert.equal((await F('/gezin/stroom/ticket', { code: g.code, kanaal: 'gezin' }, kop(g.token))).status, 403);
-  assert.equal(await fetch(base + '/api/foundation/gezin/' + g.code + '/mij?token=' + g.token).then(r => r.status), 403,
+  const vers = (await F('/gezin/inloggen', { gezinscode: g.gezinscode, pin: '2468' })).body.token;
+  assert.equal(await mij(g.code, vers), 200, 'in de header werkt de verse sessie');
+  assert.equal(await fetch(base + '/api/foundation/gezin/' + g.code + '/mij?token=' + vers).then(r => r.status), 403,
     'ook een gewone route leest geen sessie meer uit de query');
 });
 

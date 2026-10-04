@@ -198,8 +198,13 @@ test('de Capability Graph maakt de gekozen motorstand zichtbaar', () => {
    ========================================================================== */
 /* EN VAN 583 NAAR 585 OP 29 SEPTEMBER 2026 (B17): POST /api/foundation/gezin/sessie/roteer
    en /intrek, in server/foundation/gezinssessie.js als router.post('/gezin/sessie/...') op de
-   /api/foundation-router -- de foundation-familie hierboven, geen nieuwe vorm. */
-const GEMIST_MAX = 585;   // +2 imap/roteer, +4 foundation/les, +2 gezin/sessie: bekende vorm
+   /api/foundation-router -- de foundation-familie hierboven, geen nieuwe vorm.
+   EN VAN 585 NAAR 591 OP 4 OKTOBER 2026 (B18/B19): de zes routes van de gezinsdeur in
+   server/foundation/gezinsdeur.js (gezin/code/roteer en /intrek, GET gezin/:code/gezinscode,
+   gezin/stroom/ticket, gezin/sessie/verleng en gezin/passkey/weg), alle zes als router.post of
+   router.get op dezelfde /api/foundation-router. /api/rtf/gezin/passkey schrijft zijn volle
+   adres op en wordt gewoon gezien. */
+const GEMIST_MAX = 591;   // +2 imap/roteer, +4 foundation/les, +2 gezin/sessie, +6 gezinsdeur: bekende vorm
 const SPOOK_MAX = 6;      // routes die de bronscanner noemt en de router niet
 
 test('de bronscanner loopt niet verder achter op de router dan is vastgelegd', () => {

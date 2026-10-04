@@ -13,7 +13,8 @@ module.exports = (sctx) => {
    Elke hartslag kijkt of de sessie achter het ticket nog leeft. */
 app.get('/api/rtf/social/stream', async (req, res) => {
   const s = await rtf.gezinsstroom.open(req.query.code, req.query.ticket, 'sociaal');
-  if (!s.ok || s.p.rol === 'gast' || !s.handle) return res.status(s.ok ? 401 : s.status).end();
+  if (!s.ok) return res.status(s.status === 503 ? 503 : 401).end();
+  if (s.p.rol === 'gast' || !s.handle) return res.status(401).end();
   const sess = { handle: s.handle };
   res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache, no-transform', Connection: 'keep-alive' });
   res.write('retry: 3000\n\n');

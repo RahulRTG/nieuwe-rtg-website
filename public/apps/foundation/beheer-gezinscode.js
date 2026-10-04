@@ -12,7 +12,8 @@
 (function (w, d) {
   var $ = function (q) { return d.querySelector(q); };
   function sessie() { return (w.Sessie && w.Sessie.huidig()) || null; }
-  function datum(t) { try { return new Date(t).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' }); } catch (e) { return t; } }
+  // de taal van de pagina (en anders die van de browser), geen vaste locale
+  function datum(t) { try { return new Date(t).toLocaleDateString(d.documentElement.lang || undefined, { day: 'numeric', month: 'long', year: 'numeric' }); } catch (e) { return t; } }
   function toonCode(code) {
     $('#uCode').textContent = code || 'Verborgen';
     $('#uDeel').hidden = !code;

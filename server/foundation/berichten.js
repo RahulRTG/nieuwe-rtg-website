@@ -34,7 +34,7 @@ module.exports = (ctx) => {
      ticket nog leeft; afgemeld of ingetrokken sluit de stroom. */
   router.get('/gezin/:code/kanaal', async (req, res) => {
     const s = await ctx.gezinsstroom.open(req.params.code, req.query.ticket, 'gezin');
-    if (!s.ok) { res.status(s.status).end(); return; }
+    if (!s.ok) { res.status(s.status === 503 ? 503 : 401).end(); return; }
     const { g, p } = s;
     res.set({ 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', Connection: 'keep-alive', 'X-Accel-Buffering': 'no' });
     res.write('retry: 3000\n\n');

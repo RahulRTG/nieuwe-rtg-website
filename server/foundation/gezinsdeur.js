@@ -28,7 +28,6 @@ module.exports = (ctx) => {
   const OPNIEUW = 'Log opnieuw in bij je gezin.';
   const ACTIE = 'gezin-sessie-verleng';
   const geenCache = res => res.set('Cache-Control', 'no-store');
-  const kopToken = req => { const h = (req.get && req.get('authorization')) || ''; return h.startsWith('Bearer ') ? h.slice(7) : ''; };
 
   router.post('/gezin/code/roteer', async (req, res) => {
     const g = gezinVan(req, res); if (!g) return;
@@ -75,7 +74,9 @@ module.exports = (ctx) => {
 
   router.post('/gezin/sessie/verleng', async (req, res) => {
     const g = gezinVan(req, res); if (!g) return;
-    const raw = kopToken(req);
+    // alleen uit de header: de ceremonie wordt gebonden aan de sessie die daar staat
+    const kop = (req.get && req.get('authorization')) || '';
+    const raw = kop.startsWith('Bearer ') ? kop.slice(7) : '';
     if (!raw) return res.status(400).json({ error: 'Stuur je gezinssessie in de Authorization-header.' });
     const h = gezinstoken.zoek(g, raw);
     if (!h) return res.status(403).json({ error: OPNIEUW });

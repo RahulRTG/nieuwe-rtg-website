@@ -47,7 +47,8 @@ function opstelling(kasInt) {
   return { verkoop, boekingen, betaald };
 }
 
-const metIO = antwoord => async () => { await new Promise(r => setTimeout(r, 5)); return antwoord(); };
+// een sprong naar de volgende ronde van de event-loop: genoeg om twee kopers door elkaar te laten lopen
+const metIO = antwoord => async () => { await new Promise(r => setImmediate(r)); return antwoord(); };
 
 test('1. twee kopers tegelijk verkopen nooit meer dan de capaciteit, ook als de betaling op I/O wacht', async () => {
   const o = opstelling(metIO(() => ({ van: 'Lid' })));

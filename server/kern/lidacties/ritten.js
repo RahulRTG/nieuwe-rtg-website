@@ -93,7 +93,7 @@ function vraagRitVoor(session, body) {
   db.data.rides.unshift(ride);
   save();
   if (ride.status === 'aangevraagd') {
-    notifySupplier(s.code, { icon: 'auto', title: 'Nieuwe ritaanvraag', body: codename + ': ' + ride.from + ' naar ' + (ride.to || 'bestemming') + ' \u00B7 ' + pax + 'p \u00B7 \u20AC ' + quote });
+    (notifySupplier.alleenMelding || notifySupplier)(s.code, { icon: 'auto', title: 'Nieuwe ritaanvraag', body: codename + ': ' + ride.from + ' naar ' + (ride.to || 'bestemming') + ' \u00B7 ' + pax + 'p \u00B7 \u20AC ' + quote });
     sseToSupplier(s.code, 'sync', { scope: 'orders' });
     sseToOffice('sync', { scope: 'orders' });
   }

@@ -36,15 +36,7 @@ module.exports = ({ db, save, crypto, rtgKlok, sessionFor, DEMO, accounts,
     bus.publish('sse', { doel: 'office', event, data, envelop: { classificatie: 'intern' } });
   }
 
-  function notifySupplier(code, note) {
-    const n = { id: crypto.randomBytes(4).toString('hex'), read: false, at: rtgKlok.datum().toISOString(), ...note };
-    db.data.supplierNotifications[code] = (db.data.supplierNotifications[code] || []);
-    db.data.supplierNotifications[code].unshift(n);
-    db.data.supplierNotifications[code] = db.data.supplierNotifications[code].slice(0, 40);
-    save();
-    sseToSupplier(code, 'notify', n);
-    return n;
-  }
+  const notifySupplier = require('./leveranciersmeldingen')({ db, save, crypto, rtgKlok, sseToSupplier });
 
   const supplierIndex = require('./leverancierindex')(() => db.data.suppliers);
   function findSupplier(code) {

@@ -1,9 +1,8 @@
 /* BEARERCODE VERSIE 2 -- het Access/Grant-contract voor een drager.
 
-   Geen nieuwe laag: ./bearercode.js laadt dit bestand en geeft het door aan
-   elke aanroeper die `geldigheid` meegeeft. Wie dat niet doet, blijft op v1 en
-   merkt niets. Dit staat los omdat bearercode.js anders over de bestandsgrens
-   gaat, niet omdat het een tweede primitive is.
+   Geen nieuwe laag: ./bearercode.js gebruikt dit zodra een aanroeper
+   `geldigheid` meegeeft; zonder dat veld blijft het v1. Los alleen vanwege de
+   bestandsgrens.
 
    Wat v2 toevoegt, en waarom (UITVOERINGSPLAN-AUTHORITY par. 3):
      geldigheid   verplicht en eindig: { duurMs } of { verlooptOp }. Geen
@@ -120,10 +119,8 @@ module.exports = ({ crypto, ns, nu, hash, codeNieuw, plafondMs, sluit, spoor }) 
   }
 
   function roteer(oud, intrekken, { actor, prefix, afgeleid } = {}) {
-    /* Een INGETROKKEN toegang mag roteren: zo krijgt de houder van een gestolen
-       code een nieuwe (de cadeaukaart doet precies dat). De eerste intrekking
-       blijft dan staan; een verlopen toegang roteert niet, want het einde schuift
-       nooit op. */
+    /* Ook een INGETROKKEN toegang roteert (de houder van een gestolen code
+       krijgt een nieuwe); de eerste intrekking blijft staan. Verlopen niet. */
     if (!oud) throw fout('niet-roteerbaar', 'er is geen toegang om te roteren');
     const nieuw = maak({ prefix, issuer: oud.issuer, doel: oud.doel, scope: oud.scope, onderwerp: oud.onderwerp,
       geldigheid: { verlooptOp: oud.expires_at },

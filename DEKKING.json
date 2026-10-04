@@ -3,7 +3,7 @@
   "gemeten": {
     "op": "2026-10-01T11:05:36.299Z",
     "commit": "efeb612ef",
-    "routesToen": 5381
+    "routesToen": 5392
   },
   "aangeraakt": [
     "GET /",
@@ -473,7 +473,6 @@
     "POST /api/command/land",
     "POST /api/command/land/activeer",
     "POST /api/command/land/terug",
-    "POST /api/command/mandaat",
     "POST /api/command/mdm",
     "POST /api/command/mdm/gouden",
     "POST /api/command/mdm/samen",
@@ -5386,6 +5385,18 @@
     "GET /toestel/cel",
     "GET /toestel/cel.js",
     "GET /toestel/manifest.json",
-    "GET /werken/:code"
+    "GET /werken/:code",
+    "GET /api/foundation/gezin/:code/gezinscode",
+    "POST /api/foundation/gezin/code/intrek",
+    "POST /api/foundation/gezin/code/roteer",
+    "POST /api/foundation/gezin/passkey/weg",
+    "POST /api/foundation/gezin/sessie/verleng",
+    "POST /api/foundation/gezin/stroom/ticket",
+    "POST /api/foundation/les/stroomticket",
+    "POST /api/office/reisbureau/teruggave",
+    "POST /api/office/reisbureau/teruggave/opties",
+    "POST /api/office/reisbureau/teruggaven",
+    "POST /api/rtf/gezin/passkey",
+    "POST /api/supplier/horeca/teruggave"
   ]
 }

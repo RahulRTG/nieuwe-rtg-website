@@ -24,8 +24,8 @@
   source.querySelectorAll('h2').forEach(function(h,i){if(!h.id)h.id='onderdeel-'+i;right.append(link(h.textContent,'#'+h.id));});
   library.append(link('Ontdek RTG',new URL('../',base).href),link('Vergelijk de passen',new URL('../#passen',base).href));
   source.before(head,root);source.classList.add('wd-home');root.append(greeting,left,source,right,library);
-  d.body.dataset.rtgDesktop=world;d.body.dataset.rtgDesktopState='ready';d.body.dataset.rtgLayout='standard';
+  d.body.dataset.publicPlatform='detail';d.body.dataset.rtgDesktop=world;d.body.dataset.rtgDesktopState='ready';d.body.dataset.rtgLayout='standard';
   var hero=source.querySelector('.world-hero'), image=getComputedStyle(d.body).getPropertyValue('--world-image').trim();
   if(hero && /^url\(/.test(image)){var picture=node('div','wp-photo'), img=d.createElement('img');img.src=image.slice(4,-1).replace(/^['"]|['"]$/g,'');img.alt='';picture.appendChild(img);hero.appendChild(picture);}
-  ['bestand-upload.js','interface/world-desktop-copy.js','interface/personal-images.js','interface/personal-image-editor.js','interface/world-presentation.js','interface/public-presentation.js'].forEach(function(file){var script=d.createElement('script');script.src=new URL('shared/'+file,base).href;script.async=false;d.head.appendChild(script);});
+  ['interface/world-desktop-copy.js'].forEach(function(file){var script=d.createElement('script');script.src=new URL('shared/'+file,base).href;script.async=false;d.head.appendChild(script);});
 })(window,document);

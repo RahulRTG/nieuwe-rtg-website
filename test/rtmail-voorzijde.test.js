@@ -16,13 +16,14 @@ test('RTMail opent met Aandacht, Gesprek en Naar werk in de WorkOS-stijl', () =>
   for (const paneel of ['aandacht', 'gesprek', 'werk']) {
     assert.match(html, new RegExp('data-rtm-paneel="' + paneel + '"'));
   }
-  assert.match(html, /Uw inbox, teruggebracht tot wat ertoe doet\./);
+  assert.match(html, /<h1 class="rtm-titel">Uw post,<br>persoonlijk\.<\/h1>/);
+  assert.match(html, /Uw berichten en gesprekken staan hier bij elkaar\./);
   assert.match(html, /Van gesprek naar resultaat, zonder opnieuw te beginnen\./);
   assert.equal((html.match(/\/shared\/rtg-mail-2026\.css/g) || []).length, 1);
   assert.equal((html.match(/\/apps\/rtmail-voorzijde\.js/g) || []).length, 1);
   assert.equal((html.match(/\/apps\/rtmail-voorzijde-werk\.js/g) || []).length, 1);
   assert.equal((html.match(/\/apps\/rtmail-voorzijde-gesprek\.js/g) || []).length, 1);
-  for (const kleur of ['--mail-nacht:#061116', '--mail-goud:#c99b55', '--mail-teal:#7d9f98', '--mail-wijn:#7a1830']) {
+  for (const kleur of ['--mail-nacht:#181511', '--mail-goud:#d7b886', '--mail-teal:#7d9f98', '--mail-wijn:#7a1830']) {
     assert.ok(css.includes(kleur), kleur);
   }
   assert.match(css, /\.rtm-nav\{position:fixed/);

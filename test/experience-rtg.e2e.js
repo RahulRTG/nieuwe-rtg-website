@@ -39,9 +39,11 @@ test('De publieke B2B2C-ervaring wisselt van kant, zoekt in de echte app en past
    await page.locator('.role-switch [data-role-select="gebruiker"]').click();
    assert.equal(await page.evaluate(()=>sessionStorage.getItem('rtg-www-role')),'gebruiker');
    assert.match(await page.locator('#roleCapabilities').innerText(),/Foundation/);
+   await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="home"]').click();
    await page.locator('.pp-section-index button', {hasText:'De RTG Graph'}).click();
    await page.locator('[data-graph-topic="werknemer"]').click();
    assert.match(await page.locator('#graphCaption').innerText(),/uren/i);
+   await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="home"]').click();
    await page.locator('.pp-section-index button', {hasText:'Verken het RTG-platform'}).click();
    await page.keyboard.press('Control+k');
    await page.locator('#commandSearch').fill('personeel');
@@ -81,7 +83,7 @@ test('static project path and JavaScript-disabled visitors retain content and re
       if (javaScriptEnabled) {
         await ready(page);
         assert.equal(await page.locator('#roleCta').getAttribute('href'), 'https://app.rahultravelgroup.com/apps/werk.html');
-        assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.rtg-adaptive-bar')).getPropertyValue('--edge-bar-bg').trim()), '#1b1b18');
+        assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.rtg-adaptive-bar')).getPropertyValue('--edge-bar-bg').trim()), '#1b1713');
       } else {
         assert.equal(await page.locator('[data-room]:visible').count(), 4);
         assert.equal(await page.locator('[data-faq]:visible').count(), 23);

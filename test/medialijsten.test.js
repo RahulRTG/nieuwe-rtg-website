@@ -87,6 +87,17 @@ test('2. drie vormen in EEN lijst -- dat is het hele punt', async () => {
   const onzin = await api('/api/mediaos/lijst/stuk', { id: lijstId, stukId: 'muziek/12' }, maker);
   assert.equal(onzin.status, 400, 'en een id dat geen stuk-id is, komt er niet in');
 
+  // Bewijs dat het veld ook echt een verdwenen bron kan dragen: alleen een
+  // lege array controleren zou een altijd-lege projectie goedkeuren.
+  const tijdelijk = await api('/api/clips/maak', { titel: 'Tijdelijk', duurS: 5, mbGeschat: 1 }, maker);
+  const tijdelijkId = 'clip:' + tijdelijk.body.id;
+  assert.equal((await api('/api/mediaos/lijst/stuk', { id: lijstId, stukId: tijdelijkId }, maker)).status, 200);
+  assert.equal((await api('/api/clips/weg', { id: tijdelijk.body.id }, maker)).status, 200);
+  const metOntbrekend = await api('/api/mediaos/lijst', { id: lijstId }, maker);
+  assert.equal(metOntbrekend.body.verdwenen.length, 1);
+  assert.equal(metOntbrekend.body.verdwenen[0].id, tijdelijkId);
+  assert.equal((await api('/api/mediaos/lijst/stuk', { id: lijstId, stukId: tijdelijkId, aan: false }, maker)).status, 200);
+
   const l = await api('/api/mediaos/lijst', { id: lijstId }, maker);
   assert.equal(l.status, 200);
   assert.equal(l.body.stukken.length, 3, 'drie stukken');
@@ -108,12 +119,17 @@ test('3. de volgorde is van u, en verplaatsen voegt niets toe', async () => {
 });
 
 test('4. een lijst is van u alleen -- ook met het id erbij', async () => {
+  const eigenLijst = await api('/api/mediaos/lijst/maak', { naam: 'Alleen van de ander' }, ander);
+  assert.equal(eigenLijst.status, 200);
+  const vanMaker = await api('/api/mediaos/lijsten', {}, maker);
+  assert.ok(vanMaker.body.lijsten.some(l => l.id === lijstId), 'het afgeschermde object bestaat bij de eigenaar');
   const lezen = await api('/api/mediaos/lijst', { id: lijstId }, ander);
   assert.equal(lezen.status, 404, 'een ander kan hem niet openen');
   const schrijven = await api('/api/mediaos/lijst/stuk', { id: lijstId, stukId: 'track:' + uitgaveId }, ander);
   assert.equal(schrijven.status, 404, 'en er niets in zetten');
   const zijne = await api('/api/mediaos/lijsten', {}, ander);
-  assert.deepEqual(zijne.body.lijsten, [], 'en ziet er geen enkele staan');
+  assert.deepEqual(zijne.body.lijsten.map(l => l.id), [eigenLijst.body.lijst.id],
+    'hij krijgt zijn eigen echte lijst, zonder die van de maker');
 });
 
 test('5. haalt de maker een stuk weg, dan staat het er als verdwenen -- niet stil weg', async () => {

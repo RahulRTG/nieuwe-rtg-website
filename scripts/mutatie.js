@@ -557,6 +557,9 @@ const EIGEN_MODULE = new Map([
   // Deze proeven laden clientgedrag; een gewijzigde serverrespons raakt hun
   // beweringen niet (uit #446).
   ['praktijk-betalen.e2e.js', ['public/apps/werk/praktijk-betalen.js']],
+  // De deurkassa-race laadt de route via require.resolve met een nagemaakte
+  // kern; de verkoop zelf (eerst de plek, dan het geld) woont in tickets-verkoop.js.
+  ['deurverkoop-race.test.js', ['server/routes/supplier/tickets-verkoop.js']],
   ['foundation-premium-ui.test.js', ['public/apps/foundation/sw.js', 'public/apps/foundation/premium.js']],
   ['living-world.test.js', ['server/kern/living-world/actions.js']],
   ['living-world-sources.test.js', ['server/kern/living-world/actions.js']],

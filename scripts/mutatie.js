@@ -119,6 +119,7 @@ const OPERATOREN = [
   // route of export is een echte regressie, ook als geen conditie verandert.
   { naam: 'browser-export-weg', zoek: /\b((?:window|w)\.RTG\w+\s*=\s*)(?!=)/, zet: '$1undefined && ' },
   { naam: 'voorwaarde-omkeren', zoek: /\bif\s*\(\s*!(?!=)/, zet: 'if (' },
+  { naam: 'optie-uit', zoek: /:\s*true\b/, zet: ': false' },
   // Een relatieve API-aanroep is net zo goed een bestemming als /api/....
   // Alleen het eerste letterlijke argument verandert, niet de API zelf.
   {

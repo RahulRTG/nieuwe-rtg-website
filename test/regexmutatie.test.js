@@ -128,6 +128,13 @@ test('een relatieve API-actie verandert het aangeroepen doel, niet andere argume
   assert.equal(muteer('api(doel)', op('api-actie-weg')), null);
 });
 
+test('een ingeschakelde code-optie kan uit zonder returnwaarden of tekst te raken', () => {
+  assert.equal(muteer("observeer(knoop, { childList:true, subtree: true });", op('optie-uit'), 0),
+    "observeer(knoop, { childList:false, subtree: true });");
+  assert.equal(muteer("const tekst='subtree: true';", op('optie-uit'), 0), null);
+  assert.equal(muteer('function ok(){ return true; }', op('optie-uit'), 0), null);
+});
+
 test('getal+1 verhoogt het eerste getal in CODE met een', () => {
   assert.equal(muteer('const cap = 5;', op('getal+1'), 0), 'const cap = 6;');
   assert.equal(muteer('const a = 0; const b = 9;', op('getal+1'), 1), 'const a = 0; const b = 10;',

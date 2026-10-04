@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-27T20:32:26.944Z",
-    "commit": "89f85e4a",
+    "op": "2026-10-04T05:45:05.242Z",
+    "commit": "4bd5bd62",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bewijsladder.js",
-    "node": "v22.22.2"
+    "node": "v22.22.0"
   },
   "sporten": [
     {
@@ -26,6 +26,7 @@
           "aanleiding": [
             "pull_request",
             "push",
+            "schedule",
             "workflow_dispatch"
           ],
           "register": null,
@@ -41,6 +42,7 @@
           "aanleiding": [
             "pull_request",
             "push",
+            "schedule",
             "workflow_dispatch"
           ],
           "register": null,
@@ -57,6 +59,7 @@
           "aanleiding": [
             "pull_request",
             "push",
+            "schedule",
             "workflow_dispatch"
           ],
           "register": null,
@@ -73,6 +76,7 @@
           "aanleiding": [
             "pull_request",
             "push",
+            "schedule",
             "workflow_dispatch"
           ],
           "register": null,
@@ -91,6 +95,22 @@
           "graad": "vermoed"
         },
         {
+          "doel": "scripts/codeql-verdict.js",
+          "lokaal": true,
+          "keten": [
+            "codeql.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "schedule"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null,
+          "graad": "vermoed"
+        },
+        {
           "doel": "scripts/deltapoort.js",
           "lokaal": true,
           "keten": [
@@ -99,6 +119,7 @@
           "aanleiding": [
             "pull_request",
             "push",
+            "schedule",
             "workflow_dispatch"
           ],
           "register": null,
@@ -115,6 +136,7 @@
           "aanleiding": [
             "pull_request",
             "push",
+            "schedule",
             "workflow_dispatch"
           ],
           "register": null,
@@ -131,6 +153,7 @@
           "aanleiding": [
             "pull_request",
             "push",
+            "schedule",
             "workflow_dispatch"
           ],
           "register": null,
@@ -190,6 +213,7 @@
           "aanleiding": [
             "pull_request",
             "push",
+            "schedule",
             "workflow_dispatch"
           ],
           "register": "NORM.json",
@@ -232,6 +256,7 @@
           "aanleiding": [
             "pull_request",
             "push",
+            "schedule",
             "workflow_dispatch"
           ],
           "register": "ATTRIBUTIE.json",
@@ -248,6 +273,41 @@
           "aanleiding": [
             "pull_request",
             "push",
+            "schedule",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null,
+          "graad": "vermoed"
+        },
+        {
+          "doel": "scripts/evidence-calibration.js",
+          "lokaal": false,
+          "keten": [
+            "ci.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "schedule",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null,
+          "graad": "vermoed"
+        },
+        {
+          "doel": "scripts/evidence-control.js",
+          "lokaal": true,
+          "keten": [
+            "ci.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "schedule",
             "workflow_dispatch"
           ],
           "register": null,
@@ -264,6 +324,7 @@
           "aanleiding": [
             "pull_request",
             "push",
+            "schedule",
             "workflow_dispatch"
           ],
           "register": null,
@@ -273,18 +334,34 @@
         },
         {
           "doel": "scripts/evidence.js",
-          "lokaal": true,
+          "lokaal": false,
           "keten": [
             "ci.yml"
           ],
           "aanleiding": [
             "pull_request",
             "push",
+            "schedule",
             "workflow_dispatch"
           ],
           "register": null,
           "stempel": null,
           "grond": null,
+          "graad": "vermoed"
+        },
+        {
+          "doel": "scripts/outputcollect.js",
+          "lokaal": false,
+          "keten": [
+            "ronde.yml"
+          ],
+          "aanleiding": [
+            "schedule",
+            "workflow_dispatch"
+          ],
+          "register": ".provenance.json",
+          "stempel": null,
+          "grond": "schrijft",
           "graad": "vermoed"
         },
         {
@@ -296,6 +373,7 @@
           "aanleiding": [
             "pull_request",
             "push",
+            "schedule",
             "workflow_dispatch"
           ],
           "register": "VERANDERBEREIK-KENNIS.json",
@@ -327,8 +405,36 @@
       "stand": "staat",
       "waarom": "1 mechanisme(n) draaien aan beide kanten en laten een gestempeld register achter",
       "graad": "vermoed",
-      "graadWaarom": "de zwakste premisse is scripts/pgtoetsen.js (vermoed)",
+      "graadWaarom": "de zwakste premisse is node tooling/scripts/mutationproof.js (vermoed)",
       "mechanismen": [
+        {
+          "doel": "node tooling/scripts/mutationproof.js",
+          "lokaal": false,
+          "keten": [
+            "mutationproof.yml"
+          ],
+          "aanleiding": [
+            "workflow_call"
+          ],
+          "register": null,
+          "stempel": null,
+          "graad": "vermoed"
+        },
+        {
+          "doel": "scripts/outputproof.js",
+          "lokaal": false,
+          "keten": [
+            "ronde.yml"
+          ],
+          "aanleiding": [
+            "schedule",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null,
+          "graad": "vermoed"
+        },
         {
           "doel": "scripts/pgtoetsen.js",
           "lokaal": false,
@@ -338,6 +444,7 @@
           "aanleiding": [
             "pull_request",
             "push",
+            "schedule",
             "workflow_dispatch"
           ],
           "register": null,
@@ -358,9 +465,9 @@
             "schedule",
             "workflow_dispatch"
           ],
-          "register": null,
+          "register": "unit-test-fouten.json",
           "stempel": null,
-          "grond": null,
+          "grond": "schrijft",
           "graad": "vermoed"
         },
         {
@@ -387,6 +494,7 @@
           "aanleiding": [
             "pull_request",
             "push",
+            "schedule",
             "workflow_dispatch"
           ],
           "register": null,
@@ -418,8 +526,24 @@
       "stand": "staat",
       "waarom": "3 mechanisme(n) draaien aan beide kanten en laten een gestempeld register achter",
       "graad": "vermoed",
-      "graadWaarom": "de zwakste premisse is scripts/ladder.js (vermoed)",
+      "graadWaarom": "de zwakste premisse is scripts/experience.js (vermoed)",
       "mechanismen": [
+        {
+          "doel": "scripts/experience.js",
+          "lokaal": true,
+          "keten": [
+            "desktop-standard.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null,
+          "graad": "vermoed"
+        },
         {
           "doel": "scripts/ladder.js",
           "lokaal": true,
@@ -429,6 +553,7 @@
           "aanleiding": [
             "pull_request",
             "push",
+            "schedule",
             "workflow_dispatch"
           ],
           "register": "LADDER.json",
@@ -445,6 +570,7 @@
           "aanleiding": [
             "pull_request",
             "push",
+            "schedule",
             "workflow_dispatch"
           ],
           "register": "ROLRONDE.json",
@@ -502,6 +628,7 @@
           "aanleiding": [
             "pull_request",
             "push",
+            "schedule",
             "workflow_dispatch"
           ],
           "register": null,
@@ -517,6 +644,7 @@
           "aanleiding": [
             "pull_request",
             "push",
+            "schedule",
             "workflow_dispatch"
           ],
           "register": "GLUURRONDE.json",
@@ -533,6 +661,7 @@
           "aanleiding": [
             "pull_request",
             "push",
+            "schedule",
             "workflow_dispatch"
           ],
           "register": "OVERLEVING.json",
@@ -635,8 +764,23 @@
       "stand": "staat",
       "waarom": "1 mechanisme(n) draaien aan beide kanten en laten een gestempeld register achter",
       "graad": "vermoed",
-      "graadWaarom": "de zwakste premisse is scripts/dekkingsvloer.js (vermoed)",
+      "graadWaarom": "de zwakste premisse is scripts/beproeving-ci-bewijs.js (vermoed)",
       "mechanismen": [
+        {
+          "doel": "scripts/beproeving-ci-bewijs.js",
+          "lokaal": true,
+          "keten": [
+            "ronde.yml"
+          ],
+          "aanleiding": [
+            "schedule",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null,
+          "graad": "vermoed"
+        },
         {
           "doel": "scripts/beproeving.js",
           "lokaal": true,
@@ -679,6 +823,7 @@
           "aanleiding": [
             "pull_request",
             "push",
+            "schedule",
             "workflow_dispatch"
           ],
           "register": null,
@@ -695,6 +840,7 @@
           "aanleiding": [
             "pull_request",
             "push",
+            "schedule",
             "workflow_dispatch"
           ],
           "register": null,
@@ -711,6 +857,22 @@
           "aanleiding": [
             "pull_request",
             "push",
+            "schedule",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null,
+          "graad": "vermoed"
+        },
+        {
+          "doel": "scripts/performance-debt.js",
+          "lokaal": true,
+          "keten": [
+            "ronde.yml"
+          ],
+          "aanleiding": [
+            "schedule",
             "workflow_dispatch"
           ],
           "register": null,
@@ -727,6 +889,7 @@
           "aanleiding": [
             "pull_request",
             "push",
+            "schedule",
             "workflow_dispatch"
           ],
           "register": "TOETSDUUR.json",
@@ -754,6 +917,7 @@
           "aanleiding": [
             "pull_request",
             "push",
+            "schedule",
             "workflow_dispatch"
           ],
           "register": null,
@@ -822,11 +986,44 @@
           "aanleiding": [
             "pull_request",
             "push",
+            "schedule",
             "workflow_dispatch"
           ],
           "register": "NORM.json",
           "stempel": false,
           "grond": "schrijft",
+          "graad": "vermoed"
+        },
+        {
+          "doel": "test/mobile-content.e2e.js",
+          "lokaal": true,
+          "keten": [
+            "desktop-standard.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null,
+          "graad": "vermoed"
+        },
+        {
+          "doel": "test/warm-presentation.e2e.js",
+          "lokaal": true,
+          "keten": [
+            "desktop-standard.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null,
           "graad": "vermoed"
         }
       ]
@@ -849,6 +1046,7 @@
           "aanleiding": [
             "pull_request",
             "push",
+            "schedule",
             "workflow_dispatch"
           ],
           "register": null,
@@ -883,6 +1081,7 @@
           "aanleiding": [
             "pull_request",
             "push",
+            "schedule",
             "workflow_dispatch"
           ],
           "register": null,
@@ -940,6 +1139,7 @@
           "aanleiding": [
             "pull_request",
             "push",
+            "schedule",
             "workflow_dispatch"
           ],
           "register": null,
@@ -971,6 +1171,7 @@
           "aanleiding": [
             "pull_request",
             "push",
+            "schedule",
             "workflow_dispatch"
           ],
           "register": "ENVELOP.json",
@@ -987,6 +1188,7 @@
           "aanleiding": [
             "pull_request",
             "push",
+            "schedule",
             "workflow_dispatch"
           ],
           "register": "GEZAG.json",
@@ -1017,6 +1219,21 @@
           ],
           "aanleiding": [
             "schedule",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null,
+          "graad": "vermoed"
+        },
+        {
+          "doel": "scripts/release-workflow-bewijs.js",
+          "lokaal": true,
+          "keten": [
+            "release-image.yml"
+          ],
+          "aanleiding": [
+            "push",
             "workflow_dispatch"
           ],
           "register": null,
@@ -1187,7 +1404,7 @@
   "uitleg": "Welk bewijsmechanisme op welke sport van de bewijsladder staat, afgeleid uit de keten in .github/workflows en uit de scripts zelf. Per sport de stand (staat, een stap weg, bestaat niet) en per mechanisme of het lokaal draait, alleen in de keten, of beide.",
   "grens": "De SPORTEN zijn verklaard en niet gemeten: dat een soort bewijs hier ontbreekt, zegt deze meter niet. Van de mechanismen erop meet hij dat ze DRAAIEN en waar -- niet of het bewijs dat ze leveren goed is, en niet of het genoeg is. `alleenKeten` telt en oordeelt niet: zeven van die mechanismen lezen een artefact uit een andere job en kunnen lokaal per definitie niet draaien. En er staat met opzet geen samengesteld eindoordeel onder deze tabel (KEURING.md par. 5).",
   "telling": {
-    "mechanismen": 66,
+    "mechanismen": 78,
     "sporten": 12,
     "staat": 6,
     "stap": 6,
@@ -1196,8 +1413,8 @@
     "graadGemeten": 0,
     "graadVermoed": 12,
     "graadOnbekend": 0,
-    "alleenKeten": 18,
-    "vermeldingenAlleenKeten": 19,
+    "alleenKeten": 23,
+    "vermeldingenAlleenKeten": 24,
     "zonderTrede": 0
   }
 }

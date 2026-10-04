@@ -194,6 +194,26 @@ test('een VERLOPEN schuld laat hem zakken zolang de meter niet terug is, en open
   });
 });
 
+test('een verlopen schuld op een PRESTATIEmeter wordt in norm.prestatie gezocht, niet als verdwenen gemeld', () => {
+  metRepo(h => {
+    const schuld = (p99) => grond({
+      prestatie: { p99Ms: p99 },
+      notities: [{ datum: '2026-05-01', meter: 'p99Ms 144 -> 233', reden: 'samenvoeging', soort: 'schuld',
+        sleutel: 'p99Ms', van: 144, vervalt: '2026-07-01' }]
+    });
+    h.schrijfNorm(schuld(233));
+    h.git('add', '-A'); h.git('commit', '-qm', 'met prestatieschuld');
+    const basis = h.git('rev-parse', 'HEAD').trim();
+    const na = h.draai('2026-08-01', '--basis', basis);
+    assert.equal(na.code, 1, na.uit);
+    assert.doesNotMatch(na.uit, /staat niet meer in NORM/, 'de meter staat er wel: in prestatie');
+    assert.match(na.uit, /staat op 233 en hoort terug naar 144/);
+    h.schrijfNorm(schuld(140));
+    const betaald = h.draai('2026-08-01', '--basis', basis);
+    assert.match(betaald.uit, /afbetaald/, betaald.uit);
+  });
+});
+
 /* ==================== 4. DE UITZONDERINGEN VAN DE DELTAPOORT ==================== */
 
 test('een uitzondering zonder vervaldatum of over de datum laat hem zakken', () => {

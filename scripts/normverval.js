@@ -176,7 +176,12 @@ function main() {
       meldingen.push('schuld op ' + n.sleutel + ' loopt tot ' + n.vervalt + ' (terug naar ' + n.van + ')');
       continue;
     }
-    const nu = norm.meters ? norm.meters[n.sleutel] : undefined;
+    /* Een schuld kan op een kwaliteitsmeter staan (norm.meters) of op een
+       prestatiemeter (norm.prestatie: p99Ms, eventLoopP99Ms, ...). Alleen in
+       de eerste kijken gaf voor elke prestatieschuld "staat niet meer in
+       NORM.json" -- een melding die waar leek en de echte stand verborg. */
+    const nu = norm.meters && norm.meters[n.sleutel] !== undefined ? norm.meters[n.sleutel]
+      : (norm.prestatie ? norm.prestatie[n.sleutel] : undefined);
     if (nu === undefined) {
       fouten.push({ wat: n.sleutel, bericht: 'de schuld is verlopen op ' + n.vervalt + ' en de meter staat niet meer in NORM.json' });
       continue;

@@ -82,7 +82,7 @@ const LADDER = [
     patronen: [/test-runner\.js$/, /pgtoetsen\.js$/, /isolatiepoort\.test\.js$/, /mutatiecontract\.js$/,
       /^test\/native-(artifact|process)\.test\.js$/,
       /(rolproef|invoerproef|idemproef|staatproef|uitvoerproef|auditproef|handelingproef)-route\.js$/, /mutatie\.js$/,
-      /wekkers\.js$/, /outputproof\.js$/] },
+      /wekkers\.js$/, /outputproof\.js$/, /mutationproof\.js$/] },
   { id: 'reis', naam: 'Echte reizen per rol', wat: 'een keten van begin tot eind, met de actor die hem loopt',
     patronen: [/(tafel|rit|toelatings)proef\.js$/, /ketenronde\.js$/, /rolronde\.js$/, /zaakwig\.js$/,
       /ladder\.js$/, /tikken\.js$/, /appwerkt\.js$/, /vindbaar\.js$/, /tredeproef\.js$/, /experience\.js$/] },

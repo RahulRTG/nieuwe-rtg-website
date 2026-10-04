@@ -4013,7 +4013,7 @@
       "soort": "structureel",
       "sleutel": "bewijsAlleenKeten",
       "van": 18,
-      "meter": "bewijsAlleenKeten 18 -> 24 (gemeten op een schone boom; het ingecheckte register stond nog op 18 terwijl main vers al 21 meet). Op uitdrukkelijk besluit van de eigenaar van 2026-10-04.",
+      "meter": "bewijsAlleenKeten 18 -> 23 (na de integratie van alle open takken; de eigenaar stond 24 toe) (gemeten op een schone boom; het ingecheckte register stond nog op 18 terwijl main vers al 21 meet). Op uitdrukkelijk besluit van de eigenaar van 2026-10-04.",
       "reden": "Zes mechanismen draaien alleen in de keten omdat ze per definitie een kandidaat-SHA, een CI-run of de veertien routejournalen van GitHub nodig hebben. Drie kwamen met #443 op main en werden nooit gemeten: scripts/evidence.js, evidence-control.js en evidence-calibration.js. Drie komen met #444: tooling/scripts/mutationproof.js (mutationproof.yml), scripts/outputcollect.js en scripts/outputproof.js (ronde.yml). Geen ervan vervangt een lokale proef; het zijn kandidaatgebonden omhulsels eromheen.",
       "waarheen": "De lokale tegenhangers dragen dezelfde vraag: scripts/mutatie.js voor de mutatieproef, scripts/outputproef.js voor de outputproef, en npm run evidence:plan voor het bewijsplan. Zodra scripts/ci-lokaal.js die opdrachten met een lokale kandidaat kan draaien, tellen ze als lokaal bereikbaar en zakt de teller weer."
     },

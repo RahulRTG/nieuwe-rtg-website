@@ -119,13 +119,13 @@ module.exports = function maakBasis() {
     'Geld of spullen zeggen niets over hoe knap je bent. Doorzetten en oefenen brengen je verder dan wat dan ook.'
   ];
 
-  /* Het sessietoken uit een aanvraag: eerst de Authorization-header (een token
-     in een URL lekt via logs, proxies en de browsergeschiedenis), dan de body,
-     en pas als laatste de query -- die blijft alleen voor de SSE-streams
-     (EventSource kan geen headers sturen) en voor oudere, gecachte clients. */
+  /* Het sessietoken uit een aanvraag: de Authorization-header, anders de body.
+     NOOIT de query (B18): een token in een URL lekt via logs, proxies, de
+     browsergeschiedenis en een Referer. De live-kanalen, die geen header kunnen
+     sturen, openen met een eenmalig stroomticket (./gezinsstroom.js). */
   function tokenUit(req) {
     const h = ((req.get && req.get('authorization')) || '');
-    return (h.startsWith('Bearer ') ? h.slice(7) : '') || (req.body && req.body.token) || req.query.token;
+    return (h.startsWith('Bearer ') ? h.slice(7) : '') || (req.body && req.body.token) || '';
   }
 
   /* De context: alles wat de submodules delen. kiesBuddy/leeftijdInstr worden

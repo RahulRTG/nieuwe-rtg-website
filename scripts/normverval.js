@@ -260,7 +260,7 @@ function main() {
     }
     const nu = meterstand(norm, n.sleutel);
     if (nu === undefined) {
-      fouten.push({ wat: n.sleutel, bericht: 'de schuld is verlopen op ' + n.vervalt + ' en de meter staat niet meer in NORM.json' });
+      fouten.push({ wat: n.sleutel, bericht: 'de schuld is verlopen op ' + n.vervalt + ' en de meter staat niet meer in NORM.json (niet onder meters en niet onder prestatie)' });
       continue;
     }
     if (slechter(richting.get(n.sleutel), nu, n.van)) {

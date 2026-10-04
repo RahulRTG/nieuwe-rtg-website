@@ -150,9 +150,14 @@ ondertekende externe dossier staan.
 6. Keur de host en exact dezelfde CI-kandidaat. `live:golive` bouwt niets en
    raakt de productievolumes niet; het gebruikt een eigen vluchtige
    PostgreSQL-, Redis-, queue- en motoromgeving.
-7. Laat de commitgebonden einduitspraak maken. Alleen nul blokkades mag READY
+7. Draai vóór de wissel op de productiehost, tegen dezelfde `RTG_DATA_DIR` als
+   de app, `npm run ssogeheim:ouderdom -- --op <uitroldatum>` (B27). Elke
+   organisatie met `verloopt-bij-uitrol` heeft een SSO-clientgeheim dat door de
+   afkapping op 90 dagen (B22) bij de uitrol meteen verloopt; laat de eigenaar
+   daar eerst roteren. De lijst leest alleen en toont nooit het geheim.
+8. Laat de commitgebonden einduitspraak maken. Alleen nul blokkades mag READY
    opleveren.
-8. Laat een andere, bevoegde release-authority de READY-uitspraak, kandidaat-
+9. Laat een andere, bevoegde release-authority de READY-uitspraak, kandidaat-
    digests en alle bewijsbytes ondertekenen. Daarna pas volgt de wissel.
 
 ```bash

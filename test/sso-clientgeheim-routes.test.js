@@ -1,16 +1,13 @@
-/* HET SSO-CLIENTGEHEIM OP EEN ECHTE SERVER (besluit B16).
+/* HET SSO-CLIENTGEHEIM OP EEN ECHTE SERVER (B16; de passkey van B22 ook in
+   ./sso-clientgeheim-b22.test.js).
 
-   Deel 1, gewone server: de eigenaar zet en roteert het geheim; geen antwoord
-   en geen bestand in de datamap draagt het kale geheim; de overlap loopt en is
-   te sluiten; een lid en kantoor komen er niet bij; een koppeling zonder geheim
-   laat de inlog dicht met de reden in plaats van een lege tokenruil.
+   Deel 1, gewone server: de eigenaar zet en roteert (met passkey); geen antwoord
+   of bestand draagt het kale geheim; de overlap loopt en sluit; lid en kantoor
+   komen er niet bij; zonder geheim is de inlog dicht met de reden.
 
-   Deel 2, dezelfde opslag op een PRODUCTIEserver: een goed geheim laat de
-   inlog door naar de provider, een opgerekte vervaldatum en een ontbrekend
-   geheim houden hem dicht met de reden, en een geheim uit de oude opslag wordt
-   bij het laden herzegeld.
-
-   Draai los: node --test test/sso-clientgeheim-routes.test.js */
+   Deel 2, dezelfde opslag in PRODUCTIE: een goed geheim laat de inlog door,
+   een opgerekte datum of geen geheim houdt hem dicht met de reden, en de oude
+   opslag wordt bij het laden herzegeld. */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -20,6 +17,7 @@ const os = require('node:os');
 const path = require('node:path');
 const { DatabaseSync } = require('node:sqlite');
 const { startServer, stop, stopNet } = require('./helper');
+const { zwaarApi } = require('./zwaarpasskey');
 
 const KEYS = { RTG_ENC_KEY: 'k'.repeat(64), RTG_VAULT_KEY: 'v'.repeat(64), RTG_SECRET_KEY: 's'.repeat(64) };
 const GEHEIM = 'ssogeheim-' + crypto.randomBytes(10).toString('hex');
@@ -66,9 +64,10 @@ test('het clientgeheim: zetten, roteren met overlap, nooit terug, en dicht met d
     password: 'geheim12345', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
   const kantoor = (await api('/api/office/login', { code: 'KANTOOR-SSOGEHEIM' })).body.token;
   assert.ok(lid && kantoor);
+  const zw = await zwaarApi(api, proef.base, eig); // B22: verse passkey onder elk geheim
 
   for (const org of ['goed', 'gerekt', 'oud']) {
-    const r = await api('/api/techniek/sso', koppeling(org, GEHEIM), eig);
+    const r = await zw('/api/techniek/sso', koppeling(org, GEHEIM), eig);
     assert.equal(r.status, 200, r.tekst.slice(0, 200));
     assert.equal(r.tekst.includes(GEHEIM), false, 'het zetten geeft het geheim niet terug');
     assert.match(r.body.geheim.vingerafdruk, /^hmac:[0-9a-f]{16}$/);
@@ -85,13 +84,13 @@ test('het clientgeheim: zetten, roteren met overlap, nooit terug, en dicht met d
   assert.equal(lijst.tekst.includes(GEHEIM), false);
 
   // roteren met overlap
-  const rot = await api('/api/techniek/sso/geheim', { org: 'goed', clientSecret: NIEUW, overlapDagen: 3, dagen: 90 }, eig);
+  const rot = await zw('/api/techniek/sso/geheim', { org: 'goed', clientSecret: NIEUW, overlapDagen: 3, dagen: 90 }, eig);
   assert.equal(rot.status, 200, rot.tekst.slice(0, 200));
   assert.equal(rot.tekst.includes(NIEUW) || rot.tekst.includes(GEHEIM), false, 'geen van beide geheimen in het antwoord');
   assert.equal(rot.body.geheim.overlap.vingerafdruk, goed.geheim.vingerafdruk, 'het vorige loopt mee');
   assert.notEqual(rot.body.geheim.vingerafdruk, goed.geheim.vingerafdruk);
   assert.ok([89, 90].includes(rot.body.geheim.dagenOver), 'vervalt over 90 dagen');
-  const nogEens = await api('/api/techniek/sso/geheim', { org: 'goed', clientSecret: NIEUW, overlapDagen: 3 }, eig);
+  const nogEens = await zw('/api/techniek/sso/geheim', { org: 'goed', clientSecret: NIEUW, overlapDagen: 3 }, eig);
   assert.equal(nogEens.status, 200);
   assert.equal(nogEens.body.ongewijzigd, true, 'hetzelfde geheim opnieuw maakt geen overlap met zichzelf');
   assert.equal(nogEens.body.geheim.overlap.vingerafdruk, goed.geheim.vingerafdruk);
@@ -99,17 +98,17 @@ test('het clientgeheim: zetten, roteren met overlap, nooit terug, en dicht met d
   assert.equal(sluit.status, 200, sluit.tekst.slice(0, 200));
   assert.equal(sluit.body.geheim.overlap, null);
   assert.equal((await api('/api/techniek/sso/geheim/overlap/sluit', { org: 'goed' }, eig)).status, 409);
-  assert.equal((await api('/api/techniek/sso/geheim', { org: 'bestaat-niet', clientSecret: 'x' }, eig)).status, 404);
+  assert.equal((await zw('/api/techniek/sso/geheim', { org: 'bestaat-niet', clientSecret: 'x' }, eig)).status, 404);
   assert.equal((await api('/api/techniek/sso/geheim/overlap/sluit', { org: 'bestaat-niet' }, eig)).status, 404);
-  const teLang = await api('/api/techniek/sso/geheim', { org: 'goed', clientSecret: 'x', dagen: 731 }, eig);
+  const teLang = await zw('/api/techniek/sso/geheim', { org: 'goed', clientSecret: 'x', dagen: 91 }, eig);
   assert.equal(teLang.status, 400);
   assert.equal(teLang.body.code, 'VERVAL_ONGELDIG');
-  assert.equal((await api('/api/techniek/sso/geheim', { org: 'goed', clientSecret: 12 }, eig)).body.code, 'GEHEIM_ONGELDIG');
+  assert.equal((await zw('/api/techniek/sso/geheim', { org: 'goed', clientSecret: 12 }, eig)).body.code, 'GEHEIM_ONGELDIG');
 
   /* Alleen de EIGENAAR, ook niet iemand die de eigenaar tot de techniekpagina
      toeliet: techAuth laat die door, eigenaarAlleen niet. */
   const lidMail = 'sg' + u + '@x.nl';
-  assert.equal((await api('/api/techniek/toegang', { email: lidMail, actie: 'geef' }, eig)).status, 200);
+  assert.equal((await zw('/api/techniek/toegang', { email: lidMail, actie: 'geef' }, eig)).status, 200);
   const toegelaten = (await api('/api/techniek/inloggen', { login: lidMail, wachtwoord: 'geheim12345' })).body.token;
   assert.ok(toegelaten, 'het toegelaten lid komt op de techniekpagina');
   assert.equal((await api('/api/techniek/sso/geheim', { org: 'goed', clientSecret: 'overname' }, toegelaten)).status, 403);

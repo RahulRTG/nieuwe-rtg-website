@@ -17215,6 +17215,72 @@
       "operator": "&&->||#14",
       "gezakt": 1,
       "geprobeerd": 67
+    },
+    "foundation-lesstroom.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
+    },
+    "gezinscode.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/foundation/gezinscode.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "gezinsdeur.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
+    "kantoor-eerste-account.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "kantoor-koppel-passkey.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "lesdeel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/foundation/lesdeel.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 2
+    },
+    "partnerpersoneelscode-migratie.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "sso-clientgeheim-b22.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "ssogeheim-ouderdom.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/sso/clientgeheim.js",
+      "operator": "+->-#0",
+      "gezakt": 2,
+      "geprobeerd": 14
     }
   }
 }

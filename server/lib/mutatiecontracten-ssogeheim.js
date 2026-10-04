@@ -6,13 +6,14 @@
 'use strict';
 const AF = { door: 'Claude, sso/clientgeheim*.js en de routes gelezen en beproefd', op: '2026-09-29' };
 const EIGENAAR = { klasse: 'CAPABILITY_GATED', bevoegdheid: 'eigenaar van RTG (techAuth + eigenaarAlleen)' };
+const MET_PASSKEY = { klasse: 'CAPABILITY_GATED', bevoegdheid: 'eigenaar van RTG (techAuth + eigenaarAlleen) met een verse passkey (zware actie eigenaar-ssogeheim, zonder terugval; B22)' };
 const CONTRACTEN = {
   'POST /api/techniek/sso/geheim': {
     mutatieId: 'techniek.sso.geheim.roteren', herkomst: 'mens',
-    semantiek: { klasse: 'nietHerhaalbaar' }, toegang: EIGENAAR,
+    semantiek: { klasse: 'nietHerhaalbaar' }, toegang: MET_PASSKEY,
     stand: 'INTENTIONALLY_NON_IDEMPOTENT',
     waarom: 'Roteren zet een nieuw clientgeheim bovenaan en laat het vorige een begrensde overlap meelopen. Hetzelfde geheim nog eens geeft ongewijzigd: true zonder overlap met zichzelf; een ander geheim is een tweede rotatie en schuift de overlap door. De kern beslist op de verse stand, geen cache, en het antwoord draagt nooit het geheim.',
-    bewijs: { gemeten: 'test/sso-clientgeheim-routes.test.js: rotatie met overlap, dezelfde aanvraag nog eens is ongewijzigd, lid en kantoor krijgen 401/403, een onbekende org 404; test/sso-clientgeheim.test.js toets 3', op: '2026-09-29' },
+    bewijs: { gemeten: 'test/sso-clientgeheim-routes.test.js: rotatie met overlap, dezelfde aanvraag nog eens is ongewijzigd, lid en kantoor krijgen 401/403, een onbekende org 404; test/sso-clientgeheim.test.js toets 3; test/sso-clientgeheim-b22.test.js: zonder passkey 403, zonder ceremonie 401, en er wordt niets geschreven', op: '2026-10-04' },
     afgetekend: AF
   },
   'POST /api/techniek/sso/geheim/overlap/sluit': {

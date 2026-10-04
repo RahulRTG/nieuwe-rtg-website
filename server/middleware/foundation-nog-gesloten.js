@@ -7,18 +7,19 @@
    De indeling volgt de DRAGER en niet het pad. Een route staat hier omdat hij
    een niet-gemigreerde credential UITGEEFT of LEEST:
 
-   - de gezinsdeur zelf (/api/foundation/gezin: de 6-tekens gezinscode plus
-     PIN, en /api/rtf/social/stream met code en token in de URL).
-     CODECREDENTIALS.json, foundation.family_profile_access. Het
-     gezinsPROFIELTOKEN is sinds 29 september 2026 gemigreerd (B17,
-     foundation/gezinstoken.js: 128 bits, hash-only, verval, epoch, intrekken);
-     zijn consumers onder /api/rtf, /api/foundation/markt, /mail, /kosten en
-     /hulp/ai staan hier daarom niet meer
-     (foundation.family_profile_token_buiten_harde_poort, migrated). De
-     beschermde-functiepoort in ./foundation-productiepoort.js blijft voor hen
-     gewoon gelden: zonder extern dossier zijn de meeste nog steeds 503.
    - de overige oude dragers (lab2, lesmaker, schoolpas, stadionticket,
      registratiebesluit), zoals ze er al stonden.
+
+   De GEZINSDEUR staat hier sinds 4 oktober 2026 niet meer (B18,
+   CODECREDENTIALS.json foundation.family_profile_access, migrated): de
+   gezinscode is een 128-bit code die alleen als hash bestaat
+   (foundation/gezinscode.js, met een rem per adres en per gezin), het
+   zes-tekenadres opent niets, en /api/rtf/social/stream en het gezinskanaal
+   openen met een eenmalig stroomticket in plaats van de sessie in de URL
+   (foundation/gezinsstroom.js). Het gezinsPROFIELTOKEN was al gemigreerd (B17,
+   foundation/gezinstoken.js; sinds B19 zeven dagen). De beschermde-functiepoort
+   in ./foundation-productiepoort.js blijft voor de hele gezinsfamilie gelden:
+   zonder extern dossier (B8) zijn ze in productie nog steeds 503.
 
    De lescredential onder /api/foundation (les, bord, schrift, opgave(n),
    agenda en /ai) staat hier NIET meer: sinds 29 september 2026 (B17) is hij
@@ -32,7 +33,6 @@
 'use strict';
 
 const FAMILIES = Object.freeze([
-  '/api/foundation/gezin',
   '/api/foundation/school',
   '/api/lab2/mijn',
   '/api/les'
@@ -45,8 +45,7 @@ const ROUTES = Object.freeze([
   '/api/member/sport/tickets',
   '/api/sport/scan',
   '/api/foundation/registratie/status',
-  '/api/office/foundation/registratie/besluit',
-  '/api/rtf/social/stream'
+  '/api/office/foundation/registratie/besluit'
 ]);
 
 module.exports = { FAMILIES, ROUTES };

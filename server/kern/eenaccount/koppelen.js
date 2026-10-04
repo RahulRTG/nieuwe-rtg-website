@@ -1,12 +1,13 @@
 /* Eenaccount (deelbestand): het KOPPELEN van een rol aan het ene account.
 
    Dit is de bewijs-helft: personeel bewijst de zaak-code + eigen PIN, de zaak
-   bewijst de bedrijfsinlog en het kantoor een uitnodiging op naam. Buiten
-   productie mag de oude test/demo-opstelling daar nog een losse TOTP bij
-   vragen. Pas als het bewijs er is, komt de rol aan de sleutelbos. De andere
-   helft -- met die sleutelbos een werk-sessie munten -- staat in
-   ../eenaccount.js; in productie opent die kantoorrol uitsluitend na een verse
-   passkeyceremonie (kantoor/productiedeur.js).
+   bewijst de bedrijfsinlog, het kantoor bewijst een uitnodiging op naam plus
+   de tweede factor (in productie een eigen passkey, B24; daarbuiten mag de
+   oude test/demo-opstelling nog een losse TOTP vragen). Pas als het bewijs er
+   is, komt de rol aan de sleutelbos. De andere helft -- met die sleutelbos een
+   werk-sessie munten -- staat in ../eenaccount.js; in productie opent die
+   kantoorrol daarna uitsluitend na een verse passkeyceremonie
+   (kantoor/productiedeur.js).
 
    TWEE SLOTEN, EN ALLEEN SAMEN DEUGEN ZE.
 
@@ -32,7 +33,7 @@ const MAX_POGING = 5; // koppel-pogingen per account per minuut
 
 module.exports = (kctx) => {
   const { accounts, findSupplier, checkCred, hasCred, DEMO, DEMO_SUPPLIER,
-    totpOk, logInlog, pinSlot, nu, kantoorUitnodiging } = kctx;
+    totpOk, logInlog, pinSlot, nu, kantoorUitnodiging, zwaarVan } = kctx;
 
   /* De koppel-teller draait op HETZELFDE slot als de personeelspin hieronder.
      Hij had een eigen Map met dezelfde grenzen en zonder opruimronde -- en dat
@@ -105,8 +106,8 @@ module.exports = (kctx) => {
       const doel = 'kantoor:koppel';
       if (pinSlot.dicht(doel)) return { status: 429, error: 'Te veel foute pogingen. Wacht een minuut.' };
       /* FASE 2 (AUTHORITY.md): een uitnodiging op naam naast de gedeelde code.
-         De uitnodiging gaat langs hetzelfde doel-slot en dezelfde tweede factor,
-         en wordt pas verbruikt als ook die klopt. */
+         De uitnodiging gaat langs hetzelfde doel-slot en de tweede factor (in
+         productie de eigen passkey, B24), en wordt pas verbruikt als die klopt. */
       const viaUitnodiging = !!(kantoorUitnodiging && String(body.uitnodiging || '').trim());
       /* DE GEDEELDE CODE KOPPELT NIET MEER (besluit van de eigenaar, 23 september
          2026). Een code die het hele kantoor kent, bewijst niet wie er koppelt.
@@ -126,8 +127,22 @@ module.exports = (kctx) => {
         logInlog('koppel', false, 'kantoor', req);
         return toegang;
       }
-      if (!productiedeur.isProductie() && process.env.OFFICE_TOTP_SECRET &&
-          !totpOk(process.env.OFFICE_TOTP_SECRET, body.totp)) {
+      /* B24 (4 oktober 2026): in productie bevestigt de medewerker het koppelen
+         met een EIGEN verse passkey (zware poort, actie kantoor-koppel, zonder
+         terugval, gebonden aan zijn lid-sessie) en vervalt de GEDEELDE TOTP: een
+         factor die het hele kantoor kent, bewijst niet wie er koppelt. Een vraag
+         om de ceremonie is geen foute poging; een passkey die niet klopt telt
+         alleen op DIT account, zodat het gedeelde doel-slot geen hefboom wordt
+         om anderen buiten te sluiten. Buiten productie: de TOTP zoals hij was. */
+      if (productiedeur.isProductie()) {
+        const pd = await productiedeur.startBewijs({ zwaarVan, accounts, key, req,
+          actie: productiedeur.KOPPEL_ACTIE, omschrijving: 'Het koppelen van de kantoorrol' });
+        if (!pd.ok) {
+          if (pd.status === 401 && !pd.bevestigingNodig) fout(key);
+          logInlog('koppel', false, 'kantoor (passkey)', req);
+          return pd;
+        }
+      } else if (process.env.OFFICE_TOTP_SECRET && !totpOk(process.env.OFFICE_TOTP_SECRET, body.totp)) {
         fout(key);
         pinSlot.fout(doel, 'de tweede factor van de backoffice via /api/account/koppel');
         logInlog('koppel', false, 'kantoor (tweede factor)', req);

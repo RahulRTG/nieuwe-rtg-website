@@ -12,8 +12,8 @@
 
    Een medewerker is een PLEK (`pm_<hex>`) met hooguit een interne verwijzing als
    label, nooit een naam. De oude, door mensen gekozen `partner.staff.code` wordt
-   nergens meer gelezen en opent niets; de kantoorroute haalt hem weg zodra de
-   partner een nieuwe code krijgt. */
+   nergens meer gelezen, opent niets en wordt bij de opslagstart gewist (B21,
+   ./partnerpersoneelscode-migratie.js). */
 'use strict';
 
 const VORM = /^PK\.[0-9A-F]{32}$/i;

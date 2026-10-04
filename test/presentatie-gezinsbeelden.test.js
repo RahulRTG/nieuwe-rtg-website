@@ -28,7 +28,7 @@ async function post(pad, body) {
 async function profiel(naam) {
   const f = (await post('/api/foundation/gezin/maak', { gezinsnaam: naam, naam: 'Ouder', pin: '1234', bevoegdGezin: true, privacyAkkoord: true })).body;
   const c = (await post('/api/foundation/gezin/profiel/maak', { code: f.code, token: f.token, naam: 'Kind', rol: 'kind', geboortedatum: '2015-04-04', pin: '5678' })).body;
-  const k = (await post('/api/foundation/gezin/profiel/kies', { code: f.code, profielId: c.profiel.id, pin: '5678' })).body;
+  const k = (await post('/api/foundation/gezin/profiel/kies', { gezinscode: f.gezinscode, profielId: c.profiel.id, pin: '5678' })).body;
   return { code: f.code, token: k.token };
 }
 

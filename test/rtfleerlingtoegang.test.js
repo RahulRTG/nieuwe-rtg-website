@@ -17,7 +17,7 @@ const post = async (pad, body, prefix = '/api/foundation') => {
 };
 async function profiel(naam, geboortedatum, groep) {
   const p = (await post('/gezin/profiel/maak', { code: gezin.code, token: gezin.token, naam, rol: 'kind', geboortedatum, groep })).body.profiel;
-  const k = (await post('/gezin/profiel/kies', { code: gezin.code, profielId: p.id })).body;
+  const k = (await post('/gezin/profiel/kies', { gezinscode: gezin.gezinscode, profielId: p.id })).body;
   return { code: gezin.code, token: k.token, id: p.id, profiel: k.profiel };
 }
 const toegang = (sess, extra) => post('/toegang', Object.assign({ code: sess.code, token: sess.token, scherm: 'campus' }, extra || {}), '/api/rtf');
@@ -37,7 +37,7 @@ test('geboortedatum bepaalt de groep en wordt niet op de profielkeuzedeur gelekt
   assert.equal(kind.profiel.groep, 'kind');
   assert.equal(kind.profiel.leeftijdBevestigd, true);
   assert.equal(kind.profiel.geboortedatum, null, 'de profielkeuze deelt geen exacte geboortedatum');
-  const lijst = await post('/gezin/inloggen', { code: gezin.code });
+  const lijst = await post('/gezin/inloggen', { gezinscode: gezin.gezinscode });
   assert.ok(lijst.body.profielen.every(p => p.geboortedatum == null));
   const kindMij = await fetch(base + '/api/foundation/gezin/' + gezin.code + '/mij', { headers: { Authorization: 'Bearer ' + kind.token } }).then(r => r.json());
   assert.ok(kindMij.profielen.every(p => p.geboortedatum == null), 'een leerling ziet geen exacte geboortedata van het gezin');

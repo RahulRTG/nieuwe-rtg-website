@@ -45,8 +45,8 @@ let t = 0;
 async function gezin(naam) {
   const g = (await api('/gezin/maak', { gezinsnaam: naam + (t++), naam: 'Ouder', pin: '1357' })).body;
   const kp = (await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Kind', rol: 'kind' })).body;
-  const kt = (await api('/gezin/profiel/kies', { code: g.code, profielId: kp.profiel.id })).body.token;
-  const mij = await fetch(BASE + '/api/foundation/gezin/' + g.code + '/mij?token=' + g.token).then(r => r.json());
+  const kt = (await api('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: kp.profiel.id })).body.token;
+  const mij = await fetch(BASE + '/api/foundation/gezin/' + g.code + '/mij', { headers: { Authorization: 'Bearer ' + g.token } }).then(r => r.json());
   return { code: g.code, token: g.token, pid: (mij.profiel || mij).id, kindToken: kt };
 }
 const zet = (o, G) => Object.assign({ code: G.code, token: G.token }, o);

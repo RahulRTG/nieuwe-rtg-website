@@ -83,7 +83,7 @@ test('4. over HTTP: de vervaldatum gaat mee, een ongeldige telling is 400, en er
     const eig = (await post('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })).body.token;
     assert.ok(eig);
     assert.equal((await post('/api/techniek/sso', { org: 'verval', naam: 'Verval BV', issuer: 'https://idp.verval.test',
-      clientId: 'c', clientSecret: 'g', domeinen: ['verval.test'], actief: true }, eig)).status, 200);
+      clientId: 'c', domeinen: ['verval.test'], actief: true }, eig)).status, 200);
     assert.equal((await post('/api/techniek/sso/scimsleutel', { org: 'verval', dagen: 999 }, eig)).status, 400);
     const r = await post('/api/techniek/sso/scimsleutel', { org: 'verval', dagen: 60 }, eig);
     assert.equal(r.status, 200);

@@ -33,7 +33,7 @@ test('Vandaag leren op school.html en de schoolpunten alleen-lezen op de gezinsa
     const g = await api('/gezin/maak', { gezinsnaam: 'Fam Scherm', naam: 'Pap', pin: '1234' });
     const kind = await api('/gezin/profiel/maak', { code: g.code, token: g.token,
       naam: 'Roos', rol: 'kind', groep: 'tiener', kleur: '#3A7BD5', geboortedatum: '2011-08-20' });
-    const kindToken = (await api('/gezin/profiel/kies', { code: g.code, profielId: kind.profiel.id })).token;
+    const kindToken = (await api('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: kind.profiel.id })).token;
     await api('/school/koppel', { code: g.code, token: g.token, klasCode: kl.code, profielId: kind.profiel.id });
     await api('/school/uitnodiging/antwoord', { code: g.code, token: kindToken, klasCode: kl.code, akkoord: true });
     await api('/school/huiswerk/maak', { klasCode: kl.code, leraarToken: p.personeelToken,

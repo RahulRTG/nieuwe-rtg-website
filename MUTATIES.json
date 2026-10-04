@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-04T04:41:52.144Z",
-    "commit": "eaf9b488",
+    "op": "2026-10-04T18:06:19.177Z",
+    "commit": "cc0e9cae",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -15545,6 +15545,14 @@
       "module": "server/middleware/versieadres.js",
       "operator": "===->!==#0",
       "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "versmallingswetten.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/commercie/bevoegdheid.js",
+      "operator": "===->!==#0",
+      "gezakt": 8,
       "geprobeerd": 1
     },
     "verstrengeling.test.js": {

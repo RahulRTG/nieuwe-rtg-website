@@ -130,7 +130,7 @@ test('een relatieve API-actie verandert het aangeroepen doel, niet andere argume
 
 test('een ingeschakelde code-optie kan uit zonder returnwaarden of tekst te raken', () => {
   assert.equal(muteer("observeer(knoop, { childList:true, subtree: true });", op('optie-uit'), 0),
-    "observeer(knoop, { childList:false, subtree: true });");
+    "observeer(knoop, { childList: false, subtree: true });");
   assert.equal(muteer("const tekst='subtree: true';", op('optie-uit'), 0), null);
   assert.equal(muteer('function ok(){ return true; }', op('optie-uit'), 0), null);
 });

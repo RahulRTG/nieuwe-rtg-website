@@ -37,7 +37,10 @@ function sarifBestanden(map) {
 
 function beoordeel({ map, commit, ref, runId } = {}) {
   if (!SHA.test(String(commit || ''))) throw new Error('CodeQL-verdict mist volledige commit-SHA');
-  if (!/^refs\/(?:heads|tags)\/[A-Za-z0-9._\/-]+$/.test(String(ref || '')))
+  /* Een pull_request-run draait op refs/pull/<n>/merge. De ref staat alleen
+     ter herkomst in het verdict; de releaseketen kiest zelf uitsluitend
+     runs op main (release-workflow-bewijs.js), dus een PR-verdict telt daar niet. */
+  if (!/^refs\/(?:(?:heads|tags)\/[A-Za-z0-9._\/-]+|pull\/[1-9][0-9]*\/merge)$/.test(String(ref || '')))
     throw new Error('CodeQL-verdict mist geldige Git-ref');
   const gevonden = sarifBestanden(map), bestanden = [];
   let resultaten = 0, runs = 0;

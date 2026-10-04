@@ -37,6 +37,10 @@ test('ieder CodeQL-resultaat, mislukte run en ongebonden bron faalt gesloten', (
     assert.throws(() => verdict.beoordeel({ map:mislukt, commit:SHA, ref:'refs/heads/main' }), /mislukte uitvoering/);
     assert.throws(() => verdict.beoordeel({ map:rood, commit:'kort', ref:'refs/heads/main' }), /commit-SHA/);
     assert.throws(() => verdict.beoordeel({ map:rood, commit:SHA, ref:'main' }), /Git-ref/);
+    assert.equal(verdict.beoordeel({ map:rood, commit:SHA, ref:'refs/pull/447/merge' }).ref, 'refs/pull/447/merge',
+      'een pull_request-run draagt zijn merge-ref als herkomst');
+    for (const fout of ['refs/pull/447/head', 'refs/pull/0/merge', 'refs/pull/x/merge'])
+      assert.throws(() => verdict.beoordeel({ map:rood, commit:SHA, ref:fout }), /Git-ref/);
   } finally {
     fs.rmSync(rood, { recursive:true, force:true });
     fs.rmSync(mislukt, { recursive:true, force:true });

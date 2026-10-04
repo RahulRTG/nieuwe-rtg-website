@@ -114,6 +114,7 @@ const NIET_MUTEREN = new Map([
    Elke operator werkt op de bron ZONDER commentaar en tekenreeksen mee te
    rekenen, want een verandering in een uitlegregel bewijst niets. */
 const OPERATOREN = [
+  ...require('./lib/mutatie-html').OPERATOREN_HTML,
   // Bestemmingen en publieke browser-API's zijn ook gedrag. Een ontbrekende
   // route of export is een echte regressie, ook als geen conditie verandert.
   { naam: 'browser-export-weg', zoek: /\b((?:window|w)\.RTG\w+\s*=\s*)(?!=)/, zet: '$1undefined && ' },
@@ -566,6 +567,16 @@ const EIGEN_MODULE = new Map([
   ['media-studio-pro.e2e.js', ['public/apps/media/studio-pro-engine.js']],
   ['werkruimte.e2e.js', ['public/shared/rtg-schil.js']],
   ['foundation-premium-ui.test.js', ['public/apps/foundation/sw.js', 'public/apps/foundation/premium.js']],
+  ['werkos-schil.e2e.js', ['public/shared/werkos.js']],
+  ['rtg-edge-2.e2e.js', ['public/shared/rtg-edge-2.js']],
+  ['storyline-worlds.e2e.js', ['public/site/storyline-world.js']],
+  ['toestel.e2e.js', ['public/shared/toestel/opslag.js', 'public/shared/toestel/rekenaar.js']],
+  ['laatstedrie.e2e.js', ['public/shared/media.js']],
+  ['rtfrust.e2e.js', ['public/apps/foundation/rust.html']],
+  ['identiteitschermen.e2e.js', ['public/apps/rtgid.html', 'public/apps/passkeys.html']],
+  ['juridischeschermen.e2e.js', ['public/apps/juridisch/privacy.html']],
+  ['wereldbreedte.e2e.js', ['public/apps/living-os.html']],
+  ['website-screen-edges.e2e.js', ['public/site/werelden/livingos.html']],
   ['living-world.test.js', ['server/kern/living-world/actions.js']],
   ['living-world-sources.test.js', ['server/kern/living-world/actions.js']],
   ['living-world-sqlite.test.js', ['server/kern/living-world/index.js']],
@@ -1516,14 +1527,16 @@ function proefPuur(naam, posities) {
     const voor = bronStand(p);           // na de nulmeting: wat die schreef, telt niet als bijwerking
     for (let i = 0; i < diep; i++) {
       for (const op of OPERATOREN) {
-        const nieuw = muteer(origineel, op, i);
+        const html = rel.endsWith('.html');
+        const nieuw = html ? require('./lib/mutatie-html').muteerHtml(origineel, op, i, muteer) : muteer(origineel, op, i);
         if (!nieuw || nieuw === origineel) continue;
         /* Alles wat met de mutatie op schijf te maken heeft, gaat door metMutatie:
            aanmelden, spoor schrijven, terugzetten. Eén plek, dus geen lus die er
            een van vergeet. */
         const uit = metMutatie(p, nieuw, () => {
-          const check = spawnSync('node', ['--check', p], { cwd: WORTEL, encoding: 'utf8' });
-          if (check.status !== 0) return null;    // mutatie brak de syntaxis: telt niet
+          const geldig = html ? require('./lib/mutatie-html').geldigeScripts(nieuw)
+            : spawnSync('node', ['--check', p], { cwd: WORTEL, encoding: 'utf8' }).status === 0;
+          if (!geldig) return null;    // mutatie brak de syntaxis: telt niet
           geprobeerd++;
           const na = draaiToets(bestand, null, WACHT_MUTATIE);
           const schade = bijwerkingVan(voor, bronStand(p));

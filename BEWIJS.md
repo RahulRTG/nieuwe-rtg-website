@@ -15,9 +15,9 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 2356 |
 | losse beweringen (`test(...)`) | 16186 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 274 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2179 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2181 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
-| niet te meten (al rood, geen module gevonden, ...) | 176 |
+| niet te meten (al rood, geen module gevonden, ...) | 174 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
 | niets van beide | 1 |
 
@@ -545,7 +545,7 @@ toets omvalt.
 | `foundation-lescredential.pg.test.js` | 1 | slaat zichzelf over | Echte productie-topologieproef voor de lescredentials van RTFoundation- onderwijs (B17, CODECREDENTIALS.json foundation.onderwijs_les_tokens). Twee onafhankelijke instances delen dezelfde PostgreSQL. |
 | `foundation-lescredential.test.js` | 9 | gezakt op `!==->===#0` | De lescredentials van RTFoundation-onderwijs (B17, CODECREDENTIALS.json foundation.onderwijs_les_tokens) op moduleniveau: vorm, hash-only, verval, de claim met zijn plafond, intrekken en roteren, en dat een kind geen... |
 | `foundation-lesrem.test.js` | 3 | gezakt op `liegpoort /api/` | DE LES-MAAKROUTE HEEFT DE REM DIE HAAR REDEN BELOOFDE. WAT ER MIS WAS. |
-| `foundation-lesstroom.pg.test.js` | 1 | slaat zichzelf over | Echte productie-topologieproef voor het stroomticket van RTFoundation- onderwijs (B25, CODECREDENTIALS.json foundation.onderwijs_les_tokens). Twee onafhankelijke instances delen dezelfde PostgreSQL. |
+| `foundation-lesstroom.pg.test.js` | 1 | gezakt op `voorwaarde-omkeren#0` | Echte productie-topologieproef voor het stroomticket van RTFoundation- onderwijs (B25, CODECREDENTIALS.json foundation.onderwijs_les_tokens). Twee onafhankelijke instances delen dezelfde PostgreSQL. |
 | `foundation-lesstroom.test.js` | 5 | gezakt op `liegpoort /api/` | B25: de lessleutel verlaat de URL (RELEASEKANDIDAAT.md; deur foundation.onderwijs_les_tokens). Tegen een ECHTE server: - een ?token= wordt overal geweigerd, met een reden, voordat er iets wordt opgezocht -- ook met... |
 | `foundation-markt.test.js` | 5 | gezakt op `liegpoort /api/` | DE MARKTPLAATS VAN DE FOUNDATION -- 4 endpoints. detail, verwijder, chat en blokkeer stonden als nooit aangeroepen in de waargenomen dekkingsmeting. |
 | `foundation-meedoen-ontdekken.test.js` | 5 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -644,7 +644,7 @@ toets omvalt.
 | `gezinleven.test.js` | 4 | gezakt op `liegpoort /api/` | HET GEZINSLEVEN: DE OCHTEND EN HET FEEST. WAT DEZE TWEE MODULES GEMEEN HEBBEN Ze coderen allebei een OPVOEDKUNDIGE keuze, en in allebei is die keuze met een half regeltje om te draaien zonder dat er iets kapot lijkt... |
 | `gezinsagenda-motor.test.js` | 6 | gezakt op `===->!==#0` | De gezinsagenda is geen tweede agenda meer (SCHERMEIGENAAR.json, consolidatieronde van 23 september 2026): hij schrijft en leest via dezelfde motor als de ledenagenda, onder de sleutel gezin:<code>. Deze toets draait... |
 | `gezinscode.test.js` | 7 | gezakt op `true->false#0` | De gezinscode en het stroomticket (B18, CODECREDENTIALS.json foundation.family_profile_access), control voor control: 128 bits en eenmaal kaal, hash-only in een EIGEN collectie, issuer/doel/scope/onderwerp zonder... |
-| `gezinsdeur.pg.test.js` | 1 | slaat zichzelf over | Echte productie-topologieproef voor de gezinsdeur (B18, foundation.family_profile_access): twee onafhankelijke instances delen dezelfde PostgreSQL. 1. |
+| `gezinsdeur.pg.test.js` | 1 | gezakt op `voorwaarde-omkeren#0` | Echte productie-topologieproef voor de gezinsdeur (B18, foundation.family_profile_access): twee onafhankelijke instances delen dezelfde PostgreSQL. 1. |
 | `gezinsdeur.test.js` | 6 | gezakt op `liegpoort /api/` | De gezinsdeur op een ECHTE server (B18 en B19, CODECREDENTIALS.json foundation.family_profile_access): de 128-bit gezinscode die alleen in het antwoord op maken en roteren staat, het zes-tekenadres dat niets meer... |
 | `gezinskeuken.test.js` | 5 | gezakt op `liegpoort /api/` | Integratietests voor de Gezinskeuken (RTFoundation-gezin): het weekmenu (wat eten we, wie kookt), de "verras me"-ideeen, en de gedeelde boodschappenlijst waar iedereen op afvinkt. Gedeeld per gezin, dicht voor gasten... |
 | `gezinsregistratie.test.js` | 5 | gezakt op `liegpoort /api/` | De snelle gezinsdeur: code + eigen PIN zonder namenlek, kinderen onder de beheerder en volwassenen alleen via een persoonlijke eenmalige sleutel. |

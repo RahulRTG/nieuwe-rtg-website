@@ -30,6 +30,7 @@ const EIGEN = [
   '/api/supplier/horeca/bon/maak',
   '/api/supplier/horeca/bon/roteer',
   '/api/supplier/horeca/club/band',
+  '/api/supplier/horeca/teruggave',   // de kern herkent een herhaling en vraagt de providerstand na
   '/api/giftcard/buy',
   '/api/giftcard/roteer',
   '/api/supplier/betaalverzoek',

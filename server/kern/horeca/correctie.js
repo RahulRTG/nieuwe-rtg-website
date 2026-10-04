@@ -127,7 +127,7 @@ module.exports = ({ horeca, schoon }) => {
          voorkomen. */
       teruggave: teveel > 0
         ? { centen: teveel, uitgevoerd: false,
-            let: 'Dit bedrag staat KLAAR. De manager van de zaak betaalt het terug langs de weg waarlangs het binnenkwam (kern/horeca/teruggave.js); deze laag verplaatst geen geld.' }
+            let: 'Dit bedrag staat KLAAR. Een mens van de zaak, de manager, betaalt het terug langs de weg waarlangs het binnenkwam (kern/horeca/teruggave.js); deze laag verplaatst geen geld.' }
         : null
     };
     regel.gecorrigeerd = c;

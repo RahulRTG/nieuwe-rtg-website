@@ -117,6 +117,15 @@ function tel(soort, hoeveel) {
    getallen -- ./effectbon.js leest hem zo, en bouwt er geen tweede naast. */
 function huidig() { return winkel.getStore() || null; }
 
+/* De opslagtracker meldt uitsluitend de top-level collectienaam. Geen rij,
+   sleutel of waarde komt hier binnen. Daardoor kan de effectbon exact zeggen
+   WELKE soort toestand bewoog zonder twee volledige wereldscans per verzoek. */
+function wijziging(feit) {
+  const t = winkel.getStore();
+  if (!t || !t.collecties || !feit || typeof feit.collectie !== 'string') return false;
+  t.collecties.add(feit.collectie); return true;
+}
+
 /* De stand van dit verzoek, als korte tekst voor de kop. Leeg blijft leeg: een
    kop met alleen nullen suggereert een meting waar er geen was. */
 function stand(teller) {
@@ -131,38 +140,8 @@ function stand(teller) {
    zegt WAT er in de database veranderde, deze zegt DAT er iets gebeurde -- en
    die twee samenvatten maakt ze allebei onleesbaar. */
 function haak(app) {
-  if (!aan || !app || typeof app.use !== 'function') return false;
-  app.use((req, res, next) => {
-    perVerzoek((teller) => {
-      /* AAN res.end EN NIET AAN res.json.
-
-         Hij hing eerst aan res.json, zoals de opslagmeter. Dat is de gangbare
-         uitgang maar niet de enige: 282 routes die de kale ronde met 200
-         beantwoordde droegen geen kop, want zij antwoorden via res.send, een
-         redirect of een bestand -- en die gaan in server/web/verrijk.js niet
-         langs res.json. Gemeten, niet bedacht: het contractregister moest die
-         282 als ONGEMETEN afwijzen terwijl de meter gewoon had geteld.
-
-         res.end is de ene uitgang waar alle andere doorheen lopen (res.json
-         roept hem aan, res.send ook, een redirect ook). Vandaar hier. */
-      const echt = res.end;
-      res.end = function (...args) {
-        try {
-          if (!res.headersSent) {
-            /* De teller van DIT verzoek, meegegeven en niet opgevraagd. Een
-               antwoord dat uit een andere context wordt verstuurd (een
-               afgehandelde wachtrij, een foutafhandelaar hogerop) zou anders de
-               stand van een ander verzoek dragen, of geen. */
-            res.setHeader('X-RTG-Effect', stand(teller));
-            res.setHeader('X-RTG-Effect-Niet-Gemeten', NIET_GEMETEN.join(','));
-          }
-        } catch (e) { /* een kop die niet meer kan, mag het antwoord niet breken */ }
-        return echt.apply(this, args);
-      };
-      next();
-    });
-  });
-  return true;
+  return require('./effectmeter-http').koppelEffectmeterHttp(app,
+    { aan, perVerzoek, stand, nietGemeten: NIET_GEMETEN });
 }
 
 function begin(vlag) {
@@ -172,9 +151,10 @@ function begin(vlag) {
 
 begin(process.env.RTG_STAATLOG);
 
-module.exports = { haak, tel, stand, begin, perVerzoek, huidig, SOORTEN, NIET_GEMETEN,
-  get aan() { return aan; } };
+/* Eén waarnemingsweg voor iedere opslagmotor: de tracker zit om db.data en deze
+   teller zit om het verzoek. Registreren aan het eind voorkomt een modulekring
+   tijdens het opstarten van db/state. */
+try { require('./db/mutatietracker').voegWaarnemerToe(wijziging); } catch (e) {}
 
-/* De collectiewaarneming (./effectmeter-collecties.js) hangt pas NA de exports
-   aan de opslagtracker: zij leest dit verzoek via huidig(). */
-module.exports.wijziging = require('./effectmeter-collecties').wijziging;
+module.exports = { haak, tel, stand, begin, perVerzoek, huidig, wijziging, SOORTEN, NIET_GEMETEN,
+  get aan() { return aan; } };

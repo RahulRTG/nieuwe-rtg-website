@@ -8,8 +8,7 @@ module.exports = function betaalBuiten(ctx) {
   const { app, auth, betaal, betaalWaarheid, geldgraaf, appUrl, save,
     sseToSupplier, gegevensStop } = ctx.kern;
 
-  // Het Geldschild naast een bestelling: ./geldschild-buiten.js. Het signaleert alleen.
-  const geldschildVan = require('./geldschild-buiten')(geldgraaf);
+  const geldschildVan = require('./geldschild-checkout')(geldgraaf);
 
   function verrijkCheckout(req, uit) {
     const m = betaal.mogelijkheden();

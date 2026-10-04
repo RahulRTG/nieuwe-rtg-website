@@ -16,7 +16,7 @@ function eis() {
   }
   return adapter;
 }
-function moneyHookFailure(error, code) {
+function moneyFailure(error, code) {
   return Object.freeze({ ok: false, shadow: true,
     code: error && error.code || code || 'MONEY_EVIDENCE_FAILED',
     incidentId: error && error.incidentId || null });
@@ -104,7 +104,7 @@ function confirmed(payment, providerEventId, ingressProof, providerAssertion, ow
       externalValue: { providerEventId: String(providerEventId || ''),
         providerStatus: payment.providerStatus, amountCents: payment.centen, currency: payment.valuta } });
   } catch (error) {
-    return moneyHookFailure(error);
+    return moneyFailure(error);
   }
 }
 
@@ -117,7 +117,7 @@ function unknown(payment, error, owner) {
       ownerReceipt: receipt });
     return eis().assessMoney({ subjectRef: subject(payment), evidenceRefs: [technical.evidenceId],
       correlationId: correlation(payment), at: technical.observedAt });
-  } catch (hookError) { return moneyHookFailure(hookError, 'MONEY_UNKNOWN_EVIDENCE_FAILED'); }
+  } catch (hookError) { return moneyFailure(hookError, 'MONEY_UNKNOWN_EVIDENCE_FAILED'); }
 }
 
 module.exports = { install: installMoneyHook, confirmed, unknown, ownerEvidence, providerSettled,

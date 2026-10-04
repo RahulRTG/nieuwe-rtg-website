@@ -13,37 +13,32 @@ module.exports = function maakBetaalWaarheid({ d, save, crypto, betaal, nu, log 
   const afhandelaars = new Map();
   const startend = new Map();
 
-  // De opslagdoos en de geketende gebeurtenissen: ./keten.js.
-  const { doos, hash, idVan, gebeurtenis } = require('./keten')({ d, crypto, nuIso });
+  function doos() {
+    const data = d();
+    if (!data.betaalWaarheid || typeof data.betaalWaarheid !== 'object') data.betaalWaarheid = {};
+    if (!data.betaalWaarheidMeldingen || typeof data.betaalWaarheidMeldingen !== 'object') data.betaalWaarheidMeldingen = {};
+    return data.betaalWaarheid;
+  }
+  const hash = (v) => crypto.createHash('sha256').update(String(v)).digest('hex');
+  const idVan = (actor, idem) => 'BW-' + hash(String(actor) + '|' + String(idem)).slice(0, 20).toUpperCase();
+
+  function gebeurtenis(r, soort, extra) {
+    if (!Array.isArray(r.gebeurtenissen)) r.gebeurtenissen = [];
+    const vorig = r.gebeurtenissen.length ? r.gebeurtenissen[r.gebeurtenissen.length - 1].zegel : 'BEGIN';
+    const basis = Object.assign({ nr: r.gebeurtenissen.length + 1, at: nuIso(), soort,
+      status: r.status, vorig }, extra || {});
+    basis.zegel = hash(JSON.stringify(basis));
+    r.gebeurtenissen.push(basis);
+    r.bijgewerktAt = basis.at;
+    return basis;
+  }
 
   const publiek = (r) => beeld.publiek(r, definitiefBetaald);
   const bewijs = require('./bewijs')(betaal);
   const afhandeling = require('./afhandeling')({ d, doos, save, nuIso, gebeurtenis,
     STATUS, log, afhandelaars });
 
-  function maak(invoer) {
-    const actor = String(invoer.actor || '');
-    const idem = String(invoer.idem || '');
-    const centen = Math.round(Number(invoer.centen));
-    if (!actor || !idem) throw new Error('Betaling mist een eigenaar of idempotentiesleutel.');
-    if (!Number.isFinite(centen) || centen <= 0) throw new Error('Betaling mist een geldig bedrag.');
-    const id = idVan(actor, idem);
-    const bestaand = doos()[id];
-    if (bestaand) {
-      if (bestaand.actor !== actor || bestaand.centen !== centen || bestaand.bronRef !== String(invoer.bronRef || ''))
-        throw new Error('Deze veilige betaalsleutel hoort al bij een andere betaling.');
-      return bestaand;
-    }
-    const r = doos()[id] = { id, actor, idemHash: hash(idem), soort: String(invoer.soort || 'betaling'),
-      bronRef: String(invoer.bronRef || ''), supplierCode: invoer.supplierCode || null,
-      centen, valuta: String(invoer.valuta || 'eur').toLowerCase(), status: STATUS.AANGEMAAKT,
-      provider: null, providerId: null, providerStatus: null,
-      context: invoer.context || null, aangemaaktAt: nuIso(), bijgewerktAt: nuIso(),
-      gebeurtenissen: [], terugbetaaldCenten: 0 };
-    gebeurtenis(r, 'AANGEMAAKT', { bron: 'server' });
-    save();
-    return r;
-  }
+  const maak = require('./aanmaken')({ doos, hash, idVan, nuIso, gebeurtenis, save, STATUS });
 
   function naar(r, status, extra) {
     if (!mag(r.status, status)) {

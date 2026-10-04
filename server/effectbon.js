@@ -46,7 +46,7 @@
 
 const staatlog = require('./staatlog');
 const effectmeter = require('./effectmeter');
-const { klassenVan } = require('./effectbon-klassen');
+const { classificeerEffectcollecties } = require('./effectbon-classificatie');
 const { nameet } = require('./kern/stuur/gevolgcontract/nameting');
 
 /* DE VOORSPELLER WORDT ERIN GEHANGEN EN NIET OPGEHAALD. Deze laag mag kern LEZEN, maar
@@ -87,8 +87,13 @@ function maak({ envelop, voor, na, teller }) {
   const e = envelop || {};
   const ctx = e.context || {};
   const t = teller || {};
-  // Welke klassen bewogen: ./effectbon-klassen.js (tracker eerst, voor/na als terugval).
-  const { klassen, refs, zonderIndeling } = klassenVan({ voor, na, teller: t });
+  /* Nieuwe runtime: de db-proxy heeft de bewogen collecties tijdens de mutatie
+     zelf al aangewezen. De oude voor/na-vorm blijft uitsluitend als expliciete
+     fallback voor losse toetsen en voor een niet-bewaakte datastore. */
+  const waargenomen = t.collecties && typeof t.collecties[Symbol.iterator] === 'function'
+    ? [...t.collecties].sort() : null;
+  const uit = classificeerEffectcollecties({ voor, na, waargenomen });
+  const { klassen, refs, zonderIndeling } = uit;
 
   /* De twee choke points buiten de opslag. Zij dragen dezelfde klasse en dat is geen
      versimpeling: mail en sms bereiken allebei een tweede persoon buiten RTG, en dat IS

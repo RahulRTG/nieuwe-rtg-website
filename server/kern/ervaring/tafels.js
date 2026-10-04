@@ -9,12 +9,14 @@ module.exports = (ctx) => {
     orderMetRef, boekingMetRef, boekingenVanKlant, id, nu, vandaag, rond, MELDING_SCOPES, trustPlane,
     bewijsHospitalityBesluit } = ctx;
 
-  // Schaduwhaken naar het bewijsvlak; zie ./bewijshaak.js.
-  const { observe, metricTimer, finish } = require('./bewijshaak')(trustPlane);
-  // Het besluit krijgt de twee collecties die het leest, niet de hele database.
-  const beslisReservering = require('./reservering-besluit')({ ...ctx, db: undefined, observe, metricTimer, finish,
-    reserveringen: () => db.data.reserveringen || [],
-    vonkMatches: () => db.data.vonk && Array.isArray(db.data.vonk.matches) ? db.data.vonk.matches : [] });
+  const { observe, metricTimer, finish } = require('./trust-meting')(trustPlane);
+  const beslisReservering = require('./reservering-besluit')({ ...ctx, observe, metricTimer, finish,
+    vindReservering: (supplierCode, rid) => (db.data.reserveringen || [])
+      .find(x => x.id === rid && x.supplierCode === supplierCode),
+    vindVonkMatch: reservationId => {
+      const matches = db.data.vonk && Array.isArray(db.data.vonk.matches) ? db.data.vonk.matches : [];
+      return matches.find(m => m.reserveringId === reservationId);
+    } });
 
   /* Lazy sweep: reserveringen waarvan de 24u-bedenktijd voorbij is worden
      definitief zodra iemand ze opvraagt. Eén keer opslaan als er iets rijpte. */

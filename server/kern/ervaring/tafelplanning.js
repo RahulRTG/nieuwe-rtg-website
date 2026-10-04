@@ -6,8 +6,7 @@
 module.exports = (ctx, { rijpMaak }) => {
   const { db, save, notify, sseToCustomer, sseToSupplier, id, nu, vandaag, tafeldekVan, trustPlane } = ctx;
 
-  // Schaduwhaken naar het bewijsvlak; zie ./bewijshaak.js.
-  const { observe, metricTimer, finish } = require('./bewijshaak')(trustPlane);
+  const { observe, metricTimer, finish } = require('./trust-meting')(trustPlane);
 
   const tafelVan = (s, naam) => (s.tables || []).find(t => t.name === String(naam || ''));
 

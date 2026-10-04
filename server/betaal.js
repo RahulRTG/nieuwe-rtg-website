@@ -120,45 +120,10 @@ const maakBetaling = require('./betaal-connect')({
      uitgang in de echte Stripe-stand veilig dicht tot er een expliciete SEPA-
      rail of gecontroleerd Connected Account is gekoppeld.
    - Idempotent op sleutel: dezelfde afdracht wordt nooit twee keer weggezet. */
-/* MONEY-012: alleen een fout die aantoonbaar VOOR verzending valt, mag tot
-   terugboeken leiden (kern/betaalopdracht/inzending.js). Niet standaard zetten. */
-const voorDeDeur = (e) => { e.nietVerstuurd = true; return e; };
-
-async function maakUitbetaling(opdracht) {
-  if (BETALEN_UIT)
-    throw voorDeDeur(new Error('Betalen staat bewust uitgeschakeld. Er is niets uitbetaald.'));
-  const { bedrag, valuta = 'eur', iban, begunstigde, referentie, idempotentieSleutel, omschrijving } = opdracht || {};
-  if (!Number.isFinite(bedrag) || bedrag <= 0) throw voorDeDeur(new Error('Bedrag moet een positief bedrag in centen zijn.'));
-  const sleutel = 'uit:' + (idempotentieSleutel || referentie || crypto.randomUUID());
-
-  const bestaand = haalOp(sleutel);
-  if (bestaand) return Object.assign({}, bestaand, { herhaald: true });
-
-  let res;
-  if (!iban) {
-    // Geen bestemming bekend: reserveren, niet versturen.
-    res = { id: 'wacht_' + crypto.randomBytes(6).toString('hex'), status: 'te_storten', aanbieder: aanbieder(), bedrag: Math.round(bedrag), valuta, referentie, iban: '' };
-  } else if (regie.sepaGeconfigureerd && !regie.sepaAan) {
-    const e = new Error('SEPA-sandbox is door de Integratiekamer uitgezet.');
-    e.code = 'SEPA_SANDBOX_UIT';
-    throw voorDeDeur(e);
-  } else if (regie.sepaAan) {
-    // lokaal: weigert alleen bij de invoercontrole
-    try { res = sandbox.sepa({ bedrag, valuta, referentie, iban, begunstigde, omschrijving }); }
-    catch (e) { throw voorDeDeur(e); }
-  } else if (stripe) {
-    const bevestiging = UITGAAND_BEWUST_DICHT ? ' De installatie staat bewust in deze gesloten stand.' : '';
-    const e = new Error('Uitbetaling veilig geblokkeerd: een IBAN in Stripe-metadata is geen echte betaalbestemming. Koppel eerst een gecontroleerde uitbetaalrail.' + bevestiging);
-    e.code = 'UITBETAALRAIL_NIET_ACTIEF';
-    throw voorDeDeur(e);
-  } else if (DEMO_BETALEN) {
-    res = { id: 'magnaat_uit_' + crypto.randomBytes(8).toString('hex'), status: 'ingepland', aanbieder: 'magnaat-test', bedrag: Math.round(bedrag), valuta, referentie, iban };
-  } else {
-    try { eisBetaalrail(); } catch (e) { throw voorDeDeur(e); }
-  }
-  bewaar(sleutel, res);
-  return res;
-}
+const maakUitbetaling = require('./betaal/uitbetaling')({ betalenUit: BETALEN_UIT,
+  haalOp: k => haalOp(k), bewaar: (k, v) => bewaar(k, v), regie, sandbox, stripe,
+  demoBetalen: DEMO_BETALEN, aanbieder, eisBetaalrail, crypto,
+  uitgaandBewustDicht: UITGAAND_BEWUST_DICHT });
 
 /* De webhook van buiten woont in ./betaal/webhook.js -- dat is de kant die
    BINNENKOMT, en die snede houdt dit bestand onder de grens van keuringsregel 13.

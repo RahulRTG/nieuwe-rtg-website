@@ -6,7 +6,7 @@ const { hash, bevries } = require('./canon');
 
 const NETWERK = new Set(['ECONNRESET', 'ECONNREFUSED', 'EAI_AGAIN', 'ETIMEDOUT', 'ENETUNREACH']);
 
-function classificeerFout(fout) {
+function retryClassificeer(fout) {
   const status = Number(fout && (fout.status || fout.statusCode));
   const code = fout && fout.code;
   if ((status === 408 || status === 425 || status === 429 || status >= 500) || NETWERK.has(code)) return 'RETRYABLE';
@@ -41,7 +41,7 @@ async function voerUit(opties) {
       throw Object.assign(new Error('provider status ' + status), { status, response: result,
         ambiguous: !!result.ambiguous });
     } catch (fout) {
-      let klasse = classificeerFout(fout);
+      let klasse = retryClassificeer(fout);
       if (fout && fout.ambiguous && o.money === true) {
         if (typeof o.reconcile !== 'function') klasse = 'RECONCILE_REQUIRED';
         else {
@@ -68,4 +68,4 @@ async function voerUit(opties) {
   }
 }
 
-module.exports = { classificeer: classificeerFout, vertraging, voerUit };
+module.exports = { classificeer: retryClassificeer, vertraging, voerUit };

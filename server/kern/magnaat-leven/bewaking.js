@@ -50,36 +50,4 @@ function bevries(st, reden, meld) {
   meld(st, 'Dit leven is bevroren: ' + reden + '. Je kunt kijken en opnieuw beginnen, maar niets doen dat op een kapot boek bouwt.', 'nood');
 }
 
-/* Het vangnet zelf, gebouwd op de boeken van een leven. */
-function maakVangnet({ boek, save, meld, koppel }) {
-  /* Het vangnet om alles wat een leven verandert. Nog niets geboekt: terug naar
-     hoe het was. Wel geboekt: bevriezen, want het journaal gaat niet terug.
-     En kloppen de invarianten na afloop niet, dan ook bevriezen. */
-  return function beschermd(st, doe) {
-    /* De opslagstaat is contractueel JSON. SQLite bewaakt hem met een Proxy,
-       die structuredClone niet accepteert. Deze ronde maakt dezelfde losse
-       rollbackkopie langs de duurzame JSON-grens, zonder de Proxy of een ruwe
-       opslagreferentie naar het domein te lekken. */
-    const voor = JSON.parse(JSON.stringify(st)), volgorde = st.boek.boekVolgorde;
-    try {
-      const r = doe();
-      const schending = r && r.nieuw ? [] : controleer(st, boek);
-      if (!schending.length) return r;
-      bevries(st, schending[0], meld);
-      save();
-      return { status: 409, error: 'Dit leven is bevroren: ' + schending[0] + '.' };
-    } catch (e) {
-      if (st.boek.boekVolgorde === volgorde) {
-        for (const k of Object.keys(st)) delete st[k];
-        Object.assign(st, voor);
-        koppel(st, boek);
-        return { status: 500, error: 'Er ging iets mis bij deze handeling. Er is niets veranderd.' };
-      }
-      bevries(st, 'een handeling brak af nadat er al geboekt was', meld);
-      save();
-      return { status: 500, error: 'Er ging iets mis na een boeking. Dit leven is bevroren om je boeken te beschermen; begin opnieuw.' };
-    }
-  };
-}
-
-module.exports = { controleer, bevries, maakVangnet };
+module.exports = { controleer, bevries };

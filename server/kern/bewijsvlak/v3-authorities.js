@@ -71,7 +71,7 @@ function zonderAttestatie(evidence) {
   return basis;
 }
 
-function maakRegister(extra) {
+function maakAuthorityRegister(extra) {
   const map = new Map(), grants = new WeakMap();
   for (const item of [...BUILTIN, ...(extra || [])]) {
     const c = normaliseer(item), key = c.id + '@' + c.version;
@@ -115,4 +115,4 @@ function maakRegister(extra) {
     list: () => [...map.values()].map(kopie) });
 }
 
-module.exports = { PAYMENT_PROVIDERS, BUILTIN, normaliseer, maakRegister };
+module.exports = { PAYMENT_PROVIDERS, BUILTIN, normaliseer, maakRegister: maakAuthorityRegister };

@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-10-04T05:38:16.433Z",
-    "commit": "fdee9c00",
+    "op": "2026-10-04T05:07:34.506Z",
+    "commit": "dd32d17f9",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 6,
     "instrument": "scripts/mutatie.js",
-    "node": "v22.22.0"
+    "node": "v24.18.0"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -559,7 +559,7 @@
       "operator": "return-weg#3",
       "gezakt": 1,
       "geprobeerd": 18,
-      "scherp": "overleefd"
+      "scherp": "gezakt"
     },
     "antivirus.test.js": {
       "soort": "puur",
@@ -9828,7 +9828,7 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 8,
+      "gezakt": 7,
       "scherp": "gezakt"
     },
     "onderwijs.test.js": {
@@ -12359,7 +12359,7 @@
       "staat": "gezakt",
       "module": "public/shared/rtg-world-identity.js",
       "operator": "===->!==#0",
-      "gezakt": 8,
+      "gezakt": 3,
       "geprobeerd": 1
     },
     "rtg.test.js": {
@@ -17107,15 +17107,19 @@
     },
     "sqlite-tombstone-restart.test.js": {
       "soort": "puur",
-      "staat": "geen module gevonden"
+      "staat": "gezakt",
+      "module": "server/db/sqlite.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 3
     },
     "sqlite-tombstone.test.js": {
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/db/sqlite-poll.js",
-      "operator": "return-weg#0",
+      "operator": "===->!==#1",
       "gezakt": 1,
-      "geprobeerd": 5
+      "geprobeerd": 6
     },
     "trust-evidence-export.test.js": {
       "soort": "puur",
@@ -17138,7 +17142,7 @@
       "staat": "gezakt",
       "module": "server/kern/bewijsvlak/ledger.js",
       "operator": "===->!==#0",
-      "gezakt": 4,
+      "gezakt": 1,
       "geprobeerd": 1
     },
     "trust-evidence-runtime-boundary.test.js": {

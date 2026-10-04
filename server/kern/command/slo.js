@@ -34,6 +34,8 @@
 
 const fs = require('fs');
 const path = require('path');
+const { leesCapabilitySlo, begrensUitrolMetCapabilities } = require('./capability-slo');
+const { pastBijSloSelectie: past, berekenKwantielgrens: kwantielGrens } = require('./slo-rekenen');
 
 const BESTAND = path.join(__dirname, '..', '..', '..', 'SLO.json');
 
@@ -63,23 +65,6 @@ const DAG = 86400000;
 
 /* Past deze reeks bij dit doel? De keuze staat in SLO.json en niet hier, zodat
    een nieuw doel een regel gegevens is en geen tak code. */
-function past(kies, reeks) {
-  if (!kies) return false;
-  if (Array.isArray(kies.methoden) && !kies.methoden.includes(reeks.methode)) return false;
-  if (kies.routeBegintMet) return String(reeks.route).startsWith(kies.routeBegintMet);
-  if (kies.route && kies.route !== '*') return reeks.route === kies.route;
-  return true;
-}
-
-/* Het kwantiel uit een histogram: de kleinste emmer waar het aandeel gehaald
-   wordt. Uitkomst is een bovengrens, en het antwoord zegt dat er ook bij. */
-function kwantielGrens(emmers, opgeteld, aantal, q) {
-  if (!aantal) return null;
-  const doel = aantal * q;
-  for (let i = 0; i < emmers.length; i++) if (opgeteld[i] >= doel) return emmers[i];
-  return null;  // boven de grootste emmer: onbekend hoe ver
-}
-
 function maakSlo({ meting, sonde }) {
   /* Elk doel apart, met zijn eigen venster en zijn eigen oordeel. */
   function doelStand(norm, doel, r, nu) {
@@ -174,14 +159,15 @@ function maakSlo({ meting, sonde }) {
       onbeoordeeld: doelen.length - beoordeeld.length
     };
 
-    // Capability-SLO apart van HTTP; een gezakte capability sluit de uitrol (./slo-capabilities.js).
-    const { capabilities, tel: capabilityTel } = require('./slo-capabilities').capabilityStand(t, uitrol);
+    /* Capability-SLO blijft apart van HTTP; een geldige weigering is geen 5xx. */
+    const capabilityStand = leesCapabilitySlo(t);
+    begrensUitrolMetCapabilities(uitrol, capabilityStand);
 
     return {
-      doelen, capabilities, uitrol,
+      doelen, capabilities: capabilityStand.capabilities, uitrol,
       tel: { doelen: doelen.length, gehaald: beoordeeld.filter(d => d.oordeel === 'gehaald').length,
         gezakt: gezakt.length, onvoldoende: doelen.length - beoordeeld.length,
-        capabilities: capabilityTel },
+        capabilities: capabilityStand.tel },
       bron: {
         binnen: 'server/meting.js telt sinds de start van dit proces; bij een herstart begint dat opnieuw',
         buiten: sonde ? sonde.buitenkort() : null

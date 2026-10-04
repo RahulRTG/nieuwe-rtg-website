@@ -63,7 +63,7 @@ function maakPlane(opties) {
     verifyProviderProof: o.verifyProviderProof, verifyMoneyOwnerProof, verifyAuthorityOwnerProof,
     verifyExternalOwnerProof: o.verifyExternalOwnerProof });
 
-  function observeCapability(invoer) {
+  function observe(invoer) {
     const i = invoer || {}, ctx = i.context || context.huidige() || context.maak({ phase: i.phase });
     const c = registry.haal(i.capability);
     if (!c) return { ok: false, shadow: mode === 'shadow', code: 'CAPABILITY_UNKNOWN' };
@@ -87,7 +87,7 @@ function maakPlane(opties) {
 
   function compare(invoer) {
     const i = invoer || {}, zelfde = i.currentDecision === i.shadowDecision;
-    const observed = observeCapability({ capability: i.capability, subjectRef: i.subjectRef,
+    const observed = observe({ capability: i.capability, subjectRef: i.subjectRef,
       predicate: 'shadow.decision.compare', value: { same: zelfde },
       evidence: { currentDecision: i.currentDecision, shadowDecision: i.shadowDecision },
       policy: i.policy, state: zelfde ? 'PROVEN' : 'REJECTED', reasonCodes: zelfde ? [] : ['SHADOW_DIVERGENCE'] });
@@ -131,7 +131,7 @@ function maakPlane(opties) {
   }
 
   return Object.freeze({ version: 3, mode, context, ledger, claims, registry, transport, provenance, metrics, v3,
-    retry, migration, compatibility, constitution, observe: observeCapability, compare, measure, timer, slo, why,
+    retry, migration, compatibility, constitution, observe, compare, measure, timer, slo, why,
     snapshot: () => ({ version: 3, mode, contracts: registry.publiek(),
       ledgerRecords: root().ledger.length, ledgerCapacity: ledger.capacity(), transport: transport.stand(),
       capabilitySlo: metrics.standAll(registry.publiek()), trust: v3.snapshot() }) });

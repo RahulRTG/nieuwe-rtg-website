@@ -12,7 +12,7 @@ const rtgjson = require('../../lib/rtgjson');
 const { kiesStore } = require('../../db/keuze');
 
 function fout(code, melding) { return Object.assign(new Error(melding), { code }); }
-function sha256(bytes) { return crypto.createHash('sha256').update(bytes).digest('hex'); }
+function evidenceSourceSha256(bytes) { return crypto.createHash('sha256').update(bytes).digest('hex'); }
 
 function eisKluis(kluis) {
   if (!kluis || kluis.AAN !== true || typeof kluis.ontsleutel !== 'function')
@@ -63,7 +63,7 @@ function leesJson(dataDirectory, kluis) {
   if (geopend.dev !== voor.dev || geopend.ino !== voor.ino || geopend.nlink !== 1)
     throw fout('EVIDENCE_SOURCE_FILE_UNSAFE', 'db.json wisselde tijdens het lezen.');
   const document = parseRoot(ontsleutelTekst(bytes.toString('utf8'), kluis), true);
-  return { store: 'json', sourceRevision: sha256(bytes), trustEvidence: document };
+  return { store: 'json', sourceRevision: evidenceSourceSha256(bytes), trustEvidence: document };
 }
 
 function leesSqlite(dataDirectory, kluis) {

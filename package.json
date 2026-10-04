@@ -187,6 +187,7 @@
     "deelindex": "node scripts/deelindex.js",
     "bewijs": "node scripts/bewijs.js",
     "objectmodel": "node scripts/objectmodel.js",
+    "makers:vast": "node scripts/makers.js --vastleggen",
     "carrierevorm": "node scripts/carrierevorm.js",
     "bedrijfsmaat": "node scripts/bedrijfsmaat.js",
     "bedrijfsmaat:vast": "node scripts/bedrijfsmaat.js --vastleggen",

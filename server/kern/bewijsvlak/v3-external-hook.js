@@ -3,7 +3,7 @@
 const { hash } = require('./canon');
 
 let adapter = null;
-function install(value) {
+function installExternalHook(value) {
   if (!value || typeof value.externalEvidence !== 'function' ||
     typeof value.verifyOwnerProof !== 'function')
     throw new Error('bewijsvlak v3: ongeldige external-adapter');
@@ -13,12 +13,12 @@ function eis() {
   if (!adapter) throw new Error('bewijsvlak v3: external-adapter is niet geïnstalleerd');
   return adapter;
 }
-function failure(error) {
+function externalFailure(error) {
   return Object.freeze({ ok: false, shadow: true,
     code: error && error.code || 'EXTERNAL_EVIDENCE_FAILED',
     incidentId: error && error.incidentId || null });
 }
-function afhandelen(error) { if (error && error.incidentId) throw error; return failure(error); }
+function afhandelen(error) { if (error && error.incidentId) throw error; return externalFailure(error); }
 
 function reservation(stage, input) {
   try {
@@ -67,7 +67,7 @@ function reservation(stage, input) {
     if (stage === 'outcome') return eis().externalEvidence({ ...common,
       factType: 'external.outcome.observed', observer: String(i.observer || ''),
       observerProof: i.observerProof, value: i.value });
-    return failure(Object.assign(new Error('onbekende external stage'), { code: 'EXTERNAL_STAGE_UNKNOWN' }));
+    return externalFailure(Object.assign(new Error('onbekende external stage'), { code: 'EXTERNAL_STAGE_UNKNOWN' }));
   } catch (error) { return afhandelen(error); }
 }
 
@@ -79,4 +79,4 @@ function assess(reservationRef, evidenceRefs, at) {
   } catch (error) { return afhandelen(error); }
 }
 
-module.exports = { install, reservation, assess };
+module.exports = { install: installExternalHook, reservation, assess };

@@ -24,16 +24,15 @@ function herstel(object, naam, waarde) {
 
 module.exports = (ctx) => {
   const { save, crypto, notify, sseToCustomer, nu, observe, metricTimer, finish,
-    bewijsHospitalityBesluit, reserveringen, vonkMatches } = ctx;
+    bewijsHospitalityBesluit, vindReservering, vindVonkMatch } = ctx;
 
   return function beslisReservering(supplier, rid, action, authority) {
-    const r = reserveringen().find(x => x.id === rid && x.supplierCode === supplier.code);
+    const r = vindReservering(supplier.code, rid);
     if (!r) return { status: 404, error: 'Reservering niet gevonden.' };
     if (r.status !== 'aangevraagd') return { status: 409, error: 'Deze reservering is al ' + r.status + '.' };
     const decisionTimer = metricTimer({ capability: 'reservation.request', boundary: 'supplier:' + supplier.code });
     const nieuweStatus = action === 'bevestig' ? 'bevestigd' : 'geweigerd', beslotenAt = nu();
-    const matches = vonkMatches();
-    const vonkMatch = matches.find(m => m.reserveringId === r.id);
+    const vonkMatch = vindVonkMatch(r.id);
     const actor = authority && authority.actor || {};
     const request = authority && authority.request;
     const actorRef = actor.staffId || actor.lidKey || actor.name;

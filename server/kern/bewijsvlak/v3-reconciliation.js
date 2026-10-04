@@ -8,7 +8,7 @@ function maakReconciliation(opties) {
   const o = opties || {}, store = o.store, nu = o.nu || (() => new Date().toISOString());
   if (!store) throw new Error('bewijsvlak v3: reconciliation mist store');
 
-  function reconciliatieTransition(input) {
+  function reconciliationTransition(input) {
     const i = input || {}, state = String(i.state || '').toUpperCase();
     if (!STATES.includes(state)) throw new Error('bewijsvlak v3: ongeldige reconciliatiestatus');
     const previous = i.previousRecordId ? store.get('reconciliations', i.previousRecordId) : null;
@@ -25,7 +25,7 @@ function maakReconciliation(opties) {
     return store.list('reconciliations').filter(x => JSON.stringify(x.subjectRef) === s)
       .sort((a, b) => String(b.at).localeCompare(String(a.at)))[0] || null;
   }
-  return Object.freeze({ STATES, transition: reconciliatieTransition, current });
+  return Object.freeze({ STATES, transition: reconciliationTransition, current });
 }
 
 module.exports = { STATES, maakReconciliation };

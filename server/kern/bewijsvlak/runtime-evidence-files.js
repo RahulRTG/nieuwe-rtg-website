@@ -7,7 +7,7 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 
 function fout(code, melding) { return Object.assign(new Error(melding), { code }); }
-function sha256(bytes) { return crypto.createHash('sha256').update(bytes).digest('hex'); }
+function runtimeFileSha256(bytes) { return crypto.createHash('sha256').update(bytes).digest('hex'); }
 function binnen(kind, ouder) {
   const relatief = path.relative(ouder, kind);
   return relatief === '' || (!relatief.startsWith('..' + path.sep) && relatief !== '..' && !path.isAbsolute(relatief));
@@ -89,4 +89,4 @@ function schrijfNoClobber(doel, bytes, mode) {
   }
 }
 
-module.exports = { sha256, veiligeMap, veiligBestand, schrijfNoClobber };
+module.exports = { sha256: runtimeFileSha256, veiligeMap, veiligBestand, schrijfNoClobber };

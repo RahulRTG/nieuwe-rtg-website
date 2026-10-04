@@ -1,17 +1,12 @@
-/* De archiefmap van de V2-evidence-migratie: een expliciet absoluut pad,
-   gescheiden van de primaire datamap, zonder symbolische links, alleen voor de
-   eigenaar, en bestanden die no-clobber worden gekoppeld. Afgesplitst uit
-   ./legacy-archive.js, dat over de omvanggrens ging. */
 'use strict';
 
 const fs = require('node:fs');
 const path = require('node:path');
-const crypto = require('node:crypto');
-
 function fout(code, melding) { return Object.assign(new Error(melding), { code }); }
 
 function absoluut(pad, naam) {
-  if (typeof pad !== 'string' || !pad || !path.isAbsolute(pad) || path.resolve(pad) !== pad || pad === path.parse(pad).root)
+  if (typeof pad !== 'string' || !pad || !path.isAbsolute(pad) || path.resolve(pad) !== pad ||
+      pad === path.parse(pad).root)
     throw fout('LEGACY_ARCHIVE_PATH_INVALID', naam + ' moet een expliciet absoluut, genormaliseerd pad zijn.');
   return pad;
 }
@@ -59,28 +54,12 @@ function veiligeDoelmap(archiveDir, dataDir) {
   if (dataDir) {
     const dataPad = absoluut(path.resolve(dataDir), 'RTG_DATA_DIR');
     let dataWerkelijk = dataPad;
-    try { dataWerkelijk = fs.realpathSync(dataPad); } catch (error) { if (error.code !== 'ENOENT') throw error; }
+    try { dataWerkelijk = fs.realpathSync(dataPad); }
+    catch (error) { if (error.code !== 'ENOENT') throw error; }
     if (binnen(archief, dataWerkelijk) || binnen(dataWerkelijk, archief))
       throw fout('LEGACY_ARCHIVE_NOT_SEPARATE', 'Evidence-archief en primaire datamap moeten gescheiden paden zijn.');
   }
   return archief;
 }
 
-function schrijfTempEnKoppel(doel, bytes) {
-  const map = path.dirname(doel), tmp = path.join(map, '.' + path.basename(doel) +
-    '.tmp-' + process.pid + '-' + crypto.randomBytes(8).toString('hex'));
-  let fd;
-  try {
-    fd = fs.openSync(tmp, 'wx', 0o600);
-    let offset = 0;
-    while (offset < bytes.length) offset += fs.writeSync(fd, bytes, offset);
-    fs.fsyncSync(fd); fs.closeSync(fd); fd = null;
-    fs.linkSync(tmp, doel); // no-clobber: twee migrators mogen elkaar niet overschrijven
-    try { const dfd = fs.openSync(map, 'r'); try { fs.fsyncSync(dfd); } finally { fs.closeSync(dfd); } } catch (error) {}
-  } finally {
-    if (fd != null) try { fs.closeSync(fd); } catch (error) {}
-    try { fs.unlinkSync(tmp); } catch (error) { if (error.code !== 'ENOENT') throw error; }
-  }
-}
-
-module.exports = { veiligeDoelmap, schrijfTempEnKoppel };
+module.exports = { veiligeDoelmap };

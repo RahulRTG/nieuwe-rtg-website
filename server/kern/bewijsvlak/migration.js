@@ -25,7 +25,7 @@ function plan(invoer) {
   return bevries({ ...kern, planHash: hash(kern) });
 }
 
-function verifyMigratie(p) {
+function verifyMigrationPlan(p) {
   if (!p || p.format !== 'rtg-migration-plan-v1') return { ok: false, reason: 'FORMAT_UNKNOWN' };
   const kern = kopie(p), ontvangen = kern.planHash; delete kern.planHash;
   if (hash(kern) !== ontvangen) return { ok: false, reason: 'PLAN_HASH_MISMATCH' };
@@ -33,4 +33,4 @@ function verifyMigratie(p) {
   return { ok: true, executable: p.decision === 'ALLOW', planHash: ontvangen };
 }
 
-module.exports = { STANDEN, plan, verify: verifyMigratie };
+module.exports = { STANDEN, plan, verify: verifyMigrationPlan };

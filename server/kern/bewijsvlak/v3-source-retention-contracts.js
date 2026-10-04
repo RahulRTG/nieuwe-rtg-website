@@ -74,20 +74,5 @@ function normaliseerRequirement(input) {
   return bevries({ critical: i.critical !== false, roles, contracts, maxVerificationAgeMs: max });
 }
 
-// Invoercontrole van een retentionverklaring: alleen digests en tijden.
-const HEX = /^[a-f0-9]{64}$/;
-function digest(value, name) {
-  const result = String(value || '').toLowerCase();
-  if (!HEX.test(result)) throw fout('SOURCE_RETENTION_INVALID', name + ' moet een SHA-256 digest zijn');
-  return result;
-}
-function tijd(value, name) {
-  const result = String(value || '');
-  if (!result || !Number.isFinite(Date.parse(result)))
-    throw fout('SOURCE_RETENTION_INVALID', name + ' moet een geldige tijd zijn');
-  return result;
-}
-
 module.exports = { ROLES, RESULTS, MEDIA, IMMUTABILITY, CONTRACTS, fout,
-  contract, contractRef, authorityDigest, ownerAuthorityDigest, roleDigest, normaliseerRequirement,
-  HEX, digest, tijd };
+  contract, contractRef, authorityDigest, ownerAuthorityDigest, roleDigest, normaliseerRequirement };

@@ -26,7 +26,6 @@
 'use strict';
 const { lokaalAdres } = require('../lib/lokaaladres');
 const foutisolatie = require('../lib/foutisolatie');
-const { naAntwoord } = require('../lib/antwoord-einde');
 
 module.exports = function verzoekketen(deps) {
   const { app, express, log, logboek, db, save, betaal, betaalWaarheid, muntbetaal, opslagKlaar,
@@ -42,8 +41,22 @@ module.exports = function verzoekketen(deps) {
      lezen welke bewaker voor een route hangt. Zie de kop van die module. */
   foutisolatie.isoleer(app);
   app.disable('x-powered-by');
-  // Welke proxy-hops en welke proxyadressen vertrouwd worden: ./proxyvertrouwen.js.
-  require('./proxyvertrouwen')({ app });
+  /* Hoeveel proxy-hops staan er ECHT voor deze app?
+
+     Dit stond vast op 1. Dat klopt achter een reverse proxy, maar is gevaarlijk
+     zodra de app rechtstreeks bereikbaar is: dan IS de bezoeker de eerste hop en
+     mag hij zijn eigen X-Forwarded-For verzinnen -- waarmee elke snelheidslimiet
+     (die op req.ip telt) met één kop te omzeilen is. Zie test/proxykop.test.js.
+
+     RTG_PROXY_HOPS=0 zet het vertrouwen helemaal uit: dan telt alleen het adres
+     van de verbinding zelf. Dat is de juiste stand voor een app die zonder proxy
+     aan het internet hangt. */
+  require('./proxyvertrouwen')(app, process.env);
+  /* WIE die proxy is. Zonder opgave vertrouwen we alleen loopback en private
+     adressen -- de gebruikelijke plek voor een reverse proxy. Een bezoeker die
+     rechtstreeks vanaf het internet binnenkomt valt daar nooit onder, dus zijn
+     X-Forwarded-For wordt genegeerd in plaats van geloofd. Staat de proxy op een
+     publiek adres, zet die dan hier (komma-gescheiden). */
   /* DE EFFECTMETER, en met opzet als EERSTE laag van de keten.
 
      Hij hing eerst naast de staatmeter, halverwege, en meldde daar `geen` op een
@@ -107,11 +120,7 @@ module.exports = function verzoekketen(deps) {
 
   /* De meelees-laag van de RTG AI (kern/rtgai.js): telt alleen mee met het
      verkeer en doet verder niets; de kern wordt verderop aangesloten. */
-  let rtgaiMeelezer = null;
-  app.use((req, res, next) => {
-    naAntwoord(res, () => { try { if (rtgaiMeelezer) rtgaiMeelezer.lees(req.method, req.path, res.statusCode); } catch (e) {} });
-    next();
-  });
+  const zetRtgaiMeelezer = require('./rtgai-meelezer')(app);
 
   /* Een installatie die bewust zonder betalen publiceert, mag nergens een
      betaling simuleren of alleen administratief als voldaan markeren. Deze
@@ -138,7 +147,7 @@ module.exports = function verzoekketen(deps) {
   return {
     schild, zetWacht, lieg,
     ssrf: require('../kern/ssrf'), // SSRF-afweer voor client-bepaalde uitgaande doelen
-    zetRtgai: (r) => { rtgaiMeelezer = r; }
+    zetRtgai: zetRtgaiMeelezer
   };
 };
 // de dieptewacht woont in ./lijfpoort.js; hier alleen doorgegeven voor wie hem

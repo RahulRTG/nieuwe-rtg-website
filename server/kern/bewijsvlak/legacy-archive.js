@@ -9,13 +9,12 @@ const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const { canon, hash } = require('./canon');
+const { veiligeDoelmap } = require('./legacy-archive-path');
 
 const FORMAT = 'rtg-trust-evidence-legacy-archive-v1';
 
 function fout(code, melding) { return Object.assign(new Error(melding), { code }); }
-function sha256Hex(bytes) { return crypto.createHash('sha256').update(bytes).digest('hex'); }
-// De archiefmap en het no-clobber-schrijven: ./legacy-archive-map.js.
-const { veiligeDoelmap, schrijfTempEnKoppel } = require('./legacy-archive-map');
+function legacyArchiveSha256(bytes) { return crypto.createHash('sha256').update(bytes).digest('hex'); }
 
 function leesEnVerifieer(bestand, fileName, verwacht, kluis) {
   const stat = fs.lstatSync(bestand);
@@ -33,7 +32,7 @@ function leesEnVerifieer(bestand, fileName, verwacht, kluis) {
     throw fout('LEGACY_ARCHIVE_VERIFY_FAILED', 'Evidence-archief hoort niet bij het actuele migratieplan.');
   if (canon(document.entries) !== canon(verwacht.entries))
     throw fout('LEGACY_ARCHIVE_VERIFY_FAILED', 'Evidence-archief bevat niet exact de geplande legacy records.');
-  return { document, cipherDigest: sha256Hex(cipher), payloadDigest: hash(document) };
+  return { document, cipherDigest: legacyArchiveSha256(cipher), payloadDigest: hash(document) };
 }
 
 function verifieerReceipt(opties) {
@@ -56,11 +55,28 @@ function verifieerReceipt(opties) {
   if (!document || document.format !== FORMAT || document.migrationId !== receipt.migrationId ||
       document.planId !== receipt.planId || document.legacySetDigest !== receipt.legacySetDigest ||
       document.count !== receipt.migratedCount || hash(document.entries) !== receipt.legacySetDigest ||
-      hash(document) !== receipt.archivePayloadDigest || sha256Hex(cipher) !== receipt.archiveCipherDigest)
+      hash(document) !== receipt.archivePayloadDigest || legacyArchiveSha256(cipher) !== receipt.archiveCipherDigest)
     throw fout('LEGACY_ARCHIVE_VERIFY_FAILED', 'Evidence-archief komt niet overeen met het migratiereceipt.');
   return Object.freeze({ verified: true, archiveId: receipt.archiveId,
     fileName: receipt.archiveFile, legacySetDigest: receipt.legacySetDigest,
     payloadDigest: receipt.archivePayloadDigest, cipherDigest: receipt.archiveCipherDigest });
+}
+
+function schrijfTempEnKoppel(doel, bytes) {
+  const map = path.dirname(doel), tmp = path.join(map, '.' + path.basename(doel) +
+    '.tmp-' + process.pid + '-' + crypto.randomBytes(8).toString('hex'));
+  let fd;
+  try {
+    fd = fs.openSync(tmp, 'wx', 0o600);
+    let offset = 0;
+    while (offset < bytes.length) offset += fs.writeSync(fd, bytes, offset);
+    fs.fsyncSync(fd); fs.closeSync(fd); fd = null;
+    fs.linkSync(tmp, doel); // no-clobber: twee migrators mogen elkaar niet overschrijven
+    try { const dfd = fs.openSync(map, 'r'); try { fs.fsyncSync(dfd); } finally { fs.closeSync(dfd); } } catch (error) {}
+  } finally {
+    if (fd != null) try { fs.closeSync(fd); } catch (error) {}
+    try { fs.unlinkSync(tmp); } catch (error) { if (error.code !== 'ENOENT') throw error; }
+  }
 }
 
 function archiveerLegacy(opties) {

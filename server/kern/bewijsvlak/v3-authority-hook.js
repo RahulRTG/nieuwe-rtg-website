@@ -3,7 +3,7 @@
 const { hash } = require('./canon');
 
 let adapter = null;
-function install(value) {
+function installAuthorityHook(value) {
   if (!value || typeof value.authorityEvidence !== 'function' || typeof value.verifyOwnerProof !== 'function')
     throw new Error('bewijsvlak v3: ongeldige authority-adapter');
   adapter = value;
@@ -13,12 +13,12 @@ function eis() {
   if (!adapter) throw new Error('bewijsvlak v3: authority-adapter is niet geïnstalleerd');
   return adapter;
 }
-function failure(error) {
+function authorityFailure(error) {
   return Object.freeze({ ok: false, shadow: true,
     code: error && error.code || 'AUTHORITY_EVIDENCE_FAILED',
     incidentId: error && error.incidentId || null });
 }
-function afhandelen(error) { if (error && error.incidentId) throw error; return failure(error); }
+function afhandelen(error) { if (error && error.incidentId) throw error; return authorityFailure(error); }
 
 const subject = binding => ({ domain: 'authority', type: 'consent', id: 'consent_' + hash(binding).slice(0, 24) });
 const chain = binding => 'authority_' + hash(binding).slice(0, 24);
@@ -32,7 +32,7 @@ function authorityTransition(input) {
       EXPIRED: 'authority.expired'
     };
     const factType = facts[state];
-    if (!factType) return failure(Object.assign(new Error('onbekende authority-toestand'),
+    if (!factType) return authorityFailure(Object.assign(new Error('onbekende authority-toestand'),
       { code: 'AUTHORITY_STATE_UNKNOWN' }));
     const s = subject(binding);
     const assertion = { subjectRef: s, state, at, revision: i.revision,
@@ -68,4 +68,4 @@ function propagated(input) {
   } catch (error) { return afhandelen(error); }
 }
 
-module.exports = { install, subject, transition: authorityTransition, propagated };
+module.exports = { install: installAuthorityHook, subject, transition: authorityTransition, propagated };

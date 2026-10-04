@@ -61,7 +61,7 @@ function maakProviderBoundary() {
     return token;
   }
 
-  function verify(token, expected) {
+  function verifyProviderIngress(token, expected) {
     const proof = token && proofs.get(token), e = expected || {};
     if (!token) throw fout('INGRESS_PROOF_REQUIRED', 'providerbewijs ontbreekt');
     if (!proof) throw fout('INGRESS_PROOF_INVALID', 'providerbewijs is ongeldig of al gebruikt');
@@ -75,7 +75,7 @@ function maakProviderBoundary() {
     return proof;
   }
 
-  return Object.freeze({ mark, issue, verify });
+  return Object.freeze({ mark, issue, verify: verifyProviderIngress });
 }
 
 module.exports = { maakProviderBoundary };

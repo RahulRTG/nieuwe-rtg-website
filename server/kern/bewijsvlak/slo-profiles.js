@@ -26,7 +26,7 @@ function laad() {
 }
 function haal(id) { return laad()[id] || null; }
 
-function resolveSloProfiel(profileId, stand) {
+function resolveSloProfile(profileId, stand) {
   const p = haal(profileId);
   if (!p) return { oordeel: 'onvoldoende gemeten', reasons: ['SLO_PROFILE_UNKNOWN'] };
   const doelen = new Map(((stand && stand.doelen) || []).map(d => [d.id, d]));
@@ -43,4 +43,4 @@ function resolveSloProfiel(profileId, stand) {
 }
 
 const PROFILES = laad();
-module.exports = { PROFILES, laad, haal, resolve: resolveSloProfiel, BESTAND };
+module.exports = { PROFILES, laad, haal, resolve: resolveSloProfile, BESTAND };

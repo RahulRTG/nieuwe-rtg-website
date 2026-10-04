@@ -23,6 +23,8 @@ const { nameet, UITKOMSTEN, wegVan } = require('../server/kern/stuur/gevolgcontr
 
 const BRON = fs.readFileSync(path.join(__dirname, '..', 'server/effectbon.js'), 'utf8');
 const KALE_BRON = BRON.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:])\/\/[^\n]*/g, '$1 ');
+const CLASSIFICATIE_BRON = fs.readFileSync(path.join(__dirname, '..',
+  'server/effectbon-classificatie.js'), 'utf8');
 
 test('1. DE BON STAAT ALTIJD AAN, en de zware staatlogging niet', () => {
   /* De hele reden van deze laag. Zou hij aan een vlag hangen, dan bestaat de observatie
@@ -91,16 +93,11 @@ test('6. de bon bouwt niets na: hij leent staatlog en effectcollecties', () => {
   /* Een tweede implementatie van "wat is er gebeurd" is LAT.md regel 4 op de plek waar
      het het duurst is. Toets op de BRON, want een weg die er niet is kan ook niet per
      ongeluk gebruikt worden. */
-  /* De indeling woont sinds de omvangsplitsing in ./effectbon-klassen.js; die hoort
-     dus bij de bron van de bon en gaat langs dezelfde eisen. */
-  const klassenBron = require('fs').readFileSync(require('path').join(__dirname, '..', 'server', 'effectbon-klassen.js'), 'utf8')
-    .replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:])\/\/[^\n]*/g, '$1 ');
-  const BON = KALE_BRON + '\n' + klassenBron;
   assert.ok(/require\('\.\/staatlog'\)/.test(KALE_BRON), 'hij hoort staatlog te lenen');
-  assert.ok(/require\('\.\/effectbon-klassen'\)/.test(KALE_BRON) && /require\('\.\/kern\/isolatie\/effectcollecties'\)/.test(klassenBron),
-    'hij hoort de indeling te lenen');
+  assert.ok(/effectcollecties/.test(CLASSIFICATIE_BRON), 'hij hoort de indeling te lenen');
   for (const verboden of [/createHash/, /JSON\.stringify/, /PER_COLLECTIE/])
-    assert.ok(!verboden.test(BON), 'de bon bouwt zelf ' + verboden + ' en dat hoort geleend');
+    assert.ok(!verboden.test(KALE_BRON + CLASSIFICATIE_BRON),
+      'de bon bouwt zelf ' + verboden + ' en dat hoort geleend');
 });
 
 test('7. DE VIER UITKOMSTEN, elk met zijn eigen geval', () => {

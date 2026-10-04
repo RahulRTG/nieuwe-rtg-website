@@ -50,7 +50,7 @@ function maakPoll(deps) {
       const voorbereid = [];
       for (const r of gelezen.rows) {
         const sleutel = r.key;
-        if (r.deleted) { voorbereid.push({ sleutel, weg: true, ver: r.ver }); continue; }
+        if (Number(r.deleted) === 1) { voorbereid.push({ sleutel, weg: true, ver: r.ver }); continue; }
         const basis = laatsteJson.get(sleutel);
         const hunJson = uitStore(r.val);
         const lokaalOpenstaand = vuil.has(sleutel) ||

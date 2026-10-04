@@ -18,7 +18,7 @@ module.exports = function maakBrokerEvidence({ trustPlane, opslag, crypto }) {
     } catch (e) { /* shadow evidence mag de bestaande preview niet breken */ }
   }
 
-  function bewijsVoorUitvoering(key, p, objectRef, idemKey) {
+  function executeBrokerEvidence(key, p, objectRef, idemKey) {
     if (!beschikbaar()) return;
     try {
       trustPlane.observe({ capability: 'experience.propose', boundary: 'actor:' + opslag.actor(key),
@@ -31,5 +31,5 @@ module.exports = function maakBrokerEvidence({ trustPlane, opslag, crypto }) {
     } catch (e) { /* shadow evidence mag de domeincommit niet terugdraaien */ }
   }
 
-  return Object.freeze({ preview, execute: bewijsVoorUitvoering });
+  return Object.freeze({ preview, execute: executeBrokerEvidence });
 };

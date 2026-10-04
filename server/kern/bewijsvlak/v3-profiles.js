@@ -86,7 +86,7 @@ function normaliseer(input, authorities) {
   return bevries(p);
 }
 
-function maakProfielRegister(extra, authorities) {
+function maakProfileRegister(extra, authorities) {
   const map = new Map();
   for (const p of [...BUILTIN, ...(extra || [])]) {
     const vast = normaliseer(p, authorities), key = vast.id + '@' + vast.version;
@@ -100,4 +100,4 @@ function maakProfielRegister(extra, authorities) {
   });
 }
 
-module.exports = { BUILTIN, normaliseer, maakRegister: maakProfielRegister };
+module.exports = { BUILTIN, normaliseer, maakRegister: maakProfileRegister };

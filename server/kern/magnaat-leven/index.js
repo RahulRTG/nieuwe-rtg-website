@@ -16,8 +16,8 @@ const { volgendeDag } = require('./dag');
 const { ACTIES } = require('./acties');
 const { toon } = require('./weergave');
 const speelronde = require('./speelronde');
-const { maakVangnet } = require('./bewaking');
 const { oordeelGeef, oordeelOverzicht } = require('./oordeel');
+const { maakLevenstransactie } = require('./transactie');
 
 const KIES_START = 'Kies waar je begint: ' + Object.values(R.STARTPOSITIES).map(x => x.naam.toLowerCase()).join(', ') + '.';
 
@@ -25,6 +25,7 @@ function maakLeven({ db, save = () => {}, nu = () => Date.now() } = {}) {
   const boek = maakBoek({ db });
   const eigen = require('../eigencollectie')({ db, domein: 'kern/magnaat-leven', bezit: { magnaatLeven: 'kaart', magnaatOordelen: 'lijst', magnaatSteden: 'kaart' } });
   const levens = () => eigen.bak('magnaatLeven');
+  const beschermd = maakLevenstransactie({ boek, save, meld, koppel });
 
   function haal(key, opnieuw, moeilijkheid, start) {
     const alle = levens();
@@ -79,9 +80,6 @@ function maakLeven({ db, save = () => {}, nu = () => Date.now() } = {}) {
       return bewaarEnToon(st, weg);
     });
   }
-
-  // Het vangnet om alles wat een leven verandert: maakVangnet in ./bewaking.js.
-  const beschermd = maakVangnet({ boek, save, meld, koppel });
 
   /* V5: een handeling met een vangnet eromheen (./bewaking.js). Een `verzoek`-sleutel
      die al is uitgevoerd, gaat niet nog eens: geen dag twee keer afsluiten. */

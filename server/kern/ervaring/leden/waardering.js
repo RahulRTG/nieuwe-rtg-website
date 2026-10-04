@@ -4,8 +4,7 @@ module.exports = (ctx) => {
   const { db, save, findSupplier, notify, notifySupplier, sseToSupplier,
     orderMetRef, boekingMetRef, id, nu, rond, trustPlane } = ctx;
 
-  // Schaduwhaken naar het bewijsvlak; zie ../bewijshaak.js.
-  const { observe, metricTimer, finish } = require('../bewijshaak')(trustPlane);
+  const { observe, metricTimer, finish } = require('../trust-meting')(trustPlane);
 
   /* ---- 3. reviews ----
      Een review kan pas na een geslaagde afronding, een per dienst. Het

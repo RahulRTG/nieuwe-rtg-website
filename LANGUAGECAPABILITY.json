@@ -1,16 +1,16 @@
 {
   "schemaVersion": 1,
-  "startedAt": "2026-10-03T20:59:26.787Z",
-  "completedAt": "2026-10-03T20:59:53.472Z",
+  "startedAt": "2026-10-04T15:36:46.845Z",
+  "completedAt": "2026-10-04T15:37:17.077Z",
   "node": "v24.18.0",
   "command": "npm run language:proof",
   "testExitCode": 0,
-  "testOutputSha256": "0924bb626dffa57a090d36d15568711ade77a7e7d64e48d8b866b1f48683e955",
+  "testOutputSha256": "c768143ecc424494223e4364164948bd6713033c848de93b9492c2e613c35a7b",
   "sources": {
     "public/apps/access/meaning.js": "268dc805c892ee0e351c14fd2f8d955aa292b556a20af8109bece178559c8bf4",
     "public/apps/access/portal.css": "2b180093703178a7d1d5de93802b7e35e46aa061694cff0788e0fe7c1f7d3f45",
-    "public/apps/app.html": "83922e8ec22ce5059c8d9d5a5588e90f2e8f8e64af9485c3741070739a7b35a7",
-    "public/apps/app-main.js": "2cbbcbba6eb023e068de718e4faf9928b577a8ca21d1af3e56dca6bc1ec533f9",
+    "public/apps/app.html": "556f202bf1ac6a0133a6106d48ad160ea1c7603c245bd8e8166e351ba49b5742",
+    "public/apps/app-main.js": "51137a17988e1e716dcb6aff925344e364b98d3dfd5fd4b9133bb69ff1b261e4",
     "public/shared/rtg-edge-2.css": "a346fb719dfd2e0501f14057475f1933615a6c6032abc0a5e8f12f72f839c432",
     "public/shared/rtg-adaptive-edge.css": "6b4d8b9ac646287ba7e6c25b47a60ab69b53032e4bf904fb214d66ad36a44608",
     "public/shared/rtg-simple.css": "90e520e135c9799a863a291cdf0ba31f22b0ae3d428f80b623241474b77d6397",
@@ -43,7 +43,7 @@
   },
   "productionReady114Languages": false,
   "scope": "RTG member account portal and shared language loader; mobile Chromium, synthetic input.",
-  "browser": "151.0.7922.34",
+  "browser": "153.0.8010.12",
   "viewport": {
     "width": 390,
     "height": 844
@@ -461,10 +461,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -508,10 +508,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -790,10 +790,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -1260,10 +1260,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -1307,10 +1307,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -1683,10 +1683,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -1730,10 +1730,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -1777,10 +1777,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -1824,10 +1824,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -1871,10 +1871,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -1918,10 +1918,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -1965,10 +1965,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "rtl",
@@ -2153,10 +2153,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -2247,10 +2247,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -2294,10 +2294,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -2435,10 +2435,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -2482,10 +2482,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -2529,10 +2529,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -2576,10 +2576,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -2623,10 +2623,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -3140,10 +3140,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -3187,10 +3187,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -3234,10 +3234,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "rtl",
@@ -3328,10 +3328,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -3375,10 +3375,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -3422,10 +3422,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "rtl",
@@ -3469,10 +3469,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -3798,10 +3798,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -3845,10 +3845,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -3986,10 +3986,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -4033,10 +4033,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -4080,10 +4080,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -4127,10 +4127,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "rtl",
@@ -4268,10 +4268,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -4315,10 +4315,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -4362,10 +4362,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -4409,10 +4409,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -4456,10 +4456,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -4503,10 +4503,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -4550,10 +4550,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -4597,10 +4597,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -4691,10 +4691,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -4738,10 +4738,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -4785,10 +4785,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -4832,10 +4832,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -4879,10 +4879,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -4926,10 +4926,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -4973,10 +4973,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -5020,10 +5020,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -5067,10 +5067,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -5114,10 +5114,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -5161,10 +5161,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -5208,10 +5208,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -5255,10 +5255,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -5302,10 +5302,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -5349,10 +5349,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -5396,10 +5396,10 @@
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
-        "number": "12.345,67",
-        "numberLocale": "nl",
-        "date": "17-9-2026",
-        "dateLocale": "nl"
+        "number": "12,345.67",
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",

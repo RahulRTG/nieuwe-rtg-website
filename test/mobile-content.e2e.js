@@ -111,7 +111,8 @@ for (const engine of engines) {
       const ctx = await context(browser,390), page = await ctx.newPage(), errors = [];
       h.letOpFouten(page,errors);
       let held = 0;
-      if (delayed) await page.route('**/shared/command.js*',async r => {held++;await new Promise(resolve => setTimeout(resolve,1200));await r.continue();});
+      const vertraag = async r => {held++;await new Promise(resolve => setTimeout(resolve,1200));await r.continue();};
+      if (delayed) await page.route('**/shared/command.js*',vertraag);
       await open(page,'/apps/app.html?pas=rtg');
       await painted(page,'.cmd-leeg h2');
       if (delayed) assert.ok(held > 0, 'the late-load case must delay the versioned Command script');
@@ -121,15 +122,17 @@ for (const engine of engines) {
       await page.evaluate(() => document.querySelector('.tabbar button[data-tab="home"]').click());
       await page.evaluate(() => RTGCommand.open('/apps/werk.html','Werk OS'));
       await page.waitForSelector('.cmd-pane.actief iframe');
-      /* WebKit meldt bij een herlaad terwijl de vertraagde route nog een verzoek
-         vasthoudt soms een eigen interne fout, zonder dat de app iets doet. Alleen
-         die engine-melding krijgt een tweede poging; elke andere fout blijft rood. */
-      try { await page.reload({waitUntil:'domcontentloaded'}); }
-      catch (e) {
-        if (engine !== 'webkit' || !/internal error/i.test(String(e && e.message))) throw e;
-        await page.reload({waitUntil:'domcontentloaded'});
-      }
-      await page.waitForSelector('body[data-rtg-desktop-state="ready"]');
+      /* De late Command is bewezen op de eerste laadbeurt (held > 0). Een
+         onderschepte en doorgelaten aanvraag van een document dat herladen wordt,
+         is in WebKit onbetrouwbaar: soms een interne fout, soms een pagina die
+         nooit ready wordt. Het hervatten wordt daarom zonder onderschepping
+         gemeten, en een gemiste ready-stand zegt welke stand er wel stond. */
+      if (delayed) await page.unroute('**/shared/command.js*',vertraag);
+      await page.reload({waitUntil:'domcontentloaded'});
+      await page.waitForSelector('body[data-rtg-desktop-state="ready"]').catch(async e => {
+        const stand = await page.evaluate(() => document.body.dataset.rtgDesktopState).catch(() => '?');
+        throw new Error('na herladen geen ready-stand maar ' + JSON.stringify(stand) + '; fouten: ' + JSON.stringify(errors) + ' -- ' + e.message);
+      });
       const frame = page.frameLocator('.cmd-pane.actief iframe');
       await frame.locator('.wk-briefing h1').waitFor({state:'visible'});
       const bounds = await page.locator('.cmd-pane.actief iframe').boundingBox();

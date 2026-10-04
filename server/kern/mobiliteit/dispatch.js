@@ -41,7 +41,7 @@ module.exports = (ctx) => {
     }
     return assetsVan(vervoerder)
       .filter(a => !bezet.has(a.id))
-      .map(a => ({ asset: a, chauffeur: a.bestuurder || null, beoordeling: a.beoordeling,
+      .map(a => ({ asset: a, chauffeur: a.bestuurder || null,
         gepland: gepland.get(a.id) || 0, wilNaar: a.wilNaar || null }));
   }
 

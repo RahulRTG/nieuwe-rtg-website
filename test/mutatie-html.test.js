@@ -3,6 +3,7 @@ const test = require('node:test'), assert = require('node:assert/strict');
 const { bereiken, muteerHtml, geldigeScripts, OPERATOREN_HTML } = require('../scripts/lib/mutatie-html');
 const { muteer, OPERATOREN } = require('../scripts/mutatie');
 const keer = OPERATOREN.find(o => o.naam === 'voorwaarde-omkeren');
+const htmlOp = naam => OPERATOREN_HTML.find(o => o.naam === naam);
 
 test('HTML-mutatie raakt alleen uitvoerbare inlinecode, ook bij meerdere scripts', () => {
   const voor = '<!-- <script>if (!fout) bad()</script> --><textarea><script>if (!tekst) bad()</script></textarea>' +
@@ -27,17 +28,17 @@ test('een syntaxisfout telt niet als een inhoudelijk gevonden schermfout', () =>
 
 test('layoutfouten behouden de pagina en muteren geen commentaar, attributen of sjabloon', () => {
   const bron = '<!-- <main> --><template><main>voorbeeld</main></template><body title=">"><main>inhoud</main></body>';
-  const weg = muteerHtml(bron, OPERATOREN_HTML[0], 0, muteer);
+  const weg = muteerHtml(bron, htmlOp('html-hoofdinhoud-weg'), 0, muteer);
   assert.equal(weg, bron.replace('<main>inhoud', '<main><style>main{display:none!important}</style>inhoud'));
-  const breed = muteerHtml(bron, OPERATOREN_HTML[1], 0, muteer);
+  const breed = muteerHtml(bron, htmlOp('html-breedte-breken'), 0, muteer);
   assert.equal(breed, bron.replace('<body title=">">', '<body title=">"><style>body{min-width:200vw!important}</style>'));
-  assert.equal(muteerHtml('<p>geen hoofdinhoud</p>', OPERATOREN_HTML[0], 0, muteer), null);
-  assert.equal(muteer('const main = true;', OPERATOREN_HTML[0], 0), null);
+  assert.equal(muteerHtml('<p>geen hoofdinhoud</p>', htmlOp('html-hoofdinhoud-weg'), 0, muteer), null);
+  assert.equal(muteer('const main = true;', htmlOp('html-hoofdinhoud-weg'), 0), null);
 });
 
 test('een lokale script- of stijlkoppeling kan weg zonder tekst en externe bronnen te raken', () => {
   const bron = '<!-- href="/niet" --><a href="https://voorbeeld.nl">Extern</a><link href="/shared/vorm.css"><script src="/apps/werk.js"></script>';
-  assert.equal(muteerHtml(bron, OPERATOREN_HTML[0], 0, muteer), bron.replace('/shared/vorm.css', '/__rtg_mutatie__'));
-  assert.equal(muteerHtml(bron, OPERATOREN_HTML[0], 1, muteer), bron.replace('/apps/werk.js', '/__rtg_mutatie__'));
-  assert.equal(muteerHtml('<p>href="/tekst"</p>', OPERATOREN_HTML[0], 0, muteer), null);
+  assert.equal(muteerHtml(bron, htmlOp('html-bron-weg'), 0, muteer), bron.replace('/shared/vorm.css', '/__rtg_mutatie__'));
+  assert.equal(muteerHtml(bron, htmlOp('html-bron-weg'), 1, muteer), bron.replace('/apps/werk.js', '/__rtg_mutatie__'));
+  assert.equal(muteerHtml('<p>href="/tekst"</p>', htmlOp('html-bron-weg'), 0, muteer), null);
 });

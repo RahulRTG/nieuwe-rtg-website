@@ -28,7 +28,8 @@ test('de vier dashboardroutes laden één runtime, stijl en hun vastgelegde were
     assert.equal((html.match(/\/shared\/rtg-vandaag-luxe\.css/g) || []).length, 1, bestand);
     assert.equal((html.match(/\/shared\/rtg-vandaag-luxe\.js/g) || []).length, 1, bestand);
     // Preload only the image this home actually presents.
-    const foto = wereld === 'living' ? '/campagne/huis-omslag.jpg' : '/images/world-homes/' + wereld + '.webp';
+    const foto = {living:'/campagne/huis-omslag.jpg',work:'/images/world-homes/work.webp',
+      travel:'/images/editorial/travel-flight.webp',foundation:'/images/editorial/foundation-family.webp'}[wereld];
     assert.equal((html.match(new RegExp('<link[^>]+href="' + foto.replace(/\./g, '\\.') + '"[^>]+rel="preload"', 'g')) || []).length, 1, bestand);
     assert.ok(fs.existsSync(path.join(ROOT, 'public', foto)), foto);
     assert.doesNotMatch(html, /wereld-atlas\.jpg/, bestand + ' mag geen quadrant uit de oude atlas laden');

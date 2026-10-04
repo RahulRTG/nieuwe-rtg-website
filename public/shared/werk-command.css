@@ -51,3 +51,12 @@
    die bij een vlak past, en scrolt hij zelf als zijn gesprek langer wordt.
    Alleen op bureau: op de telefoon is het vlak geen bevattend blok. */
 @media(min-width:1000px){body[data-rtg-desktop] .wd-page .wk-main>.wk-rahul.page{top:0;padding:clamp(20px,3vw,32px);overflow:auto}}
+/* The mobile Edge owns the surrounding controls. When it moves the local
+   header, the remaining content cannot occupy its former 58px grid row.
+   The document is the one scroll surface, including expanded access forms. */
+html:has(>body[data-rtg-shell="mobile"] .wk-shell){height:auto!important;overflow-y:auto!important}
+body[data-rtg-shell="mobile"]:has(.wk-shell){height:auto!important;overflow-y:auto!important}
+body[data-rtg-shell="mobile"] .wk-shell{position:relative!important;inset:auto!important;height:auto!important;grid-template-columns:minmax(0,1fr)!important;grid-template-rows:auto!important}
+body[data-rtg-shell="mobile"] .wk-main{display:block!important;height:auto!important;overflow:visible!important}
+body[data-rtg-shell="mobile"] .wk-stage{height:auto!important;max-height:none!important;overflow:visible!important;padding-bottom:0!important}
+body[data-rtg-shell="mobile"] .wk-stage>#inhoud{height:auto!important}

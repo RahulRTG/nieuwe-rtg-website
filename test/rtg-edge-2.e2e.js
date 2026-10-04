@@ -129,8 +129,16 @@ function schermToestand(route) {
   const revealFocusbaar = revealZichtbaar.filter(el => !el.disabled && el.tabIndex >= 0 && getComputedStyle(el).pointerEvents !== 'none');
   const panel = document.querySelector('.rtg-edge-2-context');
   const cs = getComputedStyle(document.body);
+  const inhoud = document.querySelector('main.wd-home, .wd-page > main, main');
+  const heroTitel = [...document.querySelectorAll('.wh-photo-copy h1, .wh-foundation-public h1')].find(n => n.getBoundingClientRect().height > 0);
   return {
-    shellBottom: parseFloat(getComputedStyle(document.querySelector('.wd-shell')).paddingBottom),
+    beeldvullend: document.body.matches('.rtg-stijl[data-world-home][data-rtg-shell=mobile]') && cs.paddingTop === '0px',
+    heroTitelTop: heroTitel ? heroTitel.getBoundingClientRect().top : null,
+    topOnder: document.querySelector('.rtg-edge-top').getBoundingClientRect().bottom,
+    inhoudBottom: inhoud ? parseFloat(getComputedStyle(inhoud).paddingBottom) || 0 : 0,
+    shellBottom: ['paddingBottom','marginBottom'].reduce((n, k) => n +
+      (parseFloat(getComputedStyle(document.querySelector('.wd-shell'))[k]) || 0), 0),
+    edgeInset: window.innerHeight - document.querySelector('.rtg-adaptive-bar').getBoundingClientRect().top,
     url: location.pathname + location.search + location.hash,
     wereld: document.body.getAttribute('data-rtg-world'),
     ready: document.body.getAttribute('data-rtg-edge-ready'),
@@ -235,12 +243,20 @@ function assertStand(m, verwacht, label) {
 }
 
 function assertInsets(overzicht, compact, focus, mobiel, label) {
-  assert.ok(overzicht.padding.top - compact.padding.top >= 30,
-    label + ': compact geeft de ruimte van de bovenrand niet terug');
+  if (overzicht.beeldvullend) {
+    // De goedgekeurde mobiele hero begint achter de transparante kop. Hij
+    // heeft geen lege spacer om terug te geven, maar zijn tekst moet vrij staan.
+    assert.ok(overzicht.heroTitelTop >= overzicht.topOnder, label + ': de bovenrand bedekt de hero-titel');
+    assert.equal(compact.padding.top, 0, label + ': compact voegt ruimte boven de hero toe');
+  } else {
+    assert.ok(overzicht.padding.top - compact.padding.top >= 30,
+      label + ': compact geeft de ruimte van de bovenrand niet terug ' + JSON.stringify([overzicht.padding, compact.padding]));
+  }
   // De nieuwe shell bewaart leesruimte onder de zwevende Edge in alle standen.
   // De verdwenen zijbalk mag nooit een lege strook blijven reserveren.
   for (const m of [overzicht, compact, focus]) {
-    assert.ok(m.shellBottom >= 104, label + ': de laatste handeling mist vrije scrollruimte boven Edge');
+    assert.ok(m.shellBottom + m.padding.bottom + m.inhoudBottom >= m.edgeInset,
+      label + ': de laatste handeling mist vrije scrollruimte boven Edge ' + JSON.stringify(m));
     assert.ok(m.padding.left <= 4, label + ': de verdwenen zijrand reserveert nog ruimte');
   }
 }
@@ -307,7 +323,7 @@ async function controleerRoute(page, route, scherm) {
   assertEenRand(overzicht, label + ' · overzicht');
   assertStand(overzicht, { ...verwachtOverzicht, reveal: false }, label + ' · overzicht');
   assert.equal(overzicht.wereld, route.wereld, label + ': verkeerde wereldkleur/context');
-  assert.equal(overzicht.bottom.materiaal.toLowerCase(), {living:'#fffdf9',work:'#1c2524',travel:'#2d2025',foundation:'#1b293a'}[route.wereld],
+  assert.equal(overzicht.bottom.materiaal.toLowerCase(), {living:'#201912',work:'#192422',travel:'#29171d',foundation:'#19372d'}[route.wereld],
     label + ': de adaptieve Edge volgt niet het wereldmateriaal');
   assert.equal(overzicht.randHerstel, 2, label + ': boven- en onderrand missen hun herstelzone');
   assert.equal(overzicht.randHerstelZichtbaar, 0, label + ': herstelzones zijn buiten compact zichtbaar');

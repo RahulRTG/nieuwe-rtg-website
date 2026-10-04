@@ -151,6 +151,7 @@
 <script src="sessie.js"></script>
 <script src="/shared/rtg-school-session.js"></script>
 <script>
+(function foundationPage() {
 const $ = s => document.querySelector(s);
 const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 // sluit-knoppen zonder inline handler (past bij een strengere CSP)
@@ -167,7 +168,7 @@ if(!CODE || !TOKEN){
     if(document.documentElement.classList.contains('rtf-toegang-dicht')) addEventListener('rtf-toegang',()=>RTGSchoolSession.deur({rol:'docent'}),{once:true});
     else RTGSchoolSession.deur({rol:'docent'});
   }
-  throw new Error(Sessie && Sessie.actief() ? 'geen schoolsessie' : 'geen sessie');
+  return;
 }
 RTGSchoolSession.bewaak(['rtf_docent'],()=>{ CODE=''; TOKEN=''; RTGSchoolSession.deur({rol:'docent'}); });
 
@@ -245,6 +246,7 @@ KlasLive.verbind(CODE, 'docent', TOKEN, { presentie: d => toonLeerlingen(d.leerl
 opgavenOphalen();
 get('/les/'+CODE).then(d=> toonAgenda((d.les&&d.les.agenda)||[])).catch(()=>{});
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+}());
 </script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>

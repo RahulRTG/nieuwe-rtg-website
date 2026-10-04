@@ -1557,9 +1557,15 @@ async function edgeCatalogus(page) {
 }
 
 async function edgeActies(page) {
-  await page.waitForSelector('body[data-rtg-adaptive-ready="true"] .rtg-adaptive-bar', { state: 'visible' });
-  if (!await page.locator('.rtg-adaptive-sheet').isVisible())
-    await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="context"]').click();
+  await page.waitForSelector('body[data-rtg-adaptive-ready="true"]', { state: 'attached' });
+  // Het ene oppervlak verandert van vorm: een open sheet vervangt de balk.
+  // Chat/mail lenen hun echte invoer aan de surface; haar mond opent dezelfde
+  // acties. Nooit op de bewust verborgen oude balk blijven wachten.
+  if (!await page.locator('.rtg-adaptive-sheet').isVisible()) {
+    const mounted = page.locator('.rtg-adaptive-surface [data-rtg-adaptive-action="ai"]');
+    if (await mounted.isVisible()) await mounted.click();
+    else await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="context"]').click();
+  }
   await page.waitForSelector('.rtg-adaptive-sheet:not([hidden])', { state: 'visible' });
   await page.waitForSelector('.rtg-adaptive-controls', { state: 'attached' });
 }

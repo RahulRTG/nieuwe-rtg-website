@@ -68,8 +68,9 @@
 <script src="/shared/uitvoer.js"></script>
 <script src="sessie.js"></script>
 <script>
+(function foundationPage() {
 const $ = s => document.querySelector(s);
-if (!window.Sessie || !Sessie.eisFamilie()) throw new Error('geen sessie');
+if (!window.Sessie || !Sessie.eisFamilie()) return;
 const s = Sessie.huidig();
 Sessie.balk($('#balk'), { terug: 'index.html' });
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -131,6 +132,7 @@ $('#nDoe').addEventListener('click', async () => {
   catch (e) { $('#nFout').textContent = e.message; }
 });
 laad();
+}());
 </script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>

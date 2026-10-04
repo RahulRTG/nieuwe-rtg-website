@@ -325,6 +325,7 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
 
     const wijk = (await H('/api/supplier/horeca/wijk/zet', { naam: 'Terras', tafels: ['PDA-DRAAG'] })).body.wijk;
     await H('/api/supplier/horeca/wijk/neem', { wijkId: wijk.id });
+    assert.equal(await page.locator('.workos-bottom').isVisible(),false,'WorkOS uses the same Edge, without a second bottom bar');
     await page.click('#pVerversNu');
     /* De wijk is zojuist via de API gezet en genomen; hij bestond nog niet op het
        scherm ("Er zijn nog geen wijken"). Zijn naam in het wijkbeeld is dus het

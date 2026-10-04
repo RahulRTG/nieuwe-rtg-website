@@ -3,6 +3,7 @@
   var words = {
     loading: ['Uw gegevens worden opgehaald.', 'Your information is loading.'],
     guest: ['Meld u aan om uw eigen overzicht te zien.', 'Sign in to see your own overview.'],
+    guestCompact: ['Aanmelding nodig.', 'Sign-in required.'],
     locked: ['Deze gegevens zijn niet beschikbaar met uw huidige toegang. Open de app voor uitleg.', 'This information is not available with your current access. Open the app for details.'],
     error: ['Uw gegevens konden niet worden opgehaald.', 'Your information could not be loaded.'],
     partial: ['Een deel van de bronnen is niet beschikbaar. Dit overzicht is onvolledig.', 'Some sources are unavailable. This overview is incomplete.'],

@@ -45,8 +45,8 @@ body.rtg-daily .kop{margin-block:24px 12px;font:500 11px/1.6 Inter,sans-serif;le
   body.rtg-daily .daily-content{padding-inline:54px}
   .daily-hero{padding:46px 54px 32px}.daily-copy{padding:0 54px 40px}
   body.rtg-daily[data-daily-state="empty"] #dailyIntro,body.rtg-daily[data-daily-state="guest"] #dailyIntro{display:grid;grid-template-columns:1.1fr 1fr;align-items:center}
-  .daily-hero:has(.daily-photo){min-height:650px;padding:260px 40px 44px}
-  .daily-copy{padding:40px}body.rtg-daily .daily-heading h1{font-size:58px}
+  .daily-hero:has(.daily-photo){min-height:420px;padding:140px 28px 28px}
+  .daily-copy{padding:28px}body.rtg-daily .daily-heading h1{font-size:clamp(38px,3.3vw,50px)}
   body.rtg-daily :is(#bord,#gedeeldBord){grid-template-columns:repeat(2,minmax(0,1fr))}
   body.rtg-daily .nkaart.vast{grid-column:1/-1}
   body.rtg-daily .post{max-width:720px;margin-inline:auto}

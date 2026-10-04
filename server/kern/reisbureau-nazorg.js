@@ -28,13 +28,10 @@
       doorgaat. Wie die twee op een hoop gooit, kan achteraf niet meer zien of er
       ooit iets beloofd is, en dat is precies wat je bij een geschil wilt weten.
 
-   EN HET GELD BLIJFT HANDWERK. Er is vandaag geen betaalweg voor een reis van
-   het RTG-reisbureau (TRAVELCOMMERCE.md par. 9, punt 1), dus er valt hier ook
-   niets terug te boeken. Een afzegging schrijft daarom een `geld`-blok met de
-   stand `nietGeregeld` en de reden erbij, en doet niet alsof. Dat is de vorm van
-   kern/horeca/correctie.js: een geldbesluit wordt KLAARGEZET en nooit
-   uitgevoerd. Zodra er wel een betaalweg is, is dit het veld dat hem aanroept --
-   zolang die er niet is, staat er geen nul maar een reden (KOSTEN.md).
+   HET GELD WORDT KLAARGEZET, NIET VERPLAATST. Een BETAALDE reis krijgt bij het
+   afzeggen een teruggaverecht (kern/reisbureau-teruggave.js) dat een mens van
+   het kantoor uitvoert; een onbetaalde houdt `nietGeregeld` met de reden erbij
+   (KOSTEN.md: geen nul maar een reden).
 
    DE GESCHIEDENIS GROEIT AAN EN WORDT NOOIT HERSCHREVEN. Elke stap zet een
    regel bij: wat, wanneer, door wie, en waarom. Dat is het actielog uit het
@@ -53,7 +50,7 @@ const ROND_STANDEN = ['bevestigd', 'wijziging-gevraagd'];
    telt en die NORM.json op een ratel heeft staan: elk bestand buiten server/db/
    dat db.data rechtstreeks aanraakt, is een plek waar de opslag kan verschuiven
    zonder dat iemand het merkt. */
-module.exports = ({ rij, save, nu, dossier, visum, meldLid }) => {
+module.exports = ({ rij, save, nu, dossier, visum, meldLid, terugboeken }) => {
 
   const schoon = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n);
 
@@ -110,13 +107,18 @@ module.exports = ({ rij, save, nu, dossier, visum, meldLid }) => {
     const a = g.aanvraag;
     if (doorLid && a.customerKey !== key) return { status: 404, error: 'Reisaanvraag niet gevonden.' };
 
+    /* Eerst het geld, dan de stand: een BETAALDE reis krijgt een teruggaverecht
+       (kern/reisbureau-teruggave.js), anders wordt hij niet afgezegd (D9). */
+    let geld = { stand: 'nietGeregeld', uitleg: 'Niet via RTG betaald; een mens handelt het geld af, dit systeem verplaatste niets.' };
+    if (a.betaald) {
+      const t = terugboeken ? terugboeken(a.ref, { reden: tekst }) : { status: 503, error: 'geen terugboeklaag' };
+      if (!t.ok) return { status: t.status || 409, error: 'Betaalde reis; de teruggave kon niet klaar: ' + t.error };
+      geld = { stand: 'teruggaveKlaargezet', recht: t.recht, centen: t.centen,
+        uitleg: 'Het bedrag staat klaar om terug te betalen; een mens van het kantoor voert het uit.' };
+    }
     a.status = 'afgezegd';
     a.afzegging = { door: doorLid ? 'lid' : 'reisbureau', reden: tekst, at: nu() };
-    /* HET GELD IS NIET GEREGELD, EN DAT STAAT ER. Zie de kop: er is geen
-       betaalweg, dus er is ook niets terug te boeken. Een leeg veld zou hier als
-       "afgehandeld" gelezen worden. */
-    a.geld = { stand: 'nietGeregeld',
-      uitleg: 'Er loopt geen betaling voor een reis van het RTG-reisbureau. Een aanbetaling, een terugbetaling of annuleringskosten worden door een mens afgehandeld; dit systeem heeft niets verplaatst.' };
+    a.geld = geld;
     spoor(a, 'afgezegd', wie, { reden: tekst });
     save();
 

@@ -123,4 +123,5 @@ module.exports = (kern) => {
   require('./zelfzorg')(ctx);
   require('./magnaat-leren')(ctx);
   require('./reizen')(ctx);       // de reisbalie: het aanbod en de aanvragen
+  require('./reisteruggave')(ctx);
 };

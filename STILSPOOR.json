@@ -1,23 +1,23 @@
 {
   "stempel": {
-    "op": "2026-09-29T21:44:53.421Z",
-    "commit": "9777b2086",
+    "op": "2026-10-04T14:30:38.596Z",
+    "commit": "758d7615",
     "boomVuil": false,
-    "boomAnders": 5,
+    "boomAnders": 6,
     "instrument": "scripts/stilspoor.js",
-    "node": "v24.18.0"
+    "node": "v22.22.0"
   },
   "soort": "meting",
   "uitleg": "Schrijfacties waarvan het falen volledig wordt weggevangen, terwijl de aanroeper daarna succes meldt. De klasse van LAT.md regel 21: een belofte over een spoor is pas een regel als het spoor kan weigeren.",
   "grens": "Deze meting toont NIET aan dat een gesmoorde schrijfactie fout is -- server/log.js en kern/envelop.js smoren met reden. Het is een triagelijst, geen oordeel. Zij toont ook niet aan dat dit alle gevallen zijn: de herkenning van een spoor- of opslagschrijver is lexicaal, dus dit is een ONDERGRENS op de schuld. En zij zegt niets over aanroepers die de uitslag van een schrijfactie negeren zonder try/catch -- dat is dezelfde faalvorm zonder dit kenmerk.",
   "graad": "vermoed",
   "gemeten": {
-    "bestanden": 3910,
-    "vangers": 1996,
-    "leegVangers": 696,
-    "spoorAanroepen": 265,
-    "opslagAanroepen": 3351,
-    "spoorGesmoord": 17,
+    "bestanden": 4045,
+    "vangers": 2046,
+    "leegVangers": 700,
+    "spoorAanroepen": 271,
+    "opslagAanroepen": 3385,
+    "spoorGesmoord": 16,
     "opslagGesmoord": 24,
     "spoorGesmoordMetBesluit": 0,
     "opslagGesmoordMetBesluit": 0
@@ -40,16 +40,12 @@
       "lijf": "inzagelog.noteer({ door: (s && s.name) || zaak, over: { id }, waarom: door.reden || 'zorgprofiel gelezen bij een bestelling of verblijf', br"
     },
     {
-      "plek": "server/kern/kantoor/index.js:150",
+      "plek": "server/kern/kantoor/index.js:156",
       "lijf": "inzagelog.noteerVeel({ door: wie && wie.id != null ? { id: wie.id, naam: wie.naam } : { naam: 'backoffice' }, overIds: rij.map(u => u.id), w"
     },
     {
       "plek": "server/kern/ledenbalie-zaken.js:117",
       "lijf": "inzagelog.noteer({ door, over: { id: u.id, codenaam: u.codename }, waarom: r, bron: 'ledenbalie/abo' });"
-    },
-    {
-      "plek": "server/kern/service/machtiging.js:121",
-      "lijf": "if (inzagelog && inzagelog.noteer) { inzagelog.noteer({ door: w, over: { id: null, codenaam: z.melder }, waarom: 'Servicezaak ' + z.id + ': "
     },
     {
       "plek": "server/kern/service/onderzoeker.js:106",
@@ -118,7 +114,7 @@
       "lijf": "const bon = bewaar(maak({ envelop: req && req.envelop, voor, na: staatlog.stand(), teller })); if (!res.headersSent) res.setHeader('X-RTG-Ef"
     },
     {
-      "plek": "server/kern/agenda-ics.js:95",
+      "plek": "server/kern/agenda-ics.js:101",
       "lijf": "const nuMs = Date.now(); const vandaag = new Date(nuMs).toISOString().slice(0, 10); for (const [owner, arr] of Object.entries(store())) { co"
     },
     {
@@ -182,11 +178,11 @@
       "lijf": "save();"
     },
     {
-      "plek": "server/server.js:1821",
+      "plek": "server/server.js:1811",
       "lijf": "save();"
     },
     {
-      "plek": "server/server.js:1901",
+      "plek": "server/server.js:1891",
       "lijf": "save();"
     }
   ]

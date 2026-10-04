@@ -50,7 +50,9 @@ test('Daily rooms: first visit to real content, Edge, language, layout and recov
       assert.equal(await page.locator('#dailyIntro h1').count(), 1);
       assert.equal(await page.locator('.rtg-adaptive-bar:visible').count(), 1);
       assert.equal(await page.locator('.rtg-reality-graph,.rtg-deep-nav,.kantoor-intro').count(), 0);
-      const intro = await page.locator('#dailyIntro').boundingBox(), surface = await page.locator('.wd-page').boundingBox();
+      // Op mobiel heeft de gedeelde wrapper display:contents: de echte main
+      // bezit de contentgeometrie, zonder een tweede schil om de pagina.
+      const intro = await page.locator('#dailyIntro').boundingBox(), surface = await page.locator('main:has(> #dailyIntro)').boundingBox();
       assert.ok(intro.y >= surface.y && intro.y < surface.y + 100, app + ': introduction begins inside the common content surface');
       for (const width of [320, 390, 1440]) {
         await page.setViewportSize({ width, height: width === 1440 ? 1000 : 844 });

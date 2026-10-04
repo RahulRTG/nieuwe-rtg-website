@@ -60,9 +60,10 @@
 <script src="sessie.js"></script>
 <script src="/shared/uitvoer.js"></script>
 <script>
+(function foundationPage() {
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-if (!window.Sessie || !Sessie.eisProfiel()) throw new Error('geen sessie');
+if (!window.Sessie || !Sessie.eisProfiel()) return;
 Sessie.balk($('#balk'), { terug: 'index.html' });
 const sess = Sessie.huidig();
 const api = (pad, body) => fetch('/api/rtf/school' + pad, {
@@ -148,6 +149,7 @@ $('#sbVak').addEventListener('change', () => { ST.vak = $('#sbVak').value; ST.pa
 let zt; $('#sbZoek').addEventListener('input', () => { clearTimeout(zt); zt = setTimeout(() => { ST.zoek = $('#sbZoek').value; ST.pagina = 1; ST.mijn = false; teken(); }, 300); });
 $('#sbMijn').addEventListener('click', () => { ST.mijn = !ST.mijn; ST.pagina = 1; teken(); });
 start();
+}());
 </script>
 <script src="samen.js" defer></script>
 <script src="/shared/basis.js" defer></script>

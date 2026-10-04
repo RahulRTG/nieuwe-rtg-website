@@ -160,8 +160,9 @@
 <!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
 <script src="/shared/uitvoer.js"></script>
 <script>
+(function foundationPage() {
 const $ = s => document.querySelector(s);
-if (!window.Sessie || !Sessie.eisFamilie()) throw new Error('geen sessie');
+if (!window.Sessie || !Sessie.eisFamilie()) return;
 const s = Sessie.huidig();
 Sessie.balk($('#balk'), { terug: 'index.html' });
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -399,6 +400,7 @@ if (s) {
   const qs = new URLSearchParams(location.search);
   if (qs.get('duel')) openDuel(qs.get('duel'));
 }
+}());
 </script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/deelmenu.js" defer></script>

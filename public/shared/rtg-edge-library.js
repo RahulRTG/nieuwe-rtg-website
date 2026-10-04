@@ -14,14 +14,8 @@
         (e.key === sleutel ? 'aria-current="page"' : '') + '>' + wereld.kaart + '</a>';
     }).join('') + '</nav>';
   }
-  /* DEZELFDE VIER, MAAR DAN IN DE TOPBALK. Hij staat hier en niet in
-     rtg-edge-system.js om twee redenen: de bibliotheek bouwt de HTML en het
-     systeem bindt hem (dat is de naad tussen die twee bestanden), en die tweede
-     helft heeft geen ruimte -- rtg-edge-system.js stond op 9,98 KB en ging door
-     dit blok over de 10 KB van keuringsregel 13.
-
-     Het nummer is een merkteken en geen inhoud: aria-hidden, zodat een
-     schermlezer "LivingOS" hoort en niet "nul een LivingOS". */
+  /* De bibliotheek bouwt, het systeem bindt. Het decoratieve nummer blijft
+     aria-hidden: een schermlezer hoort de wereldnaam zonder rangnummer. */
   function balk(e, C, esc) {
     return ORDE.map(function (sleutel, i) {
       var wereld = C[sleutel];
@@ -97,8 +91,8 @@
     var q = String(waarde || '').trim().toLowerCase(), aantal = 0;
     e.root.querySelectorAll('.rtg-edge-group').forEach(function (groep) {
       var raak = 0;
-      groep.querySelectorAll('a[data-search]').forEach(function (a) {
-        var toon = !q || (a.dataset.search+' '+a.textContent.toLowerCase()).indexOf(q) >= 0;
+      groep.querySelectorAll('a[data-search],button[data-edge-ruimte]').forEach(function (a) {
+        var toon = !q || ((a.dataset.search || '')+' '+a.textContent.toLowerCase()).indexOf(q) >= 0;
         a.hidden = !toon; if (toon) { raak++; aantal++; }
       });
       groep.hidden = !raak;

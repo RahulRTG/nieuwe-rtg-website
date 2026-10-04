@@ -95,11 +95,11 @@ body[data-rtg-skin="heritage"] .skip{
   background:var(--rtg-world-action)!important;color:var(--rtg-world-action-ink)!important
 }
 body[data-rtg-skin="heritage"] :is(#btn-zet,#rkToetsen .gelijk),
-body[data-rtg-skin="heritage"][data-rtg-world="living"] .kg-rij button{color:#fff!important}
+body[data-rtg-skin="heritage"][data-rtg-world="living"] .kg-rij button{color:#211e19!important}
 body[data-rtg-skin="heritage"] #zegGo,
 body[data-rtg-skin="heritage"][data-rtg-world="work"] #boTabs .tab.aan,
 body[data-rtg-skin="heritage"][data-rtg-world="foundation"] .chip.aan{color:#211e19!important}
-body[data-rtg-skin="heritage"] .winst .kop{color:var(--rtg-world-action)!important}
+body[data-rtg-skin="heritage"] .winst .kop{color:var(--rtg-world-metal)!important}
 body[data-rtg-skin="heritage"][data-kantoor-tool="notities"] #bord>p.stil{
   color:var(--rtg-world-ink)!important
 }

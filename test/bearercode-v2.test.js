@@ -170,7 +170,13 @@ test('roteer: nieuwe code, oude dicht, einde nooit later, geschiedenis begrensd'
   assert.equal(toegang.rotatie, 26);
   assert.equal(toegang.geschiedenis.length, 20);
   assert.equal(l.reden(toegang, verwacht), null);
-  assert.throws(() => l.roteer(l.intrekken(toegang, 'a', 'b')), e => e.code === 'niet-roteerbaar');
+  const gestolen = l.intrekken(toegang, 'kantoor:a', 'gestolen');
+  const vervanger = l.roteer(gestolen, { actor: 'kantoor:b' }).toegang;
+  assert.deepEqual([gestolen.ingetrokken_door, gestolen.intrekreden], ['kantoor:a', 'gestolen'], 'de eerste intrekking blijft staan');
+  assert.equal(l.reden(vervanger, verwacht), null, 'na intrekken krijgt de houder een nieuwe code');
+  assert.throws(() => l.roteer(null), e => e.code === 'niet-roteerbaar');
+  l.klok.t = new Date(Date.parse(vervanger.expires_at) + 1000).toISOString();
+  assert.throws(() => l.roteer(vervanger, { actor: 'a' }), e => e.code === 'geldigheid-ongeldig', 'verlopen roteert niet');
   const v1 = l.maak({ issuer: 'x', doel: 'deur', scope: ['openen'], geldigMs: DAG }).toegang;
   const nieuw = l.roteer(v1, { actor: 'a', afgeleid: 'geen' }).toegang;
   assert.equal(nieuw.contractversie, 2, 'een v1-record wordt bij rotatie v2');

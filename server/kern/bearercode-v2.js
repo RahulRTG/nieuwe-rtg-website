@@ -120,7 +120,11 @@ module.exports = ({ crypto, ns, nu, hash, codeNieuw, plafondMs, sluit, spoor }) 
   }
 
   function roteer(oud, intrekken, { actor, prefix, afgeleid } = {}) {
-    if (!oud || oud.ingetrokken_at) throw fout('niet-roteerbaar', 'een ingetrokken of ontbrekende toegang roteert niet');
+    /* Een INGETROKKEN toegang mag roteren: zo krijgt de houder van een gestolen
+       code een nieuwe (de cadeaukaart doet precies dat). De eerste intrekking
+       blijft dan staan; een verlopen toegang roteert niet, want het einde schuift
+       nooit op. */
+    if (!oud) throw fout('niet-roteerbaar', 'er is geen toegang om te roteren');
     const nieuw = maak({ prefix, issuer: oud.issuer, doel: oud.doel, scope: oud.scope, onderwerp: oud.onderwerp,
       geldigheid: { verlooptOp: oud.expires_at },
       gebruik: oud.gebruiksvorm === 'sessie' ? 'sessie' : { max: oud.max_gebruik },

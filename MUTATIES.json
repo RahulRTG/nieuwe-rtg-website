@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-04T04:41:52.144Z",
-    "commit": "eaf9b488",
+    "op": "2026-10-04T19:13:16.508Z",
+    "commit": "c39d275c",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -11486,6 +11486,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "reisteruggave.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "reisuitnodiging.e2e.js": {

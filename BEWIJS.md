@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2311 bestanden en 15893 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2312 bestanden en 15907 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2311 |
-| losse beweringen (`test(...)`) | 15893 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 247 |
+| toetsbestanden | 2312 |
+| losse beweringen (`test(...)`) | 15907 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 248 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1934 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 148 |
 | alleen in de kop *genoemd*, nog niet gemeten | 39 |
-| niets van beide | 190 |
+| niets van beide | 191 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2011 bestanden, 15368 beweringen.
+2012 bestanden, 15382 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -54,7 +54,7 @@ toets omvalt.
 | `accounts-productie-hardclose.test.js` | 6 | gezakt op `return-weg#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `accounts-requestcommit.pg.test.js` | 1 | slaat zichzelf over | ACCOUNTS EN COLLECTIES IN EEN POSTGRESQL-TRANSACTIE -- tegen een echte PostgreSQL. test/accounts-transactie.test.js beproeft de orkestratie met een nagemaakte client. |
 | `accounts-transactie.test.js` | 9 | gezakt op `return-weg#0` | ACCOUNTMUTATIES IN PRODUCTIE: EEN WERKKOPIE DIE IN DE REQUESTCOMMIT LANDT. Tot 27 september 2026 gaf elke accountmutatie in productie 503 (PG_ACCOUNTS_ATOMAIR_ONTBREEKT): registreren, wachtwoord herstellen, een pas... |
-| `accounts.test.js` | 8 | gezakt op `return-weg` | Unit-tests voor de accountlaag: pseudonimisering (identiteitskluis), wachtwoord-hashing en sessietokens. Geen externe libraries: Node's eigen testrunner (node --test) en een tijdelijke datamap via RTG_DATA_DIR, zodat... |
+| `accounts.test.js` | 10 | gezakt op `return-weg` | Unit-tests voor de accountlaag: pseudonimisering (identiteitskluis), wachtwoord-hashing en sessietokens. Geen externe libraries: Node's eigen testrunner (node --test) en een tijdelijke datamap via RTG_DATA_DIR, zodat... |
 | `achtergrondcollecties.test.js` | 6 | gezakt op `!==->===#0` | Achtergrondtelemetrie mag PostgreSQL niet via raw db.data + save() passeren. Deze proeven houden de collectietransactie expres even open en laten haar eenmaal falen: pending cijfers blijven zichtbaar en worden exact... |
 | `activering.test.js` | 13 | gezakt op `===->!==#0` | DE ACTIVERINGSMETER -- en of hij werkelijk iets onderscheidt. scripts/activering.js beantwoordt per functie: wat wordt er wakker als ik dit aanzet? |
 | `activiteiten.test.js` | 6 | gezakt op `liegpoort /api/` | Het activiteiten-genre (tours, musea, experiences): tickets met tijdsloten en capaciteit, betalen vooraf, en de entree-check aan de deur op naam van het personeelslid (security/gids/balie). Vol is vol, en een ticket... |
@@ -644,7 +644,7 @@ toets omvalt.
 | `gezondheid.test.js` | 6 | gezakt op `liegpoort /api/` | Integratietests voor het Gezondheidsmaatje (RTFoundation-gezin): medicijnen met afvink-per-dag, medische afspraken (aankomend), de groeicurve, en de allergiekaart die uit het zorgprofiel (oppasinfo) komt. Medische... |
 | `gezondheidskaart.test.js` | 14 | gezakt op `===->!==#0` | DE GEZONDHEIDSKAART: veertien beweringen, en ze gaan allemaal over de manier waarop zo'n scherm normaal gesproken onwaar wordt. Dertien staan hieronder genummerd; de veertiende is de tegenhanger van de eerste, want... |
 | `ghost.test.js` | 4 | gezakt op `liegpoort /api/` | De Ghost Driver: de vooruitkijkende verkeersleider. Hij bouwt zijn voorspelling uit echte demo-data (evenement-uitloop van verkochte tickets, het vaste dagritme, de eigen rittenhistorie en het deterministische... |
-| `gidswacht.test.js` | 4 | gezakt op `return-weg#2` | De wachtende gidslezing: een koude cache is een cache-grens, geen feit. In Postgres-stand geeft de synchrone ledenGidsHaal bij een koude cache null terug terwijl het lid gewoon bestaat (de rij wordt asynchroon... |
+| `gidswacht.test.js` | 5 | gezakt op `return-weg#2` | De wachtende gidslezing: een koude cache is een cache-grens, geen feit. In Postgres-stand geeft de synchrone ledenGidsHaal bij een koude cache null terug terwijl het lid gewoon bestaat (de rij wordt asynchroon... |
 | `giftcard-credential.pg.test.js` | 1 | slaat zichzelf over | Echte productie-topologieproef voor pay.giftcard_value_code. Twee onafhankelijke kerninstances delen de autoritatieve `giftcards`-rij in PostgreSQL. |
 | `giftcard-credential.test.js` | 8 | gezakt op `===->!==#0` | De cadeaukaartcode (pay.giftcard_value_code), control voor control: entropie en kale code eenmaal, hash-only, issuer/doel/scope, vervaldatum, max_gebruik, intrekken en roteren, constant-time zoeken, de atomaire claim... |
 | `giftcard-routes.test.js` | 2 | gezakt op `liegpoort /api/` | De cadeaukaart tegen een ECHTE server (pay.giftcard_value_code): de routes, de no-store-kop, de code eenmaal, roteren en intrekken, de zaakscope, en de kassabon die met een kaart betaalt en bij een herhaling niet... |
@@ -1105,8 +1105,9 @@ toets omvalt.
 | `mutatiesemantiek.test.js` | 10 | gezakt op `===->!==#0` | DE MUTATIESEMANTIEK OVER DE ROUTES -- en of de meter werkelijk uitslaat. Het besluit staat in CREATE.md par. |
 | `mutatiewacht.test.js` | 9 | muteert zelf | DE OPRUIMWACHT VAN DE MUTATIEMOTOR: zet hij de bron ook terug bij een KILL? WAAR DIT UIT KOMT. |
 | `mutationproof-aggregate.test.js` | 2 | genoemd | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `mutationproof-canary.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `mutationproof-capture.test.js` | 2 | genoemd | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `mutationproof-runtime.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `mutationproof-runtime.test.js` | 4 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `mutationproof.test.js` | 10 | genoemd | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `muziek-bestanden.test.js` | 6 | gezakt op `liegpoort /api/` | Echte muziek in RTG Sound: rauwe upload, privé-opslag, eigen bibliotheek en afspelen met byte-ranges via een korte luisterkaart. |
 | `muziek-lied.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Klankwerk: van een lus een LIED maken. Wat hier getoetst wordt is de belofte "echte liedjes zonder er eerst voor te studeren": er komt een VORM uit (intro, couplet, refrein), een ZANGLIJN met lettergrepen... |
@@ -1690,8 +1691,8 @@ toets omvalt.
 | `sqlite-audit-herstel.test.js` | 10 | gezakt op `expliciete bronmutatie` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `sqlite-audit-publicatie.test.js` | 4 | gezakt op `expliciete bronmutatie` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `sqlite-audit-rijen.test.js` | 9 | gezakt op `expliciete bronmutatie` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `sqlite-audit-selectief.test.js` | 18 | gezakt op `expliciete bronmutatie` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `sqlite-audit-snapshot.test.js` | 8 | gezakt op `expliciete bronmutatie` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `sqlite-audit-selectief.test.js` | 23 | gezakt op `expliciete bronmutatie` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `sqlite-audit-snapshot.test.js` | 10 | gezakt op `expliciete bronmutatie` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `sqlite-duurzaam-sync.test.js` | 10 | gezakt op `expliciete bronmutatie` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `sqlite-poll-selectief.test.js` | 6 | gezakt op `expliciete bronmutatie` | De echte SQLite-poll leest alleen gewijzigde externe waarden. De proef gebruikt twee verbindingen op een tijdelijke database; geen server of last. |
 | `sso-clientgeheim-routes.test.js` | 1 | gezakt op `liegpoort /api/` | HET SSO-CLIENTGEHEIM OP EEN ECHTE SERVER (besluit B16). Deel 1, gewone server: de eigenaar zet en roteert het geheim; geen antwoord en geen bestand in de datamap draagt het kale geheim; de overlap loopt en is te... |

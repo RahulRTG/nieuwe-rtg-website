@@ -123,7 +123,16 @@ test('7. bevestigd groeit, vermoed krimpt', () => {
      nul, en deze twee horen daar met een beproefd paar uit te verdwijnen -- niet
      door de grond te verhogen. Wie hem opnieuw moet verhogen, hoort eerst te
      kijken of er echt weer routes bij zijn gekomen. */
-  const grond = { bevestigd: 43, vermoed: 49 };
+  /* 49 -> 51 op 4 oktober 2026, op dezelfde grond als hierboven: de verse
+     idemproefronde van die dag bereikte voor het eerst
+
+       /api/member/democratie/actie/start  <->  /api/member/democratie/actie/stop
+
+     Echte routes (server/routes/democratie/index.js), een paar in twee
+     richtingen. Nagegaan of het te BEPROEVEN was: de democratie weigert een
+     demosessie (403) en de herstelproef logt in als demolid, dus het staat in
+     scripts/lib/herstelwereld.js ONBEREIKBAAR met wat er zou moeten bestaan. */
+  const grond = { bevestigd: 43, vermoed: 51 };
   const vermoed = Object.values(R.per).filter(v => v.graad === 'vermoed').length;
   assert.ok(R.bevestigd.length >= grond.bevestigd,
     'bevestigde tegenhangers: ' + R.bevestigd.length + ' < ' + grond.bevestigd +

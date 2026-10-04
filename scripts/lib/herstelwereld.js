@@ -218,6 +218,8 @@ const ONBEREIKBAAR = Object.freeze({
   '/api/reserveer': 'een partner in de zaaiset',
   '/api/asset/koop': 'een object in de assetlijst',
   '/api/asset/gebruik': 'een object in de assetlijst',
+  '/api/member/democratie/actie/start': 'een EIGEN ledenaccount met een kwestie op naam; de democratie weigert een demosessie (403), en deze proef logt in als demolid',
+  '/api/member/democratie/actie/stop': 'een EIGEN ledenaccount met een kwestie op naam; de democratie weigert een demosessie (403), en deze proef logt in als demolid',
   '/api/reisbureau/boek': 'een reis in het reisbureau',
   '/api/reisbureau/annuleer': 'een reisaanvraag in het reisbureau',
   '/api/residentie/spel/zet': 'een lopend potje in de residentie',

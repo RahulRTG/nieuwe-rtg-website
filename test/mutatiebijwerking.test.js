@@ -93,3 +93,41 @@ test('5. herstellen zet de werkboom terug zoals hij voor de run was', () => {
   assert.equal(fs.existsSync(path.join(d, 'nieuw.txt')), false, 'een nieuw bestand gaat weg');
   assert.deepEqual(bijwerkingVan(voor, bronStand(doel, d)), [], 'daarna is er niets meer anders');
 });
+
+test('6. een gerichte bronmutatie is gebonden aan exacte toets- en bronbytes', t => {
+  const { gerichteBron } = require('../scripts/mutatie');
+  const crypto = require('node:crypto');
+  const d = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-gerichte-bron-'));
+  t.after(() => fs.rmSync(d, { recursive: true, force: true }));
+  fs.mkdirSync(path.join(d, 'test')); fs.mkdirSync(path.join(d, 'server'));
+  const source = 'module.exports = value => value === 3;\n';
+  const toets = 'const assert = require("node:assert/strict");\n';
+  fs.writeFileSync(path.join(d, 'server/demo.js'), source);
+  fs.writeFileSync(path.join(d, 'test/demo.test.js'), toets);
+  const hash = text => crypto.createHash('sha256').update(text).digest('hex');
+  const proef = { test: 'test/demo.test.js', module: 'server/demo.js',
+    testSha256: hash(toets), sourceSha256: hash(source), find: 'value === 3', replace: 'value !== 3',
+    expectedFailure: 'the wrong value was accepted', rationale: 'waardegrens omgedraaid' };
+  assert.deepEqual(gerichteBron(proef, d), { bron: source, mutant: source.replace('===', '!==') });
+  for (const patch of [{ test: '../test/demo.test.js' }, { module: 'server/../server/demo.js' },
+    { testSha256: '0'.repeat(64) }, { sourceSha256: '0'.repeat(64) }, { find: 'ontbreekt' },
+    { find: '' }, { replace: proef.find }, { expectedFailure: '' }, { rationale: '' }]) {
+    assert.throws(() => gerichteBron({ ...proef, ...patch }, d), JSON.stringify(patch));
+  }
+  fs.writeFileSync(path.join(d, 'server/demo.js'), source + source);
+  assert.throws(() => gerichteBron({ ...proef, sourceSha256: hash(source + source) }, d), /één exacte vervanging/);
+  fs.writeFileSync(path.join(d, 'server/demo.js'), source);
+  fs.symlinkSync(path.join(d, 'server/demo.js'), path.join(d, 'server/link.js'));
+  assert.throws(() => gerichteBron({ ...proef, module: 'server/link.js' }, d), /bronbinding/);
+});
+
+test('7. een PASS-naam, time-out of andere falende toets bewijst de gerichte assertie niet', () => {
+  const { gerichteAssertie } = require('../scripts/mutatie');
+  const claim = 'offline cache is empty';
+  const failed = "not ok 1 - cache contract\n  ---\n  error: 'offline cache is empty'\n  code: 'ERR_ASSERTION'\n  ...\n";
+  assert.equal(gerichteAssertie(failed + '# tests 1\n', claim), true);
+  assert.equal(gerichteAssertie("ok 1 - offline cache is empty\n" + failed.replace(claim, 'another failure'), claim), false);
+  assert.equal(gerichteAssertie(failed.replace('ERR_ASSERTION', 'ERR_TEST_FAILURE'), claim), false);
+  assert.equal(gerichteAssertie(failed.replace('not ok', 'ok'), claim), false);
+  assert.equal(gerichteAssertie('not ok 1 - offline cache is empty\n  error: Timeout\n', claim), false);
+});

@@ -1,13 +1,13 @@
 :root{
-  --mail-nacht:#061116;
-  --mail-diep:#030a0e;
-  --mail-paneel:#0a171d;
-  --mail-paneel-2:#102229;
-  --mail-lijn:#2c4046;
-  --mail-goud:#c99b55;
+  --mail-nacht:#181511;
+  --mail-diep:var(--rtg-world-bg,#101817);
+  --mail-paneel:#211c17;
+  --mail-paneel-2:#2d251e;
+  --mail-lijn:rgba(218,187,140,.22);
+  --mail-goud:#d7b886;
   --mail-goud-zacht:#e2bd7e;
-  --mail-ivoor:#eee6da;
-  --mail-stil:#98a5a5;
+  --mail-ivoor:#f4ecdf;
+  --mail-stil:#c5b9aa;
   --mail-teal:#7d9f98;
   --mail-wijn:#7a1830;
   --mail-rood:#d06b68;
@@ -16,6 +16,10 @@ body.rtm-voorzijde-actief,
 body.rtm-voorzijde-actief.rtg-edge-host{overflow-x:hidden;background:var(--mail-diep);padding:0!important}
 body.rtm-voorzijde-actief>header,
 body.rtm-voorzijde-actief>#main{display:none!important}
+/* The original mailbox header can be wrapped by the shared screen runtime.
+   While composing, back/save/send belong to the borrowed Edge controls. Keep
+   the source header and its handlers intact for returning to the mailbox. */
+body.rtm-composing header.ios-nav:has(.rtm-diep-terug){display:none!important}
 .rtm-voorzijde[hidden]{display:none!important}
 .rtm-voorzijde{min-height:100dvh;padding:0 0 calc(5.2rem + env(safe-area-inset-bottom));background:radial-gradient(circle at 73% -9rem,rgba(61,108,111,.3),transparent 34rem),linear-gradient(180deg,var(--mail-nacht),var(--mail-diep));color:var(--mail-ivoor);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 .rtm-voorzijde *{box-sizing:border-box}
@@ -143,3 +147,83 @@ body.rtm-voorzijde-actief>#main{display:none!important}
   .rtm-stap span{font-size:.41rem}
 }
 @media(prefers-reduced-motion:reduce){.rtm-scherm{animation:none}}
+
+/* Editorial mail: a real letter sits on ivory paper, with the same compact
+   Edge carrying the application's real controls. No extra page shell. */
+body.rtm-voorzijde-actief[data-rtg-skin][data-rtg-layout][data-rtg-world],
+body.rtm-composing[data-rtg-skin][data-rtg-layout][data-rtg-world]{background:var(--rtg-world-bg,#101817)!important;color:var(--rtg-world-ink,#f4ecdf)!important}
+body.rtm-voorzijde-actief .rtm-voorzijde{
+  background:linear-gradient(180deg,rgba(17,13,9,.24),rgba(17,13,9,.5) 19rem,var(--rtg-world-bg,#101817) 35rem),url('/images/world-homes/work-sfeer.jpg') center top/auto 35rem no-repeat;
+  padding-bottom:calc(var(--rtg-adaptive-inset,96px) + 20px);
+}
+body.rtm-voorzijde-actief .rtm-binnen{padding-top:0}
+body.rtm-voorzijde-actief .rtm-kop{min-height:36px!important;border:0!important}
+.rtm-kop .rtm-merk,.rtm-kop .rtm-huis,.rtm-kop .rtm-profiel{display:none}
+.rtm-ey{font-weight:500;font-size:10px;letter-spacing:.15em;color:#dec69f;line-height:1.6}
+.rtm-titel{max-width:14ch;font-weight:400;font-size:clamp(38px,9vw,66px);line-height:1.03;letter-spacing:-.035em;margin:22px 0 16px}
+.rtm-inleiding{font-size:14px;color:#ddd0bf;line-height:1.6;max-width:35rem;margin-bottom:30px}
+.rtm-focus,.rtm-lijst,.rtm-leeg,.rtm-bron,.rtm-werkvorm{background:rgba(31,26,22,.69);border-radius:var(--rtg-radius-content);border-color:var(--mail-lijn);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.rtm-focus{padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.16)}
+.rtm-focus:after{display:none}
+.rtm-focus h2{font-size:32px;font-weight:400;line-height:1.1}
+.rtm-focus p{color:#d2c7b7;font-size:14px;line-height:1.65}
+.rtm-focus .rtm-afzender b{font-size:13px;font-weight:500}
+.rtm-focus .rtm-afzender span{font-size:11px;color:#c4b7a6}
+.rtm-label,.rtm-soort{border-radius:var(--rtg-radius-content);font-size:9px;font-weight:500;letter-spacing:.04em;color:#d1c0a6;border-color:var(--mail-lijn)}
+.rtm-avatar,.rtm-mini{background:#352a21;color:#dec095;border-color:rgba(215,184,134,.45)}
+.rtm-primair,.rtm-secundair,.rtm-start{min-height:44px;border-radius:var(--rtg-radius-system);padding:11px 17px;font:500 13px/1.3 Inter,system-ui,sans-serif}
+.rtm-primair,.rtm-start{background:linear-gradient(135deg,#82263b,#601a2d);border-color:rgba(224,161,147,.38);color:#f8ecdf}
+.rtm-secundair{border-color:rgba(215,184,134,.34);color:#e1c69e}
+.rtm-sectiekop h2{font:400 29px/1.1 'Bodoni Moda',Georgia,serif}
+.rtm-sectiekop button{font-size:12px;min-height:44px;color:#dcc299}
+.rtm-rij{min-height:82px;padding:16px 12px;border-bottom-color:var(--mail-lijn)}
+.rtm-rij:hover,.rtm-rij:focus-visible{background:rgba(227,198,150,.08)}
+.rtm-rij b{font-size:13px;font-weight:500}.rtm-rij small{font-size:11px;color:#bdaf9d}
+.rtm-rijtijd{font:400 13px/1.3 Inter,system-ui,sans-serif}
+.rtm-rust{padding:16px 2px;border:0;background:none;color:#b9aa95;font-size:12px;line-height:1.6}
+.rtm-leeg{font-size:14px;line-height:1.65}.rtm-leeg h2{font-size:28px;font-weight:400}
+.rtm-terugkop{min-height:70px;margin:0 0 20px;color:#f4ecdf}
+.rtm-rond{width:44px;height:44px;background:rgba(22,18,14,.25);border-color:rgba(223,194,148,.2)}
+.rtm-terugtitel b{font-size:24px;font-weight:400}.rtm-terugtitel span{font-size:11px;color:#d4c4ae}
+.rtm-letter-surface{background:#f5efe4;color:#242019;padding:28px 24px;border-radius:var(--rtg-radius-content);border:1px solid rgba(223,199,160,.28);box-shadow:0 20px 60px rgba(0,0,0,.12)}
+.rtm-letter-surface .rtm-onderwerp{padding:0 0 20px;border:0;border-radius:0;background:none;backdrop-filter:none}
+.rtm-letter-surface .rtm-onderwerp small{color:#796342;font-size:10px;letter-spacing:.13em;font-weight:500}
+.rtm-letter-surface .rtm-onderwerp h1{font:400 clamp(34px,8vw,52px)/1.03 'Bodoni Moda',Georgia,serif;color:#221d17;letter-spacing:-.03em;margin:10px 0 0;overflow-wrap:anywhere}
+.rtm-letter-surface .rtm-draad{gap:24px;margin:0}
+.rtm-letter-surface .rtm-bubbel,.rtm-letter-surface .rtm-bubbel.ik{max-width:none;padding:20px 0 0;margin:0;border:0;border-top:1px solid rgba(107,81,45,.18);border-radius:0;background:none;box-shadow:none;backdrop-filter:none}
+.rtm-letter-surface .rtm-bubbelkop{gap:16px;margin-bottom:20px;align-items:baseline}
+.rtm-letter-surface .rtm-bubbelkop b{font:500 13px/1.5 Inter,system-ui,sans-serif;color:#544535;overflow-wrap:anywhere}
+.rtm-letter-surface .rtm-bubbelkop time{font:400 11px/1.5 Inter,system-ui,sans-serif;color:#70624f;flex-shrink:0}
+.rtm-letter-surface .rtm-bubbel p{color:#28231d;font:400 16px/1.7 Inter,system-ui,sans-serif;overflow-wrap:anywhere}
+.rtm-letter-surface .rtm-leeg{background:none;border:0;padding:16px 0;color:#625745}
+.rtm-samenvatting{margin-top:24px;padding:16px 18px;background:rgba(223,194,148,.055);border-color:#a6895a;border-radius:0 var(--rtg-radius-content) var(--rtg-radius-content) 0}
+.rtm-samenvatting>b{font-size:10px;letter-spacing:.1em}.rtm-samenvatting p{font-size:13px;line-height:1.65}
+.rtm-actiepunt{font-size:13px;line-height:1.5;background:transparent;border-color:var(--mail-lijn);border-radius:var(--rtg-radius-content)}.rtm-bronnoot{font-size:11px;line-height:1.6;color:#b6a996}
+.rtm-gesprekacties{grid-template-columns:1fr;gap:10px;margin:20px 0}
+.rtm-bron b,.rtm-werkveld input,.rtm-werkveld textarea,.rtm-werkveld select,.rtm-start{font-size:14px}
+.rtm-werkveld input,.rtm-werkveld textarea,.rtm-werkveld select{font-weight:400;color:#f4ecdf;background:#201b16;border-color:var(--mail-lijn);border-radius:var(--rtg-radius-content);min-height:44px}
+.rtm-werkveld label{font-size:11px;font-weight:500;color:#c6b59e;letter-spacing:.08em}.rtm-werkveld{border-color:var(--mail-lijn)}
+.rtm-borging{font-size:12px;background:rgba(223,194,148,.06);color:#c6b59e}.rtm-pad{background:#201b16;border-color:var(--mail-lijn)}.rtm-stap{border-color:var(--mail-lijn)}
+.rtm-compose{max-width:760px;margin:0 auto;padding:clamp(104px,16dvh,150px) 16px calc(var(--rtg-adaptive-inset,96px) + var(--rtg-edge-keyboard,0px) + 20px)}
+.rtm-compose[hidden]{display:none!important}
+.rtm-compose-heading p{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#826942;margin:0 0 12px}
+.rtm-compose-heading h1{font:400 clamp(34px,8vw,46px)/1.04 'Bodoni Moda',Georgia,serif;color:#272018;letter-spacing:-.025em;margin:0 0 16px;max-width:14ch}
+.rtm-paper{padding:26px 22px 20px;border:1px solid rgba(230,208,171,.35);border-radius:var(--rtg-radius-content);background:#f5efe4;color:#392e22;box-shadow:0 18px 60px rgba(0,0,0,.12)}
+.rtm-paper label{display:flex;align-items:center;gap:14px;padding:6px 0;border-bottom:1px solid rgba(101,76,42,.18);font-size:12px;color:#725b3e}
+.rtm-paper input,.rtm-paper textarea{width:100%;min-width:0;border:0!important;border-radius:0!important;background:transparent!important;color:#392e22!important;padding:8px 0!important;font:400 16px/1.65 Inter,system-ui,sans-serif!important;outline-offset:3px;box-shadow:none!important}
+.rtm-paper input::placeholder,.rtm-paper textarea::placeholder{color:#79664d;opacity:1}
+.rtm-paper .rtm-paper-body{display:block;border:0;margin-top:20px}
+.rtm-paper textarea{resize:vertical;min-height:160px;height:160px;max-height:60dvh;overflow-y:auto}
+@supports(field-sizing:content){.rtm-paper textarea{field-sizing:content;height:auto}}
+.rtm-reader-label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.rtm-compose-status{font-size:12px;color:#d5c2a3;line-height:1.6;min-height:3em;margin:18px 4px}
+.rtm-compose-controls{display:flex;align-items:center;gap:4px;justify-content:space-between;min-width:0}
+.rtm-compose-controls button{display:inline-flex!important;flex-direction:row!important;align-items:center;justify-content:center;gap:6px;flex-shrink:0;min-height:44px;height:44px;min-width:44px;padding:8px 10px!important;background:transparent;border:0;border-radius:var(--rtg-radius-system);color:var(--edge-bar-copy,#f5ecdd);font:400 12px/1.3 Inter,system-ui,sans-serif!important;white-space:nowrap!important}
+.rtm-compose-controls [data-mail-send]{background:linear-gradient(145deg,rgba(133,43,59,.92),rgba(79,20,36,.88));border:1px solid rgba(231,177,160,.35);color:#f8ecdf}
+body.rtm-composing[data-rtg-skin][data-rtg-layout][data-rtg-world]{background:linear-gradient(180deg,rgba(23,17,13,.15),rgba(23,17,13,.36)),url('/images/world-homes/work-sfeer.jpg') center top/auto 100dvh fixed!important;background-color:var(--rtg-world-bg,#101817)!important}
+body.rtm-composing .rtg-adaptive-edge{--edge-bar-bg:#2d241b;--edge-bar-copy:#f4e8d4;--edge-bar-dim:#cabcaa;--edge-bar-accent:#e6cb99}
+.rtm-draft-list{margin:24px 0;color:#e8d8bb}.rtm-draft-list[hidden]{display:none}.rtm-draft-list h2{font:400 28px 'Bodoni Moda',Georgia,serif}.rtm-draft-list button{display:block;width:100%;padding:18px 0;text-align:left;background:none;border:0;border-bottom:1px solid var(--mail-lijn);color:inherit}
+body.rtg-work-flow[data-rtg-skin][data-rtg-layout] #main .kaart{background:#f5efe4!important;color:#28231d!important;border-radius:var(--rtg-radius-content);border-color:rgba(223,199,160,.28)!important;padding:24px}
+body.rtg-work-flow #main .kaart :is(.meta,.body,.bijlaag-noot){color:#62533e!important}.rtg-work-flow #main .kaart h2{color:#28231d!important;font:400 34px/1.1 'Bodoni Moda',Georgia,serif}
+@media(min-width:1000px){.rtm-gesprekacties{grid-template-columns:1fr 1fr}.rtm-letter-surface{padding:36px}.rtm-paper{padding:32px}.rtm-compose{padding-top:90px}.rtm-voorzijde-actief .rtm-binnen{padding-left:24px;padding-right:24px}}
+@media(prefers-reduced-motion:reduce){.rtm-compose *{scroll-behavior:auto}}

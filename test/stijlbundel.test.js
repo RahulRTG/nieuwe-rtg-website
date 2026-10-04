@@ -122,7 +122,7 @@ test('9. de echte app-pagina: bundelen bewaart de portal-cascade en alle scripts
   const b = bundelHrefs(uit);
   assert.equal(b.length, 2, 'de basisschil en de portal staan aan weerszijden van inline stijlen');
   assert.ok(b[0].length >= 5, 'met minstens vijf bladen erin: ' + b[0].join(', '));
-  assert.deepEqual(b[1], ['/shared/ios.css', '/apps/access/portal.css'],
+  assert.deepEqual(b[1], ['/shared/ios.css', '/apps/access/portal.css', '/shared/rtg-communication-surface.css'],
     'de portal blijft na de inline stijlen, met dezelfde volgorde');
   const portalBundel = uit.lastIndexOf('/stijlbundel.css?');
   assert.ok(portalBundel > uit.lastIndexOf('</style>'), 'de late portalregels mogen niet vóór de inline regels komen');

@@ -11,10 +11,10 @@ const h = require('./helper');
 const pw = h.laadPlaywright(), skip = h.geenBrowser(pw);
 const engines = ['chromium', ...(process.env.RTG_TEST_WEBKIT === '1' ? ['webkit'] : [])];
 const colors = {
-  living: ['rgb(250, 248, 243)', 'rgb(255, 253, 249)', 'rgb(24, 25, 24)'],
-  work: ['rgb(20, 26, 24)', 'rgb(28, 37, 36)', 'rgb(239, 243, 238)'],
-  travel: ['rgb(28, 24, 24)', 'rgb(45, 32, 37)', 'rgb(247, 239, 235)'],
-  foundation: ['rgb(20, 32, 42)', 'rgb(27, 41, 58)', 'rgb(243, 241, 233)']
+  living: ['rgb(16, 13, 10)', 'rgb(32, 25, 18)', 'rgb(247, 240, 229)'],
+  work: ['rgb(16, 24, 23)', 'rgb(25, 36, 34)', 'rgb(243, 240, 231)'],
+  travel: ['rgb(25, 13, 18)', 'rgb(41, 23, 29)', 'rgb(248, 239, 231)'],
+  foundation: ['rgb(16, 35, 30)', 'rgb(25, 55, 45)', 'rgb(247, 241, 229)']
 };
 let srv, token;
 async function post(route, body, auth) {
@@ -102,8 +102,15 @@ for (const engine of engines) for (const width of [390,1440]) {
         }
         const out = path.join(__dirname,'../artifacts/world-palette'); fs.mkdirSync(out,{recursive:true});
         await page.screenshot({path:path.join(out,engine+'-'+width+'-'+world+'.png')});
-        await page.waitForFunction(() => document.querySelector('meta[name="theme-color"]').content ===
-          getComputedStyle(document.body).getPropertyValue('--rtg-world-bg').trim());
+        await page.waitForFunction(() => {
+          // The translucent header reports the same opaque pigment as rgb(),
+          // while world tokens use hex. Compare colours, not their spelling.
+          const c = document.createElement('canvas').getContext('2d');
+          c.fillStyle = document.querySelector('meta[name="theme-color"]').content;
+          const actual = c.fillStyle;
+          c.fillStyle = getComputedStyle(document.body).getPropertyValue('--rtg-world-bg').trim();
+          return actual === c.fillStyle;
+        });
         await home(page);
       }
       await page.evaluate(() => RTGCommand.open('/apps/werkruimte.html?gebied=reizen','Reizen'));

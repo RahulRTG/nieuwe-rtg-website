@@ -32,7 +32,6 @@ test('Saloon houdt Edge bereikbaar bij lezen, bewaren, teruggaan en bronuitval',
     const fouten = []; letOpFouten(page, fouten);
     await page.addInitScript(token => { localStorage.setItem('rtg_member_token', token); localStorage.setItem('rtg_lang', 'nl'); }, lid.token);
     await page.goto(srv.base + '/apps/wereld.html');
-    await page.locator('.wp-story a').click();
     await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
     if (await page.locator('#rtg-cookie button').isVisible()) await page.locator('#rtg-cookie button').click();
     const kaart = page.locator('[data-saloon-id="nieuws:BODE:' + nieuw.artikel.id + '"]');
@@ -46,6 +45,15 @@ test('Saloon houdt Edge bereikbaar bij lezen, bewaren, teruggaan en bronuitval',
       await page.waitForFunction(() => {
         const r = document.querySelector('.rtg-adaptive-bar').getBoundingClientRect();
         return r.left >= 0 && r.right <= innerWidth + 1 && r.bottom <= innerHeight + 1 && r.top >= 0;
+      }).catch(async error => {
+        const detail = '\nEdge-geometrie: ' + JSON.stringify(await page.evaluate(() => ({
+          breedte: innerWidth, body: document.body.className, scroll: document.documentElement.scrollWidth,
+          nodes: ['.rtg-adaptive-bar','.rtg-adaptive-edge','.rtg-edge-chrome'].map(s => {
+            const n = document.querySelector(s), c = getComputedStyle(n), r = n.getBoundingClientRect();
+            return {s, x:r.x, y:r.y, width:r.width, height:r.height, display:c.display, transform:c.transform};
+          })
+        })));
+        throw new Error(error.message + detail, { cause: error });
       });
       assert.equal(await page.locator('.rtg-edge-chrome').count(), 1);
       assert.equal(await page.locator('.rtg-adaptive-bar:visible').count(), 1);
@@ -64,6 +72,10 @@ test('Saloon houdt Edge bereikbaar bij lezen, bewaren, teruggaan en bronuitval',
     }
     for (const width of [320, 390, 834, 1440]) {
       await page.setViewportSize({ width, height: 900 }); await page.evaluate(() => scrollTo(0, 0));
+      if (width >= 1000) {
+        const openen = page.locator('.wp-domain:not([open]) > summary');
+        if (await openen.isVisible()) await openen.click();
+      }
       await foto('saloon-gebouwd-' + width); await meet();
       if (width === 390 || width === 1440) await foto('saloon-gebouwd-' + width);
       await kaart.getByRole('button', { name: 'Lees artikel' }).click();
@@ -94,10 +106,13 @@ test('Saloon houdt Edge bereikbaar bij lezen, bewaren, teruggaan en bronuitval',
     await page.getByRole('tab', { name: 'Heel RTG', exact: true }).click();
     await page.locator('.rtg-edge-face-all:not([hidden])').waitFor();
     assert.equal(await page.locator('.rtg-edge-smart-worlds a').count(), 4);
-    const menuLicht = await page.locator('.rtg-edge-faces').evaluate(n => {
-      const rgb = getComputedStyle(n).backgroundColor.match(/[\d.]+/g).map(Number); return rgb.slice(0, 3).every(x => x > 220);
-    });
-    assert.equal(menuLicht, true, 'het echte Edge-menu gebruikt het lichte LivingOS-materiaal');
+    const menu = await page.locator('.rtg-adaptive-sheet').evaluate(n => ({
+      material: getComputedStyle(n).getPropertyValue('--edge-bar-bg').trim(),
+      glass: getComputedStyle(n).backdropFilter
+    }));
+    assert.equal(menu.material, '#201912', 'het menu volgt het warme LivingOS-materiaal');
+    assert.notEqual(menu.glass, 'none', 'dezelfde transparante Edge blijft de bedieningslaag');
+    assert.equal(await page.locator('.rtg-adaptive-bar:visible').count(), 0, 'geen tweede balk naast het werkvlak');
     assert.equal(await page.locator('.rtg-edge-top').isVisible(), true, 'de gedeelde bovenrand blijft bereikbaar');
     await foto('saloon-menu-gebouwd'); await page.keyboard.press('Escape');
     await page.locator('[data-dichtbij]').click();
@@ -106,7 +121,7 @@ test('Saloon houdt Edge bereikbaar bij lezen, bewaren, teruggaan en bronuitval',
     await page.getByRole('button', { name: 'Keuzes toepassen' }).click();
     await page.waitForFunction(() => document.querySelector('#saloonStatus').textContent.startsWith('0 resultaten'));
     assert.equal(await page.locator('[data-saloon-id]').count(), 0);
-    await page.reload(); await page.locator('.wp-story a').click();
+    await page.reload();
     await page.locator('[data-dichtbij][aria-pressed="true"]').waitFor();
     await page.locator('[data-vorm="overzicht"]').click(); await kaart.waitFor();
     assert.equal((await api('/api/wereld/state', {}, lid.token)).saloon.voorkeuren.plaats, '');

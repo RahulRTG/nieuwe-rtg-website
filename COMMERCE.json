@@ -2,14 +2,14 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-10-04",
   "gemeten": {
-    "bestanden": 2656,
+    "bestanden": 2657,
     "domeinenTotaal": 691,
-    "koopbareVormen": 619,
+    "koopbareVormen": 617,
     "koopbareDomeinen": 124,
     "envelopDrempel": 8,
     "envelop": 45,
-    "veldenDomeineigen": 791,
-    "veldenNietEnvelop": 1059,
+    "veldenDomeineigen": 789,
+    "veldenNietEnvelop": 1057,
     "gelijkendeVormparen": 17,
     "werkwoordenVolledig": 2,
     "werkwoordenOveral": 0,
@@ -17,9 +17,9 @@
     "wagenVormen": 33,
     "wagenVormenUniek": 30,
     "wagenDomeinen": 22,
-    "optellingen": 123,
+    "optellingen": 121,
     "optelDomeinen": 61,
-    "optelCenten": 68,
+    "optelCenten": 66,
     "optelEuro": 5,
     "optelGemengd": 0,
     "optelOnbekend": 50
@@ -2705,16 +2705,6 @@
       ]
     },
     {
-      "domein": "kern/horeca",
-      "plekken": 7,
-      "waar": [
-        "server/kern/horeca/bon-beheer.js",
-        "server/kern/horeca/correctie.js",
-        "server/kern/horeca/foliolaag.js",
-        "server/kern/horeca/stappen.js"
-      ]
-    },
-    {
       "domein": "kern/mobiliteit",
       "plekken": 6,
       "waar": [
@@ -2732,6 +2722,16 @@
         "server/kern/pay/samen.js",
         "server/kern/pay/tegoed-zaak.js",
         "server/kern/pay/tegoed.js"
+      ]
+    },
+    {
+      "domein": "kern/horeca",
+      "plekken": 5,
+      "waar": [
+        "server/kern/horeca/correctie.js",
+        "server/kern/horeca/foliolaag.js",
+        "server/kern/horeca/stappen.js",
+        "server/kern/horeca/verdeling.js"
       ]
     },
     {

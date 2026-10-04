@@ -93,14 +93,14 @@ test('swipe, hold, toetsenbord en haptiek delen dezelfde invoerlaag', () => {
   assert.match(INPUT, /metaKey \|\| event\.ctrlKey/);
   assert.match(INPUT, /toLowerCase\(\) === 'k'/);
   assert.match(INPUT, /navigator\.vibrate\(8\)/);
-  assert.match(INPUT, /addEventListener\('scroll'/);
-  assert.match(INPUT, /handlers\.state\('peek', 'auto'\)/);
+  assert.match(INPUT, /listen\(rt\.doc, 'scroll'/);
+  assert.match(INPUT, /handlers\.state\(delta > 0 \? 'peek' : 'dock', 'auto'\)/);
 });
 
 test('Adaptive Edge laadt fail-closed na de bestaande Edge en is offline aanwezig', () => {
   const bronnen = ['/shared/rtg-adaptive-edge-loader.js'];
   const adaptieveBronnen = ['/shared/rtg-adaptive-edge.css', '/shared/rtg-adaptive-edge-core.js',
-    '/shared/rtg-adaptive-edge-controls.js', '/shared/rtg-adaptive-edge-input.js', '/shared/rtg-adaptive-edge.js', '/shared/rtg-adaptive-edge-signals.js',
+    '/shared/rtg-adaptive-edge-controls.js', '/shared/rtg-adaptive-edge-input.js', '/shared/rtg-adaptive-edge-surface.js', '/shared/rtg-adaptive-edge.js', '/shared/rtg-adaptive-edge-signals.js',
     '/shared/adaptief/grammatica.js', '/shared/edge/actiestaat.js', '/shared/edge/blikveld-hoofdactie.js', '/shared/edge/blikveld.js'];
   for (const bron of bronnen) {
     assert.ok(LOADER.includes(bron), bron + ' ontbreekt in de loader');
@@ -126,4 +126,35 @@ test('alle Adaptive Edge-browsermodules blijven onder de productlimiet', () => {
   for (const naam of ['rtg-adaptive-edge-loader.js', 'rtg-adaptive-edge-core.js', 'rtg-adaptive-edge-controls.js', 'rtg-adaptive-edge-input.js', 'rtg-adaptive-edge.js', 'rtg-adaptive-edge-signals.js']) {
     assert.ok(fs.statSync(path.join(ROOT, 'public/shared', naam)).size < 10 * 1024, naam + ' is te groot');
   }
+});
+
+
+test('invoerlaag behandelt geneste scroll en verwijdert alle luisteraars bij teardown', () => {
+  const vm = require('node:vm');
+  class Target {
+    constructor() { this.events = new Map(); this.scrollTop = 0; this.style = { removeProperty() {} }; }
+    addEventListener(type, fn, options) { this.events.set(type, { fn, options }); }
+    removeEventListener(type, fn) { if (this.events.get(type)?.fn === fn) this.events.delete(type); }
+    contains() { return false; }
+  }
+  const doc = new Target(), bar = new Target(), nested = new Target(), states = [];
+  const win = { Element: Target, scrollY: 0, setTimeout() { return 1; }, clearTimeout() {} };
+  vm.runInNewContext(INPUT, { window: win });
+  const rt = { doc, bar, win, host: { dataset: {}, contains() { return false; } },
+    edge: { root: { contains() { return false; } } }, model: { state: 'dock' } };
+  const cleanup = win.RTGAdaptiveEdgeInput.bind(rt, { state(...args) { states.push(args); } });
+  assert.equal(doc.events.get('scroll').options.capture, true, 'nested scrollers require capture');
+  nested.scrollTop = 60;
+  doc.events.get('scroll').fn({ target: nested });
+  assert.deepEqual(states, [['peek', 'auto']]);
+  nested.scrollTop = 20;
+  doc.events.get('scroll').fn({ target: nested });
+  assert.deepEqual(states[1], ['dock', 'auto']);
+  rt.model.state = 'expanded'; nested.scrollTop = 100;
+  doc.events.get('scroll').fn({ target: nested });
+  assert.equal(states.length, 2, 'an open sheet must not disappear while being used');
+  assert.ok(bar.events.size >= 5);
+  cleanup();
+  assert.equal(doc.events.size, 0);
+  assert.equal(bar.events.size, 0);
 });

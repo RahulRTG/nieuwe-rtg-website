@@ -32,7 +32,13 @@
     return transition;
   }
   w.addEventListener('pageswap', function (event) {
-    if (!event.viewTransition || !allowed() || !event.activation) return;
+    var navigation = event.viewTransition;
+    if (!navigation) return;
+    // Een overgeslagen cross-document animatie mag geen afgewezen promise lekken.
+    navigation.ready.catch(function () {});
+    navigation.finished.catch(function () {});
+    if (!allowed()) { navigation.skipTransition(); return; }
+    if (!event.activation) return;
     var to = new URL(event.activation.entry.url).pathname;
     var portals = Array.from(d.querySelectorAll('.wrooster-kaart[href],[data-rtg-component="WorldPortal"][href]'));
     var portal = portals.find(function (a) { return new URL(a.href, w.location.href).pathname === to; });

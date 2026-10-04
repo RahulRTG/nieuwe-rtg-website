@@ -1,42 +1,44 @@
 /* The world owns the entire UI palette, including Edge. No per-route skins.
    Media, documents and native canvases retain their actual content colours. */
 body[data-rtg-skin="heritage"]{
-  --rtg-world-bg:#121210!important;--rtg-world-card:#1b1b18!important;
-  --rtg-world-card-strong:#252520!important;--rtg-world-ink:#f5f1e8!important;
-  --rtg-world-muted:#beb8ab!important;--rtg-world-line:#3e3c34!important;
-  --rtg-world-signature:#c9b47f!important;--rtg-world-metal:#c9b47f!important;
-  --rtg-world-action:#c9b47f!important;--rtg-world-action-ink:#211e18!important;
+  --rtg-world-bg:#100e0c!important;--rtg-world-card:#1b1713!important;
+  --rtg-world-card-strong:#29221c!important;--rtg-world-ink:#f5efe5!important;
+  --rtg-world-muted:#c3b8a9!important;--rtg-world-line:#4d4133!important;
+  --rtg-world-signature:#b58069!important;--rtg-world-metal:#dfbd88!important;
+  --rtg-world-action:#74263c!important;--rtg-world-action-ink:#fff7ed!important;
   --rtg-world-schema:dark!important;
 }
 body[data-rtg-skin="heritage"]:is([data-rtg-palette="living"],:not([data-rtg-palette])[data-rtg-world="living"]):not([data-public-platform]){
-  --rtg-world-bg:#faf8f3!important;--rtg-world-card:#fffdf9!important;
-  --rtg-world-card-strong:#ebe2d3!important;--rtg-world-ink:#181918!important;
-  --rtg-world-muted:#5e5c57!important;--rtg-world-line:#d9d5cd!important;
-  --rtg-world-signature:#89704b!important;--rtg-world-metal:#79613d!important;
-  --rtg-world-action:#79613d!important;--rtg-world-action-ink:#fffdf9!important;
-  --rtg-world-schema:light!important;
-  --rtg-status-ok:#246a47;--rtg-status-warn:#765300;--rtg-status-danger:#9b2c42;
+  --rtg-world-bg:#100d0a!important;--rtg-world-card:#201912!important;
+  --rtg-world-card-strong:#30251a!important;--rtg-world-ink:#f7f0e5!important;
+  --rtg-world-muted:#cbbdab!important;--rtg-world-line:#514330!important;
+  --rtg-world-signature:#b59063!important;--rtg-world-metal:#dfbd88!important;
+  --rtg-world-action:#74263c!important;--rtg-world-action-ink:#fff7ed!important;
+  --rtg-world-schema:dark!important;
+  --rtg-status-ok:#85c8a1;--rtg-status-warn:#e2bd76;--rtg-status-danger:#f49bac;
 }
 body[data-rtg-skin="heritage"]:is([data-rtg-palette="work"],:not([data-rtg-palette])[data-rtg-world="work"]):not([data-public-platform]){
-  --rtg-world-bg:#141a18!important;--rtg-world-card:#1c2524!important;
-  --rtg-world-card-strong:#263130!important;--rtg-world-ink:#eff3ee!important;
-  --rtg-world-muted:#b1c0b9!important;--rtg-world-line:#354b45!important;
-  --rtg-world-signature:#91b7a9!important;--rtg-world-metal:#91b7a9!important;
-  --rtg-world-action:#91b7a9!important;--rtg-world-action-ink:#14211d!important;
+  --rtg-world-bg:#101817!important;--rtg-world-card:#192422!important;
+  --rtg-world-card-strong:#243430!important;--rtg-world-ink:#f3f0e7!important;
+  --rtg-world-muted:#bdc4bb!important;--rtg-world-line:#43514a!important;
+  --rtg-world-signature:#8da99b!important;--rtg-world-metal:#dfbd88!important;
+  --rtg-world-action:#74263c!important;--rtg-world-action-ink:#fff7ed!important;
 }
-body[data-rtg-skin="heritage"]:is([data-rtg-palette="travel"],:not([data-rtg-palette])[data-rtg-world="travel"]):not([data-public-platform]){
-  --rtg-world-bg:#1c1818!important;--rtg-world-card:#2d2025!important;
-  --rtg-world-card-strong:#3b2b31!important;--rtg-world-ink:#f7efeb!important;
-  --rtg-world-muted:#cab8bb!important;--rtg-world-line:#503940!important;
-  --rtg-world-signature:#c4a0a6!important;--rtg-world-metal:#c9af92!important;
-  --rtg-world-action:#c4a0a6!important;--rtg-world-action-ink:#2b1920!important;
+/* Travel invitations are guest access to this world, not the neutral public
+   company website; they retain the same Travel palette without an app shell. */
+body[data-rtg-skin="heritage"]:is([data-rtg-palette="travel"],:not([data-rtg-palette])[data-rtg-world="travel"]):is(:not([data-public-platform]),[data-public-platform="travel-guest"]){
+  --rtg-world-bg:#190d12!important;--rtg-world-card:#29171d!important;
+  --rtg-world-card-strong:#3a222b!important;--rtg-world-ink:#f8efe7!important;
+  --rtg-world-muted:#d1bbbc!important;--rtg-world-line:#5a3a43!important;
+  --rtg-world-signature:#b86a7e!important;--rtg-world-metal:#dfbd88!important;
+  --rtg-world-action:#74263c!important;--rtg-world-action-ink:#fff7ed!important;
 }
 body[data-rtg-skin="heritage"]:is([data-rtg-palette="foundation"],:not([data-rtg-palette])[data-rtg-world="foundation"]):not([data-public-platform]){
-  --rtg-world-bg:#14202a!important;--rtg-world-card:#1b293a!important;
-  --rtg-world-card-strong:#26374b!important;--rtg-world-ink:#f3f1e9!important;
-  --rtg-world-muted:#b6c1cd!important;--rtg-world-line:#3b4d60!important;
-  --rtg-world-signature:#cbb681!important;--rtg-world-metal:#cbb681!important;
-  --rtg-world-action:#cbb681!important;--rtg-world-action-ink:#172335!important;
+  --rtg-world-bg:#10231e!important;--rtg-world-card:#19372d!important;
+  --rtg-world-card-strong:#254b3e!important;--rtg-world-ink:#f7f1e5!important;
+  --rtg-world-muted:#c0c9b9!important;--rtg-world-line:#4a6557!important;
+  --rtg-world-signature:#9eb69b!important;--rtg-world-metal:#dfbd88!important;
+  --rtg-world-action:#244e41!important;--rtg-world-action-ink:#fff8ed!important;
 }
 body[data-rtg-skin="heritage"][data-rtg-world][data-rtg-layout="standard"]{
   --rtg-world-ground:var(--rtg-world-bg)!important;
@@ -91,6 +93,9 @@ body[data-rtg-skin="heritage"][data-rtg-layout="standard"].rtg-safe-experience :
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"].rtg-sport-flow :is(.tabs,.sport-match,.sport-table,.sport-stadium,.sport-moment,.sport-moment div),
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"].rtg-music-experience :is(.eigen-muziek,.samen,.speler),
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"].foundation-hulp :is(.fh-leeg,.fh-afspraak,.fh-snel>a,.fh-belofte--licht){background:var(--rtg-world-card)!important;color:var(--rtg-world-ink);border-color:var(--rtg-world-line)!important;box-shadow:none!important}
+/* De Vitaal-logkaart krijgt hier de wereldgrond; haar tekst volgt diezelfde
+   grond in plaats van de donkere inkt van het omringende lichte formulier. */
+body[data-rtg-skin="heritage"].rtg-safe-experience[data-veilig-stand=vitaal] #log .stil{color:var(--muted)}
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"]:is(.rtg-shop-flow,.rtg-night-flow,.rtg-safe-experience,.rtg-sport-flow,.rtg-music-experience) :is(input,select,textarea,.veld,.slot,.step button){background:var(--rtg-world-card)!important;color:var(--rtg-world-ink)!important;border-color:var(--rtg-world-line)!important}
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"] :is(.gknop.vol,.brknop.vol,button.hoofd,#nKnop,#koppelKnop,.gx-primary,.shop-primary,.night-primary,.home-button:not(.alt),.sport-action){background:var(--rtg-world-action)!important;color:var(--rtg-world-action-ink)!important;border-color:var(--rtg-world-action)!important}
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"] :is(.shop-hero,.night-hero,.home-hero,.veilig-rustig){--shop-ink:#f5f1e8;--shop-soft:#d5cbbd;--shop-gold:#dfc491;--night-ink:#f5f1e8;--night-soft:#d5cbbd;--night-gold:#dfc491;--home-cream:#f5f1e8;--home-muted:#d5cbbd;--home-gold:#dfc491;--safe-ink:#f5f1e8;--safe-soft:#d5cbbd;--safe-gold:#dfc491}
@@ -150,8 +155,8 @@ body[data-rtg-skin="heritage"][data-rtg-layout="standard"].rtg-media-experience 
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"].rtg-media-experience .knop.rood{color:var(--rtg-status-danger,#9b2c42)!important}
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"].rtg-music-experience #muziekStatus{color:var(--rtg-world-muted)!important}
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"] :is(.wd-page>header,body>header) #kop{color:var(--rtg-world-ink)!important}
-body[data-rtg-skin="heritage"][data-rtg-layout="standard"] :is(.living-example-head,.living-example-copy){background:var(--rtg-world-card)!important;color:var(--rtg-world-ink)!important}
-body[data-rtg-skin="heritage"][data-rtg-layout="standard"] :is(.living-example-head,.living-example-copy) :is(p,span){color:var(--rtg-world-ink)!important}
+/* The Living editorial photo owns its dark readability gradients and light
+   text. A solid world-card here hides the image above and below its centre. */
 
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"] .rtg-interface-second-screen .cmd-bank{
  --rtg-txt:var(--rtg-world-ink)!important;--rtg-muted:var(--rtg-world-muted)!important;--rtg-soft:var(--rtg-world-muted)!important;

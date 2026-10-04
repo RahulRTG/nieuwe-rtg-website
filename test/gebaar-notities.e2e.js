@@ -81,8 +81,11 @@ test('een veeg archiveert een notitie en draait terug; weggooien gaat alleen op 
 
     // 1. doorvegen legt de notitie ECHT in de la
     const rij = page.locator('#bord .nkaart').first();
+    await rij.scrollIntoViewIfNeeded();
+    await wachtOpRust(page, '#bord');
     const titel = (await rij.locator('h3').textContent()).trim();
-    await veegDoor(page, await rij.boundingBox());
+    const rijSelector = '#bord .nkaart[data-open="' + await rij.getAttribute('data-open') + '"]';
+    await veegDoor(page, await rij.boundingBox(), { kiezer: rijSelector });
     await wachtTot(() => staatVan(titel), (s) => s && s.archief,
       'doorvegen hoort ' + titel + ' bij de server te archiveren');
     assert.match(await page.locator('.gb-terug').textContent(), /^\s*Gearchiveerd/,

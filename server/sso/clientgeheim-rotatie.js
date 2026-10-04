@@ -38,7 +38,7 @@ function roteer(org, geheim, waarde, opties, nu) {
   if (huidig.geheimen[0] === geheim) return { waarde: basis, ongewijzigd: true };
   const sloten = [g.zegelSlot(org, geheim, { gezet: new Date(t).toISOString(), vervalt })];
   if (overlap > 0 && huidig.geheimen.length && oudSlot) {
-    const tot = new Date(Math.min(Date.parse(oudSlot.vervalt), t + overlap * g.DAG)).toISOString();
+    const tot = new Date(Math.min(g.vervaltOp(oudSlot), t + overlap * g.DAG)).toISOString();
     sloten.push(g.zegelSlot(org, huidig.geheimen[0], { gezet: oudSlot.gezet, vervalt: oudSlot.vervalt, tot,
       gemigreerd: oudSlot.gemigreerd }));
   }

@@ -55,6 +55,7 @@ const ZWARE_ACTIES = Object.freeze([
   'eigenaar-cadeaubon',         // POST /api/office/cadeaubon/stand  (de e-geldpositie, C14)
   'eigenaar-herstel-in',        // POST /api/techniek/herstel/inrichten
   'eigenaar-herstel-af',        // POST /api/techniek/herstel/afbreken
+  'eigenaar-ssogeheim',         // POST /api/techniek/sso/geheim en /api/techniek/sso met clientSecret (B22, zonder terugval)
   'eigenaar-kantooruitnodiging', // POST /api/office/kantoor/uitnodiging
   'eigenaar-doossleutel',       // POST /api/office/doos/sleutel
   'eigenaar-doossleutel-weg', 'eigenaar-doossleutel-gedeeld', 'eigenaar-beleidsmotor-afdwingen', 'eigenaar-entiteitrekening',   // POST /api/office/doos/sleutel/weg

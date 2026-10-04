@@ -28,7 +28,7 @@ test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: tru
 const post = async (pad, body, token) => {
   const headers = { 'Content-Type': 'application/json' };
   if (token) headers.Authorization = 'Bearer ' + token;
-  const r = await fetch(BASE + '/api/foundation' + pad, { method: 'POST', headers, body: JSON.stringify(body || {}) });
+  const r = await fetch(BASE + (pad.startsWith('/api/') ? pad : '/api/foundation' + pad), { method: 'POST', headers, body: JSON.stringify(body || {}) });
   let data = null; try { data = await r.json(); } catch (e) {}
   return { status: r.status, data, cache: r.headers.get('cache-control') };
 };
@@ -78,7 +78,7 @@ test('de kop en het lijf werken', async () => {
   assert.equal((await lees('/opgaven/' + d.lesId, d.token)).status, 200);
   assert.equal((await lees('/schrift/' + d.lesId, sam.token)).status, 200);
   assert.equal((await lees('/schrift/' + d.lesId + '/' + sam.studentId, d.token)).status, 200);
-  assert.equal((await post('/opgave', { code: d.lesId, tekst: 'Som 1' }, d.token)).status, 200, 'POST met de kop');
+  assert.equal((await post('/api/foundation/opgave', { code: d.lesId, tekst: 'Som 1' }, d.token)).status, 200, 'POST met de kop');
   assert.equal((await post('/agenda', { code: d.lesId, token: d.token, tekst: 'Toets' })).status, 200, 'POST met het lijf');
   assert.equal((await lees('/les/' + d.lesId)).status, 403, 'zonder sleutel niets');
 });

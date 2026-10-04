@@ -2,7 +2,7 @@
 `  /* Op de telefoon blijft de driedelige WerkOS-schil volledig bruikbaar.
      De contextbalk krijgt een eigen rij, de rail blijft een compacte
      glyfenstrook en de dock houdt altijd Start en Command Center bereikbaar. */
-`  @media (max-width:620px){
+  @media (max-width:620px){
     body.wos.wos-aan:not(.wos-thuis) .wos-pill{display:flex;}
     body.wos .wos-rail{width:50px;}
     body.wos .wos-rail-kop{font-size:0;height:36px;padding:0;}

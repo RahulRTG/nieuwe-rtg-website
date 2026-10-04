@@ -101,10 +101,10 @@ test('3. de beheerder roteert en trekt in; een kind kan dat niet', async () => {
   const k = await kind(g, '1357');
   const kt = (await F('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: k.id, pin: '1357' })).body.token;
   assert.equal((await F('/gezin/code/roteer', { code: g.code }, kop(kt))).status, 403, 'een kind roteert niet');
-  const STAND = '/gezin/:code/gezinscode';
-  assert.equal((await fetch(base + '/api/foundation' + STAND.replace(':code', g.code), { headers: kop(kt) })).status, 403,
+  const STAND = '/api/foundation/gezin/:code/gezinscode';
+  assert.equal((await fetch(base + STAND.replace(':code', g.code), { headers: kop(kt) })).status, 403,
     'een kind ziet de stand niet');
-  const st = await fetch(base + '/api/foundation' + STAND.replace(':code', g.code), { headers: kop(g.token) }).then(r => r.json());
+  const st = await fetch(base + STAND.replace(':code', g.code), { headers: kop(g.token) }).then(r => r.json());
   assert.equal(st.status.stand, 'actief');
   assert.equal(JSON.stringify(st).includes('code_hash'), false, 'de stand toont nooit de hash');
   const rot = await F('/gezin/code/roteer', { code: g.code }, kop(g.token));
@@ -114,10 +114,10 @@ test('3. de beheerder roteert en trekt in; een kind kan dat niet', async () => {
   assert.equal((await F('/gezin/inloggen', { gezinscode: g.gezinscode, pin: '2468' })).status, 403, 'de vorige opent niets meer');
   assert.equal((await F('/gezin/inloggen', { gezinscode: rot.body.gezinscode, pin: '2468' })).status, 200);
   assert.equal(await mij(g.code, kt), 200, 'roteren laat lopende sessies staan');
-  const af = await F('/gezin/code/intrek', { code: g.code }, kop(g.token));
+  const af = await post('/api/foundation/gezin/code/intrek', { code: g.code }, kop(g.token));
   assert.deepEqual([af.status, af.body.ingetrokken, af.body.status.stand], [200, 1, 'ongeldig'], af.tekst);
   assert.equal((await F('/gezin/inloggen', { gezinscode: rot.body.gezinscode, pin: '2468' })).status, 403, 'ingetrokken');
-  assert.equal((await F('/gezin/code/intrek', { code: g.code }, kop(g.token))).status, 200, 'nog eens intrekken is geen fout');
+  assert.equal((await post('/api/foundation/gezin/code/intrek', { code: g.code }, kop(g.token))).status, 200, 'nog eens intrekken is geen fout');
 });
 
 test('4. wisselen met een lopende sessie verlengt niets, en een gast wisselt niet', async () => {
@@ -214,7 +214,7 @@ test('6. verlengen met een passkey: zeven dagen erbij, gebonden aan deze sessie;
   assert.equal(await mij(g.code, g.token), 403, 'de verlengde sessie vervangt de oude');
   assert.equal(await mij(g.code, ok.body.token), 200);
   // ontkoppelen: daarna weer 409
-  const weg = await F('/gezin/passkey/weg', { code: g.code }, kop(ok.body.token));
+  const weg = await post('/api/foundation/gezin/passkey/weg', { code: g.code }, kop(ok.body.token));
   assert.deepEqual([weg.status, weg.body.ontkoppeld], [200, 1]);
   assert.equal((await F('/gezin/sessie/verleng', { code: g.code }, kop(ok.body.token))).status, 409);
 });

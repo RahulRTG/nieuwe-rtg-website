@@ -109,7 +109,9 @@ module.exports = ({ db, save, liveCodename, ledenGidsActief, ledenGidsHaal, lede
     const c = String(codenaam || '').trim();
     if (!c) return null;
     const treffers = await gidsZoekCodenaam(c, true);
-    return treffers.length ? { key: treffers[0].key, tier: treffers[0].tier, codename: treffers[0].codename } : null;
+    // Historische dubbele namen mogen nooit willekeurig naar het eerste lid
+    // routeren: een uitnodiging of betaling zou dan bij een ander aankomen.
+    return treffers.length === 1 ? { key: treffers[0].key, tier: treffers[0].tier, codename: treffers[0].codename } : null;
   }
 
   /* Een lid uit de gids halen bij het recht op vergetelheid (AVG art. 17).

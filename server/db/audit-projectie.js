@@ -35,8 +35,12 @@ module.exports = () => {
     if (!oud) gelezen.clear();
     const paginas = (oud?.paginas || []).filter(p => p.nummers.at(-1) >= minimum);
     const staart = oud?.staart;
+    // Een korte staart kan door retentie nooit vol raken. Deel dan niet eeuwig
+    // haar oude Mapkeys/WeakRef-cellen; oude snapshots behouden hun eigen kaart.
+    const refs = staart && staart.nummers[0] < minimum
+      ? new Map([...staart.refs].filter(([nr]) => nr >= minimum)) : staart?.refs;
     const rijen = staart ? staart.nummers.flatMap((nr, i) => nr >= minimum
-      ? [{ nr, tekst: staart.tekst[i], refs: staart.refs }] : []) : [];
+      ? [{ nr, tekst: staart.tekst[i], refs }] : []) : [];
     rijen.push(...nieuw);
     while (rijen.length >= OMVANG) paginas.push(pagina(rijen.splice(0, OMVANG), true));
     const over = rijen.length ? pagina(rijen, false) : null;

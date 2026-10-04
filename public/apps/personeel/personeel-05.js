@@ -38,13 +38,13 @@
   /* DE KANTOORUITNODIGING VERZILVEREN (op naam, eenmalig). Het scherm volgt de
      server: vraagt die een passkey (productie, B24), dan de ceremonie via
      RTGZwaar; anders telt de TOTP uit het veld erboven. */
+  const laad = (g, f) => window[g] || new Promise(ok => { const t = document.createElement('script'); t.src = '/shared/'+f+'.js'; t.onload = t.onerror = ok; document.head.appendChild(t); });
   function kantoorUitnodigingVeld(lt){
     const kaart = $('#gateStep').querySelector('.card');
     if (!kaart || $('#kaUitn')) return;
     kaart.insertAdjacentHTML('beforeend', '<div class="k h-mt70">'+T('pd.ka.uitn','Uitnodiging van de eigenaar')+'</div>'+
       '<div class="pinrow h-mt40"><input id="kaUitn" aria-label="'+T('pd.ka.uitn','Uitnodiging van de eigenaar')+'" autocomplete="off" autocapitalize="characters" maxlength="40" placeholder="KU.">'+
       '<button id="kaUitnGo" class="abtn">'+T('pd.ka.uitnGo','Koppel aan mijn account')+'</button></div>');
-    const laad = (g, f) => window[g] || new Promise(ok => { const t = document.createElement('script'); t.src = '/shared/'+f+'.js'; t.onload = t.onerror = ok; document.head.appendChild(t); });
     const ga = async () => {
       $('#kaFout').textContent = '';
       try {
@@ -56,14 +56,21 @@
     $('#kaUitnGo').addEventListener('click', ga);
     $('#kaUitn').addEventListener('keydown', e => { if (e.key === 'Enter') ga(); });
   }
-  /* Met het ene RTG-account de kantoordeur openen (/api/account/start, dezelfde
-     munt als de werk-kiezer). Heeft het lid een algemene pin, dan vraagt de
-     server erom; daar komt dan een pinveld voor in de plaats van een melding
-     zonder uitweg. */
-  async function kantoorMetAccount(lt, pin){
+  /* Het kantoor openen met het ene RTG-account (/api/account/start). Vraagt de
+     server een pin, dan een pinveld; vraagt hij in productie een passkey (B10),
+     dan de ceremonie die hij meegeeft, net als shared/kantoorgesprek.js. */
+  async function kantoorMetAccount(lt, pin, bewijs){
+    const lijf = Object.assign({ rol: 'kantoor' }, pin ? { pin } : {}, bewijs ? { ceremonie: bewijs.ceremonie, antwoord: bewijs.antwoord } : {});
     const s = await fetch('/api/account/start', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lt },
-      body: JSON.stringify(pin ? { rol: 'kantoor', pin } : { rol: 'kantoor' }) });
+      body: JSON.stringify(lijf) });
     const sd = await s.json().catch(() => ({}));
+    if (!s.ok && sd.bevestigingNodig && sd.bevestiging && !bewijs) {
+      await laad('RTGPasskey', 'passkey');
+      const b = window.RTGPasskey ? await RTGPasskey.bevestig(() => sd.bevestiging) : { fout: 'De passkey kon hier niet starten.' };
+      if (b && !b.fout) return kantoorMetAccount(lt, pin, b);
+      if ($('#kaFout')) $('#kaFout').textContent = (b && b.fout) || T('pd.mis', 'Er ging iets mis.');
+      return;
+    }
     if (!s.ok) {
       if (sd.pinNodig && !$('#kaPin') && $('#kaFout')) {
         $('#kaFout').insertAdjacentHTML('afterend', '<div class="pinrow h-mt60"><input id="kaPin" type="password" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="'+T('pin.veld','Algemene pin')+'" placeholder="'+T('pin.veld','Algemene pin')+'">'+

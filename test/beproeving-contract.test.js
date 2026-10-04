@@ -55,8 +55,11 @@ test('het onderweg-verhaal maakt van een positie alleen een voorstel en bevestig
       if (pad === '/api/live/update') {
         return { data: { live: { active: true, nabij: true, arrived: false } } };
       }
-      if (pad === '/api/live/aangekomen') {
-        return { data: { live: { active: true, nabij: false, arrived: true, aankomstDoor: 'lid' } } };
+      /* Het verhaal (uit #444) leest de bevestigde aankomst ook terug en
+         bevestigt haar een tweede keer: beide moeten dezelfde stand geven. */
+      if (pad === '/api/live/aangekomen' || pad === '/api/live/state') {
+        return { data: { live: { active: true, nabij: false, arrived: true, aankomstDoor: 'lid',
+          aankomstAt: '2026-10-04T10:00:00.000Z' } } };
       }
       assert.fail('onverwachte verhaalstap: ' + pad);
     }
@@ -68,6 +71,8 @@ test('het onderweg-verhaal maakt van een positie alleen een voorstel en bevestig
     '/api/live/start',
     '/api/live/update',
     '/api/live/update',
+    '/api/live/aangekomen',
+    '/api/live/state',
     '/api/live/aangekomen'
   ]);
   assert.equal(aanroepen.at(-1).token, 'lid-token');

@@ -13,6 +13,7 @@
 @import url('./rtg-world-desktop.css');
 @import url('./rtg-desktop-components.css');
 @import url('./rtg-world-palette.css');
+@import url('./rtg-editorial-system.css');
 
 /* RTG Heritage
    De vaste beeldtaal van het huis, over ieder echt appscherm heen.
@@ -32,7 +33,7 @@ body[data-rtg-skin="heritage"]{
   --rtg-space-4:16px;--rtg-space-6:24px;--rtg-space-8:32px;
   --rtg-space-12:48px;--rtg-space-16:64px;--rtg-space-24:96px;
   --rtg-space-32:128px;--rtg-grid-gap:clamp(20px,2vw,32px);
-  --rtg-radius-content:4px;--rtg-radius-system:10px;--rtg-radius-editorial:4px;
+  --rtg-radius-capsule:999px;--rtg-radius-content:10px;--rtg-radius-system:24px;--rtg-radius-editorial:16px;
   --rtg-target:48px;
 
   --rtg-world-bg:#0c0b0a;

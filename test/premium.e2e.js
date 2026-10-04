@@ -318,21 +318,20 @@ test('premium: de knop blijft getekend als de app zijn gastheer sluit',
     /* deze app meldt zijn bron pas aan als er gegevens zijn; we melden er
        zelf een aan zodat plaats() gedwongen wordt te kiezen */
     await page.evaluate(() => RTGUitvoer.bron(function () { return { kolommen: ['a', 'b'], rijen: [['1', '2']] }; }));
-    /* Wachten tot de knop er ECHT staat en getekend is -- dat is de bewering
-       eronder. Drie seconden was een gok die op een trage machine te kort en op
-       een snelle drie seconden te lang was. */
-    await wachtTot(page, () => {
-      const k = document.querySelector('.rtguitvoer-knop');
-      return !!k && k.offsetParent !== null && k.offsetHeight > 0;
-    }, null, { wat: 'de getekende uitvoerknop' });
-    const zicht = await page.evaluate(() => {
-      const k = document.querySelector('.rtguitvoer-knop');
-      if (!k) return { knop: false };
-      return { knop: true, getekend: k.offsetParent !== null, hoog: k.offsetHeight, ouder: k.parentElement.tagName };
+    // The original host is closed; its action must survive in the one Edge.
+    await edgeActies(page);
+    const exportKnop = page.locator('.rtg-adaptive-controls').getByRole('button', {name:'Meenemen',exact:true});
+    await exportKnop.scrollIntoViewIfNeeded();
+    const zicht = await exportKnop.evaluate(k => {
+      const r=k.getBoundingClientRect();
+      return {hoog:r.height,breed:r.width,inBeeld:r.top>=0&&r.bottom<=innerHeight&&r.left>=0&&r.right<=innerWidth};
     });
-    assert.equal(zicht.knop, true, 'de knop staat er');
-    assert.equal(zicht.getekend, true, 'en hij wordt ook getekend (ouder: ' + zicht.ouder + ')');
-    assert.ok(zicht.hoog >= 44, 'met zijn volle duimmaat, kreeg ' + zicht.hoog + 'px');
+    assert.ok(zicht.hoog>=44&&zicht.breed>=44,'the surviving export action has a full touch target');
+    assert.equal(zicht.inBeeld,true,'the export action is reachable after its original host closes');
+    await exportKnop.click();
+    await page.locator('.rtguitvoer-laag').waitFor({state:'visible'});
+    assert.deepEqual(await page.evaluate(()=>RTGUitvoer.gegevens()),{kolommen:['a','b'],rijen:[['1','2']]});
+
   } finally {
     if (browser) await browser.close();
     child.kill();

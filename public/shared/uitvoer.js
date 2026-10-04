@@ -221,7 +221,7 @@
     if (!document.body) return;
     // Standalone pages share one visible content frame. A former workspace
     // drawer must not keep the real export control inside a permanently closed host.
-    var frame = document.body.hasAttribute('data-rtg-desktop') && document.querySelector('.wd-page');
+    var frame = document.querySelector('.wd-page');
     if (frame) {
       var output = frame.querySelector(':scope > .wd-output');
       if (!output) { output = document.createElement('div'); output.className = 'wd-output'; frame.prepend(output); }

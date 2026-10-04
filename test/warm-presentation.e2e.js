@@ -1,6 +1,6 @@
 'use strict';
 const test = require('node:test'), assert = require('node:assert/strict'), fs = require('node:fs'), path = require('node:path');
-const { startServer, stop, laadPlaywright, browserOpties, letOpFouten } = require('./helper');
+const { startServer, stop, laadPlaywright, browserOpties, letOpFouten, edgeBediening } = require('./helper');
 let srv, browser, first, second, photo;
 const out = path.resolve(__dirname, '../../output/warm-implementation');
 async function api(route, body, token = first) {
@@ -44,20 +44,22 @@ test('four worlds share the drawn desktop and mobile composition, and editor sav
       assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,world+' desktop overflow');
       for(const width of [320,390,430]) {
         await page.setViewportSize({width,height:932});
-        assert.equal(await page.locator('.wp-tabs').isVisible(),true);
+        assert.equal(await page.locator('.wp-tabs').isVisible(),false,'mobile has one domain surface, without desktop accessory tabs');
+        assert.equal(await page.locator('.wd-home>.wp-scene').isVisible(),false,'the desktop scene must not duplicate the mobile home');
+        assert.equal(await page.locator('.rtg-adaptive-bar:visible').count(),1);
         assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,world+' '+width+' overflow');
         if(width===430)await page.screenshot({path:path.join(out,world+'-mobile.png')});
       }
     }
     await page.goto(srv.base+'/apps/rtg.html');await page.waitForSelector('body[data-rtg-desktop-state="ready"]');
     await page.waitForFunction(()=>document.querySelector('.wp-photo img').src.startsWith('data:'));
-    await page.locator('.wp-photo .pi-change').click();await page.waitForSelector('.pi-editor[open]');
+    await edgeBediening(page,'Beelden aanpassen');await page.waitForSelector('.pi-editor[open]');
     await page.getByRole('button',{name:'Mobiel',exact:true}).click();
     await page.getByLabel('Horizontaal',{exact:true}).fill('65');await page.getByLabel('Vergroten',{exact:true}).fill('1.5');
     await page.screenshot({path:path.join(out,'editor-mobile.png')});await page.getByRole('button',{name:'Opslaan',exact:true}).click();await page.waitForSelector('.pi-editor',{state:'detached'});
     assert.equal((await api('/api/ik/beelden')).body.images['living/hoofd'].mobile.x,65);
     await page.reload();await page.waitForFunction(()=>document.querySelector('.wp-photo img')?.style.transform==='scale(1.5)');
-    await page.locator('.wp-photo .pi-change').click();await page.getByRole('button',{name:'Herstel RTG-beeld',exact:true}).click();await page.getByRole('button',{name:'Opslaan',exact:true}).click();await page.waitForSelector('.pi-editor',{state:'detached'});
+    await edgeBediening(page,'Beelden aanpassen');await page.getByRole('button',{name:'Herstel RTG-beeld',exact:true}).click();await page.getByRole('button',{name:'Opslaan',exact:true}).click();await page.waitForSelector('.pi-editor',{state:'detached'});
     assert.equal((await api('/api/ik/beelden')).body.images['living/hoofd'],undefined);
     assert.deepEqual(errors,[]);
   }finally{await ctx.close();}
@@ -79,7 +81,7 @@ test('family photo uploads, gallery, cancel and profile switches use only the se
   const page=await ctx.newPage(),errors=[],memberRequests=[];letOpFouten(page,errors);
   page.on('request',r=>{if(/\/api\/(ik\/beelden|bestanden\/)/.test(r.url()))memberRequests.push(r.url());});
   try{
-    await page.goto(srv.base+'/apps/foundation/index.html');await page.waitForSelector('.wp-photo .pi-change');await page.locator('.wp-photo .pi-change').click();
+    await page.goto(srv.base+'/apps/foundation/index.html');await edgeBediening(page,'Beelden aanpassen');await page.waitForSelector('.pi-editor[open]');
     const original=fs.readFileSync(path.join(__dirname,'../public/images/daily/agenda.webp'));
     const large=Buffer.concat([original,Buffer.alloc(4*1024*1024)]);
     await page.locator('#piUpload').setInputFiles({name:'Eigen grote foto.webp',mimeType:'image/webp',buffer:large});
@@ -90,7 +92,7 @@ test('family photo uploads, gallery, cancel and profile switches use only the se
     assert.equal((await family('beelden/haal',{...other,id:saved.file})).status,404);
     assert.equal((await family('beelden/zet',{...other,slot:'foundation/hoofd',image:saved})).status,404);
     assert.equal((await family('beelden/zet',{...session,slot:'foundation/hoofd',image:{...saved,file:photo}})).status,404);
-    await page.locator('.wp-photo .pi-change').click();await page.getByRole('button',{name:'Mijn foto’s',exact:true}).click();
+    await edgeBediening(page,'Beelden aanpassen');await page.getByRole('button',{name:'Mijn foto’s',exact:true}).click();
     await page.locator('.pi-gallery button').filter({hasText:'Eigen grote foto.webp'}).waitFor();
     await page.getByLabel('Vergroten',{exact:true}).fill('1.8');await page.getByRole('button',{name:'Annuleren',exact:true}).click();
     assert.deepEqual((await family('beelden',session)).body.images['foundation/hoofd'],saved);

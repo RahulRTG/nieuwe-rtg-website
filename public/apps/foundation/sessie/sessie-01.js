@@ -43,8 +43,9 @@ function opKleur(hex) {
        binnenkomt. De weg terug staat in de deur zelf, dus niemand raakt
        opgesloten.
 
-       De pagina's roepen dit aan als `if (!Sessie.eisProfiel()) throw ...`;
-       die worp blijft staan en stopt de rest van de pagina zoals altijd. */
+       Elke tool initialiseert binnen zijn eigen functie. Als eisProfiel()
+       weigert, stopt een vroege return de initialisatie zonder paginafout.
+       De toegangsdeur en de servercontrole blijven volledig van kracht. */
     deur: function (soort) {
       var doel = document.querySelector('main') || document.querySelector('[role="main"]') || document.body;
       function toon() {

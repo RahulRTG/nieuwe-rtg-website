@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-04T04:41:52.144Z",
-    "commit": "eaf9b488",
+    "op": "2026-10-04T19:34:48.702Z",
+    "commit": "ee3e8a3e",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -2211,6 +2211,14 @@
         "server/kern/stuur/gereedschap.js"
       ],
       "posities": 1
+    },
+    "codevergelijking.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/bearercode.js",
+      "operator": "false->true#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "codewereld.test.js": {
       "soort": "puur",

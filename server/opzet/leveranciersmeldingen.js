@@ -13,7 +13,7 @@ module.exports = ({ db, save, crypto, rtgKlok, sseToSupplier }) => {
     return n;
   }
   const notifySupplier = (code, note) => meld(code, note, save);
-  notifySupplier.alleenMelding = (code, note) => meld(code, note,
+  notifySupplier.naOpslag = (code, note) => meld(code, note,
     () => typeof save.sleutels === 'function' ? save.sleutels(['supplierNotifications']) : save());
   return notifySupplier;
 };

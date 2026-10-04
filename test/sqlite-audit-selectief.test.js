@@ -598,7 +598,7 @@ test('eigen leveranciersmelding bewaart vóór SSE alleen haar collectie; gewone
   let scans = 0;
   Object.defineProperty(p.db.data.ander, 'toJSON', { value() { scans++; return { waarde: this.waarde }; } });
   p.db.data.ander.waarde = 7;
-  const eigen = notify.alleenMelding('AAA', { title: 'Nieuwe aanvraag' });
+  const eigen = notify.naOpslag('AAA', { title: 'Nieuwe aanvraag' });
   assert.equal(scans, 0); assert.equal(p.lees('ander').waarde, 1);
   assert.deepEqual(p.lees('supplierNotifications').AAA, [eigen]);
   assert.deepEqual(p.lees('supplierNotifications').BBB, [{ id: 'ander', title: 'Andere zaak' }]);
@@ -606,7 +606,7 @@ test('eigen leveranciersmelding bewaart vóór SSE alleen haar collectie; gewone
   assert.equal(scans, 1); assert.equal(p.lees('ander').waarde, 7);
   p.db.data.ander.waarde = 8;
   const oud = leveranciersMeldingPoort(p, publiceer, () => p.save());
-  oud.alleenMelding('AAA', { title: 'Opslag zonder selectieve API' });
+  oud.naOpslag('AAA', { title: 'Opslag zonder selectieve API' });
   assert.equal(scans, 2); assert.equal(p.lees('ander').waarde, 8);
   assert.equal(gezien.length, 3); assert.equal(p.lees('supplierNotifications').AAA.length, 3);
 });
@@ -620,13 +620,13 @@ test('leveranciersmelding houdt commitfailure gesloten en behoudt de bestaande b
     if (sql === 'COMMIT' && faal) { faal = false; throw new Error('leveranciersmeldingcommit mislukt'); }
     return exec.call(this, sql);
   });
-  assert.throws(() => notify.alleenMelding('AAA', { title: 'Niet bevestigd' }), /leveranciersmeldingcommit/);
+  assert.throws(() => notify.naOpslag('AAA', { title: 'Niet bevestigd' }), /leveranciersmeldingcommit/);
   assert.deepEqual(p.lees('supplierNotifications'), {}); assert.equal(effecten, 0);
   p.db.data.supplierNotifications = p.lees('supplierNotifications');
-  const n = notify.alleenMelding('AAA', { title: 'Hersteld' });
+  const n = notify.naOpslag('AAA', { title: 'Hersteld' });
   assert.deepEqual(p.lees('supplierNotifications').AAA, [n]); assert.equal(effecten, 1);
   await p.bijeen(() => {
-    notify.alleenMelding('AAA', { title: 'Samen' });
+    notify.naOpslag('AAA', { title: 'Samen' });
     p.db.data.ander.waarde = 9; p.save();
     assert.deepEqual(p.lees('supplierNotifications').AAA, [n], 'geen voortijdige deelcommit');
     assert.equal(p.lees('ander').waarde, 1);
@@ -693,7 +693,7 @@ for (const soort of ['order', 'rit']) {
     assert.deepEqual(p.signalen, soort === 'rit' ? ['notify', 'supplier', 'office', 'push'] : ['notify', 'supplier', 'office']);
   });
 
-  test(soort + ': oude meldingsfunctie zonder alleenMelding blijft bruikbaar en breed', t => {
+  test(soort + ': oude meldingsfunctie zonder naOpslag blijft bruikbaar en breed', t => {
     const p = aanvraagMetMelding(t, soort, true);
     assert.equal(p.plaats().ok, true);
     assert.equal(p.breed(), 2); assert.equal(p.scans(), 2);
@@ -726,7 +726,7 @@ test('betaalde order behoudt brede leveranciersmelding voor nog onbehouden keuke
   p.ctx.orderMetRef = ref => p.db.data.orders.find(o => o.ref === ref);
   p.ctx.keuken = require('../server/kern/keuken')({ db: p.db, save: p.ctx.save,
     crypto: p.ctx.crypto, schoon: p.ctx.schoon, notifySupplier: p.ctx.notifySupplier }).keuken;
-  p.ctx.notifySupplier.alleenMelding = () => assert.fail('betaalOrderVoor heeft nog een brede opslaggrens nodig');
+  p.ctx.notifySupplier.naOpslag = () => assert.fail('betaalOrderVoor heeft nog een brede opslaggrens nodig');
   const betaal = require('../server/kern/lidacties/betalen')(p.ctx).betaalOrderVoor;
   assert.equal((await betaal(p.actor, { ref: order.ref })).ok, true);
   assert.equal(p.lees('orders')[0].paid, true);

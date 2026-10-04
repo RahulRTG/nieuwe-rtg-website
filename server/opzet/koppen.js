@@ -30,7 +30,9 @@ module.exports = function koppen({ app }) {
        in de pagina werkt pas nadat het document is gelezen; deze kop geldt al
        voor de navigatie zelf en blijft overeind bij een vroege scriptfout. */
     const geheimFragment = req.path === '/apps/app.html' || req.path === '/apps/reisuitnodiging.html' ||
-      req.path === '/apps/spelscherm.html' || req.path === '/apps/foundation/leren.html';
+      req.path === '/apps/spelscherm.html' || req.path === '/apps/foundation/leren.html' ||
+      // B25: het bord en het schrift dragen een lessleutel in geheugen
+      req.path === '/apps/foundation/bord.html' || req.path === '/apps/foundation/schrift.html';
     res.set('Referrer-Policy', geheimFragment ? 'no-referrer' : 'strict-origin-when-cross-origin');
     if (isEenmalig(req.method, req.path)) {
       res.set('Cache-Control', 'no-store');

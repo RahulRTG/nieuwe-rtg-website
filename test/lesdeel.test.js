@@ -107,7 +107,13 @@ test('5. leren.html draagt op HTTP-niveau Referrer-Policy: no-referrer', async (
     assert.equal(r.status, 200);
     assert.equal(r.headers.get('referrer-policy'), 'no-referrer');
     await r.text();
-    const ander = await fetch(base + '/apps/foundation/bord.html');
+    /* B25: het bord en het schrift houden een lessleutel in geheugen. */
+    for (const p of ['bord', 'schrift']) {
+      const r2 = await fetch(base + '/apps/foundation/' + p + '.html');
+      assert.equal(r2.headers.get('referrer-policy'), 'no-referrer', p);
+      await r2.text();
+    }
+    const ander = await fetch(base + '/apps/foundation/klas.html');
     assert.equal(ander.headers.get('referrer-policy'), 'strict-origin-when-cross-origin', 'de regel is smal');
     await ander.text();
   } finally {

@@ -9,8 +9,8 @@
    4. Het geheim stond in geen request-URL, geen Referer, en in geen location.href
       op het moment van een fetch/XHR/EventSource/sendBeacon van de pagina.
 
-   NIET beproefd: een leerling zonder gezinsprofiel (gezinsdeur; de code is
-   dan weg, want hij staat alleen in geheugen -- hij scant opnieuw).
+   NIET beproefd: een leerling zonder gezinsprofiel (de code staat alleen in
+   geheugen; hij scant opnieuw).
 
    Draai los: node --test test/lesdeellink.e2e.js */
 const test = require('node:test');
@@ -66,7 +66,7 @@ async function openAls(sessie, spion) {
   if (spion) {
     /* Bij elk verzoek dat de PAGINA doet: waar stond de adresbalk op dat moment? */
     await ctx.addInitScript(() => {
-      /* In sessionStorage, zodat het spoor de overstap naar schrift.html overleeft. */
+      // in sessionStorage: het spoor overleeft de overstap naar schrift.html
       const noteer = (wat) => {
         const log = JSON.parse(sessionStorage.getItem('__adresBijVerzoek') || '[]');
         log.push(wat + ' @ ' + location.href);
@@ -98,13 +98,14 @@ test('een leerling komt via de deellink van het bord in de les, en het geheim bl
     const les = (await post('/api/foundation/les/maak', { vak: 'Rekenen', naam: 'Juf', idem: 'deellink-e2e-1' })).body;
     assert.ok(les.lesId && les.token, 'de les bestaat: ' + JSON.stringify(les).slice(0, 120));
 
-    /* 1. HET BORD, via de bestaande ?t=-weg; "Nieuwe lescode" roteert. */
+    /* 1. HET BORD, sleutel in de schoolsessie (B25: geen ?t=); roteren. */
     const docent = await openAls(BEHEERDER, false);
     const leerling = await openAls(MILAN, true);
     try {
       const bord = docent.page;
-      await bord.goto(base + '/apps/foundation/bord.html?code=' + encodeURIComponent(les.lesId) + '&t=' + encodeURIComponent(les.token),
-        { waitUntil: 'domcontentloaded' });
+      await bord.goto(base + '/apps/foundation/leren.html', { waitUntil: 'domcontentloaded' });
+      await bord.evaluate((l) => window.RTGSchoolSession.zet('rtf_docent', { code: l.lesId, token: l.token }), les);
+      await bord.goto(base + '/apps/foundation/bord.html?code=' + les.lesId, { waitUntil: 'domcontentloaded' });
       assert.equal(await bord.locator('#btnDeel').isHidden(), true, 'zonder lescode is er niets te delen');
       const roteer = bord.waitForResponse((r) => r.url().endsWith('/api/foundation/les/code/roteer'));
       await bord.locator('#btnKopieer').click();

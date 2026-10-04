@@ -144,6 +144,8 @@ const ROUTES = new Set([
      maken toont lescode en leraarssleutel, meedoen de leerlingsleutel, roteren een
      nieuwe lescode -- elk precies een keer; daarna bestaat alleen de hash. */
   'POST /api/foundation/les/maak', 'POST /api/foundation/les/join', 'POST /api/foundation/les/code/roteer',
+  // B25: het eenmalige stroomticket (foundation/onderwijs/stroomticket.js)
+  'POST /api/foundation/les/stroomticket',
   /* Het gezinsprofieltoken (B17, foundation/gezinstoken.js): elk van deze
      antwoorden draagt een VERSE gezinssessie die daarna alleen als hash bestaat. */
   'POST /api/foundation/gezin/maak', 'POST /api/foundation/gezin/inloggen',

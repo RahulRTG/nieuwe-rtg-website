@@ -180,6 +180,7 @@ const REQUIRED_ROUTES = [
   'POST /api/foundation/les/join', 'POST /api/foundation/ai',
   'POST /api/foundation/les/code/roteer', 'POST /api/foundation/les/code/intrekken',
   'POST /api/foundation/les/leerling/intrekken', 'POST /api/foundation/les/sluit',
+  'POST /api/foundation/les/stroomticket',
   'POST /api/rtf/uitnodiging/accepteer', 'POST /api/rtf/kanaal',
   'POST /api/rtf/toegang', 'POST /api/rtf/bieb', 'POST /api/rtf/bieb/catalogus',
   'POST /api/rtf/bieb/installeer', 'POST /api/rtf/bieb/weg',

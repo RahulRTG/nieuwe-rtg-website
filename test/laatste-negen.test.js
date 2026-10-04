@@ -96,14 +96,18 @@ test('2. de leskamer en het gezinskanaal doen hetzelfde bij de deur', async () =
   const les = (await fapi('/les/maak', { vak: 'Rekenen', naam: 'Juf Nora' })).body;
   const leerling = (await fapi('/les/join', { lescode: les.lescode, naam: 'Sem' })).body;
 
-  assert.equal((await stroom('/api/foundation/les/ZZZZZZ/stream?role=docent&token=' + les.token)).status, 404,
+  /* B25: de stroom opent met een eenmalig stroomticket; de sleutel gaat in de kop. */
+  const tik = async tok => ((await api('/api/foundation/les/stroomticket', { code: les.lesId }, tok)).body || {}).ticket;
+  assert.equal((await stroom('/api/foundation/les/ZZZZZZ/stream?role=docent&ticket=' + await tik(les.token))).status, 404,
     'een les die niet bestaat');
-  assert.equal((await stroom('/api/foundation/les/' + les.lesId + '/stream?role=docent&token=' + leerling.token)).status, 403,
+  assert.equal((await stroom('/api/foundation/les/' + les.lesId + '/stream?role=docent&ticket=' + await tik(leerling.token))).status, 403,
     'een leerling die zich voor docent uitgeeft');
-  assert.equal((await stroom('/api/foundation/les/' + les.lesId + '/stream?role=leerling&token=verzonnen')).status, 403,
-    'en een leerling zonder geldig token');
+  assert.equal((await stroom('/api/foundation/les/' + les.lesId + '/stream?role=leerling&ticket=verzonnen')).status, 403,
+    'en een leerling zonder geldig ticket');
+  assert.equal((await stroom('/api/foundation/les/' + les.lesId + '/stream?role=docent&token=' + les.token)).status, 400,
+    'de sleutel in het adres wordt geweigerd');
 
-  const doc = await stroom('/api/foundation/les/' + les.lesId + '/stream?role=docent&token=' + les.token);
+  const doc = await stroom('/api/foundation/les/' + les.lesId + '/stream?role=docent&ticket=' + await tik(les.token));
   assert.equal(doc.status, 200, 'de begeleider komt binnen');
   assert.match(doc.type, /text\/event-stream/);
 
@@ -125,7 +129,7 @@ test('3. het schrift is van de leerling die erin schrijft', async () => {
   const een = (await fapi('/les/join', { lescode: les.lescode, naam: 'Fay' })).body;
   const twee = (await fapi('/les/join', { lescode: les.lescode, naam: 'Noor' })).body;
 
-  const haal = (code, token) => fetch(base + '/api/foundation/schrift/' + code + '?token=' + token)
+  const haal = (code, token) => fetch(base + '/api/foundation/schrift/' + code, { headers: { Authorization: 'Bearer ' + token } })
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
   assert.equal((await haal('ZZZZZZ', een.token)).status, 404, 'een les die niet bestaat');

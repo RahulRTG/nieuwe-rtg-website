@@ -97,15 +97,15 @@ test('opgave klaarzetten, inleveren, en de docent leest het schrift mee', async 
   assert.equal((await api('/opgave', { code: L.code, token: L.sToken, tekst: 'stiekem' })).status, 403);
   // leerling levert in
   assert.equal((await api('/opgave/inleveren', { code: L.code, token: L.sToken, opgaveId: o.opgave.id, antwoord: '54' })).status, 200);
-  const opgaven = await json(await fetch(BASE + '/api/foundation/opgaven/' + L.code + '?token=' + L.tToken));
+  const opgaven = await json(await metSleutel('/opgaven/' + L.code, L.tToken));
   assert.equal(Object.keys(opgaven.opgaven[0].inzendingen).length, 1);
 
   // schrift opslaan en de docent leest mee
   await api('/schrift/opslaan', { code: L.code, token: L.sToken, pages: [{ type: 'tekst', titel: 'Som', inhoud: '6 x 9 = 54' }] });
-  const peek = await json(await fetch(BASE + '/api/foundation/schrift/' + L.code + '/' + L.studentId + '?token=' + L.tToken));
+  const peek = await json(await metSleutel('/schrift/' + L.code + '/' + L.studentId, L.tToken));
   assert.equal(peek.schrift.pages[0].inhoud, '6 x 9 = 54');
   // zonder docent-token mag je niet in andermans schrift
-  assert.equal((await fetch(BASE + '/api/foundation/schrift/' + L.code + '/' + L.studentId + '?token=' + L.sToken)).status, 403);
+  assert.equal((await metSleutel('/schrift/' + L.code + '/' + L.studentId, L.sToken)).status, 403);
 });
 
 test('XSS-preventie: HTML in een naam wordt ontdaan van < en >', async () => {

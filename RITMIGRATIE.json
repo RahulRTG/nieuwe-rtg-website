@@ -1,5 +1,5 @@
 {
-  "stempel": "2026-09-25",
+  "stempel": "2026-10-04",
   "uitleg": "Per lezer van db.data.rides: wat hij eruit haalt en of de opdrachtwereld dat kan leveren. Geschreven vóór de migratie, zodat die niet wordt geraden. Zie MAATSTAF.md par. 7.5.",
   "blokkade": {
     "stand": "opgeheven",
@@ -12,16 +12,16 @@
     "bijOmzetting": "elke lezer die naar de opdrachtwereld gaat, moet zo'n rit afvangen -- zichtbaar, met de reden erbij, en nooit door hem stil uit de lijst te laten vallen."
   },
   "telling": {
-    "bestanden": 23,
-    "treffers": 38,
+    "bestanden": 24,
+    "treffers": 39,
     "schrijver": 2,
     "stand": 7,
-    "historie": 10,
+    "historie": 11,
     "geenLezer": 4,
     "onbekend": 0,
     "kanNu": 7,
     "wachtOpBesluit": 0,
-    "daarna": 12
+    "daarna": 13
   },
   "perSoort": {
     "schrijver": [
@@ -112,6 +112,12 @@
         "treffers": 1,
         "wat": "fooien per dag van een zaak",
         "naOmzetting": "na het besluit. Fooi is geld van een mens: een rit die uit de telling valt, kost een chauffeur zijn deel"
+      },
+      {
+        "bestand": "server/kern/lidacties/ritreferentie.js",
+        "treffers": 1,
+        "wat": "bestaande referenties, ook van betaalde ritten, uitsluiten bij de uitgifte van een nieuwe object- en betaalidentiteit",
+        "naOmzetting": "pas als de opdrachtwereld ook alle historische referenties bewaart; een gemiste betaalde rit kan anders opnieuw dezelfde identiteit krijgen"
       },
       {
         "bestand": "server/opzet/kernlaag4.js",

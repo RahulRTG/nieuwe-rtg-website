@@ -508,14 +508,13 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
      WAARSCHUWEN hier dus, ze breken de keuring niet -- anders staat het licht
      voor iedereen op rood voor iets wat gepland is. De lijst hoort te krimpen. */
   const NOG = new Set([
-    /* Deze zeven kwamen bij de brede PR-integratie net over de lat. De naden zijn
+    /* Deze zes kwamen bij de brede PR-integratie net over de lat. De naden zijn
        benoemd, maar horen met hun gerichte toetsen in een aparte onderhoudsronde
        te worden geknipt en niet tijdens het samenvoegen van twintig releases. */
     'server/accounts/users.js',
     'server/kern/fiscaal/index.js',
     'server/kern/vergeten.js',
     'server/opzet/diensten2.js',
-    'server/opzet/leverancierpoort.js',
     'public/apps/app-main/app-main-09a.js',
     'public/shared/teamcall/teamcall-01.js',
     /* server/db/postgres-verzoeken.js STOND HIER en is er weer af: de naad die
@@ -3425,6 +3424,7 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['test/sqlite-audit-rijen.test.js', 'bewijst dat auditrijen dezelfde duurzame bundel delen'],
     ['test/sqlite-audit-selectief.test.js', 'bewijst dat selectieve opslag en audit samen duurzaam worden bevestigd'],
     ['test/sqlite-audit-publicatie.test.js', 'weigert een mislukte auditpublicatie vóór de duurzame commit'],
+    ['test/ritreferentie.test.js', 'bewijst met echte duurzame ritbetalingen dat botsende referenties en retries geen dubbele of verloren boeking geven'],
     ['test/sqlite-duurzaam-sync.test.js', 'bewijst FULL-sync, herhaling en de checkpointbarrière bij een noop'],
     ['test/notitiesduurzaam.test.js', 'de toets die bewijst dat het bord niet bevestigt zonder opslag'],
     ['scripts/duurzaamheidskosten.js', 'merkt per route of hij duurzaam is; meet de prijs, zet niets aan'],

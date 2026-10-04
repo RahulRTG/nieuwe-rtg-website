@@ -96,6 +96,16 @@ test('Vandaag leren op school.html en de schoolpunten alleen-lezen op de gezinsa
     assert.equal(await page.evaluate(() => document.querySelector('#afWeg').style.display), 'none',
       'weghalen kan ook niet');
 
+    /* ---- de ouder nodigt een kind uit: de kindkeuze komt uit de eigen sessie ---- */
+    /* Tot 4 oktober 2026 vulde school.html deze keuze via /gezin/inloggen zonder
+       pincode; die deur weigert dat buiten de testomgeving, dus bleef de keuze
+       leeg en kon een ouder geen kind aan een klas koppelen. */
+    await page.evaluate((sessie) => localStorage.setItem('rtf_sessie', JSON.stringify(sessie)),
+      { code: g.code, token: g.token, profiel: { naam: 'Pap', beheerder: true } });
+    await page.goto(base + '/apps/foundation/school.html', { waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => [...document.querySelectorAll('#kopKind option')].some(o => /Roos/.test(o.textContent)),
+      null, { timeout: 15000 });
+
     assert.deepEqual(fouten, [], 'geen JS-fouten op de pagina');
   } finally {
     if (browser) try { await browser.close(); } catch (e) {}

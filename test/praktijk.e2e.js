@@ -56,6 +56,11 @@ for (const breedte of [390,1440]) test('dagelijks werk vanaf nul en gastakkoord 
     await paneel.getByLabel('Externe stand',{exact:true}).selectOption('uitgevoerd');
     await paneel.getByLabel('Bevestiging of bewijsreferentie',{exact:true}).fill('Ontvangstbewijs BH-01');
     await paneel.getByRole('button',{name:'Extern onderdeel bewaren',exact:true}).click();
+    // De POST herlaadt het paneel. Open pas de nieuwe details nadat het
+    // opgeslagen onderdeel terugkomt; de oude summary kan nog even bestaan.
+    await paneel.getByText('Externe afspraken en onderdelen · 1',{exact:true}).waitFor({state:'attached'});
+    await paneel.locator('b').filter({hasText:/^Keukenruimte huren$/}).waitFor({state:'attached'});
+    assert.match(await paneel.textContent(),/Ontvangstbewijs BH-01/);
     await paneel.locator('[data-pr-werk] > summary').click();
     await paneel.getByLabel('Wat is daadwerkelijk uitgevoerd?').fill('Samen gekookt en opgeruimd');
     await paneel.getByRole('button',{name:'Uitvoering vastleggen',exact:true}).click();

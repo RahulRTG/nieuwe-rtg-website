@@ -114,7 +114,7 @@ window.RTGSchoolVeiligheid = (function () {
       '<option value="licht">licht</option><option value="ernstig">ernstig</option><option value="zeer ernstig">zeer ernstig</option></select>' +
       '<input class="veld h-kolom9" id="vgIncPlek" maxlength="60" placeholder="Plek" aria-label="Plek">' +
       '<button class="knop p" id="vgInc" type="button">Meld het incident</button></div>' +
-      '<label class="stil" style="display:flex;gap:.4rem;align-items:center;min-height:24px;margin-top:.4rem;">' +
+      '<label class="stil schoolveiligheid-meldingkeuze" >' +
       '<input type="checkbox" id="vgIncVert"> Vertrouwelijk: alleen de vertrouwenspersoon en de directie lezen dit mee.</label>' +
       '<p class="stil">Schrijf feitelijk op wat er is gebeurd. Een incident met een kind erin is een dossier over dat kind.</p></div>';
   }

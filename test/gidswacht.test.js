@@ -83,3 +83,18 @@ test('4. echt afwezig blijft afwezig, en een poolstoring wordt geen verzonnen li
   pool.stuk = true;
   assert.equal(await gids.ledenGidsHaalWacht('user-storing'), null, 'een storing levert onbekend op, geen verzinsel');
 });
+
+test('een ambigue lokale codenaam kiest geen eerste lid voor een uitnodiging', async () => {
+  const db = { data: { memberDir: {
+    'user-oud': { codename: 'Zilveren Valk ABCD', tier: 'lifestyle' },
+    'user-bedoeld': { codename: 'zilveren valk abcd', tier: 'lifestyle' },
+    'user-uniek': { codename: 'Gouden Ibis 1234', tier: 'rtg' }
+  } } };
+  const kern = require('../server/kern/gids')({ db, ledenGidsActief: () => false });
+  assert.equal((await kern.gidsZoekCodenaam('ZILVEREN VALK ABCD', true)).length, 2,
+    'historische botsing blijft zichtbaar, geen heimelijke datamutatie');
+  assert.equal(await kern.keyVanCodenaam(' ZILVEREN VALK ABCD '), null,
+    'eerste treffer zou de uitnodiging aan user-oud geven en niet aan het bedoelde lid');
+  assert.equal((await kern.keyVanCodenaam('gouden ibis 1234')).key, 'user-uniek');
+  assert.equal(await kern.keyVanCodenaam('onbekend'), null);
+});

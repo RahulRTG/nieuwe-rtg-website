@@ -77,12 +77,12 @@ const LADDER = [
          vinden, impact classificeren, geselecteerd herbewijzen en fail-closed
          het eindoordeel vellen. Eén familiepatroon voorkomt een nieuwe restbak
          zodra hier nog een smalle evidence-poort bijkomt. */
-      /evidence(?:-base|-gate|-control|-calibration)?\.js$/] },
+      /evidence(?:-base|-gate|-control|-calibration)?\.js$/, /outputcollect\.js$/] },
   { id: 'eenheid', naam: 'Eenheid, contract en bevoegdheid', wat: 'de toetssuite zelf, plus de as-proeven per route',
     patronen: [/test-runner\.js$/, /pgtoetsen\.js$/, /isolatiepoort\.test\.js$/, /mutatiecontract\.js$/,
       /^test\/native-(artifact|process)\.test\.js$/,
       /(rolproef|invoerproef|idemproef|staatproef|uitvoerproef|auditproef|handelingproef)-route\.js$/, /mutatie\.js$/,
-      /wekkers\.js$/] },
+      /wekkers\.js$/, /outputproof\.js$/, /mutationproof\.js$/] },
   { id: 'reis', naam: 'Echte reizen per rol', wat: 'een keten van begin tot eind, met de actor die hem loopt',
     patronen: [/(tafel|rit|toelatings)proef\.js$/, /ketenronde\.js$/, /rolronde\.js$/, /zaakwig\.js$/,
       /ladder\.js$/, /tikken\.js$/, /appwerkt\.js$/, /vindbaar\.js$/, /tredeproef\.js$/, /experience\.js$/] },
@@ -94,7 +94,7 @@ const LADDER = [
       /heapproef\.js$/, /spreidingsproef\.js$/, /grondwacht\.js$/, /native-rehearsal\.js$/] },
   { id: 'prestatie', naam: 'Prestatiebudgetten', wat: 'de storm, de duurmeting en de gewichten',
     patronen: [/beproeving\.js$/, /prestaties\.js$/, /toetsduur\.js$/, /gewichtdrift\.js$/, /gewichtvoorstel\.js$/,
-      /dekkingsvloer\.js$/, /dekking\.js$/] },
+      /dekkingsvloer\.js$/, /dekking\.js$/, /performance-debt\.js$/] },
   { id: 'scherm', naam: 'Scherm, toegankelijkheid en browser', wat: 'de schermsuite, de a11y-scan en het oordeel erover',
     patronen: [/e2e\.js$/, /a11y\.js$/, /a11y-oordeel\.js$/, /schermen\.js$/, /schermmutatie\.js$/,
       /desktop-audit\.js$/] },

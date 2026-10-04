@@ -339,8 +339,9 @@
 <script src="/shared/rtgcode.js" defer></script>
 <script src="/shared/dyncode.js" defer></script>
 <script>
+(function foundationPage() {
 const $ = s => document.querySelector(s);
-if (!window.Sessie || !Sessie.eisFamilie()) throw new Error('geen sessie');
+if (!window.Sessie || !Sessie.eisFamilie()) return;
 const s = Sessie.huidig();
 Sessie.balk($('#balk'), { terug:'index.html' });
 // gedeelde, veilige helpers uit /apps/util.js
@@ -571,6 +572,8 @@ function lnk(pad, body){
   return fetch(pad, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(Object.assign({ code:s.code, token:s.token }, body||{})) })
     .then(r => r.json().catch(()=>({})).then(d => { if(!r.ok) throw new Error(d.error||'Er ging iets mis.'); return d; }));
 }
+// Preserve the existing public adapter; its prefix guard stays authoritative.
+window.lnk = lnk;
 
 let mijnPin = null;
 let pinLive = null;
@@ -1069,6 +1072,7 @@ laad();
 startStream();
 setInterval(()=>{ if(!document.querySelector('.ov.open')) laad(); }, 12000);
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+}());
 </script>
 <script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/accounts-os.js" defer></script>

@@ -183,15 +183,27 @@ test('de contextuele schilbalk', { skip: geenBrowser(pw), concurrency: false }, 
     await metLid(390, 844, async (page) => {
       await metDocument(page, async () => {
         const maat = await page.evaluate(() => {
-          const b = document.querySelector('.rtg-adaptive-bar');
+          const b = document.querySelector('.rtg-adaptive-sheet');
           const r = document.querySelector('.rtg-adaptive-controls');
-          return { balk: b.clientWidth, venster: window.innerWidth,
-            rijClient: r.clientWidth, rijScroll: r.scrollWidth };
+          const box = b.getBoundingClientRect();
+          return { balk: box.width, links: box.left, rechts: box.right, venster: window.innerWidth,
+            rijClient: r.clientWidth, rijScroll: r.scrollWidth,
+            overflow: getComputedStyle(r).overflowX, pagina: document.documentElement.scrollWidth };
         });
-        assert.ok(maat.balk <= maat.venster,
+        assert.ok(maat.balk > 0 && maat.links >= 0 && maat.rechts <= maat.venster + 1,
           'de balk is ' + maat.balk + 'px op een venster van ' + maat.venster);
-        assert.ok(maat.rijScroll <= maat.rijClient + 1,
-          'de actierij loopt over: ' + maat.rijScroll + ' in ' + maat.rijClient);
+        assert.ok(maat.pagina <= maat.venster + 1, 'de pagina zelf loopt niet horizontaal over');
+        // De goedgekeurde Edge laat meer acties binnen dezelfde rij swipen.
+        // Bewijs ook dat de laatste actie werkelijk bereikbaar blijft.
+        if (maat.rijScroll > maat.rijClient + 1) assert.match(maat.overflow, /auto|scroll/);
+        const laatste = page.locator('.rtg-adaptive-controls button:visible').last();
+        await laatste.scrollIntoViewIfNeeded();
+        const raakvlak = await laatste.evaluate(e => {
+          const r = e.getBoundingClientRect(), p = e.closest('.rtg-adaptive-controls').getBoundingClientRect();
+          return { binnen: r.left >= p.left - 1 && r.right <= p.right + 1,
+            raakbaar: e.contains(document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2)) };
+        });
+        assert.ok(raakvlak.binnen && raakvlak.raakbaar, 'de laatste actie is na swipen zichtbaar en raakbaar');
       });
     });
   });

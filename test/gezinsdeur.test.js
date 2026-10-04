@@ -7,7 +7,7 @@
    verlengen van een gezinssessie met een echte passkeyceremonie.
 
    De eenheden staan in test/gezinscode.test.js; de race over twee
-   PostgreSQL-instances in test/gezinsdeur.pg.test.js.
+   PostgreSQL-instances in test/gezinsuitnodiging.pg.test.js.
 
    Draai los: node --test test/gezinsdeur.test.js */
 'use strict';

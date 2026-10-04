@@ -4249,14 +4249,6 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
-    "foundation-lesstroom.pg.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/pg/index.js",
-      "operator": "voorwaarde-omkeren#0",
-      "gezakt": 1,
-      "geprobeerd": 1
-    },
     "foundation-lesstroom.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -5067,14 +5059,6 @@
       "staat": "gezakt",
       "module": "server/foundation/gezinscode.js",
       "operator": "true->false#0",
-      "gezakt": 1,
-      "geprobeerd": 1
-    },
-    "gezinsdeur.pg.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/pg/index.js",
-      "operator": "voorwaarde-omkeren#0",
       "gezakt": 1,
       "geprobeerd": 1
     },

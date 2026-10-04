@@ -203,7 +203,7 @@ test('het gezinsprofieltoken en de gezinsdeur zelf zijn gemigreerd', () => {
   for (const c of ['geen_sessie_in_url', 'oude_zes_tekencode_opent_niets', 'rem_per_ip_en_per_gezin',
     'stroomticket_eenmalig_en_per_kanaal', 'sessie_zeven_dagen_verlengen_met_passkey'])
     assert.equal(deur.controls[c], true, c);
-  for (const b of ['test/gezinsdeur.test.js', 'test/gezinscode.test.js', 'test/gezinsdeur.pg.test.js'])
+  for (const b of ['test/gezinsdeur.test.js', 'test/gezinscode.test.js', 'test/gezinsuitnodiging.pg.test.js'])
     assert.ok(deur.bewijs.includes(b), b);
   assert.ok(Array.isArray(deur.restrisico) && deur.restrisico.length >= 3, 'wat niet af is, staat er');
   for (const route of ['POST /api/foundation/gezin/maak', 'POST /api/foundation/gezin/inloggen',

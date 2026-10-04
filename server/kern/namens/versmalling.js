@@ -72,9 +72,12 @@ const SLEUTELS = Object.freeze(BRONNEN.map(b => b.sleutel));
    kop: dat onderscheid overleeft tot in de uitslag. */
 function bron(waarde) {
   if (waarde == null) return { bekend: false, set: new Set() };
-  if (waarde instanceof Set) return { bekend: true, set: waarde };
-  if (Array.isArray(waarde)) {
-    return { bekend: true, set: new Set(waarde.filter(x => typeof x === 'string' && x)) };
+  /* Een Set krijgt DEZELFDE keuring als een lijst. Hier ging een Set ongezien
+     door, en dan kwam een object of een getal in `effectief` terecht -- of de
+     sortering hieronder viel om op `localeCompare`. Een bevoegdheidssleutel is
+     een niet-lege tekst, ongeacht de verpakking waarin hij aankomt. */
+  if (waarde instanceof Set || Array.isArray(waarde)) {
+    return { bekend: true, set: new Set([...waarde].filter(x => typeof x === 'string' && x)) };
   }
   /* Een bron die geen verzameling IS, is geen lege verzameling maar een fout in
      de aanroep. Hem stil als leeg behandelen zou een typefout in een aanroeper

@@ -1,26 +1,26 @@
 {
  "stempel": {
-  "op": "2026-09-30T20:12:56.381Z",
-  "commit": "ec186c7b2",
+  "op": "2026-10-04T12:52:40.455Z",
+  "commit": "1d7a01f4",
   "boomVuil": false,
-  "boomAnders": 3,
+  "boomAnders": 0,
   "instrument": "scripts/mutatieinventaris.js",
-  "node": "v26.10.0"
+  "node": "v22.22.0"
  },
  "uitleg": "De vijf inventarissen uit EEN bron, met per stap hoeveel er afvallen en waarom. Zonder dit bestand heten vier verschillende getallen allemaal \"het aantal routes\", en is elk percentage dat erop rust niet na te rekenen.",
  "grens": "Dit telt wat de ROUTER kent. Een mutatie die niet over HTTP binnenkomt -- een taak, een achtergrondlus, een migratie -- staat hier niet in en is daarmee niet geteld, niet veilig.",
  "inventarissen": {
-  "route": 5375,
-  "mutatie": 5276,
-  "mutatieBuitenSchakel": 5246,
-  "idempotentieAanroepbaar": 5236,
+  "route": 5374,
+  "mutatie": 5275,
+  "mutatieBuitenSchakel": 5245,
+  "idempotentieAanroepbaar": 5235,
   "werkelijkAangeroepen": 5148,
   "bewijsMetSleutel": 1739,
   "bewijsZonderSleutel": 266,
   "verklaard": 695
  },
  "autorisatie": {
-  "rol": 4056,
+  "rol": 4055,
   "(geen bewakerslaag)": 648,
   "geenBewaker": 71,
   "lichaamssleutel": 102,
@@ -32,7 +32,9 @@
  "kruisingen": {
   "metParameter": 10,
   "schakelpaden": 30,
-  "gemetenBuitenInventaris": [],
+  "gemetenBuitenInventaris": [
+   "POST /api/command/mandaat"
+  ],
   "weesVerklaringen": [
    "POST /api/office/bank/terugstorting",
    "POST /api/techniek/fouten/wis"

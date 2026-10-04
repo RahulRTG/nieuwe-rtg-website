@@ -21,7 +21,10 @@ module.exports = (ctx) => {
     if (!timer) return null;
     try { return timer.finish(uitkomst); } catch (e) { return null; }
   }
-  const beslisReservering = require('./reservering-besluit')({ ...ctx, observe, metricTimer, finish });
+  // Het besluit krijgt de twee collecties die het leest, niet de hele database.
+  const beslisReservering = require('./reservering-besluit')({ ...ctx, db: undefined, observe, metricTimer, finish,
+    reserveringen: () => db.data.reserveringen || [],
+    vonkMatches: () => db.data.vonk && Array.isArray(db.data.vonk.matches) ? db.data.vonk.matches : [] });
 
   /* Lazy sweep: reserveringen waarvan de 24u-bedenktijd voorbij is worden
      definitief zodra iemand ze opvraagt. Eén keer opslaan als er iets rijpte. */

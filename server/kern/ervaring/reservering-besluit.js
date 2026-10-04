@@ -23,16 +23,16 @@ function herstel(object, naam, waarde) {
 }
 
 module.exports = (ctx) => {
-  const { db, save, crypto, notify, sseToCustomer, nu, observe, metricTimer, finish,
-    bewijsHospitalityBesluit } = ctx;
+  const { save, crypto, notify, sseToCustomer, nu, observe, metricTimer, finish,
+    bewijsHospitalityBesluit, reserveringen, vonkMatches } = ctx;
 
   return function beslisReservering(supplier, rid, action, authority) {
-    const r = (db.data.reserveringen || []).find(x => x.id === rid && x.supplierCode === supplier.code);
+    const r = reserveringen().find(x => x.id === rid && x.supplierCode === supplier.code);
     if (!r) return { status: 404, error: 'Reservering niet gevonden.' };
     if (r.status !== 'aangevraagd') return { status: 409, error: 'Deze reservering is al ' + r.status + '.' };
     const decisionTimer = metricTimer({ capability: 'reservation.request', boundary: 'supplier:' + supplier.code });
     const nieuweStatus = action === 'bevestig' ? 'bevestigd' : 'geweigerd', beslotenAt = nu();
-    const matches = db.data.vonk && Array.isArray(db.data.vonk.matches) ? db.data.vonk.matches : [];
+    const matches = vonkMatches();
     const vonkMatch = matches.find(m => m.reserveringId === r.id);
     const actor = authority && authority.actor || {};
     const request = authority && authority.request;

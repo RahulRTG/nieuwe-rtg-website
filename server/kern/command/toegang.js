@@ -37,9 +37,6 @@ function maakToegang({ opslag, save, crypto, journaal }) {
   function rij() {
     return opslag.bak('commandRechten');
   }
-  function mandaten() {
-    return opslag.bak('commandMandaten');
-  }
   const nu = () => new Date().toISOString();
   const straks = (min) => new Date(Date.now() + min * 60000).toISOString();
 
@@ -98,21 +95,15 @@ function maakToegang({ opslag, save, crypto, journaal }) {
   const vanWie = (wie) => { const n = nu(); return rij().filter(x => x.aan === String(wie) && !x.ingetrokken && x.tot > n); };
   const open = () => { const n = nu(); return rij().filter(x => !x.ingetrokken && x.tot > n); };
 
-  /* MANDAAT: X mag namens Y handelen, tot een datum, voor een afgebakend
-     terrein. Ook dit vervalt vanzelf. */
-  function mandaat(van, aan, terrein, door, tot, reden) {
-    if (!van || !aan || !terrein) return { error: 'Een mandaat vraagt van wie, aan wie en waarvoor.', status: 400 };
-    if (!door) return { error: 'Zonder herleidbare actor wordt er geen mandaat vastgelegd.', status: 403 };
-    if (!tot) return { error: 'Een mandaat zonder einddatum is geen mandaat maar een overdracht.', status: 400 };
-    const m = { id: crypto.randomUUID(), van: String(van), aan: String(aan), terrein: String(terrein),
-      door: String(door), reden: String(reden || ''), at: nu(), tot: String(tot) };
-    mandaten().push(m);
-    if (save) save();
-    journaal.noteer({ actor: door, actie: 'mandaat vastleggen', objectType: 'mandaat', objectId: m.id,
-      niveau: NIVEAUS.hand, reden: m.reden, na: { van: m.van, aan: m.aan, terrein: m.terrein, tot: m.tot } });
-    return { mandaat: m };
-  }
-  const mandatenVan = (wie) => { const n = nu(); return mandaten().filter(m => (m.aan === String(wie) || m.van === String(wie)) && m.tot > n); };
+  /* Hier stond `mandaat()`: X mag namens Y handelen, tot een datum. Opgeheven op
+     4 oktober 2026. `tot` was vrije tekst die als TEKST werd vergeleken ("morgen"
+     verliep nooit, een datum in het verleden werd aanvaard), er was geen maximum
+     en geen intrekken, en geen enkele route of scherm las de mandaten. Een
+     machtiging zonder geldigheidscontract en zonder lezer is geen bevoegdheid
+     maar een regel die eruitziet als een. Wie namens iemand handelt, gaat langs
+     kern/vertegenwoordiging/ (mens-namens-mens) of kern/stuur/mandaat.js (de AI).
+     De collectie `commandMandaten` blijft geregistreerd zodat bestaande rijen
+     niet verdwijnen; niets schrijft of leest haar nog. */
 
   /* DE RECHTENGRAAF: wie heeft nu wat, waarom, van wie en tot wanneer. Dit is
      de vraag die bij een audit als eerste komt en die zonder deze laag alleen
@@ -128,14 +119,13 @@ function maakToegang({ opslag, save, crypto, journaal }) {
         at: x.at, tot: x.tot, nood: x.nood })),
       nood: levend.filter(x => x.nood).length,
       verlopen: verlopen.length,
-      mandaten: mandaten().filter(m => m.tot > n),
       /* Wat een lege lijst hier betekent, staat erbij: geen actieve zware
          rechten is een goede uitslag, geen ontbrekende meting. */
       uitleg: levend.length ? null : 'Er staan op dit moment geen zware rechten open. Dat is de bedoelde rusttoestand.'
     };
   }
 
-  return { geef, breekGlas, trekIn, geldig, vanWie, open, graaf, mandaat, mandatenVan, ZWAAR, NOOD_MINUTEN };
+  return { geef, breekGlas, trekIn, geldig, vanWie, open, graaf, ZWAAR, NOOD_MINUTEN };
 }
 
 module.exports = { maakToegang, ZWAAR, NOOD_MINUTEN };

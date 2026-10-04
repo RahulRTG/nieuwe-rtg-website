@@ -490,6 +490,14 @@ test('8. de pendeldienst: van dienstregeling naar een geteld -- en herroepbaar -
   const terug = await api('/api/supplier/mob/pendel/noshow',
     { id: pid, reservering: res.body.reservering.id, nietVerschenen: false }, baas.token);
   assert.equal(terug.body.nietVerschenen, 0, 'een telling kun je corrigeren; een strafblad niet');
+
+  /* DE TEGENPROEF van mobiliteit.test.js toets 11: daar maakt een dienst zonder
+     reserveringen geen rit, en zonder deze regel bleef die toets groen als de
+     planner nooit iets maakte. Met een gereserveerde plaats komt er wel een rit. */
+  const plan = await api('/api/supplier/mob/pendel/plan', { id: pid, datum: rooster.body.datum }, baas.token);
+  assert.equal(plan.status, 200, JSON.stringify(plan.body).slice(0, 200));
+  assert.equal(plan.body.gemaakt.length, 1, 'het bezette vertrek wordt een rit: ' + JSON.stringify(plan.body).slice(0, 300));
+  assert.equal(plan.body.gemaakt[0].vertrek, vertrek.vertrek);
 });
 
 /* ================= 4. payroll: identiteit, verzuim, contract, run ================= */

@@ -58,3 +58,4 @@
     .wos-app:nth-child(odd){border-right:0;}
     .wos-navkop{margin-top:2rem;}
   }
+`

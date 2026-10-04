@@ -406,6 +406,8 @@ test('11. de bedrijfspendel: een regel wordt een dienstregeling wordt een rit', 
   const leeg = await api('/api/supplier/mob/pendel/plan', { id: pid, datum: maandag }, zaak);
   assert.equal(leeg.status, 200);
   assert.equal(leeg.body.gemaakt.length, 0, 'zonder reserveringen rijdt er geen lege bus');
+  // alle negen vertrekken van de maandag zijn overgeslagen, en niet stil verdwenen
+  assert.equal(leeg.body.overgeslagen.length, 9, 'elk vertrek staat als overgeslagen: ' + JSON.stringify(leeg.body).slice(0, 200));
   assert.ok(leeg.body.overgeslagen.every(x => x.reden === 'geen reserveringen'));
 });
 

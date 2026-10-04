@@ -117,7 +117,7 @@ module.exports = ({ transactie, zoekIn, vanId, geldig, mutatie, t }) => {
   /* Een DEEL van een afboeking terug op de bon (een teruggave na een correctie,
      kern/horeca/teruggave.js). Nooit meer dan er met die afboeking afging, en
      `idem` maakt een herhaling tot de eerste terugboeking. */
-  function terug({ zaak, id, ref, centen, idem }) {
+  function terug({ zaak, id, ref, centen, idem, bron: herkomst }) {
     return transactie(bron => {
       const b = vanId(bron, zaak, id);
       const m = b && (b.mutaties || []).find(x => x && x.ref === ref && x.soort === 'afgeboekt');
@@ -128,7 +128,7 @@ module.exports = ({ transactie, zoekIn, vanId, geldig, mutatie, t }) => {
         (b.mutaties || []).filter(x => x && x.soort === 'teruggeboekt' && x.ref === ref).reduce((n, x) => n + x.centen, 0);
       if (!(centen > 0) || centen > ruimte) return { status: 409, error: 'Er kan nog ' + (ruimte / 100).toFixed(2) + ' terug op deze bon.' };
       b.saldo += centen;
-      mutatie(b, { centen, soort: 'teruggeboekt', ref, idem });
+      mutatie(b, { centen, soort: 'teruggeboekt', ref, idem, bron: herkomst || null });
       return { ok: true, saldo: b.saldo };
     });
   }

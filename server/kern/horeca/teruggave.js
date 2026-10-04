@@ -103,7 +103,7 @@ module.exports = ({ horeca, betaalWaarheid, bonlaag, nu, id }) => {
     }
 
     // 1. eerst vasthouden (zie de kop), dan pas iets aanroepen
-    const t = { id: 'HT-' + id(4), correctieId: c.id, betalingId: b.id, wijze: b.wijze, soort, centen: wil,
+    const t = { id: 'HT-' + id(4), correctieId: c.id, betalingId: b.id, herkomst: 'betaling:' + b.id, wijze: b.wijze, soort, centen: wil,
       reden: waarom, door: tekst(door, 60), idem: sleutel, at: nu(), stand: 'bezig' };
     lijst(rek).push(t);
     try {
@@ -111,7 +111,7 @@ module.exports = ({ horeca, betaalWaarheid, bonlaag, nu, id }) => {
         t.stand = 'uitgevoerd';
         t.let = 'Het geld ging fysiek terug; RTG legt vast wie het deed en waarom, en kan het niet nagaan.';
       } else if (soort === 'bon') {
-        const u = await bonlaag.terug({ zaak, id: b.bonId, ref: b.bonRef, centen: wil, idem: t.id });
+        const u = await bonlaag.terug({ zaak, id: b.bonId, ref: b.bonRef, centen: wil, idem: t.id, bron: 'horeca-teruggave ' + t.id });
         if (u.error) throw Object.assign(new Error(u.error), { status: u.status || 409 });
         t.stand = 'uitgevoerd';
       } else {

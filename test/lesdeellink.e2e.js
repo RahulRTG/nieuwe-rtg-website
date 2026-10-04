@@ -44,7 +44,7 @@ test.before(async () => {
   const p = (await post('/api/foundation/gezin/profiel/maak', { code: gezin.code, token: gezin.token,
     naam: 'Milan', rol: 'kind', geboortedatum: '2015-04-04', pin: '5678' })).body;
   assert.ok(p.profiel && p.profiel.id, 'Milan bestaat: ' + JSON.stringify(p).slice(0, 160));
-  const kies = (await post('/api/foundation/gezin/profiel/kies', { code: gezin.code, profielId: p.profiel.id, pin: '5678' })).body;
+  const kies = (await post('/api/foundation/gezin/profiel/kies', { gezinscode: gezin.gezinscode, profielId: p.profiel.id, pin: '5678' })).body;
   assert.ok(kies.token, 'Milan kiest zijn profiel');
   MILAN = { code: gezin.code, token: kies.token, profiel: kies.profiel };
   browser = await pw.chromium.launch(browserOpties(pw));

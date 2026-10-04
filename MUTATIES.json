@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-30T20:10:49.339Z",
-    "commit": "fb3c60829",
+    "op": "2026-10-04T07:09:04.277Z",
+    "commit": "33d2f312",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
-    "node": "v26.10.0"
+    "node": "v22.22.2"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -3865,6 +3865,13 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "foundation-lesstroom.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
+    },
     "foundation-markt.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -4558,6 +4565,21 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "gezinscode.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/foundation/gezinscode.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "gezinsdeur.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
     },
     "gezinskeuken.test.js": {
       "soort": "server",
@@ -5688,6 +5710,20 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "kantoor-eerste-account.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "kantoor-koppel-passkey.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "kantoor-productiedeur.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -6478,6 +6514,11 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "lesdeel.test.js": {
+      "soort": "server",
+      "staat": "overleefd",
+      "operator": "liegpoort /api/"
     },
     "letters.test.js": {
       "soort": "puur",
@@ -9201,6 +9242,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "scherp": "gezakt"
+    },
+    "partnerpersoneelscode-migratie.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "partnerpersoneelscode-register.test.js": {
@@ -12407,6 +12455,13 @@
       "soort": "puur",
       "staat": "geen module gevonden"
     },
+    "sso-clientgeheim-b22.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "sso-clientgeheim-routes.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -12444,6 +12499,14 @@
       "operator": "return-weg#0",
       "gezakt": 12,
       "geprobeerd": 3
+    },
+    "ssogeheim-ouderdom.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/sso/clientgeheim.js",
+      "operator": "+->-#0",
+      "gezakt": 2,
+      "geprobeerd": 14
     },
     "ssrf.test.js": {
       "soort": "puur",

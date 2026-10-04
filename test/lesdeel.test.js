@@ -17,7 +17,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
-const os = require('os');
 const path = require('path');
 const vm = require('vm');
 const crypto = require('crypto');
@@ -25,7 +24,6 @@ const Deel = require('../public/apps/foundation/lesdeel');
 const QR = require('../public/shared/qr');
 const Scan = require('../public/shared/qrscan');
 const Scanner = require('../public/shared/scanner');
-const { startServer, stop } = require('./helper');
 
 const LEREN = path.join(__dirname, '..', 'public', 'apps', 'foundation', 'leren.html');
 const BORD = path.join(__dirname, '..', 'public', 'apps', 'foundation', 'bord.html');
@@ -99,25 +97,17 @@ test('4. leren.html: eerst referrer-meta en wissen, dan pas een verzoek; het vel
   assert.match(fs.readFileSync(BORD, 'utf8'), /<script src="lesdeel\.js" defer><\/script>/, 'het bord laadt de deelknop');
 });
 
-test('5. leren.html draagt op HTTP-niveau Referrer-Policy: no-referrer', async () => {
-  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-lesdeel-'));
-  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
-  try {
-    const r = await fetch(base + '/apps/foundation/leren.html');
-    assert.equal(r.status, 200);
-    assert.equal(r.headers.get('referrer-policy'), 'no-referrer');
-    await r.text();
-    /* B25: het bord en het schrift houden een lessleutel in geheugen. */
-    for (const p of ['bord', 'schrift']) {
-      const r2 = await fetch(base + '/apps/foundation/' + p + '.html');
-      assert.equal(r2.headers.get('referrer-policy'), 'no-referrer', p);
-      await r2.text();
-    }
-    const ander = await fetch(base + '/apps/foundation/klas.html');
-    assert.equal(ander.headers.get('referrer-policy'), 'strict-origin-when-cross-origin', 'de regel is smal');
-    await ander.text();
-  } finally {
-    await stop(child);
-    fs.rmSync(TMP, { recursive: true, force: true });
-  }
+test('5. leren.html, bord en schrift dragen op HTTP-niveau Referrer-Policy: no-referrer', () => {
+  /* De kopregel zelf (server/opzet/koppen.js), zonder server: zo kan de
+     mutatiemotor de regel muteren in plaats van een liegende API te zoeken. */
+  let mw = null;
+  require('../server/opzet/koppen')({ app: { use: f => { if (!mw) mw = f; } } });
+  const kop = (pad) => {
+    const koppen = {};
+    mw({ path: pad, method: 'GET' }, { set: (k, v) => { koppen[k.toLowerCase()] = v; } }, () => {});
+    return koppen['referrer-policy'];
+  };
+  for (const p of ['leren', 'bord', 'schrift'])
+    assert.equal(kop('/apps/foundation/' + p + '.html'), 'no-referrer', p);
+  assert.equal(kop('/apps/foundation/klas.html'), 'strict-origin-when-cross-origin', 'de regel is smal');
 });

@@ -163,7 +163,7 @@ module.exports = function maakBetaalWaarheid({ d, save, crypto, betaal, nu, log 
     return Object.assign(a, { hervat: h });
   }
 
-  return { STATUS, maak, begin, publiek, van, vanActor, providerMelding,
+  return { STATUS, maak, bereidVoor: veeg.bereidVoor, begin, publiek, van, vanActor, providerMelding,
     terugbetalen: terug.terugbetalen, providerTerugbetaling: terug.providerTerugbetaling,
     registreerAfhandeling, ronde, openstaand: veeg.openstaand, definitiefBetaald };
 };

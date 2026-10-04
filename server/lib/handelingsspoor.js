@@ -171,7 +171,7 @@ function maakHandelingsspoor({ db, save, nu, max }) {
       const pseudoniem = burger.isBurgerpad(pad);
       noteer({ wie: pseudoniem ? burger.PSEUDONIEM : wieVan(req), methode: req.method,
         pad, status, afdruk: pseudoniem ? '' : afdrukVan(req.body), grof: pseudoniem });
-      if (!opslag) { if (save.sleutels) save.sleutels(['handelingLog']); else save(); }
+      if (!opslag) { if (save.sleutels) save.sleutels(['handelingLog']); else save(['handelingLog']); }
     };
     if (!verzoekcontext.haakVoorCommit(schrijf)) {
       naAntwoord(res, () => { try { schrijf(); } catch (e) {} });

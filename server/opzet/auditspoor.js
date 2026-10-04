@@ -71,7 +71,7 @@ function maakAuditspoor(deps) {
      eigen doos, zodat de twee ketens elkaar niet in de weg zitten. */
   const vak = () => eigen.bak('apiSpoor');
   const auditOpslag = save.audit?.open('apiSpoor');
-  const bewaarSpoor = () => save.sleutels ? save.sleutels(['apiSpoor']) : save();
+  const bewaarSpoor = () => save.sleutels ? save.sleutels(['apiSpoor']) : save(['apiSpoor']);
   const journaal = maakJournaal({ db, save: bewaarSpoor, crypto, vak, auditOpslag });
 
   /* De actor, in volgorde van zekerheid. req.session en req.supplier zijn door

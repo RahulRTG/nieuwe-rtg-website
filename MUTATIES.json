@@ -9320,7 +9320,7 @@
       "staat": "gezakt",
       "module": "scripts/normverval.js",
       "operator": "===->!==#0",
-      "gezakt": 7,
+      "gezakt": 8,
       "geprobeerd": 1
     },
     "notities.e2e.js": {
@@ -9971,9 +9971,9 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/db/sqlite.js",
-      "operator": "!==->===#0",
-      "gezakt": 6,
-      "geprobeerd": 4
+      "operator": "===->!==#0",
+      "gezakt": 10,
+      "geprobeerd": 3
     },
     "opslagblokkade.test.js": {
       "soort": "puur",
@@ -17168,6 +17168,53 @@
       "operator": "return-weg#0",
       "gezakt": 4,
       "geprobeerd": 2
+    },
+    "herhaalbesluit.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/herhaalbesluit.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "praktijk-betalen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/betaalwaarheid/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 3
+    },
+    "praktijk-leverancier.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/bedrijf/praktijk-vorm.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
+    "praktijk-transacties-http.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "registerratel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/registerratel.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "verhalen-aankomst.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/verhalen.js",
+      "operator": "&&->||#14",
+      "gezakt": 1,
+      "geprobeerd": 67
     }
   }
 }

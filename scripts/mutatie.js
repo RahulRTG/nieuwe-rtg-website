@@ -114,6 +114,30 @@ const NIET_MUTEREN = new Map([
    Elke operator werkt op de bron ZONDER commentaar en tekenreeksen mee te
    rekenen, want een verandering in een uitlegregel bewijst niets. */
 const OPERATOREN = [
+  // Bestemmingen en publieke browser-API's zijn ook gedrag. Een ontbrekende
+  // route of export is een echte regressie, ook als geen conditie verandert.
+  { naam: 'browser-export-weg', zoek: /\b((?:window|w)\.RTG\w+\s*=\s*)(?!=)/, zet: '$1undefined && ' },
+  { naam: 'voorwaarde-omkeren', zoek: /\bif\s*\(\s*!(?!=)/, zet: 'if (' },
+  // Een relatieve API-aanroep is net zo goed een bestemming als /api/....
+  // Alleen het eerste letterlijke argument verandert, niet de API zelf.
+  {
+    naam: 'api-actie-weg',
+    vind: bron => {
+      let tokens; try { tokens = require('./ast/lexer').lex(bron); } catch (e) { return []; }
+      return tokens.filter((t, i) => t.type === 'string' && tokens[i - 1]?.value === '(' && tokens[i - 2]?.value === 'api')
+        .map(t => ({ start: t.start, eind: t.end }));
+    },
+    maak: tekst => tekst[0] + '__rtg_mutatie__' + tekst.at(-1)
+  },
+  {
+    naam: 'route-doel-weg',
+    vind: bron => {
+      let tokens; try { tokens = require('./ast/lexer').lex(bron); } catch (e) { return []; }
+      return tokens.filter(t => t.type === 'string' && /^['"]\/(?:api|apps)\//.test(t.value))
+        .map(t => ({ start: t.start, eind: t.end }));
+    },
+    maak: tekst => tekst[0] + '/__rtg_mutatie__' + tekst.at(-1)
+  },
   { naam: 'true->false', zoek: /\breturn true\b/, zet: 'return false' },
   { naam: 'false->true', zoek: /\breturn false\b/, zet: 'return true' },
   { naam: '===->!==', zoek: /===/, zet: '!==' },
@@ -468,6 +492,7 @@ function draaiToets(bestand, env, wacht, forceer, logPrefix) {
   const gestartOp = new Date().toISOString();
   const r = spawnSync(process.execPath, vlaggen.concat([bestand]), {
     cwd: WORTEL, encoding: 'utf8', timeout: wacht || WACHT_NUL, maxBuffer: 64 * 1024 * 1024,
+    detached: process.platform !== 'win32',
     /* SIGKILL EN NIET HET STANDAARD SIGTERM, en dat is geen ruwheid maar een
        lek dat ik heb zien ontstaan. Bij een time-out stuurt spawnSync SIGTERM,
        en juist de toetsen die hier vastlopen (test/redis.test.js) blijven hangen
@@ -479,6 +504,13 @@ function draaiToets(bestand, env, wacht, forceer, logPrefix) {
     killSignal: 'SIGKILL',
     env: childEnv
   });
+  // SIGKILL op alleen de runner laat node:test-workers en hun servers leven.
+  // Een eigen procesgroep begrenst de opruiming tot deze ene proef, ook na
+  // --test-force-exit of een geslaagde runner met een achtergelaten kind.
+  if (process.platform !== 'win32' && r.pid) {
+    try { process.kill(-r.pid, 'SIGKILL'); }
+    catch (e) { if (e.code !== 'ESRCH') throw e; }
+  }
   const uit = String(r.stdout || '');
   if (logPrefix) {
     fs.writeFileSync(logPrefix + '.tap', uit);
@@ -522,6 +554,10 @@ function draaiToets(bestand, env, wacht, forceer, logPrefix) {
    De tien andere staan nog open; dat is een geteld gat in TAKEN.md en geen
    vergeten hoekje. */
 const EIGEN_MODULE = new Map([
+  // Deze proeven laden clientgedrag; een gewijzigde serverrespons raakt hun
+  // beweringen niet (uit #446).
+  ['praktijk-betalen.e2e.js', ['public/apps/werk/praktijk-betalen.js']],
+  ['foundation-premium-ui.test.js', ['public/apps/foundation/sw.js', 'public/apps/foundation/premium.js']],
   ['living-world.test.js', ['server/kern/living-world/actions.js']],
   ['living-world-sources.test.js', ['server/kern/living-world/actions.js']],
   ['living-world-sqlite.test.js', ['server/kern/living-world/index.js']],
@@ -1571,6 +1607,13 @@ function modulesVan(bestand) {
     if (!fs.existsSync(p)) { const idx = p.replace(/\.js$/, '/index.js'); if (fs.existsSync(idx)) p = idx; else continue; }
     const rel = path.relative(WORTEL, p).replace(/\\/g, '/');
     if (!uit.includes(rel)) uit.push(rel);
+  }
+  // VM- en bronproeven lezen hun onderwerp als bestand. Dat is slechts een
+  // kandidaat: alleen een groene nulproef gevolgd door een rode mutatie telt.
+  if (/\breadFileSync\s*\(/.test(bron)) {
+    for (const m of bron.matchAll(/['"](?:\.\.\/)?((?:public|server|scripts)\/[^'"\s]+\.js)['"]/g)) {
+      if (!m[1].split('/').includes('..') && fs.existsSync(path.join(WORTEL, m[1])) && !uit.includes(m[1])) uit.push(m[1]);
+    }
   }
   return uit;
 }

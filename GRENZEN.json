@@ -131,6 +131,8 @@
     ],
     "bedrijf": [
       "agenda",
+      "betaal",
+      "betaalWaarheid",
       "assetBeeld",
       "assetMet",
       "bedrijf",

@@ -63,6 +63,13 @@ test('de commandobalk zoekt in het register van de rol, en zegt waar hij keek',
     const fouten = [];
     letOpFouten(page, fouten);
     let lagenGetoetst = false;
+    const openRahul = async () => {
+      const mouth = page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]');
+      if (await mouth.isVisible()) return mouth.click();
+      // De open sheet vervangt de balk. Haar zichtbare mond gebruikt dezelfde
+      // uitvoering en moet de oude laag opruimen zonder een tweede navigator.
+      await page.locator('.rtg-adaptive-sheet [data-rtg-sheet-action="ai"]').click();
+    };
 
     const vraag = async (token, tekst) => {
       await page.goto(base + '/apps/werk.html', { waitUntil: 'domcontentloaded' });
@@ -102,13 +109,13 @@ test('de commandobalk zoekt in het register van de rol, en zegt waar hij keek',
            staan index/status/context tegelijk open met één aria-expanded. */
         await page.click('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]');
         await page.waitForSelector('.rtg-edge-index[aria-hidden="false"]');
-        await page.click('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]');
+        await openRahul();
         await page.waitForSelector('.wk-rahul.page:not([hidden])');
         assert.equal(await page.locator('.rtg-edge-index[aria-hidden="false"]').count(), 0,
           'Rahul sluit eerst de functie-index');
         assert.equal(await page.locator('.rtg-edge-menu[aria-expanded="true"]').count(), 0,
           'de menuknop blijft niet ten onrechte open');
-        await page.click('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]');
+        await openRahul();
         await page.waitForFunction(() => {
           const x = document.querySelector('.wk-rahul');
           return x && (x.hidden || !x.classList.contains('page'));
@@ -116,13 +123,13 @@ test('de commandobalk zoekt in het register van de rol, en zegt waar hij keek',
 
         await page.click('.rtg-edge-state');
         await page.waitForSelector('.rtg-edge-status-panel[aria-hidden="false"]');
-        await page.click('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]');
+        await openRahul();
         await page.waitForSelector('.wk-rahul.page:not([hidden])');
         assert.equal(await page.locator('.rtg-edge-status-panel[aria-hidden="false"]').count(), 0,
           'Rahul sluit eerst de systeemstatus');
         assert.equal(await page.locator('.rtg-edge-state[aria-expanded="true"]').count(), 0,
           'de statusknop blijft niet ten onrechte open');
-        await page.click('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]');
+        await openRahul();
         await page.waitForFunction(() => {
           const x = document.querySelector('.wk-rahul');
           return x && (x.hidden || !x.classList.contains('page'));
@@ -130,7 +137,7 @@ test('de commandobalk zoekt in het register van de rol, en zegt waar hij keek',
 
         await page.click('.rtg-adaptive-bar [data-rtg-adaptive-action="context"]');
         await page.waitForSelector('.rtg-edge-2-context:not([hidden])');
-        await page.click('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]');
+        await openRahul();
         await page.waitForSelector('.wk-rahul.page:not([hidden])');
         assert.equal(await page.locator('.rtg-edge-2-context:not([hidden])').count(), 0,
           'Rahul sluit eerst de schermcontext');
@@ -149,14 +156,15 @@ test('de commandobalk zoekt in het register van de rol, en zegt waar hij keek',
             knop + ' sluit eerst de Werk-Rahul');
           assert.equal(await page.locator('.rtg-edge-ai[aria-expanded="true"]').count(), 0,
             knop + ' laat Rahul niet als open aangekondigd staan');
-          if (knop.includes('context')) await page.click('[data-rtg-adaptive-close]');
+          if (await page.locator('.rtg-adaptive-sheet').isVisible()) await page.click('[data-rtg-adaptive-close]');
           else await page.click(knop);
-          await page.click('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]');
+          assert.equal(await page.locator(openLaag).isVisible(), false, 'de zichtbare sluitbediening sluit de actieve laag');
+          await openRahul();
           await page.waitForSelector('.wk-rahul.page:not([hidden])');
         }
         lagenGetoetst = true;
       } else {
-        await page.click('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]');
+        await openRahul();
       }
       await page.waitForSelector('.wk-rahul.page:not([hidden])', { timeout: 5000 });
       // open is niet hetzelfde als bruikbaar: de balk krijgt de klasse `page`

@@ -39,6 +39,10 @@ function maakSessies({ db, save, crypto, sessieIngetrokken }) {
   const KANAAL = 'rtg:sessies:v1';
   let bus = null;
   let gekoppeld = false;
+  /* De sessie-eigenaar schrijft alleen zijn eigen records. Een algemene save
+     scant ook mail, betalingen en alle andere domeinen bij iedere inlog. De
+     bestaande bundel blijft deze write tot dezelfde volledige commit uitstellen. */
+  const bewaar = () => save.sleutels ? save.sleutels(['sessions']) : save();
 
   function geldigeHash(h) { return /^[a-f0-9]{64}$/.test(String(h || '')); }
   function geldigeSessie(sess) {
@@ -95,7 +99,7 @@ function maakSessies({ db, save, crypto, sessieIngetrokken }) {
         for (const t of toks.slice(0, toks.length - MAX_SESSIONS)) verwijder(t, true);
       }
     }
-    save();
+    bewaar();
     const publiceer = () => { sessions.set(h, sess); zend('zet', h, sess, true); };
     if (!verzoekcontext.haakNaCommit(publiceer)) publiceer();
   }
@@ -104,7 +108,7 @@ function maakSessies({ db, save, crypto, sessieIngetrokken }) {
   function forgetSession(hash) {
     if (!geldigeHash(hash)) return;
     verwijder(hash, true);
-    save();
+    bewaar();
     intrekSignaal.meldVinger(hash);
   }
 
@@ -120,7 +124,7 @@ function maakSessies({ db, save, crypto, sessieIngetrokken }) {
       (Number.isFinite(begin) ? begin : klok.nu()) + TOKEN_TTL_MS);
     await intrekSignaal.bereid({ sleutel: 'token:' + hash, soort: 'token', waarde: hash, verloopt });
     verwijder(hash, true);
-    save();
+    bewaar();
     intrekSignaal.meldVinger(hash, verloopt);
     await intrekSignaal.wachtDuurzaam();
     return true;
@@ -137,7 +141,7 @@ function maakSessies({ db, save, crypto, sessieIngetrokken }) {
        op het vluchtige `weg`-bericht laat een herstart na gemiste Pub/Sub de
        oude snapshot weer accepteren. De Redis-replay landt juist hier. */
     if (intrekSignaal.tokenIngetrokken(token)) {
-      verwijder(h, false); save(); return null;
+      verwijder(h, false); bewaar(); return null;
     }
     const leiding = intrekSignaal.stand();
     if (process.env.REDIS_URL && (!leiding.gekoppeld ||
@@ -155,7 +159,7 @@ function maakSessies({ db, save, crypto, sessieIngetrokken }) {
     if (age > 60 * 60 * 1000) {
       const vernieuwd = Object.assign({}, sess, { at: klok.datum().toISOString() });
       sessieBak()[h] = vernieuwd;
-      save();
+      bewaar();
       const publiceer = () => { sessions.set(h, vernieuwd); zend('zet', h, vernieuwd, true); };
       if (!verzoekcontext.haakNaCommit(publiceer)) publiceer();
       return vernieuwd;

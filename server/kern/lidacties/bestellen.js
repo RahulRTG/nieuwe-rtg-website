@@ -128,7 +128,7 @@ function plaatsOrderVoor(session, body) {
   save();
   if (!vooraf) {
     const kop = naarKassa ? 'Nieuwe bestelling (afrekenen aan de kassa)' : 'Nieuwe bestelling (betaling achteraf)';
-    notifySupplier(s.code, { icon: 'hotel', title: kop, body: codename + (order.table ? ' · ' + order.table : '') + ', ' + items.reduce((n, i) => n + i.qty, 0) + ' item(s), € ' + total + (order.allergyNote ? ' · allergie: ' + order.allergyNote : '') });
+    (notifySupplier.naOpslag || notifySupplier)(s.code, { icon: 'hotel', title: kop, body: codename + (order.table ? ' · ' + order.table : '') + ', ' + items.reduce((n, i) => n + i.qty, 0) + ' item(s), € ' + total + (order.allergyNote ? ' · allergie: ' + order.allergyNote : '') });
     sseToSupplier(s.code, 'sync', { scope: 'orders' });
     sseToOffice('sync', { scope: 'orders' });
   }

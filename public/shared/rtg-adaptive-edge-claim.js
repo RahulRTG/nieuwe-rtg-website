@@ -30,7 +30,7 @@
      lopen. De bron blijft in de DOM staan met zijn eigen handlers en rechten;
      de Edge klikt hem aan. */
   var CLAIM = '.rtg-suitebar,.rtg-suitenav,.tos-opsnav,.rtg-social-commandbar,' +
-    '.salon-socialnav,.rtg-intel-strip,.rtd-nav,.one-nav,.dr-nav,.pr-nav,.rtg-deep-nav';
+    '.salon-socialnav,.rtg-intel-strip,.rtd-nav,.one-nav,.dr-nav,.pr-nav,.rtg-deep-nav,.mo-nav';
 
   /* `.ios-nav` STOND HIER EN IS ERUIT GEHAALD, en dat is een besluit met een
      prijs: het was 108 van de 135 schermen. De reden staat in wat de keten

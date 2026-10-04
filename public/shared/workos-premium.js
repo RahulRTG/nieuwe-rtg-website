@@ -22,7 +22,7 @@
   else if(path==='/apps/ik.html'||path==='/apps/app.html') active='profile';
 
   var nav=document.createElement('nav');
-  nav.className='workos-bottom';
+  nav.className='workos-bottom rtg-edge-owned-bar';
   nav.setAttribute('aria-label','WorkOS hoofdmenu');
   items.forEach(function(item){
     var link=document.createElement('a');

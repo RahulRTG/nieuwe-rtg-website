@@ -53,6 +53,8 @@ function maakSessieregister({ db, save }) {
     bezit: { sessiecontext: 'kaart' } });
   const bak = () => eigen.bak('sessiecontext');
   const kijk = () => eigen.kijk('sessiecontext');
+  // Exclusief eigendom: geen andere collectie hoort bij deze opslaghandeling.
+  const bewaar = () => save.sleutels ? save.sleutels(['sessiecontext']) : save();
 
   const geldigeSid = (s) => typeof s === 'string' && /^[A-Za-z0-9_-]{12}$/.test(s);
 
@@ -68,7 +70,7 @@ function maakSessieregister({ db, save }) {
     const rij = { lidKey: String(lidKey || '') || null, geopendOp: nu, gezienOp: nu, context };
     bak()[sid] = rij;
     ruim(rij.lidKey, sid);
-    save();
+    bewaar();
     return { ok: true, sid, geweigerd };
   }
 
@@ -94,7 +96,7 @@ function maakSessieregister({ db, save }) {
       rij.context[naam] = claim;
     }
     rij.gezienOp = klok.datum().toISOString();
-    save();
+    bewaar();
     return { ok: true, geweigerd: geweigerd.concat(afgewezen) };
   }
 
@@ -115,7 +117,7 @@ function maakSessieregister({ db, save }) {
     if (!rij) return false;
     if (klok.nu() - new Date(rij.gezienOp || 0).getTime() < 3600 * 1000) return false;
     rij.gezienOp = klok.datum().toISOString();
-    save();
+    bewaar();
     return true;
   }
 
@@ -124,7 +126,7 @@ function maakSessieregister({ db, save }) {
     const huidig = kijk();
     if (!huidig[sid]) return false;
     delete huidig[sid];
-    save();
+    bewaar();
     return true;
   }
 
@@ -170,7 +172,7 @@ function maakSessieregister({ db, save }) {
     for (const [sid, rij] of Object.entries(huidig)) {
       if (rij && rij.lidKey === lidKey) { delete huidig[sid]; weg += 1; }
     }
-    if (weg) save();
+    if (weg) bewaar();
     return weg;
   }
 

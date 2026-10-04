@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 2313 |
 | losse beweringen (`test(...)`) | 15917 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 249 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2137 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2138 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
-| niets van beide | 2 |
+| niets van beide | 1 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -1909,7 +1909,7 @@ toets omvalt.
 | `vlootbeeld.test.js` | 6 | gezakt op `===->!==#0` | HET VLOOTBEELD: zeven beweringen, en ze gaan allemaal over de manier waarop een leverancierdashboard meer belooft dan het weet. 1. |
 | `vlucht-voorzijde.test.js` | 5 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `voeding.test.js` | 8 | gezakt op `liegpoort /api/` | De voedingslaag (kern/voeding.js). Wat hier wordt vastgezet is vooral wat er NIET gebeurt, want dat is de hele keuze: 1. |
-| `vonk-daglot.test.js` | 4 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `vonk-daglot.test.js` | 4 | gezakt op `true->false#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `vonk-experience.test.js` | 7 | gezakt op `===->!==#0` | RONDE 5: de Vonk-productervaring mag de bewezen Connection-contracten alleen presenteren. Deze toetsen bewaken de eindige dag, disclosure-reden, states, scopeslot en de mobiele/a11y-basics van het echte scherm. |
 | `vonk.test.js` | 26 | gezakt op `liegpoort /api/` | RTG Vonk: dating op codenaam met de Salon-veiligheidslat. 18+ met een geverifieerd paspoort, een eindige dagselectie die wederzijds bij de wensen past, wederzijdse like = match + chatlijn + automatisch een tafel rond... |
 | `voornemen.test.js` | 15 | gezakt op `&&->||#0` | HET VOORNEMEN -- van "boek vijf hotels in Parijs onder 180 euro" naar een gecontroleerd plan, met de blokkade VOOR de uitvoering. DE FOUT DIE DIT VOORKOMT. |

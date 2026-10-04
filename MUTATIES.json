@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-04T04:41:52.144Z",
-    "commit": "eaf9b488",
+    "op": "2026-10-04T18:49:37.381Z",
+    "commit": "f8ba7f05",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -15750,6 +15750,14 @@
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
       "reden": "overleefde 17 mutaties in public/apps/voertuig.js en rit.js. Deze toets legt tekst en sleutelnamen vast, geen rekenend gedrag; geen enkele bronoperator raakt een letterlijke string. Met de hand nagetrokken op de foutklasse die hij wel bewaakt (een hernoemde opslagsleutel): tweemaal raak"
+    },
+    "vonk-daglot.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/vonk/wensen.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "vonk-experience.test.js": {
       "soort": "puur",

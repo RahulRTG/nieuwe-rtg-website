@@ -662,7 +662,7 @@ function checkCred(username, password) {
 }
 
 /* ---------- het inlog-auditlog ----------
-   Elke inlogpoging (gelukt of mislukt, op elk kanaal) komt in een afgeschermd
+   Elke inlogpoging komt in een afgeschermd
    log: wie, waar vandaan, wanneer. Zo is een aanval of een gestolen code
    achteraf altijd te reconstrueren; het kantoor leest het log in RTG HQ.
 

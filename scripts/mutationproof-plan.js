@@ -5,6 +5,10 @@
 const fs = require('node:fs'), path = require('node:path'), cp = require('node:child_process');
 const M = require('./mutationproof-model');
 const TOOLING = path.resolve(__dirname, '..'), SHARDS = 16;
+const CANARY = 'sqlite-audit-publicatie.test.js';
+function canarySubject(candidate) {
+  return { name: CANARY, testSha256: M.hash(fs.readFileSync(M.file(candidate, 'test/' + CANARY))) };
+}
 function setup(candidate, sha) {
   candidate = fs.realpathSync(candidate); M.sha(sha);
   if (candidate === TOOLING) throw Error('Candidate and tooling require separate checkouts.');
@@ -24,7 +28,7 @@ function planRun(candidate, sha, output) {
     'scripts/ast/lexer.js', 'scripts/lib/regexmutatie.js', 'scripts/lib/delen.js', 'scripts/lib/pg-toetslijst.js']
     .map(p => ({ path: p, sha256: M.hash(fs.readFileSync(M.file(candidate, p))) }));
   const plan = M.seal({ schema: 'RTG_MUTATION_PLAN_V1', createdAt: new Date().toISOString(),
-    candidate: ctx.source, runner: ctx.runner, ...discovery, shards: partitions, instrument,
+    candidate: ctx.source, runner: ctx.runner, ...discovery, shards: partitions, instrument, canary: canarySubject(candidate),
     durationsSha256: M.hash(fs.readFileSync(path.join(candidate, 'TOETSDUUR.json'))),
     dependencyLockSha256: M.hash(fs.readFileSync(path.join(candidate, 'package-lock.json'))),
     costModel: splitter.weging(discovery.rows.map(r => r.name)),
@@ -38,7 +42,8 @@ function checkPlan(ctx, plan) {
   M.verify(plan);
   if (JSON.stringify(ctx.source) !== JSON.stringify(plan.candidate) || JSON.stringify(ctx.runner) !== JSON.stringify(plan.runner)) throw Error('Plan belongs to another candidate or tooling revision.');
   if (JSON.stringify(M.discovery(ctx.candidate)) !== JSON.stringify({ rows: plan.rows, historicalOnly: plan.historicalOnly, historicalRegisterSha256: plan.historicalRegisterSha256 })) throw Error('Discovery changed.');
+  if (JSON.stringify(plan.canary) !== JSON.stringify(canarySubject(ctx.candidate))) throw Error('Canary subject changed.');
   M.partition(plan.rows, SHARDS, () => plan.shards);
   for (const f of plan.instrument) if (M.hash(fs.readFileSync(M.file(ctx.candidate, f.path))) !== f.sha256) throw Error('Candidate instrument changed.');
 }
-module.exports = { setup, empty, planRun, checkPlan, TOOLING, SHARDS };
+module.exports = { setup, empty, planRun, checkPlan, canarySubject, TOOLING, SHARDS };

@@ -3,14 +3,17 @@ const fs = require('node:fs'), path = require('node:path'), cp = require('node:c
 const M = require('./mutationproof-model');
 const SOURCES = ['motor/rust-toolchain.toml', 'motor/Cargo.lock'];
 const BINARIES = ['motor/target/release/rtg-motor', 'motor/target/release/rtg-sentinel'];
-function cloneArguments(source, target) {
+function cloneSetup(source, target, configPath, env = process.env) {
   const root = fs.realpathSync(source), gitDir = path.join(root, '.git');
   if (!fs.lstatSync(gitDir).isDirectory()) throw Error('Prepared candidate must have its own Git directory.');
-  // The read-only host checkout belongs to a different UID. Local upload-pack
-  // validates .git itself, separately from commands on the working tree.
-  // These two exact paths apply only to this process; never trust '*' globally.
-  return ['-c', 'safe.directory=' + root, '-c', 'safe.directory=' + gitDir,
-    'clone', '--quiet', '--no-hardlinks', root, target];
+  // Linux upload-pack may discard command-scope -c options. An explicit file
+  // inherited through GIT_CONFIG_GLOBAL survives that subprocess boundary.
+  // Production callers place this exclusive file in the disposable /work tmpfs;
+  // no host/global settings are edited and only these two exact paths are safe.
+  const file = path.join(fs.realpathSync(path.dirname(configPath)), path.basename(configPath));
+  fs.writeFileSync(file, '[safe]\n\tdirectory = ' + JSON.stringify(root) + '\n\tdirectory = ' + JSON.stringify(gitDir) + '\n', { flag: 'wx', mode: 0o600 });
+  return { args: ['clone', '--quiet', '--no-hardlinks', root, target],
+    env: { ...env, GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: file } };
 }
 function hashes(root, paths) {
   return Object.fromEntries(paths.map(p => [p, M.hash(fs.readFileSync(M.file(root, p)))]));
@@ -37,4 +40,4 @@ function verifyPrepared(root, r) {
   if (JSON.stringify(r.binaries) !== JSON.stringify(hashes(root, BINARIES))) throw Error('Prepared executable bytes changed.');
   for (const p of BINARIES) if (!(fs.statSync(M.file(root, p)).mode & 0o111)) throw Error('Prepared binary is not executable.');
 }
-module.exports = { SOURCES, BINARIES, cloneArguments, prepared, verifySources, verifyPrepared };
+module.exports = { SOURCES, BINARIES, cloneSetup, prepared, verifySources, verifyPrepared };

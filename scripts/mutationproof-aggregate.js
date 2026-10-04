@@ -3,6 +3,7 @@ const fs = require('node:fs'), path = require('node:path');
 const M = require('./mutationproof-model');
 const { checkPlan, empty, SHARDS } = require('./mutationproof-plan');
 const R = require('./mutationproof-runtime');
+const { caseProof } = require('./mutationproof-evidence');
 function aggregate(ctx, plan, input, output) {
   checkPlan(ctx, plan); empty(output);
   const rows = [], proposals = {}, seen = new Set(), shards = [];
@@ -17,26 +18,9 @@ function aggregate(ctx, plan, input, output) {
     seen.add(s.index); shards.push({ path: folder + '/SHARD.json', sha256: M.hash(fs.readFileSync(shardFile)), image: s.image });
     for (const r of s.rows) {
       if (r.state !== 'COLLECTED') { rows.push({ test: r.test, measured: false, state: r.state, reason: r.reason || 'No completed case artifact.' }); continue; }
-      if (r.directory !== M.hash(r.test)) throw Error('Unsafe case directory.');
-      const caseDir = path.join(dir, r.directory), e = M.verify(M.read(M.file(caseDir, 'CASE.json')));
-      for (const [p, digest] of Object.entries(r.containerLogs || {})) if (M.hash(fs.readFileSync(M.file(caseDir, p))) !== digest) throw Error('Container log changed.');
-      const subject = plan.rows.find(x => x.name === r.test);
-      if (e.plan !== plan.digest || e.test !== r.test || e.testSha256 !== subject.testSha256 || JSON.stringify(e.candidate) !== JSON.stringify(plan.candidate) ||
-          JSON.stringify(e.runner) !== JSON.stringify(plan.runner)) throw Error('Case subject mismatch.');
-      const failedBeforeCalls = !!e.error && Array.isArray(e.calls) && e.calls.length === 0;
-      if (!failedBeforeCalls && JSON.stringify(e.preparedRuntime) !== JSON.stringify(s.runtime)) throw Error('Case executable provenance mismatch.');
-      for (const [p, digest] of Object.entries(e.files)) if (M.hash(fs.readFileSync(M.file(caseDir, p))) !== digest) throw Error('Evidence file changed.');
-      const rawCalls = fs.readFileSync(M.file(caseDir, 'calls.jsonl'), 'utf8').trim().split('\n').filter(Boolean).map(JSON.parse);
-      if (JSON.stringify(rawCalls) !== JSON.stringify(e.calls)) throw Error('Case omitted or relabelled captured invocations.');
-      for (const [i, c] of e.calls.entries()) {
-        if (c.number !== i + 1) throw Error('Captured invocation sequence changed.');
-        if (c.test !== r.test || ['baseline', 'restored'].includes(c.phase) && (c.sources.length || c.lieg)) throw Error('Invalid phase binding.');
-        for (const source of c.sources) if (M.hash(fs.readFileSync(M.file(ctx.candidate, source.path))) !== source.originalSha256) throw Error('Mutant belongs to another source.');
-      }
-      const v = M.verdict(e, caseDir), evidence = folder + '/' + r.directory + '/CASE.json';
-      // An outer timeout can never be hidden by a partial successful CASE file.
-      if (r.execution.exitCode !== 0 || r.execution.timeout || r.execution.interrupted || r.execution.error || r.execution.signal) { v.measured = false; v.state = 'INCOMPLETE'; v.reason = 'Container did not complete normally.'; }
-      rows.push({ test: r.test, ...v, runtimeBound: !failedBeforeCalls, evidence, evidenceSha256: M.hash(fs.readFileSync(path.join(caseDir, 'CASE.json'))) });
+      const subject = plan.rows.find(x => x.name === r.test), evidence = folder + '/' + r.directory + '/CASE.json';
+      const v = caseProof(ctx, plan, subject, r, s.runtime, path.join(dir, r.directory));
+      rows.push({ test: r.test, ...v, evidence });
       // Raw motor diagnostics remain in CASE.json. Only the independently
       // reconstructed primary claim is eligible for a later reviewed import.
       if (v.measured) proposals[r.test] = { staat: v.state, bewijs: { candidateCommit: plan.candidate.commit,

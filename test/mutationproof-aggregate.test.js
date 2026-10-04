@@ -8,7 +8,8 @@ test('aggregation requires all shards and rederives the result from actual TAP',
   const { dir, evidence, original } = fixture(t), root = path.join(dir, 'candidate'), input = path.join(dir, 'shards');
   fs.mkdirSync(path.join(root, 'test'), { recursive: true }); fs.mkdirSync(input);
   fs.writeFileSync(path.join(root, 'test/fixture.test.js'), '// candidate test'); fs.writeFileSync(path.join(root, 'subject.js'), original);
-  M.write(path.join(root, 'MUTATIES.json'), { toetsen: {} });
+  fs.writeFileSync(path.join(root, 'test/sqlite-audit-publicatie.test.js'), '// canary subject fixture');
+  M.write(path.join(root, 'MUTATIES.json'), { toetsen: { 'sqlite-audit-publicatie.test.js': { staat: 'gezakt' } } });
   fs.mkdirSync(path.join(root, 'motor'));
   fs.writeFileSync(path.join(root, 'motor/rust-toolchain.toml'), '[toolchain]\nchannel = "1.97.1"\n');
   fs.writeFileSync(path.join(root, 'motor/Cargo.lock'), '# synthetic fixture only\n');
@@ -16,7 +17,8 @@ test('aggregation requires all shards and rederives the result from actual TAP',
     binaries: Object.fromEntries(R.BINARIES.map(p => [p, 'e'.repeat(64)])), compiler: { version: 'rustc 1.97.1 (fixture)', sha256: 'f'.repeat(64) } });
   const source = { commit: 'a'.repeat(40), tree: 'b'.repeat(40) }, tool = { commit: 'c'.repeat(40), tree: 'd'.repeat(40) };
   const d = M.discovery(root), groups = Array.from({ length: 16 }, (_, i) => i ? [] : ['fixture.test.js']);
-  const plan = M.seal({ candidate: source, runner: tool, ...d, shards: groups, instrument: [] });
+  const plan = M.seal({ candidate: source, runner: tool, ...d, shards: groups, instrument: [],
+    canary: require('../scripts/mutationproof-plan').canarySubject(root) });
   const ctx = { candidate: root, source, runner: tool }, caseId = M.hash('fixture.test.js');
   for (let index = 0; index < 16; index++) {
     const s = path.join(input, String(index)); fs.mkdirSync(s);

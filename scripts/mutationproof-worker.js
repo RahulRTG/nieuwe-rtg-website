@@ -38,7 +38,7 @@ function motor(args, env, output) {
 }
 async function main() {
   const [planPath, name] = process.argv.slice(2), plan = M.verify(M.read(planPath));
-  const row = plan.rows.find(r => r.name === name);
+  const row = plan.rows.find(r => r.name === name) || (plan.canary?.name === name ? plan.canary : null);
   if (!row || !/^[a-zA-Z0-9_.-]+\.(test|e2e)\.js$/.test(name)) throw Error('Test is not in the frozen discovery.');
   if (process.env.RTG_MUTATION_CONTAINER !== 'isolated-v1') throw Error('Requires the dedicated disposable container.');
   const output = '/out', root = '/work/candidate';
@@ -51,7 +51,10 @@ async function main() {
   try {
     result.preparedRuntime = M.read('/input/RUNTIME.json');
     R.verifyPrepared('/input/source', result.preparedRuntime);
-    sync('git', R.cloneArguments('/input/source', root));
+    const clone = R.cloneSetup('/input/source', root, '/work/candidate-git.config');
+    result.cloneGitVersion = sync('git', ['--version']);
+    result.cloneTrustConfigSha256 = M.hash(fs.readFileSync(clone.env.GIT_CONFIG_GLOBAL));
+    sync('git', clone.args, { env: clone.env });
     sync('git', ['checkout', '--quiet', '--detach', plan.candidate.commit], { cwd: root });
     if (M.identity(root).tree !== plan.candidate.tree) throw Error('Candidate tree changed.');
     if (M.hash(fs.readFileSync(path.join(root, 'test', name))) !== row.testSha256) throw Error('Test bytes changed.');

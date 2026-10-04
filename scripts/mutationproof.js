@@ -9,9 +9,11 @@ const { setup, empty, planRun, checkPlan } = require('./mutationproof-plan');
 const { aggregate } = require('./mutationproof-aggregate');
 const { cancellation, runContainer } = require('./mutationproof-process');
 const R = require('./mutationproof-runtime');
+const { canaryProof } = require('./mutationproof-evidence');
 async function runShard(candidate, sha, planPath, index, output) {
   const ctx = setup(candidate, sha), plan = M.read(planPath); checkPlan(ctx, plan);
-  if (!Number.isSafeInteger(index) || !plan.shards[index]) throw Error('Invalid shard.');
+  const canary = index === 'canary', names = canary ? [plan.canary.name] : plan.shards[index];
+  if (!canary && (!Number.isSafeInteger(index) || !names)) throw Error('Invalid shard.');
   if (process.env.GITHUB_ACTIONS !== 'true') throw Error('Heavy mutation runs are restricted to isolated GitHub runners.');
   empty(output);
   const image = cp.execFileSync('docker', ['image', 'inspect', '--format', '{{.Id}}', 'rtg-mutationproof:local'], { encoding: 'utf8' }).trim();
@@ -20,7 +22,7 @@ async function runShard(candidate, sha, planPath, index, output) {
   M.write(runtimePath, runtime);
   const started = Date.now(), rows = [], cancelled = cancellation();
   try {
-  for (const name of plan.shards[index]) {
+  for (const name of names) {
     const id = M.hash(name), dir = path.join(output, id);
     if (cancelled.interrupted || Date.now() - started >= plan.limits.shardMinutes * 60000) {
       rows.push({ test: name, state: 'UNSEEN', reason: cancelled.interrupted ? 'Shard interrupted; no further case started.' : 'Shard execution budget exhausted; no proof and no debt closure.' }); continue;
@@ -42,11 +44,22 @@ async function runShard(candidate, sha, planPath, index, output) {
     rows.push({ test: name, directory: id, execution: run,
       containerLogs: Object.fromEntries(['container.stdout', 'container.stderr'].map(p => [p, M.hash(fs.readFileSync(path.join(dir, p)))])),
       state: fs.existsSync(path.join(dir, 'CASE.json')) ? 'COLLECTED' : 'INCOMPLETE' });
-    M.write(path.join(output, 'SHARD.json'), M.seal({ schema: 'RTG_MUTATION_SHARD_V1', plan: plan.digest, candidate: ctx.source, runner: ctx.runner,
+    M.write(path.join(output, canary ? 'CANARY-PROGRESS.json' : 'SHARD.json'), M.seal({ schema: 'RTG_MUTATION_SHARD_V1', plan: plan.digest, candidate: ctx.source, runner: ctx.runner,
       index, image, runtime, complete: false, rows }));
-    console.log(index + ' ' + rows.length + '/' + plan.shards[index].length + ' ' + name + ' ' + rows.at(-1).state);
+    console.log(index + ' ' + rows.length + '/' + names.length + ' ' + name + ' ' + rows.at(-1).state);
   }
   checkPlan(ctx, plan);
+  if (canary) {
+    let proof;
+    try { proof = canaryProof(ctx, plan, rows[0], runtime, path.join(output, rows[0].directory || '')); }
+    catch (e) { proof = { passed: false, measured: false, state: 'INCOMPLETE', reason: e.message }; }
+    if (cancelled.interrupted) proof.passed = false;
+    M.write(path.join(output, 'CANARY.json'), M.seal({ schema: 'RTG_MUTATION_CANARY_V1', plan: plan.digest, candidate: ctx.source, runner: ctx.runner,
+      image, runtime, rows, proof, finishedAt: new Date().toISOString() }));
+    if (!proof.passed) throw Error('Linux canary did not prove baseline, detected mutation and restoration: ' + proof.reason);
+    console.log('Linux canary PASS: baseline, detected mutation and restored source.');
+    return;
+  }
   M.write(path.join(output, 'SHARD.json'), M.seal({ schema: 'RTG_MUTATION_SHARD_V1', plan: plan.digest, candidate: ctx.source, runner: ctx.runner,
     index, image, runtime, complete: !cancelled.interrupted, interrupted: cancelled.interrupted, rows, finishedAt: new Date().toISOString() }));
   } finally { cancelled.dispose(); }
@@ -56,9 +69,10 @@ if (require.main === module) {
   (async () => {
     if (mode === 'plan') planRun(candidate, sha, path.resolve(input));
     else if (mode === 'verify') checkPlan(setup(candidate, sha), M.read(input));
+    else if (mode === 'canary') await runShard(candidate, sha, input, 'canary', path.resolve(argument));
     else if (mode === 'shard') await runShard(candidate, sha, input, Number(argument), path.resolve(output));
     else if (mode === 'aggregate') aggregate(setup(candidate, sha), M.read(input), path.resolve(argument), path.resolve(output));
-    else throw Error('Use plan, shard or aggregate with exact candidate and output paths.');
+    else throw Error('Use plan, canary, shard or aggregate with exact candidate and output paths.');
   })().catch(e => { console.error(e.stack); process.exitCode = 2; });
 }
 module.exports = { planRun, checkPlan, runShard, aggregate };

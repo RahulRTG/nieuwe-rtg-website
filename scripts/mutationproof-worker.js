@@ -51,7 +51,7 @@ async function main() {
   try {
     result.preparedRuntime = M.read('/input/RUNTIME.json');
     R.verifyPrepared('/input/source', result.preparedRuntime);
-    sync('git', ['-c', 'safe.directory=/input/source', 'clone', '--quiet', '--no-hardlinks', '/input/source', root]);
+    sync('git', R.cloneArguments('/input/source', root));
     sync('git', ['checkout', '--quiet', '--detach', plan.candidate.commit], { cwd: root });
     if (M.identity(root).tree !== plan.candidate.tree) throw Error('Candidate tree changed.');
     if (M.hash(fs.readFileSync(path.join(root, 'test', name))) !== row.testSha256) throw Error('Test bytes changed.');

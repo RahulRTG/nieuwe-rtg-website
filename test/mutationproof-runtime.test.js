@@ -4,6 +4,30 @@ const fs = require('node:fs'), path = require('node:path'), { EventEmitter } = r
 const M = require('../scripts/mutationproof-model'), R = require('../scripts/mutationproof-runtime');
 const { temp } = require('./mutationproof-fixture');
 const { cancellation } = require('../scripts/mutationproof-process');
+test('read-only candidate clone trusts its exact Git directory under a different owner, never other repositories', t => {
+  const cp = require('node:child_process'), root = fs.realpathSync(temp(t));
+  const source = path.join(root, 'source'), target = path.join(root, 'target');
+  const home = path.join(root, 'home'); fs.mkdirSync(home); fs.mkdirSync(source);
+  const env = { ...process.env, HOME: home, GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: path.join(home, 'gitconfig') };
+  const run = (args, extra = {}) => cp.spawnSync('git', args, { cwd: root, env: { ...env, ...extra }, encoding: 'utf8', timeout: 10000 });
+  assert.equal(run(['init', '--quiet', source]).status, 0);
+  fs.writeFileSync(path.join(source, 'proof.txt'), 'candidate bytes\n');
+  assert.equal(run(['-C', source, 'add', 'proof.txt']).status, 0);
+  assert.equal(run(['-C', source, '-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid', 'commit', '--quiet', '-m', 'candidate']).status, 0);
+  const head = run(['-C', source, 'rev-parse', 'HEAD']).stdout.trim();
+  const differentOwner = { GIT_TEST_ASSUME_DIFFERENT_OWNER: '1' };
+  const old = run(['-c', 'safe.directory=' + source, 'clone', '--quiet', '--no-hardlinks', source, path.join(root, 'old')], differentOwner);
+  assert.notEqual(old.status, 0); assert.match(old.stderr, /dubious ownership/);
+  const args = R.cloneArguments(source, target), fixed = run(args, differentOwner);
+  assert.equal(fixed.status, 0, fixed.stderr);
+  assert.equal(run(['-C', target, 'rev-parse', 'HEAD']).stdout.trim(), head);
+  assert.equal(fs.readFileSync(path.join(target, 'proof.txt'), 'utf8'), 'candidate bytes\n');
+  const foreign = run([...args.slice(0, 4), '-C', target, 'status', '--porcelain'], differentOwner);
+  assert.notEqual(foreign.status, 0); assert.match(foreign.stderr, /dubious ownership/);
+  assert.equal(fs.existsSync(path.join(home, 'gitconfig')), false, 'no persistent global trust exception');
+  const other = path.join(root, 'symlink'); fs.mkdirSync(other); fs.symlinkSync(path.join(source, '.git'), path.join(other, '.git'), 'dir');
+  assert.throws(() => R.cloneArguments(other, path.join(root, 'unsafe')), /own Git directory/);
+});
 test('prepared executable hashes, modes, source lock and compiler pin are checked', t => {
   const root = temp(t); fs.mkdirSync(path.join(root, 'motor/target/release'), { recursive: true });
   fs.writeFileSync(path.join(root, R.SOURCES[0]), 'channel = "1.97.1"\n');

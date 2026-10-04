@@ -43,6 +43,7 @@
       "codenaamVan",
       "geborenVan",
       "idGeverifieerd",
+      "kluisAuth",
       "leeftijdVan",
       "onboarding",
       "tenant"

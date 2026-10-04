@@ -29,7 +29,7 @@
     "inlineStijlAttributen": 4541,
     "kernBreedsteBestand": 71,
     "kernBreedte": 1682,
-    "kernGedeeld": 255,
+    "kernGedeeld": 254,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 51,
     "keuringDubbeling": 178,
@@ -71,7 +71,7 @@
     "wekkersZonderTrede": 0,
     "wettenOnbewezen": 5,
     "zaakwigGezakt": 0,
-    "zelfpoortendeToetsen": 48,
+    "zelfpoortendeToetsen": 46,
     "geldRoutesPubliek": 0,
     "geldRoutesZonderSemantiek": 1,
     "geldRoutesZonderIdemBewijs": 3,
@@ -4020,41 +4020,12 @@
     {
       "datum": "2026-10-04",
       "soort": "schuld",
-      "sleutel": "zelfpoortendeToetsen",
-      "van": 47,
-      "vervalt": "2027-01-04",
-      "meter": "zelfpoortendeToetsen 47 -> 48",
-      "reden": "test/foundation-lesstroom.pg.test.js is nieuw (het stroomticket van RTFoundation-onderwijs, besluit B25): acht gelijktijdige claims op een eenmalig ticket over twee instances (precies een opent de stroom) en een intrekking op A tegen een claim op B. Dat kan niet eerlijk zonder PostgreSQL en Redis en slaat lokaal zonder DATABASE_URL over. Lokaal tegen echte PostgreSQL en Redis groen; met de mutatie 'de claim laat het ticket staan' zakte hij. Hij staat in scripts/lib/pg-toetslijst.js (verplicht in CI) en als uitzondering onder zelfpoortende-toets.",
-      "waarheen": "De CI-dienstmatrix draait hem zonder skip; aflossen is de standaardomgeving met PostgreSQL en Redis."
-    },
-    {
-      "datum": "2026-10-04",
-      "soort": "schuld",
       "sleutel": "toetsenNietGemeten",
       "van": 339,
       "vervalt": "2027-01-02",
       "meter": "toetsenNietGemeten 339 -> 341",
       "reden": "De gezinsdeur (B18/B19) brengt twee nieuwe toetsbestanden mee waar de mutatiemotor nog niet langs is: test/gezinsdeur.test.js (echte server) en test/gezinscode.test.js (de eenheden). Met de hand nagetrokken met zestien mutaties in gezinscode.js, gezinsstroom.js, gezinstoken.js, gezinstoegang.js, gezinsdeur.js, basis.js en foundation-nog-gesloten.js; alle zestien zakten (een, de queryterugval in tokenUit, pas nadat de toets een VERSE sessie in de URL zette in plaats van een al afgemelde). Dit is instrumentdekking en geen oordeel over de toetsen.",
       "waarheen": "Een volledige npm run mutatie op een schone boom neemt ze mee."
-    },
-    {
-      "datum": "2026-10-04",
-      "soort": "schuld",
-      "sleutel": "zelfpoortendeToetsen",
-      "van": 46,
-      "vervalt": "2027-01-02",
-      "meter": "zelfpoortendeToetsen 46 -> 47",
-      "reden": "test/gezinsdeur.pg.test.js (B18) vereist echte PostgreSQL- en Redis-diensten: hetzelfde eenmalige stroomticket tegelijk op twee instances, twaalf gelijktijdige claims van dezelfde gezinscode en een rotatie op A tegen de oude code op B. Lokaal met die diensten gedraaid en groen; zonder het advisory lock en FOR UPDATE in server/pg/collectietransactie.js zakte hij 3 van 3. Hij staat in scripts/lib/pg-toetslijst.js en als uitzondering in deze norm.",
-      "waarheen": "De CI-dienstmatrix draait hem zonder skip; aflossen is de standaardomgeving met PostgreSQL en Redis."
-    },
-    {
-      "datum": "2026-10-04",
-      "soort": "structureel",
-      "sleutel": "kernGedeeld",
-      "van": 254,
-      "meter": "kernGedeeld 254 -> 255",
-      "reden": "Het supplier-domein leest nu de betaalwaarheid (GRENZEN.json, met de hand). Een horecacorrectie na een ONLINE betaling zet een teruggaverecht klaar, en dat geld kan alleen terug langs de provider waarlangs het binnenkwam -- de betaalwaarheid is daar de enige weg (kern/horeca/teruggave.js, besluit van de eigenaar 4 oktober 2026: de zaak voert uit, per wijze). Een haak via het gast-domein had de meter op 254 gehouden en de koppeling verstopt. Zonder de naam in GRENZEN.json kopieerde routes/supplier/horeca.js hem stil niet mee en mislukte elke online teruggave; test/horeca-teruggave-online.test.js houdt dat vast.",
-      "waarheen": "Dit is de koppeling van de functie zelf; hij gaat weg als de online teruggave ooit naar het domein van de betaalwaarheid verhuist."
     }
   ],
   "prestatie": {

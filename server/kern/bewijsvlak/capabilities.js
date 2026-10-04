@@ -6,24 +6,24 @@ const { capabilityContract } = require('./contract');
 const compatibility = require('./compatibility');
 const { kopie, bevries } = require('./canon');
 
-function maakRegister(initieel) {
+function maakCapabilityRegister(initieel) {
   const map = new Map();
 
-  function registreer(invoer) {
+  function registreerCapability(invoer) {
     const c = capabilityContract(invoer);
     const sleutel = c.id + '@' + c.version;
     if (map.has(sleutel)) throw new Error('bewijsvlak: capability bestaat al: ' + sleutel);
     map.set(sleutel, c);
     return c;
   }
-  for (const c of initieel || []) registreer(c);
+  for (const c of initieel || []) registreerCapability(c);
 
   function haal(id, versie) {
     if (versie) return map.get(id + '@' + versie) || null;
     return [...map.values()].filter(c => c.id === id).sort((a, b) => b.version - a.version)[0] || null;
   }
 
-  function resolve(vraag) {
+  function resolveCapability(vraag) {
     const v = vraag || {}, c = haal(v.id, v.version);
     if (!c) return bevries({ id: v.id || null, state: 'UNKNOWN', decision: 'DENY', reasons: ['CAPABILITY_UNKNOWN'] });
     if (!c.implemented) return bevries({ id: c.id, version: c.version, state: 'BLOCKED', decision: 'DENY', reasons: ['NOT_IMPLEMENTED'] });
@@ -46,7 +46,7 @@ function maakRegister(initieel) {
     return bevries({ id: c.id, version: c.version, state: 'AVAILABLE', decision: 'ALLOW', reasons: [] });
   }
 
-  return Object.freeze({ registreer, haal, resolve,
+  return Object.freeze({ registreer: registreerCapability, haal, resolve: resolveCapability,
     publiek: () => [...map.values()].map(kopie).sort((a, b) => (a.id + a.version).localeCompare(b.id + b.version)),
     compatibilityMatrix: () => [...map.values()].map(c => ({ id: c.id, capabilityVersion: c.version,
       client: kopie(c.compatibility.client), policy: kopie(c.compatibility.policy),
@@ -54,4 +54,4 @@ function maakRegister(initieel) {
       blocked: kopie(c.compatibility.blocked || []) })) });
 }
 
-module.exports = { maakRegister };
+module.exports = { maakRegister: maakCapabilityRegister };

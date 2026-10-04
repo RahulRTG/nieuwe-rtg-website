@@ -174,27 +174,8 @@ function maakSlo({ meting, sonde }) {
       onbeoordeeld: doelen.length - beoordeeld.length
     };
 
-    /* Capability-SLO blijft apart van HTTP; een geldige weigering is geen 5xx. */
-    let capabilities = [];
-    try {
-      const plane = require('../bewijsvlak/runtime').current();
-      capabilities = plane.metrics.standAll(plane.registry.publiek(), t);
-    } catch (e) {
-      capabilities = [{ capability: 'trust-evidence-plane', oordeel: 'onvoldoende gemeten',
-        reasons: ['CAPABILITY_METER_UNAVAILABLE'] }];
-    }
-    const capabilityTel = {
-      totaal: capabilities.length,
-      gehaald: capabilities.filter(c => c.oordeel === 'gehaald').length,
-      gezakt: capabilities.filter(c => c.oordeel === 'niet gehaald').length,
-      onvoldoende: capabilities.filter(c => c.oordeel === 'onvoldoende gemeten').length
-    };
-    const capabilityGezakt = capabilities.filter(c => c.oordeel === 'niet gehaald');
-    if (capabilityGezakt.length) {
-      uitrol.mag = false;
-      uitrol.reden = 'capability-SLO niet gehaald: ' +
-        capabilityGezakt.map(c => c.capability).join(', ');
-    }
+    // Capability-SLO apart van HTTP; een gezakte capability sluit de uitrol (./slo-capabilities.js).
+    const { capabilities, tel: capabilityTel } = require('./slo-capabilities').capabilityStand(t, uitrol);
 
     return {
       doelen, capabilities, uitrol,

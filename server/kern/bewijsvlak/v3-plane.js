@@ -43,7 +43,7 @@ function maakV3(opties) {
     });
   }
 
-  function record() {
+  function recordEvidence() {
     const error = new Error('bewijsvlak v3 authority: caller-supplied strings zijn geen authority proof; gebruik een vertrouwde adapter');
     error.code = 'AUTHORITY_PROOF_REQUIRED';
     throw error;
@@ -73,7 +73,7 @@ function maakV3(opties) {
     });
   }
   const reconciliation = maakReconciliation({ store, nu });
-  function reconcile(input) {
+  function reconcileV3(input) {
     return atomic('reconciliation.transition', () => {
       const result = reconciliation.transition(input);
       if (ledger) ledger.append({ boundary: 'trust:v3:reconciliation', claimId: result.claimRef,
@@ -82,14 +82,14 @@ function maakV3(opties) {
       return result;
     });
   }
-  maakPilots({ recordAuthorized, derive, decide, reconcile, atomic, now: nu,
+  maakPilots({ recordAuthorized, derive, decide, reconcile: reconcileV3, atomic, now: nu,
     verifyProviderProof: o.verifyProviderProof,
     verifyMoneyOwnerProof: o.verifyMoneyOwnerProof,
     verifyAuthorityOwnerProof: o.verifyAuthorityOwnerProof,
     verifyExternalOwnerProof: o.verifyExternalOwnerProof });
   const publicStore = Object.freeze({ get: store.get, list: store.list,
     counts: store.counts, capacity: store.capacity });
-  return Object.freeze({ version: 3, mode: o.mode || 'shadow', record, derive, decide, reconcile,
+  return Object.freeze({ version: 3, mode: o.mode || 'shadow', record: recordEvidence, derive, decide, reconcile: reconcileV3,
     reproduce: resolver.reproduce, profiles, store: publicStore,
     evidence: id => store.get('evidence', id), claim: id => store.get('claims', id),
     snapshot: () => {

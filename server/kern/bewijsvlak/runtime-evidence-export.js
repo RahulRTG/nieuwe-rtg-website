@@ -9,11 +9,9 @@ const legacy = require('./legacy-v2-migration');
 const capaciteit = require('./capacity-watermark');
 const bestanden = require('./runtime-evidence-files');
 
-const FORMAT = 'rtg-runtime-evidence-export-v1';
-const RECEIPT_FORMAT = 'rtg-runtime-evidence-export-receipt-v1';
-const ID_RE = /^runtime_evidence_[a-f0-9]{64}$/;
-
-function fout(code, melding) { return Object.assign(new Error(melding), { code }); }
+// Formaat, adres en receipt: ./runtime-evidence-receipt.js.
+const { FORMAT, RECEIPT_FORMAT, ID_RE, fout, adres, receiptBasis, geldigeReceipt, leesReceipt,
+  receiptPastBij } = require('./runtime-evidence-receipt');
 const { sha256, veiligeMap, veiligBestand, schrijfNoClobber } = bestanden;
 
 function bron(source) {
@@ -27,11 +25,6 @@ function bron(source) {
       !/^[a-f0-9]{64}$/.test(String(revision)))
     throw fout('EVIDENCE_EXPORT_SOURCE_INVALID', 'De bronrevisie heeft geen veilige vorm.');
   return { store: source.store, revision: revision == null ? null : revision };
-}
-
-function adres(stateDigest, capacityProfileDigest, sourceStore) {
-  const addressDigest = hash({ format: FORMAT, stateDigest, capacityProfileDigest, sourceStore });
-  return 'runtime_evidence_' + addressDigest;
 }
 
 function hermeet(document) {
@@ -83,54 +76,6 @@ function leesArtefact(bestand, fileName, kluis, verwacht) {
   return { document, payloadDigest: hash(document), cipherDigest: sha256(cipher) };
 }
 
-function receiptBasis(plan, verified) {
-  return { format: RECEIPT_FORMAT, schemaVersion: 1, archiveId: plan.archiveId,
-    archiveFile: plan.fileName, stateDigest: plan.stateDigest,
-    archivePayloadDigest: verified.payloadDigest, archiveCipherDigest: verified.cipherDigest,
-    exportedAt: verified.document.capturedAt, source: verified.document.source,
-    capacity: verified.document.capacity, archiveVerified: true,
-    productionMutated: false, pruned: false, capacityFreed: false,
-    retention: { encrypted: true, authenticated: true, contentAddressed: true,
-      worm: false, offsite: false, operatorManaged: true } };
-}
-
-function geldigeReceipt(receipt, plan) {
-  if (!receipt || receipt.format !== RECEIPT_FORMAT || receipt.schemaVersion !== 1 ||
-      !/^[a-f0-9]{64}$/.test(String(receipt.receiptDigest || '')) ||
-      !/^[a-f0-9]{64}$/.test(String(receipt.stateDigest || '')) || !receipt.capacity ||
-      !receipt.capacity.profile || !/^[a-f0-9]{64}$/.test(String(receipt.capacity.profile.digest || '')) ||
-      !receipt.source || !/^(json|sqlite|postgres)$/.test(String(receipt.source.store || ''))) return false;
-  const basis = { ...receipt }; delete basis.receiptDigest;
-  if (hash(basis) !== receipt.receiptDigest || !ID_RE.test(String(receipt.archiveId || '')) ||
-      receipt.archiveFile !== receipt.archiveId + '.rtge' ||
-      receipt.archiveId !== adres(receipt.stateDigest,
-        receipt.capacity && receipt.capacity.profile && receipt.capacity.profile.digest,
-        receipt.source && receipt.source.store)) return false;
-  return (!plan || (receipt.archiveId === plan.archiveId &&
-    receipt.archiveFile === plan.fileName && receipt.stateDigest === plan.stateDigest)) &&
-    receipt.archiveVerified === true && receipt.productionMutated === false && receipt.pruned === false &&
-    receipt.capacityFreed === false && receipt.retention && receipt.retention.worm === false &&
-    receipt.retention.offsite === false;
-}
-
-function leesReceipt(bestand, plan) {
-  veiligBestand(bestand, 'Evidence-exportreceipt');
-  let receipt;
-  try { receipt = rtgjson.parse(fs.readFileSync(bestand, 'utf8'), { maxDiepte: 64 }); }
-  catch (error) { throw fout('EVIDENCE_EXPORT_RECEIPT_INVALID', 'Evidence-exportreceipt is onleesbaar.'); }
-  if (!geldigeReceipt(receipt, plan))
-    throw fout('EVIDENCE_EXPORT_RECEIPT_INVALID', 'Evidence-exportreceipt verifieert niet.');
-  return receipt;
-}
-
-function receiptPastBij(receipt, plan, verified) {
-  const basis = { ...receipt }; delete basis.receiptDigest;
-  const verwacht = receiptBasis(plan, verified);
-  if (canon(basis) !== canon(verwacht) || receipt.receiptDigest !== hash(verwacht))
-    throw fout('EVIDENCE_EXPORT_RECEIPT_INVALID',
-      'Receipt en geauthenticeerd evidence-artefact verschillen.');
-}
-
 function eisKluis(kluis) {
   if (!kluis || kluis.AAN !== true || typeof kluis.versleutelBestand !== 'function' ||
       typeof kluis.ontsleutelBestand !== 'function')
@@ -163,7 +108,7 @@ function archiveer(opties) {
   return bevries(kopie(receipt));
 }
 
-function verifieer(opties) {
+function verifieerExport(opties) {
   const o = opties || {}, kluis = o.kluis, archiveId = String(o.archiveId || '');
   eisKluis(kluis);
   if (!ID_RE.test(archiveId)) throw fout('EVIDENCE_EXPORT_ID_INVALID', 'Evidence-export-id is ongeldig.');
@@ -179,4 +124,4 @@ function verifieer(opties) {
   return bevries(kopie(receipt));
 }
 
-module.exports = { FORMAT, RECEIPT_FORMAT, maakPlan, archiveer, verifieer, veiligeMap };
+module.exports = { FORMAT, RECEIPT_FORMAT, maakPlan, archiveer, verifieer: verifieerExport, veiligeMap };

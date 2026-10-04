@@ -28,7 +28,7 @@ function maakResolver(opties) {
     return koppen[0];
   }
 
-  function derive(input) {
+  function deriveV3(input) {
     const i = input || {}, profile = profiles.get(i.profileId, i.profileVersion);
     if (!profile) throw new Error('bewijsvlak v3: onbekend requirement-profiel');
     const at = String(i.effectiveAt || nu()), derivedAt = String(i.derivedAt || nu());
@@ -87,7 +87,7 @@ function maakResolver(opties) {
     return { ok: hash(basis) === claim.derivationDigest, expectedDigest: claim.derivationDigest,
       actualDigest: hash(basis), finality: result.finality };
   }
-  return Object.freeze({ derive, reproduce, current: (subjectRef, profileId, profileVersion) => {
+  return Object.freeze({ derive: deriveV3, reproduce, current: (subjectRef, profileId, profileVersion) => {
     const profile = profiles.get(profileId, profileVersion);
     return profile ? head(subjectRef, profile) : null;
   }, evaluate: (profile, evidence, at) => evalueer(profile, evidence, at, authorities) });

@@ -4,18 +4,8 @@ module.exports = (ctx) => {
   const { db, save, findSupplier, notify, notifySupplier, sseToSupplier,
     orderMetRef, boekingMetRef, id, nu, rond, trustPlane } = ctx;
 
-  function metricTimer(invoer) {
-    if (!trustPlane || typeof trustPlane.timer !== 'function') return null;
-    try { return trustPlane.timer(invoer); } catch (e) { return null; }
-  }
-  function finish(timer, uitkomst) {
-    if (!timer) return null;
-    try { return timer.finish(uitkomst); } catch (e) { return null; }
-  }
-  function observe(invoer) {
-    if (!trustPlane || typeof trustPlane.observe !== 'function') return null;
-    try { return trustPlane.observe(invoer); } catch (e) { return null; }
-  }
+  // Schaduwhaken naar het bewijsvlak; zie ../bewijshaak.js.
+  const { observe, metricTimer, finish } = require('../bewijshaak')(trustPlane);
 
   /* ---- 3. reviews ----
      Een review kan pas na een geslaagde afronding, een per dienst. Het

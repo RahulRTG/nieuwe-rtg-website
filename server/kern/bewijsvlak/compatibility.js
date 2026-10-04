@@ -1,18 +1,18 @@
 'use strict';
 
-function nummer(v) {
+function versieNummer(v) {
   if (Number.isInteger(v)) return v;
   const m = String(v == null ? '' : v).match(/^(?:v)?(\d+)$/);
   return m ? Number(m[1]) : null;
 }
 
 function past(range, versie) {
-  const v = nummer(versie);
+  const v = versieNummer(versie);
   if (v == null || !range) return false;
-  if (range.exact != null) return v === nummer(range.exact);
-  if (range.min != null && v < nummer(range.min)) return false;
-  if (range.max != null && v > nummer(range.max)) return false;
-  if ((range.blocked || []).map(nummer).includes(v)) return false;
+  if (range.exact != null) return v === versieNummer(range.exact);
+  if (range.min != null && v < versieNummer(range.min)) return false;
+  if (range.max != null && v > versieNummer(range.max)) return false;
+  if ((range.blocked || []).map(versieNummer).includes(v)) return false;
   return true;
 }
 
@@ -27,4 +27,4 @@ function resolve(contract, versies, opties) {
   return { ok: false, decision: mutation ? 'DENY' : 'DEGRADE', reasons };
 }
 
-module.exports = { nummer, past, resolve };
+module.exports = { nummer: versieNummer, past, resolve };

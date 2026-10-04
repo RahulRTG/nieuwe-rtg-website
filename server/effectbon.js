@@ -46,7 +46,7 @@
 
 const staatlog = require('./staatlog');
 const effectmeter = require('./effectmeter');
-const effectcollecties = require('./kern/isolatie/effectcollecties');
+const { klassenVan } = require('./effectbon-klassen');
 const { nameet } = require('./kern/stuur/gevolgcontract/nameting');
 
 /* DE VOORSPELLER WORDT ERIN GEHANGEN EN NIET OPGEHAALD. Deze laag mag kern LEZEN, maar
@@ -80,20 +80,6 @@ function bewaar(bon) {
   return bon;
 }
 
-/* De klassen en de collecties die bewogen. `verschil()` geeft per collectie een getal of
-   'gewijzigd'; welke van de twee doet hier niet toe -- de vraag is of zij bewoog. */
-function uitVerschil(voor, na) {
-  const verschil = staatlog.verschil(voor, na);
-  const klassen = new Set();
-  const refs = [];
-  let zonderIndeling = 0;
-  for (const naam of Object.keys(verschil || {})) {
-    const rij = effectcollecties.effectVan(naam);
-    if (rij) { klassen.add(rij.effect); refs.push(naam); } else { zonderIndeling++; }
-  }
-  return { klassen: [...klassen].sort(), refs: refs.sort(), zonderIndeling };
-}
-
 /* De bon van EEN verzoek. `teller` komt van de effectmeter en wordt meegegeven en niet
    opgevraagd: een antwoord dat uit een andere context wordt verstuurd zou anders de stand
    van een ander verzoek dragen. */
@@ -101,20 +87,8 @@ function maak({ envelop, voor, na, teller }) {
   const e = envelop || {};
   const ctx = e.context || {};
   const t = teller || {};
-  /* Nieuwe runtime: de db-proxy heeft de bewogen collecties tijdens de mutatie
-     zelf al aangewezen. De oude voor/na-vorm blijft uitsluitend als expliciete
-     fallback voor losse toetsen en voor een niet-bewaakte datastore. */
-  const waargenomen = t.collecties && typeof t.collecties[Symbol.iterator] === 'function'
-    ? [...t.collecties].sort() : null;
-  const uit = waargenomen == null ? uitVerschil(voor, na) : (() => {
-    const klassen = new Set(), refs = []; let zonderIndeling = 0;
-    for (const naam of waargenomen) {
-      const rij = effectcollecties.effectVan(naam);
-      if (rij) { klassen.add(rij.effect); refs.push(naam); } else zonderIndeling++;
-    }
-    return { klassen: [...klassen].sort(), refs, zonderIndeling };
-  })();
-  const { klassen, refs, zonderIndeling } = uit;
+  // Welke klassen bewogen: ./effectbon-klassen.js (tracker eerst, voor/na als terugval).
+  const { klassen, refs, zonderIndeling } = klassenVan({ voor, na, teller: t });
 
   /* De twee choke points buiten de opslag. Zij dragen dezelfde klasse en dat is geen
      versimpeling: mail en sms bereiken allebei een tweede persoon buiten RTG, en dat IS

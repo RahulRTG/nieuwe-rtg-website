@@ -7,41 +7,11 @@
 const { hash, kopie, bevries } = require('./canon');
 const contracts = require('./v3-source-retention-contracts');
 const { ROLES, RESULTS, MEDIA, IMMUTABILITY, CONTRACTS, fout, contract,
-  contractRef, authorityDigest, ownerAuthorityDigest, roleDigest, normaliseerRequirement } = contracts;
-const HEX = /^[a-f0-9]{64}$/;
-function digest(value, name) {
-  const result = String(value || '').toLowerCase();
-  if (!HEX.test(result)) throw fout('SOURCE_RETENTION_INVALID', name + ' moet een SHA-256 digest zijn');
-  return result;
-}
-function tijd(value, name) {
-  const result = String(value || '');
-  if (!result || !Number.isFinite(Date.parse(result)))
-    throw fout('SOURCE_RETENTION_INVALID', name + ' moet een geldige tijd zijn');
-  return result;
-}
+  contractRef, authorityDigest, ownerAuthorityDigest, roleDigest, normaliseerRequirement,
+  HEX, digest, tijd } = contracts;
 
-function maakDraft(input) {
-  const i = input || {}, found = contract(i.contractRef), digests = i.digests || {};
-  const roles = Object.keys(digests).map(x => String(x).toUpperCase()).sort();
-  if (!roles.length || roles.some(role => !found.roles.includes(role)))
-    throw fout('SOURCE_RETENTION_ROLE_DENIED', 'rol valt buiten het retentioncontract');
-  const locatorDigest = digest(i.locatorDigest, 'locatorDigest');
-  const retentionReceiptDigest = digest(i.retentionReceiptDigest, 'retentionReceiptDigest');
-  const retainedFrom = tijd(i.retainedFrom, 'retainedFrom');
-  const retainedUntil = i.retainedUntil ? tijd(i.retainedUntil, 'retainedUntil') : null;
-  const verifiedAt = tijd(i.verifiedAt || retainedFrom, 'verifiedAt');
-  const bindings = roles.map(role => {
-    const contentDigest = digest(digests[role], role + '.contentDigest');
-    const observed = i.observedDigests && i.observedDigests[role];
-    return { role, contractRef: { id: found.id, version: found.version,
-      digest: found.contractDigest }, locatorDigest, contentDigest, retentionReceiptDigest,
-    retainedFrom, retainedUntil, verification: { available: i.available !== false,
-      observedContentDigest: observed == null && i.available !== false ? contentDigest : observed,
-      verifiedAt } };
-  });
-  return bevries({ schemaVersion: 1, bindings });
-}
+// Een conceptverklaring opstellen: ./v3-source-retention-draft.js.
+const { maakDraft } = require('./v3-source-retention-draft');
 
 function normaliseer(input) {
   if (input == null) return null;

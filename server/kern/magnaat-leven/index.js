@@ -16,7 +16,7 @@ const { volgendeDag } = require('./dag');
 const { ACTIES } = require('./acties');
 const { toon } = require('./weergave');
 const speelronde = require('./speelronde');
-const { controleer, bevries } = require('./bewaking');
+const { maakVangnet } = require('./bewaking');
 const { oordeelGeef, oordeelOverzicht } = require('./oordeel');
 
 const KIES_START = 'Kies waar je begint: ' + Object.values(R.STARTPOSITIES).map(x => x.naam.toLowerCase()).join(', ') + '.';
@@ -80,34 +80,8 @@ function maakLeven({ db, save = () => {}, nu = () => Date.now() } = {}) {
     });
   }
 
-  /* Het vangnet om alles wat een leven verandert. Nog niets geboekt: terug naar
-     hoe het was. Wel geboekt: bevriezen, want het journaal gaat niet terug.
-     En kloppen de invarianten na afloop niet, dan ook bevriezen. */
-  function beschermd(st, doe) {
-    /* De opslagstaat is contractueel JSON. SQLite bewaakt hem met een Proxy,
-       die structuredClone niet accepteert. Deze ronde maakt dezelfde losse
-       rollbackkopie langs de duurzame JSON-grens, zonder de Proxy of een ruwe
-       opslagreferentie naar het domein te lekken. */
-    const voor = JSON.parse(JSON.stringify(st)), volgorde = st.boek.boekVolgorde;
-    try {
-      const r = doe();
-      const schending = r && r.nieuw ? [] : controleer(st, boek);
-      if (!schending.length) return r;
-      bevries(st, schending[0], meld);
-      save();
-      return { status: 409, error: 'Dit leven is bevroren: ' + schending[0] + '.' };
-    } catch (e) {
-      if (st.boek.boekVolgorde === volgorde) {
-        for (const k of Object.keys(st)) delete st[k];
-        Object.assign(st, voor);
-        koppel(st, boek);
-        return { status: 500, error: 'Er ging iets mis bij deze handeling. Er is niets veranderd.' };
-      }
-      bevries(st, 'een handeling brak af nadat er al geboekt was', meld);
-      save();
-      return { status: 500, error: 'Er ging iets mis na een boeking. Dit leven is bevroren om je boeken te beschermen; begin opnieuw.' };
-    }
-  }
+  // Het vangnet om alles wat een leven verandert: maakVangnet in ./bewaking.js.
+  const beschermd = maakVangnet({ boek, save, meld, koppel });
 
   /* V5: een handeling met een vangnet eromheen (./bewaking.js). Een `verzoek`-sleutel
      die al is uitgevoerd, gaat niet nog eens: geen dag twee keer afsluiten. */

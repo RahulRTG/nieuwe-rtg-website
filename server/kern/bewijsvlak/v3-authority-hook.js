@@ -23,7 +23,7 @@ function afhandelen(error) { if (error && error.incidentId) throw error; return 
 const subject = binding => ({ domain: 'authority', type: 'consent', id: 'consent_' + hash(binding).slice(0, 24) });
 const chain = binding => 'authority_' + hash(binding).slice(0, 24);
 
-function transition(input) {
+function authorityTransition(input) {
   try {
     const i = input || {}, binding = i.binding || {}, state = i.state, at = i.at;
     const facts = {
@@ -68,4 +68,4 @@ function propagated(input) {
   } catch (error) { return afhandelen(error); }
 }
 
-module.exports = { install, subject, transition, propagated };
+module.exports = { install, subject, transition: authorityTransition, propagated };

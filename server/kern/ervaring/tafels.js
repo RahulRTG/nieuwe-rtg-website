@@ -9,18 +9,8 @@ module.exports = (ctx) => {
     orderMetRef, boekingMetRef, boekingenVanKlant, id, nu, vandaag, rond, MELDING_SCOPES, trustPlane,
     bewijsHospitalityBesluit } = ctx;
 
-  function observe(invoer) {
-    if (!trustPlane || typeof trustPlane.observe !== 'function') return null;
-    try { return trustPlane.observe(invoer); } catch (e) { return null; }
-  }
-  function metricTimer(invoer) {
-    if (!trustPlane || typeof trustPlane.timer !== 'function') return null;
-    try { return trustPlane.timer(invoer); } catch (e) { return null; }
-  }
-  function finish(timer, uitkomst) {
-    if (!timer) return null;
-    try { return timer.finish(uitkomst); } catch (e) { return null; }
-  }
+  // Schaduwhaken naar het bewijsvlak; zie ./bewijshaak.js.
+  const { observe, metricTimer, finish } = require('./bewijshaak')(trustPlane);
   // Het besluit krijgt de twee collecties die het leest, niet de hele database.
   const beslisReservering = require('./reservering-besluit')({ ...ctx, db: undefined, observe, metricTimer, finish,
     reserveringen: () => db.data.reserveringen || [],

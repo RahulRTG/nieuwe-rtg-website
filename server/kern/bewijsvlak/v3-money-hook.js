@@ -1,7 +1,7 @@
 'use strict';
 
 let adapter = null;
-function install(value) {
+function installMoneyHook(value) {
   if (!value || typeof value.moneyEvidence !== 'function' || typeof value.assessMoney !== 'function' ||
     typeof value.confirmMoney !== 'function' || typeof value.verifyOwnerProof !== 'function')
     throw new Error('bewijsvlak v3: ongeldige money-adapter');
@@ -16,7 +16,7 @@ function eis() {
   }
   return adapter;
 }
-function failure(error, code) {
+function moneyHookFailure(error, code) {
   return Object.freeze({ ok: false, shadow: true,
     code: error && error.code || code || 'MONEY_EVIDENCE_FAILED',
     incidentId: error && error.incidentId || null });
@@ -104,7 +104,7 @@ function confirmed(payment, providerEventId, ingressProof, providerAssertion, ow
       externalValue: { providerEventId: String(providerEventId || ''),
         providerStatus: payment.providerStatus, amountCents: payment.centen, currency: payment.valuta } });
   } catch (error) {
-    return failure(error);
+    return moneyHookFailure(error);
   }
 }
 
@@ -117,8 +117,8 @@ function unknown(payment, error, owner) {
       ownerReceipt: receipt });
     return eis().assessMoney({ subjectRef: subject(payment), evidenceRefs: [technical.evidenceId],
       correlationId: correlation(payment), at: technical.observedAt });
-  } catch (hookError) { return failure(hookError, 'MONEY_UNKNOWN_EVIDENCE_FAILED'); }
+  } catch (hookError) { return moneyHookFailure(hookError, 'MONEY_UNKNOWN_EVIDENCE_FAILED'); }
 }
 
-module.exports = { install, confirmed, unknown, ownerEvidence, providerSettled,
+module.exports = { install: installMoneyHook, confirmed, unknown, ownerEvidence, providerSettled,
   providerReversed, providerDisputed };

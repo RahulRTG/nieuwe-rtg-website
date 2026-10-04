@@ -7,7 +7,7 @@ function actief(e, at) {
   const t = Date.parse(at), from = Date.parse(e.effectiveFrom), until = e.effectiveUntil && Date.parse(e.effectiveUntil);
   return from <= t && (!until || until > t);
 }
-function bevoegd(e, req, at, authorities) {
+function evidenceBevoegd(e, req, at, authorities) {
   const t = Date.parse(at), a = e.authority || {}, from = Date.parse(a.validFrom), until = a.validUntil && Date.parse(a.validUntil);
   return e.factType === req.factType && e.truthClass === req.truthClass &&
     Array.isArray(a.scopes) && a.scopes.includes(req.scope) && from <= t && (!until || until > t) &&
@@ -42,7 +42,7 @@ function retentionConflicten(items) {
 function beoordeel(req, evidence, at, authorities) {
   const fact = evidence.filter(e => e.factType === req.factType && e.truthClass === req.truthClass);
   const actueel = fact.filter(e => actief(e, at));
-  const bevoegdActueel = actueel.filter(e => bevoegd(e, req, at, authorities));
+  const bevoegdActueel = actueel.filter(e => evidenceBevoegd(e, req, at, authorities));
   const vers = bevoegdActueel.filter(e => !req.maxAgeMs ||
     Date.parse(at) - Date.parse(e.observedAt) <= req.maxAgeMs);
   const inspected = vers.map(e => ({ requirementId: req.id || req.factType,
@@ -52,7 +52,7 @@ function beoordeel(req, evidence, at, authorities) {
     mismatch: inspected.filter(x => x.result.conflicts.length),
     blocking: !!req.retention && req.retention.critical && vers.length > 0 &&
       inspected.filter(x => x.result.ok).length < (req.min || 1),
-    unauthorized: actueel.filter(e => !bevoegd(e, req, at, authorities)).map(e => e.evidenceId),
+    unauthorized: actueel.filter(e => !evidenceBevoegd(e, req, at, authorities)).map(e => e.evidenceId),
     expired: fact.filter(e => !actief(e, at) || (req.maxAgeMs &&
       Date.parse(at) - Date.parse(e.observedAt) > req.maxAgeMs)).map(e => e.evidenceId) };
 }
@@ -78,7 +78,7 @@ function evalueer(profile, evidence, at, authorities) {
   let correctionRetentionGap = false;
   for (const correction of profile.corrections || []) {
     const candidates = geldig.filter(e => e.factType === correction.factType && e.truthClass === correction.truthClass);
-    const auth = candidates.filter(e => bevoegd(e, correction, at, authorities));
+    const auth = candidates.filter(e => evidenceBevoegd(e, correction, at, authorities));
     const checks = auth.map(e => ({ requirementId: correction.factType,
       ...retentionVan(e, correction, at) }));
     const accepted = checks.filter(x => x.result.ok).map(x => x.evidence);
@@ -86,7 +86,7 @@ function evalueer(profile, evidence, at, authorities) {
     evidenceDebt.push(...checks.flatMap(x => x.debt));
     retentionMismatch.push(...checks.filter(x => x.result.conflicts.length));
     correctionRetentionGap ||= !!correction.retention && correction.retention.critical && auth.length > 0 && !accepted.length;
-    unauthorized.push(...candidates.filter(e => !bevoegd(e, correction, at, authorities)).map(e => e.evidenceId));
+    unauthorized.push(...candidates.filter(e => !evidenceBevoegd(e, correction, at, authorities)).map(e => e.evidenceId));
   }
   const uniek = [...new Map(geaccepteerd.map(e => [e.evidenceId, e])).values()];
   const conflict = waardeConflicten(uniek).concat(retentionConflicten(retentionMismatch));

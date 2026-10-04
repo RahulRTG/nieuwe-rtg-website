@@ -13,25 +13,8 @@ module.exports = function maakBetaalWaarheid({ d, save, crypto, betaal, nu, log 
   const afhandelaars = new Map();
   const startend = new Map();
 
-  function doos() {
-    const data = d();
-    if (!data.betaalWaarheid || typeof data.betaalWaarheid !== 'object') data.betaalWaarheid = {};
-    if (!data.betaalWaarheidMeldingen || typeof data.betaalWaarheidMeldingen !== 'object') data.betaalWaarheidMeldingen = {};
-    return data.betaalWaarheid;
-  }
-  const hash = (v) => crypto.createHash('sha256').update(String(v)).digest('hex');
-  const idVan = (actor, idem) => 'BW-' + hash(String(actor) + '|' + String(idem)).slice(0, 20).toUpperCase();
-
-  function gebeurtenis(r, soort, extra) {
-    if (!Array.isArray(r.gebeurtenissen)) r.gebeurtenissen = [];
-    const vorig = r.gebeurtenissen.length ? r.gebeurtenissen[r.gebeurtenissen.length - 1].zegel : 'BEGIN';
-    const basis = Object.assign({ nr: r.gebeurtenissen.length + 1, at: nuIso(), soort,
-      status: r.status, vorig }, extra || {});
-    basis.zegel = hash(JSON.stringify(basis));
-    r.gebeurtenissen.push(basis);
-    r.bijgewerktAt = basis.at;
-    return basis;
-  }
+  // De opslagdoos en de geketende gebeurtenissen: ./keten.js.
+  const { doos, hash, idVan, gebeurtenis } = require('./keten')({ d, crypto, nuIso });
 
   const publiek = (r) => beeld.publiek(r, definitiefBetaald);
   const bewijs = require('./bewijs')(betaal);

@@ -1,3 +1,4 @@
+/* De telefoon: de driedelige WerkOS-schil blijft volledig bruikbaar (vervolg van de schilstijl). */
 + `  /* Op de telefoon blijft de driedelige WerkOS-schil volledig bruikbaar.
      De contextbalk krijgt een eigen rij, de rail blijft een compacte
      glyfenstrook en de dock houdt altijd Start en Command Center bereikbaar. */

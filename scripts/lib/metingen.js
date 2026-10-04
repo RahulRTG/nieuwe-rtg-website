@@ -93,10 +93,71 @@ const GEEN_METING = new Set([
      beide lijsten, en telt dus mee in `metingenZonderRatel`. Dat hier rechtzetten
      zou die tand verschuiven, en dat is een apart besluit -- het staat genoteerd
      en niet stilletjes meegenomen. */
-  'HERREKENBAAR.json'
+  'HERREKENBAAR.json',
+  /* DE AUDIT VAN 4 OKTOBER 2026. Vijftig meetbestanden stonden in geen van
+     beide lijsten; per bestand is nagelezen wat hem vasthoudt. Deze negen
+     dragen geen getal dat beter of slechter kan worden. IDEMBESLUIT.json staat
+     hier nu ook, om de reden die hierboven al stond: het is een register van
+     besluiten zoals HERREKENBAAR.json. De meting ernaast telt wel -- haal je een
+     besluit weg, dan groeit de bewijsschuldpost idem-ongeclassificeerd. */
+  'IDEMBESLUIT.json',
+  'BEGROTING.json',              // grenzen per collectie: een voornemen, geen meting
+  'KRIMP.json',                  // welke collecties krimpen in de suite: invoer voor BEGROTING
+  'MUTATIECONTRACT-VOORSTEL.json', // een machinevoorstel; het besluit staat in server/lib/mutatiecontracten.js
+  'RUST-MIGRATIES.json',         // een migratieplan; scripts/rust-migraties.js keurt zijn vorm
+  'SLO.json',                    // de servicedoelen zelf
+  'SYMBOLEN.json',               // een index (soort: index); codewereld.test.js houdt hem buiten de gedragstelling
+  'WETBRONNEN.json',             // de wetsbronnen met hun vingerafdruk: een catalogus
+  'WETWACHT.json',               // een alarmrapport over externe wetteksten; wacht.yml zakt erop
+  /* DUURZAAMHEIDSKOSTEN.json draagt vertragingsfactoren van een duurzame
+     schrijfactie. Net als TOETSDUUR.json een PLANNINGSgetal: een schijf die
+     trager is, is geen slechtere code. */
+  'DUURZAAMHEIDSKOSTEN.json'
 ]);
 
 const REGISTER = {
+  /* DE AUDIT VAN 4 OKTOBER 2026 (zie ook GEEN_METING). Elke regel hieronder is
+     nagelezen tot op de bewering die zakt: welk getal, welke richting. Vier zijn
+     DOCUMENTtanden en geen kwaliteitsratel -- CAPABILITEIT, MAGNAATLAB,
+     OBJECTMODEL en MAKERS houden een bevinding vast (er IS geen gedeeld type) of
+     een bereik, zoals CARRIEREVORM hieronder. GRAAFAS is een exacte pin en zakt
+     dus ook bij verbetering; ook dat vangt een verslechtering. De drie via
+     scripts/bewijsmatrix.js draaien in de meetronde en niet in npm test, op
+     dezelfde grond als IDEMPROEF verderop. SUITE.json wordt pas bij een
+     vrijgave gekeurd en houdt dus een release tegen, geen commit. */
+  'AANROEPGRAAF.json': { eigenRatel: 'test/codewereld.test.js' },      // doelOnbekend === 0
+  'SCHERMROUTES.json': { eigenRatel: 'test/codewereld.test.js' },      // doodPad === 0
+  'AUDITPROEF.json': { eigenRatel: 'scripts/bewijsmatrix.js' },        // AUDIT-kolom; en bewijsschuld audit-wisselend
+  'HANDELINGPROEF.json': { eigenRatel: 'scripts/bewijsmatrix.js' },    // AUDIT-kolom, terugval
+  'OUTPUTPROEF.json': { eigenRatel: 'scripts/bewijsmatrix.js' },       // OUTPUT-kolom; en bewijsschuld onbeslist/blind
+  'WAAROM.json': { eigenRatel: 'scripts/bewijsschuld.js' },            // post object-vooraf; zakt in bewijsschuld.test.js
+  'BEWIJSSCHULD.json': { eigenRatel: 'test/bewijsschuld.test.js' },    // achterstand mag niet groeien
+  'BELOFTE.json': { eigenRatel: 'test/belofte.test.js' },              // gebroken === 0
+  'DEKKING.json': { eigenRatel: 'test/routedekking.test.js' },         // gaten === 0, pct === 100
+  'ENVELOP.json': { eigenRatel: 'scripts/envelopvelden.js' },          // veldenZonderHuis, actorVormen mogen niet groeien
+  'GEZAG.json': { eigenRatel: 'scripts/gezag.js' },                    // vocabulaires, losse niveaunamen
+  'IDEMSCHULD.json': { eigenRatel: 'test/idemschuld.test.js' },        // schuld mag niet groeien
+  'IDOR.json': { eigenRatel: 'test/idor.test.js' },                    // geen doorbraak, gescheiden >= 50
+  'KLOKWACHT.json': { eigenRatel: 'test/klokwacht.test.js' },          // totaal en per bestand niet hoger
+  'MUTATIESEMANTIEK.json': { eigenRatel: 'test/mutatiesemantiek.test.js' }, // onbekende klassen, tegenspraken === 0
+  'CAPABILITEIT.json': { eigenRatel: 'test/capabilities.test.js' },    // gelijkendeParen === 0 (documenttand)
+  'MAGNAATLAB.json': { eigenRatel: 'test/magnaatlab.test.js' },        // geen gedeelde vorm (documenttand)
+  'OBJECTMODEL.json': { eigenRatel: 'test/objectmodel.test.js' },      // domeineigen > 50% (documenttand, ruim)
+  'MAKERS.json': { eigenRatel: 'test/makers.test.js' },                // bereik >= 8
+  'GRAAFAS.json': { eigenRatel: 'test/graafas.test.js' },              // exacte pin
+  'SUITE.json': { eigenRatel: 'scripts/lib/productie-vrijgave.js' },   // groen, nul mislukt: release-poort
+  /* Tien die tot 4 oktober nergens aan hingen en toen een tand in NORM.json
+     kregen (zie scripts/norm.js bij controlsNietGroen). */
+  'CONTROLS.json': { meter: ['controlsNietGroen'] },
+  'HANDLERWACHT.json': { meter: ['handlerOnbewaakt'] },
+  'KERNHERKOMST.json': { meter: ['kernOnopgelost'] },
+  'ROUTEBRON.json': { meter: ['routebronTegenspraak'] },
+  'SEMANTIEK.json': { meter: ['semantiekBotsingen'] },
+  'SCHERMGEDRAG.json': { meter: ['schermZonderGrond'] },
+  'MUTATIEBOEK.json': { meter: ['mutatiesOnverklaard'] },
+  'ONBEWEZEN.json': { meter: ['mutatiesOnbewezen'] },
+  'SCHRIJFANALYSE.json': { meter: ['schrijfOnbekend'] },
+  'VERTROUWEN.json': { meter: ['vertrouwenOngemeten'] },
   /* CONNECTION_CONSTITUTION.json wordt uitsluitend geschreven nadat alle
      genoemde product-, privacy-, state- en routeproeven groen zijn. Het script
      weigert bij een ontbrekend bewijs of exposed implemented:false capability

@@ -752,6 +752,23 @@ const METERS = [
      talentdomeinen hij werkelijk heeft gezien. Omhoog, want dit mag niet stil
      dalen -- zie de kop bij CARRIEREVORM.json in ./lib/metingen.js. */
   { sleutel: 'carriereDomeinenGemeten', richting: 'omhoog', wat: 'talentdomeinen die de carrierevormmeter werkelijk heeft gezien' },
+  /* TIEN MEETBESTANDEN DIE AAN NIETS HINGEN (metingenZonderRatel, 4 oktober
+     2026). Elk droeg een getal dat beter of slechter kan worden en geen enkele
+     toets keek ernaar; ze groeiden of ze nu groeiden of niet. Drie zijn
+     invarianten op nul (een control die rood staat, een route zonder wacht,
+     twee bronnen die elkaar tegenspreken) en zeven zijn schulden die alleen
+     omlaag mogen. Ze bijten bij het opnieuw meten van hun register, zoals elke
+     registertand hier. */
+  { sleutel: 'controlsNietGroen', richting: 'omlaag', wat: 'controls die in bedrijf zijn en niet groen staan (CONTROLS.json)' },
+  { sleutel: 'handlerOnbewaakt', richting: 'omlaag', wat: 'routes zonder bewaker of wacht die te laat komt (HANDLERWACHT.json: onbewaakt + laat)' },
+  { sleutel: 'kernOnopgelost', richting: 'omlaag', wat: 'vulplekken van de kern die niet te volgen zijn (KERNHERKOMST.json)' },
+  { sleutel: 'routebronTegenspraak', richting: 'omlaag', wat: 'routes waarover router en bronboom elkaar tegenspreken (ROUTEBRON.json)' },
+  { sleutel: 'semantiekBotsingen', richting: 'omlaag', wat: 'namen in meer domeinen met meer dan een betekenis (SEMANTIEK.json)' },
+  { sleutel: 'schermZonderGrond', richting: 'omlaag', wat: 'schermen waarover geen register iets over gedrag zegt (SCHERMGEDRAG.json)' },
+  { sleutel: 'mutatiesOnverklaard', richting: 'omlaag', wat: 'mutaties zonder besluit over hun duplicaatgedrag (MUTATIEBOEK.json)' },
+  { sleutel: 'mutatiesOnbewezen', richting: 'omlaag', wat: 'muterende routes zonder enig bewijs (ONBEWEZEN.json)' },
+  { sleutel: 'schrijfOnbekend', richting: 'omlaag', wat: 'routes waarvan de schrijfanalyse niet weet of ze schrijven (SCHRIJFANALYSE.json)' },
+  { sleutel: 'vertrouwenOngemeten', richting: 'omlaag', wat: 'routes waar niets is om te vertrouwen: geen enkele cel gemeten (VERTROUWEN.json)' },
   /* DE LEDENCONTEXT VAN RAHUL (AICONTEXT.json, npm run aicontext). Twee tanden
      die het tegenovergestelde doen; zie de kop bij het register in
      ./lib/metingen.js. De invariant omlaag, het bereik omhoog. */
@@ -1745,6 +1762,16 @@ function meet(bronnen) {
     rollbackUitzonderingen: leesRegister('ROLLBACKBESLUIT.json', (j) => Object.keys(j.routes || {}).length),
     faalproefGezakt: leesRegister('FAALPROEF.json', (j) => j.gemeten.gezakt),
     carriereDomeinenGemeten: leesRegister('CARRIEREVORM.json', (j) => j.gemeten.domeinen),
+    controlsNietGroen: leesRegister('CONTROLS.json', (j) => j.gemeten.nietGroen),
+    handlerOnbewaakt: leesRegister('HANDLERWACHT.json', (j) => j.gemeten.onbewaakt + j.gemeten.laat),
+    kernOnopgelost: leesRegister('KERNHERKOMST.json', (j) => j.gemeten.onopgelost),
+    routebronTegenspraak: leesRegister('ROUTEBRON.json', (j) => j.gemeten.waarvanTegenspraak),
+    semantiekBotsingen: leesRegister('SEMANTIEK.json', (j) => j.woordenMetMeerBetekenissen),
+    schermZonderGrond: leesRegister('SCHERMGEDRAG.json', (j) => j.gemeten.zonderGrond),
+    mutatiesOnverklaard: leesRegister('MUTATIEBOEK.json', (j) => j.gemeten.mutatiesOnverklaard),
+    mutatiesOnbewezen: leesRegister('ONBEWEZEN.json', (j) => j.gemeten.onbewezen),
+    schrijfOnbekend: leesRegister('SCHRIJFANALYSE.json', (j) => j.gemeten.onbekend),
+    vertrouwenOngemeten: leesRegister('VERTROUWEN.json', (j) => j.telling.ongemeten),
     aiContextLek: leesRegister('AICONTEXT.json', (j) => j.muur.lek.length),
     aiContextVeldenGezien: leesRegister('AICONTEXT.json', (j) => j.ledenstaat.aantal),
     idemVerklaard: leesRegister('IDEMIDENTITEIT.json', (j) => j.verklaard),

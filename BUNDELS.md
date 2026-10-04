@@ -893,14 +893,14 @@ omlaag.
 
 ## `shared/werkos.js`
 
-`public/shared/werkos/` -- 7 delen, 686 regels in de delen
+`public/shared/werkos/` -- 7 delen, 692 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `werkos-01.js` | RTG Werk-OS |
-| `werkos-01b.js` | De onderbalk is een onyx commandobalk, geen los merkobject |
-| `werkos-01bb.js` | Op de telefoon blijft de driedelige WerkOS-schil volledig bruikbaar |
-| `werkos-01c.js` | Beweging bevestigt alleen een wissel van werkvlak |
+| `werkos-01b.js` | De onderbalk: een onyx commandobalk, geen los merkobject (vervolg van de schilstijl) |
+| `werkos-01bb.js` | De telefoon: de driedelige WerkOS-schil blijft volledig bruikbaar (vervolg van de schilstijl) |
+| `werkos-01c.js` | Beweging: alleen een wissel van werkvlak wordt bevestigd (vervolg van de schilstijl) |
 | `werkos-02.js` | Command Center |
 | `werkos-03.js` | bouwen en spiegelen |
 | `werkos-04.js` | DE BORDSCHIL: het vlak dat over de app komt met de werkvlakken erin |

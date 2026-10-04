@@ -167,3 +167,19 @@ test('8. de melder gaat af na drie MEETDAGEN, en niet eerder', () => {
     { p: [dag('2026-08-29', 0), dag('2026-08-30', 0), dag('2026-08-31', 0)] });
   assert.equal(nul.length, 0, 'een gesloten post melden als stokkend maakt het doel onbereikbaar');
 });
+
+/* BESLUIT VAN 4 OKTOBER 2026: een GEMETEN `beschermd` telt als uitspraak over
+   herhalen; een route die de proef onbeschermd of ongemeten zag, blijft schuld
+   tot er een besluit is. Mutatie: de voorwaarde op `beschermd` weghalen laat de
+   eerste bewering zakken; hem op elke uitslag toepassen de tweede. */
+test('9. idem-ongeclassificeerd: alleen een gemeten bescherming lost af, een besluit blijft de andere weg', () => {
+  const post = schuld.POSTEN.find(p => p.id === 'idem-ongeclassificeerd');
+  const r = (rijen, besluiten = {}) => post.uit({ idembesluit: { routes: besluiten }, idemproef: { perRoute: rijen } });
+  const rij = (pad, idempotentie, reden = 'deed werk') => ({ pad, idempotentie, reden });
+  assert.equal(r([rij('/a', 'beschermd'), rij('/b', 'beschermd')]), 0, 'gemeten beschermd telt niet als achterstand');
+  assert.equal(r([rij('/a', 'onbeschermd'), rij('/b', 'ongemeten'), rij('/c', 'beschermd')]), 2,
+    'onbeschermd en ongemeten blijven achterstand');
+  assert.equal(r([rij('/a', 'onbeschermd')], { '/a': { klasse: 'creatie' } }), 0, 'een besluit lost ook af');
+  assert.equal(r([rij('/a', 'onbeschermd', 'geen werk gedaan')]), 0, 'een route zonder werk telt niet');
+  assert.equal(r(null), null, 'zonder meting een vraagteken en geen nul');
+});

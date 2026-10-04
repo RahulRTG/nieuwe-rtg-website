@@ -350,13 +350,21 @@ const POSTEN = [
          al onder object-vooraf en proefruis. */
       const werk = rijen.filter(x => !/geen werk/.test(x.reden || ''));
       const beslist = new Set(Object.keys(besluiten));
-      return werk.filter(x => !beslist.has(x.pad)).length;
+      /* BESLUIT VAN DE EIGENAAR (4 oktober 2026): een GEMETEN `beschermd` is een
+         uitspraak over herhalen -- de proef deed de tweede oproep en zag hem
+         afgevangen. Zo'n route telt hier niet meer als achterstand. Het blijft
+         een METING en wordt geen besluit: IDEMBESLUIT.json krijgt er niets bij,
+         en zakt de meting (een volgende ronde ziet de route onbeschermd of
+         ongemeten), dan staat hij vanzelf weer in deze post. Een besluit blijft
+         nodig waar de proef wel verschil ziet of niet kon meten. */
+      return werk.filter(x => !beslist.has(x.pad) && x.idempotentie !== 'beschermd').length;
     },
     waarom: 'autonomie zonder herhaalsemantiek is niet te doen: een keten die halverwege ' +
       'afbreekt moet weten of opnieuw beginnen veilig is. Het doel is niet dat alles ' +
       'idempotent IS -- het is dat van elke route vastligt wat een tweede keer betekent.',
-    sluit: 'per route beslissen en vastleggen. Het instrument staat (scripts/idemproef-route.js ' +
-      'plus IDEMBESLUIT.json met zijn klassen); dit is meetwerk en handwerk.' },
+    sluit: 'meten (een gemeten `beschermd` telt als uitspraak) en waar de proef verschil ziet of ' +
+      'niet kon meten per route beslissen in IDEMBESLUIT.json. Het instrument staat ' +
+      '(scripts/idemproef-route.js); dit is meetwerk en handwerk.' },
 
   { id: 'wegwerpserver-kopieen', soort: 'meetwerk',
     wat: 'scripts met een eigen kopie van "start een wegwerpserver"',

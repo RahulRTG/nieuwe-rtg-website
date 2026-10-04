@@ -1552,6 +1552,61 @@ const IJKINGEN = {
      proef en niet omhoog, want dat is de richting die ertoe doet: een meter die
      stil minder domeinen ziet, rapporteert dezelfde conclusie over minder
      bewijs, en juist daarvoor hangt de ratel eraan. */
+  /* DE TIEN TANDEN VAN 4 OKTOBER 2026 (metingenZonderRatel). Zelfde vorm als
+     laatSpoorVerdacht: elk leest een post in een register dat er al is, dus de
+     ijking verhoogt die post en eist dat de meter exact meebeweegt. Een meter
+     die het verkeerde veld leest, of een ontbrekend bestand als nul, blijft
+     staan -- en dan zakt deze proef. */
+  controlsNietGroen: {
+    proef: (voor) => metVervangenJson('CONTROLS.json',
+      (j) => { j.gemeten.nietGroen = (j.gemeten.nietGroen || 0) + 4; return j; },
+      () => meet().controlsNietGroen - voor.controlsNietGroen)
+  },
+  handlerOnbewaakt: {
+    proef: (voor) => metVervangenJson('HANDLERWACHT.json',
+      (j) => { j.gemeten.onbewaakt = (j.gemeten.onbewaakt || 0) + 4; return j; },
+      () => meet().handlerOnbewaakt - voor.handlerOnbewaakt)
+  },
+  kernOnopgelost: {
+    proef: (voor) => metVervangenJson('KERNHERKOMST.json',
+      (j) => { j.gemeten.onopgelost = (j.gemeten.onopgelost || 0) + 4; return j; },
+      () => meet().kernOnopgelost - voor.kernOnopgelost)
+  },
+  routebronTegenspraak: {
+    proef: (voor) => metVervangenJson('ROUTEBRON.json',
+      (j) => { j.gemeten.waarvanTegenspraak = (j.gemeten.waarvanTegenspraak || 0) + 4; return j; },
+      () => meet().routebronTegenspraak - voor.routebronTegenspraak)
+  },
+  semantiekBotsingen: {
+    proef: (voor) => metVervangenJson('SEMANTIEK.json',
+      (j) => { j.woordenMetMeerBetekenissen = (j.woordenMetMeerBetekenissen || 0) + 4; return j; },
+      () => meet().semantiekBotsingen - voor.semantiekBotsingen)
+  },
+  schermZonderGrond: {
+    proef: (voor) => metVervangenJson('SCHERMGEDRAG.json',
+      (j) => { j.gemeten.zonderGrond = (j.gemeten.zonderGrond || 0) + 4; return j; },
+      () => meet().schermZonderGrond - voor.schermZonderGrond)
+  },
+  mutatiesOnverklaard: {
+    proef: (voor) => metVervangenJson('MUTATIEBOEK.json',
+      (j) => { j.gemeten.mutatiesOnverklaard = (j.gemeten.mutatiesOnverklaard || 0) + 4; return j; },
+      () => meet().mutatiesOnverklaard - voor.mutatiesOnverklaard)
+  },
+  mutatiesOnbewezen: {
+    proef: (voor) => metVervangenJson('ONBEWEZEN.json',
+      (j) => { j.gemeten.onbewezen = (j.gemeten.onbewezen || 0) + 4; return j; },
+      () => meet().mutatiesOnbewezen - voor.mutatiesOnbewezen)
+  },
+  schrijfOnbekend: {
+    proef: (voor) => metVervangenJson('SCHRIJFANALYSE.json',
+      (j) => { j.gemeten.onbekend = (j.gemeten.onbekend || 0) + 4; return j; },
+      () => meet().schrijfOnbekend - voor.schrijfOnbekend)
+  },
+  vertrouwenOngemeten: {
+    proef: (voor) => metVervangenJson('VERTROUWEN.json',
+      (j) => { j.telling.ongemeten = (j.telling.ongemeten || 0) + 4; return j; },
+      () => meet().vertrouwenOngemeten - voor.vertrouwenOngemeten)
+  },
   carriereDomeinenGemeten: {
     proef: (voor) => metVervangenJson('CARRIEREVORM.json',
       (j) => { j.gemeten.domeinen = Math.max(0, (j.gemeten.domeinen || 0) - 3); return j; },

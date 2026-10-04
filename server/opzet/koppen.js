@@ -25,12 +25,12 @@ module.exports = function koppen({ app }) {
        URL vast in zijn access log. Onze eigen logger doet dat niet (die schrijft
        req.path, zonder querystring; test/loghygiene.test.js bewaakt het), maar
        de proxy moet apart worden ingesteld -- zie PRODUCTION.md. */
-    /* De twee pagina's die een eenmalige uitnodiging uit een fragment in
-       geheugen nemen, krijgen ook op HTTP-niveau de strengste regel. De meta
+    /* De pagina's die een eenmalige uitnodiging of een lescode (B20) uit een
+       fragment in geheugen nemen, krijgen ook op HTTP-niveau de strengste regel. De meta
        in de pagina werkt pas nadat het document is gelezen; deze kop geldt al
        voor de navigatie zelf en blijft overeind bij een vroege scriptfout. */
     const geheimFragment = req.path === '/apps/app.html' || req.path === '/apps/reisuitnodiging.html' ||
-      req.path === '/apps/spelscherm.html';
+      req.path === '/apps/spelscherm.html' || req.path === '/apps/foundation/leren.html';
     res.set('Referrer-Policy', geheimFragment ? 'no-referrer' : 'strict-origin-when-cross-origin');
     if (isEenmalig(req.method, req.path)) {
       res.set('Cache-Control', 'no-store');

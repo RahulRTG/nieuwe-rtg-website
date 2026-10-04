@@ -2,7 +2,7 @@
 <html lang="nl">
 <head>
 <meta charset="utf-8">
-<!-- id.js zonder defer en vooraan: RTGId levert id's die al tijdens het parsen nodig zijn -->
+<!-- id.js zonder defer en vooraan: RTGId is al tijdens het parsen nodig -->
 <script src="/shared/id.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTFoundation · Bord</title>
@@ -146,14 +146,15 @@
 
 <script src="tekenen.js"></script>
 <script src="realtime.js"></script>
-<!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
+<!-- uitvoer.js zonder defer: het eigen script roept RTGUitvoer.bron aan -->
 <script src="/shared/uitvoer.js"></script>
 <script src="sessie.js"></script>
 <script src="/shared/rtg-school-session.js"></script>
+<script src="lesdeel.js" defer></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-// sluit-knoppen zonder inline handler (past bij een strengere CSP)
+// sluit-knoppen zonder inline handler (strenge CSP)
 document.querySelectorAll('[data-sluit]').forEach(b => b.addEventListener('click', () => { const d = document.getElementById(b.dataset.sluit); if (d && d.close) d.close(); }));
 const q = new URLSearchParams(location.search);
 let CODE = (q.get('code')||'').toUpperCase(), TOKEN = q.get('t')||'';

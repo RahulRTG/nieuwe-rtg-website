@@ -47,7 +47,7 @@ function schrijfUser({ email, username, tier, realName, phone }, passwordHash) {
     username || null,
     passwordHash,
     tier,
-    kluis.makeCodename(),
+    null, // wordt samen met de botsingscontrole in dezelfde schrijfzin gekozen
     kluis.enc(realName),
     kluis.enc(email),
     phone ? kluis.enc(phone) : null,
@@ -59,13 +59,19 @@ function schrijfUser({ email, username, tier, realName, phone }, passwordHash) {
   // blok), zodat twee instances nooit hetzelfde id uitdelen. Anders SQLite-autoincrement.
   const id = mirror.nieuwId();
   let newId;
-  if (id != null) {
-    S.zin(`INSERT INTO users (id, ${kolommen}) VALUES (?, ${vals.map(() => '?').join(', ')})`).run(id, ...vals);
-    newId = id;
-  } else {
-    const info = S.zin(`INSERT INTO users (${kolommen}) VALUES (${vals.map(() => '?').join(', ')})`).run(...vals);
-    newId = info.lastInsertRowid;
+  // De codenaam is een adres voor uitnodigingen: toeval is geen uniciteit.
+  // Eén SQLite-schrijfzin controleert én reserveert de naam; een losse SELECT
+  // vooraf zou twee schrijvers dezelfde nog vrije naam kunnen laten kiezen.
+  for (let poging = 0; poging < 32 && newId == null; poging++) {
+    vals[4] = kluis.makeCodename();
+    const args = id != null ? [id, ...vals] : vals;
+    const info = S.zin(`INSERT INTO users (${id != null ? 'id, ' : ''}${kolommen})
+      SELECT ${args.map(() => '?').join(', ')}
+      WHERE NOT EXISTS (SELECT 1 FROM users WHERE lower(codename) = lower(?))`).run(...args, vals[4]);
+    if (Number(info.changes) > 0) newId = id != null ? id : info.lastInsertRowid;
   }
+  if (newId == null) throw Object.assign(new Error('Er kon geen vrije codenaam worden uitgegeven; probeer opnieuw.'),
+    { code: 'RTG_CODENAAM_BEZET', status: 503 });
   require('./onderhoud').herzegel(S.huidigeDb(), newId); // id is nu bekend: kolommen eraan binden
   mirror.markUser(newId);
   const nieuw = getUserById(newId);

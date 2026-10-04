@@ -19,7 +19,7 @@
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 <link href="/shared/wereldrooster.css" rel="stylesheet">
 <link href="/shared/experience-kernel.css?v=20260829-7" rel="stylesheet">
-<link href="/images/world-homes/travel.webp" rel="preload" as="image" fetchpriority="high">
+<link href="/images/editorial/travel-flight.webp" rel="preload" as="image" fetchpriority="high">
 <link href="/shared/rtg-vandaag-luxe.css" rel="stylesheet">
 <link href="/shared/rtg-anchor-experiences-2026.css" rel="stylesheet">
 <link rel="stylesheet" href="/shared/rtg-world-start.css">
@@ -68,29 +68,29 @@
   </nav>
 
   <main id="inhoud">
-    <p><a href="/apps/living-world.html">Living World · Ontdek een ervaring en maak haar van u</a></p>
     <section class="appblad actief" data-blad="vandaag" aria-labelledby="worldTravelTitle">
       <div class="wh-home">
-        <p class="wh-eyebrow" data-wh-copy="yourJourneys">Uw reizen, bij elkaar</p>
+        <div class="wh-travel-layout">
+          <section class="wh-photo wh-travel-hero" aria-labelledby="worldTravelTitle">
+            <img src="/images/editorial/travel-flight.webp" alt="" width="1448" height="1086" fetchpriority="high">
+            <p class="wh-eyebrow wh-hero-label" data-wh-copy="yourJourneys">Uw reizen, bij elkaar</p>
+            <div class="wh-photo-copy"><h1 id="worldTravelTitle" data-wh-copy="travelTitle">Uw reis begint hier.</h1></div>
+            <div class="wh-travel-bottom"><div id="worldTravelDetail" hidden></div><p id="worldTravelMessage" role="status" data-wh-copy="loading">Uw gegevens worden opgehaald.</p><a id="worldTravelAction" class="wh-link" href="/apps/reisbureau.html">Bespreek uw reiswens <span aria-hidden="true">↗</span></a></div>
+            <span class="wh-caption" data-wh-copy="atmosphere">Sfeerbeeld</span>
+          </section>
         <div class="wh-stories" aria-label="Ideeën voor uw reis">
-          <a class="wh-story" href="/apps/reisbureau.html"><img src="/images/editorial/travel-inspiration.webp" alt="" width="1448" height="1086"><span data-wh-copy="inspiration">Reisinspiratie</span></a>
+          <a class="wh-story" href="/apps/reisbureau.html"><img src="/images/editorial/travel-inspiration.webp" alt="" width="1448" height="1086" loading="lazy"><span data-wh-copy="inspiration">Reisinspiratie</span></a>
           <a class="wh-story" href="/apps/hotels.html"><img src="/campagne/onsen.jpg" alt="" width="960" height="720" loading="lazy"><span data-wh-copy="stays">Verblijven</span></a>
           <a class="wh-story" href="/apps/ov.html"><img src="/images/travelos/coastal-train.jpg" alt="" width="960" height="720" loading="lazy"><span data-wh-copy="onTheWay">Onderweg</span></a>
           <a class="wh-story" href="/apps/reisboek.html"><img src="/images/travelos/travel-documents.jpg" alt="" width="960" height="720" loading="lazy"><span data-wh-copy="travelBook">Uw reisboek</span></a>
         </div>
-        <div class="wh-travel-layout">
-          <section class="wh-photo wh-travel-hero" aria-labelledby="worldTravelTitle">
-            <img src="/images/world-homes/travel.webp" alt="" width="1056" height="1408" fetchpriority="high">
-            <div class="wh-photo-copy"><p class="wh-eyebrow" data-wh-copy="nextTrip">Uw volgende reis</p><h1 id="worldTravelTitle" data-wh-copy="travelTitle">Even helemaal ergens anders.</h1></div>
-            <div class="wh-travel-bottom"><div id="worldTravelDetail" hidden></div><p id="worldTravelMessage" role="status" data-wh-copy="loading">Uw gegevens worden opgehaald.</p><a id="worldTravelAction" class="wh-link" href="/apps/reisbureau.html">Bespreek uw reiswens <span aria-hidden="true">↗</span></a></div>
-            <span class="wh-caption" data-wh-copy="atmosphere">Sfeerbeeld</span>
-          </section>
           <section class="wh-travel-help" aria-labelledby="worldTravelHelp"><h2 id="worldTravelHelp" data-wh-copy="travelHelp">Alles voor onderweg.</h2>
-            <a class="wh-service" href="/apps/reisboek.html"><div><h3 data-wh-copy="travelBook">Uw reisboek</h3><p data-wh-copy="documents">Bewaar uw plannen en documenten bij elkaar.</p></div><span aria-hidden="true">›</span></a>
-            <a class="wh-service" href="#reizen"><div><h3 data-wh-copy="nextStep">Uw volgende stap</h3><p data-wh-copy="prepare">Bekijk wat u voor vertrek wilt regelen.</p></div><span aria-hidden="true">›</span></a>
-            <a class="wh-service" href="/apps/reisbureau.html"><div><h3 data-wh-copy="whereNext">Waar wilt u hierna naartoe?</h3><p data-wh-copy="ideas">Ontdek nieuwe mogelijkheden die bij u passen.</p></div><span aria-hidden="true">↗</span></a>
+            <a class="wh-service" href="/apps/reisboek.html"><span class="wh-service-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M7 3h8l4 4v14H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M15 3v5h4M9 12h6M9 16h4"/></svg></span><div><h3 data-wh-copy="travelBook">Uw reisboek</h3><p data-wh-copy="documents">Bewaar uw plannen en documenten bij elkaar.</p></div><span aria-hidden="true">›</span></a>
+            <a class="wh-service" href="#reizen"><span class="wh-service-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="5" cy="18" r="2"/><path d="M7 18h4a3 3 0 0 0 0-6H8a3 3 0 0 1 0-6h5M20 6c0 2-3 5-3 5s-3-3-3-5a3 3 0 1 1 6 0Z"/><circle cx="17" cy="6" r=".5"/></svg></span><div><h3 data-wh-copy="nextStep">Uw volgende stap</h3><p data-wh-copy="prepare">Bekijk wat u voor vertrek wilt regelen.</p></div><span aria-hidden="true">›</span></a>
+            <a class="wh-service" href="/apps/reisbureau.html"><img class="wh-service-thumb" src="/images/travelos/city-arrival.jpg" alt="" aria-hidden="true" width="1672" height="941" loading="lazy" draggable="false"><div><h3 data-wh-copy="whereNext">Waar wilt u hierna naartoe?</h3><p data-wh-copy="ideas">Ontdek nieuwe mogelijkheden die bij u passen.</p></div><span aria-hidden="true">↗</span></a>
           </section>
         </div>
+        <p class="wh-related"><a href="/apps/living-world.html">Living World · Ontdek een ervaring en maak haar van u <span aria-hidden="true">↗</span></a></p>
       </div>
       <details class="wh-details"><summary data-wh-copy="travelDetails">Uw reismomenten en reisstatus</summary>
       <div class="bladbinnen vandaagblad">

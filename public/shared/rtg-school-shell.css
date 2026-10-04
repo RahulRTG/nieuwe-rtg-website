@@ -45,3 +45,14 @@ html.in-campus .school-kader{display:block}html.in-campus .school-zij{display:no
 @media(max-width:850px){.school-kader{display:block}.school-zij{display:none}.school-boven{min-height:4rem;padding:.62rem .8rem!important}.school-werk>main{padding:.9rem .8rem 2.5rem!important}.school-toplink.verberg-smal{display:none}.school-context{max-width:11rem}.school-werk .rij>.veld{flex-basis:100%}.enterprise-hero{grid-template-columns:1fr}.poort-grid,.enterprise-start,.enterprise-sectiegrid,#dPlus,#dEnterprise,#dBeheer,#lWerk,.school-dashboard-grid{grid-template-columns:1fr}.enterprise-sectiegrid>.deel,#dPlus>.deel,#dEnterprise>.deel,#dBeheer>.deel,#lWerk>.deel,.enterprise-sectiegrid>.kpis,#dPlus>.kpis,#dEnterprise>.kpis,#dBeheer>.kpis,#lWerk>.kpis,.enterprise-breed,.school-dashboard-grid>.soort{grid-column:1}.poort-stappen,.school-veiligheidsrij{grid-template-columns:1fr}}
 @media(max-width:520px){.school-context,.school-boven .school-toplink{display:none}.enterprise-hero{padding:1rem}.enterprise-hero h2{font-size:1.65rem}.poort-stappen{display:none}}
 @media(prefers-reduced-motion:reduce){.school-nav{transition:none}}
+
+
+/* Componentopmaak: behoudt de voormalige attributen en expliciete toestanden. */
+.leer-bewijs-door{opacity:.8;}
+.leer-bewijs-datum{opacity:.7;}
+.leer-doel-uitleg{margin-top:.35rem;opacity:.85;}
+.leer-les-tekst{margin-top:.4rem;line-height:1.7;}
+body.rtg-stijl .sec.leer-uitleg-kop{margin:0;}
+body.rtg-stijl .leer-voorstel-reden{color:var(--soft);font-size:.76rem;}
+.leer-dag-uitleg{margin:.5rem 0 0;}
+.leer-antwoord-alternatief{margin-top:.35rem;opacity:.9;}

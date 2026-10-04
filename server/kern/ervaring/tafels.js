@@ -9,19 +9,14 @@ module.exports = (ctx) => {
     orderMetRef, boekingMetRef, boekingenVanKlant, id, nu, vandaag, rond, MELDING_SCOPES, trustPlane,
     bewijsHospitalityBesluit } = ctx;
 
-  function observe(invoer) {
-    if (!trustPlane || typeof trustPlane.observe !== 'function') return null;
-    try { return trustPlane.observe(invoer); } catch (e) { return null; }
-  }
-  function metricTimer(invoer) {
-    if (!trustPlane || typeof trustPlane.timer !== 'function') return null;
-    try { return trustPlane.timer(invoer); } catch (e) { return null; }
-  }
-  function finish(timer, uitkomst) {
-    if (!timer) return null;
-    try { return timer.finish(uitkomst); } catch (e) { return null; }
-  }
-  const beslisReservering = require('./reservering-besluit')({ ...ctx, observe, metricTimer, finish });
+  const { observe, metricTimer, finish } = require('./trust-meting')(trustPlane);
+  const beslisReservering = require('./reservering-besluit')({ ...ctx, observe, metricTimer, finish,
+    vindReservering: (supplierCode, rid) => (db.data.reserveringen || [])
+      .find(x => x.id === rid && x.supplierCode === supplierCode),
+    vindVonkMatch: reservationId => {
+      const matches = db.data.vonk && Array.isArray(db.data.vonk.matches) ? db.data.vonk.matches : [];
+      return matches.find(m => m.reserveringId === reservationId);
+    } });
 
   /* Lazy sweep: reserveringen waarvan de 24u-bedenktijd voorbij is worden
      definitief zodra iemand ze opvraagt. Eén keer opslaan als er iets rijpte. */

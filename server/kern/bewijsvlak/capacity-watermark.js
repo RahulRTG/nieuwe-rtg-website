@@ -16,7 +16,7 @@ const VOLGORDE = Object.freeze({ OK: 0, WARNING: 1, CRITICAL: 2, BLOCKED: 3 });
 
 function fout(code, melding) { return Object.assign(new Error(melding), { code }); }
 
-function aantal(waarde, naam, lijst) {
+function capacityAantal(waarde, naam, lijst) {
   if (lijst) {
     if (waarde == null) return 0;
     if (!Array.isArray(waarde))
@@ -29,7 +29,7 @@ function aantal(waarde, naam, lijst) {
   return Object.keys(waarde).length;
 }
 
-function limiet(waarde, naam) {
+function capacityLimiet(waarde, naam) {
   const n = Number(waarde);
   if (!Number.isSafeInteger(n) || n < 1)
     throw fout('EVIDENCE_CAPACITY_PROFILE_INVALID', 'Ongeldige capaciteitslimiet voor ' + naam + '.');
@@ -61,11 +61,11 @@ function meet(root, opties) {
   if (!v3 || typeof v3 !== 'object' || Array.isArray(v3))
     throw fout('EVIDENCE_CAPACITY_STATE_INVALID', 'Trust-evidence V3 heeft geen geldige hoofdvorm.');
   const invoer = [
-    ['v2.records', aantal(r.ledger, 'v2.records', true), limiet(v2Limits.records, 'v2.records')],
-    ['v2.evidence', aantal(r.blobs, 'v2.evidence', false), limiet(v2Limits.evidence, 'v2.evidence')]
+    ['v2.records', capacityAantal(r.ledger, 'v2.records', true), capacityLimiet(v2Limits.records, 'v2.records')],
+    ['v2.evidence', capacityAantal(r.blobs, 'v2.evidence', false), capacityLimiet(v2Limits.evidence, 'v2.evidence')]
   ];
   for (const naam of V3_COLLECTIONS) invoer.push(['v3.' + naam,
-    aantal(v3[naam], 'v3.' + naam, false), limiet(v3Limits[naam], 'v3.' + naam)]);
+    capacityAantal(v3[naam], 'v3.' + naam, false), capacityLimiet(v3Limits[naam], 'v3.' + naam)]);
 
   const collections = {}, debt = [];
   let highestStatus = 'OK';

@@ -13,7 +13,7 @@ module.exports = function maakBrokerGrenzen({ contexten }) {
     return context;
   }
 
-  function bevoegd(context, definition) {
+  function brokerBevoegd(context, definition) {
     const scope = new Set(context.authorityScope || []);
     const mist = (definition.authority || []).filter(a => !scope.has(a));
     return mist.length ? fout('Deze context geeft geen bevoegdheid voor de actie.', 403,
@@ -27,5 +27,5 @@ module.exports = function maakBrokerGrenzen({ contexten }) {
     return null;
   }
 
-  return Object.freeze({ contextVoor, bevoegd, velden });
+  return Object.freeze({ contextVoor, bevoegd: brokerBevoegd, velden });
 };

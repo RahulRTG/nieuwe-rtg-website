@@ -559,6 +559,11 @@ const EIGEN_MODULE = new Map([
   ['office-save-atomic.test.js', ['server/kern/office/docs.js']],
   ['office-classificatie-grens.test.js', ['server/kern/office/rechten.js', 'server/kern/office/gezinsdeling.js', 'server/kern/office/samen.js']],
   ['pg-fault-proxy.test.js', ['test/pg-fault-proxy.js']],
+  /* Deze restartproef laadt SQLite uitsluitend in kindprocessen. De statische
+     requirezoeker ziet daardoor geen productmodule, terwijl elk kind exact
+     server/db/sqlite.js gebruikt. Die expliciete koppeling laat de motor de
+     delete-winsgrens in de werkelijk uitgevoerde bron muteren. */
+  ['sqlite-tombstone-restart.test.js', ['server/db/sqlite.js']],
   // This test executes the browser language loader in a VM, not through require.
   ['i18n-dictionary.test.js', ['public/shared/i18n.js']],
   /* De grendel op een openbare Magnaat Test-installatie draait VOOR er ook maar

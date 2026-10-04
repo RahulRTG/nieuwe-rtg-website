@@ -186,7 +186,7 @@ test('de actieve hospitality issuer blijft alleen in de composition root bereikb
     }
   }
   loop(path.join(root, 'server'));
-  const gebruikers = files.filter(file => /hospitalityProviderBewijs\.(?:authenticeer|bevestiging|verify)/
+  const gebruikers = files.filter(file => /require\(['"]\.\.\/kern\/reservering\/providerbewijs['"]\)/
     .test(fs.readFileSync(file, 'utf8'))).map(file => path.relative(root, file));
-  assert.deepEqual(gebruikers, ['server/server.js']);
+  assert.deepEqual(gebruikers, ['server/opzet/trust-bewijs.js']);
 });

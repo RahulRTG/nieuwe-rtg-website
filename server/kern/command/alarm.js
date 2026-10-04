@@ -27,6 +27,7 @@
    uitgangen die er zijn, staan in de uitslag. */
 'use strict';
 const { maakTikker } = require('./tikker');
+const { voegAanvullendeAlarmcontrolesToe } = require('./alarm-aanvullend');
 
 const ERNST = { hoog: 3, midden: 2, laag: 1 };
 
@@ -96,24 +97,7 @@ function maakAlarm({ opslag, save, journaal, slo, sonde, canary, kwaliteit, norm
       return k && k.heel === false ? (k.waarom || 'de keten is gebroken') + ' (bij ' + k.bij + ')' : null;
     });
 
-    probeer('gegevens-kapot', 'Er staan defecten in de gegevens', 'laag', () => {
-      if (!kwaliteit) return null;
-      const t = kwaliteit.meet().tel;
-      return t.defecten > d.defectenDrempel
-        ? t.defecten + ' defecten over ' + t.soorten + ' bevinding(en); de drempel staat op ' + d.defectenDrempel
-        : null;
-    });
-
-    probeer('capability-gezakt', 'Een capability-SLO is niet gehaald', 'hoog', () => {
-      const g = (slo.stand().capabilities || []).filter(x => x.oordeel === 'niet gehaald');
-      return g.length ? g.map(x => x.capability).join(', ') + ' mist beschikbaarheid of latency' : null;
-    });
-
-    probeer('capability-verouderd', 'Capabilitybewijs is verouderd', 'midden', () => {
-      const g = (slo.stand().capabilities || []).filter(x =>
-        (x.reasons || []).includes('STALE_MEASUREMENTS') && x.availability && x.availability.eligible > 0);
-      return g.length ? g.map(x => x.capability).join(', ') + ' heeft geen verse meting' : null;
-    });
+    voegAanvullendeAlarmcontrolesToe(probeer, { slo, kwaliteit, d });
 
     return uit;
   }

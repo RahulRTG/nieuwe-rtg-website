@@ -15,6 +15,7 @@ const { alsAanbieder } = require('../server/kern/dienstidentiteit');
 const { maakProviderBoundary } = require('../server/kern/bewijsvlak/v3-ingress');
 const { maakOwnerBoundary } = require('../server/kern/bewijsvlak/v3-owner-proof');
 const verzoekcontext = require('../server/db/verzoekcontext');
+const { maakTrustEvidenceStateFor } = require('../server/db/trust-evidence-state');
 const Consent = require('../server/kern/connection-consent');
 
 const at = '2026-09-30T10:00:00.000Z';
@@ -492,7 +493,8 @@ test('dynamische stateFor bindt Trust aan dezelfde PostgreSQL request-COW als bu
   const db = {};
   Object.defineProperty(db, 'data', { get() { return verzoekcontext.dataVoor(raw); } });
   const save = () => verzoekcontext.noteerSave();
-  configureRuntime({ db, save, mode: 'shadow', nu: () => at });
+  configureRuntime({ stateFor: maakTrustEvidenceStateFor(db), save,
+    mode: 'shadow', nu: () => at });
 
   const failed = verzoekcontext.nieuw({ method: 'POST' });
   verzoekcontext.voer(failed, () => {

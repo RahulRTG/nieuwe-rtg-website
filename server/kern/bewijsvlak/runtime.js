@@ -6,14 +6,7 @@ let actief = maakPlane({ mode: 'shadow', state: {} });
 
 function configure(opties) {
   const o = opties || {}, fallback = o.state || {};
-  const stateFor = typeof o.stateFor === 'function' ? o.stateFor : o.db
-    ? () => {
-      const data = o.db.data;
-      if (!data || typeof data !== 'object') throw new Error('bewijsvlak runtime: database-state ontbreekt');
-      if (!data.trustEvidence || typeof data.trustEvidence !== 'object') data.trustEvidence = {};
-      return data.trustEvidence;
-    }
-    : () => fallback;
+  const stateFor = typeof o.stateFor === 'function' ? o.stateFor : () => fallback;
   actief = maakPlane({ ...o, state: stateFor(), stateFor });
   return actief;
 }

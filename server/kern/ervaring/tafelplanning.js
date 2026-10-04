@@ -6,18 +6,7 @@
 module.exports = (ctx, { rijpMaak }) => {
   const { db, save, notify, sseToCustomer, sseToSupplier, id, nu, vandaag, tafeldekVan, trustPlane } = ctx;
 
-  function observe(invoer) {
-    if (!trustPlane || typeof trustPlane.observe !== 'function') return null;
-    try { return trustPlane.observe(invoer); } catch (e) { return null; }
-  }
-  function metricTimer(invoer) {
-    if (!trustPlane || typeof trustPlane.timer !== 'function') return null;
-    try { return trustPlane.timer(invoer); } catch (e) { return null; }
-  }
-  function finish(timer, uitkomst) {
-    if (!timer) return null;
-    try { return timer.finish(uitkomst); } catch (e) { return null; }
-  }
+  const { observe, metricTimer, finish } = require('./trust-meting')(trustPlane);
 
   const tafelVan = (s, naam) => (s.tables || []).find(t => t.name === String(naam || ''));
 

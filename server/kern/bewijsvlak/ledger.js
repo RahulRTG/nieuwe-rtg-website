@@ -4,6 +4,8 @@
 
 const klok = require('../../lib/klok');
 const { hash, id, kopie, bevries } = require('./canon');
+const { verifieerLedger } = require('./ledger-verifier');
+const { weigerLegacyLedgerinhoud } = require('./ledger-legacy');
 
 const DEFAULT_LIMITS = Object.freeze({ records: 100000, evidence: 50000 });
 
@@ -86,16 +88,9 @@ function maakLedger(opties) {
 
   if (regels().length > limits.records) throw capaciteitFout('records', limits.records);
   if (blobAantal() > limits.evidence) throw capaciteitFout('evidence', limits.evidence);
-  for (const bestaand of (blobs() instanceof Map ? blobs().values() : Object.values(blobs()))) {
-    if (bestaand && (Object.prototype.hasOwnProperty.call(bestaand, 'content') ||
-      (bestaand.metadata && !bestaand.metadata.metadataDigest))) {
-      const fout = new Error('bewijsvlak ledger: legacy raw evidence vereist expliciete offline archivering/migratie');
-      fout.code = 'LEGACY_RAW_EVIDENCE_REQUIRES_MIGRATION';
-      throw fout;
-    }
-  }
+  weigerLegacyLedgerinhoud(blobs());
 
-  function laatste(boundary) {
+  function laatsteLedgerregel(boundary) {
     if (transaction) {
       const gepland = transaction.pending(op => op.type === 'ledger-append' &&
         op.record.boundary === boundary);
@@ -138,7 +133,7 @@ function maakLedger(opties) {
     const pendingCount = transaction ? transaction.pending(op => op.type === 'ledger-append').length : 0;
     const lijst = regels();
     if (lijst.length + pendingCount >= limits.records) throw capaciteitFout('records', limits.records);
-    const vorige = laatste(i.boundary);
+    const vorige = laatsteLedgerregel(i.boundary);
     const body = {
       evidenceRecordId: i.evidenceRecordId || id('record', { boundary: i.boundary, at: nu(),
         n: lijst.length + pendingCount, claim: i.claimId }),
@@ -189,20 +184,8 @@ function maakLedger(opties) {
     return null;
   }
 
-  function verify(boundary) {
-    const vorigePerBoundary = new Map(); let laatste = null, aantal = 0;
-    for (const regel of regels()) {
-      if (boundary && regel.boundary !== boundary) continue;
-      const vorige = vorigePerBoundary.get(regel.boundary) || null;
-      const body = kopie(regel), ontvangen = body.hash;
-      delete body.hash;
-      if (body.previousHash !== (vorige ? vorige.hash : null))
-        return { ok: false, code: 'CHAIN_BREAK', at: regel.evidenceRecordId };
-      if (hash(body) !== ontvangen) return { ok: false, code: 'HASH_MISMATCH', at: regel.evidenceRecordId };
-      vorigePerBoundary.set(regel.boundary, regel); laatste = regel; aantal++;
-    }
-    return { ok: true, records: aantal, lastHash: boundary
-      ? ((vorigePerBoundary.get(boundary) || {}).hash || null) : (laatste ? laatste.hash : null) };
+  function verifyLedger(boundary) {
+    return verifieerLedger(regels(), boundary);
   }
 
   function lijst(filter) {
@@ -212,7 +195,7 @@ function maakLedger(opties) {
       .slice(-(f.limit || 100)).map(kopie);
   }
 
-  return Object.freeze({ bewijs, generatie, append, verify, lijst,
+  return Object.freeze({ bewijs, generatie, append, verify: verifyLedger, lijst,
     capacity: () => bevries({ records: { used: regels().length, limit: limits.records },
       evidence: { used: blobAantal(), limit: limits.evidence } }),
     haalBewijs: evidenceId => heeftBlob(evidenceId) ? kopie(haalBlob(evidenceId)) : null });

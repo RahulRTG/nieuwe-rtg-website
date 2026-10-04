@@ -26,7 +26,7 @@ module.exports = function maakPoll(deps) {
         const lokaalOpenstaand = vuil.has(r.key) ||
           (basis !== undefined && JSON.stringify(db.data[r.key]) !== basis);
 
-        if (r.deleted) {
+        if (Number(r.deleted) === 1) {
           /* Een nieuwere tombstone is een autoritatieve verwijdering. Een
              verouderde lokale werkkopie mag haar nooit stil terugschrijven:
              dat zou onder meer een intrekking of AVG-verwijdering op een

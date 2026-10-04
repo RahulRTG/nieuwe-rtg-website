@@ -48,7 +48,7 @@ function maakOwnerBoundary(ownerId) {
     return token;
   }
 
-  function verify(token, expected) {
+  function verifyOwnerProof(token, expected) {
     const receipt = token && proofs.get(token), e = expected || {};
     if (!token) throw fout('OWNER_PROOF_REQUIRED', 'domeineigenaarbewijs ontbreekt');
     if (!receipt) throw fout('OWNER_PROOF_INVALID', 'domeineigenaarbewijs is ongeldig of al gebruikt');
@@ -64,7 +64,7 @@ function maakOwnerBoundary(ownerId) {
     return receipt;
   }
 
-  return Object.freeze({ mark, issue, verify });
+  return Object.freeze({ mark, issue, verify: verifyOwnerProof });
 }
 
 module.exports = { maakOwnerBoundary };

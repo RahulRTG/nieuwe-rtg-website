@@ -1,8 +1,8 @@
 {
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
-  "vastgelegd": "2026-10-03",
+  "vastgelegd": "2026-10-04",
   "gemeten": {
-    "bestanden": 2709,
+    "bestanden": 2721,
     "domeinenTotaal": 692,
     "koopbareVormen": 618,
     "koopbareDomeinen": 124,
@@ -17,12 +17,12 @@
     "wagenVormen": 33,
     "wagenVormenUniek": 30,
     "wagenDomeinen": 22,
-    "optellingen": 121,
+    "optellingen": 120,
     "optelDomeinen": 61,
     "optelCenten": 66,
     "optelEuro": 5,
     "optelGemengd": 0,
-    "optelOnbekend": 50
+    "optelOnbekend": 49
   },
   "envelop": [
     "aantal",
@@ -73,7 +73,7 @@
   ],
   "perWerkwoord": {
     "toon": 94,
-    "prijs": 39,
+    "prijs": 40,
     "beschikbaarheid": 54,
     "reserveer": 32,
     "bevestig": 61,
@@ -151,6 +151,29 @@
         "lever": "maakUitgifte",
         "annuleer": "intrekkenKaal",
         "retour": "maakTeruggave"
+      },
+      "telt": 7
+    },
+    {
+      "domein": "kern/command",
+      "heeft": {
+        "toon": true,
+        "prijs": true,
+        "beschikbaarheid": true,
+        "reserveer": true,
+        "bevestig": true,
+        "lever": true,
+        "annuleer": true,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "beeld",
+        "prijs": "berekenKwantielgrens",
+        "beschikbaarheid": "lopende",
+        "reserveer": "claims",
+        "bevestig": "bevestig",
+        "lever": "uitgifteFout",
+        "annuleer": "vervaltVan"
       },
       "telt": 7
     },
@@ -265,28 +288,6 @@
         "reserveer": "careVastleg",
         "bevestig": "boekBehandelingActie",
         "annuleer": "careAnnuleer"
-      },
-      "telt": 6
-    },
-    {
-      "domein": "kern/command",
-      "heeft": {
-        "toon": true,
-        "prijs": false,
-        "beschikbaarheid": true,
-        "reserveer": true,
-        "bevestig": true,
-        "lever": true,
-        "annuleer": true,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "beeld",
-        "beschikbaarheid": "lopende",
-        "reserveer": "claims",
-        "bevestig": "bevestig",
-        "lever": "uitgifteFout",
-        "annuleer": "vervaltVan"
       },
       "telt": 6
     },
@@ -2785,15 +2786,6 @@
       ]
     },
     {
-      "domein": "kern/command",
-      "plekken": 3,
-      "waar": [
-        "server/kern/command/operator.js",
-        "server/kern/command/slo.js",
-        "server/kern/command/toezicht.js"
-      ]
-    },
-    {
       "domein": "kern/commerce",
       "plekken": 3,
       "waar": [
@@ -2826,6 +2818,14 @@
       "waar": [
         "server/kern/bank/hart.js",
         "server/kern/bank/incasso.js"
+      ]
+    },
+    {
+      "domein": "kern/command",
+      "plekken": 2,
+      "waar": [
+        "server/kern/command/operator.js",
+        "server/kern/command/toezicht.js"
       ]
     },
     {

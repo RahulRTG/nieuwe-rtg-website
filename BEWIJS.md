@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2309 bestanden en 15898 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2307 bestanden en 15894 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2309 |
-| losse beweringen (`test(...)`) | 15898 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 244 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1917 |
+| toetsbestanden | 2307 |
+| losse beweringen (`test(...)`) | 15894 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 242 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1959 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
-| niet te meten (al rood, geen module gevonden, ...) | 149 |
-| alleen in de kop *genoemd*, nog niet gemeten | 42 |
-| niets van beide | 201 |
+| niet te meten (al rood, geen module gevonden, ...) | 158 |
+| alleen in de kop *genoemd*, nog niet gemeten | 32 |
+| niets van beide | 158 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,13 +33,13 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2013 bestanden, 15389 beweringen.
+2011 bestanden, 15385 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
 | `a11ykeuring.test.js` | 15 | gezakt op `true->false` | Eigen a11y-keuring (scripts/a11ykeuring.js), die axe-core verving. De keuring zelf draait in de browser (scripts/a11y.js); hier toetsen we de PURE kern in Node -- kleur/luminantie/contrast-wiskunde en de... |
 | `a11yoordeel.test.js` | 7 | gezakt op `===->!==#0` | HET A11Y-OORDEEL OVER OPGEDEELDE METINGEN. De a11y-scan is opgedeeld over vier runners, en dat mocht alleen omdat zijn oordeel is losgemaakt van zijn meting (scripts/lib/a11yoordeel.js). |
-| `aanbouw-collectie.test.js` | 2 | genoemd | opzet/aanbouw.js en aanbouw2.js haalden bewerkCollectie uit `kern`, en die draagt hem niet. Vijf modules (samen, samenrtf, rtgai, rtgid, vracht) kregen daardoor undefined en namen stil hun niet-atomaire terugval --... |
+| `aanbouw-collectie.test.js` | 2 | gezakt op `!==->===#0` | opzet/aanbouw.js en aanbouw2.js haalden bewerkCollectie uit `kern`, en die draagt hem niet. Vijf modules (samen, samenrtf, rtgai, rtgid, vracht) kregen daardoor undefined en namen stil hun niet-atomaire terugval --... |
 | `aankomst-chauffeur-voorzijde.test.js` | 4 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `aanmeldbesluit.test.js` | 5 | gezakt op `liegpoort /api/` | WIE HEEFT DEZE PAS TOEGEKEND? Het accepteren of afwijzen van een aanmelding is de ENE menselijke handeling in een verder volledig geautomatiseerde stroom. |
 | `aanmeldgesprek.test.js` | 1 | gezakt op `liegpoort /api/` | Het poortgesprek: Rahul neemt inloggen EN aanmelden over. Een gratis RTG-account vraagt VIER dingen: volledige naam, geboortedatum, e-mailadres en een wachtwoord. |
@@ -109,7 +109,7 @@ toets omvalt.
 | `ankerpost.test.js` | 8 | gezakt op `===->!==#0` | DE ANKERPOST (server/lib/ankerpost.js) -- de bestemming van het ankerblok. Het besluit erachter: een tweede machine binnen RTG. |
 | `anthropic.test.js` | 4 | gezakt op `return-weg#3` | Test voor de eigen Claude-client (server/anthropic.js), die @anthropic-ai/sdk verving. We draaien tegen een lokale nep-API (geen echte sleutel/kosten) en controleren: de juiste headers + body gaan eruit, het antwoord... |
 | `antivirus.test.js` | 23 | gezakt op `true->false` | Tests voor De Ontsmetter (server/kern/antivirus.js): de platform-malware- scanner. Handtekeningen, magie-controle, extensies en entropie. |
-| `antwoord-einde.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `antwoord-einde.test.js` | 3 | gezakt op `true->false#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `api-contract.test.js` | 5 | gezakt op `liegpoort /api/` | Contracttests: leggen de VORM (velden + types) van de belangrijkste API- antwoorden vast, los van de flow-tests. Zo kan een refactor of herindeling niet stilletjes een veld weglaten waar een van de apps op leunt (bijv. |
 | `apipoort-levensduur.test.js` | 6 | gezakt op `liegpoort /api/` | De machinesleutel van de API-poort als gemigreerde credential (CODECREDENTIALS.json, command.api_machinesleutel). Wat hier moet kunnen zakken: 1. |
 | `apipoort.test.js` | 9 | gezakt op `===->!==#0` | De API-poort (kern/command/apipoort.js): sleutels, scopes, quota en contractregels voor koppelingen. WAT DEZE TOETS VOORAL BEWAAKT zijn vier dingen die allemaal onzichtbaar kapot kunnen gaan: 1. |
@@ -179,8 +179,8 @@ toets omvalt.
 | `bedrijfsintake.test.js` | 1 | gezakt op `liegpoort /api/` | Golf 6: de ondernemersintake en de automatische bedrijfsprovisioning. Getoetst: de aanvraag draagt de bedrijfsbehoeften; zonder menselijk akkoord gebeurt er niets; na akkoord + eerste termijn voldaan staat de zaak er... |
 | `bedrijfsmaat-stand.test.js` | 9 | gezakt op `liegpoort /api/` | DE STAND VAN DE BEDRIJFSMATEN tegen een echte server (POST /api/office/bedrijfsmaat; server/kern/bedrijfsmaat/stand.js). Wat hier vastligt: 1. |
 | `bedrijfsmaat.test.js` | 9 | gezakt op `===->!==#0` | HET BEDRIJFSMAATREGISTER EN ZIJN MEETER (server/kern/bedrijfsmaat/, scripts/bedrijfsmaat.js, BEDRIJFSMAAT.json). Wat hier vastligt: 1. |
-| `bedrijfsmaatbewijs.test.js` | 4 | -- | BEWIJS BIJ VIER BEDRIJFSMATEN -- groei.leden-per-pas, acquisitie.via-werkgever, campagnes.rtf-werving en geo.rtf-steden (AUTONOMIE.md par. 1: een maat bestaat pas als zijn antwoord zegt hoe hard het is en wanneer het... |
-| `bedrijfsmaatgroei.test.js` | 5 | -- | DRIE MATEN UIT DE BESLUITEN VAN 29 SEPTEMBER 2026 -- server/kern/bedrijfsmaat/ stand-groei.js: zaken per genre (C17), contract verlengd (C18) en transactievolume (C19). Zes beweringen, en alle zes kunnen ze zakken: 1. |
+| `bedrijfsmaatbewijs.test.js` | 4 | gezakt op `liegpoort /api/` | BEWIJS BIJ VIER BEDRIJFSMATEN -- groei.leden-per-pas, acquisitie.via-werkgever, campagnes.rtf-werving en geo.rtf-steden (AUTONOMIE.md par. 1: een maat bestaat pas als zijn antwoord zegt hoe hard het is en wanneer het... |
+| `bedrijfsmaatgroei.test.js` | 5 | gezakt op `liegpoort /api/` | DRIE MATEN UIT DE BESLUITEN VAN 29 SEPTEMBER 2026 -- server/kern/bedrijfsmaat/ stand-groei.js: zaken per genre (C17), contract verlengd (C18) en transactievolume (C19). Zes beweringen, en alle zes kunnen ze zakken: 1. |
 | `bedrijfsmaattoelating.test.js` | 7 | gezakt op `liegpoort /api/` | DRIE MATEN UIT DE BESLUITEN VAN 30 SEPTEMBER 2026 -- server/kern/bedrijfsmaat/ stand-toelating.js: toelating van zaken (C20), contract geeindigd (C21) en de btw van RTG zelf (C22). Zes beweringen, en alle zes kunnen... |
 | `bedrijfuitgave-mix.test.js` | 3 | gezakt op `liegpoort /api/` | RTG Werk OS: de uitgave met de STRENGSTE VAN TWEE TEKENGRENZEN en de BETAALWIJZE die de werkruimte kiest (AUTHORITY.md par. 5e, vervolg). |
 | `bedrijfuitgave.test.js` | 5 | gezakt op `liegpoort /api/` | RTG Werk OS: de UITGAVE, de tekengrens en functiescheiding (AUTHORITY.md fase 5, par. 5j). |
@@ -199,7 +199,7 @@ toets omvalt.
 | `beleidsmotor-werkwoorden.test.js` | 4 | gezakt op `liegpoort /api/` | DE BOARDROOM ALS WERKRUIMTE, DE KAMERS APART (AUTHORITY.md fase 4, schaduw). Vier dingen die niet mogen sneuvelen: 1. |
 | `beleidsmotor.test.js` | 7 | gezakt op `liegpoort /api/` | DE BELEIDSMOTOR IN DE SCHADUW (AUTHORITY.md fase 1, besluiten A1 en A3). Vier dingen die niet mogen sneuvelen: 1. |
 | `belofte.test.js` | 4 | gezakt op `!==->===#0` | Het belofteregister (scripts/belofte.js + BELOFTE.json): elke toezegging draagt haar dekking, en die dekking moet er echt zijn. Deze toets bewijst dat de meter de drie standen goed uit elkaar houdt -- en vooral dat... |
-| `beproeving-ci-bewijs.test.js` | 8 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `beproeving-ci-bewijs.test.js` | 8 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `beproeving-contract.test.js` | 3 | gezakt op `+->-#2` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `bereikbaar.test.js` | 2 | geen module gevonden | ELK SCHERM MOET TE BEREIKEN ZIJN DOOR TE TIKKEN. Geen aannames. |
 | `berichten.test.js` | 10 | gezakt op `liegpoort /api/` | De Berichten-app (routes/member/berichten.js): alle gesprekken van het platform op een plek -- Rahul, de Berichtenbox van MijnOverheid en de Pulse-reacties (de vrienden-DM's en werk-chats liften op dezelfde lijst mee). |
@@ -207,12 +207,12 @@ toets omvalt.
 | `beschermd.test.js` | 4 | gezakt op `liegpoort /api/` | Integratietests voor de kinderbescherming in de vriendenlaag: profielen van 15 of jonger (groepen mini/kind/tiener, of rol kind) zijn onvindbaar en onbenaderbaar; alleen een ouder/verzorger voegt contacten voor hen toe. |
 | `beschermstand.test.js` | 6 | gezakt op `===->!==#0` | DE VEILIGE NOODSTAND -- de stand die BESCHERMT in plaats van uitzet. BESTUUR.md grens 6.10: "Een noodknop die alles platlegt, wordt niet gebruikt." De incidentcontrole kende drie standen en alle drie zetten iets UIT. |
 | `beschermzaak.test.js` | 18 | gezakt op `liegpoort /api/` | DE BESCHERMZAAK: EEN ANDERE DATAKLASSE, EN DE GRENDELS DIE DAT WAARMAKEN HDI.md par. 5.2 zegt dat veiligheidsgegevens een andere dataklasse zijn en geen gevoeliger veld. |
-| `beslisgeheugen.test.js` | 6 | -- | HET BESLISGEHEUGEN -- server/kern/beslisgeheugen.js (besluit C13). 1. |
+| `beslisgeheugen.test.js` | 6 | gezakt op `liegpoort /api/` | HET BESLISGEHEUGEN -- server/kern/beslisgeheugen.js (besluit C13). 1. |
 | `besluit.test.js` | 11 | gezakt op `!==->===#0` | DE BESLISVRAAG: een vraag, een antwoord, een vorm. Dit huis stelt "mag dit gebeuren" op tientallen plekken en beantwoordt hem elke keer anders. |
 | `bestand-binding.test.js` | 6 | gezakt op `+->-#1` | Opgeslagen bestanden zijn aan hun NAAM gebonden (server/kluis.js). De versleuteling beschermde al de inhoud van een bestand, maar zei niets over welk bestand het was. |
 | `bestanden.test.js` | 5 | gezakt op `liegpoort /api/` | RTG Bestanden: de kluis met mappen en quotum, versies, delen op codenaam, de prullenbak als zichtbare la en de stukken-upload voor grote bestanden. |
 | `bestemming.test.js` | 5 | gezakt op `===->!==#0` | BEREIKBAAR OP DE BEDOELDE BESTEMMING -- de pure kern (scripts/lib/bestemming.js). Vier rijen stonden op BEWEZEN terwijl een lid naar een kantoorscherm werd doorgestuurd. |
-| `betaal-providerbewijs.test.js` | 6 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `betaal-providerbewijs.test.js` | 6 | gezakt op `&&->||#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `betaaldienst.test.js` | 5 | gezakt op `liegpoort /api/` | De betaaldienstkosten gaan DIRECT naar de ondernemer: per kassabetaling meteen verrekend op de partnerrekening (eigen grootboekregel), transparant op de bon en in het partneroverzicht -- geen verzamelfactuur... |
 | `betaaldienstfee.test.js` | 14 | gezakt op `===->!==#0` | DE BETAALDIENSTVERGOEDING: verschuldigd is iets anders dan geboekt. In kern/pay/kassa.js stond: if (kb.error) kosten = 0; Mislukte de kostenboeking, dan werden de kosten NUL -- in de teruggave aan de kassa en dus op... |
 | `betaalopdracht.test.js` | 26 | gezakt op `true->false#0` | De betaalopdracht (kern/betaalopdracht/): het verschil tussen "geboekt" en "echt weg". Getest met een NEPRAIL die we naar believen laten mislukken, want dat is precies het geval dat er in productie niet uit te lokken... |
@@ -286,7 +286,7 @@ toets omvalt.
 | `bureau.test.js` | 39 | gezakt op `liegpoort /api/` | Integratietests voor Het Privekantoor: de ENE app van de Lifestyle Pass. Wat hier bewezen wordt, en waarom juist dit: de poort een RTG-pas komt er niet in, op geen enkele route de projectie de Life Graph LEEST de... |
 | `ca.test.js` | 4 | gezakt op `===->!==` | Bewijst onze eigen interne CA (server/lib/ca.js): een root-CA die als CA geldt, server- en client-certificaten uitgeeft die via ONS CA-cert vertrouwd worden (niet via rejectUnauthorized:false),... |
 | `cache.test.js` | 6 | gezakt op `===->!==` | De eigen in-memory cache (server/lib/cache.js): TTL-verval, LRU-uitzetting, treffer/misser-telling, en de response-cache-middleware die een publiek JSON- antwoord memoiseert (miss -> hit) en een niet-200 juist NIET... |
-| `cadeaubon.test.js` | 5 | -- | DE CADEAUBON VAN RTG -- server/kern/cadeaubon.js en het vermogen RTG_CADEAUBON in server/kern/bevoegdheid/lijst-afhankelijk.js (besluit C14). Een bon die RTG verkoopt en die ook bij de zaken te besteden is, is... |
+| `cadeaubon.test.js` | 5 | gezakt op `liegpoort /api/` | DE CADEAUBON VAN RTG -- server/kern/cadeaubon.js en het vermogen RTG_CADEAUBON in server/kern/bevoegdheid/lijst-afhankelijk.js (besluit C14). Een bon die RTG verkoopt en die ook bij de zaken te besteden is, is... |
 | `canary.test.js` | 11 | gezakt op `===->!==#0` | De canary (kern/command/canary.js) en de verdeling die erbij hoort (inCanary in server/functies/toegang.js). WAT DEZE TOETS VOORAL BEWAAKT zijn drie dingen die allemaal stil kunnen omslaan en waarvan je het pas merkt... |
 | `canvas.test.js` | 12 | geen module gevonden | THE COMMAND CANVAS: de regels uit CANVAS.md, machinaal gehandhaafd. CANVAS.md beschrijft een opbouw, geen smaak, en precies twee regels daarvan zijn hard genoeg om te meten. |
 | `capabilities.test.js` | 9 | gezakt op `===->!==#0` | DE CAPABILITY-METING -- en of hij werkelijk iets onderscheidt. scripts/capabilities.js beantwoordt de vraag uit OS.md par. |
@@ -310,9 +310,9 @@ toets omvalt.
 | `clubs.test.js` | 8 | gezakt op `liegpoort /api/` | RTG Clubs: de golf- en countryclub (Sa Roca) en de sport- en fitnessclub (Fortia). Bewaakt de tee sheet zonder dubbele flights, de lessen van de pro's, de maandbeker met vol-is-vol, de baanstatus, de ledenpas met... |
 | `codecredentials-kortecode.test.js` | 3 | gezakt op `return-weg#0` | Een van de TWEE wegen onder de 128 bit in CODECREDENTIALS.json: een verklaarde korte menscode (`beleid.korte_menscode`), voor een code die een mens voorleest. De andere is `korte_code` van de bezorgcode... |
 | `codecredentials.test.js` | 19 | gezakt op `return-weg#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `codedeuren-claim.pg.test.js` | 1 | -- | Echte productie-topologieproef voor vier codedeuren die op 27 september 2026 van `remaining` naar `migrated` gingen: workos.concern_uitnodiging, office.kantooruitnodiging, service.balie_bevestigingscode en... |
+| `codedeuren-claim.pg.test.js` | 1 | slaat zichzelf over | Echte productie-topologieproef voor vier codedeuren die op 27 september 2026 van `remaining` naar `migrated` gingen: workos.concern_uitnodiging, office.kantooruitnodiging, service.balie_bevestigingscode en... |
 | `codegrens.test.js` | 3 | geen bruikbare mutatie | CODE-AI-001 -- DE RUNTIME-AI KOMT NOOIT AAN DE BRON. Dit huis heeft vandaag twee gescheiden intelligenties, en die scheiding is waardevoller dan hij eruitziet: RUNTIME het stuur (kern/stuur/*) bestuurt RTG via... |
-| `codeql-verdict.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `codeql-verdict.test.js` | 3 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `codewereld.test.js` | 7 | geen module gevonden | DE CODEWERELD TELT INDEXEN NIET ALS GEDRAG. Twee keer op rij sprong hier een dekkingsgetal omhoog zonder dat er iets bij was gekomen: eerst bij SYMBOLEN.json (bronbereik 33% -> 100%) en daarna bij AANROEPGRAAF.json... |
 | `collectie-transactie-sqlite.test.js` | 1 | gezakt op `===->!==#0` | De collectie-transactie tegen twee ECHTE processen op dezelfde SQLite-WAL. Eén verwachte revisie mag precies één keer winnen; een gooiende callback mag geen gewijzigde RAM- of schijfstaat achterlaten. |
 | `collega-namen.test.js` | 4 | gezakt op `liegpoort /api/` | De namenregel op de werkvloer: COLLEGA'S zien elkaar overal met de echte naam: het eigen rooster en team, het personeelsnetwerk tussen zaken van elk genre, en de ketenchat van de hulpdiensten. KLANTEN blijven op... |
@@ -454,7 +454,7 @@ toets omvalt.
 | `effectmeter.test.js` | 12 | gezakt op `false->true#0` | DE EFFECTMETER: heeft dit verzoek werkelijk iets aangeraakt? De staatmeter (server/staatlog.js) kijkt naar de collecties in de database en ziet daarom een mail niet, een sms niet en een schrijfactie buiten die... |
 | `eigen-website.test.js` | 6 | gezakt op `liegpoort /api/` | DE EIGEN WEBSITE VAN EEN LID -- 5 endpoints van de Website-maker. Deze vijf wees de waargenomen dekkingsmeting aan als nooit aangeroepen: site/haal, site/publiceer, site/offline, site/fotos en site/foto-weg. |
 | `eigenaar-aanmaken.test.js` | 10 | gezakt op `liegpoort /api/` | scripts/eigenaar-aanmaken.js: maakt het script het eigenaarsaccount, en gaat de kantoordeur daar werkelijk van open? DE TWEEDE HELFT IS HET PUNT. |
-| `eigenaar-postgres-bewijs.test.js` | 2 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `eigenaar-postgres-bewijs.test.js` | 2 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `eigenaar-wedloop.test.js` | 1 | gezakt op `&&->||#0` | TWEE SERVERS DIE TEGELIJK OPKOMEN OP DEZELFDE DATABASE. In de vloot (server/vloot.js) draait elke groep als eigen proces, maar ze delen een database. |
 | `eigenaar.test.js` | 4 | gezakt op `liegpoort /api/` | De eigenaar (Roellie) heeft overal toegang tot de BEHEER-omgevingen met zijn eigen accountlogin, maar de juridische grenzen (kinderdata, privé tussen personen, ruwe identiteitsbewijzen, platte wachtwoorden) blijven... |
 | `eigenaarbevestiging.test.js` | 15 | gezakt op `liegpoort /api/` | DE ZWARE POORT: vraagt een eigenaarshandeling opnieuw om de passkey? Dit bestand bestaat omdat de vorige twee niet genoeg zijn. |
@@ -471,7 +471,7 @@ toets omvalt.
 | `envelopvorm.test.js` | 14 | gezakt op `&&->||#0` | DE CANONIEKE ENVELOP (server/opzet/envelop.js). WAT HIER OP HET SPEL STAAT. |
 | `ervaring.test.js` | 9 | gezakt op `liegpoort /api/` | End-to-end tests voor de ervaring-laag (kern/ervaring.js): tafelreserveringen, annuleren, reviews, favorieten, fooi, de reisagenda, rekening splitsen, wachtlijsten, RTG-punten en meldingsvoorkeuren. Tegen een echte... |
 | `eten-kortingscode-routes.test.js` | 3 | gezakt op `liegpoort /api/` | De promotiecode van RTG Eten tegen een ECHTE server (eten.kortingscode): de zaak slaat hem op met een vervaldatum, een maximum en een grens per lid; de controlesheet toont waarom een code niet geldt; bestellen telt... |
-| `eten-kortingscode.pg.test.js` | 1 | -- | Echte productie-topologieproef voor eten.kortingscode (de promotiecode). Twee onafhankelijke kerninstances delen de `etenKortingGebruik`-rij in PostgreSQL. |
+| `eten-kortingscode.pg.test.js` | 1 | slaat zichzelf over | Echte productie-topologieproef voor eten.kortingscode (de promotiecode). Twee onafhankelijke kerninstances delen de `etenKortingGebruik`-rij in PostgreSQL. |
 | `eten-kortingscode.test.js` | 3 | gezakt op `===->!==#0` | De kortingscode van RTG Eten (eten.kortingscode) als PROMOTIECODE: geen geheim (besluit B13), maar wel vier grenzen in code -- een vervaldatum, een maximum over alle leden, een grens per lid en (in de routes) een rem... |
 | `eten-uitgaan-voorzijde.test.js` | 4 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `eten.test.js` | 4 | gezakt op `getal+1#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -482,16 +482,16 @@ toets omvalt.
 | `evidence-engine.test.js` | 19 | gezakt op `getal+1#4` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `excursie.test.js` | 2 | gezakt op `liegpoort /api/` | DE EXCURSIE -- waar kinderen zijn, en wie dat mag weten. WAAROM DIT DE ZWAARSTE VAN DE SCHOOL IS Van alle 199 school- en RTF-routes zonder toets is dit de enige waar het over de LOCATIE VAN EEN KIND gaat. |
 | `executionmap.test.js` | 12 | al rood | DE CAPABILITY-COMPILER (scripts/executionmap.js, EXECUTIE.md blok 1). EXECUTION_MAP.json is een PROJECTIE en geen bron. |
-| `experience-broker-evidence.test.js` | 2 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `experience-dinner.test.js` | 5 | -- | Werkelijke HTTP-keten, zonder betaal-, AI- of pushprovider. De agenda leest de reserveringsbron; bevestigd blijft een besluit van de juiste zaak. |
-| `experience-intent.test.js` | 8 | -- | Tijdelijke bedoeling blijft gescheiden per sessie en doel. Intrekken, afronden en verlopen verwijderen de inhoud, zonder stil te herleven. |
+| `experience-broker-evidence.test.js` | 2 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `experience-dinner.test.js` | 5 | gezakt op `===->!==#0` | Werkelijke HTTP-keten, zonder betaal-, AI- of pushprovider. De agenda leest de reserveringsbron; bevestigd blijft een besluit van de juiste zaak. |
+| `experience-intent.test.js` | 8 | gezakt op `true->false#0` | Tijdelijke bedoeling blijft gescheiden per sessie en doel. Intrekken, afronden en verlopen verwijderen de inhoud, zonder stil te herleven. |
 | `experience-network-http.test.js` | 3 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `experience-network-scale.test.js` | 2 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `experience-network.test.js` | 12 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `experience-platform.e2e.test.js` | 3 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `experience-platform.test.js` | 12 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `experience-rtg.test.js` | 4 | gezakt op `true->false#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `experience-travel.test.js` | 4 | -- | Travel-bewijs leest de echte aanvraag, het adviseursbesluit en de projectie. Een ledenlogin geeft nooit de bevoegdheid van een reisadviseur mee. |
+| `experience-travel.test.js` | 4 | gezakt op `!==->===#0` | Travel-bewijs leest de echte aanvraag, het adviseursbesluit en de projectie. Een ledenlogin geeft nooit de bevoegdheid van een reisadviseur mee. |
 | `extern-afrekenen.test.js` | 4 | gezakt op `liegpoort /api/` | EXTERN AFREKENEN TERWIJL RTG-BETALEN UIT STAAT. Besluit van de eigenaar (27 september 2026, RELEASEKANDIDAAT.md B2b): zonder kaartrail rekent een zaak af zoals elke zaak dat doet -- contant, met de pin van haar eigen... |
 | `extern-bewijs.test.js` | 14 | gezakt op `===->!==#0` | DE BEWIJSVERSLAGEN VOOR HET EXTERNE DOSSIER (scripts/extern-bewijs.js). Wat hier beproefd wordt is het OORDEEL van elk verslag, niet de host: een verslag mag alleen PASS zeggen als het de proef werkelijk zag slagen,... |
 | `faalproefklasse.test.js` | 5 | gezakt op `!==->===#0` | KLAARZETTEN IS GEEN SCHRIJVEN -- de klassering van de faalproef. WAAROM DEZE TOETS BESTAAT. |
@@ -540,7 +540,7 @@ toets omvalt.
 | `foundation-hulp-zorg.test.js` | 4 | geen module gevonden | De Hulp & Zorg-voorzijde mag warm en persoonlijk ogen, maar nooit een zorgverlener, dossier of toestemming verzinnen. Deze toets bewaakt de drie getekende schermen en hun echte databronnen. |
 | `foundation-leren-groei.test.js` | 5 | geen module gevonden | Leren & Groei toont de bestaande leerroute in de drie goedgekeurde schermen. De toets bewaakt dat vorm nooit wordt verward met bewijs. |
 | `foundation-lescredential-server.test.js` | 3 | gezakt op `liegpoort /api/` | De lescredentials van RTFoundation-onderwijs tegen een ECHTE server (B17): elke nieuwe route krijgt hier een treffer, met de montage, de deur en de generieke antwoordcaches ervoor. Zie... |
-| `foundation-lescredential.pg.test.js` | 1 | -- | Echte productie-topologieproef voor de lescredentials van RTFoundation- onderwijs (B17, CODECREDENTIALS.json foundation.onderwijs_les_tokens). Twee onafhankelijke instances delen dezelfde PostgreSQL. |
+| `foundation-lescredential.pg.test.js` | 1 | slaat zichzelf over | Echte productie-topologieproef voor de lescredentials van RTFoundation- onderwijs (B17, CODECREDENTIALS.json foundation.onderwijs_les_tokens). Twee onafhankelijke instances delen dezelfde PostgreSQL. |
 | `foundation-lescredential.test.js` | 9 | gezakt op `!==->===#0` | De lescredentials van RTFoundation-onderwijs (B17, CODECREDENTIALS.json foundation.onderwijs_les_tokens) op moduleniveau: vorm, hash-only, verval, de claim met zijn plafond, intrekken en roteren, en dat een kind geen... |
 | `foundation-lesrem.test.js` | 3 | gezakt op `liegpoort /api/` | DE LES-MAAKROUTE HEEFT DE REM DIE HAAR REDEN BELOOFDE. WAT ER MIS WAS. |
 | `foundation-markt.test.js` | 5 | gezakt op `liegpoort /api/` | DE MARKTPLAATS VAN DE FOUNDATION -- 4 endpoints. detail, verwijder, chat en blokkeer stonden als nooit aangeroepen in de waargenomen dekkingsmeting. |
@@ -641,10 +641,10 @@ toets omvalt.
 | `gezinsagenda-motor.test.js` | 6 | gezakt op `===->!==#0` | De gezinsagenda is geen tweede agenda meer (SCHERMEIGENAAR.json, consolidatieronde van 23 september 2026): hij schrijft en leest via dezelfde motor als de ledenagenda, onder de sleutel gezin:<code>. Deze toets draait... |
 | `gezinskeuken.test.js` | 5 | gezakt op `liegpoort /api/` | Integratietests voor de Gezinskeuken (RTFoundation-gezin): het weekmenu (wat eten we, wie kookt), de "verras me"-ideeen, en de gedeelde boodschappenlijst waar iedereen op afvinkt. Gedeeld per gezin, dicht voor gasten... |
 | `gezinsregistratie.test.js` | 5 | gezakt op `liegpoort /api/` | De snelle gezinsdeur: code + eigen PIN zonder namenlek, kinderen onder de beheerder en volwassenen alleen via een persoonlijke eenmalige sleutel. |
-| `gezinssessie.test.js` | 4 | -- | Het gezinsprofieltoken op een ECHTE server (foundation.family_profile_token_ buiten_harde_poort, B17): elke uitgifte een nieuwe 128-bit sessie, roteren en afmelden door de houder, de beheerder die een profiel of het... |
-| `gezinstoken.test.js` | 9 | -- | Het gezinsprofieltoken (foundation.family_profile_token_buiten_harde_poort, B17), control voor control: 128 bits en eenmaal kaal, hash-only, issuer/doel/ scope/onderwerp zonder persoonsgegevens, vervaltijd, het... |
+| `gezinssessie.test.js` | 4 | gezakt op `liegpoort /api/` | Het gezinsprofieltoken op een ECHTE server (foundation.family_profile_token_ buiten_harde_poort, B17): elke uitgifte een nieuwe 128-bit sessie, roteren en afmelden door de houder, de beheerder die een profiel of het... |
+| `gezinstoken.test.js` | 9 | gezakt op `true->false#0` | Het gezinsprofieltoken (foundation.family_profile_token_buiten_harde_poort, B17), control voor control: 128 bits en eenmaal kaal, hash-only, issuer/doel/ scope/onderwerp zonder persoonsgegevens, vervaltijd, het... |
 | `gezinsuitnodiging-verval.test.js` | 2 | gezakt op `liegpoort /api/` | VERVALT EEN GEZINSUITNODIGING ECHT? `server/foundation/gezinsuitnodiging.js` belooft het in zijn kop -- "de sleutel verloopt na 48 uur" -- en de code doet het ook: `DUUR`, `verloop()` en `verlopen()` staan er, en... |
-| `gezinsuitnodiging.pg.test.js` | 1 | -- | Echte productie-topologieproef voor de gezinsuitnodiging (B17, foundation.family_profile_token_buiten_harde_poort): twee onafhankelijke instances delen dezelfde PostgreSQL en wisselen TEGELIJK dezelfde eenmalige... |
+| `gezinsuitnodiging.pg.test.js` | 1 | slaat zichzelf over | Echte productie-topologieproef voor de gezinsuitnodiging (B17, foundation.family_profile_token_buiten_harde_poort): twee onafhankelijke instances delen dezelfde PostgreSQL en wisselen TEGELIJK dezelfde eenmalige... |
 | `gezinzorg.test.js` | 4 | gezakt op `liegpoort /api/` | HET GEZIN: DE GEVOELIGE KANT. Dit zijn de scherpste routes van het hele huis, en ze hadden geen van drieen een eigen toets: 1. |
 | `gezondheid.test.js` | 6 | gezakt op `liegpoort /api/` | Integratietests voor het Gezondheidsmaatje (RTFoundation-gezin): medicijnen met afvink-per-dag, medische afspraken (aankomend), de groeicurve, en de allergiekaart die uit het zorgprofiel (oppasinfo) komt. Medische... |
 | `gezondheidskaart.test.js` | 14 | gezakt op `===->!==#0` | DE GEZONDHEIDSKAART: veertien beweringen, en ze gaan allemaal over de manier waarop zo'n scherm normaal gesproken onwaar wordt. Dertien staan hieronder genummerd; de veertiende is de tegenhanger van de eerste, want... |
@@ -718,11 +718,11 @@ toets omvalt.
 | `horeca-werklijst-modus.test.js` | 2 | geen module gevonden | DE WERKLIJST VIEL OM ZONDER MODUS, EN WERKTE MET ROMMEL. In server/kern/horeca/werklijst.js stond: const modus = MODI[String((opties && opties.modus) \|\| 'alles')] ? |
 | `horeca-werklijst.test.js` | 7 | gezakt op `getal+1#4` | RTG Horeca: DE WERKLIJST -- wat is mijn eerstvolgende handeling? De rekensom achter PDA SERVICE. |
 | `horeca-wijk.test.js` | 20 | gezakt op `liegpoort /api/` | RTG Horeca: DE WIJK -- welke tafels zijn van wie. De werklijst toonde de hele zaak, en dat stond er ook bij: een sectie-indeling bestond nergens, dus deed het scherm niet alsof. |
-| `horecabon-credential.pg.test.js` | 1 | genoemd | Echte productie-topologieproef voor horeca.bon_en_polsbandsaldo. Twee onafhankelijke kerninstances delen de autoritatieve `horecaBonnen`-rij in PostgreSQL. |
+| `horecabon-credential.pg.test.js` | 1 | slaat zichzelf over | Echte productie-topologieproef voor horeca.bon_en_polsbandsaldo. Twee onafhankelijke kerninstances delen de autoritatieve `horecaBonnen`-rij in PostgreSQL. |
 | `horecabon-credential.test.js` | 9 | gezakt op `===->!==#0` | De horecabon en het polsbandsaldo (horeca.bon_en_polsbandsaldo), control voor control: 128 bits en de kale code eenmaal, hash-only, issuer/doel/ scope, vervaldatum, max_gebruik (bon 100, band 10000 naast het saldo),... |
 | `horecabon-routes.test.js` | 5 | gezakt op `liegpoort /api/` | De horecabon en de polsband tegen een ECHTE server (horeca.bon_en_polsbandsaldo): de code eenmaal en no-store, intrekken en roteren (roteren alleen de manager), de kassa die op code of op ID afboekt, de polsband, en... |
 | `horlogewerk.test.js` | 11 | gezakt op `!==->===` | Het RTG-uurwerk (public/shared/horlogewerk.js): de pure, wiskundig kloppende mechaniek van het RTG-horloge. Deze toets bewijst de foutmarge 0,0 -- de perioden, de frequentie en de wijzerhoeken moeten tot op de bit... |
-| `hospitality-providerbewijs.test.js` | 9 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `hospitality-providerbewijs.test.js` | 9 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `hospitality-universe.test.js` | 5 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `housekeeping.test.js` | 6 | gezakt op `liegpoort /api/` | De housekeeper-flow: kamerstatus in een tik per stap, en de nieuwe vrijgave voor vroege check-in (de overschot-techniek voor het hotel): alleen een schone kamer kan vrij, en elke andere status haalt de vrijgave... |
 | `hrplus.test.js` | 2 | gezakt op `liegpoort /api/` | HR-plus (server): de volle HR-kamer van elke zaak. Getoetst: het manager-overzicht (dienstjaren, verloopbewaking), de inwerk-keten (starten, vinken, eigen stap, dubbel starten geweigerd), groeigesprekken en... |
@@ -918,7 +918,7 @@ toets omvalt.
 | `lifestyle.test.js` | 7 | gezakt op `liegpoort /api/` | Integratietests voor De Rechterhand: de premium Lifestyle Pass-suite. Het Concierge-bureau (verzoeken + voorkeuren), het Bezittingenregister met attentiepunten, en Gezondheid & welzijn (afspraken + prive-dossier). |
 | `lijfsleutels.test.js` | 15 | gezakt op `getal+1#0` | DE LIJFSLEUTEL -- EEN SLEUTEL DIE IN HET LICHAAM REIST. WAAROM ER EEN TWEEDE BEGRIP NAAST `rol` STAAT. |
 | `link.test.js` | 24 | gezakt op `liegpoort /api/` | RTG LINK (server/kern/link/, LINK.md) -- de adres- en capabilitylaag. Wat hier bewezen moet worden is niet dat een code te lezen valt (dat doet test/rtgcode.test.js), maar de vier beloftes waar de laag op staat: 1. |
-| `linkcap-credential.pg.test.js` | 1 | -- | Echte productie-topologieproef voor link.capability_aanvaarden (besluit B15). Twee onafhankelijke instances delen `linkCapToegang` in PostgreSQL. |
+| `linkcap-credential.pg.test.js` | 1 | slaat zichzelf over | Echte productie-topologieproef voor link.capability_aanvaarden (besluit B15). Twee onafhankelijke instances delen `linkCapToegang` in PostgreSQL. |
 | `linkcap-credential.test.js` | 7 | gezakt op `===->!==#0` | DE RTG LINK-DRAGER ALS CREDENTIAL (link.capability_aanvaarden, besluit B15): server/kern/link/cap-bak.js onder cap.js, cap-in.js en cap-beheer.js. Per control uit CODECREDENTIALS.json een toets: 128 bits, hash-only... |
 | `linkcap-productie.test.js` | 2 | gezakt op `liegpoort /api/` | DE RTG LINK-DRAGER OP EEN ECHTE SERVER (link.capability_aanvaarden, B15). 1. |
 | `linkcap.test.js` | 17 | gezakt op `liegpoort /api/` | RTG LINK, DE CAPABILITY (server/kern/link/cap.js, kern/link/handelingen.js en de eerste handeling in kern/pay/vraagcode.js). Zie LINK.md par. |
@@ -930,7 +930,7 @@ toets omvalt.
 | `live-kandidaat.test.js` | 10 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `livegang-pakket.test.js` | 6 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `livegang.test.js` | 3 | gezakt op `liegpoort /api/` | De livegang: in productie start het platform schoon en op slot. - geen demozaken in de catalogus, geen demopersoneel, geen voorbeeldposts - de demo-inlog is dicht (leden en zaken) - de rate-limiter staat aan |
-| `living-experience.test.js` | 7 | -- | De ervaringscompiler wijst kapotte bestemming, toestand, wereld en overdracht af. Ontbrekend, veranderd of overgeslagen bewijs kan nooit groen worden. |
+| `living-experience.test.js` | 7 | gezakt op `===->!==#0` | De ervaringscompiler wijst kapotte bestemming, toestand, wereld en overdracht af. Ontbrekend, veranderd of overgeslagen bewijs kan nooit groen worden. |
 | `living-world-http.test.js` | 2 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `living-world-sources.test.js` | 5 | gezakt op `true->false#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `living-world-sqlite.test.js` | 1 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -964,7 +964,7 @@ toets omvalt.
 | `magnaat-capabilities.test.js` | 7 | geen bruikbare mutatie | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `magnaat-controle.test.js` | 9 | gezakt op `!==->===#0` | Het RTG Controleregister: ieder gevonden codepunt heeft dezelfde veilige schakelaar, taakmotor en bestuursaudit, terwijl ontbrekend bronbewijs en ontbrekende echte gameplay zichtbaar rood blijven. |
 | `magnaat-economenlab.test.js` | 6 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `magnaat-economie-routes.test.js` | 2 | genoemd | De twee schrijvende economieroutes tegen de echte HTTP- en SQLite-keten. De losse economische toetsen gebruiken bewust gewone geheugenobjecten. |
+| `magnaat-economie-routes.test.js` | 2 | gezakt op `liegpoort /api/` | De twee schrijvende economieroutes tegen de echte HTTP- en SQLite-keten. De losse economische toetsen gebruiken bewust gewone geheugenobjecten. |
 | `magnaat-economie.test.js` | 11 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `magnaat-economische-motor.test.js` | 9 | gezakt op `===->!==#0` | De economische motor van Magnaat, losgemaakt uit het Oefenkantoor (ronde A1, MAGNAAT.md par. 7). |
 | `magnaat-grootboek.test.js` | 5 | gezakt op `===->!==#0` | Het Magnaat-grootboek (ronde A2.0, MAGNAAT.md): de boekhoudautoriteit als eigen laag onder de economische motor. Wat hier vastligt, en wat test/magnaat-economische-motor.test.js niet al doet: 1. |
@@ -1006,7 +1006,7 @@ toets omvalt.
 | `mailpost-kantoor.test.js` | 9 | gezakt op `liegpoort /api/` | DE DERTIEN LAATSTE MAILENDPOINTS ZONDER TOETS -- de kantoorkant, de IMAP-sleutels en de PDF-notities. Ze zijn samen genomen omdat ze samen de rest van de mailronde van vandaag vormen: alles wat erbij kwam en waar de... |
 | `mailpost.test.js` | 11 | gezakt op `liegpoort /api/` | De MAILINFRASTRUCTUUR: de verzendwachtrij en de buitenpoort. Vier beweringen, en ze gaan alle vier over wat er gebeurt als het MISGAAT -- want dat is waar een mailsysteem zich onderscheidt van een verzendknop: 1. |
 | `makers.test.js` | 9 | gezakt op `===->!==#0` | DE METING VAN DE MAKERS -- en of hij werkelijk iets onderscheidt. scripts/makers.js beantwoordt de vraag uit CREATE.md par. |
-| `mall-aanvraag-levensloop.test.js` | 6 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `mall-aanvraag-levensloop.test.js` | 6 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `mall-bestellingen.test.js` | 9 | gezakt op `liegpoort /api/` | Het bestellingenoverzicht van de RTG Mall: alles wat een lid lopen heeft, over vijf domeinen heen. Waar deze toetsen op mikken: 1. |
 | `mall-bewaard.test.js` | 11 | gezakt op `liegpoort /api/` | Bewaren in de RTG Mall, en wat er sinds het bewaren veranderde. De twee valkuilen waar deze toetsen op mikken: 1. |
 | `mall-collecties.test.js` | 12 | gezakt op `liegpoort /api/` | Samengesteld aanbod in de RTG Mall: collecties, bundels, evenementen en seizoenen -- vier soorten met een vorm. Waar deze toetsen op mikken, in volgorde van hoe duur de fout is: 1. |
@@ -1024,7 +1024,7 @@ toets omvalt.
 | `mandaatpoort.test.js` | 12 | gezakt op `===->!==#0` | DE MANDAATPOORT (server/kern/stuur/mandaatpoort.js). DE REGEL DIE HIJ BEWAAKT: geen muterend effect vanuit een intentie zonder aantoonbaar gezag. |
 | `mandaatproef.test.js` | 5 | gezakt op `&&->||#0` | DE MANDAATPROEF (scripts/mandaatproef.js). Bewaakt de VORM van de proef en niet zijn uitslag: die hoort te veranderen zodra een mandaat verleend kan worden. |
 | `marechaussee.test.js` | 5 | gezakt op `liegpoort /api/` | De Brigade RTG Airport (kern/marechaussee.js): de grensbalie op de echte luchthavendata (passagierslijst op codenaam, besluit per reiziger), patrouilles door de zones, incidenten en het grens-signaal in de cockpit. |
-| `margeperlid.test.js` | 6 | -- | DE MARGE PER LID -- server/kern/bedrijfsmaat/stand-marge.js (besluit C15). Zes beweringen, en alle zes kunnen ze zakken: 1. |
+| `margeperlid.test.js` | 6 | gezakt op `===->!==#0` | DE MARGE PER LID -- server/kern/bedrijfsmaat/stand-marge.js (besluit C15). Zes beweringen, en alle zes kunnen ze zakken: 1. |
 | `margeschaal.test.js` | 10 | gezakt op `!==->===#0` | DE RUIMTESCHAAL (ONTWERP.md 2b, TAKEN.md 4.51). Zeventien willekeurige margestappen zijn er vijf geworden, en drie daarvan stonden al in ONTWERP.md als de basisruimte van World, Pro en Command. |
 | `marina.test.js` | 7 | gezakt op `liegpoort /api/` | RTG Marina: het jachthaven-systeem (demo Marina Portell). Bewaakt de toewijzing van ligplaatsen aan passanten (eerste passende plaats, vol is vol), de bescherming van vaste liggers, de brandstofsteiger, service met... |
 | `markt-zaak.test.js` | 7 | gezakt op `liegpoort /api/` | DE MARKTPLAATS VANAF DE ZAAK -- 8 endpoints achter de leverancier-inlog. Deze acht wees de waargenomen dekkingsmeting aan als nooit aangeroepen: status, verwijder, antwoord, chat, deal/voorstel, deal/hier,... |
@@ -1110,7 +1110,7 @@ toets omvalt.
 | `mutatiecontract.test.js` | 30 | gezakt op `true->false#0` | HET MUTATIECONTRACTREGISTER -- de poort en de lat. Twee dingen worden hier afgedwongen, en ze zijn allebei een grens en geen gewoonte: 1. |
 | `mutatiedekking.test.js` | 7 | muteert zelf | DUN EN BEPROEFD ZIJN NIET HETZELFDE SOORT OVERLEVER (TAKEN.md 4.53). WAAROM DEZE TOETS ER IS. |
 | `mutatiesemantiek.test.js` | 10 | gezakt op `===->!==#0` | DE MUTATIESEMANTIEK OVER DE ROUTES -- en of de meter werkelijk uitslaat. Het besluit staat in CREATE.md par. |
-| `mutatietracker.test.js` | 6 | genoemd | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `mutatietracker.test.js` | 6 | gezakt op `false->true#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `mutatiewacht.test.js` | 9 | muteert zelf | DE OPRUIMWACHT VAN DE MUTATIEMOTOR: zet hij de bron ook terug bij een KILL? WAAR DIT UIT KOMT. |
 | `muziek-bestanden.test.js` | 6 | gezakt op `liegpoort /api/` | Echte muziek in RTG Sound: rauwe upload, privé-opslag, eigen bibliotheek en afspelen met byte-ranges via een korte luisterkaart. |
 | `muziek-lied.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Klankwerk: van een lus een LIED maken. Wat hier getoetst wordt is de belofte "echte liedjes zonder er eerst voor te studeren": er komt een VORM uit (intro, couplet, refrein), een ZANGLIJN met lettergrepen... |
@@ -1205,7 +1205,7 @@ toets omvalt.
 | `onderneming-zaakkant.test.js` | 6 | gezakt op `liegpoort /api/` | DE WERKVLOER KIJKT NAAR DE ONDERNEMING -- en vooral: wat zij daarbij NIET ziet. ONDERNEMEN.md par. |
 | `onderneming.test.js` | 22 | gezakt op `liegpoort /api/` | Ronde: het Ondernemers-OS -- de drie assen van één bedrijfsobject. 1. |
 | `ondertitels.test.js` | 7 | gezakt op `<=-><#0` | WAT EEN ONDERTITELREGEL IS, STAAT OP EEN PLEK -- en deze toets bewaakt dat. server/kern/ondertitels.js is vandaag ontstaan omdat het Theater hetzelfde ondertitelspoor kreeg als een clip. |
-| `onderweg-positie.test.js` | 7 | -- | ONDERWEG VERZINT GEEN POSITIE (NAVIGATIE.md par. 12, gebrek 11). |
+| `onderweg-positie.test.js` | 7 | gezakt op `liegpoort /api/` | ONDERWEG VERZINT GEEN POSITIE (NAVIGATIE.md par. 12, gebrek 11). |
 | `onderwijs.test.js` | 3 | gezakt op `liegpoort /api/` | RTG School golf 1: de officiële ladder, het leerpaspoort dat een leven lang meegaat, de doorstroomkaart die rare sprongen tegenhoudt, en de eerlijkheid (geen accreditatieclaims, geen echte namen in het dossier). |
 | `onderwijsstuur.test.js` | 3 | gezakt op `liegpoort /api/` | Golf 6 van de onderwijs-toren: Rahul kan de hele leerlaag bedienen via het stuur (een codepad: dezelfde routes, dezelfde inlog, dezelfde regels). "Schrijf me in op groep 3", "overhoor me", "vraag bijles" -- alles... |
 | `onderzoeker.test.js` | 4 | gezakt op `liegpoort /api/` | De Onderzoeker: de tweede AI van het RTG Kantoor. De RTG AI bouwt hem met zijn meelees-kennis als leerstof; daarna doet hij agentisch onderzoek (plan, bronnen, analyse, rapport) en adviseert hij alleen. |
@@ -1219,10 +1219,10 @@ toets omvalt.
 | `onvervreemdbaar.test.js` | 7 | gezakt op `===->!==#0` | DE UNIVERSELE BODEM -- de nulmeting, en vooral wat zij niet mag beweren. scripts/onvervreemdbaar.js vraagt voor SAMENLEVING.md SAM-01 of een werkwoord van de bodem (leren, ontwikkelen, orienteren, verbinden, rust,... |
 | `oog.test.js` | 4 | gezakt op `liegpoort /api/` | RTG Eye: de camerabril van de werkvloer. De visielaag draait op het toestel; de server bewaart compacte, gecodeerde regels: nulmetingen en schouwen per voertuig, aangeleerde spullen en het knoploze uitgifteregister... |
 | `openbare-bouwstand.test.js` | 12 | gezakt op `true->false#0` | De grendel op een OPENBARE installatie die in Magnaat Test draait. WAAR HIJ VANDAAN KOMT. |
-| `operationeel-aanvraag.test.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `operationeel-herstel.test.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `operationeel-meter.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `operationeel-productie.test.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `operationeel-aanvraag.test.js` | 1 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `operationeel-herstel.test.js` | 1 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `operationeel-meter.test.js` | 3 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `operationeel-productie.test.js` | 1 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `oplaadgat.test.js` | 4 | gezakt op `===->!==#0` | AFGESCHREVEN MOET BIJGESCHREVEN WORDEN. WAT ER MISGING. |
 | `opslag-voorcheck.test.js` | 12 | gezakt op `!==->===#0` | De goedkope voorcheck van de SQLite-opslag (server/db/sqlite.js). Verandering opsporen kostte een JSON.stringify van ELKE collectie bij ELKE save; op de echte store (164 collecties, 1,0 MB, waarvan `sessions` 780 KB)... |
 | `opslagblokkade.test.js` | 6 | gezakt op `true->false#0` | DE OPSLAGBLOKKADE: START DEZE PRODUCTIESTAND WEL OP EEN GROOTBOEK? WAAROM DEZE TOETS ER IS TAKEN 4.7 zegt dat de json- en geheugenstand geen transactiegrootboek hebben, en dat dat "klaar" is zodra die standen in... |
@@ -1254,7 +1254,7 @@ toets omvalt.
 | `partner.test.js` | 8 | gezakt op `liegpoort /api/` | Integratietests voor de PARTNER-app-flows (de leverancier-kant): - personeelslogin met PIN + rate-limiting (bescherming tegen raden) - restaurant/keuken (KDS): een order van nieuw naar klaar zetten - taxi: een rit... |
 | `partnerpas.test.js` | 9 | gezakt op `liegpoort /api/` | De toegangseis voor nieuwe partners: een partnerplek vraag je aan ALS LID, met een ZAKELIJKE pas. Het kantoor geeft ook alleen een code uit bij een aanvraag met ledenbewijs. |
 | `partnerpersoneelscode-register.test.js` | 6 | gezakt op `===->!==#0` | De personeelscode van het partnerkanaal zonder server (B14, partnerkanaal.personeels_en_partnercode): 128 bits, hash-only, onderwerp en doel, verval, een maximum aantal boekingen dat atomair wordt verbruikt, roteren... |
-| `partnerpersoneelscode.pg.test.js` | 1 | -- | Echte productie-topologieproef voor partnerkanaal.personeels_en_partnercode (B14). Twee onafhankelijke kerninstances delen de autoritatieve `partnerPersoneelscodes` in PostgreSQL. |
+| `partnerpersoneelscode.pg.test.js` | 1 | slaat zichzelf over | Echte productie-topologieproef voor partnerkanaal.personeels_en_partnercode (B14). Twee onafhankelijke kerninstances delen de autoritatieve `partnerPersoneelscodes` in PostgreSQL. |
 | `partnerpersoneelscode.test.js` | 4 | gezakt op `liegpoort /api/` | HET PARTNERKANAAL GESPLITST (besluit B14, partnerkanaal.personeels_en_partnercode), tegen een echte server. De partnercode is een openbare attributielink die niets opent; de personeelscode is een 128-bit credential... |
 | `partnertypes.test.js` | 3 | gezakt op `liegpoort /api/` | De twee leesingangen van de partneraanmelding: /api/partner/types (de kaart van wat RTG per bedrijfstype en land vraagt) en /api/partner/applications/mijn (de eigen aanvragen met hun toelatingsstand). Wat hier op het... |
 | `pas-apps.test.js` | 3 | gezakt op `liegpoort /api/` | Integratietests voor de eigen app per pas: inloggegevens werken echt alleen in de app van de eigen pas (pasApp). De gratis laag heeft geen eigen app en speelt mee in de RTG-app; de brede leden-app (zonder pasApp)... |
@@ -1297,7 +1297,7 @@ toets omvalt.
 | `perimeter-risico.test.js` | 3 | gezakt op `liegpoort /api/` | DE PERIMETER VAN DE RISICOVOLLE ENDPOINTS ZONDER EIGEN TOETS. NORM.json telt honderden endpoints die in geen enkel toetsbestand voorkomen. |
 | `persistentiestand.test.js` | 3 | geen module gevonden | DE PERSISTENTIESTAND (server/db/persistentieStand) -- het enige getal waarmee een aanroeper kan vaststellen dat zijn schrijfactie de SCHIJF heeft gehaald. WAAROM DIT ER LOS STAAT, en waarom de geldroute hem nog NIET... |
 | `personeelsuitnodiging-montage.test.js` | 2 | gezakt op `!==->===#0` | De personeelsuitnodiging (workos.personeelsuitnodiging) belooft een atomaire claim, en die bestaat alleen in een collectietransactie. Werving en supplier maakten elk een eigen instantie met alleen `kern`, en kern... |
-| `personeelsuitnodiging.pg.test.js` | 1 | -- | Echte productie-topologieproef voor workos.personeelsuitnodiging: twee onafhankelijke kerninstances delen dezelfde PostgreSQL en racen om dezelfde eenmalige personeelscode. Precies EEN lid krijgt een personeelsplek,... |
+| `personeelsuitnodiging.pg.test.js` | 1 | slaat zichzelf over | Echte productie-topologieproef voor workos.personeelsuitnodiging: twee onafhankelijke kerninstances delen dezelfde PostgreSQL en racen om dezelfde eenmalige personeelscode. Precies EEN lid krijgt een personeelsplek,... |
 | `persoonseis.test.js` | 10 | gezakt op `===->!==#0` | DE PERSOONSEIS: DE ZAAK WERD GECONTROLEERD, DE MENS NIET. WAAROM DIT BESTAAT Acht genres hielden de ZAAK tegen tot een medewerker een vergunning had gezien (kern/aanmeldingen/bewijs.js). |
 | `persoonsroutes.test.js` | 5 | gezakt op `!==->===#0` | De persoonsroutes: deuren die een medewerker vragen en niet een bedrijf. |
 | `pestgrens.test.js` | 4 | gezakt op `===->!==#0` | De pestgrens van Rahul: drie waarschuwingen bij pesten, daarna een vurig slotantwoord (waarin hij zegt dat hij hier zelf geen behoefte aan had) en 24 uur weg; na die 24 uur opent alleen een oprecht excuus de deur, en... |
@@ -1329,7 +1329,7 @@ toets omvalt.
 | `poortwacht.test.js` | 3 | gezakt op `===->!==#0` | De poortwacht-bevindingen, vastgelegd zodat ze niet terugkruipen. scripts/poortwacht.js klopt anoniem aan bij alle 2496 geregistreerde API-routes. |
 | `portemonnee.test.js` | 5 | gezakt op `liegpoort /api/` | DE PORTEMONNEE EN DE POST -- geld tussen mensen, en wat erover geschreven wordt. WAAROM DIT ER IS RTG Pay raakt het meest gevoelige dat een app kan doen: het saldo van een mens verplaatsen. |
 | `positieproef.test.js` | 5 | gezakt op `===->!==#0` | POSITIEPROEF (NAVIGATIE.md par. 6.6, A0c) -- de opslaghelft van de meter. |
-| `positiestroom.test.js` | 11 | genoemd | POSITIESTROOM -- meet hij wat hij zegt te meten, en kan hij zakken? De meter is de bron-helft van de grondwetmeter uit NAVIGATIE.md par. |
+| `positiestroom.test.js` | 11 | gezakt op `true->false#0` | POSITIESTROOM -- meet hij wat hij zegt te meten, en kan hij zakken? De meter is de bron-helft van de grondwetmeter uit NAVIGATIE.md par. |
 | `postdatum.test.js` | 13 | gezakt op `liegpoort /api/` | Postdatums: de datums die in uw eigen post staan, als VOORSTEL. Wat hier bewezen wordt, en waarom juist dit: de lezer drie vormen herkend, en de twijfelgevallen NIET geraden -- "03/04/2026" wordt overgeslagen met de... |
 | `postgres-requestcommit.pg.test.js` | 1 | slaat zichzelf over | Echte PostgreSQL failure-injection: een backend wordt gedood terwijl de request op zijn eerste collectieslot wacht. Er mag geen 200 en geen halve collectiecommit ontstaan; een tweede app-instance kan daarna exact... |
 | `postgres-requestcommit.test.js` | 17 | gezakt op `&&->||#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -1337,8 +1337,8 @@ toets omvalt.
 | `pragmavolgorde.test.js` | 2 | gezakt op `===->!==#0` | DE OMSCHAKELING NAAR WAL OP EEN BEZETTE DATABASE. `PRAGMA busy_timeout` zegt: kom je een bezet bestand tegen, wacht dan even in plaats van te weigeren. |
 | `praktijk-http.test.js` | 6 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `praktijk.test.js` | 6 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `presentatie-eigenaar.test.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `presentatie-gezinsbeelden.test.js` | 3 | -- | DE BEELDKEUZE VAN EEN GEZINSPROFIEL BLIJFT VAN DAT PROFIEL. routes/presentatie-gezinsbeelden.js (#413) laat een gekozen gezinsprofiel eigen foto's kiezen voor zijn schermen. |
+| `presentatie-eigenaar.test.js` | 1 | gezakt op `getal+1#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `presentatie-gezinsbeelden.test.js` | 3 | gezakt op `liegpoort /api/` | DE BEELDKEUZE VAN EEN GEZINSPROFIEL BLIJFT VAN DAT PROFIEL. routes/presentatie-gezinsbeelden.js (#413) laat een gekozen gezinsprofiel eigen foto's kiezen voor zijn schermen. |
 | `presentiemeting.test.js` | 4 | gezakt op `liegpoort /api/` | De presentiebelofte: een les staat binnen dertig seconden. Wat hier hard wordt gemaakt: - het scherm is UITZONDERINGSGESTUURD: iedereen staat op aanwezig en de leraar wijzigt alleen wie er niet is. |
 | `prijsmelding.test.js` | 10 | gezakt op `===->!==#0` | DE LEDENPRIJSGARANTIE: het plafond bestond, de rechtzetting niet. De garantie was voor de helft echt gebouwd -- de ledenprijs wordt server-side afgekapt op de publieke prijs (test/partner.test.js bewaakt dat). |
 | `productie-communicatie.test.js` | 8 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -1400,7 +1400,7 @@ toets omvalt.
 | `reisherkomst.test.js` | 19 | gezakt op `liegpoort /api/` | DE EERSTE VERTICALE SLICE VAN ECONOMIC PROVENANCE -- besluit van de eigenaar, 15 september 2026. De keten die hier wordt beproefd: reiscomponent -> herkomst -> commerciele geldgebeurtenis -> pay-geldrij -> economic... |
 | `reisoplosser.test.js` | 8 | gezakt op `liegpoort /api/` | DE OPLOSSER (kern/reisoplosser.js) -- REIZEN.md fase 5: "Los het op". De gevaarlijkste belofte van deze knop is dat hij dingen REGELT. |
 | `reisplan.test.js` | 9 | gezakt op `liegpoort /api/` | De multimodale reisplanner: taxi, OV en lopen naast elkaar, en een geboekte reis waarin ze samen EEN reis zijn. Draai los: node --test test/reisplan.test.js Wat deze toetsen bewaken: 1. |
-| `reisprogramma.test.js` | 5 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `reisprogramma.test.js` | 5 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `reisuitnodiging.test.js` | 12 | gezakt op `liegpoort /api/` | DE REISUITNODIGING (kern/reisuitnodiging.js): een klaargezette reis en een link. DRIE SCHAKELS: het kantoor zet een reis klaar voor iemand die nog geen lid is, die persoon wordt lid en neemt hem over, en hij nodigt... |
 | `reiswacht.test.js` | 10 | gezakt op `liegpoort /api/` | DE REISWACHT (kern/reiswacht.js) -- REIZEN.md fase 3. Dit is de gevaarlijkste functie van de reiswereld, en de toetsen gaan dan ook nauwelijks over wat de wacht ZIET -- ze gaan over wat hij TOEGEEFT: 1. |
 | `reiswereld.test.js` | 11 | gezakt op `===->!==#0` | RTG Reizen: de samenhanglaag over de reisdomeinen (PLATFORM.md, laag 2). Wat hier bewezen moet worden is niet "er komt een lijst uit" maar de twee dingen die een orkestratielaag kapot kunnen maken: 1. |
@@ -1412,7 +1412,7 @@ toets omvalt.
 | `release-bewijs.test.js` | 2 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `release-hardening.test.js` | 12 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `release-trust.test.js` | 8 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `release-workflow-bewijs.test.js` | 5 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `release-workflow-bewijs.test.js` | 5 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rem.test.js` | 6 | gezakt op `&&->||#0` | Test voor de eigen rate-limiter (server/rem.js): binnen het venster mag een sleutel tot `limit` verzoeken, daarboven springt de rem aan; sleutels tellen los; `skip` slaat over; een verlopen venster telt weer vanaf... |
 | `remduurzaam.test.js` | 5 | gezakt op `liegpoort /api/` | EEN REM DIE EEN MENS OVERHAALT, STAAT VAST VOORDAT HIJ BEVESTIGD WORDT. GELDLAT.md kreeg op 6 september 2026 een derde been in zijn reikwijdte. |
 | `rendezvous.test.js` | 32 | gezakt op `liegpoort /api/` | Integratietests voor Rendez-vous: de besloten AI-datingapp van de Lifestyle Pass. Twee leden zetten een profiel op, liken elkaar (wederzijds = match), en Rahul stelt een jetset-date voor op een gedeelde locatie. |
@@ -1422,7 +1422,7 @@ toets omvalt.
 | `residentie3.test.js` | 4 | gezakt op `liegpoort /api/` | De Residence, het paar en de directeur: samen "vast" wandelen (verzoek, volgen bij stap en kamerwissel, losmaken), koppel tegen koppel spelen (2 tegen 2 met teamstand) en Rahul, de directeur, die het vragenspel... |
 | `residentie4.test.js` | 3 | gezakt op `return-weg#0` | De vragenmotor van De Residence: ruim tienduizend verschillende vragen in zes genres, van superluchtig tot een traan tot zakelijk en door en door. Pure unit-test op de module zelf. |
 | `resolverbereik.test.js` | 6 | gezakt op `===->!==#0` | HET BEREIK VAN DE RESOLVER (scripts/resolverbereik.js). test/stuur-resolver-taal.test.js bewaakt de dekking op 27 met de hand geschreven zinnen. |
-| `restdeuren.pg.test.js` | 1 | -- | Twee kerninstances delen de collectie in PostgreSQL en racen per restdeur van B9 om dezelfde claim: er wint er een, en de database draagt alleen hashes. |
+| `restdeuren.pg.test.js` | 1 | slaat zichzelf over | Twee kerninstances delen de collectie in PostgreSQL en racen per restdeur van B9 om dezelfde claim: er wint er een, en de database draagt alleen hashes. |
 | `resync-licht.test.js` | 5 | gezakt op `===->!==#0` | EEN BEDOELDE SLUITING HOEFT NIET DE HELE KAST OPNIEUW TE LEZEN. De schrijfpoort sluit fail-closed, en dat blijft. |
 | `retail-annulering.test.js` | 9 | gezakt op `&&->||#0` | EEN VERKOOP TERUGDRAAIEN -- als tegenboeking, en nooit door de bon te wissen. DE ZWAARSTE TOETS IS 3. |
 | `retail-prijs.test.js` | 8 | gezakt op `&&->||#0` | DE PRIJS VAN EEN RETAILVERKOOP -- en de fout die eronder zat. DE ZWAARSTE TOETS IS 4. |
@@ -1501,7 +1501,7 @@ toets omvalt.
 | `rtg.test.js` | 11 | gezakt op `===->!==#0` | HET GEREEDSCHAP -- rtg new, check, dev en sdk. De belofte van dit gereedschap is niet "het draait" maar iets scherpers: het bouwt niets na**. |
 | `rtgai.test.js` | 4 | gezakt op `liegpoort /api/` | De RTG AI van het RTG Kantoor: leest mee, traint zichzelf, meldt zich klaar, en krijgt het roer ALLEEN via de knop; daarna draait het aantoonbare rondes automatisch door en de terug-knop werkt. |
 | `rtgboek.test.js` | 8 | gezakt op `liegpoort /api/` | HET BOEK VAN RTG -- server/kern/rtgboek.js en server/kern/bedrijfsmaat/stand-rtgboek.js (besluiten C8 tot en met C11). DEEL A, DE KERN: 1. |
-| `rtgcampagne.test.js` | 5 | -- | DE CAMPAGNES VAN RTG -- server/kern/rtgcampagne.js, de campagnepost in server/kern/rtgboek.js en de maat in server/kern/bedrijfsmaat/stand-rtgboek.js (besluit C12). 1. |
+| `rtgcampagne.test.js` | 5 | gezakt op `liegpoort /api/` | DE CAMPAGNES VAN RTG -- server/kern/rtgcampagne.js, de campagnepost in server/kern/rtgboek.js en de maat in server/kern/bedrijfsmaat/stand-rtgboek.js (besluit C12). 1. |
 | `rtgcode.test.js` | 5 | gezakt op `===->!==#0` | RTG scan-codes (public/shared/rtgcode.js): het vaste formaat achter de QR's. We toetsen dat bouwen + lezen elkaars omgekeerde zijn, dat tafelnamen met dubbele punt en spatie heel terugkomen, en dat vreemde tekst... |
 | `rtghorloge.test.js` | 5 | gezakt op `!==->===#0` | Het RTG-signatuurhorloge (public/shared/rtghorloge.js): de pure meetkunde -- het plaatsen op een klok-hoek, het achthoekige cassement en de uur-hoeken -- draait ook in Node en is hier los getoetst. Het tekenen (SVG +... |
 | `rtghuis.test.js` | 2 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -1686,8 +1686,8 @@ toets omvalt.
 | `spraaktekst.test.js` | 10 | geen module gevonden | SPRAAK NAAR TEKST -- lokaal, of helemaal niet. Dit is de helft die ontbrak onder de meeleesbaan. |
 | `spreidingsoordeel.test.js` | 8 | gezakt op `&&->||#4` | HET OORDEEL VAN DE SPREIDINGSPROEF (scripts/spreidingsproef.js). Het script meet doorvoer, percentielen en de rekentijd per proces. |
 | `sprongindex.test.js` | 5 | geen module gevonden | DE TWEE AFGELEIDE LIJSTEN LOPEN NIET ACHTER. shared/sprongindex.json (waar de sprong heen kan) en shared/handelingindex.json (wat je in een app kunt doen) worden allebei GEGENEREERD -- uit MAPPEN en uit de knoppen... |
-| `sqlite-tombstone-restart.test.js` | 3 | genoemd | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `sqlite-tombstone.test.js` | 1 | genoemd | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `sqlite-tombstone-restart.test.js` | 3 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `sqlite-tombstone.test.js` | 1 | gezakt op `===->!==#1` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `sso-clientgeheim-routes.test.js` | 1 | gezakt op `liegpoort /api/` | HET SSO-CLIENTGEHEIM OP EEN ECHTE SERVER (besluit B16). Deel 1, gewone server: de eigenaar zet en roteert het geheim; geen antwoord en geen bestand in de datamap draagt het kale geheim; de overlap loopt en is te... |
 | `sso-clientgeheim.test.js` | 8 | gezakt op `return-weg#0` | HET SSO-CLIENTGEHEIM, VERSLEUTELD PER TENANT (besluit B16, deur identity.sso_client_secret in CODECREDENTIALS.json). Wat hier vastligt, elk met een eigen toets: 1. |
 | `sso-werksync-failclosed.test.js` | 6 | gezakt op `===->!==#0` | SSO EN WERK OS -- authenticatie is pas zakelijke toegang na groepssync. De provider kan de persoon correct hebben aangemeld terwijl de tenantbrug faalt. |
@@ -1824,14 +1824,12 @@ toets omvalt.
 | `trio-kleef.test.js` | 11 | gezakt op `===->!==#0` | KLEEFROUTERING EN SPREIDING (server/trio-kleef.js, server/trio-spreiding.js). Dit is de laag die bepaalt WELK serverproces een lid krijgt. |
 | `trio-wees.test.js` | 4 | gezakt op `liegpoort /api/` | GEEN WEESKINDEREN ALS DE POORTWACHTER HARD OMVALT. Het trio start drie servers (server/trio-wacht.js) en, met RTG_POORTWACHTERS, ook nog voordeurprocessen (server/trio-werkers.js). |
 | `trio-werkers.test.js` | 13 | gezakt op `!==->===#0` | MEER VOORDEURPROCESSEN (server/trio-werkers.js, server/trio-schaduw.js). De poortwachter was gemeten het plafond: 90% van EEN kern terwijl de drie servers op ongeveer de helft stonden. |
-| `trust-evidence-export.pg.test.js` | 2 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `trust-evidence-export.test.js` | 7 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `trust-evidence-plane-v3.test.js` | 24 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `trust-evidence-plane.test.js` | 23 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `trust-evidence-runtime-boundary.test.js` | 3 | genoemd | Trust-runtimecollecties horen bij dezelfde PostgreSQL-requestkopie als de domeinstaat. Geen subsystem mag via een bij configure() vastgehouden object eerder zichtbaar worden, een afgewezen request overleven of na een... |
-| `trust-evidence-source-retention.test.js` | 6 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `trust-evidence-v2-migration.pg.test.js` | 2 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `trust-evidence-v2-migration.test.js` | 6 | genoemd | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `trust-evidence-export.test.js` | 7 | gezakt op `return-weg#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `trust-evidence-plane-v3.test.js` | 24 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `trust-evidence-plane.test.js` | 23 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `trust-evidence-runtime-boundary.test.js` | 3 | gezakt op `!==->===#0` | Trust-runtimecollecties horen bij dezelfde PostgreSQL-requestkopie als de domeinstaat. Geen subsystem mag via een bij configure() vastgehouden object eerder zichtbaar worden, een afgewezen request overleven of na een... |
+| `trust-evidence-source-retention.test.js` | 6 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `trust-evidence-v2-migration.test.js` | 6 | gezakt op `return-weg#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `tweedehandtekening.test.js` | 11 | gezakt op `liegpoort /api/` | EEN TWEEDE MENS ONDER TWEE BANKHANDELINGEN. `scripts/overleving.js` had één rij die met zoveel woorden `nee` zei: *een medewerker handelt te kwader trouw, in zijn eentje.* De grond was gemeten -- een medewerker op... |
 | `tweefactor.test.js` | 18 | gezakt op `===->!==#0` | DE TWEEDE FACTOR VOOR LEDEN. DE BEWERING DIE ERTOE DOET staat in toets 6: TOTP is GEEN passkey. |
 | `txgeld.test.js` | 7 | gezakt op `true->false#0` | DE TWEE GELDCOLLECTIES IN HET GROOTBOEK. directBetalingen en betaalVerzoeken werden bijgehouden met db.data.X.unshift(item); db.data.X = db.data.X.slice(0, N); Dat is precies waar boeking 50.001 aan verdween (zie... |
@@ -1986,7 +1984,7 @@ toets omvalt.
 | `werkregister.test.js` | 11 | gezakt op `liegpoort /api/` | HET WERKREGISTER: zoeken, dossier en samenhang over de tien modules heen. Deze laag bouwt geen tweede administratie -- hij zet de bestaande bakken van een werkruimte in een register (kern/werkcommand/register.js) en... |
 | `werkrol.test.js` | 3 | gezakt op `===->!==#0` | DE WERKROL: EEN INGANG IN EEN WERELD NAAR EEN KANTOORSCHERM IS NIET VOOR IEDEREEN. Op 24 september 2026 vond APPWERKT.json vier ingangen die de wereld aan elk lid toonde en die elk lid doorstuurden naar de... |
 | `werkruimte-kantoor.test.js` | 7 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `werkruimte-maak-idem.test.js` | 1 | genoemd | EEN RETRY MET DEZELFDE SLEUTEL MAAKT GEEN TWEEDE WERKRUIMTE. /api/bedrijf/werkruimte/maak staat in lib/eenmalig-geheim-routes.js: het antwoord draagt een beheer-token dat alleen als hash blijft, dus geen generieke... |
+| `werkruimte-maak-idem.test.js` | 1 | gezakt op `liegpoort /api/` | EEN RETRY MET DEZELFDE SLEUTEL MAAKT GEEN TWEEDE WERKRUIMTE. /api/bedrijf/werkruimte/maak staat in lib/eenmalig-geheim-routes.js: het antwoord draagt een beheer-token dat alleen als hash blijft, dus geen generieke... |
 | `werksleutels.test.js` | 9 | gezakt op `liegpoort /api/` | De sleutels van een werkruimte (workos.workspace_access_tokens), control voor control: 128 bits en eenmaal tonen, hash-only, issuer/doel/scope/onderwerp, vervaltijd, het plafond op sessies (een sessie telt geen... |
 | `werktafelgeheugen.test.js` | 7 | geen module gevonden | WAT DE WERKTAFEL ONTHOUDT, en waarom dat drie beloftes tegelijk is. WERELD.md beloofde tot 19 augustus 2026 dat inloggen, je laatste blad sluiten en op Home drukken alle drie op dezelfde lege werktafel uitkwamen. |
 | `werktoen.test.js` | 6 | gezakt op `liegpoort /api/` | DE TIJDMACHINE EN DE UITVALANALYSE: twee vragen die niet meer beweren dan ze meten. TOEN (bedrijf/toen.js) -- de organisatie op een datum. |

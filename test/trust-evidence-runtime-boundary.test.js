@@ -8,6 +8,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const verzoekcontext = require('../server/db/verzoekcontext');
 const runtime = require('../server/kern/bewijsvlak/runtime');
+const { maakTrustEvidenceStateFor } = require('../server/db/trust-evidence-state');
 
 const AT = '2026-10-01T12:00:00.000Z';
 const CAPABILITY = 'hospitality.availability.check';
@@ -17,7 +18,7 @@ function harnas(opties) {
   let raw = { trustEvidence: {} };
   const db = {};
   Object.defineProperty(db, 'data', { get() { return verzoekcontext.dataVoor(raw); } });
-  const plane = runtime.configure({ db, mode: 'shadow', nu: () => AT,
+  const plane = runtime.configure({ stateFor: maakTrustEvidenceStateFor(db), mode: 'shadow', nu: () => AT,
     save() {
       if (o.saveFout) throw Object.assign(new Error('opslag stuk'), { code: 'TEST_SAVE_FAILED' });
       return verzoekcontext.noteerSave();

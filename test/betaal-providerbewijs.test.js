@@ -81,7 +81,7 @@ test('alleen Payment Truth en de bootstrap mogen de proof-verifier aanroepen', (
   assert.deepEqual(hits.sort(), [
     'server/betaal.js',
     'server/kern/betaalwaarheid/bewijs.js',
-    'server/server.js'
+    'server/opzet/trust-bewijs.js'
   ]);
 });
 

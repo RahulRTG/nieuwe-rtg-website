@@ -508,7 +508,7 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
      WAARSCHUWEN hier dus, ze breken de keuring niet -- anders staat het licht
      voor iedereen op rood voor iets wat gepland is. De lijst hoort te krimpen. */
   const NOG = new Set([
-    /* Deze zeven kwamen bij de brede PR-integratie net over de lat. De naden zijn
+    /* Deze zes kwamen bij de brede PR-integratie net over de lat. De naden zijn
        benoemd, maar horen met hun gerichte toetsen in een aparte onderhoudsronde
        te worden geknipt en niet tijdens het samenvoegen van twintig releases. */
     'server/accounts/users.js',

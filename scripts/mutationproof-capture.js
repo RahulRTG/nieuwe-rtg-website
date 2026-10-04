@@ -18,8 +18,14 @@ function changes(root) {
 function restoreRegister(root, source, output, expectedHash) {
   const original = fs.readFileSync(M.file(source, 'MUTATIES.json'));
   if (M.hash(original) !== expectedHash) throw Error('Candidate mutation register changed.');
+  const committed = native('git', ['show', 'HEAD:MUTATIES.json'], { cwd: root, timeout: 30000, maxBuffer: original.length + 1024 });
+  if (committed.status !== 0 || committed.error || M.hash(committed.stdout) !== expectedHash)
+    throw Error('Clone does not contain the candidate mutation register.');
   fs.copyFileSync(M.file(root, 'MUTATIES.json'), path.join(output, 'motor-register.json'));
-  fs.writeFileSync(M.file(root, 'MUTATIES.json'), original);
+  // Restore the frozen checkout after archiving the motor's output. This is
+  // not a second register generator: only mutatie.js produces new evidence.
+  command('git', ['restore', '--source=HEAD', '--worktree', '--', 'MUTATIES.json'], { cwd: root });
+  if (!registerMatches(root, expectedHash)) throw Error('Candidate register restoration failed.');
 }
 function registerMatches(root, expectedHash) {
   return M.hash(fs.readFileSync(M.file(root, 'MUTATIES.json'))) === expectedHash;

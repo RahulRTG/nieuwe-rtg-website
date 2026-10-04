@@ -9,7 +9,7 @@
     "bewijsAchterstand": 3178,
     "bewijsAlleenKeten": 18,
     "bewijsCellenBewezen": 26449,
-    "bronBlindeBestanden": 3,
+    "bronBlindeBestanden": 0,
     "browserpoortToetsen": 402,
     "carriereDomeinenGemeten": 15,
     "dbDeuren": 536,
@@ -26,7 +26,7 @@
     "gluurGaten": 0,
     "gluurGecontroleerd": 2417,
     "gluurOnbewaakt": 0,
-    "inlineStijlAttributen": 4626,
+    "inlineStijlAttributen": 4574,
     "kernBreedsteBestand": 71,
     "kernBreedte": 1682,
     "kernGedeeld": 254,
@@ -1285,9 +1285,15 @@
       "soort": "schuld",
       "sleutel": "toetsenNietGemeten",
       "van": 250,
-      "vervalt": "2026-10-01",
+      "vervalt": "2027-01-04",
       "meter": "toetsenNietGemeten 250 -> 273 (PR #98 erbij, gemeten)",
-      "reden": "Drieentwintig toetsbestanden extra waar de mutatiemotor nog niet langs is geweest, waaronder test/nieuwe-endpoints.test.js van deze ronde zelf. Die motor draait uren en is hier niet gedraaid; aflossen is een volle ronde npm run mutatie."
+      "reden": "Drieentwintig toetsbestanden extra waar de mutatiemotor nog niet langs is geweest, waaronder test/nieuwe-endpoints.test.js van deze ronde zelf. Die motor draait uren en is hier niet gedraaid; aflossen is een volle ronde npm run mutatie.",
+      "verlengd": {
+        "op": "2026-10-04",
+        "was": "2026-10-01",
+        "reden": "Niet afgelost: de meter staat op 319 en deze schuld wil terug naar 250. MUTATIES.json is op 4 oktober 2026 wel opnieuw gestempeld (commit 6b20e024) en draagt 2099 gemeten toetsen, maar 319 toetsen zijn er nog niet door de motor geprobeerd te breken; welke van de drieentwintig bestanden van PR #98 daar nog tussen zitten, is niet per bestand nagelopen. Een volle ronde npm run mutatie duurt uren en past niet in een opruimronde van NORM.json. Er staan op dezelfde meter inmiddels 78 jongere schulden die nog lopen (de laatste tot 2027-01-02); deze oudste is de bodem daarvan en wordt niet afgeboekt omdat de jongere er bovenop zijn gekomen.",
+        "waarheen": "Een volle ronde npm run mutatie over de hele suite, waarna norm.js --vastleggen de meter strak trekt; deze notitie is afgelost zodra toetsenNietGemeten op of onder 250 staat."
+      }
     },
     {
       "datum": "2026-08-21",
@@ -1338,36 +1344,60 @@
       "soort": "schuld",
       "sleutel": "toetsenNietGemeten",
       "van": 170,
-      "vervalt": "2026-10-01",
+      "vervalt": "2027-01-04",
       "meter": "toetsenNietGemeten 170 -> 250 (VERHOOGD, gemeten over de verzameling)",
-      "reden": "De tweede samenvoegronde (PR #83): 23 PR-takken bijeen. Tachtig toetsbestanden extra waar de mutatiemotor nog niet langs is geweest. Die motor draait uren en is in deze ronde niet gedraaid; MUTATIES.json is samengevoegd uit twee runs en niet opnieuw gemeten. Aflossen is een volle ronde npm run mutatie."
+      "reden": "De tweede samenvoegronde (PR #83): 23 PR-takken bijeen. Tachtig toetsbestanden extra waar de mutatiemotor nog niet langs is geweest. Die motor draait uren en is in deze ronde niet gedraaid; MUTATIES.json is samengevoegd uit twee runs en niet opnieuw gemeten. Aflossen is een volle ronde npm run mutatie.",
+      "verlengd": {
+        "op": "2026-10-04",
+        "was": "2026-10-01",
+        "reden": "Niet afgelost: de meter staat op 319 en deze schuld (de tachtig toetsbestanden van samenvoeg-PR #83) wil terug naar 170. Zelfde blokkade als de schuld naar 250 erboven: de mutatiemotor is sindsdien niet over de hele suite gegaan, en MUTATIES.json van 4 oktober dekt 2099 toetsen. Dit is de diepste stand op deze meter; hem halen vraagt ook dat de toetsen die sinds 21 augustus bijkwamen gemeten zijn, niet alleen die van PR #83.",
+        "waarheen": "Volle npm run mutatie-ronde; eerst de schuld naar 250 aflossen, daarna is deze de volgende tand. Afgelost zodra toetsenNietGemeten op of onder 170 staat."
+      }
     },
     {
       "datum": "2026-08-21",
       "soort": "schuld",
       "sleutel": "beweringenZonderVulcontrole",
       "van": 92,
-      "vervalt": "2026-10-01",
+      "vervalt": "2027-01-04",
       "meter": "beweringenZonderVulcontrole 92 -> 106 (VERHOOGD, gemeten over de verzameling)",
-      "reden": "De tweede samenvoegronde (PR #83): 23 PR-takken bijeen. Veertien beweringen erbij die niet controleren of het veld waarop ze slaan wel gevuld was -- een toets die op undefined slaagt bewijst niets. Ze komen uit de nieuwe toetsbestanden van de veertien takken."
+      "reden": "De tweede samenvoegronde (PR #83): 23 PR-takken bijeen. Veertien beweringen erbij die niet controleren of het veld waarop ze slaan wel gevuld was -- een toets die op undefined slaagt bewijst niets. Ze komen uit de nieuwe toetsbestanden van de veertien takken.",
+      "verlengd": {
+        "op": "2026-10-04",
+        "was": "2026-10-01",
+        "reden": "Niet afgelost: scripts/tandeloos.js telt op 4 oktober 2026 100 beweringen (van 2404 bekeken) die op een lege verzameling vanzelf slagen, tegenover 92 waar deze schuld heen wil. Elke reparatie is een toetswijziging per bewering (eerst bewijzen dat de verzameling gevuld is), en die hoort per toets met een mutatie te worden nagetrokken -- geen werk voor een opruimronde van NORM.json, die geen productcode of toetslogica aanraakt.",
+        "waarheen": "Loop de leeslijst van node scripts/tandeloos.js af en zet bij acht beweringen een vulcontrole (assert dat de lijst niet leeg is) voor de bewering zelf; afgelost bij 92 of lager."
+      }
     },
     {
       "datum": "2026-08-21",
       "soort": "schuld",
       "sleutel": "metingenZonderRatel",
       "van": 9,
-      "vervalt": "2026-10-01",
+      "vervalt": "2027-01-04",
       "meter": "metingenZonderRatel 9 -> 19 (VERHOOGD, gemeten over de verzameling)",
-      "reden": "De tweede samenvoegronde (PR #83): 23 PR-takken bijeen. Tien meetbestanden erbij (FESTIVAL, LINK, ONTMOETEN en de proefregisters van #92 en #95) waar nog geen ratel aan hangt. Aflossen is er per bestand een ratel bij zetten -- zie de kop van scripts/lib/metingen.js."
+      "reden": "De tweede samenvoegronde (PR #83): 23 PR-takken bijeen. Tien meetbestanden erbij (FESTIVAL, LINK, ONTMOETEN en de proefregisters van #92 en #95) waar nog geen ratel aan hangt. Aflossen is er per bestand een ratel bij zetten -- zie de kop van scripts/lib/metingen.js.",
+      "verlengd": {
+        "op": "2026-10-04",
+        "was": "2026-10-01",
+        "reden": "Niet afgelost: de meter staat op 50 en deze schuld wil terug naar 9. Na de tien bestanden van PR #83 (FESTIVAL, LINK, ONTMOETEN en de proefregisters van #92 en #95) zijn er meer meetbestanden in de wortel zonder ratel bijgekomen; op deze meter lopen nog zes jongere schulden (terug naar 20 tot 49, de laatste tot 2026-12-15). Per bestand een ratel zetten vraagt per meter een besluit over richting en sleutel in norm.js of naast de METER-constante, en dat is meetwerk per register en geen administratie.",
+        "waarheen": "Hang de meetbestanden die scripts/lib/metingen.js als ongeratel noemt een voor een aan een ratel (METER + RICHTING in het eigen script); eerst de jongere schulden, dan deze. Afgelost bij 9 of lager."
+      }
     },
     {
       "datum": "2026-08-21",
       "soort": "schuld",
       "sleutel": "p99Ms",
       "van": 144,
-      "vervalt": "2026-10-01",
+      "vervalt": "2027-01-04",
       "meter": "p99Ms 144 -> 233, doorvoerPerSec 395 -> 336, eventLoopP99Ms 64,8 -> 97,9 (op de LAATSTE run, niet op deze stand)",
-      "reden": "De tweede samenvoegronde (PR #83): 23 PR-takken bijeen. EERLIJK GEZEGD IS DIT GEEN METING VAN DEZE VERZAMELING. BEPROEVING.json draagt een run van 18 augustus, van voor de veertien nieuwe takken; hij is wel op dezelfde soort (sqlite) als de grondwaarde, dus de vergelijking klopt -- maar hij beschrijft de code van toen. De lat gaat mee met wat er gemeten IS in plaats van te blijven staan op een getal dat niemand heeft nagelopen; de eerstvolgende npm run beproeving over deze stand vervangt hem door een echte."
+      "reden": "De tweede samenvoegronde (PR #83): 23 PR-takken bijeen. EERLIJK GEZEGD IS DIT GEEN METING VAN DEZE VERZAMELING. BEPROEVING.json draagt een run van 18 augustus, van voor de veertien nieuwe takken; hij is wel op dezelfde soort (sqlite) als de grondwaarde, dus de vergelijking klopt -- maar hij beschrijft de code van toen. De lat gaat mee met wat er gemeten IS in plaats van te blijven staan op een getal dat niemand heeft nagelopen; de eerstvolgende npm run beproeving over deze stand vervangt hem door een echte.",
+      "verlengd": {
+        "op": "2026-10-04",
+        "was": "2026-10-01",
+        "reden": "De meter is NIET uit NORM.json verdwenen: p99Ms staat in de helft `prestatie` (233), en scripts/normverval.js las bij het innen alleen `meters` -- vandaar de melding \"staat niet meer in NORM.json\" (gerepareerd op 4 oktober, met een proef in test/normverval.test.js). De schuld zelf is niet afgelost: de lat staat op 233 en hoort terug naar 144. Opnieuw meten kan hier niet eerlijk: de lat geldt op 4k/17g/linux/sqlite, de laatste ronde in BEPROEVING.json (9 september) draaide op 8k/9g/darwin en wordt door norm.js terecht niet vergeleken, en deze machine heeft 4 kernen en 15 GB. Een npm run beproeving van een kwartier op een andere vingerafdruk levert geen grondwaarde op.",
+        "waarheen": "Een npm run beproeving op de referentievingerafdruk 4k/17g/linux/sqlite (of een uitgeschreven besluit om de prestatielat op een andere vingerafdruk opnieuw te zetten); afgelost bij p99Ms 144 of lager."
+      }
     },
     {
       "datum": "2026-08-19",
@@ -2013,8 +2043,14 @@
       "soort": "schuld",
       "sleutel": "bewijsAchterstand",
       "van": 985,
-      "vervalt": "2026-09-30",
-      "reden": "Vier posten erbij bij de samenvoeging van 24 takken, alle vier in object-vooraf: nieuwe routes die een bestaand object willen bedienen dat de proef niet zelf heeft aangemaakt. Geen enkele post wisselde van soort, dus dit is groei in omvang en niet in aard. De sluitweg per post staat in BEWIJSSCHULD.json."
+      "vervalt": "2027-01-04",
+      "reden": "Vier posten erbij bij de samenvoeging van 24 takken, alle vier in object-vooraf: nieuwe routes die een bestaand object willen bedienen dat de proef niet zelf heeft aangemaakt. Geen enkele post wisselde van soort, dus dit is groei in omvang en niet in aard. De sluitweg per post staat in BEWIJSSCHULD.json.",
+      "verlengd": {
+        "op": "2026-10-04",
+        "was": "2026-09-30",
+        "reden": "Niet afgelost en sinds de notitie in een andere orde van grootte: BEWIJSSCHULD.json (gestempeld 29 september 2026) telt 2855 meetwerk + 323 instrument = 3178 tegenover 985. BEWIJSSCHULD.json telt 18 posten; of de vier object-vooraf-posten uit deze notitie daar nog afzonderlijk tussen staan, is in deze ronde niet nagelopen. Aflossen is per post een wereld in de proef laten ontstaan (de sluitweg staat per post in BEWIJSSCHULD.json), en dat is proefbouw, geen opruimwerk.",
+        "waarheen": "Sluit de posten in BEWIJSSCHULD.json langs hun eigen sluitweg (te beginnen bij de object-vooraf-posten) en leg BEWIJSSCHULD.json daarna op een schone boom opnieuw vast; afgelost bij 985 of lager."
+      }
     },
     {
       "datum": "2026-08-27",
@@ -2113,7 +2149,12 @@
       "sleutel": "bronBlindeBestanden",
       "van": 0,
       "vervalt": "2026-09-30",
-      "reden": "Samenvoeging van 24 takken (tak samenvoeging-negen-2026-08-18). Drie werkos-delen zijn niet los te ontleden: de knip loopt midden door een CSS-sjabloon. Op main was werkos-01 nog EEN bestand. Bewust genoteerd als schuld en niet stil verlaagd; de meter hoort terug naar 0."
+      "reden": "Samenvoeging van 24 takken (tak samenvoeging-negen-2026-08-18). Drie werkos-delen zijn niet los te ontleden: de knip loopt midden door een CSS-sjabloon. Op main was werkos-01 nog EEN bestand. Bewust genoteerd als schuld en niet stil verlaagd; de meter hoort terug naar 0.",
+      "afgelost": {
+        "op": "2026-10-04",
+        "meter": "bronBlindeBestanden 3 -> 0",
+        "hoe": "De drie werkos-delen (public/shared/werkos/werkos-01.js, -01b.js, -01c.js) waren voor de lexer onleesbaar omdat de bundelknip midden door EEN CSS-template liep (werkos-01bb.js lag er ook in, maar lexte toevallig). Elke naad tussen de vier delen sluit nu de template en opent een nieuwe (een backtick plus een plus aan het eind, een backtick aan het begin), zodat elk deel op zichzelf lexbaar is. De openingsopmerking van 01b, 01bb en 01c staat daardoor als JS-commentaar boven de nieuwe template in plaats van als CSS-commentaar erin, zodat de onderwerpregel van elk deel (BUNDELS.md) dezelfde blijft. De bundel public/shared/werkos.js is opnieuw gebouwd: de CSS-constante verschilt alleen in die drie commentaren (zonder commentaar en witruimte byte voor byte gelijk), en alles na de constante is ongewijzigd. De tand wordt aangedraaid naar 0."
+      }
     },
     {
       "datum": "2026-08-27",
@@ -2121,8 +2162,14 @@
       "soort": "schuld",
       "sleutel": "metingenZonderRatel",
       "van": 19,
-      "vervalt": "2026-09-30",
-      "reden": "Samenvoeging van 24 takken (tak samenvoeging-negen-2026-08-18). Een meetbestand in de wortel dat aan geen enkele ratel hangt. Bewust genoteerd als schuld en niet stil verlaagd; de meter hoort terug naar 19."
+      "vervalt": "2027-01-04",
+      "reden": "Samenvoeging van 24 takken (tak samenvoeging-negen-2026-08-18). Een meetbestand in de wortel dat aan geen enkele ratel hangt. Bewust genoteerd als schuld en niet stil verlaagd; de meter hoort terug naar 19.",
+      "verlengd": {
+        "op": "2026-10-04",
+        "was": "2026-09-30",
+        "reden": "Niet afgelost: de meter staat op 50 tegenover de 19 waar deze schuld (een meetbestand uit de samenvoeging van 24 takken) heen wil. Zelfde blokkade als de schuld naar 9: een ratel per register is een besluit over sleutel en richting per meter.",
+        "waarheen": "Ratel per ongeratel meetbestand (scripts/lib/metingen.js); deze tand is afgelost zodra metingenZonderRatel op of onder 19 staat."
+      }
     },
     {
       "datum": "2026-08-27",
@@ -2130,8 +2177,14 @@
       "soort": "schuld",
       "sleutel": "p99Ms",
       "van": 144,
-      "vervalt": "2026-09-30",
-      "reden": "Samenvoeging van 24 takken (tak samenvoeging-negen-2026-08-18). Latentie p99 onder de storm; 24 gebundelde takken meer werk per verzoek. Bewust genoteerd als schuld en niet stil verlaagd; de meter hoort terug naar 144."
+      "vervalt": "2027-01-04",
+      "reden": "Samenvoeging van 24 takken (tak samenvoeging-negen-2026-08-18). Latentie p99 onder de storm; 24 gebundelde takken meer werk per verzoek. Bewust genoteerd als schuld en niet stil verlaagd; de meter hoort terug naar 144.",
+      "verlengd": {
+        "op": "2026-10-04",
+        "was": "2026-09-30",
+        "reden": "Tweede notitie op dezelfde stand (144 -> 233) uit de samenvoeging van 24 takken. Ook hier is de meter niet verdwenen maar stond hij in `prestatie`, waar het innen niet keek (gerepareerd op 4 oktober). Niet afgelost om dezelfde reden als de notitie van 21 augustus: geen ronde op de referentievingerafdruk 4k/17g/linux/sqlite sinds 18 augustus.",
+        "waarheen": "npm run beproeving op 4k/17g/linux/sqlite; afgelost bij p99Ms 144 of lager."
+      }
     },
     {
       "datum": "2026-08-27",
@@ -2139,8 +2192,14 @@
       "soort": "schuld",
       "sleutel": "eventLoopP99Ms",
       "van": 64.8,
-      "vervalt": "2026-09-30",
-      "reden": "Samenvoeging van 24 takken (tak samenvoeging-negen-2026-08-18). Event-loopvertraging p99 onder de storm, zelfde oorzaak als p99Ms. Bewust genoteerd als schuld en niet stil verlaagd; de meter hoort terug naar 64.8."
+      "vervalt": "2027-01-04",
+      "reden": "Samenvoeging van 24 takken (tak samenvoeging-negen-2026-08-18). Event-loopvertraging p99 onder de storm, zelfde oorzaak als p99Ms. Bewust genoteerd als schuld en niet stil verlaagd; de meter hoort terug naar 64.8.",
+      "verlengd": {
+        "op": "2026-10-04",
+        "was": "2026-09-30",
+        "reden": "De meter is niet verdwenen: eventLoopP99Ms staat in `prestatie` (97,9) en het innen las alleen `meters` (gerepareerd op 4 oktober). Niet afgelost: de lat hoort terug naar 64,8. De enige latere ronde (BEPROEVING.json, 9 september, 8k/9g/darwin) gaf 162,8 op een andere machine en is daarom geen meting van deze lat; op deze machine (4 kernen, 15 GB) evenmin.",
+        "waarheen": "npm run beproeving op 4k/17g/linux/sqlite; afgelost bij eventLoopP99Ms 64,8 of lager."
+      }
     },
     {
       "datum": "2026-08-27",
@@ -4043,7 +4102,7 @@
     "keuringOmvang": "2026-09-27",
     "testbestanden": "2026-09-27",
     "toetsenNietGemeten": "2026-09-28",
-    "inlineStijlAttributen": "2026-09-27",
+    "inlineStijlAttributen": "2026-10-04",
     "ratelTanden": "2026-09-23",
     "metingenZonderRatel": "2026-08-18",
     "bewijsAchterstand": "2026-09-23",
@@ -4169,135 +4228,10 @@
     "positieNavBlijft": "2026-09-29",
     "positieNaTaak": "2026-09-29",
     "positiePassages": "2026-09-29",
-    "aankomstUitPositie": "2026-09-29"
+    "aankomstUitPositie": "2026-09-29",
+    "bronBlindeBestanden": "2026-10-04"
   },
   "uitzonderingen": [
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/app-main/app-main-56c.js",
-      "vervalt": "2026-10-01",
-      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 28 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
-    },
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/backoffice/backoffice-05.js",
-      "vervalt": "2026-10-01",
-      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 1 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
-    },
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/foundation/leerpaspoort.html",
-      "vervalt": "2026-10-01",
-      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 3 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
-    },
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/foundation/school-oefenen.js",
-      "vervalt": "2026-10-01",
-      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 2 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
-    },
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/foundation/school-toets.js",
-      "vervalt": "2026-10-01",
-      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 1 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
-    },
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/foundation/school-verlof.js",
-      "vervalt": "2026-10-01",
-      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 1 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
-    },
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/leverancier/leverancier-12a3.js",
-      "vervalt": "2026-10-01",
-      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 3 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
-    },
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/leverancier/leverancier-84.js",
-      "vervalt": "2026-10-01",
-      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 5 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
-    },
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/routedekking.html",
-      "vervalt": "2026-10-01",
-      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 1 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
-    },
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/rtgschool/leer/leer-02.js",
-      "vervalt": "2026-10-01",
-      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 5 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
-    },
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/rtgschool/leer/leer-03.js",
-      "vervalt": "2026-10-01",
-      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 3 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
-    },
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/schoolpartner/dossier/dossier-02.js",
-      "vervalt": "2026-10-01",
-      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 1 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
-    },
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/schoolpartner/geld/geld-02.js",
-      "vervalt": "2026-10-01",
-      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 1 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
-    },
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/schoolpartner/hr/hr-02.js",
-      "vervalt": "2026-10-01",
-      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 1 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
-    },
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/schoolpartner/mijnhr.js",
-      "vervalt": "2026-10-01",
-      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 2 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
-    },
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/schoolpartner/taalcheck.js",
-      "vervalt": "2026-10-01",
-      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 1 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
-    },
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/schoolpartner/toetskeuring.js",
-      "vervalt": "2026-10-01",
-      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 1 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
-    },
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/schoolpartner/veiligheid/veiligheid-02.js",
-      "vervalt": "2026-10-01",
-      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 1 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
-    },
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/schoolpartner/verlof.js",
-      "vervalt": "2026-10-01",
-      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 1 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
-    },
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/zaakpay.html",
-      "vervalt": "2026-10-01",
-      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 1 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
-    },
-    {
-      "regel": "inline-stijl",
-      "pad": "public/shared/linkkaart.js",
-      "vervalt": "2026-10-01",
-      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 1 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
-    },
     {
       "regel": "inline-stijl",
       "pad": "public/apps/commerce.html",

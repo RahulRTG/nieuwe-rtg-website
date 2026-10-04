@@ -11,9 +11,9 @@
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
   "toetsen": {
     "a11y-hermeet.e2e.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "overleefde 5 mutaties in scripts/a11y-hermeet.js (diep): wachttijden en de playState-wacht, die de uitkomst niet bepalen. 2 handmutaties raak: de tweede meting overslaan (return res) laat \"een grond die er een tel later niet meer is, telt niet\" zakken (1 !== 0), en een tweede meting die het contrast leeg teruggeeft laat \"en de tweede meting ziet hem nog steeds\" zakken (0 !== 1)"
     },
     "a11ykeuring.test.js": {
       "soort": "puur",
@@ -764,9 +764,12 @@
       "gezakteZonderMutatie": 1
     },
     "appwerkt-bestemming.e2e.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bestemming.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "appwerkt-onderschepper.test.js": {
       "soort": "puur",
@@ -1841,9 +1844,12 @@
       "geprobeerd": 2
     },
     "browserpoort.e2e.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "test/helper.js",
+      "operator": "return-weg#14",
+      "gezakt": 1,
+      "geprobeerd": 120
     },
     "brugklant.test.js": {
       "soort": "puur",
@@ -2762,9 +2768,9 @@
       "geprobeerd": 8
     },
     "csp.e2e.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "CSP-kop en browserblokkades; 1 mutatie in voordeur.js overleefd (traag: 210 s tegen een budget van 90 s, dus een schot), het beleid zelf is een tekenreeks; 2 handmutaties raak: unsafe-inline in script-src laat de kopbewering zakken, de stijlstempelaar uit laat 352 blokkades zien"
     },
     "dagcoach.test.js": {
       "soort": "server",
@@ -2829,14 +2835,14 @@
       "scherp": "gezakt"
     },
     "deelmenuronde.e2e.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "de toets bundelt public/shared/deelmenu/deelmenu-0{1,2,3}.js; 01 en 03 zijn fragmenten die node --check niet halen (0 pogingen), 02 gaf na 2 pogingen een eindeloze lus (te langzaam). Twee motoroperatoren met de hand op deelmenu-03.js raak: getal+1 op de balkopruimer (for b = 1) laat toets 2, 3 en 4 zakken, return-weg in geenMenu.open (undefined in plaats van null) laat toets 2 zakken"
     },
     "deelmenuwacht.e2e.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "bewaakt de optie subtree: true van de wacht in public/shared/deelmenu.js, en geen operator raakt een objectliteraal; 3 mutaties geprobeerd: twee returnwaarden van start() overleefden, === -> !== in de id-ontdubbeling liet de pagina eindeloos lussen (te langzaam). Handmutatie subtree: true -> false laat toets 1 zakken, toets 2 blijft groen"
     },
     "defensie.test.js": {
       "soort": "server",
@@ -5915,9 +5921,9 @@
       "geprobeerd": 1
     },
     "identiteitschermen.e2e.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "legt tekst en afwezigheid vast, geen rekenend gedrag; overleefde 13 mutaties in public/apps/geld/balansb.js (de Balans-stand). 3 handmutaties raak: \"nooit meer gegevens dan gevraagd\" uit rtgid.html laat toets 1 zakken, \"Geen streaks\" uit balansb.js laat toets 2 zakken, en een regel \"3 dagen op rij\" in balansb.js laat toets 2 zakken op de reeksteller"
     },
     "idor.test.js": {
       "soort": "puur",
@@ -6238,9 +6244,9 @@
       "geprobeerd": 6
     },
     "juridischeschermen.e2e.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "tekstcontract op vier statische HTML-pagina's, geen module maakt die tekst; 2 handmutaties raak: Autoriteit Persoonsgegevens weg uit privacy.html laat de klachtrechteis zakken, Marriott in voorwaarden.html de merkregel"
     },
     "kaart.test.js": {
       "soort": "puur",
@@ -6852,9 +6858,9 @@
       "scherp": "gezakt"
     },
     "laatstedrie.e2e.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "overleefde 34 mutaties in public/shared/media.js (diep); de twee poortbeweringen lezen vaste tekst in oog.html en scherm.html, en inline script haalt node --check niet. 2 handmutaties raak: `if (vooraf)` -> `if (!vooraf)` in vraag() (de stroom wordt nooit gevraagd) en beeld.srcObject = null in camera.html laten allebei de zoekerwacht zakken; de token-grendel omdraaien in oog.html en scherm.html bleef groen (oog valt terug op dezelfde personeelstekst via RTGDeur, scherm leest #poort voordat de 401 hem vervangt)"
     },
     "lab-geheim.test.js": {
       "soort": "puur",
@@ -6990,9 +6996,12 @@
       "scherp": "gezakt"
     },
     "leegtemeting.e2e.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/mobielkeuring.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 7
     },
     "leerfabric.test.js": {
       "soort": "puur",
@@ -7260,9 +7269,12 @@
       "geprobeerd": 1
     },
     "liegend-scherm.e2e.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/schermleugen.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "liegpoort.test.js": {
       "soort": "puur",
@@ -8289,18 +8301,24 @@
       "geprobeerd": 1
     },
     "media-studio-pro.e2e.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/media/studio-pro-engine.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "media-voorzijde.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
     },
     "media.e2e.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/media.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 3
     },
     "media.test.js": {
       "soort": "server",
@@ -10185,12 +10203,9 @@
       "geprobeerd": 2
     },
     "paginas.e2e.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "gezakt": 0,
-      "traag": true,
-      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "census over alle pagina's in public/ zonder eigen module, en de nulmeting past niet in het budget: met public/shared/basis.js als module kwam de nulmeting terug als te langzaam (0 mutaties geprobeerd). Tweemaal met de hand raak op een groene nulmeting: een TypeError in basis.js (setAttribute -> zetAttribuut) laat hem zakken op de onafgevangen fout, een scriptbron in apps/app.html naar een niet-bestaand bestand op de 404"
     },
     "paginascripts.test.js": {
       "soort": "puur",
@@ -12118,9 +12133,9 @@
       "scherp": "gezakt"
     },
     "rtfrust.e2e.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "de logica staat inline in public/apps/foundation/rust.html en de motor muteert geen .html (0 pogingen, node --check weigert hem); 2 handmutaties in dat inline script raak: de fasewissel van 4000 naar 9000 ms laat de toets zakken op het wachten op \"Houd vast\", en tijdens de minuut een tekst in #stilTekst zetten laat de bewering \"het scherm is stil\" zakken"
     },
     "rtfschool.test.js": {
       "soort": "server",
@@ -12218,9 +12233,12 @@
       "geprobeerd": 3
     },
     "rtg-dev.e2e.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/rtg-dev.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "rtg-edge-2-pilots.test.js": {
       "soort": "puur",
@@ -12231,9 +12249,9 @@
       "geprobeerd": 3
     },
     "rtg-edge-2.e2e.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "nulmeting 251 s tegen een motorgrens van 240 s (twee keer te langzaam, 0 pogingen). 2 handmutaties raak, alle 22 toetsen rood: het eerste === -> !== in public/shared/rtg-edge-2.js (de motoroperator zelf) en isEmbedded() in rtg-edge-2-context.js die een topscherm als ingebed leest (self!==top -> self===top) -- dan bouwt geen route zijn rand en zakt de wacht op data-rtg-edge-2-rendered"
     },
     "rtg-edge-2.test.js": {
       "soort": "puur",
@@ -14271,9 +14289,12 @@
       "scherp": "gezakt"
     },
     "storyline-worlds.e2e.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/site/storyline-stage.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "streefbeeld.test.js": {
       "soort": "server",
@@ -14973,9 +14994,14 @@
       "geprobeerd": 1
     },
     "toestel.e2e.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 1,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/shared/toestel/poorten.js",
+      "operator": "===->!==#0",
+      "geprobeerd": 1
     },
     "toestelbinding.test.js": {
       "soort": "puur",
@@ -16021,9 +16047,12 @@
       "scherp": "gezakt"
     },
     "website-screen-edges.e2e.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-adaptive-edge-core.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "website-text-style.test.js": {
       "soort": "puur",
@@ -16076,9 +16105,9 @@
       "scherp": "gezakt"
     },
     "wereldbreedte.e2e.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "geometrie (scrollWidth, railpositie, paneelhoogte), geen rekenend gedrag; 23 mutaties in public/apps/living-os.js, en de ene \"gezakt\" (getal+1 in een meervoudsvorm) herhaalde niet met de hand. 2 handmutaties raak: min-width 190px op de railknoppen in shared/living-os.css laat de breedtebewering zakken, en de data-view-binding weghalen in living-os.js laat \"geen zichtbaar paneel\" zakken (intent, decisions, evidence)"
     },
     "wereldcompositor.test.js": {
       "soort": "puur",
@@ -16329,9 +16358,12 @@
       "geprobeerd": 3
     },
     "werkos-schil.e2e.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/werkos.js",
+      "operator": "return-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 6
     },
     "werkplaats-uitgifte.test.js": {
       "soort": "server",
@@ -16395,9 +16427,12 @@
       "scherp": "gezakt"
     },
     "werkruimte.e2e.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-schil.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 3
     },
     "werkscherm.e2e.js": {
       "soort": "server",

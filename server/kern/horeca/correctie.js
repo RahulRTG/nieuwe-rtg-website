@@ -40,8 +40,8 @@
    3. GELD WORDT KLAARGEZET, NOOIT VERPLAATST. Is er nog niet betaald, dan zakt
       het te betalen bedrag en is er verder niets. Is er AL betaald, dan ontstaat
       er een TERUGGAVERECHT met een bevroren bedrag -- en daar houdt deze laag
-      op. Een mens voert het uit langs kern/pay, met de bevoegdheid die daarvoor
-      bestaat. Dat is GELD.md par. 3, en dezelfde afweging die
+      op. De manager van de zaak voert het uit, per betaalwijze
+      (./teruggave.js). Dat is GELD.md par. 3, en dezelfde afweging die
       kern/commerce/retour.js en kern/appstore/teruggave.js maken.
 
    4. EEN NEGATIEF `openstaand` IS HET SPIEGELBEELD VAN DE TERUGGAVE, EN DAT
@@ -84,7 +84,7 @@ module.exports = ({ horeca, schoon }) => {
      `totaal()` weet wat er betaald is, maar niet of dat na een correctie te
      veel is geworden. */
   function betaaldCenten(rek) {
-    return (rek.betalingen || []).reduce((t, b) => t + heleCenten(b.centen || 0), 0);
+    return (rek.betalingen || []).reduce((t, b) => t + heleCenten(b.centen || 0), 0) - horeca.teruggegeven(rek);
   }
 
   /* De regels die nog meetellen -- dus zonder de al gecorrigeerde. */
@@ -127,7 +127,7 @@ module.exports = ({ horeca, schoon }) => {
          voorkomen. */
       teruggave: teveel > 0
         ? { centen: teveel, uitgevoerd: false,
-            let: 'Dit bedrag staat KLAAR. Een medewerker betaalt het terug langs RTG Pay; deze laag verplaatst geen geld.' }
+            let: 'Dit bedrag staat KLAAR. De manager van de zaak betaalt het terug langs de weg waarlangs het binnenkwam (kern/horeca/teruggave.js); deze laag verplaatst geen geld.' }
         : null
     };
     regel.gecorrigeerd = c;

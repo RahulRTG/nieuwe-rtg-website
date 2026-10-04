@@ -2079,6 +2079,7 @@
       "stuurRoep"
     ],
     "supplier": [
+      "betaalWaarheid",
       "ALT_IDEE",
       "ANNULEERGRONDEN",
       "AUTOVERKOOP_BRANDSTOF",

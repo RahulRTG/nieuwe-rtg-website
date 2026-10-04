@@ -36,7 +36,7 @@ const GROND = new Map(GRONDEN.map(g => [g.id, g]));
 /* Wat deze laag met opzet NIET doet. Staat hier en niet in een document, zodat
    wie de module opent het antwoord vindt op de vraag die hij komt stellen. */
 const NIET_GEBOUWD = {
-  'automatisch-terugboeken': 'Nooit. Is er al betaald, dan ontstaat er een teruggaveRECHT met een bevroren bedrag; een mens voert het uit langs kern/pay. GELD.md par. 3.',
+  'automatisch-terugboeken': 'Nooit. Is er al betaald, dan ontstaat er een teruggaveRECHT met een bevroren bedrag; de manager van de zaak voert het uit langs de weg waarlangs het binnenkwam (kern/horeca/teruggave.js). GELD.md par. 3.',
   'correctie-door-de-gast': 'Een gast MELDT (kern/gast/verzoek.js) en een medewerker corrigeert. Een knop waarmee een gast zelf regels van de rekening haalt, is een kassa die iedereen mag bedienen.',
   'voorraad-afboeken': 'Een correctie zegt wat er met de REKENING gebeurde. Of het gerecht ook uit de voorraad moet, is een tweede handeling met een eigen grond -- kassa/derving doet dat, en die twee samenvoegen zou betekenen dat "niet gebracht" voorraad verbruikt.',
   'correctiepercentage-per-medewerker': 'Een getal naast een medewerker is een ranglijst op mensen. CLAUDE.md verbiedt dat, en HORECA.md herhaalt het.'

@@ -138,4 +138,6 @@ Object.assign(module.exports, require('./idemsleutels-nooit-linkcap'));
 Object.assign(module.exports, require('./idemsleutels-nooit-ssogeheim'));
 Object.assign(module.exports, require('./idemsleutels-nooit-lesfamilie'));
 Object.assign(module.exports, require('./idemsleutels-nooit-gezinstoken'));
+Object.assign(module.exports, require('./idemsleutels-nooit-gezinsdeur'));
+Object.assign(module.exports, require('./idemsleutels-nooit-lesstroom'));
 Object.freeze(module.exports);

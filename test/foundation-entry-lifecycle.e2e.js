@@ -69,8 +69,9 @@ test('server-issued family session still initializes agenda and management, then
       return data;
     }
     const family = await post('/gezin/maak', { gezinsnaam: 'Initializer proof', naam: 'Ouder', pin: '2468', bevoegdGezin: true, privacyAkkoord: true });
-    assert.ok(family.code && family.token);
-    const session = await post('/gezin/inloggen', { code: family.code, pin: '2468' });
+    assert.ok(family.code && family.token && family.gezinscode);
+    // B18: binnenkomen gaat met de 128-bit gezinscode; de zes tekens zijn alleen het adres
+    const session = await post('/gezin/inloggen', { gezinscode: family.gezinscode, pin: '2468' });
     assert.ok(session.token && session.profiel.beheerder);
     const auth = { code: family.code, token: session.token, profiel: session.profiel };
     const today = new Date().toISOString().slice(0, 10);

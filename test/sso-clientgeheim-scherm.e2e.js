@@ -5,7 +5,10 @@
    weg van de eigenaar: inloggen, het blok zien vullen uit het antwoord van de
    server, een nieuw geheim invoeren en roteren, de overlap sluiten -- en
    onderweg staat geen van beide geheimen ooit in de pagina, ook niet in het
-   invoerveld nadat het verstuurd is.
+   invoerveld nadat het verstuurd is. Sinds B22 vraagt roteren een verse passkey:
+   de eigenaar heeft er een (een nagespeelde sleutel, in de browser als virtuele
+   authenticator), en het scherm doet de ceremonie via shared/zwaarbevestig.js.
+   Op localhost, want een IP-adres is voor de browser geen geldige rpId.
 
    Draait alleen waar een browser is. */
 const test = require('node:test');
@@ -14,6 +17,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { zwaarApi } = require('./zwaarpasskey');
 
 const pw = laadPlaywright();
 const OWNER = 'ssoscherm-eigenaar@x.nl';
@@ -23,15 +27,20 @@ const TWEEDE = 'tweede-geheim-' + Date.now().toString(36);
 test('de techniekpagina toont het SSO-clientgeheim alleen als stand, en roteert zonder het terug te tonen',
   { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-ssoscherm-e2e-'));
-  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_OWNER_EMAIL: OWNER } });
+  const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_OWNER_EMAIL: OWNER } });
+  const child = srv.child, base = srv.base.replace('127.0.0.1', 'localhost');
   let browser;
   try {
     const inlog = await fetch(base + '/api/techniek/inloggen', { method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ login: OWNER, wachtwoord: 'Imran' }) }).then(r => r.json());
     assert.ok(inlog.token, 'de toets moet als eigenaar binnenkomen, anders meet zij een dichte deur');
-    const post = (pad, body) => fetch(base + pad, { method: 'POST', headers: { 'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + inlog.token }, body: JSON.stringify(body) }).then(r => r.json());
+    const api = (pad, body, token) => fetch(base + pad, { method: 'POST', headers: { 'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + token }, body: JSON.stringify(body || {}) })
+      .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+    const lid = (await api('/api/auth/login', { login: OWNER, password: 'Imran', pasApp: 'business' })).body.token;
+    const zw = await zwaarApi(api, base, lid);
+    const post = (pad, body) => zw(pad, body, inlog.token).then(r => r.body);
     const gezet = await post('/api/techniek/sso', { org: 'schermklant', naam: 'Schermklant BV',
       issuer: 'https://idp.schermklant.test', clientId: 'c', clientSecret: EERSTE, domeinen: ['schermklant.test'] });
     assert.ok(gezet.ok, JSON.stringify(gezet));
@@ -40,6 +49,14 @@ test('de techniekpagina toont het SSO-clientgeheim alleen als stand, en roteert 
 
     browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send('WebAuthn.enable');
+    const { authenticatorId } = await cdp.send('WebAuthn.addVirtualAuthenticator', { options: { protocol: 'ctap2',
+      transport: 'internal', hasResidentKey: true, hasUserVerification: true, isUserVerified: true,
+      automaticPresenceSimulation: true } });
+    await cdp.send('WebAuthn.addCredential', { authenticatorId, credential: { isResidentCredential: false,
+      credentialId: zw.sleutel.credId.toString('base64'), rpId: 'localhost', signCount: 100,
+      privateKey: zw.sleutel.privateKey.export({ format: 'der', type: 'pkcs8' }).toString('base64') } });
     const fouten = [];
     letOpFouten(page, fouten);
     await page.goto(base + '/apps/techniek.html', { waitUntil: 'domcontentloaded' });
@@ -63,7 +80,7 @@ test('de techniekpagina toont het SSO-clientgeheim alleen als stand, en roteert 
     await rij.locator('input[type="password"]').fill(TWEEDE);
     await rij.locator('input[type="number"]').fill('99');
     await rij.locator('button', { hasText: 'Roteren' }).click();
-    await page.waitForFunction(() => /overlap is 0 tot 30/.test(document.querySelector('#toast').textContent), null, { timeout: 15000 });
+    await page.waitForFunction(() => /overlap is 0 tot 7/.test(document.querySelector('#toast').textContent), null, { timeout: 15000 });
     assert.equal(await rij.locator('input[type="password"]').inputValue(), '', 'ook na een weigering is het veld leeg');
     await rij.locator('input[type="number"]').fill('7');
 

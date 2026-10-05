@@ -71,7 +71,11 @@ test('roteren, intrekken, een leerling eruit en de les sluiten -- elk op een ech
   assert.equal(await lees('/schrift/' + id, sam.token), 200);
   /* Een OPEN live-stroom van Sam hoort bij de intrekking dicht te gaan; anders
      keek hij gewoon door na zijn intrekking. */
-  const open = await fetch(BASE + '/api/foundation/les/' + id + '/stream?role=leerling&token=' + sam.token);
+  /* B25: de stroom opent met een eenmalig stroomticket, nooit met de sleutel in het adres. */
+  const tik = async tok => (await fetch(BASE + '/api/foundation/les/stroomticket', { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: JSON.stringify({ code: id }) }));
+  const samTicket = (await (await tik(sam.token)).json()).ticket;
+  const open = await fetch(BASE + '/api/foundation/les/' + id + '/stream?role=leerling&ticket=' + samTicket);
   assert.equal(open.status, 200);
   const lezer = open.body.getReader();
   await lezer.read();
@@ -82,8 +86,7 @@ test('roteren, intrekken, een leerling eruit en de les sluiten -- elk op een ech
   assert.equal(eruit.status, 200);
   assert.equal(await lees('/schrift/' + id, sam.token), 403, 'Sam komt niet meer in zijn schrift');
   assert.equal(await lees('/schrift/' + id, noor.token), 200, 'Noor wel');
-  const stroom = await fetch(BASE + '/api/foundation/les/' + id + '/stream?role=leerling&token=' + sam.token);
-  assert.equal(stroom.status, 403, 'en ook niet in de live-stroom');
+  assert.equal((await tik(sam.token)).status, 403, 'en krijgt geen stroomticket meer');
 
   const dicht = await post('/les/sluit', { code: id, token: d.token });
   assert.equal(dicht.status, 200);

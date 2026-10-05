@@ -25,6 +25,9 @@ module.exports = (kern, hulp) => {
     accounts, log, appUrl: (req) => kern.appUrl(req), beveiligVan: () => kern.beveilig,
     /* De generieke actor-lezer uit de envelop; zie de kop van boardroomUser. */
     envelopWie: require('./envelop').wie });
+  /* B19: een gezinssessie verlengen vraagt dezelfde zware poort (foundation/gezinsdeur.js). */
+  if (kern.rtf && typeof kern.rtf.setPasskey === 'function')
+    kern.rtf.setPasskey(() => ({ zwaar: kern.zwaarbewijs, accounts }));
 
   /* INTREKKEN SLUIT WAT OPENSTAAT (AUTHORITY.md fase 3): de kantoorsessies en
      -stromen van een mens van wie een kantoorrecht wordt ingetrokken. */

@@ -50,6 +50,10 @@
       if(uitleg)el('lgVraag').focus()
     });
     el('lgGaVerder').addEventListener('click',function(){location.href='leerpaspoort.html'});el('lgHulpVorm').addEventListener('submit',hulp);el('dStart').addEventListener('click',startLes);el('lJoin').addEventListener('click',doeMee);el('lCode').addEventListener('input',function(e){e.target.value=e.target.value.toUpperCase()});
+    /* B20: een deellink van de begeleider. leren.html las de code uit het
+       fragment en wiste dat al; hier komt hij in "Meedoen" en uit het venster.
+       Meedoen blijft een druk op de knop, met de naam die de leerling kiest. */
+    var deel=w.__RTG_LESCODE;if(deel){try{delete w.__RTG_LESCODE}catch(e){w.__RTG_LESCODE=void 0}el('lCode').value=deel;les('leerling');el('lNaam').focus()}
     laad();setTimeout(w.RTGFoundationLerenBeeld.iconen,250);if('serviceWorker'in navigator&&location.protocol.indexOf('http')===0)navigator.serviceWorker.register('sw.js').catch(function(){})
   }
   start();

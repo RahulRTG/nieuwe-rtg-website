@@ -14,7 +14,8 @@
    te beproeven is zonder een server op te starten. */
 'use strict';
 
-const { bestaat, BEVOEGDHEDEN } = require('./bevoegdheden');
+const { bestaat, BEVOEGDHEDEN, SLEUTELS } = require('./bevoegdheden');
+const { versmalNamens } = require('../namens/versmalling');
 
 module.exports = ({ stand }) => {
 
@@ -26,16 +27,22 @@ module.exports = ({ stand }) => {
      versmalt -- en de keuring telt precies dat (`keuringDubbeling`). Zelfde
      remedie als `mandaatGeldig` in kern/stuur/mandaat.js. */
   function versmalMachtiging(magClient, machtiging) {
-    const van = Array.isArray(magClient) ? magClient.filter(bestaat) : [];
     const gevraagd = (machtiging && Array.isArray(machtiging.bevoegdheden) ? machtiging.bevoegdheden : []).filter(bestaat);
-    const binnen = gevraagd.filter(k => van.includes(k));
-    const buiten = gevraagd.filter(k => !van.includes(k));
+    /* De huiswet, niet een eigen doorsnede: wat de cliënt zelf mag is de gever,
+       de gesloten lijst is het beleid. Weet niemand wat de cliënt mag (geen
+       lijst), dan is dat ONBEKEND en niet LEEG -- en dan gaat er niets open. */
+    const r = versmalNamens({ gevraagd, geverEffectief: Array.isArray(magClient) ? magClient : null,
+      beleid: SLEUTELS, context: SLEUTELS });
+    const binnen = r.ok ? gevraagd.filter(k => r.effectief.includes(k)) : [];
+    const buiten = gevraagd.filter(k => !binnen.includes(k));
     return {
-      bevoegdheden: binnen, buiten,
-      reden: buiten.length
-        ? buiten.length + ' van de ' + gevraagd.length + ' gevraagde bevoegdheden vallen af: die heeft u zelf niet. ' +
-          'Een machtiging versmalt bestaand vermogen en voegt er nooit iets aan toe.'
-        : 'Alle gevraagde bevoegdheden vallen binnen wat u zelf heeft.'
+      bevoegdheden: binnen, buiten, onbepaalbaar: r.ok ? null : r.weigering,
+      reden: !r.ok
+        ? 'Wat u zelf mag, is op dit moment niet vast te stellen. Daarom gaat er niets open.'
+        : buiten.length
+          ? buiten.length + ' van de ' + gevraagd.length + ' gevraagde bevoegdheden vallen af: die heeft u zelf niet. ' +
+            'Een machtiging versmalt bestaand vermogen en voegt er nooit iets aan toe.'
+          : 'Alle gevraagde bevoegdheden vallen binnen wat u zelf heeft.'
     };
   }
 

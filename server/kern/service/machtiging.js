@@ -42,7 +42,7 @@ const router = require('./router');
    ./machtiging-grenzen.js: pure tabel plus twee voorspellingen, zonder state.
    Apart omdat dit bestand er anders over de omvangsgrens van keuringsregel 13
    ging, en omdat een grens die je kunt aanwijzen makkelijker overeind blijft. */
-const { ZWAAR, AI_VOOR, isAi } = require('./machtiging-grenzen');
+const { ZWAAR, AI_VOOR, isAi, versmalService } = require('./machtiging-grenzen');
 /* De stand en de naar-buiten-vorm staan in ./machtiging-vorm.js, om dezelfde
    reden en op dezelfde naad: geen levensloop, geen opslag. */
 const { stand, kortM } = require('./machtiging-vorm');
@@ -69,7 +69,7 @@ module.exports = function maakMachtigingen({ db, save, crypto, zaken, inzagelog 
      goedgekeurd. Gevonden met een kale meetronde, niet met lezen: in de toets
      verhuisde geen team. Verruimen kan hij niet; het blijft `benodigd()` van
      een echt team, en ./bevestiging.js versmalt er bij het vragen al tegen. */
-  function verleen({ zaakId, mens, doel, capabilities, minuten, reden, binnenTeam } = {}) {
+  function verleen({ zaakId, mens, doel, capabilities, minuten, reden, binnenTeam, bevestigd } = {}) {
     const z = zaken.vind(zaakId);
     if (!z) return { status: 404, error: 'Zonder zaak is er geen bereik, en zonder bereik geen machtiging.' };
     const w = schoon(mens, 60);
@@ -81,15 +81,8 @@ module.exports = function maakMachtigingen({ db, save, crypto, zaken, inzagelog 
     const mag = router.teVragen(binnenTeam || z.team);
     const gevraagd = (Array.isArray(capabilities) ? capabilities : []).map(c => schoon(c, 60)).filter(Boolean);
     if (!gevraagd.length) return { status: 400, error: 'Zeg wat u nodig heeft. Een machtiging zonder inhoud opent niets.' };
-    let gekregen = gevraagd.filter(c => mag.includes(c));
-    let geweigerd = gevraagd.filter(c => !mag.includes(c));
-    if (isAi(w)) {
-      const zwaarGevraagd = gekregen.filter(c => ZWAAR[c]);
-      if (zwaarGevraagd.length) {
-        gekregen = gekregen.filter(c => !ZWAAR[c]);
-        geweigerd = geweigerd.concat(zwaarGevraagd);
-      }
-    }
+    const { gekregen, geweigerd, onbepaalbaar } = versmalService({ gevraagd, bevestigd, teamMag: mag, mens: w });
+    if (onbepaalbaar) return { status: 409, error: 'Zonder bevestiging van het lid gaat er niets open.', weigering: onbepaalbaar };
     if (!gekregen.length) {
       return { status: 403, error: 'Het team ' + (binnenTeam || z.team) + ' heeft dit niet nodig voor deze zaak. Zet de zaak eerst door naar het team dat het wel mag.', geweigerd };
     }

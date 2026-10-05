@@ -51,7 +51,7 @@ module.exports = function maakBevestigingCode({ crypto, bewerkCollectie, machtig
      er ging niets open, dus het lid mag het opnieuw proberen. */
   async function rondAf(b) {
     const m = machtigingen.verleen({ zaakId: b.zaak, mens: b.mens, doel: b.doel,
-      capabilities: b.capabilities, binnenTeam: b.team, reden: b.reden + ' (bevestigd door het lid zelf)' });
+      capabilities: b.capabilities, bevestigd: b.capabilities, binnenTeam: b.team, reden: b.reden + ' (bevestigd door het lid zelf)' });
     const beeld = await transactie(l => {
       const x = vindIn(l, b.id);
       if (!x) return null;

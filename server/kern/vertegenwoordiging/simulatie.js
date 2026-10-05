@@ -30,6 +30,8 @@
    cliënt krijgt de opbouw en trekt zelf zijn conclusie. */
 'use strict';
 
+const klok = require('../../lib/klok');
+
 const { BEVOEGDHEDEN, NOOIT } = require('./bevoegdheden');
 const { stand, versmalMachtiging, MAX_MAANDEN } = require('./machtiging');
 
@@ -41,7 +43,7 @@ const toon = (k) => Object.assign({ sleutel: k }, BEVOEGDHEDEN[k]);
 function dagenTot(tot, nu) {
   const eind = Date.parse(tot);
   if (!Number.isFinite(eind)) return null;
-  return Math.max(0, Math.floor((eind - (nu == null ? Date.now() : nu)) / 86400000));
+  return Math.max(0, Math.floor((eind - (nu == null ? klok.nu() : nu)) / 86400000));
 }
 
 /* De simulatie. `huidig` mag ontbreken (een eerste machtiging); `magClient` is
@@ -51,7 +53,7 @@ function simuleer({ voorstel, huidig, magClient, nu }) {
   if (!voorstel || typeof voorstel !== 'object') {
     return { error: 'Er is geen voorstel om te bekijken.' };
   }
-  const t = nu == null ? Date.now() : nu;
+  const t = nu == null ? klok.nu() : nu;
   const smal = versmalMachtiging(magClient, voorstel);
   const straks = smal.bevoegdheden;
 

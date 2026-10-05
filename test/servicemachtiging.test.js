@@ -36,7 +36,7 @@ test('een machtiging versmalt alleen, en zegt wat er wegviel', () => {
   const l = laag();
   const z = l.zaken.open({ melder: 'user-1', onderwerp: 'zaak', titel: 'Werkruimte reageert niet' }).zaak;
   const v = l.machtigingen.verleen({ zaakId: z.id, mens: 'nadia', reden: REDEN,
-    capabilities: ['organisatie.stand', 'betaling.stand', 'verzonnen.recht'] });
+    capabilities: ['organisatie.stand', 'betaling.stand', 'verzonnen.recht'], bevestigd: ['organisatie.stand', 'betaling.stand', 'verzonnen.recht'] });
   assert.deepEqual(v.machtiging.capabilities, ['organisatie.stand'],
     'er kwam iets bij dat het team niet nodig heeft: ' + JSON.stringify(v.machtiging.capabilities));
   assert.deepEqual(v.geweigerd.sort(), ['betaling.stand', 'verzonnen.recht'],
@@ -47,7 +47,7 @@ test('een machtiging opent niets bij een andere zaak', () => {
   const l = laag();
   const a = l.zaken.open({ melder: 'user-1', onderwerp: 'zaak', titel: 'Werkruimte reageert niet' }).zaak;
   const b = l.zaken.open({ melder: 'user-1', onderwerp: 'zaak', titel: 'Tweede werkruimtevraag' }).zaak;
-  const v = l.machtigingen.verleen({ zaakId: a.id, mens: 'nadia', reden: REDEN, capabilities: ['organisatie.stand'] });
+  const v = l.machtigingen.verleen({ zaakId: a.id, mens: 'nadia', reden: REDEN, capabilities: ['organisatie.stand'], bevestigd: ['organisatie.stand'] });
   assert.equal(l.machtigingen.magNu(v.machtiging.id, 'organisatie.stand', { zaakId: a.id }).mag, true);
   const nee = l.machtigingen.magNu(v.machtiging.id, 'organisatie.stand', { zaakId: b.id });
   assert.equal(nee.mag, false, 'dezelfde mens opende met een machtiging van zaak A ook zaak B');
@@ -57,7 +57,7 @@ test('een machtiging opent niets bij een andere zaak', () => {
 test('verlopen is een berekende toestand en geen opruimactie', () => {
   const l = laag();
   const z = l.zaken.open({ melder: 'user-1', onderwerp: 'zaak', titel: 'Werkruimte reageert niet' }).zaak;
-  const v = l.machtigingen.verleen({ zaakId: z.id, mens: 'nadia', reden: REDEN, capabilities: ['organisatie.stand'] });
+  const v = l.machtigingen.verleen({ zaakId: z.id, mens: 'nadia', reden: REDEN, capabilities: ['organisatie.stand'], bevestigd: ['organisatie.stand'] });
   /* De klok terugzetten in de opslag, niet de stand. Zou er ergens een
      opgeslagen `verlopen: true` staan, dan blijft deze machtiging geldig tot
      een schoonmaker langskomt -- en dan hangt de belofte "hij verloopt vanzelf"
@@ -71,7 +71,7 @@ test('een bevoegdheid zonder lezer krijgt geen machtiging of zware ceremonie', (
   const l = laag();
   const z = l.zaken.open({ melder: 'user-1', onderwerp: 'account', titel: 'Ik kan niet meer inloggen' }).zaak;
   assert.equal(z.team, 'toegang');
-  const v = l.machtigingen.verleen({ zaakId: z.id, mens: 'nadia', capabilities: ['identiteit.openen'],
+  const v = l.machtigingen.verleen({ zaakId: z.id, mens: 'nadia', capabilities: ['identiteit.openen'], bevestigd: ['identiteit.openen'],
     reden: 'account recovery, het lid meldt zich aan de balie' });
   assert.equal(v.status, 403);
   assert.deepEqual(v.geweigerd, ['identiteit.openen']);

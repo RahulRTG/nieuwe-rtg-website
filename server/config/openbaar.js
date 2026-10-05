@@ -95,13 +95,14 @@ function demoAan(env) {
      fouten         het bestaande gedrag (alleen blokkerend in productie)
      waarschuwingen luid, maar houden niets tegen
 
-   Waarom alleen de demostand een HARDE fout is en de rest een melding: een
-   nieuwe handhavingsregel loopt eerst mee zonder te blokkeren (CONTROLPLANE.md,
-   kern/stuur/schaduw.js). De demostand is de uitzondering omdat hij geen
-   ontbrekende instelling is maar een AANGEZETTE: er staan dan verzonnen
-   accounts, een pincode uit de broncode en een betaalprovider die zichzelf
-   bevestigt op een adres waar mensen bij kunnen. Dat is geen tekort dat je mag
-   uitrollen en daarna repareren. */
+   Op een AANTOONBAAR OPENBAAR adres zijn de productieregels GEEN schaduw meer:
+   zowel de demostand (een AANGEZETTE stand: verzonnen accounts, een pincode uit
+   de broncode, een betaalprovider die zichzelf bevestigt) ALS een ontbrekende
+   productiebeveiliging (geen kluissleutel, versleuteling-at-rest uit, geen
+   webhook-secret) gaan naar hardeFouten. Beveiliging van een publiek adres mag
+   niet afhangen van NODE_ENV (RTG-V1-RELEASE blocker 3). 'onbekend' blijft wel
+   een melding, zodat een lokale start of een toets niet omvalt op een adres dat
+   niemand als publiek heeft opgegeven. */
 function keurOpenbareBouwstand(env, bakken) {
   const { fouten, waarschuwingen, hardeFouten, productie } = bakken;
   const stand = installatieSoort(env);
@@ -126,22 +127,39 @@ function keurOpenbareBouwstand(env, bakken) {
       + 'een pincode uit de broncode en een betaalprovider die zichzelf bevestigt.');
   }
 
-  /* DE SCHADUWRONDE. Een openbare installatie die niet op productie staat, komt
-     de hele productiekeuring nooit tegen -- versleuteling-at-rest, de sleutels
-     van de identiteitskluis, de betaalcontroles. Die draaien hier wel, maar
-     uitsluitend als melding, zodat de beheerder de volledige lijst ziet zonder
-     dat een site die vandaag draait morgen niet meer opkomt. */
+  /* FAIL-CLOSED OP EEN OPENBAAR ADRES (RTG-V1-RELEASE blocker 3).
+
+     Hier stond een SCHADUWRONDE: een openbare installatie die niet op production
+     staat kwam de productiekeuring (versleuteling-at-rest, de sleutels van de
+     identiteitskluis, de betaalcontroles) alleen als MELDING tegen, zodat een
+     site "die vandaag draait morgen niet meer opkomt" niet werd afgebroken.
+
+     Dat is precies de gevonden zwakte: wie APP_URL op een openbaar adres zet maar
+     NODE_ENV vergeet, start dan met de identiteitskluis zonder sleutel en met de
+     gedeelde kantoorcode open -- met alleen logregels die voorbijscrollen.
+     Beveiliging mag niet afhangen van iemand die toevallig NODE_ENV goed zet.
+
+     Daarom gelden de productieregels nu HARD zodra het adres aantoonbaar openbaar
+     is: de productiekeuring draait, en elke fout gaat naar hardeFouten -- die
+     breken de start af ongeacht NODE_ENV (../config.js). 'onbekend' blijft buiten
+     schot (dan valt een lokale start of een toets niet om op een adres dat
+     niemand als publiek heeft opgegeven); alleen een als publiek OPGEGEVEN adres
+     dwingt dit af. */
   if (stand.soort === 'openbaar' && !productie) {
-    const schaduwFouten = [];
-    try { require('./productie').keur(env, schaduwFouten, waarschuwingen); }
-    catch (e) { waarschuwingen.push('De schaduwronde van de productiekeuring kon niet draaien: ' + (e && e.message ? e.message : e)); }
-    for (const f of schaduwFouten) {
-      waarschuwingen.push('SCHADUW (zou de start blokkeren met NODE_ENV=production): ' + f);
+    const productieFouten = [];
+    try { require('./productie').keur(env, productieFouten, waarschuwingen); }
+    catch (e) {
+      hardeFouten.push('APP_URL wijst naar een openbaar adres (' + stand.host + ') maar de productiekeuring kon niet draaien: '
+        + (e && e.message ? e.message : e) + '. Fail-closed: de start wordt afgebroken.');
     }
-    if (schaduwFouten.length) {
-      waarschuwingen.push('SCHADUW: ' + schaduwFouten.length + ' productieregel(s) zouden deze start blokkeren. '
-        + 'APP_URL wijst naar een openbaar adres (' + stand.host + ') terwijl NODE_ENV niet op production staat, '
-        + 'dus de productiekeuring wordt overgeslagen. Zet NODE_ENV=production zodra bovenstaande klopt.');
+    for (const f of productieFouten) {
+      hardeFouten.push('APP_URL wijst naar een openbaar adres (' + stand.host + ') terwijl NODE_ENV niet op "production" staat; '
+        + 'deze productieregel geldt op een publiek adres net zo hard: ' + f);
+    }
+    if (productieFouten.length) {
+      hardeFouten.push(productieFouten.length + ' productieregel(s) blokkeren de start op dit openbare adres. '
+        + 'Zet NODE_ENV=production en los bovenstaande op, of zet APP_URL op het lokale/testadres van deze installatie. '
+        + 'Een publiek adres zonder complete productiebeveiliging start niet.');
     }
   }
 

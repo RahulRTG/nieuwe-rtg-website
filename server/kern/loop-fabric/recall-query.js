@@ -40,9 +40,12 @@ module.exports=({read,sourceAdapters,time})=>{
   };
   const same=(a,b)=>a.domain===b.domain&&a.type===b.type&&a.id===b.id;
   const unavailable=(receipt,code,detail)=>({changeReceiptId:receipt.receiptId,
-    status:({SOURCE_DENIED:'denied',PURPOSE_DENIED:'denied',AUTHORITY_REVOKED:'denied',SOURCE_MISSING:'source_missing',
+    status:({SOURCE_DENIED:'denied',PURPOSE_DENIED:'denied',AUDIENCE_DENIED:'denied',USE_DENIED:'denied',
+      AUTHORITY_REVOKED:'denied',MEMORY_PROMOTION_REQUIRED:'denied',COMMONS_RELEASE_REQUIRED:'denied',AI_SCOPE_REQUIRED:'denied',
+      SOURCE_MISSING:'source_missing',
       NOT_FOUND:'source_missing',SOURCE_EXPIRED:'stale',SOURCE_WITHDRAWN:'unavailable',SOURCE_NOT_AVAILABLE:'unavailable',
-      SOURCE_CHANGED:'stale',CHECK_NOT_RUN:'not_checked'}[code]||'unavailable'),reasonCode:code||'SOURCE_UNAVAILABLE',
+      SOURCE_CHANGED:'stale',ELIGIBILITY_SOURCE_CHANGED:'stale',ELIGIBILITY_EXPIRED:'stale',CHECK_NOT_RUN:'not_checked',
+      ELIGIBILITY_UNAVAILABLE:'not_checked',AUTHORITY_UNAVAILABLE:'not_checked'}[code]||'unavailable'),reasonCode:code||'SOURCE_UNAVAILABLE',
     source:{domain:receipt.observationRef.domain,refHash:P.hash(P.refKey(receipt.observationRef))},
     why:detail||'De actuele bron kon deze context niet beschikbaar stellen.'});
   function candidates(actorRef,context) {

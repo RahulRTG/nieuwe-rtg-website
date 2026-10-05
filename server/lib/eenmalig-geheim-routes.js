@@ -18,6 +18,12 @@ const ROUTES = new Set([
   /* Account- en personeelsroutes geven een sessie/PIN eenmalig terug. Een
      generieke retrycache zou die na intrekking vóór de echte deur herhalen. */
   'POST /api/auth/register',
+  /* Het gezin aan een ouderaccount (foundation/gezinseigenaar.js): maken en
+     een sessie openen geven elk een NIEUWE gezinssessie terug. Een herhaald
+     maken krijgt 409, een herhaalde sessie een nieuwe; nooit een oude uit een cache. */
+  'POST /api/rtf/eigen-gezin/maak',
+  'POST /api/rtf/eigen-gezin/sessie',
+  'POST /api/rtf/eigen-gezin/koppel',
   /* De partijsleutel van DemocratieOS (kern/democratie/partijen.js): inschrijven
      en vervangen tonen hem een keer. Een herhaalde inschrijving krijgt 409, een
      herhaald vervangen een NIEUWE sleutel. */
@@ -144,11 +150,17 @@ const ROUTES = new Set([
      maken toont lescode en leraarssleutel, meedoen de leerlingsleutel, roteren een
      nieuwe lescode -- elk precies een keer; daarna bestaat alleen de hash. */
   'POST /api/foundation/les/maak', 'POST /api/foundation/les/join', 'POST /api/foundation/les/code/roteer',
+  // B25: het eenmalige stroomticket (foundation/onderwijs/stroomticket.js)
+  'POST /api/foundation/les/stroomticket',
   /* Het gezinsprofieltoken (B17, foundation/gezinstoken.js): elk van deze
      antwoorden draagt een VERSE gezinssessie die daarna alleen als hash bestaat. */
   'POST /api/foundation/gezin/maak', 'POST /api/foundation/gezin/inloggen',
   'POST /api/foundation/gezin/profiel/kies', 'POST /api/foundation/gezin/uitnodiging/accepteer',
-  'POST /api/foundation/gezin/sessie/roteer', 'POST /api/rtf/kanaal'
+  'POST /api/foundation/gezin/sessie/roteer', 'POST /api/rtf/kanaal',
+  /* De gezinsdeur (B18/B19, foundation/gezinsdeur.js): een nieuwe gezinscode, een
+     eenmalig stroomticket en een verlengde sessie staan elk alleen in dit antwoord. */
+  'POST /api/foundation/gezin/code/roteer', 'POST /api/foundation/gezin/stroom/ticket',
+  'POST /api/foundation/gezin/sessie/verleng'
 ]);
 
 const isEenmalig = (methode, pad) => ROUTES.has(

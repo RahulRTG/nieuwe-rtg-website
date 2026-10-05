@@ -43,7 +43,7 @@ function api(pad, body) {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {})
   }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
-const haal = (pad, code, token) => fetch(BASE + '/api/foundation/gezin/' + code + pad + '?token=' + token)
+const haal = (pad, code, token) => fetch(BASE + '/api/foundation/gezin/' + code + pad , { headers: { Authorization: 'Bearer ' + token } })
   .then(r => r.json());
 const morgen = n => new Date(Date.now() + (n || 1) * 86400000).toISOString().slice(0, 10);
 
@@ -54,7 +54,7 @@ async function gezin() {
   const g = (await api('/gezin/maak', { gezinsnaam: 'De Wit', naam: 'Ouder Een', pin: '2468' })).body;
   const mk = async (naam, rol) => {
     const p = (await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam, rol })).body;
-    const t = (await api('/gezin/profiel/kies', { code: g.code, profielId: p.profiel.id })).body.token;
+    const t = (await api('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: p.profiel.id })).body.token;
     return { id: p.profiel.id, token: t };
   };
   const ouder2 = await mk('Ouder Twee', 'ouder');

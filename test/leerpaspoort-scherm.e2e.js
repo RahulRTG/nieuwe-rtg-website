@@ -82,7 +82,7 @@ async function kindprofiel(gezin, naam, geboortedatum, pin) {
     naam, rol: 'kind', geboortedatum, pin })).body;
   assert.ok(p.profiel && p.profiel.id, naam + ' bestaat: ' + JSON.stringify(p).slice(0, 160));
   const kies = (await post('/api/foundation/gezin/profiel/kies',
-    { code: gezin.code, profielId: p.profiel.id, pin })).body;
+    { gezinscode: gezin.gezinscode, profielId: p.profiel.id, pin })).body;
   assert.ok(kies.token, naam + ' kiest zijn profiel: ' + JSON.stringify(kies).slice(0, 160));
   return { code: gezin.code, token: kies.token, profiel: kies.profiel };
 }

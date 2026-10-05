@@ -31,7 +31,7 @@ test.before(async () => {
   const g = (await fnd('/gezin/maak', { gezinsnaam: 'Geloof ' + t, naam: 'Ouder ' + t, pin: '1234' })).body;
   ouder = { code: g.code, token: g.token };
   const kp = (await fnd('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Kind ' + t, rol: 'kind', groep: 'kind' })).body;
-  const kies = (await fnd('/gezin/profiel/kies', { code: g.code, profielId: kp.profiel.id })).body;
+  const kies = (await fnd('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: kp.profiel.id })).body;
   kind = { code: g.code, token: kies.token };
 });
 test.after(() => stop(srv && srv.child));

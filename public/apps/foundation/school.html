@@ -416,7 +416,9 @@ async function ziekmelden(x){
 }
 async function vulKindKeuze(){
   try{
-    const d = await api('/gezin/inloggen', { code: s.code });
+    // de profielen komen uit de eigen sessie, niet uit de inlogdeur (die vraagt een pincode)
+    const d = await fetch('/api/foundation/gezin/' + encodeURIComponent(s.code) + '/mij',
+      { headers: { Authorization: 'Bearer ' + s.token } }).then(r => r.ok ? r.json() : {});
     vervang($('#kopKind'), (d.profielen||[]).map(p => E('option',{value:p.id}, p.naam)));
   }catch(e){}
 }

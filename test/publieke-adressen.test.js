@@ -296,7 +296,7 @@ test('verzonden post draagt alleen de eigen afzender; ontvangen post en een gast
     ...sessA, naam:'Oppas Bo', rol:'gast' }));
   assert.equal(gast.status,200,JSON.stringify(gast.body));
   const gastToken=(await json(await post('/api/foundation/gezin/profiel/kies',{
-    code:a.body.code, profielId:gast.body.profiel.id }))).body.token;
+    gezinscode: a.body.gezinscode, profielId:gast.body.profiel.id }))).body.token;
   assert.ok(gastToken,'de gast krijgt een eigen sessie in het gezin');
   const gastBak=await json(await post('/api/foundation/mail/verzonden',{
     code:a.body.code, token:gastToken }));

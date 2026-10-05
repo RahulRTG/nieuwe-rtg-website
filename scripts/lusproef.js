@@ -206,7 +206,7 @@ async function proef(basis) {
     { code: g.code, token: g.token, naam: 'Kind', rol: 'kind', geboortedatum: '2016-04-04', pin: '4321' });
   const kiesbaar = ((kind.body || {}).profiel || {}).id;
   const kies = kiesbaar
-    ? await post('/api/foundation/gezin/profiel/kies', { code: g.code, profielId: kiesbaar, pin: '4321' })
+    ? await post('/api/foundation/gezin/profiel/kies', { code: g.code, token: g.token, profielId: kiesbaar, pin: '4321' })
     : { body: {} };
   const kt = (kies.body || {}).token;
   let kindStand = 'open', kindDetail = 'geen kindsessie gekregen: ' + JSON.stringify((kies.body || {}).error || (kind.body || {}).error || kind.status);

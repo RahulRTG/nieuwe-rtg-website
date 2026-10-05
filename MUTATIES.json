@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-05T09:30:02.061Z",
-    "commit": "105aafaf5",
+    "op": "2026-10-05T09:39:31.560Z",
+    "commit": "127e15677",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -7756,6 +7756,14 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "losvanverzoek.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/kosten/haak.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 10
+    },
     "luchthaven-vip.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -9166,6 +9174,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 9,
       "scherp": "gezakt"
+    },
+    "naafloop.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/opzet/handeling.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "naamlaag.test.js": {
       "soort": "server",

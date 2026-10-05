@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-05T11:42:41.962Z",
-    "commit": "dfa3dc677",
+    "op": "2026-10-05T11:52:43.522Z",
+    "commit": "6bd72f612",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -15806,6 +15806,14 @@
       "staat": "gezakt",
       "module": "server/db/verzoekcontext.js",
       "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "verzoekframe.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/opzet/verzoekframe.js",
+      "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
     },

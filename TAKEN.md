@@ -128,7 +128,7 @@ hem draait.
 geeft `npm run golive` **dertien** blokkerende punten. Drie ervan stonden nergens
 in deze lijst en hebben daarom hieronder een nieuw nummer gekregen (1.9, 1.10,
 1.11). De andere twee staan in §2 als "sterk aangeraden" terwijl de keuring er
-wél op blokkeert: **2.2** (`OFFICE_TOTP_SECRET`) en **2.5** (een mailprovider).
+wél op blokkeerde: **2.2** (vervallen, B10/B24) en **2.5** (een mailprovider).
 Die twee houden hun nummer waar het staat -- een nummer verhuist niet -- maar ze
 horen bij dit lijstje gelezen te worden, en §2 zegt dat er nu ook bij.
 
@@ -158,8 +158,7 @@ beantwoordt, ruimt alle drie de blokkades tegelijk op. Stand vandaag: 18 van de
 Geen blokkade, wel een risico dat je bewust moet nemen -- **behalve 2.2 en 2.5,
 en dat is de reden dat deze kop hier stond te liegen.** Nagemeten op 23 augustus
 2026 geeft `npm run golive` op allebei een blokkerend kruis, niet een
-waarschuwing: zonder `OFFICE_TOTP_SECRET` staat de backoffice -- waar de
-pasbesluiten vallen -- achter alleen de statische `OFFICE_CODE`, en zonder
+waarschuwing (2.2 is op 4 oktober 2026 vervallen, zie de rij), en zonder
 mailprovider belanden herstel- en bevestigingsmail alleen in de lokale outbox.
 Ze houden hun nummer hier, want een nummer verhuist niet, maar ze horen bij §1
 gelezen te worden. De overige zeven zijn wél waarschuwingen.
@@ -167,7 +166,7 @@ gelezen te worden. De overige zeven zijn wél waarschuwingen.
 | # | Wat | Waarom |
 |---|---|---|
 | 2.1 | `ERR_WEBHOOK_URL` zetten en beproeven | Nu is er geen EXTERNE alarmering: een storing zie je alleen als je zelf kijkt, en niet als de doos plat ligt |
-| ~~2.2~~ | ~~`OFFICE_TOTP_SECRET` zetten~~ **Deze regel klopte niet meer en stond hier te verouderen.** Het geheim is geen aanbeveling maar een BLOKKADE: `server/config/productie.js` weigert de productiestart zonder een base32-geheim van minstens 16 tekens, en `scripts/docker/controle.js` eist hem ook. Wat er nog wel te doen is, is het zetten -- maar dat merk je vanzelf, want de server start anders niet. Nagemeten op 18 augustus 2026 | Een aanbeveling die in werkelijkheid een blokkade is, leert de lezer dat deze lijst niet klopt |
+| ~~2.2~~ | ~~`OFFICE_TOTP_SECRET` zetten~~ **Vervallen op 4 oktober 2026** (besluit van de eigenaar): `OFFICE_CODE` en `OFFICE_TOTP_SECRET` zijn geen productie-eis meer. In productie opent de gedeelde code niets (B10, `kern/kantoor/productiedeur.js`) en gebruikt het koppelen van een uitnodiging de TOTP niet (B24); de start blokkeert niet meer zonder, en gezet worden ze genegeerd met een regel in het opstartlog (`opzet/startcontrole.js`, `test/kantoordeur-productie.test.js`) | Een eis op een geheim dat niets opent, is een ritueel |
 | 2.3 | `DATABASE_URL` (PostgreSQL) | Op SQLite kan er maar een instance zijn; het transactiegrootboek draait alleen in de sqlite- en postgres-stand |
 | 2.4 | `REDIS_URL` | Realtime werkt nu alleen binnen een proces |
 | 2.5 | Mail aanzetten: `SMTP_URL` (smarthost) **of** `MAIL_DIRECT=1` (eigen bezorging, zie `npm run eigenpost`) | Herstel-links en bevestigingen worden nu niet echt verstuurd. De verzendlaag is er wel helemaal -- eigen SMTP-client, eigen MX-bezorging, eigen DKIM -- maar zonder een van beide standen gaat alles naar de outbox. Voor de directe stand moeten drie dingen BUITEN de code kloppen: open poort 25 uit, kloppende PTR, en de DNS-records uit `npm run eigenpost` |

@@ -45,7 +45,7 @@ async function gezin() {
 }
 async function profiel(code, gToken, naam, rol, groep) {
   const p = await json(await fnd('/gezin/profiel/maak', { code, token: gToken, naam, rol, groep }));
-  const kies = await json(await fnd('/gezin/profiel/kies', { code, profielId: p.profiel.id }));
+  const kies = await json(await fnd('/gezin/profiel/kies', { code, token: gToken, profielId: p.profiel.id }));
   return { code, token: kies.token };
 }
 

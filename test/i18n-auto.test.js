@@ -227,7 +227,7 @@ test('de publieke verhaalpagina\'s dragen de taalrail', () => {
   /* De toets hierboven dekt dit ook, maar telt over 313 bestanden: zakt hij,
      dan zegt hij "een pagina mist de rail" en niet WELKE familie. Deze negen
      zijn de reden dat de telling is verbreed, dus staan ze er bij naam. */
-  const mappen = ['public/site/passen', 'public/site/werelden'];
+  const mappen = ['public/site/passen', 'public/site/werelden', 'public/site/techniek'];
   const zonder = [];
   for (const map of mappen) {
     for (const naam of fs.readdirSync(path.join(ROOT, map))) {

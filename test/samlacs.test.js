@@ -76,7 +76,7 @@ test.before(async () => {
   tech = (await json('/api/techniek/inloggen', { login: 'roellie.i@gmail.com', wachtwoord: 'Imran' })).body.token;
 
   const k = await json('/api/techniek/sso', { org: 'O-SAML', naam: 'Klant SAML', issuer: 'https://idp.klant-saml.nl',
-    clientId: 'cid', clientSecret: 'geheim', domeinen: 'klant-saml.nl' }, tech);
+    clientId: 'cid', domeinen: 'klant-saml.nl' }, tech);
   assert.equal(k.status, 200, JSON.stringify(k.body).slice(0, 160));
   const s = await json('/api/techniek/sso/saml', { org: 'O-SAML', entityId: UITGEVER,
     ssoUrl: 'https://idp.klant-saml.nl/sso', certificaat: kp.cert }, tech);

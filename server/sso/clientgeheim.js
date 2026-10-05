@@ -14,12 +14,15 @@
       wanneer gezet, wanneer het vervalt en de overlap. Alleen geldige() levert
       de tekst, en die heeft precies een lezer: de tokenruil.
    3. ROTATIE MET OVERLAP. Een nieuw geheim wordt het eerste slot; het vorige
-      blijft een begrensde tijd (standaard 7, hoogstens 30 dagen) geldig, zodat
+      blijft een begrensde tijd (standaard 3, hoogstens 7 dagen -- B27) geldig, zodat
       een klant zonder uitval kan wisselen. De ruil probeert het oude alleen
       als de provider het nieuwe weigert met invalid_client.
-   4. EEN VERVALDATUM op elk slot (standaard 365, hoogstens 730 dagen). De
-      tijden zitten in de AAD: wie in de database een datum oprekt, maakt het
-      slot onleesbaar in plaats van langer geldig.
+   4. EEN VERVALDATUM op elk slot (B22: standaard 30 dagen -- het
+      rotatieadvies -- en hoogstens 90). De tijden zitten in de AAD: wie in de
+      database een datum oprekt, maakt het slot onleesbaar in plaats van langer
+      geldig. Een slot van voor B22 met een langere vervaldatum wordt bij het
+      LEZEN afgekapt op 90 dagen na `gezet` (vervaltOp); de opgeslagen datum
+      blijft staan, want hij zit in de AAD, en er wordt niets verlengd.
    5. FAIL-CLOSED. Zonder bruikbare sleutel (in productie: zonder RTG_VAULT_KEY)
       weigert zetten met de reden; een slot dat niet opengaat of verlopen is
       maakt de inlog dicht met de reden, en er gaat nooit een lege of halve
@@ -36,7 +39,7 @@ const gebonden = require('../accounts/gebonden');
 
 const MERK = 'RTGSSO2:';
 const DAG = 86400000;
-const GRENS = Object.freeze({ standaardDagen: 365, maxDagen: 730, standaardOverlap: 7, maxOverlap: 30,
+const GRENS = Object.freeze({ standaardDagen: 30, maxDagen: 90, standaardOverlap: 3, maxOverlap: 7,
   gemigreerdDagen: 90, maxLengte: 2048 });
 
 const REDEN = Object.freeze({
@@ -105,7 +108,13 @@ function lees(waarde) {
   } catch (e) { return { soort: 'kapot', sloten: [] }; }
 }
 const schrijf = (sloten) => MERK + JSON.stringify({ sloten });
-const inTijd = (s, nu) => Date.parse(s.vervalt) > nu && (!s.tot || Date.parse(s.tot) > nu);
+/* Het echte verval van een slot: zijn eigen datum, maar nooit later dan maxDagen
+   na uitgifte (B22). Zonder `gezet` (gemigreerd) geldt de eigen datum. */
+function vervaltOp(s) {
+  const v = Date.parse(s.vervalt), g = s.gezet ? Date.parse(s.gezet) : NaN;
+  return Number.isFinite(g) ? Math.min(v, g + GRENS.maxDagen * DAG) : v;
+}
+const inTijd = (s, nu) => vervaltOp(s) > nu && (!s.tot || Date.parse(s.tot) > nu);
 
 /* De oude opslag herzegelen. null = er valt niets te migreren (al nieuw, leeg,
    of onleesbaar -- dat laatste blijft staan en maakt de inlog dicht). */
@@ -151,8 +160,10 @@ function stand(org, waarde, nu) {
   const oud = l.sloten.filter(s => inTijd(s, t))[1] || null;
   return {
     gezet: l.soort !== 'leeg', bruikbaar: g.geheimen.length > 0, code: g.code, reden: g.reden,
-    vingerafdruk: kop ? kop.vf : null, gezetOp: kop ? kop.gezet : null, vervalt: kop ? kop.vervalt : null,
-    dagenOver: kop ? Math.floor((Date.parse(kop.vervalt) - t) / DAG) : null,
+    vingerafdruk: kop ? kop.vf : null, gezetOp: kop ? kop.gezet : null,
+    vervalt: kop ? new Date(vervaltOp(kop)).toISOString() : null,
+    afgekapt: !!(kop && vervaltOp(kop) < Date.parse(kop.vervalt)),
+    dagenOver: kop ? Math.floor((vervaltOp(kop) - t) / DAG) : null,
     gemigreerd: !!(kop && kop.gemigreerd),
     overlap: oud ? { vingerafdruk: oud.vf, tot: oud.tot } : null
   };
@@ -172,5 +183,5 @@ async function probeer(geheimen, ruil) {
 }
 
 module.exports = { MERK, GRENS, REDEN, DAG, fout, sleutelProbleem, vingerafdruk, zegelSlot, migreer, geldige,
-  stand, probeer, lees, schrijf, inTijd, tenantSleutel, aad };
+  stand, probeer, lees, schrijf, inTijd, vervaltOp, tenantSleutel, aad };
 // zetten, roteren en de overlap sluiten: ./clientgeheim-rotatie.js

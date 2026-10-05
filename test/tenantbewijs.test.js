@@ -118,7 +118,7 @@ test('4. de SSO-bewering volgt de koppeling, ook over het verschil in hoofdlette
      een klant met een keurig werkende provider. Een org is nu
      hoofdletterongevoelig, genormaliseerd op één plek: bij het lezen. */
   const k = await api('/api/techniek/sso', { org: 'O-S', naam: 'Statusklant',
-    issuer: 'https://idp.statusklant.nl', clientId: 'cid', clientSecret: 'geheim',
+    issuer: 'https://idp.statusklant.nl', clientId: 'cid',
     domeinen: 'statusklant.nl' }, tech);
   assert.equal(k.status, 200, 'de koppeling staat er: ' + JSON.stringify(k.body).slice(0, 140));
 

@@ -21,7 +21,7 @@ test.before(async () => {
   base = srv.base;
   gezin = (await api(base, '/api/foundation/gezin/maak', { gezinsnaam: 'Testgezin', naam: 'Ouder', pin: '1234' })).body;
   const kp = (await api(base, '/api/foundation/gezin/profiel/maak', { code: gezin.code, token: gezin.token, naam: 'Kim', rol: 'kind', groep: 'kind' })).body;
-  kind = (await api(base, '/api/foundation/gezin/profiel/kies', { code: gezin.code, profielId: kp.profiel.id })).body;
+  kind = (await api(base, '/api/foundation/gezin/profiel/kies', { gezinscode: gezin.gezinscode, profielId: kp.profiel.id })).body;
   assert.ok(kind.token, 'het kind-profiel heeft een token');
 });
 test.after(() => stop(srv && srv.child));

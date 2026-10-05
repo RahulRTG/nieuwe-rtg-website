@@ -69,21 +69,52 @@ test('3. het onderwerp bindt: ander gezin, ander profiel, andere rol, andere sco
   assert.equal(z.vind(g, t), null, 'een omgezette scope opent niets');
 });
 
-test('4. vervaltijd: dertig dagen, het kanaal twaalf uur, en nooit langer', () => {
+test('4. vervaltijd: zeven dagen (B19), het kanaal twaalf uur, en nooit langer', () => {
   const { z, g, schuif } = wereld();
   const t = z.geef(g, g.profielen.b);
   const s = g.profielen.b.sessies[0];
   assert.equal(s.issued_at, new Date(T0).toISOString());
-  assert.equal(Date.parse(s.expires_at) - T0, 30 * 86400000);
+  assert.equal(T.GELDIG_MS, 7 * 86400000);
+  assert.equal(Date.parse(s.expires_at) - T0, 7 * 86400000);
   const kanaal = z.geef(g, g.profielen.k, { geldigMs: T.KANAAL_MS });
   const lang = z.geef(g, g.profielen.k, { geldigMs: 365 * 86400000 });
-  assert.equal(Date.parse(g.profielen.k.sessies.at(-1).expires_at) - T0, 30 * 86400000, 'een verzoek om een jaar wordt dertig dagen');
+  assert.equal(Date.parse(g.profielen.k.sessies.at(-1).expires_at) - T0, 7 * 86400000, 'een verzoek om een jaar wordt zeven dagen');
   schuif(12 * 3600000 + 1);
   assert.equal(z.vind(g, kanaal), null, 'de kanaalsessie is na twaalf uur weg');
   assert.equal(z.vind(g, t).id, 'b');
-  schuif(30 * 86400000);
-  assert.equal(z.vind(g, t), null, 'na dertig dagen opent hij niets meer');
+  schuif(7 * 86400000);
+  assert.equal(z.vind(g, t), null, 'na zeven dagen opent hij niets meer');
   assert.equal(z.vind(g, lang), null);
+});
+
+test('4b. B19: een sessie van voor het besluit (dertig dagen op schijf) houdt na zeven dagen op', () => {
+  const { z, g, schuif } = wereld();
+  const t = z.geef(g, g.profielen.b);
+  const s = g.profielen.b.sessies[0];
+  s.expires_at = new Date(T0 + 30 * 86400000).toISOString();   // zoals B17 hem schreef
+  schuif(6 * 86400000);
+  assert.equal(z.vind(g, t).id, 'b');
+  schuif(86400000);
+  assert.equal(z.vind(g, t), null, 'zeven dagen na uitgifte, ongeacht wat er op schijf staat');
+});
+
+test('4c. B19: roteren verlengt niet, verlengen geeft zeven dagen, een gast verlengt nooit', () => {
+  const { z, g, schuif } = wereld();
+  const a = z.geef(g, g.profielen.b);
+  schuif(5 * 86400000);
+  const b = z.roteer(g, a);
+  const sb = g.profielen.b.sessies.at(-1);
+  assert.equal(Date.parse(sb.expires_at), T0 + 7 * 86400000, 'de geroteerde sessie houdt het einde van de oude');
+  const c = z.roteer(g, b, { verleng: true });
+  assert.equal(Date.parse(g.profielen.b.sessies.at(-1).expires_at), T0 + 12 * 86400000, 'verlengen: zeven dagen vanaf nu');
+  assert.equal(z.vind(g, b), null, 'de verlengde vervangt de oude');
+  schuif(7 * 86400000 + 1);
+  assert.equal(z.vind(g, c), null, 'en ook die houdt na zeven dagen op');
+  assert.equal(z.roteer(g, c, { verleng: true }), null, 'een verlopen sessie verlengt niet');
+  g.profielen.o = { id: 'o', rol: 'gast', naam: 'Oma' };
+  const k = z.geef(g, g.profielen.o, { geldigMs: T.KANAAL_MS });
+  assert.equal(z.roteer(g, k, { verleng: true }), null, 'het kanaal van een gast blijft twaalf uur');
+  assert.equal(z.vind(g, k).id, 'o', 'en de weigering laat zijn sessie staan');
 });
 
 test('5. intrekken, roteren en de epoch', () => {

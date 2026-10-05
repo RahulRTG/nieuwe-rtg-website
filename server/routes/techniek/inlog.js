@@ -35,7 +35,7 @@
    Afgesplitst uit routes/techniek.js toen die de 10 KB passeerde. */
 module.exports = (tctx) => {
   const { app, accounts, beveilig, magInzien, isEigenaar, tooManyTries, noteFailedTry, loginFails, kern } = tctx;
-  const tweefactor = kern && kern.tweefactor, rem = kern && kern.tweedeStapRem;
+  const tweefactor = kern && kern.tweefactor, rem = tweefactor && tweefactor.rem;
   if (!tweefactor || !rem) throw new Error('techniek/inlog: zonder tweefactor en zijn rem kan deze deur de tweede factor niet vragen');
   const sessie = (user) => ({ token: accounts.issueToken(user.id, 1), eigenaar: isEigenaar(user), naam: accounts.realNameOf(user) });
 

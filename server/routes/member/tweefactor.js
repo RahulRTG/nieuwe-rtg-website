@@ -16,8 +16,8 @@
 const { legInlogVast } = require('../../kern/identiteit/inlogherkomst');
 
 module.exports = (kern) => {
-  const { app, auth, accounts, handelingsspoor, tweefactor, stateFor, sessieregister, commercieel,
-    tweedeStapRem: rem } = kern;
+  const { app, auth, accounts, handelingsspoor, tweefactor, stateFor, sessieregister, commercieel } = kern;
+  const rem = tweefactor.rem;   // gedeeld met elke deur die een code toetst (kern/identiteit/tweedestap-rem.js)
 
   const eisLid = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'Alleen voor leden.' }); return false; }

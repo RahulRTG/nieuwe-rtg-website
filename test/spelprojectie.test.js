@@ -235,3 +235,26 @@ test('de browser gebruikt fragment, vaste POST-routes en geen persoonlijke schil
   assert.ok(eenmalig.has('POST /api/projectie/koppel'));
   assert.match(routes, /app\.get\('\/api\/projectie\/:code'[\s\S]*?status\(410\)/);
 });
+
+/* VERNIEUWEN (kern/bearercode-keten.js): een tweede uitgifte op hetzelfde
+   potje is een verse koppeling op naam van wie hem uitgeeft, met een eigen
+   termijn van vijftien minuten. De eerste uitgever blijft de uitgever. */
+test('een nieuwe uitgifte vernieuwt de koppeling: volgnummer, geschiedenis en eigen termijn', async () => {
+  const o = opstelling(), id = await seconden(o), oud = await koppel(o, id);
+  const rij = o.db.data.spellen.projecties[0], eerste = rij.koppeling;
+  await new Promise(r => setTimeout(r, 5));
+  const vers = await o.kern.projectieOpen('b', id, idem());
+  const nu = o.db.data.spellen.projecties[0].koppeling;
+  assert.equal(nu.rotatie, eerste.rotatie + 1);
+  assert.equal(o.db.data.spellen.projecties[0].rotatie, nu.rotatie);
+  assert.equal(nu.geschiedenis.at(-1).soort, 'vernieuwd');
+  assert.equal(nu.geschiedenis.at(-1).door, 'CN-b');
+  assert.equal(nu.geschiedenis.at(-1).einde_was, eerste.expires_at);
+  assert.equal(nu.issuer, eerste.issuer, 'de uitgever blijft');
+  assert.equal(Date.parse(nu.expires_at) - Date.parse(nu.issued_at), 15 * 60000,
+    'een vernieuwing draagt haar eigen termijn');
+  assert.ok(Date.parse(nu.expires_at) > Date.parse(eerste.expires_at));
+  assert.equal(nu.gebruik, 0, 'de teller begint opnieuw');
+  assert.equal((await o.kern.projectieKoppel(oud.uitgifte.code)).status, 404);
+  assert.equal((await o.kern.projectieKoppel(vers.code)).status, 200);
+});

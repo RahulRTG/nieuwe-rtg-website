@@ -13,7 +13,7 @@
    Deze meter is die probe als blijvend instrument: het frame dat erna komt
    moet tegen DEZE getallen bewijzen dat het iets oplost.
 
-   WAT HIJ MEET -- zeven invarianten, elk apart en met opzet geen totaalcijfer:
+   WAT HIJ MEET -- negen invarianten, elk apart en met opzet geen totaalcijfer:
 
      I1  een envelop die binnen een verzoek ontstaat, draagt diens correlatie
      I2  de correlatie maakt de server; een client-id is alleen `extern`, begrensd
@@ -21,6 +21,10 @@
      I4  achtergrondwerk erft geen verzoekidentiteit (timers na afloop)
      I5  na sluiten zegt geen context stil "gelukt"
      I9  geen enterWith in server/
+     I13 elk verzoekframe heeft precies een identiteit (een andere sleutel na
+         de eerste is een fout; dezelfde, scherper bekeken, is `herkend`)
+     I14 het verzoekframe is op elk auth-punt aanwezig en eens met handeling,
+         req.id, extern, req.envelop en de kostendrager
      I10 elke verzoekcontext overleeft de body-lezer (POST op het auth-punt)
 
    I1, I3, I4 en I10 draaien een ECHTE server (scripts/lib/contextdoorgifte-
@@ -74,7 +78,10 @@ const RICHTING = {
   i4LekPlekken: 'omlaag',
   i5StilNaSluiten: 'omlaag',
   i9EnterWith: 'omlaag',
-  i10AuthZonderContext: 'omlaag'
+  i10AuthZonderContext: 'omlaag',
+  i13TweedeIdentiteit: 'omlaag',
+  i14FrameAfwezig: 'omlaag',
+  i14FrameOneens: 'omlaag'
 };
 
 /* ---------- I9: enterWith in server/ ---------- */
@@ -194,6 +201,20 @@ async function meetI5() {
       vc.sluit(ctx);
       const r = vc.noteerSave();
       return { uitkomst: r, veranderd: !!ctx.opslaan };
+    });
+  });
+
+  /* Het verzoekframe (opzet/verzoekframe.js): na sluiten nog identificeren. */
+  uit.verzoekframe = proef(handeling, () => {
+    const vf = S('opzet/verzoekframe');
+    const req = { id: 'i5-frame', headers: {} }, res = new EventEmitter();
+    let binnen = null;
+    vf.middleware()(req, res, () => { binnen = AsyncResource.bind((fn) => fn()); });
+    res.emit('finish');
+    return binnen(() => {
+      let r = false;
+      try { r = vf.identificeer({ sleutel: 'i5-proef' }); } catch (e) { r = false; }
+      return { uitkomst: r, veranderd: !!vf.huidig().actor };
     });
   });
 
@@ -334,6 +355,9 @@ function ijkServer(R) {
     if (j.envelop.metVerzoekCorrelatie < 1) fout.push('I1 ziet een envelop met verzoekcorrelatie niet');
     if (j.auth.n - j.auth.metHandeling < 1) fout.push('I10 ziet een auth-punt zonder handeling niet');
     if (j.auth.correlatieEens < 1) fout.push('I3 ziet een correlatie die klopt niet');
+    if (!(j.auth.frameOneens >= 1)) fout.push('I14 ziet een frame dat het oneens is niet');
+    if (!(j.auth.n - j.auth.metFrame >= 1)) fout.push('I14 ziet een auth-punt zonder frame niet');
+    if (!R.frameIjk || R.frameIjk.tweedeIdentiteit < 1) fout.push('I13 ziet een tweede identiteit niet');
   }
   return fout;
 }
@@ -353,6 +377,12 @@ function samenvatting({ i5, i9, server }) {
     g.i4 = { gezetInVerzoek: m.timers.gezetInVerzoek, gevuurdNaAfloop: m.timers.gevuurdNaAfloop,
       naAfloopMetDrager: m.timers.naAfloopMetDrager, naAfloopMetAiSessie: m.timers.naAfloopMetAiSessie,
       plekken: m.timers.plekken, lekPlekken: Object.keys(m.timers.plekken).length };
+    const ft = server.R.frameTellers || {}, fi = server.R.frameIjk || {};
+    const na = (k) => (ft[k] || 0) - (fi[k] || 0);   // de ijking telt niet mee
+    g.i13 = { geidentificeerd: na('geidentificeerd'), herkend: na('herkend'),
+      tweedeIdentiteit: na('tweedeIdentiteit'), naSluiten: na('naSluiten') };
+    g.i14 = { authPunten: m.auth.n, metFrame: m.auth.metFrame, eens: m.auth.frameEens,
+      oneens: m.auth.frameOneens, waarom: m.auth.frameWaarom };
     g.i10 = { authPunten: m.auth.n, metHandeling: m.auth.metHandeling, metAiContext: m.auth.metAiContext,
       metEffectteller: m.auth.metEffectteller, post: m.auth.post, postMetAlleDrie: m.auth.postMetAlleDrie };
     g.noemer = { verzoeken: server.verzoeken, perMethode: server.perMethode, statussen: server.statussen,
@@ -374,6 +404,8 @@ function tandenVan(g) {
     t.i10AuthZonderContext = g.i10.authPunten - Math.min(g.i10.metHandeling, g.i10.metAiContext, g.i10.metEffectteller);
   }
   if (g.i4) t.i4LekPlekken = g.i4.lekPlekken;
+  if (g.i13 && g.i13.geidentificeerd) t.i13TweedeIdentiteit = g.i13.tweedeIdentiteit;
+  if (g.i14 && g.i14.authPunten) { t.i14FrameAfwezig = g.i14.authPunten - g.i14.metFrame; t.i14FrameOneens = g.i14.oneens; }
   return t;
 }
 
@@ -425,7 +457,7 @@ if (require.main === module) {
     const { stempel } = require('./lib/stempel');
     const uit = {
       stempel: stempel(),
-      uitleg: 'Loopt de identiteit van een verzoek door de zeven async-contexten waar hij hoort, en niet verder? Zeven invarianten uit het Fase 2-onderzoek (RTG Request Frame), elk apart en zonder totaalcijfer. De ratel mag alleen de goede kant op; zie test/contextdoorgifte.test.js.',
+      uitleg: 'Loopt de identiteit van een verzoek door de zeven async-contexten waar hij hoort, en niet verder? Negen invarianten uit het Fase 2-onderzoek (RTG Request Frame), elk apart en zonder totaalcijfer. De ratel mag alleen de goede kant op; zie test/contextdoorgifte.test.js.',
       hoe: 'npm run contextdoorgifte',
       grens: 'Alleen statische leden- en zaakroutes die de rolkaart een rol geeft (vandaag allemaal POST, zie noemer.perMethode) met een leeg lijf, geen PostgreSQL- of Redis-stand, alleen timers via de globale timerfuncties. Een lege noemer is niet vast te stellen.',
       richting: RICHTING,

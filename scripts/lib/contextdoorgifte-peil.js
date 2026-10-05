@@ -26,11 +26,12 @@ const kenv = S('kern/envelop');
 const haak = S('kern/kosten/haak');
 const em = S('effectmeter');
 const aic = S('ai-context');
+const vf = S('opzet/verzoekframe');
 
 const leeg = () => ({
   envelop: { binnenVerzoek: 0, metVerzoekCorrelatie: 0, metActor: 0, metSessie: 0, kanalen: {} },
   auth: { n: 0, post: 0, metHandeling: 0, metAiContext: 0, metEffectteller: 0, postMetAlleDrie: 0,
-    correlatieEens: 0, correlatieOneens: 0 },
+    correlatieEens: 0, correlatieOneens: 0, metFrame: 0, frameEens: 0, frameOneens: 0, frameWaarom: {} },
   i2: [],
   timers: { gezetInVerzoek: 0, gevuurdMetVerzoek: 0, gevuurdNaAfloop: 0, naAfloopMetDrager: 0,
     naAfloopMetAiSessie: 0, plekken: {} }
@@ -64,7 +65,7 @@ kenv.maak = function (o) {
 
 /* I3 en I10: het auth-punt. Daar is de identiteit vastgesteld en het lijf gelezen. */
 const echtBinnen = haak.binnen;
-haak.binnen = function (d, fn, pas) {
+haak.binnen = function (d, fn, pas, herkomst) {
   return echtBinnen.call(this, d, () => {
     try {
       const a = doel.auth, h = handeling.huidige(), c = aic.huidig(), t = em.huidig();
@@ -86,9 +87,24 @@ haak.binnen = function (d, fn, pas) {
         const eens = req.id === h.correlatie && (!env || env.correlatie === h.correlatie);
         if (eens) a.correlatieEens++; else a.correlatieOneens++;
       }
+      /* I14: het verzoekframe is op het auth-punt aanwezig en eens met de rest:
+         correlatie (handeling, req.id), extern, actor (req.envelop) en drager
+         (de kostenhaak). Bij oneens telt het EERSTE vak dat verschilt. */
+      const f = vf.huidig();
+      if (f) {
+        a.metFrame++;
+        const env = req && req.envelop;
+        const waarom = !h || f.correlatie !== h.correlatie ? 'correlatie-handeling'
+          : !req || f.correlatie !== req.id ? 'correlatie-req'
+          : f.extern !== (req.externeId == null ? null : req.externeId) ? 'extern'
+          : env && (!f.actor || f.actor.sleutel !== (env.actor && env.actor.id || null)) ? 'actor'
+          : !f.drager || f.drager.drager !== haak.wieNu() ? 'drager' : null;
+        if (waarom) { a.frameOneens++; a.frameWaarom[waarom] = (a.frameWaarom[waarom] || 0) + 1; }
+        else a.frameEens++;
+      }
     } catch (e) { /* idem */ }
     return fn();
-  }, pas);
+  }, pas, herkomst);
 };
 
 /* I4: een timer die binnen een verzoek wordt gezet en NA afloop vuurt, en dan
@@ -130,20 +146,24 @@ function ijk() {
   const res = new EventEmitter();
   const mw = handeling.middleware({ data: () => null, log: () => {} });
   let naAfloop = null;
-  mw(req, res, () => {
+  /* Het frame krijgt met opzet een ANDERE correlatie dan de handeling (I14 moet
+     oneens zien) en wordt twee keer geidentificeerd met een andere sleutel (I13). */
+  vf.middleware()(Object.assign(Object.create(req), { id: 'ijk-anders' }), res, () => mw(req, res, () => {
+    vf.identificeer({ sleutel: 'ijk-a' });
+    try { vf.identificeer({ sleutel: 'ijk-b' }); } catch (e) { /* verwacht: dat is de ijking */ }
     aic.inContext({ ip: req.ip, req }, () => {
       haak.binnen(haak.drager('lid', 'ijk'), () => {
         kenv.maak({ kanaal: 'ijk', correlatie: req.id });
         naAfloop = AsyncResource.bind(() => setTimeout(() => {}, 1));
       });
     });
-  });
+  }));
   res.emit('finish');
   /* De timer wordt NA afloop gezet maar in de context van het verzoek: precies
      de vorm van een gedeelde spoeltimer die zijn ronde begint. */
   naAfloop();
   haak.binnen(haak.HUIS, () => {});   // een auth-punt zonder verzoek: moet als ZONDER tellen
-  setTimeout(() => { R.ijkKlaar = true; doel = R.meting; }, 30);
+  setTimeout(() => { R.ijkKlaar = true; R.frameIjk = vf.tellers(); doel = R.meting; }, 30);
 }
 try { ijk(); } catch (e) { R.ijkFout = String(e && e.message || e).slice(0, 200); doel = R.meting; }
 
@@ -152,6 +172,7 @@ try { ijk(); } catch (e) { R.ijkFout = String(e && e.message || e).slice(0, 200)
    breekt de server niet; de meter ziet dan geen bestand en stopt. */
 const schrijf = () => {
   if (!UIT) return;
+  R.frameTellers = vf.tellers();
   try { fs.writeFileSync(UIT + '.tmp', JSON.stringify(R)); fs.renameSync(UIT + '.tmp', UIT); }
   catch (e) { process.stderr.write('contextdoorgifte-peil: schrijven mislukt: ' + e.message + '\n'); }
 };

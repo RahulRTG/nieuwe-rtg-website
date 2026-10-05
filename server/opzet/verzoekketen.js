@@ -67,7 +67,7 @@ module.exports = function verzoekketen(deps) {
      iets gebeurde is erger dan geen meter, dus staat hij nu boven alles wat
      parkeert. Zie server/effectmeter.js.
 
-     Zonder RTG_STAATLOG hangt hij helemaal niet in de keten. */
+     Zonder RTG_STAATLOG hangt hij niet in de keten. */
   /* DE EFFECTBON STAAT ERBOVEN, om precies de les hierboven: hij opent de tellercontext
      (de effectmeter hergebruikt die) en staat ALTIJD aan. Eronder zou hij zijn context na
      de body-lezer openen en dezelfde stilte melden -- op de laag die in PRODUCTIE moet
@@ -79,6 +79,7 @@ module.exports = function verzoekketen(deps) {
      staat vóór bodylezers en dus ook vóór de rauwe betaalwebhooks. */
   if (typeof postgresVerzoekMiddleware === 'function') app.use(postgresVerzoekMiddleware());
   app.use(logboek.middleware()); // correlatie-id + verzoeklog (methode, pad, status, duur)
+  app.use(require('./verzoekframe').middleware()); // identiteit van dit werk (schaduw)
   // wat verandert dit verzoek: rijen per collectie voor en na (blast radius).
   // NA het logboek want hij leunt op req.id; bewust niet in save(). Zie de kop
   // van ./handeling.js voor de afweging en de gemeten kosten.
@@ -90,8 +91,8 @@ module.exports = function verzoekketen(deps) {
   app.use(require('./handeling').middleware({
     klasse: require('../kern/handelingsklasse').maakHandelingsklasse({}).klasseVoor
   }));
-  /* De meting draait NA het logboek en VOOR de routes: hij hangt aan res.finish,
-     dus hij ziet alles wat er daarna gebeurt, inclusief de 404's. */
+  /* De meting draait NA het logboek en VOOR de routes (res.finish): hij ziet
+     alles daarna, ook de 404's. */
   app.use(require('../meting').middleware());
   /* Het routejournaal staat ernaast en doet alleen iets met RTG_ROUTELOG gezet
      (de testrun). Het levert de dekkingsmeting waargenomen feiten in plaats van
@@ -140,10 +141,10 @@ module.exports = function verzoekketen(deps) {
   require('./lijfpoort')({ app, express, db, save, log, betaal, betaalWaarheid, muntbetaal,
     opslagKlaar, zaakdoos, muntenVan, settleFactuurVan, opdrachtenVan });
   /* NA de lijfpoort, want die leest de body -- en dat lezen breekt de
-     handelingscontext van stap 3. Zonder deze regel is server/opzet/begroting.js
-     blind voor elke POST met een body, en dat is elke mutatie. Het hele verhaal
-     staat bij hervat() in ./handeling.js. */
+     handelingscontext van stap 3 (en het verzoekframe). Zonder deze regel is
+     begroting.js blind voor elke POST met een body; zie hervat() in ./handeling.js. */
   app.use(require('./handeling').hervat());
+  app.use(require('./verzoekframe').hervat());
 
   return {
     schild, zetWacht, lieg,

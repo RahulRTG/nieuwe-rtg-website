@@ -4,7 +4,9 @@
    beheert.
 
    - /gezin/sessie/roteer: de HOUDER ruilt zijn eigen sessie in voor een nieuwe.
-     De oude valt meteen weg en de nieuwe staat een keer in dit antwoord. Niemand
+     De oude valt meteen weg en de nieuwe staat een keer in dit antwoord; zij
+     houdt het einde van de oude (B19: roteren verlengt niet, alleen
+     /gezin/sessie/verleng met een passkey, ./gezinsdeur.js). Niemand
      roteert de sessie van een ander: dan had de beheerder de sleutel van zijn
      kind in handen.
    - /gezin/sessie/intrek: zonder profielId meldt de houder DEZE sessie af

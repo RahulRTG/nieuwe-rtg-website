@@ -45,7 +45,7 @@ test.before(async () => {
 
   gezin = (await fnd('/gezin/maak', { gezinsnaam: 'Familie Spil', naam: 'Ouder Spil', pin: '4321' })).body;
   kind = (await fnd('/gezin/profiel/maak', { code: gezin.code, token: gezin.token, naam: 'Tycho', rol: 'kind', groep: 'kind' })).body;
-  kindToken = (await fnd('/gezin/profiel/kies', { code: gezin.code, profielId: kind.profiel.id })).body.token;
+  kindToken = (await fnd('/gezin/profiel/kies', { gezinscode: gezin.gezinscode, profielId: kind.profiel.id })).body.token;
   for (const k of [klas, klasB]) {
     await fnd('/school/koppel', { code: gezin.code, token: gezin.token, klasCode: k.code, profielId: kind.profiel.id });
     await fnd('/school/uitnodiging/antwoord', { code: gezin.code, token: kindToken, klasCode: k.code, akkoord: true });

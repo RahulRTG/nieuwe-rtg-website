@@ -8,12 +8,11 @@ module.exports = (ctx) => {
   const { db, save, eigenVeld, crypto,
     encS, decS, teVaak, misluktePoging, goedePoging, ipVan, anthropic,
     router, F, nu, rid, schoon, LETTERS, DEMO, TIPS } = ctx;
-/* ---------- het gezin: een account, meerdere profielen (net als bij een
-   streamingdienst). De beheerder (ouder of verzorger) maakt het gezin aan en
-   kan profielen toevoegen, en berichten of een reis-oproep sturen naar iedereen
-   of naar een profiel. Iedereen logt in op hetzelfde gezin met de gezinscode en
-   kiest daarna zijn eigen profiel. ---------- */
+/* ---------- het gezin: een account, meerdere profielen. De beheerder maakt
+   het gezin aan, voegt profielen toe en stuurt berichten. Iedereen logt in met
+   de gezinscode en zijn eigen pincode (./gezinstoegang.js). ---------- */
 function G() { const f = F(); if (!f.gezinnen) f.gezinnen = {}; return f.gezinnen; }
+// het ADRES van een gezin (zes tekens): opent niets, de gezinscode is ./gezinscode.js
 function nieuweGezinscode() {
   let c; do { c = Array.from({ length: 6 }, () => LETTERS[crypto.randomInt(LETTERS.length)]).join(''); } while (G()[c]);
   return c;
@@ -154,6 +153,10 @@ function gezinVan(req, res) {
    epoch en constant-time zoeken. Dit is de ENE vergelijking; een oud kaal
    token opent niets, en de eerste aanroep haalt die van schijf. */
 const gezinstoken = require('./gezinstoken').maak({ crypto, nu });
+// de gezinscode (B18) en het stroomticket, elk in een eigen collectie
+const bc = ctx.bewerkCollectie;
+const gezinscode = require('./gezinscode').maak({ db, crypto, bewerkCollectie: bc, G, nu });
+const gezinsstroom = require('./gezinsstroom').maak({ db, crypto, bewerkCollectie: bc, gezinstoken, G, nu, rtfHandle });
 let oudGeruimd = false;
 function profielVan(g, token) {
   if (!oudGeruimd && Object.keys(G()).length) { oudGeruimd = true; if (gezinstoken.ruimOud(G())) save(); }
@@ -172,5 +175,5 @@ function berichtVoorMij(b, pid) { return b.naar === 'allen' || b.naar === pid ||
   return { G, nieuweGezinscode, ROLLEN, GROEPEN, GROEP_INFO, geboorteInfo, groepVanLeeftijd, actualiseerGroep,
     magSolliciteren, groepLeeftijd, isBeschermd, schoonGroep, isGast, KLEUREN, hashPin, checkPin, geldigePin,
     schoonAvatar, schoonKleur, nieuweCodenaam, ensureCodenaam, rtfHandle, socialProfielen, profielInfoVanHandle,
-    pubProfiel, pubGezin, gezinVan, profielVan, beheerderVan, berichtVoorMij, gezinstoken };
+    pubProfiel, pubGezin, gezinVan, profielVan, beheerderVan, berichtVoorMij, gezinstoken, gezinscode, gezinsstroom };
 };

@@ -1,11 +1,11 @@
 {
  "stempel": {
-  "op": "2026-10-05T03:09:36.459Z",
-  "commit": "ff3482c9",
+  "op": "2026-10-05T08:51:59.906Z",
+  "commit": "aa865932",
   "boomVuil": false,
   "boomAnders": 3,
   "instrument": "scripts/handlerwacht.js",
-  "node": "v22.22.2"
+  "node": "v22.22.0"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
@@ -1598,19 +1598,19 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/wissen",
-   "bestand": "server/foundation/zorg.js:106",
+   "bestand": "server/foundation/zorg.js:107",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/wissen/bevestig",
-   "bestand": "server/foundation/zorg.js:113",
+   "bestand": "server/foundation/zorg.js:114",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/wissen/intrekken",
-   "bestand": "server/foundation/zorg.js:121",
+   "bestand": "server/foundation/zorg.js:122",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },

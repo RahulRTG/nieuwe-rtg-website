@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-05T14:19:45.692Z",
-    "commit": "96ba8cac",
+    "op": "2026-10-05T16:29:29.071Z",
+    "commit": "6f75110b",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5116,6 +5116,13 @@
       "operator": "===->!==#0",
       "gezakt": 3,
       "geprobeerd": 1
+    },
+    "gezondheidstoestemming.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "gezondheidstoestemming.test.js": {
       "soort": "server",

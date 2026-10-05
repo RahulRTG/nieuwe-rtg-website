@@ -39,6 +39,17 @@ module.exports = (kern) => {
     stuur(res, rtf.eigenGezinSessie({ userId: u.id, profielId: (req.body || {}).profielId, volwassen: mijnStand(u).volwassen }));
   });
 
+  // een gezin van voor 5 oktober meenemen: gezinscode plus de pincode van de beheerder
+  app.post('/api/rtf/eigen-gezin/koppel', auth, async (req, res) => {
+    if (!eisAccount(req, res)) return;
+    const u = req.session.account, b = req.body || {};
+    const r = await rtf.eigenGezinKoppel({ userId: u.id, codenaam: u.codename, leeftijd: mijnStand(u).leeftijd,
+      raw: b.gezinscode, pin: b.pin }, res);
+    if (!r) return; // de rem heeft al geantwoord (429)
+    res.set('Cache-Control', 'no-store');
+    stuur(res, r);
+  });
+
   app.post('/api/rtf/eigen-gezin/kind', auth, (req, res) => {
     if (!eisAccount(req, res)) return;
     const u = req.session.account, b = req.body || {};

@@ -37,6 +37,14 @@ const CONTRACTEN = {
     bewijs: gemeten('twee keer 200 met twee verschillende sessies, en de eerste opende daarna nog steeds het gezin.'),
     afgetekend: AF
   },
+  'POST /api/rtf/eigen-gezin/koppel': {
+    mutatieId: 'foundation.eigengezin.meenemen', herkomst: 'mens',
+    semantiek: { klasse: 'idempotent' }, toegang: LID, stand: 'PROTECTED',
+    bewijs: { gemeten: 'test/gezinmeenemen.test.js toets 4 (' + OP + '): met hetzelfde lijf gaf de tweede 409 zonder ' +
+      'sessie (dit account heeft al een gezin), en een ander account kreeg 409 (het gezin heeft een eigenaar). Een ' +
+      'toestandscontrole: een gezin, een eigenaar.', op: OP },
+    afgetekend: { door: 'Claude, op grond van test/gezinmeenemen.test.js; niet door een mens nagelezen', op: OP }
+  },
   'POST /api/rtf/eigen-gezin/kind': {
     mutatieId: 'foundation.eigengezin.kind', herkomst: 'mens',
     semantiek: { klasse: 'idempotent' }, toegang: LID, stand: 'PROTECTED',

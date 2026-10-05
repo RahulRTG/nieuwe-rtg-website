@@ -114,6 +114,9 @@ module.exports = (gctx, ctx, plicht) => {
     return { profiel: pubProfiel(p, true) };
   }
 
+  // een bestaand gezin meenemen naar dit account: ./gezinmeenemen.js
+  const koppel = require('./gezinmeenemen')(gctx, { accountGezin, overzicht });
+
   function mijn(userId) {
     const g = accountGezin(userId);
     return g ? overzicht(g, userId) : { gezin: null };
@@ -138,6 +141,6 @@ module.exports = (gctx, ctx, plicht) => {
      pas na de foundation-router. */
   function setVolwassen(fn) { ctx.volwassenSleutel = typeof fn === 'function' ? fn : null; }
 
-  return { accountGezin, eigenGezinMaak: maak, eigenGezinSessie: sessie, eigenGezinKind: kind, eigenGezin: mijn,
+  return { accountGezin, eigenGezinMaak: maak, eigenGezinSessie: sessie, eigenGezinKind: kind, eigenGezin: mijn, eigenGezinKoppel: koppel,
     vergeetAccount, setVolwassen, volwassenAccount: plicht.volwassenAccount };
 };

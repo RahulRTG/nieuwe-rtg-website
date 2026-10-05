@@ -639,9 +639,17 @@
   <div id="aMaak" hidden>
     <input class="veld" id="aGezin" placeholder="Naam van uw gezin" maxlength="40" aria-label="Naam van uw gezin">
     <input class="veld" id="aNaam" placeholder="Uw naam in het gezin" maxlength="40" aria-label="Uw naam in het gezin">
-    <label class="mini"><input type="checkbox" id="aBevoegd"> Ik ben ouder of verzorger en mag dit gezin aanmaken.</label>
-    <label class="mini"><input type="checkbox" id="aPrivacy"> Ik heb de <a href="privacy.html">privacy-uitleg</a> gelezen.</label>
+    <div><label class="mini"><input type="checkbox" id="aBevoegd"> Ik ben ouder of verzorger en mag dit gezin aanmaken.</label></div>
+    <div><label class="mini"><input type="checkbox" id="aPrivacy"> Ik heb de <a href="privacy.html">privacy-uitleg</a> gelezen.</label></div>
   </div>
+  <!-- Een gezin van voor het account meenemen: de gezinscode plus de pincode van
+       de beheerder, net als bij de gezinsdeur. Daarna is het account de sleutel. -->
+  <details id="aMee" hidden>
+    <summary class="mini">Ik heb al een gezin: neem het mee naar mijn account</summary>
+    <input class="veld" id="aMCode" placeholder="Gezinscode (GC.…)" maxlength="48" autocapitalize="characters" aria-label="Gezinscode">
+    <input class="veld" id="aMPin" type="password" placeholder="Uw pincode als beheerder" inputmode="numeric" maxlength="6" autocomplete="current-password" aria-label="Uw pincode als beheerder">
+    <button class="knop grijs klein" id="aMDoe">Gezin meenemen</button>
+  </details>
   <div id="aProfielen" hidden></div>
   <div id="aKind" hidden>
     <div class="mini" id="aKindUitleg"></div>

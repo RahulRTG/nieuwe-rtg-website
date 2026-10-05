@@ -32,7 +32,7 @@
   function naarInlog() {
     var dlg = $('#dlgAccount');
     try { if (!dlg.open) dlg.showModal(); } catch (e) {}
-    ['#aMaak', '#aProfielen', '#aKind', '#aDoe'].forEach(function (s) { $(s).hidden = true; });
+    ['#aMaak', '#aMee', '#aProfielen', '#aKind', '#aDoe'].forEach(function (s) { $(s).hidden = true; });
     $('#aTitel').textContent = 'Eerst inloggen';
     $('#aSub').textContent = '';
     var t = document.createElement('span');
@@ -51,7 +51,7 @@
   }
 
   function toonGezin(d) {
-    $('#aMaak').hidden = true; $('#aDoe').hidden = true;
+    $('#aMaak').hidden = true; $('#aMee').hidden = true; $('#aDoe').hidden = true;
     $('#aTitel').textContent = d.gezin.naam;
     $('#aSub').textContent = 'Kies wie dit toestel gebruikt.';
     var lijst = $('#aProfielen'); lijst.textContent = ''; lijst.hidden = false;
@@ -77,12 +77,12 @@
     $('#aProfielen').hidden = true; $('#aKind').hidden = true;
     $('#aTitel').textContent = 'Mijn gezin';
     if (!d.achttienPlus) {
-      $('#aMaak').hidden = true; $('#aDoe').hidden = true;
+      $('#aMaak').hidden = true; $('#aMee').hidden = true; $('#aDoe').hidden = true;
       $('#aSub').textContent = 'Een gezin maken kan vanaf 18 jaar. Ben je jonger? Vraag je ouder of verzorger om je toe te voegen.';
       return;
     }
     $('#aSub').textContent = 'Er hangt nog geen gezin aan uw account. Maak het hier aan; FoundationOS blijft gratis.';
-    $('#aMaak').hidden = false; $('#aDoe').hidden = false;
+    $('#aMaak').hidden = false; $('#aMee').hidden = false; $('#aDoe').hidden = false;
   }
 
   function laad() {
@@ -107,6 +107,15 @@
           window.Sessie.zet({ code: d.code, token: d.token, gezin: d.gezin, profiel: d.profiel });
           location.hash = ''; location.reload();
         }).catch(function (e) { fout(e.message); });
+    });
+    // een gezin van voor het account meenemen (server: foundation/gezinmeenemen.js)
+    $('#aMDoe').addEventListener('click', function () {
+      fout('');
+      vraag('/koppel', { gezinscode: $('#aMCode').value.trim(), pin: $('#aMPin').value.trim() })
+        .then(function (d) {
+          window.Sessie.zet({ code: d.code, token: d.token, gezin: d.gezin, profiel: d.profiel });
+          location.hash = ''; location.reload();
+        }).catch(function (e) { $('#aMPin').value = ''; fout(e.message); });
     });
     $('#aKDoe').addEventListener('click', function () {
       fout('');

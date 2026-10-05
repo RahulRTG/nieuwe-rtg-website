@@ -130,7 +130,7 @@ De bijbehorende code:
 | R-G5 | Een token lekt via een URL | Middel | Middel | `tokenUit()` accepteert het token ook als `?token=`, en de social-stream zet het in de URL. Daarom blijft die stream hard dicht (`foundation-nog-gesloten.js`). Het token is 128 bits, vervalt, en is in te trekken |
 | R-G6 | Een gestolen toestel van een kind | Middel | Middel | De ouder trekt de sessie in (`/gezin/sessie/intrek`). Een sessie verloopt na 30 dagen |
 | R-G7 | De paspoortkeuring wordt ingetrokken, maar de sessie van het kind loopt door | Laag | Middel | `profielVan()` rekent `volwassen()` bij elk verzoek opnieuw. `[TE MAKEN: geen toets dekt dit geval apart; de route die sessies uitgeeft wel]` |
-| R-G8 | Gegevens van een oud, anoniem gezin worden onbereikbaar maar blijven bestaan | Middel | Laag | Onder de accountplicht opent zo'n gezin niets meer, maar de gegevens staan er nog. `[TE BESLISSEN: migreren naar een account, of wissen na aankondiging]` |
+| R-G8 | Gegevens van een oud, anoniem gezin worden onbereikbaar maar blijven bestaan | Middel | Laag | De beheerder neemt het gezin mee naar zijn account met de gezinscode plus zijn eigen pincode (`/api/rtf/eigen-gezin/koppel`, `foundation/gezinmeenemen.js`); de gegevens blijven en het account wordt de sleutel. Grens: een gezin van vóór B18 heeft nog geen gezinscode van 128 bits, en die maakt de beheerder met een sessie die onder de plicht niet meer opent. `[TE BESLISSEN: wat er met zulke gezinnen gebeurt; wissen na aankondiging is het voorstel]` |
 
 ---
 
@@ -144,6 +144,7 @@ De bijbehorende code:
 | R-G2 | Een gezin maken kan pas vanaf een opgegeven leeftijd van 18 | `gezinseigenaar.js` `maak` | `test/gezinseigenaar.test.js` 8 (een account van 16) |
 | R-G4 | Verwijderen van het account wist het gezin; export toont het | `kern/vergeten.js`, `routes/member/privacy.js` | `test/gezinseigenaar.test.js` 7 |
 | R-G4 | Een gratis account heeft recht op inzage en vergetelheid (dat weigerde eerder: `tier === 'guest'`) | `routes/member/privacy.js` | `test/gezinseigenaar.test.js` 7 |
+| R-G8 | Een bestaand gezin meenemen kan alleen de beheerder, met gezinscode en pincode, met een rem per account en per gezin; een gezin krijgt één eigenaar | `foundation/gezinmeenemen.js` | `test/gezinmeenemen.test.js` |
 | R-G5, R-G6 | Token van 128 bits, alleen de hash bewaard, met verval, epoch en intrekken | `gezinstoken.js` | `test/gezinstoken.test.js`, `test/gezinssessie.test.js` |
 | R-G5 | De stream met een token in de URL blijft dicht, ook met vrijgave | `foundation-nog-gesloten.js` | `test/foundation-productiepoort.test.js` |
 | alle | Zonder ondertekend dossier blijven de beschermde functies 503 | `foundation-productiepoort.js` | `test/foundation-productiepoort.test.js` |

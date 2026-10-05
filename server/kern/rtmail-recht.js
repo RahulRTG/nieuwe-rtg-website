@@ -32,6 +32,8 @@
       loggen het". Een reden achteraf verzinnen kan iedereen; een reden vooraf
       opschrijven is een drempel. */
 const adresLaag = require('./rtmail-adres');
+const klok = require('../lib/klok');
+const { maakLijn } = require('./rtmail-lijn');
 
 const RECHTEN = ['metadata', 'lezen', 'antwoorden', 'verzenden', 'namens', 'verwijderen',
   'vernietigen', 'exporteren', 'regels', 'delegatie', 'bewaarbeleid', 'zoekenBreed', 'inzage'];
@@ -41,7 +43,7 @@ const EIGEN = RECHTEN.filter(r => r !== 'inzage');
 
 module.exports = ({ db, save, crypto }) => {
   const eigenC = require('./eigencollectie')({ db, domein: 'kern/rtmail-recht', bezit: { rtmailRecht: 'kaart' } });
-  const nu = () => new Date().toISOString();
+  const nu = () => klok.datum().toISOString();
   const busVan = (adres) => {
     const o = adresLaag.ontleed(adres);
     return o.binnenshuis ? String(o.lokaal || '').replace(/[.-]/g, '') : String(o.adres || '');
@@ -55,11 +57,9 @@ module.exports = ({ db, save, crypto }) => {
     return d;
   }
 
-  /* Het journaal. Elke handeling die iets zegt over ANDERMANS post komt hier
-     langs -- lezen, zoeken, exporteren, vernietigen, rechten geven. Hij staat
-     nieuwste eerst en is niet te wissen via een gewone weg; wat hier eenmaal
-     in staat, hoort een vraag te kunnen beantwoorden die pas over een jaar
-     gesteld wordt. */
+  /* Het journaal: elke handeling over ANDERMANS post (lezen, zoeken, exporteren,
+     vernietigen, rechten geven), nieuwste eerst en niet via een gewone weg te
+     wissen -- hij moet een vraag van over een jaar nog kunnen beantwoorden. */
   function log(wie, wat, waarover, reden, extra) {
     const d = D();
     d.journaal.unshift(Object.assign({ id: crypto.randomBytes(5).toString('hex'),
@@ -70,10 +70,9 @@ module.exports = ({ db, save, crypto }) => {
     return d.journaal[0];
   }
 
-  /* Rechten geven op een postvak. Alleen wie zelf `delegatie` heeft (dus de
-     eigenaar, of iemand die dat recht kreeg) mag dit -- en nooit meer geven dan
-     hij zelf heeft. Anders is elke delegatie een manier om rechten te maken
-     die niemand had. */
+  /* Rechten geven op een postvak: alleen wie zelf `delegatie` heeft, en nooit
+     meer of langer dan hij zelf heeft -- anders maakt delegatie rechten die
+     niemand had. */
   function delegeer(gever, { postvak, aan, rechten, tot, reden } = {}) {
     const bus = busVan(postvak);
     const aanBus = busVan(aan);
@@ -83,8 +82,14 @@ module.exports = ({ db, save, crypto }) => {
     if (!gevraagd.length) return { error: 'Welke rechten? Kies uit: ' + RECHTEN.join(', ') + '.' };
     const teveel = gevraagd.filter(r => !mag(gever, postvak, r, 'delegatie').ok);
     if (teveel.length) return { error: 'U kunt niet weggeven wat u zelf niet heeft: ' + teveel.join(', ') + '.' };
-    const t = tot ? new Date(tot) : null;
+    let t = tot ? new Date(tot) : null;
     if (t && isNaN(t.getTime())) return { error: 'Dat is geen tijdstip.' };
+    if (t && t.toISOString() <= nu()) return { error: 'Dat tijdstip ligt al achter ons.' };
+    const eigen = busVan(gever) === bus ? null : D().delegaties.find(x => x.postvak === bus && x.aan === busVan(gever));
+    if (eigen && eigen.tot) { // nooit langer dan de gever zelf
+      if (!t) t = new Date(eigen.tot);
+      else if (t.toISOString() > eigen.tot) return { error: 'U kunt niet langer weggeven dan u zelf heeft.' };
+    }
     const d = D();
     const bestaand = d.delegaties.find(x => x.postvak === bus && x.aan === aanBus);
     const rij = bestaand || { id: crypto.randomBytes(5).toString('hex'), postvak: bus, aan: aanBus, at: nu() };
@@ -115,8 +120,9 @@ module.exports = ({ db, save, crypto }) => {
 
   const geldig = (r, t) => !r.tot || r.tot >= t;
 
-  /* De kernvraag: mag DEZE persoon DIT op DAT postvak? Geeft altijd een reden
-     terug bij nee -- "u mag dit niet" zonder waarom kost een supportgesprek. */
+  const lijn = maakLijn({ RECHTEN, geldig }); // de gever moet het NU nog mogen; zie ./rtmail-lijn.js
+
+  /* Mag DEZE persoon DIT op DAT postvak? Bij nee altijd met de reden. */
   function mag(wie, postvak, recht, alsDelegatieCheck) {
     if (!RECHTEN.includes(recht)) return { ok: false, waarom: 'Dat recht bestaat niet.' };
     const eigen = busVan(wie), bus = busVan(postvak);
@@ -128,7 +134,8 @@ module.exports = ({ db, save, crypto }) => {
     }
     const t = nu();
     const d = D().delegaties.find(x => x.postvak === bus && x.aan === eigen && geldig(x, t));
-    if (d && d.rechten.includes(recht)) return { ok: true, via: 'delegatie', tot: d.tot || null };
+    if (d && lijn.effectief(D().delegaties, d, t).includes(recht)) return { ok: true, via: 'delegatie', tot: d.tot || null };
+    if (d && d.rechten.includes(recht)) return { ok: false, waarom: 'Wie u dit gaf, mag het zelf niet meer weggeven.' };
     const verlopen = D().delegaties.find(x => x.postvak === bus && x.aan === eigen && !geldig(x, t));
     if (verlopen && !alsDelegatieCheck) {
       return { ok: false, waarom: 'Uw toegang tot dit postvak is verlopen op ' + verlopen.tot + '.' };

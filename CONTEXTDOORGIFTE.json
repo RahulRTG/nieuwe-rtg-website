@@ -1,15 +1,15 @@
 {
  "stempel": {
-  "op": "2026-10-05T09:21:06.972Z",
-  "commit": "b7f14dfaa",
-  "boomVuil": true,
-  "boomAnders": 1,
+  "op": "2026-10-05T09:30:44.118Z",
+  "commit": "d3427db96",
+  "boomVuil": false,
+  "boomAnders": 0,
   "instrument": "scripts/contextdoorgifte.js",
   "node": "v22.22.0"
  },
  "uitleg": "Loopt de identiteit van een verzoek door de zeven async-contexten waar hij hoort, en niet verder? Zes invarianten uit het Fase 2-onderzoek (RTG Request Frame), elk apart en zonder totaalcijfer. De ratel mag alleen de goede kant op; zie test/contextdoorgifte.test.js.",
  "hoe": "npm run contextdoorgifte",
- "grens": "Alleen statische leden- en zaakroutes met een leeg lijf, geen PostgreSQL- of Redis-stand, alleen timers via de globale timerfuncties. Een lege noemer is niet vast te stellen.",
+ "grens": "Alleen statische leden- en zaakroutes die de rolkaart een rol geeft (vandaag allemaal POST, zie noemer.perMethode) met een leeg lijf, geen PostgreSQL- of Redis-stand, alleen timers via de globale timerfuncties. Een lege noemer is niet vast te stellen.",
  "richting": {
   "i1AandeelMetCorrelatie": "omhoog",
   "i3CorrelatieOneens": "omlaag",
@@ -62,12 +62,12 @@
    "oneens": 0
   },
   "i4": {
-   "gezetInVerzoek": 20,
-   "gevuurdNaAfloop": 20,
-   "naAfloopMetDrager": 12,
-   "naAfloopMetAiSessie": 12,
+   "gezetInVerzoek": 19,
+   "gevuurdNaAfloop": 19,
+   "naAfloopMetDrager": 10,
+   "naAfloopMetAiSessie": 11,
    "plekken": {
-    "plan (server/kern/journaalbestand.js:105)": 13,
+    "plan (server/kern/journaalbestand.js:105)": 12,
     "planSpoel (server/kern/kosten/meter.js:136)": 4,
     "planSpoel (server/kern/kantoor/mensdeur-spoel.js:74)": 2,
     "plan (server/kern/beleidsmotor/slapend.js:54)": 1
@@ -88,11 +88,11 @@
     "POST": 3175
    },
    "statussen": {
-    "200": 785,
-    "400": 479,
+    "200": 786,
+    "400": 480,
     "403": 722,
     "404": 951,
-    "409": 177,
+    "409": 175,
     "503": 61
    },
    "rollen": [

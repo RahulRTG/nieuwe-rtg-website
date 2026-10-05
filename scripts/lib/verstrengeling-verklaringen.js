@@ -477,5 +477,11 @@ module.exports = [
      Die klok bestond al in kern/avond/klok.js; een tweede zou op een dag
      middernacht anders lezen. De lus leest alleen `min` en `klok`, geen stand. */
   { van: 'domein:bureau', naar: 'domein:avond', soort: 'GEDEELDE_PRIMITIEF',
-    reden: 'kern/bureau/lus-regels.js gebruikt min() en klok() uit kern/avond/klok.js voor de tijdlijn van een case; een tweede klok zou middernacht anders lezen (CONCIERGE.md par. 2.11)' }
+    reden: 'kern/bureau/lus-regels.js gebruikt min() en klok() uit kern/avond/klok.js voor de tijdlijn van een case; een tweede klok zou middernacht anders lezen (CONCIERGE.md par. 2.11)' },
+  /* EEN TOEGANGSMODULE VOOR TWEE SAMEN-KAMERS (UITVOERINGSPLAN par. 7.1). De
+     FoundationOS-kamer had een kopie van de LivingOS-toegang die alleen in
+     constanten verschilde; die kopie is opgeheven en samenrtf.js vraagt het
+     profiel 'rtf'. De gezins- en vriendschapscontrole blijft in samenrtf.js. */
+  { van: 'domein:samenrtf', naar: 'domein:samen-toegang', soort: 'GEDEELDE_PRIMITIEF',
+    reden: 'samenrtf.js gebruikt de levensloop van het deelgeheim uit kern/samen-toegang.js met het profiel rtf (eigen doel, scope, geldigheid en voorvoegsels); een tweede kopie liep uiteen zodra er een van de twee werd gerepareerd' }
 ];

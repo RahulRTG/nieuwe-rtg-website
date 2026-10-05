@@ -47,6 +47,9 @@ function maakPersoneelscodes({ db, crypto, bewerkCollectie, zoekPartner, nu }) {
   const vindRij = (bron, code) => bearer.vind(Object.values(bron || {}), code, r => r && r.toegang && r.toegang.code_hash);
   const klopt = r => !!r && !!r.toegang && !!r.toegang.onderwerp &&
     r.toegang.onderwerp.partner === r.partner && r.toegang.onderwerp.medewerker === r.id;
+  // v2-uitgifte (een v1-record wordt nog gelezen en vernieuwd naar v2)
+  const spec = (partner, medewerker, d, m) => ({ prefix: 'PK', issuer: ISSUER, doel: DOEL, scope: SCOPE.slice(),
+    onderwerp: { partner, medewerker }, geldigheid: { duurMs: d * DAG }, gebruik: { max: m }, afgeleid: 'geen' });
   const duur = dagen => {
     const d = dagen == null || dagen === '' ? STANDAARD_DAGEN : Number(dagen);
     return Number.isInteger(d) && d >= 1 && d <= MAX_DAGEN ? d : null;
@@ -66,14 +69,13 @@ function maakPersoneelscodes({ db, crypto, bewerkCollectie, zoekPartner, nu }) {
     const l = String(label || '').replace(/\s+/g, ' ').trim().slice(0, 60) || null;
     return transactie(bron => {
       const actief = Object.values(bron).filter(r => r && r.partner === z && r.toegang &&
-        !bearer.reden(r.toegang, { doel: DOEL, negeerGebruik: true })).length;
+        !bearer.reden(r.toegang, { doel: DOEL, scope: SCOPE, negeerGebruik: true })).length;
       if (actief >= MAX_PER_PARTNER)
         return { status: 409, error: 'Deze partner heeft al ' + MAX_PER_PARTNER + ' geldige personeelscodes. Trek er eerst een in.' };
       let id;
       do id = 'pm_' + crypto.randomBytes(8).toString('hex'); while (bron[id]);
-      const g = bearer.maak({ prefix: 'PK', issuer: ISSUER, doel: DOEL, scope: SCOPE.slice(),
-        onderwerp: { partner: z, medewerker: id }, geldigMs: d * DAG, maxGebruik: m });
-      bron[id] = { id, partner: z, label: l, toegang: g.toegang, uitgegeven_door: wie, historie: [] };
+      const g = bearer.maak(spec(z, id, d, m));
+      bron[id] = { id, partner: z, label: l, toegang: g.toegang, uitgegeven_door: wie };
       return uitgifte(bron[id], g.code);
     });
   }
@@ -85,7 +87,10 @@ function maakPersoneelscodes({ db, crypto, bewerkCollectie, zoekPartner, nu }) {
         r.toegang.expires_at.slice(0, 10) + '. Kwijt of gedeeld: roteer hem.' };
   }
 
-  // Roteren: dezelfde plek, een nieuwe code; de vorige is daarna niets meer waard.
+  /* "Roteren" op het kantoor is VERNIEUWEN (kern/bearercode-keten.js): een mens
+     op naam kiest een nieuwe looptijd en de teller begint opnieuw, met hetzelfde
+     maximum. De vorige code is daarna niets meer waard; een al ingetrokken code
+     houdt haar eerste intrekking. Volgnummer en geschiedenis gaan mee. */
   async function roteer({ id, dagen, door }) {
     const plek = String(id || '');
     const wie = String(door || '').slice(0, 100);
@@ -95,12 +100,7 @@ function maakPersoneelscodes({ db, crypto, bewerkCollectie, zoekPartner, nu }) {
     return transactie(bron => {
       const r = PLEK.test(plek) ? bron[plek] : null;
       if (!klopt(r)) return { status: 404, error: 'Deze personeelscode kennen we niet.' };
-      const oud = r.toegang;
-      if (!oud.ingetrokken_at) bearer.intrekken(oud, wie, 'geroteerd');
-      const g = bearer.maak({ prefix: 'PK', issuer: ISSUER, doel: DOEL, scope: SCOPE.slice(),
-        onderwerp: { partner: r.partner, medewerker: r.id }, geldigMs: d * DAG, maxGebruik: oud.max_gebruik });
-      g.toegang.rotatie = (Number(oud.rotatie) || 0) + 1;
-      r.historie = (Array.isArray(r.historie) ? r.historie : []).concat([oud]).slice(-3);
+      const g = bearer.vernieuw(r.toegang, spec(r.partner, r.id, d, r.toegang.max_gebruik), wie);
       r.toegang = g.toegang;
       r.uitgegeven_door = wie;
       return uitgifte(r, g.code);
@@ -150,7 +150,7 @@ function maakPersoneelscodes({ db, crypto, bewerkCollectie, zoekPartner, nu }) {
     const z = partner == null ? null : partnerVan(partner);
     const bron = eigen.kijk(COLLECTIE) || {};
     return Object.keys(bron).sort().map(k => bron[k]).filter(r => klopt(r) && (z == null || r.partner === z)).map(r => {
-      const reden = bearer.reden(r.toegang, { doel: DOEL });
+      const reden = bearer.reden(r.toegang, { doel: DOEL, scope: SCOPE });
       const p = bearer.publiek(r.toegang);
       return { id: r.id, partner: r.partner, label: r.label || null, issued_at: p.issued_at, expires_at: p.expires_at,
         max_gebruik: p.max_gebruik, gebruik: p.gebruik, laatst_gebruikt_at: p.laatst_gebruikt_at,

@@ -114,6 +114,32 @@ const NIET_MUTEREN = new Map([
    Elke operator werkt op de bron ZONDER commentaar en tekenreeksen mee te
    rekenen, want een verandering in een uitlegregel bewijst niets. */
 const OPERATOREN = [
+  ...require('./lib/mutatie-html').OPERATOREN_HTML,
+  // Bestemmingen en publieke browser-API's zijn ook gedrag. Een ontbrekende
+  // route of export is een echte regressie, ook als geen conditie verandert.
+  { naam: 'browser-export-weg', zoek: /\b((?:window|w)\.RTG\w+\s*=\s*)(?!=)/, zet: '$1undefined && ' },
+  { naam: 'voorwaarde-omkeren', zoek: /\bif\s*\(\s*!(?!=)/, zet: 'if (' },
+  { naam: 'optie-uit', zoek: /:\s*true\b/, zet: ': false' },
+  // Een relatieve API-aanroep is net zo goed een bestemming als /api/....
+  // Alleen het eerste letterlijke argument verandert, niet de API zelf.
+  {
+    naam: 'api-actie-weg',
+    vind: bron => {
+      let tokens; try { tokens = require('./ast/lexer').lex(bron); } catch (e) { return []; }
+      return tokens.filter((t, i) => t.type === 'string' && tokens[i - 1]?.value === '(' && tokens[i - 2]?.value === 'api')
+        .map(t => ({ start: t.start, eind: t.end }));
+    },
+    maak: tekst => tekst[0] + '__rtg_mutatie__' + tekst.at(-1)
+  },
+  {
+    naam: 'route-doel-weg',
+    vind: bron => {
+      let tokens; try { tokens = require('./ast/lexer').lex(bron); } catch (e) { return []; }
+      return tokens.filter(t => t.type === 'string' && /^['"]\/(?:api|apps)\//.test(t.value))
+        .map(t => ({ start: t.start, eind: t.end }));
+    },
+    maak: tekst => tekst[0] + '/__rtg_mutatie__' + tekst.at(-1)
+  },
   { naam: 'true->false', zoek: /\breturn true\b/, zet: 'return false' },
   { naam: 'false->true', zoek: /\breturn false\b/, zet: 'return true' },
   { naam: '===->!==', zoek: /===/, zet: '!==' },
@@ -522,6 +548,7 @@ function draaiToets(bestand, env, wacht, forceer, logPrefix) {
    De tien andere staan nog open; dat is een geteld gat in TAKEN.md en geen
    vergeten hoekje. */
 const EIGEN_MODULE = new Map([
+  ['praktijk-betalen.e2e.js', ['public/apps/werk/praktijk-betalen.js']],
   ['living-world.test.js', ['server/kern/living-world/actions.js']],
   ['living-world-sources.test.js', ['server/kern/living-world/actions.js']],
   ['living-world-sqlite.test.js', ['server/kern/living-world/index.js']],
@@ -1567,6 +1594,13 @@ function modulesVan(bestand) {
     const rel = path.relative(WORTEL, p).replace(/\\/g, '/');
     if (!uit.includes(rel)) uit.push(rel);
   }
+  // VM- en bronproeven lezen hun onderwerp als bestand. Dat is slechts een
+  // kandidaat: alleen een groene nulproef gevolgd door een rode mutatie telt.
+  if (/\breadFileSync\s*\(/.test(bron)) {
+    for (const m of bron.matchAll(/['"](?:\.\.\/)?((?:public|server|scripts)\/[^'"\s]+\.js)['"]/g)) {
+      if (!m[1].split('/').includes('..') && fs.existsSync(path.join(WORTEL, m[1])) && !uit.includes(m[1])) uit.push(m[1]);
+    }
+  }
   return uit;
 }
 
@@ -1626,14 +1660,16 @@ function proefPuur(naam, posities) {
     const voor = bronStand(p);           // na de nulmeting: wat die schreef, telt niet als bijwerking
     for (let i = 0; i < diep; i++) {
       for (const op of OPERATOREN) {
-        const nieuw = muteer(origineel, op, i);
+        const html = rel.endsWith('.html');
+        const nieuw = html ? require('./lib/mutatie-html').muteerHtml(origineel, op, i, muteer) : muteer(origineel, op, i);
         if (!nieuw || nieuw === origineel) continue;
         /* Alles wat met de mutatie op schijf te maken heeft, gaat door metMutatie:
            aanmelden, spoor schrijven, terugzetten. Eén plek, dus geen lus die er
            een van vergeet. */
         const uit = metMutatie(p, nieuw, () => {
-          const check = spawnSync('node', ['--check', p], { cwd: WORTEL, encoding: 'utf8' });
-          if (check.status !== 0) return null;    // mutatie brak de syntaxis: telt niet
+          const geldig = html ? require('./lib/mutatie-html').geldigeScripts(nieuw)
+            : spawnSync('node', ['--check', p], { cwd: WORTEL, encoding: 'utf8' }).status === 0;
+          if (!geldig) return null;    // mutatie brak de syntaxis: telt niet
           geprobeerd++;
           const na = draaiToets(bestand, null, WACHT_MUTATIE);
           const schade = bijwerkingVan(voor, bronStand(p));

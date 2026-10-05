@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-05T05:12:22.050Z",
-    "commit": "6ddcf4dc6",
+    "op": "2026-10-05T05:44:14.557Z",
+    "commit": "9c350079c",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -2325,6 +2325,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 7,
       "scherp": "gezakt"
+    },
+    "command-zware-rechten.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/afdelingen/inzage.js",
+      "operator": "return-weg#0",
+      "gezakt": 3,
+      "geprobeerd": 6
     },
     "command.e2e.js": {
       "soort": "server",

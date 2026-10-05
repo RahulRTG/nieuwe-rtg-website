@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-05T12:11:27.842Z",
-    "commit": "2ee5c97ed",
+    "op": "2026-10-05T12:17:20.018Z",
+    "commit": "bc3864d68",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -1969,6 +1969,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "busabonnee.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/opzet/verzoekframe.js",
+      "operator": "&&->||#0",
+      "gezakt": 2,
+      "geprobeerd": 11
     },
     "buurtruil-scherm.e2e.js": {
       "soort": "server",

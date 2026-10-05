@@ -68,3 +68,45 @@ test('4. de ophaler volgt geen omleiding en heeft een tijdslimiet', async () => 
   assert.equal(opties.redirect, 'error', 'een 302 naar binnen omzeilt anders de adrescontrole');
   assert.ok(opties.signal, 'zonder tijdslimiet zet een zwijgende bron de ronde vast');
 });
+
+/* --- de herkeuring van C5 --------------------------------------------------- */
+const { haalBron, keurBronUrl, MAX_BYTES } = require('../server/kern/payroll/bronophalen');
+
+const OOK_INTERN = [
+  'https://redis/regels.json', 'https://motor:3100/regels.json', 'https://postgres/regels.json',
+  'https://localhost./regels.json', 'https://metadata.google.internal./computeMetadata/v1/',
+  'http://regels.voorbeeld.nl/nl.json',
+];
+
+test('5. een naam van een label, een afsluitende punt en http worden overal geweigerd', async () => {
+  const b = bronnen();
+  for (const url of OOK_INTERN) {
+    assert.equal(b.zetBron('NL', { naam: 'x', url }, 'A. Bakker').status, 400, url + ' bij het registreren');
+    let aangeroepen = false;
+    const bron = urlBron({ url, fetchImpl: async () => { aangeroepen = true; return { ok: true, json: async () => ({}) }; } });
+    await assert.rejects(() => bron.haal(), /geweigerd/, url + ' bij het ophalen');
+    assert.equal(aangeroepen, false, url + ': nooit aanroepen');
+  }
+  assert.equal(keurBronUrl('https://regels.voorbeeld.nl./nl.json'), null, 'een publiek domein met een afsluitende punt blijft gewoon een publiek domein');
+});
+
+test('6. de tijdslimiet breekt ook het LEZEN van een lijf af dat nooit eindigt', { timeout: 10000 }, async () => {
+  const nooit = new ReadableStream({ start(c) { c.enqueue(new TextEncoder().encode('{"a":')); }, pull() { return new Promise(() => {}); } });
+  const begin = Date.now();
+  await assert.rejects(() => haalBron('https://regels.voorbeeld.nl/nl.json', async () => new Response(nooit), 150),
+    /niet binnen 150 ms/);
+  assert.ok(Date.now() - begin < 5000, 'de limiet gaat ook af als de koppen er al zijn');
+});
+
+test('7. een antwoord boven de groottegrens wordt afgebroken', async () => {
+  const blok = new Uint8Array(256 * 1024).fill(32);
+  let gestuurd = 0;
+  const groot = new ReadableStream({ pull(c) { gestuurd += blok.length; c.enqueue(blok); if (gestuurd > MAX_BYTES * 2) c.close(); } });
+  await assert.rejects(() => haalBron('https://regels.voorbeeld.nl/nl.json', async () => new Response(groot)), /meer dan/);
+  assert.ok(gestuurd <= MAX_BYTES + 2 * blok.length, 'er is gestopt met lezen, niet alles binnengehaald');
+});
+
+test('8. een gewoon antwoord via een echte stroom komt door', async () => {
+  const r = await haalBron('https://regels.voorbeeld.nl/nl.json', async () => new Response('{"versie":"nl-2026.1"}'));
+  assert.deepEqual(r, { versie: 'nl-2026.1' });
+});

@@ -25,7 +25,7 @@
    een pdf wil inlezen, bouwt dat als een BRON die een pakket oplevert -- dan
    valt het onder dezelfde keuring als al het andere. */
 'use strict';
-const { veiligeExternalUrl } = require('../ssrf');
+const { haalBron } = require('./bronophalen');
 
 /* Hoe vaak er gekeken wordt. Tarieven veranderen niet per uur; dagelijks is
    ruim genoeg en houdt de bron met rust. De ronde is bovendien stil als er
@@ -153,27 +153,16 @@ function maakBijwerken({ regelpakket, opslag, save, nu, log, dekking, fetchImpl 
    laat het keuren. Er wordt hier BEWUST niets geparst of gerepareerd -- wat er
    niet als geldig pakket uitkomt, hoort af te ketsen op de keuring en niet
    half-goed naar binnen te glippen. */
-/* EN HET HAALT NIET ZOMAAR ALLES OP (RTG-V1-RELEASE C5). De URL komt uit de
-   opslag en is door een kantoorhouder gezet; de server roept hem aan met zijn
-   eigen netwerkpositie. Drie sloten, in de vorm van ../ssrf.js en
-   ../../sso/haal.js: alleen https naar het open internet (ook voor een bron die
-   van voor deze regel in de opslag staat), geen omleiding volgen (een 302 naar
-   een intern adres omzeilt de eerste controle), en een tijdslimiet zodat een
-   bron die de verbinding openhoudt de dagelijkse ronde niet vastzet. */
-const TIJDSLIMIET_MS = 10000;
+/* Keuren, tijdslimiet en groottegrens staan in ./bronophalen.js: dezelfde
+   keuring als bij het registreren, en een bron van voor die regel wordt alsnog
+   geweigerd voordat er iets wordt aangeroepen (RTG-V1-RELEASE C5). */
 function urlBron({ naam, url, fetchImpl }) {
   const haalOp = fetchImpl || (typeof fetch === 'function' ? fetch : null);
   return {
     naam: naam || url, soort: 'url', url,
     async haal() {
       if (!haalOp) throw new Error('geen fetch beschikbaar in deze omgeving');
-      const keur = veiligeExternalUrl(url);
-      if (!/^https:\/\//i.test(String(url)) || !keur.ok)
-        throw new Error('bron geweigerd: ' + (keur.ok ? 'alleen https' : keur.reden));
-      const r = await haalOp(url, { headers: { accept: 'application/json' }, redirect: 'error',
-        signal: AbortSignal.timeout(TIJDSLIMIET_MS) });
-      if (!r.ok) throw new Error('bron gaf status ' + r.status);
-      return await r.json();
+      return haalBron(url, haalOp);
     }
   };
 }

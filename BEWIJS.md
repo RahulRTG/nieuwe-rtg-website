@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2332 bestanden en 15989 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2333 bestanden en 15997 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2332 |
-| losse beweringen (`test(...)`) | 15989 |
+| toetsbestanden | 2333 |
+| losse beweringen (`test(...)`) | 15997 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 248 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2157 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2158 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2029 bestanden, 15461 beweringen.
+2030 bestanden, 15469 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -361,7 +361,7 @@ toets omvalt.
 | `contactpin.test.js` | 33 | gezakt op `liegpoort /api/` | DE CONTACTPIN (server/kern/sociaal/pin.js) -- de eigen code waarmee twee mensen elkaar toevoegen zonder te zoeken. Twee lagen, allebei getoetst: 1. |
 | `context-lijn.test.js` | 5 | gezakt op `liegpoort /api/` | De dagcontext (tijd, seizoen, temperatuur voor elke AI) en de lijnbezetting (aanmelden per kant; de schermen en de coach rekenen met het aantal aangemelde koks). |
 | `contextdoorgifte-server.test.js` | 1 | gezakt op `===->!==#0` | DE SERVERHELFT VAN DE CONTEXTDOORGIFTE -- een echte server, een deelronde. scripts/contextdoorgifte.js start een wegwerpserver met de peiling als preload, rijdt de eerste routes en vergelijkt I1, I3, I4 en I10 met de... |
-| `contextdoorgifte.test.js` | 3 | gezakt op `===->!==#0` | DE CONTEXTDOORGIFTE MAG ALLEEN DE GOEDE KANT OP (scripts/contextdoorgifte.js, CONTEXTDOORGIFTE.json). Zeven invarianten uit het Fase 2-onderzoek naar een verzoekframe. |
+| `contextdoorgifte.test.js` | 3 | gezakt op `===->!==#0` | DE CONTEXTDOORGIFTE MAG ALLEEN DE GOEDE KANT OP (scripts/contextdoorgifte.js, CONTEXTDOORGIFTE.json). Negen invarianten uit het Fase 2-onderzoek naar een verzoekframe. |
 | `contextpakket.test.js` | 12 | gezakt op `===->!==#0` | DE CONTEXTSAMENSTELLER -- nooit stil afkappen. Een eigen modelserver kapt stil af wat niet in zijn venster past, vanaf het begin, en daar staat de grondwet. |
 | `contextspoor.test.js` | 3 | geen module gevonden | HET CONTEXTSPOOR STAAT UIT, EN ZWIJGT ALS HET AAN STAAT. Deze meting hangt in een HEET PAD: de domeingrens-Proxy waar elke toegang tot het contextobject langskomt, dus tienduizenden keren per opstart en opnieuw bij... |
 | `contract.test.js` | 13 | gezakt op `liegpoort /api/` | HET CONTRACT: maand 13, en de prijs die vaststaat. kern/aanmeldingen/betaalschema.js zette twaalf termijnen klaar en hield op. |
@@ -1915,6 +1915,7 @@ toets omvalt.
 | `verzoek-intrekken.test.js` | 4 | gezakt op `liegpoort /api/` | EEN BETAALVERZOEK INTREKKEN -- 2 endpoints, aan beide kanten van het huis. De dekkingsmeting wees /api/pay/verzoek/intrek (lid vraagt een vriend) en /api/supplier/betaalverzoek/intrek (zaak vraagt een klant) aan als... |
 | `verzoekbetaal-race.test.js` | 2 | gezakt op `!==->===#0` | TWEE KEER TEGELIJK BETALEN IS EEN KEER BETALEN (BEWIJSLUS.md par. 6). |
 | `verzoekcontext-wikkel.test.js` | 10 | gezakt op `true->false#0` | DE WIKKEL VAN DE VERZOEKCONTEXT -- wat er in de opslag belandt, en wat niet. server/db/verzoekcontext.js geeft elk verzoek een eigen werkkopie: lezen gaat door een Proxy, schrijven landt in de kopie, en pas de... |
+| `verzoekframe.test.js` | 8 | gezakt op `===->!==#0` | HET VERZOEKFRAME (server/opzet/verzoekframe.js) -- Fase 2, besluit B2a, in de schaduw. Deze toetsen houden de levenscyclus vast: open (correlatie van de server, extern begrensd), identificeer EEN keer en alleen via... |
 | `verzorging-leden.test.js` | 5 | gezakt op `liegpoort /api/` | De LEDENkant van de beauty-salon en barbier (kern/verzorging/beautyleden.js). Knippen, scheren en nagels waren alleen voor de zaak zelf te zien; nu boekt een lid er zelf, op codenaam, in DEZELFDE agenda als de salon. |
 | `verzorging.test.js` | 8 | gezakt op `liegpoort /api/` | RTG Verzorging: de beauty-salon en barbier (Velvet & Blade), petcare (Amics) en de kinderopvang met nanny-service (Nido). Bewaakt de agenda zonder dubbele stoelen, de stoel-soortregel, de walk-in rij, het pension met... |
 | `verzuimrooster.test.js` | 4 | gezakt op `liegpoort /api/` | EEN MENS DIE TOCH EEN AFWEZIGE MEDEWERKER INPLANT, ZIET HET ERBIJ (PERSONEEL.md par. 4, PLANNING.md par. |

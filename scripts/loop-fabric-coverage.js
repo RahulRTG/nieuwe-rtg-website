@@ -4,6 +4,7 @@ const fs=require('fs'),path=require('path');
 const ROOT=path.join(__dirname,'..'),OUT=path.join(ROOT,'LOOP-FABRIC-COVERAGE.json');
 const {FUNCTIES}=require('../server/functies/register');
 const policy=require('../server/kern/loop-fabric/coverage-policy');
+const executionPolicy=require('./lib/loop-fabric-execution-policy');
 
 const read=name=>JSON.parse(fs.readFileSync(path.join(ROOT,name),'utf8'));
 const routeSource=read('ROUTEBRON.json').perRoute;
@@ -46,6 +47,7 @@ function evidenceFor(capability) {
   const signals=Object.entries(SIGNALS).filter(([,words])=>words.some(word=>content.includes(word))).map(([key])=>key);
   const relatedScreens=screens.filter(screen=>(screen.paden||[]).some(p=>capability.paden.some(prefix=>p===prefix||p.startsWith(prefix+'/'))));
   return {routeCount:routes.length,mutationRoutes:muts.length,declaredMutationSemantics:muts.filter(x=>x.herkomst==='mens').length,
+    sourceFileCount:files.length,kernelDependencyCount:kernels.length,screenCount:relatedScreens.length,
     sourceFiles:files.slice(0,16),sourceFilesOmitted:Math.max(0,files.length-16),kernelDependencies:kernels.slice(0,24),
     kernelDependenciesOmitted:Math.max(0,kernels.length-24),screens:relatedScreens.map(x=>x.bestand).slice(0,12),
     screensOmitted:Math.max(0,relatedScreens.length-12),signals};
@@ -92,12 +94,13 @@ function missing(status) {
 function build() {
   const capabilities=FUNCTIES.map(capability=>{
     const evidence=evidenceFor(capability),decision=policy.classify(capability,evidence);
-    return {id:capability.id,name:capability.naam,category:capability.categorie,domain:decision.domain,
+    const row={id:capability.id,name:capability.naam,category:capability.categorie,domain:decision.domain,
       semanticOwner:{kind:'capability',id:capability.id,source:'server/functies/register'},entryPoints:capability.paden,
       behaviourEvidence:evidence,classification:decision.status,classificationReason:decision.reason,
       loop:loopShape(evidence.signals,decision.status),participation:participation(decision),
       crossDomainHandoffs:decision.status==='LOOP_CAPABLE'?['SOURCE_REF_TO_AUTHORIZED_CONSUMER']:
         decision.status==='PARTIALLY_LOOP_CAPABLE'?['LIMITED_PROVEN_FLOW_ONLY']:[],missing:missing(decision.status)};
+    row.execution=executionPolicy.classify(row);return row;
   });
   const domains={};
   for(const row of capabilities){const d=domains[row.domain]||(domains[row.domain]={domain:row.domain,capabilities:0,eligibleFlows:0,
@@ -109,11 +112,13 @@ function build() {
     else if(row.participation.consent==='EXPLICIT_WHERE_PERSONAL')consent.explicitConsentNeeded++;
     else if(['workos','hospitality','commerce','mobility','service-support'].includes(row.domain))consent.organizationalOrTechnicalState++;
     else if(row.classification!=='NO_LEARNING_VALUE')consent.otherBasisMustBeProven++;}
-  return {schemaVersion:1,kind:'RTG_LOOP_FABRIC_COVERAGE_REGISTRY',sourceOfTruth:false,
+  const readiness=Object.fromEntries(executionPolicy.READINESS.map(name=>[name,capabilities.filter(row=>row.execution.readiness===name).length]));
+  return {schemaVersion:1,executionSchemaVersion:1,kind:'RTG_LOOP_FABRIC_COVERAGE_REGISTRY',sourceOfTruth:false,
     warning:'Deze afgeleide registry bewijst vindbaarheid en expliciete deelnamekeuzes; brondomeinen blijven eigenaar van betekenis en eligibility.',
     sources:{capabilities:'server/functies/register',routes:'ROUTEBRON.json',mutations:'MUTATIECONTRACT.json',screens:'SCHERMFUNCTIE.json'},
     measured:{capabilities:capabilities.length,routes:routeSource.length,mutationContracts:mutation.length,screens:screens.length},
-    classifications:policy.CLASSIFICATIONS,semanticSurfaces:semanticSurfaces(),
+    classifications:policy.CLASSIFICATIONS,executionReadiness:executionPolicy.READINESS,readinessSummary:readiness,
+    semanticSurfaces:semanticSurfaces(),
     domains:Object.values(domains).sort((a,b)=>a.domain.localeCompare(b.domain)),consentCoverage:consent,capabilities};
 }
 function main(){const next=JSON.stringify(build(),null,2)+'\n';if(process.argv.includes('--controle')){

@@ -8,7 +8,7 @@ test('coverage registry omvat iedere functieschakelaar precies eenmaal en is rep
   assert.equal(new Set(built.capabilities.map(x=>x.id)).size,built.capabilities.length);
   for(const row of built.capabilities){assert.ok(row.semanticOwner.id);assert.ok(row.entryPoints.length);assert.ok(row.classificationReason);
     assert.ok(row.participation.retention);assert.ok(row.participation.eligibility);
-    assert.ok(Array.isArray(row.behaviourEvidence.kernelDependencies));}
+    assert.ok(Array.isArray(row.behaviourEvidence.kernelDependencies));assert.ok(row.execution.readiness);assert.ok(row.execution.batchId);}
   assert.ok(built.semanticSurfaces.kernelFiles>2000);assert.ok(built.semanticSurfaces.kernelGroups.length>100);
   assert.equal(built.semanticSurfaces.evidenceLevel,'STATIC_SOURCE_CANDIDATE_NOT_LEARNING_PROOF');
 });
@@ -28,4 +28,13 @@ test('registry meet semantische mutatiepunten en geen HTTP-telemetrie',()=>{
   assert.ok(registry.measured.mutationContracts>4000);
   assert.equal(registry.capabilities.some(x=>Object.hasOwn(x,'requestCount')),false);
   assert.ok(registry.capabilities.some(x=>x.behaviourEvidence.signals.includes('decision')));
+});
+
+test('preflightreadiness laat tijdelijke coverage niet doorgaan als stil GO',()=>{
+  const registry=build(),temporary=registry.capabilities.filter(row=>
+    ['PARTIALLY_LOOP_CAPABLE','NOT_YET_LOOP_CAPABLE'].includes(row.classification));
+  assert.ok(temporary.length>100);
+  assert.equal(temporary.some(row=>row.execution.readiness==='READY_TO_IMPLEMENT'),false);
+  assert.equal(registry.capabilities.find(row=>row.id==='loop-fabric').execution.action,'NONE_ALREADY_PROVEN');
+  assert.equal(registry.capabilities.find(row=>row.id==='gedachten').execution.readiness,'PROHIBITED');
 });

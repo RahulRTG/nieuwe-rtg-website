@@ -1,23 +1,23 @@
 {
   "stempel": {
-    "op": "2026-09-30T00:33:05.084Z",
-    "commit": "18c166870",
+    "op": "2026-10-05T04:30:29.108Z",
+    "commit": "edda184d",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 1,
     "instrument": "scripts/gastsplitsing.js",
-    "node": "v22.22.2"
+    "node": "v22.22.0"
   },
   "graad": "vermoed",
   "grens": "Lexicaal ingedeeld. Dit zegt NIET of een gratis account er werkelijk langs komt (dat meet npm run doelgroepbereik, met een echte gratis-accountsessie), en NIET of een deur voor een gratis account open hoort te staan -- dat is een productvraag (SAMENLEVING.md, de verklaring van de bodem). `leden` is geen fout: het woord is dubbelzinnig omdat een Community-lid ook lid heet. Een toets die het onderscheid via een andere poort maakt dan account of idGeverifieerd, telt hier als weigering.",
   "uitleg": "Per plek in server/ die op de gast toetst: maakt de code het onderscheid tussen bezoeker en gratis account, en wat zegt de weigering dat er nodig is. account-belofte = de tekst zegt dat een account of profiel volstaat, terwijl de code ook het gratis account weigert.",
   "gemeten": {
     "bestanden": 123,
-    "plekken": 140,
+    "plekken": 139,
     "perSoort": {
       "vertakt": 23,
-      "onderscheidt": 23,
+      "onderscheidt": 24,
       "pas-eis": 11,
-      "leden": 82,
+      "leden": 80,
       "zonder-tekst": 1
     },
     "tegenspraak": 0
@@ -105,7 +105,7 @@
       "zegt": null
     },
     {
-      "plek": "server/kern/lidacties/ritten.js:15",
+      "plek": "server/kern/lidacties/ritten.js:16",
       "soort": "leden",
       "zegt": "Alleen voor leden."
     },
@@ -365,32 +365,32 @@
       "zegt": null
     },
     {
-      "plek": "server/routes/member/handel/uitjes.js:12",
+      "plek": "server/routes/member/handel/uitjes.js:13",
       "soort": "leden",
       "zegt": "Alleen voor leden."
     },
     {
-      "plek": "server/routes/member/handel/uitjes.js:43",
+      "plek": "server/routes/member/handel/uitjes.js:44",
       "soort": "onderscheidt",
       "zegt": null
     },
     {
-      "plek": "server/routes/member/handel/uitjes.js:70",
+      "plek": "server/routes/member/handel/uitjes.js:78",
       "soort": "leden",
       "zegt": "Alleen voor leden."
     },
     {
-      "plek": "server/routes/member/handel/uitjes.js:79",
+      "plek": "server/routes/member/handel/uitjes.js:87",
       "soort": "leden",
       "zegt": "Alleen voor leden."
     },
     {
-      "plek": "server/routes/member/handel/uitjes.js:91",
+      "plek": "server/routes/member/handel/uitjes.js:99",
       "soort": "leden",
       "zegt": "Alleen voor leden."
     },
     {
-      "plek": "server/routes/member/handel/uitjes.js:105",
+      "plek": "server/routes/member/handel/uitjes.js:113",
       "soort": "leden",
       "zegt": "Alleen voor leden."
     },
@@ -420,7 +420,7 @@
       "zegt": "Hiervoor heeft u een pas nodig."
     },
     {
-      "plek": "server/routes/member/onderweg.js:10",
+      "plek": "server/routes/member/onderweg.js:11",
       "soort": "leden",
       "zegt": "Alleen voor leden."
     },
@@ -455,17 +455,12 @@
       "zegt": "Alleen voor leden."
     },
     {
-      "plek": "server/routes/member/privacy.js:15",
-      "soort": "leden",
-      "zegt": "Alleen voor leden."
+      "plek": "server/routes/member/privacy.js:21",
+      "soort": "onderscheidt",
+      "zegt": null
     },
     {
-      "plek": "server/routes/member/privacy.js:81",
-      "soort": "leden",
-      "zegt": "Alleen voor leden."
-    },
-    {
-      "plek": "server/routes/member/privacy.js:99",
+      "plek": "server/routes/member/privacy.js:93",
       "soort": "leden",
       "zegt": "Alleen voor leden."
     },
@@ -710,17 +705,17 @@
       "zegt": "De RTG Wallet is voor leden."
     },
     {
-      "plek": "server/server.js:550",
+      "plek": "server/server.js:547",
+      "soort": "onderscheidt",
+      "zegt": null
+    },
+    {
+      "plek": "server/server.js:1263",
       "soort": "onderscheidt",
       "zegt": null
     },
     {
       "plek": "server/server.js:1289",
-      "soort": "onderscheidt",
-      "zegt": null
-    },
-    {
-      "plek": "server/server.js:1315",
       "soort": "vertakt",
       "zegt": null
     }

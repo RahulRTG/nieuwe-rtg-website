@@ -1089,12 +1089,23 @@ app.get('/api/stream', (req, res) => {
 
    Bij een demo-sessie IS de sleutel de tier; dan wordt er een bak gelezen en
    niet twee, anders staat elk bericht er dubbel. */
+/* UIT DE PERSOONLIJKE BAK ALLES, UIT DE PAS-BAK ALLEEN BROADCASTS.
+
+   De persoonlijke meldingen van een lid staan onder zijn SLEUTEL ('user-<id>').
+   De pas-bak (db.data.notifications[tier]) is gedeeld door alle leden van die
+   pas en mag daarom alleen EXPLICIETE broadcasts prijsgeven -- anders zou een
+   persoonlijke melding die ooit (per abuis) in een pas-bak belandde alsnog bij
+   een ander lid verschijnen. Dat is de leeszijde van blocker 2: ook als een
+   schrijver zich vergist, lekt hier niets.
+
+   In DEMO valt de sleutel samen met de pas; dan is er één bak en die is van de
+   persona zelf -- geen dubbeling en geen gedeelde lezers. */
 const meldingenVan = (sess) => {
-  const opTier = db.data.notifications[sess.tier] || [];
-  if (!sess.key || sess.key === sess.tier) return opTier;
-  const opSleutel = db.data.notifications[sess.key] || [];
-  if (!opSleutel.length) return opTier;
-  return opTier.concat(opSleutel)
+  const eigen = (db.data.notifications[sess.key] || []);
+  if (!sess.tier || sess.key === sess.tier) return eigen.slice(0, 40);
+  const broadcasts = (db.data.notifications[sess.tier] || []).filter(n => n && n.broadcast);
+  if (!broadcasts.length) return eigen.slice(0, 40);
+  return eigen.concat(broadcasts)
     .sort((a, b) => String(b.at || '').localeCompare(String(a.at || '')))
     .slice(0, 40);
 };
@@ -1103,9 +1114,12 @@ app.post('/api/notifications', auth, (req, res) => {
   res.json({ notifications: meldingenVan(req.session) });
 });
 app.post('/api/notifications/read', auth, (req, res) => {
-  for (const bak of [req.session.tier, req.session.key]) {
-    if (bak) (db.data.notifications[bak] || []).forEach(n => n.read = true);
-  }
+  /* ALLEEN DE EIGEN BAK. Hier stond ook req.session.tier, de GEDEELDE pas-bak:
+     dan zette één lid de meldingen van alle leden met dezelfde pas op gelezen.
+     De persoonlijke meldingen staan onder de sleutel; de gedeelde broadcasts in
+     de pas-bak worden niet door een enkel lid gemuteerd. */
+  const eigen = req.session.key;
+  if (eigen) (db.data.notifications[eigen] || []).forEach(n => n.read = true);
   save();
   res.json({ ok: true });
 });

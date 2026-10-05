@@ -41,7 +41,7 @@ app.post('/api/supplier/order/sectie', supplierAuth, (req, res) => {
     sseToSupplier(req.supplier.code, 'pas', { ref: o.ref, pickup: o.pickup, table: o.table || null });
   sseToOffice('sync', { scope: 'orders' });
   if (o.status === 'klaar' && !wasKlaar && o.customerTier)
-    notify(o.customerTier, { icon: '\u2705', title: req.supplier.name, body: 'Uw bestelling is klaar (bon ' + o.pickup + '). Toon bij het ophalen uw afhaal-QR in de app.', scope: 'orders' });
+    notify(o.customerKey, { icon: '\u2705', title: req.supplier.name, body: 'Uw bestelling is klaar (bon ' + o.pickup + '). Toon bij het ophalen uw afhaal-QR in de app.', scope: 'orders' });
   // Order en eventuele melding zijn al bewaard; dit spoor bezit alleen zichzelf.
   (logActivity.alleenActiviteit || logActivity)(req.supplier.code, req.actor, sectie + ': ' + o.ref + ' ' + (phase === 'klaar' ? 'klaar' : 'in bereiding'));
   res.json({ ok: true, order: o });
@@ -68,7 +68,7 @@ app.post('/api/supplier/order/station', supplierAuth, (req, res) => {
     sseToSupplier(req.supplier.code, 'pas', { ref: o.ref, pickup: o.pickup, table: o.table || null });
   sseToOffice('sync', { scope: 'orders' });
   if (o.status === 'klaar' && !wasKlaar && o.customerTier)
-    notify(o.customerTier, { icon: '\u2705', title: req.supplier.name, body: 'Uw bestelling is klaar (bon ' + o.pickup + '). Toon bij het ophalen uw afhaal-QR in de app.', scope: 'orders' });
+    notify(o.customerKey, { icon: '\u2705', title: req.supplier.name, body: 'Uw bestelling is klaar (bon ' + o.pickup + '). Toon bij het ophalen uw afhaal-QR in de app.', scope: 'orders' });
   (logActivity.alleenActiviteit || logActivity)(req.supplier.code, req.actor, (station === 'bar' ? 'bar' : 'keuken') + ': ' + o.ref + ' ' + (phase === 'klaar' ? 'klaar' : 'in bereiding'));
   res.json({ ok: true, order: o });
 });
@@ -91,7 +91,7 @@ app.post('/api/supplier/order/status', supplierAuth, async (req, res) => {
   save();
   broadcastSync([o.customerTier], 'orders');
   sseToOffice('sync', { scope: 'orders' });
-  if (o.customerTier) notify(o.customerTier, { icon: 'horeca', title: req.supplier.name, body: 'Uw bestelling is nu: ' + status + '.', scope: 'orders' });
+  if (o.customerTier) notify(o.customerKey, { icon: 'horeca', title: req.supplier.name, body: 'Uw bestelling is nu: ' + status + '.', scope: 'orders' });
   (logActivity.alleenActiviteit || logActivity)(req.supplier.code, req.actor, 'zette ' + o.ref + ' op "' + status + '"');
   res.json({ ok: true, order: o });
 });
@@ -135,7 +135,7 @@ app.post('/api/supplier/refund', supplierAuth, async (req, res) => {
   logActivity(req.supplier.code, req.actor, 'stortte € ' + o.total + ' terug (' + o.ref + ')');
   broadcastSync([o.customerTier], 'orders');
   sseToOffice('sync', { scope: 'orders' });
-  notify(o.customerTier, { icon: 'betalen', title: req.supplier.name + ', terugstorting', body: 'U ontvangt € ' + o.total + ' retour.', scope: 'orders' });
+  notify(o.customerKey, { icon: 'betalen', title: req.supplier.name + ', terugstorting', body: 'U ontvangt € ' + o.total + ' retour.', scope: 'orders' });
   res.json({ ok: true, order: o });
 });
 

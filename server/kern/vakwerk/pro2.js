@@ -33,7 +33,7 @@ module.exports = (ctx) => {
     if (werk.length < 5) return { status: 400, error: 'Beschrijf kort het uitgevoerde werk.' };
     b.werkbon = { werk, materiaal: scho((body || {}).materiaal, 200) || null, door: actor.name, at: nu() };
     save();
-    notify(b.customerTier, { icon: 'agenda', title: b.supplierName, body: 'De werkbon van uw klus staat klaar: ' + werk.slice(0, 90), scope: 'orders' });
+    notify(b.customerKey, { icon: 'agenda', title: b.supplierName, body: 'De werkbon van uw klus staat klaar: ' + werk.slice(0, 90), scope: 'orders' });
     sseToCustomer(b.customerKey || b.customerTier, 'sync', { scope: 'orders' });
     return { status: 200, ok: true, werkbon: b.werkbon };
   }
@@ -84,7 +84,7 @@ module.exports = (ctx) => {
     const b = (boekingenVanZaak(code) || []).find(x => x.customerCodename === codenaam && x.service && x.service.id === dienstId);
     if (!b) return { status: 404, error: 'Geen boeking gevonden voor deze klant.' };
     const s = findSupplier(code);
-    notify(b.customerTier, { icon: 'agenda', title: s.name, body: 'Vriendelijke herinnering: uw "' + rij.dienst + '" was ' + rij.mndGeleden + ' maanden geleden. Boeken kan in de Mall, wanneer het u uitkomt.', scope: 'orders' });
+    notify(b.customerKey, { icon: 'agenda', title: s.name, body: 'Vriendelijke herinnering: uw "' + rij.dienst + '" was ' + rij.mndGeleden + ' maanden geleden. Boeken kan in de Mall, wanneer het u uitkomt.', scope: 'orders' });
     sseToCustomer(b.customerKey || b.customerTier, 'sync', { scope: 'orders' });
     eigen.bak('vakHerinnerd')[code + '|' + codenaam + '|' + dienstId] = nu();
     save();

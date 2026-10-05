@@ -114,7 +114,7 @@ app.post('/api/supplier/bezorg/status', supplierAuth, (req, res) => {
        bestelling (NAVIGATIE.md N20). Na de rit heeft niemand de coordinaat nog nodig. */
     if (status !== 'onderweg') { o.finishedAt = new Date().toISOString(); delete o.etaMin; if (o.geo) o.geo = null; }
     bijgewerkt.push(o.ref);
-    notify(o.customerTier, { icon: status === 'onderweg' ? 'logistiek' : 'meldingen', title: s.name,
+    notify(o.customerKey, { icon: status === 'onderweg' ? 'logistiek' : 'meldingen', title: s.name,
       body: status === 'onderweg' ? 'Uw bestelling is onderweg.' : status === 'bezorgd' ? 'Uw bestelling is bezorgd. Eet smakelijk!' : 'Uw bestelling is opgehaald. Dank u wel!', scope: 'orders' });
     sseToCustomer(o.customerKey || o.customerTier, 'bezorg', { ref: o.ref, kind: 'status', status });
   }

@@ -2352,9 +2352,14 @@ var RTG_BOUW = 'e097efc8';
     const lijst = LADERS_PER_TAB[tab];
     if (!lijst || gevuldeTabs[tab]) return;
     gevuldeTabs[tab] = true;
-    // een gratis gebruiker heeft geen reizen, betalen, AI, assets of zorg: die
-    // tabbladen staan voor hem verborgen, dus halen we er ook niets voor op
-    if (user.tier === 'guest' && ['reizen','betalen','ai','assets','zorg'].includes(tab)) return;
+    // een gratis gebruiker heeft geen reizen, betalen, AI of assets: die
+    // tabbladen staan voor hem verborgen, dus halen we er ook niets voor op.
+    // Zorg wel, zodra hij een eigen account heeft: dat tabblad hoort bij
+    // FoundationOS, en dat staat open na het aanmaken van een account
+    // (besluit van de eigenaar, 5 oktober 2026). Een bezoeker zonder account
+    // ziet het nog steeds niet.
+    if (user.tier === 'guest' && ['reizen','betalen','ai','assets'].includes(tab)) return;
+    if (tab === 'zorg' && user.tier === 'guest' && !user.account) return;
     for (const [naam, fn] of lijst) stap(naam, fn);
   }
 
@@ -2499,7 +2504,9 @@ var RTG_BOUW = 'e097efc8';
     const guest = user.tier === 'guest';
     stap('scherm-aanloop', () => {
     $('#codeChipTxt').textContent = user.codename;
-    ['reizen','betalen','ai','assets','zorg'].forEach(t => { const b = document.querySelector('.tabbar button[data-tab="'+t+'"]'); if (b) b.style.display = guest ? 'none' : ''; });
+    ['reizen','betalen','ai','assets'].forEach(t => { const b = document.querySelector('.tabbar button[data-tab="'+t+'"]'); if (b) b.style.display = guest ? 'none' : ''; });
+    // zorg hoort bij FoundationOS: open voor elk eigen account, ook gratis
+    { const b = document.querySelector('.tabbar button[data-tab="zorg"]'); if (b) b.style.display = (guest && !user.account) ? 'none' : ''; }
     // het OS-beginscherm leest dit: zonder pas geen wallet-tegel en geen balk
     // van Rahul, want allebei zijn ze voor leden
     document.getElementById('app').classList.toggle('os-gast', guest);

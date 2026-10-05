@@ -155,10 +155,13 @@ function gezinVan(req, res) {
    token opent niets, en de eerste aanroep haalt die van schijf. */
 const gezinstoken = require('./gezinstoken').maak({ crypto, nu });
 let oudGeruimd = false;
+// de accountplicht (minderjarigen alleen via een ouderaccount): ./accountplicht.js
+const plicht = require('./accountplicht').maak({ ctx, isBeschermd });
 function profielVan(g, token) {
   if (!oudGeruimd && Object.keys(G()).length) { oudGeruimd = true; if (gezinstoken.ruimOud(G())) save(); }
   const p = gezinstoken.vind(g, token);
   if (p) actualiseerGroep(p);
+  if (p && !plicht.magDoor(g, p)) return undefined;
   return p || undefined;
 }
 function beheerderVan(g, req, res) {
@@ -172,5 +175,5 @@ function berichtVoorMij(b, pid) { return b.naar === 'allen' || b.naar === pid ||
   return { G, nieuweGezinscode, ROLLEN, GROEPEN, GROEP_INFO, geboorteInfo, groepVanLeeftijd, actualiseerGroep,
     magSolliciteren, groepLeeftijd, isBeschermd, schoonGroep, isGast, KLEUREN, hashPin, checkPin, geldigePin,
     schoonAvatar, schoonKleur, nieuweCodenaam, ensureCodenaam, rtfHandle, socialProfielen, profielInfoVanHandle,
-    pubProfiel, pubGezin, gezinVan, profielVan, beheerderVan, berichtVoorMij, gezinstoken };
+    pubProfiel, pubGezin, gezinVan, profielVan, beheerderVan, berichtVoorMij, gezinstoken, plicht };
 };

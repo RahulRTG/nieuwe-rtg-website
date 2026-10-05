@@ -3,7 +3,7 @@ module.exports = (gctx) => {
     nieuweGezinscode, ROLLEN, GROEPEN, GROEP_INFO, geboorteInfo, groepVanLeeftijd, actualiseerGroep,
     schoonGroep, isBeschermd, isGast, KLEUREN,
     hashPin, checkPin, geldigePin, schoonAvatar, schoonKleur, nieuweCodenaam, ensureCodenaam, rtfHandle,
-    socialProfielen, profielInfoVanHandle, pubProfiel, pubGezin, gezinVan, profielVan, beheerderVan, berichtVoorMij, tokenUit, gezinstoken } = gctx;
+    socialProfielen, profielInfoVanHandle, pubProfiel, pubGezin, gezinVan, profielVan, beheerderVan, berichtVoorMij, tokenUit, gezinstoken, plicht } = gctx;
   const bezorgAanGasten = (g, b) => gctx.bezorgAanGasten(g, b);
 router.post('/gezin/maak', async (req, res) => {
   const bucket = 'maak:' + ipVan(req);
@@ -52,6 +52,7 @@ router.post('/gezin/profiel/maak', async (req, res) => {
   if (!naam) return res.status(400).json({ error: 'Vul een naam in voor het nieuwe profiel.' });
   if (Object.keys(g.profielen).length >= 12) return res.status(400).json({ error: 'Een gezin kan tot 12 profielen hebben.' });
   const rol = ROLLEN.includes(req.body.rol) ? req.body.rol : 'kind';
+  if (plicht.weigerKind(res, rol)) return;
   if (process.env.NODE_ENV !== 'test' && rol !== 'kind')
     return res.status(409).json({ error:'Volwassenen en gasten worden met een persoonlijke uitnodiging gekoppeld.' });
   if (process.env.NODE_ENV !== 'test' && !req.body.geboortedatum)

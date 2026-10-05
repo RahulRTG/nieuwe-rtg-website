@@ -93,6 +93,7 @@ function wisGezin(g) {
   ctx.wisGezinsagenda(g.code);
   delete G()[g.code]; save();
 }
+ctx.wisGezin = wisGezin; // ook voor foundation.js vergeetAccount: een verwijderd ouderaccount
 function volwassenen(g) { return Object.values(g.profielen || {}).filter(p => ['beheerder', 'ouder'].includes(p.rol)); }
 async function adultCheck(g, req, res) {
   const p = profielVan(g, req.body && req.body.token);

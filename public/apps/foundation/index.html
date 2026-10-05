@@ -208,6 +208,7 @@
          the shared Edge. This static button group is not a second dock. -->
     <div class="knoprij foundation-entry-actions" data-rtg-edge-controls>
       <button class="knop hoofd" id="bMaak" data-hoofdactie>Maak een gezin aan</button>
+      <button class="knop grijs" id="bAccount">Via mijn RTG-account</button>
       <button class="knop grijs" id="bLogin">Inloggen bij je gezin</button>
       <a class="knop grijs kaal" href="registreren.html">School, vrijwilliger of stichting</a>
     </div>
@@ -628,6 +629,29 @@
   <div class="rij"><button class="knop grijs klein" data-sluit>Annuleren</button><button class="knop" id="gDoe">Verder</button></div>
 </div></dialog>
 
+<!-- Het gezin aan uw RTG-account (eigen-gezin.js). Geen gezinscode en geen
+     pincode: uw account is de sleutel. Een kind toevoegen of openen gaat pas
+     als RTG uw paspoort heeft gecontroleerd; tot dan staat er waarom. -->
+<dialog id="dlgAccount" aria-labelledby="aTitel"><div class="kaart modal">
+  <h3 id="aTitel">Mijn gezin</h3>
+  <div class="sub" id="aSub">Uw gezin hangt aan uw eigen RTG-account. Geen gezinscode, geen pincode.</div>
+  <div id="aMaak" hidden>
+    <input class="veld" id="aGezin" placeholder="Naam van uw gezin" maxlength="40" aria-label="Naam van uw gezin">
+    <input class="veld" id="aNaam" placeholder="Uw naam in het gezin" maxlength="40" aria-label="Uw naam in het gezin">
+    <label class="mini"><input type="checkbox" id="aBevoegd"> Ik ben ouder of verzorger en mag dit gezin aanmaken.</label>
+    <label class="mini"><input type="checkbox" id="aPrivacy"> Ik heb de <a href="privacy.html">privacy-uitleg</a> gelezen.</label>
+  </div>
+  <div id="aProfielen" hidden></div>
+  <div id="aKind" hidden>
+    <div class="mini" id="aKindUitleg"></div>
+    <input class="veld" id="aKNaam" placeholder="Naam van uw kind" maxlength="40" aria-label="Naam van uw kind">
+    <input class="veld" id="aKGeboren" type="date" aria-label="Geboortedatum van uw kind">
+    <button class="knop grijs klein" id="aKDoe">Kind toevoegen</button>
+  </div>
+  <div class="fout" id="aFout" role="alert"></div>
+  <div class="rij"><button class="knop grijs klein" data-sluit>Sluiten</button><button class="knop" id="aDoe" hidden>Gezin aanmaken</button></div>
+</div></dialog>
+
 <!-- Verplichte onboarding + contract voor volwassen gezinsleden -->
 <div id="rtfOnb" role="dialog" aria-modal="true" aria-labelledby="rtfOnbTitel" hidden>
   <div class="ronb-card">
@@ -945,6 +969,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/glyf.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<script src="eigen-gezin.js" defer></script>
 <script src="premium.js" defer></script>
 </body>
 </html>

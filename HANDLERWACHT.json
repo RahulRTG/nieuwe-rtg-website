@@ -1,11 +1,11 @@
 {
  "stempel": {
-  "op": "2026-10-04T04:49:20.622Z",
-  "commit": "aedf4a83a",
-  "boomVuil": false,
-  "boomAnders": 5,
+  "op": "2026-10-05T04:26:06.556Z",
+  "commit": "f48d5aa1",
+  "boomVuil": true,
+  "boomAnders": 10,
   "instrument": "scripts/handlerwacht.js",
-  "node": "v24.18.0"
+  "node": "v22.22.0"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
@@ -1210,13 +1210,13 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/bericht",
-   "bestand": "server/foundation/gezin.js:127",
+   "bestand": "server/foundation/gezin.js:128",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/bericht/gelezen",
-   "bestand": "server/foundation/gezin.js:155",
+   "bestand": "server/foundation/gezin.js:156",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
@@ -1450,13 +1450,13 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/profiel/verwijder",
-   "bestand": "server/foundation/gezin.js:115",
+   "bestand": "server/foundation/gezin.js:116",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/profiel/wijzig",
-   "bestand": "server/foundation/gezin.js:78",
+   "bestand": "server/foundation/gezin.js:79",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
@@ -1570,19 +1570,19 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/wissen",
-   "bestand": "server/foundation/zorg.js:103",
+   "bestand": "server/foundation/zorg.js:104",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/wissen/bevestig",
-   "bestand": "server/foundation/zorg.js:110",
+   "bestand": "server/foundation/zorg.js:111",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/wissen/intrekken",
-   "bestand": "server/foundation/zorg.js:118",
+   "bestand": "server/foundation/zorg.js:119",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
@@ -4166,7 +4166,7 @@
   },
   {
    "sleutel": "POST /api/zegel/controleer",
-   "bestand": "server/server.js:1413",
+   "bestand": "server/server.js:1417",
    "staat": "openbaar",
    "reden": "controleert een handtekening; het bewijs zit in het verzoek"
   }

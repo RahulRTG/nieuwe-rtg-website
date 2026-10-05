@@ -1,28 +1,28 @@
 {
  "stempel": {
-  "op": "2026-10-05T03:09:44.801Z",
-  "commit": "ff3482c9",
+  "op": "2026-10-05T09:56:11.151Z",
+  "commit": "c07eea11",
   "boomVuil": false,
-  "boomAnders": 4,
+  "boomAnders": 1,
   "instrument": "scripts/mutatiecontract.js",
-  "node": "v22.22.2"
+  "node": "v22.22.0"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5253,
-  "geclassificeerd": 5228,
+  "totaal": 5258,
+  "geclassificeerd": 5233,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3168,
-   "NOT_APPLICABLE": 1262,
+   "NOT_APPLICABLE": 1263,
    "LEGACY_PENDING_CLASSIFICATION": 25,
-   "PROTECTED": 620,
-   "INTENTIONALLY_NON_IDEMPOTENT": 178
+   "PROTECTED": 623,
+   "INTENTIONALLY_NON_IDEMPOTENT": 179
   },
-  "vastgesteldDoorMens": 2112,
+  "vastgesteldDoorMens": 2117,
   "afgeleidDoorScript": 3116,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4324,
+   "AUTHENTICATED": 4329,
    "PUBLIC": 134,
    "OBJECT_SCOPED": 764,
    "(niet af te leiden -- vraagt een verklaring)": 15,
@@ -33,7 +33,7 @@
    "kale ronde: beschermd": 138,
    "kale ronde: onbeschermd": 128,
    "kale ronde: geen uitspraak": 4882,
-   "niet gemeten": 105
+   "niet gemeten": 110
   },
   "voorstellen": {
    "NOT_APPLICABLE": 1
@@ -85460,6 +85460,111 @@
     "grond": "opslag",
     "hindernis": null
    },
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.eigengezin.lezen",
+   "route": "POST /api/rtf/eigen-gezin",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "een eigen RTG-account",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.eigengezin.kind",
+   "route": "POST /api/rtf/eigen-gezin/kind",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "velden",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "een eigen RTG-account",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.eigengezin.meenemen",
+   "route": "POST /api/rtf/eigen-gezin/koppel",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "een eigen RTG-account",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.eigengezin.maken",
+   "route": "POST /api/rtf/eigen-gezin/maak",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "een eigen RTG-account",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.eigengezin.sessie",
+   "route": "POST /api/rtf/eigen-gezin/sessie",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "een eigen RTG-account",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
    "stand": "INTENTIONALLY_NON_IDEMPOTENT",
    "herkomst": "mens",
    "voorstel": null,

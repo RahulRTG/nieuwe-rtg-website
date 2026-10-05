@@ -3,16 +3,16 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-10-05T15:24:50.265Z",
-  "commit": "dd9f252db",
+  "op": "2026-10-05T09:56:31.724Z",
+  "commit": "b8981e1a",
   "boomVuil": false,
-  "boomAnders": 1,
+  "boomAnders": 0,
   "instrument": "scripts/afgeleid.js",
-  "node": "v24.18.0"
+  "node": "v22.22.0"
  },
  "gemeten": {
-  "artefacten": 347,
-  "bron": 26,
+  "artefacten": 348,
+  "bron": 27,
   "afgeleid": 188,
   "fragmenten": 27,
   "momentopname": 1,
@@ -21,7 +21,7 @@
   "metEigenaar": 215,
   "afgeleidEigenaarHard": 187,
   "afgeleidGrendelt": 27,
-  "metStempel": 119,
+  "metStempel": 120,
   "stempelAnders": 0
  },
  "artefacten": [
@@ -971,6 +971,18 @@
    "stempelAnders": false,
    "versheidOpdracht": "npm run doorwerking:vast",
    "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "DPIA-GEZIN.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
    "botsingVerklaard": null
   },
   {
@@ -2993,7 +3005,7 @@
     "scripts/outputband.js",
     "scripts/outputproef.js"
    ],
-   "stempelInstrument": null,
+   "stempelInstrument": "scripts/outputproef.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run meetronde -- --alleen=outputproef",
    "grendelt": false,

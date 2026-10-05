@@ -1,31 +1,31 @@
 {
  "stempel": {
-  "op": "2026-10-05T11:47:18.406Z",
-  "commit": "d45d2b00f",
+  "op": "2026-10-05T09:56:11.151Z",
+  "commit": "c07eea11",
   "boomVuil": false,
-  "boomAnders": 8,
+  "boomAnders": 1,
   "instrument": "scripts/mutatiecontract.js",
-  "node": "v24.18.0"
+  "node": "v22.22.0"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5259,
-  "geclassificeerd": 5234,
+  "totaal": 5258,
+  "geclassificeerd": 5233,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3168,
    "NOT_APPLICABLE": 1263,
    "LEGACY_PENDING_CLASSIFICATION": 25,
-   "PROTECTED": 625,
-   "INTENTIONALLY_NON_IDEMPOTENT": 178
+   "PROTECTED": 623,
+   "INTENTIONALLY_NON_IDEMPOTENT": 179
   },
-  "vastgesteldDoorMens": 2118,
+  "vastgesteldDoorMens": 2117,
   "afgeleidDoorScript": 3116,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4324,
-   "PUBLIC": 138,
+   "AUTHENTICATED": 4329,
+   "PUBLIC": 134,
    "OBJECT_SCOPED": 764,
-   "(niet af te leiden -- vraagt een verklaring)": 17,
+   "(niet af te leiden -- vraagt een verklaring)": 15,
    "SERVICE_TO_SERVICE": 15,
    "SYSTEM_INTERNAL": 1
   },
@@ -33,7 +33,7 @@
    "kale ronde: beschermd": 138,
    "kale ronde: onbeschermd": 128,
    "kale ronde: geen uitspraak": 4882,
-   "niet gemeten": 111
+   "niet gemeten": 110
   },
   "voorstellen": {
    "NOT_APPLICABLE": 1
@@ -511,30 +511,6 @@
   },
   {
    "route": "POST /api/werk-gast/besluit",
-   "bedoeld": "OBJECT_SCOPED",
-   "waargenomen": "PUBLIC",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
-   "route": "POST /api/werk-gast/betaling/start",
-   "bedoeld": "OBJECT_SCOPED",
-   "waargenomen": "PUBLIC",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
-   "route": "POST /api/werk-gast/betaling/status",
-   "bedoeld": "OBJECT_SCOPED",
-   "waargenomen": "PUBLIC",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
-   "route": "POST /api/werk-leverancier/beeld",
-   "bedoeld": "OBJECT_SCOPED",
-   "waargenomen": "PUBLIC",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
-   "route": "POST /api/werk-leverancier/besluit",
    "bedoeld": "OBJECT_SCOPED",
    "waargenomen": "PUBLIC",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
@@ -6437,25 +6413,6 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "bedrijf.praktijk.betaalverzoek",
-   "route": "POST /api/bedrijf/praktijk/betaalverzoek",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "velden",
-   "toegang": {
-    "waargenomen": null,
-    "uitHandler": null,
-    "bedoeld": "OBJECT_SCOPED",
-    "bewakers": []
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
    "mutatieId": "bedrijf.praktijk.delen",
    "route": "POST /api/bedrijf/praktijk/delen",
    "semantiek": {
@@ -6477,25 +6434,6 @@
   {
    "mutatieId": "bedrijf.praktijk.inrichten",
    "route": "POST /api/bedrijf/praktijk/inrichten",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "velden",
-   "toegang": {
-    "waargenomen": null,
-    "uitHandler": null,
-    "bedoeld": "OBJECT_SCOPED",
-    "bewakers": []
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "bedrijf.praktijk.leverancier",
-   "route": "POST /api/bedrijf/praktijk/leverancier",
    "semantiek": {
     "klasse": "idempotent"
    },
@@ -85528,6 +85466,111 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "foundation.eigengezin.lezen",
+   "route": "POST /api/rtf/eigen-gezin",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "een eigen RTG-account",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.eigengezin.kind",
+   "route": "POST /api/rtf/eigen-gezin/kind",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "velden",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "een eigen RTG-account",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.eigengezin.meenemen",
+   "route": "POST /api/rtf/eigen-gezin/koppel",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "een eigen RTG-account",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.eigengezin.maken",
+   "route": "POST /api/rtf/eigen-gezin/maak",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "een eigen RTG-account",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.eigengezin.sessie",
+   "route": "POST /api/rtf/eigen-gezin/sessie",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "een eigen RTG-account",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "rtf.geloof",
    "route": "POST /api/rtf/geloof",
    "semantiek": {
@@ -137552,82 +137595,6 @@
   {
    "mutatieId": "werk.gast.besluit",
    "route": "POST /api/werk-gast/besluit",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "PUBLIC",
-    "uitHandler": null,
-    "bedoeld": "OBJECT_SCOPED",
-    "bewakers": []
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "werk-gast.betaling.start",
-   "route": "POST /api/werk-gast/betaling/start",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "PUBLIC",
-    "uitHandler": null,
-    "bedoeld": "OBJECT_SCOPED",
-    "bewakers": []
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "werk-gast.betaling.status",
-   "route": "POST /api/werk-gast/betaling/status",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "PUBLIC",
-    "uitHandler": null,
-    "bedoeld": "OBJECT_SCOPED",
-    "bewakers": []
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "werk-leverancier.beeld",
-   "route": "POST /api/werk-leverancier/beeld",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "leest",
-   "toegang": {
-    "waargenomen": "PUBLIC",
-    "uitHandler": null,
-    "bedoeld": "OBJECT_SCOPED",
-    "bewakers": []
-   },
-   "bewijs": null,
-   "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "werk-leverancier.besluit",
-   "route": "POST /api/werk-leverancier/besluit",
    "semantiek": {
     "klasse": "idempotent"
    },

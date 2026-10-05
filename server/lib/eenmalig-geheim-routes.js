@@ -24,6 +24,12 @@ const ROUTES = new Set([
   /* Account- en personeelsroutes geven een sessie/PIN eenmalig terug. Een
      generieke retrycache zou die na intrekking vóór de echte deur herhalen. */
   'POST /api/auth/register',
+  /* Het gezin aan een ouderaccount (foundation/gezinseigenaar.js): maken en
+     een sessie openen geven elk een NIEUWE gezinssessie terug. Een herhaald
+     maken krijgt 409, een herhaalde sessie een nieuwe; nooit een oude uit een cache. */
+  'POST /api/rtf/eigen-gezin/maak',
+  'POST /api/rtf/eigen-gezin/sessie',
+  'POST /api/rtf/eigen-gezin/koppel',
   /* De partijsleutel van DemocratieOS (kern/democratie/partijen.js): inschrijven
      en vervangen tonen hem een keer. Een herhaalde inschrijving krijgt 409, een
      herhaald vervangen een NIEUWE sleutel. */

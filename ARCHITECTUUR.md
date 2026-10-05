@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 5389 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 5388 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,14 +18,14 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 5389 |
-| servermodules (`server/**/*.js`) | 4077 |
+| API-endpoints | 5388 |
+| servermodules (`server/**/*.js`) | 4074 |
 | routebestanden (`server/routes/**`) | 638 |
-| kernmodules (`server/kern/**`) | 2563 |
+| kernmodules (`server/kern/**`) | 2561 |
 | schermen (`public/**/*.html`) | 326 |
 | gedeelde browsermodules (`public/shared/*.js`) | 425 |
-| toetsbestanden (`test/*.test.js`) | 2031 |
-| schermtoetsen (`test/*.e2e.js`) | 304 |
+| toetsbestanden (`test/*.test.js`) | 2026 |
+| schermtoetsen (`test/*.e2e.js`) | 303 |
 
 ## 2. De weg van een verzoek
 
@@ -112,7 +112,7 @@ zie §5 -- er zijn nog 254 kern-namen die meer dan één domein aanraakt.
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
 | `auth` | 21 | 6 | 8 | 54 |
-| `member` | 737 | 75 | 17 | 456 |
+| `member` | 742 | 75 | 17 | 456 |
 | `supplier` | 639 | 134 | 6 | 344 |
 | `office` | 98 | 22 | 3 | 98 |
 | `staff` | 27 | 9 | 1 | 43 |
@@ -129,7 +129,7 @@ lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
 bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
 publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 3670 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 3664 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 

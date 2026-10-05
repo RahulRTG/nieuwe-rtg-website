@@ -122,6 +122,13 @@ function maakTokens(getUserById) {
          kale vergelijking. */
       if (!veiligGelijk(kluis.sign(body), sig)) return null;
       const [id, exp, uitgegeven, sid] = body.split('.');
+      /* DE EXP VAN EEN SESSIETOKEN IS EEN GETAL. Deze regel is defense-in-depth
+         naast de domeinscheiding van issueActionToken: een actietoken draagt op
+         de exp-positie zijn PURPOSE ('inlog2'), en `Number('inlog2') < Date.now()`
+         is false -- dus de kale vervalcheck hieronder liet zo'n token door. Elk
+         ding dat met S.SECRET is getekend maar geen numerieke exp heeft, is geen
+         sessietoken. */
+      if (!Number.isFinite(Number(exp))) return null;
       if (Number(exp) < Date.now()) return null;
       if (isIngetrokken(token)) return null; // uitgelogd: de handtekening klopt, wij niet meer
       /* En de sessie zelf. Dit is de tweede deur, en hij bestaat omdat de eerste
@@ -142,13 +149,28 @@ function maakTokens(getUserById) {
       return u;
     } catch (e) { return null; }
   }
+  /* DOMEINSCHEIDING VAN TOKENKLASSEN (RTG-V1-RELEASE blocker 1).
+
+     Een actietoken MOET cryptografisch onverwisselbaar zijn met een sessietoken
+     EN met een actietoken voor een ander doel. Daarom tekent hij niet met de
+     sessiesleutel (kluis.sign = S.SECRET) maar met een per-doel afgeleide
+     sleutel. Gevolg:
+       - `verifyToken` (controleert op S.SECRET) accepteert een actietoken nooit;
+       - `verifyActionToken(token, 'verify-email')` accepteert een 'inlog2'-token
+         nooit, want de afgeleide sleutel verschilt.
+     De doel-string is bewust 'actie:<purpose>', zodat hij ook niet botst met een
+     ander gebruik van sleutelVoor() (bv. 'isolatie-apparaat'). */
+  function actieSleutel(purpose) { return kluis.sleutelVoor('actie:' + String(purpose || '')); }
+
   /* Doel-gebonden token (bijv. e-mailbevestiging), los van de sessie. */
   function issueActionToken(userId, purpose, ttlMs) {
     /* De nonce maakt ook twee uitgiftes in dezelfde milliseconde afzonderlijk
-       intrekbaar. De eerste drie delen blijven gelijk voor oude verifiers. */
+       intrekbaar. */
     const body = userId + '.' + purpose + '.' + (Date.now() + ttlMs) + '.' +
       crypto.randomBytes(16).toString('base64url');
-    return Buffer.from(body).toString('base64url') + '.' + kluis.sign(body);
+    const sig = kluis.signMet(actieSleutel(purpose), body);
+    if (!sig) throw new Error('issueActionToken: geen afgeleide sleutel (kluis niet geinitialiseerd of leeg doel)');
+    return Buffer.from(body).toString('base64url') + '.' + sig;
   }
   function verifyActionToken(token, purpose) {
     token = strikt(token);   // zelfde strikte vorm als een sessietoken
@@ -156,10 +178,14 @@ function maakTokens(getUserById) {
     try {
       const [b64, sig] = String(token).split('.');
       if (!b64 || !sig) return null;
-      // zelfde reden als bij verifyToken: ook dit is een geheim
-      if (!veiligGelijk(kluis.sign(Buffer.from(b64, 'base64url').toString()), sig)) return null;
-      const [id, p, exp] = Buffer.from(b64, 'base64url').toString().split('.');
-      if (p !== purpose || Number(exp) < Date.now()) return null;
+      const body = Buffer.from(b64, 'base64url').toString();
+      /* Controleer met de PER-DOEL afgeleide sleutel. Een token dat met de
+         sessiesleutel is getekend (of voor een ander doel) valt hier af; een
+         ontbrekende sleutel geeft null en wordt dus nooit gelijk bevonden. */
+      const verwacht = kluis.signMet(actieSleutel(purpose), body);
+      if (!verwacht || !veiligGelijk(verwacht, sig)) return null;
+      const [id, p, exp] = body.split('.');
+      if (p !== purpose || !Number.isFinite(Number(exp)) || Number(exp) < Date.now()) return null;
       /* Zonder deze regel is trekInActie een gebaar: het token staat dan wel op
          de lijst, maar niemand kijkt ernaar. Dat was hierboven bij het uitloggen
          precies het gat (aanvalsronde 2, punt 14) -- niet nog een keer. */

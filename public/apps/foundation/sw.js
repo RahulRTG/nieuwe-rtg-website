@@ -64,7 +64,7 @@ const SHELL = [
 
   '/apps/foundation/club.html', '/apps/foundation/klas.html',
   '/apps/foundation/beheer.html', '/apps/foundation/privacy.html',
-  '/apps/foundation/onveilig.html', '/apps/foundation/wegwijzer.html', '/apps/foundation/sessie.js',
+  '/apps/foundation/onveilig.html', '/apps/foundation/wegwijzer.html', '/apps/foundation/sessie.js', '/apps/foundation/gezondheidstoestemming.js',
   '/apps/foundation/voorzijde.js', '/apps/foundation/voorzijde-weergave.js',
   '/apps/foundation/zorg.html', '/apps/foundation/zorg-hulp.js', '/apps/foundation/zorg-hulp-weergave.js',
 

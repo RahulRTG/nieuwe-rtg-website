@@ -11,6 +11,7 @@ module.exports = (ctx) => {
   const vandaagStr = () => new Date().toISOString().slice(0, 10);
   const isDatum = d => /^\d{4}-\d{2}-\d{2}$/.test(String(d || ''));
   const isGast = p => p.rol === 'gast';
+  const mag = (s, res) => ctx.gezondheidToestemming.eis(s, res); // art. 9, zorg.js
 
   function bak(g, pid) {
     if (!g.gezondheid || typeof g.gezondheid !== 'object') g.gezondheid = {};
@@ -70,6 +71,7 @@ module.exports = (ctx) => {
     const pid = doelVan(s, req, res); if (!pid) return;
     const naam = schoon(req.body.naam, 80);
     if (!naam) return res.status(400).json({ error: 'Welk medicijn?' });
+    if (!mag(s, res)) return;
     if (kijk(s.g, pid).medicijnen.length >= 40) return res.status(400).json({ error: 'De medicijnlijst is vol.' });
     bak(s.g, pid).medicijnen.push({ id: rid(3), naam: encS(naam), dosis: encS(schoon(req.body.dosis, 60)), tijd: schoon(req.body.tijd, 24), gegeven: null, door: s.p.id, at: nu() });
     save();
@@ -99,6 +101,7 @@ module.exports = (ctx) => {
     const pid = doelVan(s, req, res); if (!pid) return;
     const wat = schoon(req.body.wat, 80);
     if (!wat) return res.status(400).json({ error: 'Wat voor afspraak?' });
+    if (!mag(s, res)) return;
     if (!isDatum(req.body.datum)) return res.status(400).json({ error: 'Kies een datum.' });
     const tijd = /^\d{2}:\d{2}$/.test(req.body.tijd || '') ? req.body.tijd : '';
     if (kijk(s.g, pid).afspraken.length >= 60) return res.status(400).json({ error: 'Er staan al veel afspraken.' });
@@ -121,6 +124,7 @@ module.exports = (ctx) => {
     const gewicht = Number(req.body.gewicht) > 0 && Number(req.body.gewicht) <= 400 ? Math.round(Number(req.body.gewicht) * 10) / 10 : null;
     const lengte = Number(req.body.lengte) > 0 && Number(req.body.lengte) <= 260 ? Math.round(Number(req.body.lengte) * 10) / 10 : null;
     if (gewicht == null && lengte == null) return res.status(400).json({ error: 'Vul een gewicht of lengte in.' });
+    if (!mag(s, res)) return;
     const datum = isDatum(req.body.datum) ? req.body.datum : vandaagStr();
     const h = bak(s.g, pid);
     if (h.metingen.length >= 300) h.metingen.shift();
@@ -169,6 +173,7 @@ module.exports = (ctx) => {
     // de allergiekaart komt uit het zorgprofiel (oppasinfo), gedeeld voor het gezin
     const o = s.g.oppasinfo || {};
     const allergie = decS(o.allergie) || '';
-    res.json({ personen, allergie, mijnId: s.p.id, magZorgprofiel: ['beheerder', 'ouder'].includes(s.p.rol) });
+    res.json({ personen, allergie, mijnId: s.p.id, magZorgprofiel: ['beheerder', 'ouder'].includes(s.p.rol),
+      toestemming: ctx.gezondheidToestemming.heeft(s.g) });
   });
 };

@@ -12,7 +12,18 @@
       herzien; gisteren niet herschrijven, zo was het toen.
    4. HULP DICHTBIJ, GEEN ALARM. Bij zware dagen toont het SCHERM warme
       wegen naar hulp (steun, hulpwijzer, praten); de server meldt niets
-      aan niemand. Steun aanbieden is niet hetzelfde als verklikken. */
+      aan niemand. Steun aanbieden is niet hetzelfde als verklikken.
+
+   En sinds 5 oktober 2026 een vijfde: TOESTEMMING APART, BIJ EERSTE GEBRUIK
+   (DPIA-GEZIN.md, AVG art. 9). Een gevoel als "bang" of "verdrietig" kan een
+   gegeven over de geestelijke gezondheid zijn, en daar is het tikken op
+   "bewaar" geen grondslag voor. Wie 16 of ouder is geeft die toestemming zelf
+   (toestemming()); voor een jonger kind geeft een ouder hem voor het gezin
+   (foundation/gezondheidstoestemming.js). Toestemming geven is iets anders dan
+   meelezen: de ouder ziet het dagboek daarna nog steeds niet. Intrekken wist
+   het dagboek, want zonder grondslag hoort er niets te blijven staan. */
+
+const { ouderGeeftToestemming } = require('../lib/leeftijd');
 
 module.exports = ({ save }) => {
 
@@ -30,6 +41,17 @@ module.exports = ({ save }) => {
     const d = new Date();
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
   }
+  const onder16 = ouderGeeftToestemming; // lib/leeftijd.js: onder 16 beslist de ouder
+  function heeftToestemming(s) {
+    if (onder16(s.p)) return !!(s.g && s.g.toestemmingGezondheid && s.g.toestemmingGezondheid.at);
+    return !!(s.p.welzijn && s.p.welzijn.toestemming && s.p.welzijn.toestemming.at);
+  }
+  function geenToestemming(s) {
+    const zelf = !onder16(s.p);
+    return { status: 409, hoe: 'toestemming', zelf,
+      error: zelf ? 'Je dagboekje bewaren vraagt eerst je aparte toestemming.'
+        : 'Vraag je ouder om toestemming te geven, dan kun je je dagboekje bewaren.' };
+  }
   const schoon = (v, max) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, max);
 
   // het dagboek: de laatste veertien dagen, plus wat er vandaag al staat
@@ -38,7 +60,7 @@ module.exports = ({ save }) => {
     const grens = new Date(Date.now() - 13 * 86400000);
     const van = grens.getFullYear() + '-' + String(grens.getMonth() + 1).padStart(2, '0') + '-' + String(grens.getDate()).padStart(2, '0');
     const recent = b.stemmingen.filter(x => x.dag >= van).sort((a, z) => a.dag.localeCompare(z.dag));
-    return { ok: true, vandaag: vandaag(),
+    return { ok: true, vandaag: vandaag(), toestemming: heeftToestemming(s), zelfToestemming: !onder16(s.p),
       dagVandaag: b.stemmingen.find(x => x.dag === vandaag()) || null,
       stemmingen: recent };
   }
@@ -49,6 +71,7 @@ module.exports = ({ save }) => {
   function stemming(s, { gevoel, notitie }) {
     const g = String(gevoel || '');
     if (!GEVOELENS.includes(g)) return fout(400, 'Kies een van de gezichtjes.');
+    if (!heeftToestemming(s)) return geenToestemming(s);
     const b = bak(s.p);
     const dag = vandaag();
     let x = b.stemmingen.find(e => e.dag === dag);
@@ -63,5 +86,23 @@ module.exports = ({ save }) => {
     return { ok: true, dag: x };
   }
 
-  return { welzijn: { dagboek, stemming } };
+  /* Zelf toestemming geven of intrekken, vanaf 16. Intrekken wist het
+     dagboek: geen grondslag, geen gegevens. */
+  function toestemming(s, { aan }) {
+    if (onder16(s.p)) return fout(409, 'Voor wie jonger is dan 16 geeft een ouder toestemming, in de privacy-instellingen van het gezin.');
+    if (aan === true) {
+      const b = bak(s.p);
+      if (!b.toestemming) b.toestemming = { at: Date.now() };
+      save();
+      return { ok: true, toestemming: true };
+    }
+    if (aan === false) {
+      delete s.p.welzijn;
+      save();
+      return { ok: true, toestemming: false, gewist: true };
+    }
+    return fout(400, 'Zeg aan of uit.');
+  }
+
+  return { welzijn: { dagboek, stemming, toestemming } };
 };

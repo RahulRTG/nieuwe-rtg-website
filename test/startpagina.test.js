@@ -156,6 +156,22 @@ test('iedere pas heeft vanaf de startpagina een eigen verhaalpagina', () => {
   }
 });
 
+test('de techniek heeft vanaf de startpagina een eigen verhaalpagina', () => {
+  assert.match(HTML, /id="techniek"/);
+  assert.match(HTML, /href="\.\/public\/site\/techniek\/techniek\.html"/);
+  const bestand = path.join(ROOT, 'public/site/techniek/techniek.html');
+  assert.ok(fs.existsSync(bestand));
+  const html = fs.readFileSync(bestand, 'utf8');
+  assert.match(html, /href="\.\.\/start\/start-base\.css"/, 'gebruikt de gedeelde merkbasis');
+  assert.match(html, /href="\.\.\/werelden\/world\.css\?v=[A-Za-z0-9._-]+"/, 'gebruikt het gedeelde verhaalontwerp');
+  assert.match(html, /href="\.\.\/\.\.\/\.\.\/#techniek"/, 'wijst terug naar de technieksectie');
+  assert.match(html, /data-language-picker/, 'draagt de taalknop');
+  for (const m of html.matchAll(/(?:src|href)="(\.\.\/[^"?#]+)["?#]/g)) {
+    if (m[1].startsWith('../../../')) continue;
+    assert.ok(fs.existsSync(path.resolve(path.dirname(bestand), m[1])), m[1] + ' bestaat');
+  }
+});
+
 test('alle lokale HTML- en stylesheetassets zijn projectpad-relatief en bestaan', () => {
   const lokaal = [...HTML.matchAll(/(?:src|href)="(\.\/public\/[^"?#]+)["?#]/g)].map(m => m[1]);
   assert.ok(lokaal.length >= 6, 'de landing noemt zijn lokale bladen, scripts en icoon');

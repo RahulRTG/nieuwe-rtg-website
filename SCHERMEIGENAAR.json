@@ -321,7 +321,8 @@
     "site.werelden.foundationos": "site/werelden/foundationos.html",
     "site.werelden.livingos": "site/werelden/livingos.html",
     "site.werelden.travelos": "site/werelden/travelos.html",
-    "site.werelden.workos": "site/werelden/workos.html"
+    "site.werelden.workos": "site/werelden/workos.html",
+    "site.techniek": "site/techniek/techniek.html"
   },
   "oordelen": [
     {
@@ -2612,6 +2613,12 @@
       "rol": "eigenaar",
       "doelgroep": "publiek",
       "doel": "Begrijpen dat de opgevraagde pagina niet bestaat en een weg terug naar de site of de leden-app vinden."
+    },
+    "site/techniek/techniek.html": {
+      "capability": "site.techniek",
+      "rol": "eigenaar",
+      "doelgroep": "publiek",
+      "doel": "Begrijpen hoe RTG techniek en security aanpakt (de publieke techniek- en security-pagina van de site)."
     },
     "site/passen/business-lite.html": {
       "capability": "site.passen.business-lite",

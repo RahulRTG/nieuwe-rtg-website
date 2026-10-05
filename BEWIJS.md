@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2329 bestanden en 15983 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2333 bestanden en 16034 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2329 |
-| losse beweringen (`test(...)`) | 15983 |
+| toetsbestanden | 2333 |
+| losse beweringen (`test(...)`) | 16034 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 248 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2154 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2158 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2026 bestanden, 15455 beweringen.
+2030 bestanden, 15506 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1268,7 +1268,7 @@ toets omvalt.
 | `partner.test.js` | 8 | gezakt op `liegpoort /api/` | Integratietests voor de PARTNER-app-flows (de leverancier-kant): - personeelslogin met PIN + rate-limiting (bescherming tegen raden) - restaurant/keuken (KDS): een order van nieuw naar klaar zetten - taxi: een rit... |
 | `partnerpas.test.js` | 10 | gezakt op `expliciete bronmutatie` | De toegangseis voor nieuwe partners: een partnerplek vraag je aan ALS LID, met een ZAKELIJKE pas. Het kantoor geeft ook alleen een code uit bij een aanvraag met ledenbewijs. |
 | `partnerpersoneelscode-migratie.test.js` | 4 | gezakt op `liegpoort /api/` | B21 (deur partnerkanaal.personeels_en_partnercode): de oude, zelfgekozen `partner.staff.code` wordt bij de opslagstart uit de opslag gewist, met een telling in het log en een stempel op de partner, nooit met de code... |
-| `partnerpersoneelscode-register.test.js` | 6 | gezakt op `===->!==#0` | De personeelscode van het partnerkanaal zonder server (B14, partnerkanaal.personeels_en_partnercode): 128 bits, hash-only, onderwerp en doel, verval, een maximum aantal boekingen dat atomair wordt verbruikt, roteren... |
+| `partnerpersoneelscode-register.test.js` | 8 | gezakt op `===->!==#0` | De personeelscode van het partnerkanaal zonder server (B14, partnerkanaal.personeels_en_partnercode): 128 bits, hash-only, onderwerp en doel, verval, een maximum aantal boekingen dat atomair wordt verbruikt, roteren... |
 | `partnerpersoneelscode.pg.test.js` | 1 | slaat zichzelf over | Echte productie-topologieproef voor partnerkanaal.personeels_en_partnercode (B14). Twee onafhankelijke kerninstances delen de autoritatieve `partnerPersoneelscodes` in PostgreSQL. |
 | `partnerpersoneelscode.test.js` | 4 | gezakt op `liegpoort /api/` | HET PARTNERKANAAL GESPLITST (besluit B14, partnerkanaal.personeels_en_partnercode), tegen een echte server. De partnercode is een openbare attributielink die niets opent; de personeelscode is een 128-bit credential... |
 | `partnertypes.test.js` | 3 | gezakt op `liegpoort /api/` | De twee leesingangen van de partneraanmelding: /api/partner/types (de kaart van wat RTG per bedrijfstype en land vraagt) en /api/partner/applications/mijn (de eigen aanvragen met hun toelatingsstand). Wat hier op het... |

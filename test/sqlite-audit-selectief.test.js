@@ -101,14 +101,21 @@ test('toegangsschrijvers behouden volledige bundel en falen vóór bevestiging b
 
 test('beide echte auditmiddlewares bewaren hun keten zonder vreemde collecties te lezen', t => {
   const p = proef(t);
+  const exec = DatabaseSync.prototype.exec; let commits = 0;
+  t.mock.method(DatabaseSync.prototype, 'exec', function(sql) {
+    if (sql === 'COMMIT') commits++;
+    return exec.call(this, sql);
+  });
   let gelezen = 0;
   Object.defineProperty(p.db.data.ander, 'toJSON', { value() { gelezen++; return { waarde: this.waarde }; }, configurable: true });
   const handeling = require('../server/lib/handelingsspoor')({ db: p.db, save: p.save });
   const audit = require('../server/opzet/auditspoor').maakAuditspoor({ db: p.db, save: p.save });
+  const commitsVoorAntwoord = commits;
   const req = { method: 'POST', path: '/api/documenten/zet', body: { tekst: 'privé' }, session: { key: 'actor' } };
   const res = new EventEmitter(); res.statusCode = 200;
   handeling.middleware(req, res, () => {}); audit.middleware()(req, res, () => {});
   res.emit('finish');
+  assert.equal(commits - commitsVoorAntwoord, 1, 'beide antwoordsporen delen één SQLite-transactie');
   assert.equal(gelezen, 0, 'auditopslag serialiseert geen andere domeinen');
   assert.equal(p.lees('handelingLog').length, 1);
   assert.equal(p.lees('apiSpoor').commandJournaalTotaal, 1);

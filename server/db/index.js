@@ -88,9 +88,10 @@ function bewaar(sleutels, auditOp) {
      telt dus de POGING; een bundel van drie plus zijn commit telt vier. Bewust:
      de vraag is niet "hoeveel" maar "iets of niets", en die mag geen tak missen. */
   effectmeter.tel('opslag');
+  const auditOps = auditOp ? (Array.isArray(auditOp) ? auditOp : [auditOp]) : [];
   const doos = bundelDoos();
   if (doos && doos.open) {
-    if (auditOp) sqlite.auditMotor().stage(doos, auditOp);
+    for (const op of auditOps) sqlite.auditMotor().stage(doos, op);
     if (sleutels === undefined) doos.volledig = true;
     else {
       if (!doos.sleutels) doos.sleutels = new Set();
@@ -112,7 +113,7 @@ function bewaar(sleutels, auditOp) {
     postgres.planSave();
   } else if (STORE === 'sqlite') {
     // SQLite: kruisproces-sync via versienummers en de poll (geen Redis-mirror).
-    sqlite.saveSqlite(Boolean(sleutels), sleutels, auditOp ? [auditOp] : []);
+    sqlite.saveSqlite(Boolean(sleutels), sleutels, auditOps);
   } else if (STORE === 'geheugen') {
     // GEHEUGEN: versleutelde, incrementele brok-per-collectie-opslag (write-behind).
     geheugen.saveGeheugen();

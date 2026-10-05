@@ -28,19 +28,9 @@ const optie = (naam) => {
   return a ? a.slice(voor.length) : '';
 };
 const hex = (n) => crypto.randomBytes(n).toString('hex');
-const CODEABC = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
-const code = (n) => Array.from({ length: n }, () => CODEABC[crypto.randomInt(CODEABC.length)]).join('');
-
-function base32(buf) {
-  const ABC = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-  let bits = 0, waarde = 0, uit = '';
-  for (const b of buf) {
-    waarde = (waarde << 8) | b; bits += 8;
-    while (bits >= 5) { uit += ABC[(waarde >>> (bits - 5)) & 31]; bits -= 5; }
-  }
-  if (bits > 0) uit += ABC[(waarde << (5 - bits)) & 31];
-  return uit;
-}
+/* OFFICE_CODE en OFFICE_TOTP_SECRET maakt dit script niet meer (4 oktober
+   2026): in productie opent de kantoorcode niets (B10) en koppelen vraagt een
+   eigen passkey in plaats van de gedeelde TOTP (B24). */
 
 const docker = heeft('--docker');
 const priveBeta = heeft('--prive-beta');
@@ -55,7 +45,6 @@ const eigenaar = optie('--eigenaar') || 'VUL-IN@JOUW-DOMEIN.NL';
 const poort = optie('--poort') || '3000';
 const appUrl = optie('--url') || (priveBeta ? 'http://127.0.0.1:' + poort : 'https://VUL-IN.NL');
 const smtpUrl = optie('--smtp-url') || 'smtps://VUL-IN';
-const totp = base32(crypto.randomBytes(20));
 let tlsDomein = 'VUL-IN.NL';
 try { tlsDomein = new URL(appUrl).hostname || tlsDomein; } catch (e) {}
 
@@ -66,8 +55,6 @@ const regels = [
   ['RTG_SECRET_KEY', hex(32), 'sessietokens; gedeeld over alle instances'],
   ['RTG_CLUSTER_KEY', hex(24), 'beschermt de failover-endpoints'],
   ['RTG_MOTOR_TOKEN', hex(32), 'beschermt de interne Rust-geldmotor'],
-  ['OFFICE_CODE', code(12), 'inlogcode van de RTG-Backoffice'],
-  ['OFFICE_TOTP_SECRET', totp, 'tweede factor (2FA) van de backoffice; scan de otpauth-regel hieronder'],
   ['RTG_ISOLATIE_AFDWINGEN', '1', 'persoonlijke bescherm- en isolatiestanden blokkeren server-side; geen schaduwstand in productie'],
   ['DEMO_PASS', hex(12), 'vervangt het demo-wachtwoord (demo staat in productie sowieso uit)'],
   ['RTG_OWNER_EMAIL', eigenaar, 'HANDMATIG: het echte e-mailadres van de eigenaar (technische pagina)'],
@@ -125,8 +112,6 @@ for (const [naam, waarde, uitleg] of regels) {
 
 if (!stil) {
   console.log(blok.join('\n'));
-  console.log('\n# 2FA koppelen: voer dit adres (of het secret hierboven) in je authenticator-app in:');
-  console.log('# otpauth://totp/RTG%20Backoffice?secret=' + totp + '&issuer=RTG');
 }
 
 function schrijfNieuw(doel, inhoud) {

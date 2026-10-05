@@ -71,7 +71,7 @@
     "wekkersZonderTrede": 0,
     "wettenOnbewezen": 5,
     "zaakwigGezakt": 0,
-    "zelfpoortendeToetsen": 46,
+    "zelfpoortendeToetsen": 48,
     "geldRoutesPubliek": 0,
     "geldRoutesZonderSemantiek": 1,
     "geldRoutesZonderIdemBewijs": 3,
@@ -4001,6 +4001,26 @@
       "meter": "bewijsAlleenKeten 18 -> 24 (gemeten op een schone boom; het ingecheckte register stond nog op 18 terwijl main vers al 21 meet). Op uitdrukkelijk besluit van de eigenaar van 2026-10-04.",
       "reden": "Zes mechanismen draaien alleen in de keten omdat ze per definitie een kandidaat-SHA, een CI-run of de veertien routejournalen van GitHub nodig hebben. Drie kwamen met #443 op main en werden nooit gemeten: scripts/evidence.js, evidence-control.js en evidence-calibration.js. Drie komen met #444: tooling/scripts/mutationproof.js (mutationproof.yml), scripts/outputcollect.js en scripts/outputproof.js (ronde.yml). Geen ervan vervangt een lokale proef; het zijn kandidaatgebonden omhulsels eromheen.",
       "waarheen": "De lokale tegenhangers dragen dezelfde vraag: scripts/mutatie.js voor de mutatieproef, scripts/outputproef.js voor de outputproef, en npm run evidence:plan voor het bewijsplan. Zodra scripts/ci-lokaal.js die opdrachten met een lokale kandidaat kan draaien, tellen ze als lokaal bereikbaar en zakt de teller weer."
+    },
+    {
+      "datum": "2026-10-04",
+      "soort": "schuld",
+      "sleutel": "zelfpoortendeToetsen",
+      "van": 47,
+      "vervalt": "2027-01-04",
+      "meter": "zelfpoortendeToetsen 47 -> 48",
+      "reden": "test/foundation-lesstroom.pg.test.js is nieuw (het stroomticket van RTFoundation-onderwijs, besluit B25): acht gelijktijdige claims op een eenmalig ticket over twee instances (precies een opent de stroom) en een intrekking op A tegen een claim op B. Dat kan niet eerlijk zonder PostgreSQL en Redis en slaat lokaal zonder DATABASE_URL over. Lokaal tegen echte PostgreSQL en Redis groen; met de mutatie 'de claim laat het ticket staan' zakte hij. Hij staat in scripts/lib/pg-toetslijst.js (verplicht in CI) en als uitzondering onder zelfpoortende-toets.",
+      "waarheen": "De CI-dienstmatrix draait hem zonder skip; aflossen is de standaardomgeving met PostgreSQL en Redis."
+    },
+    {
+      "datum": "2026-10-04",
+      "soort": "schuld",
+      "sleutel": "zelfpoortendeToetsen",
+      "van": 46,
+      "vervalt": "2027-01-02",
+      "meter": "zelfpoortendeToetsen 46 -> 47",
+      "reden": "test/gezinsdeur.pg.test.js (B18) vereist echte PostgreSQL- en Redis-diensten: hetzelfde eenmalige stroomticket tegelijk op twee instances, twaalf gelijktijdige claims van dezelfde gezinscode en een rotatie op A tegen de oude code op B. Lokaal met die diensten gedraaid en groen; zonder het advisory lock en FOR UPDATE in server/pg/collectietransactie.js zakte hij 3 van 3. Hij staat in scripts/lib/pg-toetslijst.js en als uitzondering in deze norm.",
+      "waarheen": "De CI-dienstmatrix draait hem zonder skip; aflossen is de standaardomgeving met PostgreSQL en Redis."
     }
   ],
   "prestatie": {
@@ -4397,6 +4417,18 @@
       "pad": "test/gezinsuitnodiging.pg.test.js",
       "vervalt": "2026-10-15",
       "reden": "de raceproef voor de gezinsuitnodiging (twee instances en twaalf tikken om dezelfde eenmalige uitnodiging, die een profiel met een gezinssessie oplevert) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl hij lokaal zonder die infrastructuur expliciet overslaat"
+    },
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/foundation-lesstroom.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "de raceproef voor het stroomticket van RTFoundation-onderwijs (B25: acht gelijktijdige claims op een eenmalig ticket over twee instances, en een intrekking op A tegen een claim op B) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl hij lokaal zonder die infrastructuur expliciet overslaat"
+    },
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/gezinsdeur.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "de raceproef voor de gezinsdeur (B18: hetzelfde eenmalige stroomticket tegelijk op twee instances, twaalf gelijktijdige claims van dezelfde gezinscode, en een rotatie op A tegen de oude code op B) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl hij lokaal zonder die infrastructuur expliciet overslaat"
     }
   ]
 }

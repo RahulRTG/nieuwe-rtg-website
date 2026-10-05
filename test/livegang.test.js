@@ -4,8 +4,8 @@
    - de rate-limiter staat aan
    Draai: node --test test/livegang.test.js */
 const test = require('node:test');
-/* Deze productie-opstelling zet OFFICE_TOTP_SECRET, dus de kantoordeur vraagt
-   ook de tweede factor. Idioom uit test/bankbeveiliging.test.js. */
+/* De opstelling zet OFFICE_CODE en -TOTP toch: in productie genegeerd (B10/B24,
+   4 okt 2026), en de code met tweede factor opent niets. */
 const { totpCode } = require('../server/kern/totp');
 const assert = require('node:assert/strict');
 const fs = require('fs');

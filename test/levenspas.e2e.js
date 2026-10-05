@@ -47,7 +47,7 @@ test('de levenspas van het kind: de ouder wacht op HEM, en niets spreekt hem met
   try {
     const g = await post('/api/foundation/gezin/maak', { gezinsnaam: 'Huis', naam: 'Ouder', pin: '1234' });
     const kind = await post('/api/foundation/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Sem', rol: 'kind', groep: 'po', geboortedatum: '2016-04-12' });
-    const kies = await post('/api/foundation/gezin/profiel/kies', { code: g.code, profielId: kind.profiel.id });
+    const kies = await post('/api/foundation/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: kind.profiel.id });
     assert.ok(kies.token, 'het kind kan inloggen op zijn profiel');
 
     /* De OUDER vraagt de band. Dat is precies het geval waar besluit 1 over

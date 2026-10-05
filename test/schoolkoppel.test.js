@@ -65,7 +65,7 @@ test.before(async () => {
   gezin = (await api('/gezin/maak', { gezinsnaam: 'Fam Schakel', naam: 'Ouder Schakel', pin: '1234' })).body;
   const kind = (await api('/gezin/profiel/maak', { code: gezin.code, token: gezin.token, naam: 'Kind Schakel', rol: 'kind', groep: 'kind' })).body;
   kindId = kind.profiel.id;
-  kindToken = (await api('/gezin/profiel/kies', { code: gezin.code, profielId: kindId })).body.token;
+  kindToken = (await api('/gezin/profiel/kies', { gezinscode: gezin.gezinscode, profielId: kindId })).body.token;
   await api('/school/koppel', { code: gezin.code, token: gezin.token, klasCode: klas.code, profielId: kindId });
   await api('/school/uitnodiging/antwoord', { code: gezin.code, token: kindToken, klasCode: klas.code, akkoord: true });
 

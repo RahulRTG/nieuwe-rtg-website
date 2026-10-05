@@ -84,7 +84,7 @@ test.before(async () => {
     naam: 'Milan', rol: 'kind', geboortedatum: '2015-04-04', pin: '5678', kleur: '#3A7BD5' })).body;
   assert.ok(kind.profiel && kind.profiel.id, 'het kindprofiel bestaat: ' + JSON.stringify(kind).slice(0, 160));
   const kies = (await post('/api/foundation/gezin/profiel/kies',
-    { code: gezin.code, profielId: kind.profiel.id, pin: '5678' })).body;
+    { gezinscode: gezin.gezinscode, profielId: kind.profiel.id, pin: '5678' })).body;
   assert.ok(kies.token, 'het kind kiest zijn profiel met zijn pincode: ' + JSON.stringify(kies).slice(0, 160));
   KIND = { code: gezin.code, token: kies.token, profiel: kies.profiel };
   browser = await pw.chromium.launch(browserOpties(pw));

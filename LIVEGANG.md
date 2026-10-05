@@ -80,9 +80,8 @@ npm run motor:init
 versleutelde geldvolume daarna exact eenmaal. Start/restart doet dit nooit
 automatisch en blijft bij een verdwenen of afwijkende volume fail-closed.
 Bewaar een versleutelde kopie van deze bestanden en het geldvolume buiten de
-server. Koppel `OFFICE_TOTP_SECRET` uit `.env.productie` aan de authenticator
-van de eigenaar en verwijder `RTG_OWNER_BOOTSTRAP` zodra het eigenaarsaccount
-is geclaimd.
+server. Verwijder `RTG_OWNER_BOOTSTRAP` zodra het eigenaarsaccount is geclaimd.
+`OFFICE_CODE`/`OFFICE_TOTP_SECRET`: geen eis meer (B10/B24, 4 okt 2026).
 
 ClamAV haalt zijn handtekeningen dagelijks op via een apart update-netwerk en
 publiceert poort 3310 niet op de host. Reserveer hiervoor circa 4 GB RAM; bij te
@@ -115,9 +114,14 @@ ondertekende externe dossier staan.
 5. Keur de host en exact dezelfde CI-kandidaat. `live:golive` bouwt niets en
    raakt de productievolumes niet; het gebruikt een eigen vluchtige
    PostgreSQL-, Redis-, queue- en motoromgeving.
-6. Laat de commitgebonden einduitspraak maken. Alleen nul blokkades mag READY
+6. Draai vóór de wissel op de productiehost, tegen dezelfde `RTG_DATA_DIR` als
+   de app, `npm run ssogeheim:ouderdom -- --op <uitroldatum>` (B27). Elke
+   organisatie met `verloopt-bij-uitrol` heeft een SSO-clientgeheim dat door de
+   afkapping op 90 dagen (B22) bij de uitrol meteen verloopt; laat de eigenaar
+   daar eerst roteren. De lijst leest alleen en toont nooit het geheim.
+7. Laat de commitgebonden einduitspraak maken. Alleen nul blokkades mag READY
    opleveren.
-7. Laat een andere, bevoegde release-authority de READY-uitspraak, kandidaat-
+8. Laat een andere, bevoegde release-authority de READY-uitspraak, kandidaat-
    digests en alle bewijsbytes ondertekenen. Daarna pas volgt de wissel.
 
 ```bash

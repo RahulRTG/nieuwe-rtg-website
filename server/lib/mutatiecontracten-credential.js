@@ -146,5 +146,6 @@ Object.assign(CONTRACTEN, {
 });
 // het gezinsprofieltoken (B17): eigen bestand, want mutatiecontracten.js zit aan zijn grens
 Object.assign(CONTRACTEN, require('./mutatiecontracten-gezinstoken').CONTRACTEN);
+Object.assign(CONTRACTEN, require('./mutatiecontracten-gezinsdeur').CONTRACTEN);
 
 module.exports = { CONTRACTEN };

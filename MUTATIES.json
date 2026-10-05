@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-05T05:20:16.873Z",
-    "commit": "996d9018e",
+    "op": "2026-10-05T07:00:01.580Z",
+    "commit": "1219cce48",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -1045,6 +1045,14 @@
       "module": "server/kern/bearercode.js",
       "operator": "===->!==#0",
       "gezakt": 11,
+      "geprobeerd": 2
+    },
+    "bearercode-vernieuw.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/bearercode.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
       "geprobeerd": 2
     },
     "bearercode.test.js": {

@@ -3,8 +3,7 @@
 module.exports = (sctx) => {
   const { app, werkPoort, workLoopSource } = sctx;
   if (!workLoopSource) return {};
-  const change=kind=>async (req,res)=>{
-    const access=werkPoort(req,res,'kennis'); if (!access) return;
+  const change=async (req,res,kind,access)=>{
     if (!access.rechten.includes('besluit'))
       return res.status(403).json({error:'Deze wijziging vereist zowel kennis- als besluitbevoegdheid.',code:'AUTHORITY_DENIED'});
     if (!access.l || !access.l.id)
@@ -16,8 +15,14 @@ module.exports = (sctx) => {
       data:req.body.data});
     res.status(out.status || 200).json(out);
   };
-  app.post('/api/bedrijf/loop/procedure/change',change('procedure'));
-  app.post('/api/bedrijf/loop/runbook/change',change('runbook'));
+  app.post('/api/bedrijf/loop/procedure/change',async (req,res)=>{
+    const access=werkPoort(req,res,'kennis'); if (!access) return;
+    return change(req,res,'procedure',access);
+  });
+  app.post('/api/bedrijf/loop/runbook/change',async (req,res)=>{
+    const access=werkPoort(req,res,'kennis'); if (!access) return;
+    return change(req,res,'runbook',access);
+  });
   app.post('/api/bedrijf/loop/incident/observe',async (req,res)=>{
     const access=werkPoort(req,res,'service'); if (!access) return;
     if (!access.l || !access.l.id)

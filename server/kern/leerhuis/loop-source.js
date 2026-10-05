@@ -1,13 +1,8 @@
-/* Federated Loop Fabric-adapter voor het Leerhuis.
-
-   Het Leerhuis-spoor blijft de bronwaarheid. Dit bestand maakt uitsluitend
-   immutable voorstel- en receiptregels vervoerbaar en houdt per consumer een
-   checkpoint bij. De adapter kan geen kennisversie activeren en geen
-   praktijkvoorstel goedkeuren. */
 'use strict';
 
 const P=require('../loop-fabric/protocol');
 const D=require('../loop-fabric/delivery');
+const serviceReceipt=require('../loop-fabric/service-receipt');
 const {heeftBestuur,relatieActief}=require('./oordeel');
 
 module.exports=function makeAcademyLoopSource({db,bewerkCollectie,leerhuis,serviceProof,now}) {
@@ -152,14 +147,7 @@ module.exports=function makeAcademyLoopSource({db,bewerkCollectie,leerhuis,servi
     });
   }
   function verifyReceipt(receipt) {
-    if (!receipt || receipt.sourceDomain!=='leerhuis') return {ok:false,code:'SERVICE_PROOF_INVALID',error:'Receipt issuer en brondomein verschillen.'};
-    if (!receipt.serviceProof) return {ok:true,mode:'in-process'};
-    if (!serviceProof || typeof serviceProof.controleerBericht!=='function')
-      return {ok:false,code:'SERVICE_PROOF_UNAVAILABLE',error:'De servicehandtekening kan hier niet worden gecontroleerd.'};
-    const payload=P.clone(receipt); delete payload.serviceProof;
-    const checked=serviceProof.controleerBericht(receipt.serviceProof,payload);
-    return checked.geldig && checked.issuer==='rtg.service.leerhuis' ? {ok:true,mode:'signed',proof:checked}
-      : {ok:false,code:'SERVICE_PROOF_INVALID',error:'De Leerhuis-servicehandtekening klopt niet.'};
+    return serviceReceipt.verify(serviceProof,receipt,{domain:'leerhuis',issuer:'rtg.service.leerhuis',label:'Leerhuis'});
   }
   return {authorization,artifact,resolveObservation,protocolEvents,deliver,deliveryStatus,deliveryStatuses,replayDeadLetter,verifyReceipt};
 };

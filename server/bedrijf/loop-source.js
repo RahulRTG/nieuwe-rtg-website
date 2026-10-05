@@ -3,6 +3,7 @@
 const P = require('../kern/loop-fabric/protocol');
 const envelope = require('../kern/envelop');
 const roles = require('./rollen-beleid');
+const eligibility = require('../kern/loop-fabric/learning-eligibility');
 
 module.exports = function makeWorkLoopSource({db,bewerkCollectie,serviceProof,now}) {
   const time=now || (()=>new Date().toISOString());
@@ -39,6 +40,14 @@ module.exports = function makeWorkLoopSource({db,bewerkCollectie,serviceProof,no
     event.sequence=state.outbox.length+1; event.previousHash=prior ? prior.hash : null;
     event.hash=P.hash(event); state.outbox.push(event); return event;
   }
+  function observationEligibility(observation) {
+    return eligibility.issue({sourceRef:observation.objectRef,purpose:observation.sharing.purpose,
+      memoryClass:'ORGANIZATIONAL',audience:observation.sharing.recipients,
+      basis:{type:'VOLUNTARY_WORKPLACE_SAFETY_REPORT'},allowedFields:['title','text','observedAt','status','assessment'],
+      uses:{decision:true,recall:true,'cross-domain':false,ai:false,aggregate:false,publish:false},issuedAt:observation.recordedAt,
+      validUntil:null,retention:{mode:'SOURCE_LIFECYCLE',policyId:'workos.incident-observation.lifecycle.v1'},
+      epistemicType:'HUMAN_STATED'});
+  }
   async function observeIncident(input) {
     try {
       P.fields(input,['actorRef','memberId','workspaceCode','operationId','incidentId','runbookRef','title','text','occurredAt','purpose','verificationOf','assessment']);
@@ -73,6 +82,7 @@ module.exports = function makeWorkLoopSource({db,bewerkCollectie,serviceProof,no
             consent:true,returnUpdates:false},basis:'voluntary-workos-report',review:{actorRef,at,authorityRef:{workspace:workspace.code,
             memberId:authority.row.id,rights:authority.rights,policy:authority.policy}},contests:[],verificationOf,
           assessment:verificationOf ? P.text(input.assessment || 'unknown',40) : null};
+        observation.eligibility=observationEligibility(observation);
         state.observations[id]=P.clone(observation);
         const eventId='wlo_'+operationKey.slice(0,28);
         appendEvent(state,{id:eventId,type:verificationOf ? 'workos.verification.observed' : 'workos.incident.observed',
@@ -119,6 +129,11 @@ module.exports = function makeWorkLoopSource({db,bewerkCollectie,serviceProof,no
       return {ok:true,observation:P.clone(observation),corrected:false};
     } catch(e) { return P.error(e); }
   }
+  function learningEligibility(ref,recipient,request={}) {
+    const resolved=resolveObservation(ref,recipient);if(!resolved.ok)return resolved;
+    return eligibility.evaluate(observationEligibility(resolved.observation),{sourceRef:ref,purpose:request.purpose,
+      recipient,use:request.use||'recall'},time());
+  }
   const transport=require('./loop-source-transport')({read,tx,time,workspaceFrom,protocolState,serviceProof});
-  return {apply,observeIncident,lifecycleObservation,authorization,artifact,procedure,resolveObservation,...transport};
+  return {apply,observeIncident,lifecycleObservation,authorization,artifact,procedure,resolveObservation,learningEligibility,...transport};
 };

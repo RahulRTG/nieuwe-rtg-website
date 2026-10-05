@@ -14,8 +14,10 @@ module.exports=function decisionContext({read,livingWorld,workSource,time,target
       if (!indexed || P.refKey(indexed.record.objectRef)!==P.refKey(observationRef))
         P.fail('OBSERVATION_NOT_INDEXED','Open de actuele Observation-inbox voordat u hierover besluit.',409);
       const source=sources[observationRef.domain];
-      if (!source || typeof source.resolveObservation!=='function')
+      if (!source || typeof source.resolveObservation!=='function' || typeof source.learningEligibility!=='function')
         P.fail('SOURCE_UNAVAILABLE','Het observatiebrondomein is niet aangesloten.',503);
+      const eligible=source.learningEligibility(observationRef,target(authority.workspaceCode),{purpose:value.purpose,use:'decision'});
+      if (!eligible.ok) P.fail(eligible.code,eligible.error,eligible.status);
       const resolved=source.resolveObservation(observationRef,target(authority.workspaceCode));
       if (!resolved.ok) P.fail(resolved.code,resolved.error,resolved.status);
       const observation=resolved.observation;

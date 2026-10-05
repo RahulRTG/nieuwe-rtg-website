@@ -10,6 +10,8 @@ function projection(state) {
       P.fail('FABRIC_DOMAIN_TRUTH','De Fabric-projectie bevat broninhoud of bronidentiteit.',500);
     if (!row.record || !row.record.objectRef || !row.record.sharing)
       P.fail('FABRIC_REFERENCE_INVALID','Een Observation-indexregel mist haar minimale verwijzing.',500);
+    if (row.record.objectRef.type!=='tombstone' && (!row.record.eligibility || !row.record.eligibility.eligibilityId))
+      P.fail('FABRIC_ELIGIBILITY_REQUIRED','Een leerbare Observation mist source-issued eligibility.',500);
   }
   const receipts=new Set();
   for (const row of Object.values(state.changes || {})) {

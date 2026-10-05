@@ -3,6 +3,7 @@
 const P=require('../loop-fabric/protocol');
 const D=require('../loop-fabric/delivery');
 const serviceReceipt=require('../loop-fabric/service-receipt');
+const eligibility=require('../loop-fabric/learning-eligibility');
 const {heeftBestuur,relatieActief}=require('./oordeel');
 
 module.exports=function makeAcademyLoopSource({db,bewerkCollectie,leerhuis,serviceProof,now}) {
@@ -40,11 +41,17 @@ module.exports=function makeAcademyLoopSource({db,bewerkCollectie,leerhuis,servi
   }
   function observation(org,row) {
     const subjectRef=knowledgeRef(org,row.data),verificationOf=row.data.verificationOf ? P.objectRef(row.data.verificationOf) : null;
-    return {objectRef:proposalRef(row),subjectRef,scopeRefs:[subjectRef],title:'Praktijkvoorstel voor '+(row.data.kennis || org),
+    const out={objectRef:proposalRef(row),subjectRef,scopeRefs:[subjectRef],title:'Praktijkvoorstel voor '+(row.data.kennis || org),
       text:[row.data.probleem,row.data.voorstel,row.data.reden].filter(Boolean).join('\n'),observedAt:row.at,recordedAt:row.at,
       sourceActorRef:null,status:'submitted',sharing:{visibility:'organization',purpose:row.data.purpose || 'academy-practice-improvement',
         recipients:[{domain:'leerhuis',id:org}],consent:true,returnUpdates:true},basis:'human-practice-proposal',
       review:null,contests:[],verificationOf,assessment:verificationOf ? (row.data.assessment || 'unknown') : null};
+    out.eligibility=eligibility.issue({sourceRef:out.objectRef,purpose:out.sharing.purpose,memoryClass:'ORGANIZATIONAL',
+      audience:out.sharing.recipients,basis:{type:'VOLUNTARY_PRACTICE_PROPOSAL'},
+      allowedFields:['title','text','observedAt','status','contests','assessment'],uses:{decision:true,recall:true,'cross-domain':false,
+        ai:false,aggregate:false,publish:false},issuedAt:out.recordedAt,validUntil:null,
+      retention:{mode:'SOURCE_LIFECYCLE',policyId:'leerhuis.practice-proposal.lifecycle.v1'},epistemicType:'HUMAN_STATED'});
+    return out;
   }
   function protocolEvents(org) {
     return leerhuis.spoor(org).slice().reverse().flatMap(row=>{
@@ -78,6 +85,11 @@ module.exports=function makeAcademyLoopSource({db,bewerkCollectie,leerhuis,servi
         assertedBy:'leerhuis-governance',at:(proposal.historie.at(-1)||{}).at || time()}] : [];
       return {ok:true,observation:out,corrected:false};
     } catch(e) { return P.error(e); }
+  }
+  function learningEligibility(ref,recipient,request={}) {
+    const resolved=resolveObservation(ref,recipient);if(!resolved.ok)return resolved;
+    return eligibility.evaluate(resolved.observation.eligibility,{sourceRef:ref,purpose:request.purpose,
+      recipient,use:request.use||'recall'},time());
   }
   function artifact(actorRef,org,ref) {
     const allowed=authorization(actorRef,org,['kennis']); if (!allowed.ok) return allowed;
@@ -149,5 +161,6 @@ module.exports=function makeAcademyLoopSource({db,bewerkCollectie,leerhuis,servi
   function verifyReceipt(receipt) {
     return serviceReceipt.verify(serviceProof,receipt,{domain:'leerhuis',issuer:'rtg.service.leerhuis',label:'Leerhuis'});
   }
-  return {authorization,artifact,resolveObservation,protocolEvents,deliver,deliveryStatus,deliveryStatuses,replayDeadLetter,verifyReceipt};
+  return {authorization,artifact,resolveObservation,learningEligibility,protocolEvents,deliver,deliveryStatus,deliveryStatuses,
+    replayDeadLetter,verifyReceipt};
 };

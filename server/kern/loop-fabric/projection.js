@@ -1,6 +1,7 @@
 'use strict';
 
 const P=require('./protocol'),M=require('./model'),envelope=require('../envelop'),invariants=require('./invariants');
+const eligibility=require('./learning-eligibility');
 
 module.exports=function projection({read,tx,time,livingWorld,workSource,sourceAdapters}) {
   const proof=require('./proof')({read,workSource,sourceAdapters});
@@ -55,12 +56,16 @@ module.exports=function projection({read,tx,time,livingWorld,workSource,sourceAd
           observation.recordedAt || event.at || time());
         return;
       }
+      const eligible=eligibility.issue(observation.eligibility);
+      if (P.refKey(eligible.sourceRef)!==id||eligible.purpose!==observation.sharing.purpose)
+        P.fail('ELIGIBILITY_MISMATCH','Source-issued eligibility hoort niet bij deze Observation of purpose.',403);
       state.observations[id]={eventId:event.id,eventHash:P.hash(event),record:{objectRef:observation.objectRef,
         subjectRef:observation.subjectRef || observation.placeRef,scopeRefs:observation.scopeRefs ||
           [observation.placeRef,observation.blueprintRef].filter(Boolean),placeRef:observation.placeRef,
         planRef:observation.planRef,blueprintRef:observation.blueprintRef,
         status:observation.status,sharing:observation.sharing,recordedAt:observation.recordedAt,
-        validUntil:observation.validUntil || null,verificationOf:observation.verificationOf,assessment:observation.assessment}};
+        validUntil:observation.validUntil || null,verificationOf:observation.verificationOf,assessment:observation.assessment,
+        eligibility:eligibility.minimal(eligible)}};
       const subject=observation.subjectRef || observation.placeRef;
       lineage(state,observation.objectRef,'observed_at',subject,{domain:observation.objectRef.domain,eventRef:event.id,
         at:observation.recordedAt,visibility:observation.sharing.visibility,provenance:{basis:observation.basis}});

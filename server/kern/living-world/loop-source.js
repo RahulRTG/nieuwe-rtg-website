@@ -4,8 +4,19 @@ const M = require('./model');
 const envelope = require('../envelop');
 const protocol = require('../loop-fabric/protocol');
 const delivery = require('../loop-fabric/delivery');
+const eligibility = require('../loop-fabric/learning-eligibility');
 
 module.exports = function makeLivingWorldLoopSource({read,mutate,time}) {
+  function learningEligibility(row) {
+    const share=row.sharing || {visibility:'community',purpose:'world-memory',recipients:[],consent:{basis:'voluntary-contribution'}};
+    const audience=share.visibility==='community'?[{domain:'living-world',id:'commons'}]:(share.recipients||[]);
+    return eligibility.issue({sourceRef:{domain:'living-world',type:'observation',id:row.id,version:row.revision},
+      purpose:share.purpose,memoryClass:share.visibility==='community'?'COMMONS':'RELATIONSHIP_SHARED',audience,
+      basis:{type:share.consent&&share.consent.basis==='explicit'?'EXPLICIT_CONSENT':'VOLUNTARY_EXPLICIT_CONTRIBUTION'},
+      allowedFields:['title','text','observedAt','status','contests','assessment'],uses:{decision:true,recall:true,'cross-domain':audience.some(x=>x.domain!=='living-world'),
+        ai:false,aggregate:false,publish:false},issuedAt:row.recordedAt||row.createdAt,validUntil:row.validUntil||null,
+      retention:{mode:'SOURCE_LIFECYCLE',policyId:'living-world.contribution.lifecycle.v1'},epistemicType:'HUMAN_STATED'});
+  }
   function observationRecord(row) {
     if (!row) return null;
     return {objectRef:{domain:'living-world',type:'observation',id:row.id,version:row.revision},
@@ -17,7 +28,8 @@ module.exports = function makeLivingWorldLoopSource({read,mutate,time}) {
       basis:row.basis,sharing:M.clone(row.sharing || {visibility:'community',purpose:'world-memory',recipients:[]}),
       review:M.clone(row.review || null),contests:M.clone(row.contests || []),
       supersedes:row.supersedes || null,supersededBy:row.supersededBy || null,
-      verificationOf:M.clone(row.verificationOf || null),assessment:row.assessment || null};
+      verificationOf:M.clone(row.verificationOf || null),assessment:row.assessment || null,
+      eligibility:learningEligibility(row)};
   }
 
   function resolveObservation(ref,target) {
@@ -37,6 +49,16 @@ module.exports = function makeLivingWorldLoopSource({read,mutate,time}) {
       return {ok:true,observation:observationRecord(row),corrected,
         requestedRef:r,sourceCurrentVersion:row.revision};
     } catch(e) { return protocol.error(e); }
+  }
+  function evaluateEligibility(ref,target,request={}) {
+    try {
+      const r=protocol.objectRef(ref),s=read();let row=s.contributions&&s.contributions[r.id];
+      if (!row) protocol.fail('SOURCE_MISSING','De eligibility-bron bestaat niet meer.',404);
+      while(row.supersededBy&&s.contributions[row.supersededBy])row=s.contributions[row.supersededBy];
+      const current={domain:'living-world',type:'observation',id:row.id,version:row.revision};
+      return eligibility.evaluate(learningEligibility(row),{sourceRef:current,purpose:request.purpose,
+        recipient:target,use:request.use||'recall'},time());
+    } catch(error) { return protocol.error(error); }
   }
 
   function protocolEvents() {
@@ -136,5 +158,6 @@ module.exports = function makeLivingWorldLoopSource({read,mutate,time}) {
     });
   }
 
-  return {observationRecord,resolveObservation,protocolEvents,returnChangeReceipt,deliver,deliveryStatus,deliveryStatuses,replayDeadLetter};
+  return {observationRecord,resolveObservation,learningEligibility:evaluateEligibility,protocolEvents,returnChangeReceipt,
+    deliver,deliveryStatus,deliveryStatuses,replayDeadLetter};
 };

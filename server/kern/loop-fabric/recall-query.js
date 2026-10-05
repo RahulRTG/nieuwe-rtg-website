@@ -15,7 +15,10 @@ module.exports=({read,sourceAdapters,time})=>{
     for(const indexed of Object.values(read().observations)) {
       const record=indexed.record,shares=(record.sharing.recipients||[]).some(r=>r.domain===consumer.domain&&r.id===consumer.id);
       if(!shares||['withdrawn','deleted','expired','rejected'].includes(record.status))continue;
-      const source=sourceAdapters[record.objectRef.domain];if(!source||typeof source.resolveObservation!=='function')continue;
+      const source=sourceAdapters[record.objectRef.domain];if(!source||typeof source.resolveObservation!=='function'||
+        typeof source.learningEligibility!=='function')continue;
+      const eligible=source.learningEligibility(record.objectRef,consumer,{purpose:record.sharing.purpose,use:'decision'});
+      if(!eligible.ok)continue;
       const resolved=source.resolveObservation(record.objectRef,consumer);
       if(!resolved.ok||['withdrawn','deleted','expired','rejected'].includes(resolved.observation.status))continue;
       const observation=resolved.observation,key=P.refKey(observation.objectRef);if(seen.has(key))continue;seen.add(key);
@@ -53,7 +56,10 @@ module.exports=({read,sourceAdapters,time})=>{
       if(!recipient||recipient.domain!==consumer.domain||recipient.id!==consumer.id||rc.purpose!==purpose||
           !wanted.every(scope=>available.some(row=>same(scope,row))))continue;
       const source=sourceAdapters[receipt.observationRef.domain],changeSource=sourceAdapters[receipt.sourceDomain];
-      if(!source||typeof source.resolveObservation!=='function'){outcomes.push(unavailable(receipt,'SOURCE_UNAVAILABLE'));continue;}
+      if(!source||typeof source.resolveObservation!=='function'||typeof source.learningEligibility!=='function'){
+        outcomes.push(unavailable(receipt,'ELIGIBILITY_UNAVAILABLE'));continue;}
+      const eligible=source.learningEligibility(receipt.observationRef,consumer,{purpose,use:'recall'});
+      if(!eligible.ok){outcomes.push(unavailable(receipt,eligible.code,eligible.error));continue;}
       const observed=source.resolveObservation(receipt.observationRef,consumer);
       if(!observed.ok){outcomes.push(unavailable(receipt,observed.code,observed.error));continue;}
       if(!changeSource||typeof changeSource.artifact!=='function'){outcomes.push(unavailable(receipt,'SOURCE_UNAVAILABLE'));continue;}

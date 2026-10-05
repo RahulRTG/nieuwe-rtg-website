@@ -4,6 +4,8 @@ const assert=require('node:assert/strict');
 const makeWorld=require('../../server/kern/living-world');
 const makeWork=require('../../server/bedrijf/loop-source');
 const makeFabric=require('../../server/kern/loop-fabric');
+const {maakLeerhuis}=require('../../server/kern/leerhuis');
+const makeAcademySource=require('../../server/kern/leerhuis/loop-source');
 
 const clone=value=>JSON.parse(JSON.stringify(value));
 
@@ -23,7 +25,9 @@ function fixture(previous) {
   const sources={name:key=>'Member '+key,context:()=>({items:[],unavailable:[]}),media:()=>null};
   const world=makeWorld({db,bewerkCollectie,save:()=>{},sources,now:()=>now});
   const workSource=makeWork({db,bewerkCollectie,now:()=>now});
-  const fabric=makeFabric({db,bewerkCollectie,livingWorld:world,workSource,now:()=>now});
+  const academy=maakLeerhuis({db,save:()=>{},nu:()=>Date.parse(now)});
+  const academySource=makeAcademySource({db,bewerkCollectie,leerhuis:academy,now:()=>now});
+  const fabric=makeFabric({db,bewerkCollectie,livingWorld:world,workSource,academySource,now:()=>now});
   const workspace={code:'WLOOP',naam:'Loop Werkruimte',leden:{
     lead:{id:'lead',naam:'Olivia Organisator',status:'actief',rtgKey:'user-1',rollen:[{id:'directie',van:null,tot:null,at:now}]}
   },kennis:{procedure_v1:{id:'procedure_v1',titel:'Event toegankelijkheidscheck',tekst:'Controleer de hoofdingang.',
@@ -101,7 +105,7 @@ function fixture(previous) {
     out=await api.post('/api/bedrijf/besluit/sluit',{besluitId:id,evalueerOp:'2026-11-01'});
     assert.equal(out.status,200,JSON.stringify(out.body)); return db.data.werkruimtes.WLOOP.besluiten[id];
   }
-  const api={db,world,workSource,fabric,command,row,setupEvent,eventRun,decide,
+  const api={db,world,workSource,academy,academySource,fabric,command,row,setupEvent,eventRun,decide,
     propose,
     time:()=>now,clock:value=>{now=value;},fault:(name,when)=>{fault=name?{name,when}:null;},
     procedureRef:()=>({domain:'workos',type:'procedure',id:'procedure_v1',version:1}),

@@ -73,7 +73,7 @@ function maakLeerhuis({ db, save, nu, bijeen, inBundel, bronToets }) {
         return { antwoord: { ok: true, herhaald: true, id: (eerder.data || {}).id || null, nr: eerder.nr } };
       }
     }
-    const r = ACTIES[actie](st, invoer || {}, door, { nu: klok, id: nieuwId });
+    const r = ACTIES[actie](st, invoer || {}, door, { nu: klok, id: nieuwId, sleutel: o.sleutel || null, org });
     const gebeurtenissen = Array.isArray(r) ? r : r.gebeurtenissen;
     if (!gebeurtenissen.length) return { antwoord: { ok: true, geschreven: 0, uit: r.uit || null } };
     return { gebeurtenissen, uit: r.uit || null };

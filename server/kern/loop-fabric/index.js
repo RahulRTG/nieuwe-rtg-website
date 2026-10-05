@@ -3,7 +3,7 @@
 const P=require('./protocol'), M=require('./model'), envelope=require('../envelop');
 const klok=require('../../lib/klok');
 
-module.exports=function makeLoopFabric({db,bewerkCollectie,livingWorld,workSource,now}) {
+module.exports=function makeLoopFabric({db,bewerkCollectie,livingWorld,workSource,academySource,now}) {
   const own=require('../eigencollectie')({db,domein:'kern/loop-fabric',bezit:{loopFabric:'kaart'}});
   const time=now || (()=>klok.datum().toISOString());
   const read=()=>M.state(own.kijk('loopFabric'));
@@ -11,9 +11,11 @@ module.exports=function makeLoopFabric({db,bewerkCollectie,livingWorld,workSourc
     if (typeof bewerkCollectie!=='function') P.fail('STORAGE_UNAVAILABLE','De Loop Fabric vereist duurzame collectietransacties.',503);
     return bewerkCollectie('loopFabric',fn);
   };
-  const projector=require('./projection')({read,tx,time,livingWorld,workSource});
+  const sourceAdapters={'living-world':livingWorld,workos:workSource};
+  if (academySource) sourceAdapters.leerhuis=academySource;
+  const projector=require('./projection')({read,tx,time,livingWorld,workSource,sourceAdapters});
   const validateDecisionContext=require('./decision-context')({read,livingWorld,workSource,time,target});
-  const observationSources={'living-world':livingWorld,workos:workSource};
+  const observationSources=sourceAdapters;
   async function sync(workspaceCode) {
     const world=await livingWorld.deliver('loop-fabric',async event=>{
       const result=await projector.ingest(event); if (!result.ok) throw Object.assign(new Error(result.error),result);
@@ -28,18 +30,37 @@ module.exports=function makeLoopFabric({db,bewerkCollectie,livingWorld,workSourc
     }) : {deliveredThrough:0};
     return {ok:true,world,work,returned};
   }
+  async function syncSource(domain,scopeId) {
+    const source=sourceAdapters[domain];
+    if (!source || typeof source.deliver!=='function') return P.error(Object.assign(new Error('Onbekend brondomein.'),
+      {loopFabric:true,code:'SOURCE_UNAVAILABLE',status:503}));
+    const delivered=await source.deliver(scopeId,'loop-fabric',async event=>{
+      const result=await projector.ingest(event); if (!result.ok) throw Object.assign(new Error(result.error),result);
+    });
+    return {ok:true,domain,scopeId,delivered};
+  }
   function target(workspaceCode) { return {domain:'workos',id:String(workspaceCode||'').trim().toUpperCase()}; }
-  function inbox(actorRef,workspaceCode) {
-    const authority=workSource.authorization(actorRef,workspaceCode,['besluit']);
+  function consumerOf(context) {
+    if (context && context.consumer) return {domain:P.text(context.consumer.domain,60),id:P.text(context.consumer.id,160)};
+    return {domain:'workos',id:String(context && context.workspaceCode || '').trim().toUpperCase()};
+  }
+  function authorityFor(actorRef,consumer,required,context) {
+    const adapter=sourceAdapters[consumer.domain];
+    if (!adapter || typeof adapter.authorization!=='function')
+      return {ok:false,error:'Het ontvangende domein heeft geen authority-adapter.',status:503,code:'AUTHORITY_UNAVAILABLE'};
+    return adapter.authorization(actorRef,consumer.id,required,context);
+  }
+  function inboxFor(actorRef,consumer) {
+    const authority=authorityFor(actorRef,consumer,['besluit'],{action:'observation.review'});
     if (!authority.ok) return authority;
     const state=read(), items=[],seen=new Set();
     for (const indexed of Object.values(state.observations)) {
-      const record=indexed.record, shares=(record.sharing.recipients || []).some(r=>r.domain==='workos' && r.id===authority.workspaceCode);
-      if (!shares || !['accepted','superseded'].includes(record.status)) continue;
+      const record=indexed.record, shares=(record.sharing.recipients || []).some(r=>r.domain===consumer.domain && r.id===consumer.id);
+      if (!shares || ['withdrawn','deleted','expired','rejected'].includes(record.status)) continue;
       const source=observationSources[record.objectRef.domain];
       if (!source || typeof source.resolveObservation!=='function') continue;
-      const resolved=source.resolveObservation(record.objectRef,target(authority.workspaceCode));
-      if (!resolved.ok || resolved.observation.status!=='accepted') continue;
+      const resolved=source.resolveObservation(record.objectRef,consumer);
+      if (!resolved.ok || ['withdrawn','deleted','expired','rejected'].includes(resolved.observation.status)) continue;
       const observation=resolved.observation;
       const currentKey=P.refKey(observation.objectRef); if (seen.has(currentKey)) continue; seen.add(currentKey);
       items.push({observationRef:observation.objectRef,observationHash:P.hash(observation),title:observation.title,
@@ -50,10 +71,14 @@ module.exports=function makeLoopFabric({db,bewerkCollectie,livingWorld,workSourc
         placeRef:observation.placeRef,blueprintRef:observation.blueprintRef,
         status:observation.contests.length ? 'contested' : resolved.corrected ? 'corrected' : 'current',
         contests:observation.contests,provenance:{basis:observation.basis,review:observation.review},
-        why:'Deze vrijwillig gedeelde observatie is gericht aan werkruimte '+authority.workspaceCode+'.'});
+        why:'Deze brongebonden observatie is voor dit doel gericht aan '+consumer.domain+' '+consumer.id+'.'});
     }
     items.sort((a,b)=>b.recordedAt.localeCompare(a.recordedAt));
-    return {ok:true,workspaceCode:authority.workspaceCode,items};
+    return {ok:true,consumer,items};
+  }
+  function inbox(actorRef,workspaceCode) {
+    const result=inboxFor(actorRef,target(workspaceCode));
+    return result.ok ? {...result,workspaceCode:result.consumer.id} : result;
   }
   function contextScopes(context) {
     const rows=Array.isArray(context.scopeRefs) ? context.scopeRefs
@@ -63,8 +88,8 @@ module.exports=function makeLoopFabric({db,bewerkCollectie,livingWorld,workSourc
   }
   const sameScope=(left,right)=>left.domain===right.domain && left.type===right.type && left.id===right.id;
   function candidates(actorRef,context) {
-    P.fields(context,['workspaceCode','placeRef','blueprintRef','subjectRef','scopeRefs','action','purpose']);
-    const authority=workSource.authorization(actorRef,context.workspaceCode,['kennis']);
+    P.fields(context,['workspaceCode','consumer','placeRef','blueprintRef','subjectRef','scopeRefs','action','purpose']);
+    const consumer=consumerOf(context),authority=authorityFor(actorRef,consumer,['kennis'],context);
     if (!authority.ok) return authority;
     const scopes=contextScopes(context);
     const action=P.text(context.action,100),purpose=P.text(context.purpose,120), state=read(), items=[];
@@ -72,13 +97,17 @@ module.exports=function makeLoopFabric({db,bewerkCollectie,livingWorld,workSourc
       const receipt=entry.receipt, rc=receipt.context || {};
       const receiptScopes=[...(rc.scopeRefs || [rc.placeRef,rc.blueprintRef].filter(Boolean)),receipt.previousRef,receipt.newRef]
         .filter(Boolean);
-      if (rc.workspaceCode!==authority.workspaceCode || rc.purpose!==purpose ||
+      const receiptConsumer=rc.consumer || (rc.workspaceCode ? {domain:'workos',id:rc.workspaceCode}
+        : rc.organizationCode ? {domain:'leerhuis',id:rc.organizationCode} : null);
+      if (!receiptConsumer || receiptConsumer.domain!==consumer.domain || receiptConsumer.id!==consumer.id || rc.purpose!==purpose ||
           !scopes.every(scope=>receiptScopes.some(row=>sameScope(scope,row)))) continue;
       const source=observationSources[receipt.observationRef.domain];
       if (!source || typeof source.resolveObservation!=='function') continue;
-      const observationResult=source.resolveObservation(receipt.observationRef,target(authority.workspaceCode));
+      const observationResult=source.resolveObservation(receipt.observationRef,consumer);
       if (!observationResult.ok) continue;
-      const artifactResult=workSource.artifact(actorRef,authority.workspaceCode,receipt.newRef);
+      const changeSource=sourceAdapters[receipt.sourceDomain];
+      if (!changeSource || typeof changeSource.artifact!=='function') continue;
+      const artifactResult=changeSource.artifact(actorRef,consumer.id,receipt.newRef);
       if (!artifactResult.ok) continue;
       const observation=observationResult.observation, contested=observation.contests.length>0;
       if (observation.sharing.purpose!==purpose) continue;
@@ -96,7 +125,7 @@ module.exports=function makeLoopFabric({db,bewerkCollectie,livingWorld,workSourc
         visibility:observation.sharing.visibility,purpose:observation.sharing.purpose});
     }
     items.sort((a,b)=>b.appliedAt.localeCompare(a.appliedAt));
-    return {ok:true,workspaceCode:authority.workspaceCode,asOf:time(),items};
+    return {ok:true,consumer,asOf:time(),items};
   }
   async function present(actorRef,input) {
     try {
@@ -133,7 +162,7 @@ module.exports=function makeLoopFabric({db,bewerkCollectie,livingWorld,workSourc
         }
         const recall=state.recalls[input.recallId];
         if (!recall || recall.actorRef!==actorRef) P.fail('NOT_FOUND','Deze recall is niet beschikbaar.',404);
-        const authority=workSource.authorization(actorRef,recall.context.workspaceCode,['kennis']);
+        const consumer=consumerOf(recall.context),authority=authorityFor(actorRef,consumer,['kennis'],recall.context);
         if (!authority.ok) P.fail(authority.code,authority.error,authority.status);
         if (recall.disposition) P.fail('ALREADY_DECIDED','Deze recall is al behandeld.',409);
         recall.disposition={decision:input.decision,reason:P.text(input.reason || '',500,false),at:time()};
@@ -142,6 +171,11 @@ module.exports=function makeLoopFabric({db,bewerkCollectie,livingWorld,workSourc
       });
     } catch(e) { return P.error(e); }
   }
-  return {ingest:projector.ingest,sync,inbox,candidates,present,disposition,
-    rebuild:projector.rebuild,proof:projector.proof,validateDecisionContext,_read:read};
+  function consumerForRecall(recallId) {
+    const recall=read().recalls[String(recallId || '')];
+    return recall ? consumerOf(recall.context) : null;
+  }
+  const proofFor=(actorRef,consumer)=>projector.proofFor(actorRef,consumer);
+  return {ingest:projector.ingest,sync,syncSource,inbox,inboxFor,candidates,present,disposition,
+    consumerForRecall,rebuild:projector.rebuild,proof:projector.proof,proofFor,validateDecisionContext,_read:read};
 };

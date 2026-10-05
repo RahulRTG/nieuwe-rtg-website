@@ -14,13 +14,15 @@ module.exports = ctx => {
     const n = String(naam || '').trim().toLowerCase();
     return n ? (db.data.suppliers || []).find(s => String(s.name || '').trim().toLowerCase() === n) || null : null;
   };
-  function nieuweCode(bron, supplierCode, actor, rotatie = 1) {
+  /* Bearercode v2 met het oude gedrag: `dagen` geldig, een keer te claimen,
+     en de code IS de uitnodiging (er ontstaat geen sessie uit). */
+  const spec = (supplierCode, issuer) => ({ prefix: maakPrefix(), issuer, doel, scope,
+    onderwerp: { soort: 'supplier', id: supplierCode },
+    geldigheid: { duurMs: dagen * 86400000 }, gebruik: { max: 1 }, afgeleid: 'geen' });
+  function nieuweCode(bron, maakEen) {
     const alle = Object.values(bron).flatMap(x => Array.isArray(x) ? x : []);
     for (let poging = 0; poging < 8; poging++) {
-      const gemaakt = bearer.maak({ prefix: maakPrefix(), issuer: actor, doel, scope,
-        onderwerp: { soort: 'supplier', id: supplierCode },
-        geldigMs: dagen * 86400000, maxGebruik: 1 });
-      gemaakt.toegang.rotatie = rotatie;
+      const gemaakt = maakEen();
       const dubbel = alle.some(inv => bearer.zelfdeHash(inv && inv.toegang && inv.toegang.code_hash,
         gemaakt.toegang.code_hash) || (inv && inv.code_historie || []).some(oud =>
         bearer.zelfdeHash(oud && oud.code_hash, gemaakt.toegang.code_hash)));
@@ -55,7 +57,7 @@ module.exports = ctx => {
       if (lijst.filter(x => !x.toegang.ingetrokken_at && !x.claim && !geldig(x)).length >= 500)
         return { status: 409, error: 'Trek eerst oude personeelsuitnodigingen in.' };
       const id = 'sinv-' + crypto.randomBytes(8).toString('hex');
-      const gemaakt = nieuweCode(bron, supplier.code, actorNaam);
+      const gemaakt = nieuweCode(bron, () => bearer.maak(spec(supplier.code, actorNaam)));
       if (!gemaakt) return { status: 500, error: 'Kon geen unieke personeelsuitnodiging maken.' };
       const inv = { id, supplierCode: supplier.code, naam: naam || null,
         role: role === 'manager' ? 'manager' : 'staff', func: func || null,
@@ -94,12 +96,14 @@ module.exports = ctx => {
       return { status: 409, herhaald: true,
         error: 'De nieuwe personeelscode is al eenmalig getoond en wordt niet herhaald.',
         invite: publiek(inv) };
-    bearer.intrekken(inv.toegang, actor, 'geroteerd');
-    inv.code_historie = Array.isArray(inv.code_historie) ? inv.code_historie : [];
-    inv.code_historie.push({ code_hash: inv.toegang.code_hash,
-      ingetrokken_at: inv.toegang.ingetrokken_at, rotatie: inv.toegang.rotatie });
-    const gemaakt = nieuweCode(bron, supplierCode, actor, (inv.toegang.rotatie || 1) + 1);
+    /* VERNIEUWEN: de manager geeft een nieuwe code uit met weer `dagen` geldig
+       en een verse claim, zoals altijd. Volgnummer, geschiedenis en de
+       intrekking van de oude: kern/bearercode-keten.js. De uitgever blijft. */
+    const oud = inv.toegang;
+    const gemaakt = nieuweCode(bron, () => bearer.vernieuw(oud, spec(supplierCode, oud.issuer), actor || 'manager'));
     if (!gemaakt) return { status: 500, error: 'Kon geen unieke personeelsuitnodiging maken.' };
+    inv.code_historie = Array.isArray(inv.code_historie) ? inv.code_historie : [];
+    inv.code_historie.push({ code_hash: oud.code_hash, ingetrokken_at: oud.ingetrokken_at, rotatie: oud.rotatie });
     inv.toegang = gemaakt.toegang;
     inv.laatste_rotatie = { idem_hash: ih, dubbel_hash: ih ? null : dubbelHash,
       at: new Date().toISOString() };

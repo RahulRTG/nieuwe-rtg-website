@@ -10,6 +10,10 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
 const T = require('../server/foundation/onderwijs/toegang');
+/* De sleutels zijn bearercode v2: wie een beveiligingsveld met de hand zet, krijgt
+   `gemanipuleerd`. Om de doel-, verval- en plafondcontrole ZELF te raken, tekent
+   de proef de contracthash na zo'n ingreep opnieuw. */
+const herteken = t => { t.contracthash = require('../server/kern/bearercode')({ crypto, namespace: 'foundation-les' }).contracthash(t); };
 
 function wereld() {
   let klok = Date.parse('2026-09-29T08:00:00Z');
@@ -59,8 +63,11 @@ test('een sleutel met het verkeerde doel of een eigen verval opent niets, ook al
   const les = await t.nieuweLes();
   const k = await t.claim(les.lescode);
   rij(les.lesId).leerlingen[k.studentId].doel = T.DOEL.lescode;
+  assert.equal(t.vanSleutel(les.lesId, k.token).reden, 'gemanipuleerd', 'een overschreven doel is dicht');
+  herteken(rij(les.lesId).leerlingen[k.studentId]);
   assert.equal(t.vanSleutel(les.lesId, k.token).reden, 'verkeerd-doel');
   rij(les.lesId).leraar.expires_at = '2020-01-01T00:00:00.000Z';
+  herteken(rij(les.lesId).leraar);
   assert.equal(t.vanSleutel(les.lesId, les.token).reden, 'verlopen');
 });
 
@@ -78,6 +85,7 @@ test('het plafond: meer dan max_gebruik komt er niet in, en een bezwaar verbruik
   const { db, t, rij } = wereld();
   const les = await t.nieuweLes();
   db.data[T.COLLECTIE][les.lesId].lescode.max_gebruik = 2;
+  herteken(db.data[T.COLLECTIE][les.lesId].lescode);
   const bezwaar = await t.claim(les.lescode, () => 'naam bezet');
   assert.equal(bezwaar.status, 409);
   assert.equal(rij(les.lesId).lescode.gebruik, 0, 'een geweigerde claim telt niet');
@@ -152,4 +160,44 @@ test('een les van voor de migratie: de oude code en tokens openen niets, en ze g
   const json = JSON.stringify(data.foundation);
   assert.equal(json.includes('a'.repeat(48)) || json.includes('b'.repeat(48)), false, 'kale oude tokens op schijf');
   assert.equal(Object.keys(data.foundation.lessen).includes('OUDECODE'), false, 'de oude code is geen sleutel meer');
+});
+
+/* De leraar ROTEERT de lescode (kern/bearercode-keten.js): de nieuwe eindigt met
+   de les zoals de oude, de toetredingen tellen door tegen het plafond, de oude
+   opent niets meer, het volgnummer gaat een omhoog en de geschiedenis zegt
+   `geroteerd`. Ook een v1-lescode van voor bearercode v2. */
+test('roteren: zelfde einde, oude dicht, teller loopt door, rotatie +1, soort geroteerd', async () => {
+  const { t, rij, schuif } = wereld();
+  const les = await t.nieuweLes();
+  const oud = rij(les.lesId).lescode;
+  assert.equal(oud.contractversie, 2, 'de uitgifte is bearercode v2');
+  assert.equal(oud.expires_at, rij(les.lesId).expires_at);
+  assert.ok((await t.claim(les.lescode)).ok);
+  schuif(3600000);
+  const r = await t.roteerLescode(les.lesId, les.token);
+  const nieuw = rij(les.lesId).lescode;
+  assert.equal(nieuw.expires_at, rij(les.lesId).expires_at, 'het einde verschoof');
+  assert.equal(nieuw.rotatie, 2);
+  assert.equal(nieuw.gebruik, 1, 'de toetreding van voor de rotatie telt niet meer mee');
+  assert.equal(nieuw.geschiedenis.at(-1).soort, 'geroteerd');
+  assert.equal(nieuw.geschiedenis.at(-1).door, 'leraar');
+  assert.equal(nieuw.geschiedenis.at(-1).einde_was, nieuw.expires_at);
+  assert.equal(rij(les.lesId).lescode_historie.at(-1).code_hash, oud.code_hash, 'de oude hash staat niet in de historie');
+  assert.equal((await t.claim(les.lescode)).status, 410, 'de oude lescode opent nog iets');
+  assert.ok((await t.claim(r.lescode)).ok, 'de nieuwe opent niets');
+  assert.equal(rij(les.lesId).lescode.gebruik, 2);
+
+  // een v1-lescode (van voor deze wijziging) roteert ook, en wordt daarbij v2
+  const les2 = await t.nieuweLes();
+  const b = require('../server/kern/bearercode')({ crypto, namespace: 'foundation-les', nu: () => rij(les2.lesId).issued_at });
+  const v1 = b.maak({ prefix: 'LES', issuer: 'rtfoundation-onderwijs', doel: T.DOEL.lescode, scope: T.SCOPE.lescode,
+    onderwerp: { soort: 'foundation-les', les: les2.lesId, rol: 'lescode' }, geldigMs: T.GELDIG_MS, maxGebruik: T.MAX_LEERLINGEN });
+  rij(les2.lesId).lescode = v1.toegang;
+  assert.ok((await t.claim(v1.code)).ok, 'de v1-lescode werkt eerst');
+  const r2 = await t.roteerLescode(les2.lesId, les2.token);
+  assert.equal(rij(les2.lesId).lescode.contractversie, 2);
+  assert.equal(rij(les2.lesId).lescode.expires_at, v1.toegang.expires_at);
+  assert.equal(rij(les2.lesId).lescode.rotatie, 2);
+  assert.equal((await t.claim(v1.code)).status, 410);
+  assert.ok((await t.claim(r2.lescode)).ok);
 });

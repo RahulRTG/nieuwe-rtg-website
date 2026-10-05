@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-10-05T20:42:03.472Z",
-  "commit": "94d60b62c",
+  "op": "2026-10-05T20:42:35.968Z",
+  "commit": "53a5b066f",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 1,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.0"
  },
@@ -114332,7 +114332,7 @@
    "semantiek": {
     "klasse": "sleutelVereist"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "object: rekeningId",

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-05T16:17:14.200Z",
-    "commit": "6453dcc3",
+    "op": "2026-10-05T20:20:37.876Z",
+    "commit": "fabbdecd",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -14325,6 +14325,13 @@
       "gezakt": 3,
       "geprobeerd": 4
     },
+    "standbypoort.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "overleefd"
+    },
     "startpagina.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -14824,6 +14831,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "scherp": "gezakt"
+    },
+    "techniek-tweede.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
       "scherp": "gezakt"
     },
     "techniek.test.js": {

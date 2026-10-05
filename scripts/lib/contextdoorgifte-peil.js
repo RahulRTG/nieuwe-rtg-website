@@ -139,6 +139,13 @@ function ijk() {
 }
 try { ijk(); } catch (e) { R.ijkFout = String(e && e.message || e).slice(0, 200); doel = R.meting; }
 
-const schrijf = () => { try { if (UIT) fs.writeFileSync(UIT, JSON.stringify(R)); } catch (e) {} };
+/* Atomair (tmp + rename): de meter leest terwijl dit nog loopt, en een half
+   geschreven bestand hoort geen lege uitslag te worden. Een mislukte schrijf
+   breekt de server niet; de meter ziet dan geen bestand en stopt. */
+const schrijf = () => {
+  if (!UIT) return;
+  try { fs.writeFileSync(UIT + '.tmp', JSON.stringify(R)); fs.renameSync(UIT + '.tmp', UIT); }
+  catch (e) { process.stderr.write('contextdoorgifte-peil: schrijven mislukt: ' + e.message + '\n'); }
+};
 const t = setInterval(schrijf, 1000); t.unref();
 process.on('exit', schrijf);

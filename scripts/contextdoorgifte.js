@@ -270,9 +270,8 @@ async function meetServer(max) {
     }));
     /* De spoeltimers staan op 1 en 5 seconden; daarna nog een schrijfronde van de peiling. */
     await new Promise(r => setTimeout(r, 8000));
-    let R = null;
-    try { R = JSON.parse(fs.readFileSync(uitPad, 'utf8')); } catch (e) { R = null; }
-    if (!R) throw new Error('de peiling in de server heeft niets weggeschreven (' + uitPad + ')');
+    if (!fs.existsSync(uitPad)) throw new Error('de peiling in de server heeft niets weggeschreven (' + uitPad + ')');
+    const R = JSON.parse(fs.readFileSync(uitPad, 'utf8'));   // atomair geschreven; onleesbaar is een fout
     return { R, verzoeken: lijst.length, statussen, rollen, hernieuwd: wacht.hernieuwd(),
       perMethode: lijst.reduce((m, r) => (m[r.methode] = (m[r.methode] || 0) + 1, m), {}) };
   } finally { klaar(); try { fs.rmSync(uitPad, { force: true }); } catch (e) {} }
@@ -358,7 +357,11 @@ if (require.main === module) {
       if (fout.length) { console.error('meterStuk: ' + fout.join('; ')); process.exit(2); }
     }
     const { gemeten, tanden } = samenvatting({ i5, i9, server });
-    let oud = {}; try { oud = JSON.parse(fs.readFileSync(DOEL, 'utf8')); } catch (e) {}
+    /* Geen register is een eerste ronde; een ONLEESBAAR register is geen lege
+       ratel (scripts/stillezing.js) -- dan stopt de meter in plaats van alles
+       door te laten. */
+    let oud = {};
+    if (fs.existsSync(DOEL)) oud = JSON.parse(fs.readFileSync(DOEL, 'utf8'));
     const ratel = Object.assign({}, oud.ratel || {});
     const fout = vergelijk(ratel, tanden, statisch || !!max);
     for (const [k, v] of Object.entries(tanden)) console.log('  ' + k.padEnd(24) + ' ' + v + (k in ratel ? '   (ratel ' + ratel[k] + ', ' + RICHTING[k] + ')' : ''));

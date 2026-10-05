@@ -19,7 +19,8 @@ const WEBSITE_FILES = [
     .map(name => 'public/site/werelden/' + name),
   ...fs.readdirSync(path.join(ROOT, 'public/site/passen'))
     .filter(name => name.endsWith('.html'))
-    .map(name => 'public/site/passen/' + name)
+    .map(name => 'public/site/passen/' + name),
+  'public/site/techniek/techniek.html'
 ];
 
 const VREEMDE_TEKENS = /[\u2014\u2013↗→←·“”‘’…◌◷⌁↳↓]/u;

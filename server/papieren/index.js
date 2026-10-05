@@ -191,15 +191,14 @@ function document(naam) {
      ZONDER VRAAG -- `{{verantwoordelijke}}` dat na een hernoeming
      `{{verantwoordelijke_nieuw}}` heet, of een merkteken dat iemand in het
      document zet zonder er een vraag bij te maken. `vulIn()` laat zo'n
-     merkteken met opzet staan (het weet niet waar het antwoord vandaan moet
-     komen), maar het telde niet als gat -- en dan meldt dit document zich als
+     merkteken met opzet staan, maar het telde niet als gat -- en dan meldt dit document zich als
      INGEVULD terwijl er letterlijk `{{...}}` in staat, en laat de
      go-live-keuring los op een register met een gat erin. Precies wat de kop van
      deze module verbiedt: een register dat zijn eigen gaten verbergt is
      gevaarlijker dan een register met gaten. */
-  const gaten = (tekst.match(/_\(Rahul heeft dit nog niet|_\(nog niet bekend/g) || []).length +
-    (tekst.match(/\{\{\w+\}\}/g) || []).length;
-  return { bestand: d.bestand, waarvoor: d.waarvoor, tekst, gaten };
+  return { bestand: d.bestand, waarvoor: d.waarvoor, tekst, gaten: telGaten(tekst) };
 }
+const telGaten = (tekst) => (tekst.match(/_\(Rahul heeft dit nog niet|_\(nog niet bekend/g) || []).length +
+  (tekst.match(/\{\{\w+\}\}/g) || []).length;
 
-module.exports = { VRAGEN, DOCUMENTEN, volgende, antwoord, overzicht, openVragen, klaar, vulIn, document };
+module.exports = { VRAGEN, DOCUMENTEN, volgende, antwoord, overzicht, openVragen, klaar, vulIn, telGaten, document };

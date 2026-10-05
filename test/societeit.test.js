@@ -33,7 +33,7 @@ let A, B, aCn, bCn;
 async function jong(gezinsnaam, naam) {
   const g = await json(await fnd('/gezin/maak', { gezinsnaam, naam: 'Hoofd ' + naam, pin: '1234' }));
   const p = await json(await fnd('/gezin/profiel/maak', { code: g.code, token: g.token, naam, rol: 'gezinslid', groep: 'jong' }));
-  const kies = await json(await fnd('/gezin/profiel/kies', { code: g.code, profielId: p.profiel.id }));
+  const kies = await json(await fnd('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: p.profiel.id }));
   return { code: g.code, token: kies.token, codenaam: kies.profiel.codenaam };
 }
 test.before(async () => {

@@ -77,5 +77,9 @@ kern.personeelsUitnodiging = require('../routes/supplier/werving/uitnodiging')({
 kern.partnerPersoneelscode = require('../kern/partnerpersoneelscode').personeelscodesVan({ db, crypto,
   bewerkCollectie: hulp.bewerkCollectie,
   zoekPartner: code => kern.findPartner(code) });
+/* B21: de oude, zelfgekozen staff.code gaat bij de opslagstart uit de opslag
+   (kern/partnerpersoneelscode-migratie.js; aangeroepen vanuit server.js). */
+kern.partnerOudeCodes = require('../kern/partnerpersoneelscode-migratie')({
+  bewerkCollectie: hulp.bewerkCollectie });
 
 };

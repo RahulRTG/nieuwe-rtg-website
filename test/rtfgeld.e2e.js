@@ -21,7 +21,7 @@ test('Geldschool: ouder zet weekgeld en verzilvert sterren; het kind ziet het in
     const g = await post('/api/foundation/gezin/maak', { gezinsnaam: 'Fam Munt', naam: 'Pap', pin: '1234' });
     const k = await post('/api/foundation/gezin/profiel/maak', { code: g.code, token: g.token,
       naam: 'Mila', rol: 'kind', groep: 'tiener' });
-    const kindToken = (await post('/api/foundation/gezin/profiel/kies', { code: g.code, profielId: k.profiel.id })).token;
+    const kindToken = (await post('/api/foundation/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: k.profiel.id })).token;
     // de klusketen via de API: 3 sterren verdiend
     const kl = await post('/api/foundation/gezin/klus', { code: g.code, token: g.token, titel: 'Auto wassen', sterren: 3, voor: k.profiel.id });
     await post('/api/foundation/gezin/klus/gedaan', { code: g.code, token: kindToken, klusId: kl.klus.id });

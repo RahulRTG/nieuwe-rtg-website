@@ -313,7 +313,7 @@ test('over de route: een gezinslid mag wel in je team, ook zonder vriendschap', 
   });
   const g = await json(await fnd('/gezin/maak', { gezinsnaam: 'Teamgezin ' + t, naam: 'Ouder', pin: '1234' }));
   const p2 = await json(await fnd('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Oom', rol: 'gezinslid', groep: 'volw' }));
-  const kies = await json(await fnd('/gezin/profiel/kies', { code: g.code, profielId: p2.profiel.id }));
+  const kies = await json(await fnd('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: p2.profiel.id }));
 
   const r = await json(await fetch(BASE + '/api/rtf/spel/team-nieuw', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },

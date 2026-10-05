@@ -73,8 +73,8 @@ echte TURN-server draaien blijft een infrastructuurkeuze (zie docs/turn-server.m
 
 ## 7. Demo-deuren en XSS  (aangepakt)
 Demo-inlog en het demo-account werken alleen buiten productie of met
-`RTG_DEMO=1`; `OFFICE_CODE` valt in productie zonder eigen code terug op een
-onraadbare waarde. Berichten en snaptekst worden server-side van `<`/`>`
+`RTG_DEMO=1`; `OFFICE_CODE` wordt in productie niet gelezen (B10, 4 oktober
+2026): daar opent het kantoor alleen op naam met een passkey. Berichten en snaptekst worden server-side van `<`/`>`
 ontdaan; de front-end escapet via de gedeelde `Util.escapeHTML`. En de CSP is
 nu streng (zie 8): geen `unsafe-inline` meer voor scripts.
 

@@ -40,7 +40,7 @@ async function gezinsLeden() {
   const t = Date.now() + '' + (teller++);
   const g = await json(await fnd('/gezin/maak', { gezinsnaam: 'Leer ' + t, naam: 'Ouder ' + t, pin: '1234' }));
   const oom = await json(await fnd('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Oom ' + t, rol: 'gezinslid', groep: 'volw' }));
-  const kies = await json(await fnd('/gezin/profiel/kies', { code: g.code, profielId: oom.profiel.id }));
+  const kies = await json(await fnd('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: oom.profiel.id }));
   return { A: { code: g.code, token: g.token }, B: { code: g.code, token: kies.token }, bCn: kies.profiel.codenaam };
 }
 

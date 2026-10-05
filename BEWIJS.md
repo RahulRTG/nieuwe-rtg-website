@@ -15,10 +15,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 2313 |
 | losse beweringen (`test(...)`) | 15923 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 248 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2137 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2138 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
-| alleen in de kop *genoemd*, nog niet gemeten | 1 |
+| alleen in de kop *genoemd*, nog niet gemeten | 0 |
 | niets van beide | 1 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -634,7 +634,7 @@ toets omvalt.
 | `gezinhuishouden.test.js` | 3 | gezakt op `liegpoort /api/` | HET HUISHOUDEN: DE KEUKEN, HET SPAARPOT EN HET DROMENBORD. WAT DEZE DRIE BINDT: ze zijn allemaal GEDEELD. |
 | `gezinleven.test.js` | 4 | gezakt op `liegpoort /api/` | HET GEZINSLEVEN: DE OCHTEND EN HET FEEST. WAT DEZE TWEE MODULES GEMEEN HEBBEN Ze coderen allebei een OPVOEDKUNDIGE keuze, en in allebei is die keuze met een half regeltje om te draaien zonder dat er iets kapot lijkt... |
 | `gezinsagenda-motor.test.js` | 6 | gezakt op `===->!==#0` | De gezinsagenda is geen tweede agenda meer (SCHERMEIGENAAR.json, consolidatieronde van 23 september 2026): hij schrijft en leest via dezelfde motor als de ledenagenda, onder de sleutel gezin:<code>. Deze toets draait... |
-| `gezinseigenaar.test.js` | 9 | genoemd | HET GEZIN AAN EEN OUDERACCOUNT, op een ECHTE server (foundation/gezinseigenaar.js, besluit van de eigenaar van 5 oktober 2026). De server draait met RTF_GEZIN_ACCOUNTPLICHT=1: dezelfde plicht die in productie vanzelf... |
+| `gezinseigenaar.test.js` | 9 | gezakt op `liegpoort /api/` | HET GEZIN AAN EEN OUDERACCOUNT, op een ECHTE server (foundation/gezinseigenaar.js, besluit van de eigenaar van 5 oktober 2026). De server draait met RTF_GEZIN_ACCOUNTPLICHT=1: dezelfde plicht die in productie vanzelf... |
 | `gezinskeuken.test.js` | 5 | gezakt op `liegpoort /api/` | Integratietests voor de Gezinskeuken (RTFoundation-gezin): het weekmenu (wat eten we, wie kookt), de "verras me"-ideeen, en de gedeelde boodschappenlijst waar iedereen op afvinkt. Gedeeld per gezin, dicht voor gasten... |
 | `gezinsregistratie.test.js` | 5 | gezakt op `liegpoort /api/` | De snelle gezinsdeur: code + eigen PIN zonder namenlek, kinderen onder de beheerder en volwassenen alleen via een persoonlijke eenmalige sleutel. |
 | `gezinssessie.test.js` | 4 | gezakt op `liegpoort /api/` | Het gezinsprofieltoken op een ECHTE server (foundation.family_profile_token_ buiten_harde_poort, B17): elke uitgifte een nieuwe 128-bit sessie, roteren en afmelden door de houder, de beheerder die een profiel of het... |

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-04T04:41:52.144Z",
-    "commit": "eaf9b488",
+    "op": "2026-10-05T04:36:41.924Z",
+    "commit": "9f6a9282",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 2,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.0"
   },
@@ -4990,6 +4990,13 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "gezinseigenaar.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 9,
+      "scherp": "gezakt"
     },
     "gezinskeuken.test.js": {
       "soort": "server",

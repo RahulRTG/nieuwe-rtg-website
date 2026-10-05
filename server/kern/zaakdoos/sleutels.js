@@ -47,10 +47,13 @@ function maakDoosSleutels({ db, save, crypto, bewerkCollectie, nu }) {
     if (!bron || typeof bron !== 'object' || Array.isArray(bron)) throw new Error('doosSleutels hoort een kaart te zijn');
     return werk(bron);
   });
-  const actief = t => !!t && !bearer.reden(t, { doel: DOEL, negeerGebruik: true });
+  const stand = t => bearer.reden(t, { doel: DOEL, scope: t.scope, negeerGebruik: true });
+  const actief = t => !!t && !stand(t);
 
-  /* Uitgeven of roteren: een tweede uitgifte voor dezelfde doos trekt de vorige
-     sleutel in. Een doos die bij een ANDERE zaak hoort en nog een geldige sleutel
+  /* Uitgeven of "roteren". Een tweede uitgifte voor dezelfde doos bij dezelfde
+     zaak is VERNIEUWEN (kern/bearercode-keten.js): een mens op naam kiest een
+     nieuwe looptijd en scope, de vorige sleutel gaat dicht en volgnummer en
+     geschiedenis lopen door. Een doos die bij een ANDERE zaak hoort en nog een geldige sleutel
      heeft, wordt niet overgenomen -- trek hem daar eerst in. */
   async function geef({ doos, zaak, scope, dagen, door }) {
     const n = naamVan(doos), z = zaakVan(zaak);
@@ -71,15 +74,10 @@ function maakDoosSleutels({ db, save, crypto, bewerkCollectie, nu }) {
       const binnen = Object.values(bron).filter(r => r && r.doos !== n && r.zaak === z && actief(r.toegang)).length;
       if (binnen >= MAX_DOZEN_PER_ZAAK)
         return { status: 409, error: 'Deze zaak heeft al ' + MAX_DOZEN_PER_ZAAK + ' dozen met een geldige sleutel. Trek er eerst een in.' };
-      const g = bearer.maak({ prefix: 'ZD', issuer: ISSUER, doel: DOEL, scope: scopes.map(s => 'zaakdoos.' + s),
-        onderwerp: { doos: n, zaak: z }, geldigheid: { duurMs: d * DAG }, gebruik: 'sessie', afgeleid: 'perAanroep' });
-      const historie = oud && Array.isArray(oud.historie) ? oud.historie.slice(-2) : [];
-      if (oud && oud.toegang && oud.zaak === z) {
-        if (!oud.toegang.ingetrokken_at) bearer.intrekken(oud.toegang, wie, 'geroteerd');
-        historie.push(oud.toegang);
-        g.toegang.rotatie = (Number(oud.toegang.rotatie) || 0) + 1;
-      }
-      bron[n] = { doos: n, zaak: z, toegang: g.toegang, uitgegeven_door: wie, historie };
+      const spec = { prefix: 'ZD', issuer: ISSUER, doel: DOEL, scope: scopes.map(s => 'zaakdoos.' + s),
+        onderwerp: { doos: n, zaak: z }, geldigheid: { duurMs: d * DAG }, gebruik: 'sessie', afgeleid: 'perAanroep' };
+      const g = oud && oud.toegang && oud.zaak === z ? bearer.vernieuw(oud.toegang, spec, wie) : bearer.maak(spec);
+      bron[n] = { doos: n, zaak: z, toegang: g.toegang, uitgegeven_door: wie };
       return { ok: true, doos: n, zaak: z, sleutel: g.code, scope: scopes, expires_at: g.toegang.expires_at,
         rotatie: g.toegang.rotatie,
         let: 'Deze sleutel wordt maar een keer getoond. Zet hem op de doos als RTG_DOOS_EIGEN_SLEUTEL, met RTG_DOOS_ID=' + n +
@@ -128,7 +126,7 @@ function maakDoosSleutels({ db, save, crypto, bewerkCollectie, nu }) {
     return Object.keys(k).sort().map(n => k[n]).filter(r => zaak == null || r.zaak === zaakVan(zaak)).map(r => {
       const t = r.toegang;
       if (!t) return { doos: r.doos || null, legacy: true, geldig: false, uitleg: 'oude sleutel zonder zaak en vervaldatum: opnieuw uitgeven' };
-      const reden = bearer.reden(t, { doel: DOEL, negeerGebruik: true });
+      const reden = stand(t);
       return { doos: r.doos, zaak: r.zaak, scope: t.scope.map(s => s.replace(/^zaakdoos\./, '')), issued_at: t.issued_at,
         expires_at: t.expires_at, verlooptBinnenDagen: Math.max(0, Math.floor((Date.parse(t.expires_at) - tijd()) / DAG)),
         geldig: !reden, stand: reden || 'geldig', rotatie: t.rotatie, uitgegeven_door: r.uitgegeven_door || null,

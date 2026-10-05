@@ -18,7 +18,7 @@
    (DPIA-GEZIN.md, AVG art. 9). Een gevoel als "bang" of "verdrietig" kan een
    gegeven over de geestelijke gezondheid zijn, en daar is het tikken op
    "bewaar" geen grondslag voor. Wie 16 of ouder is geeft die toestemming zelf
-   (toestemming()); voor een jonger kind geeft een ouder hem voor het gezin
+   (dagboekToestemming()); voor een jonger kind geeft een ouder hem voor het gezin
    (foundation/gezondheidstoestemming.js). Toestemming geven is iets anders dan
    meelezen: de ouder ziet het dagboek daarna nog steeds niet. Intrekken wist
    het dagboek, want zonder grondslag hoort er niets te blijven staan. */
@@ -88,7 +88,7 @@ module.exports = ({ save }) => {
 
   /* Zelf toestemming geven of intrekken, vanaf 16. Intrekken wist het
      dagboek: geen grondslag, geen gegevens. */
-  function toestemming(s, { aan }) {
+  function dagboekToestemming(s, { aan }) {
     if (onder16(s.p)) return fout(409, 'Voor wie jonger is dan 16 geeft een ouder toestemming, in de privacy-instellingen van het gezin.');
     if (aan === true) {
       const b = bak(s.p);
@@ -104,5 +104,5 @@ module.exports = ({ save }) => {
     return fout(400, 'Zeg aan of uit.');
   }
 
-  return { welzijn: { dagboek, stemming, toestemming } };
+  return { welzijn: { dagboek, stemming, dagboekToestemming } };
 };

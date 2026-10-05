@@ -32,5 +32,5 @@ module.exports = (kern) => {
 
   app.post('/api/rtf/welzijn/dagboek', gezinsPoort, doe((s) => welzijn.dagboek(s)));
   app.post('/api/rtf/welzijn/stemming', gezinsPoort, doe((s, b) => welzijn.stemming(s, { gevoel: b.gevoel, notitie: b.notitie })));
-  app.post('/api/rtf/welzijn/toestemming', gezinsPoort, doe((s, b) => welzijn.toestemming(s, { aan: b.aan })));
+  app.post('/api/rtf/welzijn/toestemming', gezinsPoort, doe((s, b) => welzijn.dagboekToestemming(s, { aan: b.aan })));
 };

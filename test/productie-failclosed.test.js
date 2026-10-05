@@ -203,8 +203,12 @@ test('20. een OPENBAAR adres zonder NODE_ENV weigert ook de proefstanden die zic
      zelf alleen bij NODE_ENV=production, en RTG_LIEG en RTG_STAATLOG hadden
      geen toets op dit pad. */
   const { NODE_ENV, ...zonderProd } = VEILIG;
-  for (const [vlag, waarde] of [['RTG_LIEG', '/api/'], ['RTG_STAATLOG', '1'], ['RTG_VERRAAD', 'schrijf-verloren'],
-    ['RTG_KLOK', '+1u'], ['RTG_DUURZAAM', 'uit']]) {
+  /* Meer dan een waarde per vlag: de keuring hoort minstens te weigeren wat de
+     runtime aanzet (lib/klok.js, lib/verraad.js, lib/duurzaam.js lezen ook een
+     moment, elke bekende naam en hoofdletters). */
+  for (const [vlag, waarde] of [['RTG_LIEG', '/api/'], ['RTG_STAATLOG', '1'], ['RTG_STAATLOG', '2'],
+    ['RTG_VERRAAD', 'schrijf-verloren'], ['RTG_VERRAAD', ' schrijf-faalt:0.5 '], ['RTG_KLOK', '+1u'],
+    ['RTG_KLOK', '2030-01-01T00:00:00Z'], ['RTG_DUURZAAM', 'uit'], ['RTG_DUURZAAM', 'UIT']]) {
     const r = config.valideer({ ...zonderProd, APP_URL: PUBLIEK, [vlag]: waarde });
     assert.ok(r.hardeFouten.some(f => f.includes(vlag)), vlag + '=' + waarde + ' hoort op een openbaar adres hard te weigeren');
   }

@@ -80,6 +80,8 @@ test('4. de crashweg in server.js geeft de crash door aan bijCrash (in code, nie
     'de crashweg geeft de ECHTE bundelvraag mee en geen eigen functie (toets 4g; tweede herkeuring van D1)');
   assert.match(code('server/server.js'), /const \{[^}]*\binBundel\b[^}]*\} = require\('\.\/db'\)/,
     'en die bundelvraag is die van de opslag');
+  assert.doesNotMatch(h, /\b(?:const|let|var|function)\s+inBundel\b|\binBundel\s*=[^=]/,
+    'en de handler overschaduwt hem niet met een eigen inBundel');
   assert.doesNotMatch(h, /process\.exit\(\s*0\s*\)/, 'een crash mag nooit als nette afsluiting eindigen');
 });
 

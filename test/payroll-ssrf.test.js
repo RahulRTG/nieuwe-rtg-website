@@ -124,10 +124,12 @@ test('9. het PRODUCTIEPAD (urlBron) breekt een te groot antwoord ook af, en lees
 });
 
 test('10. een punt in de naam maakt nog geen publiek domein: interne netwerknamen worden geweigerd', () => {
-  for (const url of ['https://redis.rtg_data/x.json', 'https://motor.rtg_data:3100/x.json', 'https://db.internal/x.json',
+  for (const url of ['https://redis.rtg_data/x.json', 'https://redis.rtg-data/x.json', 'https://REDIS.RTG_DATA./x.json',
+    'https://motor.rtg_data:3100/x.json', 'https://db.internal/x.json',
     'https://nas.lan/x.json', 'https://printer.local/x.json', 'https://x.home.arpa/x.json']) {
     assert.match(String(keurBronUrl(url)), /publiek topdomein|privé|gereserveerd|eigen netwerk/, url);
   }
-  for (const url of ['https://regels.voorbeeld.nl/nl.json', 'https://loontabel.voorbeeld.invalid/nl.json', 'https://xn--bcher-kva.example/x.json'])
+  for (const url of ['https://regels.voorbeeld.nl/nl.json', 'https://loontabel.voorbeeld.invalid/nl.json', 'https://xn--bcher-kva.example/x.json',
+    'https://regels.voorbeeld.xn--p1ai/x.json', 'https://regels.voorbeeld.museum/x.json'])
     assert.equal(keurBronUrl(url), null, url + ' blijft gewoon mogen');
 });

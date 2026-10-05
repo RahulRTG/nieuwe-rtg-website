@@ -135,8 +135,11 @@ test('4. uitzetten deelt de rem: tien foute codes op /uit, en ook de juiste zet 
   const srv = await startServer({ env: { RTG_DATA_DIR: dir } });
   const base = srv.base;
   const post = postJson(base);
+  /* Elke poging van een eigen adres: een emmer per adres zou hier niet vullen
+     (de herkeuring van ronde 3 liet die mutant overleven op een vast adres). */
+  let n = 0;
   const uit = async (token, code) => (await fetch(base + '/api/mijn/tweefactor/uit', { method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token, 'X-Forwarded-For': '198.51.100.' + (++n) },
     body: JSON.stringify({ huidig: 'geheim12', code }) })).status;
   try {
     const reg = await post('/api/auth/register', { name: 'Rem Vier', email: 'tweede-rem4@voorbeeld.test', password: 'geheim12', geboortedatum: '1990-01-01' });
@@ -150,6 +153,13 @@ test('4. uitzetten deelt de rem: tien foute codes op /uit, en ook de juiste zet 
       'na tien foute codes zit uitzetten op slot, ook voor de juiste code');
     const stand = await post('/api/mijn/tweefactor', {}, reg.token);
     assert.equal(stand.aan, true, 'de tweede factor staat nog aan');
+    /* En het is DEZELFDE emmer als de tweede inlogstap: wie hier gokte, krijgt
+       daar geen tien nieuwe. */
+    const login = await post('/api/auth/login', { login: 'tweede-rem4@voorbeeld.test', password: 'geheim12', pasApp: 'rtg' });
+    const tweede = await fetch(base + '/api/auth/tweede', { method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': '203.0.113.9' },
+      body: JSON.stringify({ bewijs: login.bewijs, code: totpCode(begin.geheim, Date.now() + 30000, 30) }) });
+    assert.equal(tweede.status, 429, 'de gokken op /uit tellen ook voor de inlog');
   } finally {
     await stop(srv);
     try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {}

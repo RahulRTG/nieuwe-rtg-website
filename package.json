@@ -181,6 +181,8 @@
     "loopfabric:coverage:controle": "node scripts/loop-fabric-coverage.js --controle",
     "loopfabric:execution": "node scripts/loop-fabric-execution.js",
     "loopfabric:execution:controle": "node scripts/loop-fabric-execution.js --controle",
+    "loopfabric:flows": "node scripts/loop-fabric-source-flows.js",
+    "loopfabric:flows:controle": "node scripts/loop-fabric-source-flows.js --controle",
     "inlinestijl": "node scripts/inlinestijl-ronde.js",
     "inlinestijl:toon": "node scripts/inlinestijl-ronde.js --toon",
     "deelindex": "node scripts/deelindex.js",

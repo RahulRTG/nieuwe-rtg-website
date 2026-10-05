@@ -63,7 +63,7 @@ test('2. het schoolkind: de eigen Rahul kent de klas en het open huiswerk, en he
   const kl = await rtf('/school/leraar/klas/maak', { schoolCode: sch.body.schoolCode, personeelToken: p.body.personeelToken, naam: 'Groep 6' });
   const g = await rtf('/gezin/maak', { gezinsnaam: 'Fam Bijles', naam: 'Ouder Bijles', pin: '1234' });
   const kind = await rtf('/gezin/profiel/maak', { code: g.body.code, token: g.body.token, naam: 'Kind Bijles', rol: 'kind', groep: 'kind' });
-  const kindToken = (await rtf('/gezin/profiel/kies', { code: g.body.code, profielId: kind.body.profiel.id })).body.token;
+  const kindToken = (await rtf('/gezin/profiel/kies', { gezinscode: g.body.gezinscode, profielId: kind.body.profiel.id })).body.token;
   await rtf('/school/koppel', { code: g.body.code, token: kindToken, klasCode: kl.body.code });
   await rtf('/school/huiswerk/maak', { klasCode: kl.body.code, leraarToken: p.body.personeelToken,
     titel: 'Oefen optellen', vak: 'rekenen', doel: 'rekenen.g3.optellen-tot-20' });

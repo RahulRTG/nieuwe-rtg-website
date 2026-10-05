@@ -7,7 +7,7 @@
    Gemount vanuit foundation.js op de gedeelde context. */
 module.exports = (ctx) => {
   const { router, eigenVeld, nu, save, rid, schoon, encS, decS,
-    sessieVan, gezinVan, profielVan } = ctx;
+    sessieVan } = ctx;
 
   const gezinSse = new Map(); // code -> Set van { res, profielId }
   function gezinStuur(code, event, data, filter) {
@@ -29,17 +29,21 @@ module.exports = (ctx) => {
     if (ctx.pushHook) { try { ctx.pushHook(profiel.koppel.userId, { title: 'RTFoundation · ' + g.naam, body: van + ': ' + String(tekst).slice(0, 120), tag: 'rtf-chat-' + van }); } catch (e) {} }
   }
 
-  router.get('/gezin/:code/kanaal', (req, res) => {
-    const g = gezinVan(req, res); if (!g) return;
-    const p = profielVan(g, req.query.token);
-    if (!p) { res.status(403).end(); return; }
+  /* Het live-kanaal opent met een EENMALIG stroomticket (B18, ../gezinsstroom.js),
+     nooit met de sessie in de URL. Elke hartslag kijkt of de sessie achter het
+     ticket nog leeft; afgemeld of ingetrokken sluit de stroom. */
+  router.get('/gezin/:code/kanaal', async (req, res) => {
+    const s = await ctx.gezinsstroom.open(req.params.code, req.query.ticket, 'gezin');
+    if (!s.ok) { res.status(s.status === 503 ? 503 : 401).end(); return; }
+    const { g, p } = s;
     res.set({ 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', Connection: 'keep-alive', 'X-Accel-Buffering': 'no' });
     res.write('retry: 3000\n\n');
     const client = { res, profielId: p.id };
     let set = gezinSse.get(g.code); if (!set) { set = new Set(); gezinSse.set(g.code, set); }
     set.add(client);
-    const hart = setInterval(() => { try { res.write(': ping\n\n'); } catch (e) {} }, 25000);
-    req.on('close', () => { clearInterval(hart); set.delete(client); });
+    const stop = () => { clearInterval(hart); set.delete(client); };
+    const hart = setInterval(() => { if (!s.leeft()) { stop(); return res.end(); } try { res.write(': ping\n\n'); } catch (e) {} }, 25000);
+    req.on('close', stop);
   });
 
   router.post('/gezin/chat', (req, res) => {
